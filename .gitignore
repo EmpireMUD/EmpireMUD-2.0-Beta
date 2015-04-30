@@ -1,0 +1,4 @@
+config.*
+syslog
+syslog.conf
+
