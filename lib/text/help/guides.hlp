@@ -1,0 +1,224 @@
+"GETTING STARTED"
+
+New here? There's a few things you should read as you go:
+
+1. The INFO command shows a really good newbie guide.
+2. Typing HELP by itself lists a bunch of suggested commands and topics.
+3. HELP EMPIRE GUIDE for help starting an empire.
+4. HELP HOUSING GUIDE will help you build your first house.
+5. HELP IRON GUIDE will guide you through mining and forging.
+
+Are you a vampire? Try HELP VAMPIRE GUIDE.
+Are you using a screen reader? There's more info on HELP SCREEN READERS.
+
+See also: DEPLETION, LEVELS, SKILL CAPS, SKILL POINTS
+#
+"EMPIRE GUIDE"
+
+Quickstart Guide: Empires
+
+Once you have claimed a square of land on the map, your character will auto-
+matically found an empire. By default, the empire has the same name as your
+character.
+
+You can tell who owns a piece of land because it says the name underneath the
+map. It may also say the land is unclaimable, which usually means you're too
+close to a starting location. You can claim land anywhere that isn't already
+claimed, but you'll only be able to found a CITY if you're far enough away
+from starting locations and other cities. The NEARBY command will tell you if
+you're close to those.
+
+The mud's website has a graphical map that can help you find areas that aren't
+owned. You can also use TOGGLE POLITICAL to see which map tiles are claimed at
+a distance.
+
+You don't need to found a city yet, but you will be limited on how much land
+you can claim that isn't in a city. To find out what your claim limits are,
+type "empire <name>" (using the name of your character or empire). There is a
+line on that display that says "Territory: XXX in cities, YYY/ZZZ outside".
+If you reach your claim limit, you won't be able to claim more land. The
+TERRITORY help file has more information on gaining territory. It can also be
+used to find places you claimed that you might not want any more.
+
+Once you've started your empire, you should use EEDIT to get it set up:
+ > eedit name <name> - Change the full name of the empire.
+ > eedit adjective <name> - Change the "adjective form" of the name.
+ > eedit banner <color code> - See HELP COLORS for a list of color codes.
+ > eedit rank 2 <rank name> - Rename your leader rank.
+ 
+Your empire adjective should be relatively short, as it's used to build some
+sentences. If your empire is "The Grand and Eternal House of Valerie", you
+might choose "Valerien" as your adjective form. This will be used for things
+like minting "Valerien coins", or sentences like "You are in the Valerien city
+of Oroborous."
+
+You can change the number of ranks in your empire, and give names to each rank.
+However, this usually isn't important until you have more members. You can also
+set PRIVILEGE levels to restrict some actions to certain ranks in your empire.
+
+When you're ready to found your first city, find a good location with nothing
+around it on the NEARBY display. You'll want to be at least 30 tiles from any
+other city or starting location. CITY FOUND will start a city at your current
+location.
+
+You can recruit additional members for your empire on the /recruit channel,
+but you may still want to roleplay the introduction and invitation when you
+meet up with them.
+
+If you make any alts (other characters on the same account; see POLICY for
+rules), you can add them to your own empire by having them PLEDGE to it, then
+switching back to your empire leader and using ENROLL and PROMOTE. These
+characters don't have to be online at the same time. These are also the
+commands that other players will use to join.
+
+As you build houses, you will see citizens move in to live in your empire. You
+can even put them to work after unlocking the WORKFORCE technology. Unlocking
+technologies is also a good way to earn more territory.
+
+Other important empire commands: ROSTER, ESAY, ELOG, EEDIT, CITY
+#
+"HOUSING GUIDE"
+
+Quickstart Guide: Your First House
+
+Now that you have spent some time in the wilderness learning basic SURVIVAL and
+how to CRAFT some simple tools, it is probably a good time to find a suitable
+home. A CABIN is an easy way to start.
+
+The first step in any building project is choosing an appropriate location. For
+the CABIN, this will eventually require two adjoining map tiles which are both
+open plains. You will need one tile for the CABIN to occupy and another for the
+entrance to face. If you want to place your building in the woods, you can
+clear out the necessary space during the next phase.
+
+Once you've picked a nice spot, you will need your building materials. Typing
+HELP CABIN reveals that you will need a total of 6 logs for construction. That
+means you will need to find some trees, which are hopefully not too far away.
+You will want to make sure to WIELD your trusty axe and proceed to CHOP while
+in a forest tile. A fully grown forest tile will provide 4 trees, so you will
+have to clear out 2 map tiles of dense forest for all of the material. If you
+are building your CABIN in the woods, these two tiles can be for placement of
+the building.
+
+After chopping down 6 trees, you will want to SCRAPE TREE to convert the trees
+into logs and sticks. After all the scraping, you will end up with six logs
+and maybe two dozen sticks. If you can't hold all the materials, you'll want
+to move them to the construction site in preparation for the BUILD.
+
+Now you should be at the intended construction site with all 6 logs present
+in your inventory or on the ground. Make sure the tile is cleared of any trees
+and also that there is a neighboring tile open in the direction of the intended
+entrance. When everything is ready, type BUILD CABIN [X], where [X] is the
+direction you'd like the entrance to face. If you have not yet done so, this
+action will also CLAIM the tile where you stand.
+
+Once all the logs have been put in place, your construction will be complete
+and you will have your very first house! Use the HOME command to set this as
+your home, and you'll be able to use a HESTIAN TRINKET to teleport back.
+
+Try the INFO command for more getting-started tips.
+#
+"IRON GUIDE" "MINING GUIDE" "FORGE GUIDE"
+
+To Arms! Out of the Stone Age
+Using Iron Ore: Foundry, Mine & Forge
+
+The trusty stone axe has been a blessed companion so far. It chops. It scrapes.
+It skins. It slices and it dices. It's a weapon, and a tool. In many ways, it
+has been your best friend. Nevertheless, you'll want to invest in bigger and
+better tools eventually, and that will require a lot of iron ore.
+
+Like stone and lumber, ore is an essential resource, but unlike those two, iron
+ore is a little harder to obtain. Rocks and trees are just dug up or chopped
+down and taken to storage, but mining ore involves constructing a building at
+the site, just to extract it. Iron ore is only found in mountain tiles, and you
+must BUILD MINE to get at it.
+
+{FF}
+Before that, you'll want to make sure you've got a place to smelt all that iron
+ore you plan on mining. BUILD FOUNDRY requires 20 sticks (type HELP FOUNDRY)
+and this building will let you store your iron ore, as well as melt it down
+to ingots. This means that, if your MINE will be quite a distance from your
+main settlement, you can build a second FOUNDRY in which to deposit the mined
+ore and it will be accessible from the first. Typing INVENTORY in the FOUNDRY
+will let you see your empire's ore and ingot supply. RETRIEVE and STORE will
+let you take and deposit ore, respectively. SMELT ORE will let you turn two
+iron ore into one iron ingot.
+
+&y/&0[]&y\&0
+When you are ready to BUILD MINE, make sure you have the 4 required logs
+(type HELP MINE). You'll want to find a mountain tile on the edge of a range,
+so that the MINE's entrance can face an open plains tile. Once the MINE is
+finished, you can use the MINE command to begin looking for ore. The question
+that inevitably comes up at this point is "How do I mine without a pick?" You
+need iron to make a pick, and you can't get the iron without the pick!
+
+That stone axe of ours was made by the CRAFT command, with a handaxe and a
+handle. Instead of turning it into an axe, we can also WIELD a handaxe and use
+it for mining. If you need to, craft another handaxe by chipping one rock 
+against another. WIELD HANDAXE, then MINE until there's no ore left. Sometimes,
+you come across gold dust while mining ore, or perhaps the entire mine is full
+of silver instead of iron. Silver nuggets and gold dust can be stored in your
+empire's vault, which will increase its wealth rating. They can also be used in
+the FORGE, which will be discussed here shortly. When the MINE is finally
+depleted, DISMANTLE it so that the mountain tile can eventually replenish
+itself. Start another MINE along the mountain range in the meantime.
+
+[FF]
+You'll need to get your empire's iron flowing before you BUILD FORGE, because
+this building requires 10 logs, 15 rocks, and 10 iron ingots (type HELP FORGE).
+Once constructed, however, you will be able to FORGE ingots into various tools,
+weapons, and armor, according to your skill level. You can make jewelry and
+special items with gold and silver, and the FORGE (or FOUNDRY) is also where
+you SMELT these valuable metals into coins or bars. Similar to the mining
+issue, the question inevitably comes up at this stage: "how do I forge a hammer
+without a hammer to forge?"
+
+You can CRAFT a simple stone hammer with the CRAFT command, out of a rock and a
+handle. Note that you will need to CRAFT HANDLE from a stick also, for each
+handled tool you wish to make. This stone hammer is good, but you'll want
+to FORGE a better hammer eventually, which will help you forge gear faster.
+When you've finished your first hammer, WIELD HAMMER to FORGE some more useful
+things. Typing FORGE by itself will list the items that you are capable of 
+making. FORGE PICK to help you MINE, FORGE SHOVEL to help when you DIG, and you
+can even FORGE AXE to replace that stone age one you've been using.
+
+Type INFO for other getting-started tips.
+#
+"VAMPIRE GUIDE"
+
+Quickstart Guide: Being a Vampire
+
+This is a getting-started guide for vampires. If you want to find out how to
+become a vampire, or are looking for information on the Vampire skill, you
+should check HELP VAMPIRE. Any words in all-caps in this file will also have
+their own help files, if you want more information.
+
+Blood Upkeep:
+A vampire loses blood over time. New vampires lose 1 point of blood every tick
+no matter what, but more experienced vampires can shut off their active powers
+in order to reduce their blood upkeep all the way to 0. Each active power will
+raise your blood upkeep. Usually you can see your active powers by typing
+AFFECTS.
+
+Getting Blood:
+Vampires must feed off of other creatures to survive. Until you have an ability
+like COMMAND, you'll need to incapacitate your food before you can BITE it.
+The easiest way to do this is TOGGLE AUTOKILL, which will cause you to knock
+enemies out instead of killing them. (You can use EXECUTE to finish them off
+if you don't plan to bite them.) Players can freely allow you to bite them
+using TOGGLE BOTHER -- they must be botherable.
+
+Avoiding the Sun:
+Vampires in EmpireMUD don't burn in the sun, but it does block them from using
+any of their powers. If you step into a sunny area, any active powers will
+shut themselves off. If you're trapped outdoors, you'll find yourself without
+your useful Vampire abilities. You can still use your powers indoors during the
+day.
+
+Prompt:
+You can use the following PROMPT or DISPLAY codes related to being a vampire:
+   %b - current blood        %t - time
+   %B - maximum blood        %c - conditions
+#
+$

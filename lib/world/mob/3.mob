@@ -1,0 +1,116 @@
+#300
+warhorse horse armored~
+an armored warhorse~
+An armored warhorse stands valiantly here.
+~
+40 80 bdej 0
+0 0 0 11
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 4 175 100.00 4  # LOOT: an iron ingot
+I 4 175 75.00 2  # LOOT: an iron ingot
+I 4 175 50.00 2  # LOOT: an iron ingot
+I 4 175 50.00 2  # LOOT: an iron ingot
+S
+#301
+warunicorn unicorn armored~
+an armored warunicorn~
+An armored warunicorn stands majestically here!
+~
+100 150 bdejx 0
+0 0 0 11
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 4 175 100.00 4  # LOOT: an iron ingot
+I 4 175 75.00 2  # LOOT: an iron ingot
+I 4 175 50.00 2  # LOOT: an iron ingot
+I 4 175 50.00 2  # LOOT: an iron ingot
+S
+#302
+warelephant elephant huge armored~
+an armored warelephant~
+A huge, armored warelephant stands proudly here.
+~
+90 110 bdejy 0
+0 0 0 27
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 1 1351 100.00 1  # SKIN: a large skin
+I 1 1351 100.00 1  # SKIN: a large skin
+I 1 1351 100.00 1  # SKIN: a large skin
+I 4 175 100.00 4  # LOOT: an iron ingot
+I 4 175 75.00 2  # LOOT: an iron ingot
+I 4 175 50.00 2  # LOOT: an iron ingot
+I 4 175 50.00 2  # LOOT: an iron ingot
+S
+#303
+warcamel camel armored~
+an armored warcamel~
+An armored warcamel stands firmly here.
+~
+40 80 bdefj 0
+0 0 0 9
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 4 175 100.00 4  # LOOT: an iron ingot
+I 4 175 75.00 2  # LOOT: an iron ingot
+I 4 175 50.00 2  # LOOT: an iron ingot
+I 4 175 50.00 2  # LOOT: an iron ingot
+S
+#304
+warmammoth mammoth wooly armored~
+an armored warmammoth~
+An armored wooly warmammoth dominates the view!
+~
+100 150 bdefjy 0
+0 0 0 5
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 1 1351 100.00 1  # SKIN: a large skin
+I 1 1351 100.00 1  # SKIN: a large skin
+I 1 1351 100.00 1  # SKIN: a large skin
+I 1 1351 75.00 1  # SKIN: a large skin
+I 4 175 100.00 4  # LOOT: an iron ingot
+I 4 175 75.00 2  # LOOT: an iron ingot
+I 4 175 50.00 2  # LOOT: an iron ingot
+I 4 175 50.00 2  # LOOT: an iron ingot
+S
+#305
+donkey wardonkey mule armored~
+a wardonkey~
+An armored wardonkey is circling you.
+~
+40 80 dejo 0
+0 0 0 9
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 4 175 100.00 4  # LOOT: an iron ingot
+I 4 175 75.00 2  # LOOT: an iron ingot
+I 4 175 50.00 2  # LOOT: an iron ingot
+I 4 175 50.00 2  # LOOT: an iron ingot
+T 9021
+S
+#306
+warox war ox armored~
+a war ox~
+An armored war ox is standing valiantly.
+~
+40 70 dejo 0
+0 0 0 11
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 4 175 100.00 4  # LOOT: an iron ingot
+I 4 175 75.00 2  # LOOT: an iron ingot
+I 4 175 50.00 2  # LOOT: an iron ingot
+I 4 175 50.00 2  # LOOT: an iron ingot
+S
+$

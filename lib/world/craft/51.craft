@@ -1,0 +1,1065 @@
+#5100
+hut~
+-1 1  # 1x UNKNOWN
+8 -1 0 1 -1
+B
+5100 b bdeklmno
+R
+121 20  # 20x a stick
+S
+#5101
+cabin~
+-1 1  # 1x UNKNOWN
+8 -1 0 1 -1
+B
+5101 b bdeklmno
+R
+124 6  # 6x a heavy log
+S
+#5102
+house~
+-1 1  # 1x UNKNOWN
+8 -1 0 1 -1
+B
+5102 b bdeklmno
+R
+124 10  # 10x a heavy log
+S
+#5103
+mudhut~
+-1 1  # 1x UNKNOWN
+8 -1 0 1 -1
+B
+5103 e bdeklmno
+R
+121 10  # 10x a stick
+R
+100 10  # 10x a rock
+S
+#5104
+pueblo~
+-1 1  # 1x UNKNOWN
+8 -1 0 1 -1
+B
+5104 e bdeklmno
+R
+124 6  # 6x a heavy log
+R
+100 20  # 20x a rock
+S
+#5105
+cliffdwelling~
+-1 1  # 1x UNKNOWN
+8 -1 0 1 -1
+B
+5105 c bcdeklmno
+R
+124 10  # 10x a heavy log
+R
+100 20  # 20x a rock
+S
+#5106
+well~
+-1 1  # 1x UNKNOWN
+8 -1 0 1 -1
+B
+5106 b 0
+R
+121 5  # 5x a stick
+R
+124 1  # 1x a heavy log
+R
+100 10  # 10x a rock
+S
+#5107
+mine~
+-1 1  # 1x UNKNOWN
+8 -1 0 1 -1
+B
+5107 c bcdeklmno
+R
+124 4  # 4x a heavy log
+S
+#5108
+forge~
+-1 1  # 1x UNKNOWN
+8 -1 0 1 -1
+B
+5108 be bdeklmno
+R
+124 10  # 10x a heavy log
+R
+100 15  # 15x a rock
+R
+175 10  # 10x an iron ingot
+S
+#5109
+mill~
+-1 1  # 1x UNKNOWN
+8 -1 0 1 -1
+B
+5109 be bdeklmno
+R
+124 10  # 10x a heavy log
+R
+105 2  # 2x a huge stone block
+S
+#5110
+potter~
+-1 1  # 1x UNKNOWN
+8 -1 0 1 -1
+B
+5110 be bdeklmno
+R
+124 10  # 10x a heavy log
+R
+105 1  # 1x a huge stone block
+S
+#5111
+stable~
+-1 1  # 1x UNKNOWN
+8 -1 0 1 -1
+B
+5111 be bdeklmno
+R
+124 20  # 20x a heavy log
+R
+1306 8  # 8x a pouch of nails
+S
+#5112
+fence~
+-1 1  # 1x UNKNOWN
+8 -1 0 1 -1
+B
+5112 be 0
+R
+121 20  # 20x a stick
+S
+#5113
+gate~
+-1 1  # 1x UNKNOWN
+8 -1 0 1 -1
+B
+5113 be 0
+R
+121 20  # 20x a stick
+R
+178 1  # 1x a copper ingot
+S
+#5114
+cannery~
+-1 1  # 1x UNKNOWN
+8 -1 0 1 -1
+B
+5114 be bdeklmno
+R
+121 20  # 20x a stick
+S
+#5115
+foundry~
+-1 1  # 1x UNKNOWN
+8 -1 0 1 -1
+B
+5115 be bdeklmno
+R
+121 20  # 20x a stick
+S
+#5116
+granary~
+-1 1  # 1x UNKNOWN
+8 -1 0 1 -1
+B
+5116 be bdeklmno
+R
+121 20  # 20x a stick
+S
+#5117
+gravelpit~
+-1 1  # 1x UNKNOWN
+8 -1 0 1 -1
+B
+5117 be 0
+R
+121 20  # 20x a stick
+S
+#5118
+lumberyard~
+-1 1  # 1x UNKNOWN
+8 -1 0 1 -1
+B
+5118 be 0
+R
+121 20  # 20x a stick
+S
+#5119
+smokehouse~
+-1 1  # 1x UNKNOWN
+8 -1 0 1 -1
+B
+5119 be bdeklmno
+R
+121 20  # 20x a stick
+S
+#5120
+tannery~
+-1 1  # 1x UNKNOWN
+8 -1 0 1 -1
+B
+5120 be bdeklmno
+R
+121 20  # 20x a stick
+S
+#5121
+utilityshed~
+-1 1  # 1x UNKNOWN
+8 -1 0 1 -1
+B
+5121 be bdeklmno
+R
+121 20  # 20x a stick
+S
+#5122
+quarry~
+-1 1  # 1x UNKNOWN
+8 -1 0 1 -1
+B
+5122 be c
+R
+124 4  # 4x a heavy log
+R
+121 20  # 20x a stick
+S
+#5123
+claypit~
+-1 1  # 1x UNKNOWN
+8 -1 0 1 -1
+B
+5123 be a
+R
+124 4  # 4x a heavy log
+R
+121 20  # 20x a stick
+S
+#5124
+stonehouse~
+-1 1  # 1x UNKNOWN
+8 40 0 1 -1
+B
+5124 be bdeklmno
+R
+125 6  # 6x a stack of lumber
+R
+105 6  # 6x a huge stone block
+S
+#5125
+largehouse~
+-1 1  # 1x UNKNOWN
+8 40 0 1 -1
+B
+5125 be bdeklmno
+R
+125 4  # 4x a stack of lumber
+R
+1306 1  # 1x a pouch of nails
+R
+257 12  # 12x a pile of clay bricks
+S
+#5126
+treehouse~
+-1 1  # 1x UNKNOWN
+8 40 0 1 -1
+B
+5126 d bdeklmno
+R
+125 6  # 6x a stack of lumber
+R
+1306 2  # 2x a pouch of nails
+S
+#5127
+treecomplex~
+-1 1  # 1x UNKNOWN
+8 40 0 1 -1
+B
+5127 d bdeklmno
+R
+125 20  # 20x a stack of lumber
+R
+1306 8  # 8x a pouch of nails
+S
+#5128
+undergroundcomplex~
+-1 1  # 1x UNKNOWN
+8 40 0 1 -1
+B
+5128 be bdeklmno
+R
+105 2  # 2x a huge stone block
+R
+125 20  # 20x a stack of lumber
+R
+1306 8  # 8x a pouch of nails
+S
+#5129
+minecomplex~
+-1 1  # 1x UNKNOWN
+8 40 0 1 -1
+B
+5129 c bcdeklmno
+R
+125 30  # 30x a stack of lumber
+R
+1306 12  # 12x a pouch of nails
+S
+#5130
+alchemist~
+-1 1  # 1x UNKNOWN
+8 39 0 1 -1
+B
+5130 be bdeklmno
+R
+125 4  # 4x a stack of lumber
+R
+1306 2  # 2x a pouch of nails
+R
+257 12  # 12x a pile of clay bricks
+S
+#5131
+apiary~
+-1 1  # 1x UNKNOWN
+8 39 0 1 -1
+B
+5131 be bdeklmno
+R
+125 12  # 12x a stack of lumber
+R
+1306 4  # 4x a pouch of nails
+R
+916 8  # 8x a large beehive
+S
+#5132
+bakery~
+-1 1  # 1x UNKNOWN
+8 39 0 1 -1
+B
+5132 be bdeklmno
+R
+125 4  # 4x a stack of lumber
+R
+1306 2  # 2x a pouch of nails
+R
+257 12  # 12x a pile of clay bricks
+S
+#5133
+bridge~
+-1 1  # 1x UNKNOWN
+8 39 0 1 -1
+B
+5133 f 0
+R
+105 8  # 8x a huge stone block
+R
+125 12  # 12x a stack of lumber
+R
+1306 4  # 4x a pouch of nails
+S
+#5134
+carpenter~
+-1 1  # 1x UNKNOWN
+8 39 0 1 -1
+B
+5134 be bdeklmno
+R
+125 4  # 4x a stack of lumber
+R
+1306 2  # 2x a pouch of nails
+R
+257 12  # 12x a pile of clay bricks
+S
+#5135
+glassblower~
+-1 1  # 1x UNKNOWN
+8 39 0 1 -1
+B
+5135 be bdeklmno
+R
+125 4  # 4x a stack of lumber
+R
+1306 2  # 2x a pouch of nails
+R
+257 12  # 12x a pile of clay bricks
+S
+#5136
+pigeonpost~
+-1 1  # 1x UNKNOWN
+8 39 0 1 -1
+B
+5136 be bdeklmno
+R
+125 12  # 12x a stack of lumber
+R
+1306 4  # 4x a pouch of nails
+S
+#5137
+tailor~
+-1 1  # 1x UNKNOWN
+8 39 0 1 -1
+B
+5137 be bdeklmno
+R
+125 4  # 4x a stack of lumber
+R
+1306 2  # 2x a pouch of nails
+R
+257 12  # 12x a pile of clay bricks
+S
+#5138
+tavern~
+-1 1  # 1x UNKNOWN
+8 39 0 1 -1
+B
+5138 be bdeklmno
+R
+125 10  # 10x a stack of lumber
+R
+1306 4  # 4x a pouch of nails
+R
+257 12  # 12x a pile of clay bricks
+R
+143 20  # 20x a bushel of hops
+R
+145 20  # 20x a sack of barley
+S
+#5139
+warehouse~
+-1 1  # 1x UNKNOWN
+8 39 0 1 -1
+B
+5139 be bdeklmno
+R
+125 20  # 20x a stack of lumber
+R
+1306 8  # 8x a pouch of nails
+S
+#5140
+steps~
+-1 1  # 1x UNKNOWN
+8 39 0 1 -1
+B
+5140 be 0
+R
+105 8  # 8x a huge stone block
+S
+#5141
+statue~
+-1 1  # 1x UNKNOWN
+8 43 0 1 -1
+B
+5141 be 0
+R
+125 6  # 6x a stack of lumber
+R
+1306 2  # 2x a pouch of nails
+R
+105 10  # 10x a huge stone block
+S
+#5142
+henge~
+-1 1  # 1x UNKNOWN
+8 43 0 1 -1
+B
+5142 be 0
+R
+105 120  # 120x a huge stone block
+S
+#5143
+megalith~
+-1 1  # 1x UNKNOWN
+8 43 0 1 -1
+B
+5143 be 0
+R
+105 40  # 40x a huge stone block
+S
+#5144
+cemetery~
+-1 1  # 1x UNKNOWN
+8 43 0 1 -1
+B
+5144 be 0
+R
+105 8  # 8x a huge stone block
+S
+#5145
+park~
+-1 1  # 1x UNKNOWN
+8 43 0 1 -1
+B
+5145 b 0
+R
+121 25  # 25x a stick
+R
+105 4  # 4x a huge stone block
+S
+#5146
+tomb~
+-1 1  # 1x UNKNOWN
+8 43 0 1 -1
+B
+5146 be bdeklmno
+R
+125 4  # 4x a stack of lumber
+R
+1306 2  # 2x a pouch of nails
+R
+105 10  # 10x a huge stone block
+S
+#5147
+shrine~
+-1 1  # 1x UNKNOWN
+8 43 0 1 -1
+B
+5147 be bdeklmno
+R
+125 4  # 4x a stack of lumber
+R
+1306 2  # 2x a pouch of nails
+R
+105 12  # 12x a huge stone block
+S
+#5148
+temple~
+-1 1  # 1x UNKNOWN
+8 43 0 1 -1
+B
+5148 be bdeklmno
+R
+125 12  # 12x a stack of lumber
+R
+1306 4  # 4x a pouch of nails
+R
+105 24  # 24x a huge stone block
+S
+#5149
+library~
+-1 1  # 1x UNKNOWN
+8 48 0 1 -1
+B
+5149 be bdeklmno
+R
+125 100  # 100x a stack of lumber
+R
+1306 40  # 40x a pouch of nails
+R
+105 48  # 48x a huge stone block
+S
+#5150
+hightemple~
+-1 1  # 1x UNKNOWN
+8 48 0 1 -1
+B
+5150 be bdeklmno
+R
+125 24  # 24x a stack of lumber
+R
+1306 8  # 8x a pouch of nails
+R
+105 48  # 48x a huge stone block
+S
+#5151
+pyramid~
+-1 1  # 1x UNKNOWN
+8 48 0 1 -1
+B
+5151 e bdeklmno
+R
+125 100  # 100x a stack of lumber
+R
+1306 40  # 40x a pouch of nails
+R
+105 200  # 200x a huge stone block
+S
+#5152
+docks~
+-1 1  # 1x UNKNOWN
+8 45 0 1 -1
+B
+5152 be a
+R
+125 20  # 20x a stack of lumber
+R
+1306 8  # 8x a pouch of nails
+S
+#5153
+shipyard~
+-1 1  # 1x UNKNOWN
+8 45 0 1 -1
+B
+5153 be a
+R
+125 60  # 60x a stack of lumber
+R
+1306 24  # 24x a pouch of nails
+S
+#5154
+upgraded shipyard~
+-1 1  # 1x UNKNOWN
+8 45 k 1 -1
+B
+5154 be a
+R
+105 30  # 30x a huge stone block
+R
+175 20  # 20x an iron ingot
+S
+#5155
+swampwalk~
+-1 1  # 1x UNKNOWN
+8 208 0 1 -1
+B
+5155 m 0
+R
+125 4  # 4x a stack of lumber
+R
+121 40  # 40x a stick
+S
+#5156
+swampplatform~
+-1 1  # 1x UNKNOWN
+8 208 0 1 -1
+B
+5156 m 0
+R
+125 12  # 12x a stack of lumber
+R
+1306 4  # 4x a pouch of nails
+R
+121 40  # 40x a stick
+S
+#5157
+swamphut~
+-1 1  # 1x UNKNOWN
+8 208 0 1 -1
+B
+5157 m bdeklmno
+R
+125 20  # 20x a stack of lumber
+R
+1306 8  # 8x a pouch of nails
+R
+121 40  # 40x a stick
+S
+#5158
+swampmanor~
+-1 1  # 1x UNKNOWN
+8 208 0 1 -1
+B
+5158 m bdeklmno
+R
+125 30  # 30x a stack of lumber
+R
+1306 12  # 12x a pouch of nails
+R
+121 60  # 60x a stick
+S
+#5159
+swampcomplex~
+-1 1  # 1x UNKNOWN
+8 208 0 1 -1
+B
+5159 m bdeklmno
+R
+125 40  # 40x a stack of lumber
+R
+1306 16  # 16x a pouch of nails
+R
+121 80  # 80x a stick
+S
+#5160
+courtyard~
+-1 1  # 1x UNKNOWN
+8 42 m 1 -1
+B
+5160 bde 0
+R
+100 20  # 20x a rock
+R
+105 4  # 4x a huge stone block
+S
+#5161
+trapperspost~
+-1 1  # 1x UNKNOWN
+8 42 0 1 -1
+B
+5161 del bdeklmno
+R
+125 18  # 18x a stack of lumber
+R
+1306 4  # 4x a pouch of nails
+R
+1357 8  # 8x a large piece of leather
+S
+#5162
+baths~
+-1 1  # 1x UNKNOWN
+8 42 0 1 -1
+B
+5162 be bdeklmno
+R
+105 4  # 4x a huge stone block
+R
+125 8  # 8x a stack of lumber
+R
+1306 2  # 2x a pouch of nails
+R
+257 12  # 12x a pile of clay bricks
+S
+#5163
+fountain~
+-1 1  # 1x UNKNOWN
+8 42 m 1 -1
+B
+5163 be 0
+R
+105 10  # 10x a huge stone block
+S
+#5164
+sorcerytower~
+-1 1  # 1x UNKNOWN
+8 42 m 1 -1
+B
+5164 be bdeklmno
+R
+125 80  # 80x a stack of lumber
+R
+105 40  # 40x a huge stone block
+R
+176 5  # 5x an ingot of nocturnium
+R
+173 2  # 2x a gold bar
+S
+#5165
+portcullis~
+-1 1  # 1x UNKNOWN
+8 42 m 1 -1
+B
+5165 be bdeklmno
+R
+125 60  # 60x a stack of lumber
+R
+1306 14  # 14x a pouch of nails
+R
+257 60  # 60x a pile of clay bricks
+S
+#5166
+greathall~
+-1 1  # 1x UNKNOWN
+8 42 m 1 -1
+B
+5166 be bdeklmno
+R
+125 60  # 60x a stack of lumber
+R
+1306 14  # 14x a pouch of nails
+R
+257 60  # 60x a pile of clay bricks
+S
+#5167
+guardtower~
+-1 1  # 1x UNKNOWN
+8 44 m 1 -1
+B
+5167 be bdeklmno
+R
+125 12  # 12x a stack of lumber
+R
+1306 3  # 3x a pouch of nails
+S
+#5168
+upgraded guard tower~
+-1 1  # 1x UNKNOWN
+8 47 km 1 -1
+B
+5168 be bdeklmno
+R
+125 12  # 12x a stack of lumber
+R
+1306 3  # 3x a pouch of nails
+S
+#5169
+upgraded guard tower 2~
+-1 1  # 1x UNKNOWN
+8 47 km 1 -1
+B
+5169 be bdeklmno
+R
+125 24  # 24x a stack of lumber
+R
+1306 6  # 6x a pouch of nails
+S
+#5170
+mountainoutpost~
+-1 1  # 1x UNKNOWN
+8 44 0 1 -1
+B
+5170 c bcdeklmno
+R
+125 12  # 12x a stack of lumber
+R
+1306 3  # 3x a pouch of nails
+S
+#5171
+barracks~
+-1 1  # 1x UNKNOWN
+8 44 0 1 -1
+B
+5171 be bdeklmno
+R
+125 40  # 40x a stack of lumber
+R
+1306 10  # 10x a pouch of nails
+R
+257 20  # 20x a pile of clay bricks
+S
+#5172
+training yard~
+-1 1  # 1x UNKNOWN
+8 44 0 1 -1
+B
+5172 be bdeklmno
+R
+125 40  # 40x a stack of lumber
+R
+1306 10  # 10x a pouch of nails
+R
+257 20  # 20x a pile of clay bricks
+S
+#5173
+gatehouse~
+-1 1  # 1x UNKNOWN
+8 44 0 1 -1
+B
+5173 be bdeklmno
+R
+125 10  # 10x a stack of lumber
+R
+1306 4  # 4x a pouch of nails
+R
+257 10  # 10x a pile of clay bricks
+S
+#5174
+wall~
+-1 1  # 1x UNKNOWN
+8 44 0 1 -1
+B
+5174 be 0
+R
+257 10  # 10x a pile of clay bricks
+S
+#5175
+greatwall~
+-1 1  # 1x UNKNOWN
+8 141 0 1 -1
+B
+5174 bce 0
+R
+257 10  # 10x a pile of clay bricks
+R
+175 5  # 5x an iron ingot
+S
+#5176
+rivergate~
+-1 1  # 1x UNKNOWN
+8 141 0 1 -1
+B
+5176 f f
+R
+125 20  # 20x a stack of lumber
+R
+1306 8  # 8x a pouch of nails
+R
+105 10  # 10x a huge stone block
+R
+100 40  # 40x a rock
+S
+#5177
+terracedgarden~
+-1 1  # 1x UNKNOWN
+8 200 0 1 -1
+B
+5177 c 0
+R
+125 12  # 12x a stack of lumber
+R
+1306 4  # 4x a pouch of nails
+R
+100 60  # 60x a rock
+R
+1202 30  # 30x a twig of redthorn
+S
+#5178
+raftgarden~
+-1 1  # 1x UNKNOWN
+8 200 0 1 -1
+B
+5178 f 0
+R
+125 12  # 12x a stack of lumber
+R
+1306 4  # 4x a pouch of nails
+R
+121 60  # 60x a stick
+R
+1205 30  # 30x some bileberries
+S
+#5179
+oasisgarden~
+-1 1  # 1x UNKNOWN
+8 200 0 1 -1
+B
+5179 j 0
+R
+125 12  # 12x a stack of lumber
+R
+1306 4  # 4x a pouch of nails
+R
+100 60  # 60x a rock
+R
+1204 15  # 15x a daggerbite frond
+R
+1203 15  # 15x some magewhisper sepals
+S
+#5180
+estuarygarden~
+-1 1  # 1x UNKNOWN
+8 200 0 1 -1
+B
+5180 f i
+R
+125 12  # 12x a stack of lumber
+R
+1306 4  # 4x a pouch of nails
+R
+121 60  # 60x a stick
+R
+1200 30  # 30x a handful of whitegrass
+S
+#5181
+shadygarden~
+-1 1  # 1x UNKNOWN
+8 200 0 1 -1
+B
+5181 bd 0
+R
+125 12  # 12x a stack of lumber
+R
+1306 4  # 4x a pouch of nails
+R
+121 60  # 60x a stick
+R
+1201 30  # 30x some fiveleaf
+S
+#5182
+mint~
+-1 0  # 0x UNKNOWN
+8 134 0 1 -1
+B
+5182 be bdeklmno
+R
+125 12  # 12x a stack of lumber
+R
+1306 4  # 4x a pouch of nails
+R
+105 12  # 12x a huge stone block
+R
+1309 4  # 4x a heavy coin mill
+S
+#5183
+tradingpost~
+-1 1  # 1x UNKNOWN
+8 217 0 1 -1
+B
+5183 be bdeklmno
+R
+125 12  # 12x a stack of lumber
+R
+1306 4  # 4x a pouch of nails
+S
+#5184
+secretcache~
+-1 1  # 1x UNKNOWN
+8 149 0 1 -1
+B
+5184 be bdeklmno
+R
+125 20  # 20x a stack of lumber
+R
+1306 6  # 6x a pouch of nails
+R
+105 20  # 20x a huge stone block
+R
+177 5  # 5x an imperium ingot
+S
+#5185
+portal~
+-1 1  # 1x UNKNOWN
+8 189 0 1 -1
+B
+5185 be 0
+R
+124 20  # 20x a heavy log
+R
+105 12  # 12x a huge stone block
+S
+#5186
+househaven~
+-1 1  # 1x UNKNOWN
+8 46 0 1 -1
+B
+5186 b bdeklmno
+R
+125 8  # 8x a stack of lumber
+R
+1306 2  # 2x a pouch of nails
+R
+257 12  # 12x a pile of clay bricks
+S
+#5187
+burrowhaven~
+-1 1  # 1x UNKNOWN
+8 46 0 1 -1
+B
+5187 d bdeklmno
+R
+125 12  # 12x a stack of lumber
+R
+1306 3  # 3x a pouch of nails
+R
+105 4  # 4x a huge stone block
+S
+#5188
+pueblohaven~
+-1 1  # 1x UNKNOWN
+8 46 0 1 -1
+B
+5188 e bdeklmno
+R
+125 4  # 4x a stack of lumber
+R
+1306 1  # 1x a pouch of nails
+R
+257 20  # 20x a pile of clay bricks
+S
+#5189
+cavehaven~
+-1 1  # 1x UNKNOWN
+8 46 0 1 -1
+B
+5189 c bdeklmno
+R
+125 30  # 30x a stack of lumber
+R
+1306 10  # 10x a pouch of nails
+R
+105 2  # 2x a huge stone block
+S
+$

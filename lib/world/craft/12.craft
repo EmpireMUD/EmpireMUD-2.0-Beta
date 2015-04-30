@@ -1,0 +1,271 @@
+#1250
+healing potion~
+1250 1  # 1x a healing potion
+6 112 f 3 -1
+R
+1200 6  # 6x a handful of whitegrass
+S
+#1251
+regeneration potion~
+1251 1  # 1x a regeneration potion
+6 112 f 3 -1
+R
+1200 6  # 6x a handful of whitegrass
+R
+1201 3  # 3x some fiveleaf
+S
+#1252
+stamina potion~
+1252 1  # 1x a stamina potion
+6 112 f 3 -1
+R
+1202 3  # 3x a twig of redthorn
+R
+1201 3  # 3x some fiveleaf
+S
+#1253
+longrunning potion~
+1253 1  # 1x a potion of longrunning
+6 112 f 3 -1
+R
+1202 6  # 6x a twig of redthorn
+R
+1201 3  # 3x some fiveleaf
+S
+#1254
+mana potion~
+1254 1  # 1x a mana potion
+6 112 f 3 -1
+R
+1203 3  # 3x some magewhisper sepals
+R
+1201 3  # 3x some fiveleaf
+S
+#1255
+energy potion~
+1255 1  # 1x a potion of energy
+6 112 f 3 -1
+R
+1203 6  # 6x some magewhisper sepals
+R
+1201 3  # 3x some fiveleaf
+S
+#1256
+strength potion~
+1256 1  # 1x a strength potion
+6 123 f 3 -1
+R
+1202 10  # 10x a twig of redthorn
+S
+#1257
+dexterity potion~
+1257 1  # 1x a dexterity potion
+6 123 f 3 -1
+R
+1202 6  # 6x a twig of redthorn
+R
+1200 4  # 4x a handful of whitegrass
+S
+#1258
+charisma potion~
+1258 1  # 1x a charisma potion
+6 123 f 3 -1
+R
+1202 4  # 4x a twig of redthorn
+R
+1200 6  # 6x a handful of whitegrass
+S
+#1259
+intelligence potion~
+1259 1  # 1x an intelligence potion
+6 123 f 3 -1
+R
+1202 4  # 4x a twig of redthorn
+R
+1203 6  # 6x some magewhisper sepals
+S
+#1260
+wits potion~
+1260 1  # 1x a wits potion
+6 123 f 3 -1
+R
+1201 10  # 10x some fiveleaf
+S
+#1261
+armor potion~
+1261 1  # 1x a potion of armor
+6 124 f 3 -1
+R
+1202 20  # 20x a twig of redthorn
+S
+#1262
+haste potion~
+1262 1  # 1x a haste potion
+6 124 f 3 -1
+R
+1203 20  # 20x some magewhisper sepals
+S
+#1263
+blocking potion~
+1263 1  # 1x a potion of blocking
+6 124 f 3 -1
+R
+1202 10  # 10x a twig of redthorn
+R
+1201 10  # 10x some fiveleaf
+S
+#1264
+searing~
+1264 1  # 1x a vial of searing poison
+7 159 f 3 -1
+R
+1205 30  # 30x some bileberries
+S
+#1265
+weakness~
+1265 1  # 1x a vial of weakness poison
+7 159 f 3 -1
+R
+1205 15  # 15x some bileberries
+R
+1204 15  # 15x a daggerbite frond
+S
+#1266
+exhaustion~
+1266 1  # 1x a vial of exhaustion poison
+7 159 f 3 -1
+R
+1205 30  # 30x some bileberries
+S
+#1267
+braindrain~
+1267 1  # 1x a vial of brain drain poison
+7 159 f 3 -1
+R
+1203 15  # 15x some magewhisper sepals
+R
+1204 15  # 15x a daggerbite frond
+S
+#1268
+strength~
+1268 1  # 1x a vial of strength poison
+7 159 f 3 -1
+R
+1204 15  # 15x a daggerbite frond
+R
+1202 15  # 15x a twig of redthorn
+S
+#1269
+dexterity~
+1269 1  # 1x a vial of dexterity poison
+7 159 f 3 -1
+R
+1204 15  # 15x a daggerbite frond
+R
+1202 15  # 15x a twig of redthorn
+S
+#1270
+charisma~
+1270 1  # 1x a vial of charisma poison
+7 159 f 3 -1
+R
+1202 15  # 15x a twig of redthorn
+R
+1205 15  # 15x some bileberries
+S
+#1271
+intelligence~
+1271 1  # 1x a vial of intelligence poison
+7 159 f 3 -1
+R
+1203 15  # 15x some magewhisper sepals
+R
+1205 15  # 15x some bileberries
+S
+#1272
+wits~
+1272 1  # 1x a vial of wits poison
+7 159 f 3 -1
+R
+1202 15  # 15x a twig of redthorn
+R
+1205 15  # 15x some bileberries
+S
+#1273
+pain~
+1273 1  # 1x a vial of pain poison
+7 159 f 3 -1
+R
+1204 45  # 45x a daggerbite frond
+S
+#1274
+slow~
+1274 1  # 1x a vial of slow poison
+7 159 f 3 -1
+R
+1204 30  # 30x a daggerbite frond
+R
+1202 15  # 15x a twig of redthorn
+S
+#1275
+heartstop~
+1275 1  # 1x a vial of heartstop poison
+7 159 f 3 -1
+R
+1204 30  # 30x a daggerbite frond
+R
+1202 15  # 15x a twig of redthorn
+S
+#1280
+healing elixir~
+1280 1  # 1x a healing elixir
+6 113 f 3 -1
+R
+1200 10  # 10x a handful of whitegrass
+S
+#1281
+regeneration elixir~
+1281 1  # 1x a regeneration elixir
+6 113 f 3 -1
+R
+1200 10  # 10x a handful of whitegrass
+R
+1201 5  # 5x some fiveleaf
+S
+#1282
+stamina elixir~
+1282 1  # 1x a stamina elixir
+6 113 f 3 -1
+R
+1202 5  # 5x a twig of redthorn
+R
+1201 5  # 5x some fiveleaf
+S
+#1283
+longrunning elixir~
+1283 1  # 1x an elixir of longrunning
+6 113 f 3 -1
+R
+1202 10  # 10x a twig of redthorn
+R
+1201 5  # 5x some fiveleaf
+S
+#1284
+mana elixir~
+1284 1  # 1x a mana elixir
+6 113 f 3 -1
+R
+1203 5  # 5x some magewhisper sepals
+R
+1201 5  # 5x some fiveleaf
+S
+#1285
+energy elixir~
+1285 1  # 1x an elixir of energy
+6 113 f 3 -1
+R
+1203 10  # 10x some magewhisper sepals
+R
+1201 5  # 5x some fiveleaf
+S
+$

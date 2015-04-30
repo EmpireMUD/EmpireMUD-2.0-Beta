@@ -1,0 +1,70 @@
+#5000
+grave~
+-1 0  # 0x UNKNOWN
+8 -1 0 1 53
+B
+5000 be 0
+S
+#5001
+tent~
+-1 1  # 1x UNKNOWN
+8 -1 0 1 2036
+B
+5001 bde bdeklmno
+S
+#5002
+rockshelter~
+-1 1  # 1x UNKNOWN
+8 79 0 1 -1
+B
+5002 be bdeklmno
+S
+#5003
+treeshelter~
+-1 1  # 1x UNKNOWN
+8 79 0 1 -1
+B
+5003 d bdeklmno
+S
+#5004
+caveshelter~
+-1 1  # 1x UNKNOWN
+8 79 0 1 -1
+B
+5004 c bdeklmno
+S
+#5005
+jungleshelter~
+-1 1  # 1x UNKNOWN
+8 79 0 1 -1
+B
+5005 g bdegklmno
+S
+#5006
+dismantle ruins~
+-1 0  # 0x UNKNOWN
+8 -1 l 1 -1
+B
+5006 0 0
+S
+#5007
+closed ruins dismantle~
+-1 0  # 0x UNKNOWN
+8 -1 l 1 -1
+B
+5007 0 0
+S
+#5008
+tunnel dismantle~
+-1 0  # 0x UNKNOWN
+8 206 l 1 -1
+B
+5008 c bdeklmno
+R
+124 12  # 12x a heavy log
+R
+125 8  # 8x a stack of lumber
+R
+1306 4  # 4x a pouch of nails
+S
+$

@@ -1,0 +1,639 @@
+MAP LEGEND TERRAIN
+
+These are the common map icons:
+
+ <oo>  you (or other players)                        &y*/\*&0  Tower of Souls
+ <&u44&0>  ship or boat
+
+ &g....&0  Plains              &g^^^^&0  Forest              &y/\/\&0  Mountain
+ ....  Plains              YYYY  Forest              &y^^&r^&R^&0  Forest
+ &Y....&0  Desert              &Y.&G^^&Y.&0  Desert Grove        &Y.&C~~&Y.&0  Oasis
+ &y....&0  Desert              &y.&g^^&y.&0  Desert Grove        &y.&c~~&y.&0  Oasis
+ &c~~~~&0  River               &b~~~~&0  Ocean               &c~~&g^&c~&0  Swamp
+ &G^^^^&0  Jungle              &W,,,,&0  Arctic Tundra
+
+ &Y^^&Go&Y^&0  Apples              &Y^o^^&0  Peaches             &Y^^&Ro&Y^&0  Cherries
+ &Y::::&0  Barley              &g::::&0  Hops                ::::  Cotton
+ &Y;;;;&0  Wheat               &giiii&0  Corn                &Y.&G^&yo&G.&0  Oranges
+ &g,,,,&0  Rice                &Y.&G^o&G.&0  Olives              &G....&0  Peas
+ &yoooo&0  Gourds
+
+ --+-  Road                [--]  Building            \__/  Trench
+ vvvv  Fence               vxxv  Gate                VVVV  Wall
+
+You can find specific buildings in the HELP BUILDING information as well as
+the other help files listed in its "see also".
+
+See also: TOWER OF SOULS, BUILDING, CROPS
+#
+ACCOUNT ACCOUNTS
+
+All of a player's characters ("alts", "multis", or "toons") must be attached
+to the same account. You are prompted to do this during character creation.
+If you don't do it during creation, you can ask an administrator to fix it for
+you.
+
+Players are not allowed to have multiple characters that aren't all on the
+same account.
+
+Full multiplaying rules are found by typing POLICY.
+
+See also: ALTERNATE
+#
+ADVENTURE "ADVENTURE ZONE" ZONE
+
+Usage:  adventure
+
+EmpireMUD features instanced adventure zones including caves, magical planes,
+and more. Sometimes you can see them on the 'nearby' command. You can get some
+more information about an adventure using the 'adventure' command.
+
+See also: NEARBY
+#
+ATTRIBUTES STATS STRENGTH DEXTERITY CHARISMA GREATNESS GRT INTELLIGENCE INTELLECT WITS
+
+Current stat implementations are as follows:
+
+Physical attributes:
+  Strength (active) - Affects melee weapon damage (except magic weapons).
+  Dexterity (passive) - Affects to-hit and dodge chances.
+
+Social attributes:
+  Charisma (active) - Improves some Stealth abilities.
+  Greatness (passive) - Affects empire score and total available territory.
+
+Mental attributes: 
+  Intelligence (active) - Affects magic strength and magic weapon damage.
+  Wits (passive) - Affects combat speed (rate of attack).
+
+The active attribute in each category cannot go below 1 from equipment; you
+will not be able to use any item that lowers your active attributes below 1.
+
+See also: EMPIRE GREATNESS
+#
+AUTORECALL "AUTO-RECALL" "AUTO RECALL"
+
+Usage:  toggle autorecall
+
+If you turn on the autorecall toggle, your character will be sent home (or to
+a tower of souls, if you have no home) when you're logged off over an hour.
+
+If you try to log in while in hostile territory, and have been logged out over
+an hour, you will get an autorecall even if it's turned off.
+
+See also: TOGGLE
+#
+AUTOSTORE AUTO-STORE "AUTO STORE" AUTOCLEANUP "AUTO-CLEANUP" "AUTO CLEANUP"
+
+EmpireMUD conserves resources by cleaning up items that are left out in its
+vast, open world. All items left on the ground or in containers may be stored
+or cleaned up automatically.
+
+The auto-store/auto-clean system engages when an item has been left alone for
+three hours, and will not trigger if a player is present.
+
+If the location is claimed by an empire, NPCs store the items to that empire's
+inventory (if possible). If items can't be stored, they remain on the ground
+(or in their containers) on claimed land. Certain items, like "sea junk", will
+be cleaned up and removed despite being on claimed land. Items which are
+enchanted or superior cannot be stored.
+
+If the land is not claimed, animals and stray humans make off with the items,
+never to be seen again.
+
+Items which can't be picked up, like carts, are not normally affected by this
+system. However, items left inside of carts will be stored or cleaned up. This
+also applies to personal chests.
+
+(EmpireMUD used to let you keep storable items in personal chests, but revoked
+this due to players using chests to abuse limitations on Workforce.)
+
+Do not attempt to circumvent the auto-store system. If you think you found a
+way to keep items from auto-storing, please report it as a bug.
+#
+AXE
+
+You'll need an axe to chop down trees. The simplest axe can be made from
+sticks and stones, and you can see the full process on our getting-started
+tutorial by typing INFO.
+
+See also: CHOP
+#
+BINDING BOUND "BIND ON EQUIP" "BIND ON PICKUP" BIND-ON-EQUIP BIND-ON-PICKUP "OBJECT BINDING" BOE BOP
+
+Some items bind to the player who acquires or equips them. This means that
+other players can never use the item. It is used on items that must be earned
+by the person who intends to use them, or to keep items from being traded after
+being used.
+
+If a group of players kill a mob together, the loot it drops may be bound to
+ALL of the players temporarily, allowing them to trade it around. However,
+as soon as it is equipped, the item will be bound to ONLY the person who
+equipped it.
+
+Bound items can never be stored or posted for trade, and you can't drop them
+in territory claimed by other empires. Bound items will disappear from the
+ground if left on unclaimed land, like normal. They are safe to leave on
+claimed land or in your private chest.
+
+See also: HOME
+#
+BLOOD "BLOOD POINTS" "BLOOD POOL" "BLOOD UPKEEP"
+
+The blood pool is the number of total blood points a person has. For most
+players, this number is 100, but the points are only good for keeping you
+alive. For vampires, the blood pool is more variable, but must be replenished
+from live victims.
+
+Vampires also have blood upkeep, which is constant blood loss to fuel their
+active powers. Low-level vampires always have at least 1 blood upkeep. Higher-
+level vampires can shut off active abilities to reduce blood upkeep to 0.
+
+When a vampire is low on blood, they will not be able to regenerate health
+as quickly (just like being hungry). If a player runs out of blood, he or she
+will die.
+
+See also: ANCIENT BLOOD
+#
+BOARDS READ WRITE RESPOND
+
+Usage: look board
+       write <headline>
+       read <number>
+       respond <number> <headline>
+       remove <number>
+
+Bulletin boards are the forum of inter-player communication on the MUD. There
+are different bulletin boards for different purposes -- for example, a
+standard mortal board and a board for immortals. Naturally, not all players
+may be allowed to read all types of boards.
+
+Example:
+
+  > look at board
+  > write Am I using these boards correctly?
+  > look at board
+  > read 6
+  > remove 6
+
+See also: MAIL
+#
+"BONUS TRAITS" BONUSES
+
+Players get one bonus trait during character creation, and another after 2 days
+of play time. When you have earned a new bonus trait, you will be prompted to
+choose it next time you log into the game. You can't choose the same trait
+twice.
+
+Available traits:
+ More Strength, Dexterity, Charisma, Greatness, Intelligence, or Wits - +1
+ Extra health, moves, or mana - +15
+ Faster health, move, or mana regeneration - +1
+ Faster chores - chopping, digging, and other chores go faster
+ Extra daily skill points - 5 extra daily skill points
+ Larger inventory - Carry 5 more small items (or 2 more large items)
+ Faster walking - Half the lag from normal walking
+#
+CHAMELEON
+
+The "chameleon" trait is the property of some buildings to be invisible at a
+distance. Instead of seeing the building and its owner's banner, you see only
+normal terrain.
+#
+CHANNELS SHOUT
+
+Usage: shout <message>
+
+See also HELP SLASH-CHANNELS for global channels like /ooc and /newbie.
+
+These are channels reserved for specific purposes. Messages on these channels
+reach everyone who is monitoring them. You can turn channels on and off using
+the "toggle" command.
+
+The following channels are available on EmpireMUD:
+
+Global channels:
+&yshout&0 - an in-character channel limited to 50 map tiles distance
+&rtell&0 - this is a private channel that is generally considered OOC
+
+Local channels
+say - in-character speech
+oocsay - out-of-character speech
+
+See also: TOGGLE, SLASH-CHANNELS
+#
+COIN COINS COINAGE CURRENCY GOLD
+
+Commands:  coins
+           give <number> [empire] coins <person>
+           drop <number> [empire] coins
+           withdraw <number> coins
+           deposit <number> [empire] coins
+           exchange <number> [empire] coins
+           get coins
+
+Coins in EmpireMUD are minted by empires, and the value of a coin varies from
+empire to empire. If you have good relations with another empire, they will
+give more value to your currency than one that distrusts you. Currency is only
+converted at the exchange rate for certain actions like depositing in the vault
+(empires only hoard their own currency) and import/export trades. Coins are
+never de-valued in player-to-player exchanges.
+
+The exchange rates are: 50% for generic coins, 75% for coins from allied
+empires, 65% for coins from empires with non-aggression pacts, 25% for
+distrusted empires, and 50% for all other empire relationships. The exchange
+rate gets a 25% bonus (up to a maximum of 100%) for empires with trade
+relations.
+
+If you don't specify an empire for coin-related commands, it will default
+to your generic/miscellaneous coins. You can also specify those with the name
+"other" or "misc".
+
+You can only carry 10 different types of coins at a time. After that, when you
+gain new coins, the coins you have the fewest of are combined into the "misc"
+set of coins.
+
+You can create coins from valuable metals at a mint building. You can exchange
+coin types, or treasure for coins, at the mint or vault. You can deposit and
+withdraw coins from the vault. Coins that are left on the ground will autostore
+on claimed land, or disappear over time on unclaimed land.
+
+See also: DEPOSIT, EXCHANGE, MINT, SPLIT, WITHDRAW
+#
+COOLDOWNS "COOL DOWNS" CD
+
+Usage:  cooldowns
+
+This command lists abilities and actions that you currently have cooling down.
+That is, things you can't use yet because the timer hasn't expired. Some
+abilities can only be used every so often, usually for reasons relating to
+game balance.
+#
+DEATH DYING
+
+When you die in EmpireMUD, you will lie on the ground for a short time, until
+you type 'respawn'. When you respawn, you'll appear at your chosen tomb, at
+any nearby tomb your empire owns, or at a random starting location. If you die
+too often, you may have to wait a while before you can move after respawning.
+
+You can only be reanimated in a cemetery if your empire owns one on the same
+island where you died (rivers don't count for this; only oceans separate
+islands). If you own more than one, you will generally be reanimated in the
+oldest cemetery.
+
+If you die too many times in a row, you will start to accrue a death penalty,
+where you must wait before you can start acting. If you're at war, this penalty
+starts at a lower number of deaths.
+
+See also: RESPAWN, RESURRECT, STARTING LOCATION, TOMB
+#
+DEPLETION DEPLETED
+
+No resource is unlimited. Mines, quarries, gardens, and even the gold in river
+banks will eventually run out. For most resources, you will receive a message
+telling you the area is depleted. For example, digging might tell you the
+ground is too hard and there are no good rocks left.
+
+Most depletions recover over time, at the rate of 1/2 per game year. However,
+mines will never replenish unless you dismantle them completely.
+
+Forests will spread at their edges over time, creating more trees to chop.
+Desert Groves re-grow on their own, at random.
+#
+"DIMINISHING RETURNS"
+
+Diminishing returns are numbers that increase quickly at low levels, but more
+slowly at higher levels. For example, the first +20 dodge you get is applied
+directly, but the next +20 dodge only brings you up to +30.
+
+This is applied to several character traits, such as block, dodge, soak, and
+to-hit.
+#
+DISPLAY
+
+Usage:  display <text>
+
+This command processes your text in the same way as your prompt, so you can
+use it to display any of the normal prompt data. This is especially useful for
+screen-reader users who may not want the prompt to echo constantly, but still
+need this information.
+
+See the prompt help file for information on available display codes.
+
+Helpful hint: Set an alias to display your favorite set of info.
+
+See also: ALIAS, PROMPT
+#
+DOT "DOT EFFECT" "DAMAGE OVER TIME" DAMAGE-OVER-TIME
+
+A DoT (Damage over Time) effect is one that continues to deal damage. These
+come from spells, abilities, scripts, and other sources. They deal damage every
+five seconds until they expire.
+
+Some DoT effects can stack multiple times. The damage shown on your score or
+affects command is the total damage per 5 seconds (base x stacks), and the number at the end
+like (1/5) is the number and maximum number of stacks.
+
+Physical DoTs can be removed by firstaid. Magical and poison DoTs can be
+removed by cleanse.
+
+See also: AFFECTS, CLEANSE, FIRSTAID, SCORE
+#
+FARMING CROPS ORCHARDS AGRICULTURE APPLES WHEAT CORN HOPS COTTON BARLEY PEACHES CHERRIES ORANGES RICE OLIVES PEAS GOURDS
+
+You can plant and manage crops in order to supply food and trade goods to your
+empire. The crops that grow in orchards can be picked; the rest are harvested.
+You can chop down orchards in order to remove them; other crops are removed
+when you harvest them.
+
+ &Y^^&Go&Y^&0  Apples              &Y^o^^&0  Peaches             &Y^^&Ro&Y^&0  Cherries
+ &Y::::&0  Barley              &g::::&0  Hops                ::::  Cotton
+ &Y;;;;&0  Wheat               &giiii&0  Corn                &Y.&G^&yo&G.&0  Oranges
+ &g,,,,&0  Rice                &Y.&G^o&G.&0  Olives              &G....&0  Peas
+ &yoooo&0  Gourds
+
+Cotton can be woven into cloth. The rest of the crops are used to make food
+and drink.
+
+Rice and gourds must be planted on plains within 3 tiles of a river. Oranges,
+olives, and cotton only grow in the desert. The rest will grow in ordinary
+plains.
+
+See also: CHOP, COOK, HARVEST, MILL, PICK, PLANT, TAVERN, WEAVE
+#
+HAMMER
+
+A hammer is required in order to forge gear out of metal. You can make a simple
+stone hammer using the craft command.
+
+A superior hammer will forge twice as fast.
+
+See also: BASIC CRAFTS, FORGE
+#
+HEALTH "HIT POINTS" HITPOINTS HP "HEALTH POINTS" "HEALTH POOL"
+
+The health pool is the amount of damage you can take before being knocked out.
+All players begin with 50 health points and remain at this level until they
+gain a class.
+
+If you're knocked out with 0 health, you will die without assistance.
+
+See also: CLASS, DEATH, ENDURANCE
+#
+HOSTILE THIEF
+
+If you commit certain hostile or stealth acts, you may be flagged as "hostile".
+While you have the hostile flag, which lasts for one real hour, players can
+attack you as if you had toggled PVP on. City guards will also attack you, if
+they aren't from your empire.
+
+Examples of hostile actions:
+- taking something off the ground in someone else's territory
+- attacking another empire's citizens
+- infiltrating a building
+#
+INSTANCES INSTANTIATION INSTANCING
+
+EmpireMUD uses "instances" of adventures to help fill the large, dynamic world.
+It would be difficult to build enough content to cover the entire world, so
+copies of adventure zones are created and placed around the world.
+
+Each instance of an adventure is its own zone, and doesn't interact with any
+other instances of that adventure. Mobs that teleport around the zone, for
+example, always teleport to their own copy of it.
+
+Adventure instances usually remove themselves after a pre-determined period
+of time, or after some end condition is triggered by players inside.
+
+Because instances are scaled to certain player levels, two instances of the
+same adventure may have different level requirements. The 'adventure' command
+is a good way to see what level (or level range) an instance is scaled to.
+
+See also: ADVENTURE
+#
+LEVEL LEVELS "SKILL LEVELS" "GEAR LEVELS"
+
+Unlike many games, where your skills and equipment are based on your level,
+EmpireMUD does it backwards. Your level is based on your skills and gear.
+You have three different levels.
+
+Skill level: This level is determined by your top skills. When two of your
+   skills pass level 75, the game gives you a class and these become your
+   class skills. This level does not go above 100, as it is the average of
+   your two class skills. You can see it by typing "skills". Skill levels are
+   grouped into three ranges: Basic (up to 50), Specialty (up to 75), and Class
+   (up to 100).
+
+Gear level: The bonuses you receive from your equipment form your gear level.
+   There is no upper limit on this number, and any gear you have equipped
+   (except sheathed weapons) contributes to your gear level. You can see it
+   by typing "eq".
+
+Composite level: This is the sum of your skill and gear levels. It is the
+   number used for scaling mobs to fight you. This is the level shown on your
+   "score".
+
+Note: You can't use gear that's above your current level range. For example,
+   a person in the 51-75 level range can only use items that are scaled up
+   to level 75.
+
+See also: CLASS, SCALING
+#
+LINK LINKDEAD
+
+A lot of players have problems with their links to the game. This can be very
+hazardous to your health in the middle of a battle, of course. Once you go
+linkdead, your character will idle out of the game faster. But until that
+happens, you'll be stuck where you were.
+
+Do not try to get out of a fight by breaking link. You will likely still die.
+#
+MANA "MANA POINTS" "MANA POOL" "MAGIC POINTS"
+
+The mana pool is the amount of magical energy you can channel before you must
+stop to recover some. All players begin with 50 mana points and remain at this
+level until they gain a class.
+
+See also: CLASS, GIFT OF NATURE
+#
+MOVE MOVES "MOVE POINTS" "MOVEMENT POINTS"
+
+Move points are the basic energy pool for physical effort. It takes move points
+to walk around, and it takes move points to use many physical abilities like
+Kick or Shadowstep.
+
+All players begin with 100 move points. The easiest ways to get more are to
+make a walking stick or a good pair of shoes.
+#
+MUDSTATS
+
+Usage:  mudstats <option>
+
+This command displays various statistics about this EmpireMUD.
+
+Options:
+ - empires: Shows averages for the numbers used to compute empire scores.
+#
+MULTIPLAYING MULTI-PLAYING "MULTI PLAYING"
+
+EmpireMUD allows you to have multiple characters, but never online at the same
+time as each other. You can enroll your alts in your own empire even if they
+are offline.
+
+See the POLICY command for detailed rules on multiplaying and alts.
+
+See also: ALTERNATE
+#
+NEARBY
+
+Usage:  nearby
+
+This command lists nearby starting locations and cities, with the distances to
+them. This can help you figure out where to found a new city. It can also find
+some adventure zones.
+
+If you have the Navigation ability, this will also include the location.
+#
+PLAYERKILLING "PLAYER KILLING" PK PVP
+
+EmpireMUD player-killing rules
+
+The rules for player-killing are enforced by the game engine. If you are
+not following these rules, the game will prevent you from attacking another
+player.
+
+You may attack:
+- Members of another empire if your empire is at war with theirs
+- People who are not members of your empire, but are in your territory
+
+You may NOT attack:
+- Players with less than 1 day of play time, nor can they
+  attack you.
+
+You may only go to war with empires that have members online, and wars will
+automatically end if either side is logged off and the war has gone on at least
+an hour. You may only burn buildings of empires you're at war with.
+
+If you want free and open PVP, you can turn this on with "toggle pvp". This
+flag will remain active for 5 minutes after you shut it off.
+
+See also: TOGGLE
+#
+SCALING "MOB SCALING" "SCALING MOBS"
+
+EmpireMUD uses a system of mob-scaling where mobs are procedurally adjusted
+to the level of the player or group that is fighting them. Each mob has a
+minimum and maximum scale level, and will scale to any level in that range,
+based on the composite skill of the player.
+
+Some mobs have additional adjustments that make them harder or require more
+effort to beat them. You can use the 'consider' command to determine if you
+should be fighting a given mob.
+
+Items are also scaled. In adventures, they are scaled based on the level of
+the mob you got them from. Craftable items are also scaled, based on the skill
+or recipe used to make them, and on the level of the crafter.
+
+See also: CONSIDER, SCALABLE CRAFTS
+#
+SCAN
+
+Usage:  scan <direction>
+
+This command shows you the same information as the screen-reader map display,
+but in only one direction. The distance you see on a scan is based on your
+mapsize.
+
+Example:
+ > scan southwest
+ southwest: River, River, River, Swamp, Overgrown Forest, Road, Overgrown Forest, Jungle, Jungle
+
+See also: MAPSIZE, SCREEN-READERS
+#
+SHOVEL
+
+A shovel can help you dig or excavate much faster. It can be made by any
+blacksmith at a forge.
+
+See also: DIG, EXCAVATE, FORGE
+#
+"SLASH CHANNELS" SLASH-CHANNELS / /JOIN /LEAVE /WHO /HISTORY HISTORY VC "VIRTUAL CHANNELS"
+
+Usage: /join <channel>
+       /leave <channel>
+       /history <channel>
+       /who <channel>
+       /<channel> message
+       /list
+
+Slash-channels allow you dynamically join and leave channels by name, so you
+can create virtual channels to discuss things with your friends, or private
+channels for any purpose.
+
+Slash-channels may be considered moderated, public channels if many players
+are on them. However, you can also create them as private channels by not
+telling other players about them.
+
+You can start chats with * (asterisk) to make them channel-emotes.
+
+Example:
+  > /join kickflip
+  > /kickflip Hey guys!
+  > /hist kickflip
+
+See also: CHANNELS
+#
+SOAK
+
+Soak is your character's damage absorption trait. Any incoming damage is
+reduced by this amount. Soak rating usually comes from gear or spells. It
+has diminishing returns at 10 points.
+#
+SPEAR
+
+A spear is the basic tool for fishing. You can make a spear by crafting a
+handle, chipping a rock until it is a handaxe, then again until it is a spear-
+head, and then crafting the spear from the spearhead and the handle.
+
+See also: CRAFT, CHIP, FISH
+#
+TAGS "MOB TAGS" TAGGING "MOB TAGGING"
+
+When a player damages a mob, that mob becomes tagged by the player and his or
+her group. This ensures that these players receive credit for the kill, plus
+any bind-on-pickup loot the mob drops.
+
+If the mob is out of combat long enough to heal, it will also reset its tags.
+#
+TIP TIPS "TIP OF THE DAY" HINT
+
+Usage:  tip
+
+This command will give you a helpful tip about the game.
+#
+TRANSPORTATION
+
+There are several types of transportation available in the world around you.
+The most common way to get around is to walk. Better shoes or boots, and a
+walking stick, can help you move further or get tired less often.
+
+You can learn to ride, and take a sturdy mount with you everywhere you go. This
+ability takes its pick of both mundane and exotic beasts to ride upon.
+
+You can also craft or buy carts, carriages, and wagons to transport goods
+around the world. These types of transportation require harnessed animals to
+lead them, but can store far more than you can carry alone.
+
+See also: WOODWORKING, RIDE, HARNESS, PUT, GET
+#
+WHEREAMI "WHERE AM I"
+
+Usage:  whereami
+
+This simple command tells you your current location. This information is also
+available when you type "look", but this version shows only the room name and
+coordinates (if applicable).
+
+See also: LOOK
+#
+$

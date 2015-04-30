@@ -1,0 +1,91 @@
+#5500
+Helm~
+The Helm~
+~
+0 0 amHI 0
+0 0 0 -1
+C
+disembark, sail~
+D
+You are standing at the helm of the ship, where the captain directs the crew.
+~
+M
+255 20.00 c
+S
+#5501
+On Deck~
+On Deck~
+~
+0 0 amHI 0
+0 0 0 -1
+C
+disembark, sail~
+D
+You're standing on deck, looking out over this side of the ship.
+~
+M
+255 20.00 c
+S
+#5502
+Cargo Hold~
+In the Cargo Hold~
+~
+0 0 amHI 0
+0 0 0 -1
+C
+disembark, sail, unload~
+D
+You are in the cargo hold of the ship.
+~
+M
+255 20.00 c
+S
+#5503
+Below Deck~
+Below Deck~
+~
+0 0 amHI 0
+0 0 0 -1
+C
+disembark, sail, unload~
+D
+You are below deck of the ship, where the constant rocking makes you ill.
+~
+M
+255 20.00 c
+S
+#5510
+Secret Hideout~
+A Secret Hideout~
+~
+0 0 a 0
+0 0 0 221
+C
+close trapdoor, open trapdoor~
+D
+   You have climbed down the ladder from the trap door in the tavern. This room
+is surprisingly large for one so well hidden. The walls are wood and trimmed
+with gold -- or at least, it looks like gold. The walls are decorated with the
+emblems of different kings. These aren't kings that rule here, but those who
+have been duped by the building's cunning owners. This is a thieves' den.
+~
+S
+#5511
+Top of the Tower~
+The Top of the Tower~
+~
+0 0 a l
+0 0 0 228
+C
+inventory, retrieve, store, study~
+D
+   From the top floor of the tower, you can look down over the world, as the
+sorcerers who live here like to do. The walls are lined with heavy bookshelves
+and packed full with ancient volumes, but it's not so cramped as the first
+floor was. Glass display cases show the trinkets and trophies of the tower's
+powerful occupants, and a winding staircase leads back to the ground floor.
+~
+M
+237 20.00 ce
+S
+$

@@ -1,0 +1,266 @@
+#2000
+traveling hat~
+2000 1  # 1x a traveling hat
+4 55 g 6 -1
+R
+1356 3  # 3x a small piece of leather
+S
+#2001
+leather hood~
+2001 1  # 1x a leather hood
+4 55 g 6 -1
+R
+1356 3  # 3x a small piece of leather
+S
+#2002
+hood~
+2002 1  # 1x a red hood
+4 55 g 6 -1
+R
+1359 2  # 2x a bolt of cloth
+S
+#2003
+barbette~
+2003 1  # 1x a fine barbette
+4 55 g 6 -1
+R
+1359 4  # 4x a bolt of cloth
+S
+#2004
+brimmed cap~
+2004 1  # 1x a brimmed cap
+4 55 g 6 -1
+R
+1359 4  # 4x a bolt of cloth
+S
+#2005
+bonnet~
+2005 1  # 1x a bonnet
+4 55 g 6 -1
+R
+1359 3  # 3x a bolt of cloth
+S
+#2006
+coif~
+2006 1  # 1x a coif
+4 55 g 6 -1
+R
+1359 2  # 2x a bolt of cloth
+S
+#2007
+blouse~
+2007 1  # 1x a blouse
+4 55 g 6 -1
+R
+1359 5  # 5x a bolt of cloth
+S
+#2008
+dress~
+2008 1  # 1x a dress
+4 55 g 6 -1
+R
+1359 8  # 8x a bolt of cloth
+S
+#2009
+shirt~
+2009 1  # 1x a shirt
+4 55 g 6 -1
+R
+1359 4  # 4x a bolt of cloth
+S
+#2010
+fur hat~
+2010 1  # 1x a fur hat
+4 55 g 6 -1
+R
+1356 1  # 1x a small piece of leather
+R
+1352 2  # 2x a luxurious fox fur
+S
+#2011
+toga~
+2011 1  # 1x a toga
+4 55 g 6 -1
+R
+1359 8  # 8x a bolt of cloth
+S
+#2012
+robe~
+2012 1  # 1x a brown robe
+4 55 g 6 -1
+R
+1359 8  # 8x a bolt of cloth
+S
+#2013
+doublet~
+2013 1  # 1x a fine doublet
+4 55 g 6 -1
+R
+1359 8  # 8x a bolt of cloth
+S
+#2014
+waistcoat~
+2014 1  # 1x a shirt and waistcoat
+4 55 g 6 -1
+R
+1359 5  # 5x a bolt of cloth
+S
+#2015
+tunic~
+2015 1  # 1x a tunic
+4 55 g 6 -1
+R
+1359 5  # 5x a bolt of cloth
+S
+#2016
+leather jacket~
+2016 1  # 1x a leather jacket
+4 55 g 6 -1
+R
+1357 4  # 4x a large piece of leather
+S
+#2017
+spotted robe~
+2017 1  # 1x a grand, spotted robe
+4 55 g 6 -1
+R
+1357 5  # 5x a large piece of leather
+R
+1353 4  # 4x a big cat pelt
+S
+#2018
+cape~
+2018 1  # 1x a cape
+4 55 g 6 -1
+R
+1357 2  # 2x a large piece of leather
+S
+#2019
+cloak~
+2019 1  # 1x a dark cloak
+4 55 g 6 -1
+R
+1357 3  # 3x a large piece of leather
+S
+#2020
+shawl~
+2020 1  # 1x a fur shawl
+4 55 g 6 -1
+R
+1357 2  # 2x a large piece of leather
+R
+1352 4  # 4x a luxurious fox fur
+S
+#2021
+mantle~
+2021 1  # 1x a cloth mantle
+4 55 g 6 -1
+R
+1359 4  # 4x a bolt of cloth
+S
+#2022
+wimple~
+2022 1  # 1x a wimple
+4 55 g 6 -1
+R
+1359 4  # 4x a bolt of cloth
+S
+#2023
+gloves~
+2023 1  # 1x fine cloth gloves
+4 55 g 6 -1
+R
+1359 2  # 2x a bolt of cloth
+S
+#2024
+leather gloves~
+2024 1  # 1x a pair of leather gloves
+4 55 g 6 -1
+R
+1356 4  # 4x a small piece of leather
+S
+#2025
+belt~
+2025 1  # 1x a leather belt
+4 55 g 6 -1
+R
+1356 2  # 2x a small piece of leather
+S
+#2026
+girdle~
+2026 1  # 1x a cloth girdle
+4 55 g 6 -1
+R
+1359 2  # 2x a bolt of cloth
+S
+#2027
+leather pants~
+2027 1  # 1x leather pants
+4 55 g 6 -1
+R
+1357 4  # 4x a large piece of leather
+S
+#2028
+breeches~
+2028 1  # 1x a pair of breeches
+4 55 g 6 -1
+R
+1359 4  # 4x a bolt of cloth
+S
+#2029
+stockings~
+2029 1  # 1x a pair of stockings
+4 55 g 6 -1
+R
+1359 2  # 2x a bolt of cloth
+S
+#2030
+hose~
+2030 1  # 1x a pair of hose
+4 55 g 6 -1
+R
+1359 2  # 2x a bolt of cloth
+S
+#2031
+moccasins~
+2031 1  # 1x a pair of moccasins
+4 55 g 6 -1
+R
+1356 4  # 4x a small piece of leather
+S
+#2032
+sandals~
+2032 1  # 1x a pair of sandals
+4 55 g 6 -1
+R
+1356 4  # 4x a small piece of leather
+S
+#2033
+canteen~
+2033 1  # 1x a canteen
+4 55 g 8 -1
+R
+1356 2  # 2x a small piece of leather
+S
+#2034
+wineskin~
+2034 1  # 1x a wineskin
+4 56 g 8 -1
+R
+1357 2  # 2x a large piece of leather
+S
+#2035
+rope~
+2035 1  # 1x a length of rope
+2 198 g 2 -1
+R
+1356 1  # 1x a small piece of leather
+S
+#2036
+tent~
+2036 1  # 1x a collapsed tent
+4 55 g 8 -1
+R
+1357 8  # 8x a large piece of leather
+S
+$

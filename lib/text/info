@@ -1,0 +1,101 @@
+(lib/text/info)
+[Note: Further information can be gained on the capitalized words by using the
+HELP command]
+
+   Welcome to EmpireMUD. When entering the game world you will start inside of
+a Tower of Souls and given a chance at this point to use the 'transport' com-
+mand to move from tower to tower until you like what you see around you. Of
+course the first thing you will notice is that instead of being confronted with
+a simple room description, you are in fact looking at a ASCII character map
+that depicts the land around you. Here are some of the symbols and what they
+mean on the map:
+
+   .... Fields              &g^^^^&0 Forest                   &c~~~~&0 River
+   <oo> You/other players   &Go&Y^^&Go&0 Apple trees          &g.&0TT&g.&0 Guard Tower
+
+   See other map symbols on HELP MAP
+
+   You can type SCORE to see a sheet of information about your character, with
+your name, play time, and skills. It also shows your health, moves, and mana in
+the form of &gcurrent&0/&gmax&0/+&gregen&0/hr (one mud hour is 75 seconds).
+
+Here are some starting commands you will want to know from the get go:
+   EQUIPMENT (eq)   INVENTORY (i)   SKILLS
+   SEW              CRAFT           TOGGLE
+   DIG              CHOP            SKIN
+   SCRAPE           HARVEST         PICK
+   BUILD            NEWBIE
+
+   The above commands are essential to start with -- it is actually how you
+will gain some of your starting equipment. To give an example we will do a step
+by step guide to making your first handaxe:
+
+   1. First begin to DIG. If it says that you cannot dig then move around until
+      you can. Stay away from water, though, as you want rocks rather than clay.
+   2. When you see the message "You pull a rock from the ground!", you've got
+      one. You need two rocks, but if you manage to find a flint, you can
+      CRAFT a flint set (see LIGHT). You can type STOP to stop digging.
+   3. After you have gotten your second rock, WIELD one of them and CHIP the
+      other rock till it splits open.
+   4. Chip the already-chipped rock again.
+   5. Now you have your first tool, a handaxe!
+
+   After fashioning your starting handaxe you can use it. REMOVE the rock in
+your hand and then WIELD the handaxe. This will make it easier to slay animals
+and skin their corpses. You can TAN skin into leather and then SEW the leather
+into equipment and clothing. You can also sew using wool (SHEAR) or cotton
+(HARVEST) that you WEAVE into cloth.
+
+   Equipment is very important and while you may find solace in having your
+trusty handaxe, it may not be enough for the trials ahead and thus you will
+need to take on the task of improving your equipment. As another example we
+will do a step by step guide to crafting your first wood-chopping axe:
+
+   1. Find yourself a forest or a nearby tree of some sort.
+   2. GATHER sticks in the forest. You only need one; then type STOP.
+   3. CRAFT a handle using one of the sticks. You'll need to WIELD your handaxe
+      for this, because it's sharp.
+   4. REMOVE your handaxe.
+   5. Lastly, CRAFT a stone axe with the handaxe and handle you now have a real
+      axe!
+
+   At one time or another, you'll see the message "You are hungry". This means
+that it's time to find something edible before too long. People don't starve
+to death in this world, so have no fear. However, when you are hungry, you do
+not build up lost energy, so eventually you'll be unable to do anything but sit
+around and feel sorry for yourself until someone comes by. Then, you can only
+hope that it's a benevolent person, rather than a greedy thief or a warrior
+lusting for blood. You can pick fruits, go spear-fishing, butcher corpses, or
+harvest corn for food. You may also be thirsty; try "drink river" from a land
+tile that's next to a river.
+
+   If you find it difficult to navigate the map, you may want to buy the
+Navigation ability, from the Survival skill. It will give you coordinates for
+each location. When you buy this ability, your map may rotate. That means your
+character didn't know which way was actually North until now.
+
+Additional Utilities:
+  TOGGLE - Lets you turn on and off various channels, modes, and preferences.
+    - toggle political: shows ownership on the map
+    - toggle informative: shows building status as map colors
+  MAPSIZE - Change the size of your game map.
+  NEARBY - See cities, adventures, and starting locations near you.
+  ADVENTURE - Shows information about any adventure you come across.
+
+   To conclude this guide, it is always a good idea to simply ask if you do
+not know how to do something. Really a common question it seems is, "What
+do I use to forge equipment with, I don't have a hammer to use." The answer
+is rather simple too: a rock. Hopefully you enjoyed reading this info guide
+as much as I enjoyed writing it and if there is ever a doubt in your mind
+on what to do, DON'T PANIC! There is almost always someone around willing
+to lend a helping hand.
+
+You can find more information on HELP GETTING STARTED.
+
+Quick-start guides:
+* Founding an empire: HELP EMPIRE GUIDE
+* Building your first house: HELP HOUSING GUIDE
+* Mining and forging: HELP IRON GUIDE
+* Vampires: HELP VAMPIRE GUIDE
+
+See also: POLICY, HELP CRAFT, HELP FORGE, HELP SEW, HELP BUILD, HELP EEDIT

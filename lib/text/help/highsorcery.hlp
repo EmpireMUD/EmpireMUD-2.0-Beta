@@ -1,0 +1,443 @@
+"HIGH SORCERY"
+
+High Sorcery (skill)
+
+High Sorcery is one of the core skills of EmpireMUD. It is an academic way of
+harnessing the powerful mana that flows through the world.
+
+To begin the path of High Sorcery, seek out one of its lofty towers and use
+the STUDY command on the top floor.
+
+See also: STUDY, SORCERY TOWER, RITUAL, STAFFMAKING, FORESIGHT, MANASHIELD,
+    SUMMON SWIFT, DISENCHANT, COLORBURST, RITUAL OF BURDENS, PHOENIX RITE,
+    VIGOR, RITUAL OF TELEPORTATION, CITY TELEPORTATION, RITUAL OF DEFENSE,
+    PORTAL MAGIC, PORTAL MASTER, RITUAL OF SENSE LIFE, RITUAL OF DETECTION,
+    DEVASTATION RITUAL, ENCHANT, ENERVATE, SIPHON, SLOW, SUNSHOCK, MIRRORIMAGE,
+    ARCANE POWER, DISPEL, COLLAPSE
+#
+"ARCANE POWER"
+
+Arcane Power (High Sorcery ability)
+
+Sorcerers who have mastered the arcane arts can channel 35% more mana than
+those without. Your total mana increases by this amount, including any bonuses
+from equipment and other abilities.
+#
+"CITY TELEPORTATION"
+
+City Teleportation (High Sorcery ability)
+
+Usage:  ritual teleport <city>
+Cooldown:  15 minutes
+
+This ability expands your teleport power to any of your empire's cities. You
+can use the city's name or number. Use "city list" to see available cities.
+
+This ability levels up High Sorcery any time you teleport.
+
+See also: TELEPORTATION, CITY
+#
+COLORBURST
+
+Colorburst (High Sorcery ability)
+
+Usage:  colorburst [victim]
+Cooldown:  30 seconds
+
+Shoot a disorienting burst of color at your foe. This effect gives -10% to-hit
+for 30 seconds.
+
+In combat, colorburst will automatically target your current opponent if you
+do not provide a target.
+#
+"DEVASTATION RITUAL"
+
+Devastation Ritual (High Sorcery ability)
+
+Usage:  ritual devastation
+
+This ritual allows a sorcerer to quickly clear a large area of land through
+ritual magic. It will bring down forests and crops within 3 tiles of the caster.
+
+See also: RITUAL
+#
+DISENCHANT
+
+Disenchant (High Sorcery ability)
+
+Usage:  disenchant <item>
+
+This technique allows you to break open enchanted objects and strip them of
+their power. This allows them to be enchanted with something different.
+
+This will also remove the superior qualities of masterwork items.
+
+Sometimes you can create magical items from the released energy.
+#
+DISPEL
+
+Dispel (High Sorcery ability)
+
+Usage:  dispel [target]
+Cooldown:  9 seconds
+
+This spell removes any magical or fire-based damage-over-time effects on the
+target.
+
+See also: CLEANSE
+#
+ENCHANT "ENCHANT WEAPONS" "ENCHANT ARMOR" "ENCHANT TOOLS"
+
+Enchant Weapons, Enchant Armor, Enchant Tools (High Sorcery abilities)
+
+Usage:  enchant <item> <type>
+
+Powerful sorcerers learn to enchant ordinary items to increase their useful-
+ness and power. You may only enchant items that are not already enchanted. The
+level and strength of the enchantment are based on both the level of the item
+and the level of the enchanter.
+
+Enchant Weapons:
+  striking - strength, to-hit  (5 bloodstones)
+  parry - dexterity  (5 lightning stones)
+  wisdom - intelligence, mana regen  (5 glowing seashells)
+  accuracy - to-hit  (5 bloodstones)
+  awareness - wits, to-hit  (5 blue irises)
+  manaspring (offhand) - mana regen, max mana (5 blue irises)
+  healing (offhand) - bonus healing, mana regen (5 glowing seashells)
+  fury (offhand) - bonus magical, mana regen (5 lightning stone)
+  venom (offhand) - bonus physical, move regen (5 bloodstone)
+
+Enchant Armor:
+  health - health  (5 bloodstones)
+  mana - mana  (5 blue irises)
+  stamina - move  (5 lightning stones)
+  regeneration - health regen  (5 blue irises)
+  longrunning - move regen  (5 lightning stones)
+  energy - mana regen  (5 blue irises)
+  protection - soak  (5 glowing seashells)
+  evasion - dodge  (5 lightning stones)
+  rage - strength  (5 bloodstones)
+  power - intelligence  (5 glowing seashells)
+  blocking (shield) - block  (5 lightning stones)
+
+Enchant Tools:
+  embiggening (pack) - capacity  (1 of each of the 4 gems)
+
+See also: GREATER ENCHANTMENTS
+#
+ENERVATE
+
+Enervate (High Sorcery ability)
+
+Usage:  enervate <victim>
+Cooldown:  75 seconds
+
+Your victim is enervated: he loses move regen. You are able to leech some
+of this for yourself, and your move regeneration receive a temporary boost.
+
+In combat, enervate will automatically target your opponent.
+#
+FORESIGHT
+
+Foresight (High Sorcery ability)
+
+Usage:  foresight [person]
+
+When granted the gift of foresight, a person gains +10% chance to dodge as
+she begins to see the arc of an opponent's weapon before it strikes.
+
+Gain skill by casting foresight or by fighting while it is active on you.
+
+If your target is in combat, you will join the combat upon using this ability.
+#
+"GREATER ENCHANTMENTS"
+
+Greater Enchantments (High Sorcery ability)
+
+This ability raises the strength of all your enchantments by 50%.
+
+See also: ENCHANT
+#
+MANASHIELD "MANA SHIELD"
+
+Manashield (High Sorcery ability)
+
+Usage:  manashield
+
+By armoring herself with a manashield, a sorcerer sacrifices part of her mana
+pool for reduced combat damage.
+
+Mana Shield reduces your mana by 25 (this effect is doubled by Gift of Nature).
+
+Gain skill by fighting while manashielded.
+
+See also: GIFT OF NATURE
+#
+MIRRORIMAGE "MIRROR IMAGE"
+
+Mirrorimage (High Sorcery ability)
+
+Usage:  mirrorimage
+
+This spell creates an identical duplicate of the caster (with reduced health).
+It's good enough to fool at least one of the people hitting you.
+
+The mirror image counts as a familiar.
+
+See also: FAMILIAR, DISMISS, ORDER
+#
+"PHOENIX RITE"
+
+Phoenix Rite (High Sorcery ability)
+
+Usage: rite phoenix
+
+A master sorcerer can resurrect herself upon death by preparing properly. Once
+performed, the Phoenix Rite does not expire until it saves you from death.
+
+When you are restored from death, you will have 20% of your health and at least
+20% each of blood, mana, and moves.
+
+You can re-cast the ritual to gain skill, but it will give you a skill point
+when it saves you as well.
+
+See also: RITUAL
+#
+"PORTAL MAGIC" "PORTAL MAGE"
+
+Portal Magic (High Sorcery ability)
+
+Learning portal magic allows you to create portal nodes, and allows members of
+your empire to use them. These portals can only connect two locations on the
+same island or continent, unless you have a Portal Master in the empire.
+
+A "portal mage" is a person with the Portal Magic ability. Without a portal
+mage in your empire, you cannot use portal buildings.
+
+You can gain Portal Magic skill whenever someone in your empire uses your
+portal magic to open a portal.
+
+See also: PORTAL, PORTAL MASTER
+#
+"PORTAL MASTER" COLLAPSE
+
+Portal Master (High Sorcery ability)
+
+Command:  collapse <portal>
+
+Becoming a Portal Master removes the range limit on your empire's portals.
+It also allows you to collapse portals yourself.
+
+You can gain Portal Master skill whenever someone in your empire uses your
+portal mastery to open a portal.
+
+See also: PORTAL, PORTAL MAGIC
+#
+RITUAL RITE
+
+Usage:  ritual <type>
+
+This command allows a High Sorcerer to perform a variety of rituals, based on
+the different abilities they have learned. See the help file for individual
+rituals to learn more about them.
+#
+"RITUAL OF BURDENS" "BURDENS RITUAL" "BURDEN RITUAL"
+
+Ritual of Burdens (High Sorcery ability)
+
+Usage: ritual burdens
+
+This ritual allows you to carry 6, 12, or 18 more items (based on your level).
+
+You can level up High Sorcery by re-casting this ritual.
+
+See also: RITUAL
+#
+"RITUAL OF DEFENSE"
+
+Ritual of Defense (High Sorcery ability)
+
+Usage: ritual defense
+Cost: 1 imperium spike and 1 bloodstone per wall
+
+This ritual enchants a wall to be able to repel anyone flying. It also works
+on gatehouses and river gates. It will go away if you dismantle the building
+or wall.
+
+Cast it on more walls to raise your skill. You will not get your resources back
+if you cancel the ritual; they are spent immediately.
+
+See also: RITUAL
+#
+"RITUAL OF DETECTION"
+
+Ritual of Detection (High Sorcery ability)
+
+Usage:  ritual detection
+
+This ability finds all players currently in your city, whether hidden, earth-
+melded, invisible, or any other condition. This ability only works inside of a
+city owned by your empire.
+
+See also: RITUAL
+#
+"RITUAL OF SENSE LIFE" "SENSE LIFE"
+
+Ritual of Sense Life (High Sorcery skill)
+
+Usage:  ritual senselife
+
+This spell works similar to the "search ability" and can find people hidden
+in the room with you, using simple magic.
+
+See also: RITUAL
+#
+"RITUAL OF TELEPORTATION" TELEPORTATION
+
+Ritual of Teleportation (High Sorcery skill)
+
+Usage:  ritual teleportation [target]
+Cooldown:  15 minutes (teleport home only)
+
+With the basic teleportation ability, you can teleport at random (2 to 7 map
+tiles in any direction) or you can teleport to your home.
+
+This ability levels up High Sorcery any time you teleport.
+
+See also: CITY TELEPORTATION, RITUAL
+#
+"SIEGE RITUAL"
+
+Siege Ritual (High Sorcery ability)
+
+Usage:  ritual siege <direction>
+
+This powerful ability is rivaled only by the catapult in its ability to take
+down buildings. Use it to destroy your enemies!
+
+Like the catapult, you must be adjacent to your target and it targets only
+buildings.
+
+See also: RITUAL
+#
+SIPHON "MANA SIPHON"
+
+Siphon (High Sorcery ability)
+
+Usage:  siphon [victim]
+Cooldown:  20 seconds
+
+You can steal mana from other using the mana siphon ability. If you are in
+combat, it will automatically target your current opponent.
+#
+SLOW
+
+Slow (High Sorcery ability)
+
+Usage:  slow [victim]
+Cooldown:  75 seconds
+
+This ability hexes your victim with lethargy, causing them to attack more
+slowly in combat. If you're already fighting and do not specify a victim, it
+will target the person you are fighting.
+#
+STAFFMAKING "STAFF MAKING" STAFF STAVES "POWERFUL STAVES"
+
+Staffmaking, Powerful Staves (High Sorcery abilities)
+
+Command:  craft [number] <staff>
+
+Staves are the signature weapon of High Sorcery, and this power lets you make
+them.
+
+Staffmaking:
+  staff  1 log, 5 fiveleaf
+  wanderer staff  1 log, 5 lightning stones  +25 moves
+  sorcerer staff  1 log, 5 blue irises  +1 mana regen
+  staff of wisdom  1 log, 5 glowing seashells  +1 intelligence
+
+Powerful Staves:
+  staff of lightning  1 log, 10 lightning stones, 5 nocturnium ingots  +2 wits, +1 int
+  burning staff  1 log, 10 blue irises, 5 nocturnium ingots  +25 mana, +1 mana regen
+  staff of agony  1 log, 10 bloodstones, 5 nocturnium ingots  +20 to-hit, +1 health regen
+
+Gain skill by crafting staves.
+#
+"STAFF MASTERY"
+
+Staff Mastery (High Sorcery ability)
+
+Learn to focus your energy through your staff. With this ability, your staff
+attacks will deal 50% more damage.
+#
+STUDY
+
+Usage:  study
+
+By sitting down to study High Sorcery, you can begin to unlock its secrets.
+You must do this on the top floor of a Tower of Sorcery.
+
+See also: HIGH SORCERY, SORCERY TOWER
+#
+"SUMMON MATERIALS"
+
+Summon Materials (High Sorcery ability)
+
+Usage:  summon materials [number] <keywords>
+
+This ability actually allows the sorcerer to open a tiny portal to the empire's
+storage buildings, and pull out the materials he needs. There is no range on
+this ability, and it may be used to grab as many items as the sorcerer wishes.
+#
+"SUMMON SWIFT"
+
+Summon Swift (High Sorcery ability)
+
+Command:  summon swift <type>
+Cooldown:  1 minute
+
+This ability lets you summon a swift mount to your side. These unique mounts
+can be sold to players who aren't sorcerers, or kept for one's self. The swift
+mounts cannot be barded.
+
+Types of swift mounts:
+  stag - a magnificent white deer
+  deinonychus - a feathered reptile with fearsome talons (requires 51)
+  serpent - a long, gigantic snake (requires 51)
+  liger - a massive striped cat (requires 76)
+  bear - a huge bear with golden fur (requires 76)
+
+See also: SUMMON
+#
+SUNSHOCK "SUN SHOCK"
+
+Sunshock (High Sorcery ability)
+
+Usage:  sunshock [victim]
+Cooldown:  9 seconds
+
+Sunshock blasts your target with the pure light of the sun. This deals a small
+amount of damage (scaled by your level in High Sorcery), and causes a very
+short blinding effect.
+
+Sunshock does 2x damage to vampires.
+
+If you are in combat and specify no target, Sunshock hits your current
+opponent.
+#
+VIGOR
+
+Vigor (High Sorcery ability)
+
+Usage:  vigor [target]
+
+Your target receives a quick boost of movement points, at the cost of move
+regeneration. The strength of this spell is based upon the caster's intell-
+igence.
+
+The vigor bonus is doubled if the target is not in combat.
+
+If your target is in combat, you will join the combat upon using this ability.
+#
+$

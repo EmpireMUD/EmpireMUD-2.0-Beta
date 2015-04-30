@@ -1,0 +1,349 @@
+#10200
+clothing goblin set~
+goblin clothing~
+A set of goblin clothing is rotting on the ground.~
+The goblin clothing is in poor condition.
+~
+2 o ad
+0 0 0
+11 0
+S
+#10201
+pants goblin pair~
+goblin pants~
+A pair of goblin pants is lying here.~
+The goblin pants are holey, and smell hellish.
+~
+2 o af
+0 0 0
+11 0
+S
+#10202
+shoes goblin pair~
+goblin shoes~
+A pair of goblin shoes are splitting on the ground.~
+The goblin shoes are in disrepair.
+~
+2 mo ag
+0 0 0
+11 0
+A
+11 1
+C
+0 0
+S
+#10203
+coins goblin pile tarnished~
+a pile of goblin coins~
+A tarnished pile of coins is lying here.~
+It doesn't look like there are too many coins here.
+~
+11 dm a
+1 -1 0
+2 0
+C
+0 0
+S
+#10204
+saddle goblincraft~
+a goblincraft saddle~
+A goblincraft saddle has been left behind.~
+The saddle appears to be in good condition!
+~
+2 emo as
+0 0 0
+7 0
+A
+6 1
+C
+0 0
+S
+#10205
+necklace tarnished~
+a tarnished necklace~
+A tarnished necklace is coiled in the dust.~
+The necklace appears to be goblincraft.
+~
+2 mp ac
+0 0 0
+2 0
+A
+4 -1
+A
+11 1
+C
+0 0
+S
+#10206
+timepiece goblin strange~
+a goblin timepiece~
+A strange goblin timepiece is lying here.~
+It seems to be a wristband that tells time, but you can't read it.
+~
+2 mp aj
+0 0 0
+0 0
+A
+4 2
+A
+9 1
+C
+0 0
+S
+#10207
+gloves open-fingered fingered pair~
+open-fingered gloves~
+A pair of open-fingered gloves is lying here.~
+The gloves appear to be goblincraft.
+~
+2 mo ah
+0 0 0
+11 0
+A
+21 2
+A
+17 1
+C
+0 0
+S
+#10208
+collar goblin~
+a goblin collar~
+A goblin collar has been left on the ground.~
+The collar looks strong enough to protect the neck.
+~
+27 mo ac
+2 0 0
+2 0
+A
+12 2
+A
+15 1
+C
+0 0
+S
+#10209
+earring warg-bone bone strange~
+a warg-bone earring~
+A strange bone earring is lying here.~
+The earring appears to be goblincraft.
+~
+2 jmo am
+0 0 0
+14 0
+A
+22 2
+A
+17 1
+C
+0 0
+S
+#10210
+club bone zelkab's~
+Zelkab's bone club~
+A bone club is sitting on the ground.~
+This goblincraft club looks to be primarily warg bone.
+~
+1 dehmp an
+0 3 5
+14 0
+A
+12 -1
+A
+17 1
+C
+0 0
+S
+#10211
+gauntlets armored zeklab's pair~
+Zelkab's armored gauntlets~
+A pair of armored gauntlets are lying here.~
+The gauntlets appear to be goblincraft.
+~
+27 dmp ah
+1 0 0
+7 0
+A
+21 1
+A
+17 1
+C
+0 0
+S
+#10212
+staff bone glowing garlgarl's~
+Garlgarl's glowing staff~
+A glowing bone staff is lying here.~
+The staff appears to be goblincraft, and made from warg bone.
+~
+1 dehmp an
+0 1 19
+14 0
+A
+4 -1
+A
+23 3
+C
+0 0
+S
+#10213
+belt herbs garlgarl's~
+Garlgarl's belt of herbs~
+A belt made of herbs is scattered here.~
+The belt appears to be goblincraft, and crude.
+~
+27 dmp al
+0 0 0
+0 0
+A
+23 1
+A
+7 1
+C
+0 0
+S
+#10214
+bow firebranded branded filks's~
+Filks's firebranded bow~
+A firebranded bow is lying here.~
+The bow appears to be goblincraft.
+~
+20 deimp ap
+2 1 0
+0 0
+A
+17 1
+C
+0 0
+S
+#10215
+arrows bundle goblin~
+a bundle of goblin arrows~
+A bundle of goblin arrows is lying here.~
+The goblincraft arrows seem strong, but small.
+~
+21 m a
+0 1 0
+0 0
+C
+0 0
+S
+#10216
+leggings reinforced pair walts's~
+Walts's reinforced leggings~
+A pair of reinforced leggings is lying here.~
+The leggings are goblincraft, for sure.
+~
+27 demp af
+1 0 0
+7 0
+A
+21 2
+A
+17 1
+A
+9 1
+C
+0 0
+S
+#10217
+belt heavy walts's~
+Walts's heavy belt~
+A heavy belt is lying here.~
+The belt appears to be goblincraft.
+~
+27 dmp al
+1 0 0
+7 0
+A
+21 1
+A
+9 1
+A
+17 1
+A
+6 1
+C
+0 0
+S
+#10218
+waistband band armored nilbog's~
+Nilbog's armored waistband~
+An armored waistband is lying here.~
+It is a goblincraft wasteband.
+~
+27 demp al
+3 0 0
+0 0
+A
+12 2
+A
+9 -1
+A
+18 1
+C
+0 0
+S
+#10219
+helm wargskull skull Nilbog's~
+Nilbog's wargskull helm~
+A helm made from a skull is lying here.~
+The skull is goblincraft, with signature leather and beading.
+~
+27 dmp ae
+3 0 0
+14 0
+A
+4 -1
+A
+12 1
+A
+18 1
+A
+13 1
+C
+0 0
+S
+#10220
+wristbands flaming pair furl's~
+Furl's flaming wristbands~
+A pair of flaming wristbands are lying here.~
+The wristbands appear to be goblincraft, and are on fire.
+~
+27 djmp aj
+0 0 0
+0 0
+A
+1 -1
+A
+22 1
+A
+9 1
+A
+17 1
+B
+c
+C
+0 0
+S
+#10221
+wristbands armored pair furl's~
+Furl's armored wristbands~
+A pair of armored wristbands are lying here.~
+The wristbands appear to be goblincraft, made from enchanted wood.
+~
+27 djmp aj
+2 0 0
+0 0
+A
+4 -1
+A
+12 1
+A
+18 1
+A
+3 1
+C
+0 0
+S
+$

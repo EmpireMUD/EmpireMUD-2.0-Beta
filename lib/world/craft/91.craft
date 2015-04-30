@@ -1,0 +1,53 @@
+#9173
+cabin tent~
+9173 1  # 1x a collapsed cabin tent
+4 182 g 8 9180
+R
+9180 16  # 16x a walrus tusk
+R
+1357 32  # 32x a large piece of leather
+S
+#9176
+reindeer antler dagger~
+9176 1  # 1x a reindeer antler dagger
+1 196 0 32 9175
+R
+9175 1  # 1x a reindeer's antlers
+R
+177 2  # 2x an imperium ingot
+S
+#9180
+cabintent~
+-1 1  # 1x UNKNOWN
+8 -1 0 1 9173
+B
+9180 bde bdeklmno
+S
+#9182
+wolverine fur cap~
+9182 1  # 1x a wolverine fur cap
+4 182 g 12 9181
+R
+9181 1  # 1x a wolverine fur
+R
+1356 1  # 1x a small piece of leather
+S
+#9183
+polar bear cloak~
+9183 1  # 1x a polar bear cloak
+4 182 g 12 9177
+R
+9177 1  # 1x a polar bear fur
+R
+1357 1  # 1x a large piece of leather
+S
+#9186
+sealskin trousers~
+9186 1  # 1x some sealskin leggings
+4 182 g 12 9185
+R
+9185 1  # 1x a large sealskin
+R
+1357 1  # 1x a large piece of leather
+S
+$

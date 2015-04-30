@@ -1,0 +1,52 @@
+#12000
+Entrance to the Mausoleum~
+   Inside the mausoleum the stone walls are plain and undecorated, it seems the
+builders did not think the dead would need the embelishments of the living. A
+stone archway leads back outside, back towards the warmth of life. A stone
+starcase leads further down into the bowels of the world. A sudden gust of wind
+chills you to the bone.
+~
+0 0
+D9
+~
+0 12001
+S
+#12001
+A Hallway of Skulls~
+   Uncountable skulls have been stacked tightly against the walls of this
+hallway, either as a cheap way of burying the dead, or for some more sinister
+reason. You feel a slight breeze coming from the starcase at the northern end
+of the hallway. You can see the flicker of fire light towards the south.
+~
+b 0
+D8
+~
+0 12000
+D2
+~
+0 12002
+S
+#12002
+A Necromancers Common Room~
+   This large, vaulted room looks to have been a crypt at some point in the
+past, now however it seems to be used as a common room for the Necromancers who
+live here. The room is lit with a number of torches along the walls leaving the
+entire room a little smokey due to the poor ventilation. There is an assortment
+of furniture spread around the room, and a number of large bookshelves in one
+corner. It seems the occupants have been living rather well down here.
+~
+c 0
+D0
+~
+0 12001
+D1
+~
+0 12003
+D2
+~
+0 12006
+D3
+~
+0 12009
+S
+$

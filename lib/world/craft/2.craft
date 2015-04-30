@@ -1,0 +1,91 @@
+#250
+bowl~
+250 1  # 1x a clay bowl
+2 57 ag 16 -1
+R
+101 2  # 2x a pile of clay
+S
+#251
+pot~
+251 1  # 1x a clay pot
+2 57 ag 16 -1
+R
+101 4  # 4x a pile of clay
+S
+#254
+vessel~
+254 1  # 1x a clay vessel
+2 57 ag 16 -1
+R
+101 8  # 8x a pile of clay
+S
+#256
+hestian trinket~
+256 1  # 1x a hestian trinket
+2 202 ag 24 -1
+R
+101 1  # 1x a pile of clay
+R
+1300 1  # 1x a glowing green seashell
+R
+1206 1  # 1x a crystallized blue flower
+S
+#257
+bricks~
+257 1  # 1x a pile of clay bricks
+2 198 a 8 -1
+R
+101 2  # 2x a pile of clay
+S
+#258
+peace pipe~
+258 1  # 1x a peace pipe
+2 202 ag 24 -1
+R
+101 1  # 1x a pile of clay
+R
+1356 1  # 1x a small piece of leather
+R
+1300 3  # 3x a glowing green seashell
+S
+#259
+tethyan focus~
+259 1  # 1x a tethyan focus
+2 202 ag 32 -1
+R
+101 2  # 2x a pile of clay
+R
+1300 10  # 10x a glowing green seashell
+R
+1356 1  # 1x a small piece of leather
+S
+#260
+areios charm~
+260 1  # 1x an areios charm
+2 202 ag 32 -1
+R
+101 2  # 2x a pile of clay
+R
+104 10  # 10x a red bloodstone
+R
+1356 1  # 1x a small piece of leather
+S
+#261
+gaian effigy~
+261 1  # 1x a gaian effigy
+2 202 ag 32 -1
+R
+101 2  # 2x a pile of clay
+R
+1206 10  # 10x a crystallized blue flower
+R
+1356 1  # 1x a small piece of leather
+S
+#262
+trinket of conveyance~
+262 1  # 1x a trinket of conveyance
+2 57 ag 18 -1
+R
+101 1  # 1x a pile of clay
+S
+$

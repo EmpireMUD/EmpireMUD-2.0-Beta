@@ -1,0 +1,152 @@
+#250
+bowl clay~
+a clay bowl~
+A clay bowl is lying here, slightly cracked.~
+The bowl looks like it would be good for holding water.
+~
+5 0 a
+12 0 0
+6 0
+S
+#251
+pot clay~
+a clay pot~
+A clay pot is lying here, slightly cracked.~
+You can carry water in the pot.
+~
+5 0 a
+24 0 0
+6 0
+R
+5606 0
+S
+#254
+vessel clay~
+a clay vessel~
+A clay vessel has been left here.~
+The vessel looks like it would hold a lot of water.
+~
+5 0 a
+56 0 0
+6 0
+R
+5121 0
+R
+5606 0
+S
+#256
+trinket hestian~
+a hestian trinket~
+A hestian trinket is sitting on the ground.~
+   You can use the trinket to teleport home. Use the home command to set your
+home.
+~
+3 0 a
+0 0 0
+6 0
+R
+5121 0
+R
+5610 0
+T 256
+S
+#257
+bricks pile clay~
+a pile of clay bricks~
+Some clay bricks are piled on the ground.~
+You can use the bricks for building.
+~
+3 el a
+0 0 0
+6 0
+M
+0
+You put down a layer of bricks.~
+M
+1
+$n puts down a layer of bricks.~
+R
+5117 0
+S
+#258
+pipe peace~
+a peace pipe~
+A piece pipe is lying on the ground.~
+   This pipe is a symbol of peace, and smoking it is considered sacred. It
+looks like you could type 'smoke' to use it.
+~
+3 0 a
+0 0 0
+6 0
+R
+5610 0
+T 258
+S
+#259
+focus tethyan~
+a tethyan focus~
+Someone has left a tethyan focus here.~
+You can hold this item in your off-hand.
+~
+3 mo ao
+0 0 0
+6 0
+A
+7 1
+A
+8 1
+A
+9 2
+C
+0 0
+S
+#260
+charm areios~
+an areios charm~
+An areios charm is sitting on the ground.~
+You can hold this item in your off-hand.
+~
+3 mo ao
+0 0 0
+6 0
+A
+6 1
+A
+1 1
+A
+9 2
+C
+0 0
+S
+#261
+effigy gaian~
+a gaian effigy~
+A gaian effigy is sticking up out of the ground.~
+You can hold this item in your off-hand.
+~
+3 mo ao
+0 0 0
+6 0
+A
+7 2
+A
+16 1
+C
+0 0
+S
+#262
+trinket conveyance~
+a trinket of conveyance~
+A trinket of conveyance seems to have been dropped here.~
+You can use this trinket to teleport to a random starting location.
+~
+3 0 a
+0 0 0
+6 0
+R
+5121 0
+R
+5610 0
+T 262
+S
+$

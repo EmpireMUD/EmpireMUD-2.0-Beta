@@ -1,0 +1,393 @@
+#2300
+leather breastplate~
+2300 1  # 1x a leather breastplate
+4 56 g 16 -1
+R
+1357 12  # 12x a large piece of leather
+S
+#2301
+leather helm~
+2301 1  # 1x a leather helm
+4 56 g 16 -1
+R
+1357 4  # 4x a large piece of leather
+S
+#2302
+leather vambraces~
+2302 1  # 1x leather vambraces
+4 56 g 16 -1
+R
+1357 6  # 6x a large piece of leather
+S
+#2303
+scale armor~
+2303 1  # 1x scale armor
+4 182 g 24 -1
+R
+1357 20  # 20x a large piece of leather
+S
+#2304
+viper helm~
+2304 1  # 1x a viper helm
+4 182 g 24 -1
+R
+1357 12  # 12x a large piece of leather
+R
+1355 4  # 4x some snakeskin
+S
+#2305
+shark skin vambraces~
+2305 1  # 1x shark skin vambraces
+4 182 g 24 -1
+R
+1357 10  # 10x a large piece of leather
+R
+1354 10  # 10x a shark skin
+S
+#2306
+shoes~
+2306 1  # 1x leather shoes
+4 56 g 16 -1
+R
+1357 2  # 2x a large piece of leather
+S
+#2307
+leather boots~
+2307 1  # 1x leather boots
+4 182 g 24 -1
+R
+1357 4  # 4x a large piece of leather
+S
+#2308
+hauberk~
+2308 1  # 1x a mail hauberk
+1 222 0 24 -1
+R
+175 12  # 12x an iron ingot
+R
+1357 2  # 2x a large piece of leather
+R
+1359 2  # 2x UNKNOWN
+S
+#2309
+mail coif~
+2309 1  # 1x a mail coif
+1 222 0 24 -1
+R
+175 4  # 4x an iron ingot
+R
+1356 1  # 1x a small piece of leather
+R
+1359 1  # 1x UNKNOWN
+S
+#2310
+splint vambraces~
+2310 1  # 1x splint vambraces
+1 222 0 24 -1
+R
+175 8  # 8x an iron ingot
+R
+1357 2  # 2x a large piece of leather
+S
+#2311
+cuirass~
+2311 1  # 1x a fine cuirass
+1 197 0 32 -1
+R
+175 20  # 20x an iron ingot
+R
+177 6  # 6x an imperium ingot
+R
+1357 2  # 2x a large piece of leather
+R
+1359 2  # 2x UNKNOWN
+S
+#2312
+eagle helm~
+2312 1  # 1x an eagle helm
+1 197 0 32 -1
+R
+175 10  # 10x an iron ingot
+R
+177 6  # 6x an imperium ingot
+R
+1356 1  # 1x a small piece of leather
+R
+1359 1  # 1x UNKNOWN
+S
+#2313
+spiked vambraces~
+2313 1  # 1x spiked vambraces
+1 197 0 32 -1
+R
+175 14  # 14x an iron ingot
+R
+177 6  # 6x an imperium ingot
+R
+1357 2  # 2x a large piece of leather
+S
+#2314
+leather buckler~
+2314 1  # 1x a leather buckler
+4 56 g 16 -1
+R
+1357 10  # 10x a large piece of leather
+R
+175 2  # 2x an iron ingot
+S
+#2315
+kite shield~
+2315 1  # 1x a kite shield
+1 222 0 24 -1
+R
+175 6  # 6x an iron ingot
+R
+1356 2  # 2x a small piece of leather
+S
+#2316
+ram shield~
+2316 1  # 1x a ram shield
+1 197 0 24 -1
+R
+175 12  # 12x an iron ingot
+R
+177 6  # 6x an imperium ingot
+R
+1356 2  # 2x a small piece of leather
+S
+#2317
+plate armor~
+2317 1  # 1x a suit of plate armor
+1 197 0 42 -1
+R
+175 20  # 20x an iron ingot
+R
+177 10  # 10x an imperium ingot
+R
+1357 4  # 4x a large piece of leather
+R
+1359 4  # 4x UNKNOWN
+S
+#2318
+great helm~
+2318 1  # 1x a great helm
+1 197 0 42 -1
+R
+175 14  # 14x an iron ingot
+R
+177 10  # 10x an imperium ingot
+R
+1356 1  # 1x a small piece of leather
+R
+1359 1  # 1x UNKNOWN
+S
+#2319
+lower cannons~
+2319 1  # 1x lower cannons
+1 197 0 42 -1
+R
+175 18  # 18x an iron ingot
+R
+177 10  # 10x an imperium ingot
+R
+1357 2  # 2x a large piece of leather
+S
+#2320
+clay shield~
+2320 1  # 1x a clay shield
+2 57 ag 32 -1
+R
+101 6  # 6x a pile of clay
+R
+121 6  # 6x a stick
+R
+1356 1  # 1x a small piece of leather
+S
+#2321
+sorcerers robe~
+2321 1  # 1x a sorcerer's robe
+4 199 g 24 -1
+R
+1359 12  # 12x UNKNOWN
+R
+1357 4  # 4x a large piece of leather
+R
+1308 6  # 6x deep orange dye
+R
+103 6  # 6x a yellow lightning stone
+R
+176 6  # 6x an ingot of nocturnium
+S
+#2322
+wizards hat~
+2322 1  # 1x a wizard's hat
+4 199 g 25 -1
+R
+1359 6  # 6x UNKNOWN
+R
+1357 1  # 1x a large piece of leather
+R
+1307 3  # 3x deadly violet dye
+R
+103 6  # 6x a yellow lightning stone
+R
+176 6  # 6x an ingot of nocturnium
+S
+#2323
+armbands of power~
+2323 1  # 1x armbands of power
+4 199 g 24 -1
+R
+1359 8  # 8x UNKNOWN
+R
+1357 2  # 2x a large piece of leather
+R
+1308 4  # 4x deep orange dye
+R
+103 6  # 6x a yellow lightning stone
+R
+176 6  # 6x an ingot of nocturnium
+S
+#2324
+copper breastplate~
+2324 1  # 1x a copper breastplate
+1 53 0 24 -1
+R
+178 10  # 10x a copper ingot
+R
+1356 2  # 2x a small piece of leather
+S
+#2325
+copper mask~
+2325 1  # 1x a copper mask
+1 53 0 24 -1
+R
+1359 1  # 1x UNKNOWN
+R
+178 4  # 4x a copper ingot
+S
+#2326
+copper vambraces~
+2326 1  # 1x copper vambraces
+1 53 0 24 -1
+R
+178 8  # 8x a copper ingot
+R
+1356 2  # 2x a small piece of leather
+S
+#2327
+copper buckler~
+2327 1  # 1x a copper buckler
+1 53 0 24 -1
+R
+178 6  # 6x a copper ingot
+R
+1356 1  # 1x a small piece of leather
+R
+125 1  # 1x a stack of lumber
+S
+#2328
+rawhide breastplate~
+2328 1  # 1x a rawhide breastplate
+4 223 g 16 -1
+R
+1351 10  # 10x a large skin
+S
+#2329
+rawhide skullcap~
+2329 1  # 1x a rawhide skullcap
+4 223 g 16 -1
+R
+1351 4  # 4x a large skin
+R
+1350 1  # 1x a small skin
+S
+#2330
+rawhide bracers~
+2330 1  # 1x rawhide bracers
+4 223 g 16 -1
+R
+1350 8  # 8x a small skin
+S
+#2331
+rawhide boots~
+2331 1  # 1x rawhide boots
+4 223 g 16 -1
+R
+1351 2  # 2x a large skin
+R
+1350 2  # 2x a small skin
+S
+#2332
+rawhide knapsack~
+2332 1  # 1x a rawhide knapsack
+4 223 g 8 -1
+R
+1351 4  # 4x a large skin
+R
+1350 2  # 2x a small skin
+S
+#2333
+conical hat~
+2333 1  # 1x a conical hat
+4 224 g 25 -1
+R
+1357 1  # 1x a large piece of leather
+R
+1307 1  # 1x deadly violet dye
+R
+1359 4  # 4x UNKNOWN
+R
+103 4  # 4x a yellow lightning stone
+S
+#2334
+furrowed sleeves~
+2334 1  # 1x furrowed sleeves
+4 224 g 24 -1
+R
+1359 4  # 4x UNKNOWN
+R
+1308 1  # 1x deep orange dye
+R
+103 4  # 4x a yellow lightning stone
+R
+1352 2  # 2x a luxurious fox fur
+S
+#2335
+apprentice shoes~
+2335 1  # 1x apprentice shoes
+4 224 g 24 -1
+R
+1359 4  # 4x UNKNOWN
+R
+1356 2  # 2x a small piece of leather
+R
+103 2  # 2x a yellow lightning stone
+S
+#2336
+earth-hewn sandals~
+2336 1  # 1x earth-hewn sandals
+4 199 g 24 -1
+R
+176 2  # 2x an ingot of nocturnium
+R
+103 8  # 8x a yellow lightning stone
+R
+1356 4  # 4x a small piece of leather
+S
+#2337
+magewhisper pouch~
+2337 1  # 1x a magewhisper pouch
+4 199 g 25 -1
+R
+1357 1  # 1x a large piece of leather
+R
+1307 3  # 3x deadly violet dye
+R
+1203 10  # 10x some magewhisper sepals
+R
+103 12  # 12x a yellow lightning stone
+R
+1359 10  # 10x UNKNOWN
+S
+$

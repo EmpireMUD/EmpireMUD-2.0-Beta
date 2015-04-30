@@ -1,0 +1,515 @@
+"ABILITY POINTS"
+
+You earn "ability" points at certain skill levels. These points are used to
+purchase abilities from the skill's tree.
+
+You earn ability points at these levels:
+ Basic: 1, 5, 10, 15, 20, 25, 30, 40, 50  (9 total)
+ Specialty: 60, 70, 75  (3 total)
+ Class: 80, 90, 100  (3 total)
+
+You can buy abilities with "skill buy <ability>".
+
+You can reset your ability purchases with "skill reset <skill>".
+  
+Don't confuse these with "skill points", which are used for easy daily skill
+gains.
+
+See also: SKILLS, SKILL CAPS, SKILL POINTS
+#
+BATHE 
+
+Usage:  bathe 
+
+Bathe is used to begin cleaning yourself in either a bath house or a river.
+You must bathe regularly to keep clean. If you bathe in a bath house you will
+get cleaner faster than if you were to bathe in a river.
+#
+CATAPULT 
+
+Usage:  catapult <direction> 
+
+Catapult is used to launch your catapult in the direction that you want. You
+must have 20 rocks and a catapult to use this. It can only shoot at an
+adjacent room. The command can not be used in deep forests either. 
+
+Example:  
+
+  > catapult north 
+#
+CHIP
+
+Usage: chip <item>
+
+This lets you chip a rock down to a sharper, more refined tool. You need to be
+wielding a rock or other hammer to do this.
+
+If you keep chipping, you can make a handaxe.
+
+See also: CRAFT
+#
+CHOP
+
+Usage: chop
+
+This command allows you to chop trees in the forest. Beware, trees are a
+limited resource.
+
+See also: BUILD, DEPLETION, SCRAPE, TREES, LUMBER, SAW
+#
+"DAILY SKILL POINTS" "DAILY SKILLS" "SKILL POINTS"
+
+You get a certain number of "daily skill points" each day. Once you have used
+all of these, you can still gain skill, but the rate will be much slower. You
+can avoid using your daily points on the wrong skill by shutting off skill
+gains with the "noskill" command.
+
+You can see your daily skill points by typing "skills"; they are at the bottom.
+
+While you have skill points available, your skills will gain faster. You can
+still gain skill experience without any daily skill points available -- you'll
+just gain it much more slowly.
+
+Don't confuse "skill points" with "ability points", which are used to purchase
+abilities.
+
+See also: ABILITY POINTS, SKILLS, SKILL CAPS
+#
+DESIGNATE REDESIGNATE KITCHEN BEDROOM LABORATORY LARDER CLOSET CRYPT STUDY
+
+Usage: designate <direction> <room>
+       redesignate <room>
+
+This designates a new room in a building as a specific room type. You must
+specify which direction this new room will be. The first room after the
+entrance must lie directly across from the entrance. After that, you may
+choose any direction you like. Each building is limited on how many rooms it
+may have.
+
+Room types:
+ baths - Identical to the free-standing building (castle only)
+ bedroom - +1 citizen, and gives a boost to regeneration while sleeping
+ closet - Holds clothing items
+ dining room - No special features
+ great hall - A larger hallway (castle only)
+ hall - A connecting room
+ kitchen - Allows cooking and other fire-dependent tasks
+ laboratory - Identical to the free-standing Alchemist
+ larder - A place to store food
+ sitting room - No special features
+ skybridge - Above-ground hallways used in some tree buildings
+ storage - Holds certain items
+ study - Has a global message board
+ throne room - Castle only
+ tunnel - Underground hallways used in some buildings
+ vault - Holds gold and silver, and sets your wealth (castle)
+ crypt - Can be set as a tomb
+
+See also: BUILD, STORAGE
+#
+DIG
+
+Usage:  dig
+
+This lets you claw at the ground until you find something useful. Among
+things that may be found, rocks, flint, and clay are the most common.
+
+Using a shovel or having the Finder ability will each cut your dig time in
+half.
+
+See also: DEPLETION, ROCKS, FLINT, CLAY, FINDER, SHOVEL
+#
+DISMANTLE
+
+Usage:  dismantle
+
+This command allows you to tear down a building when you're done with it. You
+get back half of the resources you spent to build it.
+
+You can use "nodismantle" to keep yourself from accidentally dismantling a
+building.
+
+See also: BUILD, NODISMANTLE
+#
+FLINT "FLINT SET"
+
+Flint can be combined with rocks (using CRAFT) to create a flint set, which
+can then be used to light torches.
+
+See also: LIGHT
+#
+GATHER
+
+Usage: gather
+
+Allows you to gather sticks from the ground. Your skill in this determines
+how many different sticks you can use and thus how quickly you gather enough.
+
+You can also gather apples in an orchard.
+
+See also: DEPLETION, STICKS, APPLES, ORCHARD, FOREST
+#
+HARNESS UNHARNESS
+
+Usage:  harness <animal> <object to harness them to> 
+        unharness <animal>
+
+Harness is used to tie one or more beasts of burden to some type of wagon in
+order to pull it. You must have the animals and the wagon in the same room,
+and have some rope in your inventory. After you have harnessed enough animals
+to the wagon you will be able to lead the animals and the wagon will follow. 
+
+Example:  
+
+  > harness horse wagon 
+#
+HARVEST HARVESTING
+
+Usage: harvest
+
+Allows you to harvest a crop. Be careful that you also replant some,
+otherwise you'll run out of that crop quickly.
+
+See also: PLANT
+#
+HERD HERDING
+
+Usage: herd <animal> <direction>
+
+This command is useful in herding animals into stables and fenced-in areas.
+#
+LEAD 
+
+Usage:  lead <animal> 
+
+Lead is used to lead animals. Once you begin leading an animal it will follow
+you where you walk. This can be used to pull carts and wagons. You usually
+can't lead animals indoors.
+
+Example:  
+  > lead horse 
+
+See also: TIE, HARNESS
+#
+LIGHT TORCH
+
+Usage: light <item>
+
+To light something, you must have a flint set. You may light sticks to create
+torches.
+#
+MILK
+
+Usage:  milk <animal> <container>
+
+You can milk cows and some other animals in a stable, if you have a drink
+container to hold the milk. Cows can be milked once or twice per day.
+#
+MILL MILLING
+
+Building:  (MM)  Mill  (no skill required)
+Built on:  plains, desert
+Stored at the mill:  cornmeal, flour
+Command:  mill [number] <item>
+
+You can mill:
+  wheat into 2 flour
+  corn into 2 cornmeal
+  2 olives into olive oil
+
+You must do this at a Mill building. Milling will gain Trade skill up to 15.
+
+See also: COOK
+#
+MINE MINES
+
+Building:  &y/&0[]&y\&0  Mine  (no skill required)
+Built on:  mountain
+Command:  mine
+
+"Mine" is both a building type, and the command to work in that building. Mines
+must be built on mountains, and can only be entered from one side even before
+you complete them. To work in a mine, you need a pick of some kind, although a
+simple handaxe will also work.
+
+Mines have a limited amount of ore, and do not replenish. However, if you fully
+dismantle a mine, its mountain will reset when the MUD celebrates a new year
+(every 7.5 real days). Once this reset happens, building a new mine on the
+tile will involve digging a new mine shaft and the mineral found there could be
+completely different.
+
+Mines always count as in-city territory, no matter where you build them.
+
+See HELP IRON GUIDE for help getting started on mining and using iron.
+
+Types of mines:
+  iron - very common
+  copper - common
+  silver - very uncommon
+  gold - only found with Rare Metals
+  nocturnium - only found with Rare Metals
+  imperium - only found with Rare Metals
+
+See also: DEPLETION, DEEP MINES, PROSPECT, RARE METALS
+#
+MINT
+
+Building:  [MM]  Mint  (Commerce ability)
+Built on:  plains, desert
+Fame:  5
+Command:  mint <object>
+
+The mint building allows you to mint valuable metals into coins. Each building
+can only mint coins for the empire it belongs to. The mint command will auto-
+repeat; stopping the action will give you back the item you were minting.
+
+See also: COINS, COMMERCE, STOP
+#
+MORPH MORPHING SHAPESHIFTING
+
+Usage:  morph <form>
+        morph normal
+
+Some powers allow you to change shape, using the morph command. Morphing takes
+a few seconds, but if you're in combat you can morph instantly at a higher
+cost than normal.
+
+See also: ANIMAL FORMS, WOLF FORM, BAT FORM, HORRID FORM, MIST FORM
+#
+NOSKILL
+
+Usage:  noskill <skill>
+
+You can toggle which skills will or will not gain for you. This helps you to
+conserve the precious few skill points you earn each day.
+
+Use the "skills" command to see which are &cgaining&0 and which are &rnoskill&0.
+
+See also: SKILLS
+#
+PLANT
+
+Usage: plant <seed/food>
+
+You can replant crops in open fields so that they may regrow and be harvested
+again. This is essential in keeping your crops from dying out.
+
+Planting takes a little while, but you don't actually have to wait the whole
+time. If you immediately stop planting, your character just scatters the seeds
+and the crop will grow eventually. If you take care to plant neat rows, and
+water them (let the planting action finish), the crop will grow very quickly.
+
+See also: HARVEST, WHEAT, CORN, APPLES
+#
+SACRIFICE 
+
+Usage:  sacrifice <item> <god>
+
+Sacrifice is used to destroy an item in the favor of a specific god you
+choose. This helps you by clearing up many unwanted items and resources.
+This also may help you get favor with the god, and in turn, that god may help
+you out with a little help. The sacrifice points are increased if the
+sacrifice is performed in a shrine, temple, or high temple to that god. 
+
+Example:  
+
+  > sacrifice stick Exar 
+#
+SAW
+
+Usage:  saw <tree | log>
+
+You can saw trees and logs into lumber. You must be in a lumber yard.
+
+See also: TREES, LOGS, LUMBER
+#
+SCRAPE
+
+Usage: scrape tree
+
+This skill is used to process trees into logs.
+
+The Woodworking ability increases how fast you can scrape logs.
+
+See also: TREES, SAW, WOODWORKING
+#
+SHEAR
+
+Usage:  shear <animal>
+
+You can shear sheep in a stable, giving you wool to weave into cloth. Sheep
+can be shorn every two days.
+
+See also: WEAVE
+#
+SHOOT
+
+Usage:  shoot <target> 
+
+This is a very usefull skill. To use it you must equip some type of bow, and
+have matching arrows in your inventory. You will attack with your arrows
+one at a time, while the target runs at you. Once the target reaches you,
+you will draw your weapon and begin melee battle. 
+
+Example:  
+
+  > shoot deer 
+#
+SKILL SKILLS ABILITY ABILITIES
+
+Usage:  skills -- list all skills
+        skill <name> -- see abilities in that skill
+        skill buy <ability> -- purchase an ability
+        skill reset <skill> -- reset your ability points
+        skill drop <skill> <level> -- lose skill levels
+
+This multi-purpose command helps you understand your skills. It shows your
+progress in each skill, and the ability points you've earned.
+
+If you specify a skill, you'll see a breakdown of the abilities in that skill
+tree. Abilities marked with an "x" are the ones you already know. To buy a new
+ability, use "skill buy". You must have a free skill point to do this.
+
+For more information, see the help page for each skill or ability. In some
+cases, you may have to type "help skill empire" because "help empire" shows
+something else, although this is the name of a skill.
+
+When you hit a skill cap level (50, 75, 100) you get to reset your abilities
+in that skill. To do that, you can type "skill reset <skill>". If you type it
+without the skill name, you can see which skills have free resets available.
+
+It also shows the range in which you can gain the skill, although you can gain
+no more than 10 points from any one ability.
+
+See also: NOSKILL, SPECIALIZE, SKILL CAPS, SKILL LEVELS
+#
+"SKILL CAPS" CAPS "MAX SKILL" "MAXIMUM SKILL" "CLASS SKILLS" "SPECIALTY SKILLS" "BASIC SKILLS"
+
+Skills are capped at certain levels to limit the number of abilities any one
+character can have. When you reach 50 or 75 in a skill, you will stop gaining
+points in that skill. To choose that skill for further advancement as one of
+your specialty or class skills, use the "specialize" command. This will get you
+a free level in the skill.
+
+* You can have two skills at 100. These are your class skills.
+  These skills will get 15 abilities each.
+* You can have one skill at 75. This is your specialty skill.
+  These skills will get 12 abilities each.
+* The rest of the skills are limited to 50. These are basic skills.
+  These skills will get 9 abilities each.
+
+You can get a second specialty skill (75) if you keep two of your skills at
+zero (0). Once you have fewer than two skills at zero, you can no longer choose
+to specialize an extra skill. The opposite is also true: if you specialize an
+extra skill, you'll no longer be able to gain in your last two zeroes.
+
+See also: SKILLS, SPECIALIZE
+#
+"SKILL LEVELS" "SKILL POINTS" "SKILL EXPERIENCE" "SKILLUPS"
+
+The two ways to gain skill levels are:
+- By using "green" abilities from the skill's tree (abilities that aren't at
+  max).
+- For skills under level 15, you can usually gain skill by doing "chores". See
+  the help file for each skill tree for more information on leveling it.
+
+Each skill has an experience rating, as a percentage. This is your chance to
+gain a skill level each time you use one of the skill tree's abilities -- the
+chance is checked any time you use an ability. You don't need to get the
+experience all the way to 100%.
+
+When your skills hit level 50 or 75, you will not be able to gain additional
+levels in the skill unless you specialize into it.
+
+See also: SKILL CAPS, SPECIALIZE
+#
+SMELT MELT
+
+Usage: smelt <item>
+
+Using a forge or foundry, you can melt down metals like iron, silver, and gold
+into ingots or bars. Smelting generally requires two of the base metal (e.g.
+iron ore) to create one of the processed version (iron ingot).
+
+Ingots are used for crafting.
+
+Gold and silver bars are worth more in the vault than their raw form. The bars
+can be smelted again to return them to the smaller raw version.
+
+See also: INGOTS, WEALTH
+#
+SPECIALIZE SPECIALTY
+
+Usage:  specialize <skill>
+
+This command allows you to choose which skills become your class skills and
+specialties. You can only specialize a skill that's at 50 (the basic skill cap)
+or 75 (the specialty skill cap). Doing this will gain you a free point in the
+skill and allow you to continue leveling it.
+
+NOTE: This is a temporary command. In the future, we intend to use quests and
+other mechanisms for players who want to specialize.
+
+See also: SKILL
+#
+"STARTING LOCATION" "START LOCATION" "TOWER OF SOULS" TRANSPORT TOS
+
+Command:  transport [destination]
+
+When you start, or die, you appear at a starting location. These are safe
+locations which will give you a moment to prepare to go out into the world.
+No player can be attacked at a starting location.
+
+You can travel randomly between starting locations using the transport command.
+Alternatively, you can give the coordinates of a starting location (or the name
+of a person who is at one) to transport directly there.
+
+On EmpireMUD, starting locations are called Towers of Souls. Nobody may claim
+the area immediately around a Tower of Souls (&y*/\*&0).
+#
+SUMMON
+
+Command:  summon <type>
+
+The summon command is used by several different abilities to summon various
+creatures, items, or bodyguards. Each may serve a different purpose, so you
+should consult the help file for the specific summon ability you're using.
+
+See also:
+SUMMON HUMANS  (Vampire ability)
+SUMMON ANIMALS  (Natural Magic ability)
+SUMMON GUARDS  (Empire ability)
+SUMMON BODYGUARD  (Empire ability)
+SUMMON THUGS  (Stealth ability)
+SUMMON MATERIAlS  (High Sorcery ability)
+#
+TENT TENTS
+
+./\.  Tent  (Basic Crafts ability)
+
+Built on:  plains, desert
+Commands: sew tent
+          build tent <direction>
+
+Requires 8 large leather to sew.
+
+Once you have sewn a tent, you can carry it with you in your inventory and set
+it up or take it down using build and dismantle. The tent requires no add-
+itional resources each time you set it up.
+
+Building the tent will claim the land, just like any building command. When
+you dismantle it later, be sure to abandon the claim.
+
+See also: BUILD, DISMANTLE, SEW, CLAIM, ABANDON
+#
+UPGRADE
+
+Usage: upgrade
+
+This is used to upgrade your guard towers into more powerful towers. They can
+still shoot while you upgrade them, but people will also be able to walk
+inside and sabotage them. You can also upgrade shipyards to make bigger ships.
+
+See also: BUILD, SHIPYARD, GUARDTOWER
+#
+$

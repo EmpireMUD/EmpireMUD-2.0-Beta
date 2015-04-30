@@ -1,0 +1,3299 @@
+/* ************************************************************************
+*   File: comm.c                                          EmpireMUD 2.0b1 *
+*  Usage: Communication, socket handling, main(), central game loop       *
+*                                                                         *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  All rights reserved.  See license.doc for complete information.        *
+*                                                                         *
+*  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
+*  CircleMUD (C) 1993, 94 by the Trustees of the Johns Hopkins University *
+*  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
+************************************************************************ */
+
+#define __COMM_C__
+
+#include "conf.h"
+#include "sysdep.h"
+
+#include "structs.h"
+#include "utils.h"
+#include "comm.h"
+#include "interpreter.h"
+#include "handler.h"
+#include "db.h"
+#include "skills.h"
+#include "dg_scripts.h"
+#include "dg_event.h"
+
+/**
+* Contents:
+*   Data
+*   Helpers
+*   Reboot System
+*   Color Handling
+*   Main Game Loop
+*   Messaging
+*   Prompt
+*   Signal Processing
+*   Startup
+*/
+
+#ifdef HAVE_ARPA_TELNET_H
+#include <arpa/telnet.h>
+#else
+#include "telnet.h"
+#endif
+
+#ifndef INVALID_SOCKET
+#define INVALID_SOCKET -1
+#endif
+
+// external vars
+extern struct ban_list_element *ban_list;
+extern int num_invalid;
+extern char **intros;
+extern int num_intros;
+extern const char *version;
+extern int wizlock_level;
+extern int no_rent_check;
+extern FILE *player_fl;
+extern ush_int DFLT_PORT;
+extern const char *DFLT_DIR;
+extern char *LOGNAME;
+extern int max_playing;
+extern char *help;
+
+// external functions
+void Crash_save_all();
+void mobile_activity(void);
+void show_string(descriptor_data *d, char *input);
+int isbanned(char *hostname);
+void save_whole_world();
+
+// local functions
+RETSIGTYPE checkpointing(int sig);
+RETSIGTYPE hupsig(int sig);
+RETSIGTYPE reap(int sig);
+RETSIGTYPE reread_wizlists(int sig);
+RETSIGTYPE unrestrict_game(int sig);
+char *make_prompt(descriptor_data *point);
+char *prompt_str(char_data *ch);
+char *replace_prompt_codes(char_data *ch, char *str);
+int get_from_q(struct txt_q *queue, char *dest, int *aliased);
+int get_max_players(void);
+int new_descriptor(socket_t s);
+int open_logfile(const char *filename, FILE *stderr_fp);
+int perform_alias(descriptor_data *d, char *orig);
+int perform_subst(descriptor_data *t, char *orig, char *subst);
+int process_input(descriptor_data *t);
+int set_sendbuf(socket_t s);
+socket_t init_socket(ush_int port);
+ssize_t perform_socket_read(socket_t desc, char *read_point,size_t space_left);
+ssize_t perform_socket_write(socket_t desc, const char *txt,size_t length);
+static int process_output(descriptor_data *t);
+struct in_addr *get_bind_addr(void);
+void echo_off(descriptor_data *d);
+void echo_on(descriptor_data *d);
+void empire_sleep(struct timeval *timeout);
+void flush_queues(descriptor_data *d);
+void game_loop(socket_t mother_desc);
+void heartbeat(int heart_pulse);
+void init_descriptor(descriptor_data *newd, int desc);
+void init_game(ush_int port);
+void nonblock(socket_t s);
+void perform_act(const char *orig, char_data *ch, obj_data *obj, const void *vict_obj, const char_data *to, bool ignore_bad_act_codes);
+void reboot_recover(void);
+void setup_log(const char *filename, int fd);
+void signal_setup(void);
+void timeadd(struct timeval *sum, struct timeval *a, struct timeval *b);
+void timediff(struct timeval *diff, struct timeval *a, struct timeval *b);
+#if defined(POSIX)
+sigfunc *my_signal(int signo, sigfunc * func);
+#endif
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// DATA ////////////////////////////////////////////////////////////////////
+
+/* local globals (I majored in oxymoronism) */
+descriptor_data *descriptor_list = NULL;/* master desc list					*/
+struct txt_block *bufpool = 0;			/* pool of large output buffers		*/
+int buf_largecount = 0;					/* # of large buffers which exist	*/
+int buf_overflows = 0;					/* # of overflows of output			*/
+int buf_switches = 0;					/* # of switches from small to large buf*/
+int empire_shutdown = 0;				/* clean shutdown					*/
+int max_players = 0;					/* max descriptors available		*/
+int tics_passed = 0;					/* for extern checkpointing			*/
+int scheck = 0;							/* for syntax checking mode			*/
+struct timeval null_time;				/* zero-valued time structure		*/
+FILE *logfile = NULL;					/* Where to send the log messages	*/
+bool gain_cond_messsage = FALSE;		/* gain cond send messages			*/
+int dg_act_check;	/* toggle for act_trigger */
+unsigned long pulse = 0;	/* number of pulses since game start */
+static bool reboot_recovery = FALSE;
+int mother_desc;
+ush_int port;
+
+/* Reboot data (default to a normal reboot once per week) */
+struct reboot_control_data reboot_control = { SCMD_REBOOT, 7 * (24 * 60), SHUTDOWN_NORMAL, FALSE };
+
+
+#ifdef __CXREF__
+#undef FD_ZERO
+#undef FD_SET
+#undef FD_ISSET
+#undef FD_CLR
+#define FD_ZERO(x)
+#define FD_SET(x, y) 0
+#define FD_ISSET(x, y) 0
+#define FD_CLR(x, y)
+#endif
+
+#define plant_magic(x)	do { (x)[sizeof(x) - 1] = MAGIC_NUMBER; } while (0)
+#define test_magic(x)	((x)[sizeof(x) - 1])
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// HELPERS /////////////////////////////////////////////////////////////////
+
+// wipes the last act message on the descriptor
+void clear_last_act_message(descriptor_data *desc) {
+	if (desc->last_act_message) {
+		free(desc->last_act_message);
+		desc->last_act_message = NULL;
+	}
+}
+
+
+/**
+* @param char *txt Any string.
+* @param char character The character to search for.
+* @return int The number of occurrences of the character in the string.
+*/
+static int count_chars(char *txt, char character) {
+	int i, cnt = 0;
+
+	for(i = 0; txt[i]; i++)
+		if(txt[i] == character)
+			cnt++;
+
+	return cnt;
+}
+
+/*
+ * This may not be pretty but it keeps game_loop() neater than if it was inline.
+ */
+inline void empire_sleep(struct timeval *timeout) {
+	if (select(0, (fd_set *) 0, (fd_set *) 0, (fd_set *) 0, timeout) < 0) {
+		if (errno != EINTR) {
+			perror("SYSERR: Select sleep");
+			exit(1);
+		}
+	}
+}
+
+
+/* perform substitution for the '^..^' csh-esque syntax orig is the
+ * orig string, i.e. the one being modified.  subst contains the
+ * substition string, i.e. "^telm^tell"
+ */
+int perform_subst(descriptor_data *t, char *orig, char *subst) {
+	char newsub[MAX_INPUT_LENGTH + 5];
+
+	char *first, *second, *strpos;
+
+	/*
+	 * first is the position of the beginning of the first string (the one
+	 * to be replaced
+	 */
+	first = subst + 1;
+
+	/* now find the second '^' */
+	if (!(second = strchr(first, '^'))) {
+		SEND_TO_Q("Invalid substitution.\r\n", t);
+		return (1);
+	}
+	/* terminate "first" at the position of the '^' and make 'second' point
+	 * to the beginning of the second string
+	 */
+	*(second++) = '\0';
+
+	/* now, see if the contents of the first string appear in the original */
+	if (!(strpos = strstr(orig, first))) {
+		SEND_TO_Q("Invalid substitution.\r\n", t);
+		return (1);
+	}
+	/* now, we construct the new string for output. */
+
+	/* first, everything in the original, up to the string to be replaced */
+	strncpy(newsub, orig, (strpos - orig));
+	newsub[(strpos - orig)] = '\0';
+
+	/* now, the replacement string */
+	strncat(newsub, second, (MAX_INPUT_LENGTH - strlen(newsub) - 1));
+
+	/* now, if there's anything left in the original after the string to
+	 * replaced, copy that too.
+	 */
+	if (((strpos - orig) + strlen(first)) < strlen(orig))
+		strncat(newsub, strpos + strlen(first), (MAX_INPUT_LENGTH - strlen(newsub) - 1));
+
+	/* terminate the string in case of an overflow from strncat */
+	newsub[MAX_INPUT_LENGTH - 1] = '\0';
+	strcpy(subst, newsub);
+
+	return (0);
+}
+
+
+/*
+ * This function is called every 30 seconds from heartbeat().  It checks
+ * the four global buffers in EmpireMUD to ensure that no one has written
+ * past their bounds.  If our check digit is not there (and the position
+ * doesn't have a NUL which may result from snprintf) then we gripe that
+ * someone has overwritten our buffer.  This could cause a false positive
+ * if someone uses the buffer as a non-terminated character array but that
+ * is not likely. -gg
+ */
+void sanity_check(void) {
+	int ok = TRUE;
+
+	/*
+	 * If any line is false, 'ok' will become false also.
+	 */
+	ok &= (test_magic(buf)  == MAGIC_NUMBER || test_magic(buf)  == '\0');
+	ok &= (test_magic(buf1) == MAGIC_NUMBER || test_magic(buf1) == '\0');
+	ok &= (test_magic(buf2) == MAGIC_NUMBER || test_magic(buf2) == '\0');
+	ok &= (test_magic(arg)  == MAGIC_NUMBER || test_magic(arg)  == '\0');
+
+	/*
+	 * This isn't exactly the safest thing to do (referencing known bad memory)
+	 * but we're doomed to crash eventually, might as well try to get something
+	 * useful before we go down. -gg
+	 * However, lets fix the problem so we don't spam the logs. -gg 11/24/98
+	 */
+	if (!ok) {
+		log("SYSERR: *** Buffer overflow! ***\nbuf: %s\nbuf1: %s\nbuf2: %s\narg: %s", buf, buf1, buf2, arg);
+
+		plant_magic(buf);
+		plant_magic(buf1);
+		plant_magic(buf2);
+		plant_magic(arg);
+	}
+
+#if 0
+	log("Statistics: buf=%d buf1=%d buf2=%d arg=%d", strlen(buf), strlen(buf1), strlen(buf2), strlen(arg));
+#endif
+}
+
+
+/*
+ * Add 2 time values.
+ *
+ * Patch sent by "d. hall" <dhall@OOI.NET> to fix 'static' usage.
+ */
+void timeadd(struct timeval *rslt, struct timeval *a, struct timeval *b) {
+	rslt->tv_sec = a->tv_sec + b->tv_sec;
+	rslt->tv_usec = a->tv_usec + b->tv_usec;
+
+	while (rslt->tv_usec >= 1000000) {
+		rslt->tv_usec -= 1000000;
+		rslt->tv_sec++;
+	}
+}
+
+
+/*
+ *  new code to calculate time differences, which works on systems
+ *  for which tv_usec is unsigned (and thus comparisons for something
+ *  being < 0 fail).  Based on code submitted by ss@sirocco.cup.hp.com.
+ *
+ * code to return the time difference between a and b (a-b).
+ * always returns a nonnegative value (floors at 0).
+ */
+void timediff(struct timeval *rslt, struct timeval *a, struct timeval *b) {
+	if (a->tv_sec < b->tv_sec)
+		*rslt = null_time;
+	else if (a->tv_sec == b->tv_sec) {
+		if (a->tv_usec < b->tv_usec)
+			*rslt = null_time;
+		else {
+			rslt->tv_sec = 0;
+			rslt->tv_usec = a->tv_usec - b->tv_usec;
+		}
+	}
+	else {			/* a->tv_sec > b->tv_sec */
+		rslt->tv_sec = a->tv_sec - b->tv_sec;
+		if (a->tv_usec < b->tv_usec) {
+			rslt->tv_usec = a->tv_usec + 1000000 - b->tv_usec;
+			rslt->tv_sec--;
+		}
+		else
+			rslt->tv_usec = a->tv_usec - b->tv_usec;
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// REBOOT SYSTEM ///////////////////////////////////////////////////////////
+
+/**
+* @return bool TRUE if all players are confirmed for the reboot (or close enough).
+*/
+bool check_reboot_confirms(void) {
+	descriptor_data *desc;
+	bool found = FALSE;
+	
+	// check for unconfirmed folks
+	for (desc = descriptor_list; desc && !found; desc = desc->next) {
+		if (STATE(desc) != CON_PLAYING) {
+			found = TRUE;
+		}
+		else if (IS_NPC(desc->character)) {
+			continue;
+		}
+		else if (!REBOOT_CONF(desc->character) && (desc->character->char_specials.timer * SECS_PER_MUD_HOUR / SECS_PER_REAL_MIN) < 5) {
+			found = TRUE;
+		}
+	}
+	
+	return !found;
+}
+
+
+/**
+* Perform a reboot/shutdown.
+*/
+void perform_reboot(void) {
+	void Objsave_char(char_data *ch, int rent_code);
+	extern const char *reboot_strings[];
+	extern int num_of_reboot_strings;
+	
+	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH], group_data[MAX_STRING_LENGTH];
+	descriptor_data *desc, *next_desc;
+	int gsize = 0;
+	FILE *fl = NULL;
+	
+	*group_data = '\0';
+
+	if (reboot_control.type == SCMD_REBOOT && !(fl = fopen(REBOOT_FILE, "w"))) {
+		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: Reboot file not writeable, aborting reboot.");
+		reboot_control.time = -1;
+		return;
+	}
+
+	if (reboot_control.type == SCMD_REBOOT) {
+		sprintf(buf, "\r\n[0;0;31m *** Rebooting ***[0;0;37m\r\nPlease be patient, this will take a second.\r\n\r\n");
+	}
+	else if (reboot_control.type == SCMD_SHUTDOWN) {
+		sprintf(buf, "\r\n[0;0;31m *** Shutting Down ***[0;0;37m\r\nThe mud is shutting down, please reconnect later.\r\n\r\n");
+	}
+
+	for (desc = descriptor_list; desc; desc = next_desc) {
+		char_data *och = desc->character;
+		next_desc = desc->next;
+		
+		// people not in-game get trimmed
+		if (!och || STATE(desc) != CON_PLAYING) {
+			write_to_descriptor(desc->descriptor, buf);
+			close_socket(desc);
+			continue;
+		}
+
+		if (reboot_control.type == SCMD_REBOOT && fl) {
+			fprintf(fl, "%d %s %s\n", desc->descriptor, GET_NAME(och), desc->host);
+		
+			if (GROUP(och) && GROUP_LEADER(GROUP(och))) {
+				gsize += snprintf(group_data + gsize, sizeof(group_data) - gsize, "G %d %d\n", GET_IDNUM(och), GET_IDNUM(GROUP_LEADER(GROUP(och))));
+			}
+		}
+		
+		// send output
+		write_to_descriptor(desc->descriptor, buf);
+		if (reboot_control.type == SCMD_REBOOT) {
+			write_to_descriptor(desc->descriptor, reboot_strings[number(0, num_of_reboot_strings - 1)]);
+		}
+
+		Objsave_char(och, RENT_RENTED);
+		SAVE_CHAR(och);
+		
+		// extract is not actually necessary since we're rebooting, right?
+		// extract_char(och);
+	}
+
+	if (reboot_control.type == SCMD_REBOOT && fl) {
+		fprintf(fl, "-1 ~ ~\n");
+		fprintf(fl, "%s", group_data);
+		fprintf(fl, "$\n");
+		fclose(fl);
+	}
+
+	// prepare for the end!
+	fclose(player_fl);
+	save_whole_world();
+
+	// If this is a reboot, restart the mud!
+	if (reboot_control.type == SCMD_REBOOT) {
+		log("Reboot: performing live reboot");
+				
+		sprintf(buf, "%d", port);
+		sprintf(buf2, "-C%d", mother_desc);
+		chdir("..");
+				
+		// rotate logs -- note: you should also update the autorun script
+		system("fgrep \"ABUSE:\" syslog >> log/abuse");
+		system("fgrep \"BAN:\" syslog >> log/ban");
+		system("fgrep \"CONFIG:\" syslog >> log/config");
+		system("fgrep \"GC:\" syslog >> log/godcmds");
+		system("fgrep \"VALID:\" syslog >> log/validation");
+		system("fgrep \"DEATH:\" syslog >> log/rip");
+		system("fgrep \"BAD PW:\" syslog >> log/badpw");
+		system("fgrep \"DEL:\" syslog >> log/delete");
+		system("fgrep \"NEW:\" syslog >> log/newplayers");
+		system("fgrep \"SYSERR:\" syslog >> log/syserr");
+		system("fgrep \"LVL:\" syslog >> log/levels");
+		system("fgrep \"OLC:\" syslog >> log/olc");
+		system("fgrep \"WAR:\" syslog >> log/war");
+		system("fgrep \"SCRIPT ERR:\" syslog >> log/scripterr");
+		system("cp syslog log/syslog.old");
+		system("echo 'Rebooting EmpireMUD...' > syslog");
+
+		execl("bin/empire", "empire", buf2, buf, (char *) NULL);
+
+		// If that failed we're still here?
+		perror("reboot: execl");
+		exit(1);
+	}
+	// Otherwise it's a shutdown
+	else {
+		empire_shutdown = 1;
+		switch (reboot_control.level) {
+			case SHUTDOWN_DIE: {
+				touch(KILLSCRIPT_FILE);
+				log("Shutdown die: mud will not reboot");
+				break;
+			}
+			case SHUTDOWN_PAUSE: {
+				touch(PAUSE_FILE);
+				log("Shutdown pause: mud will not reboot until '%s' is removed", PAUSE_FILE);
+				break;
+			}
+			default: {
+				log("Shutting down: the mud will reboot shortly");
+				break;
+			}
+		}
+		
+		// done!
+		exit(0);
+	}
+}
+
+
+/**
+* Updates the reboot timer, if set, and executes a reboot / shutdown. This
+* should be called every minute.
+*/
+void update_reboot(void) {
+	extern const char *reboot_type[];
+	extern int wizlock_level;
+	extern char *wizlock_message;
+	
+	char buf[MAX_STRING_LENGTH];
+	
+	// neverboot
+	if (reboot_control.time < 0) {
+		return;
+	}
+	
+	// otherwise...
+	reboot_control.time -= 1;
+
+	if (reboot_control.time <= 0 || reboot_control.immediate || (check_reboot_confirms() && reboot_control.time <= 15)) {
+		perform_reboot();
+		return;
+	}
+	
+	// wizlock last 5 minutes
+	if (reboot_control.time <= 5) {
+		wizlock_level = 1;	// newbie lock
+		sprintf(buf, "This mud is preparing to %s. The %s will happen in about %d minutes.\r\n", reboot_type[reboot_control.type], reboot_type[reboot_control.type], reboot_control.time);
+		wizlock_message = str_dup(buf);
+	}
+	
+	// alert everyone
+	if (reboot_control.time <= 5 || (reboot_control.time <= 15 && (reboot_control.time % 2))) {
+		syslog(SYS_SYSTEM, 0, FALSE, "The mud will %s in %d minute%s (type 'confirm' to %s faster)", reboot_type[reboot_control.type], reboot_control.time, PLURAL(reboot_control.time), reboot_type[reboot_control.type]);
+		mortlog("The mud will %s in %d minute%s (type 'confirm' to %s faster)", reboot_type[reboot_control.type], reboot_control.time, PLURAL(reboot_control.time), reboot_type[reboot_control.type]);
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// COLOR HANDLING //////////////////////////////////////////////////////////
+
+/**
+* Color code processing -- turns & codes into colors
+*
+* @param char *txt The input text
+* @param descriptor_data *t The descriptor we're sending this to
+*/
+char *parse_color(char *txt, descriptor_data *t) {
+	char *new_txt;
+	char *toret;
+	register int iter, pos = 0;
+	int color = (!t->character || (!IS_NPC(t->character) && PRF_FLAGGED(t->character, PRF_COLOR)) ? 1 : 0);
+	int num_codes;
+
+	// count & codes in the string
+	num_codes = count_chars(txt, '&');
+
+	// allocate new text based on how long the codes could possibly be (7 chars each) -- it's okay to allocate too much
+	new_txt = malloc((num_codes * 7) + strlen(txt) + 1);
+
+	// shorthand for the color switch: code is the 1-char code (r from &r) replacement is the "\033[0m" and length is its length in chars
+	#define PARSE_COLOR(code, replacement, length)	\
+		if (color && code != t->last_color_sent) {	\
+			strcpy(new_txt + pos, replacement);	\
+			pos += (length);	\
+			t->last_color_sent = code;	\
+		}
+	
+	// parse color codes
+	for (iter = 0; txt[iter]; iter++) {
+		// is a color code?
+		if (txt[iter] == '&' && txt[iter+1]) {
+			++iter;
+	
+			switch(txt[iter]) {
+				case '0': {		// &0 -- don't use PARSE_COLOR because we ALWAYS want to send the \033[0m
+					if (color) {
+						strcpy(new_txt + pos, "\033[0m");
+						pos += 4;
+						t->last_color_sent = '0';
+					}
+					break;
+				}
+				case 'r': {		// &r
+					PARSE_COLOR('r', "\033[0;31m", 7);
+					break;
+				}
+				case 'R': {		// &R
+					PARSE_COLOR('R', "\033[31;1m", 7);
+					break;
+				}
+				case 'g': {		// &g
+					PARSE_COLOR('g', "\033[0;32m", 7);
+					break;
+				}
+				case 'G': {		// &G
+					PARSE_COLOR('G', "\033[32;1m", 7);
+					break;
+				}
+				case 'y': {		// &y
+					PARSE_COLOR('y', "\033[0;33m", 7);
+					break;
+				}
+				case 'Y': {		// &Y
+					PARSE_COLOR('Y', "\033[33;1m", 7);
+					break;
+				}
+				case 'b': {		// &b
+					PARSE_COLOR('b', "\033[0;34m", 7);
+					break;
+				}
+				case 'B': {		// &B
+					PARSE_COLOR('B', "\033[34;1m", 7);
+					break;
+				}
+				case 'm': {		// &m
+					PARSE_COLOR('m', "\033[0;35m", 7);
+					break;
+				}
+				case 'M': {		// &M
+					PARSE_COLOR('M', "\033[35;1m", 7);
+					break;
+				}
+				case 'c': {		// &c
+					PARSE_COLOR('c', "\033[0;36m", 7);
+					break;
+				}
+				case 'C': {		// &C
+					PARSE_COLOR('C', "\033[36;1m", 7);
+					break;
+				}
+				case 'w': {		// &w
+					PARSE_COLOR('w', "\033[0;37m", 7);
+					break;
+				}
+				case 'W': {		// &W
+					PARSE_COLOR('W', "\033[37;1m", 7);
+					break;
+				}
+				
+				// other
+				
+				case 'u': {		// &u
+					PARSE_COLOR('u', "\033[4m", 4);
+					break;
+				}
+				case '&': {		// &&
+					new_txt[pos] = txt[iter];
+					++pos;
+					break;
+				}
+				case '?': {		// &? (ignore -- handled in mapview)
+					break;
+				}
+				case 'V': {		// &V (ignore -- handled in mapview)
+					break;
+				}
+
+				default: {		// & with any other char after
+					new_txt[pos++] = '&';
+					--iter;
+					break;
+				}
+			}
+		}
+		else {	// NOT a & at txt[iter]
+			new_txt[pos] = txt[iter];
+			++pos;
+		}
+	}
+
+	// terminator
+	new_txt[pos] = '\0';
+	
+	// create a new string to return, to prevent memory loss
+	toret = strdup(new_txt);
+	
+	// free the temporary buffer
+	if (new_txt) {
+		free(new_txt);
+	}
+
+	return toret;
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// MAIN GAME LOOP //////////////////////////////////////////////////////////
+
+void heartbeat(int heart_pulse) {
+	void check_death_respawn();
+	void check_expired_cooldowns();
+	void check_idle_passwords();
+	void check_wars();
+	void chore_update();
+	void extract_pending_chars();
+	void frequent_combat(int pulse);
+	void generate_adventure_instances();
+	void output_map_to_file();
+	void point_update();
+	void process_imports();
+	void prune_instances();
+	void real_update();
+	void reduce_city_overages();
+	void reduce_outside_territory();
+	void reduce_stale_empires();
+	void reset_instances();
+	void sanity_check();
+	void skim_ocean_pool();
+	void update_actions();
+	void update_empire_npc_data();
+	void update_guard_towers();
+	void update_trading_post();
+	void update_world();
+	void weather_and_time(int mode);
+
+	static int mins_since_crashsave = 0;
+	bool debug_log = FALSE;
+	
+	#define HEARTBEAT(x)  !(heart_pulse % ((x) * PASSES_PER_SEC))
+	
+	// TODO go through this, arrange it better, combine anything combinable
+
+	// only get a gain condition message on the hour
+	if (HEARTBEAT(SECS_PER_MUD_HOUR)) {
+		gain_cond_messsage = TRUE;
+	}
+	
+	event_process();
+
+	// this is meant to be slightly longer than the mobile_activity pulse, and is mentioned in help files
+	if (HEARTBEAT(13)) {
+		script_trigger_check();
+		if (debug_log && HEARTBEAT(15)) { log("debug  2:\t%lld", microtime()); }
+	}
+
+	if (HEARTBEAT(1)) {
+		update_actions();		
+		if (debug_log && HEARTBEAT(15)) { log("debug  3:\t%lld", microtime()); }
+		check_expired_cooldowns();	// descriptor list
+		if (debug_log && HEARTBEAT(15)) { log("debug  4:\t%lld", microtime()); }
+	}
+
+	if (HEARTBEAT(3)) {
+		update_guard_towers();
+		if (debug_log && HEARTBEAT(15)) { log("debug  5:\t%lld", microtime()); }
+	}
+	
+	if (HEARTBEAT(30)) {
+		sanity_check();
+		if (debug_log && HEARTBEAT(15)) { log("debug  6:\t%lld", microtime()); }
+	}
+
+	if (HEARTBEAT(15)) {
+		check_idle_passwords();
+		if (debug_log && HEARTBEAT(15)) { log("debug  7:\t%lld", microtime()); }
+		check_death_respawn();
+		if (debug_log && HEARTBEAT(15)) { log("debug  7.5:\t%lld", microtime()); }
+	}
+
+	if (HEARTBEAT(30)) {
+		update_world();
+		if (debug_log && HEARTBEAT(15)) { log("debug  9:\t%lld", microtime()); }
+	}
+
+	if (HEARTBEAT(10)) {
+		mobile_activity();
+		if (debug_log && HEARTBEAT(15)) { log("debug 10:\t%lld", microtime()); }
+	}
+
+	// TODO won't the macro work here?
+	if (!(heart_pulse % (int)(0.1 * PASSES_PER_SEC))) {
+		frequent_combat(heart_pulse);
+		if (debug_log && HEARTBEAT(15)) { log("debug 11:\t%lld", microtime()); }
+	}
+	
+	if (HEARTBEAT(SECS_PER_MUD_HOUR)) {
+		point_update();
+		if (debug_log && HEARTBEAT(15)) { log("debug 12:\t%lld", microtime()); }
+	}
+	else if (HEARTBEAT(SECS_PER_REAL_UPDATE)) {
+		// only call real_update if we didn't also point_update
+		real_update();
+		if (debug_log && HEARTBEAT(15)) { log("debug 13:\t%lld", microtime()); }
+	}
+
+	if (HEARTBEAT(SECS_PER_MUD_HOUR)) {
+		weather_and_time(1);
+		if (debug_log && HEARTBEAT(15)) { log("debug 14a:\t%lld", microtime()); }
+		fflush(player_fl);
+		if (debug_log && HEARTBEAT(15)) { log("debug 14b:\t%lld", microtime()); }
+		chore_update();
+		if (debug_log && HEARTBEAT(15)) { log("debug 14c:\t%lld", microtime()); }
+		
+		// save the world at dawn
+		if (time_info.hours == 7) {
+			save_whole_world();
+			if (debug_log && HEARTBEAT(15)) { log("debug 14d:\t%lld", microtime()); }
+		}
+	}
+	
+	// slightly off the hour to prevent yet another thing on the tick
+	if (HEARTBEAT(SECS_PER_MUD_HOUR+1)) {
+		update_empire_npc_data();
+		if (debug_log && HEARTBEAT(15)) { log("debug 15:\t%lld", microtime()); }
+	}
+	
+	if (HEARTBEAT(SECS_PER_REAL_MIN)) {
+		check_wars();
+		if (debug_log && HEARTBEAT(15)) { log("debug 16:\t%lld", microtime()); }
+		reset_instances();
+		if (debug_log && HEARTBEAT(15)) { log("debug 17:\t%lld", microtime()); }
+	}
+	
+	if (HEARTBEAT(15 * SECS_PER_REAL_MIN)) {
+		output_map_to_file();
+		if (debug_log && HEARTBEAT(15)) { log("debug 18:\t%lld", microtime()); }
+	}
+
+	if (HEARTBEAT(SECS_PER_REAL_MIN)) {
+		update_reboot();
+		if (++mins_since_crashsave >= 5) {
+			mins_since_crashsave = 0;
+			Crash_save_all();
+			if (debug_log && HEARTBEAT(15)) { log("debug 19:\t%lld", microtime()); }
+		}
+	}
+	
+	// run often but try to avoid lining up with other updates
+	if (HEARTBEAT(10 * SECS_PER_REAL_MIN - 10)) {
+		skim_ocean_pool();
+		if (debug_log && HEARTBEAT(15)) { log("debug 19.5:\t%lld", microtime()); }
+	}
+	
+	if (HEARTBEAT(12 * SECS_PER_REAL_HOUR)) {
+		reduce_city_overages();
+		if (debug_log && HEARTBEAT(15)) { log("debug 20:\t%lld", microtime()); }
+	}
+	
+	if (HEARTBEAT(SECS_PER_REAL_HOUR)) {
+		reduce_stale_empires();
+		if (debug_log && HEARTBEAT(15)) { log("debug 21:\t%lld", microtime()); }
+	}
+	
+	if (HEARTBEAT(30 * SECS_PER_REAL_MIN)) {
+		reduce_outside_territory();
+		if (debug_log && HEARTBEAT(15)) { log("debug 22:\t%lld", microtime()); }
+	}
+	
+	if (HEARTBEAT(5 * SECS_PER_REAL_MIN)) {
+		prune_instances();
+		if (debug_log && HEARTBEAT(15)) { log("debug 23:\t%lld", microtime()); }
+		generate_adventure_instances();
+		if (debug_log && HEARTBEAT(15)) { log("debug 24:\t%lld", microtime()); }
+		update_trading_post();
+		if (debug_log && HEARTBEAT(15)) { log("debug 24.5:\t%lld", microtime()); }
+	}
+	
+	if (HEARTBEAT(SECS_PER_MUD_HOUR)) {
+		if (time_info.hours == 12) {
+			process_imports();
+			if (debug_log && HEARTBEAT(15)) { log("debug 25:\t%lld", microtime()); }
+		}
+	}
+
+	/* Every pulse! Don't want them to stink the place up... */
+	extract_pending_chars();
+
+	/* Turn this off */
+	gain_cond_messsage = FALSE;
+	
+	// check for immediate reboot
+	if (reboot_control.immediate == TRUE) {
+		perform_reboot();
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// MESSAGING ///////////////////////////////////////////////////////////////
+
+void act(const char *str, int hide_invisible, char_data *ch, obj_data *obj, const void *vict_obj, int type) {
+	extern bool is_ignoring(char_data *ch, char_data *victim);
+
+	char_data *to = NULL;
+	bool to_sleeping = FALSE, no_dark = FALSE, is_spammy = FALSE;
+
+	if (!str || !*str) {
+		return;
+	}
+	
+	/* If the bit is set, unset dg_act_check, thus the ! below */
+	dg_act_check = !IS_SET(type, DG_NO_TRIG);
+
+	if (IS_SET(type, TO_SLEEP)) {
+		to_sleeping = TRUE;
+	}
+	
+	if (IS_SET(type, TO_SPAMMY)) {
+		is_spammy = TRUE;
+	}
+
+	if (IS_SET(type, TO_NODARK)) {
+		Global_ignore_dark = no_dark = TRUE;
+	}
+
+	/* To the character */
+	if (IS_SET(type, TO_CHAR) && ch && SENDOK(ch)) {
+		perform_act(str, ch, obj, vict_obj, ch, IS_SET(type, TO_IGNORE_BAD_CODE) != 0);
+	}
+
+	/* To the victim */
+	if (IS_SET(type, TO_VICT) && (to = (char_data*) vict_obj) != NULL && SENDOK(to) && (!IS_SET(type, TO_NOT_IGNORING) || !is_ignoring(to, ch))) {
+		perform_act(str, ch, obj, vict_obj, to, IS_SET(type, TO_IGNORE_BAD_CODE) != 0);
+	}
+
+	if (IS_SET(type, TO_NOTVICT | TO_ROOM)) {
+		if (ch && IN_ROOM(ch)) {
+			to = ROOM_PEOPLE(IN_ROOM(ch));
+		}
+		else if (obj && IN_ROOM(obj)) {
+			to = ROOM_PEOPLE(IN_ROOM(obj));
+		}
+
+		if (to) {
+			for (; to; to = to->next_in_room) {
+				if (!SENDOK(to) || (to == ch))
+					continue;
+				if (IS_SET(type, TO_NOT_IGNORING) && is_ignoring(to, ch)) {
+					continue;
+				}
+				if (hide_invisible && ch && !CAN_SEE(to, ch))
+					continue;
+				if (IS_SET(type, TO_NOTVICT) && to == vict_obj)
+					continue;
+				perform_act(str, ch, obj, vict_obj, to, IS_SET(type, TO_IGNORE_BAD_CODE) != 0);
+			}
+		}
+	}
+	Global_ignore_dark = FALSE;
+}
+
+
+/*
+ * Turn off echoing (specific to telnet client)
+ */
+void echo_off(descriptor_data *d) {
+	char off_string[] = {
+		(char) IAC,
+		(char) WILL,
+		(char) TELOPT_ECHO,
+		(char) 0,
+	};
+
+	SEND_TO_Q(off_string, d);
+}
+
+
+/*
+ * Turn on echoing (specific to telnet client)
+ */
+void echo_on(descriptor_data *d) {
+	char on_string[] = {
+		(char) IAC,
+		(char) WONT,
+		(char) TELOPT_ECHO,
+		(char) 0
+	};
+
+	SEND_TO_Q(on_string, d);
+}
+
+
+/**
+* Identical to msg_to_char except takes a descriptor.
+*
+* @param descriptor_data *d The player's descriptor.
+* @param const char *messg... va_arg format.
+*/
+void msg_to_desc(descriptor_data *d, const char *messg, ...) {
+	char output[MAX_STRING_LENGTH];
+	va_list tArgList;
+	
+	if (!messg || !d) {
+		return;
+	}
+	
+	va_start(tArgList, messg);
+	vsprintf(output, messg, tArgList);
+
+	SEND_TO_Q(output, d);
+
+	va_end(tArgList);
+}
+
+
+/**
+* EmpireMUD implementation of send_to_char with va_args. In CircleMUD 3.1,
+* they changed the argument order on send_to_char to match this.
+*
+* @param char_data *ch The player.
+* @param const char *messg... va_arg format.
+*/
+void msg_to_char(char_data *ch, const char *messg, ...) {
+	char output[MAX_STRING_LENGTH];
+	va_list tArgList;
+	
+	if (!messg || !ch->desc)
+		return;
+	
+	va_start(tArgList, messg);
+	vsprintf(output, messg, tArgList);
+
+	SEND_TO_Q(output, ch->desc);
+
+	va_end(tArgList);
+}
+
+
+/**
+* Sends olc audit info to the player.
+*
+* @param char_data *ch The player.
+* @param any_vnum vnum The vnum we're reporting on.
+* @param const char *messg... va arg format.
+*/
+void olc_audit_msg(char_data *ch, any_vnum vnum, const char *messg, ...) {
+	char output[MAX_STRING_LENGTH];
+	va_list tArgList;
+	
+	if (!messg || !ch->desc) {
+		return;
+	}
+	
+	va_start(tArgList, messg);
+	vsprintf(output, messg, tArgList);
+	msg_to_desc(ch->desc, "[%5d] %s\r\n", vnum, output);
+	va_end(tArgList);
+}
+
+
+void send_to_all(const char *messg, ...) {
+	descriptor_data *i;
+	char output[MAX_STRING_LENGTH];
+	va_list tArgList;
+
+	if (!messg)
+		return;
+
+	va_start(tArgList, messg);
+	vsprintf(output, messg, tArgList);
+
+	for (i = descriptor_list; i; i = i->next)
+		if (STATE(i) == CON_PLAYING)
+			SEND_TO_Q(output, i);
+	va_end(tArgList);
+}
+
+
+/* higher-level communication: the act() function */
+void perform_act(const char *orig, char_data *ch, obj_data *obj, const void *vict_obj, const char_data *to, bool ignore_bad_act_codes) {
+	const char *i = NULL;
+	char *buf, lbuf[MAX_STRING_LENGTH], *dg_arg = NULL;
+	char_data *dg_victim = NULL;
+	obj_data *dg_target = NULL;
+	int iter;
+
+	const char *ACTNULL = "<NULL>";
+	#define CHECK_NULL(pointer, expression)  if ((pointer) == NULL) i = ACTNULL; else i = (expression);
+
+	buf = lbuf;
+
+	for (;;) {
+		if (*orig == '$') {
+			switch (*(++orig)) {
+				case 'n':
+					i = PERS(ch, (char_data*)to, 0);
+					break;
+				case 'N':
+					CHECK_NULL(vict_obj, PERS((char_data*)vict_obj,(char_data*)to, 0));
+					dg_victim = (char_data*) vict_obj;
+					break;
+				case 'o':
+					i = PERS(ch, (char_data*)to, 1);
+					break;
+				case 'O':
+					CHECK_NULL(vict_obj, PERS((char_data*)vict_obj, (char_data*)to, 1));
+					dg_victim = (char_data*) vict_obj;
+					break;
+				case 'm':
+					i = HMHR(ch);
+					break;
+				case 'M':
+					CHECK_NULL(vict_obj, HMHR((char_data*) vict_obj));
+					dg_victim = (char_data*) vict_obj;
+					break;
+				case 's':
+					i = HSHR(ch);
+					break;
+				case 'S':
+					CHECK_NULL(vict_obj, HSHR((char_data*) vict_obj));
+					dg_victim = (char_data*) vict_obj;
+					break;
+				case 'e':
+					i = HSSH(ch);
+					break;
+				case 'E':
+					CHECK_NULL(vict_obj, HSSH((char_data*) vict_obj));
+					dg_victim = (char_data*) vict_obj;
+					break;
+				case 'p':
+					CHECK_NULL(obj, OBJS(obj, (char_data*)to));
+					break;
+				case 'P':
+					CHECK_NULL(vict_obj, OBJS((obj_data*) vict_obj, (char_data*)to));
+					dg_target = (obj_data*) vict_obj;
+					break;
+				case 'a':
+					CHECK_NULL(obj, SANA(obj));
+					break;
+				case 'A':
+					CHECK_NULL(vict_obj, SANA((const obj_data*) vict_obj));
+					dg_target = (obj_data*) vict_obj;
+					break;
+				case 'T':
+					CHECK_NULL(vict_obj, (const char *) vict_obj);
+					dg_arg = (char *) vict_obj;
+					break;
+				case 't':
+					CHECK_NULL(obj, (char *) obj);
+					break;
+				case 'F':
+					CHECK_NULL(vict_obj, fname((const char *) vict_obj));
+					break;
+				case '$':
+					i = "$";
+					break;
+				default: {
+					if (!ignore_bad_act_codes) {
+						log("SYSERR: Illegal $-code to act(): %c", *orig);
+						log("SYSERR: %s", orig);
+						i = "";
+					}
+					else {
+						i = "$?";
+					}
+					break;
+				}
+			}
+			while ((*buf = *(i++)))
+				buf++;
+			orig++;
+			}
+		else if (!(*(buf++) = *(orig++)))
+			break;
+	}
+
+	*(--buf) = '\r';
+	*(++buf) = '\n';
+	*(++buf) = '\0';
+	
+	// find the first non-color-code and cap it
+	for (iter = 0; iter < strlen(lbuf); ++iter) {
+		if (lbuf[iter] == '&') {
+			// skip
+			++iter;
+		}
+		else {
+			// found one!
+			lbuf[iter] = UPPER(lbuf[iter]);
+			break;
+		}
+	}
+
+	if (to->desc) {
+		if (to->desc->last_act_message) {
+			free(to->desc->last_act_message);
+		}
+		to->desc->last_act_message = strdup(lbuf);
+		SEND_TO_Q(lbuf, to->desc);
+	}
+
+	if ((IS_NPC(to) && dg_act_check) && (to != ch)) {
+		act_mtrigger(to, lbuf, ch, dg_victim, obj, dg_target, dg_arg);
+	}
+}
+
+// this is the pre-circle3.1 send_to_char that doesn't have va_args
+void send_to_char(const char *messg, char_data *ch) {
+	if (ch->desc && messg)
+		SEND_TO_Q(messg, ch->desc);
+}
+
+
+/**
+* Sends a message to the entire group, except for ch.
+* Send 'ch' as NULL, if you want to message to reach
+* everyone. -Vatiken
+*
+* @param char_data *ch Optional: person to skip (e.g. the sender).
+* @param struct group_data *group The group to send to.
+* @param const char *msg... Message string/formatting.
+*/
+void send_to_group(char_data *ch, struct group_data *group, const char *msg, ...) {
+	char output[MAX_STRING_LENGTH];
+	struct group_member_data *mem;
+	char_data *tch;
+	va_list args;
+
+	if (msg == NULL)
+		return;
+		
+	for (mem = group->members; mem; mem = mem->next) {
+		tch = mem->member;
+		if (tch != ch && !IS_NPC(tch) && tch->desc && STATE(tch->desc) == CON_PLAYING) {
+			va_start(args, msg);
+			vsprintf(output, msg, args);
+			
+			if (!IS_NPC(tch) && GET_CUSTOM_COLOR(tch, CUSTOM_COLOR_GSAY)) {
+				msg_to_desc(tch->desc, "&%c[group] %s&0\r\n", GET_CUSTOM_COLOR(tch, CUSTOM_COLOR_GSAY), output);
+			}
+			else {
+				msg_to_desc(tch->desc, "[&Ggroup&0] %s&0\r\n", output);
+			}
+			va_end(args);
+		}
+	}
+}
+
+
+void send_to_outdoor(const char *messg, ...) {
+	descriptor_data *i;
+	va_list tArgList;
+	char output[MAX_STRING_LENGTH];
+
+	if (!messg || !*messg)
+		return;
+
+	va_start(tArgList, messg);
+	vsprintf(output, messg, tArgList);
+
+	for (i = descriptor_list; i; i = i->next) {
+		if (STATE(i) != CON_PLAYING || i->character == NULL)
+			continue;
+		if (!AWAKE(i->character) || !IS_OUTDOORS(i->character) || IS_WRITING(i->character))
+			continue;
+		SEND_TO_Q(output, i);
+	}
+	va_end(tArgList);
+}
+
+
+void send_to_room(const char *messg, room_data *room) {
+	char_data *i;
+
+	if (messg == NULL)
+		return;
+
+	for (i = ROOM_PEOPLE(room); i; i = i->next_in_room)
+		if (i->desc)
+			SEND_TO_Q(messg, i->desc);
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// SOCKETS /////////////////////////////////////////////////////////////////
+
+
+void close_socket(descriptor_data *d) {
+	descriptor_data *temp;
+
+	REMOVE_FROM_LIST(d, descriptor_list, next);
+	CLOSE_SOCKET(d->descriptor);
+	flush_queues(d);
+
+	/* Forget snooping */
+	if (d->snooping)
+		d->snooping->snoop_by = NULL;
+
+	if (d->snoop_by) {
+		SEND_TO_Q("Your victim is no longer among us.\r\n", d->snoop_by);
+		d->snoop_by->snooping = NULL;
+	}
+
+	if (d->character) {
+		/*
+		 * Plug memory leak, from Eric Green.
+		 * Note: only free if it's a type that isn't editing a live string -pc
+		 */
+		if (!IS_NPC(d->character) && (PLR_FLAGGED(d->character, PLR_MAILING) || d->notes_id > 0) && d->str) {
+			if (*(d->str))
+				free(*(d->str));
+			free(d->str);
+			d->str = NULL;
+		}
+		if (STATE(d) == CON_PLAYING || STATE(d) == CON_DISCONNECT) {
+			act("$n has lost $s link.", TRUE, d->character, 0, 0, TO_ROOM);
+			if (!IS_NPC(d->character)) {			
+				SAVE_CHAR(d->character);
+				syslog(SYS_LOGIN, GET_INVIS_LEV(d->character), TRUE, "Closing link to: %s.", GET_NAME(d->character));
+			}
+			d->character->desc = NULL;
+		}
+		else {
+			syslog(SYS_LOGIN, 0, TRUE, "Losing player: %s.", GET_NAME(d->character) ? GET_NAME(d->character) : "<null>");
+			free_char(d->character);
+		}
+	}
+	else {
+		if (config_get_bool("log_losing_descriptor_without_char")) {
+			syslog(SYS_LOGIN, 0, TRUE, "Losing descriptor without char.");
+		}
+	}
+
+	/* JE 2/22/95 -- part of my unending quest to make switch stable */
+	if (d->original && d->original->desc)
+		d->original->desc = NULL;
+
+	/* Clear the command history. */
+	if (d->history) {
+		int cnt;
+		for (cnt = 0; cnt < HISTORY_SIZE; cnt++)
+			if (d->history[cnt])
+				free(d->history[cnt]);
+		free(d->history);
+	}
+
+	if (d->showstr_head)
+		free(d->showstr_head);
+	if (d->showstr_count)
+		free(d->showstr_vector);
+	if (d->backstr) {
+		free(d->backstr);
+	}
+
+	// olc data
+	if (d->olc_storage) {
+		free(d->olc_storage);
+	}
+	if (d->olc_adventure) {
+		free_adventure(d->olc_adventure);
+	}
+	if (d->olc_craft) {
+		free_craft(d->olc_craft);
+	}
+	if (d->olc_object) {
+		free_obj(d->olc_object);
+	}
+	if (d->olc_mobile) {
+		free_char(d->olc_mobile);
+	}
+	if (d->olc_building) {
+		free_building(d->olc_building);
+	}
+	if (d->olc_crop) {
+		free_crop(d->olc_crop);
+	}
+	if (d->olc_room_template) {
+		free_room_template(d->olc_room_template);
+	}
+	if (d->olc_sector) {
+		free_sector(d->olc_sector);
+	}
+	if (d->olc_trigger) {
+		free_trigger(d->olc_trigger);
+	}
+
+	free(d);
+}
+
+
+/* Empty the queues before closing connection */
+void flush_queues(descriptor_data *d) {
+	int dummy;
+
+	if (d->large_outbuf) {
+		d->large_outbuf->next = bufpool;
+		bufpool = d->large_outbuf;
+	}
+	while (get_from_q(&d->input, buf2, &dummy));
+}
+
+
+/*
+ * get_bind_addr: Return a struct in_addr that should be used in our
+ * call to bind().  If the user has specified a desired binding
+ * address, we try to bind to it; otherwise, we bind to INADDR_ANY.
+ * Note that inet_aton() is preferred over inet_addr() so we use it if
+ * we can.  If neither is available, we always bind to INADDR_ANY.
+ */
+struct in_addr *get_bind_addr() {
+	static struct in_addr bind_addr;
+
+	/* Clear the structure */
+	memset((char *) &bind_addr, 0, sizeof(bind_addr));
+
+	/* If DLFT_IP is unspecified, use INADDR_ANY */
+	bind_addr.s_addr = htonl(INADDR_ANY);
+
+	/* Put the address that we've finally decided on into the logs */
+	if (bind_addr.s_addr == htonl(INADDR_ANY))
+		log("Binding to all IP interfaces on this host.");
+	else
+		log("Binding only to IP address %s", inet_ntoa(bind_addr));
+
+	return (&bind_addr);
+}
+
+
+int get_from_q(struct txt_q *queue, char *dest, int *aliased) {
+	struct txt_block *tmp;
+
+	/* queue empty? */
+	if (!queue->head)
+		return (0);
+
+	tmp = queue->head;
+	strcpy(dest, queue->head->text);
+	*aliased = queue->head->aliased;
+	queue->head = queue->head->next;
+
+	free(tmp->text);
+	free(tmp);
+
+	return (1);
+}
+
+
+int get_max_players(void) {
+	int max_descs = 0;
+	const char *method;
+
+	/*
+	 * First, we'll try using getrlimit/setrlimit.  This will probably work
+	 * on most systems.  HAS_RLIMIT is defined in sysdep.h.
+	 */
+#ifdef HAS_RLIMIT
+	{
+		struct rlimit limit;
+
+		/* find the limit of file descs */
+		method = "rlimit";
+		if (getrlimit(RLIMIT_NOFILE, &limit) < 0) {
+			perror("SYSERR: calling getrlimit");
+			exit(1);
+		}
+
+		/* set the current to the maximum */
+		limit.rlim_cur = limit.rlim_max;
+		if (setrlimit(RLIMIT_NOFILE, &limit) < 0) {
+			perror("SYSERR: calling setrlimit");
+			exit(1);
+		}
+
+#ifdef RLIM_INFINITY
+		if (limit.rlim_max == RLIM_INFINITY)
+			max_descs = max_playing + NUM_RESERVED_DESCS;
+		else
+			max_descs = MIN(max_playing + NUM_RESERVED_DESCS, limit.rlim_max);
+#else
+		max_descs = MIN(max_playing + NUM_RESERVED_DESCS, limit.rlim_max);
+#endif
+	}
+
+#elif defined (OPEN_MAX) || defined(FOPEN_MAX)
+#if !defined(OPEN_MAX)
+#define OPEN_MAX FOPEN_MAX
+#endif
+	method = "OPEN_MAX";
+	max_descs = OPEN_MAX;		/* Uh oh.. rlimit didn't work, but we have
+				 * OPEN_MAX */
+#elif defined (_SC_OPEN_MAX)
+	/*
+	 * Okay, you don't have getrlimit() and you don't have OPEN_MAX.  Time to
+	 * try the POSIX sysconf() function.  (See Stevens' _Advanced Programming
+	 * in the UNIX Environment_).
+	 */
+	method = "POSIX sysconf";
+	errno = 0;
+
+	if ((max_descs = sysconf(_SC_OPEN_MAX)) < 0) {
+		if (errno == 0)
+			max_descs = max_playing + NUM_RESERVED_DESCS;
+		else {
+			perror("SYSERR: Error calling sysconf");
+			exit(1);
+		}
+	}
+#else
+	/* if everything has failed, we'll just take a guess */
+	method = "random guess";
+	max_descs = max_playing + NUM_RESERVED_DESCS;
+#endif
+
+	/* now calculate max _players_ based on max descs */
+	max_descs = MIN(max_playing, max_descs - NUM_RESERVED_DESCS);
+
+	if (max_descs <= 0) {
+		log("SYSERR: Non-positive max player limit!  (Set at %d using %s).", max_descs, method);
+		exit(1);
+	}
+	log("   Setting player limit to %d using %s.", max_descs, method);
+	return (max_descs);
+}
+
+
+void init_descriptor(descriptor_data *newd, int desc) {
+	static int last_desc = 0;
+
+	newd->descriptor = desc;
+	newd->connected = CON_GET_NAME;
+	newd->idle_tics = 0;
+	newd->output = newd->small_outbuf;
+	newd->bufspace = SMALL_BUFSIZE - 1;
+	newd->next = descriptor_list;
+	newd->login_time = time(0);
+	*newd->output = '\0';
+	newd->bufptr = 0;
+	newd->has_prompt = 0;
+
+	CREATE(newd->history, char *, HISTORY_SIZE);
+	
+	newd->olc_type = 0;
+	newd->olc_vnum = NOTHING;
+	newd->olc_object = NULL;
+	newd->olc_mobile = NULL;
+
+	if (++last_desc == 1000)
+		last_desc = 1;
+	newd->desc_num = last_desc;
+}
+
+
+/*
+ * init_socket sets up the mother descriptor - creates the socket, sets
+ * its options up, binds it, and listens.
+ */
+socket_t init_socket(ush_int port) {
+	socket_t s;
+	struct sockaddr_in sa;
+	int opt;
+
+	/*
+	 * Should the first argument to socket() be AF_INET or PF_INET?  I don't
+	 * know, take your pick.  PF_INET seems to be more widely adopted, and
+	 * Comer (_Internetworking with TCP/IP_) even makes a point to say that
+	 * people erroneously use AF_INET with socket() when they should be using
+	 * PF_INET.  However, the man pages of some systems indicate that AF_INET
+	 * is correct; some such as ConvexOS even say that you can use either one.
+	 * All implementations I've seen define AF_INET and PF_INET to be the same
+	 * number anyway, so the point is (hopefully) moot.
+	 */
+
+	if ((s = socket(PF_INET, SOCK_STREAM, 0)) < 0) {
+		perror("SYSERR: Error creating socket");
+		exit(1);
+	}
+
+#if defined(SO_REUSEADDR)
+	opt = 1;
+	if (setsockopt(s, SOL_SOCKET, SO_REUSEADDR, (char *) &opt, sizeof(opt)) < 0) {
+		perror("SYSERR: setsockopt REUSEADDR");
+		exit(1);
+	}
+#endif
+
+	set_sendbuf(s);
+
+	/*
+	 * The GUSI sockets library is derived from BSD, so it defines
+	 * SO_LINGER, even though setsockopt() is unimplimented.
+	 *	(from Dean Takemori <dean@UHHEPH.PHYS.HAWAII.EDU>)
+	 */
+#if defined(SO_LINGER)
+	{
+		struct linger ld;
+
+		ld.l_onoff = 0;
+		ld.l_linger = 0;
+		if (setsockopt(s, SOL_SOCKET, SO_LINGER, (char *) &ld, sizeof(ld)) < 0)
+			perror("SYSERR: setsockopt SO_LINGER");	/* Not fatal I suppose. */
+	}
+#endif
+
+	/* Clear the structure */
+	memset((char *)&sa, 0, sizeof(sa));
+
+	sa.sin_family = AF_INET;
+	sa.sin_port = htons(port);
+	sa.sin_addr = *(get_bind_addr());
+
+	if (bind(s, (struct sockaddr *) &sa, sizeof(sa)) < 0) {
+		perror("SYSERR: bind");
+		CLOSE_SOCKET(s);
+		exit(1);
+	}
+	nonblock(s);
+	listen(s, 5);
+	return (s);
+}
+
+
+/**
+* Allows a player to manipulate their input queue. The input text is what the
+* user typed AFTER the '-' trigger character.
+*
+* Options:
+*  no-arg: show queue
+*  -: clear whole queue
+*  other: removes items from the queue that start with text
+*
+* @param descriptor_data *desc The user.
+* @param char *input The text typed, after the -.
+*/
+void manipulate_input_queue(descriptor_data *desc, char *input) {
+	struct txt_block *iter, *next_iter, *temp;
+	bool clear_all, found;
+
+	skip_spaces(&input);
+
+	// show queue?
+	if (!*input) {
+		if (desc->input.head) {
+			msg_to_desc(desc, "Input queue:\r\n");
+			for (iter = desc->input.head; iter; iter = iter->next) {
+				msg_to_desc(desc, "%s\r\n", iter->text);
+			}
+		}
+		else {
+			msg_to_desc(desc, "Your input queue is empty.\r\n");
+		}
+		return;
+	}
+	
+	// clearing everything?
+	clear_all = (*input == '-');
+	
+	// remove matches from queue
+	found = FALSE;
+	for (iter = desc->input.head; iter; iter = next_iter) {
+		next_iter = iter->next;
+		
+		if (clear_all || is_abbrev(input, iter->text)) {
+			REMOVE_FROM_LIST(iter, desc->input.head, next);
+			
+			if (!clear_all) {
+				msg_to_desc(desc, "Removed: %s\r\n", iter->text);
+			}
+			
+			free(iter->text);
+			free(iter);
+			found = TRUE;
+		}
+	}
+	
+	// find new tail
+	if ((iter = desc->input.head)) {
+		while (iter->next) {
+			iter = iter->next;
+		}
+		desc->input.tail = iter;
+	}
+	else {
+		desc->input.tail = NULL;
+	}
+	
+	if (clear_all) {
+		msg_to_desc(desc, "Input queue cleared.\r\n");
+	}
+	else if (!found) {
+		msg_to_desc(desc, "No matching items in your input queue.\r\n");
+	}
+	else {
+		// messages were sent by the loop
+	}
+}
+
+
+
+int new_descriptor(int s) {
+	socket_t desc;
+	int sockets_connected = 0;
+	socklen_t i;
+	descriptor_data *newd;
+	struct sockaddr_in peer;
+	struct hostent *from;
+
+	/* accept the new connection */
+	i = sizeof(peer);
+	if ((desc = accept(s, (struct sockaddr *) &peer, &i)) == INVALID_SOCKET) {
+		perror("SYSERR: accept");
+		return (-1);
+	}
+	/* keep it from blocking */
+	nonblock(desc);
+
+	/* set the send buffer size */
+	if (set_sendbuf(desc) < 0) {
+		CLOSE_SOCKET(desc);
+		return (0);
+	}
+
+	/* make sure we have room for it */
+	for (newd = descriptor_list; newd; newd = newd->next)
+		sockets_connected++;
+
+	if (sockets_connected >= max_players) {
+		write_to_descriptor(desc, "Sorry, EmpireMUD is full right now... please try again later!\r\n");
+		CLOSE_SOCKET(desc);
+		return (0);
+	}
+	/* create a new descriptor */
+	CREATE(newd, descriptor_data, 1);
+	memset((char *) newd, 0, sizeof(descriptor_data));
+
+	/* find the sitename */
+	if (config_get_bool("nameserver_is_slow") || !(from = gethostbyaddr((char *) &peer.sin_addr, sizeof(peer.sin_addr), AF_INET))) {
+		/* resolution failed */
+		if (!config_get_bool("nameserver_is_slow")) {
+			perror("SYSERR: gethostbyaddr");
+		}
+
+		/* find the numeric site address */
+		strncpy(newd->host, (char *)inet_ntoa(peer.sin_addr), MAX_HOST_LENGTH);
+		*(newd->host + MAX_HOST_LENGTH) = '\0';
+	}
+	else {
+		strncpy(newd->host, from->h_name, MAX_HOST_LENGTH);
+		*(newd->host + MAX_HOST_LENGTH) = '\0';
+	}
+
+	/* determine if the site is banned */
+	if (isbanned(newd->host) == BAN_ALL) {
+		CLOSE_SOCKET(desc);
+		syslog(SYS_LOGIN, 0, FALSE, "Connection attempt denied from [%s]", newd->host);
+		free(newd);
+		return (0);
+	}
+#if 0
+  /*
+   * Log new connections - probably unnecessary, but you may want it.
+   * Note that your immortals may wonder if they see a connection from
+   * your site, but you are wizinvis upon login.
+   */
+	syslog(SYS_LOGIN, 0, FALSE, "New connection from [%s]", newd->host);
+#endif
+
+	init_descriptor(newd, desc);
+	newd->has_prompt = 1;
+
+	/* prepend to list */
+	newd->next = descriptor_list;
+	descriptor_list = newd;
+
+	SEND_TO_Q(parse_color(intros[number(0, num_intros-1)], newd), newd);
+
+	return (0);
+}
+
+
+/*
+ * I tried to universally convert Circle over to POSIX compliance, but
+ * alas, some systems are still straggling behind and don't have all the
+ * appropriate defines.  In particular, NeXT 2.x defines O_NDELAY but not
+ * O_NONBLOCK.  Krusty old NeXT machines!  (Thanks to Michael Jones for
+ * this and various other NeXT fixes.)
+ */
+
+#ifndef O_NONBLOCK
+#define O_NONBLOCK O_NDELAY
+#endif
+
+void nonblock(socket_t s) {
+	int flags;
+
+	flags = fcntl(s, F_GETFL, 0);
+	flags |= O_NONBLOCK;
+	if (fcntl(s, F_SETFL, flags) < 0) {
+		perror("SYSERR: Fatal error executing nonblock (comm.c)");
+		exit(1);
+	}
+}
+
+
+/*
+ * Same information about perform_socket_write applies here. I like
+ * standards, there are so many of them. -gg 6/30/98
+ */
+ssize_t perform_socket_read(socket_t desc, char *read_point, size_t space_left) {
+	ssize_t ret;
+
+	ret = read(desc, read_point, space_left);
+
+	/* Read was successful. */
+	if (ret > 0)
+		return (ret);
+
+	/* read() returned 0, meaning we got an EOF. */
+	if (ret == 0) {
+		log("WARNING: EOF on socket read (connection broken by peer)");
+		return (-1);
+	}
+
+	/*
+	 * read returned a value < 0: there was an error
+	 */
+
+#ifdef EINTR		/* Interrupted system call - various platforms */
+	if (errno == EINTR)
+		return (0);
+#endif
+
+#ifdef EAGAIN		/* POSIX */
+	if (errno == EAGAIN)
+		return (0);
+#endif
+
+#ifdef EWOULDBLOCK	/* BSD */
+	if (errno == EWOULDBLOCK)
+		return (0);
+#endif /* EWOULDBLOCK */
+
+#ifdef EDEADLK		/* Macintosh */
+	if (errno == EDEADLK)
+		return (0);
+#endif
+
+	/*
+	 * We don't know what happened, cut them off. This qualifies for
+	 * a SYSERR because we have no idea what happened at this point.
+	 */
+	perror("perform_socket_read: about to lose connection");
+	return (-1);
+}
+
+
+/*
+ * perform_socket_write: takes a descriptor, a pointer to text, and a
+ * text length, and tries once to send that text to the OS.  This is
+ * where we stuff all the platform-dependent stuff that used to be
+ * ugly #ifdef's in write_to_descriptor().
+ *
+ * This function must return:
+ *
+ * -1  If a fatal error was encountered in writing to the descriptor.
+ *  0  If a transient failure was encountered (e.g. socket buffer full).
+ * >0  To indicate the number of bytes successfully written, possibly
+ *     fewer than the number the caller requested be written.
+ *
+ * Right now there are two versions of this function: one for Windows,
+ * and one for all other platforms.
+ */
+/* perform_socket_write for all Non-Windows platforms */
+ssize_t perform_socket_write(socket_t desc, const char *txt, size_t length) {
+	ssize_t result;
+
+	result = write(desc, txt, length);
+
+	if (result > 0) {
+		/* Write was successful. */
+		return (result);
+	}
+
+	if (result == 0) {
+		/* This should never happen! */
+		log("SYSERR: Huh??  write() returned 0???  Please report this!");
+		return (-1);
+	}
+
+	/*
+	 * result < 0, so an error was encountered - is it transient?
+	 * Unfortunately, different systems use different constants to
+	 * indicate this.
+	 */
+
+#ifdef EAGAIN		/* POSIX */
+	if (errno == EAGAIN)
+		return (0);
+#endif
+
+#ifdef EWOULDBLOCK	/* BSD */
+	if (errno == EWOULDBLOCK)
+		return (0);
+#endif
+
+#ifdef EDEADLK		/* Macintosh */
+	if (errno == EDEADLK)
+		return (0);
+#endif
+
+	/* Looks like the error was fatal.  Too bad. */
+	return (-1);
+}
+
+
+/*
+ * ASSUMPTION: There will be no newlines in the raw input buffer when this
+ * function is called.  We must maintain that before returning.
+ *
+ * Ever wonder why 'tmp' had '+8' on it?  The crusty old code could write
+ * MAX_INPUT_LENGTH+1 bytes to 'tmp' if there was a '$' as the final
+ * character in the input buffer.  This would also cause 'space_left' to
+ * drop to -1, which wasn't very happy in an unsigned variable.  Argh.
+ * So to fix the above, 'tmp' lost the '+8' since it doesn't need it
+ * and the code has been changed to reserve space by accepting one less
+ * character. (Do you really need 256 characters on a line?)
+ * -gg 1/21/2000
+ */
+int process_input(descriptor_data *t) {
+	int buf_length, do_not_add;
+	ssize_t bytes_read;
+	size_t space_left;
+	char *ptr, *read_point, *write_point, *nl_pos = NULL;
+	char tmp[MAX_INPUT_LENGTH], *input;
+	bool add_to_head = FALSE;
+
+	/* first, find the point where we left off reading data */
+	buf_length = strlen(t->inbuf);
+	read_point = t->inbuf + buf_length;
+	space_left = MAX_RAW_INPUT_LENGTH - buf_length - 1;
+
+	do {
+		if (space_left <= 0) {
+			log("WARNING: process_input: about to close connection: input overflow");
+			return (-1);
+		}
+
+		bytes_read = perform_socket_read(t->descriptor, read_point, space_left);
+
+		if (bytes_read < 0)	/* Error, disconnect them. */
+			return (-1);
+		else if (bytes_read == 0)	/* Just blocking, no problems. */
+			return (0);
+
+		/* at this point, we know we got some data from the read */
+
+		*(read_point + bytes_read) = '\0';	/* terminate the string */
+
+		/* search for a newline in the data we just read */
+		for (ptr = read_point; *ptr && !nl_pos; ptr++)
+			if (ISNEWL(*ptr))
+				nl_pos = ptr;
+
+		read_point += bytes_read;
+		space_left -= bytes_read;
+
+		/*
+		 * on some systems such as AIX, POSIX-standard nonblocking I/O is broken,
+		 * causing the MUD to hang when it encounters input not terminated by a
+		 * newline.  This was causing hangs at the Password: prompt, for example.
+		 * I attempt to compensate by always returning after the _first_ read, instead
+		 * of looping forever until a read returns -1.  This simulates non-blocking
+		 * I/O because the result is we never call read unless we know from select()
+		 * that data is ready (process_input is only called if select indicates that
+		 * this descriptor is in the read set).  JE 2/23/95.
+		 */
+#if !defined(POSIX_NONBLOCK_BROKEN)
+	} while (nl_pos == NULL);
+#else
+	} while (0);
+
+	if (nl_pos == NULL)
+		return (0);
+#endif /* POSIX_NONBLOCK_BROKEN */
+
+	/*
+	 * okay, at this point we have at least one newline in the string; now we
+	 * can copy the formatted data to a new array for further processing.
+	 */
+
+	read_point = t->inbuf;
+
+	while (nl_pos != NULL) {
+		input = tmp;
+		write_point = tmp;
+		space_left = MAX_INPUT_LENGTH - 1;
+
+		/* The '> 1' reserves room for a '$ => $$' expansion. */
+		for (ptr = read_point; (space_left > 1) && (ptr < nl_pos); ptr++) {
+			if (*ptr == '\b' || *ptr == 127) { /* handle backspacing or delete key */
+				if (write_point > tmp) {
+					if (*(--write_point) == '$') {
+						write_point--;
+						space_left += 2;
+					}
+					else
+						space_left++;
+				}
+			}
+			else if (isascii(*ptr) && isprint(*ptr)) {
+				if ((*(write_point++) = *ptr) == '$') {		/* copy one character */
+					*(write_point++) = '$';	/* if it's a $, double it */
+					space_left -= 2;
+				}
+				else
+					space_left--;
+			}
+		}
+
+		*write_point = '\0';
+
+		if ((space_left <= 0) && (ptr < nl_pos)) {
+			char buffer[MAX_INPUT_LENGTH + 64];
+
+			sprintf(buffer, "Line too long. Truncated to:\r\n%s\r\n", tmp);
+			if (write_to_descriptor(t->descriptor, buffer) < 0)
+				return (-1);
+		}
+		if (t->snoop_by) {
+			SEND_TO_Q("% ", t->snoop_by);
+			SEND_TO_Q(input, t->snoop_by);
+			SEND_TO_Q("\r\n", t->snoop_by);
+		}
+		do_not_add = 0;
+
+		if (*input == '!' && !(*(input + 1)))	/* Redo last command. */
+			strcpy(input, t->last_input);
+		else if (*input == '!' && *(input + 1)) {
+			char *commandln = (input + 1);
+			int starting_pos = t->history_pos, cnt = (t->history_pos == 0 ? HISTORY_SIZE - 1 : t->history_pos - 1);
+
+			skip_spaces(&commandln);
+			for (; cnt != starting_pos; cnt--) {
+				if (t->history[cnt] && is_abbrev(commandln, t->history[cnt])) {
+					strcpy(input, t->history[cnt]);
+					strcpy(t->last_input, input);
+					SEND_TO_Q(input, t);
+					SEND_TO_Q("\r\n", t);
+					break;
+				}
+				if (cnt == 0)	/* At top, loop to bottom. */
+					cnt = HISTORY_SIZE;
+			}
+		}
+		else if (*input == '^') {
+			if (!(do_not_add = perform_subst(t, t->last_input, input)))
+				strcpy(t->last_input, input);
+		}
+		else if (*input == '+') {	// add to head of queue
+			add_to_head = TRUE;
+			++input;
+		}
+		else if (*input == '-' && (!t->str || !t->straight_to_editor)) { // manipulate input queue
+			// ^ this doesn't execute if the person is sending text to a text editor
+			manipulate_input_queue(t, input+1);
+			do_not_add = 1;
+		}
+		else {
+			strcpy(t->last_input, input);
+			if (t->history[t->history_pos])
+				free(t->history[t->history_pos]);	/* Clear the old line. */
+			t->history[t->history_pos] = str_dup(input);	/* Save the new. */
+			if (++t->history_pos >= HISTORY_SIZE)	/* Wrap to top. */
+				t->history_pos = 0;
+		}
+
+		if (!do_not_add) {
+			write_to_q(input, &t->input, 0, add_to_head);
+		}
+
+		/* find the end of this line */
+		while (ISNEWL(*nl_pos))
+			nl_pos++;
+
+		/* see if there's another newline in the input buffer */
+		read_point = ptr = nl_pos;
+		for (nl_pos = NULL; *ptr && !nl_pos; ptr++)
+			if (ISNEWL(*ptr))
+				nl_pos = ptr;
+	}
+
+	/* now move the rest of the buffer up to the beginning for the next pass */
+	write_point = t->inbuf;
+	while (*read_point)
+		*(write_point++) = *(read_point++);
+	*write_point = '\0';
+
+	return (1);
+}
+
+
+/* Send all of the output that we've accumulated for a player out to the
+ * player's descriptor. 32 byte GARBAGE_SPACE in MAX_SOCK_BUF used for:
+ *	 2 bytes: prepended \r\n
+ *	14 bytes: overflow message
+ *	 2 bytes: extra \r\n for non-comapct
+ *      14 bytes: unused */
+static int process_output(descriptor_data *t) {
+	char i[MAX_SOCK_BUF], *osb = i + 2;
+	char *prompt;
+	int result;
+
+	/* we may need this \r\n for later -- see below */
+	strcpy(i, "\r\n");	/* strcpy: OK (for 'MAX_SOCK_BUF >= 3') */
+
+	/* now, append the 'real' output */
+	strcpy(osb, t->output);	/* strcpy: OK (t->output:LARGE_BUFSIZE < osb:MAX_SOCK_BUF-2) */
+
+	/* if we're in the overflow state, notify the user */
+	if (t->bufspace == 0)
+		strcat(osb, "**OVERFLOW**\r\n");	/* strcpy: OK (osb:MAX_SOCK_BUF-2 reserves space) */
+
+	/* add the extra CRLF if the person isn't in compact mode */
+	if (STATE(t) == CON_PLAYING && t->character && !IS_NPC(t->character) && !PRF_FLAGGED(t->character, PRF_COMPACT))
+		strcat(osb, "\r\n");	/* strcpy: OK (osb:MAX_SOCK_BUF-2 reserves space) */
+
+	// add prompt
+	prompt = make_prompt(t);
+	strncat(i, prompt, MAX_PROMPT_LENGTH);
+	free(prompt);
+
+	/* now, send the output.  If this is an 'interruption', use the prepended
+	* CRLF, otherwise send the straight output sans CRLF. */
+	if (t->has_prompt && !t->data_left_to_write) {
+		t->has_prompt = FALSE;
+		result = write_to_descriptor(t->descriptor, i);
+		if (result >= 2)
+			result -= 2;
+	}
+	else {
+		t->has_prompt = FALSE;
+		result = write_to_descriptor(t->descriptor, osb);
+	}
+
+	if (result < 0) {	/* Oops, fatal error. Bye! */
+		close_socket(t);
+		return (-1);
+	}
+	else if (result == 0)	/* Socket buffer full. Try later. */
+		return (0);
+
+	/* Handle snooping: prepend "% " and send to snooper. */
+	if (t->snoop_by) {
+		write_to_output("% ", t->snoop_by);
+		write_to_output(t->output, t->snoop_by);
+		write_to_output("%%", t->snoop_by);
+	}
+	/* The common case: all saved output was handed off to the kernel buffer. */
+	if (result >= t->bufptr) {
+		/* If we were using a large buffer, put the large buffer on the buffer pool
+		* and switch back to the small one. */
+		if (t->large_outbuf) {
+			t->large_outbuf->next = bufpool;
+			bufpool = t->large_outbuf;
+			t->large_outbuf = NULL;
+			t->output = t->small_outbuf;
+		}
+		/* reset total bufspace back to that of a small buffer */
+		t->bufspace = SMALL_BUFSIZE - 1;
+		t->bufptr = 0;
+		*(t->output) = '\0';
+
+		/* If the overflow message or prompt were partially written, try to save
+		* them. There will be enough space for them if this is true.  'result'
+		* is effectively unsigned here anyway. */
+		if ((unsigned int)result < strlen(osb)) {
+			size_t savetextlen = strlen(osb + result);
+
+			strcat(t->output, osb + result);
+			t->bufptr -= savetextlen;
+			t->bufspace += savetextlen;
+		}
+
+		t->data_left_to_write = FALSE;
+	}
+	else {
+		/* Not all data in buffer sent.  result < output buffersize. */
+		strcpy(t->output, t->output + result);	/* strcpy: OK (overlap) */
+		t->bufptr -= result;
+		t->bufspace += result;
+		
+		t->data_left_to_write = TRUE;
+	}
+
+	return (result);
+}
+
+
+/* Sets the kernel's send buffer size for the descriptor */
+int set_sendbuf(socket_t s) {
+#if defined(SO_SNDBUF)
+	int opt = MAX_SOCK_BUF;
+
+	if (setsockopt(s, SOL_SOCKET, SO_SNDBUF, (char *) &opt, sizeof(opt)) < 0) {
+		perror("SYSERR: setsockopt SNDBUF");
+		return (-1);
+	}
+
+#if 0
+	if (setsockopt(s, SOL_SOCKET, SO_RCVBUF, (char *) &opt, sizeof(opt)) < 0) {
+		perror("SYSERR: setsockopt RCVBUF");
+		return (-1);
+	}
+#endif
+
+#endif
+
+	return (0);
+}
+
+
+/* write_to_descriptor takes a descriptor, and text to write to the descriptor.
+ * It keeps calling the system-level write() until all the text has been
+ * delivered to the OS, or until an error is encountered. Returns:
+ * >=0  If all is well and good.
+ *  -1  If an error was encountered, so that the player should be cut off. */
+int write_to_descriptor(socket_t desc, const char *txt) {
+	ssize_t bytes_written;
+	size_t total = strlen(txt), write_total = 0;
+
+	while (total > 0) {
+		bytes_written = perform_socket_write(desc, txt, total);
+
+		if (bytes_written < 0) {
+			/* Fatal error.  Disconnect the player. */
+			perror("SYSERR: Write to socket");
+			return (-1);
+		}
+		else if (bytes_written == 0) {
+			/* Temporary failure -- socket buffer full. */
+			return (write_total);
+		}
+		else {
+			txt += bytes_written;
+			total -= bytes_written;
+			write_total += bytes_written;
+		}
+	}
+
+	return (write_total);
+}
+
+
+/* Add a new string to a player's output queue */
+void write_to_output(const char *txt, descriptor_data *t) {
+	int size;
+	char *new_txt;
+	char *overflow_txt = "**OVERFLOW**\r\n";
+
+	/* if we're in the overflow state already, ignore this new output */
+	if (t->bufspace == 0)
+		return;
+
+	new_txt = parse_color((char *) txt, t);
+
+	size = strlen(new_txt);
+	
+	// truncate to MAX_STRING_LENGTH srsly
+	if (size > MAX_STRING_LENGTH) {
+		size = MAX_STRING_LENGTH-1;
+		strcpy(new_txt + size - strlen(overflow_txt), overflow_txt);
+	}
+	
+	// check that text size is going to fit into a large bufffer
+	if (size + t->bufptr + 1 > LARGE_BUFSIZE) {
+		size = LARGE_BUFSIZE - t->bufptr - 1;
+		new_txt[size] = '\0';
+		++buf_overflows;
+	}
+
+	/* if we have enough space, just write to buffer and that's it! */
+	if (t->bufspace > size) {
+		strcpy(t->output + t->bufptr, new_txt);
+		t->bufspace -= size;
+		t->bufptr += size;
+		free(new_txt);
+		return;
+	}
+	
+	++buf_switches;
+
+	/* if the pool has a buffer in it, grab it */
+	if (bufpool != NULL) {
+		t->large_outbuf = bufpool;
+		bufpool = bufpool->next;
+	}
+	else {			/* else create a new one */
+   		CREATE(t->large_outbuf, struct txt_block, 1);
+		CREATE(t->large_outbuf->text, char, LARGE_BUFSIZE);
+		buf_largecount++;
+	}
+
+	strcpy(t->large_outbuf->text, t->output);	/* copy to big buffer */
+	t->output = t->large_outbuf->text;	/* make big buffer primary */
+	strcat(t->output, new_txt);
+	free(new_txt);
+
+	/* set the pointer for the next write */
+	t->bufptr = strlen(t->output);
+
+	/* calculate how much space is left in the buffer */
+	t->bufspace = LARGE_BUFSIZE - 1 - t->bufptr;
+}
+
+
+/**
+* Adds an item to an input queue.
+*
+* @param const char *txt The text to add to the queue.
+* @param struct txt_q *queue The queue to add to.
+* @param int aliased Whether or not the input was from an alias.
+* @param bool add_to_head If TRUE, puts the new item at the start instead of end of the queue.
+*/
+void write_to_q(const char *txt, struct txt_q *queue, int aliased, bool add_to_head) {
+	struct txt_block *newt;
+
+	CREATE(newt, struct txt_block, 1);
+	newt->text = str_dup(txt);
+	newt->aliased = aliased;
+
+	/* queue empty? */
+	if (!queue->head) {
+		newt->next = NULL;
+		queue->head = queue->tail = newt;
+	}
+	else if (add_to_head) {
+		newt->next = queue->head;
+		queue->head = newt;
+	}
+	else {
+		queue->tail->next = newt;
+		queue->tail = newt;
+		newt->next = NULL;
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// PROMPT //////////////////////////////////////////////////////////////////
+
+/**
+* Makes the prompt for the character. 
+*
+* NOTE: You MUST free the result of this; it is a malloc'd string.
+*
+* @param descriptor_data *d The descriptor we're making the prompt for
+* @return char* A pointer to the prompt string.
+*/
+char *make_prompt(descriptor_data *d) {
+	extern char *prompt_olc_info(char_data *ch);
+
+	static char prompt[MAX_STRING_LENGTH];
+
+	/* Note, prompt is truncated at MAX_PROMPT_LENGTH chars (structs.h )*/
+
+	if (d->character && EXTRACTED(d->character)) {
+		// no prompt to people in the EXTRACTED state
+		*prompt = '\0';
+	}
+	else if (d->showstr_count)
+		sprintf(prompt, "\r[ Return to continue, (q)uit, (r)efresh, (b)ack, or page number (%d/%d) ]", d->showstr_page, d->showstr_count);
+	else if (d->str && (STATE(d) != CON_PLAYING || d->straight_to_editor))
+		strcpy(prompt, "] ");
+	else if (STATE(d) == CON_PLAYING) {
+		*prompt = '\0';
+
+		if (!IS_NPC(d->character) && GET_INVIS_LEV(d->character))
+			sprintf(prompt + strlen(prompt), "&r(i%d) ", GET_INVIS_LEV(d->character));
+
+		if (wizlock_level > 0 && GET_ACCESS_LEVEL(d->character) >= LVL_START_IMM)
+			sprintf(prompt + strlen(prompt), "&g(w%d) ", wizlock_level);
+		
+		if (!IS_NPC(d->character) && get_cooldown_time(d->character, COOLDOWN_HOSTILE_FLAG) > 0) {
+			strcat(prompt, "&m(hostile) ");
+		}
+
+		// IS_AFK is caused by the prf or timer>10
+		if (IS_AFK(d->character)) {
+			if (PRF_FLAGGED(d->character, PRF_AFK)) {
+				strcat(prompt, "&r[AFK] ");
+			}
+			else {
+				strcat(prompt, "&r[IDLE] ");
+			}
+		}
+
+		if (!IS_NPC(d->character) && PRF_FLAGGED(d->character, PRF_RP))
+			sprintf(prompt + strlen(prompt), "&m[RP] ");
+		
+		if (IS_PVP_FLAGGED(d->character)) {
+			strcat(prompt, "&R(PVP) ");
+		}
+		
+		// olc info
+		if (GET_OLC_TYPE(d) != 0) {
+			strcat(prompt, prompt_olc_info(d->character));
+		}
+
+		strcat(prompt, "&0");
+
+		strncat(prompt, prompt_str(d->character), sizeof(prompt) - strlen(prompt) - 1);
+	}
+	else
+		*prompt = '\0';
+
+	return (parse_color(prompt, d));
+}
+
+
+/**
+* Determines a color based on percentage.
+*
+* @param int cur The current value of anything.
+* @param int max The maximum value of that thing.
+* @return char* A color code.
+*/
+char *prompt_color_by_prc(int cur, int max) {
+	int prc = cur * 100 / MAX(1, max);
+	
+	if (prc >= 90) {
+		return "&g";
+	}
+	else if (prc >= 25) {
+		return "&y";
+	}
+	else {
+		return "&r";
+	}
+}
+
+
+/**
+* Makes the prompt for a character and sends it off for processing.
+*
+* @param char_data *ch The player
+* @return char* The finished prompt
+*/
+char *prompt_str(char_data *ch) {
+	char *str = GET_PROMPT(REAL_CHAR(ch));
+
+	if (!ch->desc)
+		return (">");
+
+	// default prompts
+	if (!str || !*str) {
+		if (IS_MAGE(ch)) {
+			if (IS_VAMPIRE(ch)) {
+				str = "&0|%i/%u/%n %bb [%t]>";
+			}
+			else {
+				str = "&0|%i/%u/%n>";
+			}
+		}
+		else {
+			if (IS_VAMPIRE(ch)) {
+				str = "&0|%i/%u %bb [%t]>";
+			}
+			else {
+				str = "&0|%i/%u>";
+			}
+		}
+	}
+
+	if (!strchr(str, '%')) {
+		return str;
+	}
+	else {
+		return replace_prompt_codes(ch, str);
+	}
+}
+
+
+/**
+* Does the actual replacement of codes like %h that are used by the prompt and
+* some other commands.
+*
+* @param char_data *ch The character to base the info off of
+* @param char *str The incoming string to translate
+* @return char* The processed string
+*/
+char *replace_prompt_codes(char_data *ch, char *str) {
+	extern const char *health_levels[];
+	extern const char *move_levels[];
+	extern const char *mana_levels[];
+	extern struct action_data_struct action_data[];
+	
+	static char pbuf[MAX_STRING_LENGTH];
+	char i[MAX_STRING_LENGTH], spare[10];
+	char *cp, *tmp;
+	char_data *vict;
+
+	cp = pbuf;
+
+	for (;;) {
+		if (*str == '%') {
+			switch (*(++str)) {
+				case 'c':	/* Conditions */
+					sprintf(i, "%s%s%s%s%s%s%s",
+							   	IS_DRUNK(ch) ? "D" : "",
+							   	EFFECTIVELY_FLYING(ch) ? "F" : "",
+							   	IS_HUNGRY(ch) ? "H" : "",
+							   	(!IS_NPC(ch) && GET_MORPH(ch) != MORPH_NONE) ? "M" : "",
+							   	IS_RIDING(ch) ? "R" : "",
+							   	(IS_BLOOD_STARVED(ch)) ? "S" : "",
+							   	IS_THIRSTY(ch) ? "T" : ""
+							   	);
+					tmp = i;
+					break;
+				case 'e': {	// %e enemy's health percent
+					if ((vict = FIGHTING(ch))) {
+						sprintf(i, "%d%%", GET_HEALTH(vict) * 100 / MAX(1, GET_MAX_HEALTH(vict)));
+					}
+					else {
+						*i = '\0';
+					}
+					tmp = i;
+					break;
+				}
+				case 'f': {	// %f enemy's focus (tank): health percent
+					if (FIGHTING(ch) && (vict = FIGHTING(FIGHTING(ch))) && vict != ch) {
+						sprintf(i, "%s %d%%", (IS_NPC(vict) ? PERS(vict, vict, FALSE) : GET_NAME(vict)), GET_HEALTH(vict) * 100 / MAX(1, GET_MAX_HEALTH(vict)));
+					}
+					else {
+						*i = '\0';
+					}
+					tmp = i;
+					break;
+				
+				}
+				case 'F': {	// %f enemy's focus (tank): health total
+					if (FIGHTING(ch) && (vict = FIGHTING(FIGHTING(ch))) && !IS_NPC(vict) && vict != ch) {
+						sprintf(i, "%s %d/%d", (IS_NPC(vict) ? PERS(vict, vict, FALSE) : GET_NAME(vict)), GET_HEALTH(vict), GET_MAX_HEALTH(vict));
+					}
+					else {
+						*i = '\0';
+					}
+					tmp = i;
+					break;
+				}
+				case 'h':	// %h current health
+					sprintf(i, "%s%d&0", prompt_color_by_prc(GET_HEALTH(ch), GET_MAX_HEALTH(ch)), MAX(0, GET_HEALTH(ch)));
+					tmp = i;
+					break;
+				case 'H':	// %H max health
+					sprintf(i, "%d", GET_MAX_HEALTH(ch));
+					tmp = i;
+					break;
+				case 'i':	// %i health as text
+					sprintf(i, "%s", health_levels[MIN(10, MAX(0, GET_HEALTH(ch)) * 10 / GET_MAX_HEALTH(ch))]);
+					tmp = i;
+					break;
+				case 'v':	// %v current move
+					sprintf(i, "%s%d&0", prompt_color_by_prc(GET_MOVE(ch), GET_MAX_MOVE(ch)), MAX(0, GET_MOVE(ch)));
+					tmp = i;
+					break;
+				case 'V':	// %V max move
+					sprintf(i, "%d", GET_MAX_MOVE(ch));
+					tmp = i;
+					break;
+				case 'u':	// %u move as text
+					sprintf(i, "%s", move_levels[MIN(10, MAX(0, GET_MOVE(ch)) * 10 / GET_MAX_MOVE(ch))]);
+					tmp = i;
+					break;
+				case 'm':	// %m current mana
+					sprintf(i, "%s%d&0", prompt_color_by_prc(GET_MANA(ch), GET_MAX_MANA(ch)), MAX(0, GET_MANA(ch)));
+					tmp = i;
+					break;
+				case 'M':	// %M max mana
+					sprintf(i, "%d", GET_MAX_MANA(ch));
+					tmp = i;
+					break;
+				case 'n':	// %n mana as text
+					sprintf(i, "%s", mana_levels[MIN(10, MAX(0, GET_MANA(ch)) * 10 / GET_MAX_MANA(ch))]);
+					tmp = i;
+					break;
+				case 'b':	// %b current blood
+					if (IS_VAMPIRE(ch))
+						sprintf(i, "%s%d&0", prompt_color_by_prc(GET_BLOOD(ch), GET_MAX_BLOOD(ch)), GET_BLOOD(ch));
+					else
+						sprintf(i, "%%%c", *str);
+					tmp = i;
+					break;
+				case 'B':	// %B max blood
+					if (IS_VAMPIRE(ch))
+						sprintf(i, "%d", GET_MAX_BLOOD(ch));
+					else
+						sprintf(i, "%%%c", *str);
+					tmp = i;
+					break;
+				case 's': {	// %s skill points available
+					sprintf(i, "%d", GET_SKILL_POINTS_AVAILABLE(ch));
+					tmp = i;
+					break;
+				}
+				case 't':	/* Sun timer */
+				case 'T':
+					if (time_info.hours >= 12)
+						strcpy(spare, "pm");
+					else
+						strcpy(spare, "am");
+
+					if (time_info.hours == 6)
+						sprintf(i, "&C%d%s&0", time_info.hours > 12 ? time_info.hours - 12 : time_info.hours, spare);
+					else if (time_info.hours < 19 && time_info.hours > 6)
+						sprintf(i, "&Y%d%s&0", time_info.hours > 12 ? time_info.hours - 12 : time_info.hours, spare);
+					else if (time_info.hours == 19)
+						sprintf(i, "&R%d%s&0", time_info.hours > 12 ? time_info.hours - 12 : time_info.hours, spare);
+					else if (time_info.hours == 0)
+						sprintf(i, "&B12am&0");
+					else
+						sprintf(i, "&B%d%s&0", time_info.hours > 12 ? time_info.hours - 12 : time_info.hours, spare);
+					tmp = i;
+					break;
+				case 'a': {	// action
+					strcpy(i, action_data[!IS_NPC(ch) ? GET_ACTION(ch) : ACT_NONE].name);
+					tmp = i;
+					break;
+				}
+				case '_':
+					tmp = "\r\n";
+					break;
+				case '%':
+					*(cp++) = '%';
+					str++;
+					continue;
+					break;
+				default :
+					*(cp++) = '%';
+					str++;
+					continue;
+					break;
+				}
+
+			while ((*cp = *(tmp++))) {
+				cp++;
+			}
+			str++;
+		}
+		else if (!(*(cp++) = *(str++))) {
+			break;
+		}
+	}
+
+	*cp = '\0';
+
+	strcat(pbuf, " &0");
+	return (pbuf);
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// SIGNAL PROCESSING ///////////////////////////////////////////////////////
+
+
+RETSIGTYPE reread_wizlists(int sig) {
+	void reload_wizlists(void);
+	syslog(SYS_INFO, 0, TRUE, "Signal received - rereading wizlists.");
+	reload_wizlists();
+}
+
+
+RETSIGTYPE unrestrict_game(int sig) {
+	syslog(SYS_INFO, 0, TRUE, "Received SIGUSR2 - completely unrestricting game (emergent)");
+	ban_list = NULL;
+	wizlock_level = 0;
+	num_invalid = 0;
+}
+
+/* clean up our zombie kids to avoid defunct processes */
+RETSIGTYPE reap(int sig) {
+	while (waitpid(-1, NULL, WNOHANG) > 0);
+
+	my_signal(SIGCHLD, reap);
+}
+
+RETSIGTYPE checkpointing(int sig) {
+	if (!tics_passed) {
+		log("SYSERR: CHECKPOINT shutdown: tics not updated. (Infinite loop suspected)");
+		abort();
+	}
+	else {
+		tics_passed = 0;
+	}
+}
+
+RETSIGTYPE hupsig(int sig) {
+	log("SYSERR: Received SIGHUP, SIGINT, or SIGTERM. Shutting down...");
+	exit(1);			/* perhaps something more elegant should
+						 * substituted */
+}
+
+/*
+ * This is an implementation of signal() using sigaction() for portability.
+ * (sigaction() is POSIX; signal() is not.)  Taken from Stevens' _Advanced
+ * Programming in the UNIX Environment_.  We are specifying that all system
+ * calls _not_ be automatically restarted for uniformity, because BSD systems
+ * do not restart select(), even if SA_RESTART is used.
+ *
+ * Note that NeXT 2.x is not POSIX and does not have sigaction; therefore,
+ * I just define it to be the old signal.  If your system doesn't have
+ * sigaction either, you can use the same fix.
+ *
+ * SunOS Release 4.0.2 (sun386) needs this too, according to Tim Aldric.
+ */
+
+#ifndef POSIX
+#define my_signal(signo, func) signal(signo, func)
+#else
+sigfunc *my_signal(int signo, sigfunc * func) {
+	struct sigaction act, oact;
+
+	act.sa_handler = func;
+	sigemptyset(&act.sa_mask);
+	act.sa_flags = 0;
+#ifdef SA_INTERRUPT
+	act.sa_flags |= SA_INTERRUPT;	/* SunOS */
+#endif
+
+	if (sigaction(signo, &act, &oact) < 0)
+		return (SIG_ERR);
+
+	return (oact.sa_handler);
+}
+#endif				/* POSIX */
+
+
+void signal_setup(void) {
+	struct itimerval itime;
+	struct timeval interval;
+
+	/* user signal 1: reread wizlists.  Used by autowiz system. */
+	my_signal(SIGUSR1, reread_wizlists);
+
+	/*
+	 * user signal 2: unrestrict game.  Used for emergencies if you lock
+	 * yourself out of the MUD somehow.  (Duh...)
+	 */
+	my_signal(SIGUSR2, unrestrict_game);
+
+	/*
+	 * set up the deadlock-protection so that the MUD aborts itself if it gets
+	 * caught in an infinite loop for more than 3 minutes.
+	 */
+	interval.tv_sec = 180;
+	interval.tv_usec = 0;
+	itime.it_interval = interval;
+	itime.it_value = interval;
+	setitimer(ITIMER_VIRTUAL, &itime, NULL);
+	my_signal(SIGVTALRM, checkpointing);
+
+	/* just to be on the safe side: */
+	my_signal(SIGHUP, hupsig);
+	my_signal(SIGCHLD, reap);
+	my_signal(SIGINT, hupsig);
+	my_signal(SIGTERM, hupsig);
+	my_signal(SIGPIPE, SIG_IGN);
+	my_signal(SIGALRM, SIG_IGN);
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// STARTUP /////////////////////////////////////////////////////////////////
+
+/*
+ * game_loop contains the main loop which drives the entire MUD.  It
+ * cycles once every 0.10 seconds and is responsible for accepting new
+ * new connections, polling existing connections for input, dequeueing
+ * output and sending it out to players, and calling "heartbeat" functions
+ * such as mobile_activity().
+ */
+void game_loop(socket_t mother_desc) {
+	void reset_time(void);
+
+	fd_set input_set, output_set, exc_set, null_set;
+	struct timeval last_time, opt_time, process_time, temp_time;
+	struct timeval before_sleep, now, timeout;
+	char comm[MAX_INPUT_LENGTH];
+	char *prompt;
+	descriptor_data *d, *next_d;
+	int missed_pulses, maxdesc, aliased;
+
+	/* initialize various time values */
+	null_time.tv_sec = 0;
+	null_time.tv_usec = 0;
+	opt_time.tv_usec = OPT_USEC;
+	opt_time.tv_sec = 0;
+	FD_ZERO(&null_set);
+
+	gettimeofday(&last_time, (struct timezone *) 0);
+
+	/* The Main Loop.  The Big Cheese.  The Top Dog.  The Head Honcho.  The.. */
+	while (!empire_shutdown) {
+
+		/* Sleep if we don't have any connections */
+		if (descriptor_list == NULL) {
+			log("No connections. Going to sleep.");
+			FD_ZERO(&input_set);
+			FD_SET(mother_desc, &input_set);
+			if (select(mother_desc + 1, &input_set, (fd_set *) 0, (fd_set *) 0, NULL) < 0) {
+				if (errno == EINTR)
+					log("Waking up to process signal.");
+				else
+					perror("SYSERR: Select coma");
+				}
+			else {
+				log("New connection. Waking up.");
+				reset_time();
+			}
+			gettimeofday(&last_time, (struct timezone *) 0);
+		}
+		/* Set up the input, output, and exception sets for select(). */
+		FD_ZERO(&input_set);
+		FD_ZERO(&output_set);
+		FD_ZERO(&exc_set);
+		FD_SET(mother_desc, &input_set);
+
+		maxdesc = mother_desc;
+		for (d = descriptor_list; d; d = d->next) {
+			if (d->descriptor > maxdesc)
+				maxdesc = d->descriptor;
+			FD_SET(d->descriptor, &input_set);
+			FD_SET(d->descriptor, &output_set);
+			FD_SET(d->descriptor, &exc_set);
+		}
+
+		/*
+		 * At this point, we have completed all input, output and heartbeat
+		 * activity from the previous iteration, so we have to put ourselves
+		 * to sleep until the next 0.1 second tick.  The first step is to
+		 * calculate how long we took processing the previous iteration.
+		 */
+
+		gettimeofday(&before_sleep, (struct timezone *) 0); /* current time */
+		timediff(&process_time, &before_sleep, &last_time);
+
+		/*
+		 * If we were asleep for more than one pass, count missed pulses and sleep
+		 * until we're resynchronized with the next upcoming pulse.
+		 */
+		if (process_time.tv_sec == 0 && process_time.tv_usec < OPT_USEC) {
+			missed_pulses = 0;
+		}
+		else {
+			missed_pulses = process_time.tv_sec * PASSES_PER_SEC;
+			missed_pulses += process_time.tv_usec / OPT_USEC;
+			process_time.tv_sec = 0;
+			process_time.tv_usec = process_time.tv_usec % OPT_USEC;
+		}
+
+		/* Calculate the time we should wake up */
+		timediff(&temp_time, &opt_time, &process_time);
+		timeadd(&last_time, &before_sleep, &temp_time);
+
+		/* Now keep sleeping until that time has come */
+		gettimeofday(&now, (struct timezone *) 0);
+		timediff(&timeout, &last_time, &now);
+
+		/* Go to sleep */
+		do {
+			empire_sleep(&timeout);
+			gettimeofday(&now, (struct timezone *) 0);
+			timediff(&timeout, &last_time, &now);
+		} while (timeout.tv_usec || timeout.tv_sec);
+
+		/* Poll (without blocking) for new input, output, and exceptions */
+		if (select(maxdesc + 1, &input_set, &output_set, &exc_set, &null_time) < 0) {
+			perror("SYSERR: Select poll");
+			return;
+		}
+		/* If there are new connections waiting, accept them. */
+		if (FD_ISSET(mother_desc, &input_set))
+			new_descriptor(mother_desc);
+
+		/* Kick out the freaky folks in the exception set and marked for close */
+		for (d = descriptor_list; d; d = next_d) {
+			next_d = d->next;
+			if (FD_ISSET(d->descriptor, &exc_set)) {
+				FD_CLR(d->descriptor, &input_set);
+				FD_CLR(d->descriptor, &output_set);
+				close_socket(d);
+			}
+		}
+
+		/* Process descriptors with input pending */
+		for (d = descriptor_list; d; d = next_d) {
+			next_d = d->next;
+			if (FD_ISSET(d->descriptor, &input_set))
+				if (process_input(d) < 0)
+					close_socket(d);
+		}
+
+		/* Process commands we just read from process_input */
+		for (d = descriptor_list; d; d = next_d) {
+			next_d = d->next;
+
+			/*
+			 * Not combined to retain --(d->wait) behavior. -gg 2/20/98
+			 * If no wait state, no subtraction.  If there is a wait
+			 * state then 1 is subtracted. Therefore we don't go less
+			 * than 0 ever and don't require an 'if' bracket. -gg 2/27/99
+			 */
+			if (d->character) {
+				GET_WAIT_STATE(d->character) -= (GET_WAIT_STATE(d->character) > 0);
+
+				if (GET_WAIT_STATE(d->character))
+					continue;
+			}
+
+			if (!get_from_q(&d->input, comm, &aliased))
+				continue;
+
+			if (d->character) {
+				/* Reset the idle timer & pull char back from void if necessary */
+				d->character->char_specials.timer = 0;
+				GET_WAIT_STATE(d->character) = 1;
+			}
+			d->has_prompt = 0;
+
+			if (d->showstr_count) /* Reading something w/ pager */
+				show_string(d, comm);
+			else if (d->str && (STATE(d) != CON_PLAYING || d->straight_to_editor))		/* Writing boards, mail, etc. */
+				string_add(d, comm);
+			else if (STATE(d) != CON_PLAYING) /* In creation, etc. */
+				nanny(d, comm);
+			else {			/* else: we're playing normally. */
+				if (aliased)		/* To prevent recursive aliases. */
+					d->has_prompt = 1;	/* To get newline before next cmd output. */
+				else if (perform_alias(d, comm))    /* Run it through aliasing system */
+					get_from_q(&d->input, comm, &aliased);
+				command_interpreter(d->character, comm); /* Send it to interpreter */
+			}
+		}
+
+		/* Send queued output out to the operating system (ultimately to user). */
+		for (d = descriptor_list; d; d = next_d) {
+			next_d = d->next;
+			if (*(d->output) && FD_ISSET(d->descriptor, &output_set)) {
+				/* Output for this player is ready */
+				if (process_output(d) < 0) {
+					// process_output actually kills it itself
+					// close_socket(d);
+					continue;
+				}
+				else
+					d->has_prompt = 1;
+			}
+		}
+
+		/* Print prompts for other descriptors who had no other output */
+		for (d = descriptor_list; d; d = next_d) {
+			next_d = d->next;
+			
+			if (!d->has_prompt) {
+				prompt = make_prompt(d);
+				if (write_to_descriptor(d->descriptor, prompt) >= 0) {
+					d->has_prompt = 1;
+				}
+				free(prompt);
+			}
+		}
+
+		/* Kick out folks in the CON_CLOSE or CON_DISCONNECT state */
+		for (d = descriptor_list; d; d = next_d) {
+			next_d = d->next;
+			if (STATE(d) == CON_CLOSE || STATE(d) == CON_DISCONNECT)
+				close_socket(d);
+		}
+
+		/*
+		 * Now, we execute as many pulses as necessary--just one if we haven't
+		 * missed any pulses, or make up for lost time if we missed a few
+		 * pulses by sleeping for too long.
+		 */
+		missed_pulses++;
+
+		if (missed_pulses <= 0) {
+			log("SYSERR: **BAD** MISSED_PULSES NONPOSITIVE (%d), TIME GOING BACKWARDS!!", missed_pulses);
+			missed_pulses = 1;
+		}
+
+		/* If we missed more than 30 seconds worth of pulses, just do 30 secs */
+		if (missed_pulses > (30 * PASSES_PER_SEC)) {
+			log("SYSERR: Missed %d seconds worth of pulses.", missed_pulses / PASSES_PER_SEC);
+			missed_pulses = 30 * PASSES_PER_SEC;
+		}
+
+		/* Now execute the heartbeat functions */
+		while (missed_pulses--) {
+			heartbeat(++pulse);
+		}
+
+		/* Update tics_passed for deadlock protection */
+		++tics_passed;
+	}
+}
+
+
+/* Init sockets, run game, and cleanup sockets */
+void init_game(ush_int port) {
+	void empire_srandom(unsigned long initial_seed);
+
+	empire_srandom(time(0));
+
+	log("Finding player limit.");
+	max_players = get_max_players();
+
+	if (!reboot_recovery) {
+		log("Opening mother connection.");
+		mother_desc = init_socket(port);
+	}
+
+	event_init();
+
+	/* set up hash table for find_char() */
+	init_lookup_table();
+
+	boot_db();
+
+	log("Signal trapping.");
+	signal_setup();
+
+	if (reboot_recovery)
+		reboot_recover();
+
+	log("Entering game loop.");
+	game_loop(mother_desc);
+
+	Crash_save_all();
+
+	log("Closing all sockets.");
+	while (descriptor_list)
+		close_socket(descriptor_list);
+
+	CLOSE_SOCKET(mother_desc);
+	fclose(player_fl);
+
+	log("Normal termination of game.");
+}
+
+
+int main(int argc, char **argv) {
+	void boot_world();
+
+	int pos = 1;
+	const char *dir;
+
+	/* Initialize these to check for overruns later. */
+	plant_magic(buf);
+	plant_magic(buf1);
+	plant_magic(buf2);
+	plant_magic(arg);
+
+	port = DFLT_PORT;
+	dir = DFLT_DIR;
+
+	while ((pos < argc) && (*(argv[pos]) == '-')) {
+		switch (*(argv[pos] + 1)) {
+			case 'C':
+				reboot_recovery = TRUE;
+				mother_desc = atoi(argv[pos]+2);
+				break;
+			case 'o':
+				if (*(argv[pos] + 2))
+					LOGNAME = argv[pos] + 2;
+				else if (++pos < argc)
+					LOGNAME = argv[pos];
+				else {
+					puts("SYSERR: File name to log to expected after option -o.");
+					exit(1);
+				}
+				break;
+			case 'd':
+				if (*(argv[pos] + 2))
+					dir = argv[pos] + 2;
+				else if (++pos < argc)
+					dir = argv[pos];
+				else {
+					puts("SYSERR: Directory arg expected after option -d.");
+					exit(1);
+				}
+				break;
+			case 'c':
+				scheck = 1;
+				puts("Syntax check mode enabled.");
+				break;
+			case 'q':
+				no_rent_check = 1;
+				puts("Quick boot mode -- rent check supressed.");
+				break;
+			case 'r':
+				wizlock_level = 1;
+				puts("Restricting game -- no new players allowed.");
+				break;
+			case 'w':
+				wizlock_level = LVL_START_IMM;
+				puts("Restricting game.");
+				break;
+			case 'h':
+				/* From: Anil Mahajan <amahajan@proxicom.com> */
+				printf("Usage: %s [-c] [-q] [-r] [-o filename] [-d pathname] [port #]\n"
+					   "  -c             Enable syntax check mode.\n"
+					   "  -d <directory> Specify library directory (defaults to 'lib').\n"
+					   "  -h             Print this command line argument help.\n"
+					   "  -o <file>      Write log to <file> instead of stderr.\n"
+					   "  -q             Quick boot (doesn't scan rent for object limits)\n"
+					   "  -r             Restrict MUD -- no new players allowed.\n",
+					argv[0]);
+				exit(0);
+			default:
+				printf("SYSERR: Unknown option -%c in argument string.\n", *(argv[pos] + 1));
+				break;
+		}
+		pos++;
+	}
+
+	if (pos < argc) {
+		if (!isdigit(*argv[pos])) {
+			printf("Usage: %s [-c] [-m] [-q] [-r] [-s] [-d pathname] [port #]\n", argv[0]);
+			exit(1);
+		}
+		else if ((port = atoi(argv[pos])) <= 1024) {
+			printf("SYSERR: Illegal port number %d.\n", port);
+			exit(1);
+		}
+	}
+
+	/* All arguments have been parsed, try to open log file. */
+	setup_log(LOGNAME, STDERR_FILENO);
+
+	/*
+	 * Moved here to distinguish command line options and to show up
+	 * in the log if stderr is redirected to a file.
+	 */
+	log("%s", version);
+	log("%s", DG_SCRIPT_VERSION);
+
+	if (chdir(dir) < 0) {
+		perror("SYSERR: Fatal error changing to data directory");
+		exit(1);
+	}
+	log("Using %s as data directory.", dir);
+
+	if (scheck) {
+		boot_world();
+		log("Done.");
+	}
+	else {
+		log("Running game on port %d.", port);
+		init_game(port);
+	}
+
+	return (0);
+}
+
+
+int open_logfile(const char *filename, FILE *stderr_fp) {
+	if (stderr_fp)	/* freopen() the descriptor. */
+		logfile = freopen(filename, "w", stderr_fp);
+	else
+		logfile = fopen(filename, "w");
+
+	if (logfile) {
+		printf("Using log file '%s'%s.\n", filename, stderr_fp ? " with redirection" : "");
+		return (TRUE);
+	}
+
+	printf("SYSERR: Error opening file '%s': %s\n", filename, strerror(errno));
+	return (FALSE);
+}
+
+
+/* Prefer the file over the descriptor. */
+void setup_log(const char *filename, int fd) {
+	FILE *s_fp;
+
+#if defined(__MWERKS__) || defined(__GNUC__)
+	s_fp = stderr;
+#else
+	if ((s_fp = fdopen(STDERR_FILENO, "w")) == NULL) {
+		puts("SYSERR: Error opening stderr, trying stdout.");
+
+		if ((s_fp = fdopen(STDOUT_FILENO, "w")) == NULL) {
+			puts("SYSERR: Error opening stdout, trying a file.");
+
+			/* If we don't have a file, try a default. */
+			if (filename == NULL || *filename == '\0')
+				filename = "log/syslog";
+			}
+		}
+#endif
+
+	if (filename == NULL || *filename == '\0') {
+		/* No filename, set us up with the descriptor we just opened. */
+		logfile = s_fp;
+		puts("Using file descriptor for logging.");
+		return;
+	}
+
+	/* We honor the default filename first. */
+	if (open_logfile(filename, s_fp))
+		return;
+
+	/* Well, that failed but we want it logged to a file so try a default. */
+	if (open_logfile("log/syslog", s_fp))
+		return;
+
+	/* Ok, one last shot at a file. */
+	if (open_logfile("syslog", s_fp))
+		return;
+
+	/* Erp, that didn't work either, just die. */
+	puts("SYSERR: Couldn't open anything to log to, giving up.");
+	exit(1);
+}
+
+
+void reboot_recover(void) {
+	extern int enter_player_game(descriptor_data *d, int dolog, bool fresh);
+	extern bool global_mute_slash_channel_joins;
+
+	descriptor_data *d;
+	char_data *plr, *ldr;
+	FILE *fp;
+	char host[1024], line[256];
+	struct char_file_u tmp_store;
+	int desc, player_i, plid, leid;
+	bool fOld;
+	char name[MAX_INPUT_LENGTH];
+
+	log("Reboot is recovering players...");
+
+	if (!(fp = fopen(REBOOT_FILE, "r"))) {
+		perror("reboot_recover: fopen");
+		log("Reboot file not found. Exiting.\r\n");
+		exit(1);
+	}
+
+	unlink(REBOOT_FILE);
+	
+	// no-spam
+	global_mute_slash_channel_joins = TRUE;
+
+	// first pass: load players
+	for (;;) {
+		fOld = TRUE;
+		fscanf(fp, "%d %s %s\n", &desc, name, host);
+		if (desc == -1)
+			break;
+
+		sprintf(buf, "\r\nRestoring %s...\r\n", name);
+		if (write_to_descriptor(desc, buf) < 0) {
+			close(desc);
+			continue;
+		}
+		log (" %-20.20s - %s", name, host);
+		CREATE(d, descriptor_data, 1);
+		memset((char *) d, 0, sizeof (descriptor_data));
+		init_descriptor(d, desc);
+
+		strcpy(d->host, host);
+		d->next = descriptor_list;
+		descriptor_list = d;
+
+		d->connected = CON_CLOSE;
+
+		CREATE(d->character, char_data, 1);
+		clear_char(d->character);
+		CREATE(d->character->player_specials, struct player_special_data, 1);
+		d->character->desc = d;
+
+		if ((player_i = load_char(name, &tmp_store)) >= 0) {
+			store_to_char(&tmp_store, d->character);
+			GET_PFILEPOS(d->character) = player_i;
+			if (!PLR_FLAGGED(d->character, PLR_DELETED))
+				REMOVE_BIT(PLR_FLAGS(d->character), PLR_WRITING | PLR_MAILING);
+			else
+				fOld = FALSE;
+		}
+		else
+			fOld = FALSE;
+
+		if (!fOld) {
+			write_to_descriptor(desc, "\r\nSomehow, your character couldn't be loaded.\r\n");
+			close_socket(d);
+		}
+		else {
+			write_to_descriptor(desc, "\033[0mRecovery complete.\r\n\r\n");
+			enter_player_game(d, FALSE, FALSE);
+			d->connected = CON_PLAYING;
+		}
+	}
+	
+	// second pass: rebuild groups
+	while (get_line(fp, line)) {
+		// end
+		if (*line == '$') {
+			break;
+		}
+		else if (*line == 'G' && sscanf(line, "G %d %d", &plid, &leid) == 2) {
+			if ((plr = is_playing(plid)) && (ldr = is_playing(leid))) {
+				if (!GROUP(ldr)) {
+					create_group(ldr);
+				}
+				if (GROUP(ldr) && !GROUP(plr)) {
+					join_group(plr, GROUP(ldr));
+				}
+			}
+		}
+		else {
+			log("SYSERR: Unknown line '%s' in reboot file", line);
+		}
+	}
+	
+	global_mute_slash_channel_joins = FALSE;
+	fclose(fp);
+}

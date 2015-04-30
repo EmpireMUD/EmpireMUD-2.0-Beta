@@ -1,0 +1,1098 @@
+ALCHEMIST
+
+(AA)  Alchemist  (Artisans ability)
+
+Built on:  plains, desert
+Stored here:  herbs, poisons, potions
+
+The alchemist is a specialty building that allows you to store and process many
+types of herbs. While you can brew potions and mix poisons using any fire, it
+requires glassblowing technology if you're not at the alchemist building.
+
+See also: BREW, LABORATORY, MIX, STORAGE
+#
+APIARY APIARIES
+
+{BB}  Apiary  (Artisans ability)
+
+Built on:  plains, desert
+
+Apiaries are used as hives for raising domestic bees. They produce honey and
+wax for the empire. Some crafts require that the empire have access to these
+resources, and you can only make those crafts if you are in the territory of
+an empire with apiaries.
+
+See also: ADVANCED WOODWORKING
+#
+BAKERY
+
+(BB)  Bakery  (Artisans ability)
+
+Built on:  plains, desert
+
+The bakery is a warm, pleasant building that always smells of fresh breads.
+You can use its oven to cook all manner of foods.
+
+See also: COOK
+#
+BARRACKS FORT
+
+[BB]  Barracks (Raise Armies ability)
+
+Built on:  plains, desert
+Extra rooms:  10, interlink
+
+The barracks are one of the main parts of forts and outposts. It provides
+military to the city, and can be interlinked with other buildings.
+
+See also: DESIGNATE, INTERLINK
+#
+BATH BATHS
+
+[&b~~&0]  Baths  (Luxury ability)
+
+Built on:  plains, desert
+
+The most opulent empires construct bath houses for their citizens. These
+luxuries serve as meeting places and relaxation houses for persons of dist-
+inction throughout the empire, and are a good way to entertain guests.
+
+This building can only be built in a city.
+
+See also:  BATHE
+#
+BRIDGE
+
+&c~~&0|&c~&0  Bridge  (Artisans ability)
+
+Built on:  river
+
+Once completed, a bridge allows you to cross river tiles without a boat. You
+can also sail ships under the bridges. Nobody knows how.
+#
+BURROWHAVEN "BURROW HAVEN" "STRANGE BURROW"
+
+&g^[]^&0  Burrow Haven  (Build Haven skill)
+
+Built on:  forest
+Extra rooms:  6
+Special rooms:  tunnel, no hallway
+Citizens:  1
+Chameleon:  &g^^^^&0
+
+Havens are houses specifically for vampires. They provide increased protection
+for dwellers of the night.
+
+See also: DESIGNATE
+#
+CABIN
+
+(--)  Cabin  (no skill required)
+
+Built on:  plains only
+Citizens:  2
+
+A cabin is slightly larger than a hut, but still contains just one room.
+#
+CANNERY
+
+{CC}  Cannery  (no skill required)
+
+Built on:  plains, desert
+Stored here:  fruits
+
+A cannery is a location for preserving and storing fruits. Like all storage
+facilities, your NPCs move fruits between canneries so that you can retrieve
+them from any such location.
+
+See also: STORAGE
+#
+CARPENTER
+
+(CC)  Carpenter  (Artisans ability)
+
+Built on:  plains, desert
+
+The carpenter is a workshop for all manner of crafts. Certain craft items,
+such as wagons, require a carpenter shop for you to build them in.
+
+See also:  CRAFT, WOODWORKING
+#
+CAVEHAVEN "CAVE HAVEN" "OBSCURE CAVE"
+
+&y/&0()&y\&0  Cave Haven  (Build Haven skill)
+
+Built on:  mountain
+Extra rooms:  6
+Special rooms:  tunnel, no hallway
+Citizens:  1
+Chameleon:  &y/\/\&0
+
+Havens are houses specifically for vampires. They provide increased protection
+for dwellers of the night.
+
+See also: DESIGNATE
+#
+CAVESHELTER "CAVE SHELTER"
+
+&y^&0O&y/\&0  Cave Shelter  (Find Shelter ability)
+
+Built on:  mountain
+Chameleon:  &y/\/\&0
+
+You can quickly build a shelter to protect yourself from nasty surprises
+while you sleep.
+
+When you're done with the shelter, be sure to dismantle and abandon it.
+#
+CEMETERY
+
+.i.i  Cemetery  (Monuments ability)
+
+Built on:  plains, desert
+
+Cemeteries are a traditional place to bury the dead. When your character dies,
+you can re-spawn at a cemetery if your empire owns one on the same continent
+(otherwise, you'll re-spawn at a starting location).
+
+See also: STARTING LOCATION, TOMB
+#
+CLAYPIT "CLAY PIT"
+
+&y|__|&0  Clay Pit  (no skill required)
+
+Built on: plains or desert, facing water
+
+Clay pits are reinforced areas where fresh clay can be dug deeper, safer than
+digging on unprepared ground. You can dig more clay from them before depletion.
+
+See also: DIG
+#
+CLIFFDWELLING "CLIFF DWELLING"
+
+&y[==]&0  Cliff Dwelling  (no skill required)
+
+Built on:  mountain
+Extra rooms:  3, interlink
+Citizens:  2
+
+Cliff dwellings are an ancient type of home, generally built directly into
+the hollow sides of cliffs. Their location makes them resistant to sieges, as
+the mountain itself offers protection.
+
+See also: DESIGNATE
+#
+COURTYARD "COURT YARD"
+
+....  Courtyard  (Luxury ability)
+
+Built on:  desert, plains
+
+The courtyard is a well-appointed open space, well-planted and with fine
+paving stones. It is well-maintained and forests will not grow upon it.
+
+This building can only be built in a city.
+#
+DOCK DOCKS
+
+&b~&0==&g.&0  Docks  (Seafaring ability)
+
+Built on:  plains or desert, next to water
+
+The docks allow you a safe place to moor your ships. You can also load and
+unload boats at the docks.
+
+See also:  BOARD, LOAD, UNLOAD
+#
+ESTUARYGARDEN "ESTUARY GARDEN"
+
+&b~&0##&b~&0  Estuary Garden  (Herb Gardens ability)
+
+Built on: river, facing ocean
+Grows:  whitegrass
+
+By gardening in the fertile area where the river meets the sea, it is possible
+to grow rare whitegrass in greater abundance.
+
+You can pick more herbs than normal before the tile is depleted.
+
+See also: PICK
+#
+GRAVE GRAVES "GRAVE MARKER"
+
+New players, optimistic and eager to explore the world, leave home with a
+grave marker. When you build your first city, you can use this item to build
+a grave for yourself. Use the 'tomb' command to set it as your tomb, and you
+will respawn there if you die nearby. This will save you a walk back.
+
+To build a more permanent grave, learn the Monuments ability.
+
+See also: BUILD, MONUMENTS, TOMB
+#
+"GREAT HALL" GREATHALL
+
+[**]  Great Hall (Luxury ability)
+
+Built on:  plains, desert
+Extra rooms:  30, interlink
+Special rooms:  greathall, throne, vault, baths, laboratory
+
+The great hall is a major component of castles or other distinguished
+buildings, or it can serve as the entrance for those. You can designate a
+huge number of rooms from the great hall, and can interlink it with other
+buildings.
+
+This building can only be built in a city.
+
+See also: DESIGNATE, PORTCULLIS, INTERLINK
+#
+FENCE
+
+vvvv  Fence  (no skill required)
+
+Built on:  plains, desert
+
+Fences will block the movement of NPCs, but not players.
+
+See also: GATE
+#
+FOUNDRY
+
+{FF}  Foundry  (no skill required)
+
+Built on:  plains, desert
+Stored here:  metals
+
+A foundry is a place for smelting and storing the empire's metal. Like all
+storage facilities, your NPCs move metal between yards so that you can retrieve
+it from any such location.
+
+See also: SMELT, STORAGE
+#
+FOUNTAIN
+
+{&c~~&0}  Fountain  (Luxury ability)
+
+Built on:  plains, desert
+
+Fountains provide water, like a well.
+
+This building can only be built in a city.
+
+See also: DRINK, FILL
+#
+GATE
+
+.xx.  vxxv  Gate  (no skill required)
+
+Built on:  plains, desert
+
+A gate is an entrance for a fence. Since players are not blocked by fences,
+the gate is purely decorative.
+
+See also: FENCE
+#
+GATEHOUSE "GATE HOUSE"
+
+-==-  V||V  V\\V  Gatehouse  (Raise Armies ability)
+
+Built on:  plains, desert
+
+The gatehouse creates a secure way through your walls. Only players who can
+infiltrate will make it through the gatehouse, and many of those will be
+stopped by your city guards.
+
+If you want to allow all traffic through the gatehouse, publicize it.
+
+See also: INFILTRATE, PUBLICIZE, WALL
+#
+GLASSBLOWER "GLASS BLOWER"
+
+(GG)  Glass Blower  (Artisans ability)
+
+Built on:  plains, desert
+
+The glass blower is an artisan shop that creates flasks, vials, panes, and
+many other glass items for the empire. This building's function is passive --
+you don't blow the glass yourself. Instead, you simply need to be in the
+territory of an empire that has a glass blower in order to do certain crafts.
+#
+GRANARY
+
+{GG}  Granary  (no skill required)
+
+Built on:  plains, desert
+Stored here:  grains
+
+A granary is a silo used to store the empire's grains. Like all storage
+facilities, your NPCs move grain between silos so that you can retrieve them
+from any such location.
+
+See also: STORAGE
+#
+GRAVELPIT "GRAVEL PIT"
+
+{PP}  Gravel Pit  (no skill required)
+
+Built on:  plains, desert
+Stored here:  rocks and stone
+
+A gravel pit is a storage facility for the empire's stone. Like all storage
+facilities, your NPCs move rocks between pits so that you can retrieve them
+from any such location.
+
+See also: STORAGE
+#
+"GREAT WALLS" GREATWALLS
+
+&y^&0VV&y^&0  Great Wall  (Great Walls ability)
+
+Built on:  mountain, plains, desert
+Resources:  10 bricks, 5 iron ingots
+
+Great Walls function like ordinary walls, but can be built on mountains.
+
+See also: RIVERGATE
+#
+GUARDTOWER "GUARD TOWERS" "ADVANCED GUARD TOWER" "UPGRADED GUARD TOWER" "SUPERIOR GUARD TOWER"
+
+.TT.  Guard Tower  (Raise Armies ability)
+'TT'  Advanced Tower  (Advanced Tactics ability)
+"TT"  Superior Tower  (Advanced Tactics ability)
+
+Built on:  plains, desert
+
+Guard towers are defensive structures that automatically shoot at foes within
+range. These are often an empire's first line of defense against intruders. A
+fort or great house is equivalent in range and ability to a superior tower.
+
+Guard towers may only be built inside cities.
+
+If your empire's disposition is set to "Friendly", towers will only shoot at
+people you distrust or are at war with. If your disposition is "Distrustful",
+they will shoot at anyone you're not at peace (or better) with.
+
+Guard towers periodically shoot at any hostile player, as well as any animal
+that is leading a catapult. Advanced and Superior towers do increasingly larger
+amounts of damage. Forts do the same amount of damage as a regular guard tower.
+
+Regular guard towers have a range of 2 tiles. All other guard towers and forts
+have a range of 3 tiles. In the case of forts, this distance is measured from
+the entrance.
+
+Towers can fire over walls and buildings, but won't fire into mountains at all,
+and won't shoot into overgrown forests (&g^^^^&0) unless it is into tile
+adjacent to the tower. Plan the area around your towers carefully.
+
+Some abilities allow players to avoid detection by guard towers.
+
+Guard towers do not block players from circling around them. For optimum
+protection, build lines of wall-tower-wall-tower-wall. The walls block the
+circle command.
+
+See also: CIRCLE, RAISE ARMIES, ADVANCED TACTICS, FORT
+#
+HENGE "STONE HENGE"
+
+<<>>  Henge (Monuments ability)
+
+Built on:  desert, plains
+Fame:  4
+
+The henge is a great, circular monument made of massive stones. It is used in
+some druidic practices. In fact, it is said that by chanting at a henge, you
+can align yourself the natural flow of mana through the world, and gain an
+understanding of Natural Magic.
+
+See also: CHANT OF DRUIDS
+#
+HIGHTEMPLE "HIGH TEMPLE"
+
+[||]  High Temple  (Grand Monuments ability)
+
+Built on:  plains, desert
+Extra rooms: 5, interlink
+Fame:  10
+
+High Temples are the largest religious buildings available. You can dedicate
+them to any player or god.
+
+See also: DEDICATE
+#
+HOUSE "SMALL HOUSE"
+
+(==)  House  (no skill required)
+
+Built on:  plains only
+Extra rooms:  2
+Citizens:  2
+
+A house is slightly larger than a cabin and supports Extra rooms. You
+can build this type of home only on regular plains; the desert equivalent is
+a pueblo.
+
+See also: DESIGNATE, PUEBLO
+#
+HOUSEHAVEN "HOUSE HAVEN" "RICKETY OLD HOUSE"
+
+.[].  House Haven  (Build Haven skill)
+
+Built on:  plains
+Extra rooms:  6
+Citizens:  1
+
+Havens are houses specifically for vampires. They provide increased protection
+for dwellers of the night.
+
+See also: DESIGNATE
+#
+HUT "SMALL HUT"
+
+&g.&0()&g.&0  Hut  (no skill required)
+
+Built on:  plains only
+Citizens:  1
+
+Huts are the simplest permanent living structures. They are built only on
+regular plains; the desert version is the mud hut.
+
+See also: MUDHUT
+#
+INTERLINK INTERLINKING
+
+Usage:  interlink <direction> <code>
+
+Some buildings can be interlinked. You can connect the interior rooms of one
+interlinkable building to the interior rooms of a different nearby building.
+
+You can only interlink to buildings that are 4 tiles away or less.
+
+Typing "interlink" by itself will provide you with the interlink code for your
+current location.
+
+To find buildings that are interlinkable, try 'helpsearch interlink'.
+
+See also: HELPSEARCH, MARK
+#
+LARGEHOUSE "LARGE HOUSE"
+
+[==]  Large House  (Housing ability)
+
+Built on:  plains, desert
+Extra rooms:  5
+Citizens:  4
+
+This is the largest of the ordinary houses.
+
+See also: DESIGNATE
+#
+LUMBERYARD "LUMBER YARD"
+
+{LL}  Lumber Yard  (no skill required)
+
+Built on:  plains, desert
+Stored here:  trees and wood
+
+Each lumber yard is a storage facility for the empire's wood. Like all of the
+storage buildings, all lumber yards on the same island are linked together and
+you can retrieve from any of them.
+
+See also: STORAGE
+#
+MEGALITH
+
+&g.&0||&g.&0  Megalith  (Monuments ability)
+
+Built on:  desert, plains
+Fame:  1
+
+A megalith is a giant stone which inspires reverance and awe.
+#
+MINECOMPLEX "MINE COMPLEX"
+
+&y/&0[]&y\&0  Mine Complex  (Housing ability)
+
+Built on:  mountain
+Extra rooms:  7, interlink
+Special rooms:  tunnel, no hallway
+Citizens:  4
+
+A mine complex looks like a mine from the surface, but is really a network of
+tunnels adapted for living. These complexes can hold a large number of people.
+
+See also: DESIGNATE
+#
+MOUNTAINOUTPOST "MOUNTAIN OUTPOST"
+
+&y.&0/\&y.&0  Mountain Outpost  (Raise Armies ability)
+
+Built on:  mountain
+
+A mountain outpost is a safe place constructed in the middle of the mountains.
+It has no other purpose.
+#
+MUDHUT "MUD HUT"
+
+&y.&0()&y.&0  Mud Hut  (no skill required)
+
+Built on:  desert
+Citizens:  1
+
+A mud hut is a small, simple house which is built in the desert using any
+available water. Construction starts with a small pit, usually just two feet
+deep, to help insulate against the oppressive temperature of the desert air.
+
+See also: HUT
+#
+NODISMANTLE NO-DISMANTLE "NO DISMANTLE"
+
+Usage:  nodismantle
+
+This toggle helps you keep your minions from accidentally dismantling one of
+your buildings. They'll still be able to toggle it off and dismantle anyway,
+but nobody will take down an important structure by accident.
+
+This uses the same 'build' privilege as build and dismantle.
+
+See alos: PRIVILEGES
+#
+OASISGARDEN "OASIS GARDEN"
+
+&G^&C##&G^&0  Oasis Garden  (Herb Gardens ability)
+
+Built on:  oasis
+Grows:  daggerbite, magewhisper
+
+The best gardeners have learned to farm both daggerbite and magewhisper -- two
+rare desert herbs -- in the fertile soil around oases.
+
+You can pick more herbs than normal before the tile is depleted.
+
+See also: PICK
+#
+PARK
+
+&g.^.&co&0  Park  (Monuments ability)
+
+Built on:  plains
+
+Parks are a pleasant place to spend the day.
+#
+PIGEONPOST "PIGEON POST"
+
+[PP]  Pigeon Post  (Artisans ability)
+
+Built on:  plains, desert
+
+The Pigeon Post is a service that uses highly-trained birds to send mail across
+the world. You can receive mail anywhere, but must send it from the Post.
+
+See also: MAIL
+#
+PORTCULLIS "CASTLE PORTCULLIS" CASTLE PALACE
+
+V[]V  Portcullis (Luxury ability)
+
+Built on:  plains, desert
+Extra rooms:  30, interlink
+Special rooms:  greathall, throne, vault, baths, laboratory
+
+The portcullis serves as the entrance to a castle. You can designate a huge
+number of rooms from the portcullis, and can interlink it with other buildings.
+
+This building can only be built in a city.
+
+See also: DESIGNATE, GREAT HALL, INTERLINK
+#
+PUEBLO
+
+&y.&0[]&y.&0  Pueblo  (no skill required)
+
+Built on:  desert
+Citizens:  2
+Extra rooms:  2
+
+A pueblo is a common desert home, easily built from local materials. It is
+constructed in a shallow pit to help insulate against summer temperatures.
+Pueblos are only constructed in the desert; the temperate equivalent is the
+normal house.
+
+See also: DESIGNATE, HOUSE, OLD PUEBLO
+#
+PUEBLOHAVEN "PUEBLO HAVEN" "OLD PUEBLO"
+
+&y.&0[]&y.&0  Pueblo Haven  (Build Haven skill)
+
+Built on:  desert
+Extra rooms:  6
+Citizens:  1
+
+Havens are houses specifically for vampires. They provide increased protection
+for dwellers of the night.
+
+See also: DESIGNATE
+#
+PYRAMID
+
+/^^\  Pyramid  (Grand Monuments)
+
+Built on:  desert
+Extra rooms: 10
+Fame:  15
+
+Pyramids are grand monuments to the dead, but have no other purpose yet. You
+can dedicate them to any player or god.
+
+See also: DEDICATE
+#
+RAFTGARDEN "RAFT GARDEN"
+
+&c~&b##&c~&0  Raft Garden  (Herb Gardens ability)
+
+Built on:  river
+Grows:  bileberries
+
+The raft garden uses mats of sticks tied to the banks of rivers to grow the
+unusual and poisonous bileberries.
+
+You can pick more herbs than normal before the tile is depleted.
+
+See also: PICK
+#
+RIVERGATE "RIVER GATE"
+
+V&c||&0V  River Gate  (Great Walls ability)
+
+Built on:  river
+Resources:  20 lumber, 8 nails, 10 blocks, 40 rocks
+
+River Gates are like walls that can be built on rivers, and allow only friendly
+ships and canoes through.
+#
+ROCKSHELTER "ROCK SHELTER"
+
+.c..  Rock Shelter  (Find Shelter ability)
+
+Built on:  plains, desert
+Chameleon:  &g....&0 or &Y....&0
+
+You can quickly build a shelter to protect yourself from nasty surprises
+while you sleep.
+
+When you're done with the shelter, be sure to dismantle and abandon it.
+#
+RUINS "DECAYING RUINS"
+
+../]  [\..  |\\..  ../|  .-.]  [.-.  [__]
+
+Decaying Ruins
+
+Fame:  -1
+
+When you fail to perform upkeep on your buildings, they eventually collapse
+into ruins. These ruins stand as a testament to the hubris of an empire that
+built more than it could maintain.
+
+See also: MAINTAIN
+#
+SHADYGARDEN "SHADY GARDEN"
+
+&g|&y##&g|&0  Shady Garden  (Herb Gardens ability)
+
+Built on:  plains or forest
+Grows:  fiveleaf
+
+It is possible to grow the rare fiveleaf plant, if the soil is right and the
+area is shady. This garden helps you grow a lot of it in one place.
+
+You can pick more herbs than normal before the tile is depleted.
+
+See also: PICK
+#
+SHRINE
+
+.{}.  Shrine  (Monuments ability)
+
+Built on:  plains, desert
+Fame:  1
+
+Shrines are small buildings dedicated to a particular patron. You can dedicate
+them to any player or god.
+
+See also: DEDICATE
+#
+SMOKEHOUSE "SMOKE HOUSE"
+
+{SS}  Smoke House  (no skill required)
+
+Built on:  plains, desert
+Stored here:  meats
+
+A smoke house is a place to preserve and store meat for the empire. Like all
+storage facilities, your NPCs move meats between yards so that you can retrieve
+them from any such location.
+
+See also: STORAGE
+#
+STABLE
+
+(SS)  Stable  (no skill required)
+
+Built on:  plains, desert
+
+Stables are a safe place to keep your animals. You can also use them as a place
+to milk cows or shear sheep. This is also where you can barde horses.
+
+Most animals will not de-spawn if left in a stable.
+
+See also: BARDE, MILK, SHEAR
+#
+STATUE
+
+.}{.  Statue  (Monuments ability)
+
+Built on:  plains, desert
+Fame:  2
+
+Statues are monuments in the shape of gods and heroes. You can dedicate them
+to any player or god.
+
+See also: DEDICATE
+#
+STEPS
+
+.==.  Steps  (Artisans ability)
+
+Built on:  plains, desert
+
+Steps are similar to roads, but indicate rising terrain. These might be the
+steps to a great monument, or merely the main street of a town on a hillside.
+#
+STONEHOUSE "STONE HOUSE"
+
+[--]  Stone House  (Housing ability)
+
+Built on:  plains, desert
+Extra rooms:  3
+Citizens:  2
+
+A stone house is a larger, more permanent home that resists burning. It has
+more space than a regular house, and can be built on plains or desert.
+
+See also: DESIGNATE
+#
+SWAMPWALK "SWAMP WALK"
+
+&c~&0--&c~&0  Swamp Walk  (Swamp Engineering ability)
+
+Built on:  swamp
+
+The swamp walk, though never very stable, makes travel through the swamp
+much easier. Swamp animals may still harass you, but you will avoid random
+attacks by crocodillians.
+
+See also: BUILDING
+#
+SWAMPHUT "SWAMP HUT"
+
+&c~&0/\&c~&0  Swamp Hut  (Swamp Engineering ability)
+
+Built on:  swamp
+Extra rooms:  3
+Citizens:  2
+
+A swamp hut is a good-sized home supported on stilts above the swamp.
+
+See also: DESIGNATE
+#
+SWAMPMANOR "SWAMP MANOR"
+
+&c~&0[]&c~&0  Swamp Manor  (Swamp Engineering ability)
+
+Built on:  swamp
+Extra rooms:  5
+Citizens:  4
+
+The swamp manor is a grand house that is built only in the swamp. It is fire-
+proof and comparable to a large house.
+
+See also: DESIGNATE
+#
+SWAMPCOMPLEX "SWAMP COMPLEX"
+
+&c~&0()&c~&0  Swamp Complex  (Swamp Engineering ability)
+
+Built on:  swamp
+Extra rooms:  7, interlink
+Citizens:  2
+Chameleon: &c~~~~&0
+
+A swamp complex is a well-hidden, large home that can only be built in the
+swamp. It is designed to be difficult to see from a distance.
+
+See also: DESIGNATE
+#
+SWAMPPLATFORM "SWAMP PLATFORM"
+
+&c~&0__&c~&0  Swamp Platform  (Swamp Engineering ability)
+
+Built on: swamp
+
+By building a sturdy platform on top of swampland, you can effectively build
+"plains-only" buildings in the swamp. Once complete, the platform becomes an
+ordinary plains. If you don't build on it soon, though, the swamp will re-claim
+it.
+#
+TAILOR
+
+(TT)  Tailor  (Artisans ability)
+
+Built on:  plains, desert
+Stored here:  cotton, wool, cloth
+Command:  weave
+
+A fully-supplied tailor shop is essential to any developing empire. Here you
+can store fibers like cotton and wool, and weave them into fine cloth. Like
+all storage buildings, your NPCs will carry cloth between tailors so that you
+can retrieve it from any such location.
+
+See also: STORAGE, WEAVE
+#
+TANNERY
+
+{TT}  Tannery  (no skill required)
+
+Built on:  plains, desert
+Stored here:  skins, furs, and leathers
+Command:  tan
+
+Each tannery is a storage facility for the empire's leather. Like all storage
+facilities, your NPCs move leather goods between yards so that you can retrieve
+them from any such location.
+
+Tanning skins at a tannery causes the process to go faster.
+
+See also: STORAGE, TAN
+#
+TAVERN
+
+Tavern building (Artisans skill)
+
+Building:  [TT]  Tavern
+Built on:  plains, desert
+Command:  tavern [type]
+
+You can use this command to change what a Tavern is brewing. It will charge
+your empire the resources for the brew right away, and then will take roughly
+two game days to finish brewing. The empire will be charged the ingredients
+again every few days.
+
+There are rumors that members of a secretive guild of thieves meet in taverns.
+
+The available brews are:
+  ale -- barley + hops
+  lager -- corn + hops
+  wheatbeer -- wheat + barley
+  cider -- apples + peaches
+
+Brewing takes 5 of each ingredient at a time.
+#
+TEMPLE
+
+[[]]  Temple  (Monuments ability)
+
+Built on:  plains, desert
+Fame:  4
+
+Temples are larger than shrines, but serve the same purpose: religious worship
+of the patron to whom they are dedicated.
+
+See also: DEDICATE
+#
+TERRACEDGARDEN "TERRACED GARDEN"
+
+&y/&r##&y\&0  Terraced Garden  (Herb Gardens ability)
+
+Built on:  mountain
+Grows:  redthorn
+
+Terraced gardens are a beautiful sight on the side of a mountain. By collecting
+mountain rain, these gardens are able to foster the growth of the rare herb
+redthorn.
+
+You can pick more herbs than normal before the tile is depleted.
+
+See also: PICK
+#
+TOMB
+
+[oo]  Tomb  (Monuments ability)
+
+Built on:  plains, desert
+Fame:  1
+
+Command:  tomb [set | unset]
+
+Tombs are a prestigous place to bury the dead.
+
+The tomb command allows you to choose a tomb or cemetery as your place of rest.
+If you die, you will find yourself resurrected at your own tomb, so long as
+it's nearby. Otherwise, you'll find yourself at a random tomb or cemetery
+on the continent where you died, or at a starting location if there isn't a
+tomb available.
+
+See also: CEMETERY, STARTING LOCATION
+#
+"TOWER OF SORCERY" TOWEROFSORCERY SORCERYTOWER "SORCERY TOWER"
+
+&g.&b||&g.&0  Tower of Sorcery  (Luxury ability)
+
+Built on:  plains, desert
+Extra rooms:  1
+Special rooms: sorcery tower
+Citizens:  1
+Fame:  1
+Stored here:  magical gems
+
+The Tower of Sorcery is a shining symbol to people for miles around. It is
+the home of the masters of High Sorcery. This is where you can come to study
+the ways of city magic.
+
+If you accidentally redesignate your "Top of the Tower" room, you can get it
+back by designating a room as "sorcery tower".
+
+This building can only be built in a city.
+
+See also: DESIGNATE, HIGH SORCERY, REDESIGNATE, STUDY
+#
+TRADINGPOST "TRADING POST"
+
+[$$]  Trading Post  (Trade Routes ability)
+
+Built on:  plains, desert
+
+The trading post allows you to buy and sell unique items (including crafted
+gear and things from adventure zones) on the global market.
+
+See also: TRADE ROUTES, TRADE COMMAND
+#
+"TRAINING YARD" YARD
+
+[  ]  Training Yard (Raise Armies ability)
+
+Built on:  plains, desert
+Extra rooms:  10, interlink
+
+The training yard serves as an entrance to various fort facilities and as such,
+you can designate Extra rooms and interlink with other buildings.
+
+See also: DESIGNATE, INTERLINK
+#
+TRAPPERSPOST "TRAPPERS POST" "TRAPPING POST" "TRAPPER'S POST"
+
+&g^/\^&0  Trapper's Post  (Luxury ability)
+
+Built on:  forest, desert, grove
+
+The trapper's post is a place where trappers come to trade their skins. This
+building is required in order for your workforce to gather skin. Trapper's
+Posts become depleted like any other resource.
+
+See also: DEPLETION, WORKFORCE, SKILLED LABOR
+#
+TREECOMPLEX "TREE COMPLEX"
+
+&g^[]^&0  Tree Complex  (Housing ability)
+
+Built on:  forest
+Extra rooms:  7, interlink
+Special rooms:  skybridge
+Citizens:  4
+Chameleon:  &g^^^^&0
+
+A tree complex is a series of interconnected treehouses. It is virtually
+impossible to see from a distance, and offers a safe place for forest-dwellers
+to live.
+
+See also: DESIGNATE
+#
+TREEHOUSE "TREE HOUSE"
+
+&g^()^&0  Tree House  (Housing ability)
+
+Built on:  forest
+Extra rooms:  3
+Special rooms:  skybridge
+Citizens:  2
+Chameleon:  &g^^^^&0
+
+A tree house is a good place to live if you want to deter visitors. It is
+hidden among the canopy and can't be seen until you're right next to it.
+
+See also: DESIGNATE
+#
+TREESHELTER "TREE SHELTER"
+
+&g^&0T&g^^&0  Tree Shelter  (Find Shelter ability)
+
+Built on:  forest
+Chameleon:  &g^^^^&0
+
+You can quickly build a shelter to protect yourself from nasty surprises
+while you sleep.
+
+When you're done with the shelter, be sure to dismantle and abandon it.
+#
+UNDERGROUNDCOMPLEX "UNDERGROUND COMPLEX" "UNDERGROUND PASSAGE"
+
+&g.&0()&g.&0  Underground Complex  (Housing ability)
+
+Built on:  plains, desert
+Extra rooms:  7, interlink
+Special rooms:  tunnel, no hallway
+Citizens:  4
+Chameleon:  &g....&0 or &Y....&0
+
+The underground complex is a large subterranean home which is easy to obscure,
+due to its shallow entrance.
+
+See also: DESIGNATE
+#
+UTILITYSHED "UTILITY SHED" TOOLSHED "TOOL SHED"
+
+{UU}  Utility Shed  (no skill required)
+
+Built on:  plains, desert
+Stored here:  tools
+
+Each utility shed stores tools and miscellaneous items for the empire. Like all
+storage facilities, your NPCs move tools between yards so that you can
+retrieve it from any such location.
+
+See also: STORAGE
+#
+WALL WALLS
+
+VVVV  Wall  (Raise Armies skill)
+
+Built on:  plains, desert
+
+Walls will keep most people out, so long as they are continuous. You can also
+alternate between buildings and walls and still keep people from using circle
+to get in.
+
+Example:  VVVV"TT"VVVV"TT"VVVV"TT"VVVV"TT"VVVV
+
+See also: CIRCLE, GATEHOUSE, GREAT WALLS, RITUAL OF DEFENSE
+#
+WELL
+
+(&c~~&0)  Well  (no skill required)
+
+Built on:  plains
+
+Wells provide water for your little settlement.
+
+See also: DRINK, FILL
+#
+$

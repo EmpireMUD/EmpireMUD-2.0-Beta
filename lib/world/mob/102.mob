@@ -1,0 +1,170 @@
+#10200
+goblin zelkab bruiser~
+Zelkab, goblin bruiser~
+A goblin bruiser is guarding the nest.
+~
+0 0 bdy 0
+1 0 0 5
+I 4 10200 7.50 1  # LOOT: goblin clothing
+I 4 10201 7.50 1  # LOOT: goblin pants
+I 4 10202 7.50 1  # LOOT: goblin shoes
+I 4 10203 7.50 1  # LOOT: a pile of goblin coins
+I 4 10204 7.50 1  # LOOT: a goblincraft saddle
+I 4 10205 7.50 1  # LOOT: a tarnished necklace
+I 4 10206 7.50 1  # LOOT: a goblin timepiece
+I 4 10207 7.50 1  # LOOT: open-fingered gloves
+I 4 10208 7.50 1  # LOOT: a goblin collar
+I 4 10209 7.50 1  # LOOT: a warg-bone earring
+I 4 10210 7.50 1  # LOOT: Zelkab's bone club
+I 4 10211 7.50 1  # LOOT: Zelkab's armored gauntlets
+T 10201
+T 10204
+T 10205
+S
+#10201
+goblin garlgarl shaman~
+Garlgarl, goblin shaman~
+A goblin shaman is drawing symbols in the blood on the floor.
+~
+0 0 bdxA 0
+2 0 0 16
+I 4 10200 7.50 1  # LOOT: goblin clothing
+I 4 10201 7.50 1  # LOOT: goblin pants
+I 4 10202 7.50 1  # LOOT: goblin shoes
+I 4 10203 7.50 1  # LOOT: a pile of goblin coins
+I 4 10204 7.50 1  # LOOT: a goblincraft saddle
+I 4 10205 7.50 1  # LOOT: a tarnished necklace
+I 4 10206 7.50 1  # LOOT: a goblin timepiece
+I 4 10207 7.50 1  # LOOT: open-fingered gloves
+I 4 10208 7.50 1  # LOOT: a goblin collar
+I 4 10209 7.50 1  # LOOT: a warg-bone earring
+I 4 10212 7.50 1  # LOOT: Garlgarl's glowing staff
+I 4 10213 7.50 1  # LOOT: Garlgarl's belt of herbs
+T 10200
+T 10201
+T 10206
+T 10207
+S
+#10202
+goblin filks archer~
+Filks, goblin archer~
+A goblin archer is trying to fix her bow.
+~
+0 0 abdzA hC
+2 0 0 1
+I 4 10200 7.50 1  # LOOT: goblin clothing
+I 4 10201 7.50 1  # LOOT: goblin pants
+I 4 10202 7.50 1  # LOOT: goblin shoes
+I 4 10203 7.50 1  # LOOT: a pile of goblin coins
+I 4 10204 7.50 1  # LOOT: a goblincraft saddle
+I 4 10205 7.50 1  # LOOT: a tarnished necklace
+I 4 10206 7.50 1  # LOOT: a goblin timepiece
+I 4 10207 7.50 1  # LOOT: open-fingered gloves
+I 4 10208 7.50 1  # LOOT: a goblin collar
+I 4 10209 7.50 1  # LOOT: a warg-bone earring
+I 4 10214 7.50 1  # LOOT: Filks's firebranded bow
+I 4 10215 7.50 1  # LOOT: a bundle of goblin arrows
+T 10200
+T 10201
+T 10208
+T 10209
+T 10216
+S
+#10203
+goblin walts sapper~
+Walts, goblin sapper~
+A goblin sapper is trying to light something on fire.
+~
+0 0 abdyA hsC
+1 0 0 4
+I 4 10200 7.50 1  # LOOT: goblin clothing
+I 4 10201 7.50 1  # LOOT: goblin pants
+I 4 10202 7.50 1  # LOOT: goblin shoes
+I 4 10203 7.50 1  # LOOT: a pile of goblin coins
+I 4 10204 7.50 1  # LOOT: a goblincraft saddle
+I 4 10205 7.50 1  # LOOT: a tarnished necklace
+I 4 10206 7.50 1  # LOOT: a goblin timepiece
+I 4 10207 7.50 1  # LOOT: open-fingered gloves
+I 4 10208 7.50 1  # LOOT: a goblin collar
+I 4 10209 7.50 1  # LOOT: a warg-bone earring
+I 4 10216 7.50 1  # LOOT: Walts's reinforced leggings
+I 4 10217 7.50 1  # LOOT: Walts's heavy belt
+T 10200
+T 10201
+T 10210
+T 10211
+T 10217
+S
+#10204
+goblin nilbog champion~
+Nilbog, goblin champion~
+The goblin champion is unpolishing his armor.
+~
+0 0 bdyB h
+2 0 0 2
+I 4 10200 7.50 1  # LOOT: goblin clothing
+I 4 10201 7.50 1  # LOOT: goblin pants
+I 4 10202 7.50 1  # LOOT: goblin shoes
+I 4 10203 7.50 1  # LOOT: a pile of goblin coins
+I 4 10204 7.50 1  # LOOT: a goblincraft saddle
+I 4 10205 7.50 1  # LOOT: a tarnished necklace
+I 4 10206 7.50 1  # LOOT: a goblin timepiece
+I 4 10207 7.50 1  # LOOT: open-fingered gloves
+I 4 10208 7.50 1  # LOOT: a goblin collar
+I 4 10209 7.50 1  # LOOT: a warg-bone earring
+I 4 10218 7.50 1  # LOOT: Nilbog's armored waistband
+I 4 10219 7.50 1  # LOOT: Nilbog's wargskull helm
+T 10200
+T 10201
+T 10212
+T 10213
+S
+#10205
+goblin furl war shaman~
+Furl, war shaman~
+The goblin war shaman is raising his staff!
+~
+0 0 bdxAB h
+1 0 0 18
+I 4 10200 7.50 1  # LOOT: goblin clothing
+I 4 10201 7.50 1  # LOOT: goblin pants
+I 4 10202 7.50 1  # LOOT: goblin shoes
+I 4 10203 7.50 1  # LOOT: a pile of goblin coins
+I 4 10204 7.50 1  # LOOT: a goblincraft saddle
+I 4 10205 7.50 1  # LOOT: a tarnished necklace
+I 4 10206 7.50 1  # LOOT: a goblin timepiece
+I 4 10207 7.50 1  # LOOT: open-fingered gloves
+I 4 10208 7.50 1  # LOOT: a goblin collar
+I 4 10209 7.50 1  # LOOT: a warg-bone earring
+I 4 10220 7.50 1  # LOOT: Furl's flaming wristbands
+I 4 10221 7.50 1  # LOOT: Furl's armored wristbands
+T 10200
+T 10201
+T 10214
+T 10215
+T 10000
+S
+#10206
+warg goblin hairy big~
+a goblin warg~
+A big, hairy goblin warg is snarling at you!
+~
+50 50 dej 0
+0 0 0 10
+I 0 3012 100.00 2  # BUTCHER: UNKNOWN
+I 1 1351 100.00 1  # SKIN: a large skin
+I 1 1351 50.00 1  # SKIN: a large skin
+I 3 10207 100.00 1 X  # BARDE: an armored goblin warg
+S
+#10207
+warg goblin armored~
+an armored goblin warg~
+An armored goblin warg is here!
+~
+100 100 bdej 0
+0 0 0 10
+I 0 3012 100.00 2  # BUTCHER: UNKNOWN
+I 1 1351 100.00 1  # SKIN: a large skin
+I 1 1351 50.00 1  # SKIN: a large skin
+S
+$

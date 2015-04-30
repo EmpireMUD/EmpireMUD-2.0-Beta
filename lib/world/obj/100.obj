@@ -1,0 +1,1118 @@
+#10000
+portal strange green~
+a strange green portal~
+A strange green portal has opened in one of the trees!~
+   The portal crackles and hisses with a strange energy that is at once natural
+and unnatural. You can't see the other side of the portal, but the way it has
+formed in a tree gives you the strange feeling that there are powerful natural
+forces at work here.
+~
+8 0 0
+0 0 0
+10 0
+S
+#10001
+fire wild~
+wild fire~
+A little fire is burning on the ground.~
+Wild fire is bright, but quite harmless.
+~
+3 cm ao
+0 0 0
+10 168
+A
+7 2
+A
+8 1
+C
+0 75
+S
+#10002
+antlers stag pair~
+stag antlers~
+A pair of stag antlers is lying on the ground.~
+   This regal pair of antlers surely came off of a huge deer. It has been
+fitted with a leather hood and a piece of string so that it can be worn on the
+head, but you can't imagine it causes anything but a sore neck.
+~
+2 emp ae
+-1 -1 -1
+7 0
+A
+3 1
+A
+9 1
+C
+0 75
+S
+#10003
+ring badger furry~
+the ring of the badger~
+A furry ring is lying here.~
+The ring is covered in coarse fur.
+~
+2 mp ab
+-1 -1 -1
+7 0
+A
+17 1
+A
+9 1
+C
+0 75
+S
+#10004
+staff grove druid~
+the staff of the grove druid~
+The staff of the grove druid is staked into the ground.~
+This gnarled staff surely came from the Magiterranean!
+~
+1 ehmp an
+0 1 18
+0 0
+A
+7 3
+C
+0 75
+S
+#10005
+belt grove~
+the belt of the Grove~
+The belt of the Grove is lying on the ground.~
+This fur-lined belt is marked with the sigil of the Grove of the Magiterranean!
+~
+2 mp al
+-1 -1 -1
+7 0
+A
+2 2
+A
+3 1
+C
+0 75
+S
+#10006
+scale dragon~
+a dragon scale~
+A dragon scale is lying on the ground.~
+The dragon skill looks like you could use it to craft something impressive.
+~
+15 el a
+1 0 0
+7 0
+R
+5184 a
+R
+5611 a
+S
+#10007
+shield dragonscale scale~
+a dragonscale shield~
+A shield made of dragon scale is lying on the ground.~
+The shield looks like it can really take a beating.
+~
+23 emp ao
+0 0 0
+7 0
+A
+13 2
+A
+12 1
+C
+0 0
+S
+#10008
+longsword sword red-hot firebrand~
+a firebrand longsword~
+A red-hot sword sizzles as it scorches the ground.~
+The sword looks like it would burn the wielder!
+~
+1 emp an
+0 3 1
+2 0
+A
+1 1
+A
+17 1
+C
+0 120
+S
+#10009
+charm red dragon scaly~
+a red dragon charm~
+A red, scaly charm has been dropped here.~
+The red dragon charm pulses with with fiery energy.
+~
+2 mp ac
+-1 -1 -1
+4 0
+A
+16 3
+A
+8 1
+C
+0 120
+S
+#10010
+talisman dragon red dark~
+the red dragon talisman~
+A dark red talisman is lying here.~
+The talisman makes you feel more powerful just by holding it.
+~
+2 mp ac
+-1 -1 -1
+4 0
+A
+17 2
+A
+2 1
+C
+0 0
+S
+#10011
+grate sewer~
+an open sewer grate~
+The sewer grate is propped open.~
+The sewer grate is propped open and you can hear sounds coming from beneath.
+~
+8 0 0
+-1 0 0
+2 0
+S
+#10012
+grate sewer exit ladder~
+the exit~
+A ladder leads up to the sewer's exit.~
+The scent of fresh air wafts down from the sewer's exit.
+~
+8 0 0
+-1 0 0
+2 0
+S
+#10013
+skin rat skins pile filthy~
+a rat skin~
+There is a pile of filthy rat skins on the ground.~
+You're not sure why anybody would want a rat skin.
+~
+3 k a
+0 0 0
+7 8064
+S
+#10014
+necklace rat tooth teeth~
+a rat tooth necklace~
+A necklace made of teeth is crumpled on the floor.~
+It's made from many tiny teeth.
+~
+2 mo ac
+-1 -1 -1
+14 0
+A
+2 1
+A
+9 1
+C
+0 0
+S
+#10015
+totem ratskin furry~
+the ratskin totem~
+A furry totem is lying in the dirt.~
+This totem is carefully crafted from the skins of rats and bits of wire.
+~
+3 mp ao
+0 0 0
+7 0
+A
+2 1
+A
+9 1
+C
+0 0
+S
+#10016
+meat hunk rat spoiled~
+a hunk of rat meat~
+There is some spoiled meat on the ground.~
+This meat doesn't look very good, but it's better than starving.
+~
+6 0 a
+2 0 0
+7 24
+S
+#10017
+jerky rat~
+some rat jerky~
+Some jerky is lying on the ground.~
+Rat jerky wouldn't be your first choice for food. Maybe not even top 10.
+~
+6 0 a
+6 0 0
+7 144
+S
+#10018
+wristblade blade wrist-mounted~
+a wristblade~
+A wrist-mounted blade is poking out of the dirt.~
+It doesn't look like this would do much damage.
+~
+1 imo ano
+0 1 4
+13 0
+A
+2 3
+C
+0 0
+S
+#10019
+cloak hooded~
+a hooded cloak~
+A hooded cloak is crumpled on the floor.~
+It seems like a good cloak if you're interested in dark alleys.
+~
+0 mo ak
+0 0 0
+11 0
+A
+4 2
+A
+6 1
+C
+0 0
+S
+#10020
+cheese bits~
+bits of cheese~
+Bits of cheese are scattered on the ground.~
+Somebody has cut up some perfectly good cheese.
+~
+6 0 a
+3 0 0
+7 48
+T 10026
+S
+#10021
+fang spider dagger large~
+a spider fang dagger~
+A large spider fang is lying on the ground.~
+It looks like someone pried the fang out of a very large spider.
+~
+1 hmo ano
+0 3 4
+7 0
+A
+1 1
+A
+17 1
+C
+0 0
+S
+#10022
+ring spider-hair hair creepy~
+a spider-hair ring~
+A creepy ring is lying on the ground.~
+Someone with a lot of free time has braided giant spider hairs into a ring.
+~
+2 mo ab
+-1 -1 -1
+15 0
+A
+12 1
+A
+17 1
+C
+0 0
+S
+#10023
+ring lucky shiny~
+a lucky ring~
+A shiny ring is lying here.~
+Lucky for you, someone has lost their ring.
+~
+2 mo ab
+-1 -1 -1
+13 0
+A
+8 1
+A
+9 1
+C
+0 0
+S
+#10024
+vial sewage grimy~
+a vial of sewage~
+A grimy vial is lying here.~
+You wouldn't quaff this vial on purpose, if you knew where it came from.
+~
+25 0 a
+8 0 0
+8 8064
+S
+#10025
+hat ratsnest nest dirty~
+a ratsnest hat~
+A dirty hat is lying here.~
+It looks like someone turned a rat's nest into a hat, and you don't know why.
+~
+2 mo ae
+-1 -1 -1
+0 0
+A
+9 1
+C
+0 0
+S
+#10026
+corpse bloated~
+a bloated corpse~
+A bloated corpse is floating face-down in the sewage.~
+You would hate to be this poor sod.
+~
+3 0 0
+0 0 0
+7 120
+S
+#10027
+armor dragonwing wings dragon's piece~
+dragonwing armor~
+A piece of armor made from dragon's wings is folded on the ground.~
+~
+27 mo aq
+0 0 0
+7 0
+A
+15 3
+A
+12 1
+C
+0 0
+S
+#10030
+buffet bufet~
+the buffet~
+A buffet has been set out on a long table by the wall.~
+   The buffet table is loaded with apples, pears, cheeses (both fresh and
+foul), crisps, crackers, carrots, cuts of fish and game, and brightly colored
+birds.
+~
+6 0 0
+500 0 0
+7 0
+S
+#10031
+candelabra grand~
+the candelabra~
+A grand candelabra creates dancing shadows on the walls.~
+   The grand candelabra is made of pitch-black nocturnium, and its yellow-green
+flames create shadows which dance eerily across the walls.
+~
+3 c 0
+0 0 0
+2 0
+E
+shadows~
+The strange shadows seem to dance and play, though the candelabra isn't moving.
+~
+S
+#10032
+glass wine~
+a glass~
+A wine glass has been left behind.~
+It's a simple drinking glass.
+~
+5 0 a
+4 4 11
+8 0
+S
+#10033
+mug~
+a mug~
+A mug has been left here.~
+The mug is ceramic.
+~
+5 0 a
+4 4 9
+6 0
+S
+#10034
+wand gnarled~
+a gnarled wand~
+A gnarled wand is sticking out of the ground.~
+The wand is made from a truly gnarly tree branch.
+~
+1 mo an
+0 1 16
+0 0
+C
+0 0
+S
+#10035
+mirror strange~
+the mirror~
+A strange mirror occupies much of the wall.~
+   As you glance into the mirror, you notice that it's not actually your
+reflection you see, but rather the entrance to the tower.
+~
+8 j 0
+10030 0 0
+3 0
+S
+#10036
+skystone stone small~
+a skystone~
+A small skystone is lying here.~
+   Skystones are used to buy things at the Tower Skycleave. You can type
+'combine skystone' to combine 5 of them into a greater skystone.
+~
+3 l a
+0 0 0
+10 0
+R
+5184 a
+R
+5611 a
+T 10066
+S
+#10037
+skystone greater stone~
+a greater skystone~
+A greater skystone is sitting on the ground.~
+   Skystones are used to buy things at the Tower Skycleave. You can type 'split
+greater' to split it into smaller skystones.
+~
+3 l a
+0 0 0
+10 0
+R
+5184 a
+R
+5611 a
+T 10067
+S
+#10038
+belt skycleaver~
+a skycleaver belt~
+A skycleaver belt is lying in the dust.~
+This belt is sewn from fine silk.
+~
+2 jmo al
+-1 -1 -1
+11 0
+A
+16 1
+C
+30 50
+S
+#10039
+gloves skycleaver pair~
+skycleaver gloves~
+A pair of skycleaver gloves is lying here.~
+The gloves are sewn from fine silk, and are as blue as the sky.
+~
+2 jmo ah
+-1 -1 -1
+11 0
+A
+11 1
+C
+30 50
+S
+#10040
+armor skycleaver set~
+skycleaver armor~
+A set of skycleaver armor has been left here.~
+The armor appears to have been woven from silk, but offers surprising protection.
+~
+27 jmo aq
+0 0 0
+11 0
+A
+12 1
+C
+30 50
+S
+#10041
+rucksack sack skycleaver~
+a skycleaver rucksack~
+Someone has left their skycleaver rucksack here.~
+This bag looks like it could hold a lot.
+~
+24 jmo ar
+1 0 0
+11 0
+A
+8 1
+C
+30 50
+S
+#10042
+shoes pair bustling~
+bustling shoes~
+A pair of bustling shoes seem to be walking in circles.~
+These shoes were made for walking.
+~
+2 mo ag
+-1 -1 -1
+11 0
+A
+6 2
+A
+11 1
+C
+0 0
+S
+#10043
+robes set page~
+page robes~
+A set of page robes is lying on the ground.~
+These are the robes worn by Skycleave pages.
+~
+27 mo aq
+0 0 0
+11 0
+A
+11 1
+A
+6 1
+C
+0 0
+S
+#10044
+book skycleaver spellbook~
+a skycleaver spellbook~
+A spellbook is lying here.~
+You can't really read the spellbook, but it seems to give you power.
+~
+3 mo ao
+0 0 0
+0 0
+A
+17 2
+A
+16 1
+C
+0 0
+S
+#10045
+robes set apprentice~
+apprentice robes~
+A set of apprentice robes has been left here.~
+These are the robes worn by Skycleave apprentices.
+~
+27 mo aq
+0 0 0
+11 0
+A
+8 1
+A
+9 1
+C
+0 0
+S
+#10046
+whip goblin wrangler green~
+a goblin wrangler whip~
+A green whip is coiled here.~
+This whip is good for just one thing: goblin wrangling.
+~
+1 mo an
+0 2 7
+7 0
+A
+17 1
+C
+0 0
+S
+#10047
+pants pair wrangler goblin~
+goblin wrangler pants~
+A pair of wrangler pants is folded on the ground.~
+These sort of wrangler pants are worn by people who deal with a lot of goblins.
+~
+2 mo af
+-1 -1 -1
+11 0
+A
+12 1
+A
+2 2
+C
+0 0
+S
+#10048
+sword shortsword goblin~
+a goblin shortsword~
+A goblin shortsword is lying on the ground.~
+This shortsword was certainly crafted by goblins.
+~
+1 imo ano
+0 1 1
+2 0
+A
+5 -1
+C
+0 0
+S
+#10049
+vest goblin's goblins~
+a goblin's vest~
+A goblin has left its vest here, perhaps.~
+This vest is small, and slightly too snug.
+~
+2 mo ad
+-1 -1 -1
+11 0
+A
+9 1
+A
+5 -1
+C
+0 0
+S
+#10050
+skull goblin~
+a goblin skull~
+You see what appears to be a goblin skull.~
+This appears to be the skull of a goblin.
+~
+3 mo ao
+0 0 0
+0 0
+A
+17 1
+A
+5 -1
+C
+0 0
+S
+#10051
+armor goblin pleated set~
+pleated goblin armor~
+A set of goblin armor is sitting here.~
+Say what you want about goblins, their armorcrafting is renowned.
+~
+27 emo aq
+2 0 0
+0 0
+A
+5 -1
+A
+12 1
+A
+18 1
+C
+0 0
+S
+#10052
+vial pixy pixie dust~
+a vial of pixy dust~
+A vial of pixy dust is lying here.~
+The vial contains a sparkly green substance.
+~
+25 0 a
+14 0 0
+8 0
+S
+#10053
+sword glass~
+a glass sword~
+A glass sword is balanced precariously on edge.~
+You can see straight through it!
+~
+1 emo an
+0 2 1
+8 0
+A
+2 1
+C
+0 0
+S
+#10054
+shield glass~
+a glass shield~
+You barely notice the glass shield on the ground.~
+You can see straight through it!
+~
+23 emo ao
+0 0 0
+8 0
+A
+13 1
+A
+7 4
+C
+0 0
+S
+#10055
+earcuff pointed cuff~
+a pointed earcuff~
+A pointed earcuff is lying here.~
+It's made of copper and gives your ears the impression of having points.
+~
+2 mo am
+-1 -1 -1
+13 0
+A
+8 1
+C
+0 0
+S
+#10056
+doublet glimmering~
+a glimmering doublet~
+A glimmering doublet is lying on the ground.~
+It shines in every color, all at once.
+~
+2 eo ad
+-1 -1 -1
+10 0
+A
+5 1
+S
+#10057
+wand bone long thin~
+a bone wand~
+A long, thin bone is lying on the ground.~
+This appears to be made from a baculum.
+~
+1 mo an
+0 4 16
+14 0
+A
+9 1
+C
+0 0
+S
+#10058
+pocket double-pocket~
+a double-pocket~
+It looks like someone managed to drop a pocket.~
+This appears to be two pockets, occupying the same space.
+~
+24 mo ar
+3 0 0
+11 0
+A
+18 1
+C
+0 0
+S
+#10059
+gauntlet single otherworlder's~
+the otherworlder's gauntlet~
+A single gauntlet is lying on the ground.~
+This strange gauntlet pulses with power.
+~
+1 mo ano
+0 1 15
+2 0
+C
+0 0
+S
+#10060
+wristbands otherworlder's otherworldly~
+the otherworlder's wristbands~
+A pair of otherworldy wristbands is sitting here.~
+These wristband seem to pulse with an otherworldly power.
+~
+2 mo aj
+-1 -1 -1
+2 0
+A
+1 1
+A
+13 1
+C
+0 0
+S
+#10061
+bindings lich~
+lich bindings~
+The floor is piled with lich bindings.~
+These bindings once held a lich together.
+~
+27 mo aq
+0 0 0
+11 0
+A
+8 1
+A
+9 1
+A
+17 1
+C
+0 0
+S
+#10062
+cloak tattered lich~
+a tattered lich cloak~
+A tattered cloak is crumpled on the floor.~
+This cloak might have been nice once.
+~
+2 mo ak
+-1 -1 -1
+11 0
+A
+8 1
+A
+16 1
+A
+7 1
+C
+0 0
+S
+#10063
+club bone large~
+a bone club~
+A large bone is lying on the ground.~
+This might have been a femur.
+~
+1 emo an
+0 1 5
+14 0
+A
+17 1
+A
+4 -1
+A
+15 1
+C
+0 0
+S
+#10064
+chains ghastly piled~
+ghastly chains~
+Some chains are piled up here.~
+These chains are cold to the touch.
+~
+2 emo aj
+-1 -1 -1
+2 0
+A
+18 1
+C
+0 0
+S
+#10065
+backpack armored~
+an armored backpack~
+An armored backpack is sitting here.~
+Someone has plated a backpack in iron.
+~
+24 emo ar
+2 0 0
+2 0
+A
+12 1
+C
+30 100
+S
+#10066
+backpack form-fitting fitting strange~
+a form-fitting backpack~
+A strange backpack is lying here.~
+This backpack looks like it moves with the wearer's body.
+~
+24 mo ar
+2 0 0
+11 0
+A
+17 1
+C
+30 100
+S
+#10067
+hole portable unusual~
+a portable hole~
+There's an unusual hole in the ground.~
+It just looks like a hole. Not really a hole in anything. Just a hole.
+~
+24 mo ar
+2 0 0
+10 0
+A
+7 1
+C
+30 100
+S
+#10068
+shield mana~
+the mana shield~
+A shield made of pure mana is sitting here.~
+The shield is warm to the touch and pulses with pure mana.
+~
+23 mp ao
+0 0 0
+10 0
+A
+12 1
+A
+16 2
+A
+7 1
+C
+0 0
+S
+#10069
+belt silk majestic~
+the majestic silk belt~
+A silk belt is lying here, looking all majestic.~
+This belt is made of fine silk and seems to glow.
+~
+2 mp al
+-1 -1 -1
+11 0
+A
+5 1
+A
+11 3
+A
+6 1
+C
+0 0
+S
+#10070
+ring impact reverse sparkling~
+the reverse impact ring~
+A sparkling ring is lying here.~
+This ring sparkles in the light.
+~
+2 mp ab
+-1 -1 -1
+4 0
+A
+12 4
+A
+1 1
+C
+0 0
+S
+#10071
+grimoire arcane barrosh's~
+Barrosh's grimoire~
+An arcane grimoire is lying here.~
+The first page has, in large writing, the words "This Book Belongs To: Barrosh".
+~
+3 emp ao
+0 0 0
+0 0
+A
+5 1
+A
+7 3
+A
+8 1
+C
+0 0
+S
+#10072
+staff apollus appollus~
+the staff of Apollus~
+The staff of Apollus is staked into the ground.~
+This is the staff of Apollus, patron of healers.
+~
+1 emp an
+0 1 19
+0 0
+A
+8 3
+A
+7 3
+C
+0 0
+S
+#10073
+goggles crystal-clear clear pair~
+crystal-clear goggles~
+A pair of goggles are lying on the ground.~
+These goggles are made from some rare gem that is so clear, you can't even see it.
+~
+2 p ae
+-1 -1 -1
+8 0
+B
+ci
+S
+#10074
+robes impressive grand high sorcerer~
+the Grand High Sorcerer robes~
+A very impressive set of robes is floating here.~
+These robes once belonged to a Grand High Sorcerer.
+~
+27 emp aq
+0 0 0
+10 0
+A
+5 1
+A
+8 2
+A
+16 1
+A
+7 1
+C
+0 0
+S
+#10075
+dagger arcane black~
+an arcane dagger~
+A black dagger is sticking out of the ground.~
+The dagger is inky-dark, surely forged from nocturnium.
+~
+1 hmp ano
+0 1 4
+2 0
+A
+7 3
+A
+16 2
+C
+0 0
+S
+#10076
+earrings bone phoenix pair~
+phoenix bone earrings~
+A pair of bone earrings are sitting here.~
+These earrings are made from the bones of an actual phoenix!
+~
+2 mp am
+0 0 0
+14 0
+A
+9 1
+C
+0 0
+S
+#10077
+handwraps wraps~
+experimental handwraps~
+Some handwraps are lying on the ground.~
+You're not really sure what these are, but you found them on somebody's hands.
+~
+2 jmo ah
+-1 -1 -1
+10 0
+A
+3 1
+C
+0 0
+S
+#10078
+aura experimental~
+an experimental aura~
+There's... sort of an aura hovering here.~
+It glows with... something.
+~
+2 ejmo ak
+-1 -1 -1
+10 0
+A
+12 1
+A
+1 -3
+C
+0 0
+S
+$

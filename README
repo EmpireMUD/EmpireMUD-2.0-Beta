@@ -1,0 +1,274 @@
+
+                           EmpireMUD README File
+                           ---------------------
+
+This is the preliminary release of EmpireMUD, 1.0.  It is based on CircleMUD
+3.0 and thus most of the CircleMUD README file has been maintained within this
+document.
+
+Information about CircleMUD can be found at its home page:
+http://www.circlemud.org
+
+Out of respect for our hard work, I ask that you keep all of my credits in
+tact (including the headers in each of the files) and maintain your own
+integrity by properly repsecting all contributers.
+
+Paul Clarke
+paul@empiremud.net
+
+
+Use of this software in any capacity implies that you have read, understood,
+and agreed to abide by the terms and conditions set down by the CircleMUD
+license contained in the file license.doc.
+
+Also, out of courtesy if nothing else, please keep the 'credits' file intact.
+You can add your own credits on top of the existing file, but I'd appreciate
+it if you would not simply remove it and all references to the word "Circle"
+everywhere in the MUD.
+
+Jeremy Elson
+jelson@circlemud.org
+
+----------------------------------------------------------------------------
+
+Downloading EmpireMUD
+---------------------
+
+You can find information at the website:
+  http://empiremud.net
+
+The archive will be called something like "empiremudXXX.tar.gz" (where
+"XXX" is the version number).
+
+Once you download the archive, you must decompress it.  To unpack the
+archive on a UNIX system, type:
+
+        tar xzf empiremudXXX.tar.gz
+
+
+
+Compiling and Running EmpireMUD
+-------------------------------
+
+1)  Configure EmpireMUD for your system.  Empire must be configured using
+    the 'configure' program which attempts to guess correct values for
+    various system-dependent variables used during compilation.  It uses
+    those values to create a 'Makefile' and a header file called 'conf.h'.
+    The configure program and all associated resources are the work of
+    Jeremy Elson, EmpireMUD has merely adapted them.
+
+    From Empire's root directory, type
+
+        ./configure
+
+    If you're using 'csh' on an old version of System V, csh might try to
+    execute 'configure' itself, giving you a message like "Permission denied"
+    when you try to run "./configure".  If so, type "sh ./configure" instead.
+
+    'configure' can take several minutes if you're using a slow computer.
+
+    'configure' will attempt to use the 'gcc' compiler if it exists; if not,
+    it will try 'cc'.  If you want to use a different compiler, set the
+    'CC' environment variable to the name of the compiler you wish to use.
+
+    For example, if you want to use the 'xlc' compiler, and your shell is
+    csh or tcsh:
+
+	setenv CC xlc
+	./configure
+
+    Or, if you want to use the 'xlc' compiler, and your shell is sh or bash:
+
+	CC=xlc ./configure
+
+    This will tell 'configure' to use the 'xlc' compiler instead of 'gcc'.
+
+
+2)  There are a few things to change before you compile the first time. In the
+    'src' directory (cd src), you can edit 'structs.h' and change the MAP_WIDTH
+    and MAP_HEIGHT definitions to the size you want. However, your memory usage
+    on the server will rise with the map size. You should also change the
+    PASSWORD_SALT definition to some small unique string, as this will make
+    your passwords more secure if your compiler supports encryption. You may
+    also want to edit 'util/map.c' and check out the map generator config-
+    urations. You'll be using that to generate a map in step 5.
+    
+    If you plan to use any of the included PHP utilities, you should edit them
+    (in the 'empireMUD/php' directory) and change the text "/path/to..." to
+    the correct absolute path to your mud, html document root, or wherever it
+    indicates.
+    
+    
+3)  Build the EmpireMUD server.  This must be done from the 'src' directory.
+    Type 'make all'.
+
+    This will build EmpireMUD proper as well as its ancillary utilities,
+    which can take anywhere from 2 minutes to an hour depending on the
+    speed of your computer.
+
+    Note that in the future, when you need to recompile Empire as you make
+    changes to the code, it is NOT necessary to run 'configure' again (it
+    should only be run once, after the first time you unpack Empire from
+    its .tar file).  If you move the source code to a different computer,
+    you should reconfigure it by deleting the file 'config.cache' and
+    running 'configure' again.
+
+    The first time you try to compile Empire, you will be asked to read the
+    EmpireMUD license.  Please read it!
+
+
+4)  To select a port for your mud: edit the autorun file and find the
+    PORT variable it plans to use.  You should check with your server
+    administrator to see which port you are allowed to run off of.  You
+    should also change the default port in config.c.
+
+
+5)  Create a world:
+    a. Go back to the root directory of EmpireMUD ("ch ..").
+    b. cd lib/world/wld
+    c. ./map
+    d. This will output all the .wld files for the mud, plus a map.txt data
+       file that you can use to generate a graphical version  to see if you
+       like the map it created for you. EmpireMUD comes with a program called
+       map.php that generates a PNG image from a map.txt file.
+    e. You can re-run "./map" until you get one you like.
+
+
+6)  Go back to Empire's root directory (by typing "cd ../../..") and run the
+    EmpireMUD server.  The easiest way to do this the first time is
+    to use the 'autorun' script, which can be run in the background by
+    typing:
+
+        ./autorun &
+
+    Make sure to do this in Empire's root directory, not the src directory or
+    wld directory that you used for the previous steps.  A file called 'syslog'
+    will start growing in the same directory that contains Empire's log
+    messages.
+
+    If you're using 'csh' on an old version of System V, csh might try to
+    execute 'autorun' itself, giving you a message like "Permission denied"
+    when you try to run "./autorun".  If so, type "sh ./autorun &" instead.
+
+7)  Wait until the line 'No connections.  Going to sleep.' appears in the
+    syslog.  This indicates that the server is ready and waiting for
+    connections.  It shouldn't take more than about 30 seconds for the MUD
+    to reach this state, though performance will vary depending on how fast
+    your computer is.
+
+    If a file appears called 'syslog.CRASH', the MUD has terminated
+    (probably abnormally).  Check the contents of syslog.CRASH to see
+    what error was encountered.
+
+
+8)  Type 'telnet localhost 4000' to connect (or whatever port you picked).
+    The first person to log in will be made an implementor (max level) with
+    all powers. If your server doesn't have telnet, you'll need to connect
+    remotely using the server's host name.
+
+
+System requirements depend largely on the size of your world. An 800x600
+world will take about 130 MB of RAM; a larger world will need more. You will
+need at least 50 MB of disk space, but you'll need more if you are generating
+PNG images of your world map, and other utilities.
+
+Futher steps once you are logged into EmpireMUD:
+- Set up starting locations using the '.map' editor.
+- Review settings with the 'config' command.
+- Set up the PHP utilities on your website by symlinking them into a web
+  directory like 'public_html':
+   ln -s /path/to/empiremud/php/map.php map.php
+   ln -s /path/to/empiremud/php/map-viewer.php map-viewer.php
+- You will probably want to automate your map.php to generate a live map.png,
+  which is used by the map-viewer.php program. Consider adding a cron job:
+   crontab -e (to edit the crontab)
+   0,15,30,45 * * * * php /path/to/empiremud/php/map.php > /path/to/public_html/map-new.png && mv /path/to/public_html/map-new.png /path/to/public_html/map.png
+   0,15,30,45 * * * * php /path/to/empiremud/php/map.php political > /path/to/public_html/map-pol-new.png && mv /path/to/public_html/map-pol-new.png /path/to/public_html/map-political.png
+   (then save and quit the crontab editor)
+- If you have disk space to spare, you should also use the php/make-backup.php
+  file -- which you will need to symlink or copy into a backup directory that
+  is NOT inside your empiremud dir, and edit the make-backup.php file to set
+  the correct paths for the game and backup directories. You should set these
+  on a cron, to get hourly backups:
+   0 * * * * php /path/to/backups/make-backup.php
+
+
+Other Documentation
+-------------------
+
+The EmpireMUD documentation project is not complete.  If you need help you
+may e-mail me or see if the CircleMUD documentation will help.  I've left
+in-tact all CircleMUD documentation except that which would give you mis-
+leading information (like the building.doc, which describes Circle's
+files but would not work for Empire).
+
+Paul Clarke
+paul@empiremud.net
+
+
+CircleMUD Documentation
+-----------------------
+
+/doc/Circle/
+
+If this information isn't enough to get you running, there's a lot more
+information available.  All documentation (other than this file) is in
+the "doc" directory and available on-line at http://www.circlemud.org.
+
+The README file in the doc directory describes each documentation file
+in detail, but there are several main files which should be of interest:
+
+"The CircleMUD Administrator's Guide" (admin.txt, admin.ps)
+    A good place to start after reading this README file, admin.txt gives
+an overall description of how Circle works, how to get it to compile and
+run for the first time, information about customizing and configuration
+options and command-line arguments, and tips on maintenance and day-to-day
+MUD administration. 
+
+"The CircleMUD Coder's Manual" (coding.txt, coding.ps)
+    For the coders in your group, a technical reference describing some of
+the more basic coding tasks such as how to add new commands, spells,
+skills, socials, and classes.  Note that it assumes the reader already has
+an excellent knowledge of C; the manual is not a C tutorial.
+
+"The CircleMUD SYSERR List" (syserr.txt, syserr.ps)
+    A comprehensive list of all the possible SYSERR messages CircleMUD 
+can generate, and a description of what can cause each problem and how to 
+solve it.  An excellent guide for troubleshooting and area debugging.
+
+
+Getting Help
+------------
+
+If you have strange problems -- and you can't figure out the answer by
+reading the documentation -- fear not, there are many other resources
+available.  The best is probably just to e-mail me.
+
+Often you can get help at http://www.mudconnect.com/, their message boards
+are full of intelligent coders who can help.
+
+No matter how you choose to get help, make sure to always include the
+following information in your mail:
+
+  -- The exact version of EmpireMUD you're using (e.g., "EmpireMUD 2.0b1",
+     "EmpireMUD 2.0b2" etc.).
+  -- The EXACT text of any error messages, compiler errors, link errors,
+     or any other errors you're getting.
+  -- The exact type of hardware, operating system name and version, and
+     compiler you're using.
+  -- A description of ANY changes you've made, no matter how small, that
+     might have contributed to the error.
+  -- Some information from your gdb or other debugger log.
+  -- Your syslog.CRASH
+
+Please remember that I get a lot of mail every day and can only help you if
+you give me the proper information.  I will NOT log into your server and fix
+things for you, so please don't ask.
+
+Paul Clarke / Khufu / Gideon X
+paul@empiremud.net
+
+USE OF THIS SOFTWARE IN ANY CAPACITY IMPLIES THAT YOU HAVE READ, UNDERSTOOD,
+AND AGREED TO ABIDE BY THE TERMS AND CONDITIONS SET DOWN BY THE CIRCLEMUD
+LICENSE.
+

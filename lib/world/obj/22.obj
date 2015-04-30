@@ -1,0 +1,262 @@
+#2200
+whip studded leather~
+a studded whip~
+A studded leather whip is lying on the ground.~
+This whip has been studded with bolts at the end to increase its strike.
+~
+1 mo an
+0 1 7
+7 0
+A
+21 2
+C
+0 0
+S
+#2201
+whip razor-studded studded~
+a razor-studded whip~
+A razor-studded whip is snaked out on the ground.~
+The end of this whip has been lined with razors!
+~
+1 imo an
+0 1 7
+7 0
+A
+21 2
+C
+0 0
+S
+#2202
+sword arming~
+an arming sword~
+An arming sword is lying here.~
+This is the standard weapon of the age: the arming sword.
+~
+1 eimo ano
+0 1 1
+2 0
+C
+0 0
+S
+#2203
+falchion~
+a falchion~
+A falchion is lying here.~
+This is a finely-crafted falchion, perfectly weighted for powerful slashes.
+~
+1 emo ano
+0 4 1
+2 0
+A
+17 1
+C
+0 0
+S
+#2204
+axe battle~
+a battle axe~
+A battle axe is stuck into the ground.~
+The battle axe is one of mankind's oldest, most familiar weapons.
+~
+1 ehmo an
+0 6 2
+2 0
+A
+1 1
+C
+0 0
+S
+#2205
+axe great~
+a great axe~
+A great axe has been left here.~
+   This axe is huge, and heavy, and it looks like you could split someone in
+half with it.
+~
+1 ehmo an
+0 5 2
+2 0
+A
+1 1
+C
+0 0
+S
+#2206
+pike long~
+a pike~
+A long pike is standing here.~
+The pike is a very long spear, and you only want to be on this end of it.
+~
+1 ehmo an
+0 5 3
+2 0
+A
+18 1
+C
+0 0
+S
+#2207
+glaive~
+a glaive~
+A glaive is lying on the ground.~
+   The glaive is an elaborate spear, mounted on a strong pole and absolutely
+fearsome. Many a foe has fallen to such a weapon.
+~
+1 ehmo an
+0 5 3
+2 0
+A
+2 1
+A
+18 1
+C
+0 0
+S
+#2208
+dagger~
+a dagger~
+A dagger is lying here.~
+The dagger is small and concealable, but sharp enough to be deadly.
+~
+1 imo ano
+0 5 4
+2 0
+A
+17 1
+C
+0 0
+S
+#2209
+kris deadly~
+a deadly kris~
+A deadly kris is sticking out of the ground.~
+The kris is a flame-bladed dagger with deadly speed.
+~
+1 mo ano
+0 3 4
+2 0
+A
+9 1
+C
+0 0
+S
+#2210
+mace heavy~
+a mace~
+A heavy mace has been dropped here.~
+The mace is a powerful weapon of war, capable of crushing armor.
+~
+1 ehmo an
+0 1 5
+2 0
+C
+0 0
+S
+#2211
+maul brutal~
+a brutal maul~
+A maul is lying on the ground.~
+The maul is a cross between a large axe and a larger hammer.
+~
+1 emo an
+0 3 5
+2 0
+A
+17 1
+C
+0 0
+S
+#2212
+pickaxe~
+a pickaxe~
+A pickaxe is laying here.~
+The pickaxe is both weapon and tool.
+~
+1 ehmo an
+0 1 8
+2 0
+C
+0 0
+S
+#2213
+pick horseman's horsemans~
+a horseman's pick~
+A horseman's pick is lying on the ground.~
+   The horseman's pick is a pick mounted on a long, strong pole. It's meant for
+taking men off of horses, but it's equally effective at penetrating armor.
+~
+1 eimo an
+0 3 8
+2 0
+A
+2 1
+C
+0 0
+S
+#2214
+spear copper~
+a copper spear~
+A copper spear is planted in the ground.~
+This copper spear is somewhat crude, but effective.
+~
+1 ehmo an
+0 5 3
+13 0
+A
+2 1
+C
+0 0
+S
+#2215
+knife copper~
+a copper knife~
+A copper knife is jabbed into the ground.~
+This small copper knife is quite sharp.
+~
+1 mo ano
+0 5 4
+13 0
+A
+17 1
+C
+0 0
+S
+#2216
+mace copper~
+a copper mace~
+A copper mace is lying here.~
+The mace is a powerful weapon of war, capable of crushing armor.
+~
+1 ehmo an
+0 1 5
+13 0
+A
+21 1
+C
+0 0
+S
+#2217
+axe copper~
+a copper axe~
+A copper axe is stuck into the ground.~
+This copper axe looks well-worn.
+~
+1 ehmo an
+0 6 2
+13 0
+C
+0 0
+S
+#2218
+whip rawhide~
+a rawhide whip~
+A rawhide whip has been left on the ground.~
+The rawhide whip is firm and strong.
+~
+1 mo an
+0 1 7
+7 0
+C
+0 0
+S
+$

@@ -1,0 +1,19 @@
+                        &Y|
+                  &Y\     |     /
+                    &Y\   |   /                      &0Explore.
+                      &Y\###/                          &0Build.
+                &Y------#####------                      &0Dominate.
+                      &Y#&y/ \&Y#                              &REmpire.
+                     &y/%.   \
+                   &y/%%|      \
+                 &y/%%%.     .   \
+               &y/%%%%|            \
+             &y/%%%%%.               \
+           &y/%%%%%%|      .           \
+         &y/%%%%%%%.             "       \     / \           &0 E M P I R E  M U D
+       &y/%%%%%%%%|   '                  " \ /%.   \             &0 2.0 beta 1
+     &y/%%%%%%%%%.           .               \|      \
+   &y/%%%%%%%%%%|            |====|            \       \     &0http://empiremud.net
+ &y/%%%%%khufu%.  "           ||||     '     .   \       \&0
+ 
+Enter your character name: 

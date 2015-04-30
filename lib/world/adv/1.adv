@@ -1,0 +1,153 @@
+#100
+Magiterranean: The Grove~
+Paul Clarke~
+   A small grove deep in the Magiterranean, the plane of nature magic. This is
+a place where the forces of nature run deep, and interlopers are unwelcome.
+The grove is but a small part of the greater realm, and can be found in deep
+forests.
+~
+10000 10005 1-75
+50 0 0 0
+L
+5 0
+4320 -1 -1
+-1 0 0
+L
+2 0
+4 10000 10000
+-1 0 0
+S
+#120
+Mountain Cave: Red Dragon~
+Paul Clarke~
+   Enter a cavernous mountain cave and find yourself face-to-claw with a giant
+red dragon! Bring a healer and a tank, and see how you fare against the most
+dangerous of wild creatures.
+~
+10006 10010 300-300
+5 1440 c 4
+L
+5 0
+2880 -1 -1
+-1 0 0
+L
+1 0
+10006 -1 -1
+14 c c
+S
+#121
+The Swamp Hag~
+Paul Clarke~
+   You have stumbled upon a strange, raised house in the swamp. It's old,
+dilapidated, and surrounded by unfriendly swamp creatures. What sort of person
+would live like this?
+~
+10100 10104 75-150
+15 0 0 0
+L
+1 0
+10100 -1 -1
+8 m m
+S
+#122
+Ruins: Three Banditos~
+Paul Clarke~
+   It looks like someone has been camping out in these ruins. You've found the
+hideout of infamous bandits Berk, Jorr, and Tranc! These three are not renowned
+for fighting fair, but if you're lucky, maybe only one of them is home.
+~
+10105 10109 100-200
+20 0 cd 0
+L
+0 ac
+5007 -1 -1
+14 0 0
+L
+5 0
+2880 -1 -1
+-1 0 0
+S
+#123
+Ruins: Thieves~
+Paul Clarke~
+   This is a new adventure zone. You've stumbled onto somebody's campsite in
+the ruins. From the looks of things, it's not someone living the high life.
+Some of the items appear to be quite valuable, so it's safe to assume the
+person camping here is not the legal owner of any of these things.
+~
+10110 10114 5-100
+20 0 cd 0
+L
+5 0
+2880 -1 -1
+-1 0 0
+L
+0 ac
+5007 -1 -1
+14 0 0
+S
+#125
+Ruins: The Goblin Challenge~
+Paul Clarke~
+   The ruins have attracted a nest of goblins, and you'll have to clear them
+out before the ruins can be removed. That might not be easy, as you have
+stumbled upon the Goblin Challenge. Goblins might be small, but they aren't
+known to fight fair. Play this encounter in phases, increasing in difficulty.
+This adventure locks its level when you start combat, so check if it's already
+locked before you start.
+~
+10200 10224 50-150
+50 0 c 4
+L
+0 ac
+5007 -1 -1
+9 0 0
+L
+5 0
+10080 -1 -1
+-1 0 0
+S
+#140
+The Sewer: Ratskins~
+Paul Clarke~
+   Your city has grown, and it's not easy having so many people living so
+closely together. Sewers squirrel away the dirtiest parts of society, keeping
+the foul stench of mankind's unmentionable waste out of sight, and out of mind.
+But the sewer attracts two more of society's unwanted: the poor, and the rats.
+~
+10011 10027 1-50
+30 30 be 0
+L
+2 ab
+9 10011 10012
+-1 0 0
+L
+5 0
+7200 -1 -1
+-1 0 0
+L
+3 ab
+5009 10011 10012
+-1 0 0
+S
+#160
+The Tower Skycleave~
+Paul Clarke~
+   The Tower Skycleave is renowned throughout the land for its powerful
+sorcerers and unconventional research. It funds its discoveries through patents
+and tourism, and a sign out front eagerly encourages you to visit. Parts of the
+tower are designed for different level ranges, so use the 'consider' command
+judiciously before you attack things.
+~
+10030 10099 30-200
+1 240 0 0
+L
+1 0
+10030 -1 -1
+0 bdel bdelo
+L
+5 0
+1440 -1 -1
+-1 0 0
+S
+$

@@ -1,0 +1,184 @@
+#1100
+portal~
+a portal~
+A portal spins and crackles before you.~
+You can enter the portal and find yourself somewhere else entirely!
+~
+8 0 0
+0 0 0
+10 0
+S
+#1101
+sword blood-red bloodred red~
+the blood-red sword~
+The blood-red sword is dripping on the ground.~
+~
+1 g ano
+0 4 1
+10 0
+S
+#1102
+sword blood-red bloodred red~
+the blood-red sword~
+The blood-red sword is dripping on the ground.~
+~
+1 g ano
+0 5 1
+10 0
+S
+#1103
+sword blood-red bloodred red~
+the blood-red sword~
+The blood-red sword is dripping on the ground.~
+~
+1 g ano
+0 6 1
+10 0
+S
+#1104
+sword crimson blood~
+the crimson blood sword~
+The crimson blood sword is dripping on the ground.~
+~
+1 g ano
+0 7 1
+10 0
+S
+#1105
+fireball~
+a fireball~
+A fireball is rolling around here.~
+~
+1 g ano
+0 0 16
+10 0
+S
+#1106
+orb light glowing~
+an orb of light~
+A glowing orb is floating here.~
+This orb provides a bright light to the room.
+~
+3 cg ao
+0 0 0
+10 36
+S
+#1107
+staff wooden~
+a wooden staff~
+A wooden staff has been left here.~
+The staff is the signature weapon of High Sorcery.
+~
+1 ehlmo an
+0 1 5
+0 0
+C
+0 0
+S
+#1108
+staff wanderer's wanderers~
+a wanderer's staff~
+A wanderer's staff has fallen on the ground.~
+The staff is the signature weapon of High Sorcery.
+~
+1 ehjlmo an
+0 3 17
+0 0
+A
+6 1
+A
+11 3
+C
+0 0
+S
+#1109
+staff sorcerer's sorcerers~
+a sorcerer's staff~
+A sorcerer's staff has been dropped here.~
+The staff is the signature weapon of High Sorcery.
+~
+1 ehjlmo an
+0 4 17
+0 0
+A
+7 1
+C
+0 0
+S
+#1110
+staff wisdom~
+a staff of wisdom~
+A staff of wisdom has fallen to the ground.~
+The staff is the signature weapon of High Sorcery.
+~
+1 ehjlmo an
+0 4 17
+0 0
+A
+8 1
+C
+0 0
+S
+#1111
+staff lightning~
+a staff of lightning~
+A staff of lightning is crackling with energy on the ground.~
+The staff is the signature weapon of High Sorcery.
+~
+1 ejmo an
+0 4 17
+0 0
+A
+9 2
+A
+8 1
+C
+0 0
+S
+#1112
+staff burning~
+a burning staff~
+A burning staff is planted in the ground.~
+The staff is the signature weapon of High Sorcery.
+~
+1 ejmo an
+0 6 18
+0 0
+A
+16 1
+A
+7 1
+C
+0 0
+S
+#1113
+staff agony~
+a staff of agony~
+A staff of agony is wailing dreadfully.~
+The staff is the signature weapon of High Sorcery.
+~
+1 ejmo an
+0 5 19
+0 0
+A
+17 2
+A
+3 1
+C
+0 0
+S
+#1114
+spike imperium~
+an imperium spike~
+An imperium spike is sitting on the ground.~
+The imperium spike can be used for the Ritual of Defense.
+~
+1 h ano
+0 3 8
+2 0
+R
+5164 0
+R
+5511 0
+S
+$

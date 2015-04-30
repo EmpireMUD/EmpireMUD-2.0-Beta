@@ -1,0 +1,79 @@
+* Note: all lines between records which start with '*' are comments and
+* are ignored.
+*
+* Each line from this file is shown as a tip-of-the-day at random when a player
+* logs in.
+*
+* Game-specific tips
+The website has a graphical world map at http://empiremud.net/map-viewer/
+You can see a list of what's changed recently at http://empiremud.net/change-log/
+*
+* General tips
+You can always ask for help on the /newbie channel.
+Items you leave on your claimed land will automatically be stored in your empire.
+Items that are left on the ground will disappear over time.
+If an item gets auto-stored, you'll have to build the right building to retrieve it.
+You can check what's stored in your empire from anywhere using 'einventory'.
+You find a list of territory outside your cities by typing 'territory'.
+You can use the 'territory' command to search for any type of building or crop you own.
+You can find out if cities or starting locations are near you with 'nearby'.
+You can change how big a map you see using 'mapsize'.
+You can have more than one of your characters in the same empire, if your account is set up correctly.
+You can see who owns what on the map by turning on 'toggle political'.
+You can see which buildings are still under construction using 'toggle informative'.
+You can see which mines are depleted using 'toggle informative'.
+You can see which buildings need maintenance using 'toggle informative'.
+Lots of useful preferences are found on the 'toggle' command.
+You can knock enemies out instead of killing them using 'toggle autokill'.
+You can reduce the spam from chores like chopping by typing 'toggle action-spam'.
+If you're not riding or on a road, there's a small delay each time you move.
+You can only get two skills all the way to 100; these determine your class.
+It's possible to gain skill levels even when you're out of daily skill points. The rate is just lower.
+With the Workforce ability, you can give your citizens chores.
+Your Workforce will only work a chore if you don't already have too much of the resource it produces.
+Your Workforce will only work within 20 tiles of each citizen's home.
+If an empire is Distrustful, its guards and towers will attack anyone who isn't at peace with them.
+If an empire is Friendly, its guards and towers ignore anyone who's not at war.
+Highwaymen don't spawn on claimed land.
+Build yourself a nice burial site so you'll have somewhere closer to respawn when you die.
+You can only respawn at your preferred tomb if you died on the same continent.
+If you have a hestian trinket, you can teleport back to your home from anywhere.
+You can fill a trench faster by pouring out your canteen.
+Haste potions make most chores go twice as fast.
+You can forge faster using a superior hammer.
+You can make bricks faster at a Potter's Hut than at a campfire.
+You can make a simple cooking fire by lighting a tree or log.
+You can tan skins anywhere, but it's faster at the Tannery.
+If you're in a canoe, sharks and crocodiles may ignore you.
+You can only burn down buildings if you're at war with the owner.
+You can only go to war with empires that are currently online.
+Your Workforce will only work on tiles you have claimed.
+You can learn Natural Magic at a stone henge.
+You can study High Sorcery in any tower of sorcery.
+You can learn Stealth in the tavern.
+You can establish peace with an empire by typing 'diplomacy peace <empire>'.
+You can start trade relations with an empire by typing 'diplomacy trade <empire>'.
+You can request an end to a war with 'diplomacy peace <empire>'.
+If you have trade relations with another empire, you can retrieve your empire's resources from their storage buildings.
+The only thing that can get past enchanted walls is Earthmeld.
+Earthmeld won't let you cross a river -- or a moat.
+You can use 'mark' to measure distances on the map.
+Moving at a diagonal is actually slightly further and costs more move points.
+You can use 'home' to set a house as your own.
+You can use 'tomb' to set your burial place.
+You can see recent empire logs with the 'elog' command.
+You can set up trade using the 'import' and 'export' commands.
+You get better exchange rates with empires that you have treaties with.
+You can type 'toggle scrolling to get rid of the paged text display.
+You can level Trade all the way to 15 by chipping, tanning, or weaving, before buying any abilities.
+You can level Survival all the way to 15 by digging or gathering, before buying any abilities.
+If you find some channels hard to see, try using 'recolor'.
+All resources run out eventually. Read more with 'help depletion'.
+Try looking at items to see what they do.
+If you're not sure what a symbol on the map means, try 'help legend'.
+You can craft more than one item in a row using 'craft <number> <item>'. This also works with forge and sew.
+You can find adventures near you with 'nearby'.
+If you come across an adventure, use the 'adventure' command to find out its level and requirements.
+You can 'consider' enemies to see how hard they'd be.
+Gear makes up a significant portion of your level.
+$~

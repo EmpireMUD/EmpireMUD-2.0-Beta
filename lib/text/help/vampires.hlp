@@ -1,0 +1,372 @@
+VAMPIRE VAMPIRES "VAMPIRE SKILL"
+
+Vampire (skill)
+
+The Vampire skill tree contains all the powers of these creatures of the night.
+Vampirism is not a curse, per se, but its powers do come at a price: vampires
+must drink blood. Vampires are not harmed by the sun, but their powers do not
+function in broad daylight.
+
+Vampires at skill level 15 or bellow are constantly hungry, losing a blood
+point ever hour even if they have no blood powers active. At such low levels,
+these vampires gain skill just by drinking the blood of others. Higher level
+vampires have an hourly upkeep based only on which powers are active. See the
+help file on BITE for more information on drinking blood.
+
+To become a vampire, seek out another of their kind -- if you dare.
+
+Check out &yHELP VAMPIRE GUIDE&0 for a getting-started.
+
+See also: BITE, SIRE, FEED, BOOST, ALACRITY, BLOOD FORTITUDE, MUMMIFY,
+    TASTE BLOOD, ANCIENT BLOOD, BLOODSWORD, COMMAND, MAJESTY, SUMMON, SOULMASK,
+    DEATHSHROUD, WOLF FORM, HORRID FORM, MIST FORM, CLAWS, PREADTOR VISION,
+    REGENERATE, BUILD HAVEN, DAYWALKING, VEINTAP, WEAKEN, BAT FORM,
+    UNNATURAL THIRST, SANGUINE RESTORATION
+#
+ALACRITY
+
+Alacrity (Vampire ability)
+
+Usage:  alacrity
+Cost:  10 blood
+Upkeep:  2 blood/hr
+
+This ability grants a vampire haste, at the cost of blood.
+#
+"ANCIENT BLOOD"
+
+Ancient Blood (Vampire ability)
+
+Type: passive
+
+By learning the secrets of the ancient blood, a vampire effectively doubles
+its blood pool. The vampire also gets twice as much blood when drinking
+directly from a live host.
+#
+"BAT FORM"
+
+Bat Form (Vampire ability)
+
+Usage:  morph bat
+Cost:  50 blood (100 in combat)
+Upkeep:  1 blood/hr
+
+A master vampire can turn into a tiny bat, capable of flight.
+
+See also: MORPH
+#
+BITE
+
+Usage:  bite <target> 
+
+A vampire is only as good as the blood it drinks. Use this command to bite a
+victim and drink their blood. This means that you will suck the blood from
+your victim until they have no blood remaining. This is vital to replenish
+your blood points. This WILL kill your victim, so use it cautiously. Of course,
+you could always stop before your victim dies.
+
+You can use "toggle bother" to turn on and off no-bother. If you are no-bother,
+vampires cannot bite you without permissions.
+
+To bite an NPC or a player who hasn't toggled "bother", you must first knock
+them out in combat. You can "toggle autokill" to stop yourself from killing
+them instead, and then bite them when they are knocked out or very injured.
+
+Example:
+  > bite wolf
+
+See also: ANCIENT BLOOD, SANGUINE RESTORATION, TOGGLE, UNNATURAL THIRST
+#
+"BLOOD FORTITUDE" FORTITUDE
+
+Blood Fortitude
+Class ability:  Reaper
+Type:  passive
+
+The vampire's blood-fueled form is more resilient against physical damage.
+#
+BLOODSWORD "BLOOD-RED SWORD"
+
+Bloodsword (Vampire ability)
+
+Usage:  bloodsword
+Cost: 20 blood
+
+A vampire with this ability can create a sword from its own blood. The blood-
+red sword is only as powerful as the vampire who created it, and it only lasts
+a short time.
+
+When you activate this power, you will automatically wield the sword.
+#
+BOOST
+
+Boost (Vampire ability)
+
+Usage:  boost <strength | dexterity>
+        boost end
+Cost:  10 blood
+Upkeep:  1 blood/hr per boost
+
+This ability allows a vampire to boost strength or dexterity by spending
+blood.
+
+You can end your boosts early by typing "boost end".
+#
+CLAWS
+
+Claws (Vampire ability)
+
+Usage:  claws
+Cost:  10 blood
+Upkeep:  2 blood/hr
+
+The vampire can turn his fingers into huge, deadly claws that do greivous
+melee damage.
+#
+COMMAND
+
+Command (Vampire ability)
+
+Usage:  command <name> <task> [sentence]
+
+A vampire with this power can look deep into the eyes of men and command them
+to do simple tasks. The task can be just one word, which must be spoken aloud
+by the vampire and understood by the victim. Optionally, the word can be hidden
+in a sentence.
+
+This power only works on human NPCs, but won't work on hard/group mobs.
+#
+DAYWALKING DAYWALKER
+
+Daywalking (Vampire ability)
+
+A vampire who has learned Daywalking can leave the night behind and walk openly
+in broad daylight without losing her unnatural powers.
+
+This power also protects the vampire against the Purify spell.
+
+See also: PURIFY
+#
+DEATHSHROUD "DEATH SHROUD"
+
+Deathshroud (Vampire ability)
+
+Usage:  deathshroud
+Cost:  20 blood
+Upkeep:  1 blood/hr
+
+This ability puts the vampire into a deep sleep where it mimics the apearance
+of a corpse.
+#
+"DREAD BLOOD FORM"
+
+Dread Blood Form
+Class ability: Lich, Necromancer
+
+Usage:  morph dread blood
+Cost:  30 blood (60 in combat)
+
+The dread blood form is a liquid red terror with a shape that only vaguely
+resembles the man it once was. By channeling its full power through its
+vampiric blood, the dread blood form enhances its mana and casting power.
+
+See also: MORPH
+#
+FEED
+
+Usage:  feed <target>
+
+Vampires can feed their blood to others. You can prevent this by turning off
+the 'bother' toggle, if you don't want to be bothered.
+
+See also: TOGGLE
+#
+"HORRID FORM"
+
+Horrid Form 
+Class ability: Reaper, Shade, Wight
+
+Usage:  morph horrid form
+Cost:  30 blood (60 in combat)
+
+The vampire takes on the horrid form, a twisted bestial monstrosity.
+
+See also: MORPH
+#
+MAJESTY
+
+Majesty (Vampire ability)
+
+Usage:  majesty
+Upkeep:  3 blood/hr
+
+Some vampires have such control over the minds of others that their majesty
+makes them beyond reproach. It is very difficult to attack a majestic vampire.
+
+While Majesty is active, players are immune to random encounters such as
+sharks. Aggressive NPCs may still attack, but will be delayed.
+
+This power offers more protection to characters with higher Charisma.
+#
+"MIST FORM"
+
+Mist Form (Vampire ability)
+
+Usage:  morph mist
+Cost: 20 blood (40 in combat)
+Upkeep:  1 blood/hr
+
+The vampire dissolves into mist, unable to be harmed.
+
+See also: MORPH
+#
+MUMMIFY
+
+Mummify (Vampire ability)
+
+Usage:  mummify
+Cost:  20 blood
+Upkeep:  1 blood/hr
+
+With this ability, a vampire can mummify itself in a hard casing, protecting
+it from all physical harm.
+#
+"PREDATOR VISION"
+
+Predator Vision (Vampire ability)
+
+This ability allows you to see live creatures in the dark. However, it doesn't
+enable you to see items on the ground. You will gain experience with this
+ability whenever you're in an unlit area.
+#
+REGENERATE
+
+Regenerate (Vampire ability)
+
+Usage:  regenerate [health | move | mana] [amount]
+Cost: 10 blood per 10/15/25 regenerated (see below)
+
+Vampires have the ability to regenerate themselves using blood. This process
+heals them, but makes them hungrier. The command defaults to health, unless
+you specify otherwise.
+
+You can specify an amount to heal, but if you do this, you must specify health
+(you can't let it default to health if you want to heal a certain amount).
+
+With Vampire up to level 50, this regenerates 10 per blood point. Up to 75,
+it regenerates 15. And higher than that, it regenerates 25.
+#
+"SANGUINE RESTORATION"
+
+Sanguine Restoration (Vampire ability)
+
+While drinking blood from a live victim, your rate of regeneration goes up 4x.
+You will gain experience with this ability when drinking blood.
+
+See also: BITE
+#
+SIRE SIRING
+
+Usage:  sire <target> 
+
+When a vampire turns a mortal into a new vampire, it is called siring. This
+process drains the mortal of their blood and then attempts to turn them using
+fresh blood from the sire.
+
+Example:  
+
+  > sire Exar 
+
+See also: BITE
+#
+SOULMASK "SOUL MASK"
+
+Soulmask (Vampire ability)
+
+Usage:  soulmask
+
+The soulmask protects the vampire from certain spells and abilities, such as
+Soulsight.
+
+See also: SOULSIGHT
+#
+STAKE UNSTAKE
+
+Usage:  stake <target> 
+        unstake <target>
+
+Stake is designed to incapacitate a vampire. You must first craft a stake and
+have it in your inventory. After successfully staking a vampire it will be
+unable to move until someone unstakes it. Staked vampires may choose to use
+'respawn' to die and come back unstaked.
+
+Example:
+  > stake Deacon
+#
+"SUMMON HUMANS"
+
+Summon Humans (Vampire ability)
+
+Usage:  summon humans
+Cooldown:  1 minute
+
+This ability summons up to (Charisma / 3, rounded up) unsuspecting humans from
+the surrounding area, using the vampire's unnatural charm. They have no
+allegiance to their summoner, though, and may soon wander off again.
+
+See also: COMMAND
+#
+"TASTE BLOOD"
+
+Taste Blood (Vampire ability)
+
+Usage:  taste <person>
+
+Your target must be asleep or permitting for you to taste their blood. You can
+learn about the particular characteristics of their blood through a single
+drop.
+#
+"UNNATURAL THIRST"
+
+Unnatural Thirst (Vampire ability)
+
+Some vampires learn to subsist on blood alone, instead of food or water. Such
+vampires are said to have an unnatural thirst.
+
+You can gain Vampire skill points from this ability while drinking blood.
+
+See also: BITE
+#
+VEINTAP
+
+Veintap (Vampire ability)
+
+Usage:  veintap <amount> <container>
+
+Powerful vampires learn to preserve their blood in containers for later use,
+enabling them to travel without a live blood supply sometimes for weeks.
+#
+WEAKEN
+
+Weaken (Vampire ability)
+
+Usage:  weaken [victim]
+Cooldown:  75 seconds
+
+A vampire who is learned in the ways of blood can use her own blood to drain
+the strength of others for 75 seconds.
+#
+"WOLF FORM"
+
+Wolf Form (Vampire ability)
+
+Usage:  morph wolf
+Cost:  20 blood (40 in combat)
+Upkeep:  1 blood/hr
+
+With Wolf Form, the vampire taps into its primal nature to become wolf. In
+this form, he is nearly indistinguishable from a wild animal.
+
+See also: MORPH
+#
+$

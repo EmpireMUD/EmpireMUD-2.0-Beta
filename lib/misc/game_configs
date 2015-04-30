@@ -1,0 +1,158 @@
+* EmpireMUD Game Configs
+* See init_config_system() in config.c for adding new configs
+*
+* Game configs
+huh_string Huh?!?
+no_person No-one by that name here.
+ok_string Okay.
+require_auth 0
+starting_year 1150
+welcome_message Welcome to your EmpireMUD! Prepare to face your destiny!
+*
+* Actions configs
+chip_timer 4
+chop_timer 30
+chore_distance 20
+common_depletion 125
+dig_base_timer 4
+fishing_timer 40
+garden_depletion 440
+gather_base_timer 4
+gather_depletion 50
+harvest_timer 20
+high_depletion 250
+max_chore_resource 200
+max_chore_resource_skilled 750
+mining_timer 45
+panning_timer 10
+pick_base_timer 4
+pick_depletion 14
+planting_base_timer 120
+shear_growth_time 6
+short_depletion 25
+smelt_timer 4
+tan_timer 12
+tavern_brew_time 10
+tavern_timer 60
+trench_full_value 2000
+trench_gain_from_rain 5
+trench_initial_value -500
+*
+* City configs
+bonus_city_point_techs 10
+bonus_city_point_wealth 4000
+city_trait_radius 100
+disrepair_limit 10
+disrepair_limit_unfinished 2
+disrepair_major 6
+disrepair_minor 2
+min_distance_between_ally_cities 10
+min_distance_between_cities 30
+min_distance_from_city_to_starting_location 25
+players_per_city_point 2
+*
+* Empire configs
+building_population_timer 48
+empire_log_ttl 30
+land_outside_city_modifier 0.200000
+land_per_greatness 35
+land_per_tech 15
+land_per_wealth 0.100000
+member_timeout_full 120
+member_timeout_max_threshold 168
+member_timeout_newbie 7
+minutes_per_day_full 150
+minutes_per_day_newbie 15
+time_to_empire_delete 104
+time_to_empire_emptiness 2
+whole_empire_timeout 30
+*
+* Items configs
+autostore_time 180
+long_autostore_time 4320
+room_item_limit 404
+scale_coin_amount 10.000000
+scale_drink_capacity 9.800000
+scale_food_fullness 6.000000
+scale_pack_size 8.000000
+scale_points_at_100 4.000000
+*
+* Mobs configs
+max_npc_attribute 15
+mob_despawn_radius 3
+mob_pursuit_distance 25
+mob_pursuit_timeout 30
+mob_spawn_interval 5
+mob_spawn_radius 5
+spawn_limit_per_room 3
+use_mob_stacking 0
+*
+* Other configs
+test_config 0
+*
+* Players configs
+blood_starvation_level 20
+default_map_size 7
+idle_linkdead_rent_time 5
+idle_rent_time 20
+max_map_size 11
+max_player_attribute 15
+num_bonus_trait_daily_skills 5
+num_daily_skill_points 15
+obj_file_timeout 365
+pool_bonus_amount 15
+remove_lore_after_years 2
+*
+* Skills configs
+enchant_points_at_100 2.000000
+exp_from_workforce 0.100000
+greater_enchantments_bonus 1.500000
+min_exp_to_roll_skillup 1
+morph_timer 2
+must_be_vampire You must be a vampire to use this ability.
+potion_apply_per_100 1.333300
+potion_heal_scale 0.666600
+tracks_lifespan 60
+*
+* System configs
+log_losing_descriptor_without_char 0
+max_bad_pws 3
+max_filesize 50000
+nameserver_is_slow 0
+siteok_everyone 0
+use_autowiz 1
+*
+* Trade configs
+auto_balance_per_cycle 400
+imports_per_day 100
+trading_post_days_to_timeout 60
+trading_post_fee 0.050000
+trading_post_max_hours 72
+*
+* War configs
+death_release_minutes 5
+deaths_before_penalty 5
+deaths_before_penalty_war 0
+fire_extinguish_value 120
+hostile_flag_time 60
+pvp_timer 5
+seconds_per_death 30
+stolen_object_timer 30
+stun_immunity_time 5
+war_login_delay 30
+*
+* World configs
+arctic_percent 6.000000
+default_adventure_sect 31
+default_building_sect 10
+default_inside_sect 11
+default_interior 500
+generic_facing bdeklmno
+interlink_distance 4
+interlink_mountain_limit 1
+interlink_river_limit 0
+nearby_sector_distance 2
+ocean_pool_size 1000
+tropics_percent 35.000000
+water_crop_distance 4
+$~

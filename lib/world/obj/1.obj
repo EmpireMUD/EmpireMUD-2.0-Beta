@@ -1,0 +1,497 @@
+#100
+rock~
+a rock~
+A rock is lying on the ground.~
+   Rocks can be used as hammers, to chip other rocks, for building, to lay
+roads, or as catapult shot.
+~
+1 il ano
+0 2 5
+1 0
+R
+5117 0
+S
+#101
+clay pile lump~
+a pile of clay~
+Some clay is lumped here.~
+You can mold clay into pottery.
+~
+3 l a
+0 0 0
+6 0
+R
+5110 0
+S
+#102
+flint stone~
+a flint stone~
+A piece of flint is lying on the ground.~
+You can attach flint to a rock and get a flint set for lighting torches.
+~
+1 il ano
+0 1 5
+5 0
+R
+5117 0
+S
+#103
+stone lightning translucent yellow~
+a yellow lightning stone~
+A translucent yellow lightning stone is lying here.~
+The lightning stone can be used for certain crafts and enchantments.
+~
+3 l a
+0 0 0
+1 0
+R
+5164 0
+R
+5511 0
+S
+#104
+stone bloodstone red~
+a red bloodstone~
+A red bloodstone is sitting on the ground.~
+The bloodstone can be used for certain crafts and enchantments.
+~
+3 l a
+0 0 0
+1 0
+R
+5164 0
+R
+5511 0
+S
+#105
+block stone huge~
+a huge stone block~
+A huge stone block is sitting here.~
+The stone block is used in monumental architecture.
+~
+3 el a
+0 0 0
+1 0
+M
+0
+You heave a huge stone block into place.~
+M
+1
+$n heaves a huge stone block into place.~
+R
+5117 0
+S
+#120
+tree large~
+a large tree~
+A large tree has fallen here.~
+   You can use a sharp tool to scrape a tree until it's a log, or craft it
+into a canoe.
+~
+3 el a
+0 0 0
+0 0
+I 11 1002 100.00 1  # LIGHT: a roaring fire
+R
+5118 0
+S
+#121
+stick~
+a stick~
+A stick has fallen on the ground.~
+You can craft a handle from a stick, or use it for building.
+~
+1 l ano
+0 2 5
+0 0
+I 11 184 100.00 1  # LIGHT: a torch
+R
+5118 0
+S
+#123
+flower small~
+a small flower~
+A small flower has been dropped here.~
+It's a very pretty flower.
+~
+3 kl a
+0 0 0
+7 64
+S
+#124
+log heavy~
+a heavy log~
+A heavy log has been left here.~
+Logs are used in construction.
+~
+3 el a
+0 0 0
+0 0
+I 11 1002 100.00 1  # LIGHT: a roaring fire
+R
+5118 0
+S
+#125
+lumber stack~
+a stack of lumber~
+Some lumber is stacked on the ground.~
+Lumber is used in building construction.
+~
+3 el a
+0 0 0
+0 0
+I 11 1002 100.00 1  # LIGHT: a roaring fire
+M
+0
+You position some lumber and tie it in place.~
+M
+1
+$n positions some lumber and ties it in place.~
+R
+5118 0
+R
+5134 0
+S
+#141
+wheat bundle~
+a bundle of wheat~
+A bundle of wheat has been left on the ground.~
+Wheat can be milled into flower, or planted.
+~
+3 bl a
+0 1 0
+7 168
+R
+5116 0
+S
+#143
+hops bushel~
+a bushel of hops~
+A bushel of hops is sitting on the ground.~
+Hops can be made into ale at the tavern.
+~
+3 bl a
+0 3 0
+7 168
+M
+0
+You stock the store room with $p.~
+M
+1
+$n stocks the store room with $p.~
+R
+5116 0
+S
+#144
+cotton basket~
+a basket of cotton~
+A basket of cotton has been left here.~
+A use for cotton is coming soon...
+~
+3 bl a
+0 4 0
+7 0
+R
+5137 0
+S
+#145
+barley sack~
+a sack of barley~
+A sack of barley is sitting here.~
+Barley can be made into ale at the tavern.
+~
+3 b a
+0 5 0
+7 168
+M
+0
+You stock the store room with $p.~
+M
+1
+$n stocks the store room with $p.~
+R
+5116 0
+S
+#160
+ironore ore iron piece~
+some iron ore~
+A piece of iron ore has fallen to the ground.~
+Iron is used for forging and building.
+~
+3 l a
+0 0 0
+2 0
+R
+5115 0
+S
+#161
+silvernugget nugget silver~
+a silver nugget~
+A silver nugget has fallen to the ground.~
+Silver can be melted down for money.
+~
+15 l a
+2 0 0
+3 0
+R
+5184 a
+R
+5611 a
+S
+#162
+golddust dust gold pile sparkling~
+a pile of gold dust~
+Some sparkling gold dust is scattered across the ground.~
+Gold can be melted down for money.
+~
+15 l a
+3 0 0
+4 0
+R
+5184 a
+R
+5611 a
+S
+#163
+nocturniumore nocturnium ore chunk~
+some nocturnium ore~
+A chunk of nocturnium ore has fallen to the ground.~
+Nocturnium ore is used in forging high-quality armor and weapons.
+~
+3 l a
+0 0 0
+2 0
+R
+5115 0
+S
+#164
+imperiumore imperium ore glistening hunk~
+some imperium ore~
+A glistening hunk of imperium ore is sitting here.~
+Imperium ore is used in forging high-quality armor and weapons.
+~
+3 l a
+0 0 0
+2 0
+R
+5115 0
+S
+#165
+copperore ore copper pile~
+some copper ore~
+Some copper ore is piled on the ground.~
+Copper ore can be minted into coins.
+~
+3 l a
+0 0 0
+13 0
+R
+5115 0
+S
+#170
+silverdisc disc silver~
+a silver disc~
+A silver disc has been left on the ground.~
+Store the silver disc in your vault to gain wealth, or melt it again.
+~
+15 l a
+5 0 0
+3 0
+R
+5184 a
+R
+5611 a
+S
+#171
+golddisc disc gold~
+a gold disc~
+A gold disc is lying on the ground.~
+Store the gold disc in your vault to gain wealth, or melt it again.
+~
+15 l a
+8 0 0
+4 0
+R
+5184 a
+R
+5611 a
+S
+#172
+silverbar bar silver~
+a silver bar~
+A bar of silver has been left on the ground.~
+Store the silver bar in your vault to gain wealth.
+~
+15 l a
+10 1 0
+3 0
+R
+5184 a
+R
+5611 a
+S
+#173
+goldbar bar gold~
+a gold bar~
+A bar of gold is lying on the ground.~
+Store the gold bar in your vault to gain wealth.
+~
+15 l a
+16 1 0
+4 0
+R
+5184 a
+R
+5611 a
+S
+#174
+goldflake flake golden small~
+a small flake of gold~
+A small golden flake is lying here.~
+You can melt down gold flakes to make discs.
+~
+15 l a
+0 0 0
+4 0
+R
+5184 a
+R
+5611 a
+S
+#175
+ironingot ingot iron~
+an iron ingot~
+An iron ingot is sitting on the ground.~
+Iron is used for forging and building.
+~
+3 l a
+0 0 0
+2 0
+R
+5115 0
+S
+#176
+nocturniumingot ingot nocturnium~
+an ingot of nocturnium~
+A nocturnium ingot is sitting on the ground.~
+Nocturnium ore is used in forging high-quality armor and weapons.
+~
+3 l a
+0 0 0
+2 0
+M
+0
+You pour molten nocturnium into a ring around the base of the building.~
+M
+1
+$n pours molten nocturnium into a ring around the base of the building.~
+R
+5115 0
+S
+#177
+imperiumingot ingot imperium~
+an imperium ingot~
+An imperium ingot is sitting on the ground.~
+Imperium ore is used in forging high-quality armor and weapons.
+~
+3 l a
+0 0 0
+2 0
+M
+0
+You install imperium locks on the doors.~
+M
+1
+$n install imperium locks on the doors.~
+R
+5115 0
+S
+#178
+copperingot copper ingot~
+a copper ingot~
+A copper ingot is sitting here.~
+Copper ingots can be forged into useful things.
+~
+3 l a
+0 0 0
+13 0
+R
+5115 0
+S
+#179
+copperbar bar copper~
+a copper bar~
+A bar of copper has been left here.~
+Store the copper bar in your vault to gain wealth.
+~
+15 l a
+1 1 0
+13 0
+R
+5115 a
+R
+5184 a
+R
+5611 a
+S
+#180
+rock chipped~
+a chipped rock~
+A chipped rock is lying on the ground.~
+Keep chipping the rock.
+~
+1 ikl ano
+0 2 5
+1 0
+S
+#181
+handaxe axe~
+a handaxe~
+A handaxe has been left here.~
+A handaxe is a great multi-purpose tool, but you can also chip it down further.
+~
+1 hl ano
+0 2 1
+1 0
+R
+5121 0
+R
+5610 0
+S
+#183
+set flint~
+a flint set~
+A flint set is lying here.~
+You can use the flint set to light sticks and make torches.
+~
+3 0 a
+0 0 0
+5 0
+R
+5121 0
+R
+5610 0
+S
+#184
+torch~
+a torch~
+A torch has been dropped here.~
+A torch is important when you're out at night.
+~
+1 chl ao
+0 2 12
+0 8
+S
+#186
+spear head stone spearhead~
+a stone spear head~
+A spear head is jabbed into the ground.~
+You can attach this spear head to a handle.
+~
+1 il ano
+0 1 4
+1 0
+R
+5121 0
+S
+$

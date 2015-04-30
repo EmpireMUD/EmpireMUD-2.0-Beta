@@ -1,0 +1,655 @@
+#2300
+breastplate plate leather~
+a leather breastplate~
+A leather breastplate is lying on the ground.~
+This simple piece of hardened leather is light weight and offers good mobility.
+~
+27 emo aq
+1 0 0
+7 0
+A
+17 1
+A
+2 1
+A
+12 1
+C
+0 0
+S
+#2301
+helm leather~
+a leather helm~
+An empty leather helm is lying here.~
+The hardened leather helm looks like it might be from the militia.
+~
+27 mo ae
+1 0 0
+7 0
+A
+17 1
+A
+12 1
+C
+0 0
+S
+#2302
+vambraces leather pair~
+leather vambraces~
+A pair of leather vambraces are lying on the ground.~
+These vambraces are meant to protect the arms in combat..
+~
+27 mo ai
+1 0 0
+7 0
+A
+17 1
+A
+12 1
+C
+0 0
+S
+#2303
+armor scale suit~
+scale armor~
+A suit of scale armor is lying on the ground.~
+   Water-hardened leather scales, intricately stitched together, make up this
+light, swift armor. It offers only modest protection, but allows its wearer
+free movement.
+~
+27 emo aq
+1 0 0
+7 0
+A
+17 1
+A
+18 1
+A
+12 1
+C
+0 0
+S
+#2304
+helm viper~
+a viper helm~
+A viper helm is lying on the ground.~
+   This helmet is made from reinforced leather bands, each with a consumate 'v'
+shape that gives the whole helmet a snake-like appearance.
+~
+27 mo ae
+1 0 0
+7 0
+A
+17 1
+A
+18 1
+A
+12 1
+C
+0 0
+S
+#2305
+vambraces shark skin pair~
+shark skin vambraces~
+A pair of shark skin vambraces are lying on the ground.~
+   These mastercraft vambraces are plated in shark skin that allows them to be
+used to catch a weapon, or deflect it.
+~
+27 mo ai
+1 0 0
+7 0
+A
+17 1
+A
+18 1
+A
+12 1
+C
+0 0
+S
+#2306
+shoes leather pair~
+leather shoes~
+A pair of leather shoes is standing here.~
+   These shoes look like they're masterfully tailored for comfort and
+durability, as if you could walk twice as far in them.
+~
+2 mo ag
+0 0 0
+7 0
+A
+11 1
+C
+0 0
+S
+#2307
+boots leather pair~
+leather boots~
+A pair of leather boots is standing here.~
+These boots look extremely comfortable.
+~
+2 mo ag
+0 0 0
+7 0
+A
+11 1
+A
+17 1
+C
+0 0
+S
+#2308
+hauberk mail~
+a mail hauberk~
+A mail hauberk is piled on the ground.~
+   The hauberk is a shirt of mail, the first line of defense in battle. It's
+heavy, but you would regret not wearing one.
+~
+27 emo aq
+2 0 0
+2 0
+A
+9 -2
+A
+12 2
+C
+0 0
+S
+#2309
+coif mail~
+a mail coif~
+A mail coif is lying here.~
+   The coif is a reinforced head covering meant to stop the impact of cutting
+weapons against your precious skull.
+~
+27 mo ae
+2 0 0
+2 0
+A
+9 -2
+A
+12 2
+C
+0 0
+S
+#2310
+vambraces pair splint~
+splint vambraces~
+A pair of split vambraces are lying here.~
+   These strong vambraces are heavy, but they do an amazing job of protecting
+your forearms from enemy weaponry.
+~
+27 mo ai
+2 0 0
+2 0
+A
+9 -2
+A
+12 2
+C
+0 0
+S
+#2311
+cuirass fine~
+a fine cuirass~
+Someone has discarded a cuirass here.~
+   The cuirass is a strong plate of armor that protects the torso in melee
+combat. Its smooth finish helps deflect the damage from any attack.
+~
+27 mo aq
+2 0 0
+2 0
+A
+9 -2
+A
+12 1
+C
+0 0
+S
+#2312
+helm eagle eagle-shaped~
+an eagle helm~
+An eagle-shaped helm is lying on the ground.~
+   This helm is made of metal plates shaped to look like the break of an eagle.
+The sloping sides are designed to deflect glancing blows, and the magnificent
+beak strikes fear in your enemies.
+~
+27 mo ae
+2 0 0
+2 0
+A
+9 -2
+A
+12 1
+A
+18 1
+C
+0 0
+S
+#2313
+vambraces spiked pair~
+spiked vambraces~
+A pair of spiked vambraces is lying here.~
+   These vambraces have spikes that look like they might be meant to catch a
+sword. Some of the spikes are already broken -- ablated off in battle, perhaps.
+~
+27 mo ai
+2 0 0
+2 0
+A
+9 -2
+A
+12 1
+A
+13 1
+C
+0 0
+S
+#2314
+buckler leather~
+a leather buckler~
+A leather buckler is lying on the ground.~
+   The buckler is a small shield that can be used to deflect weapons with your
+off-hand. It's made of hardened leather and is very light compared to a metal
+shield.
+~
+23 emo ao
+0 0 0
+7 0
+A
+13 1
+C
+0 0
+S
+#2315
+shield kite~
+a kite shield~
+A kite shield is lying here.~
+The kite shield is as common as the miller's daughter.
+~
+23 emo ao
+0 0 0
+2 0
+A
+13 1
+C
+0 0
+S
+#2316
+shield ram tower ram-shaped~
+a ram shield~
+A ram-shaped tower shield is lying here.~
+The kite shield is as common as the miller's daughter.
+~
+23 emo ao
+0 0 0
+2 0
+A
+13 1
+C
+0 0
+S
+#2317
+plate armor suit~
+a suit of plate armor~
+A suit of plate armor is lying here.~
+   This is a nearly-complete suit of plate armor. It is extremely heavy, but
+offers superior protection to those who can lift it. A suit like this
+distinguishes even the least of men, and the greatest of them conquer from
+inside it.
+~
+27 emo aq
+3 0 0
+2 0
+A
+9 -2
+A
+1 -1
+A
+12 4
+A
+13 5
+C
+0 0
+S
+#2318
+helm great~
+a great helm~
+A great helm is lying on the ground.~
+   The great helm is tall and offers amazing protection for the skull of its
+bearer. The front is emblazoned with your sigil so that the sons of your foes
+know who to swear vengeance against.
+~
+27 emo ae
+3 0 0
+2 0
+A
+9 -2
+A
+1 -1
+A
+12 3
+A
+13 5
+C
+0 0
+S
+#2319
+cannons lower pair~
+lower cannons~
+A pair of lower cannons are lying on the ground.~
+   Lower cannons is what they call a powerful set of vambraces. These arm
+guards are unmatched in the land.
+~
+27 emo ai
+3 0 0
+2 0
+A
+9 -2
+A
+1 -1
+A
+12 3
+A
+13 5
+C
+0 0
+S
+#2320
+shield clay~
+a clay shield~
+A clay shield is lying here.~
+   The clay shield is heavy and rudimentary, but it seems like it would offer
+some protection. It has been reinforced with wood to protect against the
+inevitable cracks.
+~
+23 emo ao
+0 0 0
+6 0
+A
+13 1
+C
+0 0
+S
+#2321
+robe sorcerer's sorcerers~
+a sorcerer's robe~
+A sorcerer's robe is lying here.~
+   This fiery orange robe is the type commonly seen in empires that have
+embraced the power of magic. City sorcerers can often be seen wearing this
+color, as a warning to those who would cross them.
+~
+27 mo aq
+0 0 0
+7 0
+A
+16 2
+A
+8 1
+C
+0 0
+S
+#2322
+hat wizard's wizards~
+a wizard's hat~
+A wizard's hat has been left here.~
+   This hat is in the conical style that wizards prefer, perhaps because it
+focuses magic better than flatter hat styles. The hat itself is light weight,
+but when you wear it you begin to see things in a whole new way.
+~
+27 mo ae
+0 0 0
+7 0
+A
+7 1
+A
+16 1
+C
+0 0
+S
+#2323
+armbands power unusual pair~
+armbands of power~
+A pair of unusual armbands is lying here.~
+   These armbands, sewn from intricately woven and stained cloth, emanate a
+strange, peaceful feelign as you touch them.
+~
+27 mo ai
+0 0 0
+7 0
+A
+16 1
+A
+17 1
+C
+0 0
+S
+#2324
+breastplate copper~
+a copper breastplate~
+A copper breastplate is lying here.~
+The copper breastplate has molded abs!
+~
+27 emo aq
+2 0 0
+13 0
+A
+9 -1
+A
+12 2
+C
+0 0
+S
+#2325
+mask copper~
+a copper mask~
+A copper mask has been left here.~
+The mask looks like it would protect the face from blows.
+~
+27 mo ae
+2 0 0
+13 0
+A
+9 -1
+A
+12 2
+C
+0 0
+S
+#2326
+vambraces pair copper~
+copper vambraces~
+A pair of copper vambraces is lying here.~
+   These strong vambraces are heavy, but they do an amazing job of protecting
+your forearms from enemy weaponry.
+~
+27 mo ai
+2 0 0
+13 0
+A
+9 -1
+A
+12 2
+C
+0 0
+S
+#2327
+buckler copper~
+a copper buckler~
+A copper buckler is lying here.~
+The copper buckler is quite common around here.
+~
+23 emo ao
+0 0 0
+13 0
+A
+13 1
+C
+0 0
+S
+#2328
+breastplate rawhide~
+a rawhide breastplate~
+A rawhide breastplate is lying here.~
+This simple piece of hardened rawhide is light weight and offers good mobility.
+~
+27 emo aq
+1 0 0
+7 0
+A
+17 1
+A
+12 1
+C
+0 0
+S
+#2329
+skullcap cap rawhide~
+a rawhide skullcap~
+A rawhide skullcap is lying on the ground.~
+The skullcap is made from fine rawhide.
+~
+27 mo ae
+1 0 0
+7 0
+A
+17 1
+A
+12 1
+C
+0 0
+S
+#2330
+bracers rawhide pair~
+rawhide bracers~
+A pair of rawhide bracers is lying here.~
+These bracers should protect your arms in combat.
+~
+27 mo ai
+1 0 0
+7 0
+A
+17 1
+A
+12 1
+C
+0 0
+S
+#2331
+boots rawhide pair~
+rawhide boots~
+A pair of rawhide boots is sitting here.~
+These boots look sturdy, but not terribly strong.
+~
+2 mo ag
+0 0 0
+7 0
+A
+11 1
+C
+0 0
+S
+#2332
+knapsack napsack sack rawhide~
+a rawhide knapsack~
+A rawhide knapsack is lying on the ground.~
+Equip the knapsack to increase your carrying capacity.
+~
+24 mo ar
+1 0 0
+7 0
+C
+0 0
+S
+#2333
+hat conical~
+a conical hat~
+A conical hat is sticking out of the ground.~
+   This hat is in the conical style that wizards prefer, perhaps because it
+focuses magic better than flatter hat styles. The hat itself is light weight,
+but when you wear it you begin to see things in a whole new way.
+~
+27 mo ae
+0 0 0
+7 0
+A
+16 1
+C
+0 0
+S
+#2334
+sleeves furrowed~
+furrowed sleeves~
+A pair of furrowed sleeves is lying on the ground.~
+These sleeves are made from fur, furrowed into rows.
+~
+27 mo ai
+0 0 0
+7 0
+A
+16 1
+C
+0 0
+S
+#2335
+shoes apprentice pair~
+apprentice shoes~
+A pair of apprentice shoes has been left here.~
+These shoes have all the whispers of magic.
+~
+2 mo ag
+0 0 0
+7 0
+A
+16 1
+A
+17 1
+C
+0 0
+S
+#2336
+sandals earth-hewn hewn earthhewn~
+earth-hewn sandals~
+A pair of earth-hewn sandals are partially buried here.~
+These sandals are infused with the power of the earth.
+~
+2 mo ag
+0 0 0
+7 0
+A
+8 1
+A
+16 2
+C
+0 0
+S
+#2337
+pouch magewhisper~
+a magewhisper pouch~
+A magewhisper pouch is lying here.~
+Equip the pouch to increase your carrying capacity.
+~
+24 mo ar
+2 0 0
+7 0
+A
+7 1
+C
+0 0
+S
+#2338
+shield viper~
+a viper shield~
+A viper shield has been left here.~
+   The buckler is a small shield that can be used to deflect weapons with your
+off-hand. It's made of hardened leather and is very light compared to a metal
+shield.
+~
+23 emo ao
+0 0 0
+7 0
+A
+13 1
+C
+0 0
+S
+$

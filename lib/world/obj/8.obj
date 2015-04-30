@@ -1,0 +1,137 @@
+#800
+flask glass~
+a flask~
+A glass flask has been left here.~
+You can keep water in the flask.
+~
+5 0 a
+10 0 0
+8 0
+R
+5121 0
+R
+5606 0
+S
+#801
+jar glass~
+a jar~
+A glass jar has been left here.~
+You can keep water in the jar.
+~
+5 0 a
+10 0 0
+8 0
+R
+5121 0
+R
+5606 0
+S
+#802
+glass small pane~
+a small pane of glass~
+A small pane of glass has been left here.~
+Glass panes can be used to make various items.
+~
+3 0 a
+0 0 0
+8 0
+S
+#803
+mirror tarnished small~
+a tarnished mirror~
+A small mirror has fallen here.~
+~
+3 0 a
+0 0 0
+8 0
+R
+5610 0
+R
+5121 0
+T 803
+S
+#804
+lantern~
+a lantern~
+A lantern has been set here.~
+Light the lantern to see after dark.
+~
+3 0 a
+0 0 0
+8 0
+I 11 805 100.00 1  # LIGHT: a bright lantern
+R
+5121 0
+R
+5610 0
+S
+#805
+lantern bright~
+a bright lantern~
+A bright lantern has been set here.~
+The lantern really lights up the place.
+~
+3 c ao
+0 0 0
+8 48
+S
+#806
+mirror looking glass silver~
+a silver looking glass~
+A silver looking glass has been left here.~
+~
+3 0 a
+0 0 0
+3 0
+R
+5610 0
+T 806
+S
+#807
+mirror looking glass gold~
+a gold looking glass~
+A gold looking glass has been left here.~
+~
+3 0 a
+0 0 0
+4 0
+R
+5610 0
+T 806
+S
+#850
+wax beeswax pile~
+some beeswax~
+A pile of beeswax has been left here.~
+Wax can be crafted into a candle.
+~
+3 0 a
+0 0 0
+9 100
+S
+#851
+candle unlit~
+an unlit candle~
+An unlit candle has been dropped here.~
+Light the candle to see after dark.
+~
+3 l ao
+0 0 0
+9 0
+I 11 852 100.00 1  # LIGHT: a candle
+R
+5610 0
+R
+5121 0
+S
+#852
+candle~
+a candle~
+A candle has been dropped here.~
+The candle lights the way.
+~
+3 cl ao
+0 0 0
+9 6
+S
+$

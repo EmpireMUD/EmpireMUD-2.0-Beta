@@ -1,0 +1,300 @@
+SURVIVAL "SURVIVAL SKILL"
+
+Survival (skill)
+
+Survival is the art of keeping yourself alive in the wilderness. With practice,
+you can learn to travel farther, faster, and over more treacherous terrain than
+most men dare.
+
+To get started on Survival, try digging up some rocks or gathering some sticks.
+
+See also: SWIMMING, FORAGE, SATED THIRST, RIDE, ALL-TERRAIN RIDING, HUNT,
+          BY MOONLIGHT, NIGHTSIGHT, FINDER, FIND HERBS, RESIST POISON,
+          POISON IMMUNITY, FISH, FIND SHELTER, NAVIGATION, TRACK,
+          MASTER TRACKER, NO TRACE, BUTCHER, MOUNTAIN CLIMBING, STAMINA,
+          PATHFINDING, HERB GARDENS, MASTER SURVIVALIST
+#
+BUTCHER
+
+Butcher (Survival ability)
+
+Usage:  butcher <corpse>
+
+With a little practice, you can butcher a corpse into smaller cuts of meat.
+Anything that was on the corpse will end up in your inventory as well.
+#
+"BY MOONLIGHT"
+
+By Moonlight (Survival ability)
+
+This ability allows you to see better in the dark, although it's not perfect
+and you may still receive penalties for low vision. This ability is always on.
+
+By Moonlight increases your light radius at night by 1.
+
+The improved version is called Nightsight.
+
+See also: NIGHTSIGHT
+#
+"FIND HERBS" HERBS
+
+Find Herbs (Survival ability)
+
+Usage:  pick
+
+With the ability to find herbs, your "pick" command will find new things.
+
+Herbs you can find:
+ whitegrass - near oceans
+ fiveleaf - plains, forests
+ redthorn - mountains
+ magewhisper - oases
+ daggerbite - deserts
+ bileberries - near rivers
+
+See also: HERB GARDENS, PICK
+#
+"FIND SHELTER" SHELTER
+
+Find Shelter (Survival ability)
+
+This skill allows you to find quick shelter in any environment. The shelters
+show up on your "build" list but require no materials. When you're done with
+the shelter, be sure to dismantle and abandon it.
+
+Shelters boost regeneration while sleeping.
+
+See also: BUILD, DISMANTLE, ABANDON
+#
+FINDER "FINDER SKILL"
+
+Finder (Survival ability)
+
+With this ability, you can spot useful and valuable items much easier. Dig,
+gather, pick, and pan faster than before.
+
+See also: DIG, GATHER, PICK, PAN
+#
+FISH FISHING
+
+Fish (Survival ability)
+
+Usage: fish
+Tool: spear
+
+Learn to live at the water's edge through spear-fishing. As your skill
+improves, you will find yourself catching fish faster.
+
+To make a spear, craft a handle and chip a rock until it is a spearhead, then
+craft the spear from the handle and spearhead.
+
+You can find all kinds of useful things while fishing. Higher Charisma will
+improve your fishing.
+
+See also: CHIP, CRAFT, DEPLETION
+#
+FORAGE
+
+Forage (Survival ability)
+
+Usage:  forage
+
+This simple ability helps you survive in all climates by knowing which fruits
+and nuts are safe to eat. You will be able to find them more quickly as your
+Survival skill increases.
+
+See also: DEPLETION
+#
+"HERB GARDENS" GARDENS
+
+Herb Gardens (Survival ability)
+
+Command: build <garden> [direction]
+
+The various herb gardens allow you to farm more herbs than can normally be
+picked in one spot, and if your empire has Skilled Labor, your workforce can
+use the gardens as well.
+
+&y/&r##&y\&0 terracedgarden (mountain)  12 lumber, 4 nails, 60 rocks, 30 redthorn
+&c~&b##&c~&0 raftgarden (river)  12 lumber, 4 nails, 60 sticks, 30 bileberries
+&G^&C##&G^&0 oasisgarden (oasis)  12 lumber, 4 nails, 60 rocks, 15 daggerbite, 15 magewhisper
+&b~&0##&b~&0 estuarygarden (river facing ocean)  12 lumber, 4 nails, 60 sticks, 30 whitegrass
+&g|&y##&g|&0 shadygarden (plains or forest)  12 lumber, 4 nails, 60 sticks, 30 fiveleaf
+
+Only the estuarygarden requires a direction.
+
+See also: BUILD, FIND HERBS, WORKFORCE, SKILLED LABOR
+#
+HUNT HUNTING
+
+Hunt (Survival ability)
+
+Those with the Hunt ability deal twice as much damage to animals.
+#
+"MASTER SURVIVALIST" SURVIVALIST
+
+Master Survivalist (Survival ability)
+
+This ability gives you a 33% chance to dodge a blow that would deal fatal
+damage. You will be briefly stunned and unable to enter commands, for an amount
+of time based on your Dexterity.
+#
+MOUNT DISMOUNT RIDING "RIDE SKILL" "ALL-TERRAIN RIDING" "ALL TERRAIN RIDING" ATR SADDLE
+
+Ride (Survival ability)
+All-Terrain Riding (Survival ability)
+
+Usage: dismount
+       mount [animal]
+
+Once you have learned to Ride, travel becomes faster and easier. With All-
+Terrain Riding, you can coax your mount across rivers and mountains, too.
+
+When you dismount, the animal you were riding is stored. You can see it on your
+affects list. If you type "mount" again without targetting a new animal, you
+will re-mount your stored ride. If you target a new animal while you already
+have a stored mount, the old one will be released.
+
+If you have a saddle in your inventory, you will automatically equip it when
+you mount up. The saddle will be removed automatically when you dismount --
+If your inventory is full, this can cause you to drop the saddle. You can make
+a simple saddle with Basic Crafts.
+
+Flying mounts require All-Terrain Riding.
+
+See also: AFFECTS, BASIC CRAFTS
+#
+MOUNTAIN "MOUNTAIN CLIMBING"
+
+&y/\/\&0
+
+Mountain Climbing (Survival ability)
+
+In order to cross large mountain ranges, you must learn Mountain climbing.
+It still takes a lot of energy to cross, but it's not possible at all
+otherwise.
+#
+NAVIGATION "NAVIGATION SKILL" COORDINATES
+
+Navigation (Survival ability)
+
+Navigation allows you to tell which way is North. Without it, each time you
+log into the game you will see a different direction as North.
+
+Once you learn Navigation, you'll also be able to see coordinates for map
+locations. This game uses Cartesian coordinates (x, y).
+
+When you first buy this ability, your map may change orientations to the
+correct "North".
+#
+NIGHTSIGHT "NIGHT SIGHT"
+
+Nightsight (Survival ability)
+
+Usage:  nightsight
+
+This ability lets you see perfectly in almost pitch black, although your
+eyes take on a characteristic glint that is visible to others. You can turn
+this ability on and off at will.
+
+See also: BY MOONLIGHT
+#
+"NO TRACE"
+
+No trace (Survival ability)
+
+A person who has learned to leave no trace can not be found using the "track"
+or "where" commands, but this ability only functions outdoors.
+
+See also: TRACK, WHERE, UNSEEN PASSING
+#
+PATHFINDING "PATHFIND SKILL"
+
+Pathfinding (Survival ability)
+
+Usage:  lay
+
+With the Pathfinding ability, you can lay roads on mountains. This ability
+also lets you remove them with the same command. You do not need the Roads
+ability to use it.
+
+See also: ROADS
+#
+PICK 
+
+Usage:  pick 
+
+Pick is used to pick flowers on the plains plains or fruit from an orchard. All
+you need is to be standing in one of these places and pick.
+
+You can find more if you have the right ability...
+
+See also: DEPLETION, FIND HERBS
+#
+"RESIST POISON" "POISON IMMUNITY"
+
+Resist Poison (Survival ability)
+Poison Immunity (Survival ability)
+
+Poison immunity gives you total resistance to all poisons, which Resist Poison
+gives you a partial resistance and a chance to avoid being poisoned.
+
+Both of these abilities give skill-ups only when they trigger.
+#
+STAMINA "STAMINA SKILL"
+
+Stamina (Survival ability)
+
+Stamina increases the rate at which you recover movement points. They will
+regenerate even faster if you're also asleep.
+
+See also: SLEEP
+#
+SWIM SWIMMING
+
+Swimming (Survival ability)
+
+Swimming allows you to move through river and ocean squares without a canoe
+or ship. However, sharks are attracted to the splashing of swimmers and will
+attack you if you are in the ocean.
+
+See also: CANOE, SHIP
+#
+THIRST "SATED THIRST"
+
+Sated Thirst (Survival ability)
+
+While most people get thirsty and must drink from a bowl, canteen, river,
+or fountain, true survivalists learn to drink at every opportunity, and thus
+never get thirsty in the first place.
+
+See also: FILL, DRINK
+#
+TRACK "TRACK SKILL"
+
+Track (Survival ability)
+
+Usage:  track <victim>
+
+Used to find the path your target took.
+
+Example:
+  > track dog
+  You sense a trail south from here!
+#
+WHERE "MASTER TRACKER"
+
+Master Tracker (Survival ability)
+
+Usage: where <animal | player>
+
+Tells you the location of a near-by animal or player. Anybody can use this
+to find things that are close by, but master trackers can use it over a much
+larger area.
+
+Example:
+
+  > where
+  > where dragon
+#
+$

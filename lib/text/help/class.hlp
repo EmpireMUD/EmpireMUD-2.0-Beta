@@ -1,0 +1,435 @@
+CLASS CLASSES "CLASS SKILLS" "CLASS ROLE" ROLE
+
+When you specialize two skills past 75, they become your "class skills" and
+you are assigned a class. Your class determines how large your health, move,
+and mana pools are. It also gives you some new abilities once you reach 100
+in both your class skills.
+
+Usage:  class [role <type>]
+
+The class command shows your current class, role, and class abilities. You
+can also use this command to change roles. For example, "class role tank".
+
+Class roles are the different tasks a class might be suited for. For example,
+if you class has both Natural Magic and Survival as its core skills, it might
+be suited to melee damage, caster damage, or healing. You can't perform all
+roles at the same time. You can change your current role using the "class role"
+command.
+
+Tank: Takes all the damage in combat.
+Melee: Does physical damage.
+Caster: Does magical damage.
+Healer: Keeps the group alive.
+
+Classes - see HELP <NAME> CLASS
+-------------------------------
+Battle: Duke (Empire), Battlemage (High Sorcery), Werewolf (Natural Magic),
+        Assassin (Stealth), Barbarian (Survival), Steelsmith (Trade),
+        Reaper (Vampire)
+Empire: Duke (Battle), Exarch (High Sorcery), Luminary (Natural Magic),
+        Powerbroker (Stealth), Elder (Survival), Guildsman (Trade),
+        Ancient (Vampire)
+High Sorcery: Battlemage (Battle), Exarch (Empire), Archmage (Natural Magic),
+        Occultist (Stealth), Theurge (Survival), Artificer (Trade),
+        Lich (Vampire)
+Natural Magic: Werewolf (Battle), Luminary (Empire), Archmage (High Sorcery),
+        Shadow Wolf (Stealth), Feral (Survival), Alchemist (Trade),
+        Necromancer (Vampire)
+Stealth: Assassin (Battle), Powerbroker (Empire), Occultist (High Sorcery),
+        Shadow Wolf (Natural Magic), Bandit (Survival), Smuggler (Trade),
+        Shade (Vampire)
+Survival: Barbarian (Battle), Elder (Empire), Theurge (High Sorcery),
+        Feral (Natural Magic), Smuggler (Stealth), Tinker (Trade),
+        Wight (Vampire)
+Trade: Steelsmith (Battle), Guildsman (Empire), Artificer (High Sorcery),
+        Alchemist (Natural Magic), Smuggler (Stealth), Tinker (Survival),
+        Antiquarian (Vampire)
+Vampire: Reaper (Battle), Ancient (Empire), Lich (High Sorcery), Necromancer
+        (Natural Magic), Shade (Stealth), Wight (Survival), Antiquarian (Trade)
+#
+ARCHETYPES "STARTING ARCHETYPES" "STARTING CLASS"
+
+All player characters start with some gear, low attributes, and 30 skill
+points. One attribute will be 3, one will be 1, and the rest all 2s. Starting
+archetype does not limit your skills or class choices in any way.
+
+The available archetypes are:
+ Noble Birth - raised to rule (Empire, Battle, Greatness)
+ Skilled Apprentice - trained by a master artisan (Trade, Dexterity)
+ Promising Squire - built for battle (Battle, Survival, Strength)
+ Rugged Woodsman - cleaved from stone (Survival, Trade, Dexterity)
+ Tribal Leader - rise from nothing (Empire, Survival, Wits)
+ Street Urchin - the shadows of society (Stealth, Battle, Charisma)
+ Druidic Commune - wield ancient magic (Natural Magic, Survival, Intelligence)
+ Novice Sorcerer - master the rituals (High Sorcery, Battle, Intelligence)
+ Lone Vampire - empowered by blood (Vampire, Battle, Wits)
+#
+"ALCHEMIST CLASS"
+
+Alchemist
+Natural Magic + Trade
+
+Healer: Resurrect
+
+Note: Class abilities are unfinished.
+
+See also: CLASS
+#
+"ANCIENT CLASS"
+
+Ancient
+Vampire + Empire
+
+No class abilities assigned.
+
+Note: Class abilities are unfinished.
+
+See also: CLASS
+#
+"ANTIQUARIAN CLASS"
+
+Antiquarian
+Trade + Vampire
+
+No class abilities assigned.
+
+Note: Class abilities are unfinished.
+
+See also: CLASS
+#
+"ARCHMAGE CLASS"
+
+Archmage
+High Sorcery + Natural Magic
+
+Caster: Resurrect
+Healer: Resurrect
+
+Note: Class abilities are unfinished.
+
+See also: CLASS
+#
+"ARTIFICER CLASS"
+
+Artificer
+High Sorcery + Trade
+
+No class abilities assigned.
+
+Note: Class abilities are unfinished.
+
+See also: CLASS
+#
+"ASSASSIN CLASS"
+
+Assassin
+Battle + Stealth
+
+Melee: Dual-Wield
+
+Note: Class abilities are unfinished.
+
+See also: CLASS
+#
+"BANDIT CLASS"
+
+Bandit
+Stealth + Survival
+
+Melee: Dual-Wield
+
+Note: Class abilities are unfinished.
+
+See also: CLASS
+#
+"BARBARIAN CLASS"
+
+Barbarian
+Battle + Stealth
+
+Melee: Two-Handed Weapons
+
+Note: Class abilities are unfinished.
+
+See also: CLASS
+#
+"BATTLEMAGE CLASS" "BATTLE MAGE CLASS"
+
+Battlemage
+Battle + High Sorcery
+
+No abilities assigned.
+
+Note: Class abilities are unfinished.
+
+See also: CLASS
+#
+CASTER "CASTER ROLE" "MAGIC DPS" "CASTER DPS"
+
+The caster role, a type of DPS (damage-per-second) role, is meant to deal as
+much magical damage as possible. This role needs Dexterity/To-Hit, Wits, and
+Intelligence. The caster should never be taking direct damage from mobs in
+combat.
+
+Caster tips:
+ - Let the tank start the fight.
+ - Tell the healer if you need healing -- he may be focused on the tank.
+
+See also: HEALER, MELEE, TANK
+#
+"DUKE CLASS"
+
+Duke
+Battle + Empire
+
+Melee: Two-Handed Weapons
+
+Note: Class abilities are unfinished.
+
+See also: CLASS
+#
+"ELDER CLASS"
+
+Elder
+Empire + Survival
+
+No class abilities assigned.
+
+Note: Class abilities are unfinished.
+
+See also: CLASS
+#
+"EXARCH CLASS"
+
+Exarch
+Empire + High Sorcery
+
+No class abilities assigned.
+
+Note: Class abilities are unfinished.
+
+See also: CLASS
+#
+"FERAL CLASS"
+
+Feral
+Natural Magic + Survival
+
+Tank: Resurrect, Towering Werewolf Form
+Healer: Resurrect, Sage Werewolf Form
+
+Note: Class abilities are unfinished.
+
+See also: CLASS
+#
+"GUILDSMAN CLASS"
+
+Guildsman
+Empire + Trade
+
+No class abilities assigned.
+
+Note: Class abilities are unfinished.
+
+See also: CLASS
+#
+HEALER HEALING "HEALER ROLE" "HEALING ROLE"
+
+The healer is the group member who keeps the others alive. Healers focus on
+Intelligence only, as the other attributes are generally related to dealing
+damage or taking damage.
+
+Healer tips:
+ - Put the tank's health in your prompt with %f/%F.
+ - If you don't have mana to waste, don't try to contribute to combat damage
+   with spells.
+ - Use 'summary' to see everyone's health.
+
+See also: CASTER, MELEE, TANK
+#
+"LICH CLASS"
+
+Lich
+High Sorcery + Vampire
+
+Caster: Dread Blood Form
+
+Note: Class abilities are unfinished.
+
+See also: CLASS
+#
+"LUMINARY CLASS"
+
+Luminary
+Empire + Natural Magic
+
+Caster: Resurrect
+Healer: Resurrect
+
+Note: Class abilities are unfinished.
+
+See also: CLASS
+#
+MELEE "MELEE ROLE" "DPS ROLE" "MELEE DPS ROLE"
+
+The melee role, also called physical DPS (damage-per-second), deals much of
+the combat damage (along with casters). This role requires Dexterity/To-Hit,
+Wits, and Strength. The melee role should avoid taking damage in combat.
+
+Melee tips:
+ - Let the tank start the fight.
+ - Tell the healer if you need healing -- he may be focused on the tank.
+
+See also: CASTER, HEALER, TANK
+#
+"NECROMANCER CLASS"
+
+Necromancer
+Natural Magic + Vampire
+
+Caster: Dread Blood Form, Resurrect
+
+Note: Class abilities are unfinished.
+
+See also: CLASS
+#
+"OCCULTIST CLASS"
+
+Occultist
+High Sorcery + Stealth
+
+No class abilities assigned.
+
+Note: Class abilities are unfinished.
+
+See also: CLASS
+#
+"POWERBROKER CLASS" "POWER BROKER CLASS"
+
+Powerbroker
+Empire + Stealth
+
+No class abilities assigned.
+
+Note: Class abilities are unfinished.
+
+See also: CLASS
+#
+"REAPER CLASS"
+
+Reaper
+Battle + Vampire
+
+Tank: Blood Fortitude
+Melee: Horrid Form
+
+Note: Class abilities are unfinished.
+
+See also: CLASS
+#
+"SHADE CLASS"
+
+Shade
+Stealth + Vampire
+
+Melee: Horrid Form
+
+Note: Class abilities are unfinished.
+
+See also: CLASS
+#
+"SHADOW WOLF CLASS"
+
+Shadow Wolf
+Natural Magic + Stealth
+
+Melee: Moonrise, Savage Werewolf Form
+Healer: Moonrise, Sage Werewolf Form
+
+Note: Class abilities are unfinished.
+
+See also: CLASS
+#
+"SMUGGLER CLASS"
+
+Smuggler
+Stealth + Trade
+
+Melee: Dual-Wield
+
+Note: Class abilities are unfinished.
+
+See also: CLASS
+#
+"STEELSMITH CLASS" "STEEL SMITH CLASS"
+
+Steelsmith
+Battle + Trade
+
+Melee: Two-Handed Weapons
+
+Note: Class abilities are unfinished.
+
+See also: CLASS
+#
+TANK "TANK ROLE"
+
+The tank is the group member who takes damage from the enemy. A good tank has
+high hitpoints and damage mitigation (like soak and dodge). Tanks don't need
+Strength or Wits, because those are related to dealing damage.
+
+Tanking tips:
+ - The tank should start combat with all mobs so they are hitting him, rather
+   than hitting other players.
+ - The tank should use abilities like Rescue to ensure "squishy" roles like the
+   healer are not taking damage.
+
+See also: CASTER, HEALER, MELEE
+#
+"THEURGE CLASS"
+
+Theurge
+High Sorcery + Survival
+
+No class abilities assigned.
+
+Note: Class abilities are unfinished.
+
+See also: CLASS
+#
+"TINKER CLASS"
+
+Tinker
+Survival + Trade
+
+No class abilities assigned.
+
+Note: Class abilities are unfinished.
+
+See also: CLASS
+#
+"WEREWOLF CLASS"
+
+Werewolf
+Battle + Natural Magic
+
+Tank: Resurrect, Towering Werewolf Form
+Melee: Resurrect, Savage Werewolf Form
+Healer: Resurrect, Sage Werewolf Form
+
+Note: Class abilities are unfinished.
+
+See also: CLASS
+#
+"WIGHT CLASS"
+
+Wight
+Survival + Vampire
+
+Melee: Horrid Form
+
+Note: Class abilities are unfinished.
+
+See also: CLASS
+#
+$~

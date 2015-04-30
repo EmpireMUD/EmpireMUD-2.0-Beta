@@ -1,0 +1,322 @@
+# EmpireMUD 2.0 Makefile.in - Makefile template used by 'configure'
+# Designed from CircleMUD 3.0 Makefile.in
+#
+
+# C compiler to use
+CC = @CC@
+
+# Path to cxref utility
+CXREF = cxref
+
+# Any special flags you want to pass to the compiler
+MYFLAGS = @MYFLAGS@
+
+#flags for profiling (see hacker.doc for more information)
+PROFILE = 
+
+##############################################################################
+# Do Not Modify Anything Below This Line (unless you know what you're doing) #
+##############################################################################
+
+BINDIR = ../bin
+
+CFLAGS = @CFLAGS@ $(MYFLAGS) $(PROFILE)
+
+LIBS = @LIBS@ @CRYPTLIB@ @NETLIB@ -lm
+
+OBJFILES = act.action.o act.battle.o act.comm.o act.empire.o act.fight.o \
+	act.god.o act.highsorcery.o act.immortal.o act.informative.o act.item.o \
+	act.movement.o act.naturalmagic.o act.other.o act.social.o act.stealth.o \
+	act.survival.o act.trade.o act.vampire.o alias.o ban.o boards.o \
+	bookedit.o books.o building.o class.o comm.o config.o constants.o db.o \
+	db.lib.o db.player.o db.world.o dg_comm.o dg_db_scripts.o dg_event.o \
+	dg_handler.o dg_misc.o dg_mobcmd.o dg_objcmd.o dg_scripts.o dg_triggers.o \
+	dg_wldcmd.o eedit.o fight.o handler.o instance.o interpreter.o limits.o \
+	mail.o mapview.o mobact.o modify.o morph.o objsave.o olc.adventure.o \
+	olc.building.o olc.o olc.craft.o olc.crop.o olc.map.o olc.mobile.o \
+	olc.object.o olc.roomtemplate.o olc.sector.o olc.trigger.o random.o \
+	ships.o skilldata.o skills.o spells.o statistics.o utils.o weather.o \
+	workforce.o
+
+CXREF_FILES = act.action.c act.battle.c act.comm.c act.empire.c act.fight.c \
+	act.god.c act.highsorcery.c act.immortal.c act.informative.c act.item.c \
+	act.movement.c act.naturalmagic.c act.other.c act.social.c act.stealth.c \
+	act.survival.c act.trade.c act.vampire.c alias.c ban.c boards.c \
+	bookedit.c books.c building.c class.c comm.c config.c constants.c db.c \
+	db.lib.c db.player.c db.world.c dg_comm.c dg_db_scripts.c dg_event.c \
+	dg_handler.c dg_misc.c dg_mobcmd.c dg_objcmd.c dg_scripts.c dg_triggers.c \
+	dg_wldcmd.c eedit.c fight.c handler.c instance.c interpreter.c limits.c \
+	mail.c mapview.c mobact.c modify.c morph.c objsave.c olc.adventure.c \
+	olc.building.c olc.c olc.craft.c olc.craft.c olc.map.c olc.mobile.c \
+	olc.object.c olc.roomtemplate.c olc.sector.c olc.trigger.c random.c \
+	ships.c skilldata.c skills.c spells.c statistics.c utils.c weather.c \
+	workforce.c
+
+default: all
+
+all: .accepted
+	$(MAKE) $(BINDIR)/empire
+	$(MAKE) utils
+
+.accepted:
+	@./licheck @MORE@
+
+utils: .accepted
+	(cd util; $(MAKE) all)
+empire:
+	$(MAKE) $(BINDIR)/empire
+
+$(BINDIR)/empire : $(OBJFILES)
+	$(CC) -o $(BINDIR)/empire $(PROFILE) $(OBJFILES) $(LIBS)
+
+clean:
+	rm -f *.o
+ref:
+#
+# Create the cross reference files
+# Note, this is not meant to be used unless you've installed cxref...
+#
+	@for file in $(CXREF_FILES) ; do \
+	  echo Cross referencing $$file ; \
+	  $(CXREF) -D__CXREF__ -xref -Odoc -Nempire $$file ; \
+	done
+#
+# Create the source files using cxref
+#
+	@for file in $(CXREF_FILES) ; do \
+	   echo Documenting $$file ; \
+	   ( cd . ; $(CXREF) -D__CXREF__ -warn-xref -xref -Odoc -Nempire -html $$file ) ; \
+	   rm -f $(DOCS) ; \
+	done
+#
+# Create the index using cxref
+#
+	@echo Indexing
+	@( cd . ; $(CXREF) -D__CXREF__ -index-all -Odoc -Nempire -html )
+	@rm -f $(DOCS)
+
+# Dependencies for the object files (automagically generated with
+# gcc -MM)
+
+act.action.o: act.action.c conf.h sysdep.h structs.h uthash.h utils.h \
+  db.h comm.h handler.h interpreter.h skills.h vnums.h dg_scripts.h
+	$(CC) -c $(CFLAGS) act.action.c
+act.battle.o: act.battle.c conf.h sysdep.h structs.h uthash.h utils.h \
+  comm.h interpreter.h handler.h db.h skills.h dg_scripts.h
+	$(CC) -c $(CFLAGS) act.battle.c
+act.comm.o: act.comm.c conf.h sysdep.h structs.h uthash.h utils.h comm.h \
+  interpreter.h handler.h db.h skills.h dg_scripts.h
+	$(CC) -c $(CFLAGS) act.comm.c
+act.empire.o: act.empire.c conf.h sysdep.h structs.h uthash.h utils.h \
+  interpreter.h comm.h handler.h db.h skills.h vnums.h dg_scripts.h
+	$(CC) -c $(CFLAGS) act.empire.c
+act.fight.o: act.fight.c conf.h sysdep.h structs.h uthash.h utils.h \
+  comm.h interpreter.h handler.h db.h skills.h dg_scripts.h vnums.h
+	$(CC) -c $(CFLAGS) act.fight.c
+act.god.o: act.god.c conf.h sysdep.h structs.h uthash.h utils.h comm.h \
+  vnums.h interpreter.h handler.h db.h skills.h dg_scripts.h
+	$(CC) -c $(CFLAGS) act.god.c
+act.highsorcery.o: act.highsorcery.c conf.h sysdep.h structs.h uthash.h \
+  utils.h comm.h interpreter.h handler.h db.h skills.h vnums.h dg_scripts.h
+	$(CC) -c $(CFLAGS) act.highsorcery.c
+act.immortal.o: act.immortal.c conf.h sysdep.h structs.h uthash.h utils.h \
+  comm.h vnums.h interpreter.h handler.h db.h skills.h olc.h dg_scripts.h
+	$(CC) -c $(CFLAGS) act.immortal.c
+act.informative.o: act.informative.c conf.h sysdep.h structs.h uthash.h \
+  utils.h comm.h interpreter.h handler.h db.h skills.h dg_scripts.h
+	$(CC) -c $(CFLAGS) act.informative.c
+act.item.o: act.item.c conf.h sysdep.h structs.h uthash.h utils.h comm.h \
+  interpreter.h handler.h db.h skills.h vnums.h dg_scripts.h
+	$(CC) -c $(CFLAGS) act.item.c
+act.movement.o: act.movement.c conf.h sysdep.h structs.h uthash.h utils.h \
+  comm.h interpreter.h handler.h db.h skills.h vnums.h dg_scripts.h
+	$(CC) -c $(CFLAGS) act.movement.c
+act.naturalmagic.o: act.naturalmagic.c conf.h sysdep.h structs.h uthash.h \
+  utils.h comm.h interpreter.h handler.h db.h skills.h vnums.h dg_scripts.h
+	$(CC) -c $(CFLAGS) act.naturalmagic.c
+act.other.o: act.other.c conf.h sysdep.h structs.h uthash.h utils.h \
+  comm.h interpreter.h handler.h db.h skills.h vnums.h dg_scripts.h
+	$(CC) -c $(CFLAGS) act.other.c
+act.social.o: act.social.c conf.h sysdep.h structs.h uthash.h utils.h \
+  comm.h interpreter.h handler.h db.h skills.h
+	$(CC) -c $(CFLAGS) act.social.c
+act.stealth.o: act.stealth.c conf.h sysdep.h structs.h uthash.h utils.h \
+  comm.h interpreter.h handler.h db.h skills.h vnums.h dg_scripts.h
+	$(CC) -c $(CFLAGS) act.stealth.c
+act.survival.o: act.survival.c conf.h sysdep.h structs.h uthash.h utils.h \
+  comm.h interpreter.h handler.h db.h skills.h dg_scripts.h
+	$(CC) -c $(CFLAGS) act.survival.c
+act.trade.o: act.trade.c conf.h sysdep.h structs.h uthash.h utils.h \
+  comm.h interpreter.h handler.h db.h skills.h vnums.h dg_scripts.h
+	$(CC) -c $(CFLAGS) act.trade.c
+act.vampire.o: act.vampire.c conf.h sysdep.h structs.h uthash.h utils.h \
+  comm.h interpreter.h handler.h db.h skills.h vnums.h dg_scripts.h
+	$(CC) -c $(CFLAGS) act.vampire.c
+alias.o: alias.c conf.h sysdep.h structs.h uthash.h utils.h interpreter.h db.h
+	$(CC) -c $(CFLAGS) alias.c
+ban.o: ban.c conf.h sysdep.h structs.h uthash.h utils.h comm.h \
+  interpreter.h handler.h db.h
+	$(CC) -c $(CFLAGS) ban.c
+boards.o: boards.c conf.h sysdep.h structs.h uthash.h utils.h comm.h db.h \
+  boards.h interpreter.h handler.h vnums.h
+	$(CC) -c $(CFLAGS) boards.c
+bookedit.o: bookedit.c conf.h sysdep.h structs.h uthash.h utils.h comm.h \
+  handler.h interpreter.h db.h vnums.h books.h dg_scripts.h
+	$(CC) -c $(CFLAGS) bookedit.c
+books.o: books.c conf.h sysdep.h structs.h uthash.h utils.h comm.h \
+  interpreter.h handler.h db.h vnums.h books.h dg_scripts.h
+	$(CC) -c $(CFLAGS) books.c
+building.o: building.c conf.h sysdep.h structs.h uthash.h utils.h comm.h \
+  interpreter.h handler.h db.h skills.h vnums.h dg_scripts.h
+	$(CC) -c $(CFLAGS) building.c
+class.o: class.c conf.h sysdep.h structs.h uthash.h utils.h comm.h \
+  interpreter.h handler.h db.h skills.h
+	$(CC) -c $(CFLAGS) class.c
+comm.o: comm.c conf.h sysdep.h structs.h uthash.h utils.h comm.h \
+  interpreter.h handler.h db.h skills.h dg_scripts.h dg_event.h
+	$(CC) -c $(CFLAGS) comm.c
+config.o: config.c conf.h sysdep.h structs.h uthash.h utils.h comm.h db.h \
+  interpreter.h olc.h
+	$(CC) -c $(CFLAGS) config.c
+constants.o: constants.c conf.h sysdep.h structs.h uthash.h skills.h \
+  utils.h interpreter.h vnums.h olc.h
+	$(CC) -c $(CFLAGS) constants.c
+db.o: db.c conf.h sysdep.h structs.h uthash.h utils.h db.h comm.h \
+  handler.h mail.h interpreter.h skills.h olc.h vnums.h dg_scripts.h
+	$(CC) -c $(CFLAGS) db.c
+db.lib.o: db.lib.c conf.h sysdep.h structs.h uthash.h utils.h db.h comm.h \
+  handler.h skills.h olc.h dg_scripts.h vnums.h
+	$(CC) -c $(CFLAGS) db.lib.c
+db.player.o: db.player.c conf.h sysdep.h structs.h uthash.h utils.h db.h \
+  comm.h handler.h skills.h interpreter.h dg_scripts.h
+	$(CC) -c $(CFLAGS) db.player.c
+db.world.o: db.world.c conf.h sysdep.h structs.h uthash.h utils.h db.h \
+  comm.h handler.h skills.h dg_scripts.h vnums.h
+	$(CC) -c $(CFLAGS) db.world.c
+dg_comm.o: dg_comm.c conf.h sysdep.h structs.h uthash.h dg_scripts.h \
+  utils.h comm.h handler.h db.h skills.h
+	$(CC) -c $(CFLAGS) dg_comm.c
+dg_db_scripts.o: dg_db_scripts.c conf.h sysdep.h structs.h uthash.h \
+  dg_scripts.h utils.h db.h handler.h dg_event.h comm.h olc.h
+	$(CC) -c $(CFLAGS) dg_db_scripts.c
+dg_event.o: dg_event.c conf.h sysdep.h structs.h uthash.h db.h utils.h \
+  dg_event.h
+	$(CC) -c $(CFLAGS) dg_event.c
+dg_handler.o: dg_handler.c conf.h sysdep.h structs.h uthash.h \
+  dg_scripts.h utils.h comm.h db.h handler.h dg_event.h
+	$(CC) -c $(CFLAGS) dg_handler.c
+dg_misc.o: dg_misc.c conf.h sysdep.h structs.h uthash.h dg_scripts.h \
+  utils.h comm.h interpreter.h handler.h dg_event.h db.h skills.h
+	$(CC) -c $(CFLAGS) dg_misc.c
+dg_mobcmd.o: dg_mobcmd.c conf.h sysdep.h structs.h uthash.h dg_scripts.h \
+  db.h utils.h handler.h interpreter.h comm.h skills.h
+	$(CC) -c $(CFLAGS) dg_mobcmd.c
+dg_objcmd.o: dg_objcmd.c conf.h sysdep.h structs.h uthash.h dg_scripts.h \
+  utils.h comm.h interpreter.h handler.h db.h skills.h
+	$(CC) -c $(CFLAGS) dg_objcmd.c
+dg_scripts.o: dg_scripts.c conf.h sysdep.h structs.h uthash.h \
+  dg_scripts.h utils.h comm.h interpreter.h handler.h dg_event.h db.h \
+  olc.h skills.h
+	$(CC) -c $(CFLAGS) dg_scripts.c
+dg_triggers.o: dg_triggers.c conf.h sysdep.h structs.h uthash.h \
+  dg_scripts.h utils.h comm.h interpreter.h handler.h db.h skills.h olc.h
+	$(CC) -c $(CFLAGS) dg_triggers.c
+dg_wldcmd.o: dg_wldcmd.c conf.h sysdep.h structs.h uthash.h dg_scripts.h \
+  utils.h comm.h interpreter.h handler.h db.h skills.h
+	$(CC) -c $(CFLAGS) dg_wldcmd.c
+eedit.o: eedit.c conf.h sysdep.h structs.h uthash.h utils.h interpreter.h \
+  comm.h handler.h db.h olc.h
+	$(CC) -c $(CFLAGS) eedit.c
+fight.o: fight.c conf.h sysdep.h structs.h uthash.h utils.h comm.h \
+  handler.h interpreter.h db.h skills.h vnums.h dg_scripts.h
+	$(CC) -c $(CFLAGS) fight.c
+handler.o: handler.c conf.h sysdep.h structs.h uthash.h utils.h comm.h \
+  db.h handler.h interpreter.h skills.h dg_scripts.h
+	$(CC) -c $(CFLAGS) handler.c
+instance.o: instance.c conf.h sysdep.h structs.h uthash.h utils.h db.h \
+  comm.h handler.h dg_scripts.h
+	$(CC) -c $(CFLAGS) instance.c
+interpreter.o: interpreter.c conf.h sysdep.h structs.h uthash.h comm.h \
+  interpreter.h db.h utils.h handler.h mail.h olc.h skills.h vnums.h \
+  dg_scripts.h
+	$(CC) -c $(CFLAGS) interpreter.c
+limits.o: limits.c conf.h sysdep.h structs.h uthash.h utils.h comm.h db.h \
+  handler.h interpreter.h skills.h vnums.h dg_scripts.h
+	$(CC) -c $(CFLAGS) limits.c
+mail.o: mail.c conf.h sysdep.h structs.h uthash.h utils.h comm.h db.h \
+  interpreter.h handler.h mail.h
+	$(CC) -c $(CFLAGS) mail.c
+mapview.o: mapview.c conf.h sysdep.h structs.h uthash.h utils.h comm.h \
+  interpreter.h handler.h db.h skills.h vnums.h dg_scripts.h
+	$(CC) -c $(CFLAGS) mapview.c
+mobact.o: mobact.c conf.h sysdep.h structs.h uthash.h utils.h db.h comm.h \
+  interpreter.h handler.h skills.h dg_scripts.h
+	$(CC) -c $(CFLAGS) mobact.c
+modify.o: modify.c conf.h sysdep.h structs.h uthash.h utils.h \
+  interpreter.h handler.h db.h comm.h mail.h boards.h books.h olc.h
+	$(CC) -c $(CFLAGS) modify.c
+morph.o: morph.c conf.h sysdep.h structs.h uthash.h utils.h comm.h db.h \
+  skills.h handler.h interpreter.h dg_scripts.h
+	$(CC) -c $(CFLAGS) morph.c
+objsave.o: objsave.c conf.h sysdep.h structs.h uthash.h comm.h handler.h \
+  db.h interpreter.h utils.h
+	$(CC) -c $(CFLAGS) objsave.c
+olc.adventure.o: olc.adventure.c conf.h sysdep.h structs.h uthash.h \
+  utils.h interpreter.h db.h comm.h olc.h skills.h handler.h
+	$(CC) -c $(CFLAGS) olc.adventure.c
+olc.building.o: olc.building.c conf.h sysdep.h structs.h uthash.h utils.h \
+  interpreter.h db.h comm.h olc.h skills.h handler.h
+	$(CC) -c $(CFLAGS) olc.building.c
+olc.o: olc.c conf.h sysdep.h structs.h uthash.h utils.h interpreter.h \
+  handler.h db.h comm.h olc.h dg_scripts.h
+	$(CC) -c $(CFLAGS) olc.c
+olc.craft.o: olc.craft.c conf.h sysdep.h structs.h uthash.h utils.h \
+  interpreter.h db.h comm.h olc.h skills.h handler.h
+	$(CC) -c $(CFLAGS) olc.craft.c
+olc.crop.o: olc.crop.c conf.h sysdep.h structs.h uthash.h utils.h \
+  interpreter.h db.h comm.h olc.h skills.h handler.h
+	$(CC) -c $(CFLAGS) olc.crop.c
+olc.map.o: olc.map.c conf.h sysdep.h structs.h uthash.h utils.h \
+  interpreter.h handler.h db.h comm.h olc.h vnums.h
+	$(CC) -c $(CFLAGS) olc.map.c
+olc.mobile.o: olc.mobile.c conf.h sysdep.h structs.h uthash.h utils.h \
+  interpreter.h db.h comm.h olc.h skills.h handler.h dg_scripts.h
+	$(CC) -c $(CFLAGS) olc.mobile.c
+olc.object.o: olc.object.c conf.h sysdep.h structs.h uthash.h utils.h \
+  interpreter.h db.h books.h comm.h olc.h skills.h handler.h dg_scripts.h
+	$(CC) -c $(CFLAGS) olc.object.c
+olc.roomtemplate.o: olc.roomtemplate.c conf.h sysdep.h structs.h uthash.h \
+  utils.h interpreter.h db.h comm.h olc.h skills.h handler.h dg_scripts.h
+	$(CC) -c $(CFLAGS) olc.roomtemplate.c
+olc.sector.o: olc.sector.c conf.h sysdep.h structs.h uthash.h utils.h \
+  interpreter.h db.h comm.h olc.h skills.h handler.h
+	$(CC) -c $(CFLAGS) olc.sector.c
+olc.trigger.o: olc.trigger.c conf.h sysdep.h structs.h uthash.h utils.h \
+  interpreter.h db.h comm.h olc.h handler.h dg_scripts.h dg_event.h
+	$(CC) -c $(CFLAGS) olc.trigger.c
+random.o: random.c
+	$(CC) -c $(CFLAGS) random.c
+ships.o: ships.c conf.h sysdep.h structs.h uthash.h utils.h comm.h \
+  interpreter.h handler.h db.h skills.h vnums.h dg_scripts.h
+	$(CC) -c $(CFLAGS) ships.c
+skilldata.o: skilldata.c conf.h sysdep.h structs.h uthash.h skills.h \
+  utils.h
+	$(CC) -c $(CFLAGS) skilldata.c
+skills.o: skills.c conf.h sysdep.h structs.h uthash.h utils.h comm.h \
+  interpreter.h handler.h db.h skills.h vnums.h dg_scripts.h
+	$(CC) -c $(CFLAGS) skills.c
+spells.o: spells.c conf.h sysdep.h structs.h uthash.h utils.h comm.h \
+  interpreter.h handler.h db.h skills.h vnums.h dg_scripts.h
+	$(CC) -c $(CFLAGS) spells.c
+statistics.o: statistics.c conf.h sysdep.h structs.h uthash.h utils.h \
+  db.h comm.h handler.h
+	$(CC) -c $(CFLAGS) statistics.c
+utils.o: utils.c conf.h sysdep.h structs.h uthash.h utils.h db.h comm.h \
+  handler.h interpreter.h skills.h vnums.h dg_scripts.h
+	$(CC) -c $(CFLAGS) utils.c
+weather.o: weather.c conf.h sysdep.h structs.h uthash.h utils.h comm.h \
+  handler.h interpreter.h db.h skills.h
+	$(CC) -c $(CFLAGS) weather.c
+workforce.o: workforce.c conf.h sysdep.h structs.h uthash.h utils.h \
+  comm.h handler.h db.h skills.h vnums.h
+	$(CC) -c $(CFLAGS) workforce.c

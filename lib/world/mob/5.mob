@@ -1,0 +1,33 @@
+#500
+cat black familiar~
+a black cat~
+A sleek black cat sits and stares at you.
+~
+10 40 djo cf
+0 0 0 10
+S
+#501
+saber-toothed sabertoothed toothed cat large familiar~
+a saber-toothed cat~
+A large saber-toothed cat is eying you carefully.
+~
+50 70 djo cf
+0 0 0 10
+S
+#502
+sphinx large deadly familiar~
+a sphinx~
+A large, deadly sphinx is pacing back and forth.
+~
+75 90 djop cf
+0 0 0 10
+S
+#503
+griffin terrifying familiar~
+a griffin~
+A terrifying griffin sits perched, waiting to strike.
+~
+100 120 djop cf
+0 0 0 10
+S
+$

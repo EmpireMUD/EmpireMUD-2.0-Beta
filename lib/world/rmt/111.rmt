@@ -1,0 +1,749 @@
+#11100
+An Old Mine Tunnel~
+   It looks like whoever was mining here broke through into a cavern! There is
+a dank smell in the air, and the distant clatter of water. The area is cool and
+dark, and there are signs of previous visitors in the form of charred campfire
+wood.
+~
+bd 0
+D5
+~
+0 11101
+S
+#11101
+An Open Cavern~
+   The cavern broadens into a jagged, oblong shape. Ambient light filters in
+through another entrance to the north, while the sound of water is heard louder
+from the southeast. It is obvious the area has been frequently used for
+shelter.
+~
+d 0
+D6
+~
+0 11100
+D0
+~
+0 11102
+D7
+~
+0 11103
+M 0 11102 80.00 30
+M 0 11100 50.00 30
+S
+#11102
+A Winding Tunnel~
+   The tunnel is rough-hewn -- more a jagged split in the mountain's foundation
+than crafted by man, with large rocks jutting out at dangerous angles.
+Navigation is cautious, but the light grows brighter as the roof and walls open
+up into a secret canyon!
+~
+b 0
+D2
+~
+0 11101
+D1
+~
+0 11104
+M 0 11100 50.00 30
+M 0 11102 80.00 30
+S
+#11103
+A Downward Passage~
+   The sloping chasm has a clear path trodden into it, countless uses carving a
+series of switchbacks before the walls open up and the sky is revealed. The
+formerly distant sound of lapping water now echoes in their ears with a gentle
+thrum.
+~
+b 0
+D4
+~
+0 11101
+D9
+~
+0 11105
+M 0 11100 50.00 30
+M 0 11102 80.00 30
+S
+#11104
+A Dried-up Canyon~
+   The canyon's walls spread outward and upward in a wedge shape, as if a huge
+axe had split the mountain open long ago. Their sheer faces have been smoothed
+by the elements over time, and the stoney ground is pocked with shallow pools
+of stagnant water and rivulets of runoff.
+~
+a 0
+D3
+~
+0 11102
+D7
+~
+0 11107
+D8
+~
+0 11106
+M 0 9126 100.00 2
+M 0 11100 50.00 30
+M 0 11102 80.00 30
+S
+#11105
+An Underground Lakeshore~
+   A carvernous space opens up before you, the roof disappearing into darkness
+above a basin-shaped floor. The thunderous rumble of a waterfall can be heard
+to the east, on the farthest side of an underground lake. The water is brisk
+and deep, rimmed with detritus common to fluctuating shorelines.
+~
+b 0
+D8
+~
+0 11103
+D1
+~
+0 11109
+M 0 11101 50.00 1
+M 0 11102 80.00 30
+S
+#11106
+A Narrow Opening~
+   Another narrow crease winds its jagged way through the rocks, the roof above
+a jumble of large boulders which fell tumbled from the peaks above, but were
+too large to reach the bottom. An occasional, broad wooden archway is evidence
+that someone once attempted to prevent further collapse, but the path is
+littered with erosion debris.
+~
+b 0
+D1
+~
+0 11108
+D9
+~
+0 11104
+D5
+~
+0 11119
+M 0 9126 100.00 2
+M 0 11100 50.00 30
+S
+#11107
+A Downward Slide~
+   The rock underfoot is slick and stained black. Bands of brown, green, grey
+and ochre along the walls show that this was once an underground stream, long
+dry from lack of replenishment. Now all that remains is a seeping trickle
+meandering its way toward a more distinct sound of falling water.
+~
+b 0
+D4
+~
+0 11104
+D9
+~
+0 11105
+M 0 9126 100.00 1
+M 0 11102 80.00 30
+S
+#11108
+An Impassable Landslide~
+   What was once another canyon is now a jumble of massive boulders, the summit
+several hundred precarious feet almost straight-up. Even the surest footed
+climbers would be wary of trying to scale its deadly terrain.
+~
+a 0
+D3
+~
+0 11106
+D4
+rubble~
+ab 11119
+M 0 9126 100.00 2
+M 0 11100 50.00 30
+S
+#11109
+An Underground Lake~
+   The water is so deep, it appears impervious to light. A slight current
+ripples from the east, the result of tons of water cascading from somewhere in
+the darkness above.
+~
+bf 0
+D3
+~
+0 11105
+D1
+~
+0 11110
+M 0 11103 50.00 1
+S
+#11110
+A Thunderous Waterfall~
+   The air is thick with mist, and foamy white spray laps up over the sides of
+the boat. The current grows choppy, and menacing protuberances lurk just
+beneath the surface, occasionally peaking from behind the swells. Beyond them,
+a ledge juts out from the wall at mooring level, secured with a post indicating
+this is its intended purpose. There is a hollow rushing sound from deep behind
+the waterfall.
+~
+bf 0
+D3
+~
+0 11109
+D8
+~
+0 11111
+D5
+waterfall~
+ab 11112
+M 0 11103 50.00 1
+S
+#11111
+A Narrow Walkway~
+   A path has been worn into the otherwise sheer face of the rock, its shape a
+half-moon just wide enough at the base for one occupant, and tall enough to
+brush the shoulder of an average height. Given the open space on the other
+side, it's likely the groove was created from backs pressed against it for
+balance.
+~
+0 0
+D9
+~
+0 11110
+D8
+~
+0 11115
+M 0 9126 100.00 4
+M 0 11102 80.00 30
+S
+#11112
+An Underground Rapids~
+   The current becomes vacuous behind the waterfall, and the boat is sucked
+violently downward into a winding, whitewater rapids! Be prepared to type LEFT,
+RIGHT, or DUCK.
+~
+bdf 0
+T 11109
+S
+#11113
+A Serene Canyon~
+   You are launched out far above a crystal blue lake, the water clear as glass
+and the mountain walls peeled back to reveal a brilliant sky When you reach the
+shore, the sand is whisper fine, and slides through your fingers like warm
+silk. The air is temperate and refreshing, with an exquisite fragrance that
+inspires profound serenity. Tall grasses wave like an emerald sea, ripples
+radiating outward from the lake and rushing to break against the distant walls,
+their paths split by small thickets of overgrown carrot tops, blackberry
+shrubs, and pear trees.
+~
+ade 0
+D8
+~
+0 11114
+I 6 11105 33.33 1 X  # FORAGE: a few blackberries
+I 6 11103 33.33 1 X  # FORAGE: a carrot
+I 6 11107 100.00 1 X  # FORAGE: a juicy pear
+I 8 11102 33.33 1 X  # HARVEST: a bunch of carrots
+I 8 11104 33.33 1 X  # HARVEST: a bunch of blackberries
+I 8 11106 100.00 1 X  # HARVEST: some juicy pears
+M 0 9023 100.00 10
+M 0 9005 100.00 3
+M 0 9150 100.00 4
+M 0 11106 2.00 1
+S
+#11114
+An Inclining Seam~
+   The split rises gradually, and narrows only slightly, but the grass quickly
+gives way to scrub and then stone as the slope steepens.
+~
+0 0
+D9
+~
+0 11113
+D2
+~
+0 11108
+M 0 11105 50.00 1
+M 0 9150 50.00 2
+M 0 9005 100.00 3
+M 0 9117 100.00 2
+M 0 9055 20.00 1
+S
+#11115
+An Overlook Waterfall~
+   The view from the mouth of the falls is magnificent the lake below shrouded
+in a churning mist that rolls out with the current, ships of fog cast toward
+the darkness between the falls and the distant shore. Yet the sheer amount of
+water that rushes recklessly toward its breakover is equally impressive. The
+primary origin appears to be through a wide opening to the north, but it is
+greatly reinforced by several jets erupting from fissures in the walls.
+~
+b 0
+D9
+~
+0 11111
+D0
+~
+0 11116
+M 0 9126 100.00 4
+M 0 11102 80.00 30
+S
+#11116
+A Swampy Canyon~
+   The roof opens up into another canyon, this one a bog of innumerable sounds
+and smells. The ground underfoot is saturated to ankle deep, and threatens to
+pull a boot off with every step. Pockets of dryer land offer some refuge, but
+are almost overrun with plant life and crawling with hidden things.
+~
+a 0
+D2
+~
+0 11115
+D8
+~
+0 11117
+M 0 11105 50.00 1
+M 0 9150 50.00 2
+M 0 9126 100.00 4
+M 0 11102 80.00 30
+S
+#11117
+A Sloping Gully~
+   The walls here are jagged and multi-tired. The terrain is dotted with
+scrubby trees and succulants, but offers little else by way of cover.
+Mountain goats have left evidence of their frequent passage, as have the
+mountain cats that hunt them.
+~
+a 0
+D9
+~
+0 11116
+D3
+~
+0 11118
+M 0 9117 100.00 2
+M 0 9005 100.00 3
+M 0 9150 50.00 2
+M 0 11105 50.00 1
+M 0 9023 100.00 5
+S
+#11118
+A Bottleneck Canyon~
+   The canyon is flush with green, from the knee-high grasses and close-cropped
+clover, to the sprawling branches of leaning trees with their trunks blanketed
+in moss. The canyon walls are high, but active with birds and other climbing
+things.
+~
+a 0
+D1
+~
+0 11117
+D9
+~
+0 11119
+M 0 9023 100.00 10
+M 0 9005 100.00 3
+M 0 9150 50.00 2
+M 0 11105 50.00 1
+S
+#11119
+A Hazardous Cut~
+   The walls are close, the path zig-zags haphazardly, and sometimes stooping
+is required to clear the ceiling. If not for the lack of forks in the journey,
+and the persistent gusts of fresh air to confirm another end to this tunnel,
+the situation would be outright dire!
+~
+b 0
+D6
+~
+0 11106
+D8
+~
+0 11118
+M 0 11102 80.00 30
+M 0 11100 50.00 30
+S
+#11120
+A Large Rock~
+Avoid the rock!
+~
+0 0
+T 11106
+T 11107
+T 11108
+T 11110
+S
+#11121
+A Low-slung Tree Branch~
+There's a low-slung branch ahead!
+~
+0 0
+T 11106
+T 11107
+T 11108
+T 11111
+S
+#11122
+A Sliver in the Wall~
+There's a narrow crack in the wall!
+~
+0 0
+T 11106
+T 11107
+T 11108
+T 11112
+S
+#11123
+A Churning Pool~
+   You are launched out far above a churning pool of foamy green water. The
+walls are bare except directly across from the falls, which has a narrow
+opening in it.
+~
+0 0
+D8
+~
+0 11110
+S
+#11130
+An Overgrown Path~
+   A fork in the path has overgrown on one side, but appears to belong to what
+was once a frequented destination. The woods thin beyond, and there is a stone
+marker just a short way in.
+~
+a 0
+D1
+~
+0 11131
+S
+#11131
+A Weathered Stone Marker~
+   The marker stands as tall as a horse, its facade so worn down by time that
+only a fragment of its maker's mark remains. The path broadens here to the
+width of a carriage, the ruts of countless horses and wheels now reduced to
+shadowy dips in the mossy ground.
+~
+a 0
+D3
+~
+0 11130
+D7
+~
+0 11132
+E
+marker~
+   The stone marker has seen better days, and the elements have removed most of
+the identifying markers it once displayed. Yet there is a jagged edge alongside
+its southeastern face, and what lies on the ground has what appears to be a
+mill wheel carved into it.
+~
+M 0 11137 5.00 20
+M 0 11139 40.00 4
+S
+#11132
+A Ruined Old Gate House~
+   Stone walls covered over in ivy, arrow slits festooned with fresia, the old
+structure is sentinel-like in the manner of all guard houses before and since,
+careless that distant stretches of the perimeter have been rendered useless by
+disrepair. The roof, and the arch over the carriage entracne it once supported,
+collapsed long ago, allowing a large, spiny yew tree to grow through and create
+a new canopy.
+~
+a 0
+D4
+~
+0 11131
+D8
+~
+0 11140
+M 0 11133 5.00 35
+M 0 11137 5.00 20
+S
+#11133
+A Quagmire Parkway~
+   Every piece of available earth has been claimed by banyan trees. Their roots
+have grown into such a snarl during their competition for anchorage that
+traversing the former parkway is an exercise in caution. The otherwise stagnant
+air hums with insect activity, and the cloying humidity is overwhelmingly
+pungent.
+~
+af 0
+D5
+~
+0 11132
+D2
+~
+0 11137
+M 0 11134 70.00 12
+M 0 11137 15.00 20
+S
+#11134
+A Collapsed Bridge~
+   Remnants serve evidence that this was a quaint stone arch once, spanning
+almost ten feet across what must have been a steady current of water, if the
+distant mill was ever to have been useful. Unfortunately, its collapse had a
+damming effect, and the river has become a swamp.
+~
+a 0
+D7
+~
+0 11135
+D3
+~
+0 11140
+M 0 11133 30.00 35
+M 0 11137 10.00 20
+M 0 11139 40.00 4
+S
+#11135
+A Dilapidated Water Mill~
+   The swamp has consumed most of the grounds, but it has also receeded over
+time, and the stilts supporting the mill are exposed enough to take the boat
+underneath. Bands of varying shades of reddish-green stain the exposed wood,
+and yards of moss dangle from the underside of the floor.
+~
+af 0
+D4
+~
+0 11134
+D8
+~
+0 11141
+D6
+~
+0 11136
+M 0 11134 90.00 12
+M 0 11137 10.00 20
+S
+#11136
+A Watery Henge~
+   Amid the dense groves of cattails and water lilies jut the only evidence of
+the garden this must have been, the occasional revelation of fountainhead or
+statue forming a circuitous path toward a large stone marker in the centre.
+~
+af 0
+D5
+~
+0 11135
+D6
+~
+0 11137
+E
+marker~
+   The lapping swamp has done its erosive best, and a good deal of the marker's
+etchings have been lost. Still, what remains is a stone pyramid, two feet
+square at the base, with a series of friezes depicting grander times carefully
+carved into each face -- a mill, a stable, the estate, and the guard house.
+~
+M 0 11134 70.00 12
+M 0 11139 40.00 4
+S
+#11137
+A Flooded Country Estate~
+   If not for the swamp having consumed its ground floor, the master house
+would yet be a proud structure. Its walls remain intact, and the condition of
+the upper levels gives the impression parts of it are being lived in still.
+Flower boxes adorn the windows, and a thin thread of smoke curls up through a
+chimney near the rear. From here it is easy to see where there once existed a
+sculpted parkway leading from the gatehouse, as some of the wall markers topped
+with stone birds have yet to be engulfed by desperate foliage.
+~
+af 0
+D1
+~
+0 11138
+D0
+~
+0 11133
+D5
+~
+0 11136
+D8
+~
+0 11142
+M 0 11134 100.00 12
+M 0 11137 25.00 20
+S
+#11138
+An Underwater Stableyard~
+   An occasional length or square corner of smooth rocks breaking the surface
+of the swamp is all that remains of this fenced-in promenade between the home
+and the stables. The U-shaped building sags slightly, and part of its inside
+wall has come down, but the staining on the remaining surfaces reveal that the
+water has never breached the second floor.
+~
+af 0
+D3
+~
+0 11137
+D1
+~
+0 11139
+D8
+~
+0 11143
+M 0 11134 100.00 12
+M 0 11137 15.00 20
+S
+#11139
+An Abandoned Chapel~
+   The once upright and secluded structure now leans heavily against a set of
+banyans for support, its foundation having succumbed to the swamp long ago.
+The stained glass chipped and warped, its colourful patters marred by missing
+panes and a patina of filth. What must this chapel have looked like, in its
+prime? Surely it was beautiful!
+~
+af 0
+D3
+~
+0 11138
+D5
+~
+0 11145
+D8
+~
+0 11144
+M 0 11134 70.00 12
+M 0 11137 20.00 20
+M 0 11139 40.00 4
+S
+#11140
+Inside the Gate House~
+   The ground is a patchwork of ivy and roots, weaving over the fallen roof
+debris to form a layer of varying greens with speckles of red berries.
+Songbirds dart through the branches, their plumage flashing irridescent shades
+of blue and violet over mottled grey, their chirps and trills contained by the
+room's leafy insulation.
+~
+0 0
+D9
+~
+0 11132
+D1
+~
+0 11134
+M 0 11130 100.00 1
+M 0 11131 100.00 1
+M 0 11132 100.00 5
+S
+#11141
+Inside the Old Mill~
+   Time and the elements have done their worst to this structure, gutting it of
+any usefulness through relentless erosion by water and insect. Boards creek
+without influence, the walls seem more vine than rock, and every surface
+undulates from bugs or their larvae.
+~
+0 0
+D9
+~
+0 11135
+M 0 11133 20.00 35
+M 0 11137 25.00 20
+S
+#11142
+Inside the Country Estate~
+   A curved stairway connects the flooded foyer to the second story, which
+proves to be in a nearly pristine condition when viewed in contrast to the rest
+of the home. There is a bedroom suite with a crackling fireplace, and several
+of the windows have boxes flowering with herbs hanging from their sills.
+~
+0 0
+D9
+~
+0 11137
+D2
+~
+0 11148
+M 0 11135 100.00 1
+S
+#11143
+Inside the Stables~
+   The feed and bedding which had once been so carefully tended and harvested
+for the stable's occupants has long since been picked over by foragers.
+Scattered by time and left to take root in the saturated floor, all that
+remains is this covert field of wild oat and wheat grasses.
+~
+0 0
+D9
+~
+0 11138
+M 0 11133 25.00 35
+M 0 11137 20.00 20
+S
+#11144
+Inside the Chapel~
+   Water sloshes across the threshold often enough that a permanent stain has
+developed in the stone floor, covering several feet in an oblong of slick green
+algae. A quartet of pews like inverted chevrons line the aisle leading up to
+the altar, a door in the alcove behind it. Aside from that, and the number of
+bird nests in every available elevated corner, the rest of the interior appears
+mostly unsoiled.
+~
+0 0
+D5
+~
+0 11149
+D9
+~
+0 11139
+M 0 11133 25.00 35
+M 0 11137 20.00 20
+M 0 11139 30.00 4
+S
+#11148
+The Caretaker's Suite~
+   Unlike the well-tended outer chamber, this space is a jumble of items
+clearly salvaged from the lower level. Frames lean against walls and atop one
+another five or six deep, their subjects obscured by mildew and running
+colours. There is a small mattress on stilts in one corner, and a desk covered
+over in books perpendicular to the fireplace.
+~
+0 0
+D0
+~
+0 11142
+E
+desk~
+   Several volumes obscure the end of the desk closest to the fireplace. A few
+are open, a few are closed, but most of them are suffering from cracked binding
+due to lying open and face-down in the middle. Pages have dropped like leaves
+and scattered across the floor to become discoloured and curled by the heat.
+~
+M 1 11130 100.00 1
+T 11130
+S
+#11149
+The Mausoleum~
+   The mausoleum is covered over in creeping moss, and several of the formerly
+interred remains have been pushed out by the intrusive foliage. There is a hole
+in the ceiling which once served as a skylight to shine down on the sarcophagus
+in the center of the floor, but it is a cascade of thick vines now.
+~
+b 0
+D6
+~
+0 11144
+M 1 11132 100.00 1
+S
+#11150
+A Weathered Stone Marker~
+   The marker has collapsed under the weight of a heavy moss growth, and sunken
+into the saturated earth with its crown pointing toward a mass of tangled
+banyans. Beyond them, where the southeast path once ran, the burble and croak
+of swamp life punctuates a humming drone of insects, and the rancid stench of
+rot wafts on the air. One thing is clear: This will never be a friendly place
+again.
+~
+a 0
+D3
+~
+0 11130
+S
+#11151
+A Weathered Stone Marker~
+   The marker has collapsed under the weight of a heavy moss growth, and sunken
+into the rich clover with its crown pointing toward a riot of wildflowers
+blooming in the radiant sun between the trees. Birds sing and flit overhead,
+and bees busy themselves as they do. The babbling of a running spring can be
+faintly heard in the distance, and the air is fragrant with healthy growth.
+The stain has been removed from this land.
+~
+a 0
+D3
+~
+0 11130
+S
+$

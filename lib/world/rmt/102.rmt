@@ -1,0 +1,14 @@
+#10200
+A Goblin Nest~
+   The floor of the ruins is eaten away and you stumble down into a den to
+which the word filthy hardly does justice. It looks like several goblins have
+made their home here, and it may be difficult to get them to leave.
+~
+cd 0
+E
+nest filth~
+The nest is made primarily from bits of litter and the bones of food.
+~
+M 0 10200 100.00 1
+S
+$

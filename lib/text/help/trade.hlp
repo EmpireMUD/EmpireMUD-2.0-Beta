@@ -1,0 +1,677 @@
+TRADE "TRADE SKILL"
+
+Trade (skill)
+
+The Trade skill contains abilities for collecting, crafting, and trading goods
+of all kinds.
+
+You can get started in Trade by chipping rocks together to make handaxes,
+tanning leather, crafting certain items, or weaving cloth.
+
+Many craftable items are scalable, meaning their stats depend on the level of
+the person who crafts them. HELP SCALABLE CRAFTS has a full explanation.
+
+See also: CRAFT, IDENTIFY, FORGE, SEWING, POTTERY, WOODWORKING, SHIPBUILDING,
+  REFORGE
+#
+ARMORSMITHING ARMORCRAFTING
+
+Armorsmithing (Trade ability)
+Command:  forge [number] <item>
+Tool:  hammer
+
+A forgemaster with the Armorsmithing specialization can create many armors:
+  copper breastplate (armor)  10 copper ingot, 2 small leather
+  copper mask (head)  4 copper ingot, 1 cloth
+  copper vambraces (arms)  8 copper ingot, 2 small leather
+  copper buckler (shield)  6 copper ingot, 1 small leather, 1 lumber
+
+Armorsmithing -> Sturdy Armors -> Imperial Armors
+
+See also: FORGE, WEAPONCRAFTING, STURDY ARMORS, IMPERIAL ARMORS
+#
+"BASIC CRAFTS" DYE CRAFT CRAFTS
+
+Basic Crafts (Trade ability)
+
+Command:  craft [number] <item>
+
+Unskilled crafts:
+  handle  1 stick               stone axe  1 handaxe, 1 handle
+  flint set  1 flint, 1 rock    stone hammer  1 rock, 1 handle
+
+With Archery, you can craft:
+  arrows  1 lumber
+
+Basic Crafts:
+  bricks  2 clay                jar  (glassblower)
+  candle  (apiaries)            flask  (glassblower)
+  rope  1 small leather         shiv  flint, small leather
+  canoe  1 tree
+
+  saddle  1 small leather, 1 large leather
+  violet dye  2 red berries, 1 bileberries, (glassblowing)
+  orange dye  2 oranges, 1 magenta arrowfish, (glassblowing)
+
+See also: WOODWORKING
+#
+CLOTHING CLOTHES
+
+These are items you can sew and wear, but which have no affect on your stats.
+
+Leather clothing:
+ head: traveling hat (3 small leather), leather hood (3 small leather),
+       fur hat (1 small leather, 2 fox fur)
+ body: leather jacket (4 large leather), spotted robe (5 large leather, 4 pelts)
+ about body: cape (2 large leather), cloak (3 large leather), shawl (2 large
+             leather, 4 fox fur)
+ hands: leather gloves (4 small leather)
+ feet: moccasins (4 small leather), sandals (4 small leather)
+ waist: belt (2 small leather)
+ legs: leather pants (4 large leather)
+
+Cloth clothing:
+ head: hood (2 cloth), barbette (4 cloth), brimmed cap (4 cloth), bonnet (3
+       cloth), wimple (4 cloth), coif (2 cloth),
+ body: blouse (5 cloth), dress (8 cloth), shirt (4 cloth), toga (8 cloth),
+       robe (8 cloth), doublet (8 cloth), waistcoat (5 cloth), tunic (5 cloth)
+ about body: mantle (4 cloth)
+ hands: gloves (2 cloth)
+ waist: girdle (2 cloth)
+ legs: breeches (4 cloth), stockings (2 cloth), hose (2 cloth)
+
+See also: SEWING
+#
+COOK COOKING BAKE BAKING
+
+Command:  cook [number] <item>
+
+The cook command (formerly "bake") allows you to make food from a variety of
+raw ingredients. To cook, you'll need a heat source: a cooking fire, a kitchen,
+a bakery, an alchemist, or a laboratory. The Touch of Flame ability also works.
+
+Without any skill or ability, you can always cook:
+  bread  2 flour
+  tortilla  1 cornmeal
+  fried meat pie  2 fillets, 1 flour
+  casserole  1 fillet, 1 beans, 1 corn, 1 flour
+  jerky  1 fillet, apiaries tech for honey
+  burrito  1 tortilla, 1 beans
+
+  apple pie  1 bunch of apples, 1 flour
+  cherry pie  1 bag of cherries, 1 flour
+  peach pie  1 basket of peaches, 1 flour
+  candied apple  1 apple, apiaries tech for honey
+
+See also: MILL, BAKERY
+#
+"DANGEROUS LEATHERS"
+
+Dangerous Leathers (Trade ability)
+Command:  sew [number] <item>
+
+Dangerous Leathers allows you to create more powerful leather gear.
+
+Weapons:
+  razor whip  6 large leather, 4 iron ingots
+
+Armor:
+  scale armor  20 large leather
+  viper helm  12 large leather, 4 snakeskin
+  shark skin vambraces  10 large leather, 10 shark skin
+
+Misc:
+  leather boots  4 large leather
+  large backpack  10 large leather, 8 snakeskin, 2 big cat pelt
+  snakeskin saddle  8 large leather, 12 snakeskin, 2 cloth
+
+Rawhide Stitching -> Leatherworking -> Dangerous Leathers
+
+See also: LEATHERWORKING, MASTER TAILOR, RAWHIDE STITCHING, SEWING
+#
+"DEADLY WEAPONS"
+
+Deadly Weapons (Trade ability)
+Building:  forge
+Command:  forge [number] <item>
+Tool:  hammer
+
+Deadly Weapons allows you to make powerful weapons.
+
+Deadly Weapons:
+  falchion  6 iron ingots, 5 imperium ingots, 1 small leather
+  glaive  6 iron ingots, 5 imperium ingots, 1 handle
+  great axe  6 iron ingots, 5 imperium ingots, 1 handle
+  horsemans pick  6 iron ingots, 5 imperium ingots, 1 handle
+  kris  6 iron ingots, 5 imperium ingots
+  maul  6 iron ingots, 5 imperium ingots, 1 handle
+
+Weaponcrafting -> Iron Blades -> Deadly Weapons
+
+See also: FORGE, WEAPONCRAFTING, IRON BLADES
+#
+"FINE POTTERY"
+
+Fine Pottery (Trade ability)
+
+With this ability, you can make the following fine pottery items:
+  tethyan focus  (caster dps off-hand)  2 clay, 10 seashells, 1 small leather
+  areios charm  (melee dps off-hand)  2 clay, 10 bloodstones, 1 small leather
+  gaian effigy  (healer off-hand)  2 clay, 10 blue irises, 1 small leather
+  hestian trinket  (whisks you home)  1 clay, 1 seashell, 1 blue iris
+  peace pipe  1 clay, 1 small leather, 3 seashells
+
+See also: POTTERY, MASTER POTTER
+#
+FORGE
+
+Forge (Trade ability)
+
+Building:  (FF)  Forge  (no skill required)
+Built on:  plains, desert
+Command:  forge [number] <item>
+Tool:  hammer
+
+Forging is done in a forge using iron ingots. Almost all metallic armor and
+weapons are created at a forge, with varying levels of skill. Iron, silver,
+and gold are found through mining. You can craft a stone hammer to get started,
+but a superior hammer will allow you to forge more quickly.
+
+There are three forge specializations: Weaponcrafting, Armorsmithing,
+and Jewelry. You can also learn to be a Master Blacksmith.
+
+With the basic Forge skill, you can create:
+  nails (x4)  1 iron ingot
+  imperium spike (x3)  1 imperium ingot
+  hammer  1 copper ingot, 1 handle
+  woodsman axe  1 copper ingot, 1 handle -- for chopping
+  short sword  2 copper ingots, 1 small leather -- basic weapon
+  pick  1 copper ingot, 1 handle -- for mining
+  shovel  2 copper ingots, 1 handle -- dig faster
+  pan  2 copper ingots -- pan for gold
+  mirror  1 iron ingot
+  coin mill  24 iron ingots, 2 imperium ingots
+
+See also: SMELT, WEAPONCRAFTING, ARMORSMITHING, JEWELRY, MASTER BLACKSMITH,
+  IRON BLADES, STURDY ARMORS, DEADLY WEAPONS, IMPERIAL ARMORS
+#
+HANDLE
+
+Used for: forge, craft
+Stored in:  Utility Shed, Storage room
+
+Create a handle using the craft command.
+
+Handles are used in forging and crafting to provide a grasping surface to a
+tool or weapon.
+
+See also: CRAFT, FORGE
+#
+IRON "IRON ORE"
+
+Used for: forge, build, manufacture
+Stored in: Foundry
+
+Iron ore is found by mining in the mountains. It is useful in building and
+forging equipment, as well as manufacturing ships.
+
+See also: BUILD, FORGE, MINE, MANUFACTURE, SMELT
+#
+"IMPERIAL ARMORS" "IMPERIAL ARMORSMITHING"
+
+Imperial Armors (Trade ability)
+Command:  forge [number] <item>
+Tool:  hammer
+
+A forgemaster with the Imperial Armors specialization can create new armors.
+
+Medium armor:
+  cuirass (armor)  20 iron ingots, 6 imperium ingots, 2 large leather, 2 cloth
+  eagle helm (head)  10 iron ingots, 6 imperium ingots, 1 small leather, 1 cloth
+  spiked vambraces (arms)  14 iron ingots, 6 imperium ingots, 2 large leather
+
+Heavy armor:
+  plate armor  20 iron ingots, 10 imperium ingots, 4 large leather, 4 cloth
+  great helm (head)  14 iron ingots, 10 imperium ingots, 1 small leather, 1 cloth
+  lower cannons (arms)  18 iron ingots, 10 imperium ingots, 2 large leather
+
+Shield:
+  ram shield  12 iron ingots, 6 imperium ingots, 2 small leather
+  
+Armorsmithing -> Sturdy Armors -> Imperial Armors
+
+See also: FORGE, WEAPONCRAFTING, ARMORSMITHING, STURDY ARMORS
+#
+"IRON BLADES"
+
+Iron Blades (Trade ability)
+Building:  forge
+Command:  forge [number] <item>
+Tool:  hammer
+
+Iron blades allows you to forge the iron tier of equipment.
+
+Iron Blades:
+  arming sword  3 iron ingots, 1 small leather
+  battle axe  3 iron ingots, 1 handle
+  dagger  3 iron ingots
+  mace  3 iron ingots, 1 handle
+  pickaxe  3 iron ingots, 1 handle
+  pike  3 iron ingots, 1 handle
+
+Weaponcrafting -> Iron Blades -> Deadly Weapons
+
+See also: FORGE, IRON BLADES, DEADLY WEAPONS
+#
+JEWELRY
+
+Jewelry (Trade ability)
+Command:  forge [number] <item>
+Tool:  hammer
+
+The Jewelry ability is a forge specialization that can make:
+  silver ring  1 silver        silver mirror  3 silver
+  silver earrings  2 silver    gold mirror  1 silver, 2 gold
+  silver bracelets  2 silver
+  gold ring  1 gold
+  gold earrings  2 gold
+  gold bracelets  2 gold
+  engagement ring  1 gold
+  wedding band  1 gold
+  crown  4 gold
+
+See also: FORGE, WEAPONCRAFTING, ARMORSMITHING
+#
+LEATHERWORKING
+
+Leatherworking (Trade ability)
+Command:  sew [number] <item>
+
+Leatherworking is a sewing specialization. It allows you to create lightweight
+leather armors. To get leather, you must tan skins.
+
+Weapons:
+  studded whip  4 large leather, 1 iron ingot
+
+Leather Armor:
+  leather breastplate  12 large leather
+  leather helm  4 large leather
+  leather vambraces  6 large leather
+  leather buckler  10 large leather, 2 iron ingot
+  
+Misc:
+  leather shoes  2 large leather
+  wineskin  2 large leather
+  leather backpack  4 large leather
+  fine saddle  2 cloth, 4 large leather
+
+Rawhide Stitching -> Leatherworking -> Dangerous Leathers
+
+See also: SEWING, DANGEROUS LEATHERS, MASTER TAILOR, RAWHIDE STITCHING, SKIN,
+  TAN
+#
+"MAGIC ATTIRE" "MAGICAL ATTIRE"
+
+Magic Attire (Trade ability)
+Command:  sew [number] <item>
+
+Magic attire is basic cloth armor, designed for mages, and woven from magic as
+well as from cloth. These items benefit from the Master Tailor ability.
+
+You can make:
+  mage robe  10 cloth, 2 small leather, 1 lightning stone
+  conical hat  4 cloth, 1 large leather, 4 lightning stone, 1 violet dye
+  furrowed sleeves  4 cloth, 2 fox fur, 4 lightning stone, 1 orange dye
+
+  apprentice shoes  4 cloth, 2 small leather, 2 lightning stone
+
+Sew -> Magic Attire -> Magical Vestments
+
+See also: MAGICAL VESTMENTS, MASTER TAILOR, WEAVE, SEW
+#
+"MAGICAL VESTMENTS" "MAGIC VESTMENTS" VESTMENTS
+
+Magical Vestments (Trade ability)
+Command:  sew [number] <item>
+
+By learning to weave with mana, a skilled tradesman can create powerful magical
+clothing and armor. These items benefit from the Master Tailor ability.
+
+You can make:
+  sorcerers robe  12 cloth, 4 large leather, 6 orange dye,
+                  6 lightning stones, 6 nocturnium ingots
+  wizards hat  6 cloth, 1 large leather, 3 violet dye, 6 lightning stones,
+               6 nocturnium ingots
+  armbands of power  8 cloth, 2 large leather, 4 orange dye,
+                       6 lightning stones, 6 nocturnium ingots
+
+  earth-hewn sandals  4 small leather, 8 lightning stones, 2 nocturnium ingots
+  magewhisper pouch  10 cloth, 1 large leather, 3 violet dye, 10 magewhisper,
+                     12 lightning stones
+
+Sew -> Magic Attire -> Magical Vestments
+
+See also: MAGIC ATTIRE, MASTER TAILOR, WEAVE, SEW
+#
+"MASTER BLACKSMITH"
+
+Master Blacksmith (Trade ability)
+
+With this ability, some items you forge will have even greater power. You can
+also forge them more quickly.
+
+See also: FORGE, WEAPONCRAFTING, ARMORSMITHING
+#
+"MASTER FARMER" "MASTER FARMING"
+
+Master Farmer (Trade ability)
+
+Get better results from harvest, mill, and shear.
+
+See also: HARVEST, MILL, SHEAR
+#
+"MASTER POTTER"
+
+Master Potter (Trade ability)
+
+This mastery ability improves the quality of certain items from the Pottery
+tree.
+
+See also: POTTERY, FINE POTTERY
+#
+"MASTER TAILOR"
+
+Master Tailor (Trade ability)
+
+Items you sew may have extra effects. For example, the whip provides +1
+strength. (This stacks with enchantments).
+
+See also: RAWHIDE STITCHING, LEATHERWORKING, DANGEROUS LEATHERS,
+  MAGIC ATTIRE, MAGICAL VESTMENTS
+#
+POTTER POTTERY CLAY
+
+Pottery (Trade ability)
+
+Building:  (PP) potter  10 logs, 1 stone block
+Command:  craft [number] <item>
+
+Clay is found by digging near water and can be stored at the Potter.
+
+A master potter can mold clay into many different useful items. You will need
+a fire, but the pottery goes much faster if you are in a Potter building.
+
+With Pottery you can craft:
+  bowl  2 clay
+  pot  4 clay
+  vessel  8 clay
+  clay shield  (shields)  6 clay, 6 sticks, 1 small leather
+  trinket of conveyance  1 clay
+
+See also: DIG, FINE POTTERY, MASTER POTTER
+#
+"RAWHIDE STITCHING"
+
+Rawhide Stitching (Trade ability)
+Command:  sew [number] <item>
+
+The basic leather tier is made of rawhide -- untanned leather that is hardened
+to the right shape and stitched together, but isn't waterproof.
+
+Cloth armor:
+  padded armor  12 cloth, 4 small skin
+
+Weapons:
+  rawhide whip  4 large skin
+
+Armor:
+  rawhide breastplate  10 large skin
+  rawhide skullcap  4 large skin, 1 small skin
+  rawhide bracers  8 small skin
+
+Misc:
+  rawhide boots  2 large skin, 2 small skin
+  rawhide knapsack  4 large skin, 2 small skin
+  rawhide saddle  4 large skin, 2 cloth
+
+Rawhide Stitching -> Leatherworking -> Dangerous Leathers
+
+See also: DANGEROUS LEATHERS, LEATHERWORKING, MASTER TAILOR, SEWING
+#
+RECIPE RECIPES
+
+Usage:  recipes <item>
+
+This command allows you to see which recipes (forge, craft, cook, etc) you
+know that require a given item.
+#
+REFORGE REFASHION
+
+Refashion (Trade ability)
+Reforge (Trade ability)
+
+Usage: reforge <item> name <new name>
+       reforge <item> <renew | superior>
+
+A great blacksmith (weapons) or tailor (armors and shields) can use this
+ability in two ways:
+
+Name: You can take a generic item and give it a name. The name must contain
+the original name (except a leading a/an/the). Requires 1 blue iris
+per 3 gear levels on the item.
+
+Renew: This undoes any enchantments, disenchantments, name, superior quality, 
+and all other effects, and restores the item to its base stats. Requires 1
+bloodstone per 3 gear levels on the base (unmodified) item.
+
+Superior: If the item is a crafted item that could have superior qualities,
+this adds those qualities and marks it (superior). You can only use this on
+the normal version of an item that can be made superior, and only if you have
+the correct Master ability. Requires 1 green seashell per 3 gear levels on the
+item.
+
+See also: MASTER BLACKSMITH, MASTER TAILOR
+#
+"SCALABLE CRAFTS" "SCALABLE CRAFTING" "CRAFTING SCALABLES"
+
+Many craftable items (including things made with brew, craft, forge, and sew)
+are scalable, which means they change in power and attributes based on the
+level and skills of the person.
+
+For normal craftables, the level range of the ability will determine the upper
+level limit of the item created. For example, the arming sword made by
+Weaponcrafting can only be levels 30 to 50, since that's the level range of
+Weaponcrafting. Abilities bought at levels 50-74 will make crafted items that
+scale as high as 75. Abilities bought at 75-100 make crafted items scaled up to
+100. The actual level will be based on the Trade skill of the crafter, within
+that range. The item will never scale higher than the crafter's total level.
+
+If a craft recipe comes from an adventure zone, loot drop, or other non-ability
+source, it can make an item that scales up to the player's total level -- even
+if it requires a certain ability to craft it. Only normal craftable items are
+constrained by the ability's level range. However, the content builder who
+added those adventure craft recipes may have set limits on what level the
+craftables may scale to.
+
+If a craftable item is made superior, it will scale higher even at the same
+level.
+
+The identify command will help you determine if two crafted items are different
+in power, even if they have the same name.
+
+See also: IDENTIFY, SUPERIOR
+#
+SEW SEWING
+
+Sew (Trade ability)
+Command:  sew [number] <item>
+
+The art of sewing is one of the oldest and simplest trade skills, but it also
+makes some of the finest clothing and the lightest armor. The only resource
+required for sewing is skin.
+
+For a list of clothing items you can sew, see HELP CLOTHING.
+
+With basic Sewing, you can make:
+  whip (2 large leather) -- primitive weapon
+  canteen (2 small leather) -- holds drinks
+  satchel (2 large leather) -- increases carrying capacity
+  tent (8 large leather) -- a portable shelter
+
+Additional sewing items are available from other abilities in the Trade skill,
+as well as patterns and crafts hidden around the world.
+
+See also: LEATHERWORKING, RAWHIDE STITCHING, CLOTHING
+#
+SHIPBUILDING "SHIP BUILDING" MANUFACTURE SHIPYARDS "ADVANCED SHIPYARDS" "UPGRADED SHIPYARD" "ADVANCED SHIPS" SHIPS
+
+Shipbuilding (Trade ability)
+Advanced Ships (Trade ability)
+
+Buildings:  &b~&0()&b~&0  Shipyard (Seafaring ability)
+            &b~&0[]&b~&0   Upgraded Shipyard (Seafaring ability)
+Built on:  plains or desert, next to water
+Command:  manufacture <ship>
+Fame:  4 (upgraded shipyard)
+
+Great ships can be created via the manufacture skill. This can only be done in
+a shipyard, and the vessel can be sailed to a dock when finished.
+
+With basic Shipbuilding you can manufacture:
+  pinnace  30 lumber, 60 nails
+  galley  45 lumber, 90 nails
+  brigantine  60 lumber, 120 nails
+
+With Advanced ships you can manufacture:
+  argosy  120 lumber, 240 nails
+  galleon  240 lumber, 480 nails
+
+See also: BOARD, DISEMBARK, SAIL, UPGRADE
+#
+SIEGEWORKS "SIEGE WORKS"
+
+Siegeworks (Trade ability)
+
+Building:  (CC) carpenter  4 lumber, 2 nails, 12 bricks
+Command:  craft [number] <item>
+
+With Siegeworks you can craft:
+  catapult*  48 lumber, 12 nails
+
+* Crafts marked with an asterisk require the Carpenter building.
+
+See also: WOODWORKING
+#
+SKIN SKINS
+
+Usage:  skin <corpse>
+Used for:  sewing
+Stored in:  Tannery
+
+You can skin a fresh corpse to get usable material, which can later be turned
+into good equipment. Some corpses cannot be skinned, especially severely
+damaged and putrid ones.
+
+Types of skins and example animals:
+  small skin: rabbit, squirrel
+  large skin: deer, buffalo
+  shark skin: shark
+  snakeskin: any snake
+  fox fur: fox
+  big cat pelt: tiger, jaguar
+
+You can tan some skins into leather at the Tannery.
+
+See also: SEWING, LEATHERWORKING, RAWHIDE STITCHING, TAN
+#
+"STURDY ARMORS"
+
+Sturdy Armors (Trade ability)
+Command:  forge [number] <item>
+Tool:  hammer
+
+This is the iron armor tier.
+
+Sturdy Armors:
+  hauberk (armor)  12 iron ingots, 2 large leather, 2 cloth
+  mail coif (head)  4 iron ingots, 1 small leather, 1 cloth
+  splint vambraces (arms)  8 iron ingots, 2 large leather
+  kite shield  6 iron ingots, 2 small leather
+
+Armorsmithing -> Sturdy Armors -> Imperial Armors
+
+See also: FORGE, WEAPONCRAFTING, ARMORSMITHING, IMPERIAL ARMORS
+#
+TAN TANNING LEATHER
+
+Usage:  tan <skin>
+Stored in:  Tannery
+
+You can tan skins into leather. This process will go faster at a tannery. Both
+skins and leathers are used in sewing and crafting.
+
+See also: SKIN
+#
+WEAPONCRAFTING
+
+Weaponcrafting (Trade ability)
+Building:  forge
+Command:  forge [number] <item>
+Tool:  hammer
+
+Weaponcrafting is a forge specialization, and allows you to create additional
+items.
+
+Weaponcrafting:
+  copper knife  3 copper ingot
+  copper spear  3 copper ingot, 1 handle
+  copper axe  3 copper ingot, 1 handle
+  copper mace  3 copper ingot, 1 handle
+
+Weaponcrafting -> Iron Blades -> Deadly Weapons
+
+See also: FORGE, IRON BLADES, DEADLY WEAPONS
+#
+WEAVE
+
+Command:  weave <item>
+
+Weaving converts raw materials into cloth. You can weave anywhere, but it goes
+much faster at the tailor shop.
+
+Using the Sew ability:
+  cloth  2 cotton
+  wool cloth  2 wool
+  
+(Wool cloth and cotton cloth are used for the same things.)
+
+See also: SHEAR
+#
+WOODWORKING "WOOD WORKING" "ADVANCED WOODWORKING"
+
+Woodworking (Trade ability)
+Advanced Woodworking (Trade ability)
+
+Building:  (CC) carpenter  4 lumber, 2 nails, 12 bricks
+Command:  craft [number] <item>
+
+With Woodworking you can craft:
+  flute  1 lumber               shortbow  1 lumber, small leather
+  lyre  1 lumber                longbow*  1 lumber, small leather
+  stake  1 stick                cart*  16 lumber, 4 nails
+  walking stick  1 stick        lantern*  1 iron ingot, candle, (glassblowing)
+  wooden sword  1 lumber        blank sign*  1 lumber, 1 nails
+  stool*  2 lumber, nails
+  chair*  2 lumber, nails
+  table*  4 lumber, nails
+  bench*  4 lumber, nails
+  throne* 8 lumber, 2 nails, 2 cloth
+
+With Advanced Woodworking you can craft:
+  beehive*  8 lumber, 2 nails
+  carriage*  24 lumber, 6 nails
+  wagon*  32 lumber, 8 nails, 12 cloth
+
+* Crafts marked with an asterisk require the Carpenter building.
+#
+$

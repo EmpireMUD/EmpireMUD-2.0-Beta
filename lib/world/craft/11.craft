@@ -1,0 +1,77 @@
+#1107
+staff~
+1107 1  # 1x a wooden staff
+2 164 g 8 -1
+R
+124 1  # 1x a heavy log
+R
+1201 5  # 5x some fiveleaf
+S
+#1108
+wanderer staff~
+1108 1  # 1x a wanderer's staff
+2 164 g 8 -1
+R
+124 1  # 1x a heavy log
+R
+103 5  # 5x a yellow lightning stone
+S
+#1109
+sorcerer staff~
+1109 1  # 1x a sorcerer's staff
+2 164 g 8 -1
+R
+124 1  # 1x a heavy log
+R
+1206 5  # 5x an unusual blue clover
+S
+#1110
+staff of wisdom~
+1110 1  # 1x a staff of wisdom
+2 164 g 8 -1
+R
+124 1  # 1x a heavy log
+R
+1300 5  # 5x a glowing green seashell
+S
+#1111
+staff of lightning~
+1111 1  # 1x a staff of lightning
+2 170 g 16 -1
+R
+124 1  # 1x a heavy log
+R
+103 10  # 10x a yellow lightning stone
+R
+176 5  # 5x an ingot of nocturnium
+S
+#1112
+burning staff~
+1112 1  # 1x a burning staff
+2 170 g 16 -1
+R
+124 1  # 1x a heavy log
+R
+1206 10  # 10x an unusual blue clover
+R
+176 5  # 5x an ingot of nocturnium
+S
+#1113
+staff of agony~
+1113 1  # 1x a staff of agony
+2 170 g 16 -1
+R
+124 1  # 1x a heavy log
+R
+104 10  # 10x a red bloodstone
+R
+176 5  # 5x an ingot of nocturnium
+S
+#1114
+imperium spike~
+1114 3  # 3x an imperium spike
+1 51 0 2 -1
+R
+177 1  # 1x an imperium ingot
+S
+$

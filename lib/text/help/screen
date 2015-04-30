@@ -1,0 +1,22 @@
+-----------------------------------+-------------------------------------------
+Movement:                          | Communication:
+NORTH SOUTH EAST WEST NE NW SE SW  | SAY OOCSAY ESAY SHOUT SLASH-CHANNELS
+UP DOWN TRANSPORT ENTER OPEN CLOSE | HISTORY SAYHISTORY TELLHISTORY EHISTORY
+HERD SLEEP WAKE REST STAND SIT     | MAIL GSAY RECOLOR
+CIRCLE                             |
+-----------------------------------+-------------------------------------------
+Objects:                           | Information: 
+GET DROP GIVE PUT JUNK SACRIFICE   | INFO HELP HELPSEARCH SCORE WHO ADVENTURE
+WIELD HOLD WEAR REMOVE EAT DRINK   | WHERE WIZLIST GODLIST CREDITS LOOK TIME
+INVENTORY EQUIPMENT FILL POUR      | WHOIS WEATHER AFFECTS COOLDOWNS TIP
+-----------------------------------+-------------------------------------------
+Empire:                            | Resources and Crafts:
+EMPIRES PLEDGE ENROLL DEFECT ESAY  | DIG GATHER CHOP PICK MINE LEAD BUILD
+EHISTORY ROSTER CITY CLAIM ABANDON | CHIP CRAFT FORGE SEW COOK WEAVE RECIPES
+EFIND TERRITORY EEDIT              | HARVEST
+-----------------------------------+-------------------------------------------
+Skills and Combat:                 | Utility:
+KILL FLEE ASSIST EXECUTE TIE STAKE | ! ^ BUG IDEA TYPO QUIT SAVE ALIAS ALT
+SKILLS CAPS                        | TITLE TOGGLE COMMANDS SOCIALS MAPSIZE
+-----------------------------------+-------------------------------------------
+Further information available by HELP <keyword>

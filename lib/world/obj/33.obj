@@ -1,0 +1,155 @@
+#3300
+pie meat fried~
+a fried meat pie~
+A fried meat pie beckons you from the ground.~
+The pie looks delicious.
+~
+6 0 a
+48 0 0
+7 336
+S
+#3301
+pie apple warm~
+an apple pie~
+A warm apple pie is sitting out to cool.~
+The pie looks delicious!
+~
+6 0 a
+48 0 0
+7 336
+S
+#3302
+pie peach glistening~
+a peach pie~
+A glistening peach pie is sitting here.~
+The pie looks delicious!
+~
+6 0 a
+48 0 0
+7 336
+S
+#3303
+pie cherry rich~
+a cherry pie~
+A rich cherry pie is cooling here.~
+The pie looks delicious!
+~
+6 0 a
+48 0 0
+7 336
+S
+#3304
+apple candied~
+a candied apple~
+A candied apple is stuck on the ground.~
+The candied apple looks delicious!
+~
+6 0 a
+24 0 0
+7 336
+S
+#3305
+casserole steaming~
+a steaming casserole~
+A casserole is steaming on the ground.~
+The casserole looks delicious.
+~
+6 0 a
+48 0 0
+7 336
+S
+#3306
+jerky pouch~
+a pouch of jerky~
+Someone has left a pouch of jerky here.~
+The jerky looks delicious.
+~
+6 0 a
+48 0 0
+7 336
+R
+5619 0
+S
+#3307
+cornmeal meal sack~
+a sack of cornmeal~
+A sack of cornmeal is sitting here.~
+The cornmeal can be cooked into various foods.
+~
+3 0 a
+0 0 0
+7 168
+R
+5109 0
+S
+#3308
+tortilla~
+a tortilla~
+A tortilla is lying on the ground.~
+The tortilla would make a good snack.
+~
+6 0 a
+6 0 0
+7 336
+R
+5619 0
+S
+#3309
+burrito~
+a burrito~
+A burrito is lying on the ground.~
+The burrito looks muy delicioso.
+~
+6 0 a
+48 0 0
+7 336
+S
+#3310
+mushroom shroom wood ear~
+a wood ear mushroom~
+A wood ear mushroom is growing here.~
+The mushroom looks good enough to eat, somehow.
+~
+6 0 a
+6 0 0
+7 48
+S
+#3311
+oil olive jar~
+a jar of olive oil~
+A jar of olive oil is sitting on the ground.~
+The olive oil looks rich.
+~
+3 l a
+0 0 0
+6 168
+R
+5134 0
+R
+5606 0
+S
+#3312
+flour sack~
+a sack of flour~
+A sack of flour is sitting on the ground.~
+Flour is used to bake bread.
+~
+3 l a
+0 0 0
+7 168
+R
+5109 0
+S
+#3313
+bread loaf~
+a loaf of bread~
+A loaf of bread has been dropped on the ground.~
+Bread is a good portable food.
+~
+6 l a
+48 0 0
+7 336
+R
+5606 0
+S
+$

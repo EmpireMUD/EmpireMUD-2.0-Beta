@@ -1,0 +1,318 @@
+#900
+cart wooden rickety~
+a rickety cart~
+A wooden cart is parked here.~
+Carts hold items. You can harness a horse to the cart and lead the horse.
+~
+16 e 0
+200 1 0
+0 0
+S
+#901
+carriage wooden~
+a carriage~
+A wooden carriage has stopped here.~
+Carriages hold items. You can harness two horses to it and lead one.
+~
+16 e 0
+300 2 0
+0 0
+S
+#902
+wagon covered~
+a covered wagon~
+A covered wagon has been parked here.~
+Wagons hold items. You can harness two horses to it and lead one.
+~
+16 e 0
+400 2 0
+0 0
+S
+#903
+catapult~
+a catapult~
+A catapult is poised to strike!~
+   You can fire the catapult to do siege damage to buildings. You will need
+two horses or other beasts of burden to pull the catapult. Harness the horses
+to the catapult and then lead one of them.
+~
+16 e 0
+0 2 1
+0 0
+S
+#904
+chair wooden~
+a chair~
+There is a wooden chair here.~
+You can sit on the chair.
+~
+3 ael a
+0 0 0
+0 0
+S
+#905
+bench wooden~
+a wooden bench~
+There is a wooden bench here.~
+You can sit on the bench.
+~
+3 ael a
+0 0 0
+0 0
+S
+#906
+table long~
+a long table~
+There is a long table here.~
+Tables are merely for decoration.
+~
+3 el a
+0 0 0
+0 0
+S
+#907
+stool wooden~
+a stool~
+There is a wooden stool here.~
+You can sit on the stool.
+~
+3 ael a
+0 0 0
+0 0
+S
+#908
+arrows quiver~
+a quiver of arrows~
+A quiver of arrows is lying here.~
+You can use arrows from your inventory, if you have a bow equipped.
+~
+21 l a
+10 0 0
+0 0
+I 11 911 10.00 1  # LIGHT: a quiver of flaming arrows
+S
+#909
+bow short~
+a short bow~
+A short bow has been left here.~
+Equip a quiver of arrows and then use "shoot" to start ranged combat.
+~
+20 emo ap
+2 2 0
+0 0
+A
+17 1
+C
+0 0
+S
+#910
+bow long~
+a long bow~
+A long bow has been dropped here.~
+Equip a quiver of arrows and then use "shoot" to start ranged combat.
+~
+20 emo ap
+1 3 0
+0 0
+A
+17 1
+C
+0 0
+S
+#911
+arrows quiver flaming~
+a quiver of flaming arrows~
+A quiver of flaming arrows is burning here.~
+Keep this in your inventory while shooting your bow.
+~
+21 c a
+10 1 0
+0 4
+S
+#912
+lyre~
+a lyre~
+Someone has left her lyre here.~
+You can play the lyre to make soothing music.
+~
+22 0 ao
+0 0 0
+0 0
+M
+2
+You strum at $p and hum to the tune.~
+M
+2
+You pluck at $p.~
+M
+3
+$n hums a tune and strums at $p.~
+M
+3
+$n plucks at $p.~
+R
+5610 0
+S
+#913
+flute wooden~
+a wooden flute~
+A wooden flute has been tossed here.~
+You can play the flute to entertain your friends.
+~
+22 0 ao
+1 0 0
+0 0
+M
+2
+You whistle a tune through $p.~
+M
+2
+You play $p.~
+M
+3
+$n whistles a tune on $p.~
+M
+3
+$n plays $p.~
+S
+#914
+walking stick wooden long~
+a walking stick~
+A long, wooden walking stick has been dropped here!~
+The walking stick helps you walk easier.
+~
+1 ehmo ao
+0 1 5
+0 0
+A
+11 5
+C
+0 0
+S
+#915
+stake wooden sleek~
+a wooden stake~
+A sleek wooden stake has been jabbed into the ground!~
+This isn't a tent stake. It's a vampire stake!
+~
+3 l ao
+0 0 0
+0 0
+S
+#916
+beehive hive~
+a large beehive~
+A large beehive has been left here~
+You can sap honey or extract wax from the beehive.
+~
+3 e a
+0 0 0
+0 0
+M
+0
+You set up $p.~
+M
+1
+$n sets up $p.~
+S
+#917
+throne~
+the throne~
+There is a throne at the head of the room.~
+You can sit on the throne.
+~
+3 ael a
+0 0 0
+0 0
+S
+#918
+sign blank~
+a blank sign~
+A blank sign is lying on the ground.~
+   If you have the right ability, you can use this sign to mark a road with the
+roadsign command (see HELP ROADSIGN).
+~
+3 e a
+0 0 0
+0 0
+R
+5121 0
+S
+#919
+handle wooden~
+a wooden handle~
+A wooden handle has been dropped on the ground.~
+The handle can be attached to many things to build tools and weapons.
+~
+1 l ano
+0 3 5
+0 0
+I 11 184 100.00 1  # LIGHT: a torch
+R
+5121 0
+S
+#920
+canoe wooden large~
+a wooden canoe~
+A large wooden canoe is lying on its side.~
+A canoe is a convenient way to cross rivers.
+~
+7 el a
+0 0 0
+0 0
+R
+5152 0
+R
+5610 0
+S
+#952
+pinnace ship small~
+the Pinnace~
+A small pinnace is floating here.~
+Type "board" to get onto the ship.
+~
+17 0 0
+0 0 0
+0 0
+S
+#953
+brigantine ship small~
+the Brigantine~
+A small brigantine is floating here.~
+Type "board" to get onto the ship.
+~
+17 0 0
+1 0 0
+0 0
+S
+#954
+galley ship large~
+the Galley~
+A large galley is floating here.~
+Type "board" to get onto the ship.
+~
+17 0 0
+2 0 0
+0 0
+S
+#955
+argosy ship large~
+the Argosy~
+A large argosy is floating here.~
+Type "board" to get onto the ship.
+~
+17 0 0
+3 0 0
+0 0
+S
+#956
+galleon titanic large~
+the Galleon~
+A titanic galleon is floating here.~
+Type "board" to get onto the ship.
+~
+17 0 0
+4 0 0
+0 0
+S
+$

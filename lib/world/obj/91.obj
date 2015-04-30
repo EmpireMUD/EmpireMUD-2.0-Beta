@@ -1,0 +1,194 @@
+#9173
+cabin tent collapsed folded~
+a collapsed cabin tent~
+A collapsed cabin tent is folded on the ground.~
+   A patchwork of large animal hides, sewn together into several long side
+pieces, and one large roof. Stacked between the folds are several weathered
+tusks, to be used as uprights.
+~
+3 0 a
+0 0 0
+7 0
+S
+#9175
+rack antlers reindeer~
+a reindeer's antlers~
+A rack of reindeer antlers rest nearby.~
+   The root of the antler is as thick as a man's wrist and gnarled with boney
+warts before branching smoothly into a half-dozen, widely-spaced prongs.
+Forge (Deadly Weapons): reindeer antler dagger
+ 1x reindeer's antler
+ 2x imperium ingot
+~
+3 e a
+0 0 0
+14 0
+R
+5120 0
+S
+#9176
+dagger antler reindeer~
+a reindeer antler dagger~
+A dagger forged from a reindeer antler rests nearby.~
+   The hilt, fashioned from the antler of a reindeer, forms a sort of cradling
+brace for the weilder's wrist. It is as unique a piece as the animal which
+produced it.
+~
+1 hmo ano
+0 1 4
+14 0
+A
+2 1
+A
+17 1
+C
+1 100
+S
+#9177
+fur bear polar~
+a polar bear fur~
+A polar bear's fur is heaped on the ice.~
+   The polar bear fur is thick and warm. It could be sewn into garments for
+added protection from the winter elements.
+Sew (Dangerous Leathers): polar bear cloak
+ 1x polar bear fur
+ 1x large leather
+~
+3 e a
+0 0 0
+7 0
+R
+5120 0
+S
+#9178
+horn narwal~
+a narwal's horn~
+A narwal's horn pokes through the ice nearby.~
+   Long as a lance from base to tip, the exposed surface of the horn weaves a
+mesmerizing spiral around its core, and glistens with permanent cold.
+~
+1 m an
+0 1 20
+14 0
+A
+5 1
+A
+7 1
+C
+100 150
+S
+#9180
+tusk walrus~
+a walrus tusk~
+A tusk from a walrus sticks out of the ice nearby.~
+   The tusk forms a curve from massive root to blunted tip, easily the length
+of an adult man's arm.
+Sew (Dangerous Leathers): cabin tent
+ 16x walrus tusks
+ 32x large leather
+~
+3 e a
+0 0 0
+14 0
+R
+5120 0
+S
+#9181
+fur wolverine~
+a wolverine fur~
+A wolverine fur is piled on the ice.~
+   The thick, slightly oily wolverine fur is a bristling mess of tawny-tipped
+hairs over a dense, mocha-coloured undercoat. It could be sewn into garments
+for added protection against the cold.
+Sew (Dangerous Leathers): wolverine fur cap
+ 1x wolverine fur
+ 1x small leather
+~
+3 0 a
+0 0 0
+7 0
+R
+5120 0
+S
+#9182
+cap fur wolverine~
+a wolverine fur cap~
+A cap, covered with wolverine fur, rests here.~
+   The cap is covered in a bristling mess of tawny-tipped hairs over a dense,
+mocha-coloured undercoat. The sides stick out wildly, but could be brushed down
+over the ears for added warmth.
+~
+2 0 ae
+0 0 0
+7 0
+A
+3 1
+R
+5617 0
+S
+#9183
+bear polarbear cloak~
+a polar bear cloak~
+A cloak of polar bear fur rests nearby.~
+   The thick white fur is slightly oily to the touch, perfect for protection
+from harsh winter elements.
+~
+2 m ak
+0 0 0
+7 0
+A
+5 1
+A
+1 1
+C
+100 150
+S
+#9185
+skin seal sealskin large~
+a large sealskin~
+A large sealskin is piled on the ice.~
+   The skin of the elephant seal is beaded with melted snow, which runs off due
+to the pelt's natural oils. It could be sewn into garments for added protection
+against the wet and cold.
+Sew (Dangerous Leathers): sealskin leggings
+ 1x large sealskin
+ 1x large leather
+~
+3 e a
+0 0 0
+7 0
+R
+5120 0
+S
+#9186
+leggings sealskin~
+some sealskin leggings~
+A pair of sealskin leggings are piled here.~
+   The trousers are made of sealskin, with short brown hairs, slicked by
+natural oils, forming a protective barrier against wet or wintery weather.
+~
+2 m af
+0 0 0
+7 0
+A
+18 1
+A
+11 1
+C
+100 150
+S
+#9187
+aura arctic~
+an arctic aura~
+An arctic aura hovers nearby.~
+The aura is a pale blue pulse in the air, warmer than the current around it.
+~
+3 mp ak
+0 0 0
+10 0
+A
+15 1
+C
+150 150
+S
+$

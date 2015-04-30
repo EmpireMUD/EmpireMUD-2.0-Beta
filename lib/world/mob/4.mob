@@ -1,0 +1,63 @@
+#400
+deinonychus swift ferocious~
+a swift deinonychus~
+A ferocious deinonychus is stalking around!
+~
+40 50 dejo 0
+0 0 0 10
+I 0 3012 100.00 1  # BUTCHER: UNKNOWN
+I 0 3012 100.00 1  # BUTCHER: UNKNOWN
+S
+#401
+liger swift gigantic~
+a swift liger~
+A gigantic liger is prowling around!
+~
+40 50 dejo 0
+0 0 0 10
+I 0 3012 100.00 1  # BUTCHER: UNKNOWN
+I 0 3012 100.00 1  # BUTCHER: UNKNOWN
+I 0 3012 75.00 1  # BUTCHER: UNKNOWN
+I 0 3012 75.00 1  # BUTCHER: UNKNOWN
+S
+#402
+serpent giant swift~
+a swift giant serpent~
+A swift, giant serpent is coiled and ready to strike!
+~
+40 50 dejo 0
+0 0 0 10
+I 0 3012 100.00 1  # BUTCHER: UNKNOWN
+I 0 3012 100.00 1  # BUTCHER: UNKNOWN
+S
+#403
+stag swift majestic white~
+a swift white stag~
+A magestic white stag is standing before you!
+~
+40 50 dejo 0
+0 0 0 10
+I 0 3012 100.00 1  # BUTCHER: UNKNOWN
+I 0 3012 100.00 1  # BUTCHER: UNKNOWN
+S
+#404
+bear swift golden~
+a swift golden bear~
+A swift golden bear stands up and towers over you!
+~
+40 50 dejo 0
+0 0 0 10
+I 0 3012 100.00 1  # BUTCHER: UNKNOWN
+I 0 3012 100.00 1  # BUTCHER: UNKNOWN
+I 0 3012 75.00 1  # BUTCHER: UNKNOWN
+I 0 3012 75.00 1  # BUTCHER: UNKNOWN
+S
+#450
+mirror image~
+a mirror image~
+A mirror image is standing here.
+~
+0 0 bdhjorx 0
+0 0 0 7
+S
+$

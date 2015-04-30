@@ -1,0 +1,77 @@
+# EmpireMUD 2.0 Makefile.in - Makefile template used by 'configure'
+# Based upon CircleMUD 3.0 Makefile.in
+# for the 'util' directory
+
+# C compiler to use
+CC = @CC@
+
+# Any special flags you want to pass to the compiler
+MYFLAGS = @MYFLAGS@ -DEMPIRE_UTIL
+
+#flags for profiling (see hacker.doc for more information)
+PROFILE = 
+
+##############################################################################
+# Do Not Modify Anything Below This Line (unless you know what you're doing) #
+##############################################################################
+
+# binary destination directory
+BINDIR = ../../bin
+# location of world files
+WLDDIR = ../../lib/world/wld
+# location of Empire include files
+INCDIR = ..
+
+CFLAGS = @CFLAGS@ $(MYFLAGS) $(PROFILE) -I$(INCDIR) -lm
+
+default: all
+
+all: $(BINDIR)/autowiz $(BINDIR)/delobjs \
+	$(WLDDIR)/map $(BINDIR)/mudpasswd $(BINDIR)/purgeplay \
+	$(BINDIR)/showplay $(BINDIR)/sign $(BINDIR)/plrconv
+
+autowiz: $(BINDIR)/autowiz
+
+delobjs: $(BINDIR)/delobjs
+
+mudpasswd: $(BINDIR)/mudpasswd
+
+map: $(WLDDIR)/map
+
+plrconv: $(BINDIR)/plrconv
+
+purgeplay: $(BINDIR)/purgeplay
+
+showplay: $(BINDIR)/showplay
+
+sign: $(BINDIR)/sign
+
+$(BINDIR)/autowiz: autowiz.c $(INCDIR)/conf.h $(INCDIR)/sysdep.h \
+	$(INCDIR)/structs.h $(INCDIR)/utils.h $(INCDIR)/db.h
+	$(CC) $(CFLAGS) -o $(BINDIR)/autowiz autowiz.c
+
+$(BINDIR)/delobjs: delobjs.c $(INCDIR)/conf.h $(INCDIR)/sysdep.h \
+	$(INCDIR)/structs.h $(INCDIR)/utils.h
+	$(CC) $(CFLAGS) -o $(BINDIR)/delobjs delobjs.c
+
+$(WLDDIR)/map: map.c $(INCDIR)/conf.h $(INCDIR)/sysdep.h $(INCDIR)/structs.h
+	$(CC) $(CFLAGS) -o $(WLDDIR)/map map.c
+
+$(BINDIR)/mudpasswd: mudpasswd.c $(INCDIR)/conf.h $(INCDIR)/sysdep.h \
+	$(INCDIR)/structs.h $(INCDIR)/utils.h
+	$(CC) $(CFLAGS) -o $(BINDIR)/mudpasswd mudpasswd.c -lcrypt
+
+$(BINDIR)/plrconv: plrconv.c $(INCDIR)/conf.h $(INCDIR)/sysdep.h \
+	$(INCDIR)/structs.h $(INCDIR)/utils.h
+	$(CC) $(CFLAGS) -o $(BINDIR)/plrconv plrconv.c
+
+$(BINDIR)/purgeplay: purgeplay.c $(INCDIR)/conf.h $(INCDIR)/sysdep.h \
+	$(INCDIR)/structs.h $(INCDIR)/utils.h
+	$(CC) $(CFLAGS) -o $(BINDIR)/purgeplay purgeplay.c
+
+$(BINDIR)/showplay: showplay.c $(INCDIR)/conf.h $(INCDIR)/sysdep.h \
+	$(INCDIR)/structs.h
+	$(CC) $(CFLAGS) -o $(BINDIR)/showplay showplay.c
+
+$(BINDIR)/sign: sign.c $(INCDIR)/conf.h $(INCDIR)/sysdep.h
+	$(CC) $(CFLAGS) -o $(BINDIR)/sign sign.c 

@@ -1,0 +1,21 @@
+#!/bin/sh
+
+cat << EOF
+
+EmpireMUD is freeware (it doesn't cost anything).  It is a derivative of
+CircleMUD, which it is copyrighted and has a license.  You must read and
+agree to abide by the license before using CircleMUD and its derivatives.
+
+This message will only appear once (the first time you compile the server),
+but is contained in the file doc/license.doc if you'd like to refer back to
+it in the future.
+
+Press return to read the license.
+EOF
+read temp
+cat ../doc/license.doc | $1
+echo
+echo Press return to ACCEPT the terms of this license.
+echo Press Control-C if you DO NOT ACCEPT the terms of this license.
+read temp
+touch .accepted

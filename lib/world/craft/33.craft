@@ -1,0 +1,108 @@
+#3300
+fried meat pie~
+3300 1  # 1x a fried meat pie
+3 -1 gh 6 3012
+R
+3012 2  # 2x a fillet of raw meat
+R
+3312 1  # 1x a sack of flour
+S
+#3301
+apple pie~
+3301 1  # 1x an apple pie
+3 -1 gh 6 3002
+R
+3002 1  # 1x a bunch of apples
+R
+3312 1  # 1x a sack of flour
+S
+#3302
+peach pie~
+3302 1  # 1x a peach pie
+3 -1 gh 6 3004
+R
+3004 1  # 1x a basket of peaches
+R
+3312 1  # 1x a sack of flour
+S
+#3303
+cherry pie~
+3303 1  # 1x a cherry pie
+3 -1 h 6 3008
+R
+3008 1  # 1x a bag of cherries
+R
+3312 1  # 1x a sack of flour
+S
+#3304
+candied apple~
+3304 1  # 1x a candied apple
+3 -1 bh 6 3001
+R
+3001 1  # 1x a green apple
+S
+#3305
+casserole~
+3305 1  # 1x a steaming casserole
+3 -1 gh 6 3012
+R
+3012 1  # 1x a fillet of raw meat
+R
+3014 1  # 1x some dry beans
+R
+3005 1  # 1x a bushel of corn
+R
+3312 1  # 1x a sack of flour
+S
+#3306
+jerky~
+3306 1  # 1x a pouch of jerky
+3 -1 bh 6 3012
+R
+3012 1  # 1x a fillet of raw meat
+S
+#3307
+cornmeal~
+3307 2  # 2x a sack of cornmeal
+5 -1 0 4 -1
+R
+3005 1  # 1x a bushel of corn
+S
+#3308
+tortilla~
+3308 1  # 1x a tortilla
+3 -1 h 6 3307
+R
+3307 1  # 1x a sack of cornmeal
+S
+#3309
+burrito~
+3309 1  # 1x a burrito
+3 -1 gh 6 3308
+R
+3014 1  # 1x some dry beans
+R
+3308 1  # 1x a tortilla
+S
+#3311
+olive oil~
+3311 1  # 1x a jar of olive oil
+5 -1 0 6 -1
+R
+3019 2  # 2x a basket of olives
+S
+#3312
+flour~
+3312 2  # 2x a sack of flour
+5 -1 0 4 -1
+R
+141 1  # 1x a bundle of wheat
+S
+#3313
+bread~
+3313 1  # 1x a loaf of bread
+3 -1 h 6 3312
+R
+3312 2  # 2x a sack of flour
+S
+$

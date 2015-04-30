@@ -1,0 +1,41 @@
+#11146
+titanaconda scale coat~
+11146 1  # 1x a titanaconda scale coat
+4 197 g 16 11145
+R
+11145 2  # 2x the titanaconda's scales
+R
+1357 1  # 1x a large piece of leather
+R
+175 3  # 3x an iron ingot
+S
+#11147
+titanaconda scale trousers~
+11147 1  # 1x titanaconda scale trousers
+4 197 g 16 11145
+R
+11145 2  # 2x the titanaconda's scales
+R
+1357 1  # 1x a large piece of leather
+R
+175 3  # 3x an iron ingot
+S
+#11148
+opal carapace buckler~
+11148 1  # 1x an opal carapace buckler
+1 197 0 16 11133
+R
+11133 18  # 18x an opal carapace
+R
+177 2  # 2x an imperium ingot
+S
+#11149
+dorsal spine mace~
+11149 1  # 1x dorsal spine mace
+2 196 0 16 11136
+R
+11136 2  # 2x a catfish dorsal spine
+R
+919 1  # 1x UNKNOWN
+S
+$

@@ -1,0 +1,60 @@
+EmpireMUD 2.0 uses vnums under 10000 for built-in content and future expansion.
+We recommed you add new content above vnum 10000. Below is a list of the vnum
+blocks that are currently in use.
+
+   0  Boards
+ 100  misc natural resources
+ 200  Empire NPCs
+  50  clay/pottery items
+ 300  Barded mount mobs
+ 400  High Sorcery mobs
+ 500  Natural Magic mobs
+ 600  
+ 700 
+ 800  Glass and wax items
+ 900  Carpentry items and carts
+  50  Ships
+
+1000  System objects
+1100  Magic/Sorcery/Vampire skill items
+1200  Herbs, potions, and poisons
+1300  Fishing and misc crafts
+  50  Skins, leather, and wool
+
+2000  Sewing items
+2100  Primitive gear, forge, and low leather items
+2200  Forged weapons
+2300  Forged armors, high sewing items
+
+3000  Map/natural food items
+3100   "
+3200  Butchering foods
+3300  Cooking/crafted foods
+
+5000  System buildings
+5100  Skill-based buildings
+5200 
+5300 
+5400 
+5500  System rooms (ships, etc)
+5600  Designate rooms
+
+9000  Map Animals
+9100      |
+9200      |
+9200      |
+9300      |
+9400      V
+
+
+Included Adventure Zones
+[  100] Magiterranean: The Grove (10000-10005)
+[  120] Mountain Cave: Red Dragon (10006-10010)
+[  121] The Swamp Hag (10100-10104)
+[  122] Ruins: Three Banditos (10105-10109)
+[  123] Ruins: Thieves (10110-10114)
+[  125] Ruins: The Goblin Challenge (10200-10224)
+[  140] The Sewer: Ratskins (10011-10027)
+[  160] The Tower Skycleave (10030-10099)
+[  200] Burrow Canyons (11100-11129)
+[  201] The Cursed Chalice of Mill Manor (11130-11159)

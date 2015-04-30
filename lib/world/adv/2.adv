@@ -1,0 +1,40 @@
+#200
+Burrow Canyons~
+JL Decker~
+   Burrow Canyons is a chain of underground caverns which connect to hidden
+mountain vales. But be wary! There are treacherous paths to follow, and
+dangerous creatures within. It will take a valiant party to survive these
+realms. The spoils gained by those who do, however, are worth the trial!
+~
+11100 11129 0-100
+10 1440 b 4
+L
+0 a
+5107 -1 -1
+9 0 0
+L
+5 0
+10080 -1 -1
+-1 0 0
+S
+#201
+The Cursed Chalice of Mill Manor~
+JL Decker~
+   Once, Mill Manor was a grand estate, prosperous and beloved by all who lived
+there. But then, a terrible pestilence settled over the land, and misfortune
+cast it into decline. Today, although it is a wretched speck of its glorious
+past, yet tales still circle of how valuable those lands would be again, if
+only the curse were reversed.
+~
+11130 11159 100-150
+5 0 c 4
+L
+5 0
+4320 -1 -1
+-1 0 0
+L
+1 0
+11130 -1 -1
+14 m m
+S
+$

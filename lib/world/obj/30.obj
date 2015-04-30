@@ -1,0 +1,263 @@
+#3000
+lichen handful~
+a handful of lichen~
+There is some lichen growing on a rock.~
+The lichen, though not very palatable, looks like you could eat it.
+~
+6 0 a
+6 0 0
+0 48
+S
+#3001
+apple green~
+a green apple~
+Someone dropped a green apple here.~
+This is just one apple, so it's not enough to plant, but it tastes good.
+~
+6 0 a
+6 0 0
+7 48
+S
+#3002
+apples bunch~
+a bunch of apples~
+There are a bunch of apples scattered across the ground.~
+You can eat apples, or plant them.
+~
+6 bl a
+24 13 0
+7 168
+R
+5114 0
+S
+#3003
+grain handful~
+a handful of grain~
+There is some grain scattered about.~
+You can eat the grain, but it's not really anything you could plant.
+~
+6 0 a
+6 0 0
+7 48
+S
+#3004
+peaches basket~
+a basket of peaches~
+There is a basket of peaches on the ground.~
+You can eat peaches, or plant them.
+~
+6 bl a
+24 6 0
+7 168
+R
+5114 0
+S
+#3005
+corn bushel~
+a bushel of corn~
+A bushel of corn has been left on the ground.~
+You can eat corn, or plant it.
+~
+6 bl a
+24 2 0
+7 168
+R
+5116 0
+S
+#3006
+peach plump~
+a plump peach~
+Someone dropped a peach here.~
+This is just one peach, so it's not enough to plant, but it tastes good.
+~
+6 0 a
+6 0 0
+7 48
+S
+#3007
+cherry cherries couple red~
+a couple red cherries~
+Someone dropped a couple red cherries here.~
+This is just a few cherries, so it's not enough to plant, but they taste good.
+~
+6 0 a
+6 0 0
+7 48
+S
+#3008
+cherries bag~
+a bag of cherries~
+There is a bag of cherries on the ground.~
+You can eat cherries, or plant them.
+~
+6 bl a
+24 7 0
+7 168
+R
+5114 0
+S
+#3009
+orange~
+an orange~
+An orange is lying here.~
+It's a bright orange orange.
+~
+6 0 a
+6 0 0
+7 48
+S
+#3010
+oranges sack~
+a sack of oranges~
+A sack of oranges is sitting here.~
+This prize sack of oranges can be eaten or planted.
+~
+6 bl a
+24 8 0
+7 168
+R
+5114 0
+S
+#3011
+rice sack dried~
+a sack of dried rice~
+A sack of dried rice is sitting on the ground.~
+Rice can be planted near rivers.
+~
+3 bl a
+0 9 0
+7 168
+R
+5116 0
+S
+#3012
+fillet filet meat raw~
+a fillet of raw meat~
+There is a fillet of raw meat sitting on the ground.~
+You can eat the meat raw... or cook it.
+~
+6 0 a
+6 0 0
+7 24
+R
+5119 0
+S
+#3013
+nuts handful~
+a handful of nuts~
+There are some nuts scattered on the ground.~
+You can eat the nuts.
+~
+6 0 a
+6 0 0
+7 48
+S
+#3014
+beans dry~
+some dry beans~
+There is a pile of dry beans here.~
+The beans would taste delicious if you ate them.
+~
+6 0 a
+6 0 0
+7 48
+S
+#3015
+berries red berry~
+some red berries~
+There are some red berries on the ground.~
+You can eat the berries.
+~
+6 0 a
+6 0 0
+7 48
+S
+#3016
+dates handful~
+a handful of dates~
+There is about a handful of dates on the ground.~
+The dates look good enough to eat.
+~
+6 0 a
+6 0 0
+7 48
+S
+#3017
+fig plump~
+a plump fig~
+A plump fig is rolling around on the ground.~
+The fig looks good enough to eat.
+~
+6 0 a
+6 0 0
+7 48
+S
+#3018
+olives couple green~
+a couple of olives~
+A couple of green olives have been dropped here.~
+It's a handful of green olives.
+~
+6 0 a
+6 0 0
+7 48
+S
+#3019
+olives basket~
+a basket of olives~
+A basket of fresh olives is sitting on the ground.~
+You can eat olives, or plant them.
+~
+6 bl a
+24 10 0
+7 168
+R
+5114 0
+S
+#3020
+peas handful green~
+a handful of peas~
+Some green peas have been dropped here.~
+It's a handful of green peas.
+~
+6 0 a
+6 0 0
+7 48
+S
+#3021
+peas basket green~
+a basket of peas~
+A basket of green peas is sitting on the ground.~
+You can eat peas, or plant them.
+~
+6 bl a
+24 11 0
+7 168
+R
+5114 0
+S
+#3022
+squash yellow~
+a yellow squash~
+A yellow squash is lying on hte ground.~
+It's a single, delicious squash.
+~
+6 0 a
+6 0 0
+7 48
+S
+#3023
+gourds basket~
+a basket of gourds~
+A basket full of gourds is sitting on the ground.~
+You can eat gourds, or plant them.
+~
+6 bl a
+24 12 0
+7 168
+R
+5606 0
+R
+5610 0
+S
+$

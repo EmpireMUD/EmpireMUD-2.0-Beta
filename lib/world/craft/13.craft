@@ -1,0 +1,35 @@
+#1306
+nails~
+1306 4  # 4x a pouch of nails
+1 51 0 2 -1
+R
+175 1  # 1x an iron ingot
+S
+#1307
+violet dye~
+1307 1  # 1x deadly violet dye
+2 198 c 4 -1
+R
+3015 2  # 2x UNKNOWN
+R
+1205 1  # 1x some bileberries
+S
+#1308
+orange dye~
+1308 1  # 1x deep orange dye
+2 198 c 4 -1
+R
+3009 2  # 2x an orange
+R
+1303 1  # 1x a magenta arrowfish
+S
+#1309
+coin mill~
+1309 1  # 1x a heavy coin mill
+1 51 0 24 -1
+R
+175 24  # 24x an iron ingot
+R
+177 2  # 2x an imperium ingot
+S
+$

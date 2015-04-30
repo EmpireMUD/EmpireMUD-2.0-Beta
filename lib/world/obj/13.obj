@@ -1,0 +1,264 @@
+#1300
+seashell shell green glowing~
+a glowing green seashell~
+A glowing green seashell is sitting on the ground.~
+The seashell can be used in certain crafts and enchantments.
+~
+3 l a
+0 0 0
+1 0
+R
+5164 0
+R
+5511 0
+S
+#1301
+barbfish striped remains fish~
+a striped barbfish~
+The remains of a striped barbfish is rotting here.~
+You can eat the fish.
+~
+6 kl a
+24 0 0
+7 168
+R
+5119 0
+S
+#1302
+linefish giant remains fish~
+a giant linefish~
+The remains of a giant linefish is rotting here.~
+You can eat the fish.
+~
+6 k a
+24 0 0
+7 168
+R
+5119 0
+S
+#1303
+arrowfish magenta remains fish~
+a magenta arrowfish~
+The remains of a magenta arrowfish is rotting here.~
+You can eat the fish.
+~
+6 k a
+24 0 0
+7 168
+R
+5119 0
+S
+#1304
+junk sea pile~
+some sea junk~
+A pile of sea junk has been left here.~
+It looks worthless.
+~
+3 k a
+0 0 0
+1 0
+S
+#1305
+statuette worn old~
+a worn old statuette~
+A worn old statuette is lying in the dust.~
+You're not sure what it is, but it looks like you could hold it.
+~
+3 jl ao
+0 0 0
+1 0
+A
+17 10
+S
+#1306
+nails pouch~
+a pouch of nails~
+A pouch of nails is sitting here.~
+Nails are used for building.
+~
+3 l a
+0 0 0
+2 0
+M
+0
+You hammer nails into the wood joints.~
+M
+1
+$n hammers nails into the wood joints.~
+R
+5134 0
+R
+5121 0
+R
+5610 0
+S
+#1307
+dye deadly violet vial~
+deadly violet dye~
+A vial of deadly violet dye is sitting here.~
+   The vial is filled with a liquid so dark it almost looks black. But when you
+hold it up to the light, you can see its true color is a deep, deep violet.
+This dye, made from a mix of wild berries, imbues a fabric with unusual
+properties.
+~
+3 l a
+0 0 0
+8 0
+R
+5137 0
+S
+#1308
+dye deep orange vial~
+deep orange dye~
+A vial of deep orange dye is sitting here.~
+   Deep orange dye is made from the peels of fresh fruit, mixed with the
+pigment of a magenta arrowfish. It has an unusual glow in dim light, like it
+catches and amplifies every ray of light that hits it.
+~
+3 l a
+0 0 0
+8 0
+R
+5137 0
+S
+#1309
+mill coin heavy~
+a heavy coin mill~
+There is a coin mill here.~
+Coin mills are required to build a mint.
+~
+3 el a
+0 0 0
+2 0
+M
+0
+You set up $p.~
+M
+1
+$n sets up $p.~
+S
+#1350
+smallskin skin small pile~
+a small skin~
+A small pile of skin is stacked on the ground.~
+Skin can be tanned to make leather.
+~
+3 l a
+0 0 0
+7 0
+R
+5120 0
+S
+#1351
+largeskin skin large pile~
+a large skin~
+A large pile of skin is stacked on the ground.~
+Skin can be tanned to make leather.
+~
+3 l a
+0 0 0
+7 0
+R
+5120 0
+S
+#1352
+fur fox luxurious~
+a luxurious fox fur~
+A fox fur is crumpled on the ground.~
+Fox fur is used in some types of clothing.
+~
+3 0 a
+0 0 0
+7 0
+R
+5120 0
+S
+#1353
+pelt big cat~
+a big cat pelt~
+A big cat pelt is lying here.~
+This pelt, from a dangerous big cat, can be made into fancy clothing.
+~
+3 l a
+0 0 0
+7 0
+R
+5120 0
+S
+#1354
+skin shark~
+a shark skin~
+A shark skin is drying on the ground.~
+The shark skin is smooth one way, rough the other.
+~
+3 0 a
+0 0 0
+7 0
+R
+5120 0
+S
+#1355
+snakeskin skin~
+some snakeskin~
+Some snakeskin is crumpled on the ground.~
+The snakeskin can be used for certain crafts.
+~
+3 l a
+0 0 0
+7 0
+R
+5120 0
+S
+#1356
+smallleather leather small piece~
+a small piece of leather~
+A pile of small pieces of leather is sitting here.~
+Leather can be sewn into armor.
+~
+3 l a
+0 0 0
+7 0
+R
+5134 0
+R
+5120 0
+S
+#1357
+largeleather leather large piece~
+a large piece of leather~
+A pile of large pieces of leather is sitting here.~
+Leather can be sewn into armor.
+~
+3 l a
+0 0 0
+7 0
+R
+5120 0
+S
+#1358
+wool~
+some wool~
+Some wool is scattered on the ground.~
+You can weave the wool into cloth.
+~
+3 0 a
+0 0 0
+7 0
+R
+5137 0
+S
+#1359
+cloth bolt~
+a bolt of cloth~
+A bolt of cloth is lying on the ground.~
+This simple cloth is used to sew clothing.
+~
+3 l a
+0 0 0
+7 0
+R
+5137 0
+R
+5134 0
+S
+$

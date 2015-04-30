@@ -1,0 +1,62 @@
+EMPIREMUD "EMPIRE MUD"
+                    E  m  p  i  r  e  M  U  D     2  . 0
+
+EmpireMUD was developed from CircleMUD (3.0 Beta 17) by Paul Clarke in his
+free time. All code unique to EmpireMUD is the intellectual property of Paul
+Clarke, but is meant to be shared.
+
+I would like to thank Andrew Flyer, David York, Kris Saw, Jason "Opie" Babo,
+Melk, Miltazar, Tharyn, Shandia, Gaia, Evan Hall, and my parents.
+
+ Bugs, help, etc:  khufu@empiremud.net
+        Web site:  http://empiremud.net/
+
+ Paul Clarke / Khufu / Gideon X
+
+See also: CIRCLEMUD
+#
+CIRCLEMUD "CIRCLE MUD"
+                    C  I  R  C  L  E  M  U  D     3  . 0
+
+CircleMUD was developed from DikuMUD (Gamma 0.0) by Jeremy "Ras" Elson at
+Johns Hopkins University's Department of Computer Science. All code unique
+to CircleMUD is protected under a copyright by the Trustees of the Johns
+Hopkins University.
+
+Many, many people contributed to CircleMUD in one way or another throughout
+the course of its development. Although it's impossible for me to remember
+them all, I'd like to extend special thanks to certain people:
+
+  -- Jeff Fink and George Greer, for submitting a veritable mountain of
+     excellent code.
+  -- Chris Epler and Chris Herringshaw for extensive beta-testing and bug
+     reporting.
+  -- Furry (Alex Fletcher), for single-handedly managing Circle's world files.
+  -- Fred Merkel, Ryan Watkins, Jay Levino, and Sharon Goza, for other
+     code and area submissions.
+  -- Jean-Jack Riethoven for porting the code to the Amiga, David Carver
+     for porting it to OS/2, and Jack Patton and Steffen Haeuser for the
+     Amiga port.
+  -- Bill Bogstad and Tim Stearns for allowing Circle to exist at JHU.
+  -- The DikuMUD folk, and the good old WhatMUD implementors Dave & Justin,
+     for starting the ball rolling.
+  -- Bryan Jolson, Steven Lacher, Cat Stanton, and Naved Surve, for being 
+     there in the very early days of Circle's development.
+  -- Sharon, Ben, Erica, Aly, and Josh, for keeping me sane.
+  -- Jules (hamotek sheli) for being the greatest.
+
+...plus everyone else in the Circle community who has submitted material!
+Thanks everyone!
+
+  Anonymous FTP:  ftp.circlemud.org or ftp2.circlemud.org in pub/CircleMUD
+ To report bugs:  bugs@circlemud.org
+    To get help:  help@circlemud.org
+            URL:  http://www.circlemud.org/
+   Mailing List:  listserv@post.queensu.ca
+                  (write "subscribe circle <first name> <last name>")
+
+--Jeremy Elson (jelson@circlemud.org)
+
+See also: EMPIREMUD
+#
+$

@@ -1,0 +1,10 @@
+#183
+flint set~
+183 1  # 1x a flint set
+2 -1 0 1 102
+R
+102 1  # 1x a flint stone
+R
+100 1  # 1x a rock
+S
+$

@@ -1,0 +1,495 @@
+#5600
+Armory~
+The Armory~
+~
+0 0 a 0
+0 0 0 -1
+C
+inventory, retrieve, store~
+D
+   This is the armory, a large store room of arms and armor. Its primary
+function is to supply the empire with the best armaments available. The
+armory is slightly run-down as it's not the top priority for repairs. Often,
+the armory is run by an artisan of the trade.
+~
+S
+#5601
+Bedroom~
+A Bedroom~
+~
+0 0 aHIN m
+0 1 0 -1
+C
+sleep~
+D
+   The wooden walls are laced with metal and stained a rich brown in this
+bedroom. It's roomier than you would expect, even for a structure like this,
+and it makes you feel at home as you bask in the warm glow of the wood. The
+scent of fresh pine still emanates from the walls.
+~
+M
+234 0.05 ce
+S
+#5602
+Dining Room~
+The Dining Room~
+~
+0 0 a m
+0 0 0 -1
+D
+   This is one of the most important rooms: the dining room. Here, guests
+from peasants to nobles are entertained and fed the best foods available.
+Around the dining table, all men are equal. They sit and drink and brag about
+themselves without a care in the world.
+~
+M
+9188 2.00 0
+M
+9189 2.00 0
+M
+9190 2.00 0
+M
+9192 5.00 c
+M
+9193 5.00 c
+M
+9194 5.00 c
+M
+9195 5.00 c
+M
+9198 2.00 0
+M
+9199 2.00 0
+S
+#5603
+Forge~
+The Forge~
+~
+0 0 aq c
+0 0 0 212
+C
+forge, smelt~
+D
+   You are standing in a small room which is heated to well over any bearable
+temperature. A large oven against the wall is used to heat metal to a
+controlled temperature so that a master craftsman can hammer it into a useful
+shape. The metal is then cooled in water.
+~
+M
+241 20.00 ce
+S
+#5604
+Great Hall~
+The Great Hall~
+~
+0 0 a i
+0 0 0 -1
+D
+   This is the Great Hall, a room lined with magnificent suits of armor and
+decorated with the best gold available. The Great Hall is often one of the
+most important parts of the castle as it shows the wealth of the king. It
+also leads to the throne room.
+~
+M
+245 20.00 ce
+M
+239 15.00 ce
+M
+238 15.00 ce
+M
+251 15.00 ce
+S
+#5605
+Hallway~
+A Hallway~
+~
+0 0 a e
+0 0 0 -1
+D
+   This is a wooden hallway, devoid of decorations and with only one purpose.
+Hallways are used as filler space when a builder does not want to directly
+connect rooms. With bedrooms, they also offer more privacy for the occupants.
+~
+M
+9188 2.00 0
+M
+9189 2.00 0
+M
+9190 2.00 0
+M
+9192 5.00 c
+M
+9193 5.00 c
+M
+9194 5.00 c
+M
+9195 5.00 c
+M
+9198 2.00 0
+M
+9199 2.00 0
+S
+#5606
+Kitchen~
+The Kitchen~
+~
+0 0 ar m
+0 0 0 214
+C
+cook~
+D
+   You are standing in the kitchen, a sweaty room where food is prepared and
+cooked. A large iron stove rests against the wall. It is the latest
+innovation in cooking technology, replacing the open fire which has caused so
+many houses to burn to the ground.
+~
+M
+9188 2.00 0
+M
+9189 2.00 0
+M
+9190 2.00 0
+M
+9192 5.00 c
+M
+9193 5.00 c
+M
+9194 5.00 c
+M
+9195 5.00 c
+M
+9198 2.00 0
+M
+9199 2.00 0
+S
+#5607
+Sitting Room~
+The Sitting Room~
+~
+0 0 a m
+0 0 0 -1
+D
+   You are now in the sitting room, second in sociability only to the dining
+room. This room is generally used when serving tea or light drinks, and when
+guests are present. The walls are made of wood and lined with a dull metal to
+create a rustic, home-like feel.
+~
+M
+9188 2.00 0
+M
+9189 2.00 0
+M
+9190 2.00 0
+M
+9192 5.00 c
+M
+9193 5.00 c
+M
+9194 5.00 c
+M
+9195 5.00 c
+M
+9198 2.00 0
+M
+9199 2.00 0
+S
+#5608
+Study~
+The Study~
+~
+0 0 a m
+0 0 0 -1
+C
+read, respond, write~
+D
+   This is the study, a quiet room with a soft glow and a dark oaken desk.
+The room is generally used by scholars and merchants for reading, writing, and
+quantifying acquisitions. Many, however, just use it as a quiet place to
+relax and rejuvenate.
+~
+M
+9188 2.00 0
+M
+9189 2.00 0
+M
+9190 2.00 0
+M
+9192 5.00 c
+M
+9193 5.00 c
+M
+9194 5.00 c
+M
+9195 5.00 c
+M
+9198 2.00 0
+M
+9199 2.00 0
+S
+#5609
+Throne Room~
+A Magnificent Throne Room~
+~
+0 0 a g
+0 0 0 -1
+D
+   This is the castle throne room, the place where the rulers sit and address
+their subjects. The ceiling is high, so high that you wonder how it could
+even be built. The thrones themselves are set at the top of a small mountain
+of stairs, placing the king high over his subjects. The entire room is plated
+with magnificent armor and gold highlights.
+~
+M
+245 20.00 ce
+M
+239 20.00 ce
+M
+238 20.00 ce
+M
+254 50.00 c
+S
+#5610
+Store Room~
+The Store Room~
+~
+0 0 a m
+0 0 0 -1
+C
+inventory, retrieve, store~
+D
+   This is the store room, a dank corner where goods are stored for later use.
+It is expansive, large enough to hold months worth of supplies. The walls are
+moist and some fungus grows on them, indicating that this is not the most
+well-maintained room.
+~
+M
+9188 2.00 0
+M
+9189 2.00 0
+M
+9190 2.00 0
+M
+9192 5.00 c
+M
+9193 5.00 c
+M
+9194 5.00 c
+M
+9195 5.00 c
+M
+9198 2.00 0
+M
+9199 2.00 0
+S
+#5611
+Vault~
+The Vault~
+~
+0 0 aG b
+0 0 0 -1
+C
+deposit, exchange, inventory, retrieve, store, warehouse, withdraw~
+D
+   This is the castle's treasury, the place where all of its wealth is stored
+safely. The vault is virtually impenetrable, although some famous bandits
+claim they've managed the daring task. An empire's wealth is determined by
+the money in its vaults.
+Note: &yVault contents determine empire wealth&0
+~
+M
+254 50.00 c
+S
+#5612
+Tunnel~
+A Winding Tunnel~
+~
+0 0 ab d
+0 0 0 -1
+D
+   The tunnel is earthen with tall logs supporting it, though not very well.
+It winds back and forth through the hard land with torches keeping it visible
+all the way. Water drips precariously, echoing through the tunnels.
+~
+M
+9189 2.00 0
+M
+9190 2.00 0
+M
+9191 2.00 0
+M
+9198 2.00 0
+M
+9199 2.00 0
+S
+#5613
+Sky Bridge~
+A Sky Bridge~
+~
+0 0 a f
+0 0 0 -1
+D
+   A rope bridge is all that supports you as you pass from tree to tree.
+Despite your best efforts not to, you look down and are suddenly frightened by
+the great drop below. Fortunately, the superior construction prevails and
+you're saved the fall by the strong bridge.
+~
+M
+9196 2.00 0
+M
+9197 2.00 0
+M
+9198 2.00 0
+M
+9199 2.00 0
+M
+9190 2.00 0
+M
+9191 2.00 0
+S
+#5614
+Baths~
+The Baths~
+~
+0 0 aC j
+0 0 0 -1
+C
+bathe~
+D
+   Steamy air fills your lungs as you approach the baths. A pair of large
+pools consume much of the floor space, and fires burn at their sides to heat
+the water. This is a place of cleanliness, so attendants regularly add fresh
+water to the bathing pools.
+~
+M
+236 20.00 ce
+M
+236 20.00 ce
+S
+#5615
+Shield Racks~
+The Shield Racks~
+~
+0 0 a 0
+0 0 0 -1
+C
+inventory, retrieve, store~
+D
+   All around you are racks for shields of various sizes. Most are empty,
+however the look as though they could easily prepare the empire for serious
+warfare. Shields are often useful in battle, more useful than relying on a
+weapon to parry.
+~
+S
+#5616
+Armor Storage~
+Armor Storage~
+~
+0 0 a h
+0 0 0 -1
+C
+inventory, retrieve, store~
+D
+   This large room has armor racks of all shapes and sizes. It looks as
+though it will hold a large amount of all armors, helping to defend the empire
+in times of need. Armor is often stored here, as it is too bulky to store
+elsewhere or wear at all times.
+~
+S
+#5617
+Closet~
+The Closet~
+~
+0 0 a m
+0 0 0 -1
+C
+inventory, retrieve, store~
+D
+   You are standing in a large, decorated closet. It has hangers, racks, and
+shelves for all sorts of clothing. It looks as though it could hold a lot,
+too. The room is unusually deep and well-organized. This is truly a rich
+woman's dream.
+~
+M
+9188 2.00 0
+M
+9189 2.00 0
+M
+9190 2.00 0
+M
+9198 2.00 0
+M
+9199 2.00 0
+S
+#5618
+Laboratory~
+The Laboratory~
+~
+0 0 ars k
+0 0 0 231
+C
+brew, mix, retrieve, store~
+D
+   The laboratory is packed with books, flasks, bins, and jars of all kinds. It
+looks as if someone has dozens of experiments running, each with its own
+strange aroma and color. There are shelves of multi-color potions along the
+walls, each one carefully labeled.
+~
+M
+241 20.00 ce
+S
+#5619
+Larder~
+The Larder~
+~
+0 0 a m
+0 0 0 -1
+C
+inventory, retrieve, store~
+D
+   You wrap yourself up as you enter the larder, which is noticeably cooler
+than where you have just come from. Shelves of food line the walls, which are
+thick and insulated against the sun. There are no windows, and every gap in
+the walls has been plugged with pitch to ward off infestation.
+~
+M
+9188 2.00 0
+M
+9189 2.00 0
+M
+9190 2.00 0
+M
+9192 5.00 c
+M
+9193 5.00 c
+M
+9198 2.00 0
+M
+9199 2.00 0
+S
+#5620
+Crypt~
+A Musty Crypt~
+&0[  ]~
+1 0 aE a
+0 0 0 -1
+C
+tomb~
+D
+   The crypt is musty and strewn with cobwebs, although the floor has been
+swept and it looks like people have been in and out of here recently, perhaps
+to pay respects. The shadows cast by the oil lamps dance over stone tombs, with
+the stray flicker that fools your mind into seeing life in the shadows of
+death.
+~
+M
+9188 2.00 0
+M
+9189 2.00 0
+M
+9190 2.00 0
+M
+9198 2.00 0
+M
+9199 2.00 0
+S
+$

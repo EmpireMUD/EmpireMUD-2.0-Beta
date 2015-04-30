@@ -1,0 +1,180 @@
+#5000
+Grave~
+A Lone Grave~
+..&0x&?.~
+1 0 dE 0
+0 0 0 -1
+C
+tomb~
+M
+9189 2.00 0
+M
+9190 2.00 0
+M
+9191 2.00 0
+M
+9198 2.00 0
+M
+9199 2.00 0
+S
+#5001
+Tent~
+A Tent~
+.&0/\&?.~
+1 0 pN 0
+0 0 0 -1
+C
+abandon, dismantle~
+D
+   You are inside a tent made of animal hides. It's not large, but it provides
+good shelter from the sun, wind and rain. The tent is sparse, made of only as
+much material as necessary so that it can be taken down and carried in a pack.
+~
+S
+#5002
+Rock Shelter~
+A Rock Shelter~
+.&0c&?..~
+5 0 pN 0
+0 0 0 -1
+A
+d
+C
+abandon, dismantle~
+D
+   This is a small shelter made from a rock outcropping on the hillside and
+protected from the wind by a mat of debris. It's small and it's not very com-
+fortable, but it's still shelter.
+~
+S
+#5003
+Tree Shelter~
+A Tree Shelter~
+^&0T&?^^~
+5 0 pN 0
+0 0 0 -1
+A
+d
+C
+abandon, dismantle~
+D
+   You've found shelter high in the branches of a tree, protected from the wind
+and weather by thick branches. It's not a large shelter and it isn't very com-
+fortable, but it's still shelter.
+~
+S
+#5004
+Cave Shelter~
+A Cave Shelter~
+^&0O&?/\~
+5 0 pN 0
+0 0 0 -1
+A
+d
+C
+abandon, dismantle~
+D
+   This small cave looks like it was originally hollowed out by an animal, but
+it's large enough for you to stand. A fallen rock covers most of the entrance
+and protects you from the elements. The ground isn't comforable, but it's still
+a safe place to stay.
+~
+S
+#5005
+Jungle Shelter~
+A Shelter in the Jungle~
+&G^c^^~
+5 0 pN 0
+0 0 0 -1
+A
+d
+C
+abandon, dismantle~
+D
+   This tiny shelter has been scraped together from vines and leaves to provide
+some protection from the hungry animals of the jungle. The trees also give
+ample shade and protection from the elements.
+~
+S
+#5006
+Ruins Open~
+Some Decaying Ruins~
+&y/&0..&y\~
+1 -1 d 0
+0 0 0 -1
+C
+dismantle~
+M
+9189 2.00 0
+M
+9190 2.00 0
+M
+9191 2.00 0
+M
+9198 2.00 0
+M
+9199 2.00 0
+S
+#5007
+Ruins Closed~
+Some Decaying Ruins~
+&y/&0..&y\~
+1 -1 e 0
+0 0 0 -1
+C
+dismantle~
+D
+   Whatever this building used to be, it is in ruins now. The walls no longer
+offer any real protection from the elements, and the piles of debris are
+infested with rats. This is the sort of place that attracts trouble.
+~
+S
+#5008
+Tunnel~
+A Tunnel~
+/&0OO&?\~
+60 0 befg 0
+0 0 0 -1
+D
+   The tunnel is cold and damp, but is the fastest way from one side of the
+mountain to another. A rat scurries past you, but you ignore him. It's
+rumored that giant snakes reside in the mountains and you'd like to avoid
+meeting one of them.
+~
+M
+9189 2.00 0
+M
+9190 2.00 0
+M
+9191 2.00 0
+M
+9198 2.00 0
+M
+9199 2.00 0
+S
+#5009
+City Center~
+The City Center~
+????~
+1000 0 do 0
+0 0 0 -1
+M
+9188 2.00 0
+M
+9189 2.00 0
+M
+9190 2.00 0
+M
+9192 5.00 c
+M
+9193 5.00 c
+M
+9194 5.00 c
+M
+9195 5.00 c
+M
+9198 2.00 0
+M
+9199 2.00 0
+S
+$

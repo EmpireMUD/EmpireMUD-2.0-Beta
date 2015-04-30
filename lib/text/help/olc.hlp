@@ -1,0 +1,3458 @@
+OLC .OLC "DOT OLC" "DOT-OLC"
+
+EmpireMUD .olc: An on-line creation system for editing your world.
+
+Usage:  .<type> <command>
+        .<command>
+
+The .olc system allows quick, easy in-game editing of objects, mobiles, crafts,
+and more. The editor doesn't take you out of the game like some other OLC
+systems, so you still have access to help files and public channels.
+
+If you don't like the '.' command, you can also use "olc" instead. If you do,
+you must type a space after the command.
+
+Upper immortals can control the olc permissions of builders with the OLC
+CONTROLS.
+
+Available types are:
+ .b - buildings
+ .c - crafts
+ .crop - crops
+ .m - mobiles
+ .o - objects
+ .map - map tiles, rooms, and interiors
+ .sect - map sectors
+
+Basic commands:
+ . - typing '.' by itself shows your current editor
+ abort - close your current editor WITHOUT SAVING
+ copy <from vnum> <to vnum> - creates a copy of something and opens the editor
+ delete <vnum> - deletes a vnum from the database, with all copies of it
+ edit <vnum> - loads that vnum into the editor
+ list <from vnum> <to vnum> - lists everything in that vnum range
+ save - save your open editor and close it
+
+Examples:
+ > .o edit 1500
+ > olc object edit 1500
+ > .m list 50-60
+
+For notes on the mud's building rules, see HELP BUILDING GUIDE.
+ 
+See also: OLC CONTROLS, OLC BUILDINGS, OLC CRAFTS, OLC CROPS, OLC MOBILES,
+   OLC OBJECTS, OLC SECTORS, MAP OLC
+See also: OLC ABORT, OLC AUDIT, OLC COPY, OLC DELETE, OLC EDIT, OLC FREE, 
+   OLC LIST, OLC SAVE, OLC SEARCH, OLC LICENSE, TEXT EDITOR, VNUM
+#d
+"OLC ABBREVIATIONS" "OLC ABBREVS" ADV BLD BDG CFT CRP MOB OBJ RMT SCT TRG
+
+Sometimes abbreviations are used for core "thing" types, like mobs. Here are
+some common ones:
+
+adv - adventure
+bld (or bdg) - building (these include designated rooms)
+cft - craft
+crp - crop
+mob - mobile/npc
+npc - non-player character (mob)
+obj - object
+rmt - room template
+sct - sector/terrain
+trg - trigger
+#d
+"OLC LICENSE" "OLC RIGHTS"
+
+All content created for an EmpireMUD using its OLC (OnLine Creation) system
+becomes the property of the game for which it was created. EmpireMUD will not
+remove the author's credit on adventure zones or other content, and major
+contributors may appear in the game credits.
+
+Content builders must use original ideas, concepts, and characters. They must
+not copy, steal, or otherwise unlawfully use the intellectual property of
+others, except as explicitly allowed by the original author.
+
+A person who created content for EmpireMUD, but no longer wants EmpireMUD to
+use that content, may request that the content be removed. However, EmpireMUD
+is under no obligation to do so.
+#d
+BUILDING "BUILDING GUIDE" "BUILDING PARADIGM" "BUILDING CONTENT" "CONTENT BUILDING"
+
+Content for EmpireMUD is built using the .olc system, which provides editors
+for adventures, buildings (and designated rooms), craft (and building) recipes,
+crops, mobs, objects, room templates, sectors, and triggers. This document
+describes the game's current guidelines for building that content. For help
+on the editors instead, see HELP OLC.
+
+** Editor Notes **
+
+Adventures (ADVEDIT):
+- When you set a min/max level for the adventure, mobs and items that don't
+  have their own level limits will inherit the limits from the adventure.
+- If you plan to use obj/room scripts that will do scaled damage, you should
+  set one of the LOCK-LEVEL flags on the adventure, otherwise the game might
+  not have a good level to use for those scripts. Mob scripts don't require it.
+- The !NEARBY flag should only be used on zones where a player shouldn't find
+  evidence of them nearby, like a thieves' den.
+
+Buildings (BEDIT):
+- Designated rooms are also built in the building editor, using the ROOM flag.
+- If a building has at least 1 Citizen, players can also set it as their home.
+
+Crafts (CEDIT):
+- Soups are made using the COOK type and the SOUP flag. Instead of choosing an
+  item to make, you choose a liquid, and the recipe will require a container
+  of water to make the soup in.
+- To make a recipe item, build an item ("an old recipe") and set it in a
+  craft's requiresobject field. The player will only be able to see and use
+  the craft if they have the item in their inventory. You can still also choose
+  to require an Ability, for example an armor pattern that requires Armor-
+  smithing. You should consider listing the ingredients on the recipe item's
+  lookdescription.
+- To make an item that can be combined with another item, for example a spear-
+  head that can be crafted into a spear, create a craft and set its requires-
+  object to the spearhead (just like a recipe item, above). Then, also set the
+  spearhead item as a resource to make the craft, too. You'll only be able to
+  craft it when the spearhead is in your inventory, but it will consume the
+  spearhead when you make it.
+- If you use the requiresobject on a BUILD craft, it will always be consumed
+  when the building is started. This is different from other types of crafts,
+  where the requiresobject is only consumed if it's a "resource" too.
+- Scalable objects should not be used as resources or required objects for
+  craft recipes. These items aren't stored, so if they're refunded, they will
+  scale to their minimum level and lose any modifications.
+
+Crops (CROPEDIT):
+- Crop names are always lowercase because they are used to build sentences.
+  They should also be plural (e.g. "apples", "rice").
+- We don't usually give the crops different seasonal icons, but you can.
+- The map region only matters if the crop grows in the wild (no !WILD flag).
+- Crops should have a FORAGE interaction for a small single food item.
+- Crops should have a HARVEST interaction for a plantable large item.
+
+Map (MAPEDIT):
+- Immortals are not generally permitted to make edits to the map. However,
+  small aberrations may be fixed, and it's ok to make tiny (few-tile) edits
+  for mortals if there is a good reason (and won't provide any kind of game
+  advantage for the player).
+
+Mobs (MEDIT):
+- The most significant keyword should always be first. A black bat should put
+  "bat" first. Handyman Joe should probably put "Joe" first. The first keyword
+  may be used for sentence-building.
+- If you don't set a min/max level on the mob, it may inherit them from the
+  adventure zone it's in. Otherwise, they may scale to any level at all.
+- We usually don't want mobs to be able to scale to any level, so mobs that
+  spawn outside of adventure zones should almost alway shave a min/max set.
+- Mobs that use the #n tag to pick from a generic name list will be assigned
+  a random sex if you leave their sex "neutral".
+- The HARD flag means a mob needs two players at its level, or one very good
+  player.
+- The GROUP flag will require a full group of 4 players at its level, or 3
+  players working very hard, or perhaps 2 extremely good players.
+- A mob with HARD and GROUP is a major boss fight and may take a lot of work
+  even for a full 4-player group.
+- ANIMAL mobs will take double damage from players with Hunt.
+- Consider using a must-fight script (like a Leave trigger with "return 0")
+  rather than the AGGR flag.
+- If your mob spawns in a dark adventure, strongly consider givign it INFRA.
+- Animal mobs usually need a BUTCHER and SKIN interaction.
+
+Objects (OEDIT):
+- The most significant keyword should always be first. A fiery torch should put
+  "torch" first. Joe's amaazing magical wand should put "wand" first. The first
+  keyword may be used to build sentences such as "You attack with your wand."
+- Most equipment should be set SCALABLE, and there are very few acceptable
+  reasons not to do so. We prefer you rely on the scaling engine rather than
+  picking numbers for an object. See HELP ITEM SCALING.
+- If you don't set a min/max level on the object, it will inherit the min/max
+  from the adventure zone it spawns in. If it spawns outside an adventure zone,
+  you should strongly consider a min/max on the object.
+- Setting an item to ENCHANTED will make it scale higher, but players will not
+  be able to enchant it themselves.
+- Most equipment should be set bind-on-equip, included crafted items, so that
+  a player can't use them for a while and then re-sell them. Crafters will
+  prefer that each player has to buy a new item from, and it will also help to
+  encourage players to adventure for their own gear instead of getting hand-me-
+  downs from their alts.
+- Items from boss fights and most higher-end adventure items should be set
+  bind-on-pickup so that players must earn them for themselves. This is a
+  "should" rule rather than a "must" rule, but expect the head builder to
+  review your use of bind flags and ask you to justify them. You can also use
+  bind-on-pickup to encourage players to do adventures for themselves, even at
+  low levels.
+- Only reasonably small or simple weapons should have the HOLD wear flag (in
+  addition to WIELD). We don't let players wield two huge axes.
+- Even if a weapon normally takes two hands to wield, don't set the TWO-
+  HANDED flag unless you want it to be a big big weapon. This flag requires an
+  ability that is only available at level 100, to certain classes.
+- Storage is only used for resources and common items. Scalable and enchanted
+  items will never be storable in normal storage. You don't have to set any
+  storage locations for an item to be stored in "warehouse storage".
+- If an item is used as a building resource, you should give it custom messages
+  for build-to-char and build-to-room.
+- All lights must have a timer. If you want a player to activate a light before
+  it starts timing down, make an unlit version with a LIGHT interaction.
+
+Room Templates (REDIT):
+- Don't confuse room templates with the designated rooms that players can add
+  to their buildings; those are made in the building editor. Room templates are
+  only for adventure zones.
+- If your rooms are DARK (or OUTDOOR but not LIGHT), you should consider giving
+  your mobs INFRA.
+- You can use "random" direction exits to make an adventure's layout change
+  from instance to instance.
+- If your adventure is set on a ship, you can use the port/starboard/fore/aft
+  directions. Actually, you can use them even if it's not, but that might be
+  silly.
+- If you use the ROTATABLE flag on your adventure itself, the directions of
+  your exits can be rotated so the zone has the same shape, but a different
+  orientation in each instance. Random exits aren't really affected by this.
+  Ship directions like "starboard" are also not affected by this, as starboard
+  is the same direction no matter which way a ship faces.
+
+Sectors (SECTEDIT):
+- The IS-ADVENTURE, MAP-BUILDING, and INSIDE-ROOM flags are for very specific
+  special use, and shouldn't be used on new sectors. However, they won't really
+  do anything.
+- Please provide a useful list of commands for any new sector. For example, if
+  you add any DIG interaction, put "dig" on the commands list.
+
+Triggers and Scripts (TRIGEDIT):
+- Scripts must be formatted with /f -- this will also ensure your if/end and
+  while/done tags all match.
+- Each time you change a script's "types", it will reset its percent or other
+  type-specific fields. Those fields also won't appear until types are set.
+- If your script is confusing, please add comments to it (using *).
+- If a mob or room trigger uses scaled commands like %damage% or %aoe%, you
+  should ensure that it's used in an adventure zone with a LOCK-LEVEL flag,
+  otherwise the game may not be able to determine a scaled level. Objects that
+  were dropped as loot by mobs should also already have scaled levels. Mob
+  scripts also almost always have a valid scaled level, even if if not in a
+  level-locked adventure zone.
+- Adventure zone scripts that use %goto% (or any room-targeting commands) must
+  use room targets like i1234 to target by room template vnum instead of live
+  room vnum. This will cause it to go to the current instance's version of a
+  room template. It only works for room templates in the same adventure zone.
+- If a script loads an object or mob, and it's not in a level-locked adventure
+  zone, the script may also need to scale the obj's/mob's level itself.
+#d
+"OLC LEVELS" "OLC SCALING" "OLC SCALE"
+
+There are several ways you can set levels for things, and level will cascade
+from Adventure to Mob to Object.
+
+When the game scales an object, it checks the level limits on the object itself
+first. If either the min or max are 0, they will inherit the min or max from
+the adventure they are in.
+
+An object is scaled to the level of the mob who dropped it as loot, or who
+loaded it, so the object's level may also be limited by the mob's level if the
+object doesn't have its own level limits. Remember that mobs aren't usually
+scaled until combat begins, but they can be pre-scaled by the adventure flags
+LOCK-LEVEL-ON-ENTER or LOCK-LEVEL-ON-COMBAT if you need the mob scaled without
+combat.
+
+When a mob scales, it also first checks its own min/max scale levels, and if
+it doesn't have its own min or max, it will inherit one from the adventure it
+is in.
+
+See also: BUILDING GUIDE
+#d
+"ADVEDIT AUTHOR"
+
+Usage:  .author <name>
+
+This allows you to set the name of the author of the zone, which is used to
+give credit to the original builder.
+
+See also: OLC ADVENTURES
+#d
+"ADVEDIT DESCRIPTION"
+
+Usage:  .description
+
+The adventure description is shown to players who request information about the
+adventure.
+
+The description is set in the string editor. You should use /fi to format it
+with indent inside the string editor.
+
+See also: OLC ADVENTURES, STRING EDITOR
+#d
+"ADVEDIT ENDVNUM" "ADVEDIT END VNUM" "ADVEDIT STARTVNUM" "ADVEDIT START VNUM"
+
+Usage:  .startvnum <vnum>
+        .endvnum <vnum>
+
+The vnum range determines which room templates are loaded when the instance is
+instantiated. All rooms in the adventure must fall within this vnum range.
+
+Only high-level immortals can edit the vnums of an adventure. Lower-level imms
+may edit other properties of their own adventures.
+
+See also: OLC ADVENTURES
+#d
+"ADVEDIT FLAGS" "ADVENTURE FLAGS"
+
+Usage:  .flags [add | remove] <flags>
+
+The following adventure flags are available:
+ IN-DEVELOPMENT - The adventure will not be instantiated in the world.
+ LOCK-LEVEL-ON-ENTER - Instance level locks when a player enters.
+ LOCK-LEVEL-ON-COMBAT - Instance level locks when a player fights.
+ !NEARBY - Instances do not show up when players type nearby.
+ ROTATABLE - Each instance will have a random orientation (whole zone rotates).
+
+See also: OLC ADVENTURES
+#d
+"ADVEDIT LIMIT" "INSTANCE LIMIT"
+
+Usage:  .limit <number>
+
+This number controls how many copies of an adventure can exist in the world
+at a time.
+
+See also: OLC ADVENTURES
+#d
+"ADVEDIT BDG-EXISTING" "ADVEDIT LINK BDG-EXISTING" "ADVEDIT LINKING BDG-EXISTING"
+
+Usage:  .linking add BDG-EXISTING <building vnum> <dir> [flags]
+
+This adds an exit, in the direction of your choice (or "random"), to an exist-
+ing building in the world. If you don't set the CLAIMED-OK flag, it will only
+target unclaimed buildings, which may be rarer depending on player behavior.
+
+CAUTION: this will NOT work well with "open"-style buildings, such as
+fountains, because they can't have normal exits. If you want to connect an
+adventure to an open building, use PORTAL-BDG-EXISTING instead.
+
+See also: ADVEDIT LINKING, VNUM
+#d
+"ADVEDIT BDG-NEW" "ADVEDIT LINK BDG-NEW" "ADVEDIT LINKING BDG-NEW"
+
+Usage:  .linking add BDG-NEW <building vnum> <dir> "<build on>" ["build facing"] [flags]
+
+This will construct a new building somewhere in the world. The direction you
+specify will be the direction of the exit from the building into the adventure
+zone. The building may face a random direction.
+
+You must specify flags for what type of terrain it can be built upon. In most
+cases, you must also specify the type(s) of terrain it must be built facing.
+Both of these are the same as the "buildon" and "buildfacing" flags from the
+craft and sector editors; see &yHELP SECTEDIT BUILDFLAGS&0.
+
+CAUTION: this will NOT work well with "open"-style buildings, such as
+fountains, because they can't have normal exits. If you want to connect an
+adventure to an open building, use PORTAL-BDG-NEW instead.
+
+CAUTION: You must not use designated rooms (or any "building" with the ROOM
+flag) for this, because they can't be built on the map.
+
+See also: ADVEDIT LINKING, SECTEDIT BUILDFLAGS, VNUM
+#d
+"ADVEDIT PORTAL-WORLD" "ADVEDIT LINK PORTAL-WORLD" "ADVEDIT LINKING PORTAL-WORLD"
+
+Usage:  .linking add PORTAL-WORLD <sector vnum> <portal-in vnum> <portal-out vnum> [flags]
+
+This will spawn a portal somewhere in the world, matching the sector of your
+choice. You must provide portal object vnums for the in- and out-portals, but
+it is okay if both are the same.
+
+Remember that the portals don't have to be called portals. You could use "a
+strange door in the side of the tree", and the messages would look correct
+when players type "enter door" or "enter tree".
+
+CAUTION: if you choose a sector like "Building", the portal will be able to
+spawn in any building. You should NEVER use the "Adventure Room" sector, as
+spawning an adventure inside of random adventures will have strange side-
+effects, such as trapping players in the 2nd adventure.
+
+See also: ADVEDIT LINKING, VNUM
+#d
+"ADVEDIT PORTAL-BDG-EXISTING" "ADVEDIT LINK PORTAL-BDG-EXISTING" "ADVEDIT LINKING PORTAL-BDG-EXISTING"
+
+Usage:  .linking add PORTAL-BDG-EXISTING <building vnum> <portal-in vnum> <portal-out vnum> [flags]
+
+This will spawn a portal in a random building (or designated room) matching the
+vnum you set here. You must provide portal object vnums for the in- and out-
+portals, but it is okay if both are the same.
+
+Remember that the portals don't have to be called portals. You could use "a
+trapdoor in the floor", and the messages would look correct when players type
+"enter trapdoor".
+
+See also: ADVEDIT LINKING, VNUM
+#d
+"ADVEDIT PORTAL-BDG-NEW" "ADVEDIT LINK PORTAL-BDG-NEW" "ADVEDIT LINKING PORTAL-BDG-NEW"
+
+Usage:  .linking add PORTAL-BDG-NEW <building vnum> <portal-in vnum> <portal-out vnum> "<build on>" "[build facing]" [flags]
+
+This will first create a building on the map, and then spawn a portal inside
+it. You must provide portal object vnums for the in- and out-portals, but it
+is okay if both are the same.
+
+You must specify flags for what type of terrain it can be built upon. In most
+cases, you must also specify the type(s) of terrain it must be built facing.
+Both of these are the same as the "buildon" and "buildfacing" flags from the
+craft and sector editors; see &yHELP SECTEDIT BUILDFLAGS&0.
+
+Remember that the portals don't have to be called portals. You could use "a
+trapdoor in the floor", and the messages would look correct when players type
+"enter trapdoor".
+
+CAUTION: You must not use designated rooms (or any "building" with the ROOM
+flag) for this, because they can't be built on the map.
+
+See also: ADVEDIT LINKING, SECTEDIT BUILDFLAGS, VNUM
+#d
+"ADVEDIT TIME-LIMIT" "ADVEDIT LINK TIME-LIMIT" "ADVEDIT LINKING TIME-LIMIT"
+
+Usage:  .linking add TIME-LIMIT <minutes> [flags]
+
+This linking option allows you to force the adventure to de-spawn after a
+certain amount of time. You can also despawn an adventure early using the
+%adventurecomplete% command in a script.
+
+Adventures will never de-spawn while players are still inside.
+
+Adventures should ALMOST ALWAYS have this option set. If they can spawn on
+claimed land, it is required, in order to ensure the adventure eventually
+de-spawns.
+
+See also: ADVEDIT LINKING, %ADVENTURECOMPLETE%
+#d
+"ADVEDIT LINKING" "ADVEDIT LINK RULE" "LINKING RULES" "LINK RULES"
+
+Linking rules help the game engine determine where to link instances of an
+adventure. You can add as many linking rules as you like; it will spawn
+instances in any place that matches any rule.
+
+See specific help files for each type: &yHELP ADVEDIT <TYPE>&0
+ BDG-EXISTING: Link from an existing building or interior room.
+ BDG-NEW: Builds the building on the map and links from it (no interior rooms).
+ PORTAL-WORLD: Portal appears in a matching sector.
+ PORTAL-BDG-EXISTING: Portal appears in an existing building or interior room.
+ PORTAL-BDG-NEW: Builds the building on the map and puts a portal in it (no
+    interior rooms).
+ TIME-LIMIT: Removes instances after a certain number of minutes expire.
+
+Available flags:
+ CLAIMED-OK - Can link to claimed locations (default: unclaimed only).
+ CITY-ONLY - Only links to claimed tiles in cities.
+ !CITY - Will not link to claimed tiles in cities.
+
+Portals require a portal object for both the entrance and exit (they may be
+the same object). Existing buildings may also be interior rooms, but new
+building rules require a normal map building (one without the ROOM flag).
+
+For types requiring build-on or build-facing, you should include the set of
+build flags in quotes ("plains forest") if you use more than one. For the full
+list of build flags, see HELP SECTEDIT BUILDFLAGS.
+
+See also: OLC ADVENTURES, SECTEDIT BUILDFLAGS, VNUM
+#d
+"ADVEDIT MAXLEVEL" "ADVEDIT MAX LEVEL" "ADVEDIT MINLEVEL" "ADVEDIT MIN LEVEL"
+
+Usage:  .maxlevel <number>
+        .minlevel <number>
+
+These settings control the minimum and maximum levels for an adventure zone.
+These are set in terms of players' composite level (the level number given by
+their skills and gear).
+
+The OLC LEVELS help file has additional notes on how to choose levels.
+
+See also: OLC ADVENTURES, OLC LEVELS
+#d
+"ADVEDIT NAME"
+
+Usage:  .name <name>
+
+This lets you set the name of the adventure. The names should be reasonably
+short (less than 1 line) and concise. Usually, these are written in title case
+(the first letter of each word is uppercase).
+
+Example names:
+ > Magiterranean: The Grove
+ > Ruins: Bandit Camp
+
+See also: OLC ADVENTURES
+#d
+"ADVEDIT PLAYERLIMIT" "ADVEDIT PLAYER LIMIT"
+
+Usage:  .playerlimit <number>
+
+This allows you to restrict the number of players who may be inside an
+adventure at one time.
+
+Setting it to 0 means no-limit. The maximum group size is 4, so that is a safe
+limit on most adventures.
+
+See also: OLC ADVENTURES
+#d
+"ADVEDIT RESET" "ADVEDIT RESET TIME" "ADVEDIT RESETTIME"
+
+Usage:  .reset <minutes>
+
+This sets the time between adventure zone resets. Each time the zone resets,
+it may spawn more mobs and objects.
+
+You may set a reset time of 0 if the adventure should never reset once it has
+been instantiated.
+
+See also: OLC ADVENTURES
+#d
+"AFFECT FLAGS"
+
+The following affect flags are available:
+ BLIND - Unable to see.
+ MAJESTY - Hard to attack.
+ INFRA - Can see in the dark (glowing red eyes).
+ SNEAK - Cannot be seen while moving.
+ HIDE - Cannot be seen in room (without search).
+ CHARM - NPC will take orders from its master -- do not use this on items.
+ INVIS - Can't be seen, except by magic.
+ !BATTLE - Immune to the Battle debuffs.
+ SENSE-HIDE - Can see hidden people.
+ !PHYSICAL - Immune to physical damage -- do not use this on items.
+ !TARGET - Cannot be targeted in the room -- do not use this on items.
+ !SEE - Cannot be seen in the room at all -- do not use this on items.
+ FLY - Is flying.
+ !ATTACK - Cannot be attacked -- do not use this on items.
+ !HIGH-SORCERY - Immune to High Sorcery debuffs.
+ DISARM - Has lost their weapon -- do not use this on items.
+ HASTE - Has the effect of the Hasten ability.
+ ENTANGLED - Cannot move -- do not use this on items.
+ SLOW - Combat speed reduced, like the Slow spell.
+ STUNNED - Can't participate in combat or move -- do not use this on items.
+ STONED - Sees the world in stange, trippy colors.
+ !BLOOD - Cannot spend blood points.
+ CLAWS - Boosted vampire claws as barehand melee attack.
+ DEATHSHROUD - Appears as a corpse and cannot act -- do not use this on items.
+ EARTHMELD - Submerged in the earth and can't take normal actions -- do not use this on items.
+ MUMMIFY - Immune to attack and cannot act -- do not use this on items.
+ SOULMASK - Immune to soulsight.
+ !NATURAL-MAGIC - Immune to the Natural Magic debuffs.
+ !STEALTH - Immune to the Stealth debuffs.
+ !VAMPIRE - Immune to Vampire debuffs.
+ !STUN - Immune to stun effects.
+#d
+"BEDIT AFFECTS" "REDIT AFFECTS"
+
+Usage:  .affects [add | remove] <flags>
+
+Each building (or room template) type may have a default set of room affect
+flags. These are added to the building tile when built, or are present on a
+room that is instantiated from a room template.
+
+Available affects (do not set affects with *):
+ DARK - magically dark and the map tile shows as blank
+ SILENT - magically quiet
+ CHAMELEON - at distance, appears as the tile it was built upon
+ !EVOLVE - will not grow trees or process other evolutions
+ !FLY - flying characters cannot enter, like an enchanted wall
+ !DISREPAIR - never falls into disrepair (caution: this prevents empire decay)
+
+See also: OLC BUILDINGS, OLC ROOM TEMPLATES
+#d
+"BEDIT ARTISAN"
+
+Usage:  .artisan <mob vnum>
+        .artisan none
+
+Some buildings may have artisan mobs set. These mobs will always spawn in the
+building if the building is owned by an empire and has been populated. Only
+one artisan will ever spawn per building.
+
+This artisan is marked as an EMPIRE mob and you may use the following name
+tokens on the mob itself, if it is only loaded as an artisan:
+ #n - randomly chosen first name
+ #e - name of the empire it belongs to
+ #a - the adjective form of its empire's name
+
+You can use the "none" argument to this command in order to remove the artisan.
+
+See also: OLC BUILDINGS, MEDIT NAMESET, VNUM
+#d
+"BEDIT CITIZENS"
+
+Usage:  .citizens <number>
+
+This sets how many citizens will move into the base room of the building. It
+does not affect any designated/extra rooms. Once populated, these citizens
+spawn in the building tile when players are nearby. They can also perform
+Workforce chores near their home building.
+
+You cannot control which citizen mobs actually spawn, only how many may live
+here total. If the building supports extra rooms, more citizens can be added
+in bedrooms.
+
+NOTE: Any building that allows at least 1 citizen may also be set as a player's
+private home.
+
+See also: BEDIT EXTRA ROOMS, HOME, OLC BUILDINGS, WORKFORCE
+#d
+"BEDIT COMMANDS"
+
+Usage:  .commands <list>
+        .commands none
+
+Buildings that allow specific commands should list those commands to help
+players. If you set a commands list, it will appear below the room description
+(for closed buildings) or below the map (for open buildings).
+
+If this is a storage building, you should always include inventory, retrieve,
+and store. If you set the DRINK flag, you should add drink and fill. Consider
+all the special tasks a player might perform here.
+
+We generally keep the commands list in alphabetic order with commas between
+the commands, and do not put the word "and" before the last entry.
+
+Example:
+ > .commands chop, dig, gather, pick
+
+See also: BEDIT FLAGS, OLC BUILDINGS
+#d
+"BEDIT DESCRIPTION"
+
+Usage:  .description
+
+All buildings need a good description (except ones flagged OPEN). The
+description should be at least 3 full lines, and should always be formatted
+with the /fi option in the string editor. Generally descriptions should not
+run more than about 6 lines.
+
+The room description is shown when the building is complete (or, it is always
+shown if the building is flagged CLOSED). 
+
+See also: BEDIT FLAGS, OLC BUILDINGS, STRING EDITOR
+#d
+"BEDIT DESIGNATE"
+
+Usage:  .designate [add | remove] <flags>
+
+Designate flags control what types of rooms may be added to a building. This
+only matters if the "extra rooms" property is set greater than 0.
+
+Rooms can be designated in buildings that have a matching designate flag with
+the room. Rooms with no designate flags can't be designated at all (these may
+be used for other internal functions).
+
+Available designate flags:
+ CRYPT - can designate the crypt
+ VAULT - may designate a vault
+ FORGE - may designate a forge
+ TUNNEL - may designate the tunnel room (for underground/mountain houses)
+ HALL - may designate hallways
+ SKYBRIDGE - may designate the skybridge room (for treehouses)
+ THRONE - may designate a throne room
+ ARMORY - not currently used
+ GREAT-HALL - may designate great halls (for castles)
+ BATHS - may designate bath rooms
+ LABORATORY - may designate laboratories (for alchemy)
+ TOP-OF-TOWER - may designate the top-of-the-tower room (for the sorcery tower)
+ HOUSEHOLD - may designate bedroom, study, sitting room, closet, storage, etc
+ HAVEN - vampire havens
+
+See also: OLC BUILDINGS
+#d
+"BEDIT FAME"
+
+Usage:  .fame <amount>
+
+This number is added to an empire's fame for each instance of this building
+they own.
+
+You can set negative fame to penalize empires for certain buildings.
+
+Most buildings should have 0 fame, unless they are monuments.
+
+See also: OLC BUILDINGS
+#d
+"BEDIT FLAGS"
+
+Usage:  .flags [add | remove] <flags>
+
+When set on a building, these flags affect all interior rooms, too. When set
+on a designate-able room (a building where the ROOM flag is set), they only
+affect players in that room.
+
+Available flags:
+ ROOM - this is a room that can be added with the designate command if it has
+    matching designate flags with a building
+ ALLOW-MOUNTS - players can ride inside without dismounting
+ TWO-ENTRANCES - the building will have a rear entrance across from the main
+    entrance (does not apply to OPEN buildings)
+ OPEN - never takes the player off the map, shows no room description, and
+    cannot have interior rooms
+ CLOSED - always shows the room description and takes the player off the map,
+    even if the building is not complete
+ INTERLINK - can be interlinked with other nearby INTERLINK buildings
+ HERD - mobs can be herded into this building
+ DEDICATE - can be dedicated to a patron god or player, which adds "of Name"
+    to the room title
+ DRINK - has a water source, like a well or fountain
+ !NPC - mobs won't enter this building
+ BARRIER - can only go back the way you came, unless flying
+ TAVERN - functions as a tavern (don't set this on the same building as DRINK)
+ COUNTS-AS-CITY - always counts as in-city territory
+ MINE - can be mined for ore resources
+ ATTACH-ROAD - on the ascii map, roads attach to this tile like it's a road
+ BURNABLE - will catch fire if a fire is placed inside by a hostile empire
+ FORGE - can use the forge and reforge commands here
+ COOKING-FIRE - can cook, brew, and other tasks that require a fire
+ ALCHEMIST - can brew and mix here
+ STABLE - can shear, milk, and barde animals here; animals in this building don't despawn
+ LIBRARY - can write and store books here
+ APIARY - grants the Apiaries tech to the empire
+ GLASSBLOWER - grants the Glassblowing tech to the empire
+ DOCKS - grants the seaport tech to the empire; counts as a dock for ships
+ PIGEON-POST - players can send mail here
+ MILL - can use the mill command here
+ POTTER - pottery craft time is reduced here
+ TAILOR - counts as tailor; can use refashion here
+ BATHS - can use the bathe command here
+ SAIL - can enter this building with a boat
+ TOMB - players can re-spawn here after dying
+ MINT-COINS - functions as a mint
+ VAULT - stores coins, can use the warehouse command for privileged storage
+ ITEM-LIMIT - only a certain number of items can be dropped here
+ LONG-AUTOSTORE - autostore takes 72 hours instead of 3 here
+ WAREHOUSE - can use the warehouse command and store unique items
+ TRADE - access to global trade, e.g. a trading post
+ HIGH-DEPLETION - has more resources than a normal tile
+ PORTAL - functions as a portal building
+ BEDROOM - boosts regen while sleeping
+
+* Note: If you change the COUNTS-AS-CITY flag on existing buildings, territory
+        counts will not update right away. Any empire can force a re-count
+        by claiming or abandoning any tile.
+
+See also: INTERLINK, OLC BUILDINGS
+#d
+"BEDIT HITPOINTS"
+
+Usage:  .hitpoints <value>
+
+This number is how much damage a building can take from a catapult or siege
+ritual before it is destroyed.
+
+Catapults deal 8 damage per shot. Siege rituals deal Intelligence + 1 damage.
+
+See also: CATAPULT, OLC BUILDINGS, SIEGE RITUAL
+#d
+"BEDIT ICON"
+
+Usage:  .icon <icon>
+
+The icon is how a building appears on the world map. It must always be exactly
+4 characters long, not counting any color codes.
+
+Buildings usually use icons like: [  ], (  ), {  }
+Usually the symbols inside the parentheses or braces are a pair of letters that
+loosely indicate what building it is, but you should try not to duplicate
+existing buildings.
+
+If you don't start with a color code, the building will have a color based on
+the tile it was built upon (and the season). In addition to normal color codes, 
+you can use &&? to represent the base tile's color if you need to use it later
+in the color code. If you want to use the && symbol in the icon, you must
+double it (&&&&).
+
+There is no need to put a &&0 at the end of the icon.
+
+See additional info at HELP SPECIAL ICONS.
+
+Examples:
+ > .icon &&0[--]
+ > .icon .&&0[]&&?.
+
+See also: COLOR, OLC BUILDINGS
+#d
+"BEDIT MILITARY"
+
+Usage:  .military <number>
+
+This property adds to the military total of the empire that owns it. However,
+the military value of an empire is not used for anything at the moment.
+
+See also:  OLC BUILDINGS
+#d
+"BEDIT NAME"
+
+Usage:  .name <name>
+
+The 'name' property is used by some commands like 'territory' and 'vnum' to
+search for buildings, so it shoudl be reasonably unique. It's also shown as
+the short form of a building in some sentences.
+
+You should choose a name that's as short as possible. For example, if your
+room title is "A Foul-Smelling Outhouse", the name should be "Outhouse".
+
+See also: BEDIT TITLE, OLC BUILDINGS, TERRITORY, VNUM
+#d
+"BEDIT ROOMS" "BEDIT ROOMS"
+
+Usage:  .rooms <number>
+
+If this number is greater than 0, players may use the 'designate' command to
+add additional rooms to the building, with options based on what you set with
+the '.designate' olc option.
+
+NOTE: If players add bedrooms to a building, it will spawn additional citizens.
+
+See also: BEDIT DESIGNATE, OLC BUILDINGS
+#d
+"BEDIT SPAWNS" "CROPEDIT SPAWNS" "SECTEDIT SPAWNS"
+
+Usage:  .spawns add <mob vnum> <percent> [flags]
+        .spawns copy <from type> <from vnum>
+        .spawns remove <number | all>
+        .spawns list
+
+This lets you control how mobs spawn in a given location. Mobs only spawn if
+there aren't too many other mobs present, and only if they meet the percent
+and flag requirements of their spawn info.
+
+You can set any percent between .01 and 100. This is the chance the mob will
+be loaded each time the room is checked for spawns, which is usually every few
+minutes while players are nearby. Any mob spawned this way will gain the
+SPAWNED mob flag and will despawn if no players are nearby.
+
+Setting two flags which are mutually exclusive (e.g. NORTHERN and SOUTHERN)
+will result in the mob never spawning. The flags indicate the mob will spawn
+ONLY if the condition is met.
+
+Available spawn flags:
+ NOCTURNAL - only spawns at night
+ DIURNAL - only spawns during the day
+ CLAIMED - only spawns if the room/tile is claimed
+ UNCLAIMED - only spawns if the room/tile is NOT claimed
+ CITY - only spawns if the tile is in-city (and claimed)
+ OUT-OF-CITY - only spawns if the tile is not in a city, or is unclaimed
+ NORTHERN - only spawns in the northern half of the map
+ SOUTHERN - only spawns in the southern half of the map
+ EASTERN - only spawns in the eastern half of the map
+ WESTERN - only spawns in the western half of the map
+
+Example:
+ > .spawns add 12499 3 NOCTURNAL UNCLAIMED
+
+See also: OLC BUILDINGS, OLC CROPS, OLC SECTORS, VNUM
+#d
+"BEDIT TITLE"
+
+Usage:  .title <title>
+
+This sets the room title for the building. It is shown above the room
+description or map. The room's title will be colored based on the empire that
+owns it, so it's important not to put color codes in the title.
+
+Room titles are usually short, descriptive phrases, with title-case lettering
+(Title Case Capitalizes Most Words). They should usually start with "A", "An",
+or "The".
+
+Examples:
+ The Greatest Building You Never Heard Of
+ A Strange House
+ The Eye of the World
+
+See also: OLC BUILDINGS
+#d
+"BEDIT UGPRADESTO" "BEDIT UPGRADES TO"
+
+Usage:  .upgradesto <building vnum>
+        .upgradesto none
+
+Some buildings can be upgraded into other buildings. You specify which building
+this one can upgrade to here. You must specify a valid building vnum.
+
+In order for the 'upgrade' command to actually work, you must also use the
+craft recipe editor to create a new building recipe for the upgraded building,
+and mark it as UPGRADE. This building will only need a regular craft recipe,
+and only if it's buildable.
+
+See also: OLC BUILDINGS, UPGRADE, VNUM	
+#d
+"CEDIT ABILITY"
+
+Usage:  .ability <ability name | none>
+
+You can use this command to set which ability is required to use a particular
+craft recipe. If you don't want it to require an ability any more, use 'none'.
+
+See also: OLC CRAFTS
+#d
+"CEDIT BUILDFACING" "CEDIT BUILD FACING"
+
+Usage:  .buildfacing [add | remove] <flags>
+        .buildfacing generic
+
+This command sets the rules for the tile a building must face. If the building
+is an "open" building (one that doesn't take players off the map), it doesn't
+require a buildfacing at all. However, if an "open" building has a buildfacing,
+the game engine will still require a facing direction when it is built. This
+allows you to require that quarries are built next to mountains, for example.
+
+You can also set ".buildfacing generic", which sets a pre-defined list of
+buildfacing flags that many buildings are allowed to face.
+
+The following flags are available:
+ water - any ocean or river tile
+ plains - a plains or a road that was built on plains
+ mountain - a mountain or mountain path
+ forest - an overgrown forest (^^^^)
+ desert - a desert or a road that was built on desert
+ river - a river tile
+ jungle - any jungle tile
+ * - UNUSED
+ ocean - an ocean tile
+ oasis - an oasis tile
+ crops - any crop or seeded tile
+ grove - a desert grove tile
+ swamp - a swamp tile
+ any forest - any level of forest tile, from light forest to overgrown
+ open building - a building that doesn't block the map
+
+See also: OLC CRAFTS
+#d
+"CEDIT BUILDING"
+
+Usage:  .building <type>
+
+This lets you set the actual building or other construction type that the
+recipe will build. The list varies depending on the .buildtype you chose.
+
+See also: CEDIT BUILDTYPE, OLC CRAFTS
+#d
+"CEDIT BUILDON" "CEDIT BUILD ON"
+
+Usage:  .buildon [add | remove] <flags>
+
+This sets the types of terrain that a building craft may be built upon. You
+must set at least one flag.
+
+The following flags are available:
+ water - any ocean or river tile
+ plains - a plains or a road that was built on plains
+ mountain - a mountain or mountain path
+ forest - an overgrown forest (^^^^)
+ desert - a desert or a road that was built on desert
+ river - a river tile
+ jungle - any jungle tile
+ * - UNUSED
+ ocean - an ocean tile
+ oasis - an oasis tile
+ crops - *** do not use for buildon
+ grove - a desert grove tile
+ swamp - a swamp tile
+ any forest - *** do not use for buildon
+ open building - *** do not use for buildon
+
+See also: CEDIT BUILDFACING, OLC CRAFTS
+#d
+"CEDIT BUILDTYPE" "CEDIT BUILD TYPE"
+
+Usage:  .buildtype <type>
+
+Building craft recipes can be one of three types, and these types will
+determine which .building set you can choose from.
+
+Available buildtypes:
+ BUILDING - a normal building
+ ROAD - a road, bridge, mountain path, etc.
+ BARRIER - a fence or wall
+
+See also: CEDIT BUILDING, OLC CRAFTS
+#d
+"CEDIT CREATES"
+
+Usage:  .creates <object vnum>
+
+This options sets which object is created by the recipe. This only applies to
+recipes which are not soup.
+
+See also: CEDIT QUANTITY, OLC CRAFTS, VNUM
+#d
+"CEDIT FLAGS"
+
+Usage:  .flags [add | remove] <flags>
+
+Flags let you specify certain properties about the craft recipe, like where it
+must be performed.
+
+You must leave the IN-DEVELOPMENT flag set until the recipe is ready to go
+live, at which point it becomes available to players who have the right skill.
+
+Available flags:
+ POTTERY - always requires cooking fire, goes faster at potter's hut
+ APIARIES-TECH - requires being inside an empire with Apiaries tech
+ GLASS-TECH - requires being inside an empire with Glassblowing tech
+ GLASSBLOWER - requires being at an actual glassblower building
+ CARPENTER - requires being at a carpenter building
+ ALCHEMY - requires cooking fire and glassblowing tech, or alchemist/laboratory
+ SHARP-TOOL - requires a sharp tool in the wield slot
+ FIRE - requires cooking fire
+ SOUP - requires a container of water and creates a liquid instead of an item
+ IN-DEVELOPMENT - only immortals can use this recipe
+ UPGRADE - for building recipes only, marks this recipe as the cost to upgrade
+    to this building type from some other type
+ DISMANTLE-ONLY - for building recipes only, this recipe allows the building
+    to be dismantled, but not built; it won't show up in the build list
+ IN-CITY-ONLY - a craft or building can only be made in a city radius
+
+See also: CEDIT TYPE, OLC CRAFTS
+#d
+"CEDIT LIQUID"
+
+Usage:  .liquid <type>
+
+For soups, the recipe requires a drink container of water and fills that with
+a liquid type, rather than creating a new object. This command determines the
+liquid type.
+
+See also: CEDIT FLAGS, OLC CRAFTS
+#d
+"CEDIT NAME"
+
+Usage:  .name <name>
+
+This sets the name of the craft recipe. The name used when the player chooses
+which recipe to craft, e.g. "craft hammock".
+
+Names should be as short as possible, while still being distinct from other
+existing craft recipes.
+
+See also: OLC CRAFTS
+#d
+"CEDIT QUANTITY"
+
+Usage:  .quantity <number>
+
+Craft recipes can be set to create more than one of an item by raising the
+quantity.
+
+See also: CEDIT CREATES, OLC CRAFTS
+#d
+"CEDIT REQUIRESOBJECT" "CEDIT REQUIRES OBJECT"
+
+Usage:  .requiresobject <vnum>
+
+Some craft recipes may require a specific object. If the user doesn't have
+the object, the recipe won't show up in the list at all. This essentially
+associates the recipe to the object.
+
+Pro tip: Combine requiresobject with no-ability to create a building like a
+tent, which can be built as long as you have one in your inventory.
+
+For non-building crafts, the object is not consumed unless it's also on the
+list of required resources.
+
+Don't use SCALABLE items as a required object if it will be consumed, because
+it won't be scaled back to the same level if it's refunded.
+
+See also: OLC CRAFTS, VNUM
+#d
+"CEDIT RESOURCE"
+
+Usage:  .resource add <amount> <vnum>
+        .resource remove <number | all>
+        .resource move <number> <up | down>
+
+This command sets the resources required to make the recipe.
+
+Building recipes will require the resources in the order given here; crafting
+recipes will use all resources at once. Dismantled buildings also return half
+of the used resources, rounded down.
+
+Don't use SCALABLE items as a resource, because it won't be scaled back to
+the same level if it's refunded.
+
+See also: OLC CRAFTS, VNUM
+#d
+"CEDIT TIME"
+
+Usage:  .time <ticks>
+
+This sets the time (in action ticks) that it takes to create the recipe. One
+action tick is 5 real seconds. In some cases, the time is reduced by meeting
+certain requirements.
+
+For crafts with the POTTERY flag, they take 1/4 the time if crafted at a
+potter's hut.
+
+All crafting times are cut in half for players with the matching mastery
+ability.
+
+All crafting times are cut in half if they require a hammer or sharp tool,
+and that tool is marked (superior).
+
+See also: CEDIT FLAGS, CEDIT MASTERY, CEDIT TYPE, OLC CRAFTS
+#d
+"CEDIT TYPE"
+
+Usage:  .type <type>
+
+The type determines which command is used to craft the item, but not which
+ability. Some types also have built-in rules.
+
+Available types are:
+ FORGE - requires a hammer and a forge building
+ CRAFT
+ COOK
+ SEW
+ MILL - requires mill building, quantity doubled by Master Farmer ability
+ BREW - potions
+ MIX - poisons
+
+See also: CEDIT ABILITY, OLC CRAFTS
+#d
+"CEDIT VOLUME"
+
+Usage:  .volume <drinks>
+
+For soups, this determines the maximum number of drinks created by the recipe.
+It will always be limited by the size of the drink container the player uses
+to cook the soup in.
+
+See also: CEDIT FLAGS, OLC CRAFTS
+#d
+"CROPEDIT CLIMATE" "SECTEDIT CLIMATE"
+
+Usage:  .climate <type>
+
+Each crop and sector has a climate, and these must match for the crop to be
+planted on the sector. Climate also affects certain abilities, such as morphs.
+Terrains like generic rivers and mountains may have no climate at all. However,
+every crop must be associated with a climate.
+
+See also: OLC CROPS, OLC SECTORS
+#d
+"CROPEDIT FLAGS" "CROP FLAGS"
+
+Usage:  .flags [add | remove] <flags>
+
+Crop flags determine some various properties about crops.
+
+Available flags:
+ REQUIRES-WATER - Can only be planted within 4 tiles of fresh water
+ ORCHARD - Uses 'pick' instead of 'harvest', shows the orchard commands list, can be chopped down
+
+See also: OLC CROPS
+#d
+"CROPEDIT MAPOUT COLOR" "SECTEDIT MAPOUT COLOR" "MAPOUT COLOR" "MAP OUT COLOR"
+
+Usage:  .mapout <color>
+
+This determines what color pixel the sector or crop has on the graphical map.
+
+See also: OLC CROPS, OLC SECTORS
+#d
+"CROPEDIT NAME"
+
+Usage:  .name <name>
+
+A crop's name is a short name, always plural and lower-case, that describes
+the crop. It is frequently used to build sentences such as "You start planting
+<name> here."
+
+The editor will force the first character of the name to be lower-case.
+
+Examples:
+ "apples"
+ "olives"
+ "gourds"
+
+See also: OLC CROPS
+#d
+"CROPEDIT TITLE"
+
+Usage:  .title <title>
+
+This is the room title for rooms of this crop type. As with all room titles,
+it should be title-cased (Each Word Capitalized), should usually start with
+an article like "a" or "an", and should not include any punctuation.
+
+Examples:
+ "An Apple Orchard"
+ "A Field of Cotton"
+ "A Vast Cornfield"
+
+See also: OLC CROPS
+#d
+"CROPEDIT XMIN" "CROPEDIT XMAX" "CROPEDIT YMIN" "CROPEDIT YMAX"
+
+Usage:  .xmin <percent>
+        .xmax <percent>
+        .ymin <percent>
+        .ymax <percent>
+
+These four settings help the MUD determine where a crop can spawn. It spawns
+if its x-coordinate is <= xmax or >= xmin, and y-coordinate is <= ymax or >=
+ymin.
+
+If the 'min' is less than the 'max', this specifies the area between the two.
+If the 'max' is less than the 'min', it instead covers both edges of the map,
+but NOT the area between the two.
+
+These numbers range from 0-100 because they are percentages of the current map
+width, not absolute values.
+
+You should always make sure you have crops set to cover all parts of the map,
+so that the crop-spawning systems can pick a valid crop for any region. It
+usually helps to draw yourself a diagram on paper of the regions of the map
+covered by the crops.
+
+See also: OLC CROPS
+#d
+"ITEM SCALING" "OBJ SCALING" "OBJECT SCALING" SCALABLE "SCALABLE FLAG" "SCALING ITEM"
+
+Items can be set to scale to different levels. You can set various traits on
+the item, and their relative strengths, but the actual strength levels are set
+by the game engine.
+
+To make a scalable item, set:
+ - the SCALABLE flag
+ - the minlevel property (optional)
+ - the maxlevel property (optional)
+ - the SUPERIOR, ENCHANTED, or JUNK flags (optional, each changes the scaling)
+ - values and applies (see below)
+
+When you set applies, instead of setting the level you want them at, set a
+number that indicates relative power. For example, if you want all applies to
+be the same, set them all to 1. If you have three applies and want one to be
+stronger than the other two, set them 2, 1, 1. The game engine will choose
+the final numbers for these.
+
+You can also set applies to be negative, to give a penalty to that trait and
+get bonus points for the item's positive traits. Negatives should be set based
+on how negative you want them to be, NOT relative to the positive applies. The
+final number for these will still be chosen by the game engine. -1 is a small
+penalty, -3 is a larger one.
+
+Some item types have values that are also set by the game engine. For these,
+you should assign a positive number that's relative to the numbers you set
+for applies (see above). For example, setting a weapon's damage to 1 gives it
+the same weight as an apply of 1. If your item ONLY has one property to set
+(e.g. drink container, which has no applies), you should just set its value to
+1 because the actual number doesn't matter, so long as it's greater than 0.
+
+Scaling based on item types:
+ weapon - the "damage" value
+ drink container - the "capacity" value
+ food - the "fullness" value
+ coins - the "coinamount" value
+ missile weapons - the "damage" value
+ arrow - the "damage" value
+ pack - the "capacity" value
+ potion - the "potionscale" value
+
+Applies and item values of 0 are ignored and do not get any points assigned.
+
+See also: OLC LEVELS
+#d
+"MAP OLC" "OLC MAP" "WORLD OLC" "MAP EDITOR" MAPEDIT
+
+Usage: .map <command>
+
+The .olc map editor is a tool for modifying and customizing individual parts
+of the map. Unlike the other editors, it doesn't use contextual menus. The
+map editor commands make instant changes to the map where you're standing.
+
+You can get help on any of the mapeditor commands with &yHELP MAPEDIT <COMMAND>&0.
+The following commands are available:
+ complete - Finishes the building you're standing in.
+ decustomize - Removes custom icon, name, and description.
+ deleteexit - Removes an exit (careful about cutting off building interiors).
+ deleteroom - Deletes the room you're standing in (interior rooms only).
+ description - Customize the description on an interior room.
+ exit - Add a new exit between two interior rooms (similar to interlink).
+ icon - Customize the map icon.
+ name - Customize the room title.
+ passwalls - Able to move on the map unblocked by walls, interiors, etc.
+ roomtype - Change the type of an interior room.
+ terrain - Change the tile you're standing on.
+ unclaimable - Make a tile or square of tiles unclaimable (or not).
+
+For notes on the mud's building rules, see HELP BUILDING GUIDE.
+
+See also: OLC
+#d
+"MAPEDIT COMPLETE"
+
+Usage:  .map complete
+
+This command finishes an unfinished building or room, if you're standing in
+one. This is the easiest way for an immortal to build a building.
+
+Example:
+ > .map terrain plains
+ > build largehouse north
+ > .map complete
+
+See also: MAP OLC
+#d
+"MAPEDIT DECUSTOMIZE"
+
+Usage:  .map decustomize
+
+This command removes any custom name, icon, and description from a map tile
+or room.
+
+See also: MAP OLC
+#d
+"MAPEDIT DELETEEXIT" "MAPEDIT DELETE EXIT"
+
+Usage:  .map deleteexit <direction>
+
+This command removes an exit in one direction. It does not remove the other
+side's corresponding exit back, and it does not delete the room that was
+linked to that exit.
+
+You should be careful not to leave orphaned rooms or areas that players cannot
+get back out of.
+
+See also: MAPEDIT DELETE ROOM, MAP OLC
+#d
+"MAPEDIT DELETEROOM" "MAPEDIT DELETE ROOM"
+
+Usage:  .map deleteroom ok
+
+This commmand deletes the room you are standing in. It only works on interior
+(designated) rooms, and cannot be used out on the map. It will automatically
+delete any exits that link to the room you're in.
+
+Be careful about deleting rooms in the middle of buildings, as you may orphan
+part of the building and make it unreachable.
+
+See also: MAPEDIT DELETE EXIT, MAP OLC
+#d
+"MAPEDIT DESCRIPTION" "CUSTOM DESCRIPTION"
+
+Usage:  .map description set
+        .map description none
+
+This command allows you to set or remove a custom description on the room you
+are standing in. This generally only applies to interior (designated) rooms,
+but it can also be used to create custom roadsigns on roads (which show their
+custom description as a sign).
+
+See also: MAP OLC, ROADSIGN
+#d
+"MAPEDIT EXIT"
+
+Usage:  .map exit <direction> <vnum>
+        .map exit <direction> <new>
+
+This command allows you to add new exits or rooms to an existing map building.
+Unlike designate, adding new rooms this way is not limited by the size of the
+building.
+
+See also: MAP OLC
+#d
+"MAPEDIT ICON"
+
+Usage:  .map icon <icon>
+        .map icon none
+
+This command allows you to add or remove a custom icon for a map tile. Like
+all icons, it must be 4 characters wide (not counting color codes). Custom
+icons must always start with a color code (usually &&0).
+
+Remember that the map may be rotated for some players (especially new or drunk
+players), so using multiple icons to give the appearance of a larger structure
+on the map may not look correctly for all players.
+
+See also: MAP OLC
+#d
+"MAPEDIT NAME"
+
+Usage:  .map name <name>
+        .map name none
+
+This command allows you to set or remove a custom room title on the map or in
+designated rooms.
+
+Important notes:
+- Room titles are colored by the banner of the empire that owns them, so you
+  should avoid color codes in them.
+- Room titles are shown in some lists (e.g. the territory command), so they
+  should usually be short.
+- Custom room titles can help players distinguish between things like different
+  starting locations, if you name them well.
+
+See also: MAP OLC
+#d
+"MAPEDIT PASSWALLS"
+
+Usage:  .map passwalls
+
+This toggle allows an immortal to roam freely on the map without being blocked
+by terrain or buildings. When passwalls is active, the immortal cannot enter
+the interior (designated) rooms of a building; they will instead move to the
+next map tile in the direction that they were walking.
+
+See also: MAP OLC
+#d
+"MAPEDIT ROOMTYPE" "MAPEDIT ROOM TYPE"
+
+Usage:  .map roomtype <name>
+
+This command allows you to change the type of a designated interior room, to
+any available room type. Rooms are created with the building editor, and any
+building with the ROOM flag can be set this way.
+
+See also: MAP OLC, OLC BUILDINGS
+#d
+"MAPEDIT TERRAIN"
+
+Usage:  .map terrain <type>
+
+This command allows you to change the sector type (terrain) of a map tile.
+It can be used to clear space for building an immortal's home, or to remove
+a building on the map.
+
+Example:
+ > .map terrain Tower of Souls
+
+See also: MAP OLC, MAPEDIT UNCLAIMABLE
+#d
+"MAPEDIT UNCLAIMABLE"
+
+Usage:  .map unclaimable [size]
+
+This command allows you to toggle the unclaimable status of the map tile you
+are in, or of a larger area around it. The whole area is toggled on if the
+room you're standing in is toggled on, and vice versa.
+
+By tradition, EmpireMUD sets the area around starting locations as unclaimable
+so that nobody can build guard towers that threaten players on the start spot.
+
+Example:
+ > .map terrain Tower of Souls
+ > .map unclaimable 3
+
+See also: MAP OLC, MAPEDIT TERRAIN
+#d
+"MEDIT AFFECTS"
+
+Usage:  .affects [add | remove] <flags>
+
+This command adds, removes, or toggles a set of affect flags. These flags are
+always active on the mob, as if a spell had been cast on them.
+
+See also: AFFECT FLAGS, OLC MOBILES
+#d
+"MEDIT ATTACK"
+
+Usage:  .attack <type>
+
+This command sets the base attack type of the mobile. It will deal damage as
+if it was using a weapon of that type.
+
+For humans with no weapon, use #16 hit.
+
+For animals, use #10 bite, #11 claw, #12 kick, or #16 hit.
+
+See also: OLC MOBILES
+#d
+"MEDIT FLAGS"
+
+Usage:  .flags <type>
+
+This command toggles mob flags. These flags affect the default behavior. Note
+that you cannot remove flag #4 ISNPC -- this indicates the mob is an NPC.
+
+Never set a flag marked with an * (asterisk).
+
+Available mob flags:
+ BRING-A-FRIEND - Assists any non-charmed mob in combat.
+ SENTINEL - Stays in one room and never wanders.
+ AGGR - Aggressive; will attack players.
+ ISNPC - Is an NPC (this is always set).
+ MOUNTABLE - Can be ridden by players.
+ MILKABLE - Can be milked in a stable.
+ SCAVENGER - Eats corpses off the ground.
+ UNDEAD - Leaves no corpse when it dies.
+ TIED - Tied to a hitching post; will not wander unless untied; does not despawn.
+ ANIMAL - Counts as an animal for herding, tying, etc.
+ MOUNTAIN-WALK - Can cross mountain tiles.
+ AQUATIC - Can cross water tiles, but won't move on land.
+ *PLURAL - Uses the pronouns 'their', 'they', and 'them' in act messages.
+ * - DO NOT SET
+ SPAWNED - De-spawns after 5 minutes if no players are nearby.
+ CHAMPION - Will rescue its master in combat.
+ EMPIRE - Will not be saved through reboots.
+ FAMILIAR - Will not be saved through reboots; players may only have one familiar follower at a time.
+ PICKPOCKETED - Has already been pickpocketed; cannot be pickpocketed again.
+ CITYGUARD - Will assist allies from the same empire. This will only work if it is spawned by the empire system.
+ PURSUE - Will purse players who flee in combat.
+ HUMAN - Counts as a human for various commands.
+ VAMPIRE - Counts as a vampire for various commands.
+ CASTER - Has a mana pool; counts as a caster.
+ TANK - Has a larger health pool and better tank attributes.
+ DPS - Deals more damage and has better combat attributes.
+ HARD - More difficult than other mobs of the same level.
+ GROUP - Much more difficult, requires a group.
+ *EXTRACTED - Do not set.
+ !LOOT - Will not drop any loot.
+ !TELEPORT - Cannot teleport to this mob.
+
+See also: OLC MOBILES
+#d
+"MEDIT INTERACTION" "BEDIT INTERACTION" "OEDIT INTERACTION" "REDIT INTERACTION" "SECTEDIT INTERACTION" "CROPEDIT INTERACTION" INTERACTIONS
+
+Usage:  .interaction add <type> <quantity> <vnum> <percent> [exclusive]
+        .interaction copy <from type> <from vnum>
+        .interaction remove <number | all>
+        .interaction move <number> <up | down>
+
+This command adds or removes an interaction. These are objects or mobs that are
+generated by certain commands. Some are only used on mobs, while others are
+only used on rooms. You can copy interactions from other mobs, buildings,
+rooms, sectors, and crops -- this may save you time if many are the same.
+
+Mob interaction types:
+ BUTCHER - Items received when the Butcher ability is used.
+ SKIN - Items received via the skin command.
+ SHEAR - Items received when the shear command is used in a stable.
+ BARDE - Mob loaded when the Barde ability is used in a stable.
+ LOOT - Items dropped into the corpse when the mob is killed.
+ 
+Object interaction types:
+ LIGHT - Item something is converted into when lit on fire.
+
+Room interaction types:
+ DIG - Items received when using the dig action.
+ FORAGE - Items received when using the Forage ability.
+ FIND-HERB - Items found when picking, if the user has Find Herbs.
+ HARVEST - Items received when harvesting a crop, OR when picking in an ORCHARD crop.
+ GATHER - Items received from the gather action.
+ ENCOUNTER - Hostile mob loaded when a random encounter triggers.
+
+The percent may be anywhere from 0.01 to 100.00 and if the quantity is greater
+than 1, the percent is only checked once for the entire quantity. If you want
+each copy of an item to have its own percent roll, list them separately as
+quantity 1.
+
+The exclusive flag stops the list if that item passes its percentage test. If
+you don't set exclusive, each the system continues down the list for that
+interaction type and can spawn multiple items/mobs.
+
+You can use '.interact move' to rearrange entries. Interactions are always
+processed from top to bottom, so the exclusive flag prevents anything
+vertically lower in the list (higher number on the interaction display).
+
+Example of a rare result from barding (order matters here):
+ 1. BARDE: 1x an epic warhorse .50% (exclusive)
+ 2. BARDE: 1x a warhorse 100%
+
+Example of possible multiple results from shear:
+ 1. SHEAR: 1x some wool 100.00%
+ 2. SHEAR: 1x some wool 50.00%
+ 3. SHEAR: 1x some wool 5.00%
+
+See also: OLC BUILDINGS, OLC CROPS, OLC MOBILES, OLC SECTORS
+#d
+"MEDIT KEYWORDS"
+
+Usage:  .keywords <keywords>
+
+This command updates the keywords on a mob. The keywords are a list of single
+words that can be used to target the mob. It should include any words from the
+mob's short or long description that identify the mob.
+
+Example:
+ name: a fiery dragon
+ long description: A huge red dragon is flying overhead!
+ keywords: dragon fiery huge red
+
+See also: MEDIT SHORTDESCRIPTION, MEDIT LONGDESCRIPTION
+#d
+"MEDIT MAXLEVEL" "MEDIT MAX LEVEL"
+
+Usage:  .maxlevel <level>
+
+This command determines the maximum level a mobile will scale to. Players are
+rated from level 1 to 100 based on their skills, plus a number based on their
+gear. If you're unsure how to scale the mob, check the levels on some players.
+
+If you set the maxlevel to 0, there will be no maximum and the mob can scale
+to any level over the minimum.
+
+See also: MEDIT MINLEVEL, OLC MOBILES
+#d
+"MEDIT MINLEVEL" "MEDIT MIN LEVEL"
+
+Usage:  .minlevel <level>
+
+This command determines the minimum level a mobile will scale to. Players are
+rated from level 1 to 100 based on their skills, plus a number based on their
+gear. If you're unsure how to scale the mob, check the levels on some players.
+
+If you set the minlevel to 0, there will be no lower limit and mobs can scale
+to any level under the maximum.
+
+See also: MEDIT MAXLEVEL, OLC MOBILES
+#d
+"MEDIT MOVETYPE" "MEDIT MOVE TYPE"
+
+Usage:  .movetype <type>
+
+The move type determines what message is sent when the mob moves. Sometimes
+other types are substituted, for example a flying mob always says "flies" even
+if its move type is different.
+
+See also: OLC MOBILES
+#d
+"MEDIT NAMESET" "MEDIT NAME SET"
+
+Usage:  .nameset <set>
+
+Name sets are used for mobs that have #n in their strings. This feature allows
+a mob to appear to be unique by giving each copy of the mob a random name from
+the set. The various name sets contain different themed names.
+
+See also: OLC MOBILES, #n
+#d
+"MEDIT LONGDESCRIPTION" "MEDIT LONG DESCRIPTION"
+
+Usage:  .longdescription <string>
+
+The long description is the text you see when the mobile is in the room. Its
+name should appear somewhere near the beginning, and the rest should be a
+complete sentence indicating that the mobile is present.
+
+Examples:
+There is a cow munching on some grass.
+A fiery dragon circles overhead.
+You're standing at the foot of a huge giant!
+
+See also: OLC MOBILES
+#d
+"MEDIT SCRIPTS" "OEDIT SCRIPTS" "REDIT SCRIPTS"
+
+Usage:  .script add [position] <trigger vnum>
+        .script copy <from type> <from vnum>
+        .script remove <number | all>
+
+You can attach triggers to mob, objects, and room templates using this option.
+Triggers run in the order they appear in the OLC list, so you can optionally
+choose which position to insert them at, if there are multiple scripts. If you
+don't give a position, it will put it at the end.
+
+When you save your olc editor, all live copies of the thing you were editing
+should get the updated script list right away.
+
+See also: OLC MOBILES, OLC OBJECTS, OLC TRIGGERS, VNUM
+#d
+"MEDIT SEX"
+
+Usage:  .medit sex <male | female | neutral>
+
+This command sets the sex of the NPC. This matters mostly in action messages,
+where it determines the pronouns. Animals are almost always set to neutral,
+while humans should always be set to male or female. Use your best judgment.
+
+See also: OLC MOBILES
+#d
+"MEDIT SHORTDESCRIPTION" "MEDIT SHORT DESCRIPTION"
+
+Usage:  .shortdescription <string>
+
+The 'short description' is the trait that's shown in lists, in action messages,
+and almost everywhere else except when a player types 'look' in the room (where
+the long description is shown instead). This should be short, should generally
+begin with a/an/the unless it's a proper noun, and should not be capitalized
+(again unless it's a proper noun).
+
+Examples:
+ the dragon
+ a mongoose
+ Charles the Great
+
+See also: MEDIT LONG DESCRIPTION
+#d
+"OEDIT AFFECTS"
+
+Usage:  .affects [add | remove] <flags>
+
+This command adds, removes, or toggles a set of affect flags. These flags
+are set on the character who equips this object, as if they had a spell cast
+on them.
+
+See also: AFFECT FLAGS, OLC OBJECTS
+#d
+"OEDIT ANIMALSREQUIRED" "OEDIT ANIMALS REQUIRED"
+
+Usage:  .animalsrequired <number>
+
+You can specify whether the cart needs 0, 1, or 2 animals to pull it. However,
+with 0 animals, it can never be pulled.
+
+See also: HARNESS, OLC OBJECTS
+#d
+"OEDIT APPLY" APPLIES
+
+Usage:  .apply add <value> <type>
+        .apply remove <number | all>
+
+Applies are bonuses (or penalties) that an item gives to the player who is
+using it. The following applies are available. Most are self-explanatory:
+ STRENGTH - characters can't use an item that would reduce them below 1 strength
+ DEXTERITY - chance to hit/dodge
+ HEALTH-REGEN - rate of health regen (per 5 second tick)
+ CHARISMA - characters can't use an item that would reduce them below 1 charism
+ GREATNESS - empire meta-trait
+ MOVE-REGEN - rate of move regen (per 5 second tick)
+ MANA-REGEN - rate of mana regen (per 5 second tick)
+ INTELLIGENCE - characters can't use an item that would reduce them below 1 intelligence
+ WITS - combat speed
+ AGE - this actually raises/lowers the player's age, which has no effect
+ MAX-MOVE - move pool
+ SOAK - this is damage absorption
+ BLOCK - block only matters if the player has a shield
+ * - not used
+ MAX-HEALTH - health pool
+ MAX-MANA - mana pool
+ TO-HIT - chance to hit (%)
+ DODGE - chance to dodge (%)
+ INVENTORY - this adds to inventory capacity
+ MAX-BLOOD - blood pool size
+ BONUS-PHYSICAL - added to strength-based damage
+ BONUS-MAGICAL - added to magical damage
+ BONUS-HEALING - added to damage healed (by abilities this player uses)
+
+See also: OLC OBJECTS
+#d
+"OEDIT ARMORTYPE" "OEDIT ARMOR TYPE"
+
+Usage:  .armortype <type>
+
+Armor items may have several different types set. This determines which ability
+is required to wear the item. If an item does not need to be skill-restricted,
+use the WORN item type instead of ARMOR.
+
+cloth - Requires basic Battle skill. Cloth armor should provide little physical
+   protection and is best for caster gear or weak civilian armor.
+leather - Requires a DPS Battle specialty. It should provide low physical
+   protection and give bonuses to hit and damage.
+medium - Requires a tank Battle specialty. It should give moderate physical
+   protection and should take away a small amount of DPS ability, like -WITS
+   or -DAMAGE.
+heavy - Requires Battle as a class skill with a tank specialty. This type can
+   provide the most physical protection via applies like SOAK, but should also
+   take away DPS ability with -WITS, -DAMAGE, -STRENGTH, and similar.
+
+See also: OLC OBJECTS, APPLIES
+#d
+"OEDIT ARROWTYPE" "OEDIT ARROW TYPE"
+
+Usage:  .arrowtype <letter>
+
+Arrow type is a property you set on missile weapons (e.g. bows) and arrow
+objects, to match the two up together. An arrow object any kind (whether it's
+actually an arrow, or a bolt, or whatever) can only be used on a bow with the
+same arrow type.
+
+Arrow types are single letters, like 'A', 'B', and so on. You can find a list
+of existing items and their arrowtypes by typing "show arrowtypes".
+
+Common arrow types:
+ A - arrows
+
+See also: OLC OBJECTS, OEDIT TYPE, SHOW
+#d
+"OEDIT AUTOMINT" "OEDIT AUTO MINT"
+
+Usage:  .automint <on|off>
+
+This allows a wealth item to be automatically minted into coins by Workforce.
+
+See also: OLC OBJECTS
+#d
+"OEDIT BOOK"
+
+Usage:  .book <book id>
+
+You can create book objects to place in your adventure zones. Like ordinary
+books, their name will be overridden by the name set in the book editor. You
+can see the book id of any book you've written by typing "bookedit list" (it's
+the number in the [brackets]).
+
+See also: BOOKEDIT, OLC OBJECTS
+#d
+"OEDIT CAPACITY"
+
+Usage:  .capacity <number>
+
+Some items have a capacity trait, which determines how many items (or drinks)
+they can hold. In the case of drink containers, the capacity is measured in
+hours of thirst-quenching. In all other cases, this capacity is number of
+items (LARGE items count double).
+
+For SCALABLE objects, thus number is a scalable value if it is set to a number
+other than 0.
+
+See also: ITEM SCALING, OEDIT CONTENTS, OLC OBJECTS
+#d
+"OEDIT CATAPULT"
+
+Usage:  .catapult
+
+This trait, set on cart objects, turns the cart into a catapult and allows it
+to be used with the catapult command. Using .catapult again will toggle it off.
+
+See also: CATAPULT
+#d
+"OEDIT CHARGES"
+
+Usage:  .charges <number>
+
+Some items have a 'charges' trait which determines how many times they can
+be used. You need to provide at least 1 charge for the item to be useful.
+
+See also: OLC OBJECTS
+#d
+"OEDIT COINAMOUNT" "OEDIT COIN AMOUNT"
+
+Usage:  .coinamount <number>
+
+This sets how many coins are in a COINS-type object. You can't set what empire
+the coins belong to; they will always be "other".
+
+For SCALABLE objects, thus number is a scalable value if it is set to a number
+other than 0.
+
+See also: ITEM SCALING, OEDIT TYPE, OLC OBJECTS
+#d
+"OEDIT CONTAINERFLAGS" "OEDIT CONTAINER FLAGS"
+
+Usage:  .containerflags [add | remove] <flags>
+
+This command adds or removes container flags.
+
+Available flags are:
+ CLOSEABLE - the container may be closed and opened
+ CLOSED - the container is closed when it loads
+
+See also: OLC OBJECTS
+#d
+"OEDIT CONTENTS"
+
+Usage:  .contents <amount>
+
+Some items with a capacity, such as drink containers, also have a 'contents'
+property. This is how full they are when they are loaded or dropped into the
+world. If you want an item to start out empty, set its contents to 0. If you
+want it to start out full, set it to the same amount as the capacity.
+
+See also: OEDIT CAPACITY, OLC OBJECTS
+#d
+"OEDIT CUSTOM" "CUSTOM MESSAGES"
+
+Usage:  .custom add <type> <message>
+        .custom remove <number | all>
+
+You can set custom messages on objects for various actions. These messages
+may use the tokens $n/$e/$s/$m for name/he/his/him for the player using the
+item, $p for the name of the item, $a for a/an for the item.
+
+If you set more than one message of the same type, one will be chosen at
+random each time.
+
+Message types:
+ build-to-char - Shown to the character when the item is built into a building.
+ build-to-room - Shown to the room when the item is built into a building.
+ instrument-to-char - Shown every few seconds to the person playing the instrument.
+ instrument-to-room - Shown every few seconds to the room when someone is playing an instrument.
+
+See also: OLC OBJECTS
+#d
+"OEDIT DAMAGE"
+
+Usage:  .damage <amount>
+
+This lets you set the damage on various types of weapons. Usually this amount
+of damage is added to another number, like bow damage + arrow damage, or
+strength + weapon damage.
+
+When you set the damage, it will also give you the weapon's current DPS. This
+is the amount of damage it deals per second, given its current attack type
+or slow/fast flags.
+
+Weapons that are slow but strong deal the same DPS as weapons that are fast
+but weak. Some strategies prefer one way or the other. For most purposes, two
+weapons are considred equal if their DPS (not their raw damage) is equal.
+
+For SCALABLE objects, thus number is a scalable value if it is set to a number
+other than 0.
+
+See also: ITEM SCALING, OEDIT MISSILESPEED, OEDIT WEAPONTYPE, OLC OBJECTS
+#d
+"OEDIT EXTRA" "OEDIT EXTRA DESCRIPTIONS" "BEDIT EXTRA" "BEDIT EXTRA DESCRIPTIONS" "REDIT EXTRA" "REDIT EXTRA DESCRIPTIONS"
+
+Usage:  .extra add <keywords>
+        .extra remove <number | all>
+        .extra keywords <number> <new keywords>
+        .extra description <number>
+
+This command lets you add or edit extra descriptions. These are additional
+descriptions that the player may 'look' at. 
+
+For objects, tthe object's main description is set on the 'lookdescription'
+command.
+
+The keywords are a list of different words the player may look at, and the
+associated description is shown when they do. When you add a new extra, it
+immediately takes you into the string editor to write the description for the
+keywords you chose.
+
+Example in-game of a locket with extra description keyword "photo":
+ > look locket
+   The locket is worn but has a photo inside.
+ > look photo
+   It's a photo of a young girl.
+
+See also: OEDIT LOOKDESCRIPTION, OLC BUILDINGS, OLC OBJECTS, STRING EDITOR,
+  OLC ROOM TEMPLATES
+#d
+"OEDIT FLAGS"
+
+Usage:  .flags [add | remove] <flags>
+
+Object flags allow additional properties to be set on objects, with various
+effects. Never set a flag marked with an * (asterisk).
+
+Available flags:
+ CHAIR - can be sat upon using the 'sit' command
+ PLANTABLE - can be planted as a crop (see OEDIT PLANTS)
+ LIGHT - lights up the room at night
+ SUPERIOR - crafted by a master craftsman, adds the (superior) tag
+ LARGE - takes up 2 inventory slots, adds the (large) tag
+ *CREATED - created by a god command
+ 1-USE - is destroyed when un-equipped
+ SLOW - for weapons, attacks slower
+ FAST - for weapons, attacks faster
+ ENCHANTED - unstorable, magical, and vulnerable to Disenchant, adds (enchanted) tag
+ JUNK - will be cleaned up on the ground, even on claimed land -- worthless
+ CREATABLE - can be created using the 'create' command (usually resources)
+ SCALABLE - item can be scaled (see HELP ITEM SCALING)
+ TWO-HANDED - weapon requires both hand slots
+ BOE - item binds to a player when it is equipped
+ BOP - item binds to a player when it is picked up
+ STAFF - counts as a staff (even if it doesn't have a staff weapon type)
+
+See also: OLC OBJECTS
+#d
+"OEDIT FULLNESS"
+
+Usage:  .fullness <hours>
+
+This determines how long a food item can make you full for when eaten, in game
+hours (75 second intervals). The 'eat' command only eats part of food if the
+player isn't hungry enough to eat the whole thing, which displays as "You eat
+some of <item name>."
+
+Examples of good fullness numbers:
+ snack foods (apple) - 6 hours
+ baskets of food (apples) - 24 hours
+ prepared food (bread) - 48 hours
+
+Foods should also have a decay timer set. Traditionally, more-prepared foods
+take longer to decay, rather than basic it strictly on realism.
+
+For SCALABLE objects, thus number is a scalable value if it is set to a number
+other than 0.
+
+See also: ITEM SCALING, OEDIT DECAY, OLC OBJECTS
+#d
+"OEDIT KEYWORDS"
+
+Usage: .keywords <list>
+
+Keywords are the terms you can use to interact with an item. This is a list
+of all available one-word terms. Any identifying word in an object's name
+or long description should go in the keywords.
+
+Usually the most significant or unique word goes first in the keyword list.
+Some commands use the first keyword to auto-repeat, so if the keywords would
+be ambiguous like "ore iron", you can add "ironore" as the first keyword to
+help the game identify the correct object for repeating commands like smelt.
+
+Examples:
+ name: a wailing phaester
+ long description: A huge, wailing phaister is lying here.
+ keywords: phaester wailing huge
+
+See also: OLC OBJECTS
+#d
+"OEDIT LIQUID"
+
+Usage:  .liquid <type>
+
+Drink containers hold a certain type of liquid. This only matters if the
+'contents' property is greater than 0, as an empty drink container holds no
+liquid at all. If a drink container is emptied, it can be refilled with any
+type of liquid.
+
+The name of the liquid is automatically appended to the name of the item, so
+when "a flask" is full of ale, it becomes "a flask of ale". Keep this in mind
+when naming your drink containers.
+
+See also: OLC OBJECTS
+#d
+"OEDIT LONGDESCRIPTION" "OEDIT LONG DESCRIPTION" "LONG DESCRIPTION"
+
+Usage:  .longdescription <text>
+
+The long description is shown when the item is on the ground and the player
+types 'look'. This is always a full sentence that describes the object as
+present in the room. The name of the object should always be near the beginning
+of the long description.
+
+Examples:
+ A sword is lying in the dirt.
+ There is a sign stamped into the ground.
+ A strange, humming orb is floating here.
+
+See also: OLC OBJECTS
+#d
+"OEDIT LOOKDESCRIPTION" "OEDIT LOOK DESCRIPTION" "LOOK DESCRIPTION" "ACTION DESCRIPTION"
+
+Usage:  .lookdescription
+
+The look description (also called action description) is shown when a player
+looks at or examines an object. For simple, common objects, this should tell
+the player how to use the object. For decorative or impressive objects, it
+should be a description of the object's majesty.
+
+The look description is set in the string editor. If it is less than 80
+characters long, it will fit on one line and should not be indented. If it
+goes any longer than that, you should use /fi to format it with indent inside
+the string editor.
+
+See also: OLC OBJECTS, STRING EDITOR
+#d
+"OEDIT MATERIAL"
+
+Usage:  .material <type>
+
+Items are made out of various materials. This is used to determine if they can
+float in water, what message is shown when they decay, and is also used by the
+sacrifice and create commands to determine which resources the god gets or
+spends.
+
+Choose the material that best fits your object. If there isn't one that fits
+at all, contact the programmer to discuss adding a new one. But remember, the
+material doesn't need to be exact. It just needs to be close enough.
+
+See also: OLC OBJECTS
+#d
+"OEDIT MAXLEVEL" "OEDIT MAX LEVEL"
+
+Usage:  .maxlevel <level>
+
+This command determines the maximum level a objecdt will scale to. Players are
+rated from level 1 to 100 based on their skills, plus a number based on their
+gear. There is a full guide to item scaling at HELP ITEM SCALING.
+
+If you set the maxlevel to 0, there will be no maximum and the obj can scale
+to any level over the minimum.
+
+See also: ITEM SCALING, OEDIT MINLEVEL, OLC OBJECTS
+#d
+"OEDIT MINLEVEL" "OEDIT MIN LEVEL"
+
+Usage:  .minlevel <level>
+
+This command determines the minimum level a object will scale to. Players are
+rated from level 1 to 100 based on their skills, plus a number based on their
+gear. There is a full guide to item scaling at HELP ITEM SCALING.
+
+If you set the minlevel to 0, there will be no lower limit and objs can scale
+to any level under the maximum.
+
+See also: ITEM SCALING, OEDIT MAXLEVEL, OLC OBJECTS
+#d
+"OEDIT MISSILESPEED" "OEDIT MISSILE SPEED"
+
+Usage:  .missilespeed <number>
+
+This trait determines how fast a missile weapon (e.g. a bow) attacks in combat.
+You cannot choose your own speed; you must pick from a list. You should always
+specify the number in the list as your argument to this command.
+
+The 'speed' trait is the number of seconds between attacks in combat, so a
+lower number means a faster weapon. In that way, the name is backwards.
+
+See also: OLC OBJECTS
+#d
+"OEDIT STORAGE"
+
+Usage:  .storage add <building vnum> [flags]
+        .storage remove <number | all>
+
+This command lets you set where an object may be stored. An object type may
+have any number of storage locations.
+
+Available flags:
+ WITHDRAW - This item requires the "withdraw" empire privilege.
+
+See also: OLC OBJECTS
+#d
+"OEDIT PLANTS"
+
+Usage:  .plants <crop vnum>
+
+Any object with the PLANTABLE flag needs its crop set. This actually uses
+item value 2, so many object types will have conflicting values. You should
+never set a weapon as plantable, for example.
+
+PLANTABLE works best on OTHER and FOOD items. You shouldn't use any other type
+unless you have a very good reason (and that type doesn't use value 2 for
+anything else).
+
+See also: PLANT, OEDIT TYPE, OLC OBJECTS, VNUM
+#d
+"OEDIT POISON"
+
+Usage:  .poison <type>
+
+This sets which type of poison the item contains. Poisons are used by the
+Stealth skill tree, and the poison item is lost when it runs out of charges.
+
+Never set a poison type marked with an * (asterisk).
+
+See also: POISON, OEDIT CHARGES, OLC OBJECTS
+#d
+"OEDIT POTION"
+
+Usage:  .potion <type>
+
+This sets which type of potion the item contains. Potion items are used up
+(removed) when quaffed. Each potion type has a pre-determined effect.
+
+Never set a potion type with an * (asterisk).
+
+See also: POTION, OLC OBJECTS
+#d
+"OEDIT POTIONSCALE"
+
+Usage:  .potionscale <number>
+
+This sets the "scale level" of a potion's effects, usually corresponding to a
+player level.
+
+For SCALABLE objects, thus number is a scalable value if it is set to a number
+other than 0.
+
+Never set a potion type with an * (asterisk).
+
+See also: ITEM SCALING, POTION, OLC OBJECTS
+#d
+"OEDIT QUANTITY"
+
+Usage:  .quantity <number>
+
+This sets how many arrows are available from a given ARROW object.
+
+See also: OLC OBJECTS
+#d
+"OEDIT ROOMVNUM"
+
+Usage:  .roomvnum <vnum>
+
+This command sets the target for a portal object. Portals allow players to
+travel instantly to another room anywhere in the world. You need a separate
+object to represent each end of the portal, as they each target the other's
+room. Of course, you can also have one-way portals by only putting an object
+on one side.
+
+If you are using the portal in an instanced adventure zone, the target should
+be a *room template* vnum, not a real room. When the portal loads, it will be
+linked to its instance's version of that room template. Portals cannot link
+from the inside of an adventure zone to the outside, or to a room in a
+different instance.
+
+If you use the portal in a linking rule of an adventure zone, you don't need
+to set the room vnum targets at all. The instance-builder will do that for
+you.
+
+See also: OLC ADVENTURES, OLC OBJECTS, OLC ROOM TEMPLATES, PORTAL, VNUM
+#d
+"OEDIT SHORTDESCRIPTION" "OEDIT SHORT DESCRIPTION"
+
+Usage:  .shortdescription <text>
+
+An object's short description is the text that appears in sentences, and is
+shown on many status screens. The name should be reasonably short and simple.
+It should not be capitalized unless it contains a proper noun. Names should
+always start with "a", "an", or "the" unless it wouldn't make sense in a
+sentence.
+
+If an object has a capital letter in its short description, the Reforge and
+Refashion abilities will treat it as already "named" and will not allow it to
+be renamed.
+
+All of the words in the object name should also appear in the keywords list,
+except a/an/the.
+
+Sample names:
+ a flaming broadsword
+ the chain of doom
+ Amerigo's map
+ the eye of the Grasper of Apiaries (this one is pushing it for length)
+
+See also: OEDIT KEYWORDS, OLC OBJECTS
+#d
+"OEDIT TIMER" "DECAY TIMER" TIMER
+
+Usage:  .timer <hours>
+
+This determines how long an item lasts before it decays and is lost. This can
+be used to make any item temporary, but it is used especially on food, drink
+containers, portals, and similar. The decay timer only counts down while the
+item is in-game, so players who log out do not lose their items. Timers are
+measured in game hours/ticks (75 second intervals).
+
+If you set the timer to 0 or -1 in the editor, the item does not decay.
+
+Unlike all other types, when a drink container decays, only its contents go
+bad and are poured out.
+
+Food items are usually set to last longer if they are harder to get/make, and
+shorter if they are found easily.
+
+Remember, items left on the ground outdoors will decay or bestored after 3
+real hours, regardless of their decay timers.
+
+See also: AUTOSTORE, OEDIT TYPE, OLC OBJECTS
+#d
+"OEDIT TYPE"
+
+Usage:  .type <type>
+
+An object's type is its main property. This determines how it behaves in the
+game, and determines what other properties need to be set for it. When you
+change an object's type, some properties (like damage) will be reset to 0.
+
+Never set any type that is marked with an * (asterisk).
+
+Available types:
+ UNDEFINED - type not set
+ WEAPON - a melee weapon, or a caster weapon (requires .wear WIELD)
+ WORN - clothing
+ OTHER - miscellaneous
+ CONTAINER - a chest, holds items on the ground (never set wear TAKE)
+ DRINKCON - a drink container, like a flask
+ FOOD - edible
+ BOAT - lets you move on river/ocean, like a canoe
+ PORTAL - transports a player to another place (never set .wear TAKE)
+ *BOARD - a message board
+ *CORPSE - a corpse
+ COINS - a pile of coins
+ *MAIL - a letter
+ WEALTH - adds to empire wealth when stored
+ CART - a cart or wagon
+ *SHIP - a sailing ship
+ * - unused
+ * - unused
+ MISSILE_WEAPON - a bow, or similar (requires .wear RANGED)
+ ARROW - ammunition for missile weapons
+ INSTRUMENT - a musical instrument -- must set custom messages
+ SHIELD - for blocking attacks (requires .wear HOLD)
+ PACK - expands the player's inventory (requires .wear PACK)
+ POTION - gives an effect when quaffed
+ POISON - adds an effect to melee combat
+ ARMOR - requires certain skills to wear
+ BOOK - can be read like a library book
+
+You can get specific help on each of these via HELP <type> ITEM
+
+See also: OEDIT WEAR, OLC OBJECTS
+#d
+"OEDIT VALUE1" "OEDIT VALUE2" "OEDIT VALUE3"
+
+Usage:  .value1 <number>
+        .value2 <number>
+        .value3 <number>
+
+For item type OTHER, you can manually set the three object values. For all
+other item types, these values are used for things like damage, fullness,
+and capacity.
+
+If you set your OTHER object with the PLANTABLE flag, value2 is replaced by
+the 'plants' property. If you can't see the plants property in the editor,
+it means your value2 is invalid for planting and you should set your value2
+back to 0.
+
+Some special procedures may use the object values of an OTHER object; the
+significance of these values would depend on the special procedure.
+
+See also: OEDIT PLANTS, OLC OBJECTS
+#d
+"OEDIT WEALTH"
+
+Usage:  .wealth <value>
+
+This property determines how much an item adds to an empire's wealth when
+stored. It is only available on the WEALTH item type, and usually when you
+add storage for the item, you should set the WITHDRAW flag on the storage so
+that only people with the correct permission can withdraw it.
+
+See also: OEDIT STORAGE, OLC OBJECTS
+#d
+"OEDIT WEAPONTYPE" OEDIT WEAPON TYPE" "WEAPON TYPES" "ATTACK TYPES"
+
+Usage:  .weapontype <type>
+
+The weapon type determines which combat messages are sent, how fast the weapon
+attacks in combat, and whether or not it is sharp.
+
+The following weapon types are available:
+ 1. RESERVED - do not use
+ 2. slash - sword
+ 3. slice - axe (used by the chopping chore)
+ 4. jab - rapier
+ 5. stab - dagger (used by some Stealth skills)
+ 6. pound - rock
+ 7. hammer - hammer (used by the forge command)
+ 8. whip - whip weapon or tentacle-whip
+ 9. pick - used by the mining chore
+10. bite - animals
+11. claw - fist weapons; also used by animals
+12. kick - animals
+13. fire - torch
+14. vampire claws
+15. crush - animals or giants
+16. hit - normal punching (no weapon)
+17. magic fire - fireball
+18. lightning staff
+19. burn staff
+20. agony staff
+21. magic frost - chill
+22. magic shock - shock
+23. magic light - flash
+24. sting - animals
+25. swipe - animals, giants, etc
+26. tail swipe - animals
+27. peck - animals
+28. gore - animals
+
+See also: OLC OBJECTS
+#d
+"OEDIT WEAR"
+
+Usage:  .wear [add | remove] <flags>
+
+The wear flags determine which parts of the body an item can be worn on, as
+well as whether or not it can be picked up (TAKE). Be careful how many wear
+slots you set, as each one means another copy of the same item can be used
+concurrently.
+
+Only items set TAKE can be picked up off the ground.
+
+Weapons can often by set WIELD and HOLD and used in both positions.
+
+Missile weapons and instruments must be set HOLD.
+
+See also: OLC OBJECTS
+#d
+"OLC ABORT"
+
+Usage:  .abort
+
+This command closes your current OLC editor without saving. ALL YOUR CHANGES
+ARE LOST. Don't worry, the .abort command can't be abbreviated, so ".a" will
+never accidentally lose your changes.
+
+See also: OLC
+#d
+"OLC AUDIT" "OLC AUDITOR" AUDITOR
+
+Usage:  .<type> audit <from vnum> <to vnum>
+
+This will audit all things in a range of vnums for common problems.
+#d
+"OLC COPY"
+
+Usage:  .<type> copy <from vnum> <to vnum>
+
+This command copies an existing object (or mob, or whatever) to a new vnum,
+and opens the editor. If you .abort this editor, the copy will not exist at
+the new vnum. The copy is not complete until you .save your editor.
+
+Example:
+ > .o copy 105 106
+
+See also: OLC ABORT, OLC SAVE, VNUM
+#d
+"OLC ADVENTURES" ADVEDIT
+
+Usage:  .adv <command>
+        .command
+
+The .olc adventure zone editor allows you to configure the data for adventure
+zones. Each adventure zone contains a set of room templates. The .adv editor
+controls meta-data about the adventure zone, such as its name and level range.
+
+All commands in the editor arg highlighted in yellow and placed inside <angle
+braces>. You can get help on these commands by typing &yHELP ADVEDIT <COMMAND>&0.
+
+You can close an open editor with .abort or .save.
+
+Example:
+> .adv edit 123
+> .flags remove IN-DEVELOPMENT
+> .save
+
+For notes on the mud's building rules, see HELP BUILDING GUIDE.
+
+See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
+"OLC BUILDINGS" BEDIT
+
+Usage:  .b <command>
+        .command
+
+The .olc building editor allows you to configure the data for buildings of all
+kinds. It provides a simple in-game menu with options for the building.
+
+All commands in the editor are highlighted in yellow and placed inside <angle
+braces>. You can get help on these commands by typing &yHELP BEDIT <COMMAND>.&0
+
+You can close an open editor with .abort or .save.
+
+Example:
+> .b edit 11419
+> .flags BURNABLE
+> .save
+
+For notes on the mud's building rules, see HELP BUILDING GUIDE.
+
+See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
+OLC-CONTROLS "OLC CONTROLS" "OLC SETFLAGS" "OLC SETMINVNUM" "OLC SETMAXVNUM" "OLC MIN VNUM" "OLC MAX VNUM" "OLC VNUMS" "OLC FLAGS"
+
+Usage:  .setflags <immortal> [add | remove] [flags]
+        .setminvnum <immortal> <vnum>
+        .setmaxvnum <immortal> <vnum>
+
+These controls allow upper immortals to set permissions on the lower-level
+builders. In addition to the vnum range you specify, an immortal can also edit
+an adventure zone if he has permission to edit the vnums it contains.
+
+NOTE: Immortals at or above the Co-Implementor level are not constrained by
+these settings.
+
+Normally an immortal can edit any craft, mobile, or object in his/her vnum
+range. However, some flags allow you to prohibit the editing of any of these.
+
+Available flags:
+ - ALL-VNUMS -- Not restrictded by setminvnum and setmaxvnum
+ - MAP-EDIT -- Can edit the world map
+ - CLEAR-IN-DEV -- Can remove the in-development flag on recipes
+ - !CRAFT -- Cannot edit craft recipes even in the vnum range
+ - !MOBILE -- Cannot edit mobiles
+ - !OBJECT -- Cannot edit objects
+ - !BUILDING -- Cannot edit buildings
+ - SECTORS -- Can edit map sectors
+ - !CROP -- Cannot edit crops
+ - !TRIGGER -- Cannot edit triggers
+ - !ADVENTURE -- Cannot edit adventures
+ - !ROOMTEMPLATE -- Cannot edit room templates
+
+For notes on the mud's building rules, see HELP BUILDING GUIDE.
+#d
+"OLC CRAFTS" CEDIT "CRAFTS OLC" "CRAFT OLC" CRAFTS "CRAFT RECIPE" CEDIT
+
+Usage:  .c <command>
+        .<command>
+
+The .olc craft editor allows you to create and edit craft recipes for any of
+the main crafting systems in the game. It provides a simple in-game menu with
+contextual choices to set up the recipe.
+
+All commands in the editor are highlighted in yellow and placed inside <angle
+braces>. You can get help on these commands by typing &yHELP CEDIT <COMMMAND>.&0
+
+You can close an open editor with .abort or .save.
+
+Example:
+ > .c edit 23177
+ > .type forge
+ > .save
+
+For notes on the mud's building rules, see HELP BUILDING GUIDE.
+
+See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
+"OLC CROPS" CROPEDIT "CROPS OLC" "CROP OLC" CROPEDIT
+
+Usage:  .crop <command>
+        .<command>
+
+The .olc crop editor allows you to add, edit, or remove crops from the world,
+all from inside the game. It provides an in-game menu for controlling every
+detail of a crop, including what it produces.
+
+You should set the FORAGE and HARVEST interactions on a crop, usually with a
+1x quantity and 100% chance. Orchard-type crops should also usually have a
+GATHER interaction.
+
+All commands in the editor are highlighted in yellow and placed inside <angle
+braces>. You can get help on any of these commands by typing &yHELP CROPEDIT&0.
+<COMMAND>.
+
+You can close an open editor with .abort or .save.
+
+Example:
+ > .crop edit 123
+ > .flags ORCHARD
+ > .save
+
+For notes on the mud's building rules, see HELP BUILDING GUIDE.
+
+See also: CROPEDIT INTERACTION, OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
+"OLC DELETE"
+
+Usage: .<type> delete <vnum>
+
+This command deletes an object (or mob, or whatever) from the database
+entirely. All copies of that object are immediately destroyed.
+
+WARNING: This cannot be undone (except by restoring a backup, if there is one).
+
+See also: VNUM
+#d
+"OLC EDIT"
+
+Usage: .<type> edit <vnum>
+
+This command opens the OLC editor with the object (or mob, or whatever) with
+the vnum you specified. If it's a new vnum, it opens a fresh editor and the
+vnum will only exist if you .save the editor rather than .abort it when you're
+done.
+
+See also: OLC ABORT, OLC SAVE, VNUM
+#d
+"OLC EDITOR"
+
+The .olc editor is the interface for making changes to objects, mobs, and
+other in-game features. It has a simple menu, but doesn't take you out of the
+game (except for the string editor). This means you can still access help files
+and chat on public channels while editing.
+
+You can open a new editor with ".o edit <vnum>" (for objects, for example).
+You can close the editor with .save or .abort.
+
+See also: OLC ABORT, OLC EDIT, OLC SAVE, STRING EDITOR, VNUM
+#d
+"OLC FREE"
+
+Usage:  .<type> free <from vnum> <to vnum>
+
+This command finds the first available vnum in a given range -- the opposite
+of the olc 'list' command.
+
+See also: OLC LIST, VNUM
+#d
+"OLC LIST" OLIST MLIST
+
+Usage:  .<type> list <from vnum> <to vnum>
+
+This command lists all objects (or mobs, or whatever) between two vnums
+(inclusive). If the range is too long, it cuts off the list and you can try
+again with a narrower range of vnums.
+
+To look up items by name, use the 'vnum' command.
+
+To find unused vnums in a given range, use '.<type> free'.
+
+See also: OLC FREE, VNUM
+#d
+"OLC MOBILES" MEDIT "MOBILE OLC" "MOBILE EDITOR" "MOB OLC" "MOB EDITOR" MEDIT
+
+Usage: .m <command>
+       .<command>
+
+The .olc mob editor is a tool for creating and editing mobiles. It provides a
+simple in-game menu with contextual choices to allow you to easily create new
+NPCs for your game.
+
+All commands in the editor are highlighted in yellow and placed inside <angle
+braces>. You can get help on these commands by typing &yHELP MEDIT <COMMAND>&0.
+
+You can close an open editor with .abort or .save.
+
+Example:
+ > .m edit 74656
+ > .sex male
+ > .save
+
+For notes on the mud's building rules, see HELP BUILDING GUIDE.
+
+See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
+"OLC OBJECTS" OEDIT "OBJECT OLC" "OBJECT EDITOR" OEDIT
+
+Usage:  .o <command>
+        .<command>
+
+The .olc object editor is a powerful tool for creating and editing items. It
+provides a simple in-game menu with contextual choices to design any type of
+object.
+
+All commands in the editor are highlighted in yellow and placed inside <angle
+braces>. You can get help on these commands by typing &yHELP OEDIT <COMMMAND>&0.
+
+You can close an open editor with .abort or .save.
+
+Example:
+ > .o edit 11500
+ > .name a massive hammer
+ > .type weapon
+ > .save
+
+For notes on the mud's building rules, see HELP BUILDING GUIDE.
+
+See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
+"OLC ROOM TEMPLATES" "OLC ROOMTEMPLATES" "OLC ROOMS" REDIT
+
+Usage:  .r <command>
+        .command
+
+The .olc room template editor allows you to build rooms for adventure zones.
+Each adventure zone contains a set of room templates, all with vnums between
+its start and end numbers.
+
+This is NOT the editor for designatable rooms -- use .build for that (see
+HELP OLC BUILDINGS).
+
+All commands in the editor arg highlighted in yellow and placed inside <angle
+braces>. You can get help on these commands by typing &yHELP REDIT <COMMAND>&0.
+
+You can close an open editor with .abort or .save.
+
+Example:
+> .r edit 11253
+> .title On the Shores of Maybe
+> .save
+
+For notes on the mud's building rules, see HELP BUILDING GUIDE.
+
+See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
+"OLC SAVE"
+
+Usage:  .save
+
+This command saves all the changes in your open editor, then closes the editor.
+If you were editing a new vnum (or a copy), the vnum doesn't exist in the
+database until after you .save your editor.
+
+If you don't want to save your changes, you can close the editor with .abort
+instead.
+
+See also: OLC ABORT, VNUM
+#d
+"OLC SEARCH"
+
+Usage:  .<type> search <vnum>
+
+This command shows you all places that a certain vnum is used. It works for
+most OLC types.
+
+Examples:
+ > .o search 1413
+ > .t search 12
+#d
+"OLC SECTORS" SECTEDIT SECTOREDIT "SECTORS OLC" "SECTOR OLC" SECTEDIT
+
+Usage:  .sect <command>
+        .<command>
+
+The .olc sector editor allows you to add, edit, or remove entire setors
+(terrains) from within the game. It provides an in-game menu for controlling
+every detail of a sector, including how it evolves over time.
+
+Sectors are also called terrain types, and essentially form the basis of the
+world map.
+
+All commands in the editor are highlighted in yellow and placed inside <angle
+braces>. You can get help on any of these commands by typing &yHELP SECTEDIT
+<COMMAND>&0.
+
+You can close an open editor with .abort or .save.
+
+Example:
+ > .sect edit 19
+ > .evolution remove 4
+ > .save
+
+For notes on the mud's building rules, see HELP BUILDING GUIDE.
+
+See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
+"OLC TRIGGERS" "TRIGGER OLC" "OLC SCRIPTING" "SCRIPT OLC" TRIGEDIT
+
+Usage:  .trig <command>
+        .<command>
+
+The .olc trigger editor allows you to add, edit, or remove triggers which can
+be attached to scripts on mobs, objects, and other things. For each trigger,
+you must set what it's meant to attach to (e.g. mobiles), which events it
+triggers on (e.g. greeting), and then its command list.
+
+When editing the trigger's command text, you can use * to put a comment on a
+line, to help people reading the trigger understand what it's meant to do.
+
+All of the .olc commands are highlighted in yellow and placed inside <angle
+braces>. You can get help on any of these by typing &yHELP TRIGEDIT <COMMAND>&0.
+
+You can close an open editor with .abort or .save.
+
+For notes on the mud's building rules, see HELP BUILDING GUIDE.
+
+See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+See also: TRIGEDIT-TYPES
+#d
+"REDIT DESCRIPTION"
+
+Usage:  .description
+
+All rooms need a good description. The description should be at least 3 full
+lines, and should always be formatted with the /fi option in the string
+editor. Generally descriptions should not run more than about 6 lines.
+
+
+See also: OLC ROOM TEMPLATES, STRING EDITOR
+#d
+"REDIT EXITS"
+
+Usage:  .exit add <dir> <room template vnum> [keywords if door]
+        .exit remove <number | all>
+
+Room templates can exit only to other room templates -- never to real rooms
+or world locations. The starting room of an adventure zone will also always
+exit back to the place in the world it linked from (if it linked from a
+building). Other exits can be added in any direction, or choose RANDOM and a
+direction will be chosen for you.
+
+If you wish to create a door that opens and closes, specify door keyword(s) at
+the end of the exit add.
+
+Examples:
+ > .exit add random 1234
+ > .exit add down 1236 trapdoor door
+ 
+You can use .matchexits to automatically create the exits back to other rooms
+that link to the one you're currently editing.
+
+See also: OLC ROOM TEMPLATES, REDIT MATCH EXITS, VNUM
+#d
+"REDIT FLAGS"
+
+Usage:  .flags [add | remove] <flags>
+
+The following room template flags are available:
+ OUTDOOR - Affected by sun.
+ DARK - Always requires a light. (By default, rooms are dark at night.)
+ LIGHT - Never requires a light.
+ !MOB - Mobs will not wander into the room (they may still be spawned there).
+ PEACEFUL - No combat allowed.
+ NEED-BOAT - Requires a boat, swimming, or fly.
+ !TELEPORT - Cannot teleport in or out.
+
+See also: OLC ROOM TEMPLATES
+#d
+"REDIT MATCHEXITS" "REDIT MATCH EXITS"
+
+Usage:  .matchexits
+
+This command will look for other rooms in the same adventure zone that link
+to this one, and attempt to create matching exits. This makes the other side
+of exits easier to add.
+
+The exit's flags and keywords, if any, are automatically copied.
+
+Matched exits will always lead back in the opposite direction of the exit they
+matched (an east exit links back west), unless you are using "random" exits,
+in which case they will be random on both sides. When the adventure zone is
+instantiated, matching random exits will be linked in the same logical
+direction (a random exit linking to a random exit may, for example, go
+north-south). They will not end up with wildly different random directions.
+
+See also: OLC ROOM TEMPLATES, REDIT EXITS
+#d
+"REDIT TITLE"
+
+Usage:  .title <title>
+
+The title is shown above the room description. Like all titles, these should
+be title-cased (Named Like a Book), should not have punctuation at the end,
+and should be a reasonably short description of the room.
+
+See also: OLC ROOM TEMPLATES
+#d
+"REDIT SPAWNS"
+
+Usage:  .spawn add <type> <vnum> <percent> <limit>
+        .spawn copy <from type> <from vnum>
+        .spawn remove <number | all>
+
+Spawn commands cause any OBJ or MOB to load in the room whenever the adventure
+zone is reset (if their percent check passes, and there aren't more than the
+limit).
+
+The limit is only for the current instance, so setting a limit of 3 means that
+each copy of this adventure zone can have 3 of the object or mob at a time.
+
+This is different from the spawn data set on crops, sectors, and buildings.
+
+See also: OLC ROOM TEMPLATES, ADVEDIT RESET TIME, VNUM
+#d
+"SECTEDIT BUILDFLAGS"
+
+Usage:  .buildflags [add | remove] <flags>
+
+The buildflags for a sector are checked against the buildon or buildfacing
+flags of a building craft recipe, to determine if this sector is a valid place
+to build. A building may be built on this sector if at least one flag from its
+'buildon' appears in the sector's 'buildflags'.
+
+Available flags:
+ water - any type of water tile
+ plains - a flat, temperate sector like plains
+ mountain - a rough tile like a mountain
+ forest - a temperate forest of various types
+ desert - a flat, arid sector
+ river - a fresh-water sector
+ jungle - any jungle tile
+ * - 
+ ocean - a salt-water tile
+ oasis - an arid water source
+ crops - any crop tile, should ONLY be used for 'buildfacing'
+ grove - an arid forest tile like a desert grove
+ swamp - a swamp-type tile
+ any forest - a broader category of forests usually used for 'buildfacing'
+ open building - does not apply to buildflags -- do not use
+
+See also: CEDIT BUILDON, CEDIT BUILDFACING, OLC SECTORS
+#d
+"SECTEDIT COMMANDS"
+
+Usage:  .commands <list>
+        .commands none
+
+The commands list is shown below the map, and is meant to help newbies
+understand how to use the sector. If the sector can be chopped down, list
+'chop' as a command. If it has dig data, put 'dig' in the list.
+
+The commands list is usually put in alphabetic order to look cleaner and less
+scattered. The whole list is displayed in cyan, so you should not include any
+color codes in the commands list.
+
+For sectors with the CROP flag combined with a crop with the ORCHARD flag,
+the orchard command list is shown instead of the default. For all other crops,
+the sector's command list is used. For buildings, the commands list from the
+building data is used instead.
+
+See also: OLC SECTORS
+#d
+"SECTEDIT EVOLUTIONS"
+
+Usage:  .evolution add <type> [value] <percent> <becomes sector vnum>
+        .evolution remove <number | all>
+
+This command lets you add or remove an evolution from a sector. Evolutions are
+rules that describe how the sector changes over time. Some evolutions change
+the world periodically on their own; others are triggered by player action.
+
+No matter how small you set the percentages on evolutions, if they run on their
+own, they'll eventually succeed. Percentages may be set from 0.01 to 100.00.
+Evolutions are automatically sorted by type and by percentage. Only one will
+be called at a time -- the first one whose percentage check passes.
+
+Available types ([value] isn't used unless specified):
+ CHOPPED-DOWN - Sector to become when chopped by a player; value is the number
+    of trees you receive.
+ CROP-GROWS - Sector to become when the crop finishes growing (Seeded -> Crop).
+ ADJACENT-ONE - Called when this sector is next to a certain other sector
+    (value is the sector vnum that it's adjacent to).
+ ADJACENT-MANY - Called when this sector is next to at least 6 of another
+    sector (value is the sector vnum that it's adjacent to many of).
+ RANDOM - Checked periodically and called it if passes.
+ TRENCH-START - Sector this one becomes if a person starts to excavate.
+ TRENCH-FULL - Sector this one becomes, if it's a trench, when it fills up.
+ NEAR-SECTOR - Checked when this sector is within 2 tiles of another sector
+    (value is the sector vnum that must be nearby).
+ PLANTS-TO - Sector this one becomes when you start to plant a crop on it.
+ MAGIC-GROWTH - Sector this one becomes if it is magically forced to grow.
+
+Examples:
+ Jungle: .evolution add CHOPPED-DOWN 1 50% 28
+ Jungle: .evolution add CHOPPED-DOWN 1 100% 27
+ Plains: .evolution add ADJACENT-MANY 4 .02% 1
+
+See also: OLC SECTORS
+#d
+"SECTEDIT FLAGS"
+
+Usage:  .flags [add | remove] <flags>
+
+Available sector flags:
+ LOCK-ICON - a random icon is chosen when the terrain changes to this, and kept
+ IS-ADVENTURE - used only for adventure rooms
+ NON-ISLAND - won't be detected as part of an island by the island detection system
+ CHORE - This sector may have a chore (required, or the chore will never trigger)
+ !CLAIM - Cannot be claimed.
+ START-LOCATION - A starting location for players; prevents combat here
+ FRESH-WATER - Requires a boat, counts as a river
+ OCEAN - Requires a boat, counts as ocean
+ DRINK - Provides drinkable water; can also be used from adjacent rooms
+ HAS-CROP-DATA - Has an associated crop (like a seeded field or a crop tile)
+ CROP - Is a crop (visually replaced by crop data); you should also set HAS-CROP-DATA
+ LAY-ROAD - The lay command here can be used to create a road
+ IS-ROAD - This tile is a road
+ CAN-MINE - The tile is mine-able; this allows the Prospect ability
+ SHOW-ON-POLITICAL-MAPOUT - Still appears on the political version of the graphical map
+ MAP-BUILDING - This sector represents a building on the map; shown using building data
+ INSIDE-ROOM - This sector represents an interior (designated) ROOM building
+ COUNTS-AS-CITY - On empire territory count, this tile counts as in-city anywhere
+ OBSCURE-VISION - Players can't be seen here; also blocks catapults and towers
+ IS-TRENCH - Sector counts as a trench and fills with water
+ * - unused
+ ROUGH - This is rough, raised terrain, like a mountain
+ SHALLOW-WATER - The tile has water but requires no boat (like a swamp)
+
+See also: OLC SECTORS
+#d
+"SECTEDIT ICONS" "CROPEDIT ICONS"
+
+Usage:  .icons add <type> <color code> <icon>
+        .icons remove <number | all>
+
+EmpireMUD uses four different seasons and the biggest change between them is
+that sectors look different at different times of year. You can also specify
+an icon for ANY season. The <type> parameter is where you specify which season,
+and a list of valid types is shown on the olc display for the sector.
+
+If more than one icon is available for a given season (or from season + any),
+one is chosen at random. If you want to have random icons available, but want
+one pre-selected, set the LOCK-ICON sector flag. Be warned, however, that once
+an icon is locked, it remains the same in any season.
+
+For icons, the base color is separate from the icon, so the icon does not
+need to start with a color code (unless it's different from the base you set).
+You can also use the &&? color code to specify the base color.
+
+The olc editor display shows the rendered (colored) icon, its base color code,
+and then the icon with raw, unrendered && codes.
+
+See additional info at HELP SPECIAL ICONS.
+
+Example:
+ > .icon add summer &&g .&&0[]&&?.
+
+See also: OLC CROPS, OLC SECTORS
+#d
+"SECTEDIT MOVECOST" "SECTEDIT MOVE COST" "SECTEDIT MOVEMENT COST"
+
+Usage:  .movecost <number>
+
+Each sector has a movement cost when a player enters or leaves it. You can
+look at other existing sectors for an idea of what an appropriate cost is.
+
+The cost for a player to move from one sector to another is the average of the
+costs of those two sectors. Open buildings have a cost that is the average of
+their current sector (building) and the sector they were built upon (e.g.
+mountain).
+
+See also: OLC SECTORS
+#d
+"SECTEDIT NAME"
+
+Usage:  .name <name>
+
+The sector name is generally one word (sometimes two), singular (Hill not
+Hills), and capitalized. It's important that it doesn't conflict with the
+name of another sector, so you should try to make them unique. Sometimes, this
+just means adding a second word to the name ("Sandy Trench" vs "Trench").
+
+See also: OLC SECTORS
+#d
+"SECTEDIT ROADSIDEICON" "ROADSIDEICON" "ROADSIDE ICON" "ROAD SIDE ICON"
+
+Usage:  .roadsideicon <character>
+
+The roadside icon is a single-character icon that's used when map tiles are
+built around things like roads. This should be a single character that looks
+reasonably like the whole sector tile. It does not include a color code -- it
+will use the color code of the full icon that would otherwise be displayed.
+
+Examples:
+ Plains (....): .
+ Forest (^^^^): ^
+ Mountain (/\/\): ^
+
+See also: OLC SECTORS
+#d
+"SECTEDIT TITLE"
+
+Usage:  .title <title>
+
+The title is shown above the map on most sectors (except sectors which are
+buildings or crops, where the title comes from one of those instead). Like all
+titles, these should be title-cased (Named Like a Book), should not have
+punctuation at the end, and should be a reasonably short description of the
+sector.
+
+See also: OLC SECTORS
+#d
+"SPECIAL ICONS" "ICON CODES"
+
+The following special codes may be used in icons:
+ @e - show the roadside icon for the tile to the east
+ @w - show the roadside icon for the tile to the west
+ @u - show a 'v' if the tile to the west is a wall
+ @U - show a 'V' if the tile to the west is a wall
+ @v - show a 'v' if the tile to the east is a wall
+ @V - show a 'V' if the tile to the east is a wall
+
+The following special colors may be used in icons:
+ &&? - The tile color of the base terrain.
+ &&V - Wall color (walls are colored by enchantments).
+#d
+"SPECIAL PROCEDURE" "SPEC PROC"
+
+A special procedure, or spec proc, is a piece of code attached to an object
+or mobile that makes it behave in some unique way. For example, when you look
+at the port hole in a sailing ship, you see the room outside the ship instead
+of the port hole's look description.
+
+If you are interested in a spec proc, please see the programmer to discuss it.
+#d
+"STRING EDITOR" "TEXT EDITOR" "STRING EDITING"
+
+Note: If you are using the string editor in-game, you must begin commands with
+a comma (,). Only text you type starting with a , will be added to the string.
+You can enter full-string-edit mode using ,/, (or turn that mode off the same
+way).
+
+The string editor is used to edit player decriptions, board messages, mail
+letters, and more. You can type '/h' inside the string editor for a list of
+its commands.
+
+When the string editor opens, it shows you the contents of the string and
+then gives a ] prompt. You are inserting text on a new line at the end of the
+existing string. You can type '/l' to see the current string at any time.
+
+TIP: If your string is longer than 80 characters (normal telnet window width),
+use '/fi' to format it with indentation. This puts the whole thing into a
+single paragraph, indented 3 spaces, with each line no longer than 80
+characters.
+#
+"TRIGEDIT ARGUMENTS"
+
+Usage:  .arguments <string>
+
+This feature allows you to pass string arguments to the script.
+
+See also: OLC TRIGGERS, TRIGEDIT NUMARG
+#d
+"TRIGEDIT ATTACHES"
+
+Usage:  .attaches <type>
+
+This determines what type of thing the trigger is meant to attach to. A trigger
+that was designed for a mob probably wouldn't work very well attached to an
+object.
+
+The attach type also determines which event types you can choose.
+
+See also: OLC TRIGGERS, TRIGEDIT TYPES
+#d
+"TRIGEDIT COMMANDS"
+
+Usage:  .commands
+
+The "commands" section is the body of the script: the set of commands that will
+run when the trigger fires. It can include statements like "if", variables,
+and other scripting functions.
+
+The commands are edited in the text editor. When you're done editing the
+commands, you should format them with /f -- this will clean up the code, as
+well as check it to help make sure it will run safely.
+
+See also: OLC TRIGGERS, TEXT EDITOR
+#d
+"TRIGEDIT NAME"
+
+Usage:  .name <name>
+
+A trigger's name should be short and descriptive. This name is shown in many
+lists, including the list of scripts when editing a mob or object.
+
+Examples:
+ > Cow behavior
+ > Mob Fight - fireballs
+ > Hestian Trinket recall
+
+See also: OLC TRIGGERS
+#d
+"TRIGEDIT NUMARG" "TRIGEDIT NUMERIC ARGUMENT"
+
+Usage:  .numarg <number>
+
+The numeric argument (numarg) is a number that is passed to the script when
+it runs.
+
+See also: OLC TRIGGERS
+#d
+"TRIGEDIT TYPES"
+
+Usage:  .types [add | remove] <flags>
+
+You can set trigger types this way. These determine which events will set off
+the script. The available types are determined by what the trigger attaches to.
+
+See also: MOB TRIGGER TYPES, OBJ TRIGGER TYPES, ROOM TRIGGER TYPES
+See also: OLC TRIGGERS, TRIGEDIT ATTACHES
+#d
+"MOB TRIGGER TYPES" "MOBILE TRIGGER TYPES"
+
+The following triggers are available for mobs:
+ Global
+ Random
+ Command
+ Speech
+ Act
+ Death
+ Greet
+ Greet-All
+ Entry
+ Receive
+ Fight
+ HitPrcnt
+ Bribe
+ Load
+ Memory
+ Ability
+ Leave
+ Door
+
+See also: OLC TRIGGERS, TRIGEDIT ARGUMENTS, TRIGEDIT NUMARG, TRIGEDIT TYPES
+#d
+"OBJ TRIGGER TYPES" "OBJECT TRIGGER TYPES"
+
+The following triggers are available for objects:
+ Global
+ Random
+ Command
+ Timer
+ Get
+ Drop
+ Give
+ Wear
+ Remove
+ Load
+ Ability
+ Leave
+ Consume
+
+See also: OLC TRIGGERS, TRIGEDIT ARGUMENTS, TRIGEDIT NUMARG, TRIGEDIT TYPES
+#d
+"ROOM TRIGGER TYPES" "WORLD TRIGGER TYPES"
+
+The following triggers are available for rooms:
+ Global
+ Random
+ Command
+ Speech
+ Zone Reset
+ Enter
+ Drop
+ Ability
+ Leave
+ Door
+
+See also: OLC TRIGGERS, TRIGEDIT ARGUMENTS, TRIGEDIT NUMARG, TRIGEDIT TYPES
+#d
+"#n" "#e" "#a"
+
+Mob names can use certain special codes in order to dynamically add names.
+You can use these codes in the short description, long description, and
+keywords.
+
+- #n  Pick a random name from the chosen nameset. If the gender is left neutal,
+      it will also pick a random gender.
+
+- #e  Empire name. For this to work, you need to set the mob as a claimed-only
+      spawn on the map.
+
+- #a  Empire adjective. See notes on #e.
+
+See also: MEDIT NAMESET
+#d
+"ARMOR ITEM" "ARMOR OBJECT"
+
+The ARMOR item type is similar to WORN, except that it requires specific
+abilities to use it. Armor items may be set to any wear locations, but there
+is a worn-as-armor slot that must always be this item type. Armor items will
+scale higher than non-armor items.
+
+Cloth armor is for casters and healers, and should give very little soak.
+
+Leather armor is for melee damage characters and should give damage traits.
+
+Medium armor is the lower tanking tier, and may include penalties to traits
+like Wits or Strength, which are not needed by tanks.
+
+Heavy armor is the high tanking tier, and should always include penalties to
+damage traits in order to keep players from being both tank and dps.
+#d
+"ARROW ITEM" "ARROW OBJECT"
+
+The ARROW item type is used to create stacks of ammunition for the MISSILE
+WEAPON type. Its damage is added to the missile weapon's own damage. Arrows
+normally come in stacks of 10 and are named as "a quiver of arrows".
+
+If the arrow is scalable, its damage bonus will scale. Applies don't matter on
+arrow items because they are not equipped. Arrows only fire out of the player's
+inventory.
+#d
+"BOARD ITEM" "BOARD OBJECT"
+
+The BOARD item type is used only for in-game boards and cannot be set in OLC
+because boards require code support as well.
+#d
+"BOAT ITEM" "BOAT OBJECT"
+
+The BOAT item represents a canoe or raft, something reasonably small that the
+player can take with them (although you should set the LARGE flag). A player
+who has a boat will be able to cross water tiles and will be immune to water-
+based random encounters, such as sharks.
+
+This is not the type of item that players can go inside and explore; for that
+you want a ship.
+#d
+"BOOK ITEM" "BOOK OBJECT"
+
+The BOOK type is used along with the bookedit interface and EmpireMUD's library
+system. You can spawn books in adventures by writing them in the book editor,
+then assigning their book ID to a book object in your adventure zone. The
+data from the book editor will override your short decription, long desc-
+ription, and look description.
+#d
+"CART ITEM" "CART OBJECT"
+
+The CART item type represents a large item that can be moved by harnessing
+animals to it. This includes carts, but also catapults.
+
+To make a cart-type item, set the number of animals needed to pull it (1 or 2),
+and set its capacity.
+
+To make a catapult-type item, set the capacity to zero (it doesn't need to
+move anything) and the number of animals required, plus the catapult property.
+#d
+"COINS ITEM" "COINS OBJECT"
+
+The COINS type represents a pile of coins and will be converted from an object
+to "real" coins when a player picks it up. Coins dropped by adventures should
+always be "miscellaneous coins" rather than the coins of a specific empire, as
+adventures should not rely on empires continuing to exist.
+
+If your coin item is scalable, the coin value will be set by the scaling system
+based on the player's level.
+
+This should not be confused with the WEALTH item type.
+#d
+"CONTAINER ITEM" "CONTAINER OBJECT"
+
+EmpireMUD does not use containers with the TAKE flag. These items should only
+be used on the ground. If you want to raise inventory capacity, use the PACK
+item type instead.
+
+If you want to make a cart (or other movable container), use the CART type
+instead.
+#d
+"CORPSE ITEM" "CORPSE OBJECT"
+
+EmpireMUD does not currently allow content builders to add actual corpse
+objects. You can use the CONTAINER item type if you don't set it as take-able,
+or else you can use OTHER but won't be able to put items inside the corpse.
+
+This item type itself is reserved for code use.
+#d
+"DRINKCON ITEM" "DRINKCON OBJECT" "DRINK ITEM" "DRINK OBJECT" "DRINK CONTAINER ITEM" "DRINK CONTAINER OBJECT"
+
+This type represents two different things:
+
+Some drink containers are kept in the player's inventory, like a canteen or
+a cup. These should be relatively small in size, and you can set your item as
+scalable in order to automatically determine how many drinks it will hold.
+
+Other drink containers are like fountains, as no-take objects in the room
+which can provide very large amounts of liquid to players. These shouldn't
+be scalable, and you can set the capacity as high as you like.
+#d
+"FOOD ITEM" "FOOD OBJECT"
+
+The FOOD item type represents something edible which will sustain the player.
+Usually food will be higher level, with a longer timer and mour hours of full-
+ness, only if it's harder to make or acquire. Simple foods received from the
+forage or pick command should be short-lived and low-fullness no matter what
+they represent. Something that takes several ingredients and a Trade ability
+could last much longer.
+#d
+"INSTRUMENT ITEM" "INSTRUMENT OBJECT"
+
+The INSTRUMENT item type can be used with the "play" command, and you must be
+able to HOLD the instrument to do this.
+
+You need to set at least one 'instrument-to-char' and one 'instrument-to-room'
+custom message for the item. You can set more if you like, and each one will
+be displayed randomly every few action ticks.
+
+See also: OEDIT CUSTOM
+#d
+"MAIL ITEM" "MAIL OBJECT"
+
+The MAIL item type is used internally and can't be set in builder-created items
+or adventures. However, you can use the OTHER type with a look-description or
+extra-description to get the same effect.
+#d
+"MISSILE WEAPON ITEM" "MISSILE WEAPON OBJECT"
+
+The MISSILE WEAPON item type represents a bow, crossbow, or similar item. It
+should always have the RANGED wear slot only, never wield or hold. In order to
+use weapons of this type, players must also have matching ARROW items in their
+inventory.
+
+If the missile weapon is scalable, it will scale its own damage bonus.
+#d
+"OTHER ITEM" "OTHER OBJECT"
+
+This is used for items that don't have another applicable type. It has no
+base requirements to use it, and can represent almost anything. This type also
+gives you access to edit the object's 3 generic values, which may be useful
+for scripting.
+#d
+"PACK ITEM" "PACK OBJECT"
+
+The PACK item type is used to increase how much players can carry. You should
+always combine it with the PACK wear location, because it has no function in
+any other slot.
+
+Pack sizes are scalable, and you can also set various applies on the pack to
+divert its scaling points to something other than inventory size. Like all
+scaling options, the capacity and the applies will scale in proportion to
+each other.
+
+If you want items in other slots to add inventory capacity, use the INVENTORY
+apply instead.
+#d
+"POISON ITEM" "POISON OBJECT"
+
+The POISON item is applied on successful weapon attacks. Each player may only
+have one active poison at a time.
+
+Each time a poison is applied to a target, the poison object loses 1 charge,
+until it is used up and discarded completely.
+#d
+"PORTAL ITEM" "PORTAL OBJECT"
+
+Portals allow players to enter them and transport them from place to place.
+You can use portals in several ways:
+
+Adventures can use portals as their entrance/exit. You don't have to set a
+target room on these, as it will be set when the adventure instance spawns.
+
+You can create fixed portals inside of your adventures. In this case, use the
+room template that the portal leads to as its target, instead of a live world
+vnum.
+
+You could also spawn portals using scripts. In this case, you should usually
+set the portal's destination using the script that spawns it.
+#d
+"POTION ITEM" "POTION OBJECT"
+
+Potions choose their effect from a pre-existing list. Some potion types, but
+not all, can be scaled using the potionscale trait.
+
+If you don't set your potion as scalable, you can manually set the potionscale
+to a level to get that level of healing/etc.
+
+If you do set your potion as scalable, you only need to set the potionscale to
+1 and it will scale to the correct level.
+
+Potions can only be used once, and then are lost.
+#d
+"SHIELD ITEM" "SHIELD OBJECT"
+
+The SHIELD item type always needs the HOLD wear location, and in most cases it
+should have the BLOCK apply set. Shields that don't have any BLOCK will be
+ineffective at blocking, although this may be a desired effect.
+
+Shields can only be used by players with the correct Battle ability and they
+are primarily for tank characters, since they use up the off-hand hold slot.
+
+If you want an off-hand item for casters, consider type OTHER.
+#d
+"SHIP ITEM" "SHIP OBJECT"
+
+The SHIP item type represents large ships with interiors, which are piloted
+around on water tiles by players inside. These cannot be built in OLC because
+they still require code support to spawn them correctly. Future versions of
+EmpireMUD will change this by using scripts to set up the interior; it is not
+currently an option.
+#d
+"UNDEFINED ITEM" "UNDEFINED OBJECT"
+
+The UNDEFINED item type should not be used for live items. If you need a
+generic item, use type OTHER.
+#d
+"WEALTH ITEM" "WEALTH OBJECT"
+
+The WEALTH type represents an object of value. These are not converted to money
+like the COINS type is, but they can be minted into coins by players with a
+mint. Wealth items contribute to an empire's total wealth when they are stored.
+
+This item type has no effect unless the item is stored in normal storage.
+#d
+"WEAPON ITEM" "WEAPON OBJECT"
+
+The WEAPON item type covers melee/caster weapons.
+
+Notes:
+- You should almost always set .wear WIELD.
+- Small weapons, like daggers and swords, can also be .wear HOLD -- players
+  will be able to use a second copy of the weapon in their hold slot, and
+  may be able to attack with it in that slot if they have Dual Wield.
+- The TWO-HANDED flag gives a weapon more scaling points and requires both
+  hands, but only high-level players will be able to use it. Nobody below
+  skill level 100 will have the correct ability.
+- You must set the .weapontype property.
+- You should set the .damage property to at least 1. If your item is scalable,
+  this trait will scale along with the applies.
+- Players usually prefer to enchant their own weapons, so you may wish to
+  avoid pre-enchanted ones.
+- The SLOW and FAST flags affect the rate of attack, but neither is really a
+  bonus or penalty. They just help create more weapon diversity.
+#d
+"WORN ITEM" "WORN OBJECT"
+
+The WORN item type is for clothing (not armor). There are no requirements to
+use clothing and it usually isn't used to give apply bonuses, although shoes
+and some other worn items are an exception to this.
+
+If you are going to use the worn-as-armor wear location, or are planning to
+give the item good stats, you should usually be using the ARMOR item type
+instead.
+#d
+$~

@@ -1,0 +1,171 @@
+#900
+cart~
+900 1  # 1x a rickety cart
+2 58 eg 40 -1
+R
+125 16  # 16x a stack of lumber
+R
+1306 4  # 4x a pouch of nails
+S
+#901
+carriage~
+901 1  # 1x a carriage
+2 59 eg 48 -1
+R
+125 24  # 24x a stack of lumber
+R
+1306 6  # 6x a pouch of nails
+S
+#902
+wagon~
+902 1  # 1x a covered wagon
+2 59 eg 52 -1
+R
+125 32  # 32x a stack of lumber
+R
+1306 8  # 8x a pouch of nails
+R
+1359 12  # 12x a bolt of cloth
+S
+#903
+catapult~
+903 1  # 1x a catapult
+2 60 eg 80 -1
+R
+125 48  # 48x a stack of lumber
+R
+1306 12  # 12x a pouch of nails
+S
+#904
+chair~
+904 1  # 1x a chair
+2 58 eg 10 -1
+R
+125 2  # 2x a stack of lumber
+R
+1306 1  # 1x a pouch of nails
+S
+#905
+bench~
+905 1  # 1x a wooden bench
+2 58 eg 10 -1
+R
+125 4  # 4x a stack of lumber
+R
+1306 1  # 1x a pouch of nails
+S
+#906
+table~
+906 1  # 1x a long table
+2 58 eg 10 -1
+R
+125 4  # 4x a stack of lumber
+R
+1306 1  # 1x a pouch of nails
+S
+#907
+stool~
+907 1  # 1x a stool
+2 58 eg 10 -1
+R
+125 2  # 2x a stack of lumber
+R
+1306 1  # 1x a pouch of nails
+S
+#908
+arrows~
+908 1  # 1x a quiver of arrows
+2 101 g 4 -1
+R
+125 1  # 1x a stack of lumber
+S
+#909
+shortbow~
+909 1  # 1x a short bow
+2 58 g 8 -1
+R
+125 1  # 1x a stack of lumber
+R
+1356 1  # 1x a small piece of leather
+S
+#910
+longbow~
+910 1  # 1x a long bow
+2 58 eg 8 -1
+R
+125 1  # 1x a stack of lumber
+R
+1356 1  # 1x a small piece of leather
+S
+#912
+lyre~
+912 1  # 1x a lyre
+2 58 g 4 -1
+R
+125 1  # 1x a stack of lumber
+S
+#913
+flute~
+913 1  # 1x a wooden flute
+2 58 g 4 -1
+R
+125 1  # 1x a stack of lumber
+S
+#914
+walking stick~
+914 1  # 1x a walking stick
+2 58 g 6 -1
+R
+121 1  # 1x a stick
+S
+#915
+stake~
+915 1  # 1x a wooden stake
+2 58 g 4 -1
+R
+121 1  # 1x a stick
+S
+#916
+beehive~
+916 1  # 1x a large beehive
+2 59 eg 24 -1
+R
+125 8  # 8x a stack of lumber
+R
+1306 2  # 2x a pouch of nails
+S
+#917
+throne~
+917 1  # 1x the throne
+2 58 eg 10 -1
+R
+125 8  # 8x a stack of lumber
+R
+1306 1  # 1x a pouch of nails
+R
+1359 2  # 2x a bolt of cloth
+S
+#918
+blank sign~
+918 1  # 1x a blank sign
+2 58 eg 6 -1
+R
+125 1  # 1x a stack of lumber
+R
+1306 1  # 1x a pouch of nails
+S
+#919
+handle~
+919 1  # 1x a wooden handle
+2 -1 g 2 -1
+R
+121 1  # 1x a stick
+S
+#920
+canoe~
+920 1  # 1x a wooden canoe
+2 198 g 10 -1
+R
+120 1  # 1x a large tree
+S
+$

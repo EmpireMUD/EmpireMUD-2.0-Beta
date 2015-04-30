@@ -1,0 +1,37 @@
+#!/bin/sh
+
+cat << EOF
+This script will purge your playerfile, and then delete the object files
+of all players not in the playerfile.  A log of all deleted players, and
+the reason for their deletion, will be kept in lib/etc/DELETED.  If you
+would like to adjust the allowable idle times before players are deleted,
+edit src/util/purgeplay.c and recompile it.
+
+***************************************************************************
+Note, you should NEVER run this script while the MUD is running.  Also, you
+may wish to make a backup of your playerfile and/or object files before
+purging them.
+***************************************************************************
+
+Press return to continue with the purge, Ctrl-C to quit...
+EOF
+read dummy
+echo "Last chance to bail out.  Press return now to purge old players."
+read dummy
+
+echo "Purging playerfile, please wait..."
+cd lib/etc
+echo `date` >> DELETED
+../../bin/purgeplay players >> DELETED
+
+if [ ! -z players.new ]; then
+   mv players players.old
+   mv players.new players
+fi
+
+echo "Done."
+
+cd ../plrobjs
+purgeobjs
+cd ../..
+exit

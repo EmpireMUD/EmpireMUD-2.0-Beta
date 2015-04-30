@@ -1,0 +1,219 @@
+#10100
+pestle hag's hags stone large~
+the hag's pestle~
+A large stone pestle is lying on the ground.~
+This looks like it could be used to grind bone!
+~
+1 ehmp an
+0 2 5
+1 0
+A
+20 1
+C
+0 0
+S
+#10101
+stench foul hag's hags~
+the hag's stench~
+A foul stench lingers in the air.~
+It just seems to be a lingering stench, but you're getting used to it.
+~
+3 mp ak
+0 0 0
+10 0
+A
+18 1
+A
+15 1
+C
+0 0
+S
+#10102
+stench foul hag's hags~
+the hag's stench~
+A foul stench lingers in the air.~
+It just seems to be a lingering stench, but you're getting used to it.
+~
+3 mp ak
+0 0 0
+10 0
+A
+17 1
+A
+9 1
+C
+0 0
+S
+#10103
+stench foul hag's hags~
+the hag's stench~
+A foul stench lingers in the air.~
+It just seems to be a lingering stench, but you're getting used to it.
+~
+3 mp ak
+0 0 0
+10 0
+A
+16 1
+A
+8 1
+C
+0 0
+S
+#10104
+feathers fistful firebird glowing~
+a fistful of firebird feathers~
+Some firebird feathers are glowing on the ground.~
+The feathers come from the mythical firebird, and glow even when plucked.
+~
+3 c a
+0 0 0
+10 400
+S
+#10105
+armor black leather set~
+black leather armor~
+A set of black leather armor is lying here.~
+This sleek set of armor is designed to make the wearer stealthier.
+~
+27 emo aq
+1 0 0
+7 0
+A
+4 1
+A
+12 1
+A
+2 2
+C
+0 0
+S
+#10106
+aklys spiked~
+a spiked aklys~
+A spiked aklys is lying on the ground.~
+This spiked club is attached to a string, allowing it to be used at short range.
+~
+1 ehmo an
+0 1 5
+0 0
+A
+18 2
+C
+0 0
+S
+#10107
+rations dry pack~
+a pack of dry rations~
+A pack of dry rations is sitting open.~
+This food looks like it could last a while.
+~
+6 eo a
+500 0 0
+0 700
+S
+#10108
+guard neck armored~
+an armored neck guard~
+A neck guard is lying on the ground.~
+This looks like it's meant to protect the neck from sharp weapons.
+~
+27 mo ac
+2 0 0
+0 0
+A
+12 1
+C
+0 0
+S
+#10109
+ring bloodletters bloodletter's red~
+the bloodletter's ring~
+A red ring is lying on the ground.~
+This ring has razors on the outside!
+~
+2 mo ab
+-1 -1 -1
+13 0
+A
+1 1
+A
+17 2
+C
+0 0
+S
+#10110
+egg unusual~
+the egg~
+An unusual egg is sitting by the fire.~
+The egg is leathery, and very large.
+~
+3 0 0
+0 0 0
+1 0
+T 10110
+S
+#10111
+necklace charming~
+a charming necklace~
+A charming necklace has been discarded on the ground.~
+It's a rather handsome bauble.
+~
+2 jmo ac
+-1 -1 -1
+4 0
+A
+4 3
+A
+11 1
+C
+0 100
+S
+#10112
+beads wooden~
+some wooden beads~
+Some wooden beads are strung together on the ground.~
+It seems like a simple beaded necklace.
+~
+2 jmo ac
+-1 -1 -1
+0 0
+A
+17 1
+A
+9 3
+C
+0 100
+S
+#10113
+chain shifters shifter's strange~
+a shifter's chain~
+A strange chain is lying here.~
+The necklace seems to shift around as your eyes fail to follow it.
+~
+2 jmo ac
+-1 -1 -1
+13 0
+A
+15 1
+A
+18 3
+C
+0 100
+S
+#10114
+shiv talismanic glowing~
+a talismanic shiv~
+A glowing shiv is lying on the ground.~
+~
+1 ijmo ano
+0 3 4
+0 0
+A
+2 1
+A
+18 1
+C
+0 0
+S
+$

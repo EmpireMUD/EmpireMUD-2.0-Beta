@@ -1,0 +1,347 @@
+STEALTH "STEALTH SKILL"
+
+Stealth is the skill tree for all things secret, hidden, or shadow. Little is
+known about its practicioners. Rumors swirl of an underground group of thieves
+called the Guild, though no one dares confirm them.
+
+(To begin your journey down the path of Stealth, try bribing the hidden guild-
+master.)
+
+NOTE: The Stealth tree is only partially implemented.
+
+See also: HIDE, SNEAK, BACKSTAB, PICKPOCKET, DISGUISE, JAB, TERRIFY,
+    DARKNESS, APPRAISAL, BLIND, VAULTCRACKING, POISONS, DEADLY POISONS,
+    SECRET CACHE, DAGGER MASTERY, CLOAK OF DARKNESS, INFILTRATE, SAP,
+    SHADOWSTEP, CONCEALMENT, ESCAPE, PRICK
+#
+APPRAISAL
+
+Appraisal (Stealth ability)
+
+Usage:  look <person>
+
+A clever thief can see what her mark is carrying with a quick glance. When
+you look at other characters, you will see their inventories.
+
+Gain skill from this ability by attempting to look at people's inventories.
+
+See also: CONCEALMENT
+#
+BACKSTAB
+
+Backstab (Stealth ability)
+
+Usage:  backstab [victim]
+Cooldown:  9 seconds
+
+A brave warrior looks his foe in the eye, but a clever assassin looks his
+target in the back as he strikes.
+
+Backstab deals 2x weapon damage on a successful attack, and the opponent has
+no chance to dodge if the attack succeeds. A particularly skilled assassin
+deals 4x weapon damage instead.
+#
+BLIND
+
+Blind (Stealth ability)
+
+Usage:  blind [victim]
+Cooldown:  10 seconds
+
+You toss sand in your opponents' eyes, blinding them for 10 seconds.
+
+If you're fighting, this will automatically target your opponent.
+#
+"CLING TO SHADOW"
+
+Cling to Shadow (Stealth ability)
+
+With Cling to Shadow, your chance of successfully hiding (with the "hide"
+command) becomes 100% and you cannot be found using the "search" ability.
+
+See also: HIDE, SEARCH
+#
+"CLOAK OF DARKNESS"
+
+Cloak of Darkness (Stealth ability)
+
+This passive ability keeps you from being spotted at range on the map, and
+reduces the chance of guard towers seeing you.
+#
+CONCEALMENT
+
+Concealment (Stealth ability)
+
+With proper concealment, other players can no longer see exactly what you're
+using or holding.
+
+This ability gains skill points whenever they try.
+#
+DARKNESS
+
+Darkness (Stealth ability)
+
+Usage:  darkness
+Cooldown:  15 seconds
+
+Master the power of shadow to blanket an area in darkness. It becomes much
+harder to see anything any at all, even where there should be daylight. This
+ability also grants the ability to see in the darkness it creates.
+#
+"DAGGER MASTERY"
+
+Dagger Mastery (Stealth ability)
+
+Your dagger attacks deal 50% more damage.
+#
+DISGUISE
+
+Disguise (Stealth ability)
+
+Usage:  disguise <person>
+
+A savvy rogue learns to blend into his surroundings. With this ability, you can
+look like any human NPC. If you behave like one as well, you might find you
+disappear into the crowd.
+#
+ESCAPE
+
+Escape (Stealth ability)
+
+Usage:  escape
+Cost:  10 mv
+Time:  5 seconds
+
+Escape lets you run for the nearest window and quickly exit the building or
+ship you're in, making a quick getaway from even the most confusing castles.
+#
+HIDE HIDING
+
+Hide (Stealth ability)
+
+Usage:  hide
+
+When you type hide there is a chance that you hide in the room. If hidden you
+can't be seen by other people. Hide is broken by pressing return, regardless
+of whether you typed a command or not.
+
+See also: SEARCH, SNEAK
+#
+INFILTRATE "IMPROVED INFILTRATE"
+
+Infiltrate, Improved Infiltrate (Stealth abilities)
+
+Usage:  infiltrate <direction>
+
+Infiltrate allows you to enter buildings where you don't belong. You can't
+infiltrate the buildings of people you have non-aggression pacts or alliances
+with. You must have stealth permission from your empire, and infiltrating will
+trigger distrust with the other empire. The empire will be alerted to your
+presence as an infiltrator, so act fast.
+
+Improved Infiltrate increases your chances of successful infiltration and
+give you a chance to get in undetected. Even if you are detected, your identity
+will not be revealed.
+#
+JAB
+
+Jab (Stealth ability)
+
+Usage:  jab
+Cooldown:  9 seconds
+
+Jab your opponent while he's not looking and leave a wound in his side that
+will fester for 15 seconds, dealing additional damage. This ability stacks up
+to 2 times.
+#
+PICKPOCKET "PICK POCKET"
+
+Pickpocket (Stealth ability)
+
+Usage:  pickpocket <victim>
+
+A skilled thief can lift small items from an unsuspecting victim.
+
+You can only pickpocket NPCs, and even then only human ones. This ability does
+not remove items you see in their inventories, only "pocket items". The result
+is largely random. Each NPC can only be pickpocketed once.
+#
+POISON POISONS "DEADLY POISONS" MIX
+
+Poisons, Deadly Poisons (Stealth abilities)
+
+Command:  mix [number] <poison>
+          use <poison>
+
+You can mix poisons with the "mix" command in an alchemist shop, or anywhere
+you could brew a potion.
+
+To set which poison you intend to use in combat, "use" the vial containing the
+correct poison. Each time your weapon hits your opponent, you have a chance to
+envenom them with your chosen poison. When the vial runs out of poison, it will
+be removed from your inventory.
+
+All vials have 15 charges. Deadly Poisons doubles the effects of most poisons.
+Poisons only work with sharp weapons.
+
+Basic Poisons:
+  searing  +5 damage  (30 bileberries)
+  weakness  -25 health  (15 bileberries, 15 daggerbite)
+  exhaustion  -25 move  (30 bileberries)
+  braindrain  -25 mana  (15 magewhisper, 15 daggerbite)
+  strength  -1 strength  (15 daggerbite, 15 redthorn)
+  dexterity  -1 dexterity  (15 daggerbite, 15 redthorn)
+  charisma  -1 charisma  (15 bileberries, 15 redthorn)
+  intelligence  -1 intelligence  (15 magewhisper, 15 bileberries)
+  wits  -2 wits  (15 redthorn, 15 bileberries)
+
+Deadly Poisons:
+  pain  4 damage-over-time  (45 daggerbite)
+  slow  slower combat rate  (30 daggerbite, 15 redthorn)
+  heartstop  vampires can't spend blood  (30 daggerbite, 15 redthorn)
+
+See also: MIX, RESIST POISON
+#
+PRICK
+
+Prick (Stealth ability)
+
+Usage:  prick [target]
+Cooldown:  9 seconds
+
+This ability applies your poison quickly and subtly, and will work even if
+you're not in combat. If your target can't see you, it won't even start
+combat.
+
+If you're fighting, it will automatically target your enemy.
+#
+SAP
+
+Sap (Stealth ability)
+
+Usage:  sap <victim>
+Cooldown:  9 seconds
+
+This ability will temporarily stun your victim, giving you a moment collect
+yourself before starting combat.
+
+Only one person in the room may be sapped at a time. Using the ability on a
+second person will release the first one.
+#
+SEARCH
+
+Search (Stealth ability)
+
+Usage:  search
+Cooldown:  10 seconds
+
+When you know where to look, it's easier to find hidden thieves and assassins.
+This ability reveals people who use the hide command, although it doesn't
+always find them on the first try.
+
+See also: HIDE
+#
+"SECRET CACHE" SECRETCACHE
+
+.{}.  Secret Cache  (Stealth ability)
+
+Resources:  20 lumber, 6 nails, 20 blocks, 5 imperium ingots
+Built on:  plains, desert
+Chameleon:  .... or &Y....&0
+
+This ability allows you to build the secret cache, a place to store your
+wealth that is more easily hidden than a vault.
+
+See also: BUILD, VAULT
+#
+SHADOWSTEP "SHADOW STEP"
+
+Shadowstep (Stealth ability)
+
+Usage:  shadowstep <target>
+Cooldown:  1 minute
+
+Shadowstep allows a talented assassin to step into one shadow and, seemingly,
+appear out of another. This ability takes you instantly to your target. It has
+a maximum range of 7 map tiles and requires Infiltrate if you don't have per-
+mission to enter your target's location.
+
+See also: INFILTRATE
+#
+SNEAK SNEAKING
+
+Sneak (Stealth ability)
+
+Usage:  sneak <direction>
+
+Used for sneaking (moving in and out of rooms without anyone taking notice). 
+When you type sneak, there is no way to know if you're actually sneaking. It's
+based on your skill, and how well other people notice you.
+
+See also: HIDE
+#
+STEAL STEALING
+
+Steal (Stealth ability)
+
+Usage:  steal [item]
+
+To steal from an empire, at least one of their members must be online. This
+will immediately trigger a state of "distrust" if you aren't already in one.
+There is a chance the other empire will be alerted to your location. You'll
+be marked internally as hostile for 1 hour, and become a valid PVP target. If
+you die, any items stolen in the last 30 minutes will be left on your corpse.
+
+This ability has two functions:
+
+With Steal, you can pick up items from rooms that are claimed by other empires.
+You do this with the "get" command. You can't steal from allies or people you
+have a non-aggression pact with.
+
+You can also steal stored resources. If you type "steal" in a storage room or
+building, it will list what you can steal there. Type "steal <item>" to take
+one.
+
+See also: VAULTCRACKING
+#
+"SUMMON THUGS"
+
+Usage:  summon thugs
+Cooldown:  3 minutes
+
+This ability summons up to (Charisma / 3, rounded up) thugs, who will follow
+you around. This is best combined with the Disguise ability, as you can mask
+yourself as a thug.
+
+See also: DISGUISE
+#
+TERRIFY
+
+Terrify (Stealth ability)
+
+Usage:  terrify [victim]
+Cooldown:  15 seconds
+
+Use the power of the shadows to make your foes cower in fear.
+
+Only one person in the room may be terrified at a time. Using the ability on a
+second person will release the first one.
+#
+"UNSEEN PASSING"
+
+Unseen Passing (Stealth ability)
+
+When in a city or indoors, Unseen Passing makes you immune to the "where" and
+"track" commands. It doesn't work in the wilderness.
+
+See also: NO TRACE, WHERE, TRACK
+#
+VAULTCRACKING "VAULT CRACKING"
+
+Vaultcracking (Stealth ability)
+
+This ability allows you to use the "steal" command in vaults and secret caches.
+
+See also: STEAL
+#
+$

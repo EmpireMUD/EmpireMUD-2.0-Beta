@@ -1,0 +1,397 @@
+BLOODSTONE
+
+Bloodstone (resource)
+
+Stored in:  Tower of Sorcery
+
+Bloodstone is a rare stone with mystical properties, sometimes found while
+digging in the mountains.
+
+See also: DIG
+#
+BOOKEDIT "BOOK EDIT"
+
+Usage:  bookedit list -- list books you wrote
+        bookedit copy <book> -- write out a fresh copy of one of your books
+        bookedit write <book | new> -- edit a book
+
+The bookedit command lets you create books to fill the world's libraries.
+In order to work on books, you need to build a library -- one of the Grand
+Monuments.
+
+You can pick books for 'copy' and 'write' by name or number. The 'list' command
+gives you the numbers.
+
+When you use the 'write' command, it will take you to the book editor. This
+editor has its own 'help' command to assist you in using it.
+
+Steps to getting your book into a library:
+1. Write the book using "bookedit write"
+2. Make a physical copy of the book using "bookedit copy" (this takes a minute)
+3. Take your copy to any library and type "library shelve" to put your book into
+   circulation in that building
+4. You can use "library checkout" to get another copy of your book out
+
+Type "HELP BOOK TIPS" for more notes on book editing.
+
+See also: LIBRARY
+#
+"BOOK TIPS"
+
+These tips will help you with the BOOKEDIT command:
+
+You set several properties:
+- title: The story name as it appears in the library.
+- byline: The author the story is credited to.
+- item name: The way the item appears in your inventory ("a book")
+- item description: How the book is described when you look at it.
+
+Books are arranged into paragraphs which are shown to the reader every 20
+seconds. You should keep each paragraph down to just a few lines. Since telnet
+uses a standard 80-character display, you should keep your lines 80 characters
+or less.
+
+Type /c to clear the text editor when you start a new paragraph or description.
+Otherwise, the default text will still be in there. You can use /d1 to delete
+line 1 if you left it in anyway.
+
+The easiest way to format your paragraphs is to type /fi in the text editor.
+This also works on the item description. But if your whole text fits on 1 line
+under 80 characters, you probably don't need the indent.
+
+See also: BOOKEDIT, LIBRARY
+#
+BRICKS "CLAY BRICKS"
+
+Clay bricks (resource)
+
+Required ability:  Basic Crafts
+
+You can craft clay bricks from raw clay, so long as you have a fire. They will
+harden faster if you're at a Potter.
+
+See also: CLAY, CRAFT, POTTER
+#
+CANOE
+
+Canoe (item)
+
+Required ability:  Basic Crafts
+
+A good canoe will allow you to cross rivers as well as oceans. And unlike
+swimming, you won't be bothered by sharks.
+
+You only need to have the canoe in your inventory for it to work.
+
+See also: SWIMMING, SHIP
+#
+CLOTH "COTTON CLOTH"
+
+Bolt of cloth (resource)
+
+You can weave cotton into cloth. It will go faster if you're at at Tailor.
+
+See also: WEAVE, COTTON, TAILOR
+#
+"IRIDESCENT BLUE IRIS" "IRIDESCENT IRIS" "BLUE IRIS" IRIS
+
+Iridescent Blue Iris (resource)
+
+Stored in:  Tower of Sorcery
+
+The iridescent blue iris is a rare herb found anywhere you could find herbs,
+and even if you don't have the Find Herbs ability. It is used in some spells
+and crafts.
+
+See also: PICK, FIND HERBS
+#
+"GLOWING GREEN SEASHELL" "GLOWING SEASHELL" "GREEN SEASHELL" SEASHELL
+
+Glowing Green Seashell (resource)
+
+Stored in:  Tower of Sorcery
+
+This rare seashell can be found while fishing.
+
+See also: FISH
+#
+INGOTS
+
+Ingots (resources)
+
+Various types of ingots can be made by smelting metals in a forge or foundry.
+
+See also: SMELT, IRON
+#
+LARGE "LARGE ITEMS" "LARGE FLAG" (LARGE)
+
+The (large) flag on items indicates that the item is over-sized and takes up
+2 inventory slots.
+
+All other items take up 1 inventory slot.
+#
+LIBRARY
+
+Building:  [^^]  Library  (Grand Monuments)
+Command:  library browse  -- see books shelved here
+          library checkout <book>  -- grab a copy of a book
+          library shelve <item>  -- put a book away on the shelves
+          library burn <book>  -- remove all copies of a book from this library
+
+You can collect books and put them into your own library, which is a Grand
+Monument in the Empire skill tree. Once you shelve a book in your library, you
+can take as many copies of it as you want. The only way to permanently remove
+it form your collection is to use the "burn" command.
+
+The 'checkout' and 'burn' commands target books in the library's collection,
+not items in your inventory. You can pick these books by name or by number.
+Use the 'browse' command to see the numbers, but beware that these may change
+as new books are catalogued and sorted.
+
+If you have written a book with bookedit, you can always make a new copy of it
+using 'bookedit copy'.
+
+See also: BOOKEDIT
+#
+"LIGHTNING STONE" "YELLOW LIGHTNING STONE" "YELLOW STONE"
+
+Yellow Lightning Stone (resource)
+
+Stored in:  Tower of Sorcery
+
+This rare stone can be found in the desert where lightning has struck.
+#
+LUMBER
+
+Lumber (resource)
+
+Lumber is created by sawing logs or trees at a lumber yard. It is used for
+many buildings.
+
+See also: CHOP, SAW
+#
+RETRIEVE
+
+Usage: retrieve <item>
+       retrieve [number] <item>
+       retrieve all
+
+This command is used to get items from a storage building. You may use
+"retrieve all" to fill up your inventory with items, but may not specify which
+item to retrieve if you do.
+
+If you're visiting another empire, you can store and retrieve your own items
+on credit from their public (or allied) buildings, IF you have a trade pact.
+
+See also: STORE, INVENTORY, DIPLOMACY, WAREHOUSE
+#
+SPLIT
+
+Usage:  split <amount> <type> coins
+
+You can split coins you've found with members of your group using this command.
+Only group members who are present with you will receive a split. The amount is
+rounded down if there isn't an even amount to split, and you will keep the
+difference.
+
+Example:
+> split 10 misc coins
+
+See also: COINS
+#
+"STONE BLOCKS" BLOCK BLOCKS
+
+Huge Stone Block (resource)
+
+You can quarry stone blocks from the ground at a quarry. They are used in
+monumental architecture.
+
+See also: QUARRY
+#
+STORE STORAGE
+
+Usage: store <item>
+       store <number> <item>
+       store all
+
+It is recommended that you keep most of your extra resources stored. Items left
+on the ground in claimed territory will eventually be stored by the empire's
+citizens.
+
+Unique, enchanted, superior, or otherwise-modified items can't be stored in
+regular storage buildings, but you can store them with the "warehouse" command
+in a warehouse or vault.
+
+If you're visiting another empire, you can store and retrieve your own items
+on credit from their public (or allied) buildings, IF you have a trade pact.
+
+You can identify an item to see where it can be stored.
+
+See also: AUTO-STORE, RETRIEVE, IDENTIFY, INVENTORY, DIPLOMACY,
+   WAREHOUSE, VAULT
+#
+SUPERIOR MASTERWORK
+
+The (superior) flag indicates that an item is a masterwork, crafted by a truly
+legendary artisan.
+
+Masterwork abilities:
+  Sewing/Leatherworking - Master Tailor
+  Forge - Master Blacksmith
+  Pottery - Master Potter
+  Healing Elixirs and Wrath of Nature Potions are masterworks if you have both
+
+See also: SCALABLE CRAFTS
+#
+"TRADE COMMAND"
+
+Usage:  trade check [keywords]
+        trade list [keywords]
+        trade buy [number | keywords | number.keywords]
+        trade cancel [number | keywords | number.keywords]
+        trade collect
+        trade identify <number | keywords | number.keywords>
+        trade post <item> <cost> [time]
+
+(Not to be confused with the Trade skill.)
+
+You can post and buy trades at any Trading Post building. These trades are
+global and can be bought from any trading post. See the individual help files
+for notes on each trade command.
+
+Expired or sold trades must be collected by the original poster within 30 days,
+or they will be lost.
+
+See also: TRADING POST
+See also: TRADE CHECK, TRADE LIST, TRADE BUY, TRADE CANCEL, TRADE COLLECT,
+          TRADE IDENTIFY, TRADE POST
+#
+"TRADE CHECK"
+
+Usage:  trade check [keywords]
+
+Unlike other trade commands, you can use "trade check" from anywhere. It
+tells you how your own posted trades are doing, and whether you have any money
+to collect.
+
+See also: TRADE COMMAND, TRADE COLLECT
+#
+"TRADE LIST"
+
+Usage:  trade list [keywords]
+
+This command lists items available for trade at the Trading Post. If you give
+a set of keywords, it will only show items that match these keywords.
+
+If the cost in your own local coins is different than the posted coin cost, the
+cost to you will be given in parentheses.
+
+The numbers on this list match up to the "trade buy" command if you use the
+exact same set of keywords.
+
+See also: TRADE COMMAND, TRADE BUY
+#
+"TRADE BUY"
+
+Usage:  trade buy [number | keywords | number.keywords]
+
+You can buy posted trades at any Trading Post. Use "trade list" to find the
+correct number (but be aware it might change if something is purchased). If
+you use "trade list" with the exact same set of keywords as trade buy, the
+numbers will match up.
+
+For example, if "trade list sword" shows the item you want at number 4, then
+"trade buy 4.sword" will purchase it. You will receive the item immediately.
+
+See also: TRADE COMMAND, TRADE BUY
+#
+"TRADE CANCEL"
+
+Usage:  trade cancel [number | keywords | number.keywords]
+
+If you posted a trade by accident, or want to re-post it at a different price,
+you can cancel the trade at any time. You will lose the money you paid to post
+it in the first place.
+
+Canceling a trade expires it immediately. You must use "trade collect" to get
+the item back when you're done.
+
+See also: TRADE COMMAND, TRADE COLLECT
+#
+"TRADE COLLECT"
+
+Usage:  trade collect
+
+This command retrieves all the money your trades have sold for, plus any
+expired trade items you posted.
+
+See also: TRADE COMMAND
+#
+"TRADE IDENTIFY"
+
+Usage:  trade identify <item>
+
+This command will get you full stats on an item up for trade.
+
+See also:  TRADE COMMAND
+#
+"TRADE POST"
+
+Usage:  trade post <item> <cost> [time]
+
+You can post trade items from your inventory at any Trading Post. The cost you
+specify will be in your own local currency (the currency of your empire if you
+are in one, or in miscellaneous coins if not).
+
+The time to post the item is in real hours, and defaults to the maximum post
+time if you don't specify it. The minimum time is 1 hour.
+
+You must pay a small fee to post an item, based on its gear level. You will get
+this money back if your item sells successfully. However, there is a 5% charge
+for each successful sale.
+
+For example, if an item costs you 4 coins to post and you sell it for 10 coins,
+You'll receive 9 coins (95% of the sale price) plus your original 4 back, for
+a total of 13 coins.
+
+See also: TRADE COMMAND, TRADE BUY, TRADE CHECK, TRADE COLLECT
+#
+VAULT WAREHOUSE
+
+Building:  {WW}  Warehouse  (Artisans skill)
+Built on:  plains, desert
+
+Command:  warehouse inventory [item keywords]
+          warehouse identify <item keywords>
+          warehouse retrieve [number] <item keywords>
+          warehouse store [number] <item keywords>
+
+While normal resource storage (e.g. the lumber yard) can store many simple
+items, you must use a warehouse or vault to store items which are unique,
+scaled, enchanted, superior, or otherwise modified. Warehouse and vault storage
+are identical except that the vault requires "withdraw" empire privilege to
+use it, and warehouse only requires that you be a member of the empire. Both
+use the "warehouse" command.
+
+Items which can be stored in normal resource storage may not be stored using
+the "warehouse" command. Also note that treasure (like gold bars) must be
+stored in the vault using the regular "store" command, not "warehouse".
+
+The "warehouse list" will give you a numbered list of things on your current
+island that match the keywords (or all items if you don't give keywords). You
+can choose which matching thing to retrieve, for example:
+> warehouse inv sword
+ 1. a greatsword
+ 2. (2) a greatsword (enchanted)
+ 3. (4) a short sword
+> warehouse retrieve 2.sword
+You retrieve a greatsword (enchanted).
+> warehouse retrieve all 3.sword
+You retrieve a short sword (x4).
+
+Note: Immortals can see the warehouse lists for other empires using the syntax
+"warehouse inv <empire> [keywords]".
+
+See also: ARTISANS, PRIVILEGE, RETRIEVE, STORE
+#
+$
