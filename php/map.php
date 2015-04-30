@@ -28,6 +28,9 @@
 * colors to this system.
 */
 
+// this utility may need a lot of RAM, briefly, depending on the size of your map
+ini_set('memory_limit', '512M');
+
 // CHANGE THIS: the path to your mud
 $basePath = "/path/to/empireMUD";
 
