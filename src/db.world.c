@@ -1699,12 +1699,7 @@ crop_data *get_potential_crop_for_location(room_data *location) {
 	y = WRAP_Y_COORD(y);
 	
 	// determine climate
-	if (ROOM_CROP_TYPE(location) != NOTHING) {
-		climate = GET_CROP_CLIMATE(crop_proto(ROOM_CROP_TYPE(location)));
-	}
-	else {
-		climate = GET_SECT_CLIMATE(SECT(location));
-	}
+	climate = GET_SECT_CLIMATE(SECT(location));
 	
 	// don't allow NONE climates in here
 	if (climate == CLIMATE_NONE) {
