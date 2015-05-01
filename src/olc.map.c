@@ -214,7 +214,7 @@ OLC_MODULE(mapedit_icon) {
 
 	delete_doubledollar(argument);
 
-	if (IS_INSIDE(IN_ROOM(ch)) || !IS_ADVENTURE_ROOM(IN_ROOM(ch)))
+	if (IS_INSIDE(IN_ROOM(ch)) || IS_ADVENTURE_ROOM(IN_ROOM(ch)))
 		msg_to_char(ch, "You may not do that here.\r\n");
 	else if (!str_cmp(argument, "none")) {
 		if (ROOM_CUSTOM_ICON(IN_ROOM(ch))) {
