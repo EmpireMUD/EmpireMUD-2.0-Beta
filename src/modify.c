@@ -1017,7 +1017,7 @@ int format_script(struct descriptor_data *d) {
 			nlen += 2;
 		}
 		llen = snprintf(line + nlen, sizeof(line) - nlen, "%s\r\n", t);
-		if (llen < 0 || llen + nlen + len > d->max_str - 1 ) {
+		if (llen + nlen + len > d->max_str - 1 ) {
 			msg_to_desc(d, "String too long, formatting aborted\r\n");
 			free(sc);
 			return FALSE;
