@@ -2,7 +2,7 @@ EmpireMUD 0.0 Beta
 
 The CircleMUD license encompasses all of the necessary information and thus
 saves me the headache of repeating what its done.  Jeremy Elson is a visionary
-in that he has forseen all possible legal aspects and compensated for them in
+in that he has foreseen all possible legal aspects and compensated for them in
 his license.
 
 I have no copyright on any of the EmpireMUD code, nor do I plan to.  It's
@@ -16,7 +16,7 @@ Here are some clarifications:
    Traditionally, they appear on the intro screen.  However, Jeremy Elson has
    defined login sequence to be the time from when a player connects to when
    they begin to play the game and thus I have moved the credits to their own
-   section of text which is displayed immediately preceeding the MOTD.  This
+   section of text which is displayed immediately preceding the MOTD.  This
    means it's shown immediately after typing your password unless you create
    a new character.  It is shown later to new characters.  You may add to the
    credits there, but you may not remove or change them.  You may put them
@@ -256,7 +256,7 @@ Rules:
 
 
    Any running version of DikuMud must include our names in the login
-   sequence. Furthermore the "credits" command shall always cointain
+   sequence. Furthermore the "credits" command shall always contain
    our name, addresses, and a notice which states we have created DikuMud.
 
    You are allowed to alter DikuMud, source and documentation as long as
