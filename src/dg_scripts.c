@@ -1559,30 +1559,56 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				case MOB_TRIGGER:
 					ch = (char_data*) go;
 
-					if ((o = get_object_in_equip(ch, name)));
-					else if ((o = get_obj_in_list(name, ch->carrying)));
-					else if ((c = get_char_room(name, IN_ROOM(ch))));
-					else if ((o = get_obj_in_list(name, ROOM_CONTENTS(IN_ROOM(ch)))));
-					else if ((c = get_char(name)));
-					else if ((o = get_obj(name)));
-					else if ((r = get_room(IN_ROOM(ch), name)));
+					if ((o = get_object_in_equip(ch, name))) {
+						// just setting
+					}
+					else if ((o = get_obj_in_list(name, ch->carrying))) {
+						// just setting
+					}
+					else if ((c = get_char_room(name, IN_ROOM(ch)))) {
+						// just setting
+					}
+					else if ((o = get_obj_in_list(name, ROOM_CONTENTS(IN_ROOM(ch))))) {
+						// just setting
+					}
+					else if ((c = get_char(name))) {
+						// just setting
+					}
+					else if ((o = get_obj(name))) {
+						// just setting
+					}
+					else if ((r = get_room(IN_ROOM(ch), name))) {
+						// just setting
+					}
 
 					break;
 				case OBJ_TRIGGER:
 					obj = (obj_data*) go;
 
-					if ((c = get_char_by_obj(obj, name)));
-					else if ((o = get_obj_by_obj(obj, name)));
-					else if ((r = get_room(obj_room(obj), name)));
+					if ((c = get_char_by_obj(obj, name))) {
+						// just setting
+					}
+					else if ((o = get_obj_by_obj(obj, name))) {
+						// just setting
+					}
+					else if ((r = get_room(obj_room(obj), name))) {
+						// just setting
+					}
 
 					break;
 				case WLD_TRIGGER:
 				case RMT_TRIGGER:
 					room = (room_data*) go;
 
-					if ((c = get_char_by_room(room, name)));
-					else if ((o = get_obj_by_room(room, name)));
-					else if ((r = get_room(room, name)));
+					if ((c = get_char_by_room(room, name))) {
+						// just setting
+					}
+					else if ((o = get_obj_by_room(room, name))) {
+						// just setting
+					}
+					else if ((r = get_room(room, name))) {
+						// just setting
+					}
 
 					break;
 			}
