@@ -516,6 +516,9 @@ void found_city(char_data *ch, char *argument) {
 	int iter, dist;
 	struct empire_city_data *city;
 	
+	// flags which block city found
+	bitvector_t nocity_flags = SECTF_ADVENTURE | SECTF_NON_ISLAND | SECTF_NO_CLAIM | SECTF_START_LOCATION | SECTF_IS_ROAD | SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_HAS_CROP_DATA | SECTF_CROP | SECTF_MAP_BUILDING | SECTF_INSIDE | SECTF_IS_TRENCH | SECTF_SHALLOW_WATER;
+	
 	int min_distance_between_ally_cities = config_get_int("min_distance_between_ally_cities");
 	int min_distance_between_cities = config_get_int("min_distance_between_cities");
 	int min_distance_from_city_to_starting_location = config_get_int("min_distance_from_city_to_starting_location");
@@ -531,7 +534,7 @@ void found_city(char_data *ch, char *argument) {
 		msg_to_char(ch, "You don't have permission to found cities.\r\n");
 		return;
 	}
-	if (ROOM_IS_CLOSED(IN_ROOM(ch)) || COMPLEX_DATA(IN_ROOM(ch)) || IS_WATER_SECT(SECT(IN_ROOM(ch)))) {
+	if (ROOM_IS_CLOSED(IN_ROOM(ch)) || COMPLEX_DATA(IN_ROOM(ch)) || IS_WATER_SECT(SECT(IN_ROOM(ch))) || ROOM_SECT_FLAGGED(IN_ROOM(ch), nocity_flags)) {
 		msg_to_char(ch, "You can't found a city right here.\r\n");
 		return;
 	}
