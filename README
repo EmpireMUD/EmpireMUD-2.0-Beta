@@ -37,13 +37,12 @@ Downloading EmpireMUD
 You can find information at the website:
   http://empiremud.net
 
-The archive will be called something like "empiremudXXX.tar.gz" (where
-"XXX" is the version number).
+The source code and game files are available on GitHub at:
+  https://github.com/EmpireMUD/EmpireMUD-2.0-Beta
 
-Once you download the archive, you must decompress it.  To unpack the
-archive on a UNIX system, type:
-
-        tar xzf empiremudXXX.tar.gz
+You may also get EmpireMUD as an archive. Once you download the archive,
+you must decompress it.  To unpack the archive on a UNIX system, type:
+  tar xzf empiremudXXX.tar.gz
 
 
 

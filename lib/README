@@ -1,0 +1,14 @@
+Game library files.
+
+boards - In-game board files.
+books - Books written by players.
+empires - The empire files (ascii).
+etc - Various files (mostly binary) written by the MUD.
+misc - Supplemental files.
+packs - Storage files for objects on the ground.
+plralias - Player alias storage.
+plrlore - Player lore files.
+plrobjs - Player inventories and gear.
+plrvars - DG Scripts player variable storage.
+text - Intro screens, help files, and various text.
+world - Adventure zones, objects, and the live world map.

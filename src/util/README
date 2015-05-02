@@ -1,0 +1,7 @@
+This directory contains some supplemental utilities including the map
+generator. You must run the 'configure' script in the mud's root directory
+before you can compile here. This directory automatically compiles when you
+use 'make all' in the src directory.
+
+All of these utilities compile into empiremud/bin except the map generator.
+See the main README file for instructions on using the map generator.

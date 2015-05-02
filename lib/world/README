@@ -1,0 +1,14 @@
+This directory contains data files for various in-game prototypes:
+
+adv - Adventure zones
+bld - Buildings and designated rooms
+craft - Craft (forge, sew, etc) and build recipes
+crop - Crops
+mob - Mobiles/NPCs
+obj - Objects
+rmt - Room templates (for adventures)
+sect - Sectors (map terrain types)
+trg - DG Scripts triggers
+
+The final one is different.
+wld - The live world map and live rooms

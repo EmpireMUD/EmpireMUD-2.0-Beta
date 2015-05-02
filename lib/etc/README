@@ -1,0 +1,9 @@
+Various game binary files in this directory:
+
+badsites - Ban data.
+DELETED - A list of players deleted by the purge program.
+exp_cycle - The timestamp of the last daily skill reset.
+instances - Data for all current adventure instances (ascii).
+players - The player file. Be careful with this one.
+plrmail - In-game pigeon mail.
+time - The timestamp from the mud's first boot, for computing the year.
