@@ -58,6 +58,7 @@ extern obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location);
 int file_to_string_alloc(const char *name, char **buf);
 void get_one_line(FILE *fl, char *buf);
 void index_boot_help();
+void save_daily_cycle();
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1417,6 +1418,7 @@ void load_daily_cycle(void) {
 
 	if (!(fl = fopen(EXP_FILE, "r"))) {
 		daily_cycle = time(0);
+		save_daily_cycle();	// save now so we get a reset in 24 hours
 		return;
 	}
 
