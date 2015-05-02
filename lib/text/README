@@ -1,0 +1,14 @@
+This directory contains various text displays:
+
+credits - Shown when a player types 'credits'.
+credits.short - Shown during the login sequence.
+godlist - Dynamic list of god-level players.
+handbook - Immortal rules document on the 'handbook' command.
+help - The various help files.
+imotd - Shown to immortals when they log in.
+info - Newbie guide shown on the 'info' command.
+intros - Login screens/greetings.
+motd - Shown to mortals when they log in.
+names - Name lists for NPCs.
+policies - The mortal rules document shown on the 'policy' command.
+wizlist - Dynamic list of immortals.

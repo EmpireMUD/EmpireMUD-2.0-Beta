@@ -1,0 +1,10 @@
+This directory contains some data files, all ascii:
+
+bugs - Player-submitted bugs ('bug', 'show bugs' in-game).
+game_configs - The in-game 'config' system data.
+ideas - Player-submitted ideas ('idea', 'show ideas' in-game).
+messages - Fight messages matching the TYPE_x consts in the code.
+socials - Pre-configured socials/emotes.
+tips - Tip-a-day entries.
+typos - Player-submitted typoes ('typo', 'show typos' in-game).
+xnames - Disallowed player names.

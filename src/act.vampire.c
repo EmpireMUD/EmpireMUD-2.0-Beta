@@ -1158,8 +1158,9 @@ ACMD(do_regenerate) {
 	#define REGEN_PER_BLOOD_AT_75	1.5
 	#define REGEN_PER_BLOOD_AT_100	2.5
 
-	int cost = 10, per, mode, amount = -1;
+	int cost = 10, mode, amount = -1;
 	char arg2[MAX_INPUT_LENGTH];
+	double per;
 	
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs cannot use regenerate.\r\n");

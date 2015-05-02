@@ -1,0 +1,7 @@
+This directory contains the code files. You must run the 'configure' script
+in the mud's root directory before you can compile. Use 'make all' to compile
+EmpireMUD.
+
+util (dir) - additional utilities such as the map generator
+Makefile.in - used by the configure system
+conf.h.in - used by the configure system
