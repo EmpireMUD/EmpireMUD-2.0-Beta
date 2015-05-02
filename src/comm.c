@@ -2626,7 +2626,7 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 
 	*cp = '\0';
 
-	strcat(pbuf, " &0");
+	strcat(pbuf, "&0");
 	return (pbuf);
 }
 
