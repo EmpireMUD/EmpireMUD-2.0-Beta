@@ -1598,7 +1598,10 @@ SHOW(show_player) {
 	strcpy(lastlog, ctime(&vbuf.last_logon));
 	// Www Mmm dd hh:mm:ss yyyy
 	sprintf(buf + strlen(buf), "Started: %-16.16s %4.4s   Last: %-16.16s %4.4s\r\n", birth, birth+20, lastlog, lastlog+20);
-	sprintf(buf + strlen(buf), "Creation host: %s\r\n", vbuf.player_specials_saved.creation_host);
+	
+	if (vbuf.access_level <= GET_ACCESS_LEVEL(ch)) {
+		sprintf(buf + strlen(buf), "Creation host: %s\r\n", vbuf.player_specials_saved.creation_host);
+	}
 	
 	days_played = (double)(time(0) - vbuf.birth) / SECS_PER_REAL_DAY;
 	avg_min_per_day = (((double) vbuf.played / SECS_PER_REAL_HOUR) / days_played) * SECS_PER_REAL_MIN;
@@ -2371,7 +2374,9 @@ void do_stat_character(char_data *ch, char_data *k) {
 		buf2[4] = '\0';	// get only year
 
 		msg_to_char(ch, "Created: [%s, %s], Played [%dh %dm], Age [%d]\r\n", buf1, buf2, k->player.time.played / SECS_PER_REAL_HOUR, ((k->player.time.played % SECS_PER_REAL_HOUR) / SECS_PER_REAL_MIN), age(k)->year);
-		msg_to_char(ch, "Created from host: [%s]\r\n", GET_CREATION_HOST(k));
+		if (GET_ACCESS_LEVEL(k) <= GET_ACCESS_LEVEL(ch)) {
+			msg_to_char(ch, "Created from host: [%s]\r\n", GET_CREATION_HOST(k));
+		}
 		
 		if (GET_ACCESS_LEVEL(k) >= LVL_BUILDER) {
 			sprintbit(GET_OLC_FLAGS(k), olc_flag_bits, buf, TRUE);
