@@ -3585,7 +3585,7 @@ ACMD(do_roster) {
 				size += snprintf(buf + size, sizeof(buf) - size, "[%d %s] <%s&0> %s%s&0", chdata.player_specials_saved.last_known_level, class_data[chdata.player_specials_saved.character_class].name, EMPIRE_RANK(e, chdata.player_specials_saved.rank - 1), (timed_out ? "&r" : ""), chdata.name);
 								
 				// online/not
-				if ((tmp = get_player_vis(ch, chdata.name, FIND_CHAR_WORLD | FIND_NO_DARK))) {
+				if ((tmp = is_playing(chdata.char_specials_saved.idnum))) {
 					size += snprintf(buf + size, sizeof(buf) - size, "  - &conline&0%s", IS_AFK(tmp) ? " - &rafk&0" : "");
 				}
 				else if ((time(0) - chdata.last_logon) < SECS_PER_REAL_DAY) {
