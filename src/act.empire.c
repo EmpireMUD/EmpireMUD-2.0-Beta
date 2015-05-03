@@ -3581,11 +3581,13 @@ ACMD(do_roster) {
 		load_char((player_table + j)->name, &chdata);
 		if (!IS_SET(chdata.char_specials_saved.act, PLR_DELETED)) {
 			if (chdata.player_specials_saved.empire == EMPIRE_VNUM(e)) {
+				tmp = is_playing(chdata.char_specials_saved.idnum);
+			
 				timed_out = member_is_timed_out_cfu(&chdata);
-				size += snprintf(buf + size, sizeof(buf) - size, "[%d %s] <%s&0> %s%s&0", chdata.player_specials_saved.last_known_level, class_data[chdata.player_specials_saved.character_class].name, EMPIRE_RANK(e, chdata.player_specials_saved.rank - 1), (timed_out ? "&r" : ""), chdata.name);
+				size += snprintf(buf + size, sizeof(buf) - size, "[%d %s] <%s&0> %s%s&0", tmp ? GET_COMPUTED_LEVEL(tmp) : chdata.player_specials_saved.last_known_level, class_data[tmp ? GET_CLASS(tmp) : chdata.player_specials_saved.character_class].name, EMPIRE_RANK(e, (tmp ? GET_RANK(tmp) : chdata.player_specials_saved.rank) - 1), (timed_out ? "&r" : ""), chdata.name);
 								
 				// online/not
-				if ((tmp = is_playing(chdata.char_specials_saved.idnum))) {
+				if (tmp) {
 					size += snprintf(buf + size, sizeof(buf) - size, "  - &conline&0%s", IS_AFK(tmp) ? " - &rafk&0" : "");
 				}
 				else if ((time(0) - chdata.last_logon) < SECS_PER_REAL_DAY) {
