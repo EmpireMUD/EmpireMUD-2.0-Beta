@@ -142,12 +142,14 @@ bool valid_rank_name(char *newname) {
 	int iter;
 	bool ok = TRUE;
 	
+	char *valid = " -&'";
+	
 	if ((strlen(newname) - 2*count_color_codes(newname)) > MAX_RANK_LENGTH) {
 		ok = FALSE;
 	}
 
 	for (iter = 0; iter < strlen(newname) && ok; ++iter) {
-		if (!isalnum(newname[iter]) && newname[iter] != ' ' && newname[iter] != '&') {
+		if (!isalnum(newname[iter]) && !strchr(valid, newname[iter])) {
 			ok = FALSE;
 		}
 	}
