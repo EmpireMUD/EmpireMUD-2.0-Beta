@@ -409,6 +409,7 @@ ACMD(do_hit) {
 
 
 ACMD(do_respawn) {
+	extern bool can_enter_instance(char_data *ch, struct instance_data *inst);
 	extern room_data *find_load_room(char_data *ch);
 	void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, int ability);
 	extern obj_data *player_death(char_data *ch);
@@ -420,8 +421,11 @@ ACMD(do_respawn) {
 		if (GET_RESURRECT_TIME(ch) + (5 * SECS_PER_REAL_MIN) < time(0)) {
 			msg_to_char(ch, "Your resurrection has expired.\r\n");
 		}
+		else if (ROOM_INSTANCE(loc) && !can_enter_instance(ch, ROOM_INSTANCE(loc))) {
+			msg_to_char(ch, "You can't seem to resurrect there. Perhaps the adventure is full.\r\n");
+		}
 		else {
-			perform_resurrection(ch, is_playing(GET_RESURRECT_BY(ch)), real_room(GET_RESURRECT_LOCATION(ch)), GET_RESURRECT_ABILITY(ch));
+			perform_resurrection(ch, is_playing(GET_RESURRECT_BY(ch)), loc, GET_RESURRECT_ABILITY(ch));
 		}
 	}
 	else if (!IS_DEAD(ch) && !IS_INJURED(ch, INJ_STAKED)) {
