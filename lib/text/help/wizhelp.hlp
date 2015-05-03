@@ -827,13 +827,14 @@ This is a generic command that houses several simple utilities for immortals.
 They generally have no game effect, but can help with testing.
 
 Available utilities:
- diminish <number> <scale> - applies the game's diminishing returns formula,
+ diminish <number> <scale> - Applies the game's diminishing returns formula,
     and returns the result.
+ islandsize - Counts and displays tile counts for all islands.
  playerdump - Outputs a data file with tab-separated lines for all players with
     account, playtime, and host.
- randtest [number] [size] - generates a large number of random numbers, and
+ randtest [number] [size] - Generates a large number of random numbers, and
     reports the results.
- redoislands - renumbers all the islands (requires confirmation; may rearrange
+ redoislands - Renumbers all the islands (requires confirmation; may rearrange
     empire inventories).
 #d
 VNUM
