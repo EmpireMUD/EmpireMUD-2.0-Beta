@@ -513,7 +513,7 @@ void display_score_to_char(char_data *ch, char_data *to) {
 		if (j % 3)
 			strcat(buf, "\r\n ");
 		if (*buf)
-			msg_to_char(to, "+------------------------------- Resources -----------------------------------+\r\n%s", buf);
+			msg_to_char(to, "+------------------------------- Resources ---------------------------------+\r\n%s", buf);
 	}
 
 	// everything leaves a starting space so this next line does not need it
