@@ -1545,6 +1545,7 @@ SHOW(show_player) {
 	strcpy(lastlog, ctime(&vbuf.last_logon));
 	// Www Mmm dd hh:mm:ss yyyy
 	sprintf(buf + strlen(buf), "Started: %-16.16s %4.4s   Last: %-16.16s %4.4s\r\n", birth, birth+20, lastlog, lastlog+20);
+	sprintf(buf + strlen(buf), "Creation host: %s\r\n", vbuf.player_specials_saved.creation_host);
 	
 	days_played = (double)(time(0) - vbuf.birth) / SECS_PER_REAL_DAY;
 	avg_min_per_day = (((double) vbuf.played / SECS_PER_REAL_HOUR) / days_played) * SECS_PER_REAL_MIN;
@@ -2308,10 +2309,8 @@ void do_stat_character(char_data *ch, char_data *k) {
 
 		msg_to_char(ch, "Access Level: [&c%d&0], Class: [&c%s&0/&c%s&0], Skill Level: [&c%d&0], Gear Level: [&c%d&0], Total: [&c%d&0]\r\n", GET_ACCESS_LEVEL(k), class_data[GET_CLASS(k)].name, class_role[(int) GET_CLASS_ROLE(k)], GET_SKILL_LEVEL(k), (int) GET_GEAR_LEVEL(k), IN_ROOM(k) ? GET_COMPUTED_LEVEL(k) : GET_LAST_KNOWN_LEVEL(k));
 		
-		if (!IS_NPC(k)) {
-			coin_string(GET_PLAYER_COINS(k), buf);
-			msg_to_char(ch, "Coins: %s\r\n", buf);
-		}
+		coin_string(GET_PLAYER_COINS(k), buf);
+		msg_to_char(ch, "Coins: %s\r\n", buf);
 
 		strcpy(buf1, (char *) asctime(localtime(&(k->player.time.birth))));
 		strcpy(buf2, buf1 + 20);
@@ -2319,6 +2318,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 		buf2[4] = '\0';	// get only year
 
 		msg_to_char(ch, "Created: [%s, %s], Played [%dh %dm], Age [%d]\r\n", buf1, buf2, k->player.time.played / SECS_PER_REAL_HOUR, ((k->player.time.played % SECS_PER_REAL_HOUR) / SECS_PER_REAL_MIN), age(k)->year);
+		msg_to_char(ch, "Created from host: [%s]\r\n", GET_CREATION_HOST(k));
 		
 		if (GET_ACCESS_LEVEL(k) >= LVL_BUILDER) {
 			sprintbit(GET_OLC_FLAGS(k), olc_flag_bits, buf, TRUE);
