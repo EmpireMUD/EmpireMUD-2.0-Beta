@@ -121,6 +121,13 @@ int find_eq_pos(char_data *ch, obj_data *obj, char *arg) {
 			send_to_char(buf, ch);
 		}
 	}
+	
+	// check cascading wears (ring 1 -> ring 2)
+	if (GET_EQ(ch, where)) {
+		if (wear_data[where].cascade_pos != NO_WEAR) {
+			where = wear_data[where].cascade_pos;
+		}
+	}
 
 	return (where);
 }
@@ -508,15 +515,9 @@ static void perform_wear(char_data *ch, obj_data *obj, int where) {
 		return;
 	}
 	
-	// position cascade
-	if (where == WEAR_FINGER_R && GET_EQ(ch, where)) {
-		where = WEAR_FINGER_L;
-	}
-	else if (where == WEAR_NECK_1 && GET_EQ(ch, where)) {
-		where = WEAR_NECK_2;
-	}
-	else if (where == WEAR_SHEATH_1 && GET_EQ(ch, where)) {
-		where = WEAR_SHEATH_2;
+	// position cascade (ring 1/2, etc)
+	if (GET_EQ(ch, where) && wear_data[where].cascade_pos != NO_WEAR) {
+		where = wear_data[where].cascade_pos;
 	}
 
 	// make sure it wouldn't drop any primary attribute below 1
