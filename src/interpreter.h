@@ -175,6 +175,10 @@ struct alias_data {
 #define SCMD_GOTO		0
 #define SCMD_TELEPORT	1
 
+// do_prompt
+#define SCMD_PROMPT  0
+#define SCMD_FPROMPT  1
+
 /* do_reboot */
 #define SCMD_REBOOT			0
 #define SCMD_SHUTDOWN		1

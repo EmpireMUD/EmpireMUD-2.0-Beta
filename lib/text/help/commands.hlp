@@ -905,14 +905,19 @@ Examples:
 
 See also: FILL, TRENCH
 #
-PROMPT
+PROMPT FPROMPT "FIGHT PROMPT" "COMBAT PROMPT"
 
-Usage: prompt <prompt string>
+Usage: prompt <string | off | default>
+       fprompt <string | off | default>
 
 The prompt is the text you see when the game is waiting for you to do
 something, and it's usually right next to where you type (but some mud clients
 put typing in its own field). You can use the default prompt, which shows how
 injured and tired you are. Or you can choose your own prompt.
+
+You can also set an fprompt, which is used only when you are in combat. It may
+be different from your regular prompt. Using "fprompt default" will cause you
+to see your normal prompt in combat.
 
 Typing "prompt off" will remove your prompt entirely, and "prompt default"
 will restore your default prompt.

@@ -2419,7 +2419,14 @@ char *prompt_color_by_prc(int cur, int max) {
 * @return char* The finished prompt
 */
 char *prompt_str(char_data *ch) {
-	char *str = GET_PROMPT(REAL_CHAR(ch));
+	char *str;
+	
+	if (FIGHTING(ch)) {
+		str = GET_FIGHT_PROMPT(REAL_CHAR(ch)) ? GET_FIGHT_PROMPT(REAL_CHAR(ch)) : GET_PROMPT(REAL_CHAR(ch));
+	}
+	else {
+		str = GET_PROMPT(REAL_CHAR(ch));
+	}
 
 	if (!ch->desc)
 		return (">");
