@@ -111,6 +111,10 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 	
 	msg_to_char(ch, "%s%s&0%s, led by %s\r\n", EMPIRE_BANNER(e), EMPIRE_NAME(e), line, (get_name_by_id(EMPIRE_LEADER(e)) ? CAP(get_name_by_id(EMPIRE_LEADER(e))) : "(Unknown)"));
 	
+	if (IS_IMMORTAL(ch)) {
+		msg_to_char(ch, "Created: %s\r\n", ctime(&EMPIRE_CREATE_TIME(e)));
+	}
+	
 	if (EMPIRE_DESCRIPTION(e)) {
 		msg_to_char(ch, "%s&0", EMPIRE_DESCRIPTION(e));
 	}
