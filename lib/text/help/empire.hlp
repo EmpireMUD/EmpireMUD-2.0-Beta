@@ -199,7 +199,7 @@ achieving Prominence, and for having at least 10 technologies.
 
 - &ccity rename <number> <new name>&0: This allows you to rename a city.
 
-- &&ccity traits <name> [add | remove] <trait(s)>&0: Change city traits.
+- &ccity traits <name> [add | remove] <trait(s)>&0: Change city traits.
 
 Types of cities:
  -C1-  Outpost (5)
