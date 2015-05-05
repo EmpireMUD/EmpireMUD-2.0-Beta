@@ -894,15 +894,17 @@ inventory()       - Returns the id of the first item in the actors inventory or
                     the id of the first object with vnum in the subfield. If
                     the character doesn't have the item, an empty string is
                     returned. %actor.inventory(1300)%. * checks for any inv. 
-is_killer(on/off) - If the ()'s are omitted, return value is whether or not the 
-                    actor is marked as a Player killer. If the ()'s are 
-                    omitted, return value is whether or not the character is 
-                    marked as a killer. Can be set on or off with: 
-                    nop %actor.is_killer(on)%
-is_pc             - Checks if the actor is a player. Useful when you want a 
-                    trigger to fire on players and not mobs. 
+is_ally(char)     - Returns true if the other character is a combat ally. Run
+                    this in two steps:
+                    eval test %%actor.is_ally(%char%)%%
+                    if %test% ...
+is_enemy(char)    - Returns true if the other character is a combat enemy.
+is_god            - Returns true if the actor is a God-level player.
 is_hostile(on/off)- If the ()'s are omitted, return value is whether or not the 
                     actor is marked as a Hostile player.
+is_immortal       - Returns true if the actor is an immortal (admin).
+is_pc             - Checks if the actor is a player. Useful when you want a 
+                    trigger to fire on players and not mobs.
 level             - The actor's computed level (or scaled level, for mobs).
 mana              - The current mana points of the actor.
 master            - The master of the actor (as an id), or an empty return.
