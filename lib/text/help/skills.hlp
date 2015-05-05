@@ -445,7 +445,7 @@ Usage:  specialize <skill>
 This command allows you to choose which skills become your class skills and
 specialties. You can only specialize a skill that's at 50 (the basic skill cap)
 or 75 (the specialty skill cap). Doing this will gain you a free point in the
-skill and allow you to continue leveling it.
+skill and allow you to continue levelling it.
 
 NOTE: This is a temporary command. In the future, we intend to use quests and
 other mechanisms for players who want to specialize.

@@ -677,7 +677,7 @@ time. When a script is being executed it will attempt to execute all commands
 right away. To get small breaks in, and perhaps give the players time to adjust, 
 use the wait command.
 
-* If you want to syncronise your script, you can use the 'wait until' feature.
+* If you want to synchronise your script, you can use the 'wait until' feature.
 * This script wakes the mob at dawn, and puts him to sleep at night.
 wait until 8:00
 wake
@@ -1083,7 +1083,7 @@ Argument    : not used.
 #d
 TRIGEDIT-OBJ-ABILITY
 
-Activated when the obj is targetted by an ability.
+Activated when the obj is targeted by an ability.
  
 Numeric Arg : percent chance this trigger will be activated. 
 Argument    : not used.
@@ -1105,7 +1105,7 @@ Argument    : not used.
 Used with return 0 will prevent the player from leaving the room.
 
 Variables: 
-%actor%     - the character leavering the room. 
+%actor%     - the character leaving the room. 
 %direction% - the direction the character is leaving to.
 #d
 TRIGEDIT-OBJ-CONSUME
@@ -1248,7 +1248,7 @@ Argument    : not used.
 Used with return 0 will prevent the player from leaving the room.
 
 Variables: 
-%actor%     - the character leavering the room. 
+%actor%     - the character leaving the room. 
 %direction% - the direction the character is leaving to.
 #d
 TRIGEDIT-ROOM-DOOR TRIGEDIT-DOOR
@@ -1400,7 +1400,7 @@ TRIGEDIT-MOB-HITPERCENT TRIGEDIT-MOB-HITPRCNT
 Activated during combat when the mobiles hit point percentage drops below a 
 specified percentage.
  
-Numeric Arg : percentage of hitpoints at the threshhold of allowing this trigger to
+Numeric Arg : percentage of hitpoints at the threshold of allowing this trigger to
               activate.
 Argument    : not used.
 
@@ -1439,7 +1439,7 @@ Variables:
 #d
 TRIGEDIT-MOB-ABILITY
 
-Activated when the mob is targetted by an ability.
+Activated when the mob is targeted by an ability.
  
 Numeric Arg : percent chance this trigger will be activated. 
 Argument    : not used.
@@ -1461,7 +1461,7 @@ Argument    : not used.
 Used with return 0 will prevent the player from leaving the room.
 
 Variables: 
-%actor%     - the character leavering the room. 
+%actor%     - the character leaving the room. 
 %direction% - the direction the character is leaving to.
 #d
 TRIGEDIT-MOB-DOOR 
@@ -1601,8 +1601,8 @@ seen other scripts do, and allows you to produce a more interesting script.
   
 For example, I want to create a gate guard for a small walled town. The ruler
 of the town has decided that each group of people will be charged ten coins to
-enter his domain. The gate guard must notify travelers of the cost to enter,
-collect the money, allow people who have payed to enter the city, and close the
+enter his domain. The gate guard must notify travellers of the cost to enter,
+collect the money, allow people who have paid to enter the city, and close the
 gate after them. This will be a mob script. 
   
 Decide what trigger types you need.

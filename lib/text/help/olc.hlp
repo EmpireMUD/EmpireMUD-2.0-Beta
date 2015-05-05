@@ -143,7 +143,7 @@ Mobs (MEDIT):
 - If you don't set a min/max level on the mob, it may inherit them from the
   adventure zone it's in. Otherwise, they may scale to any level at all.
 - We usually don't want mobs to be able to scale to any level, so mobs that
-  spawn outside of adventure zones should almost alway shave a min/max set.
+  spawn outside of adventure zones should almost always shave a min/max set.
 - Mobs that use the #n tag to pick from a generic name list will be assigned
   a random sex if you leave their sex "neutral".
 - The HARD flag means a mob needs two players at its level, or one very good
@@ -155,12 +155,12 @@ Mobs (MEDIT):
 - ANIMAL mobs will take double damage from players with Hunt.
 - Consider using a must-fight script (like a Leave trigger with "return 0")
   rather than the AGGR flag.
-- If your mob spawns in a dark adventure, strongly consider givign it INFRA.
+- If your mob spawns in a dark adventure, strongly consider giving it INFRA.
 - Animal mobs usually need a BUTCHER and SKIN interaction.
 
 Objects (OEDIT):
 - The most significant keyword should always be first. A fiery torch should put
-  "torch" first. Joe's amaazing magical wand should put "wand" first. The first
+  "torch" first. Joe's amazing magical wand should put "wand" first. The first
   keyword may be used to build sentences such as "You attack with your wand."
 - Most equipment should be set SCALABLE, and there are very few acceptable
   reasons not to do so. We prefer you rely on the scaling engine rather than
@@ -526,7 +526,7 @@ The following affect flags are available:
  ENTANGLED - Cannot move -- do not use this on items.
  SLOW - Combat speed reduced, like the Slow spell.
  STUNNED - Can't participate in combat or move -- do not use this on items.
- STONED - Sees the world in stange, trippy colors.
+ STONED - Sees the world in strange, trippy colors.
  !BLOOD - Cannot spend blood points.
  CLAWS - Boosted vampire claws as barehand melee attack.
  DEATHSHROUD - Appears as a corpse and cannot act -- do not use this on items.
@@ -784,7 +784,7 @@ See also:  OLC BUILDINGS
 Usage:  .name <name>
 
 The 'name' property is used by some commands like 'territory' and 'vnum' to
-search for buildings, so it shoudl be reasonably unique. It's also shown as
+search for buildings, so it should be reasonably unique. It's also shown as
 the short form of a building in some sentences.
 
 You should choose a name that's as short as possible. For example, if your
@@ -1319,7 +1319,7 @@ See also: MAPEDIT DELETE ROOM, MAP OLC
 
 Usage:  .map deleteroom ok
 
-This commmand deletes the room you are standing in. It only works on interior
+This command deletes the room you are standing in. It only works on interior
 (designated) rooms, and cannot be used out on the map. It will automatically
 delete any exits that link to the room you're in.
 
@@ -1884,7 +1884,7 @@ or slow/fast flags.
 
 Weapons that are slow but strong deal the same DPS as weapons that are fast
 but weak. Some strategies prefer one way or the other. For most purposes, two
-weapons are considred equal if their DPS (not their raw damage) is equal.
+weapons are considered equal if their DPS (not their raw damage) is equal.
 
 For SCALABLE objects, thus number is a scalable value if it is set to a number
 other than 0.
@@ -2054,7 +2054,7 @@ See also: OLC OBJECTS
 
 Usage:  .maxlevel <level>
 
-This command determines the maximum level a objecdt will scale to. Players are
+This command determines the maximum level a object will scale to. Players are
 rated from level 1 to 100 based on their skills, plus a number based on their
 gear. There is a full guide to item scaling at HELP ITEM SCALING.
 
@@ -2676,7 +2676,7 @@ Examples:
 Usage:  .sect <command>
         .<command>
 
-The .olc sector editor allows you to add, edit, or remove entire setors
+The .olc sector editor allows you to add, edit, or remove entire sectors
 (terrains) from within the game. It provides an in-game menu for controlling
 every detail of a sector, including how it evolves over time.
 
@@ -3246,7 +3246,7 @@ you want a ship.
 The BOOK type is used along with the bookedit interface and EmpireMUD's library
 system. You can spawn books in adventures by writing them in the book editor,
 then assigning their book ID to a book object in your adventure zone. The
-data from the book editor will override your short decription, long desc-
+data from the book editor will override your short description, long desc-
 ription, and look description.
 #d
 "CART ITEM" "CART OBJECT"

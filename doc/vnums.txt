@@ -1,5 +1,5 @@
 EmpireMUD 2.0 uses vnums under 10000 for built-in content and future expansion.
-We recommed you add new content above vnum 10000. Below is a list of the vnum
+We recommend you add new content above vnum 10000. Below is a list of the vnum
 blocks that are currently in use.
 
    0  Boards
