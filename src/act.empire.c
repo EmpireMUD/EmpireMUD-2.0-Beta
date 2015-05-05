@@ -1682,6 +1682,12 @@ ACMD(do_demote) {
 		msg_to_char(ch, "That person is not in your empire.\r\n");
 	else if ((to_rank != NOTHING ? to_rank : (to_rank = GET_RANK(victim) - 1)) > GET_RANK(victim))
 		msg_to_char(ch, "Use promote for that.\r\n");
+	else if (GET_RANK(victim) > GET_RANK(ch)) {
+		msg_to_char(ch, "You can't demote someone above your rank.\r\n");
+	}
+	else if (GET_IDNUM(victim) == EMPIRE_LEADER(e)) {
+		msg_to_char(ch, "You cannot demote the leader.\r\n");
+	}
 	else if (to_rank == GET_RANK(victim))
 		act("$E is already that rank.", FALSE, ch, 0, victim, TO_CHAR);
 	else if (to_rank < 1)
