@@ -27,7 +27,7 @@ S
 flint stone~
 a flint stone~
 A piece of flint is lying on the ground.~
-You can attach flint to a rock and get a flint set for lighting torches.
+You can craft a flint set and use that to light torches.
 ~
 1 il ano
 0 1 5
@@ -186,7 +186,7 @@ S
 cotton basket~
 a basket of cotton~
 A basket of cotton has been left here.~
-A use for cotton is coming soon...
+Weave cotton into cloth.
 ~
 3 bl a
 0 4 0

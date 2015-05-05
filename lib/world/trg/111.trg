@@ -631,9 +631,11 @@ Lulling songbird combat~
 0 k 20
 ~
 eval target %random.enemy%
-%send% %target% %self.name% sings a sweet tune, lulling you and making you sluggish!
-%echoaround% %target% %self.name% sings a sweet tune, lulling %target.name% and making %target.himher% sluggish!
-dg_affect %target% SLOW on 15
-dg_affect %target% WITS -1 15
+if %target%
+  %send% %target% %self.name% sings a sweet tune, lulling you and making you sluggish!
+  %echoaround% %target% %self.name% sings a sweet tune, lulling %target.name% and making %target.himher% sluggish!
+  dg_affect %target% SLOW on 15
+  dg_affect %target% WITS -1 15
+end
 ~
 $
