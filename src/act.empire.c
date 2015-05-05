@@ -111,6 +111,10 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 	
 	msg_to_char(ch, "%s%s&0%s, led by %s\r\n", EMPIRE_BANNER(e), EMPIRE_NAME(e), line, (get_name_by_id(EMPIRE_LEADER(e)) ? CAP(get_name_by_id(EMPIRE_LEADER(e))) : "(Unknown)"));
 	
+	if (IS_IMMORTAL(ch)) {
+		msg_to_char(ch, "Created: %-24.24s\r\n", ctime(&EMPIRE_CREATE_TIME(e)));
+	}
+	
 	if (EMPIRE_DESCRIPTION(e)) {
 		msg_to_char(ch, "%s&0", EMPIRE_DESCRIPTION(e));
 	}
@@ -516,6 +520,9 @@ void found_city(char_data *ch, char *argument) {
 	int iter, dist;
 	struct empire_city_data *city;
 	
+	// flags which block city found
+	bitvector_t nocity_flags = SECTF_ADVENTURE | SECTF_NON_ISLAND | SECTF_NO_CLAIM | SECTF_START_LOCATION | SECTF_IS_ROAD | SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_HAS_CROP_DATA | SECTF_CROP | SECTF_MAP_BUILDING | SECTF_INSIDE | SECTF_IS_TRENCH | SECTF_SHALLOW_WATER;
+	
 	int min_distance_between_ally_cities = config_get_int("min_distance_between_ally_cities");
 	int min_distance_between_cities = config_get_int("min_distance_between_cities");
 	int min_distance_from_city_to_starting_location = config_get_int("min_distance_from_city_to_starting_location");
@@ -531,7 +538,7 @@ void found_city(char_data *ch, char *argument) {
 		msg_to_char(ch, "You don't have permission to found cities.\r\n");
 		return;
 	}
-	if (ROOM_IS_CLOSED(IN_ROOM(ch)) || COMPLEX_DATA(IN_ROOM(ch)) || IS_WATER_SECT(SECT(IN_ROOM(ch)))) {
+	if (ROOM_IS_CLOSED(IN_ROOM(ch)) || COMPLEX_DATA(IN_ROOM(ch)) || IS_WATER_SECT(SECT(IN_ROOM(ch))) || ROOM_SECT_FLAGGED(IN_ROOM(ch), nocity_flags)) {
 		msg_to_char(ch, "You can't found a city right here.\r\n");
 		return;
 	}
@@ -3574,11 +3581,13 @@ ACMD(do_roster) {
 		load_char((player_table + j)->name, &chdata);
 		if (!IS_SET(chdata.char_specials_saved.act, PLR_DELETED)) {
 			if (chdata.player_specials_saved.empire == EMPIRE_VNUM(e)) {
+				tmp = is_playing(chdata.char_specials_saved.idnum);
+			
 				timed_out = member_is_timed_out_cfu(&chdata);
-				size += snprintf(buf + size, sizeof(buf) - size, "[%d %s] <%s&0> %s%s&0", chdata.player_specials_saved.last_known_level, class_data[chdata.player_specials_saved.character_class].name, EMPIRE_RANK(e, chdata.player_specials_saved.rank - 1), (timed_out ? "&r" : ""), chdata.name);
+				size += snprintf(buf + size, sizeof(buf) - size, "[%d %s] <%s&0> %s%s&0", tmp ? GET_COMPUTED_LEVEL(tmp) : chdata.player_specials_saved.last_known_level, class_data[tmp ? GET_CLASS(tmp) : chdata.player_specials_saved.character_class].name, EMPIRE_RANK(e, (tmp ? GET_RANK(tmp) : chdata.player_specials_saved.rank) - 1), (timed_out ? "&r" : ""), chdata.name);
 								
 				// online/not
-				if ((tmp = get_player_vis(ch, chdata.name, FIND_CHAR_WORLD | FIND_NO_DARK))) {
+				if (tmp) {
 					size += snprintf(buf + size, sizeof(buf) - size, "  - &conline&0%s", IS_AFK(tmp) ? " - &rafk&0" : "");
 				}
 				else if ((time(0) - chdata.last_logon) < SECS_PER_REAL_DAY) {

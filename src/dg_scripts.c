@@ -2106,21 +2106,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							}
 						}
 					}
-
-					/*
-					else if (!str_cmp(field, "is_killer")) {
-						if (subfield && *subfield) {
-							if (!str_cmp("on", subfield))
-								SET_BIT(PLR_FLAGS(c), PLR_KILLER);
-							else if (!str_cmp("off", subfield))
-								REMOVE_BIT(PLR_FLAGS(c), PLR_KILLER);
-						}
-						if (PLR_FLAGGED(c, PLR_KILLER))
-							snprintf(str, slen, "1");
-						else
-							snprintf(str, slen, "0");
-					}
-					*/
 					
 					else if (!str_cmp(field, "is_ally")) {
 						if (subfield && *subfield) {
@@ -2140,6 +2125,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							snprintf(str, slen, "0");
 						}
 					}
+					
+					else if (!str_cmp(field, "is_god")) {
+						snprintf(str, slen, "%d", IS_GOD(c) ? 1 : 0);
+					}
 
 					else if (!str_cmp(field, "is_hostile")) {
 						if (subfield && *subfield && !IS_NPC(c)) {
@@ -2154,6 +2143,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							snprintf(str, slen, "1");
 						else
 							snprintf(str, slen, "0");
+					}
+					
+					else if (!str_cmp(field, "is_immortal")) {
+						snprintf(str, slen, "%d", IS_IMMORTAL(c) ? 1 : 0);
 					}
 
 					else if (!str_cmp(field, "int") || !str_cmp(field, "intelligence")) {

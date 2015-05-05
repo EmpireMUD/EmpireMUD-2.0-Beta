@@ -291,6 +291,7 @@ bool users_output(char_data *to, char_data *tch, descriptor_data *d, char *name_
 #define ADMIN_UTIL(name)  void name(char_data *ch, char *argument)
 
 ADMIN_UTIL(util_diminish);
+ADMIN_UTIL(util_islandsize);
 ADMIN_UTIL(util_playerdump);
 ADMIN_UTIL(util_randtest);
 ADMIN_UTIL(util_redo_islands);
@@ -303,6 +304,7 @@ struct {
 	void (*func)(char_data *ch, char *argument);
 } admin_utils[] = {
 	{ "diminish", LVL_START_IMM, util_diminish },
+	{ "islandsize", LVL_START_IMM, util_islandsize },
 	{ "playerdump", LVL_IMPL, util_playerdump },
 	{ "randtest", LVL_CIMPL, util_randtest },
 	{ "redoislands", LVL_CIMPL, util_redo_islands },
@@ -342,6 +344,57 @@ ADMIN_UTIL(util_diminish) {
 		result = diminishing_returns(number, scale);
 		
 		msg_to_char(ch, "Diminished value: %.2f\r\n", result);
+	}
+}
+
+
+// util_islandsize: helper type
+struct isf_type {
+	int island;
+	int count;
+	UT_hash_handle hh;
+};
+int sort_isf_list(struct isf_type *a, struct isf_type *b) {
+	return a->island - b->island;
+}
+
+ADMIN_UTIL(util_islandsize) {
+	struct isf_type *isf, *next_isf, *list = NULL;
+	char buf[MAX_STRING_LENGTH];
+	room_data *room, *next_room;
+	size_t size;
+	int isle;
+	
+	HASH_ITER(world_hh, world_table, room, next_room) {
+		if (GET_ROOM_VNUM(room) < MAP_SIZE) {
+			isle = GET_ISLAND_ID(room);
+			HASH_FIND_INT(list, &isle, isf);
+			if (!isf) {
+				CREATE(isf, struct isf_type, 1);
+				isf->island = isle;
+				isf->count = 0;
+				HASH_ADD_INT(list, island, isf);
+			}
+			
+			isf->count += 1;
+		}
+	}
+	
+	HASH_SORT(list, sort_isf_list);
+	
+	size = snprintf(buf, sizeof(buf), "Island sizes:\r\n");
+	HASH_ITER(hh, list, isf, next_isf) {
+		if (size < sizeof(buf)) {
+			size += snprintf(buf + size, sizeof(buf) - size, "%2d: %d tile%s\r\n", isf->island, isf->count, PLURAL(isf->count));
+		}
+		
+		// free as we go
+		HASH_DEL(list, isf);
+		free(isf);
+	}
+	
+	if (ch->desc) {
+		page_string(ch->desc, buf, TRUE);
 	}
 }
 
@@ -1546,6 +1599,10 @@ SHOW(show_player) {
 	// Www Mmm dd hh:mm:ss yyyy
 	sprintf(buf + strlen(buf), "Started: %-16.16s %4.4s   Last: %-16.16s %4.4s\r\n", birth, birth+20, lastlog, lastlog+20);
 	
+	if (vbuf.access_level <= GET_ACCESS_LEVEL(ch)) {
+		sprintf(buf + strlen(buf), "Creation host: %s\r\n", vbuf.player_specials_saved.creation_host);
+	}
+	
 	days_played = (double)(time(0) - vbuf.birth) / SECS_PER_REAL_DAY;
 	avg_min_per_day = (((double) vbuf.played / SECS_PER_REAL_HOUR) / days_played) * SECS_PER_REAL_MIN;
 	
@@ -2308,10 +2365,8 @@ void do_stat_character(char_data *ch, char_data *k) {
 
 		msg_to_char(ch, "Access Level: [&c%d&0], Class: [&c%s&0/&c%s&0], Skill Level: [&c%d&0], Gear Level: [&c%d&0], Total: [&c%d&0]\r\n", GET_ACCESS_LEVEL(k), class_data[GET_CLASS(k)].name, class_role[(int) GET_CLASS_ROLE(k)], GET_SKILL_LEVEL(k), (int) GET_GEAR_LEVEL(k), IN_ROOM(k) ? GET_COMPUTED_LEVEL(k) : GET_LAST_KNOWN_LEVEL(k));
 		
-		if (!IS_NPC(k)) {
-			coin_string(GET_PLAYER_COINS(k), buf);
-			msg_to_char(ch, "Coins: %s\r\n", buf);
-		}
+		coin_string(GET_PLAYER_COINS(k), buf);
+		msg_to_char(ch, "Coins: %s\r\n", buf);
 
 		strcpy(buf1, (char *) asctime(localtime(&(k->player.time.birth))));
 		strcpy(buf2, buf1 + 20);
@@ -2319,6 +2374,9 @@ void do_stat_character(char_data *ch, char_data *k) {
 		buf2[4] = '\0';	// get only year
 
 		msg_to_char(ch, "Created: [%s, %s], Played [%dh %dm], Age [%d]\r\n", buf1, buf2, k->player.time.played / SECS_PER_REAL_HOUR, ((k->player.time.played % SECS_PER_REAL_HOUR) / SECS_PER_REAL_MIN), age(k)->year);
+		if (GET_ACCESS_LEVEL(k) <= GET_ACCESS_LEVEL(ch)) {
+			msg_to_char(ch, "Created from host: [%s]\r\n", GET_CREATION_HOST(k));
+		}
 		
 		if (GET_ACCESS_LEVEL(k) >= LVL_BUILDER) {
 			sprintbit(GET_OLC_FLAGS(k), olc_flag_bits, buf, TRUE);

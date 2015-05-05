@@ -648,37 +648,31 @@ SHOW
 
 Usage: show <mode> [argument]
 
-Valid Modes:
-
-player         rent           stats          site
-commons        players        terrain        account
-notes          arrowtypes     skills         storage
-startlocs      spawns         ignoring       workforce
-islands
-
 The SHOW command displays information. Some modes of show require additional
-information, such as a player name.
+information, such as a player name. Valid Modes:
 
-player: Shows player summary information, simply provide a player name.
- rent: Shows the filename and path to a players rent file.
- stats: Shows game status information including players in game, mobs etc.
- site: Shows all players with a specific site segment.
- commons: Shows all players currently connected from duplicate sites.
- players: Shows health and status for all current players.
- terrain: Shows total counts for all terrain types.
- account: Shows all the alts associated with a given player.
- notes: Show notes on a player.
- arrowtypes: Shows the 'arrow type' setting for all missile weapons and arrows.
- skills: Shows skill levels for a player.
- storage: Shows all items that can be stored in a given building/room type.
- startlocs: Shows the location of all starting location tiles.
- spawns: Shows where a mob spawns on the map, similar to ".mob search".
- ignoring: Shows you who a player has on their ignore list.
- islands: Shows you which island ids have empire storage (for MOVEEINV).
- workforce: Shows you an empire's workforce setup.
+Mode       Level    Description
+------     ------   -------------
+stats      God      Shows game stats including prototypes.
+arrowtypes Immort   Shows the 'arrow type' setting for all bows and arrows.
+ignoring   Immort   Shows you who a player has on their ignore list.
+islands    Immort   Shows you which island ids have empire storage (for MOVEEINV).
+notes      Immort   Show notes on a player.
+player     Immort   Shows player summary information.
+players    Immort   Shows health and status for all current players.
+rent       Immort   Shows the filename and path to a player's inventory.
+skills     Immort   Shows skill levels and abilities for a player.
+spawns     Immort   Shows where a mob spawns on the map, similar to ".mob search".
+startlocs  Immort   Shows the location of all starting location tiles.
+storage    Immort   Shows items that can be stored in a given building/room type.
+terrain    Immort   Shows total counts for all terrain types.
+workforce  Immort   Shows you an empire's workforce setup.
+commons    Asst     Shows players currently connected from duplicate sites.
+site       Asst     Shows all players with a specific site segment.
+account    Co-Impl  Shows all the alts associated with a given player.
 
 See also: STAT, STARTING LOCATION
-#d
+#e
 SHUTDOWN
 
 Usage: shutdown [now | timer] [die | pause]
@@ -827,13 +821,14 @@ This is a generic command that houses several simple utilities for immortals.
 They generally have no game effect, but can help with testing.
 
 Available utilities:
- diminish <number> <scale> - applies the game's diminishing returns formula,
+ diminish <number> <scale> - Applies the game's diminishing returns formula,
     and returns the result.
+ islandsize - Counts and displays tile counts for all islands.
  playerdump - Outputs a data file with tab-separated lines for all players with
     account, playtime, and host.
- randtest [number] [size] - generates a large number of random numbers, and
+ randtest [number] [size] - Generates a large number of random numbers, and
     reports the results.
- redoislands - renumbers all the islands (requires confirmation; may rearrange
+ redoislands - Renumbers all the islands (requires confirmation; may rearrange
     empire inventories).
 #d
 VNUM

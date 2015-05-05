@@ -643,6 +643,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	GRANT_CMD( "force", POS_SLEEPING, do_force, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_FORCE ),
 	ABILITY_CMD( "foresight", POS_RESTING, do_foresight, NO_MIN, CTYPE_COMBAT, ABIL_FORESIGHT ),
 	STANDARD_CMD( "forge", POS_STANDING, do_gen_craft, LVL_APPROVED, NO_GRANTS, CRAFT_TYPE_FORGE, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
+	SCMD_CMD( "fprompt", POS_DEAD, do_prompt, NO_MIN, CTYPE_UTIL, SCMD_FPROMPT ),
 	SIMPLE_CMD( "fullsave", POS_DEAD, do_fullsave, LVL_TOP, CTYPE_IMMORTAL ),
 	STANDARD_CMD( "freeze", POS_DEAD, do_wizutil, LVL_CIMPL, GRANT_FREEZE, SCMD_FREEZE, CTYPE_IMMORTAL, NOBITS, NO_ABIL ),
 
@@ -765,7 +766,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "pour", POS_STANDING, do_pour, NO_MIN, CTYPE_UTIL, SCMD_POUR ),
 	ABILITY_CMD( "prick", POS_FIGHTING, do_prick, NO_MIN, CTYPE_COMBAT, ABIL_PRICK ),
 	SIMPLE_CMD( "promote", POS_DEAD, do_promote, LVL_APPROVED, CTYPE_EMPIRE ),
-	SIMPLE_CMD( "prompt", POS_DEAD, do_prompt, NO_MIN, CTYPE_UTIL ),
+	SCMD_CMD( "prompt", POS_DEAD, do_prompt, NO_MIN, CTYPE_UTIL, SCMD_PROMPT ),
 	STANDARD_CMD( "prospect", POS_STANDING, do_prospect, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, ABIL_PROSPECT ),
 	SIMPLE_CMD( "publicize", POS_RESTING, do_publicize, LVL_APPROVED, CTYPE_EMPIRE ),
 	GRANT_CMD( "purge", POS_DEAD, do_purge, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_PURGE ),

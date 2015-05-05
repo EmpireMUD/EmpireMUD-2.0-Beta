@@ -1012,19 +1012,37 @@ ACMD(do_order) {
 }
 
 
-/* Either displays current prompt, or sets one */
+// Either displays current prompt, or sets one; takes SCMD_PROMPT or SCMD_FPROMPT
 ACMD(do_prompt) {
 	extern char *show_color_codes(char *string);
+	
+	char *types[] = { "prompt", "fprompt" };
+	char **prompt;
 	
 	skip_spaces(&argument);
 	
 	if (IS_NPC(ch)) {
-		msg_to_char(ch, "NPCs get no prompt.\r\n");
+		msg_to_char(ch, "NPCs get no %s.\r\n", types[subcmd]);
 		return;
 	}
 
+	switch (subcmd) {
+		case SCMD_PROMPT: {
+			prompt = &GET_PROMPT(ch);
+			break;
+		}
+		case SCMD_FPROMPT: {
+			prompt = &GET_FIGHT_PROMPT(ch);
+			break;
+		}
+		default: {
+			msg_to_char(ch, "That command is not implemented.\r\n");
+			return;
+		}
+	}
+
 	if (!*argument) {
-		sprintf(buf, "Your prompt is currently: %s\r\n", (GET_PROMPT(ch) ? show_color_codes(GET_PROMPT(ch)) : "n/a"));
+		sprintf(buf, "Your %s is currently: %s\r\n", types[subcmd], (*prompt ? show_color_codes(*prompt) : "n/a"));
 		send_to_char(buf, ch);
 		return;
 	}
@@ -1037,26 +1055,26 @@ ACMD(do_prompt) {
 	}
 
 	if (!str_cmp(argument, "off") || !str_cmp(argument, "none")) {
-		if (GET_PROMPT(ch)) {
-			free(GET_PROMPT(ch));
+		if (*prompt) {
+			free(*prompt);
 		}
-		GET_PROMPT(ch) = str_dup("&0");	// empty prompt
+		*prompt = str_dup("&0");	// empty prompt
 		send_config_msg(ch, "ok_string");
 	}
 	else if (!str_cmp(argument, "default")) {
-		if (GET_PROMPT(ch)) {
-			free(GET_PROMPT(ch));
+		if (*prompt) {
+			free(*prompt);
 		}
-		GET_PROMPT(ch) = NULL;	// restores default prompt
+		*prompt = NULL;	// restores default prompt
 		send_config_msg(ch, "ok_string");
 	}
 	else {
-		if (GET_PROMPT(ch)) {
-			free(GET_PROMPT(ch));
+		if (*prompt) {
+			free(*prompt);
 		}
-		GET_PROMPT(ch) = str_dup(argument);
+		*prompt = str_dup(argument);
 
-		sprintf(buf, "Okay, set your prompt to: %s\r\n", show_color_codes(GET_PROMPT(ch)));
+		sprintf(buf, "Okay, set your %s to: %s\r\n", types[subcmd], show_color_codes(*prompt));
 		send_to_char(buf, ch);
 	}
 }

@@ -282,12 +282,16 @@ void perform_action(char_data *ch, int act_nr, char *argument) {
 
 		// fetch and store channel history for the room
 		for (c = ROOM_PEOPLE(IN_ROOM(ch)); c; c = c->next_in_room) {
-			if (c->desc && c->desc->last_act_message) {
+			if (c == ch || !c->desc) {
+				continue;
+			}
+			
+			if (c->desc->last_act_message) {
 				// the message was sent via act(), we can retrieve it from the desc
 				sprintf(hbuf, "&%c%s&0", (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) ? GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE) : '0', c->desc->last_act_message);
 				add_to_channel_history(c->desc, CHANNEL_HISTORY_SAY, hbuf);
 			}
-			else if (c->desc) {
+			else if (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
 				// terminate color just in case
 				msg_to_char(c, "&0");
 			}
@@ -319,12 +323,16 @@ void perform_action(char_data *ch, int act_nr, char *argument) {
 
 		// fetch and store channel history for the room
 		for (c = ROOM_PEOPLE(IN_ROOM(ch)); c; c = c->next_in_room) {
-			if (c->desc && c->desc->last_act_message) {
+			if (c == ch || !c->desc) {
+				continue;
+			}
+			
+			if (c->desc->last_act_message) {
 				// the message was sent via act(), we can retrieve it from the desc
 				sprintf(hbuf, "&%c%s&0", (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) ? GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE) : '0', c->desc->last_act_message);
 				add_to_channel_history(c->desc, CHANNEL_HISTORY_SAY, hbuf);
 			}
-			else if (c->desc) {
+			else if (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
 				// terminate color just in case
 				msg_to_char(c, "&0");
 			}
@@ -364,12 +372,16 @@ void perform_action(char_data *ch, int act_nr, char *argument) {
 
 			// fetch and store channel history for the room
 			for (c = ROOM_PEOPLE(IN_ROOM(ch)); c; c = c->next_in_room) {
-				if (c->desc && c->desc->last_act_message) {
+				if (!c->desc) {
+					continue;
+				}
+				
+				if (c->desc->last_act_message) {
 					// the message was sent via act(), we can retrieve it from the desc
 					sprintf(hbuf, "&%c%s&0", (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) ? GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE) : '0', c->desc->last_act_message);
 					add_to_channel_history(c->desc, CHANNEL_HISTORY_SAY, hbuf);
 				}
-				else if (c->desc) {
+				else if (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
 					// terminate color just in case
 					msg_to_char(c, "&0");
 				}

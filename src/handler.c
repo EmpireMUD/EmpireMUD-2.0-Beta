@@ -291,7 +291,6 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 		case APPLY_MOVE:
 			SAFE_ADD(GET_MAX_MOVE(ch), mod, INT_MIN, INT_MAX, TRUE);
 			SAFE_ADD(GET_MOVE(ch), mod, INT_MIN, INT_MAX, TRUE);
-			GET_MOVE(ch) += mod;
 			break;
 		case APPLY_HEALTH:
 			SAFE_ADD(GET_MAX_HEALTH(ch), mod, INT_MIN, INT_MAX, TRUE);
