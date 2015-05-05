@@ -294,7 +294,6 @@ ADMIN_UTIL(util_diminish);
 ADMIN_UTIL(util_islandsize);
 ADMIN_UTIL(util_playerdump);
 ADMIN_UTIL(util_randtest);
-ADMIN_UTIL(util_rankfix);
 ADMIN_UTIL(util_redo_islands);
 ADMIN_UTIL(util_tool);
 
@@ -308,7 +307,6 @@ struct {
 	{ "islandsize", LVL_START_IMM, util_islandsize },
 	{ "playerdump", LVL_IMPL, util_playerdump },
 	{ "randtest", LVL_CIMPL, util_randtest },
-	{ "rankfix", LVL_IMPL, util_rankfix },
 	{ "redoislands", LVL_CIMPL, util_redo_islands },
 	{ "tool", LVL_IMPL, util_tool },
 
@@ -323,19 +321,6 @@ ADMIN_UTIL(util_tool) {
 	
 	update_all_players(ch);	
 	msg_to_char(ch, "Ok.\r\n");
-}
-
-
-ADMIN_UTIL(util_rankfix) {
-	char_data *v;
-	int rank;
-	
-	two_arguments(argument, arg, buf);
-	rank = atoi(buf);
-	
-	if ((v = get_player_vis(ch, arg, FIND_CHAR_WORLD | FIND_NO_DARK)) && rank > 0) {
-		GET_RANK(v) = rank;
-	}
 }
 
 
