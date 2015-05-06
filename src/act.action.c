@@ -39,6 +39,7 @@ extern const struct smelt_data_type smelt_data[];
 extern const struct tanning_data_type tan_data[];
 
 // external funcs
+extern double get_base_dps(obj_data *weapon);
 extern obj_data *find_chip_weapon(char_data *ch);
 extern obj_data *has_sharp_tool(char_data *ch);
 void scale_item_to_level(obj_data *obj, int level);
@@ -899,7 +900,7 @@ void process_chop(char_data *ch) {
 			break;
 		}
 
-		add_to_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CHOP_PROGRESS, -1 * (GET_STRENGTH(ch) + GET_WEAPON_DAMAGE_BONUS(GET_EQ(ch, WEAR_WIELD))));
+		add_to_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CHOP_PROGRESS, -1 * (GET_STRENGTH(ch) + get_base_dps(GET_EQ(ch, WEAR_WIELD))));
 		act("You swing $p hard into the tree!", FALSE, ch, GET_EQ(ch, WEAR_WIELD), 0, TO_CHAR | TO_SPAMMY);
 		act("$n swings $p hard into the tree!", FALSE, ch, GET_EQ(ch, WEAR_WIELD), 0, TO_ROOM | TO_SPAMMY);
 
@@ -1342,7 +1343,7 @@ void process_mining(char_data *ch) {
 			break;
 		}
 
-		GET_ACTION_TIMER(ch) -= GET_STRENGTH(ch) + GET_WEAPON_DAMAGE_BONUS(GET_EQ(ch, WEAR_WIELD));
+		GET_ACTION_TIMER(ch) -= GET_STRENGTH(ch) + get_base_dps(GET_EQ(ch, WEAR_WIELD));
 
 		act("You pick at the walls with $p, looking for ore.", FALSE, ch, GET_EQ(ch, WEAR_WIELD), 0, TO_CHAR | TO_SPAMMY);
 		act("$n picks at the walls with $p, looking for ore.", FALSE, ch, GET_EQ(ch, WEAR_WIELD), 0, TO_ROOM | TO_SPAMMY);
