@@ -966,7 +966,7 @@ void ocean_to_pool(room_data *room) {
 	pool->room = room;
 	
 	pool->next = ocean_pool;
-	ocean_pool = pool->next;
+	ocean_pool = pool;
 }
 
 
