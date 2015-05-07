@@ -2881,23 +2881,23 @@ bool run_room_interactions(char_data *ch, room_data *room, int type, INTERACTION
 	success = *hit_exclusive = FALSE;
 	
 	// building first
-	if (!*hit_exclusive && GET_BUILDING(IN_ROOM(ch))) {
-		success |= run_interactions(ch, GET_BLD_INTERACTIONS(GET_BUILDING(IN_ROOM(ch))), type, room, NULL, NULL, func, hit_exclusive);
+	if (!*hit_exclusive && GET_BUILDING(room)) {
+		success |= run_interactions(ch, GET_BLD_INTERACTIONS(GET_BUILDING(room)), type, room, NULL, NULL, func, hit_exclusive);
 	}
 	
 	// crop second
-	if (!*hit_exclusive && ROOM_CROP_TYPE(IN_ROOM(ch)) != NOTHING && (crop = crop_proto(ROOM_CROP_TYPE(IN_ROOM(ch))))) {
+	if (!*hit_exclusive && ROOM_CROP_TYPE(room) != NOTHING && (crop = crop_proto(ROOM_CROP_TYPE(room)))) {
 		success |= run_interactions(ch, GET_CROP_INTERACTIONS(crop), type, room, NULL, NULL, func, hit_exclusive);
 	}
 	
 	// rmt third
-	if (!*hit_exclusive && GET_ROOM_TEMPLATE(IN_ROOM(ch))) {
-		success |= run_interactions(ch, GET_RMT_INTERACTIONS(GET_ROOM_TEMPLATE(IN_ROOM(ch))), type, room, NULL, NULL, func, hit_exclusive);
+	if (!*hit_exclusive && GET_ROOM_TEMPLATE(room)) {
+		success |= run_interactions(ch, GET_RMT_INTERACTIONS(GET_ROOM_TEMPLATE(room)), type, room, NULL, NULL, func, hit_exclusive);
 	}
 	
 	// sector fourth
 	if (!*hit_exclusive) {
-		success |= run_interactions(ch, GET_SECT_INTERACTIONS(SECT(IN_ROOM(ch))), type, room, NULL, NULL, func, hit_exclusive);
+		success |= run_interactions(ch, GET_SECT_INTERACTIONS(SECT(room)), type, room, NULL, NULL, func, hit_exclusive);
 	}
 	
 	return success;
