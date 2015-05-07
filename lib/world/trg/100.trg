@@ -886,7 +886,7 @@ Apprentice passive~
 ~
 switch %random.4%
   case 1
-    %echo% %self.name% casts a spell at a broomstick, which promplty splits into two broomsticks!
+    %echo% %self.name% casts a spell at a broomstick, which promptly splits into two broomsticks!
   break
   case 2
     %echo% %self.name% opens a tiny portal to summon materials...

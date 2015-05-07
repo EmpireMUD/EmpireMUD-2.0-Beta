@@ -648,7 +648,7 @@ If a match is found, the commands that follow it, up until a break or done
 command, are executed. 
 Break is used to terminate commands in a switch. 
 Case is used to begin a new conditional group in a switch block.
-Default is similiar to case but matches any condition not met. 
+Default is similar to case but matches any condition not met. 
 Done is used to terminate a while or switch block.
 #d
 WHILE DONE
@@ -677,7 +677,7 @@ time. When a script is being executed it will attempt to execute all commands
 right away. To get small breaks in, and perhaps give the players time to adjust, 
 use the wait command.
 
-* If you want to syncronise your script, you can use the 'wait until' feature.
+* If you want to synchronise your script, you can use the 'wait until' feature.
 * This script wakes the mob at dawn, and puts him to sleep at night.
 wait until 8:00
 wake
@@ -1107,7 +1107,7 @@ Argument    : not used.
 Used with return 0 will prevent the player from leaving the room.
 
 Variables: 
-%actor%     - the character leavering the room. 
+%actor%     - the character leaving the room. 
 %direction% - the direction the character is leaving to.
 #d
 TRIGEDIT-OBJ-CONSUME
@@ -1250,7 +1250,7 @@ Argument    : not used.
 Used with return 0 will prevent the player from leaving the room.
 
 Variables: 
-%actor%     - the character leavering the room. 
+%actor%     - the character leaving the room. 
 %direction% - the direction the character is leaving to.
 #d
 TRIGEDIT-ROOM-DOOR TRIGEDIT-DOOR
@@ -1402,7 +1402,7 @@ TRIGEDIT-MOB-HITPERCENT TRIGEDIT-MOB-HITPRCNT
 Activated during combat when the mobiles hit point percentage drops below a 
 specified percentage.
  
-Numeric Arg : percentage of hitpoints at the threshhold of allowing this trigger to
+Numeric Arg : percentage of hitpoints at the threshold of allowing this trigger to
               activate.
 Argument    : not used.
 
@@ -1463,7 +1463,7 @@ Argument    : not used.
 Used with return 0 will prevent the player from leaving the room.
 
 Variables: 
-%actor%     - the character leavering the room. 
+%actor%     - the character leaving the room. 
 %direction% - the direction the character is leaving to.
 #d
 TRIGEDIT-MOB-DOOR 

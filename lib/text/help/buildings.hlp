@@ -506,7 +506,7 @@ MEGALITH
 Built on:  desert, plains
 Fame:  1
 
-A megalith is a giant stone which inspires reverance and awe.
+A megalith is a giant stone which inspires reverence and awe.
 #
 MINECOMPLEX "MINE COMPLEX"
 
@@ -933,7 +933,7 @@ Fame:  1
 
 Command:  tomb [set | unset]
 
-Tombs are a prestigous place to bury the dead.
+Tombs are a prestigious place to bury the dead.
 
 The tomb command allows you to choose a tomb or cemetery as your place of rest.
 If you die, you will find yourself resurrected at your own tomb, so long as
