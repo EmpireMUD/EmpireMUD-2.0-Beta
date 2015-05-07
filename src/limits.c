@@ -1210,7 +1210,7 @@ void point_update_room(room_data *room) {
 	void death_log(char_data *ch, char_data *killer, int type);
 	void fill_trench(room_data *room);
 
-	char_data *ch;
+	char_data *ch, *next_ch;
 	obj_data *o, *next_o;
 	struct track_data *track, *next_track, *temp;
 	struct affected_type *af, *next_af;
@@ -1256,7 +1256,9 @@ void point_update_room(room_data *room) {
 					if (ROOM_PEOPLE(room)) {
 						act("The building collapses in flames around you!", FALSE, ROOM_PEOPLE(room), 0, 0, TO_CHAR | TO_ROOM);
 					}
-					while ((ch = ROOM_PEOPLE(room))) {
+					for (ch = ROOM_PEOPLE(room); ch; ch = next_ch) {
+						next_ch = ch->next_in_room;
+						
 						if (!IS_NPC(ch)) {
 							death_log(ch, ch, TYPE_SUFFERING);
 						}
