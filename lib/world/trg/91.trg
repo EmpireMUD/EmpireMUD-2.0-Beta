@@ -57,7 +57,7 @@ woodpecker animation~
 * Woodpecker Animation (9150)
 eval room %self.room%
 if ((%room.sector% /= Forest) || (%room.sector% /= Orchard))
-  %echo% %self.name% hammers into a tree with its beek, looking for food.
+  %echo% %self.name% hammers into a tree with its beak, looking for food.
 end
 ~
 #9183

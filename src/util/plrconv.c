@@ -53,7 +53,7 @@ struct OLD_player_special_data_saved {
 	byte invis_level;	// level of invisibility
 	byte immortal_level;	// stored so that if level numbers are changed, imms stay at the correct level
 	bitvector_t grants;	// grant imm abilities
-	ubyte bad_pws;	// number of bad password attemps
+	ubyte bad_pws;	// number of bad password attempts
 
 	// preferences
 	bitvector_t pref;	// preference flags for PCs.

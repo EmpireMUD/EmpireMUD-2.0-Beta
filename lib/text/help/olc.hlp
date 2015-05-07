@@ -155,12 +155,12 @@ Mobs (MEDIT):
 - ANIMAL mobs will take double damage from players with Hunt.
 - Consider using a must-fight script (like a Leave trigger with "return 0")
   rather than the AGGR flag.
-- If your mob spawns in a dark adventure, strongly consider givign it INFRA.
+- If your mob spawns in a dark adventure, strongly consider giving it INFRA.
 - Animal mobs usually need a BUTCHER and SKIN interaction.
 
 Objects (OEDIT):
 - The most significant keyword should always be first. A fiery torch should put
-  "torch" first. Joe's amaazing magical wand should put "wand" first. The first
+  "torch" first. Joe's amazing magical wand should put "wand" first. The first
   keyword may be used to build sentences such as "You attack with your wand."
 - Most equipment should be set SCALABLE, and there are very few acceptable
   reasons not to do so. We prefer you rely on the scaling engine rather than
@@ -526,7 +526,7 @@ The following affect flags are available:
  ENTANGLED - Cannot move -- do not use this on items.
  SLOW - Combat speed reduced, like the Slow spell.
  STUNNED - Can't participate in combat or move -- do not use this on items.
- STONED - Sees the world in stange, trippy colors.
+ STONED - Sees the world in strange, trippy colors.
  !BLOOD - Cannot spend blood points.
  CLAWS - Boosted vampire claws as barehand melee attack.
  DEATHSHROUD - Appears as a corpse and cannot act -- do not use this on items.
@@ -784,7 +784,7 @@ See also:  OLC BUILDINGS
 Usage:  .name <name>
 
 The 'name' property is used by some commands like 'territory' and 'vnum' to
-search for buildings, so it shoudl be reasonably unique. It's also shown as
+search for buildings, so it should be reasonably unique. It's also shown as
 the short form of a building in some sentences.
 
 You should choose a name that's as short as possible. For example, if your
@@ -1703,7 +1703,7 @@ using it. The following applies are available. Most are self-explanatory:
  STRENGTH - characters can't use an item that would reduce them below 1 strength
  DEXTERITY - chance to hit/dodge
  HEALTH-REGEN - rate of health regen (per 5 second tick)
- CHARISMA - characters can't use an item that would reduce them below 1 charism
+ CHARISMA - characters can't use an item that would reduce them below 1 charisma
  GREATNESS - empire meta-trait
  MOVE-REGEN - rate of move regen (per 5 second tick)
  MANA-REGEN - rate of mana regen (per 5 second tick)
@@ -1884,7 +1884,7 @@ or slow/fast flags.
 
 Weapons that are slow but strong deal the same DPS as weapons that are fast
 but weak. Some strategies prefer one way or the other. For most purposes, two
-weapons are considred equal if their DPS (not their raw damage) is equal.
+weapons are considered equal if their DPS (not their raw damage) is equal.
 
 For SCALABLE objects, thus number is a scalable value if it is set to a number
 other than 0.
@@ -1901,7 +1901,7 @@ Usage:  .extra add <keywords>
 This command lets you add or edit extra descriptions. These are additional
 descriptions that the player may 'look' at. 
 
-For objects, tthe object's main description is set on the 'lookdescription'
+For objects, the object's main description is set on the 'lookdescription'
 command.
 
 The keywords are a list of different words the player may look at, and the
@@ -3044,7 +3044,7 @@ a comma (,). Only text you type starting with a , will be added to the string.
 You can enter full-string-edit mode using ,/, (or turn that mode off the same
 way).
 
-The string editor is used to edit player decriptions, board messages, mail
+The string editor is used to edit player descriptions, board messages, mail
 letters, and more. You can type '/h' inside the string editor for a list of
 its commands.
 
@@ -3189,7 +3189,7 @@ Mob names can use certain special codes in order to dynamically add names.
 You can use these codes in the short description, long description, and
 keywords.
 
-- #n  Pick a random name from the chosen nameset. If the gender is left neutal,
+- #n  Pick a random name from the chosen nameset. If the gender is left neutral,
       it will also pick a random gender.
 
 - #e  Empire name. For this to work, you need to set the mob as a claimed-only
@@ -3246,7 +3246,7 @@ you want a ship.
 The BOOK type is used along with the bookedit interface and EmpireMUD's library
 system. You can spawn books in adventures by writing them in the book editor,
 then assigning their book ID to a book object in your adventure zone. The
-data from the book editor will override your short decription, long desc-
+data from the book editor will override your short description, long desc-
 ription, and look description.
 #d
 "CART ITEM" "CART OBJECT"

@@ -1130,7 +1130,7 @@ your gear level, and your total between the two.
 
 Conditions are displayed as:  Health: &g50&0/&g100&0+&g15&0/hr
 The first number (50) is your current health, the 100 is your maximum health,
-and the final number (15/hr) is your rate of regneration. One hour in the MUD
+and the final number (15/hr) is your rate of regeneration. One hour in the MUD
 is 75 seconds. Your actual regeneration happens every 5 seconds.
 
 Attributes are rated from 0 to 10. They are shown in green if you have a spell
@@ -1179,7 +1179,7 @@ SCROLLING
 Usage:  toggle scrolling
 
 This toggle turns off the page breaks sent when a character receives a long
-amoung of information. The information is sent all at once, as preferred by
+amount of information. The information is sent all at once, as preferred by
 some people for features like the WHO list.
 #
 SELFDELETE "SELF DELETE" SELF-DELETE DELETE

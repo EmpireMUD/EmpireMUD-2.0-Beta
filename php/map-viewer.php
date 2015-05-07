@@ -11,7 +11,7 @@
 * Using this file:
 *  1. update the configuration options, near the top
 *  2. you may want to symlink this file into your web directory
-*  3. you can adjust the size by adding ?size=1234 -- Must be in pixesl; this
+*  3. you can adjust the size by adding ?size=1234 -- Must be in pixels; this
 *     sets the width of the map, and the height scales proportionately.
 */
 
