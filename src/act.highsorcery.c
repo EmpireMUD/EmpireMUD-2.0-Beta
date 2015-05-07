@@ -692,8 +692,8 @@ ACMD(do_colorburst) {
 	else {
 		// succeed
 	
-		act("You whip your hand foward and fire a burst of color at $N!", FALSE, ch, NULL, vict, TO_CHAR);
-		act("$n whips $s hand foward and fires a burst of color at you!", FALSE, ch, NULL, vict, TO_VICT);
+		act("You whip your hand forward and fire a burst of color at $N!", FALSE, ch, NULL, vict, TO_CHAR);
+		act("$n whips $s hand forward and fires a burst of color at you!", FALSE, ch, NULL, vict, TO_VICT);
 		act("$n whips $s hand forward and fires a burst of color at $N!", FALSE, ch, NULL, vict, TO_NOTVICT);
 		
 		amt = CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_COLORBURST) - GET_INTELLIGENCE(ch);
@@ -1359,7 +1359,7 @@ ACMD(do_siphon) {
 		// succeed
 	
 		act("$N starts to glow violet as you shout the mana siphon hex at $M! You feel your own mana grow as you drain $S.", FALSE, ch, NULL, vict, TO_CHAR);
-		act("$n shouts somthing at you... The world takes on a violet glow and you feel your mana siphoned away.", FALSE, ch, NULL, vict, TO_VICT);
+		act("$n shouts something at you... The world takes on a violet glow and you feel your mana siphoned away.", FALSE, ch, NULL, vict, TO_VICT);
 		act("$n shouts some kind of hex at $N, who starts to glow violet as mana flows away from $S skin!", FALSE, ch, NULL, vict, TO_NOTVICT);
 
 		af = create_mod_aff(ATYPE_SIPHON, 4, APPLY_MANA_REGEN, CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_SIPHON));
@@ -1427,7 +1427,7 @@ ACMD(do_slow) {
 		// succeed
 	
 		act("$N grows lethargic and starts to glow gray as you shout the slow hex at $M!", FALSE, ch, NULL, vict, TO_CHAR);
-		act("$n shouts somthing at you... The world takes on a gray tone and you more lethargic.", FALSE, ch, NULL, vict, TO_VICT);
+		act("$n shouts something at you... The world takes on a gray tone and you more lethargic.", FALSE, ch, NULL, vict, TO_VICT);
 		act("$n shouts some kind of hex at $N, who starts to move sluggishly and starts to glow gray!", FALSE, ch, NULL, vict, TO_NOTVICT);
 	
 		af = create_flag_aff(ATYPE_SLOW, CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_SLOW), AFF_SLOW);

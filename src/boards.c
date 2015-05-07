@@ -630,7 +630,7 @@ int Board_respond_message(int board_type, char_data *ch, char *arg, obj_data *bo
 	}
 
 	if (!isdigit(*number) || (!(msg = atoi(number)))) {
-		msg_to_char(ch, "What message are you trying to respong to?\r\n");
+		msg_to_char(ch, "What message are you trying to respond to?\r\n");
 		return 1;
 	}
 	if (msg < 1 || msg > num_of_msgs[board_type]) {

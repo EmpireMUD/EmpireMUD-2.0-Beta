@@ -3064,7 +3064,7 @@ void do_stat_room(char_data *ch) {
 			else
 				sprintf(buf1, "&c%5d&0", ex->to_room);
 			sprintbit(ex->exit_info, exit_bits, buf2, TRUE);
-			sprintf(buf, "Exit &c%-5s&0:  To: [%s], Keywrd: %s, Type: %s\r\n", dirs[get_direction_for_char(ch, ex->dir)], buf1, ex->keyword ? ex->keyword : "None", buf2);
+			sprintf(buf, "Exit &c%-5s&0:  To: [%s], Keyword: %s, Type: %s\r\n", dirs[get_direction_for_char(ch, ex->dir)], buf1, ex->keyword ? ex->keyword : "None", buf2);
 			send_to_char(buf, ch);
 		}
 	}

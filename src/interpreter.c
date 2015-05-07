@@ -1246,7 +1246,7 @@ int perform_alias(descriptor_data *d, char *orig) {
 	char first_arg[MAX_INPUT_LENGTH], *ptr;
 	struct alias_data *a, *tmp;
 
-	/* Mobs don't have alaises. */
+	/* Mobs don't have aliases. */
 	if (IS_NPC(d->character))
 		return (0);
 
@@ -1513,7 +1513,7 @@ void prompt_creation(descriptor_data *d) {
 			SEND_TO_Q("\r\nEmpireMUD makes heavy use of an ascii map, but also supports screen\r\n", d);
 			SEND_TO_Q("readers for the visually impaired. This will replace the map with a short\r\n", d);
 			SEND_TO_Q("description of what you can see in each direction on the world map. This\r\n", d);
-			SEND_TO_Q("option is only recommanded for players using screen readers. You can see\r\n", d);
+			SEND_TO_Q("option is only recommended for players using screen readers. You can see\r\n", d);
 			SEND_TO_Q("HELP SCREEN READER once you're in the game for more information.\r\n", d);
 			SEND_TO_Q("\r\nAre you using a screen reader (y/n)? ", d);
 			break;
@@ -2477,7 +2477,7 @@ void nanny(descriptor_data *d, char *arg) {
 				SEND_TO_Q("member in charge of authorization. When you are able to log into the mud,\r\n", d);
 				SEND_TO_Q("type HELP AUTHORIZATION for the appropriate e-mail address, or contact the\r\n", d);
 				SEND_TO_Q("staff member via the game.\r\n", d);
-				SEND_TO_Q("\r\nPress ENTER to contine: ", d);
+				SEND_TO_Q("\r\nPress ENTER to continue: ", d);
 				syslog(SYS_LOGIN, 0, TRUE, "Login denied: Multiplaying detected for %s [%s]", GET_NAME(d->character), d->host);
 
 				STATE(d) = CON_GOODBYE;

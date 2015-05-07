@@ -3075,7 +3075,7 @@ int main(int argc, char **argv) {
 				break;
 			case 'q':
 				no_rent_check = 1;
-				puts("Quick boot mode -- rent check supressed.");
+				puts("Quick boot mode -- rent check suppressed.");
 				break;
 			case 'r':
 				wizlock_level = 1;

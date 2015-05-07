@@ -1120,7 +1120,7 @@ void char_from_room(char_data *ch) {
 	int pos;
 
 	if (ch == NULL || !IN_ROOM(ch)) {
-		log("SYSERR: NULL character or no locadtion in %s, char_from_room", __FILE__);
+		log("SYSERR: NULL character or no location in %s, char_from_room", __FILE__);
 		exit(1);
 	}
 
@@ -1951,7 +1951,7 @@ int increase_coins(char_data *ch, empire_data *emp, int amount) {
 
 /**
 * "25 empire coins" -- shorthand for reporting the amount/type of money in
-* many common strings. Not to be confsed with money_desc().
+* many common strings. Not to be confused with money_desc().
 *
 * @param empire_data *type Which empire's coins (or REAL_OTHER_COIN).
 * @param int amount How many coins.
@@ -2039,7 +2039,7 @@ const char *money_desc(empire_data *type, int amount) {
 *
 * @param char_data *ch The character.
 * @param int type Any COOLDOWN_x.
-* @param int seconds_duration How long it latss.
+* @param int seconds_duration How long it lasts.
 */
 void add_cooldown(char_data *ch, int type, int seconds_duration) {
 	struct cooldown_data *cool;
@@ -3535,7 +3535,7 @@ bool bind_ok(obj_data *obj, char_data *ch) {
 
 
 /**
-* Removes all bindings on an objet other than a player's, for things that were
+* Removes all bindings on an object other than a player's, for things that were
 * bound to multiple players but are now reduced to just one.
 *
 * @param obj_data *obj The object to simplify bindings on.
@@ -5074,7 +5074,7 @@ int store_resource(char_data *ch, empire_data *emp, obj_data *obj) {
 * This is true if ANY of its storage locations require WITHDRAW.
 *
 * @param obj_data *obj Which object (or prototype) to check.
-* @return bool TRUE if it requies withdraw; FALSE otherwise
+* @return bool TRUE if it requires withdraw; FALSE otherwise
 */
 bool stored_item_requires_withdraw(obj_data *obj) {
 	struct obj_storage_type *sdt;
