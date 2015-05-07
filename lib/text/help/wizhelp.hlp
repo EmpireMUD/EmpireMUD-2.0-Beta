@@ -594,7 +594,7 @@ For toggled fields (BINARY), the value must be ON, OFF, YES, or NO.
 
 The following are valid fields:
 
-Field          Who     Value Type   Decription
+Field          Who     Value Type   Description
 ----------------------------------------------------------------
 account        PC      NAME         Sets account to match another character
 age            BOTH    NUMBER       Player age

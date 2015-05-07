@@ -2,7 +2,7 @@
 Stealth GM Bribe coins~
 0 m 100
 ~
-%echoaround% %actor% %self.name% and %actor.name% seem to be whispering to eachother.
+%echoaround% %actor% %self.name% and %actor.name% seem to be whispering to each other.
 if (%actor.skill(Stealth)% > 0)
   %send% %actor% %self.name% whispers, 'It looks like you're already a member of the Guild.'
 elseif (!%actor.can_gain_new_skills%)
@@ -16,7 +16,7 @@ end
 Stealth GM Bribe item~
 0 j 100
 ~
-%echoaround% %actor% %self.name% and %actor.name% seem to be whispering to eachother.
+%echoaround% %actor% %self.name% and %actor.name% seem to be whispering to each other.
 if (%object.material% != GOLD)
   %send% %actor% %self.name% whispers, 'Thanks, mate!'
 elseif (%actor.skill(Stealth)% > 0)
