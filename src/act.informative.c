@@ -833,7 +833,7 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 		act(buf, FALSE, i, 0, ch, TO_VICT);
 		}
 	if (GET_FEEDING_FROM(i)) {
-		sprintf(buf, "...$e has his teeth firmly implanted in %s!", PERS(GET_FEEDING_FROM(i), ch, 0));
+		sprintf(buf, "...$e has $s teeth firmly implanted in %s!", PERS(GET_FEEDING_FROM(i), ch, 0));
 		act(buf, FALSE, i, 0, ch, TO_VICT);
 		}
 	if (!IS_NPC(i) && GET_ACTION(i) == ACT_MORPHING)
