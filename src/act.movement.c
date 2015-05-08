@@ -1387,7 +1387,7 @@ ACMD(do_portal) {
 				break;
 			}
 			
-			if (ROOM_OWNER(room) && ROOM_BLD_FLAGGED(room, BLD_PORTAL) && can_use_room(ch, room, all ? GUESTS_ALLOWED : MEMBERS_AND_ALLIES)) {
+			if (ROOM_OWNER(room) && ROOM_BLD_FLAGGED(room, BLD_PORTAL) && IS_COMPLETE(room) && can_use_room(ch, room, all ? GUESTS_ALLOWED : MEMBERS_AND_ALLIES)) {
 				// only shows owned portals the character can use
 				++count;
 				*line = '\0';
@@ -1418,7 +1418,7 @@ ACMD(do_portal) {
 	// targeting: by list number (only targets member/ally portals
 	if (is_number(arg) && (num = atoi(arg)) >= 1 && GET_LOYALTY(ch)) {
 		HASH_ITER(world_hh, world_table, room, next_room) {
-			if (ROOM_OWNER(room) && ROOM_BLD_FLAGGED(room, BLD_PORTAL) && can_use_room(ch, room, MEMBERS_AND_ALLIES)) {
+			if (ROOM_OWNER(room) && ROOM_BLD_FLAGGED(room, BLD_PORTAL) && IS_COMPLETE(room) && can_use_room(ch, room, MEMBERS_AND_ALLIES)) {
 				if (--num <= 0) {
 					target = room;
 					break;
