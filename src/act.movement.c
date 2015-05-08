@@ -527,6 +527,10 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 				act("The other animal pulling $p is tied up.", FALSE, ch, cart, 0, TO_CHAR);
 				return FALSE;
 			}
+			if (animal && is_fighting(animal)) {
+				act("The other animal pulling $p is fighting!", FALSE, ch, cart, 0, TO_CHAR);
+				return FALSE;
+			}
 		}
 	}
 
