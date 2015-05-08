@@ -1827,12 +1827,18 @@ ACMD(do_exits) {
 ACMD(do_scan) {
 	int dir;
 	
+	room_data *use_room = get_map_location_for(IN_ROOM(ch));
+	
 	skip_spaces(&argument);
 	
 	if (!*argument) {
 		msg_to_char(ch, "Scan which direction?\r\n");
 	}
-	else if (IS_ADVENTURE_ROOM(IN_ROOM(ch)) || ROOM_IS_CLOSED(IN_ROOM(ch))) {
+	else if (IS_ADVENTURE_ROOM(use_room) || ROOM_IS_CLOSED(use_room)) {	// check map room
+		msg_to_char(ch, "You can only use scan out on the map.\r\n");
+	}
+	else if (!GET_BOAT(IN_ROOM(ch)) && (IS_ADVENTURE_ROOM(IN_ROOM(ch)) || ROOM_IS_CLOSED(IN_ROOM(ch)))) {
+		// if not on a boat, can't see out from here
 		msg_to_char(ch, "Scan only works out on the map.\r\n");
 	}
 	else if ((dir = parse_direction(ch, argument)) == NO_DIR) {
@@ -1842,7 +1848,7 @@ ACMD(do_scan) {
 		msg_to_char(ch, "You can't scan that way.\r\n");
 	}
 	else {
-		screenread_one_dir(ch, IN_ROOM(ch), dir);
+		screenread_one_dir(ch, use_room, dir);
 	}
 }
 
