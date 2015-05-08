@@ -6,5 +6,5 @@ ideas - Player-submitted ideas ('idea', 'show ideas' in-game).
 messages - Fight messages matching the TYPE_x consts in the code.
 socials - Pre-configured socials/emotes.
 tips - Tip-a-day entries.
-typos - Player-submitted typos ('typo', 'show typos' in-game).
+typos - Player-submitted typoes ('typo', 'show typos' in-game).
 xnames - Disallowed player names.

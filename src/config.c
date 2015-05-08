@@ -1081,7 +1081,7 @@ void load_config_system_from_file(void) {
 	
 	// aaand read from file	
 	if (!(fl = fopen(CONFIG_FILE, "r"))) {
-		log("Unable to read config file %s, booting with no conigs", CONFIG_FILE);
+		log("Unable to read config file %s, booting with no configs", CONFIG_FILE);
 		return;
 	}
 	
@@ -1319,7 +1319,7 @@ bool find_int_in_array(int to_find, int *array, int size) {
 
 
 /**
-* Removess an int from an int array for the config system, only if the int is
+* Removes an int from an int array for the config system, only if the int is
 * already in the array.
 *
 * @param int to_remove The integer to remove.
@@ -1534,7 +1534,7 @@ void init_config_system(void) {
 	init_config(CONFIG_ACTIONS, "high_depletion", CONFTYPE_INT, "depletion in buildings with HIGH-DEPLETION");
 	init_config(CONFIG_ACTIONS, "shear_growth_time", CONFTYPE_INT, "real hours to regrow wool");
 	init_config(CONFIG_ACTIONS, "tavern_brew_time", CONFTYPE_INT, "# of 5-minute updates for initial tavern brew");
-	init_config(CONFIG_ACTIONS, "tavern_timer", CONFTYPE_INT, "# of 5-minute updates for tavern resoure cost");
+	init_config(CONFIG_ACTIONS, "tavern_timer", CONFTYPE_INT, "# of 5-minute updates for tavern resource cost");
 	init_config(CONFIG_ACTIONS, "trench_initial_value", CONFTYPE_INT, "negative starting value for excavate -- done when it counts up to 0");
 	init_config(CONFIG_ACTIONS, "trench_gain_from_rain", CONFTYPE_INT, "amount of rain water per room update added to a trench");
 	init_config(CONFIG_ACTIONS, "trench_full_value", CONFTYPE_INT, "amount of water needed to fill a trench");
@@ -1567,7 +1567,7 @@ void init_config_system(void) {
 	init_config(CONFIG_EMPIRE, "member_timeout_full", CONFTYPE_INT, "days until full member times out");
 	init_config(CONFIG_EMPIRE, "minutes_per_day_full", CONFTYPE_INT, "minutes played per day for full member");
 	init_config(CONFIG_EMPIRE, "member_timeout_max_threshold", CONFTYPE_INT, "hours, 1 week of playtime");
-	init_config(CONFIG_EMPIRE, "whole_empire_timeout", CONFTYPE_INT, "days to empire apearing idle");
+	init_config(CONFIG_EMPIRE, "whole_empire_timeout", CONFTYPE_INT, "days to empire appearing idle");
 	init_config(CONFIG_EMPIRE, "empire_log_ttl", CONFTYPE_INT, "how many days elogs last");
 
 	// items
