@@ -1803,6 +1803,11 @@ void besiege_room(room_data *to_room, int damage) {
 		// maximum damage
 		max_dam = GET_BLD_MAX_DAMAGE(building_proto(BUILDING_VNUM(to_room)));
 		
+		// incomplete?
+		if (!IS_COMPLETE(to_room)) {
+			max_dam = MAX(1, max_dam / 2);
+		}
+		
 		if (BUILDING_DAMAGE(to_room) >= max_dam) {
 			disassociate_building(to_room);
 			// only abandon outside cities
