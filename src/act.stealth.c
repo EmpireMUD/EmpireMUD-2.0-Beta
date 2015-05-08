@@ -213,7 +213,7 @@ void trigger_distrust_from_stealth(char_data *ch, empire_data *emp) {
 		pol->offer = 0;
 		pol->type = DIPL_DISTRUST;
 		
-		log_to_empire(chemp, ELOG_DIPLOMACY, "%s now distrusts this empire due to stealth activity", EMPIRE_NAME(emp));	
+		log_to_empire(chemp, ELOG_DIPLOMACY, "%s now distrusts this empire due to stealth activity (%s)", EMPIRE_NAME(emp), PERS(ch, ch, TRUE));
 		save_empire(chemp);
 	}
 	
