@@ -464,6 +464,30 @@ bool is_fight_enemy(char_data *ch, char_data *frenemy) {
 
 
 /**
+* Determines if a character is in combat in any way. This includes when someone
+* is hitting them, even if they aren't hitting back.
+*
+* @param char_data *ch The character to check.
+* @return bool TRUE if he is in combat, or FALSE if not.
+*/
+bool is_fighting(char_data *ch) {
+	char_data *iter;
+	
+	if (FIGHTING(ch)) {
+		return TRUE;
+	}
+	
+	for (iter = ROOM_PEOPLE(IN_ROOM(ch)); iter; iter = iter->next_in_room) {
+		if (iter != ch && FIGHTING(iter) == ch) {
+			return TRUE;
+		}
+	}
+	
+	return FALSE;
+}
+
+
+/**
 * Sets an object, its next-content, and all its own contents as last owned
 * by the person in question.
 *

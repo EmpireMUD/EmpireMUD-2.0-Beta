@@ -281,6 +281,7 @@ extern int damage(char_data *ch, char_data *victim, int dam, int attacktype, byt
 void engage_combat(char_data *ch, char_data *vict, bool melee);
 void heal(char_data *ch, char_data *vict, int amount);
 extern int hit(char_data *ch, char_data *victim, obj_data *weapon, bool normal_round);
+extern bool is_fighting(char_data *ch);
 void set_fighting(char_data *ch, char_data *victim, byte mode);
 void stop_fighting(char_data *ch);
 void update_pos(char_data *victim);
