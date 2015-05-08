@@ -400,7 +400,7 @@ void city_traits(char_data *ch, char *argument) {
 	
 	if (city->traits != old) {
 		prettier_sprintbit(city->traits, empire_trait_types, buf);
-		log_to_empire(emp, ELOG_TERRITORY, "%s has changed city traits for %s to %s", PERS(ch, ch, 1), city->name, buf);
+		log_to_empire(emp, ELOG_ADMIN, "%s has changed city traits for %s to %s", PERS(ch, ch, 1), city->name, buf);
 		save_empire(emp);
 	}
 }

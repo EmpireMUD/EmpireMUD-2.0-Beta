@@ -310,7 +310,16 @@ EEDIT(eedit_description) {
 
 EEDIT(eedit_frontiertraits) {
 	extern const char *empire_trait_types[];
+	
+	bitvector_t old_traits = EMPIRE_FRONTIER_TRAITS(emp);
+	char buf[MAX_STRING_LENGTH];
+	
 	EMPIRE_FRONTIER_TRAITS(emp) = olc_process_flag(ch, argument, "frontier trait", NULL, empire_trait_types, EMPIRE_FRONTIER_TRAITS(emp));
+	
+	if (EMPIRE_FRONTIER_TRAITS(emp) != old_traits) {
+		prettier_sprintbit(EMPIRE_FRONTIER_TRAITS(emp), empire_trait_types, buf);
+		log_to_empire(emp, ELOG_ADMIN, "%s has changed the frontier traits to %s", PERS(ch, ch, TRUE), buf);
+	}
 }
 
 
