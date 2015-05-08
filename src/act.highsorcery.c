@@ -1814,7 +1814,7 @@ RITUAL_SETUP_FUNC(start_siege_ritual) {
 		msg_to_char(ch, "You can't besiege that direction.\r\n");
 		return FALSE;
 	}
-	if (!ROOM_IS_CLOSED(to_room)) {
+	if (!ROOM_IS_CLOSED(to_room) && !IS_MAP_BUILDING(to_room)) {
 		msg_to_char(ch, "The Siege Ritual can only be used to destroy completed buildings.\r\n");
 		return FALSE;
 	}
