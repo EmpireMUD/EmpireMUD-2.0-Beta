@@ -116,6 +116,11 @@ bool can_steal(char_data *ch, empire_data *emp) {
 		return FALSE;
 	}
 	
+	if (emp == chemp) {
+		msg_to_char(ch, "You can't steal from your own empire.\r\n");
+		return FALSE;
+	}
+	
 	if (count_members_online(emp) == 0) {
 		msg_to_char(ch, "There are no members of %s online. ", EMPIRE_NAME(emp));
 		return FALSE;
@@ -189,7 +194,7 @@ void trigger_distrust_from_stealth(char_data *ch, empire_data *emp) {
 	struct empire_political_data *pol;
 	empire_data *chemp = GET_LOYALTY(ch);
 	
-	if (!emp || EMPIRE_IMM_ONLY(emp) || IS_IMMORTAL(ch)) {
+	if (!emp || EMPIRE_IMM_ONLY(emp) || IS_IMMORTAL(ch) || GET_LOYALTY(ch) == emp) {
 		return;
 	}
 	
@@ -1433,7 +1438,7 @@ ACMD(do_steal) {
 		return;
 	}
 	else if (!can_steal(ch, emp)) {
-		msg_to_char(ch, "You can't steal items here.\r\n");
+		// sends own message
 	}
 	else if (!emp) {
 		msg_to_char(ch, "Nothing is stored here that you can steal.\r\n");

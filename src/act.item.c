@@ -45,6 +45,7 @@ extern int drink_aff[][3];
 extern const struct wear_data_type wear_data[NUM_WEARS];
 
 // extern functions
+extern bool can_steal(char_data *ch, empire_data *emp);
 extern bool can_wear_item(char_data *ch, obj_data *item, bool send_messages);
 void expire_trading_post_item(struct trading_post_data *tpd);
 extern char *get_room_name(room_data *room, bool color);
@@ -708,9 +709,7 @@ static void perform_drop_coins(char_data *ch, empire_data *type, int amount, byt
 * @param int mode A find-obj mode like FIND_OBJ_INV.
 * @return bool TRUE if successful, FALSE on fail.
 */
-static bool perform_get_from_container(char_data *ch, obj_data *obj, obj_data *cont, int mode) {
-	extern bool can_steal(char_data *ch, empire_data *emp);
-	
+static bool perform_get_from_container(char_data *ch, obj_data *obj, obj_data *cont, int mode) {	
 	room_data *home = HOME_ROOM(IN_ROOM(ch));
 	empire_data *emp = ROOM_OWNER(home);
 	bool stealing = FALSE;
@@ -729,7 +728,7 @@ static bool perform_get_from_container(char_data *ch, obj_data *obj, obj_data *c
 		stealing = TRUE;
 		
 		if (emp && !can_steal(ch, emp)) {
-			msg_to_char(ch, "You can't steal items here.\r\n");
+			// sends own message
 			return FALSE;
 		}		
 	}
@@ -831,8 +830,6 @@ static void get_from_container(char_data *ch, obj_data *cont, char *arg, int mod
 * @return bool TRUE if he succeeds, FALSE if it fails.
 */
 static bool perform_get_from_room(char_data *ch, obj_data *obj) {
-	extern bool can_steal(char_data *ch, empire_data *emp);
-	
 	room_data *home = HOME_ROOM(IN_ROOM(ch));
 	empire_data *emp = ROOM_OWNER(home);
 	bool stealing = FALSE;
@@ -846,7 +843,7 @@ static bool perform_get_from_room(char_data *ch, obj_data *obj) {
 		stealing = TRUE;
 		
 		if (emp && !can_steal(ch, emp)) {
-			msg_to_char(ch, "You can't steal items here.\r\n");
+			// sends own message
 			return FALSE;
 		}
 	}
