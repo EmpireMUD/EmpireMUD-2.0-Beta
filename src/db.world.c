@@ -61,7 +61,6 @@ void decustomize_room(room_data *room);
 static void evolve_one_map_tile(room_data *room);
 room_vnum find_free_vnum();
 void init_room(room_data *room, room_vnum vnum);
-void ocean_to_pool(room_data *room);
 void ruin_one_building(room_data *room);
 
 
@@ -667,7 +666,7 @@ void update_world(void) {
 		if (CAN_UNLOAD_MAP_ROOM(iter)) {
 			// unload it while we're here?
 			if (!number(0, 4)) {
-				ocean_to_pool(iter);
+				delete_room(iter, FALSE);
 				// deleted = TRUE;	// no need to check exits?
 			}
 		}
@@ -898,97 +897,6 @@ struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_da
 	ROOM_OWNER(location) = emp;
 	
 	return city;
-}
-
-
- //////////////////////////////////////////////////////////////////////////////
-//// OCEAN POOL //////////////////////////////////////////////////////////////
-
-/**
-* The ocean pool system stores spare ocean rooms so they can be quickly added
-* or removed from the world.
-*/
-struct ocean_pool_item {
-	room_data *room;
-	struct ocean_pool_item *next;
-};
-
-// local global
-struct ocean_pool_item *ocean_pool = NULL;	// LL of spare oceans
-
-
-/**
-* Pulls an ocean tile out of the ocean pool (or instantiates a new one) with
-* the given vnum, and adds it to the world.
-*
-* @param room_vnum vnum The ocean room vnum to make.
-* @return room_data* The new ocean room from the pool, already added to the world.
-*/
-room_data *ocean_from_pool(room_vnum vnum) {
-	struct ocean_pool_item *pool;
-	room_data *room;
-	
-	if (ocean_pool) {
-		// pop off an ocean room
-		pool = ocean_pool;
-		ocean_pool = ocean_pool->next;
-		
-		room = pool->room;
-		room->vnum = vnum;
-		add_room_to_world_tables(room);
-	
-		// only if saveable
-		if (!CAN_UNLOAD_MAP_ROOM(room)) {
-			need_world_index = TRUE;
-		}
-		
-		free(pool);
-	}
-	else {
-		room = create_ocean_room(vnum);
-	}
-	
-	return room;
-}
-
-
-/**
-* Pulls an ocean tile out of the world and puts it in the pool of free oceans.
-*
-* @param room_data *room The ocean room to remove.
-*/
-void ocean_to_pool(room_data *room) {
-	struct ocean_pool_item *pool;
-	
-	remove_room_from_world_tables(room);
-	
-	CREATE(pool, struct ocean_pool_item, 1);
-	pool->room = room;
-	
-	pool->next = ocean_pool;
-	ocean_pool = pool;
-}
-
-
-/**
-* This frees up extra RAM from an over-large ocean pool. Spare oceans are only
-* kept in the pool up to the ocean_pool_size config amount.
-*/
-void skim_ocean_pool(void) {
-	struct ocean_pool_item *pool, *next_pool, *temp;
-	int count = 0;
-	
-	int max = config_get_int("ocean_pool_size");
-	
-	for (pool = ocean_pool; pool; pool = next_pool) {
-		next_pool = pool->next;
-		
-		if (++count > max) {
-			REMOVE_FROM_LIST(pool, ocean_pool, next);
-			delete_room(pool->room, FALSE);	// no need to clean up exits; this room was not in the world
-			free(pool);
-		}
-	}
 }
 
 

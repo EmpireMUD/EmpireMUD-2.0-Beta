@@ -5168,8 +5168,6 @@ room_data *real_real_room(room_vnum vnum) {
 * @return room_data* A pointer to the room, or NULL.
 */
 room_data *real_room(room_vnum vnum) {
-	extern room_data *ocean_from_pool(room_vnum vnum);
-
 	room_data *room = NULL;
 	
 	// sheer sanity
@@ -5182,7 +5180,7 @@ room_data *real_room(room_vnum vnum) {
 	
 	// we guarantee map rooms exist
 	if (!room && vnum < MAP_SIZE) {
-		room = ocean_from_pool(vnum);
+		room = create_ocean_room(vnum);
 	}
 
 	return room;

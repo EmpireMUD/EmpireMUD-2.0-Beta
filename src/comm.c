@@ -699,7 +699,6 @@ void heartbeat(int heart_pulse) {
 	void reduce_stale_empires();
 	void reset_instances();
 	void sanity_check();
-	void skim_ocean_pool();
 	void update_actions();
 	void update_empire_npc_data();
 	void update_guard_towers();
@@ -817,12 +816,6 @@ void heartbeat(int heart_pulse) {
 			Crash_save_all();
 			if (debug_log && HEARTBEAT(15)) { log("debug 19:\t%lld", microtime()); }
 		}
-	}
-	
-	// run often but try to avoid lining up with other updates
-	if (HEARTBEAT(10 * SECS_PER_REAL_MIN - 10)) {
-		skim_ocean_pool();
-		if (debug_log && HEARTBEAT(15)) { log("debug 19.5:\t%lld", microtime()); }
 	}
 	
 	if (HEARTBEAT(12 * SECS_PER_REAL_HOUR)) {

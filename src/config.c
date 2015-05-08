@@ -1661,6 +1661,8 @@ void init_config_system(void) {
 		init_config_custom("generic_facing", config_show_bitvector, config_edit_bitvector, (void*)bld_on_flags);
 	init_config(CONFIG_WORLD, "arctic_percent", CONFTYPE_DOUBLE, "what percent of top/bottom of the map is arctic");
 	init_config(CONFIG_WORLD, "tropics_percent", CONFTYPE_DOUBLE, "what percent of the middle of the map is tropics");
+
+	// TODO note: deprecated
 	init_config(CONFIG_WORLD, "ocean_pool_size", CONFTYPE_INT, "how many spare ocean tiles to keep on-hand");
 	
 	// TODO sector types should be audited on startup to ensure they exist -pc
