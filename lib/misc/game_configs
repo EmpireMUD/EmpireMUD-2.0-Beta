@@ -84,6 +84,7 @@ mob_pursuit_distance 25
 mob_pursuit_timeout 30
 mob_spawn_interval 5
 mob_spawn_radius 5
+npc_follower_limit 6
 spawn_limit_per_room 3
 use_mob_stacking 0
 *
@@ -112,6 +113,7 @@ morph_timer 2
 must_be_vampire You must be a vampire to use this ability.
 potion_apply_per_100 1.333300
 potion_heal_scale 0.666600
+summon_npc_limit 5
 tracks_lifespan 60
 *
 * System configs

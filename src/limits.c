@@ -412,8 +412,10 @@ void real_update_char(char_data *ch) {
 	
 	struct over_time_effect_type *dot, *next_dot;
 	struct affected_type *af, *next_af, *immune;
+	char_data *room_ch, *next_ch;
 	obj_data *obj, *next_obj;
 	int result, iter, type;
+	int fol_count;
 	
 	// heal-per-5 ? (stops at 0 health or incap)
 	if (GET_HEAL_OVER_TIME(ch) > 0 && !IS_DEAD(ch) && GET_POS(ch) >= POS_SLEEPING && GET_HEALTH(ch) > 0) {
@@ -614,6 +616,27 @@ void real_update_char(char_data *ch) {
 	if (GET_BLOOD(ch) <= 0 && !GET_FED_ON_BY(ch) && !GET_FEEDING_FROM(ch)) {
 		out_of_blood(ch);
 		return;
+	}
+	
+	// too-many-followers check
+	fol_count = 0;
+	for (room_ch = ROOM_PEOPLE(IN_ROOM(ch)); room_ch; room_ch = next_ch) {
+		next_ch = room_ch->next_in_room;
+		
+		// check is npc following ch
+		if (room_ch == ch || room_ch->desc || !IS_NPC(room_ch) || room_ch->master != ch) {
+			continue;
+		}
+		
+		// don't care about familiars
+		if (MOB_FLAGGED(room_ch, MOB_FAMILIAR)) {
+			continue;
+		}
+		
+		if (++fol_count > config_get_int("npc_follower_limit")) {
+			act("$n becomes enraged!", FALSE, room_ch, NULL, NULL, TO_ROOM);
+			engage_combat(room_ch, ch, TRUE);
+		}
 	}
 
 	random_encounter(ch);

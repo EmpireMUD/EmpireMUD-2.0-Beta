@@ -1444,7 +1444,7 @@ ACMD(do_summon) {
 		}
 	}
 	
-	if (count > 5) {
+	if (count > config_get_int("summon_npc_limit")) {
 		msg_to_char(ch, "There are too many npcs here to summon more.\r\n");
 		return;
 	}

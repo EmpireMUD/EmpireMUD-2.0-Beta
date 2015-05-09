@@ -1593,6 +1593,7 @@ void init_config_system(void) {
 	init_config(CONFIG_MOBS, "mob_spawn_interval", CONFTYPE_INT, "how often mobs spawn/last");
 	init_config(CONFIG_MOBS, "mob_spawn_radius", CONFTYPE_INT, "distance from players that mobs spawn");
 	init_config(CONFIG_MOBS, "mob_despawn_radius", CONFTYPE_INT, "distance from players to despawn mobs");
+	init_config(CONFIG_MOBS, "npc_follower_limit", CONFTYPE_INT, "more npc followers than this causes aggro");
 	init_config(CONFIG_MOBS, "spawn_limit_per_room", CONFTYPE_INT, "max npcs that will spawn in a map room");
 	init_config(CONFIG_MOBS, "mob_pursuit_timeout", CONFTYPE_INT, "minutes that mob pursuit memory lasts");
 	init_config(CONFIG_MOBS, "mob_pursuit_distance", CONFTYPE_INT, "distance a mob will pursue (as the crow flies)");
@@ -1629,6 +1630,7 @@ void init_config_system(void) {
 	init_config(CONFIG_SKILLS, "must_be_vampire", CONFTYPE_SHORT_STRING, "message for doing vampire things while not a vampire");
 	init_config(CONFIG_SKILLS, "potion_heal_scale", CONFTYPE_DOUBLE, "modifier applied to potion scale, for healing");
 	init_config(CONFIG_SKILLS, "potion_apply_per_100", CONFTYPE_DOUBLE, "apply points per 100 potion scale levels");
+	init_config(CONFIG_SKILLS, "summon_npc_limit", CONFTYPE_INT, "npc amount that blocks summons");
 
 	// system
 	init_config(CONFIG_SYSTEM, "nameserver_is_slow", CONFTYPE_BOOL, "if enabled, system will not resolve numeric IPs");
