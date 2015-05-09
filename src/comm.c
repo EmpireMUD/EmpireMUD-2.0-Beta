@@ -1596,7 +1596,7 @@ bool is_slow_ip(char *ip) {
 	int iter;
 	
 	for (iter = 0; *slow_nameserver_ips[iter] != '\n'; ++iter) {
-		if (!str_cmp(ip, slow_nameserver_ips[iter])) {
+		if (!strcmp(ip, slow_nameserver_ips[iter])) {
 			return TRUE;
 		}
 	}
