@@ -1951,7 +1951,7 @@ ACMD(do_diplomacy) {
 				pol_a->offer = pol_b->offer = 0;
 				pol_a->type = pol_b->type = DIPL_DISTRUST;
 				log_to_empire(e, ELOG_DIPLOMACY, "The empire now officially distrusts %s", EMPIRE_NAME(f));
-				log_to_empire(f, ELOG_DIPLOMACY, "%s has declared that they official distrust the empire", EMPIRE_NAME(e));
+				log_to_empire(f, ELOG_DIPLOMACY, "%s has declared that they officially distrust the empire", EMPIRE_NAME(e));
 				send_config_msg(ch, "ok_string");
 			}
 			break;

@@ -313,7 +313,8 @@ SAW
 
 Usage:  saw <tree | log>
 
-You can saw trees and logs into lumber. You must be in a lumber yard.
+You can saw trees and logs into lumber. You must be in a lumber yard. This
+will go faster if you have the Woodworking ability.
 
 See also: TREES, LOGS, LUMBER
 #
