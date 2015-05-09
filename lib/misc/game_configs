@@ -85,6 +85,7 @@ mob_pursuit_timeout 30
 mob_spawn_interval 5
 mob_spawn_radius 5
 npc_follower_limit 6
+num_duplicates_in_stable 2
 spawn_limit_per_room 3
 use_mob_stacking 0
 *

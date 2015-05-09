@@ -1233,12 +1233,15 @@ void point_update_room(room_data *room) {
 	void death_log(char_data *ch, char_data *killer, int type);
 	void fill_trench(room_data *room);
 
-	char_data *ch, *next_ch;
+	char_data *ch, *next_ch, *sub_ch, *next_sub;
 	obj_data *o, *next_o;
 	struct track_data *track, *next_track, *temp;
 	struct affected_type *af, *next_af;
 	empire_data *emp;
 	time_t now = time(0);
+	int count;
+	
+	int allowed_animals = config_get_int("num_duplicates_in_stable");
 
 	// map-only portion
 	if (GET_ROOM_VNUM(room) < MAP_SIZE) {
@@ -1344,6 +1347,34 @@ void point_update_room(room_data *room) {
 			free(track);
 		}
 	}
+	
+	// check mob crowding
+	if (ROOM_BLD_FLAGGED(room, BLD_STABLE)) {
+		for (ch = ROOM_PEOPLE(room); ch; ch = next_ch) {
+			next_ch = ch->next_in_room;
+			
+			// skip non-npcs and familiars
+			if (!IS_NPC(ch) || MOB_FLAGGED(ch, MOB_FAMILIAR)) {
+				continue;
+			}
+			
+			// look for more here than allowed
+			count = 0;
+			for (sub_ch = ch->next_in_room; sub_ch; sub_ch = next_sub) {
+				next_sub = sub_ch->next_in_room;
+				
+				// only looking for dupes
+				if (!IS_NPC(sub_ch) || sub_ch->desc || GET_MOB_VNUM(sub_ch) != GET_MOB_VNUM(ch)) {
+					continue;
+				}
+				
+				if (++count >= allowed_animals) {
+					act("$n is feeling overcrowded, and leaves.", TRUE, sub_ch, NULL, NULL, TO_ROOM);
+					extract_char(sub_ch);
+				}
+			}
+		}
+	}
 
 	// update room ffects
 	for (af = ROOM_AFFECTS(room); af; af = next_af) {
@@ -1362,6 +1393,8 @@ void point_update_room(room_data *room) {
 			affect_remove_room(room, af);
 		}
 	}
+	
+	// ensure these are up to date
 	SET_BIT(ROOM_AFF_FLAGS(room), ROOM_BASE_FLAGS(room));
 }
 

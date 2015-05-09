@@ -1594,6 +1594,7 @@ void init_config_system(void) {
 	init_config(CONFIG_MOBS, "mob_spawn_radius", CONFTYPE_INT, "distance from players that mobs spawn");
 	init_config(CONFIG_MOBS, "mob_despawn_radius", CONFTYPE_INT, "distance from players to despawn mobs");
 	init_config(CONFIG_MOBS, "npc_follower_limit", CONFTYPE_INT, "more npc followers than this causes aggro");
+	init_config(CONFIG_MOBS, "num_duplicates_in_stable", CONFTYPE_INT, "number of npc duplicates allowed in a stable before some leave");
 	init_config(CONFIG_MOBS, "spawn_limit_per_room", CONFTYPE_INT, "max npcs that will spawn in a map room");
 	init_config(CONFIG_MOBS, "mob_pursuit_timeout", CONFTYPE_INT, "minutes that mob pursuit memory lasts");
 	init_config(CONFIG_MOBS, "mob_pursuit_distance", CONFTYPE_INT, "distance a mob will pursue (as the crow flies)");
