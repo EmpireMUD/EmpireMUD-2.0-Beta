@@ -2273,6 +2273,8 @@ ACMD(do_who) {
 			return;
 		}
 	}
+	
+	*output = '\0';
 
 	/* Immortals first */
 	part = partial_who(ch, name_search, low, high, empire_who, rp, shortlist, WHO_IMMORTALS);
