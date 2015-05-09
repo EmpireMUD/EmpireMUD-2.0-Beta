@@ -156,6 +156,14 @@ const char *LOGNAME = NULL;	// using NULL outputs to stderr, otherwise outputs t
 int max_playing = 300;	// maximum number of players allowed before game starts to turn people away
 
 
+// if you have a player whose connection causes lag when they first connect,
+// adding their IPv4 address here will prevent the mud from doing a nameserver
+// lookup.
+const char *slow_nameserver_ips[] = {
+	"\n"	// put this last
+};
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// PLAYER CONFIGS //////////////////////////////////////////////////////////
 

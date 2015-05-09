@@ -1587,6 +1587,25 @@ socket_t init_socket(ush_int port) {
 
 
 /**
+* @param char *ip The IP address to check.
+* @return bool TRUE if we should skip nameserver lookup on this IP.
+*/
+bool is_slow_ip(char *ip) {
+	extern const char *slow_nameserver_ips[];
+	
+	int iter;
+	
+	for (iter = 0; *slow_nameserver_ips[iter] != '\n'; ++iter) {
+		if (!str_cmp(ip, slow_nameserver_ips[iter])) {
+			return TRUE;
+		}
+	}
+	
+	return FALSE;
+}
+
+
+/**
 * Allows a player to manipulate their input queue. The input text is what the
 * user typed AFTER the '-' trigger character.
 *
@@ -1670,6 +1689,7 @@ int new_descriptor(int s) {
 	descriptor_data *newd;
 	struct sockaddr_in peer;
 	struct hostent *from;
+	bool slow_ip;
 
 	/* accept the new connection */
 	i = sizeof(peer);
@@ -1700,9 +1720,10 @@ int new_descriptor(int s) {
 	memset((char *) newd, 0, sizeof(descriptor_data));
 
 	/* find the sitename */
-	if (config_get_bool("nameserver_is_slow") || !(from = gethostbyaddr((char *) &peer.sin_addr, sizeof(peer.sin_addr), AF_INET))) {
+	slow_ip = config_get_bool("nameserver_is_slow") || is_slow_ip(inet_ntoa(peer.sin_addr));
+	if (slow_ip || !(from = gethostbyaddr((char *) &peer.sin_addr, sizeof(peer.sin_addr), AF_INET))) {
 		/* resolution failed */
-		if (!config_get_bool("nameserver_is_slow")) {
+		if (!slow_ip) {
 			perror("SYSERR: gethostbyaddr");
 		}
 
