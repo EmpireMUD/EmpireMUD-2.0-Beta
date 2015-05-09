@@ -191,12 +191,12 @@ void sub_write(char *arg, char_data *ch, byte find_invis, int targets) {
 	*s = '\0';
 	tokens[++i] = NULL;
 
-	if (IS_SET(targets, TO_CHAR) && SENDOK(ch))
+	if (IS_SET(targets, TO_CHAR) && SENDOK(ch) && (AWAKE(ch) || IS_SET(targets, TO_SLEEP)))
 		sub_write_to_char(ch, tokens, otokens, type);
 
 	if (IS_SET(targets, TO_ROOM)) {
 		for (to = ROOM_PEOPLE(IN_ROOM(ch)); to; to = to->next_in_room) {
-			if (to != ch && SENDOK(to)) {
+			if (to != ch && SENDOK(to) && (AWAKE(to) || IS_SET(targets, TO_SLEEP))) {
 				sub_write_to_char(to, tokens, otokens, type);
 			}
 		}

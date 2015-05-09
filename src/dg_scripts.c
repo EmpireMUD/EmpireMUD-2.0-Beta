@@ -2240,6 +2240,11 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							snprintf(str, slen, "0");
 						}
 					}
+					else if (!str_cmp(field, "position")) {
+						extern const char *position_types[];
+						snprintf(str, slen, "%s", position_types[GET_POS(c)]);
+					}
+					
 					break;
 				}
 				case 'r':
