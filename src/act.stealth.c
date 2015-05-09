@@ -661,7 +661,7 @@ ACMD(do_darkness) {
 	int cost = 15;
 
 	if (!can_use_ability(ch, ABIL_DARKNESS, MOVE, cost, COOLDOWN_DARKNESS)) {
-		msg_to_char(ch, "You must purchase the Darkness ability to do that.\r\n");
+		// sends own message
 	}
 	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_DARKNESS)) {
 		return;

@@ -491,7 +491,8 @@ trench from a desert or plains. Once the trench is complete, it will begin
 to fill with water. Eventually, it becomes a river.
 
 The "fillin" command is the opposite of excavate: it fills trenches in until
-they are ordinary plains or desert again. It will also work on an oasis.
+they are ordinary plains or desert again. It will also work on a player-created
+oasis or river.
 
 There are three ways to fill a finished trench with water:
  - If there is more water adjacent, the trench will fill quickly.
