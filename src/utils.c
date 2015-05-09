@@ -109,7 +109,7 @@ void apply_bonus_trait(char_data *ch, bitvector_t trait, bool add) {
 	int amt = (add ? 1 : -1);
 	
 	if (IS_SET(trait, BONUS_EXTRA_DAILY_SKILLS)) {
-		GET_SKILL_POINTS_AVAILABLE(ch) = MAX(0, GET_SKILL_POINTS_AVAILABLE(ch) + (config_get_int("num_bonus_trait_daily_skills") * amt));
+		GET_DAILY_BONUS_EXPERIENCE(ch) = MAX(0, GET_DAILY_BONUS_EXPERIENCE(ch) + (config_get_int("num_bonus_trait_daily_skills") * amt));
 	}
 	if (IS_SET(trait, BONUS_STRENGTH)) {
 		ch->real_attributes[STRENGTH] = MAX(1, MIN(att_max(ch), ch->real_attributes[STRENGTH] + amt));

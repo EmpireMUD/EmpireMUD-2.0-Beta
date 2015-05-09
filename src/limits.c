@@ -404,7 +404,7 @@ void point_update_char(char_data *ch) {
 */
 void real_update_char(char_data *ch) {
 	extern bool can_wear_item(char_data *ch, obj_data *item, bool send_messages);
-	extern int compute_skill_points_per_day(char_data *ch);
+	extern int compute_bonus_exp_per_day(char_data *ch);
 	extern int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname);	
 	void random_encounter(char_data *ch);
 	void update_biting_char(char_data *ch);
@@ -502,12 +502,12 @@ void real_update_char(char_data *ch) {
 	// periodic exp and skill gain
 	if (GET_DAILY_CYCLE(ch) < daily_cycle) {
 		// other stuff that resets daily
-		GET_SKILL_POINTS_AVAILABLE(ch) = compute_skill_points_per_day(ch);
+		GET_DAILY_BONUS_EXPERIENCE(ch) = compute_bonus_exp_per_day(ch);
 		for (iter = 0; iter < MAX_REWARDS_PER_DAY; ++iter) {
 			GET_REWARDED_TODAY(ch, iter) = -1;
 		}
 		
-		msg_to_char(ch, "&yYour daily skill cap has reset.&0\r\n");
+		msg_to_char(ch, "&yYour daily bonus experience has reset!&0\r\n");
 		
 		// update to this cycle so it only happens once a day
 		GET_DAILY_CYCLE(ch) = daily_cycle;

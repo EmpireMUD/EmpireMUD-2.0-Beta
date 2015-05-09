@@ -768,7 +768,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_SKILL(ch, sk)  (IS_NPC(ch) ? 0 : CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.skills[sk].level)))
 #define GET_SKILL_EXP(ch, sk)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.skills[sk].exp))
 #define GET_SKILL_LEVEL(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.skill_level))
-#define GET_SKILL_POINTS_AVAILABLE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.skill_points_available))
+#define GET_DAILY_BONUS_EXPERIENCE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.daily_bonus_experience))
 #define GET_STORED_SLASH_CHANNEL(ch, pos)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.slash_channels[(pos)]))
 #define GET_TOMB_ROOM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.tomb_room))
 #define IS_DISGUISED(ch)  (!IS_NPC(ch) && PLR_FLAGGED((ch), PLR_DISGUISED))

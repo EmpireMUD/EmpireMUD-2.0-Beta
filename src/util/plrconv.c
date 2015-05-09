@@ -75,7 +75,7 @@ struct OLD_player_special_data_saved {
 
 	// some daily stuff
 	int daily_cycle;	// Last update cycle registered
-	ubyte skill_points_available;	// skill points can gain
+	ubyte daily_bonus_experience;	// boosted skill gain points
 	long rewarded_today[MAX_REWARDS_PER_DAY];	// idnums, for ABIL_REWARD
 
 	// action info
@@ -267,7 +267,7 @@ void convert_char_file_u(struct char_file_u *to, struct OLD_char_file_u *from) {
 	}
 	
 	to->player_specials_saved.daily_cycle = from->player_specials_saved.daily_cycle;
-	to->player_specials_saved.skill_points_available = from->player_specials_saved.skill_points_available;
+	to->player_specials_saved.daily_bonus_experience = from->player_specials_saved.daily_bonus_experience;
 	
 	to->player_specials_saved.action = from->player_specials_saved.action;
 	to->player_specials_saved.action_rotation = from->player_specials_saved.action_rotation;

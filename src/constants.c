@@ -269,7 +269,7 @@ const char *bonus_bit_descriptions[] = {
 	"Faster move regeneration",
 	"Faster mana regeneration",
 	"Faster chores (e.g. chopping)",
-	"Extra daily skill points",
+	"Extra daily bonus experience",
 	"Larger inventory",
 	"Faster walking",
 	"\n"

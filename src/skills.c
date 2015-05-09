@@ -502,13 +502,12 @@ void clear_char_abilities(char_data *ch, int skill) {
 
 
 /**
-* Currently, you get 10 skill points per day unless you have gained fewer than
-* 150 total skill points -- this comes out to 8 days of play time.
+* Currently, you get 15 bonus exp per day.
 *
 * @param char_data *ch
 * @return int the number of points ch can earn per day
 */
-int compute_skill_points_per_day(char_data *ch) {
+int compute_bonus_exp_per_day(char_data *ch) {
 	int perdiem = 0;
 	
 	if (!IS_NPC(ch)) {
@@ -690,7 +689,7 @@ bool gain_skill(char_data *ch, int skill, int amount) {
 * the skill approaches 100. Passing an amount of 100 guarantees a skillup,
 * if the character can gain at all.
 *
-* This function also accounts for daily skill points, and automatically
+* This function also accounts for daily bonus exp, and automatically
 * reduces amount if the character has no daily points left.
 *
 * @param char_data *ch The player character who will gain.
@@ -712,7 +711,7 @@ bool gain_skill_exp(char_data *ch, int skill, double amount) {
 	}
 
 	// this allows bonus skillups...
-	if (GET_SKILL_POINTS_AVAILABLE(ch) <= 0) {
+	if (GET_DAILY_BONUS_EXPERIENCE(ch) <= 0) {
 		amount /= 50.0;
 	}
 	
@@ -728,7 +727,7 @@ bool gain_skill_exp(char_data *ch, int skill, double amount) {
 	gained = (number(1, 100) <= GET_SKILL_EXP(ch, skill));
 	
 	if (gained) {
-		GET_SKILL_POINTS_AVAILABLE(ch) = MAX(0, GET_SKILL_POINTS_AVAILABLE(ch) - 1);
+		GET_DAILY_BONUS_EXPERIENCE(ch) = MAX(0, GET_DAILY_BONUS_EXPERIENCE(ch) - 1);
 		gained = gain_skill(ch, skill, 1);
 	}
 	
@@ -947,7 +946,7 @@ char *get_skill_gain_display(char_data *ch) {
 	
 	*out = '\0';
 	if (!IS_NPC(ch)) {
-		sprintf(out + strlen(out), "You have %d skill point%s available today. Use 'noskill <skill>' to toggle skill gain.\r\n", GET_SKILL_POINTS_AVAILABLE(ch), (GET_SKILL_POINTS_AVAILABLE(ch) != 1 ? "s" : ""));
+		sprintf(out + strlen(out), "You have %d bonus experience point%s available today. Use 'noskill <skill>' to toggle skill gain.\r\n", GET_DAILY_BONUS_EXPERIENCE(ch), PLURAL(GET_DAILY_BONUS_EXPERIENCE(ch)));
 	}
 	
 	return out;

@@ -2107,7 +2107,7 @@ struct player_special_data_saved {
 
 	// some daily stuff
 	int daily_cycle;	// Last update cycle registered
-	ubyte skill_points_available;	// skill points can gain
+	ubyte daily_bonus_experience;	// boosted skill gain points
 	int rewarded_today[MAX_REWARDS_PER_DAY];	// idnums, for ABIL_REWARD
 
 	// action info

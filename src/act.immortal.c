@@ -1775,7 +1775,7 @@ SHOW(show_skills) {
 	msg_to_char(ch, "&0%s\r\n", (found ? "" : "none"));
 	
 	// available summary
-	msg_to_char(ch, "Available skill points today: %d\r\n", GET_SKILL_POINTS_AVAILABLE(vict));
+	msg_to_char(ch, "Available daily bonus experience points: %d\r\n", GET_DAILY_BONUS_EXPERIENCE(vict));
 	
 	if (is_file) {
 		free_char(vict);

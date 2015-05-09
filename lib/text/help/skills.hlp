@@ -11,11 +11,8 @@ You earn ability points at these levels:
 You can buy abilities with "skill buy <ability>".
 
 You can reset your ability purchases with "skill reset <skill>".
-  
-Don't confuse these with "skill points", which are used for easy daily skill
-gains.
 
-See also: SKILLS, SKILL CAPS, SKILL POINTS
+See also: SKILLS, SKILL CAPS, DAILY BONUS EXPERIENCE
 #
 BATHE 
 
@@ -57,21 +54,18 @@ limited resource.
 
 See also: BUILD, DEPLETION, SCRAPE, TREES, LUMBER, SAW
 #
-"DAILY SKILL POINTS" "DAILY SKILLS" "SKILL POINTS"
+"DAILY EXPERIENCE BONUS POINTS" "DAILY SKILLS" "BONUS EXPERIENCE POINTS" "DAILY BONUS EXPERIENCE POINTS"
 
-You get a certain number of "daily skill points" each day. Once you have used
-all of these, you can still gain skill, but the rate will be much slower. You
-can avoid using your daily points on the wrong skill by shutting off skill
-gains with the "noskill" command.
+Each day, you get a certain number of daily bonus experience points. While you
+have any points left, you get 50x more skill experience from using your
+abilities. When you run out of daily bonus experience, you will still continue
+to gain skill levels, but at a slower rate.
 
-You can see your daily skill points by typing "skills"; they are at the bottom.
+Each time you gain a skill level, your daily bonus experience points will go
+down by one. When they run out, the effect ends until the daily skill reset.
 
-While you have skill points available, your skills will gain faster. You can
-still gain skill experience without any daily skill points available -- you'll
-just gain it much more slowly.
-
-Don't confuse "skill points" with "ability points", which are used to purchase
-abilities.
+You can keep yourself from accidentally spending your daily bonus experience
+in the wrong skill by using 'noskill'.
 
 See also: ABILITY POINTS, SKILLS, SKILL CAPS
 #
@@ -281,7 +275,7 @@ NOSKILL
 Usage:  noskill <skill>
 
 You can toggle which skills will or will not gain for you. This helps you to
-conserve the precious few skill points you earn each day.
+conserve the precious few bonus experience points you earn each day.
 
 Use the "skills" command to see which are &cgaining&0 and which are &rnoskill&0.
 
@@ -368,7 +362,7 @@ progress in each skill, and the ability points you've earned.
 
 If you specify a skill, you'll see a breakdown of the abilities in that skill
 tree. Abilities marked with an "x" are the ones you already know. To buy a new
-ability, use "skill buy". You must have a free skill point to do this.
+ability, use "skill buy". You must have a free ability point to do this.
 
 For more information, see the help page for each skill or ability. In some
 cases, you may have to type "help skill empire" because "help empire" shows

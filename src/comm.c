@@ -2591,8 +2591,8 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 						sprintf(i, "%%%c", *str);
 					tmp = i;
 					break;
-				case 's': {	// %s skill points available
-					sprintf(i, "%d", GET_SKILL_POINTS_AVAILABLE(ch));
+				case 's': {	// %s bonus exp available
+					sprintf(i, "%d", GET_DAILY_BONUS_EXPERIENCE(ch));
 					tmp = i;
 					break;
 				}
