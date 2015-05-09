@@ -194,6 +194,13 @@ Available traits:
  Larger inventory - Carry 5 more small items (or 2 more large items)
  Faster walking - Half the lag from normal walking
 #
+"CAMPING FIRE" "COOKING FIRE" "CAMP FIRE"
+
+You can create a cooking fire by lighting a tree or log, using a flint set.
+This will let you cook food, brew potions, or craft pottery.
+
+See also: LIGHT
+#
 CHAMELEON
 
 The "chameleon" trait is the property of some buildings to be invisible at a
