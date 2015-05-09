@@ -21,7 +21,9 @@ Butcher (Survival ability)
 Usage:  butcher <corpse>
 
 With a little practice, you can butcher a corpse into smaller cuts of meat.
-Anything that was on the corpse will end up in your inventory as well.
+If you butcher a corpse on the ground, its contents will end up on the ground.
+If you butcher one in your inventory, you will have its contents in your
+inventory.
 #
 "BY MOONLIGHT"
 
