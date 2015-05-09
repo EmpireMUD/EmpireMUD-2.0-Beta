@@ -2449,18 +2449,18 @@ char *prompt_str(char_data *ch) {
 	if (!str || !*str) {
 		if (IS_MAGE(ch)) {
 			if (IS_VAMPIRE(ch)) {
-				str = "&0|%i/%u/%n %bb [%t]>";
+				str = "&0|%i/%u/%n %bb [%t]> ";
 			}
 			else {
-				str = "&0|%i/%u/%n>";
+				str = "&0|%i/%u/%n> ";
 			}
 		}
 		else {
 			if (IS_VAMPIRE(ch)) {
-				str = "&0|%i/%u %bb [%t]>";
+				str = "&0|%i/%u %bb [%t]> ";
 			}
 			else {
-				str = "&0|%i/%u>";
+				str = "&0|%i/%u> ";
 			}
 		}
 	}
