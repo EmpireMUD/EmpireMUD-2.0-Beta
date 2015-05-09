@@ -1251,6 +1251,7 @@ typedef struct trig_data trig_data;
 #define PRF_INFORMATIVE  BIT(23)	// informative map display colors
 #define PRF_NOSPAM  BIT(24)	// blocks periodic action messages
 #define PRF_SCREEN_READER  BIT(25)	// player is visually impaired and using a screen reader that can't read the map
+#define PRF_STEALTHABLE  BIT(26)	// player can steal (rather than be prevented from accidentally stealing)
 
 
 // Rent codes

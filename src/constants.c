@@ -382,6 +382,7 @@ const char *preference_bits[] = {
 	"INFORMATIVE",
 	"!SPAM",
 	"SRCNRDR",
+	"STEALTHABLE",
 	"\n"
 };
 
@@ -416,6 +417,7 @@ const struct toggle_data_type toggle_data[] = {
 	
 	{ "channel-joins", TOG_OFFON, PRF_NO_CHANNEL_JOINS, 0, NULL },
 	{ "autorecall", TOG_ONOFF, PRF_AUTORECALL, 0, NULL },
+	{ "stealthable", TOG_ONOFF, PRF_STEALTHABLE, LVL_APPROVED, NULL },
 	
 	// imm section
 	{ "wiznet", TOG_OFFON, PRF_NOWIZ, LVL_START_IMM, NULL },

@@ -1388,6 +1388,7 @@ Toggles:
   afk - Whether or not you are away-from-keyboard
   channel-joins - blocks slash-channel join messages
   autorecall - if you're logged out over an hour, automatically sends you home
+  stealthable - if off, you will be prevented from accidentally stealing
 
 Immortal toggles:
   wiznet - shuts off the immortal channel

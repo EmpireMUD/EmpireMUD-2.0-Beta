@@ -111,6 +111,11 @@ bool can_steal(char_data *ch, empire_data *emp) {
 		return FALSE;
 	}
 	
+	if (!PRF_FLAGGED(ch, PRF_STEALTHABLE)) {
+		msg_to_char(ch, "You cannot steal because your 'stealthable' toggle is off.\r\n");
+		return FALSE;
+	}
+	
 	if (EMPIRE_IMM_ONLY(emp)) {
 		msg_to_char(ch, "You can't steal from immortal empires.\r\n");
 		return FALSE;
