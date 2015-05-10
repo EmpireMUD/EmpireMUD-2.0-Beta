@@ -151,7 +151,7 @@ A big, hairy goblin warg is snarling at you!
 ~
 50 50 dej 0
 0 0 0 10
-I 0 3012 100.00 2  # BUTCHER: UNKNOWN
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 1  # SKIN: a large skin
 I 1 1351 50.00 1  # SKIN: a large skin
 I 3 10207 100.00 1 X  # BARDE: an armored goblin warg
@@ -163,8 +163,36 @@ An armored goblin warg is here!
 ~
 100 100 bdej 0
 0 0 0 10
-I 0 3012 100.00 2  # BUTCHER: UNKNOWN
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 1  # SKIN: a large skin
 I 1 1351 50.00 1  # SKIN: a large skin
+S
+#10225
+druid #n~
+the druid #n~
+#n is tending the gardens.
+~
+50 50 bdv nD
+0 2 0 15
+T 10233
+T 10225
+T 10226
+S
+#10226
+#n gardener~
+the gardener~
+#n is tending the gardens.
+~
+50 50 bdv nD
+0 0 0 15
+T 10233
+S
+#10227
+tumbleweed enchanted~
+an enchanted tumbleweed~
+An enchanted tumbleweed is blowing through.
+~
+0 50 de 0
+0 0 4 16
 S
 $
