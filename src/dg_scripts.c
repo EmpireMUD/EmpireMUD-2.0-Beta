@@ -1400,7 +1400,6 @@ int text_processed(char *field, char *subfield, struct trig_var_data *vd, char *
 		}
 		*strptr = '\0';
 		return TRUE;
-
 	}
 	else if (!str_cmp(field, "cdr")) {                 /* cdr       */
 		char *cdr = vd->value;
@@ -1593,6 +1592,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if ((r = get_room(obj_room(obj), name))) {
 						// just setting
 					}
+					else {
+						o = obj;
+					}
 
 					break;
 				case WLD_TRIGGER:
@@ -1740,7 +1742,16 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				return;
 			}
 			else if (!str_cmp(var, "skill")) {
-				if (!str_cmp(field, "validate")) {
+				if (!str_cmp(field, "name")) {
+					if (subfield && *subfield) {
+						int sk = find_skill_by_name(subfield);
+						snprintf(str, slen, "%s", sk != NO_SKILL ? skill_data[sk].name : "");
+					}
+					else {
+						snprintf(str, slen, "");
+					}
+				}
+				else if (!str_cmp(field, "validate")) {
 					if (subfield && *subfield) {
 						int sk = find_skill_by_name(subfield);
 						snprintf(str, slen, "%d", sk != NO_SKILL ? 1 : 0);
@@ -2997,6 +3008,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					script_log("Trigger: %s, VNum %d, type: %d. unknown room field: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), type, field);
 				}
 			}
+		}
+		else {
+			if (vd && text_processed(field, subfield, vd, str, slen))
+				return;
 		}
 	}
 }

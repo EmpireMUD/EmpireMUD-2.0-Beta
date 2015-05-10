@@ -785,6 +785,7 @@ random.<#>    - This returns a number between 1 and the field value.
 random.char   - This returns a random character in the room.
 random.ally   - Returns a random ally (only if fighting).
 random.enemy  - Returns a random enemy (only if fighting).
+skill.name(sk) - The full name of a skill abbreviated by sk.
 skill.validate(sk) - Returns true if sk is a valid skill.
 speech        - This variable is set to the complete phrase spoken by an actor 
                 that triggers a speech trigger.
