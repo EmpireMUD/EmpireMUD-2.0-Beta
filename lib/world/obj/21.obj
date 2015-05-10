@@ -81,11 +81,9 @@ a stone hammer~
 A stone hammer is lying on the ground.~
 This hammer, though primitive, can function as both a weapon and a tool.
 ~
-1 hmo ano
-0 1 6
+1 ho ano
+0 3 6
 1 0
-C
-0 0
 S
 #2107
 saddle rawhide~
@@ -239,7 +237,9 @@ grave marker~
 a grave marker~
 A grave marker has been left behind.~
    You can use this grave marker to 'build grave', and then set it as your tomb
-in order to have a nearby respawn point when you die.
+in order to have a nearby respawn point when you die. This grave marker can
+only be used once, so pick a good spot for it. You'll need the Monuments
+ability to build a proper tomb after that.  
 ~
 3 g a
 0 0 0

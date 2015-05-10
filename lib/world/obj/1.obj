@@ -156,7 +156,7 @@ S
 wheat bundle~
 a bundle of wheat~
 A bundle of wheat has been left on the ground.~
-Wheat can be milled into flower, or planted.
+Wheat can be milled into flour, or planted.
 ~
 3 bl a
 0 1 0
@@ -200,7 +200,7 @@ a sack of barley~
 A sack of barley is sitting here.~
 Barley can be made into ale at the tavern.
 ~
-3 b a
+3 bl a
 0 5 0
 7 168
 M
