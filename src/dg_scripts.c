@@ -1414,10 +1414,7 @@ int text_processed(char *field, char *subfield, struct trig_var_data *vd, char *
 	}
 	else if (!str_cmp(field, "mudcommand")) {
 		/* find the mud command returned from this text */
-		/* NOTE: you may need to replace "cmd_info" with "complete_cmd_info", */
-		/* depending on what patches you've got applied.                      */
 		extern const struct command_info cmd_info[];
-		/* on older source bases:    extern struct command_info *cmd_info; */
 		int length, cmd;
 		for (length = strlen(vd->value), cmd = 0; *cmd_info[cmd].command != '\n'; cmd++)
 			if (!strn_cmp(cmd_info[cmd].command, vd->value, length))
