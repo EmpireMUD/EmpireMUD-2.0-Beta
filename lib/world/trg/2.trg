@@ -38,6 +38,10 @@ if !%test%
   return 0
   halt
 end
+if (%actor.position% != Standing)
+  %send% %actor% You can't do that right now.
+  halt
+end
 if !%actor.can_teleport_room% || !%actor.canuseroom_guest%
   %send% %actor% You can't teleport out of here.
   halt
@@ -113,6 +117,10 @@ if !%test%
   return 0
   halt
 end
+if (%actor.position% != Standing)
+  %send% %actor% You can't do that right now.
+  halt
+end
 if !%actor.can_teleport_room% || !%actor.canuseroom_guest%
   %send% %actor% You can't teleport out of here.
   halt
@@ -142,6 +150,37 @@ end
 %force% %actor% look
 eval last_conveyance_time %timestamp%
 remote last_conveyance_time %actor.id%
+%purge% %self%
+~
+#263
+Letheian Icon use~
+1 c 2
+use~
+eval item %arg.car%
+eval sk %arg.cdr%
+eval test %%self.is_name(%item%)%%
+if !(%test% && use /= %cmd%)
+  return 0
+  halt
+end
+if !%sk%
+  %send% %actor% Usage: use icon <skill>
+  halt
+end
+if (%actor.position% != Standing)
+  %send% %actor% You can't do that right now.
+  halt
+end
+eval test %%skill.validate(%sk%)%%
+if !%test%
+  %send% %actor% No such skill '%sk%'.
+  halt
+end
+eval name %%skill.name(%sk%)%%
+%send% %actor% You use %self.shortdesc% and gain a skill reset in %name%!
+%echoaround% %actor% %actor.name% uses %self.shortdesc%.
+eval grant %%actor.give_skill_reset(%sk%)%%
+nop %grant%
 %purge% %self%
 ~
 $

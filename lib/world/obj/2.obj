@@ -149,4 +149,17 @@ R
 5610 0
 T 262
 S
+#263
+icon letheian clay~
+a letheian icon~
+A clay letheian icon is lying on the ground.~
+   This icon grants a free skill reset. Once you use it, you can choose a
+different set of abilities for that skill tree. Type 'use icon Skill Name' to
+gain the reset, then 'skill reset Skill Name' to use it.  
+~
+3 0 a
+0 0 0
+0 0
+T 263
+S
 $
