@@ -1530,7 +1530,7 @@ void charge_coins(char_data *ch, empire_data *type, int amount) {
 	}
 	
 	for (coin = GET_PLAYER_COINS(ch); coin && amount > 0; coin = coin->next) {
-		if (coin->empire_id != EMPIRE_VNUM(type) && coin->empire_id != OTHER_COIN) {
+		if ((type == REAL_OTHER_COIN || coin->empire_id != EMPIRE_VNUM(type)) && coin->empire_id != OTHER_COIN) {
 			emp = real_empire(coin->empire_id);
 			// inverse exchange rate to figure out how much we owe
 			inv = 1.0 / (rate = exchange_rate(emp, type));
