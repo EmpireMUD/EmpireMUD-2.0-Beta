@@ -322,7 +322,9 @@ ADMIN_UTIL(util_fixresets) {
 	char_data *vict;
 	int pos, iter;
 	bool is_file, save = FALSE;
-
+	
+	msg_to_char(ch, "Checking...\r\n");
+	
 	// ok, ready to roll
 	for (pos = 0; pos <= top_of_p_table; ++pos) {
 		// need chdata either way; check deleted here
@@ -359,6 +361,8 @@ ADMIN_UTIL(util_fixresets) {
 			SAVE_CHAR(vict);
 		}
 	}
+	
+	msg_to_char(ch, "Done.\r\n");
 }
 
 
