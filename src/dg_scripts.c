@@ -1740,6 +1740,17 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 
 				return;
 			}
+			else if (!str_cmp(var, "skill")) {
+				if (!str_cmp(field, "validate")) {
+					if (subfield && *subfield) {
+						int sk = find_skill_by_name(subfield);
+						snprintf(str, slen, "%d", sk != NO_SKILL ? 1 : 0);
+					}
+					else {
+						snprintf(str, slen, "0");
+					}
+				}
+			}
 		}
 
 		if (c) {
