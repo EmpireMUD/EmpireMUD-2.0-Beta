@@ -578,7 +578,7 @@ list~
 %send% %actor%  - skycleaver gloves ('buy gloves', 5 skystones)
 %send% %actor%  - skycleaver armor ('buy armor', 14 skystones)
 %send% %actor%  - a skycleaver rucksack ('buy rucksack', 10 skystones)
-%send% %actor%  - an unusual blue clover ('buy clover', 2 skystones)
+%send% %actor%  - an iridescent blue iris ('buy iris', 2 skystones)
 %send% %actor%  - a yellow lightning stone ('buy lightningstone', 2 skystones)
 %send% %actor%  - a red bloodstone ('buy bloodstone', 2 skystones)
 %send% %actor%  - a glowing green seashell ('buy seashell', 2 skystones)
@@ -610,11 +610,11 @@ elseif rucksack /= %arg%
   eval vnum 10041
   eval cost 10
   eval named a skycleaver rucksack
-elseif clover /= %arg%
+elseif iris /= %arg%
   eval vnum 1206
   eval cost 2
-  eval named an unusual blue clover
-  eval keyw clover
+  eval named an iridescent blue iris
+  eval keyw iris
 elseif lightningstone /= %arg%
   eval vnum 103
   eval cost 2
