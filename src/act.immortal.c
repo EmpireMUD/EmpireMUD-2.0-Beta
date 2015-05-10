@@ -66,6 +66,7 @@ extern char *get_room_name(room_data *room, bool color);
 void save_instances();
 void save_whole_world();
 void scale_mob_to_level(char_data *mob, int level);
+void update_class(char_data *ch);
 
 // locals
 void instance_list_row(struct instance_data *inst, int number, char *save_buffer, size_t size);
@@ -296,6 +297,7 @@ ADMIN_UTIL(util_playerdump);
 ADMIN_UTIL(util_randtest);
 ADMIN_UTIL(util_redo_islands);
 ADMIN_UTIL(util_tool);
+ADMIN_UTIL(util_fixresets);
 
 
 struct {
@@ -309,10 +311,60 @@ struct {
 	{ "randtest", LVL_CIMPL, util_randtest },
 	{ "redoislands", LVL_CIMPL, util_redo_islands },
 	{ "tool", LVL_IMPL, util_tool },
+	{ "fixresets", LVL_CIMPL, util_fixresets },
 
 	// last
 	{ "\n", LVL_TOP+1, NULL }
 };
+
+
+ADMIN_UTIL(util_fixresets) {
+	struct char_file_u chdata;
+	char_data *vict;
+	int pos, iter;
+	bool is_file, save = FALSE;
+	
+	msg_to_char(ch, "Checking...\r\n");
+	
+	// ok, ready to roll
+	for (pos = 0; pos <= top_of_p_table; ++pos) {
+		// need chdata either way; check deleted here
+		if (load_char(player_table[pos].name, &chdata) <= NOBODY || IS_SET(chdata.char_specials_saved.act, PLR_DELETED)) {
+			continue;
+		}
+		
+		if (!(vict = find_or_load_player(player_table[pos].name, &is_file))) {
+			continue;
+		}
+		
+		save = FALSE;
+		
+		for (iter = 0; iter < NUM_SKILLS; ++iter) {
+			if (GET_FREE_SKILL_RESETS(vict, iter) > 5) {
+				msg_to_char(ch, "%s had %d resets in %s.\r\n", GET_NAME(vict), GET_FREE_SKILL_RESETS(vict, iter), skill_data[iter].name);
+				GET_FREE_SKILL_RESETS(vict, iter) = 0;
+				save = TRUE;
+			}
+		}
+		
+		// save
+		if (is_file) {
+			if (save) {
+				store_loaded_char(vict);
+			}
+			else {
+				free_char(vict);
+			}
+			is_file = FALSE;
+			vict = NULL;
+		}
+		else {
+			SAVE_CHAR(vict);
+		}
+	}
+	
+	msg_to_char(ch, "Done.\r\n");
+}
 
 
 // secret implementor-only util for quick changes -- util tool
@@ -1322,7 +1374,6 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		}
 	}
 	else if SET_CASE("skill") {
-		void update_class(char_data *ch);
 		extern int find_skill_by_name(char *name);
 	
 		char skillname[MAX_INPUT_LENGTH], *skillval;
@@ -4810,6 +4861,7 @@ ACMD(do_restore) {
 			for (i = 0; i < NUM_SKILLS; ++i) {
 				set_skill(vict, i, 100);
 			}
+			update_class(vict);
 			
 			// temporarily remove empire abilities
 			emp = GET_LOYALTY(vict);
