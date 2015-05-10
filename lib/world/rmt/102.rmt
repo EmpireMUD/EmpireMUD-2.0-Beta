@@ -11,4 +11,133 @@ The nest is made primarily from bits of litter and the bones of food.
 ~
 M 0 10200 100.00 1
 S
+#10225
+A Little Garden~
+   You've stumbled across a little garden hidden behind a row of plants. It's
+just a little plot, but it's obvious someone has taken good care of it. Neat
+rows of dirt have been carefully watered and though you can't see what's
+growing in them, the fertile soil is sure to produce something delicious.  
+~
+ac 0
+M 0 10225 100.00 1
+T 10236
+S
+#10226
+The Hidden Garden~
+   The druid's tiny garden has changed somehow. The air is thick and fills your
+lungs, although its strange fragrance is totally unknown to you. The landscape
+in the distance is blurry, as if the air is waving and blocking your view. And
+then you realize what has happened: you have stumbled back into the
+Magiterranean, the hidden realm of druids.  
+~
+aceg 0
+D0
+~
+0 10227
+D1
+~
+0 10228
+D2
+~
+0 10229
+D3
+~
+0 10230
+M 1 10225 100.00 3
+S
+#10227
+The Cactus Garden~
+   This Magiterranean cactus garden is expansive, but each of its cacti looks
+the same. These are prickly pear cacti, arranged as bushes of round, spined
+pads. Pale yellow flowers and bright red fruits poke out from the tops of the
+upper pads on each plant.  
+~
+aceg 0
+D2
+~
+0 10226
+I 6 10228 50.00 1 X  # FORAGE: a stack of cactus pads
+I 6 10229 100.00 1 X  # FORAGE: a cactus fruit
+I 7 1200 15.00 1 X  # FIND-HERB: a handful of whitegrass
+I 7 1201 15.00 1 X  # FIND-HERB: some fiveleaf
+I 7 1202 15.00 1 X  # FIND-HERB: a twig of redthorn
+I 7 1203 15.00 1 X  # FIND-HERB: some magewhisper sepals
+I 7 1204 15.00 1 X  # FIND-HERB: a daggerbite frond
+I 7 1205 15.00 1 X  # FIND-HERB: some bileberries
+I 7 10228 100.00 1  # FIND-HERB: a stack of cactus pads
+M 0 10226 33.00 4
+M 1 10243 10.00 1
+S
+#10228
+A Pineapple Field~
+   Long rows of short pineapple plants run the length of the field, in soil so
+fertile that it is dark black in color. The pineapples give off a sweet scent,
+and many of them appear to be ripe. On others, the bright red spiral flower
+atop each plant merely hints at the sweet beauty of the fruit that will grow
+out of it.  
+~
+aceg 0
+D3
+~
+0 10226
+I 6 10226 50.00 1 X  # FORAGE: a pineapple
+I 6 10231 100.00 1 X  # FORAGE: some desert dandelions
+I 7 1200 15.00 1 X  # FIND-HERB: a handful of whitegrass
+I 7 1201 15.00 1 X  # FIND-HERB: some fiveleaf
+I 7 1202 15.00 1 X  # FIND-HERB: a twig of redthorn
+I 7 1203 15.00 1 X  # FIND-HERB: some magewhisper sepals
+I 7 1204 15.00 1 X  # FIND-HERB: a daggerbite frond
+I 7 1205 15.00 1 X  # FIND-HERB: some bileberries
+I 7 10226 100.00 1  # FIND-HERB: a pineapple
+M 0 10226 33.00 4
+M 1 10232 10.00 1
+S
+#10229
+An Agave Field~
+   The Magiterranean is the perfect environment for growing any plant, and even
+the desert-loving agave thrives here. The field is dotten with small piles of
+stones, each with a pale green agave plant atop it. The agaves grow thick,
+fleshy leaves before sprouting a huge stalk into the air to spread its seeds.
+The heart of the agave is a prized food in some cultures.  
+~
+aceg 0
+D0
+~
+0 10226
+I 6 10227 50.00 1 X  # FORAGE: an agave heart
+I 6 10231 100.00 1 X  # FORAGE: some desert dandelions
+I 7 1200 15.00 1 X  # FIND-HERB: a handful of whitegrass
+I 7 1201 15.00 1 X  # FIND-HERB: some fiveleaf
+I 7 1202 15.00 1 X  # FIND-HERB: a twig of redthorn
+I 7 1203 15.00 1 X  # FIND-HERB: some magewhisper sepals
+I 7 1204 15.00 1 X  # FIND-HERB: a daggerbite frond
+I 7 1205 15.00 1 X  # FIND-HERB: some bileberries
+I 7 10227 100.00 1  # FIND-HERB: an agave heart
+M 0 10226 33.00 4
+M 1 10241 10.00 1
+S
+#10230
+An Aloe Garden~
+   The aloe garden is covered in dozens of small, green, succulent aloe plants.
+Each is spaced far enough that you can comfortably work at it, which makes it
+easier not to get stuck on the sharp, fleshy leaves. Aloe has long been used to
+soothe the skin and treat painful wounds. Perhaps that's what the druids of the
+Magiterranean are growing it for.  
+~
+aceg 0
+D1
+~
+0 10226
+I 6 10230 50.00 1 X  # FORAGE: some thick aloe leaves
+I 6 10231 100.00 1 X  # FORAGE: some desert dandelions
+I 7 1200 15.00 1 X  # FIND-HERB: a handful of whitegrass
+I 7 1201 15.00 1 X  # FIND-HERB: some fiveleaf
+I 7 1202 15.00 1 X  # FIND-HERB: a twig of redthorn
+I 7 1203 15.00 1 X  # FIND-HERB: some magewhisper sepals
+I 7 1204 15.00 1 X  # FIND-HERB: a daggerbite frond
+I 7 1205 15.00 1 X  # FIND-HERB: some bileberries
+I 7 10230 100.00 1  # FIND-HERB: some thick aloe leaves
+M 0 10226 33.00 4
+M 1 10245 10.00 1
+S
 $
