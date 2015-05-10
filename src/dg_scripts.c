@@ -1748,7 +1748,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%s", sk != NO_SKILL ? skill_data[sk].name : "");
 					}
 					else {
-						snprintf(str, slen, "");
+						*str = '\0';
 					}
 				}
 				else if (!str_cmp(field, "validate")) {
