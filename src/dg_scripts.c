@@ -2387,7 +2387,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 		} /* if (c) ...*/
 
 		else if (o) {
-			if (text_processed(field, subfield, vd, str, slen)) return;
+			if (text_processed(field, subfield, vd, str, slen))
+				return;
 
 			*str = '\x1';
 			switch (LOWER(*field)) {
