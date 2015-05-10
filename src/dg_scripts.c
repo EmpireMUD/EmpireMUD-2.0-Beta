@@ -2016,6 +2016,13 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							*str = '\0';
 						}
 					}
+					else if (!str_cmp(field, "give_skill_reset")) {
+						int sk = find_skill_by_name(subfield);
+						if (sk != NO_SKILL && !IS_NPC(c)) {
+							GET_FREE_SKILL_RESETS(c, sk) = MIN(GET_FREE_SKILL_RESETS(c, sk) + 1, MAX_SKILL_RESETS);
+						}
+						*str = '\0';
+					}
 					break;
 				case 'h':
 					if (!str_cmp(field, "has_item")) {
@@ -2242,7 +2249,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "position")) {
 						extern const char *position_types[];
-						snprintf(str, slen, "%s", position_types[GET_POS(c)]);
+						snprintf(str, slen, "%s", position_types[(int) GET_POS(c)]);
 					}
 					
 					break;

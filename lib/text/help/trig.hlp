@@ -856,7 +856,6 @@ affect()          - Checks the actor for the affect in the subfield
 can_afford(amt)   - Checks if the actor has enough coins of any converted type.
 can_gain_new_skills - Checks if the character can gain a new skill from 0.
 charge_coins(amt) - Charges the actor a number of coins.
-give_coins(amt)   - Gives the actor a number of coins.
 canbeseen         - True if the actor can be seen by the mob (always true 
                     for non-mob triggers).
 canuseroom_ally(room) - Character can use the room as a member or ally (with
@@ -867,10 +866,9 @@ canuseroom_member(room) - Character can use the room as a member (with no arg,
                     defaults to current room).
 can_teleport_room(room) - Character can legally teleport in/out of the room
                     (defaults to current room).
-cha               - The actor's charisma.
+cha               - The actor's Charisma.
 class             - The actor's class, as a string.
-con               - The actor's constitution.
-dex               - The actor's dexterity.
+dex               - The actor's Dexterity.
 disabled          - Returns TRUE if the actor is stunned or otherwise disabled.
 exp()             - %actor.exp% returns the actor's XP. Using the subfield it 
                     can be modified up to 1000 Xp. %actor.exp(20)% gives actor
@@ -881,6 +879,10 @@ eq()              - This will return the identifier (id) for the object
                     * checks all positions. HELP POSITIONS
 fighting          - The unique id of the mob fighting the actor.
 follower(name)    - The follower of the actor (as an id) with name supplied.
+gain_skill(sk, amt) - Gives the player points in a skill, or takes them.
+give_coins(amt)   - Gives the actor a number of coins.
+give_skill_reset(sk) - Grants the player a free skill reset in that skill.
+grt               - The actor's Greatness.
 has_item()        - Checks if the actor has a object (inventory, equipped and
                     in containers) by subfield name/var/vnum.
 heshe             - Returns the correct pronoun (he/she/it).
@@ -924,12 +926,12 @@ remove_mob_flag(flg) - Removes a mob flag from the mob. Also, add_mob_flag().
 room              - The room the actor is in as a room variable. 
 sex               - The actor's sex, as a string: MALE, FEMALE, or NEUTRAL.
 skill()           - The percentage of learnedness in the skill subfield.
-str               - The actor's strength.
-stradd            - The actor's strength addition (if str is 18).
+str               - The actor's Strength.
 title()           - The actor's title. Subfield sets. Not used for mobs.
 varexists()       - Returns 1 if global variable in subfield exists, 0 if not.
                     Useful when dealing with remote vars on players.
 vnum              - The actor's virtual number.  
+wits              - The actor's Wits.
 <global>          - If the specified field is not a recognized one, the 
                     actor's script global list is searched for a matching 
                     global name. If found, its value will be returned. This 
