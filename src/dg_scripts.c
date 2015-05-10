@@ -1394,9 +1394,11 @@ int text_processed(char *field, char *subfield, struct trig_var_data *vd, char *
 	}
 	else if (!str_cmp(field, "car")) {                 /* car       */
 		char *car = vd->value;
-		while (*car && !isspace(*car))
-			*str++ = *car++;
-		*str = '\0';
+		char *strptr = str;
+		while (*car && !isspace(*car) && (strptr - str) < (slen-1)) {
+			*strptr++ = *car++;
+		}
+		*strptr = '\0';
 		return TRUE;
 
 	}
