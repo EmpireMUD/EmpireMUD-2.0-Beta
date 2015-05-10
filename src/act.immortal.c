@@ -296,6 +296,7 @@ ADMIN_UTIL(util_playerdump);
 ADMIN_UTIL(util_randtest);
 ADMIN_UTIL(util_redo_islands);
 ADMIN_UTIL(util_tool);
+ADMIN_UTIL(util_fixresets);
 
 
 struct {
@@ -309,10 +310,56 @@ struct {
 	{ "randtest", LVL_CIMPL, util_randtest },
 	{ "redoislands", LVL_CIMPL, util_redo_islands },
 	{ "tool", LVL_IMPL, util_tool },
+	{ "fixresets", LVL_CIMPL, util_fixresets },
 
 	// last
 	{ "\n", LVL_TOP+1, NULL }
 };
+
+
+ADMIN_UTIL(util_fixresets) {
+	struct char_file_u chdata;
+	char_data *vict;
+	int pos, iter;
+	bool is_file, save = FALSE;
+
+	// ok, ready to roll
+	for (pos = 0; pos <= top_of_p_table; ++pos) {
+		// need chdata either way; check deleted here
+		if (load_char(player_table[pos].name, &chdata) <= NOBODY || IS_SET(chdata.char_specials_saved.act, PLR_DELETED)) {
+			continue;
+		}
+		
+		if (!(vict = find_or_load_player(player_table[pos].name, &is_file))) {
+			continue;
+		}
+		
+		save = FALSE;
+		
+		for (iter = 0; iter < NUM_SKILLS; ++iter) {
+			if (GET_FREE_SKILL_RESETS(vict, iter) > 5) {
+				msg_to_char(ch, "%s had %d resets in %s.\r\n", GET_NAME(vict), GET_FREE_SKILL_RESETS(vict, iter), skill_data[iter].name);
+				GET_FREE_SKILL_RESETS(vict, iter) = 0;
+				save = TRUE;
+			}
+		}
+		
+		// save
+		if (is_file) {
+			if (save) {
+				store_loaded_char(vict);
+			}
+			else {
+				free_char(vict);
+			}
+			is_file = FALSE;
+			vict = NULL;
+		}
+		else {
+			SAVE_CHAR(vict);
+		}
+	}
+}
 
 
 // secret implementor-only util for quick changes -- util tool
