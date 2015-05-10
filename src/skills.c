@@ -1372,8 +1372,7 @@ ACMD(do_specialize) {
 
 		// le done
 		set_skill(ch, sk, GET_SKILL(ch, sk) + 1);
-		GET_FREE_SKILL_RESETS(ch, sk) = MIN(GET_FREE_SKILL_RESETS(ch, sk) + 1, MAX_SKILL_RESETS);
-		msg_to_char(ch, "You have specialized in %s.\r\nYou have earned a free skill reset.\r\n", skill_data[sk].name);
+		msg_to_char(ch, "You have specialized in %s.\r\n", skill_data[sk].name);
 
 		// check class and skill levels
 		update_class(ch);
