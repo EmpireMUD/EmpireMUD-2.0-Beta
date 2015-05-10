@@ -360,7 +360,8 @@ S
 pineapple~
 a pineapple~
 A pineapple is sitting on the ground.~
-You can eat this succulent tropical fruit, or plant it.
+   You can eat this succulent tropical fruit, or plant it. You'll have to plant
+it on partially-cleared jungle.  
 ~
 6 bl a
 24 10225 0
@@ -445,7 +446,7 @@ a wooden fruit token~
 A wooden fruit token has been dropped here.~
    It's a wooden token with a picture of some fruits. The back is carved with
 the symbol of the Magiterranean, the hidden world of druids. When you have all
-three tokens, type 'combine tokens'.  
+three tokens, type 'combine tokens'.
 ~
 3 kp a
 0 0 0
@@ -457,7 +458,7 @@ a copper grain token~
 A copper grain token is lying here.~
    It's a copper token with wheat stamped on one side. The back is carved with
 the symbol of the Magiterranean, the hidden world of druids. When you have all
-three tokens, type 'combine tokens'.  
+three tokens, type 'combine tokens'.
 ~
 3 kp a
 0 0 0
@@ -469,7 +470,7 @@ a silver tradegoods token~
 A silver tradegoods token is lying here.~
    It's a silver token with a merchant ship etched into one side. The back is
 carved with the symbol of the Magiterranean, the hidden world of druids. When
-you have all three tokens, type 'combine tokens'.  
+you have all three tokens, type 'combine tokens'.
 ~
 3 kp a
 0 0 0
@@ -482,7 +483,7 @@ a gnarled wooden token~
 A gnarled wooden token is lying here.~
    This gnarled token grants the user access to the Hidden Garden in the
 Magiterranean. Simply perform the chant of gardens ('chant gardens') inside the
-Hidden Garden adventure area.  
+Hidden Garden adventure area.
 ~
 3 jp a
 0 0 0
