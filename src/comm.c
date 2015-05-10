@@ -1724,7 +1724,9 @@ int new_descriptor(int s) {
 	if (slow_ip || !(from = gethostbyaddr((char *) &peer.sin_addr, sizeof(peer.sin_addr), AF_INET))) {
 		/* resolution failed */
 		if (!slow_ip) {
-			perror("SYSERR: gethostbyaddr");
+			char buf[MAX_STRING_LENGTH];
+			snprintf(buf, sizeof(buf), "SYSERR: gethostbyaddr [%s]", inet_ntoa(peer.sin_addr));
+			perror(buf);
 		}
 
 		/* find the numeric site address */
