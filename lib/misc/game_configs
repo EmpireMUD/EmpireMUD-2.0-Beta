@@ -69,7 +69,7 @@ whole_empire_timeout 30
 *
 * Items configs
 autostore_time 180
-long_autostore_time 4320
+long_autostore_time 720
 room_item_limit 404
 scale_coin_amount 10.000000
 scale_drink_capacity 9.800000
