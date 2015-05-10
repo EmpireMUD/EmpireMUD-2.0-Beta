@@ -1,0 +1,34 @@
+#10240
+spiked wooden breastplate~
+10240 1  # 1x a spiked wooden breastplate
+2 59 eg 40 10241
+R
+125 1  # 1x a stack of lumber
+R
+10228 2  # 2x a stack of cactus pads
+R
+1114 12  # 12x an imperium spike
+R
+1357 2  # 2x a large piece of leather
+S
+#10242
+cactus sword~
+10242 1  # 1x the cactus sword
+2 59 eg 40 10243
+R
+125 1  # 1x a stack of lumber
+R
+10228 6  # 6x a stack of cactus pads
+R
+177 5  # 5x an imperium ingot
+S
+#10244
+soothing aloe elixir~
+10244 1  # 1x a soothing aloe elixir
+6 113 f 3 10245
+R
+1200 10  # 10x a handful of whitegrass
+R
+10230 4  # 4x some thick aloe leaves
+S
+$
