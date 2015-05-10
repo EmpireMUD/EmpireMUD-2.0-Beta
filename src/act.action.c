@@ -198,14 +198,22 @@ void start_action(char_data *ch, int type, int timer, bitvector_t flags) {
 * Cancels actions for anyone in the room on that action.
 *
 * @param room_data *room Where.
-* @param int action ACTION_x
+* @param int action ACTION_x or NOTHING to not stop actions.
+* @param int chore CHORE_x or NOTHING to not stop workforce.
 */
-void stop_room_action(room_data *room, int action) {
+void stop_room_action(room_data *room, int action, int chore) {
+	extern struct empire_chore_type chore_data[NUM_CHORES];
+	
 	char_data *c;
 	
 	for (c = ROOM_PEOPLE(room); c; c = c->next_in_room) {
-		if (!IS_NPC(c) && GET_ACTION(c) == action) {
+		// player actions
+		if (action != NOTHING && !IS_NPC(c) && GET_ACTION(c) == action) {
 			cancel_action(c);
+		}
+		// mob actions
+		if (chore != NOTHING && IS_NPC(c) && GET_MOB_VNUM(c) == chore_data[chore].mob) {
+			SET_BIT(MOB_FLAGS(c), MOB_SPAWNED);
 		}
 	}
 }
@@ -929,7 +937,7 @@ void process_chop(char_data *ch) {
 				gain_skill_exp(ch, SKILL_EMPIRE, 15);
 			}
 			
-			// stoppin choppin -- don't use stop_action_room because we also restart them
+			// stoppin choppin -- don't use stop_room_action because we also restart them
 			// (this includes ch)
 			for (ch_iter = ROOM_PEOPLE(IN_ROOM(ch)); ch_iter; ch_iter = ch_iter->next_in_room) {
 				if (!IS_NPC(ch_iter) && GET_ACTION(ch_iter) == ACT_CHOPPING) {
@@ -937,6 +945,8 @@ void process_chop(char_data *ch) {
 					start_chopping(ch_iter);
 				}
 			}
+			// but stop npc choppers
+			stop_room_action(IN_ROOM(ch), NOTHING, CHORE_CHOPPING);
 		}
 	}
 }
@@ -1068,7 +1078,7 @@ void process_excavating(char_data *ch) {
 				act("$n finishes excavating the trench!", FALSE, ch, 0, 0, TO_ROOM);
 				
 				// this also stops ch
-				stop_room_action(IN_ROOM(ch), ACT_EXCAVATING);
+				stop_room_action(IN_ROOM(ch), ACT_EXCAVATING, NOTHING);
 			}
 		}
 	}
@@ -1118,8 +1128,8 @@ void process_fillin(char_data *ch) {
 				act("$n finishes filling in the trench!", FALSE, ch, 0, 0, TO_ROOM);
 				
 				// stop BOTH actions -- it's not a trench!
-				stop_room_action(IN_ROOM(ch), ACT_FILLING_IN);
-				stop_room_action(IN_ROOM(ch), ACT_EXCAVATING);
+				stop_room_action(IN_ROOM(ch), ACT_FILLING_IN, NOTHING);
+				stop_room_action(IN_ROOM(ch), ACT_EXCAVATING, NOTHING);
 
 				// de-evolve sect
 				to_sect = reverse_lookup_evolution_for_sector(SECT(IN_ROOM(ch)), EVO_TRENCH_START);
@@ -1302,7 +1312,7 @@ void process_harvesting(char_data *ch) {
 		remove_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_HARVEST_PROGRESS);
 
 		// stop all harvesters including ch
-		stop_room_action(IN_ROOM(ch), ACT_HARVESTING);
+		stop_room_action(IN_ROOM(ch), ACT_HARVESTING, CHORE_FARMING);
 		
 		if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_HARVEST, finish_harvesting, &exclusive)) {
 			// skillups

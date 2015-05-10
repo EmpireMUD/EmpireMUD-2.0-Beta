@@ -43,7 +43,7 @@ void delete_room_npcs(room_data *room, struct empire_territory_data *ter);
 void free_complex_data(struct complex_room_data *data);
 extern room_data *create_room();
 void scale_item_to_level(obj_data *obj, int level);
-void stop_room_action(room_data *room, int action);
+void stop_room_action(room_data *room, int action, int chore);
 
 // external vars
 extern const char *bld_on_flags[];
@@ -213,7 +213,7 @@ void complete_building(room_data *room) {
 	}
 	
 	// stop builders
-	stop_room_action(room, ACT_BUILDING);
+	stop_room_action(room, ACT_BUILDING, CHORE_BUILDING);
 	
 	// remove any remaining resource requirements
 	while ((res = BUILDING_RESOURCES(room))) {
@@ -522,7 +522,7 @@ void finish_dismantle(char_data *ch, room_data *room) {
 	
 	msg_to_char(ch, "You finish dismantling the building.\r\n");
 	act("$n finishes dismantling the building.", FALSE, ch, 0, 0, TO_ROOM);
-	stop_room_action(IN_ROOM(ch), ACT_DISMANTLING);
+	stop_room_action(IN_ROOM(ch), ACT_DISMANTLING, CHORE_BUILDING);
 	
 	// check for required obj and return it
 	if ((type = find_building_list_entry(IN_ROOM(ch), FIND_BUILD_NORMAL)) || (type = find_building_list_entry(IN_ROOM(ch), FIND_BUILD_UPGRADE))) {

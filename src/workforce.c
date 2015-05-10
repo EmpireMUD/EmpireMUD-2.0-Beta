@@ -57,7 +57,7 @@ void do_chore_weaving(empire_data *emp, room_data *room);
 
 // external functions
 void empire_skillup(empire_data *emp, int ability, double amount);	// skills.c
-void stop_room_action(room_data *room, int action);	// act.action.c
+void stop_room_action(room_data *room, int action, int chore);	// act.action.c
 
 
  /////////////////////////////////////////////////////////////////////////////
@@ -647,7 +647,7 @@ void do_chore_building(empire_data *emp, room_data *room) {
 		if (IS_COMPLETE(room)) {
 			finish_building(worker, room);
 			SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
-			stop_room_action(room, ACT_BUILDING);
+			stop_room_action(room, ACT_BUILDING, CHORE_BUILDING);
 		}
 
 		if (!found) {
@@ -692,7 +692,7 @@ void do_chore_chopping(empire_data *emp, room_data *room) {
 				else {
 					// done: mark for de-spawn
 					SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
-					stop_room_action(room, ACT_CHOPPING);
+					stop_room_action(room, ACT_CHOPPING, CHORE_CHOPPING);
 			
 					if (EMPIRE_CHORE(emp, CHORE_AUTO_ABANDON)) {
 						abandon_room(room);
@@ -782,7 +782,7 @@ void do_chore_dismantle(empire_data *emp, room_data *room) {
 			
 			finish_dismantle(worker, room);
 			SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
-			stop_room_action(room, ACT_DISMANTLING);
+			stop_room_action(room, ACT_DISMANTLING, CHORE_BUILDING);
 		}
 
 		if (!found) {
@@ -839,7 +839,10 @@ INTERACTION_FUNC(one_farming_chore) {
 				}
 				else {
 					change_terrain(inter_room, climate_default_sector[GET_CROP_CLIMATE(crop_proto(ROOM_CROP_TYPE(inter_room)))]);
-								
+					
+					// stop the chop just in case
+					stop_room_action(inter_room, ACT_CHOPPING, CHORE_CHOPPING);
+					
 					if (EMPIRE_CHORE(emp, CHORE_AUTO_ABANDON)) {
 						abandon_room(inter_room);
 						add_chore_tracker(emp);
@@ -850,7 +853,7 @@ INTERACTION_FUNC(one_farming_chore) {
 				if (IS_NPC(ch)) {
 					SET_BIT(MOB_FLAGS(ch), MOB_SPAWNED);
 				}
-				stop_room_action(inter_room, ACT_HARVESTING);
+				stop_room_action(inter_room, ACT_HARVESTING, CHORE_FARMING);
 			}
 		}
 		
@@ -1014,7 +1017,7 @@ void do_chore_mining(empire_data *emp, room_data *room) {
 		if (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) <= 0) {
 			// mark for despawn
 			SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
-			stop_room_action(room, ACT_MINING);
+			stop_room_action(room, ACT_MINING, CHORE_MINING);
 		}
 	}
 	else if (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) > 0 && can_do) {
