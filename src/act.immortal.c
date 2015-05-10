@@ -66,6 +66,7 @@ extern char *get_room_name(room_data *room, bool color);
 void save_instances();
 void save_whole_world();
 void scale_mob_to_level(char_data *mob, int level);
+void update_class(char_data *ch);
 
 // locals
 void instance_list_row(struct instance_data *inst, int number, char *save_buffer, size_t size);
@@ -1373,7 +1374,6 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		}
 	}
 	else if SET_CASE("skill") {
-		void update_class(char_data *ch);
 		extern int find_skill_by_name(char *name);
 	
 		char skillname[MAX_INPUT_LENGTH], *skillval;
@@ -4861,6 +4861,7 @@ ACMD(do_restore) {
 			for (i = 0; i < NUM_SKILLS; ++i) {
 				set_skill(vict, i, 100);
 			}
+			update_class(vict);
 			
 			// temporarily remove empire abilities
 			emp = GET_LOYALTY(vict);
