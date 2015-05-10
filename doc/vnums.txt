@@ -49,6 +49,7 @@ blocks that are currently in use.
 
 Included Adventure Zones
 [  100] Magiterranean: The Grove (10000-10005)
+[  101] Magiterranean: The Hidden Garden (10225-10249)
 [  120] Mountain Cave: Red Dragon (10006-10010)
 [  121] The Swamp Hag (10100-10104)
 [  122] Ruins: Three Banditos (10105-10109)
