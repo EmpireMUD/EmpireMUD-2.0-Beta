@@ -961,7 +961,7 @@ evaluated from left to right. Parenthesis can be used to group.
 |   >    | greater than          | 4 > 3 = 1; 4 > 4 = 0      |
 |   <=   | less than or equal    | 4 <= 3 = 0; 4 <= 5 = 1    |
 |   >=   | greater than or equal | 4 >= 3 = 1; 4 >= 4 = 1    |
-|   /=   | abbrev                | "concatenate" /= "cat"    |
+|   /=   | abbrev                | "concatenate" /= "con"    |
 |   ~=   | substring             | "Dark Forest" ~= "Forest" |
 |   -    | subtraction           | 15 - 10 = 5               |
 |   +    | addition              | 10 + 15 = 25              |
