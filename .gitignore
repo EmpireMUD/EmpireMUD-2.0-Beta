@@ -1,4 +1,4 @@
 config.*
 syslog
-syslog.conf
+syslog.CRASH
 
