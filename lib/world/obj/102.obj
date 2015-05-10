@@ -346,4 +346,291 @@ A
 C
 0 0
 S
+#10225
+hole~
+a hole, hidden behind the plants~
+It looks like there's a hole hidden behind the plants.~
+It looks like there's more to the garden!
+~
+8 j 0
+10225 0 0
+0 0
+S
+#10226
+pineapple~
+a pineapple~
+A pineapple is sitting on the ground.~
+You can eat this succulent tropical fruit, or plant it.
+~
+6 bl a
+24 10225 0
+7 168
+R
+5114 0
+S
+#10227
+agave heart~
+an agave heart~
+An agave heart is lying here.~
+You can eat this heart of the agave plant, or replant it.
+~
+6 bl a
+24 10226 0
+7 168
+R
+5116 0
+S
+#10228
+pads cactus stack~
+a stack of cactus pads~
+Some cactus pads are stacked here.~
+   These cactus pads are edible, since they've been despined. They can also be
+used to plant more.
+~
+6 bl a
+24 10227 0
+7 168
+R
+5114 0
+S
+#10229
+fruit cactus~
+a cactus fruit~
+A cactus fruit is lying here.~
+This little red fruit came from a cactus, and it looks sweet.
+~
+6 0 a
+6 0 0
+7 48
+S
+#10230
+aloe leaves thick~
+some thick aloe leaves~
+Some thick aloe leaves are lying here.~
+The aloe leaves might be made into something soothing.
+~
+3 bl a
+0 10228 0
+7 0
+R
+5130 0
+R
+5618 0
+S
+#10231
+dandelions desert~
+some desert dandelions~
+Some desert dandelions have been left here.~
+These plants, though not delicious, are still edible.
+~
+6 0 a
+6 0 0
+7 48
+S
+#10232
+tumbleweed enchanted~
+a tumbleweed~
+A tumbleweed is lying here.~
+   This tumbleweed can be brought to life and ridden around! Type 'use
+tumbleweed' to bring it to life.
+~
+3 j a
+0 0 0
+0 0
+T 10232
+S
+#10233
+token fruit wooden~
+a wooden fruit token~
+A wooden fruit token has been dropped here.~
+   It's a wooden token with a picture of some fruits. The back is carved with
+the symbol of the Magiterranean, the hidden world of druids. When you have all
+three tokens, type 'combine tokens'.  
+~
+3 kp a
+0 0 0
+0 0
+S
+#10234
+token grain copper~
+a copper grain token~
+A copper grain token is lying here.~
+   It's a copper token with wheat stamped on one side. The back is carved with
+the symbol of the Magiterranean, the hidden world of druids. When you have all
+three tokens, type 'combine tokens'.  
+~
+3 kp a
+0 0 0
+13 0
+S
+#10235
+token silver tradegoods~
+a silver tradegoods token~
+A silver tradegoods token is lying here.~
+   It's a silver token with a merchant ship etched into one side. The back is
+carved with the symbol of the Magiterranean, the hidden world of druids. When
+you have all three tokens, type 'combine tokens'.  
+~
+3 kp a
+0 0 0
+3 0
+T 10235
+S
+#10236
+token wooden gnarled~
+a gnarled wooden token~
+A gnarled wooden token is lying here.~
+   This gnarled token grants the user access to the Hidden Garden in the
+Magiterranean. Simply perform the chant of gardens ('chant gardens') inside the
+Hidden Garden adventure area.  
+~
+3 jp a
+0 0 0
+0 0
+S
+#10237
+list first druid's~
+the druid's first list~
+A list has been left behind.~
+It appears to be a list, scribbled quickly in green ink:
+
+  4x bunch of apples
+  4x basket of peaches
+  4x bag of cherries
+  4x sack of oranges
+
+Return to any Hidden Gardens druid and type 'offer' to complete this.
+~
+3 k a
+0 0 0
+0 0
+S
+#10238
+list second druid's~
+the druid's second list~
+A list has been left behind.~
+It appears to be a list, scribbled quickly in green ink:
+
+  4x bundle of wheat
+  4x bushel of corn
+  4x sack of rice
+  4x sack of barley
+
+Return to any Hidden Gardens druid and type 'offer' to complete this.
+~
+3 k a
+0 0 0
+0 0
+S
+#10239
+list druid's third~
+the druid's third list~
+A list has been left behind.~
+It appears to be a list, scribbled quickly in green ink:
+
+  4x bushel of hops
+  4x basket of cotton
+  4x basket of gourds
+  4x basket of olives
+
+Return to any Hidden Gardens druid and type 'offer' to complete this.
+~
+3 k a
+0 0 0
+0 0
+S
+#10240
+breastplate wooden spiked~
+a spiked wooden breastplate~
+A spiked wooden breastplate is stuck into the ground.~
+   This breastplate is made from wood and cactus needles, so it might be better
+for evasion than for taking damage.
+~
+27 emo aq
+2 0 0
+0 0
+A
+9 -1
+A
+18 2
+A
+12 1
+C
+0 100
+S
+#10241
+pattern spiked wooden breastplate~
+the spiked wooden breastplate pattern~
+The pattern for a spiked wooden breastplate is lying here.~
+This is the pattern for a spiked wooden breastplate.
+Craft (Advanced Woodworking):
+  a sharp tool
+  a Carpenter building
+  1x stack of lumber
+  2x stack of cactus pads
+ 12x imperium spike
+  2x large leather
+~
+3 0 a
+0 0 0
+0 0
+S
+#10242
+sword cactus~
+the cactus sword~
+A cactus sword is stuck into the ground.~
+   This sword is made from a plank of wood, spiked with hundreds of tiny cactus
+needles, and edged with imperium.
+~
+1 emo ano
+0 1 1
+0 0
+A
+21 3
+A
+17 1
+C
+0 100
+S
+#10243
+pattern sword cactus~
+the cactus sword pattern~
+The pattern for a cactus sword is lying here.~
+This is the recipe for the cactus sword.
+Craft (Advanced Woodworking):
+  a sharp tool
+  a Carpenter building
+  1x stack of lumber
+  6x stack of cactus pads
+  5x imperium ingot
+~
+3 0 a
+0 0 0
+0 0
+S
+#10244
+elixir aloe soothing~
+a soothing aloe elixir~
+A soothing aloe elixir has been left here.~
+Quaff this swirling greenish potion to regain health.
+~
+25 m a
+0 1 0
+8 0
+C
+0 150
+S
+#10245
+recipe aloe~
+an aloe recipe~
+An aloe recipe has been left here.~
+This is the recipe for the soothing aloe elixir.
+Brew (Healing Elixirs):
+ 10x handful of whitegrass
+  4x thick aloe leaves
+~
+3 0 a
+0 0 0
+0 0
+S
 $
