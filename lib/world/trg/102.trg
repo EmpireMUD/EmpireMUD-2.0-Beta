@@ -249,7 +249,7 @@ if (%actor.has_resources(3002,4)% && %actor.has_resources(3004,4)% && %actor.has
   nop %actor.add_resources(3010,-4)%
   %load% obj 10233 %actor% inv
   %send% %actor% You give %self.name% the fruits you have collected, and %self.heshe% gives you a wooden fruit token!
-  %echoaround% %actor% %atcor.name% gives %self.name% several baskets of fruits, and receives a wooden fruit token.
+  %echoaround% %actor% %actor.name% gives %self.name% several baskets of fruits, and receives a wooden fruit token.
   if !%actor.has_item(10238)%
     %load% obj 10238 %actor% inv
     %send% %actor% %self.heshe% also gives you another list.
@@ -262,7 +262,7 @@ elseif (%actor.has_resources(141,4)% && %actor.has_resources(3005,4)% && %actor.
   nop %actor.add_resources(145,-4)%
   %load% obj 10234 %actor% inv
   %send% %actor% You give %self.name% the grains you have collected, and %self.heshe% gives you a copper grain token!
-  %echoaround% %actor% %atcor.name% gives %self.name% several baskets of grains, and receives a copper grain token.
+  %echoaround% %actor% %actor.name% gives %self.name% several baskets of grains, and receives a copper grain token.
   if !%actor.has_item(10239)%
     %load% obj 10239 %actor% inv
     %send% %actor% %self.heshe% also gives you another list.
@@ -275,7 +275,7 @@ elseif (%actor.has_resources(143,4)% && %actor.has_resources(144,4)% && %actor.h
   nop %actor.add_resources(3019,-4)%
   %load% obj 10235 %actor% inv
   %send% %actor% You give %self.name% the goods you have collected, and %self.heshe% gives you a silver tradegoods token!
-  %echoaround% %actor% %atcor.name% gives %self.name% several baskets of goods, and receives a silver tradegoods token.
+  %echoaround% %actor% %actor.name% gives %self.name% several baskets of goods, and receives a silver tradegoods token.
 else
   %send% %actor% You have nothing to offer.
   wait 5
