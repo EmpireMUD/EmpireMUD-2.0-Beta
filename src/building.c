@@ -497,10 +497,10 @@ void finish_building(char_data *ch, room_data *room) {
 			// if the player is loyal to the empire building here, gain skill
 			if (!emp || GET_LOYALTY(c) == emp) {
 				if (type && GET_CRAFT_ABILITY(type) != NO_ABIL) {
-					gain_ability_exp(c, GET_CRAFT_ABILITY(type), 50);
+					gain_ability_exp(c, GET_CRAFT_ABILITY(type), 4);
 				}
 				else if (GET_SKILL(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
-					gain_skill_exp(c, SKILL_EMPIRE, 50);
+					gain_skill_exp(c, SKILL_EMPIRE, 4);
 				}
 			}
 		}
@@ -672,6 +672,7 @@ bool is_entrance(room_data *room) {
 * @param room_data *room The location he/she is building.
 */
 void process_build(char_data *ch, room_data *room) {
+	craft_data *type = find_building_list_entry(room, FIND_BUILD_NORMAL);
 	obj_data *obj, *found_obj = NULL;
 	bool found = FALSE;
 	struct building_resource_type *res, *temp;
@@ -729,8 +730,17 @@ void process_build(char_data *ch, room_data *room) {
 			act("$n places $p carefully in the structure.", FALSE, ch, found_obj, 0, TO_ROOM | TO_SPAMMY);
 		}
 		
-		// reset disrepair
+		// reset disrepair and damage
 		COMPLEX_DATA(room)->disrepair = 0;
+		COMPLEX_DATA(room)->damage = 0;
+		
+		// skillups
+		if (type && GET_CRAFT_ABILITY(type) != NO_ABIL) {
+			gain_ability_exp(ch, GET_CRAFT_ABILITY(type), 4);
+		}
+		else if (GET_SKILL(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
+			gain_skill_exp(ch, SKILL_EMPIRE, 4);
+		}			
 	}
 
 	// extract either way
