@@ -377,7 +377,7 @@ void show_workforce_where(empire_data *emp, char_data *to) {
 	HASH_ITER(hh, counts, wct, next_wct) {
 		// only bother adding if there's room in the buffer
 		if (size < sizeof(buf) - 5) {
-			snprintf(line, sizeof(line), "%s: %d workers\r\n", chore_data[wct->chore].name, wct->count);
+			snprintf(line, sizeof(line), "%s: %d worker%s\r\n", chore_data[wct->chore].name, wct->count, PLURAL(wct->count));
 			size += snprintf(buf + size, sizeof(buf) - size, "%s", CAP(line));
 		}
 		else {
