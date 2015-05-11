@@ -702,6 +702,7 @@ void heartbeat(int heart_pulse) {
 	void update_actions();
 	void update_empire_npc_data();
 	void update_guard_towers();
+	void update_players_online_stats();
 	void update_trading_post();
 	void update_world();
 	void weather_and_time(int mode);
@@ -753,6 +754,9 @@ void heartbeat(int heart_pulse) {
 	if (HEARTBEAT(30)) {
 		update_world();
 		if (debug_log && HEARTBEAT(15)) { log("debug  9:\t%lld", microtime()); }
+		
+		update_players_online_stats();
+		if (debug_log && HEARTBEAT(15)) { log("debug  9.5:\t%lld", microtime()); }
 	}
 
 	if (HEARTBEAT(10)) {

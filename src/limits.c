@@ -1747,6 +1747,8 @@ int move_gain(char_data *ch, bool info_only) {
 */
 void point_update(bool run_real) {
 	void save_daily_cycle();
+	void update_players_online_stats();
+	extern int max_players_today;
 	
 	room_data *room, *next_room;
 	obj_data *obj, *next_obj;
@@ -1756,6 +1758,10 @@ void point_update(bool run_real) {
 	if (time(0) > daily_cycle + SECS_PER_REAL_DAY) {
 		daily_cycle += SECS_PER_REAL_DAY;
 		save_daily_cycle();
+		
+		// reset players seen today too
+		max_players_today = 0;
+		update_players_online_stats();
 	}
 	
 	// characters

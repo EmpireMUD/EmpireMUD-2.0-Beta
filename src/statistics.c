@@ -23,6 +23,7 @@
 * Contents:
 *   Stats Displays
 *   Stats Getters
+*   Player Stats
 *   World Stats
 */
 
@@ -44,6 +45,9 @@ struct stats_data_struct *global_crop_count = NULL;	// hash table count of crops
 struct stats_data_struct *global_building_count = NULL;	// hash table of building counts
 
 time_t last_world_count = 0;	// timestamp of last sector/crop/building tally
+
+int max_players_today = 0;	// stats on max players seen
+int max_players_this_uptime = 0;
 
 
 // external consts
@@ -275,6 +279,36 @@ int stats_get_sector_count(sector_data *sect) {
 	HASH_FIND_INT(global_sector_count, &vnum, data);
 	
 	return data ? data->count : 0;
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// PLAYER STATS ////////////////////////////////////////////////////////////
+
+/**
+* Updates the count of players online.
+*/
+void update_players_online_stats(void) {
+	descriptor_data *d;
+	int count;
+	
+	// determine current count
+	count = 0;
+	for (d = descriptor_list; d; d = d->next) {
+		if (STATE(d) != CON_PLAYING || !d->character) {
+			continue;
+		}
+		
+		// morts only
+		if (IS_IMMORTAL(d->character) || GET_INVIS_LEV(d->character) > LVL_APPROVED) {
+			continue;
+		}
+		
+		++count;
+	}
+	
+	max_players_today = MAX(max_players_today, count);
+	max_players_this_uptime = MAX(max_players_this_uptime, count);
 }
 
 

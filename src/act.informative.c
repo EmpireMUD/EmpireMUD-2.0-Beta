@@ -1052,8 +1052,11 @@ char *one_who_line(char_data *ch, bool shortlist) {
 * @return char* The who output for imms.
 */
 char *partial_who(char_data *ch, char *name_search, int low, int high, bool empire_who, bool rp, bool shortlist, int type) {
+	extern int max_players_today;
+	extern int max_players_this_uptime;
+	
 	static char who_output[MAX_STRING_LENGTH];
-	char whobuf[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH];
+	char whobuf[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH], online[MAX_STRING_LENGTH];
 	descriptor_data *d;
 	char_data *tch;
 	int iter, count = 0, size;
@@ -1102,7 +1105,17 @@ char *partial_who(char_data *ch, char *name_search, int low, int high, bool empi
 		// repurposing size
 		size = 0;
 		
-		size += snprintf(who_output + size, sizeof(who_output) - size, "%s: %d online", who_titles[type], count);
+		if (type == WHO_MORTALS) {
+			// update counts in case
+			max_players_today = MAX(max_players_today, count);
+			max_players_this_uptime = MAX(max_players_this_uptime, count);
+			snprintf(online, sizeof(online), "%d online (max today %d, this uptime %d)", count, max_players_today, max_players_this_uptime);
+		}
+		else {
+			snprintf(online, sizeof(online), "%d online", count);
+		}
+		
+		size += snprintf(who_output + size, sizeof(who_output) - size, "%s: %s", who_titles[type], online);
 
 		// divider
 		*buf = '\0';
