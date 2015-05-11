@@ -381,7 +381,7 @@ const char *preference_bits[] = {
 	"PVP",
 	"INFORMATIVE",
 	"!SPAM",
-	"SRCNRDR",
+	"SCREENREADER",
 	"STEALTHABLE",
 	"\n"
 };
@@ -1417,6 +1417,7 @@ const char *extra_bits[] = {
 	"BOE",
 	"BOP",
 	"STAFF",
+	"UNCOLLECTED-LOOT",
 	"\n"
 };
 
@@ -1439,6 +1440,7 @@ const char *extra_bits_inv_flags[] = {
 	"(2h)",
 	"(boe)",
 	"(bop)",
+	"",	// uncollected
 	"\n"
 };
 
@@ -1460,7 +1462,8 @@ const double obj_flag_scaling_bonus[] = {
 	1.0,	// OBJ_SCALABLE
 	1.5,	// OBJ_TWO_HANDED
 	1.3333,	// OBJ_BIND_ON_EQUIP
-	1.5		// OBJ_BIND_ON_PICKUP
+	1.5,	// OBJ_BIND_ON_PICKUP
+	1.0,	// OBJ_UNCOLLECTED_LOOT
 };
 
 

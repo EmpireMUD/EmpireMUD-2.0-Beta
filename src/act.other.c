@@ -302,7 +302,7 @@ ACMD(do_alternate) {
 	else if ((newch = is_playing(idnum)) || (newch = is_at_menu(idnum))) {
 		// in-game?
 		
-		if (GET_ACCOUNT_ID(newch) != GET_ACCOUNT_ID(ch)) {
+		if (GET_ACCOUNT_ID(newch) != GET_ACCOUNT_ID(ch) || GET_ACCOUNT_ID(newch) == 0) {
 			msg_to_char(ch, "That character isn't on your account.\r\n");
 			return;
 		}
@@ -342,7 +342,7 @@ ACMD(do_alternate) {
 		}
 		
 		// ensure legal switch
-		if (GET_ACCOUNT_ID(newch) != GET_ACCOUNT_ID(ch)) {
+		if (GET_ACCOUNT_ID(newch) != GET_ACCOUNT_ID(ch) || GET_ACCOUNT_ID(newch) == 0) {
 			msg_to_char(ch, "That character isn't on your account.\r\n");
 			free_char(newch);
 			return;
@@ -1619,7 +1619,7 @@ ACMD(do_summon) {
 			check_scaling(mob, ch);
 			
 			// spawn data
-			SET_BIT(MOB_FLAGS(mob), MOB_SPAWNED);
+			SET_BIT(MOB_FLAGS(mob), MOB_SPAWNED | MOB_NO_LOOT);
 			MOB_SPAWN_TIME(mob) = time(0);
 			
 			char_to_room(mob, IN_ROOM(ch));

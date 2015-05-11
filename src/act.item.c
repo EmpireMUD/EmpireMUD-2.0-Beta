@@ -2812,6 +2812,7 @@ ACMD(do_eat) {
 ACMD(do_exchange) {
 	int dotmode, carrying, amount, new;
 	empire_data *emp, *coin_emp;
+	char buf[MAX_STRING_LENGTH];
 	struct coin_data *coin;
 	obj_data *obj, *next_obj;
 	double rate;
@@ -2862,7 +2863,8 @@ ACMD(do_exchange) {
 		}
 		else {
 			// success!
-			msg_to_char(ch, "You exchange %s for %s.\r\n", money_amount(coin_emp, amount), money_amount(emp, new));
+			strcpy(buf, money_amount(coin_emp, amount));
+			msg_to_char(ch, "You exchange %s for %s.\r\n", buf, money_amount(emp, new));
 			act("$n exchanges some coins.", TRUE, ch, NULL, NULL, TO_ROOM);
 			decrease_coins(ch, coin_emp, amount);
 			increase_coins(ch, emp, new);

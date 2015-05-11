@@ -948,6 +948,7 @@ typedef struct trig_data trig_data;
 #define OBJ_BIND_ON_EQUIP  BIT(14)	// o. binds when equipped
 #define OBJ_BIND_ON_PICKUP  BIT(15)	// p. binds when acquired
 #define OBJ_STAFF  BIT(16)	// q. counts as a staff
+#define OBJ_UNCOLLECTED_LOOT  BIT(17)	// r. will junk instead of autostore
 
 #define OBJ_BIND_FLAGS  (OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP)	// all bind-on flags
 

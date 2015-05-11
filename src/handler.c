@@ -3760,6 +3760,11 @@ void obj_to_char(obj_data *object, char_data *ch) {
 		// set the timer here; actual rules for it are in limits.c
 		GET_AUTOSTORE_TIMER(object) = time(0);
 		
+		// unmark uncollected loot
+		if (!IS_NPC(ch)) {
+			REMOVE_BIT(GET_OBJ_EXTRA(object), OBJ_UNCOLLECTED_LOOT);
+		}
+		
 		// update last owner/empire -- only if not stolen
 		if (time(0) - GET_STOLEN_TIMER(object) > config_get_int("stolen_object_timer") * SECS_PER_REAL_MIN) {
 			if (IS_NPC(ch)) {
@@ -3798,6 +3803,11 @@ void obj_to_char_or_room(obj_data *obj, char_data *ch) {
 		}
 		
 		obj_to_room(obj, IN_ROOM(ch));
+		
+		// unmark uncollected loot if it was meant to go to a person
+		if (!IS_NPC(ch)) {
+			REMOVE_BIT(GET_OBJ_EXTRA(obj), OBJ_UNCOLLECTED_LOOT);
+		}
 		
 		// set ownership as if they got it -- if not stolen
 		if (time(0) - GET_STOLEN_TIMER(obj) > config_get_int("stolen_object_timer") * SECS_PER_REAL_MIN) {

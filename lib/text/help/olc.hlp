@@ -1943,6 +1943,7 @@ Available flags:
  BOE - item binds to a player when it is equipped
  BOP - item binds to a player when it is picked up
  STAFF - counts as a staff (even if it doesn't have a staff weapon type)
+ UNCOLLECTED-LOOT - will decay on the ground if no player gets it
 
 See also: OLC OBJECTS
 #d

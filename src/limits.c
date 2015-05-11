@@ -634,8 +634,13 @@ void real_update_char(char_data *ch) {
 		}
 		
 		if (++fol_count > config_get_int("npc_follower_limit")) {
-			act("$n becomes enraged!", FALSE, room_ch, NULL, NULL, TO_ROOM);
-			engage_combat(room_ch, ch, TRUE);
+			REMOVE_BIT(AFF_FLAGS(room_ch), AFF_CHARM);
+			stop_follower(room_ch);
+			
+			if (can_fight(room_ch, ch)) {
+				act("$n becomes enraged!", FALSE, room_ch, NULL, NULL, TO_ROOM);
+				engage_combat(room_ch, ch, TRUE);
+			}
 		}
 	}
 
@@ -1162,7 +1167,7 @@ void point_update_obj(obj_data *obj) {
 		// (only if not carried/worn, is takeable and the timer is expired)
 
 		// at this point, only care if the top object is in the room, and no players are there
-		if ((top_obj = get_top_object(obj)) && IN_ROOM(top_obj) && !IS_ADVENTURE_ROOM(IN_ROOM(top_obj)) && (OBJ_FLAGGED(obj, OBJ_JUNK) || OBJ_CAN_STORE(obj) || IS_COINS(obj) || !ROOM_OWNER(IN_ROOM(top_obj))) && !any_players_in_room(IN_ROOM(top_obj))) {
+		if ((top_obj = get_top_object(obj)) && IN_ROOM(top_obj) && !IS_ADVENTURE_ROOM(IN_ROOM(top_obj)) && (OBJ_FLAGGED(obj, OBJ_JUNK | OBJ_UNCOLLECTED_LOOT) || OBJ_CAN_STORE(obj) || IS_COINS(obj) || !ROOM_OWNER(IN_ROOM(top_obj))) && !any_players_in_room(IN_ROOM(top_obj))) {
 			if ((GET_AUTOSTORE_TIMER(obj) + config_get_int("long_autostore_time") * SECS_PER_REAL_MIN) < time(0) || (!ROOM_BLD_FLAGGED(IN_ROOM(top_obj), BLD_LONG_AUTOSTORE) && (GET_AUTOSTORE_TIMER(obj) + config_get_int("autostore_time") * SECS_PER_REAL_MIN) < time(0))) {
 				// safe to purge or store
 				empty_obj_before_extract(obj);

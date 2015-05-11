@@ -311,6 +311,89 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 
 
 /**
+* Finds workforce mobs belonging to an empire and reports on how many there
+* are.
+*
+* @param empire_data *emp The empire to check.
+* @param char_data *to The person to show the info to.
+*/
+void show_workforce(empire_data *emp, char_data *to) {
+	// helper data type
+	struct workforce_count_type {
+		int chore;
+		int count;
+		UT_hash_handle hh;
+	};
+
+	struct workforce_count_type *find, *wct, *next_wct, *counts = NULL;
+	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	char_data *ch_iter;
+	int chore, iter;
+	size_t size;
+	
+	if (!emp) {
+		msg_to_char(to, "No empire workforce found.\r\n");
+		return;
+	}
+	
+	// count up workforce mobs
+	for (ch_iter = character_list; ch_iter; ch_iter = ch_iter->next) {
+		if (!IS_NPC(ch_iter) || GET_LOYALTY(ch_iter) != emp) {
+			continue;
+		}
+		
+		chore = -1;
+		for (iter = 0; iter < NUM_CHORES; ++iter) {
+			if (GET_MOB_VNUM(ch_iter) == chore_data[iter].mob) {
+				chore = iter;
+				break;
+			}
+		}
+		
+		// not a workforce mob
+		if (chore == -1) {
+			continue;
+		}
+		
+		HASH_FIND_INT(counts, &chore, find);
+		if (!find) {
+			CREATE(find, struct workforce_count_type, 1);
+			find->chore = chore;
+			find->count = 0;
+			HASH_ADD_INT(counts, chore, find);
+		}
+		
+		find->count += 1;
+	}
+	
+	// short circuit: no workforce found
+	if (!counts) {
+		msg_to_char(to, "No working citizens found.\r\n");
+		return;
+	}
+	
+	size = snprintf(buf, sizeof(buf), "Working %s citizens:\r\n", EMPIRE_ADJECTIVE(emp));
+	
+	HASH_ITER(hh, counts, wct, next_wct) {
+		// only bother adding if there's room in the buffer
+		if (size < sizeof(buf) - 5) {
+			snprintf(line, sizeof(line), "%s: %d workers\r\n", chore_data[wct->chore].name, wct->count);
+			size += snprintf(buf + size, sizeof(buf) - size, "%s", CAP(line));
+		}
+		else {
+			size += snprintf(buf + size, sizeof(buf) - size, "...\r\n");
+		}
+		
+		// remove and free
+		HASH_DEL(counts, wct);
+		free(wct);
+	}
+	
+	page_string(to->desc, buf, TRUE);
+}
+
+
+/**
 * Shows current workforce settings for an empire, to a character.
 *
 * @param empire_data *emp The empire whose settings to show.
@@ -3783,6 +3866,9 @@ ACMD(do_workforce) {
 			msg_to_char(ch, "Workforce will no longer work this tile.\r\n");
 			deactivate_workforce_room(emp, IN_ROOM(ch));
 		}
+	}
+	else if (is_abbrev(arg, "where")) {
+		show_workforce(emp, ch);
 	}
 	else {
 		// find type to toggle

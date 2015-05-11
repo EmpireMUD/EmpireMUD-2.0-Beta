@@ -61,6 +61,30 @@ void trigger_distrust_from_hostile(char_data *ch, empire_data *emp);
 //// GETTERS / HELPERS ///////////////////////////////////////////////////////
 
 /**
+* Cancels combat for a character if they or their target have certain flags
+* that should make combat impossible.
+*
+* @param char_data *ch The fighter.
+* @param char_data *victim The victim.
+* @return bool TRUE if it's ok to fight; FALSE to stop.
+*/
+bool check_can_still_fight(char_data *ch, char_data *victim) {
+	if (!ch || !victim) {
+		return FALSE;
+	}
+	
+	if (AFF_FLAGGED(victim, AFF_NO_ATTACK | AFF_EARTHMELD)) {
+		return FALSE;
+	}
+	if (AFF_FLAGGED(ch, AFF_NO_ATTACK | AFF_EARTHMELD)) {
+		return FALSE;
+	}
+	
+	return TRUE;
+}
+
+
+/**
 * Determines what TYPE_x a character is actually using.
 * 
 * @param char_data *ch The character attacking.
@@ -833,6 +857,10 @@ void drop_loot(char_data *mob, char_data *killer) {
 		coin_emp = GET_LOYALTY(mob);
 		if (coins > 0) {
 			obj = create_money(coin_emp, coins);
+			
+			// mark for extract if no player gets it
+			SET_BIT(GET_OBJ_EXTRA(obj), OBJ_UNCOLLECTED_LOOT);
+			
 			obj_to_char(obj, mob);
 		}
 	}
@@ -852,6 +880,9 @@ void drop_loot(char_data *mob, char_data *killer) {
 				if (OBJ_FLAGGED(obj, OBJ_BIND_ON_PICKUP) && IS_NPC(mob)) {
 					bind_obj_to_tag_list(obj, MOB_TAGGED_BY(mob));
 				}
+				
+				// mark for extract if no player gets it
+				SET_BIT(GET_OBJ_EXTRA(obj), OBJ_UNCOLLECTED_LOOT);
 				
 				obj_to_char(obj, mob);
 				load_otrigger(obj);
@@ -2322,9 +2353,11 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 	/* check if the character has a fight trigger */
 	fight_mtrigger(ch);
 	
-	// hostile activity triggers distrust unless the victim is pvp-flagged
-	if (!IS_NPC(ch) && (IS_NPC(victim) || !IS_PVP_FLAGGED(victim)) && victim_emp && GET_LOYALTY(ch) != victim_emp) {
-		trigger_distrust_from_hostile(ch, victim_emp);
+	// hostile activity triggers distrust unless the victim is pvp-flagged or already hostile
+	if (!IS_NPC(ch) && victim_emp && GET_LOYALTY(ch) != victim_emp) {
+		if (IS_NPC(victim) || !IS_PVP_FLAGGED(victim) || get_cooldown_time(victim, COOLDOWN_HOSTILE_FLAG) <= 0) {
+			trigger_distrust_from_hostile(ch, victim_emp);
+		}
 	}
 	
 	// ensure scaling
@@ -3015,7 +3048,7 @@ void frequent_combat(int pulse) {
 		vict = FIGHTING(ch);
 
 		// verify still fighting
-		if (vict == NULL || IN_ROOM(ch) != IN_ROOM(vict) || IS_DEAD(vict)) {
+		if (vict == NULL || IN_ROOM(ch) != IN_ROOM(vict) || IS_DEAD(vict) || !check_can_still_fight(ch, vict)) {
 			stop_fighting(ch);
 			continue;
 		}
