@@ -1619,7 +1619,7 @@ ACMD(do_summon) {
 			check_scaling(mob, ch);
 			
 			// spawn data
-			SET_BIT(MOB_FLAGS(mob), MOB_SPAWNED);
+			SET_BIT(MOB_FLAGS(mob), MOB_SPAWNED | MOB_NO_LOOT);
 			MOB_SPAWN_TIME(mob) = time(0);
 			
 			char_to_room(mob, IN_ROOM(ch));
