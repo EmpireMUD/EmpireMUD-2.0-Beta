@@ -635,6 +635,8 @@ void real_update_char(char_data *ch) {
 		
 		if (++fol_count > config_get_int("npc_follower_limit")) {
 			act("$n becomes enraged!", FALSE, room_ch, NULL, NULL, TO_ROOM);
+			REMOVE_BIT(AFF_FLAGS(room_ch), AFF_CHARM);
+			stop_follower(room_ch);
 			engage_combat(room_ch, ch, TRUE);
 		}
 	}
