@@ -1751,7 +1751,7 @@ void write_lore(char_data *ch) {
 
 // starting coins
 PROMO_APPLY(promo_countdemonet) {
-	increase_coins(ch, REAL_OTHER_COIN, 200);
+	increase_coins(ch, REAL_OTHER_COIN, 100);
 }
 
 
