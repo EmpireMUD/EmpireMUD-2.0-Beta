@@ -2329,9 +2329,11 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 	/* check if the character has a fight trigger */
 	fight_mtrigger(ch);
 	
-	// hostile activity triggers distrust unless the victim is pvp-flagged
-	if (!IS_NPC(ch) && (IS_NPC(victim) || !IS_PVP_FLAGGED(victim)) && victim_emp && GET_LOYALTY(ch) != victim_emp) {
-		trigger_distrust_from_hostile(ch, victim_emp);
+	// hostile activity triggers distrust unless the victim is pvp-flagged or already hostile
+	if (!IS_NPC(ch) && victim_emp && GET_LOYALTY(ch) != victim_emp) {
+		if (IS_NPC(victim) || !IS_PVP_FLAGGED(victim) || get_cooldown_time(victim, COOLDOWN_HOSTILE_FLAG) <= 0) {
+			trigger_distrust_from_hostile(ch, victim_emp);
+		}
 	}
 	
 	// ensure scaling
