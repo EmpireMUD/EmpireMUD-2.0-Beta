@@ -378,7 +378,7 @@ void show_workforce(empire_data *emp, char_data *to) {
 		// only bother adding if there's room in the buffer
 		if (size < sizeof(buf) - 5) {
 			snprintf(line, sizeof(line), "%s: %d workers\r\n", chore_data[wct->chore].name, wct->count);
-			size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
+			size += snprintf(buf + size, sizeof(buf) - size, "%s", CAP(line));
 		}
 		else {
 			size += snprintf(buf + size, sizeof(buf) - size, "...\r\n");
