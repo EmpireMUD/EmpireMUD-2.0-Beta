@@ -2936,7 +2936,10 @@ ACMD(do_get) {
 	argument = two_arguments(argument, arg1, arg2);
 	one_argument(argument, arg3);
 
-	if (!*arg1)
+	if (IS_NPC(ch) && AFF_FLAGGED(ch, AFF_CHARM)) {
+		msg_to_char(ch, "Charmed NPCs cannot pick items up.\r\n");
+	}
+	else if (!*arg1)
 		send_to_char("Get what?\r\n", ch);
 	else if (!*arg2)
 		get_from_room(ch, arg1, 1);
