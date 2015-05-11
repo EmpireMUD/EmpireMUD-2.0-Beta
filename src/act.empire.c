@@ -317,7 +317,7 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 * @param empire_data *emp The empire to check.
 * @param char_data *to The person to show the info to.
 */
-void show_workforce(empire_data *emp, char_data *to) {
+void show_workforce_where(empire_data *emp, char_data *to) {
 	// helper data type
 	struct workforce_count_type {
 		int chore;
@@ -3868,7 +3868,7 @@ ACMD(do_workforce) {
 		}
 	}
 	else if (is_abbrev(arg, "where")) {
-		show_workforce(emp, ch);
+		show_workforce_where(emp, ch);
 	}
 	else {
 		// find type to toggle
