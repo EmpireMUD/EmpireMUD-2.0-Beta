@@ -61,6 +61,30 @@ void trigger_distrust_from_hostile(char_data *ch, empire_data *emp);
 //// GETTERS / HELPERS ///////////////////////////////////////////////////////
 
 /**
+* Cancels combat for a character if they or their target have certain flags
+* that should make combat impossible.
+*
+* @param char_data *ch The fighter.
+* @param char_data *victim The victim.
+* @return bool TRUE if it's ok to fight; FALSE to stop.
+*/
+bool check_can_still_fight(char_data *ch, char_data *victim) {
+	if (!ch || !victim) {
+		return FALSE;
+	}
+	
+	if (AFF_FLAGGED(victim, AFF_NO_ATTACK | AFF_EARTHMELD)) {
+		return FALSE;
+	}
+	if (AFF_FLAGGED(ch, AFF_NO_ATTACK | AFF_EARTHMELD)) {
+		return FALSE;
+	}
+	
+	return TRUE;
+}
+
+
+/**
 * Determines what TYPE_x a character is actually using.
 * 
 * @param char_data *ch The character attacking.
@@ -3024,7 +3048,7 @@ void frequent_combat(int pulse) {
 		vict = FIGHTING(ch);
 
 		// verify still fighting
-		if (vict == NULL || IN_ROOM(ch) != IN_ROOM(vict) || IS_DEAD(vict)) {
+		if (vict == NULL || IN_ROOM(ch) != IN_ROOM(vict) || IS_DEAD(vict) || !check_can_still_fight(ch, vict)) {
 			stop_fighting(ch);
 			continue;
 		}
