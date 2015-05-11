@@ -73,6 +73,7 @@ const char *default_channels[] = { "newbie", "ooc", "recruit", "trade", "\n" };
 
 // list of promo funcs
 PROMO_APPLY(promo_countdemonet);
+PROMO_APPLY(promo_facebook);
 PROMO_APPLY(promo_skillups);
 
 
@@ -86,6 +87,7 @@ struct promo_code_list promo_codes[] = {
 	{ "none",	TRUE,	NULL },	// default
 	{ "skillups", FALSE, promo_skillups },
 	{ "countdemonet", FALSE, promo_countdemonet },
+	{ "facebook", FALSE, promo_facebook },
 	
 	// last
 	{ "\n", FALSE, NULL }

@@ -1755,6 +1755,13 @@ PROMO_APPLY(promo_countdemonet) {
 }
 
 
+// bonus charisma
+PROMO_APPLY(promo_facebook) {
+	ch->real_attributes[CHARISMA] = MAX(1, MIN(att_max(ch), ch->real_attributes[CHARISMA] + 1));
+	affect_total(ch);
+}
+
+
 // 1.5x skills
 PROMO_APPLY(promo_skillups) {
 	int iter;
