@@ -302,7 +302,7 @@ ACMD(do_alternate) {
 	else if ((newch = is_playing(idnum)) || (newch = is_at_menu(idnum))) {
 		// in-game?
 		
-		if (GET_ACCOUNT_ID(newch) != GET_ACCOUNT_ID(ch)) {
+		if (GET_ACCOUNT_ID(newch) != GET_ACCOUNT_ID(ch) || GET_ACCOUNT_ID(newch) == 0) {
 			msg_to_char(ch, "That character isn't on your account.\r\n");
 			return;
 		}
@@ -342,7 +342,7 @@ ACMD(do_alternate) {
 		}
 		
 		// ensure legal switch
-		if (GET_ACCOUNT_ID(newch) != GET_ACCOUNT_ID(ch)) {
+		if (GET_ACCOUNT_ID(newch) != GET_ACCOUNT_ID(ch) || GET_ACCOUNT_ID(newch) == 0) {
 			msg_to_char(ch, "That character isn't on your account.\r\n");
 			free_char(newch);
 			return;
