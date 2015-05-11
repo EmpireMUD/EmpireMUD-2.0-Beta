@@ -833,6 +833,10 @@ void drop_loot(char_data *mob, char_data *killer) {
 		coin_emp = GET_LOYALTY(mob);
 		if (coins > 0) {
 			obj = create_money(coin_emp, coins);
+			
+			// mark for extract if no player gets it
+			SET_BIT(GET_OBJ_EXTRA(obj), OBJ_UNCOLLECTED_LOOT);
+			
 			obj_to_char(obj, mob);
 		}
 	}
@@ -852,6 +856,9 @@ void drop_loot(char_data *mob, char_data *killer) {
 				if (OBJ_FLAGGED(obj, OBJ_BIND_ON_PICKUP) && IS_NPC(mob)) {
 					bind_obj_to_tag_list(obj, MOB_TAGGED_BY(mob));
 				}
+				
+				// mark for extract if no player gets it
+				SET_BIT(GET_OBJ_EXTRA(obj), OBJ_UNCOLLECTED_LOOT);
 				
 				obj_to_char(obj, mob);
 				load_otrigger(obj);
