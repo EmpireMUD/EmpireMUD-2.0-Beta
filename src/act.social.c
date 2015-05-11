@@ -288,7 +288,7 @@ void perform_action(char_data *ch, int act_nr, char *argument) {
 			
 			if (c->desc->last_act_message) {
 				// the message was sent via act(), we can retrieve it from the desc
-				sprintf(hbuf, "&%c%s&0", (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) ? GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE) : '0', c->desc->last_act_message);
+				sprintf(hbuf, "&%c%s", (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) ? GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE) : '0', c->desc->last_act_message);
 				add_to_channel_history(c->desc, CHANNEL_HISTORY_SAY, hbuf);
 			}
 			else if (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
@@ -329,7 +329,7 @@ void perform_action(char_data *ch, int act_nr, char *argument) {
 			
 			if (c->desc->last_act_message) {
 				// the message was sent via act(), we can retrieve it from the desc
-				sprintf(hbuf, "&%c%s&0", (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) ? GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE) : '0', c->desc->last_act_message);
+				sprintf(hbuf, "&%c%s", (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) ? GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE) : '0', c->desc->last_act_message);
 				add_to_channel_history(c->desc, CHANNEL_HISTORY_SAY, hbuf);
 			}
 			else if (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
@@ -378,7 +378,7 @@ void perform_action(char_data *ch, int act_nr, char *argument) {
 				
 				if (c->desc->last_act_message) {
 					// the message was sent via act(), we can retrieve it from the desc
-					sprintf(hbuf, "&%c%s&0", (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) ? GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE) : '0', c->desc->last_act_message);
+					sprintf(hbuf, "&%c%s", (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) ? GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE) : '0', c->desc->last_act_message);
 					add_to_channel_history(c->desc, CHANNEL_HISTORY_SAY, hbuf);
 				}
 				else if (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {

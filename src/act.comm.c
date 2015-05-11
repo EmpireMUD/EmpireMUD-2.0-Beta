@@ -973,17 +973,28 @@ ACMD(do_gsay) {
 ACMD(do_history) {
 	const char *types[NUM_CHANNEL_HISTORY_TYPES] = { "god channels", "tells", "says", "empire chats" };
 	struct channel_history_data *chd_iter;
+	bool found_crlf;
+	int pos;
 	
 	if (ch->desc) {
 		msg_to_char(ch, "Last %d %s:\r\n", MAX_RECENT_CHANNELS, types[subcmd]);
 	
 		for (chd_iter = ch->desc->channel_history[subcmd]; chd_iter; chd_iter = chd_iter->next) {
-			send_to_char(chd_iter->message, ch);
-			
-			// check for newline
-			if (chd_iter->message[strlen(chd_iter->message) - 1] != '\n') {
-				send_to_char("\r\n", ch);
+			// verify has newline
+			pos = strlen(chd_iter->message) - 1;
+			found_crlf = FALSE;
+			while (pos > 0 && !found_crlf) {
+				if (chd_iter->message[pos] == '\r' || chd_iter->message[pos] == '\n' || chd_iter->message[pos] == '&') {	
+					found_crlf = TRUE;
+				}
+				else if (chd_iter->message[pos-1] == '&') {
+					// probably color code
+					--pos;
+				}
 			}
+			
+			// send message
+			msg_to_char(ch, "%s&0%s", chd_iter->message, (found_crlf ? "" : "\r\n"));
 		}
 	}
 }
