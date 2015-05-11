@@ -381,7 +381,7 @@ const char *preference_bits[] = {
 	"PVP",
 	"INFORMATIVE",
 	"!SPAM",
-	"SRCNRDR",
+	"SCREENREADER",
 	"STEALTHABLE",
 	"\n"
 };
