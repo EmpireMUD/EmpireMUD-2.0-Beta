@@ -1483,12 +1483,15 @@ struct {
 	{ CON_Q_SCREEN_READER },	// skips to CON_Q_HAS_ALT
 	{ CON_QCOLOR },
 	
-	{ CON_Q_HAS_ALT },	// skips to CON_QEQUIPMENT
+	{ CON_Q_HAS_ALT },	// skips to CON_Q_ARCHETYPE
 	{ CON_Q_ALT_NAME },
 	{ CON_Q_ALT_PASSWORD },
 	
 	{ CON_Q_ARCHETYPE },
 	{ CON_BONUS_CREATION },
+	
+	{ CON_PROMO_CODE },
+	{ CON_CONFIRM_PROMO_CODE },	// only if given invalid code
 	
 	{ CON_REFERRAL },
 	{ CON_FINISH_CREATION },
@@ -1577,6 +1580,14 @@ void prompt_creation(descriptor_data *d) {
 			SEND_TO_Q("\r\n", d);
 			SEND_TO_Q("&c[ HINT: These are only your starting traits; you can still learn any skill ]&0\r\n", d);
 			SEND_TO_Q("Choose a number or type 'help <number>' for info > ", d);
+			break;
+		}
+		case CON_PROMO_CODE: {
+			SEND_TO_Q("\r\nIf you have a promo code, enter it now. Otherwise, just leave it blank > ", d);
+			break;
+		}
+		case CON_CONFIRM_PROMO_CODE: {
+			SEND_TO_Q("\r\nUnknown promo code. Proceed without one (y/n)? ", d);
 			break;
 		}
 		case CON_REFERRAL: {
@@ -2013,12 +2024,13 @@ void nanny(descriptor_data *d, char *arg) {
 	extern int Valid_Name(char *newname);
 	
 	extern const struct archetype_type archetype[];
+	extern struct promo_code_list promo_codes[];
 	extern char *START_MESSG;
 	extern int wizlock_level;
 	extern char *wizlock_message;
 
 	char buf[MAX_STRING_LENGTH], tmp_name[MAX_INPUT_LENGTH];
-	int player_i, load_result, i, j;
+	int player_i, load_result, i, j, iter;
 	struct char_file_u tmp_store;
 	bool help, show_start = FALSE;
 
@@ -2423,7 +2435,7 @@ void nanny(descriptor_data *d, char *arg) {
 			SEND_TO_Q("\r\n*** Press ENTER: ", d);
 			STATE(d) = CON_RMOTD;
 
-			syslog(SYS_LOGIN, 0, TRUE, "NEW: %s [%s] (%s)", GET_NAME(d->character), d->host, (GET_REFERRED_BY(d->character) && *GET_REFERRED_BY(d->character)) ? GET_REFERRED_BY(d->character) : "no referral");
+			syslog(SYS_LOGIN, 0, TRUE, "NEW: %s [%s] (%s/%s)", GET_NAME(d->character), d->host, GET_PROMO_ID(d->character) > 0 ? promo_codes[(int)GET_PROMO_ID(d->character)].code : "no promo", (GET_REFERRED_BY(d->character) && *GET_REFERRED_BY(d->character)) ? GET_REFERRED_BY(d->character) : "no referral");
 			break;
 		}
 
@@ -2458,6 +2470,54 @@ void nanny(descriptor_data *d, char *arg) {
 				CREATION_ARCHETYPE(d->character) = i;
 				SET_BIT(PLR_FLAGS(d->character), PLR_NEEDS_NEWBIE_SETUP);
 				next_creation_step(d);
+			}
+			break;
+		}
+		
+		case CON_PROMO_CODE: {
+			byte promo = -1;
+			
+			skip_spaces(&arg);
+			if (!*arg) {
+				// skip entirely
+				set_creation_state(d, CON_REFERRAL);
+				return;
+			}
+			
+			for (iter = 0; *promo_codes[iter].code != '\n'; ++iter) {
+				if (!promo_codes[iter].expired && !str_cmp(arg, promo_codes[iter].code)) {
+					promo = iter;
+					break;
+				}
+			}
+			
+			GET_PROMO_ID(d->character) = promo;
+			
+			// pass off based on code validity
+			if (promo < 0) {
+				set_creation_state(d, CON_CONFIRM_PROMO_CODE);
+			}
+			else {
+				SEND_TO_Q("\r\nPromo code accepted.\r\n", d);
+				set_creation_state(d, CON_REFERRAL);
+			}
+			break;
+		}
+		
+		case CON_CONFIRM_PROMO_CODE: {
+			switch (LOWER(*arg)) {
+				case 'y': {
+					next_creation_step(d);
+					break;
+				}
+				case 'n': {
+					set_creation_state(d, CON_PROMO_CODE);
+					break;
+				}
+				default: {
+					SEND_TO_Q("Please type YES or NO: ", d);
+					return;
+				}
 			}
 			break;
 		}

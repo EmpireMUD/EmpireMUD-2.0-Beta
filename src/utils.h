@@ -760,6 +760,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_OLC_MIN_VNUM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.olc_min_vnum))
 #define GET_PC_CLASS(ch)  (IS_NPC(ch) ? 0 : GET_CLASS(ch))
 #define GET_PLEDGE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.pledge))
+#define GET_PROMO_ID(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.promo_id))
 #define GET_RANK(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.rank))
 #define GET_RECENT_DEATH_COUNT(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.recent_death_count))
 #define GET_REFERRED_BY(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.referred_by))

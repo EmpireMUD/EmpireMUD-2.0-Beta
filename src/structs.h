@@ -105,7 +105,7 @@
 //// BASIC TYPES AND CONSTS //////////////////////////////////////////////////
 
 #define BIT(bit)  (((bitvector_t)1) << ((bitvector_t)(bit)))
-#define SPECIAL(name)  void (name)(void *me)
+#define PROMO_APPLY(name)	void (name)(char_data *ch)
 
 
 /*
@@ -1096,6 +1096,8 @@ typedef struct trig_data trig_data;
 #define CON_GOODBYE  22	// Close on <enter>
 #define CON_BONUS_CREATION  23	// choose bonus trait (new character)
 #define CON_BONUS_EXISTING  24	// choose bonus trait (existing char)
+#define CON_PROMO_CODE  25	// promo code?
+#define CON_CONFIRM_PROMO_CODE  26	// promo confirmation
 
 
 // custom color types
@@ -1657,6 +1659,14 @@ struct obj_affected_type {
 };
 
 
+// for ad tracking and special promotions
+struct promo_code_list {
+	char *code;
+	bool expired;
+	PROMO_APPLY(*apply_func);
+};
+
+
 /* resource data */
 typedef struct resource_data_struct {
 	int vnum;
@@ -2160,7 +2170,7 @@ struct player_special_data_saved {
 	byte spare1;
 	byte spare2;
 	byte spare3;
-	byte spare4;
+	byte promo_id;	// entry in the promo_codes table -- TODO move up to an int in beta2, and remove int casts in various places
 	
 	ubyte spare5;
 	ubyte spare6;

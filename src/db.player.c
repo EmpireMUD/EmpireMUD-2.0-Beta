@@ -30,6 +30,7 @@
 *   Helpers
 *   Empire Player Management
 *   Lore
+*   Promo Codes
 */
 
 // external vars
@@ -1278,6 +1279,7 @@ void start_new_character(char_data *ch) {
 	void scale_item_to_level(obj_data *obj, int level);
 	void set_skill(char_data *ch, int skill, int level);
 	extern const char *default_channels[];
+	extern struct promo_code_list promo_codes[];
 	extern int tips_of_the_day_size;
 
 	char lbuf[MAX_INPUT_LENGTH];
@@ -1422,6 +1424,11 @@ void start_new_character(char_data *ch) {
 	
 	// apply any bonus traits that needed it
 	apply_bonus_trait(ch, GET_BONUS_TRAITS(ch), TRUE);
+	
+	// if they have a valid promo code, apply it now
+	if (GET_PROMO_ID(ch) >= 0 && promo_codes[(int) GET_PROMO_ID(ch)].apply_func) {
+		(promo_codes[(int) GET_PROMO_ID(ch)].apply_func)(ch);
+	}
 	
 	// set up class/level data
 	update_class(ch);
@@ -1733,4 +1740,28 @@ void write_lore(char_data *ch) {
 	fprintf(file, "$\n");
 	fclose(file);
 	rename(tempname, fn);
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// PROMO CODES /////////////////////////////////////////////////////////////
+
+// these are configured in config.c
+
+
+// starting coins
+PROMO_APPLY(promo_countdemonet) {
+	increase_coins(ch, REAL_OTHER_COIN, 200);
+}
+
+
+// 1.5x skills
+PROMO_APPLY(promo_skillups) {
+	int iter;
+	
+	for (iter = 0; iter < NUM_SKILLS; ++iter) {
+		if (GET_SKILL(ch, iter) > 0) {
+			set_skill(ch, iter, MIN(BASIC_SKILL_CAP, GET_SKILL(ch, iter) * 1.5));
+		}
+	}
 }

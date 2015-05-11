@@ -2380,6 +2380,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 	extern const char *preference_bits[];
 	extern const char *connected_types[];
 	extern const char *olc_flag_bits[];
+	extern struct promo_code_list promo_codes[];
 
 	char lbuf[MAX_STRING_LENGTH], lbuf2[MAX_STRING_LENGTH], lbuf3[MAX_STRING_LENGTH];
 	char uname[MAX_INPUT_LENGTH];
@@ -2412,6 +2413,9 @@ void do_stat_character(char_data *ch, char_data *k) {
 		
 		if (*GET_REFERRED_BY(k)) {
 			msg_to_char(ch, "Referred by: %s\r\n", GET_REFERRED_BY(k));
+		}
+		if (GET_PROMO_ID(k) > 0) {
+			msg_to_char(ch, "Promo code: %s\r\n", promo_codes[(int)GET_PROMO_ID(k)].code);
 		}
 
 		msg_to_char(ch, "Access Level: [&c%d&0], Class: [&c%s&0/&c%s&0], Skill Level: [&c%d&0], Gear Level: [&c%d&0], Total: [&c%d&0]\r\n", GET_ACCESS_LEVEL(k), class_data[GET_CLASS(k)].name, class_role[(int) GET_CLASS_ROLE(k)], GET_SKILL_LEVEL(k), (int) GET_GEAR_LEVEL(k), IN_ROOM(k) ? GET_COMPUTED_LEVEL(k) : GET_LAST_KNOWN_LEVEL(k));

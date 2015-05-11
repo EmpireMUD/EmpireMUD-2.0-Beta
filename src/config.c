@@ -71,6 +71,27 @@ void save_config_system();
 const char *default_channels[] = { "newbie", "ooc", "recruit", "trade", "\n" };
 
 
+// list of promo funcs
+PROMO_APPLY(promo_countdemonet);
+PROMO_APPLY(promo_skillups);
+
+
+// list of active promo codes: CAUTION: You should only add to the end, not
+// rearrange this list, as promo codes are stored by number.
+struct promo_code_list promo_codes[] = {
+	// add promo codes here to track ad campaigns
+	// { "code", expired, func },
+	
+	// do not change the order
+	{ "none",	TRUE,	NULL },	// default
+	{ "skillups", FALSE, promo_skillups },
+	{ "countdemonet", FALSE, promo_countdemonet },
+	
+	// last
+	{ "\n", FALSE, NULL }
+};
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// EMPIRE CONFIGS //////////////////////////////////////////////////////////
 

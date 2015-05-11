@@ -458,7 +458,9 @@ const char *connected_types[] = {
 	"Archetype",
 	"Goodbye",
 	"Choose bonus",
-	"Add bonus",	// 24
+	"Add bonus",
+	"Promo code?",	// 25
+	"Confirm promo",
 	"\n"
 };
 
