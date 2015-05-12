@@ -1399,7 +1399,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		// victory
 		old_level = GET_SKILL(vict, skill);
 		set_skill(vict, skill, level);
-		if (old_level < level) {
+		if (old_level > level) {
 			clear_char_abilities(vict, skill);
 		}
 		update_class(vict);
