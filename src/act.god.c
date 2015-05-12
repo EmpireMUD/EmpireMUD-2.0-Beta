@@ -266,9 +266,12 @@ ACMD(do_sacrifice) {
 			msg_to_char(ch, "What do you want to sacrifice all of?\r\n");
 			return;
 		}
-		if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying)))
-			if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) || !(obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)))))
+		if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+			if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) || !(obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
 				msg_to_char(ch, "You don't seem to have any %ss to sacrifice.\r\n", arg);
+				return;
+			}
+		}
 
 		while (obj) {
 			next_obj = get_obj_in_list_vis(ch, arg, obj->next_content);
