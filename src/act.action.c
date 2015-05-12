@@ -947,6 +947,8 @@ void process_chop(char_data *ch) {
 			}
 			// but stop npc choppers
 			stop_room_action(IN_ROOM(ch), NOTHING, CHORE_CHOPPING);
+			// and harvesters
+			stop_room_action(IN_ROOM(ch), NOTHING, CHORE_FARMING);
 		}
 	}
 }
