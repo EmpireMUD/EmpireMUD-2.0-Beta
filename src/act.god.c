@@ -193,7 +193,7 @@ ACMD(do_sacrifice) {
 	char_data *god = NULL, *cbuf = NULL;
 	descriptor_data *d;
 	int amount = 0, dotmode, player_i = 0;
-	bool file = FALSE;
+	bool file = FALSE, any = FALSE;
 	struct char_file_u tmp_store;
 
 	two_arguments(argument, arg, buf);
@@ -274,15 +274,28 @@ ACMD(do_sacrifice) {
 			next_obj = get_obj_in_list_vis(ch, arg, obj->next_content);
 			if (!next_obj && can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) && !IN_ROOM(obj))
 				next_obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)));
-			amount += perform_sacrifice(ch, god, obj, TRUE);
+			
+			if (CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
+				amount += perform_sacrifice(ch, god, obj, TRUE);
+				any = TRUE;
+			}
+			
 			obj = next_obj;
+		}
+		
+		if (!any) {
+			msg_to_char(ch, "You can't sacrifice anything like that.\r\n");
 		}
 	}
 	else {
 		if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying)) && (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) || !(obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))))
 			msg_to_char(ch, "You don't seem to have any %ss to sacrifice.\r\n", arg);
-		else
+		else if (!CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
+			msg_to_char(ch, "You can't sacrifice that!\r\n");
+		}
+		else {
 			amount += perform_sacrifice(ch, god, obj, TRUE);
+		}
 	}
 
 	if (!file)
