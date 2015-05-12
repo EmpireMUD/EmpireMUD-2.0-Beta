@@ -90,6 +90,11 @@ void perform_alternate(char_data *old, char_data *new) {
 	// store last known level now
 	GET_LAST_KNOWN_LEVEL(old) = GET_COMPUTED_LEVEL(old);
 	
+	// peace out
+	if (!GET_INVIS_LEV(old)) {
+		act("$n has left the game.", TRUE, old, NULL, NULL, TO_ROOM);
+	}
+	
 	// save old char...
 	Objsave_char(old, RENT_RENTED);
 	SAVE_CHAR(old);
