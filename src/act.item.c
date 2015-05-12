@@ -2733,6 +2733,8 @@ ACMD(do_drop) {
 ACMD(do_eat) {
 	extern bool check_vampire_sun(char_data *ch, bool message);
 	void taste_blood(char_data *ch, char_data *vict);
+	
+	char buf[MAX_STRING_LENGTH];
 	char_data *vict;
 	obj_data *food;
 	int amount;
@@ -2792,22 +2794,36 @@ ACMD(do_eat) {
 		GET_OBJ_VAL(food, VAL_FOOD_HOURS_OF_FULLNESS) -= amount / REAL_UPDATES_PER_MUD_HOUR;
 	}
 
-	// primary messaging
+	// prepare for messaging
 	if (IS_FOOD(food) && GET_FOOD_HOURS_OF_FULLNESS(food) <= 0) {
 		// end of the food
-		act("You eat $p.", FALSE, ch, food, 0, TO_CHAR);
-		act("$n eats $p.", FALSE, ch, food, 0, TO_ROOM);
 		extract = TRUE;
 	}
-	else {
-		if (subcmd == SCMD_EAT) {
-			act("You eat some of $p.", FALSE, ch, food, 0, TO_CHAR);
-			act("$n eats some of $p.", TRUE, ch, food, 0, TO_ROOM);
+	
+	// messaging
+	if (extract || subcmd == SCMD_EAT) {
+		// message to char
+		if (has_custom_message(food, OBJ_CUSTOM_EAT_TO_CHAR)) {
+			act(get_custom_message(food, OBJ_CUSTOM_EAT_TO_CHAR), FALSE, ch, food, NULL, TO_CHAR);
 		}
 		else {
-			act("You nibble a little bit of $p.", FALSE, ch, food, 0, TO_CHAR);
-			act("$n tastes a little bit of $p.", TRUE, ch, food, 0, TO_ROOM);
+			snprintf(buf, sizeof(buf), "You eat %s$p.", (extract ? "" : "some of "));
+			act(buf, FALSE, ch, food, NULL, TO_CHAR);
 		}
+
+		// message to room
+		if (has_custom_message(food, OBJ_CUSTOM_EAT_TO_ROOM)) {
+			act(get_custom_message(food, OBJ_CUSTOM_EAT_TO_ROOM), FALSE, ch, food, NULL, TO_ROOM);
+		}
+		else {
+			snprintf(buf, sizeof(buf), "$n eats %s$p.", (extract ? "" : "some of "));
+			act(buf, TRUE, ch, food, NULL, TO_CHAR);
+		}
+	}
+	else {
+		// just tasting
+		act("You nibble a little bit of $p.", FALSE, ch, food, 0, TO_CHAR);
+		act("$n tastes a little bit of $p.", TRUE, ch, food, 0, TO_ROOM);
 	}
 
 	// additional messages

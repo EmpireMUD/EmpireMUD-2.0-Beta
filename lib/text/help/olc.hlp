@@ -1867,6 +1867,8 @@ Message types:
  build-to-room - Shown to the room when the item is built into a building.
  instrument-to-char - Shown every few seconds to the person playing the instrument.
  instrument-to-room - Shown every few seconds to the room when someone is playing an instrument.
+ eat-to-char - Shown to the person when they eat the item.
+ eat-to-room - Shown to the room when a person eats an item.
 
 See also: OLC OBJECTS
 #d

@@ -958,6 +958,8 @@ typedef struct trig_data trig_data;
 #define OBJ_CUSTOM_BUILD_TO_ROOM  1
 #define OBJ_CUSTOM_INSTRUMENT_TO_CHAR  2
 #define OBJ_CUSTOM_INSTRUMENT_TO_ROOM  3
+#define OBJ_CUSTOM_EAT_TO_CHAR  4
+#define OBJ_CUSTOM_EAT_TO_ROOM  5
 
 
 // storage flags (for obj storage locations)

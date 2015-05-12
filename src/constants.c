@@ -1615,6 +1615,8 @@ const char *obj_custom_types[] = {
 	"build-to-room",
 	"instrument-to-char",
 	"instrument-to-room",
+	"eat-to-char",
+	"eat-to-room",
 	"\n"
 };
 
