@@ -1446,7 +1446,7 @@ bool can_wear_item(char_data *ch, obj_data *item, bool send_messages) {
 	// check skill levels?
 	if (GET_SKILL_LEVEL(ch) < CLASS_SKILL_CAP && GET_OBJ_CURRENT_SCALE_LEVEL(item) > 0) {
 		for (iter = 0; level_ranges[iter] != -1 && level_ok; ++iter) {
-			if (GET_OBJ_CURRENT_SCALE_LEVEL(item) >= level_ranges[iter] && GET_SKILL_LEVEL(ch) < level_ranges[iter]) {
+			if (GET_OBJ_CURRENT_SCALE_LEVEL(item) > level_ranges[iter] && GET_SKILL_LEVEL(ch) < level_ranges[iter]) {
 				if (send_messages) {
 					snprintf(buf, sizeof(buf), "You need to be skill level %d to use $p.", level_ranges[iter]);
 					act(buf, FALSE, ch, item, NULL, TO_CHAR);
