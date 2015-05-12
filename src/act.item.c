@@ -226,6 +226,14 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	// basic info
 	snprintf(lbuf, sizeof(lbuf), "Your analysis of $p%s reveals:", location);
 	act(lbuf, FALSE, ch, obj, NULL, TO_CHAR);
+	
+	// if it has any wear bits other than TAKE, show if they can't use it
+	if (CAN_WEAR(obj, ~ITEM_WEAR_TAKE)) {
+		// the TRUE causes it to send a message if unusable
+		msg_to_char(ch, "&r");
+		can_wear_item(ch, obj, TRUE);
+		msg_to_char(ch, "&0");
+	}
 
 	if (obj->storage) {
 		msg_to_char(ch, "Storage locations:");
