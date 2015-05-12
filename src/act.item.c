@@ -1535,6 +1535,7 @@ void trade_list(char_data *ch, char *argument) {
 	empire_data *coin_emp = NULL;
 	empire_vnum last_emp = NOTHING;
 	double rate = 0.5;
+	bool can_wear;
 	int my_cost;
 	
 	if (*argument) {
@@ -1552,6 +1553,9 @@ void trade_list(char_data *ch, char *argument) {
 		if (*argument && !multi_isname(argument, GET_OBJ_KEYWORDS(tpd->obj))) {
 			continue;
 		}
+		
+		// we always mark can-wear if it doesn't have any wear flags other than take
+		can_wear = (!CAN_WEAR(tpd->obj, ~ITEM_WEAR_TAKE) || can_wear_item(ch, tpd->obj, FALSE));
 		
 		// parts
 		if (GET_OBJ_CURRENT_SCALE_LEVEL(tpd->obj)) {
@@ -1576,7 +1580,7 @@ void trade_list(char_data *ch, char *argument) {
 			*exchange = '\0';
 		}
 		
-		snprintf(line, sizeof(line), "%s%2d. %s: %d %s%s [%.1f]%s%s%s%s&0\r\n", (tpd->player == GET_IDNUM(ch)) ? "&r" : "", ++count, GET_OBJ_SHORT_DESC(tpd->obj), tpd->buy_cost, (coin_emp ? EMPIRE_ADJECTIVE(coin_emp) : "misc"), exchange, rate_item(tpd->obj), scale, (OBJ_FLAGGED(tpd->obj, OBJ_SUPERIOR) ? " (sup)" : ""), OBJ_FLAGGED(tpd->obj, OBJ_ENCHANTED) ? " (ench)" : "", (tpd->player == GET_IDNUM(ch)) ? " (your auction)" : "");
+		snprintf(line, sizeof(line), "%s%2d. %s: %d%s %s [%.1f]%s%s%s%s%s&0\r\n", (tpd->player == GET_IDNUM(ch)) ? "&r" : (can_wear ? "" : "&R"), ++count, GET_OBJ_SHORT_DESC(tpd->obj), tpd->buy_cost, exchange, (coin_emp ? EMPIRE_ADJECTIVE(coin_emp) : "misc"), rate_item(tpd->obj), scale, (OBJ_FLAGGED(tpd->obj, OBJ_SUPERIOR) ? " (sup)" : ""), OBJ_FLAGGED(tpd->obj, OBJ_ENCHANTED) ? " (ench)" : "", (tpd->player == GET_IDNUM(ch)) ? " (your auction)" : "", can_wear ? "" : " (can't use)");
 		
 		if (size + strlen(line) < sizeof(output)) {
 			size += snprintf(output + size, sizeof(output) - size, "%s", line);
