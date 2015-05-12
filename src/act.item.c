@@ -306,7 +306,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 			msg_to_char(ch, "Contains %d ounces of %s.\r\n", GET_DRINK_CONTAINER_CONTENTS(obj), drinks[GET_DRINK_CONTAINER_TYPE(obj)]);
 			break;
 		case ITEM_FOOD:
-			msg_to_char(ch, "Fills for %d hours.\r\n", GET_FOOD_HOURS_OF_FULLNESS(obj) / REAL_UPDATES_PER_MUD_HOUR);
+			msg_to_char(ch, "Fills for %d hours.\r\n", GET_FOOD_HOURS_OF_FULLNESS(obj));
 			if (OBJ_FLAGGED(obj, OBJ_PLANTABLE))
 				msg_to_char(ch, "Plants %s.\r\n", GET_CROP_NAME(crop_proto(GET_FOOD_CROP_TYPE(obj))));
 			break;
