@@ -996,7 +996,14 @@ char *one_who_line(char_data *ch, bool shortlist) {
 		num = count_color_codes(out);
 		sprintf(buf, "%%-%d.%ds", 35 + 2 * num, 35 + 2 * num);
 		strcpy(buf1, out);
-		snprintf(out, sizeof(out), buf, buf1);
+		
+		size = snprintf(out, sizeof(out), buf, buf1);
+		
+		// append invis even in short list
+		if (GET_INVIS_LEV(ch)) {
+			size += snprintf(out + size, sizeof(out) - size, " (i%d)", GET_INVIS_LEV(ch));
+		}
+		
 		return out;
 	}
 	
@@ -1045,13 +1052,13 @@ char *one_who_line(char_data *ch, bool shortlist) {
 * @param char *name_search If filtering names, the filter string.
 * @param int low Minimum level to show.
 * @param int high Maximum level to show.
-* @param bool empire_who If TRUE, only shows members of ch's empire.
+* @param empire_data *empire_who If not null, only shows members of that empire.
 * @param bool rp If TRUE, only shows RP players.
 * @param bool shortlist If TRUE, gets the columnar short form.
 * @param int type WHO_MORTALS, WHO_GODS, or WHO_IMMORTALS
 * @return char* The who output for imms.
 */
-char *partial_who(char_data *ch, char *name_search, int low, int high, bool empire_who, bool rp, bool shortlist, int type) {
+char *partial_who(char_data *ch, char *name_search, int low, int high, empire_data *empire_who, bool rp, bool shortlist, int type) {
 	extern int max_players_today;
 	extern int max_players_this_uptime;
 	
@@ -1086,7 +1093,7 @@ char *partial_who(char_data *ch, char *name_search, int low, int high, bool empi
 			continue;
 		if (type == WHO_IMMORTALS && !IS_IMMORTAL(tch))
 			continue;
-		if (empire_who && GET_LOYALTY(ch) != GET_LOYALTY(tch))
+		if (empire_who && GET_LOYALTY(tch) != empire_who)
 			continue;
 		if (rp && !PRF_FLAGGED(tch, PRF_RP))
 			continue;
@@ -2236,12 +2243,13 @@ ACMD(do_whereami) {
 
 
 ACMD(do_who) {
-	char name_search[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH];
-	char mode, *part;
+	char name_search[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH*2], empname[MAX_INPUT_LENGTH];
+	char mode, *part, *ptr;
 	int outsize = 0;
 	int low = 0, high = LVL_TOP;
-	bool rp = FALSE, empire_who = FALSE;
+	bool rp = FALSE;
 	bool shortlist = FALSE;
+	empire_data *show_emp = NULL;
 
 	skip_spaces(&argument);
 	strcpy(buf, argument);
@@ -2268,21 +2276,38 @@ ACMD(do_who) {
 					half_chop(buf1, name_search, buf);
 					break;
 				case 'e':
-					empire_who = TRUE;
-					strcpy(buf, buf1);
+					ptr = any_one_word(buf1, empname);
+					
+					// was this actually an empire name or just a "who -e"?
+					if (!*empname || *empname == '-') {
+						show_emp = GET_LOYALTY(ch);
+						// just skip this arg
+						strcpy(buf, buf1);
+						break;
+					}
+					
+					// otherwise assume it was an empire name
+					skip_spaces(&ptr);
+					strcpy(buf, ptr);
+					
+					show_emp = get_empire_by_name(empname);
+					if (!show_emp) {
+						msg_to_char(ch, "Unknown empire '%s'.\r\n", empname);
+						return;
+					}
 					break;
 				case 's':
 					shortlist = TRUE;
 					strcpy(buf, buf1);
 					break;
 				default: {
-					send_to_char("format: who [minlev[-maxlev]] [-n name] [-o] [-e] [-r]\r\n", ch);
+					send_to_char("format: who [minlev[-maxlev]] [-n name] [-s] [-e [empire]] [-r]\r\n", ch);
 					return;
 				}
 			}				/* end of switch */
 		}
 		else {			/* endif */
-			send_to_char("format: who [minlev[-maxlev]] [-n name] [-o] [-e] [-r]\r\n", ch);
+			send_to_char("format: who [minlev[-maxlev]] [-n name] [-s] [-e [empire]] [-r]\r\n", ch);
 			return;
 		}
 	}
@@ -2290,19 +2315,19 @@ ACMD(do_who) {
 	*output = '\0';
 
 	/* Immortals first */
-	part = partial_who(ch, name_search, low, high, empire_who, rp, shortlist, WHO_IMMORTALS);
+	part = partial_who(ch, name_search, low, high, show_emp, rp, shortlist, WHO_IMMORTALS);
 	if (*part) {
 		outsize += snprintf(output + outsize, sizeof(output) - outsize, "%s%s", (*output ? "\r\n" : ""), part);
 	}
 
 	/* Gods second */
-	part = partial_who(ch, name_search, low, high, empire_who, rp, shortlist, WHO_GODS);
+	part = partial_who(ch, name_search, low, high, show_emp, rp, shortlist, WHO_GODS);
 	if (*part) {
 		outsize += snprintf(output + outsize, sizeof(output) - outsize, "%s%s", (*output ? "\r\n" : ""), part);
 	}
 
 	/* Then mortals */
-	part = partial_who(ch, name_search, low, high, empire_who, rp, shortlist, WHO_MORTALS);
+	part = partial_who(ch, name_search, low, high, show_emp, rp, shortlist, WHO_MORTALS);
 	if (*part) {
 		outsize += snprintf(output + outsize, sizeof(output) - outsize, "%s%s", (*output ? "\r\n" : ""), part);
 	}
