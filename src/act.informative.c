@@ -1085,7 +1085,7 @@ char *partial_who(char_data *ch, char *name_search, int low, int high, empire_da
 
 		if (*name_search && !is_abbrev(name_search, PERS(tch, tch, 1)) && !strstr(GET_TITLE(tch), name_search))
 			continue;
-		if (!CAN_SEE_GLOBAL(ch, tch) || GET_ACCESS_LEVEL(tch) < low || GET_ACCESS_LEVEL(tch) > high)
+		if (!CAN_SEE_GLOBAL(ch, tch) || GET_COMPUTED_LEVEL(tch) < low || GET_COMPUTED_LEVEL(tch) > high)
 			continue;
 		if (type == WHO_MORTALS && (IS_GOD(tch) || IS_IMMORTAL(tch)))
 			continue;
