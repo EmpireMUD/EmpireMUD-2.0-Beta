@@ -1364,7 +1364,7 @@ void point_update_room(room_data *room) {
 			}
 			
 			// look for more here than allowed
-			count = 0;
+			count = 1;
 			for (sub_ch = ch->next_in_room; sub_ch; sub_ch = next_sub) {
 				next_sub = sub_ch->next_in_room;
 				
