@@ -2817,7 +2817,7 @@ ACMD(do_eat) {
 		}
 		else {
 			snprintf(buf, sizeof(buf), "$n eats %s$p.", (extract ? "" : "some of "));
-			act(buf, TRUE, ch, food, NULL, TO_CHAR);
+			act(buf, TRUE, ch, food, NULL, TO_ROOM);
 		}
 	}
 	else {
