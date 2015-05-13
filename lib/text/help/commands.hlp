@@ -1465,14 +1465,18 @@ allows you to look at the phases of the moons.
 #
 WHO
 
-Usage: who [-n name] [-e]
+Usage: who [min-maxlevel] [-n name] [-e [empire]] [-r] [-s]
 
 Lists the people currently in the game. Some people may be invisible. Command-
 line options can be used to limit the listing. The parameters can be specified
 on the command-line in any order.
 
--n name : list only people whose names or titles contain name
--e : empire
+min-max    Specify a level range, e.g. 100-200
+-e [name]  members of your own empire or the one you specify (use quotes for
+           empires with names longer than one word)
+-n name    list only people whose names or titles contain name
+-r         only players with the RP flag on
+-s         short list (two columns, less info)
 
 See also: WHOIS
 #
