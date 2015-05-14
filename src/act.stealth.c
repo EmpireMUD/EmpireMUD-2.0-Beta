@@ -1017,7 +1017,7 @@ ACMD(do_pickpocket) {
 	else if (FIGHTING(vict)) {
 		msg_to_char(ch, "You can't steal from someone who's fighting.\r\n");
 	}
-	else if (MOB_FLAGGED(vict, MOB_PICKPOCKETED)) {
+	else if (MOB_FLAGGED(vict, MOB_PICKPOCKETED | MOB_NO_LOOT)) {
 		act("$E doesn't appear to be carrying anything in $S pockets.", FALSE, ch, NULL, vict, TO_CHAR);
 	}
 	else if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_PICKPOCKET)) {
