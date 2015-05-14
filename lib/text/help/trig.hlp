@@ -818,6 +818,7 @@ id       - The unique id of the room.
 name     - The name of the room.
 people   - The id of the first character in the room, or an empty return.
 sector   - The sector type of the room.
+template - The room template vnum, if any.
 vnum     - The room's vnum.
 weather  - current weather: sunny, cloudy, rainy, or lightning
 #d

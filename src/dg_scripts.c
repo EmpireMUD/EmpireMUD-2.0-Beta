@@ -2664,7 +2664,15 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					snprintf(str, slen, "%d", GET_ROOM_VNUM(r) + ROOM_ID_BASE); 
 				else
 					*str = '\0';
-			} 
+			}
+			else if (!str_cmp(field, "template")) {
+				if (r && GET_ROOM_TEMPLATE(r)) {
+					snprintf(str, slen, "%d", GET_RMT_VNUM(GET_ROOM_TEMPLATE(r))); 
+				}
+				else {
+					*str = '\0';
+				}
+			}
 			else if (!str_cmp(field, "weather")) {
 				extern const char *weather_types[];
 
