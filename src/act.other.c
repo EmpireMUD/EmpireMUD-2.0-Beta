@@ -1682,6 +1682,11 @@ ACMD(do_toggle) {
 	const char *tognames[NUM_TOG_TYPES][2] = { { "off", "on" }, { "on", "off" } };
 
 	int iter, type = NOTHING, count, on;
+	
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "NPCs do not have toggles.\r\n");
+		return;
+	}
 
 	skip_spaces(&argument);
 	
