@@ -2626,6 +2626,22 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					tmp = i;
 					break;
 				}
+				case 'r': {	// room template/building
+					if (GET_ROOM_TEMPLATE(IN_ROOM(ch))) {
+						sprintf(i, "r%d", GET_RMT_VNUM(GET_ROOM_TEMPLATE(IN_ROOM(ch))));
+					}
+					else if (GET_BUILDING(IN_ROOM(ch))) {
+						sprintf(i, "b%d", GET_BLD_VNUM(GET_BUILDING(IN_ROOM(ch))));
+					}
+					else if (crop_proto(ROOM_CROP_TYPE(IN_ROOM(ch)))) {
+						sprintf(i, "c%d/s%d", GET_CROP_VNUM(crop_proto(ROOM_CROP_TYPE(IN_ROOM(ch)))), GET_SECT_VNUM(SECT(IN_ROOM(ch))));
+					}
+					else {
+						sprintf(i, "s%d", GET_SECT_VNUM(SECT(IN_ROOM(ch))));
+					}
+					tmp = i;
+					break;
+				}
 				case '_':
 					tmp = "\r\n";
 					break;
