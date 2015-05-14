@@ -81,8 +81,8 @@ FISH FISHING
 
 Fish (Survival ability)
 
-Usage: fish
-Tool: spear
+Usage:  fish
+Tool:  spear
 
 Learn to live at the water's edge through spear-fishing. As your skill
 improves, you will find yourself catching fish faster.
@@ -111,7 +111,7 @@ See also: DEPLETION
 
 Herb Gardens (Survival ability)
 
-Command: build <garden> [direction]
+Command:  build <garden> [direction]
 
 The various herb gardens allow you to farm more herbs than can normally be
 picked in one spot, and if your empire has Skilled Labor, your workforce can
@@ -146,8 +146,8 @@ MOUNT DISMOUNT RIDING "RIDE SKILL" "ALL-TERRAIN RIDING" "ALL TERRAIN RIDING" ATR
 Ride (Survival ability)
 All-Terrain Riding (Survival ability)
 
-Usage: dismount
-       mount [animal]
+Usage:  dismount
+        mount [animal]
 
 Once you have learned to Ride, travel becomes faster and easier. With All-
 Terrain Riding, you can coax your mount across rivers and mountains, too.
@@ -288,7 +288,7 @@ WHERE "MASTER TRACKER"
 
 Master Tracker (Survival ability)
 
-Usage: where <animal | player>
+Usage:  where <animal | player>
 
 Tells you the location of a near-by animal or player. Anybody can use this
 to find things that are close by, but master trackers can use it over a much

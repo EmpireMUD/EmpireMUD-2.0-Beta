@@ -97,7 +97,7 @@ COUNTERSPELL "COUNTER SPELL"
 
 Counterspell (Natural Magic ability)
 
-Usage: counterspell
+Usage:  counterspell
 
 A clever nature mage can set up counterspell magic to deflect the next hostile
 spell cast against him or her. Each counterspell lasts one game hour, or
@@ -107,7 +107,7 @@ EARTHARMOR "EARTH ARMOR"
 
 Eartharmor (Natural Magic ability)
 
-Usage: eartharmor <target>
+Usage:  eartharmor <target>
 
 This spell allows a nature mage to coat his or her allies in a powerful
 coating of earth, protecting them from some damage.
@@ -230,7 +230,7 @@ LIGHTNINGBOLT "LIGHTNING BOLT"
 
 Lightningbolt (Natural Magic ability)
 
-Usage: lightningbolt [target]
+Usage:  lightningbolt [target]
 Cooldown:  9 seconds
 
 A powerful nature mage can shoot bolts of lightning from her fingertips,

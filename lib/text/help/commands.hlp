@@ -149,7 +149,7 @@ Bright colors:
 #
 ASSIST
 
-Usage: assist <person in need>
+Usage:  assist <person in need>
 
 If Quifael is being beaten senseless by a tiger and you feel brave enough to
 help him, type ASSIST QUIFAEL to hit the tiger. Note that the tiger will keep
@@ -171,7 +171,7 @@ See also: FOLLOW
 #
 BOARD
 
-Usage: board <ship>
+Usage:  board <ship>
 
 This command is used to board a ship in the same room.
 
@@ -189,9 +189,9 @@ See also: BRIEF, COMPACT, MAPSIZE
 #
 BUG TYPO IDEA
 
-Usage: bug <bug report>
-       idea <your new idea>
-       typo <that nasty typo>       
+Usage:  bug <bug report>
+        idea <your new idea>
+        typo <that nasty typo>       
 
 For making useful suggestions and reporting problems to the Powers that Be.
 
@@ -232,7 +232,7 @@ to clear the screen.
 #
 COMMANDS
 
-Usage: commands
+Usage:  commands
 
 The COMMANDS command gives a canonical list of all the known verbs.
 
@@ -251,7 +251,7 @@ See also: TOGGLE
 #
 CONFIRM
 
-Usage: confirm
+Usage:  confirm
 
 When a reboot has been set to a specific time, players are allowed to speed it
 up. If everyone types 'confirm,' it will reboot early. This should only be
@@ -284,7 +284,7 @@ See also: TAILOR, WEAVE
 #
 DIAGNOSE
 
-Usage: diagnose [character]
+Usage:  diagnose [character]
 
 The DIAGNOSE command tells you how wounded a character looks. If you are
 fighting someone, you can use DIAGNOSE with no arguments to diagnose the
@@ -298,18 +298,18 @@ Examples:
 #
 DIRECTIONS NORTH SOUTH EAST WEST NORTHEAST NORTHWEST SOUTHEAST SOUTHWEST UP DOWN NE NW SE SW FORE AFT PORT STARBOARD
 
-Usage: north, south, east, west
-       northeast, northwest, southeast, southwest
-       fore, aft, port, starboard (on a ship)
-       ne, nw, se, sw
-       up, down
+Usage:  north, south, east, west
+        northeast, northwest, southeast, southwest
+        fore, aft, port, starboard (on a ship)
+        ne, nw, se, sw
+        up, down
 
 To travel in a given direction. Indoors, you're given a list of directions
 you can travel. Out in the wilderness, you can go in any normal direction.
 #
 DISEMBARK
 
-Usage: disembark
+Usage:  disembark
 
 From the entry room of a ship (the room you're placed in when you board it),
 you may disembark. This can be done even in the ocean, though you may need a
@@ -325,7 +325,7 @@ This command causes your familiar to leave.
 #
 DOUSE FIRE
 
-Usage: douse
+Usage:  douse
 
 In the event of a fire, you may douse it with water from any portable source. 
 It may take a lot of water to douse the fire, and you may have to leave and 
@@ -334,7 +334,7 @@ and destroy your structure.
 #
 DRAW
 
-Usage: draw [item]
+Usage:  draw [item]
 
 This pulls your sheathed weapon from its holster. It is done automatically in
 battle as long as your hand is free.
@@ -343,10 +343,10 @@ See also: SHEATH, SWAP
 #
 DROP
 
-Usage: drop <item>
-       drop all.<item>
-       drop all
-       drop <number> [empire] coins
+Usage:  drop <item>
+        drop all.<item>
+        drop all
+        drop <number> [empire] coins
 
 If you lose interest in a carried item, you can drop it on the ground. Don't
 leave things laying around, though, or the might not be there when you get
@@ -364,10 +364,10 @@ See also: COINS, GET, JUNK
 #
 EAT DRINK SIP TASTE
 
-Usage: eat <item>
-       taste <item>
-       drink [from] <item>
-       sip [from] <item>
+Usage:  eat <item>
+        taste <item>
+        drink [from] <item>
+        sip [from] <item>
 
 If you're hungry or thirsty, these commands are for you! You can drink from
 wells, fountains, and the edge of nearby rivers, too.
@@ -383,8 +383,8 @@ See also: FILL, POUR, TASTE BLOOD
 #
 EMOTE :
 
-Usage: emote <message>
-       : <message>
+Usage:  emote <message>
+        : <message>
 
 Show people what you're feeling. The shorthand is ":".
 "emote <string>" will display your name, then the string.
@@ -398,7 +398,7 @@ See also: SOCIALS
 #
 EQUIPMENT
 
-Usage: equipment [-all]
+Usage:  equipment [-all]
 
 Gives you a list of all the equipment you're wearing, holding, and wielding.
 
@@ -419,17 +419,17 @@ See also: TOGGLE, STAKE, TIE
 #
 EXITS
 
-Usage: exits
+Usage:  exits
 
 Gives you a list of the obvious exits from your location. This command is
 only useful indoors, because on the world map all directions are exits.
 #
 FILL
 
-Usage: fill <item> [from] well
-       fill <item> [from] fountain
-       fill <item> river
-       fill <item> [from] <item>
+Usage:  fill <item> [from] well
+        fill <item> [from] fountain
+        fill <item> river
+        fill <item> [from] <item>
        
 If you want to fill a container you're holding with liquid from a fountain or
 well in the same room as you. You can also fill it from a river in the same
@@ -447,7 +447,7 @@ See also: POUR, DRINK
 #
 FLEE
 
-Usage: flee
+Usage:  flee
 
 If you are in a fight and things are beginning to get a little uncomfortable
 (maybe you are dying), just type 'flee', and presto! You are out of harm's
@@ -457,7 +457,7 @@ You must type out this command; it cannot be abbreviated.
 #
 FOLLOW
 
-Usage: follow <leader>
+Usage:  follow <leader>
 
 Use FOLLOW to automatically follow someone else. You can use AVOID to shake
 someone loose.
@@ -473,10 +473,10 @@ GET TAKE
 
 "Get" and "take" are exactly the same and can be used interchangeably.
 
-Usage: get <object>
-       take all [object]
-       take all all.<object>
-       get all.<object> all.<object>
+Usage:  get <object>
+        take all [object]
+        take all all.<object>
+        get all.<object> all.<object>
 
 If you find something interesting on the ground, you may use 'get' to pick
 it up. 'get' can also be used to extract items from containers.
@@ -492,8 +492,8 @@ See also: DROP, PUT
 #
 GIVE
 
-Usage: give <object> <victim>
-       give <number> [empire] coins <victim>
+Usage:  give <object> <victim>
+        give <number> [empire] coins <victim>
 
 If you feel benevolent, you may give some stuff to someone in need. When giving
 coins, if you don't specify an empire, it will default to your generic coins.
@@ -508,8 +508,8 @@ See also: COINS
 #
 GRAB HOLD
 
-Usage: grab <object>
-       hold <object>
+Usage:  grab <object>
+        hold <object>
 
 For getting a good grip on something; a torch, for example. This equips an
 item to the off-hand slot (held), except bows, which it puts in the ranged
@@ -524,12 +524,12 @@ See also: EQUIPMENT, REMOVE, WEAR, WIELD, SWAP
 #
 GROUP PARTY
 
-Usage: group  -- see status on the group
-       group invite <name>  -- invite a player to the group
-       group join  -- join a group you were invited to
-       group kick <name>  -- kick a member from the group
-       group leave  -- leave the group you're in
-       group leader <name>  -- change leader
+Usage:  group  -- see status on the group
+        group invite <name>  -- invite a player to the group
+        group join  -- join a group you were invited to
+        group kick <name>  -- kick a member from the group
+        group leave  -- leave the group you're in
+        group leader <name>  -- change leader
 
 Grouping allows multiple players to work on the same challenge, and gives them
 access to a private group channel. You can also type "group" by itself to see
@@ -546,8 +546,8 @@ See also: GSAY
 #
 GSAY GTELL PSAY PTELL
 
-Usage: gsay <message>
-       gtell <message>
+Usage:  gsay <message>
+        gtell <message>
 
 Tell something to all the members of your group, even if they're not in the
 room. You can also use the older psay/ptell command, which does the same thing.
@@ -556,7 +556,7 @@ See also: DISPLAY, IGNORE, GROUP, TELL, SAY
 #
 HELP
 
-Usage: help [command]
+Usage:  help [command]
 
 Help searches for a partial match of the entered word, including any
 spaces that may follow the word. Help alone will give a list of the
@@ -571,7 +571,7 @@ See also: COMMANDS, HELPSEARCH, SOCIALS
 #
 HELPSEARCH "HELP SEARCH" "SEARCH HELP"
 
-Usage: helpsearch <term>
+Usage:  helpsearch <term>
 
 This command lets you search the body of help files, instead of just their
 keywords.
@@ -625,7 +625,7 @@ idea to read them every once in a while.
 #
 INVENTORY
 
-Usage: inventory
+Usage:  inventory
 
 If you're uncertain about what you're carrying, or simply want to check that
 no thieves have got to your backpack. When in a storage building, this also
@@ -640,8 +640,8 @@ See also: EQUIPMENT, GRAB, HOLD, REMOVE, WEAR, STORE, RETRIEVE, WIELD, SWAP
 #
 JUNK
 
-Usage: junk <object>
-       junk <number> [empire] coins
+Usage:  junk <object>
+        junk <number> [empire] coins
 
 Use JUNK instead of DROP if you want to keep the world a little cleaner. If
 you JUNK something, it will disappear.
@@ -659,8 +659,8 @@ See also: COINS, DROP
 #
 KILL HIT
 
-Usage: kill <victim>
-       hit <victim>
+Usage:  kill <victim>
+        hit <victim>
 
 A good way to start a fight.
 
@@ -679,7 +679,7 @@ LAY ROAD ROADS
 Roads: ----  ..|.  ..+-  --+.  .--.
 
 Roads (Empire)
-Usage: lay
+Usage:  lay
 
 You may use this ability to lay 20 rocks into the ground to form a cobblestone 
 road. Roads eliminate the small movement lag that you normally get while
@@ -712,9 +712,9 @@ See also: UNLOAD, BOARD, SAIL
 #
 LOOK EXAMINE
 
-Usage: look
-       look [in | at] [the] <item>
-       look <direction>
+Usage:  look
+        look [in | at] [the] <item>
+        look <direction>
 
 For studying your surroundings. Examine and look do the same thing.
 
@@ -747,9 +747,9 @@ See also: TOGGLE
 #
 MAIL CHECK RECEIVE SEND
 
-Usage: mail check
-       mail send <person>
-       mail receive [amount]
+Usage:  mail check
+        mail send <person>
+        mail receive [amount]
 
 The commands used by the mail are SEND, CHECK, and RECEIVE. You can only send
 mail from a pigeon post, but you can check and receive mail from anywhere.
@@ -780,14 +780,14 @@ See also: WORKFORCE
 #
 MORTLOG
 
-Usage: mortlog
+Usage:  mortlog
 
 This will give you periodic updates, such as when a player logs in, leaves, or
 dies. It's useful in keeping up on current events. Mortlog is colored cyan.
 #
 MOTD
 
-Usage: motd
+Usage:  motd
 
 Displays the message of the day. Contains important information regarding the
 status of the MUD. You should be sure to read it when you login. If you miss
@@ -815,7 +815,7 @@ a slow connection or if it just annoys you.
 #
 NOTELL "NO TELL"
 
-Usage: toggle tell
+Usage:  toggle tell
 
 Use this toggle if you wish to prevent other players from using "tell" to
 communicate with you. (notell) will appear after your name in the WHO list if
@@ -825,7 +825,7 @@ See also: IGNORE, TELL, WHO
 #
 OPEN CLOSE
 
-Usage: open | close <door> [direction]
+Usage:  open | close <door> [direction]
 
 To open and close doors, of course. This also works on some containers.
 
@@ -836,8 +836,8 @@ Examples:
 #
 ORDER
 
-Usage: order <character> <command>
-       order followers <command>
+Usage:  order <character> <command>
+        order followers <command>
 
 Used for ordering pets and charmed people to do your evil bidding. You can
 order everyone under your command with "order followers".
@@ -889,8 +889,8 @@ See also: PORTAL MAGIC, PORTAL MASTER, COLLAPSE
 #
 POUR
 
-Usage: pour <from container> <to container>
-       pour <from container> out
+Usage:  pour <from container> <to container>
+        pour <from container> out
 
 If you want to pour some liquid from one container to another. Pouring
 out simply empties the contents of the container onto the ground.
@@ -907,8 +907,8 @@ See also: FILL, TRENCH
 #
 PROMPT FPROMPT "FIGHT PROMPT" "COMBAT PROMPT"
 
-Usage: prompt <string | off | default>
-       fprompt <string | off | default>
+Usage:  prompt <string | off | default>
+        fprompt <string | off | default>
 
 The prompt is the text you see when the game is waiting for you to do
 something, and it's usually right next to where you type (but some mud clients
@@ -955,9 +955,9 @@ See also: PROMPT
 #
 PUT
 
-Usage: put <item> [in] <container>
-       put all.<item> [in] <container>
-       put all <container>
+Usage:  put <item> [in] <container>
+        put all.<item> [in] <container>
+        put all <container>
 
 For putting items into containers.
 
@@ -1001,9 +1001,9 @@ See also: COLOR
 #
 REMOVE
 
-Usage: remove <item>
-       remove all
-       remove all.<keyword>
+Usage:  remove <item>
+        remove all
+        remove all.<keyword>
 
 If you tire of wearing some armor or wielding a weapon, remove it.
 
@@ -1018,7 +1018,7 @@ See also: GRAB, HOLD, WEAR, WIELD, SHEATH, DRAW, SWAP
 #
 REPLY
 
-Usage: reply <message>
+Usage:  reply <message>
 
 This command will send a reply to the last person to send you a message using
 TELL. It works just as if you had typed 'tell <player> <message>' but makes
@@ -1071,7 +1071,7 @@ Examples:
 #
 SAIL
 
-Usage: sail <direction>
+Usage:  sail <direction>
 
 You can sail the ship from any location inside, for your convenience. Ships
 can travel on oceans and rivers, through river gates, and under bridges. 
@@ -1082,7 +1082,7 @@ See also: BOARD, DISEMBARK
 #
 SAVE
 
-Usage: save
+Usage:  save
 
 Save your persona. This includes experience points, strength, gold, etc.
 Your equipment is also saved in the (unlikely?) event of a crash. The
@@ -1093,9 +1093,9 @@ This is not the type of game where you can re-load from past saves.
 #
 SAY OOCSAY OSAY TELL ASK WHISPER ' ""
 
-Usage: say <string>
-       oocsay <string>
-       <tell | whisper | ask> <player> <string>
+Usage:  say <string>
+        oocsay <string>
+        <tell | whisper | ask> <player> <string>
 
 If you consider communicating with other beings, you might be understood
 better if you start your sentences with either say, tell, whisper or shout.
@@ -1216,7 +1216,7 @@ See also: WAKE
 #
 SOCIALS
 
-Usage: <social> [victim]
+Usage:  <social> [victim]
 
 Socials are commands used to show your affective state to others. The actor,
 victim and bystanders may receive different messages. Generally, social
@@ -1289,7 +1289,7 @@ See also: ADVENTURE
 #
 SWAP
 
-Usage: swap
+Usage:  swap
 
 EmpireMUD uses many different weapon types for activities, and most require
 that they be in the wielding position (rather than just held). The swap
@@ -1304,7 +1304,7 @@ See also: DRAW, SHEATH
 #
 TELLHISTORY
 
-Usage: tellhistory
+Usage:  tellhistory
 
 Lists the last 20 uses of tells. This is useful if you have clear mode on
 and missed something because you were walking.
@@ -1317,7 +1317,7 @@ See also: SAYHISTORY, TELL
 #
 THROW
 
-Usage: throw <object> <direction>
+Usage:  throw <object> <direction>
 
 This is used to throw an object into a near-by room. This is used primarily
 for burning down buildings.
@@ -1352,7 +1352,7 @@ Handy time-conversion chart:
 #
 TITLE
 
-Usage: title <new title>
+Usage:  title <new title>
 
 Sets the title people see on the WHO list. You can't use parentheses (the "(" 
 and ")" characters) because those are reserved for other information.
@@ -1419,7 +1419,7 @@ See also: HESTIAN TRINKET, POISON
 #
 VISIBLE
 
-Usage: visible
+Usage:  visible
 
 Makes you visible. This command removes anything that was hiding you.
 #
@@ -1432,8 +1432,8 @@ See also: SLEEP
 #
 WEAR
 
-Usage: wear <item> [location]
-       wear all
+Usage:  wear <item> [location]
+        wear all
 
 If you want to wear some clothes, armor or the likes.
 
@@ -1460,7 +1460,7 @@ See also: EQUIPMENT, REMOVE, WIELD, HOLD, SHEATH, DRAW, SWAP
 #
 WEATHER
 
-Usage: weather
+Usage:  weather
 
 If you're uncertain whether the sun is shining or the rain is pouring down. 
 You'll have to be outside in order to tell however. At night, this also
@@ -1468,7 +1468,7 @@ allows you to look at the phases of the moons.
 #
 WHO
 
-Usage: who [min-maxlevel] [-n name] [-e [empire]] [-r] [-s]
+Usage:  who [min-maxlevel] [-n name] [-e [empire]] [-r] [-s]
 
 Lists the people currently in the game. Some people may be invisible. Command-
 line options can be used to limit the listing. The parameters can be specified
@@ -1485,7 +1485,7 @@ See also: WHOIS
 #
 WHOIS
 
-Usage: whois <name>
+Usage:  whois <name>
 
 Used to find vital information on a person. You cannot abbreviate the name
 because it draws the information from the player file. This allows it to be
@@ -1493,7 +1493,7 @@ used on players who are not logged in.
 #
 WIELD
 
-Usage: wield <weapon>
+Usage:  wield <weapon>
 
 When you get tired of bashing monsters with your fists, you might consider
 wielding a weapon.
@@ -1507,8 +1507,8 @@ See also: EQUIPMENT, REMOVE, WEAR, SHEATH, DRAW, SWAP
 #
 WIZLIST GODLIST
 
-Usage: wizlist
-       godlist
+Usage:  wizlist
+        godlist
 
 Lists the most powerful beings on the MUD. These are the people responsible
 for administering the system.

@@ -36,7 +36,7 @@ Example:
 #
 CHIP
 
-Usage: chip <item>
+Usage:  chip <item>
 
 This lets you chip a rock down to a sharper, more refined tool. You need to be
 wielding a rock or other hammer to do this.
@@ -47,7 +47,7 @@ See also: CRAFT
 #
 CHOP
 
-Usage: chop
+Usage:  chop
 
 This command allows you to chop trees in the forest. Beware, trees are a
 limited resource.
@@ -71,8 +71,8 @@ See also: ABILITY POINTS, SKILLS, SKILL CAPS
 #
 DESIGNATE REDESIGNATE KITCHEN BEDROOM LABORATORY LARDER CLOSET CRYPT STUDY
 
-Usage: designate <direction> <room>
-       redesignate <room>
+Usage:  designate <direction> <room>
+        redesignate <room>
 
 This designates a new room in a building as a specific room type. You must
 specify which direction this new room will be. The first room after the
@@ -134,7 +134,7 @@ See also: LIGHT
 #
 GATHER
 
-Usage: gather
+Usage:  gather
 
 Allows you to gather sticks from the ground. Your skill in this determines
 how many different sticks you can use and thus how quickly you gather enough.
@@ -159,7 +159,7 @@ Example:
 #
 HARVEST HARVESTING
 
-Usage: harvest
+Usage:  harvest
 
 Allows you to harvest a crop. Be careful that you also replant some,
 otherwise you'll run out of that crop quickly.
@@ -168,7 +168,7 @@ See also: PLANT
 #
 HERD HERDING
 
-Usage: herd <animal> <direction>
+Usage:  herd <animal> <direction>
 
 This command is useful in herding animals into stables and fenced-in areas.
 #
@@ -187,7 +187,7 @@ See also: TIE, HARNESS
 #
 LIGHT TORCH
 
-Usage: light <item>
+Usage:  light <item>
 
 To light something, you must have a flint set. You may light sticks to create
 torches.
@@ -283,7 +283,7 @@ See also: SKILLS
 #
 PLANT
 
-Usage: plant <seed/food>
+Usage:  plant <seed/food>
 
 You can replant crops in open fields so that they may regrow and be harvested
 again. This is essential in keeping your crops from dying out.
@@ -320,7 +320,7 @@ See also: TREES, LOGS, LUMBER
 #
 SCRAPE
 
-Usage: scrape tree
+Usage:  scrape tree
 
 This skill is used to process trees into logs.
 
@@ -420,7 +420,7 @@ See also: SKILL CAPS, SPECIALIZE
 #
 SMELT MELT
 
-Usage: smelt <item>
+Usage:  smelt <item>
 
 Using a forge or foundry, you can melt down metals like iron, silver, and gold
 into ingots or bars. Smelting generally requires two of the base metal (e.g.
@@ -499,7 +499,7 @@ See also: BUILD, DISMANTLE, SEW, CLAIM, ABANDON
 #
 UPGRADE
 
-Usage: upgrade
+Usage:  upgrade
 
 This is used to upgrade your guard towers into more powerful towers. They can
 still shoot while you upgrade them, but people will also be able to walk

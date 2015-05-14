@@ -157,11 +157,11 @@ See also: ANCIENT BLOOD
 #
 BOARDS READ WRITE RESPOND
 
-Usage: look board
-       write <headline>
-       read <number>
-       respond <number> <headline>
-       remove <number>
+Usage:  look board
+        write <headline>
+        read <number>
+        respond <number> <headline>
+        remove <number>
 
 Bulletin boards are the forum of inter-player communication on the MUD. There
 are different bulletin boards for different purposes -- for example, a
@@ -209,7 +209,7 @@ normal terrain.
 #
 CHANNELS SHOUT
 
-Usage: shout <message>
+Usage:  shout <message>
 
 See also HELP SLASH-CHANNELS for global channels like /ooc and /newbie.
 
@@ -566,12 +566,12 @@ See also: DIG, EXCAVATE, FORGE
 #
 "SLASH CHANNELS" SLASH-CHANNELS / /JOIN /LEAVE /WHO /HISTORY HISTORY VC "VIRTUAL CHANNELS"
 
-Usage: /join <channel>
-       /leave <channel>
-       /history <channel>
-       /who <channel>
-       /<channel> message
-       /list
+Usage:  /join <channel>
+        /leave <channel>
+        /history <channel>
+        /who <channel>
+        /<channel> message
+        /list
 
 Slash-channels allow you dynamically join and leave channels by name, so you
 can create virtual channels to discuss things with your friends, or private

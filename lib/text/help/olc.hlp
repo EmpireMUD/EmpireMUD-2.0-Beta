@@ -1254,7 +1254,7 @@ See also: OLC LEVELS
 #d
 "MAP OLC" "OLC MAP" "WORLD OLC" "MAP EDITOR" MAPEDIT
 
-Usage: .map <command>
+Usage:  .map <command>
 
 The .olc map editor is a tool for modifying and customizing individual parts
 of the map. Unlike the other editors, it doesn't use contextual menus. The
@@ -1973,7 +1973,7 @@ See also: ITEM SCALING, OEDIT DECAY, OLC OBJECTS
 #d
 "OEDIT KEYWORDS"
 
-Usage: .keywords <list>
+Usage:  .keywords <list>
 
 Keywords are the terms you can use to interact with an item. This is a list
 of all available one-word terms. Any identifying word in an object's name
@@ -2522,7 +2522,7 @@ See also: CROPEDIT INTERACTION, OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
 #d
 "OLC DELETE"
 
-Usage: .<type> delete <vnum>
+Usage:  .<type> delete <vnum>
 
 This command deletes an object (or mob, or whatever) from the database
 entirely. All copies of that object are immediately destroyed.
@@ -2533,7 +2533,7 @@ See also: VNUM
 #d
 "OLC EDIT"
 
-Usage: .<type> edit <vnum>
+Usage:  .<type> edit <vnum>
 
 This command opens the OLC editor with the object (or mob, or whatever) with
 the vnum you specified. If it's a new vnum, it opens a fresh editor and the
@@ -2579,8 +2579,8 @@ See also: OLC FREE, VNUM
 #d
 "OLC MOBILES" MEDIT "MOBILE OLC" "MOBILE EDITOR" "MOB OLC" "MOB EDITOR" MEDIT
 
-Usage: .m <command>
-       .<command>
+Usage:  .m <command>
+        .<command>
 
 The .olc mob editor is a tool for creating and editing mobiles. It provides a
 simple in-game menu with contextual choices to allow you to easily create new

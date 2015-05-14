@@ -25,7 +25,7 @@ See also: CLAIM, PLEDGE, ENROLL, PROMOTE, TERRITORY, CITIES, ROSTER, ESCORE,
 #
 ABANDON
 
-Usage: abandon
+Usage:  abandon
 
 This command allows you to abandon a building or acre of land which your 
 empire no longer wants. This falls under the cede privilege.
@@ -101,8 +101,8 @@ Barded mounts will not de-spawn like normal animals.
 #
 BUILD BUILDING
 
-Usage: build <building> [direction]
-       build <monument> <god>
+Usage:  build <building> [direction]
+        build <monument> <god>
 
 This command is used to create buildings using raw materials. If you build a
 shrine or temple, you must specify a God to dedicate it to. Most other
@@ -146,7 +146,7 @@ See also: EMPIRE, ARTISANS, LUXURY, MONUMENTS, GRAND MONUMENTS, SEAFARING,
 #
 CEDE
 
-Usage: cede <person> (x, y)
+Usage:  cede <person> (x, y)
 
 This is used to cede one acre of land to anyone else currently in the game. 
 If you do not include an (x, y) coordinate, it will cede the land you're on. 
@@ -221,7 +221,7 @@ ability.
 #
 CLAIM
 
-Usage: claim
+Usage:  claim
 
 Claims the acre you're currently on for your empire.
 
@@ -249,8 +249,8 @@ CUSTOMIZE "CUSTOMIZE BUILDING"
 
 Customize Building (Empire ability)
 
-Usage: customize building name <name | none>
-       customize building description <set | none>
+Usage:  customize building name <name | none>
+        customize building description <set | none>
 
 Customize Building lets you change the names and descriptions of your build-
 ings. You must own the building you're trying to customize, and have permission
@@ -300,7 +300,7 @@ See also: PLEDGE
 #
 DEMOTE
 
-Usage: demote <person> [rank]
+Usage:  demote <person> [rank]
 
 Demotes a person within the empire. You can specify the name of the rank
 you'd like to demote them to, or just do it one level at a time.
@@ -309,7 +309,7 @@ See also: PRIVILEGE, PROMOTE, EXPEL
 #
 DEPOSIT
 
-Usage: deposit <number> [empire] <coins>
+Usage:  deposit <number> [empire] <coins>
 
 You can deposit coins in your empire's vault. Foreign coins are always
 exchanged for local currency at the current exchange rate, and stored as local
@@ -319,7 +319,7 @@ See also: COMMERCE, EXCHANGE, MINT, VAULT, WITHDRAW
 #
 DIPLOMACY PEACE WAR ALLIANCE TRUCE DISTRUST
 
-Usage: diplomacy <option> <empire>
+Usage:  diplomacy <option> <empire>
 
 This command is the basis for the interaction among empires. It allows an
 empire to voice its political opinion on another empire and announce it to
@@ -415,8 +415,8 @@ See also: EEDIT
 #
 EMPIREINVENTORY EINVENTORY
 
-Usage: empireinventory [item | all]
-       einventory [item | all]
+Usage:  empireinventory [item | all]
+        einventory [item | all]
        
 The einventory command shows the contents of all storage buildings and rooms
 for the island you're currently on. It won't work out in the ocean. You can
@@ -452,7 +452,7 @@ See also: MUDSTATS
 #
 ENROLL
 
-Usage: enroll <person>
+Usage:  enroll <person>
 
 When a person has pledged his loyalty to your empire, you can enroll him into
 it. This will start him at the lowest empire level.
@@ -466,9 +466,9 @@ See also: CITY, EXPEL, PROMOTE, PRIVILEGE, PLEDGE
 #
 ESAY ETALK EHISTORY EMPIREHISTORY
 
-Usage: etalk <text>
-       etalk #level <text>
-       ehistory
+Usage:  etalk <text>
+        etalk #level <text>
+        ehistory
 
 Allows you to talk to your empire on a private channel, even from the other
 side of the world. This is very useful for espionage and other secret
@@ -517,7 +517,7 @@ See also: COINS, MINT, VAULT
 #
 EXPEL
 
-Usage: expel <person>
+Usage:  expel <person>
 
 Kicks a person out of the empire.
 
@@ -743,7 +743,7 @@ See also: FORGE
 #
 PLEDGE JOIN
 
-Usage: pledge <empire>
+Usage:  pledge <empire>
 
 Allows you to pledge your loyalty to an empire. If they find you worthy, you
 may be allowed to join.
@@ -758,7 +758,7 @@ See also: CITY, DEFECT, ENROLL
 #
 PROMOTE
 
-Usage: promote <person> [level]
+Usage:  promote <person> [level]
 
 This can be used to advance someone to a specific level, or to advance them
 one level at a time. They must be in your empire to do this.
@@ -814,7 +814,7 @@ PROSPECT
 
 Prospect (Empire ability)
 
-Usage: prospect
+Usage:  prospect
 
 A skilled prospector can determine what minerals are in the ground without
 exploratory mining.
@@ -932,7 +932,7 @@ See also: BUILD, DIG, CHIP
 #
 ROSTER
 
-Usage: roster
+Usage:  roster
 
 This command shows you the members of your empire and lets you know who's on-
 line and who's been gone a while.
@@ -1143,7 +1143,7 @@ See also: DISMANTLE, INTERLINK
 #
 UNPUBLICIZE
 
-Usage: unpublicize
+Usage:  unpublicize
 
 CAUTION: This is not a toggle!
 

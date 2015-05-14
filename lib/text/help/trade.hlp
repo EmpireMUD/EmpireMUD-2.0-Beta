@@ -452,8 +452,8 @@ REFORGE REFASHION
 Refashion (Trade ability)
 Reforge (Trade ability)
 
-Usage: reforge <item> name <new name>
-       reforge <item> <renew | superior>
+Usage:  reforge <item> name <new name>
+        reforge <item> <renew | superior>
 
 A great blacksmith (weapons) or tailor (armors and shields) can use this
 ability in two ways:

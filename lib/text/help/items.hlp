@@ -172,9 +172,9 @@ See also: CHOP, SAW
 #
 RETRIEVE
 
-Usage: retrieve <item>
-       retrieve [number] <item>
-       retrieve all
+Usage:  retrieve <item>
+        retrieve [number] <item>
+        retrieve all
 
 This command is used to get items from a storage building. You may use
 "retrieve all" to fill up your inventory with items, but may not specify which
@@ -210,9 +210,9 @@ See also: QUARRY
 #
 STORE STORAGE
 
-Usage: store <item>
-       store <number> <item>
-       store all
+Usage:  store <item>
+        store <number> <item>
+        store all
 
 It is recommended that you keep most of your extra resources stored. Items left
 on the ground in claimed territory will eventually be stored by the empire's
