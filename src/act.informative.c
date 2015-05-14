@@ -688,6 +688,11 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 	if (!ch || !i || !ch->desc) {
 		return;
 	}
+	
+	// able to see at all?
+	if (AFF_FLAGGED(i, AFF_NO_SEE_IN_ROOM) && !PRF_FLAGGED(ch, PRF_HOLYLIGHT)) {
+		return;
+	}
 
 	if (num > 1) {
 		msg_to_char(ch, "(%2d) ", num);
@@ -719,10 +724,6 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 	
 	if (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_ROOMFLAGS) && IS_NPC(i)) {
 		msg_to_char(ch, "[%d] %s", GET_MOB_VNUM(i), SCRIPT(i) ? "[TRIG] " : "");
-	}
-	
-	if (AFF_FLAGGED(i, AFF_NO_SEE_IN_ROOM) && !PRF_FLAGGED(ch, PRF_HOLYLIGHT)) {
-		return;
 	}
 
 	if (IS_NPC(i) && GET_LONG_DESC(i) && GET_POS(i) == POS_STANDING) {
@@ -1085,8 +1086,15 @@ char *partial_who(char_data *ch, char *name_search, int low, int high, empire_da
 
 		if (*name_search && !is_abbrev(name_search, PERS(tch, tch, 1)) && !strstr(GET_TITLE(tch), name_search))
 			continue;
-		if (!CAN_SEE_GLOBAL(ch, tch) || GET_COMPUTED_LEVEL(tch) < low || GET_COMPUTED_LEVEL(tch) > high)
+		if (!CAN_SEE_GLOBAL(ch, tch)) {
 			continue;
+		}
+		if (low != 0 && GET_COMPUTED_LEVEL(tch) < low) {
+			continue;
+		}
+		if (high != 0 && GET_COMPUTED_LEVEL(tch) > high) {
+			continue;
+		}
 		if (type == WHO_MORTALS && (IS_GOD(tch) || IS_IMMORTAL(tch)))
 			continue;
 		if (type == WHO_GODS && !IS_GOD(tch))
@@ -2246,7 +2254,7 @@ ACMD(do_who) {
 	char name_search[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH*2], empname[MAX_INPUT_LENGTH];
 	char mode, *part, *ptr;
 	int outsize = 0;
-	int low = 0, high = LVL_TOP;
+	int low = 0, high = 0;
 	bool rp = FALSE;
 	bool shortlist = FALSE;
 	empire_data *show_emp = NULL;
