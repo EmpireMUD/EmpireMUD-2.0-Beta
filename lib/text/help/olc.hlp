@@ -303,6 +303,7 @@ The following adventure flags are available:
  LOCK-LEVEL-ON-COMBAT - Instance level locks when a player fights.
  !NEARBY - Instances do not show up when players type nearby.
  ROTATABLE - Each instance will have a random orientation (whole zone rotates).
+ CONFUSING-RANDOMS - The instancer will not logically match random exits.
 
 See also: OLC ADVENTURES
 #d

@@ -44,7 +44,7 @@ int count_instances(adv_data *adv);
 int count_mobs_in_instance(struct instance_data *inst, mob_vnum vnum);
 int count_objs_in_instance(struct instance_data *inst, obj_vnum vnum);
 int count_players_in_instance(struct instance_data *inst, bool include_imms);
-static int determine_random_exit(room_data *from, room_data *to);
+static int determine_random_exit(adv_data *adv, room_data *from, room_data *to);
 room_data *find_room_template_in_instance(struct instance_data *inst, rmt_vnum vnum);
 static struct adventure_link_rule *get_link_rule_by_type(adv_data *adv, int type);
 any_vnum get_new_instance_id(void);
@@ -127,7 +127,7 @@ static void build_instance_entrance(struct instance_data *inst, struct adventure
 	switch (rule->type) {
 		case ADV_LINK_BUILDING_EXISTING:
 		case ADV_LINK_BUILDING_NEW: {
-			my_dir = (rule->dir != DIR_RANDOM ? rule->dir : determine_random_exit(loc, inst->start));
+			my_dir = (rule->dir != DIR_RANDOM ? rule->dir : determine_random_exit(inst->adventure, loc, inst->start));
 			if (my_dir != NO_DIR) {
 				create_exit(loc, inst->start, my_dir, TRUE);
 			}
@@ -221,14 +221,16 @@ struct instance_data *build_instance_loc(adv_data *adv, struct adventure_link_ru
 * if possible. Then, it tries to find one that can work in both directions.
 * Finally, it iterates and picks one, if possible.
 *
+* @param adv_data *adv The adventure it's linking in.
 * @param room_data *from Origin room.
 * @param room_data *to Destination room.
 * @return int Any direction constant, or NO_DIR.
 */
-static int determine_random_exit(room_data *from, room_data *to) {
+static int determine_random_exit(adv_data *adv, room_data *from, room_data *to) {
 	struct room_direction_data *ex;
 	int try, dir;
-	bool need_back = TRUE;
+	bool confuse = IS_SET(GET_ADV_FLAGS(adv), ADV_CONFUSING_RANDOMS) ? TRUE : FALSE;
+	bool need_back = !confuse;
 	
 	const int max_tries = 24;
 	
@@ -238,7 +240,7 @@ static int determine_random_exit(room_data *from, room_data *to) {
 	}
 	
 	// first see if the to room has an exit to us already
-	if (COMPLEX_DATA(to)) {
+	if (COMPLEX_DATA(to) && !confuse) {
 		for (ex = COMPLEX_DATA(to)->exits; ex; ex = ex->next) {
 			if (ex->room_ptr == from) {
 				// found!
@@ -336,7 +338,7 @@ static void instantiate_one_exit(struct instance_data *inst, room_data *room, st
 		dir = confused_dirs[rotation][0][exit->dir];
 	}
 	else {
-		dir = determine_random_exit(room, to_room);
+		dir = determine_random_exit(inst->adventure, room, to_room);
 	}
 	
 	// unable to add exit

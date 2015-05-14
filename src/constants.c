@@ -103,6 +103,7 @@ const char *adventure_flags[] = {
 	"LOCK-LEVEL-ON-COMBAT",
 	"!NEARBY",
 	"ROTATABLE",
+	"CONFUSING-RANDOMS",
 	"\n"
 };
 

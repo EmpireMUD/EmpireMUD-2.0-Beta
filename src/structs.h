@@ -282,6 +282,7 @@ typedef struct trig_data trig_data;
 #define ADV_LOCK_LEVEL_ON_COMBAT  BIT(2)	// lock levels when combat starts
 #define ADV_NO_NEARBY  BIT(3)	// hide from mortal nearby command
 #define ADV_ROTATABLE  BIT(4)	// random rotation on instantiate
+#define ADV_CONFUSING_RANDOMS  BIT(5)	// random exits do not need to match
 
 
 // adventure link rule types
