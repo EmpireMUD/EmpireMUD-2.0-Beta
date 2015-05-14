@@ -427,9 +427,9 @@ You have three different levels.
 Skill level: This level is determined by your top skills. When two of your
    skills pass level 75, the game gives you a class and these become your
    class skills. This level does not go above 100, as it is the average of
-   your two class skills. You can see it by typing "skills". Skill levels are
-   grouped into three ranges: Basic (up to 50), Specialty (up to 75), and Class
-   (up to 100).
+   your two class skills. You can see it by typing "skills", or in parentheses
+   on your "score". Skill levels are grouped into three ranges: Basic (up to
+   50), Specialty (up to 75), and Class (up to 100).
 
 Gear level: The bonuses you receive from your equipment form your gear level.
    There is no upper limit on this number, and any gear you have equipped

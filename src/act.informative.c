@@ -387,7 +387,7 @@ void display_score_to_char(char_data *ch, char_data *to) {
 
 	// row 1 col 2: class
 	msg_to_char(to, " Class: %-17.17s", IS_IMMORTAL(ch) ? "Immortal" : class_data[GET_CLASS(ch)].name);
-	msg_to_char(to, " Total Level: %d\r\n", GET_COMPUTED_LEVEL(ch));
+	msg_to_char(to, " Level: %d (%d)\r\n", GET_COMPUTED_LEVEL(ch), GET_SKILL_LEVEL(ch));
 
 	// row 1 col 3: levels
 

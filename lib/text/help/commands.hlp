@@ -1122,14 +1122,14 @@ See also: TELLHISTORY
 #
 SCORE
 
-Usage: score
+Usage:  score
 
 The score command provides you all the important information about your
 character, including health and attributes.
 
 Your class is determined by your top two skills, and you first receive a class
-when both of these skills are past 75. The levels shown are your skill level,
-your gear level, and your total between the two.
+when both of these skills are past 75. The level shown on score is your total
+level, with your skill level shown in parentheses.
 
 Conditions are displayed as:  Health: &g50&0/&g100&0+&g15&0/hr
 The first number (50) is your current health, the 100 is your maximum health,
