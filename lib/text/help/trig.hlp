@@ -26,36 +26,44 @@ See also: TRIG-COMMANDS, VARIABLES, EXPRESSIONS     =========================
 #d
 TRIGEDIT-COMMANDS TRIG-COMMANDS TRIGGER-COMMANDS TRIGEDIT-COMMANDLISTS
  
-| Script Commands  |  Mobile Commands  |  Object Commands  |   Room Commands  |
- =============================================================================
-|   * (comment)    |      %send%       |      %send%       |      %send%      |
-|       nop        |      %echo%       |      %echo%       |      %echo%      |
-|     attach       |   %echoaround%    |   %echoaround%    |   %echoaround%   |
-|     global       |      %door%       |      %door%       |      %door%      |
-|     context      |     %force%       |     %force%       |     %force%      |
-|      eval        |      %load%       |      %load%       |      %load%      |
-|       set        |     %purge%       |     %purge%       |     %purge%      |
-|      unset       |    %teleport%     |    %teleport%     |    %teleport%    |
-|     detach       |     %damage%      |     %damage%      |     %damage%     |
-|     extract      |  %buildingecho%   |  %buildingecho%   |  %buildingecho%  |
-|                  |   %regionecho%    |   %regionecho%    |   %regionecho%   |
-|       if         |     %asound%      |     %asound%      |     %asound%     |
-|      halt        |     dg_affect     |     dg_affect     |     dg_affect    |
-|      wait        |      dg_cast      |      dg_cast      |      dg_cast     |
-|     makeuid      |       %at%        |       %at%        |       %at%       |
-|     rdelete      |    %transform%    |    %transform%    |      %scale%     |
-|      remote      |       mhunt       |      otimer       |==================|
-|      return      |     mremember     |     osetval       |
-|      switch      |      mforget      |     %scale%       |
-|       case       |       %goto%      |===================|
-|      break       |       mkill       |
-|      done        |       %junk%      | Further help can be accessed by
-|      while       |      %follow%     | typing: HELP <COMMAND>.
-|                  |       %aoe%       |
-|                  |       %dot%       |
-|                  |      %scale%      |
-=======================================|
+| Script Commands |  Mobile Commands    |  Object Commands |   Room Commands  |
+ ==============================================================================
+|  * (comment)    |      %send%         |      %send%      |      %send%      |
+|      nop        |      %echo%         |      %echo%      |      %echo%      |
+|    attach       |   %echoaround%      |   %echoaround%   |   %echoaround%   |
+|    global       |      %door%         |      %door%      |      %door%      |
+|    context      |     %force%         |     %force%      |     %force%      |
+|     eval        |      %load%         |      %load%      |      %load%      |
+|      set        |     %purge%         |     %purge%      |     %purge%      |
+|     unset       |    %teleport%       |    %teleport%    |    %teleport%    |
+|    detach       |     %damage%        |     %damage%     |     %damage%     |
+|    extract      |  %buildingecho%     |  %buildingecho%  |  %buildingecho%  |
+|                 |   %regionecho%      |   %regionecho%   |   %regionecho%   |
+|      if         |     %asound%        |     %asound%     |     %asound%     |
+|     halt        |     dg_affect       |     dg_affect    |     dg_affect    |
+|     wait        |      dg_cast        |      dg_cast     |      dg_cast     |
+|    makeuid      |       %at%          |       %at%       |       %at%       |
+|    rdelete      |    %transform%      |    %transform%   |      %scale%     |
+|     remote      |       mhunt         |      otimer      |%adventurecomplete%
+|     return      |     mremember       |     osetval      |==================|
+|     switch      |      mforget        |     %scale%         |
+|      case       |       %goto%        | %adventurecomplete% |
+|     break       |       mkill         |=====================|
+|     done        |       %junk%        |
+|     while       |      %follow%       | Further help can be accessed by
+|                 |       %aoe%         | typing: HELP <COMMAND>.
+|                 |       %dot%         |
+|                 |      %scale%        |
+|                 | %adventurecomplete% |
+========================================|
 See also: TRIG-TYPES, VARIABLES, EXPRESSIONS
+#d
+%ADVENTURECOMPLETE% MADVENTURECOMPLETE OADVENTURECOMPLETE WADVENTURECOMPLETE
+
+Usage:  %adventurecomplete%
+
+This script command triggers completion on the adventure instance, which will
+clean it up (delete the instance) next time it's empty.
 #d
 %DAMAGE% ODAMAGE MDAMAGE WDAMAGE
 
