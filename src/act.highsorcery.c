@@ -381,20 +381,31 @@ INTERACTION_FUNC(devastate_crop) {
 
 
 /**
+* Name matching for enchantments, preferring exact matches first.
+*
 * @param char_data *ch the player, to check abilities
 * @param char *name enchantment name to find
 * @return int enchant_data position, or NOTHING for not found
 */
 int find_enchant_by_name(char_data *ch, char *name) {
-	int iter, found = NOTHING;
+	int iter, exact = NOTHING, partial = NOTHING;
 	
-	for (iter = 0; *enchant_data[iter].name != '\n' && found == NOTHING; ++iter) {
-		if ((enchant_data[iter].ability == NO_ABIL || HAS_ABILITY(ch, enchant_data[iter].ability)) && is_abbrev(name, enchant_data[iter].name)) {
-			found = iter;
+	for (iter = 0; *enchant_data[iter].name != '\n' && exact == NOTHING; ++iter) {
+		if ((enchant_data[iter].ability == NO_ABIL || HAS_ABILITY(ch, enchant_data[iter].ability))) {
+			if (!str_cmp(name, enchant_data[iter].name)) {
+				exact = iter;
+			}
+			else if (is_abbrev(name, enchant_data[iter].name)) {
+				partial = iter;
+			}
 		}
 	}
 	
-	return found;
+	if (exact == NOTHING) {
+		exact = partial;
+	}
+	
+	return exact;
 }
 
 
