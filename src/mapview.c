@@ -189,7 +189,7 @@ char *get_room_description(room_data *room) {
 		strcat(desc, GET_BLD_DESC(GET_BUILDING(room)));
 	}
 	else if (GET_ROOM_TEMPLATE(room)) {
-		strcat(desc, GET_RMT_DESC(GET_ROOM_TEMPLATE(room)));
+		strcat(desc, NULLSAFE(GET_RMT_DESC(GET_ROOM_TEMPLATE(room))));
 	}
 	else
 		strcpy(desc, "");
