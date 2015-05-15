@@ -242,7 +242,7 @@ void send_char_pos(char_data *ch, int dam) {
 			break;
 		case POS_INCAP:
 			act("$n is incapacitated and will slowly die, if not aided.", TRUE, ch, 0, 0, TO_ROOM);
-			msg_to_char(ch, "You are incapacitated an will slowly die, if not aided.\r\n");
+			msg_to_char(ch, "You are incapacitated and will slowly die, if not aided.\r\n");
 			break;
 		case POS_STUNNED:
 			act("$n is stunned, but will probably regain consciousness again.", TRUE, ch, 0, 0, TO_ROOM);

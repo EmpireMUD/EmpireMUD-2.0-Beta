@@ -446,7 +446,7 @@ is a good way to see what level (or level range) an instance is scaled to.
 
 See also: ADVENTURE
 #
-LEVEL LEVELS "SKILL LEVELS" "GEAR LEVELS"
+LEVEL LEVELS "GEAR LEVELS"
 
 Unlike many games, where your skills and equipment are based on your level,
 EmpireMUD does it backwards. Your level is based on your skills and gear.
