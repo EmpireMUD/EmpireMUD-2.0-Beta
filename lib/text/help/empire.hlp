@@ -582,8 +582,8 @@ Grand Monuments (Empire ability)
 The Grand Monuments ability allows you to build the largest monuments.
 
 [^^] library  100 lumber, 40 nails, 48 blocks
- 3x3 hightemple  24 lumber, 8 nails, 48 blocks
- 4x4 pyramid  100 lumber, 40 nails, 200 blocks
+[||] hightemple  24 lumber, 8 nails, 48 blocks
+/^^\ pyramid  100 lumber, 40 nails, 200 blocks
 
 See also: BUILD, MONUMENTS
 #
