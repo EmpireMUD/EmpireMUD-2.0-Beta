@@ -142,7 +142,7 @@ void sub_write(char *arg, char_data *ch, byte find_invis, int targets) {
 			case '~':
 			case '|':
 			case '^':
-			case '&':
+			// case '&':	// removed this because it conflicts with color codes
 			case '*': {
 				/* get char_data, move to next token */
 				type[i] = *p;
