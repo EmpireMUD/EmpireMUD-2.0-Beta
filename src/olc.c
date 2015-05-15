@@ -38,6 +38,7 @@ OLC_MODULE(olc_display);
 OLC_MODULE(olc_edit);
 OLC_MODULE(olc_free);
 OLC_MODULE(olc_list);
+OLC_MODULE(olc_removeindev);
 OLC_MODULE(olc_save);
 OLC_MODULE(olc_search);
 OLC_MODULE(olc_set_flags);
@@ -271,6 +272,7 @@ const struct olc_command_data olc_data[] = {
 	{ "search", olc_search, OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ROOM_TEMPLATE, NOBITS },
 	
 	// admin
+	{ "removeindev", olc_removeindev, NOBITS, NOBITS },
 	{ "setflags", olc_set_flags, NOBITS, NOBITS },
 	{ "setminvnum", olc_set_min_vnum, NOBITS, NOBITS },
 	{ "setmaxvnum", olc_set_max_vnum, NOBITS, NOBITS },
@@ -1489,6 +1491,92 @@ OLC_MODULE(olc_list) {
 		}
 		else {
 			msg_to_char(ch, "Found no %ss in that range.\r\n", buf2);
+		}
+	}
+}
+
+
+OLC_MODULE(olc_removeindev) {
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+	any_vnum from = NOTHING, to = NOTHING;
+	bool use_adv = FALSE, any = FALSE;
+	craft_data *craft, *next_craft;
+	adv_data *adv = NULL;
+	int iter;
+	
+	// allow - or : as vnum separators
+	for (iter = 0; iter < strlen(argument); ++iter) {
+		if (argument[iter] == '-' || argument[iter] == ':') {
+			argument[iter] = ' ';
+		}
+	}
+	
+	// 2nd arg optional
+	two_arguments(argument, arg1, arg2);
+	use_adv = (*arg2 ? FALSE : TRUE);
+	
+	if (GET_ACCESS_LEVEL(ch) < LVL_UNRESTRICTED_BUILDER && !IS_GRANTED(ch, GRANT_OLC_CONTROLS) && !OLC_FLAGGED(ch, OLC_FLAG_ALL_VNUMS)) {
+		msg_to_char(ch, "You must be level %d to do that.\r\n", LVL_UNRESTRICTED_BUILDER);
+	}
+	else if (!*arg1 || !isdigit(*arg1) || (*arg2 && !isdigit(*arg2))) {
+		msg_to_char(ch, "Usage: .removeindev <adventure vnum | vnum range>\r\n");
+	}
+	else if ((from = atoi(arg1)) < 0) {
+		msg_to_char(ch, "Invalid vnum '%s'.\r\n", arg1);
+	}
+	else if (*arg2 && (to = atoi(arg2)) < 0) {
+		msg_to_char(ch, "Invalid vnum '%s'.\r\n", arg2);
+	}
+	else if (use_adv && !(adv = adventure_proto(from))) {
+		msg_to_char(ch, "Unknown adventure vnum '%s'.\r\n", arg1);
+	}
+	else if (use_adv && !player_can_olc_edit(ch, OLC_ADVENTURE, from)) {
+		msg_to_char(ch, "You don't have permission to edit that adventure.\r\n");
+	}
+	else if (!use_adv && !player_can_olc_edit(ch, OLC_CRAFT, from) && !player_can_olc_edit(ch, OLC_CRAFT, to)) {
+		msg_to_char(ch, "You don't have permission to edit that vnum range.\r\n");
+	}
+	else {
+		any = FALSE;
+		
+		if (use_adv && adv && ADVENTURE_FLAGGED(adv, ADV_IN_DEVELOPMENT) && player_can_olc_edit(ch, OLC_ADVENTURE, GET_ADV_VNUM(adv))) {
+			REMOVE_BIT(GET_ADV_FLAGS(adv), ADV_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_ADV, GET_ADV_VNUM(adv));
+			msg_to_char(ch, "Removed IN-DEV flag from adventure [%d] %s.\r\n", GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
+			any = TRUE;
+		}
+		
+		// prepare to iterate
+		if (use_adv && adv) {
+			from = GET_ADV_START_VNUM(adv);
+			to = GET_ADV_END_VNUM(adv);
+		}
+		
+		HASH_ITER(hh, craft_table, craft, next_craft) {
+			if (GET_CRAFT_VNUM(craft) < from || GET_CRAFT_VNUM(craft) > to) {
+				continue;
+			}
+			if (!CRAFT_FLAGGED(craft, CRAFT_IN_DEVELOPMENT)) {
+				continue;
+			}
+			if (!player_can_olc_edit(ch, OLC_CRAFT, GET_CRAFT_VNUM(craft))) {
+				continue;
+			}
+			
+			REMOVE_BIT(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_CRAFT, GET_CRAFT_VNUM(craft));
+			msg_to_char(ch, "Removed IN-DEV flag from craft [%d] %s.\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
+			any = TRUE;
+		}
+		
+		if (!any) {
+			msg_to_char(ch, "No in-development flags to remove.\r\n");
+		}
+		else if (use_adv && adv) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s removed in-development flags for adventure [%d] %s", GET_NAME(ch), GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
+		}
+		else {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s removed in-development flags for vnums %d-%d", GET_NAME(ch), from, to);
 		}
 	}
 }

@@ -305,7 +305,7 @@ The following adventure flags are available:
  ROTATABLE - Each instance will have a random orientation (whole zone rotates).
  CONFUSING-RANDOMS - The instancer will not logically match random exits.
 
-See also: OLC ADVENTURES
+See also: OLC ADVENTURES, OLC REMOVEINDEV
 #d
 "ADVEDIT LIMIT" "INSTANCE LIMIT"
 
@@ -1003,7 +1003,7 @@ Available flags:
     to be dismantled, but not built; it won't show up in the build list
  IN-CITY-ONLY - a craft or building can only be made in a city radius
 
-See also: CEDIT TYPE, OLC CRAFTS
+See also: CEDIT TYPE, OLC CRAFTS, OLC REMOVEINDEV
 #d
 "CEDIT LIQUID"
 
@@ -2414,7 +2414,7 @@ Example:
 
 For notes on the mud's building rules, see HELP BUILDING GUIDE.
 
-See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE, OLC REMOVEINDEV
 #d
 "OLC BUILDINGS" BEDIT
 
@@ -2624,6 +2624,17 @@ Example:
 For notes on the mud's building rules, see HELP BUILDING GUIDE.
 
 See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
+"OLC REMOVEINDEVELOPMENT" REMOVEINDEV "OLC REMOVE IN-DEVELOPMENT"
+
+Usage:  .removeindev <adventure vnum>
+        .removeindev <from vnum>-<to vnum>
+
+This command removes the IN-DEVELOPMENT flag from an adventure and any craft
+recipes in it, or from craft recipes over a given vnum range. It can be used
+to quickly activate a zone.
+
+See also: OLC CONTROLS, OLC ADVENTURES, ADVEDIT FLAGS, CEDIT FLAGS
 #d
 "OLC ROOM TEMPLATES" "OLC ROOMTEMPLATES" "OLC ROOMS" REDIT
 
