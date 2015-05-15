@@ -907,7 +907,7 @@ ACMD(do_rejuvenate) {
 		charge_ability_cost(ch, MANA, cost, COOLDOWN_REJUVENATE, 15);
 		
 		if (ch == vict) {
-			msg_to_char(ch, "You surround yourself white bright white mana of rejuvenation.\r\n");
+			msg_to_char(ch, "You surround yourself with the bright white mana of rejuvenation.\r\n");
 			act("$n surrounds $mself with the bright white mana of rejuvenation.", TRUE, ch, NULL, NULL, TO_ROOM);
 		}
 		else {

@@ -170,6 +170,15 @@ many buildings.
 
 See also: CHOP, SAW
 #
+NAILS "POUCH OF NAILS"
+
+Nails (resource)
+
+You can create nails at the forge, from iron ingots. Nails are used for many
+buildings.
+
+See also: FORGE, MAINTAIN
+#
 RETRIEVE
 
 Usage:  retrieve <item>

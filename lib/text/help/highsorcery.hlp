@@ -301,7 +301,8 @@ Usage:  ritual teleportation [target]
 Cooldown:  15 minutes (teleport home only)
 
 With the basic teleportation ability, you can teleport at random (2 to 7 map
-tiles in any direction) or you can teleport to your home.
+tiles in any direction) or you can teleport to your home. You won't be able to
+teleport out of (or into) any room owned by a non-allied empire.
 
 This ability levels up High Sorcery any time you teleport.
 
@@ -353,14 +354,14 @@ them.
 
 Staffmaking:
   staff  1 log, 5 fiveleaf
-  wanderer staff  1 log, 5 lightning stones  +25 moves
-  sorcerer staff  1 log, 5 blue irises  +1 mana regen
-  staff of wisdom  1 log, 5 glowing seashells  +1 intelligence
+  wanderer staff  1 log, 5 lightning stones  (move points)
+  sorcerer staff  1 log, 5 blue irises  (mana regen)
+  staff of wisdom  1 log, 5 glowing seashells  (intelligence)
 
 Powerful Staves:
-  staff of lightning  1 log, 10 lightning stones, 5 nocturnium ingots  +2 wits, +1 int
-  burning staff  1 log, 10 blue irises, 5 nocturnium ingots  +25 mana, +1 mana regen
-  staff of agony  1 log, 10 bloodstones, 5 nocturnium ingots  +20 to-hit, +1 health regen
+  staff of lightning  1 log, 10 lightning stones, 5 nocturnium ingots  (wits)
+  burning staff  1 log, 10 blue irises, 5 nocturnium ingots  (mana)
+  staff of agony  1 log, 10 bloodstones, 5 nocturnium ingots  (to-hit)
 
 Gain skill by crafting staves.
 #

@@ -1454,7 +1454,35 @@ if it was using a weapon of that type.
 
 For humans with no weapon, use #16 hit.
 
-For animals, use #10 bite, #11 claw, #12 kick, or #16 hit.
+The following attack types are available:
+ 1. RESERVED - do not use
+ 2. slash - sword
+ 3. slice - axe
+ 4. jab - rapier
+ 5. stab - dagger
+ 6. pound - rock
+ 7. hammer - hammer
+ 8. whip - whip weapon or tentacle-whip
+ 9. pick - as for mining
+10. bite - animals
+11. claw - fist weapons; also used by animals
+12. kick - animals
+13. fire - physical fire like a torch
+14. vampire claws
+15. crush - animals or giants
+16. hit - normal punching (no weapon)
+17. magic fire - fireball
+18. lightning staff
+19. burn staff
+20. agony staff
+21. magic frost - chill
+22. magic shock - shock
+23. magic light - flash
+24. sting - animals
+25. swipe - animals, giants, etc
+26. tail swipe - animals
+27. peck - animals
+28. gore - animals
 
 See also: OLC MOBILES
 #d

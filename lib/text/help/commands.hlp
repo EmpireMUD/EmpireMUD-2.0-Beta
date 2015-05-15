@@ -699,7 +699,7 @@ See also: EMPIRE, ROADSIGN
 #
 LOAD BOATLOAD "BOAT LOAD"
 
-Usage:  load <item> <ship>
+Usage:  load <ship> <item>
 
 This command allows you to load items onto a ship. You can only do this at the
 docks.

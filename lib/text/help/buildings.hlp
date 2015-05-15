@@ -363,9 +363,7 @@ GUARDTOWER "GUARD TOWERS" "ADVANCED GUARD TOWER" "UPGRADED GUARD TOWER" "SUPERIO
 Built on:  plains, desert
 
 Guard towers are defensive structures that automatically shoot at foes within
-range. These are often an empire's first line of defense against intruders. A
-fort or great house is equivalent in range and ability to a superior tower.
-
+range. These are often an empire's first line of defense against intruders.
 Guard towers may only be built inside cities.
 
 If your empire's disposition is set to "Friendly", towers will only shoot at
@@ -374,11 +372,10 @@ they will shoot at anyone you're not at peace (or better) with.
 
 Guard towers periodically shoot at any hostile player, as well as any animal
 that is leading a catapult. Advanced and Superior towers do increasingly larger
-amounts of damage. Forts do the same amount of damage as a regular guard tower.
+amounts of damage.
 
-Regular guard towers have a range of 2 tiles. All other guard towers and forts
-have a range of 3 tiles. In the case of forts, this distance is measured from
-the entrance.
+Regular guard towers have a range of 2 tiles. All other guard towers have a
+range of 3 tiles.
 
 Towers can fire over walls and buildings, but won't fire into mountains at all,
 and won't shoot into overgrown forests (&g^^^^&0) unless it is into tile
@@ -390,7 +387,7 @@ Guard towers do not block players from circling around them. For optimum
 protection, build lines of wall-tower-wall-tower-wall. The walls block the
 circle command.
 
-See also: CIRCLE, RAISE ARMIES, ADVANCED TACTICS, FORT
+See also: CIRCLE, RAISE ARMIES, ADVANCED TACTICS
 #
 HENGE "STONE HENGE"
 

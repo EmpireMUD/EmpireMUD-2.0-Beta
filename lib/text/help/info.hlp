@@ -194,6 +194,34 @@ Available traits:
  Larger inventory - Carry 5 more small items (or 2 more large items)
  Faster walking - Half the lag from normal walking
 #
+BONUS-HEALING "BONUS HEALING" "HEALING ATTRIBUTE" "HEALING TRAIT"
+
+The BONUS-HEALING gear stat, also shown on your score page as "Healing +X",
+is an amount added to any healing abilities you use. This is similar to the
+way Intelligence is added to healing.
+
+See also: SCORE
+#
+BONUS-MAGICAL "BONUS MAGICAL" "MAGICAL ATTRIBUTE" "MAGICAL TRAIT"
+
+The BONUS-MAGICAL gear stat, also shown on your score page as "Magical +X",
+is an amount added to any magical damage you deal, including Intelligence-based
+melee attacks (like Ready Fireball) and spells.
+
+It is added to damage in the same way as Intelligence.
+
+See also: SCORE
+#
+BONUS-PHYSICAL "BONUS PHYSICAL" "PHYSICAL ATTRIBUTE" "PHYSICAL TRAIT"
+
+The BONUS-PHYSICAL gear stat, also shown on your score page as "Physical +X",
+is an amount added to any physical damage you deal. This includes melee combat
+and physical abilities.
+
+It is added to damage in the same way as Strength.
+
+See also: SCORE
+#
 "CAMPING FIRE" "COOKING FIRE" "CAMP FIRE"
 
 You can create a cooking fire by lighting a tree or log, using a flint set.
