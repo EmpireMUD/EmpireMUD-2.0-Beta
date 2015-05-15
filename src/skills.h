@@ -329,7 +329,7 @@ extern bool skill_check(char_data *ch, int ability, int difficulty);
 #define ABIL_HERB_GARDENS  200
 #define ABIL_SKILLED_LABOR  201
 #define ABIL_FINE_POTTERY  202
-#define ABIL_MASTER_POTTER  203
+#define ABIL_MASTER_CRAFTSMAN  203
 #define ABIL_MASTER_FARMER  204
 #define ABIL_MASTER_SURVIVALIST  205
 #define ABIL_TUNNEL  206

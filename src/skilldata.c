@@ -250,7 +250,7 @@ void init_skills() {
 		setup_ability(ABIL_BASIC_CRAFTS, SKILL_TRADE, 1, NO_PREREQ, "Basic Crafts");
 			setup_ability(ABIL_POTTERY, SKILL_TRADE, 10, ABIL_BASIC_CRAFTS, "Pottery");
 				setup_ability(ABIL_FINE_POTTERY, SKILL_TRADE, 50, ABIL_POTTERY, "Fine Pottery");
-					setup_ability(ABIL_MASTER_POTTER, SKILL_TRADE, 85, ABIL_FINE_POTTERY, "Master Potter");
+					setup_ability(ABIL_MASTER_CRAFTSMAN, SKILL_TRADE, 85, ABIL_FINE_POTTERY, "Master Craftsman");
 			setup_ability(ABIL_WOODWORKING, SKILL_TRADE, 15, ABIL_BASIC_CRAFTS, "Woodworking");
 				setup_ability(ABIL_ADVANCED_WOODWORKING, SKILL_TRADE, 40, ABIL_WOODWORKING, "Advanced Woodworking");
 					setup_ability(ABIL_SIEGEWORKS, SKILL_TRADE, 55, ABIL_ADVANCED_WOODWORKING, "Siegeworks");
