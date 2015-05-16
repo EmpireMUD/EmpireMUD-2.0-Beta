@@ -727,7 +727,7 @@ INTERACTION_FUNC(one_dig_chore) {
 
 void do_chore_digging(empire_data *emp, room_data *room) {	
 	char_data *worker = find_mob_in_room_by_vnum(room, chore_data[CHORE_DIGGING].mob);
-	bool depleted = (get_depletion(room, DPLTN_DIG) >= (ROOM_BLD_FLAGGED(room, BLD_HIGH_DEPLETION) ? config_get_int("high_depletion") : config_get_int("common_depletion"))) ? TRUE : FALSE;
+	bool depleted = (get_depletion(room, DPLTN_DIG) >= DEPLETION_LIMIT(room)) ? TRUE : FALSE;
 	bool can_do = !depleted && can_gain_chore_resource_from_interaction(emp, room, INTERACT_DIG);
 	bool junk;
 	
@@ -1123,7 +1123,7 @@ void do_chore_nailmaking(empire_data *emp, room_data *room) {
 
 void do_chore_quarrying(empire_data *emp, room_data *room) {
 	char_data *worker = find_mob_in_room_by_vnum(room, chore_data[CHORE_QUARRYING].mob);
-	bool depleted = (get_depletion(room, DPLTN_QUARRY) >= (ROOM_BLD_FLAGGED(room, BLD_HIGH_DEPLETION) ? config_get_int("high_depletion") : config_get_int("common_depletion"))) ? TRUE : FALSE;
+	bool depleted = (get_depletion(room, DPLTN_QUARRY) >= config_get_int("common_depletion")) ? TRUE : FALSE;
 	bool can_do = !depleted && can_gain_chore_resource(emp, room, o_STONE_BLOCK);
 	
 	if (worker && can_do) {

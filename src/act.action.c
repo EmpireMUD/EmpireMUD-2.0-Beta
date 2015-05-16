@@ -491,7 +491,7 @@ INTERACTION_FUNC(finish_digging) {
 	}
 	
 	// depleted? (uses rock for all types except clay)
-	if (get_depletion(inter_room, DPLTN_DIG) >= (ROOM_BLD_FLAGGED(inter_room, BLD_HIGH_DEPLETION) ? config_get_int("high_depletion") : config_get_int("common_depletion"))) {
+	if (get_depletion(inter_room, DPLTN_DIG) >= DEPLETION_LIMIT(inter_room)) {
 		msg_to_char(ch, "The ground is too hard and there doesn't seem to be anything useful to dig up here.\r\n");
 	}
 	else {
@@ -989,7 +989,7 @@ void process_digging(char_data *ch) {
 		
 			// character is still there and not digging?
 			if (GET_ACTION(ch) == ACT_NONE && in_room == IN_ROOM(ch)) {
-				if (get_depletion(IN_ROOM(ch), DPLTN_DIG) < (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_HIGH_DEPLETION) ? config_get_int("high_depletion") : config_get_int("common_depletion"))) {
+				if (get_depletion(IN_ROOM(ch), DPLTN_DIG) < DEPLETION_LIMIT(IN_ROOM(ch))) {
 					start_digging(ch);
 				}
 			}
@@ -1190,7 +1190,7 @@ void process_fishing(char_data *ch) {
 			}
 		}
 	}
-	else if (get_depletion(IN_ROOM(ch), DPLTN_FISH) >= config_get_int("common_depletion")) {
+	else if (get_depletion(IN_ROOM(ch), DPLTN_FISH) >= DEPLETION_LIMIT(IN_ROOM(ch))) {
 		msg_to_char(ch, "You just don't seem to be able to catch anything here.\r\n");
 		GET_ACTION(ch) = ACT_NONE;
 	}
