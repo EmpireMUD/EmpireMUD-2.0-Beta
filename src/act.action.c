@@ -2009,7 +2009,10 @@ void process_weaving(char_data *ch) {
 //// ACTION COMMANDS /////////////////////////////////////////////////////////
 
 ACMD(do_bathe) {
-	if (GET_ACTION(ch) == ACT_BATHING) {
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "NPCs cannot bathe. It's dirty, but it's true.\r\n");
+	}
+	else if (GET_ACTION(ch) == ACT_BATHING) {
 		msg_to_char(ch, "You stop bathing and climb out of the water.\r\n");
 		cancel_action(ch);
 	}
