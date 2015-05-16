@@ -1096,7 +1096,7 @@ ACMD(do_reforge) {
 
 ACMD(do_weave) {
 	int type = NOTHING, iter = 0;
-	bool this_line;
+	bool this_line, any;
 	
 	one_argument(argument, arg);
 
@@ -1119,7 +1119,7 @@ ACMD(do_weave) {
 	}
 	else if (!*arg || type == NOTHING) {
 		msg_to_char(ch, "You can weave:\r\n");
-		this_line = FALSE;
+		this_line = any = FALSE;
 		for (iter = 0; *weave_data[iter].name != '\n'; ++iter) {
 			if (*weave_data[iter].name == '\t') {
 				if (this_line) {
@@ -1130,7 +1130,12 @@ ACMD(do_weave) {
 			else if (weave_data[iter].ability == NO_ABIL || HAS_ABILITY(ch, weave_data[iter].ability)) {
 				msg_to_char(ch, "%s%s", (this_line ? ", " : " "), weave_data[iter].name);
 				this_line = TRUE;
+				any = TRUE;
 			}
+		}
+		
+		if (!any) {
+			msg_to_char(ch, " nothing");
 		}
 		
 		if (this_line) {
