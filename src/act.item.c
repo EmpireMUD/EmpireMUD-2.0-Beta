@@ -962,6 +962,11 @@ static void perform_give(char_data *ch, char_data *vict, obj_data *obj) {
 		return;
 	}
 	
+	if (IS_NPC(vict) && AFF_FLAGGED(vict, AFF_CHARM)) {
+		msg_to_char(ch, "You cannot give items to charmed NPCs.\r\n");
+		return;
+	}
+	
 	if (!bind_ok(obj, vict)) {
 		act("$p: item is bound.", FALSE, ch, obj, vict, TO_CHAR);
 		return;
