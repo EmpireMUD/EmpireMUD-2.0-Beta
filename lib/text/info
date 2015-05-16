@@ -81,6 +81,8 @@ Additional Utilities:
   MAPSIZE - Change the size of your game map.
   NEARBY - See cities, adventures, and starting locations near you.
   ADVENTURE - Shows information about any adventure you come across.
+  CONSIDER - Tells you how hard an enemy will be to fight.
+  IDENTIFY - Tells you how good an item is, and where it's stored.
 
    To conclude this guide, it is always a good idea to simply ask if you do
 not know how to do something. Really a common question it seems is, "What
