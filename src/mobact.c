@@ -408,7 +408,7 @@ bool mob_can_move_to_sect(char_data *mob, room_data *to_room) {
 	else if (move_type == MOB_MOVE_FLY || AFF_FLAGGED(mob, AFF_FLY)) {
 		ok = TRUE;
 	}
-	else if (ROOM_BLD_FLAGGED(to_room, BLD_NO_NPC)) {
+	else if (ROOM_BLD_FLAGGED(to_room, BLD_NO_NPC) && IS_COMPLETE(to_room)) {
 		// nope
 		ok = FALSE;
 	}
@@ -458,7 +458,7 @@ bool validate_mobile_move(char_data *ch, int dir, room_data *to_room) {
 	bool valid = TRUE;
 	
 	// !mob room
-	if (valid && (RMT_FLAGGED(to_room, RMT_NO_MOB) || ROOM_BLD_FLAGGED(to_room, BLD_NO_NPC))) {
+	if (valid && (RMT_FLAGGED(to_room, RMT_NO_MOB) || (IS_COMPLETE(to_room) && ROOM_BLD_FLAGGED(to_room, BLD_NO_NPC)))) {
 		valid = FALSE;
 	}
 	
