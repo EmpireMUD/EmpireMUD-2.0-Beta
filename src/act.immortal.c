@@ -1625,8 +1625,9 @@ SHOW(show_rent) {
 
 
 SHOW(show_stats) {
-	extern int get_total_score(empire_data *emp);
+	void update_account_stats();
 	extern int buf_switches, buf_largecount, buf_overflows;
+	extern int total_accounts, active_accounts, active_accounts_week;
 	
 	int num_active_empires = 0, num_objs = 0, num_mobs = 0, num_players = 0, num_descs = 0, menu_count = 0;
 	empire_data *emp, *next_emp;
@@ -1661,14 +1662,18 @@ SHOW(show_stats) {
 
 	// count active empires
 	HASH_ITER(hh, empire_table, emp, next_emp) {
-		if (get_total_score(emp) > 0) {
+		if (EMPIRE_MEMBERS(emp) > 0) {
 			++num_active_empires;
 		}
 	}
+	
+	update_account_stats();
 
 	msg_to_char(ch, "Current stats:\r\n");
 	msg_to_char(ch, "  %6d players in game  %6d connected\r\n", num_players, num_descs);
 	msg_to_char(ch, "  %6d registered       %6d at menus\r\n", top_of_p_table + 1, menu_count);
+	msg_to_char(ch, "  %6d player accounts  %6d active accounts\r\n", total_accounts, active_accounts);
+	msg_to_char(ch, "  %6d accounts logged in this week\r\n", active_accounts_week);
 	msg_to_char(ch, "  %6d empires          %6d active\r\n", HASH_COUNT(empire_table), num_active_empires);
 	msg_to_char(ch, "  %6d mobiles          %6d prototypes\r\n", num_mobs, HASH_COUNT(mobile_table));
 	msg_to_char(ch, "  %6d objects          %6d prototypes\r\n", num_objs, HASH_COUNT(object_table));
