@@ -295,8 +295,8 @@ int valid_dg_target(char_data *ch, int bitvector);
 /* mob id's: MOB_ID_BASE to ROOM_ID_BASE - 1      */
 /* room id's: ROOM_ID_BASE to OBJ_ID_BASE - 1    */
 /* object id's: OBJ_ID_BASE and higher           */
-#define MOB_ID_BASE	  1000000  /* 1000000 player IDNUMS should suffice */
-#define ROOM_ID_BASE    (1000000 + MOB_ID_BASE) /* 1000000 Mobs */
+#define MOB_ID_BASE	  10000000  /* 10000000 player IDNUMS should suffice */
+#define ROOM_ID_BASE    (10000000 + MOB_ID_BASE) /* 10000000 Mobs */
 #define OBJ_ID_BASE     ((MAP_SIZE * 5) + ROOM_ID_BASE) /* Lots o' Rooms */
 
 #define SCRIPT(o)		  ((o)->script)
