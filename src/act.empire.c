@@ -278,7 +278,7 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 	struct empire_storage_data *store;
 	obj_data *proto = NULL;
 	size_t lsize, size;
-	bool all = FALSE;
+	bool all = FALSE, any = FALSE;
 	
 	if (!ch->desc) {
 		return;
@@ -328,12 +328,6 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 		}
 	}
 	
-	// did we find anything at all?
-	if (!list) {
-		msg_to_char(ch, (*argument ? "Nothing by that name found.\r\n" : "No empire inventory found.\r\n"));
-		return;
-	}
-	
 	// build output
 	size = snprintf(output, sizeof(output), "Inventory of %s%s&0 on this island:\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 	
@@ -351,12 +345,17 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 			if (size + lsize < sizeof(output)) {
 				size += lsize;
 				strcat(output, line);
+				any = TRUE;
 			}
 		}
 		
 		// clean up either way
 		HASH_DEL(list, einv);
 		free(einv);
+	}
+	
+	if (!any) {
+		size += snprintf(output + size, sizeof(output) - size, " nothing\r\n");
 	}
 	
 	page_string(ch->desc, output, TRUE);
