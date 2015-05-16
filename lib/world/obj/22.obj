@@ -259,4 +259,29 @@ The rawhide whip is firm and strong.
 C
 0 0
 S
+#2219
+hammer iron smith's~
+an iron hammer~
+An iron smith's hammer is lying here.~
+   The hammer looks like it would be good for forging. Or, in a pinch, it would
+do in battle.
+~
+1 hmo ano
+0 1 6
+2 0
+C
+0 0
+S
+#2220
+shovel iron~
+an iron shovel~
+A shovel is stamped into the ground.~
+A shovel helps you dig or excavate faster.
+~
+1 ehm ano
+0 1 5
+2 0
+C
+0 0
+S
 $
