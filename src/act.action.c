@@ -908,7 +908,7 @@ void process_chop(char_data *ch) {
 			break;
 		}
 
-		add_to_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CHOP_PROGRESS, -1 * (GET_STRENGTH(ch) + get_base_dps(GET_EQ(ch, WEAR_WIELD))));
+		add_to_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CHOP_PROGRESS, -1 * (GET_STRENGTH(ch) + 1.5 * get_base_dps(GET_EQ(ch, WEAR_WIELD))));
 		act("You swing $p hard into the tree!", FALSE, ch, GET_EQ(ch, WEAR_WIELD), 0, TO_CHAR | TO_SPAMMY);
 		act("$n swings $p hard into the tree!", FALSE, ch, GET_EQ(ch, WEAR_WIELD), 0, TO_ROOM | TO_SPAMMY);
 
@@ -1355,7 +1355,7 @@ void process_mining(char_data *ch) {
 			break;
 		}
 
-		GET_ACTION_TIMER(ch) -= GET_STRENGTH(ch) + get_base_dps(GET_EQ(ch, WEAR_WIELD));
+		GET_ACTION_TIMER(ch) -= GET_STRENGTH(ch) + 1.5 * get_base_dps(GET_EQ(ch, WEAR_WIELD));
 
 		act("You pick at the walls with $p, looking for ore.", FALSE, ch, GET_EQ(ch, WEAR_WIELD), 0, TO_CHAR | TO_SPAMMY);
 		act("$n picks at the walls with $p, looking for ore.", FALSE, ch, GET_EQ(ch, WEAR_WIELD), 0, TO_ROOM | TO_SPAMMY);
