@@ -3114,14 +3114,24 @@ void expand_mob_tags(char_data *mob) {
 		player = is_playing(tag->idnum);
 		
 		if (player) {
+			// re-add existing player
 			if (!find_id_in_tag_list(GET_IDNUM(player), new_list)) {
 				add_mob_tag(GET_IDNUM(player), &new_list);
 			}
+			
+			// check player's group
 			if (GROUP(player)) {
 				for (mem = GROUP(player)->members; mem; mem = mem->next) {
-					if (!IS_NPC(mem->member) && !find_id_in_tag_list(GET_IDNUM(mem->member), new_list)) {
-						add_mob_tag(GET_IDNUM(mem->member), &new_list);
+					if (IS_NPC(mem->member) || find_id_in_tag_list(GET_IDNUM(mem->member), new_list)) {
+						continue;
 					}
+					
+					// check proximity (only if present)
+					if (IN_ROOM(mem->member) != IN_ROOM(mob)) {
+						continue;
+					}
+					
+					add_mob_tag(GET_IDNUM(mem->member), &new_list);
 				}
 			}
 		}
@@ -3169,9 +3179,16 @@ void tag_mob(char_data *mob, char_data *player) {
 	if (GROUP(player)) {
 		// tag for whole group
 		for (mem = GROUP(player)->members; mem; mem = mem->next) {
-			if (!IS_NPC(mem->member)) {
-				add_mob_tag(GET_IDNUM(mem->member), &MOB_TAGGED_BY(mob));
+			if (IS_NPC(mem->member)) {
+				continue;
 			}
+			
+			// check proximity (must be present)
+			if (IN_ROOM(mem->member) != IN_ROOM(mob)) {
+				continue;
+			}
+			
+			add_mob_tag(GET_IDNUM(mem->member), &MOB_TAGGED_BY(mob));
 		}
 	}
 	else {
