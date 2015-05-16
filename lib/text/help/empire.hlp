@@ -176,6 +176,11 @@ don't claim it yourself.
 You can get additional city points from accruing at least 4000 wealth, for
 achieving Prominence, and for having at least 10 technologies.
 
+EmpireMUD periodically checks if cities are completely empty and, if so,
+will remove the city center and refund the city point. This helps keep the map
+clean, and you can prevent it by making sure there is at least one building in
+your city.
+
 - &ccity list&0: This lists the cities already established in the empire, as well
     as how many city points are available to spend. Immortals can specify an
     empire to list all of its cities.
