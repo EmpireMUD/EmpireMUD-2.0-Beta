@@ -256,16 +256,36 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 }
 
 
-// called by do_empire_inventory
+/**
+* called by do_empire_inventory to show einv
+*
+* @param char_data *ch The player requesting the einv.
+* @param empire_data *emp The empire whose inventory to show.
+* @param char *argument The requested inventory item, if any.
+*/
 static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char *argument) {
 	void show_one_stored_item_to_char(char_data *ch, empire_data *emp, struct empire_storage_data *store, bool show_zero);
 	void sort_storage(empire_data *emp);
+	
+	// helper type
+	struct einv_type {
+		obj_vnum vnum;
+		int local;
+		int total;
+		UT_hash_handle hh;
+	};
 
-	bool found = FALSE;
+	char output[MAX_STRING_LENGTH*2], line[MAX_STRING_LENGTH];
+	struct einv_type *einv, *next_einv, *list = NULL;
+	obj_vnum vnum, last_vnum = NOTHING;
 	struct empire_storage_data *store;
-	obj_vnum last_vnum = NOTHING;
-	obj_data *proto;
+	obj_data *proto = NULL;
+	size_t lsize, size;
 	bool all = FALSE;
+	
+	if (!ch->desc) {
+		return;
+	}
 	
 	if (GET_ISLAND_ID(IN_ROOM(ch)) == NOTHING && !IS_IMMORTAL(ch)) {
 		msg_to_char(ch, "You can't check any empire inventory here.\r\n");
@@ -277,36 +297,72 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 		all = TRUE;
 	}
 	
-	msg_to_char(ch, "Inventory of %s%s&0 on this island:\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
-	
-	// sort first so it's in order to show
-	sort_storage(emp);
-	
+	// build list
 	for (store = EMPIRE_STORAGE(emp); store; store = store->next) {
-		if (store->vnum == last_vnum) {
+		// prototype lookup
+		if (store->vnum != last_vnum) {
+			proto = obj_proto(store->vnum);
+			last_vnum = store->vnum;
+		}
+		
+		if (!proto) {
 			continue;
 		}
 		
-		proto = obj_proto(store->vnum);
+		// argument given but doesn't match
+		if (*argument && !multi_isname(argument, GET_OBJ_KEYWORDS(proto))) {
+			continue;
+		}
 		
-		if (!*argument || multi_isname(argument, GET_OBJ_KEYWORDS(proto))) {
-			// unusual island check
-			if (store->island == GET_ISLAND_ID(IN_ROOM(ch)) || all || (*argument && !find_stored_resource(emp, GET_ISLAND_ID(IN_ROOM(ch)), store->vnum))) {
-				last_vnum = store->vnum;
-				show_one_stored_item_to_char(ch, emp, store, (store->island != GET_ISLAND_ID(IN_ROOM(ch))));
-				found = TRUE;
-			}
+		// ready to add
+		vnum = store->vnum;
+		HASH_FIND_INT(list, &vnum, einv);
+		if (!einv) {
+			CREATE(einv, struct einv_type, 1);
+			einv->vnum = vnum;
+			einv->local = einv->total = 0;
+			HASH_ADD_INT(list, vnum, einv);
+		}
+		
+		// add
+		einv->total += store->amount;
+		if (store->island == GET_ISLAND_ID(IN_ROOM(ch))) {
+			einv->local += store->amount;
 		}
 	}
 	
-	if (!found) {
-		if (!*argument) {
-			msg_to_char(ch, " Nothing.\r\n");
-		}
-		else {
-			msg_to_char(ch, " Nothing by that name\r\n");
-		}
+	// did we find anything at all?
+	if (!list) {
+		msg_to_char(ch, (*argument ? "Nothing by that name found.\r\n" : "No empire inventory found.\r\n"));
+		return;
 	}
+	
+	// build output
+	size = snprintf(output, sizeof(output), "Inventory of %s%s&0 on this island:\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+	
+	HASH_ITER(hh, list, einv, next_einv) {
+		// only display it if it's on the requested island, or if they requested it by name, or all
+		if (all || einv->local > 0 || *argument) {
+			if (einv->total > einv->local) {
+				lsize = snprintf(line, sizeof(line), "(%4d) %s (%d total)\r\n", einv->local, get_obj_name_by_proto(einv->vnum), einv->total);
+			}
+			else {
+				lsize = snprintf(line, sizeof(line), "(%4d) %s\r\n", einv->local, get_obj_name_by_proto(einv->vnum));
+			}
+			
+			// append if room
+			if (size + lsize < sizeof(output)) {
+				size += lsize;
+				strcat(output, line);
+			}
+		}
+		
+		// clean up either way
+		HASH_DEL(list, einv);
+		free(einv);
+	}
+	
+	page_string(ch->desc, output, TRUE);
 }
 
 
