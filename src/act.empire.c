@@ -264,9 +264,6 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 * @param char *argument The requested inventory item, if any.
 */
 static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char *argument) {
-	void show_one_stored_item_to_char(char_data *ch, empire_data *emp, struct empire_storage_data *store, bool show_zero);
-	void sort_storage(empire_data *emp);
-	
 	// helper type
 	struct einv_type {
 		obj_vnum vnum;
