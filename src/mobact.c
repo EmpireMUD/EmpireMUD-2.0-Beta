@@ -635,15 +635,28 @@ void mobile_activity(void) {
 		/* Aggressive Mobs */
 		if (!found && MOB_FLAGGED(ch, MOB_AGGRESSIVE)) {
 			for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict && !found; vict = vict->next_in_room) {
-				if (!IS_NPC(vict) && vict->desc && CAN_AGGRO(ch, vict) && can_fight(ch, vict)) {
-					if (affected_by_spell(vict, ATYPE_MAJESTY) && !AFF_FLAGGED(ch, AFF_IMMUNE_VAMPIRE)) {
-						gain_ability_exp(vict, ABIL_MAJESTY, 10);
-					}
-
-					if (!CHECK_MAJESTY(vict) || AFF_FLAGGED(ch, AFF_IMMUNE_VAMPIRE)) {
-						hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FALSE);
-						found = TRUE;
-					}
+				if (vict == ch) {
+					continue;
+				}
+				if (!IS_NPC(vict) && !vict->desc) {
+					// linkdead player
+					continue;
+				}
+				if (IS_NPC(vict) && (MOB_FLAGGED(vict, MOB_AGGRESSIVE) || !MOB_FLAGGED(vict, MOB_HUMAN))) {
+					// they will attack humans but not aggro humans
+					continue;
+				}
+				if (!CAN_AGGRO(ch, vict) || !can_fight(ch, vict)) {
+					continue;
+				}
+				
+				// ok good to go
+				if (affected_by_spell(vict, ATYPE_MAJESTY) && !AFF_FLAGGED(ch, AFF_IMMUNE_VAMPIRE)) {
+					gain_ability_exp(vict, ABIL_MAJESTY, 10);
+				}
+				if (!CHECK_MAJESTY(vict) || AFF_FLAGGED(ch, AFF_IMMUNE_VAMPIRE)) {
+					hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FALSE);
+					found = TRUE;
 				}
 			}
 		}
