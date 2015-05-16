@@ -978,6 +978,7 @@ void store_to_char(struct char_file_u *st, char_data *ch) {
 * @param char_data *ch The player to delete.
 */
 void delete_player_character(char_data *ch) {
+	void clear_private_owner(int id);
 	void Crash_delete_file(char *name);
 	
 	empire_data *emp = NULL;
@@ -989,6 +990,7 @@ void delete_player_character(char_data *ch) {
 	}
 	
 	SET_BIT(PLR_FLAGS(ch), PLR_DELETED);
+	clear_private_owner(GET_IDNUM(ch));
 
 	// Check the empire
 	if ((emp = GET_LOYALTY(ch)) != NULL) {
