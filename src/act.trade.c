@@ -995,6 +995,12 @@ ACMD(do_reforge) {
 			level = GET_OBJ_CURRENT_SCALE_LEVEL(obj);
 			
 			new = read_object(GET_OBJ_VNUM(proto));
+			
+			// transfer bindings
+			OBJ_BOUND_TO(new) = OBJ_BOUND_TO(obj);
+			OBJ_BOUND_TO(obj) = NULL;
+			
+			// give to char
 			obj_to_char(new, ch);
 			
 			// re-apply
@@ -1048,6 +1054,12 @@ ACMD(do_reforge) {
 			level = GET_OBJ_CURRENT_SCALE_LEVEL(obj);
 			
 			new = read_object(GET_OBJ_VNUM(proto));
+			
+			// transfer bindings
+			OBJ_BOUND_TO(new) = OBJ_BOUND_TO(obj);
+			OBJ_BOUND_TO(obj) = NULL;
+			
+			// give to char
 			obj_to_char(new, ch);
 			
 			// set superior
