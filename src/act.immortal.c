@@ -2987,6 +2987,12 @@ void do_stat_object(char_data *ch, obj_data *j) {
 		msg_to_char(ch, "\r\n");
 	}
 	
+	if (j->interactions) {
+		send_to_char("Interactions:\r\n", ch);
+		get_interaction_display(j->interactions, buf);
+		send_to_char(buf, ch);
+	}
+	
 	if (j->custom_msgs) {
 		msg_to_char(ch, "Custom messages:\r\n");
 		
