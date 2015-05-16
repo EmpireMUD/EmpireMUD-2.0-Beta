@@ -166,6 +166,9 @@ Built on: plains or desert, facing water
 Clay pits are reinforced areas where fresh clay can be dug deeper, safer than
 digging on unprepared ground. You can dig more clay from them before depletion.
 
+Clay pits always count as in-city territory for your empire, no matter where
+you build them.
+
 See also: DIG
 #
 CLIFFDWELLING "CLIFF DWELLING"
@@ -252,7 +255,8 @@ vvvv  Fence  (no skill required)
 
 Built on:  plains, desert
 
-Fences will block the movement of NPCs, but not players.
+Fences will block the movement of NPCs, but not players. They count as in-city
+territory, no matter where you build them.
 
 See also: GATE
 #

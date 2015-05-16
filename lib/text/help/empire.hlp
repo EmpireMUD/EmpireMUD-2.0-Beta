@@ -856,10 +856,11 @@ command. You will find more rocks before a quarry depletes, compared to digging
 anywhere else.
 
 You can gain Empire skill up to 15 by quarrying stone. This does not require
-an ability.
+an ability. If you have the "dig" workforce enabled, your citizens will only
+dig if you have a quarry.
 
-If you have the "dig" workforce enabled, your citizens will only dig if you
-have a quarry.
+Quarries always count as in-city territory for your empire, no matter where
+you build them.
 
 See also: DEPLETION, DIG
 #

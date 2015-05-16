@@ -693,7 +693,8 @@ the Empire skill.
 
 Roads count as their base terrain for most building functions, so you can
 build things facing roads, and can usually build right over a road -- but the
-road underneath will be lost.
+road underneath will be lost. Roads also count as in-city territory for your
+empire, no matter where you lay them.
 
 See also: EMPIRE, ROADSIGN
 #
