@@ -780,7 +780,7 @@ See also: WORKFORCE
 #
 MORTLOG
 
-Usage:  mortlog
+Usage:  toggle mortlog
 
 This will give you periodic updates, such as when a player logs in, leaves, or
 dies. It's useful in keeping up on current events. Mortlog is colored cyan.

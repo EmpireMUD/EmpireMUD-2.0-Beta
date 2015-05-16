@@ -427,6 +427,11 @@ Examples of hostile actions:
 - attacking another empire's citizens
 - infiltrating a building
 #
+INFRA INFRAVISION
+
+The INFRA affect, which appears on some spells and items, allows a character
+perfect night vision.
+#
 INSTANCES INSTANTIATION INSTANCING
 
 EmpireMUD uses "instances" of adventures to help fill the large, dynamic world.

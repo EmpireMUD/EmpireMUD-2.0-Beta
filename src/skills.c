@@ -81,7 +81,7 @@ bool can_use_ability(char_data *ch, int ability, int cost_pool, int cost_amount,
 		return FALSE;
 	}
 	if (cost_pool >= 0 && cost_pool < NUM_POOLS && cost_amount > 0 && GET_CURRENT_POOL(ch, cost_pool) < needs_cost) {
-		msg_to_char(ch, "You need %d %s points to do that.\r\n", cost_amount, pool_types[cost_pool]);
+		msg_to_char(ch, "You need %d %s point%s to do that.\r\n", cost_amount, pool_types[cost_pool], PLURAL(cost_amount));
 		return FALSE;
 	}
 	if (cooldown_type > COOLDOWN_RESERVED && (time = get_cooldown_time(ch, cooldown_type)) > 0) {

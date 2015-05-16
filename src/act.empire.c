@@ -2010,7 +2010,7 @@ ACMD(do_diplomacy) {
 				REMOVE_BIT(pol_b->offer, DIPL_TRADE);
 				SET_BIT(pol_a->type, DIPL_TRADE);
 				SET_BIT(pol_b->type, DIPL_TRADE);
-				log_to_empire(e, ELOG_DIPLOMACY, "A trade agreement been established with %s!", EMPIRE_NAME(f));
+				log_to_empire(e, ELOG_DIPLOMACY, "A trade agreement has been established with %s!", EMPIRE_NAME(f));
 				log_to_empire(f, ELOG_DIPLOMACY, "%s has accepted the offer of a trade agreement!", EMPIRE_NAME(e));
 				send_config_msg(ch, "ok_string");
 			}
