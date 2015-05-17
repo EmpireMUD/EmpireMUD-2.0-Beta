@@ -293,11 +293,13 @@ void init_skills() {
 	setup_class_ability(ABIL_DUAL_WIELD, "Dual-Wield");
 	setup_class_ability(ABIL_HORRID_FORM, "Horrid Form");
 	setup_class_ability(ABIL_MOONRISE, "Moonrise");
+	setup_class_ability(ABIL_NOBLE_BEARING, "Noble Bearing");
 	setup_class_ability(ABIL_RESURRECT, "Resurrect");
 	setup_class_ability(ABIL_SAGE_WEREWOLF_FORM, "Sage Werewolf Form");
 	setup_class_ability(ABIL_SAVAGE_WEREWOLF_FORM, "Savage Werewolf Form");
 	setup_class_ability(ABIL_TOWERING_WEREWOLF_FORM, "Towering Werewolf Form");
 	setup_class_ability(ABIL_TWO_HANDED_WEAPONS, "Two-Handed Weapons");
+	setup_class_ability(ABIL_WARD_AGAINST_MAGIC, "Ward Against Magic");
 	
 	sort_skills_and_abilities();
 }

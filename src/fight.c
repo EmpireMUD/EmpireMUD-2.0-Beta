@@ -158,8 +158,10 @@ double get_base_dps(obj_data *weapon) {
 */
 int get_block_chance(char_data *ch, char_data *attacker) {
 	obj_data *shield = GET_EQ(ch, WEAR_HOLD);
-	double base = 5.0;
+	double base = 0.0;
 	double quick_block[] = { 0.0, 10.0, 20.0 };
+	
+	int max_block = 90;	// never pass this value
 	
 	// must have a shield
 	if (!shield || !IS_SHIELD(shield)) {
@@ -182,7 +184,7 @@ int get_block_chance(char_data *ch, char_data *attacker) {
 	// block modifiers
 	base += get_effective_block(ch);
 	
-	return (int) base;
+	return MIN(max_block, (int) base);
 }
 
 
@@ -548,6 +550,10 @@ int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, i
 		// damage reduction (usually from armor)
 		if ((damtype != DAM_POISON && damtype != DAM_DIRECT)) {
 			dam -= get_effective_soak(victim);
+		}
+		
+		if (HAS_ABILITY(victim, ABIL_NOBLE_BEARING)) {
+			dam -= GET_GREATNESS(victim);
 		}
 	
 		if (check_blood_fortitude(victim)) {
@@ -2402,8 +2408,14 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 
 	success = !AWAKE(victim) || (hit_chance >= number(1, 100));
 	
-	if (success && AWAKE(victim) && CAN_SEE(victim, ch) && attack_hit_info[w_type].damage_type == DAM_PHYSICAL) {
-		block = (get_block_chance(victim, ch) > number(1, 100));
+	// blockable?
+	if (success && AWAKE(victim) && CAN_SEE(victim, ch)) {
+		if (attack_hit_info[w_type].damage_type == DAM_PHYSICAL) {
+			block = (get_block_chance(victim, ch) > number(1, 100));
+		}
+		else if (HAS_ABILITY(victim, ABIL_WARD_AGAINST_MAGIC) && attack_hit_info[w_type].damage_type == DAM_MAGICAL) {
+			block = ((get_block_chance(victim, ch) * 0.50) > number(1, 100));
+		}
 	}
 
 	// outcome:

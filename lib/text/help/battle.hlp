@@ -106,7 +106,8 @@ the disarm affect wears off, it will still be in your <wield> slot.
 #
 "DUAL-WIELD" "DUAL WIELD"
 
-Dual-Wield (Class ability)
+Dual-Wield
+Class ability: Assassin, Bandit, Smuggler
 
 With this ability, you can attack with weapons in both hands (the wield and
 hold slots). Without it, you can still hold a weapon in your off-hand, but
@@ -163,6 +164,13 @@ Usage:  kick [victim]
 Cooldown:  6 seconds
 
 Kick is a special attack that does bonus damage outside of the combat round.
+#
+"NOBLE BEARING"
+
+Noble Bearing
+Class ability: Duke
+
+Damage to your character is reduced by your Greatness rating.
 #
 "NULL MANA"
 
@@ -294,7 +302,8 @@ This command shows a summary of you, your allies, and your enemies in combat.
 #
 "TWO-HANDED WEAPONS" "TWO HANDED WEAPONS" "TWOHANDED WEAPONS" "2HANDED WEAPONS" "2H"
 
-Two-Handed Weapons (Class ability)
+Two-Handed Weapons
+Class ability: Barbarian, Duke, Steelsmith
 
 This ability allows you to use two-handed weapons. These weapons require that
 you don't have an item in your off-hand (hold) slot. Only certain powerful
@@ -302,5 +311,14 @@ melee classes receive this ability.
 
 Two-handed weapons are more powerful than ordinary weapons and are marked with
 the (2h) tag.
+#
+"WARD AGAINST MAGIC" "MAGIC WARD"
+
+Ward Against Magic
+Class ability: Barbarian, Reaper
+
+This ability allows characters to block magical attacks with their shields,
+albeit at a reduced rate. Only 50% of the character's block rating applies to
+blocking magical attacks.
 #
 $

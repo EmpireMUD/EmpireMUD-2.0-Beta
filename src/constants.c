@@ -915,7 +915,7 @@ const double apply_values[] = {
 	0.1,	// "AGE",
 	0.025,	// "MAX-MOVE",
 	1.4,	// "SOAK",
-	0.12,	// "BLOCK",
+	0.3,	// "BLOCK",
 	3,	// "HEAL-OVER-TIME",
 	0.025,	// "HEALTH",
 	0.025,	// "MAX-MANA",

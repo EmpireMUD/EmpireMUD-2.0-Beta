@@ -44,6 +44,7 @@ const struct class_data_type class_data[NUM_CLASSES] = {
 	},
 	{ "Duke", "Duke", { SKILL_BATTLE, SKILL_EMPIRE },  { 300, 200, 100, 0 },
 		{
+			{ ROLE_TANK, { ABIL_NOBLE_BEARING, ROLE_ABIL_END } },
 			{ ROLE_MELEE, { ABIL_TWO_HANDED_WEAPONS, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
@@ -67,6 +68,7 @@ const struct class_data_type class_data[NUM_CLASSES] = {
 	},
 	{ "Barbarian", "Brbn", { SKILL_BATTLE, SKILL_SURVIVAL },  { 300, 200, 100, 0 },
 		{
+			{ ROLE_TANK, { ABIL_WARD_AGAINST_MAGIC, ROLE_ABIL_END } },
 			{ ROLE_MELEE, { ABIL_TWO_HANDED_WEAPONS, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
@@ -79,7 +81,7 @@ const struct class_data_type class_data[NUM_CLASSES] = {
 	},
 	{ "Reaper", "Reap", { SKILL_BATTLE, SKILL_VAMPIRE },  { 300, 200, 100, 0 },
 		{
-			{ ROLE_TANK, { ABIL_BLOOD_FORTITUDE, ROLE_ABIL_END } },
+			{ ROLE_TANK, { ABIL_BLOOD_FORTITUDE, ABIL_WARD_AGAINST_MAGIC, ROLE_ABIL_END } },
 			{ ROLE_MELEE, { ABIL_HORRID_FORM, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
