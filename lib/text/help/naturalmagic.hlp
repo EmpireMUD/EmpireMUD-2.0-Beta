@@ -387,7 +387,9 @@ fighting.
 Solar Power (Natural Magic ability)
 
 Nature mages can learn to draw mana from the sunlight, as plants do. With this
-ability, mana regeneration doubles as long as it's sunny.
+ability, mana regeneration doubles as long as it's sunny. This ability scales
+with your Natural Magic skill, and as a class skill it works even without the
+sun.
 #
 SOULSIGHT "SOUL SIGHT"
 
