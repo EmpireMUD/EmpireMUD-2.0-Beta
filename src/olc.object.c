@@ -844,7 +844,7 @@ struct extra_descr_data *copy_extra_descs(struct extra_descr_data *list) {
 * @return obj_data *The copied object.
 */
 obj_data *setup_olc_object(obj_data *input) {
-	struct obj_storage_type *store, *new_store;
+	struct obj_storage_type *store, *new_store, *last_store;
 	struct obj_custom_message *ocm, *new_ocm, *last_ocm;
 	obj_data *new;
 	
@@ -868,12 +868,20 @@ obj_data *setup_olc_object(obj_data *input) {
 		new->interactions = copy_interaction_list(input->interactions);
 		
 		new->storage = NULL;
+		last_store = NULL;
 		for (store = input->storage; store; store = store->next) {
 			CREATE(new_store, struct obj_storage_type, 1);
 			
 			*new_store = *store;
-			new_store->next = new->storage;
-			new->storage = new_store;
+			new_store->next = NULL;
+			
+			if (last_store) {
+				last_store->next = new_store;
+			}
+			else {
+				new->storage = new_store;
+			}
+			last_store = new_store;
 		}
 		
 		// copy custom msgs
