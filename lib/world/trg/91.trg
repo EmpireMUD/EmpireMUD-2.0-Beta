@@ -80,4 +80,18 @@ if %penguins_killed% > 5 && %random.2% == 2
 end
 remote penguins_killed %actor.id%
 ~
+#9188
+Tiny Critter Despawn~
+0 b 10
+~
+%echo% %self.name% vanishes down a hole.
+%purge% %self%
+~
+#9198
+Critter Flutters Off~
+0 b 10
+~
+%echo% %self.name% flutters off.
+%purge% %self%
+~
 $

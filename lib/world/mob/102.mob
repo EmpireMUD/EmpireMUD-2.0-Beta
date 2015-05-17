@@ -195,4 +195,262 @@ An enchanted tumbleweed is blowing through.
 0 50 de 0
 0 0 4 16
 S
+#10250
+chronomancer #n~
+Chronomancer #n~
+A chronomancer is holding the portal open.
+~
+0 0 bdv cnD
+0 2 0 16
+T 10250
+S
+#10251
+salesman~
+the salesman~
+A salesman is running a booth that says 'list'.
+~
+0 0 bdv cnD
+1 0 0 15
+T 10272
+T 10273
+S
+#10252
+dracosaur king~
+the King of the Dracosaurs~
+The King of the Dracosaurs crushes trees as he approaches!
+~
+0 0 bdjyzBE cCE
+1 0 0 9
+I 0 3012 100.00 4  # BUTCHER: a fillet of raw meat
+I 0 10267 100.00 1  # BUTCHER: a serrated dracosaur tooth
+I 0 10267 50.00 1  # BUTCHER: a serrated dracosaur tooth
+I 0 10267 50.00 1  # BUTCHER: a serrated dracosaur tooth
+I 1 10265 100.00 2  # SKIN: a thick dracosaur hide
+I 1 10265 50.00 1  # SKIN: a thick dracosaur hide
+I 1 10265 50.00 1  # SKIN: a thick dracosaur hide
+I 1 1351 50.00 1  # SKIN: a large skin
+I 1 1351 50.00 1  # SKIN: a large skin
+I 4 10252 100.00 1  # LOOT: a huge dracosaur bone
+I 4 10286 7.50 1 X  # LOOT: a terrosaur whistle
+I 4 10263 15.00 1 X  # LOOT: a dracosaur whistle
+I 4 10255 20.00 1  # LOOT: a dracosaur bone bracelet
+I 4 10259 20.00 1  # LOOT: a primitive satchel
+I 4 10261 20.00 1  # LOOT: an unlit branch
+T 10262
+T 10265
+T 10256
+T 10270
+T 10252
+S
+#10253
+terrosaur terrorsaur pterosaur fearsome~
+the Terrosaur~
+A fearsome Terrosaur swoops down from the sky!
+~
+0 0 bdjyzBE cmCE
+0 0 0 27
+I 0 3200 100.00 4  # BUTCHER: a cut of poultry
+I 0 10267 100.00 2  # BUTCHER: a serrated dracosaur tooth
+I 0 10267 50.00 1  # BUTCHER: a serrated dracosaur tooth
+I 0 10267 50.00 1  # BUTCHER: a serrated dracosaur tooth
+I 1 10265 100.00 1  # SKIN: a thick dracosaur hide
+I 1 10265 50.00 1  # SKIN: a thick dracosaur hide
+I 1 10265 50.00 1  # SKIN: a thick dracosaur hide
+I 1 1351 50.00 1  # SKIN: a large skin
+I 1 1351 50.00 1  # SKIN: a large skin
+I 4 10253 100.00 1  # LOOT: the essence of terror
+I 4 10286 7.50 1 X  # LOOT: a terrosaur whistle
+I 4 10263 15.00 1 X  # LOOT: a dracosaur whistle
+I 4 10256 20.00 1  # LOOT: a dracosaur scale wristband
+I 4 10259 20.00 1  # LOOT: a primitive satchel
+I 4 10261 20.00 1  # LOOT: an unlit branch
+T 10262
+T 10265
+T 10256
+T 10271
+T 10253
+S
+#10254
+archsorcerer malfernes~
+Archsorcerer Malfernes~
+Archsorcerer Malfernes is here, and he looks like he's gone mad!
+~
+0 0 bdvxzBE cCE
+1 0 0 22
+I 4 10254 100.00 1  # LOOT: a stunning violet gem
+I 4 10265 75.00 1  # LOOT: a thick dracosaur hide
+I 4 10265 75.00 1  # LOOT: a thick dracosaur hide
+I 4 10267 75.00 1  # LOOT: a serrated dracosaur tooth
+I 4 10267 75.00 1  # LOOT: a serrated dracosaur tooth
+I 4 10286 7.50 1 X  # LOOT: a terrosaur whistle
+I 4 10263 15.00 1 X  # LOOT: a dracosaur whistle
+I 4 10259 20.00 1  # LOOT: a primitive satchel
+I 4 10261 20.00 1  # LOOT: an unlit branch
+I 4 10258 20.00 1  # LOOT: an obsidian bracelet
+T 10262
+T 10265
+T 10256
+T 10261
+T 10254
+S
+#10255
+dracosaur three-horned horned frilled~
+the three-horned dracosaur~
+A frilled, three-horned dracosaur is charging at you like a bull!
+~
+0 0 bdjyAE ch
+0 0 0 27
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
+I 0 10267 50.00 1  # BUTCHER: a serrated dracosaur tooth
+I 0 10267 50.00 1  # BUTCHER: a serrated dracosaur tooth
+I 1 10265 100.00 1  # SKIN: a thick dracosaur hide
+I 1 10265 50.00 1  # SKIN: a thick dracosaur hide
+I 1 10265 50.00 1  # SKIN: a thick dracosaur hide
+I 1 1351 50.00 1  # SKIN: a large skin
+I 1 1351 50.00 1  # SKIN: a large skin
+I 4 10255 10.00 1  # LOOT: a dracosaur bone bracelet
+I 4 10259 20.00 1  # LOOT: a primitive satchel
+I 4 10261 20.00 1  # LOOT: an unlit branch
+T 10262
+T 10265
+T 10256
+S
+#10256
+dracosaur feathered brightly~
+a feathered dracosaur~
+A brightly feathered dracosaur raises its wings to ward you off.
+~
+0 0 abdjzE c
+0 0 0 10
+I 0 3200 100.00 2  # BUTCHER: a cut of poultry
+I 0 10267 100.00 1  # BUTCHER: a serrated dracosaur tooth
+I 1 10265 100.00 1  # SKIN: a thick dracosaur hide
+I 1 1351 50.00 1  # SKIN: a large skin
+I 4 10256 10.00 1  # LOOT: a dracosaur scale wristband
+I 4 10259 20.00 1  # LOOT: a primitive satchel
+I 4 10261 20.00 1  # LOOT: an unlit branch
+T 10262
+T 10265
+T 10256
+S
+#10257
+dracosaur feathered small~
+a small, feathered dracosaur~
+A small, feathered dracosaur begins to circle around you.
+~
+0 0 abdjzE c
+0 0 0 9
+I 0 3200 100.00 1  # BUTCHER: a cut of poultry
+I 0 10267 50.00 1  # BUTCHER: a serrated dracosaur tooth
+I 1 10265 50.00 1 X  # SKIN: a thick dracosaur hide
+I 1 1351 100.00 1  # SKIN: a large skin
+I 4 10259 20.00 1  # LOOT: a primitive satchel
+I 4 10261 20.00 1  # LOOT: an unlit branch
+T 10262
+T 10265
+S
+#10258
+druid #n~
+the druid #n~
+A druid is magically growing the foliage over the path.
+~
+0 0 bdvxzAE c
+1 3 0 16
+I 4 10258 10.00 1  # LOOT: an obsidian bracelet
+I 4 10265 50.00 1  # LOOT: a thick dracosaur hide
+I 4 10265 50.00 1  # LOOT: a thick dracosaur hide
+I 4 10267 50.00 1  # LOOT: a serrated dracosaur tooth
+I 4 10267 50.00 1  # LOOT: a serrated dracosaur tooth
+I 4 10259 20.00 1  # LOOT: a primitive satchel
+I 4 10261 20.00 1  # LOOT: an unlit branch
+T 10262
+T 10265
+T 10256
+S
+#10259
+bird terror lead fierce~
+the lead terror bird~
+A fierce terror bird is pacing toward you!
+~
+0 0 abdjE c
+0 0 0 10
+I 0 3200 100.00 1  # BUTCHER: a cut of poultry
+I 1 1351 100.00 1  # SKIN: a large skin
+I 4 10259 20.00 1  # LOOT: a primitive satchel
+I 4 10261 20.00 1  # LOOT: an unlit branch
+T 10262
+T 10265
+S
+#10260
+bird terror~
+a terror bird~
+A terror bird is eyeing you from the foliage.
+~
+0 0 abdjE c
+0 0 0 9
+I 0 3200 100.00 1  # BUTCHER: a cut of poultry
+I 1 1351 75.00 1  # SKIN: a large skin
+I 4 10259 20.00 1  # LOOT: a primitive satchel
+I 4 10261 20.00 1  # LOOT: an unlit branch
+T 10262
+T 10265
+S
+#10261
+ants swarm~
+a swarm of ants~
+A swarm of ants is coming toward you!
+~
+0 0 bdjyE c
+0 0 0 9
+I 4 10259 20.00 1  # LOOT: a primitive satchel
+I 4 10261 20.00 1  # LOOT: an unlit branch
+T 10262
+T 10265
+S
+#10262
+hunter trophy~
+the trophy hunter~
+A trophy hunter is crouching in the underbrush.
+~
+0 0 bdvzE c
+1 3 0 2
+I 4 10259 20.00 1  # LOOT: a primitive satchel
+I 4 10261 20.00 1  # LOOT: an unlit branch
+T 10262
+T 10265
+S
+#10263
+dracosaur~
+a dracosaur~
+A dracosaur is sniffing around for food.
+~
+75 100 dej 0
+0 0 0 10
+I 3 10264 100.00 1 X  # BARDE: an armored dracosaur
+S
+#10264
+dracosaur armored~
+an armored dracosaur~
+An armored dracosaur stands guard valiantly.
+~
+75 100 bdej 0
+0 0 0 10
+S
+#10285
+terrosaur flying armored~
+a flying, armored terrosaur~
+An armored, flying terrosaur has perched here.
+~
+75 100 bdej m
+0 0 0 27
+S
+#10286
+terrosaur flying~
+a flying terrosaur~
+A flying terrosaur swoops low and lands.
+~
+75 100 dej m
+0 0 0 27
+I 3 10285 100.00 1 X  # BARDE: a flying, armored terrosaur
+S
 $

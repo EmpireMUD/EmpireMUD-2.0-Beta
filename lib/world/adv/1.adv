@@ -174,4 +174,24 @@ L
 1440 -1 -1
 -1 0 0
 S
+#161
+Portal to the Primeval~
+Paul Clarke~
+   The High Sorcerers in your tower have managed to open a chronoportal into
+the past! Follow Archsorcerer Malfernes through the portal and explore the
+Primeval Era, when the ancient ancestors of the dragons ruled endless jungles.
+But beware, because it's easy to get lost and you make a delicious snack for
+the dracosaurs.  
+~
+10250 10299 75-100
+10 0 f 4
+L
+5 0
+1440 -1 -1
+-1 0 0
+L
+3 a
+5511 10250 10251
+-1 0 0
+S
 $

@@ -383,4 +383,488 @@ end
 %echoaround% %actor% %actor.name% appears in a swirl of dust!
 %force% %actor% look
 ~
+#10250
+Chronomancer intro~
+0 g 100
+~
+* Only care about portal entries
+if %direction% != none
+  halt
+end
+wait 5
+say Oh great, more tourists. Listen, this isn't just some fancy jungle getaway.
+wait 2 sec
+say And that wasn't any ordinary portal. You've traveled back in time.
+wait 1 sec
+say This is the primeval jungle, completely unconquered. There are creatures here that could swallow the likes of you in one bite.
+wait 1 sec
+say Just watch out for the huge, primitive dragons that walk these parts. They aren't friendly.
+wait 3 sec
+say Oh, and watch out for Archsorcerer Malfernes. I think the chroniportation has done something to his brain!
+~
+#10252
+King of the Dracosaurs grievous bite~
+0 k 7
+~
+%send% %actor% %self.name% takes a grievous bite out of you!
+%echoaround% %actor% %self.name% takes a grievous bite out of %actor.name%!
+%dot% %actor% 100 30 physical
+%damage% %actor% 60 physical
+~
+#10253
+Terrosaur combat~
+0 k 7
+~
+dg_affect %self% BONUS-PHYSICAL 5 120
+%echo% %self.name% seems to get angrier!
+~
+#10254
+Malfernes combat~
+0 k 7
+~
+if !%self.affect(foresight)%
+  foresight
+elseif !%actor.affect(colorburst)%
+  colorburst
+elseif !%actor.affect(slow)%
+  slow
+else
+  sunshock
+end
+~
+#10256
+Primeval adventure completer~
+0 f 100
+~
+%buildingecho% %self.room% A bone-shattering roar echoes through the air!
+%adventurecomplete%
+return 0
+~
+#10257
+Dracosaur miniboss spawner~
+1 n 100
+~
+switch %random.3%
+  case 1
+    %load% mob 10255
+  break
+  case 2
+    %load% mob 10258
+  break
+  case 3
+    %load% mob 10256
+    %load% mob 10257
+    %load% mob 10257
+  break
+done
+%purge% %self%
+~
+#10260
+Dracosaur trash spawner~
+1 n 100
+~
+switch %random.3%
+  case 1
+    %load% mob 10261
+  break
+  case 2
+    %load% mob 10262
+  break
+  case 3
+    %load% mob 10259
+    %load% mob 10260
+    %load% mob 10260
+  break
+done
+%purge% %self%
+~
+#10261
+Malfernes greet/aggro~
+0 g 100
+~
+if (%self.fighting% || %self.disabled% || %actor.nohassle%)
+  halt
+end
+wait 5
+%echo% %self.name% cackles insanely!
+wait 3 sec
+if (%self.fighting% || %self.disabled%)
+  halt
+end
+%echo% A strange violet glow encircles %self.name%, as if some arcane magic is controlling him.
+wait 3 sec
+if (%self.fighting% || %self.disabled%)
+  halt
+end
+say How dare you follow me here!
+wait 3 sec
+if (%self.fighting% || %self.disabled%)
+  halt
+end
+say Did the Academy send you? Are you here to take me back? I'm not going back there!
+wait 3 sec
+if (%self.fighting% || %self.disabled%)
+  halt
+end
+%kill% %actor%
+~
+#10262
+Primeval must-fight~
+0 q 100
+~
+if (%actor.nohassle% || %direction% == south)
+  halt
+end
+%send% %actor% You can't seem to get away from %self.name%!
+return 0
+~
+#10263
+Mount whistle use~
+1 c 2
+use~
+eval test %%self.is_name(%arg%)%%
+if !%test%
+  return 0
+  halt
+end
+if (%actor.position% != Standing)
+  %send% %actor% You can't do that right now.
+  halt
+end
+%load% m %self.val0%
+%send% %actor% You use %self.shortdesc% and a new mount appears!
+%echoaround% %actor% %actor.name% uses %self.shortdesc% and a new mount appears!
+%purge% %self%
+~
+#10264
+Dracosaur boss spawner~
+1 n 100
+~
+switch %random.3%
+  case 1
+    %load% mob 10252
+  break
+  case 2
+    %load% mob 10253
+  break
+  case 3
+    %load% mob 10254
+  break
+done
+%purge% %self%
+~
+#10265
+Primeval no-flee~
+0 c 0
+flee~
+%send% %actor% There's nowhere to flee!
+return 0
+~
+#10266
+Hint to 10252~
+2 c 0
+track~
+eval tofind 10252
+if (!%actor.ability(Track)% || !%actor.ability(Navigation)%)
+  * Fail through to ability message
+  halt
+end
+* It's never south -- that's always backtrack
+eval north %room.north(room)%
+eval east %room.east(room)%
+eval west %room.west(room)%
+eval northeast %room.northeast(room)%
+eval northwest %room.northwest(room)%
+eval southeast %room.southeast(room)%
+eval southwest %room.southwest(room)%
+if (%north% && %north.template% == %tofind%)
+  %send% %actor% You sense a trail to the north!
+  return 1
+elseif (%east% && %east.template% == %tofind%)
+  %send% %actor% You sense a trail to the east!
+  return 1
+elseif (%west% && %west.template% == %tofind%)
+  %send% %actor% You sense a trail to the west!
+  return 1
+elseif (%northeast% && %northeast.template% == %tofind%)
+  %send% %actor% You sense a trail to the northeast!
+  return 1
+elseif (%northwest% && %northwest.template% == %tofind%)
+  %send% %actor% You sense a trail to the northwest!
+  return 1
+elseif (%southeast% && %southeast.template% == %tofind%)
+  %send% %actor% You sense a trail to the southeast!
+  return 1
+elseif (%southwest% && %southwest.template% == %tofind%)
+  %send% %actor% You sense a trail to the southwest!
+  return 1
+end
+~
+#10267
+Hint to 10253~
+2 c 0
+track~
+eval tofind 10253
+if (!%actor.ability(Track)% || !%actor.ability(Navigation)%)
+  * Fail through to ability message
+  halt
+end
+* It's never south -- that's always backtrack
+eval north %room.north(room)%
+eval east %room.east(room)%
+eval west %room.west(room)%
+eval northeast %room.northeast(room)%
+eval northwest %room.northwest(room)%
+eval southeast %room.southeast(room)%
+eval southwest %room.southwest(room)%
+if (%north% && %north.template% == %tofind%)
+  %send% %actor% You sense a trail to the north!
+  return 1
+elseif (%east% && %east.template% == %tofind%)
+  %send% %actor% You sense a trail to the east!
+  return 1
+elseif (%west% && %west.template% == %tofind%)
+  %send% %actor% You sense a trail to the west!
+  return 1
+elseif (%northeast% && %northeast.template% == %tofind%)
+  %send% %actor% You sense a trail to the northeast!
+  return 1
+elseif (%northwest% && %northwest.template% == %tofind%)
+  %send% %actor% You sense a trail to the northwest!
+  return 1
+elseif (%southeast% && %southeast.template% == %tofind%)
+  %send% %actor% You sense a trail to the southeast!
+  return 1
+elseif (%southwest% && %southwest.template% == %tofind%)
+  %send% %actor% You sense a trail to the southwest!
+  return 1
+end
+~
+#10268
+Hint to 10254~
+2 c 0
+track~
+eval tofind 10254
+if (!%actor.ability(Track)% || !%actor.ability(Navigation)%)
+  * Fail through to ability message
+  halt
+end
+* It's never south -- that's always backtrack
+eval north %room.north(room)%
+eval east %room.east(room)%
+eval west %room.west(room)%
+eval northeast %room.northeast(room)%
+eval northwest %room.northwest(room)%
+eval southeast %room.southeast(room)%
+eval southwest %room.southwest(room)%
+if (%north% && %north.template% == %tofind%)
+  %send% %actor% You sense a trail to the north!
+  return 1
+elseif (%east% && %east.template% == %tofind%)
+  %send% %actor% You sense a trail to the east!
+  return 1
+elseif (%west% && %west.template% == %tofind%)
+  %send% %actor% You sense a trail to the west!
+  return 1
+elseif (%northeast% && %northeast.template% == %tofind%)
+  %send% %actor% You sense a trail to the northeast!
+  return 1
+elseif (%northwest% && %northwest.template% == %tofind%)
+  %send% %actor% You sense a trail to the northwest!
+  return 1
+elseif (%southeast% && %southeast.template% == %tofind%)
+  %send% %actor% You sense a trail to the southeast!
+  return 1
+elseif (%southwest% && %southwest.template% == %tofind%)
+  %send% %actor% You sense a trail to the southwest!
+  return 1
+end
+~
+#10269
+Hint to 10255~
+2 c 0
+track~
+eval tofind 10255
+if (!%actor.ability(Track)% || !%actor.ability(Navigation)%)
+  * Fail through to ability message
+  halt
+end
+* It's never south -- that's always backtrack
+eval north %room.north(room)%
+eval east %room.east(room)%
+eval west %room.west(room)%
+eval northeast %room.northeast(room)%
+eval northwest %room.northwest(room)%
+eval southeast %room.southeast(room)%
+eval southwest %room.southwest(room)%
+if (%north% && %north.template% == %tofind%)
+  %send% %actor% You sense a trail to the north!
+  return 1
+elseif (%east% && %east.template% == %tofind%)
+  %send% %actor% You sense a trail to the east!
+  return 1
+elseif (%west% && %west.template% == %tofind%)
+  %send% %actor% You sense a trail to the west!
+  return 1
+elseif (%northeast% && %northeast.template% == %tofind%)
+  %send% %actor% You sense a trail to the northeast!
+  return 1
+elseif (%northwest% && %northwest.template% == %tofind%)
+  %send% %actor% You sense a trail to the northwest!
+  return 1
+elseif (%southeast% && %southeast.template% == %tofind%)
+  %send% %actor% You sense a trail to the southeast!
+  return 1
+elseif (%southwest% && %southwest.template% == %tofind%)
+  %send% %actor% You sense a trail to the southwest!
+  return 1
+end
+~
+#10270
+King of the Dracosaurs greet/aggro~
+0 g 100
+~
+if (%self.fighting% || %self.disabled% || %actor.nohassle%)
+  halt
+end
+wait 5
+%echo% The earth itself tremors in fear as %self.name% stomps toward you.
+wait 3 sec
+if (%self.fighting% || %self.disabled%)
+  halt
+end
+%echo% %self.name% stops and lets out a terrifying roar!
+wait 3 sec
+if (%self.fighting% || %self.disabled%)
+  halt
+end
+%echo% %self.name% swipes %self.hisher% massive tail, and a tree goes flying!
+%load% obj 120
+wait 3 sec
+if (%self.fighting% || %self.disabled%)
+  halt
+end
+%echo% %self.name% looms close, and it's only as %self.heshe% bends down to bite you that you realize how big %self.heshe% is!
+wait 3 sec
+if (%self.fighting% || %self.disabled%)
+  halt
+end
+%kill% %actor%
+~
+#10271
+Terrosaur greet/aggro~
+0 g 100
+~
+if (%self.fighting% || %self.disabled% || %actor.nohassle%)
+  halt
+end
+wait 5
+%echo% A wicked screech pierces the air!
+wait 3 sec
+if (%self.fighting% || %self.disabled%)
+  halt
+end
+%echo% %self.name% drops the crocodile %self.heshe% was carrying in its talons, and swoops toward you!
+wait 3 sec
+if (%self.fighting% || %self.disabled%)
+  halt
+end
+%echo% %self.name% vanishes as %self.heshe% swoops too close to the trees for you to see exactly which way %self.heshe%'s coming from.
+%load% obj 120
+wait 3 sec
+if (%self.fighting% || %self.disabled%)
+  halt
+end
+%echo% %self.name% reappears over the clearing, suddenly so close %self.heshe% blots out the sun!
+wait 3 sec
+if (%self.fighting% || %self.disabled%)
+  halt
+end
+%kill% %actor%
+~
+#10272
+Primeval salesman list~
+0 c 0
+list~
+%send% %actor% %self.name% sells crafting patterns for 1000 coins each. Each
+%send% %actor% pattern is reusable, but you need the correct ability to use it.
+%send% %actor% To purchase a pattern, use '&cbuy <name>&0'.
+%send% %actor%  - &caxe&0: a primordial axe (Deadly Weapons, 2-hand melee weapon)
+%send% %actor%  - &cspear&0: the dracosaur bone spear (Deadly Weapons, tank weapon)
+%send% %actor%  - &cstaff&0: the jeweled bone staff (Powerful Staves, caster weapon)
+%send% %actor%  - &crobe&0: a dracosaur scale robe (Magical Vestments, healer armor)
+%send% %actor%  - &cscale boots&0: dracosaur scale boots (Imperial Armors, medium armor boots)
+%send% %actor%  - &cprimordial boots&0: a pair of primordial boots (Imperial Armors, heavy armor boots)
+%send% %actor%  - &cgauntlets&0: a pair of dracosaur scale gauntlets (Dangerous Leathers, leather armor gloves)
+%send% %actor%  - &ctome&0: the Tome of hte Primordium (Master Craftsman, caster offhand)
+%send% %actor%  - &ccrown&0: the brown crown of the primeval (Jewelry, Greatness headgear)
+~
+#10273
+Primeval salesman buy~
+0 c 0
+buy~
+eval vnum -1
+set named a thing
+if (!%arg%)
+  %send% %actor% Type 'list' to see what's available.
+  halt
+elseif axe /= %arg%
+  eval vnum 10269
+  set named the primordial axe pattern
+elseif spear /= %arg%
+  eval vnum 10271
+  set named the dracosaur bone spear pattern
+elseif staff /= %arg%
+  eval vnum 10273
+  set named the jeweled bone staff pattern
+elseif robe /= %arg%
+  eval vnum 10275
+  set named the dracosaur scale robe pattern
+elseif scale boots /= %arg%
+  eval vnum 10277
+  set named the dracosaur scale boots pattern
+elseif primordial boots /= %arg%
+  eval vnum 10279
+  set named the primordial boots pattern
+elseif gauntlets /= %arg%
+  eval vnum 10281
+  set named the dracosaur scale gauntlets pattern
+elseif tome /= %arg%
+  eval vnum 10283
+  set named the Tome of the Primordium schematic
+elseif crown /= %arg%
+  eval vnum 10285
+  set named the bone crown pattern
+else
+  %send% %actor% They don't seem to sell '%arg%' here.
+  halt
+end
+if !%actor.can_afford(1000)%
+  %send% %actor% %self.name% tells you, 'You'll need 1000 coins to buy that.'
+  halt
+end
+nop %actor.charge_coins(1000)%
+%load% obj %vnum% %actor% inv
+%send% %actor% You buy %named% for 1000 coins
+%echoaround% %actor% %actor.name% buys %named%.
+~
+#10274
+Primeval environment~
+2 b 5
+~
+switch %random.4%
+  case 1
+    %echo% The sky grows darker and darker as the volcano in the distance erupts!
+  break
+  case 2
+    %echo% A thunderous roar shakes the trees.
+  break
+  case 3
+    %echo% You have the everpresent feeling that someone is watching you through the trees.
+  break
+  case 4
+    %echo% The ground rumbles beneath you.
+  break
+done
+~
 $

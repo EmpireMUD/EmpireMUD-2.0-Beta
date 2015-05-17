@@ -361,7 +361,7 @@ pineapple~
 a pineapple~
 A pineapple is sitting on the ground.~
    You can eat this succulent tropical fruit, or plant it. You'll have to plant
-it on partially-cleared jungle.  
+it on partially-cleared jungle.
 ~
 6 bl a
 24 10225 0
@@ -633,5 +633,553 @@ Brew (Healing Elixirs):
 3 0 a
 0 0 0
 0 0
+S
+#10250
+portal raging red~
+a raging red portal~
+A raging, red portal in the middle of the chamber seems to be unstable.~
+Through the portal, you see some tents and a very large jungle.
+~
+8 0 0
+-1 0 0
+10 0
+S
+#10251
+portal red raging home~
+the portal home~
+This side of the portal home looks like it's barely staying open!~
+This portal looks like it leads back to the tower.
+~
+8 0 0
+-1 0 0
+10 0
+S
+#10252
+dracosaur bone huge~
+a huge dracosaur bone~
+A huge dracosaur bone is sticking up out of the ground.~
+   This bone looks like it came from something gigantic, although it is
+surprisingly light-weight. Although it might be difficult to craft anything
+useful from it, it looks like you woul be able to make some items using
+patterns purchased from the Portal to the Primeval adventure.
+~
+3 e a
+0 0 0
+14 0
+R
+5511 0
+R
+5164 0
+S
+#10253
+bottle essence terror~
+the essence of terror~
+The essence of terror is lying here in a bottle.~
+   This tiny glass bottle contains the essence of pure terror, harvested from
+the dawn of time from a flying creature who truly embodies the concept.
+~
+3 0 a
+0 0 0
+8 0
+R
+5164 0
+R
+5511 0
+S
+#10254
+gem stunning violet~
+a stunning violet gem~
+A violet gem has been discarded here.~
+   This stunning gem looks like it must contain some arcane power. Perhaps it
+can be used in some kind of crafting recipe.
+~
+3 0 a
+0 0 0
+10 0
+R
+5164 0
+R
+5511 0
+S
+#10255
+bracelet dracosaur bone~
+a dracosaur bone bracelet~
+There is a dracosaur bone bracelet on the ground.~
+This bracelet is made from small dracosaur bones.
+~
+2 mp aj
+0 0 0
+14 0
+A
+17 1
+A
+21 1
+C
+0 0
+S
+#10256
+wristband dracosaur scale~
+a dracosaur scale wristband~
+A dracosaur scale wristband is lying on the ground.~
+The wristband is made from braided dracosaur leather.
+~
+2 mp aj
+0 0 0
+7 0
+A
+16 1
+A
+22 1
+C
+0 0
+S
+#10257
+spawner miniboss dracosaur~
+the dracosaur miniboss spawner~
+The dracosaur miniboss spawner is lying here, useless.~
+This item spawns mini-bosses.
+~
+3 0 0
+0 0 0
+0 0
+T 10257
+S
+#10258
+bracelet obsidian~
+an obsidian bracelet~
+Someone has left an obsidian bracelet here.~
+The bracelet is made from black volcanic glass, and radiates with energy.
+~
+2 mp aj
+0 0 0
+8 0
+A
+23 1
+A
+7 1
+C
+0 0
+S
+#10259
+satchel primitive~
+a primitive satchel~
+There is a primitive satchel on the ground, empty.~
+This small satchel is made from dracosaur leather, and is quite durable.
+~
+24 mp ar
+3 0 0
+7 0
+A
+15 1
+C
+0 0
+S
+#10260
+spawner trash dracosaur~
+the dracosaur trash spawner~
+The dracosaur trash spawner is lying here, useless.~
+This item spawns trash mobs.
+~
+3 0 0
+0 0 0
+0 0
+T 10260
+S
+#10261
+branch unlit~
+an unlit branch~
+An unlit branch is lying on the ground.~
+This branch is thick with sap, and looks like it would make a good torch.
+~
+3 0 ao
+0 0 0
+0 0
+I 11 10262 100.00 1 X  # LIGHT: a lit branch
+S
+#10262
+branch lit burning~
+a lit branch~
+A lit branch is burning on the ground.~
+The burning branch spits and sparks as pockets of sap catch fire.
+~
+3 c ao
+0 0 0
+0 48
+S
+#10263
+whistle bone small dracosaur~
+a dracosaur whistle~
+A small bone whistle is lying on the ground.~
+This whistle can be used just once, to summon a dracosaur mount.
+~
+3 0 a
+10263 0 0
+14 0
+T 10263
+S
+#10264
+dracosaur boss spawner~
+the dracosaur boss spawner~
+The dracosaur boss spawner is lying here, useless.~
+This item spawns a boss and then purges itself.
+~
+3 0 0
+0 0 0
+0 0
+T 10264
+S
+#10265
+hide dracosaur piece thick~
+a thick dracosaur hide~
+A thick piece of dracosaur hide has been left on the ground.~
+   The dracosaur hide is thick and scaly, and seems like it would be difficult
+to work into anything useful. This hide can be used to craft items using
+patterns from the Portal to the Primeval adventure.
+~
+3 0 a
+0 0 0
+7 0
+R
+5120 0
+S
+#10267
+tooth dracosaur serrated~
+a serrated dracosaur tooth~
+A serrated dracosaur tooth is lying here.~
+   This jagged tooth is longer than your hand, and surely must have come from a
+huge dracosaur. It looks like you might be able to make something useful from
+this, if you bought the patterns from the Portal to the Primeval adventure.
+~
+3 0 a
+0 0 0
+14 0
+R
+5120 0
+S
+#10268
+axe bone primordial~
+a primordial axe~
+A primordial bone axe is sticking up from the ground.~
+   This massive axe appears to have been made from the bones and teeth of
+something huge, and ancient. The handle is wrapped in a hardened, scaly
+leather. It looks like you'd need to use both hands to wield it.
+~
+1 ehmno an
+0 3 2
+14 0
+A
+1 1
+A
+17 1
+C
+0 125
+S
+#10269
+pattern axe primordial~
+the primordial axe pattern~
+The pattern for a primordial axe is lying here.~
+This pattern allows you to craft the primordial axe, a powerful weapon from
+the dawn of time.
+
+Forge (requires Deadly Weapons): primordial axe
+  6x thick dracosaur hide
+  8x serrated dracosaur tooth
+  2x huge dracosaur bone
+  5x imperium ingot
+~
+3 0 a
+0 0 0
+0 0
+S
+#10270
+spear bone dracosaur~
+the dracosaur bone spear~
+A dracosaur bone spear is lying here.~
+This huge spear looks like it was made from the massive legbone of a dracosaur!
+~
+1 emo an
+0 1 3
+14 0
+A
+13 1
+A
+18 1
+C
+0 125
+S
+#10271
+pattern spear dracosaur bone~
+the dracosaur bone spear pattern~
+The pattern for a dracosaur bone spear is lying here.~
+This pattern allows you to craft the dracosaur bone spear, a strong tanking
+weapon from the Primeval age.
+
+Forge (requires Deadly Weapons): dracosaur bone spear
+  4x thick dracosaur hide
+ 10x serrated dracosaur tooth
+  1x huge dracosaur bone
+  1x essence of terror
+  5x imperium ingot
+~
+3 0 a
+0 0 0
+0 0
+S
+#10272
+staff bone jeweled jewelled~
+the jeweled bone staff~
+A jeweled bone staff has been discarded here.~
+   This staff appears to have been made from a very large, very ancient bone.
+Violet gems encircle its crown, and a thick, scaly hide is wrapped around the
+shaft.
+~
+1 ehmoq an
+0 1 18
+14 0
+A
+9 1
+A
+8 2
+C
+0 125
+S
+#10273
+pattern staff bone jeweled~
+the jeweled bone staff pattern~
+The pattern for a jeweled bone staff is lying here.~
+This pattern allows you to craft the jeweled bone staff, a great magical weapon
+from the prehistoric era.
+
+Craft (requires Powerful Staves): jeweled bone staff
+ 10x thick dracosaur hide
+  4x serrated dracosaur tooth
+  1x huge dracosaur bone
+  1x stunning violet gem
+  5x ingot of nocturnium
+~
+3 0 a
+0 0 0
+0 0
+S
+#10274
+robe dracosaur scale~
+a dracosaur scale robe~
+A dracosaur scale robe is crumpled in a heap.~
+   This robe appears to be made from the hide of dracosaurs -- primitive
+dragons from the primeval age. The craftsmanship, however, is very modern.
+~
+27 emo aq
+0 0 0
+7 0
+A
+9 -1
+A
+23 3
+A
+16 1
+C
+0 125
+S
+#10275
+pattern robe dracosaur scale~
+the dracosaur scale robe pattern~
+The pattern for a dracosaur scale robe is lying here.~
+This pattern allows you to sew the dracosaur scale robe, a powerful healing
+robe from the Primeval period.
+
+Sew (requires Magical Vestments): dracosaur scale robe
+  8x thick dracosaur hide
+  6x serrated dracosaur tooth
+  1x stunning violet gem
+  6x ingot of nocturnium
+~
+3 0 a
+0 0 0
+0 0
+S
+#10276
+boots dracosaur scale pair~
+dracosaur scale boots~
+A pair of dracosaur scale boots is lying here.~
+The boots look to be made from hardened dracosaur scales, and edged in imperium.
+~
+27 emo ag
+2 0 0
+7 0
+A
+9 -2
+A
+2 1
+A
+12 1
+C
+0 125
+S
+#10277
+pattern boots dracosaur scale~
+the dracosaur scale boots pattern~
+The pattern for some dracosaur scale boots is lying here.~
+This pattern allows you to forge the dracosaur scale boots, medium armor well-
+suited to mucking through pre-history.
+
+Forge (requires Imperial Armors): dracosaur scale boots
+  8x thick dracosaur hide
+  6x serrated dracosaur tooth
+  1x essence of terror
+  6x imperium ingot
+~
+3 0 a
+0 0 0
+0 0
+S
+#10278
+boots primordial pair~
+a pair of primordial boots~
+A pair of primordial boots is lying here.~
+The boots are made from shaped dracosaur bone, laced with imperium.
+~
+27 emo ag
+3 0 0
+14 0
+A
+9 -2
+A
+2 1
+A
+12 2
+A
+1 -1
+C
+0 125
+S
+#10279
+pattern boots primordial~
+the primordial boots pattern~
+The pattern for the primordial boots is lying here.~
+This pattern allows you to forge the primordial boots, some of the best tanking
+boots in all of history.
+
+Forge (requires Imperial Armors): primordial boots
+  6x thick dracosaur hide
+  8x serrated dracosaur tooth
+  1x huge dracosaur bone
+ 10x imperium ingot
+~
+3 0 a
+0 0 0
+0 0
+S
+#10280
+gauntlets pair dracosaur scale~
+a pair of dracosaur scale gauntlets~
+A pair of dracosaur scale gauntlets is lying in the dust.~
+   These fine gauntlets are made from hardened dracosaur scales, and look like
+they pack quite the punch.
+~
+27 mo ah
+1 0 0
+7 0
+A
+17 2
+A
+21 1
+C
+0 125
+S
+#10281
+pattern gauntlets dracosaur scale~
+the dracosaur scale gauntlets pattern~
+The pattern for the dracosaur scale gauntlets is lying here.~
+This pattern allows you to sew the dracosaur scale gauntlets, dangerous leather
+gloves from beyond the Primeval portal.
+
+Sew (requires Dangerous Leathers): dracosaur scale gauntlets
+ 12x thick dracosaur hide
+  2x serrated dracosaur tooth
+  1x essence of terror
+  5x imperium ingot
+~
+3 0 a
+0 0 0
+0 0
+S
+#10282
+tome primordial primordium~
+the Tome of the Primordium~
+Someone has left a primordial tome here.~
+   The tome is a heavy book, bound in a thick, scaly leather. A violet gem is
+set into its cover, and the whole thing reeks of ancient mana.
+~
+3 emo ao
+0 0 0
+7 0
+A
+12 -1
+A
+22 2
+A
+17 1
+C
+0 125
+S
+#10283
+schematic tome primordium primordial~
+the Tome of the Primordium schematic~
+The schematic for the Tome of the Primordium is lying here.~
+This pattern allows you to craft the tome of the primordium, a powerful magical
+relic from a bygone era.
+
+Sew (requires Master Craftsman): tome of the primordium
+  4x thick dracosaur hide
+ 10x serrated dracosaur tooth
+  1x stunning violet gem
+  5x ingot of nocturnium
+~
+3 0 a
+0 0 0
+0 0
+S
+#10284
+crown bone primeval~
+the bone crown of the primeval~
+The bone crown of the primeval is lying here.~
+   This magnificent crown is forged from the bone of a primeval dracosaur, an
+ancient form of dragon that existed before the age of man. Only someone who has
+conquered that lost age would dare wear this.
+~
+2 o ae
+0 0 0
+14 0
+A
+5 3
+A
+4 1
+S
+#10285
+pattern bone crown primeval~
+the bone crown pattern~
+The pattern for the bone crown of the primeval is lying here.~
+This pattern allows you to craft the bone crown of the primeval, an ancient
+symbol of kings from a less civilized age.
+
+Craft (requires Jewelry): bone crown of the primeval
+  1x huge dracosaur bone
+  1x essence of terror
+  1x stunning violet gem
+~
+3 0 a
+0 0 0
+0 0
+S
+#10286
+whistle bone strange terrosaur~
+a terrosaur whistle~
+A strange bone whistle is lying on the ground.~
+This whistle can be used just once, to summon a terrosaur mount.
+~
+3 0 a
+10286 0 0
+14 0
+T 10263
 S
 $
