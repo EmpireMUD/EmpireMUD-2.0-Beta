@@ -797,7 +797,7 @@ list~
 %send% %actor%  - &cprimordial boots&0: a pair of primordial boots (Imperial Armors, heavy armor boots)
 %send% %actor%  - &cgauntlets&0: a pair of dracosaur scale gauntlets (Dangerous Leathers, leather armor gloves)
 %send% %actor%  - &ctome&0: the Tome of the Primordium (Master Craftsman, caster offhand)
-%send% %actor%  - &ccrown&0: the brown crown of the primeval (Jewelry, Greatness headgear)
+%send% %actor%  - &ccrown&0: the bone crown of the primeval (Jewelry, Greatness headgear)
 ~
 #10273
 Primeval salesman buy~

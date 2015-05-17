@@ -685,7 +685,7 @@ switch %random.4%
     makeuid goblin mob goblin
     if %goblin%
       %echo% %self.name% opens a cage and lets %goblin.name% out!
-      %force% %goblin% %kill% %actor%
+      %force% %goblin% mkill %actor%
     end
   break
 done
@@ -1041,7 +1041,7 @@ else
       makeuid skelly mob skeleton
       if %skelly%
         %echo% %skelly.name% rises from the floor!
-        %force% %skelly% %kill% %actor%
+        %force% %skelly% mkill %actor%
       end
     break
   done
