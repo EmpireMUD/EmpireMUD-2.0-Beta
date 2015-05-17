@@ -126,9 +126,8 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 		// rank name
 		msg_to_char(ch, " %2d. %s&0", iter, EMPIRE_RANK(e, iter-1));
 		
-		// privs -- only show if not max rank (top rank always has all remaining privs)
-		// and only shown to own empire
-		if (is_own_empire && iter != EMPIRE_NUM_RANKS(e)) {
+		// privs -- only shown to own empire
+		if (is_own_empire) {
 			found = FALSE;
 			for (sub = 0; sub < NUM_PRIVILEGES; ++sub) {
 				if (EMPIRE_PRIV(e, sub) == iter) {
