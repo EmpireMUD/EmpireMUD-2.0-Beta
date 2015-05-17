@@ -413,7 +413,7 @@ King of the Dracosaurs grievous bite~
 ~
 #10253
 Terrosaur combat~
-0 k 7
+0 k 5
 ~
 dg_affect %self% BONUS-PHYSICAL 5 120
 %echo% %self.name% seems to get angrier!
@@ -506,7 +506,7 @@ wait 3 sec
 if (%self.fighting% || %self.disabled%)
   halt
 end
-%kill% %actor%
+mkill %actor%
 ~
 #10262
 Primeval must-fight~
@@ -749,7 +749,7 @@ wait 3 sec
 if (%self.fighting% || %self.disabled%)
   halt
 end
-%kill% %actor%
+mkill %actor%
 ~
 #10271
 Terrosaur greet/aggro~
@@ -780,7 +780,7 @@ wait 3 sec
 if (%self.fighting% || %self.disabled%)
   halt
 end
-%kill% %actor%
+mkill %actor%
 ~
 #10272
 Primeval salesman list~
@@ -796,7 +796,7 @@ list~
 %send% %actor%  - &cscale boots&0: dracosaur scale boots (Imperial Armors, medium armor boots)
 %send% %actor%  - &cprimordial boots&0: a pair of primordial boots (Imperial Armors, heavy armor boots)
 %send% %actor%  - &cgauntlets&0: a pair of dracosaur scale gauntlets (Dangerous Leathers, leather armor gloves)
-%send% %actor%  - &ctome&0: the Tome of hte Primordium (Master Craftsman, caster offhand)
+%send% %actor%  - &ctome&0: the Tome of the Primordium (Master Craftsman, caster offhand)
 %send% %actor%  - &ccrown&0: the brown crown of the primeval (Jewelry, Greatness headgear)
 ~
 #10273

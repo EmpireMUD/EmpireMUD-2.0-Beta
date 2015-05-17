@@ -234,8 +234,8 @@ I 4 10252 100.00 1  # LOOT: a huge dracosaur bone
 I 4 10286 7.50 1 X  # LOOT: a terrosaur whistle
 I 4 10263 15.00 1 X  # LOOT: a dracosaur whistle
 I 4 10255 20.00 1  # LOOT: a dracosaur bone bracelet
-I 4 10259 20.00 1  # LOOT: a primitive satchel
-I 4 10261 20.00 1  # LOOT: an unlit branch
+I 4 10259 10.00 1  # LOOT: a primitive satchel
+I 4 10261 10.00 1  # LOOT: an unlit branch
 T 10262
 T 10265
 T 10256
@@ -262,8 +262,8 @@ I 4 10253 100.00 1  # LOOT: the essence of terror
 I 4 10286 7.50 1 X  # LOOT: a terrosaur whistle
 I 4 10263 15.00 1 X  # LOOT: a dracosaur whistle
 I 4 10256 20.00 1  # LOOT: a dracosaur scale wristband
-I 4 10259 20.00 1  # LOOT: a primitive satchel
-I 4 10261 20.00 1  # LOOT: an unlit branch
+I 4 10259 10.00 1  # LOOT: a primitive satchel
+I 4 10261 10.00 1  # LOOT: an unlit branch
 T 10262
 T 10265
 T 10256
@@ -284,9 +284,9 @@ I 4 10267 75.00 1  # LOOT: a serrated dracosaur tooth
 I 4 10267 75.00 1  # LOOT: a serrated dracosaur tooth
 I 4 10286 7.50 1 X  # LOOT: a terrosaur whistle
 I 4 10263 15.00 1 X  # LOOT: a dracosaur whistle
-I 4 10259 20.00 1  # LOOT: a primitive satchel
-I 4 10261 20.00 1  # LOOT: an unlit branch
 I 4 10258 20.00 1  # LOOT: an obsidian bracelet
+I 4 10259 10.00 1  # LOOT: a primitive satchel
+I 4 10261 10.00 1  # LOOT: an unlit branch
 T 10262
 T 10265
 T 10256
@@ -309,8 +309,8 @@ I 1 10265 50.00 1  # SKIN: a thick dracosaur hide
 I 1 1351 50.00 1  # SKIN: a large skin
 I 1 1351 50.00 1  # SKIN: a large skin
 I 4 10255 10.00 1  # LOOT: a dracosaur bone bracelet
-I 4 10259 20.00 1  # LOOT: a primitive satchel
-I 4 10261 20.00 1  # LOOT: an unlit branch
+I 4 10259 10.00 1  # LOOT: a primitive satchel
+I 4 10261 10.00 1  # LOOT: an unlit branch
 T 10262
 T 10265
 T 10256
@@ -327,8 +327,8 @@ I 0 10267 100.00 1  # BUTCHER: a serrated dracosaur tooth
 I 1 10265 100.00 1  # SKIN: a thick dracosaur hide
 I 1 1351 50.00 1  # SKIN: a large skin
 I 4 10256 10.00 1  # LOOT: a dracosaur scale wristband
-I 4 10259 20.00 1  # LOOT: a primitive satchel
-I 4 10261 20.00 1  # LOOT: an unlit branch
+I 4 10259 10.00 1  # LOOT: a primitive satchel
+I 4 10261 10.00 1  # LOOT: an unlit branch
 T 10262
 T 10265
 T 10256
@@ -344,8 +344,6 @@ I 0 3200 100.00 1  # BUTCHER: a cut of poultry
 I 0 10267 50.00 1  # BUTCHER: a serrated dracosaur tooth
 I 1 10265 50.00 1 X  # SKIN: a thick dracosaur hide
 I 1 1351 100.00 1  # SKIN: a large skin
-I 4 10259 20.00 1  # LOOT: a primitive satchel
-I 4 10261 20.00 1  # LOOT: an unlit branch
 T 10262
 T 10265
 S
@@ -361,8 +359,8 @@ I 4 10265 50.00 1  # LOOT: a thick dracosaur hide
 I 4 10265 50.00 1  # LOOT: a thick dracosaur hide
 I 4 10267 50.00 1  # LOOT: a serrated dracosaur tooth
 I 4 10267 50.00 1  # LOOT: a serrated dracosaur tooth
-I 4 10259 20.00 1  # LOOT: a primitive satchel
-I 4 10261 20.00 1  # LOOT: an unlit branch
+I 4 10259 10.00 1  # LOOT: a primitive satchel
+I 4 10261 10.00 1  # LOOT: an unlit branch
 T 10262
 T 10265
 T 10256
@@ -376,8 +374,8 @@ A fierce terror bird is pacing toward you!
 0 0 0 10
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
 I 1 1351 100.00 1  # SKIN: a large skin
-I 4 10259 20.00 1  # LOOT: a primitive satchel
-I 4 10261 20.00 1  # LOOT: an unlit branch
+I 4 10259 10.00 1  # LOOT: a primitive satchel
+I 4 10261 10.00 1  # LOOT: an unlit branch
 T 10262
 T 10265
 S
@@ -390,8 +388,6 @@ A terror bird is eyeing you from the foliage.
 0 0 0 9
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
 I 1 1351 75.00 1  # SKIN: a large skin
-I 4 10259 20.00 1  # LOOT: a primitive satchel
-I 4 10261 20.00 1  # LOOT: an unlit branch
 T 10262
 T 10265
 S
@@ -402,8 +398,8 @@ A swarm of ants is coming toward you!
 ~
 0 0 bdjyE c
 0 0 0 9
-I 4 10259 20.00 1  # LOOT: a primitive satchel
-I 4 10261 20.00 1  # LOOT: an unlit branch
+I 4 10259 10.00 1  # LOOT: a primitive satchel
+I 4 10261 10.00 1  # LOOT: an unlit branch
 T 10262
 T 10265
 S
@@ -414,8 +410,8 @@ A trophy hunter is crouching in the underbrush.
 ~
 0 0 bdvzE c
 1 3 0 2
-I 4 10259 20.00 1  # LOOT: a primitive satchel
-I 4 10261 20.00 1  # LOOT: an unlit branch
+I 4 10259 10.00 1  # LOOT: a primitive satchel
+I 4 10261 10.00 1  # LOOT: an unlit branch
 T 10262
 T 10265
 S
