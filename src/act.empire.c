@@ -1558,7 +1558,7 @@ ACMD(do_barde) {
 					char_to_room(newmob, IN_ROOM(ch));
 					MOB_INSTANCE_ID(newmob) = MOB_INSTANCE_ID(ch);
 		
-					prc = (double)GET_HEALTH(mob) / GET_MAX_HEALTH(mob);
+					prc = (double)GET_HEALTH(mob) / MAX(1, GET_MAX_HEALTH(mob));
 					GET_HEALTH(newmob) = (int)(prc * GET_MAX_HEALTH(newmob));
 				}
 				

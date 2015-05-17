@@ -334,7 +334,7 @@ void diag_char_to_char(char_data *i, char_data *ch) {
 		return;
 	}
 	
-	sprintf(buf, "$n is %s.", health_levels[(MAX(0, GET_HEALTH(i)) * 10 / GET_MAX_HEALTH(i))]);
+	sprintf(buf, "$n is %s.", health_levels[(MAX(0, GET_HEALTH(i)) * 10 / MAX(1, GET_MAX_HEALTH(i)))]);
 	act(buf, FALSE, i, 0, ch, TO_VICT);
 }
 

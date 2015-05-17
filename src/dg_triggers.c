@@ -441,7 +441,7 @@ void hitprcnt_mtrigger(char_data *ch) {
 		return;
 
 	for (t = TRIGGERS(SCRIPT(ch)); t; t = t->next) {
-		if (TRIGGER_CHECK(t, MTRIG_HITPRCNT) && GET_MAX_HEALTH(ch) && (((GET_HEALTH(ch) * 100) / GET_MAX_HEALTH(ch)) <= GET_TRIG_NARG(t))) {
+		if (TRIGGER_CHECK(t, MTRIG_HITPRCNT) && GET_MAX_HEALTH(ch) && (((GET_HEALTH(ch) * 100) / MAX(1, GET_MAX_HEALTH(ch))) <= GET_TRIG_NARG(t))) {
 			union script_driver_data_u sdd;
 
 			actor = FIGHTING(ch);

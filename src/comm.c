@@ -2556,7 +2556,7 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					tmp = i;
 					break;
 				case 'i':	// %i health as text
-					sprintf(i, "%s", health_levels[MIN(10, MAX(0, GET_HEALTH(ch)) * 10 / GET_MAX_HEALTH(ch))]);
+					sprintf(i, "%s", health_levels[MIN(10, MAX(0, GET_HEALTH(ch)) * 10 / MAX(1, GET_MAX_HEALTH(ch)))]);
 					tmp = i;
 					break;
 				case 'v':	// %v current move
@@ -2568,7 +2568,7 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					tmp = i;
 					break;
 				case 'u':	// %u move as text
-					sprintf(i, "%s", move_levels[MIN(10, MAX(0, GET_MOVE(ch)) * 10 / GET_MAX_MOVE(ch))]);
+					sprintf(i, "%s", move_levels[MIN(10, MAX(0, GET_MOVE(ch)) * 10 / MAX(1, GET_MAX_MOVE(ch)))]);
 					tmp = i;
 					break;
 				case 'm':	// %m current mana
@@ -2580,7 +2580,7 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					tmp = i;
 					break;
 				case 'n':	// %n mana as text
-					sprintf(i, "%s", mana_levels[MIN(10, MAX(0, GET_MANA(ch)) * 10 / GET_MAX_MANA(ch))]);
+					sprintf(i, "%s", mana_levels[MIN(10, MAX(0, GET_MANA(ch)) * 10 / MAX(1, GET_MAX_MANA(ch)))]);
 					tmp = i;
 					break;
 				case 'b':	// %b current blood
