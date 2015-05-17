@@ -53,6 +53,7 @@ struct instance_data *real_instance(any_vnum instance_id);
 void reset_instance(struct instance_data *inst);
 void save_instances();
 static void scale_instance_to_level(struct instance_data *inst, int level);
+bool template_has_free_exit(room_template *rmt, int dir);
 void unlink_instance_entrance(room_data *room);
 
 
@@ -563,17 +564,19 @@ inline bool validate_one_loc(struct adventure_link_rule *rule, room_data *loc) {
 /**
 * This function finds a location that matches a linking rule.
 *
+* @param adv_data *adv The adventure we are linking.
 * @param struct adventure_link_rule *rule The linking rule we're trying.
 * @param int *which_dir The direction, for linking rules that require one.
 * @return room_data* A valid location, or else NULL if we couldn't find one.
 */
-room_data *find_location_for_rule(struct adventure_link_rule *rule, int *which_dir) {
+room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rule, int *which_dir) {
 	extern bool can_build_on(room_data *room, bitvector_t flags);
 	
 	room_data *room, *next_room, *loc, *shift, *found = NULL;
 	bld_data *findbdg = NULL;
 	sector_data *findsect = NULL;
-	bool match_buildon = FALSE;
+	room_template *start_room = room_template_proto(GET_ADV_START_VNUM(adv));
+	bool match_buildon = FALSE, needs_inside_dir = FALSE;
 	int pos = -1;	// default < 0
 	int dir, iter, sub;
 	
@@ -581,15 +584,22 @@ room_data *find_location_for_rule(struct adventure_link_rule *rule, int *which_d
 	
 	*which_dir = NO_DIR;
 	
+	// cannot find a location without a start room
+	if (!start_room) {
+		return NULL;
+	}
+	
 	// ADV_LINK_x
 	switch (rule->type) {
 		case ADV_LINK_BUILDING_EXISTING: {
 			findbdg = building_proto(rule->value);
 			pos = number(0, stats_get_building_count(findbdg) - 1);
+			needs_inside_dir = TRUE;
 			break;
 		}
 		case ADV_LINK_BUILDING_NEW: {
 			match_buildon = TRUE;
+			needs_inside_dir = TRUE;
 			break;
 		}
 		case ADV_LINK_PORTAL_WORLD: {
@@ -653,12 +663,25 @@ room_data *find_location_for_rule(struct adventure_link_rule *rule, int *which_d
 				else {
 					for (sub = 0; sub < max_dir_tries && !found; ++sub) {
 						dir = number(0, NUM_2D_DIRS-1);
-						if (dir != rule->dir && (shift = real_shift(loc, shift_dir[dir][0], shift_dir[dir][1]))) {
-							if (can_build_on(shift, rule->bld_facing)) {
-								*which_dir = dir;
-								found = loc;
-								break;
-							}
+						
+						// matches the dir we need inside?
+						if (dir == rule->dir) {
+							continue;
+						}
+						// requires that dir for inside
+						if (needs_inside_dir && !template_has_free_exit(start_room, rev_dir[dir])) {
+							continue;
+						}
+						// need a valid map tile to face
+						if (!(shift = real_shift(loc, shift_dir[dir][0], shift_dir[dir][1]))) {
+							continue;
+						}
+						
+						// ok go
+						if (can_build_on(shift, rule->bld_facing)) {
+							*which_dir = dir;
+							found = loc;
+							break;
 						}
 					}
 				}
@@ -694,7 +717,7 @@ void generate_adventure_instances(void) {
 		
 			if (can_instance(iter)) {
 				for (rule = GET_ADV_LINKING(iter); rule; rule = rule->next) {
-					if ((loc = find_location_for_rule(rule, &dir))) {
+					if ((loc = find_location_for_rule(iter, rule, &dir))) {
 						// make it so!
 						if (build_instance_loc(iter, rule, loc, dir)) {
 							save_instances();
@@ -1265,6 +1288,31 @@ struct instance_data *real_instance(any_vnum instance_id) {
 	}
 	
 	return NULL;
+}
+
+
+/**
+* Determines if a room template can accept an exit in a given direction.
+*
+* @param room_template *rmt The room template to check.
+* @param int dir Which direction to check.
+* @return bool TRUE if that direction is ok.
+*/
+bool template_has_free_exit(room_template *rmt, int dir) {
+	struct exit_template *ex;
+	
+	// realistically, always have a random dir available
+	if (dir == DIR_RANDOM) {
+		return TRUE;
+	}
+	
+	for (ex = rmt->exits; ex; ex = ex->next) {
+		if (ex->dir == dir) {
+			return FALSE;
+		}
+	}
+	
+	return TRUE;
 }
 
 

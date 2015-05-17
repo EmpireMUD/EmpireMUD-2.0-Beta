@@ -566,7 +566,7 @@ ACMD(do_admin_util) {
 
 void do_instance_add(char_data *ch, char *argument) {
 	extern bool can_instance(adv_data *adv);
-	extern room_data *find_location_for_rule(struct adventure_link_rule *rule, int *which_dir);
+	extern room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rule, int *which_dir);
 
 	struct adventure_link_rule *rule;
 	bool found = FALSE;
@@ -586,7 +586,7 @@ void do_instance_add(char_data *ch, char *argument) {
 	}
 	
 	for (rule = GET_ADV_LINKING(adv); rule; rule = rule->next) {
-		if ((loc = find_location_for_rule(rule, &dir))) {
+		if ((loc = find_location_for_rule(adv, rule, &dir))) {
 			// make it so!
 			if (build_instance_loc(adv, rule, loc, dir)) {
 				found = TRUE;
