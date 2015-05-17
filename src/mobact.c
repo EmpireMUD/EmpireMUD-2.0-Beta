@@ -1148,6 +1148,7 @@ void scale_mob_to_level(char_data *mob, int level) {
 	value = base_player_pools[BLOOD];
 	value += MOB_FLAGGED(mob, MOB_VAMPIRE) ? ((10 * high_level) + (20 * over_level)) : 0;
 	value *= MOB_FLAGGED(mob, MOB_ANIMAL) ? 0.5 : 1.0;
+	value *= (level <= 10) ? 0.1 : 1.0;
 	mob->points.max_pools[BLOOD] = MAX(1, (int) ceil(value));
 	
 	// strength
