@@ -327,10 +327,11 @@ rooms.
 
 *mobs do not currently engage upon finding, it is bugged.
 #d
-%KILL% WKILL OKILL MKILL
+MKILL
 
 mkill <victim>
 mkill %actor%
+
    mkill causes the mob to hit the victim. It is the same as kill, except mkill 
 works for low level mobs attacking PCs, where kill might not.
 #d

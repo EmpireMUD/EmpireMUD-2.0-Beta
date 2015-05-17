@@ -886,6 +886,10 @@ void drop_loot(char_data *mob, char_data *killer) {
 				
 				obj_to_char(obj, mob);
 				load_otrigger(obj);
+				
+				if (interact->exclusive) {
+					break;
+				}
 			}
 		}
 	}
@@ -2584,7 +2588,7 @@ void perform_execute(char_data *ch, char_data *victim, int attacktype, int damty
 	char_data *m, *ch_iter;
 	obj_data *weapon;
 
-	#define WOULD_EXECUTE(ch)  (IS_NPC(ch) ? (!MOB_FLAGGED((ch), MOB_ANIMAL) || MOB_FLAGGED((ch), MOB_AGGRESSIVE)) : (PRF_FLAGGED((ch), PRF_AUTOKILL)))
+	#define WOULD_EXECUTE(ch)  (IS_NPC(ch) ? (!MOB_FLAGGED((ch), MOB_ANIMAL) || MOB_FLAGGED((ch), MOB_AGGRESSIVE | MOB_HARD | MOB_GROUP)) : (PRF_FLAGGED((ch), PRF_AUTOKILL)))
 
 	/* stop_fighting() is split around here to help with exp */
 

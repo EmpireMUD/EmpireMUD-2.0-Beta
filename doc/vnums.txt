@@ -57,5 +57,6 @@ Included Adventure Zones
 [  125] Ruins: The Goblin Challenge (10200-10224)
 [  140] The Sewer: Ratskins (10011-10027)
 [  160] The Tower Skycleave (10030-10099)
+[  161] Portal to the Primeval (10250-10299)
 [  200] Burrow Canyons (11100-11129)
 [  201] The Cursed Chalice of Mill Manor (11130-11159)
