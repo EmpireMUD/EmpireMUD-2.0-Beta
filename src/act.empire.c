@@ -3592,16 +3592,10 @@ ACMD(do_reclaim) {
 }
 
 
-ACMD(do_reward) {
-	void set_skill(char_data *ch, int skill, int level);
-	extern int find_skill_by_name(char *name);
-	
-	const int max = 75;
-	
+ACMD(do_reward) {	
+	char arg[MAX_INPUT_LENGTH];
+	int count, iter;
 	char_data *vict;
-	empire_data *emp;
-	int skill, count, iter;
-	char arg2[MAX_INPUT_LENGTH];
 	bool found;
 	
 	// count rewards used
@@ -3611,17 +3605,17 @@ ACMD(do_reward) {
 		}
 	}
 	
-	two_arguments(argument, arg, arg2);
+	one_argument(argument, arg);
 	
 	if (IS_NPC(ch) || !can_use_ability(ch, ABIL_REWARD, NOTHING, 0, COOLDOWN_REWARD)) {
 		// nope
 	}
-	else if (!*arg || !*arg2) {
-		msg_to_char(ch, "Usage: reward <person> <skill>\r\n");
+	else if (!*arg) {
+		msg_to_char(ch, "Usage: reward <person>\r\n");
 		msg_to_char(ch, "You have %d rewards remaining today.\r\n", MAX(0, MAX_REWARDS_PER_DAY - count));
 	}
 	else if (count >= MAX_REWARDS_PER_DAY) {
-		msg_to_char(ch, "You have no more reward points to give out today.\r\n");
+		msg_to_char(ch, "You have no more rewards to give out today.\r\n");
 	}
 	else if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
@@ -3632,20 +3626,8 @@ ACMD(do_reward) {
 	else if (IS_NPC(vict)) {
 		msg_to_char(ch, "You can only reward players, not NPCs.\r\n");
 	}
-	else if (!(emp = GET_LOYALTY(ch)) || GET_LOYALTY(vict) != emp) {
+	else if (!GET_LOYALTY(ch) || GET_LOYALTY(vict) != GET_LOYALTY(ch)) {
 		msg_to_char(ch, "You can only reward people in your empire.\r\n");
-	}
-	else if ((skill = find_skill_by_name(arg2)) == NO_SKILL) {
-		msg_to_char(ch, "Unknown skill '%s'.\r\n", arg2);
-	}
-	else if (GET_SKILL(vict, skill) >= GET_SKILL(ch, skill)) {
-		msg_to_char(ch, "You can only a reward a skill if you are better at it than your target.\r\n");
-	}
-	else if (GET_SKILL(vict, skill) >= max) {
-		act("You can't reward that skill to $N -- $E's already too good at it.", FALSE, ch, NULL, vict, TO_CHAR);
-	}
-	else if (GET_SKILL(vict, skill) == 0) {
-		act("$N must learn some of that skill before you can reward it to $M.", FALSE, ch, NULL, vict, TO_CHAR);
 	}
 	else if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_REWARD)) {
 		return;
@@ -3660,21 +3642,16 @@ ACMD(do_reward) {
 		}
 		
 		if (found) {
-			act("$N was already rewarded today.", FALSE, ch, NULL, vict, TO_CHAR);
+			act("You have already rewarded $N today.", FALSE, ch, NULL, vict, TO_CHAR);
 		}
 		else {
 			charge_ability_cost(ch, NOTHING, 0, COOLDOWN_REWARD, 30);
 			
-			sprintf(buf, "You reward $N with %s.", skill_data[skill].name);
-			act(buf, FALSE, ch, NULL, vict, TO_CHAR);
-		
-			sprintf(buf, "$n rewards you with %s!", skill_data[skill].name);
-			act(buf, FALSE, ch, NULL, vict, TO_VICT);
-		
-			sprintf(buf, "$n rewards $N with %s.", skill_data[skill].name);
-			act(buf, TRUE, ch, NULL, vict, TO_NOTVICT);
-		
-			set_skill(vict, skill, GET_SKILL(vict, skill) + 1);
+			act("You reward $N with extra bonus experience!", FALSE, ch, NULL, vict, TO_CHAR);
+			act("$n rewards you with extra bonus experience!", FALSE, ch, NULL, vict, TO_VICT);
+			act("$n rewards $N with extra bonus experience!", TRUE, ch, NULL, vict, TO_NOTVICT);
+			
+			SAFE_ADD(GET_DAILY_BONUS_EXPERIENCE(ch), 5, 0, UCHAR_MAX, FALSE);
 		
 			// mark rewarded
 			for (iter = 0, found = FALSE; !found && iter < MAX_REWARDS_PER_DAY; ++iter) {

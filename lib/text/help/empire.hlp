@@ -916,16 +916,17 @@ REWARD
 
 Reward (Empire ability)
 
-Usage:  reward <player> <skill>
+Usage:  reward <player>
 Cooldown:  30 seconds
 
-Great leaders can reward their loyal subjects with additional skill points
+Great leaders can reward their loyal subjects with additional bonus experience
 each day. Each leader with Reward may only grant 5 rewards per day, and each
 reward must go to a different member of the empire. However, if two leaders
 have Reward, they may both choose to reward the same member.
 
-You cannot reward a skill to someone if their skill is already over 75, or if
-they are better at that skill than you.
+Each Reward gives a member of your empire +5 bonus experience for the day.
+Just like regular bonus experience, it will expire at the end of the day if
+it isn't used.
 #
 ROCKS
 
