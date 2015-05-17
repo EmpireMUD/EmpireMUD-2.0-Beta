@@ -356,24 +356,6 @@ C
 dig, quarry~
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
-M
-9188 2.00 0
-M
-9189 2.00 0
-M
-9190 2.00 0
-M
-9192 5.00 c
-M
-9193 5.00 c
-M
-9194 5.00 c
-M
-9195 5.00 c
-M
-9198 2.00 0
-M
-9199 2.00 0
 S
 #5123
 Clay Pit~
@@ -573,19 +555,9 @@ stool, both stained with ink. The smell is surprisingly tolerable despite the
 number of pigeons -- a clear indication the post is well-tended.
 ~
 M
-9188 2.00 0
-M
-9189 2.00 0
-M
-9190 2.00 0
-M
-9192 5.00 c
-M
-9198 2.00 0
-M
-9199 2.00 0
-M
 9193 5.00 c
+M
+9024 20.00 0
 S
 #5137
 Tailor~
@@ -657,24 +629,6 @@ the items from the top shelf -- but you can't see the far walls to get a sense
 for how large the warehouse actually is. As you wander the aisles, you find
 many different and curious items.
 ~
-M
-9188 2.00 0
-M
-9189 2.00 0
-M
-9190 2.00 0
-M
-9192 5.00 c
-M
-9193 5.00 c
-M
-9194 5.00 c
-M
-9195 5.00 c
-M
-9198 2.00 0
-M
-9199 2.00 0
 S
 #5140
 Steps~
@@ -775,16 +729,6 @@ itself, a small stick figure atop an altar, is stained with the blood of many
 sacrifices. That same activity leaves a horrid stench in the air, but that
 stench is what attracts patron gods.
 ~
-M
-9189 2.00 0
-M
-9190 2.00 0
-M
-9191 2.00 0
-M
-9198 2.00 0
-M
-9199 2.00 0
 S
 #5148
 Temple~
@@ -819,23 +763,7 @@ most incredible monuments in the world, and you are overcome with awe each time
 you gaze up its towering shelves.
 ~
 M
-9188 2.00 0
-M
-9189 2.00 0
-M
-9190 2.00 0
-M
-9192 5.00 c
-M
-9193 5.00 c
-M
-9194 5.00 c
-M
-9195 5.00 c
-M
 9198 2.00 0
-M
-9199 2.00 0
 S
 #5150
 High Temple~
@@ -871,10 +799,6 @@ Writings on the walls warn you of traps and an unending fate for anyone who
 breaks the seal on the door.
 ~
 M
-9189 2.00 0
-M
-9190 2.00 0
-M
 9191 2.00 0
 M
 9198 2.00 0
@@ -896,24 +820,6 @@ D
 be docked here for easy storage. In addition, the facility allows the loading
 of larger pieces of equipment into the ship's hold.
 ~
-M
-9188 2.00 0
-M
-9189 2.00 0
-M
-9190 2.00 0
-M
-9192 5.00 c
-M
-9193 5.00 c
-M
-9194 5.00 c
-M
-9195 5.00 c
-M
-9198 2.00 0
-M
-9199 2.00 0
 S
 #5153
 Shipyard~
@@ -929,24 +835,6 @@ great ships right into the water. Ships built here may be boarded by
 passengers, but the shipyard lacks the facilities to load heavy equipment or
 animals. Ships may also not be brought back in once they leave.
 ~
-M
-9188 2.00 0
-M
-9189 2.00 0
-M
-9190 2.00 0
-M
-9192 5.00 c
-M
-9193 5.00 c
-M
-9194 5.00 c
-M
-9195 5.00 c
-M
-9198 2.00 0
-M
-9199 2.00 0
 U
 5154
 S
@@ -964,24 +852,6 @@ great ships right into the water. Ships built here may be boarded by
 passengers, but the shipyard lacks the facilities to load heavy equipment or
 animals. Ships may also not be brought back in once they leave.
 ~
-M
-9188 2.00 0
-M
-9189 2.00 0
-M
-9190 2.00 0
-M
-9192 5.00 c
-M
-9193 5.00 c
-M
-9194 5.00 c
-M
-9195 5.00 c
-M
-9198 2.00 0
-M
-9199 2.00 0
 S
 #5155
 Swamp Walk~
@@ -1059,25 +929,9 @@ meat and drying leather leaves a hollow feeling in your stomach, and your mouth
 begins to water.
 ~
 M
-9188 2.00 0
-M
-9189 2.00 0
-M
-9190 2.00 0
-M
-9192 5.00 c
-M
-9193 5.00 c
-M
 9194 5.00 c
 M
 9195 5.00 c
-M
-9198 2.00 0
-M
-9199 2.00 0
-M
-9191 2.00 0
 S
 #5162
 Baths~
@@ -1185,24 +1039,6 @@ decorated with the best gold available. The Great Hall is often one of the
 most important parts of the castle as it shows the wealth of the king. It
 also leads to the throne room.
 ~
-M
-9188 2.00 0
-M
-9189 2.00 0
-M
-9190 2.00 0
-M
-9192 5.00 c
-M
-9193 5.00 c
-M
-9194 5.00 c
-M
-9195 5.00 c
-M
-9198 2.00 0
-M
-9199 2.00 0
 S
 #5167
 Guard Tower~
@@ -1220,23 +1056,7 @@ against invasion. Hopefully, it will be enough defense. The tower may be
 upgraded by typing upgrade here.
 ~
 M
-9188 2.00 0
-M
-9189 2.00 0
-M
-9190 2.00 0
-M
-9192 5.00 c
-M
-9193 5.00 c
-M
-9194 5.00 c
-M
-9195 5.00 c
-M
-9198 2.00 0
-M
-9199 2.00 0
+251 5.00 ce
 U
 5168
 S
@@ -1256,23 +1076,7 @@ against invasion. Hopefully, it will be enough defense. The tower may be
 upgraded by typing upgrade here again.
 ~
 M
-9188 2.00 0
-M
-9189 2.00 0
-M
-9190 2.00 0
-M
-9192 5.00 c
-M
-9193 5.00 c
-M
-9194 5.00 c
-M
-9195 5.00 c
-M
-9198 2.00 0
-M
-9199 2.00 0
+251 5.00 ce
 U
 5169
 S
@@ -1289,23 +1093,7 @@ trespassers it sees. The tower is made from wood, so it is not well protected
 against invasion. Hopefully, it will be enough defense.
 ~
 M
-9188 2.00 0
-M
-9189 2.00 0
-M
-9190 2.00 0
-M
-9192 5.00 c
-M
-9193 5.00 c
-M
-9194 5.00 c
-M
-9195 5.00 c
-M
-9198 2.00 0
-M
-9199 2.00 0
+251 5.00 ce
 S
 #5170
 Outpost~
@@ -1334,24 +1122,6 @@ sleeping quarters are lined with cots and hammocks, and the scent of roasted
 meat wafts from the kitchen at all hours. So long as the troops are well-fed
 and well-trained, there is little need for the empire to fear.
 ~
-M
-9188 2.00 0
-M
-9189 2.00 0
-M
-9190 2.00 0
-M
-9192 5.00 c
-M
-9193 5.00 c
-M
-9194 5.00 c
-M
-9195 5.00 c
-M
-9198 2.00 0
-M
-9199 2.00 0
 S
 #5172
 Training Yard~
@@ -1365,24 +1135,6 @@ with the blood of overworked soldiers. This is the place where the empire's
 finest troops hone their combat skills and square off against each other for
 pride and glory, lest they be unprepared when war comes.
 ~
-M
-9188 2.00 0
-M
-9189 2.00 0
-M
-9190 2.00 0
-M
-9192 5.00 c
-M
-9193 5.00 c
-M
-9194 5.00 c
-M
-9195 5.00 c
-M
-9198 2.00 0
-M
-9199 2.00 0
 S
 #5173
 Gatehouse~
@@ -1503,24 +1255,6 @@ new and old, are stacked on every shelf, hung from every rack, and piled in
 every corner. Prices are affixed to every item, and a large sign on the wall
 reads 'No Bartering'.
 ~
-M
-9188 2.00 0
-M
-9189 2.00 0
-M
-9190 2.00 0
-M
-9192 5.00 c
-M
-9193 5.00 c
-M
-9194 5.00 c
-M
-9195 5.00 c
-M
-9198 2.00 0
-M
-9199 2.00 0
 S
 #5184
 Secret Cache~

@@ -56,10 +56,6 @@ M
 9194 5.00 c
 M
 9195 5.00 c
-M
-9198 2.00 0
-M
-9199 2.00 0
 S
 #5603
 Forge~
@@ -110,24 +106,6 @@ D
 Hallways are used as filler space when a builder does not want to directly
 connect rooms. With bedrooms, they also offer more privacy for the occupants.
 ~
-M
-9188 2.00 0
-M
-9189 2.00 0
-M
-9190 2.00 0
-M
-9192 5.00 c
-M
-9193 5.00 c
-M
-9194 5.00 c
-M
-9195 5.00 c
-M
-9198 2.00 0
-M
-9199 2.00 0
 S
 #5606
 Kitchen~
@@ -175,12 +153,6 @@ guests are present. The walls are made of wood and lined with a dull metal to
 create a rustic, home-like feel.
 ~
 M
-9188 2.00 0
-M
-9189 2.00 0
-M
-9190 2.00 0
-M
 9192 5.00 c
 M
 9193 5.00 c
@@ -188,10 +160,6 @@ M
 9194 5.00 c
 M
 9195 5.00 c
-M
-9198 2.00 0
-M
-9199 2.00 0
 S
 #5608
 Study~
@@ -208,10 +176,6 @@ quantifying acquisitions. Many, however, just use it as a quiet place to
 relax and rejuvenate.
 ~
 M
-9188 2.00 0
-M
-9189 2.00 0
-M
 9190 2.00 0
 M
 9192 5.00 c
@@ -223,8 +187,6 @@ M
 9195 5.00 c
 M
 9198 2.00 0
-M
-9199 2.00 0
 S
 #5609
 Throne Room~
@@ -262,24 +224,6 @@ It is expansive, large enough to hold months worth of supplies. The walls are
 moist and some fungus grows on them, indicating that this is not the most
 well-maintained room.
 ~
-M
-9188 2.00 0
-M
-9189 2.00 0
-M
-9190 2.00 0
-M
-9192 5.00 c
-M
-9193 5.00 c
-M
-9194 5.00 c
-M
-9195 5.00 c
-M
-9198 2.00 0
-M
-9199 2.00 0
 S
 #5611
 Vault~
@@ -409,16 +353,6 @@ shelves for all sorts of clothing. It looks as though it could hold a lot,
 too. The room is unusually deep and well-organized. This is truly a rich
 woman's dream.
 ~
-M
-9188 2.00 0
-M
-9189 2.00 0
-M
-9190 2.00 0
-M
-9198 2.00 0
-M
-9199 2.00 0
 S
 #5618
 Laboratory~
@@ -457,10 +391,6 @@ M
 9189 2.00 0
 M
 9190 2.00 0
-M
-9192 5.00 c
-M
-9193 5.00 c
 M
 9198 2.00 0
 M

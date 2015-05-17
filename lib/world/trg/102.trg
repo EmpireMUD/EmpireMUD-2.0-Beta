@@ -860,7 +860,7 @@ switch %random.4%
     %echo% A thunderous roar shakes the trees.
   break
   case 3
-    %echo% You have the everpresent feeling that someone is watching you through the trees.
+    %echo% You have the ever-present feeling that someone is watching you through the trees.
   break
   case 4
     %echo% The ground rumbles beneath you.
