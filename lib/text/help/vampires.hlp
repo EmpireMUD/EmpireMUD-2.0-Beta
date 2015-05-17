@@ -85,6 +85,16 @@ Type:  passive
 
 The vampire's blood-fueled form is more resilient against physical damage.
 #
+BLOODSWEAT "BLOOD SWEAT"
+
+Bloodsweat
+Class ability:  Reaper
+Usage:  bloodsweat
+Cost:  50 blood
+Cooldown:  30 seconds
+
+This power purges a vampire's blood of any poisons, by sweating them out.
+#
 BLOODSWORD "BLOOD-RED SWORD"
 
 Bloodsword (Vampire ability)

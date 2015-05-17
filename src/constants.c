@@ -2255,6 +2255,7 @@ const char *cooldown_types[] = {
 	"moonrise",
 	"alternate",	// 45
 	"dispel",
+	"bloodsweat",
 	"\n"
 };
 

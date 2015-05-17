@@ -355,8 +355,9 @@ extern bool skill_check(char_data *ch, int ability, int difficulty);
 #define ABIL_SANGUINE_RESTORATION  226
 #define ABIL_WARD_AGAINST_MAGIC  227
 #define ABIL_NOBLE_BEARING  228
+#define ABIL_BLOODSWEAT  229
 
-#define NUM_ABILITIES  229		// must be <= MAX_ABILITIES (structs.h)
+#define NUM_ABILITIES  230		// must be <= MAX_ABILITIES (structs.h)
 
 
 // cooldowns -- see COOLDOWN_x in constants.c
@@ -407,6 +408,7 @@ extern bool skill_check(char_data *ch, int ability, int difficulty);
 #define COOLDOWN_MOONRISE  44
 #define COOLDOWN_ALTERNATE  45
 #define COOLDOWN_DISPEL  46
+#define COOLDOWN_BLOODSWEAT  47
 
 
 /* WEAPON ATTACK TYPES */
