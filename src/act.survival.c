@@ -59,11 +59,14 @@ INTERACTION_FUNC(butcher_interact) {
 		if (interaction->quantity != 1) {
 			sprintf(buf, "You skillfully butcher $p (x%d) from the corpse!", interaction->quantity);
 			act(buf, FALSE, ch, fillet, NULL, TO_CHAR);
+			
+			sprintf(buf, "$n butchers a corpse and gets $p (x%d).", interaction->quantity);
+			act(buf, FALSE, ch, fillet, NULL, TO_ROOM);
 		}
 		else {
 			act("You skillfully butcher $p from the corpse!", FALSE, ch, fillet, NULL, TO_CHAR);
+			act("$n butchers a corpse and gets $p.", FALSE, ch, fillet, NULL, TO_ROOM);
 		}
-		act("$n butchers a corpse!", FALSE, ch, NULL, NULL, TO_ROOM);
 		return TRUE;
 	}
 
