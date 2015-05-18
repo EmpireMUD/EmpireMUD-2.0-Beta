@@ -2344,7 +2344,7 @@ void warehouse_store(char_data *ch, char *argument) {
 			
 			// we use !OBJ_CAN_STORE because it blocks things that can be stored normally
 			// bound objects never store, nor can torches
-			if (!OBJ_CAN_STORE(obj) && !OBJ_BOUND_TO(obj) && (!OBJ_FLAGGED(obj, OBJ_LIGHT) || GET_OBJ_TIMER(obj) == UNLIMITED)) {
+			if (!OBJ_FLAGGED(obj, OBJ_KEEP) && !OBJ_CAN_STORE(obj) && !OBJ_BOUND_TO(obj) && (!OBJ_FLAGGED(obj, OBJ_LIGHT) || GET_OBJ_TIMER(obj) == UNLIMITED)) {
 				// may extract obj
 				store_unique_item(ch, obj, GET_LOYALTY(ch), IN_ROOM(ch), &full);
 				if (!full) {
@@ -2376,7 +2376,7 @@ void warehouse_store(char_data *ch, char *argument) {
 
 			// we use !OBJ_CAN_STORE because it blocks things that can be stored normally			
 			// bound objects never store
-			if (!OBJ_CAN_STORE(obj) && !OBJ_BOUND_TO(obj) && (!OBJ_FLAGGED(obj, OBJ_LIGHT) || GET_OBJ_TIMER(obj) == UNLIMITED)) {
+			if ((!OBJ_FLAGGED(obj, OBJ_KEEP) || total == 1) && !OBJ_CAN_STORE(obj) && !OBJ_BOUND_TO(obj) && (!OBJ_FLAGGED(obj, OBJ_LIGHT) || GET_OBJ_TIMER(obj) == UNLIMITED)) {
 				// may extract obj
 				store_unique_item(ch, obj, GET_LOYALTY(ch), IN_ROOM(ch), &full);
 				if (!full) {
@@ -2690,6 +2690,11 @@ ACMD(do_drop) {
 			else {
 				for (obj = ch->carrying; obj; obj = next_obj) {
 					next_obj = obj->next_content;
+					
+					if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
+						continue;
+					}
+					
 					this = perform_drop(ch, obj, mode, sname);
 					if (this == -1) {
 						break;
@@ -2697,6 +2702,10 @@ ACMD(do_drop) {
 					else {
 						amount += this;
 					}
+				}
+				
+				if (amount == 0) {
+					msg_to_char(ch, "You don't have anything that isn't marked 'keep'.\r\n");
 				}
 			}
 		}
@@ -2712,6 +2721,10 @@ ACMD(do_drop) {
 			}
 			while (obj) {
 				next_obj = get_obj_in_list_vis(ch, arg, obj->next_content);
+				if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
+					continue;
+				}
+				
 				this = perform_drop(ch, obj, mode, sname);
 				obj = next_obj;
 				if (this == -1) {
@@ -2720,6 +2733,10 @@ ACMD(do_drop) {
 				else {
 					amount += this;
 				}
+			}
+			
+			if (amount == 0) {
+				msg_to_char(ch, "You don't have any that aren't marked 'keep'.\r\n");
 			}
 		}
 		else {
@@ -2915,6 +2932,10 @@ ACMD(do_exchange) {
 			for (obj = ch->carrying; obj; obj = next_obj) {
 				next_obj = obj->next_content;
 				
+				if (!OBJ_FLAGGED(obj, OBJ_KEEP)) {
+					continue;
+				}
+				
 				if (!perform_exchange(ch, obj, emp)) {
 					break;
 				}
@@ -2936,8 +2957,10 @@ ACMD(do_exchange) {
 			
 				while (obj) {
 					next_obj = get_obj_in_list_vis(ch, arg, obj->next_content);
-					if (!perform_exchange(ch, obj, emp)) {
-						break;
+					if (!OBJ_FLAGGED(obj, OBJ_KEEP)) {
+						if (!perform_exchange(ch, obj, emp)) {
+							break;
+						}
 					}
 					obj = next_obj;
 				}
@@ -3047,6 +3070,7 @@ ACMD(do_give) {
 	obj_data *obj, *next_obj;
 	char *argpos;
 	empire_data *coin_emp;
+	bool any = FALSE;
 	
 	// give coins?
 	if ((argpos = find_coin_arg(argument, &coin_emp, &coin_amt, FALSE)) > argument && coin_amt > 0) {
@@ -3077,10 +3101,20 @@ ACMD(do_give) {
 			send_to_char(buf, ch);
 		}
 		else {
-			while (obj && amount--) {
+			while (obj && amount > 0) {
 				next_obj = get_obj_in_list_vis(ch, arg, obj->next_content);
-				perform_give(ch, vict, obj);
+				
+				if (!OBJ_FLAGGED(obj, OBJ_KEEP)) {
+					perform_give(ch, vict, obj);
+					--amount;
+					any = TRUE;
+				}
+				
 				obj = next_obj;
+			}
+			
+			if (!any) {
+				msg_to_char(ch, "You don't seem to have any of those that aren't set 'keep'.\r\n");
 			}
 		}
 	}
@@ -3105,11 +3139,18 @@ ACMD(do_give) {
 			}
 			if (!ch->carrying)
 				send_to_char("You don't seem to be holding anything.\r\n", ch);
-			else
+			else {
 				for (obj = ch->carrying; obj; obj = next_obj) {
 					next_obj = obj->next_content;
-					if (CAN_SEE_OBJ(ch, obj) && ((dotmode == FIND_ALL || isname(arg, GET_OBJ_KEYWORDS(obj)))))
+					if (CAN_SEE_OBJ(ch, obj) && !OBJ_FLAGGED(obj, OBJ_KEEP) && ((dotmode == FIND_ALL || isname(arg, GET_OBJ_KEYWORDS(obj))))) {
 						perform_give(ch, vict, obj);
+						any = TRUE;
+					}
+				}
+				
+				if (!any) {
+					msg_to_char(ch, "You don't seem to have any of those that aren't set 'keep'.\r\n");
+				}
 			}
 		}
 	}
@@ -3173,6 +3214,94 @@ ACMD(do_identify) {
 	else {
 		charge_ability_cost(ch, NOTHING, 0, NOTHING, 0);
 		identify_obj_to_char(obj, ch);
+	}
+}
+
+
+ACMD(do_keep) {
+	char arg[MAX_INPUT_LENGTH];
+	obj_data *obj, *next_obj;
+	int dotmode, mode = SCMD_KEEP;
+	const char *sname;
+
+	// validate mode
+	switch (subcmd) {
+		case SCMD_KEEP: {
+			sname = "keep";
+			mode = SCMD_KEEP;
+			break;
+		}
+		case SCMD_UNKEEP:
+		default: {
+			sname = "unkeep";
+			mode = SCMD_UNKEEP;
+			break;
+		}
+	}
+
+	argument = one_argument(argument, arg);
+
+	if (!*arg) {
+		sprintf(buf, "What do you want to %s?\r\n", sname);
+		send_to_char(buf, ch);
+		return;
+	}
+	
+	dotmode = find_all_dots(arg);
+
+	if (dotmode == FIND_ALL) {
+		if (!ch->carrying) {
+			send_to_char("You don't seem to be carrying anything.\r\n", ch);
+		}
+		else {
+			for (obj = ch->carrying; obj; obj = next_obj) {
+				next_obj = obj->next_content;
+				
+				if (mode == SCMD_KEEP) {
+					SET_BIT(GET_OBJ_EXTRA(obj), OBJ_KEEP);
+				}
+				else {
+					REMOVE_BIT(GET_OBJ_EXTRA(obj), OBJ_KEEP);
+				}
+			}
+			
+			msg_to_char(ch, "You %s all items in your inventory.\r\n", sname);
+		}
+	}
+	else if (dotmode == FIND_ALLDOT) {
+		if (!*arg) {
+			msg_to_char(ch, "What do you want to %s all of?\r\n", sname);
+			return;
+		}
+		if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+			msg_to_char(ch, "You don't seem to have any %ss.\r\n", arg);
+		}
+		while (obj) {
+			next_obj = get_obj_in_list_vis(ch, arg, obj->next_content);
+			if (mode == SCMD_KEEP) {
+				SET_BIT(GET_OBJ_EXTRA(obj), OBJ_KEEP);
+			}
+			else {
+				REMOVE_BIT(GET_OBJ_EXTRA(obj), OBJ_KEEP);
+			}
+			sprintf(buf, "You %s $p.", sname);
+			act(buf, FALSE, ch, obj, NULL, TO_CHAR);
+		}
+	}
+	else {
+		if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+			msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
+		}
+		else {
+			if (mode == SCMD_KEEP) {
+				SET_BIT(GET_OBJ_EXTRA(obj), OBJ_KEEP);
+			}
+			else {
+				REMOVE_BIT(GET_OBJ_EXTRA(obj), OBJ_KEEP);
+			}
+			sprintf(buf, "You %s $p.", sname);
+			act(buf, FALSE, ch, obj, NULL, TO_CHAR);
+		}
 	}
 }
 
@@ -3399,6 +3528,7 @@ ACMD(do_put) {
 	char_data *tmp_char;
 	int obj_dotmode, cont_dotmode, found = 0, howmany = 1;
 	char *theobj, *thecont;
+	bool multi = FALSE;
 
 	argument = two_arguments(argument, arg1, arg2);
 	one_argument(argument, arg3);
@@ -3407,6 +3537,7 @@ ACMD(do_put) {
 		howmany = atoi(arg1);
 		theobj = arg2;
 		thecont = arg3;
+		multi = (howmany > 1);
 	}
 	else {
 		theobj = arg1;
@@ -3441,13 +3572,26 @@ ACMD(do_put) {
 				}
 				else if (obj == cont)
 					send_to_char("You attempt to fold it into itself, but fail.\r\n", ch);
+				else if (multi && OBJ_FLAGGED(obj, OBJ_KEEP)) {
+					msg_to_char(ch, "You marked that 'keep' and can't put it in anything unless you unkeep it.\r\n");
+				}
 				else {
 					obj_data *next_obj;
 					while(obj && howmany--) {
 						next_obj = obj->next_content;
+						
+						if (multi && OBJ_FLAGGED(obj, OBJ_KEEP)) {
+							continue;
+						}
+						
 						if (!perform_put(ch, obj, cont))
 							break;
 						obj = get_obj_in_list_vis(ch, theobj, next_obj);
+						found = 1;
+					}
+					
+					if (!found) {
+						msg_to_char(ch, "You didn't seem to have any that aren't marked 'keep'.\r\n");
 					}
 				}
 			}
@@ -3455,6 +3599,9 @@ ACMD(do_put) {
 				for (obj = ch->carrying; obj; obj = next_obj) {
 					next_obj = obj->next_content;
 					if (obj != cont && CAN_SEE_OBJ(ch, obj) && (obj_dotmode == FIND_ALL || isname(theobj, GET_OBJ_KEYWORDS(obj)))) {
+						if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
+							continue;
+						}
 						found = 1;
 						if (!perform_put(ch, obj, cont))
 							break;
@@ -3462,9 +3609,9 @@ ACMD(do_put) {
 				}
 				if (!found) {
 					if (obj_dotmode == FIND_ALL)
-						send_to_char("You don't seem to have anything to put in it.\r\n", ch);
+						send_to_char("You don't seem to have any non-keep items to put in it.\r\n", ch);
 					else {
-						sprintf(buf, "You don't seem to have any %ss.\r\n", theobj);
+						sprintf(buf, "You don't seem to have any %ss that aren't marked 'keep'.\r\n", theobj);
 						send_to_char(buf, ch);
 					}
 				}
@@ -3860,7 +4007,7 @@ ACMD(do_store) {
 		for (obj = ch->carrying; obj; obj = next_obj) {
 			next_obj = obj->next_content;
 			
-			if (OBJ_CAN_STORE(obj) && obj_can_be_stored(obj, IN_ROOM(ch))) {
+			if (!OBJ_FLAGGED(obj, OBJ_KEEP) && OBJ_CAN_STORE(obj) && obj_can_be_stored(obj, IN_ROOM(ch))) {
 				if ((store = find_stored_resource(emp, GET_ISLAND_ID(IN_ROOM(ch)), GET_OBJ_VNUM(obj)))) {
 					if (store->amount >= MAX_STORAGE) {
 						full = 1;
@@ -3892,7 +4039,7 @@ ACMD(do_store) {
 		while (obj && (dotmode == FIND_ALLDOT || count < total)) {
 			next_obj = get_obj_in_list_vis(ch, arg, obj->next_content);
 			
-			if (OBJ_CAN_STORE(obj) && obj_can_be_stored(obj, IN_ROOM(ch))) {
+			if ((!OBJ_FLAGGED(obj, OBJ_KEEP) || total == 1) && OBJ_CAN_STORE(obj) && obj_can_be_stored(obj, IN_ROOM(ch))) {
 				if ((store = find_stored_resource(emp, GET_ISLAND_ID(IN_ROOM(ch)), GET_OBJ_VNUM(obj)))) {
 					if (store->amount >= MAX_STORAGE) {
 						full = 1;

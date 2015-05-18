@@ -1420,6 +1420,7 @@ const char *extra_bits[] = {
 	"BOP",
 	"STAFF",
 	"UNCOLLECTED-LOOT",
+	"*KEEP",
 	"\n"
 };
 
@@ -1444,6 +1445,7 @@ const char *extra_bits_inv_flags[] = {
 	"(bop)",
 	"",	// staff
 	"",	// uncollected
+	"(keep)",
 	"\n"
 };
 
@@ -1468,6 +1470,7 @@ const double obj_flag_scaling_bonus[] = {
 	1.5,	// OBJ_BIND_ON_PICKUP
 	1.0,	// OBJ_STAFF
 	1.0,	// OBJ_UNCOLLECTED_LOOT
+	1.0,	// OBJ_KEEP
 };
 
 

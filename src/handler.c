@@ -3904,6 +3904,9 @@ void obj_to_obj(obj_data *obj, obj_data *obj_to) {
 
 		// set the timer here; actual rules for it are in limits.c
 		GET_AUTOSTORE_TIMER(obj) = time(0);
+		
+		// clear keep now
+		REMOVE_BIT(GET_OBJ_EXTRA(obj), OBJ_KEEP);
 
 		obj->next_content = obj_to->contains;
 		obj_to->contains = obj;
@@ -3934,6 +3937,9 @@ void obj_to_room(obj_data *object, room_data *room) {
 		if (OBJ_FLAGGED(object, OBJ_LIGHT)) {
 			ROOM_LIGHTS(IN_ROOM(object))++;
 		}
+		
+		// clear keep now
+		REMOVE_BIT(GET_OBJ_EXTRA(object), OBJ_KEEP);
 
 		// set the timer here; actual rules for it are in limits.c
 		GET_AUTOSTORE_TIMER(object) = time(0);
@@ -5297,6 +5303,7 @@ void store_unique_item(char_data *ch, obj_data *obj, empire_data *emp, room_data
 	}
 	
 	// empty/clear first
+	REMOVE_BIT(GET_OBJ_EXTRA(obj), OBJ_KEEP);
 	LAST_OWNER_ID(obj) = NOBODY;
 	obj->last_empire_id = NOTHING;
 	empty_obj_before_extract(obj);

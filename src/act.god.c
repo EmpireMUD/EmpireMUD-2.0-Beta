@@ -245,10 +245,19 @@ ACMD(do_sacrifice) {
 		else {
 			for (obj = ch->carrying; obj; obj = next_obj) {
 				next_obj = obj->next_content;
+				
+				if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
+					continue;
+				}
+				
 				amount += perform_sacrifice(ch, god, obj, TRUE);
 			}
 			for (obj = ROOM_CONTENTS(IN_ROOM(ch)); obj; obj = next_obj) {
 				next_obj = obj->next_content;
+				
+				if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
+					continue;
+				}
 
 				if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED))
 					continue;
@@ -278,7 +287,7 @@ ACMD(do_sacrifice) {
 			if (!next_obj && can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) && !IN_ROOM(obj))
 				next_obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)));
 			
-			if (CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
+			if (CAN_WEAR(obj, ITEM_WEAR_TAKE) && !OBJ_FLAGGED(obj, OBJ_KEEP)) {
 				amount += perform_sacrifice(ch, god, obj, TRUE);
 				any = TRUE;
 			}

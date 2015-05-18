@@ -360,7 +360,7 @@ generic coins. If you need to use an empire with a multi-word name, put it in
   > drop all.bread
   > drop all
 
-See also: COINS, GET, JUNK
+See also: COINS, GET, JUNK, KEEP
 #
 EAT DRINK SIP TASTE
 
@@ -488,7 +488,7 @@ Examples:
   > get all all.bag
   > get all.bread all.bag
 
-See also: DROP, PUT
+See also: DROP, KEEP, PUT
 #
 GIVE
 
@@ -504,7 +504,7 @@ can use the empire's full name, adjective name, or number.
   > give bread doctor
   > give all.bronze mirlen
 
-See also: COINS
+See also: COINS, KEEP
 #
 GRAB HOLD
 
@@ -968,7 +968,7 @@ Examples:
   > put all.bread bag
   > put all chest
 
-See also: GET
+See also: GET, KEEP
 #
 QUIT
 

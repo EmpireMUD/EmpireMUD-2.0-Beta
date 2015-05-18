@@ -175,6 +175,10 @@ struct alias_data {
 #define SCMD_GOTO		0
 #define SCMD_TELEPORT	1
 
+// do_keep
+#define SCMD_KEEP  0
+#define SCMD_UNKEEP  1
+
 // do_prompt
 #define SCMD_PROMPT  0
 #define SCMD_FPROMPT  1

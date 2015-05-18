@@ -1988,6 +1988,7 @@ Available flags:
  BOP - item binds to a player when it is picked up
  STAFF - counts as a staff (even if it doesn't have a staff weapon type)
  UNCOLLECTED-LOOT - will decay on the ground if no player gets it
+ *KEEP - player has marked the object with the 'keep' command
 
 See also: OLC OBJECTS
 #d

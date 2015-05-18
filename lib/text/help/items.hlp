@@ -123,6 +123,24 @@ Various types of ingots can be made by smelting metals in a forge or foundry.
 
 See also: SMELT, IRON
 #
+KEEP UNKEEP
+
+Usage:  keep <item>
+        unkeep <item>
+
+Setting an item to 'keep' will keep you from dropping, putting, giving,
+or sacrificing it as part of a set of "all". This means if you 'keep' your
+stone hammer, then type "drop all.stone", you won't drop the hammer -- only
+other stone items.
+
+You can still drop, give, put, or sacrifice a 'keep' item if you only target
+one item at a time. That is, "drop hammer" will still drop the hammer even
+though you marked it keep.
+
+Items you 'keep' will have a (keep) tag next to their name. You can use
+'unkeep' to unprotect an item. You can also 'keep all' and 'unkeep all' on
+your inventory.
+#
 LARGE "LARGE ITEMS" "LARGE FLAG" (LARGE)
 
 The (large) flag on items indicates that the item is over-sized and takes up
@@ -151,7 +169,7 @@ as new books are catalogued and sorted.
 If you have written a book with bookedit, you can always make a new copy of it
 using 'bookedit copy'.
 
-See also: BOOKEDIT
+See also: BOOKEDIT, KEEP
 #
 "LIGHTNING STONE" "YELLOW LIGHTNING STONE" "YELLOW STONE"
 
@@ -236,7 +254,7 @@ on credit from their public (or allied) buildings, IF you have a trade pact.
 
 You can identify an item to see where it can be stored.
 
-See also: AUTO-STORE, RETRIEVE, IDENTIFY, INVENTORY, DIPLOMACY,
+See also: AUTO-STORE, KEEP, RETRIEVE, IDENTIFY, INVENTORY, DIPLOMACY,
    WAREHOUSE, VAULT
 #
 SUPERIOR MASTERWORK
@@ -402,6 +420,6 @@ You retrieve a short sword (x4).
 Note: Immortals can see the warehouse lists for other empires using the syntax
 "warehouse inv <empire> [keywords]".
 
-See also: ARTISANS, PRIVILEGE, RETRIEVE, STORE
+See also: ARTISANS, KEEP, PRIVILEGE, RETRIEVE, STORE
 #
 $
