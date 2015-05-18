@@ -2376,7 +2376,7 @@ void warehouse_store(char_data *ch, char *argument) {
 
 			// we use !OBJ_CAN_STORE because it blocks things that can be stored normally			
 			// bound objects never store
-			if ((!OBJ_FLAGGED(obj, OBJ_KEEP) || total == 1) && !OBJ_CAN_STORE(obj) && !OBJ_BOUND_TO(obj) && (!OBJ_FLAGGED(obj, OBJ_LIGHT) || GET_OBJ_TIMER(obj) == UNLIMITED)) {
+			if ((!OBJ_FLAGGED(obj, OBJ_KEEP) || (total == 1 && dotmode != FIND_ALLDOT)) && !OBJ_CAN_STORE(obj) && !OBJ_BOUND_TO(obj) && (!OBJ_FLAGGED(obj, OBJ_LIGHT) || GET_OBJ_TIMER(obj) == UNLIMITED)) {
 				// may extract obj
 				store_unique_item(ch, obj, GET_LOYALTY(ch), IN_ROOM(ch), &full);
 				if (!full) {
@@ -4041,7 +4041,7 @@ ACMD(do_store) {
 		while (obj && (dotmode == FIND_ALLDOT || count < total)) {
 			next_obj = get_obj_in_list_vis(ch, arg, obj->next_content);
 			
-			if ((!OBJ_FLAGGED(obj, OBJ_KEEP) || total == 1) && OBJ_CAN_STORE(obj) && obj_can_be_stored(obj, IN_ROOM(ch))) {
+			if ((!OBJ_FLAGGED(obj, OBJ_KEEP) || (total == 1 && dotmode != FIND_ALLDOT)) && OBJ_CAN_STORE(obj) && obj_can_be_stored(obj, IN_ROOM(ch))) {
 				if ((store = find_stored_resource(emp, GET_ISLAND_ID(IN_ROOM(ch)), GET_OBJ_VNUM(obj)))) {
 					if (store->amount >= MAX_STORAGE) {
 						full = 1;
