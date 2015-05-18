@@ -261,8 +261,8 @@ int get_dodge_modifier(char_data *ch) {
 	
 	base = 0.0;
 	
-	// 10% per dexterity (balances to-hit dexterity)
-	base += 10.0 * GET_DEXTERITY(ch) + get_effective_dodge(ch);
+	// 5% per dexterity (balances to-hit dexterity)
+	base += 5.0 * GET_DEXTERITY(ch) + get_effective_dodge(ch);
 	
 	// skills
 	gain_ability_exp(ch, ABIL_REFLEXES, 1);
@@ -341,8 +341,8 @@ int get_to_hit(char_data *ch, bool off_hand) {
 	// start at 50%
 	base_chance = 50.0 + get_effective_to_hit(ch);
 	
-	// add 10 per dexterity (will be counter-balanced by dodge dexterity)
-	base_chance += 10.0 * GET_DEXTERITY(ch);
+	// add 5 per dexterity (will be counter-balanced by dodge dexterity)
+	base_chance += 5.0 * GET_DEXTERITY(ch);
 	
 	// skills
 	gain_ability_exp(ch, ABIL_SPARRING, 1);
@@ -2404,6 +2404,11 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 	// evasion
 	if (AWAKE(victim) && CAN_SEE(victim, ch)) {
 		hit_chance -= get_dodge_modifier(victim);
+	}
+	
+	// absolute minimum of 5% chance of hit so long as ch is at least as high as victim
+	if (get_approximate_level(ch) >= get_approximate_level(victim)) {
+		hit_chance = MAX(5, hit_chance);
 	}
 
 	success = !AWAKE(victim) || (hit_chance >= number(1, 100));
