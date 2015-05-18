@@ -502,6 +502,49 @@ static void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct 
 //// INSTANCE GENERATION /////////////////////////////////////////////////////
 
 /**
+* Checks secondary link limiters like ADV_LINK_NOT_NEAR_SELF.
+*
+* @param adv_data *adv The adventure we are trying to link.
+* @param room_data *loc The chosen location.
+* @return bool TRUE if the location is ok, FALSE if not.
+*/
+bool validate_linking_limits(adv_data *adv, room_data *loc) {
+	struct adventure_link_rule *rule;
+	struct instance_data *inst;
+	
+	for (rule = GET_ADV_LINKING(adv); rule; rule = rule->next) {
+		// ADV_LINK_x: but only some rules matter here (secondary limiters)
+		switch (rule->type) {
+			case ADV_LINK_NOT_NEAR_SELF: {
+				// adventure cannot link within X tiles of itself
+				for (inst = instance_list; inst; inst = inst->next) {
+					if (GET_ADV_VNUM(inst->adventure) != GET_ADV_VNUM(adv)) {
+						continue;
+					}
+					if (INSTANCE_FLAGGED(inst, INST_COMPLETED)) {
+						// skip completed ones -- it's safe to link a new one now
+						continue;
+					}
+					
+					// check distance
+					if (inst->location && compute_distance(inst->location, loc) <= rule->value) {
+						// NO! Too close.
+						return FALSE;
+					}
+				}
+				
+				break;
+			}
+			// other types don't have secondary linking limits
+		}
+	}
+	
+	// all clear
+	return TRUE;
+}
+
+
+/**
 * This function checks basic room properties too see if the location is allowed
 * at all. It does NOT check the sector/building/bld_on rules -- that is done
 * in find_location_for_rule, which calls this.
@@ -630,6 +673,11 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 				continue;
 			}
 			
+			// check secondary limits
+			if (!validate_linking_limits(adv, room)) {
+				continue;
+			}
+			
 			// TODO this specifically does not work on ocean without the whole map loaded
 			if (findsect && SECT(room) == findsect && pos-- == 0) {
 				found = room;
@@ -651,6 +699,11 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 			}
 
 			if (!validate_one_loc(rule, loc)) {
+				continue;
+			}
+			
+			// check secondary limits
+			if (!validate_linking_limits(adv, loc)) {
 				continue;
 			}
 			

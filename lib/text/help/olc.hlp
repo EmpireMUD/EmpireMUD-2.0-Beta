@@ -352,6 +352,18 @@ flag) for this, because they can't be built on the map.
 
 See also: ADVEDIT LINKING, SECTEDIT BUILDFLAGS, VNUM
 #d
+"ADVEDIT NOT-NEAR-SELF" "ADVEDIT LINK NOT-NEAR-SELF" "ADVEDIT LINKING NOT-NEAR-SELF"
+
+Usage:  .linking add NOT-NEAR-SELF <distance>
+
+This linking rule limits all other rules based on distance. You can use it to
+keep the same adventure from spawning two copies in close proximity.
+
+All distances are measured in map tiles. Setting a NOT-NEAR-SELF of 50 would
+mean no two copies of the adventure will link within 50 tiles of each other.
+
+See also: ADVEDIT LINKING
+#d
 "ADVEDIT PORTAL-WORLD" "ADVEDIT LINK PORTAL-WORLD" "ADVEDIT LINKING PORTAL-WORLD"
 
 Usage:  .linking add PORTAL-WORLD <sector vnum> <portal-in vnum> <portal-out vnum> [flags]
@@ -437,6 +449,7 @@ See specific help files for each type: &yHELP ADVEDIT <TYPE>&0
  PORTAL-BDG-NEW: Builds the building on the map and puts a portal in it (no
     interior rooms).
  TIME-LIMIT: Removes instances after a certain number of minutes expire.
+ NOT-NEAR-SELF: Prevent the adventure from linking near other copies of itself.
 
 Available flags:
  CLAIMED-OK - Can link to claimed locations (default: unclaimed only).

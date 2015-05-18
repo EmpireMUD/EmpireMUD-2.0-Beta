@@ -292,6 +292,7 @@ typedef struct trig_data trig_data;
 #define ADV_LINK_PORTAL_BUILDING_EXISTING  3
 #define ADV_LINK_PORTAL_BUILDING_NEW  4
 #define ADV_LINK_TIME_LIMIT  5
+#define ADV_LINK_NOT_NEAR_SELF  6
 
 
 // adventure link rule flags

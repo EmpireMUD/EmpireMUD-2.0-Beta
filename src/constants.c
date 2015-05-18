@@ -125,6 +125,7 @@ const char *adventure_link_types[] = {
 	"PORTAL-BDG-EXISTING",
 	"PORTAL-BDG-NEW",
 	"TIME-LIMIT",
+	"NOT-NEAR-SELF",
 	"\n"
 };
 

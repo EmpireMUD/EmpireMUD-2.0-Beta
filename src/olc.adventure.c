@@ -322,7 +322,7 @@ void get_adventure_linking_display(struct adventure_link_rule *list, char *save_
 			bfac[strlen(bfac)-1] = '\0';	// trim
 		}
 	
-		// lbuf: based on type
+		// ADV_LINK_x: lbuf based on type
 		switch (rule->type) {
 			case ADV_LINK_BUILDING_EXISTING:	// drop-thru
 			case ADV_LINK_BUILDING_NEW: {
@@ -365,6 +365,10 @@ void get_adventure_linking_display(struct adventure_link_rule *list, char *save_
 			}
 			case ADV_LINK_TIME_LIMIT: {
 				sprintf(lbuf, "expires after %d minutes (%d:%02d:%02d)", rule->value, (rule->value / (60 * 24)), ((rule->value % (60 * 24)) / 60), ((rule->value % (60 * 24)) % 60));
+				break;
+			}
+			case ADV_LINK_NOT_NEAR_SELF: {
+				sprintf(lbuf, "not within %d tiles of itself", rule->value);
 				break;
 			}
 			default: {
@@ -562,7 +566,7 @@ OLC_MODULE(advedit_linking) {
 			return;
 		}
 		
-		// rest of args depend on type
+		// ADV_LINK_x: rest of args depend on type
 		switch (type) {
 			case ADV_LINK_BUILDING_EXISTING: {
 				argument = any_one_word(argument, vnum_arg);
@@ -610,6 +614,11 @@ OLC_MODULE(advedit_linking) {
 				break;
 			}
 			case ADV_LINK_TIME_LIMIT: {
+				argument = any_one_word(argument, num_arg);
+				need_num = TRUE;
+				break;
+			}
+			case ADV_LINK_NOT_NEAR_SELF: {
 				argument = any_one_word(argument, num_arg);
 				need_num = TRUE;
 				break;
