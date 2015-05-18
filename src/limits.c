@@ -705,6 +705,7 @@ static bool check_one_city_for_ruin(empire_data *emp, struct empire_city_data *c
 	}
 	
 	if (!found_building) {
+		log_to_empire(emp, ELOG_TERRITORY, "%s (%d, %d) abandoned as ruins", city->name, X_COORD(city->location), Y_COORD(city->location));
 		perform_abandon_city(emp, city, TRUE);
 		read_empire_territory(emp);
 		return TRUE;
