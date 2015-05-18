@@ -296,7 +296,7 @@ int stats_get_sector_count(sector_data *sect) {
 *  active_accounts_week (at least one character this week)
 */
 void update_account_stats(void) {
-	extern bool member_is_timed_out_ch(char_data *ch);
+	extern bool member_is_timed_out_cfu(struct char_file_u *chdata);
 
 	// helper type
 	struct uniq_acct_t {
@@ -308,9 +308,7 @@ void update_account_stats(void) {
 
 	struct uniq_acct_t *acct, *next_acct, *acct_list = NULL;
 	struct char_file_u chdata;
-	char_data *plr;
 	int pos, id;
-	bool is_file;
 	
 	// rate-limit this, as it scans the whole playerfile
 	if (last_account_count + rescan_world_after > time(0)) {
@@ -324,12 +322,8 @@ void update_account_stats(void) {
 			continue;
 		}
 		
-		if (!(plr = find_or_load_player(player_table[pos].name, &is_file))) {
-			continue;
-		}
-		
 		// see if we have data
-		id = GET_ACCOUNT_ID(plr) > 0 ? GET_ACCOUNT_ID(plr) : (-1 * GET_IDNUM(plr));
+		id = chdata.player_specials_saved.account_id > 0 ? chdata.player_specials_saved.account_id : (-1 * chdata.char_specials_saved.idnum);
 		HASH_FIND_INT(acct_list, &id, acct);
 		if (!acct) {
 			CREATE(acct, struct uniq_acct_t, 1);
@@ -339,13 +333,9 @@ void update_account_stats(void) {
 		}
 		
 		// update
-		acct->active_week |= ((time(0) - plr->player.time.logon) < SECS_PER_REAL_WEEK);
+		acct->active_week |= ((time(0) - chdata.last_logon) < SECS_PER_REAL_WEEK);
 		if (!acct->active_timeout) {
-			acct->active_timeout = !member_is_timed_out_ch(plr);
-		}
-		
-		if (is_file) {
-			free_char(plr);
+			acct->active_timeout = !member_is_timed_out_cfu(&chdata);
 		}
 	}
 
