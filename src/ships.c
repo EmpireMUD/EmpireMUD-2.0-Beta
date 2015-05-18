@@ -751,7 +751,7 @@ ACMD(do_sail) {
 	
 	for (vict = ROOM_PEOPLE(IN_ROOM(ship)); vict; vict = vict->next_in_room) {
 		if (vict->desc) {
-			sprintf(buf, "$p sails in %s.", from_dir[get_direction_for_char(vict, dir)]);
+			sprintf(buf, "$p sails in from %s.", from_dir[get_direction_for_char(vict, dir)]);
 			act(buf, TRUE, vict, ship, 0, TO_CHAR | TO_SPAMMY);
 		}
 	}
