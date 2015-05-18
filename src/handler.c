@@ -297,7 +297,7 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 					GET_MOVE(ch) = 0;
 				}
 				else if (GET_MOVE_DEFICIT(ch) > 0) {
-					int diff = MAX(0, GET_MOVE_DEFICIT(ch) - GET_MOVE(ch));
+					int diff = MIN(GET_MOVE_DEFICIT(ch), GET_MOVE(ch));
 					GET_MOVE_DEFICIT(ch) -= diff;
 					GET_MOVE(ch) -= diff;
 				}
@@ -313,7 +313,7 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 				}
 				else if (GET_HEALTH_DEFICIT(ch) > 0) {
 					// always save 1 health
-					int diff = MAX(0, GET_HEALTH_DEFICIT(ch) - (GET_HEALTH(ch)-1));
+					int diff = MIN(0GET_HEALTH_DEFICIT(ch), GET_HEALTH(ch)-1);
 					GET_HEALTH_DEFICIT(ch) -= diff;
 					GET_HEALTH(ch) -= diff;
 				}
@@ -332,7 +332,7 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 					GET_MANA(ch) = 0;
 				}
 				else if (GET_MANA_DEFICIT(ch) > 0) {
-					int diff = MAX(0, GET_MANA_DEFICIT(ch) - GET_MANA(ch));
+					int diff = MIN(GET_MANA_DEFICIT(ch), GET_MANA(ch));
 					GET_MANA_DEFICIT(ch) -= diff;
 					GET_MANA(ch) -= diff;
 				}
