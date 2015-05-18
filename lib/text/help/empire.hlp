@@ -20,6 +20,8 @@ Empire is a skill, a command, and a grouping of people and land.
    chopping trees, scraping trees, planting crops, harvesting crops, mining,
    and building.
 
+You can learn about founding and managing empires on HELP EMPIRE GUIDE.
+
 See also: CLAIM, PLEDGE, ENROLL, PROMOTE, TERRITORY, CITIES, ROSTER, ESCORE,
     EMPIRE TRAITS, ELOG, EEDIT, ETALK
 #
@@ -139,6 +141,8 @@ vxvv gate  20 sticks, 1 copper ingot
 {UU} utilityshed  20 sticks -- store tools
 |__| quarry  4 logs, 20 sticks -- must be on flat land facing a mountain
 &y|__|&0 claypit  4 logs, 20 sticks -- must be on flat land facing water
+
+For more information on building your first house, see HELP HOUSING GUIDE.
 
 See also: EMPIRE, ARTISANS, LUXURY, MONUMENTS, GRAND MONUMENTS, SEAFARING,
           HOUSING, LOCKSMITHING, RAISE ARMIES, ADVANCED TACTICS, ROADS, HAVENS,
