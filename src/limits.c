@@ -415,7 +415,7 @@ void real_update_char(char_data *ch) {
 	char_data *room_ch, *next_ch;
 	obj_data *obj, *next_obj;
 	int result, iter, type;
-	int fol_count, diff;
+	int fol_count, gain;
 	
 	// heal-per-5 ? (stops at 0 health or incap)
 	if (GET_HEAL_OVER_TIME(ch) > 0 && !IS_DEAD(ch) && GET_POS(ch) >= POS_SLEEPING && GET_HEALTH(ch) > 0) {
@@ -591,29 +591,19 @@ void real_update_char(char_data *ch) {
 	}
 
 	// regenerate: do not put move_gain and mana_gain inside of MIN/MAX macros -- this will call them twice
-	heal(ch, ch, health_gain(ch, FALSE));
-	if (GET_HEALTH_DEFICIT(ch) > 0) {
-		// always save 1 health
-		diff = MAX(0, GET_HEALTH_DEFICIT(ch) - (GET_HEALTH(ch)-1));
-		GET_HEALTH_DEFICIT(ch) -= diff;
-		GET_HEALTH(ch) -= diff;
-	}
+	gain = health_gain(ch, FALSE);
+	heal(ch, ch, gain);
+	GET_HEALTH_DEFICIT(ch) = MAX(0, GET_HEALTH_DEFICIT(ch) - gain);
 	
-	GET_MOVE(ch) += move_gain(ch, FALSE);
-	if (GET_MOVE_DEFICIT(ch) > 0) {
-		diff = MAX(0, GET_MOVE_DEFICIT(ch) - GET_MOVE(ch));
-		GET_MOVE_DEFICIT(ch) -= diff;
-		GET_MOVE(ch) -= diff;
-	}
+	gain = move_gain(ch, FALSE);
+	GET_MOVE(ch) += gain;
 	GET_MOVE(ch) = MIN(GET_MOVE(ch), GET_MAX_MOVE(ch));
+	GET_MOVE_DEFICIT(ch) = MAX(0, GET_MOVE_DEFICIT(ch) - gain);
 	
-	GET_MANA(ch) += mana_gain(ch, FALSE);
-	if (GET_MANA_DEFICIT(ch) > 0) {
-		diff = MAX(0, GET_MANA_DEFICIT(ch) - GET_MANA(ch));
-		GET_MANA_DEFICIT(ch) -= diff;
-		GET_MANA(ch) -= diff;
-	}
+	gain = mana_gain(ch, FALSE);
+	GET_MANA(ch) += gain;
 	GET_MANA(ch) = MIN(GET_MANA(ch), GET_MAX_MANA(ch));
+	GET_MANA_DEFICIT(ch) = MAX(0, GET_MANA_DEFICIT(ch) - gain);
 	
 	if (IS_VAMPIRE(ch)) {
 		update_vampire_sun(ch);
