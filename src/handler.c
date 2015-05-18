@@ -291,18 +291,52 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 		case APPLY_MOVE:
 			SAFE_ADD(GET_MAX_MOVE(ch), mod, INT_MIN, INT_MAX, TRUE);
 			SAFE_ADD(GET_MOVE(ch), mod, INT_MIN, INT_MAX, TRUE);
+			if (!IS_NPC(ch)) {
+				if (GET_MOVE(ch) < 0) {
+					GET_MOVE_DEFICIT(ch) -= GET_MOVE(ch);
+					GET_MOVE(ch) = 0;
+				}
+				else if (GET_MOVE_DEFICIT(ch) > 0) {
+					int diff = MAX(0, GET_MOVE_DEFICIT(ch) - GET_MOVE(ch));
+					GET_MOVE_DEFICIT(ch) -= diff;
+					GET_MOVE(ch) -= diff;
+				}
+			}
 			break;
 		case APPLY_HEALTH:
 			SAFE_ADD(GET_MAX_HEALTH(ch), mod, INT_MIN, INT_MAX, TRUE);
 			SAFE_ADD(GET_HEALTH(ch), mod, INT_MIN, INT_MAX, TRUE);
-			if (GET_HEALTH(ch) < 1) {
-				// minimum health from this change
-				GET_HEALTH(ch) = 1;
+			if (!IS_NPC(ch)) {
+				if (GET_HEALTH(ch) < 1) {	// min 1 on health
+					GET_HEALTH_DEFICIT(ch) -= GET_HEALTH(ch);
+					GET_HEALTH(ch) = 0;
+				}
+				else if (GET_HEALTH_DEFICIT(ch) > 0) {
+					// always save 1 health
+					int diff = MAX(0, GET_HEALTH_DEFICIT(ch) - (GET_HEALTH(ch)-1));
+					GET_HEALTH_DEFICIT(ch) -= diff;
+					GET_HEALTH(ch) -= diff;
+				}
+			}
+			else {
+				// npcs cannot die this way
+				GET_HEALTH(ch) = MAX(1, GET_HEALTH(ch));
 			}
 			break;
 		case APPLY_MANA:
 			SAFE_ADD(GET_MAX_MANA(ch), mod, INT_MIN, INT_MAX, TRUE);
 			SAFE_ADD(GET_MANA(ch), mod, INT_MIN, INT_MAX, TRUE);
+			if (!IS_NPC(ch)) {
+				if (GET_MANA(ch) < 0) {
+					GET_MANA_DEFICIT(ch) -= GET_MANA(ch);
+					GET_MANA(ch) = 0;
+				}
+				else if (GET_MANA_DEFICIT(ch) > 0) {
+					int diff = MAX(0, GET_MANA_DEFICIT(ch) - GET_MANA(ch));
+					GET_MANA_DEFICIT(ch) -= diff;
+					GET_MANA(ch) -= diff;
+				}
+			}
 			break;
 		case APPLY_BLOOD: {
 			SAFE_ADD(GET_EXTRA_BLOOD(ch), mod, INT_MIN, INT_MAX, TRUE);

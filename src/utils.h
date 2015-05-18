@@ -777,6 +777,11 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define PRF_FLAGS(ch)  CHECK_PLAYER_SPECIAL(REAL_CHAR(ch), (REAL_CHAR(ch)->player_specials->saved.pref))
 #define USING_POISON(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.using_poison))
 
+// temporary location for these
+#define GET_HEALTH_DEFICIT(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.health_deficit))
+#define GET_MOVE_DEFICIT(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.move_deficit))
+#define GET_MANA_DEFICIT(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.mana_deficit))
+
 // helpers
 #define GET_LEVELS_GAINED_FROM_ABILITY(ch, ab)  ((!IS_NPC(ch) && (ab) >= 0 && (ab) <= NUM_ABILITIES) ? CHECK_PLAYER_SPECIAL((ch), (ch)->player_specials->saved.abilities[(ab)].levels_gained) : 0)
 #define HAS_ABILITY(ch, ab)  ((!IS_NPC(ch) && (ab) >= 0 && (ab) <= NUM_ABILITIES) ? CHECK_PLAYER_SPECIAL((ch), (ch)->player_specials->saved.abilities[(ab)].purchased) : FALSE)

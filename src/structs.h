@@ -2190,9 +2190,9 @@ struct player_special_data_saved {
 	
 	int spare15;
 	int spare16;
-	int spare17;
-	int spare18;
-	int spare19;
+	int health_deficit;	// TODO in beta2, move these to an array with the pools
+	int move_deficit;
+	int mana_deficit;
 	
 	double spare20;
 	double spare21;
