@@ -3646,7 +3646,7 @@ ACMD(do_reward) {
 			act("$n rewards you with extra bonus experience!", FALSE, ch, NULL, vict, TO_VICT);
 			act("$n rewards $N with extra bonus experience!", TRUE, ch, NULL, vict, TO_NOTVICT);
 			
-			SAFE_ADD(GET_DAILY_BONUS_EXPERIENCE(ch), 5, 0, UCHAR_MAX, FALSE);
+			SAFE_ADD(GET_DAILY_BONUS_EXPERIENCE(vict), 5, 0, UCHAR_MAX, FALSE);
 		
 			// mark rewarded
 			for (iter = 0, found = FALSE; !found && iter < MAX_REWARDS_PER_DAY; ++iter) {
