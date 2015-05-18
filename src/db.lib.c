@@ -2251,6 +2251,7 @@ void kill_empire_npc(char_data *ch) {
 			if (npc == GET_EMPIRE_NPC_DATA(ch)) {
 				// remove the npc data
 				REMOVE_FROM_LIST(npc, ter->npcs, next);
+				EMPIRE_POPULATION(emp) = MAX(0, EMPIRE_POPULATION(emp) - 1);
 				
 				// reset the population timer
 				ter->population_timer = building_population_timer;
