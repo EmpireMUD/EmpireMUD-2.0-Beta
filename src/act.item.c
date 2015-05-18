@@ -3287,6 +3287,7 @@ ACMD(do_keep) {
 			}
 			sprintf(buf, "You %s $p.", sname);
 			act(buf, FALSE, ch, obj, NULL, TO_CHAR);
+			obj = next_obj;
 		}
 	}
 	else {
