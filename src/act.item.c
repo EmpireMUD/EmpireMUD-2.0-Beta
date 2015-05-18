@@ -2624,6 +2624,7 @@ ACMD(do_drop) {
 	int this, dotmode, amount = 0, multi, coin_amt;
 	empire_data *coin_emp;
 	const char *sname;
+	bool any = FALSE;
 	char *argpos;
 
 	switch (subcmd) {
@@ -2701,10 +2702,11 @@ ACMD(do_drop) {
 					}
 					else {
 						amount += this;
+						any = TRUE;
 					}
 				}
 				
-				if (amount == 0) {
+				if (!any) {
 					msg_to_char(ch, "You don't have anything that isn't marked 'keep'.\r\n");
 				}
 			}
@@ -2733,10 +2735,11 @@ ACMD(do_drop) {
 				}
 				else {
 					amount += this;
+					any = TRUE;
 				}
 			}
 			
-			if (amount == 0) {
+			if (!any) {
 				msg_to_char(ch, "You don't have any that aren't marked 'keep'.\r\n");
 			}
 		}
