@@ -313,7 +313,7 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 				}
 				else if (GET_HEALTH_DEFICIT(ch) > 0) {
 					// always save 1 health
-					int diff = MIN(0GET_HEALTH_DEFICIT(ch), GET_HEALTH(ch)-1);
+					int diff = MIN(GET_HEALTH_DEFICIT(ch), GET_HEALTH(ch)-1);
 					GET_HEALTH_DEFICIT(ch) -= diff;
 					GET_HEALTH(ch) -= diff;
 				}
