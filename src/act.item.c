@@ -2722,6 +2722,7 @@ ACMD(do_drop) {
 			while (obj) {
 				next_obj = get_obj_in_list_vis(ch, arg, obj->next_content);
 				if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
+					obj = next_obj;
 					continue;
 				}
 				
