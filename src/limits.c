@@ -1380,7 +1380,7 @@ void point_update_room(room_data *room) {
 					continue;
 				}
 				
-				if (++count >= allowed_animals) {
+				if (count++ >= allowed_animals) {
 					act("$n is feeling overcrowded, and leaves.", TRUE, sub_ch, NULL, NULL, TO_ROOM);
 					extract_char(sub_ch);
 				}
