@@ -373,7 +373,7 @@ bool show_pc_in_room(char_data *ch, room_data *room, struct mappc_data_container
 		
 		pc = pc->next;
 		emp = GET_LOYALTY(pc->character);
-		sprintf(lbuf + strlen(lbuf), "o%s>", !emp ? "" : EMPIRE_BANNER(emp));
+		sprintf(lbuf + strlen(lbuf), "%so&0>", !emp ? "" : EMPIRE_BANNER(emp));
 		
 		send_to_char(lbuf, ch);
 	}
