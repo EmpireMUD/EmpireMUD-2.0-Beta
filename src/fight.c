@@ -2368,7 +2368,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 	if (!IS_NPC(ch) && victim_emp && GET_LOYALTY(ch) != victim_emp) {
 		// we check the victim's master if it's an NPC and the master is a PC
 		check = (IS_NPC(victim) && victim->master && !IS_NPC(victim->master)) ? victim->master : victim;
-		if (IS_NPC(check) || !IS_PVP_FLAGGED(check) || get_cooldown_time(check, COOLDOWN_HOSTILE_FLAG) <= 0) {
+		if ((IS_NPC(check) || !IS_PVP_FLAGGED(check)) && get_cooldown_time(check, COOLDOWN_HOSTILE_FLAG) <= 0) {
 			trigger_distrust_from_hostile(ch, victim_emp);
 		}
 	}
