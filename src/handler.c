@@ -319,7 +319,8 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 					GET_HEALTH(ch) = 1;
 				}
 				else if (GET_HEALTH_DEFICIT(ch) > 0) {
-					diff = MIN(MIN(GET_HEALTH_DEFICIT(ch), MAX(0, GET_HEALTH(ch) - orig)), GET_HEALTH(ch)-1);
+					diff = MIN(GET_HEALTH_DEFICIT(ch), MAX(0, GET_HEALTH(ch) - orig));
+					diff = MIN(diff, GET_HEALTH(ch)-1);
 					GET_HEALTH_DEFICIT(ch) -= diff;
 					GET_HEALTH(ch) -= diff;
 				}

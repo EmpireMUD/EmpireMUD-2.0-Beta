@@ -1170,6 +1170,11 @@ int enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 		GET_COND(ch, DRUNK) = MIN(0, GET_COND(ch, DRUNK));
 		GET_BLOOD(ch) = GET_MAX_BLOOD(ch);
 		
+		// clear deficits
+		GET_HEALTH_DEFICIT(ch) = 0;
+		GET_MOVE_DEFICIT(ch) = 0;
+		GET_MANA_DEFICIT(ch) = 0;
+		
 		// check for confusion!
 		GET_CONFUSED_DIR(ch) = number(0, NUM_SIMPLE_DIRS-1);
 		
