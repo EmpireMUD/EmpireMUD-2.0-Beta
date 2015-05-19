@@ -315,8 +315,8 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 			SAFE_ADD(GET_HEALTH(ch), mod, INT_MIN, INT_MAX, TRUE);
 			if (!IS_NPC(ch)) {
 				if (GET_HEALTH(ch) < 1) {	// min 1 on health
-					GET_HEALTH_DEFICIT(ch) -= GET_HEALTH(ch);
-					GET_HEALTH(ch) = 0;
+					GET_HEALTH_DEFICIT(ch) -= (GET_HEALTH(ch)-1);
+					GET_HEALTH(ch) = 1;
 				}
 				else if (GET_HEALTH_DEFICIT(ch) > 0) {
 					diff = MIN(MIN(GET_HEALTH_DEFICIT(ch), MAX(0, GET_HEALTH(ch) - orig)), GET_HEALTH(ch)-1);
