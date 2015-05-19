@@ -337,11 +337,9 @@ Class ability: Alchemist, Archmage, Feral, Luminary, Necromancer, Werewolf
 Usage:  resurrect <dead person>
 Cost:  75 mana
 
-This ability can return a recently-deceased player to life. It only works if
-they are laying on the ground, dead. It won't work after they respawn. The
-player will return with 10% of his or her health, mana, and moves.
-
-You can target the dead player or the player's most recent corpse.
+This ability can return a recently-deceased player to life. The player will
+return with 10% of his or her health, mana, and moves. You can target the dead
+player or the player's most recent corpse.
 
 See also: MOONRISE, RESPAWN
 #
