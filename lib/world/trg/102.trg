@@ -567,6 +567,7 @@ track~
 eval tofind 10252
 if (!%actor.ability(Track)% || !%actor.ability(Navigation)%)
   * Fail through to ability message
+  return 0
   halt
 end
 * It's never south -- that's always backtrack
@@ -607,6 +608,7 @@ track~
 eval tofind 10253
 if (!%actor.ability(Track)% || !%actor.ability(Navigation)%)
   * Fail through to ability message
+  return 0
   halt
 end
 * It's never south -- that's always backtrack
@@ -647,6 +649,7 @@ track~
 eval tofind 10254
 if (!%actor.ability(Track)% || !%actor.ability(Navigation)%)
   * Fail through to ability message
+  return 0
   halt
 end
 * It's never south -- that's always backtrack
@@ -687,6 +690,7 @@ track~
 eval tofind 10255
 if (!%actor.ability(Track)% || !%actor.ability(Navigation)%)
   * Fail through to ability message
+  return 0
   halt
 end
 * It's never south -- that's always backtrack
