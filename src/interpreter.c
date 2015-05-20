@@ -889,7 +889,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "tip", POS_DEAD, do_tip, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "title", POS_DEAD, do_title, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "toggles", POS_DEAD, do_toggle, NO_MIN, CTYPE_UTIL ),
-	SIMPLE_CMD( "tomb", POS_SLEEPING, do_tomb, LVL_APPROVED, CTYPE_UTIL ),
+	SIMPLE_CMD( "tomb", POS_DEAD, do_tomb, LVL_APPROVED, CTYPE_UTIL ),
 	ABILITY_CMD( "track", POS_STANDING, do_track, NO_MIN, CTYPE_SKILL, ABIL_TRACK ),
 	SIMPLE_CMD( "trade", POS_RESTING, do_trade, NO_MIN, CTYPE_MOVE ),
 	GRANT_CMD( "transfer", POS_SLEEPING, do_trans, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_TRANSFER ),
