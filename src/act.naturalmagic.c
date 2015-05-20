@@ -79,6 +79,7 @@ void un_earthmeld(char_data *ch) {
 			msg_to_char(ch, "You rise from the ground!\r\n");
 			act("$n rises from the ground!", TRUE, ch, 0, 0, TO_ROOM);
 			GET_POS(ch) = POS_STANDING;
+			add_cooldown(ch, COOLDOWN_EARTHMELD, 2 * SECS_PER_REAL_MIN);
 		}
 	}
 }
@@ -376,7 +377,7 @@ ACMD(do_earthmeld) {
 		return;
 	}
 
-	if (!can_use_ability(ch, ABIL_EARTHMELD, MANA, cost, NOTHING)) {
+	if (!can_use_ability(ch, ABIL_EARTHMELD, MANA, cost, COOLDOWN_EARTHMELD)) {
 		return;
 	}
 	

@@ -409,6 +409,7 @@ extern bool skill_check(char_data *ch, int ability, int difficulty);
 #define COOLDOWN_ALTERNATE  45
 #define COOLDOWN_DISPEL  46
 #define COOLDOWN_BLOODSWEAT  47
+#define COOLDOWN_EARTHMELD  48
 
 
 /* WEAPON ATTACK TYPES */

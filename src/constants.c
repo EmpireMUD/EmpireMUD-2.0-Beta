@@ -2260,6 +2260,7 @@ const char *cooldown_types[] = {
 	"alternate",	// 45
 	"dispel",
 	"bloodsweat",
+	"earthmeld",
 	"\n"
 };
 
