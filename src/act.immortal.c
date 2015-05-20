@@ -4175,6 +4175,55 @@ ACMD(do_force) {
 }
 
 
+ACMD(do_forgive) {
+	char_data *vict;
+	bool any;
+	
+	one_argument(argument, arg);
+	
+	if (!*arg) {
+		msg_to_char(ch, "Forgive whom?r\n");
+	}
+	else if (!(vict = get_player_vis(ch, arg, FIND_CHAR_WORLD | FIND_NO_DARK))) {
+		send_config_msg(ch, "no_person");
+	}
+	else if (IS_NPC(vict)) {
+		msg_to_char(ch, "You can't forgive an NPC for anything.\r\n");
+	}
+	else {
+		any = FALSE;
+		
+		if (get_cooldown_time(vict, COOLDOWN_HOSTILE_FLAG) > 0) {
+			remove_cooldown_by_type(vict, COOLDOWN_HOSTILE_FLAG);
+			msg_to_char(ch, "Hostile flag forgiven.\r\n");
+			act("$n has forgiven your hostile flag.", FALSE, ch, NULL, vict, TO_VICT);
+			any = TRUE;
+		}
+		
+		if (get_cooldown_time(vict, COOLDOWN_LEFT_EMPIRE) > 0) {
+			remove_cooldown_by_type(vict, COOLDOWN_LEFT_EMPIRE);
+			msg_to_char(ch, "Defect timer forgiven.\r\n");
+			act("$n has forgiven your empire defect timer.", FALSE, ch, NULL, vict, TO_VICT);
+			any = TRUE;
+		}
+		
+		if (get_cooldown_time(vict, COOLDOWN_PVP_FLAG) > 0) {
+			remove_cooldown_by_type(vict, COOLDOWN_PVP_FLAG);
+			msg_to_char(ch, "PVP cooldown forgiven.\r\n");
+			act("$n has forgiven your PVP cooldown.", FALSE, ch, NULL, vict, TO_VICT);
+			any = TRUE;
+		}
+		
+		if (any) {
+			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has forgiven %s", GET_NAME(ch), GET_NAME(vict));
+		}
+		else {
+			act("There's nothing you can forigve $N for.", FALSE, ch, NULL, vict, TO_CHAR);
+		}
+	}
+}
+
+
 ACMD(do_fullsave) {
 	syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has triggered a full map save", GET_REAL_NAME(ch));
 	syslog(SYS_INFO, 0, FALSE, "Updating zone files...");

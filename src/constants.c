@@ -326,6 +326,7 @@ const char *grant_bits[] = {
 	"wizlock",
 	"unbind",
 	"authorize",
+	"forgive",
 	"\n"
 };
 

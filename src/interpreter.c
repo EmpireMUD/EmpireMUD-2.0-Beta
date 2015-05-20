@@ -174,6 +174,7 @@ ACMD(do_follow);
 ACMD(do_forage);
 ACMD(do_force);
 ACMD(do_foresight);
+ACMD(do_forgive);
 ACMD(do_fullsave);
 
 ACMD(do_gather);
@@ -646,6 +647,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	GRANT_CMD( "force", POS_SLEEPING, do_force, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_FORCE ),
 	ABILITY_CMD( "foresight", POS_RESTING, do_foresight, NO_MIN, CTYPE_COMBAT, ABIL_FORESIGHT ),
 	STANDARD_CMD( "forge", POS_STANDING, do_gen_craft, LVL_APPROVED, NO_GRANTS, CRAFT_TYPE_FORGE, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
+	GRANT_CMD( "forgive", POS_DEAD, do_forgive, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_FORGIVE ),
 	SCMD_CMD( "fprompt", POS_DEAD, do_prompt, NO_MIN, CTYPE_UTIL, SCMD_FPROMPT ),
 	SIMPLE_CMD( "fullsave", POS_DEAD, do_fullsave, LVL_TOP, CTYPE_IMMORTAL ),
 	STANDARD_CMD( "freeze", POS_DEAD, do_wizutil, LVL_CIMPL, GRANT_FREEZE, SCMD_FREEZE, CTYPE_IMMORTAL, NOBITS, NO_ABIL ),
