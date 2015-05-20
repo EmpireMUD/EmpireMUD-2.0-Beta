@@ -1159,6 +1159,7 @@ typedef struct trig_data trig_data;
 #define GRANT_RESCALE  BIT(30)
 #define GRANT_AUTHORIZE  BIT(31)
 #define GRANT_FORGIVE  BIT(32)
+#define GRANT_HOSTILE  BIT(33)
 
 
 // Lore types

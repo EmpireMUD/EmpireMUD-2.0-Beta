@@ -217,6 +217,17 @@ Example:
 If you are invisible to the one being forced, the force will be performed
 silently.
 #d
+FORGIVE
+
+Usage:  forgive <player>
+
+This command forgives the following conditions:
+ - hostile flag
+ - empire defect timer
+ - pvp flag cooldown
+
+See also: HOSTILE
+#d
 FREEZE THAW
 
 Usage:  freeze <victim>
@@ -307,6 +318,19 @@ A toggle which allows you to see:
 It is expected most immortals will keep HOLYLIGHT on most of the time; it
 exists so that you have the ability to see what mortals see for debugging
 purposes.
+#d
+HOSTILE "HOSTILE COMMAND"
+
+Usage:  hostile <victim>
+
+This immortal command causes a player to be marked as hostile. It should only
+be used when someone is doing something that should really allow guards and
+other players to attack them, but doesn't.
+
+You can tell if someone is hostile by doing a 'stat' on them and looking for
+the hostile cooldown.
+
+See also: FORGIVE, STAT, THIEF
 #d
 IMOTD
 

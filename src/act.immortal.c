@@ -4196,21 +4196,27 @@ ACMD(do_forgive) {
 		if (get_cooldown_time(vict, COOLDOWN_HOSTILE_FLAG) > 0) {
 			remove_cooldown_by_type(vict, COOLDOWN_HOSTILE_FLAG);
 			msg_to_char(ch, "Hostile flag forgiven.\r\n");
-			act("$n has forgiven your hostile flag.", FALSE, ch, NULL, vict, TO_VICT);
+			if (ch != vict) {
+				act("$n has forgiven your hostile flag.", FALSE, ch, NULL, vict, TO_VICT);
+			}
 			any = TRUE;
 		}
 		
 		if (get_cooldown_time(vict, COOLDOWN_LEFT_EMPIRE) > 0) {
 			remove_cooldown_by_type(vict, COOLDOWN_LEFT_EMPIRE);
 			msg_to_char(ch, "Defect timer forgiven.\r\n");
-			act("$n has forgiven your empire defect timer.", FALSE, ch, NULL, vict, TO_VICT);
+			if (ch != vict) {
+				act("$n has forgiven your empire defect timer.", FALSE, ch, NULL, vict, TO_VICT);
+			}
 			any = TRUE;
 		}
 		
 		if (get_cooldown_time(vict, COOLDOWN_PVP_FLAG) > 0) {
 			remove_cooldown_by_type(vict, COOLDOWN_PVP_FLAG);
 			msg_to_char(ch, "PVP cooldown forgiven.\r\n");
-			act("$n has forgiven your PVP cooldown.", FALSE, ch, NULL, vict, TO_VICT);
+			if (ch != vict) {
+				act("$n has forgiven your PVP cooldown.", FALSE, ch, NULL, vict, TO_VICT);
+			}
 			any = TRUE;
 		}
 		
@@ -4276,6 +4282,34 @@ ACMD(do_goto) {
 	}
 
 	perform_goto(ch, location);
+}
+
+
+ACMD(do_hostile) {
+	char_data *vict;
+	
+	one_argument(argument, arg);
+	
+	if (!*arg) {
+		msg_to_char(ch, "Mark whom hostile?r\n");
+	}
+	else if (!(vict = get_player_vis(ch, arg, FIND_CHAR_WORLD | FIND_NO_DARK))) {
+		send_config_msg(ch, "no_person");
+	}
+	else if (IS_NPC(vict)) {
+		msg_to_char(ch, "You can't mark an NPC hostile.\r\n");
+	}
+	else if (GET_ACCESS_LEVEL(vict) > GET_ACCESS_LEVEL(ch)) {
+		msg_to_char(ch, "You can't do that.\r\n");
+	}
+	else {
+		add_cooldown(vict, COOLDOWN_HOSTILE_FLAG, config_get_int("hostile_flag_time") * SECS_PER_REAL_MIN);
+		msg_to_char(vict, "You are now hostile!\r\n");
+		if (ch != vict) {
+			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has marked %s as hostile", GET_NAME(ch), GET_NAME(vict));
+			act("$N is now hostile.", FALSE, ch, NULL, vict, TO_CHAR);
+		}
+	}
 }
 
 

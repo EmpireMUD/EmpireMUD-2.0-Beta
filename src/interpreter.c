@@ -202,6 +202,7 @@ ACMD(do_hide);
 ACMD(do_history);
 ACMD(do_hit);
 ACMD(do_home);
+ACMD(do_hostile);
 
 ACMD(do_identify);
 ACMD(do_ignore);
@@ -681,6 +682,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "hit", POS_FIGHTING, do_hit, NO_MIN, CTYPE_COMBAT, SCMD_HIT ),
 	SIMPLE_CMD( "hold", POS_RESTING, do_grab, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "home", POS_SLEEPING, do_home, LVL_APPROVED, CTYPE_UTIL ),
+	GRANT_CMD( "hostile", POS_DEAD, do_hostile, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_HOSTILE ),
 
 	SIMPLE_CMD( "inventory", POS_DEAD, do_inventory, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "identify", POS_STANDING, do_identify, NO_MIN, CTYPE_SKILL ),
@@ -689,7 +691,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "import", POS_DEAD, do_import, LVL_APPROVED, CTYPE_UTIL, TRADE_IMPORT ),
 	SCMD_CMD( "imotd", POS_DEAD, do_gen_ps, LVL_START_IMM, CTYPE_IMMORTAL, SCMD_IMOTD ),
 	ABILITY_CMD( "infiltrate", POS_STANDING, do_infiltrate, NO_MIN, CTYPE_MOVE, ABIL_INFILTRATE ),
-	GRANT_CMD( "instance", POS_DEAD, do_instance, LVL_CIMPL, CTYPE_UTIL, GRANT_INSTANCE ),
+	GRANT_CMD( "instance", POS_DEAD, do_instance, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_INSTANCE ),
 	SCMD_CMD( "info", POS_DEAD, do_gen_ps, NO_MIN, CTYPE_UTIL, SCMD_INFO ),
 	ABILITY_CMD( "inspire", POS_STANDING, do_inspire, NO_MIN, CTYPE_SKILL, ABIL_INSPIRE ),
 	SIMPLE_CMD( "insult", POS_RESTING, do_insult, NO_MIN, CTYPE_COMM ),
