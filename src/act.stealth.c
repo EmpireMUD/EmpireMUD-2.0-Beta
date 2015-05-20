@@ -1289,6 +1289,9 @@ ACMD(do_shadowstep) {
 	}
 	else if (IS_RIDING(ch))
 		msg_to_char(ch, "You can't shadowstep while riding.\r\n");
+	else if (!can_teleport_to(ch, IN_ROOM(ch), FALSE)) {
+		msg_to_char(ch, "You can't teleport out of here.\r\n");
+	}
 	else if (!*argument)
 		msg_to_char(ch, "Shadowstep to whom?\r\n");
 	else if (!(vict = find_closest_char(ch, argument, FALSE))) {
@@ -1315,7 +1318,16 @@ ACMD(do_shadowstep) {
 	else {
 		infil = !can_use_room(ch, IN_ROOM(vict), GUESTS_ALLOWED);
 		
-		// TODO should this have a stealth permission check?
+		if (infil && emp && GET_LOYALTY(ch) && !has_relationship(GET_LOYALTY(ch), emp, DIPL_WAR)) {
+			if (!PRF_FLAGGED(ch, PRF_STEALTHABLE)) {
+				msg_to_char(ch, "You cannot shadowstep there while your 'stealthable' toggle is off.\r\n");
+				return;
+			}
+			if (GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_STEALTH)) {
+				msg_to_char(ch, "You don't have the empire rank required to commit stealth acts.\r\n");
+				return;
+			}
+		}
 
 		charge_ability_cost(ch, MOVE, cost, COOLDOWN_SHADOWSTEP, SECS_PER_REAL_MIN);		
 		gain_ability_exp(ch, ABIL_SHADOWSTEP, 20);
