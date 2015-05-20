@@ -2720,6 +2720,7 @@ ACMD(do_drop) {
 			if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
 				sprintf(buf, "You don't seem to have any %ss.\r\n", arg);
 				send_to_char(buf, ch);
+				return;
 			}
 			while (obj) {
 				next_obj = get_obj_in_list_vis(ch, arg, obj->next_content);
