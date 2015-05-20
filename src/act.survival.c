@@ -326,7 +326,7 @@ ACMD(do_mount) {
 	else if (mob && !MOB_FLAGGED(mob, MOB_MOUNTABLE) && !IS_IMMORTAL(ch)) {
 		act("You can't ride $N!", FALSE, ch, 0, mob, TO_CHAR);
 	}
-	else if (mob && AFF_FLAGGED(mob, AFF_FLY) && !HAS_ABILITY(ch, ABIL_ALL_TERRAIN_RIDING)) {
+	else if (((mob && AFF_FLAGGED(mob, AFF_FLY)) || (!mob && MOUNT_FLAGGED(ch, MOUNT_FLYING))) && !HAS_ABILITY(ch, ABIL_ALL_TERRAIN_RIDING)) {
 		act("You need All-Terrain Riding to ride $N!", FALSE, ch, 0, mob, TO_CHAR);
 	}
 	else if (mob && (mob->desc || (GET_PC_NAME(mob) && (proto = mob_proto(GET_MOB_VNUM(mob))) && GET_PC_NAME(mob) != GET_PC_NAME(proto)))) {
