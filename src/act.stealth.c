@@ -107,7 +107,7 @@ bool can_steal(char_data *ch, empire_data *emp) {
 	}
 	
 	if (!HAS_ABILITY(ch, ABIL_STEAL)) {
-		msg_to_char(ch, "You don't have the Steal ability. ");
+		msg_to_char(ch, "You don't have the Steal ability.\r\n");
 		return FALSE;
 	}
 	
@@ -127,14 +127,14 @@ bool can_steal(char_data *ch, empire_data *emp) {
 	}
 	
 	if (count_members_online(emp) == 0) {
-		msg_to_char(ch, "There are no members of %s online. ", EMPIRE_NAME(emp));
+		msg_to_char(ch, "There are no members of %s online.\r\n", EMPIRE_NAME(emp));
 		return FALSE;
 	}
 	
 	pol = find_relation(chemp, emp);
 	
 	if (pol && IS_SET(pol->type, DIPL_ALLIED | DIPL_NONAGGR)) {
-		msg_to_char(ch, "You have a treaty with %s. ", EMPIRE_NAME(emp));
+		msg_to_char(ch, "You have a treaty with %s.\r\n", EMPIRE_NAME(emp));
 		return FALSE;
 	}
 	
