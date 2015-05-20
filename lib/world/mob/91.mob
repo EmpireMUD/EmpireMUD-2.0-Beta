@@ -118,7 +118,7 @@ chimpanzee hairy~
 a chimpanzee~
 A hairy chimpanzee eyes you cautiously.
 ~
-80 100 dovA 0
+80 100 doA 0
 1 0 0 15
 S
 #9111
@@ -126,7 +126,7 @@ gorilla huge~
 a gorilla~
 A huge gorilla pounds its chest at you.
 ~
-90 110 dovA 0
+90 110 doA 0
 1 0 0 15
 S
 #9112
