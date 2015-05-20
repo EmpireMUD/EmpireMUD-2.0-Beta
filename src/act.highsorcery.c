@@ -39,6 +39,7 @@ extern const int universal_wait;
 
 // external funcs
 extern bool trigger_counterspell(char_data *ch);	// spells.c
+void trigger_distrust_from_hostile(char_data *ch, empire_data *emp);	// fight.c
 
 // locals
 void send_ritual_messages(char_data *ch, int rit, int pos);
@@ -1845,8 +1846,14 @@ RITUAL_SETUP_FUNC(start_siege_ritual) {
 		msg_to_char(ch, "You can't besiege that tile!\r\n");
 		return FALSE;
 	}
+
+	// ready:
+
+	// trigger hostile immediately so they are attackable
+	if (enemy && GET_LOYALTY(ch) != enemy) {
+		trigger_distrust_from_hostile(ch, enemy);
+	}
 	
-	// finally safe!
 	start_ritual(ch, ritual);
 	GET_ACTION_VNUM(ch, 1) = GET_ROOM_VNUM(to_room);	// action 0 is ritual #
 	return TRUE;
@@ -1870,11 +1877,17 @@ RITUAL_FINISH_FUNC(perform_siege_ritual) {
 		secttype = SECT(to_room);
 		msg_to_char(ch, "You fire one last powerful fireball...\r\n");
 		act("$n fires one last powerful fireball...", FALSE, ch, NULL, NULL, TO_ROOM);
+
+		if (ROOM_OWNER(to_room) && GET_LOYALTY(ch) != ROOM_OWNER(to_room)) {
+			trigger_distrust_from_hostile(ch, ROOM_OWNER(to_room));
+		}
 		besiege_room(to_room, 1 + GET_INTELLIGENCE(ch));
+
 		if (SECT(to_room) != secttype) {
 			msg_to_char(ch, "It is destroyed!\r\n");
 			act("$n's target is destroyed!", FALSE, ch, NULL, NULL, TO_ROOM);
 		}
+
 		gain_ability_exp(ch, ABIL_SIEGE_RITUAL, 33.4);
 	}
 }

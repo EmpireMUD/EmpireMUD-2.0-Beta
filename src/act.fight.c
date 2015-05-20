@@ -41,6 +41,7 @@ extern int get_dodge_modifier(char_data *ch);	// fight.c
 extern int get_to_hit(char_data *ch, bool off_hand);	// fight.c
 extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
 extern bool is_fight_enemy(char_data *ch, char_data *frenemy);	// fight.c
+void trigger_distrust_from_hostile(char_data *ch, empire_data *emp);	// fight.c
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -132,7 +133,7 @@ ACMD(do_catapult) {
 		if (e && (!emp_pol || !IS_SET(emp_pol->type, DIPL_WAR))) {
 			msg_to_char(ch, "You can't attack that acre!\r\n");
 			return;
-			}
+		}
 		extract_resources(ch, rocks, FALSE);
 		sprintf(buf, "You shoot $p %s!", dirs[get_direction_for_char(ch, dir)]);
 		act(buf, FALSE, ch, catapult, 0, TO_CHAR);
@@ -148,6 +149,10 @@ ACMD(do_catapult) {
 		
 		if (SHOULD_APPEAR(ch)) {
 			appear(ch);
+		}
+
+		if (e && GET_LOYALTY(ch) != e) {
+			trigger_distrust_from_hostile(ch, e);
 		}
 		
 		// fire!
