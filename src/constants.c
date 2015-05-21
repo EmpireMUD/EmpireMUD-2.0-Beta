@@ -1652,7 +1652,7 @@ struct attack_hit_type attack_hit_info[NUM_ATTACK_TYPES] = {
 	{ "lightning staff", "zap", "zaps", { 2.2, 2.5, 2.8 }, WEAPON_MAGIC, DAM_MAGICAL },
 	{ "burn staff", "burn", "burns", { 2.6, 2.9, 3.2 }, WEAPON_MAGIC, DAM_MAGICAL },
 	{ "agony staff", "agonize", "agonizes", { 3.3, 3.6, 3.9 }, WEAPON_MAGIC, DAM_MAGICAL },
-	{ "magic frost", "chill", "chills", { 4.1, 3.3, 4.5 }, WEAPON_MAGIC, DAM_MAGICAL },
+	{ "magic frost", "chill", "chills", { 4.1, 4.3, 4.5 }, WEAPON_MAGIC, DAM_MAGICAL },
 	{ "magic shock", "shock", "shocks", { 2.6, 2.8, 3.0 }, WEAPON_MAGIC, DAM_MAGICAL },
 	{ "magic light", "flash", "flashes", { 2.8, 3.0, 3.2 }, WEAPON_MAGIC, DAM_MAGICAL },
 	{ "sting", "sting", "stings", { 3.6, 3.8, 4.0 }, WEAPON_SHARP, DAM_PHYSICAL },
