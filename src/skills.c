@@ -44,86 +44,6 @@ bool green_skill_deadend(char_data *ch, int skill);
 //// END AFFECT WHEN SKILL LOST //////////////////////////////////////////////
 
 /**
-* General test function for abilities. It allows mobs who are not charmed to
-* use any ability. Otherwise, it supports an energy pool cost and/or cooldowns,
-* as well as checking that the player has the ability.
-*
-* @param char_data *ch The player or NPC.
-* @param int ability Any ABIL_x const.
-* @param int cost_pool HEALTH, MANA, MOVE, BLOOD (NOTHING if no charge).
-* @param int cost_amount Mana (or whatever) amount required, if any.
-* @param int cooldown_type Any COOLDOWN_x const, or NOTHING for no cooldown check.
-* @return bool TRUE if ch can use ability; FALSE if not.
-*/
-bool can_use_ability(char_data *ch, int ability, int cost_pool, int cost_amount, int cooldown_type) {
-	extern const char *pool_types[];
-	
-	char buf[MAX_STRING_LENGTH];
-	int time, needs_cost;
-	
-	// this actually blocks npcs, too, so it's higher than other checks
-	if (cost_pool == BLOOD && cost_amount > 0 && !CAN_SPEND_BLOOD(ch)) {
-		msg_to_char(ch, "Your blood is inert, you can't do that!\r\n");
-		return FALSE;
-	}
-	
-	// special rules for npcs
-	if (IS_NPC(ch)) {
-		return (AFF_FLAGGED(ch, AFF_CHARM) ? FALSE : TRUE);
-	}
-	
-	// special rule: require that blood or health costs not reduce player below 1
-	needs_cost = cost_amount + ((cost_pool == HEALTH || cost_pool == BLOOD) ? 1 : 0);
-	
-	// players:
-	if (!HAS_ABILITY(ch, ability)) {
-		msg_to_char(ch, "You have not purchased the %s ability.\r\n", ability_data[ability].name);
-		return FALSE;
-	}
-	if (cost_pool >= 0 && cost_pool < NUM_POOLS && cost_amount > 0 && GET_CURRENT_POOL(ch, cost_pool) < needs_cost) {
-		msg_to_char(ch, "You need %d %s point%s to do that.\r\n", cost_amount, pool_types[cost_pool], PLURAL(cost_amount));
-		return FALSE;
-	}
-	if (cooldown_type > COOLDOWN_RESERVED && (time = get_cooldown_time(ch, cooldown_type)) > 0) {
-		snprintf(buf, sizeof(buf), "%s is still on cooldown for %d second%s.\r\n", ability_data[ability].name, time, (time != 1 ? "s" : ""));
-		CAP(buf);
-		send_to_char(buf, ch);
-		return FALSE;
-	}
-
-	return TRUE;
-}
-
-
-/**
-* Safely charges a player the cost for using an ability (won't go below 0) and
-* applies a cooldown, if applicable. This works on both players and NPCs, but
-* only applies the cooldown to players.
-*
-* The player will also experience universal_wait for using the ability.
-*
-* @param char_data *ch The player or NPC.
-* @param int cost_pool HEALTH, MANA, MOVE, BLOOD (NOTHING if no charge).
-* @param int cost_amount Mana (or whatever) amount required, if any.
-* @param int cooldown_type Any COOLDOWN_x const to apply (NOTHING for none).
-* @param int cooldown_time Cooldown duration, if any.
-*/
-void charge_ability_cost(char_data *ch, int cost_pool, int cost_amount, int cooldown_type, int cooldown_time) {
-	extern const int universal_wait;
-	
-	if (cost_pool >= 0 && cost_pool < NUM_POOLS && cost_amount > 0) {
-		GET_CURRENT_POOL(ch, cost_pool) = MAX(0, GET_CURRENT_POOL(ch, cost_pool) - cost_amount);
-	}
-	
-	// only npcs get cooldowns here
-	if (cooldown_type > COOLDOWN_RESERVED && cooldown_time > 0 && !IS_NPC(ch)) {
-		add_cooldown(ch, cooldown_type, cooldown_time);
-	}
-	WAIT_STATE(ch, universal_wait);
-}
-
-
-/**
 * Code that must run when skills are sold.
 *
 * @param char_data *ch
@@ -148,6 +68,18 @@ void check_skill_sell(char_data *ch, int abil) {
 			end_alacrity(ch);
 			break;
 		}
+		case ABIL_ANIMAL_FORMS: {
+			if (GET_MORPH(ch) == MORPH_DEER || GET_MORPH(ch) == MORPH_OSTRICH || GET_MORPH(ch) == MORPH_TAPIR) {
+				perform_morph(ch, MORPH_NONE);
+			}
+			break;
+		}
+		case ABIL_BAT_FORM: {
+			if (GET_MORPH(ch) == MORPH_BAT) {
+				perform_morph(ch, MORPH_NONE);
+			}
+			break;
+		}
 		case ABIL_BLOODSWORD: {
 			if ((obj = GET_EQ(ch, WEAR_WIELD))) {
 				if (GET_OBJ_VNUM(obj) == o_BLOODSWORD_LOW || GET_OBJ_VNUM(obj) == o_BLOODSWORD_MEDIUM || GET_OBJ_VNUM(obj) == o_BLOODSWORD_HIGH || GET_OBJ_VNUM(obj) == o_BLOODSWORD_LEGENDARY) {
@@ -161,8 +93,24 @@ void check_skill_sell(char_data *ch, int abil) {
 			affect_from_char(ch, ATYPE_BOOST);
 			break;
 		}
+		case ABIL_CHANT_OF_NATURE: {
+			if (GET_ACTION(ch) == ACT_CHANTING) {
+				msg_to_char(ch, "You end the chant.\r\n");
+				act("$n ends the chant.", FALSE, ch, NULL, NULL, TO_ROOM);
+				cancel_action(ch);
+			}
+			break;
+		}
 		case ABIL_CLAWS: {
 			retract_claws(ch);
+			break;
+		}
+		case ABIL_CLOTH_ARMOR: {
+			remove_armor_by_type(ch, ARMOR_CLOTH);
+			break;
+		}
+		case ABIL_COUNTERSPELL: {
+			affect_from_char(ch, ATYPE_COUNTERSPELL);
 			break;
 		}
 		case ABIL_DEATHSHROUD: {
@@ -178,6 +126,12 @@ void check_skill_sell(char_data *ch, int abil) {
 			}
 			break;
 		}
+		case ABIL_DREAD_BLOOD_FORM: {
+			if (GET_MORPH(ch) == MORPH_DREAD_BLOOD) {
+				perform_morph(ch, MORPH_NONE);
+			}
+			break;
+		}
 		case ABIL_EARTHMELD: {
 			if (affected_by_spell(ch, ATYPE_EARTHMELD)) {
 				void un_earthmeld(char_data *ch);
@@ -185,8 +139,31 @@ void check_skill_sell(char_data *ch, int abil) {
 			}
 			break;
 		}
+		case ABIL_FAMILIAR: {
+			if ((vict = has_familiar(ch)) && !vict->desc) {
+				if (GET_MOB_VNUM(vict) == FAMILIAR_CAT || GET_MOB_VNUM(vict) == FAMILIAR_SABERTOOTH || GET_MOB_VNUM(vict) == FAMILIAR_SPHINX || GET_MOB_VNUM(vict) == FAMILIAR_GRIFFIN) {
+					act("$n vanishes.", FALSE, vict, NULL, NULL, TO_ROOM);
+					extract_char(vict);
+				}
+			}
+			break;
+		}
+		case ABIL_FISH: {
+			if (GET_ACTION(ch) == ACT_FISHING) {
+				cancel_action(ch);
+			}
+			break;
+		}
 		case ABIL_FLY: {
 			affect_from_char(ch, ATYPE_FLY);
+			break;
+		}
+		case ABIL_FORESIGHT: {
+			affect_from_char(ch, ATYPE_FORESIGHT);
+			break;
+		}
+		case ABIL_HEAVY_ARMOR: {
+			remove_armor_by_type(ch, ARMOR_HEAVY);
 			break;
 		}
 		case ABIL_HORRID_FORM: {
@@ -195,38 +172,27 @@ void check_skill_sell(char_data *ch, int abil) {
 			}
 			break;
 		}
-		case ABIL_DREAD_BLOOD_FORM: {
-			if (GET_MORPH(ch) == MORPH_DREAD_BLOOD) {
-				perform_morph(ch, MORPH_NONE);
-			}
-			break;
-		}
-		case ABIL_SAVAGE_WEREWOLF_FORM: {
-			if (GET_MORPH(ch) == MORPH_SAVAGE_WEREWOLF) {
-				perform_morph(ch, MORPH_NONE);
-			}
-			break;
-		}
-		case ABIL_TOWERING_WEREWOLF_FORM: {
-			if (GET_MORPH(ch) == MORPH_TOWERING_WEREWOLF) {
-				perform_morph(ch, MORPH_NONE);
-			}
-			break;
-		}
-		case ABIL_SAGE_WEREWOLF_FORM: {
-			if (GET_MORPH(ch) == MORPH_SAGE_WEREWOLF) {
-				perform_morph(ch, MORPH_NONE);
-			}
-			break;
-		}
-		case ABIL_ANIMAL_FORMS: {
-			if (GET_MORPH(ch) == MORPH_DEER || GET_MORPH(ch) == MORPH_OSTRICH || GET_MORPH(ch) == MORPH_TAPIR) {
-				perform_morph(ch, MORPH_NONE);
-			}
+		case ABIL_LEATHER_ARMOR: {
+			remove_armor_by_type(ch, ARMOR_LEATHER);
 			break;
 		}
 		case ABIL_MAJESTY: {
 			end_majesty(ch);
+			break;
+		}
+		case ABIL_MANASHIELD: {
+			affect_from_char(ch, ATYPE_MANASHIELD);
+			break;
+		}
+		case ABIL_MEDIUM_ARMOR: {
+			remove_armor_by_type(ch, ARMOR_MEDIUM);
+			break;
+		}
+		case ABIL_MIRRORIMAGE: {
+			if ((vict = has_familiar(ch)) && !vict->desc && GET_MOB_VNUM(vict) == MIRROR_IMAGE_MOB) {
+				act("$n vanishes.", FALSE, vict, NULL, NULL, TO_ROOM);
+				extract_char(vict);
+			}
 			break;
 		}
 		case ABIL_MIST_FORM: {
@@ -242,6 +208,10 @@ void check_skill_sell(char_data *ch, int abil) {
 			}
 			break;
 		}
+		case ABIL_NAVIGATION: {
+			GET_CONFUSED_DIR(ch) = NORTH;
+			break;
+		}
 		case ABIL_NIGHTSIGHT: {
 			if (affected_by_spell(ch, ATYPE_NIGHTSIGHT)) {
 				msg_to_char(ch, "You end your nightsight.\r\n");
@@ -250,44 +220,12 @@ void check_skill_sell(char_data *ch, int abil) {
 			}
 			break;
 		}
-		case ABIL_RIDE: {
-			if (IS_RIDING(ch)) {
-				msg_to_char(ch, "You climb down from your mount.\r\n");
-				perform_dismount(ch);
-			}
+		case ABIL_PHOENIX_RITE: {
+			affect_from_char(ch, ATYPE_PHOENIX_RITE);
 			break;
 		}
-		case ABIL_FISH: {
-			if (GET_ACTION(ch) == ACT_FISHING) {
-				cancel_action(ch);
-			}
-			break;
-		}
-		case ABIL_NAVIGATION: {
-			GET_CONFUSED_DIR(ch) = NORTH;
-			break;
-		}
-		case ABIL_SHIELD_BLOCK: {
-			if ((obj = GET_EQ(ch, WEAR_HOLD)) && IS_SHIELD(obj)) {
-				act("You stop using $p.", FALSE, ch, GET_EQ(ch, WEAR_HOLD), NULL, TO_CHAR);
-				unequip_char_to_inventory(ch, WEAR_HOLD, TRUE);
-			}
-			break;
-		}
-		case ABIL_LEATHER_ARMOR: {
-			remove_armor_by_type(ch, ARMOR_LEATHER);
-			break;
-		}
-		case ABIL_MEDIUM_ARMOR: {
-			remove_armor_by_type(ch, ARMOR_MEDIUM);
-			break;
-		}
-		case ABIL_HEAVY_ARMOR: {
-			remove_armor_by_type(ch, ARMOR_HEAVY);
-			break;
-		}
-		case ABIL_CLOTH_ARMOR: {
-			remove_armor_by_type(ch, ARMOR_CLOTH);
+		case ABIL_RADIANCE: {
+			affect_from_char(ch, ATYPE_RADIANCE);
 			break;
 		}
 		case ABIL_READY_FIREBALL: {
@@ -299,57 +237,46 @@ void check_skill_sell(char_data *ch, int abil) {
 			}
 			break;
 		}
-		case ABIL_COUNTERSPELL: {
-			affect_from_char(ch, ATYPE_COUNTERSPELL);
-			break;
-		}
-		case ABIL_CHANT_OF_NATURE: {
-			if (GET_ACTION(ch) == ACT_CHANTING) {
-				msg_to_char(ch, "You end the chant.\r\n");
-				act("$n ends the chant.", FALSE, ch, NULL, NULL, TO_ROOM);
-				cancel_action(ch);
+		case ABIL_RIDE: {
+			if (IS_RIDING(ch)) {
+				msg_to_char(ch, "You climb down from your mount.\r\n");
+				perform_dismount(ch);
 			}
 			break;
 		}
-		case ABIL_RADIANCE: {
-			affect_from_char(ch, ATYPE_RADIANCE);
+		case ABIL_RITUAL_OF_BURDENS: {
+			if (affected_by_spell(ch, ATYPE_UNBURDENED)) {
+				msg_to_char(ch, "Your burdens return.\r\n");
+				affect_from_char(ch, ATYPE_UNBURDENED);
+			}
 			break;
 		}
-		case ABIL_BAT_FORM: {
-			if (GET_MORPH(ch) == MORPH_BAT) {
+		case ABIL_SAGE_WEREWOLF_FORM: {
+			if (GET_MORPH(ch) == MORPH_SAGE_WEREWOLF) {
 				perform_morph(ch, MORPH_NONE);
 			}
 			break;
 		}
-		case ABIL_MANASHIELD: {
-			affect_from_char(ch, ATYPE_MANASHIELD);
+		case ABIL_SAVAGE_WEREWOLF_FORM: {
+			if (GET_MORPH(ch) == MORPH_SAVAGE_WEREWOLF) {
+				perform_morph(ch, MORPH_NONE);
+			}
 			break;
 		}
-		case ABIL_FORESIGHT: {
-			affect_from_char(ch, ATYPE_FORESIGHT);
+		case ABIL_SHIELD_BLOCK: {
+			if ((obj = GET_EQ(ch, WEAR_HOLD)) && IS_SHIELD(obj)) {
+				act("You stop using $p.", FALSE, ch, GET_EQ(ch, WEAR_HOLD), NULL, TO_CHAR);
+				unequip_char_to_inventory(ch, WEAR_HOLD, TRUE);
+			}
 			break;
 		}
 		case ABIL_SIPHON: {
 			affect_from_char(ch, ATYPE_SIPHON);
 			break;
 		}
-		case ABIL_PHOENIX_RITE: {
-			affect_from_char(ch, ATYPE_PHOENIX_RITE);
-			break;
-		}
-		case ABIL_MIRRORIMAGE: {
-			if ((vict = has_familiar(ch)) && !vict->desc && GET_MOB_VNUM(vict) == MIRROR_IMAGE_MOB) {
-				act("$n vanishes.", FALSE, vict, NULL, NULL, TO_ROOM);
-				extract_char(vict);
-			}
-			break;
-		}
-		case ABIL_FAMILIAR: {
-			if ((vict = has_familiar(ch)) && !vict->desc) {
-				if (GET_MOB_VNUM(vict) == FAMILIAR_CAT || GET_MOB_VNUM(vict) == FAMILIAR_SABERTOOTH || GET_MOB_VNUM(vict) == FAMILIAR_SPHINX || GET_MOB_VNUM(vict) == FAMILIAR_GRIFFIN) {
-					act("$n vanishes.", FALSE, vict, NULL, NULL, TO_ROOM);
-					extract_char(vict);
-				}
+		case ABIL_TOWERING_WEREWOLF_FORM: {
+			if (GET_MORPH(ch) == MORPH_TOWERING_WEREWOLF) {
+				perform_morph(ch, MORPH_NONE);
 			}
 			break;
 		}
@@ -359,7 +286,6 @@ void check_skill_sell(char_data *ch, int abil) {
 			}
 			break;
 		}
-		
 		default: {
 			found = FALSE;
 		}
@@ -459,6 +385,86 @@ bool can_gain_skill_from(char_data *ch, int ability) {
 	}
 	
 	return FALSE;
+}
+
+
+/**
+* General test function for abilities. It allows mobs who are not charmed to
+* use any ability. Otherwise, it supports an energy pool cost and/or cooldowns,
+* as well as checking that the player has the ability.
+*
+* @param char_data *ch The player or NPC.
+* @param int ability Any ABIL_x const.
+* @param int cost_pool HEALTH, MANA, MOVE, BLOOD (NOTHING if no charge).
+* @param int cost_amount Mana (or whatever) amount required, if any.
+* @param int cooldown_type Any COOLDOWN_x const, or NOTHING for no cooldown check.
+* @return bool TRUE if ch can use ability; FALSE if not.
+*/
+bool can_use_ability(char_data *ch, int ability, int cost_pool, int cost_amount, int cooldown_type) {
+	extern const char *pool_types[];
+	
+	char buf[MAX_STRING_LENGTH];
+	int time, needs_cost;
+	
+	// this actually blocks npcs, too, so it's higher than other checks
+	if (cost_pool == BLOOD && cost_amount > 0 && !CAN_SPEND_BLOOD(ch)) {
+		msg_to_char(ch, "Your blood is inert, you can't do that!\r\n");
+		return FALSE;
+	}
+	
+	// special rules for npcs
+	if (IS_NPC(ch)) {
+		return (AFF_FLAGGED(ch, AFF_CHARM) ? FALSE : TRUE);
+	}
+	
+	// special rule: require that blood or health costs not reduce player below 1
+	needs_cost = cost_amount + ((cost_pool == HEALTH || cost_pool == BLOOD) ? 1 : 0);
+	
+	// players:
+	if (!HAS_ABILITY(ch, ability)) {
+		msg_to_char(ch, "You have not purchased the %s ability.\r\n", ability_data[ability].name);
+		return FALSE;
+	}
+	if (cost_pool >= 0 && cost_pool < NUM_POOLS && cost_amount > 0 && GET_CURRENT_POOL(ch, cost_pool) < needs_cost) {
+		msg_to_char(ch, "You need %d %s point%s to do that.\r\n", cost_amount, pool_types[cost_pool], PLURAL(cost_amount));
+		return FALSE;
+	}
+	if (cooldown_type > COOLDOWN_RESERVED && (time = get_cooldown_time(ch, cooldown_type)) > 0) {
+		snprintf(buf, sizeof(buf), "%s is still on cooldown for %d second%s.\r\n", ability_data[ability].name, time, (time != 1 ? "s" : ""));
+		CAP(buf);
+		send_to_char(buf, ch);
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
+
+/**
+* Safely charges a player the cost for using an ability (won't go below 0) and
+* applies a cooldown, if applicable. This works on both players and NPCs, but
+* only applies the cooldown to players.
+*
+* The player will also experience universal_wait for using the ability.
+*
+* @param char_data *ch The player or NPC.
+* @param int cost_pool HEALTH, MANA, MOVE, BLOOD (NOTHING if no charge).
+* @param int cost_amount Mana (or whatever) amount required, if any.
+* @param int cooldown_type Any COOLDOWN_x const to apply (NOTHING for none).
+* @param int cooldown_time Cooldown duration, if any.
+*/
+void charge_ability_cost(char_data *ch, int cost_pool, int cost_amount, int cooldown_type, int cooldown_time) {
+	extern const int universal_wait;
+	
+	if (cost_pool >= 0 && cost_pool < NUM_POOLS && cost_amount > 0) {
+		GET_CURRENT_POOL(ch, cost_pool) = MAX(0, GET_CURRENT_POOL(ch, cost_pool) - cost_amount);
+	}
+	
+	// only npcs get cooldowns here
+	if (cooldown_type > COOLDOWN_RESERVED && cooldown_time > 0 && !IS_NPC(ch)) {
+		add_cooldown(ch, cooldown_type, cooldown_time);
+	}
+	WAIT_STATE(ch, universal_wait);
 }
 
 
