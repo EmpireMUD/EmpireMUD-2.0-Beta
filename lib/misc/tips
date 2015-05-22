@@ -76,4 +76,20 @@ You can find adventures near you with 'nearby'.
 If you come across an adventure, use the 'adventure' command to find out its level and requirements.
 You can 'consider' enemies to see how hard they'd be.
 Gear makes up a significant portion of your level.
+Type 'keep' to keep yourself from dropping certain items with 'drop all'.
+Some items are marked (boe), or bind-on-equip. Once you use them, you can't give them away.
+You'll need All-Terrain Riding to use a flying mount.
+You can hold a small weapon in your off-hand, but you need Dual Wield to fight with it.
+You can use 'alternate' to quickly switch between your characters.
+Type 'portal -all' to see a list of public portals.
+You can see where your citizens are working with 'workforce where'.
+If the periodic action messages are too spammy, type 'toggle action-spam'.
+Type 'elog' to see a list of recent empire events.
+You can use the 'eedit' command to configure your empire.
+Type 'cooldowns' to see how long until your abilities are available.
+Players with less than 24 hours of playtime can't be attacked by other players, unless they are hostile.
+You get a class when two skills hit level 76, but won't get class abilities until they are at 100.
+You can identify items to see how good they are, or which is better.
+To identify an item in your inventory when you're wearing something with the same name, try 'id 1.item'.
+You can create new slash-channels with /join.
 $~
