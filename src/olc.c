@@ -2188,7 +2188,7 @@ bool player_can_olc_edit(char_data *ch, int type, any_vnum vnum) {
 		else {
 			// otherwise, can only edit an adventure if its contained vnums are editable
 			adv_data *adv = adventure_proto(vnum);
-			if (GET_ADV_START_VNUM(adv) >= GET_OLC_MIN_VNUM(ch) && GET_ADV_END_VNUM(adv) <= GET_OLC_MAX_VNUM(ch)) {
+			if (adv && GET_ADV_START_VNUM(adv) >= GET_OLC_MIN_VNUM(ch) && GET_ADV_END_VNUM(adv) <= GET_OLC_MAX_VNUM(ch)) {
 				return TRUE;
 			}
 		}
