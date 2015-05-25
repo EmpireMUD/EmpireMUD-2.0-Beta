@@ -1031,13 +1031,18 @@ bool check_autostore(obj_data *obj, bool force) {
 	else if (IS_COINS(obj)) {
 		store = TRUE;
 	}
+	else if (!emp) {	// no owner
+		store = TRUE;
+	}
+	else if (OBJ_FLAGGED(obj, OBJ_NO_AUTOSTORE)) {
+		// this goes after the !emp check because we "store" them on unclaimed land anyway
+		// but this otherwise blocks the item from storing
+		store = FALSE;
+	}
 	else if (UNIQUE_OBJ_CAN_STORE(obj) && ROOM_PRIVATE_OWNER(HOME_ROOM(IN_ROOM(top_obj))) == NOBODY) {
 		// store unique items but not in private homes
 		store = TRUE;
 		unique = TRUE;
-	}
-	else if (!emp) {	// no owner
-		store = TRUE;
 	}
 	else if (OBJ_BOUND_TO(obj) && ROOM_PRIVATE_OWNER(HOME_ROOM(IN_ROOM(top_obj))) == NOBODY && (GET_AUTOSTORE_TIMER(obj) + config_get_int("bound_item_junk_time") * SECS_PER_REAL_MIN) < time(0)) {
 		// room owned, item is bound, not a private home, but not storable? junk it
