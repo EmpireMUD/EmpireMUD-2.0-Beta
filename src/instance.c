@@ -623,7 +623,7 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 	int pos = -1;	// default < 0
 	int dir, iter, sub;
 	
-	const int max_tries = 500, max_dir_tries = 10;	// for random checks
+	const int max_tries = 50, max_dir_tries = 10;	// for random checks
 	
 	*which_dir = NO_DIR;
 	
