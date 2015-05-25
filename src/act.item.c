@@ -2342,9 +2342,8 @@ void warehouse_store(char_data *ch, char *argument) {
 		for (obj = ch->carrying; obj && !full; obj = next_obj) {
 			next_obj = obj->next_content;
 			
-			// we use !OBJ_CAN_STORE because it blocks things that can be stored normally
 			// bound objects never store, nor can torches
-			if (!OBJ_FLAGGED(obj, OBJ_KEEP) && !OBJ_CAN_STORE(obj) && !OBJ_BOUND_TO(obj) && (!OBJ_FLAGGED(obj, OBJ_LIGHT) || GET_OBJ_TIMER(obj) == UNLIMITED)) {
+			if (!OBJ_FLAGGED(obj, OBJ_KEEP) && UNIQUE_OBJ_CAN_STORE(obj)) {
 				// may extract obj
 				store_unique_item(ch, obj, GET_LOYALTY(ch), IN_ROOM(ch), &full);
 				if (!full) {
@@ -2374,9 +2373,8 @@ void warehouse_store(char_data *ch, char *argument) {
 		while (obj && (dotmode == FIND_ALLDOT || count < total)) {
 			next_obj = get_obj_in_list_vis(ch, argument, obj->next_content);
 
-			// we use !OBJ_CAN_STORE because it blocks things that can be stored normally			
 			// bound objects never store
-			if ((!OBJ_FLAGGED(obj, OBJ_KEEP) || (total == 1 && dotmode != FIND_ALLDOT)) && !OBJ_CAN_STORE(obj) && !OBJ_BOUND_TO(obj) && (!OBJ_FLAGGED(obj, OBJ_LIGHT) || GET_OBJ_TIMER(obj) == UNLIMITED)) {
+			if ((!OBJ_FLAGGED(obj, OBJ_KEEP) || (total == 1 && dotmode != FIND_ALLDOT)) && UNIQUE_OBJ_CAN_STORE(obj)) {
 				// may extract obj
 				store_unique_item(ch, obj, GET_LOYALTY(ch), IN_ROOM(ch), &full);
 				if (!full) {

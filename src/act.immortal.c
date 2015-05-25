@@ -82,30 +82,19 @@ void instance_list_row(struct instance_data *inst, int number, char *save_buffer
 * @param empire_data *emp The empire to store it to.
 * @param int island The islands to store it to.
 */
-static void perform_autostore(obj_data *obj, empire_data *emp, int island) {	
+static void perform_autostore(obj_data *obj, empire_data *emp, int island) {
+	extern bool check_autostore(obj_data *obj, bool force);
+	
 	obj_data *temp, *next_temp;
 	
-	// try to store it
-	if (emp) {
-		if (OBJ_CAN_STORE(obj) || IS_COINS(obj)) {
-			// try to store contents
-			for (temp = obj->contains; temp; temp = next_temp) {
-				next_temp = temp->next_content;
-				perform_autostore(temp, emp, island);
-			}
-	
-			// empty then just empty it
-			empty_obj_before_extract(obj);
-
-			if (IS_COINS(obj)) {
-				increase_empire_coins(emp, real_empire(GET_COINS_EMPIRE_ID(obj)), GET_COINS_AMOUNT(obj));
-			}
-			else {
-				add_to_empire_storage(emp, island, GET_OBJ_VNUM(obj), 1);
-			}
-			extract_obj(obj);
-		}
+	// store the inside first
+	for (temp = obj->contains; temp; temp = next_temp) {
+		next_temp = temp->next_content;
+		perform_autostore(temp, emp, island);
 	}
+	
+	
+	check_autostore(obj, TRUE);
 }
 
 

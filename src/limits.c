@@ -986,14 +986,100 @@ bool should_delete_empire(empire_data *emp) {
 //// OBJECT LIMITS ///////////////////////////////////////////////////////////
 
 /**
+* Checks and runs an autostore for an object.
+*
+* @param obj_data *obj The item to check/store.
+* @param bool force If TRUE, ignores timers and players present and stores all storables.
+* @return bool TRUE if the item is still in the world, FALSE if it was extracted
+*/
+bool check_autostore(obj_data *obj, bool force) {
+	obj_data *top_obj;
+	empire_data *emp;
+	bool store, unique, full;
+	
+	// easy exclusions
+	if (obj->carried_by || obj->worn_by || !CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
+		return TRUE;
+	}
+	
+	// timer check (if not forced)
+	if (!force && (GET_AUTOSTORE_TIMER(obj) + config_get_int("autostore_time") * SECS_PER_REAL_MIN) > time(0)) {
+		return TRUE;
+	}
+	
+	// ensure object is in a room, or in an object in a room
+	top_obj = get_top_object(obj);
+	if (!IN_ROOM(top_obj) || IS_ADVENTURE_ROOM(IN_ROOM(top_obj))) {
+		return TRUE;
+	}
+	
+	// never do it in front of players
+	if (!force && any_players_in_room(IN_ROOM(top_obj))) {
+		return TRUE;
+	}
+	
+	emp = ROOM_OWNER(IN_ROOM(top_obj));
+	
+	// reasons something is storable (timer was already checked)
+	store = unique = FALSE;
+	if (OBJ_FLAGGED(obj, OBJ_JUNK | OBJ_UNCOLLECTED_LOOT)) {
+		store = TRUE;
+	}
+	else if (OBJ_CAN_STORE(obj)) {
+		store = TRUE;
+	}
+	else if (IS_COINS(obj)) {
+		store = TRUE;
+	}
+	else if (UNIQUE_OBJ_CAN_STORE(obj) && ROOM_PRIVATE_OWNER(HOME_ROOM(IN_ROOM(top_obj))) == NOBODY) {
+		// store unique items but not in private homes
+		store = TRUE;
+		unique = TRUE;
+	}
+	else if (!emp) {	// no owner
+		store = TRUE;
+	}
+	
+	// do we even bother?
+	if (!store) {
+		return TRUE;
+	}
+
+	// final timer check (long-autostore)
+	if (!force && ROOM_BLD_FLAGGED(IN_ROOM(top_obj), BLD_LONG_AUTOSTORE) && (GET_AUTOSTORE_TIMER(obj) + config_get_int("long_autostore_time") * SECS_PER_REAL_MIN) > time(0)) {
+		return TRUE;
+	}
+	
+	// OK GO:
+	empty_obj_before_extract(obj);
+	
+	if (emp) {					
+		if (IS_COINS(obj)) {
+			increase_empire_coins(emp, real_empire(GET_COINS_EMPIRE_ID(obj)), GET_COINS_AMOUNT(obj));
+		}
+		else if (unique) {
+			// this extracts it itself
+			store_unique_item(NULL, obj, emp, IN_ROOM(top_obj), &full);
+			return FALSE;
+		}
+		else if (OBJ_CAN_STORE(obj)) {
+			add_to_empire_storage(emp, GET_ISLAND_ID(IN_ROOM(top_obj)), GET_OBJ_VNUM(obj), 1);
+		}
+	}
+
+	// get rid of it either way
+	extract_obj(obj);
+	return FALSE;
+}
+
+
+/**
 * This runs a point update (every tick) on an object.
 *
 * @param obj_data *obj The object to update.
 */
 void point_update_obj(obj_data *obj) {
 	room_data *to_room, *obj_r;
-	obj_data *top_obj;
-	empire_data *emp;
 	char_data *c;
 	time_t timer;
 	
@@ -1170,31 +1256,9 @@ void point_update_obj(obj_data *obj) {
 		} // end non-drink decay
 	}
 	
-	// 2nd type of timer: the autostore timer (keeps the world clean of litter) -- this does a preliminary time check to avoid work, but a full time check after
-	if (!obj->carried_by && !obj->worn_by && CAN_WEAR(obj, ITEM_WEAR_TAKE) && (GET_AUTOSTORE_TIMER(obj) + config_get_int("autostore_time") * SECS_PER_REAL_MIN) < time(0)) {
-		// (only if not carried/worn, is takeable and the timer is expired)
-
-		// at this point, only care if the top object is in the room, and no players are there
-		if ((top_obj = get_top_object(obj)) && IN_ROOM(top_obj) && !IS_ADVENTURE_ROOM(IN_ROOM(top_obj)) && (OBJ_FLAGGED(obj, OBJ_JUNK | OBJ_UNCOLLECTED_LOOT) || OBJ_CAN_STORE(obj) || IS_COINS(obj) || !ROOM_OWNER(IN_ROOM(top_obj))) && !any_players_in_room(IN_ROOM(top_obj))) {
-			if ((GET_AUTOSTORE_TIMER(obj) + config_get_int("long_autostore_time") * SECS_PER_REAL_MIN) < time(0) || (!ROOM_BLD_FLAGGED(IN_ROOM(top_obj), BLD_LONG_AUTOSTORE) && (GET_AUTOSTORE_TIMER(obj) + config_get_int("autostore_time") * SECS_PER_REAL_MIN) < time(0))) {
-				// safe to purge or store
-				empty_obj_before_extract(obj);
-				emp = ROOM_OWNER(IN_ROOM(top_obj));
-			
-				if (emp) {					
-					if (IS_COINS(obj)) {
-						increase_empire_coins(emp, real_empire(GET_COINS_EMPIRE_ID(obj)), GET_COINS_AMOUNT(obj));
-					}
-					else if (OBJ_CAN_STORE(obj)) {
-						add_to_empire_storage(emp, GET_ISLAND_ID(IN_ROOM(top_obj)), GET_OBJ_VNUM(obj), 1);
-					}
-				}
-
-				// get rid of it either way
-				extract_obj(obj);
-				return;
-			}
-		}
+	// 2nd type of timer: the autostore timer (keeps the world clean of litter)
+	if (!check_autostore(obj, FALSE)) {
+		return;
 	}
 }
 
