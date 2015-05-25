@@ -1603,6 +1603,7 @@ void init_config_system(void) {
 
 	// items
 	init_config(CONFIG_ITEMS, "autostore_time", CONFTYPE_INT, "minutes items last on the ground");
+	init_config(CONFIG_ITEMS, "bound_item_junk_time", CONFTYPE_INT, "minutes bound items last on the ground before being junked");
 	init_config(CONFIG_ITEMS, "long_autostore_time", CONFTYPE_INT, "minutes items last with the long-autostore bld flag");
 	init_config(CONFIG_ITEMS, "room_item_limit", CONFTYPE_INT, "number of items allowed in buildings with item-limit flag");
 	init_config(CONFIG_ITEMS, "scale_points_at_100", CONFTYPE_DOUBLE, "number of scaling points for a 100-scale item");

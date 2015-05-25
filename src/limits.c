@@ -1039,6 +1039,11 @@ bool check_autostore(obj_data *obj, bool force) {
 	else if (!emp) {	// no owner
 		store = TRUE;
 	}
+	else if (OBJ_BOUND_TO(obj) && ROOM_PRIVATE_OWNER(HOME_ROOM(IN_ROOM(top_obj))) == NOBODY && (GET_AUTOSTORE_TIMER(obj) + config_get_int("bound_item_junk_time") * SECS_PER_REAL_MIN) < time(0)) {
+		// room owned, item is bound, not a private home, but not storable? junk it
+		store = TRUE;
+		// DON'T mark unique -- we are just junking it
+	}
 	
 	// do we even bother?
 	if (!store) {
