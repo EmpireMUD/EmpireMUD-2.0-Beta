@@ -239,7 +239,7 @@ A grave marker has been left behind.~
    You can use this grave marker to 'build grave', and then set it as your tomb
 in order to have a nearby respawn point when you die. This grave marker can
 only be used once, so pick a good spot for it. You'll need the Monuments
-ability to build a proper tomb after that.  
+ability to build a proper tomb after that.
 ~
 3 g a
 0 0 0
@@ -251,7 +251,7 @@ a shovel~
 A shovel is stamped into the ground.~
 A shovel helps you dig or excavate faster.
 ~
-1 ehl ano
+1 ehlu ano
 0 4 5
 13 0
 R
@@ -265,7 +265,7 @@ a metal pan~
 A pan has been left here.~
 You can pan at the edge of the river to look for gold.
 ~
-3 l ao
+3 lt ao
 0 0 0
 13 0
 R
