@@ -1989,6 +1989,8 @@ Available flags:
  STAFF - counts as a staff (even if it doesn't have a staff weapon type)
  UNCOLLECTED-LOOT - will decay on the ground if no player gets it
  *KEEP - player has marked the object with the 'keep' command
+ TOOL-PAN - can pan for gold if holding this
+ TOOL-SHOVEL - acts as a shovel for dig and excavate
 
 See also: OLC OBJECTS
 #d
