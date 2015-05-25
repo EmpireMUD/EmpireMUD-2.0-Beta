@@ -967,7 +967,7 @@ void process_digging(char_data *ch) {
 	GET_ACTION_TIMER(ch) -= 1;
 	
 	// detect shovel in either hand
-	if ((GET_EQ(ch, WEAR_WIELD) && GET_OBJ_VNUM(GET_EQ(ch, WEAR_WIELD)) == o_SHOVEL) || (GET_EQ(ch, WEAR_HOLD) && GET_OBJ_VNUM(GET_EQ(ch, WEAR_HOLD)) == o_SHOVEL)) {
+	if ((GET_EQ(ch, WEAR_WIELD) && OBJ_FLAGGED(GET_EQ(ch, WEAR_WIELD), OBJ_TOOL_SHOVEL)) || (GET_EQ(ch, WEAR_HOLD) && OBJ_FLAGGED(GET_EQ(ch, WEAR_HOLD), OBJ_TOOL_SHOVEL))) {
 		GET_ACTION_TIMER(ch) -= 1;
 	}
 	
@@ -1049,7 +1049,7 @@ void process_excavating(char_data *ch) {
 
 	total = 1 + (AFF_FLAGGED(ch, AFF_HASTE) ? 1 : 0) + (HAS_BONUS_TRAIT(ch, BONUS_FAST_CHORES) ? 1 : 0);
 	for (count = 0; count < total && GET_ACTION(ch) == ACT_EXCAVATING; ++count) {
-		if ((!GET_EQ(ch, WEAR_HOLD) || GET_OBJ_VNUM(GET_EQ(ch, WEAR_HOLD)) != o_SHOVEL) && (!GET_EQ(ch, WEAR_WIELD) || GET_OBJ_VNUM(GET_EQ(ch, WEAR_WIELD)) != o_SHOVEL)) {
+		if ((!GET_EQ(ch, WEAR_HOLD) || !OBJ_FLAGGED(GET_EQ(ch, WEAR_HOLD), OBJ_TOOL_SHOVEL)) && (!GET_EQ(ch, WEAR_WIELD) || !OBJ_FLAGGED(GET_EQ(ch, WEAR_WIELD), OBJ_TOOL_SHOVEL))) {
 			msg_to_char(ch, "You need a shovel to excavate.\r\n");
 			cancel_action(ch);
 		}
@@ -1098,7 +1098,7 @@ void process_fillin(char_data *ch) {
 
 	total = 1 + (AFF_FLAGGED(ch, AFF_HASTE) ? 1 : 0) + (HAS_BONUS_TRAIT(ch, BONUS_FAST_CHORES) ? 1 : 0);
 	for (count = 0; count < total && GET_ACTION(ch) == ACT_FILLING_IN; ++count) {
-		if ((!GET_EQ(ch, WEAR_HOLD) || GET_OBJ_VNUM(GET_EQ(ch, WEAR_HOLD)) != o_SHOVEL) && (!GET_EQ(ch, WEAR_WIELD) || GET_OBJ_VNUM(GET_EQ(ch, WEAR_WIELD)) != o_SHOVEL)) {
+		if ((!GET_EQ(ch, WEAR_HOLD) || !OBJ_FLAGGED(GET_EQ(ch, WEAR_HOLD), OBJ_TOOL_SHOVEL)) && (!GET_EQ(ch, WEAR_WIELD) || !OBJ_FLAGGED(GET_EQ(ch, WEAR_WIELD), OBJ_TOOL_SHOVEL))) {
 			msg_to_char(ch, "You need a shovel to fill in the trench.\r\n");
 			cancel_action(ch);
 		}
@@ -1495,7 +1495,7 @@ void process_panning(char_data *ch) {
 	
 	int short_depletion = config_get_int("short_depletion");
 
-	if (!GET_EQ(ch, WEAR_HOLD) || GET_OBJ_VNUM(GET_EQ(ch, WEAR_HOLD)) != o_PAN) {
+	if (!GET_EQ(ch, WEAR_HOLD) || !OBJ_FLAGGED(GET_EQ(ch, WEAR_HOLD), OBJ_TOOL_PAN)) {
 		msg_to_char(ch, "You need to be holding a pan to do that.\r\n");
 		cancel_action(ch);
 	}
@@ -2146,7 +2146,7 @@ ACMD(do_excavate) {
 		// 1st check: allies ok
 		msg_to_char(ch, "You don't have permission to excavate here!\r\n");
 	}
-	else if ((!GET_EQ(ch, WEAR_HOLD) || GET_OBJ_VNUM(GET_EQ(ch, WEAR_HOLD)) != o_SHOVEL) && (!GET_EQ(ch, WEAR_WIELD) || GET_OBJ_VNUM(GET_EQ(ch, WEAR_WIELD)) != o_SHOVEL)) {
+	else if ((!GET_EQ(ch, WEAR_HOLD) || !OBJ_FLAGGED(GET_EQ(ch, WEAR_HOLD), OBJ_TOOL_SHOVEL)) && (!GET_EQ(ch, WEAR_WIELD) || !OBJ_FLAGGED(GET_EQ(ch, WEAR_WIELD), OBJ_TOOL_SHOVEL))) {
 		msg_to_char(ch, "You need a shovel to excavate.\r\n");
 	}
 	else if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_IS_TRENCH) && get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_PROGRESS) < 0) {
@@ -2199,7 +2199,7 @@ ACMD(do_fillin) {
 		// 1st check: allies can help
 		msg_to_char(ch, "You don't have permission to fill in here!\r\n");
 	}
-	else if ((!GET_EQ(ch, WEAR_HOLD) || GET_OBJ_VNUM(GET_EQ(ch, WEAR_HOLD)) != o_SHOVEL) && (!GET_EQ(ch, WEAR_WIELD) || GET_OBJ_VNUM(GET_EQ(ch, WEAR_WIELD)) != o_SHOVEL)) {
+	else if ((!GET_EQ(ch, WEAR_HOLD) || !OBJ_FLAGGED(GET_EQ(ch, WEAR_HOLD), OBJ_TOOL_SHOVEL)) && (!GET_EQ(ch, WEAR_WIELD) || !OBJ_FLAGGED(GET_EQ(ch, WEAR_WIELD), OBJ_TOOL_SHOVEL))) {
 		msg_to_char(ch, "You need a shovel to do that.\r\n");
 	}
 	else if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_IS_TRENCH)) {
@@ -2407,7 +2407,7 @@ ACMD(do_pan) {
 	else if (!find_flagged_sect_within_distance_from_char(ch, SECTF_FRESH_WATER, NOBITS, 1)) {
 		msg_to_char(ch, "You need to be near fresh water to pan for gold.\r\n");
 	}
-	else if (!GET_EQ(ch, WEAR_HOLD) || GET_OBJ_VNUM(GET_EQ(ch, WEAR_HOLD)) != o_PAN) {
+	else if (!GET_EQ(ch, WEAR_HOLD) || !OBJ_FLAGGED(GET_EQ(ch, WEAR_HOLD), OBJ_TOOL_PAN)) {
 		msg_to_char(ch, "You need to be holding a pan to do that.\r\n");
 	}
 	else {

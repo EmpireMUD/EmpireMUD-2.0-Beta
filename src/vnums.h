@@ -148,10 +148,6 @@
 #define o_ROPE  2035
 #define o_TENT  2036
 
-// forge
-#define o_SHOVEL  2118
-#define o_PAN  2119
-
 // Wood crafts
 #define o_STAKE  915	// could be a flag
 #define o_BLANK_SIGN  918

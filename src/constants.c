@@ -1423,6 +1423,8 @@ const char *extra_bits[] = {
 	"STAFF",
 	"UNCOLLECTED-LOOT",
 	"*KEEP",
+	"TOOL-PAN",
+	"TOOL-SHOVEL",
 	"\n"
 };
 
@@ -1448,6 +1450,8 @@ const char *extra_bits_inv_flags[] = {
 	"",	// staff
 	"",	// uncollected
 	"(keep)",
+	"",	// pan
+	"",	// shovel
 	"\n"
 };
 
@@ -1473,6 +1477,8 @@ const double obj_flag_scaling_bonus[] = {
 	1.0,	// OBJ_STAFF
 	1.0,	// OBJ_UNCOLLECTED_LOOT
 	1.0,	// OBJ_KEEP
+	1.0,	// OBJ_TOOL_PAN
+	1.0	// OBJ_TOOL_SHOVEL
 };
 
 
