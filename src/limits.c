@@ -50,6 +50,7 @@ extern struct instance_data *find_instance_by_room(room_data *room);
 extern room_data *obj_room(obj_data *obj);
 void out_of_blood(char_data *ch);
 void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool full_abandon);
+void stop_room_action(room_data *room, int action, int chore);
 
 // locals
 int health_gain(char_data *ch, bool info_only);
@@ -1225,6 +1226,10 @@ void real_update_obj(obj_data *obj) {
 					COMPLEX_DATA(home)->burning = number(4, 12);
 					if (ROOM_PEOPLE(home)) {
 						act("A stray ember from $p ignites the room!", FALSE, ROOM_PEOPLE(home), obj, 0, TO_CHAR | TO_ROOM);
+
+						// ensure no building or dismantling
+						stop_room_action(home, ACT_BUILDING, CHORE_BUILDING);
+						stop_room_action(home, ACT_DISMANTLING, CHORE_BUILDING);
 					}
 				}
 			}

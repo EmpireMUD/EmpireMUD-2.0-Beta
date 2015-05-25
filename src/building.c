@@ -988,6 +988,9 @@ ACMD(do_build) {
 				msg_to_char(ch, "The building is being dismantled, you can't rebuild it now.\r\n");
 			else if (GET_ACTION(ch) != ACT_NONE)
 				msg_to_char(ch, "You're kinda busy right now.\r\n");
+			else if (BUILDING_BURNING(IN_ROOM(ch))) {
+				msg_to_char(ch, "You can't work on a burning building!\r\n");
+			}
 			else {
 				start_action(ch, ACT_BUILDING, 0, NOBITS);
 				msg_to_char(ch, "You start building.\r\n");
@@ -1193,6 +1196,11 @@ ACMD(do_dismantle) {
 	
 	if (HOME_ROOM(IN_ROOM(ch)) != IN_ROOM(ch)) {
 		msg_to_char(ch, "You need to dismantle from the main room.\r\n");
+		return;
+	}
+	
+	if (BUILDING_BURNING(IN_ROOM(ch))) {
+		msg_to_char(ch, "You can't dismantle a burning building!\r\n");
 		return;
 	}
 
