@@ -191,8 +191,19 @@ ACMD(do_cleanse) {
 	struct affected_type *aff, *next_aff;
 	bitvector_t bitv;
 	char_data *vict = ch;
-	int pos, cost = 30;
-	bool done_aff;
+	int pos, iter, cost = 30;
+	bool done_aff, uncleansable;
+	
+	// a list of affects cleanse should ignore
+	int exclude_blacklist[] = {
+		ATYPE_MANASHIELD,	// has a max-mana penalty
+		ATYPE_VIGOR,	// has a move regen penalty
+		ATYPE_MUMMIFY,	// has a strange set of affs
+		ATYPE_DEATHSHROUD,	// has a strange set of affs
+		ATYPE_DEATH_PENALTY,	// is a penalty
+		ATYPE_WAR_DELAY,	// is a penalty
+		-1	// last
+	};
 	
 	one_argument(argument, arg);
 	
@@ -221,6 +232,19 @@ ACMD(do_cleanse) {
 		// remove bad effects
 		for (aff = vict->affected; aff; aff = next_aff) {
 			next_aff = aff->next;
+			
+			// ensure not uncleansable
+			uncleansable = FALSE;
+			for (iter = 0; exclude_blacklist[iter] != -1; ++iter) {
+				if (aff->type == exclude_blacklist[iter]) {
+					uncleansable = TRUE;
+					break;
+				}
+			}
+			if (uncleansable) {
+				continue;
+			}
+			
 			done_aff = FALSE;
 			if (aff->location != APPLY_NONE && (apply_values[(int) aff->location] == 0.0 || aff->modifier < 0)) {
 				affect_remove(vict, aff);
@@ -240,6 +264,18 @@ ACMD(do_cleanse) {
 		// remove DoTs
 		for (dot = vict->over_time_effects; dot; dot = next_dot) {
 			next_dot = dot->next;
+			
+			// ensure not uncleansable
+			uncleansable = FALSE;
+			for (iter = 0; exclude_blacklist[iter] != -1; ++iter) {
+				if (dot->type == exclude_blacklist[iter]) {
+					uncleansable = TRUE;
+					break;
+				}
+			}
+			if (uncleansable) {
+				continue;
+			}
 
 			if (dot->damage_type == DAM_PHYSICAL || dot->damage_type == DAM_POISON) {
 				dot_remove(vict, dot);
