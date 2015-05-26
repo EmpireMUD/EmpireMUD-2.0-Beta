@@ -2006,13 +2006,13 @@ int _parse_name(char *arg, char *name) {
 	
 	// don't allow leading apostrophe or dash
 	if (*arg == '\'' || *arg == '-') {
-		return 0;
+		return 1;
 	}
 
 	// check for anything that's not an apostrophe or dash
 	for (i = 0; (*name = *arg); arg++, i++, name++)
 		if (!isalpha(*arg) && *arg != '\'' && *arg != '-')
-			return (0);
+			return 1;
 
 	if (!i)
 		return (1);
