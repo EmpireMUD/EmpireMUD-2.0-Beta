@@ -491,7 +491,7 @@ extern bool skill_check(char_data *ch, int ability, int difficulty);
 #define ATYPE_EARTHMELD  10
 #define ATYPE_MUMMIFY  11
 #define ATYPE_EARTHARMOR  12
-#define ATYPE_BESTOW_VIGOR  13
+#define ATYPE_BESTOW_VIGOR  13	// NOTE: not used
 #define ATYPE_WEAKEN  14
 #define ATYPE_COLORBURST  15
 #define ATYPE_HEARTSTOP  16
