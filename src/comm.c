@@ -837,10 +837,13 @@ void heartbeat(int heart_pulse) {
 		if (debug_log && HEARTBEAT(15)) { log("debug 22:\t%lld", microtime()); }
 	}
 	
+	if (HEARTBEAT(3 * SECS_PER_REAL_MIN)) {
+		generate_adventure_instances();
+		if (debug_log && HEARTBEAT(15)) { log("debug 23:\t%lld", microtime()); }
+	}
+	
 	if (HEARTBEAT(5 * SECS_PER_REAL_MIN)) {
 		prune_instances();
-		if (debug_log && HEARTBEAT(15)) { log("debug 23:\t%lld", microtime()); }
-		generate_adventure_instances();
 		if (debug_log && HEARTBEAT(15)) { log("debug 24:\t%lld", microtime()); }
 		update_trading_post();
 		if (debug_log && HEARTBEAT(15)) { log("debug 24.5:\t%lld", microtime()); }

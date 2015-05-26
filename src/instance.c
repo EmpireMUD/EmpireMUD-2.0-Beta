@@ -769,25 +769,27 @@ void generate_adventure_instances(void) {
 			}
 		
 			if (can_instance(iter)) {
+				// mark it done no matter what -- we only instance 1 per cycle
+				last_adv_vnum = GET_ADV_VNUM(iter);
+				
 				for (rule = GET_ADV_LINKING(iter); rule; rule = rule->next) {
 					if ((loc = find_location_for_rule(iter, rule, &dir))) {
 						// make it so!
 						if (build_instance_loc(iter, rule, loc, dir)) {
 							save_instances();
-							last_adv_vnum = GET_ADV_VNUM(iter);
 							// only 1 instance per cycle
 							return;
 						}
 					}
 				}
+				
+				// we ran rules on this one; don't run any more
+				return;
 			}
 		}
 	
 		last_adv_vnum = NOTHING;
 	}
-	
-	// save time later, sort now
-	sort_world_table();
 }
 
 
