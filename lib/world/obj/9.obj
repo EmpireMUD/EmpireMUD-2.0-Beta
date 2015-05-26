@@ -49,6 +49,8 @@ You can sit on the chair.
 3 aelv a
 0 0 0
 0 0
+R
+5610 0
 S
 #905
 bench wooden~
@@ -59,6 +61,8 @@ You can sit on the bench.
 3 aelv a
 0 0 0
 0 0
+R
+5610 0
 S
 #906
 table long~
@@ -69,6 +73,8 @@ Tables are merely for decoration.
 3 elv a
 0 0 0
 0 0
+R
+5610 0
 S
 #907
 stool wooden~
@@ -79,6 +85,8 @@ You can sit on the stool.
 3 aelv a
 0 0 0
 0 0
+R
+5610 0
 S
 #908
 arrows quiver~
@@ -226,6 +234,8 @@ You can sit on the throne.
 3 aelv a
 0 0 0
 0 0
+R
+5610 0
 S
 #918
 sign blank~
