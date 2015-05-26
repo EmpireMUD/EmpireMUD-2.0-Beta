@@ -3543,7 +3543,8 @@ void write_room_to_file(FILE *fl, room_data *room) {
 	fprintf(fl, "#%d\n", GET_ROOM_VNUM(room));
 	
 	// both sector and original-sector must save vnums
-	fprintf(fl, "%d %d %d\n", GET_ISLAND_ID(room), GET_SECT_VNUM(SECT(room)), GET_SECT_VNUM(ROOM_ORIGINAL_SECT(room)));
+	// NOTE: does not need an island id if it's not on the map
+	fprintf(fl, "%d %d %d\n", (GET_ROOM_VNUM(HOME_ROOM(room)) < MAP_SIZE) ? GET_ISLAND_ID(room) : -1, GET_SECT_VNUM(SECT(room)), GET_SECT_VNUM(ROOM_ORIGINAL_SECT(room)));
 	
 	// B building data
 	if (COMPLEX_DATA(room)) {
