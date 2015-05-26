@@ -2671,7 +2671,8 @@ void perform_execute(char_data *ch, char_data *victim, int attacktype, int damty
 		act(buf, TRUE, victim, 0, 0, TO_ROOM);
 	}
 		
-	act("$n is dead! R.I.P.", FALSE, victim, 0, 0, TO_ROOM);
+	act("$n is dead, killed by $N! R.I.P.", FALSE, victim, NULL, ch, TO_NOTVICT);
+	act("You have killed $n! R.I.P.", FALSE, victim, NULL, ch, TO_VICT);
 
 	// cleanup
 	end_pursuit(ch, victim);
