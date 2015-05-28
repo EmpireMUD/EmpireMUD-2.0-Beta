@@ -1737,6 +1737,9 @@ void trade_cancel(char_data *ch, char *argument) {
 		if (tpd->player != GET_IDNUM(ch)) {
 			continue;
 		}
+		if (!tpd->obj) {
+			continue;
+		}
 		if (IS_SET(tpd->state, TPD_EXPIRED) && (!IS_SET(tpd->state, TPD_OBJ_PENDING) || !tpd->obj)) {
 			continue;
 		}
