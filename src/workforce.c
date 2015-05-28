@@ -588,20 +588,14 @@ void do_chore_auto_balance(empire_data *emp, room_data *room) {
 void do_chore_brickmaking(empire_data *emp, room_data *room) {
 	struct empire_storage_data *store = find_stored_resource(emp, GET_ISLAND_ID(room), o_CLAY);
 	char_data *worker = find_mob_in_room_by_vnum(room, chore_data[CHORE_BRICKMAKING].mob);
-	bool can_do = can_gain_chore_resource(emp, room, o_BRICKS);
+	bool can_do = (can_gain_chore_resource(emp, room, o_BRICKS) && store && store->amount >= 2);
 	
 	if (worker && can_do) {
-		if (store && store->amount >= 2) {
-			charge_stored_resource(emp, GET_ISLAND_ID(room), store->vnum, 2);
-			add_to_empire_storage(emp, GET_ISLAND_ID(room), o_BRICKS, 1);
-			
-			act("$n finishes a pile of bricks.", FALSE, worker, NULL, NULL, TO_ROOM);
-			empire_skillup(emp, ABIL_WORKFORCE, config_get_double("exp_from_workforce"));
-		}
-		else {
-			// no trees remain: mark for despawn
-			SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
-		}
+		charge_stored_resource(emp, GET_ISLAND_ID(room), store->vnum, 2);
+		add_to_empire_storage(emp, GET_ISLAND_ID(room), o_BRICKS, 1);
+		
+		act("$n finishes a pile of bricks.", FALSE, worker, NULL, NULL, TO_ROOM);
+		empire_skillup(emp, ABIL_WORKFORCE, config_get_double("exp_from_workforce"));
 	}
 	else if (store && can_do) {
 		worker = place_chore_worker(emp, CHORE_BRICKMAKING, room);
