@@ -22,7 +22,9 @@ WLDDIR = ../../lib/world/wld
 # location of Empire include files
 INCDIR = ..
 
-CFLAGS = @CFLAGS@ $(MYFLAGS) $(PROFILE) -I$(INCDIR) -lm
+CFLAGS = @CFLAGS@ $(MYFLAGS) $(PROFILE) -I$(INCDIR)
+
+LIBS = -lm
 
 default: all
 
@@ -48,30 +50,30 @@ sign: $(BINDIR)/sign
 
 $(BINDIR)/autowiz: autowiz.c $(INCDIR)/conf.h $(INCDIR)/sysdep.h \
 	$(INCDIR)/structs.h $(INCDIR)/utils.h $(INCDIR)/db.h
-	$(CC) $(CFLAGS) -o $(BINDIR)/autowiz autowiz.c
+	$(CC) $(CFLAGS) -o $(BINDIR)/autowiz autowiz.c $(LIBS)
 
 $(BINDIR)/delobjs: delobjs.c $(INCDIR)/conf.h $(INCDIR)/sysdep.h \
 	$(INCDIR)/structs.h $(INCDIR)/utils.h
-	$(CC) $(CFLAGS) -o $(BINDIR)/delobjs delobjs.c
+	$(CC) $(CFLAGS) -o $(BINDIR)/delobjs delobjs.c $(LIBS)
 
 $(WLDDIR)/map: map.c $(INCDIR)/conf.h $(INCDIR)/sysdep.h $(INCDIR)/structs.h
-	$(CC) $(CFLAGS) -o $(WLDDIR)/map map.c
+	$(CC) $(CFLAGS) -o $(WLDDIR)/map map.c $(LIBS)
 
 $(BINDIR)/mudpasswd: mudpasswd.c $(INCDIR)/conf.h $(INCDIR)/sysdep.h \
 	$(INCDIR)/structs.h $(INCDIR)/utils.h
-	$(CC) $(CFLAGS) -o $(BINDIR)/mudpasswd mudpasswd.c -lcrypt
+	$(CC) $(CFLAGS) -o $(BINDIR)/mudpasswd mudpasswd.c -lcrypt $(LIBS)
 
 $(BINDIR)/plrconv: plrconv.c $(INCDIR)/conf.h $(INCDIR)/sysdep.h \
 	$(INCDIR)/structs.h $(INCDIR)/utils.h
-	$(CC) $(CFLAGS) -o $(BINDIR)/plrconv plrconv.c
+	$(CC) $(CFLAGS) -o $(BINDIR)/plrconv plrconv.c $(LIBS)
 
 $(BINDIR)/purgeplay: purgeplay.c $(INCDIR)/conf.h $(INCDIR)/sysdep.h \
 	$(INCDIR)/structs.h $(INCDIR)/utils.h
-	$(CC) $(CFLAGS) -o $(BINDIR)/purgeplay purgeplay.c
+	$(CC) $(CFLAGS) -o $(BINDIR)/purgeplay purgeplay.c $(LIBS)
 
 $(BINDIR)/showplay: showplay.c $(INCDIR)/conf.h $(INCDIR)/sysdep.h \
 	$(INCDIR)/structs.h
-	$(CC) $(CFLAGS) -o $(BINDIR)/showplay showplay.c
+	$(CC) $(CFLAGS) -o $(BINDIR)/showplay showplay.c $(LIBS)
 
 $(BINDIR)/sign: sign.c $(INCDIR)/conf.h $(INCDIR)/sysdep.h
-	$(CC) $(CFLAGS) -o $(BINDIR)/sign sign.c 
+	$(CC) $(CFLAGS) -o $(BINDIR)/sign sign.c $(LIBS)
