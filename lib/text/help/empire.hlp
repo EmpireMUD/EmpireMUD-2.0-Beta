@@ -353,6 +353,15 @@ Options:
   distrust - a state just short of war which indicates hatred
   truce    - ends a war or distrustful state without creating peace
 #
+DRAGONRIDING "DRAGON RIDING"
+
+Dragonriding (Class ability)
+Class ability: All Empire classes
+
+Dragonriding allows you to ride flying mounts, if you have the Ride ability.
+
+See also: RIDE
+#
 EEDIT "EMPIRE EDITOR" "EDIT EMPIRE"
 
 Usage:  eedit <option> <argument>

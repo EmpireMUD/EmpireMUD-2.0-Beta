@@ -80,7 +80,7 @@ See also: CLASS
 Ancient
 Vampire + Empire
 
-No class abilities assigned.
+Melee: Dragonriding
 
 Note: Class abilities are unfinished.
 
@@ -183,8 +183,8 @@ See also: HEALER, MELEE, TANK
 Duke
 Battle + Empire
 
-Tank: Noble Bearing
-Melee: Two-Handed Weapons
+Tank: Dragonriding, Noble Bearing
+Melee: Dragonriding, Two-Handed Weapons
 
 Note: Class abilities are unfinished.
 
@@ -195,7 +195,7 @@ See also: CLASS
 Elder
 Empire + Survival
 
-No class abilities assigned.
+Melee: Dragonriding
 
 Note: Class abilities are unfinished.
 
@@ -206,7 +206,7 @@ See also: CLASS
 Exarch
 Empire + High Sorcery
 
-No class abilities assigned.
+Caster: Dragonriding
 
 Note: Class abilities are unfinished.
 
@@ -229,7 +229,7 @@ See also: CLASS
 Guildsman
 Empire + Trade
 
-No class abilities assigned.
+Melee: Dragonriding
 
 Note: Class abilities are unfinished.
 
@@ -265,8 +265,8 @@ See also: CLASS
 Luminary
 Empire + Natural Magic
 
-Caster: Resurrect
-Healer: Resurrect
+Caster: Dragonriding, Resurrect
+Healer: Dragonriding, Resurrect
 
 Note: Class abilities are unfinished.
 
@@ -311,7 +311,7 @@ See also: CLASS
 Powerbroker
 Empire + Stealth
 
-No class abilities assigned.
+Melee: Dragonriding
 
 Note: Class abilities are unfinished.
 

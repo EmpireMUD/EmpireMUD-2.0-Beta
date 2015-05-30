@@ -44,8 +44,8 @@ const struct class_data_type class_data[NUM_CLASSES] = {
 	},
 	{ "Duke", "Duke", { SKILL_BATTLE, SKILL_EMPIRE },  { 300, 200, 100, 0 },
 		{
-			{ ROLE_TANK, { ABIL_NOBLE_BEARING, ROLE_ABIL_END } },
-			{ ROLE_MELEE, { ABIL_TWO_HANDED_WEAPONS, ROLE_ABIL_END } },
+			{ ROLE_TANK, { ABIL_DRAGONRIDING, ABIL_NOBLE_BEARING, ROLE_ABIL_END } },
+			{ ROLE_MELEE, { ABIL_DRAGONRIDING, ABIL_TWO_HANDED_WEAPONS, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
@@ -87,26 +87,41 @@ const struct class_data_type class_data[NUM_CLASSES] = {
 		}
 	},
 	{ "Exarch", "Exrc", { SKILL_EMPIRE, SKILL_HIGH_SORCERY },  { 150, 150, 300, 0 },
-		{ ROLE_LIST_END }
+		{
+			{ ROLE_CASTER, { ABIL_DRAGONRIDING, ROLE_ABIL_END } },
+			ROLE_LIST_END
+		}
 	},
 	{ "Luminary", "Lmny", { SKILL_EMPIRE, SKILL_NATURAL_MAGIC },  { 150, 150, 300, 0 },
 		{
-			{ ROLE_CASTER, { ABIL_RESURRECT, ROLE_ABIL_END } },
-			{ ROLE_HEALER, { ABIL_RESURRECT, ROLE_ABIL_END } },
+			{ ROLE_CASTER, { ABIL_DRAGONRIDING, ABIL_RESURRECT, ROLE_ABIL_END } },
+			{ ROLE_HEALER, { ABIL_DRAGONRIDING, ABIL_RESURRECT, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
 	{ "Powerbroker", "Pwbk", { SKILL_EMPIRE, SKILL_STEALTH },  { 200, 300, 100, 0 },
-		{ ROLE_LIST_END }
+		{
+			{ ROLE_MELEE, { ABIL_DRAGONRIDING, ROLE_ABIL_END } },
+			ROLE_LIST_END
+		}
 	},
 	{ "Elder", "Eldr", { SKILL_EMPIRE, SKILL_SURVIVAL },  { 200, 200, 200, 0 },
-		{ ROLE_LIST_END }
+		{
+			{ ROLE_MELEE, { ABIL_DRAGONRIDING, ROLE_ABIL_END } },
+			ROLE_LIST_END
+		}
 	},
 	{ "Guildsman", "Gdsm", { SKILL_EMPIRE, SKILL_TRADE },  { 200, 200, 200, 0 },
-		{ ROLE_LIST_END }
+		{
+			{ ROLE_MELEE, { ABIL_DRAGONRIDING, ROLE_ABIL_END } },
+			ROLE_LIST_END
+		}
 	},
 	{ "Ancient", "Anct", { SKILL_EMPIRE, SKILL_VAMPIRE },  { 200, 200, 200, 0 },
-		{ ROLE_LIST_END }
+		{
+			{ ROLE_MELEE, { ABIL_DRAGONRIDING, ROLE_ABIL_END } },
+			ROLE_LIST_END
+		}
 	},
 	{ "Archmage", "Achm", { SKILL_HIGH_SORCERY, SKILL_NATURAL_MAGIC },  { 150, 150, 300, 0 },
 		{

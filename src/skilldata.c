@@ -290,6 +290,7 @@ void init_skills() {
 	
 	setup_class_ability(ABIL_BLOOD_FORTITUDE, "Blood Fortitude");
 	setup_class_ability(ABIL_BLOODSWEAT, "Bloodsweat");
+	setup_class_ability(ABIL_DRAGONRIDING, "Dragonriding");
 	setup_class_ability(ABIL_DREAD_BLOOD_FORM, "Dread Blood Form");
 	setup_class_ability(ABIL_DUAL_WIELD, "Dual-Wield");
 	setup_class_ability(ABIL_HORRID_FORM, "Horrid Form");
