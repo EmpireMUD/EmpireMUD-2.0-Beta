@@ -1208,12 +1208,12 @@ ACMD(do_enter) {
 	
 	// permissions
 	if (ROOM_OWNER(IN_ROOM(ch)) && !IS_IMMORTAL(ch) && !IS_NPC(ch) && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
-		if (!can_infiltrate(ch, ROOM_OWNER(IN_ROOM(ch)))) {
-			// sends own message
+		if (!HAS_ABILITY(ch, ABIL_INFILTRATE)) {
+			msg_to_char(ch, "You don't have permission to enter that.\r\n");
 			return;
 		}
-		if (!HAS_ABILITY(ch, ABIL_INFILTRATE)) {
-			msg_to_char(ch, "You don't have the ability to infiltrate that.\r\n");
+		if (!can_infiltrate(ch, ROOM_OWNER(IN_ROOM(ch)))) {
+			// sends own message
 			return;
 		}
 	}
