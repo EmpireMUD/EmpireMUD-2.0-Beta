@@ -1952,7 +1952,7 @@ double rate_item(obj_data *obj) {
 	extern double get_base_dps(obj_data *weapon);
 	extern const double apply_values[];
 	
-	double score_modifier = 0.9;	// in case gear levels are coming out a little too high
+	double score_modifier = 0.8;	// in case gear levels are coming out a little too high
 	
 	double score = 0;
 	int iter;
