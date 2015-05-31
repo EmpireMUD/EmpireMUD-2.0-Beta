@@ -311,7 +311,7 @@ void update_class(char_data *ch) {
 			// update best
 			for (best_iter = 0; best_iter < NUM_BEST; ++best_iter) {
 				// new best
-				if (best[best_iter] == NO_SKILL || GET_SKILL(ch, iter) > best_level[best_iter]) {
+				if (GET_SKILL(ch, iter) > best_level[best_iter]) {
 					// move down the other best first
 					for (best_sub = best_iter + 1; best_sub < NUM_BEST; ++best_sub) {
 						best[best_sub] = best[best_sub-1];
@@ -375,7 +375,7 @@ void update_class(char_data *ch) {
 		}
 		
 		// set level
-		GET_SKILL_LEVEL(ch) = (best_total - IGNORE_BOTTOM_SKILL_POINTS) * 100 / (BEST_SUM_REQUIRED_FOR_100 - IGNORE_BOTTOM_SKILL_POINTS);
+		GET_SKILL_LEVEL(ch) = (best_total - IGNORE_BOTTOM_SKILL_POINTS) * 100 / MAX(1, BEST_SUM_REQUIRED_FOR_100 - IGNORE_BOTTOM_SKILL_POINTS);
 		GET_SKILL_LEVEL(ch) = MIN(CLASS_SKILL_CAP, MAX(1, GET_SKILL_LEVEL(ch)));
 		
 		// level!
