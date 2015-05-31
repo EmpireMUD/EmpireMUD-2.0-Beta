@@ -1124,10 +1124,10 @@ void scale_mob_to_level(char_data *mob, int level) {
 	GET_CURRENT_SCALE_LEVEL(mob) = level;
 
 	// health
-	value = (1.5 * low_level) + (2.5 * mid_level) + (3.5 * high_level) + (5 * over_level);
-	value *= MOB_FLAGGED(mob, MOB_TANK) ? 2.0 : 1.0;
-	value *= MOB_FLAGGED(mob, MOB_HARD) ? 2.0 : 1.0;
-	value *= MOB_FLAGGED(mob, MOB_GROUP) ? 3.0 : 1.0;
+	value = (1.5 * low_level) + (3.5 * mid_level) + (5.5 * high_level) + (10 * over_level);
+	value *= MOB_FLAGGED(mob, MOB_TANK) ? 3.0 : 1.0;
+	value *= MOB_FLAGGED(mob, MOB_HARD) ? 3.0 : 1.0;
+	value *= MOB_FLAGGED(mob, MOB_GROUP) ? 4.0 : 1.0;
 	mob->points.max_pools[HEALTH] = MAX(1, (int) ceil(value));
 	
 	// move
@@ -1152,60 +1152,60 @@ void scale_mob_to_level(char_data *mob, int level) {
 	mob->points.max_pools[BLOOD] = MAX(1, (int) ceil(value));
 	
 	// strength
-	value = level / 25.0;
+	value = level / 20.0;
 	value *= MOB_FLAGGED(mob, MOB_DPS) ? 1.5 : 1.0;
 	value += MOB_FLAGGED(mob, MOB_HARD) ? 1.5 : 0;
 	value += MOB_FLAGGED(mob, MOB_GROUP) ? 2.0 : 0;
 	mob->real_attributes[STRENGTH] = MAX(1, (int) ceil(value));
 	
 	// dexterity
-	value = level / 25.0;
+	value = level / 20.0;
 	value *= MOB_FLAGGED(mob, MOB_TANK) ? 1.25 : 1.0;
 	value += MOB_FLAGGED(mob, MOB_HARD) ? 1.25 : 0;
 	value += MOB_FLAGGED(mob, MOB_GROUP) ? 2.0 : 0;
 	mob->real_attributes[DEXTERITY] = MAX(1, (int) ceil(value));
 	
 	// charisma
-	value = level / 25.0;
+	value = level / 20.0;
 	value *= MOB_FLAGGED(mob, MOB_HUMAN) ? 1.25 : 1.0;
 	mob->real_attributes[CHARISMA] = MAX(1, (int) ceil(value));
 	
 	// greatness
-	value = level / 25.0;
+	value = level / 20.0;
 	value *= MOB_FLAGGED(mob, MOB_HUMAN) ? 1.25 : 1.0;
 	mob->real_attributes[GREATNESS] = MAX(1, (int) ceil(value));
 	
 	// intelligence
-	value = level / 25.0;
+	value = level / 20.0;
 	value *= MOB_FLAGGED(mob, MOB_CASTER) ? 1.5 : 1.0;
 	value += MOB_FLAGGED(mob, MOB_HARD) ? 1.5 : 0;
 	value += MOB_FLAGGED(mob, MOB_GROUP) ? 2.0 : 0;
 	mob->real_attributes[INTELLIGENCE] = MAX(1, (int) ceil(value));
 	
 	// wits
-	value = level / 25.0;
+	value = level / 20.0;
 	value *= MOB_FLAGGED(mob, MOB_DPS) ? 1.5 : 1.0;
 	value *= MOB_FLAGGED(mob, MOB_TANK) ? 0.5 : 1.0;
 	mob->real_attributes[WITS] = MAX(1, (int) ceil(value));
 	
 	// damage
-	target = level / 20.0;
+	target = (low_level / 20.0) + (mid_level / 15.0) + (high_level / 10.0) + (over_level / 5.0);
 	value = target * attack_hit_info[MOB_ATTACK_TYPE(mob)].speed[SPD_NORMAL];
-	value *= MOB_FLAGGED(mob, MOB_DPS) ? 1.15 : 1.0;
+	value *= MOB_FLAGGED(mob, MOB_DPS) ? 1.25 : 1.0;
 	value *= MOB_FLAGGED(mob, MOB_HARD) ? 2.0 : 1.0;
 	value *= MOB_FLAGGED(mob, MOB_GROUP) ? 3.0 : 1.0;
 	mob->mob_specials.damage = MAX(1, (int) ceil(value));
 	
 	// to-hit
 	value = level / 10.0;
-	value *= MOB_FLAGGED(mob, MOB_DPS) ? 1.5 : 1.0;
+	value *= MOB_FLAGGED(mob, MOB_DPS) ? 2.0 : 1.0;
 	value *= MOB_FLAGGED(mob, MOB_HARD) ? 2.0 : 1.0;
 	value *= MOB_FLAGGED(mob, MOB_GROUP) ? 3.0 : 1.0;
 	mob->mob_specials.to_hit = MAX(1, (int) ceil(value));
 	
 	// to-dodge
 	value = level / 10.0;
-	value *= MOB_FLAGGED(mob, MOB_TANK) ? 1.5 : 1.0;
+	value *= MOB_FLAGGED(mob, MOB_TANK) ? 2.0 : 1.0;
 	value *= MOB_FLAGGED(mob, MOB_HARD) ? 2.0 : 1.0;
 	value *= MOB_FLAGGED(mob, MOB_GROUP) ? 3.0 : 1.0;
 	mob->mob_specials.to_dodge = MAX(1, (int) ceil(value));
