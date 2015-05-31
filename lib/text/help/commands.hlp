@@ -871,7 +871,7 @@ mission to use both buildings. The portal will stay open for a few minutes.
 You can target the portal building on the other end using either its co-
 ordinates, or the name of a person who is at the other side.
 
-Portals over 50 map tiles away cost 1 lightning stone per 50 tiles, rounded up.
+Portals over 50 map tiles away cost 1 lightning stone per 75 tiles, rounded up.
 
 You can portal to specific coordinates by using parentheses (123, 456) or by
 typing the coordinates with no space -- 123,456 -- but you can target your

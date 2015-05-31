@@ -10,6 +10,8 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 
+#include <math.h>
+
 #include "conf.h"
 #include "sysdep.h"
 
@@ -1496,7 +1498,7 @@ ACMD(do_portal) {
 	
 	// distance/cost checks
 	dist = compute_distance(IN_ROOM(ch), target);
-	cost = MAX(0, (dist+25) / 50);
+	cost = MAX(0, ceil(dist / 75.0));
 	if (!all_access && dist > 50 && cost > 0) {
 		Resource res[2] = { { o_LIGHTNING_STONE, cost }, END_RESOURCE_LIST };
 		if (!has_resources(ch, res, FALSE, FALSE)) {
@@ -1505,6 +1507,9 @@ ACMD(do_portal) {
 		}
 		
 		// charge
+		msg_to_char(ch, "You toss %d lightning stone%s out onto the ground...\r\n", cost, PLURAL(cost));
+		sprintf(buf, "$n tosses %s lighting stone%s out onto the ground...", cost > 1 ? "some" : "a", PLURAL(cost));
+		act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
 		extract_resources(ch, res, FALSE);
 	}
 
