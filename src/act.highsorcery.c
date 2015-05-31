@@ -1176,8 +1176,8 @@ ACMD(do_mirrorimage) {
 	// stats
 	GET_REAL_SEX(mob) = GET_REAL_SEX(ch);
 	
-	mob->points.max_pools[HEALTH] = GET_MAX_HEALTH(ch);
-	mob->points.current_pools[HEALTH] = MIN(25, GET_HEALTH(ch));	// NOTE lower health
+	mob->points.max_pools[HEALTH] = MIN(100, GET_HEALTH(ch));	// NOTE lower health
+	mob->points.current_pools[HEALTH] = MIN(100, GET_HEALTH(ch));	// NOTE lower health
 	mob->points.max_pools[MOVE] = GET_MAX_MOVE(ch);
 	mob->points.current_pools[MOVE] = GET_MOVE(ch);
 	mob->points.max_pools[MANA] = GET_MAX_MANA(ch);
