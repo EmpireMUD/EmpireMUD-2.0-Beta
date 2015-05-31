@@ -327,7 +327,12 @@ ACMD(do_mount) {
 		act("You can't ride $N!", FALSE, ch, 0, mob, TO_CHAR);
 	}
 	else if (((mob && AFF_FLAGGED(mob, AFF_FLY)) || (!mob && MOUNT_FLAGGED(ch, MOUNT_FLYING))) && !CAN_RIDE_FLYING_MOUNT(ch)) {
-		act("You don't have the correct ability to ride $N! (see HELP RIDE)", FALSE, ch, 0, mob, TO_CHAR);
+		if (mob) {
+			act("You don't have the correct ability to ride $N! (see HELP RIDE)", FALSE, ch, 0, mob, TO_CHAR);
+		}
+		else {
+			msg_to_char(ch, "You don't have the correct ability to ride %s! (see HELP RIDE)\r\n", get_mob_name_by_proto(GET_MOUNT_VNUM(ch)));
+		}
 	}
 	else if (mob && (mob->desc || (GET_PC_NAME(mob) && (proto = mob_proto(GET_MOB_VNUM(mob))) && GET_PC_NAME(mob) != GET_PC_NAME(proto)))) {
 		act("You can't ride $N!", FALSE, ch, 0, mob, TO_CHAR);
