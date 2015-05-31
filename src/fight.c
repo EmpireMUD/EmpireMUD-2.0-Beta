@@ -184,6 +184,10 @@ int get_block_chance(char_data *ch, char_data *attacker) {
 	// block modifiers
 	base += get_effective_block(ch);
 	
+	if (attacker && !CAN_SEE(ch, attacker)) {
+		base *= 2/3;
+	}
+	
 	return MIN(max_block, (int) base);
 }
 
@@ -253,9 +257,10 @@ double get_combat_speed(char_data *ch, int pos) {
 * Not to be confused with get_effective_dodge()
 *
 * @param char_data *ch The dodger.
+* @param char_data *attacker The attacker, if any.
 * @return int The total dodge %.
 */
-int get_dodge_modifier(char_data *ch) {
+int get_dodge_modifier(char_data *ch, char_data *attacker) {
 	double base;
 	double reflexes[] = { 10.0, 20.0, 30.0 };
 	
@@ -273,6 +278,11 @@ int get_dodge_modifier(char_data *ch) {
 	// npc
 	if (IS_NPC(ch)) {
 		base += MOB_TO_DODGE(ch);
+	}
+	
+	// blind penalty
+	if (attacker && !CAN_SEE(ch, attacker)) {
+		base *= 2/3;
 	}
 	
 	return (int) base;
@@ -330,11 +340,12 @@ int get_effective_to_hit(char_data *ch) {
 * Chance of ch hitting as 0-100, or more.
 * Not to be confused with get_effective_to_hit().
 * 
-* @param chat_data *ch The hitter.
+* @param char_data *ch The hitter.
+* @param char_adta *victim The victim.
 * @param bool off_hand If TRUE, penalizes to-hit due to off-hand item.
 * @return int The hit %.
 */
-int get_to_hit(char_data *ch, bool off_hand) {
+int get_to_hit(char_data *ch, char_data *victim, bool off_hand) {
 	double base_chance;
 	double sparring_bonus[] = { 10.0, 20.0, 30.0 };
 	
@@ -358,6 +369,11 @@ int get_to_hit(char_data *ch, bool off_hand) {
 	// npc
 	if (IS_NPC(ch)) {
 		base_chance += MOB_TO_HIT(ch);
+	}
+	
+	// blind penalty
+	if (victim && !CAN_SEE(ch, victim)) {
+		base_chance *= 2/3;
 	}
 	
 	return (int) base_chance;
@@ -2066,7 +2082,7 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 	dam = reduce_damage_from_skills(dam, victim, ch, damtype);
 	
 	// lethal damage?? check Master Survivalist
-	if ((ch != victim) && dam >= GET_HEALTH(victim) && !IS_NPC(victim) && AWAKE(victim) && CAN_SEE(victim, ch) && HAS_ABILITY(victim, ABIL_MASTER_SURVIVALIST)) {
+	if ((ch != victim) && dam >= GET_HEALTH(victim) && !IS_NPC(victim) && AWAKE(victim) && HAS_ABILITY(victim, ABIL_MASTER_SURVIVALIST)) {
 		if (!number(0, 2)) {
 			msg_to_char(victim, "You dive out of the way at the last second!\r\n");
 			act("$n dives out of the way at the last second!", FALSE, victim, NULL, NULL, TO_ROOM);
@@ -2402,11 +2418,11 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 	can_gain_skill = GET_HEALTH(victim) > 0;
 	
 	// determine hit (if WEAR_HOLD, pass off_hand=TRUE)
-	hit_chance = get_to_hit(ch, (weapon && weapon->worn_on == WEAR_HOLD));
+	hit_chance = get_to_hit(ch, victim, (weapon && weapon->worn_on == WEAR_HOLD));
 	
 	// evasion
-	if (AWAKE(victim) && CAN_SEE(victim, ch)) {
-		hit_chance -= get_dodge_modifier(victim);
+	if (AWAKE(victim)) {
+		hit_chance -= get_dodge_modifier(victim, ch);
 	}
 	
 	// absolute minimum of 5% chance of hit so long as ch is at least as high as victim
@@ -2417,7 +2433,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 	success = !AWAKE(victim) || (hit_chance >= number(1, 100));
 	
 	// blockable?
-	if (success && AWAKE(victim) && CAN_SEE(victim, ch)) {
+	if (success && AWAKE(victim)) {
 		if (attack_hit_info[w_type].damage_type == DAM_PHYSICAL) {
 			block = (get_block_chance(victim, ch) > number(1, 100));
 		}
@@ -2895,15 +2911,15 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 	}
 
 	// compute
-	to_hit = get_to_hit(ch, FALSE);
+	to_hit = get_to_hit(ch, FIGHTING(ch), FALSE);
 
-	if (AWAKE(FIGHTING(ch)) && CAN_SEE(FIGHTING(ch), ch)) {
-		to_hit -= get_dodge_modifier(FIGHTING(ch));
+	if (AWAKE(FIGHTING(ch))) {
+		to_hit -= get_dodge_modifier(FIGHTING(ch), ch);
 	}
 	
 	success = (to_hit >= number(1, 100));
 	
-	if (success && AWAKE(FIGHTING(ch)) && CAN_SEE(FIGHTING(ch), ch) && HAS_ABILITY(FIGHTING(ch), ABIL_BLOCK_ARROWS)) {
+	if (success && AWAKE(FIGHTING(ch)) && HAS_ABILITY(FIGHTING(ch), ABIL_BLOCK_ARROWS)) {
 		block = (get_block_chance(FIGHTING(ch), ch) > number(1, 100));
 		gain_ability_exp(FIGHTING(ch), ABIL_BLOCK_ARROWS, 2);
 	}

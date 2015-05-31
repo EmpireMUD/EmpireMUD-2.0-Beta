@@ -37,8 +37,6 @@ void besiege_room(room_data *to_room, int damage);
 void death_log(char_data *ch, char_data *killer, int type);
 extern obj_data *die(char_data *ch, char_data *killer);
 extern int determine_best_scale_level(char_data *ch, bool check_group);	// mobact.c
-extern int get_dodge_modifier(char_data *ch);	// fight.c
-extern int get_to_hit(char_data *ch, bool off_hand);	// fight.c
 extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
 extern bool is_fight_enemy(char_data *ch, char_data *frenemy);	// fight.c
 void trigger_distrust_from_hostile(char_data *ch, empire_data *emp);	// fight.c
