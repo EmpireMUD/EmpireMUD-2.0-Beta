@@ -1691,11 +1691,9 @@ ACMD(do_steal) {
 
 
 ACMD(do_terrify) {
-	ACMD(do_flee);
-
 	struct affected_type *af;
+	int value, cost = 15;
 	char_data *victim;
-	int cost = 15;
 
 	one_argument(argument, arg);
 
@@ -1714,7 +1712,7 @@ ACMD(do_terrify) {
 	else if (!AWAKE(victim) || IS_DEAD(victim) || AFF_FLAGGED(victim, AFF_BLIND)) {
 		msg_to_char(ch, "You can't use your shadows to terrify someone who can't even see them!\r\n");
 	}
-	else if (AFF_FLAGGED(victim, AFF_IMMUNE_STUN | AFF_IMMUNE_STEALTH)) {
+	else if (AFF_FLAGGED(victim, AFF_IMMUNE_STEALTH)) {
 		act("$E doesn't look like $E'd be affected by that.", FALSE, ch, NULL, victim, TO_CHAR);
 	}
 	else if (ABILITY_TRIGGERS(ch, victim, NULL, ABIL_TERRIFY)) {
@@ -1732,19 +1730,17 @@ ACMD(do_terrify) {
 		act("Shadows creep up around $n and then strike out at $N!", FALSE, ch, 0, victim, TO_NOTVICT);
 		
 		if (skill_check(ch, ABIL_TERRIFY, DIFF_HARD) && !AFF_FLAGGED(victim, AFF_IMMUNE_STEALTH)) {
-			af = create_flag_aff(ATYPE_TERRIFY, 0.5 * REAL_UPDATES_PER_MIN, AFF_STUNNED);
+			value = round(GET_COMPUTED_LEVEL(ch) / 30);
+			af = create_mod_aff(ATYPE_TERRIFY, 0.5 * REAL_UPDATES_PER_MIN, APPLY_BONUS_PHYSICAL, -value);
+			affect_join(victim, af, 0);
+			af = create_mod_aff(ATYPE_TERRIFY, 0.5 * REAL_UPDATES_PER_MIN, APPLY_BONUS_MAGICAL, -value);
 			affect_join(victim, af, 0);
 			
 			msg_to_char(victim, "You are terrified!\r\n");
 			act("$n is terrified!", TRUE, victim, NULL, NULL, TO_ROOM);
 		}
-		else {
-			engage_combat(victim, ch, TRUE);
-		}
 		
+		engage_combat(victim, ch, TRUE);
 		gain_ability_exp(ch, ABIL_TERRIFY, 15);
-		
-		// release other terrifiers here
-		limit_crowd_control(victim, ATYPE_TERRIFY);
 	}
 }

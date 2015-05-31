@@ -428,11 +428,11 @@ Terrify (Stealth ability)
 
 Usage:  terrify [victim]
 Cooldown:  15 seconds
+Debuff type: Stealth
 
-Use the power of the shadows to make your foes cower in fear.
-
-Only one person in the room may be terrified at a time. Using the ability on a
-second person will release the first one.
+Use the power of the shadows to make your foes cower in fear, lowering the
+physical and magical damage they deal by an amount equal to your total level
+divided by 30.
 #
 "UNSEEN PASSING"
 
