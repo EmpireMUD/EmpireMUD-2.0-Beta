@@ -52,7 +52,7 @@ void trigger_distrust_from_stealth(char_data *ch, empire_data *emp);
 * @param empire_data *emp an opposing empire
 * @return bool TRUE if ch is allowed to infiltrate emp
 */
-bool can_infiltrate(char_data *ch, empire_data *emp) {	
+bool can_infiltrate(char_data *ch, empire_data *emp) {
 	struct empire_political_data *pol;
 	empire_data *chemp = GET_LOYALTY(ch);
 	
@@ -74,12 +74,17 @@ bool can_infiltrate(char_data *ch, empire_data *emp) {
 	pol = find_relation(chemp, emp);
 	
 	if (pol && IS_SET(pol->type, DIPL_ALLIED | DIPL_NONAGGR)) {
-		msg_to_char(ch, "You have a non-aggression pact with %s.\r\n", EMPIRE_NAME(emp));
+		msg_to_char(ch, "You can't infiltrate -- you have a non-aggression pact with %s.\r\n", EMPIRE_NAME(emp));
 		return FALSE;
 	}
 	
 	if (GET_RANK(ch) < EMPIRE_PRIV(chemp, PRIV_STEALTH) && (!pol || !IS_SET(pol->type, DIPL_WAR))) {
 		msg_to_char(ch, "You don't have permission from your empire to infiltrate others. Are you trying to start a war?\r\n");
+		return FALSE;
+	}
+	
+	if (!PRF_FLAGGED(ch, PRF_STEALTHABLE)) {
+		msg_to_char(ch, "You cannot infiltrate because your 'stealthable' toggle is off.\r\n");
 		return FALSE;
 	}
 	
@@ -829,7 +834,6 @@ ACMD(do_hide) {
 
 ACMD(do_infiltrate) {
 	void empire_skillup(empire_data *emp, int ability, double amount);
-	bool can_infiltrate(char_data *ch, empire_data *emp);
 
 	room_data *to_room;
 	int dir;

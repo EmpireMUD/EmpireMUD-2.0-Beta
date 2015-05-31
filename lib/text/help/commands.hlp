@@ -886,9 +886,13 @@ Portals can only connect two locations on the same land mass (continent or
 island) unless your empire has a Portal Master. You can't open a portal at all
 if there isn't at least a Portal Mage.
 
+You can't enter a portal of any kind if it's on a tile you don't have
+permission to use, such as one owned by an enemy empire. Infiltrate can get
+around this (you still use the 'enter' command).
+
 Immortals can open portals between any two locations.
 
-See also: PORTAL MAGIC, PORTAL MASTER, COLLAPSE
+See also: PORTAL MAGIC, PORTAL MASTER, COLLAPSE, INFILTRATE
 #
 POUR
 

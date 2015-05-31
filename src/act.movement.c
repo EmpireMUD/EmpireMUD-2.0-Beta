@@ -432,8 +432,16 @@ void perform_transport(char_data *ch, room_data *to_room) {
  //////////////////////////////////////////////////////////////////////////////
 //// MOVE SYSTEM /////////////////////////////////////////////////////////////
 
-// process sending ch through portal
-void char_through_portal(char_data *ch, obj_data *portal) {
+/**
+* process sending ch through portal
+*
+* @param char_data *ch The person to send through.
+* @param obj_data *portal The portal object.
+* @param bool following TRUE only if this person followed someone else through.
+*/
+void char_through_portal(char_data *ch, obj_data *portal, bool following) {
+	void trigger_distrust_from_stealth(char_data *ch, empire_data *emp);
+	
 	obj_data *objiter, *use_portal;
 	struct follow_type *fol, *next_fol;
 	room_data *to_room = real_room(GET_PORTAL_TARGET_VNUM(portal));
@@ -483,8 +491,13 @@ void char_through_portal(char_data *ch, obj_data *portal) {
 		next_fol = fol->next;
 		if ((IN_ROOM(fol->follower) == was_in) && (GET_POS(fol->follower) >= POS_STANDING) && can_enter_room(fol->follower, to_room)) {
 			act("You follow $N.\r\n", FALSE, fol->follower, 0, ch, TO_CHAR);
-			char_through_portal(fol->follower, portal);
+			char_through_portal(fol->follower, portal, TRUE);
 		}
+	}
+	
+	// trigger distrust?
+	if (!following && ROOM_OWNER(was_in) && !IS_IMMORTAL(ch) && !IS_NPC(ch) && !can_use_room(ch, was_in, GUESTS_ALLOWED)) {
+		trigger_distrust_from_stealth(ch, ROOM_OWNER(was_in));
 	}
 }
 
@@ -1157,6 +1170,8 @@ ACMD(do_circle) {
 
 // enters a portal
 ACMD(do_enter) {
+	extern bool can_infiltrate(char_data *ch, empire_data *emp);
+	
 	char_data *tmp_char;
 	obj_data *portal;
 	room_data *room;
@@ -1191,7 +1206,19 @@ ACMD(do_enter) {
 		return;
 	}
 	
-	char_through_portal(ch, portal);
+	// permissions
+	if (ROOM_OWNER(IN_ROOM(ch)) && !IS_IMMORTAL(ch) && !IS_NPC(ch) && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+		if (!can_infiltrate(ch, ROOM_OWNER(IN_ROOM(ch)))) {
+			// sends own message
+			return;
+		}
+		if (!HAS_ABILITY(ch, ABIL_INFILTRATE)) {
+			msg_to_char(ch, "You don't have the ability to infiltrate that.\r\n");
+			return;
+		}
+	}
+	
+	char_through_portal(ch, portal, FALSE);
 }
 
 
