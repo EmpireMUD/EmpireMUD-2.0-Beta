@@ -37,7 +37,7 @@ void init_skills() {
 	void setup_skill(int number, char *name, int flags, char *description, char *creation_description);
 	void setup_ability(int number, int parent_skill, int parent_skill_required, int parent_ability, char *name);
 	
-	#define setup_class_ability(abil, name)	setup_ability((abil), NOTHING, 100, NO_PREREQ, name)
+	#define setup_class_ability(abil, name)	setup_ability((abil), NO_SKILL, 100, NO_PREREQ, name)
 	
 	init_skill_data();
 	init_ability_data();

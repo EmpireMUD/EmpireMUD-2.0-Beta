@@ -1135,6 +1135,9 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options);
 // things not meriting their own section
 #define CHECK_INTERACT(interact, itype)  ((interact)->type == (itype) && number(1, 10000) < (int)((interact)->percent * 100))
 
+// for the easy-update system
+#define PLAYER_UPDATE_FUNC(name)  void (name)(char_data *ch, bool is_file)
+
 // Group related defines
 #define GROUP(ch)  (ch->group)
 #define GROUP_LEADER(group)  (group->leader)

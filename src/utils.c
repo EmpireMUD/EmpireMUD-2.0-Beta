@@ -3570,18 +3570,6 @@ unsigned long long microtime(void) {
 
 
 /**
-* Put changes in here and run update_all_players to apply it to all player
-* characters, whether logged in or not.
-*
-* @param char_data *ch The player to apply the changes to.
-* @param bool is_file If TRUE, the player was loaded from file. FALSE means in-game.
-*/
-void update_one_player(char_data *ch, bool is_file) {
-	// put logic here
-}
-
-
-/**
 * This re-usable function is for making tweaks to all players, for example
 * removing a player flag that's no longer used. It loads all players who aren't
 * already in-game.
@@ -3590,8 +3578,9 @@ void update_one_player(char_data *ch, bool is_file) {
 * loaded and saved automatically.
 *
 * @param char_data *to_message Optional: a character to send error messages to, if this is called from a command.
+* @param PLAYER_UPDATE_FUNC(*func)  A function pointer for the function to run on each player.
 */
-void update_all_players(char_data *to_message) {
+void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func)) {
 	struct char_file_u chdata;
 	descriptor_data *desc;
 	char_data *ch;
@@ -3639,7 +3628,9 @@ void update_all_players(char_data *to_message) {
 			continue;
 		}
 		
-		update_one_player(ch, is_file);
+		if (func) {
+			(func)(ch, is_file);
+		}
 		
 		// save
 		if (is_file) {

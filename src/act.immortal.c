@@ -280,6 +280,7 @@ bool users_output(char_data *to, char_data *tch, descriptor_data *d, char *name_
 
 #define ADMIN_UTIL(name)  void name(char_data *ch, char *argument)
 
+ADMIN_UTIL(util_clear_roles);
 ADMIN_UTIL(util_diminish);
 ADMIN_UTIL(util_islandsize);
 ADMIN_UTIL(util_playerdump);
@@ -293,6 +294,7 @@ struct {
 	int level;
 	void (*func)(char_data *ch, char *argument);
 } admin_utils[] = {
+	{ "clearroles", LVL_CIMPL, util_clear_roles },
 	{ "diminish", LVL_START_IMM, util_diminish },
 	{ "islandsize", LVL_START_IMM, util_islandsize },
 	{ "playerdump", LVL_IMPL, util_playerdump },
@@ -307,9 +309,40 @@ struct {
 
 // secret implementor-only util for quick changes -- util tool
 ADMIN_UTIL(util_tool) {
-	void update_all_players(char_data *to_message);
+	msg_to_char(ch, "Ok.\r\n");
+}
+
+
+// for util_clear_roles
+PLAYER_UPDATE_FUNC(update_clear_roles) {
+	void check_skill_sell(char_data *ch, int abil);
+	int iter;
 	
-	update_all_players(ch);	
+	if (IS_IMMORTAL(ch)) {
+		return;
+	}
+	
+	GET_CLASS_ROLE(ch) = ROLE_NONE;
+	
+	if (!is_file) {
+		msg_to_char(ch, "Your class role has been reset.\r\n");
+	}
+	
+	for (iter = 0; iter < NUM_ABILITIES; ++iter) {
+		if (ability_data[iter].parent_skill == NO_SKILL && HAS_ABILITY(ch, iter)) {
+			ch->player_specials->saved.abilities[iter].purchased = FALSE;
+			if (!is_file) {
+				check_skill_sell(ch, iter);
+			}
+		}
+	}
+}
+
+
+ADMIN_UTIL(util_clear_roles) {
+	void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func));
+	update_all_players(ch, update_clear_roles);
+	syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has cleared all player roles", GET_NAME(ch));
 	msg_to_char(ch, "Ok.\r\n");
 }
 
