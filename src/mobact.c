@@ -1124,7 +1124,7 @@ void scale_mob_to_level(char_data *mob, int level) {
 	GET_CURRENT_SCALE_LEVEL(mob) = level;
 
 	// health
-	value = (1.5 * low_level) + (3.5 * mid_level) + (5.5 * high_level) + (10 * over_level);
+	value = (1.5 * low_level) + (3.0 * mid_level) + (4.5 * high_level) + (9.0 * over_level);
 	value *= MOB_FLAGGED(mob, MOB_TANK) ? 3.0 : 1.0;
 	value *= MOB_FLAGGED(mob, MOB_HARD) ? 3.0 : 1.0;
 	value *= MOB_FLAGGED(mob, MOB_GROUP) ? 4.0 : 1.0;
@@ -1189,7 +1189,7 @@ void scale_mob_to_level(char_data *mob, int level) {
 	mob->real_attributes[WITS] = MAX(1, (int) ceil(value));
 	
 	// damage
-	target = (low_level / 20.0) + (mid_level / 15.0) + (high_level / 10.0) + (over_level / 5.0);
+	target = (low_level / 20.0) + (mid_level / 17.5) + (high_level / 15.0) + (over_level / 10.0);
 	value = target * attack_hit_info[MOB_ATTACK_TYPE(mob)].speed[SPD_NORMAL];
 	value *= MOB_FLAGGED(mob, MOB_DPS) ? 1.25 : 1.0;
 	value *= MOB_FLAGGED(mob, MOB_HARD) ? 2.0 : 1.0;
