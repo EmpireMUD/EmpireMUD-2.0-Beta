@@ -1358,7 +1358,7 @@ ACMD(do_portal) {
 	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
 	room_data *room, *next_room, *target = NULL;
 	obj_data *portal, *end, *obj;
-	int bsize, lsize, count, num;
+	int bsize, lsize, count, num, dist, cost;
 	bool all = FALSE;
 	
 	argument = any_one_word(argument, arg);
@@ -1465,6 +1465,20 @@ ACMD(do_portal) {
 			msg_to_char(ch, "There is already a portal to that location open here.\r\n");
 			return;
 		}
+	}
+	
+	// distance/cost checks
+	dist = compute_distance(IN_ROOM(ch), target);
+	cost = MAX(0, (dist+25) / 50);
+	if (!all_access && dist > 50 && cost > 0) {
+		Resource res[2] = { { o_LIGHTNING_STONE, cost }, END_RESOURCE_LIST };
+		if (!has_resources(ch, res, FALSE, FALSE)) {
+			msg_to_char(ch, "You need %d lightning stone%s to open a portal that far.\r\n", cost, PLURAL(cost));
+			return;
+		}
+		
+		// charge
+		extract_resources(ch, res, FALSE);
 	}
 
 	// portal this side
