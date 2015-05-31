@@ -313,7 +313,7 @@ void update_class(char_data *ch) {
 				// new best
 				if (GET_SKILL(ch, iter) > best_level[best_iter]) {
 					// move down the other best first
-					for (best_sub = best_iter + 1; best_sub < NUM_BEST; ++best_sub) {
+					for (best_sub = NUM_BEST - 1; best_sub > best_iter; --best_sub) {
 						best[best_sub] = best[best_sub-1];
 						best_level[best_sub] = best_level[best_sub-1];
 					}
