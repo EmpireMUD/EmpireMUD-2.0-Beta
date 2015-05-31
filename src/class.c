@@ -277,14 +277,23 @@ void adjust_class_abilities(char_data *ch, bool add, int class, int role) {
 * @param char_data *ch the player
 */
 void update_class(char_data *ch) {
+	#define NUM_BEST  3
+	#define BEST_SUM_REQUIRED_FOR_100  (2 * CLASS_SKILL_CAP + SPECIALTY_SKILL_CAP)
+	
 	int iter, skl, class = CLASS_NONE, at_zero = 0, over_basic = 0, over_specialty = 0;
+	int best[NUM_BEST], best_level[NUM_BEST], best_iter, best_sub, best_total;
 	int total_class_skill, total_skill;
 	int old_class, old_level;
 	bool ok;
 	
 	if (!IS_NPC(ch)) {
-		// find skill counts
 		total_skill = 0;
+		for (best_iter = 0; best_iter < NUM_BEST; ++best_iter) {
+			best[best_iter] = NO_SKILL;
+			best_level[best_iter] = 0;
+		}
+		
+		// find skill counts
 		for (iter = 0; iter < NUM_SKILLS; ++iter) {
 			total_skill += GET_SKILL(ch, iter);
 			
@@ -296,6 +305,25 @@ void update_class(char_data *ch) {
 			}
 			if (GET_SKILL(ch, iter) > SPECIALTY_SKILL_CAP) {
 				++over_specialty;
+			}
+			
+			// update best
+			for (best_iter = 0; best_iter < NUM_BEST; ++best_iter) {
+				// new best
+				if (best[best_iter] == NO_SKILL || GET_SKILL(ch, iter) > best_level[best_iter]) {
+					// move down the other best first
+					for (best_sub = best_iter + 1; best_sub < NUM_BEST; ++best_sub) {
+						best[best_sub] = best[best_sub-1];
+						best_level[best_sub] = best_level[best_sub-1];
+					}
+					
+					// store this one
+					best[best_iter] = iter;
+					best_level[best_iter] = GET_SKILL(ch, iter);
+					
+					// ONLY update the first matching best
+					break;
+				}
 			}
 		}
 		
@@ -339,17 +367,21 @@ void update_class(char_data *ch) {
 		
 		// no need to add new class abilities because IF the role changed, it is set to none
 		
+		// total up best X skills
+		best_total = 0;
+		for (best_iter = 0; best_iter < NUM_BEST; ++best_iter) {
+			best_total += best_level[best_iter];
+		}
+		
+		// set level
+		GET_SKILL_LEVEL(ch) = MIN(CLASS_SKILL_CAP, best_total * 100 / BEST_SUM_REQUIRED_FOR_100);
+		
 		// level!
 		if (class != CLASS_NONE) {
-			// skill level based on average of class skills
-			GET_SKILL_LEVEL(ch) = total_class_skill / SKILLS_PER_CLASS;
-			
 			// class progression level based on % of the way
 			GET_CLASS_PROGRESSION(ch) = (GET_SKILL_LEVEL(ch) - SPECIALTY_SKILL_CAP) * 100 / (CLASS_SKILL_CAP - SPECIALTY_SKILL_CAP);
 		}
 		else {
-			// average of total_skill averaged over the number of non-zero skills available -- this gives us a rough level that is usually < 75
-			GET_SKILL_LEVEL(ch) = total_skill / (NUM_SKILLS - ZEROES_REQUIRED_FOR_BONUS_SKILLS);
 			GET_CLASS_PROGRESSION(ch) = 0;
 		}
 		
