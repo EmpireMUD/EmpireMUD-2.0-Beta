@@ -278,6 +278,7 @@ void adjust_class_abilities(char_data *ch, bool add, int class, int role) {
 */
 void update_class(char_data *ch) {
 	#define NUM_BEST  3
+	#define IGNORE_BOTTOM_SKILL_POINTS  30	// amount newbies should start with
 	#define BEST_SUM_REQUIRED_FOR_100  (2 * CLASS_SKILL_CAP + SPECIALTY_SKILL_CAP)
 	
 	int iter, skl, class = CLASS_NONE, at_zero = 0, over_basic = 0, over_specialty = 0;
@@ -374,7 +375,8 @@ void update_class(char_data *ch) {
 		}
 		
 		// set level
-		GET_SKILL_LEVEL(ch) = MIN(CLASS_SKILL_CAP, best_total * 100 / BEST_SUM_REQUIRED_FOR_100);
+		GET_SKILL_LEVEL(ch) = (best_total - IGNORE_BOTTOM_SKILL_POINTS) * 100 / (BEST_SUM_REQUIRED_FOR_100 - IGNORE_BOTTOM_SKILL_POINTS);
+		GET_SKILL_LEVEL(ch) = MIN(CLASS_SKILL_CAP, MAX(1, GET_SKILL_LEVEL(ch)));
 		
 		// level!
 		if (class != CLASS_NONE) {
