@@ -10,6 +10,8 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 
+#include <math.h>
+
 #include "conf.h"
 #include "sysdep.h"
 
@@ -35,6 +37,7 @@ extern const int rev_dir[];
 extern const int universal_wait;
 
 // external funcs
+extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
 
 // locals
 int apply_poison(char_data *ch, char_data *vict, int type);
@@ -760,6 +763,67 @@ ACMD(do_disguise) {
 }
 
 
+ACMD(do_diversion) {
+	char_data *victim, *next_vict;
+	struct affected_type *af;
+	int value, cost = 50;
+	bool first = TRUE;
+	
+	if (!can_use_ability(ch, ABIL_DIVERSION, MOVE, cost, COOLDOWN_DIVERSION)) {
+		return;
+	}
+	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_DIVERSION)) {
+		return;
+	}
+	else {
+		if (SHOULD_APPEAR(ch)) {
+			appear(ch);
+		}
+		
+		charge_ability_cost(ch, MOVE, cost, COOLDOWN_DIVERSION, 30);
+		
+		// variable messaging
+		switch (number(0, 2)) {
+			case 0: {
+				msg_to_char(ch, "You release a small flock of pigeons into the melee!\r\n");
+				act("$n releases a small flock of pigeons into the melee!", FALSE, ch, NULL, NULL, TO_ROOM);
+				break;
+			}
+			case 1: {
+				msg_to_char(ch, "You toss some firecrackers into the melee!\r\n");
+				act("$n tosses some firecrackers into the melee!", FALSE, ch, NULL, NULL, TO_ROOM);
+				break;
+			}
+			case 2: {
+				msg_to_char(ch, "You throw a pocketful of sparkling dust into the melee!\r\n");
+				act("$n throws a pocketful of sparkling dust into the melee!", FALSE, ch, NULL, NULL, TO_ROOM);
+				break;
+			}
+		}
+		
+		for (victim = ROOM_PEOPLE(IN_ROOM(ch)); victim; victim = next_vict) {
+			next_vict = victim->next_in_room;
+			
+			if (AFF_FLAGGED(victim, AFF_IMMUNE_STEALTH)) {
+				continue;
+			}
+			
+			// TODO could macro this whole line since it's used in several AoEs
+			if (victim != ch && IS_NPC(victim) && CAN_SEE(ch, victim) && !is_fight_ally(ch, victim) && !in_same_group(ch, victim) && can_fight(ch, victim)) {
+				value = ceil(GET_CHARISMA(ch) * (first ? 1.0 : 0.5));
+				first = FALSE;
+				
+				af = create_mod_aff(ATYPE_DIVERSION, 3, APPLY_WITS, -value);
+				affect_join(victim, af, NOBITS);
+				
+				msg_to_char(victim, "You can't seem to focus on the battle!\r\n");
+				engage_combat(ch, victim, TRUE);
+			}
+		}
+	}
+}
+
+
 ACMD(do_escape) {
 	int cost = 10;
 	
@@ -828,6 +892,50 @@ ACMD(do_hide) {
 
 	if (HAS_ABILITY(ch, ABIL_CLING_TO_SHADOW) || skill_check(ch, ABIL_HIDE, DIFF_MEDIUM)) {
 		SET_BIT(AFF_FLAGS(ch), AFF_HIDE);
+	}
+}
+
+
+ACMD(do_howl) {
+	char_data *victim, *next_vict;
+	struct affected_type *af;
+	int value, cost = 50;
+	bool first = TRUE;
+	
+	if (!can_use_ability(ch, ABIL_HOWL, MOVE, cost, COOLDOWN_HOWL)) {
+		return;
+	}
+	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_HOWL)) {
+		return;
+	}
+	else {
+		if (SHOULD_APPEAR(ch)) {
+			appear(ch);
+		}
+		
+		charge_ability_cost(ch, MOVE, cost, COOLDOWN_HOWL, 30);
+		
+		msg_to_char(ch, "You let out a fearsome howl!\r\n");
+		act("$n lets out a bone-chilling howl!", FALSE, ch, NULL, NULL, TO_ROOM);
+		
+		for (victim = ROOM_PEOPLE(IN_ROOM(ch)); victim; victim = next_vict) {
+			next_vict = victim->next_in_room;
+			
+			if (AFF_FLAGGED(victim, AFF_IMMUNE_STEALTH)) {
+				continue;
+			}
+			
+			if (victim != ch && IS_NPC(victim) && CAN_SEE(ch, victim) && !is_fight_ally(ch, victim) && !in_same_group(ch, victim) && can_fight(ch, victim)) {
+				value = GET_CHARISMA(ch) * (first ? 5 : 3);
+				first = FALSE;
+				
+				af = create_mod_aff(ATYPE_HOWL, 3, APPLY_TO_HIT, -value);
+				affect_join(victim, af, NOBITS);
+				
+				msg_to_char(victim, "You are too scared to aim effectively!\r\n");
+				engage_combat(ch, victim, TRUE);
+			}
+		}
 	}
 }
 
@@ -959,6 +1067,27 @@ ACMD(do_jab) {
 		
 		if (hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FALSE) > 0) {
 			apply_dot_effect(vict, ATYPE_JABBED, 3, DAM_PHYSICAL, get_ability_level(ch, ABIL_JAB) / 24, 2);
+			
+			if (!HAS_ABILITY(ch, ABIL_STAGGER_JAB) && !AFF_FLAGGED(vict, AFF_IMMUNE_STEALTH)) {
+				struct affected_type *af;
+				int value = ceil(GET_CHARISMA(ch) / 5);
+				af = create_mod_aff(ATYPE_STAGGER_JAB, 3, APPLY_TO_HIT, -value);
+				affect_join(vict, af, ADD_MODIFIER);
+			}
+			
+			if (HAS_ABILITY(ch, ABIL_CRUCIAL_JAB) && !AFF_FLAGGED(vict, AFF_IMMUNE_STEALTH)) {
+				struct affected_type *af;
+				int value = round(GET_COMPUTED_LEVEL(ch) / 80);
+				af = create_mod_aff(ATYPE_CRUCIAL_JAB, 2, APPLY_DEXTERITY, -value);
+				affect_join(vict, af, NOBITS);
+			}
+			
+			if (HAS_ABILITY(ch, ABIL_SHADOW_JAB) && !AFF_FLAGGED(vict, AFF_IMMUNE_STEALTH)) {
+				struct affected_type *af;
+				int value = ceil(GET_CHARISMA(ch) / 5);
+				af = create_mod_aff(ATYPE_SHADOW_JAB, 3, APPLY_DEXTERITY, -value);
+				affect_join(vict, af, ADD_MODIFIER);
+			}
 		}
 		gain_ability_exp(ch, ABIL_JAB, 15);
 	}
@@ -1271,6 +1400,50 @@ ACMD(do_search) {
 
 		charge_ability_cost(ch, NOTHING, 0, COOLDOWN_SEARCH, 10);
 		gain_ability_exp(ch, ABIL_SEARCH, 20);
+	}
+}
+
+
+ACMD(do_shadowcage) {
+	char_data *victim, *next_vict;
+	struct affected_type *af;
+	int value, cost = 50;
+	bool first = TRUE;
+	
+	if (!can_use_ability(ch, ABIL_SHADOWCAGE, MOVE, cost, COOLDOWN_SHADOWCAGE)) {
+		return;
+	}
+	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_SHADOWCAGE)) {
+		return;
+	}
+	else {
+		if (SHOULD_APPEAR(ch)) {
+			appear(ch);
+		}
+		
+		charge_ability_cost(ch, MOVE, cost, COOLDOWN_SHADOWCAGE, 30);
+		
+		msg_to_char(ch, "You shoot webs of pure shadow, forming a tight cage!\r\n");
+		act("$n shoots webs of pure shadow, forming a tight cage!", FALSE, ch, NULL, NULL, TO_ROOM);
+		
+		for (victim = ROOM_PEOPLE(IN_ROOM(ch)); victim; victim = next_vict) {
+			next_vict = victim->next_in_room;
+			
+			if (AFF_FLAGGED(victim, AFF_IMMUNE_STEALTH)) {
+				continue;
+			}
+			
+			if (victim != ch && IS_NPC(victim) && CAN_SEE(ch, victim) && !is_fight_ally(ch, victim) && !in_same_group(ch, victim) && can_fight(ch, victim)) {
+				value = GET_CHARISMA(ch) * (first ? 5 : 3);
+				first = FALSE;
+				
+				af = create_mod_aff(ATYPE_SHADOWCAGE, 3, APPLY_DODGE, -value);
+				affect_join(victim, af, NOBITS);
+				
+				msg_to_char(victim, "You can't seem to dodge as well in the shadowcage!\r\n");
+				engage_combat(ch, victim, TRUE);
+			}
+		}
 	}
 }
 

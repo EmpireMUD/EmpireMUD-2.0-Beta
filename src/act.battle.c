@@ -10,6 +10,8 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 
+#include <math.h>
+
 #include "conf.h"
 #include "sysdep.h"
 
@@ -385,6 +387,15 @@ ACMD(do_kick) {
 	success = IS_SPECIALTY_ABILITY(ch, ABIL_KICK) || !AWAKE(vict) || (hit_chance >= number(1, 100));
 
 	if (success) {
+		if (HAS_ABILITY(ch, ABIL_SHADOW_KICK) && !AFF_FLAGGED(vict, AFF_IMMUNE_BATTLE)) {
+			struct affected_type *af;
+			int value = round(GET_COMPUTED_LEVEL(ch) / 50);
+			af = create_mod_aff(ATYPE_SHADOW_KICK, 2, APPLY_BONUS_PHYSICAL, -value);
+			affect_join(vict, af, 0);
+			af = create_mod_aff(ATYPE_SHADOW_KICK, 2, APPLY_BONUS_MAGICAL, -value);
+			affect_join(vict, af, 0);
+		}
+	
 		dam = GET_STRENGTH(ch) * (IS_CLASS_ABILITY(ch, ABIL_KICK) ? 4 : 2);
 		dam += GET_BONUS_PHYSICAL(ch);
 		damage(ch, vict, dam, ATTACK_KICK, DAM_PHYSICAL);

@@ -125,7 +125,7 @@ See also: CLASS
 Assassin
 Battle + Stealth
 
-Melee: Dual-Wield
+Melee: Dual-Wield, Shadow Kick
 
 Note: Class abilities are unfinished.
 
@@ -136,7 +136,7 @@ See also: CLASS
 Bandit
 Stealth + Survival
 
-Melee: Dual-Wield
+Melee: Crucial Jab, Dual-Wield
 
 Note: Class abilities are unfinished.
 
@@ -300,7 +300,7 @@ See also: CLASS
 Occultist
 High Sorcery + Stealth
 
-No class abilities assigned.
+Melee: Shadowcage
 
 Note: Class abilities are unfinished.
 
@@ -311,7 +311,7 @@ See also: CLASS
 Powerbroker
 Empire + Stealth
 
-Melee: Dragonriding
+Melee: Dragonriding, Stagger Jab
 
 Note: Class abilities are unfinished.
 
@@ -334,7 +334,7 @@ See also: CLASS
 Shade
 Stealth + Vampire
 
-Melee: Horrid Form
+Melee: Horrid Form, Shadow Jab
 
 Note: Class abilities are unfinished.
 
@@ -345,7 +345,7 @@ See also: CLASS
 Shadow Wolf
 Natural Magic + Stealth
 
-Melee: Moonrise, Savage Werewolf Form
+Melee: Howl, Moonrise, Savage Werewolf Form
 Healer: Moonrise, Sage Werewolf Form
 
 Note: Class abilities are unfinished.
@@ -357,7 +357,7 @@ See also: CLASS
 Smuggler
 Stealth + Trade
 
-Melee: Dual-Wield
+Melee: Diversion, Dual-Wield
 
 Note: Class abilities are unfinished.
 

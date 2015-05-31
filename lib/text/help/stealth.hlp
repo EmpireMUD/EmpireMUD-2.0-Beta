@@ -75,6 +75,17 @@ using or holding.
 
 This ability gains skill points whenever they try.
 #
+"CRUCIAL JAB"
+
+Crucial Jab
+Class ability: Bandit
+Debuff type: Stealth
+
+Your Jab ability causes a debuff equal to your total level divided by 80 to
+your victim's Dexterity, for 10 seconds.
+
+See also: JAB
+#
 DARKNESS
 
 Darkness (Stealth ability)
@@ -102,6 +113,30 @@ A savvy rogue learns to blend into his surroundings. With this ability, you can
 look like any human NPC. If you behave like one as well, you might find you
 disappear into the crowd.
 #
+SHADOWCAGE "SHADOW CAGE"
+
+Shadowcage
+Class ability: Occultist
+Debuff type: Stealth
+Cost: 50 move
+Cooldown: 30 seconds
+
+You create a cage of shadows, penalizing all enemies. The first victim loses
+dodge equal to 5x your Charsima. Each additional victim loses dodge equal to 3x
+Charisma instead.
+#
+DIVERSION
+
+Diversion
+Class ability: Smuggler
+Debuff type: Stealth
+Cost: 50 move
+Cooldown: 30 seconds
+
+You create a flashy diversion, penalizing all enemies. The first victim loses
+Wits equal to your Charsima. Each additional victim loses Wits equal to half
+your Charisma (rounded up) instead. This effect lasts 15 seconds.
+#
 ESCAPE
 
 Escape (Stealth ability)
@@ -124,6 +159,30 @@ can't be seen by other people. Hide is broken by pressing return, regardless
 of whether you typed a command or not.
 
 See also: SEARCH, SNEAK
+#
+HOWL
+
+Howl
+Class ability: Shadow Wolf
+Debuff type: Stealth
+Cost: 50 move
+Cooldown: 30 seconds
+
+You let out a terrifying howl, penalizing all enemies. The first victim loses
+to-hit equal to 5x your Charsima. Each additional victim loses to-hit equal to
+3x Charisma instead.
+#
+SHADOWCAGE "SHADOW CAGE"
+
+Shadowcage
+Class ability: Occultist
+Debuff type: Stealth
+Cost: 50 move
+Cooldown: 30 seconds
+
+You create a cage of shadows, penalizing all enemies. The first victim loses
+dodge equal to 5x your Charsima. Each additional victim loses dodge equal to 3x
+Charisma instead. This effect lasts 15 seconds.
 #
 INFILTRATE "IMPROVED INFILTRATE"
 
@@ -154,6 +213,8 @@ Cooldown:  9 seconds
 Jab your opponent while he's not looking and leave a wound in his side that
 will fester for 15 seconds, dealing additional damage. This ability stacks up
 to 2 times.
+
+See also: CRUCIAL JAB, SHADOW JAB, STAGGER JAB
 #
 PICKPOCKET "PICK POCKET"
 
@@ -255,6 +316,40 @@ wealth that is more easily hidden than a vault.
 
 See also: BUILD, VAULT
 #
+"SHADOW JAB"
+
+Shadow Jab
+Class ability: Shade
+Debuff type: Stealth
+
+Your Jab ability causes a debuff equal to your Charisma divided by 5 (rounded
+up) to your victim's dodge, for 15 seconds. This effect may stack.
+
+See also: JAB
+#
+"SHADOW KICK"
+
+Shadow Kick
+Class ability: Assassin
+Debuff type: Battle
+
+Your Kick ability causes a penalty to physical and magical damage equal to
+your total level divided by 50 for 10 seconds.
+
+See also: KICK
+#
+SHADOWCAGE "SHADOW CAGE"
+
+Shadowcage
+Class ability: Occultist
+Debuff type: Stealth
+Cost: 50 move
+Cooldown: 30 seconds
+
+You create a cage of shadows, penalizing all enemies. The first victim loses
+dodge equal to 5x your Charsima. Each additional victim loses dodge equal to 3x
+Charisma instead. This effect lasts 15 seconds.
+#
 SHADOWSTEP "SHADOW STEP"
 
 Shadowstep (Stealth ability)
@@ -280,6 +375,17 @@ When you type sneak, there is no way to know if you're actually sneaking. It's
 based on your skill, and how well other people notice you.
 
 See also: HIDE
+#
+"STAGGER JAB"
+
+Stagger Jab
+Class ability: Powerbroker
+Debuff type: Stealth
+
+Your Jab ability causes a debuff equal to your Charisma divided by 5 (rounded
+up) to your victim's to-hit, for 15 seconds. This effect may stack.
+
+See also: JAB
 #
 STEAL STEALING
 

@@ -2157,7 +2157,14 @@ const char *affect_types[] = {
 	"stunning blow",
 	"stun immunity",	// 50
 	"war delay",
-	"unburdened",	// 52
+	"unburdened",
+	"shadow kick",
+	"stagger jab",
+	"shadowcage",	// 55
+	"howl",
+	"crucial jab",
+	"diversion",
+	"shadow jab",	// 59
 	"\n"
 	};
 
@@ -2216,7 +2223,14 @@ const char *affect_wear_off_msgs[] = {
 	"You are no longer dazed by that stunning blow.",
 	"Your stun immunity expires.",	// 50
 	"Your war delay ends and you are free to act.",
-	"You feel the weight of the world return.",	// 52
+	"You feel the weight of the world return.",
+	"You are no longer weakened by the shadow kick.",
+	"You are no longer weakened by the stagger jab.",
+	"The shadowcage fades and your focus returns.",	// 55
+	"The terrifying howl fades from your mind.",
+	"You are no longer weakened by the crucial jab.",
+	"You are no longer distracted by the diversion.",
+	"You are no longer weakened by the shadow jab.",	// 59
 	"\n"
 };
 
@@ -2272,6 +2286,9 @@ const char *cooldown_types[] = {
 	"dispel",
 	"bloodsweat",
 	"earthmeld",
+	"shadowcage",
+	"howl",	// 50
+	"diversion",
 	"\n"
 };
 

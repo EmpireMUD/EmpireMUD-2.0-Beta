@@ -357,8 +357,15 @@ extern bool skill_check(char_data *ch, int ability, int difficulty);
 #define ABIL_NOBLE_BEARING  228
 #define ABIL_BLOODSWEAT  229
 #define ABIL_DRAGONRIDING  230
+#define ABIL_SHADOW_KICK  231
+#define ABIL_STAGGER_JAB  232
+#define ABIL_SHADOWCAGE  233
+#define ABIL_HOWL  234
+#define ABIL_CRUCIAL_JAB  235
+#define ABIL_DIVERSION  236
+#define ABIL_SHADOW_JAB  237
 
-#define NUM_ABILITIES  231		// must be <= MAX_ABILITIES (structs.h)
+#define NUM_ABILITIES  238		// must be <= MAX_ABILITIES (structs.h)
 
 
 // cooldowns -- see COOLDOWN_x in constants.c
@@ -411,6 +418,9 @@ extern bool skill_check(char_data *ch, int ability, int difficulty);
 #define COOLDOWN_DISPEL  46
 #define COOLDOWN_BLOODSWEAT  47
 #define COOLDOWN_EARTHMELD  48
+#define COOLDOWN_SHADOWCAGE  49
+#define COOLDOWN_HOWL  50
+#define COOLDOWN_DIVERSION  51
 
 
 /* WEAPON ATTACK TYPES */
@@ -532,7 +542,15 @@ extern bool skill_check(char_data *ch, int ability, int difficulty);
 #define ATYPE_STUN_IMMUNITY  50
 #define ATYPE_WAR_DELAY  51
 #define ATYPE_UNBURDENED  52
-#define NUM_ATYPES  53	// total number, for bounds checking
+#define ATYPE_SHADOW_KICK  53
+#define ATYPE_STAGGER_JAB  54
+#define ATYPE_SHADOWCAGE  55
+#define ATYPE_HOWL  56
+#define ATYPE_CRUCIAL_JAB  57
+#define ATYPE_DIVERSION  58
+#define ATYPE_SHADOW_JAB  59
+
+#define NUM_ATYPES  60	// total number, for bounds checking
 
 
 // armor types

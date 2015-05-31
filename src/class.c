@@ -62,7 +62,7 @@ const struct class_data_type class_data[NUM_CLASSES] = {
 	},
 	{ "Assassin", "Assn", { SKILL_BATTLE, SKILL_STEALTH },  { 200, 300, 100, 0 },
 		{
-			{ ROLE_MELEE, { ABIL_DUAL_WIELD, ROLE_ABIL_END } },
+			{ ROLE_MELEE, { ABIL_DUAL_WIELD, ABIL_SHADOW_KICK, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
@@ -101,7 +101,7 @@ const struct class_data_type class_data[NUM_CLASSES] = {
 	},
 	{ "Powerbroker", "Pwbk", { SKILL_EMPIRE, SKILL_STEALTH },  { 200, 300, 100, 0 },
 		{
-			{ ROLE_MELEE, { ABIL_DRAGONRIDING, ROLE_ABIL_END } },
+			{ ROLE_MELEE, { ABIL_DRAGONRIDING, ABIL_STAGGER_JAB, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
@@ -131,7 +131,10 @@ const struct class_data_type class_data[NUM_CLASSES] = {
 		}
 	},
 	{ "Occultist", "Oclt", { SKILL_HIGH_SORCERY, SKILL_STEALTH },  { 100, 250, 250, 0 },
-		{ ROLE_LIST_END }
+		{
+			{ ROLE_MELEE, { ABIL_SHADOWCAGE, ROLE_ABIL_END } },
+			ROLE_LIST_END
+		}
 	},
 	{ "Theurge", "Thrg", { SKILL_HIGH_SORCERY, SKILL_SURVIVAL },  { 200, 100, 300, 0 },
 		{ ROLE_LIST_END }
@@ -147,7 +150,7 @@ const struct class_data_type class_data[NUM_CLASSES] = {
 	},
 	{ "Shadow Wolf", "ShWf", { SKILL_NATURAL_MAGIC, SKILL_STEALTH },  { 100, 200, 300, 0 },
 		{
-			{ ROLE_MELEE, { ABIL_MOONRISE, ABIL_SAVAGE_WEREWOLF_FORM, ROLE_ABIL_END } },
+			{ ROLE_MELEE, { ABIL_HOWL, ABIL_MOONRISE, ABIL_SAVAGE_WEREWOLF_FORM, ROLE_ABIL_END } },
 			{ ROLE_HEALER, { ABIL_MOONRISE, ABIL_SAGE_WEREWOLF_FORM, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
@@ -173,19 +176,19 @@ const struct class_data_type class_data[NUM_CLASSES] = {
 	},
 	{ "Bandit", "Bndt", { SKILL_STEALTH, SKILL_SURVIVAL },  { 250, 250, 100, 0 },
 		{
-			{ ROLE_MELEE, { ABIL_DUAL_WIELD, ROLE_ABIL_END } },
+			{ ROLE_MELEE, { ABIL_CRUCIAL_JAB, ABIL_DUAL_WIELD, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
 	{ "Smuggler", "Smgl", { SKILL_STEALTH, SKILL_TRADE },  { 200, 300, 100, 0 },
 		{
-			{ ROLE_MELEE, { ABIL_DUAL_WIELD, ROLE_ABIL_END } },
+			{ ROLE_MELEE, { ABIL_DIVERSION, ABIL_DUAL_WIELD, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
 	{ "Shade", "Shde", { SKILL_STEALTH, SKILL_VAMPIRE },  { 200, 300, 100, 0 },
 		{
-			{ ROLE_MELEE, { ABIL_HORRID_FORM, ROLE_ABIL_END } },
+			{ ROLE_MELEE, { ABIL_HORRID_FORM, ABIL_SHADOW_JAB, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},

@@ -128,6 +128,7 @@ ACMD(do_dismount);
 ACMD(do_dispel);
 ACMD(do_display);
 ACMD(do_distance);
+ACMD(do_diversion);
 ACMD(do_douse);
 ACMD(do_draw);
 ACMD(do_drink);
@@ -203,6 +204,7 @@ ACMD(do_history);
 ACMD(do_hit);
 ACMD(do_home);
 ACMD(do_hostile);
+ACMD(do_howl);
 
 ACMD(do_identify);
 ACMD(do_ignore);
@@ -329,6 +331,7 @@ ACMD(do_search);
 ACMD(do_send);
 ACMD(do_selfdelete);
 ACMD(do_set);
+ACMD(do_shadowcage);
 ACMD(do_shadowstep);
 ACMD(do_shear);
 ACMD(do_sheathe);
@@ -595,6 +598,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "dig", POS_STANDING, do_dig, LVL_APPROVED, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "display", POS_DEAD, do_display, NO_MIN, CTYPE_UTIL ),
 	ABILITY_CMD( "dispel", POS_FIGHTING, do_dispel, NO_MIN, CTYPE_SKILL, ABIL_DISPEL ),
+	ABILITY_CMD( "diversion", POS_FIGHTING, do_diversion, NO_MIN, CTYPE_SKILL, ABIL_DIVERSION ),
 	SIMPLE_CMD( "douse", POS_STANDING, do_douse, NO_MIN, CTYPE_BUILD ),
 	SCMD_CMD( "drop", POS_RESTING, do_drop, NO_MIN, CTYPE_MOVE, SCMD_DROP ),
 	SIMPLE_CMD( "draw", POS_RESTING, do_draw, NO_MIN, CTYPE_COMBAT ),
@@ -683,6 +687,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "hold", POS_RESTING, do_grab, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "home", POS_SLEEPING, do_home, LVL_APPROVED, CTYPE_UTIL ),
 	GRANT_CMD( "hostile", POS_DEAD, do_hostile, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_HOSTILE ),
+	ABILITY_CMD( "howl", POS_FIGHTING, do_howl, NO_MIN, CTYPE_SKILL, ABIL_HOWL ),
 
 	SIMPLE_CMD( "inventory", POS_DEAD, do_inventory, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "identify", POS_STANDING, do_identify, NO_MIN, CTYPE_SKILL ),
@@ -835,6 +840,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	GRANT_CMD( "send", POS_SLEEPING, do_send, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_SEND ),
 	GRANT_CMD( "set", POS_DEAD, do_set, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_SET ),
 	STANDARD_CMD( "sew", POS_STANDING, do_gen_craft, LVL_APPROVED, NO_GRANTS, CRAFT_TYPE_SEW, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
+	ABILITY_CMD( "shadowcage", POS_FIGHTING, do_shadowcage, NO_MIN, CTYPE_SKILL, ABIL_SHADOWCAGE ),
 	ABILITY_CMD( "shadowstep", POS_STANDING, do_shadowstep, NO_MIN, CTYPE_MOVE, ABIL_SHADOWSTEP ),
 	STANDARD_CMD( "shear", POS_STANDING, do_shear, LVL_APPROVED, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "sheathe", POS_RESTING, do_sheathe, NO_MIN, CTYPE_COMBAT ),
