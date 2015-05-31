@@ -2686,9 +2686,14 @@ void perform_execute(char_data *ch, char_data *victim, int attacktype, int damty
 		perform_morph(victim, MORPH_NONE);
 		act(buf, TRUE, victim, 0, 0, TO_ROOM);
 	}
-		
-	act("$n is dead, killed by $N! R.I.P.", FALSE, victim, NULL, ch, TO_NOTVICT);
-	act("You have killed $n! R.I.P.", FALSE, victim, NULL, ch, TO_VICT);
+	
+	if (ch == victim) {
+		act("$n is dead -- R.I.P.", FALSE, victim, NULL, ch, TO_NOTVICT);
+	}
+	else {
+		act("$n is dead, killed by $N! R.I.P.", FALSE, victim, NULL, ch, TO_NOTVICT);
+		act("You have killed $n! R.I.P.", FALSE, victim, NULL, ch, TO_VICT);
+	}
 
 	// cleanup
 	end_pursuit(ch, victim);
