@@ -722,7 +722,8 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 							continue;
 						}
 						// requires that dir for inside
-						if (needs_inside_dir && !template_has_free_exit(start_room, rev_dir[dir])) {
+						// NOTE: changed final arg from rev_dir[dir] to dir, thinking it was excluding the opposite direction from what it should -paul
+						if (needs_inside_dir && !template_has_free_exit(start_room, dir)) {
 							continue;
 						}
 						// need a valid map tile to face
