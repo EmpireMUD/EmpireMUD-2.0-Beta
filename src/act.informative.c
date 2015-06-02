@@ -1808,9 +1808,10 @@ ACMD(do_help) {
 
 
 ACMD(do_helpsearch) {	
-	char output[MAX_STRING_LENGTH];
+	char output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
 	int iter;
 	bool found;
+	size_t size;
 	
 	// this removes leading filler words, which are going to show up in a lot of helps
 	one_argument(argument, arg);
@@ -1826,22 +1827,31 @@ ACMD(do_helpsearch) {
 		msg_to_char(ch, "No help available.r\n");
 	}
 	else {
-		strcpy(output, "You find help on that in the following help entries:\r\n");
+		size = snprintf(output, sizeof(output), "You find help on that in the following help entries:\r\n");
 		found = FALSE;
 		
 		for (iter = 0; iter <= top_of_helpt; ++iter) {
 			if (GET_ACCESS_LEVEL(ch) >= help_table[iter].level && (!help_table[iter].duplicate && str_str(help_table[iter].entry, arg))) {
-				sprintf(output + strlen(output), " %s\r\n", help_table[iter].keyword);
+				snprintf(line, sizeof(line), " %s\r\n", help_table[iter].keyword);
 				found = TRUE;
+				
+				if (size + strlen(line) < sizeof(output)) {
+					strcat(output, line);
+					size += strlen(line);
+				}
+				else {
+					size += snprintf(output + size, sizeof(output) - size, "... and more\r\n");
+				}
 			}
 		}
 		
 		if (!found) {
-			strcat(output, " none\r\n");
+			msg_to_char(ch, "%s none\r\n", output);
 		}
-		
-		// send it out
-		page_string(ch->desc, output, TRUE);
+		else {
+			// send it out
+			page_string(ch->desc, output, TRUE);
+		}
 	}
 }
 
