@@ -7,6 +7,8 @@ The pie looks delicious.
 6 0 a
 48 0 0
 7 336
+R
+5619 0
 S
 #3301
 pie apple warm~
@@ -17,6 +19,8 @@ The pie looks delicious!
 6 0 a
 48 0 0
 7 336
+R
+5606 0
 S
 #3302
 pie peach glistening~
@@ -27,6 +31,8 @@ The pie looks delicious!
 6 0 a
 48 0 0
 7 336
+R
+5606 0
 S
 #3303
 pie cherry rich~
@@ -47,6 +53,8 @@ The candied apple looks delicious!
 6 0 a
 24 0 0
 7 336
+R
+5606 0
 S
 #3305
 casserole steaming~
@@ -57,6 +65,8 @@ The casserole looks delicious.
 6 0 a
 48 0 0
 7 336
+R
+5619 0
 S
 #3306
 jerky pouch~
@@ -81,6 +91,8 @@ The cornmeal can be cooked into various foods.
 7 168
 R
 5109 0
+R
+5606 0
 S
 #3308
 tortilla~
@@ -103,6 +115,8 @@ The burrito looks muy delicioso.
 6 0 a
 48 0 0
 7 336
+R
+5619 0
 S
 #3310
 mushroom shroom wood ear~
@@ -113,6 +127,8 @@ The mushroom looks good enough to eat, somehow.
 6 0 a
 6 0 0
 7 48
+R
+5606 0
 S
 #3311
 oil olive jar~
@@ -139,6 +155,8 @@ Flour is used to bake bread.
 7 168
 R
 5109 0
+R
+5606 0
 S
 #3313
 bread loaf~
@@ -151,5 +169,320 @@ Bread is a good portable food.
 7 336
 R
 5606 0
+S
+#3314
+rice fried bowl~
+a bowl of fried rice~
+A bowl of fried rice is steaming away.~
+   This bowl of fried rice was made with very little spices. It is however very
+hot and filling.
+~
+6 0 a
+48 0 0
+7 336
+M
+5
+$n chows down on $p.~
+M
+4
+You blow on $p and eat a mouthful.~
+R
+5619 0
+S
+#3315
+pork salted steaming slab~
+a salted slab of pork~
+A slab of steaming salt pork has been left here, discarded.~
+   A long, thick slab of salted pork. Lines of fat run through it giving
+contrast to the dense meat.
+~
+6 0 a
+24 0 0
+7 336
+E
+fat~
+   The lines of fat glisten with honey and look downright mouth watering.
+~
+M
+4
+Tearing off a chunk of $p, you chew contentedly.~
+M
+5
+$n tears off a hunk of $p and chews contentedly.~
+R
+5619 0
+S
+#3316
+chicken vegetables meal~
+a plate of chicken and vegetables~
+There is a full meal of chicken and vegetables just laying here.~
+   Such a large chicken breast, surrounded by corn, peas and carrots garnished
+with a sprig of parsley. The smell wafting up from this plate is delicious and
+the chicken is nice and crispy.
+~
+6 0 a
+96 0 0
+7 336
+M
+4
+You scoop up some vegetables and shovel them into your mouth.~
+M
+5
+$n scoops up some vegetables and shovels them into $s mouth.~
+M
+5
+$n tears off some meat from $p and wolfs it down.~
+M
+4
+You tear off a piece of chicken and take a good bite.~
+R
+5619 0
+S
+#3317
+sandwich ham cheese~
+a ham and cheese sandwich~
+A sandwich is lying here, bread askew.~
+   It is just a regular ham and cheese sandwich. Someone perhaps forgot to
+dress it properly, but it is still delicious looking. A good thick slab of
+honey cooked ham with some cheese slipped in between two crusty pieces of
+bread.
+~
+6 0 a
+24 0 0
+7 336
+M
+4
+You take a bite out of $p.~
+M
+5
+$n chomps down on $p.~
+R
+5619 0
+S
+#3318
+bowl fruit~
+a fruit bowl~
+A bowl of fruit is sitting here, like a still life.~
+   Comprising of cherries, apples, pears, and other various fruits, this fruit
+bowl will serve for any ocasion.
+~
+6 0 a
+120 0 0
+7 336
+M
+4
+You pluck out a cherry and pop it into your mouth.~
+M
+4
+You take a large bite out of a juicy apple.~
+M
+4
+You grab a pineapple slice and chomp down on it.~
+M
+4
+As you bite into a pear juice runs down your chin.~
+M
+5
+$n grabs an apple from $p and takes a huge bite.~
+M
+5
+$n plucks a ripe cherry from $p and pops it into $s mouth.~
+M
+5
+$n gets a plump peach and takes a bite. As $e does so juice runs down $s chin.~
+R
+5619 0
+S
+#3319
+plate chicken pears orange~
+a plate of orange chicken and pears~
+A plate of chicken and pears is sitting here.~
+   Delicately sliced the pears surround the chicken breast, giving it a
+flowering appearance. Regardless of the finesse involved in creating this
+wonderful dish, it is sure to be gone in a matter of moments.
+~
+6 0 a
+72 0 0
+7 336
+M
+5
+$n takes a delicate bite of $p.~
+M
+5
+$n seperates a piece of pear and eats it.~
+M
+4
+You cut off a piece of chicken and savor the taste as you chew.~
+M
+4
+You seperate a piece of pear, taste it and finding it good eat it whole.~
+R
+5619 0
+S
+#3320
+sausages hefty linked couple~
+a sausage link~
+A couple of hefty sausages are linked together.~
+   A pair of sausages, well made and looking savory. Are they spicy? Who knows
+until the first bite.  
+~
+6 0 a
+48 0 0
+7 336
+M
+5
+$n gasps and almost chokes as $e takes a bite off $p.~
+M
+4
+You almost choke as you gasp at the spiciness from $p.~
+R
+5619 0
+S
+#3321
+biscuit road over-sized~
+a road biscuit~
+An over-sized biscuit is sitting here.~
+   Looking at this somewhat large biscuit you can see bits of nut, corn, and
+most importantly strips of meat. All these things have been fixed in the dough
+at the time of cooking. This biscuit will keep for quite a while I'm sure, as
+it has been dried out and well stored.  
+~
+6 0 a
+24 0 0
+7 500
+M
+4
+You worry $p between your teeth, hoping for nourishment.~
+M
+5
+$n tries to take a bite of $p but decides to just chew on it for a while.~
+R
+5619 0
+S
+#3322
+plate fried mushrooms chicken rice~
+a plate of mushrooms topped with chicken and rice~
+A fried mushroom plate topped with chicken and rice is sitting here.~
+   A deep fried mushroom with little fried chicken bits and rice. It will
+probably clog your arteries but if Furl could see it, he'd just die with envy.
+ 
+~
+6 0 a
+96 0 0
+7 336
+M
+4
+You pop a bit of mushroom in your mouth and enjoy the flavor.~
+M
+5
+$n scoops up some chicken and rice with a bit of mushroom and pops it into $s mouth~
+R
+5619 0
+S
+#3323
+pie pumpkin rich~
+a pumpkin pie~
+A rich pumpkin pie is cooling here.~
+The pie looks delicious!
+~
+6 0 a
+48 0 0
+7 336
+S
+#3324
+tart blackberry flaky~
+a blackberry tart~
+A flaky blackberry tart has been left here.~
+   This small tart is stuffed full with blackberries. Flaky, honey baked crust
+surround a thick blackberry filling. It should be quite delicious.
+~
+6 0 a
+24 0 0
+7 336
+M
+4
+You take a bite of $p and dribble a little blackberry juice down your chin.~
+M
+5
+$n takes a bite of $p, as you watch a thin stream of blackberry juice runs down $s chin.~
+R
+5619 0
+S
+#3325
+flatbread nutty squash piece~
+a nutty squash flatbread~
+A piece of flatbread has been left here.~
+   Threaded through this inocuous piece of flatbread are nuts, squash and a
+distinct glaze from honey.
+~
+6 0 a
+48 0 0
+7 336
+M
+4
+You roll up $p and take a good sized bite out of it.~
+M
+5
+$n rolls up $p and bites off a good sized piece.~
+R
+5619 0
+S
+#3326
+plate roast delicious hot vegetables~
+a delicious roast plate~
+A hot plate of roast and vegetables has been left here.~
+   A thick slab of finely cooked meat surrounded by sliced vegetables. Steamed
+to perfection, the sliced carrots and squash let off a surprising aroma.
+~
+6 0 a
+72 0 0
+7 336
+M
+4
+You cut off a bite of roast and add some vegetables to it, before savoring the flavor.~
+M
+5
+$n scoops up some vegetables with $s roast and eats them.~
+R
+5619 0
+S
+#3327
+plate fish poached vegetables~
+a poached fish plate~
+A plate of fish and vegetables has been left here.~
+   A plate of poached fish with steamed rice and peas. The fish has been
+delicately poached with a hint of lemon and the vegetables have been arranged
+quite artisticly.
+~
+6 0 a
+72 0 0
+7 336
+M
+4
+You enjoy the lemon flavor as you take a bite of $p.~
+M
+5
+$n makes a delighted noise as he savors the taste of $p.~
+R
+5619 0
+S
+#3328
+plate catfish hushpuppies fried~
+a plate of catfish and hushpuppies~
+A plate with fried catfish and hushpuppies has been left here.~
+   Deep fried catfish with a hint of lemon takes up the majority of this plate.
+Alongside the fish are golden brown hushpuppies.  
+~
+6 0 a
+72 0 0
+7 336
+M
+4
+You cut a piece of catfish and pop it and a hush puppy into your mouth.~
+M
+5
+$n slices off a piece of catfish and pops it into $s mouth, followed quickly by a hush puppy.~
+R
+5619 0
 S
 $
