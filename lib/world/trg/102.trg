@@ -169,6 +169,7 @@ Furl Death Rarespawn~
 ~
 %echo% As Furl dies, you notice his trusty mount enter the nest!
 %load% mob 10206
+%adventurecomplete%
 ~
 #10216
 Filks Respawn~

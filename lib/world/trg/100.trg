@@ -857,7 +857,7 @@ eval ch %room.people%
 while %ch%
   if %ch.varexists(pixy_choice)%
     if %ch.pixy_choice% == %winner%
-      eval amt %ch.pixy_wager% * 4
+      eval amt %ch.pixy_wager% * 3
       %send% %ch% Your pixy won! You earn %amt% coins!
       %echoaround% %ch% %ch.name% has won %ch.hisher% bet!
       eval adjust %%ch.give_coins(%amt%)%%
