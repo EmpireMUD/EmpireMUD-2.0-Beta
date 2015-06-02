@@ -153,7 +153,7 @@ const struct morph_data_structure morph_data[] = {
 		{ 0, 50, 0, 0 },
 		{ 0, 100, 0, 0 },
 		{ 0, 3, 0, 0, 0, -1 },
-		{ 200, 125, 10, 100 },
+		{ 200, 125, 20, 100 },
 		TYPE_CLAW, 0,
 		0,
 		"a towering werewolf",
