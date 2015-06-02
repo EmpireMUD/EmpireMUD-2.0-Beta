@@ -53,7 +53,6 @@ struct instance_data *real_instance(any_vnum instance_id);
 void reset_instance(struct instance_data *inst);
 void save_instances();
 static void scale_instance_to_level(struct instance_data *inst, int level);
-bool template_has_free_exit(room_template *rmt, int dir);
 void unlink_instance_entrance(room_data *room);
 
 
@@ -619,7 +618,7 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 	bld_data *findbdg = NULL;
 	sector_data *findsect = NULL;
 	room_template *start_room = room_template_proto(GET_ADV_START_VNUM(adv));
-	bool match_buildon = FALSE, needs_inside_dir = FALSE;
+	bool match_buildon = FALSE;
 	int pos = -1;	// default < 0
 	int dir, iter, sub;
 	
@@ -637,12 +636,10 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 		case ADV_LINK_BUILDING_EXISTING: {
 			findbdg = building_proto(rule->value);
 			pos = number(0, stats_get_building_count(findbdg) - 1);
-			needs_inside_dir = TRUE;
 			break;
 		}
 		case ADV_LINK_BUILDING_NEW: {
 			match_buildon = TRUE;
-			needs_inside_dir = TRUE;
 			break;
 		}
 		case ADV_LINK_PORTAL_WORLD: {
@@ -719,10 +716,6 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 						
 						// matches the dir we need inside?
 						if (dir == rule->dir) {
-							continue;
-						}
-						// requires that dir for inside
-						if (needs_inside_dir && !template_has_free_exit(start_room, rev_dir[dir])) {
 							continue;
 						}
 						// need a valid map tile to face
@@ -1343,31 +1336,6 @@ struct instance_data *real_instance(any_vnum instance_id) {
 	}
 	
 	return NULL;
-}
-
-
-/**
-* Determines if a room template can accept an exit in a given direction.
-*
-* @param room_template *rmt The room template to check.
-* @param int dir Which direction to check.
-* @return bool TRUE if that direction is ok.
-*/
-bool template_has_free_exit(room_template *rmt, int dir) {
-	struct exit_template *ex;
-	
-	// realistically, always have a random dir available
-	if (dir == DIR_RANDOM) {
-		return TRUE;
-	}
-	
-	for (ex = rmt->exits; ex; ex = ex->next) {
-		if (ex->dir == dir) {
-			return FALSE;
-		}
-	}
-	
-	return TRUE;
 }
 
 
