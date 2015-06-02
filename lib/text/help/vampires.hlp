@@ -319,6 +319,7 @@ Summon Humans (Vampire ability)
 
 Usage:  summon humans
 Cooldown:  1 minute
+Cost:  10 blood
 
 This ability summons up to (Charisma / 3, rounded up) unsuspecting humans from
 the surrounding area, using the vampire's unnatural charm. They have no
