@@ -1841,6 +1841,7 @@ ACMD(do_helpsearch) {
 				}
 				else {
 					size += snprintf(output + size, sizeof(output) - size, "... and more\r\n");
+					break;
 				}
 			}
 		}
