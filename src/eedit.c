@@ -285,7 +285,7 @@ EEDIT(eedit_banner) {
 EEDIT(eedit_change_leader) {
 	bool imm_access = GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES);
 	bool file = FALSE;
-	char_data *victim;
+	char_data *victim = NULL;
 	
 	one_argument(argument, arg);
 	
