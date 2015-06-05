@@ -69,7 +69,7 @@ Mental attributes:
 The active attribute in each category cannot go below 1 from equipment; you
 will not be able to use any item that lowers your active attributes below 1.
 
-See also: EMPIRE GREATNESS
+See also: DODGE, EMPIRE GREATNESS, SECONDARY ATTRIBUTES, TO-HIT
 #
 AUTORECALL "AUTO-RECALL" "AUTO RECALL"
 
@@ -136,7 +136,23 @@ in territory claimed by other empires. Bound items will disappear from the
 ground if left on unclaimed land, like normal. They are safe to leave on
 claimed land or in your private chest.
 
+You cannot unbind items.
+
 See also: HOME
+#
+BLOCK
+
+Your block rating, shown on 'score', is your character's bonus chance to block
+attacks. You must have the Shield Block ability, and be holding a shield in
+your off hand. Block bonuses come from equipment or spell effect, but have no
+benefit if you are not using a shield.
+
+There is a maximum 90% chance to block. However, it requires much more than +90
+block ro reach this level. You can normally only block physical attacks, but
+certain abilities allow you to block other types as well.
+
+See also: AFFECTS, SCORE, SHIELD BLOCK, WARD AGAINST MAGIC
+#
 #
 BLOOD "BLOOD POINTS" "BLOOD POOL" "BLOOD UPKEEP"
 
@@ -341,8 +357,7 @@ Diminishing returns are numbers that increase quickly at low levels, but more
 slowly at higher levels. For example, the first +20 dodge you get is applied
 directly, but the next +20 dodge only brings you up to +30.
 
-This is applied to several character traits, such as block, dodge, soak, and
-to-hit.
+This is applied to several character traits, such as block, dodge, and to-hit.
 #
 DISPLAY
 
@@ -358,6 +373,16 @@ See the prompt help file for information on available display codes.
 Helpful hint: Set an alias to display your favorite set of info.
 
 See also: ALIAS, PROMPT
+#
+DODGE
+
+Your dodge rating, shown on 'score', is your character's bonus to avoid being
+hit in combat. This bonus may come from equipment or spell effects.
+
+You also get the equivalent of 5 points of dodge per point of Dexterity, but
+this is not included in the portion shown in your score.
+
+See also: AFFECTS, SCORE
 #
 DOT "DOT EFFECT" "DAMAGE OVER TIME" DAMAGE-OVER-TIME
 
@@ -635,8 +660,7 @@ See also: CHANNELS
 SOAK
 
 Soak is your character's damage absorption trait. Any incoming damage is
-reduced by this amount. Soak rating usually comes from gear or spells. It
-has diminishing returns at 10 points.
+reduced by this amount. Soak rating usually comes from gear or spells.
 #
 SPEAR
 
@@ -659,6 +683,16 @@ TIP TIPS "TIP OF THE DAY" HINT
 Usage:  tip
 
 This command will give you a helpful tip about the game.
+#
+TO-HIT "TO HIT" TOHIT "HIT CHANCE"
+
+Your to-hit rating, shown on 'score', is your character's bonus chance to hit
+an enemy in combat. This bonus may come from equipment or spell effects.
+
+You also get the equivalent of 5 points of to-hit per point of Dexterity, but
+this is not included in the portion shown in your score.
+
+See also: AFFECTS, SCORE
 #
 TRANSPORTATION
 
