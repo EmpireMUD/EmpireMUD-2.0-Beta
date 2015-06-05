@@ -1213,7 +1213,7 @@ static bool tower_would_shoot(room_data *from_room, char_data *vict) {
 	char_data *m;
 	obj_data *pulling = GET_PULLING(vict);
 	int iter, distance;
-	bool hostile = (!IS_NPC(vict) && get_cooldown_time(vict, COOLDOWN_HOSTILE_FLAG) > 0);
+	bool hostile = IS_HOSTILE(vict);
 	
 	// sanity check
 	if (!emp || EXTRACTED(vict) || IS_DEAD(vict)) {
@@ -1766,7 +1766,7 @@ bool can_fight(char_data *ch, char_data *victim) {
 	// final stop before play-time
 	
 	// hostile!
-	if (get_cooldown_time(victim, COOLDOWN_HOSTILE_FLAG) > 0) {
+	if (IS_HOSTILE(victim)) {
 		return TRUE;
 	}
 	// allow-pvp
@@ -2384,7 +2384,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 	if (!IS_NPC(ch) && victim_emp && GET_LOYALTY(ch) != victim_emp) {
 		// we check the victim's master if it's an NPC and the master is a PC
 		check = (IS_NPC(victim) && victim->master && !IS_NPC(victim->master)) ? victim->master : victim;
-		if ((IS_NPC(check) || !IS_PVP_FLAGGED(check)) && get_cooldown_time(check, COOLDOWN_HOSTILE_FLAG) <= 0) {
+		if ((IS_NPC(check) || !IS_PVP_FLAGGED(check)) && !IS_HOSTILE(check)) {
 			trigger_distrust_from_hostile(ch, victim_emp);
 		}
 	}
@@ -2788,8 +2788,9 @@ void trigger_distrust_from_hostile(char_data *ch, empire_data *emp) {
 	
 	add_cooldown(ch, COOLDOWN_HOSTILE_FLAG, config_get_int("hostile_flag_time") * SECS_PER_REAL_MIN);
 	
-	// no player empire? done
+	// no player empire? mark rogue and done
 	if (!chemp) {
+		add_cooldown(ch, COOLDOWN_ROGUE_FLAG, config_get_int("rogue_flag_time") * SECS_PER_REAL_MIN);
 		return;
 	}
 	

@@ -213,8 +213,9 @@ void trigger_distrust_from_stealth(char_data *ch, empire_data *emp) {
 	
 	add_cooldown(ch, COOLDOWN_HOSTILE_FLAG, config_get_int("hostile_flag_time") * SECS_PER_REAL_MIN);
 	
-	// no player empire? done
+	// no player empire? mark rogue and done
 	if (!chemp) {
+		add_cooldown(ch, COOLDOWN_ROGUE_FLAG, config_get_int("rogue_flag_time") * SECS_PER_REAL_MIN);
 		return;
 	}
 	

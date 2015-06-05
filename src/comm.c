@@ -2376,8 +2376,13 @@ char *make_prompt(descriptor_data *d) {
 		if (wizlock_level > 0 && GET_ACCESS_LEVEL(d->character) >= LVL_START_IMM)
 			sprintf(prompt + strlen(prompt), "&g(w%d) ", wizlock_level);
 		
-		if (!IS_NPC(d->character) && get_cooldown_time(d->character, COOLDOWN_HOSTILE_FLAG) > 0) {
-			strcat(prompt, "&m(hostile) ");
+		if (!IS_NPC(d->character)) {
+			if (get_cooldown_time(d->character, COOLDOWN_ROGUE_FLAG) > 0) {
+				strcat(prompt, "&M(rogue) ");
+			}
+			else if (get_cooldown_time(d->character, COOLDOWN_HOSTILE_FLAG) > 0) {
+				strcat(prompt, "&m(hostile) ");
+			}
 		}
 
 		// IS_AFK is caused by the prf or timer>10

@@ -704,7 +704,7 @@ void mobile_activity(void) {
 							
 							// check friendly first -- so we don't attack someone who's friendly
 							if (!empire_is_friendly(chemp, victemp) && can_fight(ch, vict)) {
-								if (get_cooldown_time(vict, COOLDOWN_HOSTILE_FLAG) > 0 || (!IS_DISGUISED(vict) && empire_is_hostile(chemp, victemp, IN_ROOM(ch)))) {
+								if (IS_HOSTILE(vict) || (!IS_DISGUISED(vict) && empire_is_hostile(chemp, victemp, IN_ROOM(ch)))) {
 									if (affected_by_spell(vict, ATYPE_MAJESTY) && !AFF_FLAGGED(ch, AFF_IMMUNE_VAMPIRE)) {
 										gain_ability_exp(vict, ABIL_MAJESTY, 10);
 									}

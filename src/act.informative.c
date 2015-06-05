@@ -1024,6 +1024,9 @@ char *one_who_line(char_data *ch, bool shortlist) {
 	if (PRF_FLAGGED(ch, PRF_RP)) {
 		size += snprintf(out + size, sizeof(out) - size, " &m(RP)&0");
 	}
+	if (get_cooldown_time(ch, COOLDOWN_ROGUE_FLAG) > 0) {
+		size += snprintf(out + size, sizeof(out) - size, " &M(rogue)&0");
+	}
 
 	if (GET_INVIS_LEV(ch)) {
 		size += snprintf(out + size, sizeof(out) - size, " (i%d)", GET_INVIS_LEV(ch));

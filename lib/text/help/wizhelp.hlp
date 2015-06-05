@@ -223,6 +223,7 @@ Usage:  forgive <player>
 
 This command forgives the following conditions:
  - hostile flag
+ - rogue flag
  - empire defect timer
  - pvp flag cooldown
 

@@ -2289,6 +2289,7 @@ const char *cooldown_types[] = {
 	"shadowcage",
 	"howl",	// 50
 	"diversion",
+	"rogue flag",
 	"\n"
 };
 

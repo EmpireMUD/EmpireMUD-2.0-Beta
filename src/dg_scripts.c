@@ -2167,7 +2167,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 								remove_cooldown_by_type(c, COOLDOWN_HOSTILE_FLAG);
 							}
 						}
-						if (!IS_NPC(c) && get_cooldown_time(c, COOLDOWN_HOSTILE_FLAG) > 0)
+						if (IS_HOSTILE(c))
 							snprintf(str, slen, "1");
 						else
 							snprintf(str, slen, "0");

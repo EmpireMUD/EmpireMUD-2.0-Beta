@@ -800,6 +800,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define OLC_FLAGGED(ch, flag)  (!IS_NPC(ch) && IS_SET(GET_OLC_FLAGS(ch), (flag)))
 
 // definitions
+#define IS_HOSTILE(ch)  (!IS_NPC(ch) && (get_cooldown_time((ch), COOLDOWN_HOSTILE_FLAG) > 0 || get_cooldown_time((ch), COOLDOWN_ROGUE_FLAG) > 0))
 #define IS_HUNGRY(ch)  (GET_COND(ch, FULL) >= 360 && !HAS_ABILITY(ch, ABIL_UNNATURAL_THIRST))
 #define IS_DRUNK(ch)  (GET_COND(ch, DRUNK) >= 360)
 #define IS_GOD(ch)  (GET_ACCESS_LEVEL(ch) == LVL_GOD)

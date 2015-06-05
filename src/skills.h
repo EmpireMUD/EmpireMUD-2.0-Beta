@@ -421,6 +421,7 @@ extern bool skill_check(char_data *ch, int ability, int difficulty);
 #define COOLDOWN_SHADOWCAGE  49
 #define COOLDOWN_HOWL  50
 #define COOLDOWN_DIVERSION  51
+#define COOLDOWN_ROGUE_FLAG  52
 
 
 /* WEAPON ATTACK TYPES */

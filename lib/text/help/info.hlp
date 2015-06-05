@@ -415,17 +415,26 @@ If you're knocked out with 0 health, you will die without assistance.
 
 See also: CLASS, DEATH, ENDURANCE
 #
-HOSTILE THIEF
+HOSTILE ROGUE THIEF
 
-If you commit certain hostile or stealth acts, you may be flagged as "hostile".
+If you commit certain hostile or stealth acts, you may be flagged as 'hostile'.
 While you have the hostile flag, which lasts for one real hour, players can
 attack you as if you had toggled PVP on. City guards will also attack you, if
 they aren't from your empire.
+
+The 'rogue' flag is a stronger, longer-lasting version of 'hostile' that is
+given to players who are not members of an empire when they commit a hostile
+action. The rogue flag is visible to all players.
 
 Examples of hostile actions:
 - taking something off the ground in someone else's territory
 - attacking another empire's citizens
 - infiltrating a building
+
+You can see how long your hostile/rogue flag has left by checking your
+cooldowns.
+
+See also: COOLDOWNS
 #
 INFRA INFRAVISION
 

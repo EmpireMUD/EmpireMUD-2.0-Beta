@@ -4224,6 +4224,15 @@ ACMD(do_forgive) {
 			any = TRUE;
 		}
 		
+		if (get_cooldown_time(vict, COOLDOWN_ROGUE_FLAG) > 0) {
+			remove_cooldown_by_type(vict, COOLDOWN_ROGUE_FLAG);
+			msg_to_char(ch, "Rogue flag forgiven.\r\n");
+			if (ch != vict) {
+				act("$n has forgiven your rogue flag.", FALSE, ch, NULL, vict, TO_VICT);
+			}
+			any = TRUE;
+		}
+		
 		if (get_cooldown_time(vict, COOLDOWN_LEFT_EMPIRE) > 0) {
 			remove_cooldown_by_type(vict, COOLDOWN_LEFT_EMPIRE);
 			msg_to_char(ch, "Defect timer forgiven.\r\n");
