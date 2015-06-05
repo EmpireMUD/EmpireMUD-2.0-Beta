@@ -990,12 +990,34 @@ void load_help(FILE *fl) {
 		el.level = 0;
 
 		if (*line == '#' && *(line + 1))
+			// this uses switch, not alpha-math, because some of these levels
+			// may be the same as others, but the letters still need to work
+			// consistently -paul
 			switch (*(line + 1)) {
-				case 'a':	el.level = LVL_IMPL;		break;
-				case 'b':	el.level = LVL_CIMPL;		break;
-				case 'c':	el.level = LVL_ASST;		break;
-				case 'd':	el.level = LVL_START_IMM;	break;
-				case 'e':	el.level = LVL_APPROVED;	break;
+				case 'a': {
+					el.level = LVL_IMPL;
+					break;
+				}
+				case 'b': {
+					el.level = LVL_CIMPL;
+					break;
+				}
+				case 'c': {
+					el.level = LVL_ASST;
+					break;
+				}
+				case 'd': {
+					el.level = LVL_START_IMM;
+					break;
+				}
+				case 'e': {
+					el.level = LVL_GOD;
+					break;
+				}
+				case 'f': {
+					el.level = LVL_APPROVED;
+					break;
+				}
 			}
 
 		/* now, add the entry to the index with each keyword on the keyword line */
