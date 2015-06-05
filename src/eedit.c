@@ -211,7 +211,7 @@ ACMD(do_eedit) {
 	if (IS_NPC(ch) || !emp) {
 		msg_to_char(ch, "You are not in any empire.\r\n");
 	}
-	else if (GET_RANK(ch) < EMPIRE_NUM_RANKS(emp)) {
+	else if (!imm_access && GET_RANK(ch) < EMPIRE_NUM_RANKS(emp)) {
 		msg_to_char(ch, "Your rank is too low to edit the empire.\r\n");
 	}
 	else if (!*arg || type == NOTHING) {
