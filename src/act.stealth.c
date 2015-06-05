@@ -1486,6 +1486,9 @@ ACMD(do_shadowstep) {
 	else if (!IS_OUTDOORS(vict) && !can_use_room(ch, IN_ROOM(vict), GUESTS_ALLOWED) && (emp = ROOM_OWNER(IN_ROOM(vict))) && !can_infiltrate(ch, emp)) {
 		// can_infiltrate sends its own message
 	}
+	else if (IS_NPC(vict) && ((GET_LOYALTY(vict) && GET_LOYALTY(vict) != GET_LOYALTY(ch)) || !can_use_room(ch, IN_ROOM(vict), GUESTS_ALLOWED))) {
+		msg_to_char(ch, "You can't shadowstep to NPCs in other empires.\r\n");
+	}
 	else if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_SHADOWSTEP)) {
 		return;
 	}

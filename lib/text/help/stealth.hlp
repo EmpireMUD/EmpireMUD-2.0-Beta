@@ -362,6 +362,9 @@ appear out of another. This ability takes you instantly to your target. It has
 a maximum range of 7 map tiles and requires Infiltrate if you don't have per-
 mission to enter your target's location.
 
+You cannot shadowstep to NPCs that belong to other empires, or that are on land
+that belongs to other empires.
+
 See also: INFILTRATE
 #
 SNEAK SNEAKING
