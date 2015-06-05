@@ -373,6 +373,7 @@ the empire's properties.
 Available options:
  adjective - the form of the empire name used in some sentences
  banner - set the color codes used for your empire's name and territory
+ changeleader - lets you set a new leader
  description - shown on your empire detail
  motd - change the "message of the day"
  name - set the full name of the empire

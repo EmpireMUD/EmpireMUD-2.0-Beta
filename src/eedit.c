@@ -37,6 +37,7 @@ void eliminate_linkdead_players();
 // locals
 EEDIT(eedit_adjective);
 EEDIT(eedit_banner);
+EEDIT(eedit_change_leader);
 EEDIT(eedit_description);
 EEDIT(eedit_frontiertraits);
 EEDIT(eedit_motd);
@@ -169,6 +170,7 @@ const struct {
 } eedit_cmd[] = {
 	{ "adjective", eedit_adjective, NOBITS },
 	{ "banner", eedit_banner, NOBITS },
+	{ "changeleader", eedit_change_leader, NOBITS },
 	{ "description", eedit_description, NOBITS },
 	{ "frontiertraits", eedit_frontiertraits, NOBITS },
 	{ "motd", eedit_motd, NOBITS },
@@ -177,8 +179,6 @@ const struct {
 	{ "rank", eedit_rank, NOBITS },
 	{ "ranks", eedit_num_ranks, NOBITS },
 	
-	// TODO: change leader -- add a generic function for doing it procedurally, so it can also be done on-delete
-
 	// this goes last
 	{ "\n", NULL, NOBITS }
 };
@@ -278,6 +278,52 @@ EEDIT(eedit_banner) {
 
 		log_to_empire(emp, ELOG_ADMIN, "%s has changed the banner color", PERS(ch, ch, TRUE));
 		msg_to_char(ch, "The empire's banner is now: %s%s&0\r\n", EMPIRE_BANNER(emp), show_color_codes(EMPIRE_BANNER(emp)));
+	}
+}
+
+
+EEDIT(eedit_change_leader) {
+	bool imm_access = GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES);
+	bool file = FALSE;
+	char_data *victim;
+	
+	one_argument(argument, arg);
+	
+	if (!imm_access && GET_IDNUM(ch) != EMPIRE_LEADER(emp)) {
+		msg_to_char(ch, "Only the current leader can change leadership.\r\n");
+	}
+	else if (!*arg) {
+		msg_to_char(ch, "Change the leader to whom?\r\n");
+	}
+	else if (!(victim = find_or_load_player(arg, &file))) {
+		send_to_char("There is no such player.\r\n", ch);
+	}
+	else if (!imm_access && victim == ch) {
+		msg_to_char(ch, "You are already the leader!\r\n");
+	}
+	else if (IS_NPC(victim) || GET_LOYALTY(victim) != emp) {
+		msg_to_char(ch, "That person is not in the empire.\r\n");
+	}
+	else {
+		GET_RANK(victim) = EMPIRE_NUM_RANKS(emp);
+		EMPIRE_LEADER(emp) = GET_IDNUM(victim);
+
+		log_to_empire(emp, ELOG_MEMBERS, "%s is now the leader of the empire!", PERS(victim, victim, TRUE));
+		msg_to_char(ch, "You make %s leader of the empire.\r\n", PERS(victim, victim, TRUE));
+
+		// save now
+		if (file) {
+			store_loaded_char(victim);
+			file = FALSE;
+		}
+		else {
+			SAVE_CHAR(victim);
+		}
+	}
+	
+	// clean up
+	if (file && victim) {
+		free_char(victim);
 	}
 }
 
