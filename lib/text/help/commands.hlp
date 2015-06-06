@@ -221,7 +221,7 @@ Usage:  circle <direction>
 
 This command allows you to circle around a building. This bypasses the building
 on the map. It can't be used on walls, or buildings that are flanked on two
-sides by walls.
+sides by walls. You can circle up to three closed buildings in a row.
 #
 CLS
 
