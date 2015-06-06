@@ -1674,7 +1674,7 @@ ACMD(do_sleep) {
 			char_from_chair(ch);
 		case POS_RESTING:
 			if (IS_RIDING(ch)) {
-				msg_to_char(ch, "You climb down from your mount..\r\n");
+				msg_to_char(ch, "You climb down from your mount.\r\n");
 				perform_dismount(ch);
 			}
 			send_to_char("You lay down and go to sleep.\r\n", ch);
