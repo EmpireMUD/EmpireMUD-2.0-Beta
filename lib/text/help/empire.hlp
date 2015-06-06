@@ -1080,10 +1080,15 @@ Get a tree using the chop command.
 Get a log using the scrape command.
 
 Trees are found by chopping down forests. They are used in most buildings,
-but you must scrape them first. Be warned, however, because trees are a
-limited resource.
+but you must scrape them first. Forests will regrow if you don't chop down all
+four trees on a tile, and they also spread from overgrown forests to adjacent
+plains. Desert groves are different, and will spring up anywhere in the desert.
 
-See also: CHOP, BUILD, SCRAPE
+You can stop the spread of trees by chopping them all down, by building a
+fence, or by laying a road. Chant of Nature can be used to grow trees on bare
+plains.
+
+See also: CHANT OF NATURE, CHOP, BUILD, SCRAPE
 #
 TECHNOLOGY TECHNOLOGIES "EMPIRE TECHNOLOGY"
 
