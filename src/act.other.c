@@ -403,6 +403,7 @@ ACMD(do_confirm) {
 	bool check_reboot_confirms();
 	void perform_reboot();
 	extern struct reboot_control_data reboot_control;
+	extern const char *reboot_type[];
 	
 	if (IS_NPC(ch)) {
 		return;
@@ -419,11 +420,11 @@ ACMD(do_confirm) {
 	}
 
 	if (REBOOT_CONF(ch)) {
-		msg_to_char(ch, "You've already confirmed that you're ready for the reboot.\r\n");
+		msg_to_char(ch, "You've already confirmed that you're ready for the %s.\r\n", reboot_type[reboot_control.type]);
 	}
 	else {
 		REBOOT_CONF(ch) = TRUE;
-		msg_to_char(ch, "You have confirmed that you're ready for the reboot.\r\n");
+		msg_to_char(ch, "You have confirmed that you're ready for the %s.\r\n", reboot_type[reboot_control.type]);
 	}
 
 	if (check_reboot_confirms() && reboot_control.time <= 15) {
