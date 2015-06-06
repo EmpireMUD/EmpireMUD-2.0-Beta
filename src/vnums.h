@@ -172,6 +172,7 @@
 #define o_BLOODSWORD_LEGENDARY  1104
 #define o_FIREBALL  1105
 #define o_IMPERIUM_SPIKE  1114
+#define o_NEXUS_CRYSTAL  1115
 
 // herbs
 #define o_WHITEGRASS  1200

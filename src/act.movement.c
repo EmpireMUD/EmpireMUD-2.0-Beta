@@ -267,6 +267,33 @@ int get_north_for_char(char_data *ch) {
 }
 
 
+/**
+* Determines the cost to portal between two places.
+*
+* @param room_data *from The origin.
+* @param room_data *to The destination.
+* @return int The cost, in nexus crystals.
+*/
+int portal_cost(room_data *from, room_data *to) {
+	int cost, dist;
+	
+	// safety first
+	if (!from || !to) {
+		return 0;
+	}
+	
+	dist = compute_distance(from, to);
+	
+	// free distance
+	if (dist <= 50) {
+		return 0;
+	}
+	
+	cost = MAX(0, ceil(dist / 75.0));
+	return cost;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// MOVE VALIDATORS /////////////////////////////////////////////////////////
 
@@ -1387,7 +1414,7 @@ ACMD(do_portal) {
 	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
 	room_data *room, *next_room, *target = NULL;
 	obj_data *portal, *end, *obj;
-	int bsize, lsize, count, num, dist, cost;
+	int bsize, lsize, count, num, cost;
 	bool all = FALSE;
 	
 	argument = any_one_word(argument, arg);
@@ -1432,7 +1459,8 @@ ACMD(do_portal) {
 					lsize += snprintf(line + lsize, sizeof(line) - lsize, "(%*d, %*d) ", X_PRECISION, X_COORD(room), Y_PRECISION, Y_COORD(room));
 				}
 				
-				lsize += snprintf(line + lsize, sizeof(line) - lsize, "%s (%s%s&0)", get_room_name(room, FALSE), EMPIRE_BANNER(ROOM_OWNER(room)), EMPIRE_ADJECTIVE(ROOM_OWNER(room)));
+				cost = portal_cost(IN_ROOM(ch), room);
+				lsize += snprintf(line + lsize, sizeof(line) - lsize, "[%2d] %s (%s%s&0)", portal_cost(IN_ROOM(ch), room), get_room_name(room, FALSE), EMPIRE_BANNER(ROOM_OWNER(room)), EMPIRE_ADJECTIVE(ROOM_OWNER(room)));
 				
 				bsize += snprintf(buf + bsize, sizeof(buf) - bsize, "%s\r\n", line);
 			}
@@ -1496,19 +1524,18 @@ ACMD(do_portal) {
 		}
 	}
 	
-	// distance/cost checks
-	dist = compute_distance(IN_ROOM(ch), target);
-	cost = MAX(0, ceil(dist / 75.0));
-	if (!all_access && dist > 50 && cost > 0) {
-		Resource res[2] = { { o_LIGHTNING_STONE, cost }, END_RESOURCE_LIST };
+	// cost checks
+	cost = portal_cost(IN_ROOM(ch), target);
+	if (!all_access && cost > 0) {
+		Resource res[2] = { { o_NEXUS_CRYSTAL, cost }, END_RESOURCE_LIST };
 		if (!has_resources(ch, res, FALSE, FALSE)) {
 			msg_to_char(ch, "You need %d lightning stone%s to open a portal that far.\r\n", cost, PLURAL(cost));
 			return;
 		}
 		
 		// charge
-		msg_to_char(ch, "You toss %d lightning stone%s out onto the ground...\r\n", cost, PLURAL(cost));
-		sprintf(buf, "$n tosses %s lighting stone%s out onto the ground...", cost > 1 ? "some" : "a", PLURAL(cost));
+		msg_to_char(ch, "You toss %d nexus crystal%s out onto the ground...\r\n", cost, PLURAL(cost));
+		sprintf(buf, "$n tosses %s nexus crystal%s out onto the ground...", cost > 1 ? "some" : "a", PLURAL(cost));
 		act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
 		extract_resources(ch, res, FALSE);
 	}

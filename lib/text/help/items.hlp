@@ -197,6 +197,15 @@ buildings.
 
 See also: FORGE, MAINTAIN
 #
+"NEXUS CRYSTALS"
+
+Nexus Crystal (resource)
+
+Opening a magical portal requires nexus crystals, based on distance. These can
+be crafted from magical gems (such as the bloodstone) by any portal mage.
+
+See also: PORTAL
+#
 RETRIEVE
 
 Usage:  retrieve <item>
