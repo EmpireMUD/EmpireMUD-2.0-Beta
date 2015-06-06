@@ -568,7 +568,7 @@ RESCALE
 
 Usage:  rescale <mob/item> <level>
 
-This command allows you to rescale a mob of item. It checks for a matching mob
+This command allows you to rescale a mob or item. It checks for a matching mob
 in the room first, then an item in your inventory, then an item on the ground.
 
 The level you choose will still be constrained by the mob/item's minimum and
