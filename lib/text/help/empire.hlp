@@ -1242,7 +1242,7 @@ Workforce types:
   &ybuilding:&0 NPCs will build any building that has been started, or dismantle
             any building you've started to dismantle. They build using stored
             empire resources, not items on the ground.
-  &ychopping:&0 NPCs will chop down trees.
+  &ychopping:&0 NPCs will chop down forests and desert groves.
   &ydigging:&0 NPCs will dig for rocks in any quarry, or clay in any clay pit.
   &yfarming:&0 NPCs will harvest crops.
   &yreplanting:&0 after farming crops, NPCs will replant them.

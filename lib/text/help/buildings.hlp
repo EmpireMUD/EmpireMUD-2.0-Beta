@@ -381,13 +381,8 @@ that is leading a catapult. Advanced and Superior towers do increasingly larger
 amounts of damage.
 
 Regular guard towers have a range of 2 tiles. All other guard towers have a
-range of 3 tiles.
-
-Towers can fire over walls and buildings, but won't fire into mountains at all,
-and won't shoot into overgrown forests (&g^^^^&0) unless it is into tile
-adjacent to the tower. Plan the area around your towers carefully.
-
-Some abilities allow players to avoid detection by guard towers.
+range of 3 tiles. Towers can fire over walls and buildings, but won't fire
+into mountains. Some abilities allow players to avoid detection.
 
 Guard towers do not block players from circling around them. For optimum
 protection, build lines of wall-tower-wall-tower-wall. The walls block the
