@@ -1529,7 +1529,7 @@ ACMD(do_portal) {
 	if (!all_access && cost > 0) {
 		Resource res[2] = { { o_NEXUS_CRYSTAL, cost }, END_RESOURCE_LIST };
 		if (!has_resources(ch, res, FALSE, FALSE)) {
-			msg_to_char(ch, "You need %d lightning stone%s to open a portal that far.\r\n", cost, PLURAL(cost));
+			msg_to_char(ch, "You need %d nexus crystal%s to open a portal that far.\r\n", cost, PLURAL(cost));
 			return;
 		}
 		
