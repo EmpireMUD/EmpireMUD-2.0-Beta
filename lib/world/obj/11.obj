@@ -181,4 +181,50 @@ R
 R
 5511 0
 S
+#1115
+crystal nexus~
+a nexus crystal~
+A nexus crystal is lying here.~
+   The nexus crystal is a small, fiery gem that is used to open portals in
+certain buildings. See HELP PORTAL for information on how to use them.  
+~
+3 0 a
+0 0 0
+8 0
+R
+5185 0
+S
+#1116
+&0~
+do not use~
+Leave this object blank, it's a placeholder to block a recipe slot.~
+Or, use this vnum for an item that is NOT made by a recipe.
+There are 4 recipes for item 1115.
+~
+0 0 0
+0 0 0
+0 0
+S
+#1117
+&0~
+do not use~
+Leave this object blank, it's a placeholder to block a recipe slot.~
+Or, use this vnum for an item that is NOT made by a recipe.
+There are 4 recipes for item 1115.
+~
+0 0 0
+0 0 0
+0 0
+S
+#1118
+&0~
+do not use~
+Leave this object blank, it's a placeholder to block a recipe slot.~
+Or, use this vnum for an item that is NOT made by a recipe.
+There are 4 recipes for item 1115.
+~
+0 0 0
+0 0 0
+0 0
+S
 $
