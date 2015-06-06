@@ -1030,6 +1030,32 @@ See also: BUILD, HOME, WORKFORCE
 #
 TERRITORY
 
+(Disambiguation: Did you mean HELP TERRITORY COMMAND ?)
+
+Each empire is limited in how much territory it can claim. The formula for
+territory is:
+
+(Greatness x 35) + (Wealth / 10) + (Technologies x 15)
+
+* Greatness: This is the total Greatness of all members.
+* Wealth: Only empires with the Commerce tech can gain territory from Wealth.
+      You can gain wealth by storing precious metals in your vault.
+* Technologies: Each technology you unlock (e.g. City Lights) gives 15. These
+      only count once per empire, so two members with City Lights will not
+      result in +30 territory.
+
+80% of an empire's maximum must be within the borders of its cities. Only 20%
+of your total territory can be outside of cities. However, some buildings, such
+as Mines, do not count as outside territory no matter where you build them.
+Roads also do not count as outside.
+
+When an empire's members start time time out from lack of gameplay, the empire
+may start losing territory.
+
+See also: CITIES, EMPIRE TIMEOUT, TERRITORY COMMAND
+#
+"TERRITORY COMMAND"
+
 Usage:  territory [type]
         territory <empire> [type]  -- immortals only
 
@@ -1044,26 +1070,7 @@ that type.
 You require the Navigation ability to use the "territory" command, because it
 gives coordinates.
 
-Each empire is limited in how much territory it can claim. The formula for
-territory is:
-
-(Greatness x 35) + (Wealth / 10) + (Technologies x 15)
-
-* Greatness: This is the total Greatness of all members.
-* Wealth: Only empires with the Commerce tech can gain territory from Wealth.
-      You can gain wealth by storing precious metals in your vault.
-* Technologies: Each technology you unlock (e.g. City Lights) gives 15. These
-      only count once per empire, so two members with City Lights will not
-      result in +30 territory.
-
-80% of an empire's territory must be within the borders of its cities. The
-other 20% can be anywhere. Some buildings, like Mines, do not count as outside
-territory no matter where you build them. Roads also do not count as outside.
-
-When an empire's members start time time out from lack of gameplay, the empire
-may start losing territory.
-
-See also: CITIES, NAVIGATION, EMPIRE TIMEOUT
+See also: CITIES, NAVIGATION, TERRITORY
 #
 TREES LOGS
 
