@@ -433,8 +433,8 @@ See also: BASIC CRAFTS, FORGE
 HEALTH "HIT POINTS" HITPOINTS HP "HEALTH POINTS" "HEALTH POOL"
 
 The health pool is the amount of damage you can take before being knocked out.
-All players begin with 50 health points and remain at this level until they
-gain a class.
+All players begin with 50 health points and starts to rise around level 80.
+Your base health at level 100 is based on your class.
 
 If you're knocked out with 0 health, you will die without assistance.
 
@@ -491,12 +491,11 @@ Unlike many games, where your skills and equipment are based on your level,
 EmpireMUD does it backwards. Your level is based on your skills and gear.
 You have three different levels.
 
-Skill level: This level is determined by your top skills. When two of your
-   skills pass level 75, the game gives you a class and these become your
-   class skills. This level does not go above 100, as it is the average of
-   your two class skills. You can see it by typing "skills", or in parentheses
-   on your "score". Skill levels are grouped into three ranges: Basic (up to
-   50), Specialty (up to 75), and Class (up to 100).
+Skill level: This level is determined by your top 3 skills, and is currently
+   capped at 100. You only reach that level when you have two skills at 100
+   and one skill at 75. You can see your skill level by typing "skills", or
+   in parentheses on your "score". Skill levels are grouped into three ranges:
+   Basic (up to 50), Specialty (up to 75), and Class (up to 100).
 
 Gear level: The bonuses you receive from your equipment form your gear level.
    There is no upper limit on this number, and any gear you have equipped
@@ -525,8 +524,8 @@ Do not try to get out of a fight by breaking link. You will likely still die.
 MANA "MANA POINTS" "MANA POOL" "MAGIC POINTS"
 
 The mana pool is the amount of magical energy you can channel before you must
-stop to recover some. All players begin with 50 mana points and remain at this
-level until they gain a class.
+stop to recover some. All players begin with 50 mana points and start to rise
+around level 80. Your base mana at level 100 is based on your class.
 
 See also: CLASS, GIFT OF NATURE
 #
@@ -536,8 +535,10 @@ Move points are the basic energy pool for physical effort. It takes move points
 to walk around, and it takes move points to use many physical abilities like
 Kick or Shadowstep.
 
-All players begin with 100 move points. The easiest ways to get more are to
-make a walking stick or a good pair of shoes.
+All players begin with 100 mana points and start to rise around level 80. Your
+base move points at level 100 is based on your class. The easiest ways to get
+more move points at any level are to make a walking stick or a good pair of
+shoes.
 #
 MUDSTATS
 
