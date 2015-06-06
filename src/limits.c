@@ -300,7 +300,7 @@ void point_update_char(char_data *ch) {
 		if (weather_info.sunlight == SUN_DARK) {
 			gain_ability_exp(ch, ABIL_CITY_LIGHTS, 2);
 		}
-		else if (weather_info.sunlight == SUN_LIGHT && !ROOM_IS_CLOSED(IN_ROOM(ch))) {
+		else if (weather_info.sunlight == SUN_LIGHT && IS_OUTDOORS(ch)) {
 			gain_ability_exp(ch, ABIL_DAYWALKING, 2);
 		}
 		
