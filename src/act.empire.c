@@ -673,7 +673,7 @@ void found_city(char_data *ch, char *argument) {
 		return;
 	}
 	if (ROOM_IS_CLOSED(IN_ROOM(ch)) || COMPLEX_DATA(IN_ROOM(ch)) || IS_WATER_SECT(SECT(IN_ROOM(ch))) || ROOM_SECT_FLAGGED(IN_ROOM(ch), nocity_flags)) {
-		msg_to_char(ch, "You can't found a city right here.\r\n");
+		msg_to_char(ch, "You can't found a city on this type of terrain.\r\n");
 		return;
 	}
 	if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
