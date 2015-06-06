@@ -264,8 +264,8 @@ you specify otherwise.
 You can specify an amount to heal, but if you do this, you must specify health
 (you can't let it default to health if you want to heal a certain amount).
 
-With Vampire up to level 50, this regenerates 10 per blood point. Up to 75,
-it regenerates 15. And higher than that, it regenerates 25.
+With Vampire up to level 50, this regenerates 1 per blood point. Up to 75,
+it regenerates 1.5. And higher than that, it regenerates 2.5.
 #
 "SANGUINE RESTORATION"
 

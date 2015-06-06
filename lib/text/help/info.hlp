@@ -68,6 +68,7 @@ Mental attributes:
 
 The active attribute in each category cannot go below 1 from equipment; you
 will not be able to use any item that lowers your active attributes below 1.
+There is also currently a maximum rating of 15 in these attributes.
 
 See also: DODGE, EMPIRE GREATNESS, SECONDARY ATTRIBUTES, TO-HIT
 #

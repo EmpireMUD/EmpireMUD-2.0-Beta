@@ -50,14 +50,16 @@ for 30 seconds.
 In combat, colorburst will automatically target your current opponent if you
 do not provide a target.
 #
-"DEVASTATION RITUAL"
+"DEVASTATION RITUAL" "RITUAL OF DEVASTATION" DEVASTATE
 
 Devastation Ritual (High Sorcery ability)
 
 Usage:  ritual devastation
 
 This ritual allows a sorcerer to quickly clear a large area of land through
-ritual magic. It will bring down forests and crops within 3 tiles of the caster.
+ritual magic. It will bring down forests and crops within 3 tiles of the
+caster, one resource at a time, repeating until it completes (or until you run
+out of mana). These resources are transferred to the caster.
 
 See also: RITUAL
 #
@@ -330,8 +332,9 @@ Siphon (High Sorcery ability)
 Usage:  siphon [victim]
 Cooldown:  20 seconds
 
-You can steal mana from other using the mana siphon ability. If you are in
-combat, it will automatically target your current opponent.
+You can steal mana from other casters using the mana siphon ability. If you are
+in combat, it will automatically target your current opponent. This will boost
+your own mana regen while dropping theirs significantly.
 #
 SLOW
 

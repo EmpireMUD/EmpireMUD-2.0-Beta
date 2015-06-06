@@ -262,7 +262,7 @@ Deadly Poisons:
   slow  slower combat rate  (30 daggerbite, 15 redthorn)
   heartstop  vampires can't spend blood  (30 daggerbite, 15 redthorn)
 
-See also: MIX, RESIST POISON
+See also: RESIST POISON
 #
 PRICK
 
@@ -284,7 +284,7 @@ Sap (Stealth ability)
 Usage:  sap <victim>
 Cooldown:  9 seconds
 
-This ability will temporarily stun your victim, giving you a moment collect
+This ability will temporarily stun your victim, giving you a moment to collect
 yourself before starting combat.
 
 Only one person in the room may be sapped at a time. Using the ability on a

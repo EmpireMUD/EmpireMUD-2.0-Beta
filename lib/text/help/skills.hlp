@@ -224,7 +224,8 @@ Command:  mine
 "Mine" is both a building type, and the command to work in that building. Mines
 must be built on mountains, and can only be entered from one side even before
 you complete them. To work in a mine, you need a pick of some kind, although a
-simple handaxe will also work.
+simple handaxe will also work. A better mining tool and more Strength will help
+you mine faster.
 
 Mines have a limited amount of ore, and do not replenish. However, if you fully
 dismantle a mine, its mountain will reset when the MUD celebrates a new year
@@ -350,7 +351,7 @@ Example:
 
   > shoot deer 
 #
-SKILL SKILLS ABILITY ABILITIES
+SKILL SKILLS ABILITY ABILITIES "SKILL BUY" "SKILL RESET" "SKILL DROP"
 
 Usage:  skills -- list all skills
         skill <name> -- see abilities in that skill
@@ -398,7 +399,10 @@ zero (0). Once you have fewer than two skills at zero, you can no longer choose
 to specialize an extra skill. The opposite is also true: if you specialize an
 extra skill, you'll no longer be able to gain in your last two zeroes.
 
-See also: SKILLS, SPECIALIZE
+You can use 'skill drop' if you want to lower one of your skills so that you
+can then start raising a different one.
+
+See also: SKILLS, SKILL DROP, SPECIALIZE
 #
 "SKILL LEVELS" "SKILL POINTS" "SKILL EXPERIENCE" "SKILLUPS" EXPERIENCE
 
@@ -445,7 +449,7 @@ skill and allow you to continue leveling it.
 NOTE: This is a temporary command. In the future, we intend to use quests and
 other mechanisms for players who want to specialize.
 
-See also: SKILL
+See also: SKILL, SKILL CAPS
 #
 "STARTING LOCATION" "START LOCATION" "TOWER OF SOULS" TRANSPORT TOS
 

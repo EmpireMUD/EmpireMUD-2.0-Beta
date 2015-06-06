@@ -2352,7 +2352,7 @@ that only people with the correct permission can withdraw it.
 
 See also: OEDIT STORAGE, OLC OBJECTS
 #d
-"OEDIT WEAPONTYPE" OEDIT WEAPON TYPE" "WEAPON TYPES" "ATTACK TYPES"
+"OEDIT WEAPONTYPE" "OEDIT WEAPON TYPE" "WEAPON TYPES" "ATTACK TYPES"
 
 Usage:  .weapontype <type>
 

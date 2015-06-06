@@ -252,7 +252,7 @@ Commerce also allows you to build the mint building, and mint your own coins:
 
 [MM] mint  12 lumber, 4 nails, 12 blocks, 4 coin mills
 
-See also: BUILD, WEALTH
+See also: BUILD, MINT, WEALTH
 #
 CUSTOMIZE "CUSTOMIZE BUILDING"
 
@@ -513,6 +513,9 @@ The "fillin" command is the opposite of excavate: it fills trenches in until
 they are ordinary plains or desert again. It will also work on a player-created
 oasis or river.
 
+If you fill a desert trench, it will become an Oasis instead of a river. Oases
+convert into rivers if they are adjacent to other rivers or to oceans.
+
 There are three ways to fill a finished trench with water:
  - If there is more water adjacent, the trench will fill quickly.
  - If you pour water out on the ground, you can fill the trench yourself.
@@ -704,9 +707,12 @@ Buildings fall into disrepair over time. It costs 1 pile of lumber and 1 pouch
 of nails per year of disrepair. You can also use workforce to maintain your
 buildings.
 
+It takes roughly two and a half months (realtime) for buildings to decay,
+although unfinished buildings decay faster.
+
 Use findmaintenance to find buildings in need.
 
-See also: FINDMAINTENANCE, WORKFORCE
+See also: FINDMAINTENANCE, RUINS, WORKFORCE
 #
 MEMBERS MEMBERSHIP "EMPIRE MEMBERS" "EMPIRE MEMBERSHIP" "EMPIRE GREATNESS" "TIMED-OUT" "TIMED OUT" TIMEOUTS "EMPIRE TIMEOUT"
 

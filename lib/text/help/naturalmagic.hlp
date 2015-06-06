@@ -448,7 +448,7 @@ Usage:  worm <direction>
         worm look
 
 Particularly powerful nature mages can move while earthmelded, worming their
-way through the ground.
+way through the ground. You cannot worm through water tiles.
 
 See also: EARTHMELD
 #
