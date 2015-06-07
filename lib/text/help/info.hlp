@@ -449,7 +449,7 @@ HOSTILE ROGUE THIEF
 If you commit certain hostile or stealth acts, you may be flagged as 'hostile'.
 While you have the hostile flag, which lasts for one real hour, players can
 attack you as if you had toggled PVP on. City guards will also attack you, if
-they aren't from your empire.
+they aren't from your empire or its allies.
 
 The 'rogue' flag is a stronger, longer-lasting version of 'hostile' that is
 given to players who are not members of an empire when they commit a hostile

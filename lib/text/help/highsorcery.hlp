@@ -183,6 +183,7 @@ MIRRORIMAGE "MIRROR IMAGE"
 Mirrorimage (High Sorcery ability)
 
 Usage:  mirrorimage
+Cooldown:  5 minutes
 
 This spell creates an identical duplicate of the caster (with reduced health).
 It's good enough to fool at least one of the people hitting you.

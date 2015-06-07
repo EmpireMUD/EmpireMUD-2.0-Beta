@@ -130,7 +130,7 @@ FLINT "FLINT SET"
 Flint can be combined with rocks (using CRAFT) to create a flint set, which
 can then be used to light torches.
 
-See also: LIGHT
+See also: DIG, LIGHT
 #
 GATHER
 
@@ -351,7 +351,7 @@ Example:
 
   > shoot deer 
 #
-SKILL SKILLS ABILITY ABILITIES "SKILL BUY" "SKILL RESET" "SKILL DROP"
+SKILL SKILLS ABILITY ABILITIES "SKILL BUY" "SKILL RESET"
 
 Usage:  skills -- list all skills
         skill <name> -- see abilities in that skill
@@ -377,7 +377,7 @@ without the skill name, you can see which skills have free resets available.
 It also shows the range in which you can gain the skill, although you can gain
 no more than 10 points from any one ability.
 
-See also: NOSKILL, SPECIALIZE, SKILL CAPS, SKILL LEVELS
+See also: NOSKILL, SPECIALIZE, SKILL CAPS, SKILL DROP, SKILL LEVELS
 #
 "SKILL CAPS" CAPS "MAX SKILL" "MAXIMUM SKILL" "CLASS SKILLS" "SPECIALTY SKILLS" "BASIC SKILLS"
 
@@ -403,6 +403,19 @@ You can use 'skill drop' if you want to lower one of your skills so that you
 can then start raising a different one.
 
 See also: SKILLS, SKILL DROP, SPECIALIZE
+#
+"SKILL DROP"
+
+Usage:  skill drop <skill> <level>
+
+This command allows you to voluntary give up points in one of your skills.
+You might do this because you accidentally raised one from 0, or because you
+want to try a different specialty.
+
+Once you use this command, those skill points are gone forever. You will also
+lose any abilities you purchased above the new level.
+
+See also: SKILL
 #
 "SKILL LEVELS" "SKILL POINTS" "SKILL EXPERIENCE" "SKILLUPS" EXPERIENCE
 
