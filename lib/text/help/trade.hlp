@@ -168,6 +168,7 @@ FORGE
 Forge (Trade ability)
 
 Building:  (FF)  Forge  (no skill required)
+Resources:  10 logs, 15 rocks, 10 iron ingots
 Built on:  plains, desert
 Command:  forge [number] <item>
 Tool:  hammer
@@ -405,6 +406,7 @@ POTTER POTTERY CLAY
 Pottery (Trade ability)
 
 Building:  (PP) potter  10 logs, 1 stone block
+Resources:  10 logs, 1 stone block
 Command:  craft [number] <item>
 
 Clay is found by digging near water and can be stored at the Potter.

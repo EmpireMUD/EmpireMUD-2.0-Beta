@@ -747,7 +747,7 @@ Monuments (Empire ability)
 The Monuments ability allows you to build monuments.
 
 &g.&0}{&g.&0 statue  6 lumber, 2 nails, 10 blocks
-<<>> henge  120 stone blocks (30 per corner)
+<<>> henge  120 stone blocks
 &g.&0||&g.&0 megalith  40 stone blocks
 &g.&0i&g.&0i cemetery  8 stone blocks
 &g.^.&co&0 park  25 sticks, 4 blocks
@@ -868,6 +868,7 @@ QUARRY
 
 Command:  quarry
 Building:  |__|  Quarry  (no skill required)
+Resources:  4 logs, 20 sticks
 Built on:  plains or desert, facing mountain
 
 A quarry must be built on plains or desert, facing a mountain. Quarries are a
