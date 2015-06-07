@@ -463,7 +463,8 @@ Usage:  interlink <direction> <code>
 Some buildings can be interlinked. You can connect the interior rooms of one
 interlinkable building to the interior rooms of a different nearby building.
 
-You can only interlink to buildings that are 4 tiles away or less.
+You can only interlink to buildings that are 4 tiles away or less. This limit
+drops to 1 in the mountains and you can't interlink over rivers at all.
 
 Typing "interlink" by itself will provide you with the interlink code for your
 current location.

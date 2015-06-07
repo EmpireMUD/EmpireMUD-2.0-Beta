@@ -43,6 +43,7 @@ Colorburst (High Sorcery ability)
 
 Usage:  colorburst [victim]
 Cooldown:  30 seconds
+Debuff type:  High Sorcery
 
 Shoot a disorienting burst of color at your foe. This effect gives -10% to-hit
 for 30 seconds.
@@ -134,6 +135,7 @@ Enervate (High Sorcery ability)
 
 Usage:  enervate <victim>
 Cooldown:  75 seconds
+Debuff type:  High Sorcery
 
 Your victim is enervated: he loses move regen. You are able to leech some
 of this for yourself, and your move regeneration receive a temporary boost.
@@ -331,6 +333,7 @@ Siphon (High Sorcery ability)
 
 Usage:  siphon [victim]
 Cooldown:  20 seconds
+Debuff type:  High Sorcery
 
 You can steal mana from other casters using the mana siphon ability. If you are
 in combat, it will automatically target your current opponent. This will boost
@@ -342,6 +345,7 @@ Slow (High Sorcery ability)
 
 Usage:  slow [victim]
 Cooldown:  75 seconds
+Debuff type:  High Sorcery
 
 This ability hexes your victim with lethargy, causing them to attack more
 slowly in combat. If you're already fighting and do not specify a victim, it
@@ -425,6 +429,7 @@ Sunshock (High Sorcery ability)
 
 Usage:  sunshock [victim]
 Cooldown:  9 seconds
+Debuff type:  High Sorcery
 
 Sunshock blasts your target with the pure light of the sun. This deals a small
 amount of damage (scaled by your level in High Sorcery), and causes a very

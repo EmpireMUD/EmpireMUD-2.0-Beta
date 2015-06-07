@@ -131,6 +131,7 @@ Entangle (Natural Magic ability)
 
 Usage:  entangle [target]
 Cooldown:  30 seconds
+Debuff type:  Natural Magic
 
 Nature mages have the power to entangle their foes in mana, preventing them
 from getting away.
@@ -236,6 +237,7 @@ Lightningbolt (Natural Magic ability)
 
 Usage:  lightningbolt [target]
 Cooldown:  9 seconds
+Debuff type:  Natural Magic
 
 A powerful nature mage can shoot bolts of lightning from her fingertips,
 causing massive trauma to the target, and leaving them shocked. Victims con-
@@ -377,6 +379,7 @@ Skybrand (Natural Magic ability)
 
 Usage:  skybrand [target]
 Cooldown:  6 seconds
+Debuff type:  Natural Magic
 
 A nature mage can mark a target with the Skybrand, causing the victim to take
 damage for several seconds. This ability stacks up to 3 times.

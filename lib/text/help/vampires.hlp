@@ -29,7 +29,7 @@ Alacrity (Vampire ability)
 
 Usage:  alacrity
 Cost:  10 blood
-Upkeep:  2 blood/hr
+Upkeep:  3 blood/hr
 
 This ability grants a vampire haste, at the cost of blood.
 #
@@ -138,6 +138,7 @@ COMMAND
 Command (Vampire ability)
 
 Usage:  command <name> <task> [sentence]
+Debuff type:  Vampire
 
 A vampire with this power can look deep into the eyes of men and command them
 to do simple tasks. The task can be just one word, which must be spoken aloud
@@ -217,7 +218,8 @@ makes them beyond reproach. It is very difficult to attack a majestic vampire.
 While Majesty is active, players are immune to random encounters such as
 sharks. Aggressive NPCs may still attack, but will be delayed.
 
-This power offers more protection to characters with higher Charisma.
+This power offers more protection to characters with higher Charisma. NPCs
+that are immune to Vampire debuffs are also immune to Majesty.
 #
 "MIST FORM"
 
@@ -364,6 +366,7 @@ Weaken (Vampire ability)
 
 Usage:  weaken [victim]
 Cooldown:  75 seconds
+Debuff type:  Vampire
 
 A vampire who is learned in the ways of blood can use her own blood to drain
 the strength of others for 75 seconds.

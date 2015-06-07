@@ -45,6 +45,7 @@ Blind (Stealth ability)
 
 Usage:  blind [victim]
 Cooldown:  10 seconds
+Debuff type:  Stealth
 
 You toss sand in your opponents' eyes, blinding them for 10 seconds.
 
@@ -116,10 +117,11 @@ disappear into the crowd.
 SHADOWCAGE "SHADOW CAGE"
 
 Shadowcage
-Class ability: Occultist
-Debuff type: Stealth
-Cost: 50 move
-Cooldown: 30 seconds
+Class ability:  Occultist
+Debuff type:  Stealth
+Cost:  50 move
+Cooldown:  30 seconds
+Usage:  shadowcage
 
 You create a cage of shadows, penalizing all enemies. The first victim loses
 dodge equal to 5x your Charsima. Each additional victim loses dodge equal to 3x
@@ -128,10 +130,11 @@ Charisma instead.
 DIVERSION
 
 Diversion
-Class ability: Smuggler
-Debuff type: Stealth
-Cost: 50 move
-Cooldown: 30 seconds
+Class ability:  Smuggler
+Debuff type:  Stealth
+Cost:  50 move
+Cooldown:  30 seconds
+Usage:  diversion
 
 You create a flashy diversion, penalizing all enemies. The first victim loses
 Wits equal to your Charsima. Each additional victim loses Wits equal to half
@@ -163,10 +166,11 @@ See also: SEARCH, SNEAK
 HOWL
 
 Howl
-Class ability: Shadow Wolf
-Debuff type: Stealth
-Cost: 50 move
-Cooldown: 30 seconds
+Class ability:  Shadow Wolf
+Debuff type:  Stealth
+Cost:  50 move
+Cooldown:  30 seconds
+Usage:  howl
 
 You let out a terrifying howl, penalizing all enemies. The first victim loses
 to-hit equal to 5x your Charsima. Each additional victim loses to-hit equal to
@@ -244,7 +248,8 @@ envenom them with your chosen poison. When the vial runs out of poison, it will
 be removed from your inventory.
 
 All vials have 15 charges. Deadly Poisons doubles the effects of most poisons.
-Poisons only work with sharp weapons.
+Poisons only work with sharp weapons. Poisons also count as Stealth debuffs,
+and some NPCs are immune.
 
 Basic Poisons:
   searing  +5 damage  (30 bileberries)
@@ -283,6 +288,7 @@ Sap (Stealth ability)
 
 Usage:  sap <victim>
 Cooldown:  9 seconds
+Debuff type:  Stealth, Stun
 
 This ability will temporarily stun your victim, giving you a moment to collect
 yourself before starting combat.
@@ -330,8 +336,8 @@ See also: JAB
 "SHADOW KICK"
 
 Shadow Kick
-Class ability: Assassin
-Debuff type: Battle
+Class ability:  Assassin
+Debuff type:  Battle
 
 Your Kick ability causes a penalty to physical and magical damage equal to
 your total level divided by 50 for 10 seconds.
@@ -431,7 +437,8 @@ Terrify (Stealth ability)
 
 Usage:  terrify [victim]
 Cooldown:  15 seconds
-Debuff type: Stealth
+Debuff type:  Stealth
+Cost:  15 moves
 
 Use the power of the shadows to make your foes cower in fear, lowering the
 physical and magical damage they deal by an amount equal to your total level

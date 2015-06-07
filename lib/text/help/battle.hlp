@@ -55,6 +55,7 @@ Bash (Battle ability)
 
 Usage:  bash [target]
 Cooldown:  9 seconds
+Debuff type:  Battle, Stun
 
 Bash your target with your weapon and send him flying to the ground. When you
 successfully bash, your target is briefly stunned.
@@ -85,6 +86,7 @@ take less damage before you've even gotten to your opponent.
 "CUT DEEP" "DEEP CUTS"
 
 Cut Deep (Battle ability)
+Debuff type:  Battle
 
 Once you learn to cut deep, your sharp attacks have a chance to cause deep
 cuts that bleed for additional damage. Higher Battle skill level results in
@@ -96,6 +98,7 @@ Disarm (Battle ability)
 
 Usage:  disarm [target]
 Cooldown:  30 seconds
+Debuff type:  Battle
 
 In battle you can disarm your target, reducing the damage he deals by knocking
 away his weapon for a few seconds. If you're fighting someone already, you do
@@ -152,6 +155,7 @@ Heartstop (Battle ability)
 
 Usage:  heartstop [target]
 Cooldown:  30 seconds
+Debuff type:  Battle
 
 Learn to fight vampires and win as you find the right spot to hit to stop them
 from using their blood to activate their deadly powers!
@@ -290,6 +294,7 @@ See also: SCORE
 "STUNNING BLOW"
 
 Stunning Blow (Battle ability)
+Debuff type:  Battle, Stun
 
 With this passive ability, your blunt weapons have a chance to knock your
 opponent down and stun him briefly, similar to a Bash.
