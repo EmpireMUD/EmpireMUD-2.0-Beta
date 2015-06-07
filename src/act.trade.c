@@ -882,6 +882,8 @@ ACMD(do_reforge) {
 	bool found;
 	obj_data *obj, *new, *proto;
 	
+	bitvector_t preserve_flags = OBJ_HARD_DROP | OBJ_GROUP_DROP;	// flags to copy over if obj is reloaded
+	
 	// reforge <item> name <name>
 	// reforge <item> renew
 	
@@ -995,6 +997,7 @@ ACMD(do_reforge) {
 			level = GET_OBJ_CURRENT_SCALE_LEVEL(obj);
 			
 			new = read_object(GET_OBJ_VNUM(proto));
+			GET_OBJ_EXTRA(new) |= GET_OBJ_EXTRA(obj) & preserve_flags;
 			
 			// transfer bindings
 			OBJ_BOUND_TO(new) = OBJ_BOUND_TO(obj);
@@ -1054,6 +1057,7 @@ ACMD(do_reforge) {
 			level = GET_OBJ_CURRENT_SCALE_LEVEL(obj);
 			
 			new = read_object(GET_OBJ_VNUM(proto));
+			GET_OBJ_EXTRA(new) |= GET_OBJ_EXTRA(obj) & preserve_flags;
 			
 			// transfer bindings
 			OBJ_BOUND_TO(new) = OBJ_BOUND_TO(obj);

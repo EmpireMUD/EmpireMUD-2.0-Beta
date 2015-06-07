@@ -4834,7 +4834,7 @@ ACMD(do_rescale) {
 	char_data *vict;
 	int level;
 	
-	bitvector_t preserve_flags = OBJ_SUPERIOR;	// flags to copy over if obj is reloaded
+	bitvector_t preserve_flags = OBJ_SUPERIOR | OBJ_HARD_DROP | OBJ_GROUP_DROP;	// flags to copy over if obj is reloaded
 
 	argument = one_argument(argument, arg);
 	skip_spaces(&argument);
