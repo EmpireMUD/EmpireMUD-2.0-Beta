@@ -239,12 +239,15 @@ It is added to damage in the same way as Strength.
 
 See also: SCORE
 #
-"CAMPING FIRE" "COOKING FIRE" "CAMP FIRE"
+FIRE "CAMPING FIRE" "COOKING FIRE" "CAMP FIRE"
 
 You can create a cooking fire by lighting a tree or log, using a flint set.
 This will let you cook food, brew potions, or craft pottery.
 
-See also: LIGHT
+You can also cook in a Kitchen, Alchemist, Pottery, or Laboratory. If you have
+the Touch of Flame ability, you don't need a fire at all.
+
+See also: LIGHT, TOUCH OF FLAME
 #
 CHAMELEON
 
