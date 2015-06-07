@@ -378,8 +378,8 @@ void update_class(char_data *ch) {
 		GET_SKILL_LEVEL(ch) = (best_total - IGNORE_BOTTOM_SKILL_POINTS) * 100 / MAX(1, BEST_SUM_REQUIRED_FOR_100 - IGNORE_BOTTOM_SKILL_POINTS);
 		GET_SKILL_LEVEL(ch) = MIN(CLASS_SKILL_CAP, MAX(1, GET_SKILL_LEVEL(ch)));
 		
-		// level!
-		if (class != CLASS_NONE) {
+		// set progression (% of the way from 75 to 100)
+		if (class != CLASS_NONE && GET_SKILL_LEVEL(ch) >= SPECIALTY_SKILL_CAP) {
 			// class progression level based on % of the way
 			GET_CLASS_PROGRESSION(ch) = (GET_SKILL_LEVEL(ch) - SPECIALTY_SKILL_CAP) * 100 / (CLASS_SKILL_CAP - SPECIALTY_SKILL_CAP);
 		}
