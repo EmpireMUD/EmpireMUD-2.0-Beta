@@ -1991,6 +1991,9 @@ Available flags:
  *KEEP - player has marked the object with the 'keep' command
  TOOL-PAN - can pan for gold if holding this
  TOOL-SHOVEL - acts as a shovel for dig and excavate
+ !AUTOSTORE - will not autostore (e.g. furniture)
+ HARD-DROP - was dropped by a hard mob (CAUTION: it will set this itself when dropped as loot)
+ GROUP-DROP - was dropped by a hard mob (CAUTION: it will set this itself when dropped as loot)
 
 See also: OLC OBJECTS
 #d

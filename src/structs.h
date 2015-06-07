@@ -955,6 +955,8 @@ typedef struct trig_data trig_data;
 #define OBJ_TOOL_PAN  BIT(19)	// t. counts as pan
 #define OBJ_TOOL_SHOVEL  BIT(20)	// u. counts as shovel
 #define OBJ_NO_AUTOSTORE  BIT(21)	// v. keeps the game from cleaning it up
+#define OBJ_HARD_DROP  BIT(22)	// w. dropped by a 'hard' mob
+#define OBJ_GROUP_DROP  BIT(22)	// x. dropped by a 'group' mob
 
 #define OBJ_BIND_FLAGS  (OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP)	// all bind-on flags
 

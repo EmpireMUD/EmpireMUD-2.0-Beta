@@ -1426,6 +1426,8 @@ const char *extra_bits[] = {
 	"TOOL-PAN",
 	"TOOL-SHOVEL",
 	"!AUTOSTORE",
+	"HARD-DROP",
+	"GROUP-DROP",
 	"\n"
 };
 
@@ -1454,6 +1456,8 @@ const char *extra_bits_inv_flags[] = {
 	"",	// pan
 	"",	// shovel
 	"",	// !autostore
+	"",	// hard-drop
+	"",	// group-drop
 	"\n"
 };
 
@@ -1481,7 +1485,9 @@ const double obj_flag_scaling_bonus[] = {
 	1.0,	// OBJ_KEEP
 	1.0,	// OBJ_TOOL_PAN
 	1.0,	// OBJ_TOOL_SHOVEL
-	1.0	// OBJ_NO_AUTOSTORE
+	1.0,	// OBJ_NO_AUTOSTORE
+	1.2,	// OBJ_HARD_DROP
+	1.5	// OBJ_GROUP_DROP
 };
 
 
