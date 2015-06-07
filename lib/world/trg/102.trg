@@ -850,7 +850,7 @@ if !%actor.can_afford(1000)%
 end
 nop %actor.charge_coins(1000)%
 %load% obj %vnum% %actor% inv
-%send% %actor% You buy %named% for 1000 coins
+%send% %actor% You buy %named% for 1000 coins.
 %echoaround% %actor% %actor.name% buys %named%.
 ~
 #10274
