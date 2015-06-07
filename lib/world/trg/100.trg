@@ -642,7 +642,7 @@ end
 eval charge %%actor.add_resources(10036,-%cost%)%%
 nop %charge%
 %load% obj %vnum% %actor% inv %actor.level%
-%send% %actor% You buy a %named% for %cost% skystones.
+%send% %actor% You buy %named% for %cost% skystones.
 %echoaround% %actor% %actor.name% buys a %named%.
 ~
 #10038
