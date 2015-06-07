@@ -286,6 +286,9 @@ The Jewelry ability is a forge specialization that can make:
   wedding band  1 gold
   crown  4 gold
 
+All silver costs are in nuggets and gold costs are in dust. You can smelt bars
+back down into these forms if you have already smelted them into bars.
+
 See also: FORGE, WEAPONCRAFTING, ARMORSMITHING
 #
 LEATHERWORKING
