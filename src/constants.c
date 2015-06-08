@@ -1428,6 +1428,7 @@ const char *extra_bits[] = {
 	"!AUTOSTORE",
 	"HARD-DROP",
 	"GROUP-DROP",
+	"GENERIC-DROP",
 	"\n"
 };
 
@@ -1458,6 +1459,7 @@ const char *extra_bits_inv_flags[] = {
 	"",	// !autostore
 	"",	// hard-drop
 	"",	// group-drop
+	"",	// generic-drop
 	"\n"
 };
 
@@ -1487,7 +1489,8 @@ const double obj_flag_scaling_bonus[] = {
 	1.0,	// OBJ_TOOL_SHOVEL
 	1.0,	// OBJ_NO_AUTOSTORE
 	1.2,	// OBJ_HARD_DROP
-	1.4	// OBJ_GROUP_DROP
+	1.4,	// OBJ_GROUP_DROP
+	1.0	// OBJ_GENERIC_DROP
 };
 
 

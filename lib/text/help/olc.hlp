@@ -1994,6 +1994,7 @@ Available flags:
  !AUTOSTORE - will not autostore (e.g. furniture)
  HARD-DROP - was dropped by a HARD mob (CAUTION: it will set this itself when dropped as loot)
  GROUP-DROP - was dropped by a GROUP mob (CAUTION: it will set this itself when dropped as loot)
+ GENERIC-DROP - never receives the HARD-DROP/GROUP-DROP flags
 
 See also: OLC OBJECTS
 #d

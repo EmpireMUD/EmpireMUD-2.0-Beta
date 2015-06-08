@@ -894,11 +894,13 @@ void drop_loot(char_data *mob, char_data *killer) {
 				obj = read_object(interact->vnum);
 				
 				// set flags (before scaling)
-				if (MOB_FLAGGED(mob, MOB_HARD)) {
-					SET_BIT(GET_OBJ_EXTRA(obj), OBJ_HARD_DROP);
-				}
-				if (MOB_FLAGGED(mob, MOB_GROUP)) {
-					SET_BIT(GET_OBJ_EXTRA(obj), OBJ_GROUP_DROP);
+				if (!OBJ_FLAGGED(obj, OBJ_GENERIC_DROP)) {
+					if (MOB_FLAGGED(mob, MOB_HARD)) {
+						SET_BIT(GET_OBJ_EXTRA(obj), OBJ_HARD_DROP);
+					}
+					if (MOB_FLAGGED(mob, MOB_GROUP)) {
+						SET_BIT(GET_OBJ_EXTRA(obj), OBJ_GROUP_DROP);
+					}
 				}
 				
 				// scale
