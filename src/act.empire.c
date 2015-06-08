@@ -646,6 +646,7 @@ void downgrade_city(char_data *ch, char *argument) {
 
 void found_city(char_data *ch, char *argument) {
 	extern struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_data *location, int type);
+	void stop_room_action(room_data *room, int action, int chore);
 	extern int num_of_start_locs;
 	extern int *start_locs;
 	
@@ -752,6 +753,15 @@ void found_city(char_data *ch, char *argument) {
 	else {
 		log_to_empire(emp, ELOG_TERRITORY, "%s has founded %s", PERS(ch, ch, 1), city->name);
 	}
+	
+	stop_room_action(IN_ROOM(ch), ACT_CHOPPING, CHORE_CHOPPING);
+	stop_room_action(IN_ROOM(ch), ACT_PICKING, CHORE_FARMING);
+	stop_room_action(IN_ROOM(ch), ACT_DIGGING, NOTHING);
+	stop_room_action(IN_ROOM(ch), ACT_EXCAVATING, NOTHING);
+	stop_room_action(IN_ROOM(ch), ACT_FILLING_IN, NOTHING);
+	stop_room_action(IN_ROOM(ch), ACT_GATHERING, NOTHING);
+	stop_room_action(IN_ROOM(ch), ACT_HARVESTING, NOTHING);
+	stop_room_action(IN_ROOM(ch), ACT_PLANTING, NOTHING);
 	
 	read_empire_territory(emp);
 	save_empire(emp);
