@@ -238,6 +238,8 @@ void string_add(descriptor_data *d, char *str) {
 					else {
 						*GET_ADMIN_NOTES(vict) = '\0';
 					}
+					
+					syslog(SYS_GC, GET_INVIS_LEV(d->character), TRUE, "GC: %s has edited notes for %s", GET_REAL_NAME(d->character), GET_REAL_NAME(vict));
 										
 					// save now
 					if (file) {
