@@ -897,7 +897,7 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 		if (!IS_NPC(i) && !IS_DISGUISED(i)) {
 			// basic description -- don't show if morphed
 			if (GET_LONG_DESC(i) && (IS_NPC(i) || GET_MORPH(i) == MORPH_NONE)) {
-				send_to_char(GET_LONG_DESC(i), ch);
+				msg_to_char(ch, "%s&0", GET_LONG_DESC(i));
 			}
 
 			if (HAS_INFRA(i)) {
