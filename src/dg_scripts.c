@@ -2021,7 +2021,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							int sk = NO_SKILL, amount = 0;
 							
 							comma_args(subfield, arg1, arg2);
-							if (*arg1 && *arg2 && (sk = find_skill_by_name(arg1)) != NO_SKILL && (amount = atoi(arg2)) != 0) {
+							if (*arg1 && *arg2 && (sk = find_skill_by_name(arg1)) != NO_SKILL && (amount = atoi(arg2)) != 0 && !NOSKILL_BLOCKED(c, sk)) {
 								gain_skill(c, sk, amount);
 								snprintf(str, slen, "1");
 							}
@@ -2324,7 +2324,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							int sk = NO_SKILL, sk_lev = 0;
 							
 							comma_args(subfield, arg1, arg2);
-							if (*arg1 && *arg2 && (sk = find_skill_by_name(arg1)) != NO_SKILL && (sk_lev = atoi(arg2)) >= 0 && sk_lev <= CLASS_SKILL_CAP) {
+							if (*arg1 && *arg2 && (sk = find_skill_by_name(arg1)) != NO_SKILL && (sk_lev = atoi(arg2)) >= 0 && sk_lev <= CLASS_SKILL_CAP && (sk_lev < GET_SKILL(c, sk) || !NOSKILL_BLOCKED(c, sk))) {
 								// TODO skill cap checking! need a f() like can_set_skill_to(ch, sk, lev)
 								set_skill(c, sk, sk_lev);
 								snprintf(str, slen, "1");
