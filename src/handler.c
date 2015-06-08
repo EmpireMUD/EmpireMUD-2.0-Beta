@@ -554,15 +554,14 @@ void affect_total(char_data *ch) {
 	
 	// Base energies do not change
 	if (!IS_NPC(ch)) {
+		GET_MAX_HEALTH(ch) = base_player_pools[HEALTH];
+		GET_MAX_MOVE(ch) = base_player_pools[MOVE];
+		GET_MAX_MANA(ch) = base_player_pools[MANA];
+		
 		if (GET_CLASS(ch) != CLASS_NONE) {
-			GET_MAX_HEALTH(ch) = MAX(base_player_pools[HEALTH], GET_CLASS_PROGRESSION(ch) * class_data[GET_CLASS(ch)].max_pools[HEALTH] / 100);
-			GET_MAX_MOVE(ch) = MAX(base_player_pools[MOVE], GET_CLASS_PROGRESSION(ch) * class_data[GET_CLASS(ch)].max_pools[MOVE] / 100);
-			GET_MAX_MANA(ch) = MAX(base_player_pools[MANA], GET_CLASS_PROGRESSION(ch) * class_data[GET_CLASS(ch)].max_pools[MANA] / 100);
-		}
-		else {
-			GET_MAX_HEALTH(ch) = base_player_pools[HEALTH];
-			GET_MAX_MOVE(ch) = base_player_pools[MOVE];
-			GET_MAX_MANA(ch) = base_player_pools[MANA];
+			GET_MAX_HEALTH(ch) += MAX(0, GET_CLASS_PROGRESSION(ch) * (class_data[GET_CLASS(ch)].max_pools[HEALTH] - base_player_pools[HEALTH]) / 100);
+			GET_MAX_MOVE(ch) += MAX(0, GET_CLASS_PROGRESSION(ch) * (class_data[GET_CLASS(ch)].max_pools[MOVE] - base_player_pools[MOVE]) / 100);
+			GET_MAX_MANA(ch) += MAX(0, GET_CLASS_PROGRESSION(ch) * (class_data[GET_CLASS(ch)].max_pools[MANA] - base_player_pools[MANA]) / 100);
 		}
 	}
 
