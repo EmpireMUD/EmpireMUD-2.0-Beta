@@ -93,6 +93,7 @@ ACMD(do_create) {
 	obj_data *proto, *obj = NULL;
 	obj_data *obj_iter, *next_obj;
 	int cost, iter, mat, num = 1, count = 0;
+	bool imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_LOAD));
 	bool low_res = FALSE;
 
 	// create [number] <name list>
@@ -139,7 +140,7 @@ ACMD(do_create) {
 	// make them!
 	for (iter = 0; iter < num && !low_res; ++iter) {
 		// imms have no need to have the resources (just gods)
-		if (GET_RESOURCE(ch, mat) >= cost || IS_IMMORTAL(ch)) {
+		if (GET_RESOURCE(ch, mat) >= cost || imm_access) {
 			++count;
 			GET_RESOURCE(ch, mat) = MAX(0, GET_RESOURCE(ch, mat) - cost);
 			obj = read_object(GET_OBJ_VNUM(proto));
