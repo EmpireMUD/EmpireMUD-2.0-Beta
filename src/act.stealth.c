@@ -59,8 +59,8 @@ bool can_infiltrate(char_data *ch, empire_data *emp) {
 	struct empire_political_data *pol;
 	empire_data *chemp = GET_LOYALTY(ch);
 	
-	// if either is not in an empire, it's all good
-	if (!emp || !chemp) {
+	// no empire = no problem
+	if (!emp) {
 		return TRUE;
 	}
 	
@@ -74,6 +74,16 @@ bool can_infiltrate(char_data *ch, empire_data *emp) {
 		return FALSE;
 	}
 	
+	if (!PRF_FLAGGED(ch, PRF_STEALTHABLE)) {
+		msg_to_char(ch, "You cannot infiltrate because your 'stealthable' toggle is off.\r\n");
+		return FALSE;
+	}
+	
+	// further checks only matter if ch is in an empire
+	if (!chemp) {
+		return TRUE;
+	}
+	
 	pol = find_relation(chemp, emp);
 	
 	if (pol && IS_SET(pol->type, DIPL_ALLIED | DIPL_NONAGGR)) {
@@ -83,11 +93,6 @@ bool can_infiltrate(char_data *ch, empire_data *emp) {
 	
 	if (GET_RANK(ch) < EMPIRE_PRIV(chemp, PRIV_STEALTH) && (!pol || !IS_SET(pol->type, DIPL_WAR))) {
 		msg_to_char(ch, "You don't have permission from your empire to infiltrate others. Are you trying to start a war?\r\n");
-		return FALSE;
-	}
-	
-	if (!PRF_FLAGGED(ch, PRF_STEALTHABLE)) {
-		msg_to_char(ch, "You cannot infiltrate because your 'stealthable' toggle is off.\r\n");
 		return FALSE;
 	}
 	
@@ -109,8 +114,8 @@ bool can_steal(char_data *ch, empire_data *emp) {
 	struct empire_political_data *pol;
 	empire_data *chemp = GET_LOYALTY(ch);
 	
-	// if either is not in an empire, it's all good
-	if (!emp || !chemp) {
+	// no empire = ok
+	if (!emp) {
 		return TRUE;
 	}
 	
@@ -137,6 +142,11 @@ bool can_steal(char_data *ch, empire_data *emp) {
 	if (count_members_online(emp) == 0) {
 		msg_to_char(ch, "There are no members of %s online.\r\n", EMPIRE_NAME(emp));
 		return FALSE;
+	}
+	
+	// further checks don't matter if ch is in no empire
+	if (!chemp) {
+		return TRUE;
 	}
 	
 	pol = find_relation(chemp, emp);
