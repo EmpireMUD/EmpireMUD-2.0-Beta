@@ -199,7 +199,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	int iter, found;
 	
 	// ONLY flags to show
-	bitvector_t show_obj_flags = OBJ_LIGHT | OBJ_SUPERIOR | OBJ_ENCHANTED | OBJ_JUNK | OBJ_TWO_HANDED | OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP;
+	bitvector_t show_obj_flags = OBJ_LIGHT | OBJ_SUPERIOR | OBJ_ENCHANTED | OBJ_JUNK | OBJ_TWO_HANDED | OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP | OBJ_HARD_DROP | OBJ_GROUP_DROP;
 	
 	// sanity / don't bother
 	if (!obj || !ch || !ch->desc) {
