@@ -3310,14 +3310,14 @@ ACMD(do_pledge) {
 	if (IS_NPC(ch))
 		return;
 
-	one_argument(argument, arg);
+	skip_spaces(&argument);
 
 	if (IS_NPC(ch)) {
 		return;
 	}
 	else if ((old = GET_LOYALTY(ch)) && EMPIRE_LEADER(old) != GET_IDNUM(ch))
 		msg_to_char(ch, "You're already a member of an empire.\r\n");
-	else if (!(e = get_empire_by_name(arg)))
+	else if (!(e = get_empire_by_name(argument)))
 		msg_to_char(ch, "There is no empire by that name.\r\n");
 	else if (GET_LOYALTY(ch) == e) {
 		msg_to_char(ch, "You are already a member of that empire. In fact, you seem to be the most forgetful member.\r\n");
