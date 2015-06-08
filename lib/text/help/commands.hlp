@@ -321,7 +321,9 @@ DISMISS
 
 Usage:  dismiss <familiar>
 
-This command causes your familiar to leave.
+This command causes your familiar to leave. You can target the familiar by
+name if it's in the room with you, or else can type 'dismiss familiar' to
+dismiss it anywhere in the world.
 #
 DOUSE BURNING "PUT OUT FIRE"
 

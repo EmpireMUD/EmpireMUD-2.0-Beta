@@ -35,6 +35,7 @@
 */
 
 // external prototypes
+extern char_data *has_familiar(char_data *ch);
 void Objsave_char(char_data *ch, int rent_code);
 void scale_item_to_level(obj_data *obj, int level);
 
@@ -459,6 +460,19 @@ ACMD(do_dismiss) {
 	
 	if (!*arg) {
 		msg_to_char(ch, "Dismiss whom?\r\n");
+	}
+	else if (!strn_cmp(argument, "famil", 5) && is_abbrev(argument, "familiar")) {
+		// requires abbrev of at least "famil"
+		if (!(vict = has_familiar(ch))) {
+			msg_to_char(ch, "You do not have a familiar to dismiss.\r\n");
+		}
+		else {
+			if (IN_ROOM(ch) != IN_ROOM(vict)) {
+				msg_to_char(ch, "You dismiss %s.\r\n", PERS(vict, vict, FALSE));
+			}
+			act("$n is dismissed and vanishes!", TRUE, vict, NULL, NULL, TO_ROOM);
+			extract_char(vict);
+		}
 	}
 	else if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
@@ -1382,7 +1396,6 @@ ACMD(do_summon) {
 	bool check_scaling(char_data *mob, char_data *attacker);
 	extern bool check_vampire_sun(char_data *ch, bool message);
 	void summon_materials(char_data *ch, char *argument);
-	extern char_data *has_familiar(char_data *ch);
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	
 	char_data *mob;
