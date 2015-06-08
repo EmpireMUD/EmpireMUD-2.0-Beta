@@ -2566,7 +2566,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 				act("$n's last attack cuts deep -- $N is bleeding!", FALSE, ch, NULL, victim, TO_NOTVICT);
 
 				if (can_gain_skill) {
-					gain_ability_exp(ch, ABIL_CUT_DEEP, 1);
+					gain_ability_exp(ch, ABIL_CUT_DEEP, 10);
 				}
 			}
 		
@@ -2580,7 +2580,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 				act("$n's last blow seems to stun $N!", FALSE, ch, NULL, victim, TO_NOTVICT);
 
 				if (can_gain_skill) {
-					gain_ability_exp(ch, ABIL_STUNNING_BLOW, 1);
+					gain_ability_exp(ch, ABIL_STUNNING_BLOW, 10);
 				}
 			}
 			
