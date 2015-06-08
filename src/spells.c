@@ -283,7 +283,7 @@ void perform_chant(char_data *ch) {
 	// effects?
 	switch (chant) {
 		case 0: {	// druids
-			if (CAN_GAIN_NEW_SKILLS(ch) && GET_SKILL(ch, SKILL_NATURAL_MAGIC) == 0 && number(0, 99) == 0) {
+			if (CAN_GAIN_NEW_SKILLS(ch) && GET_SKILL(ch, SKILL_NATURAL_MAGIC) == 0 && number(0, 99) == 0 && !NOSKILL_BLOCKED(ch, SKILL_NATURAL_MAGIC)) {
 				msg_to_char(ch, "&gAs you chant, you begin to see the weave of mana through nature...&0\r\n");
 				set_skill(ch, SKILL_NATURAL_MAGIC, 1);
 				SAVE_CHAR(ch);
