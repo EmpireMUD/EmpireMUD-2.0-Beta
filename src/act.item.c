@@ -637,7 +637,7 @@ int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname) {
 			if (IS_IMMORTAL(ch)) {
 				for (iter = ROOM_PEOPLE(IN_ROOM(ch)); iter; iter = iter->next_in_room) {
 					if (iter != ch && !IS_NPC(iter) && !IS_IMMORTAL(iter)) {
-						syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s drops %s with mortal present (%s)", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), GET_NAME(iter));
+						syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s drops %s with mortal present (%s) at %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), GET_NAME(iter), room_log_identifier(IN_ROOM(ch)));
 						break;
 					}
 				}
