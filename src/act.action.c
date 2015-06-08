@@ -391,9 +391,6 @@ static void start_digging(char_data *ch) {
 
 		send_to_char("You begin to dig into the ground.\r\n", ch);
 		act("$n kneels down and begins to dig.", TRUE, ch, 0, 0, TO_ROOM);
-		
-		// finder triggers on start-dig
-		gain_ability_exp(ch, ABIL_FINDER, 5);
 	}
 }
 
@@ -436,8 +433,6 @@ void start_panning(char_data *ch) {
 		
 		msg_to_char(ch, "You kneel down and begin panning at the shore.\r\n");
 		act("$n kneels down and begins panning at the shore.", TRUE, ch, 0, 0, TO_ROOM);
-
-		gain_ability_exp(ch, ABIL_FINDER, 5);
 	}
 }
 
@@ -452,7 +447,6 @@ void start_picking(char_data *ch) {
 	
 	start_action(ch, ACT_PICKING, pick_base_timer / (HAS_ABILITY(ch, ABIL_FINDER) ? 2 : 1), 0);
 	send_to_char("You begin looking around.\r\n", ch);
-	gain_ability_exp(ch, ABIL_FINDER, 5);
 }
 
 
@@ -517,6 +511,9 @@ INTERACTION_FUNC(finish_digging) {
 		if (obj) {
 			act(buf1, FALSE, ch, obj, 0, TO_CHAR);
 			act("$n pulls $p from the ground!", FALSE, ch, obj, 0, TO_ROOM);
+		
+			// if they have this, it levels now
+			gain_ability_exp(ch, ABIL_FINDER, 5);
 		}
 	}
 	
@@ -553,6 +550,9 @@ INTERACTION_FUNC(finish_gathering) {
 			gain_skill_exp(ch, SKILL_SURVIVAL, 10);
 		}
 		// action does not end normally
+		
+		// if they have this, it levels now
+		gain_ability_exp(ch, ABIL_FINDER, 5);
 		
 		return TRUE;
 	}
@@ -656,6 +656,9 @@ INTERACTION_FUNC(finish_picking_herb) {
 			act("You find $p!", FALSE, ch, obj, 0, TO_CHAR);
 		}
 		act("$n finds $p!", TRUE, ch, obj, 0, TO_ROOM);
+		
+		// if they have this, it levels now
+		gain_ability_exp(ch, ABIL_FINDER, 5);
 	}
 	else {
 		msg_to_char(ch, "You find nothing.\r\n");
@@ -1257,7 +1260,6 @@ void process_gathering(char_data *ch) {
 				// check repeatability
 				if (CAN_INTERACT_ROOM(IN_ROOM(ch), INTERACT_GATHER)) {
 					GET_ACTION_TIMER(ch) = gather_base_timer / (HAS_ABILITY(ch, ABIL_FINDER) ? 2 : 1);
-					gain_ability_exp(ch, ABIL_FINDER, 5);
 				}
 				else {
 					GET_ACTION(ch) = ACT_NONE;
@@ -1520,6 +1522,9 @@ void process_panning(char_data *ch) {
 				act("You find $p!", FALSE, ch, obj, 0, TO_CHAR);
 				add_depletion(IN_ROOM(ch), DPLTN_PAN, TRUE);
 				load_otrigger(obj);
+				
+				// if they have this, it levels now
+				gain_ability_exp(ch, ABIL_FINDER, 5);
 				
 				if (in_room == IN_ROOM(ch)) {
 					start_panning(ch);
@@ -2255,9 +2260,6 @@ ACMD(do_gather) {
 		start_action(ch, ACT_GATHERING, gather_base_timer / (HAS_ABILITY(ch, ABIL_FINDER) ? 2 : 1), 0);
 		
 		send_to_char("You begin looking around for sticks.\r\n", ch);
-		
-		// finder triggers on start-gather
-		gain_ability_exp(ch, ABIL_FINDER, 5);
 	}
 }
 
