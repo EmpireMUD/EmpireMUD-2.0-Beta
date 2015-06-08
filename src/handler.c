@@ -3339,21 +3339,30 @@ obj_data *copy_warehouse_obj(obj_data *input) {
 * @param obj_data *obj The object to empty.
 */
 void empty_obj_before_extract(obj_data *obj) {
+	void get_check_money(char_data *ch, obj_data *obj);
+	
 	obj_data *jj, *next_thing;
 	
 	for (jj = obj->contains; jj; jj = next_thing) {
 		next_thing = jj->next_content;		/* Next in inventory */
 
-		if (obj->in_obj)
+		if (obj->in_obj) {
 			obj_to_obj(jj, obj->in_obj);
-		else if (obj->carried_by)
+		}
+		else if (obj->carried_by) {
 			obj_to_char(jj, obj->carried_by);
-		else if (obj->worn_by)
+			get_check_money(obj->worn_by, jj);
+		}
+		else if (obj->worn_by) {
 			obj_to_char(jj, obj->worn_by);
-		else if (IN_ROOM(obj))
+			get_check_money(obj->worn_by, jj);
+		}
+		else if (IN_ROOM(obj)) {
 			obj_to_room(jj, IN_ROOM(obj));
-		else
+		}
+		else {
 			extract_obj(jj);
+		}
 	}
 }
 

@@ -141,7 +141,7 @@ int find_eq_pos(char_data *ch, obj_data *obj, char *arg) {
 * @param char_data *ch The person getting obj.
 * @param obj_data *obj The item being picked up.
 */
-static void get_check_money(char_data *ch, obj_data *obj) {
+void get_check_money(char_data *ch, obj_data *obj) {
 	int value = GET_COINS_AMOUNT(obj);
 	empire_data *emp = real_empire(GET_COINS_EMPIRE_ID(obj));
 
