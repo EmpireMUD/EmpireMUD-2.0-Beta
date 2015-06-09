@@ -753,7 +753,7 @@ MUDCOMMAND CMD.MUDCOMMAND %CMD.MUDCOMMAND% %MUDCOMMAND%
 any abbreviations.
  
 * check for command sit with arg chair. Also matching any abbreviations. 
-if %cmd.mudcommand% == sit && chair /= %arg% && %arg%
+if %cmd.mudcommand% == sit &&&& chair /= %arg% &&&& %arg%
 #d
 TRIGEDIT-VARIABLES-TEXTS TEXT-VAR %ARG% .CDR .CAR ARG.CDR CMD.CDR ARG.CAR CMD.CAR %TEXT% PUSH CMD %CMD% %CDR% %CAR% %TRIM% TRIGEDIT-TEXT-VAR %STRLEN%
 
@@ -805,7 +805,7 @@ time.<field>  - Field may be hour, day, month, or year. The returned value will
 timestamp     - Current unix timestamp.
 weather       - One of: sunny, cloudy, raining, lightning
 |%var%        - name's, someone's, your
-&%var%        - it, you, he/she -- DOES NOT WORK
+&&%var%        - it, you, he/she -- DOES NOT WORK
 *%var%        - it, you, him/her
 * object only
 '%obj%        - something, name
@@ -965,7 +965,7 @@ evaluated from left to right. Parenthesis can be used to group.
 |Operator|         Name          | Examples  0=False 1=True  |
 --------------------------------------------------------------
 |   ||   | logical or            | 0 || ( ) = 0; 5 || 0 = 1  |
-|   &&   | logical and           | 1 && 0 = 0; 5 && 3 = 1    |
+|   &&&&   | logical and           | 1 &&&& 0 = 0; 5 &&&& 3 = 1    |
 |   ==   | equivalence           | 5 == 3 = 0; dog == DoG = 1| 
 |   !=   | inequality            | 0 != Z = 0; dog != d = 1  | 
 |   <    | less than             | 4 < 3 = 0; 4 < 5 = 1      |
