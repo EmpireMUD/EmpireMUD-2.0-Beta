@@ -519,7 +519,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 
 // definitions
 #define GET_OBJ_INVENTORY_SIZE(obj)  (OBJ_FLAGGED((obj), OBJ_LARGE) ? 2 : 1)
-#define IS_STOLEN(obj)  ((config_get_int("stolen_object_timer") * SECS_PER_REAL_MIN) + GET_STOLEN_TIMER(obj) > time(0))
+#define IS_STOLEN(obj)  (GET_STOLEN_TIMER(obj) > 0 && (config_get_int("stolen_object_timer") * SECS_PER_REAL_MIN) + GET_STOLEN_TIMER(obj) > time(0))
 
 // helpers
 #define OBJ_FLAGGED(obj, flag)  (IS_SET(GET_OBJ_EXTRA(obj), (flag)))
