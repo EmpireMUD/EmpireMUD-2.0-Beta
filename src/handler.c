@@ -3842,7 +3842,7 @@ void obj_to_char(obj_data *object, char_data *ch) {
 		}
 		
 		// update last owner/empire -- only if not stolen
-		if (time(0) - GET_STOLEN_TIMER(object) > config_get_int("stolen_object_timer") * SECS_PER_REAL_MIN) {
+		if (!IS_STOLEN(object)) {
 			if (IS_NPC(ch)) {
 				object->last_owner_id = NOBODY;
 				object->last_empire_id = NOTHING;
@@ -3886,7 +3886,7 @@ void obj_to_char_or_room(obj_data *obj, char_data *ch) {
 		}
 		
 		// set ownership as if they got it -- if not stolen
-		if (time(0) - GET_STOLEN_TIMER(obj) > config_get_int("stolen_object_timer") * SECS_PER_REAL_MIN) {
+		if (!IS_STOLEN(obj)) {
 			if (IS_NPC(ch)) {
 				obj->last_owner_id = NOBODY;
 				obj->last_empire_id = NOTHING;

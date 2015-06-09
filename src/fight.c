@@ -937,8 +937,6 @@ obj_data *make_corpse(char_data *ch) {
 	obj_data *corpse, *o, *next_o;
 	int i;
 	bool human = (!IS_NPC(ch) || MOB_FLAGGED(ch, MOB_HUMAN));
-	
-	int stolen_object_timer = config_get_int("stolen_object_timer") * SECS_PER_REAL_MIN;
 
 	corpse = read_object(o_CORPSE);
 	
@@ -1009,14 +1007,14 @@ obj_data *make_corpse(char_data *ch) {
 			next_o = o->next;
 			
 			// is it stolen?
-			if (GET_STOLEN_TIMER(o) + stolen_object_timer > time(0)) {
+			if (IS_STOLEN(o)) {
 				obj_to_obj(o, corpse);
 			}
 		}
 		
 		// check eq for stolen
 		for (i = 0; i < NUM_WEARS; ++i) {
-			if (GET_EQ(ch, i) && GET_STOLEN_TIMER(GET_EQ(ch, i)) + stolen_object_timer > time(0)) {
+			if (GET_EQ(ch, i) && IS_STOLEN(GET_EQ(ch, i))) {
 				obj_to_obj(unequip_char(ch, i), corpse);
 			}
 		}

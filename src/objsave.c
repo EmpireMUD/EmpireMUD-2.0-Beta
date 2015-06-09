@@ -649,7 +649,7 @@ void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location) {
 	if (obj->last_owner_id != NOBODY) {
 		fprintf(fl, "Last-owner: %d\n", obj->last_owner_id);
 	}
-	if (time(0) - obj->stolen_timer < config_get_int("stolen_object_timer") * SECS_PER_REAL_MIN) {
+	if (IS_STOLEN(obj)) {
 		fprintf(fl, "Stolen-timer: %d\n", (int) obj->stolen_timer);
 	}
 	if (GET_AUTOSTORE_TIMER(obj) > 0) {

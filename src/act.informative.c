@@ -1435,6 +1435,10 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 		if (strncmp(flags, "NOBITS", 6)) {
 			sprintf(buf + strlen(buf), " %*s", ((int)strlen(flags)-1), flags);	// remove trailing space
 		}
+		
+		if (IS_STOLEN(obj)) {
+			strcat(buf, " (STOLEN)");
+		}
 	}
 	
 	if (mode == OBJ_DESC_LOOK_AT) {
