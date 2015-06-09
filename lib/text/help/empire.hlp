@@ -342,7 +342,7 @@ members is online.
 
 Options:
   peace    - an end to a war, or a good starting relationship
-  war      - a state of supreme distrust and hate
+  war*     - a state of supreme distrust and hate
              depending on the pk option set on the mud, you may only be able
              to kill someone from an empire you're at war with
   ally     - share facilities and friendship
@@ -352,6 +352,13 @@ Options:
              exchange goods and services
   distrust - a state just short of war which indicates hatred
   truce    - ends a war or distrustful state without creating peace
+
+* To declare war, an empire must immediately spend an amount of money based
+on the difference between the two empires' composite scores. You can see the
+cost to declare war on the empire detail page for any empire you're not in
+a non-aggression pact (or better) with.
+
+See also: EMPIRE SCORE
 #
 DRAGONRIDING "DRAGON RIDING"
 
