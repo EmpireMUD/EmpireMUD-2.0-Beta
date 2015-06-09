@@ -144,6 +144,8 @@ pvp_timer 5
 seconds_per_death 30
 stolen_object_timer 30
 stun_immunity_time 5
+war_cost_max 50000
+war_cost_min 5000
 war_login_delay 30
 *
 * World configs

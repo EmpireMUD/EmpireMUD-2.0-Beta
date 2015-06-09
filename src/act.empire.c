@@ -63,6 +63,36 @@ void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool 
 //// HELPERS /////////////////////////////////////////////////////////////////
 
 /**
+* Determines how much an empire must spend to start a war with another empire,
+* based on the configs "war_cost_max" and "war_cost_min". This is calculated
+* by the difference in score between the two empires with the maximum value at
+* a difference of 50 or more. The function is a simple parabola.
+*
+* @param empire_data *emp The empire declaring war.
+* @param empire_data *victim The victim empire.
+* @return int The cost, in coins, to go to war.
+*/
+int get_war_cost(empire_data *emp, empire_data *victim) {
+	int min = config_get_int("war_cost_min"), max = config_get_int("war_cost_max");
+	int score_e, score_v;
+	double diff, max_diff;
+	int cost;
+	
+	score_e = emp ? get_total_score(emp) : 0;
+	score_v = victim ? get_total_score(victim) : 0;
+	
+	// difference between scores (caps at 50)
+	max_diff = 50;
+	diff = ABSOLUTE(score_e - score_v);
+	diff = MIN(diff, max_diff);
+	
+	// simple parabola: y = ax^2 + b, a = (max-min)/max_diff^2, b = min
+	cost = (max - min) / (max_diff * max_diff) * (diff * diff) + min;
+	return cost;
+}
+
+
+/**
 * for do_empires
 *
 * @param char_data *ch who to send to
@@ -176,6 +206,14 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 		comma = TRUE;
 	}
 	msg_to_char(ch, ")\r\n");
+
+	// show war cost?
+	if (GET_LOYALTY(ch) && GET_LOYALTY(ch) != e && !EMPIRE_IMM_ONLY(e) && !EMPIRE_IMM_ONLY(GET_LOYALTY(ch)) && !has_relationship(GET_LOYALTY(ch), e, DIPL_NONAGGR | DIPL_ALLIED)) {
+		int war_cost = get_war_cost(GET_LOYALTY(ch), e);
+		if (war_cost > 0) {
+			msg_to_char(ch, "Cost to declare war on this empire: %d coin%s\r\n", war_cost, PLURAL(war_cost));
+		}
+	}
 
 	// diplomacy
 	if (EMPIRE_DIPLOMACY(e)) {
@@ -1998,22 +2036,31 @@ ACMD(do_diplomacy) {
 			else
 				msg_to_char(ch, "But you already have better relations!\r\n");
 			break;
-		case 1:		/* War */
+		case 1: {	/* War */
+			int war_cost = get_war_cost(e, f);
+			
 			if (IS_SET(pol_a->type, DIPL_WAR))
 				msg_to_char(ch, "You're already at war!\r\n");
 			else if (count_members_online(f) == 0) {
 				msg_to_char(ch, "You can't declare war on an empire if none of their members are online!\r\n");
 			}
+			else if (EMPIRE_COINS(e) < war_cost) {
+				msg_to_char(ch, "The empire requires %d coin%s in the vault in order to finance the war with %s!\r\n", war_cost, PLURAL(war_cost), EMPIRE_NAME(f));
+			}
 			else {
 				pol_a->start_time = pol_b->start_time = time(0);
 				pol_a->offer = pol_b->offer = 0;
 				pol_a->type = pol_b->type = DIPL_WAR;
-				log_to_empire(e, ELOG_DIPLOMACY, "War has been declared upon %s!", EMPIRE_NAME(f));
+				
+				EMPIRE_COINS(e) -= war_cost;
+				
+				log_to_empire(e, ELOG_DIPLOMACY, "War has been declared upon %s for %d coin%s!", EMPIRE_NAME(f), war_cost, PLURAL(war_cost));
 				log_to_empire(f, ELOG_DIPLOMACY, "%s has declared war!", EMPIRE_NAME(e));
 				syslog(SYS_INFO, 0, TRUE, "WAR: %s (%s) has declared war on %s", EMPIRE_NAME(e), GET_NAME(ch), EMPIRE_NAME(f));
 				send_config_msg(ch, "ok_string");
 			}
 			break;
+		}
 		case 2:		/* Ally */
 			if (IS_SET(pol_b->offer, DIPL_ALLIED)) {
 				REMOVE_BIT(pol_b->offer, DIPL_ALLIED | DIPL_NONAGGR | DIPL_PEACE | DIPL_TRUCE);
