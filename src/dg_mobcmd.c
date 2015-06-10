@@ -61,6 +61,7 @@ extern const char *dirs[];
 void die(char_data *ch, char_data *killer);
 extern struct instance_data *get_instance_by_mob(char_data *mob);
 extern room_data *get_room(room_data *ref, char *name);
+void instance_obj_setup(struct instance_data *inst, obj_data *obj);
 extern struct instance_data *real_instance(any_vnum instance_id);
 void send_char_pos(char_data *ch, int dam);
 void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
@@ -476,6 +477,7 @@ ACMD(do_mload) {
 	void scale_item_to_level(obj_data *obj, int level);
 	void scale_mob_to_level(char_data *mob, int level);
 	
+	struct instance_data *inst = get_instance_by_mob(ch);
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	int number = 0;
 	char_data *mob, *tch;
@@ -539,6 +541,10 @@ ACMD(do_mload) {
 		if ((object = read_object(number)) == NULL) {
 			mob_log(ch, "mload: bad object vnum");
 			return;
+		}
+		
+		if (inst) {
+			instance_obj_setup(inst, object);
 		}
 		
 		/* special handling to make objects able to load on a person/in a container/worn etc. */
