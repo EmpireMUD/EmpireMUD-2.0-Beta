@@ -446,9 +446,9 @@ Usage:  eval <variable> <expression>
 
 * this example immediately evaluates the expression below and stores the result
 * in %result%:
-eval result %self.hitp% * 100 / %self.maxhitp% 
+eval result %self.health% * 100 / %self.maxhealth% 
 say My hitpoint percentage is %result%
-* this result will not change after the evaluation even if %self.hitp% changes.
+* this result will not change after the evaluation even if %self.health% changes.
 
    The eval command is used to set (or create) the specified variable equal to 
 the result of the immediate evaluation of the provided expression. There also 
@@ -465,8 +465,8 @@ Set sets variable to value, without evaluating it.
  Example: set foobar 15 - 5
  sets the variable foobar to the string "15 - 5"
 
-* this example sets the value of result to '%self.hitp% * 100 / %self.maxhitp%'
-set result %self.hitp% * 100 / %self.maxhitp% 
+* this example sets the value of result to '%self.health% * 100 / %self.maxhealth%'
+set result %self.health% * 100 / %self.maxhealth% 
 * The %result% var now works as a 'function' every time it's accessed.
 say My hitpoint percentage is %result%
 %damage% %self% 30
@@ -865,6 +865,7 @@ add_mob_flag(flg) - Adds a mob flag to the mob. Also, remove_mob_flag().
 alias             - The list of aliases of the mob or the player name. 
 aff_flagged(flg)  - Checks if the actor has an AFF flag (e.g. ENTANGLED).
 affect()          - Checks the actor for the affect in the subfield 
+blood(amt)        - Returns current blood, or adds/removes blood if amt is set.
 can_afford(amt)   - Checks if the actor has enough coins of any converted type.
 can_gain_new_skills - Checks if the character can gain a new skill from 0.
 charge_coins(amt) - Charges the actor a number of coins.
@@ -900,7 +901,7 @@ has_item()        - Checks if the actor has a object (inventory, equipped and
 heshe             - Returns the correct pronoun (he/she/it).
 himher            - Returns the correct pronoun (him/her/it).
 hisher            - Returns the correct pronoun (his/her/its).
-hitp              - The current hit points of the actor.      
+health            - The current hit points of the actor.      
 home              - Room id of the player's home, if any.
 id                - The unique id of the actor.
 int               - The actor's intelligence.
@@ -922,7 +923,7 @@ is_pc             - Checks if the actor is a player. Useful when you want a
 level             - The actor's computed level (or scaled level, for mobs).
 mana              - The current mana points of the actor.
 master            - The master of the actor (as an id), or an empty return.
-maxhitp           - The maximum hit points of the actor.
+maxhealth         - The maximum hit points of the actor.
 maxmana           - The maximum mana points of the actor.
 maxmove           - The maximum movement points of the actor.
 mob_flagged(flag) - Returns TRUE if the NPC has the given flag, e.g. VAMPIRE.

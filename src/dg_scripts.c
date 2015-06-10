@@ -1871,8 +1871,31 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				case 'b': {
 					if (!str_cmp(field, "block"))
 						snprintf(str, slen, "%d", GET_BLOCK(c));
-					else if (!str_cmp(field, "blood"))
-						snprintf(str, slen, "%d", GET_BLOOD(c));
+					else if (!str_cmp(field, "blood")) {
+						if (subfield && *subfield) {
+							int amt = atoi(subfield);
+							if (amt != 0) {
+								GET_BLOOD(c) += amt;
+								GET_BLOOD(c) = MAX(GET_BLOOD(c), 0);
+								GET_BLOOD(c) = MIN(GET_BLOOD(c), GET_MAX_BLOOD(c));
+								
+								if (GET_BLOOD(c) == 0) {
+									void out_of_blood(char_data *ch);
+									
+									out_of_blood(c);
+									
+									if (c == ch && EXTRACTED(c)) {
+										// in case
+										dg_owner_purged = 1;
+									}
+								}
+							}
+						}
+						else {
+							// current blood
+							snprintf(str, slen, "%d", GET_BLOOD(c));
+						}
+					}
 					break;
 				}
 				case 'c':
