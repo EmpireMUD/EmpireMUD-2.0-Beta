@@ -1434,7 +1434,7 @@ int text_processed(char *field, char *subfield, struct trig_var_data *vd, char *
 void find_replacement(void *go, struct script_data *sc, trig_data *trig, int type, char *var, char *field, char *subfield, char *str, size_t slen) {
 	struct room_direction_data *ex;	
 	struct trig_var_data *vd=NULL;
-	char_data *ch, *c = NULL, *rndm;
+	char_data *ch = NULL, *c = NULL, *rndm;
 	obj_data *obj = NULL, *o = NULL;
 	room_data *room, *r = NULL;
 	char *name;
@@ -1884,7 +1884,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 									
 									out_of_blood(c);
 									
-									if (c == ch && EXTRACTED(c)) {
+									if (ch && c == ch && EXTRACTED(c)) {
 										// in case
 										dg_owner_purged = 1;
 									}
