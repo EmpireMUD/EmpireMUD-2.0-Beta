@@ -777,7 +777,7 @@ typedef struct trig_data trig_data;
 #define MOB_MOUNTAINWALK  BIT(10)	// k. Walks on mountains
 #define MOB_AQUATIC  BIT(11)	// l. Mob lives in the water only
 #define MOB_PLURAL  BIT(12)	// m. Mob represents 2+ creatures
-#define MOB_RANDOM_ENCOUNTER  BIT(13)	// n. Mob which doesn't normally exist
+	#define MOB_UNUSED1  BIT(13)	// no longer used
 #define MOB_SPAWNED  BIT(14)	// o. Mob was spawned and should despawn if nobody is around
 #define MOB_CHAMPION  BIT(15)	// p. Mob auto-rescues its master
 #define MOB_EMPIRE  BIT(16)	// q. empire NPC
