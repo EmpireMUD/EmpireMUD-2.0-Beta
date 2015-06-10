@@ -38,6 +38,7 @@ room_data *get_room(room_data *ref, char *name);
 obj_data *get_obj_by_room(room_data *room, char *name);
 char_data *get_char_in_room(room_data *room, char *name);
 obj_data *get_obj_in_room(room_data *room, char *name);
+void instance_obj_setup(struct instance_data *inst, obj_data *obj);
 void scale_item_to_level(obj_data *obj, int level);
 void scale_mob_to_level(char_data *mob, int level);
 void wld_command_interpreter(room_data *room, char *argument);
@@ -549,7 +550,7 @@ WCMD(do_wload) {
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
-	struct instance_data *inst;
+	struct instance_data *inst = find_instance_by_room(room);
 	int number = 0;
 	char_data *mob, *tch;
 	obj_data *object, *cnt;
@@ -594,12 +595,16 @@ WCMD(do_wload) {
 			return;
 		}
 		
+		if (inst) {
+			instance_obj_setup(inst, object);
+		}
+		
 		/* special handling to make objects able to load on a person/in a container/worn etc. */
 		if (!target || !*target) {
 			obj_to_room(object, room);
 
 			// adventure is level-locked?		
-			if ((inst = find_instance_by_room(room)) && inst->level > 0) {
+			if (inst && inst->level > 0) {
 				scale_item_to_level(object, inst->level);
 			}
 		
