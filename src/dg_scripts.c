@@ -1890,6 +1890,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 									}
 								}
 							}
+							
+							// return current remainder
+							snprintf(str, slen, "%d", GET_BLOOD(c));
 						}
 						else {
 							// current blood
