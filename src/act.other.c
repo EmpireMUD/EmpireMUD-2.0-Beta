@@ -228,7 +228,7 @@ static void print_group(char_data *ch) {
 INTERACTION_FUNC(shear_interact) {
 	char buf[MAX_STRING_LENGTH];
 	int iter, amt;
-	obj_data *obj;
+	obj_data *obj = NULL;
 	
 	add_cooldown(inter_mob, COOLDOWN_SHEAR, config_get_int("shear_growth_time") * SECS_PER_REAL_HOUR);
 	WAIT_STATE(ch, 2 RL_SEC);
@@ -265,7 +265,7 @@ INTERACTION_FUNC(shear_interact) {
 
 INTERACTION_FUNC(skin_interact) {
 	char buf[MAX_STRING_LENGTH];
-	obj_data *obj;
+	obj_data *obj = NULL;
 	int num;
 
 	SET_BIT(GET_OBJ_VAL(inter_item, VAL_CORPSE_FLAGS), CORPSE_SKINNED);
