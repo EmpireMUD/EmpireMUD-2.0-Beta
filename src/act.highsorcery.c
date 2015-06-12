@@ -1917,7 +1917,6 @@ RITUAL_FINISH_FUNC(perform_devastation_ritual) {
 	crop_data *cp;
 	int dist, iter;
 	int x, y, num;
-	bool junk;
 	
 	#define CAN_DEVASTATE(room)  ((ROOM_SECT_FLAGGED((room), SECTF_HAS_CROP_DATA) || CAN_CHOP_ROOM(room)) && !ROOM_AFF_FLAGGED((room), ROOM_AFF_HAS_INSTANCE))
 	#define DEVASTATE_RANGE  3	// tiles
@@ -1961,7 +1960,7 @@ RITUAL_FINISH_FUNC(perform_devastation_ritual) {
 			}
 		}
 		else if (ROOM_SECT_FLAGGED(to_room, SECTF_CROP) && (cp = crop_proto(ROOM_CROP_TYPE(to_room))) && has_interaction(GET_CROP_INTERACTIONS(cp), INTERACT_HARVEST)) {
-			run_room_interactions(ch, to_room, INTERACT_HARVEST, devastate_crop, &junk);
+			run_room_interactions(ch, to_room, INTERACT_HARVEST, devastate_crop);
 			change_terrain(to_room, climate_default_sector[GET_CROP_CLIMATE(cp)]);
 		}
 		else if (ROOM_SECT_FLAGGED(to_room, SECTF_HAS_CROP_DATA) && (cp = crop_proto(ROOM_CROP_TYPE(to_room)))) {

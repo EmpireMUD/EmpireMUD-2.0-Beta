@@ -141,7 +141,6 @@ ACMD(do_butcher) {
 	
 	char_data *proto;
 	obj_data *corpse;
-	bool junk;
 	
 	one_argument(argument, arg);
 
@@ -178,7 +177,7 @@ ACMD(do_butcher) {
 		return;
 	}
 	else {
-		if (run_interactions(ch, proto->interactions, INTERACT_BUTCHER, IN_ROOM(ch), NULL, corpse, butcher_interact, &junk)) {
+		if (run_interactions(ch, proto->interactions, INTERACT_BUTCHER, IN_ROOM(ch), NULL, corpse, butcher_interact)) {
 			// success
 		}
 		else {
@@ -252,7 +251,6 @@ ACMD(do_fish) {
 
 ACMD(do_forage) {
 	int cost = 1;
-	bool junk;
 	
 	int short_depletion = config_get_int("short_depletion");
 	
@@ -274,7 +272,7 @@ ACMD(do_forage) {
 		return;
 	}
 
-	if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_FORAGE, do_one_forage, &junk)) {
+	if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_FORAGE, do_one_forage)) {
 		// success
 		charge_ability_cost(ch, MOVE, cost, NOTHING, 0);
 		gain_ability_exp(ch, ABIL_FORAGE, 15);

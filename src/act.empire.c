@@ -1549,6 +1549,7 @@ ACMD(do_barde) {
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	
 	Resource res[2] = { { o_IRON_INGOT, 10 }, END_RESOURCE_LIST };
+	struct interact_exclusion_data *excl = NULL;
 	struct interaction_item *interact;
 	char_data *mob, *newmob = NULL;
 	bool found;
@@ -1584,7 +1585,7 @@ ACMD(do_barde) {
 		// find interact
 		found = FALSE;
 		for (interact = mob->interactions; interact; interact = interact->next) {
-			if (CHECK_INTERACT(interact, INTERACT_BARDE)) {
+			if (interact->type == INTERACT_BARDE && check_exclusion_set(&excl, interact->exclusion_code, interact->percent)) {
 				if (!found) {
 					// first one found
 					act("You strap heavy armor onto $N.", FALSE, ch, NULL, mob, TO_CHAR);
@@ -1618,10 +1619,8 @@ ACMD(do_barde) {
 				mob = newmob;
 				load_mtrigger(mob);
 								
-				// barde ALWAYS requires exclusive because the original mob and interactions are gone
-				if (TRUE || interact->exclusive) {
-					break;
-				}
+				// barde ALWAYS breaks because the original mob and interactions are gone
+				break;
 			}
 		}
 
@@ -1633,6 +1632,8 @@ ACMD(do_barde) {
 		else {
 			act("You can't barde $N!", FALSE, ch, NULL, mob, TO_CHAR);
 		}
+		
+		free_exclusion_data(excl);
 	}
 }
 

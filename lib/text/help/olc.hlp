@@ -1545,7 +1545,7 @@ See also: OLC MOBILES
 #d
 "MEDIT INTERACTION" "BEDIT INTERACTION" "OEDIT INTERACTION" "REDIT INTERACTION" "SECTEDIT INTERACTION" "CROPEDIT INTERACTION" INTERACTIONS
 
-Usage:  .interaction add <type> <quantity> <vnum> <percent> [exclusive]
+Usage:  .interaction add <type> <quantity> <vnum> <percent> [exclusion code]
         .interaction copy <from type> <from vnum>
         .interaction remove <number | all>
         .interaction move <number> <up | down>
@@ -1578,17 +1578,19 @@ than 1, the percent is only checked once for the entire quantity. If you want
 each copy of an item to have its own percent roll, list them separately as
 quantity 1.
 
-The exclusive flag stops the list if that item passes its percentage test. If
-you don't set exclusive, each the system continues down the list for that
-interaction type and can spawn multiple items/mobs.
+The exclusion code (optional) may be any letter, which changes how random
+interactions are chosen. All items with the same exclusion code have a cumu-
+lative roll (meaning if the percents add up to 100, one of them is guaranteed)
+but only one item from the same exclusion set will ever pass. The rest will
+fail. If you don't set an exclusion code, the interaction is not exclusive and
+always gets its own percent roll.
 
 You can use '.interact move' to rearrange entries. Interactions are always
-processed from top to bottom, so the exclusive flag prevents anything
-vertically lower in the list (higher number on the interaction display).
+processed from top to bottom.
 
 Example of a rare result from barding (order matters here):
- 1. BARDE: 1x an epic warhorse .50% (exclusive)
- 2. BARDE: 1x a warhorse 100%
+ 1. BARDE: 1x an epic warhorse .50% (e)
+ 2. BARDE: 1x a warhorse 100% (e)
 
 Example of possible multiple results from shear:
  1. SHEAR: 1x some wool 100.00%

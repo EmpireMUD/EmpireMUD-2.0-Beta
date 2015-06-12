@@ -1981,7 +1981,11 @@ void get_interaction_display(struct interaction_item *list, char *save_buffer) {
 		else {
 			strcpy(lbuf, skip_filler(get_obj_name_by_proto(interact->vnum)));
 		}
-		sprintf(save_buffer + strlen(save_buffer), "%2d. %s: %dx %s (%d) %.2f%%%s\r\n", ++count, interact_types[interact->type], interact->quantity, lbuf, interact->vnum, interact->percent, (interact->exclusive ? " (exclusive)" : ""));
+		sprintf(save_buffer + strlen(save_buffer), "%2d. %s: %dx %s (%d) %.2f%%", ++count, interact_types[interact->type], interact->quantity, lbuf, interact->vnum, interact->percent);
+		if (isalpha(interact->exclusion_code)) {
+			sprintf(save_buffer + strlen(save_buffer), " (%c)", interact->exclusion_code);
+		}
+		strcat(save_buffer, "\r\n");
 	}
 	
 	if (count == 0) {
@@ -2883,7 +2887,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 				if (--num == 0) {
 					found = TRUE;
 					
-					msg_to_char(ch, "You remove %s: %dx %s %.2f%%%s\r\n", interact_types[interact->type], interact->quantity, (interact_vnum_types[interact->type] == TYPE_MOB ? skip_filler(get_mob_name_by_proto(interact->vnum)) : skip_filler(get_obj_name_by_proto(interact->vnum))), interact->percent, (interact->exclusive ? " (exclusive)" : ""));
+					msg_to_char(ch, "You remove %s: %dx %s %.2f%%\r\n", interact_types[interact->type], interact->quantity, (interact_vnum_types[interact->type] == TYPE_MOB ? skip_filler(get_mob_name_by_proto(interact->vnum)) : skip_filler(get_obj_name_by_proto(interact->vnum))), interact->percent);
 					REMOVE_FROM_LIST(interact, *list, next);
 					free(interact);
 				}
@@ -2970,14 +2974,14 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 		half_chop(buf, arg2, buf1);	// arg2: type
 		half_chop(buf1, arg3, buf);	// arg3: quantity
 		half_chop(buf, arg4, buf1);	// arg4: vnum
-		half_chop(buf1, arg5, arg6);	// arg5: percent, arg6: exclusive
+		half_chop(buf1, arg5, arg6);	// arg5: percent, arg6: exclusion
 	
 		num = atoi(arg3);
 		vnum = atoi(arg4);
 		prc = atof(arg5);
 		
 		if (!*arg2 || !*arg3 || !*arg4 || !*arg5 || !isdigit(*arg3) || !isdigit(*arg4) || !isdigit(*arg5)) {
-			msg_to_char(ch, "Usage: interaction add <type> <quantity> <vnum> <percent> [exclusive]\r\n");
+			msg_to_char(ch, "Usage: interaction add <type> <quantity> <vnum> <percent> [exclusion code]\r\n");
 		}
 		else if ((loc = search_block(arg2, interact_types, FALSE)) == NOTHING || interact_attach_types[loc] != attach_type) {
 			msg_to_char(ch, "Invalid type.\r\n");
@@ -2994,8 +2998,8 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 		else if (prc < 0.01 || prc > 100.00) {
 			msg_to_char(ch, "You must choose a percentage between 0.01 and 100.00.\r\n");
 		}
-		else if (*arg6 && !is_abbrev(arg6, "exclusive")) {
-			msg_to_char(ch, "Invalid exclusive value (use 'exclusive', 'e', or leave it blank).\r\n");
+		else if (*arg6 && !isalpha(*arg6)) {
+			msg_to_char(ch, "Invalid exclusion code (must be a letter, or leave it blank).\r\n");
 		}
 		else {
 			CREATE(temp, struct interaction_item, 1);
@@ -3003,7 +3007,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 			temp->vnum = vnum;
 			temp->percent = prc;
 			temp->quantity = num;
-			temp->exclusive = is_abbrev(arg6, "exclusive");
+			temp->exclusion_code = isalpha(*arg6) ? *arg6 : 0;
 			temp->next = NULL;
 			
 			if ((interact = *list) != NULL) {
@@ -3017,11 +3021,15 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 			}
 
 			sort_interactions(list);
-			msg_to_char(ch, "You add %s: %dx %s %.2f%%%s\r\n", interact_types[loc], num, (interact_vnum_types[loc] == TYPE_MOB ? skip_filler(get_mob_name_by_proto(vnum)) : skip_filler(get_obj_name_by_proto(vnum))), prc, (temp->exclusive ? " (exclusive)" : ""));
+			msg_to_char(ch, "You add %s: %dx %s %.2f%%", interact_types[loc], num, (interact_vnum_types[loc] == TYPE_MOB ? skip_filler(get_mob_name_by_proto(vnum)) : skip_filler(get_obj_name_by_proto(vnum))), prc);
+			if (temp->exclusion_code) {
+				msg_to_char(ch, " (%c)", temp->exclusion_code);
+			}
+			msg_to_char(ch, "\r\n");
 		}
 	}
 	else {
-		msg_to_char(ch, "Usage: interaction add <type> <quantity> <vnum> <percent> [exclusive]\r\n");
+		msg_to_char(ch, "Usage: interaction add <type> <quantity> <vnum> <percent> [exclusion code]\r\n");
 		msg_to_char(ch, "Usage: interaction copy <from type> <from vnum>\r\n");
 		msg_to_char(ch, "Usage: interaction remove <number | all>\r\n");
 		msg_to_char(ch, "Usage: interaction move <number> <up | down>\r\n");

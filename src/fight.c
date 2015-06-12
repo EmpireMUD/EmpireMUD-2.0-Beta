@@ -861,6 +861,7 @@ void drop_loot(char_data *mob, char_data *killer) {
 	extern int mob_coins(char_data *mob);
 	void scale_item_to_level(obj_data *obj, int level);
 
+	struct interact_exclusion_data *excl = NULL;
 	struct interaction_item *interact;
 	obj_data *obj;
 	int iter, coins, scale_level = 0;
@@ -889,7 +890,7 @@ void drop_loot(char_data *mob, char_data *killer) {
 
 	// find and drop loot
 	for (interact = mob->interactions; interact; interact = interact->next) {
-		if (CHECK_INTERACT(interact, INTERACT_LOOT)) {
+		if (interact->type == INTERACT_LOOT && check_exclusion_set(&excl, interact->exclusion_code, interact->percent)) {
 			for (iter = 0; iter < interact->quantity; ++iter) {
 				obj = read_object(interact->vnum);
 				
@@ -918,13 +919,11 @@ void drop_loot(char_data *mob, char_data *killer) {
 				
 				obj_to_char(obj, mob);
 				load_otrigger(obj);
-				
-				if (interact->exclusive) {
-					break;
-				}
 			}
 		}
 	}
+	
+	free_exclusion_data(excl);
 }
 
 

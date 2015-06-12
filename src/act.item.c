@@ -3319,7 +3319,6 @@ ACMD(do_keep) {
 ACMD(do_light) {
 	obj_data *obj, *flint = NULL;
 	bool magic = !IS_NPC(ch) && HAS_ABILITY(ch, ABIL_TOUCH_OF_FLAME);
-	bool junk;
 
 	one_argument(argument, arg);
 
@@ -3353,7 +3352,7 @@ ACMD(do_light) {
 		
 		// will extract no matter what happens here
 		empty_obj_before_extract(obj);
-		run_interactions(ch, obj->interactions, INTERACT_LIGHT, IN_ROOM(ch), NULL, obj, light_obj_interact, &junk);
+		run_interactions(ch, obj->interactions, INTERACT_LIGHT, IN_ROOM(ch), NULL, obj, light_obj_interact);
 		extract_obj(obj);
 		WAIT_STATE(ch, 1 RL_SEC);
 	}

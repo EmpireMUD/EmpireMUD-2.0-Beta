@@ -225,6 +225,77 @@ static void print_group(char_data *ch) {
 }
 
 
+INTERACTION_FUNC(shear_interact) {
+	char buf[MAX_STRING_LENGTH];
+	int iter, amt;
+	obj_data *obj;
+	
+	add_cooldown(inter_mob, COOLDOWN_SHEAR, config_get_int("shear_growth_time") * SECS_PER_REAL_HOUR);
+	WAIT_STATE(ch, 2 RL_SEC);
+			
+	amt = interaction->quantity;
+	if (HAS_ABILITY(ch, ABIL_MASTER_FARMER)) {
+		amt *= 2;
+	}
+	
+	for (iter = 0; iter < amt; ++iter) {
+		obj = read_object(interaction->vnum);
+		obj_to_char_or_room(obj, ch);
+		load_otrigger(obj);
+	}
+	
+	// only show loot to the skinner
+	if (amt == 1) {
+		act("You skillfully shear $N and get $p.", FALSE, ch, obj, inter_mob, TO_CHAR);
+		act("$n skillfully shears you and gets $p.", FALSE, ch, obj, inter_mob, TO_VICT);
+		act("$n skillfully shears $N and gets $p.", FALSE, ch, obj, inter_mob, TO_NOTVICT);
+	}
+	else {
+		sprintf(buf, "You skillfully shear $N and get $p (x%d).", amt);
+		act(buf, FALSE, ch, obj, inter_mob, TO_CHAR);
+		sprintf(buf, "$n skillfully shears you and gets $p (x%d).", amt);
+		act(buf, FALSE, ch, obj, inter_mob, TO_VICT);
+		sprintf(buf, "$n skillfully shears $N and gets $p (x%d).", amt);
+		act(buf, FALSE, ch, obj, inter_mob, TO_NOTVICT);
+	}
+	
+	return TRUE;
+}
+
+
+INTERACTION_FUNC(skin_interact) {
+	char buf[MAX_STRING_LENGTH];
+	obj_data *obj;
+	int num;
+
+	SET_BIT(GET_OBJ_VAL(inter_item, VAL_CORPSE_FLAGS), CORPSE_SKINNED);
+	WAIT_STATE(ch, 2 RL_SEC);
+		
+	for (num = 0; num < interaction->quantity; ++num) {
+		obj = read_object(interaction->vnum);
+		if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
+			scale_item_to_level(obj, 1);	// min scale
+		}
+		obj_to_char_or_room(obj, ch);
+		load_otrigger(obj);
+	}
+	
+	// only show loot to the skinner
+	if (interaction->quantity > 1) {
+		sprintf(buf, "You carefully skin $P and get $p (x%d).", interaction->quantity);
+		act(buf, FALSE, ch, obj, inter_item, TO_CHAR);
+		sprintf(buf, "$n carefully skins $P and gets $p (x%d).", interaction->quantity);
+		act(buf, FALSE, ch, obj, inter_item, TO_ROOM);
+	}
+	else {
+		act("You carefully skin $P and get $p.", FALSE, ch, obj, inter_item, TO_CHAR);
+		act("$n carefully skins $P and gets $p.", FALSE, ch, obj, inter_item, TO_ROOM);
+	}
+	
+	return TRUE;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// TOGGLE NOTIFIERS ////////////////////////////////////////////////////////
 
@@ -1238,12 +1309,6 @@ ACMD(do_selfdelete) {
 
 ACMD(do_shear) {
 	char_data *mob;
-	obj_data *obj = NULL;
-	struct interaction_item *interact;
-	int amt, iter;
-	bool found;
-	
-	int shear_growth_time = config_get_int("shear_growth_time");
 
 	one_argument(argument, arg);
 
@@ -1266,48 +1331,7 @@ ACMD(do_shear) {
 		act("$E is already shorn.", FALSE, ch, NULL, mob, TO_CHAR);
 	}
 	else {
-		found = FALSE;
-		for (interact = mob->interactions; interact; interact = interact->next) {
-			if (CHECK_INTERACT(interact, INTERACT_SHEAR)) {
-				if (!found) {
-					// first one found
-					act("You skillfully shear $N...", FALSE, ch, NULL, mob, TO_CHAR);
-					act("$n skillfully shears you. It hardly hurts at all!", FALSE, ch, NULL, mob, TO_VICT);
-					act("$n skillfully shears $N.", FALSE, ch, NULL, mob, TO_NOTVICT);
-					
-					add_cooldown(mob, COOLDOWN_SHEAR, shear_growth_time * SECS_PER_REAL_HOUR);
-					WAIT_STATE(ch, 2 RL_SEC);
-					found = TRUE;
-				}
-				
-				amt = interact->quantity;
-				if (HAS_ABILITY(ch, ABIL_MASTER_FARMER)) {
-					amt *= 2;
-				}
-				
-				for (iter = 0; iter < amt; ++iter) {
-					obj = read_object(interact->vnum);
-					obj_to_char_or_room(obj, ch);
-					load_otrigger(obj);
-				}
-				
-				// only show loot to the skinner
-				if (amt == 1) {
-					act("You get $p.", FALSE, ch, obj, NULL, TO_CHAR);
-				}
-				else {
-					sprintf(buf, "You get $p (x%d).", amt);
-					act(buf, FALSE, ch, obj, NULL, TO_CHAR);
-				}
-				
-				// there can be only one?
-				if (interact->exclusive) {
-					break;
-				}
-			}
-		}
-
-		if (found) {
+		if (run_interactions(ch, mob->interactions, INTERACT_SHEAR, IN_ROOM(ch), mob, NULL, shear_interact)) {
 			gain_ability_exp(ch, ABIL_MASTER_FARMER, 5);
 		}
 		else {
@@ -1320,11 +1344,8 @@ ACMD(do_shear) {
 ACMD(do_skin) {
 	extern obj_data *has_sharp_tool(char_data *ch);
 
-	obj_data *obj, *obj2 = NULL;
-	struct interaction_item *interact;
+	obj_data *obj;
 	char_data *proto;
-	bool found;
-	int num;
 
 	one_argument(argument, arg);
 
@@ -1344,48 +1365,8 @@ ACMD(do_skin) {
 	else if (!has_sharp_tool(ch))
 		msg_to_char(ch, "You need to be wielding a sharp tool to skin a corpse.\r\n");
 	else {
-		found = FALSE;
-		for (interact = proto->interactions; interact; interact = interact->next) {
-			if (CHECK_INTERACT(interact, INTERACT_SKIN)) {
-				if (!found) {
-					// first one found
-					act("You carefully skin $p...", FALSE, ch, obj, NULL, TO_CHAR);
-					act("$n carefully skins $p.", FALSE, ch, obj, NULL, TO_ROOM);
-					
-					SET_BIT(GET_OBJ_VAL(obj, VAL_CORPSE_FLAGS), CORPSE_SKINNED);
-					WAIT_STATE(ch, 2 RL_SEC);
-					found = TRUE;
-				}
-				
-				for (num = 0; num < interact->quantity; ++num) {
-					obj2 = read_object(interact->vnum);
-					if (OBJ_FLAGGED(obj2, OBJ_SCALABLE)) {
-						scale_item_to_level(obj2, 1);	// min scale
-					}
-					obj_to_char_or_room(obj2, ch);
-					load_otrigger(obj2);
-				}
-				
-				// only show loot to the skinner
-				if (interact->quantity > 1) {
-					sprintf(buf, "You get $p (x%d).", interact->quantity);
-					act(buf, FALSE, ch, obj2, NULL, TO_CHAR);
-					sprintf(buf, "$n gets $p (x%d).", interact->quantity);
-					act(buf, FALSE, ch, obj2, NULL, TO_ROOM);
-				}
-				else {
-					act("You get $p.", FALSE, ch, obj2, NULL, TO_CHAR);
-					act("$n gets $p.", FALSE, ch, obj2, NULL, TO_ROOM);
-				}
-				
-				// there can be only one?
-				if (interact->exclusive) {
-					break;
-				}
-			}
-		}
-
-		if (!found) {
+		// run it
+		if (!run_interactions(ch, proto->interactions, INTERACT_SKIN, IN_ROOM(ch), NULL, obj, skin_interact)) {
 			msg_to_char(ch, "There isn't anything you can skin from that corpse.\r\n");
 		}
 	}

@@ -2852,6 +2852,93 @@ struct help_index_element *find_help_entry(int level, const char *word) {
 //// INTERACTION HANDLERS ////////////////////////////////////////////////////
 
 /**
+* Compares an interaction's chances against an exclusion set. Interactions are
+* exclusive with other interactions that share an exclusion code, and the
+* chance rolls on exclusion sets are cumulative.
+*
+* @param struct interact_exclusion_data **set A pointer to the hash table that holds the data (may add an entry).
+* @param char code The exclusion code (must be a single letter; any empty or invalid code is treated as non-exclusive).
+* @param double percent The percent (0.01-100.00) chance of passing.
+* @return bool TRUE if the interaction succeeds
+*/
+bool check_exclusion_set(struct interact_exclusion_data **set, char code, double percent) {
+	struct interact_exclusion_data *find;
+	
+	// limited set of codes
+	if ((code < 'a' && code > 'z') && (code < 'A' && code > 'Z')) {
+		code = 0;
+	}
+	
+	// no exclusion? just roll
+	if (code == 0) {
+		return number(1, 10000) < (percent * 100);
+	}
+	
+	// this 'find' is guaranteed because it makes it if it doesn't exist
+	if ((find = find_exclusion_data(set, code))) {
+		if (find->done) {
+			// already excluded
+			return FALSE;
+		}
+		
+		// add to cumulative percent and check it
+		find->cumulative_value += (percent * 100);
+		if (find->rolled_value < find->cumulative_value) {
+			find->done = TRUE;
+			return TRUE;
+		}
+		
+		return FALSE;
+	}
+	
+	// just in case
+	return FALSE;
+}
+
+
+/**
+* Finds (or creates) an exclusion entry for a given code. Exclusion codes must
+* be single letters.
+*
+* @param struct interact_exclusion_data **set A pointer to the hash table that holds the data (may add an entry).
+* @param char code The exclusion code (must be a single letter; any empty or invalid code is treated as non-exclusive).
+* @return struct interact_exclusion_data* The exclusion data for that code.
+*/
+struct interact_exclusion_data *find_exclusion_data(struct interact_exclusion_data **set, char code) {
+	struct interact_exclusion_data *find;
+	int val;
+	
+	val = (int) code;
+	HASH_FIND_INT(*set, &val, find);
+	if (!find) {
+		CREATE(find, struct interact_exclusion_data, 1);
+		find->code = (int) code;
+		// this rolls now -- rolls are for the entire exclusion set
+		find->rolled_value = number(1, 10000);
+		find->cumulative_value = 0;
+		find->done = FALSE;
+		HASH_ADD_INT(*set, code, find);
+	}
+	
+	return find;
+}
+
+
+/**
+* Free a set of exclusion data.
+* 
+* @param struct interact_exclusion_data *list The list to free.
+*/
+void free_exclusion_data(struct interact_exclusion_data *list) {
+	struct interact_exclusion_data *iter, *next;
+	HASH_ITER(hh, list, iter, next) {
+		HASH_DEL(list, iter);
+		free(iter);
+	}
+}
+
+
+/**
 * @param struct interaction_item *list The list to check.
 * @param int type The INTERACT_x type to check for.
 * @return bool TRUE if at least one interaction of that type is in the list.
@@ -2881,34 +2968,23 @@ bool has_interaction(struct interaction_item *list, int type) {
 * @param char_data *inter_mob For mob interactions, the mob.
 * @param obj_data *inter_item For item interactions, the item.
 * @param INTERACTION_FUNC(*func) A function pointer that runs each successful interaction (func returns TRUE if an interaction happens; FALSE if it aborts)
-* @param bool *hit_exclusive A bool pointer to store whether or not we hit an exclusive.
 * @return bool TRUE if any interactions ran successfully, FALSE if not.
 */
-bool run_interactions(char_data *ch, struct interaction_item *run_list, int type, room_data *inter_room, char_data *inter_mob, obj_data *inter_item, INTERACTION_FUNC(*func), bool *hit_exclusive) {
+bool run_interactions(char_data *ch, struct interaction_item *run_list, int type, room_data *inter_room, char_data *inter_mob, obj_data *inter_item, INTERACTION_FUNC(*func)) {
+	struct interact_exclusion_data *exclusion = NULL;
 	struct interaction_item *interact;
-	bool this, success = FALSE;
-	
-	*hit_exclusive = FALSE;
+	bool success = FALSE;
 
 	for (interact = run_list; interact; interact = interact->next) {
-		this = FALSE;
-		
-		if (CHECK_INTERACT(interact, type)) {
+		if (interact->type == type && check_exclusion_set(&exclusion, interact->exclusion_code, interact->percent)) {
 			if (func) {
 				// run function
-				this = (func)(ch, interact, inter_room, inter_mob, inter_item);
-			}
-			
-			success |= this;
-			
-			// there can be only one?
-			if (this && interact->exclusive) {
-				*hit_exclusive = TRUE;
-				break;
+				success |= (func)(ch, interact, inter_room, inter_mob, inter_item);
 			}
 		}
 	}
-
+	
+	free_exclusion_data(exclusion);
 	return success;
 }
 
@@ -2921,33 +2997,32 @@ bool run_interactions(char_data *ch, struct interaction_item *run_list, int type
 * @param room_data *room The location to run on.
 * @param int type Any INTERACT_x const.
 * @param INTERACTION_FUNC(*func) A function pointer that runs each successful interaction (func returns TRUE if an interaction happens; FALSE if it aborts)
-* @param bool *hit_exclusive A bool pointer to store whether or not we hit an exclusive.
 * @return bool TRUE if any interactions ran successfully, FALSE if not.
 */
-bool run_room_interactions(char_data *ch, room_data *room, int type, INTERACTION_FUNC(*func), bool *hit_exclusive) {
+bool run_room_interactions(char_data *ch, room_data *room, int type, INTERACTION_FUNC(*func)) {
 	bool success;
 	crop_data *crop;
 	
-	success = *hit_exclusive = FALSE;
+	success = FALSE;
 	
 	// building first
-	if (!*hit_exclusive && GET_BUILDING(room)) {
-		success |= run_interactions(ch, GET_BLD_INTERACTIONS(GET_BUILDING(room)), type, room, NULL, NULL, func, hit_exclusive);
+	if (!success && GET_BUILDING(room)) {
+		success |= run_interactions(ch, GET_BLD_INTERACTIONS(GET_BUILDING(room)), type, room, NULL, NULL, func);
 	}
 	
 	// crop second
-	if (!*hit_exclusive && ROOM_CROP_TYPE(room) != NOTHING && (crop = crop_proto(ROOM_CROP_TYPE(room)))) {
-		success |= run_interactions(ch, GET_CROP_INTERACTIONS(crop), type, room, NULL, NULL, func, hit_exclusive);
+	if (!success && ROOM_CROP_TYPE(room) != NOTHING && (crop = crop_proto(ROOM_CROP_TYPE(room)))) {
+		success |= run_interactions(ch, GET_CROP_INTERACTIONS(crop), type, room, NULL, NULL, func);
 	}
 	
 	// rmt third
-	if (!*hit_exclusive && GET_ROOM_TEMPLATE(room)) {
-		success |= run_interactions(ch, GET_RMT_INTERACTIONS(GET_ROOM_TEMPLATE(room)), type, room, NULL, NULL, func, hit_exclusive);
+	if (!success && GET_ROOM_TEMPLATE(room)) {
+		success |= run_interactions(ch, GET_RMT_INTERACTIONS(GET_ROOM_TEMPLATE(room)), type, room, NULL, NULL, func);
 	}
 	
 	// sector fourth
-	if (!*hit_exclusive) {
-		success |= run_interactions(ch, GET_SECT_INTERACTIONS(SECT(room)), type, room, NULL, NULL, func, hit_exclusive);
+	if (!success) {
+		success |= run_interactions(ch, GET_SECT_INTERACTIONS(SECT(room)), type, room, NULL, NULL, func);
 	}
 	
 	return success;

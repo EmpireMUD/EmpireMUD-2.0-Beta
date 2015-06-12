@@ -144,9 +144,12 @@ void join_group(char_data *ch, struct group_data *group);
 void leave_group(char_data *ch);
 
 // interaction handlers
+extern bool check_exclusion_set(struct interact_exclusion_data **set, char code, double percent);
+extern struct interact_exclusion_data *find_exclusion_data(struct interact_exclusion_data **set, char code);
+void free_exclusion_data(struct interact_exclusion_data *list);
 extern bool has_interaction(struct interaction_item *list, int type);
-extern bool run_interactions(char_data *ch, struct interaction_item *run_list, int type, room_data *inter_room, char_data *inter_mob, obj_data *inter_item, INTERACTION_FUNC(*func), bool *hit_exclusive);
-extern bool run_room_interactions(char_data *ch, room_data *room, int type, INTERACTION_FUNC(*func), bool *hit_exclusive);
+extern bool run_interactions(char_data *ch, struct interaction_item *run_list, int type, room_data *inter_room, char_data *inter_mob, obj_data *inter_item, INTERACTION_FUNC(*func));
+extern bool run_room_interactions(char_data *ch, room_data *room, int type, INTERACTION_FUNC(*func));
 
 // lore handlers
 void add_lore(char_data *ch, int type, int value);

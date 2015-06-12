@@ -723,11 +723,10 @@ void do_chore_digging(empire_data *emp, room_data *room) {
 	char_data *worker = find_mob_in_room_by_vnum(room, chore_data[CHORE_DIGGING].mob);
 	bool depleted = (get_depletion(room, DPLTN_DIG) >= DEPLETION_LIMIT(room)) ? TRUE : FALSE;
 	bool can_do = !depleted && can_gain_chore_resource_from_interaction(emp, room, INTERACT_DIG);
-	bool junk;
 	
 	if (CAN_INTERACT_ROOM(room, INTERACT_DIG) && can_do) {
 		if (worker) {
-			if (!run_room_interactions(worker, room, INTERACT_DIG, one_dig_chore, &junk)) {
+			if (!run_room_interactions(worker, room, INTERACT_DIG, one_dig_chore)) {
 				SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 			}
 		}
@@ -861,11 +860,10 @@ INTERACTION_FUNC(one_farming_chore) {
 void do_chore_farming(empire_data *emp, room_data *room) {
 	char_data *worker = find_mob_in_room_by_vnum(room, chore_data[CHORE_FARMING].mob);
 	bool can_do = can_gain_chore_resource_from_interaction(emp, room, INTERACT_HARVEST);
-	bool junk;
 	
 	if (CAN_INTERACT_ROOM(room, INTERACT_HARVEST) && can_do) {
 		if (worker) {
-			if (!run_room_interactions(worker, room, INTERACT_HARVEST, one_farming_chore, &junk)) {
+			if (!run_room_interactions(worker, room, INTERACT_HARVEST, one_farming_chore)) {
 				SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 			}
 		}
@@ -929,11 +927,10 @@ void do_chore_gardening(empire_data *emp, room_data *room) {
 	char_data *worker = find_mob_in_room_by_vnum(room, chore_data[CHORE_HERB_GARDENING].mob);
 	bool depleted = (get_depletion(room, DPLTN_PICK) >= garden_depletion);
 	bool can_do = !depleted && can_gain_chore_resource_from_interaction(emp, room, INTERACT_FIND_HERB);
-	bool junk;
 	
 	if (CAN_INTERACT_ROOM(room, INTERACT_FIND_HERB) && can_do) {
 		if (worker) {
-			if (!run_room_interactions(worker, room, INTERACT_FIND_HERB, one_gardening_chore, &junk)) {
+			if (!run_room_interactions(worker, room, INTERACT_FIND_HERB, one_gardening_chore)) {
 				SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 			}
 		}
@@ -1204,6 +1201,8 @@ void do_chore_shearing(empire_data *emp, room_data *room) {
 	
 	char_data *worker = find_mob_in_room_by_vnum(room, chore_data[CHORE_SHEARING].mob);
 	char_data *mob, *shearable = NULL;
+	
+	struct interact_exclusion_data *excl = NULL;
 	struct interaction_item *interact;
 	bool found;
 
@@ -1226,7 +1225,7 @@ void do_chore_shearing(empire_data *emp, room_data *room) {
 		
 		// we know it's shearable, but have to find the items
 		for (interact = shearable->interactions; interact; interact = interact->next) {
-			if (CHECK_INTERACT(interact, INTERACT_SHEAR)) {
+			if (interact->type == INTERACT_SHEAR && check_exclusion_set(&excl, interact->exclusion_code, interact->percent)) {
 				// messaging
 				if (!found) {
 					act("$n shears $N.", FALSE, worker, NULL, shearable, TO_ROOM);
@@ -1236,10 +1235,6 @@ void do_chore_shearing(empire_data *emp, room_data *room) {
 				
 				add_to_empire_storage(emp, GET_ISLAND_ID(room), interact->vnum, interact->quantity);
 				add_cooldown(shearable, COOLDOWN_SHEAR, shear_growth_time * SECS_PER_REAL_HOUR);
-				
-				if (interact->exclusive) {
-					break;
-				}
 			}
 		}		
 	}
@@ -1249,6 +1244,8 @@ void do_chore_shearing(empire_data *emp, room_data *room) {
 	else if (worker) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 	}
+	
+	free_exclusion_data(excl);
 }
 
 

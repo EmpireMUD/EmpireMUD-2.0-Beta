@@ -195,8 +195,6 @@ INTERACTION_FUNC(run_one_encounter) {
 */
 void random_encounter(char_data *ch) {
 	extern bool has_boat(char_data *ch);
-	
-	bool junk;
 
 	if (!ch->desc || IS_NPC(ch) || !IN_ROOM(ch) || FIGHTING(ch) || IS_GOD(ch) || NOHASSLE(ch)) {
 		return;
@@ -211,7 +209,7 @@ void random_encounter(char_data *ch) {
 		return;
 	}
 
-	run_room_interactions(ch, IN_ROOM(ch), INTERACT_ENCOUNTER, run_one_encounter, &junk);
+	run_room_interactions(ch, IN_ROOM(ch), INTERACT_ENCOUNTER, run_one_encounter);
 }
 
 

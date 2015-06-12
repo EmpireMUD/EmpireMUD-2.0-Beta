@@ -964,7 +964,6 @@ void process_chop(char_data *ch) {
 */
 void process_digging(char_data *ch) {
 	room_data *in_room;
-	bool hit_exclusive = FALSE;
 
 	// decrement timer
 	GET_ACTION_TIMER(ch) -= 1;
@@ -984,7 +983,7 @@ void process_digging(char_data *ch) {
 		GET_ACTION(ch) = ACT_NONE;
 		in_room = IN_ROOM(ch);
 		
-		if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_DIG, finish_digging, &hit_exclusive)) {
+		if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_DIG, finish_digging)) {
 			// success
 			if (GET_SKILL(ch, SKILL_SURVIVAL) < EMPIRE_CHORE_SKILL_CAP) {
 				gain_skill_exp(ch, SKILL_SURVIVAL, 10);
@@ -1234,8 +1233,6 @@ void process_fishing(char_data *ch) {
 * @param char_data *ch The gatherer.
 */
 void process_gathering(char_data *ch) {
-	bool junk;
-	
 	int gather_base_timer = config_get_int("gather_base_timer");
 	int gather_depletion = config_get_int("gather_depletion");
 	
@@ -1256,7 +1253,7 @@ void process_gathering(char_data *ch) {
 			GET_ACTION(ch) = ACT_NONE;
 		}
 		else {
-			if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_GATHER, finish_gathering, &junk)) {
+			if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_GATHER, finish_gathering)) {
 				// check repeatability
 				if (CAN_INTERACT_ROOM(IN_ROOM(ch), INTERACT_GATHER)) {
 					GET_ACTION_TIMER(ch) = gather_base_timer / (HAS_ABILITY(ch, ABIL_FINDER) ? 2 : 1);
@@ -1279,9 +1276,7 @@ void process_gathering(char_data *ch) {
 *
 * @param char_data *ch The harvester.
 */
-void process_harvesting(char_data *ch) {
-	bool exclusive;
-	
+void process_harvesting(char_data *ch) {	
 	if (!GET_EQ(ch, WEAR_WIELD) || (GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) != TYPE_SLICE && GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) != TYPE_SLASH)) {
 		send_to_char("You're not wielding the proper tool for harvesting.\r\n", ch);
 		cancel_action(ch);
@@ -1318,7 +1313,7 @@ void process_harvesting(char_data *ch) {
 		// stop all harvesters including ch
 		stop_room_action(IN_ROOM(ch), ACT_HARVESTING, CHORE_FARMING);
 		
-		if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_HARVEST, finish_harvesting, &exclusive)) {
+		if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_HARVEST, finish_harvesting)) {
 			// skillups
 			if (GET_SKILL(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
 				gain_skill_exp(ch, SKILL_EMPIRE, 30);
@@ -1545,7 +1540,7 @@ void process_panning(char_data *ch) {
 * @param char_data *ch The picker.
 */
 void process_picking(char_data *ch) {	
-	bool exclusive = FALSE, found = FALSE;
+	bool found = FALSE;
 	
 	int garden_depletion = config_get_int("garden_depletion");
 	int pick_depletion = config_get_int("pick_depletion");
@@ -1570,7 +1565,7 @@ void process_picking(char_data *ch) {
 			act("$n stops looking for things to pick as $e comes up empty-handed.", TRUE, ch, NULL, NULL, TO_ROOM);
 		}
 		else {
-			if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_FIND_HERB, finish_picking_herb, &exclusive)) {
+			if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_FIND_HERB, finish_picking_herb)) {
 				if (GET_SKILL(ch, SKILL_SURVIVAL) < EMPIRE_CHORE_SKILL_CAP) {
 					gain_skill_exp(ch, SKILL_SURVIVAL, 10);
 				}
@@ -1578,7 +1573,7 @@ void process_picking(char_data *ch) {
 			}
 			else if (CAN_INTERACT_ROOM(IN_ROOM(ch), INTERACT_HARVEST) && (IS_ADVENTURE_ROOM(IN_ROOM(ch)) || ROOM_CROP_FLAGGED(IN_ROOM(ch), CROPF_IS_ORCHARD))) {
 				// only orchards allow pick -- and only run this if we hit no herbs at all
-				if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_HARVEST, finish_picking_crop, &exclusive)) {
+				if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_HARVEST, finish_picking_crop)) {
 					if (GET_SKILL(ch, SKILL_SURVIVAL) < EMPIRE_CHORE_SKILL_CAP) {
 						gain_skill_exp(ch, SKILL_SURVIVAL, 10);
 					}

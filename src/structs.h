@@ -1654,13 +1654,23 @@ struct index_data {
 };
 
 
+// for exclusive interaction processing
+struct interact_exclusion_data {
+	int code;	// a-z, A-Z, or empty (stored as an int for easy-int funcs)
+	int rolled_value;	// 1-10000
+	int cumulative_value;	// value so far
+	bool done;	// TRUE if one already passed
+	UT_hash_handle hh;
+};
+
+
 // for the "interactions" system (like butcher, dig, etc) -- INTERACT_x
 struct interaction_item {
 	int type;	// INTERACT_x
 	obj_vnum vnum;	// the skin object
 	double percent;	// how often to do it 0.01 - 100.00
 	int quantity;	// how many to give
-	bool exclusive;	// stops execution if so
+	char exclusion_code;	// creates mutually-exclusive sets
 	
 	struct interaction_item *next;
 };

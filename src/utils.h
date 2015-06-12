@@ -1134,9 +1134,6 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options);
  //////////////////////////////////////////////////////////////////////////////
 //// MISCELLANEOUS UTILS /////////////////////////////////////////////////////
 
-// things not meriting their own section
-#define CHECK_INTERACT(interact, itype)  ((interact)->type == (itype) && number(1, 10000) < (int)((interact)->percent * 100))
-
 // for the easy-update system
 #define PLAYER_UPDATE_FUNC(name)  void (name)(char_data *ch, bool is_file)
 

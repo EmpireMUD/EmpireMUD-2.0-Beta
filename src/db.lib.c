@@ -2538,15 +2538,14 @@ void parse_interaction(char *line, struct interaction_item **list, char *error_p
 	struct interaction_item *interact, *inter_iter;
 	int int_in[3];
 	double dbl_in;
-	char char_in;
-	bool exclusive;
+	char char_in, excl = 0;
 
 	// interaction item: I type vnum percent quantity X
-	if (sscanf(line, "I %d %d %lf %d %c", &int_in[0], &int_in[1], &dbl_in, &int_in[2], &char_in) == 5) {	// with X
-		exclusive = (char_in == 'X');
+	if (sscanf(line, "I %d %d %lf %d %c", &int_in[0], &int_in[1], &dbl_in, &int_in[2], &char_in) == 5) {	// with exclusion code
+		excl = char_in;
 	}
-	else if (sscanf(line, "I %d %d %lf %d", &int_in[0], &int_in[1], &dbl_in, &int_in[2]) == 4) {	// no X
-		exclusive = FALSE;
+	else if (sscanf(line, "I %d %d %lf %d", &int_in[0], &int_in[1], &dbl_in, &int_in[2]) == 4) {	// no exclusion code
+		excl = 0;
 	}
 	else {
 		log("SYSERR: Format error in 'I' field, %s\n", error_part);
@@ -2558,10 +2557,10 @@ void parse_interaction(char *line, struct interaction_item **list, char *error_p
 	interact->vnum = int_in[1];
 	interact->percent = dbl_in;
 	interact->quantity = int_in[2];
-	interact->exclusive = exclusive;
+	interact->exclusion_code = excl;
 	interact->next = NULL;
 	
-	// gotta add to the end of the list because of "exclusive"
+	// gotta add to the end of the list exclusion order is important
 	if ((inter_iter = *list) != NULL) {
 		while (inter_iter->next) {
 			inter_iter = inter_iter->next;
@@ -2589,8 +2588,8 @@ void write_interactions_to_file(FILE *fl, struct interaction_item *list) {
 	for (interact = list; interact; interact = interact->next) {
 		fprintf(fl, "I %d %d %.2f %d", interact->type, interact->vnum, interact->percent, interact->quantity);
 		
-		if (interact->exclusive) {
-			fprintf(fl, " X");
+		if (isalpha(interact->exclusion_code)) {
+			fprintf(fl, " %c", interact->exclusion_code);
 		}
 		
 		fprintf(fl, "  # %s: %s\n", interact_types[interact->type], (interact_vnum_types[interact->type] == TYPE_MOB) ? get_mob_name_by_proto(interact->vnum) : get_obj_name_by_proto(interact->vnum));
@@ -5615,7 +5614,7 @@ void sort_interactions(struct interaction_item **list) {
 
 			a = *list;
 			while ((b = a->next)) {
-				if (a->type > b->type) {
+				if (a->type > b->type || (a->type == b->type && a->exclusion_code > b->exclusion_code)) {
 					// preserve next-pointers
 					a_next = a->next;
 					b_next = b->next;
