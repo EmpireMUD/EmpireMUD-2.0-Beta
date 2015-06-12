@@ -759,7 +759,7 @@ OLC_MODULE(cedit_resource) {
 			}
 		}
 	}
-	if (is_abbrev(arg1, "change")) {
+	else if (is_abbrev(arg1, "change")) {
 		if (!*arg2 || !*arg3 || !*arg4 || !isdigit(*arg2) || !isdigit(*arg4)) {
 			msg_to_char(ch, "Usage: resource change <number> <quantity | vnum> <value>\r\n");
 			return;
