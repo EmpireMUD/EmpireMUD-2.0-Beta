@@ -599,11 +599,11 @@ OLC_MODULE(rmedit_description) {
 
 OLC_MODULE(rmedit_exit) {
 	room_template *rmt = GET_OLC_ROOM_TEMPLATE(ch->desc);
-	char arg1[MAX_INPUT_LENGTH], dir_arg[MAX_INPUT_LENGTH], room_arg[MAX_INPUT_LENGTH];
+	char arg1[MAX_INPUT_LENGTH], dir_arg[MAX_INPUT_LENGTH], room_arg[MAX_INPUT_LENGTH], num_arg[MAX_INPUT_LENGTH], field_arg[MAX_INPUT_LENGTH];
 	adv_data *adv = get_adventure_for_vnum(GET_OLC_VNUM(ch->desc));
 	int num, vnum, dir;
 	room_template *to_template;
-	struct exit_template *ex, *temp;
+	struct exit_template *ex, *temp, *change;
 	bool found;
 	
 	// arg1 argument
@@ -687,8 +687,78 @@ OLC_MODULE(rmedit_exit) {
 			msg_to_char(ch, "You add an exit %s to %d %s%s%s.\r\n", dirs[dir], vnum, !to_template ? "UNKNOWN" : GET_RMT_TITLE(to_template), *argument ? ", with door keywords: " : "", *argument ? argument : "");
 		}
 	}
+	else if (is_abbrev(arg1, "change")) {
+		argument = any_one_arg(argument, num_arg);
+		argument = any_one_arg(argument, field_arg);
+		skip_spaces(&argument);	// value
+
+		if (!*argument || !*num_arg || !*field_arg || !isdigit(*num_arg)) {
+			msg_to_char(ch, "Usage: exit change <number> <field> <value>\r\n");
+			return;
+		}
+		
+		// find entry
+		num = atoi(num_arg);
+		change = NULL;
+		for (ex = GET_RMT_EXITS(rmt); ex; ex = ex->next) {
+			if (--num == 0) {
+				change = ex;
+				break;
+			}
+		}
+		
+		if (!change) {
+			msg_to_char(ch, "Invalid exit number.\r\n");
+		}
+		else if (is_abbrev(field_arg, "direction")) {
+			if ((dir = parse_direction(ch, argument)) == NO_DIR) {
+				msg_to_char(ch, "Invalid direction '%s'.\r\n", argument);
+			}
+			else {
+				change->dir = dir;
+				msg_to_char(ch, "Exit %d direction changed to %s.\r\n", atoi(num_arg), dirs[dir]);
+			}
+		}
+		else if (is_abbrev(field_arg, "room") || is_abbrev(field_arg, "template") || is_abbrev(field_arg, "vnum") || is_abbrev(field_arg, "target")) {
+			if (!isdigit(*argument) || (vnum = atoi(argument)) < 0 || get_adventure_for_vnum(vnum) != adv) {
+				msg_to_char(ch, "Invalid room template vnum '%s'; target room must be part of the same adventure zone.\r\n", argument);
+			}
+			else {
+				change->target_room = vnum;
+				to_template = room_template_proto(vnum);
+				msg_to_char(ch, "Exit %d (%s) target changed to [%d] %s.\r\n", atoi(num_arg), dirs[change->dir], vnum, !to_template ? "UNKNOWN" : GET_RMT_TITLE(to_template));
+			}
+		}
+		else if (is_abbrev(field_arg, "keywords")) {
+			if (!*argument) {
+				msg_to_char(ch, "Change the keywords to what (or 'none' to have no door)?\r\n");
+			}
+			else if (!str_cmp(argument, "none")) {
+				if (ex->keyword) {
+					free(ex->keyword);
+				}
+				ex->keyword = NULL;
+				ex->exit_info = NOBITS;
+				
+				msg_to_char(ch, "Exit %d (%s) keywords and door removed.\r\n", atoi(num_arg), dirs[change->dir]);
+			}
+			else {
+				if (ex->keyword) {
+					free(ex->keyword);
+				}
+				ex->keyword = str_dup(argument);
+				ex->exit_info = EX_ISDOOR | EX_CLOSED;
+				
+				msg_to_char(ch, "Exit %d (%s) door keywords set to: %s\r\n", atoi(num_arg), dirs[change->dir], argument);
+			}
+		}
+		else {
+			msg_to_char(ch, "You can change: direction, room, keywords\r\n");
+		}
+	}
 	else {
 		msg_to_char(ch, "Usage: exit add <dir> <room template vnum> [keywords if door]\r\n");
+		msg_to_char(ch, "Usage: exit change <number> <field> <value>\r\n");
 		msg_to_char(ch, "Usage: exit remove <number | all>\r\n");
 	}
 }

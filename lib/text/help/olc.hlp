@@ -2802,6 +2802,7 @@ See also: OLC ROOM TEMPLATES, STRING EDITOR
 "REDIT EXITS"
 
 Usage:  .exit add <dir> <room template vnum> [keywords if door]
+        .exit change <number> <field> <value>
         .exit remove <number | all>
 
 Room templates can exit only to other room templates -- never to real rooms
@@ -2812,6 +2813,9 @@ direction will be chosen for you.
 
 If you wish to create a door that opens and closes, specify door keyword(s) at
 the end of the exit add.
+
+You can use 'change' to alter an exit's direction, target, or keywords.
+Changing the keywords to 'none' removes the door.
 
 Examples:
  > .exit add random 1234
