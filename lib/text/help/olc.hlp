@@ -1071,6 +1071,7 @@ See also: OLC CRAFTS, VNUM
 "CEDIT RESOURCE"
 
 Usage:  .resource add <amount> <vnum>
+        .resource change <number> <quantity | vnum> <value>
         .resource remove <number | all>
         .resource move <number> <up | down>
 
