@@ -233,9 +233,9 @@ I 1 1351 50.00 1  # SKIN: a large skin
 I 4 10252 100.00 1  # LOOT: a huge dracosaur bone
 I 4 10286 7.50 1 X  # LOOT: a terrosaur whistle
 I 4 10263 15.00 1 X  # LOOT: a dracosaur whistle
-I 4 10255 20.00 1  # LOOT: a dracosaur bone bracelet
-I 4 10259 10.00 1  # LOOT: a primitive satchel
-I 4 10261 10.00 1  # LOOT: an unlit branch
+I 4 10255 20.00 1 X  # LOOT: a dracosaur bone bracelet
+I 4 10259 10.00 1 X  # LOOT: a primitive satchel
+I 4 10261 10.00 1 X  # LOOT: an unlit branch
 T 10262
 T 10265
 T 10256
@@ -261,9 +261,9 @@ I 1 1351 50.00 1  # SKIN: a large skin
 I 4 10253 100.00 1  # LOOT: the essence of terror
 I 4 10286 7.50 1 X  # LOOT: a terrosaur whistle
 I 4 10263 15.00 1 X  # LOOT: a dracosaur whistle
-I 4 10256 20.00 1  # LOOT: a dracosaur scale wristband
-I 4 10259 10.00 1  # LOOT: a primitive satchel
-I 4 10261 10.00 1  # LOOT: an unlit branch
+I 4 10256 20.00 1 X  # LOOT: a dracosaur scale wristband
+I 4 10259 10.00 1 X  # LOOT: a primitive satchel
+I 4 10261 10.00 1 X  # LOOT: an unlit branch
 T 10262
 T 10265
 T 10256
@@ -284,9 +284,9 @@ I 4 10267 75.00 1  # LOOT: a serrated dracosaur tooth
 I 4 10267 75.00 1  # LOOT: a serrated dracosaur tooth
 I 4 10286 7.50 1 X  # LOOT: a terrosaur whistle
 I 4 10263 15.00 1 X  # LOOT: a dracosaur whistle
-I 4 10258 20.00 1  # LOOT: an obsidian bracelet
-I 4 10259 10.00 1  # LOOT: a primitive satchel
-I 4 10261 10.00 1  # LOOT: an unlit branch
+I 4 10258 20.00 1 X  # LOOT: an obsidian bracelet
+I 4 10259 10.00 1 X  # LOOT: a primitive satchel
+I 4 10261 10.00 1 X  # LOOT: an unlit branch
 T 10262
 T 10265
 T 10256
@@ -343,7 +343,7 @@ A small, feathered dracosaur begins to circle around you.
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
 I 0 10267 50.00 1  # BUTCHER: a serrated dracosaur tooth
 I 1 10265 50.00 1 X  # SKIN: a thick dracosaur hide
-I 1 1351 100.00 1  # SKIN: a large skin
+I 1 1351 100.00 1 X  # SKIN: a large skin
 T 10262
 T 10265
 S

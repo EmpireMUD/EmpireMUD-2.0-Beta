@@ -64,7 +64,7 @@ I 7 1202 15.00 1 X  # FIND-HERB: a twig of redthorn
 I 7 1203 15.00 1 X  # FIND-HERB: some magewhisper sepals
 I 7 1204 15.00 1 X  # FIND-HERB: a daggerbite frond
 I 7 1205 15.00 1 X  # FIND-HERB: some bileberries
-I 7 10228 100.00 1  # FIND-HERB: a stack of cactus pads
+I 7 10228 100.00 1 X  # FIND-HERB: a stack of cactus pads
 M 0 10226 33.00 4
 M 1 10243 10.00 1
 S
@@ -88,7 +88,7 @@ I 7 1202 15.00 1 X  # FIND-HERB: a twig of redthorn
 I 7 1203 15.00 1 X  # FIND-HERB: some magewhisper sepals
 I 7 1204 15.00 1 X  # FIND-HERB: a daggerbite frond
 I 7 1205 15.00 1 X  # FIND-HERB: some bileberries
-I 7 10226 100.00 1  # FIND-HERB: a pineapple
+I 7 10226 100.00 1 X  # FIND-HERB: a pineapple
 M 0 10226 33.00 4
 M 1 10232 10.00 1
 S
@@ -112,7 +112,7 @@ I 7 1202 15.00 1 X  # FIND-HERB: a twig of redthorn
 I 7 1203 15.00 1 X  # FIND-HERB: some magewhisper sepals
 I 7 1204 15.00 1 X  # FIND-HERB: a daggerbite frond
 I 7 1205 15.00 1 X  # FIND-HERB: some bileberries
-I 7 10227 100.00 1  # FIND-HERB: an agave heart
+I 7 10227 100.00 1 X  # FIND-HERB: an agave heart
 M 0 10226 33.00 4
 M 1 10241 10.00 1
 S
@@ -136,7 +136,7 @@ I 7 1202 15.00 1 X  # FIND-HERB: a twig of redthorn
 I 7 1203 15.00 1 X  # FIND-HERB: some magewhisper sepals
 I 7 1204 15.00 1 X  # FIND-HERB: a daggerbite frond
 I 7 1205 15.00 1 X  # FIND-HERB: some bileberries
-I 7 10230 100.00 1  # FIND-HERB: some thick aloe leaves
+I 7 10230 100.00 1 X  # FIND-HERB: some thick aloe leaves
 M 0 10226 33.00 4
 M 1 10245 10.00 1
 S
