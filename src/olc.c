@@ -2780,7 +2780,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 	extern const byte interact_vnum_types[NUM_INTERACTS];
 	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], arg4[MAX_INPUT_LENGTH], arg5[MAX_INPUT_LENGTH], arg6[MAX_INPUT_LENGTH];
-	struct interaction_item *interact, *prev, *to_move, *temp, *a, *b, *a_next, *b_next, *copyfrom = NULL;
+	struct interaction_item *interact, *prev, *to_move, *temp, *a, *b, *a_next, *b_next, *copyfrom = NULL, *change;
 	struct interaction_item iitem;
 	int iter, loc, num, count, findtype;
 	any_vnum vnum;
@@ -3028,8 +3028,103 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 			msg_to_char(ch, "\r\n");
 		}
 	}
+	else if (is_abbrev(arg1, "change")) {
+		// arg1 == change
+		// arg2 contains the rest of the string -- split it up now
+		strcpy(buf, arg2);
+		half_chop(buf, arg2, buf1);	// arg2: number
+		half_chop(buf1, arg3, arg4);	// arg3: field, arg4: value
+		
+		// find which one to change
+		if (!isdigit(*arg2) || (num = atoi(arg2)) < 1) {
+			msg_to_char(ch, "Invalid interaction number.\r\n");
+			return;
+		}
+		change = NULL;
+		for (interact = *list; interact && !change; interact = interact->next) {
+			if (--num == 0) {
+				change = interact;
+				break;
+			}
+		}
+		if (!change) {
+			msg_to_char(ch, "Invalid interaction number.\r\n");
+			return;
+		}
+		
+		// ok now which field to change:
+		if (is_abbrev(arg3, "type")) {
+			if ((loc = search_block(arg4, interact_types, FALSE)) == NOTHING || interact_attach_types[loc] != attach_type) {
+				msg_to_char(ch, "Invalid type.\r\n");
+			}
+			else {
+				change->type = loc;
+				msg_to_char(ch, "Interaction %d type changed to %s.\r\n", atoi(arg2), interact_types[loc]);
+			}
+		}
+		else if (is_abbrev(arg3, "quantity")) {
+			if ((num = atoi(arg4)) < 1 || num >= 1000) {
+				msg_to_char(ch, "You must choose a quantity between 1 and 1000.\r\n");
+			}
+			else {
+				change->quantity = num;
+				msg_to_char(ch, "Interaction %d quantity changed to %d.\r\n", atoi(arg2), num);
+			}
+		}
+		else if (is_abbrev(arg3, "vnum")) {
+			vnum = atoi(arg4);
+			if (!*arg4) {
+				msg_to_char(ch, "Change it to which vnum?\r\n");
+			}
+			else if (interact_vnum_types[change->type] == TYPE_MOB && !mob_proto(vnum)) {
+				msg_to_char(ch, "Invalid mob vnum %d.\r\n", vnum);
+			}
+			else if (interact_vnum_types[change->type] == TYPE_OBJ && !obj_proto(vnum)) {
+				msg_to_char(ch, "Invalid object vnum %d.\r\n", vnum);
+			}
+			else {
+				change->vnum = vnum;
+				msg_to_char(ch, "Interaction %d vnum changed to [%d] %s.\r\n", atoi(arg2), vnum, (interact_vnum_types[change->type] == TYPE_MOB) ? get_mob_name_by_proto(vnum) : get_obj_name_by_proto(vnum));
+			}
+		}
+		else if (is_abbrev(arg3, "percent")) {
+			prc = atof(arg4);
+			if (!*arg4) {
+				msg_to_char(ch, "Change the percent to what?\r\n");
+			}
+			else if (prc < 0.01 || prc > 100.00) {
+				msg_to_char(ch, "You must choose a percentage between 0.01 and 100.00.\r\n");
+			}
+			else {
+				change->percent = prc;
+				msg_to_char(ch, "Interaction %d vnum changed to %.2f.\r\n", atoi(arg2), prc);
+			}
+		}
+		else if (is_abbrev(arg3, "exclusion")) {
+			if (!*arg4) {
+				msg_to_char(ch, "Change the exclusion code to what (or 'none')?\r\n");
+			}
+			else if (!str_cmp(arg4, "none")) {
+				change->exclusion_code = 0;
+				msg_to_char(ch, "Interaction %d exclusion code removed.\r\n", atoi(arg2));
+			}
+			else if (!isalpha(*arg4)) {
+				msg_to_char(ch, "Invalid exclusion code (must be a letter, 'none').\r\n");
+			}
+			else {
+				change->exclusion_code = *arg4;
+				msg_to_char(ch, "Interaction %d exclusion code changed to '%c'.\r\n", atoi(arg2), *arg4);
+			}
+		}
+		else {
+			msg_to_char(ch, "Invalid field. You can change: type, quantity, vnum, percent, exclusion\r\n");
+		}
+		
+		sort_interactions(list);
+	}
 	else {
 		msg_to_char(ch, "Usage: interaction add <type> <quantity> <vnum> <percent> [exclusion code]\r\n");
+		msg_to_char(ch, "Usage: interaction change <number> <field> <value>\r\n");
 		msg_to_char(ch, "Usage: interaction copy <from type> <from vnum>\r\n");
 		msg_to_char(ch, "Usage: interaction remove <number | all>\r\n");
 		msg_to_char(ch, "Usage: interaction move <number> <up | down>\r\n");

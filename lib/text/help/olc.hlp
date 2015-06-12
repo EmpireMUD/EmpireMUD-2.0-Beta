@@ -1546,6 +1546,7 @@ See also: OLC MOBILES
 "MEDIT INTERACTION" "BEDIT INTERACTION" "OEDIT INTERACTION" "REDIT INTERACTION" "SECTEDIT INTERACTION" "CROPEDIT INTERACTION" INTERACTIONS
 
 Usage:  .interaction add <type> <quantity> <vnum> <percent> [exclusion code]
+        .interaction change <number> <field> <value>
         .interaction copy <from type> <from vnum>
         .interaction remove <number | all>
         .interaction move <number> <up | down>
