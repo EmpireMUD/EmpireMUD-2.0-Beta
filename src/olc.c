@@ -3097,7 +3097,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 			}
 			else {
 				change->percent = prc;
-				msg_to_char(ch, "Interaction %d vnum changed to %.2f.\r\n", atoi(arg2), prc);
+				msg_to_char(ch, "Interaction %d percent changed to %.2f.\r\n", atoi(arg2), prc);
 			}
 		}
 		else if (is_abbrev(arg3, "exclusion")) {
