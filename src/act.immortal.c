@@ -2751,6 +2751,10 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	
 	msg_to_char(ch, "Gear level: [&g%.2f%s&0], VNum: [&g%5d&0], Type: &c%s&0\r\n", rate_item(j), buf, vnum, item_types[(int) GET_OBJ_TYPE(j)]);
 	msg_to_char(ch, "L-Des: %s\r\n", GET_OBJ_DESC(j, ch, OBJ_DESC_LONG));
+	
+	if (GET_OBJ_ACTION_DESC(j)) {
+		msg_to_char(ch, "%s", GET_OBJ_ACTION_DESC(j));
+	}
 
 	*buf = 0;
 	if (j->ex_description) {
