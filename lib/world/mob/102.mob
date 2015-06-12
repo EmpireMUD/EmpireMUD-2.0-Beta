@@ -5,18 +5,18 @@ A goblin bruiser is guarding the nest.
 ~
 0 0 bdy 0
 1 0 0 5
-I 4 10200 7.50 1  # LOOT: goblin clothing
-I 4 10201 7.50 1  # LOOT: goblin pants
-I 4 10202 7.50 1  # LOOT: goblin shoes
-I 4 10203 7.50 1  # LOOT: a pile of goblin coins
-I 4 10204 7.50 1  # LOOT: a goblincraft saddle
-I 4 10205 7.50 1  # LOOT: a tarnished necklace
-I 4 10206 7.50 1  # LOOT: a goblin timepiece
-I 4 10207 7.50 1  # LOOT: open-fingered gloves
-I 4 10208 7.50 1  # LOOT: a goblin collar
-I 4 10209 7.50 1  # LOOT: a warg-bone earring
-I 4 10210 7.50 1  # LOOT: Zelkab's bone club
-I 4 10211 7.50 1  # LOOT: Zelkab's armored gauntlets
+I 4 10200 5.00 1 A  # LOOT: goblin clothing
+I 4 10201 5.00 1 A  # LOOT: goblin pants
+I 4 10202 5.00 1 A  # LOOT: goblin shoes
+I 4 10203 5.00 1 A  # LOOT: a pile of goblin coins
+I 4 10204 5.00 1 A  # LOOT: a goblincraft saddle
+I 4 10205 5.00 1 A  # LOOT: a tarnished necklace
+I 4 10206 5.00 1 A  # LOOT: a goblin timepiece
+I 4 10207 5.00 1 A  # LOOT: open-fingered gloves
+I 4 10208 5.00 1 A  # LOOT: a goblin collar
+I 4 10209 5.00 1 A  # LOOT: a warg-bone earring
+I 4 10210 7.50 1 B  # LOOT: Zelkab's bone club
+I 4 10211 7.50 1 B  # LOOT: Zelkab's armored gauntlets
 T 10201
 T 10204
 T 10205
@@ -28,18 +28,18 @@ A goblin shaman is drawing symbols in the blood on the floor.
 ~
 0 0 bdxA 0
 2 0 0 16
-I 4 10200 7.50 1  # LOOT: goblin clothing
-I 4 10201 7.50 1  # LOOT: goblin pants
-I 4 10202 7.50 1  # LOOT: goblin shoes
-I 4 10203 7.50 1  # LOOT: a pile of goblin coins
-I 4 10204 7.50 1  # LOOT: a goblincraft saddle
-I 4 10205 7.50 1  # LOOT: a tarnished necklace
-I 4 10206 7.50 1  # LOOT: a goblin timepiece
-I 4 10207 7.50 1  # LOOT: open-fingered gloves
-I 4 10208 7.50 1  # LOOT: a goblin collar
-I 4 10209 7.50 1  # LOOT: a warg-bone earring
-I 4 10212 7.50 1  # LOOT: Garlgarl's glowing staff
-I 4 10213 7.50 1  # LOOT: Garlgarl's belt of herbs
+I 4 10200 5.00 1 A  # LOOT: goblin clothing
+I 4 10201 5.00 1 A  # LOOT: goblin pants
+I 4 10202 5.00 1 A  # LOOT: goblin shoes
+I 4 10203 5.00 1 A  # LOOT: a pile of goblin coins
+I 4 10204 5.00 1 A  # LOOT: a goblincraft saddle
+I 4 10205 5.00 1 A  # LOOT: a tarnished necklace
+I 4 10206 5.00 1 A  # LOOT: a goblin timepiece
+I 4 10207 5.00 1 A  # LOOT: open-fingered gloves
+I 4 10208 5.00 1 A  # LOOT: a goblin collar
+I 4 10209 5.00 1 A  # LOOT: a warg-bone earring
+I 4 10212 7.50 1 B  # LOOT: Garlgarl's glowing staff
+I 4 10213 7.50 1 B  # LOOT: Garlgarl's belt of herbs
 T 10200
 T 10201
 T 10206
@@ -52,18 +52,18 @@ A goblin archer is trying to fix her bow.
 ~
 0 0 abdzA hC
 2 0 0 1
-I 4 10200 7.50 1  # LOOT: goblin clothing
-I 4 10201 7.50 1  # LOOT: goblin pants
-I 4 10202 7.50 1  # LOOT: goblin shoes
-I 4 10203 7.50 1  # LOOT: a pile of goblin coins
-I 4 10204 7.50 1  # LOOT: a goblincraft saddle
-I 4 10205 7.50 1  # LOOT: a tarnished necklace
-I 4 10206 7.50 1  # LOOT: a goblin timepiece
-I 4 10207 7.50 1  # LOOT: open-fingered gloves
-I 4 10208 7.50 1  # LOOT: a goblin collar
-I 4 10209 7.50 1  # LOOT: a warg-bone earring
-I 4 10214 7.50 1  # LOOT: Filks's firebranded bow
-I 4 10215 7.50 1  # LOOT: a bundle of goblin arrows
+I 4 10200 5.00 1 A  # LOOT: goblin clothing
+I 4 10201 5.00 1 A  # LOOT: goblin pants
+I 4 10202 5.00 1 A  # LOOT: goblin shoes
+I 4 10203 5.00 1 A  # LOOT: a pile of goblin coins
+I 4 10204 5.00 1 A  # LOOT: a goblincraft saddle
+I 4 10205 5.00 1 A  # LOOT: a tarnished necklace
+I 4 10206 5.00 1 A  # LOOT: a goblin timepiece
+I 4 10207 5.00 1 A  # LOOT: open-fingered gloves
+I 4 10208 5.00 1 A  # LOOT: a goblin collar
+I 4 10209 5.00 1 A  # LOOT: a warg-bone earring
+I 4 10214 7.50 1 B  # LOOT: Filks's firebranded bow
+I 4 10215 7.50 1 B  # LOOT: a bundle of goblin arrows
 T 10200
 T 10201
 T 10208
@@ -77,18 +77,18 @@ A goblin sapper is trying to light something on fire.
 ~
 0 0 abdyA hsC
 1 0 0 4
-I 4 10200 7.50 1  # LOOT: goblin clothing
-I 4 10201 7.50 1  # LOOT: goblin pants
-I 4 10202 7.50 1  # LOOT: goblin shoes
-I 4 10203 7.50 1  # LOOT: a pile of goblin coins
-I 4 10204 7.50 1  # LOOT: a goblincraft saddle
-I 4 10205 7.50 1  # LOOT: a tarnished necklace
-I 4 10206 7.50 1  # LOOT: a goblin timepiece
-I 4 10207 7.50 1  # LOOT: open-fingered gloves
-I 4 10208 7.50 1  # LOOT: a goblin collar
-I 4 10209 7.50 1  # LOOT: a warg-bone earring
-I 4 10216 7.50 1  # LOOT: Walts's reinforced leggings
-I 4 10217 7.50 1  # LOOT: Walts's heavy belt
+I 4 10200 5.00 1 A  # LOOT: goblin clothing
+I 4 10201 5.00 1 A  # LOOT: goblin pants
+I 4 10202 5.00 1 A  # LOOT: goblin shoes
+I 4 10203 5.00 1 A  # LOOT: a pile of goblin coins
+I 4 10204 5.00 1 A  # LOOT: a goblincraft saddle
+I 4 10205 5.00 1 A  # LOOT: a tarnished necklace
+I 4 10206 5.00 1 A  # LOOT: a goblin timepiece
+I 4 10207 5.00 1 A  # LOOT: open-fingered gloves
+I 4 10208 5.00 1 A  # LOOT: a goblin collar
+I 4 10209 5.00 1 A  # LOOT: a warg-bone earring
+I 4 10216 7.50 1 B  # LOOT: Walts's reinforced leggings
+I 4 10217 7.50 1 B  # LOOT: Walts's heavy belt
 T 10200
 T 10201
 T 10210
@@ -102,18 +102,18 @@ The goblin champion is unpolishing her armor.
 ~
 0 0 bdyB h
 2 0 0 2
-I 4 10200 7.50 1  # LOOT: goblin clothing
-I 4 10201 7.50 1  # LOOT: goblin pants
-I 4 10202 7.50 1  # LOOT: goblin shoes
-I 4 10203 7.50 1  # LOOT: a pile of goblin coins
-I 4 10204 7.50 1  # LOOT: a goblincraft saddle
-I 4 10205 7.50 1  # LOOT: a tarnished necklace
-I 4 10206 7.50 1  # LOOT: a goblin timepiece
-I 4 10207 7.50 1  # LOOT: open-fingered gloves
-I 4 10208 7.50 1  # LOOT: a goblin collar
-I 4 10209 7.50 1  # LOOT: a warg-bone earring
-I 4 10218 7.50 1  # LOOT: Nilbog's armored waistband
-I 4 10219 7.50 1  # LOOT: Nilbog's wargskull helm
+I 4 10200 5.00 1 A  # LOOT: goblin clothing
+I 4 10201 5.00 1 A  # LOOT: goblin pants
+I 4 10202 5.00 1 A  # LOOT: goblin shoes
+I 4 10203 5.00 1 A  # LOOT: a pile of goblin coins
+I 4 10204 5.00 1 A  # LOOT: a goblincraft saddle
+I 4 10205 5.00 1 A  # LOOT: a tarnished necklace
+I 4 10206 5.00 1 A  # LOOT: a goblin timepiece
+I 4 10207 5.00 1 A  # LOOT: open-fingered gloves
+I 4 10208 5.00 1 A  # LOOT: a goblin collar
+I 4 10209 5.00 1 A  # LOOT: a warg-bone earring
+I 4 10218 7.50 1 B  # LOOT: Nilbog's armored waistband
+I 4 10219 7.50 1 B  # LOOT: Nilbog's wargskull helm
 T 10200
 T 10201
 T 10212
@@ -126,18 +126,18 @@ The goblin war shaman is raising his staff!
 ~
 0 0 bdxAB h
 1 0 0 18
-I 4 10200 7.50 1  # LOOT: goblin clothing
-I 4 10201 7.50 1  # LOOT: goblin pants
-I 4 10202 7.50 1  # LOOT: goblin shoes
-I 4 10203 7.50 1  # LOOT: a pile of goblin coins
-I 4 10204 7.50 1  # LOOT: a goblincraft saddle
-I 4 10205 7.50 1  # LOOT: a tarnished necklace
-I 4 10206 7.50 1  # LOOT: a goblin timepiece
-I 4 10207 7.50 1  # LOOT: open-fingered gloves
-I 4 10208 7.50 1  # LOOT: a goblin collar
-I 4 10209 7.50 1  # LOOT: a warg-bone earring
-I 4 10220 7.50 1  # LOOT: Furl's flaming wristbands
-I 4 10221 7.50 1  # LOOT: Furl's armored wristbands
+I 4 10200 5.00 1 A  # LOOT: goblin clothing
+I 4 10201 5.00 1 A  # LOOT: goblin pants
+I 4 10202 5.00 1 A  # LOOT: goblin shoes
+I 4 10203 5.00 1 A  # LOOT: a pile of goblin coins
+I 4 10204 5.00 1 A  # LOOT: a goblincraft saddle
+I 4 10205 5.00 1 A  # LOOT: a tarnished necklace
+I 4 10206 5.00 1 A  # LOOT: a goblin timepiece
+I 4 10207 5.00 1 A  # LOOT: open-fingered gloves
+I 4 10208 5.00 1 A  # LOOT: a goblin collar
+I 4 10209 5.00 1 A  # LOOT: a warg-bone earring
+I 4 10220 7.50 1 B  # LOOT: Furl's flaming wristbands
+I 4 10221 7.50 1 B  # LOOT: Furl's armored wristbands
 T 10200
 T 10201
 T 10214
@@ -231,8 +231,8 @@ I 1 10265 50.00 1  # SKIN: a thick dracosaur hide
 I 1 1351 50.00 1  # SKIN: a large skin
 I 1 1351 50.00 1  # SKIN: a large skin
 I 4 10252 100.00 1  # LOOT: a huge dracosaur bone
-I 4 10286 7.50 1 X  # LOOT: a terrosaur whistle
-I 4 10263 15.00 1 X  # LOOT: a dracosaur whistle
+I 4 10286 5.00 1 X  # LOOT: a terrosaur whistle
+I 4 10263 10.00 1 X  # LOOT: a dracosaur whistle
 I 4 10255 20.00 1 X  # LOOT: a dracosaur bone bracelet
 I 4 10259 10.00 1 X  # LOOT: a primitive satchel
 I 4 10261 10.00 1 X  # LOOT: an unlit branch
@@ -259,8 +259,8 @@ I 1 10265 50.00 1  # SKIN: a thick dracosaur hide
 I 1 1351 50.00 1  # SKIN: a large skin
 I 1 1351 50.00 1  # SKIN: a large skin
 I 4 10253 100.00 1  # LOOT: the essence of terror
-I 4 10286 7.50 1 X  # LOOT: a terrosaur whistle
-I 4 10263 15.00 1 X  # LOOT: a dracosaur whistle
+I 4 10286 5.00 1 X  # LOOT: a terrosaur whistle
+I 4 10263 10.00 1 X  # LOOT: a dracosaur whistle
 I 4 10256 20.00 1 X  # LOOT: a dracosaur scale wristband
 I 4 10259 10.00 1 X  # LOOT: a primitive satchel
 I 4 10261 10.00 1 X  # LOOT: an unlit branch
@@ -282,8 +282,8 @@ I 4 10265 75.00 1  # LOOT: a thick dracosaur hide
 I 4 10265 75.00 1  # LOOT: a thick dracosaur hide
 I 4 10267 75.00 1  # LOOT: a serrated dracosaur tooth
 I 4 10267 75.00 1  # LOOT: a serrated dracosaur tooth
-I 4 10286 7.50 1 X  # LOOT: a terrosaur whistle
-I 4 10263 15.00 1 X  # LOOT: a dracosaur whistle
+I 4 10286 5.00 1 X  # LOOT: a terrosaur whistle
+I 4 10263 10.00 1 X  # LOOT: a dracosaur whistle
 I 4 10258 20.00 1 X  # LOOT: an obsidian bracelet
 I 4 10259 10.00 1 X  # LOOT: a primitive satchel
 I 4 10261 10.00 1 X  # LOOT: an unlit branch
@@ -308,9 +308,9 @@ I 1 10265 50.00 1  # SKIN: a thick dracosaur hide
 I 1 10265 50.00 1  # SKIN: a thick dracosaur hide
 I 1 1351 50.00 1  # SKIN: a large skin
 I 1 1351 50.00 1  # SKIN: a large skin
-I 4 10255 10.00 1  # LOOT: a dracosaur bone bracelet
-I 4 10259 10.00 1  # LOOT: a primitive satchel
-I 4 10261 10.00 1  # LOOT: an unlit branch
+I 4 10255 10.00 1 X  # LOOT: a dracosaur bone bracelet
+I 4 10259 10.00 1 X  # LOOT: a primitive satchel
+I 4 10261 10.00 1 X  # LOOT: an unlit branch
 T 10262
 T 10265
 T 10256
@@ -326,9 +326,9 @@ I 0 3200 100.00 2  # BUTCHER: a cut of poultry
 I 0 10267 100.00 1  # BUTCHER: a serrated dracosaur tooth
 I 1 10265 100.00 1  # SKIN: a thick dracosaur hide
 I 1 1351 50.00 1  # SKIN: a large skin
-I 4 10256 10.00 1  # LOOT: a dracosaur scale wristband
-I 4 10259 10.00 1  # LOOT: a primitive satchel
-I 4 10261 10.00 1  # LOOT: an unlit branch
+I 4 10256 10.00 1 X  # LOOT: a dracosaur scale wristband
+I 4 10259 10.00 1 X  # LOOT: a primitive satchel
+I 4 10261 10.00 1 X  # LOOT: an unlit branch
 T 10262
 T 10265
 T 10256
@@ -354,13 +354,13 @@ A druid is magically growing the foliage over the path.
 ~
 0 0 bdvxzAE c
 1 3 0 16
-I 4 10258 10.00 1  # LOOT: an obsidian bracelet
 I 4 10265 50.00 1  # LOOT: a thick dracosaur hide
 I 4 10265 50.00 1  # LOOT: a thick dracosaur hide
 I 4 10267 50.00 1  # LOOT: a serrated dracosaur tooth
 I 4 10267 50.00 1  # LOOT: a serrated dracosaur tooth
-I 4 10259 10.00 1  # LOOT: a primitive satchel
-I 4 10261 10.00 1  # LOOT: an unlit branch
+I 4 10258 10.00 1 X  # LOOT: an obsidian bracelet
+I 4 10259 10.00 1 X  # LOOT: a primitive satchel
+I 4 10261 10.00 1 X  # LOOT: an unlit branch
 T 10262
 T 10265
 T 10256
@@ -374,8 +374,8 @@ A fierce terror bird is pacing toward you!
 0 0 0 10
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
 I 1 1351 100.00 1  # SKIN: a large skin
-I 4 10259 10.00 1  # LOOT: a primitive satchel
-I 4 10261 10.00 1  # LOOT: an unlit branch
+I 4 10259 10.00 1 X  # LOOT: a primitive satchel
+I 4 10261 10.00 1 X  # LOOT: an unlit branch
 T 10262
 T 10265
 S
@@ -398,8 +398,8 @@ A swarm of ants is coming toward you!
 ~
 0 0 bdjyE c
 0 0 0 9
-I 4 10259 10.00 1  # LOOT: a primitive satchel
-I 4 10261 10.00 1  # LOOT: an unlit branch
+I 4 10259 10.00 1 X  # LOOT: a primitive satchel
+I 4 10261 10.00 1 X  # LOOT: an unlit branch
 T 10262
 T 10265
 S
@@ -410,8 +410,8 @@ A trophy hunter is crouching in the underbrush.
 ~
 0 0 bdvzE c
 1 3 0 2
-I 4 10259 10.00 1  # LOOT: a primitive satchel
-I 4 10261 10.00 1  # LOOT: an unlit branch
+I 4 10259 10.00 1 X  # LOOT: a primitive satchel
+I 4 10261 10.00 1 X  # LOOT: an unlit branch
 T 10262
 T 10265
 S
