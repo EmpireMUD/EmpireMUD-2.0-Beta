@@ -2455,7 +2455,7 @@ ACMD(do_drink) {
 	obj_data *obj = NULL;
 	int amount, i, liquid;
 	double thirst_amt, hunger_amt;
-	int type = NOTHING;
+	int type = drink_OBJ;
 	room_data *to_room;
 
 	one_argument(argument, arg);
