@@ -3426,7 +3426,7 @@ void empty_obj_before_extract(obj_data *obj) {
 		}
 		else if (obj->carried_by) {
 			obj_to_char(jj, obj->carried_by);
-			get_check_money(obj->worn_by, jj);
+			get_check_money(obj->carried_by, jj);
 		}
 		else if (obj->worn_by) {
 			obj_to_char(jj, obj->worn_by);
