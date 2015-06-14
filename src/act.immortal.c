@@ -4424,6 +4424,7 @@ ACMD(do_island) {
 
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH * 2], line[256], flags[256];
 	struct island_info *isle, *next_isle;
+	room_data *center;
 	bitvector_t old;
 	size_t outsize;
 	
@@ -4438,10 +4439,12 @@ ACMD(do_island) {
 		outsize = snprintf(output, sizeof(output), "Islands:\r\n");
 		
 		HASH_ITER(hh, island_table, isle, next_isle) {
-			snprintf(line, sizeof(line), "%2d. %s", isle->id, isle->name);
+			center = real_room(isle->center);
+			
+			snprintf(line, sizeof(line), "%2d. %s (%d, %d), size %d", isle->id, isle->name, (center ? FLAT_X_COORD(center) : -1), (center ? FLAT_X_COORD(center) : -1), isle->tile_size);
 			if (isle->flags) {
 				sprintbit(isle->flags, island_bits, flags, TRUE);
-				snprintf(line + strlen(line), sizeof(line) - strlen(line), " (%-*.*s)", (int)strlen(flags)-1, (int)strlen(flags)-1, flags);
+				snprintf(line + strlen(line), sizeof(line) - strlen(line), " %s", flags);
 			}
 			
 			if (strlen(line) + outsize < sizeof(output)) {
