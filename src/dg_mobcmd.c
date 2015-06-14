@@ -84,13 +84,13 @@ double scale_modifier_by_mob(char_data *mob, double modifier) {
 	}
 
 	if (MOB_FLAGGED(mob, MOB_DPS)) {
-		modifier *= 1.1;
-	}
-	if (MOB_FLAGGED(mob, MOB_HARD)) {
 		modifier *= 1.25;
 	}
-	if (MOB_FLAGGED(mob, MOB_GROUP)) {
+	if (MOB_FLAGGED(mob, MOB_HARD)) {
 		modifier *= 1.5;
+	}
+	if (MOB_FLAGGED(mob, MOB_GROUP)) {
+		modifier *= 2.0;
 	}
 	
 	return modifier;
