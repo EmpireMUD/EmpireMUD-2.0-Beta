@@ -414,7 +414,6 @@ void real_update_char(char_data *ch) {
 	struct over_time_effect_type *dot, *next_dot;
 	struct affected_type *af, *next_af, *immune;
 	char_data *room_ch, *next_ch;
-	obj_data *obj, *next_obj;
 	int result, iter, type;
 	int fol_count, gain;
 	
@@ -557,16 +556,6 @@ void real_update_char(char_data *ch) {
 			act("$n stops using $p.", TRUE, ch, GET_EQ(ch, iter), NULL, TO_ROOM);
 			// this may extract it, or drop it
 			unequip_char_to_inventory(ch, iter, TRUE);
-		}
-	}
-
-	// over inventory
-	if (!IS_IMMORTAL(ch) && IS_CARRYING_N(ch) > CAN_CARRY_N(ch)) {
-		msg_to_char(ch, "You are carrying too many items!\r\n");
-		
-		for (obj = ch->carrying; obj && IS_CARRYING_N(ch) > CAN_CARRY_N(ch); obj = next_obj) {
-			next_obj = obj->next_content;
-			perform_drop(ch, obj, SCMD_DROP, "drop");
 		}
 	}
 

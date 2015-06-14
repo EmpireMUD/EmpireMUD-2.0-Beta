@@ -575,7 +575,12 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 			}
 		}
 	}
-
+	
+	if (!IS_IMMORTAL(ch) && IS_CARRYING_N(ch) > CAN_CARRY_N(ch)) {
+		msg_to_char(ch, "You are overburdened and cannot move.\r\n");
+		return FALSE;
+	}
+	
 	if (IS_INJURED(ch, INJ_TIED)) {
 		msg_to_char(ch, "You can't seem to move!\r\n");
 		return FALSE;
@@ -1227,6 +1232,11 @@ ACMD(do_enter) {
 	room = real_room(GET_PORTAL_TARGET_VNUM(portal));
 	if (!room) {
 		act("$p doesn't seem to lead anywhere.", FALSE, ch, portal, 0, TO_CHAR);
+		return;
+	}
+	
+	if (!IS_IMMORTAL(ch) && IS_CARRYING_N(ch) > CAN_CARRY_N(ch)) {
+		msg_to_char(ch, "You are overburdened and cannot move.\r\n");
 		return;
 	}
 	

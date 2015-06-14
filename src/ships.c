@@ -443,6 +443,9 @@ ACMD(do_board) {
 		msg_to_char(ch, "You can't lead an animal on board from here.\r\n");
 	else if (GET_SHIP_RESOURCES_REMAINING(ship) > 0)
 		msg_to_char(ch, "You can't board the ship until it's finished!\r\n");
+	else if (!IS_IMMORTAL(ch) && IS_CARRYING_N(ch) > CAN_CARRY_N(ch)) {
+		msg_to_char(ch, "You are overburdened and cannot move.\r\n");
+	}
 	else {
 		act("$n boards $p.", TRUE, ch, ship, 0, TO_ROOM);
 		msg_to_char(ch, "You board it.\r\n");
@@ -509,6 +512,9 @@ ACMD(do_disembark) {
 		msg_to_char(ch, "You can't disembark while riding.\r\n");
 	else if (GET_LEADING(ch) && IN_ROOM(GET_LEADING(ch)) == IN_ROOM(ch) && (leading = GET_LEADING(ch)) && BUILDING_VNUM(IN_ROOM(ship)) != BUILDING_DOCKS)
 		msg_to_char(ch, "You can't lead an animal off the ship unless it's at a dock.\r\n");
+	else if (!IS_IMMORTAL(ch) && IS_CARRYING_N(ch) > CAN_CARRY_N(ch)) {
+		msg_to_char(ch, "You are overburdened and cannot move.\r\n");
+	}
 	else {
 		act("$n disembarks from $p.", TRUE, ch, ship, 0, TO_ROOM);
 		msg_to_char(ch, "You disembark.\r\n");
