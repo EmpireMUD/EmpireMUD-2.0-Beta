@@ -1270,29 +1270,29 @@ const char *wear_keywords[] = {
 
 // WEAR_x -- data for each wear slot
 const struct wear_data_type wear_data[NUM_WEARS] = {
-	// eq tag,				 wear bit,		count-stats, cascade-pos, already-wearing, wear-message-to-room, wear-message-to-char
-	{ "    <worn on head> ", ITEM_WEAR_HEAD, TRUE, NO_WEAR, "You're already wearing $p on your head.", "$n wears $p on $s head.", "You wear $p on your head." },
-	{ "    <worn on ears> ", ITEM_WEAR_EARS, TRUE, NO_WEAR, "You're already wearing $p on your ears.", "$n pins $p onto $s ears.", "You pin $p onto your ears." },
-	{ "<worn around neck> ", ITEM_WEAR_NECK, TRUE, WEAR_NECK_2, "YOU SHOULD NEVER SEE THIS MESSAGE. PLEASE REPORT.", "$n wears $p around $s neck.", "You wear $p around your neck." },
-	{ "<worn around neck> ", ITEM_WEAR_NECK, TRUE, NO_WEAR, "You're already wearing enough around your neck.", "$n wears $p around $s neck.", "You wear $p around your neck." },
-	{ " <worn as clothes> ", ITEM_WEAR_CLOTHES, TRUE, NO_WEAR, "You're already wearing $p as clothes.", "$n wears $p as clothing.", "You wear $p as clothing." },
-	{ "   <worn as armor> ", ITEM_WEAR_ARMOR, TRUE, NO_WEAR, "You're already wearing $p as armor.", "$n wears $p as armor.", "You wear $p as armor." },
-	{ " <worn about body> ", ITEM_WEAR_ABOUT, TRUE, NO_WEAR, "You're already wearing $p about your body.", "$n wears $p about $s body.", "You wear $p around your body." },
-	{ "    <worn on arms> ", ITEM_WEAR_ARMS, TRUE, NO_WEAR, "You're already wearing $p on your arms.", "$n wears $p on $s arms.", "You wear $p on your arms." },
-	{ "  <worn on wrists> ", ITEM_WEAR_WRISTS, TRUE, NO_WEAR, "You're already wearing $p on your wrists.", "$n wears $p on $s wrists.", "You wear $p on your wrists." },
-	{ "   <worn on hands> ", ITEM_WEAR_HANDS, TRUE, NO_WEAR, "You're already wearing $p on your hands.", "$n puts $p on $s hands.", "You put $p on your hands." },
-	{ "  <worn on finger> ", ITEM_WEAR_FINGER, TRUE, WEAR_FINGER_L, "YOU SHOULD NEVER SEE THIS MESSAGE. PLEASE REPORT.", "$n slides $p on to $s right ring finger.", "You slide $p on to your right ring finger." },
-	{ "  <worn on finger> ", ITEM_WEAR_FINGER, TRUE, NO_WEAR, "You're already wearing something on both of your ring fingers.", "$n slides $p on to $s left ring finger.", "You slide $p on to your left ring finger." },
-	{ "<worn about waist> ", ITEM_WEAR_WAIST, TRUE, NO_WEAR, "You already have $p around your waist.", "$n wears $p around $s waist.", "You wear $p around your waist." },
-	{ "    <worn on legs> ", ITEM_WEAR_LEGS, TRUE, NO_WEAR, "You're already wearing $p on your legs.", "$n puts $p on $s legs.", "You put $p on your legs." },
-	{ "    <worn on feet> ", ITEM_WEAR_FEET, TRUE, NO_WEAR, "You're already wearing $p on your feet.", "$n wears $p on $s feet.", "You wear $p on your feet." },
-	{ " <carried as pack> ", ITEM_WEAR_PACK, TRUE, NO_WEAR, "You're already using $p.", "$n starts using $p.", "You start using $p." },
-	{ "  <used as saddle> ", ITEM_WEAR_SADDLE, TRUE, NO_WEAR, "You're already using $p.", "$n start using $p.", "You start using $p." },
-	{ "          (sheath) ", ITEM_WEAR_WIELD, FALSE, WEAR_SHEATH_2, "You've already got something sheathed.", "$n sheathes $p.", "You sheathe $p." },
-	{ "          (sheath) ", ITEM_WEAR_WIELD, FALSE, NO_WEAR, "You've already got something sheathed.", "$n sheathes $p.", "You sheathe $p." },
-	{ "         <wielded> ", ITEM_WEAR_WIELD, 	TRUE, NO_WEAR, "You're already wielding $p.", "$n wields $p.", "You wield $p." },
-	{ "          <ranged> ", ITEM_WEAR_RANGED, TRUE, NO_WEAR, "You're already using $p.", "$n uses $p.", "You use $p." },
-	{ "            <held> ", ITEM_WEAR_HOLD, TRUE, NO_WEAR, "You're already holding $p.", "$n grabs $p.", "You grab $p." }
+	// eq tag,				 wear bit,		count-stats, adds-gear-level, cascade-pos, already-wearing, wear-message-to-room, wear-message-to-char
+	{ "    <worn on head> ", ITEM_WEAR_HEAD, TRUE, TRUE, NO_WEAR, "You're already wearing $p on your head.", "$n wears $p on $s head.", "You wear $p on your head." },
+	{ "    <worn on ears> ", ITEM_WEAR_EARS, TRUE, TRUE, NO_WEAR, "You're already wearing $p on your ears.", "$n pins $p onto $s ears.", "You pin $p onto your ears." },
+	{ "<worn around neck> ", ITEM_WEAR_NECK, TRUE, TRUE, WEAR_NECK_2, "YOU SHOULD NEVER SEE THIS MESSAGE. PLEASE REPORT.", "$n wears $p around $s neck.", "You wear $p around your neck." },
+	{ "<worn around neck> ", ITEM_WEAR_NECK, TRUE, TRUE, NO_WEAR, "You're already wearing enough around your neck.", "$n wears $p around $s neck.", "You wear $p around your neck." },
+	{ " <worn as clothes> ", ITEM_WEAR_CLOTHES, TRUE, TRUE, NO_WEAR, "You're already wearing $p as clothes.", "$n wears $p as clothing.", "You wear $p as clothing." },
+	{ "   <worn as armor> ", ITEM_WEAR_ARMOR, TRUE, TRUE, NO_WEAR, "You're already wearing $p as armor.", "$n wears $p as armor.", "You wear $p as armor." },
+	{ " <worn about body> ", ITEM_WEAR_ABOUT, TRUE, TRUE, NO_WEAR, "You're already wearing $p about your body.", "$n wears $p about $s body.", "You wear $p around your body." },
+	{ "    <worn on arms> ", ITEM_WEAR_ARMS, TRUE, TRUE, NO_WEAR, "You're already wearing $p on your arms.", "$n wears $p on $s arms.", "You wear $p on your arms." },
+	{ "  <worn on wrists> ", ITEM_WEAR_WRISTS, TRUE, TRUE, NO_WEAR, "You're already wearing $p on your wrists.", "$n wears $p on $s wrists.", "You wear $p on your wrists." },
+	{ "   <worn on hands> ", ITEM_WEAR_HANDS, TRUE, TRUE, NO_WEAR, "You're already wearing $p on your hands.", "$n puts $p on $s hands.", "You put $p on your hands." },
+	{ "  <worn on finger> ", ITEM_WEAR_FINGER, TRUE, TRUE, WEAR_FINGER_L, "YOU SHOULD NEVER SEE THIS MESSAGE. PLEASE REPORT.", "$n slides $p on to $s right ring finger.", "You slide $p on to your right ring finger." },
+	{ "  <worn on finger> ", ITEM_WEAR_FINGER, TRUE, TRUE, NO_WEAR, "You're already wearing something on both of your ring fingers.", "$n slides $p on to $s left ring finger.", "You slide $p on to your left ring finger." },
+	{ "<worn about waist> ", ITEM_WEAR_WAIST, TRUE, TRUE, NO_WEAR, "You already have $p around your waist.", "$n wears $p around $s waist.", "You wear $p around your waist." },
+	{ "    <worn on legs> ", ITEM_WEAR_LEGS, TRUE, TRUE, NO_WEAR, "You're already wearing $p on your legs.", "$n puts $p on $s legs.", "You put $p on your legs." },
+	{ "    <worn on feet> ", ITEM_WEAR_FEET, TRUE, TRUE, NO_WEAR, "You're already wearing $p on your feet.", "$n wears $p on $s feet.", "You wear $p on your feet." },
+	{ " <carried as pack> ", ITEM_WEAR_PACK, TRUE, TRUE, NO_WEAR, "You're already using $p.", "$n starts using $p.", "You start using $p." },
+	{ "  <used as saddle> ", ITEM_WEAR_SADDLE, TRUE, FALSE, NO_WEAR, "You're already using $p.", "$n start using $p.", "You start using $p." },
+	{ "          (sheath) ", ITEM_WEAR_WIELD, FALSE, FALSE, WEAR_SHEATH_2, "You've already got something sheathed.", "$n sheathes $p.", "You sheathe $p." },
+	{ "          (sheath) ", ITEM_WEAR_WIELD, FALSE, FALSE, NO_WEAR, "You've already got something sheathed.", "$n sheathes $p.", "You sheathe $p." },
+	{ "         <wielded> ", ITEM_WEAR_WIELD, 	TRUE, TRUE, NO_WEAR, "You're already wielding $p.", "$n wields $p.", "You wield $p." },
+	{ "          <ranged> ", ITEM_WEAR_RANGED, TRUE, TRUE, NO_WEAR, "You're already using $p.", "$n uses $p.", "You use $p." },
+	{ "            <held> ", ITEM_WEAR_HOLD, TRUE, TRUE, NO_WEAR, "You're already holding $p.", "$n grabs $p.", "You grab $p." }
 };
 
 

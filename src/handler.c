@@ -3776,7 +3776,7 @@ void equip_char(char_data *ch, obj_data *obj, int pos) {
 		obj->worn_on = pos;
 
 		// update gear level for characters
-		if (!IS_NPC(ch) && wear_data[pos].count_stats) {
+		if (!IS_NPC(ch) && wear_data[pos].adds_gear_level) {
 			GET_GEAR_LEVEL(ch) += rate_item(obj);
 		}
 
@@ -4096,7 +4096,7 @@ obj_data *unequip_char(char_data *ch, int pos) {
 		obj->worn_on = NO_WEAR;
 		
 		// adjust gear level
-		if (!IS_NPC(ch) && wear_data[pos].count_stats) {
+		if (!IS_NPC(ch) && wear_data[pos].adds_gear_level) {
 			GET_GEAR_LEVEL(ch) -= rate_item(obj);
 		}
 

@@ -1140,7 +1140,7 @@ int enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	// check equipment levels
 	level = 0;
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
-		if (GET_EQ(ch, iter) && wear_data[iter].count_stats) {
+		if (GET_EQ(ch, iter) && wear_data[iter].adds_gear_level) {
 			level += rate_item(GET_EQ(ch, iter));
 		}
 	}
