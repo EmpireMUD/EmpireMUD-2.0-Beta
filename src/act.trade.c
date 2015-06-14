@@ -103,15 +103,21 @@ obj_data *find_water_container(char_data *ch, obj_data *list) {
 */
 obj_data *has_hammer(char_data *ch) {
 	obj_data *hammer = NULL;
+	int iter;
 	
-	if (!(hammer = GET_EQ(ch, WEAR_WIELD)) || !IS_WEAPON(hammer) || GET_WEAPON_TYPE(hammer) != TYPE_HAMMER) {
-		if (!(hammer = GET_EQ(ch, WEAR_HOLD)) || !IS_WEAPON(hammer) || GET_WEAPON_TYPE(hammer) != TYPE_HAMMER) {
-			msg_to_char(ch, "You need to use a hammer to do that.\r\n");
-			hammer = NULL;
+	// list of valid slots; terminate with -1
+	int slots[] = { WEAR_WIELD, WEAR_HOLD, WEAR_SHEATH_1, WEAR_SHEATH_2, -1 };
+	
+	for (iter = 0; slots[iter] != -1; ++iter) {
+		hammer = GET_EQ(ch, slots[iter]);
+		if (IS_WEAPON(hammer) && GET_WEAPON_TYPE(hammer) == TYPE_HAMMER) {
+			return hammer;
 		}
 	}
 	
-	return hammer;
+	// nope
+	msg_to_char(ch, "You need to use a hammer to do that.\r\n");
+	return NULL;
 }
 
 
