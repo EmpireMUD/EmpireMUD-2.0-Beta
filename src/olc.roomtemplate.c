@@ -829,9 +829,9 @@ OLC_MODULE(rmedit_spawns) {
 	extern const char *olc_type_bits[NUM_OLC_TYPES+1];
 
 	room_template *rmt = GET_OLC_ROOM_TEMPLATE(ch->desc);
-	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], vnum_arg[MAX_INPUT_LENGTH], prc_arg[MAX_INPUT_LENGTH];
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], num_arg[MAX_INPUT_LENGTH], prc_arg[MAX_INPUT_LENGTH];
 	int num, stype, limit, findtype;
-	struct adventure_spawn *spawn, *temp, *copyfrom = NULL;
+	struct adventure_spawn *spawn, *temp, *change, *copyfrom = NULL;
 	double prc;
 	any_vnum vnum;
 	bool found;
@@ -916,24 +916,24 @@ OLC_MODULE(rmedit_spawns) {
 	}
 	else if (is_abbrev(arg1, "add")) {
 		argument = any_one_arg(argument, type_arg);
-		argument = any_one_arg(argument, vnum_arg);
+		argument = any_one_arg(argument, num_arg);
 		argument = any_one_arg(argument, prc_arg);
 		skip_spaces(&argument);	// limit
 		
-		if (!*type_arg || !*vnum_arg || !*prc_arg || !*argument) {
+		if (!*type_arg || !*num_arg || !*prc_arg || !*argument) {
 			msg_to_char(ch, "Usage: spawn add <type> <vnum> <percent> <limit>\r\n");
 		}
 		else if ((stype = search_block(type_arg, adventure_spawn_types, FALSE)) == NOTHING) {
 			msg_to_char(ch, "Invalid type '%s'.\r\n", type_arg);
 		}
-		else if (!isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
-			msg_to_char(ch, "Invalid vnum '%s'.\r\n", vnum_arg);
+		else if (!isdigit(*num_arg) || (vnum = atoi(num_arg)) < 0) {
+			msg_to_char(ch, "Invalid vnum '%s'.\r\n", num_arg);
 		}
 		else if (stype == ADV_SPAWN_MOB && !mob_proto(vnum)) {
-			msg_to_char(ch, "Invalid mobile vnum '%s'.\r\n", vnum_arg);
+			msg_to_char(ch, "Invalid mobile vnum '%s'.\r\n", num_arg);
 		}
 		else if (stype == ADV_SPAWN_OBJ && !obj_proto(vnum)) {
-			msg_to_char(ch, "Invalid object vnum '%s'.\r\n", vnum_arg);
+			msg_to_char(ch, "Invalid object vnum '%s'.\r\n", num_arg);
 		}
 		else if ((prc = atof(prc_arg)) < .01 || prc > 100.00) {
 			msg_to_char(ch, "Percentage must be between .01 and 100; '%s' given.\r\n", prc_arg);
@@ -964,8 +964,71 @@ OLC_MODULE(rmedit_spawns) {
 			msg_to_char(ch, "You add spawn for %s %s (%d) at %.2f%%, limit %d.\r\n", adventure_spawn_types[stype], stype == ADV_SPAWN_MOB ? get_mob_name_by_proto(vnum) : get_obj_name_by_proto(vnum), vnum, prc, limit);
 		}
 	}
+	else if (is_abbrev(arg1, "change")) {
+		argument = any_one_arg(argument, num_arg);
+		argument = any_one_arg(argument, type_arg);
+		skip_spaces(&argument);	// value
+		
+		if (!*num_arg || !isdigit(*num_arg) || !*type_arg || !*argument) {
+			msg_to_char(ch, "Usage: spawn change <number> <vnum | percent | limit> <value>\r\n");
+			return;
+		}
+		
+		// find which one to change
+		num = atoi(num_arg);
+		change = NULL;
+		for (spawn = GET_RMT_SPAWNS(rmt); spawn && !change; spawn = spawn->next) {
+			if (--num == 0) {
+				change = spawn;
+				break;
+			}
+		}
+		
+		if (!change) {
+			msg_to_char(ch, "Invalid spawn number.\r\n");
+		}
+		else if (is_abbrev(type_arg, "vnum")) {
+			if (!isdigit(*argument) || (vnum = atoi(argument)) < 0) {
+				msg_to_char(ch, "Invalid vnum '%s'.\r\n", argument);
+			}
+			else if (change->type == ADV_SPAWN_MOB && !mob_proto(vnum)) {
+				msg_to_char(ch, "Invalid mobile vnum '%s'.\r\n", argument);
+			}
+			else if (change->type == ADV_SPAWN_OBJ && !obj_proto(vnum)) {
+				msg_to_char(ch, "Invalid object vnum '%s'.\r\n", argument);
+			}
+			else {
+				change->vnum = vnum;
+				msg_to_char(ch, "Spawn %d changed to vnum %d (%s).\r\n", atoi(num_arg), vnum, change->type == ADV_SPAWN_MOB ? get_mob_name_by_proto(vnum) : get_obj_name_by_proto(vnum));
+			}
+		}
+		else if (is_abbrev(type_arg, "percent")) {
+			prc = atof(argument);
+			
+			if (prc < .01 || prc > 100.00) {
+				msg_to_char(ch, "Percentage must be between .01 and 100; '%s' given.\r\n", prc_arg);
+			}
+			else {
+				change->percent = prc;
+				msg_to_char(ch, "Spawn %d changed to %.2f percent.\r\n", atoi(num_arg), prc);
+			}
+		}
+		else if (is_abbrev(type_arg, "limit")) {
+			if (!isdigit(*argument) || (limit = atoi(argument)) < -1 || limit > MAX_INT) {
+				msg_to_char(ch, "Invalid limit '%s'.\r\n", argument);
+			}
+			else {
+				change->limit = limit;
+				msg_to_char(ch, "Spawn %d changed to limit %d.\r\n", atoi(num_arg), limit);
+			}
+		}
+		else {
+			msg_to_char(ch, "You can only change the vnum, percent, or limit.\r\n");
+		}
+	}
 	else {
 		msg_to_char(ch, "Usage: spawn add <type> <vnum> <percent> <limit>\r\n");
+		msg_to_char(ch, "Usage: spawn change <number> <vnum | percent | limit> <value>\r\n");
 		msg_to_char(ch, "Usage: spawn copy <from type> <from vnum>\r\n");
 		msg_to_char(ch, "Usage: spawn remove <number | all>\r\n");
 	}

@@ -2873,6 +2873,7 @@ See also: OLC ROOM TEMPLATES
 "REDIT SPAWNS"
 
 Usage:  .spawn add <type> <vnum> <percent> <limit>
+        .spawn change <number> <vnum | percent | limit> <value>
         .spawn copy <from type> <from vnum>
         .spawn remove <number | all>
 
