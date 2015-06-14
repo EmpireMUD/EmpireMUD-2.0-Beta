@@ -2598,6 +2598,162 @@ void write_interactions_to_file(FILE *fl, struct interaction_item *list) {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// ISLAND LIB //////////////////////////////////////////////////////////////
+
+/**
+* Fetches the island data for a given room. Optionally, you can have this
+* function guarantee the existence of the island data (e.g. if you're fetching
+* based on a room).
+*
+* @param int island_id The island to look up.
+* @param bool create_if_missing If TRUE, will guarantee a result by adding one.
+* @return struct island_info* A pointer to the island data, or NULL if there is none (and you didn't specify create).
+*/
+struct island_info *get_island(int island_id, bool create_if_missing) {
+	extern int sort_island_table(struct island_info *a, struct island_info *b);
+	
+	struct island_info *isle = NULL;
+	int iter;
+	
+	HASH_FIND_INT(island_table, &island_id, isle);
+	
+	if (!isle && create_if_missing) {
+		CREATE(isle, struct island_info, 1);
+		// ensure good data
+		isle->id = island_id;
+		isle->name = str_dup("Unexplored Island");
+		isle->flags = NOBITS;
+		isle->tile_size = 0;
+		isle->center = NOWHERE;
+		for (iter = 0; iter < NUM_SIMPLE_DIRS; ++iter) {
+			isle->edge[iter] = NOWHERE;
+		}
+		
+		HASH_ADD_INT(island_table, id, isle);
+		HASH_SORT(island_table, sort_island_table);
+	}
+
+	return isle;
+}
+
+
+/**
+* Load one island from file.
+*
+* @param FILE *fl The open read file.
+* @param int id The island id.
+* @return struct island_info* The island.
+*/
+static struct island_info *load_one_island(FILE *fl, int id) {	
+	char errstr[MAX_STRING_LENGTH], line[256], str_in[256];
+	struct island_info *isle;
+	
+	snprintf(errstr, sizeof(errstr), "island %d", id);
+	
+	// this does all the adding to tables and whatnot too!
+	isle = get_island(id, TRUE);
+	
+	// line 1: name
+	if (isle->name) {
+		free(isle->name);
+	}
+	isle->name = fread_string(fl, errstr);
+	
+	// line 2: center, flags
+	if (!get_line(fl, line) || sscanf(line, "%s", str_in) != 1) {
+		log("SYSERR: Format error in line 2 of %s", errstr);
+		exit(1);
+	}
+	
+	isle->flags = asciiflag_conv(str_in);
+	
+	// optionals
+	for (;;) {
+		if (!get_line(fl, line)) {
+			log("SYSERR: Format error in instance, expecting alphabetic flags, got: %s", line);
+			exit(1);
+		}
+		switch (*line) {
+			case 'S': {
+				// done
+				return isle;
+			}
+		}
+	}
+	
+	return isle;
+}
+
+
+/**
+* Loads island data, if there is any.
+*/
+void load_islands(void) {
+	char line[256];
+	FILE *fl;
+	
+	if (!(fl = fopen(ISLAND_FILE, "r"))) {
+		// log("SYSERR: Unable to load islands from file.");
+		// there just isn't a file -- that's ok, we'll generate new data
+		return;
+	}
+	
+	while (get_line(fl, line)) {
+		if (*line == '#') {
+			load_one_island(fl, atoi(line+1));
+		}
+		else if (*line == '$') {
+			// done;
+			break;
+		}
+		else {
+			// junk data?
+		}
+	}
+	
+	fclose(fl);
+}
+
+
+/**
+* Write island data to file.
+*/
+void save_island_table(void) {
+	struct island_info *isle, *next_isle;
+	FILE *fl;
+	
+	if (!(fl = fopen(ISLAND_FILE TEMP_SUFFIX, "w"))) {
+		log("SYSERR: Unable to write %s", ISLAND_FILE TEMP_SUFFIX);
+		return;
+	}
+
+	HASH_ITER(hh, island_table, isle, next_isle) {
+		fprintf(fl, "#%d\n", isle->id);
+		fprintf(fl, "%s~\n", NULLSAFE(isle->name));
+		fprintf(fl, "%s\n", bitv_to_alpha(isle->flags));		
+		fprintf(fl, "S\n");
+	}
+
+	fprintf(fl, "$\n");
+	fclose(fl);
+	rename(ISLAND_FILE TEMP_SUFFIX, ISLAND_FILE);
+}
+
+
+/**
+* Simple sorter for the island_table hash
+*
+* @param struct island_info *a One element
+* @param struct island_info *b Another element
+* @return int Sort instruction of -1, 0, or 1
+*/
+int sort_island_table(struct island_info *a, struct island_info *b) {
+	return a->id - b->id;
+}
+
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// MOBILE LIB //////////////////////////////////////////////////////////////
 
 /**

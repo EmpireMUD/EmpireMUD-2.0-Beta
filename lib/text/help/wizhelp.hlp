@@ -390,6 +390,19 @@ prompted to press any key to enter the game.
 
 See also: INVIS, VISIBLE
 #d
+ISLAND "ISLAND COMMAND"
+
+Usage:  island list
+        island rename <id> <name>
+        island flags <id> [add | remove] <flags>
+
+This immortal command allows the game's staff to name islands and apply
+properties to them.
+
+Island flags:
+ NEWBIE - Wipes claims periodically
+ !AGGRO - Prevents aggro mobs, and guard towers won't fire
+#d
 LAST
 
 Usage:  last <player_name>

@@ -63,6 +63,7 @@ member_timeout_max_threshold 168
 member_timeout_newbie 7
 minutes_per_day_full 150
 minutes_per_day_newbie 15
+newbie_island_day_limit 7
 time_to_empire_delete 104
 time_to_empire_emptiness 2
 whole_empire_timeout 30

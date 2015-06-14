@@ -49,6 +49,7 @@ extern const char *dirs[];
 extern const char *drinks[];
 extern const char *genders[];
 extern const char *grant_bits[];
+extern const char *island_bits[];
 extern const char *mapout_color_names[];
 extern const char *room_aff_bits[];
 extern const char *spawn_flags[];
@@ -530,7 +531,7 @@ ADMIN_UTIL(util_randtest) {
 
 
 ADMIN_UTIL(util_redo_islands) {
-	void number_the_islands(bool reset);
+	void number_and_count_islands(bool reset);
 	
 	skip_spaces(&argument);
 	
@@ -540,7 +541,7 @@ ADMIN_UTIL(util_redo_islands) {
 	}
 	else {
 		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has renumbered islands", GET_NAME(ch));
-		number_the_islands(TRUE);
+		number_and_count_islands(TRUE);
 		msg_to_char(ch, "Islands renumbered. Caution: empire inventories may now be in the wrong place.\r\n");
 	}
 }
@@ -3014,7 +3015,7 @@ void do_stat_room(char_data *ch) {
 		strcpy(buf2, GET_SECT_NAME(SECT(IN_ROOM(ch))));
 	}
 	msg_to_char(ch, "(%d, %d) %s (&c%s&0/&c%s&0)\r\n", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), get_room_name(IN_ROOM(ch), FALSE), buf2, GET_SECT_NAME(ROOM_ORIGINAL_SECT(IN_ROOM(ch))));
-	msg_to_char(ch, "VNum: [&g%d&0], Island: [%d]\r\n", GET_ROOM_VNUM(IN_ROOM(ch)), GET_ISLAND_ID(home));
+	msg_to_char(ch, "VNum: [&g%d&0], Island: [%d] %s\r\n", GET_ROOM_VNUM(IN_ROOM(ch)), GET_ISLAND_ID(home), get_island(GET_ISLAND_ID(home), TRUE)->name);
 	
 	if (home != IN_ROOM(ch)) {
 		msg_to_char(ch, "Home room: &g%d&0 %s\r\n", GET_ROOM_VNUM(home), get_room_name(home, FALSE));
@@ -4414,6 +4415,96 @@ ACMD(do_invis) {
 			perform_immort_vis(ch);
 		else
 			perform_immort_invis(ch, level);
+	}
+}
+
+
+ACMD(do_island) {
+	void save_island_table();
+
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH * 2], line[256], flags[256];
+	struct island_info *isle, *next_isle;
+	bitvector_t old;
+	size_t outsize;
+	
+	argument = any_one_arg(argument, arg1);	// command
+	skip_spaces(&argument);	// remainder
+	
+	if (!ch->desc) {
+		// don't bother
+		return;
+	}
+	else if (is_abbrev(arg1, "list")) {
+		outsize = snprintf(output, sizeof(output), "Islands:\r\n");
+		
+		HASH_ITER(hh, island_table, isle, next_isle) {
+			snprintf(line, sizeof(line), "%2d. %s", isle->id, isle->name);
+			if (isle->flags) {
+				sprintbit(isle->flags, island_bits, flags, TRUE);
+				snprintf(line + strlen(line), sizeof(line) - strlen(line), " (%-*.*s)", (int)strlen(flags)-1, (int)strlen(flags)-1, flags);
+			}
+			
+			if (strlen(line) + outsize < sizeof(output)) {
+				outsize += snprintf(output + outsize, sizeof(output) - outsize, "%s\r\n", line);
+			}
+			else {
+				outsize += snprintf(output + outsize, sizeof(output) - outsize, "OVERFLOW\r\n");
+				break;
+			}
+		}
+		
+		page_string(ch->desc, output, TRUE);
+	}
+	else if (is_abbrev(arg1, "rename")) {
+		argument = one_argument(argument, arg2);
+		skip_spaces(&argument);
+		
+		if (!*arg2 || !*argument || !isdigit(*arg2)) {
+			msg_to_char(ch, "Usage: island rename <id> <name>\r\n");
+		}
+		else if (!(isle = get_island(atoi(arg2), FALSE))) {
+			msg_to_char(ch, "Unknown island id '%s'.\r\n", arg2);
+		}
+		else if (strlen(argument) > MAX_ISLAND_NAME) {
+			msg_to_char(ch, "Island names may not be longer than %d characters.\r\n", MAX_ISLAND_NAME);
+		}
+		else {
+			send_config_msg(ch, "ok_string");
+			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has renamed island %d (%s) to %s", GET_NAME(ch), isle->id, NULLSAFE(isle->name), argument);
+			
+			if (isle->name) {
+				free(isle->name);
+			}
+			isle->name = str_dup(argument);
+			
+			save_island_table();
+		}
+	}
+	else if (is_abbrev(arg1, "flags")) {
+		argument = one_argument(argument, arg2);
+		skip_spaces(&argument);
+		
+		if (!*arg2 || !*argument || !isdigit(*arg2)) {
+			msg_to_char(ch, "Usage: island flags <id> [add | remove] [flags]\r\n");
+		}
+		else if (!(isle = get_island(atoi(arg2), FALSE))) {
+			msg_to_char(ch, "Unknown island id '%s'.\r\n", arg2);
+		}
+		else {
+			old = isle->flags;
+			isle->flags = olc_process_flag(ch, argument, "island", "island flags", island_bits, isle->flags);
+			
+			if (isle->flags != old) {
+				sprintbit(isle->flags, island_bits, flags, TRUE);
+				syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has set island %d (%s) flags to: %s", GET_NAME(ch), isle->id, NULLSAFE(isle->name), flags);
+				save_island_table();
+			}
+		}
+	}
+	else {
+		msg_to_char(ch, "Usage: island list\r\n");
+		msg_to_char(ch, "       island rename <id> <name>\r\n");
+		msg_to_char(ch, "       island flags <id> [add | remove] [flags]\r\n");
 	}
 }
 

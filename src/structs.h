@@ -1166,6 +1166,8 @@ typedef struct trig_data trig_data;
 #define GRANT_AUTHORIZE  BIT(31)
 #define GRANT_FORGIVE  BIT(32)
 #define GRANT_HOSTILE  BIT(33)
+#define GRANT_SLAY  BIT(34)
+#define GRANT_ISLAND  BIT(35)
 
 
 // Lore types
@@ -1424,6 +1426,11 @@ typedef struct trig_data trig_data;
 #define EX_CLOSED  BIT(1)	// The door is closed
 
 
+// Island flags -- ISLE_x
+#define ISLE_NEWBIE  BIT(0)	// a. Island follows newbie rules
+#define ISLE_NO_AGGRO  BIT(1)	// b. Island will not fire aggro mobs or guard towers
+
+
 // mine types
 #define MINE_NOT_SET  0	// do not change this -- 0 can't be used, as it represents an uninitialized mine. The rest are arbitrary
 #define MINE_IRON  10
@@ -1494,6 +1501,7 @@ typedef struct trig_data trig_data;
 #define MAX_INPUT_LENGTH  1024	// Max length per *line* of input
 #define MAX_INT  2147483647	// useful for bounds checking
 #define MAX_INVALID_NAMES  200	// ban.c
+#define MAX_ISLAND_NAME  40	// island name length -- seems more than reasonable
 #define MAX_ITEM_DESCRIPTION  4000
 #define MAX_MESSAGES  60	// fight.c
 #define MAX_MOTD_LENGTH  4000	// eedit.c, configs
@@ -3180,6 +3188,21 @@ struct depletion_data {
 	int count;
 	
 	struct depletion_data *next;
+};
+
+
+// data for the island_table
+struct island_info {
+	any_vnum id;	// game-assigned, permanent id
+	char *name;	// player-designated island naming
+	bitvector_t flags;	// ISLE_x flags
+	
+	// computed data
+	int tile_size;
+	room_vnum center;
+	room_vnum edge[NUM_SIMPLE_DIRS];	// edges
+	
+	UT_hash_handle hh;	// island_table hash
 };
 
 

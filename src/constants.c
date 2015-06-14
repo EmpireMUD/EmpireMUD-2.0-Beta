@@ -328,6 +328,8 @@ const char *grant_bits[] = {
 	"authorize",
 	"forgive",
 	"hostile",
+	"slay",
+	"island",	// 35
 	"\n"
 };
 
@@ -1879,6 +1881,14 @@ const int evo_val_types[NUM_EVOS] = {
 	EVO_VAL_SECTOR,	// near-sector
 	EVO_VAL_NONE,	// plants-to
 	EVO_VAL_NONE	// magic-growth
+};
+
+
+// ISLE_x -- island flags
+const char *island_bits[] = {
+	"NEWBIE",
+	"!AGGRO",
+	"\n"
 };
 
 

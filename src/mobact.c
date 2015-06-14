@@ -196,7 +196,7 @@ INTERACTION_FUNC(run_one_encounter) {
 void random_encounter(char_data *ch) {
 	extern bool has_boat(char_data *ch);
 
-	if (!ch->desc || IS_NPC(ch) || !IN_ROOM(ch) || FIGHTING(ch) || IS_GOD(ch) || NOHASSLE(ch)) {
+	if (!ch->desc || IS_NPC(ch) || !IN_ROOM(ch) || FIGHTING(ch) || IS_GOD(ch) || NOHASSLE(ch) || ISLAND_FLAGGED(IN_ROOM(ch), ISLE_NO_AGGRO)) {
 		return;
 	}
 
@@ -631,7 +631,7 @@ void mobile_activity(void) {
 		found = FALSE;
 
 		/* Aggressive Mobs */
-		if (!found && MOB_FLAGGED(ch, MOB_AGGRESSIVE)) {
+		if (!found && MOB_FLAGGED(ch, MOB_AGGRESSIVE) && !ISLAND_FLAGGED(IN_ROOM(ch), ISLE_NO_AGGRO)) {
 			for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict && !found; vict = vict->next_in_room) {
 				if (vict == ch) {
 					continue;
@@ -680,51 +680,53 @@ void mobile_activity(void) {
 			}
 			
 			// look for people to aggro
-			chemp = NULL;
-			for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict && !found; vict = vict->next_in_room) {
-				if (vict == ch) {
-					continue;
-				}
+			if (!ISLAND_FLAGGED(IN_ROOM(ch), ISLE_NO_AGGRO)) {
+				chemp = NULL;
+				for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict && !found; vict = vict->next_in_room) {
+					if (vict == ch) {
+						continue;
+					}
 				
-				// aggro players
-				if (!IS_NPC(vict) && vict->desc) {
-					if (GET_LOYALTY(vict) != GET_LOYALTY(ch) && CAN_AGGRO(ch, vict)) {
-						if (!chemp) {
-							chemp = GET_LOYALTY(ch);
-						}
+					// aggro players
+					if (!IS_NPC(vict) && vict->desc) {
+						if (GET_LOYALTY(vict) != GET_LOYALTY(ch) && CAN_AGGRO(ch, vict)) {
+							if (!chemp) {
+								chemp = GET_LOYALTY(ch);
+							}
 
-						// check character OR their leader for permission to be here, actually
-						if (!((m = vict->master) && in_same_group(vict, m))) {
-							m = vict;
-						}
-						if (GET_LOYALTY(m) != GET_LOYALTY(ch)) {
-							victemp = GET_LOYALTY(vict);
+							// check character OR their leader for permission to be here, actually
+							if (!((m = vict->master) && in_same_group(vict, m))) {
+								m = vict;
+							}
+							if (GET_LOYALTY(m) != GET_LOYALTY(ch)) {
+								victemp = GET_LOYALTY(vict);
 							
-							// check friendly first -- so we don't attack someone who's friendly
-							if (!empire_is_friendly(chemp, victemp) && can_fight(ch, vict)) {
-								if (IS_HOSTILE(vict) || (!IS_DISGUISED(vict) && empire_is_hostile(chemp, victemp, IN_ROOM(ch)))) {
-									if (affected_by_spell(vict, ATYPE_MAJESTY) && !AFF_FLAGGED(ch, AFF_IMMUNE_VAMPIRE)) {
-										gain_ability_exp(vict, ABIL_MAJESTY, 10);
-									}
+								// check friendly first -- so we don't attack someone who's friendly
+								if (!empire_is_friendly(chemp, victemp) && can_fight(ch, vict)) {
+									if (IS_HOSTILE(vict) || (!IS_DISGUISED(vict) && empire_is_hostile(chemp, victemp, IN_ROOM(ch)))) {
+										if (affected_by_spell(vict, ATYPE_MAJESTY) && !AFF_FLAGGED(ch, AFF_IMMUNE_VAMPIRE)) {
+											gain_ability_exp(vict, ABIL_MAJESTY, 10);
+										}
 									
-									if (!CHECK_MAJESTY(vict) || AFF_FLAGGED(ch, AFF_IMMUNE_VAMPIRE)) {
-										hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FALSE);
-										found = TRUE;
+										if (!CHECK_MAJESTY(vict) || AFF_FLAGGED(ch, AFF_IMMUNE_VAMPIRE)) {
+											hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FALSE);
+											found = TRUE;
+										}
 									}
 								}
 							}
 						}
 					}
-				}
-				// aggro mobs
-				else if (IS_NPC(vict) && MOB_FLAGGED(vict, MOB_AGGRESSIVE) && GET_LOYALTY(ch) != GET_LOYALTY(vict) && can_fight(ch, vict)) {
-					hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FALSE);
-					found = TRUE;
-				}
-				// hostility against empire mobs
-				else if (IS_NPC(vict) && GET_LOYALTY(vict) && GET_LOYALTY(vict) != GET_LOYALTY(ch) && empire_is_hostile(GET_LOYALTY(ch), GET_LOYALTY(vict), IN_ROOM(ch))) {
-					hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FALSE);
-					found = TRUE;
+					// aggro mobs
+					else if (IS_NPC(vict) && MOB_FLAGGED(vict, MOB_AGGRESSIVE) && GET_LOYALTY(ch) != GET_LOYALTY(vict) && can_fight(ch, vict)) {
+						hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FALSE);
+						found = TRUE;
+					}
+					// hostility against empire mobs
+					else if (IS_NPC(vict) && GET_LOYALTY(vict) && GET_LOYALTY(vict) != GET_LOYALTY(ch) && empire_is_hostile(GET_LOYALTY(ch), GET_LOYALTY(vict), IN_ROOM(ch))) {
+						hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FALSE);
+						found = TRUE;
+					}
 				}
 			}
 		}

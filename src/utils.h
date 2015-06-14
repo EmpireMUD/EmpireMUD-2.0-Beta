@@ -875,6 +875,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define IS_IN_CITY_ROOM(room)  (ROOM_OWNER(room) ? (find_city(ROOM_OWNER(room), room) != NULL) : FALSE)
 #define IS_LIGHT(room)  (!MAGIC_DARKNESS(room) && WOULD_BE_LIGHT_WITHOUT_MAGIC_DARKNESS(room))
 #define IS_REAL_LIGHT(room)  (!MAGIC_DARKNESS(room) && (!IS_DARK(room) || RMT_FLAGGED((room), RMT_LIGHT) || IS_INSIDE(room) || (ROOM_OWNER(room) && IS_ANY_BUILDING(room))))
+#define ISLAND_FLAGGED(room, flag)  ((GET_ISLAND_ID(room) != NO_ISLAND) ? IS_SET(get_island(GET_ISLAND_ID(room), TRUE)->flags, (flag)) : FALSE)
 #define MAGIC_DARKNESS(room)  (ROOM_AFF_FLAGGED((room), ROOM_AFF_DARK))
 #define ROOM_CAN_MINE(room)  (ROOM_SECT_FLAGGED((room), SECTF_CAN_MINE) || ROOM_BLD_FLAGGED((room), BLD_MINE) || (IS_ROAD(room) && SECT_FLAGGED(ROOM_ORIGINAL_SECT(room), SECTF_CAN_MINE)))
 #define ROOM_IS_CLOSED(room)  (IS_INSIDE(room) || IS_ADVENTURE_ROOM(room) || (IS_ANY_BUILDING(room) && !ROOM_BLD_FLAGGED(room, BLD_OPEN) && (IS_COMPLETE(room) || ROOM_BLD_FLAGGED(room, BLD_CLOSED))))

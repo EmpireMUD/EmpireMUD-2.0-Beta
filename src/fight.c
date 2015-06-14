@@ -1264,7 +1264,12 @@ static bool tower_would_shoot(room_data *from_room, char_data *vict) {
 	if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_DARK)) {
 		return FALSE;
 	}
-
+	
+	// non-aggressive island
+	if (ISLAND_FLAGGED(to_room, ISLE_NO_AGGRO)) {
+		return FALSE;
+	}
+	
 	// Special handling for mobs -- skip any mob not pulling a catapult
 	if (IS_NPC(vict)) {
 		if (!pulling || !CART_CAN_FIRE(pulling)) {
@@ -1364,6 +1369,11 @@ void process_tower(room_data *room) {
 	
 	// darkness effect
 	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_DARK)) {
+		return;
+	}
+	
+	// non-aggressive island
+	if (ISLAND_FLAGGED(room, ISLE_NO_AGGRO)) {
 		return;
 	}
 	
