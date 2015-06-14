@@ -1133,7 +1133,6 @@ void check_newbie_islands(void) {
 	room_data *room, *next_room;
 	int last_isle = -1;
 	empire_data *emp;
-	bool any = FALSE;
 	
 	HASH_ITER(world_hh, world_table, room, next_room) {
 		if (GET_ROOM_VNUM(room) >= MAP_SIZE || GET_ISLAND_ID(room) == NO_ISLAND) {
@@ -1150,13 +1149,8 @@ void check_newbie_islands(void) {
 			if ((emp = ROOM_OWNER(room)) && (EMPIRE_CREATE_TIME(emp) + (config_get_int("newbie_island_day_limit") * SECS_PER_REAL_DAY)) < time(0)) {
 				log_to_empire(emp, ELOG_TERRITORY, "(%d, %d) abandoned on newbie island", FLAT_X_COORD(room), FLAT_Y_COORD(room));
 				abandon_room(room);
-				any = TRUE;
 			}
 		}
-	}
-	
-	if (any) {
-		reread_empire_tech(NULL);
 	}
 }
 
