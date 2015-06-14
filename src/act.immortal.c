@@ -4441,7 +4441,7 @@ ACMD(do_island) {
 		HASH_ITER(hh, island_table, isle, next_isle) {
 			center = real_room(isle->center);
 			
-			snprintf(line, sizeof(line), "%2d. %s (%d, %d), size %d", isle->id, isle->name, (center ? FLAT_X_COORD(center) : -1), (center ? FLAT_X_COORD(center) : -1), isle->tile_size);
+			snprintf(line, sizeof(line), "%2d. %s (%d, %d), size %d", isle->id, isle->name, (center ? FLAT_X_COORD(center) : -1), (center ? FLAT_Y_COORD(center) : -1), isle->tile_size);
 			if (isle->flags) {
 				sprintbit(isle->flags, island_bits, flags, TRUE);
 				snprintf(line + strlen(line), sizeof(line) - strlen(line), " %s", flags);
