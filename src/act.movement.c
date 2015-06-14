@@ -550,28 +550,34 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 
 	/* First things first: Are we pulling a cart? */
 	if ((cart = GET_PULLING(ch))) {
-		mode = MOVE_CART;
-		if (ch == GET_PULLED_BY(cart, 0))
-			animal = GET_PULLED_BY(cart, 1);
-		else
-			animal = GET_PULLED_BY(cart, 0);
-		if (animal && IN_ROOM(animal) != IN_ROOM(ch))
-			animal = NULL;
+		if (IN_ROOM(cart) != IN_ROOM(ch)) {
+			// don't bother
+			cart = NULL;
+		}
+		else {
+			mode = MOVE_CART;
+			if (ch == GET_PULLED_BY(cart, 0))
+				animal = GET_PULLED_BY(cart, 1);
+			else
+				animal = GET_PULLED_BY(cart, 0);
+			if (animal && IN_ROOM(animal) != IN_ROOM(ch))
+				animal = NULL;
 
-		/* Make sure there's enough work animals */
-		if (GET_CART_ANIMALS_REQUIRED(cart) > 1) {
-			if (!animal) {
-				act("You need two animals to move $p.", FALSE, ch, cart, 0, TO_CHAR);
-				return FALSE;
-			}
+			/* Make sure there's enough work animals */
+			if (GET_CART_ANIMALS_REQUIRED(cart) > 1) {
+				if (!animal) {
+					act("You need two animals to move $p.", FALSE, ch, cart, 0, TO_CHAR);
+					return FALSE;
+				}
 		
-			if (animal && MOB_FLAGGED(animal, MOB_TIED)) {
-				act("The other animal pulling $p is tied up.", FALSE, ch, cart, 0, TO_CHAR);
-				return FALSE;
-			}
-			if (animal && is_fighting(animal)) {
-				act("The other animal pulling $p is fighting!", FALSE, ch, cart, 0, TO_CHAR);
-				return FALSE;
+				if (animal && MOB_FLAGGED(animal, MOB_TIED)) {
+					act("The other animal pulling $p is tied up.", FALSE, ch, cart, 0, TO_CHAR);
+					return FALSE;
+				}
+				if (animal && is_fighting(animal)) {
+					act("The other animal pulling $p is fighting!", FALSE, ch, cart, 0, TO_CHAR);
+					return FALSE;
+				}
 			}
 		}
 	}
