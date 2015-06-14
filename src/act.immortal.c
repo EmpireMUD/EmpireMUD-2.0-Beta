@@ -4487,7 +4487,7 @@ ACMD(do_island) {
 		argument = one_argument(argument, arg2);
 		skip_spaces(&argument);
 		
-		if (!*arg2 || !*argument || !isdigit(*arg2)) {
+		if (!*arg2 || !isdigit(*arg2)) {
 			msg_to_char(ch, "Usage: island flags <id> [add | remove] [flags]\r\n");
 		}
 		else if (!(isle = get_island(atoi(arg2), FALSE))) {
