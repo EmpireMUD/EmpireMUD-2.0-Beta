@@ -1250,6 +1250,11 @@ void number_and_count_islands(bool reset) {
 		
 		// find helper entry
 		id = GET_ISLAND_ID(room);
+		if (id == NO_ISLAND) {
+			// just an ocean
+			continue;
+		}
+		
 		HASH_FIND_INT(list, &id, data);
 		if (!data) {	// or create one
 			CREATE(data, struct island_read_data, 1);
