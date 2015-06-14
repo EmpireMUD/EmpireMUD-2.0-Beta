@@ -1519,17 +1519,16 @@ bool has_cooking_fire(char_data *ch) {
 */
 obj_data *has_sharp_tool(char_data *ch) {
 	obj_data *obj;
+	int iter;
 	
-	// wield
-	obj = GET_EQ(ch, WEAR_WIELD);
-	if (obj && IS_WEAPON(obj) && attack_hit_info[GET_WEAPON_TYPE(obj)].weapon_type == WEAPON_SHARP) {
-		return obj;
-	}
+	// slots to check (ensure a -1 terminator)
+	int slots[] = { WEAR_WIELD, WEAR_HOLD, WEAR_SHEATH_1, WEAR_SHEATH_2, -1 };
 	
-	// hold
-	obj = GET_EQ(ch, WEAR_HOLD);
-	if (obj && IS_WEAPON(obj) && attack_hit_info[GET_WEAPON_TYPE(obj)].weapon_type == WEAPON_SHARP) {
-		return obj;
+	for (iter = 0; slots[iter] != -1; ++iter) {
+		obj = GET_EQ(ch, slots[iter]);
+		if (obj && IS_WEAPON(obj) && attack_hit_info[GET_WEAPON_TYPE(obj)].weapon_type == WEAPON_SHARP) {
+			return obj;
+		}
 	}
 	
 	return NULL;
