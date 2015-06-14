@@ -1156,7 +1156,7 @@ void check_newbie_islands(void) {
 	}
 	
 	if (any) {
-		read_empire_territory(NULL);
+		reread_empire_tech(NULL);
 	}
 }
 
