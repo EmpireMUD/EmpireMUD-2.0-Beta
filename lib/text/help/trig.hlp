@@ -941,6 +941,8 @@ sex               - The actor's sex, as a string: MALE, FEMALE, or NEUTRAL.
 skill()           - The percentage of learnedness in the skill subfield.
 str               - The actor's Strength.
 title()           - The actor's title. Subfield sets. Not used for mobs.
+trigger_counterspell - Fires the character's counterspell and returns 1 if
+                    so, or returns 0 if there was no counterspell.
 varexists()       - Returns 1 if global variable in subfield exists, 0 if not.
                     Useful when dealing with remote vars on players.
 vnum              - The actor's virtual number.  

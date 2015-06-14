@@ -2367,8 +2367,18 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 
 					break;
 				case 't': {
-					if (!str_cmp(field, "tohit"))
+					if (!str_cmp(field, "tohit")) {
 						snprintf(str, slen, "%d", GET_TO_HIT(c));
+					}
+					else if (!str_cmp(field, "trigger_counterspell")) {
+						extern bool trigger_counterspell(char_data *ch);	// spells.c
+						if (trigger_counterspell(c)) {
+							snprintf(str, slen, "1");
+						}
+						else {
+							snprintf(str, slen, "0");
+						}
+					}
 					break;
 				}
 				case 'v':
