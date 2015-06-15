@@ -2294,6 +2294,14 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							snprintf(str, slen, "0");
 						}
 					}
+					else if (!str_cmp(field, "poison_immunity")) {
+						if (HAS_ABILITY(c, ABIL_POISON_IMMUNITY)) {
+							snprintf(str, slen, "1");
+						}
+						else {
+							snprintf(str, slen, "0");
+						}
+					}
 					else if (!str_cmp(field, "position")) {
 						extern const char *position_types[];
 						snprintf(str, slen, "%s", position_types[(int) GET_POS(c)]);
@@ -2313,6 +2321,14 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							}
 						}
 						snprintf(str, slen, "0");
+					}
+					else if (!str_cmp(field, "resist_poison")) {
+						if (HAS_ABILITY(c, ABIL_RESIST_POISON)) {
+							snprintf(str, slen, "1");
+						}
+						else {
+							snprintf(str, slen, "0");
+						}
 					}
 					else if (!str_cmp(field, "room")) {
 						snprintf(str, slen, "%c%d",UID_CHAR, GET_ROOM_VNUM(IN_ROOM(c)) + ROOM_ID_BASE); 

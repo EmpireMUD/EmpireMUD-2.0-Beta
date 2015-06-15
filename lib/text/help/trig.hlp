@@ -934,8 +934,10 @@ next_in_room      - The next actor in the room as a variable (id) nice to
 nohassle          - If TRUE, the player is an immortal with !HASSLE on.
 pc_name           - Player's name or mob's keyword list, rather than short desc
 plr_flagged(flag) - Returns TRUE if the player has the given flag (VAMPIRE).
+poison_immunity   - Returns TRUE if the player has Poison Immunity.
 position          - Returns Standing, Sitting, Fighting, etc.
 remove_mob_flag(flg) - Removes a mob flag from the mob. Also, add_mob_flag().
+resist_poison     - Returns TRUE if the player has Resist Poison.
 room              - The room the actor is in as a room variable. 
 sex               - The actor's sex, as a string: MALE, FEMALE, or NEUTRAL.
 skill()           - The percentage of learnedness in the skill subfield.
