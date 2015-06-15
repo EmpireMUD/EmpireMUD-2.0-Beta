@@ -3260,6 +3260,11 @@ void expand_mob_tags(char_data *mob) {
 				}
 			}
 		}
+		else {
+			if (!find_id_in_tag_list(tag->idnum, new_list)) {
+				add_mob_tag(tag->idnum, &new_list);
+			}
+		}
 	}
 	
 	free_mob_tags(&MOB_TAGGED_BY(mob));
