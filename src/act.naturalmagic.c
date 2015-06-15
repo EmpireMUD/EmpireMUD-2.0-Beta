@@ -523,7 +523,7 @@ ACMD(do_familiar) {
 		int cost;
 	} familiars[] = {
 		{ "cat", ABIL_FAMILIAR, 0, FAMILIAR_CAT, 40 },
-		{ "sabertooth", ABIL_FAMILIAR, 51, FAMILIAR_SABERTOOTH, 40 },
+		{ "saber-tooth", ABIL_FAMILIAR, 51, FAMILIAR_SABERTOOTH, 40 },
 		{ "sphinx", ABIL_FAMILIAR, 76, FAMILIAR_SPHINX, 40 },
 		{ "griffin", ABIL_FAMILIAR, 100, FAMILIAR_GRIFFIN, 40 },
 		

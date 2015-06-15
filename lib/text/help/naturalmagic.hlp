@@ -146,7 +146,7 @@ FAMILIAR
 
 Familiar (Natural Magic ability)
 
-Usage:  familiar
+Usage:  familiar <type>
 
 Natural Magic users are able to become friends with all sorts of animals, to
 the point where they can summon the aid of a familiar animal. When you call
@@ -154,6 +154,12 @@ a familiar, it appears, follows you, and prepares to take orders.
 
 The power and abilities of the familiar are based on your prowess in Natural
 Magic.
+
+Available familiars:
+  cat - A low-level familiar for novice mages.
+  saber-tooth - A larger cat with a bigger bite.
+  sphinx - A powerful familiar that will tank for you in combat.
+  griffin - A powerful familiar that will tank for you in combat.
 
 Use "dismiss" to get rid of your familiar.
 
