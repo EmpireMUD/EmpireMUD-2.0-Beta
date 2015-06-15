@@ -125,7 +125,7 @@ Cooldown:  30 seconds
 Usage:  shadowcage
 
 You create a cage of shadows, penalizing all enemies. The first victim loses
-dodge equal to 5x your Charsima. Each additional victim loses dodge equal to 3x
+dodge equal to 5x your Charisma. Each additional victim loses dodge equal to 3x
 Charisma instead.
 #
 DIVERSION
@@ -138,7 +138,7 @@ Cooldown:  30 seconds
 Usage:  diversion
 
 You create a flashy diversion, penalizing all enemies. The first victim loses
-Wits equal to your Charsima. Each additional victim loses Wits equal to half
+Wits equal to your Charisma. Each additional victim loses Wits equal to half
 your Charisma (rounded up) instead. This effect lasts 15 seconds.
 #
 ESCAPE
@@ -174,7 +174,7 @@ Cooldown:  30 seconds
 Usage:  howl
 
 You let out a terrifying howl, penalizing all enemies. The first victim loses
-to-hit equal to 5x your Charsima. Each additional victim loses to-hit equal to
+to-hit equal to 5x your Charisma. Each additional victim loses to-hit equal to
 3x Charisma instead.
 #
 SHADOWCAGE "SHADOW CAGE"
@@ -186,7 +186,7 @@ Cost: 50 move
 Cooldown: 30 seconds
 
 You create a cage of shadows, penalizing all enemies. The first victim loses
-dodge equal to 5x your Charsima. Each additional victim loses dodge equal to 3x
+dodge equal to 5x your Charisma. Each additional victim loses dodge equal to 3x
 Charisma instead. This effect lasts 15 seconds.
 #
 INFILTRATE "IMPROVED INFILTRATE"
@@ -354,7 +354,7 @@ Cost: 50 move
 Cooldown: 30 seconds
 
 You create a cage of shadows, penalizing all enemies. The first victim loses
-dodge equal to 5x your Charsima. Each additional victim loses dodge equal to 3x
+dodge equal to 5x your Charisma. Each additional victim loses dodge equal to 3x
 Charisma instead. This effect lasts 15 seconds.
 #
 SHADOWSTEP "SHADOW STEP"

@@ -338,12 +338,11 @@ and destroy your structure.
 #
 DRAW
 
-Usage:  draw [item]
+Usage:  draw <item>
 
-This pulls your sheathed weapon from its holster. It is done automatically in
-battle as long as your hand is free.
+This command pulls one of your sheathed weapons into your main hand.
 
-See also: SHEATH, SWAP
+See also: SHEATHE, SWAP
 #
 DROP
 
