@@ -1071,7 +1071,7 @@ bool can_use_room(char_data *ch, room_data *room, int mode) {
 		}
 	}
 	// check allies if not a private room
-	if (ROOM_PRIVATE_OWNER(homeroom) == NOBODY && has_relationship(ROOM_OWNER(homeroom), GET_LOYALTY(ch), DIPL_ALLIED)) {
+	if (mode != MEMBERS_ONLY && ROOM_PRIVATE_OWNER(homeroom) == NOBODY && has_relationship(ROOM_OWNER(homeroom), GET_LOYALTY(ch), DIPL_ALLIED)) {
 		return TRUE;
 	}
 	
