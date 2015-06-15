@@ -542,7 +542,9 @@ Shipbuilding (Trade ability)
 Advanced Ships (Trade ability)
 
 Buildings:  &b~&0()&b~&0  Shipyard (Seafaring ability)
-            &b~&0[]&b~&0   Upgraded Shipyard (Seafaring ability)
+            &b~&0[]&b~&0  Upgraded Shipyard (Seafaring ability)
+Resources:  60 lumber, 24 nails (shipyard)
+            30 blocks, 20 iron ingots  (upgraded)
 Built on:  plains or desert, next to water
 Command:  manufacture <ship>
 Fame:  4 (upgraded shipyard)
