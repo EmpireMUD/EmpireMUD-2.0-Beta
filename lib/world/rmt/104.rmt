@@ -1,0 +1,314 @@
+#10400
+A Burning Hamlet~
+   The sky over the small hamlet is thick with smoke, and some of the buildings
+nearby are already half-burnt. It looks like all sane citizens have fled, but
+no small number of them did not make it out the gates.  
+~
+acd 0
+D4
+~
+0 10401
+D0
+~
+0 10407
+D5
+~
+0 10413
+M 0 10400 100.00 1
+T 10408
+S
+#10401
+Market Street~
+   The street, once dense with market stalls, now lies in total disarray. 
+Charred fruit rolls slowly down the hillside , amidst the trampled remains of
+flower bouquets and spoiled vegetables.  
+~
+acd 0
+D7
+~
+0 10400
+D0
+~
+0 10402
+M 1 10402 100.00 1
+M 1 10405 100.00 3
+T 10408
+S
+#10402
+Market Street~
+   The chaos of the burning hamlet has left piles of rubble and spilled goods
+down the entire length of Market Street. The buildings that line the street
+have been boarded up, probably by desperate citizens hoping to save their
+homes.  
+~
+acd 0
+D2
+~
+0 10401
+D0
+~
+0 10403
+M 1 10402 100.00 1
+M 1 10405 100.00 3
+T 10408
+S
+#10403
+The Market Street Blockade~
+   At the intersection where Market Street meets Trade Row, the hamlet's
+citizens have constructed a huge blockade. The street is completely impassable.
+But at least the buildings aren't on fire here.  
+~
+acd 0
+D2
+~
+0 10402
+D3
+~
+0 10404
+M 0 10404 100.00 1
+M 1 10401 100.00 2
+T 10408
+S
+#10404
+A Back Alley~
+   The alley stretches behind Market Street's buildings, though crowded by a
+tall fence on the back side. The alley looks like it will get you around to the
+town square, but there isn't much room to move back here.  
+~
+acd 0
+D1
+~
+0 10403
+D0
+~
+0 10405
+M 1 10402 100.00 1
+M 1 10407 100.00 2
+T 10408
+S
+#10405
+A Back Alley~
+   The alley comes to an end behind town square, past the burning blockade. 
+From here you can see the square, which looks like it's being torn up by a huge
+animal. For the moment, though, you're safe here.  
+~
+acd 0
+D2
+~
+0 10404
+D1
+~
+0 10406
+M 1 10402 100.00 1
+T 10408
+S
+#10406
+The West End of Town Square~
+   You have reached the town square -- or what's left of it. It looks like the
+skeletal mammoth has torn up carts, stalls, and building facades alike. Every
+street is blocked by the devastation, and burning buildings prevent you from
+going any direction except back into the alley.  
+~
+acd 0
+D3
+~
+0 10405
+M 0 10405 100.00 1
+T 10408
+S
+#10407
+Main Street~
+   The shop fronts of Main Street are boarded up and the less fortunate among
+them are actually on fire. Melted plates of slag adorn the front of the
+armorer's old shop, and most of the citizens appear to have fled.  
+~
+acd 0
+D2
+~
+0 10400
+D0
+~
+0 10408
+M 1 10403 100.00 1
+T 10408
+S
+#10408
+Main Street~
+   Main Street curves around a small hillside which is now completely on fire.
+Several buildings have completely collapsed amidst the chaos, and you can hear
+the howling of the undead from every dark corner.  
+~
+acd 0
+D2
+~
+0 10407
+D0
+~
+0 10409
+M 1 10403 100.00 1
+M 1 10405 100.00 3
+T 10408
+S
+#10409
+The Main Street Blockade~
+   Main Street is completely blocked at Trade Row, which normally links Main
+Street to Market Street. It seems that some desperate town guards must have
+tried to block the necromancers from advancing into the hamlet.  
+~
+acd 0
+D2
+~
+0 10408
+D5
+~
+0 10410
+M 0 10409 100.00 1
+M 1 10401 100.00 2
+T 10408
+S
+#10410
+A Half-Demolished Store~
+   You've found your way through the rubble and into a store whose frame is
+still standing. Most of its walls are in ruins, letting you cut through the
+store to get past the Main Street blockade.  
+~
+acd 0
+D6
+~
+0 10409
+D3
+~
+0 10411
+M 1 10403 100.00 1
+T 10408
+S
+#10411
+Main Street~
+   You have made your way past the blockade and toward Town Square, but the
+howling of demons and the shouts of necromancers drowns out even the roar of
+the burning buildings. The blockade to the south blocks you from leaving the
+city, although you can still cut through the shop again.  
+~
+acd 0
+D1
+~
+0 10410
+D0
+~
+0 10412
+M 1 10403 100.00 1
+M 1 10406 100.00 2
+T 10408
+S
+#10412
+The East End of Town Square~
+   Town Square is cut in half by toppled wagons and mountains of debris. In the
+streets, there are corpses of citizens who appear to have been killed, raised
+as undead, and killed again. The sky is dark with smoke, but it looks like
+every path out of the square is blocked.  
+~
+acd 0
+D2
+~
+0 10411
+M 0 10410 100.00 1
+T 10408
+S
+#10413
+Temple Street~
+   The cobblestone street winds up the hillside toward the temple that
+overlooks the small hamlet. Compared to the rest of the town, this area is
+relatively undamaged. Still, it looks like the citizens have all fled.  
+~
+acd 0
+D6
+~
+0 10400
+D5
+~
+0 10414
+M 1 10404 100.00 1
+T 10408
+S
+#10414
+Temple Street~
+   The street curves around the hillside, past a burning guard shack, toward
+the temple steps. From here you can clearly see the devastation that the
+necromancers have brought down on the hamlet.  
+~
+acd 0
+D6
+~
+0 10413
+D0
+~
+0 10415
+M 1 10404 100.00 1
+M 1 10406 100.00 2
+T 10408
+S
+#10415
+The Temple Steps~
+   You have reached the base of the steps up to the hamlet's new temple. The
+air here is dense with smoke, and it burns your lungs as you try to make your
+way through town.  
+~
+acd 0
+D2
+~
+0 10414
+D8
+~
+0 10416
+M 0 10414 100.00 1
+T 10408
+S
+#10416
+The Temple Steps~
+   The long staircase up to the temple seems relatively undamaged by the siege
+on the hamlet. You can see most of town from here -- or, at least, the plumes
+of smoke coming from its buildings and streets.  
+~
+acd 0
+D9
+~
+0 10415
+D8
+~
+0 10417
+M 1 10404 100.00 1
+T 10408
+S
+#10417
+The Entrance to the Temple~
+   You have reached the front of the hamlet's new temple which would have been
+grand, if it weren't already on fire. The necromancers seem to have ignited the
+marble itself, and the building looks as if it is slowly melting.  
+~
+acd 0
+D9
+~
+0 10416
+D0
+~
+0 10418
+M 1 10404 100.00 1
+M 1 10407 100.00 2
+T 10408
+S
+#10418
+The Ruined Temple~
+   This temple, though dedicated only last week, is already in ruins. The
+oculus in the ceiling has opened completely and chunks of burning marble lie
+where statues once stood. The smoke over the city has begun to clear and you
+can clearly see all of the hamlet from the windows. Unfortunately, it's now
+clear that no part of this town can be saved.  
+~
+acd 0
+D2
+~
+0 10417
+M 0 10415 100.00 1
+T 10408
+S
+$

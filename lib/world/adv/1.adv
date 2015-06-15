@@ -222,4 +222,26 @@ L
 30 -1 -1
 -1 0 0
 S
+#170
+Hamlet of the Undead~
+Paul Clarke~
+   You've come across a small hamlet, ablaze and beset by the undead. Most of
+the citizens have fled, but it looks as if the city needs help. With no army to
+come to its rescue, the hamlet's only hope is you!
+This adventure has three wings:
+ Market Street: Solo players
+ Main Street: Two players
+ Temple Street: Groups
+~
+10400 10449 175-225
+10 120 0 4
+L
+5 0
+1440 -1 -1
+-1 0 0
+L
+1 a
+10400 -1 -1
+0 de de
+S
 $
