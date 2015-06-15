@@ -576,7 +576,7 @@ void herd_animals_out(room_data *location) {
 		for (ch_iter = ROOM_PEOPLE(location); ch_iter; ch_iter = next_ch) {
 			next_ch = ch_iter->next_in_room;
 		
-			if (IS_NPC(ch_iter) && IN_ROOM(ch_iter) == location && !ch_iter->desc && !ch_iter->master && !AFF_FLAGGED(ch_iter, AFF_CHARM) && MOB_FLAGGED(ch_iter, MOB_ANIMAL)) {
+			if (IS_NPC(ch_iter) && IN_ROOM(ch_iter) == location && !ch_iter->desc && !ch_iter->master && !AFF_FLAGGED(ch_iter, AFF_CHARM) && MOB_FLAGGED(ch_iter, MOB_ANIMAL) && GET_POS(ch_iter) >= POS_STANDING && !MOB_FLAGGED(ch_iter, MOB_TIED)) {
 				if (!herd_msg) {
 					act("The animals are herded out of the building...", FALSE, ROOM_PEOPLE(location), NULL, NULL, TO_CHAR | TO_ROOM);
 					herd_msg = TRUE;
