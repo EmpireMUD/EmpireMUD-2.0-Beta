@@ -512,35 +512,80 @@ ACMD(do_familiar) {
 	bool check_scaling(char_data *mob, char_data *attacker);
 	
 	char_data *mob;
-	int cost = 40, vnum;
+	int iter, type;
+	bool any;
 	
-	if (!can_use_ability(ch, ABIL_FAMILIAR, MANA, cost, NOTHING)) {
-		return;
-	}
+	struct {
+		char *name;
+		int ability;
+		int level;	// skill level required
+		mob_vnum vnum;
+		int cost;
+	} familiars[] = {
+		{ "cat", ABIL_FAMILIAR, 0, FAMILIAR_CAT, 40 },
+		{ "sabertooth", ABIL_FAMILIAR, 51, FAMILIAR_SABERTOOTH, 40 },
+		{ "sphinx", ABIL_FAMILIAR, 76, FAMILIAR_SPHINX, 40 },
+		{ "griffin", ABIL_FAMILIAR, 100, FAMILIAR_GRIFFIN, 40 },
+		
+		{ "\n", NO_ABIL, 0, NOTHING, 0 }
+	};
 	
 	if (has_familiar(ch)) {
-		msg_to_char(ch, "You can't summon a familiar while you already have a charmed follower.\r\n");
-		return;
-	}
-	if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_FAMILIAR)) {
+		msg_to_char(ch, "You can't summon a familiar while you already have one.\r\n");
 		return;
 	}
 	
-	if (get_ability_level(ch, ABIL_FAMILIAR) >= 100) {
-		vnum = FAMILIAR_GRIFFIN;
-	}
-	else if (IS_CLASS_ABILITY(ch, ABIL_FAMILIAR)) {
-		vnum = FAMILIAR_SPHINX;
-	}
-	else if (IS_SPECIALTY_ABILITY(ch, ABIL_FAMILIAR)) {
-		vnum = FAMILIAR_SABERTOOTH;
-	}
-	else {
-		vnum = FAMILIAR_CAT;
+	one_argument(argument, arg);
+	
+	// no-arg: just list
+	if (!*arg) {
+		msg_to_char(ch, "Summon which familiar:");
+		any = FALSE;
+		for (iter = 0; *familiars[iter].name != '\n'; ++iter) {
+			if (!IS_NPC(ch) && familiars[iter].ability != NO_ABIL && !HAS_ABILITY(ch, familiars[iter].ability)) {
+				continue;
+			}
+			if (GET_SKILL_LEVEL(ch) < familiars[iter].level) {
+				continue;
+			}
+			
+			msg_to_char(ch, "%s%s", any ? ", " : " ", familiars[iter].name);
+			any = TRUE;
+		}
+		
+		return;
 	}
 	
-	charge_ability_cost(ch, MANA, cost, NOTHING, 0);
-	mob = read_mobile(vnum);
+	// find which one they wanted
+	type = -1;
+	for (iter = 0; *familiars[iter].name != '\n'; ++iter) {
+		if (!IS_NPC(ch) && familiars[iter].ability != NO_ABIL && !HAS_ABILITY(ch, familiars[iter].ability)) {
+			continue;
+		}
+		if (GET_SKILL_LEVEL(ch) < familiars[iter].level) {
+			continue;
+		}
+		if (is_abbrev(arg, familiars[iter].name)) {
+			type = iter;
+			break;
+		}
+	}
+	
+	if (type == -1) {
+		msg_to_char(ch, "Unknown familiar.\r\n");
+		return;
+	}
+	
+	if (!can_use_ability(ch, familiars[type].ability, MANA, familiars[type].cost, NOTHING)) {
+		return;
+	}
+	
+	if (familiars[type].ability != NO_ABIL && ABILITY_TRIGGERS(ch, NULL, NULL, familiars[type].ability)) {
+		return;
+	}
+	
+	charge_ability_cost(ch, MANA, familiars[type].cost, NOTHING, 0);
+	mob = read_mobile(familiars[type].vnum);
 	if (IS_NPC(ch)) {
 		MOB_INSTANCE_ID(mob) = MOB_INSTANCE_ID(ch);
 	}
@@ -558,7 +603,9 @@ ACMD(do_familiar) {
 	SET_BIT(MOB_FLAGS(mob), MOB_FAMILIAR);
 	add_follower(mob, ch, TRUE);
 	
-	gain_ability_exp(ch, ABIL_FAMILIAR, 33.4);
+	if (familiars[type].ability != NO_ABIL) {
+		gain_ability_exp(ch, familiars[type].ability, 33.4);
+	}
 	
 	load_mtrigger(mob);
 }

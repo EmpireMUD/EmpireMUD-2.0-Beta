@@ -421,7 +421,7 @@ bool can_use_ability(char_data *ch, int ability, int cost_pool, int cost_amount,
 	needs_cost = cost_amount + ((cost_pool == HEALTH || cost_pool == BLOOD) ? 1 : 0);
 	
 	// players:
-	if (!HAS_ABILITY(ch, ability)) {
+	if (ability != NO_ABIL && !HAS_ABILITY(ch, ability)) {
 		msg_to_char(ch, "You have not purchased the %s ability.\r\n", ability_data[ability].name);
 		return FALSE;
 	}
