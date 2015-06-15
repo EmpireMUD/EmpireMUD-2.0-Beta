@@ -2771,6 +2771,9 @@ void set_fighting(char_data *ch, char_data *vict, byte mode) {
 		FIGHT_WAIT(ch) = 0;
 	}
 	GET_POS(ch) = POS_FIGHTING;
+	
+	// remove all stuns when combat starts
+	affects_from_char_by_aff_flag(ch, AFF_STUNNED);
 }
 
 
