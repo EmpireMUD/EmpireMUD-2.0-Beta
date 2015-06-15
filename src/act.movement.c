@@ -343,7 +343,7 @@ int can_move(char_data *ch, int dir, room_data *to_room, int need_specials_check
 		return 0;
 	}
 	
-	if (MOB_FLAGGED(ch, MOB_AQUATIC) && !WATER_SECT(to_room)) {
+	if (MOB_FLAGGED(ch, MOB_AQUATIC) && !WATER_SECT(to_room) && !EFFECTIVELY_FLYING(ch)) {
 		msg_to_char(ch, "You can't go on land!\r\n");
 		return 0;
 	}
