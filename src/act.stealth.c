@@ -1333,6 +1333,9 @@ ACMD(do_sap) {
 	else if (AFF_FLAGGED(vict, AFF_IMMUNE_STUN | AFF_IMMUNE_STEALTH)) {
 		act("$E doesn't look like $E'd be affected by that.", FALSE, ch, NULL, vict, TO_CHAR);
 	}
+	else if (AFF_FLAGGED(vict, AFF_STUNNED)) {
+		act("$E is already stunned!", FALSE, ch, NULL, vict, TO_CHAR);
+	}
 	else if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_SAP)) {
 		return;
 	}
