@@ -1928,6 +1928,9 @@ void trade_post(char_data *ch, char *argument) {
 	else if (OBJ_BOUND_TO(obj)) {
 		msg_to_char(ch, "You can't trade bound items.\r\n");
 	}
+	else if (IS_STOLEN(obj)) {
+		msg_to_char(ch, "You can't post stolen items.\r\n");
+	}
 	else if ((cost = atoi(costarg)) < 1) {
 		msg_to_char(ch, "You must charge at least 1 coin.\r\n");
 	}
