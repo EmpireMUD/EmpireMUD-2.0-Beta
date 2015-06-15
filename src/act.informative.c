@@ -2249,7 +2249,7 @@ ACMD(do_weather) {
 		};
 
 	if (IS_OUTDOORS(ch)) {
-		msg_to_char(ch, "The sky is %s and %s.\r\n", sky_look[weather_info.sky], (weather_info.change >= 0 ? "you feel a warm wind from south" : "your foot tells you bad weather is due"));
+		msg_to_char(ch, "The sky is %s and %s.\r\n", sky_look[weather_info.sky], (weather_info.change >= 0 ? "you feel a warm wind from the south" : "your foot tells you bad weather is due"));
 		if (weather_info.sunlight == SUN_SET || weather_info.sunlight == SUN_DARK) {
 			list_moons_to_char(ch);
 		}
