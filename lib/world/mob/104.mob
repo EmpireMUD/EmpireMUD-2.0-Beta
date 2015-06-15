@@ -175,7 +175,7 @@ watchman risen~
 a risen watchman~
 A risen watchman shambles down the street.
 ~
-0 0 bdzA 0
+0 0 abdzA 0
 1 0 0 2
 I 4 10408 3.00 1 X  # LOOT: tarnished silver earrings
 I 4 10409 3.00 1 X  # LOOT: a steel chain
@@ -236,9 +236,9 @@ T 10405
 T 10409
 S
 #10415
-#n necromancer~
-Necromancer #n~
-Necromancer #n is channeling a powerful spell!
+#n necromaster~
+Necromaster #n~
+Necromaster #n is shouting orders to the cultists!
 ~
 0 0 bdxAB 0
 0 2 0 21
