@@ -671,7 +671,7 @@ static void perform_drop_coins(char_data *ch, empire_data *type, int amount, byt
 	obj_data *obj;
 
 	if (amount <= 0)
-		msg_to_char(ch, "Heh heh heh.. we are jolly funny today, eh?\r\n");
+		msg_to_char(ch, "Heh heh heh... we are jolly funny today, eh?\r\n");
 	else if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs can't drop coins.\r\n");
 	}

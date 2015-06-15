@@ -243,7 +243,7 @@ ACMD(do_fish) {
 	else {
 		start_action(ch, ACT_FISHING, fishing_timer / (skill_check(ch, ABIL_FISH, DIFF_EASY) ? 2 : 1), 0);
 		
-		msg_to_char(ch, "You begin looking for fish..\r\n");
+		msg_to_char(ch, "You begin looking for fish...\r\n");
 		act("$n begins looking for fish.", TRUE, ch, 0, 0, TO_ROOM);
 	}
 }

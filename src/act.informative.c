@@ -1450,7 +1450,7 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 			if ((board_type = find_board(ch)) != -1)
 				if (Board_show_board(board_type, ch, "board", obj))
 					return;
-			strcpy(buf, "You see nothing special..");
+			strcpy(buf, "You see nothing special.");
 		}
 		else if (IS_BOOK(obj)) {
 			strcpy(buf, get_book_item_description_by_id(GET_BOOK_ID(obj)));
@@ -1472,7 +1472,7 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 			strcpy(buf, GET_OBJ_ACTION_DESC(obj));
 		}
 		else if (GET_OBJ_TYPE(obj) != ITEM_DRINKCON)
-			strcpy(buf, "You see nothing special..");
+			strcpy(buf, "You see nothing special.");
 		else {
 			/* ITEM_TYPE == ITEM_DRINKCON */
 			strcpy(buf, "It looks like a drink container.");

@@ -1453,7 +1453,7 @@ Activated when the mobile encounters a character in its memory (mremember)
 list and there is no over-riding command. Any mobile making use of mremember 
 MUST have a memory script, even if it will never be called.
  
-Numeric Arg : percent chance this trigger will be activated..
+Numeric Arg : percent chance this trigger will be activated.
 Argument    : not used.
 
 Variables:

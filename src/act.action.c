@@ -1180,7 +1180,7 @@ void process_fishing(char_data *ch) {
 			}
 			case 1: {
 				if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
-					msg_to_char(ch, "The water waves peacefully, but you don't see any fish..\r\n");
+					msg_to_char(ch, "The water waves peacefully, but you don't see any fish...\r\n");
 				}
 				break;
 			}
@@ -1217,7 +1217,7 @@ void process_fishing(char_data *ch) {
 			
 			add_depletion(IN_ROOM(ch), DPLTN_FISH, TRUE);
 		
-			msg_to_char(ch, "A fish darts past you..\r\n");
+			msg_to_char(ch, "A fish darts past you...\r\n");
 			act("You jab your spear into the water and when you extract it you find $p on the end!", FALSE, ch, obj, 0, TO_CHAR);
 			act("$n jabs $s spear into the water and when $e draws it out, it has $p on the end!", TRUE, ch, obj, 0, TO_ROOM);
 			gain_ability_exp(ch, ABIL_FISH, 10);
@@ -2318,7 +2318,7 @@ ACMD(do_mine) {
 		msg_to_char(ch, "You're busy doing something else right now.\r\n");
 	}
 	else if (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_MINE)) {
-		msg_to_char(ch, "This isn't a mine..\r\n");
+		msg_to_char(ch, "This isn't a mine.\r\n");
 	}
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "The mine shafts aren't finished yet.\r\n");

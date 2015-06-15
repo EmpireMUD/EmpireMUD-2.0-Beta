@@ -390,7 +390,7 @@ void taste_blood(char_data *ch, char_data *vict) {
 	else if (GET_ACTION(ch) != ACT_NONE)
 		msg_to_char(ch, "You're a bit busy right now.\r\n");
 	else if (ch == vict)
-		msg_to_char(ch, "It seems redundant to taste your own blood..\r\n");
+		msg_to_char(ch, "It seems redundant to taste your own blood.\r\n");
 	else if (!IS_NPC(vict) && AWAKE(vict) && !PRF_FLAGGED(vict, PRF_BOTHERABLE))
 		act("You don't have permission to taste $N's blood!", FALSE, ch, 0, vict, TO_CHAR);
 	else {
@@ -681,7 +681,7 @@ ACMD(do_bite) {
 	else if (subcmd ? (!(victim = get_player_vis(ch, arg, FIND_CHAR_ROOM))) : (!(victim = get_char_vis(ch, arg, FIND_CHAR_ROOM))))
 		send_config_msg(ch, "no_person");
 	else if (ch == victim)
-		msg_to_char(ch, "That seems a bit redundant..\r\n");
+		msg_to_char(ch, "That seems a bit redundant...\r\n");
 	else if (GET_FED_ON_BY(victim))
 		msg_to_char(ch, "Sorry, somebody beat you to it.\r\n");
 	else if (IS_GOD(victim) || IS_IMMORTAL(victim))

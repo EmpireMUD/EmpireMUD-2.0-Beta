@@ -248,7 +248,7 @@ void perform_action(char_data *ch, int act_nr, char *argument) {
 				send_to_char("In your dreams, or what?\r\n", ch);
 				break;
 			case POS_RESTING:
-				send_to_char("Nah... You feel too relaxed to do that..\r\n", ch);
+				send_to_char("Nah... You feel too relaxed to do that.\r\n", ch);
 				break;
 			case POS_SITTING:
 				send_to_char("Maybe you should get on your feet first?\r\n", ch);

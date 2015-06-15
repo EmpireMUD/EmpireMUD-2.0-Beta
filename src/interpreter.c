@@ -1128,7 +1128,7 @@ void command_interpreter(char_data *ch, char *argument) {
 				send_to_char("In your dreams, or what?\r\n", ch);
 				break;
 			case POS_RESTING:
-				send_to_char("Nah... You feel too relaxed to do that..\r\n", ch);
+				send_to_char("Nah... You feel too relaxed to do that.\r\n", ch);
 				break;
 			case POS_SITTING:
 				send_to_char("Maybe you should get on your feet first?\r\n", ch);
@@ -2218,7 +2218,7 @@ void nanny(descriptor_data *d, char *arg) {
 					if (wizlock_message)
 						SEND_TO_Q(wizlock_message, d);
 					else
-						SEND_TO_Q("The game is temporarily restricted.. try again later.\r\n", d);
+						SEND_TO_Q("The game is temporarily restricted... try again later.\r\n", d);
 					STATE(d) = CON_CLOSE;
 					syslog(SYS_LOGIN, 0, TRUE, "Request for login denied for %s [%s] (wizlock)", GET_NAME(d->character), d->host);
 					return;
@@ -2402,7 +2402,7 @@ void nanny(descriptor_data *d, char *arg) {
 					d->character->player.sex = SEX_FEMALE;
 					break;
 				default:
-					SEND_TO_Q("That is not a sex..\r\nWhat IS your sex? ", d);
+					SEND_TO_Q("That is not a sex...\r\nWhat IS your sex? ", d);
 					return;
 			}
 

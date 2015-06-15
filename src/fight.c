@@ -2010,7 +2010,7 @@ void check_auto_assist(char_data *ch) {
 bool check_combat_position(char_data *ch, double speed) {
 	// auto-dismount in combat
 	if (IS_RIDING(ch)) {
-		msg_to_char(ch, "You jump down from your mount..\r\n");
+		msg_to_char(ch, "You jump down from your mount.\r\n");
 		perform_dismount(ch);
 		// does not block combat round
 	}

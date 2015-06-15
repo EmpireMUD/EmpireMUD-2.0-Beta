@@ -1073,7 +1073,7 @@ ACMD(do_page) {
 	half_chop(argument, arg, buf2);
 
 	if (REAL_NPC(ch))
-		msg_to_char(ch, "Monsters can't page.. go away.\r\n");
+		msg_to_char(ch, "Monsters can't page... go away.\r\n");
 	else if (!*arg)
 		msg_to_char(ch, "Whom do you wish to page?\r\n");
 	else {
@@ -1294,7 +1294,7 @@ ACMD(do_spec_comm) {
 	half_chop(argument, buf, buf2);
 
 	if (!*buf || !*buf2) {
-		sprintf(buf, "Whom do you want to %s.. and what??\r\n", action_sing);
+		sprintf(buf, "Whom do you want to %s... and what??\r\n", action_sing);
 		msg_to_char(ch, buf);
 		}
 	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_SILENT))

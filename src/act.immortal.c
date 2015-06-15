@@ -3747,7 +3747,7 @@ ACMD(do_dc) {
 		if (!CAN_SEE(ch, d->character))
 			send_to_char("No such connection.\r\n", ch);
 		else
-			send_to_char("Umm.. maybe that's not such a good idea...\r\n", ch);
+			send_to_char("Umm... maybe that's not such a good idea...\r\n", ch);
 		return;
 	}
 
@@ -3826,7 +3826,7 @@ ACMD(do_echo) {
 	strcpy(string, argument);
 
 	if (!*argument) {
-		send_to_char("Yes.. but what?\r\n", ch);
+		send_to_char("Yes... but what?\r\n", ch);
 		return;
 	}
 
@@ -5306,7 +5306,7 @@ ACMD(do_slay) {
 		if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM)))
 			send_to_char("They aren't here.\r\n", ch);
 		else if (ch == vict)
-			send_to_char("Your mother would be so sad.. :(\r\n", ch);
+			send_to_char("Your mother would be so sad... :(\r\n", ch);
 		else if (!IS_NPC(vict) && GET_ACCESS_LEVEL(vict) >= GET_ACCESS_LEVEL(ch)) {
 			act("Surely you don't expect $N to let you slay $M, do you?", FALSE, ch, NULL, vict, TO_CHAR);
 		}
@@ -5339,7 +5339,7 @@ ACMD(do_snoop) {
 	else if (!(victim = get_char_vis(ch, arg, FIND_CHAR_WORLD)))
 		send_to_char("No such person around.\r\n", ch);
 	else if (!victim->desc)
-		send_to_char("There's no link.. nothing to snoop.\r\n", ch);
+		send_to_char("There's no link... nothing to snoop.\r\n", ch);
 	else if (victim == ch)
 		stop_snooping(ch);
 	else if (victim->desc->snoop_by)
