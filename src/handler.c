@@ -2865,12 +2865,12 @@ bool check_exclusion_set(struct interact_exclusion_data **set, char code, double
 	struct interact_exclusion_data *find;
 	
 	// limited set of codes
-	if ((code < 'a' && code > 'z') && (code < 'A' && code > 'Z')) {
+	if (!isalpha(code)) {
 		code = 0;
 	}
 	
 	// no exclusion? just roll
-	if (code == 0) {
+	if (!code) {
 		return (number(1, 10000) <= (percent * 100));
 	}
 	
