@@ -2871,7 +2871,7 @@ bool check_exclusion_set(struct interact_exclusion_data **set, char code, double
 	
 	// no exclusion? just roll
 	if (code == 0) {
-		return number(1, 10000) < (percent * 100);
+		return (number(1, 10000) <= (percent * 100));
 	}
 	
 	// this 'find' is guaranteed because it makes it if it doesn't exist
@@ -2883,7 +2883,7 @@ bool check_exclusion_set(struct interact_exclusion_data **set, char code, double
 		
 		// add to cumulative percent and check it
 		find->cumulative_value += (percent * 100);
-		if (find->rolled_value < find->cumulative_value) {
+		if (find->rolled_value <= find->cumulative_value) {
 			find->done = TRUE;
 			return TRUE;
 		}
