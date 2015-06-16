@@ -2542,7 +2542,7 @@ void parse_interaction(char *line, struct interaction_item **list, char *error_p
 
 	// interaction item: I type vnum percent quantity X
 	if (sscanf(line, "I %d %d %lf %d %c", &int_in[0], &int_in[1], &dbl_in, &int_in[2], &char_in) == 5) {	// with exclusion code
-		excl = char_in;
+		excl = isalpha(char_in) ? char_in : 0;
 	}
 	else if (sscanf(line, "I %d %d %lf %d", &int_in[0], &int_in[1], &dbl_in, &int_in[2]) == 4) {	// no exclusion code
 		excl = 0;
