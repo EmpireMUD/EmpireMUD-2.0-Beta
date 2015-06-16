@@ -4,7 +4,7 @@ goblin clothing~
 A set of goblin clothing is rotting on the ground.~
 The goblin clothing is in poor condition.
 ~
-2 o ad
+2 oy ad
 0 0 0
 11 0
 S
@@ -14,7 +14,7 @@ goblin pants~
 A pair of goblin pants is lying here.~
 The goblin pants are holey, and smell hellish.
 ~
-2 o af
+2 oy af
 0 0 0
 11 0
 S
@@ -24,7 +24,7 @@ goblin shoes~
 A pair of goblin shoes are splitting on the ground.~
 The goblin shoes are in disrepair.
 ~
-2 mo ag
+2 moy ag
 0 0 0
 11 0
 A
@@ -50,7 +50,7 @@ a goblincraft saddle~
 A goblincraft saddle has been left behind.~
 The saddle appears to be in good condition!
 ~
-2 emo as
+2 emoy as
 0 0 0
 7 0
 A
@@ -64,7 +64,7 @@ a tarnished necklace~
 A tarnished necklace is coiled in the dust.~
 The necklace appears to be goblincraft.
 ~
-2 mo ac
+2 moy ac
 0 0 0
 2 0
 A
@@ -80,7 +80,7 @@ a goblin timepiece~
 A strange goblin timepiece is lying here.~
 It seems to be a wristband that tells time, but you can't read it.
 ~
-2 mo aj
+2 moy aj
 0 0 0
 0 0
 A
@@ -96,7 +96,7 @@ open-fingered gloves~
 A pair of open-fingered gloves is lying here.~
 The gloves appear to be goblincraft.
 ~
-2 mo ah
+2 moy ah
 0 0 0
 11 0
 A
@@ -112,7 +112,7 @@ a goblin collar~
 A goblin collar has been left on the ground.~
 The collar looks strong enough to protect the neck.
 ~
-27 mo ac
+27 moy ac
 2 0 0
 2 0
 A
@@ -128,7 +128,7 @@ a warg-bone earring~
 A strange bone earring is lying here.~
 The earring appears to be goblincraft.
 ~
-2 jmo am
+2 jmoy am
 0 0 0
 14 0
 A
