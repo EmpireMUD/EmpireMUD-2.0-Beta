@@ -185,7 +185,7 @@ int get_block_chance(char_data *ch, char_data *attacker) {
 	base += get_effective_block(ch);
 	
 	if (attacker && !CAN_SEE(ch, attacker)) {
-		base *= 2/3;
+		base *= 2.0/3.0;
 	}
 	
 	return MIN(max_block, (int) base);
@@ -282,7 +282,7 @@ int get_dodge_modifier(char_data *ch, char_data *attacker) {
 	
 	// blind penalty
 	if (attacker && !CAN_SEE(ch, attacker)) {
-		base *= 2/3;
+		base *= 2.0/3.0;
 	}
 	
 	return (int) base;
@@ -373,7 +373,7 @@ int get_to_hit(char_data *ch, char_data *victim, bool off_hand) {
 	
 	// blind penalty
 	if (victim && !CAN_SEE(ch, victim)) {
-		base_chance *= 2/3;
+		base_chance *= 2.0/3.0;
 	}
 	
 	return (int) base_chance;
