@@ -110,7 +110,7 @@ obj_data *has_hammer(char_data *ch) {
 	
 	for (iter = 0; slots[iter] != -1; ++iter) {
 		hammer = GET_EQ(ch, slots[iter]);
-		if (IS_WEAPON(hammer) && GET_WEAPON_TYPE(hammer) == TYPE_HAMMER) {
+		if (hammer && IS_WEAPON(hammer) && GET_WEAPON_TYPE(hammer) == TYPE_HAMMER) {
 			return hammer;
 		}
 	}
