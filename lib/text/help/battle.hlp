@@ -223,6 +223,12 @@ REFLEXES
 Reflexes (Battle ability)
 
 With training, your reflexes become good enough that you dodge more often.
+This ability gives at least +10 dodge automatically.
+
+As a specialty ability, it gives +5% total dodge.
+As a class ability, it gives +10% total dodge.
+
+This dodge bonus is refleced on your 'score'.
 
 See also: SHIELD BLOCK, QUICK BLOCK, BLOCK ARROWS, MEDIUM ARMOR, OUTRAGE,
     HEAVY ARMOR, RESCUE, DISARM
@@ -278,7 +284,13 @@ SPARRING
 
 Sparring (Battle ability)
 
-By sparring, you can learn to hit more accurately.
+By sparring, you can learn to hit more accurately. This ability gives at least
++10 to-hit automatically.
+
+As a specialty ability, it gives +5% total to-hit.
+As a class ability, it gives +10% total to-hit.
+
+This to-hit bonus is refleced on your 'score'.
 
 See also: LEATHER ARMOR, KICK, BASH, CUT DEEP, STUNNING BLOW, FINESSE
 #
