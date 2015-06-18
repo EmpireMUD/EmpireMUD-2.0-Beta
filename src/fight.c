@@ -380,10 +380,12 @@ int get_effective_soak(char_data *ch) {
 * @return int The hit %.
 */
 int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill) {
+	extern const int base_hit_chance;
+	
 	double base_chance, spar = 0.0;
 	
-	// start at 50
-	base_chance = 50.0 + GET_TO_HIT(ch);
+	// starting value
+	base_chance = base_hit_chance + GET_TO_HIT(ch);
 	
 	// add 5 per dexterity (will be counter-balanced by dodge dexterity)
 	base_chance += 5.0 * GET_DEXTERITY(ch);

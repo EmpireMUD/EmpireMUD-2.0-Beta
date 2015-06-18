@@ -375,6 +375,7 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	extern int get_ability_points_available_for_char(char_data *ch, int skill);
 	extern const struct material_data materials[NUM_MATERIALS];
 	extern int skill_sort[NUM_SKILLS];
+	extern const int base_hit_chance;
 
 	char lbuf[MAX_STRING_LENGTH], lbuf2[MAX_STRING_LENGTH], lbuf3[MAX_STRING_LENGTH];
 	int i, j, count, iter, sk, pts, cols, val;
@@ -476,7 +477,7 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	
 	// row 3
 	val = get_to_hit(ch, NULL, FALSE, FALSE);
-	sprintf(lbuf, "To-hit  [%s%d&0]", HAPPY_COLOR(val, 50), val);
+	sprintf(lbuf, "To-hit  [%s%d&0]", HAPPY_COLOR(val, base_hit_chance), val);
 	sprintf(lbuf2, "Speed  [%.2f]", get_combat_speed(ch, WEAR_WIELD));
 	msg_to_char(to, "  %-28.28s %-28.28s \r\n", lbuf, lbuf2);
 

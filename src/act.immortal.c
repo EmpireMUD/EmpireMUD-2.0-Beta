@@ -2357,6 +2357,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 	extern const char *preference_bits[];
 	extern const char *connected_types[];
 	extern const char *olc_flag_bits[];
+	extern const int base_hit_chance;
 	extern struct promo_code_list promo_codes[];
 
 	char lbuf[MAX_STRING_LENGTH], lbuf2[MAX_STRING_LENGTH], lbuf3[MAX_STRING_LENGTH];
@@ -2433,7 +2434,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 		msg_to_char(ch, "  %-28.28s %-28.28s %-28.28s\r\n", lbuf, lbuf2, lbuf3);
 
 		val = get_to_hit(k, NULL, FALSE, FALSE);
-		sprintf(lbuf, "To-hit  [%s%d&0]", HAPPY_COLOR(val, 50), val);
+		sprintf(lbuf, "To-hit  [%s%d&0]", HAPPY_COLOR(val, base_hit_chance), val);
 		sprintf(lbuf2, "Speed  [%.2f]", get_combat_speed(k, WEAR_WIELD));
 		msg_to_char(ch, "  %-28.28s %-28.28s\r\n", lbuf, lbuf2);
 

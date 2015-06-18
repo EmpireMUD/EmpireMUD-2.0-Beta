@@ -359,8 +359,6 @@ Desert Groves re-grow on their own, at random.
 Diminishing returns are numbers that increase quickly at low levels, but more
 slowly at higher levels. For example, the first +20 dodge you get is applied
 directly, but the next +20 dodge only brings you up to +30.
-
-This is applied to several character traits, such as block, dodge, and to-hit.
 #
 DISPLAY
 
@@ -377,15 +375,26 @@ Helpful hint: Set an alias to display your favorite set of info.
 
 See also: ALIAS, PROMPT
 #
-DODGE
+DODGE "DODGE CAP"
 
-Your dodge rating, shown on 'score', is your character's bonus to avoid being
-hit in combat. This bonus may come from equipment or spell effects.
+Your dodge rating, shown on 'score', is subtracted from your opponent's to-hit
+score. It includes effects, Dexterity, and gear.
 
-You also get the equivalent of 5 points of dodge per point of Dexterity, but
-this is not included in the portion shown in your score.
+For fighting NPCs, the highest possible dodge chance is 75%. Against players,
+it's 95%. Players' chance of hitting you is based on their to-hit score, but
+mobs are more predictable and it is possible to reach a "dodge cap", the amount
+where NPCs hit you as little as possible.
 
-See also: AFFECTS, SCORE
+Dodge cap:
+- Take the mob's level minus 50 (not less than 0)
+- Add 10% of the mob's level
+- For hard mobs, add 10% to the total
+- For group mobs, add 30% to the total
+- For boss mobs, add both 10% and 30% (+43% total)
+- Add 120 (45 base hit chance + 75 max-dodge)
+- Add +5 per Dexterity the mob has more than you
+
+See also: AFFECTS, SCORE, TO-HIT
 #
 DOT "DOT EFFECT" "DAMAGE OVER TIME" DAMAGE-OVER-TIME
 
@@ -688,15 +697,26 @@ Usage:  tip
 
 This command will give you a helpful tip about the game.
 #
-TO-HIT "TO HIT" TOHIT "HIT CHANCE"
+TO-HIT "TO HIT" TOHIT "HIT CHANCE" "HIT CAP"
 
-Your to-hit rating, shown on 'score', is your character's bonus chance to hit
-an enemy in combat. This bonus may come from equipment or spell effects.
+Your to-hit rating, shown on 'score', represents the character's ability to
+hit enemies in combat. It includes bonuses from Dexterity, spells, and gear.
 
-You also get the equivalent of 5 points of to-hit per point of Dexterity, but
-this is not included in the portion shown in your score.
+Players always have a minimum of 5% final chance to hit (mobs have 25%), so
+long as they're within 50 levels of the target. Your opponent's Dodge rating
+is subtracted from your to-hit to determine your final chance to-hit. You can
+compute the "hit cap" -- the point at which you'll hit 100% of the time --
+based on the level of the mob you're fighting.
 
-See also: AFFECTS, SCORE
+Hit cap:
+- Take the mob's level minus 50 (not less than 0)
+- Add 10% of the mob's level
+- For hard mobs, add 10% to the total
+- For group mobs, add 30% to the total
+- For boss mobs, add both 10% and 30% (+43% total)
+- Add 55, +5 per Dexterity the mob has more than you
+
+See also: AFFECTS, DODGE, SCORE
 #
 TRANSPORTATION
 
