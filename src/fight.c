@@ -229,7 +229,7 @@ int get_block_chance(char_data *ch, char_data *attacker) {
 	base += get_effective_block(ch);
 	
 	if (attacker && !CAN_SEE(ch, attacker)) {
-		base *= 2.0/3.0;
+		base -= 50;
 	}
 	
 	return MIN(max_block, (int) base);
