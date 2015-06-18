@@ -391,7 +391,7 @@ Dodge cap:
 - For hard mobs, add 10% to the total
 - For group mobs, add 30% to the total
 - For boss mobs, add both 10% and 30% (+43% total)
-- Add 120 (45 base hit chance + 75 max-dodge)
+- Add 125 (50 base hit chance + 75 max-dodge)
 - Add +5 per Dexterity the mob has more than you
 
 See also: AFFECTS, SCORE, TO-HIT
@@ -714,7 +714,7 @@ Hit cap:
 - For hard mobs, add 10% to the total
 - For group mobs, add 30% to the total
 - For boss mobs, add both 10% and 30% (+43% total)
-- Add 55, +5 per Dexterity the mob has more than you
+- Add 50, +5 per Dexterity the mob has more than you
 
 See also: AFFECTS, DODGE, SCORE
 #
