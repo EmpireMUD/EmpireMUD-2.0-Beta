@@ -34,8 +34,7 @@
 extern const int universal_wait;
 
 // external functions
-extern int get_dodge_modifier(char_data *ch, char_data *attacker);	// fight.c
-extern int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill);	// fight.c
+extern bool check_hit_vs_dodge(char_data *attacker, char_data *victim, bool off_hand);	// fight.c
 extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
 
 
@@ -71,8 +70,8 @@ void perform_rescue(char_data *ch, char_data *vict, char_data *from) {
 ACMD(do_bash) {
 	char_data *vict;
 	struct affected_type *af;
-	int hit_chance, dam, cost = 15;
 	bool success = FALSE;
+	int dam, cost = 15;
 
 	one_argument(argument, arg);
 
@@ -117,8 +116,7 @@ ACMD(do_bash) {
 	charge_ability_cost(ch, MOVE, cost, COOLDOWN_BASH, 9);
 
 	// determine hit
-	hit_chance = get_to_hit(ch, vict, FALSE, TRUE) - get_dodge_modifier(vict, ch);
-	success = IS_SPECIALTY_ABILITY(ch, ABIL_BASH) || !AWAKE(vict) || (hit_chance >= number(1, 100));
+	success = IS_SPECIALTY_ABILITY(ch, ABIL_BASH) || check_hit_vs_dodge(ch, vict, FALSE);
 
 	if (!success) {
 		damage(ch, vict, 0, ATTACK_BASH, DAM_PHYSICAL);
@@ -333,7 +331,7 @@ ACMD(do_heartstop) {
 
 ACMD(do_kick) {
 	char_data *vict;
-	int cost = 10, hit_chance;
+	int cost = 10;
 	byte dam;
 	bool success = FALSE;
 
@@ -371,8 +369,7 @@ ACMD(do_kick) {
 	charge_ability_cost(ch, MOVE, cost, COOLDOWN_KICK, 6);
 	
 	// determine hit
-	hit_chance = get_to_hit(ch, vict, FALSE, TRUE) - get_dodge_modifier(vict, ch);
-	success = IS_SPECIALTY_ABILITY(ch, ABIL_KICK) || !AWAKE(vict) || (hit_chance >= number(1, 100));
+	success = IS_SPECIALTY_ABILITY(ch, ABIL_KICK) || check_hit_vs_dodge(ch, vict, FALSE);
 
 	if (success) {
 		if (HAS_ABILITY(ch, ABIL_SHADOW_KICK) && !AFF_FLAGGED(vict, AFF_IMMUNE_BATTLE)) {

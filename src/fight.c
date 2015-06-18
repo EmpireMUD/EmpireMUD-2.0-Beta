@@ -47,8 +47,10 @@ extern int determine_best_scale_level(char_data *ch, bool check_group);
 // locals
 int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damtype);
 void drop_loot(char_data *mob, char_data *killer);
+int get_dodge_modifier(char_data *ch, char_data *attacker);
 int get_effective_block(char_data *ch);
 int get_effective_dodge(char_data *ch);
+int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill);
 double get_weapon_speed(obj_data *weapon);
 void heal(char_data *ch, char_data *vict, int amount);
 int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round);
@@ -81,6 +83,49 @@ bool check_can_still_fight(char_data *ch, char_data *victim) {
 	}
 	
 	return TRUE;
+}
+
+
+/**
+* Computes whether one person hits the other, or not, based on their to-hit
+* and dodge ratings.
+*
+* @param char_data *attacker The person attacking.
+* @param char_data *victim The target.
+* @param bool off_hand Whether or not to apply the off-hand penalty to the attacker.
+* @return bool TRUE if the attack hits, or FALSE if not.
+*/
+bool check_hit_vs_dodge(char_data *attacker, char_data *victim, bool off_hand) {
+	int chance;
+	
+	int level_tolerance = 50;	// must be within X levels to get minimum hit chance
+	int min_npc_to_hit = 25;	// min chance an NPC will hit the target
+	int min_pc_to_hit = 5;	// min chance a player will hit the target
+	
+	// safety
+	if (!attacker || !victim) {
+		return FALSE;
+	}
+	
+	if (AWAKE(victim)) {
+		chance = get_to_hit(attacker, victim, off_hand, TRUE) - get_dodge_modifier(victim, attacker);
+		
+		// limits IF the character is at least close in level
+		if (get_approximate_level(attacker) >= (get_approximate_level(victim) - level_tolerance)) {
+			if (IS_NPC(attacker)) {
+				chance = MAX(chance, min_npc_to_hit);
+			}
+			else {
+				chance = MAX(chance, min_pc_to_hit);
+			}
+		}
+		
+		return (chance >= number(1, 100));
+	}
+	else {
+		// not awake: always hit
+		return TRUE;
+	}
 }
 
 
@@ -2381,7 +2426,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 	
 	struct instance_data *inst;
 	int w_type;
-	int dam, hit_chance, result;
+	int dam, result;
 	bool success = FALSE, block = FALSE;
 	bool can_gain_skill;
 	empire_data *victim_emp;
@@ -2453,15 +2498,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 	can_gain_skill = GET_HEALTH(victim) > 0;
 	
 	// determine hit (if WEAR_HOLD, pass off_hand=TRUE)
-	hit_chance = get_to_hit(ch, victim, (weapon && weapon->worn_on == WEAR_HOLD), TRUE);
-	hit_chance -= get_dodge_modifier(victim, ch);
-	
-	// absolute minimum of 5% chance of hit so long as ch is at least as high as victim
-	if (get_approximate_level(ch) >= get_approximate_level(victim)) {
-		hit_chance = MAX(5, hit_chance);
-	}
-
-	success = !AWAKE(victim) || (hit_chance >= number(1, 100));
+	success = check_hit_vs_dodge(ch, victim, (weapon && weapon->worn_on == WEAR_HOLD));
 	
 	// blockable?
 	if (success && AWAKE(victim)) {
@@ -2911,7 +2948,6 @@ void perform_violence_melee(char_data *ch, obj_data *weapon) {
 void perform_violence_missile(char_data *ch, obj_data *weapon) {
 	obj_data *arrow, *best = NULL;
 	int dam = 0;
-	int to_hit;
 	bool success = FALSE, block = FALSE;
 	
 	if (!FIGHTING(ch)) {
@@ -2951,8 +2987,7 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 	}
 
 	// compute
-	to_hit = get_to_hit(ch, FIGHTING(ch), FALSE, TRUE) - get_dodge_modifier(FIGHTING(ch), ch);
-	success = (to_hit >= number(1, 100));
+	success = check_hit_vs_dodge(ch, FIGHTING(ch), FALSE);
 	
 	if (success && AWAKE(FIGHTING(ch)) && HAS_ABILITY(FIGHTING(ch), ABIL_BLOCK_ARROWS)) {
 		block = (get_block_chance(FIGHTING(ch), ch) > number(1, 100));
