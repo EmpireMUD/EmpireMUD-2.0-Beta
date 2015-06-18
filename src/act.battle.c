@@ -35,7 +35,7 @@ extern const int universal_wait;
 
 // external functions
 extern int get_dodge_modifier(char_data *ch, char_data *attacker);	// fight.c
-extern int get_to_hit(char_data *ch, char_data *victim, bool off_hand);	// fight.c
+extern int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill);	// fight.c
 extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
 
 
@@ -117,13 +117,7 @@ ACMD(do_bash) {
 	charge_ability_cost(ch, MOVE, cost, COOLDOWN_BASH, 9);
 
 	// determine hit
-	hit_chance = get_to_hit(ch, vict, FALSE);
-	
-	// evasion
-	if (AWAKE(vict)) {
-		hit_chance -= get_dodge_modifier(vict, ch);
-	}
-
+	hit_chance = get_to_hit(ch, vict, FALSE, TRUE) - get_dodge_modifier(vict, ch);
 	success = IS_SPECIALTY_ABILITY(ch, ABIL_BASH) || !AWAKE(vict) || (hit_chance >= number(1, 100));
 
 	if (!success) {
@@ -377,13 +371,7 @@ ACMD(do_kick) {
 	charge_ability_cost(ch, MOVE, cost, COOLDOWN_KICK, 6);
 	
 	// determine hit
-	hit_chance = get_to_hit(ch, vict, FALSE);
-	
-	// evasion
-	if (AWAKE(vict)) {
-		hit_chance -= get_dodge_modifier(vict, ch);
-	}
-
+	hit_chance = get_to_hit(ch, vict, FALSE, TRUE) - get_dodge_modifier(vict, ch);
 	success = IS_SPECIALTY_ABILITY(ch, ABIL_KICK) || !AWAKE(vict) || (hit_chance >= number(1, 100));
 
 	if (success) {

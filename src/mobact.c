@@ -1204,10 +1204,9 @@ void scale_mob_to_level(char_data *mob, int level) {
 	mob->mob_specials.to_hit = MAX(1, (int) ceil(value));
 	
 	// to-dodge
-	value = level / 15.0;
-	value *= MOB_FLAGGED(mob, MOB_TANK) ? 2.0 : 1.0;
-	value *= MOB_FLAGGED(mob, MOB_HARD) ? 2.0 : 1.0;
-	value *= MOB_FLAGGED(mob, MOB_GROUP) ? 3.0 : 1.0;
+	value = MAX(0, level - 50) + (level * 0.1);
+	value *= MOB_FLAGGED(mob, MOB_HARD) ? 1.1 : 1.0;
+	value *= MOB_FLAGGED(mob, MOB_GROUP) ? 1.3 : 1.0;
 	mob->mob_specials.to_dodge = MAX(1, (int) ceil(value));
 	
 	// cleanup

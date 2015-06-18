@@ -367,6 +367,7 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	void show_character_affects(char_data *ch, char_data *to);
 	extern double get_combat_speed(char_data *ch, int pos);
 	extern int get_blood_upkeep_cost(char_data *ch);
+	extern int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill);
 	extern int health_gain(char_data *ch, bool info_only);
 	extern int move_gain(char_data *ch, bool info_only);
 	extern int mana_gain(char_data *ch, bool info_only);
@@ -375,7 +376,7 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	extern int skill_sort[NUM_SKILLS];
 
 	char lbuf[MAX_STRING_LENGTH], lbuf2[MAX_STRING_LENGTH], lbuf3[MAX_STRING_LENGTH];
-	int i, j, count, iter, sk, pts, cols;
+	int i, j, count, iter, sk, pts, cols, val;
 	empire_data *emp;
 	struct time_info_data playing_time;
 
@@ -472,7 +473,8 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	msg_to_char(to, "  %-28.28s %-28.28s %-28.28s\r\n", lbuf, lbuf2, lbuf3);
 	
 	// row 3
-	sprintf(lbuf, "To-hit  [%s%+d&0]", HAPPY_COLOR(GET_TO_HIT(ch), 0), GET_TO_HIT(ch));
+	val = get_to_hit(ch, NULL, FALSE, FALSE);
+	sprintf(lbuf, "To-hit  [%s%d&0]", HAPPY_COLOR(val, 50), val);
 	sprintf(lbuf2, "Speed  [%.2f]", get_combat_speed(ch, WEAR_WIELD));
 	msg_to_char(to, "  %-28.28s %-28.28s \r\n", lbuf, lbuf2);
 

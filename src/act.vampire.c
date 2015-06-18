@@ -653,7 +653,7 @@ ACMD(do_alacrity) {
 
 
 ACMD(do_bite) {
-	extern int get_to_hit(char_data *ch, char_data *victim, bool off_hand);
+	extern int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill);
 	extern int get_dodge_modifier(char_data *ch, char_data *attacker);
 
 	char_data *victim, *ch_iter;
@@ -715,11 +715,7 @@ ACMD(do_bite) {
 			/* if the person isn't biteable, gotta roll! */
 			if ((IS_NPC(victim) || !PRF_FLAGGED(victim, PRF_BOTHERABLE)) && AWAKE(victim)) {
 				// determine hit
-				hit_chance = get_to_hit(ch, victim, FALSE);
-	
-				// evasion
-				hit_chance -= get_dodge_modifier(victim, ch);
-
+				hit_chance = get_to_hit(ch, victim, FALSE, TRUE) - get_dodge_modifier(victim, ch);
 				success = !AWAKE(victim) || (hit_chance >= number(1, 100));
 
 				if (!success && !MOB_FLAGGED(victim, MOB_ANIMAL)) {

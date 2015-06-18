@@ -332,46 +332,64 @@ int get_effective_soak(char_data *ch) {
 * @return int The effective to-hit rating.
 */
 int get_effective_to_hit(char_data *ch) {
-	return (int) diminishing_returns(GET_TO_HIT(ch), 50);
+	return GET_TO_HIT(ch);
+	
+	// not currently diminishing to-hit
+	//return (int) diminishing_returns(GET_TO_HIT(ch), 50);
 }
 
 
 /**
-* Chance of ch hitting as 0-100, or more.
+* Total to-hit value for a character. Final hit chance will subtract opponent's
+* dodge for a number that is (ideally) 1-100, then the player rolls.
+*
 * Not to be confused with get_effective_to_hit().
 * 
 * @param char_data *ch The hitter.
-* @param char_adta *victim The victim.
+* @param char_adta *victim The victim (if any).
 * @param bool off_hand If TRUE, penalizes to-hit due to off-hand item.
+* @param bool can_gain_skill If FALSE, only fetches this as information.
 * @return int The hit %.
 */
-int get_to_hit(char_data *ch, char_data *victim, bool off_hand) {
-	double base_chance;
-	double sparring_bonus[] = { 10.0, 20.0, 30.0 };
+int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill) {
+	double base_chance, spar = 0.0;
 	
-	// start at 50%
+	// start at 50
 	base_chance = 50.0 + get_effective_to_hit(ch);
 	
 	// add 5 per dexterity (will be counter-balanced by dodge dexterity)
 	base_chance += 5.0 * GET_DEXTERITY(ch);
 	
-	// skills
-	gain_ability_exp(ch, ABIL_SPARRING, 1);
-	if (skill_check(ch, ABIL_SPARRING, DIFF_EASY)) {
-		base_chance += CHOOSE_BY_ABILITY_LEVEL(sparring_bonus, ch, ABIL_SPARRING);
+	// skills: sparring
+	if (HAS_ABILITY(ch, ABIL_SPARRING)) {
+		if (IS_CLASS_ABILITY(ch, ABIL_SPARRING)) {
+			spar = MAX(10.0, GET_COMPUTED_LEVEL(ch) * 0.1);
+		}
+		else if (IS_SPECIALTY_ABILITY(ch, ABIL_SPARRING)) {
+			spar = MAX(10.0, GET_COMPUTED_LEVEL(ch) * 0.05);
+		}
+		else {
+			spar = 10.0;
+		}
+		
+		base_chance += spar;
+		
+		if (can_gain_skill) {
+			gain_ability_exp(ch, ABIL_SPARRING, 1);
+		}
 	}
 	
 	// penalty
 	if (off_hand) {
-		base_chance -= 50;	// TODO is this high enough? could be a config
+		base_chance -= 50;
 	}
 	
-	// npc
+	// npc -- add raw hit bonus
 	if (IS_NPC(ch)) {
 		base_chance += MOB_TO_HIT(ch);
 	}
 	
-	// blind penalty
+	// blind/dark penalty
 	if (victim && !CAN_SEE(ch, victim)) {
 		base_chance *= 2.0/3.0;
 	}
@@ -2435,12 +2453,8 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 	can_gain_skill = GET_HEALTH(victim) > 0;
 	
 	// determine hit (if WEAR_HOLD, pass off_hand=TRUE)
-	hit_chance = get_to_hit(ch, victim, (weapon && weapon->worn_on == WEAR_HOLD));
-	
-	// evasion
-	if (AWAKE(victim)) {
-		hit_chance -= get_dodge_modifier(victim, ch);
-	}
+	hit_chance = get_to_hit(ch, victim, (weapon && weapon->worn_on == WEAR_HOLD), TRUE);
+	hit_chance -= get_dodge_modifier(victim, ch);
 	
 	// absolute minimum of 5% chance of hit so long as ch is at least as high as victim
 	if (get_approximate_level(ch) >= get_approximate_level(victim)) {
@@ -2937,12 +2951,7 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 	}
 
 	// compute
-	to_hit = get_to_hit(ch, FIGHTING(ch), FALSE);
-
-	if (AWAKE(FIGHTING(ch))) {
-		to_hit -= get_dodge_modifier(FIGHTING(ch), ch);
-	}
-	
+	to_hit = get_to_hit(ch, FIGHTING(ch), FALSE, TRUE) - get_dodge_modifier(FIGHTING(ch), ch);
 	success = (to_hit >= number(1, 100));
 	
 	if (success && AWAKE(FIGHTING(ch)) && HAS_ABILITY(FIGHTING(ch), ABIL_BLOCK_ARROWS)) {

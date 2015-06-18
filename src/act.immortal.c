@@ -2345,7 +2345,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 	extern int get_effective_block(char_data *ch);
 	extern int get_effective_dodge(char_data *ch);
 	extern int get_effective_soak(char_data *ch);
-	extern int get_effective_to_hit(char_data *ch);
+	extern int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill);
 	extern int move_gain(char_data *ch);
 	void display_attributes(char_data *ch, char_data *to);
 
@@ -2364,7 +2364,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 	struct script_memory *mem;
 	struct trig_var_data *tv;
 	struct cooldown_data *cool;
-	int i, i2, diff, found = 0;
+	int i, i2, diff, found = 0, val;
 	obj_data *j;
 	struct follow_type *fol;
 	struct over_time_effect_type *dot;
@@ -2431,7 +2431,8 @@ void do_stat_character(char_data *ch, char_data *k) {
 		sprintf(lbuf3, "Healing  [%s%+d&0]", HAPPY_COLOR(GET_BONUS_HEALING(k), 0), GET_BONUS_HEALING(k));
 		msg_to_char(ch, "  %-28.28s %-28.28s %-28.28s\r\n", lbuf, lbuf2, lbuf3);
 
-		sprintf(lbuf, "To-hit  [%s%+d/%+d&0]", HAPPY_COLOR(get_effective_to_hit(k), 0), GET_TO_HIT(k), get_effective_to_hit(k));
+		val = get_to_hit(k, NULL, FALSE, FALSE);
+		sprintf(lbuf, "To-hit  [%s%d&0]", HAPPY_COLOR(val, 50), val);
 		sprintf(lbuf2, "Speed  [%.2f]", get_combat_speed(k, WEAR_WIELD));
 		msg_to_char(ch, "  %-28.28s %-28.28s\r\n", lbuf, lbuf2);
 
