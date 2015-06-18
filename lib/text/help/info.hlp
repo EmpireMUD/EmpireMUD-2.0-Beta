@@ -378,7 +378,7 @@ See also: ALIAS, PROMPT
 DODGE "DODGE CAP"
 
 Your dodge rating, shown on 'score', is subtracted from your opponent's to-hit
-score. It includes effects, Dexterity, and gear.
+score; the result is their chance to hit you as a percent.
 
 For fighting NPCs, the highest possible dodge chance is 75%. Against players,
 it's 95%. Players' chance of hitting you is based on their to-hit score, but
@@ -700,7 +700,8 @@ This command will give you a helpful tip about the game.
 TO-HIT "TO HIT" TOHIT "HIT CHANCE" "HIT CAP"
 
 Your to-hit rating, shown on 'score', represents the character's ability to
-hit enemies in combat. It includes bonuses from Dexterity, spells, and gear.
+hit enemies in combat. Your opponent's dodge rating is subtracted from your
+to-hit, and the resulting number is your percent chance to hit them.
 
 Players always have a minimum of 5% final chance to hit (mobs have 25%), so
 long as they're within 50 levels of the target. Your opponent's Dodge rating
@@ -714,7 +715,8 @@ Hit cap:
 - For hard mobs, add 10% to the total
 - For group mobs, add 30% to the total
 - For boss mobs, add both 10% and 30% (+43% total)
-- Add 50, +5 per Dexterity the mob has more than you
+- Add 50 to the total
+- Add +5 per Dexterity the mob has more than you
 
 See also: AFFECTS, DODGE, SCORE
 #
