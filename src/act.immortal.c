@@ -2352,6 +2352,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 	extern const char *class_role[NUM_ROLES];
 	extern const char *cooldown_types[];
 	extern const char *damage_types[];
+	extern const double hit_per_dex;
 	extern const char *player_bits[];
 	extern const char *position_types[];
 	extern const char *preference_bits[];
@@ -2422,7 +2423,8 @@ void do_stat_character(char_data *ch, char_data *k) {
 
 		display_attributes(k, ch);
 
-		val = get_dodge_modifier(k, NULL, FALSE);
+		// dex is removed from dodge to make it easier to compare to caps
+		val = get_dodge_modifier(k, NULL, FALSE) - (hit_per_dex * GET_DEXTERITY(ch));;
 		sprintf(lbuf, "Dodge  [%s%d&0]", HAPPY_COLOR(val, 0), val);
 		sprintf(lbuf2, "Block  [%s%+d/%+d&0]", HAPPY_COLOR(get_effective_block(k), 0), GET_BLOCK(k), get_effective_block(k));
 		sprintf(lbuf3, "Soak  [%s%+d/%+d&0]", HAPPY_COLOR(get_effective_soak(k), 0), GET_SOAK(k), get_effective_soak(k));
@@ -2433,7 +2435,8 @@ void do_stat_character(char_data *ch, char_data *k) {
 		sprintf(lbuf3, "Healing  [%s%+d&0]", HAPPY_COLOR(GET_BONUS_HEALING(k), 0), GET_BONUS_HEALING(k));
 		msg_to_char(ch, "  %-28.28s %-28.28s %-28.28s\r\n", lbuf, lbuf2, lbuf3);
 
-		val = get_to_hit(k, NULL, FALSE, FALSE);
+		// dex is removed from to-hit to make it easier to compare to caps
+		val = get_to_hit(k, NULL, FALSE, FALSE) - (hit_per_dex * GET_DEXTERITY(k));;
 		sprintf(lbuf, "To-hit  [%s%d&0]", HAPPY_COLOR(val, base_hit_chance), val);
 		sprintf(lbuf2, "Speed  [%.2f]", get_combat_speed(k, WEAR_WIELD));
 		msg_to_char(ch, "  %-28.28s %-28.28s\r\n", lbuf, lbuf2);

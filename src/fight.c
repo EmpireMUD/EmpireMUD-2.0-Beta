@@ -38,6 +38,7 @@
 
 // external vars
 extern struct message_list fight_messages[MAX_MESSAGES];
+extern const double hit_per_dex;
 
 // external funcs
 ACMD(do_flee);
@@ -310,8 +311,8 @@ int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill) 
 	// no default dodge amount
 	base = GET_DODGE(ch);
 	
-	// 5% per dexterity (balances to-hit dexterity)
-	base += 5.0 * GET_DEXTERITY(ch);
+	// dexterity (balances to-hit dexterity)
+	base += GET_DEXTERITY(ch) * hit_per_dex;
 	
 	// skills
 	if (HAS_ABILITY(ch, ABIL_REFLEXES)) {
@@ -387,8 +388,8 @@ int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_sk
 	// starting value
 	base_chance = base_hit_chance + GET_TO_HIT(ch);
 	
-	// add 5 per dexterity (will be counter-balanced by dodge dexterity)
-	base_chance += 5.0 * GET_DEXTERITY(ch);
+	// add dexterity (will be counter-balanced by dodge dexterity)
+	base_chance += GET_DEXTERITY(ch) * hit_per_dex;
 	
 	// skills: sparring
 	if (HAS_ABILITY(ch, ABIL_SPARRING)) {

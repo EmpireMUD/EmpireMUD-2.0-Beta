@@ -376,6 +376,7 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	extern const struct material_data materials[NUM_MATERIALS];
 	extern int skill_sort[NUM_SKILLS];
 	extern const int base_hit_chance;
+	extern const double hit_per_dex;
 
 	char lbuf[MAX_STRING_LENGTH], lbuf2[MAX_STRING_LENGTH], lbuf3[MAX_STRING_LENGTH];
 	int i, j, count, iter, sk, pts, cols, val;
@@ -462,8 +463,8 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	// secondary attributes
 	msg_to_char(to, " +---------------------------------------------------------------------------+\r\n");
 
-	// row 1	
-	val = get_dodge_modifier(ch, NULL, FALSE);
+	// row 1 (dex is removed from dodge to make the display easier to read)
+	val = get_dodge_modifier(ch, NULL, FALSE) - (hit_per_dex * GET_DEXTERITY(ch));
 	sprintf(lbuf, "Dodge  [%s%d&0]", HAPPY_COLOR(val, 0), val);
 	sprintf(lbuf2, "Block  [%s%+d&0]", HAPPY_COLOR(GET_BLOCK(ch), 0), GET_BLOCK(ch));
 	sprintf(lbuf3, "Soak  [%s%+d&0]", HAPPY_COLOR(GET_SOAK(ch), 0), GET_SOAK(ch));
@@ -475,8 +476,8 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	sprintf(lbuf3, "Healing  [%s%+d&0]", HAPPY_COLOR(GET_BONUS_HEALING(ch), 0), GET_BONUS_HEALING(ch));
 	msg_to_char(to, "  %-28.28s %-28.28s %-28.28s\r\n", lbuf, lbuf2, lbuf3);
 	
-	// row 3
-	val = get_to_hit(ch, NULL, FALSE, FALSE);
+	// row 3 (dex is removed from to-hit to make the display easier to read)
+	val = get_to_hit(ch, NULL, FALSE, FALSE) - (hit_per_dex * GET_DEXTERITY(ch));
 	sprintf(lbuf, "To-hit  [%s%d&0]", HAPPY_COLOR(val, base_hit_chance), val);
 	sprintf(lbuf2, "Speed  [%.2f]", get_combat_speed(ch, WEAR_WIELD));
 	msg_to_char(to, "  %-28.28s %-28.28s \r\n", lbuf, lbuf2);

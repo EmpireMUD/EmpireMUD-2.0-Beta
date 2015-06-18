@@ -205,6 +205,9 @@ const int remove_lore_types[] = { LORE_PLAYER_KILL, LORE_PLAYER_DEATH, LORE_TOWE
 // used in several places to represent the lowest to-hit a player could have
 const int base_hit_chance = 50;
 
+// how much hit/dodge 1 point of Dexterity gives
+const double hit_per_dex = 5.0;
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// WAR CONFIGS /////////////////////////////////////////////////////////////
