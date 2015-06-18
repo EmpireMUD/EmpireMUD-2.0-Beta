@@ -47,9 +47,8 @@ extern int determine_best_scale_level(char_data *ch, bool check_group);
 // locals
 int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damtype);
 void drop_loot(char_data *mob, char_data *killer);
-int get_dodge_modifier(char_data *ch, char_data *attacker);
+int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
 int get_effective_block(char_data *ch);
-int get_effective_dodge(char_data *ch);
 int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill);
 double get_weapon_speed(obj_data *weapon);
 void heal(char_data *ch, char_data *vict, int amount);
@@ -108,7 +107,7 @@ bool check_hit_vs_dodge(char_data *attacker, char_data *victim, bool off_hand) {
 	}
 	
 	if (AWAKE(victim)) {
-		chance = get_to_hit(attacker, victim, off_hand, TRUE) - get_dodge_modifier(victim, attacker);
+		chance = get_to_hit(attacker, victim, off_hand, TRUE) - get_dodge_modifier(victim, attacker, TRUE);
 		
 		// limits IF the character is at least close in level
 		if (get_approximate_level(attacker) >= (get_approximate_level(victim) - level_tolerance)) {
@@ -299,25 +298,38 @@ double get_combat_speed(char_data *ch, int pos) {
 
 /**
 * This is subtracted from get_to_hit (which is 0-100, or more).
-* Not to be confused with get_effective_dodge()
 *
 * @param char_data *ch The dodger.
 * @param char_data *attacker The attacker, if any.
+* @param bool can_gain_skill Only gains skill if TRUE, otherwise this is just informative.
 * @return int The total dodge %.
 */
-int get_dodge_modifier(char_data *ch, char_data *attacker) {
-	double base;
-	double reflexes[] = { 10.0, 20.0, 30.0 };
+int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill) {
+	double base, refl = 0.0;
 	
-	base = 0.0;
+	// no default dodge amount
+	base = GET_DODGE(ch);
 	
 	// 5% per dexterity (balances to-hit dexterity)
-	base += 5.0 * GET_DEXTERITY(ch) + get_effective_dodge(ch);
+	base += 5.0 * GET_DEXTERITY(ch);
 	
 	// skills
-	gain_ability_exp(ch, ABIL_REFLEXES, 1);
-	if (!IS_NPC(ch) && skill_check(ch, ABIL_REFLEXES, DIFF_EASY)) {
-		base += CHOOSE_BY_ABILITY_LEVEL(reflexes, ch, ABIL_REFLEXES);
+	if (HAS_ABILITY(ch, ABIL_REFLEXES)) {
+		if (IS_CLASS_ABILITY(ch, ABIL_REFLEXES)) {
+			refl = MAX(10.0, GET_COMPUTED_LEVEL(ch) * 0.1);
+		}
+		else if (IS_SPECIALTY_ABILITY(ch, ABIL_REFLEXES)) {
+			refl = MAX(10.0, GET_COMPUTED_LEVEL(ch) * 0.05);
+		}
+		else {
+			refl = 10.0;
+		}
+		
+		base += refl;
+		
+		if (can_gain_skill) {
+			gain_ability_exp(ch, ABIL_REFLEXES, 1);
+		}
 	}
 	
 	// npc
@@ -327,7 +339,7 @@ int get_dodge_modifier(char_data *ch, char_data *attacker) {
 	
 	// blind penalty
 	if (attacker && !CAN_SEE(ch, attacker)) {
-		base *= 2.0/3.0;
+		base -= 50;
 	}
 	
 	return (int) base;
@@ -347,18 +359,6 @@ int get_effective_block(char_data *ch) {
 
 
 /**
-* Applies diminishing returns to GET_DODGE.
-* Not to be confused with get_dodge_modifier.
-*
-* @param char_data *ch The person whose dodge rating to get.
-* @return int The effective dodge rating.
-*/
-int get_effective_dodge(char_data *ch) {
-	return (int) diminishing_returns(GET_DODGE(ch), 50);
-}
-
-
-/**
 * Applies diminishing returns to soak.
 *
 * @param char_data *ch The person whose soak rating to get.
@@ -370,25 +370,8 @@ int get_effective_soak(char_data *ch) {
 
 
 /**
-* Applies diminishing returns to GET_TO_HIT.
-* Not to be confused with get_to_hit().
-*
-* @param char_data *ch The person whose to-hit rating to get.
-* @return int The effective to-hit rating.
-*/
-int get_effective_to_hit(char_data *ch) {
-	return GET_TO_HIT(ch);
-	
-	// not currently diminishing to-hit
-	//return (int) diminishing_returns(GET_TO_HIT(ch), 50);
-}
-
-
-/**
 * Total to-hit value for a character. Final hit chance will subtract opponent's
 * dodge for a number that is (ideally) 1-100, then the player rolls.
-*
-* Not to be confused with get_effective_to_hit().
 * 
 * @param char_data *ch The hitter.
 * @param char_adta *victim The victim (if any).
@@ -400,7 +383,7 @@ int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_sk
 	double base_chance, spar = 0.0;
 	
 	// start at 50
-	base_chance = 50.0 + get_effective_to_hit(ch);
+	base_chance = 50.0 + GET_TO_HIT(ch);
 	
 	// add 5 per dexterity (will be counter-balanced by dodge dexterity)
 	base_chance += 5.0 * GET_DEXTERITY(ch);
@@ -436,7 +419,7 @@ int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_sk
 	
 	// blind/dark penalty
 	if (victim && !CAN_SEE(ch, victim)) {
-		base_chance *= 2.0/3.0;
+		base_chance -= 50;
 	}
 	
 	return (int) base_chance;

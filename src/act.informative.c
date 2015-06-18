@@ -367,6 +367,7 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	void show_character_affects(char_data *ch, char_data *to);
 	extern double get_combat_speed(char_data *ch, int pos);
 	extern int get_blood_upkeep_cost(char_data *ch);
+	extern int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
 	extern int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill);
 	extern int health_gain(char_data *ch, bool info_only);
 	extern int move_gain(char_data *ch, bool info_only);
@@ -461,7 +462,8 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	msg_to_char(to, " +---------------------------------------------------------------------------+\r\n");
 
 	// row 1	
-	sprintf(lbuf, "Dodge  [%s%+d&0]", HAPPY_COLOR(GET_DODGE(ch), 0), GET_DODGE(ch));
+	val = get_dodge_modifier(ch, NULL, FALSE);
+	sprintf(lbuf, "Dodge  [%s%d&0]", HAPPY_COLOR(val, 0), val);
 	sprintf(lbuf2, "Block  [%s%+d&0]", HAPPY_COLOR(GET_BLOCK(ch), 0), GET_BLOCK(ch));
 	sprintf(lbuf3, "Soak  [%s%+d&0]", HAPPY_COLOR(GET_SOAK(ch), 0), GET_SOAK(ch));
 	msg_to_char(to, "  %-28.28s %-28.28s %-28.28s\r\n", lbuf, lbuf2, lbuf3);
