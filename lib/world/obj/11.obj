@@ -9,40 +9,17 @@ You can enter the portal and find yourself somewhere else entirely!
 10 0
 S
 #1101
-sword blood-red bloodred red~
-the blood-red sword~
-The blood-red sword is dripping on the ground.~
+sword crimson bloodsword~
+a crimson bloodsword~
+A bloodsword is puddling on the ground.~
 ~
-1 g ano
-0 4 1
+1 gmp an
+0 3 1
 10 0
-S
-#1102
-sword blood-red bloodred red~
-the blood-red sword~
-The blood-red sword is dripping on the ground.~
-~
-1 g ano
-0 5 1
-10 0
-S
-#1103
-sword blood-red bloodred red~
-the blood-red sword~
-The blood-red sword is dripping on the ground.~
-~
-1 g ano
-0 6 1
-10 0
-S
-#1104
-sword crimson blood~
-the crimson blood sword~
-The crimson blood sword is dripping on the ground.~
-~
-1 g ano
-0 7 1
-10 0
+A
+17 1
+C
+0 0
 S
 #1105
 fireball~
@@ -186,7 +163,7 @@ crystal nexus~
 a nexus crystal~
 A nexus crystal is lying here.~
    The nexus crystal is a small, fiery gem that is used to open portals in
-certain buildings. See HELP PORTAL for information on how to use them.  
+certain buildings. See HELP PORTAL for information on how to use them.
 ~
 3 0 a
 0 0 0
