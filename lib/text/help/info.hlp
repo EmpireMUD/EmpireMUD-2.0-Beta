@@ -386,7 +386,7 @@ mobs are more predictable and it is possible to reach a "dodge cap", the amount
 where NPCs hit you as little as possible.
 
 Dodge cap:
-- Take the mob's level minus 50 (not less than 0)
+- Start with the mob's level, minus 50 (not less than 0)
 - Add 10% of the mob's level
 - For hard mobs, add 10% to the total
 - For group mobs, add 30% to the total
@@ -710,7 +710,7 @@ compute the "hit cap" -- the point at which you'll hit 100% of the time --
 based on the level of the mob you're fighting.
 
 Hit cap:
-- Take the mob's level minus 50 (not less than 0)
+- Start with the mob's level, minus 50 (not less than 0)
 - Add 10% of the mob's level
 - For hard mobs, add 10% to the total
 - For group mobs, add 30% to the total

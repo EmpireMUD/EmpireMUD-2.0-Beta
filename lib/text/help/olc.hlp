@@ -3216,6 +3216,7 @@ The following triggers are available for mobs:
  Memory
  Ability
  Leave
+ Leave-All
  Door
 
 See also: OLC TRIGGERS, TRIGEDIT ARGUMENTS, TRIGEDIT NUMARG, TRIGEDIT TYPES

@@ -21,6 +21,7 @@ Further help can be       =========================|  TRIGEDIT-MOB-LOAD      |
 accessed by typing:                                |  TRIGEDIT-MOB-MEMORY    |
 HELP <TYPE>.                                       |  TRIGEDIT-MOB-ABILITY   |
 i.e. HELP TRIGEDIT-MOB-ACT                         |  TRIGEDIT-MOB-LEAVE     |
+                                                   |  TRIGEDIT-MOB-LEAVE-ALL |
                                                    |  TRIGEDIT-MOB-DOOR      |
 See also: TRIG-COMMANDS, VARIABLES, EXPRESSIONS     =========================
 #d
@@ -1032,7 +1033,8 @@ MOB-TRIGGERS MOBILE-TRIGGERS TRIGEDIT-MOB-TYPES
 15) Memory      HELP TRIGEDIT-MOB-MEMORY          
 16) Ability     HELP TRIGEDIT-MOB-ABILITY          
 17) Leave       HELP TRIGEDIT-MOB-LEAVE          
-18) Door        HELP TRIGEDIT-MOB-DOOR          
+18) Door        HELP TRIGEDIT-MOB-DOOR                    
+17) Leave-All   HELP TRIGEDIT-MOB-LEAVE-ALL
 #d
 TRIGEDIT-OBJ-GET
 
@@ -1473,9 +1475,10 @@ Variables:
 %ability%     - the number of the ability
 %abilityname% - the name of the ability
 #d
-TRIGEDIT-MOB-LEAVE 
+TRIGEDIT-MOB-LEAVE TRIGEDIT-MOB-LEAVE-ALL
 
-Activated when someone leaves the room the mob is in if the mob can see the person.
+Activated when someone leaves the room the mob is in. The difference between
+'Leave' and 'Leave-All' is that Leave only works if the mob can see the person.
 
 Numeric Arg : percent chance this trigger will be activated. 
 Argument    : not used.
@@ -1488,8 +1491,8 @@ Variables:
 #d
 TRIGEDIT-MOB-DOOR 
  
-Activated when the mobile is in the same room as someone using the door specific 
-commands 'close, open, pick, lock, unlock' on a door. 
+Activated when the mobile is in the same room as someone using the door
+specific commands 'close, open, pick, lock, unlock' on a door. 
 
 Used with return 0 will prevent the command from executing.
 

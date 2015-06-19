@@ -51,6 +51,7 @@
 #define MTRIG_ABILITY          BIT(15)     /* mob targetted by ability     */
 #define MTRIG_LEAVE            BIT(16)     /* someone leaves room seen   */
 #define MTRIG_DOOR             BIT(17)     /* door manipulated in room   */
+#define MTRIG_LEAVE_ALL        BIT(18)		// leave even if they can't see
 
 /* obj trigger types */
 #define OTRIG_GLOBAL           BIT(0)	     /* unused                     */

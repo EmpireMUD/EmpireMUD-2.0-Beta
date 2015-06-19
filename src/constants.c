@@ -2404,20 +2404,20 @@ const char *trig_types[] = {
 	"Command",
 	"Speech",
 	"Act",
-	"Death",
+	"Death",	// 5
 	"Greet",
 	"Greet-All",
 	"Entry",
 	"Receive",
-	"Fight",
+	"Fight",	// 10
 	"HitPrcnt",
 	"Bribe",
 	"Load",
 	"Memory",
-	"Ability",
+	"Ability",	// 15
 	"Leave",
 	"Door",
-	"UNUSED",
+	"Leave-All",
 	"\n"
 };
 
