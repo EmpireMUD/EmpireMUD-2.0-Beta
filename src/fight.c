@@ -62,6 +62,10 @@ void trigger_distrust_from_hostile(char_data *ch, empire_data *emp);
  //////////////////////////////////////////////////////////////////////////////
 //// GETTERS / HELPERS ///////////////////////////////////////////////////////
 
+// used by several functions to determine auto-kill
+#define WOULD_EXECUTE(ch, vict)  (IS_NPC(ch) ? (!MOB_FLAGGED((ch), MOB_ANIMAL) || MOB_FLAGGED((ch), MOB_AGGRESSIVE | MOB_HARD | MOB_GROUP)) : (PRF_FLAGGED((ch), PRF_AUTOKILL) && !MOB_FLAGGED((vict), MOB_HARD | MOB_GROUP)))
+
+
 /**
 * Cancels combat for a character if they or their target have certain flags
 * that should make combat impossible.
@@ -2182,7 +2186,7 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 	if (!IS_WEAPON_TYPE(attacktype))
 		skill_message(dam, ch, victim, attacktype);
 	else {
-		if (dam == 0 || ch == victim || (GET_POS(victim) == POS_DEAD && !(!IS_NPC(ch) && !PRF_FLAGGED(ch, PRF_AUTOKILL)))) {
+		if (dam == 0 || ch == victim || (GET_POS(victim) == POS_DEAD && WOULD_EXECUTE(ch, victim))) {
 			if (!skill_message(dam, ch, victim, attacktype))
 				dam_message(dam, ch, victim, attacktype);
 		}
@@ -2678,8 +2682,6 @@ void perform_execute(char_data *ch, char_data *victim, int attacktype, int damty
 	char_data *m, *ch_iter;
 	obj_data *weapon;
 
-	#define WOULD_EXECUTE(ch)  (IS_NPC(ch) ? (!MOB_FLAGGED((ch), MOB_ANIMAL) || MOB_FLAGGED((ch), MOB_AGGRESSIVE | MOB_HARD | MOB_GROUP)) : (PRF_FLAGGED((ch), PRF_AUTOKILL)))
-
 	/* stop_fighting() is split around here to help with exp */
 
 	/* Probably sent here by damage() */
@@ -2687,7 +2689,7 @@ void perform_execute(char_data *ch, char_data *victim, int attacktype, int damty
 		ok = TRUE;
 
 	/* Sent here by damage() */
-	if (attacktype > NUM_ATTACK_TYPES || WOULD_EXECUTE(ch)) {
+	if (attacktype > NUM_ATTACK_TYPES || WOULD_EXECUTE(ch, victim)) {
 		ok = TRUE;
 	}
 	
@@ -2706,7 +2708,7 @@ void perform_execute(char_data *ch, char_data *victim, int attacktype, int damty
 
 		// look for anybody in the room fighting victim (including ch) who wouldn't execute:
 		for (ch_iter = ROOM_PEOPLE(IN_ROOM(victim)); ch_iter; ch_iter = ch_iter->next_in_room) {
-			if (ch_iter != victim && FIGHTING(ch_iter) == victim && !WOULD_EXECUTE(ch_iter)) {
+			if (ch_iter != victim && FIGHTING(ch_iter) == victim && !WOULD_EXECUTE(ch_iter, victim)) {
 				stop_fighting(ch_iter);
 			}
 		}
@@ -2919,7 +2921,7 @@ void perform_violence_melee(char_data *ch, obj_data *weapon) {
 		return;
 	}
 	
-	if (!IS_NPC(ch) && FIGHTING(ch) && GET_HEALTH(FIGHTING(ch)) <= 0 && !PRF_FLAGGED(ch, PRF_AUTOKILL)) {
+	if (FIGHTING(ch) && GET_HEALTH(FIGHTING(ch)) <= 0 && !WOULD_EXECUTE(ch, FIGHTING(ch))) {
 		stop_fighting(ch);
 	}
 }
@@ -3007,7 +3009,7 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 		extract_obj(best);
 	}
 		
-	if (!IS_NPC(ch) && FIGHTING(ch) && GET_HEALTH(FIGHTING(ch)) <= 0 && !PRF_FLAGGED(ch, PRF_AUTOKILL)) {
+	if (FIGHTING(ch) && GET_HEALTH(FIGHTING(ch)) <= 0 && WOULD_EXECUTE(ch, FIGHTING(ch))) {
 		stop_fighting(ch);
 	}
 }
