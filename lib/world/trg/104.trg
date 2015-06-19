@@ -28,7 +28,7 @@ global intro_running
 ~
 #10401
 Hamlet intro exit block~
-0 q 100
+0 s 0
 ~
 if (!%actor.nohassle% && %intro_running%)
   %send% %actor% You can't leave during the intro.
@@ -126,7 +126,7 @@ end
 ~
 #10405
 Mob block higher template id~
-0 q 100
+0 s 0
 ~
 * One quick trick to get the target room
 eval room_var %self.room%

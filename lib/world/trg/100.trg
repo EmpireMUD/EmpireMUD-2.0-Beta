@@ -6,7 +6,7 @@ Mob Kill Adventure Completion~
 ~
 #10001
 Mob Must Fight~
-0 q 100
+0 s 0
 ~
 %send% %actor% You can't leave because of %self.name%.
 return 0
