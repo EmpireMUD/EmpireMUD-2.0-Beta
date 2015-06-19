@@ -63,7 +63,7 @@ void trigger_distrust_from_hostile(char_data *ch, empire_data *emp);
 //// GETTERS / HELPERS ///////////////////////////////////////////////////////
 
 // used by several functions to determine auto-kill
-#define WOULD_EXECUTE(ch, vict)  (IS_NPC(ch) ? (!MOB_FLAGGED((ch), MOB_ANIMAL) || MOB_FLAGGED((ch), MOB_AGGRESSIVE | MOB_HARD | MOB_GROUP)) : (PRF_FLAGGED((ch), PRF_AUTOKILL) && !MOB_FLAGGED((vict), MOB_HARD | MOB_GROUP)))
+#define WOULD_EXECUTE(ch, vict)  (IS_NPC(ch) ? (!MOB_FLAGGED((ch), MOB_ANIMAL) || MOB_FLAGGED((ch), MOB_AGGRESSIVE | MOB_HARD | MOB_GROUP)) : (PRF_FLAGGED((ch), PRF_AUTOKILL) || MOB_FLAGGED((vict), MOB_HARD | MOB_GROUP)))
 
 
 /**
