@@ -110,8 +110,8 @@ void check_attribute_gear(char_data *ch) {
 				if (GET_ATT(ch, primary_attributes[iter]) < 1 && primary_attributes[iter] == apply_attribute[(int) obj->affected[app].location]) {
 					act("You are too weak to keep using $p.", FALSE, ch, obj, NULL, TO_CHAR);
 					act("$n stops using $p.", TRUE, ch, obj, NULL, TO_ROOM);
-					// this may extract it, or drop it
-					unequip_char_to_inventory(ch, pos, TRUE);
+					// this may extract it
+					unequip_char_to_inventory(ch, pos);
 					
 					found = TRUE;
 				}
@@ -494,7 +494,7 @@ void real_update_char(char_data *ch) {
 	}
 	
 	if (GET_EQ(ch, WEAR_SADDLE) && !IS_RIDING(ch)) {
-		perform_remove(ch, WEAR_SADDLE, FALSE, TRUE);
+		perform_remove(ch, WEAR_SADDLE);
 	}
 	
 	if (GET_BLOOD(ch) > GET_MAX_BLOOD(ch)) {
@@ -554,8 +554,8 @@ void real_update_char(char_data *ch) {
 		if (GET_EQ(ch, iter) && !can_wear_item(ch, GET_EQ(ch, iter), TRUE)) {
 			// can_wear_item sends own message to ch
 			act("$n stops using $p.", TRUE, ch, GET_EQ(ch, iter), NULL, TO_ROOM);
-			// this may extract it, or drop it
-			unequip_char_to_inventory(ch, iter, TRUE);
+			// this may extract it
+			unequip_char_to_inventory(ch, iter);
 		}
 	}
 

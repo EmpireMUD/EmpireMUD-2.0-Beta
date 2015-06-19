@@ -487,15 +487,11 @@ static int perform_put(char_data *ch, obj_data *obj, obj_data *cont) {
 }
 
 
-void perform_remove(char_data *ch, int pos, bool swap, bool droppable) {
+void perform_remove(char_data *ch, int pos) {
 	obj_data *obj;
-
-	/* If swap == TRUE, we're swapping weapons */
 
 	if (!(obj = GET_EQ(ch, pos)))
 		log("SYSERR: perform_remove: bad pos %d passed.", pos);
-	else if (!swap && !droppable && IS_CARRYING_N(ch) + GET_OBJ_INVENTORY_SIZE(obj) > CAN_CARRY_N(ch))
-		act("$p: you can't carry that many items!", FALSE, ch, obj, 0, TO_CHAR);
 	else if (pos == WEAR_SADDLE && IS_RIDING(ch)) {
 		msg_to_char(ch, "You can't remove your saddle while you're riding!\r\n");
 	}
@@ -508,7 +504,7 @@ void perform_remove(char_data *ch, int pos, bool swap, bool droppable) {
 		act("$n stops using $p.", TRUE, ch, obj, 0, TO_ROOM);
 		
 		// this may extract it, or drop it
-		unequip_char_to_inventory(ch, pos, droppable);
+		unequip_char_to_inventory(ch, pos);
 	}
 }
 
@@ -571,7 +567,7 @@ void remove_armor_by_type(char_data *ch, int armor_type) {
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
 		if (GET_EQ(ch, iter) && GET_ARMOR_TYPE(GET_EQ(ch, iter)) == armor_type) {
 			act("You take off $p.", FALSE, ch, GET_EQ(ch, iter), NULL, TO_CHAR);
-			unequip_char_to_inventory(ch, iter, TRUE);
+			unequip_char_to_inventory(ch, iter);
 		}
 	}
 }
@@ -2439,7 +2435,7 @@ ACMD(do_draw) {
 
 	// attempt to remove existing wield
 	if (GET_EQ(ch, WEAR_WIELD)) {
-		perform_remove(ch, WEAR_WIELD, FALSE, TRUE);
+		perform_remove(ch, WEAR_WIELD);
 		
 		// did it work? if not, player got an error
 		if (GET_EQ(ch, WEAR_WIELD)) {
@@ -3189,7 +3185,7 @@ ACMD(do_grab) {
 	}
 	else if (CAN_WEAR(obj, ITEM_WEAR_RANGED)) {
 		if (GET_EQ(ch, WEAR_RANGED)) {
-			perform_remove(ch, WEAR_RANGED, TRUE, FALSE);
+			perform_remove(ch, WEAR_RANGED);
 		}
 		perform_wear(ch, obj, WEAR_RANGED);
 	}
@@ -3200,7 +3196,7 @@ ACMD(do_grab) {
 		else {
 			// remove existing item
 			if (GET_EQ(ch, WEAR_HOLD)) {
-				perform_remove(ch, WEAR_HOLD, TRUE, FALSE);
+				perform_remove(ch, WEAR_HOLD);
 			}
 			perform_wear(ch, obj, WEAR_HOLD);
 		}
@@ -3669,7 +3665,7 @@ ACMD(do_remove) {
 		found = 0;
 		for (i = 0; i < NUM_WEARS; i++)
 			if (GET_EQ(ch, i)) {
-				perform_remove(ch, i, FALSE, TRUE);
+				perform_remove(ch, i);
 				found = 1;
 			}
 		if (!found)
@@ -3682,7 +3678,7 @@ ACMD(do_remove) {
 			found = 0;
 			for (i = 0; i < NUM_WEARS; i++)
 				if (GET_EQ(ch, i) && CAN_SEE_OBJ(ch, GET_EQ(ch, i)) && isname(arg, GET_OBJ_KEYWORDS(GET_EQ(ch, i)))) {
-					perform_remove(ch, i, FALSE, TRUE);
+					perform_remove(ch, i);
 					found = 1;
 				}
 			if (!found) {
@@ -3698,7 +3694,7 @@ ACMD(do_remove) {
 			send_to_char(buf, ch);
 		}
 		else
-			perform_remove(ch, i, FALSE, TRUE);
+			perform_remove(ch, i);
 	}
 }
 
@@ -4329,7 +4325,7 @@ ACMD(do_wield) {
 	}
 	else {
 		if (GET_EQ(ch, WEAR_WIELD)) {
-			perform_remove(ch, WEAR_WIELD, TRUE, FALSE);
+			perform_remove(ch, WEAR_WIELD);
 		}
 		perform_wear(ch, obj, WEAR_WIELD);
 	}

@@ -84,7 +84,7 @@ void check_skill_sell(char_data *ch, int abil) {
 			if ((obj = GET_EQ(ch, WEAR_WIELD))) {
 				if (GET_OBJ_VNUM(obj) == o_BLOODSWORD) {
 					act("You stop using $p.", FALSE, ch, GET_EQ(ch, WEAR_WIELD), NULL, TO_CHAR);
-					unequip_char_to_inventory(ch, WEAR_WIELD, TRUE);
+					unequip_char_to_inventory(ch, WEAR_WIELD);
 				}
 			}
 			break;
@@ -232,7 +232,7 @@ void check_skill_sell(char_data *ch, int abil) {
 			if ((obj = GET_EQ(ch, WEAR_WIELD))) {
 				if (GET_OBJ_VNUM(obj) == o_FIREBALL) {
 					act("You stop using $p.", FALSE, ch, GET_EQ(ch, WEAR_WIELD), NULL, TO_CHAR);
-					unequip_char_to_inventory(ch, WEAR_WIELD, TRUE);
+					unequip_char_to_inventory(ch, WEAR_WIELD);
 				}
 			}
 			break;
@@ -266,7 +266,7 @@ void check_skill_sell(char_data *ch, int abil) {
 		case ABIL_SHIELD_BLOCK: {
 			if ((obj = GET_EQ(ch, WEAR_HOLD)) && IS_SHIELD(obj)) {
 				act("You stop using $p.", FALSE, ch, GET_EQ(ch, WEAR_HOLD), NULL, TO_CHAR);
-				unequip_char_to_inventory(ch, WEAR_HOLD, TRUE);
+				unequip_char_to_inventory(ch, WEAR_HOLD);
 			}
 			break;
 		}

@@ -189,7 +189,7 @@ void obj_to_obj(obj_data *obj, obj_data *obj_to);
 void obj_to_room(obj_data *object, room_data *room);
 void swap_obj_for_obj(obj_data *old, obj_data *new);
 extern obj_data *unequip_char(char_data *ch, int pos);
-void unequip_char_to_inventory(char_data *ch, int pos, bool droppable);
+void unequip_char_to_inventory(char_data *ch, int pos);
 void unequip_char_to_room(char_data *ch, int pos);
 
 // object message handlers
@@ -267,7 +267,7 @@ extern int parse_direction(char_data *ch, char *dir);
 //// handlers from other files ///////////////////////////////////////////////
 
 // act.item.c
-void perform_remove(char_data *ch, int pos, bool swap, bool droppable);
+void perform_remove(char_data *ch, int pos);
 
 // config.c
 extern bitvector_t config_get_bitvector(char *key);

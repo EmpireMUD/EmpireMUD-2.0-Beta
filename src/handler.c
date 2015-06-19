@@ -1069,7 +1069,7 @@ void perform_dismount(char_data *ch) {
 	REMOVE_BIT(GET_MOUNT_FLAGS(ch), MOUNT_RIDING);
 	
 	if (GET_EQ(ch, WEAR_SADDLE)) {
-		perform_remove(ch, WEAR_SADDLE, FALSE, TRUE);
+		perform_remove(ch, WEAR_SADDLE);
 	}
 }
 
@@ -4133,18 +4133,12 @@ obj_data *unequip_char(char_data *ch, int pos) {
 *
 * @param char_data *ch The person to unequip
 * @param int pos The WEAR_x slot to remove
-* @param bool droppable If TRUE, checks that ch can carry the item, or else puts it in the room and sends a message
 */
-void unequip_char_to_inventory(char_data *ch, int pos, bool droppable) {
+void unequip_char_to_inventory(char_data *ch, int pos) {
 	obj_data *obj = unequip_char(ch, pos);
 	
 	if (OBJ_FLAGGED(obj, OBJ_SINGLE_USE)) {
 		extract_obj(obj);
-	}
-	else if (droppable && !IS_IMMORTAL(ch) && IN_ROOM(ch) && IS_CARRYING_N(ch) + GET_OBJ_INVENTORY_SIZE(obj) > CAN_CARRY_N(ch)) {
-		act("... your inventory is full and you drop it.", FALSE, ch, obj, NULL, TO_CHAR);
-		act("... $s inventory is full and $e drops it.", TRUE, ch, obj, NULL, TO_ROOM);
-		obj_to_room(obj, IN_ROOM(ch));
 	}
 	else {
 		obj_to_char(obj, ch);

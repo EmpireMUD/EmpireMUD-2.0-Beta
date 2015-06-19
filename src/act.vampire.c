@@ -809,7 +809,7 @@ ACMD(do_bloodsword) {
 	
 	// attempt to remove existing wield
 	if (GET_EQ(ch, WEAR_WIELD)) {
-		perform_remove(ch, WEAR_WIELD, FALSE, FALSE);
+		perform_remove(ch, WEAR_WIELD);
 		
 		// did it work? if not, player got an error
 		if (GET_EQ(ch, WEAR_WIELD)) {
@@ -933,7 +933,7 @@ ACMD(do_claws) {
 
 	// attempt to remove existing wield
 	if (GET_EQ(ch, WEAR_WIELD)) {
-		perform_remove(ch, WEAR_WIELD, FALSE, FALSE);
+		perform_remove(ch, WEAR_WIELD);
 		
 		// did it work? if not, player got an error
 		if (GET_EQ(ch, WEAR_WIELD)) {
