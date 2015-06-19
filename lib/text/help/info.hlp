@@ -701,7 +701,9 @@ TO-HIT "TO HIT" TOHIT "HIT CHANCE" "HIT CAP"
 
 Your to-hit rating, shown on 'score', represents the character's ability to
 hit enemies in combat. Your opponent's dodge rating is subtracted from your
-to-hit, and the resulting number is your percent chance to hit them.
+to-hit, and the resulting number is your percent chance to hit them. You have
+a base to-hit of 50 with no gear, representing a 50% chance to hit a level 1
+mob.
 
 Players always have a minimum of 5% final chance to hit (mobs have 25%), so
 long as they're within 50 levels of the target. Your opponent's Dodge rating
@@ -715,7 +717,7 @@ Hit cap:
 - For hard mobs, raise the total by 10%
 - For group mobs, raise the total by 30%
 - For boss mobs, raise the total by both 10% and 30% (+43% total)
-- Add 50 to the total
+- Add 100 to the total
 - Add +5 per Dexterity the mob has more than you
 
 See also: AFFECTS, DODGE, SCORE
