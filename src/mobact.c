@@ -1196,10 +1196,11 @@ void scale_mob_to_level(char_data *mob, int level) {
 	value *= MOB_FLAGGED(mob, MOB_GROUP) ? 3.0 : 1.0;
 	mob->mob_specials.damage = MAX(1, (int) ceil(value));
 	
-	// to-hit (mobs are hit-capped)
-	value = MAX(0, level - 50) + (level * 0.1) + 50;
+	// to-hit
+	value = MAX(0, level - 50) + (level * 0.1);
 	value *= MOB_FLAGGED(mob, MOB_HARD) ? 1.1 : 1.0;
 	value *= MOB_FLAGGED(mob, MOB_GROUP) ? 1.3 : 1.0;
+	value += 50;	// to hit-cap them
 	mob->mob_specials.to_hit = MAX(1, (int) ceil(value));
 	
 	// to-dodge
