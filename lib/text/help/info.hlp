@@ -388,10 +388,10 @@ where NPCs hit you as little as possible.
 Dodge cap:
 - Start with the mob's level, minus 50 (not less than 0)
 - Add 10% of the mob's level
-- For hard mobs, add 10% to the total
-- For group mobs, add 30% to the total
-- For boss mobs, add both 10% and 30% (+43% total)
-- Add 125 (50 base hit chance + 75 max-dodge)
+- For hard mobs, raise the total by 10%
+- For group mobs, raise the total by 30%
+- For boss mobs, raise the total by both 10% and 30% (+43% total)
+- Add 75 to the total
 - Add +5 per Dexterity the mob has more than you
 
 See also: AFFECTS, SCORE, TO-HIT
@@ -712,9 +712,9 @@ based on the level of the mob you're fighting.
 Hit cap:
 - Start with the mob's level, minus 50 (not less than 0)
 - Add 10% of the mob's level
-- For hard mobs, add 10% to the total
-- For group mobs, add 30% to the total
-- For boss mobs, add both 10% and 30% (+43% total)
+- For hard mobs, raise the total by 10%
+- For group mobs, raise the total by 30%
+- For boss mobs, raise the total by both 10% and 30% (+43% total)
 - Add 50 to the total
 - Add +5 per Dexterity the mob has more than you
 
