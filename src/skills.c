@@ -82,7 +82,7 @@ void check_skill_sell(char_data *ch, int abil) {
 		}
 		case ABIL_BLOODSWORD: {
 			if ((obj = GET_EQ(ch, WEAR_WIELD))) {
-				if (GET_OBJ_VNUM(obj) == o_BLOODSWORD_LOW || GET_OBJ_VNUM(obj) == o_BLOODSWORD_MEDIUM || GET_OBJ_VNUM(obj) == o_BLOODSWORD_HIGH || GET_OBJ_VNUM(obj) == o_BLOODSWORD_LEGENDARY) {
+				if (GET_OBJ_VNUM(obj) == o_BLOODSWORD) {
 					act("You stop using $p.", FALSE, ch, GET_EQ(ch, WEAR_WIELD), NULL, TO_CHAR);
 					unequip_char_to_inventory(ch, WEAR_WIELD, TRUE);
 				}

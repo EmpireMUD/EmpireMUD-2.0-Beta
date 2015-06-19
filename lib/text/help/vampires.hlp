@@ -95,12 +95,12 @@ Cooldown:  30 seconds
 
 This power purges a vampire's blood of any poisons, by sweating them out.
 #
-BLOODSWORD "BLOOD-RED SWORD"
+BLOODSWORD BLOOD-SWORD "BLOOD SWORD"
 
 Bloodsword (Vampire ability)
 
 Usage:  bloodsword
-Cost: 20 blood
+Cost:  40 blood
 
 A vampire with this ability can create a sword from its own blood. The blood-
 red sword is only as powerful as the vampire who created it, and it only lasts

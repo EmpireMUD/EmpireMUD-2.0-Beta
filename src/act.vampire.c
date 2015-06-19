@@ -787,9 +787,10 @@ ACMD(do_bloodsweat) {
 
 
 ACMD(do_bloodsword) {
+	void scale_item_to_level(obj_data *obj, int level);
+
 	obj_data *obj;
-	int cost = 20;
-	int vnum;
+	int cost = 40;
 
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs cannot use bloodsword.\r\n");
@@ -816,22 +817,12 @@ ACMD(do_bloodsword) {
 		}
 	}
 	
-	// determine which version
-	if (get_ability_level(ch, ABIL_BLOODSWORD) >= 100) {
-		vnum = o_BLOODSWORD_LEGENDARY;
-	}
-	else if (get_ability_level(ch, ABIL_BLOODSWORD) >= 90) {
-		vnum = o_BLOODSWORD_HIGH;
-	}
-	else if (get_ability_level(ch, ABIL_BLOODSWORD) >= 50) {
-		vnum = o_BLOODSWORD_MEDIUM;
-	}
-	else {
-		vnum = o_BLOODSWORD_LOW;
-	}
-	
 	charge_ability_cost(ch, BLOOD, cost, NOTHING, 0);
-	obj = read_object(vnum);
+	obj = read_object(o_BLOODSWORD);
+	
+	if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
+		scale_item_to_level(obj, IS_CLASS_ABILITY(ch, ABIL_BLOODSWORD) ? get_approximate_level(ch) : GET_SKILL(ch, SKILL_VAMPIRE));
+	}
 	
 	act("You drain blood from your wrist and mold it into $p.", FALSE, ch, obj, NULL, TO_CHAR);
 	act("$n twists and molds $s own blood into $p.", TRUE, ch, obj, NULL, TO_ROOM);

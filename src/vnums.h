@@ -166,10 +166,7 @@
 
 // Skill tree items
 #define o_PORTAL  1100  // could probably safely generate a NOTHING item
-#define o_BLOODSWORD_LOW  1101
-#define o_BLOODSWORD_MEDIUM  1102
-#define o_BLOODSWORD_HIGH  1103
-#define o_BLOODSWORD_LEGENDARY  1104
+#define o_BLOODSWORD  1101
 #define o_FIREBALL  1105
 #define o_IMPERIUM_SPIKE  1114
 #define o_NEXUS_CRYSTAL  1115
