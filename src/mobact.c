@@ -1201,13 +1201,13 @@ void scale_mob_to_level(char_data *mob, int level) {
 	value *= MOB_FLAGGED(mob, MOB_HARD) ? 1.1 : 1.0;
 	value *= MOB_FLAGGED(mob, MOB_GROUP) ? 1.3 : 1.0;
 	value += 50;	// to hit-cap them
-	mob->mob_specials.to_hit = MAX(1, (int) ceil(value));
+	mob->mob_specials.to_hit = MAX(0, (int) round(value));
 	
 	// to-dodge
 	value = MAX(0, level - 50) + (level * 0.1);
 	value *= MOB_FLAGGED(mob, MOB_HARD) ? 1.1 : 1.0;
 	value *= MOB_FLAGGED(mob, MOB_GROUP) ? 1.3 : 1.0;
-	mob->mob_specials.to_dodge = MAX(1, (int) ceil(value));
+	mob->mob_specials.to_dodge = MAX(0, (int) round(value));
 	
 	// cleanup
 	for (iter = 0; iter < NUM_POOLS; ++iter) {
