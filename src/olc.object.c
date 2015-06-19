@@ -173,6 +173,7 @@ bool audit_object(obj_data *obj, char_data *ch) {
 				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Poison charges not set");
 				problem = TRUE;
 			}
+			break;
 		}
 		case ITEM_BOOK: {
 			if (!find_book_by_id(GET_BOOK_ID(obj))) {
