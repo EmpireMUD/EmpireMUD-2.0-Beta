@@ -1,6 +1,6 @@
 #10200
 Goblin Challenge Must Fight~
-0 s 0
+0 s 100
 ~
 %send% %actor% You have begun the Goblin Challenge and cannot leave without fighting %self.name%.
 return 0
@@ -511,7 +511,7 @@ mkill %actor%
 ~
 #10262
 Primeval must-fight~
-0 s 0
+0 s 100
 ~
 if (%actor.nohassle% || %direction% == south)
   halt
