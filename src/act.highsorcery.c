@@ -656,11 +656,12 @@ ACMD(do_collapse) {
 ACMD(do_colorburst) {
 	char_data *vict = NULL;
 	struct affected_type *af;
-	int amt, cost = 15;
+	int amt;
 	
+	int costs[] = { 15, 30, 45 };
 	int levels[] = { -5, -10, -15 };
 	
-	if (!can_use_ability(ch, ABIL_COLORBURST, MANA, cost, COOLDOWN_COLORBURST)) {
+	if (!can_use_ability(ch, ABIL_COLORBURST, MANA, CHOOSE_BY_ABILITY_LEVEL(costs, ch, ABIL_COLORBURST), COOLDOWN_COLORBURST)) {
 		return;
 	}
 	
@@ -689,7 +690,7 @@ ACMD(do_colorburst) {
 		return;
 	}
 	
-	charge_ability_cost(ch, MANA, cost, COOLDOWN_COLORBURST, 30);
+	charge_ability_cost(ch, MANA, CHOOSE_BY_ABILITY_LEVEL(costs, ch, ABIL_COLORBURST), COOLDOWN_COLORBURST, 30);
 	
 	if (SHOULD_APPEAR(ch)) {
 		appear(ch);
