@@ -2440,7 +2440,8 @@ const bitvector_t mtrig_argument_types[] = {
 	TRIG_ARG_PERCENT,	// memory
 	TRIG_ARG_PERCENT,	// ability
 	TRIG_ARG_PERCENT,	// leave
-	TRIG_ARG_PERCENT	// door
+	TRIG_ARG_PERCENT,	// door
+	TRIG_ARG_PERCENT	// leave-all
 };
 
 
