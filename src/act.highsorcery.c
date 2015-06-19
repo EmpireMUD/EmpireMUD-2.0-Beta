@@ -1056,10 +1056,9 @@ ACMD(do_enervate) {
 ACMD(do_foresight) {
 	struct affected_type *af;
 	char_data *vict = ch;
-	int cost = 15;
-	int amt;
+	int amt, cost = 30;
 	
-	int levels[] = { 10, 15, 20 };
+	int levels[] = { 5, 10, 15 };
 	
 	one_argument(argument, arg);
 	

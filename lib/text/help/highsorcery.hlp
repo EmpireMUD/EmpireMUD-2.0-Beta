@@ -149,9 +149,11 @@ FORESIGHT
 Foresight (High Sorcery ability)
 
 Usage:  foresight [person]
+Cost:  30 mana
 
-When granted the gift of foresight, a person gains +10% chance to dodge as
-she begins to see the arc of an opponent's weapon before it strikes.
+When granted the gift of foresight, a person gains +5, +10, or +15 Dodge
+(based on skill, modified by Intelligence) as she begins to see the arc of an
+opponent's weapon before it strikes.
 
 Gain skill by casting foresight or by fighting while it is active on you.
 
