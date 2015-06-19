@@ -115,19 +115,6 @@ A savvy rogue learns to blend into his surroundings. With this ability, you can
 look like any human NPC. If you behave like one as well, you might find you
 disappear into the crowd.
 #
-SHADOWCAGE "SHADOW CAGE"
-
-Shadowcage
-Class ability:  Occultist
-Debuff type:  Stealth
-Cost:  50 move
-Cooldown:  30 seconds
-Usage:  shadowcage
-
-You create a cage of shadows, penalizing all enemies. The first victim loses
-dodge equal to 5x your Charisma. Each additional victim loses dodge equal to 3x
-Charisma instead.
-#
 DIVERSION
 
 Diversion
@@ -174,8 +161,8 @@ Cooldown:  30 seconds
 Usage:  howl
 
 You let out a terrifying howl, penalizing all enemies. The first victim loses
-to-hit equal to 5x your Charisma. Each additional victim loses to-hit equal to
-3x Charisma instead.
+to-hit equal to 4x your Charisma. Each additional victim loses to-hit equal to
+2x Charisma instead.
 #
 SHADOWCAGE "SHADOW CAGE"
 
@@ -186,7 +173,7 @@ Cost: 50 move
 Cooldown: 30 seconds
 
 You create a cage of shadows, penalizing all enemies. The first victim loses
-dodge equal to 5x your Charisma. Each additional victim loses dodge equal to 3x
+dodge equal to 4x your Charisma. Each additional victim loses dodge equal to 2x
 Charisma instead. This effect lasts 15 seconds.
 #
 INFILTRATE "IMPROVED INFILTRATE"

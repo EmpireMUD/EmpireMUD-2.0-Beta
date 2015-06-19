@@ -937,7 +937,7 @@ ACMD(do_howl) {
 			}
 			
 			if (victim != ch && IS_NPC(victim) && CAN_SEE(ch, victim) && !is_fight_ally(ch, victim) && !in_same_group(ch, victim) && can_fight(ch, victim)) {
-				value = GET_CHARISMA(ch) * (first ? 5 : 3);
+				value = GET_CHARISMA(ch) * (first ? 4 : 2);
 				first = FALSE;
 				
 				af = create_mod_aff(ATYPE_HOWL, 3, APPLY_TO_HIT, -value);
@@ -1448,7 +1448,7 @@ ACMD(do_shadowcage) {
 			}
 			
 			if (victim != ch && IS_NPC(victim) && CAN_SEE(ch, victim) && !is_fight_ally(ch, victim) && !in_same_group(ch, victim) && can_fight(ch, victim)) {
-				value = GET_CHARISMA(ch) * (first ? 5 : 3);
+				value = GET_CHARISMA(ch) * (first ? 4 : 2);
 				first = FALSE;
 				
 				af = create_mod_aff(ATYPE_SHADOWCAGE, 3, APPLY_DODGE, -value);
