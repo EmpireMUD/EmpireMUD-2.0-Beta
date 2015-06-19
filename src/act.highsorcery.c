@@ -658,7 +658,7 @@ ACMD(do_colorburst) {
 	struct affected_type *af;
 	int amt, cost = 15;
 	
-	int levels[] = { -10, -15, -20 };
+	int levels[] = { -5, -10, -15 };
 	
 	if (!can_use_ability(ch, ABIL_COLORBURST, MANA, cost, COOLDOWN_COLORBURST)) {
 		return;

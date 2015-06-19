@@ -45,8 +45,9 @@ Usage:  colorburst [victim]
 Cooldown:  30 seconds
 Debuff type:  High Sorcery
 
-Shoot a disorienting burst of color at your foe. This effect gives -10% to-hit
-for 30 seconds.
+Shoot a disorienting burst of color at your foe and makes it harder for them
+to hit you. Colorburst causes a to-hit penalty of -5, -10, or -20 depending
+on your skill level, with a bonus based on your Intelligence.
 
 In combat, colorburst will automatically target your current opponent if you
 do not provide a target.
