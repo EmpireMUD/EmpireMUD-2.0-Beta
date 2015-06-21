@@ -161,11 +161,13 @@ ACMD(do_catapult) {
 
 
 ACMD(do_consider) {
+	extern int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
+	extern int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill);
 	extern const char *affected_bits_consider[];
 	
-	char buf[MAX_STRING_LENGTH], difficult[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH];
 	bitvector_t bits;
-	int diff, pos;
+	int diff, pos, hitch;
 	double scale = 0.0;
 	char_data *vict;
 	
@@ -196,13 +198,6 @@ ACMD(do_consider) {
 			else {
 				scale = GET_CURRENT_SCALE_LEVEL(vict);
 			}
-			
-			if (MOB_FLAGGED(vict, MOB_HARD)) {
-				scale *= 1.1;
-			}
-			if (MOB_FLAGGED(vict, MOB_GROUP)) {
-				scale *= 1.2;
-			}
 		}
 		else {
 			// player
@@ -211,50 +206,41 @@ ACMD(do_consider) {
 		
 		// compute
 		diff -= (int) scale;
-		
-		// flag-based
-		if (MOB_FLAGGED(vict, MOB_HARD) && MOB_FLAGGED(vict, MOB_GROUP)) {
-			snprintf(difficult, sizeof(difficult), " (boss)");
-		}
-		else if (MOB_FLAGGED(vict, MOB_GROUP)) {
-			snprintf(difficult, sizeof(difficult), " (group)");
-		}
-		else if (MOB_FLAGGED(vict, MOB_HARD)) {
-			snprintf(difficult, sizeof(difficult), " (hard)");
-		}
-		else {
-			*difficult = '\0';
-		}
-		
+				
+		act("You consider your chances against $N.", FALSE, ch, NULL, vict, TO_CHAR);
 		act("$n considers $s chances against $N.", FALSE, ch, NULL, vict, TO_NOTVICT);
 		act("$n considers $s chances against you.", FALSE, ch, NULL, vict, TO_VICT);
 		
-		if (diff < -30) {
-			snprintf(buf, sizeof(buf), "$E looks like $E'd destroy you!%s", difficult);
-			act(buf, FALSE, ch, NULL, vict, TO_CHAR);
-		}
-		else if (diff < -10) {
-			snprintf(buf, sizeof(buf), "It looks like $E would be difficult for you.%s", difficult);
-			act(buf, FALSE, ch, NULL, vict, TO_CHAR);
-		}
-		else if (diff < 10) {
-			snprintf(buf, sizeof(buf), "It looks like a fair fight.%s", difficult);
-			act(buf, FALSE, ch, NULL, vict, TO_CHAR);
-		}
-		else if (diff < 30) {
-			snprintf(buf, sizeof(buf), "It looks like you wouldn't have much trouble.%s", difficult);
-			act(buf, FALSE, ch, NULL, vict, TO_CHAR);
-		}
-		else {
-			snprintf(buf, sizeof(buf), "You would walk all over $M.%s", difficult);
+		if (diff != 0) {
+			snprintf(buf, sizeof(buf), "$E is %d levels %s you.", ABSOLUTE(diff), diff > 0 ? "below" : "above");
 			act(buf, FALSE, ch, NULL, vict, TO_CHAR);
 		}
 		
+		// difficulty
+		if (MOB_FLAGGED(vict, MOB_HARD) && MOB_FLAGGED(vict, MOB_GROUP)) {
+			act("$E is a boss fight (requires 4 players of proper level).", FALSE, ch, NULL, vict, TO_CHAR);
+		}
+		else if (MOB_FLAGGED(vict, MOB_GROUP)) {
+			act("$E is a group fight (requires 3 players of proper level).", FALSE, ch, NULL, vict, TO_CHAR);
+		}
+		else if (MOB_FLAGGED(vict, MOB_HARD)) {
+			act("$E is a hard fight (may require 2 players of proper level).", FALSE, ch, NULL, vict, TO_CHAR);
+		}
+
+		// hit/dodge
+		hitch = get_to_hit(ch, vict, FALSE, FALSE) - get_dodge_modifier(vict, ch, FALSE);
+		if (hitch < 50) {
+			act("You would have trouble hitting $M.", FALSE, ch, NULL, vict, TO_CHAR);
+		}
+		hitch = get_to_hit(vict, ch, FALSE, FALSE) - get_dodge_modifier(ch, vict, FALSE);
+		if (hitch > 50) {
+			act("You would have trouble doding $S attacks.", FALSE, ch, NULL, vict, TO_CHAR);
+		}
+
 		// flags (with overflow protection on affected_bits_consider[])
 		for (bits = AFF_FLAGS(vict), pos = 0; bits && *affected_bits_consider[pos] != '\n'; bits >>= 1, ++pos) {
 			if (IS_SET(bits, BIT(0)) && *affected_bits_consider[pos]) {
-				snprintf(buf, sizeof(buf), "... %s", affected_bits_consider[pos]);
-				act(buf, FALSE, ch, NULL, vict, TO_CHAR);
+				act(affected_bits_consider[pos], FALSE, ch, NULL, vict, TO_CHAR);
 			}
 		}
 	}
