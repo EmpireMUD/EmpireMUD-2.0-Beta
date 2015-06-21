@@ -1906,7 +1906,7 @@ void get_evolution_display(struct evolution_data *list, char *save_buffer) {
 
 
 /**
-* Displays the interactions data from a given list.
+* Displays the extra descs from a given list.
 *
 * @param struct extra_descr_data *list Pointer to the start of a list of decriptions.
 * @param char *save_buffer A buffer to store the result to.
@@ -2786,6 +2786,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 	any_vnum vnum;
 	double prc;
 	bool found, up;
+	char exc;
 	
 	half_chop(argument, arg1, arg2);
 	
@@ -3007,7 +3008,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 			temp->vnum = vnum;
 			temp->percent = prc;
 			temp->quantity = num;
-			temp->exclusion_code = isalpha(*arg6) ? *arg6 : 0;
+			temp->exclusion_code = exc = isalpha(*arg6) ? *arg6 : 0;
 			temp->next = NULL;
 			
 			if ((interact = *list) != NULL) {
@@ -3022,8 +3023,8 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 
 			sort_interactions(list);
 			msg_to_char(ch, "You add %s: %dx %s %.2f%%", interact_types[loc], num, (interact_vnum_types[loc] == TYPE_MOB ? skip_filler(get_mob_name_by_proto(vnum)) : skip_filler(get_obj_name_by_proto(vnum))), prc);
-			if (temp->exclusion_code) {
-				msg_to_char(ch, " (%c)", temp->exclusion_code);
+			if (exc) {
+				msg_to_char(ch, " (%c)", exc);
 			}
 			msg_to_char(ch, "\r\n");
 		}
