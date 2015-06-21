@@ -672,14 +672,21 @@ INSPIRE
 Inspire (Empire ability)
 
 Usage:  inspire <target | all> <type>
+Cost:  30 per person or 60 for 'all'
 
 A powerful leader can inspire his friends and allies with a rousing speech.
+It will only be half as effective when used on himself. The 'all' option
+targets all players in the room except himself.
 
 Here are the ways you can inspire:
-  Battle: dexterity and strength
-  Mana: mana and mana regeneration
-  Stamina: move and move regeneration
-  Toughness: health and health regeneration
+  Accuracy: to-hit
+  Evasion: dodge
+  Mana: max mana and mana regeneration
+  Might: strength and bonus physical damage
+  Prowess: dexterity and wits
+  Sorcery: intelligence and bonus magical damage
+  Stamina: max moves and move regeneration
+  toughness: max health
 #
 LOCKSMITHING
 

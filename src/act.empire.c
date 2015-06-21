@@ -1300,32 +1300,40 @@ void do_import_analysis(char_data *ch, empire_data *emp, char *argument, int sub
 struct {
 	char *name;
 	int first_apply;
-	int first_mod;
 	int second_apply;
-	int second_mod;
 } inspire_data[] = {
-	{ "battle",  APPLY_DEXTERITY, 1,  APPLY_STRENGTH, 1 },
-	{ "mana",  APPLY_MANA, 50,  APPLY_MANA_REGEN, 1 },
-	{ "stamina",  APPLY_MOVE, 100,  APPLY_MOVE_REGEN, 1 },
-	{ "toughness",  APPLY_HEALTH, 50,  APPLY_HEALTH_REGEN, 1 },
+								// use APPLY_NONE to give no second bonus
+	{ "accuracy", APPLY_TO_HIT, APPLY_NONE },
+	{ "evasion", APPLY_DODGE, APPLY_NONE },
+	{ "mana", APPLY_MANA, APPLY_MANA_REGEN },
+	{ "might", APPLY_STRENGTH, APPLY_BONUS_PHYSICAL },
+	{ "prowess", APPLY_DEXTERITY, APPLY_WITS },
+	{ "sorcery", APPLY_INTELLIGENCE, APPLY_BONUS_MAGICAL },
+	{ "stamina", APPLY_MOVE, APPLY_MOVE_REGEN },
+	{ "toughness", APPLY_HEALTH, APPLY_NONE, },
 
-	{ "\n",  APPLY_NONE, 0,  APPLY_NONE, 0 }
+	{ "\n", APPLY_NONE, APPLY_NONE }
 };
 
+
 /**
-* @param char* input The name typed by the player
+* @param char *input The name typed by the player
 * @return int an inspire_data index, or NOTHING for not found
 */
 int find_inspire(char *input) {
-	int iter;
+	int iter, abbrev = NOTHING;
 	
 	for (iter = 0; *inspire_data[iter].name != '\n'; ++iter) {
-		if (is_abbrev(input, inspire_data[iter].name)) {
+		if (!str_cmp(input, inspire_data[iter].name)) {
+			// found exact match
 			return iter;
+		}
+		else if (abbrev == NOTHING && is_abbrev(input, inspire_data[iter].name)) {
+			abbrev= iter;
 		}
 	}
 
-	return NOTHING;
+	return abbrev;	// if any
 }
 
 
@@ -1337,23 +1345,51 @@ int find_inspire(char *input) {
 * @param int type The inspire_data index
 */
 void perform_inspire(char_data *ch, char_data *vict, int type) {
-	struct affected_type *af;
+	extern const double apply_values[];
 	
-	msg_to_char(vict, "You feel inspired!\r\n");
-	act("$n seems inspired!", FALSE, vict, NULL, NULL, TO_ROOM);
+	double points, any = FALSE;
+	struct affected_type *af;
+	int time, value;
+	bool two;
 	
 	affect_from_char(vict, ATYPE_INSPIRE);
 	
-	if (inspire_data[type].first_apply != APPLY_NONE) {
-		af = create_mod_aff(ATYPE_INSPIRE, 24 MUD_HOURS, inspire_data[type].first_apply, inspire_data[type].first_mod);
-		affect_join(vict, af, 0);
+	if (ch == vict || (GET_LOYALTY(ch) && GET_LOYALTY(ch) == GET_LOYALTY(vict))) {
+		time = 24 MUD_HOURS;
 	}
-	if (inspire_data[type].second_apply != APPLY_NONE) {
-		af = create_mod_aff(ATYPE_INSPIRE, 24 MUD_HOURS, inspire_data[type].second_apply, inspire_data[type].second_mod);
-		affect_join(vict, af, 0);
+	else {
+		time = 4 MUD_HOURS;
 	}
 	
-	gain_ability_exp(ch, ABIL_INSPIRE, 33.4);
+	// amount to give
+	points = GET_GREATNESS(ch) / 4.0;
+	if (ch == vict) {
+		points /= 2.0;
+	}
+	two = (inspire_data[type].second_apply != APPLY_NONE);
+	
+	if (inspire_data[type].first_apply != APPLY_NONE) {
+		value = round((points * (two ? 0.5 : 1.0)) / apply_values[inspire_data[type].first_apply]);
+		if (value > 0) {
+			af = create_mod_aff(ATYPE_INSPIRE, time, inspire_data[type].first_apply, value);
+			affect_join(vict, af, 0);
+			any = TRUE;
+		}
+	}
+	if (inspire_data[type].second_apply != APPLY_NONE) {
+		value = round((points * 0.5) / apply_values[inspire_data[type].second_apply]);
+		if (value > 0) {
+			af = create_mod_aff(ATYPE_INSPIRE, time, inspire_data[type].second_apply, value);
+			affect_join(vict, af, 0);
+			any = TRUE;
+		}
+	}
+	
+	if (any) {
+		msg_to_char(vict, "You feel inspired!\r\n");
+		act("$n seems inspired!", FALSE, vict, NULL, NULL, TO_ROOM);
+		gain_ability_exp(ch, ABIL_INSPIRE, 33.4);
+	}
 }
 
 
@@ -3304,7 +3340,7 @@ ACMD(do_inspire) {
 	char_data *vict = NULL;
 	int type, cost = 30;
 	empire_data *emp = GET_LOYALTY(ch);
-	bool all = FALSE;
+	bool any, all = FALSE;
 	
 	two_arguments(argument, arg, arg1);
 	
@@ -3317,7 +3353,13 @@ ACMD(do_inspire) {
 		// nope
 	}
 	else if (!*arg || !*arg1) {
-		msg_to_char(ch, "Usage: inspire <name | all> [battle | mana | stamina | toughness]\r\n");
+		msg_to_char(ch, "Usage: inspire <name | all> <type>\r\n");
+		msg_to_char(ch, "Types:");
+		for (type = 0, any = FALSE; *inspire_data[type].name != '\n'; ++type) {
+			msg_to_char(ch, "%s%s", (any ? ", " : " "), inspire_data[type].name);
+			any = TRUE;
+		}
+		msg_to_char(ch, "\r\n");
 	}
 	else if (!all && !(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
@@ -3330,9 +3372,6 @@ ACMD(do_inspire) {
 	}
 	else if (vict && IS_NPC(vict)) {
 		msg_to_char(ch, "You can only inspire other players.\r\n");
-	}
-	else if (vict && vict == ch) {
-		msg_to_char(ch, "You can't inspire yourself!\r\n");
 	}
 	else if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_INSPIRE)) {
 		return;
