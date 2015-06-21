@@ -205,9 +205,12 @@ See also: RESCUE
 
 Quick Block (Battle ability)
 
-As you learn to block more quickly, your shield becomes more effective. This
-bonus is 10% block chance as a specialty skill (51-75), and 20% block chance
-as a class skill (76-100).
+As you learn to block more quickly, your shield becomes more effective. Quick
+Block gives you +10 to Block. As a class-level ability, it instead gives +10%
+of your level, with a minimum of +10. This is included in the Block rating
+shown on your score.
+
+See also: BLOCK
 #
 "QUICK DRAW"
 
@@ -278,7 +281,7 @@ from it.
 
 You must be holding a shield to block attacks.
 
-See also:  HOLD
+See also:  BLOCK, HOLD
 #
 SPARRING
 

@@ -141,16 +141,20 @@ You cannot unbind items.
 
 See also: HOME
 #
-BLOCK
+BLOCK "BLOCK CAP"
 
 Your block rating, shown on 'score', is your character's bonus chance to block
 attacks. You must have the Shield Block ability, and be holding a shield in
 your off hand. Block bonuses come from equipment or spell effect, but have no
 benefit if you are not using a shield.
 
-There is a maximum 90% chance to block. However, it requires much more than +90
-block to reach this level. You can normally only block physical attacks, but
-certain abilities allow you to block other types as well.
+There is a maximum 50% chance to block. The amount of Block required to hit
+this cap is based on the level of your opponent.
+
+Block cap:
+- Start with the mob's level divided by 2 (half)
+- For hard mobs, raise the total by 10%
+- For group mobs, raise the total by 30%
 
 See also: AFFECTS, SCORE, SHIELD BLOCK, WARD AGAINST MAGIC
 #
