@@ -991,6 +991,10 @@ ACMD(do_history) {
 					// probably color code
 					--pos;
 				}
+				else {
+					// found something not a crlf or a color code
+					break;
+				}
 			}
 			
 			// send message
