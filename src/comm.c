@@ -2725,8 +2725,9 @@ RETSIGTYPE checkpointing(int sig) {
 
 RETSIGTYPE hupsig(int sig) {
 	log("SYSERR: Received SIGHUP, SIGINT, or SIGTERM. Shutting down...");
-	exit(1);			/* perhaps something more elegant should
-						 * substituted */
+	reboot_control.type = SCMD_SHUTDOWN;
+	perform_reboot();
+	// exit(1);
 }
 
 /*
