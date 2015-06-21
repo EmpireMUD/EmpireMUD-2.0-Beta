@@ -48,8 +48,8 @@ extern int determine_best_scale_level(char_data *ch, bool check_group);
 // locals
 int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damtype);
 void drop_loot(char_data *mob, char_data *killer);
+int get_block_rating(char_data *ch, bool can_gain_skill);
 int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
-int get_effective_block(char_data *ch);
 int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill);
 double get_weapon_speed(obj_data *weapon);
 void heal(char_data *ch, char_data *vict, int amount);
@@ -64,6 +64,50 @@ void trigger_distrust_from_hostile(char_data *ch, empire_data *emp);
 
 // used by several functions to determine auto-kill
 #define WOULD_EXECUTE(ch, vict)  (IS_NPC(ch) ? (!MOB_FLAGGED((ch), MOB_ANIMAL) || MOB_FLAGGED((ch), MOB_AGGRESSIVE | MOB_HARD | MOB_GROUP)) : (PRF_FLAGGED((ch), PRF_AUTOKILL) || MOB_FLAGGED((vict), MOB_HARD | MOB_GROUP)))
+
+
+/**
+* Determine if ch blocks the attacker.
+*
+* @param char_data *ch The blocker.
+* @param char_data *attacker The attacker.
+* @param bool can_gain_skill Pass TRUE to do skillups or FALSE to just get info.
+* @return bool TRUE if the block succeeds, or FALSE if not.
+*/
+bool check_block(char_data *ch, char_data *attacker, bool can_gain_skill) {
+	obj_data *shield = GET_EQ(ch, WEAR_HOLD);
+	double chance, rating, target;
+	int level;
+	
+	int max_block = 50;	// never pass this value
+	
+	// must have a shield and Shield Block
+	if (!shield || !IS_SHIELD(shield) || (!IS_NPC(ch) && !HAS_ABILITY(ch, ABIL_SHIELD_BLOCK))) {
+		return FALSE;
+	}
+	
+	rating = get_block_rating(ch, can_gain_skill);
+	
+	// penalty for blind/dark
+	if (attacker && !CAN_SEE(ch, attacker)) {
+		rating -= 50;
+	}
+	
+	// block cap and target check
+	level = attacker ? get_approximate_level(attacker) : get_approximate_level(ch);
+	target = level * 0.5;
+	if (attacker && MOB_FLAGGED(attacker, MOB_HARD)) {
+		target *= 1.1;
+	}
+	if (attacker && MOB_FLAGGED(attacker, MOB_GROUP)) {
+		target *= 1.3;
+	}
+	
+	// Block cap is when rating == target
+	chance = MIN(max_block, max_block + rating - target);
+	
+	return (number(1, 100) <= chance);
+}
 
 
 /**
@@ -199,45 +243,30 @@ double get_base_dps(obj_data *weapon) {
 
 /**
 * Determine ch's chance to block (0-100).
-* Not to be confused with get_effective_block().
 *
 * @param char_data *ch The blocker.
-* @param char_data *attacker The attacker.
-* @return int The block chance 0-100%.
+* @param bool can_gain_skill Pass TRUE to do skillups or FALSE to just get info.
+* @return int The total block rating.
 */
-int get_block_chance(char_data *ch, char_data *attacker) {
-	obj_data *shield = GET_EQ(ch, WEAR_HOLD);
-	double base = 0.0;
-	double quick_block[] = { 0.0, 10.0, 20.0 };
+int get_block_rating(char_data *ch, bool can_gain_skill) {
+	double rating = 0.0;
 	
-	int max_block = 90;	// never pass this value
+	double quick_block_base = 10.0;
+	double quick_block_scale = 0.1;	// % of level
 	
-	// must have a shield
-	if (!shield || !IS_SHIELD(shield)) {
-		return 0;
-	}
-	
-	// skill required for players to block at all
-	if (!IS_NPC(ch) && !HAS_ABILITY(ch, ABIL_SHIELD_BLOCK)) {
-		return 0;
-	}
+	rating = GET_BLOCK(ch);
 	
 	// quick block procs to add 10%
-	if (skill_check(ch, ABIL_QUICK_BLOCK, DIFF_MEDIUM)) {
-		base += CHOOSE_BY_ABILITY_LEVEL(quick_block, ch, ABIL_QUICK_BLOCK);
+	if (HAS_ABILITY(ch, ABIL_QUICK_BLOCK)) {
+		rating += MAX(quick_block_base, get_approximate_level(ch) * quick_block_scale);
 	}
 	
-	gain_ability_exp(ch, ABIL_SHIELD_BLOCK, 1);
-	gain_ability_exp(ch, ABIL_QUICK_BLOCK, 1);
+	if (can_gain_skill) {
+		gain_ability_exp(ch, ABIL_SHIELD_BLOCK, 1);
+		gain_ability_exp(ch, ABIL_QUICK_BLOCK, 1);
+	}
 		
-	// block modifiers
-	base += get_effective_block(ch);
-	
-	if (attacker && !CAN_SEE(ch, attacker)) {
-		base -= 50;
-	}
-	
-	return MIN(max_block, (int) base);
+	return rating;
 }
 
 
@@ -348,18 +377,6 @@ int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill) 
 	}
 	
 	return (int) base;
-}
-
-
-/**
-* Applies diminishing returns to GET_BLOCK.
-* Not to be confused with get_block_chance().
-*
-* @param char_data *ch The person whose block rating to get.
-* @return int The effective block rating.
-*/
-int get_effective_block(char_data *ch) {
-	return (int) diminishing_returns(GET_BLOCK(ch), 20);
 }
 
 
@@ -2493,10 +2510,11 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 	// blockable?
 	if (success && AWAKE(victim)) {
 		if (attack_hit_info[w_type].damage_type == DAM_PHYSICAL) {
-			block = (get_block_chance(victim, ch) > number(1, 100));
+			block = check_block(victim, ch, TRUE);
 		}
 		else if (HAS_ABILITY(victim, ABIL_WARD_AGAINST_MAGIC) && attack_hit_info[w_type].damage_type == DAM_MAGICAL) {
-			block = ((get_block_chance(victim, ch) * 0.50) > number(1, 100));
+			// half-chance
+			block = check_block(victim, ch, TRUE) && !number(0, 1);
 		}
 	}
 
@@ -2978,7 +2996,7 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 	success = check_hit_vs_dodge(ch, FIGHTING(ch), FALSE);
 	
 	if (success && AWAKE(FIGHTING(ch)) && HAS_ABILITY(FIGHTING(ch), ABIL_BLOCK_ARROWS)) {
-		block = (get_block_chance(FIGHTING(ch), ch) > number(1, 100));
+		block = check_block(FIGHTING(ch), ch, TRUE);
 		gain_ability_exp(FIGHTING(ch), ABIL_BLOCK_ARROWS, 2);
 	}
 	

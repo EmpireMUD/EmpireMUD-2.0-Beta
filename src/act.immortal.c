@@ -2342,8 +2342,8 @@ void do_stat_building(char_data *ch, bld_data *bdg) {
 void do_stat_character(char_data *ch, char_data *k) {
 	void find_uid_name(char *uid, char *name);
 	extern double get_combat_speed(char_data *ch, int pos);
+	extern int get_block_rating(char_data *ch, bool can_gain_skill);
 	extern int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
-	extern int get_effective_block(char_data *ch);
 	extern int get_effective_soak(char_data *ch);
 	extern int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill);
 	extern int move_gain(char_data *ch);
@@ -2426,7 +2426,10 @@ void do_stat_character(char_data *ch, char_data *k) {
 		// dex is removed from dodge to make it easier to compare to caps
 		val = get_dodge_modifier(k, NULL, FALSE) - (hit_per_dex * GET_DEXTERITY(ch));;
 		sprintf(lbuf, "Dodge  [%s%d&0]", HAPPY_COLOR(val, 0), val);
-		sprintf(lbuf2, "Block  [%s%+d/%+d&0]", HAPPY_COLOR(get_effective_block(k), 0), GET_BLOCK(k), get_effective_block(k));
+		
+		val = get_block_rating(k, FALSE);
+		sprintf(lbuf2, "Block  [%s%d&0]", HAPPY_COLOR(val, 0), val);
+		
 		sprintf(lbuf3, "Soak  [%s%+d/%+d&0]", HAPPY_COLOR(get_effective_soak(k), 0), GET_SOAK(k), get_effective_soak(k));
 		msg_to_char(ch, "  %-28.28s %-28.28s %-28.28s\r\n", lbuf, lbuf2, lbuf3);
 	
