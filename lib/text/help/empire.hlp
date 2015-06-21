@@ -678,6 +678,9 @@ A powerful leader can inspire his friends and allies with a rousing speech.
 It will only be half as effective when used on himself. The 'all' option
 targets all players in the room except himself.
 
+This ability scales with the user's Greatness. If Greatness is too low, people
+may not feel inspired at all.
+
 Here are the ways you can inspire:
   Accuracy: to-hit
   Evasion: dodge
