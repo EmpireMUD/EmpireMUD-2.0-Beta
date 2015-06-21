@@ -984,10 +984,10 @@ ACMD(do_history) {
 			pos = strlen(chd_iter->message) - 1;
 			found_crlf = FALSE;
 			while (pos > 0 && !found_crlf) {
-				if (chd_iter->message[pos] == '\r' || chd_iter->message[pos] == '\n' || chd_iter->message[pos] == '&') {	
+				if (chd_iter->message[pos] == '\r' || chd_iter->message[pos] == '\n') {	
 					found_crlf = TRUE;
 				}
-				else if (chd_iter->message[pos-1] == '&') {
+				else if (chd_iter->message[pos] == '&' || chd_iter->message[pos-1] == '&') {
 					// probably color code
 					--pos;
 				}
