@@ -234,7 +234,7 @@ ACMD(do_consider) {
 		}
 		hitch = get_to_hit(vict, ch, FALSE, FALSE) - get_dodge_modifier(ch, vict, FALSE);
 		if (hitch > 50) {
-			act("You would have trouble doding $S attacks.", FALSE, ch, NULL, vict, TO_CHAR);
+			act("You would have trouble dodging $S attacks.", FALSE, ch, NULL, vict, TO_CHAR);
 		}
 
 		// flags (with overflow protection on affected_bits_consider[])
