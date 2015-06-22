@@ -110,7 +110,9 @@ Eartharmor (Natural Magic ability)
 Usage:  eartharmor <target>
 
 This spell allows a nature mage to coat his or her allies in a powerful
-coating of earth, protecting them from some damage.
+coating of earth, protecting them from some damage. It adds an amount of Soak
+equal to the caster's Natural Magic level divided by 14, with a bonus based
+on Intelligence.
 #
 EARTHMELD "EARTH MELD"
 
