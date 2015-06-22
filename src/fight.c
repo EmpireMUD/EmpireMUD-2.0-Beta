@@ -258,7 +258,12 @@ int get_block_rating(char_data *ch, bool can_gain_skill) {
 	
 	// quick block procs to add 10%
 	if (HAS_ABILITY(ch, ABIL_QUICK_BLOCK)) {
-		rating += MAX(quick_block_base, get_approximate_level(ch) * quick_block_scale);
+		if (IS_CLASS_ABILITY(ch, ABIL_QUICK_BLOCK)) {
+			rating += MAX(quick_block_base, get_approximate_level(ch) * quick_block_scale);
+		}
+		else {
+			rating += quick_block_base;
+		}
 	}
 	
 	if (can_gain_skill) {
