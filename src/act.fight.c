@@ -161,6 +161,7 @@ ACMD(do_catapult) {
 
 
 ACMD(do_consider) {
+	extern bool check_scaling(char_data *mob, char_data *attacker);
 	extern int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
 	extern int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill);
 	extern const char *affected_bits_consider[];
@@ -168,7 +169,6 @@ ACMD(do_consider) {
 	char buf[MAX_STRING_LENGTH];
 	bitvector_t bits;
 	int diff, pos, hitch;
-	double scale = 0.0;
 	char_data *vict;
 	
 	one_argument(argument, arg);
@@ -183,29 +183,9 @@ ACMD(do_consider) {
 		msg_to_char(ch, "You look pretty wimpy.\r\n");
 	}
 	else {
-		diff = determine_best_scale_level(ch, FALSE);
-		
-		if (IS_NPC(vict)) {
-			if (GET_CURRENT_SCALE_LEVEL(vict) == 0) {
-				scale = diff;
-				if (GET_MAX_SCALE_LEVEL(vict) > 0) {
-					scale = MIN(GET_MAX_SCALE_LEVEL(vict), scale);
-				}
-				if (GET_MIN_SCALE_LEVEL(vict) > 0) {
-					scale = MAX(GET_MIN_SCALE_LEVEL(vict), scale);
-				}
-			}
-			else {
-				scale = GET_CURRENT_SCALE_LEVEL(vict);
-			}
-		}
-		else {
-			// player
-			scale = determine_best_scale_level(vict, FALSE);
-		}
-		
-		// compute
-		diff -= (int) scale;
+		// scale first
+		check_scaling(vict, ch);
+		diff = determine_best_scale_level(ch, FALSE) - determine_best_scale_level(vict, FALSE);
 				
 		act("You consider your chances against $N.", FALSE, ch, NULL, vict, TO_CHAR);
 		act("$n considers $s chances against $N.", FALSE, ch, NULL, vict, TO_NOTVICT);
