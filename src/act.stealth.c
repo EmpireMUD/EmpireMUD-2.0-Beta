@@ -1726,7 +1726,7 @@ ACMD(do_terrify) {
 	}
 	else if (!can_fight(ch, victim))
 		act("You can't terrify $N!", FALSE, ch, 0, victim, TO_CHAR);
-	else if (!AWAKE(victim) || IS_DEAD(victim) || AFF_FLAGGED(victim, AFF_BLIND)) {
+	else if (!AWAKE(victim) || IS_DEAD(victim)) {
 		msg_to_char(ch, "You can't use your shadows to terrify someone who can't even see them!\r\n");
 	}
 	else if (AFF_FLAGGED(victim, AFF_IMMUNE_STEALTH)) {
