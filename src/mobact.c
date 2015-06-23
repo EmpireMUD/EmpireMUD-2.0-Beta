@@ -668,7 +668,7 @@ void mobile_activity(void) {
 					// matching empire to rescue?
 					if (CAN_AGGRO(ch, vict) && GET_LOYALTY(vict) == GET_LOYALTY(ch)) {
 						// make sure it's not a PVP-flagged fight
-						if (IS_NPC(targ) || IS_NPC(vict) || !PRF_FLAGGED(vict, PRF_ALLOW_PVP)) {
+						if (IS_NPC(targ) || IS_NPC(vict) || !IS_PVP_FLAGGED(vict)) {
 							// make sure targ (vict's fighting) isn't a pc in my empire
 							if (IS_NPC(targ) || GET_LOYALTY(targ) != GET_LOYALTY(ch)) {
 								if (can_fight(ch, targ)) {
