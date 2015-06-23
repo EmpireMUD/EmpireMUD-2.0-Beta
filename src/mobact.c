@@ -667,12 +667,15 @@ void mobile_activity(void) {
 				if (vict != ch && (targ = FIGHTING(vict)) && targ != ch && ch->master != targ && (IS_NPC(targ) || GET_ACCESS_LEVEL(targ) < LVL_GOD) && CAN_SEE(ch, targ)) {
 					// matching empire to rescue?
 					if (CAN_AGGRO(ch, vict) && GET_LOYALTY(vict) == GET_LOYALTY(ch)) {
-						// make sure targ (vict's fighting) isn't a pc in my empire
-						if (IS_NPC(targ) || GET_LOYALTY(targ) != GET_LOYALTY(ch)) {
-							if (can_fight(ch, targ)) {
-								// assist vict
-								engage_combat(ch, targ, FALSE);
-								found = TRUE;
+						// make sure it's not a PVP-flagged fight
+						if (IS_NPC(targ) || IS_NPC(vict) || !PRF_FLAGGED(vict, PRF_ALLOW_PVP)) {
+							// make sure targ (vict's fighting) isn't a pc in my empire
+							if (IS_NPC(targ) || GET_LOYALTY(targ) != GET_LOYALTY(ch)) {
+								if (can_fight(ch, targ)) {
+									// assist vict
+									engage_combat(ch, targ, FALSE);
+									found = TRUE;
+								}
 							}
 						}
 					}
