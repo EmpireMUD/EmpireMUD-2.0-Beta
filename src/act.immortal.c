@@ -2424,7 +2424,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 		display_attributes(k, ch);
 
 		// dex is removed from dodge to make it easier to compare to caps
-		val = get_dodge_modifier(k, NULL, FALSE) - (hit_per_dex * GET_DEXTERITY(ch));;
+		val = get_dodge_modifier(k, NULL, FALSE) - (hit_per_dex * GET_DEXTERITY(k));;
 		sprintf(lbuf, "Dodge  [%s%d&0]", HAPPY_COLOR(val, 0), val);
 		
 		val = get_block_rating(k, FALSE);
