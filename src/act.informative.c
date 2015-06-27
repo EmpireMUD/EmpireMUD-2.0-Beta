@@ -471,7 +471,7 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	val = get_block_rating(ch, FALSE);
 	sprintf(lbuf2, "Block  [%s%d&0]", HAPPY_COLOR(val, 0), val);
 	
-	sprintf(lbuf3, "Soak  [%s%+d&0]", HAPPY_COLOR(GET_SOAK(ch), 0), GET_SOAK(ch));
+	sprintf(lbuf3, "Resist  [%d|%d]", GET_RESIST_PHYSICAL(ch), GET_RESIST_MAGICAL(ch));
 	msg_to_char(to, "  %-28.28s %-28.28s %-28.28s\r\n", lbuf, lbuf2, lbuf3);
 	
 	// row 2

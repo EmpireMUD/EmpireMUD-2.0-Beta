@@ -120,7 +120,7 @@ const struct potion_data_type potion_data[] = {
 	{ "intelligence", ATYPE_NATURE_POTION, APPLY_INTELLIGENCE, NOBITS, POTION_SPEC_NONE }, // 10
 	{ "wits", ATYPE_NATURE_POTION, APPLY_WITS, NOBITS, POTION_SPEC_NONE }, // 11
 		{ "*", 0, APPLY_NONE, NOBITS, POTION_SPEC_NONE },	// 12. UNUSED
-	{ "soak", ATYPE_NATURE_POTION, APPLY_SOAK, NOBITS, POTION_SPEC_NONE },	// 13
+	{ "resist-physical", ATYPE_NATURE_POTION, APPLY_RESIST_PHYSICAL, NOBITS, POTION_SPEC_NONE },	// 13
 	{ "haste", ATYPE_NATURE_POTION, APPLY_NONE, AFF_HASTE, POTION_SPEC_NONE }, // 14
 	{ "block", ATYPE_NATURE_POTION, APPLY_BLOCK, NOBITS, POTION_SPEC_NONE }, // 15
 
@@ -351,10 +351,10 @@ ACMD(do_eartharmor) {
 	
 	charge_ability_cost(ch, MANA, cost, NOTHING, 0);
 	
-	// 100/14 = 7 soak at max level
+	// 100/14 = 7 resistance at max level
 	amount = get_ability_level(ch, ABIL_EARTHARMOR) / 14.0;
 	amount += GET_INTELLIGENCE(ch) / 3.0;
-	af = create_mod_aff(ATYPE_EARTHARMOR, 30, APPLY_SOAK, (int)amount);
+	af = create_mod_aff(ATYPE_EARTHARMOR, 30, APPLY_RESIST_PHYSICAL, (int)amount);
 	
 	if (ch == vict) {
 		msg_to_char(ch, "You form a thick layer of mana over your body, and it hardens to solid earth!\r\n");

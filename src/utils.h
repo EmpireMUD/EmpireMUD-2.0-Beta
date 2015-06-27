@@ -217,7 +217,8 @@
 #define GET_BLOOD(ch)  GET_CURRENT_POOL(ch, BLOOD)
 extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other max pools, and max_pools[BLOOD] is not used.
 #define GET_BONUS_INVENTORY(ch)  GET_EXTRA_ATT(ch, ATT_BONUS_INVENTORY)
-#define GET_SOAK(ch)  GET_EXTRA_ATT(ch, ATT_SOAK)
+#define GET_RESIST_PHYSICAL(ch)  GET_EXTRA_ATT(ch, ATT_RESIST_PHYSICAL)
+#define GET_RESIST_MAGICAL(ch)  GET_EXTRA_ATT(ch, ATT_RESIST_MAGICAL)
 #define GET_BLOCK(ch)  GET_EXTRA_ATT(ch, ATT_BLOCK)
 #define GET_TO_HIT(ch)  GET_EXTRA_ATT(ch, ATT_TO_HIT)
 #define GET_DODGE(ch)  GET_EXTRA_ATT(ch, ATT_DODGE)

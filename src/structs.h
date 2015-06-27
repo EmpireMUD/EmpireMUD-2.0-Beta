@@ -211,7 +211,7 @@ typedef struct trig_data trig_data;
 #define APPLY_WITS  9	// Apply to wits
 #define APPLY_AGE  10	// Apply to age
 #define APPLY_MOVE  11	// Apply to max move points
-#define APPLY_SOAK  12	// Apply to soak pool
+#define APPLY_RESIST_PHYSICAL  12	// Apply to physical damage resistance
 #define APPLY_BLOCK  13	// Apply to chance to block
 #define APPLY_HEAL_OVER_TIME  14	// heals you every 5
 #define APPLY_HEALTH  15	// Apply to max health
@@ -223,6 +223,7 @@ typedef struct trig_data trig_data;
 #define APPLY_BONUS_PHYSICAL  21	// add to bonus damage
 #define APPLY_BONUS_MAGICAL  22	// add to magical damage
 #define APPLY_BONUS_HEALING  23	// add to healing
+#define APPLY_RESIST_MAGICAL  24	// Apply to magic damage resistance
 
 
 // don't change these
@@ -433,7 +434,7 @@ typedef struct trig_data trig_data;
 
 // extra attributes -- ATT_x
 #define ATT_BONUS_INVENTORY  0	// carry capacity
-#define ATT_SOAK  1	// damage absorption
+#define ATT_RESIST_PHYSICAL  1	// damage reduction
 #define ATT_BLOCK  2	// bonus block chance
 #define ATT_TO_HIT  3	// bonus to-hit chance
 #define ATT_DODGE  4	// bonus dodge chance
@@ -442,7 +443,8 @@ typedef struct trig_data trig_data;
 #define ATT_BONUS_MAGICAL  7	// extra magical damage
 #define ATT_BONUS_HEALING  8	// extra healing
 #define ATT_HEAL_OVER_TIME  9	// heal per 5
-#define NUM_EXTRA_ATTRIBUTES  10
+#define ATT_RESIST_MAGICAL  10	// damage reduction
+#define NUM_EXTRA_ATTRIBUTES  11
 #define TOTAL_EXTRA_ATTRIBUTES  20	// including spares, 10 spares remaining -- **DO NOT CHANGE**
 
 

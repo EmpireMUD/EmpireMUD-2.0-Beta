@@ -115,7 +115,7 @@ struct {
 	{ "regeneration", ENCH_ARMOR, ABIL_ENCHANT_ARMOR, APPLY_HEALTH_REGEN, APPLY_NONE, { { o_IRIDESCENT_IRIS, 5 }, END_RESOURCE_LIST } },
 	{ "longrunning", ENCH_ARMOR, ABIL_ENCHANT_ARMOR, APPLY_MOVE_REGEN, APPLY_NONE, { { o_LIGHTNING_STONE, 5 }, END_RESOURCE_LIST } },
 	{ "energy", ENCH_ARMOR, ABIL_ENCHANT_ARMOR, APPLY_MANA_REGEN, APPLY_NONE, { { o_IRIDESCENT_IRIS, 5 }, END_RESOURCE_LIST } },
-	{ "protection", ENCH_ARMOR, ABIL_ENCHANT_ARMOR, APPLY_SOAK, APPLY_NONE, { { o_GLOWING_SEASHELL, 5 }, END_RESOURCE_LIST } },
+	{ "protection", ENCH_ARMOR, ABIL_ENCHANT_ARMOR, APPLY_RESIST_PHYSICAL, APPLY_NONE, { { o_GLOWING_SEASHELL, 5 }, END_RESOURCE_LIST } },
 	{ "evasion", ENCH_ARMOR, ABIL_ENCHANT_ARMOR, APPLY_DODGE, APPLY_NONE, { { o_LIGHTNING_STONE, 5 }, END_RESOURCE_LIST } },
 	
 	ENCHANT_LINE_BREAK,
@@ -1099,7 +1099,7 @@ ACMD(do_foresight) {
 
 
 ACMD(do_manashield) {
-	struct affected_type *af1, *af2;
+	struct affected_type *af1, *af2, *af3;
 	int cost = 25;
 	int amt;
 	
@@ -1125,9 +1125,11 @@ ACMD(do_manashield) {
 		amt = CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_MANASHIELD) + (GET_INTELLIGENCE(ch) / 3);
 		
 		af1 = create_mod_aff(ATYPE_MANASHIELD, 24 MUD_HOURS, APPLY_MANA, -25);
-		af2 = create_mod_aff(ATYPE_MANASHIELD, 24 MUD_HOURS, APPLY_SOAK, amt);
+		af2 = create_mod_aff(ATYPE_MANASHIELD, 24 MUD_HOURS, APPLY_RESIST_PHYSICAL, amt);
+		af3 = create_mod_aff(ATYPE_MANASHIELD, 24 MUD_HOURS, APPLY_RESIST_MAGICAL, amt);
 		affect_join(ch, af1, 0);
 		affect_join(ch, af2, 0);
+		affect_join(ch, af3, 0);
 		
 		// possible to go negative here
 		GET_MANA(ch) = MAX(0, GET_MANA(ch));

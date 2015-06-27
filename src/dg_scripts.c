@@ -2322,6 +2322,12 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 						snprintf(str, slen, "0");
 					}
+					else if (!str_cmp(field, "resist_magical")) {
+						snprintf(str, slen, "%d", GET_RESIST_MAGICAL(c));
+					}
+					else if (!str_cmp(field, "resist_physical")) {
+						snprintf(str, slen, "%d", GET_RESIST_PHYSICAL(c));
+					}
 					else if (!str_cmp(field, "resist_poison")) {
 						if (HAS_ABILITY(c, ABIL_RESIST_POISON)) {
 							snprintf(str, slen, "1");
@@ -2378,9 +2384,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					
-					else if (!str_cmp(field, "soak"))
-						snprintf(str, slen, "%d", GET_SOAK(c));
-
 					break;
 				case 't': {
 					if (!str_cmp(field, "tohit")) {

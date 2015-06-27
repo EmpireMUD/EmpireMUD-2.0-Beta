@@ -377,8 +377,8 @@ See also: CLASS
 TANK "TANK ROLE"
 
 The tank is the group member who takes damage from the enemy. A good tank has
-high hitpoints and damage mitigation (like soak and dodge). Tanks don't need
-Strength or Wits, because those are related to dealing damage.
+high hitpoints and damage mitigation (like resistance and dodge). Tanks don't
+need Strength or Wits, because those are related to dealing damage.
 
 Tanking tips:
  - The tank should start combat with all mobs so they are hitting him, rather

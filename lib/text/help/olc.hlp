@@ -1757,7 +1757,7 @@ using it. The following applies are available. Most are self-explanatory:
  WITS - combat speed
  AGE - this actually raises/lowers the player's age, which has no effect
  MAX-MOVE - move pool
- SOAK - this is damage absorption
+ RESIST-PHYSICAL - physical damage reduction
  BLOCK - block only matters if the player has a shield
  * - not used
  MAX-HEALTH - health pool
@@ -1769,6 +1769,7 @@ using it. The following applies are available. Most are self-explanatory:
  BONUS-PHYSICAL - added to strength-based damage
  BONUS-MAGICAL - added to magical damage
  BONUS-HEALING - added to damage healed (by abilities this player uses)
+ RESIST-MAGICAL - magical damage reduction
 
 See also: OLC OBJECTS
 #d
@@ -1788,8 +1789,8 @@ medium - Requires a tank Battle specialty. It should give moderate physical
    protection and should take away a small amount of DPS ability, like -WITS
    or -DAMAGE.
 heavy - Requires Battle as a class skill with a tank specialty. This type can
-   provide the most physical protection via applies like SOAK, but should also
-   take away DPS ability with -WITS, -DAMAGE, -STRENGTH, and similar.
+   provide the most physical protection via applies like RESIST-*, but should
+   also take away DPS ability with -WITS, -DAMAGE, -STRENGTH, and similar.
 
 See also: OLC OBJECTS, APPLIES
 #d
@@ -3279,7 +3280,8 @@ abilities to use it. Armor items may be set to any wear locations, but there
 is a worn-as-armor slot that must always be this item type. Armor items will
 scale higher than non-armor items.
 
-Cloth armor is for casters and healers, and should give very little soak.
+Cloth armor is for casters and healers, and should give very little damage
+resistance.
 
 Leather armor is for melee damage characters and should give damage traits.
 

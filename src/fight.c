@@ -10,6 +10,8 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 
+#include <math.h>
+
 #include "conf.h"
 #include "sysdep.h"
 
@@ -386,17 +388,6 @@ int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill) 
 
 
 /**
-* Applies diminishing returns to soak.
-*
-* @param char_data *ch The person whose soak rating to get.
-* @return int The effective soak rating.
-*/
-int get_effective_soak(char_data *ch) {
-	return GET_SOAK(ch); //(int) diminishing_returns(GET_SOAK(ch), 10);
-}
-
-
-/**
 * Total to-hit value for a character. Final hit chance will subtract opponent's
 * dodge for a number that is (ideally) 1-100, then the player rolls.
 * 
@@ -624,7 +615,7 @@ static void recursive_loot_set(obj_data *obj, int idnum, empire_data *emp) {
 
 
 /**
-* Applies skills and soak to damage, if applicable. This can be used for any
+* Applies skills and resistance to damage, if applicable. This can be used for any
 * function but is applied inside of damage() already.
 *
 * @param int dam The original damage.
@@ -636,19 +627,36 @@ int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, i
 	extern bool check_blood_fortitude(char_data *ch);
 	
 	bool self = (!attacker || attacker == victim);
+	int max_resist, use_resist;
+	double resist_prc;
 	
 	if (!self) {
-		// damage reduction (usually from armor)
-		if ((damtype != DAM_POISON && damtype != DAM_DIRECT)) {
-			dam -= get_effective_soak(victim);
-		}
-		
 		if (HAS_ABILITY(victim, ABIL_NOBLE_BEARING)) {
 			dam -= GET_GREATNESS(victim);
 		}
+		
+		// damage reduction (usually from armor/spells)
+		if (attacker) {
+			max_resist = get_approximate_level(attacker) / 2;
+			use_resist = 0;
+			
+			if (damtype == DAM_PHYSICAL || damtype == DAM_FIRE || (damtype == DAM_POISON && HAS_ABILITY(victim, ABIL_RESIST_POISON))) {
+				use_resist = GET_RESIST_PHYSICAL(victim);
+			}
+			else if (damtype == DAM_MAGICAL) {
+				use_resist = GET_RESIST_MAGICAL(victim);
+			}
+			
+			// require at least half of the magical resistance requirement to reduce any
+			if (use_resist > max_resist / 2) {
+				use_resist = MIN(use_resist, max_resist);
+				resist_prc = ((double) use_resist - (max_resist/2.0)) / (max_resist / 2.0);
+				dam = (int) round(dam * (1.0 - resist_prc));
+			}
+		}
 	
 		if (check_blood_fortitude(victim)) {
-			dam = (int) (0.9 * dam);
+			dam = (int) round(0.9 * dam);
 		}
 	
 		// redirect some damage to mana: player only
@@ -666,11 +674,8 @@ int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, i
 	if (damtype == DAM_POISON) {
 		if (HAS_ABILITY(victim, ABIL_POISON_IMMUNITY)) {
 			dam = 0;
-			gain_ability_exp(victim, ABIL_POISON_IMMUNITY, 2);
 		}
-		else if (skill_check(victim, ABIL_RESIST_POISON, DIFF_HARD)) {
-			dam *= 0.5;
-		}
+		gain_ability_exp(victim, ABIL_POISON_IMMUNITY, 2);
 		gain_ability_exp(victim, ABIL_RESIST_POISON, 5);
 	}
 	

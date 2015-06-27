@@ -238,8 +238,9 @@ See also: DEPLETION, FIND HERBS
 Resist Poison (Survival ability)
 Poison Immunity (Survival ability)
 
-Poison immunity gives you total resistance to all poisons, which Resist Poison
-gives you a partial resistance and a chance to avoid being poisoned.
+Poison immunity gives you total resistance to all poisons, while Resist Poison
+gives you a partial resistance and a chance to avoid being poisoned. Resist
+Poison also allows your physical resistance trait to apply to poison damage.
 
 Both of these abilities give skill-ups only when they trigger.
 #

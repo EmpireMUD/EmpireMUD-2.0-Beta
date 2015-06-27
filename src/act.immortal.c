@@ -2344,7 +2344,6 @@ void do_stat_character(char_data *ch, char_data *k) {
 	extern double get_combat_speed(char_data *ch, int pos);
 	extern int get_block_rating(char_data *ch, bool can_gain_skill);
 	extern int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
-	extern int get_effective_soak(char_data *ch);
 	extern int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill);
 	extern int move_gain(char_data *ch);
 	void display_attributes(char_data *ch, char_data *to);
@@ -2430,7 +2429,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 		val = get_block_rating(k, FALSE);
 		sprintf(lbuf2, "Block  [%s%d&0]", HAPPY_COLOR(val, 0), val);
 		
-		sprintf(lbuf3, "Soak  [%s%+d/%+d&0]", HAPPY_COLOR(get_effective_soak(k), 0), GET_SOAK(k), get_effective_soak(k));
+		sprintf(lbuf3, "Resist  [%d|%d]", GET_RESIST_PHYSICAL(k), GET_RESIST_MAGICAL(k));
 		msg_to_char(ch, "  %-28.28s %-28.28s %-28.28s\r\n", lbuf, lbuf2, lbuf3);
 	
 		sprintf(lbuf, "Physical  [%s%+d&0]", HAPPY_COLOR(GET_BONUS_PHYSICAL(k), 0), GET_BONUS_PHYSICAL(k));

@@ -938,6 +938,8 @@ plr_flagged(flag) - Returns TRUE if the player has the given flag (VAMPIRE).
 poison_immunity   - Returns TRUE if the player has Poison Immunity.
 position          - Returns Standing, Sitting, Fighting, etc.
 remove_mob_flag(flg) - Removes a mob flag from the mob. Also, add_mob_flag().
+resist_magical    - Returns the amount of magic resistance the player has.
+resist_physical   - Returns the amount of physical resistance the player has.
 resist_poison     - Returns TRUE if the player has Resist Poison.
 room              - The room the actor is in as a room variable. 
 sex               - The actor's sex, as a string: MALE, FEMALE, or NEUTRAL.

@@ -1152,10 +1152,9 @@ Attributes are rated from 0 to 10. They are shown in green if you have a spell
 or piece of gear enhancing the attribute, or red if there is one subtracting
 from it.
 
-Dodge: Your bonus to your per cent chance to dodge an attack.
-Block: Bonus to chance to block with a shield.
-Soak: Damage absorption from gear and spells.
-To-hit: Bonus chance to hit with attacks.
+You can get more information on most of the traits on the score from their own
+help files (e.g. HELP DODGE). The 'Resist' trait is split into two parts: the
+first is resist-physical, and the second is resist-magical.
 
 Skills are shown as:  Battle: &g100 (1)&0
 In this example, "Battle" is the name of the skill, 100 is your rating in it,

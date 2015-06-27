@@ -311,7 +311,7 @@ void script_damage(char_data *vict, char_data *killer, int level, int dam_type, 
 	
 	// guarantee at least 1
 	if (modifier > 0) {
-		dam = reduce_damage_from_skills(dam, vict, killer, dam_type);	// soak, etc
+		dam = reduce_damage_from_skills(dam, vict, killer, dam_type);	// resistance, etc
 		dam = MAX(1, dam);
 	}
 	else if (modifier < 0) {

@@ -359,9 +359,14 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 			SAFE_ADD(GET_EXTRA_BLOOD(ch), mod, INT_MIN, INT_MAX, TRUE);
 			break;
 		}
-		case APPLY_SOAK:
-			SAFE_ADD(GET_SOAK(ch), mod, INT_MIN, INT_MAX, TRUE);
+		case APPLY_RESIST_PHYSICAL: {
+			SAFE_ADD(GET_RESIST_PHYSICAL(ch), mod, INT_MIN, INT_MAX, TRUE);
 			break;
+		}
+		case APPLY_RESIST_MAGICAL: {
+			SAFE_ADD(GET_RESIST_MAGICAL(ch), mod, INT_MIN, INT_MAX, TRUE);
+			break;
+		}
 		case APPLY_TO_HIT: {
 			SAFE_ADD(GET_TO_HIT(ch), mod, INT_MIN, INT_MAX, TRUE);
 			break;

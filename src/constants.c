@@ -891,16 +891,31 @@ const char *injury_bits[] = {
 
 /* APPLY_x (1/3) */
 const char *apply_types[] = {
-	"NONE",			"STRENGTH",		"DEXTERITY",
-	"HEALTH-REGEN",	"CHARISMA",		"GREATNESS",
-	"MOVE-REGEN",	"MANA-REGEN",	"INTELLIGENCE",
-	"WITS",			"AGE",			"MAX-MOVE",
-	"SOAK",			"BLOCK",		"HEAL-OVER-TIME",
-	"MAX-HEALTH",	"MAX-MANA",		"TO-HIT",
-	"DODGE",		"INVENTORY",	"MAX-BLOOD",
+	"NONE",
+	"STRENGTH",
+	"DEXTERITY",
+	"HEALTH-REGEN",
+	"CHARISMA",
+	"GREATNESS",
+	"MOVE-REGEN",
+	"MANA-REGEN",
+	"INTELLIGENCE",
+	"WITS",
+	"AGE",
+	"MAX-MOVE",
+	"RESIST-PHSYICAL",
+	"BLOCK",
+	"HEAL-OVER-TIME",
+	"MAX-HEALTH",
+	"MAX-MANA",
+	"TO-HIT",
+	"DODGE",
+	"INVENTORY",
+	"MAX-BLOOD",
 	"BONUS-PHYSICAL",
 	"BONUS-MAGICAL",
 	"BONUS-HEALING",
+	"RESIST-MAGICAL",
 	"\n"
 };
 
@@ -919,7 +934,7 @@ const double apply_values[] = {
 	1,	// "WITS",
 	0.1,	// "AGE",
 	0.025,	// "MAX-MOVE",
-	1.4,	// "SOAK",
+	0.5,	// RESIST-PHYSICAL
 	0.3,	// "BLOCK",
 	3,	// "HEAL-OVER-TIME",
 	0.025,	// "HEALTH",
@@ -930,7 +945,8 @@ const double apply_values[] = {
 	0.02,	// "BLOOD",
 	1,	// BONUS-PHYSICAL
 	1,	// BONUS-MAGICAL
-	1	// BONUS-HEALING
+	1,	// BONUS-HEALING
+	0.5	// RESIST-MAGICAL
 };
 
 
@@ -948,7 +964,7 @@ const int apply_attribute[] = {
 	WITS,
 	NOTHING,	// age
 	NOTHING,	// max-move
-	NOTHING,	// soak
+	NOTHING,	// resist-physical
 	NOTHING,	// block
 	NOTHING,	// heal-over-time
 	NOTHING,	// max-health
@@ -959,7 +975,8 @@ const int apply_attribute[] = {
 	NOTHING,	// blood
 	NOTHING,	// bonus-phys
 	NOTHING,	// bonus-mag
-	NOTHING	// bonus-heal
+	NOTHING,	// bonus-heal
+	NOTHING	// resist-magical
 };
 
 
