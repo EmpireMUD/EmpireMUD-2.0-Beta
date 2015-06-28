@@ -305,8 +305,6 @@ staff weapon, and it tingles slightly when held.
 0 0
 A
 17 1
-A
-12 1
 C
 0 0
 S
@@ -431,9 +429,11 @@ flexible, and its hues of deep green reflect wetly in the light.
 2 0 0
 7 0
 A
-12 1
+17 1
 A
 18 1
+A
+15 1
 C
 100 150
 S
@@ -452,7 +452,7 @@ A
 A
 18 1
 A
-9 -1
+17 1
 C
 100 150
 S

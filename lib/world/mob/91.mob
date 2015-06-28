@@ -867,9 +867,9 @@ I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 9177 100.00 1  # SKIN: a polar bear fur
 S
 #9178
-narwal huge~
-a narwal~
-A huge narwal breaks the surface of the water.
+narwhal narwal huge~
+narwhal~
+A huge narwhal breaks the surface of the water.
 ~
 100 125 djloy 0
 0 0 6 5
@@ -879,7 +879,7 @@ I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 9178 100.00 1 X  # BUTCHER: a narwal's horn
+I 0 9178 100.00 1 X  # BUTCHER: a narwhal's horn
 S
 #9179
 lemming~
@@ -959,7 +959,7 @@ I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 9185 100.00 1  # SKIN: a large sealskin
+I 1 9185 100.00 1  # SKIN: a sealskin
 S
 #9186
 seal~

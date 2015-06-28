@@ -113,10 +113,8 @@ A goblin collar has been left on the ground.~
 The collar looks strong enough to protect the neck.
 ~
 27 moy ac
-2 0 0
+3 0 0
 2 0
-A
-12 2
 A
 15 1
 C
@@ -276,11 +274,11 @@ It is a goblincraft waistband.
 3 0 0
 0 0
 A
-12 2
+12 1
 A
 9 -1
 A
-18 1
+18 2
 C
 0 0
 S
@@ -296,7 +294,7 @@ The skull is goblincraft, with signature leather and beading.
 A
 4 -1
 A
-12 1
+15 1
 A
 18 1
 A
@@ -314,7 +312,7 @@ The wristbands appear to be goblincraft, and are on fire.
 0 0 0
 0 0
 A
-1 -1
+12 -1
 A
 22 1
 A
@@ -338,11 +336,11 @@ The wristbands appear to be goblincraft, made from enchanted wood.
 A
 4 -1
 A
-12 1
+17 1
 A
 18 1
 A
-3 1
+6 1
 C
 0 0
 S
@@ -548,14 +546,16 @@ A spiked wooden breastplate is stuck into the ground.~
 for evasion than for taking damage.
 ~
 27 emo aq
-2 0 0
+3 0 0
 0 0
 A
 9 -1
 A
 18 2
 A
-12 1
+15 1
+A
+1 -1
 C
 0 100
 S
@@ -972,7 +972,7 @@ dragons from the primeval age. The craftsmanship, however, is very modern.
 0 0 0
 7 0
 A
-9 -1
+12 -1
 A
 23 3
 A
@@ -1007,11 +1007,11 @@ The boots look to be made from hardened dracosaur scales, and edged in imperium.
 2 0 0
 7 0
 A
-9 -2
+17 1
 A
 2 1
 A
-12 1
+18 1
 C
 0 125
 S
@@ -1046,7 +1046,7 @@ A
 A
 2 1
 A
-12 2
+15 2
 A
 1 -1
 C

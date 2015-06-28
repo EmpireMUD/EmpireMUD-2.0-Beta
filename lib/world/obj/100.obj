@@ -383,9 +383,9 @@ A piece of armor made from dragon's wings is folded on the ground.~
 0 0 0
 7 0
 A
-15 3
-A
 12 1
+A
+24 1
 C
 0 0
 S
@@ -526,10 +526,14 @@ A set of skycleaver armor has been left here.~
 The armor appears to have been woven from silk, but offers surprising protection.
 ~
 27 jmo aq
-0 0 0
+2 0 0
 11 0
 A
 12 1
+A
+18 1
+A
+17 1
 C
 30 50
 S
@@ -631,11 +635,11 @@ goblin wrangler pants~
 A pair of wrangler pants is folded on the ground.~
 These sort of wrangler pants are worn by people who deal with a lot of goblins.
 ~
-2 mo af
--1 -1 -1
+27 mo af
+2 0 0
 11 0
 A
-12 1
+18 1
 A
 2 2
 C
@@ -699,7 +703,7 @@ Say what you want about goblins, their armorcrafting is renowned.
 A
 5 -1
 A
-12 1
+17 1
 A
 18 1
 C
@@ -947,7 +951,7 @@ The shield is warm to the touch and pulses with pure mana.
 0 0 0
 10 0
 A
-12 1
+24 1
 A
 16 2
 A

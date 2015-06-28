@@ -11,8 +11,6 @@ A
 17 1
 A
 2 1
-A
-12 1
 C
 0 0
 S
@@ -28,7 +26,7 @@ The hardened leather helm looks like it might be from the militia.
 A
 17 1
 A
-12 1
+9 1
 C
 0 0
 S
@@ -44,7 +42,7 @@ These vambraces are meant to protect the arms in combat..
 A
 17 1
 A
-12 1
+1 1
 C
 0 75
 S
@@ -62,9 +60,7 @@ free movement.
 A
 17 1
 A
-18 1
-A
-12 1
+2 1
 C
 0 0
 S
@@ -81,9 +77,7 @@ shape that gives the whole helmet a snake-like appearance.
 A
 17 1
 A
-18 1
-A
-12 1
+9 1
 C
 0 0
 S
@@ -100,9 +94,7 @@ used to catch a weapon, or deflect it.
 A
 17 1
 A
-18 1
-A
-12 1
+1 1
 C
 0 0
 S
@@ -148,9 +140,9 @@ heavy, but you would regret not wearing one.
 2 0 0
 2 0
 A
-9 -2
+18 1
 A
-12 2
+17 1
 C
 0 0
 S
@@ -165,9 +157,11 @@ weapons against your precious skull.
 2 0 0
 2 0
 A
-9 -2
+18 1
 A
-12 2
+17 1
+A
+2 1
 C
 0 0
 S
@@ -182,9 +176,11 @@ your forearms from enemy weaponry.
 2 0 0
 2 0
 A
-9 -2
+18 1
 A
-12 2
+17 1
+A
+2 1
 C
 0 75
 S
@@ -199,9 +195,9 @@ combat. Its smooth finish helps deflect the damage from any attack.
 2 0 0
 2 0
 A
-9 -2
+18 1
 A
-12 1
+17 1
 C
 0 0
 S
@@ -217,9 +213,9 @@ beak strikes fear in your enemies.
 2 0 0
 2 0
 A
-9 -2
+2 1
 A
-12 1
+17 1
 A
 18 1
 C
@@ -236,11 +232,11 @@ sword. Some of the spikes are already broken -- ablated off in battle, perhaps.
 2 0 0
 2 0
 A
-9 -2
+2 1
 A
-12 1
+18 1
 A
-13 1
+17 1
 C
 0 0
 S
@@ -305,9 +301,11 @@ A
 A
 1 -1
 A
-12 4
+18 1
 A
-13 5
+13 1
+A
+15 2
 C
 0 0
 S
@@ -325,11 +323,11 @@ know who to swear vengeance against.
 A
 9 -2
 A
-1 -1
+2 1
 A
-12 3
+12 1
 A
-13 5
+15 2
 C
 0 0
 S
@@ -346,11 +344,11 @@ guards are unmatched in the land.
 A
 9 -2
 A
-1 -1
+13 2
 A
-12 3
+12 1
 A
-13 5
+15 2
 C
 0 0
 S
@@ -385,6 +383,8 @@ A
 16 2
 A
 8 1
+A
+12 -1
 C
 0 0
 S
@@ -403,6 +403,8 @@ A
 7 1
 A
 16 1
+A
+12 -1
 C
 0 0
 S
@@ -420,6 +422,8 @@ A
 16 1
 A
 17 1
+A
+12 -1
 C
 0 0
 S
@@ -433,9 +437,9 @@ The copper breastplate has molded abs!
 2 0 0
 13 0
 A
-9 -1
+18 1
 A
-12 2
+17 1
 C
 0 0
 S
@@ -449,9 +453,9 @@ The mask looks like it would protect the face from blows.
 2 0 0
 13 0
 A
-9 -1
+17 1
 A
-12 2
+18 1
 C
 0 0
 S
@@ -466,9 +470,9 @@ your forearms from enemy weaponry.
 2 0 0
 13 0
 A
-9 -1
+18 1
 A
-12 2
+17 1
 C
 0 0
 S
@@ -498,7 +502,7 @@ This simple piece of hardened rawhide is light weight and offers good mobility.
 A
 17 1
 A
-12 1
+2 1
 C
 0 0
 S
@@ -514,7 +518,7 @@ The skullcap is made from fine rawhide.
 A
 17 1
 A
-12 1
+9 1
 C
 0 0
 S
@@ -530,7 +534,7 @@ These bracers should protect your arms in combat.
 A
 17 1
 A
-12 1
+1 1
 C
 0 0
 S
