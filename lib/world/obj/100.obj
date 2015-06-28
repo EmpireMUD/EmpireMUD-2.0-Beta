@@ -380,12 +380,14 @@ dragonwing armor~
 A piece of armor made from dragon's wings is folded on the ground.~
 ~
 27 mo aq
-0 0 0
+2 0 0
 7 0
 A
-12 1
+17 1
 A
-24 1
+18 1
+A
+15 1
 C
 0 0
 S
@@ -529,11 +531,9 @@ The armor appears to have been woven from silk, but offers surprising protection
 2 0 0
 11 0
 A
-12 1
-A
-18 1
-A
 17 1
+A
+15 1
 C
 30 50
 S
