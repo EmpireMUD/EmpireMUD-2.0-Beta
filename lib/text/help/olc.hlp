@@ -1781,8 +1781,7 @@ Armor items may have several different types set. This determines which ability
 is required to wear the item. If an item does not need to be skill-restricted,
 use the WORN item type instead of ARMOR.
 
-cloth - Should provide caster or healer traits, OR a low amount of damage
-   reduction.
+mage - Should provide caster or healer traits and no real protection.
 light - Should provide melee DPS traits.
 medium - Should provide both DPS and tank traits, such as to-hit and dodge.
 heavy - Should include a -WITS or -STRENGTH penalty, and should include only
@@ -3276,8 +3275,7 @@ abilities to use it. Armor items may be set to any wear locations, but there
 is a worn-as-armor slot that must always be this item type. Armor items will
 scale higher than non-armor items.
 
-Cloth armor is for casters and healers, and should rarely give damage
-resistance.
+Mage armor is for casters and healers.
 
 Light armor is for melee damage characters and should give damage traits.
 

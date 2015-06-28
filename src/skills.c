@@ -105,8 +105,8 @@ void check_skill_sell(char_data *ch, int abil) {
 			retract_claws(ch);
 			break;
 		}
-		case ABIL_CLOTH_ARMOR: {
-			remove_armor_by_type(ch, ARMOR_CLOTH);
+		case ABIL_MAGE_ARMOR: {
+			remove_armor_by_type(ch, ARMOR_MAGE);
 			break;
 		}
 		case ABIL_COUNTERSPELL: {
@@ -1413,8 +1413,8 @@ bool can_wear_item(char_data *ch, obj_data *item, bool send_messages) {
 	
 	if (IS_ARMOR(item)) {
 		switch (GET_ARMOR_TYPE(item)) {
-			case ARMOR_CLOTH: {
-				abil = ABIL_CLOTH_ARMOR;
+			case ARMOR_MAGE: {
+				abil = ABIL_MAGE_ARMOR;
 				break;
 			}
 			case ARMOR_LIGHT: {

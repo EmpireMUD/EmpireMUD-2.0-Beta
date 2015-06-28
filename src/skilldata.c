@@ -65,7 +65,7 @@ void init_skills() {
 			setup_ability(ABIL_HEARTSTOP, SKILL_BATTLE, 95, ABIL_BIG_GAME_HUNTER, "Heartstop");			
 		setup_ability(ABIL_FIRSTAID, SKILL_BATTLE, 15, NO_PREREQ, "Firstaid");
 		setup_ability(ABIL_FLEET, SKILL_BATTLE, 15, NO_PREREQ, "Fleet");
-		setup_ability(ABIL_CLOTH_ARMOR, SKILL_BATTLE, 35, NO_PREREQ, "Cloth Armor");
+		setup_ability(ABIL_MAGE_ARMOR, SKILL_BATTLE, 35, NO_PREREQ, "Mage Armor");
 		setup_ability(ABIL_LIGHT_ARMOR, SKILL_BATTLE, 55, NO_PREREQ, "Light Armor");
 		setup_ability(ABIL_MEDIUM_ARMOR, SKILL_BATTLE, 50, NO_PREREQ, "Medium Armor");
 		setup_ability(ABIL_HEAVY_ARMOR, SKILL_BATTLE, 75, NO_PREREQ, "Heavy Armor");

@@ -226,7 +226,7 @@ extern bool skill_check(char_data *ch, int ability, int difficulty);
 #define ABIL_BASH  97
 #define ABIL_CUT_DEEP  98
 #define ABIL_BIG_GAME_HUNTER  99
-#define ABIL_CLOTH_ARMOR  100
+#define ABIL_MAGE_ARMOR  100
 #define ABIL_ARCHERY  101
 #define ABIL_QUICK_DRAW  102
 #define ABIL_FIRSTAID  103
@@ -555,7 +555,7 @@ extern bool skill_check(char_data *ch, int ability, int difficulty);
 
 
 // armor types
-#define ARMOR_CLOTH  0
+#define ARMOR_MAGE  0
 #define ARMOR_LIGHT  1
 #define ARMOR_MEDIUM  2
 #define ARMOR_HEAVY  3

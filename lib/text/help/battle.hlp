@@ -28,16 +28,16 @@ Learn to use bows to start combat while you're still at a safe distance.
 
 See also: QUICK DRAW, SHOOT
 #
-ARMOR "LIGHT ARMOR" "MEDIUM ARMOR" "HEAVY ARMOR" "CLOTH ARMOR"
+ARMOR "LIGHT ARMOR" "MEDIUM ARMOR" "HEAVY ARMOR" "MAGE ARMOR"
 
-Cloth Armor (Battle ability)
 Light Armor (Battle ability)
+Mage Armor (Battle ability)
 Medium Armor (Battle ability)
 Heavy Armor (Battle ability)
 
 In order to wear pieces of armor, you must learn the appropriate ability.
 
-Cloth armor is usually meant for casters and healers, and tends to give bonuses
+Mage armor is usually meant for casters and healers, and tends to give bonuses
 to magical traits.
 
 Light armor offers little protection, but makes the wearer more lithe and

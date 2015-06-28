@@ -2262,8 +2262,8 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 		for (iter = 0; iter < NUM_WEARS; ++iter) {
 			if (GET_EQ(victim, iter) && GET_ARMOR_TYPE(GET_EQ(victim, iter)) != NOTHING) {
 				switch (GET_ARMOR_TYPE(GET_EQ(victim, iter))) {
-					case ARMOR_CLOTH: {
-						gain_ability_exp(victim, ABIL_CLOTH_ARMOR, 1);
+					case ARMOR_MAGE: {
+						gain_ability_exp(victim, ABIL_MAGE_ARMOR, 1);
 						break;
 					}
 					case ARMOR_LIGHT: {
