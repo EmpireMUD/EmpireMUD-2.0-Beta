@@ -2266,8 +2266,8 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 						gain_ability_exp(victim, ABIL_CLOTH_ARMOR, 1);
 						break;
 					}
-					case ARMOR_LEATHER: {
-						gain_ability_exp(victim, ABIL_LEATHER_ARMOR, 1);
+					case ARMOR_LIGHT: {
+						gain_ability_exp(victim, ABIL_LIGHT_ARMOR, 1);
 						break;
 					}
 					case ARMOR_MEDIUM: {

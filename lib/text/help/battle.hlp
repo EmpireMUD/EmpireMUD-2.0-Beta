@@ -28,26 +28,26 @@ Learn to use bows to start combat while you're still at a safe distance.
 
 See also: QUICK DRAW, SHOOT
 #
-ARMOR "LEATHER ARMOR" "MEDIUM ARMOR" "HEAVY ARMOR" "CLOTH ARMOR"
+ARMOR "LIGHT ARMOR" "MEDIUM ARMOR" "HEAVY ARMOR" "CLOTH ARMOR"
 
 Cloth Armor (Battle ability)
-Leather Armor (Battle ability)
+Light Armor (Battle ability)
 Medium Armor (Battle ability)
 Heavy Armor (Battle ability)
 
 In order to wear pieces of armor, you must learn the appropriate ability.
 
-Cloth armor is light weight and offers little protection, but frequently has
-bonuses for spellcasters in combat.
+Cloth armor is usually meant for casters and healers, and tends to give bonuses
+to magical traits.
 
-Leather armor offers some protection, but is still light and flexible, and
-is good for people who must move quickly and don't take much damage.
+Light armor offers little protection, but makes the wearer more lithe and
+deadly in combat. It is meant for melee DPS characters.
 
-Medium armor is the standard for knights across the realm. It's strong and
-protects from most damage.
+Medium armor is a hybrid of light and heavy armor, and is good for those who
+do a lot of solo exploration and adventuring, as well as for PVP players.
 
-Heavy armor is the stuff of legends, but it also requires extensive practice
-and training to use.
+Heavy armor is the mainstay of tanks, and offers great protection at the cost
+of making it harder for the wearer to deal damage.
 #
 BASH
 
@@ -295,7 +295,7 @@ As a class ability, it gives +10% total to-hit.
 
 This to-hit bonus is refleced on your 'score'.
 
-See also: LEATHER ARMOR, KICK, BASH, CUT DEEP, STUNNING BLOW, FINESSE
+See also: LIGHT ARMOR, KICK, BASH, CUT DEEP, STUNNING BLOW, FINESSE
 #
 SPEED "COMBAT SPEED" "FIGHT SPEED" "FIGHTING SPEED"
 

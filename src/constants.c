@@ -1537,7 +1537,7 @@ const struct material_data materials[NUM_MATERIALS] = {
 // ARMOR_x part 1 - names
 const char *armor_types[NUM_ARMOR_TYPES+1] = {
 	"cloth",
-	"leather",
+	"light",
 	"medium",
 	"heavy",
 	"\n"
@@ -1547,9 +1547,9 @@ const char *armor_types[NUM_ARMOR_TYPES+1] = {
 // ARMOR_x part 2 - scale values
 const double armor_scale_bonus[NUM_ARMOR_TYPES] = {
 	1.2,	// cloth
-	1.3333,	// leather
-	1.25,	// medium
-	1.5		// heavy
+	1.2,	// light
+	1.2,	// medium
+	1.2		// heavy
 };
 
 

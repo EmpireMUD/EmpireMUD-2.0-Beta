@@ -1781,16 +1781,12 @@ Armor items may have several different types set. This determines which ability
 is required to wear the item. If an item does not need to be skill-restricted,
 use the WORN item type instead of ARMOR.
 
-cloth - Requires basic Battle skill. Cloth armor should provide little physical
-   protection and is best for caster gear or weak civilian armor.
-leather - Requires a DPS Battle specialty. It should provide low physical
-   protection and give bonuses to hit and damage.
-medium - Requires a tank Battle specialty. It should give moderate physical
-   protection and should take away a small amount of DPS ability, like -WITS
-   or -DAMAGE.
-heavy - Requires Battle as a class skill with a tank specialty. This type can
-   provide the most physical protection via applies like RESIST-*, but should
-   also take away DPS ability with -WITS, -DAMAGE, -STRENGTH, and similar.
+cloth - Should provide caster or healer traits, OR a low amount of damage
+   reduction.
+light - Should provide melee DPS traits.
+medium - Should provide both DPS and tank traits, such as to-hit and dodge.
+heavy - Should include a -WITS or -STRENGTH penalty, and should include only
+   tank traits.
 
 See also: OLC OBJECTS, APPLIES
 #d
@@ -3280,16 +3276,16 @@ abilities to use it. Armor items may be set to any wear locations, but there
 is a worn-as-armor slot that must always be this item type. Armor items will
 scale higher than non-armor items.
 
-Cloth armor is for casters and healers, and should give very little damage
+Cloth armor is for casters and healers, and should rarely give damage
 resistance.
 
-Leather armor is for melee damage characters and should give damage traits.
+Light armor is for melee damage characters and should give damage traits.
 
-Medium armor is the lower tanking tier, and may include penalties to traits
-like Wits or Strength, which are not needed by tanks.
+Medium armor is for PVP or solo adventuring, and should give both DPS and
+   tank traits on the same item.
 
-Heavy armor is the high tanking tier, and should always include penalties to
-damage traits in order to keep players from being both tank and dps.
+Heavy armor should always include -WITS, -STRENGTH, or other melee penalties.
+   It should only include tank traits otherwise.
 #d
 "ARROW ITEM" "ARROW OBJECT"
 

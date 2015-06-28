@@ -46,8 +46,6 @@ void init_skills() {
 	setup_skill(SKILL_BATTLE, "Battle", 0, "Charge confidently into combat", "Battle is important for combat, especially tanks and melee damage characters");
 		setup_ability(ABIL_ENDURANCE, SKILL_BATTLE, 75, NO_PREREQ, "Endurance");
 		setup_ability(ABIL_REFLEXES, SKILL_BATTLE, 15, NO_PREREQ, "Reflexes");
-			setup_ability(ABIL_MEDIUM_ARMOR, SKILL_BATTLE, 50, ABIL_REFLEXES, "Medium Armor");
-				setup_ability(ABIL_HEAVY_ARMOR, SKILL_BATTLE, 75, ABIL_MEDIUM_ARMOR, "Heavy Armor");
 			setup_ability(ABIL_SHIELD_BLOCK, SKILL_BATTLE, 30, ABIL_REFLEXES, "Shield Block");
 				setup_ability(ABIL_BLOCK_ARROWS, SKILL_BATTLE, 50, ABIL_SHIELD_BLOCK, "Block Arrows");
 				setup_ability(ABIL_QUICK_BLOCK, SKILL_BATTLE, 60, ABIL_SHIELD_BLOCK, "Quick Block");
@@ -55,7 +53,6 @@ void init_skills() {
 			setup_ability(ABIL_OUTRAGE, SKILL_BATTLE, 75, ABIL_REFLEXES, "Outrage");
 		setup_ability(ABIL_RESCUE, SKILL_BATTLE, 50, NO_PREREQ, "Rescue");
 		setup_ability(ABIL_SPARRING, SKILL_BATTLE, 15, NO_PREREQ, "Sparring");
-			setup_ability(ABIL_LEATHER_ARMOR, SKILL_BATTLE, 55, ABIL_SPARRING, "Leather Armor");
 			setup_ability(ABIL_KICK, SKILL_BATTLE, 30, ABIL_SPARRING, "Kick");
 				setup_ability(ABIL_BASH, SKILL_BATTLE, 40, ABIL_KICK, "Bash");				
 			setup_ability(ABIL_CUT_DEEP, SKILL_BATTLE, 65, ABIL_SPARRING, "Cut Deep");
@@ -69,6 +66,9 @@ void init_skills() {
 		setup_ability(ABIL_FIRSTAID, SKILL_BATTLE, 15, NO_PREREQ, "Firstaid");
 		setup_ability(ABIL_FLEET, SKILL_BATTLE, 15, NO_PREREQ, "Fleet");
 		setup_ability(ABIL_CLOTH_ARMOR, SKILL_BATTLE, 35, NO_PREREQ, "Cloth Armor");
+		setup_ability(ABIL_LIGHT_ARMOR, SKILL_BATTLE, 55, NO_PREREQ, "Light Armor");
+		setup_ability(ABIL_MEDIUM_ARMOR, SKILL_BATTLE, 50, NO_PREREQ, "Medium Armor");
+		setup_ability(ABIL_HEAVY_ARMOR, SKILL_BATTLE, 75, NO_PREREQ, "Heavy Armor");
 	// end Battle
 	
 
