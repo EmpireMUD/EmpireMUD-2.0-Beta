@@ -295,7 +295,10 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 	if (obj && proto && OBJ_VERSION(obj) < OBJ_VERSION(proto) && config_get_bool("auto_update_items")) {
 		// TODO rewrite this as a generic rescale obj function AND make changes to live objects update players in-game (and trading post, einv, and rooms)
 		new = read_object(vnum);
-		GET_OBJ_EXTRA(new) |= GET_OBJ_EXTRA(obj) & (OBJ_SUPERIOR | OBJ_HARD_DROP | OBJ_GROUP_DROP);
+		GET_OBJ_EXTRA(new) |= GET_OBJ_EXTRA(obj) & OBJ_SUPERIOR;
+		if (!OBJ_FLAGGED(new, OBJ_GENERIC_DROP)) {
+			GET_OBJ_EXTRA(new) |= GET_OBJ_EXTRA(obj) & (OBJ_HARD_DROP | OBJ_GROUP_DROP);
+		}
 		OBJ_BOUND_TO(new) = OBJ_BOUND_TO(obj);
 		OBJ_BOUND_TO(obj) = NULL;
 		GET_OBJ_TIMER(new) = GET_OBJ_TIMER(obj);
