@@ -52,7 +52,7 @@ void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location);
 void discrete_load(FILE *fl, int mode, char *filename);
 void free_complex_data(struct complex_room_data *data);
 void index_boot(int mode);
-extern obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location);
+extern obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify);
 
 // local functions
 int file_to_string_alloc(const char *name, char **buf);
@@ -1813,7 +1813,7 @@ void load_trading_post(void) {
 				break;
 			}
 			case '#': { // load object into last T
-				obj = Obj_load_from_file(fl, atoi(line+1), &int_in[0]);	// last val is junk
+				obj = Obj_load_from_file(fl, atoi(line+1), &int_in[0], NULL);	// last val is junk
 				
 				if (obj && tpd) {
 					remove_from_object_list(obj);	// doesn't really go here right now

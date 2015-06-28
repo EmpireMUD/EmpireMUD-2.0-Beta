@@ -513,6 +513,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define IN_CHAIR(obj)  ((obj)->sitting)
 #define LAST_OWNER_ID(obj)  ((obj)->last_owner_id)
 #define OBJ_BOUND_TO(obj)  ((obj)->bound_to)
+#define OBJ_VERSION(obj)  ((obj)->version)
 
 // compound attributes
 #define GET_OBJ_DESC(obj, ch, mode)  get_obj_desc((obj), (ch), (mode))

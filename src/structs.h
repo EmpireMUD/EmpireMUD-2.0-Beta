@@ -2975,6 +2975,8 @@ struct obj_flag_data {
 // a game item
 struct obj_data {
 	obj_vnum vnum;	// object's virtual number
+	ush_int version;	// for auto-updating objects
+	
 	room_data *in_room;	// In what room -- NULL when container/carried
 
 	struct obj_flag_data obj_flags;	// Object information

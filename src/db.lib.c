@@ -58,7 +58,7 @@ extern bool world_is_sorted;
 extern room_data *create_ocean_room(room_vnum vnum);
 extern struct complex_room_data *init_complex_data();
 void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location);
-extern obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location);
+extern obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify);
 void sort_exits(struct room_direction_data **list);
 void sort_world_table();
 
@@ -1523,7 +1523,7 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 					continue;
 				}
 				
-				obj = Obj_load_from_file(fl, t[2], &junk);
+				obj = Obj_load_from_file(fl, t[2], &junk, NULL);
 				if (obj) {
 					remove_from_object_list(obj);	// doesn't really go here right now
 					
@@ -3103,13 +3103,18 @@ void parse_object(FILE *obj_f, int nr) {
 		log("SYSERR: Expecting first numeric line of %s, but file ended!", buf2);
 		exit(1);
 	}
-	if ((retval = sscanf(line, " %d %s %s", t, f1, f2)) != 3) {
-		log("SYSERR: Format error in first numeric line (expecting 3 args, got %d), %s", retval, buf2);
-		exit(1);
+	if ((retval = sscanf(line, " %d %s %s %d", &t[0], f1, f2, &t[1])) != 4) {
+		// older version of the file: missing version into
+		t[1] = 0;
+		if ((retval = sscanf(line, " %d %s %s", t, f1, f2)) != 3) {
+			log("SYSERR: Format error in first numeric line (expecting 3 args, got %d), %s", retval, buf2);
+			exit(1);
+		}
 	}
 	obj->obj_flags.type_flag = t[0];
 	obj->obj_flags.extra_flags = asciiflag_conv(f1);
 	obj->obj_flags.wear_flags = asciiflag_conv(f2);
+	OBJ_VERSION(obj) = t[1];
 
 	if (!get_line(obj_f, line)) {
 		log("SYSERR: Expecting second numeric line of %s, but file ended!", buf2);
@@ -3296,7 +3301,7 @@ void write_obj_to_file(FILE *fl, obj_data *obj) {
 	// I imagine calling this function twice in one fprintf would not have the desired effect.
 	strcpy(temp, bitv_to_alpha(GET_OBJ_EXTRA(obj)));
 	strcpy(temp2, bitv_to_alpha(GET_OBJ_WEAR(obj)));
-	fprintf(fl, "%d %s %s\n", GET_OBJ_TYPE(obj), temp, temp2);
+	fprintf(fl, "%d %s %s %d\n", GET_OBJ_TYPE(obj), temp, temp2, OBJ_VERSION(obj));
 
 	fprintf(fl, "%d %d %d\n", GET_OBJ_VAL(obj, 0), GET_OBJ_VAL(obj, 1), GET_OBJ_VAL(obj, 2));
 	

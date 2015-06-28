@@ -839,7 +839,9 @@ struct extra_descr_data *copy_extra_descs(struct extra_descr_data *list) {
 
 
 /**
-* Creates a copy of an object, or clears a new one, for editing.
+* Creates a copy of an object, or clears a new one, for editing. Note that this
+* will increase the version number of the item by 1, for the auto-update
+* system.
 * 
 * @param obj_data *input The object to copy, or NULL to make a new one.
 * @return obj_data *The copied object.
@@ -908,6 +910,9 @@ obj_data *setup_olc_object(obj_data *input) {
 		SCRIPT(new) = NULL;
 		new->proto_script = NULL;
 		copy_proto_script(input, new, OBJ_TRIGGER);
+		
+		// update version number
+		OBJ_VERSION(new) += 1;
 	}
 	else {
 		// brand new
@@ -916,6 +921,7 @@ obj_data *setup_olc_object(obj_data *input) {
 		GET_OBJ_LONG_DESC(new) = str_dup("A new object is sitting here.");
 		GET_OBJ_ACTION_DESC(new) = NULL;
 		GET_OBJ_WEAR(new) = ITEM_WEAR_TAKE;
+		OBJ_VERSION(new) = 1;
 
 		SCRIPT(new) = NULL;
 		new->proto_script = NULL;

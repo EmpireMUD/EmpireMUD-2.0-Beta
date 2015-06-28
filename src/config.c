@@ -1608,6 +1608,7 @@ void init_config_system(void) {
 	init_config(CONFIG_EMPIRE, "empire_log_ttl", CONFTYPE_INT, "how many days elogs last");
 
 	// items
+	init_config(CONFIG_MOBS, "auto_update_items", CONFTYPE_BOOL, "uses item version numbers to automatically update items");
 	init_config(CONFIG_ITEMS, "autostore_time", CONFTYPE_INT, "minutes items last on the ground");
 	init_config(CONFIG_ITEMS, "bound_item_junk_time", CONFTYPE_INT, "minutes bound items last on the ground before being junked");
 	init_config(CONFIG_ITEMS, "long_autostore_time", CONFTYPE_INT, "minutes items last with the long-autostore bld flag");

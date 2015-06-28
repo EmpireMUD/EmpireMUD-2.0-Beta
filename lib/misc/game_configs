@@ -69,6 +69,7 @@ time_to_empire_emptiness 2
 whole_empire_timeout 30
 *
 * Items configs
+auto_update_items 1
 autostore_time 180
 bound_item_junk_time 10080
 long_autostore_time 720
