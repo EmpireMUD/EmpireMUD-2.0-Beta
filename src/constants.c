@@ -903,7 +903,7 @@ const char *apply_types[] = {
 	"WITS",
 	"AGE",
 	"MAX-MOVE",
-	"RESIST-PHSYICAL",
+	"RESIST-PHYSICAL",
 	"BLOCK",
 	"HEAL-OVER-TIME",
 	"MAX-HEALTH",
