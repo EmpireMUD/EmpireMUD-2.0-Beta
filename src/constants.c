@@ -935,12 +935,12 @@ const double apply_values[] = {
 	0.1,	// "AGE",
 	0.025,	// "MAX-MOVE",
 	0.5,	// RESIST-PHYSICAL
-	0.3,	// "BLOCK",
+	0.25,	// "BLOCK",
 	3,	// "HEAL-OVER-TIME",
 	0.025,	// "HEALTH",
 	0.025,	// "MAX-MANA",
 	0.15,	// "TO-HIT",
-	0.15,	// "DODGE",
+	0.10,	// "DODGE",
 	0.15,	// "INVENTORY",
 	0.02,	// "BLOOD",
 	1,	// BONUS-PHYSICAL
