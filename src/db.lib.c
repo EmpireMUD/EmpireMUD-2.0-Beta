@@ -3105,7 +3105,7 @@ void parse_object(FILE *obj_f, int nr) {
 	}
 	if ((retval = sscanf(line, " %d %s %s %d", &t[0], f1, f2, &t[1])) != 4) {
 		// older version of the file: missing version into
-		t[1] = 0;
+		t[1] = 1;
 		if ((retval = sscanf(line, " %d %s %s", t, f1, f2)) != 3) {
 			log("SYSERR: Format error in first numeric line (expecting 3 args, got %d), %s", retval, buf2);
 			exit(1);
