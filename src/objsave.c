@@ -287,7 +287,7 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 	}
 	
 	// check versioning: load a new version
-	if (obj && OBJ_VERSION(obj) < OBJ_VERSION(proto) && config_get_bool("auto_update_items")) {
+	if (obj && proto && OBJ_VERSION(obj) < OBJ_VERSION(proto) && config_get_bool("auto_update_items")) {
 		// TODO rewrite this as a generic rescale obj function AND make changes to live objects update players in-game (and trading post, einv, and rooms)
 		new = read_object(vnum);
 		GET_OBJ_EXTRA(new) |= GET_OBJ_EXTRA(obj) & (OBJ_SUPERIOR | OBJ_HARD_DROP | OBJ_GROUP_DROP);
