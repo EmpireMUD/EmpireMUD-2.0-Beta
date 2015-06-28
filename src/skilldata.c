@@ -46,8 +46,8 @@ void init_skills() {
 	setup_skill(SKILL_BATTLE, "Battle", 0, "Charge confidently into combat", "Battle is important for combat, especially tanks and melee damage characters");
 		setup_ability(ABIL_ENDURANCE, SKILL_BATTLE, 75, NO_PREREQ, "Endurance");
 		setup_ability(ABIL_REFLEXES, SKILL_BATTLE, 15, NO_PREREQ, "Reflexes");
-			setup_ability(ABIL_MEDIUM_ARMOR, SKILL_BATTLE, 55, ABIL_REFLEXES, "Medium Armor");
-				setup_ability(ABIL_HEAVY_ARMOR, SKILL_BATTLE, 80, ABIL_MEDIUM_ARMOR, "Heavy Armor");
+			setup_ability(ABIL_MEDIUM_ARMOR, SKILL_BATTLE, 50, ABIL_REFLEXES, "Medium Armor");
+				setup_ability(ABIL_HEAVY_ARMOR, SKILL_BATTLE, 75, ABIL_MEDIUM_ARMOR, "Heavy Armor");
 			setup_ability(ABIL_SHIELD_BLOCK, SKILL_BATTLE, 30, ABIL_REFLEXES, "Shield Block");
 				setup_ability(ABIL_BLOCK_ARROWS, SKILL_BATTLE, 50, ABIL_SHIELD_BLOCK, "Block Arrows");
 				setup_ability(ABIL_QUICK_BLOCK, SKILL_BATTLE, 60, ABIL_SHIELD_BLOCK, "Quick Block");
