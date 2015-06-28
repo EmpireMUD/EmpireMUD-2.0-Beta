@@ -299,6 +299,36 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 		new->last_owner_id = obj->last_owner_id;
 		new->last_empire_id = obj->last_empire_id;
 		
+		// certain things that must always copy over
+		switch (GET_OBJ_TYPE(new)) {
+			case ITEM_ARROW: {
+				GET_OBJ_VAL(new, VAL_ARROW_QUANTITY) = GET_OBJ_VAL(obj, VAL_ARROW_QUANTITY);
+				break;
+			}
+			case ITEM_BOOK: {
+				GET_OBJ_VAL(new, VAL_BOOK_ID) = GET_OBJ_VAL(obj, VAL_BOOK_ID);
+				break;
+			}
+			case ITEM_DRINKCON: {
+				GET_OBJ_VAL(new, VAL_DRINK_CONTAINER_CONTENTS) = GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS);
+				GET_OBJ_VAL(new, VAL_DRINK_CONTAINER_TYPE) = GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE);
+				break;
+			}
+			case ITEM_PORTAL: {
+				GET_OBJ_VAL(new, VAL_PORTAL_TARGET_VNUM) = GET_OBJ_VAL(obj, VAL_PORTAL_TARGET_VNUM);
+				break;
+			}
+			case ITEM_POISON: {
+				GET_OBJ_VAL(new, VAL_POISON_CHARGES) = GET_OBJ_VAL(obj, VAL_POISON_CHARGES);
+				break;
+			}
+			case ITEM_SHIP: {
+				GET_OBJ_VAL(new, VAL_SHIP_RESOURCES_REMAINING) = GET_OBJ_VAL(obj, VAL_SHIP_RESOURCES_REMAINING);
+				GET_OBJ_VAL(new, VAL_SHIP_MAIN_ROOM) = GET_OBJ_VAL(obj, VAL_SHIP_MAIN_ROOM);
+				break;
+			}
+		}
+		
 		if (OBJ_FLAGGED(new, OBJ_SCALABLE) && GET_OBJ_CURRENT_SCALE_LEVEL(obj) > 0) {
 			scale_item_to_level(new, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 		}
