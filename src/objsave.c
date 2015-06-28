@@ -114,6 +114,9 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 		}
 	}
 	
+	// default to version 0
+	OBJ_VERSION(obj) = 0;
+	
 	// for fread_string
 	sprintf(error, "Obj_load_from_file %d", vnum);
 	
