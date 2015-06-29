@@ -108,6 +108,7 @@ Enchant Weapons:
   wisdom - intelligence, mana regen  (5 glowing seashells)
   accuracy - to-hit  (5 bloodstones)
   awareness - wits, to-hit  (5 blue irises)
+  deflection - dodge, block (5 lightning stones)
   manaspring (offhand) - mana regen, max mana (5 blue irises)
   healing (offhand) - bonus healing, mana regen (5 glowing seashells)
   fury (offhand) - bonus magical, mana regen (5 lightning stone)
@@ -124,6 +125,9 @@ Enchant Armor:
   evasion - dodge  (5 lightning stones)
   rage - strength  (5 bloodstones)
   power - intelligence  (5 glowing seashells)
+  spellwarding - resist-magical (5 blue irises)
+  focus - to-hit (5 bloodstones)
+  acrobatics - dexterity (5 lightning stones)
   blocking (shield) - block  (5 lightning stones)
 
 Enchant Tools:
