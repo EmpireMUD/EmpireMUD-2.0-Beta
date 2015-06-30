@@ -240,7 +240,7 @@ void string_add(descriptor_data *d, char *str) {
 						*GET_ADMIN_NOTES(vict) = '\0';
 					}
 					
-					syslog(SYS_GC, GET_INVIS_LEV(d->character), TRUE, "GC: %s has edited notes for %s", GET_REAL_NAME(d->character), GET_REAL_NAME(vict));
+					syslog(SYS_GC, GET_INVIS_LEV(d->character), TRUE, "GC: %s has edited notes for %s", GET_NAME(d->character), GET_NAME(vict));
 										
 					// save now
 					if (file) {
@@ -265,8 +265,12 @@ void string_add(descriptor_data *d, char *str) {
 			}
 			
 			// d->str is always a copy
-			free(*d->str);
-			free(d->str);
+			if (*d->str) {
+				free(*d->str);
+			}
+			if (d->str) {
+				free(d->str);
+			}
 			d->str = NULL;
 			
 			act("$n stops editing notes.", TRUE, d->character, 0, 0, TO_ROOM);
