@@ -1025,43 +1025,62 @@ ACMD(do_rejuvenate) {
 	char_data *vict = ch;
 	int amount, cost = 25;
 	
-	int heal_levels[] = { 4, 6, 8 };
+	int heal_levels[] = { 4, 6, 8 };	// x6 ticks (24, 36, 42)
+	double int_mod = 0.3333;
+	double over_level_mod = 1.0/12.0;
+	double bonus_heal_mod = 1.0/6.0;
+	double cost_mod[] = { 4.0, 3.0, 2.0 };
 	
 	one_argument(argument, arg);
 	
-	if (!can_use_ability(ch, ABIL_REJUVENATE, MANA, cost, COOLDOWN_REJUVENATE)) {
+	if (!can_use_ability(ch, ABIL_REJUVENATE, MANA, 0, COOLDOWN_REJUVENATE)) {
 		return;
 	}
-	else if (*arg && !(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
+	if (*arg && !(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
-	}
-	else if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_REJUVENATE)) {
 		return;
+	}
+	
+	// amount determines cost
+	amount = CHOOSE_BY_ABILITY_LEVEL(heal_levels, ch, ABIL_REJUVENATE);
+	amount += round(MAX(0, get_approximate_level(ch) - 100) * over_level_mod);
+	amount += round(GET_INTELLIGENCE(ch) * int_mod);
+	
+	cost = round(amount * CHOOSE_BY_ABILITY_LEVEL(cost_mod, ch, ABIL_REJUVENATE));
+	cost = MAX(1, cost);
+	
+	// does not affect the cost
+	amount += round(GET_BONUS_HEALING(ch) * bonus_heal_mod);
+	
+	// run this again but with the cost
+	if (!can_use_ability(ch, ABIL_REJUVENATE, MANA, cost, NOTHING)) {
+		return;
+	}
+	
+	// validated -- check triggers
+	if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_REJUVENATE)) {
+		return;
+	}
+		
+	charge_ability_cost(ch, MANA, cost, COOLDOWN_REJUVENATE, 15);
+	
+	if (ch == vict) {
+		msg_to_char(ch, "You surround yourself with the bright white mana of rejuvenation.\r\n");
+		act("$n surrounds $mself with the bright white mana of rejuvenation.", TRUE, ch, NULL, NULL, TO_ROOM);
 	}
 	else {
-		charge_ability_cost(ch, MANA, cost, COOLDOWN_REJUVENATE, 15);
-		
-		if (ch == vict) {
-			msg_to_char(ch, "You surround yourself with the bright white mana of rejuvenation.\r\n");
-			act("$n surrounds $mself with the bright white mana of rejuvenation.", TRUE, ch, NULL, NULL, TO_ROOM);
-		}
-		else {
-			act("You surround $N with the bright white mana of rejuvenation.", FALSE, ch, NULL, vict, TO_CHAR);
-			act("$n surrounds you with the bright white mana of rejuvenation.", FALSE, ch, NULL, vict, TO_VICT);
-			act("$n surrounds $N with the bright white mana of rejuvenation.", FALSE, ch, NULL, vict, TO_NOTVICT);
-		}
-		
-		amount = CHOOSE_BY_ABILITY_LEVEL(heal_levels, ch, ABIL_REJUVENATE);
-		amount += GET_INTELLIGENCE(ch) / 3;
-		
-		af = create_mod_aff(ATYPE_REJUVENATE, 6, APPLY_HEAL_OVER_TIME, amount);
-		affect_join(vict, af, 0);
-		
-		gain_ability_exp(ch, ABIL_REJUVENATE, 15);
+		act("You surround $N with the bright white mana of rejuvenation.", FALSE, ch, NULL, vict, TO_CHAR);
+		act("$n surrounds you with the bright white mana of rejuvenation.", FALSE, ch, NULL, vict, TO_VICT);
+		act("$n surrounds $N with the bright white mana of rejuvenation.", FALSE, ch, NULL, vict, TO_NOTVICT);
+	}
+	
+	af = create_mod_aff(ATYPE_REJUVENATE, 6, APPLY_HEAL_OVER_TIME, amount);
+	affect_join(vict, af, 0);
+	
+	gain_ability_exp(ch, ABIL_REJUVENATE, 15);
 
-		if (FIGHTING(vict) && !FIGHTING(ch)) {
-			engage_combat(ch, FIGHTING(vict), FALSE);
-		}
+	if (FIGHTING(vict) && !FIGHTING(ch)) {
+		engage_combat(ch, FIGHTING(vict), FALSE);
 	}
 }
 

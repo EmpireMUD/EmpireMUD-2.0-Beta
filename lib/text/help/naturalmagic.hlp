@@ -345,7 +345,9 @@ Cooldown:  15 seconds
 
 By blessing a person with rejuvenation, a nature mage can cause that person's
 wounds to heal themselves over time. This spell heals the target every 5
-seconds until it expires.
+seconds until it expires. The amount rejuvenated depends on your total level,
+your Natural Magic level, and your Intelligence. The cost depends upon the
+amount healed.
 
 If you cast this spell without a target, it will target yourself.
 
