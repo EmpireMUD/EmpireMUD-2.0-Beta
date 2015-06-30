@@ -1946,6 +1946,11 @@ void besiege_room(room_data *to_room, int damage) {
 	if (IS_CITY_CENTER(to_room)) {
 		return;
 	}
+	
+	// start locations are always safezones
+	if (ROOM_SECT_FLAGGED(to_room, SECTF_START_LOCATION)) {
+		return;
+	}
 
 	if (emp) {
 		log_to_empire(emp, ELOG_HOSTILITY, "Building under siege at (%d, %d)", X_COORD(to_room), Y_COORD(to_room));

@@ -125,6 +125,9 @@ ACMD(do_catapult) {
 	else if (IS_CITY_CENTER(to_room)) {
 		msg_to_char(ch, "You can't shoot at a city center.\r\n");
 	}
+	else if (ROOM_SECT_FLAGGED(to_room, SECTF_START_LOCATION)) {
+		msg_to_char(ch, "You can't besiege a starting location.\r\n");
+	}
 	else {
 		if ((e = ROOM_OWNER(to_room)))
 			emp_pol = find_relation(GET_LOYALTY(ch), e);

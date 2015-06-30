@@ -1845,6 +1845,10 @@ RITUAL_SETUP_FUNC(start_siege_ritual) {
 		msg_to_char(ch, "You can't besiege at a city center.\r\n");
 		return FALSE;
 	}
+	if (ROOM_SECT_FLAGGED(to_room, SECTF_START_LOCATION)) {
+		msg_to_char(ch, "You can't besiege a starting location.\r\n");
+		return FALSE;
+	}
 	
 	if ((enemy = ROOM_OWNER(to_room))) {
 		emp_pol = find_relation(GET_LOYALTY(ch), enemy);
