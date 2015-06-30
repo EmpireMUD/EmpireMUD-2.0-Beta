@@ -213,7 +213,13 @@ Practitioners of Natural Magic can learn to heal themselves and others using
 mana. It is easiest to heal one's own self, but a powerful user can heal an
 entire party at once.
 
-If you cast this spell with no target, it will heal yourself.
+If you cast this spell with no target, it will heal yourself. Self-heals cost
+25% less. Healing the whole party costs 50% more.
+
+The size of your heals, and their cost, rises with your level, with your
+Natural Magic level, and with your Intelligence. The Bonus-Healing trait,
+shown as "Healing [+X]" on your score, adds directly to the amount healed, but
+does not increase the cost.
 
 If your target is in combat, you will join the combat upon using this ability.
 #

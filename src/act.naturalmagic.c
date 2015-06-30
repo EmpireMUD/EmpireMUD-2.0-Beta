@@ -703,6 +703,10 @@ ACMD(do_heal) {
 	
 	int heal_levels[] = { 15, 25, 35 };
 	double intel_bonus[] = { 0.5, 1.5, 2.0 };
+	double level_bonus[] = { 0.5, 1.0, 1.5 };
+	double cost_ratio[] = { 0.75, 0.5, 0.25 };	// multiplied by amount healed
+	double party_cost = 1.5;
+	double self_cost = 0.75;
 	
 	one_argument(argument, arg);
 	
@@ -743,19 +747,32 @@ ACMD(do_heal) {
 	
 	// determine cost
 	if (party) {
-		cost = 75;
 		abil = ABIL_HEAL_PARTY;
 		gain = 25;
 	}
 	else if (ch == vict) {
-		cost = 15;
 		abil = ABIL_HEAL;
 	}
 	else {
 		// ch != vict
-		cost = 35;
 		abil = ABIL_HEAL_FRIEND;
 	}
+
+	// amount to heal will determine the cost
+	amount = CHOOSE_BY_ABILITY_LEVEL(heal_levels, ch, abil) + (GET_INTELLIGENCE(ch) * CHOOSE_BY_ABILITY_LEVEL(intel_bonus, ch, abil)) + (MAX(0, get_approximate_level(ch)) * CHOOSE_BY_ABILITY_LEVEL(level_bonus, ch, abil));
+	cost = amount * CHOOSE_BY_ABILITY_LEVEL(cost_ratio, ch, abil);
+	
+	// bonus healing does not add to cost
+	amount += GET_BONUS_HEALING(ch);
+	
+	if (party) {
+		cost = round(cost * party_cost);
+	}
+	else if (ch == vict) {
+		cost = round(cost * self_cost);
+	}
+	
+	cost = MAX(1, cost);
 
 	// cost check	
 	if (!can_use_ability(ch, abil, MANA, cost, NOTHING)) {
@@ -772,9 +789,6 @@ ACMD(do_heal) {
 	
 	// done!
 	charge_ability_cost(ch, MANA, cost, NOTHING, 0);
-	
-	amount = CHOOSE_BY_ABILITY_LEVEL(heal_levels, ch, abil) + (GET_INTELLIGENCE(ch) * CHOOSE_BY_ABILITY_LEVEL(intel_bonus, ch, abil));
-	amount += GET_BONUS_HEALING(ch);
 	
 	if (party) {
 		msg_to_char(ch, "You muster up as much mana as you can and send out a shockwave, healing the entire party!\r\n");
