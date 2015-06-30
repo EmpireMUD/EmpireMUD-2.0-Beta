@@ -606,13 +606,13 @@ int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname) {
 	}
 	
 	// don't let people drop bound items in other people's territory
-	if (OBJ_BOUND_TO(obj) && ROOM_OWNER(IN_ROOM(ch)) && ROOM_OWNER(IN_ROOM(ch)) != GET_LOYALTY(ch)) {
+	if (mode != SCMD_JUNK && OBJ_BOUND_TO(obj) && ROOM_OWNER(IN_ROOM(ch)) && ROOM_OWNER(IN_ROOM(ch)) != GET_LOYALTY(ch)) {
 		msg_to_char(ch, "You can't drop bound items here.\r\n");
 		return -1;
 	}
 	
 	// count items
-	if (need_capacity) {
+	if (mode != SCMD_JUNK && need_capacity) {
 		size = (OBJ_FLAGGED(obj, OBJ_LARGE) ? 2 : 1);
 		if ((size + count_objs_in_room(IN_ROOM(ch))) > config_get_int("room_item_limit")) {
 			msg_to_char(ch, "You can't drop any more items here.\r\n");
