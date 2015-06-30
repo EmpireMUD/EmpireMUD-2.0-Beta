@@ -2350,6 +2350,7 @@ ACMD(do_mint) {
 	else if (GET_ACTION(ch) == ACT_MINTING) {
 		msg_to_char(ch, "You stop minting coins.\r\n");
 		act("$n stops minting coins.", FALSE, ch, NULL, NULL, TO_ROOM);
+		cancel_action(ch);
 	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're busy doing something else right now.\r\n");
