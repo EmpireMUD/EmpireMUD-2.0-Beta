@@ -788,7 +788,9 @@ ACMD(do_heal) {
 	amount = CHOOSE_BY_ABILITY_LEVEL(heal_levels, ch, abil) + (GET_INTELLIGENCE(ch) * CHOOSE_BY_ABILITY_LEVEL(intel_bonus, ch, abil)) + (MAX(0, get_approximate_level(ch)) * CHOOSE_BY_ABILITY_LEVEL(level_bonus, ch, abil));
 	
 	if (vict && !party) {
-		amount = MIN(amount, GET_MAX_HEALTH(vict) - GET_HEALTH(vict));
+		// subtract bonus-healing because it will be re-added at the end
+		amount = MIN(amount, GET_MAX_HEALTH(vict) - GET_HEALTH(vict) - GET_BONUS_HEALING(ch));
+		amount = MAX(1, amount);
 	}
 	
 	cost = amount * CHOOSE_BY_ABILITY_LEVEL(cost_ratio, ch, abil);
