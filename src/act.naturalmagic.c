@@ -37,6 +37,8 @@ extern const int universal_wait;
 
 // external funcs
 extern obj_data *find_obj(int n);
+extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
+extern bool is_fight_enemy(char_data *ch, char_data *frenemy);	// fight.c
 void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, int ability);
 extern bool trigger_counterspell(char_data *ch);	// spells.c
 
@@ -64,6 +66,30 @@ char_data *has_familiar(char_data *ch) {
 	}
 	
 	return found;
+}
+
+
+/**
+* Sends an update to the healer on the status of the healee.
+*
+* @param char_data *healed Person who was healed.
+* @param int amount The amount healed.
+* @param char_data *report_to The person to send the message to (the healer).
+*/
+void report_healing(char_data *healed, int amount, char_data *report_to) {
+	char buf[MAX_STRING_LENGTH];
+	size_t size;
+	
+	size = snprintf(buf, sizeof(buf), "You healed %s for %d (", (healed == report_to) ? "yourself" : PERS(healed, report_to, FALSE), amount);
+	
+	if (is_fight_enemy(healed, report_to) || (IS_NPC(healed) && !is_fight_ally(healed, report_to))) {
+		size += snprintf(buf + size, sizeof(buf) - size, "%.1f%% health).\r\n", (GET_HEALTH(healed) * 100.0 / MAX(1, GET_MAX_HEALTH(healed))));
+	}
+	else {
+		size += snprintf(buf + size, sizeof(buf) - size, "%d/%d health).\r\n", GET_HEALTH(healed), GET_MAX_HEALTH(healed));
+	}
+	
+	msg_to_char(report_to, "%s", buf);
 }
 
 
@@ -705,7 +731,7 @@ ACMD(do_heal) {
 	double intel_bonus[] = { 0.5, 1.5, 2.0 };
 	double level_bonus[] = { 0.5, 1.0, 1.5 };
 	double cost_ratio[] = { 0.75, 0.5, 0.25 };	// multiplied by amount healed
-	double party_cost = 1.5;
+	double party_cost = 1.25;
 	double self_cost = 0.75;
 	
 	one_argument(argument, arg);
@@ -803,6 +829,8 @@ ACMD(do_heal) {
 				if (FIGHTING(ch_iter) && !FIGHTING(ch)) {
 					engage_combat(ch, FIGHTING(ch_iter), FALSE);
 				}
+				
+				report_healing(ch_iter, amount * 0.75, ch);
 			}
 		}
 	}
@@ -823,6 +851,8 @@ ACMD(do_heal) {
 		if (FIGHTING(vict) && !FIGHTING(ch)) {
 			engage_combat(ch, FIGHTING(vict), FALSE);
 		}
+		
+		report_healing(vict, amount, ch);
 	}
 	
 	if (abil != NO_ABIL) {
