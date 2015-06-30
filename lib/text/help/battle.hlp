@@ -122,10 +122,15 @@ ENDURANCE "ENDURANCE BRANCH"
 
 Endurance (Battle ability)
 
-Endurance doubles your health points by teaching you how to properly take a
-blow from your opponent. This is the first step to becoming a tank -- the
-person who holds the enemy's focus in battle, and takes all of the damage while
-his or her friends attack back.
+Endurance teaches you how to properly a blow from your opponent. This is the
+first step to becoming a tank -- the person who holds the enemy's focus in
+battle, and takes all of the damage while his or her friends attack back.
+
+Endurance doubles up to 1000 health points and gives you +25% of any health
+over that 1000. For example, a person who naturally has 2000 health would have
+3250 with Endurance.
+
+See also: TANK
 #
 FINESSE
 
