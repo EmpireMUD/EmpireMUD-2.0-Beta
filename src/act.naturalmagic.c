@@ -1027,7 +1027,7 @@ ACMD(do_rejuvenate) {
 	
 	int heal_levels[] = { 4, 6, 8 };	// x6 ticks (24, 36, 42)
 	double int_mod = 0.3333;
-	double over_level_mod = 1.0/12.0;
+	double over_level_mod = 1.0/6.0;
 	double bonus_heal_mod = 1.0/6.0;
 	double cost_mod[] = { 2.5, 2.0, 1.5 };
 	
