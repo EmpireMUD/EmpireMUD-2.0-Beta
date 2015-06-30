@@ -1046,7 +1046,7 @@ int format_script(struct descriptor_data *d) {
 
 
 void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int maxlen) {
-	int line_chars, cap_next = TRUE, cap_next_next = FALSE;
+	int line_chars, startlen, cap_next = TRUE, cap_next_next = FALSE;
 	char *flow, *start = NULL, temp;
 	char formatted[MAX_STRING_LENGTH];
 
@@ -1092,7 +1092,8 @@ void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int m
 			temp = *flow;
 			*flow = '\0';
 
-			if (line_chars + strlen(start) + 1 > 79) {
+			startlen = strlen(start) - (2 * count_color_codes(start));
+			if (line_chars + startlen + 1 > 79) {
 				strcat(formatted, "\r\n");
 				line_chars = 0;
 			}
@@ -1106,7 +1107,7 @@ void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int m
 				cap_next = FALSE;
 				*start = UPPER(*start);
 			}
-			line_chars += strlen(start);
+			line_chars += startlen;
 			strcat(formatted, start);
 			*flow = temp;
 		}
