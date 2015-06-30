@@ -36,6 +36,7 @@
 #define PARSE_LIST_NORM		5
 #define PARSE_LIST_NUM		6
 #define PARSE_EDIT			7
+#define PARSE_LIST_COLOR	8
 
 /*
  * Defines for the action variable.
@@ -565,6 +566,13 @@ int improved_editor_execute(descriptor_data *d, char *str) {
 			else
 				SEND_TO_Q("Current buffer empty.\r\n", d);
 			break;
+		case 'm': {
+			if (d->str && *d->str)
+				parse_action(PARSE_LIST_COLOR, actions, d);
+			else
+				SEND_TO_Q("Current buffer empty.\r\n", d);
+			break;
+		}
 		case 'n':
 			if (d->str && *d->str)
 				parse_action(PARSE_LIST_NUM, actions, d);
@@ -616,6 +624,7 @@ void parse_action(int command, char *string, descriptor_data *d) {
 				"/fi        - formats text and indents\r\n"
 				"/i# <text> - inserts <text> before line #\r\n"
 				"/l         - lists the buffer\r\n"
+				"/m         - lists the buffer with color\r\n"
 				"/n         - lists the buffer with line numbers\r\n"
 				"/r 'a' 'b' - replaces 1st occurrence of <a> with <b>\r\n"
 				"/ra 'a' 'b'- replaces all occurrences of <a> with <b>\r\n"
@@ -732,7 +741,8 @@ void parse_action(int command, char *string, descriptor_data *d) {
 				return;
 			}
 			break;
-		case PARSE_LIST_NORM:
+		case PARSE_LIST_NORM:	// pass-thru
+		case PARSE_LIST_COLOR: {
 			*buf = '\0';
 			if (*string)
 				switch(sscanf(string, " %d - %d ", &line_low, &line_high)) {
@@ -788,8 +798,9 @@ void parse_action(int command, char *string, descriptor_data *d) {
 			else
 				strcat(buf, t);
 			sprintf(buf + strlen(buf), "\r\n%d line%sshown.\r\n", total_len, total_len != 1 ? "s " : " ");
-			page_string(d, show_color_codes(buf), TRUE);
+			page_string(d, (command == PARSE_LIST_COLOR) ? buf : show_color_codes(buf), TRUE);
 			break;
+		}
 		case PARSE_LIST_NUM:
 			*buf = '\0';
 			if (*string)
