@@ -361,7 +361,13 @@ void cancel_tanning(char_data *ch) {
 void start_chopping(char_data *ch) {
 	int chop_timer = config_get_int("chop_timer");
 	
-	if (CAN_CHOP_ROOM(IN_ROOM(ch))) {
+	if (!ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE) && !can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
+		msg_to_char(ch, "You don't have permission to chop here.\r\n");
+	}
+	else if (!CAN_CHOP_ROOM(IN_ROOM(ch))) {
+		msg_to_char(ch, "There's nothing left here to chop.\r\n");
+	}
+	else {
 		start_action(ch, ACT_CHOPPING, 0, 0);
 
 		// ensure progress data is set up
@@ -371,9 +377,6 @@ void start_chopping(char_data *ch) {
 		
 		send_to_char("You swing back your axe and prepare to chop...\r\n", ch);
 		act("$n swings $s axe over $s shoulder.", TRUE, ch, 0, 0, TO_ROOM);
-	}
-	else {
-		msg_to_char(ch, "There's nothing left here to chop.\r\n");
 	}
 }
 
@@ -2086,7 +2089,7 @@ ACMD(do_chop) {
 	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_HAS_INSTANCE)) {
 		msg_to_char(ch, "You can't chop here.\r\n");
 	}
-	else if (!ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE) && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+	else if (!ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE) && !can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
 		msg_to_char(ch, "You don't have permission to chop down trees here.\r\n");
 	}
 	else if (!ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE) && !has_permission(ch, PRIV_CHOP)) {
