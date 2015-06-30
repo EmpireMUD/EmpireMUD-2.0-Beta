@@ -264,8 +264,8 @@ void string_add(descriptor_data *d, char *str) {
 				SEND_TO_Q("Edit aborted.\r\n", d);
 			}
 			
-			// d->str is always a copy
-			if (*d->str) {
+			// d->str is always a copy; may have been freed already
+			if (d->str && *d->str) {
 				free(*d->str);
 			}
 			if (d->str) {
