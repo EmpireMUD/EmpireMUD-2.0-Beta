@@ -777,7 +777,7 @@ ACMD(do_slash_channel) {
 		any_one_arg(arg2, arg3);
 		
 		// validate name
-		ok = TRUE;
+		ok = TRUE && *arg3;
 		for (iter = 0; ok && *invalid_channel_names[iter] != '\n'; ++iter) {
 			if (!str_cmp(arg3, invalid_channel_names[iter])) {
 				ok = FALSE;
