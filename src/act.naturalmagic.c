@@ -1029,7 +1029,7 @@ ACMD(do_rejuvenate) {
 	double int_mod = 0.3333;
 	double over_level_mod = 1.0/4.0;
 	double bonus_heal_mod = 1.0/4.0;
-	double cost_mod[] = { 2.5, 2.0, 1.5 };
+	double cost_mod[] = { 2.0, 1.5, 1.1 };
 	
 	one_argument(argument, arg);
 	
