@@ -417,11 +417,6 @@ void real_update_char(char_data *ch) {
 	int result, iter, type;
 	int fol_count, gain;
 	
-	// heal-per-5 ? (stops at 0 health or incap)
-	if (GET_HEAL_OVER_TIME(ch) > 0 && !IS_DEAD(ch) && GET_POS(ch) >= POS_SLEEPING && GET_HEALTH(ch) > 0) {
-		heal(ch, ch, GET_HEAL_OVER_TIME(ch));
-	}
-	
 	// update affects (NPCs get this, too)
 	for (af = ch->affected; af; af = next_af) {
 		next_af = af->next;
@@ -445,6 +440,11 @@ void real_update_char(char_data *ch) {
 			
 			affect_remove(ch, af);
 		}
+	}
+	
+	// heal-per-5 ? (stops at 0 health or incap)
+	if (GET_HEAL_OVER_TIME(ch) > 0 && !IS_DEAD(ch) && GET_POS(ch) >= POS_SLEEPING && GET_HEALTH(ch) > 0) {
+		heal(ch, ch, GET_HEAL_OVER_TIME(ch));
 	}
 
 	// update DoTs (NPCs get this, too)
