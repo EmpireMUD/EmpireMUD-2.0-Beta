@@ -532,7 +532,7 @@ ACMD(do_dismiss) {
 	if (!*arg) {
 		msg_to_char(ch, "Dismiss whom?\r\n");
 	}
-	else if (!strn_cmp(argument, "famil", 5) && is_abbrev(argument, "familiar")) {
+	else if (!strn_cmp(arg, "famil", 5) && is_abbrev(arg, "familiar")) {
 		// requires abbrev of at least "famil"
 		if (!(vict = has_familiar(ch))) {
 			msg_to_char(ch, "You do not have a familiar to dismiss.\r\n");
