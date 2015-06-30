@@ -785,7 +785,7 @@ ACMD(do_heal) {
 	}
 
 	// amount to heal will determine the cost
-	amount = CHOOSE_BY_ABILITY_LEVEL(heal_levels, ch, abil) + (GET_INTELLIGENCE(ch) * CHOOSE_BY_ABILITY_LEVEL(intel_bonus, ch, abil)) + (MAX(0, get_approximate_level(ch)) * CHOOSE_BY_ABILITY_LEVEL(level_bonus, ch, abil));
+	amount = CHOOSE_BY_ABILITY_LEVEL(heal_levels, ch, abil) + (GET_INTELLIGENCE(ch) * CHOOSE_BY_ABILITY_LEVEL(intel_bonus, ch, abil)) + (MAX(0, get_approximate_level(ch) - 100) * CHOOSE_BY_ABILITY_LEVEL(level_bonus, ch, abil));
 	
 	if (vict && !party) {
 		// subtract bonus-healing because it will be re-added at the end
