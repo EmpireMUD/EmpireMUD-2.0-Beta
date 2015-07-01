@@ -784,6 +784,13 @@ ACMD(do_slash_channel) {
 			}
 		}
 		
+		// check alphanumeric
+		for (iter = 0; ok && iter < strlen(arg3); ++iter) {
+			if (!isalnum(arg3[iter])) {
+				ok = FALSE;
+			}
+		}
+		
 		if (!ok || strlen(arg3) >= MAX_SLASH_CHANNEL_NAME_LENGTH) {
 			msg_to_char(ch, "Invalid channel name.\r\n");
 			return;
