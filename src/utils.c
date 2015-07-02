@@ -38,6 +38,7 @@
 *   Interpreter Utils
 *   Mobile Utils
 *   Object Utils
+*   Player Utils
 *   Resource Utils
 *   Sector Utils
 *   String Utils
@@ -1999,8 +2000,63 @@ double rate_item(obj_data *obj) {
 
 
  //////////////////////////////////////////////////////////////////////////////
-//// RESOURCE UTILS //////////////////////////////////////////////////////////
+//// PLAYER UTILS ////////////////////////////////////////////////////////////
 
+/**
+* Gives a character the appropriate amount of command lag (wait time).
+*
+* @param char_data *ch The person to give command lag to.
+* @param int wait_type A WAIT_x const to help determine wait time.
+*/
+void command_lag(char_data *ch, int wait_type) {
+	extern const int universal_wait;
+	
+	double val;
+	int wait;
+	
+	// short-circuit
+	if (wait_type == WAIT_NONE) {
+		return;
+	}
+	
+	// base
+	wait = universal_wait;
+	
+	switch (wait_type) {
+		case WAIT_SPELL: {	// spells (but not combat spells)
+			if (HAS_ABILITY(ch, ABIL_FASTCASTING)) {
+				val = 0.3333 * GET_WITS(ch);
+				wait -= MAX(0, val) RL_SEC;
+				
+				// ensure minimum of 0.5 seconds
+				wait = MAX(wait, 0.5 RL_SEC);
+			}
+			break;
+		}
+		case WAIT_MOVEMENT: {	// normal movement (special handling)
+			if (AFF_FLAGGED(ch, AFF_SLOW)) {
+				wait = 1 RL_SEC;
+			}
+			else if (!IS_RIDING(ch) && IS_OUTDOORS(ch) && !IS_ROAD(IN_ROOM(ch))) {
+				if (HAS_BONUS_TRAIT(ch, BONUS_FASTER)) {
+					wait = 0.25 RL_SEC;
+				}
+				else {
+					wait = 0.5 RL_SEC;
+				}
+			}
+			break;
+		}
+	}
+	
+	if (GET_WAIT_STATE(ch) < wait) {
+		GET_WAIT_STATE(ch) = wait;
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// RESOURCE UTILS //////////////////////////////////////////////////////////
 
 /**
 * Extract resources from the list, hopefully having checked has_resources, as

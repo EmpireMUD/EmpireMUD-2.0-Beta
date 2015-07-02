@@ -1628,7 +1628,7 @@ ACMD(do_barde) {
 					act("$n straps heavy armor onto $N.", FALSE, ch, NULL, mob, TO_NOTVICT);
 					
 					gain_ability_exp(ch, ABIL_BARDE, 50);
-					WAIT_STATE(ch, 2 RL_SEC);
+					command_lag(ch, WAIT_ABILITY);
 					found = TRUE;
 				}
 				
@@ -3381,7 +3381,7 @@ ACMD(do_inspire) {
 			appear(ch);
 		}
 		
-		charge_ability_cost(ch, MOVE, cost, NOTHING, 0);
+		charge_ability_cost(ch, MOVE, cost, NOTHING, 0, WAIT_ABILITY);
 		
 		msg_to_char(ch, "You give a powerful speech about %s.\r\n", inspire_data[type].name);
 		sprintf(buf, "$n gives a powerful speech about %s.", inspire_data[type].name);
@@ -3556,7 +3556,7 @@ ACMD(do_radiance) {
 		
 		msg_to_char(ch, "You project a radiant aura!\r\n");
 		act("$n projects a radiant aura!", TRUE, ch, NULL, NULL, TO_ROOM);
-		WAIT_STATE(ch, 1 RL_SEC);
+		command_lag(ch, WAIT_ABILITY);
 	}
 }
 
@@ -3737,7 +3737,7 @@ ACMD(do_reward) {
 			act("You have already rewarded $N today.", FALSE, ch, NULL, vict, TO_CHAR);
 		}
 		else {
-			charge_ability_cost(ch, NOTHING, 0, COOLDOWN_REWARD, 30);
+			charge_ability_cost(ch, NOTHING, 0, COOLDOWN_REWARD, 30, WAIT_ABILITY);
 			
 			act("You reward $N with extra bonus experience!", FALSE, ch, NULL, vict, TO_CHAR);
 			act("$n rewards you with extra bonus experience!", FALSE, ch, NULL, vict, TO_VICT);

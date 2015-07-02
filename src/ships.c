@@ -494,8 +494,9 @@ ACMD(do_board) {
 				greet_mtrigger(k->follower, NO_DIR);
 				greet_memory_mtrigger(k->follower);
 			}
-		if (BUILDING_VNUM(was_in) != BUILDING_DOCKS)
-			WAIT_STATE(ch, 2 RL_SEC);
+		if (BUILDING_VNUM(was_in) != BUILDING_DOCKS) {
+			command_lag(ch, WAIT_OTHER);
+		}
 	}
 }
 
@@ -563,8 +564,9 @@ ACMD(do_disembark) {
 				greet_mtrigger(k->follower, NO_DIR);
 				greet_memory_mtrigger(k->follower);
 			}
-		if (BUILDING_VNUM(IN_ROOM(ch)) != BUILDING_DOCKS)
-			WAIT_STATE(ch, 2 RL_SEC);
+		if (BUILDING_VNUM(IN_ROOM(ch)) != BUILDING_DOCKS) {
+			command_lag(ch, WAIT_OTHER);
+		}
 	}
 }
 
@@ -764,7 +766,7 @@ ACMD(do_sail) {
 	
 	// looking at the room you're in while on a ship shows the surrounding area
 	look_at_room_by_loc(ch, IN_ROOM(ch), NOBITS);
-	WAIT_STATE(ch, 1 RL_SEC);
+	command_lag(ch, WAIT_OTHER);
 }
 
 

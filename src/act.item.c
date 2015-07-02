@@ -676,7 +676,8 @@ static void perform_drop_coins(char_data *ch, empire_data *type, int amount, byt
 	}
 	else {
 		if (mode != SCMD_JUNK) {
-			WAIT_STATE(ch, 2 RL_SEC); /* to prevent coin-bombing */
+			/* to prevent coin-bombing */
+			command_lag(ch, WAIT_OTHER);
 			obj = create_money(type, amount);
 
 			if (!drop_wtrigger(obj, ch)) {
@@ -3220,7 +3221,7 @@ ACMD(do_identify) {
 		msg_to_char(ch, "You see nothing like that here.\r\n");
 	}
 	else {
-		charge_ability_cost(ch, NOTHING, 0, NOTHING, 0);
+		charge_ability_cost(ch, NOTHING, 0, NOTHING, 0, WAIT_OTHER);
 		identify_obj_to_char(obj, ch);
 	}
 }
@@ -3353,7 +3354,7 @@ ACMD(do_light) {
 		empty_obj_before_extract(obj);
 		run_interactions(ch, obj->interactions, INTERACT_LIGHT, IN_ROOM(ch), NULL, obj, light_obj_interact);
 		extract_obj(obj);
-		WAIT_STATE(ch, 1 RL_SEC);
+		command_lag(ch, WAIT_OTHER);
 	}
 }
 

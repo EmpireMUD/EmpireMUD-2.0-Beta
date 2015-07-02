@@ -961,7 +961,7 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 
 		if (ch != i && i->carrying) {
 			gain_ability_exp(ch, ABIL_APPRAISAL, 5);
-			WAIT_STATE(ch, 0.5 RL_SEC);
+			GET_WAIT_STATE(ch) = MAX(GET_WAIT_STATE(ch), 0.5 RL_SEC);
 		}
 	}
 }

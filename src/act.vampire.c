@@ -31,7 +31,6 @@
 */
 
 // external vars
-extern const int universal_wait;
 
 // external funcs
 extern bool check_scaling(char_data *mob, char_data *based_on);
@@ -409,7 +408,7 @@ void taste_blood(char_data *ch, char_data *vict) {
 		sprintf(buf, "$E is about %d years old.", GET_AGE(vict) + number(-1, 1));
 		act(buf, FALSE, ch, 0, vict, TO_CHAR);
 		
-		WAIT_STATE(ch, universal_wait);
+		command_lag(ch, WAIT_ABILITY);
 		gain_ability_exp(ch, ABIL_TASTE_BLOOD, 20);
 	}
 }
@@ -609,7 +608,7 @@ void update_vampire_sun(char_data *ch) {
 	
 	// lastly
 	if (found) {
-		WAIT_STATE(ch, universal_wait);
+		command_lag(ch, WAIT_ABILITY);
 	}
 }
 
@@ -623,7 +622,7 @@ ACMD(do_alacrity) {
 	
 	if (affected_by_spell(ch, ATYPE_ALACRITY)) {
 		end_alacrity(ch);
-		WAIT_STATE(ch, universal_wait);
+		command_lag(ch, WAIT_OTHER);
 		return;
 	}
 	
@@ -647,7 +646,7 @@ ACMD(do_alacrity) {
 	af = create_flag_aff(ATYPE_ALACRITY, UNLIMITED, AFF_HASTE);
 	affect_join(ch, af, 0);
 
-	charge_ability_cost(ch, BLOOD, cost, NOTHING, 0);
+	charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
 	gain_ability_exp(ch, ABIL_ALACRITY, 20);
 }
 
@@ -719,7 +718,8 @@ ACMD(do_bite) {
 					act("You lunge at $N, but $E dodges you!", FALSE, ch, 0, victim, TO_CHAR);
 					act("$n lunges at $N, but $E dodges it!", FALSE, ch, 0, victim, TO_NOTVICT);
 					act("$n lunges at you, but you dodge $m!", FALSE, ch, 0, victim, TO_VICT);
-					WAIT_STATE(ch, universal_wait);
+					
+					command_lag(ch, WAIT_COMBAT_ABILITY);
 					if (!FIGHTING(victim)) {
 						hit(victim, ch, GET_EQ(victim, WEAR_WIELD), FALSE);
 					}
@@ -779,7 +779,7 @@ ACMD(do_bloodsweat) {
 		}
 		
 		// ok go
-		charge_ability_cost(ch, BLOOD, cost, COOLDOWN_BLOODSWEAT, 30);
+		charge_ability_cost(ch, BLOOD, cost, COOLDOWN_BLOODSWEAT, 30, WAIT_ABILITY);
 		msg_to_char(ch, "You sweat blood through your pores, and poison with it!\r\n");
 		act("$n begins sweating blood.", TRUE, ch, NULL, NULL, TO_ROOM);
 	}
@@ -817,7 +817,7 @@ ACMD(do_bloodsword) {
 		}
 	}
 	
-	charge_ability_cost(ch, BLOOD, cost, NOTHING, 0);
+	charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
 	obj = read_object(o_BLOODSWORD);
 	
 	if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
@@ -875,7 +875,7 @@ ACMD(do_boost) {
 			af = create_mod_aff(ATYPE_BOOST, 3 MUD_HOURS, APPLY_STRENGTH, 1 + (skill_check(ch, ABIL_BOOST, DIFF_HARD) ? 1 : 0));
 			affect_join(ch, af, AVG_DURATION | ADD_MODIFIER);
 
-			charge_ability_cost(ch, BLOOD, cost, NOTHING, 0);
+			charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
 
 			msg_to_char(ch, "You force blood into your muscles, boosting your strength!\r\n");
 			gain_ability_exp(ch, ABIL_BOOST, 20);
@@ -894,7 +894,7 @@ ACMD(do_boost) {
 			af = create_mod_aff(ATYPE_BOOST, 3 MUD_HOURS, APPLY_DEXTERITY, 1 + (skill_check(ch, ABIL_BOOST, DIFF_HARD) ? 1 : 0));
 			affect_join(ch, af, AVG_DURATION | ADD_MODIFIER);
 
-			charge_ability_cost(ch, BLOOD, cost, NOTHING, 0);
+			charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
 
 			msg_to_char(ch, "You focus your blood, increasing your dexterity!\r\n");
 			gain_ability_exp(ch, ABIL_BOOST, 20);
@@ -912,7 +912,7 @@ ACMD(do_claws) {
 	
 	if (affected_by_spell(ch, ATYPE_CLAWS)) {
 		retract_claws(ch);
-		WAIT_STATE(ch, universal_wait);
+		command_lag(ch, WAIT_OTHER);
 		return;
 	}
 	
@@ -948,7 +948,7 @@ ACMD(do_claws) {
 	af = create_flag_aff(ATYPE_CLAWS, UNLIMITED, AFF_CLAWS);
 	affect_join(ch, af, 0);
 
-	charge_ability_cost(ch, BLOOD, cost, NOTHING, 0);
+	charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
 	gain_ability_exp(ch, ABIL_CLAWS, 20);
 }
 
@@ -1023,7 +1023,7 @@ ACMD(do_command) {
 			}
 		}
 		
-		WAIT_STATE(ch, universal_wait);
+		command_lag(ch, WAIT_ABILITY);
 	}
 }
 
@@ -1040,7 +1040,7 @@ ACMD(do_deathshroud) {
 	}
 	else if (affected_by_spell(ch, ATYPE_DEATHSHROUD)) {
 		un_deathshroud(ch);
-		WAIT_STATE(ch, universal_wait);
+		command_lag(ch, WAIT_OTHER);
 	}
 	else if (!check_vampire_ability(ch, ABIL_DEATHSHROUD, BLOOD, cost, NOTHING)) {
 		return;
@@ -1064,7 +1064,7 @@ ACMD(do_deathshroud) {
 		affect_join(ch, af, 0);
 
 		GET_POS(ch) = POS_SLEEPING;
-		charge_ability_cost(ch, BLOOD, cost, NOTHING, 0);
+		charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
 		gain_ability_exp(ch, ABIL_DEATHSHROUD, 50);
 	}
 }
@@ -1128,7 +1128,7 @@ ACMD(do_majesty) {
 		affect_join(ch, af, 0);
 	}
 	
-	WAIT_STATE(ch, universal_wait);
+	command_lag(ch, WAIT_ABILITY);
 }
 
 
@@ -1141,7 +1141,7 @@ ACMD(do_mummify) {
 	}
 	else if (affected_by_spell(ch, ATYPE_MUMMIFY)) {
 		un_mummify(ch);
-		WAIT_STATE(ch, universal_wait);
+		command_lag(ch, WAIT_OTHER);
 	}
 	else if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs cannot mummify.\r\n");
@@ -1164,7 +1164,7 @@ ACMD(do_mummify) {
 		msg_to_char(ch, "Your flesh hardens as you mummify yourself!\r\n");
 		act("$n's flesh hardens and $e falls to the ground!", TRUE, ch, 0, 0, TO_ROOM);
 		GET_POS(ch) = POS_SLEEPING;
-		charge_ability_cost(ch, BLOOD, cost, NOTHING, 0);
+		charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
 
 		af = create_aff(ATYPE_MUMMIFY, -1, APPLY_NONE, 0, AFF_IMMUNE_PHYSICAL | AFF_MUMMIFY | AFF_NO_ATTACK);
 		affect_join(ch, af, 0);
@@ -1292,7 +1292,7 @@ ACMD(do_regenerate) {
 		return;
 	}
 	
-	charge_ability_cost(ch, BLOOD, cost, NOTHING, 0);
+	charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
 	
 	if (skill_check(ch, ABIL_REGENERATE, DIFF_EASY)) {
 		switch (mode) {
@@ -1321,7 +1321,7 @@ ACMD(do_regenerate) {
 	}
 	
 	gain_ability_exp(ch, ABIL_REGENERATE, 15);
-	WAIT_STATE(ch, universal_wait);
+	command_lag(ch, WAIT_ABILITY);
 }
 
 
@@ -1365,7 +1365,7 @@ ACMD(do_soulmask) {
 	if (affected_by_spell(ch, ATYPE_SOULMASK)) {
 		msg_to_char(ch, "You turn off your soulmask.\r\n");
 		affect_from_char(ch, ATYPE_SOULMASK);
-		WAIT_STATE(ch, universal_wait);
+		command_lag(ch, WAIT_OTHER);
 		return;
 	}
 	else if (!check_vampire_ability(ch, ABIL_SOULMASK, NOTHING, 0, NOTHING)) {
@@ -1385,7 +1385,7 @@ ACMD(do_soulmask) {
 		msg_to_char(ch, "You conceal your magical aura!\r\n");
 		
 		gain_ability_exp(ch, ABIL_SOULMASK, 33.4);
-		WAIT_STATE(ch, universal_wait);
+		command_lag(ch, WAIT_ABILITY);
 	}
 }
 
@@ -1432,7 +1432,7 @@ ACMD(do_veintap) {
 
 		amt = MIN(amt, GET_DRINK_CONTAINER_CAPACITY(container) - GET_DRINK_CONTAINER_CONTENTS(container));
 
-		charge_ability_cost(ch, BLOOD, amt, NOTHING, 0);
+		charge_ability_cost(ch, BLOOD, amt, NOTHING, 0, WAIT_ABILITY);
 		GET_OBJ_VAL(container, VAL_DRINK_CONTAINER_CONTENTS) += amt;
 		GET_OBJ_VAL(container, VAL_DRINK_CONTAINER_TYPE) = LIQ_BLOOD;
 		
@@ -1474,7 +1474,7 @@ ACMD(do_weaken) {
 			appear(ch);
 		}
 
-		charge_ability_cost(ch, BLOOD, cost, COOLDOWN_WEAKEN, SECS_PER_MUD_HOUR);
+		charge_ability_cost(ch, BLOOD, cost, COOLDOWN_WEAKEN, SECS_PER_MUD_HOUR, WAIT_COMBAT_ABILITY);
 
 		act("You spread your dead blood on $N...", FALSE, ch, 0, victim, TO_CHAR);
 		act("$n spreads $s cold, dead blood on you...", FALSE, ch, 0, victim, TO_VICT);

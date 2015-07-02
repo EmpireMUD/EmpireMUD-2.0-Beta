@@ -566,7 +566,7 @@ ACMD(do_morph) {
 		if (fighting) {
 			// insta-morph!
 			finish_morphing(ch, morph_to);
-			WAIT_STATE(ch, 4 RL_SEC);
+			command_lag(ch, WAIT_OTHER);
 		}
 		else {
 			start_action(ch, ACT_MORPHING, config_get_int("morph_timer"), ACT_ANYWHERE);

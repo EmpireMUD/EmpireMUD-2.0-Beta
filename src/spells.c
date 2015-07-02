@@ -34,7 +34,6 @@
 */
 
 // external vars
-extern const int universal_wait;
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -171,7 +170,7 @@ ACMD(do_damage_spell) {
 		dmg *= 2;
 	}
 	
-	charge_ability_cost(ch, MANA, cost, damage_spell[type].cooldown_type, damage_spell[type].cooldown_time);
+	charge_ability_cost(ch, MANA, cost, damage_spell[type].cooldown_type, damage_spell[type].cooldown_time, WAIT_COMBAT_SPELL);
 	
 	if (SHOULD_APPEAR(ch)) {
 		appear(ch);
@@ -511,5 +510,5 @@ ACMD(do_ready) {
 
 	load_otrigger(obj);
 	
-	WAIT_STATE(ch, universal_wait);
+	command_lag(ch, WAIT_SPELL);
 }

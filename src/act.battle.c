@@ -31,7 +31,6 @@
 */
 
 // external vars
-extern const int universal_wait;
 
 // external functions
 extern bool check_hit_vs_dodge(char_data *attacker, char_data *victim, bool off_hand);	// fight.c
@@ -113,7 +112,7 @@ ACMD(do_bash) {
 		return;
 	}
 	
-	charge_ability_cost(ch, MOVE, cost, COOLDOWN_BASH, 9);
+	charge_ability_cost(ch, MOVE, cost, COOLDOWN_BASH, 9, WAIT_COMBAT_ABILITY);
 
 	// determine hit
 	success = IS_SPECIALTY_ABILITY(ch, ABIL_BASH) || check_hit_vs_dodge(ch, vict, FALSE);
@@ -187,7 +186,7 @@ ACMD(do_disarm) {
 			appear(ch);
 		}
 		
-		charge_ability_cost(ch, MOVE, cost, COOLDOWN_DISARM, 30);
+		charge_ability_cost(ch, MOVE, cost, COOLDOWN_DISARM, 30, WAIT_COMBAT_ABILITY);
 		
 		if (!skill_check(ch, ABIL_DISARM, DIFF_HARD) || AFF_FLAGGED(victim, AFF_IMMUNE_BATTLE)) {
 			act("You attempt to disarm $N, but fail.", FALSE, ch, 0, victim, TO_CHAR);
@@ -247,7 +246,7 @@ ACMD(do_firstaid) {
 		return;
 	}
 	
-	charge_ability_cost(ch, MOVE, cost, NOTHING, 0);
+	charge_ability_cost(ch, MOVE, cost, NOTHING, 0, WAIT_ABILITY);
 	
 	if (ch == vict) {
 		msg_to_char(ch, "You apply first aid to your wounds.\r\n");
@@ -270,7 +269,7 @@ ACMD(do_firstaid) {
 	
 	heal(ch, vict, CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_FIRSTAID) + GET_BONUS_HEALING(ch));
 	gain_ability_exp(ch, ABIL_FIRSTAID, 15);
-	WAIT_STATE(ch, 2 RL_SEC);	// plus universal
+	GET_WAIT_STATE(ch) += 2 RL_SEC;	// plus normal command_lag
 }
 
 
@@ -305,7 +304,7 @@ ACMD(do_heartstop) {
 			appear(ch);
 		}
 		
-		charge_ability_cost(ch, MOVE, cost, COOLDOWN_HEARTSTOP, 30);
+		charge_ability_cost(ch, MOVE, cost, COOLDOWN_HEARTSTOP, 30, WAIT_COMBAT_ABILITY);
 
 		act("You grab $N and press hard against $S throat...", FALSE, ch, 0, victim, TO_CHAR);
 		act("$n grabs you and presses hard against your throat...", FALSE, ch, 0, victim, TO_VICT);
@@ -366,7 +365,7 @@ ACMD(do_kick) {
 		return;
 	}
 	
-	charge_ability_cost(ch, MOVE, cost, COOLDOWN_KICK, 6);
+	charge_ability_cost(ch, MOVE, cost, COOLDOWN_KICK, 6, WAIT_COMBAT_ABILITY);
 	
 	// determine hit
 	success = IS_SPECIALTY_ABILITY(ch, ABIL_KICK) || check_hit_vs_dodge(ch, vict, FALSE);
@@ -409,7 +408,7 @@ ACMD(do_outrage) {
 			appear(ch);
 		}
 		
-		charge_ability_cost(ch, MOVE, base_cost, COOLDOWN_OUTRAGE, 9);
+		charge_ability_cost(ch, MOVE, base_cost, COOLDOWN_OUTRAGE, 9, WAIT_COMBAT_ABILITY);
 		
 		msg_to_char(ch, "You spin wildly with outrage, hitting everything in sight!\r\n");
 		act("$n spins wildly with outrage, hitting everything in sight!", FALSE, ch, NULL, NULL, TO_ROOM);
@@ -469,7 +468,7 @@ ACMD(do_rescue) {
 				return;
 			}
 
-			charge_ability_cost(ch, MOVE, cost, COOLDOWN_RESCUE, 6);
+			charge_ability_cost(ch, MOVE, cost, COOLDOWN_RESCUE, 6, WAIT_COMBAT_ABILITY);
 			perform_rescue(ch, FIGHTING(vict), vict);
 			gain_ability_exp(ch, ABIL_RESCUE, 15);
 			break;
@@ -519,7 +518,7 @@ ACMD(do_rescue) {
 		return;
 	}
 
-	charge_ability_cost(ch, MOVE, cost, COOLDOWN_RESCUE, 6);
+	charge_ability_cost(ch, MOVE, cost, COOLDOWN_RESCUE, 6, WAIT_COMBAT_ABILITY);
 	perform_rescue(ch, vict, tmp_ch);
 	gain_ability_exp(ch, ABIL_RESCUE, 15);
 }

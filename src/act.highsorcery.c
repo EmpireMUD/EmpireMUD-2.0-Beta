@@ -35,7 +35,6 @@
 */
 
 // external vars
-extern const int universal_wait;
 
 // external funcs
 extern bool trigger_counterspell(char_data *ch);	// spells.c
@@ -593,7 +592,7 @@ void summon_materials(char_data *ch, char *argument) {
 		}
 	}
 	
-	WAIT_STATE(ch, universal_wait);
+	command_lag(ch, WAIT_OTHER);
 }
 
 
@@ -640,7 +639,7 @@ ACMD(do_collapse) {
 	}
 
 	// do it
-	charge_ability_cost(ch, MANA, cost, NOTHING, 0);
+	charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
 	
 	act("You grab $p and draw it shut!", FALSE, ch, portal, NULL, TO_CHAR);
 	act("$n grabs $p and draws it shut!", FALSE, ch, portal, NULL, TO_ROOM);
@@ -695,7 +694,7 @@ ACMD(do_colorburst) {
 		return;
 	}
 	
-	charge_ability_cost(ch, MANA, CHOOSE_BY_ABILITY_LEVEL(costs, ch, ABIL_COLORBURST), COOLDOWN_COLORBURST, 30);
+	charge_ability_cost(ch, MANA, CHOOSE_BY_ABILITY_LEVEL(costs, ch, ABIL_COLORBURST), COOLDOWN_COLORBURST, 30, WAIT_COMBAT_SPELL);
 	
 	if (SHOULD_APPEAR(ch)) {
 		appear(ch);
@@ -750,7 +749,7 @@ ACMD(do_disenchant) {
 		act("$p is not even enchanted.", FALSE, ch, obj, NULL, TO_CHAR);
 	}
 	else {
-		charge_ability_cost(ch, MANA, cost, NOTHING, 0);
+		charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
 		REMOVE_BIT(GET_OBJ_EXTRA(obj), OBJ_ENCHANTED | OBJ_SUPERIOR);
 		proto = obj_proto(GET_OBJ_VNUM(obj));
 		
@@ -830,7 +829,7 @@ ACMD(do_dispel) {
 			return;
 		}
 	
-		charge_ability_cost(ch, MANA, cost, COOLDOWN_DISPEL, 9);
+		charge_ability_cost(ch, MANA, cost, COOLDOWN_DISPEL, 9, WAIT_SPELL);
 		
 		if (ch == vict) {
 			msg_to_char(ch, "You shout 'KA!' and dispel your afflictions.\r\n");
@@ -986,7 +985,7 @@ ACMD(do_enchant) {
 		}
 		gain_ability_exp(ch, ABIL_GREATER_ENCHANTMENTS, 50);
 		
-		WAIT_STATE(ch, universal_wait);
+		command_lag(ch, WAIT_ABILITY);
 	}
 }
 
@@ -1027,7 +1026,7 @@ ACMD(do_enervate) {
 		return;
 	}
 	
-	charge_ability_cost(ch, MANA, cost, COOLDOWN_ENERVATE, SECS_PER_MUD_HOUR);
+	charge_ability_cost(ch, MANA, cost, COOLDOWN_ENERVATE, SECS_PER_MUD_HOUR, WAIT_COMBAT_SPELL);
 	
 	if (SHOULD_APPEAR(ch)) {
 		appear(ch);
@@ -1077,7 +1076,7 @@ ACMD(do_foresight) {
 		return;
 	}
 	else {
-		charge_ability_cost(ch, MANA, cost, NOTHING, 0);
+		charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
 		
 		if (ch == vict) {
 			msg_to_char(ch, "You pull out a grease pencil and mark each of your eyelids with an X...\r\nYou feel the gift of foresight!\r\n");
@@ -1122,7 +1121,7 @@ ACMD(do_manashield) {
 		return;
 	}
 	else {
-		charge_ability_cost(ch, MANA, cost, NOTHING, 0);
+		charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
 		
 		msg_to_char(ch, "You pull out a grease pencil and draw a series of arcane symbols down your left arm...\r\nYou feel yourself shielded by your mana!\r\n");
 		act("$n pulls out a grease pencil and draws a series of arcane symbols down $s left arm.", TRUE, ch, NULL, NULL, TO_ROOM);
@@ -1165,7 +1164,7 @@ ACMD(do_mirrorimage) {
 		return;
 	}
 	
-	charge_ability_cost(ch, MANA, cost, COOLDOWN_MIRRORIMAGE, 5 * SECS_PER_REAL_MIN);
+	charge_ability_cost(ch, MANA, cost, COOLDOWN_MIRRORIMAGE, 5 * SECS_PER_REAL_MIN, WAIT_COMBAT_SPELL);
 	mob = read_mobile(vnum);
 	
 	// scale mob to the summoner -- so it won't change its attributes later
@@ -1362,7 +1361,7 @@ ACMD(do_siphon) {
 		return;
 	}
 	
-	charge_ability_cost(ch, MANA, cost, COOLDOWN_SIPHON, 20);
+	charge_ability_cost(ch, MANA, cost, COOLDOWN_SIPHON, 20, WAIT_COMBAT_SPELL);
 	
 	if (SHOULD_APPEAR(ch)) {
 		appear(ch);
@@ -1430,7 +1429,7 @@ ACMD(do_slow) {
 		return;
 	}
 	
-	charge_ability_cost(ch, MANA, cost, COOLDOWN_SLOW, 75);
+	charge_ability_cost(ch, MANA, cost, COOLDOWN_SLOW, 75, WAIT_COMBAT_SPELL);
 	
 	if (SHOULD_APPEAR(ch)) {
 		appear(ch);
@@ -1498,7 +1497,7 @@ ACMD(do_vigor) {
 		}
 	}
 	else {
-		charge_ability_cost(ch, MANA, CHOOSE_BY_ABILITY_LEVEL(costs, ch, ABIL_VIGOR), NOTHING, 0);
+		charge_ability_cost(ch, MANA, CHOOSE_BY_ABILITY_LEVEL(costs, ch, ABIL_VIGOR), NOTHING, 0, WAIT_SPELL);
 		
 		if (ch == vict) {
 			msg_to_char(ch, "You focus your thoughts and say the word 'maktso', and you feel a burst of vigor!\r\n");

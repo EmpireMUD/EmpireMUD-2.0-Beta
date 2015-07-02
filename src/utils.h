@@ -281,7 +281,6 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define REAL_NPC(ch)  (IS_NPC(REAL_CHAR(ch)))
 
 // wait!
-#define WAIT_STATE(ch, cycle) do { GET_WAIT_STATE(ch) = (cycle); } while(0)  // deprecated
 #define GET_WAIT_STATE(ch)  ((ch)->wait)
 
 
@@ -1067,6 +1066,9 @@ extern char *get_mob_name_by_proto(mob_vnum vnum);
 extern char *get_obj_name_by_proto(obj_vnum vnum);
 extern obj_data *get_top_object(obj_data *obj);
 extern double rate_item(obj_data *obj);
+
+// player functions from utils.c
+void command_lag(char_data *ch, int wait_type);
 
 // resource functions from utils.c
 void extract_resources(char_data *ch, Resource list[], bool ground);

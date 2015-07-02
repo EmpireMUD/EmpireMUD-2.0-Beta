@@ -231,7 +231,7 @@ INTERACTION_FUNC(shear_interact) {
 	obj_data *obj = NULL;
 	
 	add_cooldown(inter_mob, COOLDOWN_SHEAR, config_get_int("shear_growth_time") * SECS_PER_REAL_HOUR);
-	WAIT_STATE(ch, 2 RL_SEC);
+	command_lag(ch, WAIT_OTHER);
 			
 	amt = interaction->quantity;
 	if (HAS_ABILITY(ch, ABIL_MASTER_FARMER)) {
@@ -269,7 +269,7 @@ INTERACTION_FUNC(skin_interact) {
 	int num;
 
 	SET_BIT(GET_OBJ_VAL(inter_item, VAL_CORPSE_FLAGS), CORPSE_SKINNED);
-	WAIT_STATE(ch, 2 RL_SEC);
+	command_lag(ch, WAIT_OTHER);
 		
 	for (num = 0; num < interaction->quantity; ++num) {
 		obj = read_object(interaction->vnum);
@@ -359,7 +359,7 @@ ACMD(do_alternate) {
 		}
 		
 		// prevent rapid-use
-		WAIT_STATE(ch, 1.5 RL_SEC);
+		command_lag(ch, WAIT_OTHER);
 	}
 	else if (ROOM_OWNER(IN_ROOM(ch)) && empire_is_hostile(ROOM_OWNER(IN_ROOM(ch)), GET_LOYALTY(ch), IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't alternate in hostile territory.\r\n");
@@ -1600,7 +1600,7 @@ ACMD(do_summon) {
 		return;
 	}
 	
-	charge_ability_cost(ch, cost_type, cost, cooldown, cooldown_time);
+	charge_ability_cost(ch, cost_type, cost, cooldown, cooldown_time, WAIT_ABILITY);
 
 	msg_to_char(ch, "You whistle loudly...\r\n");
 	act("$n whistles loudly!", FALSE, ch, 0, 0, TO_ROOM);

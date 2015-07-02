@@ -807,17 +807,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 	}
 	
 	// wait if outdoors, not riding, not on road
-	if (AFF_FLAGGED(ch, AFF_SLOW)) {
-		WAIT_STATE(ch, 1 RL_SEC);
-	}
-	else if (!IS_RIDING(ch) && IS_OUTDOORS(ch) && !IS_ROAD(IN_ROOM(ch))) {
-		if (HAS_BONUS_TRAIT(ch, BONUS_FASTER)) {
-			WAIT_STATE(ch, (1 RL_SEC) / 4);
-		}
-		else {
-			WAIT_STATE(ch, (1 RL_SEC) / 2);
-		}
-	}
+	command_lag(ch, WAIT_MOVEMENT);
 
 	if (animal) {
 		char_from_room(animal);
@@ -1001,7 +991,7 @@ ACMD(do_avoid) {
 		act("$n manages to avoid $N, who was following $m.", TRUE, ch, NULL, vict, TO_NOTVICT);
 		
 		stop_follower(vict);
-		WAIT_STATE(vict, 4 RL_SEC);
+		GET_WAIT_STATE(vict) = 4 RL_SEC;
 	}
 }
 
@@ -1377,7 +1367,7 @@ ACMD(do_land) {
 		msg_to_char(ch, "You can't seem to land. Perhaps whatever is causing your flight can't be ended.\r\n");
 	}
 	
-	WAIT_STATE(ch, 2 RL_SEC);
+	command_lag(ch, WAIT_OTHER);
 }
 
 
@@ -1429,7 +1419,6 @@ ACMD(do_move) {
 ACMD(do_portal) {
 	void empire_skillup(empire_data *emp, int ability, double amount);
 	extern char *get_room_name(room_data *room, bool color);
-	extern const int universal_wait;
 	
 	bool all_access = (IS_IMMORTAL(ch) || (IS_NPC(ch) && !AFF_FLAGGED(ch, AFF_CHARM)));
 	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
@@ -1489,7 +1478,7 @@ ACMD(do_portal) {
 		
 		// page it in case it's long
 		page_string(ch->desc, buf, TRUE);
-		WAIT_STATE(ch, universal_wait);
+		command_lag(ch, WAIT_OTHER);
 		return;
 	}
 	
@@ -1593,7 +1582,7 @@ ACMD(do_portal) {
 		empire_skillup(GET_LOYALTY(ch), ABIL_PORTAL_MASTER, 15);
 	}
 	
-	WAIT_STATE(ch, universal_wait);
+	command_lag(ch, WAIT_OTHER);
 }
 
 
@@ -1855,7 +1844,7 @@ ACMD(do_worm) {
 		gain_ability_exp(ch, ABIL_WORM, 1);
 		
 		// on top of any wait from the move itself
-		WAIT_STATE(ch, 1 RL_SEC);
+		GET_WAIT_STATE(ch) += 1 RL_SEC;
 	}
 }
 

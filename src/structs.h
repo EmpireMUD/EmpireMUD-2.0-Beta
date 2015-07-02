@@ -1303,6 +1303,16 @@ typedef struct trig_data trig_data;
 #define SYS_VALID  BIT(10)	// validation logs
 
 
+// Wait types for the command_lag() function.
+#define WAIT_NONE  -1	// for functions that require a wait_type
+#define WAIT_ABILITY  0	// general abilities
+#define WAIT_COMBAT_ABILITY  1	// ability that does damage or affects combat
+#define WAIT_COMBAT_SPELL  2	// spell that does damage or affects combat (except healing)
+#define WAIT_MOVEMENT  3	// normal move lag
+#define WAIT_SPELL  4	// general spells
+#define WAIT_OTHER  5	// not covered by other categories
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// SECTOR DEFINES //////////////////////////////////////////////////////////
 

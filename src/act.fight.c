@@ -30,7 +30,6 @@
 
 // external vars
 extern const char *dirs[];
-extern const int universal_wait;
 
 // external functions
 void besiege_room(room_data *to_room, int damage);
@@ -158,7 +157,7 @@ ACMD(do_catapult) {
 		
 		// fire!
 		besiege_room(to_room, 8);
-		WAIT_STATE(ch, 5 RL_SEC);
+		GET_WAIT_STATE(ch) = 5 RL_SEC;
 	}
 }
 
@@ -312,18 +311,18 @@ ACMD(do_flee) {
 				if (was_fighting) {
 					gain_ability_exp(ch, ABIL_FLEET, 5);
 				}
-				WAIT_STATE(ch, 2 RL_SEC);
+				GET_WAIT_STATE(ch) = 2 RL_SEC;
 			}
 			else {
 				act("$n tries to flee, but can't!", TRUE, ch, 0, 0, TO_ROOM);
 				send_to_char("PANIC! You couldn't escape!\r\n", ch);
-				WAIT_STATE(ch, 2 RL_SEC);
+				GET_WAIT_STATE(ch) = 2 RL_SEC;
 			}
 			return;
 		}
 	}
 	send_to_char("PANIC! You couldn't escape!\r\n", ch);
-	WAIT_STATE(ch, 2 RL_SEC);
+	GET_WAIT_STATE(ch) = 2 RL_SEC;
 }
 
 
@@ -347,7 +346,7 @@ ACMD(do_hit) {
 			act("You run at $M!", FALSE, ch, 0, vict, TO_CHAR);
 			FIGHT_MODE(ch) = FMODE_WAITING;
 			FIGHT_WAIT(ch) = 4;
-			WAIT_STATE(ch, 2 RL_SEC);
+			command_lag(ch, WAIT_OTHER);
 		}
 		else {
 			FIGHT_MODE(ch) = FMODE_MELEE;
@@ -363,7 +362,7 @@ ACMD(do_hit) {
 		else if (FIGHTING(vict) && FIGHT_MODE(vict) == FMODE_MISSILE) {
 			set_fighting(ch, vict, FMODE_WAITING);
 			act("You run at $M!", FALSE, ch, 0, vict, TO_CHAR);
-			WAIT_STATE(ch, 2 RL_SEC);
+			command_lag(ch, WAIT_OTHER);
 		}
 		else {
 			hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FALSE);
@@ -371,7 +370,7 @@ ACMD(do_hit) {
 			if (vict && !EXTRACTED(vict) && !IS_DEAD(vict) && FIGHTING(ch) && FIGHTING(ch) != vict) {
 				FIGHTING(ch) = vict;
 			}
-			WAIT_STATE(ch, 2 RL_SEC);
+			command_lag(ch, WAIT_OTHER);
 		}
 	}
 	else {
@@ -459,7 +458,7 @@ ACMD(do_shoot) {
 			else
 				set_fighting(vict, ch, FMODE_WAITING);
 		}
-		WAIT_STATE(ch, 2 RL_SEC);
+		command_lag(ch, WAIT_OTHER);
 	}
 	else {
 		act("You can't shoot $N!", FALSE, ch, 0, vict, TO_CHAR);
@@ -509,7 +508,7 @@ ACMD(do_stake) {
 		msg_to_char(ch, "You can't stake someone who is already dead.\r\n");
 	}
 	else {
-		WAIT_STATE(ch, universal_wait);
+		command_lag(ch, WAIT_COMBAT_ABILITY);
 
 		act("You jab $p through $N's heart!", FALSE, ch, stake, victim, TO_CHAR);
 		act("$n jabs $p through your heart!", FALSE, ch, stake, victim, TO_VICT | TO_SLEEP);
@@ -540,7 +539,7 @@ ACMD(do_struggle) {
 	else if (!number(0, MAX(1, GET_STRENGTH(ch)/2))) {
 		msg_to_char(ch, "You struggle a bit, but fail to break free.\r\n");
 		act("$n struggles a little with $s bindings!", TRUE, ch, 0, 0, TO_ROOM);
-		WAIT_STATE(ch, 30 RL_SEC);
+		GET_WAIT_STATE(ch) = 30 RL_SEC;
 		}
 	else {
 		msg_to_char(ch, "You break free!\r\n");

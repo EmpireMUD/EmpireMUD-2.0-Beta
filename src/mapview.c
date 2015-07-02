@@ -1615,7 +1615,7 @@ void perform_mortal_where(char_data *ch, char *arg) {
 		max_distance = 75;
 	}
 	
-	WAIT_STATE(ch, 2 RL_SEC);
+	command_lag(ch, WAIT_OTHER);
 
 	if (!*arg) {
 		send_to_char("Players near you\r\n--------------------\r\n", ch);

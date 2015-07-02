@@ -172,12 +172,12 @@ See also: DISMISS
 FASTCASTING "FAST CASTING"
 
 Fastcasting
-Class ability:  Alchemist, Archmage, Feral, Luminary, Necromancer, 
-                Werewolf, Shadow Wolf
+Class ability:  All healer classes
 
 With Fastcasting, your Wits attribute no longer boosts your combat speed.
-Instead, it reduces the command lag after casting spells. This ability is
-used by healers to help them keep their party alive.
+Instead, it reduces the command lag after casting non-combat spells (including
+healing spells). This ability is used by healers to help them keep their party
+alive.
 
 See also: COMMAND LAG
 #

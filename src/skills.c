@@ -445,15 +445,14 @@ bool can_use_ability(char_data *ch, int ability, int cost_pool, int cost_amount,
 * applies a cooldown, if applicable. This works on both players and NPCs, but
 * only applies the cooldown to players.
 *
-* The player will also experience universal_wait for using the ability.
-*
 * @param char_data *ch The player or NPC.
 * @param int cost_pool HEALTH, MANA, MOVE, BLOOD (NOTHING if no charge).
 * @param int cost_amount Mana (or whatever) amount required, if any.
 * @param int cooldown_type Any COOLDOWN_x const to apply (NOTHING for none).
 * @param int cooldown_time Cooldown duration, if any.
+* @param int wait_type Any WAIT_x const or WAIT_NONE for no command lag.
 */
-void charge_ability_cost(char_data *ch, int cost_pool, int cost_amount, int cooldown_type, int cooldown_time) {
+void charge_ability_cost(char_data *ch, int cost_pool, int cost_amount, int cooldown_type, int cooldown_time, int wait_type) {
 	extern const int universal_wait;
 	
 	if (cost_pool >= 0 && cost_pool < NUM_POOLS && cost_amount > 0) {
@@ -464,7 +463,8 @@ void charge_ability_cost(char_data *ch, int cost_pool, int cost_amount, int cool
 	if (cooldown_type > COOLDOWN_RESERVED && cooldown_time > 0 && !IS_NPC(ch)) {
 		add_cooldown(ch, cooldown_type, cooldown_time);
 	}
-	WAIT_STATE(ch, universal_wait);
+	
+	command_lag(ch, wait_type);
 }
 
 

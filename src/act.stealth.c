@@ -34,7 +34,6 @@
 
 // external vars
 extern const int rev_dir[];
-extern const int universal_wait;
 
 // external funcs
 extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
@@ -591,7 +590,7 @@ ACMD(do_backstab) {
 		return;
 	}
 	else {
-		charge_ability_cost(ch, MOVE, cost, COOLDOWN_BACKSTAB, 9);
+		charge_ability_cost(ch, MOVE, cost, COOLDOWN_BACKSTAB, 9, WAIT_COMBAT_ABILITY);
 
 		success = skill_check(ch, ABIL_BACKSTAB, DIFF_EASY);
 
@@ -609,8 +608,6 @@ ACMD(do_backstab) {
 			}
 
 			if (damage(ch, vict, dam, ATTACK_BACKSTAB, DAM_PHYSICAL) > 0) {
-				WAIT_STATE(vict, 2 RL_SEC);
-				
 				if (HAS_ABILITY(ch, ABIL_POISONS)) {
 					if (!number(0, 1) && apply_poison(ch, vict, USING_POISON(ch)) < 0) {
 						// dedz
@@ -650,7 +647,7 @@ ACMD(do_blind) {
 		return;
 	}
 	else {
-		charge_ability_cost(ch, MOVE, cost, COOLDOWN_BLIND, 10);
+		charge_ability_cost(ch, MOVE, cost, COOLDOWN_BLIND, 10, WAIT_COMBAT_ABILITY);
 
 		if (skill_check(ch, ABIL_BLIND, DIFF_MEDIUM) && !AFF_FLAGGED(vict, AFF_IMMUNE_STEALTH)) {
 			act("You toss a handful of sand into $N's eyes!", FALSE, ch, NULL, vict, TO_CHAR);
@@ -691,7 +688,7 @@ ACMD(do_darkness) {
 		msg_to_char(ch, "You wave your hand and the darkness dissipates.\r\n");
 		act("$n waves $s hand and the darkness dissipates.", FALSE, ch, 0, 0, TO_ROOM);
 
-		charge_ability_cost(ch, MOVE, cost, NOTHING, 0);
+		charge_ability_cost(ch, MOVE, cost, NOTHING, 0, WAIT_OTHER);
 	}
 	else {
 		msg_to_char(ch, "You draw upon the shadows to blanket the area in an inky darkness!\r\n");
@@ -708,7 +705,7 @@ ACMD(do_darkness) {
 		free(af);	// affect_to_room duplicates affects
 		gain_ability_exp(ch, ABIL_DARKNESS, 20);
 		
-		charge_ability_cost(ch, MOVE, cost, COOLDOWN_DARKNESS, 15);
+		charge_ability_cost(ch, MOVE, cost, COOLDOWN_DARKNESS, 15, WAIT_ABILITY);
 	}
 }
 
@@ -723,7 +720,7 @@ ACMD(do_disguise) {
 	}
 	else if (IS_DISGUISED(ch)) {
 		undisguise(ch);
-		WAIT_STATE(ch, 2 RL_SEC);
+		command_lag(ch, WAIT_OTHER);
 	}
 	else if (!can_use_ability(ch, ABIL_DISGUISE, NOTHING, 0, NOTHING)) {
 		// sends own message
@@ -752,7 +749,7 @@ ACMD(do_disguise) {
 		act("$n tries to disguise $mself as $N, but fails.", FALSE, ch, NULL, vict, TO_ROOM);
 		
 		gain_ability_exp(ch, ABIL_DISGUISE, 33.4);
-		WAIT_STATE(ch, 4 RL_SEC);
+		command_lag(ch, WAIT_ABILITY);
 	}
 	else {
 		act("You skillfully disguise yourself as $N!", FALSE, ch, NULL, vict, TO_CHAR);
@@ -769,7 +766,7 @@ ACMD(do_disguise) {
 		GET_DISGUISED_SEX(ch) = GET_SEX(vict);
 		
 		gain_ability_exp(ch, ABIL_DISGUISE, 33.4);
-		WAIT_STATE(ch, 4 RL_SEC);
+		GET_WAIT_STATE(ch) = 4 RL_SEC;	// long wait
 	}
 }
 
@@ -791,7 +788,7 @@ ACMD(do_diversion) {
 			appear(ch);
 		}
 		
-		charge_ability_cost(ch, MOVE, cost, COOLDOWN_DIVERSION, 30);
+		charge_ability_cost(ch, MOVE, cost, COOLDOWN_DIVERSION, 30, WAIT_COMBAT_ABILITY);
 		
 		// variable messaging
 		switch (number(0, 2)) {
@@ -860,9 +857,9 @@ ACMD(do_escape) {
 			act("$n runs toward the window!", TRUE, ch, NULL, NULL, TO_ROOM);
 		}
 		
-		charge_ability_cost(ch, MOVE, cost, NOTHING, 0);
+		charge_ability_cost(ch, MOVE, cost, NOTHING, 0, WAIT_ABILITY);
 		start_action(ch, ACT_ESCAPING, 1, 0);
-		WAIT_STATE(ch, 4 RL_SEC);
+		GET_WAIT_STATE(ch) = 4 RL_SEC;	// long wait
 	}
 }
 
@@ -889,7 +886,7 @@ ACMD(do_hide) {
 		REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDE);
 	}
 
-	WAIT_STATE(ch, 2 RL_SEC);
+	command_lag(ch, WAIT_ABILITY);
 
 	for (c = ROOM_PEOPLE(IN_ROOM(ch)); c; c = c->next_in_room) {
 		if (c != ch && CAN_SEE(c, ch) && (!IS_NPC(c) || !MOB_FLAGGED(c, MOB_ANIMAL)) && !skill_check(ch, ABIL_HIDE, DIFF_HARD) && !skill_check(ch, ABIL_CLING_TO_SHADOW, DIFF_MEDIUM)) {
@@ -924,7 +921,7 @@ ACMD(do_howl) {
 			appear(ch);
 		}
 		
-		charge_ability_cost(ch, MOVE, cost, COOLDOWN_HOWL, 30);
+		charge_ability_cost(ch, MOVE, cost, COOLDOWN_HOWL, 30, WAIT_COMBAT_ABILITY);
 		
 		msg_to_char(ch, "You let out a fearsome howl!\r\n");
 		act("$n lets out a bone-chilling howl!", FALSE, ch, NULL, NULL, TO_ROOM);
@@ -990,7 +987,7 @@ ACMD(do_infiltrate) {
 		// sends own message
 	}
 	else {
-		charge_ability_cost(ch, MOVE, cost, NOTHING, 0);
+		charge_ability_cost(ch, MOVE, cost, NOTHING, 0, WAIT_ABILITY);
 		
 		gain_ability_exp(ch, ABIL_INFILTRATE, 50);
 		gain_ability_exp(ch, ABIL_IMPROVED_INFILTRATE, 50);
@@ -1062,7 +1059,7 @@ ACMD(do_jab) {
 		return;
 	}
 	else {
-		charge_ability_cost(ch, MOVE, cost, COOLDOWN_JAB, 9);
+		charge_ability_cost(ch, MOVE, cost, COOLDOWN_JAB, 9, WAIT_COMBAT_ABILITY);
 
 		if (IS_NPC(ch)) {
 			// NPC has no weapon
@@ -1239,7 +1236,7 @@ ACMD(do_pickpocket) {
 		
 		// gain either way
 		gain_ability_exp(ch, ABIL_PICKPOCKET, 25);
-		WAIT_STATE(ch, universal_wait);
+		command_lag(ch, WAIT_ABILITY);
 	}
 }
 
@@ -1279,7 +1276,7 @@ ACMD(do_prick) {
 		return;
 	}
 	else {
-		charge_ability_cost(ch, MOVE, cost, COOLDOWN_PRICK, 9);
+		charge_ability_cost(ch, MOVE, cost, COOLDOWN_PRICK, 9, WAIT_COMBAT_ABILITY);
 		
 		if (SHOULD_APPEAR(ch)) {
 			appear(ch);
@@ -1340,7 +1337,7 @@ ACMD(do_sap) {
 		return;
 	}
 	else {
-		charge_ability_cost(ch, MOVE, cost, COOLDOWN_SAP, 9);
+		charge_ability_cost(ch, MOVE, cost, COOLDOWN_SAP, 9, WAIT_COMBAT_ABILITY);
 	
 		success = !AFF_FLAGGED(vict, AFF_IMMUNE_STEALTH) && (!CAN_SEE(vict, ch) || skill_check(ch, ABIL_SAP, DIFF_MEDIUM));
 
@@ -1412,7 +1409,7 @@ ACMD(do_search) {
 		if (!found)
 			msg_to_char(ch, "You search, but find nobody.\r\n");
 
-		charge_ability_cost(ch, NOTHING, 0, COOLDOWN_SEARCH, 10);
+		charge_ability_cost(ch, NOTHING, 0, COOLDOWN_SEARCH, 10, WAIT_ABILITY);
 		gain_ability_exp(ch, ABIL_SEARCH, 20);
 	}
 }
@@ -1435,7 +1432,7 @@ ACMD(do_shadowcage) {
 			appear(ch);
 		}
 		
-		charge_ability_cost(ch, MOVE, cost, COOLDOWN_SHADOWCAGE, 30);
+		charge_ability_cost(ch, MOVE, cost, COOLDOWN_SHADOWCAGE, 30, WAIT_COMBAT_ABILITY);
 		
 		msg_to_char(ch, "You shoot webs of pure shadow, forming a tight cage!\r\n");
 		act("$n shoots webs of pure shadow, forming a tight cage!", FALSE, ch, NULL, NULL, TO_ROOM);
@@ -1523,7 +1520,7 @@ ACMD(do_shadowstep) {
 			}
 		}
 
-		charge_ability_cost(ch, MOVE, cost, COOLDOWN_SHADOWSTEP, SECS_PER_REAL_MIN);		
+		charge_ability_cost(ch, MOVE, cost, COOLDOWN_SHADOWSTEP, SECS_PER_REAL_MIN, WAIT_ABILITY);
 		gain_ability_exp(ch, ABIL_SHADOWSTEP, 20);
 		
 		if (infil && !HAS_ABILITY(ch, ABIL_IMPROVED_INFILTRATE) && !skill_check(ch, ABIL_INFILTRATE, DIFF_HARD)) {
@@ -1615,8 +1612,8 @@ ACMD(do_sneak) {
 		REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDE);
 	}
 
-	/* Delay after sneaking */
-	WAIT_STATE(ch, 1 RL_SEC);
+	// Delay after sneaking -- on top of normal move lag
+	GET_WAIT_STATE(ch) += 1 RL_SEC;
 
 	if (perform_move(ch, dir, FALSE, 0)) {	// should be MOVE_NORMAL
 		gain_ability_exp(ch, ABIL_SNEAK, 5);
@@ -1694,7 +1691,7 @@ ACMD(do_steal) {
 					save_empire(emp);
 					read_vault(emp);
 				
-					WAIT_STATE(ch, 4 RL_SEC);
+					GET_WAIT_STATE(ch) = 4 RL_SEC;	// long wait
 				}
 			}
 		}
@@ -1736,7 +1733,7 @@ ACMD(do_terrify) {
 		return;
 	}
 	else {
-		charge_ability_cost(ch, MOVE, cost, COOLDOWN_TERRIFY, 15);
+		charge_ability_cost(ch, MOVE, cost, COOLDOWN_TERRIFY, 15, WAIT_COMBAT_ABILITY);
 		
 		if (SHOULD_APPEAR(ch)) {
 			appear(ch);

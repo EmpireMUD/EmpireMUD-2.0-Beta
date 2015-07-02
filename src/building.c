@@ -1353,7 +1353,7 @@ ACMD(do_dismantle) {
 	msg_to_char(ch, "You begin to dismantle the building.\r\n");
 	act("$n begins to dismantle the building.\r\n", FALSE, ch, 0, 0, TO_ROOM);
 	process_dismantling(ch, IN_ROOM(ch));
-	WAIT_STATE(ch, 2 RL_SEC);
+	command_lag(ch, WAIT_OTHER);
 }
 
 
@@ -1736,7 +1736,7 @@ ACMD(do_lay) {
 		
 		// this will tear it back down to its base type
 		disassociate_building(IN_ROOM(ch));
-		WAIT_STATE(ch, 3 RL_SEC);
+		command_lag(ch, WAIT_OTHER);
 		check_lay_territory(ch, IN_ROOM(ch));
 	}
 	else if (!road_sect) {
@@ -1767,7 +1767,7 @@ ACMD(do_lay) {
 		// preserve this for un-laying the road (disassociate_building)
 		ROOM_ORIGINAL_SECT(IN_ROOM(ch)) = original_sect;
 
-		WAIT_STATE(ch, 3 RL_SEC);
+		command_lag(ch, WAIT_OTHER);
 		check_lay_territory(ch, IN_ROOM(ch));
 	}
 }
@@ -1790,7 +1790,7 @@ ACMD(do_maintain) {
 		COMPLEX_DATA(IN_ROOM(ch))->disrepair = 0;
 		msg_to_char(ch, "You perform some quick maintenance on the building.\r\n");
 		act("$n performs some quick maintenance on the building.", TRUE, ch, NULL, NULL, TO_ROOM);
-		WAIT_STATE(ch, 2 RL_SEC);
+		command_lag(ch, WAIT_OTHER);
 	}
 }
 

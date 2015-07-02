@@ -2192,7 +2192,7 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 			act("$n dives out of the way at the last second!", FALSE, victim, NULL, NULL, TO_ROOM);
 			dam = 0;
 			// wait is based on % of max dexterity, where it's longest when you have 1 dex and shortest at max
-			WAIT_STATE(victim, (3 RL_SEC * (1.0 - ((double) GET_DEXTERITY(victim) / (att_max(victim) + 1)))));
+			GET_WAIT_STATE(victim) = (3 RL_SEC * (1.0 - ((double) GET_DEXTERITY(victim) / (att_max(victim) + 1))));
 		}
 		
 		gain_ability_exp(ch, ABIL_MASTER_SURVIVALIST, 33.4);

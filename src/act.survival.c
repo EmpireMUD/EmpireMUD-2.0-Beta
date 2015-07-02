@@ -29,7 +29,6 @@
 */
 
 // external vars
-extern const int universal_wait;
 
 // external funcs
 void scale_item_to_level(obj_data *obj, int level);
@@ -187,7 +186,7 @@ ACMD(do_butcher) {
 		
 		empty_obj_before_extract(corpse);
 		extract_obj(corpse);
-		charge_ability_cost(ch, NOTHING, 0, NOTHING, 0);
+		charge_ability_cost(ch, NOTHING, 0, NOTHING, 0, WAIT_ABILITY);
 		gain_ability_exp(ch, ABIL_BUTCHER, 15);
 	}
 }
@@ -274,7 +273,7 @@ ACMD(do_forage) {
 
 	if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_FORAGE, do_one_forage)) {
 		// success
-		charge_ability_cost(ch, MOVE, cost, NOTHING, 0);
+		charge_ability_cost(ch, MOVE, cost, NOTHING, 0, WAIT_ABILITY);
 		gain_ability_exp(ch, ABIL_FORAGE, 15);
 	}
 	else {
@@ -396,14 +395,12 @@ ACMD(do_mount) {
 		
 		// hard work! this will un-load the mob
 		perform_mount(ch, mob);
-		WAIT_STATE(ch, universal_wait);
+		command_lag(ch, WAIT_OTHER);
 	}
 }
 
 
-ACMD(do_nightsight) {
-	extern const int universal_wait;
-	
+ACMD(do_nightsight) {	
 	struct affected_type *af;
 	
 	if (affected_by_spell(ch, ATYPE_NIGHTSIGHT)) {
@@ -423,7 +420,8 @@ ACMD(do_nightsight) {
 		af = create_flag_aff(ATYPE_NIGHTSIGHT, UNLIMITED, AFF_INFRAVISION);
 		affect_join(ch, af, 0);
 	}
-	WAIT_STATE(ch, universal_wait);
+
+	command_lag(ch, WAIT_ABILITY);
 }
 
 
@@ -469,6 +467,6 @@ ACMD(do_track) {
 	else {
 		msg_to_char(ch, "You can't seem to find a trail.\r\n");
 	}
-
-	WAIT_STATE(ch, universal_wait);
+	
+	command_lag(ch, WAIT_ABILITY);
 }

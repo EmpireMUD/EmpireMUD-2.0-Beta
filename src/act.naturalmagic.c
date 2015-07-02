@@ -33,7 +33,6 @@
 */
 
 // external vars
-extern const int universal_wait;
 
 // external funcs
 extern obj_data *find_obj(int n);
@@ -243,7 +242,7 @@ ACMD(do_cleanse) {
 		return;
 	}
 	else {
-		charge_ability_cost(ch, MANA, cost, COOLDOWN_CLEANSE, 9);
+		charge_ability_cost(ch, MANA, cost, COOLDOWN_CLEANSE, 9, WAIT_SPELL);
 		
 		if (ch == vict) {
 			msg_to_char(ch, "You shine brightly as your mana cleanses you.\r\n");
@@ -335,7 +334,7 @@ ACMD(do_counterspell) {
 		return;
 	}
 	else {
-		charge_ability_cost(ch, MANA, cost, NOTHING, 0);
+		charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
 		
 		msg_to_char(ch, "You ready a counterspell.\r\n");
 		act("$n flickers momentarily with a blue-white aura.", TRUE, ch, NULL, NULL, TO_ROOM);
@@ -375,7 +374,7 @@ ACMD(do_eartharmor) {
 		appear(ch);
 	}
 	
-	charge_ability_cost(ch, MANA, cost, NOTHING, 0);
+	charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
 	
 	// 100/14 = 7 resistance at max level
 	amount = get_ability_level(ch, ABIL_EARTHARMOR) / 14.0;
@@ -500,7 +499,7 @@ ACMD(do_entangle) {
 		return;
 	}
 	
-	charge_ability_cost(ch, MANA, cost, COOLDOWN_ENTANGLE, 30);
+	charge_ability_cost(ch, MANA, cost, COOLDOWN_ENTANGLE, 30, WAIT_COMBAT_SPELL);
 	
 	if (SHOULD_APPEAR(ch)) {
 		appear(ch);
@@ -610,7 +609,7 @@ ACMD(do_familiar) {
 		return;
 	}
 	
-	charge_ability_cost(ch, MANA, familiars[type].cost, NOTHING, 0);
+	charge_ability_cost(ch, MANA, familiars[type].cost, NOTHING, 0, WAIT_SPELL);
 	mob = read_mobile(familiars[type].vnum);
 	if (IS_NPC(ch)) {
 		MOB_INSTANCE_ID(mob) = MOB_INSTANCE_ID(ch);
@@ -647,7 +646,7 @@ ACMD(do_fly) {
 		msg_to_char(ch, "You stop flying and your wings fade away.\r\n");
 		act("$n lands and $s wings fade away.", TRUE, ch, NULL, NULL, TO_ROOM);
 		affect_from_char(ch, ATYPE_FLY);
-		WAIT_STATE(ch, universal_wait);
+		command_lag(ch, WAIT_OTHER);
 		return;
 	}
 	
@@ -663,7 +662,7 @@ ACMD(do_fly) {
 		return;
 	}
 	
-	charge_ability_cost(ch, MANA, cost, NOTHING, 0);
+	charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
 	
 	af = create_flag_aff(ATYPE_FLY, CHOOSE_BY_ABILITY_LEVEL(fly_durations, ch, ABIL_FLY), AFF_FLY);
 	affect_join(ch, af, 0);
@@ -693,7 +692,7 @@ ACMD(do_hasten) {
 		return;
 	}
 	else {
-		charge_ability_cost(ch, MANA, cost, NOTHING, 0);
+		charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
 		
 		if (ch == vict) {
 			msg_to_char(ch, "You concentrate and veins of red mana streak down your skin.\r\n");
@@ -821,7 +820,7 @@ ACMD(do_heal) {
 	}
 	
 	// done!
-	charge_ability_cost(ch, MANA, cost, NOTHING, 0);
+	charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
 	
 	if (party) {
 		msg_to_char(ch, "You muster up as much mana as you can and send out a shockwave, healing the entire party!\r\n");
@@ -895,7 +894,7 @@ ACMD(do_moonrise) {
 		}
 		else {
 			// success: resurrect dead target
-			charge_ability_cost(ch, MANA, cost, COOLDOWN_MOONRISE, 20 * SECS_PER_REAL_MIN);
+			charge_ability_cost(ch, MANA, cost, COOLDOWN_MOONRISE, 20 * SECS_PER_REAL_MIN, WAIT_SPELL);
 			msg_to_char(ch, "You let out a bone-chilling howl...\r\n");
 			act("$n lets out a bone-chilling howl...", FALSE, ch, NULL, NULL, TO_ROOM);
 			perform_resurrection(vict, ch, IN_ROOM(ch), ABIL_MOONRISE);
@@ -921,7 +920,7 @@ ACMD(do_moonrise) {
 		}
 		else {
 			// seems legit...
-			charge_ability_cost(ch, MANA, cost, NOTHING, 0);
+			charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
 			msg_to_char(ch, "You let out a bone-chilling howl...\r\n");
 			act("$n lets out a bone-chilling howl...", FALSE, ch, NULL, NULL, TO_ROOM);
 			
@@ -966,7 +965,7 @@ ACMD(do_purify) {
 		return;
 	}
 	else {
-		charge_ability_cost(ch, MANA, cost, NOTHING, 0);
+		charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
 		
 		if (ch == vict) {
 			msg_to_char(ch, "You let your mana wash over your body and purify your form.\r\n");
@@ -1062,7 +1061,7 @@ ACMD(do_rejuvenate) {
 		return;
 	}
 		
-	charge_ability_cost(ch, MANA, cost, COOLDOWN_REJUVENATE, 15);
+	charge_ability_cost(ch, MANA, cost, COOLDOWN_REJUVENATE, 15, WAIT_SPELL);
 	
 	if (ch == vict) {
 		msg_to_char(ch, "You surround yourself with the bright white mana of rejuvenation.\r\n");
@@ -1113,7 +1112,7 @@ ACMD(do_resurrect) {
 		}
 		else {
 			// success: resurrect in room
-			charge_ability_cost(ch, MANA, cost, NOTHING, 0);
+			charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
 			msg_to_char(ch, "You begin channeling mana...\r\n");
 			act("$n glows with white light as $e begins to channel $s mana...", FALSE, ch, NULL, NULL, TO_ROOM);
 			perform_resurrection(vict, ch, IN_ROOM(ch), ABIL_RESURRECT);
@@ -1139,7 +1138,7 @@ ACMD(do_resurrect) {
 		}
 		else {
 			// seems legit...
-			charge_ability_cost(ch, MANA, cost, NOTHING, 0);
+			charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
 			act("You begin channeling mana to resurrect $N...", FALSE, ch, NULL, vict, TO_CHAR | TO_NODARK);
 			act("$n glows with white light as $e begins to channel $s mana to resurrect $N...", FALSE, ch, NULL, vict, TO_NOTVICT);
 			
@@ -1190,7 +1189,7 @@ ACMD(do_skybrand) {
 		return;
 	}
 	
-	charge_ability_cost(ch, MANA, cost, COOLDOWN_SKYBRAND, 6);
+	charge_ability_cost(ch, MANA, cost, COOLDOWN_SKYBRAND, 6, WAIT_COMBAT_SPELL);
 	
 	if (SHOULD_APPEAR(ch)) {
 		appear(ch);
@@ -1237,7 +1236,7 @@ ACMD(do_soulsight) {
 		return;
 	}
 	else {
-		charge_ability_cost(ch, MANA, cost, NOTHING, 0);
+		charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
 
 		act("$n's eyes flash briefly.", TRUE, ch, NULL, NULL, TO_ROOM);
 

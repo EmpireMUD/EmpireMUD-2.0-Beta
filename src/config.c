@@ -197,7 +197,7 @@ const int base_player_pools[NUM_POOLS] = { 50, 100, 50, 100 };
 const int primary_attributes[] = { STRENGTH, CHARISMA, INTELLIGENCE, NOTHING };
 
 // universal wait (command lag) after abilities with cooldowns
-const int universal_wait = 1.1 RL_SEC;
+const int universal_wait = 1.25 RL_SEC;
 
 // lore cleanup -- terminate the list with a -1
 const int remove_lore_types[] = { LORE_PLAYER_KILL, LORE_PLAYER_DEATH, LORE_TOWER_DEATH, LORE_DEATH, -1 };
