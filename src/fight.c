@@ -325,7 +325,9 @@ double get_combat_speed(char_data *ch, int pos) {
 	}
 	
 	// wits: it gets .1 second faster for every 4 wits
-	base *= (1.0 - (0.025 * GET_WITS(ch)));
+	if (!HAS_ABILITY(ch, ABIL_FASTCASTING)) {
+		base *= (1.0 - (0.025 * GET_WITS(ch)));
+	}
 	
 	// round to .1 seconds
 	base *= 10.0;

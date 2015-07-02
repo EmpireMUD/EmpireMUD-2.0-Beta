@@ -295,6 +295,7 @@ void init_skills() {
 	setup_class_ability(ABIL_DREAD_BLOOD_FORM, "Dread Blood Form");
 	setup_class_ability(ABIL_DIVERSION, "Diversion");
 	setup_class_ability(ABIL_DUAL_WIELD, "Dual-Wield");
+	setup_class_ability(ABIL_FASTCASTING, "Fastcasting");
 	setup_class_ability(ABIL_HORRID_FORM, "Horrid Form");
 	setup_class_ability(ABIL_HOWL, "Howl");
 	setup_class_ability(ABIL_MOONRISE, "Moonrise");

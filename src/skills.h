@@ -364,8 +364,9 @@ extern bool skill_check(char_data *ch, int ability, int difficulty);
 #define ABIL_CRUCIAL_JAB  235
 #define ABIL_DIVERSION  236
 #define ABIL_SHADOW_JAB  237
+#define ABIL_FASTCASTING  238
 
-#define NUM_ABILITIES  238		// must be <= MAX_ABILITIES (structs.h)
+#define NUM_ABILITIES  239		// must be <= MAX_ABILITIES (structs.h)
 
 
 // cooldowns -- see COOLDOWN_x in constants.c
