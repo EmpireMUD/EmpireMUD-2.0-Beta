@@ -249,7 +249,7 @@ void assign_class_abilities(char_data *ch, int class, int role) {
 	}
 	
 	// check all abilities
-	for (abil = 0; abil < NUM_ABILITIES; ++iter) {
+	for (abil = 0; abil < NUM_ABILITIES; ++abil) {
 		// class abils only
 		if (ability_data[abil].parent_skill != NO_SKILL) {
 			continue;
