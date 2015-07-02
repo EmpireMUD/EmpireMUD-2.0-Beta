@@ -1038,6 +1038,11 @@ ACMD(do_circle) {
 		return;
 	}
 	
+	if (!IS_IMMORTAL(ch) && IS_CARRYING_N(ch) > CAN_CARRY_N(ch)) {
+		msg_to_char(ch, "You are overburdened and cannot move.\r\n");
+		return;
+	}
+	
 	// start here
 	to_room = IN_ROOM(ch);
 	
