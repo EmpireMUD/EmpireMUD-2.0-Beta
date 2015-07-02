@@ -69,7 +69,7 @@ The available archetypes are:
 Alchemist
 Natural Magic + Trade
 
-Healer: Resurrect
+Healer: Fastcasting, Resurrect
 
 Note: Class abilities are unfinished.
 
@@ -103,7 +103,7 @@ Archmage
 High Sorcery + Natural Magic
 
 Caster: Resurrect
-Healer: Resurrect
+Healer: Fastcasting, Resurrect
 
 Note: Class abilities are unfinished.
 
@@ -218,7 +218,7 @@ Feral
 Natural Magic + Survival
 
 Tank: Resurrect, Towering Werewolf Form
-Healer: Resurrect, Sage Werewolf Form
+Healer: Fastcasting, Resurrect, Sage Werewolf Form
 
 Note: Class abilities are unfinished.
 
@@ -266,7 +266,7 @@ Luminary
 Empire + Natural Magic
 
 Caster: Dragonriding, Resurrect
-Healer: Dragonriding, Resurrect
+Healer: Dragonriding, Fastcasting, Resurrect
 
 Note: Class abilities are unfinished.
 
@@ -290,6 +290,7 @@ Necromancer
 Natural Magic + Vampire
 
 Caster: Dread Blood Form, Resurrect
+Healer: Fastcasting, Resurrect
 
 Note: Class abilities are unfinished.
 
@@ -346,7 +347,7 @@ Shadow Wolf
 Natural Magic + Stealth
 
 Melee: Howl, Moonrise, Savage Werewolf Form
-Healer: Moonrise, Sage Werewolf Form
+Healer: Fastcasting, Moonrise, Sage Werewolf Form
 
 Note: Class abilities are unfinished.
 
@@ -417,7 +418,7 @@ Battle + Natural Magic
 
 Tank: Resurrect, Towering Werewolf Form
 Melee: Resurrect, Savage Werewolf Form
-Healer: Resurrect, Sage Werewolf Form
+Healer: Fastcasting, Resurrect, Sage Werewolf Form
 
 Note: Class abilities are unfinished.
 
