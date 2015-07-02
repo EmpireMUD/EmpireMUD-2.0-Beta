@@ -221,51 +221,63 @@ const char *class_role[NUM_ROLES] = {
  /////////////////////////////////////////////////////////////////////////////
 //// HELPERS ////////////////////////////////////////////////////////////////
 
-
 /**
-* Adds/removes the character all abilities for his class/role. If you pass NOTHING
-* instead of class and/or role, it will default to the character's current.
+* Checks that the player has the correct set of class abilities, and removes
+* any they shouldn't have. This function ignores immortals.
 *
-* This can remove at any level, but will only add abilities if the character's
-* level is at maximum.
-*
-* @param char_data *ch The player.
-* @param bool add if TRUE, adds the abilities; if FALSE, removes
-* @param int class Any CLASS_x or NOTHING to read it from the player.
-* @param int role Any ROLE_x or NOTHING to read it from the player.
+* @param char_data *ch The player to check.
+* @param int class Any CLASS_X const, or NOTHING to detect from the player.
+* @param int roole Any ROLE_X const, or NOTHING to detect from the player.
 */
-void adjust_class_abilities(char_data *ch, bool add, int class, int role) {
+void assign_class_abilities(char_data *ch, int class, int role) {
 	void check_skill_sell(char_data *ch, int abil);
 	
-	int iter, abil, role_iter;
-	
-	if (IS_NPC(ch)) {
+	int abil, role_iter, iter;
+	bool has;
+
+	// simple sanity
+	if (IS_NPC(ch) || IS_IMMORTAL(ch)) {
 		return;
 	}
 	
-	if (!add || GET_SKILL_LEVEL(ch) >= CLASS_SKILL_CAP) {
-		// defaults
-		if (class == NOTHING) {
-			class = GET_CLASS(ch);
+	// verify we have a class and role (defaults)
+	if (class == NOTHING) {
+		class = GET_CLASS(ch);
+	}
+	if (role == NOTHING) {
+		role = GET_CLASS_ROLE(ch);
+	}
+	
+	// check all abilities
+	for (abil = 0; abil < NUM_ABILITIES; ++iter) {
+		// class abils only
+		if (ability_data[abil].parent_skill != NO_SKILL) {
+			continue;
 		}
-		if (role == NOTHING) {
-			role = GET_CLASS_ROLE(ch);
-		}
-
-		// find the matching role
-		for (role_iter = 0; class_data[class].role[role_iter].role != ROLE_NONE; ++role_iter) {
-			if (class_data[class].role[role_iter].role == role) {
-				// update role abilities
-				for (iter = 0; class_data[class].role[role_iter].ability[iter] != ROLE_ABIL_END; ++iter) {
-					abil = class_data[class].role[role_iter].ability[iter];
 		
-					ch->player_specials->saved.abilities[abil].purchased = add;
-		
-					if (!add) {
-						check_skill_sell(ch, abil);
-					}
+		// determine if the player's class/role has this abil
+		has = FALSE;
+		for (role_iter = 0; !has && class_data[class].role[role_iter].role != ROLE_NONE; ++role_iter) {
+			if (class_data[class].role[role_iter].role != role) {
+				continue;
+			}
+			
+			// found role -- check its abils
+			for (iter = 0; !has && class_data[class].role[role_iter].ability[iter] != ROLE_ABIL_END; ++iter) {
+				if (class_data[class].role[role_iter].ability[iter] == abil) {
+					has = TRUE;	// class/role DOES have this ability
 				}
 			}
+		}
+		
+		// remove any they shouldn't have
+		if (ch->player_specials->saved.abilities[abil].purchased && !has) {
+			ch->player_specials->saved.abilities[abil].purchased = FALSE;
+			check_skill_sell(ch, abil);
+		}
+		// add if needed
+		if (has) {
+			ch->player_specials->saved.abilities[abil].purchased = TRUE;
 		}
 	}
 }
@@ -359,16 +371,14 @@ void update_class(char_data *ch) {
 			}
 		}
 		
-		// remove old class abilities
+		// clear role?
 		if (class != old_class) {
-			adjust_class_abilities(ch, FALSE, old_class, NOTHING);
 			GET_CLASS_ROLE(ch) = ROLE_NONE;
 		}
 		
 		GET_CLASS(ch) = class;
-		
-		// no need to add new class abilities because IF the role changed, it is set to none
-		
+		assign_class_abilities(ch, NOTHING, NOTHING);
+				
 		// total up best X skills
 		best_total = 0;
 		for (best_iter = 0; best_iter < NUM_BEST; ++best_iter) {
@@ -452,13 +462,12 @@ ACMD(do_class) {
 					if (emp) {
 						adjust_abilities_to_empire(ch, emp, FALSE);
 					}
-					adjust_class_abilities(ch, FALSE, NOTHING, NOTHING);
 					
 					// change role
 					GET_CLASS_ROLE(ch) = found;
 					
 					// add new abilities
-					adjust_class_abilities(ch, TRUE, NOTHING, NOTHING);
+					assign_class_abilities(ch, NOTHING, NOTHING);
 					if (emp) {
 						adjust_abilities_to_empire(ch, emp, TRUE);
 						resort_empires();

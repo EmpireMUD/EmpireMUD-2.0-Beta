@@ -1032,6 +1032,7 @@ void delete_player_character(char_data *ch) {
 * @return int 1 = rent-saved, 0 = crash-saved
 */
 int enter_player_game(descriptor_data *d, int dolog, bool fresh) {
+	void assign_class_abilities(char_data *ch, int class, int role);
 	void clean_lore(char_data *ch);
 	extern int Objload_char(char_data *ch, int dolog);
 	void read_aliases(char_data *ch);
@@ -1214,6 +1215,9 @@ int enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	
 	// remove stale coins
 	cleanup_coins(ch);
+	
+	// verify abils -- TODO should this remove/re-add abilities for the empire? do class abilities affect that?
+	assign_class_abilities(ch, NOTHING, NOTHING);
 	
 	// ensure player has penalty if at war
 	if (fresh && GET_LOYALTY(ch) && is_at_war(GET_LOYALTY(ch))) {
