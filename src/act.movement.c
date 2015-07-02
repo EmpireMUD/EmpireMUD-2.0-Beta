@@ -514,6 +514,7 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 
 	act("$n appears from $p!", TRUE, ch, use_portal, 0, TO_ROOM);
 	look_at_room(ch);
+	command_lag(ch, WAIT_MOVEMENT);
 	
 	enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
 	entry_memory_mtrigger(ch);
@@ -806,7 +807,6 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 		cancel_action(ch);
 	}
 	
-	// wait if outdoors, not riding, not on road
 	command_lag(ch, WAIT_MOVEMENT);
 
 	if (animal) {
@@ -1169,6 +1169,8 @@ ACMD(do_circle) {
 	if (ch->desc) {
 		look_at_room(ch);
 	}
+	
+	command_lag(ch, WAIT_MOVEMENT);
 	
 	// triggers?
 	if (!enter_wtrigger(IN_ROOM(ch), ch, dir) || !greet_mtrigger(ch, dir)) {
