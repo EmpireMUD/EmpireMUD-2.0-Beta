@@ -453,8 +453,6 @@ bool can_use_ability(char_data *ch, int ability, int cost_pool, int cost_amount,
 * @param int wait_type Any WAIT_x const or WAIT_NONE for no command lag.
 */
 void charge_ability_cost(char_data *ch, int cost_pool, int cost_amount, int cooldown_type, int cooldown_time, int wait_type) {
-	extern const int universal_wait;
-	
 	if (cost_pool >= 0 && cost_pool < NUM_POOLS && cost_amount > 0) {
 		GET_CURRENT_POOL(ch, cost_pool) = MAX(0, GET_CURRENT_POOL(ch, cost_pool) - cost_amount);
 	}
