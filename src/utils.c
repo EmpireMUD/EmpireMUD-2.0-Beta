@@ -2037,7 +2037,10 @@ void command_lag(char_data *ch, int wait_type) {
 			if (AFF_FLAGGED(ch, AFF_SLOW)) {
 				wait = 1 RL_SEC;
 			}
-			else if (!IS_RIDING(ch) && IS_OUTDOORS(ch) && !IS_ROAD(IN_ROOM(ch))) {
+			else if (IS_RIDING(ch) || IS_ROAD(IN_ROOM(ch))) {
+				wait = 0;	// no wait on riding/road
+			}
+			else if (IS_OUTDOORS(ch)) {
 				if (HAS_BONUS_TRAIT(ch, BONUS_FASTER)) {
 					wait = 0.25 RL_SEC;
 				}
