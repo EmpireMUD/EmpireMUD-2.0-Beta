@@ -165,18 +165,26 @@ Note: Class abilities are unfinished.
 
 See also: CLASS
 #
-CASTER "CASTER ROLE" "MAGIC DPS" "CASTER DPS"
+CASTER "CASTER ROLE" "MAGIC DPS" "CASTER DPS" "CASTER TRAITS"
 
 The caster role, a type of DPS (damage-per-second) role, is meant to deal as
 much magical damage as possible. This role needs Dexterity/To-Hit, Wits, and
 Intelligence. The caster should never be taking direct damage from mobs in
-combat.
+combat. When choosing gear, potions, and buffs for your caster character, focus
+on the caster traits below. Other traits don't contribute to caster DPS.
 
 Caster tips:
  - Let the tank start the fight.
  - Tell the healer if you need healing -- he may be focused on the tank.
 
-See also: HEALER, MELEE, TANK
+Caster traits:
+ - Intelligence: Increases the power of your damage spells and many others.
+ - Dexterity: Counteracts your target's Dexterity and boosts your hit chance.
+ - To-Hit: You need to be as close to the hit cap for your level as possible.
+ - Wits: Increases the speed of your attacks and boosts the damage you deal.
+ - Bonus-Magical: Any spare points can go here to boost your magical damage.
+
+See also: HEALER, HIT CAP, MELEE, TANK
 #
 "DUKE CLASS"
 
@@ -235,17 +243,26 @@ Note: Class abilities are unfinished.
 
 See also: CLASS
 #
-HEALER HEALING "HEALER ROLE" "HEALING ROLE"
+HEALER HEALING "HEALER ROLE" "HEALING ROLE" "HEALER TRAITS" "HEALING TRAITS"
 
 The healer is the group member who keeps the others alive. Healers focus on
 Intelligence only, as the other attributes are generally related to dealing
-damage or taking damage.
+damage or taking damage. When choosing gear, potions, and buffs for your healer
+character, focus on the healer traits below. Other traits don't contribute to
+healing.
 
 Healer tips:
  - Put the tank's health in your prompt with %f/%F.
  - If you don't have mana to waste, don't try to contribute to combat damage
    with spells.
  - Use 'summary' to see everyone's health.
+ 
+Healer traits:
+ - Intelligence: Increases the power of many spells.
+ - Mana-Regen: Ensures you have enough mana to keep the group alive.
+ - Wits: Allows you to cast faster with Fastcasting.
+ - Bonus-Healing: Raises the size of your heals without raising the cost.
+ - Misc*: Each healer class has a unique trait requirement.
 
 See also: CASTER, MELEE, TANK
 #
@@ -268,21 +285,33 @@ Empire + Natural Magic
 Caster: Dragonriding, Resurrect
 Healer: Ancestral Healing, Dragonriding, Fastcasting, Resurrect
 
+Luminary Healers gain additional healing power from Greatness and should build
+their Greatness in addition to the 4 healer traits.
+
 Note: Class abilities are unfinished.
 
 See also: CLASS
 #
-MELEE "MELEE ROLE" "DPS ROLE" "MELEE DPS ROLE"
+MELEE "MELEE ROLE" "DPS ROLE" "MELEE DPS ROLE" "MELEE TRAITS"
 
 The melee role, also called physical DPS (damage-per-second), deals much of
 the combat damage (along with casters). This role requires Dexterity/To-Hit,
-Wits, and Strength. The melee role should avoid taking damage in combat.
+Wits, and Strength. The melee role should avoid taking damage in combat. When
+choosing gear, potions, and buffs for your melee character, focus on the
+melee traits below. Other traits don't contribute to melee DPS.
 
 Melee tips:
  - Let the tank start the fight.
  - Tell the healer if you need healing -- he may be focused on the tank.
 
-See also: CASTER, HEALER, TANK
+Melee traits:
+ - Strength: Increases the damage you deal.
+ - Dexterity: Counteracts your target's Dexterity and boosts your hit chance.
+ - To-Hit: You need to be as close to the hit cap for your level as possible.
+ - Wits: Increases your combat speed and raises the damage you deal.
+ - Bonus-Physical: Any spare points should go here to raise damage.
+
+See also: CASTER, HEALER, HIT CAP, TANK
 #
 "NECROMANCER CLASS"
 
@@ -375,11 +404,13 @@ Note: Class abilities are unfinished.
 
 See also: CLASS
 #
-TANK "TANK ROLE"
+TANK TANKING "TANK ROLE" "TANKING ROLE" "TANK TRAITS" "TANKING ROLE"
 
 The tank is the group member who takes damage from the enemy. A good tank has
 high hitpoints and damage mitigation (like resistance and dodge). Tanks don't
-need Strength or Wits, because those are related to dealing damage.
+need Strength or Wits, because those are related to dealing damage. When
+choosing gear, potions, and buffs for your tank character, you only need to
+worry about the tank traits listed below
 
 Tanking tips:
  - The tank should start combat with all mobs so they are hitting him, rather
@@ -387,7 +418,15 @@ Tanking tips:
  - The tank should use abilities like Rescue to ensure "squishy" roles like the
    healer are not taking damage.
 
-See also: CASTER, HEALER, MELEE
+Tank traits:
+ - Dexterity: Contributes to Dodge and counteracts the attacker's Dexterity.
+ - Dodge: You should be as close to the dodge cap for your level as possible.
+ - Block: You should be as close to the block cap for your level as possible,
+      and using a shield.
+ - Resist-Magical: Any spare points can go into resistances.
+ - Resist-Physical: Any spare points can go into resistances.
+
+See also: CASTER, DODGE CAP, HEALER, MELEE
 #
 "THEURGE CLASS"
 
@@ -419,6 +458,9 @@ Battle + Natural Magic
 Tank: Resurrect, Towering Werewolf Form
 Melee: Resurrect, Savage Werewolf Form
 Healer: Confer, Fastcasting, Resurrect, Sage Werewolf Form
+
+Healer Werewolves can convert Strength into buffs for themselves and their
+allies, and should build their Strength in addition to the 4 healer traits.
 
 Note: Class abilities are unfinished.
 
