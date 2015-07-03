@@ -458,7 +458,7 @@ ACMD(do_confer) {
 		amt = MAX(amt, 1);	// ensure at least 1 point of stuff
 		
 		// attempt to find an existing confer effect that matches and just add to its amount
-		found_existing = FALSE;
+		found_existing = found_ch = FALSE;
 		for (aff_iter = vict->affected; aff_iter; aff_iter = aff_iter->next) {
 			if (aff_iter->type == ATYPE_CONFER && aff_iter->location == confer_list[type].apply) {
 				found_existing = TRUE;
@@ -489,15 +489,6 @@ ACMD(do_confer) {
 					break;
 				}
 			}
-			
-			if (!found_ch) {
-				// need a new strength effect on ch
-				aff = create_mod_aff(ATYPE_CONFERRED, duration, APPLY_STRENGTH, -1);
-				
-				// use affect_to_char instead of affect_join because we will allow multiple copies of this with different durations
-				affect_to_char(ch, aff);
-				free(aff);
-			}
 		}
 		else {
 			// did not find existing: add if needed
@@ -505,6 +496,16 @@ ACMD(do_confer) {
 			
 			// use affect_to_char instead of affect_join because we will allow multiple copies of this with different durations
 			affect_to_char(vict, aff);
+			free(aff);
+		}
+		
+		// separately ...
+		if (!found_ch) {
+			// need a new strength effect on ch
+			aff = create_mod_aff(ATYPE_CONFERRED, duration, APPLY_STRENGTH, -1);
+			
+			// use affect_to_char instead of affect_join because we will allow multiple copies of this with different durations
+			affect_to_char(ch, aff);
 			free(aff);
 		}
 	}
