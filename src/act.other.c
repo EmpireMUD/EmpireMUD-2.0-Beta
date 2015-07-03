@@ -91,8 +91,8 @@ void perform_alternate(char_data *old, char_data *new) {
 
 	strcpy(temp, PERS(new, new, TRUE));
 	snprintf(mort_alt, sizeof(mort_alt), "%s has switched to %s", PERS(old, old, TRUE), temp);
-	snprintf(mort_out, sizeof(mort_in), "%s has entered the game", temp);
-	snprintf(mort_in, sizeof(mort_in), "%s has left the game", PERS(old, old, TRUE));
+	snprintf(mort_in, sizeof(mort_in), "%s has entered the game", temp);
+	snprintf(mort_out, sizeof(mort_in), "%s has left the game", PERS(old, old, TRUE));
 	
 	// store last known level now
 	GET_LAST_KNOWN_LEVEL(old) = GET_COMPUTED_LEVEL(old);
