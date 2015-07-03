@@ -303,7 +303,7 @@ S
 Smokehouse~
 The Smokehouse~
 &0{SS}~
-15 0 bp 0
+15 0 br 0
 0 0 0 -1
 C
 retrieve, store~
@@ -777,7 +777,7 @@ D
    This temple is nothing less than massive! It rises high above the ground and
 from its ceremonial chamber, a viewer can see for miles. A column of steps
 cascades down from the top, where the temple altar is surprisingly clean, a
-state mandated by any god worthy of a temple of such stature.  
+state mandated by any god worthy of a temple of such stature.
 ~
 M
 244 20.00 c

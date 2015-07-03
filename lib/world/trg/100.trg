@@ -928,7 +928,7 @@ if !%actor.affect(enervate)%
   enervate
 else
   %send% %actor% %self.name% marks you with a piece of chalk. It burns!
-  %echoaround% %actor% %self.name% marks %actor.name with a piece of chalk. It looks like it burns!
+  %echoaround% %actor% %self.name% marks %actor.name% with a piece of chalk. It looks like it burns!
   %dot% %actor% 50 20 magical
   %damage% %actor% 50 magical
 end
@@ -1369,7 +1369,7 @@ switch %random.3%
     dg_affect %self% TO-HIT 1 60
   break
   case 3
-    dg_affect %self% SOAK 1 60
+    dg_affect %self% RESIST-PHYSICAL 1 60
   break
 done
 ~
