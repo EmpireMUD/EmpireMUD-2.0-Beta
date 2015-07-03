@@ -2200,7 +2200,9 @@ const char *affect_types[] = {
 	"howl",
 	"crucial jab",
 	"diversion",
-	"shadow jab",	// 59
+	"shadow jab",
+	"confer",	// 60
+	"conferred",
 	"\n"
 	};
 
@@ -2266,7 +2268,9 @@ const char *affect_wear_off_msgs[] = {
 	"The terrifying howl fades from your mind.",
 	"You are no longer weakened by the crucial jab.",
 	"You are no longer distracted by the diversion.",
-	"You are no longer weakened by the shadow jab.",	// 59
+	"You are no longer weakened by the shadow jab.",
+	"The power you were conferred has faded.",	// 60
+	"Your conferred strength returns.",
 	"\n"
 };
 

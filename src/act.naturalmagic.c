@@ -256,6 +256,7 @@ ACMD(do_cleanse) {
 		ATYPE_DEATHSHROUD,	// has a strange set of affs
 		ATYPE_DEATH_PENALTY,	// is a penalty
 		ATYPE_WAR_DELAY,	// is a penalty
+		ATYPE_CONFERRED,	// is a penalty
 		-1	// last
 	};
 	
@@ -344,6 +345,167 @@ ACMD(do_cleanse) {
 
 		if (FIGHTING(vict) && !FIGHTING(ch)) {
 			engage_combat(ch, FIGHTING(vict), FALSE);
+		}
+	}
+}
+
+
+ACMD(do_confer) {
+	extern const double apply_values[];
+	
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	struct affected_type *aff, *aff_iter;
+	bool any, found_existing, found_ch;
+	int amt, iter, abbrev, type;
+	int match_duration = 0;
+	char_data *vict = ch;
+	
+	// configs
+	int duration = 6 * REAL_UPDATES_PER_MIN;
+	int cost = 50;
+
+	struct {
+		char *name;
+		int apply;
+	} confer_list[] = {
+		{ "block", APPLY_BLOCK },
+		{ "dodge", APPLY_DODGE },
+		{ "health", APPLY_HEALTH },
+		{ "health-regen", APPLY_HEALTH_REGEN },
+		{ "mana", APPLY_MANA },
+		{ "mana-regen", APPLY_MANA_REGEN },
+		{ "move", APPLY_MOVE },
+		{ "move-regen", APPLY_MOVE_REGEN },
+		{ "resist-magical", APPLY_RESIST_MAGICAL },
+		{ "resist-physical", APPLY_RESIST_PHYSICAL },
+		{ "to-hit", APPLY_TO_HIT },
+		
+		// last
+		{ "\n", APPLY_NONE }
+	};
+	
+	two_arguments(argument, arg1, arg2);
+	
+	if (!can_use_ability(ch, ABIL_CONFER, MANA, cost, NOTHING)) {
+		return;
+	}
+	
+	if (!*arg1) {
+		msg_to_char(ch, "Usage: confer <trait> [person]\r\n");
+		msg_to_char(ch, "You know how to confer:");
+		any = FALSE;
+		for (iter = 0; *confer_list[iter].name != '\n'; ++iter) {
+			msg_to_char(ch, "%s%s", (any ? ", " : " "), confer_list[iter].name);
+			any = TRUE;
+		}
+		if (!any) {
+			msg_to_char(ch, " nothing");
+		}
+		msg_to_char(ch, "\r\n");
+		return;
+	}
+
+	// optional 2nd arg
+	if (*arg2 && !(vict = get_char_vis(ch, arg2, FIND_CHAR_ROOM))) {
+		send_config_msg(ch, "no_person");
+		return;
+	}
+	
+	// find type in list: prefer exact match
+	type = abbrev = NOTHING;
+	for (iter = 0; *confer_list[iter].name != '\n'; ++iter) {
+		if (!str_cmp(arg1, confer_list[iter].name)) {
+			type = iter;
+			break;
+		}
+		else if (is_abbrev(arg1, confer_list[iter].name)) {
+			abbrev = iter;
+		}
+	}
+	if (type == NOTHING) {
+		type = abbrev;	// no exact match
+	}
+	
+	// pre-validation complete
+	if (GET_STRENGTH(ch) < 2) {
+		msg_to_char(ch, "You have no strength to confer.\r\n");
+	}
+	else if (type == NOTHING || confer_list[type].apply == APPLY_NONE) {
+		msg_to_char(ch, "You don't know how to confer '%s'.\r\n", arg1);
+	}
+	else if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_CONFER)) {
+		return;
+	}
+	else {
+		// good to go
+		charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
+		
+		// messaging
+		if (ch == vict) {
+			msg_to_char(ch, "You confer your own strength into %s!\r\n", confer_list[type].name);
+			// no message to room!
+		}
+		else {
+			sprintf(buf, "You confer your strength into $N's %s!", confer_list[type].name);
+			act(buf, FALSE, ch, NULL, vict, TO_CHAR);
+			sprintf(buf, "$n confers $s strength into your %s!", confer_list[type].name);
+			act(buf, FALSE, ch, NULL, vict, TO_VICT);
+			act("$n confers $s strength into $N!", FALSE, ch, NULL, vict, TO_NOTVICT);
+		}
+		
+		// determine how much to give: based on what a point of strength is worth
+		amt = round(apply_values[APPLY_STRENGTH] / apply_values[confer_list[type].apply]);
+		amt = MAX(amt, 1);	// ensure at least 1 point of stuff
+		
+		// attempt to find an existing confer effect that matches and just add to its amount
+		found_existing = FALSE;
+		for (aff_iter = vict->affected; aff_iter; aff_iter = aff_iter->next) {
+			if (aff_iter->type == ATYPE_CONFER && aff_iter->location == confer_list[type].apply) {
+				found_existing = TRUE;
+				aff_iter->modifier += amt;
+				match_duration = aff_iter->duration;	// store this to match it later
+				aff_iter->duration = duration;	// reset to max duration
+
+				// ensure stats are correct
+				affect_modify(vict, aff_iter->location, amt, NOBITS, TRUE);
+				affect_total(vict);
+				break;
+			}
+		}
+		
+		if (found_existing) {
+			// if there was an existing aff on the target, maybe there is one on ch
+			found_ch = FALSE;
+			for (aff_iter = ch->affected; aff_iter; aff_iter = aff_iter->next) {
+				// we match by duration because lengthening any -str affect that had the same duration is equally good
+				if (aff_iter->type == ATYPE_CONFERRED && aff_iter->duration == match_duration) {
+					found_ch = TRUE;
+					aff_iter->modifier -= 1;	// additional -1 strength
+					aff_iter->duration = duration;	// reset to max duration
+
+					// ensure stats are correct
+					affect_modify(ch, aff_iter->location, -1, NOBITS, TRUE);
+					affect_total(ch);
+					break;
+				}
+			}
+			
+			if (!found_ch) {
+				// need a new strength effect on ch
+				aff = create_mod_aff(ATYPE_CONFERRED, duration, APPLY_STRENGTH, -1);
+				
+				// use affect_to_char instead of affect_join because we will allow multiple copies of this with different durations
+				affect_to_char(ch, aff);
+				free(aff);
+			}
+		}
+		else {
+			// did not find existing: add if needed
+			aff = create_mod_aff(ATYPE_CONFER, duration, confer_list[type].apply, amt);
+			
+			// use affect_to_char instead of affect_join because we will allow multiple copies of this with different durations
+			affect_to_char(vict, aff);
+			free(aff);
 		}
 	}
 }

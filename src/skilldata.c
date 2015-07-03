@@ -291,6 +291,7 @@ void init_skills() {
 	setup_class_ability(ABIL_ANCESTRAL_HEALING, "Ancestral Healing");
 	setup_class_ability(ABIL_BLOOD_FORTITUDE, "Blood Fortitude");
 	setup_class_ability(ABIL_BLOODSWEAT, "Bloodsweat");
+	setup_class_ability(ABIL_CONFER, "Confer");
 	setup_class_ability(ABIL_CRUCIAL_JAB, "Crucial Jab");
 	setup_class_ability(ABIL_DRAGONRIDING, "Dragonriding");
 	setup_class_ability(ABIL_DREAD_BLOOD_FORM, "Dread Blood Form");

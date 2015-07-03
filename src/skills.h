@@ -366,8 +366,9 @@ extern bool skill_check(char_data *ch, int ability, int difficulty);
 #define ABIL_SHADOW_JAB  237
 #define ABIL_FASTCASTING  238
 #define ABIL_ANCESTRAL_HEALING  239
+#define ABIL_CONFER  240
 
-#define NUM_ABILITIES  240		// must be <= MAX_ABILITIES (400; structs.h)
+#define NUM_ABILITIES  241		// must be <= MAX_ABILITIES (400; structs.h)
 
 
 // cooldowns -- see COOLDOWN_x in constants.c
@@ -552,8 +553,10 @@ extern bool skill_check(char_data *ch, int ability, int difficulty);
 #define ATYPE_CRUCIAL_JAB  57
 #define ATYPE_DIVERSION  58
 #define ATYPE_SHADOW_JAB  59
+#define ATYPE_CONFER  60
+#define ATYPE_CONFERRED  61
 
-#define NUM_ATYPES  60	// total number, for bounds checking
+#define NUM_ATYPES  62	// total number, for bounds checking
 
 
 // armor types

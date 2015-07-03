@@ -112,6 +112,26 @@ If your target is in combat, you will join the combat upon using this ability.
 
 See also: DISPEL
 #
+CONFER
+
+Confer
+Class ability:  Werewolf
+Usage:  confer <trait> [person]
+Duration:  6 minutes
+Cost:  50 mana, 1 Strength
+
+This ability allows a werewolf to confer his or her strength upon others. The
+werewolf gets -1 Strength and the target gets a boost to the specified trait.
+Both effects last the same amount of time.
+
+You can target yourself with this ability by omitting the target, or targeting
+'self'.
+
+Using this ability multiple times on the same target and same trait will stack
+onto the same +trait buff and -Strength debuff and also reset their timer, so
+you can refresh this buff's full effect if you have the Strength to recast it
+before it expires.
+#
 COUNTERSPELL "COUNTER SPELL"
 
 Counterspell (Natural Magic ability)
@@ -197,6 +217,9 @@ With Fastcasting, your Wits attribute no longer boosts your combat speed.
 Instead, it reduces the command lag after casting non-combat spells (including
 healing spells). This ability is used by healers to help them keep their party
 alive.
+
+Base command lag is 1.25 seconds, and this ability reduces it by 0.1 per 3
+Wits, down to 0.75 seconds.
 
 See also: COMMAND LAG
 #

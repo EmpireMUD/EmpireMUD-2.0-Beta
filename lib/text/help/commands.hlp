@@ -24,7 +24,8 @@ See also: ALIAS
 
 The + and - commands allow you to manipulate your input queue. Some commands,
 such as abilities, cause a small amount of "command lag". Anything you type
-while you have this "lag" is added to the end of your input queue.
+while you have this "lag" is added to the end of your input queue. Normal
+command lag is 1.25 seconds for abilities, but some traits can lower this.
 
 You can add a new command to the start of your input queue (instead of the
 end of the queue) using a +. For example, "+heal" will put "heal" at the start
@@ -35,6 +36,8 @@ You can see your current queue by typing -.
 You can clear your entire queue with --, or you can remove specific items with
 "-text" where text is an abbreviation for the commands to remove. For example,
 "-kick" will remove anything that starts with "kick".
+
+See also: FASTCASTING
 #
 AFFECTS
 
