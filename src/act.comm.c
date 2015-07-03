@@ -796,7 +796,7 @@ ACMD(do_slash_channel) {
 		
 		found = FALSE;
 		for (slash = GET_SLASH_CHANNELS(ch); slash; slash = slash->next) {
-			if ((chan = find_slash_channel_by_id(slash->id)) && find_on_slash_channel(vict, slash->id)) {
+			if ((chan = find_slash_channel_by_id(slash->id)) && (IS_IMMORTAL(ch) || find_on_slash_channel(vict, slash->id))) {
 				msg_to_char(ch, "  &%c/%s&0\r\n", chan->color, chan->name);
 				found = TRUE;
 			}
