@@ -50,6 +50,26 @@ void un_earthmeld(char_data *ch);
 //// HELPERS /////////////////////////////////////////////////////////////////
 
 /**
+* Returns the amount of healing to add if the player has Ancestral Healing and
+* the Greatness attribute.
+*
+* @param char_data *ch The character to check for the ability.
+* @return int The amount of healing to add (or 0 if none).
+*/
+int ancestral_healing(char_data *ch) {
+	double mod, amt;
+	
+	if (!HAS_ABILITY(ch, ABIL_ANCESTRAL_HEALING)) {
+		return 0;
+	}
+	
+	mod = get_approximate_level(ch) / 150.0;
+	amt = round(GET_GREATNESS(ch) * mod);
+	return MAX(0, amt);
+}
+
+
+/**
 * @param char_data *ch
 * @return char_data *the familiar if one exists, or NULL
 */
@@ -724,7 +744,7 @@ ACMD(do_hasten) {
 ACMD(do_heal) {
 	char_data *vict = ch, *ch_iter, *next_ch;
 	bool party = FALSE;
-	int cost, abil = NO_ABIL, gain = 15, amount;
+	int cost, abil = NO_ABIL, gain = 15, amount, bonus;
 	
 	int heal_levels[] = { 15, 25, 35 };
 	double intel_bonus[] = { 0.5, 1.5, 2.0 };
@@ -785,17 +805,18 @@ ACMD(do_heal) {
 
 	// amount to heal will determine the cost
 	amount = CHOOSE_BY_ABILITY_LEVEL(heal_levels, ch, abil) + (GET_INTELLIGENCE(ch) * CHOOSE_BY_ABILITY_LEVEL(intel_bonus, ch, abil)) + (MAX(0, get_approximate_level(ch) - 100) * CHOOSE_BY_ABILITY_LEVEL(level_bonus, ch, abil));
+	bonus = GET_BONUS_HEALING(ch) + ancestral_healing(ch);
 	
 	if (vict && !party) {
 		// subtract bonus-healing because it will be re-added at the end
-		amount = MIN(amount, GET_MAX_HEALTH(vict) - GET_HEALTH(vict) - GET_BONUS_HEALING(ch));
+		amount = MIN(amount, GET_MAX_HEALTH(vict) - GET_HEALTH(vict) - bonus);
 		amount = MAX(1, amount);
 	}
 	
 	cost = amount * CHOOSE_BY_ABILITY_LEVEL(cost_ratio, ch, abil);
 	
 	// bonus healing does not add to cost
-	amount += GET_BONUS_HEALING(ch);
+	amount += bonus;
 	
 	if (party) {
 		cost = round(cost * party_cost);
@@ -1022,7 +1043,7 @@ ACMD(do_quaff) {
 ACMD(do_rejuvenate) {
 	struct affected_type *af;
 	char_data *vict = ch;
-	int amount, cost = 25;
+	int amount, bonus, cost = 25;
 	
 	int heal_levels[] = { 4, 6, 8 };	// x6 ticks (24, 36, 42)
 	double int_mod = 0.3333;
@@ -1049,7 +1070,8 @@ ACMD(do_rejuvenate) {
 	cost = MAX(1, cost);
 	
 	// does not affect the cost
-	amount += round(GET_BONUS_HEALING(ch) * bonus_heal_mod);
+	bonus = GET_BONUS_HEALING(ch) + ancestral_healing(ch);
+	amount += round(bonus * bonus_heal_mod);
 	
 	// run this again but with the cost
 	if (!can_use_ability(ch, ABIL_REJUVENATE, MANA, cost, NOTHING)) {

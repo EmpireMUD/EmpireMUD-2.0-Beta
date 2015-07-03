@@ -288,6 +288,7 @@ void init_skills() {
 	
 	// class-only abilities (require less data; see class.c for more)
 	
+	setup_class_ability(ABIL_ANCESTRAL_HEALING, "Ancestral Healing");
 	setup_class_ability(ABIL_BLOOD_FORTITUDE, "Blood Fortitude");
 	setup_class_ability(ABIL_BLOODSWEAT, "Bloodsweat");
 	setup_class_ability(ABIL_CRUCIAL_JAB, "Crucial Jab");

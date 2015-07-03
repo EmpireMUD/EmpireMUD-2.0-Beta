@@ -21,6 +21,25 @@ See also: CHANT, CHANT OF NATURE, HEAL, CLEANSE, PURIFY, EARTHARMOR,
     SOLAR POWER, EARTHMELD, WORM, FLY, GIFT OF NATURE, SUMMON, TOUCH OF FLAME,
     ANIMAL FORMS
 #
+"ANCESTRAL HEALING"
+
+Ancestral Healing
+Class ability:  Luminary
+
+This passive ability channels the power of your ancestors to add your Greatness
+attribute to your healing spells. This effect gets more powerful as your level
+goes up.
+
+The amount of healing added is a proportion of your Greatness: your total
+Greatness is added per 150 player levels, with a proportion of your Greatness
+for any potion under 150 levels. For example, if you are level 75, you gain
+half your Greatness. At level 150, it's your full Greatness. At level 300, it's
+2x Greatness.
+
+This bonus healing does not add to the cost of the healing spell.
+
+See also: HEAL, REJUVENATE
+#
 "ANIMAL FORMS" "DEER FORM" "OSTRICH FORM" "TAPIR FORM"
 
 Animal Forms (Natural Magic ability)
