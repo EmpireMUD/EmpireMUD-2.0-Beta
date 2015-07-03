@@ -1078,13 +1078,14 @@ const char *empire_log_types[] = {
 
 // ELOG_x: Whether or not logs are shown to players online
 const bool show_empire_log_type[] = {
-	TRUE,
-	TRUE,
-	TRUE,
-	TRUE,
-	TRUE,
-	TRUE,
-	FALSE
+	TRUE,	// none
+	TRUE,	// admin
+	TRUE,	// diplo
+	TRUE,	// hostility
+	TRUE,	// members
+	TRUE,	// territory
+	FALSE,	// trade
+	TRUE	// logins
 };
 
 
