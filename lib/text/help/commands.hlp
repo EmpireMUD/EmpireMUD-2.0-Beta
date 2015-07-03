@@ -109,9 +109,10 @@ This command lets you switch from one alt to another. An "alt" is a character
 you own, on your account. You can only use this command to switch between
 characters on the same account. No password is required.
 
-Other players will see a log indicating that you switched from one character
-to the other, so if you're trying to hide your true identity, you should
-probably not use this command.
+Players will only see the login/logout messages unless they are in the same
+empire as both your alts, in which case they will see a "switch" message.
+However, if this EmpireMUD has public logins enabled, alternate will always
+give a "switch" mortlog (instead of elogs).
 
 You can't use alternate again within 60 seconds of a previous use. Please don't
 spam players by logging in and out more rapidly than this.
@@ -987,7 +988,8 @@ See also: GET, KEEP
 QUIT
 
 When you get tired of playing, you can leave the game by typing 'quit'. This
-will save your character and disconnect you.
+will save your character and disconnect you. Only players in the same empire
+will see a message that you quit, unless public logins are enabled.
 
 You can use "alt" to quickly change characters, rather than quitting.
 
