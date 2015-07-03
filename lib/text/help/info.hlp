@@ -684,12 +684,13 @@ blacksmith at a forge.
 
 See also: DIG, EXCAVATE, FORGE
 #
-"SLASH CHANNELS" SLASH-CHANNELS / /JOIN /LEAVE /WHO /HISTORY HISTORY VC "VIRTUAL CHANNELS"
+"SLASH CHANNELS" SLASH-CHANNELS / /JOIN /CHECK /LEAVE /WHO /HISTORY HISTORY VC "VIRTUAL CHANNELS"
 
 Usage:  /join <channel>
         /leave <channel>
         /history <channel>
         /who <channel>
+        /check <person>
         /<channel> message
         /list
 
@@ -700,6 +701,9 @@ channels for any purpose.
 Slash-channels may be considered moderated, public channels if many players
 are on them. However, you can also create them as private channels by not
 telling other players about them.
+
+/who lists all players on a channel. /check lets you see which channels a
+player is on with you. /list lists all channels you are on.
 
 You can start chats with * (asterisk) to make them channel-emotes.
 

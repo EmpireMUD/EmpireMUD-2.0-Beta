@@ -743,6 +743,7 @@ ACMD(do_slash_channel) {
 	struct player_slash_channel *slash, *temp;
 	char arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
 	descriptor_data *desc;
+	char_data *vict;
 	int iter;
 	bool ok, found;
 	
@@ -756,13 +757,46 @@ ACMD(do_slash_channel) {
 	}
 	
 	if (!*arg) {
-		msg_to_char(ch, "Valid slash-channel commands are: /join, /leave, /who, /hist, /history, /list, and /<channel>\r\n");
+		msg_to_char(ch, "Valid slash-channel commands are: /join, /leave, /who, /hist, /history, /check, /list, and /<channel>\r\n");
 	}
 	else if (!str_cmp(arg, "list")) {
 		msg_to_char(ch, "You are on the following channels:\r\n");
 		found = FALSE;
 		for (slash = GET_SLASH_CHANNELS(ch); slash; slash = slash->next) {
 			if ((chan = find_slash_channel_by_id(slash->id))) {
+				msg_to_char(ch, "  &%c/%s&0\r\n", chan->color, chan->name);
+				found = TRUE;
+			}
+		}
+		
+		if (!found) {
+			msg_to_char(ch, "  none\r\n");
+		}
+	}
+	else if (!str_cmp(arg, "check")) {
+		// check channels: any player
+		one_argument(arg2, arg3);
+		
+		if (!(vict = get_player_vis(ch, arg3, FIND_CHAR_WORLD | FIND_NO_DARK))) {
+			send_config_msg(ch, "no_person");
+			return;
+		}
+		if (vict == ch) {
+			msg_to_char(ch, "If you want to check what channels you're on, use /list.\r\n");
+			return;
+		}
+		
+		// messaging
+		if (IS_IMMORTAL(ch)) {
+			msg_to_char(ch, "%s is on the following slash-channels:\r\n", PERS(vict, ch, TRUE));
+		}
+		else {
+			msg_to_char(ch, "%s is on the following channels with you:\r\n", PERS(vict, ch, TRUE));
+		}
+		
+		found = FALSE;
+		for (slash = GET_SLASH_CHANNELS(ch); slash; slash = slash->next) {
+			if ((chan = find_slash_channel_by_id(slash->id)) && find_on_slash_channel(vict, slash->id)) {
 				msg_to_char(ch, "  &%c/%s&0\r\n", chan->color, chan->name);
 				found = TRUE;
 			}
