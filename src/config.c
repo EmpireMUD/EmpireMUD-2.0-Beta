@@ -1546,6 +1546,7 @@ void init_config_system(void) {
 	init_config(CONFIG_GAME, "ok_string", CONFTYPE_SHORT_STRING, "simple Ok message");
 	init_config(CONFIG_GAME, "no_person", CONFTYPE_SHORT_STRING, "bad target error for no person");
 	init_config(CONFIG_GAME, "huh_string", CONFTYPE_SHORT_STRING, "message for invalid command");
+	init_config(CONFIG_GAME, "public_logins", CONFTYPE_BOOL, "login/out/alt display to mortlog instead of elog");
 	init_config(CONFIG_GAME, "require_auth", CONFTYPE_BOOL, "new players will not auto-authorize");
 
 	// actions

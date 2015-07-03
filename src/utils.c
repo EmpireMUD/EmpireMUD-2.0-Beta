@@ -1375,7 +1375,7 @@ void basic_mud_log(const char *format, ...) {
 
 /**
 * Shows a log to players in-game and also stores it to file, except for the
-* ELOG_NONE type, which is displayed by not stored.
+* ELOG_NONE/ELOG_LOGINS types, which are displayed but not stored.
 *
 * @param empire_data *emp Which empire to log to.
 * @param int type ELOG_x
@@ -1397,7 +1397,7 @@ void log_to_empire(empire_data *emp, int type, const char *str, ...) {
 	vsprintf(output, str, tArgList);
 	
 	// save to file?
-	if (type != ELOG_NONE) {
+	if (type != ELOG_NONE && type != ELOG_LOGINS) {
 		CREATE(elog, struct empire_log_data, 1);
 		elog->type = type;
 		elog->timestamp = time(0);

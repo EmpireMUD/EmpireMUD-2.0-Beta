@@ -391,7 +391,12 @@ int Objload_char(char_data *ch, int dolog) {
 		if (dolog) {
 			syslog(SYS_LOGIN, GET_INVIS_LEV(ch), TRUE, "%s entering game with no equipment.", GET_NAME(ch));
 			if (GET_INVIS_LEV(ch) == 0) {
-				mortlog("%s has entered the game", PERS(ch, ch, 1));
+				if (config_get_bool("public_logins")) {
+					mortlog("%s has entered the game", PERS(ch, ch, TRUE));
+				}
+				else if (GET_LOYALTY(ch)) {
+					log_to_empire(GET_LOYALTY(ch), ELOG_LOGINS, "%s has entered the game", PERS(ch, ch, TRUE));
+				}
 			}
 		}
 		return (1);
@@ -591,7 +596,12 @@ int Objload_char(char_data *ch, int dolog) {
 	
 	// mortlog
 	if (dolog && GET_INVIS_LEV(ch) == 0) {
-		mortlog("%s has entered the game", PERS(ch, ch, TRUE));
+		if (config_get_bool("public_logins")) {
+			mortlog("%s has entered the game", PERS(ch, ch, TRUE));
+		}
+		else if (GET_LOYALTY(ch)) {
+			log_to_empire(GET_LOYALTY(ch), ELOG_LOGINS, "%s has entered the game", PERS(ch, ch, TRUE));
+		}
 	}
 
 	fclose(fl);

@@ -1041,6 +1041,8 @@ int enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	extern room_data *find_load_room(char_data *ch);
 	extern int get_ptable_by_name(char *name);
 	void read_saved_vars(char_data *ch);
+	
+	extern bool global_mute_slash_channel_joins;
 	extern int top_idnum;
 	extern const struct wear_data_type wear_data[NUM_WEARS];
 
@@ -1154,12 +1156,14 @@ int enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	GET_RESURRECT_ABILITY(ch) = NO_ABIL;
 
 	// re-join slash-channels
+	global_mute_slash_channel_joins = TRUE;
 	for (iter = 0; iter < MAX_SLASH_CHANNELS; ++iter) {
 		if (*GET_STORED_SLASH_CHANNEL(ch, iter)) {
 			sprintf(lbuf, "join %s", GET_STORED_SLASH_CHANNEL(ch, iter));
 			do_slash_channel(ch, lbuf, 0, 0);
 		}
 	}
+	global_mute_slash_channel_joins = FALSE;
 	
 	// free reset?
 	if (RESTORE_ON_LOGIN(ch)) {
@@ -1296,6 +1300,9 @@ void start_new_character(char_data *ch) {
 	char lbuf[MAX_INPUT_LENGTH];
 	int type, iter;
 	obj_data *obj;
+	
+	// announce to existing players that we have a newbie
+	mortlog("%s has joined the game", PERS(ch, ch, TRUE));
 
 	set_title(ch, NULL);
 

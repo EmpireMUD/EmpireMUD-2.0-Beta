@@ -59,11 +59,12 @@ void perform_alternate(char_data *old, char_data *new) {
 	extern char *START_MESSG;
 	extern bool global_mute_slash_channel_joins;
 	
-	char sys[MAX_STRING_LENGTH], mort[MAX_STRING_LENGTH], temp[256];
+	char sys[MAX_STRING_LENGTH], mort_in[MAX_STRING_LENGTH], mort_out[MAX_STRING_LENGTH], mort_alt[MAX_STRING_LENGTH], temp[256];
 	descriptor_data *desc, *next_d;
 	bool show_start = FALSE;
 	char_data *ch_iter;
-	int invis_lev, last_tell;
+	int invis_lev, old_invis, last_tell;
+	empire_data *old_emp;
 	
 	if (!old || !new || !old->desc || new->desc) {
 		log("SYSERR: Attempting invalid peform_alternate with %s, %s, %s, %s", old ? "ok" : "no old", new ? "ok" : "no new", old->desc ? "ok" : "no old desc", new->desc ? "new desc" : "ok");
@@ -82,11 +83,16 @@ void perform_alternate(char_data *old, char_data *new) {
 	}
 	
 	invis_lev = MAX(GET_INVIS_LEV(new), (PLR_FLAGGED(new, PLR_INVSTART) ? GET_ACCESS_LEVEL(new) : 0));
+	old_invis = GET_INVIS_LEV(old);
+	old_emp = GET_LOYALTY(old);
 	
 	// prepare logs
 	snprintf(sys, sizeof(sys), "%s used alternate to switch to %s.", GET_NAME(old), GET_NAME(new));
+
 	strcpy(temp, PERS(new, new, TRUE));
-	snprintf(mort, sizeof(mort), "%s has switched to %s", PERS(old, old, TRUE), temp);
+	snprintf(mort_alt, sizeof(mort_alt), "%s has switched to %s", PERS(old, old, TRUE), temp);
+	snprintf(mort_out, sizeof(mort_in), "%s has entered the game", temp);
+	snprintf(mort_in, sizeof(mort_in), "%s has left the game", PERS(old, old, TRUE));
 	
 	// store last known level now
 	GET_LAST_KNOWN_LEVEL(old) = GET_COMPUTED_LEVEL(old);
@@ -119,8 +125,27 @@ void perform_alternate(char_data *old, char_data *new) {
 	extract_char(old);
 	
 	syslog(SYS_LOGIN, invis_lev, TRUE, "%s", sys);
-	if (GET_INVIS_LEV(new) == 0 && !PLR_FLAGGED(new, PLR_INVSTART)) {
-		mortlog("%s", mort);
+	if (config_get_bool("public_logins")) {
+		if (GET_INVIS_LEV(new) == 0 && !PLR_FLAGGED(new, PLR_INVSTART)) {
+			mortlog("%s", mort_alt);
+		}
+		else if (old_invis == 0) {
+			// only mortlog logout
+			mortlog("%s", mort_out);
+		}
+	}
+	else {	// not public logins -- use elogs
+		if (old_emp && GET_LOYALTY(new) == old_emp && old_invis == 0) {
+			// both in same empire
+			log_to_empire(old_emp, ELOG_LOGINS, "%s", mort_alt);
+		}
+		else if (old_emp && old_invis == 0) {
+			log_to_empire(old_emp, ELOG_LOGINS, "%s", mort_out);
+		}
+		
+		if (GET_LOYALTY(new) && GET_LOYALTY(new) != old_emp && GET_INVIS_LEV(new) == 0 && !PLR_FLAGGED(new, PLR_INVSTART)) {
+			log_to_empire(GET_LOYALTY(new), ELOG_LOGINS, "%s", mort_in);
+		}
 	}
 	
 	// if new is NOT already in-game
@@ -1213,7 +1238,12 @@ ACMD(do_quit) {
 		}
 		syslog(SYS_LOGIN, GET_INVIS_LEV(ch), TRUE, "%s has quit the game.", GET_NAME(ch));
 		if (GET_INVIS_LEV(ch) == 0) {
-			mortlog("%s has left the game", PERS(ch, ch, 1));
+			if (config_get_bool("public_logins")) {
+				mortlog("%s has left the game", PERS(ch, ch, 1));
+			}
+			else if (GET_LOYALTY(ch)) {
+				log_to_empire(GET_LOYALTY(ch), ELOG_LOGINS, "%s has left the game", PERS(ch, ch, TRUE));
+			}
 		}
 		send_to_char("Goodbye, friend.. Come back soon!\r\n", ch);
 
@@ -1297,7 +1327,12 @@ ACMD(do_selfdelete) {
 			act("$n has left the game.", TRUE, ch, 0, 0, TO_ROOM);
 		}
 		if (GET_INVIS_LEV(ch) == 0) {
-			mortlog("%s has left the game", PERS(ch, ch, TRUE));
+			if (config_get_bool("public_logins")) {
+				mortlog("%s has left the game", PERS(ch, ch, 1));
+			}
+			else if (GET_LOYALTY(ch)) {
+				log_to_empire(GET_LOYALTY(ch), ELOG_LOGINS, "%s has left the game", PERS(ch, ch, TRUE));
+			}
 		}
 		msg_to_char(ch, "You have deleted your character. Goodbye...\r\n");
 		

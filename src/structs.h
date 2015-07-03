@@ -604,6 +604,7 @@ typedef struct trig_data trig_data;
 #define ELOG_MEMBERS  4	// enroll, promote, demote, etc
 #define ELOG_TERRITORY  5	// territory changes
 #define ELOG_TRADE  6	// auto-trades
+#define ELOG_LOGINS  7	// login/out/alt (does not save to file)
 
 
 // for empire_unique_storage->flags
