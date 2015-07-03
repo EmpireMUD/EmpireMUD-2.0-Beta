@@ -1294,6 +1294,7 @@ void start_new_character(char_data *ch) {
 	void scale_item_to_level(obj_data *obj, int level);
 	void set_skill(char_data *ch, int skill, int level);
 	extern const char *default_channels[];
+	extern bool global_mute_slash_channel_joins;
 	extern struct promo_code_list promo_codes[];
 	extern int tips_of_the_day_size;
 
@@ -1359,10 +1360,12 @@ void start_new_character(char_data *ch) {
 	}
 	
 	// add the default slash channels
+	global_mute_slash_channel_joins = TRUE;
 	for (iter = 0; *default_channels[iter] != '\n'; ++iter) {
 		sprintf(lbuf, "join %s", default_channels[iter]);
 		do_slash_channel(ch, lbuf, 0, 0);
 	}
+	global_mute_slash_channel_joins = FALSE;
 
 	/* Give EQ, if applicable */
 	if (CREATION_ARCHETYPE(ch) != 0) {
