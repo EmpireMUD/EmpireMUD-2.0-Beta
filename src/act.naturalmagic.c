@@ -70,6 +70,15 @@ int ancestral_healing(char_data *ch) {
 
 
 /**
+* @param char_data *ch The person.
+* @return int The total Bonus-Healing trait for that person, with any modifiers.
+*/
+int total_bonus_healing(char_data *ch) {
+	return GET_BONUS_HEALING(ch) + ancestral_healing(ch);
+}
+
+
+/**
 * @param char_data *ch
 * @return char_data *the familiar if one exists, or NULL
 */
@@ -805,7 +814,7 @@ ACMD(do_heal) {
 
 	// amount to heal will determine the cost
 	amount = CHOOSE_BY_ABILITY_LEVEL(heal_levels, ch, abil) + (GET_INTELLIGENCE(ch) * CHOOSE_BY_ABILITY_LEVEL(intel_bonus, ch, abil)) + (MAX(0, get_approximate_level(ch) - 100) * CHOOSE_BY_ABILITY_LEVEL(level_bonus, ch, abil));
-	bonus = GET_BONUS_HEALING(ch) + ancestral_healing(ch);
+	bonus = total_bonus_healing(ch);
 	
 	if (vict && !party) {
 		// subtract bonus-healing because it will be re-added at the end
@@ -1070,7 +1079,7 @@ ACMD(do_rejuvenate) {
 	cost = MAX(1, cost);
 	
 	// does not affect the cost
-	bonus = GET_BONUS_HEALING(ch) + ancestral_healing(ch);
+	bonus = total_bonus_healing(ch);
 	amount += round(bonus * bonus_heal_mod);
 	
 	// run this again but with the cost

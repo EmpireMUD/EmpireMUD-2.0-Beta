@@ -209,6 +209,8 @@ ACMD(do_disarm) {
 
 
 ACMD(do_firstaid) {
+	extern int total_bonus_healing(char_data *ch);
+
 	struct over_time_effect_type *dot, *next_dot;
 	char_data *vict;
 	int cost = 20;
@@ -267,7 +269,7 @@ ACMD(do_firstaid) {
 		}
 	}
 	
-	heal(ch, vict, CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_FIRSTAID) + GET_BONUS_HEALING(ch));
+	heal(ch, vict, CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_FIRSTAID) + total_bonus_healing(ch));
 	gain_ability_exp(ch, ABIL_FIRSTAID, 15);
 	GET_WAIT_STATE(ch) += 2 RL_SEC;	// plus normal command_lag
 }
