@@ -618,9 +618,11 @@ void delete_orphaned_rooms(void) {
 		}
 		
 		if (!COMPLEX_DATA(room) || !COMPLEX_DATA(room)->home_room || !COMPLEX_DATA(HOME_ROOM(room))) {
-			log("Deleting room %d due to missing homeroom.", GET_ROOM_VNUM(room));
-			delete_room(room, FALSE);	// must check_all_exits
-			deleted = TRUE;
+			if (!ROOM_BLD_FLAGGED(room, BLD_NO_DELETE)) {
+				log("Deleting room %d due to missing homeroom.", GET_ROOM_VNUM(room));
+				delete_room(room, FALSE);	// must check_all_exits
+				deleted = TRUE;
+			}
 		}
 	}
 	

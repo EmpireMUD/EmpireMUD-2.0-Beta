@@ -2644,7 +2644,6 @@ struct island_info *get_island(int island_id, bool create_if_missing) {
 * @return struct island_info* The island data, or NULL if no match.
 */
 struct island_info *get_island_by_coords(char *coords) {
-	struct island_info *isle, *next_isle;
 	char str[MAX_INPUT_LENGTH];
 	room_data *room;
 	
@@ -2653,7 +2652,7 @@ struct island_info *get_island_by_coords(char *coords) {
 		any_one_word(coords, str);
 	}
 	else {
-		strcpr(str, coords);
+		strcpy(str, coords);
 	}
 	
 	// must be coords
@@ -2670,7 +2669,7 @@ struct island_info *get_island_by_coords(char *coords) {
 		return NULL;
 	}
 	else {
-		return get_island(GET_ISLAND_ID(room, TRUE));
+		return get_island(GET_ISLAND_ID(room), TRUE);
 	}
 }
 

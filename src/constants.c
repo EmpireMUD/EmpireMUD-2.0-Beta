@@ -1815,6 +1815,7 @@ const char *bld_flags[] = {
 	"HIGH-DEPLETION",
 	"PORTAL",
 	"BEDROOM",
+	"!DELETE",
 	"\n"
 };
 

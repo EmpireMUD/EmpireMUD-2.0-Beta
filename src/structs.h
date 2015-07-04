@@ -365,6 +365,7 @@ typedef struct trig_data trig_data;
 #define BLD_HIGH_DEPLETION  BIT(37)	// allows more resource farming here
 #define BLD_PORTAL  BIT(38)	// functions as a portal building
 #define BLD_BEDROOM  BIT(39)	// boosts regen when sleeping
+#define BLD_NO_DELETE  BIT(40)	// will not be deleted for not having a homeroom
 
 
 // Terrain flags for do_build -- these match up with build_on flags for building crafts
