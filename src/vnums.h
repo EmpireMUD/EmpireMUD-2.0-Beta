@@ -70,6 +70,7 @@
 #define RTYPE_B_ONDECK  5501	// boat
 #define RTYPE_B_STORAGE  5502	// boat
 #define RTYPE_B_BELOWDECK  5503	// boat
+#define RTYPE_SHIP_HOLDING_PEN  5509	// for the shipping system's storage room
 #define RTYPE_STEALTH_HIDEOUT  5510
 #define RTYPE_SORCERER_TOWER  5511
 

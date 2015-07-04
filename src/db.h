@@ -214,6 +214,8 @@ void free_extra_descs(struct extra_descr_data **list);
 // islands
 extern struct island_info *island_table;
 extern struct island_info *get_island(int island_id, bool create_if_missing);
+extern struct island_info *get_island_by_coords(char *coords);
+extern struct island_info *get_island_by_name(char *name);
 
 // mobiles/chars
 extern char_data *character_list;

@@ -2638,6 +2638,68 @@ struct island_info *get_island(int island_id, bool create_if_missing) {
 
 
 /**
+* Finds island data using coordinates.
+*
+* @param char_data *coords The incoming coordinates.
+* @return struct island_info* The island data, or NULL if no match.
+*/
+struct island_info *get_island_by_coords(char *coords) {
+	struct island_info *isle, *next_isle;
+	char str[MAX_INPUT_LENGTH];
+	room_data *room;
+	
+	skip_spaces(&coords);
+	if (*coords == '(') {
+		any_one_word(coords, str);
+	}
+	else {
+		strcpr(str, coords);
+	}
+	
+	// must be coords
+	if (!*str || !isdigit(*str) || !strchr(str, ',')) {
+		return NULL;
+	}
+	
+	// find room by coords
+	if (!(room = find_target_room(NULL, str))) {
+		return NULL;
+	}
+	
+	if (GET_ISLAND_ID(room) == NO_ISLAND) {
+		return NULL;
+	}
+	else {
+		return get_island(GET_ISLAND_ID(room, TRUE));
+	}
+}
+
+
+/**
+* This finds an island by name. It prefers exact matches over abbrevs.
+* 
+* @param char *name The name of an island.
+* @return struct island_info* Returns an island if any matched, or NULL.
+*/
+struct island_info *get_island_by_name(char *name) {
+	struct island_info *isle, *next_isle, *abbrev;
+	
+	abbrev = NULL;
+	HASH_ITER(hh, island_table, isle, next_isle) {
+		if (!str_cmp(name, isle->name)) {
+			return isle;
+		}
+		else if (!abbrev && is_abbrev(name, isle->name)) {
+			abbrev = isle;
+		}
+	}
+	
+	// didn't find an exact match, so:
+	return abbrev;
+}
+
+
+/**
 * Load one island from file.
 *
 * @param FILE *fl The open read file.
