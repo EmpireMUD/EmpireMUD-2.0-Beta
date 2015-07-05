@@ -10,6 +10,8 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 
+#include <math.h>
+
 #include "conf.h"
 #include "sysdep.h"
 
@@ -243,7 +245,7 @@ void add_chore_tracker(empire_data *add) {
 * @return bool TRUE if the empire is below the cap
 */
 static bool can_gain_chore_resource(empire_data *emp, room_data *loc, obj_vnum vnum) {
-	int island_count, total_count, island_max;
+	int island_count, total_count, island_max, total_max;
 	struct empire_storage_data *store;
 	int island;
 	
@@ -267,21 +269,24 @@ static bool can_gain_chore_resource(empire_data *emp, room_data *loc, obj_vnum v
 		}
 	}
 	
+	// determine local maxima
+	if (EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR)) {
+		island_max = config_get_int("max_chore_resource_skilled");
+	}
+	else {
+		island_max = config_get_int("max_chore_resource");
+	}
+	
+	// total max is a factor of this
+	total_max = round(island_max * diminishing_returns(EMPIRE_MEMBERS(emp), 5));
+
 	// do we have too much?
-	if (total_count >= config_get_int("max_chore_total_resource")) {
+	if (total_count >= total_max) {
 		if (island_count < config_get_int("max_chore_resource_over_total")) {
 			return TRUE;
 		}
 	}
 	else {
-		// determine local maxima
-		if (EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR)) {
-			island_max = config_get_int("max_chore_resource_skilled");
-		}
-		else {
-			island_max = config_get_int("max_chore_resource");
-		}
-	
 		if (island_count < island_max) {
 			return TRUE;
 		}

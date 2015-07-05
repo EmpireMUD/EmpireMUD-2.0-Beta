@@ -1578,7 +1578,6 @@ void init_config_system(void) {
 	init_config(CONFIG_ACTIONS, "max_chore_resource", CONFTYPE_INT, "max items workforce will collect");
 	init_config(CONFIG_ACTIONS, "max_chore_resource_over_total", CONFTYPE_INT, "how much of a resource workers will gather if over the total cap");
 	init_config(CONFIG_ACTIONS, "max_chore_resource_skilled", CONFTYPE_INT, "workforce cap for skilled labor");
-	init_config(CONFIG_ACTIONS, "max_chore_total_resource", CONFTYPE_INT, "total workforce cap for all islands combined");
 
 	// cities
 	init_config(CONFIG_CITY, "players_per_city_point", CONFTYPE_INT, "how many members you need to earn each city point");
