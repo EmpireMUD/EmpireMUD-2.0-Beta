@@ -243,24 +243,44 @@ void add_chore_tracker(empire_data *add) {
 * @return bool TRUE if the empire is below the cap
 */
 static bool can_gain_chore_resource(empire_data *emp, room_data *loc, obj_vnum vnum) {
+	int island_count, total_count, island_max;
 	struct empire_storage_data *store;
-	bool ok = FALSE;
-
-	store = find_stored_resource(emp, GET_ISLAND_ID(loc), vnum);
+	int island;
 	
-	if (!store) {
-		ok = TRUE;
+	// safety first!
+	if (!emp || !loc || vnum == NOTHING) {
+		return FALSE;
+	}
+
+	island = GET_ISLAND_ID(loc);
+
+	// count both at onces (quicker)
+	island_count = 0;
+	total_count = 0;
+	for (store = EMPIRE_STORAGE(emp); store; store = store->next) {
+		if (store->vnum == vnum) {
+			total_count += store->amount;
+			
+			if (store->island == island) {
+				island_count += store->amount;
+			}
+		}
+	}
+	
+	// determine local maxima
+	if (EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR)) {
+		island_max = config_get_int("max_chore_resource_skilled");
 	}
 	else {
-		if (EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR)) {
-			ok = (store->amount < config_get_int("max_chore_resource_skilled"));
-		}
-		else {
-			ok = (store->amount < config_get_int("max_chore_resource"));
-		}
+		island_max = config_get_int("max_chore_resource");
 	}
 	
-	return ok;
+	if (island_count < island_max && total_count < config_get_int("max_chore_total_resource")) {
+		return TRUE;
+	}
+	else {
+		return FALSE;
+	}
 }
 
 
