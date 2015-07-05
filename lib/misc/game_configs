@@ -23,6 +23,7 @@ gather_depletion 50
 harvest_timer 20
 high_depletion 250
 max_chore_resource 200
+max_chore_resource_over_total 25
 max_chore_resource_skilled 750
 max_chore_total_resource 4500
 mining_timer 45

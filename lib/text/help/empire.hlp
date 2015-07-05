@@ -1260,7 +1260,9 @@ will tell you how many citizens are working each task.
 Note: Your workforce will only do chores if your empire has less than 200 of
 the resource provided by the chore. For example, miners won't do any work in
 iron mines if you have 200 iron ore. This does not apply to dismantling. If
-you have Skilled Labor, the cap is 750 instead. This cap is per-island.
+you have Skilled Labor, the cap is 750 instead. This cap is per-island. There
+is also a total cap of 4500 of any given resource, after which the locals will
+collect much less of it.
 
 Workforce types:
   &ybuilding:&0 NPCs will build any building that has been started, or dismantle

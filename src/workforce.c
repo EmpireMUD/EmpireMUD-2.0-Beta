@@ -267,20 +267,28 @@ static bool can_gain_chore_resource(empire_data *emp, room_data *loc, obj_vnum v
 		}
 	}
 	
-	// determine local maxima
-	if (EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR)) {
-		island_max = config_get_int("max_chore_resource_skilled");
+	// do we have too much?
+	if (total_count >= config_get_int("max_chore_total_resource")) {
+		if (island_count < config_get_int("max_chore_resource_over_total")) {
+			return TRUE;
+		}
 	}
 	else {
-		island_max = config_get_int("max_chore_resource");
+		// determine local maxima
+		if (EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR)) {
+			island_max = config_get_int("max_chore_resource_skilled");
+		}
+		else {
+			island_max = config_get_int("max_chore_resource");
+		}
+	
+		if (island_count < island_max) {
+			return TRUE;
+		}
 	}
 	
-	if (island_count < island_max && total_count < config_get_int("max_chore_total_resource")) {
-		return TRUE;
-	}
-	else {
-		return FALSE;
-	}
+	// in all other cases
+	return FALSE;
 }
 
 
