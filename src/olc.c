@@ -2261,7 +2261,7 @@ char *prompt_olc_info(char_data *ch) {
 * @return bitvector_t The new value of the whole bitset.
 */
 bitvector_t olc_process_flag(char_data *ch, char *argument, char *name, char *command, const char **flag_names, bitvector_t existing_bits) {
-	char arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], line[256];
+	char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], line[256];
 	bool add = FALSE, remove = FALSE, toggle = FALSE, alldigit, found;
 	bitvector_t bit;
 	int iter;
