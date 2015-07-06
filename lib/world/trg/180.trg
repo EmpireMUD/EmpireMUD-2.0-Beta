@@ -163,7 +163,7 @@ switch %phase%
         wait 5 sec
         %echo% &rThe floating motes of mana in the air transform into ethereal blades!&0
         %aoe% 100 magical
-        %aoe% 100 physical
+        %aoe% 50 physical
         wait 5 sec
         %echo% %self.name% sinks back into the lava...
       break
