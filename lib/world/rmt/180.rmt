@@ -1,0 +1,32 @@
+#18075
+A Precarious Ledge~
+   You descend into the fissure, following a rock ledge along one wall. You are
+immediately struck by the furnace-like heat rising from the magma below, and
+your ears are constantly assaulted by a deafening roar. The ledge beneath your
+feet slopes gently downward before turning off into a cavern in the rock wall.
+~
+c 0
+D14
+~
+0 18076
+T 18075
+S
+#18076
+The Fiend's Lair~
+   You emerge on a narrow ledge in a large, domed cavern. Not far below is a
+huge, roiling lake of magma. Ahead of you, a narrow rock bridge slopes downward
+to a central pillar, barely elevated above the magma.  
+~
+c 0
+D14
+~
+0 18075
+E
+bridge rock narrow~
+   The bridge is somewhat narrow but thick, formed from a black volcanic stone.
+It will not collapse under the weight of a few adventures, and as long as
+you're careful you should be able to stay on it.  
+~
+M 0 18075 100.00 1
+S
+$

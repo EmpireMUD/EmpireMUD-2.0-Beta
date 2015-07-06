@@ -1,0 +1,71 @@
+#18075
+fiend molten massive chained~
+the molten fiend~
+A massive molten fiend is chained to the wall here, half-submerged in magma!
+~
+0 0 bdxyAB c
+0 0 0 16
+I 4 18075 10.00 1 a  # LOOT: a firecloth skirt
+I 4 18076 10.00 1 a  # LOOT: firecloth pauldrons
+I 4 18077 10.00 1 a  # LOOT: a hearthflame skirt
+I 4 18078 10.00 1 a  # LOOT: hearthflame sleeves
+I 4 18079 10.00 1 a  # LOOT: magma-forged pauldrons
+I 4 18080 10.00 1 a  # LOOT: core-forged plate armor
+I 4 18081 10.00 1 a  # LOOT: huge spiked pauldrons
+I 4 18082 10.00 1 a  # LOOT: a fiendskin jerkin
+I 4 18083 10.00 1 a  # LOOT: a bottomless pouch
+I 4 18084 10.00 1 a  # LOOT: an igneous shield
+I 4 18085 10.00 1 b  # LOOT: a cold lava ring
+I 4 18086 10.00 1 b  # LOOT: a mantle of flames
+I 4 18087 10.00 1 b  # LOOT: frozen flame earrings
+I 4 18088 10.00 1 b  # LOOT: emberweave gloves
+I 4 18089 10.00 1 b  # LOOT: molten gauntlets
+I 4 18090 10.00 1 b  # LOOT: the molten fiend's earrings
+I 4 18091 10.00 1 b  # LOOT: Flametalon
+I 4 18092 10.00 1 b  # LOOT: an obsidian earring
+I 4 18093 10.00 1 b  # LOOT: a crown of abyssal flames
+I 4 18094 10.00 1 b  # LOOT: a fiendhorn bow
+I 4 18095 10.00 1 c  # LOOT: a hellsteed's reins
+I 4 18096 5.00 1 c  # LOOT: a pile of phoenix ash
+T 18076
+T 10000
+T 18079
+T 18080
+S
+#18077
+elemental fire~
+a fire elemental~
+A fire elemental blazes brightly here!
+~
+0 0 abcdhox cm
+0 0 2 15
+T 18077
+T 18078
+S
+#18078
+hellsteed pitch-black black steed~
+a pitch-black hellsteed~
+A pitch-black hellsteed is rearing here, mane and tail ablaze!
+~
+100 150 dej c
+0 0 12 11
+I 3 18080 100.00 1  # BARDE: a fearsome hellcharger
+S
+#18079
+phoenix magnificent~
+a magnificent phoenix~
+A magnificent phoenix soars overhead, beating its massive wings of flame!
+~
+100 125 deh m
+0 0 2 12
+I 4 18096 100.00 1  # LOOT: a pile of phoenix ash
+S
+#18080
+hellcharger fearsome charger~
+a fearsome hellcharger~
+A fearsome hellcharger clad in molten mail is trampling the charred ground!
+~
+100 150 dejy c
+0 0 12 11
+S
+$
