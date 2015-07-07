@@ -69,7 +69,7 @@ switch %phase%
         %echo% %self.name% looks exhausted!
         *Ensure that no other abilities are used while the elementals are up:
         dg_affect %self% STUNNED on 30
-        wait 30 sec
+        wait 25 sec
       break
       case 2
         %echo% %self.name% raises a hand, leaning back from the platform...
@@ -82,7 +82,7 @@ switch %phase%
         *should be a breather for average geared parties:
         dg_affect %self% TO-HIT -100 30
         dg_affect %self% SLOW on 30
-        dg_affect %self% DODGE 150 30
+        dg_affect %self% DODGE 100 30
         %echo% A flickering barrier of force surrounds %self.name%!
         wait 30 sec *Make sure he doesn't do anything else while the shield is up.
         %echo% The magical shield around %self.name% fades!

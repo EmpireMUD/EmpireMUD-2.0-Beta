@@ -20,13 +20,13 @@ C
 0 0
 S
 #18076
-pauldrons firecloth pair~
+pauldrons firecloth pair blazing~
 firecloth pauldrons~
-A pair of firecloth pauldrons are blazing away here!~
+A pair of firecloth pauldrons is blazing here!~
    These fiery shoulder guards seem to have been woven from the flames of a
 raging inferno! They throw off a fierce heat, but are safe to wear.
 ~
-27 mp ai 2
+27 mp ai 3
 0 0 0
 10 0
 A
@@ -61,12 +61,12 @@ C
 0 0
 S
 #18078
-sleeves hearthflame~
+sleeves hearthflame pair~
 hearthflame sleeves~
-A pair of hearthflame sleeves are lying here.~
+A pair of hearthflame sleeves is lying here.~
 Touching these dark red cloth sleeves makes you feel slightly more calm.
 ~
-27 mp ai 4
+27 mp ai 5
 0 0 0
 11 0
 A
@@ -81,13 +81,13 @@ C
 0 0
 S
 #18079
-pauldrons magma-forged forged~
+pauldrons magma-forged forged heavy~
 magma-forged pauldrons~
-A pair of magma-forged pauldrons are lying here.~
+A pair of heavy magma-forged pauldrons is lying here.~
    These heavy iron pauldrons were forged by the land itself at a density no
 mortal smith could hope to match.
 ~
-27 mp ai 10
+27 mp ai 11
 3 0 0
 2 0
 A
@@ -125,11 +125,11 @@ S
 #18081
 pauldrons huge spiked pair~
 huge spiked pauldrons~
-A pair of huge spiked pauldrons are lying here.~
+A pair of huge spiked pauldrons is lying here.~
    Unleash your inner berserker with these incredibly top-heavy shoulder
-guards! Be careful not to shrug.  
+guards! Be careful not to shrug.
 ~
-27 mp ai 12
+27 mp ai 13
 1 0 0
 2 0
 A
@@ -190,11 +190,11 @@ S
 #18084
 shield igneous spiked~
 an igneous shield~
-An igneous spiked shield is lying here.~
+A spiked igneous shield is lying here.~
    This bladed shield of black stone looks like it could do some serious
 damage! It's a bit awkward to hold, though.
 ~
-23 mp ao 5
+23 mp ao 6
 0 0 0
 1 0
 A
@@ -209,11 +209,11 @@ S
 #18085
 ring lava cold~
 a cold lava ring~
-A ring made of lava is lying here!~
+A ring made of lava is lying here, cold to the touch!~
    This ring is weirdly cool to the touch. It seems to be safe, but the
 patterns on it still look like they're flowing...
 ~
-2 mp ab 1
+2 mp ab 2
 0 0 0
 1 0
 A
@@ -255,11 +255,11 @@ S
 #18087
 earrings flame-shaped shaped frozen~
 frozen flame earrings~
-There are a pair of flame-shaped earrings lying here.~
+There is a pair of flame-shaped earrings lying here.~
    You're not sure if these intricate earrings are made from gemstones, or
 magically frozen fires. They should be safe to wear anyhow.
 ~
-2 mp am 1
+2 mp am 2
 0 0 0
 10 0
 A
@@ -272,13 +272,13 @@ C
 0 0
 S
 #18088
-gloves glowing emberweave~
+gloves glowing emberweave pair~
 emberweave gloves~
-A pair of glowing emberweave gloves are lying here.~
+A pair of glowing emberweave gloves is lying here.~
    These gloves look like they were woven from ash studded with hot coals, but
 they are only pleasantly warm to the touch.
 ~
-27 mp ah 1
+27 mp ah 2
 0 0 0
 11 0
 A
@@ -291,13 +291,13 @@ C
 0 0
 S
 #18089
-gauntlets molten iron~
+gauntlets iron molten pair~
 molten gauntlets~
-A pair of molten iron gauntlets are lying here!~
-   These gauntlets, formed from molten metal and pressed with magical runes,
-are extremely hot, but safe to wear. For a given value of 'safe'.
+A pair of molten iron gauntlets is lying here.~
+   These gauntlets, formed from molten metal and emblazoned with an infernal
+crest, are extremely hot, but safe to wear. For a given value of 'safe'.  
 ~
-27 mp ah 1
+27 mp ah 3
 3 0 0
 2 0
 A
@@ -358,7 +358,7 @@ A razor-sharp obsidian earring is lying here.~
    If you don't want to wear it, you could always stab someone with it... Then
 again, you would probably cut yourself in the process.
 ~
-2 mp am 2
+2 mp am 3
 0 0 0
 8 0
 A
@@ -375,7 +375,7 @@ crown abyssal obsidian flames~
 a crown of abyssal flames~
 An obsidian crown wreathed in abyssal flames is levitating here!~
    Despite their dull hue, the flames adorning this demonic status symbol give
-off the heat of a blast furnace. Only the wearer is safe...  
+off the heat of a blast furnace. Only the wearer is safe...
 ~
 2 mp ae 8
 0 0 0
@@ -394,13 +394,13 @@ C
 0 0
 S
 #18094
-bow bladed fiendhorn horn~
-a fiendhorn bow~
-A bladed bow made from fiend horn is lying here.~
-   This raises an interesting question: did someone carve this out, or are
-demon horns always neatly bow-shaped?
+bow bladed fiendhorn fiend's fiends horns~
+a fiendhorn bladed bow~
+A bladed bow made from a fiend's horns is lying here.~
+   This raises an interesting question: did someone carve this out, or were
+this demon's horns always neatly bow-shaped?  
 ~
-20 mp ap 3
+20 mp ap 4
 0 3 0
 14 0
 A
@@ -423,9 +423,10 @@ S
 ash phoenix noble pile~
 a pile of phoenix ash~
 The ashes of a noble phoenix are lying here.~
-This ash can be restored into a noble Phoenix, which will be indebted to you!
+   This pile of ash, when used, will be restored into a noble Phoenix, which
+will be indebted to you!  
 ~
-3 0 a 4
+3 0 a 6
 18079 0 0
 10 0
 T 10263
