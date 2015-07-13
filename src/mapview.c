@@ -736,6 +736,11 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		
 		msg_to_char(ch, "\r\n");
 	}
+	else if (!emp && ROOM_AFF_FLAGGED(HOME_ROOM(IN_ROOM(ch)), ROOM_AFF_NO_DISMANTLE)) {
+		// show no-dismantle anyway
+		msg_to_char(ch, "This area is (no-dismantle).\r\n");
+	}
+	
 	if (emp && GET_LOYALTY(ch) == emp && ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_WORK)) {
 		msg_to_char(ch, "Workforce will not work this tile.\r\n");
 	}
