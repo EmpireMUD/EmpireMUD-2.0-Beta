@@ -1482,17 +1482,14 @@ ACMD(do_shadowstep) {
 	}
 	else if (!*argument)
 		msg_to_char(ch, "Shadowstep to whom?\r\n");
-	else if (!(vict = find_closest_char(ch, argument, FALSE))) {
-		send_config_msg(ch, "no_person");
+	else if (!(vict = find_closest_char(ch, argument, FALSE)) || compute_distance(IN_ROOM(ch), IN_ROOM(vict)) > 7) {
+		msg_to_char(ch, "Nobody by that name within range.\r\n");
 	}
 	else if (ch == vict) {
 		msg_to_char(ch, "You can't shadowstep to yourself.\r\n");
 	}
 	else if (IS_GOD(vict) || IS_IMMORTAL(vict)) {
 		msg_to_char(ch, "You can't target a god!\r\n");
-	}
-	else if (compute_distance(IN_ROOM(ch), IN_ROOM(vict)) > 7) {
-		act("$N is too far away.", FALSE, ch, NULL, vict, TO_CHAR);
 	}
 	else if (!IS_OUTDOORS(vict) && !can_use_room(ch, IN_ROOM(vict), GUESTS_ALLOWED) && (emp = ROOM_OWNER(IN_ROOM(vict))) && !can_infiltrate(ch, emp)) {
 		// can_infiltrate sends its own message
