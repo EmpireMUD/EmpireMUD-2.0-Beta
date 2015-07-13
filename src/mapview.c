@@ -1793,7 +1793,7 @@ ACMD(do_exits) {
 		msg_to_char(ch, "You can't see a damned thing, you're blind!\r\n");
 		return;
 	}
-	if (COMPLEX_DATA(room)) {
+	if (COMPLEX_DATA(room) && ROOM_IS_CLOSED(room)) {
 		*buf = '\0';
 		for (ex = COMPLEX_DATA(room)->exits; ex; ex = ex->next) {
 			if ((to_room = ex->room_ptr) && !EXIT_FLAGGED(ex, EX_CLOSED)) {
