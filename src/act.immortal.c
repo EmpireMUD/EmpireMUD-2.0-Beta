@@ -1545,6 +1545,7 @@ SHOW(show_islands) {
 	struct empire_unique_storage *uniq;
 	struct empire_storage_data *store;
 	char arg[MAX_INPUT_LENGTH];
+	struct island_info *isle;
 	empire_data *emp;
 	int iter;
 	
@@ -1593,7 +1594,8 @@ SHOW(show_islands) {
 				continue;
 			}
 			
-			msg_to_char(ch, "%2d. %d items\r\n", cur->island, cur->count);
+			isle = get_island(cur->island, TRUE);
+			msg_to_char(ch, "%2d. %s: %d items\r\n", cur->island, isle->name, cur->count);
 			// pull it out of the list to prevent unlimited iteration
 			REMOVE_FROM_LIST(cur, list, next);
 			free(cur);
