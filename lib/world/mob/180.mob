@@ -24,7 +24,7 @@ I 4 18090 10.00 1 b  # LOOT: the molten fiend's earrings
 I 4 18091 10.00 1 b  # LOOT: Flametalon
 I 4 18092 10.00 1 b  # LOOT: an obsidian earring
 I 4 18093 10.00 1 b  # LOOT: a crown of abyssal flames
-I 4 18094 10.00 1 b  # LOOT: a fiendhorn bow
+I 4 18094 10.00 1 b  # LOOT: a fiendhorn bladed bow
 I 4 18095 10.00 1 c  # LOOT: a hellsteed's reins
 I 4 18096 5.00 1 c  # LOOT: a pile of phoenix ash
 T 18076
@@ -38,7 +38,7 @@ a fire elemental~
 A fire elemental blazes brightly here!
 ~
 0 0 abcdhox cm
-0 0 2 15
+0 0 2 12
 T 18077
 T 18078
 S

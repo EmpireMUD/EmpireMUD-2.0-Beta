@@ -14,8 +14,8 @@ S
 #18076
 The Fiend's Lair~
    You emerge on a narrow ledge in a large, domed cavern. Not far below is a
-huge, roiling lake of magma. Ahead of you, a narrow rock bridge slopes downward
-to a central pillar, barely elevated above the magma.  
+huge, boiling lake of magma. Ahead of you, a narrow rock bridge slopes downward
+to a central pillar, barely elevated above the magma.
 ~
 c 0
 D14
@@ -25,7 +25,7 @@ E
 bridge rock narrow~
    The bridge is somewhat narrow but thick, formed from a black volcanic stone.
 It will not collapse under the weight of a few adventures, and as long as
-you're careful you should be able to stay on it.  
+you're careful you should be able to stay on it.
 ~
 M 0 18075 100.00 1
 S

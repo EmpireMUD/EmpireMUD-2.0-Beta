@@ -148,7 +148,7 @@ if %phase%==3
           %echoaround %target% A tornado of harmless smoke briefly surrounds %target%!
         else
           %send% %target% &rYour body bursts into unquenchable flames!&0
-          %echoaround% %target% %target%'s body bursts into unquenchable flames!
+          %echoaround% %target% %target.name%'s body bursts into unquenchable flames!
           %damage% %target% 25 fire
           %dot% %target% 100 300 fire
         end

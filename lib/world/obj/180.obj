@@ -295,7 +295,7 @@ gauntlets iron molten pair~
 molten gauntlets~
 A pair of molten iron gauntlets is lying here.~
    These gauntlets, formed from molten metal and emblazoned with an infernal
-crest, are extremely hot, but safe to wear. For a given value of 'safe'.  
+crest, are extremely hot, but safe to wear. For a given value of 'safe'.
 ~
 27 mp ah 3
 3 0 0
@@ -398,7 +398,7 @@ bow bladed fiendhorn fiend's fiends horns~
 a fiendhorn bladed bow~
 A bladed bow made from a fiend's horns is lying here.~
    This raises an interesting question: did someone carve this out, or were
-this demon's horns always neatly bow-shaped?  
+this demon's horns always neatly bow-shaped?
 ~
 20 mp ap 4
 0 3 0
@@ -420,13 +420,13 @@ These reins can be used just once, to summon a hellsteed mount.
 T 10263
 S
 #18096
-ash phoenix noble pile~
+ashes phoenix noble pile~
 a pile of phoenix ash~
 The ashes of a noble phoenix are lying here.~
    This pile of ash, when used, will be restored into a noble Phoenix, which
-will be indebted to you!  
+will be indebted to you!
 ~
-3 0 a 6
+3 0 a 8
 18079 0 0
 10 0
 T 10263
