@@ -396,9 +396,10 @@ void taste_blood(char_data *ch, char_data *vict) {
 		act("You taste a sample of $N's blood!", FALSE, ch, 0, vict, TO_CHAR);
 		act("$n tastes a sample of your blood!", FALSE, ch, 0, vict, TO_VICT);
 		act("$n tastes a sample of $N's blood!", FALSE, ch, 0, vict, TO_NOTVICT);
-
-		sprintf(buf, "This is $O, a %s.", IS_VAMPIRE(vict) ? "vampire" : (!IS_NPC(vict) || !MOB_FLAGGED(vict, MOB_ANIMAL)) ? "human" : "animal");
-		act(buf, FALSE, ch, 0, vict, TO_CHAR);
+		
+		if (IS_VAMPIRE(vict)) {
+			act("$E is a vampire.", FALSE, ch, NULL, vict, TO_CHAR);
+		}
 
 		if (GET_BLOOD(vict) != GET_MAX_BLOOD(vict)) {
 			sprintf(buf, "$E is missing about %d%% of $S blood.", (GET_MAX_BLOOD(vict) - GET_BLOOD(vict)) * 100 / GET_MAX_BLOOD(vict));
