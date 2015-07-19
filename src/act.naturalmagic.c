@@ -770,6 +770,11 @@ ACMD(do_familiar) {
 			any = TRUE;
 		}
 		
+		if (!any) {
+			msg_to_char(ch, " (you know of none)");
+		}
+		msg_to_char(ch, "\r\n");
+		
 		return;
 	}
 	
