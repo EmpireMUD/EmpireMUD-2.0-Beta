@@ -86,6 +86,9 @@
 
 // ***WARNING*** Change this before starting your playerfile
 // but NEVER change it after, or you may not be able to log in to any character
+// NOTE: You should use a salt starting with "$5$" and ending with "$" in order
+// to get support for longer passwords and proper encryption, e.g. "$5$salt$"
+// See http://linux.die.net/man/3/crypt for more info.
 #define PASSWORD_SALT  "salt"
 
 // this determines if a room is "empty ocean" and doesn't need to stay in RAM
