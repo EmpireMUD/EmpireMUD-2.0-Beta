@@ -3438,7 +3438,7 @@ ACMD(do_pour) {
 		return;
 	}
 	if (GET_DRINK_CONTAINER_CONTENTS(from_obj) == 0) {
-		act("The $p is empty.", FALSE, ch, from_obj, 0, TO_CHAR);
+		act("$p is empty.", FALSE, ch, from_obj, 0, TO_CHAR);
 		return;
 	}
 	if (subcmd == SCMD_POUR) {	/* pour */
