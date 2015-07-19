@@ -406,6 +406,12 @@ bool can_use_ability(char_data *ch, int ability, int cost_pool, int cost_amount,
 	char buf[MAX_STRING_LENGTH];
 	int time, needs_cost;
 	
+	// purchase check first, or the rest don't make sense.
+	if (!IS_NPC(ch) && ability != NO_ABIL && !HAS_ABILITY(ch, ability)) {
+		msg_to_char(ch, "You have not purchased the %s ability.\r\n", ability_data[ability].name);
+		return FALSE;
+	}
+	
 	// this actually blocks npcs, too, so it's higher than other checks
 	if (cost_pool == BLOOD && cost_amount > 0 && !CAN_SPEND_BLOOD(ch)) {
 		msg_to_char(ch, "Your blood is inert, you can't do that!\r\n");
@@ -420,11 +426,7 @@ bool can_use_ability(char_data *ch, int ability, int cost_pool, int cost_amount,
 	// special rule: require that blood or health costs not reduce player below 1
 	needs_cost = cost_amount + ((cost_pool == HEALTH || cost_pool == BLOOD) ? 1 : 0);
 	
-	// players:
-	if (ability != NO_ABIL && !HAS_ABILITY(ch, ability)) {
-		msg_to_char(ch, "You have not purchased the %s ability.\r\n", ability_data[ability].name);
-		return FALSE;
-	}
+	// more player checks
 	if (cost_pool >= 0 && cost_pool < NUM_POOLS && cost_amount > 0 && GET_CURRENT_POOL(ch, cost_pool) < needs_cost) {
 		msg_to_char(ch, "You need %d %s point%s to do that.\r\n", cost_amount, pool_types[cost_pool], PLURAL(cost_amount));
 		return FALSE;
