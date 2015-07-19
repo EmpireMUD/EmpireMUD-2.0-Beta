@@ -237,7 +237,7 @@ Examples:
    %scale% bag 100
    %scale% sword %actor.level%
 #d
-%TELEPORT% WTELEPORT OTELEPORT MTELEPORT PORTALS
+%TELEPORT% WTELEPORT OTELEPORT MTELEPORT
 
 %teleport% <victim> <location>
 %teleport% all <location>
