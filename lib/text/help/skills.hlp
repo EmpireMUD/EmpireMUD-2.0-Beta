@@ -333,12 +333,12 @@ The Woodworking ability increases how fast you can scrape logs.
 
 See also: TREES, SAW, WOODWORKING
 #
-SHEAR
+SHEAR SHEARING
 
 Usage:  shear <animal>
 
 You can shear sheep in a stable, giving you wool to weave into cloth. Sheep
-can be shorn every two days.
+can be shorn every 6 hours (of real time).
 
 See also: WEAVE
 #
