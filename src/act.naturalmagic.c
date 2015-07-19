@@ -949,11 +949,9 @@ ACMD(do_heal) {
 		return;
 	}
 	else if (!party && ch != vict && !can_use_ability(ch, ABIL_HEAL_FRIEND, NOTHING, 0, NOTHING)) {
-		msg_to_char(ch, "You must purchase the Heal Friend ability to heal others.\r\n");
 		return;
 	}
 	else if (party && !can_use_ability(ch, ABIL_HEAL_PARTY, NOTHING, 0, NOTHING)) {
-		msg_to_char(ch, "You must purchase the Heal Party ability to heal the whole party.\r\n");
 		return;
 	}
 	
