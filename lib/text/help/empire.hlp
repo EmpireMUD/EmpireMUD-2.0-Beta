@@ -312,7 +312,7 @@ DEMOTE
 Usage:  demote <person> [rank]
 
 Demotes a person within the empire. You can specify the name of the rank
-you'd like to demote them to, or just do it one level at a time.
+you'd like to demote them to, or just do it one rank at a time.
 
 See also: PRIVILEGE, PROMOTE, EXPEL
 #
@@ -800,10 +800,10 @@ See also: CITY, DEFECT, ENROLL
 #
 PROMOTE
 
-Usage:  promote <person> [level]
+Usage:  promote <person> [rank]
 
-This can be used to advance someone to a specific level, or to advance them
-one level at a time. They must be in your empire to do this.
+This can be used to advance someone to a specific rank, or to advance them
+one rank at a time. They must be in your empire to do this.
 
 See also: DEMOTE, ENROLL, PRIVILEGE
 #
