@@ -3487,7 +3487,7 @@ ACMD(do_pour) {
 		return;
 	}
 	if (subcmd == SCMD_POUR) {
-		sprintf(buf, "You pour the %s into the %s.", drinks[GET_DRINK_CONTAINER_TYPE(from_obj)], arg2);
+		sprintf(buf, "You pour the %s into %s.", drinks[GET_DRINK_CONTAINER_TYPE(from_obj)], GET_OBJ_SHORT_DESC(to_obj));
 		send_to_char(buf, ch);
 	}
 	if (subcmd == SCMD_FILL) {
