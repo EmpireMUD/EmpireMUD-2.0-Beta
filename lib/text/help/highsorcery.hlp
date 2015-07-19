@@ -180,11 +180,10 @@ Usage:  manashield
 By armoring herself with a manashield, a sorcerer sacrifices part of her mana
 pool for reduced combat damage.
 
-Mana Shield reduces your mana by 25 (this effect is doubled by Gift of Nature).
+Mana Shield reduces your mana by 25 (this effect is modified by abilities which
+change your mana pool size, such as Gift of Nature).
 
 Gain skill by fighting while manashielded.
-
-See also: GIFT OF NATURE
 #
 MIRRORIMAGE "MIRROR IMAGE"
 
