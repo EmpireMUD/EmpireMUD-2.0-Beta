@@ -17,7 +17,7 @@ mean on the map:
 
    You can type SCORE to see a sheet of information about your character, with
 your name, play time, and skills. It also shows your health, moves, and mana in
-the form of &gcurrent&0/&gmax&0/+&gregen&0/hr (one mud hour is 75 seconds).
+the form of &gcurrent&0/&gmax&0/+&gregen&0/5s (amount per 5 seconds).
 
 Here are some starting commands you will want to know from the get go:
    EQUIPMENT (eq)   INVENTORY (i)   SKILLS
