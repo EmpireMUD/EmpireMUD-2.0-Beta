@@ -921,7 +921,7 @@ The Raise Armies ability unlocks additional buildings.
 .TT. guardtower  12 lumber, 3 nails (may only be built in a city)
 &y.&0/\&y.&0 mountainoutpost  12 lumber, 3 nails
 [BB] barracks  40 lumber, 10 nails, 20 bricks
-[  ] training yard  40 lumber, 10 nails, 20 bricks
+[  ] trainingyard  40 lumber, 10 nails, 20 bricks
 VVVV wall  10 bricks
 V||V gatehouse  10 lumber, 4 nails, 10 bricks
  
