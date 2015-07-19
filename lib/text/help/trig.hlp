@@ -2022,10 +2022,10 @@ DG_AFFECTS
 Usage:  dg_affect <target> <property> <value> <duration>
 
 Modifies an affection or apply on the target. Durations must be non-zero.
-dg_affect %actor% sanct on 20    -- Sets sanctuary on actor for 20 seconds.
-dg_affect %actor% maxhit 100 20  -- Sets maxhit on actor +100 for 20 seconds.
+dg_affect %actor% HASTE on 20    -- Sets haste on actor for 20 seconds.
+dg_affect %actor% DODGE 100 20  -- Sets dodge on actor +100 for 20 seconds.
 
-See also: APPLIES, AFFECTIONS
+See also: APPLIES, AFFECTS
 #d
 VDELETE
 
