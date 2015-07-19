@@ -261,7 +261,7 @@ See also: BUILD, MONUMENTS, TOMB
 Resources:  60 lumber, 14 nails, 60 bricks
 Built on:  plains, desert
 Extra rooms:  30, interlink
-Special rooms:  greathall, throne, vault, baths, laboratory
+Special rooms:  greathall, crypt, throne, vault, baths, laboratory
 
 The great hall is a major component of castles or other distinguished
 buildings, or it can serve as the entrance for those. You can designate a
@@ -651,7 +651,7 @@ V[]V  Portcullis (Luxury ability)
 Resources:  60 lumber, 14 nails, 60 bricks
 Built on:  plains, desert
 Extra rooms:  30, interlink
-Special rooms:  greathall, throne, vault, baths, laboratory
+Special rooms:  greathall, crypt, throne, vault, baths, laboratory
 
 The portcullis serves as the entrance to a castle. You can designate a huge
 number of rooms from the portcullis, and can interlink it with other buildings.
