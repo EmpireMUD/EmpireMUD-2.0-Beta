@@ -1071,7 +1071,7 @@ of your total territory can be outside of cities. However, some buildings, such
 as Mines, do not count as outside territory no matter where you build them.
 Roads also do not count as outside.
 
-When an empire's members start time time out from lack of gameplay, the empire
+When an empire's members start to time out from lack of gameplay, the empire
 may start losing territory.
 
 See also: CITIES, EMPIRE TIMEOUT, TERRITORY COMMAND
