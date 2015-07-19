@@ -813,7 +813,7 @@ The Docks~
 20 0 bdpxD 0
 0 0 0 -1
 C
-board, load~
+board, load, unload~
 D
    The docks stretch out several yards into the water. Ships of any size may
 be docked here for easy storage. In addition, the facility allows the loading

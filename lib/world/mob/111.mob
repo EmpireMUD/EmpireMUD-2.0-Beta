@@ -138,16 +138,16 @@ The caretaker, pale and disheveled, pokes at the soil of one of the window boxes
 0 0 13 3
 S
 #11136
-undead caretaker~
+caretaker undead re-animated reanimated~
 the undead caretaker~
 The re-animated caretaker lets out a rattling moan, guttural and ferocious!
 ~
 0 0 cdghuB 0
 0 0 11 9
-I 4 11138 50.00 1 X  # LOOT: a wooden staff
-I 4 11139 100.00 1 X  # LOOT: a wooden staff
 I 4 11142 100.00 1  # LOOT: a dried woundwort cutting
 I 4 11143 100.00 1  # LOOT: a star anise pod
+I 4 11138 50.00 1 X  # LOOT: a wooden staff
+I 4 11139 100.00 1 X  # LOOT: a wooden staff
 S
 #11137
 darting dragonfly hovers shimmering green~

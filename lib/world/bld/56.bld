@@ -328,7 +328,7 @@ S
 Armor Storage~
 Armor Storage~
 ~
-0 0 a h
+0 0 a 0
 0 0 0 -1
 C
 inventory, retrieve, store~

@@ -233,9 +233,9 @@ I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 1  # SKIN: a large skin
 S
 #9122
-ground-squirrel squirrel~
-a ground-squirrel~
-A small ground-squirrel dashes behind a shrub.
+squirrel ground small~
+a ground squirrel~
+A small ground squirrel dashes behind a shrub.
 ~
 1 3 djo c
 0 0 0 9
@@ -707,7 +707,7 @@ S
 #9167
 whale fin gigantic~
 the fin whale~
-A gigantic fin whale swims up along side you!
+A gigantic fin whale swims up alongside you!
 ~
 70 80 djloy 0
 0 0 6 5
@@ -977,7 +977,7 @@ the Emperor of Penguins~
 The Emperor of Penguins stares at you from beneath his penguin cowl.
 ~
 150 150 bdvA 0
-0 0 13 15
+1 0 13 15
 I 4 9187 100.00 1  # LOOT: an arctic aura
 S
 #9188

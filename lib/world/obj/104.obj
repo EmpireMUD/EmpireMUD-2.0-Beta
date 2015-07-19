@@ -4,7 +4,7 @@ the town portal~
 A portal back to the entrance to town has opened here.~
 It looks like the portal leads back to the entrance.
 ~
-8 0 0
+8 0 0 1
 10400 0 0
 10 8
 S
@@ -16,7 +16,7 @@ A makeshift blockade bars passage down the street.~
 form a blockade before the necromancers advanced on the city. Now the blockade
 is on fire, and you won't be able to pass it.
 ~
-3 0 0
+3 0 0 1
 0 0 0
 0 0
 T 10407
@@ -27,7 +27,7 @@ Market Street trash spawner~
 The Market Street trash spawner is malfunctioning.~
 This item spawns trash mobs.
 ~
-3 0 0
+3 0 0 1
 0 0 0
 0 0
 T 10402
@@ -38,7 +38,7 @@ Main Street trash spawner~
 The Main Street trash spawner is malfunctioning.~
 This item spawns trash mobs.
 ~
-3 0 0
+3 0 0 1
 0 0 0
 0 0
 T 10403
@@ -49,7 +49,7 @@ Temple Street trash spawner~
 The Temple Street trash spawner is malfunctioning.~
 This item spawns trash mobs.
 ~
-3 0 0
+3 0 0 1
 0 0 0
 0 0
 T 10404
@@ -60,7 +60,7 @@ an overturned cart~
 An overturned cart is lying in the street.~
 In his haste to flee the hamlet, some poor fool lost his cart!
 ~
-3 0 0
+3 0 0 1
 0 0 0
 0 0
 S
@@ -70,7 +70,7 @@ the corpse of a citizen~
 The mangled, half-chewed corpse of a citizen is lying here.~
 It looks like something has already started to eat this one.
 ~
-3 0 0
+3 0 0 1
 0 0 0
 0 0
 S
@@ -82,7 +82,7 @@ A pile of rubble cascades down the street.~
 down by a stray catapult shot -- or the club of the skeletal giant down the
 street.
 ~
-3 0 0
+3 0 0 1
 0 0 0
 0 0
 S
@@ -92,7 +92,7 @@ tarnished silver earrings~
 A pair of tarnished earrings has been discarded here.~
 These earrings look like they were quite nice once, and give you a rustic look.
 ~
-2 moy am
+2 moy am 1
 0 0 0
 3 0
 A
@@ -108,7 +108,7 @@ a steel chain~
 A steel chain is crumpled in a pile.~
 The chain looks just long enough to wear around your neck.
 ~
-2 moy ac
+2 moy ac 1
 0 0 0
 2 0
 A
@@ -125,7 +125,7 @@ A pair of ringmail bracers is lying here.~
    The craftsmanship on this ringmail is fine, although they don't seem
 well-maintained.
 ~
-2 moy aj
+2 moy aj 1
 0 0 0
 2 0
 A
@@ -141,7 +141,7 @@ a ring of pearls~
 A pearl ring is lying in the dust.~
 This shimmering ring seems to be made from fused pearls.
 ~
-2 moy ab
+2 moy ab 1
 0 0 0
 14 0
 A
@@ -157,7 +157,7 @@ a fine village dress~
 A fine village dress has been carefully draped here.~
 The dress is certainly rural, but has its own sort of charm.
 ~
-2 oy ad
+2 oy ad 1
 0 0 0
 11 0
 A
@@ -170,7 +170,7 @@ A handsome village suit is carefully hung here.~
    The suit is nothing you'd wear to the castle on ball night. Still, it has a
 rustic, rural charm that is not soon forgotten.
 ~
-2 oy ad
+2 oy ad 1
 0 0 0
 11 0
 A
@@ -178,11 +178,11 @@ A
 S
 #10414
 band imperium wedding~
-an imperium weddding band~
+an imperium wedding band~
 An imperium wedding band is lying here.~
 Though the ring looks old, it has not rusted.
 ~
-2 moy ab
+2 moy ab 2
 0 0 0
 2 0
 A
@@ -201,7 +201,7 @@ An heirloom necklace has been carelessly left behind.~
    The necklace is old, but made of carefully crafted lace such that it still
 has the same gorgeous quality as the day it was made.
 ~
-27 moy ac
+27 moy ac 1
 0 0 0
 2 0
 A
@@ -219,7 +219,7 @@ a giant bone mace~
 A giant bone mace stands before you.~
 It looks like the mace's handle is made from the bone of a giant!
 ~
-1 emp an
+1 emp an 1
 0 1 5
 14 0
 A
@@ -235,7 +235,7 @@ a tattered cloak of manasilk~
 A tattered cloak is lying here.~
 This cloak was once made of fine manasilk. Now, it's in tatters.
 ~
-2 mp ak
+2 mp ak 1
 0 0 0
 11 0
 A
@@ -253,7 +253,7 @@ a skeletal horse whip~
 A skeletal horse whip is lying here.~
 This whip can be used, just once, to summon a skeletal horse mount.
 ~
-3 0 a
+3 0 a 1
 10418 0 0
 14 0
 T 10418
@@ -264,7 +264,7 @@ a pair of enchanted boots~
 A pair of enchanted boots is marching in circles.~
 The boots seem to be made for walkin'.
 ~
-27 mp ag
+27 mp ag 1
 0 0 0
 11 0
 A
@@ -282,7 +282,7 @@ a skeletal mammoth crop~
 A skeletal mammoth crop is lying here.~
 This riding crop can be used, just once, to summon a skeletal mammoth mount.
 ~
-3 0 a
+3 0 a 1
 10420 0 0
 14 0
 T 10418
@@ -293,7 +293,7 @@ a mammoth spear~
 A mammoth spear protrudes from the ground.~
 This spear looks like it could be used to take down a mammoth!
 ~
-1 ehmnp an
+1 ehmnp an 1
 0 3 3
 0 0
 A
@@ -310,7 +310,7 @@ An imperium-weave cloak is lying on the ground.~
    The cloak is made from fine imperium-weave cloth, of the sort they drape
 over war mammoths.
 ~
-27 mp ak
+27 mp ak 1
 3 0 0
 2 0
 A
@@ -328,7 +328,7 @@ shackles of the undead~
 The shackles of the undead are lying here.~
 These shackles look like they could be used to bind a ghost!
 ~
-2 mp ag
+2 mp ag 1
 0 0 0
 11 0
 A
@@ -347,7 +347,7 @@ A necrofiend leg is lying here, bloody.~
    It looks like the long, thin leg from a necrofiend has been turned into some
 sort of whip!
 ~
-1 ehmp an
+1 ehmp an 1
 0 4 7
 7 0
 A
@@ -364,7 +364,7 @@ A studded bone shield is lying on the ground.~
    The shield is made mostly from bones, bound in leather, and studded with
 imperium. You'd hate to have been the raw materials for one of these.
 ~
-23 emp ao
+23 emp ao 1
 0 0 0
 14 0
 A
@@ -380,7 +380,7 @@ the necrofiend's majesty~
 A strange aura of majesty hovers in the air.~
 It has all the majesty of a hideous necrofiend.
 ~
-2 mp ae
+2 mp ae 1
 0 0 0
 10 0
 A
@@ -400,7 +400,7 @@ the infernomancer's flame~
 A magical flame hovers in mid-air.~
 This glinting magical flame has the potential to do a lot of damage.
 ~
-1 imp an
+1 imp an 1
 0 1 16
 10 0
 A
@@ -418,7 +418,7 @@ the purifying flame~
 A glinting white flame dances across the air.~
 This beautiful fire looks like it could heal as much as it could damage.
 ~
-3 mp ao
+3 mp ao 1
 0 0 0
 10 0
 A
@@ -434,7 +434,7 @@ a terrifying leather mask~
 A terrifying mask lies on the ground.~
 The mask is stained in blood, and has fangs carved from its mouth.
 ~
-27 mp ae
+27 mp ae 1
 1 0 0
 0 0
 A
@@ -454,7 +454,7 @@ the necromancer's staff~
 A twisted staff is staked into the ground.~
 This twisted old staff is crawling with maggots!
 ~
-1 eimpq an
+1 eimpq an 1
 0 4 19
 0 0
 A
@@ -469,7 +469,7 @@ A pair of ghoulsbane gauntlets is lying here.~
    These gauntlets have backwards-facing spines to make them more effective
 against ghouls of all sorts.
 ~
-27 mp ah
+27 mp ah 1
 1 0 0
 7 0
 A
@@ -489,7 +489,7 @@ A necrotic mail skirt is lying here.~
 decaying. But due to some strange magical infusion, the decay is only making it
 stronger.
 ~
-27 emp af
+27 emp af 1
 3 0 0
 2 0
 A
@@ -509,7 +509,7 @@ Fiendclaw~
 A vicious claw weapon is lying here.~
 This huge claw would fit right over your hand!
 ~
-1 mp an
+1 mp an 1
 0 1 10
 0 0
 A
@@ -528,7 +528,7 @@ A pair of lace gloves has been left behind.~
    These gloves are laced from death itself, and you'd hate to be on the
 receiving end of their wrath.
 ~
-27 mp ah
+27 mp ah 1
 0 0 0
 11 0
 A
@@ -546,7 +546,7 @@ a hanged man's hand~
 A hanged man's hand is lying here.~
 This hand, though slightly rotted, looks as fresh as the day it was hanged.
 ~
-3 mp ao
+3 mp ao 1
 0 0 0
 7 0
 A
