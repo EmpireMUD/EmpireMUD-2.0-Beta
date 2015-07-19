@@ -1203,11 +1203,11 @@ ACMD(do_pickpocket) {
 			
 			// messaging
 			if (coins > 0 && obj) {
-				sprintf(buf, "You pick $N's pocket and find $p and %s.\r\n", money_amount(vict_emp, coins));
+				sprintf(buf, "You pick $N's pocket and find $p and %s.", money_amount(vict_emp, coins));
 				act(buf, FALSE, ch, obj, vict, TO_CHAR);
 			}
 			else if (coins > 0) {
-				sprintf(buf, "You pick $N's pocket and find %s.\r\n", money_amount(vict_emp, coins));
+				sprintf(buf, "You pick $N's pocket and find %s.", money_amount(vict_emp, coins));
 				act(buf, FALSE, ch, NULL, vict, TO_CHAR);
 			}
 			else if (obj) {
