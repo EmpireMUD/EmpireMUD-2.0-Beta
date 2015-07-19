@@ -145,7 +145,8 @@ to do simple tasks. The task can be just one word, which must be spoken aloud
 by the vampire and understood by the victim. Optionally, the word can be hidden
 in a sentence.
 
-This power only works on human NPCs, but won't work on hard/group mobs.
+This power only works on human NPCs, but won't work on hard/group mobs. It also
+won't work on mobs who are more powerful than you.
 #
 DAYWALKING DAYWALKER
 
