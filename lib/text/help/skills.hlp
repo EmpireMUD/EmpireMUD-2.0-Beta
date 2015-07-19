@@ -27,8 +27,8 @@ CATAPULT
 Usage:  catapult <direction> 
 
 Catapult is used to launch your catapult in the direction that you want. You
-must have 20 rocks and a catapult to use this. It can only shoot at an
-adjacent room. The command can not be used in deep forests either. 
+must have 12 rocks and a catapult to use this. It can only shoot at an
+adjacent room.
 
 Example:  
 
