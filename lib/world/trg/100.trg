@@ -1077,7 +1077,7 @@ switch %msg_pos%
     %echo% %self.name% sits in her chair.
   break
   case 2
-    %echo% %self.name% stands up, puts a book in a glase case, and locks it.
+    %echo% %self.name% stands up, puts a book in a glass case, and locks it.
   break
   case 3
     say I have a lithe, form-fitting backpack for sale -- just 5 greater skystones (type 'buy').
