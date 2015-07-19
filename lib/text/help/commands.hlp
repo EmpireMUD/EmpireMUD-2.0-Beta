@@ -1411,7 +1411,7 @@ Toggles:
 
 Immortal toggles:
   wiznet - shuts off the immortal channel
-  hassle - if hassle it on, the immortal may be hit by mobs and scripts
+  hassle - if hassle is on, the immortal may be hit by mobs and scripts
   holylight - allows immortals to see in the dark
   roomflags - shows room flags, vnums, and other info to immortals
   idle-out - if off, the immortal will not disconnect from idling
