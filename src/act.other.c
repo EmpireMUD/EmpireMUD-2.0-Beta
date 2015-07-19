@@ -1430,6 +1430,10 @@ ACMD(do_summon) {
 	
 	// types of summon
 	if (is_abbrev(arg, "humans")) {
+		// check ability immediately because the sun error message is misleading otherwise
+		if (!can_use_ability(ch, ABIL_SUMMON_HUMANS, NOTHING, 0, NOTHING)) {
+			return;
+		}
 		if (!check_vampire_sun(ch, TRUE)) {
 			return;
 		}
