@@ -824,7 +824,7 @@ ACMD(do_dispel) {
 				msg_to_char(ch, "You aren't afflicted by anything that can be dispelled.\r\n");
 			}
 			else {
-				act("$e isn't afflicted by anything that can be dispelled.", FALSE, ch, NULL, vict, TO_CHAR);
+				act("$E isn't afflicted by anything that can be dispelled.", FALSE, ch, NULL, vict, TO_CHAR);
 			}
 			return;
 		}
