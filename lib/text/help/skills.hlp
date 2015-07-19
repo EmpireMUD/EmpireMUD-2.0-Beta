@@ -228,7 +228,7 @@ Command:  mine
 must be built on mountains, and can only be entered from one side even before
 you complete them. To work in a mine, you need a pick of some kind, although a
 simple handaxe will also work. A better mining tool and more Strength will help
-you mine faster.
+you mine faster, as will haste.
 
 Mines have a limited amount of ore, and do not replenish. However, if you fully
 dismantle a mine, its mountain will reset when the MUD celebrates a new year
