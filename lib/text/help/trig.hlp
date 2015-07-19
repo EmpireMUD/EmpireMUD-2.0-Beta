@@ -884,9 +884,6 @@ cha               - The actor's Charisma.
 class             - The actor's class, as a string.
 dex               - The actor's Dexterity.
 disabled          - Returns TRUE if the actor is stunned or otherwise disabled.
-exp()             - %actor.exp% returns the actor's XP. Using the subfield it 
-                    can be modified up to 1000 Xp. %actor.exp(20)% gives actor
-                    20 XP. The subfield can be negative. 
 eq()              - This will return the identifier (id) for the object 
                     equipped in position, if any. The specified position may be 
                     either a position number (0-18) or the name of the location
