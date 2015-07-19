@@ -742,7 +742,7 @@ void do_instance_nearby(char_data *ch, char *argument) {
 		return;
 	}
 	
-	size = snprintf(buf, sizeof(buf), "Instanes within %d tiles:\r\n", distance);
+	size = snprintf(buf, sizeof(buf), "Instances within %d tiles:\r\n", distance);
 	
 	for (inst = instance_list; inst; inst = inst->next) {
 		++num;
