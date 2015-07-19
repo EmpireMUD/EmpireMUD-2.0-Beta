@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: plrconv.c                                       EmpireMUD 2.0b1 *
+*   File: plrconv.c                                       EmpireMUD 2.0b2 *
 *  Usage: convert player file structures without wiping                   *
 *                                                                         *
 *  Credits: This is a cheap mock-up of play2to3.c which is included in    *

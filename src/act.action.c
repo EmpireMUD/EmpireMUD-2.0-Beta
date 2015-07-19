@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.action.c                                    EmpireMUD 2.0b1 *
+*   File: act.action.c                                    EmpireMUD 2.0b2 *
 *  Usage: commands and processors related to the action system            *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

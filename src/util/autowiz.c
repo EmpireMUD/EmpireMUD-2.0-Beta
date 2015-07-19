@@ -1,5 +1,5 @@
 /* ************************************************************************
-*  file:  autowiz.c                                       EmpireMUD 2.0b1 *
+*  file:  autowiz.c                                       EmpireMUD 2.0b2 *
 *  Usage: self-updating wizlists                                          *
 *                                                                         *
 *  Written by Jeremy Elson                                                *

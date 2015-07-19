@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: skills.c                                        EmpireMUD 2.0b1 *
+*   File: skills.c                                        EmpireMUD 2.0b2 *
 *  Usage: code related to the skill and ability system                    *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

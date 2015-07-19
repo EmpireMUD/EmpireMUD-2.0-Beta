@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: dg_scripts.c                                    EmpireMUD 2.0b1 *
+*   File: dg_scripts.c                                    EmpireMUD 2.0b2 *
 *  Usage: contains general functions for using scripts.                   *
 *                                                                         *
 *  DG Scripts code by egreen, 1996/09/24 03:48:42, revision 3.25          *

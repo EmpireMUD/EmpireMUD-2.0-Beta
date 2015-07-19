@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: handler.h                                       EmpireMUD 2.0b1 *
+*   File: handler.h                                       EmpireMUD 2.0b2 *
 *  Usage: header file: prototypes of handling and utility functions       *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

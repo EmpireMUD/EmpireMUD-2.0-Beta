@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: olc.building.c                                  EmpireMUD 2.0b1 *
+*   File: olc.building.c                                  EmpireMUD 2.0b2 *
 *  Usage: OLC for building prototypes                                     *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

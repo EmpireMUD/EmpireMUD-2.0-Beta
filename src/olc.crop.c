@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: olc.crop.c                                      EmpireMUD 2.0b1 *
+*   File: olc.crop.c                                      EmpireMUD 2.0b2 *
 *  Usage: OLC for crop prototypes                                         *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: structs.h                                       EmpireMUD 2.0b1 *
+*   File: structs.h                                       EmpireMUD 2.0b2 *
 *  Usage: header file for central structures and contstants               *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

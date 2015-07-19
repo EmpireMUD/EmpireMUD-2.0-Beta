@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: workforce.c                                     EmpireMUD 2.0b1 *
+*   File: workforce.c                                     EmpireMUD 2.0b2 *
 *  Usage: functions related to npc chores and workforce                   *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

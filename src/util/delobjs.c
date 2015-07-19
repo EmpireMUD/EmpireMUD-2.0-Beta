@@ -1,5 +1,5 @@
 /* ************************************************************************
-*  file:  delobjs.c                                       EmpireMUD 2.0b1 *
+*  file:  delobjs.c                                       EmpireMUD 2.0b2 *
 *  Usage: deleting object files for players who are not in the playerfile *
 *                                                                         *
 *  Written by Jeremy Elson 4/2/93                                         *

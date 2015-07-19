@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: constants.c                                     EmpireMUD 2.0b1 *
+*   File: constants.c                                     EmpireMUD 2.0b2 *
 *  Usage: Numeric and string contants used by the MUD                     *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -45,7 +45,7 @@ void afk_notify(char_data *ch);
  //////////////////////////////////////////////////////////////////////////////
 //// EMPIREMUD CONSTANTS /////////////////////////////////////////////////////
 
-const char *version = "EmpireMUD 2.0 beta 1";
+const char *version = "EmpireMUD 2.0 beta 2";
 
 
 // data for the built-in game levels -- this adapts itself if you reduce the number of immortal levels

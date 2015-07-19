@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.informative.c                               EmpireMUD 2.0b1 *
+*   File: act.informative.c                               EmpireMUD 2.0b2 *
 *  Usage: Player-level commands of an informative nature                  *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -386,7 +386,7 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	struct time_info_data playing_time;
 
 
-	msg_to_char(to, " +----------------------------- EmpireMUD 2.0b1 -----------------------------+\r\n");
+	msg_to_char(to, " +----------------------------- EmpireMUD 2.0b2 -----------------------------+\r\n");
 	
 	// row 1 col 1: name
 	msg_to_char(to, "  Name: %-18.18s", PERS(ch, ch, 1));

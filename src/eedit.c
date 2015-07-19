@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: eedit.c                                         EmpireMUD 2.0b1 *
+*   File: eedit.c                                         EmpireMUD 2.0b2 *
 *  Usage: empire editor code                                              *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

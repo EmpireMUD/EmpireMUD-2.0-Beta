@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: skills.h                                        EmpireMUD 2.0b1 *
+*   File: skills.h                                        EmpireMUD 2.0b2 *
 *  Usage: header file for classes, skills, and combat                     *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

@@ -1,5 +1,5 @@
 /* ************************************************************************
-*  file:  mudpasswd.c                                     EmpireMUD 2.0b1 *
+*  file:  mudpasswd.c                                     EmpireMUD 2.0b2 *
 *  Usage: changing passwords of chars in a Diku playerfile                *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

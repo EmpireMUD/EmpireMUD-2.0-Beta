@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: olc.mobile.c                                    EmpireMUD 2.0b1 *
+*   File: olc.mobile.c                                    EmpireMUD 2.0b2 *
 *  Usage: OLC for mobs                                                    *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

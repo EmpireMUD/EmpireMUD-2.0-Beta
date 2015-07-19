@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: dg_db_scripts.c                                 EmpireMUD 2.0b1 *
+*   File: dg_db_scripts.c                                 EmpireMUD 2.0b2 *
 *  Usage: Contains routines to handle db functions for scripts and trigs  *
 *                                                                         *
 *  DG Scripts code by egreen, 1996/09/30 21:27:54, revision 3.7           *

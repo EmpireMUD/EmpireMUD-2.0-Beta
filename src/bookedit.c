@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: bookedit.c                                      EmpireMUD 2.0b1 *
+*   File: bookedit.c                                      EmpireMUD 2.0b2 *
 *  Usage: the book editor functionality                                   *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

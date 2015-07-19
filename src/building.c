@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: building.c                                      EmpireMUD 2.0b1 *
+*   File: building.c                                      EmpireMUD 2.0b2 *
 *  Usage: Miscellaneous player-level commands                             *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

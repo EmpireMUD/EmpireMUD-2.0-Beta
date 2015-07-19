@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: db.lib.c                                        EmpireMUD 2.0b1 *
+*   File: db.lib.c                                        EmpireMUD 2.0b2 *
 *  Usage: Primary read/write functions for game world data                *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
