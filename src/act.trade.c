@@ -1157,7 +1157,7 @@ ACMD(do_weave) {
 		}
 		
 		if (!any) {
-			msg_to_char(ch, " nothing");
+			msg_to_char(ch, " nothing\r\n");
 		}
 		
 		if (this_line) {
