@@ -136,7 +136,9 @@ FINESSE
 
 Finesse (Battle ability)
 
-With finesse, your melee attacks happen faster, giving you more damage.
+With finesse, your melee attacks happen faster, leading to more damage overall.
+As a basic ability, attacks are 10% faster. As a specialty ability, they are
+15% faster. As a class ability, they are 20% faster.
 #
 FIRSTAID "FIRST AID"
 
@@ -222,7 +224,8 @@ See also: BLOCK
 Quick Draw (Battle ability)
 
 Shoot more arrows before your enemies reach you by learning to draw more
-quickly.
+quickly, leading to more damage per second. This improves your ranged combat
+speed by 25% (or 35% as a class ability).
 
 See also: ARCHERY, SHOOT
 #
