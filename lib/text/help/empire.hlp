@@ -332,9 +332,7 @@ Usage:  diplomacy <option> <empire>
 
 This command is the basis for the interaction among empires. It allows an
 empire to voice its political opinion on another empire and announce it to
-that empire. For the privacy of these empires, and to promote a sense of
-realism, empires cannot view the relations between two other empires. They
-may only see the relations which directly affect themselves.
+that empire.
 
 You can only burn down or besiege another empires buildings if you are at war.
 You can only go to war with or steal from an empire if at least one of their
