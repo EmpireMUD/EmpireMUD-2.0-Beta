@@ -61,3 +61,4 @@ Included Adventure Zones
 [  170] Hamlet of the Undead (10400-10449)
 [  200] Burrow Canyons (11100-11129)
 [  201] The Cursed Chalice of Mill Manor (11130-11159)
+[  281] Mountain Valley: Molten Fiend (18075-18099)
