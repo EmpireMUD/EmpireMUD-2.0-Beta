@@ -598,9 +598,9 @@ inventory, empire inventory, room packs, and on the trading post to auto-update
 when loaded if the version is changed. Existing .obj files are
 backwards-compatible.
 - Barley: Can now be created by the gods.
-- Block: Raised block scaling level on items slightly. Reduced the amount of
-BLOCK that appears on scaled items. This will allow for block on more items
-overall, instead of stacking high block values at low gear levels.
+- Block: Altered the amount of BLOCK that appears on scaled items. This will
+allow for block on more items overall, instead of stacking high block values at
+low gear levels.
 - Blood: Drinking blood no longer makes you less hungry.
 - Bloodsword: Added a look description.
 - Bound items: When left on the ground outside a private house, bound items
