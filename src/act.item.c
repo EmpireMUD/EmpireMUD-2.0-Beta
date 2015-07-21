@@ -1265,7 +1265,8 @@ void scale_item_to_level(obj_data *obj, int level) {
 	
 	// first check applies, count share/bonus
 	for (iter = 0; iter < MAX_OBJ_AFFECT; ++iter) {
-		if (obj->affected[iter].location != APPLY_NONE && obj->affected[iter].location != APPLY_GREATNESS) {
+		// TODO non-scalable traits should be an array
+		if (obj->affected[iter].location != APPLY_NONE && obj->affected[iter].location != APPLY_GREATNESS && obj->affected[iter].location != APPLY_CRAFTING) {
 			SHARE_OR_BONUS(obj->affected[iter].modifier);
 		}
 	}
@@ -1429,7 +1430,8 @@ void scale_item_to_level(obj_data *obj, int level) {
 	
 	// distribute points: applies
 	for (iter = 0; iter < MAX_OBJ_AFFECT; ++iter) {
-		if (obj->affected[iter].location != APPLY_NONE && obj->affected[iter].location != APPLY_GREATNESS) {
+		// TODO non-scalable traits should be an array
+		if (obj->affected[iter].location != APPLY_NONE && obj->affected[iter].location != APPLY_GREATNESS && obj->affected[iter].location != APPLY_CRAFTING) {
 			this_share = MAX(0, MIN(share, points_to_give));
 			// raw amount
 			per_point = (1.0 / apply_values[(int)obj->affected[iter].location]);
