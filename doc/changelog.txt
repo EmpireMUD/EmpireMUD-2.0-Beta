@@ -679,7 +679,7 @@ converted the wear code to use it.
 
 Major bugs:
 - Alternate: Was not checking the account ID correctly on characters not on any
-account.
+account. You can no longer alternate while editing text.
 - Build: Barriers were counting as open spaces for building entrances.
 - Burning: Buildings with players inside when they burned down were triggered
 infinite loops due to late extraction.
