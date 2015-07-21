@@ -6,7 +6,7 @@ Mob Kill Adventure Completion~
 ~
 #10001
 Mob Must Fight~
-0 q 100
+0 s 100
 ~
 %send% %actor% You can't leave because of %self.name%.
 return 0
@@ -578,7 +578,7 @@ list~
 %send% %actor%  - skycleaver gloves ('buy gloves', 5 skystones)
 %send% %actor%  - skycleaver armor ('buy armor', 14 skystones)
 %send% %actor%  - a skycleaver rucksack ('buy rucksack', 10 skystones)
-%send% %actor%  - an unusual blue clover ('buy clover', 2 skystones)
+%send% %actor%  - an iridescent blue iris ('buy iris', 2 skystones)
 %send% %actor%  - a yellow lightning stone ('buy lightningstone', 2 skystones)
 %send% %actor%  - a red bloodstone ('buy bloodstone', 2 skystones)
 %send% %actor%  - a glowing green seashell ('buy seashell', 2 skystones)
@@ -610,11 +610,11 @@ elseif rucksack /= %arg%
   eval vnum 10041
   eval cost 10
   eval named a skycleaver rucksack
-elseif clover /= %arg%
+elseif iris /= %arg%
   eval vnum 1206
   eval cost 2
-  eval named an unusual blue clover
-  eval keyw clover
+  eval named an iridescent blue iris
+  eval keyw iris
 elseif lightningstone /= %arg%
   eval vnum 103
   eval cost 2
@@ -642,7 +642,7 @@ end
 eval charge %%actor.add_resources(10036,-%cost%)%%
 nop %charge%
 %load% obj %vnum% %actor% inv %actor.level%
-%send% %actor% You buy a %named% for %cost% skystones.
+%send% %actor% You buy %named% for %cost% skystones.
 %echoaround% %actor% %actor.name% buys a %named%.
 ~
 #10038
@@ -685,7 +685,7 @@ switch %random.4%
     makeuid goblin mob goblin
     if %goblin%
       %echo% %self.name% opens a cage and lets %goblin.name% out!
-      %force% %goblin% %kill% %actor%
+      %force% %goblin% mkill %actor%
     end
   break
 done
@@ -857,7 +857,7 @@ eval ch %room.people%
 while %ch%
   if %ch.varexists(pixy_choice)%
     if %ch.pixy_choice% == %winner%
-      eval amt %ch.pixy_wager% * 4
+      eval amt %ch.pixy_wager% * 3
       %send% %ch% Your pixy won! You earn %amt% coins!
       %echoaround% %ch% %ch.name% has won %ch.hisher% bet!
       eval adjust %%ch.give_coins(%amt%)%%
@@ -886,7 +886,7 @@ Apprentice passive~
 ~
 switch %random.4%
   case 1
-    %echo% %self.name% casts a spell at a broomstick, which promplty splits into two broomsticks!
+    %echo% %self.name% casts a spell at a broomstick, which promptly splits into two broomsticks!
   break
   case 2
     %echo% %self.name% opens a tiny portal to summon materials...
@@ -928,7 +928,7 @@ if !%actor.affect(enervate)%
   enervate
 else
   %send% %actor% %self.name% marks you with a piece of chalk. It burns!
-  %echoaround% %actor% %self.name% marks %actor.name with a piece of chalk. It looks like it burns!
+  %echoaround% %actor% %self.name% marks %actor.name% with a piece of chalk. It looks like it burns!
   %dot% %actor% 50 20 magical
   %damage% %actor% 50 magical
 end
@@ -1041,7 +1041,7 @@ else
       makeuid skelly mob skeleton
       if %skelly%
         %echo% %skelly.name% rises from the floor!
-        %force% %skelly% %kill% %actor%
+        %force% %skelly% mkill %actor%
       end
     break
   done
@@ -1077,7 +1077,7 @@ switch %msg_pos%
     %echo% %self.name% sits in her chair.
   break
   case 2
-    %echo% %self.name% stands up, puts a book in a glase case, and locks it.
+    %echo% %self.name% stands up, puts a book in a glass case, and locks it.
   break
   case 3
     say I have a lithe, form-fitting backpack for sale -- just 5 greater skystones (type 'buy').
@@ -1369,7 +1369,7 @@ switch %random.3%
     dg_affect %self% TO-HIT 1 60
   break
   case 3
-    dg_affect %self% SOAK 1 60
+    dg_affect %self% RESIST-PHYSICAL 1 60
   break
 done
 ~

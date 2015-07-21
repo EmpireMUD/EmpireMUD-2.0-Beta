@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: statistics.c                                    EmpireMUD 2.0b1 *
+*   File: statistics.c                                    EmpireMUD 2.0b2 *
 *  Usage: code related game stats                                         *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -23,6 +23,7 @@
 * Contents:
 *   Stats Displays
 *   Stats Getters
+*   Player Stats
 *   World Stats
 */
 
@@ -44,6 +45,13 @@ struct stats_data_struct *global_crop_count = NULL;	// hash table count of crops
 struct stats_data_struct *global_building_count = NULL;	// hash table of building counts
 
 time_t last_world_count = 0;	// timestamp of last sector/crop/building tally
+time_t last_account_count = 0;	// timestamp of last time accounts were read
+
+int total_accounts = 0;	// including inactive
+int active_accounts = 0;	// not timed out (at least 1 char)
+int active_accounts_week = 0;	// just this week (at least 1 char)
+int max_players_today = 0;	// stats on max players seen
+int max_players_this_uptime = 0;
 
 
 // external consts
@@ -275,6 +283,110 @@ int stats_get_sector_count(sector_data *sect) {
 	HASH_FIND_INT(global_sector_count, &vnum, data);
 	
 	return data ? data->count : 0;
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// PLAYER STATS ////////////////////////////////////////////////////////////
+
+/**
+* This function updates the following global stats:
+*  total_accounts (all)
+*  active_accounts (at least one character not timed out)
+*  active_accounts_week (at least one character this week)
+*/
+void update_account_stats(void) {
+	extern bool member_is_timed_out_cfu(struct char_file_u *chdata);
+
+	// helper type
+	struct uniq_acct_t {
+		int id;	// either account id (positive) or player idnum (negative)
+		bool active_week;
+		bool active_timeout;
+		UT_hash_handle hh;
+	};
+
+	struct uniq_acct_t *acct, *next_acct, *acct_list = NULL;
+	struct char_file_u chdata;
+	int pos, id;
+	
+	// rate-limit this, as it scans the whole playerfile
+	if (last_account_count + rescan_world_after > time(0)) {
+		return;
+	}
+	
+	// build list
+	for (pos = 0; pos <= top_of_p_table; ++pos) {
+		// need chdata either way; check deleted here
+		if (load_char(player_table[pos].name, &chdata) <= NOBODY || IS_SET(chdata.char_specials_saved.act, PLR_DELETED)) {
+			continue;
+		}
+		
+		// see if we have data
+		id = chdata.player_specials_saved.account_id > 0 ? chdata.player_specials_saved.account_id : (-1 * chdata.char_specials_saved.idnum);
+		HASH_FIND_INT(acct_list, &id, acct);
+		if (!acct) {
+			CREATE(acct, struct uniq_acct_t, 1);
+			acct->id = id;
+			acct->active_week = acct->active_timeout = FALSE;
+			HASH_ADD_INT(acct_list, id, acct);
+		}
+		
+		// update
+		acct->active_week |= ((time(0) - chdata.last_logon) < SECS_PER_REAL_WEEK);
+		if (!acct->active_timeout) {
+			acct->active_timeout = !member_is_timed_out_cfu(&chdata);
+		}
+	}
+
+	// compute stats (and free temp data)
+	total_accounts = 0;
+	active_accounts = 0;
+	active_accounts_week = 0;
+	
+	HASH_ITER(hh, acct_list, acct, next_acct) {
+		++total_accounts;
+		if (acct->active_week) {
+			++active_accounts_week;
+		}
+		if (acct->active_timeout) {
+			++active_accounts;
+		}
+		
+		// and free
+		HASH_DEL(acct_list, acct);
+		free(acct);
+	}
+	
+	// update timestamp
+	last_account_count = time(0);
+}
+
+
+/**
+* Updates the count of players online.
+*/
+void update_players_online_stats(void) {
+	descriptor_data *d;
+	int count;
+	
+	// determine current count
+	count = 0;
+	for (d = descriptor_list; d; d = d->next) {
+		if (STATE(d) != CON_PLAYING || !d->character) {
+			continue;
+		}
+		
+		// morts only
+		if (IS_IMMORTAL(d->character) || GET_INVIS_LEV(d->character) > LVL_APPROVED) {
+			continue;
+		}
+		
+		++count;
+	}
+	
+	max_players_today = MAX(max_players_today, count);
+	max_players_this_uptime = MAX(max_players_this_uptime, count);
 }
 
 

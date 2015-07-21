@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: interpreter.c                                   EmpireMUD 2.0b1 *
+*   File: interpreter.c                                   EmpireMUD 2.0b2 *
 *  Usage: parse user commands, search for specials, call ACMD functions   *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -71,6 +71,7 @@ ACMD(do_bash);
 ACMD(do_bathe);
 ACMD(do_bite);
 ACMD(do_blind);
+ACMD(do_bloodsweat);
 ACMD(do_bloodsword);
 ACMD(do_board);
 ACMD(do_boost);
@@ -95,6 +96,7 @@ ACMD(do_collapse);
 ACMD(do_colorburst);
 ACMD(do_command);
 ACMD(do_commands);
+ACMD(do_confer);
 ACMD(do_config);
 ACMD(do_confirm);
 ACMD(do_consider);
@@ -127,6 +129,7 @@ ACMD(do_dismount);
 ACMD(do_dispel);
 ACMD(do_display);
 ACMD(do_distance);
+ACMD(do_diversion);
 ACMD(do_douse);
 ACMD(do_draw);
 ACMD(do_drink);
@@ -173,6 +176,7 @@ ACMD(do_follow);
 ACMD(do_forage);
 ACMD(do_force);
 ACMD(do_foresight);
+ACMD(do_forgive);
 ACMD(do_fullsave);
 
 ACMD(do_gather);
@@ -200,6 +204,8 @@ ACMD(do_hide);
 ACMD(do_history);
 ACMD(do_hit);
 ACMD(do_home);
+ACMD(do_hostile);
+ACMD(do_howl);
 
 ACMD(do_identify);
 ACMD(do_ignore);
@@ -212,9 +218,11 @@ ACMD(do_insult);
 ACMD(do_interlink);
 ACMD(do_inventory);
 ACMD(do_invis);
+ACMD(do_island);
 
 ACMD(do_jab);
 
+ACMD(do_keep);
 ACMD(do_kick);
 
 ACMD(do_land);
@@ -325,6 +333,7 @@ ACMD(do_search);
 ACMD(do_send);
 ACMD(do_selfdelete);
 ACMD(do_set);
+ACMD(do_shadowcage);
 ACMD(do_shadowstep);
 ACMD(do_shear);
 ACMD(do_sheathe);
@@ -523,6 +532,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "bathe", POS_STANDING, do_bathe, NO_MIN, CTYPE_MOVE ),
 	STANDARD_CMD( "bite", POS_FIGHTING, do_bite, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_COMBAT, CMD_NO_ANIMALS, NO_ABIL ),
 	ABILITY_CMD( "blind", POS_FIGHTING, do_blind, NO_MIN, CTYPE_COMBAT, ABIL_BLIND ),
+	ABILITY_CMD( "bloodsweat", POS_SLEEPING, do_bloodsweat, NO_MIN, CTYPE_SKILL, ABIL_BLOODSWEAT ),
 	ABILITY_CMD( "bloodsword", POS_RESTING, do_bloodsword, NO_MIN, CTYPE_SKILL, ABIL_BLOODSWORD ),
 	SIMPLE_CMD( "board", POS_STANDING, do_board, NO_MIN, CTYPE_MOVE ),
 	STANDARD_CMD( "boatload", POS_STANDING, do_load_boat, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
@@ -559,6 +569,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "consider", POS_RESTING, do_consider, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "config", POS_DEAD, do_config, LVL_CIMPL, CTYPE_IMMORTAL ),
 	SIMPLE_CMD( "confirm", POS_SLEEPING, do_confirm, NO_MIN, CTYPE_UTIL ),
+	ABILITY_CMD( "confer", POS_RESTING, do_confer, NO_MIN, CTYPE_SKILL, ABIL_CONFER ),
 	STANDARD_CMD( "cook", POS_STANDING, do_gen_craft, LVL_APPROVED, NO_GRANTS, CRAFT_TYPE_COOK, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "cooldowns", POS_DEAD, do_cooldowns, NO_MIN, CTYPE_UTIL ),
 	ABILITY_CMD( "counterspell", POS_FIGHTING, do_counterspell, NO_MIN, CTYPE_SKILL, ABIL_COUNTERSPELL ),
@@ -590,6 +601,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "dig", POS_STANDING, do_dig, LVL_APPROVED, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "display", POS_DEAD, do_display, NO_MIN, CTYPE_UTIL ),
 	ABILITY_CMD( "dispel", POS_FIGHTING, do_dispel, NO_MIN, CTYPE_SKILL, ABIL_DISPEL ),
+	ABILITY_CMD( "diversion", POS_FIGHTING, do_diversion, NO_MIN, CTYPE_SKILL, ABIL_DIVERSION ),
 	SIMPLE_CMD( "douse", POS_STANDING, do_douse, NO_MIN, CTYPE_BUILD ),
 	SCMD_CMD( "drop", POS_RESTING, do_drop, NO_MIN, CTYPE_MOVE, SCMD_DROP ),
 	SIMPLE_CMD( "draw", POS_RESTING, do_draw, NO_MIN, CTYPE_COMBAT ),
@@ -643,6 +655,8 @@ cpp_extern const struct command_info cmd_info[] = {
 	GRANT_CMD( "force", POS_SLEEPING, do_force, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_FORCE ),
 	ABILITY_CMD( "foresight", POS_RESTING, do_foresight, NO_MIN, CTYPE_COMBAT, ABIL_FORESIGHT ),
 	STANDARD_CMD( "forge", POS_STANDING, do_gen_craft, LVL_APPROVED, NO_GRANTS, CRAFT_TYPE_FORGE, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
+	GRANT_CMD( "forgive", POS_DEAD, do_forgive, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_FORGIVE ),
+	SCMD_CMD( "fprompt", POS_DEAD, do_prompt, NO_MIN, CTYPE_UTIL, SCMD_FPROMPT ),
 	SIMPLE_CMD( "fullsave", POS_DEAD, do_fullsave, LVL_TOP, CTYPE_IMMORTAL ),
 	STANDARD_CMD( "freeze", POS_DEAD, do_wizutil, LVL_CIMPL, GRANT_FREEZE, SCMD_FREEZE, CTYPE_IMMORTAL, NOBITS, NO_ABIL ),
 
@@ -652,8 +666,8 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "give", POS_RESTING, do_give, NO_MIN, CTYPE_MOVE ),
 	SCMD_CMD( "goto", POS_SLEEPING, do_goto, LVL_START_IMM, CTYPE_IMMORTAL, SCMD_GOTO ),
 	SCMD_CMD( "godnet", POS_DEAD, do_pub_comm, LVL_GOD, CTYPE_IMMORTAL, SCMD_GODNET ),
-	SCMD_CMD( "godhistory", POS_DEAD, do_history, NO_MIN, CTYPE_COMM, CHANNEL_HISTORY_GOD ),
-	SCMD_CMD( "ghistory", POS_DEAD, do_history, NO_MIN, CTYPE_COMM, CHANNEL_HISTORY_GOD ),
+	SCMD_CMD( "godhistory", POS_DEAD, do_history, LVL_GOD, CTYPE_COMM, CHANNEL_HISTORY_GOD ),
+	SCMD_CMD( "ghistory", POS_DEAD, do_history, LVL_GOD, CTYPE_COMM, CHANNEL_HISTORY_GOD ),
 	SCMD_CMD( "godlist", POS_DEAD, do_gen_ps, NO_MIN, CTYPE_UTIL, SCMD_GODLIST ),
 	SIMPLE_CMD( "gold", POS_DEAD, do_coins, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "grab", POS_RESTING, do_grab, NO_MIN, CTYPE_UTIL ),
@@ -675,6 +689,8 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "hit", POS_FIGHTING, do_hit, NO_MIN, CTYPE_COMBAT, SCMD_HIT ),
 	SIMPLE_CMD( "hold", POS_RESTING, do_grab, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "home", POS_SLEEPING, do_home, LVL_APPROVED, CTYPE_UTIL ),
+	GRANT_CMD( "hostile", POS_DEAD, do_hostile, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_HOSTILE ),
+	ABILITY_CMD( "howl", POS_FIGHTING, do_howl, NO_MIN, CTYPE_SKILL, ABIL_HOWL ),
 
 	SIMPLE_CMD( "inventory", POS_DEAD, do_inventory, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "identify", POS_STANDING, do_identify, NO_MIN, CTYPE_SKILL ),
@@ -683,17 +699,19 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "import", POS_DEAD, do_import, LVL_APPROVED, CTYPE_UTIL, TRADE_IMPORT ),
 	SCMD_CMD( "imotd", POS_DEAD, do_gen_ps, LVL_START_IMM, CTYPE_IMMORTAL, SCMD_IMOTD ),
 	ABILITY_CMD( "infiltrate", POS_STANDING, do_infiltrate, NO_MIN, CTYPE_MOVE, ABIL_INFILTRATE ),
-	GRANT_CMD( "instance", POS_DEAD, do_instance, LVL_CIMPL, CTYPE_UTIL, GRANT_INSTANCE ),
+	GRANT_CMD( "instance", POS_DEAD, do_instance, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_INSTANCE ),
 	SCMD_CMD( "info", POS_DEAD, do_gen_ps, NO_MIN, CTYPE_UTIL, SCMD_INFO ),
 	ABILITY_CMD( "inspire", POS_STANDING, do_inspire, NO_MIN, CTYPE_SKILL, ABIL_INSPIRE ),
 	SIMPLE_CMD( "insult", POS_RESTING, do_insult, NO_MIN, CTYPE_COMM ),
 	SIMPLE_CMD( "interlink", POS_STANDING, do_interlink, NO_MIN, CTYPE_BUILD ),
 	SIMPLE_CMD( "invis", POS_DEAD, do_invis, LVL_GOD, CTYPE_IMMORTAL ),
+	GRANT_CMD( "island", POS_DEAD, do_island, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_ISLAND ),
 
 	ABILITY_CMD( "jab", POS_FIGHTING, do_jab, NO_MIN, CTYPE_COMBAT, ABIL_JAB ),
 	SCMD_CMD( "junk", POS_RESTING, do_drop, NO_MIN, CTYPE_UTIL, SCMD_JUNK ),
 
 	SIMPLE_CMD( "kill", POS_FIGHTING, do_hit, NO_MIN, CTYPE_COMBAT ),
+	SCMD_CMD( "keep", POS_DEAD, do_keep, NO_MIN, CTYPE_UTIL, SCMD_KEEP ),
 	ABILITY_CMD( "kick", POS_FIGHTING, do_kick, NO_MIN, CTYPE_COMBAT, ABIL_KICK ),
 
 	SCMD_CMD( "look", POS_RESTING, do_look, NO_MIN, CTYPE_UTIL, SCMD_LOOK ),
@@ -765,7 +783,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "pour", POS_STANDING, do_pour, NO_MIN, CTYPE_UTIL, SCMD_POUR ),
 	ABILITY_CMD( "prick", POS_FIGHTING, do_prick, NO_MIN, CTYPE_COMBAT, ABIL_PRICK ),
 	SIMPLE_CMD( "promote", POS_DEAD, do_promote, LVL_APPROVED, CTYPE_EMPIRE ),
-	SIMPLE_CMD( "prompt", POS_DEAD, do_prompt, NO_MIN, CTYPE_UTIL ),
+	SCMD_CMD( "prompt", POS_DEAD, do_prompt, NO_MIN, CTYPE_UTIL, SCMD_PROMPT ),
 	STANDARD_CMD( "prospect", POS_STANDING, do_prospect, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, ABIL_PROSPECT ),
 	SIMPLE_CMD( "publicize", POS_RESTING, do_publicize, LVL_APPROVED, CTYPE_EMPIRE ),
 	GRANT_CMD( "purge", POS_DEAD, do_purge, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_PURGE ),
@@ -826,6 +844,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	GRANT_CMD( "send", POS_SLEEPING, do_send, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_SEND ),
 	GRANT_CMD( "set", POS_DEAD, do_set, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_SET ),
 	STANDARD_CMD( "sew", POS_STANDING, do_gen_craft, LVL_APPROVED, NO_GRANTS, CRAFT_TYPE_SEW, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
+	ABILITY_CMD( "shadowcage", POS_FIGHTING, do_shadowcage, NO_MIN, CTYPE_SKILL, ABIL_SHADOWCAGE ),
 	ABILITY_CMD( "shadowstep", POS_STANDING, do_shadowstep, NO_MIN, CTYPE_MOVE, ABIL_SHADOWSTEP ),
 	STANDARD_CMD( "shear", POS_STANDING, do_shear, LVL_APPROVED, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "sheathe", POS_RESTING, do_sheathe, NO_MIN, CTYPE_COMBAT ),
@@ -841,7 +860,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "skin", POS_STANDING, do_skin, LVL_APPROVED, CTYPE_SKILL ),
 	ABILITY_CMD( "skybrand", POS_FIGHTING, do_skybrand, NO_MIN, CTYPE_COMBAT, ABIL_SKYBRAND ),
 	SIMPLE_CMD( "sleep", POS_SLEEPING, do_sleep, NO_MIN, CTYPE_MOVE ),
-	SIMPLE_CMD( "slay", POS_RESTING, do_slay, LVL_CIMPL, CTYPE_IMMORTAL ),
+	GRANT_CMD( "slay", POS_RESTING, do_slay, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_SLAY ),
 	ABILITY_CMD( "slow", POS_FIGHTING, do_slow, NO_MIN, CTYPE_COMBAT, ABIL_SLOW ),
 	STANDARD_CMD( "smelt", POS_STANDING, do_smelt, LVL_APPROVED, NO_GRANTS, NO_SCMD, CTYPE_EMPIRE, CMD_NO_ANIMALS, NO_ABIL ),
 	STANDARD_CMD( "sneak", POS_STANDING, do_sneak, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_STAY_HIDDEN, ABIL_SNEAK ),
@@ -884,7 +903,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "tip", POS_DEAD, do_tip, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "title", POS_DEAD, do_title, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "toggles", POS_DEAD, do_toggle, NO_MIN, CTYPE_UTIL ),
-	SIMPLE_CMD( "tomb", POS_SLEEPING, do_tomb, LVL_APPROVED, CTYPE_UTIL ),
+	SIMPLE_CMD( "tomb", POS_DEAD, do_tomb, LVL_APPROVED, CTYPE_UTIL ),
 	ABILITY_CMD( "track", POS_STANDING, do_track, NO_MIN, CTYPE_SKILL, ABIL_TRACK ),
 	SIMPLE_CMD( "trade", POS_RESTING, do_trade, NO_MIN, CTYPE_MOVE ),
 	GRANT_CMD( "transfer", POS_SLEEPING, do_trans, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_TRANSFER ),
@@ -894,6 +913,7 @@ cpp_extern const struct command_info cmd_info[] = {
 
 	GRANT_CMD( "unbind", POS_SLEEPING, do_unbind, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_UNBIND ),
 	STANDARD_CMD( "unharness", POS_STANDING, do_harness, NO_MIN, NO_GRANTS, TRUE, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
+	SCMD_CMD( "unkeep", POS_DEAD, do_keep, NO_MIN, CTYPE_UTIL, SCMD_UNKEEP ),
 	STANDARD_CMD( "unload", POS_STANDING, do_unload_boat, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
 	SCMD_CMD( "unstake", POS_STANDING, do_stake, NO_MIN, CTYPE_COMBAT, TRUE ),
 	STANDARD_CMD( "untie", POS_STANDING, do_tie, NO_MIN, NO_GRANTS, TRUE, CTYPE_COMBAT, CMD_NO_ANIMALS, NO_ABIL ),
@@ -1110,7 +1130,7 @@ void command_interpreter(char_data *ch, char *argument) {
 				send_to_char("In your dreams, or what?\r\n", ch);
 				break;
 			case POS_RESTING:
-				send_to_char("Nah... You feel too relaxed to do that..\r\n", ch);
+				send_to_char("Nah... You feel too relaxed to do that.\r\n", ch);
 				break;
 			case POS_SITTING:
 				send_to_char("Maybe you should get on your feet first?\r\n", ch);
@@ -1245,7 +1265,7 @@ int perform_alias(descriptor_data *d, char *orig) {
 	char first_arg[MAX_INPUT_LENGTH], *ptr;
 	struct alias_data *a, *tmp;
 
-	/* Mobs don't have alaises. */
+	/* Mobs don't have aliases. */
 	if (IS_NPC(d->character))
 		return (0);
 
@@ -1482,12 +1502,15 @@ struct {
 	{ CON_Q_SCREEN_READER },	// skips to CON_Q_HAS_ALT
 	{ CON_QCOLOR },
 	
-	{ CON_Q_HAS_ALT },	// skips to CON_QEQUIPMENT
+	{ CON_Q_HAS_ALT },	// skips to CON_Q_ARCHETYPE
 	{ CON_Q_ALT_NAME },
 	{ CON_Q_ALT_PASSWORD },
 	
 	{ CON_Q_ARCHETYPE },
 	{ CON_BONUS_CREATION },
+	
+	{ CON_PROMO_CODE },
+	{ CON_CONFIRM_PROMO_CODE },	// only if given invalid code
 	
 	{ CON_REFERRAL },
 	{ CON_FINISH_CREATION },
@@ -1512,7 +1535,7 @@ void prompt_creation(descriptor_data *d) {
 			SEND_TO_Q("\r\nEmpireMUD makes heavy use of an ascii map, but also supports screen\r\n", d);
 			SEND_TO_Q("readers for the visually impaired. This will replace the map with a short\r\n", d);
 			SEND_TO_Q("description of what you can see in each direction on the world map. This\r\n", d);
-			SEND_TO_Q("option is only recommanded for players using screen readers. You can see\r\n", d);
+			SEND_TO_Q("option is only recommended for players using screen readers. You can see\r\n", d);
 			SEND_TO_Q("HELP SCREEN READER once you're in the game for more information.\r\n", d);
 			SEND_TO_Q("\r\nAre you using a screen reader (y/n)? ", d);
 			break;
@@ -1576,6 +1599,14 @@ void prompt_creation(descriptor_data *d) {
 			SEND_TO_Q("\r\n", d);
 			SEND_TO_Q("&c[ HINT: These are only your starting traits; you can still learn any skill ]&0\r\n", d);
 			SEND_TO_Q("Choose a number or type 'help <number>' for info > ", d);
+			break;
+		}
+		case CON_PROMO_CODE: {
+			SEND_TO_Q("\r\nIf you have a promo code, enter it now. Otherwise, just leave it blank > ", d);
+			break;
+		}
+		case CON_CONFIRM_PROMO_CODE: {
+			SEND_TO_Q("\r\nUnknown promo code. Proceed without one (y/n)? ", d);
 			break;
 		}
 		case CON_REFERRAL: {
@@ -1983,14 +2014,15 @@ int _parse_name(char *arg, char *name) {
 	/* skip whitespaces */
 	for (; isspace(*arg); arg++);
 	
-	// don't allow leading apostrophe
-	if (*arg == '\'') {
-		return 0;
+	// don't allow leading apostrophe or dash
+	if (*arg == '\'' || *arg == '-') {
+		return 1;
 	}
 
+	// check for anything that's not an apostrophe or dash
 	for (i = 0; (*name = *arg); arg++, i++, name++)
 		if (!isalpha(*arg) && *arg != '\'' && *arg != '-')
-			return (1);
+			return 1;
 
 	if (!i)
 		return (1);
@@ -2012,12 +2044,13 @@ void nanny(descriptor_data *d, char *arg) {
 	extern int Valid_Name(char *newname);
 	
 	extern const struct archetype_type archetype[];
+	extern struct promo_code_list promo_codes[];
 	extern char *START_MESSG;
 	extern int wizlock_level;
 	extern char *wizlock_message;
 
 	char buf[MAX_STRING_LENGTH], tmp_name[MAX_INPUT_LENGTH];
-	int player_i, load_result, i, j;
+	int player_i, load_result, i, j, iter;
 	struct char_file_u tmp_store;
 	bool help, show_start = FALSE;
 
@@ -2187,7 +2220,7 @@ void nanny(descriptor_data *d, char *arg) {
 					if (wizlock_message)
 						SEND_TO_Q(wizlock_message, d);
 					else
-						SEND_TO_Q("The game is temporarily restricted.. try again later.\r\n", d);
+						SEND_TO_Q("The game is temporarily restricted... try again later.\r\n", d);
 					STATE(d) = CON_CLOSE;
 					syslog(SYS_LOGIN, 0, TRUE, "Request for login denied for %s [%s] (wizlock)", GET_NAME(d->character), d->host);
 					return;
@@ -2371,7 +2404,7 @@ void nanny(descriptor_data *d, char *arg) {
 					d->character->player.sex = SEX_FEMALE;
 					break;
 				default:
-					SEND_TO_Q("That is not a sex..\r\nWhat IS your sex? ", d);
+					SEND_TO_Q("That is not a sex...\r\nWhat IS your sex? ", d);
 					return;
 			}
 
@@ -2422,7 +2455,7 @@ void nanny(descriptor_data *d, char *arg) {
 			SEND_TO_Q("\r\n*** Press ENTER: ", d);
 			STATE(d) = CON_RMOTD;
 
-			syslog(SYS_LOGIN, 0, TRUE, "NEW: %s [%s] (%s)", GET_NAME(d->character), d->host, (GET_REFERRED_BY(d->character) && *GET_REFERRED_BY(d->character)) ? GET_REFERRED_BY(d->character) : "no referral");
+			syslog(SYS_LOGIN, 0, TRUE, "NEW: %s [%s] (%s/%s)", GET_NAME(d->character), d->host, GET_PROMO_ID(d->character) > 0 ? promo_codes[GET_PROMO_ID(d->character)].code : "no promo", (GET_REFERRED_BY(d->character) && *GET_REFERRED_BY(d->character)) ? GET_REFERRED_BY(d->character) : "no referral");
 			break;
 		}
 
@@ -2460,6 +2493,54 @@ void nanny(descriptor_data *d, char *arg) {
 			}
 			break;
 		}
+		
+		case CON_PROMO_CODE: {
+			int promo = -1;
+			
+			skip_spaces(&arg);
+			if (!*arg) {
+				// skip entirely
+				set_creation_state(d, CON_REFERRAL);
+				return;
+			}
+			
+			for (iter = 0; *promo_codes[iter].code != '\n'; ++iter) {
+				if (!promo_codes[iter].expired && !str_cmp(arg, promo_codes[iter].code)) {
+					promo = iter;
+					break;
+				}
+			}
+			
+			GET_PROMO_ID(d->character) = promo;
+			
+			// pass off based on code validity
+			if (promo < 0) {
+				set_creation_state(d, CON_CONFIRM_PROMO_CODE);
+			}
+			else {
+				SEND_TO_Q("\r\nPromo code accepted.\r\n", d);
+				set_creation_state(d, CON_REFERRAL);
+			}
+			break;
+		}
+		
+		case CON_CONFIRM_PROMO_CODE: {
+			switch (LOWER(*arg)) {
+				case 'y': {
+					next_creation_step(d);
+					break;
+				}
+				case 'n': {
+					set_creation_state(d, CON_PROMO_CODE);
+					break;
+				}
+				default: {
+					SEND_TO_Q("Please type YES or NO: ", d);
+					return;
+				}
+			}
+			break;
+		}
 
 		case CON_RMOTD: {		/* read CR after printing motd   */
 			if (PLR_FLAGGED(d->character, PLR_IPMASK)) {
@@ -2476,7 +2557,7 @@ void nanny(descriptor_data *d, char *arg) {
 				SEND_TO_Q("member in charge of authorization. When you are able to log into the mud,\r\n", d);
 				SEND_TO_Q("type HELP AUTHORIZATION for the appropriate e-mail address, or contact the\r\n", d);
 				SEND_TO_Q("staff member via the game.\r\n", d);
-				SEND_TO_Q("\r\nPress ENTER to contine: ", d);
+				SEND_TO_Q("\r\nPress ENTER to continue: ", d);
 				syslog(SYS_LOGIN, 0, TRUE, "Login denied: Multiplaying detected for %s [%s]", GET_NAME(d->character), d->host);
 
 				STATE(d) = CON_GOODBYE;

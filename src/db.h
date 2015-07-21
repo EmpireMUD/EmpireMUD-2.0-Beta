@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: db.h                                            EmpireMUD 2.0b1 *
+*   File: db.h                                            EmpireMUD 2.0b2 *
 *  Usage: header file for database handling                               *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -122,6 +122,7 @@
 #define TIME_FILE  LIB_ETC"time"	// for recording the big bang
 #define EXP_FILE  LIB_ETC"exp_cycle"	// for experience cycling
 #define INSTANCE_FILE  LIB_ETC"instances"	// instanced adventures
+#define ISLAND_FILE  LIB_ETC"islands"	// island info
 #define TRADING_POST_FILE  LIB_ETC"trading_post"	// for global trade
 
 // map output data
@@ -209,6 +210,12 @@ void save_all_empires();
 
 // extra descs
 void free_extra_descs(struct extra_descr_data **list);
+
+// islands
+extern struct island_info *island_table;
+extern struct island_info *get_island(int island_id, bool create_if_missing);
+extern struct island_info *get_island_by_coords(char *coords);
+extern struct island_info *get_island_by_name(char *name);
 
 // mobiles/chars
 extern char_data *character_list;

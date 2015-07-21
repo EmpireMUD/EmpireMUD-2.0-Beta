@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: plrconv.c                                       EmpireMUD 2.0b1 *
+*   File: plrconv.c                                       EmpireMUD 2.0b2 *
 *  Usage: convert player file structures without wiping                   *
 *                                                                         *
 *  Credits: This is a cheap mock-up of play2to3.c which is included in    *
@@ -53,7 +53,7 @@ struct OLD_player_special_data_saved {
 	byte invis_level;	// level of invisibility
 	byte immortal_level;	// stored so that if level numbers are changed, imms stay at the correct level
 	bitvector_t grants;	// grant imm abilities
-	ubyte bad_pws;	// number of bad password attemps
+	ubyte bad_pws;	// number of bad password attempts
 
 	// preferences
 	bitvector_t pref;	// preference flags for PCs.
@@ -75,7 +75,7 @@ struct OLD_player_special_data_saved {
 
 	// some daily stuff
 	int daily_cycle;	// Last update cycle registered
-	ubyte skill_points_available;	// skill points can gain
+	ubyte daily_bonus_experience;	// boosted skill gain points
 	long rewarded_today[MAX_REWARDS_PER_DAY];	// idnums, for ABIL_REWARD
 
 	// action info
@@ -267,7 +267,7 @@ void convert_char_file_u(struct char_file_u *to, struct OLD_char_file_u *from) {
 	}
 	
 	to->player_specials_saved.daily_cycle = from->player_specials_saved.daily_cycle;
-	to->player_specials_saved.skill_points_available = from->player_specials_saved.skill_points_available;
+	to->player_specials_saved.daily_bonus_experience = from->player_specials_saved.daily_bonus_experience;
 	
 	to->player_specials_saved.action = from->player_specials_saved.action;
 	to->player_specials_saved.action_rotation = from->player_specials_saved.action_rotation;

@@ -36,7 +36,7 @@ This is the standard weapon of the age: the arming sword.
 0 1 1
 2 0
 C
-0 0
+0 75
 S
 #2203
 falchion~
@@ -150,7 +150,7 @@ The mace is a powerful weapon of war, capable of crushing armor.
 0 1 5
 2 0
 C
-0 0
+0 75
 S
 #2211
 maul brutal~
@@ -256,6 +256,31 @@ The rawhide whip is firm and strong.
 1 mo an
 0 1 7
 7 0
+C
+0 0
+S
+#2219
+hammer iron smith's~
+an iron hammer~
+An iron smith's hammer is lying here.~
+   The hammer looks like it would be good for forging. Or, in a pinch, it would
+do in battle.
+~
+1 hmo ano
+0 1 6
+2 0
+C
+0 0
+S
+#2220
+shovel iron~
+an iron shovel~
+A shovel is stamped into the ground.~
+A shovel helps you dig or excavate faster.
+~
+1 ehmu ano
+0 1 5
+2 0
 C
 0 0
 S

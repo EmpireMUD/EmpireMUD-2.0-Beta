@@ -1,13 +1,11 @@
 STEALTH "STEALTH SKILL"
 
 Stealth is the skill tree for all things secret, hidden, or shadow. Little is
-known about its practicioners. Rumors swirl of an underground group of thieves
+known about its practitioners. Rumors swirl of an underground group of thieves
 called the Guild, though no one dares confirm them.
 
 (To begin your journey down the path of Stealth, try bribing the hidden guild-
 master.)
-
-NOTE: The Stealth tree is only partially implemented.
 
 See also: HIDE, SNEAK, BACKSTAB, PICKPOCKET, DISGUISE, JAB, TERRIFY,
     DARKNESS, APPRAISAL, BLIND, VAULTCRACKING, POISONS, DEADLY POISONS,
@@ -35,7 +33,8 @@ Usage:  backstab [victim]
 Cooldown:  9 seconds
 
 A brave warrior looks his foe in the eye, but a clever assassin looks his
-target in the back as he strikes.
+target in the back as he strikes. You must wield a stabbing weapon to use this
+ability.
 
 Backstab deals 2x weapon damage on a successful attack, and the opponent has
 no chance to dodge if the attack succeeds. A particularly skilled assassin
@@ -47,6 +46,7 @@ Blind (Stealth ability)
 
 Usage:  blind [victim]
 Cooldown:  10 seconds
+Debuff type:  Stealth
 
 You toss sand in your opponents' eyes, blinding them for 10 seconds.
 
@@ -77,6 +77,17 @@ using or holding.
 
 This ability gains skill points whenever they try.
 #
+"CRUCIAL JAB"
+
+Crucial Jab
+Class ability: Bandit
+Debuff type: Stealth
+
+Your Jab ability causes a debuff equal to your total level divided by 80 to
+your victim's Dexterity, for 10 seconds.
+
+See also: JAB
+#
 DARKNESS
 
 Darkness (Stealth ability)
@@ -104,6 +115,19 @@ A savvy rogue learns to blend into his surroundings. With this ability, you can
 look like any human NPC. If you behave like one as well, you might find you
 disappear into the crowd.
 #
+DIVERSION
+
+Diversion
+Class ability:  Smuggler
+Debuff type:  Stealth
+Cost:  50 move
+Cooldown:  30 seconds
+Usage:  diversion
+
+You create a flashy diversion, penalizing all enemies. The first victim loses
+Wits equal to your Charisma. Each additional victim loses Wits equal to half
+your Charisma (rounded up) instead. This effect lasts 15 seconds.
+#
 ESCAPE
 
 Escape (Stealth ability)
@@ -127,6 +151,31 @@ of whether you typed a command or not.
 
 See also: SEARCH, SNEAK
 #
+HOWL
+
+Howl
+Class ability:  Shadow Wolf
+Debuff type:  Stealth
+Cost:  50 move
+Cooldown:  30 seconds
+Usage:  howl
+
+You let out a terrifying howl, penalizing all enemies. The first victim loses
+to-hit equal to 4x your Charisma. Each additional victim loses to-hit equal to
+2x Charisma instead.
+#
+SHADOWCAGE "SHADOW CAGE"
+
+Shadowcage
+Class ability: Occultist
+Debuff type: Stealth
+Cost: 50 move
+Cooldown: 30 seconds
+
+You create a cage of shadows, penalizing all enemies. The first victim loses
+dodge equal to 4x your Charisma. Each additional victim loses dodge equal to 2x
+Charisma instead. This effect lasts 15 seconds.
+#
 INFILTRATE "IMPROVED INFILTRATE"
 
 Infiltrate, Improved Infiltrate (Stealth abilities)
@@ -138,6 +187,9 @@ infiltrate the buildings of people you have non-aggression pacts or alliances
 with. You must have stealth permission from your empire, and infiltrating will
 trigger distrust with the other empire. The empire will be alerted to your
 presence as an infiltrator, so act fast.
+
+Infiltrate will also allow you to enter portals in places that you don't have
+permission to use.
 
 Improved Infiltrate increases your chances of successful infiltration and
 give you a chance to get in undetected. Even if you are detected, your identity
@@ -153,6 +205,8 @@ Cooldown:  9 seconds
 Jab your opponent while he's not looking and leave a wound in his side that
 will fester for 15 seconds, dealing additional damage. This ability stacks up
 to 2 times.
+
+See also: CRUCIAL JAB, SHADOW JAB, STAGGER JAB
 #
 PICKPOCKET "PICK POCKET"
 
@@ -182,7 +236,8 @@ envenom them with your chosen poison. When the vial runs out of poison, it will
 be removed from your inventory.
 
 All vials have 15 charges. Deadly Poisons doubles the effects of most poisons.
-Poisons only work with sharp weapons.
+Poisons only work with sharp weapons. Poisons also count as Stealth debuffs,
+and some NPCs are immune.
 
 Basic Poisons:
   searing  +5 damage  (30 bileberries)
@@ -200,7 +255,7 @@ Deadly Poisons:
   slow  slower combat rate  (30 daggerbite, 15 redthorn)
   heartstop  vampires can't spend blood  (30 daggerbite, 15 redthorn)
 
-See also: MIX, RESIST POISON
+See also: RESIST POISON
 #
 PRICK
 
@@ -221,8 +276,9 @@ Sap (Stealth ability)
 
 Usage:  sap <victim>
 Cooldown:  9 seconds
+Debuff type:  Stealth, Stun
 
-This ability will temporarily stun your victim, giving you a moment collect
+This ability will temporarily stun your victim, giving you a moment to collect
 yourself before starting combat.
 
 Only one person in the room may be sapped at a time. Using the ability on a
@@ -254,6 +310,40 @@ wealth that is more easily hidden than a vault.
 
 See also: BUILD, VAULT
 #
+"SHADOW JAB"
+
+Shadow Jab
+Class ability: Shade
+Debuff type: Stealth
+
+Your Jab ability causes a debuff equal to your Charisma divided by 5 (rounded
+up) to your victim's dodge, for 15 seconds. This effect may stack.
+
+See also: JAB
+#
+"SHADOW KICK"
+
+Shadow Kick
+Class ability:  Assassin
+Debuff type:  Battle
+
+Your Kick ability causes a penalty to physical and magical damage equal to
+your total level divided by 50 for 10 seconds.
+
+See also: KICK
+#
+SHADOWCAGE "SHADOW CAGE"
+
+Shadowcage
+Class ability: Occultist
+Debuff type: Stealth
+Cost: 50 move
+Cooldown: 30 seconds
+
+You create a cage of shadows, penalizing all enemies. The first victim loses
+dodge equal to 5x your Charisma. Each additional victim loses dodge equal to 3x
+Charisma instead. This effect lasts 15 seconds.
+#
 SHADOWSTEP "SHADOW STEP"
 
 Shadowstep (Stealth ability)
@@ -265,6 +355,9 @@ Shadowstep allows a talented assassin to step into one shadow and, seemingly,
 appear out of another. This ability takes you instantly to your target. It has
 a maximum range of 7 map tiles and requires Infiltrate if you don't have per-
 mission to enter your target's location.
+
+You cannot shadowstep to NPCs that belong to other empires, or that are on land
+that belongs to other empires.
 
 See also: INFILTRATE
 #
@@ -279,6 +372,17 @@ When you type sneak, there is no way to know if you're actually sneaking. It's
 based on your skill, and how well other people notice you.
 
 See also: HIDE
+#
+"STAGGER JAB"
+
+Stagger Jab
+Class ability: Powerbroker
+Debuff type: Stealth
+
+Your Jab ability causes a debuff equal to your Charisma divided by 5 (rounded
+up) to your victim's to-hit, for 15 seconds. This effect may stack.
+
+See also: JAB
 #
 STEAL STEALING
 
@@ -321,11 +425,12 @@ Terrify (Stealth ability)
 
 Usage:  terrify [victim]
 Cooldown:  15 seconds
+Debuff type:  Stealth
+Cost:  15 moves
 
-Use the power of the shadows to make your foes cower in fear.
-
-Only one person in the room may be terrified at a time. Using the ability on a
-second person will release the first one.
+Use the power of the shadows to make your foes cower in fear, lowering the
+physical and magical damage they deal by an amount equal to your total level
+divided by 30.
 #
 "UNSEEN PASSING"
 

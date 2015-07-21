@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.highsorcery.c                               EmpireMUD 2.0b1 *
+*   File: act.highsorcery.c                               EmpireMUD 2.0b2 *
 *  Usage: implementation for high sorcery abilities                       *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -35,10 +35,10 @@
 */
 
 // external vars
-extern const int universal_wait;
 
 // external funcs
 extern bool trigger_counterspell(char_data *ch);	// spells.c
+void trigger_distrust_from_hostile(char_data *ch, empire_data *emp);	// fight.c
 
 // locals
 void send_ritual_messages(char_data *ch, int rit, int pos);
@@ -96,6 +96,8 @@ struct {
 	{ "wisdom", ENCH_WEAPON, ABIL_ENCHANT_WEAPONS, APPLY_INTELLIGENCE, APPLY_MANA_REGEN, { { o_GLOWING_SEASHELL, 5 }, END_RESOURCE_LIST } },
 	{ "accuracy", ENCH_WEAPON, ABIL_ENCHANT_WEAPONS, APPLY_TO_HIT, APPLY_NONE, { { o_BLOODSTONE, 5 }, END_RESOURCE_LIST } },
 	{ "awareness", ENCH_WEAPON, ABIL_ENCHANT_WEAPONS, APPLY_WITS, APPLY_TO_HIT, { { o_IRIDESCENT_IRIS, 5 }, END_RESOURCE_LIST } },
+	{ "deflection", ENCH_WEAPON, ABIL_ENCHANT_WEAPONS, APPLY_DODGE, APPLY_BLOCK, { { o_LIGHTNING_STONE, 5 }, END_RESOURCE_LIST } },
+
 	
 	ENCHANT_LINE_BREAK,
 	
@@ -114,13 +116,16 @@ struct {
 	{ "regeneration", ENCH_ARMOR, ABIL_ENCHANT_ARMOR, APPLY_HEALTH_REGEN, APPLY_NONE, { { o_IRIDESCENT_IRIS, 5 }, END_RESOURCE_LIST } },
 	{ "longrunning", ENCH_ARMOR, ABIL_ENCHANT_ARMOR, APPLY_MOVE_REGEN, APPLY_NONE, { { o_LIGHTNING_STONE, 5 }, END_RESOURCE_LIST } },
 	{ "energy", ENCH_ARMOR, ABIL_ENCHANT_ARMOR, APPLY_MANA_REGEN, APPLY_NONE, { { o_IRIDESCENT_IRIS, 5 }, END_RESOURCE_LIST } },
-	{ "protection", ENCH_ARMOR, ABIL_ENCHANT_ARMOR, APPLY_SOAK, APPLY_NONE, { { o_GLOWING_SEASHELL, 5 }, END_RESOURCE_LIST } },
+	{ "protection", ENCH_ARMOR, ABIL_ENCHANT_ARMOR, APPLY_RESIST_PHYSICAL, APPLY_NONE, { { o_GLOWING_SEASHELL, 5 }, END_RESOURCE_LIST } },
 	{ "evasion", ENCH_ARMOR, ABIL_ENCHANT_ARMOR, APPLY_DODGE, APPLY_NONE, { { o_LIGHTNING_STONE, 5 }, END_RESOURCE_LIST } },
 	
 	ENCHANT_LINE_BREAK,
 	
 	{ "rage", ENCH_ARMOR, ABIL_ENCHANT_ARMOR, APPLY_STRENGTH, APPLY_NONE, { { o_BLOODSTONE, 5 }, END_RESOURCE_LIST } },
 	{ "power", ENCH_ARMOR, ABIL_ENCHANT_ARMOR, APPLY_INTELLIGENCE, APPLY_NONE, { { o_GLOWING_SEASHELL, 5 }, END_RESOURCE_LIST } },
+	{ "spellwarding", ENCH_ARMOR, ABIL_ENCHANT_ARMOR, APPLY_RESIST_MAGICAL, APPLY_NONE, { { o_IRIDESCENT_IRIS, 5 }, END_RESOURCE_LIST } },
+	{ "focus", ENCH_ARMOR, ABIL_ENCHANT_ARMOR, APPLY_TO_HIT, APPLY_NONE, { { o_BLOODSTONE, 5 }, END_RESOURCE_LIST } },
+	{ "acrobatics", ENCH_ARMOR, ABIL_ENCHANT_ARMOR, APPLY_DEXTERITY, APPLY_NONE, { { o_LIGHTNING_STONE, 5 }, END_RESOURCE_LIST } },
 	
 	ENCHANT_LINE_BREAK,
 	
@@ -381,20 +386,31 @@ INTERACTION_FUNC(devastate_crop) {
 
 
 /**
+* Name matching for enchantments, preferring exact matches first.
+*
 * @param char_data *ch the player, to check abilities
 * @param char *name enchantment name to find
 * @return int enchant_data position, or NOTHING for not found
 */
 int find_enchant_by_name(char_data *ch, char *name) {
-	int iter, found = NOTHING;
+	int iter, exact = NOTHING, partial = NOTHING;
 	
-	for (iter = 0; *enchant_data[iter].name != '\n' && found == NOTHING; ++iter) {
-		if ((enchant_data[iter].ability == NO_ABIL || HAS_ABILITY(ch, enchant_data[iter].ability)) && is_abbrev(name, enchant_data[iter].name)) {
-			found = iter;
+	for (iter = 0; *enchant_data[iter].name != '\n' && exact == NOTHING; ++iter) {
+		if ((enchant_data[iter].ability == NO_ABIL || HAS_ABILITY(ch, enchant_data[iter].ability))) {
+			if (!str_cmp(name, enchant_data[iter].name)) {
+				exact = iter;
+			}
+			else if (is_abbrev(name, enchant_data[iter].name)) {
+				partial = iter;
+			}
 		}
 	}
 	
-	return found;
+	if (exact == NOTHING) {
+		exact = partial;
+	}
+	
+	return exact;
 }
 
 
@@ -576,7 +592,7 @@ void summon_materials(char_data *ch, char *argument) {
 		}
 	}
 	
-	WAIT_STATE(ch, universal_wait);
+	command_lag(ch, WAIT_OTHER);
 }
 
 
@@ -623,7 +639,7 @@ ACMD(do_collapse) {
 	}
 
 	// do it
-	charge_ability_cost(ch, MANA, cost, NOTHING, 0);
+	charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
 	
 	act("You grab $p and draw it shut!", FALSE, ch, portal, NULL, TO_CHAR);
 	act("$n grabs $p and draws it shut!", FALSE, ch, portal, NULL, TO_ROOM);
@@ -644,11 +660,12 @@ ACMD(do_collapse) {
 ACMD(do_colorburst) {
 	char_data *vict = NULL;
 	struct affected_type *af;
-	int amt, cost = 15;
+	int amt;
 	
-	int levels[] = { -10, -15, -20 };
+	int costs[] = { 15, 30, 45 };
+	int levels[] = { -5, -10, -15 };
 	
-	if (!can_use_ability(ch, ABIL_COLORBURST, MANA, cost, COOLDOWN_COLORBURST)) {
+	if (!can_use_ability(ch, ABIL_COLORBURST, MANA, CHOOSE_BY_ABILITY_LEVEL(costs, ch, ABIL_COLORBURST), COOLDOWN_COLORBURST)) {
 		return;
 	}
 	
@@ -677,7 +694,7 @@ ACMD(do_colorburst) {
 		return;
 	}
 	
-	charge_ability_cost(ch, MANA, cost, COOLDOWN_COLORBURST, 30);
+	charge_ability_cost(ch, MANA, CHOOSE_BY_ABILITY_LEVEL(costs, ch, ABIL_COLORBURST), COOLDOWN_COLORBURST, 30, WAIT_COMBAT_SPELL);
 	
 	if (SHOULD_APPEAR(ch)) {
 		appear(ch);
@@ -692,8 +709,8 @@ ACMD(do_colorburst) {
 	else {
 		// succeed
 	
-		act("You whip your hand foward and fire a burst of color at $N!", FALSE, ch, NULL, vict, TO_CHAR);
-		act("$n whips $s hand foward and fires a burst of color at you!", FALSE, ch, NULL, vict, TO_VICT);
+		act("You whip your hand forward and fire a burst of color at $N!", FALSE, ch, NULL, vict, TO_CHAR);
+		act("$n whips $s hand forward and fires a burst of color at you!", FALSE, ch, NULL, vict, TO_VICT);
 		act("$n whips $s hand forward and fires a burst of color at $N!", FALSE, ch, NULL, vict, TO_NOTVICT);
 		
 		amt = CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_COLORBURST) - GET_INTELLIGENCE(ch);
@@ -732,7 +749,7 @@ ACMD(do_disenchant) {
 		act("$p is not even enchanted.", FALSE, ch, obj, NULL, TO_CHAR);
 	}
 	else {
-		charge_ability_cost(ch, MANA, cost, NOTHING, 0);
+		charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
 		REMOVE_BIT(GET_OBJ_EXTRA(obj), OBJ_ENCHANTED | OBJ_SUPERIOR);
 		proto = obj_proto(GET_OBJ_VNUM(obj));
 		
@@ -807,12 +824,12 @@ ACMD(do_dispel) {
 				msg_to_char(ch, "You aren't afflicted by anything that can be dispelled.\r\n");
 			}
 			else {
-				act("$e isn't afflicted by anything that can be dispelled.", FALSE, ch, NULL, vict, TO_CHAR);
+				act("$E isn't afflicted by anything that can be dispelled.", FALSE, ch, NULL, vict, TO_CHAR);
 			}
 			return;
 		}
 	
-		charge_ability_cost(ch, MANA, cost, COOLDOWN_DISPEL, 9);
+		charge_ability_cost(ch, MANA, cost, COOLDOWN_DISPEL, 9, WAIT_SPELL);
 		
 		if (ch == vict) {
 			msg_to_char(ch, "You shout 'KA!' and dispel your afflictions.\r\n");
@@ -968,7 +985,7 @@ ACMD(do_enchant) {
 		}
 		gain_ability_exp(ch, ABIL_GREATER_ENCHANTMENTS, 50);
 		
-		WAIT_STATE(ch, universal_wait);
+		command_lag(ch, WAIT_ABILITY);
 	}
 }
 
@@ -1009,7 +1026,7 @@ ACMD(do_enervate) {
 		return;
 	}
 	
-	charge_ability_cost(ch, MANA, cost, COOLDOWN_ENERVATE, SECS_PER_MUD_HOUR);
+	charge_ability_cost(ch, MANA, cost, COOLDOWN_ENERVATE, SECS_PER_MUD_HOUR, WAIT_COMBAT_SPELL);
 	
 	if (SHOULD_APPEAR(ch)) {
 		appear(ch);
@@ -1043,10 +1060,9 @@ ACMD(do_enervate) {
 ACMD(do_foresight) {
 	struct affected_type *af;
 	char_data *vict = ch;
-	int cost = 15;
-	int amt;
+	int amt, cost = 30;
 	
-	int levels[] = { 10, 15, 20 };
+	int levels[] = { 5, 10, 15 };
 	
 	one_argument(argument, arg);
 	
@@ -1060,7 +1076,7 @@ ACMD(do_foresight) {
 		return;
 	}
 	else {
-		charge_ability_cost(ch, MANA, cost, NOTHING, 0);
+		charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
 		
 		if (ch == vict) {
 			msg_to_char(ch, "You pull out a grease pencil and mark each of your eyelids with an X...\r\nYou feel the gift of foresight!\r\n");
@@ -1087,7 +1103,7 @@ ACMD(do_foresight) {
 
 
 ACMD(do_manashield) {
-	struct affected_type *af1, *af2;
+	struct affected_type *af1, *af2, *af3;
 	int cost = 25;
 	int amt;
 	
@@ -1105,7 +1121,7 @@ ACMD(do_manashield) {
 		return;
 	}
 	else {
-		charge_ability_cost(ch, MANA, cost, NOTHING, 0);
+		charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
 		
 		msg_to_char(ch, "You pull out a grease pencil and draw a series of arcane symbols down your left arm...\r\nYou feel yourself shielded by your mana!\r\n");
 		act("$n pulls out a grease pencil and draws a series of arcane symbols down $s left arm.", TRUE, ch, NULL, NULL, TO_ROOM);
@@ -1113,9 +1129,11 @@ ACMD(do_manashield) {
 		amt = CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_MANASHIELD) + (GET_INTELLIGENCE(ch) / 3);
 		
 		af1 = create_mod_aff(ATYPE_MANASHIELD, 24 MUD_HOURS, APPLY_MANA, -25);
-		af2 = create_mod_aff(ATYPE_MANASHIELD, 24 MUD_HOURS, APPLY_SOAK, amt);
+		af2 = create_mod_aff(ATYPE_MANASHIELD, 24 MUD_HOURS, APPLY_RESIST_PHYSICAL, amt);
+		af3 = create_mod_aff(ATYPE_MANASHIELD, 24 MUD_HOURS, APPLY_RESIST_MAGICAL, amt);
 		affect_join(ch, af1, 0);
 		affect_join(ch, af2, 0);
+		affect_join(ch, af3, 0);
 		
 		// possible to go negative here
 		GET_MANA(ch) = MAX(0, GET_MANA(ch));
@@ -1146,7 +1164,7 @@ ACMD(do_mirrorimage) {
 		return;
 	}
 	
-	charge_ability_cost(ch, MANA, cost, COOLDOWN_MIRRORIMAGE, 5 * SECS_PER_REAL_MIN);
+	charge_ability_cost(ch, MANA, cost, COOLDOWN_MIRRORIMAGE, 5 * SECS_PER_REAL_MIN, WAIT_COMBAT_SPELL);
 	mob = read_mobile(vnum);
 	
 	// scale mob to the summoner -- so it won't change its attributes later
@@ -1164,8 +1182,8 @@ ACMD(do_mirrorimage) {
 	// stats
 	GET_REAL_SEX(mob) = GET_REAL_SEX(ch);
 	
-	mob->points.max_pools[HEALTH] = GET_MAX_HEALTH(ch);
-	mob->points.current_pools[HEALTH] = MIN(25, GET_HEALTH(ch));	// NOTE lower health
+	mob->points.max_pools[HEALTH] = MIN(100, GET_HEALTH(ch));	// NOTE lower health
+	mob->points.current_pools[HEALTH] = MIN(100, GET_HEALTH(ch));	// NOTE lower health
 	mob->points.max_pools[MOVE] = GET_MAX_MOVE(ch);
 	mob->points.current_pools[MOVE] = GET_MOVE(ch);
 	mob->points.max_pools[MANA] = GET_MAX_MANA(ch);
@@ -1343,7 +1361,7 @@ ACMD(do_siphon) {
 		return;
 	}
 	
-	charge_ability_cost(ch, MANA, cost, COOLDOWN_SIPHON, 20);
+	charge_ability_cost(ch, MANA, cost, COOLDOWN_SIPHON, 20, WAIT_COMBAT_SPELL);
 	
 	if (SHOULD_APPEAR(ch)) {
 		appear(ch);
@@ -1359,7 +1377,7 @@ ACMD(do_siphon) {
 		// succeed
 	
 		act("$N starts to glow violet as you shout the mana siphon hex at $M! You feel your own mana grow as you drain $S.", FALSE, ch, NULL, vict, TO_CHAR);
-		act("$n shouts somthing at you... The world takes on a violet glow and you feel your mana siphoned away.", FALSE, ch, NULL, vict, TO_VICT);
+		act("$n shouts something at you... The world takes on a violet glow and you feel your mana siphoned away.", FALSE, ch, NULL, vict, TO_VICT);
 		act("$n shouts some kind of hex at $N, who starts to glow violet as mana flows away from $S skin!", FALSE, ch, NULL, vict, TO_NOTVICT);
 
 		af = create_mod_aff(ATYPE_SIPHON, 4, APPLY_MANA_REGEN, CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_SIPHON));
@@ -1411,7 +1429,7 @@ ACMD(do_slow) {
 		return;
 	}
 	
-	charge_ability_cost(ch, MANA, cost, COOLDOWN_SLOW, 75);
+	charge_ability_cost(ch, MANA, cost, COOLDOWN_SLOW, 75, WAIT_COMBAT_SPELL);
 	
 	if (SHOULD_APPEAR(ch)) {
 		appear(ch);
@@ -1427,7 +1445,7 @@ ACMD(do_slow) {
 		// succeed
 	
 		act("$N grows lethargic and starts to glow gray as you shout the slow hex at $M!", FALSE, ch, NULL, vict, TO_CHAR);
-		act("$n shouts somthing at you... The world takes on a gray tone and you more lethargic.", FALSE, ch, NULL, vict, TO_VICT);
+		act("$n shouts something at you... The world takes on a gray tone and you more lethargic.", FALSE, ch, NULL, vict, TO_VICT);
 		act("$n shouts some kind of hex at $N, who starts to move sluggishly and starts to glow gray!", FALSE, ch, NULL, vict, TO_NOTVICT);
 	
 		af = create_flag_aff(ATYPE_SLOW, CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_SLOW), AFF_SLOW);
@@ -1479,7 +1497,7 @@ ACMD(do_vigor) {
 		}
 	}
 	else {
-		charge_ability_cost(ch, MANA, CHOOSE_BY_ABILITY_LEVEL(costs, ch, ABIL_VIGOR), NOTHING, 0);
+		charge_ability_cost(ch, MANA, CHOOSE_BY_ABILITY_LEVEL(costs, ch, ABIL_VIGOR), NOTHING, 0, WAIT_SPELL);
 		
 		if (ch == vict) {
 			msg_to_char(ch, "You focus your thoughts and say the word 'maktso', and you feel a burst of vigor!\r\n");
@@ -1814,7 +1832,7 @@ RITUAL_SETUP_FUNC(start_siege_ritual) {
 		msg_to_char(ch, "You can't besiege that direction.\r\n");
 		return FALSE;
 	}
-	if (!ROOM_IS_CLOSED(to_room)) {
+	if (!ROOM_IS_CLOSED(to_room) && !IS_MAP_BUILDING(to_room)) {
 		msg_to_char(ch, "The Siege Ritual can only be used to destroy completed buildings.\r\n");
 		return FALSE;
 	}
@@ -1826,6 +1844,10 @@ RITUAL_SETUP_FUNC(start_siege_ritual) {
 		msg_to_char(ch, "You can't besiege at a city center.\r\n");
 		return FALSE;
 	}
+	if (ROOM_SECT_FLAGGED(to_room, SECTF_START_LOCATION)) {
+		msg_to_char(ch, "You can't besiege a starting location.\r\n");
+		return FALSE;
+	}
 	
 	if ((enemy = ROOM_OWNER(to_room))) {
 		emp_pol = find_relation(GET_LOYALTY(ch), enemy);
@@ -1834,8 +1856,14 @@ RITUAL_SETUP_FUNC(start_siege_ritual) {
 		msg_to_char(ch, "You can't besiege that tile!\r\n");
 		return FALSE;
 	}
+
+	// ready:
+
+	// trigger hostile immediately so they are attackable
+	if (enemy && GET_LOYALTY(ch) != enemy) {
+		trigger_distrust_from_hostile(ch, enemy);
+	}
 	
-	// finally safe!
 	start_ritual(ch, ritual);
 	GET_ACTION_VNUM(ch, 1) = GET_ROOM_VNUM(to_room);	// action 0 is ritual #
 	return TRUE;
@@ -1859,11 +1887,17 @@ RITUAL_FINISH_FUNC(perform_siege_ritual) {
 		secttype = SECT(to_room);
 		msg_to_char(ch, "You fire one last powerful fireball...\r\n");
 		act("$n fires one last powerful fireball...", FALSE, ch, NULL, NULL, TO_ROOM);
+
+		if (ROOM_OWNER(to_room) && GET_LOYALTY(ch) != ROOM_OWNER(to_room)) {
+			trigger_distrust_from_hostile(ch, ROOM_OWNER(to_room));
+		}
 		besiege_room(to_room, 1 + GET_INTELLIGENCE(ch));
+
 		if (SECT(to_room) != secttype) {
 			msg_to_char(ch, "It is destroyed!\r\n");
 			act("$n's target is destroyed!", FALSE, ch, NULL, NULL, TO_ROOM);
 		}
+
 		gain_ability_exp(ch, ABIL_SIEGE_RITUAL, 33.4);
 	}
 }
@@ -1893,7 +1927,6 @@ RITUAL_FINISH_FUNC(perform_devastation_ritual) {
 	crop_data *cp;
 	int dist, iter;
 	int x, y, num;
-	bool junk;
 	
 	#define CAN_DEVASTATE(room)  ((ROOM_SECT_FLAGGED((room), SECTF_HAS_CROP_DATA) || CAN_CHOP_ROOM(room)) && !ROOM_AFF_FLAGGED((room), ROOM_AFF_HAS_INSTANCE))
 	#define DEVASTATE_RANGE  3	// tiles
@@ -1937,7 +1970,7 @@ RITUAL_FINISH_FUNC(perform_devastation_ritual) {
 			}
 		}
 		else if (ROOM_SECT_FLAGGED(to_room, SECTF_CROP) && (cp = crop_proto(ROOM_CROP_TYPE(to_room))) && has_interaction(GET_CROP_INTERACTIONS(cp), INTERACT_HARVEST)) {
-			run_room_interactions(ch, to_room, INTERACT_HARVEST, devastate_crop, &junk);
+			run_room_interactions(ch, to_room, INTERACT_HARVEST, devastate_crop);
 			change_terrain(to_room, climate_default_sector[GET_CROP_CLIMATE(cp)]);
 		}
 		else if (ROOM_SECT_FLAGGED(to_room, SECTF_HAS_CROP_DATA) && (cp = crop_proto(ROOM_CROP_TYPE(to_room)))) {
@@ -2075,7 +2108,7 @@ void perform_study(char_data *ch) {
 	
 	if (*study_strings[pos] == '\n') {
 		// DONE!
-		if (CAN_GAIN_NEW_SKILLS(ch) && GET_SKILL(ch, SKILL_HIGH_SORCERY) == 0) {
+		if (CAN_GAIN_NEW_SKILLS(ch) && GET_SKILL(ch, SKILL_HIGH_SORCERY) == 0 && !NOSKILL_BLOCKED(ch, SKILL_HIGH_SORCERY)) {
 			msg_to_char(ch, "&mYour mind begins to open to the ways of High Sorcery, and you are now an apprentice to this school.&0\r\n");
 			set_skill(ch, SKILL_HIGH_SORCERY, 1);
 			SAVE_CHAR(ch);

@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: alias.c                                         EmpireMUD 2.0b1 *
+*   File: alias.c                                         EmpireMUD 2.0b2 *
 *  Usage: writing/reading player's aliases.                               *
 *                                                                         *
 *  Code done by Jeremy Hess and Chad Thompson                             *

@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: dg_scripts.c                                    EmpireMUD 2.0b1 *
+*   File: dg_scripts.c                                    EmpireMUD 2.0b2 *
 *  Usage: contains general functions for using scripts.                   *
 *                                                                         *
 *  DG Scripts code by egreen, 1996/09/24 03:48:42, revision 3.25          *
@@ -1394,11 +1394,12 @@ int text_processed(char *field, char *subfield, struct trig_var_data *vd, char *
 	}
 	else if (!str_cmp(field, "car")) {                 /* car       */
 		char *car = vd->value;
-		while (*car && !isspace(*car))
-			*str++ = *car++;
-		*str = '\0';
+		char *strptr = str;
+		while (*car && !isspace(*car) && (strptr - str) < (slen-1)) {
+			*strptr++ = *car++;
+		}
+		*strptr = '\0';
 		return TRUE;
-
 	}
 	else if (!str_cmp(field, "cdr")) {                 /* cdr       */
 		char *cdr = vd->value;
@@ -1412,10 +1413,7 @@ int text_processed(char *field, char *subfield, struct trig_var_data *vd, char *
 	}
 	else if (!str_cmp(field, "mudcommand")) {
 		/* find the mud command returned from this text */
-		/* NOTE: you may need to replace "cmd_info" with "complete_cmd_info", */
-		/* depending on what patches you've got applied.                      */
 		extern const struct command_info cmd_info[];
-		/* on older source bases:    extern struct command_info *cmd_info; */
 		int length, cmd;
 		for (length = strlen(vd->value), cmd = 0; *cmd_info[cmd].command != '\n'; cmd++)
 			if (!strn_cmp(cmd_info[cmd].command, vd->value, length))
@@ -1436,7 +1434,7 @@ int text_processed(char *field, char *subfield, struct trig_var_data *vd, char *
 void find_replacement(void *go, struct script_data *sc, trig_data *trig, int type, char *var, char *field, char *subfield, char *str, size_t slen) {
 	struct room_direction_data *ex;	
 	struct trig_var_data *vd=NULL;
-	char_data *ch, *c = NULL, *rndm;
+	char_data *ch = NULL, *c = NULL, *rndm;
 	obj_data *obj = NULL, *o = NULL;
 	room_data *room, *r = NULL;
 	char *name;
@@ -1594,6 +1592,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if ((r = get_room(obj_room(obj), name))) {
 						// just setting
 					}
+					else {
+						o = obj;
+					}
 
 					break;
 				case WLD_TRIGGER:
@@ -1740,6 +1741,26 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 
 				return;
 			}
+			else if (!str_cmp(var, "skill")) {
+				if (!str_cmp(field, "name")) {
+					if (subfield && *subfield) {
+						int sk = find_skill_by_name(subfield);
+						snprintf(str, slen, "%s", sk != NO_SKILL ? skill_data[sk].name : "");
+					}
+					else {
+						*str = '\0';
+					}
+				}
+				else if (!str_cmp(field, "validate")) {
+					if (subfield && *subfield) {
+						int sk = find_skill_by_name(subfield);
+						snprintf(str, slen, "%d", sk != NO_SKILL ? 1 : 0);
+					}
+					else {
+						snprintf(str, slen, "0");
+					}
+				}
+			}
 		}
 
 		if (c) {
@@ -1850,8 +1871,34 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				case 'b': {
 					if (!str_cmp(field, "block"))
 						snprintf(str, slen, "%d", GET_BLOCK(c));
-					else if (!str_cmp(field, "blood"))
-						snprintf(str, slen, "%d", GET_BLOOD(c));
+					else if (!str_cmp(field, "blood")) {
+						if (subfield && *subfield) {
+							int amt = atoi(subfield);
+							if (amt != 0) {
+								GET_BLOOD(c) += amt;
+								GET_BLOOD(c) = MAX(GET_BLOOD(c), 0);
+								GET_BLOOD(c) = MIN(GET_BLOOD(c), GET_MAX_BLOOD(c));
+								
+								if (GET_BLOOD(c) == 0) {
+									void out_of_blood(char_data *ch);
+									
+									out_of_blood(c);
+									
+									if (ch && c == ch && EXTRACTED(c)) {
+										// in case
+										dg_owner_purged = 1;
+									}
+								}
+							}
+							
+							// return current remainder
+							snprintf(str, slen, "%d", GET_BLOOD(c));
+						}
+						else {
+							// current blood
+							snprintf(str, slen, "%d", GET_BLOOD(c));
+						}
+					}
 					break;
 				}
 				case 'c':
@@ -2000,7 +2047,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							int sk = NO_SKILL, amount = 0;
 							
 							comma_args(subfield, arg1, arg2);
-							if (*arg1 && *arg2 && (sk = find_skill_by_name(arg1)) != NO_SKILL && (amount = atoi(arg2)) != 0) {
+							if (*arg1 && *arg2 && (sk = find_skill_by_name(arg1)) != NO_SKILL && (amount = atoi(arg2)) != 0 && !NOSKILL_BLOCKED(c, sk)) {
 								gain_skill(c, sk, amount);
 								snprintf(str, slen, "1");
 							}
@@ -2015,6 +2062,13 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							increase_coins(c, (type == MOB_TRIGGER) ? GET_LOYALTY((char_data*)go) : REAL_OTHER_COIN, atoi(subfield));
 							*str = '\0';
 						}
+					}
+					else if (!str_cmp(field, "give_skill_reset")) {
+						int sk = find_skill_by_name(subfield);
+						if (sk != NO_SKILL && !IS_NPC(c)) {
+							GET_FREE_SKILL_RESETS(c, sk) = MIN(GET_FREE_SKILL_RESETS(c, sk) + 1, MAX_SKILL_RESETS);
+						}
+						*str = '\0';
 					}
 					break;
 				case 'h':
@@ -2106,21 +2160,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							}
 						}
 					}
-
-					/*
-					else if (!str_cmp(field, "is_killer")) {
-						if (subfield && *subfield) {
-							if (!str_cmp("on", subfield))
-								SET_BIT(PLR_FLAGS(c), PLR_KILLER);
-							else if (!str_cmp("off", subfield))
-								REMOVE_BIT(PLR_FLAGS(c), PLR_KILLER);
-						}
-						if (PLR_FLAGGED(c, PLR_KILLER))
-							snprintf(str, slen, "1");
-						else
-							snprintf(str, slen, "0");
-					}
-					*/
 					
 					else if (!str_cmp(field, "is_ally")) {
 						if (subfield && *subfield) {
@@ -2140,6 +2179,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							snprintf(str, slen, "0");
 						}
 					}
+					
+					else if (!str_cmp(field, "is_god")) {
+						snprintf(str, slen, "%d", IS_GOD(c) ? 1 : 0);
+					}
 
 					else if (!str_cmp(field, "is_hostile")) {
 						if (subfield && *subfield && !IS_NPC(c)) {
@@ -2150,10 +2193,14 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 								remove_cooldown_by_type(c, COOLDOWN_HOSTILE_FLAG);
 							}
 						}
-						if (!IS_NPC(c) && get_cooldown_time(c, COOLDOWN_HOSTILE_FLAG) > 0)
+						if (IS_HOSTILE(c))
 							snprintf(str, slen, "1");
 						else
 							snprintf(str, slen, "0");
+					}
+					
+					else if (!str_cmp(field, "is_immortal")) {
+						snprintf(str, slen, "%d", IS_IMMORTAL(c) ? 1 : 0);
 					}
 
 					else if (!str_cmp(field, "int") || !str_cmp(field, "intelligence")) {
@@ -2247,6 +2294,19 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							snprintf(str, slen, "0");
 						}
 					}
+					else if (!str_cmp(field, "poison_immunity")) {
+						if (HAS_ABILITY(c, ABIL_POISON_IMMUNITY)) {
+							snprintf(str, slen, "1");
+						}
+						else {
+							snprintf(str, slen, "0");
+						}
+					}
+					else if (!str_cmp(field, "position")) {
+						extern const char *position_types[];
+						snprintf(str, slen, "%s", position_types[(int) GET_POS(c)]);
+					}
+					
 					break;
 				}
 				case 'r':
@@ -2261,6 +2321,20 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							}
 						}
 						snprintf(str, slen, "0");
+					}
+					else if (!str_cmp(field, "resist_magical")) {
+						snprintf(str, slen, "%d", GET_RESIST_MAGICAL(c));
+					}
+					else if (!str_cmp(field, "resist_physical")) {
+						snprintf(str, slen, "%d", GET_RESIST_PHYSICAL(c));
+					}
+					else if (!str_cmp(field, "resist_poison")) {
+						if (HAS_ABILITY(c, ABIL_RESIST_POISON)) {
+							snprintf(str, slen, "1");
+						}
+						else {
+							snprintf(str, slen, "0");
+						}
 					}
 					else if (!str_cmp(field, "room")) {
 						snprintf(str, slen, "%c%d",UID_CHAR, GET_ROOM_VNUM(IN_ROOM(c)) + ROOM_ID_BASE); 
@@ -2298,7 +2372,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							int sk = NO_SKILL, sk_lev = 0;
 							
 							comma_args(subfield, arg1, arg2);
-							if (*arg1 && *arg2 && (sk = find_skill_by_name(arg1)) != NO_SKILL && (sk_lev = atoi(arg2)) >= 0 && sk_lev <= CLASS_SKILL_CAP) {
+							if (*arg1 && *arg2 && (sk = find_skill_by_name(arg1)) != NO_SKILL && (sk_lev = atoi(arg2)) >= 0 && sk_lev <= CLASS_SKILL_CAP && (sk_lev < GET_SKILL(c, sk) || !NOSKILL_BLOCKED(c, sk))) {
 								// TODO skill cap checking! need a f() like can_set_skill_to(ch, sk, lev)
 								set_skill(c, sk, sk_lev);
 								snprintf(str, slen, "1");
@@ -2310,13 +2384,20 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					
-					else if (!str_cmp(field, "soak"))
-						snprintf(str, slen, "%d", GET_SOAK(c));
-
 					break;
 				case 't': {
-					if (!str_cmp(field, "tohit"))
+					if (!str_cmp(field, "tohit")) {
 						snprintf(str, slen, "%d", GET_TO_HIT(c));
+					}
+					else if (!str_cmp(field, "trigger_counterspell")) {
+						extern bool trigger_counterspell(char_data *ch);	// spells.c
+						if (trigger_counterspell(c)) {
+							snprintf(str, slen, "1");
+						}
+						else {
+							snprintf(str, slen, "0");
+						}
+					}
 					break;
 				}
 				case 'v':
@@ -2372,7 +2453,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 		} /* if (c) ...*/
 
 		else if (o) {
-			if (text_processed(field, subfield, vd, str, slen)) return;
+			if (text_processed(field, subfield, vd, str, slen))
+				return;
 
 			*str = '\x1';
 			switch (LOWER(*field)) {
@@ -2637,7 +2719,15 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					snprintf(str, slen, "%d", GET_ROOM_VNUM(r) + ROOM_ID_BASE); 
 				else
 					*str = '\0';
-			} 
+			}
+			else if (!str_cmp(field, "template")) {
+				if (r && GET_ROOM_TEMPLATE(r)) {
+					snprintf(str, slen, "%d", GET_RMT_VNUM(GET_ROOM_TEMPLATE(r))); 
+				}
+				else {
+					*str = '\0';
+				}
+			}
 			else if (!str_cmp(field, "weather")) {
 				extern const char *weather_types[];
 
@@ -2981,6 +3071,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					script_log("Trigger: %s, VNum %d, type: %d. unknown room field: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), type, field);
 				}
 			}
+		}
+		else {
+			if (vd && text_processed(field, subfield, vd, str, slen))
+				return;
 		}
 	}
 }

@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: utils.c                                         EmpireMUD 2.0b1 *
+*   File: utils.c                                         EmpireMUD 2.0b2 *
 *  Usage: various internal functions of a utility nature                  *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -38,6 +38,7 @@
 *   Interpreter Utils
 *   Mobile Utils
 *   Object Utils
+*   Player Utils
 *   Resource Utils
 *   Sector Utils
 *   String Utils
@@ -109,7 +110,7 @@ void apply_bonus_trait(char_data *ch, bitvector_t trait, bool add) {
 	int amt = (add ? 1 : -1);
 	
 	if (IS_SET(trait, BONUS_EXTRA_DAILY_SKILLS)) {
-		GET_SKILL_POINTS_AVAILABLE(ch) = MAX(0, GET_SKILL_POINTS_AVAILABLE(ch) + (config_get_int("num_bonus_trait_daily_skills") * amt));
+		GET_DAILY_BONUS_EXPERIENCE(ch) = MAX(0, GET_DAILY_BONUS_EXPERIENCE(ch) + (config_get_int("num_bonus_trait_daily_skills") * amt));
 	}
 	if (IS_SET(trait, BONUS_STRENGTH)) {
 		ch->real_attributes[STRENGTH] = MAX(1, MIN(att_max(ch), ch->real_attributes[STRENGTH] + amt));
@@ -1071,7 +1072,7 @@ bool can_use_room(char_data *ch, room_data *room, int mode) {
 		}
 	}
 	// check allies if not a private room
-	if (ROOM_PRIVATE_OWNER(homeroom) == NOBODY && has_relationship(ROOM_OWNER(homeroom), GET_LOYALTY(ch), DIPL_ALLIED)) {
+	if (mode != MEMBERS_ONLY && ROOM_PRIVATE_OWNER(homeroom) == NOBODY && has_relationship(ROOM_OWNER(homeroom), GET_LOYALTY(ch), DIPL_ALLIED)) {
 		return TRUE;
 	}
 	
@@ -1374,7 +1375,7 @@ void basic_mud_log(const char *format, ...) {
 
 /**
 * Shows a log to players in-game and also stores it to file, except for the
-* ELOG_NONE type, which is displayed by not stored.
+* ELOG_NONE/ELOG_LOGINS types, which are displayed but not stored.
 *
 * @param empire_data *emp Which empire to log to.
 * @param int type ELOG_x
@@ -1396,7 +1397,7 @@ void log_to_empire(empire_data *emp, int type, const char *str, ...) {
 	vsprintf(output, str, tArgList);
 	
 	// save to file?
-	if (type != ELOG_NONE) {
+	if (type != ELOG_NONE && type != ELOG_LOGINS) {
 		CREATE(elog, struct empire_log_data, 1);
 		elog->type = type;
 		elog->timestamp = time(0);
@@ -1952,7 +1953,7 @@ double rate_item(obj_data *obj) {
 	extern double get_base_dps(obj_data *weapon);
 	extern const double apply_values[];
 	
-	double score_modifier = 0.9;	// in case gear levels are coming out a little too high
+	double score_modifier = 0.7;	// in case gear levels are coming out a little too high
 	
 	double score = 0;
 	int iter;
@@ -1999,8 +2000,66 @@ double rate_item(obj_data *obj) {
 
 
  //////////////////////////////////////////////////////////////////////////////
-//// RESOURCE UTILS //////////////////////////////////////////////////////////
+//// PLAYER UTILS ////////////////////////////////////////////////////////////
 
+/**
+* Gives a character the appropriate amount of command lag (wait time).
+*
+* @param char_data *ch The person to give command lag to.
+* @param int wait_type A WAIT_x const to help determine wait time.
+*/
+void command_lag(char_data *ch, int wait_type) {
+	extern const int universal_wait;
+	
+	double val;
+	int wait;
+	
+	// short-circuit
+	if (wait_type == WAIT_NONE) {
+		return;
+	}
+	
+	// base
+	wait = universal_wait;
+	
+	switch (wait_type) {
+		case WAIT_SPELL: {	// spells (but not combat spells)
+			if (HAS_ABILITY(ch, ABIL_FASTCASTING)) {
+				val = 0.3333 * GET_WITS(ch);
+				wait -= MAX(0, val) RL_SEC;
+				
+				// ensure minimum of 0.5 seconds
+				wait = MAX(wait, 0.5 RL_SEC);
+			}
+			break;
+		}
+		case WAIT_MOVEMENT: {	// normal movement (special handling)
+			if (AFF_FLAGGED(ch, AFF_SLOW)) {
+				wait = 1 RL_SEC;
+			}
+			else if (IS_RIDING(ch) || IS_ROAD(IN_ROOM(ch))) {
+				wait = 0;	// no wait on riding/road
+			}
+			else if (IS_OUTDOORS(ch)) {
+				if (HAS_BONUS_TRAIT(ch, BONUS_FASTER)) {
+					wait = 0.25 RL_SEC;
+				}
+				else {
+					wait = 0.5 RL_SEC;
+				}
+			}
+			break;
+		}
+	}
+	
+	if (GET_WAIT_STATE(ch) < wait) {
+		GET_WAIT_STATE(ch) = wait;
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// RESOURCE UTILS //////////////////////////////////////////////////////////
 
 /**
 * Extract resources from the list, hopefully having checked has_resources, as
@@ -3570,18 +3629,6 @@ unsigned long long microtime(void) {
 
 
 /**
-* Put changes in here and run update_all_players to apply it to all player
-* characters, whether logged in or not.
-*
-* @param char_data *ch The player to apply the changes to.
-* @param bool is_file If TRUE, the player was loaded from file. FALSE means in-game.
-*/
-void update_one_player(char_data *ch, bool is_file) {
-	// put logic here
-}
-
-
-/**
 * This re-usable function is for making tweaks to all players, for example
 * removing a player flag that's no longer used. It loads all players who aren't
 * already in-game.
@@ -3590,8 +3637,9 @@ void update_one_player(char_data *ch, bool is_file) {
 * loaded and saved automatically.
 *
 * @param char_data *to_message Optional: a character to send error messages to, if this is called from a command.
+* @param PLAYER_UPDATE_FUNC(*func)  A function pointer for the function to run on each player.
 */
-void update_all_players(char_data *to_message) {
+void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func)) {
 	struct char_file_u chdata;
 	descriptor_data *desc;
 	char_data *ch;
@@ -3639,7 +3687,9 @@ void update_all_players(char_data *to_message) {
 			continue;
 		}
 		
-		update_one_player(ch, is_file);
+		if (func) {
+			(func)(ch, is_file);
+		}
 		
 		// save
 		if (is_file) {

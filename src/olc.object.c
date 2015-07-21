@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: olc.object.c                                    EmpireMUD 2.0b1 *
+*   File: olc.object.c                                    EmpireMUD 2.0b2 *
 *  Usage: OLC for items                                                   *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -173,6 +173,7 @@ bool audit_object(obj_data *obj, char_data *ch) {
 				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Poison charges not set");
 				problem = TRUE;
 			}
+			break;
 		}
 		case ITEM_BOOK: {
 			if (!find_book_by_id(GET_BOOK_ID(obj))) {
@@ -838,13 +839,15 @@ struct extra_descr_data *copy_extra_descs(struct extra_descr_data *list) {
 
 
 /**
-* Creates a copy of an object, or clears a new one, for editing.
+* Creates a copy of an object, or clears a new one, for editing. Note that this
+* will increase the version number of the item by 1, for the auto-update
+* system.
 * 
 * @param obj_data *input The object to copy, or NULL to make a new one.
 * @return obj_data *The copied object.
 */
 obj_data *setup_olc_object(obj_data *input) {
-	struct obj_storage_type *store, *new_store;
+	struct obj_storage_type *store, *new_store, *last_store;
 	struct obj_custom_message *ocm, *new_ocm, *last_ocm;
 	obj_data *new;
 	
@@ -868,12 +871,20 @@ obj_data *setup_olc_object(obj_data *input) {
 		new->interactions = copy_interaction_list(input->interactions);
 		
 		new->storage = NULL;
+		last_store = NULL;
 		for (store = input->storage; store; store = store->next) {
 			CREATE(new_store, struct obj_storage_type, 1);
 			
 			*new_store = *store;
-			new_store->next = new->storage;
-			new->storage = new_store;
+			new_store->next = NULL;
+			
+			if (last_store) {
+				last_store->next = new_store;
+			}
+			else {
+				new->storage = new_store;
+			}
+			last_store = new_store;
 		}
 		
 		// copy custom msgs
@@ -899,6 +910,9 @@ obj_data *setup_olc_object(obj_data *input) {
 		SCRIPT(new) = NULL;
 		new->proto_script = NULL;
 		copy_proto_script(input, new, OBJ_TRIGGER);
+		
+		// update version number
+		OBJ_VERSION(new) += 1;
 	}
 	else {
 		// brand new
@@ -907,6 +921,7 @@ obj_data *setup_olc_object(obj_data *input) {
 		GET_OBJ_LONG_DESC(new) = str_dup("A new object is sitting here.");
 		GET_OBJ_ACTION_DESC(new) = NULL;
 		GET_OBJ_WEAR(new) = ITEM_WEAR_TAKE;
+		OBJ_VERSION(new) = 1;
 
 		SCRIPT(new) = NULL;
 		new->proto_script = NULL;

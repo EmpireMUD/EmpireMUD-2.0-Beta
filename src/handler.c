@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: handler.c                                       EmpireMUD 2.0b1 *
+*   File: handler.c                                       EmpireMUD 2.0b2 *
 *  Usage: internal funcs: moving and finding chars/objs                   *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -247,6 +247,7 @@ void affect_join(char_data *ch, struct affected_type *af, int flags) {
 */
 void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool add) {
 	empire_data *emp = GET_LOYALTY(ch);
+	// int diff, orig;
 	
 	if (add) {
 		SET_BIT(AFF_FLAGS(ch), bitv);
@@ -290,28 +291,82 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 			break;
 		case APPLY_MOVE:
 			SAFE_ADD(GET_MAX_MOVE(ch), mod, INT_MIN, INT_MAX, TRUE);
+			
+			// prevent from going negative
+			//orig = GET_MOVE(ch);
 			SAFE_ADD(GET_MOVE(ch), mod, INT_MIN, INT_MAX, TRUE);
-			GET_MOVE(ch) += mod;
+			/*
+			if (!IS_NPC(ch)) {
+				if (GET_MOVE(ch) < 0) {
+					GET_MOVE_DEFICIT(ch) -= GET_MOVE(ch);
+					GET_MOVE(ch) = 0;
+				}
+				else if (GET_MOVE_DEFICIT(ch) > 0) {
+					diff = MIN(GET_MOVE_DEFICIT(ch), MAX(0, GET_MOVE(ch) - orig));
+					GET_MOVE_DEFICIT(ch) -= diff;
+					GET_MOVE(ch) -= diff;
+				}
+			}
+			*/
 			break;
 		case APPLY_HEALTH:
 			SAFE_ADD(GET_MAX_HEALTH(ch), mod, INT_MIN, INT_MAX, TRUE);
+			
+			// prevent from going negative
+			//orig = GET_HEALTH(ch);
 			SAFE_ADD(GET_HEALTH(ch), mod, INT_MIN, INT_MAX, TRUE);
-			if (GET_HEALTH(ch) < 1) {
-				// minimum health from this change
-				GET_HEALTH(ch) = 1;
+			GET_HEALTH(ch) = MAX(1, GET_HEALTH(ch));
+			/*
+			if (!IS_NPC(ch)) {
+				if (GET_HEALTH(ch) < 1) {	// min 1 on health
+					GET_HEALTH_DEFICIT(ch) -= (GET_HEALTH(ch)-1);
+					GET_HEALTH(ch) = 1;
+				}
+				else if (GET_HEALTH_DEFICIT(ch) > 0) {
+					diff = MIN(GET_HEALTH_DEFICIT(ch), MAX(0, GET_HEALTH(ch) - orig));
+					diff = MIN(diff, GET_HEALTH(ch)-1);
+					GET_HEALTH_DEFICIT(ch) -= diff;
+					GET_HEALTH(ch) -= diff;
+				}
 			}
+			else {
+				// npcs cannot die this way
+				GET_HEALTH(ch) = MAX(1, GET_HEALTH(ch));
+			}
+			*/
 			break;
 		case APPLY_MANA:
 			SAFE_ADD(GET_MAX_MANA(ch), mod, INT_MIN, INT_MAX, TRUE);
+			
+			// prevent from going negative
+			//orig = GET_MANA(ch);
 			SAFE_ADD(GET_MANA(ch), mod, INT_MIN, INT_MAX, TRUE);
+			/*
+			if (!IS_NPC(ch)) {
+				if (GET_MANA(ch) < 0) {
+					GET_MANA_DEFICIT(ch) -= GET_MANA(ch);
+					GET_MANA(ch) = 0;
+				}
+				else if (GET_MANA_DEFICIT(ch) > 0) {
+					diff = MIN(GET_MANA_DEFICIT(ch), MAX(0, GET_MANA(ch) - orig));
+					GET_MANA_DEFICIT(ch) -= diff;
+					GET_MANA(ch) -= diff;
+				}
+			}
+			*/
 			break;
 		case APPLY_BLOOD: {
 			SAFE_ADD(GET_EXTRA_BLOOD(ch), mod, INT_MIN, INT_MAX, TRUE);
 			break;
 		}
-		case APPLY_SOAK:
-			SAFE_ADD(GET_SOAK(ch), mod, INT_MIN, INT_MAX, TRUE);
+		case APPLY_RESIST_PHYSICAL: {
+			SAFE_ADD(GET_RESIST_PHYSICAL(ch), mod, INT_MIN, INT_MAX, TRUE);
 			break;
+		}
+		case APPLY_RESIST_MAGICAL: {
+			SAFE_ADD(GET_RESIST_MAGICAL(ch), mod, INT_MIN, INT_MAX, TRUE);
+			break;
+		}
 		case APPLY_TO_HIT: {
 			SAFE_ADD(GET_TO_HIT(ch), mod, INT_MIN, INT_MAX, TRUE);
 			break;
@@ -504,15 +559,14 @@ void affect_total(char_data *ch) {
 	
 	// Base energies do not change
 	if (!IS_NPC(ch)) {
+		GET_MAX_HEALTH(ch) = base_player_pools[HEALTH];
+		GET_MAX_MOVE(ch) = base_player_pools[MOVE];
+		GET_MAX_MANA(ch) = base_player_pools[MANA];
+		
 		if (GET_CLASS(ch) != CLASS_NONE) {
-			GET_MAX_HEALTH(ch) = MAX(base_player_pools[HEALTH], GET_CLASS_PROGRESSION(ch) * class_data[GET_CLASS(ch)].max_pools[HEALTH] / 100);
-			GET_MAX_MOVE(ch) = MAX(base_player_pools[MOVE], GET_CLASS_PROGRESSION(ch) * class_data[GET_CLASS(ch)].max_pools[MOVE] / 100);
-			GET_MAX_MANA(ch) = MAX(base_player_pools[MANA], GET_CLASS_PROGRESSION(ch) * class_data[GET_CLASS(ch)].max_pools[MANA] / 100);
-		}
-		else {
-			GET_MAX_HEALTH(ch) = base_player_pools[HEALTH];
-			GET_MAX_MOVE(ch) = base_player_pools[MOVE];
-			GET_MAX_MANA(ch) = base_player_pools[MANA];
+			GET_MAX_HEALTH(ch) += MAX(0, GET_CLASS_PROGRESSION(ch) * (class_data[GET_CLASS(ch)].max_pools[HEALTH] - base_player_pools[HEALTH]) / 100);
+			GET_MAX_MOVE(ch) += MAX(0, GET_CLASS_PROGRESSION(ch) * (class_data[GET_CLASS(ch)].max_pools[MOVE] - base_player_pools[MOVE]) / 100);
+			GET_MAX_MANA(ch) += MAX(0, GET_CLASS_PROGRESSION(ch) * (class_data[GET_CLASS(ch)].max_pools[MANA] - base_player_pools[MANA]) / 100);
 		}
 	}
 
@@ -543,7 +597,7 @@ void affect_total(char_data *ch) {
 	// ability-based modifiers
 	if (!IS_NPC(ch)) {
 		if (HAS_ABILITY(ch, ABIL_ENDURANCE)) {
-			GET_MAX_HEALTH(ch) *= 2;
+			GET_MAX_HEALTH(ch) = MIN(GET_MAX_HEALTH(ch), 1000) * 2.0 + MAX(GET_MAX_HEALTH(ch) - 1000, 0) * 1.25;
 		}
 		if (HAS_ABILITY(ch, ABIL_GIFT_OF_NATURE)) {
 			GET_MAX_MANA(ch) *= 1.35;
@@ -1020,7 +1074,7 @@ void perform_dismount(char_data *ch) {
 	REMOVE_BIT(GET_MOUNT_FLAGS(ch), MOUNT_RIDING);
 	
 	if (GET_EQ(ch, WEAR_SADDLE)) {
-		perform_remove(ch, WEAR_SADDLE, FALSE, TRUE);
+		perform_remove(ch, WEAR_SADDLE);
 	}
 }
 
@@ -1121,7 +1175,7 @@ void char_from_room(char_data *ch) {
 	int pos;
 
 	if (ch == NULL || !IN_ROOM(ch)) {
-		log("SYSERR: NULL character or no locadtion in %s, char_from_room", __FILE__);
+		log("SYSERR: NULL character or no location in %s, char_from_room", __FILE__);
 		exit(1);
 	}
 
@@ -1531,7 +1585,7 @@ void charge_coins(char_data *ch, empire_data *type, int amount) {
 	}
 	
 	for (coin = GET_PLAYER_COINS(ch); coin && amount > 0; coin = coin->next) {
-		if (coin->empire_id != EMPIRE_VNUM(type) && coin->empire_id != OTHER_COIN) {
+		if ((type == REAL_OTHER_COIN || coin->empire_id != EMPIRE_VNUM(type)) && coin->empire_id != OTHER_COIN) {
 			emp = real_empire(coin->empire_id);
 			// inverse exchange rate to figure out how much we owe
 			inv = 1.0 / (rate = exchange_rate(emp, type));
@@ -1952,7 +2006,7 @@ int increase_coins(char_data *ch, empire_data *emp, int amount) {
 
 /**
 * "25 empire coins" -- shorthand for reporting the amount/type of money in
-* many common strings. Not to be confsed with money_desc().
+* many common strings. Not to be confused with money_desc().
 *
 * @param empire_data *type Which empire's coins (or REAL_OTHER_COIN).
 * @param int amount How many coins.
@@ -2040,7 +2094,7 @@ const char *money_desc(empire_data *type, int amount) {
 *
 * @param char_data *ch The character.
 * @param int type Any COOLDOWN_x.
-* @param int seconds_duration How long it latss.
+* @param int seconds_duration How long it lasts.
 */
 void add_cooldown(char_data *ch, int type, int seconds_duration) {
 	struct cooldown_data *cool;
@@ -2803,6 +2857,93 @@ struct help_index_element *find_help_entry(int level, const char *word) {
 //// INTERACTION HANDLERS ////////////////////////////////////////////////////
 
 /**
+* Compares an interaction's chances against an exclusion set. Interactions are
+* exclusive with other interactions that share an exclusion code, and the
+* chance rolls on exclusion sets are cumulative.
+*
+* @param struct interact_exclusion_data **set A pointer to the hash table that holds the data (may add an entry).
+* @param char code The exclusion code (must be a single letter; any empty or invalid code is treated as non-exclusive).
+* @param double percent The percent (0.01-100.00) chance of passing.
+* @return bool TRUE if the interaction succeeds
+*/
+bool check_exclusion_set(struct interact_exclusion_data **set, char code, double percent) {
+	struct interact_exclusion_data *find;
+	
+	// limited set of codes
+	if (!isalpha(code)) {
+		code = 0;
+	}
+	
+	// no exclusion? just roll
+	if (!code) {
+		return (number(1, 10000) <= (percent * 100));
+	}
+	
+	// this 'find' is guaranteed because it makes it if it doesn't exist
+	if ((find = find_exclusion_data(set, code))) {
+		if (find->done) {
+			// already excluded
+			return FALSE;
+		}
+		
+		// add to cumulative percent and check it
+		find->cumulative_value += (percent * 100);
+		if (find->rolled_value <= find->cumulative_value) {
+			find->done = TRUE;
+			return TRUE;
+		}
+		
+		return FALSE;
+	}
+	
+	// just in case
+	return FALSE;
+}
+
+
+/**
+* Finds (or creates) an exclusion entry for a given code. Exclusion codes must
+* be single letters.
+*
+* @param struct interact_exclusion_data **set A pointer to the hash table that holds the data (may add an entry).
+* @param char code The exclusion code (must be a single letter; any empty or invalid code is treated as non-exclusive).
+* @return struct interact_exclusion_data* The exclusion data for that code.
+*/
+struct interact_exclusion_data *find_exclusion_data(struct interact_exclusion_data **set, char code) {
+	struct interact_exclusion_data *find;
+	int val;
+	
+	val = (int) code;
+	HASH_FIND_INT(*set, &val, find);
+	if (!find) {
+		CREATE(find, struct interact_exclusion_data, 1);
+		find->code = (int) code;
+		// this rolls now -- rolls are for the entire exclusion set
+		find->rolled_value = number(1, 10000);
+		find->cumulative_value = 0;
+		find->done = FALSE;
+		HASH_ADD_INT(*set, code, find);
+	}
+	
+	return find;
+}
+
+
+/**
+* Free a set of exclusion data.
+* 
+* @param struct interact_exclusion_data *list The list to free.
+*/
+void free_exclusion_data(struct interact_exclusion_data *list) {
+	struct interact_exclusion_data *iter, *next;
+	HASH_ITER(hh, list, iter, next) {
+		HASH_DEL(list, iter);
+		free(iter);
+	}
+}
+
+
+/**
 * @param struct interaction_item *list The list to check.
 * @param int type The INTERACT_x type to check for.
 * @return bool TRUE if at least one interaction of that type is in the list.
@@ -2832,34 +2973,23 @@ bool has_interaction(struct interaction_item *list, int type) {
 * @param char_data *inter_mob For mob interactions, the mob.
 * @param obj_data *inter_item For item interactions, the item.
 * @param INTERACTION_FUNC(*func) A function pointer that runs each successful interaction (func returns TRUE if an interaction happens; FALSE if it aborts)
-* @param bool *hit_exclusive A bool pointer to store whether or not we hit an exclusive.
 * @return bool TRUE if any interactions ran successfully, FALSE if not.
 */
-bool run_interactions(char_data *ch, struct interaction_item *run_list, int type, room_data *inter_room, char_data *inter_mob, obj_data *inter_item, INTERACTION_FUNC(*func), bool *hit_exclusive) {
+bool run_interactions(char_data *ch, struct interaction_item *run_list, int type, room_data *inter_room, char_data *inter_mob, obj_data *inter_item, INTERACTION_FUNC(*func)) {
+	struct interact_exclusion_data *exclusion = NULL;
 	struct interaction_item *interact;
-	bool this, success = FALSE;
-	
-	*hit_exclusive = FALSE;
+	bool success = FALSE;
 
 	for (interact = run_list; interact; interact = interact->next) {
-		this = FALSE;
-		
-		if (CHECK_INTERACT(interact, type)) {
+		if (interact->type == type && check_exclusion_set(&exclusion, interact->exclusion_code, interact->percent)) {
 			if (func) {
 				// run function
-				this = (func)(ch, interact, inter_room, inter_mob, inter_item);
-			}
-			
-			success |= this;
-			
-			// there can be only one?
-			if (this && interact->exclusive) {
-				*hit_exclusive = TRUE;
-				break;
+				success |= (func)(ch, interact, inter_room, inter_mob, inter_item);
 			}
 		}
 	}
-
+	
+	free_exclusion_data(exclusion);
 	return success;
 }
 
@@ -2872,33 +3002,32 @@ bool run_interactions(char_data *ch, struct interaction_item *run_list, int type
 * @param room_data *room The location to run on.
 * @param int type Any INTERACT_x const.
 * @param INTERACTION_FUNC(*func) A function pointer that runs each successful interaction (func returns TRUE if an interaction happens; FALSE if it aborts)
-* @param bool *hit_exclusive A bool pointer to store whether or not we hit an exclusive.
 * @return bool TRUE if any interactions ran successfully, FALSE if not.
 */
-bool run_room_interactions(char_data *ch, room_data *room, int type, INTERACTION_FUNC(*func), bool *hit_exclusive) {
+bool run_room_interactions(char_data *ch, room_data *room, int type, INTERACTION_FUNC(*func)) {
 	bool success;
 	crop_data *crop;
 	
-	success = *hit_exclusive = FALSE;
+	success = FALSE;
 	
 	// building first
-	if (!*hit_exclusive && GET_BUILDING(IN_ROOM(ch))) {
-		success |= run_interactions(ch, GET_BLD_INTERACTIONS(GET_BUILDING(IN_ROOM(ch))), type, room, NULL, NULL, func, hit_exclusive);
+	if (!success && GET_BUILDING(room)) {
+		success |= run_interactions(ch, GET_BLD_INTERACTIONS(GET_BUILDING(room)), type, room, NULL, NULL, func);
 	}
 	
 	// crop second
-	if (!*hit_exclusive && ROOM_CROP_TYPE(IN_ROOM(ch)) != NOTHING && (crop = crop_proto(ROOM_CROP_TYPE(IN_ROOM(ch))))) {
-		success |= run_interactions(ch, GET_CROP_INTERACTIONS(crop), type, room, NULL, NULL, func, hit_exclusive);
+	if (!success && ROOM_CROP_TYPE(room) != NOTHING && (crop = crop_proto(ROOM_CROP_TYPE(room)))) {
+		success |= run_interactions(ch, GET_CROP_INTERACTIONS(crop), type, room, NULL, NULL, func);
 	}
 	
 	// rmt third
-	if (!*hit_exclusive && GET_ROOM_TEMPLATE(IN_ROOM(ch))) {
-		success |= run_interactions(ch, GET_RMT_INTERACTIONS(GET_ROOM_TEMPLATE(IN_ROOM(ch))), type, room, NULL, NULL, func, hit_exclusive);
+	if (!success && GET_ROOM_TEMPLATE(room)) {
+		success |= run_interactions(ch, GET_RMT_INTERACTIONS(GET_ROOM_TEMPLATE(room)), type, room, NULL, NULL, func);
 	}
 	
 	// sector fourth
-	if (!*hit_exclusive) {
-		success |= run_interactions(ch, GET_SECT_INTERACTIONS(SECT(IN_ROOM(ch))), type, room, NULL, NULL, func, hit_exclusive);
+	if (!success) {
+		success |= run_interactions(ch, GET_SECT_INTERACTIONS(SECT(room)), type, room, NULL, NULL, func);
 	}
 	
 	return success;
@@ -3115,15 +3244,30 @@ void expand_mob_tags(char_data *mob) {
 		player = is_playing(tag->idnum);
 		
 		if (player) {
+			// re-add existing player
 			if (!find_id_in_tag_list(GET_IDNUM(player), new_list)) {
 				add_mob_tag(GET_IDNUM(player), &new_list);
 			}
+			
+			// check player's group
 			if (GROUP(player)) {
 				for (mem = GROUP(player)->members; mem; mem = mem->next) {
-					if (!IS_NPC(mem->member) && !find_id_in_tag_list(GET_IDNUM(mem->member), new_list)) {
-						add_mob_tag(GET_IDNUM(mem->member), &new_list);
+					if (IS_NPC(mem->member) || find_id_in_tag_list(GET_IDNUM(mem->member), new_list)) {
+						continue;
 					}
+					
+					// check proximity (only if present)
+					if (IN_ROOM(mem->member) != IN_ROOM(mob)) {
+						continue;
+					}
+					
+					add_mob_tag(GET_IDNUM(mem->member), &new_list);
 				}
+			}
+		}
+		else {
+			if (!find_id_in_tag_list(tag->idnum, new_list)) {
+				add_mob_tag(tag->idnum, &new_list);
 			}
 		}
 	}
@@ -3170,9 +3314,16 @@ void tag_mob(char_data *mob, char_data *player) {
 	if (GROUP(player)) {
 		// tag for whole group
 		for (mem = GROUP(player)->members; mem; mem = mem->next) {
-			if (!IS_NPC(mem->member)) {
-				add_mob_tag(GET_IDNUM(mem->member), &MOB_TAGGED_BY(mob));
+			if (IS_NPC(mem->member)) {
+				continue;
 			}
+			
+			// check proximity (must be present)
+			if (IN_ROOM(mem->member) != IN_ROOM(mob)) {
+				continue;
+			}
+			
+			add_mob_tag(GET_IDNUM(mem->member), &MOB_TAGGED_BY(mob));
 		}
 	}
 	else {
@@ -3273,21 +3424,30 @@ obj_data *copy_warehouse_obj(obj_data *input) {
 * @param obj_data *obj The object to empty.
 */
 void empty_obj_before_extract(obj_data *obj) {
+	void get_check_money(char_data *ch, obj_data *obj);
+	
 	obj_data *jj, *next_thing;
 	
 	for (jj = obj->contains; jj; jj = next_thing) {
 		next_thing = jj->next_content;		/* Next in inventory */
 
-		if (obj->in_obj)
+		if (obj->in_obj) {
 			obj_to_obj(jj, obj->in_obj);
-		else if (obj->carried_by)
+		}
+		else if (obj->carried_by) {
 			obj_to_char(jj, obj->carried_by);
-		else if (obj->worn_by)
+			get_check_money(obj->carried_by, jj);
+		}
+		else if (obj->worn_by) {
 			obj_to_char(jj, obj->worn_by);
-		else if (IN_ROOM(obj))
+			get_check_money(obj->worn_by, jj);
+		}
+		else if (IN_ROOM(obj)) {
 			obj_to_room(jj, IN_ROOM(obj));
-		else
+		}
+		else {
 			extract_obj(jj);
+		}
 	}
 }
 
@@ -3536,7 +3696,7 @@ bool bind_ok(obj_data *obj, char_data *ch) {
 
 
 /**
-* Removes all bindings on an objet other than a player's, for things that were
+* Removes all bindings on an object other than a player's, for things that were
 * bound to multiple players but are now reduced to just one.
 *
 * @param obj_data *obj The object to simplify bindings on.
@@ -3626,7 +3786,7 @@ void equip_char(char_data *ch, obj_data *obj, int pos) {
 		obj->worn_on = pos;
 
 		// update gear level for characters
-		if (!IS_NPC(ch) && wear_data[pos].count_stats) {
+		if (!IS_NPC(ch) && wear_data[pos].adds_gear_level) {
 			GET_GEAR_LEVEL(ch) += rate_item(obj);
 		}
 
@@ -3761,8 +3921,13 @@ void obj_to_char(obj_data *object, char_data *ch) {
 		// set the timer here; actual rules for it are in limits.c
 		GET_AUTOSTORE_TIMER(object) = time(0);
 		
+		// unmark uncollected loot
+		if (!IS_NPC(ch)) {
+			REMOVE_BIT(GET_OBJ_EXTRA(object), OBJ_UNCOLLECTED_LOOT);
+		}
+		
 		// update last owner/empire -- only if not stolen
-		if (time(0) - GET_STOLEN_TIMER(object) > config_get_int("stolen_object_timer") * SECS_PER_REAL_MIN) {
+		if (!IS_STOLEN(object)) {
 			if (IS_NPC(ch)) {
 				object->last_owner_id = NOBODY;
 				object->last_empire_id = NOTHING;
@@ -3800,8 +3965,13 @@ void obj_to_char_or_room(obj_data *obj, char_data *ch) {
 		
 		obj_to_room(obj, IN_ROOM(ch));
 		
+		// unmark uncollected loot if it was meant to go to a person
+		if (!IS_NPC(ch)) {
+			REMOVE_BIT(GET_OBJ_EXTRA(obj), OBJ_UNCOLLECTED_LOOT);
+		}
+		
 		// set ownership as if they got it -- if not stolen
-		if (time(0) - GET_STOLEN_TIMER(obj) > config_get_int("stolen_object_timer") * SECS_PER_REAL_MIN) {
+		if (!IS_STOLEN(obj)) {
 			if (IS_NPC(ch)) {
 				obj->last_owner_id = NOBODY;
 				obj->last_empire_id = NOTHING;
@@ -3835,6 +4005,9 @@ void obj_to_obj(obj_data *obj, obj_data *obj_to) {
 
 		// set the timer here; actual rules for it are in limits.c
 		GET_AUTOSTORE_TIMER(obj) = time(0);
+		
+		// clear keep now
+		REMOVE_BIT(GET_OBJ_EXTRA(obj), OBJ_KEEP);
 
 		obj->next_content = obj_to->contains;
 		obj_to->contains = obj;
@@ -3865,6 +4038,9 @@ void obj_to_room(obj_data *object, room_data *room) {
 		if (OBJ_FLAGGED(object, OBJ_LIGHT)) {
 			ROOM_LIGHTS(IN_ROOM(object))++;
 		}
+		
+		// clear keep now
+		REMOVE_BIT(GET_OBJ_EXTRA(object), OBJ_KEEP);
 
 		// set the timer here; actual rules for it are in limits.c
 		GET_AUTOSTORE_TIMER(object) = time(0);
@@ -3930,7 +4106,7 @@ obj_data *unequip_char(char_data *ch, int pos) {
 		obj->worn_on = NO_WEAR;
 		
 		// adjust gear level
-		if (!IS_NPC(ch) && wear_data[pos].count_stats) {
+		if (!IS_NPC(ch) && wear_data[pos].adds_gear_level) {
 			GET_GEAR_LEVEL(ch) -= rate_item(obj);
 		}
 
@@ -3962,18 +4138,12 @@ obj_data *unequip_char(char_data *ch, int pos) {
 *
 * @param char_data *ch The person to unequip
 * @param int pos The WEAR_x slot to remove
-* @param bool droppable If TRUE, checks that ch can carry the item, or else puts it in the room and sends a message
 */
-void unequip_char_to_inventory(char_data *ch, int pos, bool droppable) {
+void unequip_char_to_inventory(char_data *ch, int pos) {
 	obj_data *obj = unequip_char(ch, pos);
 	
 	if (OBJ_FLAGGED(obj, OBJ_SINGLE_USE)) {
 		extract_obj(obj);
-	}
-	else if (droppable && !IS_IMMORTAL(ch) && IN_ROOM(ch) && IS_CARRYING_N(ch) + GET_OBJ_INVENTORY_SIZE(obj) > CAN_CARRY_N(ch)) {
-		act("... your inventory is full and you drop it.", FALSE, ch, obj, NULL, TO_CHAR);
-		act("... $s inventory is full and $e drops it.", TRUE, ch, obj, NULL, TO_ROOM);
-		obj_to_room(obj, IN_ROOM(ch));
 	}
 	else {
 		obj_to_char(obj, ch);
@@ -5075,7 +5245,7 @@ int store_resource(char_data *ch, empire_data *emp, obj_data *obj) {
 * This is true if ANY of its storage locations require WITHDRAW.
 *
 * @param obj_data *obj Which object (or prototype) to check.
-* @return bool TRUE if it requies withdraw; FALSE otherwise
+* @return bool TRUE if it requires withdraw; FALSE otherwise
 */
 bool stored_item_requires_withdraw(obj_data *obj) {
 	struct obj_storage_type *sdt;
@@ -5228,6 +5398,7 @@ void store_unique_item(char_data *ch, obj_data *obj, empire_data *emp, room_data
 	}
 	
 	// empty/clear first
+	REMOVE_BIT(GET_OBJ_EXTRA(obj), OBJ_KEEP);
 	LAST_OWNER_ID(obj) = NOBODY;
 	obj->last_empire_id = NOTHING;
 	empty_obj_before_extract(obj);

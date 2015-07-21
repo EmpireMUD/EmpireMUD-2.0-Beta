@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: config.c                                        EmpireMUD 2.0b1 *
+*   File: config.c                                        EmpireMUD 2.0b2 *
 *  Usage: Configuration of various aspects of CircleMUD operation         *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -69,6 +69,29 @@ void save_config_system();
 
 // slash-channels a player joins automatically upon creation (\n-terminated list)
 const char *default_channels[] = { "newbie", "ooc", "recruit", "trade", "\n" };
+
+
+// list of promo funcs
+PROMO_APPLY(promo_countdemonet);
+PROMO_APPLY(promo_facebook);
+PROMO_APPLY(promo_skillups);
+
+
+// list of active promo codes: CAUTION: You should only add to the end, not
+// rearrange this list, as promo codes are stored by number.
+struct promo_code_list promo_codes[] = {
+	// add promo codes here to track ad campaigns
+	// { "code", expired, func },
+	
+	// do not change the order
+	{ "none",	TRUE,	NULL },	// default
+	{ "skillups", FALSE, promo_skillups },
+	{ "countdemonet", FALSE, promo_countdemonet },
+	{ "facebook", FALSE, promo_facebook },
+	
+	// last
+	{ "\n", FALSE, NULL }
+};
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -156,6 +179,14 @@ const char *LOGNAME = NULL;	// using NULL outputs to stderr, otherwise outputs t
 int max_playing = 300;	// maximum number of players allowed before game starts to turn people away
 
 
+// if you have a player whose connection causes lag when they first connect,
+// adding their IPv4 address here will prevent the mud from doing a nameserver
+// lookup.
+const char *slow_nameserver_ips[] = {
+	"\n"	// put this last
+};
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// PLAYER CONFIGS //////////////////////////////////////////////////////////
 
@@ -166,11 +197,16 @@ const int base_player_pools[NUM_POOLS] = { 50, 100, 50, 100 };
 const int primary_attributes[] = { STRENGTH, CHARISMA, INTELLIGENCE, NOTHING };
 
 // universal wait (command lag) after abilities with cooldowns
-const int universal_wait = 1.1 RL_SEC;
+const int universal_wait = 1.25 RL_SEC;
 
 // lore cleanup -- terminate the list with a -1
 const int remove_lore_types[] = { LORE_PLAYER_KILL, LORE_PLAYER_DEATH, LORE_TOWER_DEATH, LORE_DEATH, -1 };
 
+// used in several places to represent the lowest to-hit a player could have
+const int base_hit_chance = 50;
+
+// how much hit/dodge 1 point of Dexterity gives
+const double hit_per_dex = 5.0;
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1081,7 +1117,7 @@ void load_config_system_from_file(void) {
 	
 	// aaand read from file	
 	if (!(fl = fopen(CONFIG_FILE, "r"))) {
-		log("Unable to read config file %s, booting with no conigs", CONFIG_FILE);
+		log("Unable to read config file %s, booting with no configs", CONFIG_FILE);
 		return;
 	}
 	
@@ -1319,7 +1355,7 @@ bool find_int_in_array(int to_find, int *array, int size) {
 
 
 /**
-* Removess an int from an int array for the config system, only if the int is
+* Removes an int from an int array for the config system, only if the int is
 * already in the array.
 *
 * @param int to_remove The integer to remove.
@@ -1510,6 +1546,7 @@ void init_config_system(void) {
 	init_config(CONFIG_GAME, "ok_string", CONFTYPE_SHORT_STRING, "simple Ok message");
 	init_config(CONFIG_GAME, "no_person", CONFTYPE_SHORT_STRING, "bad target error for no person");
 	init_config(CONFIG_GAME, "huh_string", CONFTYPE_SHORT_STRING, "message for invalid command");
+	init_config(CONFIG_GAME, "public_logins", CONFTYPE_BOOL, "login/out/alt display to mortlog instead of elog");
 	init_config(CONFIG_GAME, "require_auth", CONFTYPE_BOOL, "new players will not auto-authorize");
 
 	// actions
@@ -1534,11 +1571,12 @@ void init_config_system(void) {
 	init_config(CONFIG_ACTIONS, "high_depletion", CONFTYPE_INT, "depletion in buildings with HIGH-DEPLETION");
 	init_config(CONFIG_ACTIONS, "shear_growth_time", CONFTYPE_INT, "real hours to regrow wool");
 	init_config(CONFIG_ACTIONS, "tavern_brew_time", CONFTYPE_INT, "# of 5-minute updates for initial tavern brew");
-	init_config(CONFIG_ACTIONS, "tavern_timer", CONFTYPE_INT, "# of 5-minute updates for tavern resoure cost");
+	init_config(CONFIG_ACTIONS, "tavern_timer", CONFTYPE_INT, "# of 5-minute updates for tavern resource cost");
 	init_config(CONFIG_ACTIONS, "trench_initial_value", CONFTYPE_INT, "negative starting value for excavate -- done when it counts up to 0");
 	init_config(CONFIG_ACTIONS, "trench_gain_from_rain", CONFTYPE_INT, "amount of rain water per room update added to a trench");
 	init_config(CONFIG_ACTIONS, "trench_full_value", CONFTYPE_INT, "amount of water needed to fill a trench");
 	init_config(CONFIG_ACTIONS, "max_chore_resource", CONFTYPE_INT, "max items workforce will collect");
+	init_config(CONFIG_ACTIONS, "max_chore_resource_over_total", CONFTYPE_INT, "how much of a resource workers will gather if over the total cap");
 	init_config(CONFIG_ACTIONS, "max_chore_resource_skilled", CONFTYPE_INT, "workforce cap for skilled labor");
 
 	// cities
@@ -1567,11 +1605,14 @@ void init_config_system(void) {
 	init_config(CONFIG_EMPIRE, "member_timeout_full", CONFTYPE_INT, "days until full member times out");
 	init_config(CONFIG_EMPIRE, "minutes_per_day_full", CONFTYPE_INT, "minutes played per day for full member");
 	init_config(CONFIG_EMPIRE, "member_timeout_max_threshold", CONFTYPE_INT, "hours, 1 week of playtime");
-	init_config(CONFIG_EMPIRE, "whole_empire_timeout", CONFTYPE_INT, "days to empire apearing idle");
+	init_config(CONFIG_EMPIRE, "newbie_island_day_limit", CONFTYPE_INT, "number of days old an empire can be before losing newbie island claims");
+	init_config(CONFIG_EMPIRE, "whole_empire_timeout", CONFTYPE_INT, "days to empire appearing idle");
 	init_config(CONFIG_EMPIRE, "empire_log_ttl", CONFTYPE_INT, "how many days elogs last");
 
 	// items
+	init_config(CONFIG_MOBS, "auto_update_items", CONFTYPE_BOOL, "uses item version numbers to automatically update items");
 	init_config(CONFIG_ITEMS, "autostore_time", CONFTYPE_INT, "minutes items last on the ground");
+	init_config(CONFIG_ITEMS, "bound_item_junk_time", CONFTYPE_INT, "minutes bound items last on the ground before being junked");
 	init_config(CONFIG_ITEMS, "long_autostore_time", CONFTYPE_INT, "minutes items last with the long-autostore bld flag");
 	init_config(CONFIG_ITEMS, "room_item_limit", CONFTYPE_INT, "number of items allowed in buildings with item-limit flag");
 	init_config(CONFIG_ITEMS, "scale_points_at_100", CONFTYPE_DOUBLE, "number of scaling points for a 100-scale item");
@@ -1585,6 +1626,8 @@ void init_config_system(void) {
 	init_config(CONFIG_MOBS, "mob_spawn_interval", CONFTYPE_INT, "how often mobs spawn/last");
 	init_config(CONFIG_MOBS, "mob_spawn_radius", CONFTYPE_INT, "distance from players that mobs spawn");
 	init_config(CONFIG_MOBS, "mob_despawn_radius", CONFTYPE_INT, "distance from players to despawn mobs");
+	init_config(CONFIG_MOBS, "npc_follower_limit", CONFTYPE_INT, "more npc followers than this causes aggro");
+	init_config(CONFIG_MOBS, "num_duplicates_in_stable", CONFTYPE_INT, "number of npc duplicates allowed in a stable before some leave");
 	init_config(CONFIG_MOBS, "spawn_limit_per_room", CONFTYPE_INT, "max npcs that will spawn in a map room");
 	init_config(CONFIG_MOBS, "mob_pursuit_timeout", CONFTYPE_INT, "minutes that mob pursuit memory lasts");
 	init_config(CONFIG_MOBS, "mob_pursuit_distance", CONFTYPE_INT, "distance a mob will pursue (as the crow flies)");
@@ -1621,6 +1664,7 @@ void init_config_system(void) {
 	init_config(CONFIG_SKILLS, "must_be_vampire", CONFTYPE_SHORT_STRING, "message for doing vampire things while not a vampire");
 	init_config(CONFIG_SKILLS, "potion_heal_scale", CONFTYPE_DOUBLE, "modifier applied to potion scale, for healing");
 	init_config(CONFIG_SKILLS, "potion_apply_per_100", CONFTYPE_DOUBLE, "apply points per 100 potion scale levels");
+	init_config(CONFIG_SKILLS, "summon_npc_limit", CONFTYPE_INT, "npc amount that blocks summons");
 
 	// system
 	init_config(CONFIG_SYSTEM, "nameserver_is_slow", CONFTYPE_BOOL, "if enabled, system will not resolve numeric IPs");
@@ -1645,8 +1689,11 @@ void init_config_system(void) {
 	init_config(CONFIG_WAR, "death_release_minutes", CONFTYPE_INT, "minutes a person can sit without respawning");
 	init_config(CONFIG_WAR, "deaths_before_penalty", CONFTYPE_INT, "how many times you can die in a short period without being penalized");
 	init_config(CONFIG_WAR, "deaths_before_penalty_war", CONFTYPE_INT, "death limit while at war");
+	init_config(CONFIG_WAR, "rogue_flag_time", CONFTYPE_INT, "in minutes, acts like hostile flag but for non-empire players");
 	init_config(CONFIG_WAR, "seconds_per_death", CONFTYPE_INT, "how long the penalty lasts per death over the limit");
 	init_config(CONFIG_WAR, "stun_immunity_time", CONFTYPE_INT, "seconds a person is immune to stuns after a stun wears off");
+	init_config(CONFIG_WAR, "war_cost_max", CONFTYPE_INT, "empire coins to start a war at maximum level difference");
+	init_config(CONFIG_WAR, "war_cost_min", CONFTYPE_INT, "empire coins to start a war at minimum level difference");
 	init_config(CONFIG_WAR, "war_login_delay", CONFTYPE_INT, "seconds a person is stunned if they log in while at war");
 
 	// world
@@ -1661,6 +1708,8 @@ void init_config_system(void) {
 		init_config_custom("generic_facing", config_show_bitvector, config_edit_bitvector, (void*)bld_on_flags);
 	init_config(CONFIG_WORLD, "arctic_percent", CONFTYPE_DOUBLE, "what percent of top/bottom of the map is arctic");
 	init_config(CONFIG_WORLD, "tropics_percent", CONFTYPE_DOUBLE, "what percent of the middle of the map is tropics");
+
+	// TODO note: deprecated
 	init_config(CONFIG_WORLD, "ocean_pool_size", CONFTYPE_INT, "how many spare ocean tiles to keep on-hand");
 	
 	// TODO sector types should be audited on startup to ensure they exist -pc

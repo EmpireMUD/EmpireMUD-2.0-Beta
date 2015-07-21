@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.item.c                                      EmpireMUD 2.0b1 *
+*   File: act.item.c                                      EmpireMUD 2.0b2 *
 *  Usage: object handling routines -- get/drop and container handling     *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -45,6 +45,7 @@ extern int drink_aff[][3];
 extern const struct wear_data_type wear_data[NUM_WEARS];
 
 // extern functions
+extern bool can_steal(char_data *ch, empire_data *emp);
 extern bool can_wear_item(char_data *ch, obj_data *item, bool send_messages);
 void expire_trading_post_item(struct trading_post_data *tpd);
 extern char *get_room_name(room_data *room, bool color);
@@ -121,6 +122,13 @@ int find_eq_pos(char_data *ch, obj_data *obj, char *arg) {
 			send_to_char(buf, ch);
 		}
 	}
+	
+	// check cascading wears (ring 1 -> ring 2)
+	if (GET_EQ(ch, where)) {
+		if (wear_data[where].cascade_pos != NO_WEAR) {
+			where = wear_data[where].cascade_pos;
+		}
+	}
 
 	return (where);
 }
@@ -133,7 +141,7 @@ int find_eq_pos(char_data *ch, obj_data *obj, char *arg) {
 * @param char_data *ch The person getting obj.
 * @param obj_data *obj The item being picked up.
 */
-static void get_check_money(char_data *ch, obj_data *obj) {
+void get_check_money(char_data *ch, obj_data *obj) {
 	int value = GET_COINS_AMOUNT(obj);
 	empire_data *emp = real_empire(GET_COINS_EMPIRE_ID(obj));
 
@@ -191,7 +199,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	int iter, found;
 	
 	// ONLY flags to show
-	bitvector_t show_obj_flags = OBJ_LIGHT | OBJ_SUPERIOR | OBJ_ENCHANTED | OBJ_JUNK | OBJ_TWO_HANDED | OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP;
+	bitvector_t show_obj_flags = OBJ_LIGHT | OBJ_SUPERIOR | OBJ_ENCHANTED | OBJ_JUNK | OBJ_TWO_HANDED | OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP | OBJ_HARD_DROP | OBJ_GROUP_DROP | OBJ_GENERIC_DROP;
 	
 	// sanity / don't bother
 	if (!obj || !ch || !ch->desc) {
@@ -218,6 +226,14 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	// basic info
 	snprintf(lbuf, sizeof(lbuf), "Your analysis of $p%s reveals:", location);
 	act(lbuf, FALSE, ch, obj, NULL, TO_CHAR);
+	
+	// if it has any wear bits other than TAKE, show if they can't use it
+	if (CAN_WEAR(obj, ~ITEM_WEAR_TAKE)) {
+		// the TRUE causes it to send a message if unusable
+		msg_to_char(ch, "&r");
+		can_wear_item(ch, obj, TRUE);
+		msg_to_char(ch, "&0");
+	}
 
 	if (obj->storage) {
 		msg_to_char(ch, "Storage locations:");
@@ -290,7 +306,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 			msg_to_char(ch, "Contains %d ounces of %s.\r\n", GET_DRINK_CONTAINER_CONTENTS(obj), drinks[GET_DRINK_CONTAINER_TYPE(obj)]);
 			break;
 		case ITEM_FOOD:
-			msg_to_char(ch, "Fills for %d hours.\r\n", GET_FOOD_HOURS_OF_FULLNESS(obj) / REAL_UPDATES_PER_MUD_HOUR);
+			msg_to_char(ch, "Fills for %d hours.\r\n", GET_FOOD_HOURS_OF_FULLNESS(obj));
 			if (OBJ_FLAGGED(obj, OBJ_PLANTABLE))
 				msg_to_char(ch, "Plants %s.\r\n", GET_CROP_NAME(crop_proto(GET_FOOD_CROP_TYPE(obj))));
 			break;
@@ -471,15 +487,11 @@ static int perform_put(char_data *ch, obj_data *obj, obj_data *cont) {
 }
 
 
-void perform_remove(char_data *ch, int pos, bool swap, bool droppable) {
+void perform_remove(char_data *ch, int pos) {
 	obj_data *obj;
-
-	/* If swap == TRUE, we're swapping weapons */
 
 	if (!(obj = GET_EQ(ch, pos)))
 		log("SYSERR: perform_remove: bad pos %d passed.", pos);
-	else if (!swap && !droppable && IS_CARRYING_N(ch) + GET_OBJ_INVENTORY_SIZE(obj) > CAN_CARRY_N(ch))
-		act("$p: you can't carry that many items!", FALSE, ch, obj, 0, TO_CHAR);
 	else if (pos == WEAR_SADDLE && IS_RIDING(ch)) {
 		msg_to_char(ch, "You can't remove your saddle while you're riding!\r\n");
 	}
@@ -492,7 +504,7 @@ void perform_remove(char_data *ch, int pos, bool swap, bool droppable) {
 		act("$n stops using $p.", TRUE, ch, obj, 0, TO_ROOM);
 		
 		// this may extract it, or drop it
-		unequip_char_to_inventory(ch, pos, droppable);
+		unequip_char_to_inventory(ch, pos);
 	}
 }
 
@@ -508,15 +520,9 @@ static void perform_wear(char_data *ch, obj_data *obj, int where) {
 		return;
 	}
 	
-	// position cascade
-	if (where == WEAR_FINGER_R && GET_EQ(ch, where)) {
-		where = WEAR_FINGER_L;
-	}
-	else if (where == WEAR_NECK_1 && GET_EQ(ch, where)) {
-		where = WEAR_NECK_2;
-	}
-	else if (where == WEAR_SHEATH_1 && GET_EQ(ch, where)) {
-		where = WEAR_SHEATH_2;
+	// position cascade (ring 1/2, etc)
+	if (GET_EQ(ch, where) && wear_data[where].cascade_pos != NO_WEAR) {
+		where = wear_data[where].cascade_pos;
 	}
 
 	// make sure it wouldn't drop any primary attribute below 1
@@ -561,7 +567,7 @@ void remove_armor_by_type(char_data *ch, int armor_type) {
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
 		if (GET_EQ(ch, iter) && GET_ARMOR_TYPE(GET_EQ(ch, iter)) == armor_type) {
 			act("You take off $p.", FALSE, ch, GET_EQ(ch, iter), NULL, TO_CHAR);
-			unequip_char_to_inventory(ch, iter, TRUE);
+			unequip_char_to_inventory(ch, iter);
 		}
 	}
 }
@@ -600,13 +606,13 @@ int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname) {
 	}
 	
 	// don't let people drop bound items in other people's territory
-	if (OBJ_BOUND_TO(obj) && ROOM_OWNER(IN_ROOM(ch)) && ROOM_OWNER(IN_ROOM(ch)) != GET_LOYALTY(ch)) {
+	if (mode != SCMD_JUNK && OBJ_BOUND_TO(obj) && ROOM_OWNER(IN_ROOM(ch)) && ROOM_OWNER(IN_ROOM(ch)) != GET_LOYALTY(ch)) {
 		msg_to_char(ch, "You can't drop bound items here.\r\n");
 		return -1;
 	}
 	
 	// count items
-	if (need_capacity) {
+	if (mode != SCMD_JUNK && need_capacity) {
 		size = (OBJ_FLAGGED(obj, OBJ_LARGE) ? 2 : 1);
 		if ((size + count_objs_in_room(IN_ROOM(ch))) > config_get_int("room_item_limit")) {
 			msg_to_char(ch, "You can't drop any more items here.\r\n");
@@ -627,7 +633,7 @@ int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname) {
 			if (IS_IMMORTAL(ch)) {
 				for (iter = ROOM_PEOPLE(IN_ROOM(ch)); iter; iter = iter->next_in_room) {
 					if (iter != ch && !IS_NPC(iter) && !IS_IMMORTAL(iter)) {
-						syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s drops %s with mortal present", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj));
+						syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s drops %s with mortal present (%s) at %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), GET_NAME(iter), room_log_identifier(IN_ROOM(ch)));
 						break;
 					}
 				}
@@ -661,7 +667,7 @@ static void perform_drop_coins(char_data *ch, empire_data *type, int amount, byt
 	obj_data *obj;
 
 	if (amount <= 0)
-		msg_to_char(ch, "Heh heh heh.. we are jolly funny today, eh?\r\n");
+		msg_to_char(ch, "Heh heh heh... we are jolly funny today, eh?\r\n");
 	else if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs can't drop coins.\r\n");
 	}
@@ -670,7 +676,8 @@ static void perform_drop_coins(char_data *ch, empire_data *type, int amount, byt
 	}
 	else {
 		if (mode != SCMD_JUNK) {
-			WAIT_STATE(ch, 2 RL_SEC); /* to prevent coin-bombing */
+			/* to prevent coin-bombing */
+			command_lag(ch, WAIT_OTHER);
 			obj = create_money(type, amount);
 
 			if (!drop_wtrigger(obj, ch)) {
@@ -707,9 +714,7 @@ static void perform_drop_coins(char_data *ch, empire_data *type, int amount, byt
 * @param int mode A find-obj mode like FIND_OBJ_INV.
 * @return bool TRUE if successful, FALSE on fail.
 */
-static bool perform_get_from_container(char_data *ch, obj_data *obj, obj_data *cont, int mode) {
-	extern bool can_steal(char_data *ch, empire_data *emp);
-	
+static bool perform_get_from_container(char_data *ch, obj_data *obj, obj_data *cont, int mode) {	
 	room_data *home = HOME_ROOM(IN_ROOM(ch));
 	empire_data *emp = ROOM_OWNER(home);
 	bool stealing = FALSE;
@@ -728,7 +733,7 @@ static bool perform_get_from_container(char_data *ch, obj_data *obj, obj_data *c
 		stealing = TRUE;
 		
 		if (emp && !can_steal(ch, emp)) {
-			msg_to_char(ch, "You can't steal items here.\r\n");
+			// sends own message
 			return FALSE;
 		}		
 	}
@@ -830,8 +835,6 @@ static void get_from_container(char_data *ch, obj_data *cont, char *arg, int mod
 * @return bool TRUE if he succeeds, FALSE if it fails.
 */
 static bool perform_get_from_room(char_data *ch, obj_data *obj) {
-	extern bool can_steal(char_data *ch, empire_data *emp);
-	
 	room_data *home = HOME_ROOM(IN_ROOM(ch));
 	empire_data *emp = ROOM_OWNER(home);
 	bool stealing = FALSE;
@@ -845,7 +848,7 @@ static bool perform_get_from_room(char_data *ch, obj_data *obj) {
 		stealing = TRUE;
 		
 		if (emp && !can_steal(ch, emp)) {
-			msg_to_char(ch, "You can't steal items here.\r\n");
+			// sends own message
 			return FALSE;
 		}
 	}
@@ -953,6 +956,11 @@ static void perform_give(char_data *ch, char_data *vict, obj_data *obj) {
 		return;
 	}
 	if (!receive_mtrigger(vict, ch, obj)) {
+		return;
+	}
+	
+	if (IS_NPC(vict) && AFF_FLAGGED(vict, AFF_CHARM)) {
+		msg_to_char(ch, "You cannot give items to charmed NPCs.\r\n");
 		return;
 	}
 	
@@ -1473,6 +1481,9 @@ void trade_check(char_data *ch, char *argument) {
 		if (tpd->player != GET_IDNUM(ch)) {
 			continue;
 		}
+		if (!tpd->obj) {
+			continue;
+		}
 		if (IS_SET(tpd->state, TPD_EXPIRED) && (!IS_SET(tpd->state, TPD_OBJ_PENDING) || !tpd->obj)) {
 			// if it's expired, only show it if the object is still attached
 			continue;
@@ -1537,6 +1548,7 @@ void trade_list(char_data *ch, char *argument) {
 	empire_data *coin_emp = NULL;
 	empire_vnum last_emp = NOTHING;
 	double rate = 0.5;
+	bool can_wear;
 	int my_cost;
 	
 	if (*argument) {
@@ -1554,6 +1566,9 @@ void trade_list(char_data *ch, char *argument) {
 		if (*argument && !multi_isname(argument, GET_OBJ_KEYWORDS(tpd->obj))) {
 			continue;
 		}
+		
+		// we always mark can-wear if it doesn't have any wear flags other than take
+		can_wear = (!CAN_WEAR(tpd->obj, ~ITEM_WEAR_TAKE) || can_wear_item(ch, tpd->obj, FALSE));
 		
 		// parts
 		if (GET_OBJ_CURRENT_SCALE_LEVEL(tpd->obj)) {
@@ -1578,7 +1593,7 @@ void trade_list(char_data *ch, char *argument) {
 			*exchange = '\0';
 		}
 		
-		snprintf(line, sizeof(line), "%s%2d. %s: %d %s%s [%.1f]%s%s%s%s&0\r\n", (tpd->player == GET_IDNUM(ch)) ? "&r" : "", ++count, GET_OBJ_SHORT_DESC(tpd->obj), tpd->buy_cost, (coin_emp ? EMPIRE_ADJECTIVE(coin_emp) : "misc"), exchange, rate_item(tpd->obj), scale, (OBJ_FLAGGED(tpd->obj, OBJ_SUPERIOR) ? " (sup)" : ""), OBJ_FLAGGED(tpd->obj, OBJ_ENCHANTED) ? " (ench)" : "", (tpd->player == GET_IDNUM(ch)) ? " (your auction)" : "");
+		snprintf(line, sizeof(line), "%s%2d. %s: %d%s %s [%.1f]%s%s%s%s%s&0\r\n", (tpd->player == GET_IDNUM(ch)) ? "&r" : (can_wear ? "" : "&R"), ++count, GET_OBJ_SHORT_DESC(tpd->obj), tpd->buy_cost, exchange, (coin_emp ? EMPIRE_ADJECTIVE(coin_emp) : "misc"), rate_item(tpd->obj), scale, (OBJ_FLAGGED(tpd->obj, OBJ_SUPERIOR) ? " (sup)" : ""), OBJ_FLAGGED(tpd->obj, OBJ_ENCHANTED) ? " (ench)" : "", (tpd->player == GET_IDNUM(ch)) ? " (your auction)" : "", can_wear ? "" : " (can't use)");
 		
 		if (size + strlen(line) < sizeof(output)) {
 			size += snprintf(output + size, sizeof(output) - size, "%s", line);
@@ -1720,6 +1735,9 @@ void trade_cancel(char_data *ch, char *argument) {
 	for (tpd = trading_list; tpd; tpd = tpd->next) {
 		// disqualifiers -- this should be the same as trade_check since the player uses it to find numbers
 		if (tpd->player != GET_IDNUM(ch)) {
+			continue;
+		}
+		if (!tpd->obj) {
 			continue;
 		}
 		if (IS_SET(tpd->state, TPD_EXPIRED) && (!IS_SET(tpd->state, TPD_OBJ_PENDING) || !tpd->obj)) {
@@ -1906,6 +1924,9 @@ void trade_post(char_data *ch, char *argument) {
 	}
 	else if (OBJ_BOUND_TO(obj)) {
 		msg_to_char(ch, "You can't trade bound items.\r\n");
+	}
+	else if (IS_STOLEN(obj)) {
+		msg_to_char(ch, "You can't post stolen items.\r\n");
 	}
 	else if ((cost = atoi(costarg)) < 1) {
 		msg_to_char(ch, "You must charge at least 1 coin.\r\n");
@@ -2327,9 +2348,8 @@ void warehouse_store(char_data *ch, char *argument) {
 		for (obj = ch->carrying; obj && !full; obj = next_obj) {
 			next_obj = obj->next_content;
 			
-			// we use !OBJ_CAN_STORE because it blocks things that can be stored normally
 			// bound objects never store, nor can torches
-			if (!OBJ_CAN_STORE(obj) && !OBJ_BOUND_TO(obj) && (!OBJ_FLAGGED(obj, OBJ_LIGHT) || GET_OBJ_TIMER(obj) == UNLIMITED)) {
+			if (!OBJ_FLAGGED(obj, OBJ_KEEP) && UNIQUE_OBJ_CAN_STORE(obj)) {
 				// may extract obj
 				store_unique_item(ch, obj, GET_LOYALTY(ch), IN_ROOM(ch), &full);
 				if (!full) {
@@ -2359,9 +2379,8 @@ void warehouse_store(char_data *ch, char *argument) {
 		while (obj && (dotmode == FIND_ALLDOT || count < total)) {
 			next_obj = get_obj_in_list_vis(ch, argument, obj->next_content);
 
-			// we use !OBJ_CAN_STORE because it blocks things that can be stored normally			
 			// bound objects never store
-			if (!OBJ_CAN_STORE(obj) && !OBJ_BOUND_TO(obj) && (!OBJ_FLAGGED(obj, OBJ_LIGHT) || GET_OBJ_TIMER(obj) == UNLIMITED)) {
+			if ((!OBJ_FLAGGED(obj, OBJ_KEEP) || (total == 1 && dotmode != FIND_ALLDOT)) && UNIQUE_OBJ_CAN_STORE(obj)) {
 				// may extract obj
 				store_unique_item(ch, obj, GET_LOYALTY(ch), IN_ROOM(ch), &full);
 				if (!full) {
@@ -2417,7 +2436,7 @@ ACMD(do_draw) {
 
 	// attempt to remove existing wield
 	if (GET_EQ(ch, WEAR_WIELD)) {
-		perform_remove(ch, WEAR_WIELD, FALSE, TRUE);
+		perform_remove(ch, WEAR_WIELD);
 		
 		// did it work? if not, player got an error
 		if (GET_EQ(ch, WEAR_WIELD)) {
@@ -2436,7 +2455,7 @@ ACMD(do_drink) {
 	obj_data *obj = NULL;
 	int amount, i, liquid;
 	double thirst_amt, hunger_amt;
-	int type = NOTHING;
+	int type = drink_OBJ;
 	room_data *to_room;
 
 	one_argument(argument, arg);
@@ -2609,6 +2628,7 @@ ACMD(do_drop) {
 	int this, dotmode, amount = 0, multi, coin_amt;
 	empire_data *coin_emp;
 	const char *sname;
+	bool any = FALSE;
 	char *argpos;
 
 	switch (subcmd) {
@@ -2675,13 +2695,23 @@ ACMD(do_drop) {
 			else {
 				for (obj = ch->carrying; obj; obj = next_obj) {
 					next_obj = obj->next_content;
+					
+					if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
+						continue;
+					}
+					
 					this = perform_drop(ch, obj, mode, sname);
 					if (this == -1) {
 						break;
 					}
 					else {
 						amount += this;
+						any = TRUE;
 					}
+				}
+				
+				if (!any) {
+					msg_to_char(ch, "You don't have anything that isn't marked 'keep'.\r\n");
 				}
 			}
 		}
@@ -2694,9 +2724,15 @@ ACMD(do_drop) {
 			if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
 				sprintf(buf, "You don't seem to have any %ss.\r\n", arg);
 				send_to_char(buf, ch);
+				return;
 			}
 			while (obj) {
 				next_obj = get_obj_in_list_vis(ch, arg, obj->next_content);
+				if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
+					obj = next_obj;
+					continue;
+				}
+				
 				this = perform_drop(ch, obj, mode, sname);
 				obj = next_obj;
 				if (this == -1) {
@@ -2704,7 +2740,12 @@ ACMD(do_drop) {
 				}
 				else {
 					amount += this;
+					any = TRUE;
 				}
+			}
+			
+			if (!any) {
+				msg_to_char(ch, "You don't have any that aren't marked 'keep'.\r\n");
 			}
 		}
 		else {
@@ -2723,6 +2764,8 @@ ACMD(do_drop) {
 ACMD(do_eat) {
 	extern bool check_vampire_sun(char_data *ch, bool message);
 	void taste_blood(char_data *ch, char_data *vict);
+	
+	char buf[MAX_STRING_LENGTH];
 	char_data *vict;
 	obj_data *food;
 	int amount;
@@ -2782,22 +2825,36 @@ ACMD(do_eat) {
 		GET_OBJ_VAL(food, VAL_FOOD_HOURS_OF_FULLNESS) -= amount / REAL_UPDATES_PER_MUD_HOUR;
 	}
 
-	// primary messaging
+	// prepare for messaging
 	if (IS_FOOD(food) && GET_FOOD_HOURS_OF_FULLNESS(food) <= 0) {
 		// end of the food
-		act("You eat $p.", FALSE, ch, food, 0, TO_CHAR);
-		act("$n eats $p.", FALSE, ch, food, 0, TO_ROOM);
 		extract = TRUE;
 	}
-	else {
-		if (subcmd == SCMD_EAT) {
-			act("You eat some of $p.", FALSE, ch, food, 0, TO_CHAR);
-			act("$n eats some of $p.", TRUE, ch, food, 0, TO_ROOM);
+	
+	// messaging
+	if (extract || subcmd == SCMD_EAT) {
+		// message to char
+		if (has_custom_message(food, OBJ_CUSTOM_EAT_TO_CHAR)) {
+			act(get_custom_message(food, OBJ_CUSTOM_EAT_TO_CHAR), FALSE, ch, food, NULL, TO_CHAR);
 		}
 		else {
-			act("You nibble a little bit of $p.", FALSE, ch, food, 0, TO_CHAR);
-			act("$n tastes a little bit of $p.", TRUE, ch, food, 0, TO_ROOM);
+			snprintf(buf, sizeof(buf), "You eat %s$p.", (extract ? "" : "some of "));
+			act(buf, FALSE, ch, food, NULL, TO_CHAR);
 		}
+
+		// message to room
+		if (has_custom_message(food, OBJ_CUSTOM_EAT_TO_ROOM)) {
+			act(get_custom_message(food, OBJ_CUSTOM_EAT_TO_ROOM), FALSE, ch, food, NULL, TO_ROOM);
+		}
+		else {
+			snprintf(buf, sizeof(buf), "$n eats %s$p.", (extract ? "" : "some of "));
+			act(buf, TRUE, ch, food, NULL, TO_ROOM);
+		}
+	}
+	else {
+		// just tasting
+		act("You nibble a little bit of $p.", FALSE, ch, food, 0, TO_CHAR);
+		act("$n tastes a little bit of $p.", TRUE, ch, food, 0, TO_ROOM);
 	}
 
 	// additional messages
@@ -2814,6 +2871,7 @@ ACMD(do_eat) {
 ACMD(do_exchange) {
 	int dotmode, carrying, amount, new;
 	empire_data *emp, *coin_emp;
+	char buf[MAX_STRING_LENGTH];
 	struct coin_data *coin;
 	obj_data *obj, *next_obj;
 	double rate;
@@ -2864,7 +2922,8 @@ ACMD(do_exchange) {
 		}
 		else {
 			// success!
-			msg_to_char(ch, "You exchange %s for %s.\r\n", money_amount(coin_emp, amount), money_amount(emp, new));
+			strcpy(buf, money_amount(coin_emp, amount));
+			msg_to_char(ch, "You exchange %s for %s.\r\n", buf, money_amount(emp, new));
 			act("$n exchanges some coins.", TRUE, ch, NULL, NULL, TO_ROOM);
 			decrease_coins(ch, coin_emp, amount);
 			increase_coins(ch, emp, new);
@@ -2881,6 +2940,10 @@ ACMD(do_exchange) {
 			
 			for (obj = ch->carrying; obj; obj = next_obj) {
 				next_obj = obj->next_content;
+				
+				if (!OBJ_FLAGGED(obj, OBJ_KEEP)) {
+					continue;
+				}
 				
 				if (!perform_exchange(ch, obj, emp)) {
 					break;
@@ -2903,8 +2966,10 @@ ACMD(do_exchange) {
 			
 				while (obj) {
 					next_obj = get_obj_in_list_vis(ch, arg, obj->next_content);
-					if (!perform_exchange(ch, obj, emp)) {
-						break;
+					if (!OBJ_FLAGGED(obj, OBJ_KEEP)) {
+						if (!perform_exchange(ch, obj, emp)) {
+							break;
+						}
 					}
 					obj = next_obj;
 				}
@@ -2938,7 +3003,10 @@ ACMD(do_get) {
 	argument = two_arguments(argument, arg1, arg2);
 	one_argument(argument, arg3);
 
-	if (!*arg1)
+	if (IS_NPC(ch) && AFF_FLAGGED(ch, AFF_CHARM)) {
+		msg_to_char(ch, "Charmed NPCs cannot pick items up.\r\n");
+	}
+	else if (!*arg1)
 		send_to_char("Get what?\r\n", ch);
 	else if (!*arg2)
 		get_from_room(ch, arg1, 1);
@@ -3011,6 +3079,7 @@ ACMD(do_give) {
 	obj_data *obj, *next_obj;
 	char *argpos;
 	empire_data *coin_emp;
+	bool any = FALSE;
 	
 	// give coins?
 	if ((argpos = find_coin_arg(argument, &coin_emp, &coin_amt, FALSE)) > argument && coin_amt > 0) {
@@ -3041,10 +3110,20 @@ ACMD(do_give) {
 			send_to_char(buf, ch);
 		}
 		else {
-			while (obj && amount--) {
+			while (obj && amount > 0) {
 				next_obj = get_obj_in_list_vis(ch, arg, obj->next_content);
-				perform_give(ch, vict, obj);
+				
+				if (!OBJ_FLAGGED(obj, OBJ_KEEP)) {
+					perform_give(ch, vict, obj);
+					--amount;
+					any = TRUE;
+				}
+				
 				obj = next_obj;
+			}
+			
+			if (!any) {
+				msg_to_char(ch, "You don't seem to have any of those that aren't set 'keep'.\r\n");
 			}
 		}
 	}
@@ -3069,11 +3148,18 @@ ACMD(do_give) {
 			}
 			if (!ch->carrying)
 				send_to_char("You don't seem to be holding anything.\r\n", ch);
-			else
+			else {
 				for (obj = ch->carrying; obj; obj = next_obj) {
 					next_obj = obj->next_content;
-					if (CAN_SEE_OBJ(ch, obj) && ((dotmode == FIND_ALL || isname(arg, GET_OBJ_KEYWORDS(obj)))))
+					if (CAN_SEE_OBJ(ch, obj) && !OBJ_FLAGGED(obj, OBJ_KEEP) && ((dotmode == FIND_ALL || isname(arg, GET_OBJ_KEYWORDS(obj))))) {
 						perform_give(ch, vict, obj);
+						any = TRUE;
+					}
+				}
+				
+				if (!any) {
+					msg_to_char(ch, "You don't seem to have any of those that aren't set 'keep'.\r\n");
+				}
 			}
 		}
 	}
@@ -3100,7 +3186,7 @@ ACMD(do_grab) {
 	}
 	else if (CAN_WEAR(obj, ITEM_WEAR_RANGED)) {
 		if (GET_EQ(ch, WEAR_RANGED)) {
-			perform_remove(ch, WEAR_RANGED, TRUE, FALSE);
+			perform_remove(ch, WEAR_RANGED);
 		}
 		perform_wear(ch, obj, WEAR_RANGED);
 	}
@@ -3111,7 +3197,7 @@ ACMD(do_grab) {
 		else {
 			// remove existing item
 			if (GET_EQ(ch, WEAR_HOLD)) {
-				perform_remove(ch, WEAR_HOLD, TRUE, FALSE);
+				perform_remove(ch, WEAR_HOLD);
 			}
 			perform_wear(ch, obj, WEAR_HOLD);
 		}
@@ -3135,8 +3221,97 @@ ACMD(do_identify) {
 		msg_to_char(ch, "You see nothing like that here.\r\n");
 	}
 	else {
-		charge_ability_cost(ch, NOTHING, 0, NOTHING, 0);
+		charge_ability_cost(ch, NOTHING, 0, NOTHING, 0, WAIT_OTHER);
 		identify_obj_to_char(obj, ch);
+	}
+}
+
+
+ACMD(do_keep) {
+	char arg[MAX_INPUT_LENGTH];
+	obj_data *obj, *next_obj;
+	int dotmode, mode = SCMD_KEEP;
+	const char *sname;
+
+	// validate mode
+	switch (subcmd) {
+		case SCMD_KEEP: {
+			sname = "keep";
+			mode = SCMD_KEEP;
+			break;
+		}
+		case SCMD_UNKEEP:
+		default: {
+			sname = "unkeep";
+			mode = SCMD_UNKEEP;
+			break;
+		}
+	}
+
+	argument = one_argument(argument, arg);
+
+	if (!*arg) {
+		sprintf(buf, "What do you want to %s?\r\n", sname);
+		send_to_char(buf, ch);
+		return;
+	}
+	
+	dotmode = find_all_dots(arg);
+
+	if (dotmode == FIND_ALL) {
+		if (!ch->carrying) {
+			send_to_char("You don't seem to be carrying anything.\r\n", ch);
+		}
+		else {
+			for (obj = ch->carrying; obj; obj = next_obj) {
+				next_obj = obj->next_content;
+				
+				if (mode == SCMD_KEEP) {
+					SET_BIT(GET_OBJ_EXTRA(obj), OBJ_KEEP);
+				}
+				else {
+					REMOVE_BIT(GET_OBJ_EXTRA(obj), OBJ_KEEP);
+				}
+			}
+			
+			msg_to_char(ch, "You %s all items in your inventory.\r\n", sname);
+		}
+	}
+	else if (dotmode == FIND_ALLDOT) {
+		if (!*arg) {
+			msg_to_char(ch, "What do you want to %s all of?\r\n", sname);
+			return;
+		}
+		if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+			msg_to_char(ch, "You don't seem to have any %ss.\r\n", arg);
+		}
+		while (obj) {
+			next_obj = get_obj_in_list_vis(ch, arg, obj->next_content);
+			if (mode == SCMD_KEEP) {
+				SET_BIT(GET_OBJ_EXTRA(obj), OBJ_KEEP);
+			}
+			else {
+				REMOVE_BIT(GET_OBJ_EXTRA(obj), OBJ_KEEP);
+			}
+			sprintf(buf, "You %s $p.", sname);
+			act(buf, FALSE, ch, obj, NULL, TO_CHAR);
+			obj = next_obj;
+		}
+	}
+	else {
+		if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+			msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
+		}
+		else {
+			if (mode == SCMD_KEEP) {
+				SET_BIT(GET_OBJ_EXTRA(obj), OBJ_KEEP);
+			}
+			else {
+				REMOVE_BIT(GET_OBJ_EXTRA(obj), OBJ_KEEP);
+			}
+			sprintf(buf, "You %s $p.", sname);
+			act(buf, FALSE, ch, obj, NULL, TO_CHAR);
+		}
 	}
 }
 
@@ -3144,7 +3319,6 @@ ACMD(do_identify) {
 ACMD(do_light) {
 	obj_data *obj, *flint = NULL;
 	bool magic = !IS_NPC(ch) && HAS_ABILITY(ch, ABIL_TOUCH_OF_FLAME);
-	bool junk;
 
 	one_argument(argument, arg);
 
@@ -3178,9 +3352,9 @@ ACMD(do_light) {
 		
 		// will extract no matter what happens here
 		empty_obj_before_extract(obj);
-		run_interactions(ch, obj->interactions, INTERACT_LIGHT, IN_ROOM(ch), NULL, obj, light_obj_interact, &junk);
+		run_interactions(ch, obj->interactions, INTERACT_LIGHT, IN_ROOM(ch), NULL, obj, light_obj_interact);
 		extract_obj(obj);
-		WAIT_STATE(ch, 1 RL_SEC);
+		command_lag(ch, WAIT_OTHER);
 	}
 }
 
@@ -3264,7 +3438,7 @@ ACMD(do_pour) {
 		return;
 	}
 	if (GET_DRINK_CONTAINER_CONTENTS(from_obj) == 0) {
-		act("The $p is empty.", FALSE, ch, from_obj, 0, TO_CHAR);
+		act("$p is empty.", FALSE, ch, from_obj, 0, TO_CHAR);
 		return;
 	}
 	if (subcmd == SCMD_POUR) {	/* pour */
@@ -3313,7 +3487,7 @@ ACMD(do_pour) {
 		return;
 	}
 	if (subcmd == SCMD_POUR) {
-		sprintf(buf, "You pour the %s into the %s.", drinks[GET_DRINK_CONTAINER_TYPE(from_obj)], arg2);
+		sprintf(buf, "You pour the %s into %s.", drinks[GET_DRINK_CONTAINER_TYPE(from_obj)], GET_OBJ_SHORT_DESC(to_obj));
 		send_to_char(buf, ch);
 	}
 	if (subcmd == SCMD_FILL) {
@@ -3363,6 +3537,7 @@ ACMD(do_put) {
 	char_data *tmp_char;
 	int obj_dotmode, cont_dotmode, found = 0, howmany = 1;
 	char *theobj, *thecont;
+	bool multi = FALSE;
 
 	argument = two_arguments(argument, arg1, arg2);
 	one_argument(argument, arg3);
@@ -3371,6 +3546,7 @@ ACMD(do_put) {
 		howmany = atoi(arg1);
 		theobj = arg2;
 		thecont = arg3;
+		multi = (howmany > 1);
 	}
 	else {
 		theobj = arg1;
@@ -3405,13 +3581,26 @@ ACMD(do_put) {
 				}
 				else if (obj == cont)
 					send_to_char("You attempt to fold it into itself, but fail.\r\n", ch);
+				else if (multi && OBJ_FLAGGED(obj, OBJ_KEEP)) {
+					msg_to_char(ch, "You marked that 'keep' and can't put it in anything unless you unkeep it.\r\n");
+				}
 				else {
 					obj_data *next_obj;
 					while(obj && howmany--) {
 						next_obj = obj->next_content;
+						
+						if (multi && OBJ_FLAGGED(obj, OBJ_KEEP)) {
+							continue;
+						}
+						
 						if (!perform_put(ch, obj, cont))
 							break;
 						obj = get_obj_in_list_vis(ch, theobj, next_obj);
+						found = 1;
+					}
+					
+					if (!found) {
+						msg_to_char(ch, "You didn't seem to have any that aren't marked 'keep'.\r\n");
 					}
 				}
 			}
@@ -3419,6 +3608,9 @@ ACMD(do_put) {
 				for (obj = ch->carrying; obj; obj = next_obj) {
 					next_obj = obj->next_content;
 					if (obj != cont && CAN_SEE_OBJ(ch, obj) && (obj_dotmode == FIND_ALL || isname(theobj, GET_OBJ_KEYWORDS(obj)))) {
+						if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
+							continue;
+						}
 						found = 1;
 						if (!perform_put(ch, obj, cont))
 							break;
@@ -3426,9 +3618,9 @@ ACMD(do_put) {
 				}
 				if (!found) {
 					if (obj_dotmode == FIND_ALL)
-						send_to_char("You don't seem to have anything to put in it.\r\n", ch);
+						send_to_char("You don't seem to have any non-keep items to put in it.\r\n", ch);
 					else {
-						sprintf(buf, "You don't seem to have any %ss.\r\n", theobj);
+						sprintf(buf, "You don't seem to have any %ss that aren't marked 'keep'.\r\n", theobj);
 						send_to_char(buf, ch);
 					}
 				}
@@ -3474,7 +3666,7 @@ ACMD(do_remove) {
 		found = 0;
 		for (i = 0; i < NUM_WEARS; i++)
 			if (GET_EQ(ch, i)) {
-				perform_remove(ch, i, FALSE, TRUE);
+				perform_remove(ch, i);
 				found = 1;
 			}
 		if (!found)
@@ -3487,7 +3679,7 @@ ACMD(do_remove) {
 			found = 0;
 			for (i = 0; i < NUM_WEARS; i++)
 				if (GET_EQ(ch, i) && CAN_SEE_OBJ(ch, GET_EQ(ch, i)) && isname(arg, GET_OBJ_KEYWORDS(GET_EQ(ch, i)))) {
-					perform_remove(ch, i, FALSE, TRUE);
+					perform_remove(ch, i);
 					found = 1;
 				}
 			if (!found) {
@@ -3503,7 +3695,7 @@ ACMD(do_remove) {
 			send_to_char(buf, ch);
 		}
 		else
-			perform_remove(ch, i, FALSE, TRUE);
+			perform_remove(ch, i);
 	}
 }
 
@@ -3824,7 +4016,7 @@ ACMD(do_store) {
 		for (obj = ch->carrying; obj; obj = next_obj) {
 			next_obj = obj->next_content;
 			
-			if (OBJ_CAN_STORE(obj) && obj_can_be_stored(obj, IN_ROOM(ch))) {
+			if (!OBJ_FLAGGED(obj, OBJ_KEEP) && OBJ_CAN_STORE(obj) && obj_can_be_stored(obj, IN_ROOM(ch))) {
 				if ((store = find_stored_resource(emp, GET_ISLAND_ID(IN_ROOM(ch)), GET_OBJ_VNUM(obj)))) {
 					if (store->amount >= MAX_STORAGE) {
 						full = 1;
@@ -3856,7 +4048,7 @@ ACMD(do_store) {
 		while (obj && (dotmode == FIND_ALLDOT || count < total)) {
 			next_obj = get_obj_in_list_vis(ch, arg, obj->next_content);
 			
-			if (OBJ_CAN_STORE(obj) && obj_can_be_stored(obj, IN_ROOM(ch))) {
+			if ((!OBJ_FLAGGED(obj, OBJ_KEEP) || (total == 1 && dotmode != FIND_ALLDOT)) && OBJ_CAN_STORE(obj) && obj_can_be_stored(obj, IN_ROOM(ch))) {
 				if ((store = find_stored_resource(emp, GET_ISLAND_ID(IN_ROOM(ch)), GET_OBJ_VNUM(obj)))) {
 					if (store->amount >= MAX_STORAGE) {
 						full = 1;
@@ -4134,7 +4326,7 @@ ACMD(do_wield) {
 	}
 	else {
 		if (GET_EQ(ch, WEAR_WIELD)) {
-			perform_remove(ch, WEAR_WIELD, TRUE, FALSE);
+			perform_remove(ch, WEAR_WIELD);
 		}
 		perform_wear(ch, obj, WEAR_WIELD);
 	}

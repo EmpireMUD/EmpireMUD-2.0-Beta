@@ -1,0 +1,306 @@
+#10400
+guard panicked~
+the panicked guard~
+A panicked guard is fleeing the hamlet!
+~
+0 0 bdv nD
+1 0 0 15
+T 10400
+T 10401
+S
+#10401
+ghoul crouching~
+a crouching ghoul~
+A ghoul is crouched here, looking up at you.
+~
+0 0 abd s
+0 0 0 10
+I 4 10408 3.00 1 X  # LOOT: tarnished silver earrings
+I 4 10409 3.00 1 X  # LOOT: a steel chain
+I 4 10410 3.00 1 X  # LOOT: ringmail bracers
+I 4 10411 3.00 1 X  # LOOT: a ring of pearls
+I 4 10412 3.00 1 X  # LOOT: a fine village dress
+I 4 10413 3.00 1 X  # LOOT: a handsome village suit
+I 4 10414 3.00 1 X  # LOOT: an imperium weddding band
+I 4 10415 3.00 1 X  # LOOT: an heirloom cloth necklace
+T 10405
+S
+#10402
+panther huge familiar~
+a huge panther~
+A huge panther, surely a mage's familiar, is prowling the street.
+~
+0 0 bdz 0
+0 0 0 9
+I 4 10408 6.00 1 X  # LOOT: tarnished silver earrings
+I 4 10409 6.00 1 X  # LOOT: a steel chain
+I 4 10410 6.00 1 X  # LOOT: ringmail bracers
+I 4 10411 6.00 1 X  # LOOT: a ring of pearls
+I 4 10412 6.00 1 X  # LOOT: a fine village dress
+I 4 10413 6.00 1 X  # LOOT: a handsome village suit
+I 4 10414 6.00 1 X  # LOOT: an imperium weddding band
+I 4 10415 6.00 1 X  # LOOT: an heirloom cloth necklace
+T 10405
+S
+#10403
+panther huge familiar~
+a giant cobra~
+There is a giant cobra familiar coiled in the street.
+~
+0 0 bdz 0
+0 0 0 9
+I 4 10408 6.00 1 X  # LOOT: tarnished silver earrings
+I 4 10409 6.00 1 X  # LOOT: a steel chain
+I 4 10410 6.00 1 X  # LOOT: ringmail bracers
+I 4 10411 6.00 1 X  # LOOT: a ring of pearls
+I 4 10412 6.00 1 X  # LOOT: a fine village dress
+I 4 10413 6.00 1 X  # LOOT: a handsome village suit
+I 4 10414 6.00 1 X  # LOOT: an imperium weddding band
+I 4 10415 6.00 1 X  # LOOT: an heirloom cloth necklace
+T 10405
+S
+#10404
+skeleton giant animated~
+the giant skeleton~
+The animated skeleton of a giant looms tall over the street!
+~
+0 0 bdA 0
+0 0 0 5
+I 4 10418 2.00 1 X  # LOOT: a skeletal horse whip
+I 4 10416 20.00 1 X  # LOOT: a giant bone mace
+I 4 10417 20.00 1 X  # LOOT: a tattered cloak of manasilk
+I 4 10419 20.00 1 X  # LOOT: a pair of enchanted boots
+T 10405
+T 10410
+S
+#10405
+mammoth skeletal~
+the skeletal mammoth~
+A skeletal mammoth blocks the entire street!
+~
+0 0 bdyA 0
+0 0 0 27
+I 4 10420 2.00 1 X  # LOOT: a skeletal mammoth crop
+I 4 10418 4.00 1 X  # LOOT: a skeletal horse whip
+I 4 10421 20.00 1 X  # LOOT: a mammoth spear
+I 4 10422 20.00 1 X  # LOOT: an imperium-weave cloak
+I 4 10423 20.00 1 X  # LOOT: shackles of the undead
+T 10405
+T 10406
+T 10410
+S
+#10406
+armor animated suit~
+the animated armor~
+An animated suit of armor swings its sword at you!
+~
+0 0 bdzA 0
+0 0 0 1
+I 4 10408 6.00 1 X  # LOOT: tarnished silver earrings
+I 4 10409 6.00 1 X  # LOOT: a steel chain
+I 4 10410 6.00 1 X  # LOOT: ringmail bracers
+I 4 10411 6.00 1 X  # LOOT: a ring of pearls
+I 4 10412 6.00 1 X  # LOOT: a fine village dress
+I 4 10413 6.00 1 X  # LOOT: a handsome village suit
+I 4 10414 6.00 1 X  # LOOT: an imperium weddding band
+I 4 10415 6.00 1 X  # LOOT: an heirloom cloth necklace
+T 10405
+S
+#10407
+imp green~
+a green imp~
+A green imp scampers down the shopfront!
+~
+0 0 bdzA 0
+0 0 0 16
+I 4 10408 6.00 1 X  # LOOT: tarnished silver earrings
+I 4 10409 6.00 1 X  # LOOT: a steel chain
+I 4 10410 6.00 1 X  # LOOT: ringmail bracers
+I 4 10411 6.00 1 X  # LOOT: a ring of pearls
+I 4 10412 6.00 1 X  # LOOT: a fine village dress
+I 4 10413 6.00 1 X  # LOOT: a handsome village suit
+I 4 10414 6.00 1 X  # LOOT: an imperium weddding band
+I 4 10415 6.00 1 X  # LOOT: an heirloom cloth necklace
+T 10405
+S
+#10408
+demon ruddy big~
+a ruddy demon~
+A big, ruddy demon blocks your path!
+~
+0 0 bdyA 0
+0 0 0 24
+I 4 10408 6.00 1 X  # LOOT: tarnished silver earrings
+I 4 10409 6.00 1 X  # LOOT: a steel chain
+I 4 10410 6.00 1 X  # LOOT: ringmail bracers
+I 4 10411 6.00 1 X  # LOOT: a ring of pearls
+I 4 10412 6.00 1 X  # LOOT: a fine village dress
+I 4 10413 6.00 1 X  # LOOT: a handsome village suit
+I 4 10414 6.00 1 X  # LOOT: an imperium weddding band
+I 4 10415 6.00 1 X  # LOOT: an heirloom cloth necklace
+T 10405
+S
+#10409
+necrofiend fiend nine-legged~
+the necrofiend~
+A nine-legged necrofiend crawls over the blockade!
+~
+0 0 bdB 0
+0 0 0 20
+I 4 10418 2.00 1 X  # LOOT: a skeletal horse whip
+I 4 10424 20.00 1 X  # LOOT: a disjointed necrofiend leg
+I 4 10425 20.00 1 X  # LOOT: a studded bone shield
+I 4 10426 20.00 1 X  # LOOT: the necrofiend's majesty
+T 10405
+T 10411
+S
+#10410
+#n infernomancer~
+Infernomancer #n~
+Infernomancer #n drags waves of fire over the square!
+~
+0 0 bdxzB 0
+0 2 0 16
+I 4 10420 2.00 1 X  # LOOT: a skeletal mammoth crop
+I 4 10418 4.00 1 X  # LOOT: a skeletal horse whip
+I 4 10427 20.00 1 X  # LOOT: the infernomancer's flame
+I 4 10428 20.00 1 X  # LOOT: the purifying flame
+I 4 10429 20.00 1 X  # LOOT: a terrifying leather mask
+T 10405
+T 10406
+T 10412
+S
+#10411
+watchman risen~
+a risen watchman~
+A risen watchman shambles down the street.
+~
+0 0 abdzA 0
+1 0 0 2
+I 4 10408 3.00 1 X  # LOOT: tarnished silver earrings
+I 4 10409 3.00 1 X  # LOOT: a steel chain
+I 4 10410 3.00 1 X  # LOOT: ringmail bracers
+I 4 10411 3.00 1 X  # LOOT: a ring of pearls
+I 4 10412 3.00 1 X  # LOOT: a fine village dress
+I 4 10413 3.00 1 X  # LOOT: a handsome village suit
+I 4 10414 3.00 1 X  # LOOT: an imperium weddding band
+I 4 10415 3.00 1 X  # LOOT: an heirloom cloth necklace
+T 10405
+S
+#10412
+monk risen~
+a risen monk~
+A risen monk is gnawing on his own arm.
+~
+0 0 bdB 0
+1 0 0 9
+I 4 10408 6.00 1 X  # LOOT: tarnished silver earrings
+I 4 10409 6.00 1 X  # LOOT: a steel chain
+I 4 10410 6.00 1 X  # LOOT: ringmail bracers
+I 4 10411 6.00 1 X  # LOOT: a ring of pearls
+I 4 10412 6.00 1 X  # LOOT: a fine village dress
+I 4 10413 6.00 1 X  # LOOT: a handsome village suit
+I 4 10414 6.00 1 X  # LOOT: an imperium weddding band
+I 4 10415 6.00 1 X  # LOOT: an heirloom cloth necklace
+T 10405
+S
+#10413
+guard temple risen~
+a risen temple guard~
+A risen temple guard lurches toward you!
+~
+0 0 bdB 0
+1 0 0 5
+I 4 10408 6.00 1 X  # LOOT: tarnished silver earrings
+I 4 10409 6.00 1 X  # LOOT: a steel chain
+I 4 10410 6.00 1 X  # LOOT: ringmail bracers
+I 4 10411 6.00 1 X  # LOOT: a ring of pearls
+I 4 10412 6.00 1 X  # LOOT: a fine village dress
+I 4 10413 6.00 1 X  # LOOT: a handsome village suit
+I 4 10414 6.00 1 X  # LOOT: an imperium weddding band
+I 4 10415 6.00 1 X  # LOOT: an heirloom cloth necklace
+T 10405
+S
+#10414
+#n necromancer~
+Necromancer #n~
+A necromancer is preparing a dark spell over one of the corpses.
+~
+0 0 bdxAB 0
+2 2 0 19
+I 4 10418 2.00 1 X  # LOOT: a skeletal horse whip
+I 4 10430 20.00 1 X  # LOOT: the necromancer's staff
+I 4 10431 20.00 1 X  # LOOT: a pair of ghoulsbane gauntlets
+I 4 10432 20.00 1 X  # LOOT: a necrotic mail skirt
+T 10405
+T 10409
+S
+#10415
+#n necromaster~
+Necromaster #n~
+Necromaster #n is shouting orders to the cultists!
+~
+0 0 bdxAB 0
+0 2 0 21
+I 4 10420 2.00 1 X  # LOOT: a skeletal mammoth crop
+I 4 10418 4.00 1 X  # LOOT: a skeletal horse whip
+I 4 10433 20.00 1 X  # LOOT: Fiendclaw
+I 4 10434 20.00 1 X  # LOOT: deathlace gloves
+I 4 10435 20.00 1 X  # LOOT: a hanged man's hand
+T 10405
+T 10406
+T 10409
+S
+#10416
+citizen fleeing~
+a fleeing citizen~
+A fleeing citizen looks absolutely panicked!
+~
+40 80 dv 0
+2 0 0 15
+T 10416
+S
+#10417
+zombie shambling citizen~
+a shambling zombie~
+The shambling zombie of a citizen stumbles toward you.
+~
+40 80 dv 0
+0 0 0 9
+T 10417
+S
+#10418
+horse skeletal~
+a skeletal horse~
+A skeletal horse munches fruitlessly at the turf.
+~
+30 60 dej 0
+0 0 14 11
+I 3 10419 100.00 1 X  # BARDE: a skeletal warhorse
+S
+#10419
+warhorse horse skeletal~
+a skeletal warhorse~
+A skeletal warhorse rears and kicks at the air.
+~
+40 80 bdej 0
+0 0 0 11
+S
+#10420
+mammoth skeletal bony huge~
+a skeletal mammoth~
+A huge, bony skeletal mammoth stands over you.
+~
+100 120 dejy 0
+0 0 0 5
+I 3 10421 100.00 1 X  # BARDE: a skeletal warmammoth
+S
+#10421
+mammoth skeletal warmammoth huge~
+a skeletal warmammoth~
+A huge skeletal warmammoth looms down on you.
+~
+100 120 dejy 0
+0 0 0 5
+S
+$

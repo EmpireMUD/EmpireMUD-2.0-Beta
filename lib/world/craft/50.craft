@@ -1,7 +1,7 @@
 #5000
 grave~
 -1 0  # 0x UNKNOWN
-8 -1 0 1 53
+8 -1 0 1 2117
 B
 5000 be 0
 S
@@ -31,7 +31,7 @@ caveshelter~
 -1 1  # 1x UNKNOWN
 8 79 0 1 -1
 B
-5004 c bdeklmno
+5004 c bcdeklmno
 S
 #5005
 jungleshelter~

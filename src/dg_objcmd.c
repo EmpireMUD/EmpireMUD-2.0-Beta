@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: dg_objcmd.c                                     EmpireMUD 2.0b1 *
+*   File: dg_objcmd.c                                     EmpireMUD 2.0b2 *
 *  Usage: contains the command_interpreter for objects, object commands.  *
 *                                                                         *
 *  DG Scripts code by galion, 1996/08/04 23:10:16, revision 3.8           *
@@ -32,9 +32,11 @@ extern int dg_owner_purged;
 // external functions
 void obj_command_interpreter(obj_data *obj, char *argument);
 void send_char_pos(char_data *ch, int dam);
+extern struct instance_data *find_instance_by_room(room_data *room);
 char_data *get_char_by_obj(obj_data *obj, char *name);
 obj_data *get_obj_by_obj(obj_data *obj, char *name);
 room_data *get_room(room_data *ref, char *name);
+void instance_obj_setup(struct instance_data *inst, obj_data *obj);
 void sub_write(char *arg, char_data *ch, byte find_invis, int targets);
 void die(char_data *ch, char_data *killer);
 void scale_item_to_level(obj_data *obj, int level);
@@ -424,9 +426,7 @@ OCMD(do_opurge) {
 }
 
 
-OCMD(do_oteleport) {
-	extern struct instance_data *find_instance_by_room(room_data *room);
-	
+OCMD(do_oteleport) {	
 	char_data *ch, *next_ch;
 	room_data *target, *orm = obj_room(obj);
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
@@ -515,6 +515,7 @@ OCMD(do_dgoload) {
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+	struct instance_data *inst = NULL;
 	int number = 0;
 	room_data *room;
 	char_data *mob, *tch;
@@ -533,6 +534,10 @@ OCMD(do_dgoload) {
 	if (!(room = obj_room(obj))) {
 		obj_log(obj, "oload: object in no location trying to load");
 		return;
+	}
+	
+	if (obj_room(obj)) {
+		inst = find_instance_by_room(obj_room(obj));
 	}
 
 	if (is_abbrev(arg1, "mob")) {
@@ -557,6 +562,10 @@ OCMD(do_dgoload) {
 		if ((object = read_object(number)) == NULL) {
 			obj_log(obj, "oload: bad object vnum");
 			return;
+		}
+		
+		if (inst) {
+			instance_obj_setup(inst, object);
 		}
 
 		/* special handling to make objects able to load on a person/in a container/worn etc. */

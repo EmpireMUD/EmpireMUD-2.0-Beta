@@ -155,12 +155,12 @@ Mobs (MEDIT):
 - ANIMAL mobs will take double damage from players with Hunt.
 - Consider using a must-fight script (like a Leave trigger with "return 0")
   rather than the AGGR flag.
-- If your mob spawns in a dark adventure, strongly consider givign it INFRA.
+- If your mob spawns in a dark adventure, strongly consider giving it INFRA.
 - Animal mobs usually need a BUTCHER and SKIN interaction.
 
 Objects (OEDIT):
 - The most significant keyword should always be first. A fiery torch should put
-  "torch" first. Joe's amaazing magical wand should put "wand" first. The first
+  "torch" first. Joe's amazing magical wand should put "wand" first. The first
   keyword may be used to build sentences such as "You attack with your wand."
 - Most equipment should be set SCALABLE, and there are very few acceptable
   reasons not to do so. We prefer you rely on the scaling engine rather than
@@ -303,8 +303,9 @@ The following adventure flags are available:
  LOCK-LEVEL-ON-COMBAT - Instance level locks when a player fights.
  !NEARBY - Instances do not show up when players type nearby.
  ROTATABLE - Each instance will have a random orientation (whole zone rotates).
+ CONFUSING-RANDOMS - The instancer will not logically match random exits.
 
-See also: OLC ADVENTURES
+See also: OLC ADVENTURES, OLC REMOVEINDEV
 #d
 "ADVEDIT LIMIT" "INSTANCE LIMIT"
 
@@ -350,6 +351,18 @@ CAUTION: You must not use designated rooms (or any "building" with the ROOM
 flag) for this, because they can't be built on the map.
 
 See also: ADVEDIT LINKING, SECTEDIT BUILDFLAGS, VNUM
+#d
+"ADVEDIT NOT-NEAR-SELF" "ADVEDIT LINK NOT-NEAR-SELF" "ADVEDIT LINKING NOT-NEAR-SELF"
+
+Usage:  .linking add NOT-NEAR-SELF <distance>
+
+This linking rule limits all other rules based on distance. You can use it to
+keep the same adventure from spawning two copies in close proximity.
+
+All distances are measured in map tiles. Setting a NOT-NEAR-SELF of 50 would
+mean no two copies of the adventure will link within 50 tiles of each other.
+
+See also: ADVEDIT LINKING
 #d
 "ADVEDIT PORTAL-WORLD" "ADVEDIT LINK PORTAL-WORLD" "ADVEDIT LINKING PORTAL-WORLD"
 
@@ -436,6 +449,7 @@ See specific help files for each type: &yHELP ADVEDIT <TYPE>&0
  PORTAL-BDG-NEW: Builds the building on the map and puts a portal in it (no
     interior rooms).
  TIME-LIMIT: Removes instances after a certain number of minutes expire.
+ NOT-NEAR-SELF: Prevent the adventure from linking near other copies of itself.
 
 Available flags:
  CLAIMED-OK - Can link to claimed locations (default: unclaimed only).
@@ -526,7 +540,7 @@ The following affect flags are available:
  ENTANGLED - Cannot move -- do not use this on items.
  SLOW - Combat speed reduced, like the Slow spell.
  STUNNED - Can't participate in combat or move -- do not use this on items.
- STONED - Sees the world in stange, trippy colors.
+ STONED - Sees the world in strange, trippy colors.
  !BLOOD - Cannot spend blood points.
  CLAWS - Boosted vampire claws as barehand melee attack.
  DEATHSHROUD - Appears as a corpse and cannot act -- do not use this on items.
@@ -784,7 +798,7 @@ See also:  OLC BUILDINGS
 Usage:  .name <name>
 
 The 'name' property is used by some commands like 'territory' and 'vnum' to
-search for buildings, so it shoudl be reasonably unique. It's also shown as
+search for buildings, so it should be reasonably unique. It's also shown as
 the short form of a building in some sentences.
 
 You should choose a name that's as short as possible. For example, if your
@@ -1002,7 +1016,7 @@ Available flags:
     to be dismantled, but not built; it won't show up in the build list
  IN-CITY-ONLY - a craft or building can only be made in a city radius
 
-See also: CEDIT TYPE, OLC CRAFTS
+See also: CEDIT TYPE, OLC CRAFTS, OLC REMOVEINDEV
 #d
 "CEDIT LIQUID"
 
@@ -1057,6 +1071,7 @@ See also: OLC CRAFTS, VNUM
 "CEDIT RESOURCE"
 
 Usage:  .resource add <amount> <vnum>
+        .resource change <number> <quantity | vnum> <value>
         .resource remove <number | all>
         .resource move <number> <up | down>
 
@@ -1254,7 +1269,7 @@ See also: OLC LEVELS
 #d
 "MAP OLC" "OLC MAP" "WORLD OLC" "MAP EDITOR" MAPEDIT
 
-Usage: .map <command>
+Usage:  .map <command>
 
 The .olc map editor is a tool for modifying and customizing individual parts
 of the map. Unlike the other editors, it doesn't use contextual menus. The
@@ -1453,7 +1468,35 @@ if it was using a weapon of that type.
 
 For humans with no weapon, use #16 hit.
 
-For animals, use #10 bite, #11 claw, #12 kick, or #16 hit.
+The following attack types are available:
+ 1. RESERVED - do not use
+ 2. slash - sword
+ 3. slice - axe
+ 4. jab - rapier
+ 5. stab - dagger
+ 6. pound - rock
+ 7. hammer - hammer
+ 8. whip - whip weapon or tentacle-whip
+ 9. pick - as for mining
+10. bite - animals
+11. claw - fist weapons; also used by animals
+12. kick - animals
+13. fire - physical fire like a torch
+14. vampire claws
+15. crush - animals or giants
+16. hit - normal punching (no weapon)
+17. magic fire - fireball
+18. lightning staff
+19. burn staff
+20. agony staff
+21. magic frost - chill
+22. magic shock - shock
+23. magic light - flash
+24. sting - animals
+25. swipe - animals, giants, etc
+26. tail swipe - animals
+27. peck - animals
+28. gore - animals
 
 See also: OLC MOBILES
 #d
@@ -1503,7 +1546,8 @@ See also: OLC MOBILES
 #d
 "MEDIT INTERACTION" "BEDIT INTERACTION" "OEDIT INTERACTION" "REDIT INTERACTION" "SECTEDIT INTERACTION" "CROPEDIT INTERACTION" INTERACTIONS
 
-Usage:  .interaction add <type> <quantity> <vnum> <percent> [exclusive]
+Usage:  .interaction add <type> <quantity> <vnum> <percent> [exclusion code]
+        .interaction change <number> <field> <value>
         .interaction copy <from type> <from vnum>
         .interaction remove <number | all>
         .interaction move <number> <up | down>
@@ -1536,17 +1580,19 @@ than 1, the percent is only checked once for the entire quantity. If you want
 each copy of an item to have its own percent roll, list them separately as
 quantity 1.
 
-The exclusive flag stops the list if that item passes its percentage test. If
-you don't set exclusive, each the system continues down the list for that
-interaction type and can spawn multiple items/mobs.
+The exclusion code (optional) may be any letter, which changes how random
+interactions are chosen. All items with the same exclusion code have a cumu-
+lative roll (meaning if the percents add up to 100, one of them is guaranteed)
+but only one item from the same exclusion set will ever pass. The rest will
+fail. If you don't set an exclusion code, the interaction is not exclusive and
+always gets its own percent roll.
 
 You can use '.interact move' to rearrange entries. Interactions are always
-processed from top to bottom, so the exclusive flag prevents anything
-vertically lower in the list (higher number on the interaction display).
+processed from top to bottom.
 
 Example of a rare result from barding (order matters here):
- 1. BARDE: 1x an epic warhorse .50% (exclusive)
- 2. BARDE: 1x a warhorse 100%
+ 1. BARDE: 1x an epic warhorse .50% (e)
+ 2. BARDE: 1x a warhorse 100% (e)
 
 Example of possible multiple results from shear:
  1. SHEAR: 1x some wool 100.00%
@@ -1703,7 +1749,7 @@ using it. The following applies are available. Most are self-explanatory:
  STRENGTH - characters can't use an item that would reduce them below 1 strength
  DEXTERITY - chance to hit/dodge
  HEALTH-REGEN - rate of health regen (per 5 second tick)
- CHARISMA - characters can't use an item that would reduce them below 1 charism
+ CHARISMA - characters can't use an item that would reduce them below 1 charisma
  GREATNESS - empire meta-trait
  MOVE-REGEN - rate of move regen (per 5 second tick)
  MANA-REGEN - rate of mana regen (per 5 second tick)
@@ -1711,7 +1757,7 @@ using it. The following applies are available. Most are self-explanatory:
  WITS - combat speed
  AGE - this actually raises/lowers the player's age, which has no effect
  MAX-MOVE - move pool
- SOAK - this is damage absorption
+ RESIST-PHYSICAL - physical damage reduction
  BLOCK - block only matters if the player has a shield
  * - not used
  MAX-HEALTH - health pool
@@ -1723,6 +1769,7 @@ using it. The following applies are available. Most are self-explanatory:
  BONUS-PHYSICAL - added to strength-based damage
  BONUS-MAGICAL - added to magical damage
  BONUS-HEALING - added to damage healed (by abilities this player uses)
+ RESIST-MAGICAL - magical damage reduction
 
 See also: OLC OBJECTS
 #d
@@ -1734,16 +1781,11 @@ Armor items may have several different types set. This determines which ability
 is required to wear the item. If an item does not need to be skill-restricted,
 use the WORN item type instead of ARMOR.
 
-cloth - Requires basic Battle skill. Cloth armor should provide little physical
-   protection and is best for caster gear or weak civilian armor.
-leather - Requires a DPS Battle specialty. It should provide low physical
-   protection and give bonuses to hit and damage.
-medium - Requires a tank Battle specialty. It should give moderate physical
-   protection and should take away a small amount of DPS ability, like -WITS
-   or -DAMAGE.
-heavy - Requires Battle as a class skill with a tank specialty. This type can
-   provide the most physical protection via applies like SOAK, but should also
-   take away DPS ability with -WITS, -DAMAGE, -STRENGTH, and similar.
+mage - Should provide caster or healer traits and no real protection.
+light - Should provide melee DPS traits.
+medium - Should provide both DPS and tank traits, such as to-hit and dodge.
+heavy - Should include a -WITS or -STRENGTH penalty, and should include only
+   tank traits.
 
 See also: OLC OBJECTS, APPLIES
 #d
@@ -1867,6 +1909,8 @@ Message types:
  build-to-room - Shown to the room when the item is built into a building.
  instrument-to-char - Shown every few seconds to the person playing the instrument.
  instrument-to-room - Shown every few seconds to the room when someone is playing an instrument.
+ eat-to-char - Shown to the person when they eat the item.
+ eat-to-room - Shown to the room when a person eats an item.
 
 See also: OLC OBJECTS
 #d
@@ -1884,7 +1928,7 @@ or slow/fast flags.
 
 Weapons that are slow but strong deal the same DPS as weapons that are fast
 but weak. Some strategies prefer one way or the other. For most purposes, two
-weapons are considred equal if their DPS (not their raw damage) is equal.
+weapons are considered equal if their DPS (not their raw damage) is equal.
 
 For SCALABLE objects, thus number is a scalable value if it is set to a number
 other than 0.
@@ -1901,7 +1945,7 @@ Usage:  .extra add <keywords>
 This command lets you add or edit extra descriptions. These are additional
 descriptions that the player may 'look' at. 
 
-For objects, tthe object's main description is set on the 'lookdescription'
+For objects, the object's main description is set on the 'lookdescription'
 command.
 
 The keywords are a list of different words the player may look at, and the
@@ -1943,6 +1987,14 @@ Available flags:
  BOE - item binds to a player when it is equipped
  BOP - item binds to a player when it is picked up
  STAFF - counts as a staff (even if it doesn't have a staff weapon type)
+ UNCOLLECTED-LOOT - will decay on the ground if no player gets it
+ *KEEP - player has marked the object with the 'keep' command
+ TOOL-PAN - can pan for gold if holding this
+ TOOL-SHOVEL - acts as a shovel for dig and excavate
+ !AUTOSTORE - will not autostore (e.g. furniture)
+ HARD-DROP - was dropped by a HARD mob (CAUTION: it will set this itself when dropped as loot)
+ GROUP-DROP - was dropped by a GROUP mob (CAUTION: it will set this itself when dropped as loot)
+ GENERIC-DROP - never receives the HARD-DROP/GROUP-DROP flags
 
 See also: OLC OBJECTS
 #d
@@ -1970,7 +2022,7 @@ See also: ITEM SCALING, OEDIT DECAY, OLC OBJECTS
 #d
 "OEDIT KEYWORDS"
 
-Usage: .keywords <list>
+Usage:  .keywords <list>
 
 Keywords are the terms you can use to interact with an item. This is a list
 of all available one-word terms. Any identifying word in an object's name
@@ -2304,7 +2356,7 @@ that only people with the correct permission can withdraw it.
 
 See also: OEDIT STORAGE, OLC OBJECTS
 #d
-"OEDIT WEAPONTYPE" OEDIT WEAPON TYPE" "WEAPON TYPES" "ATTACK TYPES"
+"OEDIT WEAPONTYPE" "OEDIT WEAPON TYPE" "WEAPON TYPES" "ATTACK TYPES"
 
 Usage:  .weapontype <type>
 
@@ -2410,7 +2462,7 @@ Example:
 
 For notes on the mud's building rules, see HELP BUILDING GUIDE.
 
-See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE, OLC REMOVEINDEV
 #d
 "OLC BUILDINGS" BEDIT
 
@@ -2519,7 +2571,7 @@ See also: CROPEDIT INTERACTION, OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
 #d
 "OLC DELETE"
 
-Usage: .<type> delete <vnum>
+Usage:  .<type> delete <vnum>
 
 This command deletes an object (or mob, or whatever) from the database
 entirely. All copies of that object are immediately destroyed.
@@ -2530,7 +2582,7 @@ See also: VNUM
 #d
 "OLC EDIT"
 
-Usage: .<type> edit <vnum>
+Usage:  .<type> edit <vnum>
 
 This command opens the OLC editor with the object (or mob, or whatever) with
 the vnum you specified. If it's a new vnum, it opens a fresh editor and the
@@ -2576,8 +2628,8 @@ See also: OLC FREE, VNUM
 #d
 "OLC MOBILES" MEDIT "MOBILE OLC" "MOBILE EDITOR" "MOB OLC" "MOB EDITOR" MEDIT
 
-Usage: .m <command>
-       .<command>
+Usage:  .m <command>
+        .<command>
 
 The .olc mob editor is a tool for creating and editing mobiles. It provides a
 simple in-game menu with contextual choices to allow you to easily create new
@@ -2620,6 +2672,17 @@ Example:
 For notes on the mud's building rules, see HELP BUILDING GUIDE.
 
 See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
+"OLC REMOVEINDEVELOPMENT" REMOVEINDEV "OLC REMOVE IN-DEVELOPMENT"
+
+Usage:  .removeindev <adventure vnum>
+        .removeindev <from vnum>-<to vnum>
+
+This command removes the IN-DEVELOPMENT flag from an adventure and any craft
+recipes in it, or from craft recipes over a given vnum range. It can be used
+to quickly activate a zone.
+
+See also: OLC CONTROLS, OLC ADVENTURES, ADVEDIT FLAGS, CEDIT FLAGS
 #d
 "OLC ROOM TEMPLATES" "OLC ROOMTEMPLATES" "OLC ROOMS" REDIT
 
@@ -2735,6 +2798,7 @@ See also: OLC ROOM TEMPLATES, STRING EDITOR
 "REDIT EXITS"
 
 Usage:  .exit add <dir> <room template vnum> [keywords if door]
+        .exit change <number> <field> <value>
         .exit remove <number | all>
 
 Room templates can exit only to other room templates -- never to real rooms
@@ -2745,6 +2809,9 @@ direction will be chosen for you.
 
 If you wish to create a door that opens and closes, specify door keyword(s) at
 the end of the exit add.
+
+You can use 'change' to alter an exit's direction, target, or keywords.
+Changing the keywords to 'none' removes the door.
 
 Examples:
  > .exit add random 1234
@@ -2802,6 +2869,7 @@ See also: OLC ROOM TEMPLATES
 "REDIT SPAWNS"
 
 Usage:  .spawn add <type> <vnum> <percent> <limit>
+        .spawn change <number> <vnum | percent | limit> <value>
         .spawn copy <from type> <from vnum>
         .spawn remove <number | all>
 
@@ -3044,7 +3112,7 @@ a comma (,). Only text you type starting with a , will be added to the string.
 You can enter full-string-edit mode using ,/, (or turn that mode off the same
 way).
 
-The string editor is used to edit player decriptions, board messages, mail
+The string editor is used to edit player descriptions, board messages, mail
 letters, and more. You can type '/h' inside the string editor for a list of
 its commands.
 
@@ -3144,6 +3212,7 @@ The following triggers are available for mobs:
  Memory
  Ability
  Leave
+ Leave-All
  Door
 
 See also: OLC TRIGGERS, TRIGEDIT ARGUMENTS, TRIGEDIT NUMARG, TRIGEDIT TYPES
@@ -3189,7 +3258,7 @@ Mob names can use certain special codes in order to dynamically add names.
 You can use these codes in the short description, long description, and
 keywords.
 
-- #n  Pick a random name from the chosen nameset. If the gender is left neutal,
+- #n  Pick a random name from the chosen nameset. If the gender is left neutral,
       it will also pick a random gender.
 
 - #e  Empire name. For this to work, you need to set the mob as a claimed-only
@@ -3206,15 +3275,15 @@ abilities to use it. Armor items may be set to any wear locations, but there
 is a worn-as-armor slot that must always be this item type. Armor items will
 scale higher than non-armor items.
 
-Cloth armor is for casters and healers, and should give very little soak.
+Mage armor is for casters and healers.
 
-Leather armor is for melee damage characters and should give damage traits.
+Light armor is for melee damage characters and should give damage traits.
 
-Medium armor is the lower tanking tier, and may include penalties to traits
-like Wits or Strength, which are not needed by tanks.
+Medium armor is for PVP or solo adventuring, and should give both DPS and
+   tank traits on the same item.
 
-Heavy armor is the high tanking tier, and should always include penalties to
-damage traits in order to keep players from being both tank and dps.
+Heavy armor should always include -WITS, -STRENGTH, or other melee penalties.
+   It should only include tank traits otherwise.
 #d
 "ARROW ITEM" "ARROW OBJECT"
 
@@ -3246,7 +3315,7 @@ you want a ship.
 The BOOK type is used along with the bookedit interface and EmpireMUD's library
 system. You can spawn books in adventures by writing them in the book editor,
 then assigning their book ID to a book object in your adventure zone. The
-data from the book editor will override your short decription, long desc-
+data from the book editor will override your short description, long desc-
 ription, and look description.
 #d
 "CART ITEM" "CART OBJECT"

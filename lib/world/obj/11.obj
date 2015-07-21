@@ -4,52 +4,30 @@ a portal~
 A portal spins and crackles before you.~
 You can enter the portal and find yourself somewhere else entirely!
 ~
-8 0 0
+8 0 0 1
 0 0 0
 10 0
 S
 #1101
-sword blood-red bloodred red~
-the blood-red sword~
-The blood-red sword is dripping on the ground.~
+sword crimson bloodsword~
+a crimson bloodsword~
+A bloodsword is puddling on the ground.~
+The sword drips with blood.
 ~
-1 g ano
-0 4 1
+1 gmp an 2
+0 3 1
 10 0
-S
-#1102
-sword blood-red bloodred red~
-the blood-red sword~
-The blood-red sword is dripping on the ground.~
-~
-1 g ano
-0 5 1
-10 0
-S
-#1103
-sword blood-red bloodred red~
-the blood-red sword~
-The blood-red sword is dripping on the ground.~
-~
-1 g ano
-0 6 1
-10 0
-S
-#1104
-sword crimson blood~
-the crimson blood sword~
-The crimson blood sword is dripping on the ground.~
-~
-1 g ano
-0 7 1
-10 0
+A
+17 1
+C
+0 0
 S
 #1105
 fireball~
 a fireball~
 A fireball is rolling around here.~
 ~
-1 g ano
+1 g ano 1
 0 0 16
 10 0
 S
@@ -59,7 +37,7 @@ an orb of light~
 A glowing orb is floating here.~
 This orb provides a bright light to the room.
 ~
-3 cg ao
+3 cg ao 1
 0 0 0
 10 36
 S
@@ -69,11 +47,11 @@ a wooden staff~
 A wooden staff has been left here.~
 The staff is the signature weapon of High Sorcery.
 ~
-1 ehlmo an
+1 ehlmo an 1
 0 1 5
 0 0
 C
-0 0
+0 50
 S
 #1108
 staff wanderer's wanderers~
@@ -81,7 +59,7 @@ a wanderer's staff~
 A wanderer's staff has fallen on the ground.~
 The staff is the signature weapon of High Sorcery.
 ~
-1 ehjlmo an
+1 ehjlmo an 1
 0 3 17
 0 0
 A
@@ -97,7 +75,7 @@ a sorcerer's staff~
 A sorcerer's staff has been dropped here.~
 The staff is the signature weapon of High Sorcery.
 ~
-1 ehjlmo an
+1 ehjlmo an 1
 0 4 17
 0 0
 A
@@ -111,7 +89,7 @@ a staff of wisdom~
 A staff of wisdom has fallen to the ground.~
 The staff is the signature weapon of High Sorcery.
 ~
-1 ehjlmo an
+1 ehjlmo an 1
 0 4 17
 0 0
 A
@@ -125,7 +103,7 @@ a staff of lightning~
 A staff of lightning is crackling with energy on the ground.~
 The staff is the signature weapon of High Sorcery.
 ~
-1 ejmo an
+1 ejmo an 1
 0 4 17
 0 0
 A
@@ -141,7 +119,7 @@ a burning staff~
 A burning staff is planted in the ground.~
 The staff is the signature weapon of High Sorcery.
 ~
-1 ejmo an
+1 ejmo an 1
 0 6 18
 0 0
 A
@@ -157,13 +135,11 @@ a staff of agony~
 A staff of agony is wailing dreadfully.~
 The staff is the signature weapon of High Sorcery.
 ~
-1 ejmo an
-0 5 19
+1 ejmo an 1
+0 3 19
 0 0
 A
-17 2
-A
-3 1
+17 1
 C
 0 0
 S
@@ -173,12 +149,58 @@ an imperium spike~
 An imperium spike is sitting on the ground.~
 The imperium spike can be used for the Ritual of Defense.
 ~
-1 h ano
+1 h ano 1
 0 3 8
 2 0
 R
 5164 0
 R
 5511 0
+S
+#1115
+crystal nexus~
+a nexus crystal~
+A nexus crystal is lying here.~
+   The nexus crystal is a small, fiery gem that is used to open portals in
+certain buildings. See HELP PORTAL for information on how to use them.
+~
+3 0 a 1
+0 0 0
+8 0
+R
+5185 0
+S
+#1116
+&0~
+do not use~
+Leave this object blank, it's a placeholder to block a recipe slot.~
+Or, use this vnum for an item that is NOT made by a recipe.
+There are 4 recipes for item 1115.
+~
+0 0 0 1
+0 0 0
+0 0
+S
+#1117
+&0~
+do not use~
+Leave this object blank, it's a placeholder to block a recipe slot.~
+Or, use this vnum for an item that is NOT made by a recipe.
+There are 4 recipes for item 1115.
+~
+0 0 0 1
+0 0 0
+0 0
+S
+#1118
+&0~
+do not use~
+Leave this object blank, it's a placeholder to block a recipe slot.~
+Or, use this vnum for an item that is NOT made by a recipe.
+There are 4 recipes for item 1115.
+~
+0 0 0 1
+0 0 0
+0 0
 S
 $

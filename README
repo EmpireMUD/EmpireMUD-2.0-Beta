@@ -1,3 +1,6 @@
+Warning: Always back up your EmpireMUD before updating your git checkout. Some
+patches may require playerfile conversions or may have other unexpected side-
+effects.
 
                            EmpireMUD README File
                            ---------------------
@@ -11,7 +14,7 @@ http://www.circlemud.org
 
 Out of respect for our hard work, I ask that you keep all of my credits in
 tact (including the headers in each of the files) and maintain your own
-integrity by properly repsecting all contributers.
+integrity by properly respecting all contributors.
 
 Paul Clarke
 paul@empiremud.net

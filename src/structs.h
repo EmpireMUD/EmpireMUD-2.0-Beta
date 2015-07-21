@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: structs.h                                       EmpireMUD 2.0b1 *
+*   File: structs.h                                       EmpireMUD 2.0b2 *
 *  Usage: header file for central structures and contstants               *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -86,6 +86,9 @@
 
 // ***WARNING*** Change this before starting your playerfile
 // but NEVER change it after, or you may not be able to log in to any character
+// NOTE: You should use a salt starting with "$5$" and ending with "$" in order
+// to get support for longer passwords and proper encryption, e.g. "$5$salt$"
+// See http://linux.die.net/man/3/crypt for more info.
 #define PASSWORD_SALT  "salt"
 
 // this determines if a room is "empty ocean" and doesn't need to stay in RAM
@@ -105,7 +108,7 @@
 //// BASIC TYPES AND CONSTS //////////////////////////////////////////////////
 
 #define BIT(bit)  (((bitvector_t)1) << ((bitvector_t)(bit)))
-#define SPECIAL(name)  void (name)(void *me)
+#define PROMO_APPLY(name)	void (name)(char_data *ch)
 
 
 /*
@@ -211,7 +214,7 @@ typedef struct trig_data trig_data;
 #define APPLY_WITS  9	// Apply to wits
 #define APPLY_AGE  10	// Apply to age
 #define APPLY_MOVE  11	// Apply to max move points
-#define APPLY_SOAK  12	// Apply to soak pool
+#define APPLY_RESIST_PHYSICAL  12	// Apply to physical damage resistance
 #define APPLY_BLOCK  13	// Apply to chance to block
 #define APPLY_HEAL_OVER_TIME  14	// heals you every 5
 #define APPLY_HEALTH  15	// Apply to max health
@@ -223,6 +226,7 @@ typedef struct trig_data trig_data;
 #define APPLY_BONUS_PHYSICAL  21	// add to bonus damage
 #define APPLY_BONUS_MAGICAL  22	// add to magical damage
 #define APPLY_BONUS_HEALING  23	// add to healing
+#define APPLY_RESIST_MAGICAL  24	// Apply to magic damage resistance
 
 
 // don't change these
@@ -282,6 +286,7 @@ typedef struct trig_data trig_data;
 #define ADV_LOCK_LEVEL_ON_COMBAT  BIT(2)	// lock levels when combat starts
 #define ADV_NO_NEARBY  BIT(3)	// hide from mortal nearby command
 #define ADV_ROTATABLE  BIT(4)	// random rotation on instantiate
+#define ADV_CONFUSING_RANDOMS  BIT(5)	// random exits do not need to match
 
 
 // adventure link rule types
@@ -291,6 +296,7 @@ typedef struct trig_data trig_data;
 #define ADV_LINK_PORTAL_BUILDING_EXISTING  3
 #define ADV_LINK_PORTAL_BUILDING_NEW  4
 #define ADV_LINK_TIME_LIMIT  5
+#define ADV_LINK_NOT_NEAR_SELF  6
 
 
 // adventure link rule flags
@@ -362,6 +368,7 @@ typedef struct trig_data trig_data;
 #define BLD_HIGH_DEPLETION  BIT(37)	// allows more resource farming here
 #define BLD_PORTAL  BIT(38)	// functions as a portal building
 #define BLD_BEDROOM  BIT(39)	// boosts regen when sleeping
+#define BLD_NO_DELETE  BIT(40)	// will not be deleted for not having a homeroom
 
 
 // Terrain flags for do_build -- these match up with build_on flags for building crafts
@@ -431,7 +438,7 @@ typedef struct trig_data trig_data;
 
 // extra attributes -- ATT_x
 #define ATT_BONUS_INVENTORY  0	// carry capacity
-#define ATT_SOAK  1	// damage absorption
+#define ATT_RESIST_PHYSICAL  1	// damage reduction
 #define ATT_BLOCK  2	// bonus block chance
 #define ATT_TO_HIT  3	// bonus to-hit chance
 #define ATT_DODGE  4	// bonus dodge chance
@@ -440,7 +447,8 @@ typedef struct trig_data trig_data;
 #define ATT_BONUS_MAGICAL  7	// extra magical damage
 #define ATT_BONUS_HEALING  8	// extra healing
 #define ATT_HEAL_OVER_TIME  9	// heal per 5
-#define NUM_EXTRA_ATTRIBUTES  10
+#define ATT_RESIST_MAGICAL  10	// damage reduction
+#define NUM_EXTRA_ATTRIBUTES  11
 #define TOTAL_EXTRA_ATTRIBUTES  20	// including spares, 10 spares remaining -- **DO NOT CHANGE**
 
 
@@ -463,15 +471,15 @@ typedef struct trig_data trig_data;
 #define AFF_IMMUNE_HIGH_SORCERY  BIT(14)	// o. immune to high sorcery debuffs
 #define AFF_DISARM  BIT(15)	// p. disarmed
 #define AFF_HASTE  BIT(16)	// q. haste: attacks faster
-#define AFF_ENTANGLED  BIT(17)	// r. engtangled: can't move
+#define AFF_ENTANGLED  BIT(17)	// r. entangled: can't move
 #define AFF_SLOW  BIT(18)	// s. slow (how great did that work out)
 #define AFF_STUNNED  BIT(19)	// t. stunned/unable to act
 #define AFF_STONED  BIT(20)	// u. trippy effects
 #define AFF_CANT_SPEND_BLOOD  BIT(21)	// v. hinder vitae
 #define AFF_CLAWS  BIT(22)	// w. claws
 #define AFF_DEATHSHROUD  BIT(23)	// x. deathshroud
-#define AFF_EARTHMELD  BIT(24)	// y. interred in the eart
-#define AFF_MUMMIFY  BIT(25)	// z. mummifiedh
+#define AFF_EARTHMELD  BIT(24)	// y. interred in the earth
+#define AFF_MUMMIFY  BIT(25)	// z. mummified
 #define AFF_SOULMASK  BIT(26)	// A. soulmask
 #define AFF_IMMUNE_NATURAL_MAGIC  BIT(27)	// B. immune to natural magic debuffs
 #define AFF_IMMUNE_STEALTH  BIT(28)	// C. Immune to stealth debuffs
@@ -600,6 +608,7 @@ typedef struct trig_data trig_data;
 #define ELOG_MEMBERS  4	// enroll, promote, demote, etc
 #define ELOG_TERRITORY  5	// territory changes
 #define ELOG_TRADE  6	// auto-trades
+#define ELOG_LOGINS  7	// login/out/alt (does not save to file)
 
 
 // for empire_unique_storage->flags
@@ -775,7 +784,7 @@ typedef struct trig_data trig_data;
 #define MOB_MOUNTAINWALK  BIT(10)	// k. Walks on mountains
 #define MOB_AQUATIC  BIT(11)	// l. Mob lives in the water only
 #define MOB_PLURAL  BIT(12)	// m. Mob represents 2+ creatures
-#define MOB_RANDOM_ENCOUNTER  BIT(13)	// n. Mob which doesn't normally exist
+	#define MOB_UNUSED1  BIT(13)	// no longer used
 #define MOB_SPAWNED  BIT(14)	// o. Mob was spawned and should despawn if nobody is around
 #define MOB_CHAMPION  BIT(15)	// p. Mob auto-rescues its master
 #define MOB_EMPIRE  BIT(16)	// q. empire NPC
@@ -948,6 +957,14 @@ typedef struct trig_data trig_data;
 #define OBJ_BIND_ON_EQUIP  BIT(14)	// o. binds when equipped
 #define OBJ_BIND_ON_PICKUP  BIT(15)	// p. binds when acquired
 #define OBJ_STAFF  BIT(16)	// q. counts as a staff
+#define OBJ_UNCOLLECTED_LOOT  BIT(17)	// r. will junk instead of autostore
+#define OBJ_KEEP  BIT(18)	// s. obj will not be part of any "all" commands like "drop all"
+#define OBJ_TOOL_PAN  BIT(19)	// t. counts as pan
+#define OBJ_TOOL_SHOVEL  BIT(20)	// u. counts as shovel
+#define OBJ_NO_AUTOSTORE  BIT(21)	// v. keeps the game from cleaning it up
+#define OBJ_HARD_DROP  BIT(22)	// w. dropped by a 'hard' mob
+#define OBJ_GROUP_DROP  BIT(23)	// x. dropped by a 'group' mob
+#define OBJ_GENERIC_DROP  BIT(24)	// y. blocks the hard/group drop flags
 
 #define OBJ_BIND_FLAGS  (OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP)	// all bind-on flags
 
@@ -957,6 +974,8 @@ typedef struct trig_data trig_data;
 #define OBJ_CUSTOM_BUILD_TO_ROOM  1
 #define OBJ_CUSTOM_INSTRUMENT_TO_CHAR  2
 #define OBJ_CUSTOM_INSTRUMENT_TO_ROOM  3
+#define OBJ_CUSTOM_EAT_TO_CHAR  4
+#define OBJ_CUSTOM_EAT_TO_ROOM  5
 
 
 // storage flags (for obj storage locations)
@@ -1096,6 +1115,8 @@ typedef struct trig_data trig_data;
 #define CON_GOODBYE  22	// Close on <enter>
 #define CON_BONUS_CREATION  23	// choose bonus trait (new character)
 #define CON_BONUS_EXISTING  24	// choose bonus trait (existing char)
+#define CON_PROMO_CODE  25	// promo code?
+#define CON_CONFIRM_PROMO_CODE  26	// promo confirmation
 
 
 // custom color types
@@ -1114,7 +1135,7 @@ typedef struct trig_data trig_data;
 #define DRUNK  0
 #define FULL  1
 #define THIRST  2
-#define NUM_CONDS  3
+#define NUM_CONDS  3	// WARNING do not change: used in char_file_u
 
 
 // Grant flags allow players to use abilities below the required access level
@@ -1150,6 +1171,10 @@ typedef struct trig_data trig_data;
 #define GRANT_WIZLOCK  BIT(29)
 #define GRANT_RESCALE  BIT(30)
 #define GRANT_AUTHORIZE  BIT(31)
+#define GRANT_FORGIVE  BIT(32)
+#define GRANT_HOSTILE  BIT(33)
+#define GRANT_SLAY  BIT(34)
+#define GRANT_ISLAND  BIT(35)
 
 
 // Lore types
@@ -1251,6 +1276,7 @@ typedef struct trig_data trig_data;
 #define PRF_INFORMATIVE  BIT(23)	// informative map display colors
 #define PRF_NOSPAM  BIT(24)	// blocks periodic action messages
 #define PRF_SCREEN_READER  BIT(25)	// player is visually impaired and using a screen reader that can't read the map
+#define PRF_STEALTHABLE  BIT(26)	// player can steal (rather than be prevented from accidentally stealing)
 
 
 // Rent codes
@@ -1280,6 +1306,16 @@ typedef struct trig_data trig_data;
 #define SYS_SCRIPT  BIT(8)	// script logs
 #define SYS_SYSTEM  BIT(9)	// system stuff
 #define SYS_VALID  BIT(10)	// validation logs
+
+
+// Wait types for the command_lag() function.
+#define WAIT_NONE  -1	// for functions that require a wait_type
+#define WAIT_ABILITY  0	// general abilities
+#define WAIT_COMBAT_ABILITY  1	// ability that does damage or affects combat
+#define WAIT_COMBAT_SPELL  2	// spell that does damage or affects combat (except healing)
+#define WAIT_MOVEMENT  3	// normal move lag
+#define WAIT_SPELL  4	// general spells
+#define WAIT_OTHER  5	// not covered by other categories
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1407,6 +1443,11 @@ typedef struct trig_data trig_data;
 #define EX_CLOSED  BIT(1)	// The door is closed
 
 
+// Island flags -- ISLE_x
+#define ISLE_NEWBIE  BIT(0)	// a. Island follows newbie rules
+#define ISLE_NO_AGGRO  BIT(1)	// b. Island will not fire aggro mobs or guard towers
+
+
 // mine types
 #define MINE_NOT_SET  0	// do not change this -- 0 can't be used, as it represents an uninitialized mine. The rest are arbitrary
 #define MINE_IRON  10
@@ -1477,6 +1518,7 @@ typedef struct trig_data trig_data;
 #define MAX_INPUT_LENGTH  1024	// Max length per *line* of input
 #define MAX_INT  2147483647	// useful for bounds checking
 #define MAX_INVALID_NAMES  200	// ban.c
+#define MAX_ISLAND_NAME  40	// island name length -- seems more than reasonable
 #define MAX_ITEM_DESCRIPTION  4000
 #define MAX_MESSAGES  60	// fight.c
 #define MAX_MOTD_LENGTH  4000	// eedit.c, configs
@@ -1543,6 +1585,7 @@ typedef struct trig_data trig_data;
 // Simple affect structure -- Used in char_file_u **DO NOT CHANGE**
 struct affected_type {
 	sh_int type;	// The type of spell that caused this
+	int cast_by;	// player ID (positive) or mob vnum (negative)
 	sh_int duration;	// For how long its effects will last
 	int modifier;	// This is added to apropriate ability
 	byte location;	// Tells which ability to change - APPLY_x
@@ -1637,13 +1680,23 @@ struct index_data {
 };
 
 
+// for exclusive interaction processing
+struct interact_exclusion_data {
+	int code;	// a-z, A-Z, or empty (stored as an int for easy-int funcs)
+	int rolled_value;	// 1-10000
+	int cumulative_value;	// value so far
+	bool done;	// TRUE if one already passed
+	UT_hash_handle hh;
+};
+
+
 // for the "interactions" system (like butcher, dig, etc) -- INTERACT_x
 struct interaction_item {
 	int type;	// INTERACT_x
 	obj_vnum vnum;	// the skin object
 	double percent;	// how often to do it 0.01 - 100.00
 	int quantity;	// how many to give
-	bool exclusive;	// stops execution if so
+	char exclusion_code;	// creates mutually-exclusive sets
 	
 	struct interaction_item *next;
 };
@@ -1653,6 +1706,14 @@ struct interaction_item {
 struct obj_affected_type {
 	byte location;	// Which ability to change (APPLY_XXX)
 	sh_int modifier;	// How much it changes by
+};
+
+
+// for ad tracking and special promotions
+struct promo_code_list {
+	char *code;
+	bool expired;
+	PROMO_APPLY(*apply_func);
 };
 
 
@@ -2085,6 +2146,7 @@ struct player_special_data_saved {
 	bitvector_t syslogs;	// which syslogs people want to see
 	bitvector_t bonus_traits;	// BONUS_x
 	ubyte bad_pws;	// number of bad password attemps
+	int promo_id;	// entry in the promo_codes table
 
 	// preferences
 	bitvector_t pref;	// preference flags for PCs.
@@ -2106,7 +2168,7 @@ struct player_special_data_saved {
 
 	// some daily stuff
 	int daily_cycle;	// Last update cycle registered
-	ubyte skill_points_available;	// skill points can gain
+	ubyte daily_bonus_experience;	// boosted skill gain points
 	int rewarded_today[MAX_REWARDS_PER_DAY];	// idnums, for ABIL_REWARD
 
 	// action info
@@ -2276,6 +2338,7 @@ struct char_player_data {
 struct char_point_data {
 	int current_pools[NUM_POOLS];	// HEALTH, MOVE, MANA, BLOOD
 	int max_pools[NUM_POOLS];	// HEALTH, MOVE, MANA, BLOOD
+	int deficit[NUM_POOLS];	// HEALTH, MOVE, MANA, BLOOD
 	
 	int extra_attributes[TOTAL_EXTRA_ATTRIBUTES];	// ATT_x (dodge, etc)
 };
@@ -2394,6 +2457,7 @@ struct cooldown_data {
 // for damage-over-time (DoTs) Used in char_file_u **DO NOT CHANGE**
 struct over_time_effect_type {
 	sh_int type;	// ATYPE_x
+	int cast_by;	// player ID (positive) or mob vnum (negative)
 	sh_int duration;	// time in 5-second real-updates
 	sh_int damage_type;	// DAM_x type
 	sh_int damage;	// amount
@@ -2694,6 +2758,8 @@ struct wear_data_type {
 	char *eq_prompt;	// shown on 'eq' list
 	bitvector_t item_wear;	// matching ITEM_WEAR_x
 	bool count_stats;	// FALSE means it's a slot like in-sheath, and adds nothing to the character
+	bool adds_gear_level;	// whether or not it contributes to player gear level
+	int cascade_pos;	// for ring 1 -> ring 2; use NO_WEAR if it doesn't cascade
 	char *already_wearing;	// error message when slot is full
 	char *wear_msg_to_room;	// msg act()'d to room on wear
 	char *wear_msg_to_char;	// msg act()'d to char on wear
@@ -2928,6 +2994,8 @@ struct obj_flag_data {
 // a game item
 struct obj_data {
 	obj_vnum vnum;	// object's virtual number
+	ush_int version;	// for auto-updating objects
+	
 	room_data *in_room;	// In what room -- NULL when container/carried
 
 	struct obj_flag_data obj_flags;	// Object information
@@ -3144,6 +3212,21 @@ struct depletion_data {
 	int count;
 	
 	struct depletion_data *next;
+};
+
+
+// data for the island_table
+struct island_info {
+	any_vnum id;	// game-assigned, permanent id
+	char *name;	// player-designated island naming
+	bitvector_t flags;	// ISLE_x flags
+	
+	// computed data
+	int tile_size;
+	room_vnum center;
+	room_vnum edge[NUM_SIMPLE_DIRS];	// edges
+	
+	UT_hash_handle hh;	// island_table hash
 };
 
 

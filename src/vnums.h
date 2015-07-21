@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: vnums.h                                         EmpireMUD 2.0b1 *
+*   File: vnums.h                                         EmpireMUD 2.0b2 *
 *  Usage: stores commonly-used virtual numbers                            *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -70,6 +70,7 @@
 #define RTYPE_B_ONDECK  5501	// boat
 #define RTYPE_B_STORAGE  5502	// boat
 #define RTYPE_B_BELOWDECK  5503	// boat
+#define RTYPE_SHIP_HOLDING_PEN  5509	// for the shipping system's storage room
 #define RTYPE_STEALTH_HIDEOUT  5510
 #define RTYPE_SORCERER_TOWER  5511
 
@@ -148,10 +149,6 @@
 #define o_ROPE  2035
 #define o_TENT  2036
 
-// forge
-#define o_SHOVEL  2118
-#define o_PAN  2119
-
 // Wood crafts
 #define o_STAKE  915	// could be a flag
 #define o_BLANK_SIGN  918
@@ -170,12 +167,10 @@
 
 // Skill tree items
 #define o_PORTAL  1100  // could probably safely generate a NOTHING item
-#define o_BLOODSWORD_LOW  1101
-#define o_BLOODSWORD_MEDIUM  1102
-#define o_BLOODSWORD_HIGH  1103
-#define o_BLOODSWORD_LEGENDARY  1104
+#define o_BLOODSWORD  1101
 #define o_FIREBALL  1105
 #define o_IMPERIUM_SPIKE  1114
+#define o_NEXUS_CRYSTAL  1115
 
 // herbs
 #define o_WHITEGRASS  1200

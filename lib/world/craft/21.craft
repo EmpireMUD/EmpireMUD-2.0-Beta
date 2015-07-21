@@ -46,7 +46,7 @@ S
 #2106
 stone hammer~
 2106 1  # 1x a stone hammer
-2 198 0 4 100
+2 -1 0 4 100
 R
 919 1  # 1x a wooden handle
 R
@@ -94,15 +94,6 @@ R
 1356 2  # 2x a small piece of leather
 R
 103 1  # 1x a yellow lightning stone
-S
-#2112
-padded armor~
-2112 1  # 1x padded armor
-4 223 g 16 -1
-R
-1359 12  # 12x a bolt of cloth
-R
-1350 4  # 4x a small skin
 S
 #2113
 saddle~

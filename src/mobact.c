@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: mobact.c                                        EmpireMUD 2.0b1 *
+*   File: mobact.c                                        EmpireMUD 2.0b2 *
 *  Usage: Functions for generating intelligent (?) behavior in mobiles    *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -195,10 +195,8 @@ INTERACTION_FUNC(run_one_encounter) {
 */
 void random_encounter(char_data *ch) {
 	extern bool has_boat(char_data *ch);
-	
-	bool junk;
 
-	if (!ch->desc || IS_NPC(ch) || !IN_ROOM(ch) || FIGHTING(ch) || IS_GOD(ch) || NOHASSLE(ch)) {
+	if (!ch->desc || IS_NPC(ch) || !IN_ROOM(ch) || FIGHTING(ch) || IS_GOD(ch) || NOHASSLE(ch) || ISLAND_FLAGGED(IN_ROOM(ch), ISLE_NO_AGGRO)) {
 		return;
 	}
 
@@ -211,7 +209,7 @@ void random_encounter(char_data *ch) {
 		return;
 	}
 
-	run_room_interactions(ch, IN_ROOM(ch), INTERACT_ENCOUNTER, run_one_encounter, &junk);
+	run_room_interactions(ch, IN_ROOM(ch), INTERACT_ENCOUNTER, run_one_encounter);
 }
 
 
@@ -408,7 +406,7 @@ bool mob_can_move_to_sect(char_data *mob, room_data *to_room) {
 	else if (move_type == MOB_MOVE_FLY || AFF_FLAGGED(mob, AFF_FLY)) {
 		ok = TRUE;
 	}
-	else if (ROOM_BLD_FLAGGED(to_room, BLD_NO_NPC)) {
+	else if (ROOM_BLD_FLAGGED(to_room, BLD_NO_NPC) && IS_COMPLETE(to_room)) {
 		// nope
 		ok = FALSE;
 	}
@@ -458,7 +456,7 @@ bool validate_mobile_move(char_data *ch, int dir, room_data *to_room) {
 	bool valid = TRUE;
 	
 	// !mob room
-	if (valid && (RMT_FLAGGED(to_room, RMT_NO_MOB) || ROOM_BLD_FLAGGED(to_room, BLD_NO_NPC))) {
+	if (valid && (RMT_FLAGGED(to_room, RMT_NO_MOB) || (IS_COMPLETE(to_room) && ROOM_BLD_FLAGGED(to_room, BLD_NO_NPC)))) {
 		valid = FALSE;
 	}
 	
@@ -633,17 +631,30 @@ void mobile_activity(void) {
 		found = FALSE;
 
 		/* Aggressive Mobs */
-		if (!found && MOB_FLAGGED(ch, MOB_AGGRESSIVE)) {
+		if (!found && MOB_FLAGGED(ch, MOB_AGGRESSIVE) && !ISLAND_FLAGGED(IN_ROOM(ch), ISLE_NO_AGGRO)) {
 			for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict && !found; vict = vict->next_in_room) {
-				if (!IS_NPC(vict) && vict->desc && CAN_AGGRO(ch, vict) && can_fight(ch, vict)) {
-					if (affected_by_spell(vict, ATYPE_MAJESTY) && !AFF_FLAGGED(ch, AFF_IMMUNE_VAMPIRE)) {
-						gain_ability_exp(vict, ABIL_MAJESTY, 10);
-					}
-
-					if (!CHECK_MAJESTY(vict) || AFF_FLAGGED(ch, AFF_IMMUNE_VAMPIRE)) {
-						hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FALSE);
-						found = TRUE;
-					}
+				if (vict == ch) {
+					continue;
+				}
+				if (!IS_NPC(vict) && !vict->desc) {
+					// linkdead player
+					continue;
+				}
+				if (IS_NPC(vict) && (MOB_FLAGGED(vict, MOB_AGGRESSIVE) || !MOB_FLAGGED(vict, MOB_HUMAN))) {
+					// they will attack humans but not aggro humans
+					continue;
+				}
+				if (!CAN_AGGRO(ch, vict) || !can_fight(ch, vict)) {
+					continue;
+				}
+				
+				// ok good to go
+				if (affected_by_spell(vict, ATYPE_MAJESTY) && !AFF_FLAGGED(ch, AFF_IMMUNE_VAMPIRE)) {
+					gain_ability_exp(vict, ABIL_MAJESTY, 10);
+				}
+				if (!CHECK_MAJESTY(vict) || AFF_FLAGGED(ch, AFF_IMMUNE_VAMPIRE)) {
+					hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FALSE);
+					found = TRUE;
 				}
 			}
 		}
@@ -656,12 +667,15 @@ void mobile_activity(void) {
 				if (vict != ch && (targ = FIGHTING(vict)) && targ != ch && ch->master != targ && (IS_NPC(targ) || GET_ACCESS_LEVEL(targ) < LVL_GOD) && CAN_SEE(ch, targ)) {
 					// matching empire to rescue?
 					if (CAN_AGGRO(ch, vict) && GET_LOYALTY(vict) == GET_LOYALTY(ch)) {
-						// make sure targ (vict's fighting) isn't a pc in my empire
-						if (IS_NPC(targ) || GET_LOYALTY(targ) != GET_LOYALTY(ch)) {
-							if (can_fight(ch, targ)) {
-								// assist vict
-								engage_combat(ch, targ, FALSE);
-								found = TRUE;
+						// make sure it's not a PVP-flagged fight
+						if (IS_NPC(targ) || IS_NPC(vict) || !IS_PVP_FLAGGED(vict)) {
+							// make sure targ (vict's fighting) isn't a pc in my empire
+							if (IS_NPC(targ) || GET_LOYALTY(targ) != GET_LOYALTY(ch)) {
+								if (can_fight(ch, targ)) {
+									// assist vict
+									engage_combat(ch, targ, FALSE);
+									found = TRUE;
+								}
 							}
 						}
 					}
@@ -669,51 +683,53 @@ void mobile_activity(void) {
 			}
 			
 			// look for people to aggro
-			chemp = NULL;
-			for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict && !found; vict = vict->next_in_room) {
-				if (vict == ch) {
-					continue;
-				}
+			if (!ISLAND_FLAGGED(IN_ROOM(ch), ISLE_NO_AGGRO)) {
+				chemp = NULL;
+				for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict && !found; vict = vict->next_in_room) {
+					if (vict == ch) {
+						continue;
+					}
 				
-				// aggro players
-				if (!IS_NPC(vict) && vict->desc) {
-					if (GET_LOYALTY(vict) != GET_LOYALTY(ch) && CAN_AGGRO(ch, vict)) {
-						if (!chemp) {
-							chemp = GET_LOYALTY(ch);
-						}
+					// aggro players
+					if (!IS_NPC(vict) && vict->desc) {
+						if (GET_LOYALTY(vict) != GET_LOYALTY(ch) && CAN_AGGRO(ch, vict)) {
+							if (!chemp) {
+								chemp = GET_LOYALTY(ch);
+							}
 
-						// check character OR their leader for permission to be here, actually
-						if (!((m = vict->master) && in_same_group(vict, m))) {
-							m = vict;
-						}
-						if (GET_LOYALTY(m) != GET_LOYALTY(ch)) {
-							victemp = GET_LOYALTY(vict);
+							// check character OR their leader for permission to be here, actually
+							if (!((m = vict->master) && in_same_group(vict, m))) {
+								m = vict;
+							}
+							if (GET_LOYALTY(m) != GET_LOYALTY(ch)) {
+								victemp = GET_LOYALTY(vict);
 							
-							// check friendly first -- so we don't attack someone who's friendly
-							if (!empire_is_friendly(chemp, victemp) && can_fight(ch, vict)) {
-								if (get_cooldown_time(vict, COOLDOWN_HOSTILE_FLAG) > 0 || (!IS_DISGUISED(vict) && empire_is_hostile(chemp, victemp, IN_ROOM(ch)))) {
-									if (affected_by_spell(vict, ATYPE_MAJESTY) && !AFF_FLAGGED(ch, AFF_IMMUNE_VAMPIRE)) {
-										gain_ability_exp(vict, ABIL_MAJESTY, 10);
-									}
+								// check friendly first -- so we don't attack someone who's friendly
+								if (!empire_is_friendly(chemp, victemp) && can_fight(ch, vict)) {
+									if (IS_HOSTILE(vict) || (!IS_DISGUISED(vict) && empire_is_hostile(chemp, victemp, IN_ROOM(ch)))) {
+										if (affected_by_spell(vict, ATYPE_MAJESTY) && !AFF_FLAGGED(ch, AFF_IMMUNE_VAMPIRE)) {
+											gain_ability_exp(vict, ABIL_MAJESTY, 10);
+										}
 									
-									if (!CHECK_MAJESTY(vict) || AFF_FLAGGED(ch, AFF_IMMUNE_VAMPIRE)) {
-										hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FALSE);
-										found = TRUE;
+										if (!CHECK_MAJESTY(vict) || AFF_FLAGGED(ch, AFF_IMMUNE_VAMPIRE)) {
+											hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FALSE);
+											found = TRUE;
+										}
 									}
 								}
 							}
 						}
 					}
-				}
-				// aggro mobs
-				else if (IS_NPC(vict) && MOB_FLAGGED(vict, MOB_AGGRESSIVE) && GET_LOYALTY(ch) != GET_LOYALTY(vict) && can_fight(ch, vict)) {
-					hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FALSE);
-					found = TRUE;
-				}
-				// hostility against empire mobs
-				else if (IS_NPC(vict) && GET_LOYALTY(vict) && GET_LOYALTY(vict) != GET_LOYALTY(ch) && empire_is_hostile(GET_LOYALTY(ch), GET_LOYALTY(vict), IN_ROOM(ch))) {
-					hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FALSE);
-					found = TRUE;
+					// aggro mobs
+					else if (IS_NPC(vict) && MOB_FLAGGED(vict, MOB_AGGRESSIVE) && GET_LOYALTY(ch) != GET_LOYALTY(vict) && can_fight(ch, vict)) {
+						hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FALSE);
+						found = TRUE;
+					}
+					// hostility against empire mobs
+					else if (IS_NPC(vict) && GET_LOYALTY(vict) && GET_LOYALTY(vict) != GET_LOYALTY(ch) && empire_is_hostile(GET_LOYALTY(ch), GET_LOYALTY(vict), IN_ROOM(ch))) {
+						hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FALSE);
+						found = TRUE;
+					}
 				}
 			}
 		}
@@ -1111,10 +1127,10 @@ void scale_mob_to_level(char_data *mob, int level) {
 	GET_CURRENT_SCALE_LEVEL(mob) = level;
 
 	// health
-	value = (1.5 * low_level) + (2.5 * mid_level) + (3.5 * high_level) + (5 * over_level);
-	value *= MOB_FLAGGED(mob, MOB_TANK) ? 2.0 : 1.0;
-	value *= MOB_FLAGGED(mob, MOB_HARD) ? 2.0 : 1.0;
-	value *= MOB_FLAGGED(mob, MOB_GROUP) ? 3.0 : 1.0;
+	value = (1.5 * low_level) + (3.0 * mid_level) + (4.5 * high_level) + (9.0 * over_level);
+	value *= MOB_FLAGGED(mob, MOB_TANK) ? 3.0 : 1.0;
+	value *= MOB_FLAGGED(mob, MOB_HARD) ? 3.0 : 1.0;
+	value *= MOB_FLAGGED(mob, MOB_GROUP) ? 4.0 : 1.0;
 	mob->points.max_pools[HEALTH] = MAX(1, (int) ceil(value));
 	
 	// move
@@ -1135,66 +1151,66 @@ void scale_mob_to_level(char_data *mob, int level) {
 	value = base_player_pools[BLOOD];
 	value += MOB_FLAGGED(mob, MOB_VAMPIRE) ? ((10 * high_level) + (20 * over_level)) : 0;
 	value *= MOB_FLAGGED(mob, MOB_ANIMAL) ? 0.5 : 1.0;
+	value *= (level <= 10) ? 0.1 : 1.0;
 	mob->points.max_pools[BLOOD] = MAX(1, (int) ceil(value));
 	
 	// strength
-	value = level / 25.0;
+	value = level / 20.0;
 	value *= MOB_FLAGGED(mob, MOB_DPS) ? 1.5 : 1.0;
 	value += MOB_FLAGGED(mob, MOB_HARD) ? 1.5 : 0;
 	value += MOB_FLAGGED(mob, MOB_GROUP) ? 2.0 : 0;
 	mob->real_attributes[STRENGTH] = MAX(1, (int) ceil(value));
 	
 	// dexterity
-	value = level / 25.0;
+	value = level / 20.0;
 	value *= MOB_FLAGGED(mob, MOB_TANK) ? 1.25 : 1.0;
 	value += MOB_FLAGGED(mob, MOB_HARD) ? 1.25 : 0;
 	value += MOB_FLAGGED(mob, MOB_GROUP) ? 2.0 : 0;
 	mob->real_attributes[DEXTERITY] = MAX(1, (int) ceil(value));
 	
 	// charisma
-	value = level / 25.0;
+	value = level / 20.0;
 	value *= MOB_FLAGGED(mob, MOB_HUMAN) ? 1.25 : 1.0;
 	mob->real_attributes[CHARISMA] = MAX(1, (int) ceil(value));
 	
 	// greatness
-	value = level / 25.0;
+	value = level / 20.0;
 	value *= MOB_FLAGGED(mob, MOB_HUMAN) ? 1.25 : 1.0;
 	mob->real_attributes[GREATNESS] = MAX(1, (int) ceil(value));
 	
 	// intelligence
-	value = level / 25.0;
+	value = level / 20.0;
 	value *= MOB_FLAGGED(mob, MOB_CASTER) ? 1.5 : 1.0;
 	value += MOB_FLAGGED(mob, MOB_HARD) ? 1.5 : 0;
 	value += MOB_FLAGGED(mob, MOB_GROUP) ? 2.0 : 0;
 	mob->real_attributes[INTELLIGENCE] = MAX(1, (int) ceil(value));
 	
 	// wits
-	value = level / 25.0;
+	value = level / 20.0;
 	value *= MOB_FLAGGED(mob, MOB_DPS) ? 1.5 : 1.0;
 	value *= MOB_FLAGGED(mob, MOB_TANK) ? 0.5 : 1.0;
 	mob->real_attributes[WITS] = MAX(1, (int) ceil(value));
 	
 	// damage
-	target = level / 20.0;
+	target = (low_level / 20.0) + (mid_level / 17.5) + (high_level / 15.0) + (over_level / 10.0);
 	value = target * attack_hit_info[MOB_ATTACK_TYPE(mob)].speed[SPD_NORMAL];
-	value *= MOB_FLAGGED(mob, MOB_DPS) ? 1.15 : 1.0;
+	value *= MOB_FLAGGED(mob, MOB_DPS) ? 1.25 : 1.0;
 	value *= MOB_FLAGGED(mob, MOB_HARD) ? 2.0 : 1.0;
 	value *= MOB_FLAGGED(mob, MOB_GROUP) ? 3.0 : 1.0;
 	mob->mob_specials.damage = MAX(1, (int) ceil(value));
 	
 	// to-hit
-	value = level / 10.0;
-	value *= MOB_FLAGGED(mob, MOB_DPS) ? 1.5 : 1.0;
-	value *= MOB_FLAGGED(mob, MOB_HARD) ? 2.0 : 1.0;
-	value *= MOB_FLAGGED(mob, MOB_GROUP) ? 3.0 : 1.0;
-	mob->mob_specials.to_hit = MAX(1, (int) ceil(value));
+	value = MAX(0, level - 50) + (level * 0.1);
+	value *= MOB_FLAGGED(mob, MOB_HARD) ? 1.1 : 1.0;
+	value *= MOB_FLAGGED(mob, MOB_GROUP) ? 1.3 : 1.0;
+	value += 50;	// to hit-cap them
+	mob->mob_specials.to_hit = MAX(0, (int) round(value));
 	
 	// to-dodge
-	value = level / 10.0;
-	value *= MOB_FLAGGED(mob, MOB_TANK) ? 1.5 : 1.0;
-	value *= MOB_FLAGGED(mob, MOB_HARD) ? 2.0 : 1.0;
-	value *= MOB_FLAGGED(mob, MOB_GROUP) ? 3.0 : 1.0;
-	mob->mob_specials.to_dodge = MAX(1, (int) ceil(value));
+	value = MAX(0, level - 50) + (level * 0.1);
+	value *= MOB_FLAGGED(mob, MOB_HARD) ? 1.1 : 1.0;
+	value *= MOB_FLAGGED(mob, MOB_GROUP) ? 1.3 : 1.0;
+	mob->mob_specials.to_dodge = MAX(0, (int) round(value));
 	
 	// cleanup
 	for (iter = 0; iter < NUM_POOLS; ++iter) {

@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: class.c                                         EmpireMUD 2.0b1 *
+*   File: class.c                                         EmpireMUD 2.0b2 *
 *  Usage: code related to classes                                         *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -44,7 +44,8 @@ const struct class_data_type class_data[NUM_CLASSES] = {
 	},
 	{ "Duke", "Duke", { SKILL_BATTLE, SKILL_EMPIRE },  { 300, 200, 100, 0 },
 		{
-			{ ROLE_MELEE, { ABIL_TWO_HANDED_WEAPONS, ROLE_ABIL_END } },
+			{ ROLE_TANK, { ABIL_DRAGONRIDING, ABIL_NOBLE_BEARING, ROLE_ABIL_END } },
+			{ ROLE_MELEE, { ABIL_DRAGONRIDING, ABIL_TWO_HANDED_WEAPONS, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
@@ -55,18 +56,19 @@ const struct class_data_type class_data[NUM_CLASSES] = {
 		{
 			{ ROLE_TANK, { ABIL_RESURRECT, ABIL_TOWERING_WEREWOLF_FORM, ROLE_ABIL_END } },
 			{ ROLE_MELEE, { ABIL_RESURRECT, ABIL_SAVAGE_WEREWOLF_FORM, ROLE_ABIL_END } },
-			{ ROLE_HEALER, { ABIL_RESURRECT, ABIL_SAGE_WEREWOLF_FORM, ROLE_ABIL_END } },
+			{ ROLE_HEALER, { ABIL_CONFER, ABIL_FASTCASTING, ABIL_RESURRECT, ABIL_SAGE_WEREWOLF_FORM, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
 	{ "Assassin", "Assn", { SKILL_BATTLE, SKILL_STEALTH },  { 200, 300, 100, 0 },
 		{
-			{ ROLE_MELEE, { ABIL_DUAL_WIELD, ROLE_ABIL_END } },
+			{ ROLE_MELEE, { ABIL_DUAL_WIELD, ABIL_SHADOW_KICK, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
 	{ "Barbarian", "Brbn", { SKILL_BATTLE, SKILL_SURVIVAL },  { 300, 200, 100, 0 },
 		{
+			{ ROLE_TANK, { ABIL_WARD_AGAINST_MAGIC, ROLE_ABIL_END } },
 			{ ROLE_MELEE, { ABIL_TWO_HANDED_WEAPONS, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
@@ -79,42 +81,60 @@ const struct class_data_type class_data[NUM_CLASSES] = {
 	},
 	{ "Reaper", "Reap", { SKILL_BATTLE, SKILL_VAMPIRE },  { 300, 200, 100, 0 },
 		{
-			{ ROLE_TANK, { ABIL_BLOOD_FORTITUDE, ROLE_ABIL_END } },
+			{ ROLE_TANK, { ABIL_BLOOD_FORTITUDE, ABIL_BLOODSWEAT, ABIL_WARD_AGAINST_MAGIC, ROLE_ABIL_END } },
 			{ ROLE_MELEE, { ABIL_HORRID_FORM, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
 	{ "Exarch", "Exrc", { SKILL_EMPIRE, SKILL_HIGH_SORCERY },  { 150, 150, 300, 0 },
-		{ ROLE_LIST_END }
+		{
+			{ ROLE_CASTER, { ABIL_DRAGONRIDING, ROLE_ABIL_END } },
+			ROLE_LIST_END
+		}
 	},
 	{ "Luminary", "Lmny", { SKILL_EMPIRE, SKILL_NATURAL_MAGIC },  { 150, 150, 300, 0 },
 		{
-			{ ROLE_CASTER, { ABIL_RESURRECT, ROLE_ABIL_END } },
-			{ ROLE_HEALER, { ABIL_RESURRECT, ROLE_ABIL_END } },
+			{ ROLE_CASTER, { ABIL_DRAGONRIDING, ABIL_RESURRECT, ROLE_ABIL_END } },
+			{ ROLE_HEALER, { ABIL_ANCESTRAL_HEALING, ABIL_FASTCASTING, ABIL_DRAGONRIDING, ABIL_RESURRECT, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
 	{ "Powerbroker", "Pwbk", { SKILL_EMPIRE, SKILL_STEALTH },  { 200, 300, 100, 0 },
-		{ ROLE_LIST_END }
+		{
+			{ ROLE_MELEE, { ABIL_DRAGONRIDING, ABIL_STAGGER_JAB, ROLE_ABIL_END } },
+			ROLE_LIST_END
+		}
 	},
 	{ "Elder", "Eldr", { SKILL_EMPIRE, SKILL_SURVIVAL },  { 200, 200, 200, 0 },
-		{ ROLE_LIST_END }
+		{
+			{ ROLE_MELEE, { ABIL_DRAGONRIDING, ROLE_ABIL_END } },
+			ROLE_LIST_END
+		}
 	},
 	{ "Guildsman", "Gdsm", { SKILL_EMPIRE, SKILL_TRADE },  { 200, 200, 200, 0 },
-		{ ROLE_LIST_END }
+		{
+			{ ROLE_MELEE, { ABIL_DRAGONRIDING, ROLE_ABIL_END } },
+			ROLE_LIST_END
+		}
 	},
 	{ "Ancient", "Anct", { SKILL_EMPIRE, SKILL_VAMPIRE },  { 200, 200, 200, 0 },
-		{ ROLE_LIST_END }
+		{
+			{ ROLE_MELEE, { ABIL_DRAGONRIDING, ROLE_ABIL_END } },
+			ROLE_LIST_END
+		}
 	},
 	{ "Archmage", "Achm", { SKILL_HIGH_SORCERY, SKILL_NATURAL_MAGIC },  { 150, 150, 300, 0 },
 		{
 			{ ROLE_CASTER, { ABIL_RESURRECT, ROLE_ABIL_END } },
-			{ ROLE_HEALER, { ABIL_RESURRECT, ROLE_ABIL_END } },
+			{ ROLE_HEALER, { ABIL_FASTCASTING, ABIL_RESURRECT, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
 	{ "Occultist", "Oclt", { SKILL_HIGH_SORCERY, SKILL_STEALTH },  { 100, 250, 250, 0 },
-		{ ROLE_LIST_END }
+		{
+			{ ROLE_MELEE, { ABIL_SHADOWCAGE, ROLE_ABIL_END } },
+			ROLE_LIST_END
+		}
 	},
 	{ "Theurge", "Thrg", { SKILL_HIGH_SORCERY, SKILL_SURVIVAL },  { 200, 100, 300, 0 },
 		{ ROLE_LIST_END }
@@ -130,45 +150,46 @@ const struct class_data_type class_data[NUM_CLASSES] = {
 	},
 	{ "Shadow Wolf", "ShWf", { SKILL_NATURAL_MAGIC, SKILL_STEALTH },  { 100, 200, 300, 0 },
 		{
-			{ ROLE_MELEE, { ABIL_MOONRISE, ABIL_SAVAGE_WEREWOLF_FORM, ROLE_ABIL_END } },
-			{ ROLE_HEALER, { ABIL_MOONRISE, ABIL_SAGE_WEREWOLF_FORM, ROLE_ABIL_END } },
+			{ ROLE_MELEE, { ABIL_HOWL, ABIL_MOONRISE, ABIL_SAVAGE_WEREWOLF_FORM, ROLE_ABIL_END } },
+			{ ROLE_HEALER, { ABIL_FASTCASTING, ABIL_MOONRISE, ABIL_SAGE_WEREWOLF_FORM, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
 	{ "Feral", "Ferl", { SKILL_NATURAL_MAGIC, SKILL_SURVIVAL },  { 150, 150, 300, 0 },
 		{
 			{ ROLE_TANK, { ABIL_RESURRECT, ABIL_TOWERING_WEREWOLF_FORM, ROLE_ABIL_END } },
-			{ ROLE_HEALER, { ABIL_RESURRECT, ABIL_SAGE_WEREWOLF_FORM, ROLE_ABIL_END } },
+			{ ROLE_HEALER, { ABIL_FASTCASTING, ABIL_RESURRECT, ABIL_SAGE_WEREWOLF_FORM, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
 	{ "Alchemist", "Alch", { SKILL_NATURAL_MAGIC, SKILL_TRADE },  { 150, 150, 300, 0 },
 		{
-			{ ROLE_HEALER, { ABIL_RESURRECT, ROLE_ABIL_END } },
+			{ ROLE_HEALER, { ABIL_FASTCASTING, ABIL_RESURRECT, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
 	{ "Necromancer", "Necr", { SKILL_NATURAL_MAGIC, SKILL_VAMPIRE },  { 150, 150, 300, 0 },
 		{
 			{ ROLE_CASTER, { ABIL_DREAD_BLOOD_FORM, ABIL_RESURRECT, ROLE_ABIL_END } },
+			{ ROLE_HEALER, { ABIL_FASTCASTING, ABIL_RESURRECT, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
 	{ "Bandit", "Bndt", { SKILL_STEALTH, SKILL_SURVIVAL },  { 250, 250, 100, 0 },
 		{
-			{ ROLE_MELEE, { ABIL_DUAL_WIELD, ROLE_ABIL_END } },
+			{ ROLE_MELEE, { ABIL_CRUCIAL_JAB, ABIL_DUAL_WIELD, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
 	{ "Smuggler", "Smgl", { SKILL_STEALTH, SKILL_TRADE },  { 200, 300, 100, 0 },
 		{
-			{ ROLE_MELEE, { ABIL_DUAL_WIELD, ROLE_ABIL_END } },
+			{ ROLE_MELEE, { ABIL_DIVERSION, ABIL_DUAL_WIELD, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
 	{ "Shade", "Shde", { SKILL_STEALTH, SKILL_VAMPIRE },  { 200, 300, 100, 0 },
 		{
-			{ ROLE_MELEE, { ABIL_HORRID_FORM, ROLE_ABIL_END } },
+			{ ROLE_MELEE, { ABIL_HORRID_FORM, ABIL_SHADOW_JAB, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
@@ -200,51 +221,63 @@ const char *class_role[NUM_ROLES] = {
  /////////////////////////////////////////////////////////////////////////////
 //// HELPERS ////////////////////////////////////////////////////////////////
 
-
 /**
-* Adds/removes the character all abilities for his class/role. If you pass NOTHING
-* instead of class and/or role, it will default to the character's current.
+* Checks that the player has the correct set of class abilities, and removes
+* any they shouldn't have. This function ignores immortals.
 *
-* This can remove at any level, but will only add abilities if the character's
-* level is at maximum.
-*
-* @param char_data *ch The player.
-* @param bool add if TRUE, adds the abilities; if FALSE, removes
-* @param int class Any CLASS_x or NOTHING to read it from the player.
-* @param int role Any ROLE_x or NOTHING to read it from the player.
+* @param char_data *ch The player to check.
+* @param int class Any CLASS_X const, or NOTHING to detect from the player.
+* @param int roole Any ROLE_X const, or NOTHING to detect from the player.
 */
-void adjust_class_abilities(char_data *ch, bool add, int class, int role) {
+void assign_class_abilities(char_data *ch, int class, int role) {
 	void check_skill_sell(char_data *ch, int abil);
 	
-	int iter, abil, role_iter;
-	
-	if (IS_NPC(ch)) {
+	int abil, role_iter, iter;
+	bool has;
+
+	// simple sanity
+	if (IS_NPC(ch) || IS_IMMORTAL(ch)) {
 		return;
 	}
 	
-	if (!add || GET_SKILL_LEVEL(ch) >= CLASS_SKILL_CAP) {
-		// defaults
-		if (class == NOTHING) {
-			class = GET_CLASS(ch);
+	// verify we have a class and role (defaults)
+	if (class == NOTHING) {
+		class = GET_CLASS(ch);
+	}
+	if (role == NOTHING) {
+		role = GET_CLASS_ROLE(ch);
+	}
+	
+	// check all abilities
+	for (abil = 0; abil < NUM_ABILITIES; ++abil) {
+		// class abils only
+		if (ability_data[abil].parent_skill != NO_SKILL) {
+			continue;
 		}
-		if (role == NOTHING) {
-			role = GET_CLASS_ROLE(ch);
-		}
-
-		// find the matching role
-		for (role_iter = 0; class_data[class].role[role_iter].role != ROLE_NONE; ++role_iter) {
-			if (class_data[class].role[role_iter].role == role) {
-				// update role abilities
-				for (iter = 0; class_data[class].role[role_iter].ability[iter] != ROLE_ABIL_END; ++iter) {
-					abil = class_data[class].role[role_iter].ability[iter];
 		
-					ch->player_specials->saved.abilities[abil].purchased = add;
-		
-					if (!add) {
-						check_skill_sell(ch, abil);
-					}
+		// determine if the player's class/role has this abil
+		has = FALSE;
+		for (role_iter = 0; !has && class_data[class].role[role_iter].role != ROLE_NONE; ++role_iter) {
+			if (class_data[class].role[role_iter].role != role) {
+				continue;
+			}
+			
+			// found role -- check its abils
+			for (iter = 0; !has && class_data[class].role[role_iter].ability[iter] != ROLE_ABIL_END; ++iter) {
+				if (class_data[class].role[role_iter].ability[iter] == abil) {
+					has = TRUE;	// class/role DOES have this ability
 				}
 			}
+		}
+		
+		// remove any they shouldn't have
+		if (ch->player_specials->saved.abilities[abil].purchased && !has) {
+			ch->player_specials->saved.abilities[abil].purchased = FALSE;
+			check_skill_sell(ch, abil);
+		}
+		// add if needed
+		if (has) {
+			ch->player_specials->saved.abilities[abil].purchased = TRUE;
 		}
 	}
 }
@@ -257,14 +290,24 @@ void adjust_class_abilities(char_data *ch, bool add, int class, int role) {
 * @param char_data *ch the player
 */
 void update_class(char_data *ch) {
+	#define NUM_BEST  3
+	#define IGNORE_BOTTOM_SKILL_POINTS  30	// amount newbies should start with
+	#define BEST_SUM_REQUIRED_FOR_100  (2 * CLASS_SKILL_CAP + SPECIALTY_SKILL_CAP)
+	
 	int iter, skl, class = CLASS_NONE, at_zero = 0, over_basic = 0, over_specialty = 0;
+	int best[NUM_BEST], best_level[NUM_BEST], best_iter, best_sub, best_total;
 	int total_class_skill, total_skill;
 	int old_class, old_level;
 	bool ok;
 	
 	if (!IS_NPC(ch)) {
-		// find skill counts
 		total_skill = 0;
+		for (best_iter = 0; best_iter < NUM_BEST; ++best_iter) {
+			best[best_iter] = NO_SKILL;
+			best_level[best_iter] = 0;
+		}
+		
+		// find skill counts
 		for (iter = 0; iter < NUM_SKILLS; ++iter) {
 			total_skill += GET_SKILL(ch, iter);
 			
@@ -276,6 +319,25 @@ void update_class(char_data *ch) {
 			}
 			if (GET_SKILL(ch, iter) > SPECIALTY_SKILL_CAP) {
 				++over_specialty;
+			}
+			
+			// update best
+			for (best_iter = 0; best_iter < NUM_BEST; ++best_iter) {
+				// new best
+				if (GET_SKILL(ch, iter) > best_level[best_iter]) {
+					// move down the other best first
+					for (best_sub = NUM_BEST - 1; best_sub > best_iter; --best_sub) {
+						best[best_sub] = best[best_sub-1];
+						best_level[best_sub] = best_level[best_sub-1];
+					}
+					
+					// store this one
+					best[best_iter] = iter;
+					best_level[best_iter] = GET_SKILL(ch, iter);
+					
+					// ONLY update the first matching best
+					break;
+				}
 			}
 		}
 		
@@ -309,27 +371,30 @@ void update_class(char_data *ch) {
 			}
 		}
 		
-		// remove old class abilities
+		// clear role?
 		if (class != old_class) {
-			adjust_class_abilities(ch, FALSE, old_class, NOTHING);
 			GET_CLASS_ROLE(ch) = ROLE_NONE;
 		}
 		
 		GET_CLASS(ch) = class;
+		assign_class_abilities(ch, NOTHING, NOTHING);
+				
+		// total up best X skills
+		best_total = 0;
+		for (best_iter = 0; best_iter < NUM_BEST; ++best_iter) {
+			best_total += best_level[best_iter];
+		}
 		
-		// no need to add new class abilities because IF the role changed, it is set to none
+		// set level
+		GET_SKILL_LEVEL(ch) = (best_total - IGNORE_BOTTOM_SKILL_POINTS) * 100 / MAX(1, BEST_SUM_REQUIRED_FOR_100 - IGNORE_BOTTOM_SKILL_POINTS);
+		GET_SKILL_LEVEL(ch) = MIN(CLASS_SKILL_CAP, MAX(1, GET_SKILL_LEVEL(ch)));
 		
-		// level!
-		if (class != CLASS_NONE) {
-			// skill level based on average of class skills
-			GET_SKILL_LEVEL(ch) = total_class_skill / SKILLS_PER_CLASS;
-			
+		// set progression (% of the way from 75 to 100)
+		if (class != CLASS_NONE && GET_SKILL_LEVEL(ch) >= SPECIALTY_SKILL_CAP) {
 			// class progression level based on % of the way
 			GET_CLASS_PROGRESSION(ch) = (GET_SKILL_LEVEL(ch) - SPECIALTY_SKILL_CAP) * 100 / (CLASS_SKILL_CAP - SPECIALTY_SKILL_CAP);
 		}
 		else {
-			// average of total_skill averaged over the number of non-zero skills available -- this gives us a rough level that is usually < 75
-			GET_SKILL_LEVEL(ch) = total_skill / (NUM_SKILLS - ZEROES_REQUIRED_FOR_BONUS_SKILLS);
 			GET_CLASS_PROGRESSION(ch) = 0;
 		}
 		
@@ -397,13 +462,12 @@ ACMD(do_class) {
 					if (emp) {
 						adjust_abilities_to_empire(ch, emp, FALSE);
 					}
-					adjust_class_abilities(ch, FALSE, NOTHING, NOTHING);
 					
 					// change role
 					GET_CLASS_ROLE(ch) = found;
 					
 					// add new abilities
-					adjust_class_abilities(ch, TRUE, NOTHING, NOTHING);
+					assign_class_abilities(ch, NOTHING, NOTHING);
 					if (emp) {
 						adjust_abilities_to_empire(ch, emp, TRUE);
 						resort_empires();

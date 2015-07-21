@@ -2,7 +2,7 @@
 Stealth GM Bribe coins~
 0 m 100
 ~
-%echoaround% %actor% %self.name% and %actor.name% seem to be whispering to eachother.
+%echoaround% %actor% %self.name% and %actor.name% seem to be whispering to each other.
 if (%actor.skill(Stealth)% > 0)
   %send% %actor% %self.name% whispers, 'It looks like you're already a member of the Guild.'
 elseif (!%actor.can_gain_new_skills%)
@@ -16,7 +16,7 @@ end
 Stealth GM Bribe item~
 0 j 100
 ~
-%echoaround% %actor% %self.name% and %actor.name% seem to be whispering to eachother.
+%echoaround% %actor% %self.name% and %actor.name% seem to be whispering to each other.
 if (%object.material% != GOLD)
   %send% %actor% %self.name% whispers, 'Thanks, mate!'
 elseif (%actor.skill(Stealth)% > 0)
@@ -36,6 +36,10 @@ use~
 eval test %%self.is_name(%arg%)%%
 if !%test%
   return 0
+  halt
+end
+if (%actor.position% != Standing)
+  %send% %actor% You can't do that right now.
   halt
 end
 if !%actor.can_teleport_room% || !%actor.canuseroom_guest%
@@ -113,6 +117,10 @@ if !%test%
   return 0
   halt
 end
+if (%actor.position% != Standing)
+  %send% %actor% You can't do that right now.
+  halt
+end
 if !%actor.can_teleport_room% || !%actor.canuseroom_guest%
   %send% %actor% You can't teleport out of here.
   halt
@@ -142,6 +150,37 @@ end
 %force% %actor% look
 eval last_conveyance_time %timestamp%
 remote last_conveyance_time %actor.id%
+%purge% %self%
+~
+#263
+Letheian Icon use~
+1 c 2
+use~
+eval item %arg.car%
+eval sk %arg.cdr%
+eval test %%self.is_name(%item%)%%
+if !(%test% && use /= %cmd%)
+  return 0
+  halt
+end
+if !%sk%
+  %send% %actor% Usage: use icon <skill>
+  halt
+end
+if (%actor.position% != Standing)
+  %send% %actor% You can't do that right now.
+  halt
+end
+eval test %%skill.validate(%sk%)%%
+if !%test%
+  %send% %actor% No such skill '%sk%'.
+  halt
+end
+eval name %%skill.name(%sk%)%%
+%send% %actor% You use %self.shortdesc% and gain a skill reset in %name%!
+%echoaround% %actor% %actor.name% uses %self.shortdesc%.
+eval grant %%actor.give_skill_reset(%sk%)%%
+nop %grant%
 %purge% %self%
 ~
 $

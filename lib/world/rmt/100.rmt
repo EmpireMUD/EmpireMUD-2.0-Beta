@@ -15,7 +15,7 @@ I 5 103 3.00 1 X  # DIG: a yellow lightning stone
 I 5 102 8.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 1254 1.00 1 X  # FORAGE: a mana potion
-I 6 3013 25.00 1 X  # FORAGE: UNKNOWN
+I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
 I 6 3009 25.00 1 X  # FORAGE: an orange
 I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
 I 6 3001 100.00 1 X  # FORAGE: a green apple
@@ -49,7 +49,7 @@ I 5 103 3.00 1 X  # DIG: a yellow lightning stone
 I 5 102 8.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 1254 1.00 1 X  # FORAGE: a mana potion
-I 6 3013 25.00 1 X  # FORAGE: UNKNOWN
+I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
 I 6 3009 25.00 1 X  # FORAGE: an orange
 I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
 I 6 3001 100.00 1 X  # FORAGE: a green apple
@@ -84,7 +84,7 @@ I 5 103 3.00 1 X  # DIG: a yellow lightning stone
 I 5 102 8.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 1254 1.00 1 X  # FORAGE: a mana potion
-I 6 3013 25.00 1 X  # FORAGE: UNKNOWN
+I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
 I 6 3009 25.00 1 X  # FORAGE: an orange
 I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
 I 6 3001 100.00 1 X  # FORAGE: a green apple
@@ -121,7 +121,7 @@ I 5 103 3.00 1 X  # DIG: a yellow lightning stone
 I 5 102 8.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 1254 1.00 1 X  # FORAGE: a mana potion
-I 6 3013 25.00 1 X  # FORAGE: UNKNOWN
+I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
 I 6 3009 25.00 1 X  # FORAGE: an orange
 I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
 I 6 3001 100.00 1 X  # FORAGE: a green apple
@@ -159,7 +159,7 @@ I 5 103 3.00 1 X  # DIG: a yellow lightning stone
 I 5 102 8.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 1254 1.00 1 X  # FORAGE: a mana potion
-I 6 3013 25.00 1 X  # FORAGE: UNKNOWN
+I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
 I 6 3009 25.00 1 X  # FORAGE: an orange
 I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
 I 6 3001 100.00 1 X  # FORAGE: a green apple
@@ -194,7 +194,7 @@ I 5 103 3.00 1 X  # DIG: a yellow lightning stone
 I 5 102 8.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 1254 1.00 1 X  # FORAGE: a mana potion
-I 6 3013 25.00 1 X  # FORAGE: UNKNOWN
+I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
 I 6 3009 25.00 1 X  # FORAGE: an orange
 I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
 I 6 3001 100.00 1 X  # FORAGE: a green apple
@@ -224,7 +224,7 @@ S
 The City Sewers~
    The last fresh breath of air escapes from your lungs and floats out the open
 sewer grate, which shines a column of light from the city above. A narrow ledge
-is all the separates you from the stream of human waste that flows slowly past.
+is all that separates you from the stream of human waste that flows past.  
 ~
 c 0
 D3
@@ -651,8 +651,8 @@ S
 The Second Floor~
    The long hallway is filled with stations where the Tower Skycleave's various
 apprentices practice their experiments and conduct their research, hoping to
-join the upper eschelons of Skycleave's hierarchy. As if to inspire them, the
-wall is lined with portaits of former masters of the tower.
+join the upper echelons of Skycleave's hierarchy. As if to inspire them, the
+wall is lined with portraits of former masters of the tower.
 ~
 c 0
 D7
@@ -698,7 +698,7 @@ S
 #10040
 The Third Floor~
    This floor of the Tower Skycleave features the offices of the tower's
-Residents - sorcerers who have earned their place in the upper eschelon, but
+Residents - sorcerers who have earned their place in the upper echelon, but
 who are still working to master the magical sciences. Most of the doors are
 shut and locked, and perhaps mystically muffled.
 ~
@@ -889,7 +889,7 @@ The Goblin Cages~
    The cages extend all the way to the far wall. Some goblins are fortunate
 enough to have their cage in front of a window, but most never see daylight. A
 foul-smelling bin suggests not all of the goblin experiments go well, but you
-can't bring yourself to life the latch and open it.
+can't bring yourself to lift the latch and open it.
 ~
 c 0
 D3

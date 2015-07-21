@@ -1,6 +1,6 @@
 ADVANCE
 
-Usage: advance <victim> <access level>
+Usage:  advance <victim> <access level>
 
 ADVANCE moves a player to a new access level. If used to promote a player to an
 immortal level, and if you have the autowiz program installed, the wizlist and
@@ -15,7 +15,7 @@ See also: SET
 #d
 APPROVE
 
-Usage: approve <name> <e-mail>
+Usage:  approve <name> <e-mail>
 
 This command approves a character so that he/she can use empire and ubilding
 commands. You must supply an e-mail address so that players can be verified
@@ -30,7 +30,7 @@ Keep it fair.
 #d
 AT WIZAT
 
-Usage: at <room | coords | item | mob | player name> <command> <arguments>
+Usage:  at <room | coords | item | mob | player name> <command> <arguments>
 
 AT can be used to perform an action in a location other than where you are
 standing. The first argument can be a virtual room number or the name of a
@@ -67,8 +67,8 @@ Regenerates the wizlist.
 #d
 BAN UNBAN
 
-Usage: ban [<all | new | select> <site>]
-       unban <site>
+Usage:  ban [<all | new | select> <site>]
+        unban <site>
 
 These commands prevent anyone from a site with a hostname containing the site
 substring from logging in to the game. You may ban a site to ALL, NEW or
@@ -89,7 +89,7 @@ See also: WIZLOCK
 #d
 CLEARABILITIES
 
-Usage: clearabilities <player> <skill | all>
+Usage:  clearabilities <player> <skill | all>
 
 This command resets the abilities for the target player. They keep their skill
 percentages, but may re-purchase all their abilities. You can either target a
@@ -130,7 +130,7 @@ Shows the current real time. (Not a social)
 #d
 DC
 
-Usage: dc <descriptor number>
+Usage:  dc <descriptor number>
 
 DC (DisConnect) is used to disconnect a socket. If used on a playing socket,
 the player will lose his/her link, but, unlike PURGE, will not extract the
@@ -154,9 +154,9 @@ See also: MARK
 #d
 ECHO GECHO SEND
 
-Usage: echo <message>
-       gecho <message>
-       send <victim> <message>
+Usage:  echo <message>
+        gecho <message>
+        send <victim> <message>
 
 ECHO displays a string to everyone in your room.
 GECHO displays the string to everyone in the game.
@@ -174,7 +174,7 @@ See also: EMOTE
 #d
 EDELETE
 
-Usage: edelete <empire>
+Usage:  edelete <empire>
 
 Immortal tool to delete an empire.
 #d
@@ -190,7 +190,7 @@ below his own level.
 #d
 FILE
 
-Usage: file <file> <lines>
+Usage:  file <file> <lines>
 
 Displays the last X lines of a file in the shell. This is useful for seeing 
 recent bad password attempts, ideas, and other information. Unfortunately, 
@@ -201,7 +201,7 @@ smaller logs.
 #d
 FORCE
 
-Usage: force <victim | all | room> <command> <arguments>
+Usage:  force <victim | all | room> <command> <arguments>
 
 FORCE forces a character, either monster or player, to perform a certain
 action. FORCE ALL forces everyone in the game; FORCE ROOM forces everyone in
@@ -217,10 +217,22 @@ Example:
 If you are invisible to the one being forced, the force will be performed
 silently.
 #d
+FORGIVE
+
+Usage:  forgive <player>
+
+This command forgives the following conditions:
+ - hostile flag
+ - rogue flag
+ - empire defect timer
+ - pvp flag cooldown
+
+See also: HOSTILE
+#d
 FREEZE THAW
 
-Usage: freeze <victim>
-       thaw <victim>
+Usage:  freeze <victim>
+        thaw <victim>
 
 FREEZE, originally invented on CircleMUD (we think), is used to prevent a
 player from playing. If frozen, the game will ignore all commands entered by
@@ -233,7 +245,7 @@ See also: SET -> FROZEN
 #d
 FULLSAVE
 
-Usage: fullsave
+Usage:  fullsave
 
 This allows you to force all of the zones in the world to save. They will
 only do so if they've been flagged for saves (thus minimizing lag).
@@ -246,7 +258,7 @@ This is the history command for the immortal and god channels.
 
 See also: WIZNET
 #d
-GODNET /
+GODNET
 
 The gods' communication channel.
 
@@ -256,8 +268,8 @@ See also: GHISTORY
 #e
 GOTO TRANSFER
 
-Usage: goto <location>
-       trans <victim> [location]
+Usage:  goto <location>
+        trans <victim> [location]
 
 These commands are used to transports yourself and others to different rooms.
 GOTO allows you to go to other rooms; TRANS transports a person from wherever
@@ -291,7 +303,7 @@ See also: OLC-CONTROLS
 #d
 HANDBOOK
 
-Usage: handbook
+Usage:  handbook
 
 Guidelines for having an Immortal character -- you should read it.
 #d
@@ -308,9 +320,22 @@ It is expected most immortals will keep HOLYLIGHT on most of the time; it
 exists so that you have the ability to see what mortals see for debugging
 purposes.
 #d
+HOSTILE "HOSTILE COMMAND"
+
+Usage:  hostile <victim>
+
+This immortal command causes a player to be marked as hostile. It should only
+be used when someone is doing something that should really allow guards and
+other players to attack them, but doesn't.
+
+You can tell if someone is hostile by doing a 'stat' on them and looking for
+the hostile cooldown.
+
+See also: FORGIVE, STAT, THIEF
+#d
 IMOTD
 
-Usage: imotd
+Usage:  imotd
 
 Displays the Immortal message of the day. This file usually contains new
 information on commands recently added, new features and other important
@@ -340,7 +365,7 @@ portal, even if that instance cannot be linked.
 #d
 INVIS INVISIBLE
 
-Usage: invis [level]
+Usage:  invis [level]
 
 INVIS sets your invisibility level. With no argument, invis toggles between
 making you fully visible and fully invisible. If you specify a level, only
@@ -365,9 +390,22 @@ prompted to press any key to enter the game.
 
 See also: INVIS, VISIBLE
 #d
+ISLAND "ISLAND COMMAND"
+
+Usage:  island list
+        island rename <id> <name>
+        island flags <id> [add | remove] <flags>
+
+This immortal command allows the game's staff to name islands and apply
+properties to them.
+
+Island flags:
+ NEWBIE - Wipes claims periodically
+ !AGGRO - Prevents aggro mobs, and guard towers won't fire
+#d
 LAST
 
-Usage: last <player_name>
+Usage:  last <player_name>
 
 For checking the last time a person logged on, their sitename, and their ID
 number.
@@ -381,7 +419,7 @@ See also: STAT
 #d
 LOAD
 
-Usage: load <mob | obj> <virtual number>
+Usage:  load <mob | obj> <virtual number>
 
 LOAD is used to create mobiles and objects. The first argument specifies if
 you are trying to load a mobile or an object; the second is the virtual
@@ -399,7 +437,7 @@ See also: VNUM
 #d
 MOVEEINV "MOVE EINV" "MOVE EMPIRE INVENTORY"
 
-Usage: moveeinv "<empire>" <from island> <to island>
+Usage:  moveeinv "<empire>" <from island> <to island>
 
 This command allows an immortal to move an empire's inventory from one island
 to another. All stored items one on island are transferred to the other.
@@ -413,7 +451,7 @@ See also: EINV, SHOW
 #d
 MUTE
 
-Usage: mute <victim>
+Usage:  mute <victim>
 
 MUTE is used to shut a player up. When muted, a player will not be able to
 use most communication channels until he/she is unmuted.
@@ -422,7 +460,7 @@ See also: FLAGS
 #d
 NOTITLE
 
-Usage: notitle <vicitim>
+Usage:  notitle <vicitim>
 
 Prevent players from being able to set their own titles; i.e., if the player
 consistently has an offensive title. The definition of offensive is left as
@@ -432,7 +470,7 @@ See also: TITLE
 #d
 NOWIZNET "NO WIZNET"
 
-Usage: toggle wiznet
+Usage:  toggle wiznet
 
 Allows you to hear or ignore messages coming over the wiznet.
 
@@ -440,7 +478,7 @@ See also: WIZNET
 #d
 PAGE
 
-Usage: page <player | all> <message>
+Usage:  page <player | all> <message>
 
 PAGE is used to send a message, along with a beep, to another player. Use
 PAGE ALL to send a message and a beep to everyone in the game.
@@ -454,8 +492,8 @@ Do not abuse this command.
 #d
 POOFIN POOFOUT
 
-Usage: poofin <message | none>
-       poofout <message | none>
+Usage:  poofin <message | none>
+        poofout <message | none>
 
 Sets the message seen by players when you use GOTO to move to a different
 room. POOFIN with no argument resets your poofin to the default "appears with
@@ -477,7 +515,7 @@ See also: GOTO
 #e
 PURGE
 
-Usage: purge [name]
+Usage:  purge [name]
 
 Purge destroys things. If used with no arguments, it will clear a room of all
 mobiles and objects, but will not harm players. If the argument is an object,
@@ -500,14 +538,14 @@ See also: DC
 #d
 RANDOM
 
-Usage: random
+Usage:  random
 
 This is used to go to a random room on the world map. It's very useful for
 finding new places to build an island.
 #d
 REBOOT
 
-Usage: reboot [now | minutes]
+Usage:  reboot [now | minutes]
 
 You can use this to either trigger an instant reboot, or count one down. 
 Because this is a reboot and saves everything, no information is ever lost.
@@ -519,7 +557,7 @@ arguments displays the current status.
 #d
 RELOAD
 
-Usage: reload < '*' | all | file >
+Usage:  reload < '*' | all | file >
 
 Reload is used to reload text files such as the MOTD from disk into memory. 
 Reload * reloads all the text files below.
@@ -543,7 +581,7 @@ RESCALE
 
 Usage:  rescale <mob/item> <level>
 
-This command allows you to rescale a mob of item. It checks for a matching mob
+This command allows you to rescale a mob or item. It checks for a matching mob
 in the room first, then an item in your inventory, then an item on the ground.
 
 The level you choose will still be constrained by the mob/item's minimum and
@@ -554,7 +592,7 @@ will lose any enchantments or modifications.
 #d
 RESTORE
 
-Usage: restore <player | mobile>
+Usage:  restore <player | mobile>
 
 RESTORE restores a player or mobile to full hit, mana, and movement points.
 It also resets all cooldowns.
@@ -563,7 +601,7 @@ If used on immortals, it also sets all skill levels to 100%.
 #d
 RETURN
 
-Usage: return
+Usage:  return
 
 RETURN returns you to your regular body if you are switched into a mob.
 
@@ -577,7 +615,7 @@ This immortal toggle allows you to see flags and vnums on the "look" command.
 #d
 SET
 
-Usage: set [file | player] <character> <field> <value>
+Usage:  set [file | player] <character> <field> <value>
 
 SET is an extremely powerful command, capable of setting dozens of aspects of
 characters, both players and mobiles.
@@ -594,7 +632,7 @@ For toggled fields (BINARY), the value must be ON, OFF, YES, or NO.
 
 The following are valid fields:
 
-Field          Who     Value Type   Decription
+Field          Who     Value Type   Description
 ----------------------------------------------------------------
 account        PC      NAME         Sets account to match another character
 age            BOTH    NUMBER       Player age
@@ -646,42 +684,36 @@ See also: GRANTS, STAT
 #d
 SHOW
 
-Usage: show <mode> [argument]
-
-Valid Modes:
-
-player         rent           stats          site
-commons        players        terrain        account
-notes          arrowtypes     skills         storage
-startlocs      spawns         ignoring       workforce
-islands
+Usage:  show <mode> [argument]
 
 The SHOW command displays information. Some modes of show require additional
-information, such as a player name.
+information, such as a player name. Valid Modes:
 
-player: Shows player summary information, simply provide a player name.
- rent: Shows the filename and path to a players rent file.
- stats: Shows game status information including players in game, mobs etc.
- site: Shows all players with a specific site segment.
- commons: Shows all players currently connected from duplicate sites.
- players: Shows health and status for all current players.
- terrain: Shows total counts for all terrain types.
- account: Shows all the alts associated with a given player.
- notes: Show notes on a player.
- arrowtypes: Shows the 'arrow type' setting for all missile weapons and arrows.
- skills: Shows skill levels for a player.
- storage: Shows all items that can be stored in a given building/room type.
- startlocs: Shows the location of all starting location tiles.
- spawns: Shows where a mob spawns on the map, similar to ".mob search".
- ignoring: Shows you who a player has on their ignore list.
- islands: Shows you which island ids have empire storage (for MOVEEINV).
- workforce: Shows you an empire's workforce setup.
+Mode       Level    Description
+------     ------   -------------
+stats      God      Shows game stats including prototypes.
+arrowtypes Immort   Shows the 'arrow type' setting for all bows and arrows.
+ignoring   Immort   Shows you who a player has on their ignore list.
+islands    Immort   Shows you which island ids have empire storage (for MOVEEINV).
+notes      Immort   Show notes on a player.
+player     Immort   Shows player summary information.
+players    Immort   Shows health and status for all current players.
+rent       Immort   Shows the filename and path to a player's inventory.
+skills     Immort   Shows skill levels and abilities for a player.
+spawns     Immort   Shows where a mob spawns on the map, similar to ".mob search".
+startlocs  Immort   Shows the location of all starting location tiles.
+storage    Immort   Shows items that can be stored in a given building/room type.
+terrain    Immort   Shows total counts for all terrain types.
+workforce  Immort   Shows you an empire's workforce setup.
+commons    Asst     Shows players currently connected from duplicate sites.
+site       Asst     Shows all players with a specific site segment.
+account    Co-Impl  Shows all the alts associated with a given player.
 
 See also: STAT, STARTING LOCATION
-#d
+#e
 SHUTDOWN
 
-Usage: shutdown [now | timer] [die | pause]
+Usage:  shutdown [now | timer] [die | pause]
 
 SHUTDOWN shuts the MUD down. The SHUTDOWN command works in conjunction with
 EmpireMUD's 'autorun' script. If you are not using autorun, the arguments are
@@ -701,7 +733,7 @@ See also: REBOOT
 #d
 SLAY
 
-Usage: slay
+Usage:  slay
 
 This is an instant-kill power for the Implementor which was originally part of
 CircleMUD's normal kill command. It has been filtered out because we found it
@@ -709,7 +741,7 @@ to be easier to have it separate.
 #d
 SNOOP
 
-Usage: snoop [player]
+Usage:  snoop [player]
 
 Snoop allows you to listen in on another player's session; everything the
 player sees or types will be displayed on your terminal preceded by a '%'.
@@ -721,7 +753,7 @@ Type snoop <your name> or just snoop to stop snooping.
 #d
 STAT
 
-Usage: stat [adventure | building | player | object | mobile | room | template | file] [name]
+Usage:  stat [adventure | building | player | object | mobile | room | template | file] [name]
 
 Gives information about players, animals, and objects in the game. The type
 argument is optional.
@@ -748,7 +780,7 @@ See also: VSTAT
 #d
 SWITCH
 
-Usage: switch <monster>
+Usage:  switch <monster>
 
 SWITCH is used to take over the body of mobiles; useful for interactive
 adventures. If the monster in which you are switched is killed you will be
@@ -770,13 +802,13 @@ See also: TOGGLE
 #d
 TEDIT
 
-Usage: tedit <message>
+Usage:  tedit <message>
 
 Allows you to alter a game message or text file from within the game.
 #d
 TELEPORT
 
-Usage: teleport <person/location>
+Usage:  teleport <person/location>
 
 This command allows a god to teleport from one location to another. The target
 location may be coordinates like (123, 456). It may be a player, or even a
@@ -795,13 +827,13 @@ See also: BINDING
 #d
 UPTIME
 
-Usage: uptime
+Usage:  uptime
 
 Displays when the game was booted and calculates how long ago that was.
 #d
 USERS
 
-Usage: users [switches]
+Usage:  users [switches]
 
 USERS gives a list of all sockets (i.e., connections) currently active on the
 MUD. The multi-column display shows the socket number (used by DC), class,
@@ -827,13 +859,15 @@ This is a generic command that houses several simple utilities for immortals.
 They generally have no game effect, but can help with testing.
 
 Available utilities:
- diminish <number> <scale> - applies the game's diminishing returns formula,
+ clearroles - Clears the class roles and class abilities of all players.
+ diminish <number> <scale> - Applies the game's diminishing returns formula,
     and returns the result.
+ islandsize - Counts and displays tile counts for all islands.
  playerdump - Outputs a data file with tab-separated lines for all players with
     account, playtime, and host.
- randtest [number] [size] - generates a large number of random numbers, and
+ randtest [number] [size] - Generates a large number of random numbers, and
     reports the results.
- redoislands - renumbers all the islands (requires confirmation; may rearrange
+ redoislands - Renumbers all the islands (requires confirmation; may rearrange
     empire inventories).
 #d
 VNUM
@@ -861,7 +895,7 @@ Examples:
 #d
 VSTAT
 
-Usage: vstat <type> <vnum>
+Usage:  vstat <type> <vnum>
 
 Used to stat a prototypical object by virtual number.
 
@@ -877,13 +911,13 @@ See also: LOAD, STAT, VNUM
 #d
 WIZHELP
 
-Usage: wizhelp
+Usage:  wizhelp
 
 Gives a list of the special commands available at your level.
 #d
 WIZLOCK
 
-Usage: wizlock [value] [message]
+Usage:  wizlock [value] [message]
 
 WIZLOCK allows you to restrict the game. WIZLOCK 1 prevents new characters
 from being created. WIZLOCK n prevents new characters and allows only
@@ -897,7 +931,7 @@ WIZNET ;
 
 The immortal communication channel.
 
-Usage: wiznet [#level] <text>
+Usage:  wiznet [#level] <text>
 
 Examples:
 

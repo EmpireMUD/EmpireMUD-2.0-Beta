@@ -76,7 +76,7 @@ abandon, dismantle~
 D
    This small cave looks like it was originally hollowed out by an animal, but
 it's large enough for you to stand. A fallen rock covers most of the entrance
-and protects you from the elements. The ground isn't comforable, but it's still
+and protects you from the elements. The ground isn't comfortable, but it's still
 a safe place to stay.
 ~
 S
@@ -104,16 +104,6 @@ Some Decaying Ruins~
 0 0 0 -1
 C
 dismantle~
-M
-9189 2.00 0
-M
-9190 2.00 0
-M
-9191 2.00 0
-M
-9198 2.00 0
-M
-9199 2.00 0
 S
 #5007
 Ruins Closed~
@@ -158,23 +148,5 @@ The City Center~
 ????~
 1000 0 do 0
 0 0 0 -1
-M
-9188 2.00 0
-M
-9189 2.00 0
-M
-9190 2.00 0
-M
-9192 5.00 c
-M
-9193 5.00 c
-M
-9194 5.00 c
-M
-9195 5.00 c
-M
-9198 2.00 0
-M
-9199 2.00 0
 S
 $

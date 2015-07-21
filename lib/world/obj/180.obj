@@ -1,0 +1,434 @@
+#18075
+skirt firecloth brilliant~
+a firecloth skirt~
+A brilliant firecloth skirt blazes here!~
+   This glowing skirt seems to have been woven from the flames of a raging
+inferno! It is only warm, not hot, to the touch.
+~
+27 mp af 2
+0 0 0
+10 0
+A
+22 3
+A
+17 1
+A
+7 1
+B
+c
+C
+0 0
+S
+#18076
+pauldrons firecloth pair blazing~
+firecloth pauldrons~
+A pair of firecloth pauldrons is blazing here!~
+   These fiery shoulder guards seem to have been woven from the flames of a
+raging inferno! They throw off a fierce heat, but are safe to wear.
+~
+27 mp ai 3
+0 0 0
+10 0
+A
+22 3
+A
+17 1
+A
+16 1
+B
+c
+C
+0 0
+S
+#18077
+skirt hearthflame warm~
+a hearthflame skirt~
+A warm hearthflame skirt is lying here.~
+This dark red cloth skirt feels soothing and warm to the touch.
+~
+27 mp af 3
+0 0 0
+10 0
+A
+23 1
+A
+7 2
+A
+9 1
+A
+16 1
+C
+0 0
+S
+#18078
+sleeves hearthflame pair~
+hearthflame sleeves~
+A pair of hearthflame sleeves is lying here.~
+Touching these dark red cloth sleeves makes you feel slightly more calm.
+~
+27 mp ai 5
+0 0 0
+11 0
+A
+23 2
+A
+7 2
+A
+9 1
+A
+8 1
+C
+0 0
+S
+#18079
+pauldrons magma-forged forged heavy~
+magma-forged pauldrons~
+A pair of heavy magma-forged pauldrons is lying here.~
+   These heavy iron pauldrons were forged by the land itself at a density no
+mortal smith could hope to match.
+~
+27 mp ai 11
+3 0 0
+2 0
+A
+13 1
+A
+18 2
+A
+2 1
+A
+1 1
+C
+0 0
+S
+#18080
+armor plate core-forged forged~
+core-forged plate armor~
+A huge suit of core-forged plate armor is piled up here.~
+   This pile of massive armor plates were forged by the land itself to an
+incredible density. No normal man could even wear this armor.
+~
+27 emp aq 10
+3 0 0
+2 0
+A
+1 -3
+A
+13 3
+A
+12 2
+A
+18 1
+C
+0 0
+S
+#18081
+pauldrons huge spiked pair~
+huge spiked pauldrons~
+A pair of huge spiked pauldrons is lying here.~
+   Unleash your inner berserker with these incredibly top-heavy shoulder
+guards! Be careful not to shrug.
+~
+27 mp ai 13
+1 0 0
+2 0
+A
+12 -3
+A
+21 5
+A
+17 2
+A
+9 1
+A
+2 1
+C
+0 0
+S
+#18082
+jerkin fiendskin~
+a fiendskin jerkin~
+A fiendskin jerkin is lying here, radiating warmth.~
+   This thick, leathery demonhide jacket is nice and warm... Even in the middle
+of a blizzard.
+~
+27 mp aq 12
+1 0 0
+7 0
+A
+12 -3
+A
+21 3
+A
+17 2
+A
+2 1
+C
+0 0
+S
+#18083
+pouch bottomless flame-patterned patterned~
+a bottomless pouch~
+Someone has left a flame-patterned pouch here.~
+   This leather pouch is stained with fiery designs. It appears to be quite
+deep... Luckily, it is too small to fall into.
+~
+24 mp ar 19
+2 0 0
+7 0
+A
+2 1
+A
+9 1
+A
+6 1
+A
+11 1
+C
+0 0
+S
+#18084
+shield igneous spiked~
+an igneous shield~
+A spiked igneous shield is lying here.~
+   This bladed shield of black stone looks like it could do some serious
+damage! It's a bit awkward to hold, though.
+~
+23 mp ao 6
+0 0 0
+1 0
+A
+13 3
+A
+2 2
+A
+21 2
+C
+0 0
+S
+#18085
+ring lava cold~
+a cold lava ring~
+A ring made of lava is lying here, cold to the touch!~
+   This ring is weirdly cool to the touch. It seems to be safe, but the
+patterns on it still look like they're flowing...
+~
+2 mp ab 2
+0 0 0
+1 0
+A
+22 2
+A
+7 1
+A
+16 1
+A
+23 -1
+C
+0 0
+S
+#18086
+mantle flames sheet flickering~
+a mantle of flames~
+A sheet of flickering flames is hovering here!~
+   This sheet of magical fire radiates all of its heat in one direction - you
+could safely wrap it around yourself!
+~
+27 mp ak 2
+0 0 0
+10 0
+A
+22 5
+A
+8 1
+A
+2 1
+A
+23 -3
+A
+17 1
+B
+c
+C
+0 0
+S
+#18087
+earrings flame-shaped shaped frozen~
+frozen flame earrings~
+There is a pair of flame-shaped earrings lying here.~
+   You're not sure if these intricate earrings are made from gemstones, or
+magically frozen fires. They should be safe to wear anyhow.
+~
+2 mp am 2
+0 0 0
+10 0
+A
+7 2
+A
+16 1
+A
+8 1
+C
+0 0
+S
+#18088
+gloves glowing emberweave pair~
+emberweave gloves~
+A pair of glowing emberweave gloves is lying here.~
+   These gloves look like they were woven from ash studded with hot coals, but
+they are only pleasantly warm to the touch.
+~
+27 mp ah 2
+0 0 0
+11 0
+A
+23 5
+A
+7 1
+A
+8 1
+C
+0 0
+S
+#18089
+gauntlets iron molten pair~
+molten gauntlets~
+A pair of molten iron gauntlets is lying here.~
+   These gauntlets, formed from molten metal and emblazoned with an infernal
+crest, are extremely hot, but safe to wear. For a given value of 'safe'.
+~
+27 mp ah 3
+3 0 0
+2 0
+A
+9 -2
+A
+15 2
+A
+12 2
+A
+24 2
+B
+c
+C
+0 0
+S
+#18090
+earrings fiend's molten~
+the molten fiend's earrings~
+The molten fiend's earrings are lying here!~
+   These golden earrings are inscribed with countless demonic sigils, and grant
+unholy vitality to the wearer!
+~
+2 mp am 2
+0 0 0
+4 0
+A
+15 4
+A
+3 1
+A
+6 1
+B
+c
+C
+0 0
+S
+#18091
+flametalon flaming talon~
+Flametalon~
+A flaming talon is stabbed into the ground here.~
+   This talon, about the size and shape of a dagger, blazes energetically with
+fiendish flames. It looks absolutely lethal!
+~
+1 imp ano 1
+0 6 4
+14 0
+A
+17 2
+A
+6 1
+C
+0 0
+S
+#18092
+earring obsidian razor-sharp sharp~
+an obsidian earring~
+A razor-sharp obsidian earring is lying here.~
+   If you don't want to wear it, you could always stab someone with it... Then
+again, you would probably cut yourself in the process.
+~
+2 mp am 3
+0 0 0
+8 0
+A
+21 3
+A
+1 1
+A
+17 2
+C
+0 0
+S
+#18093
+crown abyssal obsidian flames~
+a crown of abyssal flames~
+An obsidian crown wreathed in abyssal flames is levitating here!~
+   Despite their dull hue, the flames adorning this demonic status symbol give
+off the heat of a blast furnace. Only the wearer is safe...
+~
+2 mp ae 8
+0 0 0
+1 0
+A
+16 3
+A
+7 1
+A
+8 1
+A
+5 1
+B
+c
+C
+0 0
+S
+#18094
+bow bladed fiendhorn fiend's fiends horns~
+a fiendhorn bladed bow~
+A bladed bow made from a fiend's horns is lying here.~
+   This raises an interesting question: did someone carve this out, or were
+this demon's horns always neatly bow-shaped?
+~
+20 mp ap 4
+0 3 0
+14 0
+A
+15 3
+C
+0 0
+S
+#18095
+reins hellish hellsteed's~
+a hellsteed's reins~
+A set of hellish reins are lying here.~
+These reins can be used just once, to summon a hellsteed mount.
+~
+3 0 a 4
+18078 0 0
+7 0
+T 10263
+S
+#18096
+ashes phoenix noble pile~
+a pile of phoenix ash~
+The ashes of a noble phoenix are lying here.~
+   This pile of ash, when used, will be restored into a noble Phoenix, which
+will be indebted to you!
+~
+3 0 a 8
+18079 0 0
+10 0
+T 10263
+S
+$

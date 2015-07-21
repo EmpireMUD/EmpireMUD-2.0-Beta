@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.god.c                                       EmpireMUD 2.0b1 *
+*   File: act.god.c                                       EmpireMUD 2.0b2 *
 *  Usage: Player-level God commands                                       *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -93,6 +93,7 @@ ACMD(do_create) {
 	obj_data *proto, *obj = NULL;
 	obj_data *obj_iter, *next_obj;
 	int cost, iter, mat, num = 1, count = 0;
+	bool imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_LOAD));
 	bool low_res = FALSE;
 
 	// create [number] <name list>
@@ -139,7 +140,7 @@ ACMD(do_create) {
 	// make them!
 	for (iter = 0; iter < num && !low_res; ++iter) {
 		// imms have no need to have the resources (just gods)
-		if (GET_RESOURCE(ch, mat) >= cost || IS_IMMORTAL(ch)) {
+		if (GET_RESOURCE(ch, mat) >= cost || imm_access) {
 			++count;
 			GET_RESOURCE(ch, mat) = MAX(0, GET_RESOURCE(ch, mat) - cost);
 			obj = read_object(GET_OBJ_VNUM(proto));
@@ -193,7 +194,7 @@ ACMD(do_sacrifice) {
 	char_data *god = NULL, *cbuf = NULL;
 	descriptor_data *d;
 	int amount = 0, dotmode, player_i = 0;
-	bool file = FALSE;
+	bool file = FALSE, any = FALSE;
 	struct char_file_u tmp_store;
 
 	two_arguments(argument, arg, buf);
@@ -245,10 +246,19 @@ ACMD(do_sacrifice) {
 		else {
 			for (obj = ch->carrying; obj; obj = next_obj) {
 				next_obj = obj->next_content;
+				
+				if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
+					continue;
+				}
+				
 				amount += perform_sacrifice(ch, god, obj, TRUE);
 			}
 			for (obj = ROOM_CONTENTS(IN_ROOM(ch)); obj; obj = next_obj) {
 				next_obj = obj->next_content;
+				
+				if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
+					continue;
+				}
 
 				if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED))
 					continue;
@@ -266,23 +276,39 @@ ACMD(do_sacrifice) {
 			msg_to_char(ch, "What do you want to sacrifice all of?\r\n");
 			return;
 		}
-		if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying)))
-			if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) || !(obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)))))
+		if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+			if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) || !(obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
 				msg_to_char(ch, "You don't seem to have any %ss to sacrifice.\r\n", arg);
+				return;
+			}
+		}
 
 		while (obj) {
 			next_obj = get_obj_in_list_vis(ch, arg, obj->next_content);
 			if (!next_obj && can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) && !IN_ROOM(obj))
 				next_obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)));
-			amount += perform_sacrifice(ch, god, obj, TRUE);
+			
+			if (CAN_WEAR(obj, ITEM_WEAR_TAKE) && !OBJ_FLAGGED(obj, OBJ_KEEP)) {
+				amount += perform_sacrifice(ch, god, obj, TRUE);
+				any = TRUE;
+			}
+			
 			obj = next_obj;
+		}
+		
+		if (!any) {
+			msg_to_char(ch, "You can't sacrifice anything like that.\r\n");
 		}
 	}
 	else {
 		if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying)) && (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) || !(obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))))
 			msg_to_char(ch, "You don't seem to have any %ss to sacrifice.\r\n", arg);
-		else
+		else if (!CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
+			msg_to_char(ch, "You can't sacrifice that!\r\n");
+		}
+		else {
 			amount += perform_sacrifice(ch, god, obj, TRUE);
+		}
 	}
 
 	if (!file)

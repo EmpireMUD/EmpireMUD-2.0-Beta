@@ -1267,7 +1267,7 @@ E
 1 0 100.00 16
 E
 9 0 4.00 16
-I 6 3017 100.00 1  # FORAGE: UNKNOWN
+I 6 3017 100.00 1  # FORAGE: a plump fig
 I 9 121 100.00 1  # GATHER: a stick
 M
 9061 0.01 d
@@ -1586,7 +1586,7 @@ Oasis~
 A Sparkling Oasis~
 '~' 18 2 6 iw j
 C
-dig, drink, fill, fillin, gather, pick~
+dig, drink, fill, gather, pick~
 D1
 .&C~~&?.~
 &Y~
@@ -1845,7 +1845,7 @@ E
 8 0 100.00 15
 E
 9 0 4.00 28
-I 6 3017 100.00 1  # FORAGE: UNKNOWN
+I 6 3017 100.00 1  # FORAGE: a plump fig
 I 9 121 100.00 1  # GATHER: a stick
 M
 9061 0.01 d
@@ -1940,7 +1940,7 @@ E
 0 1 100.00 28
 E
 7 5 0.50 29
-I 6 3017 100.00 1  # FORAGE: UNKNOWN
+I 6 3017 100.00 1  # FORAGE: a plump fig
 I 9 121 100.00 1  # GATHER: a stick
 M
 9061 0.01 d

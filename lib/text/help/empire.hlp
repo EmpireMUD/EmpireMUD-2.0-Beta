@@ -20,12 +20,14 @@ Empire is a skill, a command, and a grouping of people and land.
    chopping trees, scraping trees, planting crops, harvesting crops, mining,
    and building.
 
+You can learn about founding and managing empires on HELP EMPIRE GUIDE.
+
 See also: CLAIM, PLEDGE, ENROLL, PROMOTE, TERRITORY, CITIES, ROSTER, ESCORE,
     EMPIRE TRAITS, ELOG, EEDIT, ETALK
 #
 ABANDON
 
-Usage: abandon
+Usage:  abandon
 
 This command allows you to abandon a building or acre of land which your 
 empire no longer wants. This falls under the cede privilege.
@@ -101,8 +103,8 @@ Barded mounts will not de-spawn like normal animals.
 #
 BUILD BUILDING
 
-Usage: build <building> [direction]
-       build <monument> <god>
+Usage:  build <building> [direction]
+        build <monument> <god>
 
 This command is used to create buildings using raw materials. If you build a
 shrine or temple, you must specify a God to dedicate it to. Most other
@@ -140,13 +142,15 @@ vxvv gate  20 sticks, 1 copper ingot
 |__| quarry  4 logs, 20 sticks -- must be on flat land facing a mountain
 &y|__|&0 claypit  4 logs, 20 sticks -- must be on flat land facing water
 
+For more information on building your first house, see HELP HOUSING GUIDE.
+
 See also: EMPIRE, ARTISANS, LUXURY, MONUMENTS, GRAND MONUMENTS, SEAFARING,
           HOUSING, LOCKSMITHING, RAISE ARMIES, ADVANCED TACTICS, ROADS, HAVENS,
           SWAMP ENGINEERING, GREAT WALLS, DESIGNATE, DISMANTLE
 #
 CEDE
 
-Usage: cede <person> (x, y)
+Usage:  cede <person> (x, y)
 
 This is used to cede one acre of land to anyone else currently in the game. 
 If you do not include an (x, y) coordinate, it will cede the land you're on. 
@@ -176,6 +180,11 @@ don't claim it yourself.
 You can get additional city points from accruing at least 4000 wealth, for
 achieving Prominence, and for having at least 10 technologies.
 
+EmpireMUD periodically checks if cities are completely empty and, if so,
+will remove the city center and refund the city point. This helps keep the map
+clean, and you can prevent it by making sure there is at least one building in
+your city.
+
 - &ccity list&0: This lists the cities already established in the empire, as well
     as how many city points are available to spend. Immortals can specify an
     empire to list all of its cities.
@@ -199,7 +208,7 @@ achieving Prominence, and for having at least 10 technologies.
 
 - &ccity rename <number> <new name>&0: This allows you to rename a city.
 
-- &&ccity traits <name> [add | remove] <trait(s)>&0: Change city traits.
+- &ccity traits <name> [add | remove] <trait(s)>&0: Change city traits.
 
 Types of cities:
  -C1-  Outpost (5)
@@ -221,7 +230,7 @@ ability.
 #
 CLAIM
 
-Usage: claim
+Usage:  claim
 
 Claims the acre you're currently on for your empire.
 
@@ -243,14 +252,14 @@ Commerce also allows you to build the mint building, and mint your own coins:
 
 [MM] mint  12 lumber, 4 nails, 12 blocks, 4 coin mills
 
-See also: BUILD, WEALTH
+See also: BUILD, MINT, WEALTH
 #
 CUSTOMIZE "CUSTOMIZE BUILDING"
 
 Customize Building (Empire ability)
 
-Usage: customize building name <name | none>
-       customize building description <set | none>
+Usage:  customize building name <name | none>
+        customize building description <set | none>
 
 Customize Building lets you change the names and descriptions of your build-
 ings. You must own the building you're trying to customize, and have permission
@@ -300,16 +309,16 @@ See also: PLEDGE
 #
 DEMOTE
 
-Usage: demote <person> [rank]
+Usage:  demote <person> [rank]
 
 Demotes a person within the empire. You can specify the name of the rank
-you'd like to demote them to, or just do it one level at a time.
+you'd like to demote them to, or just do it one rank at a time.
 
 See also: PRIVILEGE, PROMOTE, EXPEL
 #
 DEPOSIT
 
-Usage: deposit <number> [empire] <coins>
+Usage:  deposit <number> [empire] <coins>
 
 You can deposit coins in your empire's vault. Foreign coins are always
 exchanged for local currency at the current exchange rate, and stored as local
@@ -319,13 +328,11 @@ See also: COMMERCE, EXCHANGE, MINT, VAULT, WITHDRAW
 #
 DIPLOMACY PEACE WAR ALLIANCE TRUCE DISTRUST
 
-Usage: diplomacy <option> <empire>
+Usage:  diplomacy <option> <empire>
 
 This command is the basis for the interaction among empires. It allows an
 empire to voice its political opinion on another empire and announce it to
-that empire. For the privacy of these empires, and to promote a sense of
-realism, empires cannot view the relations between two other empires. They
-may only see the relations which directly affect themselves.
+that empire.
 
 You can only burn down or besiege another empires buildings if you are at war.
 You can only go to war with or steal from an empire if at least one of their
@@ -333,7 +340,7 @@ members is online.
 
 Options:
   peace    - an end to a war, or a good starting relationship
-  war      - a state of supreme distrust and hate
+  war*     - a state of supreme distrust and hate
              depending on the pk option set on the mud, you may only be able
              to kill someone from an empire you're at war with
   ally     - share facilities and friendship
@@ -343,6 +350,22 @@ Options:
              exchange goods and services
   distrust - a state just short of war which indicates hatred
   truce    - ends a war or distrustful state without creating peace
+
+* To declare war, an empire must immediately spend an amount of money based
+on the difference between the two empires' composite scores. You can see the
+cost to declare war on the empire detail page for any empire you're not in
+a non-aggression pact (or better) with.
+
+See also: EMPIRE SCORE
+#
+DRAGONRIDING "DRAGON RIDING"
+
+Dragonriding (Class ability)
+Class ability: All Empire classes
+
+Dragonriding allows you to ride flying mounts, if you have the Ride ability.
+
+See also: RIDE
 #
 EEDIT "EMPIRE EDITOR" "EDIT EMPIRE"
 
@@ -355,6 +378,7 @@ the empire's properties.
 Available options:
  adjective - the form of the empire name used in some sentences
  banner - set the color codes used for your empire's name and territory
+ changeleader - lets you set a new leader
  description - shown on your empire detail
  motd - change the "message of the day"
  name - set the full name of the empire
@@ -415,8 +439,8 @@ See also: EEDIT
 #
 EMPIREINVENTORY EINVENTORY
 
-Usage: empireinventory [item | all]
-       einventory [item | all]
+Usage:  empireinventory [item | all]
+        einventory [item | all]
        
 The einventory command shows the contents of all storage buildings and rooms
 for the island you're currently on. It won't work out in the ocean. You can
@@ -452,7 +476,7 @@ See also: MUDSTATS
 #
 ENROLL
 
-Usage: enroll <person>
+Usage:  enroll <person>
 
 When a person has pledged his loyalty to your empire, you can enroll him into
 it. This will start him at the lowest empire level.
@@ -466,9 +490,9 @@ See also: CITY, EXPEL, PROMOTE, PRIVILEGE, PLEDGE
 #
 ESAY ETALK EHISTORY EMPIREHISTORY
 
-Usage: etalk <text>
-       etalk #level <text>
-       ehistory
+Usage:  etalk <text>
+        etalk #level <text>
+        ehistory
 
 Allows you to talk to your empire on a private channel, even from the other
 side of the world. This is very useful for espionage and other secret
@@ -491,7 +515,11 @@ trench from a desert or plains. Once the trench is complete, it will begin
 to fill with water. Eventually, it becomes a river.
 
 The "fillin" command is the opposite of excavate: it fills trenches in until
-they are ordinary plains or desert again. It will also work on an oasis.
+they are ordinary plains or desert again. It will also work on a player-created
+oasis or river.
+
+If you fill a desert trench, it will become an Oasis instead of a river. Oases
+convert into rivers if they are adjacent to other rivers or to oceans.
 
 There are three ways to fill a finished trench with water:
  - If there is more water adjacent, the trench will fill quickly.
@@ -512,11 +540,11 @@ trading in.
 
 The exchange rates can be found on HELP COINS.
 
-See also: COINS, MINT, VAULT
+See also: COINS, KEEP, MINT, VAULT
 #
 EXPEL
 
-Usage: expel <person>
+Usage:  expel <person>
 
 Kicks a person out of the empire.
 
@@ -581,8 +609,8 @@ Grand Monuments (Empire ability)
 The Grand Monuments ability allows you to build the largest monuments.
 
 [^^] library  100 lumber, 40 nails, 48 blocks
- 3x3 hightemple  24 lumber, 8 nails, 48 blocks
- 4x4 pyramid  100 lumber, 40 nails, 200 blocks
+[||] hightemple  24 lumber, 8 nails, 48 blocks
+/^^\ pyramid  100 lumber, 40 nails, 200 blocks
 
 See also: BUILD, MONUMENTS
 #
@@ -642,14 +670,24 @@ INSPIRE
 Inspire (Empire ability)
 
 Usage:  inspire <target | all> <type>
+Cost:  30 move points per person or 60 for 'all'
 
 A powerful leader can inspire his friends and allies with a rousing speech.
+It will only be half as effective when used on himself. The 'all' option
+targets all players in the room except himself.
+
+This ability scales with the user's Greatness. If Greatness is too low, people
+may not feel inspired at all.
 
 Here are the ways you can inspire:
-  Battle: dexterity and strength
-  Mana: mana and mana regeneration
-  Stamina: move and move regeneration
-  Toughness: health and health regeneration
+  Accuracy: to-hit
+  Evasion: dodge
+  Mana: max mana and mana regeneration
+  Might: strength and bonus physical damage
+  Prowess: dexterity and wits
+  Sorcery: intelligence and bonus magical damage
+  Stamina: max moves and move regeneration
+  Toughness: max health
 #
 LOCKSMITHING
 
@@ -684,9 +722,12 @@ Buildings fall into disrepair over time. It costs 1 pile of lumber and 1 pouch
 of nails per year of disrepair. You can also use workforce to maintain your
 buildings.
 
+It takes roughly two and a half months (realtime) for buildings to decay,
+although unfinished buildings decay faster.
+
 Use findmaintenance to find buildings in need.
 
-See also: FINDMAINTENANCE, WORKFORCE
+See also: FINDMAINTENANCE, RUINS, WORKFORCE
 #
 MEMBERS MEMBERSHIP "EMPIRE MEMBERS" "EMPIRE MEMBERSHIP" "EMPIRE GREATNESS" "TIMED-OUT" "TIMED OUT" TIMEOUTS "EMPIRE TIMEOUT"
 
@@ -721,7 +762,7 @@ Monuments (Empire ability)
 The Monuments ability allows you to build monuments.
 
 &g.&0}{&g.&0 statue  6 lumber, 2 nails, 10 blocks
-<<>> henge  120 stone blocks (30 per corner)
+<<>> henge  120 stone blocks
 &g.&0||&g.&0 megalith  40 stone blocks
 &g.&0i&g.&0i cemetery  8 stone blocks
 &g.^.&co&0 park  25 sticks, 4 blocks
@@ -738,11 +779,11 @@ Usage:  pan
 Using a simple metal pan, you can pan for gold flakes next to the river. It's
 rare to find anything, but it's something to do.
 
-See also: FORGE
+See also: DEPLETION, FORGE
 #
 PLEDGE JOIN
 
-Usage: pledge <empire>
+Usage:  pledge <empire>
 
 Allows you to pledge your loyalty to an empire. If they find you worthy, you
 may be allowed to join.
@@ -757,10 +798,10 @@ See also: CITY, DEFECT, ENROLL
 #
 PROMOTE
 
-Usage: promote <person> [level]
+Usage:  promote <person> [rank]
 
-This can be used to advance someone to a specific level, or to advance them
-one level at a time. They must be in your empire to do this.
+This can be used to advance someone to a specific rank, or to advance them
+one rank at a time. They must be in your empire to do this.
 
 See also: DEMOTE, ENROLL, PRIVILEGE
 #
@@ -813,7 +854,7 @@ PROSPECT
 
 Prospect (Empire ability)
 
-Usage: prospect
+Usage:  prospect
 
 A skilled prospector can determine what minerals are in the ground without
 exploratory mining.
@@ -842,6 +883,7 @@ QUARRY
 
 Command:  quarry
 Building:  |__|  Quarry  (no skill required)
+Resources:  4 logs, 20 sticks
 Built on:  plains or desert, facing mountain
 
 A quarry must be built on plains or desert, facing a mountain. Quarries are a
@@ -850,10 +892,11 @@ command. You will find more rocks before a quarry depletes, compared to digging
 anywhere else.
 
 You can gain Empire skill up to 15 by quarrying stone. This does not require
-an ability.
+an ability. If you have the "dig" workforce enabled, your citizens will only
+dig if you have a quarry.
 
-If you have the "dig" workforce enabled, your citizens will only dig if you
-have a quarry.
+Quarries always count as in-city territory for your empire, no matter where
+you build them.
 
 See also: DEPLETION, DIG
 #
@@ -876,7 +919,7 @@ The Raise Armies ability unlocks additional buildings.
 .TT. guardtower  12 lumber, 3 nails (may only be built in a city)
 &y.&0/\&y.&0 mountainoutpost  12 lumber, 3 nails
 [BB] barracks  40 lumber, 10 nails, 20 bricks
-[  ] training yard  40 lumber, 10 nails, 20 bricks
+[  ] trainingyard  40 lumber, 10 nails, 20 bricks
 VVVV wall  10 bricks
 V||V gatehouse  10 lumber, 4 nails, 10 bricks
  
@@ -909,16 +952,17 @@ REWARD
 
 Reward (Empire ability)
 
-Usage:  reward <player> <skill>
+Usage:  reward <player>
 Cooldown:  30 seconds
 
-Great leaders can reward their loyal subjects with additional skill points
+Great leaders can reward their loyal subjects with additional bonus experience
 each day. Each leader with Reward may only grant 5 rewards per day, and each
 reward must go to a different member of the empire. However, if two leaders
 have Reward, they may both choose to reward the same member.
 
-You cannot reward a skill to someone if their skill is already over 75, or if
-they are better at that skill than you.
+Each Reward gives a member of your empire +5 bonus experience for the day.
+Just like regular bonus experience, it will expire at the end of the day if
+it isn't used.
 #
 ROCKS
 
@@ -931,7 +975,7 @@ See also: BUILD, DIG, CHIP
 #
 ROSTER
 
-Usage: roster
+Usage:  roster
 
 This command shows you the members of your empire and lets you know who's on-
 line and who's been gone a while.
@@ -1008,6 +1052,32 @@ See also: BUILD, HOME, WORKFORCE
 #
 TERRITORY
 
+(Disambiguation: Did you mean HELP TERRITORY COMMAND ?)
+
+Each empire is limited in how much territory it can claim. The formula for
+territory is:
+
+(Greatness x 35) + (Wealth / 10) + (Technologies x 15)
+
+* Greatness: This is the total Greatness of all members.
+* Wealth: Only empires with the Commerce tech can gain territory from Wealth.
+      You can gain wealth by storing precious metals in your vault.
+* Technologies: Each technology you unlock (e.g. City Lights) gives 15. These
+      only count once per empire, so two members with City Lights will not
+      result in +30 territory.
+
+80% of an empire's maximum must be within the borders of its cities. Only 20%
+of your total territory can be outside of cities. However, some buildings, such
+as Mines, do not count as outside territory no matter where you build them.
+Roads also do not count as outside.
+
+When an empire's members start to time out from lack of gameplay, the empire
+may start losing territory.
+
+See also: CITIES, EMPIRE TIMEOUT, TERRITORY COMMAND
+#
+"TERRITORY COMMAND"
+
 Usage:  territory [type]
         territory <empire> [type]  -- immortals only
 
@@ -1022,26 +1092,7 @@ that type.
 You require the Navigation ability to use the "territory" command, because it
 gives coordinates.
 
-Each empire is limited in how much territory it can claim. The formula for
-territory is:
-
-(Greatness x 35) + (Wealth / 10) + (Technologies x 15)
-
-* Greatness: This is the total Greatness of all members.
-* Wealth: Only empires with the Commerce tech can gain territory from Wealth.
-      You can gain wealth by storing precious metals in your vault.
-* Technologies: Each technology you unlock (e.g. City Lights) gives 15. These
-      only count once per empire, so two members with City Lights will not
-      result in +30 territory.
-
-80% of an empire's territory must be within the borders of its cities. The
-other 20% can be anywhere. Some buildings, like Mines, do not count as outside
-territory no matter where you build them. Roads also do not count as outside.
-
-When an empire's members start time time out from lack of gameplay, the empire
-may start losing territory.
-
-See also: CITIES, NAVIGATION, EMPIRE TIMEOUT
+See also: CITIES, NAVIGATION, TERRITORY
 #
 TREES LOGS
 
@@ -1051,10 +1102,15 @@ Get a tree using the chop command.
 Get a log using the scrape command.
 
 Trees are found by chopping down forests. They are used in most buildings,
-but you must scrape them first. Be warned, however, because trees are a
-limited resource.
+but you must scrape them first. Forests will regrow if you don't chop down all
+four trees on a tile, and they also spread from overgrown forests to adjacent
+plains. Desert groves are different, and will spring up anywhere in the desert.
 
-See also: CHOP, BUILD, SCRAPE
+You can stop the spread of trees by chopping them all down, by building a
+fence, or by laying a road. Chant of Nature can be used to grow trees on bare
+plains.
+
+See also: CHANT OF NATURE, CHOP, BUILD, SCRAPE
 #
 TECHNOLOGY TECHNOLOGIES "EMPIRE TECHNOLOGY"
 
@@ -1129,7 +1185,7 @@ range. Tunnels always go in a straight line, and you can't pass through each
 part of a tunnel until it is finished. If you destroy one side of the tunnel,
 the other side will result in a dead end.
 
-To begin the tunnel, stand on flat ground (plains, desest, etc) next to the
+To begin the tunnel, stand on flat ground (plains, desert, etc) next to the
 mountain and type "tunnel east" (or whichever way the mountain is). You must
 have permission to build on both ends of the tunnel (you can't tunnel into
 someone else's claimed land).
@@ -1142,7 +1198,7 @@ See also: DISMANTLE, INTERLINK
 #
 UNPUBLICIZE
 
-Usage: unpublicize
+Usage:  unpublicize
 
 CAUTION: This is not a toggle!
 
@@ -1178,6 +1234,7 @@ Workforce, Skilled Labor (Empire abilities)
 
 Usage:  workforce [type]
         workforce no-work
+        workforce where
 
 Once at least one member of an empire has the Workforce ability, the empire's
 citizens (NPCs) will start performing simple tasks for the empire. You can
@@ -1195,18 +1252,22 @@ island. Citizens will only work on claimed land. Only one citizen will work
 a given location at a time.
 
 You can use the "workforce no-work" command to toggle whether or not your
-citizens will work the room you're currently standing in.
+citizens will work the room you're currently standing in. The "workforce where"
+will tell you how many citizens are working each task.
 
 Note: Your workforce will only do chores if your empire has less than 200 of
 the resource provided by the chore. For example, miners won't do any work in
 iron mines if you have 200 iron ore. This does not apply to dismantling. If
-you have Skilled Labor, the cap is 750 instead. This cap is per-island.
+you have Skilled Labor, the cap is 750 instead. This cap is per-island. There
+is also a total cap for any given resource, which is based on the number of
+players in your empire. After passing the total cap, the locals will collect
+much less of that resource on each island.
 
 Workforce types:
   &ybuilding:&0 NPCs will build any building that has been started, or dismantle
             any building you've started to dismantle. They build using stored
             empire resources, not items on the ground.
-  &ychopping:&0 NPCs will chop down trees.
+  &ychopping:&0 NPCs will chop down forests and desert groves.
   &ydigging:&0 NPCs will dig for rocks in any quarry, or clay in any clay pit.
   &yfarming:&0 NPCs will harvest crops.
   &yreplanting:&0 after farming crops, NPCs will replant them.

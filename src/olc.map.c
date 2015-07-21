@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: olc.map.c                                       EmpireMUD 2.0b1 *
+*   File: olc.map.c                                       EmpireMUD 2.0b2 *
 *  Usage: OLC for the map and map-building rooms                          *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -55,7 +55,7 @@ OLC_MODULE(mapedit_terrain) {
 		
 		count = 0;
 		HASH_ITER(hh, sector_table, sect, next_sect) {
-			msg_to_char(ch, "%s %s", (++count > 0 ? "," : ""), GET_SECT_NAME(sect));
+			msg_to_char(ch, "%s %s", (count++ > 0 ? "," : ""), GET_SECT_NAME(sect));
 		}
 		HASH_ITER(hh, crop_table, crop, next_crop) {
 			msg_to_char(ch, ", %s", GET_CROP_NAME(crop));

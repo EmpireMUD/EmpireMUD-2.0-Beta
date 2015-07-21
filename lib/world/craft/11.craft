@@ -23,7 +23,7 @@ sorcerer staff~
 R
 124 1  # 1x a heavy log
 R
-1206 5  # 5x an unusual blue clover
+1206 5  # 5x an iridescent blue iris
 S
 #1110
 staff of wisdom~
@@ -52,7 +52,7 @@ burning staff~
 R
 124 1  # 1x a heavy log
 R
-1206 10  # 10x an unusual blue clover
+1206 10  # 10x an iridescent blue iris
 R
 176 5  # 5x an ingot of nocturnium
 S
@@ -73,5 +73,33 @@ imperium spike~
 1 51 0 2 -1
 R
 177 1  # 1x an imperium ingot
+S
+#1115
+nexus crystal~
+1115 2  # 2x a nexus crystal
+2 189 h 2 104
+R
+104 1  # 1x a red bloodstone
+S
+#1116
+nexus crystal~
+1115 2  # 2x a nexus crystal
+2 189 h 2 103
+R
+103 1  # 1x a yellow lightning stone
+S
+#1117
+nexus crystal~
+1115 2  # 2x a nexus crystal
+2 189 h 2 1206
+R
+1206 1  # 1x an iridescent blue iris
+S
+#1118
+nexus crystal~
+1115 2  # 2x a nexus crystal
+2 189 h 2 1300
+R
+1300 1  # 1x a glowing green seashell
 S
 $

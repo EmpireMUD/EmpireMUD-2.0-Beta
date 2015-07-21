@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.immortal.c                                  EmpireMUD 2.0b1 *
+*   File: act.immortal.c                                  EmpireMUD 2.0b2 *
 *  Usage: Player-level imm commands and other goodies                     *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -49,6 +49,7 @@ extern const char *dirs[];
 extern const char *drinks[];
 extern const char *genders[];
 extern const char *grant_bits[];
+extern const char *island_bits[];
 extern const char *mapout_color_names[];
 extern const char *room_aff_bits[];
 extern const char *spawn_flags[];
@@ -66,6 +67,7 @@ extern char *get_room_name(room_data *room, bool color);
 void save_instances();
 void save_whole_world();
 void scale_mob_to_level(char_data *mob, int level);
+void update_class(char_data *ch);
 
 // locals
 void instance_list_row(struct instance_data *inst, int number, char *save_buffer, size_t size);
@@ -81,30 +83,19 @@ void instance_list_row(struct instance_data *inst, int number, char *save_buffer
 * @param empire_data *emp The empire to store it to.
 * @param int island The islands to store it to.
 */
-static void perform_autostore(obj_data *obj, empire_data *emp, int island) {	
+static void perform_autostore(obj_data *obj, empire_data *emp, int island) {
+	extern bool check_autostore(obj_data *obj, bool force);
+	
 	obj_data *temp, *next_temp;
 	
-	// try to store it
-	if (emp) {
-		if (OBJ_CAN_STORE(obj) || IS_COINS(obj)) {
-			// try to store contents
-			for (temp = obj->contains; temp; temp = next_temp) {
-				next_temp = temp->next_content;
-				perform_autostore(temp, emp, island);
-			}
-	
-			// empty then just empty it
-			empty_obj_before_extract(obj);
-
-			if (IS_COINS(obj)) {
-				increase_empire_coins(emp, real_empire(GET_COINS_EMPIRE_ID(obj)), GET_COINS_AMOUNT(obj));
-			}
-			else {
-				add_to_empire_storage(emp, island, GET_OBJ_VNUM(obj), 1);
-			}
-			extract_obj(obj);
-		}
+	// store the inside first
+	for (temp = obj->contains; temp; temp = next_temp) {
+		next_temp = temp->next_content;
+		perform_autostore(temp, emp, island);
 	}
+	
+	
+	check_autostore(obj, TRUE);
 }
 
 
@@ -290,7 +281,9 @@ bool users_output(char_data *to, char_data *tch, descriptor_data *d, char *name_
 
 #define ADMIN_UTIL(name)  void name(char_data *ch, char *argument)
 
+ADMIN_UTIL(util_clear_roles);
 ADMIN_UTIL(util_diminish);
+ADMIN_UTIL(util_islandsize);
 ADMIN_UTIL(util_playerdump);
 ADMIN_UTIL(util_randtest);
 ADMIN_UTIL(util_redo_islands);
@@ -302,7 +295,9 @@ struct {
 	int level;
 	void (*func)(char_data *ch, char *argument);
 } admin_utils[] = {
+	{ "clearroles", LVL_CIMPL, util_clear_roles },
 	{ "diminish", LVL_START_IMM, util_diminish },
+	{ "islandsize", LVL_START_IMM, util_islandsize },
 	{ "playerdump", LVL_IMPL, util_playerdump },
 	{ "randtest", LVL_CIMPL, util_randtest },
 	{ "redoislands", LVL_CIMPL, util_redo_islands },
@@ -315,9 +310,40 @@ struct {
 
 // secret implementor-only util for quick changes -- util tool
 ADMIN_UTIL(util_tool) {
-	void update_all_players(char_data *to_message);
+	msg_to_char(ch, "Ok.\r\n");
+}
+
+
+// for util_clear_roles
+PLAYER_UPDATE_FUNC(update_clear_roles) {
+	void check_skill_sell(char_data *ch, int abil);
+	int iter;
 	
-	update_all_players(ch);	
+	if (IS_IMMORTAL(ch)) {
+		return;
+	}
+	
+	GET_CLASS_ROLE(ch) = ROLE_NONE;
+	
+	if (!is_file) {
+		msg_to_char(ch, "Your class role has been reset.\r\n");
+	}
+	
+	for (iter = 0; iter < NUM_ABILITIES; ++iter) {
+		if (ability_data[iter].parent_skill == NO_SKILL && HAS_ABILITY(ch, iter)) {
+			ch->player_specials->saved.abilities[iter].purchased = FALSE;
+			if (!is_file) {
+				check_skill_sell(ch, iter);
+			}
+		}
+	}
+}
+
+
+ADMIN_UTIL(util_clear_roles) {
+	void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func));
+	update_all_players(ch, update_clear_roles);
+	syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has cleared all player roles", GET_NAME(ch));
 	msg_to_char(ch, "Ok.\r\n");
 }
 
@@ -342,6 +368,57 @@ ADMIN_UTIL(util_diminish) {
 		result = diminishing_returns(number, scale);
 		
 		msg_to_char(ch, "Diminished value: %.2f\r\n", result);
+	}
+}
+
+
+// util_islandsize: helper type
+struct isf_type {
+	int island;
+	int count;
+	UT_hash_handle hh;
+};
+int sort_isf_list(struct isf_type *a, struct isf_type *b) {
+	return a->island - b->island;
+}
+
+ADMIN_UTIL(util_islandsize) {
+	struct isf_type *isf, *next_isf, *list = NULL;
+	char buf[MAX_STRING_LENGTH];
+	room_data *room, *next_room;
+	size_t size;
+	int isle;
+	
+	HASH_ITER(world_hh, world_table, room, next_room) {
+		if (GET_ROOM_VNUM(room) < MAP_SIZE) {
+			isle = GET_ISLAND_ID(room);
+			HASH_FIND_INT(list, &isle, isf);
+			if (!isf) {
+				CREATE(isf, struct isf_type, 1);
+				isf->island = isle;
+				isf->count = 0;
+				HASH_ADD_INT(list, island, isf);
+			}
+			
+			isf->count += 1;
+		}
+	}
+	
+	HASH_SORT(list, sort_isf_list);
+	
+	size = snprintf(buf, sizeof(buf), "Island sizes:\r\n");
+	HASH_ITER(hh, list, isf, next_isf) {
+		if (size < sizeof(buf)) {
+			size += snprintf(buf + size, sizeof(buf) - size, "%2d: %d tile%s\r\n", isf->island, isf->count, PLURAL(isf->count));
+		}
+		
+		// free as we go
+		HASH_DEL(list, isf);
+		free(isf);
+	}
+	
+	if (ch->desc) {
+		page_string(ch->desc, buf, TRUE);
 	}
 }
 
@@ -454,7 +531,7 @@ ADMIN_UTIL(util_randtest) {
 
 
 ADMIN_UTIL(util_redo_islands) {
-	void number_the_islands(bool reset);
+	void number_and_count_islands(bool reset);
 	
 	skip_spaces(&argument);
 	
@@ -464,7 +541,7 @@ ADMIN_UTIL(util_redo_islands) {
 	}
 	else {
 		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has renumbered islands", GET_NAME(ch));
-		number_the_islands(TRUE);
+		number_and_count_islands(TRUE);
 		msg_to_char(ch, "Islands renumbered. Caution: empire inventories may now be in the wrong place.\r\n");
 	}
 }
@@ -512,7 +589,7 @@ ACMD(do_admin_util) {
 
 void do_instance_add(char_data *ch, char *argument) {
 	extern bool can_instance(adv_data *adv);
-	extern room_data *find_location_for_rule(struct adventure_link_rule *rule, int *which_dir);
+	extern room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rule, int *which_dir);
 
 	struct adventure_link_rule *rule;
 	bool found = FALSE;
@@ -532,7 +609,7 @@ void do_instance_add(char_data *ch, char *argument) {
 	}
 	
 	for (rule = GET_ADV_LINKING(adv); rule; rule = rule->next) {
-		if ((loc = find_location_for_rule(rule, &dir))) {
+		if ((loc = find_location_for_rule(adv, rule, &dir))) {
 			// make it so!
 			if (build_instance_loc(adv, rule, loc, dir)) {
 				found = TRUE;
@@ -665,7 +742,7 @@ void do_instance_nearby(char_data *ch, char *argument) {
 		return;
 	}
 	
-	size = snprintf(buf, sizeof(buf), "Instanes within %d tiles:\r\n", distance);
+	size = snprintf(buf, sizeof(buf), "Instances within %d tiles:\r\n", distance);
 	
 	for (inst = instance_list; inst; inst = inst->next) {
 		++num;
@@ -1269,7 +1346,6 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		}
 	}
 	else if SET_CASE("skill") {
-		void update_class(char_data *ch);
 		extern int find_skill_by_name(char *name);
 	
 		char skillname[MAX_INPUT_LENGTH], *skillval;
@@ -1295,7 +1371,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		// victory
 		old_level = GET_SKILL(vict, skill);
 		set_skill(vict, skill, level);
-		if (old_level < level) {
+		if (old_level > level) {
 			clear_char_abilities(vict, skill);
 		}
 		update_class(vict);
@@ -1469,6 +1545,7 @@ SHOW(show_islands) {
 	struct empire_unique_storage *uniq;
 	struct empire_storage_data *store;
 	char arg[MAX_INPUT_LENGTH];
+	struct island_info *isle;
 	empire_data *emp;
 	int iter;
 	
@@ -1517,7 +1594,8 @@ SHOW(show_islands) {
 				continue;
 			}
 			
-			msg_to_char(ch, "%2d. %d items\r\n", cur->island, cur->count);
+			isle = get_island(cur->island, TRUE);
+			msg_to_char(ch, "%2d. %s: %d items\r\n", cur->island, isle->name, cur->count);
 			// pull it out of the list to prevent unlimited iteration
 			REMOVE_FROM_LIST(cur, list, next);
 			free(cur);
@@ -1546,6 +1624,10 @@ SHOW(show_player) {
 	// Www Mmm dd hh:mm:ss yyyy
 	sprintf(buf + strlen(buf), "Started: %-16.16s %4.4s   Last: %-16.16s %4.4s\r\n", birth, birth+20, lastlog, lastlog+20);
 	
+	if (vbuf.access_level <= GET_ACCESS_LEVEL(ch)) {
+		sprintf(buf + strlen(buf), "Creation host: %s\r\n", vbuf.player_specials_saved.creation_host);
+	}
+	
 	days_played = (double)(time(0) - vbuf.birth) / SECS_PER_REAL_DAY;
 	avg_min_per_day = (((double) vbuf.played / SECS_PER_REAL_HOUR) / days_played) * SECS_PER_REAL_MIN;
 	
@@ -1568,8 +1650,9 @@ SHOW(show_rent) {
 
 
 SHOW(show_stats) {
-	extern int get_total_score(empire_data *emp);
+	void update_account_stats();
 	extern int buf_switches, buf_largecount, buf_overflows;
+	extern int total_accounts, active_accounts, active_accounts_week;
 	
 	int num_active_empires = 0, num_objs = 0, num_mobs = 0, num_players = 0, num_descs = 0, menu_count = 0;
 	empire_data *emp, *next_emp;
@@ -1604,14 +1687,18 @@ SHOW(show_stats) {
 
 	// count active empires
 	HASH_ITER(hh, empire_table, emp, next_emp) {
-		if (get_total_score(emp) > 0) {
+		if (EMPIRE_MEMBERS(emp) > 0) {
 			++num_active_empires;
 		}
 	}
+	
+	update_account_stats();
 
 	msg_to_char(ch, "Current stats:\r\n");
 	msg_to_char(ch, "  %6d players in game  %6d connected\r\n", num_players, num_descs);
 	msg_to_char(ch, "  %6d registered       %6d at menus\r\n", top_of_p_table + 1, menu_count);
+	msg_to_char(ch, "  %6d player accounts  %6d active accounts\r\n", total_accounts, active_accounts);
+	msg_to_char(ch, "  %6d accounts logged in this week\r\n", active_accounts_week);
 	msg_to_char(ch, "  %6d empires          %6d active\r\n", HASH_COUNT(empire_table), num_active_empires);
 	msg_to_char(ch, "  %6d mobiles          %6d prototypes\r\n", num_mobs, HASH_COUNT(mobile_table));
 	msg_to_char(ch, "  %6d objects          %6d prototypes\r\n", num_objs, HASH_COUNT(object_table));
@@ -1718,7 +1805,7 @@ SHOW(show_skills) {
 	msg_to_char(ch, "&0%s\r\n", (found ? "" : "none"));
 	
 	// available summary
-	msg_to_char(ch, "Available skill points today: %d\r\n", GET_SKILL_POINTS_AVAILABLE(vict));
+	msg_to_char(ch, "Available daily bonus experience points: %d\r\n", GET_DAILY_BONUS_EXPERIENCE(vict));
 	
 	if (is_file) {
 		free_char(vict);
@@ -2257,28 +2344,31 @@ void do_stat_building(char_data *ch, bld_data *bdg) {
 void do_stat_character(char_data *ch, char_data *k) {
 	void find_uid_name(char *uid, char *name);
 	extern double get_combat_speed(char_data *ch, int pos);
-	extern int get_effective_block(char_data *ch);
-	extern int get_effective_dodge(char_data *ch);
-	extern int get_effective_soak(char_data *ch);
-	extern int get_effective_to_hit(char_data *ch);
+	extern int get_block_rating(char_data *ch, bool can_gain_skill);
+	extern int total_bonus_healing(char_data *ch);
+	extern int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
+	extern int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill);
 	extern int move_gain(char_data *ch);
 	void display_attributes(char_data *ch, char_data *to);
 
 	extern const char *class_role[NUM_ROLES];
 	extern const char *cooldown_types[];
 	extern const char *damage_types[];
+	extern const double hit_per_dex;
 	extern const char *player_bits[];
 	extern const char *position_types[];
 	extern const char *preference_bits[];
 	extern const char *connected_types[];
 	extern const char *olc_flag_bits[];
+	extern const int base_hit_chance;
+	extern struct promo_code_list promo_codes[];
 
 	char lbuf[MAX_STRING_LENGTH], lbuf2[MAX_STRING_LENGTH], lbuf3[MAX_STRING_LENGTH];
 	char uname[MAX_INPUT_LENGTH];
 	struct script_memory *mem;
 	struct trig_var_data *tv;
 	struct cooldown_data *cool;
-	int i, i2, diff, found = 0;
+	int i, i2, diff, found = 0, val;
 	obj_data *j;
 	struct follow_type *fol;
 	struct over_time_effect_type *dot;
@@ -2305,13 +2395,14 @@ void do_stat_character(char_data *ch, char_data *k) {
 		if (*GET_REFERRED_BY(k)) {
 			msg_to_char(ch, "Referred by: %s\r\n", GET_REFERRED_BY(k));
 		}
+		if (GET_PROMO_ID(k) > 0) {
+			msg_to_char(ch, "Promo code: %s\r\n", promo_codes[GET_PROMO_ID(k)].code);
+		}
 
 		msg_to_char(ch, "Access Level: [&c%d&0], Class: [&c%s&0/&c%s&0], Skill Level: [&c%d&0], Gear Level: [&c%d&0], Total: [&c%d&0]\r\n", GET_ACCESS_LEVEL(k), class_data[GET_CLASS(k)].name, class_role[(int) GET_CLASS_ROLE(k)], GET_SKILL_LEVEL(k), (int) GET_GEAR_LEVEL(k), IN_ROOM(k) ? GET_COMPUTED_LEVEL(k) : GET_LAST_KNOWN_LEVEL(k));
 		
-		if (!IS_NPC(k)) {
-			coin_string(GET_PLAYER_COINS(k), buf);
-			msg_to_char(ch, "Coins: %s\r\n", buf);
-		}
+		coin_string(GET_PLAYER_COINS(k), buf);
+		msg_to_char(ch, "Coins: %s\r\n", buf);
 
 		strcpy(buf1, (char *) asctime(localtime(&(k->player.time.birth))));
 		strcpy(buf2, buf1 + 20);
@@ -2319,6 +2410,9 @@ void do_stat_character(char_data *ch, char_data *k) {
 		buf2[4] = '\0';	// get only year
 
 		msg_to_char(ch, "Created: [%s, %s], Played [%dh %dm], Age [%d]\r\n", buf1, buf2, k->player.time.played / SECS_PER_REAL_HOUR, ((k->player.time.played % SECS_PER_REAL_HOUR) / SECS_PER_REAL_MIN), age(k)->year);
+		if (GET_ACCESS_LEVEL(k) <= GET_ACCESS_LEVEL(ch)) {
+			msg_to_char(ch, "Created from host: [%s]\r\n", GET_CREATION_HOST(k));
+		}
 		
 		if (GET_ACCESS_LEVEL(k) >= LVL_BUILDER) {
 			sprintbit(GET_OLC_FLAGS(k), olc_flag_bits, buf, TRUE);
@@ -2331,17 +2425,24 @@ void do_stat_character(char_data *ch, char_data *k) {
 
 		display_attributes(k, ch);
 
-		sprintf(lbuf, "Dodge  [%s%+d/%+d&0]", HAPPY_COLOR(get_effective_dodge(k), 0), GET_DODGE(k), get_effective_dodge(k));
-		sprintf(lbuf2, "Block  [%s%+d/%+d&0]", HAPPY_COLOR(get_effective_block(k), 0), GET_BLOCK(k), get_effective_block(k));
-		sprintf(lbuf3, "Soak  [%s%+d/%+d&0]", HAPPY_COLOR(get_effective_soak(k), 0), GET_SOAK(k), get_effective_soak(k));
+		// dex is removed from dodge to make it easier to compare to caps
+		val = get_dodge_modifier(k, NULL, FALSE) - (hit_per_dex * GET_DEXTERITY(k));;
+		sprintf(lbuf, "Dodge  [%s%d&0]", HAPPY_COLOR(val, 0), val);
+		
+		val = get_block_rating(k, FALSE);
+		sprintf(lbuf2, "Block  [%s%d&0]", HAPPY_COLOR(val, 0), val);
+		
+		sprintf(lbuf3, "Resist  [%d|%d]", GET_RESIST_PHYSICAL(k), GET_RESIST_MAGICAL(k));
 		msg_to_char(ch, "  %-28.28s %-28.28s %-28.28s\r\n", lbuf, lbuf2, lbuf3);
 	
 		sprintf(lbuf, "Physical  [%s%+d&0]", HAPPY_COLOR(GET_BONUS_PHYSICAL(k), 0), GET_BONUS_PHYSICAL(k));
 		sprintf(lbuf2, "Magical  [%s%+d&0]", HAPPY_COLOR(GET_BONUS_MAGICAL(k), 0), GET_BONUS_MAGICAL(k));
-		sprintf(lbuf3, "Healing  [%s%+d&0]", HAPPY_COLOR(GET_BONUS_HEALING(k), 0), GET_BONUS_HEALING(k));
+		sprintf(lbuf3, "Healing  [%s%+d&0]", HAPPY_COLOR(total_bonus_healing(k), 0), total_bonus_healing(k));
 		msg_to_char(ch, "  %-28.28s %-28.28s %-28.28s\r\n", lbuf, lbuf2, lbuf3);
 
-		sprintf(lbuf, "To-hit  [%s%+d/%+d&0]", HAPPY_COLOR(get_effective_to_hit(k), 0), GET_TO_HIT(k), get_effective_to_hit(k));
+		// dex is removed from to-hit to make it easier to compare to caps
+		val = get_to_hit(k, NULL, FALSE, FALSE) - (hit_per_dex * GET_DEXTERITY(k));;
+		sprintf(lbuf, "To-hit  [%s%d&0]", HAPPY_COLOR(val, base_hit_chance), val);
 		sprintf(lbuf2, "Speed  [%.2f]", get_combat_speed(k, WEAR_WIELD));
 		msg_to_char(ch, "  %-28.28s %-28.28s\r\n", lbuf, lbuf2);
 
@@ -2662,6 +2763,10 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	
 	msg_to_char(ch, "Gear level: [&g%.2f%s&0], VNum: [&g%5d&0], Type: &c%s&0\r\n", rate_item(j), buf, vnum, item_types[(int) GET_OBJ_TYPE(j)]);
 	msg_to_char(ch, "L-Des: %s\r\n", GET_OBJ_DESC(j, ch, OBJ_DESC_LONG));
+	
+	if (GET_OBJ_ACTION_DESC(j)) {
+		msg_to_char(ch, "%s", GET_OBJ_ACTION_DESC(j));
+	}
 
 	*buf = 0;
 	if (j->ex_description) {
@@ -2874,6 +2979,12 @@ void do_stat_object(char_data *ch, obj_data *j) {
 		msg_to_char(ch, "\r\n");
 	}
 	
+	if (j->interactions) {
+		send_to_char("Interactions:\r\n", ch);
+		get_interaction_display(j->interactions, buf);
+		send_to_char(buf, ch);
+	}
+	
 	if (j->custom_msgs) {
 		msg_to_char(ch, "Custom messages:\r\n");
 		
@@ -2915,7 +3026,7 @@ void do_stat_room(char_data *ch) {
 		strcpy(buf2, GET_SECT_NAME(SECT(IN_ROOM(ch))));
 	}
 	msg_to_char(ch, "(%d, %d) %s (&c%s&0/&c%s&0)\r\n", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), get_room_name(IN_ROOM(ch), FALSE), buf2, GET_SECT_NAME(ROOM_ORIGINAL_SECT(IN_ROOM(ch))));
-	msg_to_char(ch, "VNum: [&g%d&0], Island: [%d]\r\n", GET_ROOM_VNUM(IN_ROOM(ch)), GET_ISLAND_ID(home));
+	msg_to_char(ch, "VNum: [&g%d&0], Island: [%d] %s\r\n", GET_ROOM_VNUM(IN_ROOM(ch)), GET_ISLAND_ID(home), get_island(GET_ISLAND_ID(home), TRUE)->name);
 	
 	if (home != IN_ROOM(ch)) {
 		msg_to_char(ch, "Home room: &g%d&0 %s\r\n", GET_ROOM_VNUM(home), get_room_name(home, FALSE));
@@ -3006,7 +3117,7 @@ void do_stat_room(char_data *ch) {
 			else
 				sprintf(buf1, "&c%5d&0", ex->to_room);
 			sprintbit(ex->exit_info, exit_bits, buf2, TRUE);
-			sprintf(buf, "Exit &c%-5s&0:  To: [%s], Keywrd: %s, Type: %s\r\n", dirs[get_direction_for_char(ch, ex->dir)], buf1, ex->keyword ? ex->keyword : "None", buf2);
+			sprintf(buf, "Exit &c%-5s&0:  To: [%s], Keyword: %s, Type: %s\r\n", dirs[get_direction_for_char(ch, ex->dir)], buf1, ex->keyword ? ex->keyword : "None", buf2);
 			send_to_char(buf, ch);
 		}
 	}
@@ -3647,7 +3758,7 @@ ACMD(do_dc) {
 		if (!CAN_SEE(ch, d->character))
 			send_to_char("No such connection.\r\n", ch);
 		else
-			send_to_char("Umm.. maybe that's not such a good idea...\r\n", ch);
+			send_to_char("Umm... maybe that's not such a good idea...\r\n", ch);
 		return;
 	}
 
@@ -3726,7 +3837,7 @@ ACMD(do_echo) {
 	strcpy(string, argument);
 
 	if (!*argument) {
-		send_to_char("Yes.. but what?\r\n", ch);
+		send_to_char("Yes... but what?\r\n", ch);
 		return;
 	}
 
@@ -4102,6 +4213,70 @@ ACMD(do_force) {
 }
 
 
+ACMD(do_forgive) {
+	char_data *vict;
+	bool any;
+	
+	one_argument(argument, arg);
+	
+	if (!*arg) {
+		msg_to_char(ch, "Forgive whom?r\n");
+	}
+	else if (!(vict = get_player_vis(ch, arg, FIND_CHAR_WORLD | FIND_NO_DARK))) {
+		send_config_msg(ch, "no_person");
+	}
+	else if (IS_NPC(vict)) {
+		msg_to_char(ch, "You can't forgive an NPC for anything.\r\n");
+	}
+	else {
+		any = FALSE;
+		
+		if (get_cooldown_time(vict, COOLDOWN_HOSTILE_FLAG) > 0) {
+			remove_cooldown_by_type(vict, COOLDOWN_HOSTILE_FLAG);
+			msg_to_char(ch, "Hostile flag forgiven.\r\n");
+			if (ch != vict) {
+				act("$n has forgiven your hostile flag.", FALSE, ch, NULL, vict, TO_VICT);
+			}
+			any = TRUE;
+		}
+		
+		if (get_cooldown_time(vict, COOLDOWN_ROGUE_FLAG) > 0) {
+			remove_cooldown_by_type(vict, COOLDOWN_ROGUE_FLAG);
+			msg_to_char(ch, "Rogue flag forgiven.\r\n");
+			if (ch != vict) {
+				act("$n has forgiven your rogue flag.", FALSE, ch, NULL, vict, TO_VICT);
+			}
+			any = TRUE;
+		}
+		
+		if (get_cooldown_time(vict, COOLDOWN_LEFT_EMPIRE) > 0) {
+			remove_cooldown_by_type(vict, COOLDOWN_LEFT_EMPIRE);
+			msg_to_char(ch, "Defect timer forgiven.\r\n");
+			if (ch != vict) {
+				act("$n has forgiven your empire defect timer.", FALSE, ch, NULL, vict, TO_VICT);
+			}
+			any = TRUE;
+		}
+		
+		if (get_cooldown_time(vict, COOLDOWN_PVP_FLAG) > 0) {
+			remove_cooldown_by_type(vict, COOLDOWN_PVP_FLAG);
+			msg_to_char(ch, "PVP cooldown forgiven.\r\n");
+			if (ch != vict) {
+				act("$n has forgiven your PVP cooldown.", FALSE, ch, NULL, vict, TO_VICT);
+			}
+			any = TRUE;
+		}
+		
+		if (any) {
+			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has forgiven %s", GET_NAME(ch), GET_NAME(vict));
+		}
+		else {
+			act("There's nothing you can forigve $N for.", FALSE, ch, NULL, vict, TO_CHAR);
+		}
+	}
+}
+
+
 ACMD(do_fullsave) {
 	syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has triggered a full map save", GET_REAL_NAME(ch));
 	syslog(SYS_INFO, 0, FALSE, "Updating zone files...");
@@ -4154,6 +4329,34 @@ ACMD(do_goto) {
 	}
 
 	perform_goto(ch, location);
+}
+
+
+ACMD(do_hostile) {
+	char_data *vict;
+	
+	one_argument(argument, arg);
+	
+	if (!*arg) {
+		msg_to_char(ch, "Mark whom hostile?r\n");
+	}
+	else if (!(vict = get_player_vis(ch, arg, FIND_CHAR_WORLD | FIND_NO_DARK))) {
+		send_config_msg(ch, "no_person");
+	}
+	else if (IS_NPC(vict)) {
+		msg_to_char(ch, "You can't mark an NPC hostile.\r\n");
+	}
+	else if (GET_ACCESS_LEVEL(vict) > GET_ACCESS_LEVEL(ch)) {
+		msg_to_char(ch, "You can't do that.\r\n");
+	}
+	else {
+		add_cooldown(vict, COOLDOWN_HOSTILE_FLAG, config_get_int("hostile_flag_time") * SECS_PER_REAL_MIN);
+		msg_to_char(vict, "You are now hostile!\r\n");
+		if (ch != vict) {
+			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has marked %s as hostile", GET_NAME(ch), GET_NAME(vict));
+			act("$N is now hostile.", FALSE, ch, NULL, vict, TO_CHAR);
+		}
+	}
 }
 
 
@@ -4223,6 +4426,99 @@ ACMD(do_invis) {
 			perform_immort_vis(ch);
 		else
 			perform_immort_invis(ch, level);
+	}
+}
+
+
+ACMD(do_island) {
+	void save_island_table();
+
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH * 2], line[256], flags[256];
+	struct island_info *isle, *next_isle;
+	room_data *center;
+	bitvector_t old;
+	size_t outsize;
+	
+	argument = any_one_arg(argument, arg1);	// command
+	skip_spaces(&argument);	// remainder
+	
+	if (!ch->desc) {
+		// don't bother
+		return;
+	}
+	else if (is_abbrev(arg1, "list")) {
+		outsize = snprintf(output, sizeof(output), "Islands:\r\n");
+		
+		HASH_ITER(hh, island_table, isle, next_isle) {
+			center = real_room(isle->center);
+			
+			snprintf(line, sizeof(line), "%2d. %s (%d, %d), size %d", isle->id, isle->name, (center ? FLAT_X_COORD(center) : -1), (center ? FLAT_Y_COORD(center) : -1), isle->tile_size);
+			if (isle->flags) {
+				sprintbit(isle->flags, island_bits, flags, TRUE);
+				snprintf(line + strlen(line), sizeof(line) - strlen(line), " %s", flags);
+			}
+			
+			if (strlen(line) + outsize < sizeof(output)) {
+				outsize += snprintf(output + outsize, sizeof(output) - outsize, "%s\r\n", line);
+			}
+			else {
+				outsize += snprintf(output + outsize, sizeof(output) - outsize, "OVERFLOW\r\n");
+				break;
+			}
+		}
+		
+		page_string(ch->desc, output, TRUE);
+	}
+	else if (is_abbrev(arg1, "rename")) {
+		argument = one_argument(argument, arg2);
+		skip_spaces(&argument);
+		
+		if (!*arg2 || !*argument || !isdigit(*arg2)) {
+			msg_to_char(ch, "Usage: island rename <id> <name>\r\n");
+		}
+		else if (!(isle = get_island(atoi(arg2), FALSE))) {
+			msg_to_char(ch, "Unknown island id '%s'.\r\n", arg2);
+		}
+		else if (strlen(argument) > MAX_ISLAND_NAME) {
+			msg_to_char(ch, "Island names may not be longer than %d characters.\r\n", MAX_ISLAND_NAME);
+		}
+		else {
+			send_config_msg(ch, "ok_string");
+			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has renamed island %d (%s) to %s", GET_NAME(ch), isle->id, NULLSAFE(isle->name), argument);
+			
+			if (isle->name) {
+				free(isle->name);
+			}
+			isle->name = str_dup(argument);
+			
+			save_island_table();
+		}
+	}
+	else if (is_abbrev(arg1, "flags")) {
+		argument = one_argument(argument, arg2);
+		skip_spaces(&argument);
+		
+		if (!*arg2 || !isdigit(*arg2)) {
+			msg_to_char(ch, "Usage: island flags <id> [add | remove] [flags]\r\n");
+		}
+		else if (!(isle = get_island(atoi(arg2), FALSE))) {
+			msg_to_char(ch, "Unknown island id '%s'.\r\n", arg2);
+		}
+		else {
+			old = isle->flags;
+			isle->flags = olc_process_flag(ch, argument, "island", "island flags", island_bits, isle->flags);
+			
+			if (isle->flags != old) {
+				sprintbit(isle->flags, island_bits, flags, TRUE);
+				syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has set island %d (%s) flags to: %s", GET_NAME(ch), isle->id, NULLSAFE(isle->name), flags);
+				save_island_table();
+			}
+		}
+	}
+	else {
+		msg_to_char(ch, "Usage: island list\r\n");
+		msg_to_char(ch, "       island rename <id> <name>\r\n");
+		msg_to_char(ch, "       island flags <id> [add | remove] [flags]\r\n");
 	}
 }
 
@@ -4647,7 +4943,7 @@ ACMD(do_rescale) {
 	char_data *vict;
 	int level;
 	
-	bitvector_t preserve_flags = OBJ_SUPERIOR;	// flags to copy over if obj is reloaded
+	bitvector_t preserve_flags = OBJ_SUPERIOR | OBJ_HARD_DROP | OBJ_GROUP_DROP | OBJ_KEEP;	// flags to copy over if obj is reloaded
 
 	argument = one_argument(argument, arg);
 	skip_spaces(&argument);
@@ -4752,6 +5048,7 @@ ACMD(do_restore) {
 			for (i = 0; i < NUM_SKILLS; ++i) {
 				set_skill(vict, i, 100);
 			}
+			update_class(vict);
 			
 			// temporarily remove empire abilities
 			emp = GET_LOYALTY(vict);
@@ -5020,7 +5317,7 @@ ACMD(do_slay) {
 		if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM)))
 			send_to_char("They aren't here.\r\n", ch);
 		else if (ch == vict)
-			send_to_char("Your mother would be so sad.. :(\r\n", ch);
+			send_to_char("Your mother would be so sad... :(\r\n", ch);
 		else if (!IS_NPC(vict) && GET_ACCESS_LEVEL(vict) >= GET_ACCESS_LEVEL(ch)) {
 			act("Surely you don't expect $N to let you slay $M, do you?", FALSE, ch, NULL, vict, TO_CHAR);
 		}
@@ -5053,7 +5350,7 @@ ACMD(do_snoop) {
 	else if (!(victim = get_char_vis(ch, arg, FIND_CHAR_WORLD)))
 		send_to_char("No such person around.\r\n", ch);
 	else if (!victim->desc)
-		send_to_char("There's no link.. nothing to snoop.\r\n", ch);
+		send_to_char("There's no link... nothing to snoop.\r\n", ch);
 	else if (victim == ch)
 		stop_snooping(ch);
 	else if (victim->desc->snoop_by)

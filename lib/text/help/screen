@@ -7,7 +7,7 @@ CIRCLE                             |
 -----------------------------------+-------------------------------------------
 Objects:                           | Information: 
 GET DROP GIVE PUT JUNK SACRIFICE   | INFO HELP HELPSEARCH SCORE WHO ADVENTURE
-WIELD HOLD WEAR REMOVE EAT DRINK   | WHERE WIZLIST GODLIST CREDITS LOOK TIME
+WIELD HOLD WEAR REMOVE EAT DRINK   | WHERE WIZLIST GODLIST PROMPT LOOK TIME
 INVENTORY EQUIPMENT FILL POUR      | WHOIS WEATHER AFFECTS COOLDOWNS TIP
 -----------------------------------+-------------------------------------------
 Empire:                            | Resources and Crafts:

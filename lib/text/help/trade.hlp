@@ -161,13 +161,14 @@ With this ability, you can make the following fine pottery items:
   hestian trinket  (whisks you home)  1 clay, 1 seashell, 1 blue iris
   peace pipe  1 clay, 1 small leather, 3 seashells
 
-See also: POTTERY, MASTER POTTER
+See also: POTTERY, MASTER CRAFTSMAN
 #
 FORGE
 
 Forge (Trade ability)
 
 Building:  (FF)  Forge  (no skill required)
+Resources:  10 logs, 15 rocks, 10 iron ingots
 Built on:  plains, desert
 Command:  forge [number] <item>
 Tool:  hammer
@@ -186,7 +187,7 @@ With the basic Forge skill, you can create:
   hammer  1 copper ingot, 1 handle
   woodsman axe  1 copper ingot, 1 handle -- for chopping
   short sword  2 copper ingots, 1 small leather -- basic weapon
-  pick  1 copper ingot, 1 handle -- for mining
+  pick  2 copper ingots, 1 handle -- for mining
   shovel  2 copper ingots, 1 handle -- dig faster
   pan  2 copper ingots -- pan for gold
   mirror  1 iron ingot
@@ -214,6 +215,8 @@ Stored in: Foundry
 
 Iron ore is found by mining in the mountains. It is useful in building and
 forging equipment, as well as manufacturing ships.
+
+You can learn about getting iron via HELP IRON GUIDE.
 
 See also: BUILD, FORGE, MINE, MANUFACTURE, SMELT
 #
@@ -259,6 +262,10 @@ Iron Blades:
   pickaxe  3 iron ingots, 1 handle
   pike  3 iron ingots, 1 handle
 
+Tools:
+  iron hammer  2 iron ingots, 1 handle
+  iron shovel  2 iron ingots, 1 handle
+
 Weaponcrafting -> Iron Blades -> Deadly Weapons
 
 See also: FORGE, IRON BLADES, DEADLY WEAPONS
@@ -280,6 +287,9 @@ The Jewelry ability is a forge specialization that can make:
   wedding band  1 gold
   crown  4 gold
 
+All silver costs are in nuggets and gold costs are in dust. You can smelt bars
+back down into these forms if you have already smelted them into bars.
+
 See also: FORGE, WEAPONCRAFTING, ARMORSMITHING
 #
 LEATHERWORKING
@@ -293,14 +303,14 @@ leather armors. To get leather, you must tan skins.
 Weapons:
   studded whip  4 large leather, 1 iron ingot
 
-Leather Armor:
+Light Armor:
   leather breastplate  12 large leather
   leather helm  4 large leather
   leather vambraces  6 large leather
   leather buckler  10 large leather, 2 iron ingot
   
 Misc:
-  leather shoes  2 large leather
+  shoes  2 large leather
   wineskin  2 large leather
   leather backpack  4 large leather
   fine saddle  2 cloth, 4 large leather
@@ -370,12 +380,14 @@ Get better results from harvest, mill, and shear.
 
 See also: HARVEST, MILL, SHEAR
 #
-"MASTER POTTER"
+"MASTER CRAFTSMAN"
 
-Master Potter (Trade ability)
+Master Craftsman (Trade ability)
 
 This mastery ability improves the quality of certain items from the Pottery
-tree.
+and woodworking tree. It also allows you to craft the following:
+
+  letheian icon  1 clay, 1 silver bar, 2 seashells, 3 bileberries (skill reset)
 
 See also: POTTERY, FINE POTTERY
 #
@@ -394,11 +406,12 @@ POTTER POTTERY CLAY
 Pottery (Trade ability)
 
 Building:  (PP) potter  10 logs, 1 stone block
+Resources:  10 logs, 1 stone block
 Command:  craft [number] <item>
 
 Clay is found by digging near water and can be stored at the Potter.
 
-A master potter can mold clay into many different useful items. You will need
+A good potter can mold clay into many different useful items. You will need
 a fire, but the pottery goes much faster if you are in a Potter building.
 
 With Pottery you can craft:
@@ -408,7 +421,7 @@ With Pottery you can craft:
   clay shield  (shields)  6 clay, 6 sticks, 1 small leather
   trinket of conveyance  1 clay
 
-See also: DIG, FINE POTTERY, MASTER POTTER
+See also: DIG, FINE POTTERY, MASTER CRAFTSMAN
 #
 "RAWHIDE STITCHING"
 
@@ -417,9 +430,6 @@ Command:  sew [number] <item>
 
 The basic leather tier is made of rawhide -- untanned leather that is hardened
 to the right shape and stitched together, but isn't waterproof.
-
-Cloth armor:
-  padded armor  12 cloth, 4 small skin
 
 Weapons:
   rawhide whip  4 large skin
@@ -450,8 +460,8 @@ REFORGE REFASHION
 Refashion (Trade ability)
 Reforge (Trade ability)
 
-Usage: reforge <item> name <new name>
-       reforge <item> <renew | superior>
+Usage:  reforge <item> name <new name>
+        reforge <item> <renew | superior>
 
 A great blacksmith (weapons) or tailor (armors and shields) can use this
 ability in two ways:
@@ -529,7 +539,9 @@ Shipbuilding (Trade ability)
 Advanced Ships (Trade ability)
 
 Buildings:  &b~&0()&b~&0  Shipyard (Seafaring ability)
-            &b~&0[]&b~&0   Upgraded Shipyard (Seafaring ability)
+            &b~&0[]&b~&0  Upgraded Shipyard (Seafaring ability)
+Resources:  60 lumber, 24 nails (shipyard)
+            30 blocks, 20 iron ingots  (upgraded)
 Built on:  plains or desert, next to water
 Command:  manufacture <ship>
 Fame:  4 (upgraded shipyard)

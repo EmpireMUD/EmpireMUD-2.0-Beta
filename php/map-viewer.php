@@ -11,7 +11,7 @@
 * Using this file:
 *  1. update the configuration options, near the top
 *  2. you may want to symlink this file into your web directory
-*  3. you can adjust the size by adding ?size=1234 -- Must be in pixesl; this
+*  3. you can adjust the size by adding ?size=1234 -- Must be in pixels; this
 *     sets the width of the map, and the height scales proportionately.
 */
 
@@ -121,8 +121,8 @@ body {
 <body>
 
 <div id="prefs">
-	<div><input type="checkbox" id="pol" name="pol" /> <label for="pol">Political Map</label></div>
-	<div><input type="checkbox" id="grid" name="grid" /> <label for="grid">Grid</label></div>
+	<div title="Press 'p' to toggle the political map."><input type="checkbox" id="pol" name="pol" /> <label for="pol">Political Map</label></div>
+	<div title="Press 'g' to toggle the grid."><input type="checkbox" id="grid" name="grid" /> <label for="grid">Grid</label></div>
 	<div style="clear: both;"></div>
 </div>
 <div id="coords"></div>
@@ -175,6 +175,16 @@ $(document).ready(function() {
 	
 	$("#grid").click(function() {
 		checkgrid();
+	});
+	
+	$(document).keypress(function(e) {
+		var c = String.fromCharCode(e.which);
+		if (c == 'p' || c == 'P') {
+			$("#pol").click();
+		}
+		else if (c == 'g' || c == 'G') {
+			$("#grid").click();
+		}
 	});
 
 	$("#map").bind("mouseover mouseout mousemove", function(e) {

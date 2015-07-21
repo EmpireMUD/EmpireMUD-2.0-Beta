@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: dg_scripts.h                                    EmpireMUD 2.0b1 *
+*   File: dg_scripts.h                                    EmpireMUD 2.0b2 *
 *  Usage: header file for script structures and contstants, and           *
 *         function prototypes for dg_scripts.c                            *
 *                                                                         *
@@ -51,6 +51,7 @@
 #define MTRIG_ABILITY          BIT(15)     /* mob targetted by ability     */
 #define MTRIG_LEAVE            BIT(16)     /* someone leaves room seen   */
 #define MTRIG_DOOR             BIT(17)     /* door manipulated in room   */
+#define MTRIG_LEAVE_ALL        BIT(18)		// leave even if they can't see
 
 /* obj trigger types */
 #define OTRIG_GLOBAL           BIT(0)	     /* unused                     */
@@ -295,8 +296,8 @@ int valid_dg_target(char_data *ch, int bitvector);
 /* mob id's: MOB_ID_BASE to ROOM_ID_BASE - 1      */
 /* room id's: ROOM_ID_BASE to OBJ_ID_BASE - 1    */
 /* object id's: OBJ_ID_BASE and higher           */
-#define MOB_ID_BASE	  1000000  /* 1000000 player IDNUMS should suffice */
-#define ROOM_ID_BASE    (1000000 + MOB_ID_BASE) /* 1000000 Mobs */
+#define MOB_ID_BASE	  10000000  /* 10000000 player IDNUMS should suffice */
+#define ROOM_ID_BASE    (10000000 + MOB_ID_BASE) /* 10000000 Mobs */
 #define OBJ_ID_BASE     ((MAP_SIZE * 5) + ROOM_ID_BASE) /* Lots o' Rooms */
 
 #define SCRIPT(o)		  ((o)->script)

@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: comm.c                                          EmpireMUD 2.0b1 *
+*   File: comm.c                                          EmpireMUD 2.0b2 *
 *  Usage: Communication, socket handling, main(), central game loop       *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -699,10 +699,10 @@ void heartbeat(int heart_pulse) {
 	void reduce_stale_empires();
 	void reset_instances();
 	void sanity_check();
-	void skim_ocean_pool();
 	void update_actions();
 	void update_empire_npc_data();
 	void update_guard_towers();
+	void update_players_online_stats();
 	void update_trading_post();
 	void update_world();
 	void weather_and_time(int mode);
@@ -754,6 +754,9 @@ void heartbeat(int heart_pulse) {
 	if (HEARTBEAT(30)) {
 		update_world();
 		if (debug_log && HEARTBEAT(15)) { log("debug  9:\t%lld", microtime()); }
+		
+		update_players_online_stats();
+		if (debug_log && HEARTBEAT(15)) { log("debug  9.5:\t%lld", microtime()); }
 	}
 
 	if (HEARTBEAT(10)) {
@@ -819,12 +822,6 @@ void heartbeat(int heart_pulse) {
 		}
 	}
 	
-	// run often but try to avoid lining up with other updates
-	if (HEARTBEAT(10 * SECS_PER_REAL_MIN - 10)) {
-		skim_ocean_pool();
-		if (debug_log && HEARTBEAT(15)) { log("debug 19.5:\t%lld", microtime()); }
-	}
-	
 	if (HEARTBEAT(12 * SECS_PER_REAL_HOUR)) {
 		reduce_city_overages();
 		if (debug_log && HEARTBEAT(15)) { log("debug 20:\t%lld", microtime()); }
@@ -840,10 +837,13 @@ void heartbeat(int heart_pulse) {
 		if (debug_log && HEARTBEAT(15)) { log("debug 22:\t%lld", microtime()); }
 	}
 	
+	if (HEARTBEAT(3 * SECS_PER_REAL_MIN)) {
+		generate_adventure_instances();
+		if (debug_log && HEARTBEAT(15)) { log("debug 23:\t%lld", microtime()); }
+	}
+	
 	if (HEARTBEAT(5 * SECS_PER_REAL_MIN)) {
 		prune_instances();
-		if (debug_log && HEARTBEAT(15)) { log("debug 23:\t%lld", microtime()); }
-		generate_adventure_instances();
 		if (debug_log && HEARTBEAT(15)) { log("debug 24:\t%lld", microtime()); }
 		update_trading_post();
 		if (debug_log && HEARTBEAT(15)) { log("debug 24.5:\t%lld", microtime()); }
@@ -1594,6 +1594,25 @@ socket_t init_socket(ush_int port) {
 
 
 /**
+* @param char *ip The IP address to check.
+* @return bool TRUE if we should skip nameserver lookup on this IP.
+*/
+bool is_slow_ip(char *ip) {
+	extern const char *slow_nameserver_ips[];
+	
+	int iter;
+	
+	for (iter = 0; *slow_nameserver_ips[iter] != '\n'; ++iter) {
+		if (!strcmp(ip, slow_nameserver_ips[iter])) {
+			return TRUE;
+		}
+	}
+	
+	return FALSE;
+}
+
+
+/**
 * Allows a player to manipulate their input queue. The input text is what the
 * user typed AFTER the '-' trigger character.
 *
@@ -1677,6 +1696,7 @@ int new_descriptor(int s) {
 	descriptor_data *newd;
 	struct sockaddr_in peer;
 	struct hostent *from;
+	bool slow_ip;
 
 	/* accept the new connection */
 	i = sizeof(peer);
@@ -1707,10 +1727,13 @@ int new_descriptor(int s) {
 	memset((char *) newd, 0, sizeof(descriptor_data));
 
 	/* find the sitename */
-	if (config_get_bool("nameserver_is_slow") || !(from = gethostbyaddr((char *) &peer.sin_addr, sizeof(peer.sin_addr), AF_INET))) {
+	slow_ip = config_get_bool("nameserver_is_slow") || is_slow_ip(inet_ntoa(peer.sin_addr));
+	if (slow_ip || !(from = gethostbyaddr((char *) &peer.sin_addr, sizeof(peer.sin_addr), AF_INET))) {
 		/* resolution failed */
-		if (!config_get_bool("nameserver_is_slow")) {
-			perror("SYSERR: gethostbyaddr");
+		if (!slow_ip) {
+			char buf[MAX_STRING_LENGTH];
+			snprintf(buf, sizeof(buf), "SYSERR: gethostbyaddr [%s]", inet_ntoa(peer.sin_addr));
+			perror(buf);
 		}
 
 		/* find the numeric site address */
@@ -2353,8 +2376,13 @@ char *make_prompt(descriptor_data *d) {
 		if (wizlock_level > 0 && GET_ACCESS_LEVEL(d->character) >= LVL_START_IMM)
 			sprintf(prompt + strlen(prompt), "&g(w%d) ", wizlock_level);
 		
-		if (!IS_NPC(d->character) && get_cooldown_time(d->character, COOLDOWN_HOSTILE_FLAG) > 0) {
-			strcat(prompt, "&m(hostile) ");
+		if (!IS_NPC(d->character)) {
+			if (get_cooldown_time(d->character, COOLDOWN_ROGUE_FLAG) > 0) {
+				strcat(prompt, "&M(rogue) ");
+			}
+			else if (get_cooldown_time(d->character, COOLDOWN_HOSTILE_FLAG) > 0) {
+				strcat(prompt, "&m(hostile) ");
+			}
 		}
 
 		// IS_AFK is caused by the prf or timer>10
@@ -2419,7 +2447,14 @@ char *prompt_color_by_prc(int cur, int max) {
 * @return char* The finished prompt
 */
 char *prompt_str(char_data *ch) {
-	char *str = GET_PROMPT(REAL_CHAR(ch));
+	char *str;
+	
+	if (FIGHTING(ch)) {
+		str = GET_FIGHT_PROMPT(REAL_CHAR(ch)) ? GET_FIGHT_PROMPT(REAL_CHAR(ch)) : GET_PROMPT(REAL_CHAR(ch));
+	}
+	else {
+		str = GET_PROMPT(REAL_CHAR(ch));
+	}
 
 	if (!ch->desc)
 		return (">");
@@ -2428,18 +2463,18 @@ char *prompt_str(char_data *ch) {
 	if (!str || !*str) {
 		if (IS_MAGE(ch)) {
 			if (IS_VAMPIRE(ch)) {
-				str = "&0|%i/%u/%n %bb [%t]>";
+				str = "&0|%i/%u/%n %bb [%t]> ";
 			}
 			else {
-				str = "&0|%i/%u/%n>";
+				str = "&0|%i/%u/%n> ";
 			}
 		}
 		else {
 			if (IS_VAMPIRE(ch)) {
-				str = "&0|%i/%u %bb [%t]>";
+				str = "&0|%i/%u %bb [%t]> ";
 			}
 			else {
-				str = "&0|%i/%u>";
+				str = "&0|%i/%u> ";
 			}
 		}
 	}
@@ -2529,7 +2564,7 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					tmp = i;
 					break;
 				case 'i':	// %i health as text
-					sprintf(i, "%s", health_levels[MIN(10, MAX(0, GET_HEALTH(ch)) * 10 / GET_MAX_HEALTH(ch))]);
+					sprintf(i, "%s", health_levels[MIN(10, MAX(0, GET_HEALTH(ch)) * 10 / MAX(1, GET_MAX_HEALTH(ch)))]);
 					tmp = i;
 					break;
 				case 'v':	// %v current move
@@ -2541,7 +2576,7 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					tmp = i;
 					break;
 				case 'u':	// %u move as text
-					sprintf(i, "%s", move_levels[MIN(10, MAX(0, GET_MOVE(ch)) * 10 / GET_MAX_MOVE(ch))]);
+					sprintf(i, "%s", move_levels[MIN(10, MAX(0, GET_MOVE(ch)) * 10 / MAX(1, GET_MAX_MOVE(ch)))]);
 					tmp = i;
 					break;
 				case 'm':	// %m current mana
@@ -2553,7 +2588,7 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					tmp = i;
 					break;
 				case 'n':	// %n mana as text
-					sprintf(i, "%s", mana_levels[MIN(10, MAX(0, GET_MANA(ch)) * 10 / GET_MAX_MANA(ch))]);
+					sprintf(i, "%s", mana_levels[MIN(10, MAX(0, GET_MANA(ch)) * 10 / MAX(1, GET_MAX_MANA(ch)))]);
 					tmp = i;
 					break;
 				case 'b':	// %b current blood
@@ -2570,8 +2605,8 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 						sprintf(i, "%%%c", *str);
 					tmp = i;
 					break;
-				case 's': {	// %s skill points available
-					sprintf(i, "%d", GET_SKILL_POINTS_AVAILABLE(ch));
+				case 's': {	// %s bonus exp available
+					sprintf(i, "%d", GET_DAILY_BONUS_EXPERIENCE(ch));
 					tmp = i;
 					break;
 				}
@@ -2596,6 +2631,28 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					break;
 				case 'a': {	// action
 					strcpy(i, action_data[!IS_NPC(ch) ? GET_ACTION(ch) : ACT_NONE].name);
+					tmp = i;
+					break;
+				}
+				case 'r': {	// room template/building
+					if (IS_IMMORTAL(ch)) {
+						if (GET_ROOM_TEMPLATE(IN_ROOM(ch))) {
+							sprintf(i, "r%d", GET_RMT_VNUM(GET_ROOM_TEMPLATE(IN_ROOM(ch))));
+						}
+						else if (GET_BUILDING(IN_ROOM(ch))) {
+							sprintf(i, "b%d", GET_BLD_VNUM(GET_BUILDING(IN_ROOM(ch))));
+						}
+						else if (crop_proto(ROOM_CROP_TYPE(IN_ROOM(ch)))) {
+							sprintf(i, "c%d/s%d", GET_CROP_VNUM(crop_proto(ROOM_CROP_TYPE(IN_ROOM(ch)))), GET_SECT_VNUM(SECT(IN_ROOM(ch))));
+						}
+						else {
+							sprintf(i, "s%d", GET_SECT_VNUM(SECT(IN_ROOM(ch))));
+						}
+					}
+					else {
+						sprintf(i, "%%%c", *str);
+					}
+					
 					tmp = i;
 					break;
 				}
@@ -2626,7 +2683,7 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 
 	*cp = '\0';
 
-	strcat(pbuf, " &0");
+	strcat(pbuf, "&0");
 	return (pbuf);
 }
 
@@ -2668,8 +2725,9 @@ RETSIGTYPE checkpointing(int sig) {
 
 RETSIGTYPE hupsig(int sig) {
 	log("SYSERR: Received SIGHUP, SIGINT, or SIGTERM. Shutting down...");
-	exit(1);			/* perhaps something more elegant should
-						 * substituted */
+	reboot_control.type = SCMD_SHUTDOWN;
+	perform_reboot();
+	// exit(1);
 }
 
 /*
@@ -3068,7 +3126,7 @@ int main(int argc, char **argv) {
 				break;
 			case 'q':
 				no_rent_check = 1;
-				puts("Quick boot mode -- rent check supressed.");
+				puts("Quick boot mode -- rent check suppressed.");
 				break;
 			case 'r':
 				wizlock_level = 1;

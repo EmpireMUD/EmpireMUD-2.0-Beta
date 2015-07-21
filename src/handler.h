@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: handler.h                                       EmpireMUD 2.0b1 *
+*   File: handler.h                                       EmpireMUD 2.0b2 *
 *  Usage: header file: prototypes of handling and utility functions       *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -144,9 +144,12 @@ void join_group(char_data *ch, struct group_data *group);
 void leave_group(char_data *ch);
 
 // interaction handlers
+extern bool check_exclusion_set(struct interact_exclusion_data **set, char code, double percent);
+extern struct interact_exclusion_data *find_exclusion_data(struct interact_exclusion_data **set, char code);
+void free_exclusion_data(struct interact_exclusion_data *list);
 extern bool has_interaction(struct interaction_item *list, int type);
-extern bool run_interactions(char_data *ch, struct interaction_item *run_list, int type, room_data *inter_room, char_data *inter_mob, obj_data *inter_item, INTERACTION_FUNC(*func), bool *hit_exclusive);
-extern bool run_room_interactions(char_data *ch, room_data *room, int type, INTERACTION_FUNC(*func), bool *hit_exclusive);
+extern bool run_interactions(char_data *ch, struct interaction_item *run_list, int type, room_data *inter_room, char_data *inter_mob, obj_data *inter_item, INTERACTION_FUNC(*func));
+extern bool run_room_interactions(char_data *ch, room_data *room, int type, INTERACTION_FUNC(*func));
 
 // lore handlers
 void add_lore(char_data *ch, int type, int value);
@@ -186,7 +189,7 @@ void obj_to_obj(obj_data *obj, obj_data *obj_to);
 void obj_to_room(obj_data *object, room_data *room);
 void swap_obj_for_obj(obj_data *old, obj_data *new);
 extern obj_data *unequip_char(char_data *ch, int pos);
-void unequip_char_to_inventory(char_data *ch, int pos, bool droppable);
+void unequip_char_to_inventory(char_data *ch, int pos);
 void unequip_char_to_room(char_data *ch, int pos);
 
 // object message handlers
@@ -264,7 +267,7 @@ extern int parse_direction(char_data *ch, char *dir);
 //// handlers from other files ///////////////////////////////////////////////
 
 // act.item.c
-void perform_remove(char_data *ch, int pos, bool swap, bool droppable);
+void perform_remove(char_data *ch, int pos);
 
 // config.c
 extern bitvector_t config_get_bitvector(char *key);
@@ -281,6 +284,7 @@ extern int damage(char_data *ch, char_data *victim, int dam, int attacktype, byt
 void engage_combat(char_data *ch, char_data *vict, bool melee);
 void heal(char_data *ch, char_data *vict, int amount);
 extern int hit(char_data *ch, char_data *victim, obj_data *weapon, bool normal_round);
+extern bool is_fighting(char_data *ch);
 void set_fighting(char_data *ch, char_data *victim, byte mode);
 void stop_fighting(char_data *ch);
 void update_pos(char_data *victim);

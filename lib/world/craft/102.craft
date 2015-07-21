@@ -1,0 +1,153 @@
+#10240
+spiked wooden breastplate~
+10240 1  # 1x a spiked wooden breastplate
+2 59 eg 40 10241
+R
+125 1  # 1x a stack of lumber
+R
+10228 2  # 2x a stack of cactus pads
+R
+1114 12  # 12x an imperium spike
+R
+1357 2  # 2x a large piece of leather
+S
+#10242
+cactus sword~
+10242 1  # 1x the cactus sword
+2 59 eg 40 10243
+R
+125 1  # 1x a stack of lumber
+R
+10228 6  # 6x a stack of cactus pads
+R
+177 5  # 5x an imperium ingot
+S
+#10244
+soothing aloe elixir~
+10244 1  # 1x a soothing aloe elixir
+6 113 f 3 10245
+R
+1200 10  # 10x a handful of whitegrass
+R
+10230 4  # 4x some thick aloe leaves
+S
+#10268
+primordial axe~
+10268 1  # 1x a primordial axe
+1 196 0 32 10269
+R
+10265 6  # 6x a thick dracosaur hide
+R
+10267 8  # 8x a serrated dracosaur tooth
+R
+10252 2  # 2x a huge dracosaur bone
+R
+177 5  # 5x an imperium ingot
+S
+#10270
+dracosaur bone spear~
+10270 1  # 1x the dracosaur bone spear
+1 196 0 32 10271
+R
+10265 4  # 4x a thick dracosaur hide
+R
+10267 10  # 10x a serrated dracosaur tooth
+R
+10252 1  # 1x a huge dracosaur bone
+R
+10253 1  # 1x the essence of terror
+R
+177 5  # 5x an imperium ingot
+S
+#10272
+jeweled bone staff~
+10272 1  # 1x the jeweled bone staff
+2 170 0 32 10273
+R
+10265 10  # 10x a thick dracosaur hide
+R
+10267 4  # 4x a serrated dracosaur tooth
+R
+10252 1  # 1x a huge dracosaur bone
+R
+10254 1  # 1x a stunning violet gem
+R
+176 5  # 5x an ingot of nocturnium
+S
+#10274
+dracosaur scale robe~
+10274 1  # 1x a dracosaur scale robe
+4 199 g 32 10275
+R
+10265 8  # 8x a thick dracosaur hide
+R
+10267 6  # 6x a serrated dracosaur tooth
+R
+10254 1  # 1x a stunning violet gem
+R
+176 6  # 6x an ingot of nocturnium
+S
+#10276
+dracosaur scale boots~
+10276 1  # 1x dracosaur scale boots
+1 197 0 32 10277
+R
+10265 8  # 8x a thick dracosaur hide
+R
+10267 6  # 6x a serrated dracosaur tooth
+R
+10253 1  # 1x the essence of terror
+R
+177 6  # 6x an imperium ingot
+S
+#10278
+primordial boots~
+10278 1  # 1x a pair of primordial boots
+1 197 0 32 10279
+R
+10265 6  # 6x a thick dracosaur hide
+R
+10267 8  # 8x a serrated dracosaur tooth
+R
+10252 1  # 1x a huge dracosaur bone
+R
+177 10  # 10x an imperium ingot
+S
+#10280
+dracosaur scale gauntlets~
+10280 1  # 1x a pair of dracosaur scale gauntlets
+4 182 g 32 10281
+R
+10265 12  # 12x a thick dracosaur hide
+R
+10267 2  # 2x a serrated dracosaur tooth
+R
+10253 1  # 1x the essence of terror
+R
+177 5  # 5x an imperium ingot
+S
+#10282
+tome of the primordium~
+10282 1  # 1x the Tome of the Primordium
+2 203 0 32 10283
+R
+10265 4  # 4x a thick dracosaur hide
+R
+10267 10  # 10x a serrated dracosaur tooth
+R
+10254 1  # 1x a stunning violet gem
+R
+176 5  # 5x an ingot of nocturnium
+S
+#10284
+bone crown of the primeval~
+10284 1  # 1x the bone crown of the primeval
+2 54 0 32 10285
+R
+10252 1  # 1x a huge dracosaur bone
+R
+10253 1  # 1x the essence of terror
+R
+10254 1  # 1x a stunning violet gem
+S
+$

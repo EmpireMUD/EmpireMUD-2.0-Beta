@@ -118,7 +118,7 @@ chimpanzee hairy~
 a chimpanzee~
 A hairy chimpanzee eyes you cautiously.
 ~
-80 100 dovA 0
+80 100 doA 0
 1 0 0 15
 S
 #9111
@@ -126,7 +126,7 @@ gorilla huge~
 a gorilla~
 A huge gorilla pounds its chest at you.
 ~
-90 110 dovA 0
+90 110 doA 0
 1 0 0 15
 S
 #9112
@@ -233,9 +233,9 @@ I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 1  # SKIN: a large skin
 S
 #9122
-ground-squirrel squirrel~
-a ground-squirrel~
-A small ground-squirrel dashes behind a shrub.
+squirrel ground small~
+a ground squirrel~
+A small ground squirrel dashes behind a shrub.
 ~
 1 3 djo c
 0 0 0 9
@@ -707,7 +707,7 @@ S
 #9167
 whale fin gigantic~
 the fin whale~
-A gigantic fin whale swims up along side you!
+A gigantic fin whale swims up alongside you!
 ~
 70 80 djloy 0
 0 0 6 5
@@ -867,9 +867,9 @@ I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 9177 100.00 1  # SKIN: a polar bear fur
 S
 #9178
-narwal huge~
-a narwal~
-A huge narwal breaks the surface of the water.
+narwhal narwal huge~
+narwhal~
+A huge narwhal breaks the surface of the water.
 ~
 100 125 djloy 0
 0 0 6 5
@@ -879,7 +879,7 @@ I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 9178 100.00 1 X  # BUTCHER: a narwal's horn
+I 0 9178 100.00 1 X  # BUTCHER: a narwhal's horn
 S
 #9179
 lemming~
@@ -959,7 +959,7 @@ I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 9185 100.00 1  # SKIN: a large sealskin
+I 1 9185 100.00 1  # SKIN: a sealskin
 S
 #9186
 seal~
@@ -977,7 +977,7 @@ the Emperor of Penguins~
 The Emperor of Penguins stares at you from beneath his penguin cowl.
 ~
 150 150 bdvA 0
-0 0 13 15
+1 0 13 15
 I 4 9187 100.00 1  # LOOT: an arctic aura
 S
 #9188
@@ -987,6 +987,7 @@ A mouse scurries by.
 ~
 1 3 bdjo c
 0 0 8 9
+T 9188
 S
 #9189
 rat~
@@ -997,6 +998,7 @@ A rat scurries by.
 0 0 8 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1350 100.00 1  # SKIN: a small skin
+T 9188
 S
 #9190
 spider~
@@ -1005,6 +1007,7 @@ A spider scurries by.
 ~
 1 3 bdjo c
 0 0 7 9
+T 9188
 S
 #9191
 spider large~
@@ -1013,6 +1016,7 @@ A large spider creeps by.
 ~
 1 10 djo c
 0 0 9 9
+T 9188
 S
 #9192
 cat tabby~
@@ -1065,6 +1069,7 @@ A gecko flicks its tongue nearby.
 ~
 1 3 bdjko c
 0 0 1 9
+T 9188
 S
 #9198
 moth~
@@ -1073,6 +1078,7 @@ A moth flutters nearby.
 ~
 1 1 bdjo c
 0 0 2 15
+T 9198
 S
 #9199
 beetle~
@@ -1081,5 +1087,6 @@ A beetle skitters for cover nearby.
 ~
 1 1 bdjo c
 0 0 8 9
+T 9188
 S
 $

@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: workforce.c                                     EmpireMUD 2.0b1 *
+*   File: workforce.c                                     EmpireMUD 2.0b2 *
 *  Usage: functions related to npc chores and workforce                   *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -9,6 +9,8 @@
 *  CircleMUD (C) 1993, 94 by the Trustees of the Johns Hopkins University *
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
+
+#include <math.h>
 
 #include "conf.h"
 #include "sysdep.h"
@@ -57,7 +59,7 @@ void do_chore_weaving(empire_data *emp, room_data *room);
 
 // external functions
 void empire_skillup(empire_data *emp, int ability, double amount);	// skills.c
-void stop_room_action(room_data *room, int action);	// act.action.c
+void stop_room_action(room_data *room, int action, int chore);	// act.action.c
 
 
  /////////////////////////////////////////////////////////////////////////////
@@ -243,24 +245,55 @@ void add_chore_tracker(empire_data *add) {
 * @return bool TRUE if the empire is below the cap
 */
 static bool can_gain_chore_resource(empire_data *emp, room_data *loc, obj_vnum vnum) {
+	int island_count, total_count, island_max, total_max;
 	struct empire_storage_data *store;
-	bool ok = FALSE;
-
-	store = find_stored_resource(emp, GET_ISLAND_ID(loc), vnum);
+	int island;
 	
-	if (!store) {
-		ok = TRUE;
+	// safety first!
+	if (!emp || !loc || vnum == NOTHING) {
+		return FALSE;
+	}
+
+	island = GET_ISLAND_ID(loc);
+
+	// count both at onces (quicker)
+	island_count = 0;
+	total_count = 0;
+	for (store = EMPIRE_STORAGE(emp); store; store = store->next) {
+		if (store->vnum == vnum) {
+			total_count += store->amount;
+			
+			if (store->island == island) {
+				island_count += store->amount;
+			}
+		}
+	}
+	
+	// determine local maxima
+	if (EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR)) {
+		island_max = config_get_int("max_chore_resource_skilled");
 	}
 	else {
-		if (EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR)) {
-			ok = (store->amount < config_get_int("max_chore_resource_skilled"));
+		island_max = config_get_int("max_chore_resource");
+	}
+	
+	// total max is a factor of this
+	total_max = round(island_max * diminishing_returns(EMPIRE_MEMBERS(emp), 5));
+
+	// do we have too much?
+	if (total_count >= total_max) {
+		if (island_count < config_get_int("max_chore_resource_over_total")) {
+			return TRUE;
 		}
-		else {
-			ok = (store->amount < config_get_int("max_chore_resource"));
+	}
+	else {
+		if (island_count < island_max) {
+			return TRUE;
 		}
 	}
 	
-	return ok;
+	// in all other cases
+	return FALSE;
 }
 
 
@@ -588,20 +621,14 @@ void do_chore_auto_balance(empire_data *emp, room_data *room) {
 void do_chore_brickmaking(empire_data *emp, room_data *room) {
 	struct empire_storage_data *store = find_stored_resource(emp, GET_ISLAND_ID(room), o_CLAY);
 	char_data *worker = find_mob_in_room_by_vnum(room, chore_data[CHORE_BRICKMAKING].mob);
-	bool can_do = can_gain_chore_resource(emp, room, o_BRICKS);
+	bool can_do = (can_gain_chore_resource(emp, room, o_BRICKS) && store && store->amount >= 2);
 	
 	if (worker && can_do) {
-		if (store && store->amount >= 2) {
-			charge_stored_resource(emp, GET_ISLAND_ID(room), store->vnum, 2);
-			add_to_empire_storage(emp, GET_ISLAND_ID(room), o_BRICKS, 1);
-			
-			act("$n finishes a pile of bricks.", FALSE, worker, NULL, NULL, TO_ROOM);
-			empire_skillup(emp, ABIL_WORKFORCE, config_get_double("exp_from_workforce"));
-		}
-		else {
-			// no trees remain: mark for despawn
-			SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
-		}
+		charge_stored_resource(emp, GET_ISLAND_ID(room), store->vnum, 2);
+		add_to_empire_storage(emp, GET_ISLAND_ID(room), o_BRICKS, 1);
+		
+		act("$n finishes a pile of bricks.", FALSE, worker, NULL, NULL, TO_ROOM);
+		empire_skillup(emp, ABIL_WORKFORCE, config_get_double("exp_from_workforce"));
 	}
 	else if (store && can_do) {
 		worker = place_chore_worker(emp, CHORE_BRICKMAKING, room);
@@ -647,7 +674,7 @@ void do_chore_building(empire_data *emp, room_data *room) {
 		if (IS_COMPLETE(room)) {
 			finish_building(worker, room);
 			SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
-			stop_room_action(room, ACT_BUILDING);
+			stop_room_action(room, ACT_BUILDING, CHORE_BUILDING);
 		}
 
 		if (!found) {
@@ -692,7 +719,7 @@ void do_chore_chopping(empire_data *emp, room_data *room) {
 				else {
 					// done: mark for de-spawn
 					SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
-					stop_room_action(room, ACT_CHOPPING);
+					stop_room_action(room, ACT_CHOPPING, CHORE_CHOPPING);
 			
 					if (EMPIRE_CHORE(emp, CHORE_AUTO_ABANDON)) {
 						abandon_room(room);
@@ -727,13 +754,12 @@ INTERACTION_FUNC(one_dig_chore) {
 
 void do_chore_digging(empire_data *emp, room_data *room) {	
 	char_data *worker = find_mob_in_room_by_vnum(room, chore_data[CHORE_DIGGING].mob);
-	bool depleted = (get_depletion(room, DPLTN_DIG) >= (ROOM_BLD_FLAGGED(room, BLD_HIGH_DEPLETION) ? config_get_int("high_depletion") : config_get_int("common_depletion"))) ? TRUE : FALSE;
+	bool depleted = (get_depletion(room, DPLTN_DIG) >= DEPLETION_LIMIT(room)) ? TRUE : FALSE;
 	bool can_do = !depleted && can_gain_chore_resource_from_interaction(emp, room, INTERACT_DIG);
-	bool junk;
 	
 	if (CAN_INTERACT_ROOM(room, INTERACT_DIG) && can_do) {
 		if (worker) {
-			if (!run_room_interactions(worker, room, INTERACT_DIG, one_dig_chore, &junk)) {
+			if (!run_room_interactions(worker, room, INTERACT_DIG, one_dig_chore)) {
 				SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 			}
 		}
@@ -782,7 +808,7 @@ void do_chore_dismantle(empire_data *emp, room_data *room) {
 			
 			finish_dismantle(worker, room);
 			SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
-			stop_room_action(room, ACT_DISMANTLING);
+			stop_room_action(room, ACT_DISMANTLING, CHORE_BUILDING);
 		}
 
 		if (!found) {
@@ -839,7 +865,10 @@ INTERACTION_FUNC(one_farming_chore) {
 				}
 				else {
 					change_terrain(inter_room, climate_default_sector[GET_CROP_CLIMATE(crop_proto(ROOM_CROP_TYPE(inter_room)))]);
-								
+					
+					// stop the chop just in case
+					stop_room_action(inter_room, ACT_CHOPPING, CHORE_CHOPPING);
+					
 					if (EMPIRE_CHORE(emp, CHORE_AUTO_ABANDON)) {
 						abandon_room(inter_room);
 						add_chore_tracker(emp);
@@ -850,7 +879,7 @@ INTERACTION_FUNC(one_farming_chore) {
 				if (IS_NPC(ch)) {
 					SET_BIT(MOB_FLAGS(ch), MOB_SPAWNED);
 				}
-				stop_room_action(inter_room, ACT_HARVESTING);
+				stop_room_action(inter_room, ACT_HARVESTING, CHORE_FARMING);
 			}
 		}
 		
@@ -864,11 +893,10 @@ INTERACTION_FUNC(one_farming_chore) {
 void do_chore_farming(empire_data *emp, room_data *room) {
 	char_data *worker = find_mob_in_room_by_vnum(room, chore_data[CHORE_FARMING].mob);
 	bool can_do = can_gain_chore_resource_from_interaction(emp, room, INTERACT_HARVEST);
-	bool junk;
 	
 	if (CAN_INTERACT_ROOM(room, INTERACT_HARVEST) && can_do) {
 		if (worker) {
-			if (!run_room_interactions(worker, room, INTERACT_HARVEST, one_farming_chore, &junk)) {
+			if (!run_room_interactions(worker, room, INTERACT_HARVEST, one_farming_chore)) {
 				SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 			}
 		}
@@ -932,11 +960,10 @@ void do_chore_gardening(empire_data *emp, room_data *room) {
 	char_data *worker = find_mob_in_room_by_vnum(room, chore_data[CHORE_HERB_GARDENING].mob);
 	bool depleted = (get_depletion(room, DPLTN_PICK) >= garden_depletion);
 	bool can_do = !depleted && can_gain_chore_resource_from_interaction(emp, room, INTERACT_FIND_HERB);
-	bool junk;
 	
 	if (CAN_INTERACT_ROOM(room, INTERACT_FIND_HERB) && can_do) {
 		if (worker) {
-			if (!run_room_interactions(worker, room, INTERACT_FIND_HERB, one_gardening_chore, &junk)) {
+			if (!run_room_interactions(worker, room, INTERACT_FIND_HERB, one_gardening_chore)) {
 				SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 			}
 		}
@@ -1014,7 +1041,7 @@ void do_chore_mining(empire_data *emp, room_data *room) {
 		if (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) <= 0) {
 			// mark for despawn
 			SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
-			stop_room_action(room, ACT_MINING);
+			stop_room_action(room, ACT_MINING, CHORE_MINING);
 		}
 	}
 	else if (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) > 0 && can_do) {
@@ -1120,7 +1147,7 @@ void do_chore_nailmaking(empire_data *emp, room_data *room) {
 
 void do_chore_quarrying(empire_data *emp, room_data *room) {
 	char_data *worker = find_mob_in_room_by_vnum(room, chore_data[CHORE_QUARRYING].mob);
-	bool depleted = (get_depletion(room, DPLTN_QUARRY) >= (ROOM_BLD_FLAGGED(room, BLD_HIGH_DEPLETION) ? config_get_int("high_depletion") : config_get_int("common_depletion"))) ? TRUE : FALSE;
+	bool depleted = (get_depletion(room, DPLTN_QUARRY) >= config_get_int("common_depletion")) ? TRUE : FALSE;
 	bool can_do = !depleted && can_gain_chore_resource(emp, room, o_STONE_BLOCK);
 	
 	if (worker && can_do) {
@@ -1207,6 +1234,8 @@ void do_chore_shearing(empire_data *emp, room_data *room) {
 	
 	char_data *worker = find_mob_in_room_by_vnum(room, chore_data[CHORE_SHEARING].mob);
 	char_data *mob, *shearable = NULL;
+	
+	struct interact_exclusion_data *excl = NULL;
 	struct interaction_item *interact;
 	bool found;
 
@@ -1229,7 +1258,7 @@ void do_chore_shearing(empire_data *emp, room_data *room) {
 		
 		// we know it's shearable, but have to find the items
 		for (interact = shearable->interactions; interact; interact = interact->next) {
-			if (CHECK_INTERACT(interact, INTERACT_SHEAR)) {
+			if (interact->type == INTERACT_SHEAR && check_exclusion_set(&excl, interact->exclusion_code, interact->percent)) {
 				// messaging
 				if (!found) {
 					act("$n shears $N.", FALSE, worker, NULL, shearable, TO_ROOM);
@@ -1239,10 +1268,6 @@ void do_chore_shearing(empire_data *emp, room_data *room) {
 				
 				add_to_empire_storage(emp, GET_ISLAND_ID(room), interact->vnum, interact->quantity);
 				add_cooldown(shearable, COOLDOWN_SHEAR, shear_growth_time * SECS_PER_REAL_HOUR);
-				
-				if (interact->exclusive) {
-					break;
-				}
 			}
 		}		
 	}
@@ -1252,6 +1277,8 @@ void do_chore_shearing(empire_data *emp, room_data *room) {
 	else if (worker) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 	}
+	
+	free_exclusion_data(excl);
 }
 
 

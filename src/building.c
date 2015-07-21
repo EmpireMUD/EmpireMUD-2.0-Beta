@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: building.c                                      EmpireMUD 2.0b1 *
+*   File: building.c                                      EmpireMUD 2.0b2 *
 *  Usage: Miscellaneous player-level commands                             *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -43,7 +43,7 @@ void delete_room_npcs(room_data *room, struct empire_territory_data *ter);
 void free_complex_data(struct complex_room_data *data);
 extern room_data *create_room();
 void scale_item_to_level(obj_data *obj, int level);
-void stop_room_action(room_data *room, int action);
+void stop_room_action(room_data *room, int action, int chore);
 
 // external vars
 extern const char *bld_on_flags[];
@@ -137,7 +137,7 @@ void special_building_setup(char_data *ch, room_data *room) {
 * @return TRUE if valid, FALSE if not
 */
 bool can_build_on(room_data *room, bitvector_t flags) {
-	#define CLEAR_OPEN_BUILDING(r)	(IS_MAP_BUILDING(r) && ROOM_BLD_FLAGGED((r), BLD_OPEN) && !SECT_FLAGGED(ROOM_ORIGINAL_SECT(r), SECTF_FRESH_WATER | SECTF_OCEAN))
+	#define CLEAR_OPEN_BUILDING(r)	(IS_MAP_BUILDING(r) && ROOM_BLD_FLAGGED((r), BLD_OPEN) && !ROOM_BLD_FLAGGED((r), BLD_BARRIER) && !SECT_FLAGGED(ROOM_ORIGINAL_SECT(r), SECTF_FRESH_WATER | SECTF_OCEAN))
 
 	return (
 		IS_SET(GET_SECT_BUILD_FLAGS(SECT(room)), flags) || 
@@ -213,7 +213,7 @@ void complete_building(room_data *room) {
 	}
 	
 	// stop builders
-	stop_room_action(room, ACT_BUILDING);
+	stop_room_action(room, ACT_BUILDING, CHORE_BUILDING);
 	
 	// remove any remaining resource requirements
 	while ((res = BUILDING_RESOURCES(room))) {
@@ -497,10 +497,10 @@ void finish_building(char_data *ch, room_data *room) {
 			// if the player is loyal to the empire building here, gain skill
 			if (!emp || GET_LOYALTY(c) == emp) {
 				if (type && GET_CRAFT_ABILITY(type) != NO_ABIL) {
-					gain_ability_exp(c, GET_CRAFT_ABILITY(type), 50);
+					gain_ability_exp(c, GET_CRAFT_ABILITY(type), 3);
 				}
 				else if (GET_SKILL(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
-					gain_skill_exp(c, SKILL_EMPIRE, 50);
+					gain_skill_exp(c, SKILL_EMPIRE, 3);
 				}
 			}
 		}
@@ -522,7 +522,7 @@ void finish_dismantle(char_data *ch, room_data *room) {
 	
 	msg_to_char(ch, "You finish dismantling the building.\r\n");
 	act("$n finishes dismantling the building.", FALSE, ch, 0, 0, TO_ROOM);
-	stop_room_action(IN_ROOM(ch), ACT_DISMANTLING);
+	stop_room_action(IN_ROOM(ch), ACT_DISMANTLING, CHORE_BUILDING);
 	
 	// check for required obj and return it
 	if ((type = find_building_list_entry(IN_ROOM(ch), FIND_BUILD_NORMAL)) || (type = find_building_list_entry(IN_ROOM(ch), FIND_BUILD_UPGRADE))) {
@@ -576,7 +576,7 @@ void herd_animals_out(room_data *location) {
 		for (ch_iter = ROOM_PEOPLE(location); ch_iter; ch_iter = next_ch) {
 			next_ch = ch_iter->next_in_room;
 		
-			if (IS_NPC(ch_iter) && IN_ROOM(ch_iter) == location && !ch_iter->desc && !ch_iter->master && !AFF_FLAGGED(ch_iter, AFF_CHARM) && MOB_FLAGGED(ch_iter, MOB_ANIMAL)) {
+			if (IS_NPC(ch_iter) && IN_ROOM(ch_iter) == location && !ch_iter->desc && !ch_iter->master && !AFF_FLAGGED(ch_iter, AFF_CHARM) && MOB_FLAGGED(ch_iter, MOB_ANIMAL) && GET_POS(ch_iter) >= POS_STANDING && !MOB_FLAGGED(ch_iter, MOB_TIED)) {
 				if (!herd_msg) {
 					act("The animals are herded out of the building...", FALSE, ROOM_PEOPLE(location), NULL, NULL, TO_CHAR | TO_ROOM);
 					herd_msg = TRUE;
@@ -672,6 +672,7 @@ bool is_entrance(room_data *room) {
 * @param room_data *room The location he/she is building.
 */
 void process_build(char_data *ch, room_data *room) {
+	craft_data *type = find_building_list_entry(room, FIND_BUILD_NORMAL);
 	obj_data *obj, *found_obj = NULL;
 	bool found = FALSE;
 	struct building_resource_type *res, *temp;
@@ -729,8 +730,17 @@ void process_build(char_data *ch, room_data *room) {
 			act("$n places $p carefully in the structure.", FALSE, ch, found_obj, 0, TO_ROOM | TO_SPAMMY);
 		}
 		
-		// reset disrepair
+		// reset disrepair and damage
 		COMPLEX_DATA(room)->disrepair = 0;
+		COMPLEX_DATA(room)->damage = 0;
+		
+		// skillups
+		if (type && GET_CRAFT_ABILITY(type) != NO_ABIL) {
+			gain_ability_exp(ch, GET_CRAFT_ABILITY(type), 3);
+		}
+		else if (GET_SKILL(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
+			gain_skill_exp(ch, SKILL_EMPIRE, 3);
+		}			
 	}
 
 	// extract either way
@@ -978,6 +988,9 @@ ACMD(do_build) {
 				msg_to_char(ch, "The building is being dismantled, you can't rebuild it now.\r\n");
 			else if (GET_ACTION(ch) != ACT_NONE)
 				msg_to_char(ch, "You're kinda busy right now.\r\n");
+			else if (BUILDING_BURNING(IN_ROOM(ch))) {
+				msg_to_char(ch, "You can't work on a burning building!\r\n");
+			}
 			else {
 				start_action(ch, ACT_BUILDING, 0, NOBITS);
 				msg_to_char(ch, "You start building.\r\n");
@@ -1185,6 +1198,11 @@ ACMD(do_dismantle) {
 		msg_to_char(ch, "You need to dismantle from the main room.\r\n");
 		return;
 	}
+	
+	if (BUILDING_BURNING(IN_ROOM(ch))) {
+		msg_to_char(ch, "You can't dismantle a burning building!\r\n");
+		return;
+	}
 
 	if (IS_DISMANTLING(IN_ROOM(ch))) {
 		msg_to_char(ch, "You begin to dismantle the building.\r\n");
@@ -1335,7 +1353,7 @@ ACMD(do_dismantle) {
 	msg_to_char(ch, "You begin to dismantle the building.\r\n");
 	act("$n begins to dismantle the building.\r\n", FALSE, ch, 0, 0, TO_ROOM);
 	process_dismantling(ch, IN_ROOM(ch));
-	WAIT_STATE(ch, 2 RL_SEC);
+	command_lag(ch, WAIT_OTHER);
 }
 
 
@@ -1718,7 +1736,7 @@ ACMD(do_lay) {
 		
 		// this will tear it back down to its base type
 		disassociate_building(IN_ROOM(ch));
-		WAIT_STATE(ch, 3 RL_SEC);
+		command_lag(ch, WAIT_OTHER);
 		check_lay_territory(ch, IN_ROOM(ch));
 	}
 	else if (!road_sect) {
@@ -1749,7 +1767,7 @@ ACMD(do_lay) {
 		// preserve this for un-laying the road (disassociate_building)
 		ROOM_ORIGINAL_SECT(IN_ROOM(ch)) = original_sect;
 
-		WAIT_STATE(ch, 3 RL_SEC);
+		command_lag(ch, WAIT_OTHER);
 		check_lay_territory(ch, IN_ROOM(ch));
 	}
 }
@@ -1772,7 +1790,7 @@ ACMD(do_maintain) {
 		COMPLEX_DATA(IN_ROOM(ch))->disrepair = 0;
 		msg_to_char(ch, "You perform some quick maintenance on the building.\r\n");
 		act("$n performs some quick maintenance on the building.", TRUE, ch, NULL, NULL, TO_ROOM);
-		WAIT_STATE(ch, 2 RL_SEC);
+		command_lag(ch, WAIT_OTHER);
 	}
 }
 

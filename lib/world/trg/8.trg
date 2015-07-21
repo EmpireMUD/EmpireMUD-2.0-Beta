@@ -7,7 +7,7 @@ if !(look /= %cmd% && %test%)
   return 0
   halt
 end
-%send% %actor% You look into %self.shortdesc%, but it's too tarrnished to see a good reflection.
+%send% %actor% You look into %self.shortdesc%, but it's too tarnished to see a good reflection.
 %echoaround% %actor% %actor.name% looks into %self.shortdesc%.
 ~
 #806

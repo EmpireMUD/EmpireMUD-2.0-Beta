@@ -68,8 +68,9 @@ Mental attributes:
 
 The active attribute in each category cannot go below 1 from equipment; you
 will not be able to use any item that lowers your active attributes below 1.
+There is also currently a maximum rating of 15 in these attributes.
 
-See also: EMPIRE GREATNESS
+See also: DODGE, EMPIRE GREATNESS, SECONDARY ATTRIBUTES, TO-HIT
 #
 AUTORECALL "AUTO-RECALL" "AUTO RECALL"
 
@@ -136,7 +137,26 @@ in territory claimed by other empires. Bound items will disappear from the
 ground if left on unclaimed land, like normal. They are safe to leave on
 claimed land or in your private chest.
 
+You cannot unbind items.
+
 See also: HOME
+#
+BLOCK "BLOCK CAP"
+
+Your block rating, shown on 'score', is your character's bonus chance to block
+attacks. You must have the Shield Block ability, and be holding a shield in
+your off hand. Block bonuses come from equipment or spell effect, but have no
+benefit if you are not using a shield.
+
+There is a maximum 50% chance to block. The amount of Block required to hit
+this cap is based on the level of your opponent.
+
+Block cap:
+- Start with the mob's level divided by 2 (half)
+- For hard mobs, raise the total by 10%
+- For group mobs, raise the total by 30%
+
+See also: AFFECTS, SCORE, SHIELD BLOCK, WARD AGAINST MAGIC
 #
 BLOOD "BLOOD POINTS" "BLOOD POOL" "BLOOD UPKEEP"
 
@@ -157,11 +177,11 @@ See also: ANCIENT BLOOD
 #
 BOARDS READ WRITE RESPOND
 
-Usage: look board
-       write <headline>
-       read <number>
-       respond <number> <headline>
-       remove <number>
+Usage:  look board
+        write <headline>
+        read <number>
+        respond <number> <headline>
+        remove <number>
 
 Bulletin boards are the forum of inter-player communication on the MUD. There
 are different bulletin boards for different purposes -- for example, a
@@ -190,9 +210,47 @@ Available traits:
  Extra health, moves, or mana - +15
  Faster health, move, or mana regeneration - +1
  Faster chores - chopping, digging, and other chores go faster
- Extra daily skill points - 5 extra daily skill points
+ Extra daily bonus experience - 5 extra daily bonus experience points
  Larger inventory - Carry 5 more small items (or 2 more large items)
  Faster walking - Half the lag from normal walking
+#
+BONUS-HEALING "BONUS HEALING" "HEALING ATTRIBUTE" "HEALING TRAIT"
+
+The BONUS-HEALING gear stat, also shown on your score page as "Healing +X",
+is an amount added to any healing abilities you use. This is similar to the
+way Intelligence is added to healing.
+
+See also: SCORE
+#
+BONUS-MAGICAL "BONUS MAGICAL" "MAGICAL ATTRIBUTE" "MAGICAL TRAIT"
+
+The BONUS-MAGICAL gear stat, also shown on your score page as "Magical +X",
+is an amount added to any magical damage you deal, including Intelligence-based
+melee attacks (like Ready Fireball) and spells.
+
+It is added to damage in the same way as Intelligence.
+
+See also: SCORE
+#
+BONUS-PHYSICAL "BONUS PHYSICAL" "PHYSICAL ATTRIBUTE" "PHYSICAL TRAIT"
+
+The BONUS-PHYSICAL gear stat, also shown on your score page as "Physical +X",
+is an amount added to any physical damage you deal. This includes melee combat
+and physical abilities.
+
+It is added to damage in the same way as Strength.
+
+See also: SCORE
+#
+FIRE "CAMPING FIRE" "COOKING FIRE" "CAMP FIRE"
+
+You can create a cooking fire by lighting a tree or log, using a flint set.
+This will let you cook food, brew potions, or craft pottery.
+
+You can also cook in a Kitchen, Alchemist, Pottery, or Laboratory. If you have
+the Touch of Flame ability, you don't need a fire at all.
+
+See also: LIGHT, TOUCH OF FLAME
 #
 CHAMELEON
 
@@ -200,9 +258,9 @@ The "chameleon" trait is the property of some buildings to be invisible at a
 distance. Instead of seeing the building and its owner's banner, you see only
 normal terrain.
 #
-CHANNELS SHOUT
+CHANNELS SHOUT /OOC /NEWBIE /RECRUIT /TRADE
 
-Usage: shout <message>
+Usage:  shout <message>
 
 See also HELP SLASH-CHANNELS for global channels like /ooc and /newbie.
 
@@ -213,6 +271,10 @@ the "toggle" command.
 The following channels are available on EmpireMUD:
 
 Global channels:
+&y/ooc&0 - General chat
+&g/newbie&0 - Newbie channel
+&g/recruit&0 - Empire recruitment channel
+&r/trade&0 - Global trade channel
 &yshout&0 - an in-character channel limited to 50 map tiles distance
 &rtell&0 - this is a private channel that is generally considered OOC
 
@@ -305,9 +367,6 @@ Desert Groves re-grow on their own, at random.
 Diminishing returns are numbers that increase quickly at low levels, but more
 slowly at higher levels. For example, the first +20 dodge you get is applied
 directly, but the next +20 dodge only brings you up to +30.
-
-This is applied to several character traits, such as block, dodge, soak, and
-to-hit.
 #
 DISPLAY
 
@@ -323,6 +382,27 @@ See the prompt help file for information on available display codes.
 Helpful hint: Set an alias to display your favorite set of info.
 
 See also: ALIAS, PROMPT
+#
+DODGE "DODGE CAP"
+
+Your Dodge rating, shown on 'score', is subtracted from your opponent's To-Hit
+score; the result is their chance to hit you as a percent.
+
+For fighting NPCs, the highest possible dodge chance is 75%. Against players,
+it's 95%. Players' chance of hitting you is based on their to-hit score, but
+mobs are more predictable and it is possible to reach a "dodge cap", the amount
+where NPCs hit you as little as possible.
+
+Dodge cap:
+- Start with the mob's level, minus 50 (not less than 0)
+- Add 10% of the mob's level
+- For hard mobs, raise the total by 10%
+- For group mobs, raise the total by 30%
+- For boss mobs, raise the total by both 10% and 30% (+43% total)
+- Add 75 to the total
+- Add +5 per Dexterity the mob has more than you
+
+See also: AFFECTS, SCORE, TO-HIT
 #
 DOT "DOT EFFECT" "DAMAGE OVER TIME" DAMAGE-OVER-TIME
 
@@ -373,24 +453,38 @@ See also: BASIC CRAFTS, FORGE
 HEALTH "HIT POINTS" HITPOINTS HP "HEALTH POINTS" "HEALTH POOL"
 
 The health pool is the amount of damage you can take before being knocked out.
-All players begin with 50 health points and remain at this level until they
-gain a class.
+All players begin with 50 health points and starts to rise around level 80.
+Your base health at level 100 is based on your class.
 
 If you're knocked out with 0 health, you will die without assistance.
 
 See also: CLASS, DEATH, ENDURANCE
 #
-HOSTILE THIEF
+HOSTILE ROGUE THIEF
 
-If you commit certain hostile or stealth acts, you may be flagged as "hostile".
+If you commit certain hostile or stealth acts, you may be flagged as 'hostile'.
 While you have the hostile flag, which lasts for one real hour, players can
 attack you as if you had toggled PVP on. City guards will also attack you, if
-they aren't from your empire.
+they aren't from your empire or its allies.
+
+The 'rogue' flag is a stronger, longer-lasting version of 'hostile' that is
+given to players who are not members of an empire when they commit a hostile
+action. The rogue flag is visible to all players.
 
 Examples of hostile actions:
 - taking something off the ground in someone else's territory
 - attacking another empire's citizens
 - infiltrating a building
+
+You can see how long your hostile/rogue flag has left by checking your
+cooldowns.
+
+See also: COOLDOWNS
+#
+INFRA INFRAVISION
+
+The INFRA affect, which appears on some spells and items, allows a character
+perfect night vision.
 #
 INSTANCES INSTANTIATION INSTANCING
 
@@ -411,18 +505,17 @@ is a good way to see what level (or level range) an instance is scaled to.
 
 See also: ADVENTURE
 #
-LEVEL LEVELS "SKILL LEVELS" "GEAR LEVELS"
+LEVEL LEVELS "GEAR LEVELS"
 
 Unlike many games, where your skills and equipment are based on your level,
 EmpireMUD does it backwards. Your level is based on your skills and gear.
 You have three different levels.
 
-Skill level: This level is determined by your top skills. When two of your
-   skills pass level 75, the game gives you a class and these become your
-   class skills. This level does not go above 100, as it is the average of
-   your two class skills. You can see it by typing "skills". Skill levels are
-   grouped into three ranges: Basic (up to 50), Specialty (up to 75), and Class
-   (up to 100).
+Skill level: This level is determined by your top 3 skills, and is currently
+   capped at 100. You only reach that level when you have two skills at 100
+   and one skill at 75. You can see your skill level by typing "skills", or
+   in parentheses on your "score". Skill levels are grouped into three ranges:
+   Basic (up to 50), Specialty (up to 75), and Class (up to 100).
 
 Gear level: The bonuses you receive from your equipment form your gear level.
    There is no upper limit on this number, and any gear you have equipped
@@ -451,8 +544,8 @@ Do not try to get out of a fight by breaking link. You will likely still die.
 MANA "MANA POINTS" "MANA POOL" "MAGIC POINTS"
 
 The mana pool is the amount of magical energy you can channel before you must
-stop to recover some. All players begin with 50 mana points and remain at this
-level until they gain a class.
+stop to recover some. All players begin with 50 mana points and start to rise
+around level 80. Your base mana at level 100 is based on your class.
 
 See also: CLASS, GIFT OF NATURE
 #
@@ -462,8 +555,10 @@ Move points are the basic energy pool for physical effort. It takes move points
 to walk around, and it takes move points to use many physical abilities like
 Kick or Shadowstep.
 
-All players begin with 100 move points. The easiest ways to get more are to
-make a walking stick or a good pair of shoes.
+All players begin with 100 mana points and start to rise around level 80. Your
+base move points at level 100 is based on your class. The easiest ways to get
+more move points at any level are to make a walking stick or a good pair of
+shoes.
 #
 MUDSTATS
 
@@ -519,6 +614,42 @@ flag will remain active for 5 minutes after you shut it off.
 
 See also: TOGGLE
 #
+RESIST-MAGICAL "RESIST MAGICAL" "MAGICAL RESISTANCE"
+
+Your magic resistance is a measure of how much damage your character can ignore
+from magical sources. It can reduce incoming magical damage by up to 25%,
+although the amount of resistance required to achieve this depends upon the
+level of the person attacking you.
+
+The amount of resistance required to hit the 25% reduction cap is equal to half
+of the attacker's level. (You need 50 resistance to reach the cap against a
+level 100 mob.) Magical resistance is the second number in the 'Resist' section
+of your score.
+
+Note that fire from magical sources (like the Ready Fireball ability) is
+reduced by this, but fire from physical sources (like a torch weapon) falls
+under physical resistance instead.
+
+See also: RESIST-PHYSICAL, SCORE
+#
+RESIST-PHYSICAL "RESIST PHYSICAL" "PHYSICAL RESISTANCE" SOAK
+
+Your physical resistance is a measure of how much physical damage your
+character can simply shrug off. It can reduce incoming physical damage by up
+to 25%, although the amount of physical resistance required to achieve this
+depends upon the level of the person attacking you.
+
+The amount of resistance required to hit the 25% reduction cap is equal to half
+of the attacker's level. (You need 50 resistance to reach the cap against a
+level 100 mob.) Physical resistance is the first number in the 'Resist' section
+of your score.
+
+Physical resistance includes resistance to fire damage (but not magical fire;
+that's magic resistance). This trait is similar to the "soak" trait from older
+versions of EmpireMUD.
+
+See also: RESIST-MAGICAL, SCORE
+#
 SCALING "MOB SCALING" "SCALING MOBS"
 
 EmpireMUD uses a system of mob-scaling where mobs are procedurally adjusted
@@ -557,14 +688,15 @@ blacksmith at a forge.
 
 See also: DIG, EXCAVATE, FORGE
 #
-"SLASH CHANNELS" SLASH-CHANNELS / /JOIN /LEAVE /WHO /HISTORY HISTORY VC "VIRTUAL CHANNELS"
+"SLASH CHANNELS" SLASH-CHANNELS / /JOIN /CHECK /LEAVE /WHO /HISTORY HISTORY VC "VIRTUAL CHANNELS"
 
-Usage: /join <channel>
-       /leave <channel>
-       /history <channel>
-       /who <channel>
-       /<channel> message
-       /list
+Usage:  /join <channel>
+        /leave <channel>
+        /history <channel>
+        /who <channel>
+        /check <person>
+        /<channel> message
+        /list
 
 Slash-channels allow you dynamically join and leave channels by name, so you
 can create virtual channels to discuss things with your friends, or private
@@ -574,6 +706,9 @@ Slash-channels may be considered moderated, public channels if many players
 are on them. However, you can also create them as private channels by not
 telling other players about them.
 
+/who lists all players on a channel. /check lets you see which channels a
+player is on with you. /list lists all channels you are on.
+
 You can start chats with * (asterisk) to make them channel-emotes.
 
 Example:
@@ -582,12 +717,6 @@ Example:
   > /hist kickflip
 
 See also: CHANNELS
-#
-SOAK
-
-Soak is your character's damage absorption trait. Any incoming damage is
-reduced by this amount. Soak rating usually comes from gear or spells. It
-has diminishing returns at 10 points.
 #
 SPEAR
 
@@ -610,6 +739,31 @@ TIP TIPS "TIP OF THE DAY" HINT
 Usage:  tip
 
 This command will give you a helpful tip about the game.
+#
+TO-HIT "TO HIT" TOHIT "HIT CHANCE" "HIT CAP"
+
+Your to-hit rating, shown on 'score', represents the character's ability to
+hit enemies in combat. Your opponent's Dodge rating is subtracted from your
+To-Hit, and the resulting number is your percent chance to hit them. You have
+a base to-hit of 50 with no gear, representing a 50% chance to hit a level 1
+mob.
+
+Players always have a minimum of 5% final chance to hit (mobs have 25%), so
+long as they're within 50 levels of the target. Your opponent's Dodge rating
+is subtracted from your to-hit to determine your final chance to-hit. You can
+compute the "hit cap" -- the point at which you'll hit 100% of the time --
+based on the level of the mob you're fighting.
+
+Hit cap:
+- Start with the mob's level, minus 50 (not less than 0)
+- Add 10% of the mob's level
+- For hard mobs, raise the total by 10%
+- For group mobs, raise the total by 30%
+- For boss mobs, raise the total by both 10% and 30% (+43% total)
+- Add 100 to the total
+- Add +5 per Dexterity the mob has more than you
+
+See also: AFFECTS, DODGE, SCORE
 #
 TRANSPORTATION
 

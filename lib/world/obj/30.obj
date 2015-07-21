@@ -239,7 +239,7 @@ S
 #3022
 squash yellow~
 a yellow squash~
-A yellow squash is lying on hte ground.~
+A yellow squash is lying on the ground.~
 It's a single, delicious squash.
 ~
 6 0 a
@@ -259,5 +259,27 @@ R
 5606 0
 R
 5610 0
+S
+#3024
+plantain unripe~
+an unripe plantain~
+There is an unripe plantain on the ground.~
+This plantain doesn't quite look ripe and it will be starchy, but edible.  
+~
+6 0 a
+6 0 0
+7 48
+S
+#3025
+plantains basket~
+a basket of plantains~
+A basket of plantains is sitting here.~
+You can eat the plantains, or plant them.
+~
+6 bl a
+24 14 0
+7 168
+R
+5116 0
 S
 $

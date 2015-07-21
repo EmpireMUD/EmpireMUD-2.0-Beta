@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.empire.c                                    EmpireMUD 2.0b1 *
+*   File: act.empire.c                                    EmpireMUD 2.0b2 *
 *  Usage: stores all of the empire-related commands                       *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -63,6 +63,36 @@ void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool 
 //// HELPERS /////////////////////////////////////////////////////////////////
 
 /**
+* Determines how much an empire must spend to start a war with another empire,
+* based on the configs "war_cost_max" and "war_cost_min". This is calculated
+* by the difference in score between the two empires with the maximum value at
+* a difference of 50 or more. The function is a simple parabola.
+*
+* @param empire_data *emp The empire declaring war.
+* @param empire_data *victim The victim empire.
+* @return int The cost, in coins, to go to war.
+*/
+int get_war_cost(empire_data *emp, empire_data *victim) {
+	int min = config_get_int("war_cost_min"), max = config_get_int("war_cost_max");
+	int score_e, score_v;
+	double diff, max_diff;
+	int cost;
+	
+	score_e = emp ? get_total_score(emp) : 0;
+	score_v = victim ? get_total_score(victim) : 0;
+	
+	// difference between scores (caps at 50)
+	max_diff = 50;
+	diff = ABSOLUTE(score_e - score_v);
+	diff = MIN(diff, max_diff);
+	
+	// simple parabola: y = ax^2 + b, a = (max-min)/max_diff^2, b = min
+	cost = (max - min) / (max_diff * max_diff) * (diff * diff) + min;
+	return cost;
+}
+
+
+/**
 * for do_empires
 *
 * @param char_data *ch who to send to
@@ -111,6 +141,10 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 	
 	msg_to_char(ch, "%s%s&0%s, led by %s\r\n", EMPIRE_BANNER(e), EMPIRE_NAME(e), line, (get_name_by_id(EMPIRE_LEADER(e)) ? CAP(get_name_by_id(EMPIRE_LEADER(e))) : "(Unknown)"));
 	
+	if (IS_IMMORTAL(ch)) {
+		msg_to_char(ch, "Created: %-24.24s\r\n", ctime(&EMPIRE_CREATE_TIME(e)));
+	}
+	
 	if (EMPIRE_DESCRIPTION(e)) {
 		msg_to_char(ch, "%s&0", EMPIRE_DESCRIPTION(e));
 	}
@@ -122,9 +156,8 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 		// rank name
 		msg_to_char(ch, " %2d. %s&0", iter, EMPIRE_RANK(e, iter-1));
 		
-		// privs -- only show if not max rank (top rank always has all remaining privs)
-		// and only shown to own empire
-		if (is_own_empire && iter != EMPIRE_NUM_RANKS(e)) {
+		// privs -- only shown to own empire
+		if (is_own_empire) {
 			found = FALSE;
 			for (sub = 0; sub < NUM_PRIVILEGES; ++sub) {
 				if (EMPIRE_PRIV(e, sub) == iter) {
@@ -173,6 +206,14 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 		comma = TRUE;
 	}
 	msg_to_char(ch, ")\r\n");
+
+	// show war cost?
+	if (GET_LOYALTY(ch) && GET_LOYALTY(ch) != e && !EMPIRE_IMM_ONLY(e) && !EMPIRE_IMM_ONLY(GET_LOYALTY(ch)) && !has_relationship(GET_LOYALTY(ch), e, DIPL_NONAGGR | DIPL_ALLIED)) {
+		int war_cost = get_war_cost(GET_LOYALTY(ch), e);
+		if (war_cost > 0) {
+			msg_to_char(ch, "Cost to declare war on this empire: %d coin%s\r\n", war_cost, PLURAL(war_cost));
+		}
+	}
 
 	// diplomacy
 	if (EMPIRE_DIPLOMACY(e)) {
@@ -252,16 +293,33 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 }
 
 
-// called by do_empire_inventory
+/**
+* called by do_empire_inventory to show einv
+*
+* @param char_data *ch The player requesting the einv.
+* @param empire_data *emp The empire whose inventory to show.
+* @param char *argument The requested inventory item, if any.
+*/
 static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char *argument) {
-	void show_one_stored_item_to_char(char_data *ch, empire_data *emp, struct empire_storage_data *store, bool show_zero);
-	void sort_storage(empire_data *emp);
+	// helper type
+	struct einv_type {
+		obj_vnum vnum;
+		int local;
+		int total;
+		UT_hash_handle hh;
+	};
 
-	bool found = FALSE;
+	char output[MAX_STRING_LENGTH*2], line[MAX_STRING_LENGTH];
+	struct einv_type *einv, *next_einv, *list = NULL;
+	obj_vnum vnum, last_vnum = NOTHING;
 	struct empire_storage_data *store;
-	obj_vnum last_vnum = NOTHING;
-	obj_data *proto;
-	bool all = FALSE;
+	obj_data *proto = NULL;
+	size_t lsize, size;
+	bool all = FALSE, any = FALSE;
+	
+	if (!ch->desc) {
+		return;
+	}
 	
 	if (GET_ISLAND_ID(IN_ROOM(ch)) == NOTHING && !IS_IMMORTAL(ch)) {
 		msg_to_char(ch, "You can't check any empire inventory here.\r\n");
@@ -273,36 +331,154 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 		all = TRUE;
 	}
 	
-	msg_to_char(ch, "Inventory of %s%s&0 on this island:\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
-	
-	// sort first so it's in order to show
-	sort_storage(emp);
-	
+	// build list
 	for (store = EMPIRE_STORAGE(emp); store; store = store->next) {
-		if (store->vnum == last_vnum) {
+		// prototype lookup
+		if (store->vnum != last_vnum) {
+			proto = obj_proto(store->vnum);
+			last_vnum = store->vnum;
+		}
+		
+		if (!proto) {
 			continue;
 		}
 		
-		proto = obj_proto(store->vnum);
+		// argument given but doesn't match
+		if (*argument && !multi_isname(argument, GET_OBJ_KEYWORDS(proto))) {
+			continue;
+		}
 		
-		if (!*argument || multi_isname(argument, GET_OBJ_KEYWORDS(proto))) {
-			// unusual island check
-			if (store->island == GET_ISLAND_ID(IN_ROOM(ch)) || all || (*argument && !find_stored_resource(emp, GET_ISLAND_ID(IN_ROOM(ch)), store->vnum))) {
-				last_vnum = store->vnum;
-				show_one_stored_item_to_char(ch, emp, store, (store->island != GET_ISLAND_ID(IN_ROOM(ch))));
-				found = TRUE;
-			}
+		// ready to add
+		vnum = store->vnum;
+		HASH_FIND_INT(list, &vnum, einv);
+		if (!einv) {
+			CREATE(einv, struct einv_type, 1);
+			einv->vnum = vnum;
+			einv->local = einv->total = 0;
+			HASH_ADD_INT(list, vnum, einv);
+		}
+		
+		// add
+		einv->total += store->amount;
+		if (store->island == GET_ISLAND_ID(IN_ROOM(ch))) {
+			einv->local += store->amount;
 		}
 	}
 	
-	if (!found) {
-		if (!*argument) {
-			msg_to_char(ch, " Nothing.\r\n");
+	// build output
+	size = snprintf(output, sizeof(output), "Inventory of %s%s&0 on this island:\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+	
+	HASH_ITER(hh, list, einv, next_einv) {
+		// only display it if it's on the requested island, or if they requested it by name, or all
+		if (all || einv->local > 0 || *argument) {
+			if (einv->total > einv->local) {
+				lsize = snprintf(line, sizeof(line), "(%4d) %s (%d total)\r\n", einv->local, get_obj_name_by_proto(einv->vnum), einv->total);
+			}
+			else {
+				lsize = snprintf(line, sizeof(line), "(%4d) %s\r\n", einv->local, get_obj_name_by_proto(einv->vnum));
+			}
+			
+			// append if room
+			if (size + lsize < sizeof(output)) {
+				size += lsize;
+				strcat(output, line);
+				any = TRUE;
+			}
+		}
+		
+		// clean up either way
+		HASH_DEL(list, einv);
+		free(einv);
+	}
+	
+	if (!any) {
+		size += snprintf(output + size, sizeof(output) - size, " nothing\r\n");
+	}
+	
+	page_string(ch->desc, output, TRUE);
+}
+
+
+/**
+* Finds workforce mobs belonging to an empire and reports on how many there
+* are.
+*
+* @param empire_data *emp The empire to check.
+* @param char_data *to The person to show the info to.
+*/
+void show_workforce_where(empire_data *emp, char_data *to) {
+	// helper data type
+	struct workforce_count_type {
+		int chore;
+		int count;
+		UT_hash_handle hh;
+	};
+
+	struct workforce_count_type *find, *wct, *next_wct, *counts = NULL;
+	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	char_data *ch_iter;
+	int chore, iter;
+	size_t size;
+	
+	if (!emp) {
+		msg_to_char(to, "No empire workforce found.\r\n");
+		return;
+	}
+	
+	// count up workforce mobs
+	for (ch_iter = character_list; ch_iter; ch_iter = ch_iter->next) {
+		if (!IS_NPC(ch_iter) || GET_LOYALTY(ch_iter) != emp) {
+			continue;
+		}
+		
+		chore = -1;
+		for (iter = 0; iter < NUM_CHORES; ++iter) {
+			if (GET_MOB_VNUM(ch_iter) == chore_data[iter].mob) {
+				chore = iter;
+				break;
+			}
+		}
+		
+		// not a workforce mob
+		if (chore == -1) {
+			continue;
+		}
+		
+		HASH_FIND_INT(counts, &chore, find);
+		if (!find) {
+			CREATE(find, struct workforce_count_type, 1);
+			find->chore = chore;
+			find->count = 0;
+			HASH_ADD_INT(counts, chore, find);
+		}
+		
+		find->count += 1;
+	}
+	
+	// short circuit: no workforce found
+	if (!counts) {
+		msg_to_char(to, "No working citizens found.\r\n");
+		return;
+	}
+	
+	size = snprintf(buf, sizeof(buf), "Working %s citizens:\r\n", EMPIRE_ADJECTIVE(emp));
+	
+	HASH_ITER(hh, counts, wct, next_wct) {
+		// only bother adding if there's room in the buffer
+		if (size < sizeof(buf) - 5) {
+			snprintf(line, sizeof(line), "%s: %d worker%s\r\n", chore_data[wct->chore].name, wct->count, PLURAL(wct->count));
+			size += snprintf(buf + size, sizeof(buf) - size, "%s", CAP(line));
 		}
 		else {
-			msg_to_char(ch, " Nothing by that name\r\n");
+			size += snprintf(buf + size, sizeof(buf) - size, "...\r\n");
 		}
+		
+		// remove and free
+		HASH_DEL(counts, wct);
+		free(wct);
 	}
+	
+	page_string(to->desc, buf, TRUE);
 }
 
 
@@ -396,7 +572,7 @@ void city_traits(char_data *ch, char *argument) {
 	
 	if (city->traits != old) {
 		prettier_sprintbit(city->traits, empire_trait_types, buf);
-		log_to_empire(emp, ELOG_TERRITORY, "%s has changed city traits for %s to %s", PERS(ch, ch, 1), city->name, buf);
+		log_to_empire(emp, ELOG_ADMIN, "%s has changed city traits for %s to %s", PERS(ch, ch, 1), city->name, buf);
 		save_empire(emp);
 	}
 }
@@ -508,6 +684,7 @@ void downgrade_city(char_data *ch, char *argument) {
 
 void found_city(char_data *ch, char *argument) {
 	extern struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_data *location, int type);
+	void stop_room_action(room_data *room, int action, int chore);
 	extern int num_of_start_locs;
 	extern int *start_locs;
 	
@@ -515,6 +692,9 @@ void found_city(char_data *ch, char *argument) {
 	empire_data *emp_iter, *next_emp;
 	int iter, dist;
 	struct empire_city_data *city;
+	
+	// flags which block city found
+	bitvector_t nocity_flags = SECTF_ADVENTURE | SECTF_NON_ISLAND | SECTF_NO_CLAIM | SECTF_START_LOCATION | SECTF_IS_ROAD | SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_HAS_CROP_DATA | SECTF_CROP | SECTF_MAP_BUILDING | SECTF_INSIDE | SECTF_IS_TRENCH | SECTF_SHALLOW_WATER;
 	
 	int min_distance_between_ally_cities = config_get_int("min_distance_between_ally_cities");
 	int min_distance_between_cities = config_get_int("min_distance_between_cities");
@@ -531,8 +711,8 @@ void found_city(char_data *ch, char *argument) {
 		msg_to_char(ch, "You don't have permission to found cities.\r\n");
 		return;
 	}
-	if (ROOM_IS_CLOSED(IN_ROOM(ch)) || COMPLEX_DATA(IN_ROOM(ch)) || IS_WATER_SECT(SECT(IN_ROOM(ch)))) {
-		msg_to_char(ch, "You can't found a city right here.\r\n");
+	if (ROOM_IS_CLOSED(IN_ROOM(ch)) || COMPLEX_DATA(IN_ROOM(ch)) || IS_WATER_SECT(SECT(IN_ROOM(ch))) || ROOM_SECT_FLAGGED(IN_ROOM(ch), nocity_flags)) {
+		msg_to_char(ch, "You can't found a city on this type of terrain.\r\n");
 		return;
 	}
 	if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
@@ -611,6 +791,15 @@ void found_city(char_data *ch, char *argument) {
 	else {
 		log_to_empire(emp, ELOG_TERRITORY, "%s has founded %s", PERS(ch, ch, 1), city->name);
 	}
+	
+	stop_room_action(IN_ROOM(ch), ACT_CHOPPING, CHORE_CHOPPING);
+	stop_room_action(IN_ROOM(ch), ACT_PICKING, CHORE_FARMING);
+	stop_room_action(IN_ROOM(ch), ACT_DIGGING, NOTHING);
+	stop_room_action(IN_ROOM(ch), ACT_EXCAVATING, NOTHING);
+	stop_room_action(IN_ROOM(ch), ACT_FILLING_IN, NOTHING);
+	stop_room_action(IN_ROOM(ch), ACT_GATHERING, NOTHING);
+	stop_room_action(IN_ROOM(ch), ACT_HARVESTING, NOTHING);
+	stop_room_action(IN_ROOM(ch), ACT_PLANTING, NOTHING);
 	
 	read_empire_territory(emp);
 	save_empire(emp);
@@ -1058,10 +1247,6 @@ void do_import_analysis(char_data *ch, empire_data *emp, char *argument, int sub
 		
 		// vnum is valid (obj was a throwaway)
 		HASH_ITER(hh, empire_table, iter, next_iter) {
-			if (!is_trading_with(emp, iter)) {
-				continue;
-			}
-			
 			// success! now, are they importing/exporting it?
 			if (!(trade = find_trade_entry(iter, find_type, vnum))) {
 				continue;
@@ -1088,7 +1273,7 @@ void do_import_analysis(char_data *ch, empire_data *emp, char *argument, int sub
 				*coin_conv = '\0';
 			}
 			
-			sprintf(line, " %s (%d%%) is %sing it at &y%d%s coin%s&0%s%s\r\n", EMPIRE_NAME(iter), (int)(100 * rate), trade_type[find_type], trade->cost, coin_conv, (trade->cost != 1 ? "s" : ""), ((find_type != TRADE_EXPORT || has_avail) ? "" : " (none available)"), ((find_type != TRADE_IMPORT || is_buying) ? "" : " (full)"));
+			sprintf(line, " %s (%d%%) is %sing it at &y%d%s coin%s&0%s%s%s\r\n", EMPIRE_NAME(iter), (int)(100 * rate), trade_type[find_type], trade->cost, coin_conv, (trade->cost != 1 ? "s" : ""), ((find_type != TRADE_EXPORT || has_avail) ? "" : " (none available)"), ((find_type != TRADE_IMPORT || is_buying) ? "" : " (full)"), (is_trading_with(emp, iter) ? "" : " (not trading)"));
 			found = TRUE;
 			
 			if (strlen(buf) + strlen(line) < MAX_STRING_LENGTH + 15) {
@@ -1115,32 +1300,40 @@ void do_import_analysis(char_data *ch, empire_data *emp, char *argument, int sub
 struct {
 	char *name;
 	int first_apply;
-	int first_mod;
 	int second_apply;
-	int second_mod;
 } inspire_data[] = {
-	{ "battle",  APPLY_DEXTERITY, 1,  APPLY_STRENGTH, 1 },
-	{ "mana",  APPLY_MANA, 50,  APPLY_MANA_REGEN, 1 },
-	{ "stamina",  APPLY_MOVE, 100,  APPLY_MOVE_REGEN, 1 },
-	{ "toughness",  APPLY_HEALTH, 50,  APPLY_HEALTH_REGEN, 1 },
+								// use APPLY_NONE to give no second bonus
+	{ "accuracy", APPLY_TO_HIT, APPLY_NONE },
+	{ "evasion", APPLY_DODGE, APPLY_NONE },
+	{ "mana", APPLY_MANA, APPLY_MANA_REGEN },
+	{ "might", APPLY_STRENGTH, APPLY_BONUS_PHYSICAL },
+	{ "prowess", APPLY_DEXTERITY, APPLY_WITS },
+	{ "sorcery", APPLY_INTELLIGENCE, APPLY_BONUS_MAGICAL },
+	{ "stamina", APPLY_MOVE, APPLY_MOVE_REGEN },
+	{ "toughness", APPLY_HEALTH, APPLY_NONE, },
 
-	{ "\n",  APPLY_NONE, 0,  APPLY_NONE, 0 }
+	{ "\n", APPLY_NONE, APPLY_NONE }
 };
 
+
 /**
-* @param char* input The name typed by the player
+* @param char *input The name typed by the player
 * @return int an inspire_data index, or NOTHING for not found
 */
 int find_inspire(char *input) {
-	int iter;
+	int iter, abbrev = NOTHING;
 	
 	for (iter = 0; *inspire_data[iter].name != '\n'; ++iter) {
-		if (is_abbrev(input, inspire_data[iter].name)) {
+		if (!str_cmp(input, inspire_data[iter].name)) {
+			// found exact match
 			return iter;
+		}
+		else if (abbrev == NOTHING && is_abbrev(input, inspire_data[iter].name)) {
+			abbrev= iter;
 		}
 	}
 
-	return NOTHING;
+	return abbrev;	// if any
 }
 
 
@@ -1152,23 +1345,51 @@ int find_inspire(char *input) {
 * @param int type The inspire_data index
 */
 void perform_inspire(char_data *ch, char_data *vict, int type) {
-	struct affected_type *af;
+	extern const double apply_values[];
 	
-	msg_to_char(vict, "You feel inspired!\r\n");
-	act("$n seems inspired!", FALSE, vict, NULL, NULL, TO_ROOM);
+	double points, any = FALSE;
+	struct affected_type *af;
+	int time, value;
+	bool two;
 	
 	affect_from_char(vict, ATYPE_INSPIRE);
 	
-	if (inspire_data[type].first_apply != APPLY_NONE) {
-		af = create_mod_aff(ATYPE_INSPIRE, 24 MUD_HOURS, inspire_data[type].first_apply, inspire_data[type].first_mod);
-		affect_join(vict, af, 0);
+	if (ch == vict || (GET_LOYALTY(ch) && GET_LOYALTY(ch) == GET_LOYALTY(vict))) {
+		time = 24 MUD_HOURS;
 	}
-	if (inspire_data[type].second_apply != APPLY_NONE) {
-		af = create_mod_aff(ATYPE_INSPIRE, 24 MUD_HOURS, inspire_data[type].second_apply, inspire_data[type].second_mod);
-		affect_join(vict, af, 0);
+	else {
+		time = 4 MUD_HOURS;
 	}
 	
-	gain_ability_exp(ch, ABIL_INSPIRE, 33.4);
+	// amount to give
+	points = GET_GREATNESS(ch) / 4.0;
+	if (ch == vict) {
+		points /= 2.0;
+	}
+	two = (inspire_data[type].second_apply != APPLY_NONE);
+	
+	if (inspire_data[type].first_apply != APPLY_NONE) {
+		value = round((points * (two ? 0.5 : 1.0)) / apply_values[inspire_data[type].first_apply]);
+		if (value > 0) {
+			af = create_mod_aff(ATYPE_INSPIRE, time, inspire_data[type].first_apply, value);
+			affect_join(vict, af, 0);
+			any = TRUE;
+		}
+	}
+	if (inspire_data[type].second_apply != APPLY_NONE) {
+		value = round((points * 0.5) / apply_values[inspire_data[type].second_apply]);
+		if (value > 0) {
+			af = create_mod_aff(ATYPE_INSPIRE, time, inspire_data[type].second_apply, value);
+			affect_join(vict, af, 0);
+			any = TRUE;
+		}
+	}
+	
+	if (any) {
+		msg_to_char(vict, "You feel inspired!\r\n");
+		act("$n seems inspired!", FALSE, vict, NULL, NULL, TO_ROOM);
+		gain_ability_exp(ch, ABIL_INSPIRE, 33.4);
+	}
 }
 
 
@@ -1364,6 +1585,7 @@ ACMD(do_barde) {
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	
 	Resource res[2] = { { o_IRON_INGOT, 10 }, END_RESOURCE_LIST };
+	struct interact_exclusion_data *excl = NULL;
 	struct interaction_item *interact;
 	char_data *mob, *newmob = NULL;
 	bool found;
@@ -1399,14 +1621,14 @@ ACMD(do_barde) {
 		// find interact
 		found = FALSE;
 		for (interact = mob->interactions; interact; interact = interact->next) {
-			if (CHECK_INTERACT(interact, INTERACT_BARDE)) {
+			if (interact->type == INTERACT_BARDE && check_exclusion_set(&excl, interact->exclusion_code, interact->percent)) {
 				if (!found) {
 					// first one found
 					act("You strap heavy armor onto $N.", FALSE, ch, NULL, mob, TO_CHAR);
 					act("$n straps heavy armor onto $N.", FALSE, ch, NULL, mob, TO_NOTVICT);
 					
 					gain_ability_exp(ch, ABIL_BARDE, 50);
-					WAIT_STATE(ch, 2 RL_SEC);
+					command_lag(ch, WAIT_ABILITY);
 					found = TRUE;
 				}
 				
@@ -1416,7 +1638,7 @@ ACMD(do_barde) {
 					char_to_room(newmob, IN_ROOM(ch));
 					MOB_INSTANCE_ID(newmob) = MOB_INSTANCE_ID(ch);
 		
-					prc = (double)GET_HEALTH(mob) / GET_MAX_HEALTH(mob);
+					prc = (double)GET_HEALTH(mob) / MAX(1, GET_MAX_HEALTH(mob));
 					GET_HEALTH(newmob) = (int)(prc * GET_MAX_HEALTH(newmob));
 				}
 				
@@ -1433,10 +1655,8 @@ ACMD(do_barde) {
 				mob = newmob;
 				load_mtrigger(mob);
 								
-				// barde ALWAYS requires exclusive because the original mob and interactions are gone
-				if (TRUE || interact->exclusive) {
-					break;
-				}
+				// barde ALWAYS breaks because the original mob and interactions are gone
+				break;
 			}
 		}
 
@@ -1448,6 +1668,8 @@ ACMD(do_barde) {
 		else {
 			act("You can't barde $N!", FALSE, ch, NULL, mob, TO_CHAR);
 		}
+		
+		free_exclusion_data(excl);
 	}
 }
 
@@ -1675,6 +1897,12 @@ ACMD(do_demote) {
 		msg_to_char(ch, "That person is not in your empire.\r\n");
 	else if ((to_rank != NOTHING ? to_rank : (to_rank = GET_RANK(victim) - 1)) > GET_RANK(victim))
 		msg_to_char(ch, "Use promote for that.\r\n");
+	else if (GET_RANK(victim) > GET_RANK(ch)) {
+		msg_to_char(ch, "You can't demote someone above your rank.\r\n");
+	}
+	else if (GET_IDNUM(victim) == EMPIRE_LEADER(e)) {
+		msg_to_char(ch, "You cannot demote the leader.\r\n");
+	}
 	else if (to_rank == GET_RANK(victim))
 		act("$E is already that rank.", FALSE, ch, 0, victim, TO_CHAR);
 	else if (to_rank < 1)
@@ -1845,22 +2073,31 @@ ACMD(do_diplomacy) {
 			else
 				msg_to_char(ch, "But you already have better relations!\r\n");
 			break;
-		case 1:		/* War */
+		case 1: {	/* War */
+			int war_cost = get_war_cost(e, f);
+			
 			if (IS_SET(pol_a->type, DIPL_WAR))
 				msg_to_char(ch, "You're already at war!\r\n");
 			else if (count_members_online(f) == 0) {
 				msg_to_char(ch, "You can't declare war on an empire if none of their members are online!\r\n");
 			}
+			else if (EMPIRE_COINS(e) < war_cost) {
+				msg_to_char(ch, "The empire requires %d coin%s in the vault in order to finance the war with %s!\r\n", war_cost, PLURAL(war_cost), EMPIRE_NAME(f));
+			}
 			else {
 				pol_a->start_time = pol_b->start_time = time(0);
 				pol_a->offer = pol_b->offer = 0;
 				pol_a->type = pol_b->type = DIPL_WAR;
-				log_to_empire(e, ELOG_DIPLOMACY, "War has been declared upon %s!", EMPIRE_NAME(f));
+				
+				EMPIRE_COINS(e) -= war_cost;
+				
+				log_to_empire(e, ELOG_DIPLOMACY, "War has been declared upon %s for %d coin%s!", EMPIRE_NAME(f), war_cost, PLURAL(war_cost));
 				log_to_empire(f, ELOG_DIPLOMACY, "%s has declared war!", EMPIRE_NAME(e));
 				syslog(SYS_INFO, 0, TRUE, "WAR: %s (%s) has declared war on %s", EMPIRE_NAME(e), GET_NAME(ch), EMPIRE_NAME(f));
 				send_config_msg(ch, "ok_string");
 			}
 			break;
+		}
 		case 2:		/* Ally */
 			if (IS_SET(pol_b->offer, DIPL_ALLIED)) {
 				REMOVE_BIT(pol_b->offer, DIPL_ALLIED | DIPL_NONAGGR | DIPL_PEACE | DIPL_TRUCE);
@@ -1914,7 +2151,7 @@ ACMD(do_diplomacy) {
 				REMOVE_BIT(pol_b->offer, DIPL_TRADE);
 				SET_BIT(pol_a->type, DIPL_TRADE);
 				SET_BIT(pol_b->type, DIPL_TRADE);
-				log_to_empire(e, ELOG_DIPLOMACY, "A trade agreement been established with %s!", EMPIRE_NAME(f));
+				log_to_empire(e, ELOG_DIPLOMACY, "A trade agreement has been established with %s!", EMPIRE_NAME(f));
 				log_to_empire(f, ELOG_DIPLOMACY, "%s has accepted the offer of a trade agreement!", EMPIRE_NAME(e));
 				send_config_msg(ch, "ok_string");
 			}
@@ -1938,7 +2175,7 @@ ACMD(do_diplomacy) {
 				pol_a->offer = pol_b->offer = 0;
 				pol_a->type = pol_b->type = DIPL_DISTRUST;
 				log_to_empire(e, ELOG_DIPLOMACY, "The empire now officially distrusts %s", EMPIRE_NAME(f));
-				log_to_empire(f, ELOG_DIPLOMACY, "%s has declared that they official distrust the empire", EMPIRE_NAME(e));
+				log_to_empire(f, ELOG_DIPLOMACY, "%s has declared that they officially distrust the empire", EMPIRE_NAME(e));
 				send_config_msg(ch, "ok_string");
 			}
 			break;
@@ -3103,7 +3340,7 @@ ACMD(do_inspire) {
 	char_data *vict = NULL;
 	int type, cost = 30;
 	empire_data *emp = GET_LOYALTY(ch);
-	bool all = FALSE;
+	bool any, all = FALSE;
 	
 	two_arguments(argument, arg, arg1);
 	
@@ -3116,7 +3353,13 @@ ACMD(do_inspire) {
 		// nope
 	}
 	else if (!*arg || !*arg1) {
-		msg_to_char(ch, "Usage: inspire <name | all> [battle | mana | stamina | toughness]\r\n");
+		msg_to_char(ch, "Usage: inspire <name | all> <type>\r\n");
+		msg_to_char(ch, "Types:");
+		for (type = 0, any = FALSE; *inspire_data[type].name != '\n'; ++type) {
+			msg_to_char(ch, "%s%s", (any ? ", " : " "), inspire_data[type].name);
+			any = TRUE;
+		}
+		msg_to_char(ch, "\r\n");
 	}
 	else if (!all && !(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
@@ -3130,9 +3373,6 @@ ACMD(do_inspire) {
 	else if (vict && IS_NPC(vict)) {
 		msg_to_char(ch, "You can only inspire other players.\r\n");
 	}
-	else if (vict && vict == ch) {
-		msg_to_char(ch, "You can't inspire yourself!\r\n");
-	}
 	else if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_INSPIRE)) {
 		return;
 	}
@@ -3141,7 +3381,7 @@ ACMD(do_inspire) {
 			appear(ch);
 		}
 		
-		charge_ability_cost(ch, MOVE, cost, NOTHING, 0);
+		charge_ability_cost(ch, MOVE, cost, NOTHING, 0, WAIT_ABILITY);
 		
 		msg_to_char(ch, "You give a powerful speech about %s.\r\n", inspire_data[type].name);
 		sprintf(buf, "$n gives a powerful speech about %s.", inspire_data[type].name);
@@ -3167,14 +3407,14 @@ ACMD(do_pledge) {
 	if (IS_NPC(ch))
 		return;
 
-	one_argument(argument, arg);
+	skip_spaces(&argument);
 
 	if (IS_NPC(ch)) {
 		return;
 	}
 	else if ((old = GET_LOYALTY(ch)) && EMPIRE_LEADER(old) != GET_IDNUM(ch))
 		msg_to_char(ch, "You're already a member of an empire.\r\n");
-	else if (!(e = get_empire_by_name(arg)))
+	else if (!(e = get_empire_by_name(argument)))
 		msg_to_char(ch, "There is no empire by that name.\r\n");
 	else if (GET_LOYALTY(ch) == e) {
 		msg_to_char(ch, "You are already a member of that empire. In fact, you seem to be the most forgetful member.\r\n");
@@ -3316,7 +3556,7 @@ ACMD(do_radiance) {
 		
 		msg_to_char(ch, "You project a radiant aura!\r\n");
 		act("$n projects a radiant aura!", TRUE, ch, NULL, NULL, TO_ROOM);
-		WAIT_STATE(ch, 1 RL_SEC);
+		command_lag(ch, WAIT_ABILITY);
 	}
 }
 
@@ -3444,16 +3684,10 @@ ACMD(do_reclaim) {
 }
 
 
-ACMD(do_reward) {
-	void set_skill(char_data *ch, int skill, int level);
-	extern int find_skill_by_name(char *name);
-	
-	const int max = 75;
-	
+ACMD(do_reward) {	
+	char arg[MAX_INPUT_LENGTH];
+	int count, iter;
 	char_data *vict;
-	empire_data *emp;
-	int skill, count, iter;
-	char arg2[MAX_INPUT_LENGTH];
 	bool found;
 	
 	// count rewards used
@@ -3463,17 +3697,17 @@ ACMD(do_reward) {
 		}
 	}
 	
-	two_arguments(argument, arg, arg2);
+	one_argument(argument, arg);
 	
 	if (IS_NPC(ch) || !can_use_ability(ch, ABIL_REWARD, NOTHING, 0, COOLDOWN_REWARD)) {
 		// nope
 	}
-	else if (!*arg || !*arg2) {
-		msg_to_char(ch, "Usage: reward <person> <skill>\r\n");
+	else if (!*arg) {
+		msg_to_char(ch, "Usage: reward <person>\r\n");
 		msg_to_char(ch, "You have %d rewards remaining today.\r\n", MAX(0, MAX_REWARDS_PER_DAY - count));
 	}
 	else if (count >= MAX_REWARDS_PER_DAY) {
-		msg_to_char(ch, "You have no more reward points to give out today.\r\n");
+		msg_to_char(ch, "You have no more rewards to give out today.\r\n");
 	}
 	else if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
@@ -3484,20 +3718,8 @@ ACMD(do_reward) {
 	else if (IS_NPC(vict)) {
 		msg_to_char(ch, "You can only reward players, not NPCs.\r\n");
 	}
-	else if (!(emp = GET_LOYALTY(ch)) || GET_LOYALTY(vict) != emp) {
+	else if (!GET_LOYALTY(ch) || GET_LOYALTY(vict) != GET_LOYALTY(ch)) {
 		msg_to_char(ch, "You can only reward people in your empire.\r\n");
-	}
-	else if ((skill = find_skill_by_name(arg2)) == NO_SKILL) {
-		msg_to_char(ch, "Unknown skill '%s'.\r\n", arg2);
-	}
-	else if (GET_SKILL(vict, skill) >= GET_SKILL(ch, skill)) {
-		msg_to_char(ch, "You can only a reward a skill if you are better at it than your target.\r\n");
-	}
-	else if (GET_SKILL(vict, skill) >= max) {
-		act("You can't reward that skill to $N -- $E's already too good at it.", FALSE, ch, NULL, vict, TO_CHAR);
-	}
-	else if (GET_SKILL(vict, skill) == 0) {
-		act("$N must learn some of that skill before you can reward it to $M.", FALSE, ch, NULL, vict, TO_CHAR);
 	}
 	else if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_REWARD)) {
 		return;
@@ -3512,21 +3734,16 @@ ACMD(do_reward) {
 		}
 		
 		if (found) {
-			act("$N was already rewarded today.", FALSE, ch, NULL, vict, TO_CHAR);
+			act("You have already rewarded $N today.", FALSE, ch, NULL, vict, TO_CHAR);
 		}
 		else {
-			charge_ability_cost(ch, NOTHING, 0, COOLDOWN_REWARD, 30);
+			charge_ability_cost(ch, NOTHING, 0, COOLDOWN_REWARD, 30, WAIT_ABILITY);
 			
-			sprintf(buf, "You reward $N with %s.", skill_data[skill].name);
-			act(buf, FALSE, ch, NULL, vict, TO_CHAR);
-		
-			sprintf(buf, "$n rewards you with %s!", skill_data[skill].name);
-			act(buf, FALSE, ch, NULL, vict, TO_VICT);
-		
-			sprintf(buf, "$n rewards $N with %s.", skill_data[skill].name);
-			act(buf, TRUE, ch, NULL, vict, TO_NOTVICT);
-		
-			set_skill(vict, skill, GET_SKILL(vict, skill) + 1);
+			act("You reward $N with extra bonus experience!", FALSE, ch, NULL, vict, TO_CHAR);
+			act("$n rewards you with extra bonus experience!", FALSE, ch, NULL, vict, TO_VICT);
+			act("$n rewards $N with extra bonus experience!", TRUE, ch, NULL, vict, TO_NOTVICT);
+			
+			SAFE_ADD(GET_DAILY_BONUS_EXPERIENCE(vict), 5, 0, UCHAR_MAX, FALSE);
 		
 			// mark rewarded
 			for (iter = 0, found = FALSE; !found && iter < MAX_REWARDS_PER_DAY; ++iter) {
@@ -3574,11 +3791,13 @@ ACMD(do_roster) {
 		load_char((player_table + j)->name, &chdata);
 		if (!IS_SET(chdata.char_specials_saved.act, PLR_DELETED)) {
 			if (chdata.player_specials_saved.empire == EMPIRE_VNUM(e)) {
+				tmp = is_playing(chdata.char_specials_saved.idnum);
+			
 				timed_out = member_is_timed_out_cfu(&chdata);
-				size += snprintf(buf + size, sizeof(buf) - size, "[%d %s] <%s&0> %s%s&0", chdata.player_specials_saved.last_known_level, class_data[chdata.player_specials_saved.character_class].name, EMPIRE_RANK(e, chdata.player_specials_saved.rank - 1), (timed_out ? "&r" : ""), chdata.name);
+				size += snprintf(buf + size, sizeof(buf) - size, "[%d %s] <%s&0> %s%s&0", tmp ? GET_COMPUTED_LEVEL(tmp) : chdata.player_specials_saved.last_known_level, class_data[tmp ? GET_CLASS(tmp) : chdata.player_specials_saved.character_class].name, EMPIRE_RANK(e, (tmp ? GET_RANK(tmp) : chdata.player_specials_saved.rank) - 1), (timed_out ? "&r" : ""), chdata.name);
 								
 				// online/not
-				if ((tmp = get_player_vis(ch, chdata.name, FIND_CHAR_WORLD | FIND_NO_DARK))) {
+				if (tmp) {
 					size += snprintf(buf + size, sizeof(buf) - size, "  - &conline&0%s", IS_AFK(tmp) ? " - &rafk&0" : "");
 				}
 				else if ((time(0) - chdata.last_logon) < SECS_PER_REAL_DAY) {
@@ -3768,6 +3987,9 @@ ACMD(do_workforce) {
 			msg_to_char(ch, "Workforce will no longer work this tile.\r\n");
 			deactivate_workforce_room(emp, IN_ROOM(ch));
 		}
+	}
+	else if (is_abbrev(arg, "where")) {
+		show_workforce_where(emp, ch);
 	}
 	else {
 		// find type to toggle

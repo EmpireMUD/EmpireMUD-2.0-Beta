@@ -5,6 +5,7 @@
 huh_string Huh?!?
 no_person No-one by that name here.
 ok_string Okay.
+public_logins 0
 require_auth 0
 starting_year 1150
 welcome_message Welcome to your EmpireMUD! Prepare to face your destiny!
@@ -22,6 +23,7 @@ gather_depletion 50
 harvest_timer 20
 high_depletion 250
 max_chore_resource 200
+max_chore_resource_over_total 25
 max_chore_resource_skilled 750
 mining_timer 45
 panning_timer 10
@@ -63,13 +65,16 @@ member_timeout_max_threshold 168
 member_timeout_newbie 7
 minutes_per_day_full 150
 minutes_per_day_newbie 15
+newbie_island_day_limit 7
 time_to_empire_delete 104
 time_to_empire_emptiness 2
 whole_empire_timeout 30
 *
 * Items configs
+auto_update_items 1
 autostore_time 180
-long_autostore_time 4320
+bound_item_junk_time 10080
+long_autostore_time 720
 room_item_limit 404
 scale_coin_amount 10.000000
 scale_drink_capacity 9.800000
@@ -84,6 +89,8 @@ mob_pursuit_distance 25
 mob_pursuit_timeout 30
 mob_spawn_interval 5
 mob_spawn_radius 5
+npc_follower_limit 6
+num_duplicates_in_stable 2
 spawn_limit_per_room 3
 use_mob_stacking 0
 *
@@ -112,6 +119,7 @@ morph_timer 2
 must_be_vampire You must be a vampire to use this ability.
 potion_apply_per_100 1.333300
 potion_heal_scale 0.666600
+summon_npc_limit 5
 tracks_lifespan 60
 *
 * System configs
@@ -135,10 +143,13 @@ deaths_before_penalty 5
 deaths_before_penalty_war 0
 fire_extinguish_value 120
 hostile_flag_time 60
+rogue_flag_time 1440
 pvp_timer 5
 seconds_per_death 30
 stolen_object_timer 30
 stun_immunity_time 5
+war_cost_max 50000
+war_cost_min 5000
 war_login_delay 30
 *
 * World configs

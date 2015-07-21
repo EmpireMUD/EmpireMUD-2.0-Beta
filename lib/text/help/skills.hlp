@@ -11,11 +11,8 @@ You earn ability points at these levels:
 You can buy abilities with "skill buy <ability>".
 
 You can reset your ability purchases with "skill reset <skill>".
-  
-Don't confuse these with "skill points", which are used for easy daily skill
-gains.
 
-See also: SKILLS, SKILL CAPS, SKILL POINTS
+See also: SKILLS, SKILL CAPS, DAILY BONUS EXPERIENCE
 #
 BATHE 
 
@@ -30,8 +27,8 @@ CATAPULT
 Usage:  catapult <direction> 
 
 Catapult is used to launch your catapult in the direction that you want. You
-must have 20 rocks and a catapult to use this. It can only shoot at an
-adjacent room. The command can not be used in deep forests either. 
+must have 12 rocks and a catapult to use this. It can only shoot at an
+adjacent room.
 
 Example:  
 
@@ -39,7 +36,7 @@ Example:
 #
 CHIP
 
-Usage: chip <item>
+Usage:  chip <item>
 
 This lets you chip a rock down to a sharper, more refined tool. You need to be
 wielding a rock or other hammer to do this.
@@ -50,35 +47,33 @@ See also: CRAFT
 #
 CHOP
 
-Usage: chop
+Usage:  chop
 
 This command allows you to chop trees in the forest. Beware, trees are a
-limited resource.
+limited resource. You can chop faster if you are stronger, if your axe deals
+more damage, or if you have haste.
 
 See also: BUILD, DEPLETION, SCRAPE, TREES, LUMBER, SAW
 #
-"DAILY SKILL POINTS" "DAILY SKILLS" "SKILL POINTS"
+"DAILY EXPERIENCE BONUS POINTS" "DAILY SKILLS" "BONUS EXPERIENCE POINTS" "DAILY BONUS EXPERIENCE POINTS"
 
-You get a certain number of "daily skill points" each day. Once you have used
-all of these, you can still gain skill, but the rate will be much slower. You
-can avoid using your daily points on the wrong skill by shutting off skill
-gains with the "noskill" command.
+Each day, you get a certain number of daily bonus experience points. While you
+have any points left, you get 50x more skill experience from using your
+abilities. When you run out of daily bonus experience, you will still continue
+to gain skill levels, but at a slower rate.
 
-You can see your daily skill points by typing "skills"; they are at the bottom.
+Each time you gain a skill level, your daily bonus experience points will go
+down by one. When they run out, the effect ends until the daily skill reset.
 
-While you have skill points available, your skills will gain faster. You can
-still gain skill experience without any daily skill points available -- you'll
-just gain it much more slowly.
-
-Don't confuse "skill points" with "ability points", which are used to purchase
-abilities.
+You can keep yourself from accidentally spending your daily bonus experience
+in the wrong skill by using 'noskill'.
 
 See also: ABILITY POINTS, SKILLS, SKILL CAPS
 #
 DESIGNATE REDESIGNATE KITCHEN BEDROOM LABORATORY LARDER CLOSET CRYPT STUDY
 
-Usage: designate <direction> <room>
-       redesignate <room>
+Usage:  designate <direction> <room>
+        redesignate <room>
 
 This designates a new room in a building as a specific room type. You must
 specify which direction this new room will be. The first room after the
@@ -98,12 +93,12 @@ Room types:
  larder - A place to store food
  sitting room - No special features
  skybridge - Above-ground hallways used in some tree buildings
- storage - Holds certain items
+ store room - Holds certain items
  study - Has a global message board
  throne room - Castle only
  tunnel - Underground hallways used in some buildings
  vault - Holds gold and silver, and sets your wealth (castle)
- crypt - Can be set as a tomb
+ crypt - Can be set as a tomb (castle)
 
 See also: BUILD, STORAGE
 #
@@ -136,11 +131,11 @@ FLINT "FLINT SET"
 Flint can be combined with rocks (using CRAFT) to create a flint set, which
 can then be used to light torches.
 
-See also: LIGHT
+See also: DIG, LIGHT
 #
 GATHER
 
-Usage: gather
+Usage:  gather
 
 Allows you to gather sticks from the ground. Your skill in this determines
 how many different sticks you can use and thus how quickly you gather enough.
@@ -165,7 +160,7 @@ Example:
 #
 HARVEST HARVESTING
 
-Usage: harvest
+Usage:  harvest
 
 Allows you to harvest a crop. Be careful that you also replant some,
 otherwise you'll run out of that crop quickly.
@@ -174,7 +169,7 @@ See also: PLANT
 #
 HERD HERDING
 
-Usage: herd <animal> <direction>
+Usage:  herd <animal> <direction>
 
 This command is useful in herding animals into stables and fenced-in areas.
 #
@@ -193,7 +188,7 @@ See also: TIE, HARNESS
 #
 LIGHT TORCH
 
-Usage: light <item>
+Usage:  light <item>
 
 To light something, you must have a flint set. You may light sticks to create
 torches.
@@ -208,6 +203,7 @@ container to hold the milk. Cows can be milked once or twice per day.
 MILL MILLING
 
 Building:  (MM)  Mill  (no skill required)
+Resources:  10 logs, 2 stone blocks
 Built on:  plains, desert
 Stored at the mill:  cornmeal, flour
 Command:  mill [number] <item>
@@ -224,13 +220,15 @@ See also: COOK
 MINE MINES
 
 Building:  &y/&0[]&y\&0  Mine  (no skill required)
+Resources:  4 logs
 Built on:  mountain
 Command:  mine
 
 "Mine" is both a building type, and the command to work in that building. Mines
 must be built on mountains, and can only be entered from one side even before
 you complete them. To work in a mine, you need a pick of some kind, although a
-simple handaxe will also work.
+simple handaxe will also work. A better mining tool and more Strength will help
+you mine faster, as will haste.
 
 Mines have a limited amount of ore, and do not replenish. However, if you fully
 dismantle a mine, its mountain will reset when the MUD celebrates a new year
@@ -255,6 +253,7 @@ See also: DEPLETION, DEEP MINES, PROSPECT, RARE METALS
 MINT
 
 Building:  [MM]  Mint  (Commerce ability)
+Resources:  12 lumber, 4 nails, 12 blocks, 4 coin mills
 Built on:  plains, desert
 Fame:  5
 Command:  mint <object>
@@ -281,7 +280,7 @@ NOSKILL
 Usage:  noskill <skill>
 
 You can toggle which skills will or will not gain for you. This helps you to
-conserve the precious few skill points you earn each day.
+conserve the precious few bonus experience points you earn each day.
 
 Use the "skills" command to see which are &cgaining&0 and which are &rnoskill&0.
 
@@ -289,7 +288,7 @@ See also: SKILLS
 #
 PLANT
 
-Usage: plant <seed/food>
+Usage:  plant <seed/food>
 
 You can replant crops in open fields so that they may regrow and be harvested
 again. This is essential in keeping your crops from dying out.
@@ -319,13 +318,14 @@ SAW
 
 Usage:  saw <tree | log>
 
-You can saw trees and logs into lumber. You must be in a lumber yard.
+You can saw trees and logs into lumber. You must be in a lumber yard. This
+will go faster if you have the Woodworking ability.
 
 See also: TREES, LOGS, LUMBER
 #
 SCRAPE
 
-Usage: scrape tree
+Usage:  scrape tree
 
 This skill is used to process trees into logs.
 
@@ -333,12 +333,12 @@ The Woodworking ability increases how fast you can scrape logs.
 
 See also: TREES, SAW, WOODWORKING
 #
-SHEAR
+SHEAR SHEARING
 
 Usage:  shear <animal>
 
 You can shear sheep in a stable, giving you wool to weave into cloth. Sheep
-can be shorn every two days.
+can be shorn every 6 hours (of real time).
 
 See also: WEAVE
 #
@@ -346,7 +346,7 @@ SHOOT
 
 Usage:  shoot <target> 
 
-This is a very usefull skill. To use it you must equip some type of bow, and
+This is a very useful skill. To use it you must equip some type of bow, and
 have matching arrows in your inventory. You will attack with your arrows
 one at a time, while the target runs at you. Once the target reaches you,
 you will draw your weapon and begin melee battle. 
@@ -355,7 +355,7 @@ Example:
 
   > shoot deer 
 #
-SKILL SKILLS ABILITY ABILITIES
+SKILL SKILLS ABILITY ABILITIES "SKILL BUY" "SKILL RESET"
 
 Usage:  skills -- list all skills
         skill <name> -- see abilities in that skill
@@ -368,7 +368,7 @@ progress in each skill, and the ability points you've earned.
 
 If you specify a skill, you'll see a breakdown of the abilities in that skill
 tree. Abilities marked with an "x" are the ones you already know. To buy a new
-ability, use "skill buy". You must have a free skill point to do this.
+ability, use "skill buy". You must have a free ability point to do this.
 
 For more information, see the help page for each skill or ability. In some
 cases, you may have to type "help skill empire" because "help empire" shows
@@ -381,7 +381,7 @@ without the skill name, you can see which skills have free resets available.
 It also shows the range in which you can gain the skill, although you can gain
 no more than 10 points from any one ability.
 
-See also: NOSKILL, SPECIALIZE, SKILL CAPS, SKILL LEVELS
+See also: NOSKILL, SPECIALIZE, SKILL CAPS, SKILL DROP, SKILL LEVELS
 #
 "SKILL CAPS" CAPS "MAX SKILL" "MAXIMUM SKILL" "CLASS SKILLS" "SPECIALTY SKILLS" "BASIC SKILLS"
 
@@ -403,9 +403,25 @@ zero (0). Once you have fewer than two skills at zero, you can no longer choose
 to specialize an extra skill. The opposite is also true: if you specialize an
 extra skill, you'll no longer be able to gain in your last two zeroes.
 
-See also: SKILLS, SPECIALIZE
+You can use 'skill drop' if you want to lower one of your skills so that you
+can then start raising a different one.
+
+See also: SKILLS, SKILL DROP, SPECIALIZE
 #
-"SKILL LEVELS" "SKILL POINTS" "SKILL EXPERIENCE" "SKILLUPS"
+"SKILL DROP"
+
+Usage:  skill drop <skill> <level>
+
+This command allows you to voluntary give up points in one of your skills.
+You might do this because you accidentally raised one from 0, or because you
+want to try a different specialty.
+
+Once you use this command, those skill points are gone forever. You will also
+lose any abilities you purchased above the new level.
+
+See also: SKILL
+#
+"SKILL LEVELS" "SKILL POINTS" "SKILL EXPERIENCE" "SKILLUPS" EXPERIENCE
 
 The two ways to gain skill levels are:
 - By using "green" abilities from the skill's tree (abilities that aren't at
@@ -425,7 +441,7 @@ See also: SKILL CAPS, SPECIALIZE
 #
 SMELT MELT
 
-Usage: smelt <item>
+Usage:  smelt <item>
 
 Using a forge or foundry, you can melt down metals like iron, silver, and gold
 into ingots or bars. Smelting generally requires two of the base metal (e.g.
@@ -450,7 +466,7 @@ skill and allow you to continue leveling it.
 NOTE: This is a temporary command. In the future, we intend to use quests and
 other mechanisms for players who want to specialize.
 
-See also: SKILL
+See also: SKILL, SKILL CAPS
 #
 "STARTING LOCATION" "START LOCATION" "TOWER OF SOULS" TRANSPORT TOS
 
@@ -504,7 +520,7 @@ See also: BUILD, DISMANTLE, SEW, CLAIM, ABANDON
 #
 UPGRADE
 
-Usage: upgrade
+Usage:  upgrade
 
 This is used to upgrade your guard towers into more powerful towers. They can
 still shoot while you upgrade them, but people will also be able to walk

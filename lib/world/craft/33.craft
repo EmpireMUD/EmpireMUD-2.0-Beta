@@ -105,4 +105,165 @@ bread~
 R
 3312 2  # 2x a sack of flour
 S
+#3314
+fried rice~
+3314 1  # 1x a bowl of fried rice
+3 -1 hj 6 3011
+R
+3011 2  # 2x a sack of dried rice
+S
+#3315
+salt pork~
+3315 1  # 1x a salted slab of pork
+3 -1 bh 5 3201
+R
+3201 1  # 1x a slab of pork
+S
+#3316
+chicken and vegetables~
+3316 1  # 1x a plate of chicken and vegetables
+3 -1 h 10 3200
+R
+3200 1  # 1x a cut of poultry
+R
+3005 1  # 1x a bushel of corn
+R
+3021 1  # 1x a basket of peas
+R
+11102 1  # 1x a bunch of carrots
+S
+#3317
+ham and cheese sandwich~
+3317 4  # 4x a ham and cheese sandwich
+3 -1 0 5 3313
+R
+3313 1  # 1x a loaf of bread
+R
+3201 2  # 2x a slab of pork
+S
+#3318
+fruit bowl~
+3318 1  # 1x a fruit bowl
+3 -1 0 4 3002
+R
+3002 1  # 1x a bunch of apples
+R
+3004 1  # 1x a basket of peaches
+R
+3008 1  # 1x a bag of cherries
+R
+10226 1  # 1x a pineapple
+R
+11106 1  # 1x some juicy pears
+S
+#3319
+orange chicken and pears~
+3319 1  # 1x a plate of orange chicken and pears
+3 -1 h 6 3200
+R
+3200 1  # 1x a cut of poultry
+R
+11106 1  # 1x some juicy pears
+R
+3010 1  # 1x a sack of oranges
+S
+#3320
+sausage link~
+3320 1  # 1x a sausage link
+3 -1 h 4 3012
+R
+3012 1  # 1x a fillet of raw meat
+R
+3201 1  # 1x a slab of pork
+S
+#3321
+road biscuit~
+3321 4  # 4x a road biscuit
+3 -1 h 6 3312
+R
+3012 1  # 1x a fillet of raw meat
+R
+3005 1  # 1x a bushel of corn
+R
+3312 1  # 1x a sack of flour
+R
+3013 1  # 1x a handful of nuts
+S
+#3322
+mushroom plate~
+3322 1  # 1x a plate of mushrooms topped with chicken and rice
+3 -1 h 6 3310
+R
+3312 1  # 1x a sack of flour
+R
+3011 1  # 1x a sack of dried rice
+R
+3200 1  # 1x a cut of poultry
+R
+3310 1  # 1x a wood ear mushroom
+S
+#3323
+pumpkin pie~
+3323 1  # 1x a pumpkin pie
+3 -1 h 6 3023
+R
+3312 1  # 1x a sack of flour
+R
+3023 1  # 1x a basket of gourds
+S
+#3324
+blackberry tart~
+3324 2  # 2x a blackberry tart
+3 -1 bh 5 11104
+R
+11104 1  # 1x a bunch of blackberries
+R
+3312 1  # 1x a sack of flour
+S
+#3325
+nutty squash flatbread~
+3325 2  # 2x a nutty squash flatbread
+3 -1 bh 6 3022
+R
+3022 1  # 1x a yellow squash
+R
+3311 1  # 1x a jar of olive oil
+R
+3307 1  # 1x a sack of cornmeal
+R
+3013 1  # 1x a handful of nuts
+S
+#3326
+roast plate~
+3326 1  # 1x a delicious roast plate
+3 -1 h 6 3012
+R
+3012 1  # 1x a fillet of raw meat
+R
+3023 1  # 1x a basket of gourds
+R
+11102 1  # 1x a bunch of carrots
+S
+#3327
+fish plate~
+3327 1  # 1x a poached fish plate
+3 -1 h 6 1302
+R
+1302 1  # 1x a giant linefish
+R
+3011 1  # 1x a sack of dried rice
+R
+3021 1  # 1x a basket of peas
+S
+#3328
+catfish plate~
+3328 1  # 1x a plate of catfish and hushpuppies
+3 -1 h 6 11137
+R
+11137 1  # 1x a catfish fillet
+R
+3312 1  # 1x a sack of flour
+R
+3307 1  # 1x a sack of cornmeal
+S
 $

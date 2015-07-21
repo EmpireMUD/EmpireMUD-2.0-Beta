@@ -33,7 +33,7 @@ Cooldown:  15 minutes
 This ability expands your teleport power to any of your empire's cities. You
 can use the city's name or number. Use "city list" to see available cities.
 
-This ability levels up High Sorcery any time you teleport.
+This ability levels up High Sorcery any time you teleport to a city.
 
 See also: TELEPORTATION, CITY
 #
@@ -43,21 +43,26 @@ Colorburst (High Sorcery ability)
 
 Usage:  colorburst [victim]
 Cooldown:  30 seconds
+Cost:  15 / 30 / 45 mana
+Debuff type:  High Sorcery
 
-Shoot a disorienting burst of color at your foe. This effect gives -10% to-hit
-for 30 seconds.
+Shoot a disorienting burst of color at your foe and makes it harder for them
+to hit you. Colorburst causes a to-hit penalty of -5, -10, or -20 depending
+on your skill level, with a bonus based on your Intelligence.
 
 In combat, colorburst will automatically target your current opponent if you
 do not provide a target.
 #
-"DEVASTATION RITUAL"
+"DEVASTATION RITUAL" "RITUAL OF DEVASTATION" DEVASTATE
 
 Devastation Ritual (High Sorcery ability)
 
 Usage:  ritual devastation
 
 This ritual allows a sorcerer to quickly clear a large area of land through
-ritual magic. It will bring down forests and crops within 3 tiles of the caster.
+ritual magic. It will bring down forests and crops within 3 tiles of the
+caster, one resource at a time, repeating until it completes (or until you run
+out of mana). These resources are transferred to the caster.
 
 See also: RITUAL
 #
@@ -103,6 +108,7 @@ Enchant Weapons:
   wisdom - intelligence, mana regen  (5 glowing seashells)
   accuracy - to-hit  (5 bloodstones)
   awareness - wits, to-hit  (5 blue irises)
+  deflection - dodge, block (5 lightning stones)
   manaspring (offhand) - mana regen, max mana (5 blue irises)
   healing (offhand) - bonus healing, mana regen (5 glowing seashells)
   fury (offhand) - bonus magical, mana regen (5 lightning stone)
@@ -115,10 +121,13 @@ Enchant Armor:
   regeneration - health regen  (5 blue irises)
   longrunning - move regen  (5 lightning stones)
   energy - mana regen  (5 blue irises)
-  protection - soak  (5 glowing seashells)
+  protection - resist-physical  (5 glowing seashells)
   evasion - dodge  (5 lightning stones)
   rage - strength  (5 bloodstones)
   power - intelligence  (5 glowing seashells)
+  spellwarding - resist-magical (5 blue irises)
+  focus - to-hit (5 bloodstones)
+  acrobatics - dexterity (5 lightning stones)
   blocking (shield) - block  (5 lightning stones)
 
 Enchant Tools:
@@ -132,6 +141,7 @@ Enervate (High Sorcery ability)
 
 Usage:  enervate <victim>
 Cooldown:  75 seconds
+Debuff type:  High Sorcery
 
 Your victim is enervated: he loses move regen. You are able to leech some
 of this for yourself, and your move regeneration receive a temporary boost.
@@ -143,9 +153,11 @@ FORESIGHT
 Foresight (High Sorcery ability)
 
 Usage:  foresight [person]
+Cost:  30 mana
 
-When granted the gift of foresight, a person gains +10% chance to dodge as
-she begins to see the arc of an opponent's weapon before it strikes.
+When granted the gift of foresight, a person gains +5, +10, or +15 Dodge
+(based on skill, modified by Intelligence) as she begins to see the arc of an
+opponent's weapon before it strikes.
 
 Gain skill by casting foresight or by fighting while it is active on you.
 
@@ -168,17 +180,17 @@ Usage:  manashield
 By armoring herself with a manashield, a sorcerer sacrifices part of her mana
 pool for reduced combat damage.
 
-Mana Shield reduces your mana by 25 (this effect is doubled by Gift of Nature).
+Mana Shield reduces your mana by 25 (this effect is modified by abilities which
+change your mana pool size, such as Gift of Nature).
 
 Gain skill by fighting while manashielded.
-
-See also: GIFT OF NATURE
 #
 MIRRORIMAGE "MIRROR IMAGE"
 
 Mirrorimage (High Sorcery ability)
 
 Usage:  mirrorimage
+Cooldown:  5 minutes
 
 This spell creates an identical duplicate of the caster (with reduced health).
 It's good enough to fool at least one of the people hitting you.
@@ -191,7 +203,7 @@ See also: FAMILIAR, DISMISS, ORDER
 
 Phoenix Rite (High Sorcery ability)
 
-Usage: rite phoenix
+Usage:  rite phoenix
 
 A master sorcerer can resurrect herself upon death by preparing properly. Once
 performed, the Phoenix Rite does not expire until it saves you from death.
@@ -199,7 +211,7 @@ performed, the Phoenix Rite does not expire until it saves you from death.
 When you are restored from death, you will have 20% of your health and at least
 20% each of blood, mana, and moves.
 
-You can re-cast the ritual to gain skill, but it will give you a skill point
+You can re-cast the ritual to gain skill, but it will level your High Sorcery
 when it saves you as well.
 
 See also: RITUAL
@@ -208,9 +220,10 @@ See also: RITUAL
 
 Portal Magic (High Sorcery ability)
 
-Learning portal magic allows you to create portal nodes, and allows members of
-your empire to use them. These portals can only connect two locations on the
-same island or continent, unless you have a Portal Master in the empire.
+Learning portal magic allows you to create portal nodes, craft nexus crystals,
+and allows members of your empire to use them. These portals can only connect
+two locations on the same island or continent, unless you have a Portal Master
+in the empire.
 
 A "portal mage" is a person with the Portal Magic ability. Without a portal
 mage in your empire, you cannot use portal buildings.
@@ -246,7 +259,7 @@ rituals to learn more about them.
 
 Ritual of Burdens (High Sorcery ability)
 
-Usage: ritual burdens
+Usage:  ritual burdens
 
 This ritual allows you to carry 6, 12, or 18 more items (based on your level).
 
@@ -258,7 +271,7 @@ See also: RITUAL
 
 Ritual of Defense (High Sorcery ability)
 
-Usage: ritual defense
+Usage:  ritual defense
 Cost: 1 imperium spike and 1 bloodstone per wall
 
 This ritual enchants a wall to be able to repel anyone flying. It also works
@@ -282,7 +295,7 @@ city owned by your empire.
 
 See also: RITUAL
 #
-"RITUAL OF SENSE LIFE" "SENSE LIFE"
+"RITUAL OF SENSE LIFE" "SENSE LIFE RITUAL"
 
 Ritual of Sense Life (High Sorcery skill)
 
@@ -301,7 +314,8 @@ Usage:  ritual teleportation [target]
 Cooldown:  15 minutes (teleport home only)
 
 With the basic teleportation ability, you can teleport at random (2 to 7 map
-tiles in any direction) or you can teleport to your home.
+tiles in any direction) or you can teleport to your home. You won't be able to
+teleport out of (or into) any room owned by a non-allied empire.
 
 This ability levels up High Sorcery any time you teleport.
 
@@ -327,9 +341,11 @@ Siphon (High Sorcery ability)
 
 Usage:  siphon [victim]
 Cooldown:  20 seconds
+Debuff type:  High Sorcery
 
-You can steal mana from other using the mana siphon ability. If you are in
-combat, it will automatically target your current opponent.
+You can steal mana from other casters using the mana siphon ability. If you are
+in combat, it will automatically target your current opponent. This will boost
+your own mana regen while dropping theirs significantly.
 #
 SLOW
 
@@ -337,6 +353,7 @@ Slow (High Sorcery ability)
 
 Usage:  slow [victim]
 Cooldown:  75 seconds
+Debuff type:  High Sorcery
 
 This ability hexes your victim with lethargy, causing them to attack more
 slowly in combat. If you're already fighting and do not specify a victim, it
@@ -353,14 +370,14 @@ them.
 
 Staffmaking:
   staff  1 log, 5 fiveleaf
-  wanderer staff  1 log, 5 lightning stones  +25 moves
-  sorcerer staff  1 log, 5 blue irises  +1 mana regen
-  staff of wisdom  1 log, 5 glowing seashells  +1 intelligence
+  wanderer staff  1 log, 5 lightning stones  (move points)
+  sorcerer staff  1 log, 5 blue irises  (mana regen)
+  staff of wisdom  1 log, 5 glowing seashells  (intelligence)
 
 Powerful Staves:
-  staff of lightning  1 log, 10 lightning stones, 5 nocturnium ingots  +2 wits, +1 int
-  burning staff  1 log, 10 blue irises, 5 nocturnium ingots  +25 mana, +1 mana regen
-  staff of agony  1 log, 10 bloodstones, 5 nocturnium ingots  +20 to-hit, +1 health regen
+  staff of lightning  1 log, 10 lightning stones, 5 nocturnium ingots  (wits)
+  burning staff  1 log, 10 blue irises, 5 nocturnium ingots  (mana)
+  staff of agony  1 log, 10 bloodstones, 5 nocturnium ingots  (to-hit)
 
 Gain skill by crafting staves.
 #
@@ -389,6 +406,10 @@ Usage:  summon materials [number] <keywords>
 This ability actually allows the sorcerer to open a tiny portal to the empire's
 storage buildings, and pull out the materials he needs. There is no range on
 this ability, and it may be used to grab as many items as the sorcerer wishes.
+
+You cannot summon items out of the vault (or other secure locations).
+
+See also: VAULT
 #
 "SUMMON SWIFT"
 
@@ -416,6 +437,7 @@ Sunshock (High Sorcery ability)
 
 Usage:  sunshock [victim]
 Cooldown:  9 seconds
+Debuff type:  High Sorcery
 
 Sunshock blasts your target with the pure light of the sun. This deals a small
 amount of damage (scaled by your level in High Sorcery), and causes a very

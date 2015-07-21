@@ -1,4 +1,10 @@
 config.*
 syslog
-syslog.conf
+syslog.CRASH
 
+
+*.plist
+
+bin/plrconv-20b1-to-20b2.dSYM/Contents/Resources/DWARF/plrconv-20b1-to-20b2
+
+bin/plrconv-20b1-to-20b2

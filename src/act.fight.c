@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.fight.c                                     EmpireMUD 2.0b1 *
+*   File: act.fight.c                                     EmpireMUD 2.0b2 *
 *  Usage: non-skill commands and functions related to the fight system    *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -30,17 +30,15 @@
 
 // external vars
 extern const char *dirs[];
-extern const int universal_wait;
 
 // external functions
 void besiege_room(room_data *to_room, int damage);
 void death_log(char_data *ch, char_data *killer, int type);
 extern obj_data *die(char_data *ch, char_data *killer);
 extern int determine_best_scale_level(char_data *ch, bool check_group);	// mobact.c
-extern int get_dodge_modifier(char_data *ch);	// fight.c
-extern int get_to_hit(char_data *ch, bool off_hand);	// fight.c
 extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
 extern bool is_fight_enemy(char_data *ch, char_data *frenemy);	// fight.c
+void trigger_distrust_from_hostile(char_data *ch, empire_data *emp);	// fight.c
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -126,13 +124,16 @@ ACMD(do_catapult) {
 	else if (IS_CITY_CENTER(to_room)) {
 		msg_to_char(ch, "You can't shoot at a city center.\r\n");
 	}
+	else if (ROOM_SECT_FLAGGED(to_room, SECTF_START_LOCATION)) {
+		msg_to_char(ch, "You can't besiege a starting location.\r\n");
+	}
 	else {
 		if ((e = ROOM_OWNER(to_room)))
 			emp_pol = find_relation(GET_LOYALTY(ch), e);
 		if (e && (!emp_pol || !IS_SET(emp_pol->type, DIPL_WAR))) {
 			msg_to_char(ch, "You can't attack that acre!\r\n");
 			return;
-			}
+		}
 		extract_resources(ch, rocks, FALSE);
 		sprintf(buf, "You shoot $p %s!", dirs[get_direction_for_char(ch, dir)]);
 		act(buf, FALSE, ch, catapult, 0, TO_CHAR);
@@ -149,21 +150,27 @@ ACMD(do_catapult) {
 		if (SHOULD_APPEAR(ch)) {
 			appear(ch);
 		}
+
+		if (e && GET_LOYALTY(ch) != e) {
+			trigger_distrust_from_hostile(ch, e);
+		}
 		
 		// fire!
 		besiege_room(to_room, 8);
-		WAIT_STATE(ch, 5 RL_SEC);
+		GET_WAIT_STATE(ch) = 5 RL_SEC;
 	}
 }
 
 
 ACMD(do_consider) {
+	extern bool check_scaling(char_data *mob, char_data *attacker);
+	extern int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
+	extern int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill);
 	extern const char *affected_bits_consider[];
 	
-	char buf[MAX_STRING_LENGTH], difficult[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH];
 	bitvector_t bits;
-	int diff, pos;
-	double scale = 0.0;
+	int diff, pos, hitch;
 	char_data *vict;
 	
 	one_argument(argument, arg);
@@ -178,80 +185,44 @@ ACMD(do_consider) {
 		msg_to_char(ch, "You look pretty wimpy.\r\n");
 	}
 	else {
-		diff = determine_best_scale_level(ch, FALSE);
-		
-		if (IS_NPC(vict)) {
-			if (GET_CURRENT_SCALE_LEVEL(vict) == 0) {
-				scale = diff;
-				if (GET_MAX_SCALE_LEVEL(vict) > 0) {
-					scale = MIN(GET_MAX_SCALE_LEVEL(vict), scale);
-				}
-				if (GET_MIN_SCALE_LEVEL(vict) > 0) {
-					scale = MAX(GET_MIN_SCALE_LEVEL(vict), scale);
-				}
-			}
-			else {
-				scale = GET_CURRENT_SCALE_LEVEL(vict);
-			}
-			
-			if (MOB_FLAGGED(vict, MOB_HARD)) {
-				scale *= 1.1;
-			}
-			if (MOB_FLAGGED(vict, MOB_GROUP)) {
-				scale *= 1.2;
-			}
-		}
-		else {
-			// player
-			scale = determine_best_scale_level(vict, FALSE);
-		}
-		
-		// compute
-		diff -= (int) scale;
-		
-		// flag-based
-		if (MOB_FLAGGED(vict, MOB_HARD) && MOB_FLAGGED(vict, MOB_GROUP)) {
-			snprintf(difficult, sizeof(difficult), " (boss)");
-		}
-		else if (MOB_FLAGGED(vict, MOB_GROUP)) {
-			snprintf(difficult, sizeof(difficult), " (group)");
-		}
-		else if (MOB_FLAGGED(vict, MOB_HARD)) {
-			snprintf(difficult, sizeof(difficult), " (hard)");
-		}
-		else {
-			*difficult = '\0';
-		}
-		
+		// scale first
+		check_scaling(vict, ch);
+		diff = determine_best_scale_level(ch, FALSE) - determine_best_scale_level(vict, FALSE);
+				
+		act("You consider your chances against $N.", FALSE, ch, NULL, vict, TO_CHAR);
 		act("$n considers $s chances against $N.", FALSE, ch, NULL, vict, TO_NOTVICT);
 		act("$n considers $s chances against you.", FALSE, ch, NULL, vict, TO_VICT);
 		
-		if (diff < -30) {
-			snprintf(buf, sizeof(buf), "$E looks like $E'd destroy you!%s", difficult);
-			act(buf, FALSE, ch, NULL, vict, TO_CHAR);
-		}
-		else if (diff < -10) {
-			snprintf(buf, sizeof(buf), "It looks like $E would be difficult for you.%s", difficult);
-			act(buf, FALSE, ch, NULL, vict, TO_CHAR);
-		}
-		else if (diff < 10) {
-			snprintf(buf, sizeof(buf), "It looks like a fair fight.%s", difficult);
-			act(buf, FALSE, ch, NULL, vict, TO_CHAR);
-		}
-		else if (diff < 30) {
-			snprintf(buf, sizeof(buf), "It looks like you wouldn't have much trouble.%s", difficult);
-			act(buf, FALSE, ch, NULL, vict, TO_CHAR);
-		}
-		else {
-			snprintf(buf, sizeof(buf), "You would walk all over $M.%s", difficult);
+		if (diff != 0) {
+			snprintf(buf, sizeof(buf), "$E is %d levels %s you.", ABSOLUTE(diff), diff > 0 ? "below" : "above");
 			act(buf, FALSE, ch, NULL, vict, TO_CHAR);
 		}
 		
+		// difficulty
+		if (MOB_FLAGGED(vict, MOB_HARD) && MOB_FLAGGED(vict, MOB_GROUP)) {
+			act("$E is a boss fight (requires 4 players of proper level).", FALSE, ch, NULL, vict, TO_CHAR);
+		}
+		else if (MOB_FLAGGED(vict, MOB_GROUP)) {
+			act("$E is a group fight (requires 3 players of proper level).", FALSE, ch, NULL, vict, TO_CHAR);
+		}
+		else if (MOB_FLAGGED(vict, MOB_HARD)) {
+			act("$E is a hard fight (may require 2 players of proper level).", FALSE, ch, NULL, vict, TO_CHAR);
+		}
+
+		// hit/dodge
+		hitch = get_to_hit(ch, vict, FALSE, FALSE) - get_dodge_modifier(vict, ch, FALSE);
+		if (hitch < 50) {
+			act("You would have trouble hitting $M.", FALSE, ch, NULL, vict, TO_CHAR);
+		}
+		hitch = get_to_hit(vict, ch, FALSE, FALSE) - get_dodge_modifier(ch, vict, FALSE);
+		if (hitch > 50) {
+			act("You would have trouble dodging $S attacks.", FALSE, ch, NULL, vict, TO_CHAR);
+		}
+
 		// flags (with overflow protection on affected_bits_consider[])
 		for (bits = AFF_FLAGS(vict), pos = 0; bits && *affected_bits_consider[pos] != '\n'; bits >>= 1, ++pos) {
 			if (IS_SET(bits, BIT(0)) && *affected_bits_consider[pos]) {
-				snprintf(buf, sizeof(buf), "... %s", affected_bits_consider[pos]);
-				act(buf, FALSE, ch, NULL, vict, TO_CHAR);
+				act(affected_bits_consider[pos], FALSE, ch, NULL, vict, TO_CHAR);
 			}
 		}
 	}
@@ -340,18 +311,18 @@ ACMD(do_flee) {
 				if (was_fighting) {
 					gain_ability_exp(ch, ABIL_FLEET, 5);
 				}
-				WAIT_STATE(ch, 2 RL_SEC);
+				GET_WAIT_STATE(ch) = 2 RL_SEC;
 			}
 			else {
 				act("$n tries to flee, but can't!", TRUE, ch, 0, 0, TO_ROOM);
 				send_to_char("PANIC! You couldn't escape!\r\n", ch);
-				WAIT_STATE(ch, 2 RL_SEC);
+				GET_WAIT_STATE(ch) = 2 RL_SEC;
 			}
 			return;
 		}
 	}
 	send_to_char("PANIC! You couldn't escape!\r\n", ch);
-	WAIT_STATE(ch, 2 RL_SEC);
+	GET_WAIT_STATE(ch) = 2 RL_SEC;
 }
 
 
@@ -375,7 +346,7 @@ ACMD(do_hit) {
 			act("You run at $M!", FALSE, ch, 0, vict, TO_CHAR);
 			FIGHT_MODE(ch) = FMODE_WAITING;
 			FIGHT_WAIT(ch) = 4;
-			WAIT_STATE(ch, 2 RL_SEC);
+			command_lag(ch, WAIT_OTHER);
 		}
 		else {
 			FIGHT_MODE(ch) = FMODE_MELEE;
@@ -391,7 +362,7 @@ ACMD(do_hit) {
 		else if (FIGHTING(vict) && FIGHT_MODE(vict) == FMODE_MISSILE) {
 			set_fighting(ch, vict, FMODE_WAITING);
 			act("You run at $M!", FALSE, ch, 0, vict, TO_CHAR);
-			WAIT_STATE(ch, 2 RL_SEC);
+			command_lag(ch, WAIT_OTHER);
 		}
 		else {
 			hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FALSE);
@@ -399,7 +370,7 @@ ACMD(do_hit) {
 			if (vict && !EXTRACTED(vict) && !IS_DEAD(vict) && FIGHTING(ch) && FIGHTING(ch) != vict) {
 				FIGHTING(ch) = vict;
 			}
-			WAIT_STATE(ch, 2 RL_SEC);
+			command_lag(ch, WAIT_OTHER);
 		}
 	}
 	else {
@@ -409,6 +380,7 @@ ACMD(do_hit) {
 
 
 ACMD(do_respawn) {
+	extern bool can_enter_instance(char_data *ch, struct instance_data *inst);
 	extern room_data *find_load_room(char_data *ch);
 	void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, int ability);
 	extern obj_data *player_death(char_data *ch);
@@ -420,8 +392,11 @@ ACMD(do_respawn) {
 		if (GET_RESURRECT_TIME(ch) + (5 * SECS_PER_REAL_MIN) < time(0)) {
 			msg_to_char(ch, "Your resurrection has expired.\r\n");
 		}
+		else if (ROOM_INSTANCE(loc) && !can_enter_instance(ch, ROOM_INSTANCE(loc))) {
+			msg_to_char(ch, "You can't seem to resurrect there. Perhaps the adventure is full.\r\n");
+		}
 		else {
-			perform_resurrection(ch, is_playing(GET_RESURRECT_BY(ch)), real_room(GET_RESURRECT_LOCATION(ch)), GET_RESURRECT_ABILITY(ch));
+			perform_resurrection(ch, is_playing(GET_RESURRECT_BY(ch)), loc, GET_RESURRECT_ABILITY(ch));
 		}
 	}
 	else if (!IS_DEAD(ch) && !IS_INJURED(ch, INJ_STAKED)) {
@@ -483,7 +458,7 @@ ACMD(do_shoot) {
 			else
 				set_fighting(vict, ch, FMODE_WAITING);
 		}
-		WAIT_STATE(ch, 2 RL_SEC);
+		command_lag(ch, WAIT_OTHER);
 	}
 	else {
 		act("You can't shoot $N!", FALSE, ch, 0, vict, TO_CHAR);
@@ -533,7 +508,7 @@ ACMD(do_stake) {
 		msg_to_char(ch, "You can't stake someone who is already dead.\r\n");
 	}
 	else {
-		WAIT_STATE(ch, universal_wait);
+		command_lag(ch, WAIT_COMBAT_ABILITY);
 
 		act("You jab $p through $N's heart!", FALSE, ch, stake, victim, TO_CHAR);
 		act("$n jabs $p through your heart!", FALSE, ch, stake, victim, TO_VICT | TO_SLEEP);
@@ -564,7 +539,7 @@ ACMD(do_struggle) {
 	else if (!number(0, MAX(1, GET_STRENGTH(ch)/2))) {
 		msg_to_char(ch, "You struggle a bit, but fail to break free.\r\n");
 		act("$n struggles a little with $s bindings!", TRUE, ch, 0, 0, TO_ROOM);
-		WAIT_STATE(ch, 30 RL_SEC);
+		GET_WAIT_STATE(ch) = 30 RL_SEC;
 		}
 	else {
 		msg_to_char(ch, "You break free!\r\n");

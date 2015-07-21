@@ -21,41 +21,50 @@ Further help can be       =========================|  TRIGEDIT-MOB-LOAD      |
 accessed by typing:                                |  TRIGEDIT-MOB-MEMORY    |
 HELP <TYPE>.                                       |  TRIGEDIT-MOB-ABILITY   |
 i.e. HELP TRIGEDIT-MOB-ACT                         |  TRIGEDIT-MOB-LEAVE     |
+                                                   |  TRIGEDIT-MOB-LEAVE-ALL |
                                                    |  TRIGEDIT-MOB-DOOR      |
 See also: TRIG-COMMANDS, VARIABLES, EXPRESSIONS     =========================
 #d
 TRIGEDIT-COMMANDS TRIG-COMMANDS TRIGGER-COMMANDS TRIGEDIT-COMMANDLISTS
  
-| Script Commands  |  Mobile Commands  |  Object Commands  |   Room Commands  |
- =============================================================================
-|   * (comment)    |      %send%       |      %send%       |      %send%      |
-|       nop        |      %echo%       |      %echo%       |      %echo%      |
-|     attach       |   %echoaround%    |   %echoaround%    |   %echoaround%   |
-|     global       |      %door%       |      %door%       |      %door%      |
-|     context      |     %force%       |     %force%       |     %force%      |
-|      eval        |      %load%       |      %load%       |      %load%      |
-|       set        |     %purge%       |     %purge%       |     %purge%      |
-|      unset       |    %teleport%     |    %teleport%     |    %teleport%    |
-|     detach       |     %damage%      |     %damage%      |     %damage%     |
-|     extract      |  %buildingecho%   |  %buildingecho%   |  %buildingecho%  |
-|                  |   %regionecho%    |   %regionecho%    |   %regionecho%   |
-|       if         |     %asound%      |     %asound%      |     %asound%     |
-|      halt        |     dg_affect     |     dg_affect     |     dg_affect    |
-|      wait        |      dg_cast      |      dg_cast      |      dg_cast     |
-|     makeuid      |       %at%        |       %at%        |       %at%       |
-|     rdelete      |    %transform%    |    %transform%    |      %scale%     |
-|      remote      |       mhunt       |      otimer       |==================|
-|      return      |     mremember     |     osetval       |
-|      switch      |      mforget      |     %scale%       |
-|       case       |       %goto%      |===================|
-|      break       |       mkill       |
-|      done        |       %junk%      | Further help can be accessed by
-|      while       |      %follow%     | typing: HELP <COMMAND>.
-|                  |       %aoe%       |
-|                  |       %dot%       |
-|                  |      %scale%      |
-=======================================|
+| Script Commands |  Mobile Commands    |  Object Commands |   Room Commands  |
+ ==============================================================================
+|  * (comment)    |      %send%         |      %send%      |      %send%      |
+|      nop        |      %echo%         |      %echo%      |      %echo%      |
+|    attach       |   %echoaround%      |   %echoaround%   |   %echoaround%   |
+|    global       |      %door%         |      %door%      |      %door%      |
+|    context      |     %force%         |     %force%      |     %force%      |
+|     eval        |      %load%         |      %load%      |      %load%      |
+|      set        |     %purge%         |     %purge%      |     %purge%      |
+|     unset       |    %teleport%       |    %teleport%    |    %teleport%    |
+|    detach       |     %damage%        |     %damage%     |     %damage%     |
+|    extract      |  %buildingecho%     |  %buildingecho%  |  %buildingecho%  |
+|                 |   %regionecho%      |   %regionecho%   |   %regionecho%   |
+|      if         |     %asound%        |     %asound%     |     %asound%     |
+|     halt        |     dg_affect       |     dg_affect    |     dg_affect    |
+|     wait        |      dg_cast        |      dg_cast     |      dg_cast     |
+|    makeuid      |       %at%          |       %at%       |       %at%       |
+|    rdelete      |    %transform%      |    %transform%   |      %scale%     |
+|     remote      |       mhunt         |      otimer      |%adventurecomplete%
+|     return      |     mremember       |     osetval      |==================|
+|     switch      |      mforget        |     %scale%         |
+|      case       |       %goto%        | %adventurecomplete% |
+|     break       |       mkill         |=====================|
+|     done        |       %junk%        |
+|     while       |      %follow%       | Further help can be accessed by
+|                 |       %aoe%         | typing: HELP <COMMAND>.
+|                 |       %dot%         |
+|                 |      %scale%        |
+|                 | %adventurecomplete% |
+========================================|
 See also: TRIG-TYPES, VARIABLES, EXPRESSIONS
+#d
+%ADVENTURECOMPLETE% MADVENTURECOMPLETE OADVENTURECOMPLETE WADVENTURECOMPLETE
+
+Usage:  %adventurecomplete%
+
+This script command triggers completion on the adventure instance, which will
+clean it up (delete the instance) next time it's empty.
 #d
 %DAMAGE% ODAMAGE MDAMAGE WDAMAGE
 
@@ -228,7 +237,7 @@ Examples:
    %scale% bag 100
    %scale% sword %actor.level%
 #d
-%TELEPORT% WTELEPORT OTELEPORT MTELEPORT PORTALS
+%TELEPORT% WTELEPORT OTELEPORT MTELEPORT
 
 %teleport% <victim> <location>
 %teleport% all <location>
@@ -319,10 +328,11 @@ rooms.
 
 *mobs do not currently engage upon finding, it is bugged.
 #d
-%KILL% WKILL OKILL MKILL
+MKILL
 
 mkill <victim>
 mkill %actor%
+
    mkill causes the mob to hit the victim. It is the same as kill, except mkill 
 works for low level mobs attacking PCs, where kill might not.
 #d
@@ -437,9 +447,9 @@ Usage:  eval <variable> <expression>
 
 * this example immediately evaluates the expression below and stores the result
 * in %result%:
-eval result %self.hitp% * 100 / %self.maxhitp% 
+eval result %self.health% * 100 / %self.maxhealth% 
 say My hitpoint percentage is %result%
-* this result will not change after the evaluation even if %self.hitp% changes.
+* this result will not change after the evaluation even if %self.health% changes.
 
    The eval command is used to set (or create) the specified variable equal to 
 the result of the immediate evaluation of the provided expression. There also 
@@ -456,8 +466,8 @@ Set sets variable to value, without evaluating it.
  Example: set foobar 15 - 5
  sets the variable foobar to the string "15 - 5"
 
-* this example sets the value of result to '%self.hitp% * 100 / %self.maxhitp%'
-set result %self.hitp% * 100 / %self.maxhitp% 
+* this example sets the value of result to '%self.health% * 100 / %self.maxhealth%'
+set result %self.health% * 100 / %self.maxhealth% 
 * The %result% var now works as a 'function' every time it's accessed.
 say My hitpoint percentage is %result%
 %damage% %self% 30
@@ -648,7 +658,7 @@ If a match is found, the commands that follow it, up until a break or done
 command, are executed. 
 Break is used to terminate commands in a switch. 
 Case is used to begin a new conditional group in a switch block.
-Default is similiar to case but matches any condition not met. 
+Default is similar to case but matches any condition not met. 
 Done is used to terminate a while or switch block.
 #d
 WHILE DONE
@@ -677,7 +687,7 @@ time. When a script is being executed it will attempt to execute all commands
 right away. To get small breaks in, and perhaps give the players time to adjust, 
 use the wait command.
 
-* If you want to syncronise your script, you can use the 'wait until' feature.
+* If you want to synchronise your script, you can use the 'wait until' feature.
 * This script wakes the mob at dawn, and puts him to sleep at night.
 wait until 8:00
 wake
@@ -744,7 +754,7 @@ MUDCOMMAND CMD.MUDCOMMAND %CMD.MUDCOMMAND% %MUDCOMMAND%
 any abbreviations.
  
 * check for command sit with arg chair. Also matching any abbreviations. 
-if %cmd.mudcommand% == sit && chair /= %arg% && %arg%
+if %cmd.mudcommand% == sit &&&& chair /= %arg% &&&& %arg%
 #d
 TRIGEDIT-VARIABLES-TEXTS TEXT-VAR %ARG% .CDR .CAR ARG.CDR CMD.CDR ARG.CAR CMD.CAR %TEXT% PUSH CMD %CMD% %CDR% %CAR% %TRIM% TRIGEDIT-TEXT-VAR %STRLEN%
 
@@ -785,6 +795,8 @@ random.<#>    - This returns a number between 1 and the field value.
 random.char   - This returns a random character in the room.
 random.ally   - Returns a random ally (only if fighting).
 random.enemy  - Returns a random enemy (only if fighting).
+skill.name(sk) - The full name of a skill abbreviated by sk.
+skill.validate(sk) - Returns true if sk is a valid skill.
 speech        - This variable is set to the complete phrase spoken by an actor 
                 that triggers a speech trigger.
 startloc      - A random starting location.
@@ -794,7 +806,7 @@ time.<field>  - Field may be hour, day, month, or year. The returned value will
 timestamp     - Current unix timestamp.
 weather       - One of: sunny, cloudy, raining, lightning
 |%var%        - name's, someone's, your
-&%var%        - it, you, he/she -- DOES NOT WORK
+&&%var%        - it, you, he/she -- DOES NOT WORK
 *%var%        - it, you, him/her
 * object only
 '%obj%        - something, name
@@ -816,6 +828,7 @@ id       - The unique id of the room.
 name     - The name of the room.
 people   - The id of the first character in the room, or an empty return.
 sector   - The sector type of the room.
+template - The room template vnum, if any.
 vnum     - The room's vnum.
 weather  - current weather: sunny, cloudy, rainy, or lightning
 #d
@@ -853,10 +866,10 @@ add_mob_flag(flg) - Adds a mob flag to the mob. Also, remove_mob_flag().
 alias             - The list of aliases of the mob or the player name. 
 aff_flagged(flg)  - Checks if the actor has an AFF flag (e.g. ENTANGLED).
 affect()          - Checks the actor for the affect in the subfield 
+blood(amt)        - Returns current blood, or adds/removes blood if amt is set.
 can_afford(amt)   - Checks if the actor has enough coins of any converted type.
 can_gain_new_skills - Checks if the character can gain a new skill from 0.
 charge_coins(amt) - Charges the actor a number of coins.
-give_coins(amt)   - Gives the actor a number of coins.
 canbeseen         - True if the actor can be seen by the mob (always true 
                     for non-mob triggers).
 canuseroom_ally(room) - Character can use the room as a member or ally (with
@@ -867,26 +880,26 @@ canuseroom_member(room) - Character can use the room as a member (with no arg,
                     defaults to current room).
 can_teleport_room(room) - Character can legally teleport in/out of the room
                     (defaults to current room).
-cha               - The actor's charisma.
+cha               - The actor's Charisma.
 class             - The actor's class, as a string.
-con               - The actor's constitution.
-dex               - The actor's dexterity.
+dex               - The actor's Dexterity.
 disabled          - Returns TRUE if the actor is stunned or otherwise disabled.
-exp()             - %actor.exp% returns the actor's XP. Using the subfield it 
-                    can be modified up to 1000 Xp. %actor.exp(20)% gives actor
-                    20 XP. The subfield can be negative. 
 eq()              - This will return the identifier (id) for the object 
                     equipped in position, if any. The specified position may be 
                     either a position number (0-18) or the name of the location
                     * checks all positions. HELP POSITIONS
 fighting          - The unique id of the mob fighting the actor.
 follower(name)    - The follower of the actor (as an id) with name supplied.
+gain_skill(sk, amt) - Gives the player points in a skill, or takes them.
+give_coins(amt)   - Gives the actor a number of coins.
+give_skill_reset(sk) - Grants the player a free skill reset in that skill.
+grt               - The actor's Greatness.
 has_item()        - Checks if the actor has a object (inventory, equipped and
                     in containers) by subfield name/var/vnum.
 heshe             - Returns the correct pronoun (he/she/it).
 himher            - Returns the correct pronoun (him/her/it).
 hisher            - Returns the correct pronoun (his/her/its).
-hitp              - The current hit points of the actor.      
+health            - The current hit points of the actor.      
 home              - Room id of the player's home, if any.
 id                - The unique id of the actor.
 int               - The actor's intelligence.
@@ -894,19 +907,21 @@ inventory()       - Returns the id of the first item in the actors inventory or
                     the id of the first object with vnum in the subfield. If
                     the character doesn't have the item, an empty string is
                     returned. %actor.inventory(1300)%. * checks for any inv. 
-is_killer(on/off) - If the ()'s are omitted, return value is whether or not the 
-                    actor is marked as a Player killer. If the ()'s are 
-                    omitted, return value is whether or not the character is 
-                    marked as a killer. Can be set on or off with: 
-                    nop %actor.is_killer(on)%
-is_pc             - Checks if the actor is a player. Useful when you want a 
-                    trigger to fire on players and not mobs. 
+is_ally(char)     - Returns true if the other character is a combat ally. Run
+                    this in two steps:
+                    eval test %%actor.is_ally(%char%)%%
+                    if %test% ...
+is_enemy(char)    - Returns true if the other character is a combat enemy.
+is_god            - Returns true if the actor is a God-level player.
 is_hostile(on/off)- If the ()'s are omitted, return value is whether or not the 
                     actor is marked as a Hostile player.
+is_immortal       - Returns true if the actor is an immortal (admin).
+is_pc             - Checks if the actor is a player. Useful when you want a 
+                    trigger to fire on players and not mobs.
 level             - The actor's computed level (or scaled level, for mobs).
 mana              - The current mana points of the actor.
 master            - The master of the actor (as an id), or an empty return.
-maxhitp           - The maximum hit points of the actor.
+maxhealth         - The maximum hit points of the actor.
 maxmana           - The maximum mana points of the actor.
 maxmove           - The maximum movement points of the actor.
 mob_flagged(flag) - Returns TRUE if the NPC has the given flag, e.g. VAMPIRE.
@@ -917,16 +932,23 @@ next_in_room      - The next actor in the room as a variable (id) nice to
 nohassle          - If TRUE, the player is an immortal with !HASSLE on.
 pc_name           - Player's name or mob's keyword list, rather than short desc
 plr_flagged(flag) - Returns TRUE if the player has the given flag (VAMPIRE).
+poison_immunity   - Returns TRUE if the player has Poison Immunity.
+position          - Returns Standing, Sitting, Fighting, etc.
 remove_mob_flag(flg) - Removes a mob flag from the mob. Also, add_mob_flag().
+resist_magical    - Returns the amount of magic resistance the player has.
+resist_physical   - Returns the amount of physical resistance the player has.
+resist_poison     - Returns TRUE if the player has Resist Poison.
 room              - The room the actor is in as a room variable. 
 sex               - The actor's sex, as a string: MALE, FEMALE, or NEUTRAL.
 skill()           - The percentage of learnedness in the skill subfield.
-str               - The actor's strength.
-stradd            - The actor's strength addition (if str is 18).
+str               - The actor's Strength.
 title()           - The actor's title. Subfield sets. Not used for mobs.
+trigger_counterspell - Fires the character's counterspell and returns 1 if
+                    so, or returns 0 if there was no counterspell.
 varexists()       - Returns 1 if global variable in subfield exists, 0 if not.
                     Useful when dealing with remote vars on players.
 vnum              - The actor's virtual number.  
+wits              - The actor's Wits.
 <global>          - If the specified field is not a recognized one, the 
                     actor's script global list is searched for a matching 
                     global name. If found, its value will be returned. This 
@@ -948,14 +970,14 @@ evaluated from left to right. Parenthesis can be used to group.
 |Operator|         Name          | Examples  0=False 1=True  |
 --------------------------------------------------------------
 |   ||   | logical or            | 0 || ( ) = 0; 5 || 0 = 1  |
-|   &&   | logical and           | 1 && 0 = 0; 5 && 3 = 1    |
+|   &&&&   | logical and           | 1 &&&& 0 = 0; 5 &&&& 3 = 1    |
 |   ==   | equivalence           | 5 == 3 = 0; dog == DoG = 1| 
 |   !=   | inequality            | 0 != Z = 0; dog != d = 1  | 
 |   <    | less than             | 4 < 3 = 0; 4 < 5 = 1      |
 |   >    | greater than          | 4 > 3 = 1; 4 > 4 = 0      |
 |   <=   | less than or equal    | 4 <= 3 = 0; 4 <= 5 = 1    |
 |   >=   | greater than or equal | 4 >= 3 = 1; 4 >= 4 = 1    |
-|   /=   | abbrev                | "concatenate" /= "cat"    |
+|   /=   | abbrev                | "concatenate" /= "con"    |
 |   ~=   | substring             | "Dark Forest" ~= "Forest" |
 |   -    | subtraction           | 15 - 10 = 5               |
 |   +    | addition              | 10 + 15 = 25              |
@@ -1010,7 +1032,8 @@ MOB-TRIGGERS MOBILE-TRIGGERS TRIGEDIT-MOB-TYPES
 15) Memory      HELP TRIGEDIT-MOB-MEMORY          
 16) Ability     HELP TRIGEDIT-MOB-ABILITY          
 17) Leave       HELP TRIGEDIT-MOB-LEAVE          
-18) Door        HELP TRIGEDIT-MOB-DOOR          
+18) Door        HELP TRIGEDIT-MOB-DOOR                    
+17) Leave-All   HELP TRIGEDIT-MOB-LEAVE-ALL
 #d
 TRIGEDIT-OBJ-GET
 
@@ -1105,7 +1128,7 @@ Argument    : not used.
 Used with return 0 will prevent the player from leaving the room.
 
 Variables: 
-%actor%     - the character leavering the room. 
+%actor%     - the character leaving the room. 
 %direction% - the direction the character is leaving to.
 #d
 TRIGEDIT-OBJ-CONSUME
@@ -1248,7 +1271,7 @@ Argument    : not used.
 Used with return 0 will prevent the player from leaving the room.
 
 Variables: 
-%actor%     - the character leavering the room. 
+%actor%     - the character leaving the room. 
 %direction% - the direction the character is leaving to.
 #d
 TRIGEDIT-ROOM-DOOR TRIGEDIT-DOOR
@@ -1400,7 +1423,7 @@ TRIGEDIT-MOB-HITPERCENT TRIGEDIT-MOB-HITPRCNT
 Activated during combat when the mobiles hit point percentage drops below a 
 specified percentage.
  
-Numeric Arg : percentage of hitpoints at the threshhold of allowing this trigger to
+Numeric Arg : percentage of hitpoints at the threshold of allowing this trigger to
               activate.
 Argument    : not used.
 
@@ -1431,7 +1454,7 @@ Activated when the mobile encounters a character in its memory (mremember)
 list and there is no over-riding command. Any mobile making use of mremember 
 MUST have a memory script, even if it will never be called.
  
-Numeric Arg : percent chance this trigger will be activated..
+Numeric Arg : percent chance this trigger will be activated.
 Argument    : not used.
 
 Variables:
@@ -1451,9 +1474,10 @@ Variables:
 %ability%     - the number of the ability
 %abilityname% - the name of the ability
 #d
-TRIGEDIT-MOB-LEAVE 
+TRIGEDIT-MOB-LEAVE TRIGEDIT-MOB-LEAVE-ALL
 
-Activated when someone leaves the room the mob is in if the mob can see the person.
+Activated when someone leaves the room the mob is in. The difference between
+'Leave' and 'Leave-All' is that Leave only works if the mob can see the person.
 
 Numeric Arg : percent chance this trigger will be activated. 
 Argument    : not used.
@@ -1461,13 +1485,13 @@ Argument    : not used.
 Used with return 0 will prevent the player from leaving the room.
 
 Variables: 
-%actor%     - the character leavering the room. 
+%actor%     - the character leaving the room. 
 %direction% - the direction the character is leaving to.
 #d
 TRIGEDIT-MOB-DOOR 
  
-Activated when the mobile is in the same room as someone using the door specific 
-commands 'close, open, pick, lock, unlock' on a door. 
+Activated when the mobile is in the same room as someone using the door
+specific commands 'close, open, pick, lock, unlock' on a door. 
 
 Used with return 0 will prevent the command from executing.
 
@@ -1995,10 +2019,10 @@ DG_AFFECTS
 Usage:  dg_affect <target> <property> <value> <duration>
 
 Modifies an affection or apply on the target. Durations must be non-zero.
-dg_affect %actor% sanct on 20    -- Sets sanctuary on actor for 20 seconds.
-dg_affect %actor% maxhit 100 20  -- Sets maxhit on actor +100 for 20 seconds.
+dg_affect %actor% HASTE on 20    -- Sets haste on actor for 20 seconds.
+dg_affect %actor% DODGE 100 20  -- Sets dodge on actor +100 for 20 seconds.
 
-See also: APPLIES, AFFECTIONS
+See also: APPLIES, AFFECTS
 #d
 VDELETE
 

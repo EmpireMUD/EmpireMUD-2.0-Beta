@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: spells.c                                        EmpireMUD 2.0b1 *
+*   File: spells.c                                        EmpireMUD 2.0b2 *
 *  Usage: implementation for spells                                       *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -34,7 +34,6 @@
 */
 
 // external vars
-extern const int universal_wait;
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -171,7 +170,7 @@ ACMD(do_damage_spell) {
 		dmg *= 2;
 	}
 	
-	charge_ability_cost(ch, MANA, cost, damage_spell[type].cooldown_type, damage_spell[type].cooldown_time);
+	charge_ability_cost(ch, MANA, cost, damage_spell[type].cooldown_type, damage_spell[type].cooldown_time, WAIT_COMBAT_SPELL);
 	
 	if (SHOULD_APPEAR(ch)) {
 		appear(ch);
@@ -283,7 +282,7 @@ void perform_chant(char_data *ch) {
 	// effects?
 	switch (chant) {
 		case 0: {	// druids
-			if (CAN_GAIN_NEW_SKILLS(ch) && GET_SKILL(ch, SKILL_NATURAL_MAGIC) == 0 && number(0, 99) == 0) {
+			if (CAN_GAIN_NEW_SKILLS(ch) && GET_SKILL(ch, SKILL_NATURAL_MAGIC) == 0 && number(0, 99) == 0 && !NOSKILL_BLOCKED(ch, SKILL_NATURAL_MAGIC)) {
 				msg_to_char(ch, "&gAs you chant, you begin to see the weave of mana through nature...&0\r\n");
 				set_skill(ch, SKILL_NATURAL_MAGIC, 1);
 				SAVE_CHAR(ch);
@@ -478,7 +477,7 @@ ACMD(do_ready) {
 	
 	// attempt to remove existing wield
 	if (GET_EQ(ch, WEAR_WIELD)) {
-		perform_remove(ch, WEAR_WIELD, FALSE, FALSE);
+		perform_remove(ch, WEAR_WIELD);
 		
 		// did it work? if not, player got an error
 		if (GET_EQ(ch, WEAR_WIELD)) {
@@ -511,5 +510,5 @@ ACMD(do_ready) {
 
 	load_otrigger(obj);
 	
-	WAIT_STATE(ch, universal_wait);
+	command_lag(ch, WAIT_SPELL);
 }

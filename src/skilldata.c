@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: skilldata.c                                     EmpireMUD 2.0b1 *
+*   File: skilldata.c                                     EmpireMUD 2.0b2 *
 *  Usage: skill definitions                                               *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -37,7 +37,7 @@ void init_skills() {
 	void setup_skill(int number, char *name, int flags, char *description, char *creation_description);
 	void setup_ability(int number, int parent_skill, int parent_skill_required, int parent_ability, char *name);
 	
-	#define setup_class_ability(abil, name)	setup_ability((abil), NOTHING, 100, NO_PREREQ, name)
+	#define setup_class_ability(abil, name)	setup_ability((abil), NO_SKILL, 100, NO_PREREQ, name)
 	
 	init_skill_data();
 	init_ability_data();
@@ -46,8 +46,6 @@ void init_skills() {
 	setup_skill(SKILL_BATTLE, "Battle", 0, "Charge confidently into combat", "Battle is important for combat, especially tanks and melee damage characters");
 		setup_ability(ABIL_ENDURANCE, SKILL_BATTLE, 75, NO_PREREQ, "Endurance");
 		setup_ability(ABIL_REFLEXES, SKILL_BATTLE, 15, NO_PREREQ, "Reflexes");
-			setup_ability(ABIL_MEDIUM_ARMOR, SKILL_BATTLE, 55, ABIL_REFLEXES, "Medium Armor");
-				setup_ability(ABIL_HEAVY_ARMOR, SKILL_BATTLE, 80, ABIL_MEDIUM_ARMOR, "Heavy Armor");
 			setup_ability(ABIL_SHIELD_BLOCK, SKILL_BATTLE, 30, ABIL_REFLEXES, "Shield Block");
 				setup_ability(ABIL_BLOCK_ARROWS, SKILL_BATTLE, 50, ABIL_SHIELD_BLOCK, "Block Arrows");
 				setup_ability(ABIL_QUICK_BLOCK, SKILL_BATTLE, 60, ABIL_SHIELD_BLOCK, "Quick Block");
@@ -55,7 +53,6 @@ void init_skills() {
 			setup_ability(ABIL_OUTRAGE, SKILL_BATTLE, 75, ABIL_REFLEXES, "Outrage");
 		setup_ability(ABIL_RESCUE, SKILL_BATTLE, 50, NO_PREREQ, "Rescue");
 		setup_ability(ABIL_SPARRING, SKILL_BATTLE, 15, NO_PREREQ, "Sparring");
-			setup_ability(ABIL_LEATHER_ARMOR, SKILL_BATTLE, 55, ABIL_SPARRING, "Leather Armor");
 			setup_ability(ABIL_KICK, SKILL_BATTLE, 30, ABIL_SPARRING, "Kick");
 				setup_ability(ABIL_BASH, SKILL_BATTLE, 40, ABIL_KICK, "Bash");				
 			setup_ability(ABIL_CUT_DEEP, SKILL_BATTLE, 65, ABIL_SPARRING, "Cut Deep");
@@ -68,7 +65,10 @@ void init_skills() {
 			setup_ability(ABIL_HEARTSTOP, SKILL_BATTLE, 95, ABIL_BIG_GAME_HUNTER, "Heartstop");			
 		setup_ability(ABIL_FIRSTAID, SKILL_BATTLE, 15, NO_PREREQ, "Firstaid");
 		setup_ability(ABIL_FLEET, SKILL_BATTLE, 15, NO_PREREQ, "Fleet");
-		setup_ability(ABIL_CLOTH_ARMOR, SKILL_BATTLE, 35, NO_PREREQ, "Cloth Armor");
+		setup_ability(ABIL_MAGE_ARMOR, SKILL_BATTLE, 35, NO_PREREQ, "Mage Armor");
+		setup_ability(ABIL_LIGHT_ARMOR, SKILL_BATTLE, 55, NO_PREREQ, "Light Armor");
+		setup_ability(ABIL_MEDIUM_ARMOR, SKILL_BATTLE, 50, NO_PREREQ, "Medium Armor");
+		setup_ability(ABIL_HEAVY_ARMOR, SKILL_BATTLE, 75, NO_PREREQ, "Heavy Armor");
 	// end Battle
 	
 
@@ -250,7 +250,7 @@ void init_skills() {
 		setup_ability(ABIL_BASIC_CRAFTS, SKILL_TRADE, 1, NO_PREREQ, "Basic Crafts");
 			setup_ability(ABIL_POTTERY, SKILL_TRADE, 10, ABIL_BASIC_CRAFTS, "Pottery");
 				setup_ability(ABIL_FINE_POTTERY, SKILL_TRADE, 50, ABIL_POTTERY, "Fine Pottery");
-					setup_ability(ABIL_MASTER_POTTER, SKILL_TRADE, 85, ABIL_FINE_POTTERY, "Master Potter");
+					setup_ability(ABIL_MASTER_CRAFTSMAN, SKILL_TRADE, 85, ABIL_FINE_POTTERY, "Master Craftsman");
 			setup_ability(ABIL_WOODWORKING, SKILL_TRADE, 15, ABIL_BASIC_CRAFTS, "Woodworking");
 				setup_ability(ABIL_ADVANCED_WOODWORKING, SKILL_TRADE, 40, ABIL_WOODWORKING, "Advanced Woodworking");
 					setup_ability(ABIL_SIEGEWORKS, SKILL_TRADE, 55, ABIL_ADVANCED_WOODWORKING, "Siegeworks");
@@ -288,16 +288,30 @@ void init_skills() {
 	
 	// class-only abilities (require less data; see class.c for more)
 	
+	setup_class_ability(ABIL_ANCESTRAL_HEALING, "Ancestral Healing");
 	setup_class_ability(ABIL_BLOOD_FORTITUDE, "Blood Fortitude");
+	setup_class_ability(ABIL_BLOODSWEAT, "Bloodsweat");
+	setup_class_ability(ABIL_CONFER, "Confer");
+	setup_class_ability(ABIL_CRUCIAL_JAB, "Crucial Jab");
+	setup_class_ability(ABIL_DRAGONRIDING, "Dragonriding");
 	setup_class_ability(ABIL_DREAD_BLOOD_FORM, "Dread Blood Form");
+	setup_class_ability(ABIL_DIVERSION, "Diversion");
 	setup_class_ability(ABIL_DUAL_WIELD, "Dual-Wield");
+	setup_class_ability(ABIL_FASTCASTING, "Fastcasting");
 	setup_class_ability(ABIL_HORRID_FORM, "Horrid Form");
+	setup_class_ability(ABIL_HOWL, "Howl");
 	setup_class_ability(ABIL_MOONRISE, "Moonrise");
+	setup_class_ability(ABIL_NOBLE_BEARING, "Noble Bearing");
 	setup_class_ability(ABIL_RESURRECT, "Resurrect");
 	setup_class_ability(ABIL_SAGE_WEREWOLF_FORM, "Sage Werewolf Form");
 	setup_class_ability(ABIL_SAVAGE_WEREWOLF_FORM, "Savage Werewolf Form");
+	setup_class_ability(ABIL_SHADOW_JAB, "Shadow Jab");
+	setup_class_ability(ABIL_SHADOW_KICK, "Shadow Kick");
+	setup_class_ability(ABIL_SHADOWCAGE, "Shadowcage");
+	setup_class_ability(ABIL_STAGGER_JAB, "Stagger Jab");
 	setup_class_ability(ABIL_TOWERING_WEREWOLF_FORM, "Towering Werewolf Form");
 	setup_class_ability(ABIL_TWO_HANDED_WEAPONS, "Two-Handed Weapons");
+	setup_class_ability(ABIL_WARD_AGAINST_MAGIC, "Ward Against Magic");
 	
 	sort_skills_and_abilities();
 }

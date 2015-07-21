@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: mapview.c                                       EmpireMUD 2.0b1 *
+*   File: mapview.c                                       EmpireMUD 2.0b2 *
 *  Usage: Map display functions                                           *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -189,7 +189,7 @@ char *get_room_description(room_data *room) {
 		strcat(desc, GET_BLD_DESC(GET_BUILDING(room)));
 	}
 	else if (GET_ROOM_TEMPLATE(room)) {
-		strcat(desc, GET_RMT_DESC(GET_ROOM_TEMPLATE(room)));
+		strcat(desc, NULLSAFE(GET_RMT_DESC(GET_ROOM_TEMPLATE(room))));
 	}
 	else
 		strcpy(desc, "");
@@ -373,7 +373,7 @@ bool show_pc_in_room(char_data *ch, room_data *room, struct mappc_data_container
 		
 		pc = pc->next;
 		emp = GET_LOYALTY(pc->character);
-		sprintf(lbuf + strlen(lbuf), "o%s>", !emp ? "" : EMPIRE_BANNER(emp));
+		sprintf(lbuf + strlen(lbuf), "%so&0>", !emp ? "" : EMPIRE_BANNER(emp));
 		
 		send_to_char(lbuf, ch);
 	}
@@ -736,6 +736,11 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		
 		msg_to_char(ch, "\r\n");
 	}
+	else if (!emp && ROOM_AFF_FLAGGED(HOME_ROOM(IN_ROOM(ch)), ROOM_AFF_NO_DISMANTLE)) {
+		// show no-dismantle anyway
+		msg_to_char(ch, "This area is (no-dismantle).\r\n");
+	}
+	
 	if (emp && GET_LOYALTY(ch) == emp && ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_WORK)) {
 		msg_to_char(ch, "Workforce will not work this tile.\r\n");
 	}
@@ -1615,7 +1620,7 @@ void perform_mortal_where(char_data *ch, char *arg) {
 		max_distance = 75;
 	}
 	
-	WAIT_STATE(ch, 2 RL_SEC);
+	command_lag(ch, WAIT_OTHER);
 
 	if (!*arg) {
 		send_to_char("Players near you\r\n--------------------\r\n", ch);
@@ -1793,7 +1798,7 @@ ACMD(do_exits) {
 		msg_to_char(ch, "You can't see a damned thing, you're blind!\r\n");
 		return;
 	}
-	if (COMPLEX_DATA(room)) {
+	if (COMPLEX_DATA(room) && ROOM_IS_CLOSED(room)) {
 		*buf = '\0';
 		for (ex = COMPLEX_DATA(room)->exits; ex; ex = ex->next) {
 			if ((to_room = ex->room_ptr) && !EXIT_FLAGGED(ex, EX_CLOSED)) {
@@ -1827,12 +1832,18 @@ ACMD(do_exits) {
 ACMD(do_scan) {
 	int dir;
 	
+	room_data *use_room = get_map_location_for(IN_ROOM(ch));
+	
 	skip_spaces(&argument);
 	
 	if (!*argument) {
 		msg_to_char(ch, "Scan which direction?\r\n");
 	}
-	else if (IS_ADVENTURE_ROOM(IN_ROOM(ch)) || ROOM_IS_CLOSED(IN_ROOM(ch))) {
+	else if (IS_ADVENTURE_ROOM(use_room) || ROOM_IS_CLOSED(use_room)) {	// check map room
+		msg_to_char(ch, "You can only use scan out on the map.\r\n");
+	}
+	else if (!GET_BOAT(IN_ROOM(ch)) && (IS_ADVENTURE_ROOM(IN_ROOM(ch)) || ROOM_IS_CLOSED(IN_ROOM(ch)))) {
+		// if not on a boat, can't see out from here
 		msg_to_char(ch, "Scan only works out on the map.\r\n");
 	}
 	else if ((dir = parse_direction(ch, argument)) == NO_DIR) {
@@ -1842,7 +1853,7 @@ ACMD(do_scan) {
 		msg_to_char(ch, "You can't scan that way.\r\n");
 	}
 	else {
-		screenread_one_dir(ch, IN_ROOM(ch), dir);
+		screenread_one_dir(ch, use_room, dir);
 	}
 }
 

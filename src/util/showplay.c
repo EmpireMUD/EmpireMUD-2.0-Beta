@@ -1,5 +1,5 @@
 /* ************************************************************************
-*  file:  showplay.c                                      EmpireMUD 2.0b1 *
+*  file:  showplay.c                                      EmpireMUD 2.0b2 *
 *  Usage: list a diku playerfile                                          *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

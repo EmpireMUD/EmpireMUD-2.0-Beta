@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.vampire.c                                   EmpireMUD 2.0b1 *
+*   File: act.vampire.c                                   EmpireMUD 2.0b2 *
 *  Usage: Code related to the Vampire ability and its commands            *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -31,7 +31,6 @@
 */
 
 // external vars
-extern const int universal_wait;
 
 // external funcs
 extern bool check_scaling(char_data *mob, char_data *based_on);
@@ -390,16 +389,17 @@ void taste_blood(char_data *ch, char_data *vict) {
 	else if (GET_ACTION(ch) != ACT_NONE)
 		msg_to_char(ch, "You're a bit busy right now.\r\n");
 	else if (ch == vict)
-		msg_to_char(ch, "It seems redundant to taste your own blood..\r\n");
+		msg_to_char(ch, "It seems redundant to taste your own blood.\r\n");
 	else if (!IS_NPC(vict) && AWAKE(vict) && !PRF_FLAGGED(vict, PRF_BOTHERABLE))
 		act("You don't have permission to taste $N's blood!", FALSE, ch, 0, vict, TO_CHAR);
 	else {
 		act("You taste a sample of $N's blood!", FALSE, ch, 0, vict, TO_CHAR);
 		act("$n tastes a sample of your blood!", FALSE, ch, 0, vict, TO_VICT);
 		act("$n tastes a sample of $N's blood!", FALSE, ch, 0, vict, TO_NOTVICT);
-
-		sprintf(buf, "This is $O, a %s.", IS_VAMPIRE(vict) ? "vampire" : (!IS_NPC(vict) || !MOB_FLAGGED(vict, MOB_ANIMAL)) ? "human" : "animal");
-		act(buf, FALSE, ch, 0, vict, TO_CHAR);
+		
+		if (IS_VAMPIRE(vict)) {
+			act("$E is a vampire.", FALSE, ch, NULL, vict, TO_CHAR);
+		}
 
 		if (GET_BLOOD(vict) != GET_MAX_BLOOD(vict)) {
 			sprintf(buf, "$E is missing about %d%% of $S blood.", (GET_MAX_BLOOD(vict) - GET_BLOOD(vict)) * 100 / GET_MAX_BLOOD(vict));
@@ -409,7 +409,7 @@ void taste_blood(char_data *ch, char_data *vict) {
 		sprintf(buf, "$E is about %d years old.", GET_AGE(vict) + number(-1, 1));
 		act(buf, FALSE, ch, 0, vict, TO_CHAR);
 		
-		WAIT_STATE(ch, universal_wait);
+		command_lag(ch, WAIT_ABILITY);
 		gain_ability_exp(ch, ABIL_TASTE_BLOOD, 20);
 	}
 }
@@ -609,7 +609,7 @@ void update_vampire_sun(char_data *ch) {
 	
 	// lastly
 	if (found) {
-		WAIT_STATE(ch, universal_wait);
+		command_lag(ch, WAIT_ABILITY);
 	}
 }
 
@@ -623,7 +623,7 @@ ACMD(do_alacrity) {
 	
 	if (affected_by_spell(ch, ATYPE_ALACRITY)) {
 		end_alacrity(ch);
-		WAIT_STATE(ch, universal_wait);
+		command_lag(ch, WAIT_OTHER);
 		return;
 	}
 	
@@ -647,17 +647,16 @@ ACMD(do_alacrity) {
 	af = create_flag_aff(ATYPE_ALACRITY, UNLIMITED, AFF_HASTE);
 	affect_join(ch, af, 0);
 
-	charge_ability_cost(ch, BLOOD, cost, NOTHING, 0);
+	charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
 	gain_ability_exp(ch, ABIL_ALACRITY, 20);
 }
 
 
 ACMD(do_bite) {
-	extern int get_to_hit(char_data *ch, bool off_hand);
-	extern int get_dodge_modifier(char_data *ch);
+	extern bool check_hit_vs_dodge(char_data *attacker, char_data *victim, bool off_hand);
 
 	char_data *victim, *ch_iter;
-	int hit_chance, success;
+	int success;
 	bool found;
 
 	one_argument(argument, arg);
@@ -681,11 +680,14 @@ ACMD(do_bite) {
 	else if (subcmd ? (!(victim = get_player_vis(ch, arg, FIND_CHAR_ROOM))) : (!(victim = get_char_vis(ch, arg, FIND_CHAR_ROOM))))
 		send_config_msg(ch, "no_person");
 	else if (ch == victim)
-		msg_to_char(ch, "That seems a bit redundant..\r\n");
+		msg_to_char(ch, "That seems a bit redundant...\r\n");
 	else if (GET_FED_ON_BY(victim))
 		msg_to_char(ch, "Sorry, somebody beat you to it.\r\n");
 	else if (IS_GOD(victim) || IS_IMMORTAL(victim))
 		msg_to_char(ch, "You can't bite an immortal!\r\n");
+	else if (IS_DEAD(victim)) {
+		msg_to_char(ch, "Your victim seems to be dead.\r\n");
+	}
 	else if ((IS_NPC(victim) || !PRF_FLAGGED(victim, PRF_BOTHERABLE)) && !can_fight(ch, victim))
 		act("You can't attack $N!", FALSE, ch, 0, victim, TO_CHAR);
 	else if (check_scaling(victim, ch) && !PRF_FLAGGED(victim, PRF_BOTHERABLE) && AWAKE(victim) && GET_HEALTH(victim) > MAX(5, GET_MAX_HEALTH(victim)/20)) {
@@ -711,21 +713,14 @@ ACMD(do_bite) {
 
 			/* if the person isn't biteable, gotta roll! */
 			if ((IS_NPC(victim) || !PRF_FLAGGED(victim, PRF_BOTHERABLE)) && AWAKE(victim)) {
-				// determine hit
-				hit_chance = get_to_hit(ch, FALSE);
-	
-				// evasion
-				if (CAN_SEE(victim, ch)) {
-					hit_chance -= get_dodge_modifier(victim);
-				}
-
-				success = !AWAKE(victim) || (hit_chance >= number(1, 100));
+				success = check_hit_vs_dodge(ch, victim, FALSE);
 
 				if (!success && !MOB_FLAGGED(victim, MOB_ANIMAL)) {
 					act("You lunge at $N, but $E dodges you!", FALSE, ch, 0, victim, TO_CHAR);
 					act("$n lunges at $N, but $E dodges it!", FALSE, ch, 0, victim, TO_NOTVICT);
 					act("$n lunges at you, but you dodge $m!", FALSE, ch, 0, victim, TO_VICT);
-					WAIT_STATE(ch, universal_wait);
+					
+					command_lag(ch, WAIT_COMBAT_ABILITY);
 					if (!FIGHTING(victim)) {
 						hit(victim, ch, GET_EQ(victim, WEAR_WIELD), FALSE);
 					}
@@ -755,10 +750,48 @@ ACMD(do_bite) {
 }
 
 
+ACMD(do_bloodsweat) {
+	struct over_time_effect_type *dot, *next_dot;
+	bool any = FALSE;
+	int cost = 50;
+	
+	if (!can_use_ability(ch, ABIL_BLOODSWEAT, BLOOD, cost, COOLDOWN_BLOODSWEAT)) {
+		return;
+	}
+	else {
+		// remove first (to ensure there are some
+		for (dot = ch->over_time_effects; dot; dot = next_dot) {
+			next_dot = dot->next;
+
+			if (dot->damage_type == DAM_POISON) {
+				dot_remove(ch, dot);
+				any = TRUE;
+			}
+		}
+		
+		if (affected_by_spell(ch, ATYPE_POISON)) {
+			affect_from_char(ch, ATYPE_POISON);
+			any = TRUE;
+		}
+		
+		if (!any) {
+			msg_to_char(ch, "You are not even poisoned!\r\n");
+			return;
+		}
+		
+		// ok go
+		charge_ability_cost(ch, BLOOD, cost, COOLDOWN_BLOODSWEAT, 30, WAIT_ABILITY);
+		msg_to_char(ch, "You sweat blood through your pores, and poison with it!\r\n");
+		act("$n begins sweating blood.", TRUE, ch, NULL, NULL, TO_ROOM);
+	}
+}
+
+
 ACMD(do_bloodsword) {
+	void scale_item_to_level(obj_data *obj, int level);
+
 	obj_data *obj;
-	int cost = 20;
-	int vnum;
+	int cost = 40;
 
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs cannot use bloodsword.\r\n");
@@ -777,7 +810,7 @@ ACMD(do_bloodsword) {
 	
 	// attempt to remove existing wield
 	if (GET_EQ(ch, WEAR_WIELD)) {
-		perform_remove(ch, WEAR_WIELD, FALSE, FALSE);
+		perform_remove(ch, WEAR_WIELD);
 		
 		// did it work? if not, player got an error
 		if (GET_EQ(ch, WEAR_WIELD)) {
@@ -785,22 +818,12 @@ ACMD(do_bloodsword) {
 		}
 	}
 	
-	// determine which version
-	if (get_ability_level(ch, ABIL_BLOODSWORD) >= 100) {
-		vnum = o_BLOODSWORD_LEGENDARY;
-	}
-	else if (get_ability_level(ch, ABIL_BLOODSWORD) >= 90) {
-		vnum = o_BLOODSWORD_HIGH;
-	}
-	else if (get_ability_level(ch, ABIL_BLOODSWORD) >= 50) {
-		vnum = o_BLOODSWORD_MEDIUM;
-	}
-	else {
-		vnum = o_BLOODSWORD_LOW;
-	}
+	charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
+	obj = read_object(o_BLOODSWORD);
 	
-	charge_ability_cost(ch, BLOOD, cost, NOTHING, 0);
-	obj = read_object(vnum);
+	if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
+		scale_item_to_level(obj, IS_CLASS_ABILITY(ch, ABIL_BLOODSWORD) ? get_approximate_level(ch) : GET_SKILL(ch, SKILL_VAMPIRE));
+	}
 	
 	act("You drain blood from your wrist and mold it into $p.", FALSE, ch, obj, NULL, TO_CHAR);
 	act("$n twists and molds $s own blood into $p.", TRUE, ch, obj, NULL, TO_ROOM);
@@ -853,7 +876,7 @@ ACMD(do_boost) {
 			af = create_mod_aff(ATYPE_BOOST, 3 MUD_HOURS, APPLY_STRENGTH, 1 + (skill_check(ch, ABIL_BOOST, DIFF_HARD) ? 1 : 0));
 			affect_join(ch, af, AVG_DURATION | ADD_MODIFIER);
 
-			charge_ability_cost(ch, BLOOD, cost, NOTHING, 0);
+			charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
 
 			msg_to_char(ch, "You force blood into your muscles, boosting your strength!\r\n");
 			gain_ability_exp(ch, ABIL_BOOST, 20);
@@ -872,7 +895,7 @@ ACMD(do_boost) {
 			af = create_mod_aff(ATYPE_BOOST, 3 MUD_HOURS, APPLY_DEXTERITY, 1 + (skill_check(ch, ABIL_BOOST, DIFF_HARD) ? 1 : 0));
 			affect_join(ch, af, AVG_DURATION | ADD_MODIFIER);
 
-			charge_ability_cost(ch, BLOOD, cost, NOTHING, 0);
+			charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
 
 			msg_to_char(ch, "You focus your blood, increasing your dexterity!\r\n");
 			gain_ability_exp(ch, ABIL_BOOST, 20);
@@ -890,7 +913,7 @@ ACMD(do_claws) {
 	
 	if (affected_by_spell(ch, ATYPE_CLAWS)) {
 		retract_claws(ch);
-		WAIT_STATE(ch, universal_wait);
+		command_lag(ch, WAIT_OTHER);
 		return;
 	}
 	
@@ -911,7 +934,7 @@ ACMD(do_claws) {
 
 	// attempt to remove existing wield
 	if (GET_EQ(ch, WEAR_WIELD)) {
-		perform_remove(ch, WEAR_WIELD, FALSE, FALSE);
+		perform_remove(ch, WEAR_WIELD);
 		
 		// did it work? if not, player got an error
 		if (GET_EQ(ch, WEAR_WIELD)) {
@@ -926,7 +949,7 @@ ACMD(do_claws) {
 	af = create_flag_aff(ATYPE_CLAWS, UNLIMITED, AFF_CLAWS);
 	affect_join(ch, af, 0);
 
-	charge_ability_cost(ch, BLOOD, cost, NOTHING, 0);
+	charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
 	gain_ability_exp(ch, ABIL_CLAWS, 20);
 }
 
@@ -1001,7 +1024,7 @@ ACMD(do_command) {
 			}
 		}
 		
-		WAIT_STATE(ch, universal_wait);
+		command_lag(ch, WAIT_ABILITY);
 	}
 }
 
@@ -1018,7 +1041,7 @@ ACMD(do_deathshroud) {
 	}
 	else if (affected_by_spell(ch, ATYPE_DEATHSHROUD)) {
 		un_deathshroud(ch);
-		WAIT_STATE(ch, universal_wait);
+		command_lag(ch, WAIT_OTHER);
 	}
 	else if (!check_vampire_ability(ch, ABIL_DEATHSHROUD, BLOOD, cost, NOTHING)) {
 		return;
@@ -1042,7 +1065,7 @@ ACMD(do_deathshroud) {
 		affect_join(ch, af, 0);
 
 		GET_POS(ch) = POS_SLEEPING;
-		charge_ability_cost(ch, BLOOD, cost, NOTHING, 0);
+		charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
 		gain_ability_exp(ch, ABIL_DEATHSHROUD, 50);
 	}
 }
@@ -1066,6 +1089,9 @@ ACMD(do_feed) {
 		msg_to_char(ch, "You can't give THAT much blood.\r\n");
 	else if (!(victim = get_char_vis(ch, arg, FIND_CHAR_ROOM)))
 		send_config_msg(ch, "no_person");
+	else if (IS_DEAD(victim)) {
+		act("It would do no good for $M now -- $E's dead!", FALSE, ch, NULL, victim, TO_CHAR);
+	}
 	else if (IS_NPC(victim) || !PRF_FLAGGED(victim, PRF_BOTHERABLE))
 		act("$E refuses your vitae.", FALSE, ch, 0, victim, TO_CHAR);
 	else {
@@ -1103,7 +1129,7 @@ ACMD(do_majesty) {
 		affect_join(ch, af, 0);
 	}
 	
-	WAIT_STATE(ch, universal_wait);
+	command_lag(ch, WAIT_ABILITY);
 }
 
 
@@ -1116,7 +1142,7 @@ ACMD(do_mummify) {
 	}
 	else if (affected_by_spell(ch, ATYPE_MUMMIFY)) {
 		un_mummify(ch);
-		WAIT_STATE(ch, universal_wait);
+		command_lag(ch, WAIT_OTHER);
 	}
 	else if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs cannot mummify.\r\n");
@@ -1139,7 +1165,7 @@ ACMD(do_mummify) {
 		msg_to_char(ch, "Your flesh hardens as you mummify yourself!\r\n");
 		act("$n's flesh hardens and $e falls to the ground!", TRUE, ch, 0, 0, TO_ROOM);
 		GET_POS(ch) = POS_SLEEPING;
-		charge_ability_cost(ch, BLOOD, cost, NOTHING, 0);
+		charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
 
 		af = create_aff(ATYPE_MUMMIFY, -1, APPLY_NONE, 0, AFF_IMMUNE_PHYSICAL | AFF_MUMMIFY | AFF_NO_ATTACK);
 		affect_join(ch, af, 0);
@@ -1267,7 +1293,7 @@ ACMD(do_regenerate) {
 		return;
 	}
 	
-	charge_ability_cost(ch, BLOOD, cost, NOTHING, 0);
+	charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
 	
 	if (skill_check(ch, ABIL_REGENERATE, DIFF_EASY)) {
 		switch (mode) {
@@ -1296,7 +1322,7 @@ ACMD(do_regenerate) {
 	}
 	
 	gain_ability_exp(ch, ABIL_REGENERATE, 15);
-	WAIT_STATE(ch, universal_wait);
+	command_lag(ch, WAIT_ABILITY);
 }
 
 
@@ -1340,7 +1366,7 @@ ACMD(do_soulmask) {
 	if (affected_by_spell(ch, ATYPE_SOULMASK)) {
 		msg_to_char(ch, "You turn off your soulmask.\r\n");
 		affect_from_char(ch, ATYPE_SOULMASK);
-		WAIT_STATE(ch, universal_wait);
+		command_lag(ch, WAIT_OTHER);
 		return;
 	}
 	else if (!check_vampire_ability(ch, ABIL_SOULMASK, NOTHING, 0, NOTHING)) {
@@ -1360,7 +1386,7 @@ ACMD(do_soulmask) {
 		msg_to_char(ch, "You conceal your magical aura!\r\n");
 		
 		gain_ability_exp(ch, ABIL_SOULMASK, 33.4);
-		WAIT_STATE(ch, universal_wait);
+		command_lag(ch, WAIT_ABILITY);
 	}
 }
 
@@ -1407,7 +1433,7 @@ ACMD(do_veintap) {
 
 		amt = MIN(amt, GET_DRINK_CONTAINER_CAPACITY(container) - GET_DRINK_CONTAINER_CONTENTS(container));
 
-		charge_ability_cost(ch, BLOOD, amt, NOTHING, 0);
+		charge_ability_cost(ch, BLOOD, amt, NOTHING, 0, WAIT_ABILITY);
 		GET_OBJ_VAL(container, VAL_DRINK_CONTAINER_CONTENTS) += amt;
 		GET_OBJ_VAL(container, VAL_DRINK_CONTAINER_TYPE) = LIQ_BLOOD;
 		
@@ -1449,7 +1475,7 @@ ACMD(do_weaken) {
 			appear(ch);
 		}
 
-		charge_ability_cost(ch, BLOOD, cost, COOLDOWN_WEAKEN, SECS_PER_MUD_HOUR);
+		charge_ability_cost(ch, BLOOD, cost, COOLDOWN_WEAKEN, SECS_PER_MUD_HOUR, WAIT_COMBAT_ABILITY);
 
 		act("You spread your dead blood on $N...", FALSE, ch, 0, victim, TO_CHAR);
 		act("$n spreads $s cold, dead blood on you...", FALSE, ch, 0, victim, TO_VICT);

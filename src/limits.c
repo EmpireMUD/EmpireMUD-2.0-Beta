@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: limits.c                                        EmpireMUD 2.0b1 *
+*   File: limits.c                                        EmpireMUD 2.0b2 *
 *  Usage: Periodic updates and limiters                                   *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -50,6 +50,7 @@ extern struct instance_data *find_instance_by_room(room_data *room);
 extern room_data *obj_room(obj_data *obj);
 void out_of_blood(char_data *ch);
 void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool full_abandon);
+void stop_room_action(room_data *room, int action, int chore);
 
 // locals
 int health_gain(char_data *ch, bool info_only);
@@ -109,8 +110,8 @@ void check_attribute_gear(char_data *ch) {
 				if (GET_ATT(ch, primary_attributes[iter]) < 1 && primary_attributes[iter] == apply_attribute[(int) obj->affected[app].location]) {
 					act("You are too weak to keep using $p.", FALSE, ch, obj, NULL, TO_CHAR);
 					act("$n stops using $p.", TRUE, ch, obj, NULL, TO_ROOM);
-					// this may extract it, or drop it
-					unequip_char_to_inventory(ch, pos, TRUE);
+					// this may extract it
+					unequip_char_to_inventory(ch, pos);
 					
 					found = TRUE;
 				}
@@ -299,7 +300,7 @@ void point_update_char(char_data *ch) {
 		if (weather_info.sunlight == SUN_DARK) {
 			gain_ability_exp(ch, ABIL_CITY_LIGHTS, 2);
 		}
-		else if (weather_info.sunlight == SUN_LIGHT && !ROOM_IS_CLOSED(IN_ROOM(ch))) {
+		else if (weather_info.sunlight == SUN_LIGHT && IS_OUTDOORS(ch)) {
 			gain_ability_exp(ch, ABIL_DAYWALKING, 2);
 		}
 		
@@ -404,7 +405,7 @@ void point_update_char(char_data *ch) {
 */
 void real_update_char(char_data *ch) {
 	extern bool can_wear_item(char_data *ch, obj_data *item, bool send_messages);
-	extern int compute_skill_points_per_day(char_data *ch);
+	extern int compute_bonus_exp_per_day(char_data *ch);
 	extern int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname);	
 	void random_encounter(char_data *ch);
 	void update_biting_char(char_data *ch);
@@ -412,13 +413,9 @@ void real_update_char(char_data *ch) {
 	
 	struct over_time_effect_type *dot, *next_dot;
 	struct affected_type *af, *next_af, *immune;
-	obj_data *obj, *next_obj;
+	char_data *room_ch, *next_ch;
 	int result, iter, type;
-	
-	// heal-per-5 ? (stops at 0 health or incap)
-	if (GET_HEAL_OVER_TIME(ch) > 0 && !IS_DEAD(ch) && GET_POS(ch) >= POS_SLEEPING && GET_HEALTH(ch) > 0) {
-		heal(ch, ch, GET_HEAL_OVER_TIME(ch));
-	}
+	int fol_count, gain;
 	
 	// update affects (NPCs get this, too)
 	for (af = ch->affected; af; af = next_af) {
@@ -443,6 +440,11 @@ void real_update_char(char_data *ch) {
 			
 			affect_remove(ch, af);
 		}
+	}
+	
+	// heal-per-5 ? (stops at 0 health or incap)
+	if (GET_HEAL_OVER_TIME(ch) > 0 && !IS_DEAD(ch) && GET_POS(ch) >= POS_SLEEPING && GET_HEALTH(ch) > 0) {
+		heal(ch, ch, GET_HEAL_OVER_TIME(ch));
 	}
 
 	// update DoTs (NPCs get this, too)
@@ -492,7 +494,7 @@ void real_update_char(char_data *ch) {
 	}
 	
 	if (GET_EQ(ch, WEAR_SADDLE) && !IS_RIDING(ch)) {
-		perform_remove(ch, WEAR_SADDLE, FALSE, TRUE);
+		perform_remove(ch, WEAR_SADDLE);
 	}
 	
 	if (GET_BLOOD(ch) > GET_MAX_BLOOD(ch)) {
@@ -502,12 +504,12 @@ void real_update_char(char_data *ch) {
 	// periodic exp and skill gain
 	if (GET_DAILY_CYCLE(ch) < daily_cycle) {
 		// other stuff that resets daily
-		GET_SKILL_POINTS_AVAILABLE(ch) = compute_skill_points_per_day(ch);
+		GET_DAILY_BONUS_EXPERIENCE(ch) = compute_bonus_exp_per_day(ch);
 		for (iter = 0; iter < MAX_REWARDS_PER_DAY; ++iter) {
 			GET_REWARDED_TODAY(ch, iter) = -1;
 		}
 		
-		msg_to_char(ch, "&yYour daily skill cap has reset.&0\r\n");
+		msg_to_char(ch, "&yYour daily bonus experience has reset!&0\r\n");
 		
 		// update to this cycle so it only happens once a day
 		GET_DAILY_CYCLE(ch) = daily_cycle;
@@ -552,18 +554,8 @@ void real_update_char(char_data *ch) {
 		if (GET_EQ(ch, iter) && !can_wear_item(ch, GET_EQ(ch, iter), TRUE)) {
 			// can_wear_item sends own message to ch
 			act("$n stops using $p.", TRUE, ch, GET_EQ(ch, iter), NULL, TO_ROOM);
-			// this may extract it, or drop it
-			unequip_char_to_inventory(ch, iter, TRUE);
-		}
-	}
-
-	// over inventory
-	if (!IS_IMMORTAL(ch) && IS_CARRYING_N(ch) > CAN_CARRY_N(ch)) {
-		msg_to_char(ch, "You are carrying too many items!\r\n");
-		
-		for (obj = ch->carrying; obj && IS_CARRYING_N(ch) > CAN_CARRY_N(ch); obj = next_obj) {
-			next_obj = obj->next_content;
-			perform_drop(ch, obj, SCMD_DROP, "drop");
+			// this may extract it
+			unequip_char_to_inventory(ch, iter);
 		}
 	}
 
@@ -589,13 +581,19 @@ void real_update_char(char_data *ch) {
 	}
 
 	// regenerate: do not put move_gain and mana_gain inside of MIN/MAX macros -- this will call them twice
-	heal(ch, ch, health_gain(ch, FALSE));
+	gain = health_gain(ch, FALSE);
+	heal(ch, ch, gain);
+	GET_HEALTH_DEFICIT(ch) = MAX(0, GET_HEALTH_DEFICIT(ch) - gain);
 	
-	GET_MOVE(ch) += move_gain(ch, FALSE);
+	gain = move_gain(ch, FALSE);
+	GET_MOVE(ch) += gain;
 	GET_MOVE(ch) = MIN(GET_MOVE(ch), GET_MAX_MOVE(ch));
+	GET_MOVE_DEFICIT(ch) = MAX(0, GET_MOVE_DEFICIT(ch) - gain);
 	
-	GET_MANA(ch) += mana_gain(ch, FALSE);
+	gain = mana_gain(ch, FALSE);
+	GET_MANA(ch) += gain;
 	GET_MANA(ch) = MIN(GET_MANA(ch), GET_MAX_MANA(ch));
+	GET_MANA_DEFICIT(ch) = MAX(0, GET_MANA_DEFICIT(ch) - gain);
 	
 	if (IS_VAMPIRE(ch)) {
 		update_vampire_sun(ch);
@@ -614,6 +612,32 @@ void real_update_char(char_data *ch) {
 	if (GET_BLOOD(ch) <= 0 && !GET_FED_ON_BY(ch) && !GET_FEEDING_FROM(ch)) {
 		out_of_blood(ch);
 		return;
+	}
+	
+	// too-many-followers check
+	fol_count = 0;
+	for (room_ch = ROOM_PEOPLE(IN_ROOM(ch)); room_ch; room_ch = next_ch) {
+		next_ch = room_ch->next_in_room;
+		
+		// check is npc following ch
+		if (room_ch == ch || room_ch->desc || !IS_NPC(room_ch) || room_ch->master != ch) {
+			continue;
+		}
+		
+		// don't care about familiars
+		if (MOB_FLAGGED(room_ch, MOB_FAMILIAR)) {
+			continue;
+		}
+		
+		if (++fol_count > config_get_int("npc_follower_limit")) {
+			REMOVE_BIT(AFF_FLAGS(room_ch), AFF_CHARM);
+			stop_follower(room_ch);
+			
+			if (can_fight(room_ch, ch)) {
+				act("$n becomes enraged!", FALSE, room_ch, NULL, NULL, TO_ROOM);
+				engage_combat(room_ch, ch, TRUE);
+			}
+		}
 	}
 
 	random_encounter(ch);
@@ -661,6 +685,7 @@ static bool check_one_city_for_ruin(empire_data *emp, struct empire_city_data *c
 	}
 	
 	if (!found_building) {
+		log_to_empire(emp, ELOG_TERRITORY, "%s (%d, %d) abandoned as ruins", city->name, X_COORD(city->location), Y_COORD(city->location));
 		perform_abandon_city(emp, city, TRUE);
 		read_empire_territory(emp);
 		return TRUE;
@@ -950,14 +975,110 @@ bool should_delete_empire(empire_data *emp) {
 //// OBJECT LIMITS ///////////////////////////////////////////////////////////
 
 /**
+* Checks and runs an autostore for an object.
+*
+* @param obj_data *obj The item to check/store.
+* @param bool force If TRUE, ignores timers and players present and stores all storables.
+* @return bool TRUE if the item is still in the world, FALSE if it was extracted
+*/
+bool check_autostore(obj_data *obj, bool force) {
+	obj_data *top_obj;
+	empire_data *emp;
+	bool store, unique, full;
+	
+	// easy exclusions
+	if (obj->carried_by || obj->worn_by || !CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
+		return TRUE;
+	}
+	
+	// timer check (if not forced)
+	if (!force && (GET_AUTOSTORE_TIMER(obj) + config_get_int("autostore_time") * SECS_PER_REAL_MIN) > time(0)) {
+		return TRUE;
+	}
+	
+	// ensure object is in a room, or in an object in a room
+	top_obj = get_top_object(obj);
+	if (!IN_ROOM(top_obj) || IS_ADVENTURE_ROOM(IN_ROOM(top_obj))) {
+		return TRUE;
+	}
+	
+	// never do it in front of players
+	if (!force && any_players_in_room(IN_ROOM(top_obj))) {
+		return TRUE;
+	}
+	
+	emp = ROOM_OWNER(IN_ROOM(top_obj));
+	
+	// reasons something is storable (timer was already checked)
+	store = unique = FALSE;
+	if (OBJ_FLAGGED(obj, OBJ_JUNK | OBJ_UNCOLLECTED_LOOT)) {
+		store = TRUE;
+	}
+	else if (OBJ_CAN_STORE(obj)) {
+		store = TRUE;
+	}
+	else if (IS_COINS(obj)) {
+		store = TRUE;
+	}
+	else if (!emp) {	// no owner
+		store = TRUE;
+	}
+	else if (OBJ_FLAGGED(obj, OBJ_NO_AUTOSTORE)) {
+		// this goes after the !emp check because we "store" them on unclaimed land anyway
+		// but this otherwise blocks the item from storing
+		store = FALSE;
+	}
+	else if (UNIQUE_OBJ_CAN_STORE(obj) && ROOM_PRIVATE_OWNER(HOME_ROOM(IN_ROOM(top_obj))) == NOBODY) {
+		// store unique items but not in private homes
+		store = TRUE;
+		unique = TRUE;
+	}
+	else if (OBJ_BOUND_TO(obj) && ROOM_PRIVATE_OWNER(HOME_ROOM(IN_ROOM(top_obj))) == NOBODY && (GET_AUTOSTORE_TIMER(obj) + config_get_int("bound_item_junk_time") * SECS_PER_REAL_MIN) < time(0)) {
+		// room owned, item is bound, not a private home, but not storable? junk it
+		store = TRUE;
+		// DON'T mark unique -- we are just junking it
+	}
+	
+	// do we even bother?
+	if (!store) {
+		return TRUE;
+	}
+
+	// final timer check (long-autostore)
+	if (!force && ROOM_BLD_FLAGGED(IN_ROOM(top_obj), BLD_LONG_AUTOSTORE) && (GET_AUTOSTORE_TIMER(obj) + config_get_int("long_autostore_time") * SECS_PER_REAL_MIN) > time(0)) {
+		return TRUE;
+	}
+	
+	// OK GO:
+	empty_obj_before_extract(obj);
+	
+	if (emp) {					
+		if (IS_COINS(obj)) {
+			increase_empire_coins(emp, real_empire(GET_COINS_EMPIRE_ID(obj)), GET_COINS_AMOUNT(obj));
+		}
+		else if (unique) {
+			// this extracts it itself
+			store_unique_item(NULL, obj, emp, IN_ROOM(top_obj), &full);
+			return FALSE;
+		}
+		else if (OBJ_CAN_STORE(obj)) {
+			add_to_empire_storage(emp, GET_ISLAND_ID(IN_ROOM(top_obj)), GET_OBJ_VNUM(obj), 1);
+		}
+	}
+
+	// get rid of it either way
+	extract_obj(obj);
+	return FALSE;
+}
+
+
+/**
 * This runs a point update (every tick) on an object.
 *
 * @param obj_data *obj The object to update.
 */
 void point_update_obj(obj_data *obj) {
 	room_data *to_room, *obj_r;
-	obj_data *top_obj;
-	empire_data *emp;
 	char_data *c;
 	time_t timer;
 	
@@ -1134,31 +1255,9 @@ void point_update_obj(obj_data *obj) {
 		} // end non-drink decay
 	}
 	
-	// 2nd type of timer: the autostore timer (keeps the world clean of litter) -- this does a preliminary time check to avoid work, but a full time check after
-	if (!obj->carried_by && !obj->worn_by && CAN_WEAR(obj, ITEM_WEAR_TAKE) && (GET_AUTOSTORE_TIMER(obj) + config_get_int("autostore_time") * SECS_PER_REAL_MIN) < time(0)) {
-		// (only if not carried/worn, is takeable and the timer is expired)
-
-		// at this point, only care if the top object is in the room, and no players are there
-		if ((top_obj = get_top_object(obj)) && IN_ROOM(top_obj) && !IS_ADVENTURE_ROOM(IN_ROOM(top_obj)) && (OBJ_FLAGGED(obj, OBJ_JUNK) || OBJ_CAN_STORE(obj) || IS_COINS(obj) || !ROOM_OWNER(IN_ROOM(top_obj))) && !any_players_in_room(IN_ROOM(top_obj))) {
-			if ((GET_AUTOSTORE_TIMER(obj) + config_get_int("long_autostore_time") * SECS_PER_REAL_MIN) < time(0) || (!ROOM_BLD_FLAGGED(IN_ROOM(top_obj), BLD_LONG_AUTOSTORE) && (GET_AUTOSTORE_TIMER(obj) + config_get_int("autostore_time") * SECS_PER_REAL_MIN) < time(0))) {
-				// safe to purge or store
-				empty_obj_before_extract(obj);
-				emp = ROOM_OWNER(IN_ROOM(top_obj));
-			
-				if (emp) {					
-					if (IS_COINS(obj)) {
-						increase_empire_coins(emp, real_empire(GET_COINS_EMPIRE_ID(obj)), GET_COINS_AMOUNT(obj));
-					}
-					else if (OBJ_CAN_STORE(obj)) {
-						add_to_empire_storage(emp, GET_ISLAND_ID(IN_ROOM(top_obj)), GET_OBJ_VNUM(obj), 1);
-					}
-				}
-
-				// get rid of it either way
-				extract_obj(obj);
-				return;
-			}
-		}
+	// 2nd type of timer: the autostore timer (keeps the world clean of litter)
+	if (!check_autostore(obj, FALSE)) {
+		return;
 	}
 }
 
@@ -1190,6 +1289,10 @@ void real_update_obj(obj_data *obj) {
 					COMPLEX_DATA(home)->burning = number(4, 12);
 					if (ROOM_PEOPLE(home)) {
 						act("A stray ember from $p ignites the room!", FALSE, ROOM_PEOPLE(home), obj, 0, TO_CHAR | TO_ROOM);
+
+						// ensure no building or dismantling
+						stop_room_action(home, ACT_BUILDING, CHORE_BUILDING);
+						stop_room_action(home, ACT_DISMANTLING, CHORE_BUILDING);
 					}
 				}
 			}
@@ -1210,12 +1313,15 @@ void point_update_room(room_data *room) {
 	void death_log(char_data *ch, char_data *killer, int type);
 	void fill_trench(room_data *room);
 
-	char_data *ch;
+	char_data *ch, *next_ch, *sub_ch, *next_sub;
 	obj_data *o, *next_o;
 	struct track_data *track, *next_track, *temp;
 	struct affected_type *af, *next_af;
 	empire_data *emp;
 	time_t now = time(0);
+	int count;
+	
+	int allowed_animals = config_get_int("num_duplicates_in_stable");
 
 	// map-only portion
 	if (GET_ROOM_VNUM(room) < MAP_SIZE) {
@@ -1256,7 +1362,9 @@ void point_update_room(room_data *room) {
 					if (ROOM_PEOPLE(room)) {
 						act("The building collapses in flames around you!", FALSE, ROOM_PEOPLE(room), 0, 0, TO_CHAR | TO_ROOM);
 					}
-					while ((ch = ROOM_PEOPLE(room))) {
+					for (ch = ROOM_PEOPLE(room); ch; ch = next_ch) {
+						next_ch = ch->next_in_room;
+						
 						if (!IS_NPC(ch)) {
 							death_log(ch, ch, TYPE_SUFFERING);
 						}
@@ -1319,6 +1427,34 @@ void point_update_room(room_data *room) {
 			free(track);
 		}
 	}
+	
+	// check mob crowding
+	if (ROOM_BLD_FLAGGED(room, BLD_STABLE)) {
+		for (ch = ROOM_PEOPLE(room); ch; ch = next_ch) {
+			next_ch = ch->next_in_room;
+			
+			// skip non-npcs and familiars
+			if (!IS_NPC(ch) || MOB_FLAGGED(ch, MOB_FAMILIAR)) {
+				continue;
+			}
+			
+			// look for more here than allowed
+			count = 1;
+			for (sub_ch = ch->next_in_room; sub_ch; sub_ch = next_sub) {
+				next_sub = sub_ch->next_in_room;
+				
+				// only looking for dupes
+				if (!IS_NPC(sub_ch) || sub_ch->desc || GET_MOB_VNUM(sub_ch) != GET_MOB_VNUM(ch)) {
+					continue;
+				}
+				
+				if (count++ >= allowed_animals) {
+					act("$n is feeling overcrowded, and leaves.", TRUE, sub_ch, NULL, NULL, TO_ROOM);
+					extract_char(sub_ch);
+				}
+			}
+		}
+	}
 
 	// update room ffects
 	for (af = ROOM_AFFECTS(room); af; af = next_af) {
@@ -1337,6 +1473,8 @@ void point_update_room(room_data *room) {
 			affect_remove_room(room, af);
 		}
 	}
+	
+	// ensure these are up to date
 	SET_BIT(ROOM_AFF_FLAGS(room), ROOM_BASE_FLAGS(room));
 }
 
@@ -1689,6 +1827,8 @@ int move_gain(char_data *ch, bool info_only) {
 */
 void point_update(bool run_real) {
 	void save_daily_cycle();
+	void update_players_online_stats();
+	extern int max_players_today;
 	
 	room_data *room, *next_room;
 	obj_data *obj, *next_obj;
@@ -1698,6 +1838,10 @@ void point_update(bool run_real) {
 	if (time(0) > daily_cycle + SECS_PER_REAL_DAY) {
 		daily_cycle += SECS_PER_REAL_DAY;
 		save_daily_cycle();
+		
+		// reset players seen today too
+		max_players_today = 0;
+		update_players_online_stats();
 	}
 	
 	// characters

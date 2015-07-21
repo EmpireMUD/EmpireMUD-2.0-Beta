@@ -123,6 +123,24 @@ Various types of ingots can be made by smelting metals in a forge or foundry.
 
 See also: SMELT, IRON
 #
+KEEP UNKEEP
+
+Usage:  keep <item>
+        unkeep <item>
+
+Setting an item to 'keep' will keep you from dropping, putting, giving,
+or sacrificing it as part of a set of "all". This means if you 'keep' your
+stone hammer, then type "drop all.stone", you won't drop the hammer -- only
+other stone items.
+
+You can still drop, give, put, or sacrifice a 'keep' item if you only target
+one item at a time. That is, "drop hammer" will still drop the hammer even
+though you marked it keep.
+
+Items you 'keep' will have a (keep) tag next to their name. You can use
+'unkeep' to unprotect an item. You can also 'keep all' and 'unkeep all' on
+your inventory.
+#
 LARGE "LARGE ITEMS" "LARGE FLAG" (LARGE)
 
 The (large) flag on items indicates that the item is over-sized and takes up
@@ -133,6 +151,7 @@ All other items take up 1 inventory slot.
 LIBRARY
 
 Building:  [^^]  Library  (Grand Monuments)
+Resources:  100 lumber, 40 nails, 48 blocks
 Command:  library browse  -- see books shelved here
           library checkout <book>  -- grab a copy of a book
           library shelve <item>  -- put a book away on the shelves
@@ -151,7 +170,7 @@ as new books are catalogued and sorted.
 If you have written a book with bookedit, you can always make a new copy of it
 using 'bookedit copy'.
 
-See also: BOOKEDIT
+See also: BOOKEDIT, KEEP
 #
 "LIGHTNING STONE" "YELLOW LIGHTNING STONE" "YELLOW STONE"
 
@@ -170,11 +189,29 @@ many buildings.
 
 See also: CHOP, SAW
 #
+NAILS "POUCH OF NAILS"
+
+Nails (resource)
+
+You can create nails at the forge, from iron ingots. Nails are used for many
+buildings.
+
+See also: FORGE, MAINTAIN
+#
+"NEXUS CRYSTALS"
+
+Nexus Crystal (resource)
+
+Opening a magical portal requires nexus crystals, based on distance. These can
+be crafted from magical gems (such as the bloodstone) by any portal mage.
+
+See also: PORTAL
+#
 RETRIEVE
 
-Usage: retrieve <item>
-       retrieve [number] <item>
-       retrieve all
+Usage:  retrieve <item>
+        retrieve [number] <item>
+        retrieve all
 
 This command is used to get items from a storage building. You may use
 "retrieve all" to fill up your inventory with items, but may not specify which
@@ -199,7 +236,7 @@ Example:
 
 See also: COINS
 #
-"STONE BLOCKS" BLOCK BLOCKS
+"STONE BLOCKS" BLOCKS
 
 Huge Stone Block (resource)
 
@@ -210,9 +247,9 @@ See also: QUARRY
 #
 STORE STORAGE
 
-Usage: store <item>
-       store <number> <item>
-       store all
+Usage:  store <item>
+        store <number> <item>
+        store all
 
 It is recommended that you keep most of your extra resources stored. Items left
 on the ground in claimed territory will eventually be stored by the empire's
@@ -227,7 +264,7 @@ on credit from their public (or allied) buildings, IF you have a trade pact.
 
 You can identify an item to see where it can be stored.
 
-See also: AUTO-STORE, RETRIEVE, IDENTIFY, INVENTORY, DIPLOMACY,
+See also: AUTO-STORE, KEEP, RETRIEVE, IDENTIFY, INVENTORY, DIPLOMACY,
    WAREHOUSE, VAULT
 #
 SUPERIOR MASTERWORK
@@ -238,7 +275,8 @@ legendary artisan.
 Masterwork abilities:
   Sewing/Leatherworking - Master Tailor
   Forge - Master Blacksmith
-  Pottery - Master Potter
+  Pottery - Master Craftsman
+  Woodworking - Master Craftsman
   Healing Elixirs and Wrath of Nature Potions are masterworks if you have both
 
 See also: SCALABLE CRAFTS
@@ -359,6 +397,7 @@ See also: TRADE COMMAND, TRADE BUY, TRADE CHECK, TRADE COLLECT
 VAULT WAREHOUSE
 
 Building:  {WW}  Warehouse  (Artisans skill)
+Resources:  20 lumber, 8 nails
 Built on:  plains, desert
 
 Command:  warehouse inventory [item keywords]
@@ -392,6 +431,6 @@ You retrieve a short sword (x4).
 Note: Immortals can see the warehouse lists for other empires using the syntax
 "warehouse inv <empire> [keywords]".
 
-See also: ARTISANS, PRIVILEGE, RETRIEVE, STORE
+See also: ARTISANS, KEEP, PRIVILEGE, RETRIEVE, STORE
 #
 $

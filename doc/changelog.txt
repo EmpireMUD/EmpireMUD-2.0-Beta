@@ -1,0 +1,879 @@
+EmpireMUD 2.0 beta Change Log
+* * * * * * * * * * * * * * *
+
+2.0 b2 (July 21, 2015)
+
+Abilities:
+- Ancestral Healing: A new Luminary class ability which adds your Greatness to
+your Bonus-Healing.
+- Blood Fortitude: Changed damage computation for 10% damage reduction from
+being floored to being rounded.
+- Bloodsweat: New Reaper class ability removes poisons.
+- Bloodsword: Raised the cost on this ability. It now scales better with the
+level of the player.
+- Cleanse: Added a blacklist of affects that cannot be Cleansed, because it was
+able to remove certain penalties and effects: Manashield, Vigor, Mummify,
+Deathshroud, death penalty, and war delay.
+- Colorburst: Updated the to-hit penalty from Colorburst. The cost now also
+scales with level.
+- Confer: A new Werewolf class ability that lets the user temporarily sacrifice
+Strength to give himself or others a buff.
+- Crucial Jab: New Bandit class ability adds a debuff to jab.
+- Cut Deep: Raised per-proc experience from 1 to 10 (with bonus exp).
+- Daywalking: Now skills up any time you are outdoors, not just out on the map.
+- Diversion: New Smuggler class ability. This is an AoE debuff.
+- Dragonriding: A new ability on all Empire classes that allows the use of
+flying mounts.
+- Earthmeld: Added a cooldown starting when the player un-melds.
+- Enchant: Now prefers exact name matches over partial matches.
+- Enchant Armor: Added enchantments for dexterity, resist-magical, and to-hit.
+- Enchant Weapons: Added a dodge/parry weapon enchantment.
+- Endurance: Now doubles only the first 1000 health, then gives +25% of the
+remaining health.
+- Familiar: Rewrote this ability to allow players to choose which familiar to
+summon.
+- Fastcasting: A new ability on all healer classes which lowers command lag on
+non-combat spells (including heals) by 0.1 second per 3 Wits. It also removes
+the combat speed bonus from Wits (so you can't have both effects at once).
+- Find Shelter: The mountainshelter can now be built facing mountains.
+- Finder: Now skills up at the end of abilities instead of at the beginning.
+- Fly: Players who have both Fly and Ride can now use flying mounts without
+All-Terrain Riding.
+- Foresight: Updated the dodge bonus on Foresight. Raised the cost to 30.
+- Heal: Raised the amount healed by level, and tied the cost to the amount.
+Heal also now tells you how much you healed and how much health your target has
+now.
+- Heavy Armor: Lowered to level 75 to reduce the firm need for Battle on
+tanking classes, if people want to get creative. No longer has pre-requisites.
+- Howl: New Shadow Wolf class ability. This is an AoE debuff.
+- Infiltrate: Now allows you to enter portals (using the 'enter' command) even
+if you don't have permission to use the room they are in.
+- Inspire: Updated the inspire options and their levels, which now scale with
+Greatness. You can now inspire yourself for half-effectiveness. Inspire now
+lasts 30 minutes on empire-mates and 5 minutes on everyone else.
+- Light Armor: Renamed from Leather armor. No longer has a pre-requisite.
+- Mage Armor: Renamed from Cloth armor.
+- Master Craftsman: Renamed "Master Potter" and applied Master Craftsman as the
+mastery ability for the Woodworking branch, in addition to the Pottery branch.
+- Master Survivalist: No longer requires that you can see the attacker.
+- Medium Armor: Lowered to level 50. Medium armor is now a hybrid dps/tank set
+that's also good for PVP. No longer has pre-requisites.
+- Mirrorimage: Fixed a bug where mirror images can heal up to huge health
+pools, as only their current health was lowered on creation. Raised their
+maximum health to 100 but prevented overhealing.
+- Noble Bearing: New class ability for Dukes reduces damage by an amount equal
+to Greatness.
+- Quick Block: Now gives +10 or +10% of level, whichever is better (at class
+level only; at lower levels it still only gives +10).
+- Refashion/Reforge: Fixed a bug where these commands could remove object
+bindings.
+- Reflexes: Now provides +5% Dodge as a specialty ability and +10% Dodge as a
+class ability, with a +10 (flat) Dodge minimum at all levels.
+- Resist Poison: Now causes your physical damage resistance to be applied to
+poison damage, rather than causing a 50% reduction in poison damage.
+- Reward: Now gives +5 bonus exp instead of +1 skill point.
+- Ride: If a player loses All-Terrain Riding, they will no longer be able to
+mount a flying mount they had already stored.
+- Ritual of Burdens: When you lose this ability, it will now wear off
+immediately.
+- Sage Werewolf Form: Added +1 Strength to this form, to be used with Confer.
+- Sap: No longer able to target people who are already stunned.
+- Savage Werewolf Form: Removed the health bonus and increased the mana penalty
+in this form.
+- Shadow Jab: New Shade class ability adds a debuff to jab.
+- Shadow Kick: New Assassin class ability adds a damage debuff to kick.
+- Shadowcage: New Occultist class ability. This is an AoE debuff.
+- Shadowstep: Changed how targets are validated so that this command can't be
+used to check for the existence of mobs anywhere at no cost. Players can no
+longer shadowstep to an NPC who belongs to another empire, or who is on land
+belonging to another empire. Now checks the stealthable flag and empire stealth
+permission. Also fixed a bug where you could shadowstep out of no-teleport
+rooms.
+- Siege Ritual: Now triggers hostile status. Now able to target open buildings
+as well as closed ones.
+- Sparring: Now provides +5% To-Hit as a specialty ability and +10% To-Hit as a
+class ability, with a +10 (flat) To-Hit minimum at all levels.
+- Stagger Jab: New Powerbroker class ability adds a debuff to jab.
+- Steal: You can no longer steal from your own empire.
+- Stunning Blow: Raised per-proc experience from 1 to 10 (with bonus exp).
+- Taste Blood: Removed the animal/human info. It now only mentions if the
+target is a vampire. The animal/human info was unpredictable and usually
+confusing.
+- Terrify: No longer blocked by the mob being blind. Replaced this ability's
+stun with a debuff to physical and magical damage.
+- Towering Werewolf Form: Added +1 Strength to this form, to allow it to use an
+additional piece of -Strength gear. Increased the mana penalty in this form.
+- Ward Against Magic: New class ability for Barbarians and Reapers allows them
+to block magical attacks at 50% of their normal block rating.
+
+Adventures:
+- 101 Magiterranean: The Hidden Garden: A new craft/crop adventure with no
+combat and 4 unique items.
+- 120 Red Dragon: Fixed a typo in the charm's look description.
+- 122 Three Banditos: Fixed two kill scripts.
+- 125 The Goblin Challenge: Fixed typo in keywords on Zelkab's gauntlets.
+Changed the timepiece and necklace generic drops from BoP to BoE. All BoE items
+in this adventure also gained the GENERIC loot flag. Removed the built-in
+(superior) flags on loot items. This is replaced by the drop-scaling change
+below. Fixed the long description on the goblin champion. Added an
+%adventurecomplete% command to the warg spawn death trigger, to fix an issue
+where spawning the warg prevents completion.
+- 140 The Sewers: Ratskins: Fixed a typo in the waste that flows slowly past.
+- 160 The Tower Skycleave: Fixed a typo in Celiya's trigger text. Fixed a
+script typo that lead to error logs. Updated another script, which used the
+now-outdated SOAK affect type. Corrected the word 'otherworldy' in the long
+description. Corrected a typo in the Goblin Cages (2) room description. Fixed
+the buy message at the shop. Added a missing keyword to the experimental
+handrwaps. Lowered the payout on the pixy races to prevent an infinite money
+exploit. Fixed two kill scripts. Fixed the name of the iris reagent in the
+shop.
+- 161 Portal to the Primeval: A new adventure for levels 75-100 with hunting,
+tracking, skinning, and crafting. This adds several new craftable items in the
+100-125 level range.
+- 170 Hamlet of the Undead: New 175-225 adventure.
+- 200 Burrow Canyons: Applied missing INFRA flags to mobs. Fixed the keywords
+on the pears, which had "tree" but not "juicy".
+- 201 Mill Manor: Added missing keywords to the caretaker. Updated the text in
+the mage's journal (book id 24) to correct some typoes and to add a hint for
+the reminder text. Also fixed keywords on the dorsal spine mace. Added missing
+bind flags to items. Also fixed the wear locations and added missing -1 Wits on
+the Titanaconda scale trousers. Also fixed an issue in its linking rule that
+resulted in it blocking off its own exit.
+- 281 Mountain Valley: Molten Fiend - A new, short group adventure for the
+200-250 level range.
+- All stock adventures: Updated most armor and any items that used to give
++soak with new stats. Updated the loot drop rates and loot exclusion sets on
+many NPCs with the new interaction exclusion system, generally raising overall
+loot drop chance slightly.
+- Confusing random exits: Added an adventure option that prevents the instancer
+from trying to logically match random exits.
+- Instancing: The instance linker will now check if it needs a certain
+direction inside, before picking that direction for the building to face. This
+keeps instances from blocking their own exits. Fixed an off-by-one error in the
+instancing code where the first valid location for an adventure could not be
+picked, and adventures with only one valid link point could not spawn.
+- Must-Fight Triggers: All stock adventures with must-fight triggers on mobs
+have been updated to ignore invisibility and blindness using Leave-All
+triggers.
+- Not-near-self: New adventure linking option prevents adventures from spawning
+too close to other copies of the same adventure. Applied this option to all
+included adventures except 100 The Grove.
+- Player limits: Resurrecting someone from a corpse now correctly checks
+instance limits.
+
+Buildings:
+- Apiary: No longer lists storage commands in its commands line.
+- Critters: Reduced the spawn locations for small critter mobs.
+- Damage: Incomplete buildings now have only 50% the hitpoints of finished
+ones. Damage is now reset on incomplete buildings by adding more resources to
+them.
+- !delete: New building flag prevents auto-deletion during homeroom check on
+startup.
+- Dock: Added 'unload' to list of commands.
+- Experience: The build action now grants experience per resource added plus a
+little bit at the end, rather than only a lump sum at the end.
+- High Temple: Updated the description, which came from a time when all temples
+faced North, and which really misused the word 'magnanimous'. Added HALL and
+TUNNEL designate flags, as it had none.
+- Smokehouse: Can no longer be burnt down when you light a fire inside to make
+smoked foods. Also now has a cooking fire of its own.
+- Quarries: Workforce was incorrectly using the wrong, higher depletion limit
+on quarries.
+- Stable: No more than two of each type of NPC will now stay in a stable.
+- Training Yard: Changed the build recipe from 'training yard' to
+'trainingyard' to be consistent with all other buildings.
+
+Code cleanup:
+- Affects: Added data for storage of a caster id for affects, for future development.
+- Command lag: Replaced inline use of WAIT_STATE() in most places to the new
+command_lag() function, which takes a "lag type" to allow abilities to modify
+the lag time on some types of commands. Also removed all remaining uses of the
+deprecated WAIT_STATE() macro in favor of GET_WAIT_STATE().
+- Converter: Added a playerfile converter program specifically for b1.x -> b2.0 updates.
+- is_fighting: Provided a new function that determines if a character is being
+attacked, in addition to whether or not he is attacking.
+- Playerfile spares: Moved spares used in b1.* to permanent locations.
+- Shear: Rewrote shear to use an INTERACTION_FUNC.
+- skills.c: Moved two functions that were in the wrong section of the file, and
+ordered the switch statement for abilities. These appeared to have been missed
+in the alpha cleanup.
+- Skin: Rewrote skin to use an INTERACTION_FUNC.
+- util: Fixed the order of libs in the util Makefile.in because some systems
+are pickier about argument order to the compiler.
+
+Combat:
+- Autokill: When fighting a hard/group/boss mob, it's no longer possible to
+incapacitate them by shutting off autokill.
+- Blind: Now applies a flat -50 to Block, Dodge and To-Hit if you can't see
+your target.
+- Block: Removed diminishing returns and reworked block to have a predictable
+cap based on the mob's level. Block also has an absolute maximum chance of 50%.
+Removed the 5% base block chance (block now relies more on gear).
+- Dexterity: Reduced the hit/dodge modifier for Dexterity from 10 to 5; the
+to-hit and dodge traits now make up a larger portion of hit chance.
+- Dodge: Reworked the entire dodge formula to create a real Dodge cap. Updated
+the help file to explain better.
+- Hit chance: There is now an absolute minimum to-hit chance of 5% so long as
+the character is at least equal to the victim in level.
+- Hostile flag: Attacking a person who is PVP-flagged or marked as hostile will
+no longer mark you as hostile as well.
+- No-attack: If a person gains an !ATTACK flag mid-combat, it should now remove
+them from combat.
+- PVP flag: Attacking a familiar will no longer result in empire hostility when
+the master is PVP-flagged. Guards will no longer auto-assist players who are
+using the PVP toggle for consensual player-vs-player combat.
+- Resist-Magical, Resist-Physical: Added physical resistance, which reduces
+physical and fire damage by up to 25% based on the amount of this trait, with
+the cap based on the level of the attacker. Magical resistance works the same
+but for magical damage.
+- Siege Attacks: You can no longer besiege a starting location (e.g. with a
+catapult).
+- Soak: Removed the soak trait.
+- To-Hit: Reworked the entire to-hit formula to create a real Hit cap. Updated
+the help file to explain better. There is now a minimum 5% chance to-hit for
+players and 25% chance to-hit for mobs, so long as they are within 50 levels of
+the victim.
+
+Commands:
+- Alternate: Now echoes a "Name has left the game" to the room when it removes
+the old alt.
+- Bathe: No longer allows NPCs to attempt to bathe.
+- Bite: Will no longer allow you to bite dead people.
+- Build: You can no longer work on building when the building is burning. When
+a building catches fire, it will stop building progress.
+- Butcher: Now shows the room what you got from butchering.
+- Catapult: Now triggers hostile status.
+- /check: You can now see which slash-channels another player is on with you.
+- Chop and mine: Now both use weapon dps, not raw damage, as modifiers on chore
+speed. This slows both chores down slightly.
+- Chop: Increased the chop speed contribution from weapon damage. Chop now has
+members-only permissions, rather than guest permissions. This means you can't
+chop on an allied or public tile.
+- Circle: Now has normal movement lag, and correctly checks if the player is
+overburdened.
+- City: Clarified the invalid-terrain error for founding a city.
+- City found: Added a list of sector flags which block city found, fixing a bug
+in founding a city on a crop.
+- Command lag: Changed the base command lag from 1.1 seconds to 1.25 seconds,
+to allow for abilities that lower it (e.g. Fastcasting).
+- Confirm: Now correctly shows "shutdown" or "reboot" based on which type is
+scheduled.
+- Demote: No longer allows you to demote someone who is above your rank.
+- Designate: Removed armor storage, which was outdated.
+- Dismantle: You can no longer dismantle burning buildings. When a building
+catches fire, it will stop dismantle progress.
+- Dismiss: Can now be used with the syntax "dismiss familiar" to dismiss yours
+anywhere in the world.
+- Drop: Fixed a double-error message on "drop all.item" when you have no
+matches.
+- Eedit rank: Now accepts - and ' as valid rank characters.
+- Einv: Rewrote the einv command completely because the previous version did
+not correctly handle cases where an empire had storage on more than two
+islands.
+- Enter: Entering portals now has normal movement lag. You can no longer enter
+a portal if you don't have permission to use the room it's in.
+- Exchange: No longer shows the same coin amount twice, instead of the correct
+amounts.
+- Exits: Now acts the same in an open building as it does anywhere else on the
+map.
+- /f: Updated the string formatter to ignore color codes when determining line
+length.
+- Feed: Vampires can no longer feed blood to players who are dead.
+- Godhistory: Fixed minimum level requirement, although this command was
+useless to mortals anyway.
+- Grants: Fixed the order of grants in constants.c because some grants were
+misaligned.
+- Herd: No longer works on mobs marked aggressive, group, or hard.
+- Identify: Fixed an incorrect stat on food, where hours of fullness was
+divided by 15.
+- Import analyze: Now shows all empires, not just trading partners.
+- /join: You can no longer join a slash-channel with no name.
+- Junk: Fixed a bug where junk was checking some 'drop' limitations like
+bound-items-in-claimed-rooms and room capacities.
+- Keep, unkeep: Added a way to prevent items from being included in "all" and
+"all.name" commands like drop, put, give, sacrifice, junk, and store.
+- /m: New version of /l in the string editor gives the current buffer with
+parsed color codes (default is to show the raw codes).
+- Mine: Increased the mine speed contribution from weapon damage.
+- Mint: The mint command will correctly cancel the minting action if you're
+already doing it, rather than just saying it cancels it.
+- Pledge: Fixed the argument parser, which dropped fill words like 'the' and
+incorrectly only took 1-word arguments.
+- Portal: Portals over 50 map tiles in distance now cost 1 nexus crystal per 75
+tiles, rounded up. No longer shows incomplete portal buildings on the list.
+- Rescale: Now preserved "keep" flags.
+- Sacrifice: No longer works on no-take items.
+- Sail: Added the missing "from" in the ship-sails message.
+- Sayhistory: Fixed an issue where socials were adding extra linebreaks.
+- Scan: Now works on ships.
+- Show: The 'show islands' option now includes the islands' names.
+- Slay: Now correctly accepts the 'slay' grant.
+- Specialize: This command no longer grants an additional skill reset.
+- Toggles: No longer allow NPCs to use toggles.
+- Toggle stealthable: This new preference blocks you from accidentally
+stealing.
+- Tomb: Can now be used to unset your tomb while dead.
+- Trade: The trading post no longer allows you to post stolen items.
+- Trade list: Rearranged where coins are displayed so it's "actual (exchange)
+empire" rather than "actual empire (exchange)" and added an indicator if you
+cannot use the item.
+- Warehouse: You can no longer warehouse store stolen items.
+- Wear all: Fixed a bug where gear slots that have more than one slot, like
+neck, weren't cascading when a player typed 'wear all'.
+- Weave: Will now show "nothing" when you can't weave anything.
+- Who: Allow the who command to target by empire name, show invis level even on
+the shortlist, and updated its help file and syntax.
+- Workforce: Added the "workforce where" option to see how many chore NPCs are
+working.
+
+Core changes:
+- !AGGRO Islands: New island flag allows full disabling of guard towers and
+aggro mobs.
+- Interactions: Replaced the 'exclusive' interaction bit with an interaction
+exclusion set identifier (char). Exclusion sets now use a cumulative roll,
+rather than rolling for each interaction in the set. Only one interaction from
+each exclusion set can fire. The file format does not change; interactions
+previously marked exclusive are now part of exclusion set 'X'. Updated
+interactions that required it for this system. The run_interactions() and
+run_room_interactions() functions were changed to support this. Rooms that run
+any successful interaction from one source (e.g. sector, crop) will no longer
+run any other sets.
+- Islands: EmpireMUD now stores meta-data about islands including names, and
+computes their locations.
+- Newbie Islands: Empires over 1 week old(configurable) cannot maintain claims
+on newbie islands through reboots. Auto-abandons from this will show up on the
+elog.
+- Stuns: When a character enters combat, all stun effects will break
+immediately. This does not apply if the character was already in combat when he
+became stunned.
+
+Crops:
+- Plantains: Added plantains as a base crop for jungles, as the code supports
+jungle crops but had none live. These won't spawn in the wild using the current
+version of the map generator, but the code requires at least one valid crop for
+each location.
+
+Displays:
+- Abilities: Moved up the "you must purchase the ability" message ahead of
+other errors. Fixed the plural in the "not enough energy" message for
+abilities, which showed on "forage" as "You need 1 move points..."
+- Auto-assist: Corrected the word "aid", which was written "aide".
+- Biting: The message shown to the room no longer says "she has his fangs...".
+- Consider: Added more clear level and difficulty info, and added notes if
+hit/dodge are too low. Consider now also scales the mob first to get a better
+measure of its power.
+- Daily skill points: This feature has been renamed "daily bonus experience
+points" to help make it less confusing for new players.
+- Death: Fixed the death message when a person dies on his own rather than from
+a killer. Tweaked the death message slightly to make it more apparent what has
+happened.
+- Diplomacy: Fixed a typo in a diplomacy empire log.
+- Disarm: Corrected capitalization in an error message.
+- Dispel: Fixed target of the no-affliction error message's gender.
+- Distrust: Automatic distrust now logs the name of the player who triggered
+it, to that player's empire only (the enemy doesn't see which player it was).
+- Ellipses: Found all remaining places where ".." is used either as an ellipsis
+or a typo, and fixed them.
+- Empire: Privileges are now shown on the top empire rank, just like all the
+others, on your own empire's detail.
+- Empire population: Fixed a bug where killing an empire NPC would not update
+the population count right away.
+- Familiar: Added missing linebreak to the list, and added a note in the
+unlikely event the person has no available familiars.
+- Heal: Removed double-error messages in heal friend and heal party, when you
+haven't purchased the correct ability.
+- Incapacitation: Fixed a typo in the incapacitation message.
+- Info: Fixed note on regen, which said it was per-hour. Also fixed the /newbie
+channel info.
+- Logins: No longer show slash-channel joins on logins.
+- Look at character: Long description now automatically has a color terminator.
+- Map PCs: Fixed a display error when two players from different empires are in
+a room together on the visible map; the wrong character in the <oo> was being
+colored for the second player.
+- Newbies: Added a mortlog indicating a player is new to the game.
+- No-Dismantle: Now appears on the 'look' display even when the location is not
+claimed.
+- Oasis: No longer shows 'fillin' on its command list.
+- Order: Fixed a misspelling of schizophrenia.
+- Pickpocket: Removed extra line break in two pickpocket messages.
+- Pour: Fixed a typo when the container is empty. Also fixed a case where the
+typed-in argument is used instead of the short description.
+- Prompt: Added the %r prompt code for immortals to see the template/sector
+vnum they are in. Added a trailing space to the default prompts. Removed a
+trailing space that was added to some, but not all generated prompts.
+- Public logins: Added a config option that changes the mortlogs on
+login/out/alternate into empire logs, allowing more privacy for logins and
+logouts. The "switch" message for alternate is only shown if both alts are in
+the same empire.
+- Rejuvenate: Fixed a typo in the to-character message.
+- Roster: Fixed a bug where the (online) tag was applied if the member's name
+is an abbreviation of someone who is online. Also loading live data for level
+and class where possible, rather than using outdated saved data.
+- Score: To-hit and dodge now include all available modifiers instead of only
+showing value from gear/affects. Now shows skill level in parentheses after the
+total level.
+- Score: Fixed the length of the bottom divider.
+- Show player: Now shows the host a user created from.
+- Show stats: Added account stats (total, active, this week) to show stats.
+- Socials: Worked on the custom color coding issue and cleaned up some color
+code sends, but there is still a bug where an extra line is added to
+sayhistory.
+- Stat character: Fixed a display bug where the wrong person's dexterity was
+subtracted from dodge rating. Now shows the host a user created from.
+- Stolen items: The tag (STOLEN) now appears next to stolen items in lists,
+until their stolen timer expires.
+- Summon Humans: Changed the order of error messages to make more sense.
+- Survey: Now indicates which island you are one.
+- Stroke: Fixed a $s that should have been $S in this social.
+- Weather: Typo fix.
+- Weave: Added missing linebreak when you don't know how to weave anything.
+- Who: When using the 'who' command with no visible players, an uninitialized
+string was displaying. Now shows max players today and max players this uptime.
+- Whole source update: Thing has been gracious enough to go through all of the
+help files, readmes, combat messages, and code. He has fixed a large number of
+typoes, some going back as far as the CircleMUD base.
+
+Empires:
+- Changeleader: New eedit option allows the current leader (or an immortal,
+administratively) to change the empire leader. The old leader keeps his/her
+rank but the new leader is always promoted to top rank.
+- Rogue: Players who perform hostile/stealth actions while not a member of any
+empire will now gain the 'rogue' flag. This flag is visible on the who list and
+lasts longer than 'hostile'. It is otherwise identical in function.
+- Ruined cities: Added an elog when a city is abandoned as ruins, due to having
+no non-ruined buildings inside of it.
+- Traits: Updated how empire trait changes log to the empire log.
+- War: It now costs coins to go to war with another empire, with the cost based
+on the difference in composite empire score, rising parabolically until it hits
+a score difference of 50. Minimum and maximum costs are set in configs
+war_cost_min and war_cost_max. Players can view the cost to go to war on the
+empire detail page.
+- Workforce: Added a maximum resource cap for workforce that is not
+island-dependent, but instead related to the number of players in the empire.
+
+Game Balance:
+- Blind/Darkness: Being unable to see your opponent no longer negates dodge and
+block. Instead, you now get a 33% block, dodge, and to-hit penalty when you
+cannot see your opponent.
+
+Help Files:
+- Ancient/Alchemist: Fixed a keyword issue between these two class help files.
+- Attributes: Added maximum level. Added help files for the bonus physical,
+magical, and healing attributes.
+- Barbarian: Corrected "Battle + Stealth" to "Battle + Survival"
+- Block: New help file for the block trait.
+- Blood: Removed an invalid # line that was blocking the blood points help
+file.
+- Boost: Mentioned the bonus boost at high levels.
+- Buildings: Added building costs to all building help files. Added notes to
+the help files of buildings that always count as in-city territory.
+- Catapult: Corrected help file.
+- Channels: Added notes on the default slash-channels.
+- CHAR-VAR: Removed outdated exp() variable.
+- Chop: Updated help file with info on how to chop faster.
+- Circle: Updated information.
+- Cities: Added information about city auto-abandonment to the city help.
+- City: Fixed bad color code.
+- Class: Fixed Smuggler class in main class help file.
+- Colors: Updated the keywords to include ampersand (&).
+- Command: Added a note on more powerful mobs.
+- Commerce: Updated building help files from the Commerce ability to show
+resource costs.
+- Cooking Fire: Improved the help file and gave it the FIRE keyword.
+- Crypt: Added to special rooms list for Great Hall and Portcullis.
+- Debuff types: Added notes to many abilities to indicate which debuff
+immunities affect them.
+- Demote/Promote: Changed the word 'level' to 'rank' in these helps.
+- Designate: Corrected 'storage' to 'store room'. Added castle annotation for
+crypt.
+- Devastation Ritual: Added better information on what happens to the
+resources, and added keywords.
+- dg_affect: Updated help file with more relevant examples.
+- Diplomacy: Removed outdated info from the help file.
+- Draw: Rewrote out-of-date help file.
+- Dodge: New help file for the dodge trait.
+- Eartharmor: Updated the help file with more information.
+- Excavate: Added info on desert trenches.
+- Guard Towers: Removed outdated information on forests, and cleaned up the
+last few paragraphs.
+- Guides: Added more references to the various help guides, from related help
+files.
+- Finesse: Added more info to help file.
+- Forge: Corrected item costs.
+- Forts: Removed several outdated reference to forts.
+- Great Monuments: Updated building icons.
+- Health, mana, and move: Updated the help files on these pools to give more,
+better information about how they grow over time.
+- Info: Added "consider" and "identify" to the info page.
+- Infra: Added a help file for the INFRA effect, which appears on items and
+spells.
+- Inspire: Clarified move cost.
+- Jewelry: Clarified costs.
+- Leatherworking: Fixed the name of the shoes craft.
+- Level controls: Fixed the #e level help file level control to mean 'gods'
+rather than 'approved players' and added #f for approved players. #e was
+already used on help files meant for gods and no help files are currently
+restricted to approved players.
+- Levels: Updated the skill level information. Removed conflicting keyword on
+HELP SKILL LEVELS.
+- Load: Corrected argument order on boat load help.
+- Maintain: Added decay notes.
+- Manashield: Updated info on things that modify the size of the effect.
+- Mine: Updated help file with more info.
+- Mkill: Fixed ambiguous help file.
+- Mob attacks: Added a proper list of mob attack types.
+- Mortlog: Fixed usage syntax.
+- Powerful staves: Removed outdated stats from help file.
+- Pyramid: Fixed color code and removed erroneous room count.
+- Quick Draw: Added more info to help file.
+- Regenerate: Fixed blood costs.
+- Resurrect: Removed conflicting information on corpses.
+- Ritual of Sense Life: Added missing alias to help file.
+- Ritual of Teleportation: Updated help file with a note saying you can't use
+it on claimed land that you don't have permission to use.
+- Rivergate: Clarified the behavior described.
+- Ruins: Added decay notes.
+- Scripting: Updated character variables with some missing options.
+- See also: Updated the see-also for some helps.
+- Shear: Corrected cooldown time and added 'shearing' keyword.
+- Show: Added usage notes and cleaned up help file.
+- Solar Power: Added a note about how it improves with level.
+- Spacing: Standardized the spacing on the usage/command lines of help files.
+- Statue: Fixed paste error in resource line.
+- Summon Humans: Added blood cost.
+- Summon Materials: Added text describing the vault restriction.
+- %teleport%: Removed 'portals' from the keyword list for this help.
+- Territory: Split the territory help file into two helps, as it had two
+concepts crammed into it. Also clarified the section about outside territory.
+- Tips: Added some new tips to the list.
+- To-Hit: New help file for the to-hit trait.
+- Toggles: Fixed a typo in the hassle section.
+- Tower of Sorcery: Added missing designate note for skybridges.
+- Trees: Added better notes on tree depletion and growth.
+- Triggers: Updated several help files that needed correct ampersand escaping.
+- Typoes: Fixed various typoes in help files.
+- Various: Typo fixes.
+- Wake: Added a note that it can be used to wake other players.
+- Wolf Form: Fixed a typo in the help file.
+
+Immortals:
+- Abuse: The immortal abuse log for dropping items for mortals now also
+mentions which mortal is present.
+- Create: Immortals can no longer use the god 'create' command for free unless
+they have the 'load' grant or are Co-Implementor level.
+- Drop: Added location to the drop abuse logs.
+- Editnotes: Now syslogs when an imm saves notes.
+- Eedit: Fixed a bug where imms with global eedit access were getting
+rank-checked against the empire they were trying to edit.
+- Empire detail: Immortals can now see the empire creation timestamp.
+- Forgive: New immortal command cures hostile flag, pvp cooldown, rogue flag,
+and defect timer.
+- Hostile: New immortal command marks a player as hostile.
+- Instances: Fixed a typo in the "instance nearby" immortal command.
+- Island: New immortal command lists and manages islands.
+- Restore: Immortal restore now correctly sets skill level.
+- Screenreader flag: Fixed a typo in the immortal stats display for
+screenreader, which marked it SRCNRDR.
+- Set skill: Now correctly clears abilities when the new skill is lower than
+the old skill, rather than higher.
+- Stat object: An object's look/action description now shows on the immortal
+'stat' command. Now shows interactions.
+- Stat room: Now shows island name.
+- Util clearroles: Added an immortal utility that clears all class roles and
+class abilities, to make it easier for players to get class updates.
+- Util islandsize: New immortal utility command that shows the tile counts of
+all islands.
+
+Items:
+- Applies: Fixed a bug where the MAX-MOVE apply was adding to the user's
+current move pool twice.
+- Arctic crafts: Added missing BOE flags on craftable arctic items.
+- Armbands of Power: Fixed typo in look description.
+- Armor: Updated virtually all armor items in the game with corrected stats
+based on the current armor paradigm. Lowered item scaling bonuses from armor
+types.
+- Autostore: Unique items left on the ground will now autostore to warehouse
+storage, if possible, rather than staying as clutter. Added a new !AUTOSTORE
+item flag that causes some items to be ignored by autostore. Applied this to
+furniture.
+- Auto-updates: Added a configurable option that will cause items in player
+inventory, empire inventory, room packs, and on the trading post to auto-update
+when loaded if the version is changed. Existing .obj files are
+backwards-compatible.
+- Barley: Can now be created by the gods.
+- Block: Altered the amount of BLOCK that appears on scaled items. This will
+allow for block on more items overall, instead of stacking high block values at
+low gear levels.
+- Blood: Drinking blood no longer makes you less hungry.
+- Bloodsword: Added a look description.
+- Bound items: When left on the ground outside a private house, bound items
+will now be destroyed after one week (real time). They will no longer preserve
+on the ground forever.
+- Cabin Tent: Fixed a typo in the building description.
+- can_wear_item: Fixed an off-by-one error where it was saying "You must be
+skill level 50 to use this" when <= 50.
+- Carts: Fixed a bug where a cart (or other pullable) could be teleported to
+the animal that was pulling it if they got separated.
+- City mob drops: Applied correct max levels on some items dropped by city
+mobs, so that players don't receive over-scaled versions of common items.
+- Cotton: Replaced the "coming soon" description.
+- Custom eat messages: Added support for custom strings on food items.
+- Decay: When an item decays while it contains coins and is in a player's
+inventory (or equipment), the coins will now process properly instead of going
+to the inventory as an item.
+- Dodge: Raised dodge scaling level on items slightly.
+- Dragon scale: Fixed a typo in the short description of the dragon scale item
+from the Red Dragon adventure.
+- Foods: Added about a dozen new food items and recipes from the builder port.
+Added kitchen and larder storage locations for foods that were missing them.
+- Iron Blades: Added iron versions of the shovel and hammer.
+- Flint stone: Updated the description to have the correct command for making
+the flint set.
+- Gear score: Adjusted the raw value of gear score on items across the board.
+This is a change to the reported gear level, not to scaled attribute values.
+- Grave marker: Added its impermanence to its look description. Fixed the build
+recipe, which required the wrong object.
+- Health: Raised max-health scaling on items slightly.
+- Intelligence potion: Fixed a typo in the long description.
+- Letheian icon: A new Master Pottery item that grants a skill reset.
+- Lightning staff: Fixed the "lighting" typo in three kill and miss messages.
+- Magic Frost damage: Fixed a typo where the 'magic frost' damage type's normal
+speed was 3.3, not 4.3 (its fast is 4.1 and slow is 4.5).
+- Nexus crystal: New item crafted from any of the four colored magical gems,
+using Portal Magic. This item is stored at portal buildings and is used to open
+portals.
+- Overburdened: Instead of automatically dropping items when overburdened,
+characters are now prevented from moving (simple move, enter, board,
+disembark). Removing equipment no longer drops it to the room if your inventory
+is full.
+- Pan: Added the TOOL-PAN obj flag and converted the panning system to use this
+flag instead of a vnum. Updated the stock pan.
+- Ram's shield: Corrected the look description, which appeared to have been
+copied from the kite shield.
+- Rocks: Corrected the list of functions in the look description.
+- Saddles: This gear slot no longer affects player's gear level.
+- Scaling: Added new HARD-DROP and GROUP-DROP flags which boost item scaling by
+1.2x and 1.4x, respectively (combined, 1.68x). These flags are set
+automatically when an item is dropped as loot by a hard/group mob. Also added
+GENERIC-DROP flag to block those other two flags on generic loot.
+- Sealskin: Removed the keyword 'large' because this item was conflicting with
+the regular large skin on both keywords.
+- Sealskin leggings: Updated the craft name to correctly match the item.
+- Sharp tools and hammers: Commands that require a sharp tool or hammer now
+check wield, hold, and both sheaths.
+- Shovel: Added the TOOL-SHOVEL obj flag and converted dig/excavate code to
+check for flag instead of vnum. Updated stock shovels.
+- Soak: Updated all items that gave Soak bonuses.
+- Splint Vambraces: Corrected a typo in the long description.
+- Stone hammer: Raised damage slightly, as it's a non-scalable item. Was
+incorrectly requiring Basic Crafts. Also fixed a bug where it scaled too high
+(it should not have been scaling).
+- Stake: Now storable in the utility shed again.
+- Trinkets: Now require that you be standing, not sleeping.
+- Uncollected loot: Added a new object flag that will cause loot from dead
+creatures to decay even on claimed land, if it is never picked up by a player.
+- Wear cascade: Added wear location cascade data to the wear_data array and
+converted the wear code to use it.
+- Wheat: Fixed the line that said it could be milled into "flower".
+- Wolverine fur cap: Now correctly scales.
+
+Major bugs:
+- Alternate: Was not checking the account ID correctly on characters not on any
+account. You can no longer alternate while editing text.
+- Build: Barriers were counting as open spaces for building entrances.
+- Burning: Buildings with players inside when they burned down were triggered
+infinite loops due to late extraction.
+- Chant of Druids: Noskilling Natural Magic will now block this chant from
+rewarding skill.
+- City Found: Stopped several chore actions in the room when a city is founded,
+as this may be the source of actions processing on rooms that don't have valid
+results for them.
+- Class abilities: Changed how class abilities are applied and removed so that
+players do not end up with an outdated set of class abilities, or a class
+ability that should have been removed.
+- Coins: Fixed a crash bug when the game attempts to charge misc coins to a
+player who only has empire coins.
+- Distrust from stealth/hostility: Fixed an issue where an empire could become
+distrustful with itself, although this had no real meaning.
+- Divide by zero: Fixed several places where health/move/mana having a max of 0
+would trigger a divide-by-zero segfault.
+- Docks: Fixed a bug where players without swim could not enter an unfinished
+Docks (or other land-based water building).
+- Earthmeld: Some parts of a character were visible in the room when using a
+no-see-in-room effect like Earthmeld, due to an improperly placed return.
+- Editnotes: Fixed a crash bug in aborting editnotes.
+- empty_obj_before_extract: Fixed a bug where a carried item that was emptied
+(e.g. by Butcher) called the wrong property and triggered a full crash.
+- Follower limits: Players were able to override the NPC follower limit in
+several ways. NPCs over the limit will now attack their master.
+- Hammers: Fixed a crash bug in the b1.8 hammer change.
+- Heal-per-5: Moved the code to the correct place after affect wear-off to
+prevent a bonus tick on this affect.
+- Health, Move, Mana: Fixed an issue where people able to class below skill
+level 75 were seeing huge health/move/mana pools until 75, then dropping back
+to 50/100/50.
+- Helpsearch: Fixed an overflow issue that really easily crashed the game.
+- History: Fixed a crash bug triggered by specific items in the history. Also
+fixed its CRLF detection.
+- Homes: Deleting a character who had a private home no longer results in a
+permanently claimed home marked "someone".
+- Infiltrate: Fixed a bug where some players could avoid the members-online and
+other stealth checks.
+- Interactions: Fixed a bug in b1.8 where non-exclusive interactions were being
+treated as mutually exclusive.
+- Interactions: Room interactions were always running on the room the character
+is in, which was causing a bug in using Devastation Ritual to harvest crops.
+- Mob tagging: Fixed a bug where logging off at the right time could result in
+untagging a mob.
+- Names: Fixed the name validator, which was incorrectly checking for invalid
+names.
+- Nameserver lookups: Added an option to disable hostname lookups on a per-IP
+basis in order to prevent the need to turn off hostname lookup due to one slow
+nameserver lagging out the mud.
+- Ocean pool: Removed the ocean pool system entirely. It was the cause of a
+memory leak which is easily fixed, but that also means the mud has been running
+well without the ocean pool functioning.
+- OLC: Fixed an issue where low-level immortals trying to edit adventures in a
+particular way would cause a full crash.
+- Permissions: Fixed a bug where allies could sometimes qualify for
+members-only permissions.
+- Room templates: Fixed a crash bug caused by null room template descriptions.
+- Scripting: Noskill will now block scripts from granting skill gains or
+setting skill higher.
+- Scripting: Raised the size of the ID space for mobs and rooms in the
+scripting system by 10x in order to delay the major fallout that occurs when
+they run out of IDs. This will need a larger fix, but on the beta server at
+least, 1m IDs took 2-3 days to run out, so 10m should be good for over a week
+even on a busy game.
+- Slash-channels: Prevented non-alphanumeric and unprintable characters from
+being used in slash-channel names.
+- Steal: Fixed a bug where some players could avoid the members-online and
+other stealth checks.
+- Study: Noskilling High Sorcery will now block study from rewarding skill.
+- Trade: Fixed a bug where the cancel and check 'trade' subcommands could cause
+a crash in the event that there is a purchased-but-uncollected item in the
+list.
+- Workforce: Finishing chopping, mining, building, or dismantling for a
+workforce mob will no longer block it from despawning.
+
+Miscellaneous:
+- Shutdowns: The SIGHUP, SIGINT, and SIGTERM signals now trigger a graceful
+shutdown instead of a rapid exit.
+- Socials: Large number of text fixes in socials, mostly from Steel.
+
+Mobs:
+- Aggressive: Mobs flagged AGGRO will now correctly attack citizens (and, in
+fact, will attack any human NPC that isn't also aggressive).
+- Aquatic: Mobs with the aquatic flag can no longer move on land (unless they
+are flying).
+- Auto-herd: Mobs who are tied up or incapacitated will no longer auto-herd.
+- Autokill: Mobs flagged HARD or GROUP will now autokill (animals usually
+don't).
+- Blood: Very low-level mobs now have much lower blood pools.
+- Bodyguard: Added infravision so bodyguards can assist in dark rooms.
+- Charm: Players may no longer give items to charmed NPCs. Charmed mobs can no
+longer pick up items.
+- Chimpanzees: Are no longer flagged as HUMAN.
+- Critters: Added despawn triggers to tiny critters like mice and spiders.
+- Emperor of Penguins: Corrected this mob's gender.
+- Fin Whale: Corrected typo in long description.
+- Gorillas: Are no longer flagged as HUMAN.
+- Ground squirrel: Removed hyphen in name.
+- Harnessed animals: Fixed a bug where it was possible to move a two-animal
+cart while the second animal is in combat; the animal would break combat and
+move.
+- Loot: Fixed the 'exclusive' interaction flag for loot, which was ignoring it.
+- !LOOT flag: This flag now also blocks pickpocket.
+- !NPC building flag: This flag no longer functions if the building is
+incomplete.
+- Scaling: Raised scaled attributes, damage, and health on high-level mobs in
+general. Raised to-hit on DPS mobs and dodge on tank mobs. Lowered mob dodge
+overall.
+- Summoned mobs: No longer able to drop any loot.
+- Tagging: Group members who aren't present will no longer automatically tag a
+mob. This prevents items from binding to group members who aren't present in
+order to bypass the BoP system.
+- Wolf: Fixed a typo in the wolf's environmental trigger.
+- Workforce: Fixed an issue where the brickmaking chore might spawn a mob when
+there is no work to do, in rare cases.
+
+New configs:
+- auto_update_items 1
+- bound_item_junk_time  10080
+- long_autostore: Reduced default to 720 minutes, from 3 days.
+- max_chore_resource_over_total 25
+- newbie_island_day_limit 7
+- npc_follower_limit 6
+- num_duplicates_in_stable 2
+- public_logins 0
+- rogue_flag_time 1440
+- summon_npc_limit 5
+- war_cost_max 50000
+- war_cost_min 5000
+
+OLC:
+- Exits: Added a 'change' option for the room template exit editor.
+- Interactions: Added a 'change' option for the interaction interface. Fixed a
+display bug in adding interactions.
+- .map terrain: Removed the extra comma at the start of the terrain list.
+- Objects: Fixed a bug in the object auditor where poisons were dropping
+through to book audits.
+- .removeindev: Added a new OLC command that removes all in-development flags
+from a zone or vnum range.
+- Resources: Added a 'change' option for the resource list in the craft editor.
+- Room template spawns: Added a 'change' option.
+- Storage: Object storage locations will now preserve their list order when
+opening an object editor. They were inverting the order each time, causing
+meaningless changes to the files.
+
+Optimization:
+- Instancer: Adjusted the limits on the instancing code in order to prevent
+crippling lag.
+- Room saving: Skip island lookup on boat rooms, which do not require an island
+id anyway.
+
+PHP:
+- map-viewer.php: Added 'p' and 'g' shortcut keys to the map viewer page, for
+toggling political mode and the grid.
+
+Players:
+- Deficits: Added a deficit system for health, mana, and move. This prevents
+them from going negative and the deficit will decay as the player regenerates
+normally. If they re-equip items while the deficit is present, they will not
+get the full boost to their current h/v/m. However, this feature is disabled in
+2.0b2 for further testing and fixes with morphed players.
+- Health, Move, Mana: Adjusted the way these traits rise with level so that
+players start gaining them as soon as they pass skill level 75, with a class.
+Previously, they might take several levels more to start rising.
+- Promo codes: New characters are now prompted for promo codes when they
+create, to help track ads and traffic sources.
+- Skill level: Replaced the skill level computation completely. Players are now
+considered skill level 100 when they have two level-100 skills and one level-75
+skill. All lower levels are now based on percentage of progress to that.
+
+Scripting:
+- Blood: Added %actor.blood()% which returns current blood or adds/removes
+blood.
+- Character variables: Added is_god and is_immortal.
+- Color codes: Fixed an issue where color codes starting with ampersands were
+getting eaten by the script parser.
+- Counterspell: Added %actor.trigger_counterspell%.
+- Damage: Raised scripting damage.
+- Leave-All: Added a new mob trigger type that ignores inability to see the
+player.
+- %load%: Added the instance_obj_setup step to the %load% command to ensure
+portals loaded by scripts get the correct target.
+- Messages: Script messages will no longer be sent to sleeping players.
+- Poisons: Added %actor.resist_poison% and %actor.poison_immunity% getters.
+- Position: Added %actor.position% getter for character position.
+- Resources: Added a 'change' option for the resource list in the craft editor.
+- Room template spawns: Added a 'change' option.
+- Rooms: Added a room template vnum getter, %room.template%.
+- Skill names: Added %skill.name()% to get the full name of an abbreviated
+skill.
+- Skill resets: Added %actor.give_skill_reset()% function.
+- Skill validation: Added %skill.validate()% for verifying user input.
+- Text parsing: Fixed an issue where some scripts could miss text parsing and
+be unable to use the %str.car% and %str.cdr% in some cases.
+
+== end of 2.0 b2 ==

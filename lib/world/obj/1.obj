@@ -2,8 +2,9 @@
 rock~
 a rock~
 A rock is lying on the ground.~
-   Rocks can be used as hammers, to chip other rocks, for building, to lay
-roads, or as catapult shot.
+   Rocks can be used as a primite weapon, used to chip other rocks, used as a
+crafting component, or as catapult shot. They are also used to lay roads and
+build some buildings.  
 ~
 1 il ano
 0 2 5
@@ -27,7 +28,7 @@ S
 flint stone~
 a flint stone~
 A piece of flint is lying on the ground.~
-You can attach flint to a rock and get a flint set for lighting torches.
+You can craft a flint set and use that to light torches.
 ~
 1 il ano
 0 1 5
@@ -156,7 +157,7 @@ S
 wheat bundle~
 a bundle of wheat~
 A bundle of wheat has been left on the ground.~
-Wheat can be milled into flower, or planted.
+Wheat can be milled into flour, or planted.
 ~
 3 bl a
 0 1 0
@@ -186,7 +187,7 @@ S
 cotton basket~
 a basket of cotton~
 A basket of cotton has been left here.~
-A use for cotton is coming soon...
+Weave cotton into cloth.
 ~
 3 bl a
 0 4 0
@@ -200,7 +201,7 @@ a sack of barley~
 A sack of barley is sitting here.~
 Barley can be made into ale at the tavern.
 ~
-3 b a
+3 bl a
 0 5 0
 7 168
 M

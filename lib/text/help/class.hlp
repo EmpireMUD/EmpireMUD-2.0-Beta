@@ -39,7 +39,7 @@ Stealth: Assassin (Battle), Powerbroker (Empire), Occultist (High Sorcery),
         Shadow Wolf (Natural Magic), Bandit (Survival), Smuggler (Trade),
         Shade (Vampire)
 Survival: Barbarian (Battle), Elder (Empire), Theurge (High Sorcery),
-        Feral (Natural Magic), Smuggler (Stealth), Tinker (Trade),
+        Feral (Natural Magic), Bandit (Stealth), Tinker (Trade),
         Wight (Vampire)
 Trade: Steelsmith (Battle), Guildsman (Empire), Artificer (High Sorcery),
         Alchemist (Natural Magic), Smuggler (Stealth), Tinker (Survival),
@@ -50,7 +50,7 @@ Vampire: Reaper (Battle), Ancient (Empire), Lich (High Sorcery), Necromancer
 ARCHETYPES "STARTING ARCHETYPES" "STARTING CLASS"
 
 All player characters start with some gear, low attributes, and 30 skill
-points. One attribute will be 3, one will be 1, and the rest all 2s. Starting
+points. One attribute will be 3, two will be 1, and the rest all 2s. Starting
 archetype does not limit your skills or class choices in any way.
 
 The available archetypes are:
@@ -64,23 +64,23 @@ The available archetypes are:
  Novice Sorcerer - master the rituals (High Sorcery, Battle, Intelligence)
  Lone Vampire - empowered by blood (Vampire, Battle, Wits)
 #
-"ALCHEMIST CLASS"
+"ALCHEMIST CLASS" ALCHEMIST
 
 Alchemist
 Natural Magic + Trade
 
-Healer: Resurrect
+Healer: Fastcasting, Resurrect
 
 Note: Class abilities are unfinished.
 
 See also: CLASS
 #
-"ANCIENT CLASS"
+"ANCIENT CLASS" ANCIENT
 
 Ancient
 Vampire + Empire
 
-No class abilities assigned.
+Melee: Dragonriding
 
 Note: Class abilities are unfinished.
 
@@ -103,7 +103,7 @@ Archmage
 High Sorcery + Natural Magic
 
 Caster: Resurrect
-Healer: Resurrect
+Healer: Fastcasting, Resurrect
 
 Note: Class abilities are unfinished.
 
@@ -125,7 +125,7 @@ See also: CLASS
 Assassin
 Battle + Stealth
 
-Melee: Dual-Wield
+Melee: Dual-Wield, Shadow Kick
 
 Note: Class abilities are unfinished.
 
@@ -136,7 +136,7 @@ See also: CLASS
 Bandit
 Stealth + Survival
 
-Melee: Dual-Wield
+Melee: Crucial Jab, Dual-Wield
 
 Note: Class abilities are unfinished.
 
@@ -145,8 +145,9 @@ See also: CLASS
 "BARBARIAN CLASS"
 
 Barbarian
-Battle + Stealth
+Battle + Survival
 
+Tank: Ward Against Magic
 Melee: Two-Handed Weapons
 
 Note: Class abilities are unfinished.
@@ -164,25 +165,34 @@ Note: Class abilities are unfinished.
 
 See also: CLASS
 #
-CASTER "CASTER ROLE" "MAGIC DPS" "CASTER DPS"
+CASTER "CASTER ROLE" "MAGIC DPS" "CASTER DPS" "CASTER TRAITS"
 
 The caster role, a type of DPS (damage-per-second) role, is meant to deal as
 much magical damage as possible. This role needs Dexterity/To-Hit, Wits, and
 Intelligence. The caster should never be taking direct damage from mobs in
-combat.
+combat. When choosing gear, potions, and buffs for your caster character, focus
+on the caster traits below. Other traits don't contribute to caster DPS.
 
 Caster tips:
  - Let the tank start the fight.
  - Tell the healer if you need healing -- he may be focused on the tank.
 
-See also: HEALER, MELEE, TANK
+Caster traits:
+ - Intelligence: Increases the power of your damage spells and many others.
+ - Dexterity: Counteracts your target's Dexterity and boosts your hit chance.
+ - To-Hit: You need to be as close to the hit cap for your level as possible.
+ - Wits: Increases the speed of your attacks and boosts the damage you deal.
+ - Bonus-Magical: Any spare points can go here to boost your magical damage.
+
+See also: HEALER, HIT CAP, MELEE, TANK
 #
 "DUKE CLASS"
 
 Duke
 Battle + Empire
 
-Melee: Two-Handed Weapons
+Tank: Dragonriding, Noble Bearing
+Melee: Dragonriding, Two-Handed Weapons
 
 Note: Class abilities are unfinished.
 
@@ -193,7 +203,7 @@ See also: CLASS
 Elder
 Empire + Survival
 
-No class abilities assigned.
+Melee: Dragonriding
 
 Note: Class abilities are unfinished.
 
@@ -204,7 +214,7 @@ See also: CLASS
 Exarch
 Empire + High Sorcery
 
-No class abilities assigned.
+Caster: Dragonriding
 
 Note: Class abilities are unfinished.
 
@@ -216,7 +226,7 @@ Feral
 Natural Magic + Survival
 
 Tank: Resurrect, Towering Werewolf Form
-Healer: Resurrect, Sage Werewolf Form
+Healer: Fastcasting, Resurrect, Sage Werewolf Form
 
 Note: Class abilities are unfinished.
 
@@ -227,23 +237,32 @@ See also: CLASS
 Guildsman
 Empire + Trade
 
-No class abilities assigned.
+Melee: Dragonriding
 
 Note: Class abilities are unfinished.
 
 See also: CLASS
 #
-HEALER HEALING "HEALER ROLE" "HEALING ROLE"
+HEALER HEALING "HEALER ROLE" "HEALING ROLE" "HEALER TRAITS" "HEALING TRAITS"
 
 The healer is the group member who keeps the others alive. Healers focus on
 Intelligence only, as the other attributes are generally related to dealing
-damage or taking damage.
+damage or taking damage. When choosing gear, potions, and buffs for your healer
+character, focus on the healer traits below. Other traits don't contribute to
+healing.
 
 Healer tips:
  - Put the tank's health in your prompt with %f/%F.
  - If you don't have mana to waste, don't try to contribute to combat damage
    with spells.
  - Use 'summary' to see everyone's health.
+ 
+Healer traits:
+ - Intelligence: Increases the power of many spells.
+ - Mana-Regen: Ensures you have enough mana to keep the group alive.
+ - Wits: Allows you to cast faster with Fastcasting.
+ - Bonus-Healing: Raises the size of your heals without raising the cost.
+ - Misc*: Each healer class has a unique trait requirement.
 
 See also: CASTER, MELEE, TANK
 #
@@ -263,24 +282,36 @@ See also: CLASS
 Luminary
 Empire + Natural Magic
 
-Caster: Resurrect
-Healer: Resurrect
+Caster: Dragonriding, Resurrect
+Healer: Ancestral Healing, Dragonriding, Fastcasting, Resurrect
+
+Luminary Healers gain additional healing power from Greatness and should build
+their Greatness in addition to the 4 healer traits.
 
 Note: Class abilities are unfinished.
 
 See also: CLASS
 #
-MELEE "MELEE ROLE" "DPS ROLE" "MELEE DPS ROLE"
+MELEE "MELEE ROLE" "DPS ROLE" "MELEE DPS ROLE" "MELEE TRAITS"
 
 The melee role, also called physical DPS (damage-per-second), deals much of
 the combat damage (along with casters). This role requires Dexterity/To-Hit,
-Wits, and Strength. The melee role should avoid taking damage in combat.
+Wits, and Strength. The melee role should avoid taking damage in combat. When
+choosing gear, potions, and buffs for your melee character, focus on the
+melee traits below. Other traits don't contribute to melee DPS.
 
 Melee tips:
  - Let the tank start the fight.
  - Tell the healer if you need healing -- he may be focused on the tank.
 
-See also: CASTER, HEALER, TANK
+Melee traits:
+ - Strength: Increases the damage you deal.
+ - Dexterity: Counteracts your target's Dexterity and boosts your hit chance.
+ - To-Hit: You need to be as close to the hit cap for your level as possible.
+ - Wits: Increases your combat speed and raises the damage you deal.
+ - Bonus-Physical: Any spare points should go here to raise damage.
+
+See also: CASTER, HEALER, HIT CAP, TANK
 #
 "NECROMANCER CLASS"
 
@@ -288,6 +319,7 @@ Necromancer
 Natural Magic + Vampire
 
 Caster: Dread Blood Form, Resurrect
+Healer: Fastcasting, Resurrect
 
 Note: Class abilities are unfinished.
 
@@ -298,7 +330,7 @@ See also: CLASS
 Occultist
 High Sorcery + Stealth
 
-No class abilities assigned.
+Melee: Shadowcage
 
 Note: Class abilities are unfinished.
 
@@ -309,7 +341,7 @@ See also: CLASS
 Powerbroker
 Empire + Stealth
 
-No class abilities assigned.
+Melee: Dragonriding, Stagger Jab
 
 Note: Class abilities are unfinished.
 
@@ -320,7 +352,7 @@ See also: CLASS
 Reaper
 Battle + Vampire
 
-Tank: Blood Fortitude
+Tank: Blood Fortitude, Bloodsweat, Ward Against Magic
 Melee: Horrid Form
 
 Note: Class abilities are unfinished.
@@ -332,7 +364,7 @@ See also: CLASS
 Shade
 Stealth + Vampire
 
-Melee: Horrid Form
+Melee: Horrid Form, Shadow Jab
 
 Note: Class abilities are unfinished.
 
@@ -343,8 +375,8 @@ See also: CLASS
 Shadow Wolf
 Natural Magic + Stealth
 
-Melee: Moonrise, Savage Werewolf Form
-Healer: Moonrise, Sage Werewolf Form
+Melee: Howl, Moonrise, Savage Werewolf Form
+Healer: Fastcasting, Moonrise, Sage Werewolf Form
 
 Note: Class abilities are unfinished.
 
@@ -355,7 +387,7 @@ See also: CLASS
 Smuggler
 Stealth + Trade
 
-Melee: Dual-Wield
+Melee: Diversion, Dual-Wield
 
 Note: Class abilities are unfinished.
 
@@ -372,11 +404,13 @@ Note: Class abilities are unfinished.
 
 See also: CLASS
 #
-TANK "TANK ROLE"
+TANK TANKING "TANK ROLE" "TANKING ROLE" "TANK TRAITS" "TANKING ROLE"
 
 The tank is the group member who takes damage from the enemy. A good tank has
-high hitpoints and damage mitigation (like soak and dodge). Tanks don't need
-Strength or Wits, because those are related to dealing damage.
+high hitpoints and damage mitigation (like resistance and dodge). Tanks don't
+need Strength or Wits, because those are related to dealing damage. When
+choosing gear, potions, and buffs for your tank character, you only need to
+worry about the tank traits listed below
 
 Tanking tips:
  - The tank should start combat with all mobs so they are hitting him, rather
@@ -384,7 +418,15 @@ Tanking tips:
  - The tank should use abilities like Rescue to ensure "squishy" roles like the
    healer are not taking damage.
 
-See also: CASTER, HEALER, MELEE
+Tank traits:
+ - Dexterity: Contributes to Dodge and counteracts the attacker's Dexterity.
+ - Dodge: You should be as close to the dodge cap for your level as possible.
+ - Block: You should be as close to the block cap for your level as possible,
+      and using a shield.
+ - Resist-Magical: Any spare points can go into resistances.
+ - Resist-Physical: Any spare points can go into resistances.
+
+See also: CASTER, DODGE CAP, HEALER, MELEE
 #
 "THEURGE CLASS"
 
@@ -415,7 +457,10 @@ Battle + Natural Magic
 
 Tank: Resurrect, Towering Werewolf Form
 Melee: Resurrect, Savage Werewolf Form
-Healer: Resurrect, Sage Werewolf Form
+Healer: Confer, Fastcasting, Resurrect, Sage Werewolf Form
+
+Healer Werewolves can convert Strength into buffs for themselves and their
+allies, and should build their Strength in addition to the 4 healer traits.
 
 Note: Class abilities are unfinished.
 

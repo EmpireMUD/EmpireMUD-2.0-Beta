@@ -29,7 +29,7 @@ if ((%time.hour% < 7) && (%time.hour% > 19))
   end
 else
   if (%self.name% == a snarling wolf)
-    %echo% %self.name% looks directly at you, opens mouth to show %self.hisher% fangs, and growls deep in %self.hisher% chest as %self.hisher% hackles stand on end...
+    %echo% %self.name% looks directly at you, opens %self.hisher% mouth to show %self.hisher% fangs, and growls deep in %self.hisher% chest as %self.hisher% hackles stand on end...
   else
     switch (%random.4%)
       case 1

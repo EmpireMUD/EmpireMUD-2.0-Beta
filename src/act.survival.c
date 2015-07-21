@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.survival.c                                  EmpireMUD 2.0b1 *
+*   File: act.survival.c                                  EmpireMUD 2.0b2 *
 *  Usage: code related to the Survival skill and its abilities            *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -29,7 +29,6 @@
 */
 
 // external vars
-extern const int universal_wait;
 
 // external funcs
 void scale_item_to_level(obj_data *obj, int level);
@@ -59,11 +58,14 @@ INTERACTION_FUNC(butcher_interact) {
 		if (interaction->quantity != 1) {
 			sprintf(buf, "You skillfully butcher $p (x%d) from the corpse!", interaction->quantity);
 			act(buf, FALSE, ch, fillet, NULL, TO_CHAR);
+			
+			sprintf(buf, "$n butchers a corpse and gets $p (x%d).", interaction->quantity);
+			act(buf, FALSE, ch, fillet, NULL, TO_ROOM);
 		}
 		else {
 			act("You skillfully butcher $p from the corpse!", FALSE, ch, fillet, NULL, TO_CHAR);
+			act("$n butchers a corpse and gets $p.", FALSE, ch, fillet, NULL, TO_ROOM);
 		}
-		act("$n butchers a corpse!", FALSE, ch, NULL, NULL, TO_ROOM);
 		return TRUE;
 	}
 
@@ -138,7 +140,6 @@ ACMD(do_butcher) {
 	
 	char_data *proto;
 	obj_data *corpse;
-	bool junk;
 	
 	one_argument(argument, arg);
 
@@ -175,7 +176,7 @@ ACMD(do_butcher) {
 		return;
 	}
 	else {
-		if (run_interactions(ch, proto->interactions, INTERACT_BUTCHER, IN_ROOM(ch), NULL, corpse, butcher_interact, &junk)) {
+		if (run_interactions(ch, proto->interactions, INTERACT_BUTCHER, IN_ROOM(ch), NULL, corpse, butcher_interact)) {
 			// success
 		}
 		else {
@@ -185,7 +186,7 @@ ACMD(do_butcher) {
 		
 		empty_obj_before_extract(corpse);
 		extract_obj(corpse);
-		charge_ability_cost(ch, NOTHING, 0, NOTHING, 0);
+		charge_ability_cost(ch, NOTHING, 0, NOTHING, 0, WAIT_ABILITY);
 		gain_ability_exp(ch, ABIL_BUTCHER, 15);
 	}
 }
@@ -241,7 +242,7 @@ ACMD(do_fish) {
 	else {
 		start_action(ch, ACT_FISHING, fishing_timer / (skill_check(ch, ABIL_FISH, DIFF_EASY) ? 2 : 1), 0);
 		
-		msg_to_char(ch, "You begin looking for fish..\r\n");
+		msg_to_char(ch, "You begin looking for fish...\r\n");
 		act("$n begins looking for fish.", TRUE, ch, 0, 0, TO_ROOM);
 	}
 }
@@ -249,7 +250,6 @@ ACMD(do_fish) {
 
 ACMD(do_forage) {
 	int cost = 1;
-	bool junk;
 	
 	int short_depletion = config_get_int("short_depletion");
 	
@@ -271,9 +271,9 @@ ACMD(do_forage) {
 		return;
 	}
 
-	if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_FORAGE, do_one_forage, &junk)) {
+	if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_FORAGE, do_one_forage)) {
 		// success
-		charge_ability_cost(ch, MOVE, cost, NOTHING, 0);
+		charge_ability_cost(ch, MOVE, cost, NOTHING, 0, WAIT_ABILITY);
 		gain_ability_exp(ch, ABIL_FORAGE, 15);
 	}
 	else {
@@ -323,8 +323,13 @@ ACMD(do_mount) {
 	else if (mob && !MOB_FLAGGED(mob, MOB_MOUNTABLE) && !IS_IMMORTAL(ch)) {
 		act("You can't ride $N!", FALSE, ch, 0, mob, TO_CHAR);
 	}
-	else if (mob && AFF_FLAGGED(mob, AFF_FLY) && !HAS_ABILITY(ch, ABIL_ALL_TERRAIN_RIDING)) {
-		act("You need All-Terrain Riding to ride $N!", FALSE, ch, 0, mob, TO_CHAR);
+	else if (((mob && AFF_FLAGGED(mob, AFF_FLY)) || (!mob && MOUNT_FLAGGED(ch, MOUNT_FLYING))) && !CAN_RIDE_FLYING_MOUNT(ch)) {
+		if (mob) {
+			act("You don't have the correct ability to ride $N! (see HELP RIDE)", FALSE, ch, 0, mob, TO_CHAR);
+		}
+		else {
+			msg_to_char(ch, "You don't have the correct ability to ride %s! (see HELP RIDE)\r\n", get_mob_name_by_proto(GET_MOUNT_VNUM(ch)));
+		}
 	}
 	else if (mob && (mob->desc || (GET_PC_NAME(mob) && (proto = mob_proto(GET_MOB_VNUM(mob))) && GET_PC_NAME(mob) != GET_PC_NAME(proto)))) {
 		act("You can't ride $N!", FALSE, ch, 0, mob, TO_CHAR);
@@ -390,14 +395,12 @@ ACMD(do_mount) {
 		
 		// hard work! this will un-load the mob
 		perform_mount(ch, mob);
-		WAIT_STATE(ch, universal_wait);
+		command_lag(ch, WAIT_OTHER);
 	}
 }
 
 
-ACMD(do_nightsight) {
-	extern const int universal_wait;
-	
+ACMD(do_nightsight) {	
 	struct affected_type *af;
 	
 	if (affected_by_spell(ch, ATYPE_NIGHTSIGHT)) {
@@ -417,7 +420,8 @@ ACMD(do_nightsight) {
 		af = create_flag_aff(ATYPE_NIGHTSIGHT, UNLIMITED, AFF_INFRAVISION);
 		affect_join(ch, af, 0);
 	}
-	WAIT_STATE(ch, universal_wait);
+
+	command_lag(ch, WAIT_ABILITY);
 }
 
 
@@ -463,6 +467,6 @@ ACMD(do_track) {
 	else {
 		msg_to_char(ch, "You can't seem to find a trail.\r\n");
 	}
-
-	WAIT_STATE(ch, universal_wait);
+	
+	command_lag(ch, WAIT_ABILITY);
 }

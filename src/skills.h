@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: skills.h                                        EmpireMUD 2.0b1 *
+*   File: skills.h                                        EmpireMUD 2.0b2 *
 *  Usage: header file for classes, skills, and combat                     *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -49,7 +49,7 @@
 // protos
 void adjust_abilities_to_empire(char_data *ch, empire_data *emp, bool add);
 extern bool can_use_ability(char_data *ch, int ability, int cost_pool, int cost_amount, int cooldown_type);
-void charge_ability_cost(char_data *ch, int cost_pool, int cost_amount, int cooldown_type, int cooldown_time);
+void charge_ability_cost(char_data *ch, int cost_pool, int cost_amount, int cooldown_type, int cooldown_time, int wait_type);
 void gain_ability_exp(char_data *ch, int ability, double amount);
 extern bool gain_skill(char_data *ch, int skill, int amount);
 extern bool gain_skill_exp(char_data *ch, int skill, double amount);
@@ -215,7 +215,7 @@ extern bool skill_check(char_data *ch, int ability, int difficulty);
 #define ABIL_QUICK_BLOCK  86
 #define ABIL_REFORGE  87
 #define ABIL_BLOCK_ARROWS  88
-#define ABIL_LEATHER_ARMOR  89
+#define ABIL_LIGHT_ARMOR  89
 #define ABIL_MEDIUM_ARMOR  90
 #define ABIL_HEAVY_ARMOR  91
 #define ABIL_ENDURANCE  92
@@ -226,7 +226,7 @@ extern bool skill_check(char_data *ch, int ability, int difficulty);
 #define ABIL_BASH  97
 #define ABIL_CUT_DEEP  98
 #define ABIL_BIG_GAME_HUNTER  99
-#define ABIL_CLOTH_ARMOR  100
+#define ABIL_MAGE_ARMOR  100
 #define ABIL_ARCHERY  101
 #define ABIL_QUICK_DRAW  102
 #define ABIL_FIRSTAID  103
@@ -329,7 +329,7 @@ extern bool skill_check(char_data *ch, int ability, int difficulty);
 #define ABIL_HERB_GARDENS  200
 #define ABIL_SKILLED_LABOR  201
 #define ABIL_FINE_POTTERY  202
-#define ABIL_MASTER_POTTER  203
+#define ABIL_MASTER_CRAFTSMAN  203
 #define ABIL_MASTER_FARMER  204
 #define ABIL_MASTER_SURVIVALIST  205
 #define ABIL_TUNNEL  206
@@ -353,8 +353,22 @@ extern bool skill_check(char_data *ch, int ability, int difficulty);
 #define ABIL_MAGIC_ATTIRE  224
 #define ABIL_PREDATOR_VISION  225
 #define ABIL_SANGUINE_RESTORATION  226
+#define ABIL_WARD_AGAINST_MAGIC  227
+#define ABIL_NOBLE_BEARING  228
+#define ABIL_BLOODSWEAT  229
+#define ABIL_DRAGONRIDING  230
+#define ABIL_SHADOW_KICK  231
+#define ABIL_STAGGER_JAB  232
+#define ABIL_SHADOWCAGE  233
+#define ABIL_HOWL  234
+#define ABIL_CRUCIAL_JAB  235
+#define ABIL_DIVERSION  236
+#define ABIL_SHADOW_JAB  237
+#define ABIL_FASTCASTING  238
+#define ABIL_ANCESTRAL_HEALING  239
+#define ABIL_CONFER  240
 
-#define NUM_ABILITIES  227		// must be <= MAX_ABILITIES (structs.h)
+#define NUM_ABILITIES  241		// must be <= MAX_ABILITIES (400; structs.h)
 
 
 // cooldowns -- see COOLDOWN_x in constants.c
@@ -405,6 +419,12 @@ extern bool skill_check(char_data *ch, int ability, int difficulty);
 #define COOLDOWN_MOONRISE  44
 #define COOLDOWN_ALTERNATE  45
 #define COOLDOWN_DISPEL  46
+#define COOLDOWN_BLOODSWEAT  47
+#define COOLDOWN_EARTHMELD  48
+#define COOLDOWN_SHADOWCAGE  49
+#define COOLDOWN_HOWL  50
+#define COOLDOWN_DIVERSION  51
+#define COOLDOWN_ROGUE_FLAG  52
 
 
 /* WEAPON ATTACK TYPES */
@@ -486,7 +506,7 @@ extern bool skill_check(char_data *ch, int ability, int difficulty);
 #define ATYPE_EARTHMELD  10
 #define ATYPE_MUMMIFY  11
 #define ATYPE_EARTHARMOR  12
-#define ATYPE_BESTOW_VIGOR  13
+#define ATYPE_BESTOW_VIGOR  13	// NOTE: not used
 #define ATYPE_WEAKEN  14
 #define ATYPE_COLORBURST  15
 #define ATYPE_HEARTSTOP  16
@@ -526,12 +546,22 @@ extern bool skill_check(char_data *ch, int ability, int difficulty);
 #define ATYPE_STUN_IMMUNITY  50
 #define ATYPE_WAR_DELAY  51
 #define ATYPE_UNBURDENED  52
-#define NUM_ATYPES  53	// total number, for bounds checking
+#define ATYPE_SHADOW_KICK  53
+#define ATYPE_STAGGER_JAB  54
+#define ATYPE_SHADOWCAGE  55
+#define ATYPE_HOWL  56
+#define ATYPE_CRUCIAL_JAB  57
+#define ATYPE_DIVERSION  58
+#define ATYPE_SHADOW_JAB  59
+#define ATYPE_CONFER  60
+#define ATYPE_CONFERRED  61
+
+#define NUM_ATYPES  62	// total number, for bounds checking
 
 
 // armor types
-#define ARMOR_CLOTH  0
-#define ARMOR_LEATHER  1
+#define ARMOR_MAGE  0
+#define ARMOR_LIGHT  1
 #define ARMOR_MEDIUM  2
 #define ARMOR_HEAVY  3
 #define NUM_ARMOR_TYPES  4

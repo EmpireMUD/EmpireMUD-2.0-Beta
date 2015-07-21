@@ -46,9 +46,11 @@ a chair~
 There is a wooden chair here.~
 You can sit on the chair.
 ~
-3 ael a
+3 aelv a
 0 0 0
 0 0
+R
+5610 0
 S
 #905
 bench wooden~
@@ -56,9 +58,11 @@ a wooden bench~
 There is a wooden bench here.~
 You can sit on the bench.
 ~
-3 ael a
+3 aelv a
 0 0 0
 0 0
+R
+5610 0
 S
 #906
 table long~
@@ -66,9 +70,11 @@ a long table~
 There is a long table here.~
 Tables are merely for decoration.
 ~
-3 el a
+3 elv a
 0 0 0
 0 0
+R
+5610 0
 S
 #907
 stool wooden~
@@ -76,9 +82,11 @@ a stool~
 There is a wooden stool here.~
 You can sit on the stool.
 ~
-3 ael a
+3 aelv a
 0 0 0
 0 0
+R
+5610 0
 S
 #908
 arrows quiver~
@@ -103,7 +111,7 @@ Equip a quiver of arrows and then use "shoot" to start ranged combat.
 A
 17 1
 C
-0 0
+0 50
 S
 #910
 bow long~
@@ -198,6 +206,8 @@ This isn't a tent stake. It's a vampire stake!
 3 l ao
 0 0 0
 0 0
+R
+5121 0
 S
 #916
 beehive hive~
@@ -221,9 +231,11 @@ the throne~
 There is a throne at the head of the room.~
 You can sit on the throne.
 ~
-3 ael a
+3 aelv a
 0 0 0
 0 0
+R
+5610 0
 S
 #918
 sign blank~

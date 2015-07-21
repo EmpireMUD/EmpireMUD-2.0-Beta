@@ -91,10 +91,10 @@ I 0 3012 75.00 4  # BUTCHER: a fillet of raw meat
 I 0 3012 75.00 4  # BUTCHER: a fillet of raw meat
 I 1 10006 75.00 1  # SKIN: a dragon scale
 I 1 1351 100.00 8  # SKIN: a large skin
-I 4 10007 25.00 1  # LOOT: a dragonscale shield
-I 4 10008 25.00 1  # LOOT: a firebrand longsword
-I 4 10009 25.00 1  # LOOT: a red dragon charm
-I 4 10010 25.00 1  # LOOT: the red dragon talisman
+I 4 10007 25.00 1 X  # LOOT: a dragonscale shield
+I 4 10008 25.00 1 X  # LOOT: a firebrand longsword
+I 4 10009 25.00 1 X  # LOOT: a red dragon charm
+I 4 10010 25.00 1 X  # LOOT: the red dragon talisman
 T 10001
 T 10006
 T 10007
@@ -186,9 +186,9 @@ S
 ~
 75 75 bdvzA 0
 0 0 0 4
-I 4 10018 30.00 1  # LOOT: a wristblade
-I 4 10022 10.00 1  # LOOT: a spider-hair ring
-I 4 10019 30.00 1  # LOOT: a hooded cloak
+I 4 10018 30.00 1 X  # LOOT: a wristblade
+I 4 10022 10.00 1 X  # LOOT: a spider-hair ring
+I 4 10019 30.00 1 X  # LOOT: a hooded cloak
 T 10019
 T 221
 T 222
@@ -215,8 +215,8 @@ A rat-eating spider is picking through a nest.
 ~
 0 50 bdjA c
 0 0 8 9
-I 4 10021 50.00 1  # LOOT: a spider fang dagger
-I 4 10022 50.00 1  # LOOT: a spider-hair ring
+I 4 10021 50.00 1 X  # LOOT: a spider fang dagger
+I 4 10022 50.00 1 X  # LOOT: a spider-hair ring
 T 10023
 S
 #10019
@@ -278,8 +278,8 @@ A page is bustling past you.
 ~
 30 50 advxA 0
 1 0 0 0
-I 4 10043 10.00 1  # LOOT: page robes
-I 4 10042 10.00 1  # LOOT: bustling shoes
+I 4 10043 10.00 1 X  # LOOT: page robes
+I 4 10042 10.00 1 X  # LOOT: bustling shoes
 I 4 10036 100.00 1  # LOOT: a skystone
 T 10031
 T 10046
@@ -342,8 +342,8 @@ An apprentice is staring intently at a glass case.
 ~
 50 70 advxA 0
 0 0 0 16
-I 4 10045 10.00 1  # LOOT: apprentice robes
-I 4 10044 10.00 1  # LOOT: a skycleaver spellbook
+I 4 10045 10.00 1 X  # LOOT: apprentice robes
+I 4 10044 10.00 1 X  # LOOT: a skycleaver spellbook
 I 4 10036 100.00 1  # LOOT: a skystone
 T 10045
 T 10046
@@ -355,8 +355,8 @@ The goblin wrangler snaps his whip at a cage.
 ~
 50 70 bdvxA 0
 1 0 0 7
-I 4 10047 10.00 1  # LOOT: goblin wrangler pants
-I 4 10046 10.00 1  # LOOT: a goblin wrangler whip
+I 4 10047 10.00 1 X  # LOOT: goblin wrangler pants
+I 4 10046 10.00 1 X  # LOOT: a goblin wrangler whip
 I 4 10036 100.00 1  # LOOT: a skystone
 T 10038
 T 10039
@@ -368,8 +368,8 @@ A caged goblin is making a strange chirping noise.
 ~
 30 50 bdz 0
 0 0 0 1
-I 4 10049 10.00 1  # LOOT: a goblin's vest
-I 4 10048 10.00 1  # LOOT: a goblin shortsword
+I 4 10049 10.00 1 X  # LOOT: a goblin's vest
+I 4 10048 10.00 1 X  # LOOT: a goblin shortsword
 I 4 10036 100.00 1  # LOOT: a skystone
 T 10040
 S
@@ -380,8 +380,8 @@ A goblin commando is biting the cage bars.
 ~
 40 60 bdyz 0
 0 0 0 1
-I 4 10051 50.00 1  # LOOT: pleated goblin armor
-I 4 10050 50.00 1  # LOOT: a goblin skull
+I 4 10051 50.00 1 X  # LOOT: pleated goblin armor
+I 4 10050 50.00 1 X  # LOOT: a goblin skull
 I 4 10036 100.00 1  # LOOT: a skystone
 I 4 10036 50.00 1  # LOOT: a skystone
 T 10040
@@ -413,8 +413,8 @@ Watcher #n~
 ~
 70 90 advxA 0
 0 2 0 1
-I 4 10054 10.00 1  # LOOT: a glass shield
-I 4 10053 10.00 1  # LOOT: a glass sword
+I 4 10054 10.00 1 X  # LOOT: a glass shield
+I 4 10053 10.00 1 X  # LOOT: a glass sword
 I 4 10036 100.00 1  # LOOT: a skystone
 T 10044
 T 10046
@@ -426,8 +426,8 @@ A sorcerer resident looks rather busy.
 ~
 70 90 advxA 0
 2 0 0 16
-I 4 10056 10.00 1  # LOOT: a glimmering doublet
-I 4 10055 10.00 1  # LOOT: a pointed earcuff
+I 4 10056 10.00 1 X  # LOOT: a glimmering doublet
+I 4 10055 10.00 1 X  # LOOT: a pointed earcuff
 I 4 10036 100.00 1  # LOOT: a skystone
 T 10046
 S
@@ -438,8 +438,8 @@ High Master #n is overseeing the residents.
 ~
 110 110 bdvxA 0
 0 2 0 16
-I 4 10058 10.00 1  # LOOT: a double-pocket
-I 4 10057 10.00 1  # LOOT: a bone wand
+I 4 10058 10.00 1 X  # LOOT: a double-pocket
+I 4 10057 10.00 1 X  # LOOT: a bone wand
 I 4 10036 100.00 1  # LOOT: a skystone
 T 10047
 T 10046
@@ -461,8 +461,8 @@ A huge otherworlder is chained to the floor!
 ~
 50 90 bdyz 0
 1 0 0 5
-I 4 10060 10.00 1  # LOOT: the otherworlder's wristbands
-I 4 10059 10.00 1  # LOOT: the otherworlder's gauntlet
+I 4 10060 10.00 1 X  # LOOT: the otherworlder's wristbands
+I 4 10059 10.00 1 X  # LOOT: the otherworlder's gauntlet
 I 4 10036 100.00 1  # LOOT: a skystone
 T 10049
 T 10050
@@ -474,8 +474,8 @@ A bony lich is channelling a spell.
 ~
 70 90 bdhwxzA 0
 1 0 2 16
-I 4 10061 10.00 1  # LOOT: lich bindings
-I 4 10062 10.00 1  # LOOT: a tattered lich cloak
+I 4 10061 10.00 1 X  # LOOT: lich bindings
+I 4 10062 10.00 1 X  # LOOT: a tattered lich cloak
 I 4 10036 100.00 1  # LOOT: a skystone
 T 10051
 T 10052
@@ -509,8 +509,8 @@ An escaped experiment is running past you!
 ~
 30 100 dy 0
 0 0 0 15
-I 4 10077 50.00 1  # LOOT: experimental handwraps
-I 4 10078 50.00 1  # LOOT: an experimental aura
+I 4 10077 50.00 1 X  # LOOT: experimental handwraps
+I 4 10078 50.00 1 X  # LOOT: an experimental aura
 I 4 10036 100.00 1  # LOOT: a skystone
 T 10064
 T 10065
@@ -523,9 +523,9 @@ High Sorceress Celiya is here.
 120 120 bdvxB 0
 2 0 0 17
 I 4 10037 100.00 1  # LOOT: a greater skystone
-I 4 10070 15.00 1  # LOOT: the reverse impact ring
-I 4 10069 10.00 1  # LOOT: the majestic silk belt
-I 4 10068 15.00 1  # LOOT: the mana shield
+I 4 10070 15.00 1 X  # LOOT: the reverse impact ring
+I 4 10069 10.00 1 X  # LOOT: the majestic silk belt
+I 4 10068 15.00 1 X  # LOOT: the mana shield
 T 10046
 T 10055
 T 10056
@@ -539,9 +539,9 @@ High Sorcerer Barrosh is tinkering with a spell.
 150 150 bdvxyB 0
 1 0 0 18
 I 4 10037 100.00 1  # LOOT: a greater skystone
-I 4 10073 15.00 1  # LOOT: crystal-clear goggles
-I 4 10072 15.00 1  # LOOT: the staff of Apollus
-I 4 10071 10.00 1  # LOOT: Barrosh's grimoire
+I 4 10073 15.00 1 X  # LOOT: crystal-clear goggles
+I 4 10072 15.00 1 X  # LOOT: the staff of Apollus
+I 4 10071 10.00 1 X  # LOOT: Barrosh's grimoire
 T 10046
 T 10058
 T 10059
@@ -555,9 +555,9 @@ Grand High Sorcerer Knezz appears to be meditating.
 200 200 bdvxyzB 0
 1 0 0 19
 I 4 10037 100.00 1  # LOOT: a greater skystone
-I 4 10076 15.00 1  # LOOT: phoenix bone earrings
-I 4 10075 15.00 1  # LOOT: an arcane dagger
-I 4 10074 10.00 1  # LOOT: the Grand High Sorcerer robes
+I 4 10076 15.00 1 X  # LOOT: phoenix bone earrings
+I 4 10075 15.00 1 X  # LOOT: an arcane dagger
+I 4 10074 10.00 1 X  # LOOT: the Grand High Sorcerer robes
 T 10046
 T 10061
 T 10062

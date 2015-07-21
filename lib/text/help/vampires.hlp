@@ -7,7 +7,7 @@ Vampirism is not a curse, per se, but its powers do come at a price: vampires
 must drink blood. Vampires are not harmed by the sun, but their powers do not
 function in broad daylight.
 
-Vampires at skill level 15 or bellow are constantly hungry, losing a blood
+Vampires at skill level 15 or below are constantly hungry, losing a blood
 point ever hour even if they have no blood powers active. At such low levels,
 these vampires gain skill just by drinking the blood of others. Higher level
 vampires have an hourly upkeep based only on which powers are active. See the
@@ -29,7 +29,7 @@ Alacrity (Vampire ability)
 
 Usage:  alacrity
 Cost:  10 blood
-Upkeep:  2 blood/hr
+Upkeep:  3 blood/hr
 
 This ability grants a vampire haste, at the cost of blood.
 #
@@ -85,12 +85,22 @@ Type:  passive
 
 The vampire's blood-fueled form is more resilient against physical damage.
 #
-BLOODSWORD "BLOOD-RED SWORD"
+BLOODSWEAT "BLOOD SWEAT"
+
+Bloodsweat
+Class ability:  Reaper
+Usage:  bloodsweat
+Cost:  50 blood
+Cooldown:  30 seconds
+
+This power purges a vampire's blood of any poisons, by sweating them out.
+#
+BLOODSWORD BLOOD-SWORD "BLOOD SWORD"
 
 Bloodsword (Vampire ability)
 
 Usage:  bloodsword
-Cost: 20 blood
+Cost:  40 blood
 
 A vampire with this ability can create a sword from its own blood. The blood-
 red sword is only as powerful as the vampire who created it, and it only lasts
@@ -108,7 +118,7 @@ Cost:  10 blood
 Upkeep:  1 blood/hr per boost
 
 This ability allows a vampire to boost strength or dexterity by spending
-blood.
+blood. At high skill levels, you may get a stronger boost at the same cost.
 
 You can end your boosts early by typing "boost end".
 #
@@ -120,7 +130,7 @@ Usage:  claws
 Cost:  10 blood
 Upkeep:  2 blood/hr
 
-The vampire can turn his fingers into huge, deadly claws that do greivous
+The vampire can turn his fingers into huge, deadly claws that do grievous
 melee damage.
 #
 COMMAND
@@ -128,20 +138,23 @@ COMMAND
 Command (Vampire ability)
 
 Usage:  command <name> <task> [sentence]
+Debuff type:  Vampire
 
 A vampire with this power can look deep into the eyes of men and command them
 to do simple tasks. The task can be just one word, which must be spoken aloud
 by the vampire and understood by the victim. Optionally, the word can be hidden
 in a sentence.
 
-This power only works on human NPCs, but won't work on hard/group mobs.
+This power only works on human NPCs, but won't work on hard/group mobs. It also
+won't work on mobs who are more powerful than you.
 #
 DAYWALKING DAYWALKER
 
 Daywalking (Vampire ability)
 
 A vampire who has learned Daywalking can leave the night behind and walk openly
-in broad daylight without losing her unnatural powers.
+in broad daylight without losing her unnatural powers. You can gain skill
+points from this ability by being outdoors in the sun.
 
 This power also protects the vampire against the Purify spell.
 
@@ -155,7 +168,7 @@ Usage:  deathshroud
 Cost:  20 blood
 Upkeep:  1 blood/hr
 
-This ability puts the vampire into a deep sleep where it mimics the apearance
+This ability puts the vampire into a deep sleep where it mimics the appearance
 of a corpse.
 #
 "DREAD BLOOD FORM"
@@ -206,7 +219,8 @@ makes them beyond reproach. It is very difficult to attack a majestic vampire.
 While Majesty is active, players are immune to random encounters such as
 sharks. Aggressive NPCs may still attack, but will be delayed.
 
-This power offers more protection to characters with higher Charisma.
+This power offers more protection to characters with higher Charisma. NPCs
+that are immune to Vampire debuffs are also immune to Majesty.
 #
 "MIST FORM"
 
@@ -253,8 +267,8 @@ you specify otherwise.
 You can specify an amount to heal, but if you do this, you must specify health
 (you can't let it default to health if you want to heal a certain amount).
 
-With Vampire up to level 50, this regenerates 10 per blood point. Up to 75,
-it regenerates 15. And higher than that, it regenerates 25.
+With Vampire up to level 50, this regenerates 1 per blood point. Up to 75,
+it regenerates 1.5. And higher than that, it regenerates 2.5.
 #
 "SANGUINE RESTORATION"
 
@@ -309,6 +323,7 @@ Summon Humans (Vampire ability)
 
 Usage:  summon humans
 Cooldown:  1 minute
+Cost:  10 blood
 
 This ability summons up to (Charisma / 3, rounded up) unsuspecting humans from
 the surrounding area, using the vampire's unnatural charm. They have no
@@ -352,6 +367,7 @@ Weaken (Vampire ability)
 
 Usage:  weaken [victim]
 Cooldown:  75 seconds
+Debuff type:  Vampire
 
 A vampire who is learned in the ways of blood can use her own blood to drain
 the strength of others for 75 seconds.
@@ -364,7 +380,7 @@ Usage:  morph wolf
 Cost:  20 blood (40 in combat)
 Upkeep:  1 blood/hr
 
-With Wolf Form, the vampire taps into its primal nature to become wolf. In
+With Wolf Form, the vampire taps into its primal nature to become a wolf. In
 this form, he is nearly indistinguishable from a wild animal.
 
 See also: MORPH

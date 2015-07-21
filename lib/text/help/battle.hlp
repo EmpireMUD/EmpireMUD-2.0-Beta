@@ -28,26 +28,26 @@ Learn to use bows to start combat while you're still at a safe distance.
 
 See also: QUICK DRAW, SHOOT
 #
-ARMOR "LEATHER ARMOR" "MEDIUM ARMOR" "HEAVY ARMOR" "CLOTH ARMOR"
+ARMOR "LIGHT ARMOR" "MEDIUM ARMOR" "HEAVY ARMOR" "MAGE ARMOR"
 
-Cloth Armor (Battle ability)
-Leather Armor (Battle ability)
+Light Armor (Battle ability)
+Mage Armor (Battle ability)
 Medium Armor (Battle ability)
 Heavy Armor (Battle ability)
 
 In order to wear pieces of armor, you must learn the appropriate ability.
 
-Cloth armor is light weight and offers little protection, but frequently has
-bonuses for spellcasters in combat.
+Mage armor is usually meant for casters and healers, and tends to give bonuses
+to magical traits.
 
-Leather armor offers some protection, but is still light and flexible, and
-is good for people who must move quickly and don't take much damage.
+Light armor offers little protection, but makes the wearer more lithe and
+deadly in combat. It is meant for melee DPS characters.
 
-Medium armor is the standard for knights across the realm. It's strong and
-protects from most damage.
+Medium armor is a hybrid of light and heavy armor, and is good for those who
+do a lot of solo exploration and adventuring, as well as for PVP players.
 
-Heavy armor is the stuff of legends, but it also requires extensive practice
-and training to use.
+Heavy armor is the mainstay of tanks, and offers great protection at the cost
+of making it harder for the wearer to deal damage.
 #
 BASH
 
@@ -55,6 +55,7 @@ Bash (Battle ability)
 
 Usage:  bash [target]
 Cooldown:  9 seconds
+Debuff type:  Battle, Stun
 
 Bash your target with your weapon and send him flying to the ground. When you
 successfully bash, your target is briefly stunned.
@@ -85,6 +86,7 @@ take less damage before you've even gotten to your opponent.
 "CUT DEEP" "DEEP CUTS"
 
 Cut Deep (Battle ability)
+Debuff type:  Battle
 
 Once you learn to cut deep, your sharp attacks have a chance to cause deep
 cuts that bleed for additional damage. Higher Battle skill level results in
@@ -96,6 +98,7 @@ Disarm (Battle ability)
 
 Usage:  disarm [target]
 Cooldown:  30 seconds
+Debuff type:  Battle
 
 In battle you can disarm your target, reducing the damage he deals by knocking
 away his weapon for a few seconds. If you're fighting someone already, you do
@@ -106,7 +109,8 @@ the disarm affect wears off, it will still be in your <wield> slot.
 #
 "DUAL-WIELD" "DUAL WIELD"
 
-Dual-Wield (Class ability)
+Dual-Wield
+Class ability: Assassin, Bandit, Smuggler
 
 With this ability, you can attack with weapons in both hands (the wield and
 hold slots). Without it, you can still hold a weapon in your off-hand, but
@@ -114,20 +118,27 @@ will never attack with it.
 
 Your off-hand receives a significant to-hit penalty.
 #
-ENDURANCE "ENDURANCE BRANCH"
+ENDURANCE
 
 Endurance (Battle ability)
 
-Endurance doubles your health points by teaching you how to properly take a
-blow from your opponent. This is the first step to becoming a tank -- the
-person who holds the enemy's focus in battle, and takes all of the damage while
-his or her friends attack back.
+Endurance teaches you how to properly a blow from your opponent. This is the
+a core step in becoming a tank -- the person who holds the enemy's focus in
+battle, and takes all of the damage while his or her friends attack back.
+
+Endurance doubles up to 1000 health points and gives you +25% of any health
+over that 1000. For example, a person who naturally has 2000 health would have
+3250 with Endurance.
+
+See also: TANK
 #
 FINESSE
 
 Finesse (Battle ability)
 
-With finesse, your melee attacks happen faster, giving you more damage.
+With finesse, your melee attacks happen faster, leading to more damage overall.
+As a basic ability, attacks are 10% faster. As a specialty ability, they are
+15% faster. As a class ability, they are 20% faster.
 #
 FIRSTAID "FIRST AID"
 
@@ -151,6 +162,7 @@ Heartstop (Battle ability)
 
 Usage:  heartstop [target]
 Cooldown:  30 seconds
+Debuff type:  Battle
 
 Learn to fight vampires and win as you find the right spot to hit to stop them
 from using their blood to activate their deadly powers!
@@ -163,6 +175,15 @@ Usage:  kick [victim]
 Cooldown:  6 seconds
 
 Kick is a special attack that does bonus damage outside of the combat round.
+
+See also: SHADOW KICK
+#
+"NOBLE BEARING"
+
+Noble Bearing
+Class ability: Duke
+
+Damage to your character is reduced by your Greatness rating.
 #
 "NULL MANA"
 
@@ -191,22 +212,34 @@ See also: RESCUE
 
 Quick Block (Battle ability)
 
-As you learn to block more quickly, your shield becomes more effective.
+As you learn to block more quickly, your shield becomes more effective. Quick
+Block gives you +10 to Block. As a class-level ability, it instead gives +10%
+of your level, with a minimum of +10. This is included in the Block rating
+shown on your score.
+
+See also: BLOCK
 #
 "QUICK DRAW"
 
 Quick Draw (Battle ability)
 
 Shoot more arrows before your enemies reach you by learning to draw more
-quickly.
+quickly, leading to more damage per second. This improves your ranged combat
+speed by 25% (or 35% as a class ability).
 
 See also: ARCHERY, SHOOT
 #
-REFLEXES DODGE
+REFLEXES
 
 Reflexes (Battle ability)
 
 With training, your reflexes become good enough that you dodge more often.
+This ability gives at least +10 dodge automatically.
+
+As a specialty ability, it gives +5% total dodge.
+As a class ability, it gives +10% total dodge.
+
+This dodge bonus is refleced on your 'score'.
 
 See also: SHIELD BLOCK, QUICK BLOCK, BLOCK ARROWS, MEDIUM ARMOR, OUTRAGE,
     HEAVY ARMOR, RESCUE, DISARM
@@ -256,15 +289,21 @@ from it.
 
 You must be holding a shield to block attacks.
 
-See also:  HOLD
+See also:  BLOCK, HOLD
 #
 SPARRING
 
 Sparring (Battle ability)
 
-By sparring, you can learn to hit more accurately.
+By sparring, you can learn to hit more accurately. This ability gives at least
++10 to-hit automatically.
 
-See also: LEATHER ARMOR, KICK, BASH, CUT DEEP, STUNNING BLOW, FINESSE
+As a specialty ability, it gives +5% total to-hit.
+As a class ability, it gives +10% total to-hit.
+
+This to-hit bonus is refleced on your 'score'.
+
+See also: LIGHT ARMOR, KICK, BASH, CUT DEEP, STUNNING BLOW, FINESSE
 #
 SPEED "COMBAT SPEED" "FIGHT SPEED" "FIGHTING SPEED"
 
@@ -280,6 +319,7 @@ See also: SCORE
 "STUNNING BLOW"
 
 Stunning Blow (Battle ability)
+Debuff type:  Battle, Stun
 
 With this passive ability, your blunt weapons have a chance to knock your
 opponent down and stun him briefly, similar to a Bash.
@@ -294,7 +334,8 @@ This command shows a summary of you, your allies, and your enemies in combat.
 #
 "TWO-HANDED WEAPONS" "TWO HANDED WEAPONS" "TWOHANDED WEAPONS" "2HANDED WEAPONS" "2H"
 
-Two-Handed Weapons (Class ability)
+Two-Handed Weapons
+Class ability: Barbarian, Duke, Steelsmith
 
 This ability allows you to use two-handed weapons. These weapons require that
 you don't have an item in your off-hand (hold) slot. Only certain powerful
@@ -302,5 +343,14 @@ melee classes receive this ability.
 
 Two-handed weapons are more powerful than ordinary weapons and are marked with
 the (2h) tag.
+#
+"WARD AGAINST MAGIC" "MAGIC WARD"
+
+Ward Against Magic
+Class ability: Barbarian, Reaper
+
+This ability allows characters to block magical attacks with their shields,
+albeit at a reduced rate. Only 50% of the character's block rating applies to
+blocking magical attacks.
 #
 $

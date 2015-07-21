@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: dg_triggers.c                                   EmpireMUD 2.0b1 *
+*   File: dg_triggers.c                                   EmpireMUD 2.0b2 *
 *  Usage: contains all the trigger functions for scripts.                 *
 *                                                                         *
 *  DG Scripts code by galion, 1996/08/05 23:32:08, revision 3.9           *
@@ -206,8 +206,12 @@ int greet_mtrigger(char_data *actor, int dir) {
 		return TRUE;
 
 	for (ch = ROOM_PEOPLE(IN_ROOM(actor)); ch; ch = ch->next_in_room) {
-		if (!SCRIPT_CHECK(ch, MTRIG_GREET | MTRIG_GREET_ALL) ||  !AWAKE(ch) || FIGHTING(ch) || (ch == actor) ||  AFF_FLAGGED(ch, AFF_CHARM))
+		if (!SCRIPT_CHECK(ch, MTRIG_GREET | MTRIG_GREET_ALL) || (ch == actor) || AFF_FLAGGED(ch, AFF_CHARM)) {
 			continue;
+		}
+		if (!SCRIPT_CHECK(ch, MTRIG_GREET_ALL) && (!AWAKE(ch) || FIGHTING(ch))) {
+			continue;
+		}
 
 		for (t = TRIGGERS(SCRIPT(ch)); t; t = t->next) {
 			if (((IS_SET(GET_TRIG_TYPE(t), MTRIG_GREET) && CAN_SEE(ch, actor)) || IS_SET(GET_TRIG_TYPE(t), MTRIG_GREET_ALL)) && !GET_TRIG_DEPTH(t) && (number(1, 100) <= GET_TRIG_NARG(t))) {
@@ -441,7 +445,7 @@ void hitprcnt_mtrigger(char_data *ch) {
 		return;
 
 	for (t = TRIGGERS(SCRIPT(ch)); t; t = t->next) {
-		if (TRIGGER_CHECK(t, MTRIG_HITPRCNT) && GET_MAX_HEALTH(ch) && (((GET_HEALTH(ch) * 100) / GET_MAX_HEALTH(ch)) <= GET_TRIG_NARG(t))) {
+		if (TRIGGER_CHECK(t, MTRIG_HITPRCNT) && GET_MAX_HEALTH(ch) && (((GET_HEALTH(ch) * 100) / MAX(1, GET_MAX_HEALTH(ch))) <= GET_TRIG_NARG(t))) {
 			union script_driver_data_u sdd;
 
 			actor = FIGHTING(ch);
@@ -570,11 +574,15 @@ int leave_mtrigger(char_data *actor, int dir) {
 	char buf[MAX_INPUT_LENGTH];
 
 	for (ch = ROOM_PEOPLE(IN_ROOM(actor)); ch; ch = ch->next_in_room) {
-		if (!SCRIPT_CHECK(ch, MTRIG_LEAVE) || !AWAKE(ch) || FIGHTING(ch) || (ch == actor) || AFF_FLAGGED(ch, AFF_CHARM))
+		if (!SCRIPT_CHECK(ch, MTRIG_LEAVE | MTRIG_LEAVE_ALL) || (ch == actor) || AFF_FLAGGED(ch, AFF_CHARM)) {
 			continue;
+		}
+		if (!SCRIPT_CHECK(ch, MTRIG_LEAVE_ALL) && (!AWAKE(ch) || FIGHTING(ch))) {
+			continue;
+		}
 
 		for (t = TRIGGERS(SCRIPT(ch)); t; t = t->next) {
-			if ((IS_SET(GET_TRIG_TYPE(t), MTRIG_LEAVE) && CAN_SEE(ch, actor)) && !GET_TRIG_DEPTH(t) && (number(1, 100) <= GET_TRIG_NARG(t))) {
+			if (((IS_SET(GET_TRIG_TYPE(t), MTRIG_LEAVE) && CAN_SEE(ch, actor)) || IS_SET(GET_TRIG_TYPE(t), MTRIG_LEAVE_ALL)) && !GET_TRIG_DEPTH(t) && (number(1, 100) <= GET_TRIG_NARG(t))) {
 				union script_driver_data_u sdd;
 				if (dir>=0 && dir < NUM_OF_DIRS)
 					add_var(&GET_TRIG_VARS(t), "direction", (char *)dirs[dir], 0);

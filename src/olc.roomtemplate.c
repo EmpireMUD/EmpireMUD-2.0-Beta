@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: olc.roomtemplate.c                              EmpireMUD 2.0b1 *
+*   File: olc.roomtemplate.c                              EmpireMUD 2.0b2 *
 *  Usage: OLC for room templates                                          *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -599,11 +599,11 @@ OLC_MODULE(rmedit_description) {
 
 OLC_MODULE(rmedit_exit) {
 	room_template *rmt = GET_OLC_ROOM_TEMPLATE(ch->desc);
-	char arg1[MAX_INPUT_LENGTH], dir_arg[MAX_INPUT_LENGTH], room_arg[MAX_INPUT_LENGTH];
+	char arg1[MAX_INPUT_LENGTH], dir_arg[MAX_INPUT_LENGTH], room_arg[MAX_INPUT_LENGTH], num_arg[MAX_INPUT_LENGTH], field_arg[MAX_INPUT_LENGTH];
 	adv_data *adv = get_adventure_for_vnum(GET_OLC_VNUM(ch->desc));
 	int num, vnum, dir;
 	room_template *to_template;
-	struct exit_template *ex, *temp;
+	struct exit_template *ex, *temp, *change;
 	bool found;
 	
 	// arg1 argument
@@ -687,8 +687,78 @@ OLC_MODULE(rmedit_exit) {
 			msg_to_char(ch, "You add an exit %s to %d %s%s%s.\r\n", dirs[dir], vnum, !to_template ? "UNKNOWN" : GET_RMT_TITLE(to_template), *argument ? ", with door keywords: " : "", *argument ? argument : "");
 		}
 	}
+	else if (is_abbrev(arg1, "change")) {
+		argument = any_one_arg(argument, num_arg);
+		argument = any_one_arg(argument, field_arg);
+		skip_spaces(&argument);	// value
+
+		if (!*argument || !*num_arg || !*field_arg || !isdigit(*num_arg)) {
+			msg_to_char(ch, "Usage: exit change <number> <field> <value>\r\n");
+			return;
+		}
+		
+		// find entry
+		num = atoi(num_arg);
+		change = NULL;
+		for (ex = GET_RMT_EXITS(rmt); ex; ex = ex->next) {
+			if (--num == 0) {
+				change = ex;
+				break;
+			}
+		}
+		
+		if (!change) {
+			msg_to_char(ch, "Invalid exit number.\r\n");
+		}
+		else if (is_abbrev(field_arg, "direction")) {
+			if ((dir = parse_direction(ch, argument)) == NO_DIR) {
+				msg_to_char(ch, "Invalid direction '%s'.\r\n", argument);
+			}
+			else {
+				change->dir = dir;
+				msg_to_char(ch, "Exit %d direction changed to %s.\r\n", atoi(num_arg), dirs[dir]);
+			}
+		}
+		else if (is_abbrev(field_arg, "room") || is_abbrev(field_arg, "template") || is_abbrev(field_arg, "vnum") || is_abbrev(field_arg, "target")) {
+			if (!isdigit(*argument) || (vnum = atoi(argument)) < 0 || get_adventure_for_vnum(vnum) != adv) {
+				msg_to_char(ch, "Invalid room template vnum '%s'; target room must be part of the same adventure zone.\r\n", argument);
+			}
+			else {
+				change->target_room = vnum;
+				to_template = room_template_proto(vnum);
+				msg_to_char(ch, "Exit %d (%s) target changed to [%d] %s.\r\n", atoi(num_arg), dirs[change->dir], vnum, !to_template ? "UNKNOWN" : GET_RMT_TITLE(to_template));
+			}
+		}
+		else if (is_abbrev(field_arg, "keywords")) {
+			if (!*argument) {
+				msg_to_char(ch, "Change the keywords to what (or 'none' to have no door)?\r\n");
+			}
+			else if (!str_cmp(argument, "none")) {
+				if (ex->keyword) {
+					free(ex->keyword);
+				}
+				ex->keyword = NULL;
+				ex->exit_info = NOBITS;
+				
+				msg_to_char(ch, "Exit %d (%s) keywords and door removed.\r\n", atoi(num_arg), dirs[change->dir]);
+			}
+			else {
+				if (ex->keyword) {
+					free(ex->keyword);
+				}
+				ex->keyword = str_dup(argument);
+				ex->exit_info = EX_ISDOOR | EX_CLOSED;
+				
+				msg_to_char(ch, "Exit %d (%s) door keywords set to: %s\r\n", atoi(num_arg), dirs[change->dir], argument);
+			}
+		}
+		else {
+			msg_to_char(ch, "You can change: direction, room, keywords\r\n");
+		}
+	}
 	else {
 		msg_to_char(ch, "Usage: exit add <dir> <room template vnum> [keywords if door]\r\n");
+		msg_to_char(ch, "Usage: exit change <number> <field> <value>\r\n");
 		msg_to_char(ch, "Usage: exit remove <number | all>\r\n");
 	}
 }
@@ -759,9 +829,9 @@ OLC_MODULE(rmedit_spawns) {
 	extern const char *olc_type_bits[NUM_OLC_TYPES+1];
 
 	room_template *rmt = GET_OLC_ROOM_TEMPLATE(ch->desc);
-	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], vnum_arg[MAX_INPUT_LENGTH], prc_arg[MAX_INPUT_LENGTH];
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], num_arg[MAX_INPUT_LENGTH], prc_arg[MAX_INPUT_LENGTH];
 	int num, stype, limit, findtype;
-	struct adventure_spawn *spawn, *temp, *copyfrom = NULL;
+	struct adventure_spawn *spawn, *temp, *change, *copyfrom = NULL;
 	double prc;
 	any_vnum vnum;
 	bool found;
@@ -846,24 +916,24 @@ OLC_MODULE(rmedit_spawns) {
 	}
 	else if (is_abbrev(arg1, "add")) {
 		argument = any_one_arg(argument, type_arg);
-		argument = any_one_arg(argument, vnum_arg);
+		argument = any_one_arg(argument, num_arg);
 		argument = any_one_arg(argument, prc_arg);
 		skip_spaces(&argument);	// limit
 		
-		if (!*type_arg || !*vnum_arg || !*prc_arg || !*argument) {
+		if (!*type_arg || !*num_arg || !*prc_arg || !*argument) {
 			msg_to_char(ch, "Usage: spawn add <type> <vnum> <percent> <limit>\r\n");
 		}
 		else if ((stype = search_block(type_arg, adventure_spawn_types, FALSE)) == NOTHING) {
 			msg_to_char(ch, "Invalid type '%s'.\r\n", type_arg);
 		}
-		else if (!isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
-			msg_to_char(ch, "Invalid vnum '%s'.\r\n", vnum_arg);
+		else if (!isdigit(*num_arg) || (vnum = atoi(num_arg)) < 0) {
+			msg_to_char(ch, "Invalid vnum '%s'.\r\n", num_arg);
 		}
 		else if (stype == ADV_SPAWN_MOB && !mob_proto(vnum)) {
-			msg_to_char(ch, "Invalid mobile vnum '%s'.\r\n", vnum_arg);
+			msg_to_char(ch, "Invalid mobile vnum '%s'.\r\n", num_arg);
 		}
 		else if (stype == ADV_SPAWN_OBJ && !obj_proto(vnum)) {
-			msg_to_char(ch, "Invalid object vnum '%s'.\r\n", vnum_arg);
+			msg_to_char(ch, "Invalid object vnum '%s'.\r\n", num_arg);
 		}
 		else if ((prc = atof(prc_arg)) < .01 || prc > 100.00) {
 			msg_to_char(ch, "Percentage must be between .01 and 100; '%s' given.\r\n", prc_arg);
@@ -894,8 +964,71 @@ OLC_MODULE(rmedit_spawns) {
 			msg_to_char(ch, "You add spawn for %s %s (%d) at %.2f%%, limit %d.\r\n", adventure_spawn_types[stype], stype == ADV_SPAWN_MOB ? get_mob_name_by_proto(vnum) : get_obj_name_by_proto(vnum), vnum, prc, limit);
 		}
 	}
+	else if (is_abbrev(arg1, "change")) {
+		argument = any_one_arg(argument, num_arg);
+		argument = any_one_arg(argument, type_arg);
+		skip_spaces(&argument);	// value
+		
+		if (!*num_arg || !isdigit(*num_arg) || !*type_arg || !*argument) {
+			msg_to_char(ch, "Usage: spawn change <number> <vnum | percent | limit> <value>\r\n");
+			return;
+		}
+		
+		// find which one to change
+		num = atoi(num_arg);
+		change = NULL;
+		for (spawn = GET_RMT_SPAWNS(rmt); spawn && !change; spawn = spawn->next) {
+			if (--num == 0) {
+				change = spawn;
+				break;
+			}
+		}
+		
+		if (!change) {
+			msg_to_char(ch, "Invalid spawn number.\r\n");
+		}
+		else if (is_abbrev(type_arg, "vnum")) {
+			if (!isdigit(*argument) || (vnum = atoi(argument)) < 0) {
+				msg_to_char(ch, "Invalid vnum '%s'.\r\n", argument);
+			}
+			else if (change->type == ADV_SPAWN_MOB && !mob_proto(vnum)) {
+				msg_to_char(ch, "Invalid mobile vnum '%s'.\r\n", argument);
+			}
+			else if (change->type == ADV_SPAWN_OBJ && !obj_proto(vnum)) {
+				msg_to_char(ch, "Invalid object vnum '%s'.\r\n", argument);
+			}
+			else {
+				change->vnum = vnum;
+				msg_to_char(ch, "Spawn %d changed to vnum %d (%s).\r\n", atoi(num_arg), vnum, change->type == ADV_SPAWN_MOB ? get_mob_name_by_proto(vnum) : get_obj_name_by_proto(vnum));
+			}
+		}
+		else if (is_abbrev(type_arg, "percent")) {
+			prc = atof(argument);
+			
+			if (prc < .01 || prc > 100.00) {
+				msg_to_char(ch, "Percentage must be between .01 and 100; '%s' given.\r\n", prc_arg);
+			}
+			else {
+				change->percent = prc;
+				msg_to_char(ch, "Spawn %d changed to %.2f percent.\r\n", atoi(num_arg), prc);
+			}
+		}
+		else if (is_abbrev(type_arg, "limit")) {
+			if (!isdigit(*argument) || (limit = atoi(argument)) < -1 || limit > MAX_INT) {
+				msg_to_char(ch, "Invalid limit '%s'.\r\n", argument);
+			}
+			else {
+				change->limit = limit;
+				msg_to_char(ch, "Spawn %d changed to limit %d.\r\n", atoi(num_arg), limit);
+			}
+		}
+		else {
+			msg_to_char(ch, "You can only change the vnum, percent, or limit.\r\n");
+		}
+	}
 	else {
 		msg_to_char(ch, "Usage: spawn add <type> <vnum> <percent> <limit>\r\n");
+		msg_to_char(ch, "Usage: spawn change <number> <vnum | percent | limit> <value>\r\n");
 		msg_to_char(ch, "Usage: spawn copy <from type> <from vnum>\r\n");
 		msg_to_char(ch, "Usage: spawn remove <number | all>\r\n");
 	}

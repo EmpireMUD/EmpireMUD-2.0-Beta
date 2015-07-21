@@ -57,7 +57,7 @@ woodpecker animation~
 * Woodpecker Animation (9150)
 eval room %self.room%
 if ((%room.sector% /= Forest) || (%room.sector% /= Orchard))
-  %echo% %self.name% hammers into a tree with its beek, looking for food.
+  %echo% %self.name% hammers into a tree with its beak, looking for food.
 end
 ~
 #9183
@@ -79,5 +79,19 @@ if %penguins_killed% > 5 && %random.2% == 2
   eval penguins_killed 0
 end
 remote penguins_killed %actor.id%
+~
+#9188
+Tiny Critter Despawn~
+0 b 10
+~
+%echo% %self.name% vanishes down a hole.
+%purge% %self%
+~
+#9198
+Critter Flutters Off~
+0 b 10
+~
+%echo% %self.name% flutters off.
+%purge% %self%
 ~
 $

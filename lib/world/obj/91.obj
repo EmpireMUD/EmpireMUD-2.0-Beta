@@ -6,7 +6,7 @@ A collapsed cabin tent is folded on the ground.~
 pieces, and one large roof. Stacked between the folds are several weathered
 tusks, to be used as uprights.
 ~
-3 0 a
+3 0 a 1
 0 0 0
 7 0
 S
@@ -20,7 +20,7 @@ Forge (Deadly Weapons): reindeer antler dagger
  1x reindeer's antler
  2x imperium ingot
 ~
-3 e a
+3 e a 1
 0 0 0
 14 0
 R
@@ -34,7 +34,7 @@ A dagger forged from a reindeer antler rests nearby.~
 brace for the weilder's wrist. It is as unique a piece as the animal which
 produced it.
 ~
-1 hmo ano
+1 hmo ano 1
 0 1 4
 14 0
 A
@@ -54,20 +54,20 @@ Sew (Dangerous Leathers): polar bear cloak
  1x polar bear fur
  1x large leather
 ~
-3 e a
+3 e a 1
 0 0 0
 7 0
 R
 5120 0
 S
 #9178
-horn narwal~
-a narwal's horn~
-A narwal's horn pokes through the ice nearby.~
+horn narwhal narwal~
+a narwhal's horn~
+A narwhal's horn pokes through the ice nearby.~
    Long as a lance from base to tip, the exposed surface of the horn weaves a
 mesmerizing spiral around its core, and glistens with permanent cold.
 ~
-1 m an
+1 mp an 1
 0 1 20
 14 0
 A
@@ -87,7 +87,7 @@ Sew (Dangerous Leathers): cabin tent
  16x walrus tusks
  32x large leather
 ~
-3 e a
+3 e a 1
 0 0 0
 14 0
 R
@@ -104,7 +104,7 @@ Sew (Dangerous Leathers): wolverine fur cap
  1x wolverine fur
  1x small leather
 ~
-3 0 a
+3 0 a 1
 0 0 0
 7 0
 R
@@ -118,13 +118,13 @@ A cap, covered with wolverine fur, rests here.~
 mocha-coloured undercoat. The sides stick out wildly, but could be brushed down
 over the ears for added warmth.
 ~
-2 0 ae
+2 mo ae 1
 0 0 0
 7 0
 A
 3 1
-R
-5617 0
+C
+75 100
 S
 #9183
 bear polarbear cloak~
@@ -133,7 +133,7 @@ A cloak of polar bear fur rests nearby.~
    The thick white fur is slightly oily to the touch, perfect for protection
 from harsh winter elements.
 ~
-2 m ak
+2 mo ak 1
 0 0 0
 7 0
 A
@@ -144,9 +144,9 @@ C
 100 150
 S
 #9185
-skin seal sealskin large~
-a large sealskin~
-A large sealskin is piled on the ice.~
+sealskin skin~
+a sealskin~
+A seaskin is piled on the ice.~
    The skin of the elephant seal is beaded with melted snow, which runs off due
 to the pelt's natural oils. It could be sewn into garments for added protection
 against the wet and cold.
@@ -154,7 +154,7 @@ Sew (Dangerous Leathers): sealskin leggings
  1x large sealskin
  1x large leather
 ~
-3 e a
+3 e a 1
 0 0 0
 7 0
 R
@@ -167,13 +167,15 @@ A pair of sealskin leggings are piled here.~
    The trousers are made of sealskin, with short brown hairs, slicked by
 natural oils, forming a protective barrier against wet or wintery weather.
 ~
-2 m af
-0 0 0
+27 mo af 2
+2 0 0
 7 0
 A
 18 1
 A
 11 1
+A
+17 1
 C
 100 150
 S
@@ -183,7 +185,7 @@ an arctic aura~
 An arctic aura hovers nearby.~
 The aura is a pale blue pulse in the air, warmer than the current around it.
 ~
-3 mp ak
+3 mp ak 1
 0 0 0
 10 0
 A

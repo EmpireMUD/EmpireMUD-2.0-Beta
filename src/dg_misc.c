@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: dg_misc.c                                       EmpireMUD 2.0b1 *
+*   File: dg_misc.c                                       EmpireMUD 2.0b2 *
 *  Usage: contains general functions for script usage.                    *
 *                                                                         *
 *  DG Scripts code had no header or author info in this file              *
@@ -218,6 +218,7 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 
 	/* add the affect */
 	af.type = ATYPE_DG_AFFECT;
+	af.cast_by = 0;	// TODO implement this
 	af.duration = ceil((double)duration / SECS_PER_REAL_UPDATE);
 	af.modifier = value;
 
@@ -242,7 +243,7 @@ void send_char_pos(char_data *ch, int dam) {
 			break;
 		case POS_INCAP:
 			act("$n is incapacitated and will slowly die, if not aided.", TRUE, ch, 0, 0, TO_ROOM);
-			msg_to_char(ch, "You are incapacitated an will slowly die, if not aided.\r\n");
+			msg_to_char(ch, "You are incapacitated and will slowly die, if not aided.\r\n");
 			break;
 		case POS_STUNNED:
 			act("$n is stunned, but will probably regain consciousness again.", TRUE, ch, 0, 0, TO_ROOM);
@@ -306,12 +307,12 @@ void script_damage(char_data *vict, char_data *killer, int level, int dam_type, 
 		return;
 	}
 	
-	dam = level / 10.0;
+	dam = level / 8.0;
 	dam *= modifier;
 	
 	// guarantee at least 1
 	if (modifier > 0) {
-		dam = reduce_damage_from_skills(dam, vict, killer, dam_type);	// soak, etc
+		dam = reduce_damage_from_skills(dam, vict, killer, dam_type);	// resistance, etc
 		dam = MAX(1, dam);
 	}
 	else if (modifier < 0) {
@@ -357,7 +358,7 @@ void script_damage_over_time(char_data *vict, int level, int dam_type, double mo
 		return;
 	}
 	
-	dam = level / 25.0;
+	dam = level / 20.0;
 	dam *= modifier;
 	
 	// guarantee at least 1

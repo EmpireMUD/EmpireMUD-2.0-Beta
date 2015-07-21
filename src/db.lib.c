@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: db.lib.c                                        EmpireMUD 2.0b1 *
+*   File: db.lib.c                                        EmpireMUD 2.0b2 *
 *  Usage: Primary read/write functions for game world data                *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -58,7 +58,7 @@ extern bool world_is_sorted;
 extern room_data *create_ocean_room(room_vnum vnum);
 extern struct complex_room_data *init_complex_data();
 void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location);
-extern obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location);
+extern obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify);
 void sort_exits(struct room_direction_data **list);
 void sort_world_table();
 
@@ -1523,7 +1523,7 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 					continue;
 				}
 				
-				obj = Obj_load_from_file(fl, t[2], &junk);
+				obj = Obj_load_from_file(fl, t[2], &junk, NULL);
 				if (obj) {
 					remove_from_object_list(obj);	// doesn't really go here right now
 					
@@ -2251,6 +2251,7 @@ void kill_empire_npc(char_data *ch) {
 			if (npc == GET_EMPIRE_NPC_DATA(ch)) {
 				// remove the npc data
 				REMOVE_FROM_LIST(npc, ter->npcs, next);
+				EMPIRE_POPULATION(emp) = MAX(0, EMPIRE_POPULATION(emp) - 1);
 				
 				// reset the population timer
 				ter->population_timer = building_population_timer;
@@ -2537,15 +2538,14 @@ void parse_interaction(char *line, struct interaction_item **list, char *error_p
 	struct interaction_item *interact, *inter_iter;
 	int int_in[3];
 	double dbl_in;
-	char char_in;
-	bool exclusive;
+	char char_in, excl = 0;
 
 	// interaction item: I type vnum percent quantity X
-	if (sscanf(line, "I %d %d %lf %d %c", &int_in[0], &int_in[1], &dbl_in, &int_in[2], &char_in) == 5) {	// with X
-		exclusive = (char_in == 'X');
+	if (sscanf(line, "I %d %d %lf %d %c", &int_in[0], &int_in[1], &dbl_in, &int_in[2], &char_in) == 5) {	// with exclusion code
+		excl = isalpha(char_in) ? char_in : 0;
 	}
-	else if (sscanf(line, "I %d %d %lf %d", &int_in[0], &int_in[1], &dbl_in, &int_in[2]) == 4) {	// no X
-		exclusive = FALSE;
+	else if (sscanf(line, "I %d %d %lf %d", &int_in[0], &int_in[1], &dbl_in, &int_in[2]) == 4) {	// no exclusion code
+		excl = 0;
 	}
 	else {
 		log("SYSERR: Format error in 'I' field, %s\n", error_part);
@@ -2557,10 +2557,10 @@ void parse_interaction(char *line, struct interaction_item **list, char *error_p
 	interact->vnum = int_in[1];
 	interact->percent = dbl_in;
 	interact->quantity = int_in[2];
-	interact->exclusive = exclusive;
+	interact->exclusion_code = excl;
 	interact->next = NULL;
 	
-	// gotta add to the end of the list because of "exclusive"
+	// gotta add to the end of the list exclusion order is important
 	if ((inter_iter = *list) != NULL) {
 		while (inter_iter->next) {
 			inter_iter = inter_iter->next;
@@ -2588,13 +2588,230 @@ void write_interactions_to_file(FILE *fl, struct interaction_item *list) {
 	for (interact = list; interact; interact = interact->next) {
 		fprintf(fl, "I %d %d %.2f %d", interact->type, interact->vnum, interact->percent, interact->quantity);
 		
-		if (interact->exclusive) {
-			fprintf(fl, " X");
+		if (isalpha(interact->exclusion_code)) {
+			fprintf(fl, " %c", interact->exclusion_code);
 		}
 		
 		fprintf(fl, "  # %s: %s\n", interact_types[interact->type], (interact_vnum_types[interact->type] == TYPE_MOB) ? get_mob_name_by_proto(interact->vnum) : get_obj_name_by_proto(interact->vnum));
 	}
 }
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// ISLAND LIB //////////////////////////////////////////////////////////////
+
+/**
+* Fetches the island data for a given room. Optionally, you can have this
+* function guarantee the existence of the island data (e.g. if you're fetching
+* based on a room).
+*
+* @param int island_id The island to look up.
+* @param bool create_if_missing If TRUE, will guarantee a result by adding one.
+* @return struct island_info* A pointer to the island data, or NULL if there is none (and you didn't specify create).
+*/
+struct island_info *get_island(int island_id, bool create_if_missing) {
+	extern int sort_island_table(struct island_info *a, struct island_info *b);
+	
+	struct island_info *isle = NULL;
+	int iter;
+	
+	HASH_FIND_INT(island_table, &island_id, isle);
+	
+	if (!isle && create_if_missing) {
+		CREATE(isle, struct island_info, 1);
+		// ensure good data
+		isle->id = island_id;
+		isle->name = str_dup("Unexplored Island");
+		isle->flags = NOBITS;
+		isle->tile_size = 0;
+		isle->center = NOWHERE;
+		for (iter = 0; iter < NUM_SIMPLE_DIRS; ++iter) {
+			isle->edge[iter] = NOWHERE;
+		}
+		
+		HASH_ADD_INT(island_table, id, isle);
+		HASH_SORT(island_table, sort_island_table);
+	}
+
+	return isle;
+}
+
+
+/**
+* Finds island data using coordinates.
+*
+* @param char_data *coords The incoming coordinates.
+* @return struct island_info* The island data, or NULL if no match.
+*/
+struct island_info *get_island_by_coords(char *coords) {
+	char str[MAX_INPUT_LENGTH];
+	room_data *room;
+	
+	skip_spaces(&coords);
+	if (*coords == '(') {
+		any_one_word(coords, str);
+	}
+	else {
+		strcpy(str, coords);
+	}
+	
+	// must be coords
+	if (!*str || !isdigit(*str) || !strchr(str, ',')) {
+		return NULL;
+	}
+	
+	// find room by coords
+	if (!(room = find_target_room(NULL, str))) {
+		return NULL;
+	}
+	
+	if (GET_ISLAND_ID(room) == NO_ISLAND) {
+		return NULL;
+	}
+	else {
+		return get_island(GET_ISLAND_ID(room), TRUE);
+	}
+}
+
+
+/**
+* This finds an island by name. It prefers exact matches over abbrevs.
+* 
+* @param char *name The name of an island.
+* @return struct island_info* Returns an island if any matched, or NULL.
+*/
+struct island_info *get_island_by_name(char *name) {
+	struct island_info *isle, *next_isle, *abbrev;
+	
+	abbrev = NULL;
+	HASH_ITER(hh, island_table, isle, next_isle) {
+		if (!str_cmp(name, isle->name)) {
+			return isle;
+		}
+		else if (!abbrev && is_abbrev(name, isle->name)) {
+			abbrev = isle;
+		}
+	}
+	
+	// didn't find an exact match, so:
+	return abbrev;
+}
+
+
+/**
+* Load one island from file.
+*
+* @param FILE *fl The open read file.
+* @param int id The island id.
+* @return struct island_info* The island.
+*/
+static struct island_info *load_one_island(FILE *fl, int id) {	
+	char errstr[MAX_STRING_LENGTH], line[256], str_in[256];
+	struct island_info *isle;
+	
+	snprintf(errstr, sizeof(errstr), "island %d", id);
+	
+	// this does all the adding to tables and whatnot too!
+	isle = get_island(id, TRUE);
+	
+	// line 1: name
+	if (isle->name) {
+		free(isle->name);
+	}
+	isle->name = fread_string(fl, errstr);
+	
+	// line 2: center, flags
+	if (!get_line(fl, line) || sscanf(line, "%s", str_in) != 1) {
+		log("SYSERR: Format error in line 2 of %s", errstr);
+		exit(1);
+	}
+	
+	isle->flags = asciiflag_conv(str_in);
+	
+	// optionals
+	for (;;) {
+		if (!get_line(fl, line)) {
+			log("SYSERR: Format error in instance, expecting alphabetic flags, got: %s", line);
+			exit(1);
+		}
+		switch (*line) {
+			case 'S': {
+				// done
+				return isle;
+			}
+		}
+	}
+	
+	return isle;
+}
+
+
+/**
+* Loads island data, if there is any.
+*/
+void load_islands(void) {
+	char line[256];
+	FILE *fl;
+	
+	if (!(fl = fopen(ISLAND_FILE, "r"))) {
+		// log("SYSERR: Unable to load islands from file.");
+		// there just isn't a file -- that's ok, we'll generate new data
+		return;
+	}
+	
+	while (get_line(fl, line)) {
+		if (*line == '#') {
+			load_one_island(fl, atoi(line+1));
+		}
+		else if (*line == '$') {
+			// done;
+			break;
+		}
+		else {
+			// junk data?
+		}
+	}
+	
+	fclose(fl);
+}
+
+
+/**
+* Write island data to file.
+*/
+void save_island_table(void) {
+	struct island_info *isle, *next_isle;
+	FILE *fl;
+	
+	if (!(fl = fopen(ISLAND_FILE TEMP_SUFFIX, "w"))) {
+		log("SYSERR: Unable to write %s", ISLAND_FILE TEMP_SUFFIX);
+		return;
+	}
+
+	HASH_ITER(hh, island_table, isle, next_isle) {
+		fprintf(fl, "#%d\n", isle->id);
+		fprintf(fl, "%s~\n", NULLSAFE(isle->name));
+		fprintf(fl, "%s\n", bitv_to_alpha(isle->flags));		
+		fprintf(fl, "S\n");
+	}
+
+	fprintf(fl, "$\n");
+	fclose(fl);
+	rename(ISLAND_FILE TEMP_SUFFIX, ISLAND_FILE);
+}
+
+
+/**
+* Simple sorter for the island_table hash
+*
+* @param struct island_info *a One element
+* @param struct island_info *b Another element
+* @return int Sort instruction of -1, 0, or 1
+*/
+int sort_island_table(struct island_info *a, struct island_info *b) {
+	return a->id - b->id;
+}
+
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2947,13 +3164,18 @@ void parse_object(FILE *obj_f, int nr) {
 		log("SYSERR: Expecting first numeric line of %s, but file ended!", buf2);
 		exit(1);
 	}
-	if ((retval = sscanf(line, " %d %s %s", t, f1, f2)) != 3) {
-		log("SYSERR: Format error in first numeric line (expecting 3 args, got %d), %s", retval, buf2);
-		exit(1);
+	if ((retval = sscanf(line, " %d %s %s %d", &t[0], f1, f2, &t[1])) != 4) {
+		// older version of the file: missing version into
+		t[1] = 1;
+		if ((retval = sscanf(line, " %d %s %s", t, f1, f2)) != 3) {
+			log("SYSERR: Format error in first numeric line (expecting 3 args, got %d), %s", retval, buf2);
+			exit(1);
+		}
 	}
 	obj->obj_flags.type_flag = t[0];
 	obj->obj_flags.extra_flags = asciiflag_conv(f1);
 	obj->obj_flags.wear_flags = asciiflag_conv(f2);
+	OBJ_VERSION(obj) = t[1];
 
 	if (!get_line(obj_f, line)) {
 		log("SYSERR: Expecting second numeric line of %s, but file ended!", buf2);
@@ -3140,7 +3362,7 @@ void write_obj_to_file(FILE *fl, obj_data *obj) {
 	// I imagine calling this function twice in one fprintf would not have the desired effect.
 	strcpy(temp, bitv_to_alpha(GET_OBJ_EXTRA(obj)));
 	strcpy(temp2, bitv_to_alpha(GET_OBJ_WEAR(obj)));
-	fprintf(fl, "%d %s %s\n", GET_OBJ_TYPE(obj), temp, temp2);
+	fprintf(fl, "%d %s %s %d\n", GET_OBJ_TYPE(obj), temp, temp2, OBJ_VERSION(obj));
 
 	fprintf(fl, "%d %d %d\n", GET_OBJ_VAL(obj, 0), GET_OBJ_VAL(obj, 1), GET_OBJ_VAL(obj, 2));
 	
@@ -3542,7 +3764,8 @@ void write_room_to_file(FILE *fl, room_data *room) {
 	fprintf(fl, "#%d\n", GET_ROOM_VNUM(room));
 	
 	// both sector and original-sector must save vnums
-	fprintf(fl, "%d %d %d\n", GET_ISLAND_ID(room), GET_SECT_VNUM(SECT(room)), GET_SECT_VNUM(ROOM_ORIGINAL_SECT(room)));
+	// NOTE: does not need an island id if it's not on the map
+	fprintf(fl, "%d %d %d\n", (GET_ROOM_VNUM(HOME_ROOM(room)) < MAP_SIZE) ? GET_ISLAND_ID(room) : -1, GET_SECT_VNUM(SECT(room)), GET_SECT_VNUM(ROOM_ORIGINAL_SECT(room)));
 	
 	// B building data
 	if (COMPLEX_DATA(room)) {
@@ -5168,8 +5391,6 @@ room_data *real_real_room(room_vnum vnum) {
 * @return room_data* A pointer to the room, or NULL.
 */
 room_data *real_room(room_vnum vnum) {
-	extern room_data *ocean_from_pool(room_vnum vnum);
-
 	room_data *room = NULL;
 	
 	// sheer sanity
@@ -5182,7 +5403,7 @@ room_data *real_room(room_vnum vnum) {
 	
 	// we guarantee map rooms exist
 	if (!room && vnum < MAP_SIZE) {
-		room = ocean_from_pool(vnum);
+		room = create_ocean_room(vnum);
 	}
 
 	return room;
@@ -5615,7 +5836,7 @@ void sort_interactions(struct interaction_item **list) {
 
 			a = *list;
 			while ((b = a->next)) {
-				if (a->type > b->type) {
+				if (a->type > b->type || (a->type == b->type && a->exclusion_code > b->exclusion_code)) {
 					// preserve next-pointers
 					a_next = a->next;
 					b_next = b->next;

@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.comm.c                                      EmpireMUD 2.0b1 *
+*   File: act.comm.c                                      EmpireMUD 2.0b2 *
 *  Usage: Player-level communication commands                             *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -743,6 +743,7 @@ ACMD(do_slash_channel) {
 	struct player_slash_channel *slash, *temp;
 	char arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
 	descriptor_data *desc;
+	char_data *vict;
 	int iter;
 	bool ok, found;
 	
@@ -756,7 +757,7 @@ ACMD(do_slash_channel) {
 	}
 	
 	if (!*arg) {
-		msg_to_char(ch, "Valid slash-channel commands are: /join, /leave, /who, /hist, /history, /list, and /<channel>\r\n");
+		msg_to_char(ch, "Valid slash-channel commands are: /join, /leave, /who, /hist, /history, /check, /list, and /<channel>\r\n");
 	}
 	else if (!str_cmp(arg, "list")) {
 		msg_to_char(ch, "You are on the following channels:\r\n");
@@ -772,14 +773,54 @@ ACMD(do_slash_channel) {
 			msg_to_char(ch, "  none\r\n");
 		}
 	}
+	else if (!str_cmp(arg, "check")) {
+		// check channels: any player
+		one_argument(arg2, arg3);
+		
+		if (!(vict = get_player_vis(ch, arg3, FIND_CHAR_WORLD | FIND_NO_DARK))) {
+			send_config_msg(ch, "no_person");
+			return;
+		}
+		if (vict == ch) {
+			msg_to_char(ch, "If you want to check what channels you're on, use /list.\r\n");
+			return;
+		}
+		
+		// messaging
+		if (IS_IMMORTAL(ch)) {
+			msg_to_char(ch, "%s is on the following slash-channels:\r\n", PERS(vict, ch, TRUE));
+		}
+		else {
+			msg_to_char(ch, "%s is on the following channels with you:\r\n", PERS(vict, ch, TRUE));
+		}
+		
+		found = FALSE;
+		for (slash = GET_SLASH_CHANNELS(vict); slash; slash = slash->next) {
+			if ((chan = find_slash_channel_by_id(slash->id)) && (IS_IMMORTAL(ch) || find_on_slash_channel(ch, slash->id))) {
+				msg_to_char(ch, "  &%c/%s&0\r\n", chan->color, chan->name);
+				found = TRUE;
+			}
+		}
+		
+		if (!found) {
+			msg_to_char(ch, "  none\r\n");
+		}
+	}
 	else if (!str_cmp(arg, "join")) {
 		// join channel: just first word
 		any_one_arg(arg2, arg3);
 		
 		// validate name
-		ok = TRUE;
+		ok = TRUE && *arg3;
 		for (iter = 0; ok && *invalid_channel_names[iter] != '\n'; ++iter) {
 			if (!str_cmp(arg3, invalid_channel_names[iter])) {
+				ok = FALSE;
+			}
+		}
+		
+		// check alphanumeric
+		for (iter = 0; ok && iter < strlen(arg3); ++iter) {
+			if (!isalnum(arg3[iter])) {
 				ok = FALSE;
 			}
 		}
@@ -973,17 +1014,32 @@ ACMD(do_gsay) {
 ACMD(do_history) {
 	const char *types[NUM_CHANNEL_HISTORY_TYPES] = { "god channels", "tells", "says", "empire chats" };
 	struct channel_history_data *chd_iter;
+	bool found_crlf;
+	int pos;
 	
 	if (ch->desc) {
 		msg_to_char(ch, "Last %d %s:\r\n", MAX_RECENT_CHANNELS, types[subcmd]);
 	
 		for (chd_iter = ch->desc->channel_history[subcmd]; chd_iter; chd_iter = chd_iter->next) {
-			send_to_char(chd_iter->message, ch);
-			
-			// check for newline
-			if (chd_iter->message[strlen(chd_iter->message) - 1] != '\n') {
-				send_to_char("\r\n", ch);
+			// verify has newline
+			pos = strlen(chd_iter->message) - 1;
+			found_crlf = FALSE;
+			while (pos > 0 && !found_crlf) {
+				if (chd_iter->message[pos] == '\r' || chd_iter->message[pos] == '\n') {	
+					found_crlf = TRUE;
+				}
+				else if (chd_iter->message[pos] == '&' || chd_iter->message[pos-1] == '&') {
+					// probably color code
+					--pos;
+				}
+				else {
+					// found something not a crlf or a color code
+					break;
+				}
 			}
+			
+			// send message
+			msg_to_char(ch, "%s&0%s", chd_iter->message, (found_crlf ? "" : "\r\n"));
 		}
 	}
 }
@@ -1062,7 +1118,7 @@ ACMD(do_page) {
 	half_chop(argument, arg, buf2);
 
 	if (REAL_NPC(ch))
-		msg_to_char(ch, "Monsters can't page.. go away.\r\n");
+		msg_to_char(ch, "Monsters can't page... go away.\r\n");
 	else if (!*arg)
 		msg_to_char(ch, "Whom do you wish to page?\r\n");
 	else {
@@ -1283,7 +1339,7 @@ ACMD(do_spec_comm) {
 	half_chop(argument, buf, buf2);
 
 	if (!*buf || !*buf2) {
-		sprintf(buf, "Whom do you want to %s.. and what??\r\n", action_sing);
+		sprintf(buf, "Whom do you want to %s... and what??\r\n", action_sing);
 		msg_to_char(ch, buf);
 		}
 	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_SILENT))

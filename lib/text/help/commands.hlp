@@ -24,7 +24,8 @@ See also: ALIAS
 
 The + and - commands allow you to manipulate your input queue. Some commands,
 such as abilities, cause a small amount of "command lag". Anything you type
-while you have this "lag" is added to the end of your input queue.
+while you have this "lag" is added to the end of your input queue. Normal
+command lag is 1.25 seconds for abilities, but some traits can lower this.
 
 You can add a new command to the start of your input queue (instead of the
 end of the queue) using a +. For example, "+heal" will put "heal" at the start
@@ -35,6 +36,8 @@ You can see your current queue by typing -.
 You can clear your entire queue with --, or you can remove specific items with
 "-text" where text is an abbreviation for the commands to remove. For example,
 "-kick" will remove anything that starts with "kick".
+
+See also: FASTCASTING
 #
 AFFECTS
 
@@ -106,9 +109,10 @@ This command lets you switch from one alt to another. An "alt" is a character
 you own, on your account. You can only use this command to switch between
 characters on the same account. No password is required.
 
-Other players will see a log indicating that you switched from one character
-to the other, so if you're trying to hide your true identity, you should
-probably not use this command.
+Players will only see the login/logout messages unless they are in the same
+empire as both your alts, in which case they will see a "switch" message.
+However, if this EmpireMUD has public logins enabled, alternate will always
+give a "switch" mortlog (instead of elogs).
 
 You can't use alternate again within 60 seconds of a previous use. Please don't
 spam players by logging in and out more rapidly than this.
@@ -121,7 +125,7 @@ information on these rules.
 
 See also: QUIT
 #
-ANSI COLOR MAPCOLOR "MAP COLOR" MAP-COLOR
+ANSI COLOR COLORS MAPCOLOR "MAP COLOR" MAP-COLOR &&
 
 Usage:  toggle color
         toggle map-color
@@ -149,7 +153,7 @@ Bright colors:
 #
 ASSIST
 
-Usage: assist <person in need>
+Usage:  assist <person in need>
 
 If Quifael is being beaten senseless by a tiger and you feel brave enough to
 help him, type ASSIST QUIFAEL to hit the tiger. Note that the tiger will keep
@@ -171,7 +175,7 @@ See also: FOLLOW
 #
 BOARD
 
-Usage: board <ship>
+Usage:  board <ship>
 
 This command is used to board a ship in the same room.
 
@@ -189,9 +193,9 @@ See also: BRIEF, COMPACT, MAPSIZE
 #
 BUG TYPO IDEA
 
-Usage: bug <bug report>
-       idea <your new idea>
-       typo <that nasty typo>       
+Usage:  bug <bug report>
+        idea <your new idea>
+        typo <that nasty typo>       
 
 For making useful suggestions and reporting problems to the Powers that Be.
 
@@ -221,7 +225,9 @@ Usage:  circle <direction>
 
 This command allows you to circle around a building. This bypasses the building
 on the map. It can't be used on walls, or buildings that are flanked on two
-sides by walls.
+sides by walls. You can circle up to three closed buildings in a row.
+
+You cannot circle onto water tiles or rough terrain.
 #
 CLS
 
@@ -232,7 +238,7 @@ to clear the screen.
 #
 COMMANDS
 
-Usage: commands
+Usage:  commands
 
 The COMMANDS command gives a canonical list of all the known verbs.
 
@@ -251,7 +257,7 @@ See also: TOGGLE
 #
 CONFIRM
 
-Usage: confirm
+Usage:  confirm
 
 When a reboot has been set to a specific time, players are allowed to speed it
 up. If everyone types 'confirm,' it will reboot early. This should only be
@@ -284,7 +290,7 @@ See also: TAILOR, WEAVE
 #
 DIAGNOSE
 
-Usage: diagnose [character]
+Usage:  diagnose [character]
 
 The DIAGNOSE command tells you how wounded a character looks. If you are
 fighting someone, you can use DIAGNOSE with no arguments to diagnose the
@@ -298,18 +304,18 @@ Examples:
 #
 DIRECTIONS NORTH SOUTH EAST WEST NORTHEAST NORTHWEST SOUTHEAST SOUTHWEST UP DOWN NE NW SE SW FORE AFT PORT STARBOARD
 
-Usage: north, south, east, west
-       northeast, northwest, southeast, southwest
-       fore, aft, port, starboard (on a ship)
-       ne, nw, se, sw
-       up, down
+Usage:  north, south, east, west
+        northeast, northwest, southeast, southwest
+        fore, aft, port, starboard (on a ship)
+        ne, nw, se, sw
+        up, down
 
 To travel in a given direction. Indoors, you're given a list of directions
 you can travel. Out in the wilderness, you can go in any normal direction.
 #
 DISEMBARK
 
-Usage: disembark
+Usage:  disembark
 
 From the entry room of a ship (the room you're placed in when you board it),
 you may disembark. This can be done even in the ocean, though you may need a
@@ -321,11 +327,13 @@ DISMISS
 
 Usage:  dismiss <familiar>
 
-This command causes your familiar to leave.
+This command causes your familiar to leave. You can target the familiar by
+name if it's in the room with you, or else can type 'dismiss familiar' to
+dismiss it anywhere in the world.
 #
-DOUSE FIRE
+DOUSE BURNING "PUT OUT FIRE"
 
-Usage: douse
+Usage:  douse
 
 In the event of a fire, you may douse it with water from any portable source. 
 It may take a lot of water to douse the fire, and you may have to leave and 
@@ -334,19 +342,18 @@ and destroy your structure.
 #
 DRAW
 
-Usage: draw [item]
+Usage:  draw <item>
 
-This pulls your sheathed weapon from its holster. It is done automatically in
-battle as long as your hand is free.
+This command pulls one of your sheathed weapons into your main hand.
 
-See also: SHEATH, SWAP
+See also: SHEATHE, SWAP
 #
 DROP
 
-Usage: drop <item>
-       drop all.<item>
-       drop all
-       drop <number> [empire] coins
+Usage:  drop <item>
+        drop all.<item>
+        drop all
+        drop <number> [empire] coins
 
 If you lose interest in a carried item, you can drop it on the ground. Don't
 leave things laying around, though, or the might not be there when you get
@@ -360,14 +367,14 @@ generic coins. If you need to use an empire with a multi-word name, put it in
   > drop all.bread
   > drop all
 
-See also: COINS, GET, JUNK
+See also: COINS, GET, JUNK, KEEP
 #
 EAT DRINK SIP TASTE
 
-Usage: eat <item>
-       taste <item>
-       drink [from] <item>
-       sip [from] <item>
+Usage:  eat <item>
+        taste <item>
+        drink [from] <item>
+        sip [from] <item>
 
 If you're hungry or thirsty, these commands are for you! You can drink from
 wells, fountains, and the edge of nearby rivers, too.
@@ -383,8 +390,8 @@ See also: FILL, POUR, TASTE BLOOD
 #
 EMOTE :
 
-Usage: emote <message>
-       : <message>
+Usage:  emote <message>
+        : <message>
 
 Show people what you're feeling. The shorthand is ":".
 "emote <string>" will display your name, then the string.
@@ -398,7 +405,7 @@ See also: SOCIALS
 #
 EQUIPMENT
 
-Usage: equipment [-all]
+Usage:  equipment [-all]
 
 Gives you a list of all the equipment you're wearing, holding, and wielding.
 
@@ -419,17 +426,17 @@ See also: TOGGLE, STAKE, TIE
 #
 EXITS
 
-Usage: exits
+Usage:  exits
 
 Gives you a list of the obvious exits from your location. This command is
 only useful indoors, because on the world map all directions are exits.
 #
 FILL
 
-Usage: fill <item> [from] well
-       fill <item> [from] fountain
-       fill <item> river
-       fill <item> [from] <item>
+Usage:  fill <item> [from] well
+        fill <item> [from] fountain
+        fill <item> river
+        fill <item> [from] <item>
        
 If you want to fill a container you're holding with liquid from a fountain or
 well in the same room as you. You can also fill it from a river in the same
@@ -447,7 +454,7 @@ See also: POUR, DRINK
 #
 FLEE
 
-Usage: flee
+Usage:  flee
 
 If you are in a fight and things are beginning to get a little uncomfortable
 (maybe you are dying), just type 'flee', and presto! You are out of harm's
@@ -457,7 +464,7 @@ You must type out this command; it cannot be abbreviated.
 #
 FOLLOW
 
-Usage: follow <leader>
+Usage:  follow <leader>
 
 Use FOLLOW to automatically follow someone else. You can use AVOID to shake
 someone loose.
@@ -473,10 +480,10 @@ GET TAKE
 
 "Get" and "take" are exactly the same and can be used interchangeably.
 
-Usage: get <object>
-       take all [object]
-       take all all.<object>
-       get all.<object> all.<object>
+Usage:  get <object>
+        take all [object]
+        take all all.<object>
+        get all.<object> all.<object>
 
 If you find something interesting on the ground, you may use 'get' to pick
 it up. 'get' can also be used to extract items from containers.
@@ -488,12 +495,12 @@ Examples:
   > get all all.bag
   > get all.bread all.bag
 
-See also: DROP, PUT
+See also: DROP, KEEP, PUT
 #
 GIVE
 
-Usage: give <object> <victim>
-       give <number> [empire] coins <victim>
+Usage:  give <object> <victim>
+        give <number> [empire] coins <victim>
 
 If you feel benevolent, you may give some stuff to someone in need. When giving
 coins, if you don't specify an empire, it will default to your generic coins.
@@ -504,12 +511,12 @@ can use the empire's full name, adjective name, or number.
   > give bread doctor
   > give all.bronze mirlen
 
-See also: COINS
+See also: COINS, KEEP
 #
 GRAB HOLD
 
-Usage: grab <object>
-       hold <object>
+Usage:  grab <object>
+        hold <object>
 
 For getting a good grip on something; a torch, for example. This equips an
 item to the off-hand slot (held), except bows, which it puts in the ranged
@@ -524,12 +531,12 @@ See also: EQUIPMENT, REMOVE, WEAR, WIELD, SWAP
 #
 GROUP PARTY
 
-Usage: group  -- see status on the group
-       group invite <name>  -- invite a player to the group
-       group join  -- join a group you were invited to
-       group kick <name>  -- kick a member from the group
-       group leave  -- leave the group you're in
-       group leader <name>  -- change leader
+Usage:  group  -- see status on the group
+        group invite <name>  -- invite a player to the group
+        group join  -- join a group you were invited to
+        group kick <name>  -- kick a member from the group
+        group leave  -- leave the group you're in
+        group leader <name>  -- change leader
 
 Grouping allows multiple players to work on the same challenge, and gives them
 access to a private group channel. You can also type "group" by itself to see
@@ -546,8 +553,8 @@ See also: GSAY
 #
 GSAY GTELL PSAY PTELL
 
-Usage: gsay <message>
-       gtell <message>
+Usage:  gsay <message>
+        gtell <message>
 
 Tell something to all the members of your group, even if they're not in the
 room. You can also use the older psay/ptell command, which does the same thing.
@@ -556,7 +563,7 @@ See also: DISPLAY, IGNORE, GROUP, TELL, SAY
 #
 HELP
 
-Usage: help [command]
+Usage:  help [command]
 
 Help searches for a partial match of the entered word, including any
 spaces that may follow the word. Help alone will give a list of the
@@ -571,7 +578,7 @@ See also: COMMANDS, HELPSEARCH, SOCIALS
 #
 HELPSEARCH "HELP SEARCH" "SEARCH HELP"
 
-Usage: helpsearch <term>
+Usage:  helpsearch <term>
 
 This command lets you search the body of help files, instead of just their
 keywords.
@@ -625,7 +632,7 @@ idea to read them every once in a while.
 #
 INVENTORY
 
-Usage: inventory
+Usage:  inventory
 
 If you're uncertain about what you're carrying, or simply want to check that
 no thieves have got to your backpack. When in a storage building, this also
@@ -640,8 +647,8 @@ See also: EQUIPMENT, GRAB, HOLD, REMOVE, WEAR, STORE, RETRIEVE, WIELD, SWAP
 #
 JUNK
 
-Usage: junk <object>
-       junk <number> [empire] coins
+Usage:  junk <object>
+        junk <number> [empire] coins
 
 Use JUNK instead of DROP if you want to keep the world a little cleaner. If
 you JUNK something, it will disappear.
@@ -659,8 +666,8 @@ See also: COINS, DROP
 #
 KILL HIT
 
-Usage: kill <victim>
-       hit <victim>
+Usage:  kill <victim>
+        hit <victim>
 
 A good way to start a fight.
 
@@ -679,7 +686,7 @@ LAY ROAD ROADS
 Roads: ----  ..|.  ..+-  --+.  .--.
 
 Roads (Empire)
-Usage: lay
+Usage:  lay
 
 You may use this ability to lay 20 rocks into the ground to form a cobblestone 
 road. Roads eliminate the small movement lag that you normally get while
@@ -693,13 +700,14 @@ the Empire skill.
 
 Roads count as their base terrain for most building functions, so you can
 build things facing roads, and can usually build right over a road -- but the
-road underneath will be lost.
+road underneath will be lost. Roads also count as in-city territory for your
+empire, no matter where you lay them.
 
 See also: EMPIRE, ROADSIGN
 #
 LOAD BOATLOAD "BOAT LOAD"
 
-Usage:  load <item> <ship>
+Usage:  load <ship> <item>
 
 This command allows you to load items onto a ship. You can only do this at the
 docks.
@@ -712,9 +720,9 @@ See also: UNLOAD, BOARD, SAIL
 #
 LOOK EXAMINE
 
-Usage: look
-       look [in | at] [the] <item>
-       look <direction>
+Usage:  look
+        look [in | at] [the] <item>
+        look <direction>
 
 For studying your surroundings. Examine and look do the same thing.
 
@@ -747,9 +755,9 @@ See also: TOGGLE
 #
 MAIL CHECK RECEIVE SEND
 
-Usage: mail check
-       mail send <person>
-       mail receive [amount]
+Usage:  mail check
+        mail send <person>
+        mail receive [amount]
 
 The commands used by the mail are SEND, CHECK, and RECEIVE. You can only send
 mail from a pigeon post, but you can check and receive mail from anywhere.
@@ -780,14 +788,14 @@ See also: WORKFORCE
 #
 MORTLOG
 
-Usage: mortlog
+Usage:  toggle mortlog
 
 This will give you periodic updates, such as when a player logs in, leaves, or
 dies. It's useful in keeping up on current events. Mortlog is colored cyan.
 #
 MOTD
 
-Usage: motd
+Usage:  motd
 
 Displays the message of the day. Contains important information regarding the
 status of the MUD. You should be sure to read it when you login. If you miss
@@ -815,7 +823,7 @@ a slow connection or if it just annoys you.
 #
 NOTELL "NO TELL"
 
-Usage: toggle tell
+Usage:  toggle tell
 
 Use this toggle if you wish to prevent other players from using "tell" to
 communicate with you. (notell) will appear after your name in the WHO list if
@@ -825,7 +833,7 @@ See also: IGNORE, TELL, WHO
 #
 OPEN CLOSE
 
-Usage: open | close <door> [direction]
+Usage:  open | close <door> [direction]
 
 To open and close doors, of course. This also works on some containers.
 
@@ -836,8 +844,8 @@ Examples:
 #
 ORDER
 
-Usage: order <character> <command>
-       order followers <command>
+Usage:  order <character> <command>
+        order followers <command>
 
 Used for ordering pets and charmed people to do your evil bidding. You can
 order everyone under your command with "order followers".
@@ -870,6 +878,10 @@ mission to use both buildings. The portal will stay open for a few minutes.
 You can target the portal building on the other end using either its co-
 ordinates, or the name of a person who is at the other side.
 
+Portals over 50 map tiles away cost 1 nexus crystal per 75 tiles, rounded up.
+These crystals can be crafted from magical gems by any portal mage, and stored
+at the portal building.
+
 You can portal to specific coordinates by using parentheses (123, 456) or by
 typing the coordinates with no space -- 123,456 -- but you can target your
 own and allied portals by number.
@@ -883,14 +895,18 @@ Portals can only connect two locations on the same land mass (continent or
 island) unless your empire has a Portal Master. You can't open a portal at all
 if there isn't at least a Portal Mage.
 
+You can't enter a portal of any kind if it's on a tile you don't have
+permission to use, such as one owned by an enemy empire. Infiltrate can get
+around this (you still use the 'enter' command).
+
 Immortals can open portals between any two locations.
 
-See also: PORTAL MAGIC, PORTAL MASTER, COLLAPSE
+See also: PORTAL MAGIC, PORTAL MASTER, COLLAPSE, INFILTRATE
 #
 POUR
 
-Usage: pour <from container> <to container>
-       pour <from container> out
+Usage:  pour <from container> <to container>
+        pour <from container> out
 
 If you want to pour some liquid from one container to another. Pouring
 out simply empties the contents of the container onto the ground.
@@ -905,14 +921,19 @@ Examples:
 
 See also: FILL, TRENCH
 #
-PROMPT
+PROMPT FPROMPT "FIGHT PROMPT" "COMBAT PROMPT"
 
-Usage: prompt <prompt string>
+Usage:  prompt <string | off | default>
+        fprompt <string | off | default>
 
 The prompt is the text you see when the game is waiting for you to do
 something, and it's usually right next to where you type (but some mud clients
 put typing in its own field). You can use the default prompt, which shows how
 injured and tired you are. Or you can choose your own prompt.
+
+You can also set an fprompt, which is used only when you are in combat. It may
+be different from your regular prompt. Using "fprompt default" will cause you
+to see your normal prompt in combat.
 
 Typing "prompt off" will remove your prompt entirely, and "prompt default"
 will restore your default prompt.
@@ -931,7 +952,10 @@ Here are the prompt codes and what they do:
                           %F  Current/total health of enemy's focus (if player)
   
   %c  Conditions (hunger, thirst)
-  %s  skill points left today
+  %s  bonus skill exp left today
+
+For immortals:
+  %r  Sector/building/room number
 
 See also: PROMPT SUGGESTIONS
 #
@@ -947,9 +971,9 @@ See also: PROMPT
 #
 PUT
 
-Usage: put <item> [in] <container>
-       put all.<item> [in] <container>
-       put all <container>
+Usage:  put <item> [in] <container>
+        put all.<item> [in] <container>
+        put all <container>
 
 For putting items into containers.
 
@@ -959,12 +983,13 @@ Examples:
   > put all.bread bag
   > put all chest
 
-See also: GET
+See also: GET, KEEP
 #
 QUIT
 
 When you get tired of playing, you can leave the game by typing 'quit'. This
-will save your character and disconnect your.
+will save your character and disconnect you. Only players in the same empire
+will see a message that you quit, unless public logins are enabled.
 
 You can use "alt" to quickly change characters, rather than quitting.
 
@@ -993,9 +1018,9 @@ See also: COLOR
 #
 REMOVE
 
-Usage: remove <item>
-       remove all
-       remove all.<keyword>
+Usage:  remove <item>
+        remove all
+        remove all.<keyword>
 
 If you tire of wearing some armor or wielding a weapon, remove it.
 
@@ -1010,7 +1035,7 @@ See also: GRAB, HOLD, WEAR, WIELD, SHEATH, DRAW, SWAP
 #
 REPLY
 
-Usage: reply <message>
+Usage:  reply <message>
 
 This command will send a reply to the last person to send you a message using
 TELL. It works just as if you had typed 'tell <player> <message>' but makes
@@ -1063,7 +1088,7 @@ Examples:
 #
 SAIL
 
-Usage: sail <direction>
+Usage:  sail <direction>
 
 You can sail the ship from any location inside, for your convenience. Ships
 can travel on oceans and rivers, through river gates, and under bridges. 
@@ -1074,7 +1099,7 @@ See also: BOARD, DISEMBARK
 #
 SAVE
 
-Usage: save
+Usage:  save
 
 Save your persona. This includes experience points, strength, gold, etc.
 Your equipment is also saved in the (unlikely?) event of a crash. The
@@ -1085,9 +1110,9 @@ This is not the type of game where you can re-load from past saves.
 #
 SAY OOCSAY OSAY TELL ASK WHISPER ' ""
 
-Usage: say <string>
-       oocsay <string>
-       <tell | whisper | ask> <player> <string>
+Usage:  say <string>
+        oocsay <string>
+        <tell | whisper | ask> <player> <string>
 
 If you consider communicating with other beings, you might be understood
 better if you start your sentences with either say, tell, whisper or shout.
@@ -1114,28 +1139,27 @@ See also: TELLHISTORY
 #
 SCORE
 
-Usage: score
+Usage:  score
 
 The score command provides you all the important information about your
 character, including health and attributes.
 
 Your class is determined by your top two skills, and you first receive a class
-when both of these skills are past 75. The levels shown are your skill level,
-your gear level, and your total between the two.
+when both of these skills are past 75. The level shown on score is your total
+level, with your skill level shown in parentheses.
 
 Conditions are displayed as:  Health: &g50&0/&g100&0+&g15&0/hr
 The first number (50) is your current health, the 100 is your maximum health,
-and the final number (15/hr) is your rate of regneration. One hour in the MUD
+and the final number (15/hr) is your rate of regeneration. One hour in the MUD
 is 75 seconds. Your actual regeneration happens every 5 seconds.
 
 Attributes are rated from 0 to 10. They are shown in green if you have a spell
 or piece of gear enhancing the attribute, or red if there is one subtracting
 from it.
 
-Dodge: Your bonus to your per cent chance to dodge an attack.
-Block: Bonus to chance to block with a shield.
-Soak: Damage absorption from gear and spells.
-To-hit: Bonus chance to hit with attacks.
+You can get more information on most of the traits on the score from their own
+help files (e.g. HELP DODGE). The 'Resist' trait is split into two parts: the
+first is resist-physical, and the second is resist-magical.
 
 Skills are shown as:  Battle: &g100 (1)&0
 In this example, "Battle" is the name of the skill, 100 is your rating in it,
@@ -1174,7 +1198,7 @@ SCROLLING
 Usage:  toggle scrolling
 
 This toggle turns off the page breaks sent when a character receives a long
-amoung of information. The information is sent all at once, as preferred by
+amount of information. The information is sent all at once, as preferred by
 some people for features like the WHO list.
 #
 SELFDELETE "SELF DELETE" SELF-DELETE DELETE
@@ -1208,7 +1232,7 @@ See also: WAKE
 #
 SOCIALS
 
-Usage: <social> [victim]
+Usage:  <social> [victim]
 
 Socials are commands used to show your affective state to others. The actor,
 victim and bystanders may receive different messages. Generally, social
@@ -1281,7 +1305,7 @@ See also: ADVENTURE
 #
 SWAP
 
-Usage: swap
+Usage:  swap
 
 EmpireMUD uses many different weapon types for activities, and most require
 that they be in the wielding position (rather than just held). The swap
@@ -1296,7 +1320,7 @@ See also: DRAW, SHEATH
 #
 TELLHISTORY
 
-Usage: tellhistory
+Usage:  tellhistory
 
 Lists the last 20 uses of tells. This is useful if you have clear mode on
 and missed something because you were walking.
@@ -1309,7 +1333,7 @@ See also: SAYHISTORY, TELL
 #
 THROW
 
-Usage: throw <object> <direction>
+Usage:  throw <object> <direction>
 
 This is used to throw an object into a near-by room. This is used primarily
 for burning down buildings.
@@ -1344,7 +1368,7 @@ Handy time-conversion chart:
 #
 TITLE
 
-Usage: title <new title>
+Usage:  title <new title>
 
 Sets the title people see on the WHO list. You can't use parentheses (the "(" 
 and ")" characters) because those are reserved for other information.
@@ -1383,9 +1407,11 @@ Toggles:
   afk - Whether or not you are away-from-keyboard
   channel-joins - blocks slash-channel join messages
   autorecall - if you're logged out over an hour, automatically sends you home
+  stealthable - if off, you will be prevented from accidentally stealing
 
 Immortal toggles:
   wiznet - shuts off the immortal channel
+  hassle - if hassle is on, the immortal may be hit by mobs and scripts
   holylight - allows immortals to see in the dark
   roomflags - shows room flags, vnums, and other info to immortals
   idle-out - if off, the immortal will not disconnect from idling
@@ -1409,7 +1435,7 @@ See also: HESTIAN TRINKET, POISON
 #
 VISIBLE
 
-Usage: visible
+Usage:  visible
 
 Makes you visible. This command removes anything that was hiding you.
 #
@@ -1418,12 +1444,14 @@ WAKE REST SIT STAND
 For changing your position. If you feel weary, it's probably a good idea to
 sit and rest for a while, or maybe even take a nap.
 
+Wake can also be used to wake up other players.
+
 See also: SLEEP
 #
 WEAR
 
-Usage: wear <item> [location]
-       wear all
+Usage:  wear <item> [location]
+        wear all
 
 If you want to wear some clothes, armor or the likes.
 
@@ -1450,7 +1478,7 @@ See also: EQUIPMENT, REMOVE, WIELD, HOLD, SHEATH, DRAW, SWAP
 #
 WEATHER
 
-Usage: weather
+Usage:  weather
 
 If you're uncertain whether the sun is shining or the rain is pouring down. 
 You'll have to be outside in order to tell however. At night, this also
@@ -1458,20 +1486,24 @@ allows you to look at the phases of the moons.
 #
 WHO
 
-Usage: who [-n name] [-e]
+Usage:  who [min-maxlevel] [-n name] [-e [empire]] [-r] [-s]
 
 Lists the people currently in the game. Some people may be invisible. Command-
 line options can be used to limit the listing. The parameters can be specified
 on the command-line in any order.
 
--n name : list only people whose names or titles contain name
--e : empire
+min-max    Specify a level range, e.g. 100-200
+-e [name]  members of your own empire or the one you specify (use quotes for
+           empires with names longer than one word)
+-n name    list only people whose names or titles contain name
+-r         only players with the RP flag on
+-s         short list (two columns, less info)
 
 See also: WHOIS
 #
 WHOIS
 
-Usage: whois <name>
+Usage:  whois <name>
 
 Used to find vital information on a person. You cannot abbreviate the name
 because it draws the information from the player file. This allows it to be
@@ -1479,7 +1511,7 @@ used on players who are not logged in.
 #
 WIELD
 
-Usage: wield <weapon>
+Usage:  wield <weapon>
 
 When you get tired of bashing monsters with your fists, you might consider
 wielding a weapon.
@@ -1493,8 +1525,8 @@ See also: EQUIPMENT, REMOVE, WEAR, SHEATH, DRAW, SWAP
 #
 WIZLIST GODLIST
 
-Usage: wizlist
-       godlist
+Usage:  wizlist
+        godlist
 
 Lists the most powerful beings on the MUD. These are the people responsible
 for administering the system.

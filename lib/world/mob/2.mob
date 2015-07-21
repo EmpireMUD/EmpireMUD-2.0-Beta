@@ -43,7 +43,7 @@ S
 #n the bodyguard~
 #n the bodyguard is standing here.
 ~
-75 100 bdpquv 0
+75 100 bdpquv c
 1 0 0 1
 S
 #206
@@ -236,10 +236,10 @@ High Sorcerer #n is standing here.
 100 125 bdqvxA ci
 1 2 0 16
 I 4 1107 10.00 1  # LOOT: a wooden staff
-I 4 1206 10.00 1  # LOOT: an iridescent blue iris
-I 4 103 10.00 1  # LOOT: a yellow lightning stone
-I 4 104 10.00 1  # LOOT: a red bloodstone
-I 4 1300 10.00 1  # LOOT: a glowing green seashell
+I 4 1206 10.00 1 X  # LOOT: an iridescent blue iris
+I 4 103 10.00 1 X  # LOOT: a yellow lightning stone
+I 4 104 10.00 1 X  # LOOT: a red bloodstone
+I 4 1300 10.00 1 X  # LOOT: a glowing green seashell
 S
 #229
 #n repairman~
@@ -313,10 +313,10 @@ A city sorcerer is standing here.
 75 100 dquvx 0
 1 0 0 16
 I 4 1107 10.00 1  # LOOT: a wooden staff
-I 4 1206 10.00 1  # LOOT: an iridescent blue iris
-I 4 103 10.00 1  # LOOT: a yellow lightning stone
-I 4 104 10.00 1  # LOOT: a red bloodstone
-I 4 1300 10.00 1  # LOOT: a glowing green seashell
+I 4 1206 10.00 1 X  # LOOT: an iridescent blue iris
+I 4 103 10.00 1 X  # LOOT: a yellow lightning stone
+I 4 104 10.00 1 X  # LOOT: a red bloodstone
+I 4 1300 10.00 1 X  # LOOT: a glowing green seashell
 S
 #238
 diplomat foreign~
@@ -432,10 +432,10 @@ A rogue wizard is standing here.
 50 75 cdqvx 0
 1 0 0 16
 I 4 1107 10.00 1  # LOOT: a wooden staff
-I 4 1206 10.00 1  # LOOT: an iridescent blue iris
-I 4 103 10.00 1  # LOOT: a yellow lightning stone
-I 4 104 10.00 1  # LOOT: a red bloodstone
-I 4 1300 10.00 1  # LOOT: a glowing green seashell
+I 4 1206 10.00 1 X  # LOOT: an iridescent blue iris
+I 4 103 10.00 1 X  # LOOT: a yellow lightning stone
+I 4 104 10.00 1 X  # LOOT: a red bloodstone
+I 4 1300 10.00 1 X  # LOOT: a glowing green seashell
 S
 #251
 guard cityguard~

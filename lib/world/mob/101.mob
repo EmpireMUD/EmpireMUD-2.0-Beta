@@ -5,11 +5,11 @@ An old hag is rocking slowly in her chair.
 ~
 0 0 bdgvxA c
 2 0 0 15
-I 4 10100 5.00 1  # LOOT: the hag's pestle
-I 4 10101 5.00 1  # LOOT: the hag's stench
-I 4 10102 5.00 1  # LOOT: the hag's stench
-I 4 10103 5.00 1  # LOOT: the hag's stench
-I 4 10104 5.00 1  # LOOT: a fistful of firebird feathers
+I 4 10100 5.00 1 X  # LOOT: the hag's pestle
+I 4 10101 5.00 1 X  # LOOT: the hag's stench
+I 4 10102 5.00 1 X  # LOOT: the hag's stench
+I 4 10103 5.00 1 X  # LOOT: the hag's stench
+I 4 10104 5.00 1 X  # LOOT: a fistful of firebird feathers
 T 10101
 T 10102
 T 10103
@@ -30,8 +30,8 @@ Berk is crouched by the fire, whittling some wood.
 ~
 100 200 abdvzB 0
 1 0 0 4
-I 4 10109 10.00 1  # LOOT: the bloodletter's ring
-I 4 10107 5.00 1  # LOOT: a pack of dry rations
+I 4 10109 10.00 1 X  # LOOT: the bloodletter's ring
+I 4 10107 5.00 1 X  # LOOT: a pack of dry rations
 T 10000
 T 10105
 S
@@ -42,8 +42,8 @@ Jorr is cooking a pot of beans over the fire.
 ~
 100 200 abdvxzB 0
 2 0 0 12
-I 4 10105 10.00 1  # LOOT: black leather armor
-I 4 10107 5.00 1  # LOOT: a pack of dry rations
+I 4 10105 10.00 1 X  # LOOT: black leather armor
+I 4 10107 5.00 1 X  # LOOT: a pack of dry rations
 T 10000
 T 10106
 S
@@ -54,8 +54,8 @@ Tranc is strapping on his armor.
 ~
 100 200 abdvyB 0
 1 0 0 5
-I 4 10106 10.00 1  # LOOT: a spiked aklys
-I 4 10108 5.00 1  # LOOT: an armored neck guard
+I 4 10106 10.00 1 X  # LOOT: a spiked aklys
+I 4 10108 5.00 1 X  # LOOT: an armored neck guard
 T 10000
 T 10107
 S
@@ -75,10 +75,10 @@ A thief is hunched in the corner.
 ~
 0 0 abdvA 0
 1 0 0 4
-I 4 10111 5.00 1  # LOOT: a charming necklace
-I 4 10112 5.00 1  # LOOT: some wooden beads
-I 4 10113 5.00 1  # LOOT: a shifter's chain
-I 4 10114 5.00 1  # LOOT: a talismanic shiv
+I 4 10111 5.00 1 X  # LOOT: a charming necklace
+I 4 10112 5.00 1 X  # LOOT: some wooden beads
+I 4 10113 5.00 1 X  # LOOT: a shifter's chain
+I 4 10114 5.00 1 X  # LOOT: a talismanic shiv
 T 10113
 T 10111
 T 10000
@@ -90,10 +90,10 @@ A thief is warming her hands by the fire.
 ~
 0 0 abdvA 0
 2 0 0 4
-I 4 10111 5.00 1  # LOOT: a charming necklace
-I 4 10112 5.00 1  # LOOT: some wooden beads
-I 4 10113 5.00 1  # LOOT: a shifter's chain
-I 4 10114 5.00 1  # LOOT: a talismanic shiv
+I 4 10111 5.00 1 X  # LOOT: a charming necklace
+I 4 10112 5.00 1 X  # LOOT: some wooden beads
+I 4 10113 5.00 1 X  # LOOT: a shifter's chain
+I 4 10114 5.00 1 X  # LOOT: a talismanic shiv
 T 10113
 T 10112
 T 10000

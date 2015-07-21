@@ -188,7 +188,7 @@ if !%hound% && !%corpse%
   makeuid hound mob black-haired
   if %hound%
     echo %hound.name% appears!
-    %force% %hound% %kill% %actor%
+    %force% %hound% mkill %actor%
   end
   halt
 end
@@ -214,7 +214,7 @@ switch %random.3%
       if %test && %ch.maxmana% > %actor.maxmana%
         %send% %ch% %self.name% is coming for you!
         %echoaround% %ch% %self.name% runs for %ch.name%!
-        %kill% %ch%
+        mkill %ch%
         halt
       end
       eval ch %ch.next_in_room%

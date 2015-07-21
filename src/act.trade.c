@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.trade.c                                     EmpireMUD 2.0b1 *
+*   File: act.trade.c                                     EmpireMUD 2.0b2 *
 *  Usage: code related to crafting and the trade skill                    *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -103,15 +103,21 @@ obj_data *find_water_container(char_data *ch, obj_data *list) {
 */
 obj_data *has_hammer(char_data *ch) {
 	obj_data *hammer = NULL;
+	int iter;
 	
-	if (!(hammer = GET_EQ(ch, WEAR_WIELD)) || !IS_WEAPON(hammer) || GET_WEAPON_TYPE(hammer) != TYPE_HAMMER) {
-		if (!(hammer = GET_EQ(ch, WEAR_HOLD)) || !IS_WEAPON(hammer) || GET_WEAPON_TYPE(hammer) != TYPE_HAMMER) {
-			msg_to_char(ch, "You need to use a hammer to do that.\r\n");
-			hammer = NULL;
+	// list of valid slots; terminate with -1
+	int slots[] = { WEAR_WIELD, WEAR_HOLD, WEAR_SHEATH_1, WEAR_SHEATH_2, -1 };
+	
+	for (iter = 0; slots[iter] != -1; ++iter) {
+		hammer = GET_EQ(ch, slots[iter]);
+		if (hammer && IS_WEAPON(hammer) && GET_WEAPON_TYPE(hammer) == TYPE_HAMMER) {
+			return hammer;
 		}
 	}
 	
-	return hammer;
+	// nope
+	msg_to_char(ch, "You need to use a hammer to do that.\r\n");
+	return NULL;
 }
 
 
@@ -167,13 +173,14 @@ struct {
 	{ ABIL_WRATH_OF_NATURE_POTIONS, ABIL_HEALING_ELIXIRS },
 	
 	// craft block
-//	{ ABIL_BASIC_CRAFTS, ABIL_MASTER_WOODWORKING },
-//	{ ABIL_WOODWORKING, ABIL_MASTER_WOODWORKING },
-//	{ ABIL_ADVANCED_WOODWORKING, ABIL_MASTER_WOODWORKING },
+	{ ABIL_BASIC_CRAFTS, ABIL_MASTER_CRAFTSMAN },
+	{ ABIL_WOODWORKING, ABIL_MASTER_CRAFTSMAN },
+	{ ABIL_ADVANCED_WOODWORKING, ABIL_MASTER_CRAFTSMAN },
 	
 	// pottery block
-	{ ABIL_POTTERY, ABIL_MASTER_POTTER },
-	{ ABIL_FINE_POTTERY, ABIL_MASTER_POTTER },
+	{ ABIL_POTTERY, ABIL_MASTER_CRAFTSMAN },
+	{ ABIL_FINE_POTTERY, ABIL_MASTER_CRAFTSMAN },
+	{ ABIL_MASTER_CRAFTSMAN, ABIL_MASTER_CRAFTSMAN },	// its own
 	
 	// sew block
 	{ ABIL_SEWING, ABIL_MASTER_TAILOR },
@@ -881,6 +888,8 @@ ACMD(do_reforge) {
 	bool found;
 	obj_data *obj, *new, *proto;
 	
+	bitvector_t preserve_flags = OBJ_HARD_DROP | OBJ_GROUP_DROP;	// flags to copy over if obj is reloaded
+	
 	// reforge <item> name <name>
 	// reforge <item> renew
 	
@@ -994,6 +1003,13 @@ ACMD(do_reforge) {
 			level = GET_OBJ_CURRENT_SCALE_LEVEL(obj);
 			
 			new = read_object(GET_OBJ_VNUM(proto));
+			GET_OBJ_EXTRA(new) |= GET_OBJ_EXTRA(obj) & preserve_flags;
+			
+			// transfer bindings
+			OBJ_BOUND_TO(new) = OBJ_BOUND_TO(obj);
+			OBJ_BOUND_TO(obj) = NULL;
+			
+			// give to char
 			obj_to_char(new, ch);
 			
 			// re-apply
@@ -1047,6 +1063,13 @@ ACMD(do_reforge) {
 			level = GET_OBJ_CURRENT_SCALE_LEVEL(obj);
 			
 			new = read_object(GET_OBJ_VNUM(proto));
+			GET_OBJ_EXTRA(new) |= GET_OBJ_EXTRA(obj) & preserve_flags;
+			
+			// transfer bindings
+			OBJ_BOUND_TO(new) = OBJ_BOUND_TO(obj);
+			OBJ_BOUND_TO(obj) = NULL;
+			
+			// give to char
 			obj_to_char(new, ch);
 			
 			// set superior
@@ -1095,7 +1118,7 @@ ACMD(do_reforge) {
 
 ACMD(do_weave) {
 	int type = NOTHING, iter = 0;
-	bool this_line;
+	bool this_line, any;
 	
 	one_argument(argument, arg);
 
@@ -1118,7 +1141,7 @@ ACMD(do_weave) {
 	}
 	else if (!*arg || type == NOTHING) {
 		msg_to_char(ch, "You can weave:\r\n");
-		this_line = FALSE;
+		this_line = any = FALSE;
 		for (iter = 0; *weave_data[iter].name != '\n'; ++iter) {
 			if (*weave_data[iter].name == '\t') {
 				if (this_line) {
@@ -1129,7 +1152,12 @@ ACMD(do_weave) {
 			else if (weave_data[iter].ability == NO_ABIL || HAS_ABILITY(ch, weave_data[iter].ability)) {
 				msg_to_char(ch, "%s%s", (this_line ? ", " : " "), weave_data[iter].name);
 				this_line = TRUE;
+				any = TRUE;
 			}
+		}
+		
+		if (!any) {
+			msg_to_char(ch, " nothing\r\n");
 		}
 		
 		if (this_line) {

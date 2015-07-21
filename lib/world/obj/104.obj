@@ -1,0 +1,561 @@
+#10400
+portal town~
+the town portal~
+A portal back to the entrance to town has opened here.~
+It looks like the portal leads back to the entrance.
+~
+8 0 0 1
+10400 0 0
+10 8
+S
+#10401
+blockade makeshift~
+the blockade~
+A makeshift blockade bars passage down the street.~
+   It looks like the citizens managed to pile up street stalls and carts to
+form a blockade before the necromancers advanced on the city. Now the blockade
+is on fire, and you won't be able to pass it.
+~
+3 0 0 1
+0 0 0
+0 0
+T 10407
+S
+#10402
+spawner trash market~
+Market Street trash spawner~
+The Market Street trash spawner is malfunctioning.~
+This item spawns trash mobs.
+~
+3 0 0 1
+0 0 0
+0 0
+T 10402
+S
+#10403
+spawner trash main~
+Main Street trash spawner~
+The Main Street trash spawner is malfunctioning.~
+This item spawns trash mobs.
+~
+3 0 0 1
+0 0 0
+0 0
+T 10403
+S
+#10404
+spawner trash temple~
+Temple Street trash spawner~
+The Temple Street trash spawner is malfunctioning.~
+This item spawns trash mobs.
+~
+3 0 0 1
+0 0 0
+0 0
+T 10404
+S
+#10405
+cart overturned~
+an overturned cart~
+An overturned cart is lying in the street.~
+In his haste to flee the hamlet, some poor fool lost his cart!
+~
+3 0 0 1
+0 0 0
+0 0
+S
+#10406
+corpse citizen~
+the corpse of a citizen~
+The mangled, half-chewed corpse of a citizen is lying here.~
+It looks like something has already started to eat this one.
+~
+3 0 0 1
+0 0 0
+0 0
+S
+#10407
+rubble pile~
+a pile of rubble~
+A pile of rubble cascades down the street.~
+   This rubble looks like it was once the front of a building, perhaps torn
+down by a stray catapult shot -- or the club of the skeletal giant down the
+street.
+~
+3 0 0 1
+0 0 0
+0 0
+S
+#10408
+earrings tarnished silver~
+tarnished silver earrings~
+A pair of tarnished earrings has been discarded here.~
+These earrings look like they were quite nice once, and give you a rustic look.
+~
+2 moy am 1
+0 0 0
+3 0
+A
+4 2
+A
+9 1
+C
+0 0
+S
+#10409
+chain steel~
+a steel chain~
+A steel chain is crumpled in a pile.~
+The chain looks just long enough to wear around your neck.
+~
+2 moy ac 1
+0 0 0
+2 0
+A
+17 3
+A
+9 1
+C
+0 0
+S
+#10410
+bracers ringmail pair~
+ringmail bracers~
+A pair of ringmail bracers is lying here.~
+   The craftsmanship on this ringmail is fine, although they don't seem
+well-maintained.
+~
+2 moy aj 1
+0 0 0
+2 0
+A
+18 3
+A
+13 1
+C
+0 0
+S
+#10411
+ring pearls~
+a ring of pearls~
+A pearl ring is lying in the dust.~
+This shimmering ring seems to be made from fused pearls.
+~
+2 moy ab 1
+0 0 0
+14 0
+A
+23 2
+A
+7 1
+C
+0 0
+S
+#10412
+dress village fine~
+a fine village dress~
+A fine village dress has been carefully draped here.~
+The dress is certainly rural, but has its own sort of charm.
+~
+2 oy ad 1
+0 0 0
+11 0
+A
+4 1
+S
+#10413
+suit village handsome~
+a handsome village suit~
+A handsome village suit is carefully hung here.~
+   The suit is nothing you'd wear to the castle on ball night. Still, it has a
+rustic, rural charm that is not soon forgotten.
+~
+2 oy ad 1
+0 0 0
+11 0
+A
+4 1
+S
+#10414
+band imperium wedding~
+an imperium wedding band~
+An imperium wedding band is lying here.~
+Though the ring looks old, it has not rusted.
+~
+2 moy ab 2
+0 0 0
+2 0
+A
+15 2
+A
+18 1
+A
+13 1
+C
+0 0
+S
+#10415
+necklace cloth heirloom~
+an heirloom cloth necklace~
+An heirloom necklace has been carelessly left behind.~
+   The necklace is old, but made of carefully crafted lace such that it still
+has the same gorgeous quality as the day it was made.
+~
+27 moy ac 1
+0 0 0
+2 0
+A
+8 1
+A
+7 1
+A
+16 1
+C
+0 0
+S
+#10416
+mace bone giant~
+a giant bone mace~
+A giant bone mace stands before you.~
+It looks like the mace's handle is made from the bone of a giant!
+~
+1 emp an 1
+0 1 5
+14 0
+A
+15 3
+A
+13 1
+C
+0 0
+S
+#10417
+cloak tattered manasilk~
+a tattered cloak of manasilk~
+A tattered cloak is lying here.~
+This cloak was once made of fine manasilk. Now, it's in tatters.
+~
+2 mp ak 1
+0 0 0
+11 0
+A
+8 1
+A
+23 2
+A
+7 1
+C
+0 0
+S
+#10418
+whip horse skeletal~
+a skeletal horse whip~
+A skeletal horse whip is lying here.~
+This whip can be used, just once, to summon a skeletal horse mount.
+~
+3 0 a 1
+10418 0 0
+14 0
+T 10418
+S
+#10419
+boots enchanted pair~
+a pair of enchanted boots~
+A pair of enchanted boots is marching in circles.~
+The boots seem to be made for walkin'.
+~
+27 mp ag 1
+0 0 0
+11 0
+A
+7 1
+A
+16 3
+A
+22 1
+C
+0 0
+S
+#10420
+crop mammoth skeletal~
+a skeletal mammoth crop~
+A skeletal mammoth crop is lying here.~
+This riding crop can be used, just once, to summon a skeletal mammoth mount.
+~
+3 0 a 1
+10420 0 0
+14 0
+T 10418
+S
+#10421
+spear mammoth~
+a mammoth spear~
+A mammoth spear protrudes from the ground.~
+This spear looks like it could be used to take down a mammoth!
+~
+1 ehmnp an 1
+0 3 3
+0 0
+A
+17 1
+A
+9 1
+C
+0 0
+S
+#10422
+cloak imperium-weave weave~
+an imperium-weave cloak~
+An imperium-weave cloak is lying on the ground.~
+   The cloak is made from fine imperium-weave cloth, of the sort they drape
+over war mammoths.
+~
+27 mp ak 1
+3 0 0
+2 0
+A
+9 -1
+A
+18 3
+A
+12 1
+C
+0 0
+S
+#10423
+shackles undead~
+shackles of the undead~
+The shackles of the undead are lying here.~
+These shackles look like they could be used to bind a ghost!
+~
+2 mp ag 1
+0 0 0
+11 0
+A
+16 2
+A
+7 2
+A
+23 1
+C
+0 0
+S
+#10424
+leg necrofiend disjointed~
+a disjointed necrofiend leg~
+A necrofiend leg is lying here, bloody.~
+   It looks like the long, thin leg from a necrofiend has been turned into some
+sort of whip!
+~
+1 ehmp an 1
+0 4 7
+7 0
+A
+17 1
+A
+1 1
+C
+0 0
+S
+#10425
+shield studded bone~
+a studded bone shield~
+A studded bone shield is lying on the ground.~
+   The shield is made mostly from bones, bound in leather, and studded with
+imperium. You'd hate to have been the raw materials for one of these.
+~
+23 emp ao 1
+0 0 0
+14 0
+A
+13 4
+A
+1 1
+C
+0 0
+S
+#10426
+majesty necrofiend's aura strange~
+the necrofiend's majesty~
+A strange aura of majesty hovers in the air.~
+It has all the majesty of a hideous necrofiend.
+~
+2 mp ae 1
+0 0 0
+10 0
+A
+7 1
+A
+8 1
+A
+23 1
+A
+16 1
+C
+0 0
+S
+#10427
+flame infernomancer's magical~
+the infernomancer's flame~
+A magical flame hovers in mid-air.~
+This glinting magical flame has the potential to do a lot of damage.
+~
+1 imp an 1
+0 1 16
+10 0
+A
+8 1
+A
+16 1
+A
+22 1
+C
+0 0
+S
+#10428
+flame purifying white glinting~
+the purifying flame~
+A glinting white flame dances across the air.~
+This beautiful fire looks like it could heal as much as it could damage.
+~
+3 mp ao 1
+0 0 0
+10 0
+A
+23 3
+A
+7 1
+C
+0 0
+S
+#10429
+mask terrifying leather~
+a terrifying leather mask~
+A terrifying mask lies on the ground.~
+The mask is stained in blood, and has fangs carved from its mouth.
+~
+27 mp ae 1
+1 0 0
+0 0
+A
+17 1
+A
+2 1
+A
+21 1
+A
+1 1
+C
+0 0
+S
+#10430
+staff twisted necromancer's~
+the necromancer's staff~
+A twisted staff is staked into the ground.~
+This twisted old staff is crawling with maggots!
+~
+1 eimpq an 1
+0 4 19
+0 0
+A
+17 1
+C
+0 0
+S
+#10431
+gauntlets pair ghoulsbane~
+a pair of ghoulsbane gauntlets~
+A pair of ghoulsbane gauntlets is lying here.~
+   These gauntlets have backwards-facing spines to make them more effective
+against ghouls of all sorts.
+~
+27 mp ah 1
+1 0 0
+7 0
+A
+17 1
+A
+1 1
+A
+21 2
+C
+0 0
+S
+#10432
+skirt mail necrotic~
+a necrotic mail skirt~
+A necrotic mail skirt is lying here.~
+   This battle dress, made mostly of ringmail and leather, appears to be
+decaying. But due to some strange magical infusion, the decay is only making it
+stronger.
+~
+27 emp af 1
+3 0 0
+2 0
+A
+21 -3
+A
+13 2
+A
+15 2
+A
+18 2
+C
+0 0
+S
+#10433
+weapon fiendclaw claw vicious~
+Fiendclaw~
+A vicious claw weapon is lying here.~
+This huge claw would fit right over your hand!
+~
+1 mp an 1
+0 1 10
+0 0
+A
+15 2
+A
+13 2
+A
+18 1
+C
+0 0
+S
+#10434
+gloves lace deathlace pair~
+deathlace gloves~
+A pair of lace gloves has been left behind.~
+   These gloves are laced from death itself, and you'd hate to be on the
+receiving end of their wrath.
+~
+27 mp ah 1
+0 0 0
+11 0
+A
+16 1
+A
+22 2
+A
+17 2
+C
+0 0
+S
+#10435
+hand hanged man's~
+a hanged man's hand~
+A hanged man's hand is lying here.~
+This hand, though slightly rotted, looks as fresh as the day it was hanged.
+~
+3 mp ao 1
+0 0 0
+7 0
+A
+17 2
+A
+21 1
+A
+9 1
+C
+0 0
+S
+$

@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.battle.c                                    EmpireMUD 2.0b1 *
+*   File: act.battle.c                                    EmpireMUD 2.0b2 *
 *  Usage: commands and functions related to the Battle skill              *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -9,6 +9,8 @@
 *  CircleMUD (C) 1993, 94 by the Trustees of the Johns Hopkins University *
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
+
+#include <math.h>
 
 #include "conf.h"
 #include "sysdep.h"
@@ -29,11 +31,9 @@
 */
 
 // external vars
-extern const int universal_wait;
 
 // external functions
-extern int get_dodge_modifier(char_data *ch);	// fight.c
-extern int get_to_hit(char_data *ch, bool off_hand);	// fight.c
+extern bool check_hit_vs_dodge(char_data *attacker, char_data *victim, bool off_hand);	// fight.c
 extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
 
 
@@ -69,8 +69,8 @@ void perform_rescue(char_data *ch, char_data *vict, char_data *from) {
 ACMD(do_bash) {
 	char_data *vict;
 	struct affected_type *af;
-	int hit_chance, dam, cost = 15;
 	bool success = FALSE;
+	int dam, cost = 15;
 
 	one_argument(argument, arg);
 
@@ -112,17 +112,10 @@ ACMD(do_bash) {
 		return;
 	}
 	
-	charge_ability_cost(ch, MOVE, cost, COOLDOWN_BASH, 9);
+	charge_ability_cost(ch, MOVE, cost, COOLDOWN_BASH, 9, WAIT_COMBAT_ABILITY);
 
 	// determine hit
-	hit_chance = get_to_hit(ch, FALSE);
-	
-	// evasion
-	if (AWAKE(vict) && CAN_SEE(vict, ch)) {
-		hit_chance -= get_dodge_modifier(vict);
-	}
-
-	success = IS_SPECIALTY_ABILITY(ch, ABIL_BASH) || !AWAKE(vict) || (hit_chance >= number(1, 100));
+	success = IS_SPECIALTY_ABILITY(ch, ABIL_BASH) || check_hit_vs_dodge(ch, vict, FALSE);
 
 	if (!success) {
 		damage(ch, vict, 0, ATTACK_BASH, DAM_PHYSICAL);
@@ -180,7 +173,7 @@ ACMD(do_disarm) {
 		msg_to_char(ch, "You can't disarm someone who isn't wielding a weapon.\r\n");
 	}
 	else if (IS_NPC(victim) && !GET_EQ(victim, WEAR_WIELD) && (MOB_ATTACK_TYPE(victim) == TYPE_BITE || MOB_ATTACK_TYPE(victim) == TYPE_KICK || MOB_ATTACK_TYPE(victim) == TYPE_CLAW || MOB_ATTACK_TYPE(victim) == TYPE_HIT)) {
-		act("You can't disarm $M! $E isn't using a weapon.", FALSE, ch, 0, victim, TO_CHAR);
+		act("You can't disarm $M -- $E isn't using a weapon.", FALSE, ch, 0, victim, TO_CHAR);
 	}
 	else if (AFF_FLAGGED(victim, AFF_DISARM)) {
 		act("$E is already disarmed.", FALSE, ch, 0, victim, TO_CHAR);
@@ -193,7 +186,7 @@ ACMD(do_disarm) {
 			appear(ch);
 		}
 		
-		charge_ability_cost(ch, MOVE, cost, COOLDOWN_DISARM, 30);
+		charge_ability_cost(ch, MOVE, cost, COOLDOWN_DISARM, 30, WAIT_COMBAT_ABILITY);
 		
 		if (!skill_check(ch, ABIL_DISARM, DIFF_HARD) || AFF_FLAGGED(victim, AFF_IMMUNE_BATTLE)) {
 			act("You attempt to disarm $N, but fail.", FALSE, ch, 0, victim, TO_CHAR);
@@ -216,6 +209,8 @@ ACMD(do_disarm) {
 
 
 ACMD(do_firstaid) {
+	extern int total_bonus_healing(char_data *ch);
+
 	struct over_time_effect_type *dot, *next_dot;
 	char_data *vict;
 	int cost = 20;
@@ -253,7 +248,7 @@ ACMD(do_firstaid) {
 		return;
 	}
 	
-	charge_ability_cost(ch, MOVE, cost, NOTHING, 0);
+	charge_ability_cost(ch, MOVE, cost, NOTHING, 0, WAIT_ABILITY);
 	
 	if (ch == vict) {
 		msg_to_char(ch, "You apply first aid to your wounds.\r\n");
@@ -274,9 +269,9 @@ ACMD(do_firstaid) {
 		}
 	}
 	
-	heal(ch, vict, CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_FIRSTAID) + GET_BONUS_HEALING(ch));
+	heal(ch, vict, CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_FIRSTAID) + total_bonus_healing(ch));
 	gain_ability_exp(ch, ABIL_FIRSTAID, 15);
-	WAIT_STATE(ch, 2 RL_SEC);	// plus universal
+	GET_WAIT_STATE(ch) += 2 RL_SEC;	// plus normal command_lag
 }
 
 
@@ -311,7 +306,7 @@ ACMD(do_heartstop) {
 			appear(ch);
 		}
 		
-		charge_ability_cost(ch, MOVE, cost, COOLDOWN_HEARTSTOP, 30);
+		charge_ability_cost(ch, MOVE, cost, COOLDOWN_HEARTSTOP, 30, WAIT_COMBAT_ABILITY);
 
 		act("You grab $N and press hard against $S throat...", FALSE, ch, 0, victim, TO_CHAR);
 		act("$n grabs you and presses hard against your throat...", FALSE, ch, 0, victim, TO_VICT);
@@ -337,7 +332,7 @@ ACMD(do_heartstop) {
 
 ACMD(do_kick) {
 	char_data *vict;
-	int cost = 10, hit_chance;
+	int cost = 10;
 	byte dam;
 	bool success = FALSE;
 
@@ -372,19 +367,21 @@ ACMD(do_kick) {
 		return;
 	}
 	
-	charge_ability_cost(ch, MOVE, cost, COOLDOWN_KICK, 6);
+	charge_ability_cost(ch, MOVE, cost, COOLDOWN_KICK, 6, WAIT_COMBAT_ABILITY);
 	
 	// determine hit
-	hit_chance = get_to_hit(ch, FALSE);
-	
-	// evasion
-	if (AWAKE(vict) && CAN_SEE(vict, ch)) {
-		hit_chance -= get_dodge_modifier(vict);
-	}
-
-	success = IS_SPECIALTY_ABILITY(ch, ABIL_KICK) || !AWAKE(vict) || (hit_chance >= number(1, 100));
+	success = IS_SPECIALTY_ABILITY(ch, ABIL_KICK) || check_hit_vs_dodge(ch, vict, FALSE);
 
 	if (success) {
+		if (HAS_ABILITY(ch, ABIL_SHADOW_KICK) && !AFF_FLAGGED(vict, AFF_IMMUNE_BATTLE)) {
+			struct affected_type *af;
+			int value = round(GET_COMPUTED_LEVEL(ch) / 50);
+			af = create_mod_aff(ATYPE_SHADOW_KICK, 2, APPLY_BONUS_PHYSICAL, -value);
+			affect_join(vict, af, 0);
+			af = create_mod_aff(ATYPE_SHADOW_KICK, 2, APPLY_BONUS_MAGICAL, -value);
+			affect_join(vict, af, 0);
+		}
+	
 		dam = GET_STRENGTH(ch) * (IS_CLASS_ABILITY(ch, ABIL_KICK) ? 4 : 2);
 		dam += GET_BONUS_PHYSICAL(ch);
 		damage(ch, vict, dam, ATTACK_KICK, DAM_PHYSICAL);
@@ -413,7 +410,7 @@ ACMD(do_outrage) {
 			appear(ch);
 		}
 		
-		charge_ability_cost(ch, MOVE, base_cost, COOLDOWN_OUTRAGE, 9);
+		charge_ability_cost(ch, MOVE, base_cost, COOLDOWN_OUTRAGE, 9, WAIT_COMBAT_ABILITY);
 		
 		msg_to_char(ch, "You spin wildly with outrage, hitting everything in sight!\r\n");
 		act("$n spins wildly with outrage, hitting everything in sight!", FALSE, ch, NULL, NULL, TO_ROOM);
@@ -473,7 +470,7 @@ ACMD(do_rescue) {
 				return;
 			}
 
-			charge_ability_cost(ch, MOVE, cost, COOLDOWN_RESCUE, 6);
+			charge_ability_cost(ch, MOVE, cost, COOLDOWN_RESCUE, 6, WAIT_COMBAT_ABILITY);
 			perform_rescue(ch, FIGHTING(vict), vict);
 			gain_ability_exp(ch, ABIL_RESCUE, 15);
 			break;
@@ -523,7 +520,7 @@ ACMD(do_rescue) {
 		return;
 	}
 
-	charge_ability_cost(ch, MOVE, cost, COOLDOWN_RESCUE, 6);
+	charge_ability_cost(ch, MOVE, cost, COOLDOWN_RESCUE, 6, WAIT_COMBAT_ABILITY);
 	perform_rescue(ch, vict, tmp_ch);
 	gain_ability_exp(ch, ABIL_RESCUE, 15);
 }

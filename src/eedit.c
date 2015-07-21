@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: eedit.c                                         EmpireMUD 2.0b1 *
+*   File: eedit.c                                         EmpireMUD 2.0b2 *
 *  Usage: empire editor code                                              *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -37,6 +37,7 @@ void eliminate_linkdead_players();
 // locals
 EEDIT(eedit_adjective);
 EEDIT(eedit_banner);
+EEDIT(eedit_change_leader);
 EEDIT(eedit_description);
 EEDIT(eedit_frontiertraits);
 EEDIT(eedit_motd);
@@ -142,12 +143,14 @@ bool valid_rank_name(char *newname) {
 	int iter;
 	bool ok = TRUE;
 	
+	char *valid = " -&'";
+	
 	if ((strlen(newname) - 2*count_color_codes(newname)) > MAX_RANK_LENGTH) {
 		ok = FALSE;
 	}
 
 	for (iter = 0; iter < strlen(newname) && ok; ++iter) {
-		if (!isalnum(newname[iter]) && newname[iter] != ' ' && newname[iter] != '&') {
+		if (!isalnum(newname[iter]) && !strchr(valid, newname[iter])) {
 			ok = FALSE;
 		}
 	}
@@ -167,6 +170,7 @@ const struct {
 } eedit_cmd[] = {
 	{ "adjective", eedit_adjective, NOBITS },
 	{ "banner", eedit_banner, NOBITS },
+	{ "changeleader", eedit_change_leader, NOBITS },
 	{ "description", eedit_description, NOBITS },
 	{ "frontiertraits", eedit_frontiertraits, NOBITS },
 	{ "motd", eedit_motd, NOBITS },
@@ -175,8 +179,6 @@ const struct {
 	{ "rank", eedit_rank, NOBITS },
 	{ "ranks", eedit_num_ranks, NOBITS },
 	
-	// TODO: change leader -- add a generic function for doing it procedurally, so it can also be done on-delete
-
 	// this goes last
 	{ "\n", NULL, NOBITS }
 };
@@ -209,7 +211,7 @@ ACMD(do_eedit) {
 	if (IS_NPC(ch) || !emp) {
 		msg_to_char(ch, "You are not in any empire.\r\n");
 	}
-	else if (GET_RANK(ch) < EMPIRE_NUM_RANKS(emp)) {
+	else if (!imm_access && GET_RANK(ch) < EMPIRE_NUM_RANKS(emp)) {
 		msg_to_char(ch, "Your rank is too low to edit the empire.\r\n");
 	}
 	else if (!*arg || type == NOTHING) {
@@ -280,6 +282,52 @@ EEDIT(eedit_banner) {
 }
 
 
+EEDIT(eedit_change_leader) {
+	bool imm_access = GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES);
+	bool file = FALSE;
+	char_data *victim = NULL;
+	
+	one_argument(argument, arg);
+	
+	if (!imm_access && GET_IDNUM(ch) != EMPIRE_LEADER(emp)) {
+		msg_to_char(ch, "Only the current leader can change leadership.\r\n");
+	}
+	else if (!*arg) {
+		msg_to_char(ch, "Change the leader to whom?\r\n");
+	}
+	else if (!(victim = find_or_load_player(arg, &file))) {
+		send_to_char("There is no such player.\r\n", ch);
+	}
+	else if (!imm_access && victim == ch) {
+		msg_to_char(ch, "You are already the leader!\r\n");
+	}
+	else if (IS_NPC(victim) || GET_LOYALTY(victim) != emp) {
+		msg_to_char(ch, "That person is not in the empire.\r\n");
+	}
+	else {
+		GET_RANK(victim) = EMPIRE_NUM_RANKS(emp);
+		EMPIRE_LEADER(emp) = GET_IDNUM(victim);
+
+		log_to_empire(emp, ELOG_MEMBERS, "%s is now the leader of the empire!", PERS(victim, victim, TRUE));
+		msg_to_char(ch, "You make %s leader of the empire.\r\n", PERS(victim, victim, TRUE));
+
+		// save now
+		if (file) {
+			store_loaded_char(victim);
+			file = FALSE;
+		}
+		else {
+			SAVE_CHAR(victim);
+		}
+	}
+	
+	// clean up
+	if (file && victim) {
+		free_char(victim);
+	}
+}
+
+
 EEDIT(eedit_description) {
 	char buf[MAX_STRING_LENGTH];
 	descriptor_data *desc;
@@ -308,7 +356,16 @@ EEDIT(eedit_description) {
 
 EEDIT(eedit_frontiertraits) {
 	extern const char *empire_trait_types[];
+	
+	bitvector_t old_traits = EMPIRE_FRONTIER_TRAITS(emp);
+	char buf[MAX_STRING_LENGTH];
+	
 	EMPIRE_FRONTIER_TRAITS(emp) = olc_process_flag(ch, argument, "frontier trait", NULL, empire_trait_types, EMPIRE_FRONTIER_TRAITS(emp));
+	
+	if (EMPIRE_FRONTIER_TRAITS(emp) != old_traits) {
+		prettier_sprintbit(EMPIRE_FRONTIER_TRAITS(emp), empire_trait_types, buf);
+		log_to_empire(emp, ELOG_ADMIN, "%s has changed the frontier traits to %s", PERS(ch, ch, TRUE), buf);
+	}
 }
 
 

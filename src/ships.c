@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: ships.c                                         EmpireMUD 2.0b1 *
+*   File: ships.c                                         EmpireMUD 2.0b2 *
 *  Usage: code related to boating                                         *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -443,6 +443,9 @@ ACMD(do_board) {
 		msg_to_char(ch, "You can't lead an animal on board from here.\r\n");
 	else if (GET_SHIP_RESOURCES_REMAINING(ship) > 0)
 		msg_to_char(ch, "You can't board the ship until it's finished!\r\n");
+	else if (!IS_IMMORTAL(ch) && IS_CARRYING_N(ch) > CAN_CARRY_N(ch)) {
+		msg_to_char(ch, "You are overburdened and cannot move.\r\n");
+	}
 	else {
 		act("$n boards $p.", TRUE, ch, ship, 0, TO_ROOM);
 		msg_to_char(ch, "You board it.\r\n");
@@ -491,8 +494,9 @@ ACMD(do_board) {
 				greet_mtrigger(k->follower, NO_DIR);
 				greet_memory_mtrigger(k->follower);
 			}
-		if (BUILDING_VNUM(was_in) != BUILDING_DOCKS)
-			WAIT_STATE(ch, 2 RL_SEC);
+		if (BUILDING_VNUM(was_in) != BUILDING_DOCKS) {
+			command_lag(ch, WAIT_OTHER);
+		}
 	}
 }
 
@@ -509,6 +513,9 @@ ACMD(do_disembark) {
 		msg_to_char(ch, "You can't disembark while riding.\r\n");
 	else if (GET_LEADING(ch) && IN_ROOM(GET_LEADING(ch)) == IN_ROOM(ch) && (leading = GET_LEADING(ch)) && BUILDING_VNUM(IN_ROOM(ship)) != BUILDING_DOCKS)
 		msg_to_char(ch, "You can't lead an animal off the ship unless it's at a dock.\r\n");
+	else if (!IS_IMMORTAL(ch) && IS_CARRYING_N(ch) > CAN_CARRY_N(ch)) {
+		msg_to_char(ch, "You are overburdened and cannot move.\r\n");
+	}
 	else {
 		act("$n disembarks from $p.", TRUE, ch, ship, 0, TO_ROOM);
 		msg_to_char(ch, "You disembark.\r\n");
@@ -557,8 +564,9 @@ ACMD(do_disembark) {
 				greet_mtrigger(k->follower, NO_DIR);
 				greet_memory_mtrigger(k->follower);
 			}
-		if (BUILDING_VNUM(IN_ROOM(ch)) != BUILDING_DOCKS)
-			WAIT_STATE(ch, 2 RL_SEC);
+		if (BUILDING_VNUM(IN_ROOM(ch)) != BUILDING_DOCKS) {
+			command_lag(ch, WAIT_OTHER);
+		}
 	}
 }
 
@@ -751,14 +759,14 @@ ACMD(do_sail) {
 	
 	for (vict = ROOM_PEOPLE(IN_ROOM(ship)); vict; vict = vict->next_in_room) {
 		if (vict->desc) {
-			sprintf(buf, "$p sails in %s.", from_dir[get_direction_for_char(vict, dir)]);
+			sprintf(buf, "$p sails in from %s.", from_dir[get_direction_for_char(vict, dir)]);
 			act(buf, TRUE, vict, ship, 0, TO_CHAR | TO_SPAMMY);
 		}
 	}
 	
 	// looking at the room you're in while on a ship shows the surrounding area
 	look_at_room_by_loc(ch, IN_ROOM(ch), NOBITS);
-	WAIT_STATE(ch, 1 RL_SEC);
+	command_lag(ch, WAIT_OTHER);
 }
 
 

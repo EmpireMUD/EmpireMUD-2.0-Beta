@@ -28,7 +28,7 @@ R
 R
 1300 1  # 1x a glowing green seashell
 R
-1206 1  # 1x a crystallized blue flower
+1206 1  # 1x an iridescent blue iris
 S
 #257
 bricks~
@@ -77,7 +77,7 @@ gaian effigy~
 R
 101 2  # 2x a pile of clay
 R
-1206 10  # 10x a crystallized blue flower
+1206 10  # 10x an iridescent blue iris
 R
 1356 1  # 1x a small piece of leather
 S
@@ -87,5 +87,18 @@ trinket of conveyance~
 2 57 ag 18 -1
 R
 101 1  # 1x a pile of clay
+S
+#263
+letheian icon~
+263 1  # 1x a letheian icon
+2 203 ag 24 -1
+R
+101 1  # 1x a pile of clay
+R
+1205 3  # 3x some bileberries
+R
+1300 2  # 2x a glowing green seashell
+R
+172 1  # 1x a silver bar
 S
 $

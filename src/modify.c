@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: modify.c                                        EmpireMUD 2.0b1 *
+*   File: modify.c                                        EmpireMUD 2.0b2 *
 *  Usage: Run-time modification of game variables                         *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -36,6 +36,7 @@
 #define PARSE_LIST_NORM		5
 #define PARSE_LIST_NUM		6
 #define PARSE_EDIT			7
+#define PARSE_LIST_COLOR	8
 
 /*
  * Defines for the action variable.
@@ -238,6 +239,8 @@ void string_add(descriptor_data *d, char *str) {
 					else {
 						*GET_ADMIN_NOTES(vict) = '\0';
 					}
+					
+					syslog(SYS_GC, GET_INVIS_LEV(d->character), TRUE, "GC: %s has edited notes for %s", GET_NAME(d->character), GET_NAME(vict));
 										
 					// save now
 					if (file) {
@@ -261,9 +264,13 @@ void string_add(descriptor_data *d, char *str) {
 				SEND_TO_Q("Edit aborted.\r\n", d);
 			}
 			
-			// d->str is always a copy
-			free(*d->str);
-			free(d->str);
+			// d->str is always a copy; may have been freed already
+			if (d->str && *d->str) {
+				free(*d->str);
+			}
+			if (d->str) {
+				free(d->str);
+			}
 			d->str = NULL;
 			
 			act("$n stops editing notes.", TRUE, d->character, 0, 0, TO_ROOM);
@@ -367,7 +374,7 @@ char *next_page(char *str) {
 
 			/*
 			 * We need to check here and see if we are over the page width,
-			 * and if so, compensate by going to the begining of the next line.
+			 * and if so, compensate by going to the beginning of the next line.
 			 */
 			else if (col++ > PAGE_WIDTH) {
 				col = 1;
@@ -563,6 +570,13 @@ int improved_editor_execute(descriptor_data *d, char *str) {
 			else
 				SEND_TO_Q("Current buffer empty.\r\n", d);
 			break;
+		case 'm': {
+			if (d->str && *d->str)
+				parse_action(PARSE_LIST_COLOR, actions, d);
+			else
+				SEND_TO_Q("Current buffer empty.\r\n", d);
+			break;
+		}
 		case 'n':
 			if (d->str && *d->str)
 				parse_action(PARSE_LIST_NUM, actions, d);
@@ -614,9 +628,10 @@ void parse_action(int command, char *string, descriptor_data *d) {
 				"/fi        - formats text and indents\r\n"
 				"/i# <text> - inserts <text> before line #\r\n"
 				"/l         - lists the buffer\r\n"
+				"/m         - lists the buffer with color\r\n"
 				"/n         - lists the buffer with line numbers\r\n"
-				"/r 'a' 'b' - replaces 1st occurance of <a> with <b>\r\n"
-				"/ra 'a' 'b'- replaces all occurances of <a> with <b>\r\n"
+				"/r 'a' 'b' - replaces 1st occurrence of <a> with <b>\r\n"
+				"/ra 'a' 'b'- replaces all occurrences of <a> with <b>\r\n"
 				"             usage: /r[a] 'pattern' 'replacement'\r\n"
 				"/,         - toggle requiring , before text edits\r\n"
 				"/s         - saves the buffer and exits\r\n"
@@ -662,7 +677,7 @@ void parse_action(int command, char *string, descriptor_data *d) {
 			}
 			else if ((total_len = ((strlen(t) - strlen(s)) + strlen(*d->str))) <= d->max_str) {
 				if ((replaced = replace_str(d->str, s, t, rep_all, d->max_str)) > 0) {
-					sprintf(buf, "Replaced %d occurance%sof '%s' with '%s'.\r\n", replaced, replaced != 1 ? "s " : " ", s, t);
+					sprintf(buf, "Replaced %d occurrence%sof '%s' with '%s'.\r\n", replaced, replaced != 1 ? "s " : " ", s, t);
 					SEND_TO_Q(buf, d);
 				}
 				else if (replaced == 0) {
@@ -730,7 +745,8 @@ void parse_action(int command, char *string, descriptor_data *d) {
 				return;
 			}
 			break;
-		case PARSE_LIST_NORM:
+		case PARSE_LIST_NORM:	// pass-thru
+		case PARSE_LIST_COLOR: {
 			*buf = '\0';
 			if (*string)
 				switch(sscanf(string, " %d - %d ", &line_low, &line_high)) {
@@ -786,8 +802,9 @@ void parse_action(int command, char *string, descriptor_data *d) {
 			else
 				strcat(buf, t);
 			sprintf(buf + strlen(buf), "\r\n%d line%sshown.\r\n", total_len, total_len != 1 ? "s " : " ");
-			page_string(d, show_color_codes(buf), TRUE);
+			page_string(d, (command == PARSE_LIST_COLOR) ? buf : show_color_codes(buf), TRUE);
 			break;
+		}
 		case PARSE_LIST_NUM:
 			*buf = '\0';
 			if (*string)
@@ -887,17 +904,17 @@ void parse_action(int command, char *string, descriptor_data *d) {
 				RECREATE(*d->str, char, strlen(buf) + 3);
 
 				strcpy(*d->str, buf);
-				SEND_TO_Q("Line instered.\r\n", d);
+				SEND_TO_Q("Line inserted.\r\n", d);
 			}
 			else {
-				SEND_TO_Q("LIne number must be higher than 0.\r\n", d);
+				SEND_TO_Q("Line number must be higher than 0.\r\n", d);
 				return;
 			}
 			break;
 		case PARSE_EDIT:
 			half_chop(string, buf, buf2);
 			if (*buf == '\0') {
-				SEND_TO_Q("You must specify a line number at which to tchange text.\r\n", d);
+				SEND_TO_Q("You must specify a line number at which to change text.\r\n", d);
 				return;
 			}
 			line_low = atoi(buf);
@@ -1044,7 +1061,7 @@ int format_script(struct descriptor_data *d) {
 
 
 void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int maxlen) {
-	int line_chars, cap_next = TRUE, cap_next_next = FALSE;
+	int line_chars, startlen, cap_next = TRUE, cap_next_next = FALSE;
 	char *flow, *start = NULL, temp;
 	char formatted[MAX_STRING_LENGTH];
 
@@ -1090,7 +1107,8 @@ void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int m
 			temp = *flow;
 			*flow = '\0';
 
-			if (line_chars + strlen(start) + 1 > 79) {
+			startlen = strlen(start) - (2 * count_color_codes(start));
+			if (line_chars + startlen + 1 > 79) {
 				strcat(formatted, "\r\n");
 				line_chars = 0;
 			}
@@ -1104,7 +1122,7 @@ void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int m
 				cap_next = FALSE;
 				*start = UPPER(*start);
 			}
-			line_chars += strlen(start);
+			line_chars += startlen;
 			strcat(formatted, start);
 			*flow = temp;
 		}

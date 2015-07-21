@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.other.c                                     EmpireMUD 2.0b1 *
+*   File: act.other.c                                     EmpireMUD 2.0b2 *
 *  Usage: Miscellaneous player-level commands                             *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -35,6 +35,7 @@
 */
 
 // external prototypes
+extern char_data *has_familiar(char_data *ch);
 void Objsave_char(char_data *ch, int rent_code);
 void scale_item_to_level(obj_data *obj, int level);
 
@@ -58,11 +59,12 @@ void perform_alternate(char_data *old, char_data *new) {
 	extern char *START_MESSG;
 	extern bool global_mute_slash_channel_joins;
 	
-	char sys[MAX_STRING_LENGTH], mort[MAX_STRING_LENGTH], temp[256];
+	char sys[MAX_STRING_LENGTH], mort_in[MAX_STRING_LENGTH], mort_out[MAX_STRING_LENGTH], mort_alt[MAX_STRING_LENGTH], temp[256];
 	descriptor_data *desc, *next_d;
 	bool show_start = FALSE;
 	char_data *ch_iter;
-	int invis_lev, last_tell;
+	int invis_lev, old_invis, last_tell;
+	empire_data *old_emp;
 	
 	if (!old || !new || !old->desc || new->desc) {
 		log("SYSERR: Attempting invalid peform_alternate with %s, %s, %s, %s", old ? "ok" : "no old", new ? "ok" : "no new", old->desc ? "ok" : "no old desc", new->desc ? "new desc" : "ok");
@@ -81,14 +83,24 @@ void perform_alternate(char_data *old, char_data *new) {
 	}
 	
 	invis_lev = MAX(GET_INVIS_LEV(new), (PLR_FLAGGED(new, PLR_INVSTART) ? GET_ACCESS_LEVEL(new) : 0));
+	old_invis = GET_INVIS_LEV(old);
+	old_emp = GET_LOYALTY(old);
 	
 	// prepare logs
 	snprintf(sys, sizeof(sys), "%s used alternate to switch to %s.", GET_NAME(old), GET_NAME(new));
+
 	strcpy(temp, PERS(new, new, TRUE));
-	snprintf(mort, sizeof(mort), "%s has switched to %s", PERS(old, old, TRUE), temp);
+	snprintf(mort_alt, sizeof(mort_alt), "%s has switched to %s", PERS(old, old, TRUE), temp);
+	snprintf(mort_in, sizeof(mort_in), "%s has entered the game", temp);
+	snprintf(mort_out, sizeof(mort_in), "%s has left the game", PERS(old, old, TRUE));
 	
 	// store last known level now
 	GET_LAST_KNOWN_LEVEL(old) = GET_COMPUTED_LEVEL(old);
+	
+	// peace out
+	if (!GET_INVIS_LEV(old)) {
+		act("$n has left the game.", TRUE, old, NULL, NULL, TO_ROOM);
+	}
 	
 	// save old char...
 	Objsave_char(old, RENT_RENTED);
@@ -113,8 +125,27 @@ void perform_alternate(char_data *old, char_data *new) {
 	extract_char(old);
 	
 	syslog(SYS_LOGIN, invis_lev, TRUE, "%s", sys);
-	if (GET_INVIS_LEV(new) == 0 && !PLR_FLAGGED(new, PLR_INVSTART)) {
-		mortlog("%s", mort);
+	if (config_get_bool("public_logins")) {
+		if (GET_INVIS_LEV(new) == 0 && !PLR_FLAGGED(new, PLR_INVSTART)) {
+			mortlog("%s", mort_alt);
+		}
+		else if (old_invis == 0) {
+			// only mortlog logout
+			mortlog("%s", mort_out);
+		}
+	}
+	else {	// not public logins -- use elogs
+		if (old_emp && GET_LOYALTY(new) == old_emp && old_invis == 0) {
+			// both in same empire
+			log_to_empire(old_emp, ELOG_LOGINS, "%s", mort_alt);
+		}
+		else if (old_emp && old_invis == 0) {
+			log_to_empire(old_emp, ELOG_LOGINS, "%s", mort_out);
+		}
+		
+		if (GET_LOYALTY(new) && GET_LOYALTY(new) != old_emp && GET_INVIS_LEV(new) == 0 && !PLR_FLAGGED(new, PLR_INVSTART)) {
+			log_to_empire(GET_LOYALTY(new), ELOG_LOGINS, "%s", mort_in);
+		}
 	}
 	
 	// if new is NOT already in-game
@@ -219,6 +250,77 @@ static void print_group(char_data *ch) {
 }
 
 
+INTERACTION_FUNC(shear_interact) {
+	char buf[MAX_STRING_LENGTH];
+	int iter, amt;
+	obj_data *obj = NULL;
+	
+	add_cooldown(inter_mob, COOLDOWN_SHEAR, config_get_int("shear_growth_time") * SECS_PER_REAL_HOUR);
+	command_lag(ch, WAIT_OTHER);
+			
+	amt = interaction->quantity;
+	if (HAS_ABILITY(ch, ABIL_MASTER_FARMER)) {
+		amt *= 2;
+	}
+	
+	for (iter = 0; iter < amt; ++iter) {
+		obj = read_object(interaction->vnum);
+		obj_to_char_or_room(obj, ch);
+		load_otrigger(obj);
+	}
+	
+	// only show loot to the skinner
+	if (amt == 1) {
+		act("You skillfully shear $N and get $p.", FALSE, ch, obj, inter_mob, TO_CHAR);
+		act("$n skillfully shears you and gets $p.", FALSE, ch, obj, inter_mob, TO_VICT);
+		act("$n skillfully shears $N and gets $p.", FALSE, ch, obj, inter_mob, TO_NOTVICT);
+	}
+	else {
+		sprintf(buf, "You skillfully shear $N and get $p (x%d).", amt);
+		act(buf, FALSE, ch, obj, inter_mob, TO_CHAR);
+		sprintf(buf, "$n skillfully shears you and gets $p (x%d).", amt);
+		act(buf, FALSE, ch, obj, inter_mob, TO_VICT);
+		sprintf(buf, "$n skillfully shears $N and gets $p (x%d).", amt);
+		act(buf, FALSE, ch, obj, inter_mob, TO_NOTVICT);
+	}
+	
+	return TRUE;
+}
+
+
+INTERACTION_FUNC(skin_interact) {
+	char buf[MAX_STRING_LENGTH];
+	obj_data *obj = NULL;
+	int num;
+
+	SET_BIT(GET_OBJ_VAL(inter_item, VAL_CORPSE_FLAGS), CORPSE_SKINNED);
+	command_lag(ch, WAIT_OTHER);
+		
+	for (num = 0; num < interaction->quantity; ++num) {
+		obj = read_object(interaction->vnum);
+		if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
+			scale_item_to_level(obj, 1);	// min scale
+		}
+		obj_to_char_or_room(obj, ch);
+		load_otrigger(obj);
+	}
+	
+	// only show loot to the skinner
+	if (interaction->quantity > 1) {
+		sprintf(buf, "You carefully skin $P and get $p (x%d).", interaction->quantity);
+		act(buf, FALSE, ch, obj, inter_item, TO_CHAR);
+		sprintf(buf, "$n carefully skins $P and gets $p (x%d).", interaction->quantity);
+		act(buf, FALSE, ch, obj, inter_item, TO_ROOM);
+	}
+	else {
+		act("You carefully skin $P and get $p.", FALSE, ch, obj, inter_item, TO_CHAR);
+		act("$n carefully skins $P and gets $p.", FALSE, ch, obj, inter_item, TO_ROOM);
+	}
+	
+	return TRUE;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// TOGGLE NOTIFIERS ////////////////////////////////////////////////////////
 
@@ -282,7 +384,10 @@ ACMD(do_alternate) {
 		}
 		
 		// prevent rapid-use
-		WAIT_STATE(ch, 1.5 RL_SEC);
+		command_lag(ch, WAIT_OTHER);
+	}
+	else if (ch->desc->str) {
+		msg_to_char(ch, "You can't alterante while editing text.\r\n");
 	}
 	else if (ROOM_OWNER(IN_ROOM(ch)) && empire_is_hostile(ROOM_OWNER(IN_ROOM(ch)), GET_LOYALTY(ch), IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't alternate in hostile territory.\r\n");
@@ -302,7 +407,7 @@ ACMD(do_alternate) {
 	else if ((newch = is_playing(idnum)) || (newch = is_at_menu(idnum))) {
 		// in-game?
 		
-		if (GET_ACCOUNT_ID(newch) != GET_ACCOUNT_ID(ch)) {
+		if (GET_ACCOUNT_ID(newch) != GET_ACCOUNT_ID(ch) || GET_ACCOUNT_ID(newch) == 0) {
 			msg_to_char(ch, "That character isn't on your account.\r\n");
 			return;
 		}
@@ -342,7 +447,7 @@ ACMD(do_alternate) {
 		}
 		
 		// ensure legal switch
-		if (GET_ACCOUNT_ID(newch) != GET_ACCOUNT_ID(ch)) {
+		if (GET_ACCOUNT_ID(newch) != GET_ACCOUNT_ID(ch) || GET_ACCOUNT_ID(newch) == 0) {
 			msg_to_char(ch, "That character isn't on your account.\r\n");
 			free_char(newch);
 			return;
@@ -398,6 +503,7 @@ ACMD(do_confirm) {
 	bool check_reboot_confirms();
 	void perform_reboot();
 	extern struct reboot_control_data reboot_control;
+	extern const char *reboot_type[];
 	
 	if (IS_NPC(ch)) {
 		return;
@@ -414,11 +520,11 @@ ACMD(do_confirm) {
 	}
 
 	if (REBOOT_CONF(ch)) {
-		msg_to_char(ch, "You've already confirmed that you're ready for the reboot.\r\n");
+		msg_to_char(ch, "You've already confirmed that you're ready for the %s.\r\n", reboot_type[reboot_control.type]);
 	}
 	else {
 		REBOOT_CONF(ch) = TRUE;
-		msg_to_char(ch, "You have confirmed that you're ready for the reboot.\r\n");
+		msg_to_char(ch, "You have confirmed that you're ready for the %s.\r\n", reboot_type[reboot_control.type]);
 	}
 
 	if (check_reboot_confirms() && reboot_control.time <= 15) {
@@ -453,6 +559,19 @@ ACMD(do_dismiss) {
 	
 	if (!*arg) {
 		msg_to_char(ch, "Dismiss whom?\r\n");
+	}
+	else if (!strn_cmp(arg, "famil", 5) && is_abbrev(arg, "familiar")) {
+		// requires abbrev of at least "famil"
+		if (!(vict = has_familiar(ch))) {
+			msg_to_char(ch, "You do not have a familiar to dismiss.\r\n");
+		}
+		else {
+			if (IN_ROOM(ch) != IN_ROOM(vict)) {
+				msg_to_char(ch, "You dismiss %s.\r\n", PERS(vict, vict, FALSE));
+			}
+			act("$n is dismissed and vanishes!", TRUE, vict, NULL, NULL, TO_ROOM);
+			extract_char(vict);
+		}
 	}
 	else if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
@@ -559,7 +678,7 @@ ACMD(do_gen_write) {
 		return;
 	}
 	if (fbuf.st_size >= config_get_int("max_filesize")) {
-		send_to_char("Sorry, the file is full right now.. try again later.\r\n", ch);
+		send_to_char("Sorry, the file is full right now... try again later.\r\n", ch);
 		return;
 	}
 	if (!(fl = fopen(filename, "a"))) {
@@ -856,6 +975,9 @@ ACMD(do_herd) {
 		msg_to_char(ch, "You can't herd yourself.\r\n");
 	else if (!IS_NPC(victim) || victim->desc || !MOB_FLAGGED(victim, MOB_ANIMAL))
 		msg_to_char(ch, "You can only herd animals.\r\n");
+	else if (IS_NPC(victim) && MOB_FLAGGED(victim, MOB_HARD | MOB_GROUP | MOB_AGGRESSIVE)) {
+		act("You can't herd $N!", FALSE, ch, NULL, victim, TO_CHAR);
+	}
 	else if ((dir = parse_direction(ch, buf)) == NO_DIR || !(to_room = real_shift(IN_ROOM(ch), shift_dir[dir][0], shift_dir[dir][1])))
 		msg_to_char(ch, "That's not a direction!\r\n");
 	else if (!ROOM_IS_CLOSED(IN_ROOM(ch)) && dir >= NUM_2D_DIRS) {
@@ -972,7 +1094,7 @@ ACMD(do_order) {
 	else if (!(vict = get_char_vis(ch, name, FIND_CHAR_ROOM)) && !is_abbrev(name, "followers"))
 		send_to_char("That person isn't here.\r\n", ch);
 	else if (ch == vict)
-		send_to_char("You obviously suffer from skitzofrenia.\r\n", ch);
+		send_to_char("You obviously suffer from schizophrenia.\r\n", ch);
 	else {
 		if (AFF_FLAGGED(ch, AFF_CHARM)) {
 			send_to_char("Your superior would not aprove of you giving orders.\r\n", ch);
@@ -1012,19 +1134,37 @@ ACMD(do_order) {
 }
 
 
-/* Either displays current prompt, or sets one */
+// Either displays current prompt, or sets one; takes SCMD_PROMPT or SCMD_FPROMPT
 ACMD(do_prompt) {
 	extern char *show_color_codes(char *string);
+	
+	char *types[] = { "prompt", "fprompt" };
+	char **prompt;
 	
 	skip_spaces(&argument);
 	
 	if (IS_NPC(ch)) {
-		msg_to_char(ch, "NPCs get no prompt.\r\n");
+		msg_to_char(ch, "NPCs get no %s.\r\n", types[subcmd]);
 		return;
 	}
 
+	switch (subcmd) {
+		case SCMD_PROMPT: {
+			prompt = &GET_PROMPT(ch);
+			break;
+		}
+		case SCMD_FPROMPT: {
+			prompt = &GET_FIGHT_PROMPT(ch);
+			break;
+		}
+		default: {
+			msg_to_char(ch, "That command is not implemented.\r\n");
+			return;
+		}
+	}
+
 	if (!*argument) {
-		sprintf(buf, "Your prompt is currently: %s\r\n", (GET_PROMPT(ch) ? show_color_codes(GET_PROMPT(ch)) : "n/a"));
+		sprintf(buf, "Your %s is currently: %s\r\n", types[subcmd], (*prompt ? show_color_codes(*prompt) : "n/a"));
 		send_to_char(buf, ch);
 		return;
 	}
@@ -1037,26 +1177,26 @@ ACMD(do_prompt) {
 	}
 
 	if (!str_cmp(argument, "off") || !str_cmp(argument, "none")) {
-		if (GET_PROMPT(ch)) {
-			free(GET_PROMPT(ch));
+		if (*prompt) {
+			free(*prompt);
 		}
-		GET_PROMPT(ch) = str_dup("&0");	// empty prompt
+		*prompt = str_dup("&0");	// empty prompt
 		send_config_msg(ch, "ok_string");
 	}
 	else if (!str_cmp(argument, "default")) {
-		if (GET_PROMPT(ch)) {
-			free(GET_PROMPT(ch));
+		if (*prompt) {
+			free(*prompt);
 		}
-		GET_PROMPT(ch) = NULL;	// restores default prompt
+		*prompt = NULL;	// restores default prompt
 		send_config_msg(ch, "ok_string");
 	}
 	else {
-		if (GET_PROMPT(ch)) {
-			free(GET_PROMPT(ch));
+		if (*prompt) {
+			free(*prompt);
 		}
-		GET_PROMPT(ch) = str_dup(argument);
+		*prompt = str_dup(argument);
 
-		sprintf(buf, "Okay, set your prompt to: %s\r\n", show_color_codes(GET_PROMPT(ch)));
+		sprintf(buf, "Okay, set your %s to: %s\r\n", types[subcmd], show_color_codes(*prompt));
 		send_to_char(buf, ch);
 	}
 }
@@ -1101,7 +1241,12 @@ ACMD(do_quit) {
 		}
 		syslog(SYS_LOGIN, GET_INVIS_LEV(ch), TRUE, "%s has quit the game.", GET_NAME(ch));
 		if (GET_INVIS_LEV(ch) == 0) {
-			mortlog("%s has left the game", PERS(ch, ch, 1));
+			if (config_get_bool("public_logins")) {
+				mortlog("%s has left the game", PERS(ch, ch, 1));
+			}
+			else if (GET_LOYALTY(ch)) {
+				log_to_empire(GET_LOYALTY(ch), ELOG_LOGINS, "%s has left the game", PERS(ch, ch, TRUE));
+			}
 		}
 		send_to_char("Goodbye, friend.. Come back soon!\r\n", ch);
 
@@ -1185,7 +1330,12 @@ ACMD(do_selfdelete) {
 			act("$n has left the game.", TRUE, ch, 0, 0, TO_ROOM);
 		}
 		if (GET_INVIS_LEV(ch) == 0) {
-			mortlog("%s has left the game", PERS(ch, ch, TRUE));
+			if (config_get_bool("public_logins")) {
+				mortlog("%s has left the game", PERS(ch, ch, 1));
+			}
+			else if (GET_LOYALTY(ch)) {
+				log_to_empire(GET_LOYALTY(ch), ELOG_LOGINS, "%s has left the game", PERS(ch, ch, TRUE));
+			}
 		}
 		msg_to_char(ch, "You have deleted your character. Goodbye...\r\n");
 		
@@ -1197,12 +1347,6 @@ ACMD(do_selfdelete) {
 
 ACMD(do_shear) {
 	char_data *mob;
-	obj_data *obj = NULL;
-	struct interaction_item *interact;
-	int amt, iter;
-	bool found;
-	
-	int shear_growth_time = config_get_int("shear_growth_time");
 
 	one_argument(argument, arg);
 
@@ -1225,48 +1369,7 @@ ACMD(do_shear) {
 		act("$E is already shorn.", FALSE, ch, NULL, mob, TO_CHAR);
 	}
 	else {
-		found = FALSE;
-		for (interact = mob->interactions; interact; interact = interact->next) {
-			if (CHECK_INTERACT(interact, INTERACT_SHEAR)) {
-				if (!found) {
-					// first one found
-					act("You skillfully shear $N...", FALSE, ch, NULL, mob, TO_CHAR);
-					act("$n skillfully shears you. It hardly hurts at all!", FALSE, ch, NULL, mob, TO_VICT);
-					act("$n skillfully shears $N.", FALSE, ch, NULL, mob, TO_NOTVICT);
-					
-					add_cooldown(mob, COOLDOWN_SHEAR, shear_growth_time * SECS_PER_REAL_HOUR);
-					WAIT_STATE(ch, 2 RL_SEC);
-					found = TRUE;
-				}
-				
-				amt = interact->quantity;
-				if (HAS_ABILITY(ch, ABIL_MASTER_FARMER)) {
-					amt *= 2;
-				}
-				
-				for (iter = 0; iter < amt; ++iter) {
-					obj = read_object(interact->vnum);
-					obj_to_char_or_room(obj, ch);
-					load_otrigger(obj);
-				}
-				
-				// only show loot to the skinner
-				if (amt == 1) {
-					act("You get $p.", FALSE, ch, obj, NULL, TO_CHAR);
-				}
-				else {
-					sprintf(buf, "You get $p (x%d).", amt);
-					act(buf, FALSE, ch, obj, NULL, TO_CHAR);
-				}
-				
-				// there can be only one?
-				if (interact->exclusive) {
-					break;
-				}
-			}
-		}
-
-		if (found) {
+		if (run_interactions(ch, mob->interactions, INTERACT_SHEAR, IN_ROOM(ch), mob, NULL, shear_interact)) {
 			gain_ability_exp(ch, ABIL_MASTER_FARMER, 5);
 		}
 		else {
@@ -1279,11 +1382,8 @@ ACMD(do_shear) {
 ACMD(do_skin) {
 	extern obj_data *has_sharp_tool(char_data *ch);
 
-	obj_data *obj, *obj2 = NULL;
-	struct interaction_item *interact;
+	obj_data *obj;
 	char_data *proto;
-	bool found;
-	int num;
 
 	one_argument(argument, arg);
 
@@ -1303,48 +1403,8 @@ ACMD(do_skin) {
 	else if (!has_sharp_tool(ch))
 		msg_to_char(ch, "You need to be wielding a sharp tool to skin a corpse.\r\n");
 	else {
-		found = FALSE;
-		for (interact = proto->interactions; interact; interact = interact->next) {
-			if (CHECK_INTERACT(interact, INTERACT_SKIN)) {
-				if (!found) {
-					// first one found
-					act("You carefully skin $p...", FALSE, ch, obj, NULL, TO_CHAR);
-					act("$n carefully skins $p.", FALSE, ch, obj, NULL, TO_ROOM);
-					
-					SET_BIT(GET_OBJ_VAL(obj, VAL_CORPSE_FLAGS), CORPSE_SKINNED);
-					WAIT_STATE(ch, 2 RL_SEC);
-					found = TRUE;
-				}
-				
-				for (num = 0; num < interact->quantity; ++num) {
-					obj2 = read_object(interact->vnum);
-					if (OBJ_FLAGGED(obj2, OBJ_SCALABLE)) {
-						scale_item_to_level(obj2, 1);	// min scale
-					}
-					obj_to_char_or_room(obj2, ch);
-					load_otrigger(obj2);
-				}
-				
-				// only show loot to the skinner
-				if (interact->quantity > 1) {
-					sprintf(buf, "You get $p (x%d).", interact->quantity);
-					act(buf, FALSE, ch, obj2, NULL, TO_CHAR);
-					sprintf(buf, "$n gets $p (x%d).", interact->quantity);
-					act(buf, FALSE, ch, obj2, NULL, TO_ROOM);
-				}
-				else {
-					act("You get $p.", FALSE, ch, obj2, NULL, TO_CHAR);
-					act("$n gets $p.", FALSE, ch, obj2, NULL, TO_ROOM);
-				}
-				
-				// there can be only one?
-				if (interact->exclusive) {
-					break;
-				}
-			}
-		}
-
-		if (!found) {
+		// run it
+		if (!run_interactions(ch, proto->interactions, INTERACT_SKIN, IN_ROOM(ch), NULL, obj, skin_interact)) {
 			msg_to_char(ch, "There isn't anything you can skin from that corpse.\r\n");
 		}
 	}
@@ -1355,7 +1415,6 @@ ACMD(do_summon) {
 	bool check_scaling(char_data *mob, char_data *attacker);
 	extern bool check_vampire_sun(char_data *ch, bool message);
 	void summon_materials(char_data *ch, char *argument);
-	extern char_data *has_familiar(char_data *ch);
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	
 	char_data *mob;
@@ -1374,6 +1433,10 @@ ACMD(do_summon) {
 	
 	// types of summon
 	if (is_abbrev(arg, "humans")) {
+		// check ability immediately because the sun error message is misleading otherwise
+		if (!can_use_ability(ch, ABIL_SUMMON_HUMANS, NOTHING, 0, NOTHING)) {
+			return;
+		}
 		if (!check_vampire_sun(ch, TRUE)) {
 			return;
 		}
@@ -1426,7 +1489,7 @@ ACMD(do_summon) {
 		}
 	}
 	
-	if (count > 5) {
+	if (count > config_get_int("summon_npc_limit")) {
 		msg_to_char(ch, "There are too many npcs here to summon more.\r\n");
 		return;
 	}
@@ -1579,7 +1642,7 @@ ACMD(do_summon) {
 		return;
 	}
 	
-	charge_ability_cost(ch, cost_type, cost, cooldown, cooldown_time);
+	charge_ability_cost(ch, cost_type, cost, cooldown, cooldown_time, WAIT_ABILITY);
 
 	msg_to_char(ch, "You whistle loudly...\r\n");
 	act("$n whistles loudly!", FALSE, ch, 0, 0, TO_ROOM);
@@ -1601,7 +1664,7 @@ ACMD(do_summon) {
 			check_scaling(mob, ch);
 			
 			// spawn data
-			SET_BIT(MOB_FLAGS(mob), MOB_SPAWNED);
+			SET_BIT(MOB_FLAGS(mob), MOB_SPAWNED | MOB_NO_LOOT);
 			MOB_SPAWN_TIME(mob) = time(0);
 			
 			char_to_room(mob, IN_ROOM(ch));
@@ -1659,6 +1722,11 @@ ACMD(do_toggle) {
 	const char *tognames[NUM_TOG_TYPES][2] = { { "off", "on" }, { "on", "off" } };
 
 	int iter, type = NOTHING, count, on;
+	
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "NPCs do not have toggles.\r\n");
+		return;
+	}
 
 	skip_spaces(&argument);
 	

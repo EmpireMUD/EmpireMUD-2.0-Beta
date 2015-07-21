@@ -16,6 +16,10 @@ L
 5 0
 10080 -1 -1
 -1 0 0
+L
+6 0
+100 -1 -1
+-1 0 0
 S
 #201
 The Cursed Chalice of Mill Manor~
@@ -33,8 +37,35 @@ L
 4320 -1 -1
 -1 0 0
 L
+6 0
+100 -1 -1
+-1 0 0
+L
 1 0
 11130 -1 -1
-14 m m
+5 m m
+S
+#281
+Mountain Valley: Molten Fiend~
+Owen Morris~
+   A powerful demon, buried beneath the earth in ages past, is trying to break
+free, and its struggles have opened this molten crevice in the mountains! 
+Bring a capable party with you, for the demon's lengthy imprisonment has only
+fueled the fires of its rage!  
+~
+18075 18099 200-250
+5 0 0 4
+L
+6 0
+50 -1 -1
+-1 0 0
+L
+1 0
+18075 -1 -1
+9 c c
+L
+5 0
+1440 -1 -1
+-1 0 0
 S
 $

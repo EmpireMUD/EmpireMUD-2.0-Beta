@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.informative.c                               EmpireMUD 2.0b1 *
+*   File: act.informative.c                               EmpireMUD 2.0b2 *
 *  Usage: Player-level commands of an informative nature                  *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -334,7 +334,7 @@ void diag_char_to_char(char_data *i, char_data *ch) {
 		return;
 	}
 	
-	sprintf(buf, "$n is %s.", health_levels[(MAX(0, GET_HEALTH(i)) * 10 / GET_MAX_HEALTH(i))]);
+	sprintf(buf, "$n is %s.", health_levels[(MAX(0, GET_HEALTH(i)) * 10 / MAX(1, GET_MAX_HEALTH(i)))]);
 	act(buf, FALSE, i, 0, ch, TO_VICT);
 }
 
@@ -366,28 +366,34 @@ void display_attributes(char_data *ch, char_data *to) {
 void display_score_to_char(char_data *ch, char_data *to) {
 	void show_character_affects(char_data *ch, char_data *to);
 	extern double get_combat_speed(char_data *ch, int pos);
+	extern int get_block_rating(char_data *ch, bool can_gain_skill);
 	extern int get_blood_upkeep_cost(char_data *ch);
+	extern int total_bonus_healing(char_data *ch);
+	extern int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
+	extern int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill);
 	extern int health_gain(char_data *ch, bool info_only);
 	extern int move_gain(char_data *ch, bool info_only);
 	extern int mana_gain(char_data *ch, bool info_only);
 	extern int get_ability_points_available_for_char(char_data *ch, int skill);
 	extern const struct material_data materials[NUM_MATERIALS];
 	extern int skill_sort[NUM_SKILLS];
+	extern const int base_hit_chance;
+	extern const double hit_per_dex;
 
 	char lbuf[MAX_STRING_LENGTH], lbuf2[MAX_STRING_LENGTH], lbuf3[MAX_STRING_LENGTH];
-	int i, j, count, iter, sk, pts, cols;
+	int i, j, count, iter, sk, pts, cols, val;
 	empire_data *emp;
 	struct time_info_data playing_time;
 
 
-	msg_to_char(to, " +----------------------------- EmpireMUD 2.0b1 -----------------------------+\r\n");
+	msg_to_char(to, " +----------------------------- EmpireMUD 2.0b2 -----------------------------+\r\n");
 	
 	// row 1 col 1: name
 	msg_to_char(to, "  Name: %-18.18s", PERS(ch, ch, 1));
 
 	// row 1 col 2: class
 	msg_to_char(to, " Class: %-17.17s", IS_IMMORTAL(ch) ? "Immortal" : class_data[GET_CLASS(ch)].name);
-	msg_to_char(to, " Total Level: %d\r\n", GET_COMPUTED_LEVEL(ch));
+	msg_to_char(to, " Level: %d (%d)\r\n", GET_COMPUTED_LEVEL(ch), GET_SKILL_LEVEL(ch));
 
 	// row 1 col 3: levels
 
@@ -459,20 +465,25 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	// secondary attributes
 	msg_to_char(to, " +---------------------------------------------------------------------------+\r\n");
 
-	// row 1	
-	sprintf(lbuf, "Dodge  [%s%+d&0]", HAPPY_COLOR(GET_DODGE(ch), 0), GET_DODGE(ch));
-	sprintf(lbuf2, "Block  [%s%+d&0]", HAPPY_COLOR(GET_BLOCK(ch), 0), GET_BLOCK(ch));
-	sprintf(lbuf3, "Soak  [%s%+d&0]", HAPPY_COLOR(GET_SOAK(ch), 0), GET_SOAK(ch));
+	// row 1 (dex is removed from dodge to make the display easier to read)
+	val = get_dodge_modifier(ch, NULL, FALSE) - (hit_per_dex * GET_DEXTERITY(ch));
+	sprintf(lbuf, "Dodge  [%s%d&0]", HAPPY_COLOR(val, 0), val);
+	
+	val = get_block_rating(ch, FALSE);
+	sprintf(lbuf2, "Block  [%s%d&0]", HAPPY_COLOR(val, 0), val);
+	
+	sprintf(lbuf3, "Resist  [%d|%d]", GET_RESIST_PHYSICAL(ch), GET_RESIST_MAGICAL(ch));
 	msg_to_char(to, "  %-28.28s %-28.28s %-28.28s\r\n", lbuf, lbuf2, lbuf3);
 	
 	// row 2
 	sprintf(lbuf, "Physical  [%s%+d&0]", HAPPY_COLOR(GET_BONUS_PHYSICAL(ch), 0), GET_BONUS_PHYSICAL(ch));
 	sprintf(lbuf2, "Magical  [%s%+d&0]", HAPPY_COLOR(GET_BONUS_MAGICAL(ch), 0), GET_BONUS_MAGICAL(ch));
-	sprintf(lbuf3, "Healing  [%s%+d&0]", HAPPY_COLOR(GET_BONUS_HEALING(ch), 0), GET_BONUS_HEALING(ch));
+	sprintf(lbuf3, "Healing  [%s%+d&0]", HAPPY_COLOR(total_bonus_healing(ch), 0), total_bonus_healing(ch));
 	msg_to_char(to, "  %-28.28s %-28.28s %-28.28s\r\n", lbuf, lbuf2, lbuf3);
 	
-	// row 3
-	sprintf(lbuf, "To-hit  [%s%+d&0]", HAPPY_COLOR(GET_TO_HIT(ch), 0), GET_TO_HIT(ch));
+	// row 3 (dex is removed from to-hit to make the display easier to read)
+	val = get_to_hit(ch, NULL, FALSE, FALSE) - (hit_per_dex * GET_DEXTERITY(ch));
+	sprintf(lbuf, "To-hit  [%s%d&0]", HAPPY_COLOR(val, base_hit_chance), val);
 	sprintf(lbuf2, "Speed  [%.2f]", get_combat_speed(ch, WEAR_WIELD));
 	msg_to_char(to, "  %-28.28s %-28.28s \r\n", lbuf, lbuf2);
 
@@ -513,7 +524,7 @@ void display_score_to_char(char_data *ch, char_data *to) {
 		if (j % 3)
 			strcat(buf, "\r\n ");
 		if (*buf)
-			msg_to_char(to, "+------------------------------- Resources -----------------------------------+\r\n%s", buf);
+			msg_to_char(to, "+------------------------------- Resources ---------------------------------+\r\n%s", buf);
 	}
 
 	// everything leaves a starting space so this next line does not need it
@@ -688,6 +699,11 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 	if (!ch || !i || !ch->desc) {
 		return;
 	}
+	
+	// able to see at all?
+	if (AFF_FLAGGED(i, AFF_NO_SEE_IN_ROOM) && !PRF_FLAGGED(ch, PRF_HOLYLIGHT)) {
+		return;
+	}
 
 	if (num > 1) {
 		msg_to_char(ch, "(%2d) ", num);
@@ -719,10 +735,6 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 	
 	if (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_ROOMFLAGS) && IS_NPC(i)) {
 		msg_to_char(ch, "[%d] %s", GET_MOB_VNUM(i), SCRIPT(i) ? "[TRIG] " : "");
-	}
-	
-	if (AFF_FLAGGED(i, AFF_NO_SEE_IN_ROOM) && !PRF_FLAGGED(ch, PRF_HOLYLIGHT)) {
-		return;
 	}
 
 	if (IS_NPC(i) && GET_LONG_DESC(i) && GET_POS(i) == POS_STANDING) {
@@ -833,7 +845,7 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 		act(buf, FALSE, i, 0, ch, TO_VICT);
 		}
 	if (GET_FEEDING_FROM(i)) {
-		sprintf(buf, "...$e has his teeth firmly implanted in %s!", PERS(GET_FEEDING_FROM(i), ch, 0));
+		sprintf(buf, "...$e has $s teeth firmly implanted in %s!", PERS(GET_FEEDING_FROM(i), ch, 0));
 		act(buf, FALSE, i, 0, ch, TO_VICT);
 		}
 	if (!IS_NPC(i) && GET_ACTION(i) == ACT_MORPHING)
@@ -896,7 +908,7 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 		if (!IS_NPC(i) && !IS_DISGUISED(i)) {
 			// basic description -- don't show if morphed
 			if (GET_LONG_DESC(i) && (IS_NPC(i) || GET_MORPH(i) == MORPH_NONE)) {
-				send_to_char(GET_LONG_DESC(i), ch);
+				msg_to_char(ch, "%s&0", GET_LONG_DESC(i));
 			}
 
 			if (HAS_INFRA(i)) {
@@ -950,7 +962,7 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 
 		if (ch != i && i->carrying) {
 			gain_ability_exp(ch, ABIL_APPRAISAL, 5);
-			WAIT_STATE(ch, 0.5 RL_SEC);
+			GET_WAIT_STATE(ch) = MAX(GET_WAIT_STATE(ch), 0.5 RL_SEC);
 		}
 	}
 }
@@ -996,7 +1008,14 @@ char *one_who_line(char_data *ch, bool shortlist) {
 		num = count_color_codes(out);
 		sprintf(buf, "%%-%d.%ds", 35 + 2 * num, 35 + 2 * num);
 		strcpy(buf1, out);
-		snprintf(out, sizeof(out), buf, buf1);
+		
+		size = snprintf(out, sizeof(out), buf, buf1);
+		
+		// append invis even in short list
+		if (GET_INVIS_LEV(ch)) {
+			size += snprintf(out + size, sizeof(out) - size, " (i%d)", GET_INVIS_LEV(ch));
+		}
+		
 		return out;
 	}
 	
@@ -1015,6 +1034,9 @@ char *one_who_line(char_data *ch, bool shortlist) {
 	}
 	if (PRF_FLAGGED(ch, PRF_RP)) {
 		size += snprintf(out + size, sizeof(out) - size, " &m(RP)&0");
+	}
+	if (get_cooldown_time(ch, COOLDOWN_ROGUE_FLAG) > 0) {
+		size += snprintf(out + size, sizeof(out) - size, " &M(rogue)&0");
 	}
 
 	if (GET_INVIS_LEV(ch)) {
@@ -1045,15 +1067,18 @@ char *one_who_line(char_data *ch, bool shortlist) {
 * @param char *name_search If filtering names, the filter string.
 * @param int low Minimum level to show.
 * @param int high Maximum level to show.
-* @param bool empire_who If TRUE, only shows members of ch's empire.
+* @param empire_data *empire_who If not null, only shows members of that empire.
 * @param bool rp If TRUE, only shows RP players.
 * @param bool shortlist If TRUE, gets the columnar short form.
 * @param int type WHO_MORTALS, WHO_GODS, or WHO_IMMORTALS
 * @return char* The who output for imms.
 */
-char *partial_who(char_data *ch, char *name_search, int low, int high, bool empire_who, bool rp, bool shortlist, int type) {
+char *partial_who(char_data *ch, char *name_search, int low, int high, empire_data *empire_who, bool rp, bool shortlist, int type) {
+	extern int max_players_today;
+	extern int max_players_this_uptime;
+	
 	static char who_output[MAX_STRING_LENGTH];
-	char whobuf[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH];
+	char whobuf[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH], online[MAX_STRING_LENGTH];
 	descriptor_data *d;
 	char_data *tch;
 	int iter, count = 0, size;
@@ -1075,15 +1100,22 @@ char *partial_who(char_data *ch, char *name_search, int low, int high, bool empi
 
 		if (*name_search && !is_abbrev(name_search, PERS(tch, tch, 1)) && !strstr(GET_TITLE(tch), name_search))
 			continue;
-		if (!CAN_SEE_GLOBAL(ch, tch) || GET_ACCESS_LEVEL(tch) < low || GET_ACCESS_LEVEL(tch) > high)
+		if (!CAN_SEE_GLOBAL(ch, tch)) {
 			continue;
+		}
+		if (low != 0 && GET_COMPUTED_LEVEL(tch) < low) {
+			continue;
+		}
+		if (high != 0 && GET_COMPUTED_LEVEL(tch) > high) {
+			continue;
+		}
 		if (type == WHO_MORTALS && (IS_GOD(tch) || IS_IMMORTAL(tch)))
 			continue;
 		if (type == WHO_GODS && !IS_GOD(tch))
 			continue;
 		if (type == WHO_IMMORTALS && !IS_IMMORTAL(tch))
 			continue;
-		if (empire_who && GET_LOYALTY(ch) != GET_LOYALTY(tch))
+		if (empire_who && GET_LOYALTY(tch) != empire_who)
 			continue;
 		if (rp && !PRF_FLAGGED(tch, PRF_RP))
 			continue;
@@ -1102,7 +1134,17 @@ char *partial_who(char_data *ch, char *name_search, int low, int high, bool empi
 		// repurposing size
 		size = 0;
 		
-		size += snprintf(who_output + size, sizeof(who_output) - size, "%s: %d online", who_titles[type], count);
+		if (type == WHO_MORTALS) {
+			// update counts in case
+			max_players_today = MAX(max_players_today, count);
+			max_players_this_uptime = MAX(max_players_this_uptime, count);
+			snprintf(online, sizeof(online), "%d online (max today %d, this uptime %d)", count, max_players_today, max_players_this_uptime);
+		}
+		else {
+			snprintf(online, sizeof(online), "%d online", count);
+		}
+		
+		size += snprintf(who_output + size, sizeof(who_output) - size, "%s: %s", who_titles[type], online);
 
 		// divider
 		*buf = '\0';
@@ -1404,6 +1446,10 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 		if (strncmp(flags, "NOBITS", 6)) {
 			sprintf(buf + strlen(buf), " %*s", ((int)strlen(flags)-1), flags);	// remove trailing space
 		}
+		
+		if (IS_STOLEN(obj)) {
+			strcat(buf, " (STOLEN)");
+		}
 	}
 	
 	if (mode == OBJ_DESC_LOOK_AT) {
@@ -1415,7 +1461,7 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 			if ((board_type = find_board(ch)) != -1)
 				if (Board_show_board(board_type, ch, "board", obj))
 					return;
-			strcpy(buf, "You see nothing special..");
+			strcpy(buf, "You see nothing special.");
 		}
 		else if (IS_BOOK(obj)) {
 			strcpy(buf, get_book_item_description_by_id(GET_BOOK_ID(obj)));
@@ -1437,7 +1483,7 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 			strcpy(buf, GET_OBJ_ACTION_DESC(obj));
 		}
 		else if (GET_OBJ_TYPE(obj) != ITEM_DRINKCON)
-			strcpy(buf, "You see nothing special..");
+			strcpy(buf, "You see nothing special.");
 		else {
 			/* ITEM_TYPE == ITEM_DRINKCON */
 			strcpy(buf, "It looks like a drink container.");
@@ -1780,9 +1826,10 @@ ACMD(do_help) {
 
 
 ACMD(do_helpsearch) {	
-	char output[MAX_STRING_LENGTH];
+	char output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
 	int iter;
 	bool found;
+	size_t size;
 	
 	// this removes leading filler words, which are going to show up in a lot of helps
 	one_argument(argument, arg);
@@ -1798,22 +1845,32 @@ ACMD(do_helpsearch) {
 		msg_to_char(ch, "No help available.r\n");
 	}
 	else {
-		strcpy(output, "You find help on that in the following help entries:\r\n");
+		size = snprintf(output, sizeof(output), "You find help on that in the following help entries:\r\n");
 		found = FALSE;
 		
 		for (iter = 0; iter <= top_of_helpt; ++iter) {
 			if (GET_ACCESS_LEVEL(ch) >= help_table[iter].level && (!help_table[iter].duplicate && str_str(help_table[iter].entry, arg))) {
-				sprintf(output + strlen(output), " %s\r\n", help_table[iter].keyword);
+				snprintf(line, sizeof(line), " %s\r\n", help_table[iter].keyword);
 				found = TRUE;
+				
+				if (size + strlen(line) < sizeof(output)) {
+					strcat(output, line);
+					size += strlen(line);
+				}
+				else {
+					size += snprintf(output + size, sizeof(output) - size, "... and more\r\n");
+					break;
+				}
 			}
 		}
 		
 		if (!found) {
-			strcat(output, " none\r\n");
+			msg_to_char(ch, "%s none\r\n", output);
 		}
-		
-		// send it out
-		page_string(ch->desc, output, TRUE);
+		else {
+			// send it out
+			page_string(ch->desc, output, TRUE);
+		}
 	}
 }
 
@@ -2115,13 +2172,17 @@ ACMD(do_survey) {
 	
 	msg_to_char(ch, "You survey the area:\r\n");
 	
+	if (GET_ISLAND_ID(IN_ROOM(ch)) != NO_ISLAND) {
+		msg_to_char(ch, "Location: %s\r\n", get_island(GET_ISLAND_ID(IN_ROOM(ch)), TRUE)->name);
+	}
+	
 	// empire
 	if (ROOM_OWNER(IN_ROOM(ch))) {
 		if ((city = find_city(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch)))) {
-			msg_to_char(ch, "This is the %s%s&0 %s of %s.", EMPIRE_BANNER(ROOM_OWNER(IN_ROOM(ch))), EMPIRE_ADJECTIVE(ROOM_OWNER(IN_ROOM(ch))), city_type[city->type].name, city->name);
+			msg_to_char(ch, "This is the %s%s&0 %s of %s.\r\n", EMPIRE_BANNER(ROOM_OWNER(IN_ROOM(ch))), EMPIRE_ADJECTIVE(ROOM_OWNER(IN_ROOM(ch))), city_type[city->type].name, city->name);
 		}	
 		else {
-			msg_to_char(ch, "This area is claimed by %s%s&0.", EMPIRE_BANNER(ROOM_OWNER(IN_ROOM(ch))), EMPIRE_NAME(ROOM_OWNER(IN_ROOM(ch))));
+			msg_to_char(ch, "This area is claimed by %s%s&0.\r\n", EMPIRE_BANNER(ROOM_OWNER(IN_ROOM(ch))), EMPIRE_NAME(ROOM_OWNER(IN_ROOM(ch))));
 		}
 	}
 	
@@ -2199,7 +2260,7 @@ ACMD(do_weather) {
 		};
 
 	if (IS_OUTDOORS(ch)) {
-		msg_to_char(ch, "The sky is %s and %s.\r\n", sky_look[weather_info.sky], (weather_info.change >= 0 ? "you feel a warm wind from south" : "your foot tells you bad weather is due"));
+		msg_to_char(ch, "The sky is %s and %s.\r\n", sky_look[weather_info.sky], (weather_info.change >= 0 ? "you feel a warm wind from the south" : "your foot tells you bad weather is due"));
 		if (weather_info.sunlight == SUN_SET || weather_info.sunlight == SUN_DARK) {
 			list_moons_to_char(ch);
 		}
@@ -2223,12 +2284,13 @@ ACMD(do_whereami) {
 
 
 ACMD(do_who) {
-	char name_search[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH];
-	char mode, *part;
+	char name_search[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH*2], empname[MAX_INPUT_LENGTH];
+	char mode, *part, *ptr;
 	int outsize = 0;
-	int low = 0, high = LVL_TOP;
-	bool rp = FALSE, empire_who = FALSE;
+	int low = 0, high = 0;
+	bool rp = FALSE;
 	bool shortlist = FALSE;
+	empire_data *show_emp = NULL;
 
 	skip_spaces(&argument);
 	strcpy(buf, argument);
@@ -2255,39 +2317,58 @@ ACMD(do_who) {
 					half_chop(buf1, name_search, buf);
 					break;
 				case 'e':
-					empire_who = TRUE;
-					strcpy(buf, buf1);
+					ptr = any_one_word(buf1, empname);
+					
+					// was this actually an empire name or just a "who -e"?
+					if (!*empname || *empname == '-') {
+						show_emp = GET_LOYALTY(ch);
+						// just skip this arg
+						strcpy(buf, buf1);
+						break;
+					}
+					
+					// otherwise assume it was an empire name
+					skip_spaces(&ptr);
+					strcpy(buf, ptr);
+					
+					show_emp = get_empire_by_name(empname);
+					if (!show_emp) {
+						msg_to_char(ch, "Unknown empire '%s'.\r\n", empname);
+						return;
+					}
 					break;
 				case 's':
 					shortlist = TRUE;
 					strcpy(buf, buf1);
 					break;
 				default: {
-					send_to_char("format: who [minlev[-maxlev]] [-n name] [-o] [-e] [-r]\r\n", ch);
+					send_to_char("format: who [minlev[-maxlev]] [-n name] [-s] [-e [empire]] [-r]\r\n", ch);
 					return;
 				}
 			}				/* end of switch */
 		}
 		else {			/* endif */
-			send_to_char("format: who [minlev[-maxlev]] [-n name] [-o] [-e] [-r]\r\n", ch);
+			send_to_char("format: who [minlev[-maxlev]] [-n name] [-s] [-e [empire]] [-r]\r\n", ch);
 			return;
 		}
 	}
+	
+	*output = '\0';
 
 	/* Immortals first */
-	part = partial_who(ch, name_search, low, high, empire_who, rp, shortlist, WHO_IMMORTALS);
+	part = partial_who(ch, name_search, low, high, show_emp, rp, shortlist, WHO_IMMORTALS);
 	if (*part) {
 		outsize += snprintf(output + outsize, sizeof(output) - outsize, "%s%s", (*output ? "\r\n" : ""), part);
 	}
 
 	/* Gods second */
-	part = partial_who(ch, name_search, low, high, empire_who, rp, shortlist, WHO_GODS);
+	part = partial_who(ch, name_search, low, high, show_emp, rp, shortlist, WHO_GODS);
 	if (*part) {
 		outsize += snprintf(output + outsize, sizeof(output) - outsize, "%s%s", (*output ? "\r\n" : ""), part);
 	}
 
 	/* Then mortals */
-	part = partial_who(ch, name_search, low, high, empire_who, rp, shortlist, WHO_MORTALS);
+	part = partial_who(ch, name_search, low, high, show_emp, rp, shortlist, WHO_MORTALS);
 	if (*part) {
 		outsize += snprintf(output + outsize, sizeof(output) - outsize, "%s%s", (*output ? "\r\n" : ""), part);
 	}

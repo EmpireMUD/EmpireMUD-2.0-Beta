@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: db.c                                            EmpireMUD 2.0b1 *
+*   File: db.c                                            EmpireMUD 2.0b2 *
 *  Usage: Loading/saving chars, booting/resetting world, internal funcs   *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -52,7 +52,7 @@ void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location);
 void discrete_load(FILE *fl, int mode, char *filename);
 void free_complex_data(struct complex_room_data *data);
 void index_boot(int mode);
-extern obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location);
+extern obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify);
 
 // local functions
 int file_to_string_alloc(const char *name, char **buf);
@@ -162,6 +162,7 @@ room_data *world_table = NULL;	// hash table of the whole world
 room_data *interior_world_table = NULL;	// hash table of the interior world
 bool world_is_sorted = FALSE;	// to prevent unnecessary re-sorts
 bool need_world_index = TRUE;	// used to trigger world index saving (always save at least once)
+struct island_info *island_table = NULL; // hash table for all the islands
 
 
 // DB_BOOT_x
@@ -312,11 +313,13 @@ void boot_db(void) {
 void boot_world(void) {
 	void check_for_bad_buildings();
 	void check_for_bad_sectors();
+	void check_newbie_islands();
 	void clean_empire_logs();
 	void index_boot_world();
 	void load_empire_storage();
 	void load_instances();
-	void number_the_islands(bool reset);
+	void load_islands();
+	void number_and_count_islands(bool reset);
 	void renum_world();
 	void setup_start_locations();
 	void verify_sectors();
@@ -356,7 +359,8 @@ void boot_world(void) {
 	renum_world();
 	
 	log("  Finding islands.");
-	number_the_islands(FALSE);
+	load_islands();
+	number_and_count_islands(FALSE);
 
 	log("  Initializing start locations.");
 	setup_start_locations();
@@ -386,6 +390,9 @@ void boot_world(void) {
 	log("Verifying data.");
 	check_for_bad_buildings();
 	check_for_bad_sectors();
+	
+	log("Checking newbie islands.");
+	check_newbie_islands();
 }
 
 
@@ -611,9 +618,11 @@ void delete_orphaned_rooms(void) {
 		}
 		
 		if (!COMPLEX_DATA(room) || !COMPLEX_DATA(room)->home_room || !COMPLEX_DATA(HOME_ROOM(room))) {
-			log("Deleting room %d due to missing homeroom.", GET_ROOM_VNUM(room));
-			delete_room(room, FALSE);	// must check_all_exits
-			deleted = TRUE;
+			if (!ROOM_BLD_FLAGGED(room, BLD_NO_DELETE)) {
+				log("Deleting room %d due to missing homeroom.", GET_ROOM_VNUM(room));
+				delete_room(room, FALSE);	// must check_all_exits
+				deleted = TRUE;
+			}
 		}
 	}
 	
@@ -990,12 +999,34 @@ void load_help(FILE *fl) {
 		el.level = 0;
 
 		if (*line == '#' && *(line + 1))
+			// this uses switch, not alpha-math, because some of these levels
+			// may be the same as others, but the letters still need to work
+			// consistently -paul
 			switch (*(line + 1)) {
-				case 'a':	el.level = LVL_IMPL;		break;
-				case 'b':	el.level = LVL_CIMPL;		break;
-				case 'c':	el.level = LVL_ASST;		break;
-				case 'd':	el.level = LVL_START_IMM;	break;
-				case 'e':	el.level = LVL_APPROVED;	break;
+				case 'a': {
+					el.level = LVL_IMPL;
+					break;
+				}
+				case 'b': {
+					el.level = LVL_CIMPL;
+					break;
+				}
+				case 'c': {
+					el.level = LVL_ASST;
+					break;
+				}
+				case 'd': {
+					el.level = LVL_START_IMM;
+					break;
+				}
+				case 'e': {
+					el.level = LVL_GOD;
+					break;
+				}
+				case 'f': {
+					el.level = LVL_APPROVED;
+					break;
+				}
 			}
 
 		/* now, add the entry to the index with each keyword on the keyword line */
@@ -1096,6 +1127,36 @@ void index_boot_help(void) {
  //////////////////////////////////////////////////////////////////////////////
 //// ISLAND SETUP ////////////////////////////////////////////////////////////
 
+/**
+* Checks the newbie islands and applies their rules (abandons land).
+*/
+void check_newbie_islands(void) {
+	struct island_info *isle = NULL;
+	room_data *room, *next_room;
+	int last_isle = -1;
+	empire_data *emp;
+	
+	HASH_ITER(world_hh, world_table, room, next_room) {
+		if (GET_ROOM_VNUM(room) >= MAP_SIZE || GET_ISLAND_ID(room) == NO_ISLAND) {
+			continue;
+		}
+		
+		// usually see many of the same island in a row, so this reduces lookups
+		if (last_isle == -1 || GET_ISLAND_ID(room) != last_isle) {
+			isle = get_island(GET_ISLAND_ID(room), TRUE);
+		}
+		
+		// apply newbie rules?
+		if (IS_SET(isle->flags, ISLE_NEWBIE)) {
+			if ((emp = ROOM_OWNER(room)) && (EMPIRE_CREATE_TIME(emp) + (config_get_int("newbie_island_day_limit") * SECS_PER_REAL_DAY)) < time(0)) {
+				log_to_empire(emp, ELOG_TERRITORY, "(%d, %d) abandoned on newbie island", FLAT_X_COORD(room), FLAT_Y_COORD(room));
+				abandon_room(room);
+			}
+		}
+	}
+}
+
+
 // adds a room to an island, then scans all adjacent rooms
 static void recursive_island_scan(room_data *room, int island) {
 	int dir;
@@ -1123,23 +1184,36 @@ static void recursive_island_scan(room_data *room, int island) {
 *
 * @param bool reset If TRUE, clears all existing island IDs and renumbers.
 */
-void number_the_islands(bool reset) {
-	room_data *iter, *next_iter;
+void number_and_count_islands(bool reset) {
+	// helper type
+	struct island_read_data {
+		int id;
+			int size;
+		int sum_x, sum_y;	// for averaging center
+		room_vnum edge[NUM_SIMPLE_DIRS];	// detected edges
+		int edge_val[NUM_SIMPLE_DIRS];	// for detecting edges
+		UT_hash_handle hh;
+	};
+	
+	struct island_read_data *data, *next_data, *list = NULL;
 	bool re_empire = (top_island_num != -1);
+	room_data *room, *next_room;
+	struct island_info *isle;
+	int id, iter;
 	
 	// find top island id (and reset if requested)
 	top_island_num = -1;
-	HASH_ITER(world_hh, world_table, iter, next_iter) {
+	HASH_ITER(world_hh, world_table, room, next_room) {
 		// map only
-		if (GET_ROOM_VNUM(iter) >= MAP_SIZE) {
+		if (GET_ROOM_VNUM(room) >= MAP_SIZE) {
 			continue;
 		}
 		
-		if (reset || ROOM_SECT_FLAGGED(iter, SECTF_NON_ISLAND)) {
-			SET_ISLAND_ID(iter, NO_ISLAND);
+		if (reset || ROOM_SECT_FLAGGED(room, SECTF_NON_ISLAND)) {
+			SET_ISLAND_ID(room, NO_ISLAND);
 		}
 		else {
-			top_island_num = MAX(top_island_num, GET_ISLAND_ID(iter));
+			top_island_num = MAX(top_island_num, GET_ISLAND_ID(room));
 		}
 	}
 	
@@ -1147,28 +1221,89 @@ void number_the_islands(bool reset) {
 	
 	// 1. expand EXISTING islands
 	if (!reset) {
-		HASH_ITER(world_hh, world_table, iter, next_iter) {
+		HASH_ITER(world_hh, world_table, room, next_room) {
 			// map only
-			if (GET_ROOM_VNUM(iter) >= MAP_SIZE) {
+			if (GET_ROOM_VNUM(room) >= MAP_SIZE) {
 				continue;
 			}
 			
-			if (GET_ISLAND_ID(iter) != NO_ISLAND) {
-				recursive_island_scan(iter, GET_ISLAND_ID(iter));
+			if (GET_ISLAND_ID(room) != NO_ISLAND) {
+				recursive_island_scan(room, GET_ISLAND_ID(room));
 			}
 		}
 	}
 	
-	// 2. look for places that have no island id but need one
-	HASH_ITER(world_hh, world_table, iter, next_iter) {
+	// 2. look for places that have no island id but need one -- and also measure islands while we're here
+	HASH_ITER(world_hh, world_table, room, next_room) {
 		// map only!
-		if (GET_ROOM_VNUM(iter) >= MAP_SIZE) {
+		if (GET_ROOM_VNUM(room) >= MAP_SIZE) {
 			continue;
 		}
 		
-		if (GET_ISLAND_ID(iter) == NO_ISLAND && !ROOM_SECT_FLAGGED(iter, SECTF_NON_ISLAND)) {
-			recursive_island_scan(iter, ++top_island_num);
+		if (GET_ISLAND_ID(room) == NO_ISLAND && !ROOM_SECT_FLAGGED(room, SECTF_NON_ISLAND)) {
+			recursive_island_scan(room, ++top_island_num);
 		}
+		
+		// find helper entry
+		id = GET_ISLAND_ID(room);
+		if (id == NO_ISLAND) {
+			// just an ocean
+			continue;
+		}
+		
+		HASH_FIND_INT(list, &id, data);
+		if (!data) {	// or create one
+			CREATE(data, struct island_read_data, 1);
+			data->id = id;
+			for (iter = 0; iter < NUM_SIMPLE_DIRS; ++iter) {
+				data->edge[iter] = NOWHERE;
+				data->edge_val[iter] = NOWHERE;
+			}
+			HASH_ADD_INT(list, id, data);
+		}
+
+		// update helper data
+		data->size += 1;
+		data->sum_x += FLAT_X_COORD(room);
+		data->sum_y += FLAT_Y_COORD(room);
+	
+		// detect edges
+		if (data->edge[NORTH] == NOWHERE || FLAT_Y_COORD(room) > data->edge_val[NORTH]) {
+			data->edge[NORTH] = GET_ROOM_VNUM(room);
+			data->edge_val[NORTH] = FLAT_Y_COORD(room);
+		}
+		if (data->edge[SOUTH] == NOWHERE || FLAT_Y_COORD(room) < data->edge_val[SOUTH]) {
+			data->edge[SOUTH] = GET_ROOM_VNUM(room);
+			data->edge_val[SOUTH] = FLAT_Y_COORD(room);
+		}
+		if (data->edge[EAST] == NOWHERE || FLAT_X_COORD(room) > data->edge_val[EAST]) {
+			data->edge[EAST] = GET_ROOM_VNUM(room);
+			data->edge_val[EAST] = FLAT_X_COORD(room);
+		}
+		if (data->edge[WEST] == NOWHERE || FLAT_X_COORD(room) < data->edge_val[WEST]) {
+			data->edge[WEST] = GET_ROOM_VNUM(room);
+			data->edge_val[WEST] = FLAT_X_COORD(room);
+		}
+	}
+	
+	// process and free the island helpers
+	HASH_ITER(hh, list, data, next_data) {
+		if ((isle = get_island(data->id, TRUE))) {
+			isle->tile_size = data->size;
+
+			// detect center
+			room = real_room(((data->sum_y / data->size) * MAP_WIDTH) + (data->sum_x / data->size));
+			isle->center = room ? GET_ROOM_VNUM(room) : NOWHERE;
+			
+			// store edges
+			for (iter = 0; iter < NUM_SIMPLE_DIRS; ++iter) {
+				isle->edge[iter] = data->edge[iter];
+			}
+		}
+		
+		// and free
+		HASH_DEL(list, data);
+		free(data);
 	}
 	
 	// lastly
@@ -1680,7 +1815,7 @@ void load_trading_post(void) {
 				break;
 			}
 			case '#': { // load object into last T
-				obj = Obj_load_from_file(fl, atoi(line+1), &int_in[0]);	// last val is junk
+				obj = Obj_load_from_file(fl, atoi(line+1), &int_in[0], NULL);	// last val is junk
 				
 				if (obj && tpd) {
 					remove_from_object_list(obj);	// doesn't really go here right now

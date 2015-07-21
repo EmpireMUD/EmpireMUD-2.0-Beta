@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: olc.c                                           EmpireMUD 2.0b1 *
+*   File: olc.c                                           EmpireMUD 2.0b2 *
 *  Usage: On-Line Creation at player level                                *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -38,6 +38,7 @@ OLC_MODULE(olc_display);
 OLC_MODULE(olc_edit);
 OLC_MODULE(olc_free);
 OLC_MODULE(olc_list);
+OLC_MODULE(olc_removeindev);
 OLC_MODULE(olc_save);
 OLC_MODULE(olc_search);
 OLC_MODULE(olc_set_flags);
@@ -271,6 +272,7 @@ const struct olc_command_data olc_data[] = {
 	{ "search", olc_search, OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ROOM_TEMPLATE, NOBITS },
 	
 	// admin
+	{ "removeindev", olc_removeindev, NOBITS, NOBITS },
 	{ "setflags", olc_set_flags, NOBITS, NOBITS },
 	{ "setminvnum", olc_set_min_vnum, NOBITS, NOBITS },
 	{ "setmaxvnum", olc_set_max_vnum, NOBITS, NOBITS },
@@ -1494,6 +1496,92 @@ OLC_MODULE(olc_list) {
 }
 
 
+OLC_MODULE(olc_removeindev) {
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+	any_vnum from = NOTHING, to = NOTHING;
+	bool use_adv = FALSE, any = FALSE;
+	craft_data *craft, *next_craft;
+	adv_data *adv = NULL;
+	int iter;
+	
+	// allow - or : as vnum separators
+	for (iter = 0; iter < strlen(argument); ++iter) {
+		if (argument[iter] == '-' || argument[iter] == ':') {
+			argument[iter] = ' ';
+		}
+	}
+	
+	// 2nd arg optional
+	two_arguments(argument, arg1, arg2);
+	use_adv = (*arg2 ? FALSE : TRUE);
+	
+	if (GET_ACCESS_LEVEL(ch) < LVL_UNRESTRICTED_BUILDER && !IS_GRANTED(ch, GRANT_OLC_CONTROLS) && !OLC_FLAGGED(ch, OLC_FLAG_ALL_VNUMS)) {
+		msg_to_char(ch, "You must be level %d to do that.\r\n", LVL_UNRESTRICTED_BUILDER);
+	}
+	else if (!*arg1 || !isdigit(*arg1) || (*arg2 && !isdigit(*arg2))) {
+		msg_to_char(ch, "Usage: .removeindev <adventure vnum | vnum range>\r\n");
+	}
+	else if ((from = atoi(arg1)) < 0) {
+		msg_to_char(ch, "Invalid vnum '%s'.\r\n", arg1);
+	}
+	else if (*arg2 && (to = atoi(arg2)) < 0) {
+		msg_to_char(ch, "Invalid vnum '%s'.\r\n", arg2);
+	}
+	else if (use_adv && !(adv = adventure_proto(from))) {
+		msg_to_char(ch, "Unknown adventure vnum '%s'.\r\n", arg1);
+	}
+	else if (use_adv && !player_can_olc_edit(ch, OLC_ADVENTURE, from)) {
+		msg_to_char(ch, "You don't have permission to edit that adventure.\r\n");
+	}
+	else if (!use_adv && !player_can_olc_edit(ch, OLC_CRAFT, from) && !player_can_olc_edit(ch, OLC_CRAFT, to)) {
+		msg_to_char(ch, "You don't have permission to edit that vnum range.\r\n");
+	}
+	else {
+		any = FALSE;
+		
+		if (use_adv && adv && ADVENTURE_FLAGGED(adv, ADV_IN_DEVELOPMENT) && player_can_olc_edit(ch, OLC_ADVENTURE, GET_ADV_VNUM(adv))) {
+			REMOVE_BIT(GET_ADV_FLAGS(adv), ADV_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_ADV, GET_ADV_VNUM(adv));
+			msg_to_char(ch, "Removed IN-DEV flag from adventure [%d] %s.\r\n", GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
+			any = TRUE;
+		}
+		
+		// prepare to iterate
+		if (use_adv && adv) {
+			from = GET_ADV_START_VNUM(adv);
+			to = GET_ADV_END_VNUM(adv);
+		}
+		
+		HASH_ITER(hh, craft_table, craft, next_craft) {
+			if (GET_CRAFT_VNUM(craft) < from || GET_CRAFT_VNUM(craft) > to) {
+				continue;
+			}
+			if (!CRAFT_FLAGGED(craft, CRAFT_IN_DEVELOPMENT)) {
+				continue;
+			}
+			if (!player_can_olc_edit(ch, OLC_CRAFT, GET_CRAFT_VNUM(craft))) {
+				continue;
+			}
+			
+			REMOVE_BIT(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_CRAFT, GET_CRAFT_VNUM(craft));
+			msg_to_char(ch, "Removed IN-DEV flag from craft [%d] %s.\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
+			any = TRUE;
+		}
+		
+		if (!any) {
+			msg_to_char(ch, "No in-development flags to remove.\r\n");
+		}
+		else if (use_adv && adv) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s removed in-development flags for adventure [%d] %s", GET_NAME(ch), GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
+		}
+		else {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s removed in-development flags for vnums %d-%d", GET_NAME(ch), from, to);
+		}
+	}
+}
+
+
 OLC_MODULE(olc_save) {
 	void save_olc_adventure(descriptor_data *desc);
 	void save_olc_building(descriptor_data *desc);
@@ -1818,7 +1906,7 @@ void get_evolution_display(struct evolution_data *list, char *save_buffer) {
 
 
 /**
-* Displays the interactions data from a given list.
+* Displays the extra descs from a given list.
 *
 * @param struct extra_descr_data *list Pointer to the start of a list of decriptions.
 * @param char *save_buffer A buffer to store the result to.
@@ -1893,7 +1981,11 @@ void get_interaction_display(struct interaction_item *list, char *save_buffer) {
 		else {
 			strcpy(lbuf, skip_filler(get_obj_name_by_proto(interact->vnum)));
 		}
-		sprintf(save_buffer + strlen(save_buffer), "%2d. %s: %dx %s (%d) %.2f%%%s\r\n", ++count, interact_types[interact->type], interact->quantity, lbuf, interact->vnum, interact->percent, (interact->exclusive ? " (exclusive)" : ""));
+		sprintf(save_buffer + strlen(save_buffer), "%2d. %s: %dx %s (%d) %.2f%%", ++count, interact_types[interact->type], interact->quantity, lbuf, interact->vnum, interact->percent);
+		if (isalpha(interact->exclusion_code)) {
+			sprintf(save_buffer + strlen(save_buffer), " (%c)", interact->exclusion_code);
+		}
+		strcat(save_buffer, "\r\n");
 	}
 	
 	if (count == 0) {
@@ -2100,7 +2192,7 @@ bool player_can_olc_edit(char_data *ch, int type, any_vnum vnum) {
 		else {
 			// otherwise, can only edit an adventure if its contained vnums are editable
 			adv_data *adv = adventure_proto(vnum);
-			if (GET_ADV_START_VNUM(adv) >= GET_OLC_MIN_VNUM(ch) && GET_ADV_END_VNUM(adv) <= GET_OLC_MAX_VNUM(ch)) {
+			if (adv && GET_ADV_START_VNUM(adv) >= GET_OLC_MIN_VNUM(ch) && GET_ADV_END_VNUM(adv) <= GET_OLC_MAX_VNUM(ch)) {
 				return TRUE;
 			}
 		}
@@ -2169,7 +2261,7 @@ char *prompt_olc_info(char_data *ch) {
 * @return bitvector_t The new value of the whole bitset.
 */
 bitvector_t olc_process_flag(char_data *ch, char *argument, char *name, char *command, const char **flag_names, bitvector_t existing_bits) {
-	char arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], line[256];
+	char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], line[256];
 	bool add = FALSE, remove = FALSE, toggle = FALSE, alldigit, found;
 	bitvector_t bit;
 	int iter;
@@ -2688,12 +2780,13 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 	extern const byte interact_vnum_types[NUM_INTERACTS];
 	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], arg4[MAX_INPUT_LENGTH], arg5[MAX_INPUT_LENGTH], arg6[MAX_INPUT_LENGTH];
-	struct interaction_item *interact, *prev, *to_move, *temp, *a, *b, *a_next, *b_next, *copyfrom = NULL;
+	struct interaction_item *interact, *prev, *to_move, *temp, *a, *b, *a_next, *b_next, *copyfrom = NULL, *change;
 	struct interaction_item iitem;
 	int iter, loc, num, count, findtype;
 	any_vnum vnum;
 	double prc;
 	bool found, up;
+	char exc;
 	
 	half_chop(argument, arg1, arg2);
 	
@@ -2795,7 +2888,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 				if (--num == 0) {
 					found = TRUE;
 					
-					msg_to_char(ch, "You remove %s: %dx %s %.2f%%%s\r\n", interact_types[interact->type], interact->quantity, (interact_vnum_types[interact->type] == TYPE_MOB ? skip_filler(get_mob_name_by_proto(interact->vnum)) : skip_filler(get_obj_name_by_proto(interact->vnum))), interact->percent, (interact->exclusive ? " (exclusive)" : ""));
+					msg_to_char(ch, "You remove %s: %dx %s %.2f%%\r\n", interact_types[interact->type], interact->quantity, (interact_vnum_types[interact->type] == TYPE_MOB ? skip_filler(get_mob_name_by_proto(interact->vnum)) : skip_filler(get_obj_name_by_proto(interact->vnum))), interact->percent);
 					REMOVE_FROM_LIST(interact, *list, next);
 					free(interact);
 				}
@@ -2882,14 +2975,14 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 		half_chop(buf, arg2, buf1);	// arg2: type
 		half_chop(buf1, arg3, buf);	// arg3: quantity
 		half_chop(buf, arg4, buf1);	// arg4: vnum
-		half_chop(buf1, arg5, arg6);	// arg5: percent, arg6: exclusive
+		half_chop(buf1, arg5, arg6);	// arg5: percent, arg6: exclusion
 	
 		num = atoi(arg3);
 		vnum = atoi(arg4);
 		prc = atof(arg5);
 		
 		if (!*arg2 || !*arg3 || !*arg4 || !*arg5 || !isdigit(*arg3) || !isdigit(*arg4) || !isdigit(*arg5)) {
-			msg_to_char(ch, "Usage: interaction add <type> <quantity> <vnum> <percent> [exclusive]\r\n");
+			msg_to_char(ch, "Usage: interaction add <type> <quantity> <vnum> <percent> [exclusion code]\r\n");
 		}
 		else if ((loc = search_block(arg2, interact_types, FALSE)) == NOTHING || interact_attach_types[loc] != attach_type) {
 			msg_to_char(ch, "Invalid type.\r\n");
@@ -2906,8 +2999,8 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 		else if (prc < 0.01 || prc > 100.00) {
 			msg_to_char(ch, "You must choose a percentage between 0.01 and 100.00.\r\n");
 		}
-		else if (*arg6 && !is_abbrev(arg6, "exclusive")) {
-			msg_to_char(ch, "Invalid exclusive value (use 'exclusive', 'e', or leave it blank).\r\n");
+		else if (*arg6 && !isalpha(*arg6)) {
+			msg_to_char(ch, "Invalid exclusion code (must be a letter, or leave it blank).\r\n");
 		}
 		else {
 			CREATE(temp, struct interaction_item, 1);
@@ -2915,7 +3008,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 			temp->vnum = vnum;
 			temp->percent = prc;
 			temp->quantity = num;
-			temp->exclusive = is_abbrev(arg6, "exclusive");
+			temp->exclusion_code = exc = isalpha(*arg6) ? *arg6 : 0;
 			temp->next = NULL;
 			
 			if ((interact = *list) != NULL) {
@@ -2929,11 +3022,110 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 			}
 
 			sort_interactions(list);
-			msg_to_char(ch, "You add %s: %dx %s %.2f%%%s\r\n", interact_types[loc], num, (interact_vnum_types[loc] == TYPE_MOB ? skip_filler(get_mob_name_by_proto(vnum)) : skip_filler(get_obj_name_by_proto(vnum))), prc, (temp->exclusive ? " (exclusive)" : ""));
+			msg_to_char(ch, "You add %s: %dx %s %.2f%%", interact_types[loc], num, (interact_vnum_types[loc] == TYPE_MOB ? skip_filler(get_mob_name_by_proto(vnum)) : skip_filler(get_obj_name_by_proto(vnum))), prc);
+			if (exc) {
+				msg_to_char(ch, " (%c)", exc);
+			}
+			msg_to_char(ch, "\r\n");
 		}
 	}
+	else if (is_abbrev(arg1, "change")) {
+		// arg1 == change
+		// arg2 contains the rest of the string -- split it up now
+		strcpy(buf, arg2);
+		half_chop(buf, arg2, buf1);	// arg2: number
+		half_chop(buf1, arg3, arg4);	// arg3: field, arg4: value
+		
+		// find which one to change
+		if (!isdigit(*arg2) || (num = atoi(arg2)) < 1) {
+			msg_to_char(ch, "Invalid interaction number.\r\n");
+			return;
+		}
+		change = NULL;
+		for (interact = *list; interact && !change; interact = interact->next) {
+			if (--num == 0) {
+				change = interact;
+				break;
+			}
+		}
+		if (!change) {
+			msg_to_char(ch, "Invalid interaction number.\r\n");
+			return;
+		}
+		
+		// ok now which field to change:
+		if (is_abbrev(arg3, "type")) {
+			if ((loc = search_block(arg4, interact_types, FALSE)) == NOTHING || interact_attach_types[loc] != attach_type) {
+				msg_to_char(ch, "Invalid type.\r\n");
+			}
+			else {
+				change->type = loc;
+				msg_to_char(ch, "Interaction %d type changed to %s.\r\n", atoi(arg2), interact_types[loc]);
+			}
+		}
+		else if (is_abbrev(arg3, "quantity")) {
+			if ((num = atoi(arg4)) < 1 || num >= 1000) {
+				msg_to_char(ch, "You must choose a quantity between 1 and 1000.\r\n");
+			}
+			else {
+				change->quantity = num;
+				msg_to_char(ch, "Interaction %d quantity changed to %d.\r\n", atoi(arg2), num);
+			}
+		}
+		else if (is_abbrev(arg3, "vnum")) {
+			vnum = atoi(arg4);
+			if (!*arg4) {
+				msg_to_char(ch, "Change it to which vnum?\r\n");
+			}
+			else if (interact_vnum_types[change->type] == TYPE_MOB && !mob_proto(vnum)) {
+				msg_to_char(ch, "Invalid mob vnum %d.\r\n", vnum);
+			}
+			else if (interact_vnum_types[change->type] == TYPE_OBJ && !obj_proto(vnum)) {
+				msg_to_char(ch, "Invalid object vnum %d.\r\n", vnum);
+			}
+			else {
+				change->vnum = vnum;
+				msg_to_char(ch, "Interaction %d vnum changed to [%d] %s.\r\n", atoi(arg2), vnum, (interact_vnum_types[change->type] == TYPE_MOB) ? get_mob_name_by_proto(vnum) : get_obj_name_by_proto(vnum));
+			}
+		}
+		else if (is_abbrev(arg3, "percent")) {
+			prc = atof(arg4);
+			if (!*arg4) {
+				msg_to_char(ch, "Change the percent to what?\r\n");
+			}
+			else if (prc < 0.01 || prc > 100.00) {
+				msg_to_char(ch, "You must choose a percentage between 0.01 and 100.00.\r\n");
+			}
+			else {
+				change->percent = prc;
+				msg_to_char(ch, "Interaction %d percent changed to %.2f.\r\n", atoi(arg2), prc);
+			}
+		}
+		else if (is_abbrev(arg3, "exclusion")) {
+			if (!*arg4) {
+				msg_to_char(ch, "Change the exclusion code to what (or 'none')?\r\n");
+			}
+			else if (!str_cmp(arg4, "none")) {
+				change->exclusion_code = 0;
+				msg_to_char(ch, "Interaction %d exclusion code removed.\r\n", atoi(arg2));
+			}
+			else if (!isalpha(*arg4)) {
+				msg_to_char(ch, "Invalid exclusion code (must be a letter, 'none').\r\n");
+			}
+			else {
+				change->exclusion_code = *arg4;
+				msg_to_char(ch, "Interaction %d exclusion code changed to '%c'.\r\n", atoi(arg2), *arg4);
+			}
+		}
+		else {
+			msg_to_char(ch, "Invalid field. You can change: type, quantity, vnum, percent, exclusion\r\n");
+		}
+		
+		sort_interactions(list);
+	}
 	else {
-		msg_to_char(ch, "Usage: interaction add <type> <quantity> <vnum> <percent> [exclusive]\r\n");
+		msg_to_char(ch, "Usage: interaction add <type> <quantity> <vnum> <percent> [exclusion code]\r\n");
+		msg_to_char(ch, "Usage: interaction change <number> <field> <value>\r\n");
 		msg_to_char(ch, "Usage: interaction copy <from type> <from vnum>\r\n");
 		msg_to_char(ch, "Usage: interaction remove <number | all>\r\n");
 		msg_to_char(ch, "Usage: interaction move <number> <up | down>\r\n");

@@ -17,6 +17,34 @@ L
 4 10000 10000
 -1 0 0
 S
+#101
+Magiterranean: The Hidden Garden~
+Paul Clarke~
+   You find a hidden garden, nestled through a hole in the bushes of another
+garden. But this is no ordinary place. Help the druid gardener with a few
+simple requests, and be transported to the Magiterranean, the secret world of
+druids! You can do this quest alone or with friends, but there's no combat
+here. This adventure is for farmers and gardeners.
+~
+10225 10249 15-0
+5 0 0 0
+L
+3 a
+5179 10225 10225
+-1 0 0
+L
+3 a
+5181 10225 10225
+-1 0 0
+L
+5 0
+2160 -1 -1
+-1 0 0
+L
+6 0
+30 -1 -1
+-1 0 0
+S
 #120
 Mountain Cave: Red Dragon~
 Paul Clarke~
@@ -48,6 +76,10 @@ L
 1 0
 10100 -1 -1
 8 m m
+L
+6 0
+100 -1 -1
+-1 0 0
 S
 #122
 Ruins: Three Banditos~
@@ -65,6 +97,10 @@ L
 L
 5 0
 2880 -1 -1
+-1 0 0
+L
+6 0
+50 -1 -1
 -1 0 0
 S
 #123
@@ -85,6 +121,10 @@ L
 0 ac
 5007 -1 -1
 14 0 0
+L
+6 0
+50 -1 -1
+-1 0 0
 S
 #125
 Ruins: The Goblin Challenge~
@@ -105,6 +145,10 @@ L
 L
 5 0
 10080 -1 -1
+-1 0 0
+L
+6 0
+50 -1 -1
 -1 0 0
 S
 #140
@@ -129,6 +173,10 @@ L
 3 ab
 5009 10011 10012
 -1 0 0
+L
+6 0
+30 -1 -1
+-1 0 0
 S
 #160
 The Tower Skycleave~
@@ -149,5 +197,51 @@ L
 5 0
 1440 -1 -1
 -1 0 0
+S
+#161
+Portal to the Primeval~
+Paul Clarke~
+   The High Sorcerers in your tower have managed to open a chronoportal into
+the past! Follow Archsorcerer Malfernes through the portal and explore the
+Primeval Era, when the ancient ancestors of the dragons ruled endless jungles.
+But beware, because it's easy to get lost and you make a delicious snack for
+the dracosaurs.
+~
+10250 10299 75-100
+10 0 f 4
+L
+5 0
+1440 -1 -1
+-1 0 0
+L
+3 a
+5511 10250 10251
+-1 0 0
+L
+6 0
+30 -1 -1
+-1 0 0
+S
+#170
+Hamlet of the Undead~
+Paul Clarke~
+   You've come across a small hamlet, ablaze and beset by the undead. Most of
+the citizens have fled, but it looks as if the city needs help. With no army to
+come to its rescue, the hamlet's only hope is you!
+This adventure has three wings:
+ Market Street: Solo players
+ Main Street: Two players
+ Temple Street: Groups
+~
+10400 10449 175-225
+10 360 0 4
+L
+5 0
+1440 -1 -1
+-1 0 0
+L
+1 a
+10400 -1 -1
+0 de de
 S
 $

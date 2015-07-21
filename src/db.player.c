@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: db.player.c                                     EmpireMUD 2.0b1 *
+*   File: db.player.c                                     EmpireMUD 2.0b2 *
 *  Usage: Database functions related to players and the player table      *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -30,6 +30,7 @@
 *   Helpers
 *   Empire Player Management
 *   Lore
+*   Promo Codes
 */
 
 // external vars
@@ -245,6 +246,7 @@ void char_to_store(char_data *ch, struct char_file_u *st) {
 		}
 		else {
 			st->affected[i].type = 0;	/* Zero signifies not used */
+			st->affected[i].cast_by = 0;
 			st->affected[i].duration = 0;
 			st->affected[i].modifier = 0;
 			st->affected[i].location = 0;
@@ -263,6 +265,7 @@ void char_to_store(char_data *ch, struct char_file_u *st) {
 		}
 		else {
 			st->over_time_effects[i].type = 0;
+			st->over_time_effects[i].cast_by = 0;
 			st->over_time_effects[i].damage = 0;
 			st->over_time_effects[i].duration = 0;
 			st->over_time_effects[i].damage_type = 0;
@@ -977,6 +980,7 @@ void store_to_char(struct char_file_u *st, char_data *ch) {
 * @param char_data *ch The player to delete.
 */
 void delete_player_character(char_data *ch) {
+	void clear_private_owner(int id);
 	void Crash_delete_file(char *name);
 	
 	empire_data *emp = NULL;
@@ -988,6 +992,7 @@ void delete_player_character(char_data *ch) {
 	}
 	
 	SET_BIT(PLR_FLAGS(ch), PLR_DELETED);
+	clear_private_owner(GET_IDNUM(ch));
 
 	// Check the empire
 	if ((emp = GET_LOYALTY(ch)) != NULL) {
@@ -1029,6 +1034,7 @@ void delete_player_character(char_data *ch) {
 * @return int 1 = rent-saved, 0 = crash-saved
 */
 int enter_player_game(descriptor_data *d, int dolog, bool fresh) {
+	void assign_class_abilities(char_data *ch, int class, int role);
 	void clean_lore(char_data *ch);
 	extern int Objload_char(char_data *ch, int dolog);
 	void read_aliases(char_data *ch);
@@ -1037,6 +1043,8 @@ int enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	extern room_data *find_load_room(char_data *ch);
 	extern int get_ptable_by_name(char *name);
 	void read_saved_vars(char_data *ch);
+	
+	extern bool global_mute_slash_channel_joins;
 	extern int top_idnum;
 	extern const struct wear_data_type wear_data[NUM_WEARS];
 
@@ -1137,7 +1145,7 @@ int enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	// check equipment levels
 	level = 0;
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
-		if (GET_EQ(ch, iter) && wear_data[iter].count_stats) {
+		if (GET_EQ(ch, iter) && wear_data[iter].adds_gear_level) {
 			level += rate_item(GET_EQ(ch, iter));
 		}
 	}
@@ -1150,12 +1158,14 @@ int enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	GET_RESURRECT_ABILITY(ch) = NO_ABIL;
 
 	// re-join slash-channels
+	global_mute_slash_channel_joins = TRUE;
 	for (iter = 0; iter < MAX_SLASH_CHANNELS; ++iter) {
 		if (*GET_STORED_SLASH_CHANNEL(ch, iter)) {
 			sprintf(lbuf, "join %s", GET_STORED_SLASH_CHANNEL(ch, iter));
 			do_slash_channel(ch, lbuf, 0, 0);
 		}
 	}
+	global_mute_slash_channel_joins = FALSE;
 	
 	// free reset?
 	if (RESTORE_ON_LOGIN(ch)) {
@@ -1166,6 +1176,11 @@ int enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 		GET_COND(ch, THIRST) = MIN(0, GET_COND(ch, THIRST));
 		GET_COND(ch, DRUNK) = MIN(0, GET_COND(ch, DRUNK));
 		GET_BLOOD(ch) = GET_MAX_BLOOD(ch);
+		
+		// clear deficits
+		for (iter = 0; iter < NUM_POOLS; ++iter) {
+			GET_DEFICIT(ch, iter) = 0;
+		}
 		
 		// check for confusion!
 		GET_CONFUSED_DIR(ch) = number(0, NUM_SIMPLE_DIRS-1);
@@ -1206,6 +1221,9 @@ int enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	
 	// remove stale coins
 	cleanup_coins(ch);
+	
+	// verify abils -- TODO should this remove/re-add abilities for the empire? do class abilities affect that?
+	assign_class_abilities(ch, NOTHING, NOTHING);
 	
 	// ensure player has penalty if at war
 	if (fresh && GET_LOYALTY(ch) && is_at_war(GET_LOYALTY(ch))) {
@@ -1278,11 +1296,16 @@ void start_new_character(char_data *ch) {
 	void scale_item_to_level(obj_data *obj, int level);
 	void set_skill(char_data *ch, int skill, int level);
 	extern const char *default_channels[];
+	extern bool global_mute_slash_channel_joins;
+	extern struct promo_code_list promo_codes[];
 	extern int tips_of_the_day_size;
 
 	char lbuf[MAX_INPUT_LENGTH];
 	int type, iter;
 	obj_data *obj;
+	
+	// announce to existing players that we have a newbie
+	mortlog("%s has joined the game", PERS(ch, ch, TRUE));
 
 	set_title(ch, NULL);
 
@@ -1339,10 +1362,12 @@ void start_new_character(char_data *ch) {
 	}
 	
 	// add the default slash channels
+	global_mute_slash_channel_joins = TRUE;
 	for (iter = 0; *default_channels[iter] != '\n'; ++iter) {
 		sprintf(lbuf, "join %s", default_channels[iter]);
 		do_slash_channel(ch, lbuf, 0, 0);
 	}
+	global_mute_slash_channel_joins = FALSE;
 
 	/* Give EQ, if applicable */
 	if (CREATION_ARCHETYPE(ch) != 0) {
@@ -1422,6 +1447,11 @@ void start_new_character(char_data *ch) {
 	
 	// apply any bonus traits that needed it
 	apply_bonus_trait(ch, GET_BONUS_TRAITS(ch), TRUE);
+	
+	// if they have a valid promo code, apply it now
+	if (GET_PROMO_ID(ch) >= 0 && promo_codes[GET_PROMO_ID(ch)].apply_func) {
+		(promo_codes[GET_PROMO_ID(ch)].apply_func)(ch);
+	}
 	
 	// set up class/level data
 	update_class(ch);
@@ -1733,4 +1763,35 @@ void write_lore(char_data *ch) {
 	fprintf(file, "$\n");
 	fclose(file);
 	rename(tempname, fn);
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// PROMO CODES /////////////////////////////////////////////////////////////
+
+// these are configured in config.c
+
+
+// starting coins
+PROMO_APPLY(promo_countdemonet) {
+	increase_coins(ch, REAL_OTHER_COIN, 100);
+}
+
+
+// bonus charisma
+PROMO_APPLY(promo_facebook) {
+	ch->real_attributes[CHARISMA] = MAX(1, MIN(att_max(ch), ch->real_attributes[CHARISMA] + 1));
+	affect_total(ch);
+}
+
+
+// 1.5x skills
+PROMO_APPLY(promo_skillups) {
+	int iter;
+	
+	for (iter = 0; iter < NUM_SKILLS; ++iter) {
+		if (GET_SKILL(ch, iter) > 0) {
+			set_skill(ch, iter, MIN(BASIC_SKILL_CAP, GET_SKILL(ch, iter) * 1.5));
+		}
+	}
 }

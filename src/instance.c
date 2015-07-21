@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: instance.c                                      EmpireMUD 2.0b1 *
+*   File: instance.c                                      EmpireMUD 2.0b2 *
 *  Usage: code related to instantiating adventure zones                   *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -44,7 +44,7 @@ int count_instances(adv_data *adv);
 int count_mobs_in_instance(struct instance_data *inst, mob_vnum vnum);
 int count_objs_in_instance(struct instance_data *inst, obj_vnum vnum);
 int count_players_in_instance(struct instance_data *inst, bool include_imms);
-static int determine_random_exit(room_data *from, room_data *to);
+static int determine_random_exit(adv_data *adv, room_data *from, room_data *to);
 room_data *find_room_template_in_instance(struct instance_data *inst, rmt_vnum vnum);
 static struct adventure_link_rule *get_link_rule_by_type(adv_data *adv, int type);
 any_vnum get_new_instance_id(void);
@@ -127,7 +127,7 @@ static void build_instance_entrance(struct instance_data *inst, struct adventure
 	switch (rule->type) {
 		case ADV_LINK_BUILDING_EXISTING:
 		case ADV_LINK_BUILDING_NEW: {
-			my_dir = (rule->dir != DIR_RANDOM ? rule->dir : determine_random_exit(loc, inst->start));
+			my_dir = (rule->dir != DIR_RANDOM ? rule->dir : determine_random_exit(inst->adventure, loc, inst->start));
 			if (my_dir != NO_DIR) {
 				create_exit(loc, inst->start, my_dir, TRUE);
 			}
@@ -221,14 +221,16 @@ struct instance_data *build_instance_loc(adv_data *adv, struct adventure_link_ru
 * if possible. Then, it tries to find one that can work in both directions.
 * Finally, it iterates and picks one, if possible.
 *
+* @param adv_data *adv The adventure it's linking in.
 * @param room_data *from Origin room.
 * @param room_data *to Destination room.
 * @return int Any direction constant, or NO_DIR.
 */
-static int determine_random_exit(room_data *from, room_data *to) {
+static int determine_random_exit(adv_data *adv, room_data *from, room_data *to) {
 	struct room_direction_data *ex;
 	int try, dir;
-	bool need_back = TRUE;
+	bool confuse = IS_SET(GET_ADV_FLAGS(adv), ADV_CONFUSING_RANDOMS) ? TRUE : FALSE;
+	bool need_back = !confuse;
 	
 	const int max_tries = 24;
 	
@@ -238,7 +240,7 @@ static int determine_random_exit(room_data *from, room_data *to) {
 	}
 	
 	// first see if the to room has an exit to us already
-	if (COMPLEX_DATA(to)) {
+	if (COMPLEX_DATA(to) && !confuse) {
 		for (ex = COMPLEX_DATA(to)->exits; ex; ex = ex->next) {
 			if (ex->room_ptr == from) {
 				// found!
@@ -336,7 +338,7 @@ static void instantiate_one_exit(struct instance_data *inst, room_data *room, st
 		dir = confused_dirs[rotation][0][exit->dir];
 	}
 	else {
-		dir = determine_random_exit(room, to_room);
+		dir = determine_random_exit(inst->adventure, room, to_room);
 	}
 	
 	// unable to add exit
@@ -499,6 +501,49 @@ static void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct 
 //// INSTANCE GENERATION /////////////////////////////////////////////////////
 
 /**
+* Checks secondary link limiters like ADV_LINK_NOT_NEAR_SELF.
+*
+* @param adv_data *adv The adventure we are trying to link.
+* @param room_data *loc The chosen location.
+* @return bool TRUE if the location is ok, FALSE if not.
+*/
+bool validate_linking_limits(adv_data *adv, room_data *loc) {
+	struct adventure_link_rule *rule;
+	struct instance_data *inst;
+	
+	for (rule = GET_ADV_LINKING(adv); rule; rule = rule->next) {
+		// ADV_LINK_x: but only some rules matter here (secondary limiters)
+		switch (rule->type) {
+			case ADV_LINK_NOT_NEAR_SELF: {
+				// adventure cannot link within X tiles of itself
+				for (inst = instance_list; inst; inst = inst->next) {
+					if (GET_ADV_VNUM(inst->adventure) != GET_ADV_VNUM(adv)) {
+						continue;
+					}
+					if (INSTANCE_FLAGGED(inst, INST_COMPLETED)) {
+						// skip completed ones -- it's safe to link a new one now
+						continue;
+					}
+					
+					// check distance
+					if (inst->location && compute_distance(inst->location, loc) <= rule->value) {
+						// NO! Too close.
+						return FALSE;
+					}
+				}
+				
+				break;
+			}
+			// other types don't have secondary linking limits
+		}
+	}
+	
+	// all clear
+	return TRUE;
+}
+
+
+/**
 * This function checks basic room properties too see if the location is allowed
 * at all. It does NOT check the sector/building/bld_on rules -- that is done
 * in find_location_for_rule, which calls this.
@@ -561,16 +606,18 @@ inline bool validate_one_loc(struct adventure_link_rule *rule, room_data *loc) {
 /**
 * This function finds a location that matches a linking rule.
 *
+* @param adv_data *adv The adventure we are linking.
 * @param struct adventure_link_rule *rule The linking rule we're trying.
 * @param int *which_dir The direction, for linking rules that require one.
 * @return room_data* A valid location, or else NULL if we couldn't find one.
 */
-room_data *find_location_for_rule(struct adventure_link_rule *rule, int *which_dir) {
+room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rule, int *which_dir) {
 	extern bool can_build_on(room_data *room, bitvector_t flags);
 	
 	room_data *room, *next_room, *loc, *shift, *found = NULL;
 	bld_data *findbdg = NULL;
 	sector_data *findsect = NULL;
+	room_template *start_room = room_template_proto(GET_ADV_START_VNUM(adv));
 	bool match_buildon = FALSE;
 	int pos = -1;	// default < 0
 	int dir, iter, sub;
@@ -578,6 +625,11 @@ room_data *find_location_for_rule(struct adventure_link_rule *rule, int *which_d
 	const int max_tries = 500, max_dir_tries = 10;	// for random checks
 	
 	*which_dir = NO_DIR;
+	
+	// cannot find a location without a start room
+	if (!start_room) {
+		return NULL;
+	}
 	
 	// ADV_LINK_x
 	switch (rule->type) {
@@ -618,12 +670,17 @@ room_data *find_location_for_rule(struct adventure_link_rule *rule, int *which_d
 				continue;
 			}
 			
+			// check secondary limits
+			if (!validate_linking_limits(adv, room)) {
+				continue;
+			}
+			
 			// TODO this specifically does not work on ocean without the whole map loaded
-			if (findsect && SECT(room) == findsect && --pos == 0) {
+			if (findsect && SECT(room) == findsect && pos-- == 0) {
 				found = room;
 				break;
 			}
-			if (findbdg && BUILDING_VNUM(room) == GET_BLD_VNUM(findbdg) && --pos == 0) {
+			if (findbdg && BUILDING_VNUM(room) == GET_BLD_VNUM(findbdg) && pos-- == 0) {
 				found = room;
 				break;
 			}
@@ -642,6 +699,11 @@ room_data *find_location_for_rule(struct adventure_link_rule *rule, int *which_d
 				continue;
 			}
 			
+			// check secondary limits
+			if (!validate_linking_limits(adv, loc)) {
+				continue;
+			}
+			
 			// never build on a closed location
 			if (!ROOM_IS_CLOSED(loc) && can_build_on(loc, rule->bld_on)) {
 				if (rule->bld_facing == NOBITS) {
@@ -651,12 +713,21 @@ room_data *find_location_for_rule(struct adventure_link_rule *rule, int *which_d
 				else {
 					for (sub = 0; sub < max_dir_tries && !found; ++sub) {
 						dir = number(0, NUM_2D_DIRS-1);
-						if (dir != rule->dir && (shift = real_shift(loc, shift_dir[dir][0], shift_dir[dir][1]))) {
-							if (can_build_on(shift, rule->bld_facing)) {
-								*which_dir = dir;
-								found = loc;
-								break;
-							}
+						
+						// matches the dir we need inside?
+						if (dir == rule->dir) {
+							continue;
+						}
+						// need a valid map tile to face
+						if (!(shift = real_shift(loc, shift_dir[dir][0], shift_dir[dir][1]))) {
+							continue;
+						}
+						
+						// ok go
+						if (can_build_on(shift, rule->bld_facing)) {
+							*which_dir = dir;
+							found = loc;
+							break;
 						}
 					}
 				}
@@ -691,25 +762,27 @@ void generate_adventure_instances(void) {
 			}
 		
 			if (can_instance(iter)) {
+				// mark it done no matter what -- we only instance 1 per cycle
+				last_adv_vnum = GET_ADV_VNUM(iter);
+				
 				for (rule = GET_ADV_LINKING(iter); rule; rule = rule->next) {
-					if ((loc = find_location_for_rule(rule, &dir))) {
+					if ((loc = find_location_for_rule(iter, rule, &dir))) {
 						// make it so!
 						if (build_instance_loc(iter, rule, loc, dir)) {
 							save_instances();
-							last_adv_vnum = GET_ADV_VNUM(iter);
 							// only 1 instance per cycle
 							return;
 						}
 					}
 				}
+				
+				// we ran rules on this one; don't run any more
+				return;
 			}
 		}
 	
 		last_adv_vnum = NOTHING;
 	}
-	
-	// save time later, sort now
-	sort_world_table();
 }
 
 

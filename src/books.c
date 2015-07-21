@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: books.c                                         EmpireMUD 2.0b1 *
+*   File: books.c                                         EmpireMUD 2.0b2 *
 *  Usage: data and functions for libraries and books                      *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -639,7 +639,7 @@ LIBRARY_SCMD(library_shelve) {
 			else {
 				for (obj = ch->carrying; obj; obj = next_obj) {
 					next_obj = obj->next_content;
-					if (IS_BOOK(obj)) {
+					if (!OBJ_FLAGGED(obj, OBJ_KEEP) && IS_BOOK(obj)) {
 						amount += perform_shelve(ch, obj);
 						found = TRUE;
 					}
@@ -660,7 +660,9 @@ LIBRARY_SCMD(library_shelve) {
 			}
 			while (obj) {
 				next_obj = get_obj_in_list_vis(ch, arg, obj->next_content);
-				amount += perform_shelve(ch, obj);
+				if (!OBJ_FLAGGED(obj, OBJ_KEEP)) {
+					amount += perform_shelve(ch, obj);
+				}
 				obj = next_obj;
 			}
 		}

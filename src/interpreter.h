@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: interpreter.h                                   EmpireMUD 2.0b1 *
+*   File: interpreter.h                                   EmpireMUD 2.0b2 *
 *  Usage: header file: public procs, macro defs, subcommand defines       *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -174,6 +174,14 @@ struct alias_data {
 /* do_goto */
 #define SCMD_GOTO		0
 #define SCMD_TELEPORT	1
+
+// do_keep
+#define SCMD_KEEP  0
+#define SCMD_UNKEEP  1
+
+// do_prompt
+#define SCMD_PROMPT  0
+#define SCMD_FPROMPT  1
 
 /* do_reboot */
 #define SCMD_REBOOT			0
