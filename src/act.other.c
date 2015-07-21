@@ -386,6 +386,9 @@ ACMD(do_alternate) {
 		// prevent rapid-use
 		command_lag(ch, WAIT_OTHER);
 	}
+	else if (ch->desc->str) {
+		msg_to_char(ch, "You can't alterante while editing text.\r\n");
+	}
 	else if (ROOM_OWNER(IN_ROOM(ch)) && empire_is_hostile(ROOM_OWNER(IN_ROOM(ch)), GET_LOYALTY(ch), IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't alternate in hostile territory.\r\n");
 	}
