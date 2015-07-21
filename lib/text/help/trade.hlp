@@ -77,7 +77,7 @@ Basic Crafts:
   violet dye  2 red berries, 1 bileberries, (glassblowing)
   orange dye  2 oranges, 1 magenta arrowfish, (glassblowing)
 
-See also: WOODWORKING
+See also: CRAFTING LEVEL, WOODWORKING
 #
 CLOTHING CLOTHES
 
@@ -127,7 +127,7 @@ Without any skill or ability, you can always cook:
   peach pie  1 basket of peaches, 1 flour
   candied apple  1 apple, apiaries tech for honey
 
-See also: MILL, BAKERY
+See also: CRAFTING LEVEL, MILL, BAKERY
 #
 "DANGEROUS LEATHERS"
 
@@ -217,8 +217,9 @@ With the basic Forge skill, you can create:
   mirror  1 iron ingot
   coin mill  24 iron ingots, 2 imperium ingots
 
-See also: SMELT, WEAPONCRAFTING, ARMORSMITHING, JEWELRY, MASTER BLACKSMITH,
-  IRON BLADES, STURDY ARMORS, DEADLY WEAPONS, IMPERIAL ARMORS
+See also: CRAFTING LEVEL, SMELT, WEAPONCRAFTING, ARMORSMITHING, JEWELRY,
+  MASTER BLACKSMITH, IRON BLADES, STURDY ARMORS, DEADLY WEAPONS,
+  IMPERIAL ARMORS
 #
 "GUILDSMAN CRAFTS"
 
@@ -565,7 +566,7 @@ With basic Sewing, you can make:
 Additional sewing items are available from other abilities in the Trade skill,
 as well as patterns and crafts hidden around the world.
 
-See also: LEATHERWORKING, RAWHIDE STITCHING, CLOTHING
+See also: CRAFTING LEVEL, LEATHERWORKING, RAWHIDE STITCHING, CLOTHING
 #
 SHIPBUILDING "SHIP BUILDING" MANUFACTURE SHIPYARDS "ADVANCED SHIPYARDS" "UPGRADED SHIPYARD" "ADVANCED SHIPS" SHIPS
 

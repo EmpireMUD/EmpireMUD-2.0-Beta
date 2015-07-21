@@ -155,6 +155,7 @@ struct {
 } gen_craft_data[] = {
 	{ "error", "erroring", { "", "" } },	// dummy to require scmd
 	
+	// Note: These correspond to CRAFT_TYPE_x so you cannot change the order.
 	{ "forge", "forging", { "You hit the %s on the anvil hard with $p!", "$n hits the %s on the anvil hard with $p!" } },
 	{ "craft", "crafting", { "You continue crafting the %s...", "$n continues crafting the %s..." } },
 	{ "cook", "cooking", { "You continue cooking the %s...", "$n continues cooking the %s..." } },

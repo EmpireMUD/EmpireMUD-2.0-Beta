@@ -100,7 +100,8 @@ Usage:  enchant <item> <type>
 Powerful sorcerers learn to enchant ordinary items to increase their useful-
 ness and power. You may only enchant items that are not already enchanted. The
 level and strength of the enchantment are based on both the level of the item
-and the level of the enchanter.
+and the crafting level of the enchanter. If the enchanter's gear level is
+better than his/her crafting level, that is used instead.
 
 Enchant Weapons:
   striking - strength, to-hit  (5 bloodstones)
@@ -133,7 +134,7 @@ Enchant Armor:
 Enchant Tools:
   embiggening (pack) - capacity  (1 of each of the 4 gems)
 
-See also: GREATER ENCHANTMENTS
+See also: CRAFTING LEVEL, GREATER ENCHANTMENTS
 #
 ENERVATE
 
