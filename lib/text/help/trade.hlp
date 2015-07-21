@@ -14,6 +14,20 @@ the person who crafts them. HELP SCALABLE CRAFTS has a full explanation.
 See also: CRAFT, IDENTIFY, FORGE, SEWING, POTTERY, WOODWORKING, SHIPBUILDING,
   REFORGE
 #
+"ALCHEMIST CRAFTS"
+
+Alchemist Crafts
+Class ability: Alchemist
+
+This ability will contain any crafts for the Alchemist class.
+#
+"ANTIQUARIAN CRAFTS"
+
+Antiquarian Crafts
+Class ability: Antiquarian
+
+This ability will contain any crafts for the Antiquarian class.
+#
 ARMORSMITHING ARMORCRAFTING
 
 Armorsmithing (Trade ability)
@@ -29,6 +43,13 @@ A forgemaster with the Armorsmithing specialization can create many armors:
 Armorsmithing -> Sturdy Armors -> Imperial Armors
 
 See also: FORGE, WEAPONCRAFTING, STURDY ARMORS, IMPERIAL ARMORS
+#
+"ARTIFICER CRAFTS"
+
+Artificer Crafts
+Class ability: Artificer
+
+This ability will contain any crafts for the Artificer class.
 #
 "BASIC CRAFTS" DYE CRAFT CRAFTS
 
@@ -195,6 +216,13 @@ With the basic Forge skill, you can create:
 
 See also: SMELT, WEAPONCRAFTING, ARMORSMITHING, JEWELRY, MASTER BLACKSMITH,
   IRON BLADES, STURDY ARMORS, DEADLY WEAPONS, IMPERIAL ARMORS
+#
+"GUILDSMAN CRAFTS"
+
+Guildsman Crafts
+Class ability: Guildsman
+
+This ability will contain any crafts for the Guildsman class.
 #
 HANDLE
 
@@ -596,6 +624,20 @@ You can tan some skins into leather at the Tannery.
 
 See also: SEWING, LEATHERWORKING, RAWHIDE STITCHING, TAN
 #
+"SMUGGLER CRAFTS"
+
+Smuggler Crafts
+Class ability: Smuggler
+
+This ability will contain any crafts for the Smuggler class.
+#
+"STEELSMITH CRAFTS"
+
+Steelsmith Crafts
+Class ability: Steelsmith
+
+This ability will contain any crafts for the Steelsmith class.
+#
 "STURDY ARMORS"
 
 Sturdy Armors (Trade ability)
@@ -623,6 +665,13 @@ You can tan skins into leather. This process will go faster at a tannery. Both
 skins and leathers are used in sewing and crafting.
 
 See also: SKIN
+#
+"TINKER CRAFTS"
+
+Tinker Crafts
+Class ability: Tinker
+
+This ability will contain any crafts for the Tinker class.
 #
 WEAPONCRAFTING
 
