@@ -2531,6 +2531,7 @@ struct craft_data {
 	obj_vnum object;	// vnum of the object it makes, or liquid id if CRAFT_SOUP
 	int quantity;	// makes X
 	
+	int min_level;	// required level to craft it using get_crafting_level()
 	bitvector_t flags;	// CRAFT_x
 	int time;	// how many action ticks it takes
 	

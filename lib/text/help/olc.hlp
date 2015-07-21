@@ -1018,6 +1018,17 @@ Available flags:
 
 See also: CEDIT TYPE, OLC CRAFTS, OLC REMOVEINDEV
 #d
+"CEDIT LEVELREQUIRED" "CEDIT LEVEL REQUIRED"
+
+Usage:  .levelrequired <level>
+
+This lets you set the crafting level required to make a craft. It works on any
+type of craft. This uses the 'Crafting' trait shown on score, and the +CRAFTING
+apply from items. Crafting level includes skill level, so a requirement of 100
+would only require that the player be skill level 100.
+
+See also: OLC CRAFTS
+#d
 "CEDIT LIQUID"
 
 Usage:  .liquid <type>

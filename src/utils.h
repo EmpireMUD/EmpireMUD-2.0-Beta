@@ -297,6 +297,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_CRAFT_BUILD_ON(craft)  ((craft)->build_on)
 #define GET_CRAFT_BUILD_TYPE(craft)  ((craft)->build_type)
 #define GET_CRAFT_FLAGS(craft)  ((craft)->flags)
+#define GET_CRAFT_MIN_LEVEL(craft)  ((craft)->min_level)
 #define GET_CRAFT_NAME(craft)  ((craft)->name)
 #define GET_CRAFT_OBJECT(craft)  ((craft)->object)
 #define GET_CRAFT_QUANTITY(craft)  ((craft)->quantity)

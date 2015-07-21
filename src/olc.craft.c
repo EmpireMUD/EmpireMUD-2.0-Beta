@@ -390,6 +390,8 @@ void olc_show_craft(char_data *ch) {
 		}
 	}
 	sprintf(buf + strlen(buf), "<&yability&0> %s\r\n", buf1);
+	
+	sprintf(buf + strlen(buf), "<&ylevelrequired&0> %d\r\n", GET_CRAFT_MIN_LEVEL(craft));
 
 	if (GET_CRAFT_TYPE(craft) != CRAFT_TYPE_BUILD) {
 		seconds = (GET_CRAFT_TIME(craft) * SECS_PER_REAL_UPDATE);
@@ -552,6 +554,12 @@ OLC_MODULE(cedit_flags) {
 		msg_to_char(ch, "You don't have permission to remove the IN-DEVELOPMENT flag.\r\n");
 		SET_BIT(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT);
 	}
+}
+
+
+OLC_MODULE(cedit_levelrequired) {
+	craft_data *craft = GET_OLC_CRAFT(ch->desc);
+	GET_CRAFT_MIN_LEVEL(craft) = olc_process_number(ch, argument, "minimum level", "levelrequired", 0, 1000, GET_CRAFT_MIN_LEVEL(craft));
 }
 
 

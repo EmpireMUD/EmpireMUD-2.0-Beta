@@ -86,6 +86,7 @@ OLC_MODULE(cedit_buildon);
 OLC_MODULE(cedit_builds);
 OLC_MODULE(cedit_creates);
 OLC_MODULE(cedit_flags);
+OLC_MODULE(cedit_levelrequired);
 OLC_MODULE(cedit_liquid);
 OLC_MODULE(cedit_name);
 OLC_MODULE(cedit_quantity);
@@ -318,6 +319,7 @@ const struct olc_command_data olc_data[] = {
 	{ "buildon", cedit_buildon, OLC_CRAFT, OLC_CF_EDITOR },
 	{ "creates", cedit_creates, OLC_CRAFT, OLC_CF_EDITOR },
 	{ "flags", cedit_flags, OLC_CRAFT, OLC_CF_EDITOR },
+	{ "levelrequired", cedit_levelrequired, OLC_CRAFT, OLC_CF_EDITOR },
 	{ "liquid", cedit_liquid, OLC_CRAFT, OLC_CF_EDITOR },
 	{ "name", cedit_name, OLC_CRAFT, OLC_CF_EDITOR },
 	{ "quantity", cedit_quantity, OLC_CRAFT, OLC_CF_EDITOR },

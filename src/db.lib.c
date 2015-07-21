@@ -785,6 +785,17 @@ void parse_craft(FILE *fl, craft_vnum vnum) {
 				GET_CRAFT_BUILD_FACING(craft) = asciiflag_conv(str_in2);
 				break;
 			}
+			
+			// L: Minimum crafting level
+			case 'L': {
+				if (!get_line(fl, line) || sscanf(line, "%d", &int_in[0]) != 1) {
+					log("SYSERR: Format error in L section of craft recipe #%d", vnum);
+					exit(1);
+				}
+				
+				GET_CRAFT_MIN_LEVEL(craft) = int_in[0];
+				break;
+			}
 
 			// resources: vnum amount
 			case 'R': {
@@ -846,6 +857,11 @@ void write_craft_to_file(FILE *fl, craft_data *craft) {
 		
 		fprintf(fl, "B\n");
 		fprintf(fl, "%d %s %s\n", GET_CRAFT_BUILD_TYPE(craft), temp1, temp2);
+	}
+	
+	if (GET_CRAFT_MIN_LEVEL(craft) > 0) {
+		fprintf(fl, "L\n");
+		fprintf(fl, "%d\n", GET_CRAFT_MIN_LEVEL(craft));
 	}
 	
 	for (iter = 0; iter < MAX_RESOURCES_REQUIRED && GET_CRAFT_RESOURCES(craft)[iter].vnum != NOTHING; ++iter) {
