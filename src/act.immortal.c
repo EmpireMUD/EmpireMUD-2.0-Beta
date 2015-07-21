@@ -2661,7 +2661,7 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 		sprintf(buf + strlen(buf), " (%s %d)", skill_data[ability_data[GET_CRAFT_ABILITY(craft)].parent_skill].name, ability_data[GET_CRAFT_ABILITY(craft)].parent_skill_required);
 	}
 	seconds = GET_CRAFT_TIME(craft) * SECS_PER_REAL_UPDATE;
-	msg_to_char(ch, "Ability: &y%s&0, Time: [&g%d action tick%s&0 | &g%d:%02d&0]\r\n", buf, GET_CRAFT_TIME(craft), PLURAL(GET_CRAFT_TIME(craft)), seconds / SECS_PER_REAL_MIN, seconds % SECS_PER_REAL_MIN);
+	msg_to_char(ch, "Ability: &y%s&0, Level: &g%d&0, Time: [&g%d action tick%s&0 | &g%d:%02d&0]\r\n", buf, GET_CRAFT_MIN_LEVEL(craft), GET_CRAFT_TIME(craft), PLURAL(GET_CRAFT_TIME(craft)), seconds / SECS_PER_REAL_MIN, seconds % SECS_PER_REAL_MIN);
 
 	sprintbit(GET_CRAFT_FLAGS(craft), craft_flags, buf, TRUE);
 	msg_to_char(ch, "Flags: &c%s&0\r\n", buf);
