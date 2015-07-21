@@ -75,7 +75,7 @@ const struct class_data_type class_data[NUM_CLASSES] = {
 	},
 	{ "Steelsmith", "Smth", { SKILL_BATTLE, SKILL_TRADE },  { 300, 200, 100, 0 },
 		{
-			{ ROLE_MELEE, { ABIL_TWO_HANDED_WEAPONS, ROLE_ABIL_END } },
+			{ ROLE_MELEE, { ABIL_STEELSMITH_CRAFTS, ABIL_TWO_HANDED_WEAPONS, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
@@ -113,7 +113,7 @@ const struct class_data_type class_data[NUM_CLASSES] = {
 	},
 	{ "Guildsman", "Gdsm", { SKILL_EMPIRE, SKILL_TRADE },  { 200, 200, 200, 0 },
 		{
-			{ ROLE_MELEE, { ABIL_DRAGONRIDING, ROLE_ABIL_END } },
+			{ ROLE_MELEE, { ABIL_DRAGONRIDING, ABIL_GUILDSMAN_CRAFTS, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
@@ -140,7 +140,10 @@ const struct class_data_type class_data[NUM_CLASSES] = {
 		{ ROLE_LIST_END }
 	},
 	{ "Artificer", "Artf", { SKILL_HIGH_SORCERY, SKILL_TRADE },  { 150, 150, 300, 0 },
-		{ ROLE_LIST_END }
+		{
+			{ ROLE_CASTER, { ABIL_ARTIFICER_CRAFTS, ROLE_ABIL_END } },
+			ROLE_LIST_END
+		}
 	},
 	{ "Lich", "Lich", { SKILL_HIGH_SORCERY, SKILL_VAMPIRE },  { 150, 150, 300, 0 },
 		{
@@ -164,7 +167,7 @@ const struct class_data_type class_data[NUM_CLASSES] = {
 	},
 	{ "Alchemist", "Alch", { SKILL_NATURAL_MAGIC, SKILL_TRADE },  { 150, 150, 300, 0 },
 		{
-			{ ROLE_HEALER, { ABIL_FASTCASTING, ABIL_RESURRECT, ROLE_ABIL_END } },
+			{ ROLE_HEALER, { ABIL_ALCHEMIST_CRAFTS, ABIL_FASTCASTING, ABIL_RESURRECT, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
@@ -183,7 +186,7 @@ const struct class_data_type class_data[NUM_CLASSES] = {
 	},
 	{ "Smuggler", "Smgl", { SKILL_STEALTH, SKILL_TRADE },  { 200, 300, 100, 0 },
 		{
-			{ ROLE_MELEE, { ABIL_DIVERSION, ABIL_DUAL_WIELD, ROLE_ABIL_END } },
+			{ ROLE_MELEE, { ABIL_DIVERSION, ABIL_DUAL_WIELD, ABIL_SMUGGLER_CRAFTS, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
@@ -194,7 +197,10 @@ const struct class_data_type class_data[NUM_CLASSES] = {
 		}
 	},
 	{ "Tinker", "Tnkr", { SKILL_SURVIVAL, SKILL_TRADE },  { 250, 250, 100, 0 },
-		{ ROLE_LIST_END }
+		{
+			{ ROLE_MELEE, { ABIL_TINKER_CRAFTS, ROLE_ABIL_END } },
+			ROLE_LIST_END
+		}
 	},
 	{ "Wight", "Wght", { SKILL_SURVIVAL, SKILL_VAMPIRE },  { 300, 200, 100, 0 },
 		{
@@ -203,7 +209,10 @@ const struct class_data_type class_data[NUM_CLASSES] = {
 		}
 	},
 	{ "Antiquarian", "Antq", { SKILL_TRADE, SKILL_VAMPIRE },  { 200, 200, 200, 0 },
-		{ ROLE_LIST_END }
+		{
+			{ ROLE_MELEE, { ABIL_ANTIQUARIAN_CRAFTS, ROLE_ABIL_END } },
+			ROLE_LIST_END
+		}
 	}
 };
 

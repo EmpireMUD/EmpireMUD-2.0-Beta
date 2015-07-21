@@ -69,7 +69,7 @@ The available archetypes are:
 Alchemist
 Natural Magic + Trade
 
-Healer: Fastcasting, Resurrect
+Healer: Alchemist Crafts, Fastcasting, Resurrect
 
 Note: Class abilities are unfinished.
 
@@ -91,7 +91,7 @@ See also: CLASS
 Antiquarian
 Trade + Vampire
 
-No class abilities assigned.
+Melee: Antiquarian Crafts
 
 Note: Class abilities are unfinished.
 
@@ -114,7 +114,7 @@ See also: CLASS
 Artificer
 High Sorcery + Trade
 
-No class abilities assigned.
+Caster: Artificer Crafts
 
 Note: Class abilities are unfinished.
 
@@ -237,7 +237,7 @@ See also: CLASS
 Guildsman
 Empire + Trade
 
-Melee: Dragonriding
+Melee: Dragonriding, Guildsman Crafts
 
 Note: Class abilities are unfinished.
 
@@ -387,7 +387,7 @@ See also: CLASS
 Smuggler
 Stealth + Trade
 
-Melee: Diversion, Dual-Wield
+Melee: Diversion, Dual-Wield, Smuggler Crafts
 
 Note: Class abilities are unfinished.
 
@@ -398,7 +398,7 @@ See also: CLASS
 Steelsmith
 Battle + Trade
 
-Melee: Two-Handed Weapons
+Melee: Steelsmith Crafts, Two-Handed Weapons
 
 Note: Class abilities are unfinished.
 
@@ -444,7 +444,7 @@ See also: CLASS
 Tinker
 Survival + Trade
 
-No class abilities assigned.
+Melee: Tinker Crafts
 
 Note: Class abilities are unfinished.
 
