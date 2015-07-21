@@ -1135,7 +1135,7 @@ typedef struct trig_data trig_data;
 #define DRUNK  0
 #define FULL  1
 #define THIRST  2
-#define NUM_CONDS  3
+#define NUM_CONDS  3	// WARNING do not change: used in char_file_u
 
 
 // Grant flags allow players to use abilities below the required access level
