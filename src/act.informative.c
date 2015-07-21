@@ -368,6 +368,7 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	extern double get_combat_speed(char_data *ch, int pos);
 	extern int get_block_rating(char_data *ch, bool can_gain_skill);
 	extern int get_blood_upkeep_cost(char_data *ch);
+	extern int get_crafting_level(char_data *ch);
 	extern int total_bonus_healing(char_data *ch);
 	extern int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
 	extern int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill);
@@ -485,7 +486,8 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	val = get_to_hit(ch, NULL, FALSE, FALSE) - (hit_per_dex * GET_DEXTERITY(ch));
 	sprintf(lbuf, "To-hit  [%s%d&0]", HAPPY_COLOR(val, base_hit_chance), val);
 	sprintf(lbuf2, "Speed  [%.2f]", get_combat_speed(ch, WEAR_WIELD));
-	msg_to_char(to, "  %-28.28s %-28.28s \r\n", lbuf, lbuf2);
+	sprintf(lbuf3, "Crafting [%s%d&0]", HAPPY_COLOR(get_crafting_level(ch), GET_SKILL_LEVEL(ch)), get_crafting_level(ch));
+	msg_to_char(to, "  %-28.28s %-28.28s %-28.28s\r\n", lbuf, lbuf2, lbuf3);
 
 	msg_to_char(to, " +--------------------------------- Skills ----------------------------------+\r\n ");
 

@@ -96,6 +96,21 @@ obj_data *find_water_container(char_data *ch, obj_data *list) {
 
 
 /**
+* Returns the total level to use for a character's crafts.
+*
+* @param char_data *ch The character to check.
+*/
+int get_crafting_level(char_data *ch) {
+	if (IS_NPC(ch)) {
+		return get_approximate_level(ch) + GET_CRAFTING_BONUS(ch);
+	}
+	else {
+		return GET_SKILL_LEVEL(ch) + GET_CRAFTING_BONUS(ch);
+	}
+}
+
+
+/**
 * This finds a hammer in either tool slot, and returns it.
 *
 * @param char_data *ch The person using the hammer?
@@ -431,7 +446,7 @@ void scale_craftable(obj_data *obj, char_data *ch, craft_data *craft) {
 	// determine ideal scale level
 	if (craft) {
 		if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING && (req = obj_proto(GET_CRAFT_REQUIRES_OBJ(craft)))) {
-			level = GET_COMPUTED_LEVEL(ch);
+			level = get_crafting_level(ch);
 			
 			// check bounds on the required object
 			if (GET_OBJ_MAX_SCALE_LEVEL(req) > 0) {
@@ -447,7 +462,7 @@ void scale_craftable(obj_data *obj, char_data *ch, craft_data *craft) {
 			}
 			else if (ability_data[GET_CRAFT_ABILITY(craft)].parent_skill == NO_SKILL) {
 				// probably a class skill
-				level = GET_COMPUTED_LEVEL(ch);
+				level = get_crafting_level(ch);
 			}
 			else if ((psr = GET_PARENT_SKILL_REQUIRED(GET_CRAFT_ABILITY(craft))) != NOTHING) {
 				if (psr < BASIC_SKILL_CAP) {
@@ -462,16 +477,16 @@ void scale_craftable(obj_data *obj, char_data *ch, craft_data *craft) {
 			}
 			else {
 				// this is probably unreachable
-				level = GET_COMPUTED_LEVEL(ch);
+				level = get_crafting_level(ch);
 			}
 			
-			// always bound by the computed level
-			level = MIN(level, GET_COMPUTED_LEVEL(ch));
+			// always bound by the crafting level
+			level = MIN(level, get_crafting_level(ch));
 		}
 	}
 	else {
 		// no craft given
-		level = GET_COMPUTED_LEVEL(ch);
+		level = get_crafting_level(ch);
 	}
 	
 	// do it

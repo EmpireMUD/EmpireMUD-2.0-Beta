@@ -1770,6 +1770,7 @@ using it. The following applies are available. Most are self-explanatory:
  BONUS-MAGICAL - added to magical damage
  BONUS-HEALING - added to damage healed (by abilities this player uses)
  RESIST-MAGICAL - magical damage reduction
+ CRAFTING - bonus to craft level
 
 See also: OLC OBJECTS
 #d

@@ -227,6 +227,7 @@ typedef struct trig_data trig_data;
 #define APPLY_BONUS_MAGICAL  22	// add to magical damage
 #define APPLY_BONUS_HEALING  23	// add to healing
 #define APPLY_RESIST_MAGICAL  24	// Apply to magic damage resistance
+#define APPLY_CRAFTING  25	// bonus craft levels
 
 
 // don't change these
@@ -448,7 +449,8 @@ typedef struct trig_data trig_data;
 #define ATT_BONUS_HEALING  8	// extra healing
 #define ATT_HEAL_OVER_TIME  9	// heal per 5
 #define ATT_RESIST_MAGICAL  10	// damage reduction
-#define NUM_EXTRA_ATTRIBUTES  11
+#define ATT_CRAFTING_BONUS  11	// levels added to crafting
+#define NUM_EXTRA_ATTRIBUTES  12
 #define TOTAL_EXTRA_ATTRIBUTES  20	// including spares, 10 spares remaining -- **DO NOT CHANGE**
 
 

@@ -860,6 +860,7 @@ ACMD(do_dispel) {
 
 
 ACMD(do_enchant) {
+	extern int get_crafting_level(char_data *ch);
 	extern const double apply_values[];
 	
 	char arg2[MAX_INPUT_LENGTH];
@@ -925,8 +926,8 @@ ACMD(do_enchant) {
 	else {
 		extract_resources(ch, enchant_data[type].resources, FALSE);
 		
-		// enchant scale level is whichever is less: obj scale level, or player level
-		scale = MIN(GET_OBJ_CURRENT_SCALE_LEVEL(obj), GET_COMPUTED_LEVEL(ch));
+		// enchant scale level is whichever is less: obj scale level, or player crafting level
+		scale = MIN(GET_OBJ_CURRENT_SCALE_LEVEL(obj), get_crafting_level(ch));
 		points_available = MAX(1.0, scale / 100.0 * enchant_points_at_100);
 		
 		if (HAS_ABILITY(ch, ABIL_GREATER_ENCHANTMENTS)) {

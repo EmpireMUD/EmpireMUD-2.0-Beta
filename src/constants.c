@@ -916,13 +916,14 @@ const char *apply_types[] = {
 	"BONUS-MAGICAL",
 	"BONUS-HEALING",
 	"RESIST-MAGICAL",
+	"CRAFTING",
 	"\n"
 };
 
 
 // APPLY_x (2/3) -- for rate_item (amount multiplied by the apply modifier to make each of these equal to 1)
 const double apply_values[] = {
-	0,	// "NONE",
+	0.01,	// "NONE",
 	1,	// "STRENGTH",
 	1,	// "DEXTERITY",
 	0.5,	// "HEALTH-REGEN",
@@ -946,7 +947,8 @@ const double apply_values[] = {
 	1,	// BONUS-PHYSICAL
 	1,	// BONUS-MAGICAL
 	1,	// BONUS-HEALING
-	0.5	// RESIST-MAGICAL
+	0.5,	// RESIST-MAGICAL
+	0.01	// CRAFTING
 };
 
 
@@ -976,7 +978,8 @@ const int apply_attribute[] = {
 	NOTHING,	// bonus-phys
 	NOTHING,	// bonus-mag
 	NOTHING,	// bonus-heal
-	NOTHING	// resist-magical
+	NOTHING,	// resist-magical
+	NOTHING	// crafting
 };
 
 
