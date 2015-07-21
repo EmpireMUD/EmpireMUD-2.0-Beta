@@ -218,6 +218,7 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 
 	/* add the affect */
 	af.type = ATYPE_DG_AFFECT;
+	af.cast_by = 0;	// TODO implement this
 	af.duration = ceil((double)duration / SECS_PER_REAL_UPDATE);
 	af.modifier = value;
 

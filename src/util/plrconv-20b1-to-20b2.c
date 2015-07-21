@@ -353,6 +353,7 @@ struct b2_player_special_data_saved {
 	bitvector_t syslogs;	// which syslogs people want to see
 	bitvector_t bonus_traits;	// BONUS_x
 	ubyte bad_pws;	// number of bad password attemps
+	int promo_id;	// entry in the promo_codes table
 
 	// preferences
 	bitvector_t pref;	// preference flags for PCs.
@@ -469,6 +470,7 @@ struct b2_player_special_data_saved {
 
 struct b2_affected_type {
 	sh_int type;	// The type of spell that caused this
+	int cast_by;	// player ID (positive) or mob vnum (negative)
 	sh_int duration;	// For how long its effects will last
 	int modifier;	// This is added to apropriate ability
 	byte location;	// Tells which ability to change - APPLY_x
@@ -480,12 +482,14 @@ struct b2_affected_type {
 struct b2_char_point_data {
 	int current_pools[b2_NUM_POOLS];	// HEALTH, MOVE, MANA, BLOOD
 	int max_pools[b2_NUM_POOLS];	// HEALTH, MOVE, MANA, BLOOD
+	int deficit[b2_NUM_POOLS];	// HEALTH, MOVE, MANA, BLOOD
 	
 	int extra_attributes[b2_TOTAL_EXTRA_ATTRIBUTES];	// ATT_x (dodge, etc)
 };
 
 struct b2_over_time_effect_type {
 	sh_int type;	// ATYPE_x
+	int cast_by;	// player ID (positive) or mob vnum (negative)
 	sh_int duration;	// time in 5-second real-updates
 	sh_int damage_type;	// DAM_x type
 	sh_int damage;	// amount
@@ -577,6 +581,7 @@ void convert_char_file_u(struct b2_char_file_u *to, struct b1_char_file_u *from)
 	to->player_specials_saved.syslogs = from->player_specials_saved.syslogs;
 	to->player_specials_saved.bonus_traits = from->player_specials_saved.bonus_traits;
 	to->player_specials_saved.bad_pws = from->player_specials_saved.bad_pws;
+	to->player_specials_saved.promo_id = from->player_specials_saved.promo_id;
 	to->player_specials_saved.pref = from->player_specials_saved.pref;
 	to->player_specials_saved.last_tip = from->player_specials_saved.last_tip;
 	to->player_specials_saved.mapsize = from->player_specials_saved.mapsize;
@@ -685,11 +690,18 @@ void convert_char_file_u(struct b2_char_file_u *to, struct b1_char_file_u *from)
 	for (iter = 0; iter < b2_TOTAL_EXTRA_ATTRIBUTES; ++iter) {
 		to->points.extra_attributes[iter] = (iter < b1_TOTAL_EXTRA_ATTRIBUTES) ? from->points.extra_attributes[iter] : 0;
 	}
+	for (iter = 0; iter < b2_NUM_POOLS; ++iter) {
+		to->points.deficit[iter] = 0;	// initialize
+	}
+	to->points.deficit[HEALTH] = from->player_specials_saved.health_deficit;
+	to->points.deficit[MOVE] = from->player_specials_saved.move_deficit;
+	to->points.deficit[MANA] = from->player_specials_saved.mana_deficit;
 
 	// affected_type
 	for (iter = 0; iter < b2_MAX_AFFECT; ++iter) {
 		if (iter < b1_MAX_AFFECT) {
 			to->affected[iter].type = from->affected[iter].type;
+			to->affected[iter].cast_by = 0;	// new in b2
 			to->affected[iter].duration = from->affected[iter].duration;
 			to->affected[iter].modifier = from->affected[iter].modifier;
 			to->affected[iter].location = from->affected[iter].location;
@@ -698,6 +710,7 @@ void convert_char_file_u(struct b2_char_file_u *to, struct b1_char_file_u *from)
 		}
 		else {
 			to->affected[iter].type = 0;
+			to->affected[iter].cast_by = 0;
 			to->affected[iter].duration = 0;
 			to->affected[iter].modifier = 0;
 			to->affected[iter].location = APPLY_NONE;
@@ -710,6 +723,7 @@ void convert_char_file_u(struct b2_char_file_u *to, struct b1_char_file_u *from)
 	for (iter = 0; iter < b2_MAX_AFFECT; ++iter) {
 		if (iter < b1_MAX_AFFECT) {
 			to->over_time_effects[iter].type = from->over_time_effects[iter].type;
+			to->over_time_effects[iter].cast_by = 0;	// new in b2
 			to->over_time_effects[iter].duration = from->over_time_effects[iter].duration;
 			to->over_time_effects[iter].damage_type = from->over_time_effects[iter].damage_type;
 			to->over_time_effects[iter].damage = from->over_time_effects[iter].damage;
@@ -719,6 +733,7 @@ void convert_char_file_u(struct b2_char_file_u *to, struct b1_char_file_u *from)
 		}
 		else {
 			to->over_time_effects[iter].type = 0;
+			to->over_time_effects[iter].cast_by = 0;	// new in b2
 			to->over_time_effects[iter].duration = 0;
 			to->over_time_effects[iter].damage_type = 0;
 			to->over_time_effects[iter].damage = 0;

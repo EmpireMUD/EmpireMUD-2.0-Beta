@@ -205,6 +205,7 @@
 // ch->points: char_point_data
 #define GET_CURRENT_POOL(ch, pool)  ((ch)->points.current_pools[(pool)])
 #define GET_MAX_POOL(ch, pool)  ((ch)->points.max_pools[(pool)])
+#define GET_DEFICIT(ch, pool)  ((ch)->points.deficit[(pool)])
 #define GET_EXTRA_ATT(ch, att)  ((ch)->points.extra_attributes[(att)])
 
 // ch->points: specific pools
@@ -216,6 +217,9 @@
 #define GET_MAX_MOVE(ch)  GET_MAX_POOL(ch, MOVE)
 #define GET_BLOOD(ch)  GET_CURRENT_POOL(ch, BLOOD)
 extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other max pools, and max_pools[BLOOD] is not used.
+#define GET_HEALTH_DEFICIT(ch)  GET_DEFICIT((ch), HEALTH)
+#define GET_MOVE_DEFICIT(ch)  GET_DEFICIT((ch), MOVE)
+#define GET_MANA_DEFICIT(ch)  GET_DEFICIT((ch), MANA)
 #define GET_BONUS_INVENTORY(ch)  GET_EXTRA_ATT(ch, ATT_BONUS_INVENTORY)
 #define GET_RESIST_PHYSICAL(ch)  GET_EXTRA_ATT(ch, ATT_RESIST_PHYSICAL)
 #define GET_RESIST_MAGICAL(ch)  GET_EXTRA_ATT(ch, ATT_RESIST_MAGICAL)
@@ -781,11 +785,6 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define NOSKILL_BLOCKED(ch, skill)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.skills[(skill)].noskill))
 #define PRF_FLAGS(ch)  CHECK_PLAYER_SPECIAL(REAL_CHAR(ch), (REAL_CHAR(ch)->player_specials->saved.pref))
 #define USING_POISON(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.using_poison))
-
-// temporary location for these
-#define GET_HEALTH_DEFICIT(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.health_deficit))
-#define GET_MOVE_DEFICIT(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.move_deficit))
-#define GET_MANA_DEFICIT(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.mana_deficit))
 
 // helpers
 #define GET_LEVELS_GAINED_FROM_ABILITY(ch, ab)  ((!IS_NPC(ch) && (ab) >= 0 && (ab) <= NUM_ABILITIES) ? CHECK_PLAYER_SPECIAL((ch), (ch)->player_specials->saved.abilities[(ab)].levels_gained) : 0)

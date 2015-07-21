@@ -246,6 +246,7 @@ void char_to_store(char_data *ch, struct char_file_u *st) {
 		}
 		else {
 			st->affected[i].type = 0;	/* Zero signifies not used */
+			st->affected[i].cast_by = 0;
 			st->affected[i].duration = 0;
 			st->affected[i].modifier = 0;
 			st->affected[i].location = 0;
@@ -264,6 +265,7 @@ void char_to_store(char_data *ch, struct char_file_u *st) {
 		}
 		else {
 			st->over_time_effects[i].type = 0;
+			st->over_time_effects[i].cast_by = 0;
 			st->over_time_effects[i].damage = 0;
 			st->over_time_effects[i].duration = 0;
 			st->over_time_effects[i].damage_type = 0;
@@ -1176,9 +1178,9 @@ int enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 		GET_BLOOD(ch) = GET_MAX_BLOOD(ch);
 		
 		// clear deficits
-		GET_HEALTH_DEFICIT(ch) = 0;
-		GET_MOVE_DEFICIT(ch) = 0;
-		GET_MANA_DEFICIT(ch) = 0;
+		for (iter = 0; iter < NUM_POOLS; ++iter) {
+			GET_DEFICIT(ch, iter) = 0;
+		}
 		
 		// check for confusion!
 		GET_CONFUSED_DIR(ch) = number(0, NUM_SIMPLE_DIRS-1);
@@ -1447,8 +1449,8 @@ void start_new_character(char_data *ch) {
 	apply_bonus_trait(ch, GET_BONUS_TRAITS(ch), TRUE);
 	
 	// if they have a valid promo code, apply it now
-	if (GET_PROMO_ID(ch) >= 0 && promo_codes[(int) GET_PROMO_ID(ch)].apply_func) {
-		(promo_codes[(int) GET_PROMO_ID(ch)].apply_func)(ch);
+	if (GET_PROMO_ID(ch) >= 0 && promo_codes[GET_PROMO_ID(ch)].apply_func) {
+		(promo_codes[GET_PROMO_ID(ch)].apply_func)(ch);
 	}
 	
 	// set up class/level data

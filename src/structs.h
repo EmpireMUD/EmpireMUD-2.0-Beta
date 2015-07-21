@@ -1585,6 +1585,7 @@ typedef struct trig_data trig_data;
 // Simple affect structure -- Used in char_file_u **DO NOT CHANGE**
 struct affected_type {
 	sh_int type;	// The type of spell that caused this
+	int cast_by;	// player ID (positive) or mob vnum (negative)
 	sh_int duration;	// For how long its effects will last
 	int modifier;	// This is added to apropriate ability
 	byte location;	// Tells which ability to change - APPLY_x
@@ -2145,6 +2146,7 @@ struct player_special_data_saved {
 	bitvector_t syslogs;	// which syslogs people want to see
 	bitvector_t bonus_traits;	// BONUS_x
 	ubyte bad_pws;	// number of bad password attemps
+	int promo_id;	// entry in the promo_codes table
 
 	// preferences
 	bitvector_t pref;	// preference flags for PCs.
@@ -2219,7 +2221,7 @@ struct player_special_data_saved {
 	byte spare1;
 	byte spare2;
 	byte spare3;
-	byte promo_id;	// entry in the promo_codes table -- TODO move up to an int in beta2, and remove int casts in various places
+	byte spare4;
 	
 	ubyte spare5;
 	ubyte spare6;
@@ -2235,9 +2237,9 @@ struct player_special_data_saved {
 	
 	int spare15;
 	int spare16;
-	int health_deficit;	// TODO in beta2, move these to an array with the pools
-	int move_deficit;
-	int mana_deficit;
+	int spare17;
+	int spare18;
+	int spare19;
 	
 	double spare20;
 	double spare21;
@@ -2336,6 +2338,7 @@ struct char_player_data {
 struct char_point_data {
 	int current_pools[NUM_POOLS];	// HEALTH, MOVE, MANA, BLOOD
 	int max_pools[NUM_POOLS];	// HEALTH, MOVE, MANA, BLOOD
+	int deficit[NUM_POOLS];	// HEALTH, MOVE, MANA, BLOOD
 	
 	int extra_attributes[TOTAL_EXTRA_ATTRIBUTES];	// ATT_x (dodge, etc)
 };
@@ -2454,6 +2457,7 @@ struct cooldown_data {
 // for damage-over-time (DoTs) Used in char_file_u **DO NOT CHANGE**
 struct over_time_effect_type {
 	sh_int type;	// ATYPE_x
+	int cast_by;	// player ID (positive) or mob vnum (negative)
 	sh_int duration;	// time in 5-second real-updates
 	sh_int damage_type;	// DAM_x type
 	sh_int damage;	// amount

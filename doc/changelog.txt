@@ -184,12 +184,15 @@ on quarries.
 'trainingyard' to be consistent with all other buildings.
 
 Code cleanup:
+- Affects: Added data for storage of a caster id for affects, for future development.
 - Command lag: Replaced inline use of WAIT_STATE() in most places to the new
 command_lag() function, which takes a "lag type" to allow abilities to modify
 the lag time on some types of commands. Also removed all remaining uses of the
 deprecated WAIT_STATE() macro in favor of GET_WAIT_STATE().
+- Converter: Added a playerfile converter program specifically for b1.x -> b2.0 updates.
 - is_fighting: Provided a new function that determines if a character is being
 attacked, in addition to whether or not he is attacking.
+- Playerfile spares: Moved spares used in b1.* to permanent locations.
 - Shear: Rewrote shear to use an INTERACTION_FUNC.
 - skills.c: Moved two functions that were in the wrong section of the file, and
 ordered the switch statement for abilities. These appeared to have been missed
