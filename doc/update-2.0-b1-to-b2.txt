@@ -4,7 +4,7 @@ Updating EmpireMUD from 2.0b1 to 2.0b2:
 
 WARNING: You will need to convert your playerfile for this upgrade.
 
-Steps by step instructions:
+Step by step instructions:
 
 1. Shut down your EmpireMUD using "shutdown die".
 
