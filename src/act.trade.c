@@ -223,7 +223,12 @@ void cancel_gen_craft(char_data *ch) {
 
 			// just empty it
 			GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) = 0;
-			obj_to_char_or_room(obj, ch);
+			if (CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
+				obj_to_char(obj, ch);
+			}
+			else {
+				obj_to_room(obj, IN_ROOM(ch));
+			}
 			load_otrigger(obj);
 		}
 	}
@@ -298,7 +303,12 @@ void finish_gen_craft(char_data *ch) {
 	
 		// set it to go bad... very bad
 		GET_OBJ_TIMER(obj) = SOUP_TIMER;
-		obj_to_char_or_room(obj, ch);
+		if (CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
+			obj_to_char(obj, ch);
+		}
+		else {
+			obj_to_room(obj, IN_ROOM(ch));
+		}
 		scale_craftable(obj, ch, type);
 		
 		load_otrigger(obj);
@@ -325,7 +335,7 @@ void finish_gen_craft(char_data *ch) {
 	
 				// where to put it
 				if (CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
-					obj_to_char_or_room(obj, ch);
+					obj_to_char(obj, ch);
 				}
 				else {
 					obj_to_room(obj, IN_ROOM(ch));
@@ -626,7 +636,12 @@ void finish_weaving(char_data *ch) {
 
 	obj = read_object(weave_data[type].vnum);
 	
-	obj_to_char_or_room(obj, ch);
+	if (CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
+		obj_to_char(obj, ch);
+	}
+	else {
+		obj_to_room(obj, IN_ROOM(ch));
+	}
 
 	act("You finish weaving $p!", FALSE, ch, obj, 0, TO_CHAR);
 	act("$n finishes weaving $p!", FALSE, ch, obj, 0, TO_ROOM);
