@@ -67,7 +67,7 @@ R
 R
 1357 2  # 2x a large piece of leather
 R
-1359 2  # 2x UNKNOWN
+1359 2  # 2x a bolt of cloth
 S
 #2309
 mail coif~
@@ -78,7 +78,7 @@ R
 R
 1356 1  # 1x a small piece of leather
 R
-1359 1  # 1x UNKNOWN
+1359 1  # 1x a bolt of cloth
 S
 #2310
 splint vambraces~
@@ -100,7 +100,7 @@ R
 R
 1357 2  # 2x a large piece of leather
 R
-1359 2  # 2x UNKNOWN
+1359 2  # 2x a bolt of cloth
 S
 #2312
 eagle helm~
@@ -113,7 +113,7 @@ R
 R
 1356 1  # 1x a small piece of leather
 R
-1359 1  # 1x UNKNOWN
+1359 1  # 1x a bolt of cloth
 S
 #2313
 spiked vambraces~
@@ -166,7 +166,7 @@ R
 R
 1357 4  # 4x a large piece of leather
 R
-1359 4  # 4x UNKNOWN
+1359 4  # 4x a bolt of cloth
 S
 #2318
 great helm~
@@ -179,7 +179,7 @@ R
 R
 1356 1  # 1x a small piece of leather
 R
-1359 1  # 1x UNKNOWN
+1359 1  # 1x a bolt of cloth
 S
 #2319
 lower cannons~
@@ -208,7 +208,7 @@ sorcerers robe~
 2321 1  # 1x a sorcerer's robe
 4 199 g 24 -1
 R
-1359 12  # 12x UNKNOWN
+1359 12  # 12x a bolt of cloth
 R
 1357 4  # 4x a large piece of leather
 R
@@ -223,7 +223,7 @@ wizards hat~
 2322 1  # 1x a wizard's hat
 4 199 g 25 -1
 R
-1359 6  # 6x UNKNOWN
+1359 6  # 6x a bolt of cloth
 R
 1357 1  # 1x a large piece of leather
 R
@@ -238,7 +238,7 @@ armbands of power~
 2323 1  # 1x armbands of power
 4 199 g 24 -1
 R
-1359 8  # 8x UNKNOWN
+1359 8  # 8x a bolt of cloth
 R
 1357 2  # 2x a large piece of leather
 R
@@ -262,7 +262,7 @@ copper mask~
 2325 1  # 1x a copper mask
 1 53 0 24 -1
 R
-1359 1  # 1x UNKNOWN
+1359 1  # 1x a bolt of cloth
 R
 178 4  # 4x a copper ingot
 S
@@ -336,7 +336,7 @@ R
 R
 1307 1  # 1x deadly violet dye
 R
-1359 4  # 4x UNKNOWN
+1359 4  # 4x a bolt of cloth
 R
 103 4  # 4x a yellow lightning stone
 S
@@ -345,7 +345,7 @@ furrowed sleeves~
 2334 1  # 1x furrowed sleeves
 4 224 g 24 -1
 R
-1359 4  # 4x UNKNOWN
+1359 4  # 4x a bolt of cloth
 R
 1308 1  # 1x deep orange dye
 R
@@ -358,7 +358,7 @@ apprentice shoes~
 2335 1  # 1x apprentice shoes
 4 224 g 24 -1
 R
-1359 4  # 4x UNKNOWN
+1359 4  # 4x a bolt of cloth
 R
 1356 2  # 2x a small piece of leather
 R
@@ -388,6 +388,88 @@ R
 R
 103 12  # 12x a yellow lightning stone
 R
-1359 10  # 10x UNKNOWN
+1359 10  # 10x a bolt of cloth
+S
+#2339
+clockwork goggles~
+2339 1  # 1x clockwork goggles
+2 -1 0 12 2343
+L
+100
+R
+2343 1  # 1x a clockwork lens array
+R
+178 2  # 2x a copper ingot
+S
+#2340
+guildmaster tunic~
+2340 1  # 1x a guildmaster's tunic
+4 -1 g 12 2344
+L
+100
+R
+2344 1  # 1x guild-patterned cloth
+R
+1359 2  # 2x a bolt of cloth
+S
+#2341
+utility belt~
+2341 1  # 1x a utility belt
+4 -1 g 12 2345
+L
+100
+R
+2345 1  # 1x some clips and buckles
+R
+1357 4  # 4x a large piece of leather
+S
+#2342
+steel multitool~
+2342 1  # 1x a steel multitool
+1 -1 0 12 2346
+L
+100
+R
+2346 1  # 1x a set of delicate tools
+R
+1356 1  # 1x a small piece of leather
+R
+175 1  # 1x an iron ingot
+S
+#2343
+clockwork lens array~
+2343 1  # 1x a clockwork lens array
+2 243 c 12 -1
+R
+162 2  # 2x a pile of gold dust
+R
+175 4  # 4x an iron ingot
+S
+#2344
+guild patterned cloth~
+2344 1  # 1x guild-patterned cloth
+4 242 g 12 -1
+R
+1359 4  # 4x a bolt of cloth
+R
+161 2  # 2x a silver nugget
+S
+#2345
+clips and buckles~
+2345 1  # 1x some clips and buckles
+1 246 0 12 -1
+R
+177 2  # 2x an imperium ingot
+R
+175 4  # 4x an iron ingot
+S
+#2346
+delicate tools~
+2346 1  # 1x a set of delicate tools
+1 241 0 12 -1
+R
+175 4  # 4x an iron ingot
+R
+176 2  # 2x an ingot of nocturnium
 S
 $

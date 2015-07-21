@@ -656,4 +656,113 @@ A
 C
 0 0
 S
+#2339
+goggles clockwork pair~
+clockwork goggles~
+A pair of clockwork goggles are lying here.~
+   Fitted with several lenses for different distances and magnifications, these
+goggles make precision craftsmanship much easier. And protect your eyes.
+~
+2 p ae 7
+0 0 0
+8 0
+A
+25 25
+S
+#2340
+tunic guildmasters guildmaster's~
+a guildmaster's tunic~
+A guildmaster has left his tunic here.~
+   This tunic is finely embroidered with the symbol of a craftsman's guild on
+the front. It is also fireproof, and resists stains.
+~
+2 p ad 6
+0 0 0
+11 0
+A
+25 25
+S
+#2341
+belt utility~
+a utility belt~
+A utility belt has been discarded here.~
+   This sturdy leather belt is specially designed to let you keep your own
+weight in tools within your reach while keeping both hands free.
+~
+2 p al 7
+0 0 0
+7 0
+A
+25 25
+S
+#2342
+multitool folding steel~
+a steel multitool~
+An folding steel multitool is lying here.~
+   This amazing multi-purpose folding tool has attachments for almost every
+conceivable purpose. It even has a corkscrew!
+~
+3 p ao 6
+0 0 0
+2 0
+A
+25 25
+S
+#2343
+lenses clockwork array~
+a clockwork lens array~
+An array of clockwork lenses is lying here.~
+These can be used by any craftsman to make a personal set of clockwork goggles.
+
+Craft (no skill required): clockwork goggles
+  1x clockwork lens array
+  2x copper ingot
+~
+3 0 a 4
+0 0 0
+8 0
+S
+#2344
+sheet cloth guild-patterned patterned~
+guild-patterned cloth~
+A sheet of guild-patterned cloth is lying here.~
+This can be used by any craftsman to make a personal guildmaster's tunic.
+
+Sew (no skill required): guildmaster tunic
+  1x guild-patterned cloth
+  2x bolt of cloth
+~
+3 0 a 4
+0 0 0
+11 0
+S
+#2345
+buckles clips pile~
+some clips and buckles~
+A pile of clips and buckles is lying here.~
+These can be used by any craftsman to make a personal utility belt.
+ 
+Sew (no skill required): utility belt
+  1x clips and buckles
+  4x large leather
+~
+3 0 a 5
+0 0 0
+2 0
+S
+#2346
+tools delicate tiny set~
+a set of delicate tools~
+A set of tiny, delicate tools is lying here.~
+These can be used by any craftsman to make a personal artisan's multitool.
+ 
+Craft (no skill required): steel multitool
+  1x set of delicate tools
+  1x small leather
+  1x iron ingot
+~
+3 0 a 5
+0 0 0
+2 0
+S
 $
