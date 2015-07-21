@@ -49,7 +49,10 @@ See also: FORGE, WEAPONCRAFTING, STURDY ARMORS, IMPERIAL ARMORS
 Artificer Crafts
 Class ability: Artificer
 
-This ability will contain any crafts for the Artificer class.
+Craft items:
+  clockwork lens array  2 gold dust, 4 iron ingots  (crafter item)
+
+See also: CRAFT
 #
 "BASIC CRAFTS" DYE CRAFT CRAFTS
 
@@ -222,7 +225,10 @@ See also: SMELT, WEAPONCRAFTING, ARMORSMITHING, JEWELRY, MASTER BLACKSMITH,
 Guildsman Crafts
 Class ability: Guildsman
 
-This ability will contain any crafts for the Guildsman class.
+Sew items:
+  guild patterned cloth  4 cloth, 2 gold dust  (crafter item)
+
+See also: SEW
 #
 HANDLE
 
@@ -636,7 +642,10 @@ This ability will contain any crafts for the Smuggler class.
 Steelsmith Crafts
 Class ability: Steelsmith
 
-This ability will contain any crafts for the Steelsmith class.
+Forge items:
+  delicate tools  4 iron ingots, 2 nocturnium ingots  (crafter item)
+
+See also: FORGE
 #
 "STURDY ARMORS"
 
@@ -671,7 +680,10 @@ See also: SKIN
 Tinker Crafts
 Class ability: Tinker
 
-This ability will contain any crafts for the Tinker class.
+Forge items:
+  clips and buckles  2 imperium ingots, 4 iron ingots  (crafter item)
+
+See also: FORGE
 #
 WEAPONCRAFTING
 
