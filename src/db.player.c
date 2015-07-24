@@ -1046,7 +1046,6 @@ int enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	
 	extern bool global_mute_slash_channel_joins;
 	extern int top_idnum;
-	extern const struct wear_data_type wear_data[NUM_WEARS];
 
 	char lbuf[MAX_STRING_LENGTH];
 	int i, iter;
