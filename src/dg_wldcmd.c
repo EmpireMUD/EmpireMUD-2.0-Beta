@@ -845,7 +845,8 @@ WCMD(do_wscale) {
 				extract_obj(obj);
 			}
 			else {
-				wld_log(room, "wscale: target is not scalable");
+				// attempt to scale anyway
+				scale_item_to_level(obj, level);
 			}
 		}
 		else 

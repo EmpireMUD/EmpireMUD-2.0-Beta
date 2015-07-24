@@ -153,10 +153,7 @@ ACMD(do_create) {
 				obj_to_char_or_room(obj, ch);
 			}
 			
-			if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-				scale_item_to_level(obj, 1);	// minimum level
-			}
-			
+			scale_item_to_level(obj, 1);	// minimum level
 			load_otrigger(obj);
 		}
 		else {

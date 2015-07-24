@@ -1400,10 +1400,7 @@ void start_new_character(char_data *ch) {
 			}
 			
 			obj = read_object(archetype[type].gear[iter].vnum);
-			
-			if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-				scale_item_to_level(obj, 1);	// lowest possible scale
-			}
+			scale_item_to_level(obj, 1);	// lowest possible scale
 			
 			if (archetype[type].gear[iter].wear == NOWHERE) {
 				obj_to_char(obj, ch);
@@ -1415,31 +1412,23 @@ void start_new_character(char_data *ch) {
 
 		// misc items
 		obj = read_object(o_GRAVE_MARKER);
-		if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-			scale_item_to_level(obj, 1);	// lowest possible scale
-		}
+		scale_item_to_level(obj, 1);	// lowest possible scale
 		obj_to_char(obj, ch);
 		
 		for (iter = 0; iter < 2; ++iter) {
 			// 2 bread
 			obj = read_object(o_BREAD);
-			if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-				scale_item_to_level(obj, 1);	// lowest possible scale
-			}
+			scale_item_to_level(obj, 1);	// lowest possible scale
 			obj_to_char(obj, ch);
 			
 			// 2 trinket of conveyance
 			obj = read_object(o_TRINKET_OF_CONVEYANCE);
-			if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-				scale_item_to_level(obj, 1);	// lowest possible scale
-			}
+			scale_item_to_level(obj, 1);	// lowest possible scale
 			obj_to_char(obj, ch);
 		}
 		
 		obj = read_object(o_BOWL);
-		if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-			scale_item_to_level(obj, 1);	// lowest possible scale
-		}
+		scale_item_to_level(obj, 1);	// lowest possible scale
 		GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) = GET_DRINK_CONTAINER_CAPACITY(obj);
 		GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = LIQ_WATER;
 		obj_to_char(obj, ch);

@@ -944,7 +944,7 @@ static void reset_instance_room(struct instance_data *inst, room_data *room) {
 						obj = read_object(spawn->vnum);
 						instance_obj_setup(inst, obj);
 						obj_to_room(obj, room);
-						if (OBJ_FLAGGED(obj, OBJ_SCALABLE) && inst->level > 0) {
+						if (inst->level > 0) {
 							scale_item_to_level(obj, inst->level);
 						}
 						act("$p appears.", FALSE, NULL, obj, NULL, TO_ROOM);
@@ -1663,9 +1663,7 @@ static void scale_instance_to_level(struct instance_data *inst, int level) {
 				}
 			}
 			for (obj = ROOM_CONTENTS(inst->room[iter]); obj; obj = obj->next_content) {
-				if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-					scale_item_to_level(obj, level);
-				}
+				scale_item_to_level(obj, level);
 			}
 		}
 	}

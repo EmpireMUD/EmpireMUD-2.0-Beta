@@ -197,6 +197,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	char lbuf[MAX_STRING_LENGTH], location[MAX_STRING_LENGTH];
 	bld_data *bld;
 	int iter, found;
+	double rating;
 	
 	// ONLY flags to show
 	bitvector_t show_obj_flags = OBJ_LIGHT | OBJ_SUPERIOR | OBJ_ENCHANTED | OBJ_JUNK | OBJ_TWO_HANDED | OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP | OBJ_HARD_DROP | OBJ_GROUP_DROP | OBJ_GENERIC_DROP;
@@ -258,11 +259,12 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	
 	// only show gear if equippable (has more than ITEM_WEAR_TRADE)
 	if ((GET_OBJ_WEAR(obj) & ~ITEM_WEAR_TAKE) != NOBITS) {
-		msg_to_char(ch, "Gear level: %.1f", rate_item(obj));
 		if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) > 0) {
-			msg_to_char(ch, " (scaled to %d)", GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			msg_to_char(ch, "Level: %d\r\n", GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 		}
-		msg_to_char(ch, "\r\n");
+		if ((rating = rate_item(obj)) > 0) {
+			msg_to_char(ch, "Gear rating: %.1f\r\n", rating);
+		}
 		
 		prettier_sprintbit(GET_OBJ_WEAR(obj) & ~ITEM_WEAR_TAKE, wear_bits, buf);
 		msg_to_char(ch, "Can be worn on: %s\r\n", buf);
@@ -376,10 +378,7 @@ INTERACTION_FUNC(light_obj_interact) {
 	for (num = 0; num < interaction->quantity; ++num) {
 		// load
 		new = read_object(vnum);
-		
-		if (OBJ_FLAGGED(new, OBJ_SCALABLE)) {
-			scale_item_to_level(new, GET_OBJ_CURRENT_SCALE_LEVEL(inter_item));
-		}
+		scale_item_to_level(new, GET_OBJ_CURRENT_SCALE_LEVEL(inter_item));
 		
 		// ownership
 		new->last_owner_id = GET_IDNUM(ch);
@@ -744,9 +743,7 @@ static bool perform_get_from_container(char_data *ch, obj_data *obj, obj_data *c
 		}
 		else if (get_otrigger(obj, ch)) {
 			// last-minute scaling: scale to its minimum (adventures will override this on their own)
-			if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-				scale_item_to_level(obj, GET_OBJ_MIN_SCALE_LEVEL(obj));
-			}
+			scale_item_to_level(obj, GET_OBJ_MIN_SCALE_LEVEL(obj));
 			
 			obj_to_char(obj, ch);
 			act("You get $p from $P.", FALSE, ch, obj, cont, TO_CHAR);
@@ -854,9 +851,7 @@ static bool perform_get_from_room(char_data *ch, obj_data *obj) {
 	}
 	if (can_take_obj(ch, obj) && get_otrigger(obj, ch)) {
 		// last-minute scaling: scale to its minimum (adventures will override this on their own)
-		if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-			scale_item_to_level(obj, GET_OBJ_MIN_SCALE_LEVEL(obj));
-		}
+		scale_item_to_level(obj, GET_OBJ_MIN_SCALE_LEVEL(obj));
 		
 		obj_to_char(obj, ch);
 		act("You get $p.", FALSE, ch, obj, 0, TO_CHAR);
@@ -1189,7 +1184,7 @@ void scale_item_to_level(obj_data *obj, int level) {
 	int room_lev = 0, room_min = 0, room_max = 0, sig;
 	double share, this_share, points_to_give, per_point;
 	room_data *room = NULL;
-	obj_data *top_obj;
+	obj_data *top_obj, *proto;
 	bitvector_t bits;
 	
 	// configure this here
@@ -1199,11 +1194,6 @@ void scale_item_to_level(obj_data *obj, int level) {
 	
 	// WEAR_POS_x: modifier based on best wear type
 	const double wear_pos_modifier[] = { 0.75, 1.0 };
-
-	if (!OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-		log("SYSERR: Attempting to scale item which is not scalable or is already scaled: %s", GET_OBJ_SHORT_DESC(obj));
-		return;
-	}
 	
 	// determine any scale constraints from the room
 	top_obj = get_top_object(obj);
@@ -1243,6 +1233,17 @@ void scale_item_to_level(obj_data *obj, int level) {
 	
 	// hard lower limit -- the stats are the same at 0 or 1, but 0 shows as "unscalable" because unscalable items have 0 scale level
 	level = MAX(1, level);
+	
+	// if it's not scalable, we can still set its scale level if the prototype is not scalable
+	// (if the prototype IS scalable, but this instance isn't, we can't rescale it this way)
+	if (!OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
+		if (GET_OBJ_VNUM(obj) != NOTHING && (proto = obj_proto(GET_OBJ_VNUM(obj)))) {
+			GET_OBJ_CURRENT_SCALE_LEVEL(obj) = level;
+		}
+		
+		// can't do anything else here
+		return;
+	}
 	
 	// scale data
 	REMOVE_BIT(GET_OBJ_EXTRA(obj), OBJ_SCALABLE);
@@ -1514,7 +1515,7 @@ void trade_check(char_data *ch, char *argument) {
 			*scale = '\0';
 		}
 		
-		snprintf(line, sizeof(line), "%s%2d. %s: %d coin%s [%.1f]%s%s&0\r\n", IS_SET(tpd->state, TPD_EXPIRED) ? "&r" : "", ++count, GET_OBJ_SHORT_DESC(tpd->obj), tpd->buy_cost, PLURAL(tpd->buy_cost), rate_item(tpd->obj), scale, IS_SET(tpd->state, TPD_EXPIRED) ? " (expired)" : "");
+		snprintf(line, sizeof(line), "%s%2d. %s: %d coin%s [lvl %d]%s%s&0\r\n", IS_SET(tpd->state, TPD_EXPIRED) ? "&r" : "", ++count, GET_OBJ_SHORT_DESC(tpd->obj), tpd->buy_cost, PLURAL(tpd->buy_cost), GET_OBJ_CURRENT_SCALE_LEVEL(tpd->obj), scale, IS_SET(tpd->state, TPD_EXPIRED) ? " (expired)" : "");
 		
 		if (size + strlen(line) < sizeof(output)) {
 			size += snprintf(output + size, sizeof(output) - size, "%s", line);
@@ -1595,7 +1596,7 @@ void trade_list(char_data *ch, char *argument) {
 			*exchange = '\0';
 		}
 		
-		snprintf(line, sizeof(line), "%s%2d. %s: %d%s %s [%.1f]%s%s%s%s%s&0\r\n", (tpd->player == GET_IDNUM(ch)) ? "&r" : (can_wear ? "" : "&R"), ++count, GET_OBJ_SHORT_DESC(tpd->obj), tpd->buy_cost, exchange, (coin_emp ? EMPIRE_ADJECTIVE(coin_emp) : "misc"), rate_item(tpd->obj), scale, (OBJ_FLAGGED(tpd->obj, OBJ_SUPERIOR) ? " (sup)" : ""), OBJ_FLAGGED(tpd->obj, OBJ_ENCHANTED) ? " (ench)" : "", (tpd->player == GET_IDNUM(ch)) ? " (your auction)" : "", can_wear ? "" : " (can't use)");
+		snprintf(line, sizeof(line), "%s%2d. %s: %d%s %s [lvl %d]%s%s%s%s%s&0\r\n", (tpd->player == GET_IDNUM(ch)) ? "&r" : (can_wear ? "" : "&R"), ++count, GET_OBJ_SHORT_DESC(tpd->obj), tpd->buy_cost, exchange, (coin_emp ? EMPIRE_ADJECTIVE(coin_emp) : "misc"), GET_OBJ_CURRENT_SCALE_LEVEL(tpd->obj), scale, (OBJ_FLAGGED(tpd->obj, OBJ_SUPERIOR) ? " (sup)" : ""), OBJ_FLAGGED(tpd->obj, OBJ_ENCHANTED) ? " (ench)" : "", (tpd->player == GET_IDNUM(ch)) ? " (your auction)" : "", can_wear ? "" : " (can't use)");
 		
 		if (size + strlen(line) < sizeof(output)) {
 			size += snprintf(output + size, sizeof(output) - size, "%s", line);

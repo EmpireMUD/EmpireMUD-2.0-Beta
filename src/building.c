@@ -530,9 +530,7 @@ void finish_dismantle(char_data *ch, room_data *room) {
 			newobj = read_object(GET_CRAFT_REQUIRES_OBJ(type));
 			
 			// scale item to minimum level
-			if (OBJ_FLAGGED(newobj, OBJ_SCALABLE)) {
-				scale_item_to_level(newobj, 0);
-			}
+			scale_item_to_level(newobj, 0);
 			
 			if (IS_NPC(ch)) {
 				obj_to_room(newobj, room);
@@ -787,10 +785,7 @@ void process_dismantling(char_data *ch, room_data *room) {
 
 	if (obj) {
 		// scale item to minimum level
-		if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-			scale_item_to_level(obj, 0);
-		}
-				
+		scale_item_to_level(obj, 0);
 		obj_to_char_or_room(obj, ch);
 		
 		act("$n removes $p from the structure.", FALSE, ch, obj, 0, TO_ROOM | TO_SPAMMY);

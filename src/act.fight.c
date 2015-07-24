@@ -492,9 +492,7 @@ ACMD(do_stake) {
 			GET_POS(victim) = POS_RESTING;
 		REMOVE_BIT(INJURY_FLAGS(victim), INJ_STAKED);
 		obj_to_char_or_room((stake = read_object(o_STAKE)), ch);
-		if (OBJ_FLAGGED(stake, OBJ_SCALABLE)) {
-			scale_item_to_level(stake, 1);	// min scale
-		}
+		scale_item_to_level(stake, 1);	// min scale
 		load_otrigger(stake);
 	}
 	else if (!can_fight(ch, victim))

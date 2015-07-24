@@ -450,7 +450,7 @@ void scale_craftable(obj_data *obj, char_data *ch, craft_data *craft) {
 	int level = 1, psr;
 	obj_data *req;
 	
-	if (!OBJ_FLAGGED(obj, OBJ_SCALABLE) || IS_NPC(ch)) {
+	if (IS_NPC(ch)) {
 		return;
 	}
 	
@@ -1049,7 +1049,7 @@ ACMD(do_reforge) {
 			// re-apply
 			new->stolen_timer = old_stolen_time;
 			GET_OBJ_TIMER(new) = old_timer;
-			if (level > 0 && OBJ_FLAGGED(new, OBJ_SCALABLE)) {
+			if (level > 0) {
 				scale_item_to_level(new, level);
 			}
 			
@@ -1126,7 +1126,7 @@ ACMD(do_reforge) {
 			// re-apply values
 			new->stolen_timer = old_stolen_time;
 			GET_OBJ_TIMER(new) = old_timer;
-			if (level > 0 && OBJ_FLAGGED(new, OBJ_SCALABLE)) {
+			if (level > 0) {
 				scale_item_to_level(new, level);
 			}
 			

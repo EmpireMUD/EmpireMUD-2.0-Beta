@@ -3402,7 +3402,7 @@ void write_obj_to_file(FILE *fl, obj_data *obj) {
 	}
 	
 	// C: scaling
-	if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
+	if (GET_OBJ_MIN_SCALE_LEVEL(obj) > 0 || GET_OBJ_MAX_SCALE_LEVEL(obj) > 0) {
 		fprintf(fl, "C\n");
 		fprintf(fl, "%d %d\n", GET_OBJ_MIN_SCALE_LEVEL(obj), GET_OBJ_MAX_SCALE_LEVEL(obj));
 	}

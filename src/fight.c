@@ -976,7 +976,6 @@ void drop_loot(char_data *mob, char_data *killer) {
 			for (iter = 0; iter < interact->quantity; ++iter) {
 				obj = read_object(interact->vnum);
 				
-				// scale
 				if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
 					// set flags (before scaling)
 					if (!OBJ_FLAGGED(obj, OBJ_GENERIC_DROP)) {
@@ -987,9 +986,10 @@ void drop_loot(char_data *mob, char_data *killer) {
 							SET_BIT(GET_OBJ_EXTRA(obj), OBJ_GROUP_DROP);
 						}
 					}
-					
-					scale_item_to_level(obj, scale_level);
 				}
+				
+				// scale
+				scale_item_to_level(obj, scale_level);
 				
 				// preemptive binding
 				if (OBJ_FLAGGED(obj, OBJ_BIND_ON_PICKUP) && IS_NPC(mob)) {

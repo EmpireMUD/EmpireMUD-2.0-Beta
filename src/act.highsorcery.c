@@ -366,18 +366,14 @@ INTERACTION_FUNC(devastate_crop) {
 	
 	while (num-- > 0) {
 		obj_to_char_or_room((newobj = read_object(interaction->vnum)), ch);
-		if (OBJ_FLAGGED(newobj, OBJ_SCALABLE)) {
-			scale_item_to_level(newobj, 1);	// minimum level
-		}
+		scale_item_to_level(newobj, 1);	// minimum level
 		load_otrigger(newobj);
 	}
 	
 	// additional tree if orchard
 	if (ROOM_CROP_FLAGGED(inter_room, CROPF_IS_ORCHARD)) {
 		obj_to_char_or_room((newobj = read_object(o_TREE)), ch);
-		if (OBJ_FLAGGED(newobj, OBJ_SCALABLE)) {
-			scale_item_to_level(newobj, 1);	// minimum level
-		}
+		scale_item_to_level(newobj, 1);	// minimum level
 		load_otrigger(newobj);
 	}
 	

@@ -2124,9 +2124,7 @@ void give_resources(char_data *ch, Resource list[], bool split) {
 				obj = read_object(list[i].vnum);
 				
 				// scale item to minimum level
-				if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-					scale_item_to_level(obj, 0);
-				}
+				scale_item_to_level(obj, 0);
 				
 				obj_to_char_or_room(obj, ch);
 				load_otrigger(obj);

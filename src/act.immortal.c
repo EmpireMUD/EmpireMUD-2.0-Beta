@@ -2761,7 +2761,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 		strcpy(buf, " (unscaled)");
 	}
 	
-	msg_to_char(ch, "Gear level: [&g%.2f%s&0], VNum: [&g%5d&0], Type: &c%s&0\r\n", rate_item(j), buf, vnum, item_types[(int) GET_OBJ_TYPE(j)]);
+	msg_to_char(ch, "Gear rating: [&g%.2f%s&0], VNum: [&g%5d&0], Type: &c%s&0\r\n", rate_item(j), buf, vnum, item_types[(int) GET_OBJ_TYPE(j)]);
 	msg_to_char(ch, "L-Des: %s\r\n", GET_OBJ_DESC(j, ch, OBJ_DESC_LONG));
 	
 	if (GET_OBJ_ACTION_DESC(j)) {
@@ -4939,7 +4939,7 @@ ACMD(do_reload) {
 ACMD(do_rescale) {
 	void scale_item_to_level(obj_data *obj, int level);
 
-	obj_data *obj, *new, *proto = NULL;
+	obj_data *obj, *new;
 	char_data *vict;
 	int level;
 	
@@ -4975,34 +4975,28 @@ ACMD(do_rescale) {
 		}
 	}
 	else if ((obj = get_obj_in_list_vis(ch, arg, ch->carrying)) || (obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
+		// TODO this needs the same logical transfer of stats as the object loader in objsave.c uses to update items -paul
+		
 		// item mode
-		if (!OBJ_FLAGGED(obj, OBJ_SCALABLE) && !(proto = obj_proto(GET_OBJ_VNUM(obj)))) {
-			msg_to_char(ch, "That object cannot be rescaled.\r\n");
-		}
-		else if (proto && !OBJ_FLAGGED(proto, OBJ_SCALABLE)) {
-			act("$p is not scalable.", FALSE, ch, obj, NULL, TO_CHAR);
-		}
-		else {
-			if (!OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-				new = read_object(GET_OBJ_VNUM(obj));
-				GET_OBJ_EXTRA(new) |= GET_OBJ_EXTRA(obj) & preserve_flags;
-				
-				// swap binds
-				OBJ_BOUND_TO(new) = OBJ_BOUND_TO(obj);
-				OBJ_BOUND_TO(obj) = NULL;
-				
-				swap_obj_for_obj(obj, new);
-				extract_obj(obj);
-				obj = new;
-			}
+		if (!OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
+			new = read_object(GET_OBJ_VNUM(obj));
+			GET_OBJ_EXTRA(new) |= GET_OBJ_EXTRA(obj) & preserve_flags;
 			
-			scale_item_to_level(obj, level);
+			// swap binds
+			OBJ_BOUND_TO(new) = OBJ_BOUND_TO(obj);
+			OBJ_BOUND_TO(obj) = NULL;
 			
-			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s has rescaled obj %s to level %d at %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), GET_OBJ_CURRENT_SCALE_LEVEL(obj), room_log_identifier(IN_ROOM(ch)));
-			sprintf(buf, "You rescale $p to level %d.", GET_OBJ_CURRENT_SCALE_LEVEL(obj));
-			act(buf, FALSE, ch, obj, NULL, TO_CHAR);
-			act("$n rescales $p.", FALSE, ch, obj, NULL, TO_ROOM);
+			swap_obj_for_obj(obj, new);
+			extract_obj(obj);
+			obj = new;
 		}
+		
+		scale_item_to_level(obj, level);
+		
+		syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s has rescaled obj %s to level %d at %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), GET_OBJ_CURRENT_SCALE_LEVEL(obj), room_log_identifier(IN_ROOM(ch)));
+		sprintf(buf, "You rescale $p to level %d.", GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+		act(buf, FALSE, ch, obj, NULL, TO_CHAR);
+		act("$n rescales $p.", FALSE, ch, obj, NULL, TO_ROOM);
 	}
 	else {
 		msg_to_char(ch, "You don't see %s %s here.\r\n", AN(arg), arg);

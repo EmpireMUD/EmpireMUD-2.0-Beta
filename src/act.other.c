@@ -298,9 +298,7 @@ INTERACTION_FUNC(skin_interact) {
 		
 	for (num = 0; num < interaction->quantity; ++num) {
 		obj = read_object(interaction->vnum);
-		if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-			scale_item_to_level(obj, 1);	// min scale
-		}
+		scale_item_to_level(obj, 1);	// min scale
 		obj_to_char_or_room(obj, ch);
 		load_otrigger(obj);
 	}
