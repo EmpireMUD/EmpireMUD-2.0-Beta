@@ -1684,7 +1684,7 @@ ACMD(do_equipment) {
 	}
 	
 	if (!IS_NPC(ch)) {
-		msg_to_char(ch, "You are using (gear level %d):\r\n", (int) GET_GEAR_LEVEL(ch));
+		msg_to_char(ch, "You are using (gear level %d):\r\n", GET_GEAR_LEVEL(ch));
 	}
 	else {
 		send_to_char("You are using:\r\n", ch);

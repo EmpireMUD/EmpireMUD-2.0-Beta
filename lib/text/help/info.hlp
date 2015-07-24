@@ -517,10 +517,9 @@ Skill level: This level is determined by your top 3 skills, and is currently
    in parentheses on your "score". Skill levels are grouped into three ranges:
    Basic (up to 50), Specialty (up to 75), and Class (up to 100).
 
-Gear level: The bonuses you receive from your equipment form your gear level.
-   There is no upper limit on this number, and any gear you have equipped
-   (except sheathed weapons) contributes to your gear level. You can see it
-   by typing "eq".
+Gear level: Your gear level raises your total level to 50 more than the average
+   level of the gear you have equipped (except sheathed weapons, clothes, and
+   some other slots). You can see it by typing "eq".
 
 Composite level: This is the sum of your skill and gear levels. It is the
    number used for scaling mobs to fight you. This is the level shown on your

@@ -967,7 +967,7 @@ ACMD(do_reforge) {
 		msg_to_char(ch, "You can't %s that item.\r\n", reforge_data[subcmd].command);
 	}
 	else if (is_abbrev(arg2, "name")) {
-		// calculate gem cost based on the gear level of the item
+		// calculate gem cost based on the gear rating of the item
 		res[0].vnum = o_IRIDESCENT_IRIS;
 		res[0].amount = MAX(1, rate_item(obj) / 3);
 		
@@ -1018,7 +1018,7 @@ ACMD(do_reforge) {
 	else if (is_abbrev(arg2, "renew")) {
 		proto = obj_proto(GET_OBJ_VNUM(obj));
 		
-		// calculate gem cost based on the gear level of the original item
+		// calculate gem cost based on the gear rating of the original item
 		res[0].vnum = o_BLOODSTONE;
 		res[0].amount = MAX(1, (proto ? rate_item(proto) : rate_item(obj)) / 3);
 		
@@ -1071,7 +1071,7 @@ ACMD(do_reforge) {
 		}
 	}
 	else if (is_abbrev(arg2, "superior")) {
-		// calculate gem cost based on the gear level of the item
+		// calculate gem cost based on the gear rating of the item
 		res[0].vnum = o_GLOWING_SEASHELL;
 		res[0].amount = MAX(1, rate_item(obj) / 3);
 		proto = obj_proto(GET_OBJ_VNUM(obj));

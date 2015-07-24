@@ -2274,7 +2274,7 @@ struct player_special_data_saved {
 struct player_special_data {
 	struct player_special_data_saved saved;
 	
-	double gear_level;	// total of rate_item() on equipment
+	int gear_level;	// computed gear level -- determine_gear_level()
 	struct coin_data *coins;	// linked list of coin data
 	
 	char *lastname;	// Last name

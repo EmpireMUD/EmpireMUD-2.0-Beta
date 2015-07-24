@@ -404,9 +404,9 @@ are in one, or in miscellaneous coins if not).
 The time to post the item is in real hours, and defaults to the maximum post
 time if you don't specify it. The minimum time is 1 hour.
 
-You must pay a small fee to post an item, based on its gear level. You will get
-this money back if your item sells successfully. However, there is a 5% charge
-for each successful sale.
+You must pay a small fee to post an item, based on its gear rating. You will
+get this money back if your item sells successfully. However, there is a 5%
+charge for each successful sale.
 
 For example, if an item costs you 4 coins to post and you sell it for 10 coins,
 You'll receive 9 coins (95% of the sale price) plus your original 4 back, for

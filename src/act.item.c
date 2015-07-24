@@ -1919,7 +1919,7 @@ void trade_post(char_data *ch, char *argument) {
 	
 	if (!*itemarg || !*costarg) {
 		msg_to_char(ch, "Usage: trade post <item> <cost> [time]\r\n");
-		msg_to_char(ch, "It costs 1 coin per gear level to post an item (minimum 1; refundable).\r\n");
+		msg_to_char(ch, "It costs 1 coin per gear rating to post an item (minimum 1; refundable).\r\n");
 		msg_to_char(ch, "The item must be in your inventory. Cost is number of your empire's coins.\r\n");
 		msg_to_char(ch, "Time is in real hours (default: %d).\r\n", config_get_int("trading_post_max_hours"));
 	}

@@ -502,17 +502,17 @@ A great blacksmith (weapons) or tailor (armors and shields) can use this
 ability in two ways:
 
 Name: You can take a generic item and give it a name. The name must contain
-the original name (except a leading a/an/the). Requires 1 blue iris
-per 3 gear levels on the item.
+the original name (except a leading a/an/the). Requires 1 blue iris per 3 gear
+rating on the item.
 
 Renew: This undoes any enchantments, disenchantments, name, superior quality, 
 and all other effects, and restores the item to its base stats. Requires 1
-bloodstone per 3 gear levels on the base (unmodified) item.
+bloodstone per 3 gear rating on the base (unmodified) item.
 
 Superior: If the item is a crafted item that could have superior qualities,
 this adds those qualities and marks it (superior). You can only use this on
 the normal version of an item that can be made superior, and only if you have
-the correct Master ability. Requires 1 green seashell per 3 gear levels on the
+the correct Master ability. Requires 1 green seashell per 3 gear rating on the
 item.
 
 See also: MASTER BLACKSMITH, MASTER TAILOR

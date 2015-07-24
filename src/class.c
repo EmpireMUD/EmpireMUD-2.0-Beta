@@ -497,7 +497,7 @@ ACMD(do_class) {
 			msg_to_char(ch, "You don't have a class. You can earn your class by raising two skills to 76 or higher.\r\n");
 		}
 		else {
-			msg_to_char(ch, "%s\r\nClass: %s (%s) %d/%d/%d\r\n", PERS(ch, ch, TRUE), class_data[GET_CLASS(ch)].name, class_role[(int) GET_CLASS_ROLE(ch)], GET_SKILL_LEVEL(ch), (int) GET_GEAR_LEVEL(ch), GET_COMPUTED_LEVEL(ch));
+			msg_to_char(ch, "%s\r\nClass: %s (%s) %d/%d/%d\r\n", PERS(ch, ch, TRUE), class_data[GET_CLASS(ch)].name, class_role[(int) GET_CLASS_ROLE(ch)], GET_SKILL_LEVEL(ch), GET_GEAR_LEVEL(ch), GET_COMPUTED_LEVEL(ch));
 			
 			// only show roles if there are any
 			if (class_data[GET_CLASS(ch)].role[0].role != ROLE_NONE) {
