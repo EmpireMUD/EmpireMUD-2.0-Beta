@@ -2758,7 +2758,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 		sprintf(buf, " (%d)", GET_OBJ_CURRENT_SCALE_LEVEL(j));
 	}
 	else {
-		strcpy(buf, " (unscalable)");
+		strcpy(buf, " (unscaled)");
 	}
 	
 	msg_to_char(ch, "Gear level: [&g%.2f%s&0], VNum: [&g%5d&0], Type: &c%s&0\r\n", rate_item(j), buf, vnum, item_types[(int) GET_OBJ_TYPE(j)]);
