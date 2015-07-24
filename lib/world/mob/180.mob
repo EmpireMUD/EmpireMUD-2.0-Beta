@@ -5,6 +5,10 @@ A massive molten fiend is chained to the wall here, half-submerged in magma!
 ~
 0 0 bdxyAB c
 0 0 0 16
+I 4 2347 1.00 1 C  # LOOT: the alchemical filter pattern
+I 4 2348 1.00 1 C  # LOOT: the antiquated device design
+I 4 2349 1.00 1 C  # LOOT: the concealed pouch pattern
+I 4 2350 1.00 1 C  # LOOT: the tinker's harness pattern
 I 4 18075 10.00 1 a  # LOOT: a firecloth skirt
 I 4 18076 10.00 1 a  # LOOT: firecloth pauldrons
 I 4 18077 10.00 1 a  # LOOT: a hearthflame skirt
@@ -31,6 +35,7 @@ T 18076
 T 10000
 T 18079
 T 18080
+T 18081
 S
 #18077
 elemental fire~

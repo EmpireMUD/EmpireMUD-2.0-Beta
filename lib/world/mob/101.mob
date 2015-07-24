@@ -32,6 +32,10 @@ Berk is crouched by the fire, whittling some wood.
 1 0 0 4
 I 4 10109 10.00 1 X  # LOOT: the bloodletter's ring
 I 4 10107 5.00 1 X  # LOOT: a pack of dry rations
+I 4 2347 1.00 1 c  # LOOT: the alchemical filter pattern
+I 4 2348 1.00 1 c  # LOOT: the antiquated device design
+I 4 2349 1.00 1 c  # LOOT: the concealed pouch pattern
+I 4 2350 1.00 1 c  # LOOT: the tinker's harness pattern
 T 10000
 T 10105
 S
@@ -44,6 +48,10 @@ Jorr is cooking a pot of beans over the fire.
 2 0 0 12
 I 4 10105 10.00 1 X  # LOOT: black leather armor
 I 4 10107 5.00 1 X  # LOOT: a pack of dry rations
+I 4 2347 1.00 1 c  # LOOT: the alchemical filter pattern
+I 4 2348 1.00 1 c  # LOOT: the antiquated device design
+I 4 2349 1.00 1 c  # LOOT: the concealed pouch pattern
+I 4 2350 1.00 1 c  # LOOT: the tinker's harness pattern
 T 10000
 T 10106
 S
@@ -56,6 +64,10 @@ Tranc is strapping on his armor.
 1 0 0 5
 I 4 10106 10.00 1 X  # LOOT: a spiked aklys
 I 4 10108 5.00 1 X  # LOOT: an armored neck guard
+I 4 2347 1.00 1 c  # LOOT: the alchemical filter pattern
+I 4 2348 1.00 1 c  # LOOT: the antiquated device design
+I 4 2349 1.00 1 c  # LOOT: the concealed pouch pattern
+I 4 2350 1.00 1 c  # LOOT: the tinker's harness pattern
 T 10000
 T 10107
 S
@@ -115,7 +127,7 @@ A baby dragon has hatched!
 ~
 0 0 bdy c
 0 0 2 9
-I 0 3012 100.00 1  # BUTCHER: UNKNOWN
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 10006 10.00 1  # SKIN: a dragon scale
 I 1 1351 100.00 1  # SKIN: a large skin
 T 10024

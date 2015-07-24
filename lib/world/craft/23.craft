@@ -472,4 +472,118 @@ R
 R
 176 2  # 2x an ingot of nocturnium
 S
+#2351
+alchemical filter~
+2351 1  # 1x an alchemical filter
+2 244 0 24 2347
+L
+200
+R
+1200 2  # 2x a handful of whitegrass
+R
+1201 2  # 2x some fiveleaf
+R
+1202 2  # 2x a twig of redthorn
+R
+1203 2  # 2x some magewhisper sepals
+R
+1204 2  # 2x a daggerbite frond
+R
+1205 2  # 2x some bileberries
+R
+176 2  # 2x an ingot of nocturnium
+S
+#2352
+antique device parts~
+2352 1  # 1x a pile of antique device parts
+1 247 0 24 2348
+L
+200
+R
+161 8  # 8x a silver nugget
+R
+162 2  # 2x a pile of gold dust
+R
+178 4  # 4x a copper ingot
+S
+#2353
+concealed pouches~
+2353 1  # 1x some concealed silk pouches
+4 245 0 24 2349
+L
+200
+R
+103 1  # 1x a yellow lightning stone
+R
+104 1  # 1x a red bloodstone
+R
+1206 1  # 1x an iridescent blue iris
+R
+1300 1  # 1x a glowing green seashell
+R
+1359 6  # 6x a bolt of cloth
+S
+#2354
+tinker harness~
+2354 1  # 1x a tinker's harness
+1 246 0 24 2350
+L
+200
+R
+177 2  # 2x an imperium ingot
+R
+175 8  # 8x an iron ingot
+R
+1354 2  # 2x a shark skin
+R
+1355 2  # 2x some snakeskin
+S
+#2355
+chemists cleansing cap~
+2355 1  # 1x a chemist's cleansing cap
+4 -1 g 24 2351
+L
+200
+R
+2351 1  # 1x an alchemical filter
+R
+1357 2  # 2x a large piece of leather
+S
+#2356
+antiquated arcane apparatus~
+2356 1  # 1x an antiquated arcane apparatus
+2 -1 h 24 2352
+L
+200
+R
+2352 1  # 1x a pile of antique device parts
+R
+162 1  # 1x a pile of gold dust
+R
+178 2  # 2x a copper ingot
+S
+#2357
+superb smuggling sash~
+2357 1  # 1x a superb smuggling sash
+4 -1 g 24 2353
+L
+200
+R
+2353 1  # 1x some concealed silk pouches
+R
+1359 6  # 6x a bolt of cloth
+S
+#2358
+traveling tinkers trappings~
+2358 1  # 1x a traveling tinker's trappings
+4 -1 g 24 2354
+L
+200
+R
+2354 1  # 1x a tinker's harness
+R
+1359 4  # 4x a bolt of cloth
+R
+1357 2  # 2x a large piece of leather
+S
 $
