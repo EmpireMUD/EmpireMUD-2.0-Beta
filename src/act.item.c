@@ -1238,7 +1238,7 @@ void scale_item_to_level(obj_data *obj, int level) {
 	// if it's not scalable, we can still set its scale level if the prototype is not scalable
 	// (if the prototype IS scalable, but this instance isn't, we can't rescale it this way)
 	if (!OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-		if (GET_OBJ_VNUM(obj) != NOTHING && (proto = obj_proto(GET_OBJ_VNUM(obj)))) {
+		if (GET_OBJ_VNUM(obj) != NOTHING && (proto = obj_proto(GET_OBJ_VNUM(obj))) && !OBJ_FLAGGED(proto, OBJ_SCALABLE)) {
 			GET_OBJ_CURRENT_SCALE_LEVEL(obj) = level;
 		}
 		
@@ -1516,7 +1516,7 @@ void trade_check(char_data *ch, char *argument) {
 			*scale = '\0';
 		}
 		
-		snprintf(line, sizeof(line), "%s%2d. %s: %d coin%s [lvl %d]%s%s&0\r\n", IS_SET(tpd->state, TPD_EXPIRED) ? "&r" : "", ++count, GET_OBJ_SHORT_DESC(tpd->obj), tpd->buy_cost, PLURAL(tpd->buy_cost), GET_OBJ_CURRENT_SCALE_LEVEL(tpd->obj), scale, IS_SET(tpd->state, TPD_EXPIRED) ? " (expired)" : "");
+		snprintf(line, sizeof(line), "%s%2d. %s: %d coin%s%s%s&0\r\n", IS_SET(tpd->state, TPD_EXPIRED) ? "&r" : "", ++count, GET_OBJ_SHORT_DESC(tpd->obj), tpd->buy_cost, PLURAL(tpd->buy_cost), scale, IS_SET(tpd->state, TPD_EXPIRED) ? " (expired)" : "");
 		
 		if (size + strlen(line) < sizeof(output)) {
 			size += snprintf(output + size, sizeof(output) - size, "%s", line);
@@ -1597,7 +1597,7 @@ void trade_list(char_data *ch, char *argument) {
 			*exchange = '\0';
 		}
 		
-		snprintf(line, sizeof(line), "%s%2d. %s: %d%s %s [lvl %d]%s%s%s%s%s&0\r\n", (tpd->player == GET_IDNUM(ch)) ? "&r" : (can_wear ? "" : "&R"), ++count, GET_OBJ_SHORT_DESC(tpd->obj), tpd->buy_cost, exchange, (coin_emp ? EMPIRE_ADJECTIVE(coin_emp) : "misc"), GET_OBJ_CURRENT_SCALE_LEVEL(tpd->obj), scale, (OBJ_FLAGGED(tpd->obj, OBJ_SUPERIOR) ? " (sup)" : ""), OBJ_FLAGGED(tpd->obj, OBJ_ENCHANTED) ? " (ench)" : "", (tpd->player == GET_IDNUM(ch)) ? " (your auction)" : "", can_wear ? "" : " (can't use)");
+		snprintf(line, sizeof(line), "%s%2d. %s: %d%s %s%s%s%s%s%s&0\r\n", (tpd->player == GET_IDNUM(ch)) ? "&r" : (can_wear ? "" : "&R"), ++count, GET_OBJ_SHORT_DESC(tpd->obj), tpd->buy_cost, exchange, (coin_emp ? EMPIRE_ADJECTIVE(coin_emp) : "misc"), scale, (OBJ_FLAGGED(tpd->obj, OBJ_SUPERIOR) ? " (sup)" : ""), OBJ_FLAGGED(tpd->obj, OBJ_ENCHANTED) ? " (ench)" : "", (tpd->player == GET_IDNUM(ch)) ? " (your auction)" : "", can_wear ? "" : " (can't use)");
 		
 		if (size + strlen(line) < sizeof(output)) {
 			size += snprintf(output + size, sizeof(output) - size, "%s", line);
