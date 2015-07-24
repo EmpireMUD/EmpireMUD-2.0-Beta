@@ -2761,7 +2761,7 @@ struct wear_data_type {
 	char *eq_prompt;	// shown on 'eq' list
 	bitvector_t item_wear;	// matching ITEM_WEAR_x
 	bool count_stats;	// FALSE means it's a slot like in-sheath, and adds nothing to the character
-	bool adds_gear_level;	// whether or not it contributes to player gear level
+	double gear_level_mod;	// modifier (slot significance) when counting gear level
 	int cascade_pos;	// for ring 1 -> ring 2; use NO_WEAR if it doesn't cascade
 	char *already_wearing;	// error message when slot is full
 	char *wear_msg_to_room;	// msg act()'d to room on wear

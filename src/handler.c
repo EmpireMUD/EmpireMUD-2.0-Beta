@@ -3789,11 +3789,6 @@ void equip_char(char_data *ch, obj_data *obj, int pos) {
 		obj->worn_by = ch;
 		obj->worn_on = pos;
 
-		// update gear level for characters
-		if (!IS_NPC(ch) && wear_data[pos].adds_gear_level) {
-			GET_GEAR_LEVEL(ch) += rate_item(obj);
-		}
-
 		// lights?
 		if (IN_ROOM(ch) && OBJ_FLAGGED(obj, OBJ_LIGHT)) {
 			ROOM_LIGHTS(IN_ROOM(ch))++;
@@ -4108,11 +4103,6 @@ obj_data *unequip_char(char_data *ch, int pos) {
 		obj = GET_EQ(ch, pos);
 		obj->worn_by = NULL;
 		obj->worn_on = NO_WEAR;
-		
-		// adjust gear level
-		if (!IS_NPC(ch) && wear_data[pos].adds_gear_level) {
-			GET_GEAR_LEVEL(ch) -= rate_item(obj);
-		}
 
 		// adjust lights
 		if (IN_ROOM(ch) && OBJ_FLAGGED(obj, OBJ_LIGHT)) {

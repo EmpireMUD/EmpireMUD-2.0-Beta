@@ -348,6 +348,7 @@ ACMD(do_mount) {
 			saddle = find_best_saddle(ch);
 			if (saddle) {
 				equip_char(ch, saddle, WEAR_SADDLE);
+				determine_gear_level(ch);
 			}
 		}
 		

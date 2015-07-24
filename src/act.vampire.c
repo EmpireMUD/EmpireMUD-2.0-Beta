@@ -827,6 +827,7 @@ ACMD(do_bloodsword) {
 	act("$n twists and molds $s own blood into $p.", TRUE, ch, obj, NULL, TO_ROOM);
 	
 	equip_char(ch, obj, WEAR_WIELD);
+	determine_gear_level(ch);
 	
 	gain_ability_exp(ch, ABIL_BLOODSWORD, 20);
 	load_otrigger(obj);

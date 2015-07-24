@@ -551,6 +551,7 @@ static void perform_wear(char_data *ch, obj_data *obj, int where) {
 
 	wear_message(ch, obj, where);
 	equip_char(ch, obj, where);
+	determine_gear_level(ch);
 }
 
 

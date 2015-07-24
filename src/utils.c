@@ -2058,6 +2058,54 @@ void command_lag(char_data *ch, int wait_type) {
 }
 
 
+/**
+* Calculates a player's gear level, based on what they have equipped.
+*
+* @param char_data *ch The player to set gear level for.
+*/
+void determine_gear_level(char_data *ch) {
+	extern const struct wear_data_type wear_data[NUM_WEARS];
+
+	double total, slots;
+	int avg, level, pos;
+	
+	// sanity check: we really have no work to do for mobs
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	level = total = slots = 0;	// init
+	
+	for (pos = 0; pos < NUM_WEARS; ++pos) {
+		// some items count as more or less than 1 slot
+		slots += wear_data[pos].gear_level_mod;
+		
+		if (GET_EQ(ch, pos)) {
+			total += GET_OBJ_CURRENT_SCALE_LEVEL(GET_EQ(ch, pos)) * wear_data[pos].gear_level_mod;
+			
+			// bonuses
+			if (OBJ_FLAGGED(GET_EQ(ch, pos), OBJ_SUPERIOR)) {
+				total += 10;
+			}
+			if (OBJ_FLAGGED(GET_EQ(ch, pos), OBJ_HARD_DROP)) {
+				total += 10;
+			}
+			if (OBJ_FLAGGED(GET_EQ(ch, pos), OBJ_GROUP_DROP)) {
+				total += 10;
+			}
+		}
+	}
+	
+	// determine average gear level of the player's slots
+	avg = round(total / slots);
+	
+	// player's gear level (which will be added to skill level) is:
+	level = avg + 50 - 100;	// 50 higher than the average scaled level of their gear, -100 to compensate for skill level
+	
+	GET_GEAR_LEVEL(ch) = MAX(level, 0);
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// RESOURCE UTILS //////////////////////////////////////////////////////////
 

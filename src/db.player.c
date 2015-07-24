@@ -1050,7 +1050,6 @@ int enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 
 	char lbuf[MAX_STRING_LENGTH];
 	int i, iter;
-	double level;
 	empire_data *emp;
 	room_data *load_room = NULL, *map_loc;
 	char_data *ch = d->character;
@@ -1139,17 +1138,9 @@ int enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	affect_total(ch);
 	SAVE_CHAR(ch);
 		
-	// verify class/skill levels are up-to-date
+	// verify class and skill/gear levels are up-to-date
 	update_class(ch);
-	
-	// check equipment levels
-	level = 0;
-	for (iter = 0; iter < NUM_WEARS; ++iter) {
-		if (GET_EQ(ch, iter) && wear_data[iter].adds_gear_level) {
-			level += rate_item(GET_EQ(ch, iter));
-		}
-	}
-	GET_GEAR_LEVEL(ch) = level;
+	determine_gear_level(ch);
 	
 	// clear some player special data
 	GET_MARK_LOCATION(ch) = NOWHERE;
@@ -1432,6 +1423,7 @@ void start_new_character(char_data *ch) {
 		GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) = GET_DRINK_CONTAINER_CAPACITY(obj);
 		GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = LIQ_WATER;
 		obj_to_char(obj, ch);
+		determine_gear_level(ch);
 	}
 	
 	// apply any bonus traits that needed it
