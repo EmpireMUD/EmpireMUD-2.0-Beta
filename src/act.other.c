@@ -62,7 +62,7 @@ void perform_alternate(char_data *old, char_data *new) {
 	char sys[MAX_STRING_LENGTH], mort_in[MAX_STRING_LENGTH], mort_out[MAX_STRING_LENGTH], mort_alt[MAX_STRING_LENGTH], temp[256];
 	descriptor_data *desc, *next_d;
 	bool show_start = FALSE;
-	int invis_lev, old_invis;
+	int invis_lev, old_invis, last_tell;
 	empire_data *old_emp;
 	
 	if (!old || !new || !old->desc || new->desc) {
@@ -101,6 +101,9 @@ void perform_alternate(char_data *old, char_data *new) {
 	// save old char...
 	Objsave_char(old, RENT_RENTED);
 	SAVE_CHAR(old);
+	
+	// save this to switch over replies
+	last_tell = GET_LAST_TELL(old);
 	
 	// move desc (do this AFTER saving)
 	new->desc = old->desc;
@@ -171,6 +174,7 @@ void perform_alternate(char_data *old, char_data *new) {
 	}
 	
 	add_cooldown(new, COOLDOWN_ALTERNATE, SECS_PER_REAL_MIN);
+	GET_LAST_TELL(new) = last_tell;
 }
 
 
