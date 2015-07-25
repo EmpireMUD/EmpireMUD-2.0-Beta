@@ -1209,9 +1209,6 @@ int enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 		}
 	}
 	
-	// update recent level time so their highest recent level won't drop right away
-	GET_RECENT_LEVEL_TIME(ch) = time(0);
-	
 	// remove stale coins
 	cleanup_coins(ch);
 	
