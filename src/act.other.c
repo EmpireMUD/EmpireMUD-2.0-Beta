@@ -94,9 +94,6 @@ void perform_alternate(char_data *old, char_data *new) {
 	snprintf(mort_in, sizeof(mort_in), "%s has entered the game", temp);
 	snprintf(mort_out, sizeof(mort_in), "%s has left the game", PERS(old, old, TRUE));
 	
-	// store last known level now
-	GET_LAST_KNOWN_LEVEL(old) = GET_COMPUTED_LEVEL(old);
-	
 	// peace out
 	if (!GET_INVIS_LEV(old)) {
 		act("$n has left the game.", TRUE, old, NULL, NULL, TO_ROOM);
@@ -1230,9 +1227,6 @@ ACMD(do_quit) {
 			player_death(ch);
 			died = TRUE;
 		}
-				
-		// store last known level now
-		GET_LAST_KNOWN_LEVEL(ch) = GET_COMPUTED_LEVEL(ch);
 		
 		if (!GET_INVIS_LEV(ch)) {
 			act("$n has left the game.", TRUE, ch, 0, 0, TO_ROOM);
@@ -1277,10 +1271,7 @@ ACMD(do_save) {
 		if (cmd) {
 			msg_to_char(ch, "Saving %s.\r\n", GET_NAME(ch));
 		}
-				
-		// store last known level now
-		GET_LAST_KNOWN_LEVEL(ch) = GET_COMPUTED_LEVEL(ch);
-
+		
 		write_aliases(ch);
 		SAVE_CHAR(ch);
 		Objsave_char(ch, RENT_CRASH);

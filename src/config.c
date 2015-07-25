@@ -1653,6 +1653,7 @@ void init_config_system(void) {
 	init_config(CONFIG_PLAYERS, "default_map_size", CONFTYPE_INT, "distance from the player that can be seen");
 	init_config(CONFIG_PLAYERS, "max_map_size", CONFTYPE_INT, "highest view radius a player may set");
 	init_config(CONFIG_PLAYERS, "blood_starvation_level", CONFTYPE_INT, "how low blood gets before a vampire is starving");
+	init_config(CONFIG_PLAYERS, "recent_level_minutes", CONFTYPE_INT, "how long to keep highest-recent-level");
 	
 	// skills
 	init_config(CONFIG_SKILLS, "exp_from_workforce", CONFTYPE_DOUBLE, "amount of exp gained per chore completion");

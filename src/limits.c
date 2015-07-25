@@ -487,7 +487,13 @@ void real_update_char(char_data *ch) {
 	if (IS_NPC(ch)) {
 		return;
 	}
-
+	
+	// update recent level data if level has gone up or it's been too long since we've seen a higher level
+	if (GET_COMPUTED_LEVEL(ch) >= GET_HIGHEST_RECENT_LEVEL(ch) || (time(0) - GET_RECENT_LEVEL_TIME(ch)) > (config_get_int("recent_level_minutes") * SECS_PER_REAL_MIN)) {
+		GET_HIGHEST_RECENT_LEVEL(ch) = GET_COMPUTED_LEVEL(ch);
+		GET_RECENT_LEVEL_TIME(ch) = time(0);
+	}
+	
 	// very drunk? more confused!
 	if (GET_COND(ch, DRUNK) > 350) {
 		GET_CONFUSED_DIR(ch) = number(0, NUM_SIMPLE_DIRS-1);
