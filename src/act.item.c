@@ -504,6 +504,7 @@ void perform_remove(char_data *ch, int pos) {
 		
 		// this may extract it, or drop it
 		unequip_char_to_inventory(ch, pos);
+		determine_gear_level(ch);
 	}
 }
 
