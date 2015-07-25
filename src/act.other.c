@@ -62,8 +62,7 @@ void perform_alternate(char_data *old, char_data *new) {
 	char sys[MAX_STRING_LENGTH], mort_in[MAX_STRING_LENGTH], mort_out[MAX_STRING_LENGTH], mort_alt[MAX_STRING_LENGTH], temp[256];
 	descriptor_data *desc, *next_d;
 	bool show_start = FALSE;
-	char_data *ch_iter;
-	int invis_lev, old_invis, last_tell;
+	int invis_lev, old_invis;
 	empire_data *old_emp;
 	
 	if (!old || !new || !old->desc || new->desc) {
@@ -102,16 +101,6 @@ void perform_alternate(char_data *old, char_data *new) {
 	// save old char...
 	Objsave_char(old, RENT_RENTED);
 	SAVE_CHAR(old);
-	
-	// switch over replies
-	last_tell = GET_LAST_TELL(old);
-	if (invis_lev <= LVL_APPROVED) {
-		for (ch_iter = character_list; ch_iter; ch_iter = ch_iter->next) {
-			if (!IS_NPC(ch_iter) && GET_LAST_TELL(ch_iter) == GET_IDNUM(old)) {
-				GET_LAST_TELL(ch_iter) = GET_IDNUM(new);
-			}
-		}
-	}
 	
 	// move desc (do this AFTER saving)
 	new->desc = old->desc;
@@ -182,7 +171,6 @@ void perform_alternate(char_data *old, char_data *new) {
 	}
 	
 	add_cooldown(new, COOLDOWN_ALTERNATE, SECS_PER_REAL_MIN);
-	GET_LAST_TELL(new) = last_tell;
 }
 
 
@@ -383,6 +371,12 @@ ACMD(do_alternate) {
 	}
 	else if (ch->desc->str) {
 		msg_to_char(ch, "You can't alterante while editing text.\r\n");
+	}
+	else if (ch->desc->snooping) {
+		msg_to_char(ch, "You can't alternate while snooping.\r\n");
+	}
+	else if (GET_OLC_TYPE(ch->desc) != 0) {
+		msg_to_char(ch, "You can't alternate with an OLC editor open.\r\n");
 	}
 	else if (ROOM_OWNER(IN_ROOM(ch)) && empire_is_hostile(ROOM_OWNER(IN_ROOM(ch)), GET_LOYALTY(ch), IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't alternate in hostile territory.\r\n");
