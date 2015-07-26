@@ -2750,15 +2750,15 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	struct obj_custom_message *ocm;
 
 	msg_to_char(ch, "Name: '&y%s&0', Aliases: %s\r\n", GET_OBJ_DESC(j, ch, OBJ_DESC_SHORT), GET_OBJ_KEYWORDS(j));
-	
-	if (OBJ_FLAGGED(j, OBJ_SCALABLE)) {
-		sprintf(buf, " (%d-%d)", GET_OBJ_MIN_SCALE_LEVEL(j), GET_OBJ_MAX_SCALE_LEVEL(j));
-	}
-	else if (GET_OBJ_CURRENT_SCALE_LEVEL(j) > 0) {
+
+	if (GET_OBJ_CURRENT_SCALE_LEVEL(j) > 0) {
 		sprintf(buf, " (%d)", GET_OBJ_CURRENT_SCALE_LEVEL(j));
 	}
+	else if (GET_OBJ_MIN_SCALE_LEVEL(j) > 0 || GET_OBJ_MAX_SCALE_LEVEL(j) > 0) {
+		sprintf(buf, " (%d-%d)", GET_OBJ_MIN_SCALE_LEVEL(j), GET_OBJ_MAX_SCALE_LEVEL(j));
+	}
 	else {
-		strcpy(buf, " (unscaled)");
+		strcpy(buf, " (no scale limit)");
 	}
 	
 	msg_to_char(ch, "Gear rating: [&g%.2f%s&0], VNum: [&g%5d&0], Type: &c%s&0\r\n", rate_item(j), buf, vnum, item_types[(int) GET_OBJ_TYPE(j)]);
