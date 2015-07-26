@@ -2046,6 +2046,9 @@ void command_lag(char_data *ch, int wait_type) {
 					wait = 0.5 RL_SEC;
 				}
 			}
+			else {
+				wait = 0;	// indoors
+			}
 			break;
 		}
 	}
