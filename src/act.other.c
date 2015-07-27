@@ -336,12 +336,27 @@ INTERACTION_FUNC(skin_interact) {
 
 OFFER_VALIDATE(oval_rez) {
 	extern bool can_enter_instance(char_data *ch, struct instance_data *inst);
+	extern obj_data *find_obj(int n);
+	extern room_data *obj_room(obj_data *obj);
 	
 	room_data *loc = real_room(offer->location);
+	obj_data *corpse;
 	
 	if (!loc || (ROOM_INSTANCE(loc) && !can_enter_instance(ch, ROOM_INSTANCE(loc)))) {
 		msg_to_char(ch, "You can't seem to resurrect there. Perhaps the adventure is full.\r\n");
 		return FALSE;
+	}
+	
+	// if already respawned, verify corpse location
+	if (!IS_DEAD(ch)) {
+		if (!(corpse = find_obj(GET_LAST_CORPSE_ID(ch))) || !IS_CORPSE(corpse)) {
+			msg_to_char(ch, "You can't resurrect because your corpse is gone.\r\n");
+			return FALSE;
+		}
+		if (obj_room(corpse) != loc) {
+			msg_to_char(ch, "You can't resurrect because your corpse has moved from the resurrection location.\r\n");
+			return FALSE;
+		}
 	}
 	
 	return TRUE;
