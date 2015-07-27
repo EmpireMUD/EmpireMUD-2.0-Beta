@@ -4473,7 +4473,7 @@ struct offer_data *add_offer(char_data *ch, char_data *from, int type, int data)
 	
 	// ensure no existing offer (overwrite if so)
 	for (iter = GET_OFFERS(ch); iter; iter = iter->next) {
-		if (offer->type == type && offer->from == GET_IDNUM(from)) {
+		if (iter->type == type && iter->from == GET_IDNUM(from)) {
 			offer = iter;
 			break;
 		}
