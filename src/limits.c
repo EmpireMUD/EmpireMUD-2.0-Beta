@@ -405,7 +405,6 @@ void point_update_char(char_data *ch) {
 */
 void real_update_char(char_data *ch) {
 	extern bool can_wear_item(char_data *ch, obj_data *item, bool send_messages);
-	void clean_offers(char_data *ch);
 	extern int compute_bonus_exp_per_day(char_data *ch);
 	extern int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname);	
 	void random_encounter(char_data *ch);
@@ -488,9 +487,6 @@ void real_update_char(char_data *ch) {
 	if (IS_NPC(ch)) {
 		return;
 	}
-	
-	// remove stale offers
-	clean_offers(ch);
 	
 	// update recent level data if level has gone up or it's been too long since we've seen a higher level
 	if (GET_COMPUTED_LEVEL(ch) >= GET_HIGHEST_RECENT_LEVEL(ch) || (time(0) - GET_RECENT_LEVEL_TIME(ch)) > (config_get_int("recent_level_minutes") * SECS_PER_REAL_MIN)) {
@@ -1836,6 +1832,7 @@ int move_gain(char_data *ch, bool info_only) {
 * update for that tick, to avoid iterating a second time over the same data.
 */
 void point_update(bool run_real) {
+	void clean_offers(char_data *ch);
 	void save_daily_cycle();
 	void update_players_online_stats();
 	extern int max_players_today;
@@ -1857,6 +1854,11 @@ void point_update(bool run_real) {
 	// characters
 	for (ch = character_list; ch; ch = next_ch) {
 		next_ch = ch->next;
+		
+		// remove stale offers -- this needs to happen even if dead (resurrect)
+		if (!IS_NPC(ch)) {
+			clean_offers(ch);
+		}
 		
 		if (EXTRACTED(ch) || IS_DEAD(ch)) {
 			continue;
