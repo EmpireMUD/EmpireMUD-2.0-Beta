@@ -1446,18 +1446,20 @@ bool can_wear_item(char_data *ch, obj_data *item, bool send_messages) {
 	}
 	
 	// check levels
-	if (OBJ_FLAGGED(item, OBJ_BIND_ON_PICKUP)) {
-		level_min = GET_OBJ_CURRENT_SCALE_LEVEL(item) - 50;
-	}
-	else {
-		level_min = GET_OBJ_CURRENT_SCALE_LEVEL(item) - 25;
-	}
-	if (GET_HIGHEST_RECENT_LEVEL(ch) < level_min) {
-		if (send_messages) {
-			snprintf(buf, sizeof(buf), "You need to be level %d to use $p.", level_min);
-			act(buf, FALSE, ch, item, NULL, TO_CHAR);
+	if (!IS_IMMORTAL(ch)) {
+		if (OBJ_FLAGGED(item, OBJ_BIND_ON_PICKUP)) {
+			level_min = GET_OBJ_CURRENT_SCALE_LEVEL(item) - 50;
 		}
-		return FALSE;
+		else {
+			level_min = GET_OBJ_CURRENT_SCALE_LEVEL(item) - 25;
+		}
+		if (GET_HIGHEST_RECENT_LEVEL(ch) < level_min) {
+			if (send_messages) {
+				snprintf(buf, sizeof(buf), "You need to be level %d to use $p.", level_min);
+				act(buf, FALSE, ch, item, NULL, TO_CHAR);
+			}
+			return FALSE;
+		}
 	}
 	
 	return TRUE;
