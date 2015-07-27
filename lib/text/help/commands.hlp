@@ -1308,6 +1308,19 @@ alias pol toggle political;look
 
 See also: ALIAS, IDEA
 #
+"SUMMON PLAYERS"
+
+Command:  summon player <name>
+
+This command allows you to teleport another player to your location. You can
+only summon a player who is grouped with you, and to do so you must be at an
+Astral Nexus with another player. That is, you need two players there
+(including you) to summon a third player.
+
+Players must accept the summon using 'accept'.
+
+See also: ACCEPT, ASTRAL NEXUS
+#
 SURVEY
 
 Usage:  survey
