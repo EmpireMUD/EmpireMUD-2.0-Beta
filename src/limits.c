@@ -405,6 +405,7 @@ void point_update_char(char_data *ch) {
 */
 void real_update_char(char_data *ch) {
 	extern bool can_wear_item(char_data *ch, obj_data *item, bool send_messages);
+	void clean_offers(char_data *ch);
 	extern int compute_bonus_exp_per_day(char_data *ch);
 	extern int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname);	
 	void random_encounter(char_data *ch);
@@ -487,6 +488,9 @@ void real_update_char(char_data *ch) {
 	if (IS_NPC(ch)) {
 		return;
 	}
+	
+	// remove stale offers
+	clean_offers(ch);
 	
 	// update recent level data if level has gone up or it's been too long since we've seen a higher level
 	if (GET_COMPUTED_LEVEL(ch) >= GET_HIGHEST_RECENT_LEVEL(ch) || (time(0) - GET_RECENT_LEVEL_TIME(ch)) > (config_get_int("recent_level_minutes") * SECS_PER_REAL_MIN)) {

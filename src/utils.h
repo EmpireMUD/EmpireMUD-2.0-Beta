@@ -711,15 +711,12 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_FIGHT_PROMPT(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->fight_prompt))
 #define GET_SLASH_CHANNELS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->slash_channels))
 #define GET_TITLE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->title))
+#define GET_OFFERS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->offers))
 #define POOFIN(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->poofin))
 #define POOFOUT(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->poofout))
 #define REBOOT_CONF(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->reboot_conf))
 #define REREAD_EMPIRE_TECH_ON_LOGIN(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->reread_empire_tech_on_login))
 #define RESTORE_ON_LOGIN(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->restore_on_login))
-#define GET_RESURRECT_LOCATION(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->resurrect_location))
-#define GET_RESURRECT_BY(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->resurrect_by))
-#define GET_RESURRECT_ABILITY(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->resurrect_ability))
-#define GET_RESURRECT_TIME(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->resurrect_time))
 
 
 // ch->player_specials.saved: player_special_data_saved

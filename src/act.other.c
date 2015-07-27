@@ -30,6 +30,7 @@
 /**
 * Contents:
 *   Helpers
+*   Accept/Reject Helpers
 *   Toggle Notifiers
 *   Commands
 */
@@ -309,6 +310,45 @@ INTERACTION_FUNC(skin_interact) {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// ACCEPT/REJECT HELPERS ///////////////////////////////////////////////////
+
+// helper types and functions
+#define OFFER_VALIDATE(name)  bool (name)(char_data *ch, struct offer_data *offer)
+#define OFFER_FINISH(name)  void (name)(char_data *ch, struct offer_data *offer)
+
+
+OFFER_VALIDATE(oval_rez) {
+	extern bool can_enter_instance(char_data *ch, struct instance_data *inst);
+	
+	room_data *loc = real_room(offer->location);
+	
+	if (!loc || (ROOM_INSTANCE(loc) && !can_enter_instance(ch, ROOM_INSTANCE(loc)))) {
+		msg_to_char(ch, "You can't seem to resurrect there. Perhaps the adventure is full.\r\n");
+		return FALSE;
+	}
+	
+	return TRUE;
+}
+
+OFFER_FINISH(ofin_rez) {
+	void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, int ability);
+	room_data *loc = real_room(offer->location);	// pre-validated
+	perform_resurrection(ch, is_playing(offer->from), loc, offer->data);
+}
+
+
+OFFER_VALIDATE(oval_summon) {
+	msg_to_char(ch, "Not implemented.\r\n");
+	return FALSE;
+}
+
+OFFER_FINISH(ofin_summon) {
+	// room_data *loc = real_room(offer->location);
+	msg_to_char(ch, "Not implemented.\r\n");
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// TOGGLE NOTIFIERS ////////////////////////////////////////////////////////
 
 /**
@@ -328,6 +368,143 @@ void afk_notify(char_data *ch) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// COMMANDS ////////////////////////////////////////////////////////////////
+
+// also reject / do_reject (search hint)
+ACMD(do_accept) {
+	char type_arg[MAX_INPUT_LENGTH], name_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	int max_duration = config_get_int("offer_time");
+	struct offer_data *ofiter, *offer, *temp;
+	int iter, type, ts;
+	bool found, dupe;
+	char_data *from;
+	
+	const char *mode[] = { "accept", "reject" };	// SCMD_ACCEPT, SCMD_REJECT
+	
+	// OFFER_x - Data for the offer system, for do_accept/reject
+	struct {
+		char *name;
+		int min_pos;
+		OFFER_VALIDATE(*validate_func);
+		OFFER_FINISH(*finish_func);
+	} offer_types[] = {
+		{ "resurrection", POS_DEAD, oval_rez, ofin_rez },	// uses offer->data for ability
+		{ "summon", POS_STANDING, oval_summon, ofin_summon },
+	
+		// end
+		{ "\n", POS_DEAD, NULL, NULL }
+	};
+
+	two_arguments(argument, type_arg, name_arg);
+	
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "NPCs cannot %s offers.\r\n", mode[subcmd]);
+		return;
+	}
+	
+	if (!*type_arg) {
+		msg_to_char(ch, "Usage: %s <type> [person]\r\n", mode[subcmd]);
+		if (GET_OFFERS(ch)) {
+			msg_to_char(ch, "You have the following offers available:\r\n");
+			
+			found = FALSE;
+			for (offer = GET_OFFERS(ch); offer; offer = offer->next) {
+				if (!(from = is_playing(offer->from))) {
+					continue;
+				}
+				
+				ts = time(0) - offer->time;
+				msg_to_char(ch, " %s - %s (%d seconds left)\r\n", GET_NAME(from), offer_types[offer->type].name, MAX(0, max_duration - ts));
+				found = TRUE;
+			}
+			if (!found) {
+				msg_to_char(ch, " none\r\n");
+			}
+		}
+		else {
+			msg_to_char(ch, "You have no offers available to %s.\r\n", mode[subcmd]);
+		}
+		return;
+	}
+	
+	// determine type
+	type = -1;
+	for (iter = 0; *offer_types[iter].name != '\n'; ++iter) {
+		if (is_abbrev(type_arg, offer_types[iter].name)) {
+			type = iter;
+			break;
+		}
+	}
+	if (type == -1) {
+		msg_to_char(ch, "Invalid type.\r\n");
+		return;
+	}
+	if (!offer_types[type].validate_func || !offer_types[type].finish_func) {
+		msg_to_char(ch, "That offer type is not currently implemented.\r\n");
+		return;
+	}
+	
+	// find entry
+	offer = NULL;
+	dupe = FALSE;
+	for (ofiter = GET_OFFERS(ch); ofiter; ofiter = ofiter->next) {
+		if (ofiter->type != type) {
+			continue;
+		}
+		if (!(from = is_playing(ofiter->from))) {
+			continue;
+		}
+		if (*name_arg && !is_abbrev(name_arg, GET_NAME(from))) {
+			continue;
+		}
+		
+		// validated
+		if (!offer) {
+			offer = ofiter;
+			if (*name_arg) {
+				break;	// end early if they specified the name
+			}
+		}
+		else {
+			dupe = TRUE;	// whoops, more than 1 valid match
+			break;
+		}
+	}
+	
+	if (!offer) {
+		msg_to_char(ch, "You have no offer like that to %s.\r\n", mode[subcmd]);
+		return;
+	}
+	if (dupe) {
+		msg_to_char(ch, "You have more than one offer for %s. Please specify a name too.\r\n", offer_types[type].name);
+		return;
+	}
+	if (GET_POS(ch) < offer_types[type].min_pos) {
+		msg_to_char(ch, "You can't do that right now.\r\n");
+		return;
+	}
+	
+	if (subcmd == SCMD_ACCEPT) {
+		// ok, we have validated offer so far..
+		if (!(offer_types[type].validate_func)(ch, offer)) {
+			return;
+		}
+	
+		// and finally
+		(offer_types[type].finish_func)(ch, offer);
+	}
+	else {
+		msg_to_char(ch, "You reject the offer for %s.\r\n", offer_types[type].name);
+		if ((from = is_playing(offer->from))) {
+			snprintf(buf, sizeof(buf), "$N has rejected your offer for %s.", offer_types[type].name);
+			act(buf, FALSE, from, NULL, ch, TO_CHAR);
+		}
+	}
+	
+	// in either case
+	REMOVE_FROM_LIST(offer, GET_OFFERS(ch), next);
+	free(offer);
+}
+
 
 ACMD(do_alternate) {
 	extern int isbanned(char *hostname);

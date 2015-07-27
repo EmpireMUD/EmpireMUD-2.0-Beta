@@ -778,8 +778,9 @@ void death_restore(char_data *ch) {
 		}
 	}
 	
-	// remove respawn
+	// remove respawn/rez
 	remove_cooldown_by_type(ch, COOLDOWN_DEATH_RESPAWN);
+	remove_offers_by_type(ch, OFFER_RESURRECTION);
 	
 	// Pools restore
 	GET_HEALTH(ch) = MAX(1, GET_MAX_HEALTH(ch) / 4);
@@ -882,8 +883,6 @@ obj_data *die(char_data *ch, char_data *killer) {
 	// for players, die() ends here, until they respawn or quit
 	if (!IS_NPC(ch)) {
 		add_cooldown(ch, COOLDOWN_DEATH_RESPAWN, config_get_int("death_release_minutes") * SECS_PER_REAL_MIN);
-		GET_RESURRECT_LOCATION(ch) = NOWHERE;	// ensure no pending resurrect
-		GET_RESURRECT_BY(ch) = NOBODY;
 		msg_to_char(ch, "Type 'respawn' to come back at your tomb.\r\n");
 		GET_POS(ch) = POS_DEAD;	// ensure pos
 		return NULL;
@@ -1148,10 +1147,7 @@ void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, int 
 		}
 	}
 	affect_from_char(ch, ATYPE_DEATH_PENALTY);	// in case
-	
-	GET_RESURRECT_LOCATION(ch) = NOWHERE;
-	GET_RESURRECT_BY(ch) = NOBODY;
-	GET_RESURRECT_ABILITY(ch) = NO_ABIL;
+	remove_offers_by_type(ch, OFFER_RESURRECTION);
 
 	// log
 	syslog(SYS_DEATH, GET_INVIS_LEV(ch), TRUE, "%s has been resurrected by %s at %s", GET_NAME(ch), rez_by ? GET_NAME(rez_by) : "(unknown)", room_log_identifier(loc));

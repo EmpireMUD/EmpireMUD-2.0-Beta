@@ -82,6 +82,10 @@ struct alias_data {
 // to avoid magic-numbering in things that don't use subcmds
 #define NO_SCMD  0
 
+// for do_accept
+#define SCMD_ACCEPT  0
+#define SCMD_REJECT  1
+
 /* do_gen_ps */
 #define SCMD_INFO		0
 #define SCMD_HANDBOOK	1 

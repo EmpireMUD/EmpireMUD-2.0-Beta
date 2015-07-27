@@ -1228,6 +1228,11 @@ typedef struct trig_data trig_data;
 #define MOUNT_FLYING  BIT(2)	// mount can fly
 
 
+// OFFER_x - types for the do_accept/offer_data system
+#define OFFER_RESURRECTION  0
+#define OFFER_SUMMON  1
+
+
 /* Player flags: used by char_data.char_specials.act */
 #define PLR_FROZEN		BIT(0)	/* Player is frozen						*/
 #define PLR_WRITING		BIT(1)	/* Player writing (board/mail)			*/
@@ -1708,6 +1713,17 @@ struct interaction_item {
 struct obj_affected_type {
 	byte location;	// Which ability to change (APPLY_XXX)
 	sh_int modifier;	// How much it changes by
+};
+
+
+// for do_accept/reject
+struct offer_data {
+	int from;	// player id
+	int type;	// OFFER_x
+	room_vnum location;	// where the player was
+	time_t time;	// when the offer happened
+	int data;	// misc data
+	struct offer_data *next;
 };
 
 
@@ -2298,13 +2314,8 @@ struct player_special_data {
 	
 	room_vnum marked_location;	// for map marking
 	
+	struct offer_data *offers;	// various offers for do_accept/reject
 	int group_invite_by;	// idnum of the last player to invite this one
-	
-	// for late-accept resurrection
-	room_vnum resurrect_location;	// where the player is being resurrected (vnum so we don't have to look for it on room delete)
-	int resurrect_by;	// idnum of player who cast it, for skillups
-	int resurrect_ability;	// which ability was used
-	time_t resurrect_time;	// time of last rez offer
 };
 
 

@@ -46,6 +46,7 @@
 *   Object Location Handlers
 *   Object Message Handlers
 *   Object Targeting Handlers
+*   Offer Handlers
 *   Resource Depletion Handlers
 *   Room Handlers
 *   Room Extra Handlers
@@ -4447,6 +4448,98 @@ obj_data *get_obj_world(char *name) {
 	}
 
 	return found;
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// OFFER HANDLERS //////////////////////////////////////////////////////////
+
+/**
+* Adds an offer to ch. This is used by do_accept. This function does not send
+* messages. This will overwrite a previous identical entry.
+*
+* @param char_data *ch The person who is getting an offer.
+* @param char_data *from The person sending the offer.
+* @param int type Any OFFER_x type.
+* @param int data A misc integer that may be passed based on type (use 0 for none).
+* @return struct offer_data* A pointer to the attached new offer, if it succeeds.
+*/
+struct offer_data *add_offer(char_data *ch, char_data *from, int type, int data) {
+	struct offer_data *iter, *offer = NULL;
+	
+	if (!ch || !from || IS_NPC(ch) || IS_NPC(from)) {
+		return NULL;
+	}
+	
+	// ensure no existing offer (overwrite if so)
+	for (iter = GET_OFFERS(ch); iter; iter = iter->next) {
+		if (offer->type == type && offer->from == GET_IDNUM(from)) {
+			offer = iter;
+			break;
+		}
+	}
+	
+	if (!offer) {
+		CREATE(offer, struct offer_data, 1);
+		offer->next = GET_OFFERS(ch);
+		GET_OFFERS(ch) = offer;
+	}
+	
+	offer->from = GET_IDNUM(from);
+	offer->type = type;
+	offer->location = IN_ROOM(from) ? GET_ROOM_VNUM(IN_ROOM(from)) : NOWHERE;
+	offer->time = time(0);
+	offer->data = data;
+	
+	return offer;
+}
+
+
+/**
+* Removes any expired offers the character may have.
+*
+* @param char_data *ch The player to clean up offers for.
+*/
+void clean_offers(char_data *ch) {
+	struct offer_data *offer, *next_offer, *temp;
+	int max_duration = config_get_int("offer_time");
+	
+	if (!ch || IS_NPC(ch)) {
+		return;
+	}
+	
+	for (offer = GET_OFFERS(ch); offer; offer = next_offer) {
+		next_offer = offer->next;
+		
+		if (time(0) - offer->time > max_duration) {
+			REMOVE_FROM_LIST(offer, GET_OFFERS(ch), next);
+			free(offer);
+		}
+	}
+}
+
+
+/**
+* Removes all offers of a given type.
+*
+* @param char_data *ch The person whose offers to remove.
+* @param int type Any OFFER_x type.
+*/
+void remove_offers_by_type(char_data *ch, int type) {
+	struct offer_data *offer, *next_offer, *temp;
+	
+	if (!ch || IS_NPC(ch)) {
+		return;
+	}
+	
+	for (offer = GET_OFFERS(ch); offer; offer = next_offer) {
+		next_offer = offer->next;
+		
+		if (offer->type == type) {
+			REMOVE_FROM_LIST(offer, GET_OFFERS(ch), next);
+			free(offer);
+		}
+	}
 }
 
 

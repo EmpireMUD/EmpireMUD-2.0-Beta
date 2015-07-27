@@ -39,6 +39,19 @@ You can clear your entire queue with --, or you can remove specific items with
 
 See also: FASTCASTING
 #
+ACCEPT REJECT OFFERS
+
+Usage:  accept [type] [person]
+        reject [type] [person]
+
+You can accept or reject offers using these commands. You may receive offers
+for resurrection, summoning, and various other things. Offers are only good for
+a short time. If you have more than one open offer of the same type, you must
+specify the name of a player.
+
+Typing accept or reject with no argument will display open offers. If the
+player who sent the offer logs off, you cannot accept the offer.
+#
 AFFECTS
 
 Usage:  affects

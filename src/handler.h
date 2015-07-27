@@ -207,6 +207,10 @@ extern obj_data *get_obj_vis(char_data *ch, char *name);
 extern obj_data *get_object_in_equip_vis(char_data *ch, char *arg, obj_data *equipment[], int *pos);
 extern obj_data *get_obj_world(char *name);
 
+// offer handlers
+extern struct offer_data *add_offer(char_data *ch, char_data *from, int type, int data);
+void remove_offers_by_type(char_data *ch, int type);
+
 // resource depletion handlers
 void add_depletion(room_data *room, int type, bool multiple);
 extern int get_depletion(room_data *room, int type);

@@ -271,12 +271,6 @@ Usage:  respawn
 When your character has died, you can still observe for a short time. When you
 are ready to respawn, use this command.
 
-You can also use this command to accept a resurrection even after you have
-left your corpse. If you do, you will be returned to the corpse's location and
-your health/move/mana levels may change again. These resurrection offers only
-last for five minutes, and then expire. You also can't be resurrected after
-respawning if you quit and re-enter, die again, or if there is a reboot.
-
 See also: DEATH, TOMB
 #
 "SHIELD BLOCK" SHIELDS

@@ -489,6 +489,7 @@ void free_char(char_data *ch) {
 	struct channel_history_data *history;
 	struct player_slash_channel *slash;
 	struct interaction_item *interact;
+	struct offer_data *offer;
 	struct lore_data *lore;
 	struct coin_data *coin;
 	struct alias_data *a;
@@ -531,6 +532,11 @@ void free_char(char_data *ch) {
 		while ((a = GET_ALIASES(ch)) != NULL) {
 			GET_ALIASES(ch) = (GET_ALIASES(ch))->next;
 			free_alias(a);
+		}
+		
+		while ((offer = GET_OFFERS(ch))) {
+			GET_OFFERS(ch) = offer->next;
+			free(offer);
 		}
 		
 		while ((slash = GET_SLASH_CHANNELS(ch))) {
@@ -1143,9 +1149,6 @@ int enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	
 	// clear some player special data
 	GET_MARK_LOCATION(ch) = NOWHERE;
-	GET_RESURRECT_LOCATION(ch) = NOWHERE;
-	GET_RESURRECT_BY(ch) = NOBODY;
-	GET_RESURRECT_ABILITY(ch) = NO_ABIL;
 
 	// re-join slash-channels
 	global_mute_slash_channel_joins = TRUE;
