@@ -601,6 +601,7 @@ ACMD(do_summary) {
 }
 
 
+// do_untie -- search hint
 ACMD(do_tie) {
 	void perform_npc_tie(char_data *ch, char_data *victim, int subcmd);
 
@@ -615,6 +616,9 @@ ACMD(do_tie) {
 		msg_to_char(ch, "%sie whom?\r\n", subcmd ? "Unt" : "T");
 	else if (!(victim = get_char_vis(ch, arg, FIND_CHAR_ROOM)))
 		send_config_msg(ch, "no_person");
+	else if (IS_DEAD(victim)) {
+		msg_to_char(ch, "You can't do that to someone who is already dead.\r\n");
+	}
 	else if (IS_NPC(victim) && MOB_FLAGGED(victim, MOB_ANIMAL))
 		perform_npc_tie(ch, victim, subcmd);
 	else if (IS_GOD(victim) || IS_IMMORTAL(victim))
