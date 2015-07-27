@@ -1124,6 +1124,7 @@ void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, int 
 	
 	if (IN_ROOM(ch) != loc) {
 		act("$n vanishes in a swirl of light!", TRUE, ch, NULL, NULL, TO_ROOM);
+		GET_LAST_DIR(ch) = NO_DIR;
 	}
 	
 	// move character

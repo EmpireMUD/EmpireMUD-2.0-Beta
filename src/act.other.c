@@ -36,6 +36,7 @@
 */
 
 // external prototypes
+extern bool can_enter_instance(char_data *ch, struct instance_data *inst);
 extern char_data *has_familiar(char_data *ch);
 void Objsave_char(char_data *ch, int rent_code);
 void scale_item_to_level(obj_data *obj, int level);
@@ -309,6 +310,83 @@ INTERACTION_FUNC(skin_interact) {
 }
 
 
+/**
+* Begins a summon for a player -- see do_summon.
+*
+* @param char_data *ch The summoner.
+* @param char *argument The typed-in arg.
+*/
+void summon_player(char_data *ch, char *argument) {
+	extern char *get_room_name(room_data *room, bool color);
+
+	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	char_data *vict, *ch_iter;
+	bool found;
+	
+	one_argument(argument, arg);
+	
+	if (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_SUMMON_PLAYER)) {
+		msg_to_char(ch, "You can't summon players here.\r\n");
+	}
+	else if (!IS_COMPLETE(IN_ROOM(ch))) {
+		msg_to_char(ch, "You must complete the building first.\r\n");
+	}
+	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+		msg_to_char(ch, "You don't have permission to summon players here.\r\n");
+	}
+	else if (!*arg) {
+		msg_to_char(ch, "Summon whom?\r\n");
+	}
+	else if (!(vict = get_player_vis(ch, arg, FIND_CHAR_WORLD | FIND_NO_DARK))) {
+		send_config_msg(ch, "no_person");
+	}
+	else if (!GROUP(ch) || GROUP(ch) != GROUP(vict)) {
+		msg_to_char(ch, "You can only summon members of your own group.\r\n");
+	}
+	else if (IN_ROOM(vict) == IN_ROOM(ch)) {
+		msg_to_char(ch, "Your target is already here.\r\n");
+	}
+	else if (IS_DEAD(vict)) {
+		msg_to_char(ch, "You cannot summon the dead like that.\r\n");
+	}
+	else if (!can_teleport_to(vict, IN_ROOM(vict), TRUE)) {
+		msg_to_char(ch, "Your target can't be teleported from %s current location.\r\n", HSHR(vict));
+	}
+	else if (!can_teleport_to(vict, IN_ROOM(ch), FALSE)) {
+		msg_to_char(ch, "Your target can't be teleported here.\r\n");
+	}
+	else {
+		// mostly-valid by now... just a little bit more to check
+		found = FALSE;
+		for (ch_iter = ROOM_PEOPLE(IN_ROOM(ch)); ch_iter && !found; ch_iter = ch_iter->next_in_room) {
+			if (IS_DEAD(ch_iter) || !ch_iter->desc) {
+				continue;
+			}
+			
+			if (ch_iter != ch && GROUP(ch_iter) == GROUP(ch)) {
+				found = TRUE;
+			}
+		}
+		
+		if (!found) {
+			msg_to_char(ch, "You need a second group member present to help summon.\r\n");
+			return;
+		}
+		
+		act("You start summoning $N...", FALSE, ch, NULL, vict, TO_CHAR);
+		if (HAS_ABILITY(vict, ABIL_NAVIGATION)) {
+			snprintf(buf, sizeof(buf), "$n is trying to summon you to %s (%d, %d) -- use 'accept/reject summon'.\r\n", get_room_name(IN_ROOM(ch), FALSE), X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
+		}
+		else {
+			snprintf(buf, sizeof(buf), "$n is trying to summon you to %s -- use 'accept/reject summon'.\r\n", get_room_name(IN_ROOM(ch), FALSE));
+		}
+		act(buf, FALSE, ch, NULL, vict, TO_VICT | TO_SLEEP);
+		add_offer(vict, ch, OFFER_SUMMON, 0);
+		command_lag(ch, WAIT_OTHER);
+	}
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// ACCEPT/REJECT HELPERS ///////////////////////////////////////////////////
 
@@ -335,7 +413,6 @@ INTERACTION_FUNC(skin_interact) {
 
 
 OFFER_VALIDATE(oval_rez) {
-	extern bool can_enter_instance(char_data *ch, struct instance_data *inst);
 	extern obj_data *find_obj(int n);
 	extern room_data *obj_room(obj_data *obj);
 	
@@ -371,13 +448,42 @@ OFFER_FINISH(ofin_rez) {
 
 
 OFFER_VALIDATE(oval_summon) {
-	msg_to_char(ch, "Not implemented.\r\n");
-	return FALSE;
+	room_data *loc = real_room(offer->location);
+	
+	if (!loc) {
+		msg_to_char(ch, "Summon location invalid.\r\n");
+		return FALSE;
+	}
+	if (loc == IN_ROOM(ch)) {
+		msg_to_char(ch, "You are already there!\r\n");
+		return FALSE;
+	}
+	if ((ROOM_INSTANCE(loc) && !can_enter_instance(ch, ROOM_INSTANCE(loc)))) {
+		msg_to_char(ch, "You can't be summoned there right now. Perhaps the adventure is full.\r\n");
+		return FALSE;
+	}
+	if (!can_teleport_to(ch, IN_ROOM(ch), TRUE)) {
+		msg_to_char(ch, "You can't be teleported out of here.\r\n");
+		return FALSE;
+	}
+	if (!can_teleport_to(ch, loc, FALSE)) {
+		msg_to_char(ch, "You can't be teleported to the summon location.\r\n");
+		return FALSE;
+	}
+	// TODO instance full?
+	
+	return TRUE;
 }
 
 OFFER_FINISH(ofin_summon) {
-	// room_data *loc = real_room(offer->location);
-	msg_to_char(ch, "Not implemented.\r\n");
+	room_data *loc = real_room(offer->location);
+	
+	act("$n vanishes in a swirl of light!", TRUE, ch, NULL, NULL, TO_ROOM);
+	char_to_room(ch, loc);
+	GET_LAST_DIR(ch) = NO_DIR;
+	look_at_room(ch);
+	act("$n appears in a swirl of light!", TRUE, ch, NULL, NULL, TO_ROOM);
+	
 	return TRUE;
 }
 
@@ -1674,6 +1780,11 @@ ACMD(do_summon) {
 	else if (!IS_NPC(ch) && is_abbrev(arg, "materials")) {
 		ability = ABIL_SUMMON_MATERIALS;
 		summon_materials(ch, argument);
+		return;
+	}
+	else if (!IS_NPC(ch) && is_abbrev(arg, "player")) {
+		ability = NO_ABIL;
+		summon_player(ch, argument);
 		return;
 	}
 	else {
