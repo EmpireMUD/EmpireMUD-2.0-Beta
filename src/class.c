@@ -88,7 +88,7 @@ const struct class_data_type class_data[NUM_CLASSES] = {
 	},
 	{ "Exarch", "Exrc", { SKILL_EMPIRE, SKILL_HIGH_SORCERY },  { 150, 150, 300, 0 },
 		{
-			{ ROLE_CASTER, { ABIL_DRAGONRIDING, ROLE_ABIL_END } },
+			{ ROLE_CASTER, { ABIL_DRAGONRIDING, ABIL_EXARCH_BUILDINGS, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},

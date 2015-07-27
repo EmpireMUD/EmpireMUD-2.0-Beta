@@ -1819,6 +1819,7 @@ const char *bld_flags[] = {
 	"PORTAL",
 	"BEDROOM",
 	"!DELETE",
+	"SUMMON-PLAYER",
 	"\n"
 };
 

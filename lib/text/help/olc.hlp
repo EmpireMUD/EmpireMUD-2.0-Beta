@@ -738,6 +738,8 @@ Available flags:
  HIGH-DEPLETION - has more resources than a normal tile
  PORTAL - functions as a portal building
  BEDROOM - boosts regen while sleeping
+ !DELETE - will not be deleted for not having a homeroom
+ SUMMON-PLAYERS - allows the summon player command
 
 * Note: If you change the COUNTS-AS-CITY flag on existing buildings, territory
         counts will not update right away. Any empire can force a re-count
