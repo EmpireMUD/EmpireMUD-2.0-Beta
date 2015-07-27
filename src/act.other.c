@@ -312,9 +312,26 @@ INTERACTION_FUNC(skin_interact) {
  //////////////////////////////////////////////////////////////////////////////
 //// ACCEPT/REJECT HELPERS ///////////////////////////////////////////////////
 
-// helper types and functions
+// helper types and functions:
+
+/**
+* Validation function for offer accepts.
+*
+* @param char_data *ch The person trying to accept the offer.
+* @param struct offer_data *offer The offer they are trying to accept.
+* @return bool TRUE if it's okay to accept, FALSE to block it.
+*/
 #define OFFER_VALIDATE(name)  bool (name)(char_data *ch, struct offer_data *offer)
-#define OFFER_FINISH(name)  void (name)(char_data *ch, struct offer_data *offer)
+
+/**
+* Function to perform an offer accept. The return value determines whether or
+* not the offer should be deleted.
+*
+* @param char_data *ch The person accepting the offer.
+* @param struct offer_data *offer The offer they are trying accepting.
+* @return bool TRUE if we should delete the offer after, or FALSE if not (e.g. if it was deleted during the finish).
+*/
+#define OFFER_FINISH(name)  bool (name)(char_data *ch, struct offer_data *offer)
 
 
 OFFER_VALIDATE(oval_rez) {
@@ -334,6 +351,7 @@ OFFER_FINISH(ofin_rez) {
 	void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, int ability);
 	room_data *loc = real_room(offer->location);	// pre-validated
 	perform_resurrection(ch, is_playing(offer->from), loc, offer->data);
+	return FALSE;
 }
 
 
@@ -345,6 +363,7 @@ OFFER_VALIDATE(oval_summon) {
 OFFER_FINISH(ofin_summon) {
 	// room_data *loc = real_room(offer->location);
 	msg_to_char(ch, "Not implemented.\r\n");
+	return TRUE;
 }
 
 
@@ -374,6 +393,7 @@ ACMD(do_accept) {
 	char type_arg[MAX_INPUT_LENGTH], name_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	int max_duration = config_get_int("offer_time");
 	struct offer_data *ofiter, *offer, *temp;
+	bool delete = FALSE;
 	int iter, type, ts;
 	bool found, dupe;
 	char_data *from;
@@ -384,8 +404,8 @@ ACMD(do_accept) {
 	struct {
 		char *name;
 		int min_pos;
-		OFFER_VALIDATE(*validate_func);
-		OFFER_FINISH(*finish_func);
+		OFFER_VALIDATE(*validate_func);	// returns TRUE to allow, FALSE to prevent accept
+		OFFER_FINISH(*finish_func);	// returns TRUE if it's ok to delete the offer, FALSE if not
 	} offer_types[] = {
 		{ "resurrection", POS_DEAD, oval_rez, ofin_rez },	// uses offer->data for ability
 		{ "summon", POS_STANDING, oval_summon, ofin_summon },
@@ -490,7 +510,7 @@ ACMD(do_accept) {
 		}
 	
 		// and finally
-		(offer_types[type].finish_func)(ch, offer);
+		delete = (offer_types[type].finish_func)(ch, offer);
 	}
 	else {
 		msg_to_char(ch, "You reject the offer for %s.\r\n", offer_types[type].name);
@@ -498,11 +518,14 @@ ACMD(do_accept) {
 			snprintf(buf, sizeof(buf), "$N has rejected your offer for %s.", offer_types[type].name);
 			act(buf, FALSE, from, NULL, ch, TO_CHAR);
 		}
+		delete = TRUE;
 	}
 	
 	// in either case
-	REMOVE_FROM_LIST(offer, GET_OFFERS(ch), next);
-	free(offer);
+	if (delete) {
+		REMOVE_FROM_LIST(offer, GET_OFFERS(ch), next);
+		free(offer);
+	}
 }
 
 
