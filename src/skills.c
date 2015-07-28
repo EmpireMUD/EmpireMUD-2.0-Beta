@@ -1468,7 +1468,8 @@ bool can_wear_item(char_data *ch, obj_data *item, bool send_messages) {
 			else {
 				level_min = GET_OBJ_CURRENT_SCALE_LEVEL(item) - 25;
 			}
-			if (GET_SKILL_LEVEL(ch) < CLASS_SKILL_CAP) {
+			level_min = MAX(level_min, CLASS_SKILL_CAP);
+			if (GET_SKILL_LEVEL(ch) < CLASS_SKILL_CAP && level_min > CLASS_SKILL_CAP) {
 				if (send_messages) {
 					snprintf(buf, sizeof(buf), "You need to be skill level %d and total level %d to use $p.", CLASS_SKILL_CAP, level_min);
 					act(buf, FALSE, ch, item, NULL, TO_CHAR);
