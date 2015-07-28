@@ -1401,7 +1401,10 @@ ACMD(do_specialize) {
 bool can_wear_item(char_data *ch, obj_data *item, bool send_messages) {
 	char buf[MAX_STRING_LENGTH];
 	int abil = NO_ABIL;
-	int level_min;
+	int iter, level_min;
+
+	// players won't be able to use gear >= these levels if their skill level is < the level
+	int skill_level_ranges[] = { CLASS_SKILL_CAP, SPECIALTY_SKILL_CAP, BASIC_SKILL_CAP, -1 };	// terminate with -1
 	
 	if (IS_NPC(ch)) {
 		return TRUE;
@@ -1447,18 +1450,38 @@ bool can_wear_item(char_data *ch, obj_data *item, bool send_messages) {
 	
 	// check levels
 	if (!IS_IMMORTAL(ch)) {
-		if (OBJ_FLAGGED(item, OBJ_BIND_ON_PICKUP)) {
-			level_min = GET_OBJ_CURRENT_SCALE_LEVEL(item) - 50;
-		}
-		else {
-			level_min = GET_OBJ_CURRENT_SCALE_LEVEL(item) - 25;
-		}
-		if (GET_HIGHEST_RECENT_LEVEL(ch) < level_min) {
-			if (send_messages) {
-				snprintf(buf, sizeof(buf), "You need to be level %d to use $p.", level_min);
-				act(buf, FALSE, ch, item, NULL, TO_CHAR);
+		if (GET_OBJ_CURRENT_SCALE_LEVEL(item) <= CLASS_SKILL_CAP) {
+			for (iter = 0; skill_level_ranges[iter] != -1; ++iter) {
+				if (GET_OBJ_CURRENT_SCALE_LEVEL(item) > skill_level_ranges[iter] && GET_SKILL_LEVEL(ch) < skill_level_ranges[iter]) {
+					if (send_messages) {
+						snprintf(buf, sizeof(buf), "You need to be skill level %d to use $p.", skill_level_ranges[iter]);
+						act(buf, FALSE, ch, item, NULL, TO_CHAR);
+					}
+					return FALSE;
+				}
 			}
-			return FALSE;
+		}
+		else {	// > 100
+			if (OBJ_FLAGGED(item, OBJ_BIND_ON_PICKUP)) {
+				level_min = GET_OBJ_CURRENT_SCALE_LEVEL(item) - 50;
+			}
+			else {
+				level_min = GET_OBJ_CURRENT_SCALE_LEVEL(item) - 25;
+			}
+			if (GET_SKILL_LEVEL(ch) < CLASS_SKILL_CAP) {
+				if (send_messages) {
+					snprintf(buf, sizeof(buf), "You need to be skill level %d and total level %d to use $p.", CLASS_SKILL_CAP, level_min);
+					act(buf, FALSE, ch, item, NULL, TO_CHAR);
+				}
+				return FALSE;
+			}
+			if (GET_HIGHEST_RECENT_LEVEL(ch) < level_min) {
+				if (send_messages) {
+					snprintf(buf, sizeof(buf), "You need to be level %d to use $p.", level_min);
+					act(buf, FALSE, ch, item, NULL, TO_CHAR);
+				}
+				return FALSE;
+			}
 		}
 	}
 	
