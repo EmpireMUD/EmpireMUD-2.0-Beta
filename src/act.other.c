@@ -76,6 +76,9 @@ void adventure_summon(char_data *ch, char *argument) {
 	else if (!(vict = get_player_vis(ch, arg, FIND_CHAR_WORLD | FIND_NO_DARK))) {
 		send_config_msg(ch, "no_person");
 	}
+	else if (vict == ch) {
+		msg_to_char(ch, "You summon yourself! Look, you're already here.\r\n");
+	}
 	else if (!GROUP(ch) || GROUP(ch) != GROUP(vict)) {
 		msg_to_char(ch, "You can only summon members of your own group.\r\n");
 	}
@@ -454,6 +457,9 @@ void summon_player(char_data *ch, char *argument) {
 	}
 	else if (!(vict = get_player_vis(ch, arg, FIND_CHAR_WORLD | FIND_NO_DARK))) {
 		send_config_msg(ch, "no_person");
+	}
+	else if (vict == ch) {
+		msg_to_char(ch, "You summon yourself! Look, you're already here.\r\n");
 	}
 	else if (!GROUP(ch) || GROUP(ch) != GROUP(vict)) {
 		msg_to_char(ch, "You can only summon members of your own group.\r\n");
