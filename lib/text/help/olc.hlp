@@ -738,6 +738,8 @@ Available flags:
  HIGH-DEPLETION - has more resources than a normal tile
  PORTAL - functions as a portal building
  BEDROOM - boosts regen while sleeping
+ !DELETE - will not be deleted for not having a homeroom
+ SUMMON-PLAYERS - allows the summon player command
 
 * Note: If you change the COUNTS-AS-CITY flag on existing buildings, territory
         counts will not update right away. Any empire can force a re-count
@@ -1017,6 +1019,17 @@ Available flags:
  IN-CITY-ONLY - a craft or building can only be made in a city radius
 
 See also: CEDIT TYPE, OLC CRAFTS, OLC REMOVEINDEV
+#d
+"CEDIT LEVELREQUIRED" "CEDIT LEVEL REQUIRED"
+
+Usage:  .levelrequired <level>
+
+This lets you set the crafting level required to make a craft. It works on any
+type of craft. This uses the 'Crafting' trait shown on score, and the +CRAFTING
+apply from items. Crafting level includes skill level, so a requirement of 100
+would only require that the player be skill level 100.
+
+See also: OLC CRAFTS
 #d
 "CEDIT LIQUID"
 
@@ -1770,6 +1783,7 @@ using it. The following applies are available. Most are self-explanatory:
  BONUS-MAGICAL - added to magical damage
  BONUS-HEALING - added to damage healed (by abilities this player uses)
  RESIST-MAGICAL - magical damage reduction
+ CRAFTING - bonus to craft level
 
 See also: OLC OBJECTS
 #d

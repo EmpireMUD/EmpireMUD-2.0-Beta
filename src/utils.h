@@ -231,6 +231,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_BONUS_MAGICAL(ch)  GET_EXTRA_ATT(ch, ATT_BONUS_MAGICAL)
 #define GET_BONUS_HEALING(ch)  GET_EXTRA_ATT(ch, ATT_BONUS_HEALING)	// use total_bonus_healing(ch) for most uses
 #define GET_HEAL_OVER_TIME(ch)  GET_EXTRA_ATT(ch, ATT_HEAL_OVER_TIME)
+#define GET_CRAFTING_BONUS(ch)  GET_EXTRA_ATT(ch, ATT_CRAFTING_BONUS)
 
 // ch->char_specials: char_special_data
 #define FIGHTING(ch)  ((ch)->char_specials.fighting.victim)
@@ -296,6 +297,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_CRAFT_BUILD_ON(craft)  ((craft)->build_on)
 #define GET_CRAFT_BUILD_TYPE(craft)  ((craft)->build_type)
 #define GET_CRAFT_FLAGS(craft)  ((craft)->flags)
+#define GET_CRAFT_MIN_LEVEL(craft)  ((craft)->min_level)
 #define GET_CRAFT_NAME(craft)  ((craft)->name)
 #define GET_CRAFT_OBJECT(craft)  ((craft)->object)
 #define GET_CRAFT_QUANTITY(craft)  ((craft)->quantity)
@@ -534,7 +536,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 
 // for stacking, sotring, etc
 #define OBJ_CAN_STACK(obj)  (GET_OBJ_TYPE(obj) != ITEM_CONTAINER && !OBJ_FLAGGED((obj), OBJ_ENCHANTED) && !IN_CHAIR(obj) && !IS_ARROW(obj))
-#define OBJ_CAN_STORE(obj)  ((obj)->storage && !OBJ_BOUND_TO(obj) && !OBJ_FLAGGED((obj), OBJ_SUPERIOR | OBJ_ENCHANTED) && GET_OBJ_CURRENT_SCALE_LEVEL(obj) == 0)
+#define OBJ_CAN_STORE(obj)  ((obj)->storage && !OBJ_BOUND_TO(obj) && !OBJ_FLAGGED((obj), OBJ_SUPERIOR | OBJ_ENCHANTED))
 #define UNIQUE_OBJ_CAN_STORE(obj)  (!OBJ_BOUND_TO(obj) && !OBJ_CAN_STORE(obj) && (!OBJ_FLAGGED((obj), OBJ_LIGHT) || GET_OBJ_TIMER(obj) == UNLIMITED) && !IS_STOLEN(obj))
 #define OBJ_STACK_FLAGS  (OBJ_SUPERIOR | OBJ_KEEP)
 #define OBJS_ARE_SAME(o1, o2)  (GET_OBJ_VNUM(o1) == GET_OBJ_VNUM(o2) && ((GET_OBJ_EXTRA(o1) & OBJ_STACK_FLAGS) == (GET_OBJ_EXTRA(o2) & OBJ_STACK_FLAGS)) && (!IS_DRINK_CONTAINER(o1) || GET_DRINK_CONTAINER_TYPE(o1) == GET_DRINK_CONTAINER_TYPE(o2)))
@@ -709,15 +711,12 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_FIGHT_PROMPT(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->fight_prompt))
 #define GET_SLASH_CHANNELS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->slash_channels))
 #define GET_TITLE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->title))
+#define GET_OFFERS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->offers))
 #define POOFIN(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->poofin))
 #define POOFOUT(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->poofout))
 #define REBOOT_CONF(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->reboot_conf))
 #define REREAD_EMPIRE_TECH_ON_LOGIN(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->reread_empire_tech_on_login))
 #define RESTORE_ON_LOGIN(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->restore_on_login))
-#define GET_RESURRECT_LOCATION(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->resurrect_location))
-#define GET_RESURRECT_BY(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->resurrect_by))
-#define GET_RESURRECT_ABILITY(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->resurrect_ability))
-#define GET_RESURRECT_TIME(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->resurrect_time))
 
 
 // ch->player_specials.saved: player_special_data_saved
@@ -731,13 +730,15 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_ACTION_TIMER(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.action_timer))
 #define GET_ACTION_VNUM(ch, n)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.action_vnum[(n)]))
 #define GET_ADMIN_NOTES(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.admin_notes))
+#define GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.adventure_summon_return_location))
+#define GET_ADVENTURE_SUMMON_RETURN_MAP(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.adventure_summon_return_map))
 #define GET_APPARENT_AGE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.apparent_age))
 #define GET_BAD_PWS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.bad_pws))
 #define GET_BONUS_TRAITS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.bonus_traits))
 #define GET_CLASS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.character_class))
 #define GET_CLASS_PROGRESSION(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.class_progression))
 #define GET_CLASS_ROLE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.class_role))
-#define GET_COMPUTED_LEVEL(ch)  (GET_SKILL_LEVEL(ch) + (int)GET_GEAR_LEVEL(ch))
+#define GET_COMPUTED_LEVEL(ch)  (GET_SKILL_LEVEL(ch) + GET_GEAR_LEVEL(ch))
 #define GET_COND(ch, i)  CHECK_PLAYER_SPECIAL(REAL_CHAR(ch), (REAL_CHAR(ch)->player_specials->saved.conditions[(i)]))
 #define GET_CONFUSED_DIR(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.confused_dir))
 #define GET_CREATION_HOST(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.creation_host))
@@ -754,7 +755,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_LAST_CORPSE_ID(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.last_corpse_id))
 #define GET_LAST_DEATH_TIME(ch)  CHECK_PLAYER_SPECIAL(REAL_CHAR(ch), (REAL_CHAR(ch)->player_specials->saved.last_death_time))
 #define GET_LAST_DIR(ch)  CHECK_PLAYER_SPECIAL(REAL_CHAR(ch), (REAL_CHAR(ch)->player_specials->saved.last_direction))
-#define GET_LAST_KNOWN_LEVEL(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.last_known_level))
+#define GET_HIGHEST_RECENT_LEVEL(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.highest_recent_level))
 #define GET_LAST_ROOM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.last_room))
 #define GET_LAST_TIP(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.last_tip))
 #define GET_LOADROOM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.load_room))
@@ -772,6 +773,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_PROMO_ID(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.promo_id))
 #define GET_RANK(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.rank))
 #define GET_RECENT_DEATH_COUNT(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.recent_death_count))
+#define GET_RECENT_LEVEL_TIME(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.recent_level_time))
 #define GET_REFERRED_BY(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.referred_by))
 #define GET_RESOURCE(ch, i)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.resources[i]))
 #define GET_REWARDED_TODAY(ch, pos)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.rewarded_today[(pos)]))
@@ -1068,6 +1070,7 @@ extern double rate_item(obj_data *obj);
 
 // player functions from utils.c
 void command_lag(char_data *ch, int wait_type);
+void determine_gear_level(char_data *ch);
 
 // resource functions from utils.c
 void extract_resources(char_data *ch, Resource list[], bool ground);

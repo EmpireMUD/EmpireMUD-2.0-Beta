@@ -1191,9 +1191,7 @@ ACMD(do_pickpocket) {
 		
 			if (vnum != NOTHING) {
 				obj = read_object(vnum);
-				if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-					scale_item_to_level(obj, get_approximate_level(vict));
-				}
+				scale_item_to_level(obj, get_approximate_level(vict));
 				
 				obj_to_char_or_room(obj, ch);
 			}

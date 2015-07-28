@@ -368,6 +368,7 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	extern double get_combat_speed(char_data *ch, int pos);
 	extern int get_block_rating(char_data *ch, bool can_gain_skill);
 	extern int get_blood_upkeep_cost(char_data *ch);
+	extern int get_crafting_level(char_data *ch);
 	extern int total_bonus_healing(char_data *ch);
 	extern int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
 	extern int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill);
@@ -485,7 +486,9 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	val = get_to_hit(ch, NULL, FALSE, FALSE) - (hit_per_dex * GET_DEXTERITY(ch));
 	sprintf(lbuf, "To-hit  [%s%d&0]", HAPPY_COLOR(val, base_hit_chance), val);
 	sprintf(lbuf2, "Speed  [%.2f]", get_combat_speed(ch, WEAR_WIELD));
-	msg_to_char(to, "  %-28.28s %-28.28s \r\n", lbuf, lbuf2);
+	sprintf(lbuf3, "Crafting [%s%d&0]", HAPPY_COLOR(get_crafting_level(ch), GET_SKILL_LEVEL(ch)), get_crafting_level(ch));
+	// note: the "%-24.24s" for speed is lower because it contains no color codes
+	msg_to_char(to, "  %-28.28s %-24.24s %-28.28s\r\n", lbuf, lbuf2, lbuf3);
 
 	msg_to_char(to, " +--------------------------------- Skills ----------------------------------+\r\n ");
 
@@ -985,13 +988,13 @@ char *one_who_line(char_data *ch, bool shortlist) {
 	// level/class info
 	if (!IS_GOD(ch) && !IS_IMMORTAL(ch)) {
 		if (shortlist) {
-			size += snprintf(out + size, sizeof(out) - size, "[%3d] ", GET_COMPUTED_LEVEL(ch));
+			size += snprintf(out + size, sizeof(out) - size, "[%3d] ", GET_HIGHEST_RECENT_LEVEL(ch));
 		}
 		else if (GET_CLASS(ch) != CLASS_NONE) {
-			size += snprintf(out + size, sizeof(out) - size, "[%3d %s] ", GET_COMPUTED_LEVEL(ch), class_data[GET_CLASS(ch)].abbrev);
+			size += snprintf(out + size, sizeof(out) - size, "[%3d %s] ", GET_HIGHEST_RECENT_LEVEL(ch), class_data[GET_CLASS(ch)].abbrev);
 		}
 		else {	// classless
-			size += snprintf(out + size, sizeof(out) - size, "[%3d Advn] ", GET_COMPUTED_LEVEL(ch));
+			size += snprintf(out + size, sizeof(out) - size, "[%3d Advn] ", GET_HIGHEST_RECENT_LEVEL(ch));
 		}
 	}
 	
@@ -1103,10 +1106,10 @@ char *partial_who(char_data *ch, char *name_search, int low, int high, empire_da
 		if (!CAN_SEE_GLOBAL(ch, tch)) {
 			continue;
 		}
-		if (low != 0 && GET_COMPUTED_LEVEL(tch) < low) {
+		if (low != 0 && GET_HIGHEST_RECENT_LEVEL(tch) < low) {
 			continue;
 		}
-		if (high != 0 && GET_COMPUTED_LEVEL(tch) > high) {
+		if (high != 0 && GET_HIGHEST_RECENT_LEVEL(tch) > high) {
 			continue;
 		}
 		if (type == WHO_MORTALS && (IS_GOD(tch) || IS_IMMORTAL(tch)))
@@ -1525,7 +1528,19 @@ void show_one_stored_item_to_char(char_data *ch, empire_data *emp, struct empire
 //// COMMANDS ////////////////////////////////////////////////////////////////
 
 ACMD(do_adventure) {
+	void adventure_summon(char_data *ch, char *argument);
+
+	char arg[MAX_STRING_LENGTH];
 	struct instance_data *inst;
+	
+	if (*argument) {
+		argument = any_one_arg(argument, arg);
+		if (is_abbrev(arg, "summon")) {
+			adventure_summon(ch, argument);
+			return;
+		}
+		// otherwise fall through to the rest of the command
+	}
 	
 	if (!(inst = find_instance_by_room(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You are not in or near an adventure zone.\r\n");
@@ -1681,7 +1696,7 @@ ACMD(do_equipment) {
 	}
 	
 	if (!IS_NPC(ch)) {
-		msg_to_char(ch, "You are using (gear level %d):\r\n", (int) GET_GEAR_LEVEL(ch));
+		msg_to_char(ch, "You are using (gear level %d):\r\n", GET_GEAR_LEVEL(ch));
 	}
 	else {
 		send_to_char("You are using:\r\n", ch);
@@ -2414,7 +2429,9 @@ ACMD(do_whois) {
 
 	// show class (but don't bother for immortals, as they generally have all skills
 	if (!IS_GOD(victim) && !IS_IMMORTAL(victim)) {
-		level = file ? GET_LAST_KNOWN_LEVEL(victim) : GET_COMPUTED_LEVEL(victim);
+		// level = file ? GET_HIGHEST_RECENT_LEVEL(victim) : GET_COMPUTED_LEVEL(victim);
+		// always show highest recent level
+		level = GET_HIGHEST_RECENT_LEVEL(victim);
 		
 		if (GET_CLASS(victim) != CLASS_NONE) {
 			msg_to_char(ch, "Class: %d %s (%s)\r\n", level, class_data[GET_PC_CLASS(victim)].name, class_role[(int) GET_CLASS_ROLE(victim)]);

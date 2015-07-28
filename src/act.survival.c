@@ -47,9 +47,7 @@ INTERACTION_FUNC(butcher_interact) {
 	
 	for (num = 0; num < interaction->quantity; ++num) {
 		fillet = read_object(interaction->vnum);
-		if (OBJ_FLAGGED(fillet, OBJ_SCALABLE)) {
-			scale_item_to_level(fillet, 1);	// minimum level
-		}
+		scale_item_to_level(fillet, 1);	// minimum level
 		obj_to_char_or_room(fillet, ch);
 		load_otrigger(fillet);
 	}
@@ -88,9 +86,7 @@ INTERACTION_FUNC(do_one_forage) {
 	
 	for (iter = 0; iter < num; ++iter) {
 		obj = read_object(interaction->vnum);
-		if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-			scale_item_to_level(obj, 1);	// minimum level
-		}
+		scale_item_to_level(obj, 1);	// minimum level
 		obj_to_char_or_room(obj, ch);
 		add_depletion(inter_room, DPLTN_FORAGE, TRUE);
 		load_otrigger(obj);
@@ -352,6 +348,7 @@ ACMD(do_mount) {
 			saddle = find_best_saddle(ch);
 			if (saddle) {
 				equip_char(ch, saddle, WEAR_SADDLE);
+				determine_gear_level(ch);
 			}
 		}
 		

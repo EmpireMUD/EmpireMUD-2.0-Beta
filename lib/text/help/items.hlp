@@ -93,6 +93,26 @@ You can weave cotton into cloth. It will go faster if you're at at Tailor.
 
 See also: WEAVE, COTTON, TAILOR
 #
+"CRAFTER ITEMS" "CRAFTING ITEMS" "CRAFT ITEMS" "CRAFTING LEVEL" "CRAFTER LEVEL" "CRAFT LEVEL"
+
+A character's crafts (forge, sew, craft, etc.) are scaled up to the character's
+crafting level. This level is shown on your 'score' as Crafting. This is based
+on the character's skill level (1-100) plus bonuses from gear.
+
+Crafter items come in four different equipment slots: head, clothes, waist, and
+off-hand (hold). You can get a new set of crafter items every 100 levels or so.
+You must always make your own crafter items, but you may need to buy some of
+the components from other players.
+
+The first tier of crafter items comes at level 100:
+  Head: clockwork goggles (requires a clockwork lens array from an Artificer)
+  Clothes: guildmaster tunic (requires guild-patterned cloth from a Guildsman)
+  Waist: utility belt (requires some clips and buckles from a Tinker)
+  Off-hand: steel multitool (needs a set of delicate tools from a Steelsmith)
+
+See also: ARTIFICER, CRAFT, ENCHANT, FORGE, GUILDSMAN, SCORE, SEW, STEELSMITH,
+   TINKER
+#
 "IRIDESCENT BLUE IRIS" "IRIDESCENT IRIS" "BLUE IRIS" IRIS
 
 Iridescent Blue Iris (resource)
@@ -384,9 +404,9 @@ are in one, or in miscellaneous coins if not).
 The time to post the item is in real hours, and defaults to the maximum post
 time if you don't specify it. The minimum time is 1 hour.
 
-You must pay a small fee to post an item, based on its gear level. You will get
-this money back if your item sells successfully. However, there is a 5% charge
-for each successful sale.
+You must pay a small fee to post an item, based on its gear rating. You will
+get this money back if your item sells successfully. However, there is a 5%
+charge for each successful sale.
 
 For example, if an item costs you 4 coins to post and you sell it for 10 coins,
 You'll receive 9 coins (95% of the sale price) plus your original 4 back, for

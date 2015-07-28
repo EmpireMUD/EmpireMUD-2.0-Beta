@@ -30,11 +30,14 @@
 /**
 * Contents:
 *   Helpers
+*   Accept/Reject Helpers
 *   Toggle Notifiers
 *   Commands
 */
 
 // external prototypes
+extern bool can_enter_instance(char_data *ch, struct instance_data *inst);
+extern char *get_room_name(room_data *room, bool color);
 extern char_data *has_familiar(char_data *ch);
 void Objsave_char(char_data *ch, int rent_code);
 void scale_item_to_level(obj_data *obj, int level);
@@ -42,6 +45,126 @@ void scale_item_to_level(obj_data *obj, int level);
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
+
+/**
+* For the "adventure summon <player>" command.
+*
+* @param char_data *ch The player doing the summoning.
+* @param char *argument The typed argument.
+*/
+void adventure_summon(char_data *ch, char *argument) {
+	extern struct instance_data *find_instance_by_room(room_data *room);
+	
+	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	struct instance_data *inst;
+	char_data *vict;
+	
+	one_argument(argument, arg);
+	
+	if (GET_POS(ch) < POS_STANDING) {
+		msg_to_char(ch, "You can't do that right now.\r\n");
+	}
+	else if (!IS_ADVENTURE_ROOM(IN_ROOM(ch)) || !(inst = find_instance_by_room(IN_ROOM(ch)))) {
+		msg_to_char(ch, "You can only use the adventure summon command inside and adventure.\r\n");
+	}
+	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+		msg_to_char(ch, "You don't have permission to summon players here.\r\n");
+	}
+	else if (!*arg) {
+		msg_to_char(ch, "Summon whom to the adventure?\r\n");
+	}
+	else if (!(vict = get_player_vis(ch, arg, FIND_CHAR_WORLD | FIND_NO_DARK))) {
+		send_config_msg(ch, "no_person");
+	}
+	else if (vict == ch) {
+		msg_to_char(ch, "You summon yourself! Look, you're already here.\r\n");
+	}
+	else if (!GROUP(ch) || GROUP(ch) != GROUP(vict)) {
+		msg_to_char(ch, "You can only summon members of your own group.\r\n");
+	}
+	else if (IN_ROOM(vict) == IN_ROOM(ch)) {
+		msg_to_char(ch, "Your target is already here.\r\n");
+	}
+	else if (IS_ADVENTURE_ROOM(IN_ROOM(vict))) {
+		msg_to_char(ch, "You cannot summon someone who is already in an adventure.\r\n");
+	}
+	else if (IS_DEAD(vict)) {
+		msg_to_char(ch, "You cannot summon the dead like that.\r\n");
+	}
+	else if (!can_enter_instance(vict, inst)) {
+		msg_to_char(ch, "Your target can't enter this instance.\r\n");
+	}
+	else if (!can_teleport_to(vict, IN_ROOM(vict), TRUE)) {
+		msg_to_char(ch, "Your target can't be summoned from %s current location.\r\n", HSHR(vict));
+	}
+	else if (!can_teleport_to(vict, IN_ROOM(ch), FALSE)) {
+		msg_to_char(ch, "Your target can't be summoned here.\r\n");
+	}
+	else if (PLR_FLAGGED(vict, PLR_ADVENTURE_SUMMONED)) {
+		msg_to_char(ch, "You can't summon someone who is already adventure-summoned.\r\n");
+	}
+	else {
+		act("You start summoning $N...", FALSE, ch, NULL, vict, TO_CHAR);
+		snprintf(buf, sizeof(buf), "$n is trying to summon you to %s (%s) -- use 'accept/reject summon'.", GET_ADV_NAME(inst->adventure), get_room_name(IN_ROOM(ch), FALSE));
+		act(buf, FALSE, ch, NULL, vict, TO_VICT | TO_SLEEP);
+		add_offer(vict, ch, OFFER_SUMMON, SUMMON_ADVENTURE);
+		command_lag(ch, WAIT_OTHER);
+	}
+}
+
+
+/**
+* Sends a player back to where they came from, if they were adventure-summoned
+* and they left the adventure.
+*
+* @param char_data *ch The person to return back where they came from.
+*/
+void adventure_unsummon(char_data *ch) {
+	extern room_data *find_load_room(char_data *ch);
+	
+	room_data *room, *map;
+	
+	// safety first
+	if (!ch || IS_NPC(ch) || !PLR_FLAGGED(ch, PLR_ADVENTURE_SUMMONED)) {
+		return;
+	}
+	
+	REMOVE_BIT(PLR_FLAGS(ch), PLR_ADVENTURE_SUMMONED);
+	
+	room = real_room(GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch));
+	map = real_room(GET_ADVENTURE_SUMMON_RETURN_MAP(ch));
+	
+	act("$n vanishes in a wisp of smoke!", TRUE, ch, NULL, NULL, TO_ROOM);
+	
+	if (room && map && map == get_map_location_for(room)) {
+		char_to_room(ch, room);
+	}
+	else {
+		// nowhere safe to send back to
+		char_to_room(ch, find_load_room(ch));
+	}
+	
+	act("$n appears in a burst of smoke!", TRUE, ch, NULL, NULL, TO_ROOM);
+	GET_LAST_DIR(ch) = NO_DIR;
+	
+	look_at_room(ch);
+	msg_to_char(ch, "\r\nYou have been returned to your original location after leaving the adventure.\r\n");
+}
+
+
+/**
+* Ensures a character won't be returned home by adventure_unsummon()
+*
+* @param char_data *ch The person to cancel the return-summon data for.
+*/
+void cancel_adventure_summon(char_data *ch) {
+	if (!IS_NPC(ch)) {
+		REMOVE_BIT(PLR_FLAGS(ch), PLR_ADVENTURE_SUMMONED);
+		GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch) = NOWHERE;
+		GET_ADVENTURE_SUMMON_RETURN_MAP(ch) = NOWHERE;
+	}
+}
+
 
 /**
 * This quits out an old character and swaps the descriptor over to the new
@@ -62,7 +185,6 @@ void perform_alternate(char_data *old, char_data *new) {
 	char sys[MAX_STRING_LENGTH], mort_in[MAX_STRING_LENGTH], mort_out[MAX_STRING_LENGTH], mort_alt[MAX_STRING_LENGTH], temp[256];
 	descriptor_data *desc, *next_d;
 	bool show_start = FALSE;
-	char_data *ch_iter;
 	int invis_lev, old_invis, last_tell;
 	empire_data *old_emp;
 	
@@ -94,9 +216,6 @@ void perform_alternate(char_data *old, char_data *new) {
 	snprintf(mort_in, sizeof(mort_in), "%s has entered the game", temp);
 	snprintf(mort_out, sizeof(mort_in), "%s has left the game", PERS(old, old, TRUE));
 	
-	// store last known level now
-	GET_LAST_KNOWN_LEVEL(old) = GET_COMPUTED_LEVEL(old);
-	
 	// peace out
 	if (!GET_INVIS_LEV(old)) {
 		act("$n has left the game.", TRUE, old, NULL, NULL, TO_ROOM);
@@ -106,15 +225,8 @@ void perform_alternate(char_data *old, char_data *new) {
 	Objsave_char(old, RENT_RENTED);
 	SAVE_CHAR(old);
 	
-	// switch over replies
+	// save this to switch over replies
 	last_tell = GET_LAST_TELL(old);
-	if (invis_lev <= LVL_APPROVED) {
-		for (ch_iter = character_list; ch_iter; ch_iter = ch_iter->next) {
-			if (!IS_NPC(ch_iter) && GET_LAST_TELL(ch_iter) == GET_IDNUM(old)) {
-				GET_LAST_TELL(ch_iter) = GET_IDNUM(new);
-			}
-		}
-	}
 	
 	// move desc (do this AFTER saving)
 	new->desc = old->desc;
@@ -195,7 +307,6 @@ void perform_alternate(char_data *old, char_data *new) {
 * @param char_data *ch The person to display to.
 */
 static void print_group(char_data *ch) {
-	extern char *get_room_name(room_data *room, bool color);
 	extern const char *class_role[NUM_ROLES];
 	extern const char *pool_abbrevs[];
 
@@ -298,9 +409,7 @@ INTERACTION_FUNC(skin_interact) {
 		
 	for (num = 0; num < interaction->quantity; ++num) {
 		obj = read_object(interaction->vnum);
-		if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-			scale_item_to_level(obj, 1);	// min scale
-		}
+		scale_item_to_level(obj, 1);	// min scale
 		obj_to_char_or_room(obj, ch);
 		load_otrigger(obj);
 	}
@@ -316,6 +425,203 @@ INTERACTION_FUNC(skin_interact) {
 		act("You carefully skin $P and get $p.", FALSE, ch, obj, inter_item, TO_CHAR);
 		act("$n carefully skins $P and gets $p.", FALSE, ch, obj, inter_item, TO_ROOM);
 	}
+	
+	return TRUE;
+}
+
+
+/**
+* Begins a summon for a player -- see do_summon.
+*
+* @param char_data *ch The summoner.
+* @param char *argument The typed-in arg.
+*/
+void summon_player(char_data *ch, char *argument) {
+	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	char_data *vict, *ch_iter;
+	bool found;
+	
+	one_argument(argument, arg);
+	
+	if (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_SUMMON_PLAYER)) {
+		msg_to_char(ch, "You can't summon players here.\r\n");
+	}
+	else if (!IS_COMPLETE(IN_ROOM(ch))) {
+		msg_to_char(ch, "You must complete the building first.\r\n");
+	}
+	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+		msg_to_char(ch, "You don't have permission to summon players here.\r\n");
+	}
+	else if (!*arg) {
+		msg_to_char(ch, "Summon whom?\r\n");
+	}
+	else if (!(vict = get_player_vis(ch, arg, FIND_CHAR_WORLD | FIND_NO_DARK))) {
+		send_config_msg(ch, "no_person");
+	}
+	else if (vict == ch) {
+		msg_to_char(ch, "You summon yourself! Look, you're already here.\r\n");
+	}
+	else if (!GROUP(ch) || GROUP(ch) != GROUP(vict)) {
+		msg_to_char(ch, "You can only summon members of your own group.\r\n");
+	}
+	else if (IN_ROOM(vict) == IN_ROOM(ch)) {
+		msg_to_char(ch, "Your target is already here.\r\n");
+	}
+	else if (IS_DEAD(vict)) {
+		msg_to_char(ch, "You cannot summon the dead like that.\r\n");
+	}
+	else if (!can_teleport_to(vict, IN_ROOM(vict), TRUE)) {
+		msg_to_char(ch, "Your target can't be summoned from %s current location.\r\n", HSHR(vict));
+	}
+	else if (!can_teleport_to(vict, IN_ROOM(ch), FALSE)) {
+		msg_to_char(ch, "Your target can't be summoned here.\r\n");
+	}
+	else {
+		// mostly-valid by now... just a little bit more to check
+		found = FALSE;
+		for (ch_iter = ROOM_PEOPLE(IN_ROOM(ch)); ch_iter && !found; ch_iter = ch_iter->next_in_room) {
+			if (IS_DEAD(ch_iter) || !ch_iter->desc) {
+				continue;
+			}
+			
+			if (ch_iter != ch && GROUP(ch_iter) == GROUP(ch)) {
+				found = TRUE;
+			}
+		}
+		
+		if (!found) {
+			msg_to_char(ch, "You need a second group member present to help summon.\r\n");
+			return;
+		}
+		
+		act("You start summoning $N...", FALSE, ch, NULL, vict, TO_CHAR);
+		if (HAS_ABILITY(vict, ABIL_NAVIGATION)) {
+			snprintf(buf, sizeof(buf), "$n is trying to summon you to %s (%d, %d) -- use 'accept/reject summon'.", get_room_name(IN_ROOM(ch), FALSE), X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
+		}
+		else {
+			snprintf(buf, sizeof(buf), "$n is trying to summon you to %s -- use 'accept/reject summon'.", get_room_name(IN_ROOM(ch), FALSE));
+		}
+		act(buf, FALSE, ch, NULL, vict, TO_VICT | TO_SLEEP);
+		add_offer(vict, ch, OFFER_SUMMON, SUMMON_PLAYER);
+		command_lag(ch, WAIT_OTHER);
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// ACCEPT/REJECT HELPERS ///////////////////////////////////////////////////
+
+// helper types and functions:
+
+/**
+* Validation function for offer accepts.
+*
+* @param char_data *ch The person trying to accept the offer.
+* @param struct offer_data *offer The offer they are trying to accept.
+* @return bool TRUE if it's okay to accept, FALSE to block it.
+*/
+#define OFFER_VALIDATE(name)  bool (name)(char_data *ch, struct offer_data *offer)
+
+/**
+* Function to perform an offer accept. The return value determines whether or
+* not the offer should be deleted.
+*
+* @param char_data *ch The person accepting the offer.
+* @param struct offer_data *offer The offer they are trying accepting.
+* @return bool TRUE if we should delete the offer after, or FALSE if not (e.g. if it was deleted during the finish).
+*/
+#define OFFER_FINISH(name)  bool (name)(char_data *ch, struct offer_data *offer)
+
+
+OFFER_VALIDATE(oval_rez) {
+	extern obj_data *find_obj(int n);
+	extern room_data *obj_room(obj_data *obj);
+	
+	room_data *loc = real_room(offer->location);
+	obj_data *corpse;
+	
+	if (!loc || (ROOM_INSTANCE(loc) && !can_enter_instance(ch, ROOM_INSTANCE(loc)))) {
+		msg_to_char(ch, "You can't seem to resurrect there. Perhaps the adventure is full.\r\n");
+		return FALSE;
+	}
+	
+	// if already respawned, verify corpse location
+	if (!IS_DEAD(ch)) {
+		if (!(corpse = find_obj(GET_LAST_CORPSE_ID(ch))) || !IS_CORPSE(corpse)) {
+			msg_to_char(ch, "You can't resurrect because your corpse is gone.\r\n");
+			return FALSE;
+		}
+		if (obj_room(corpse) != loc) {
+			msg_to_char(ch, "You can't resurrect because your corpse has moved from the resurrection location.\r\n");
+			return FALSE;
+		}
+	}
+	
+	return TRUE;
+}
+
+OFFER_FINISH(ofin_rez) {
+	void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, int ability);
+	room_data *loc = real_room(offer->location);	// pre-validated
+	perform_resurrection(ch, is_playing(offer->from), loc, offer->data);
+	return FALSE;
+}
+
+
+OFFER_VALIDATE(oval_summon) {
+	room_data *loc = real_room(offer->location);
+	int type = offer->data;
+	
+	if (!loc) {
+		msg_to_char(ch, "Summon location invalid.\r\n");
+		return FALSE;
+	}
+	if (loc == IN_ROOM(ch)) {
+		msg_to_char(ch, "You are already there!\r\n");
+		return FALSE;
+	}
+	if ((ROOM_INSTANCE(loc) && !can_enter_instance(ch, ROOM_INSTANCE(loc)))) {
+		msg_to_char(ch, "You can't be summoned there right now. Perhaps the adventure is full.\r\n");
+		return FALSE;
+	}
+	if (type == SUMMON_ADVENTURE && IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
+		msg_to_char(ch, "You can't accept an adventure summon while you're already in an adventure.\r\n");
+		return FALSE;
+	}
+	if (!can_teleport_to(ch, IN_ROOM(ch), TRUE)) {
+		msg_to_char(ch, "You can't be teleported out of here.\r\n");
+		return FALSE;
+	}
+	if (!can_teleport_to(ch, loc, FALSE)) {
+		msg_to_char(ch, "You can't be teleported to the summon location.\r\n");
+		return FALSE;
+	}
+	
+	return TRUE;
+}
+
+OFFER_FINISH(ofin_summon) {
+	room_data *loc = real_room(offer->location), *map;
+	int type = offer->data;
+	
+	if (type == SUMMON_ADVENTURE) {
+		SET_BIT(PLR_FLAGS(ch), PLR_ADVENTURE_SUMMONED);
+		GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch) = GET_ROOM_VNUM(IN_ROOM(ch));
+		map = get_map_location_for(IN_ROOM(ch));
+		GET_ADVENTURE_SUMMON_RETURN_MAP(ch) = map ? GET_ROOM_VNUM(map) : NOWHERE;
+	}
+	else {
+		// if they accept a normal summon out of an adventure, cancel their group summon
+		if (PLR_FLAGGED(ch, PLR_ADVENTURE_SUMMONED) && ROOM_INSTANCE(IN_ROOM(ch)) != ROOM_INSTANCE(loc)) {
+			cancel_adventure_summon(ch);
+		}
+	}
+	
+	act("$n vanishes in a swirl of light!", TRUE, ch, NULL, NULL, TO_ROOM);
+	char_to_room(ch, loc);
+	GET_LAST_DIR(ch) = NO_DIR;
+	look_at_room(ch);
+	act("$n appears in a swirl of light!", TRUE, ch, NULL, NULL, TO_ROOM);
 	
 	return TRUE;
 }
@@ -341,6 +647,147 @@ void afk_notify(char_data *ch) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// COMMANDS ////////////////////////////////////////////////////////////////
+
+// also reject / do_reject (search hint)
+ACMD(do_accept) {
+	char type_arg[MAX_INPUT_LENGTH], name_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	int max_duration = config_get_int("offer_time");
+	struct offer_data *ofiter, *offer, *temp;
+	bool delete = FALSE;
+	int iter, type, ts;
+	bool found, dupe;
+	char_data *from;
+	
+	const char *mode[] = { "accept", "reject" };	// SCMD_ACCEPT, SCMD_REJECT
+	
+	// OFFER_x - Data for the offer system, for do_accept/reject
+	struct {
+		char *name;
+		int min_pos;
+		OFFER_VALIDATE(*validate_func);	// returns TRUE to allow, FALSE to prevent accept
+		OFFER_FINISH(*finish_func);	// returns TRUE if it's ok to delete the offer, FALSE if not
+	} offer_types[] = {
+		{ "resurrection", POS_DEAD, oval_rez, ofin_rez },	// OFFER_RESURRECTION: uses offer->data for ability
+		{ "summon", POS_STANDING, oval_summon, ofin_summon },	// OFFER_SUMMON: uses offer->data for SUMMON_x
+	
+		// end
+		{ "\n", POS_DEAD, NULL, NULL }
+	};
+
+	two_arguments(argument, type_arg, name_arg);
+	
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "NPCs cannot %s offers.\r\n", mode[subcmd]);
+		return;
+	}
+	
+	if (!*type_arg) {
+		msg_to_char(ch, "Usage: %s <type> [person]\r\n", mode[subcmd]);
+		if (GET_OFFERS(ch)) {
+			msg_to_char(ch, "You have the following offers available:\r\n");
+			
+			found = FALSE;
+			for (offer = GET_OFFERS(ch); offer; offer = offer->next) {
+				if (!(from = is_playing(offer->from))) {
+					continue;
+				}
+				
+				ts = time(0) - offer->time;
+				msg_to_char(ch, " %s - %s (%d seconds left)\r\n", GET_NAME(from), offer_types[offer->type].name, MAX(0, max_duration - ts));
+				found = TRUE;
+			}
+			if (!found) {
+				msg_to_char(ch, " none\r\n");
+			}
+		}
+		else {
+			msg_to_char(ch, "You have no offers available to %s.\r\n", mode[subcmd]);
+		}
+		return;
+	}
+	
+	// determine type
+	type = -1;
+	for (iter = 0; *offer_types[iter].name != '\n'; ++iter) {
+		if (is_abbrev(type_arg, offer_types[iter].name)) {
+			type = iter;
+			break;
+		}
+	}
+	if (type == -1) {
+		msg_to_char(ch, "Invalid type.\r\n");
+		return;
+	}
+	if (!offer_types[type].validate_func || !offer_types[type].finish_func) {
+		msg_to_char(ch, "That offer type is not currently implemented.\r\n");
+		return;
+	}
+	
+	// find entry
+	offer = NULL;
+	dupe = FALSE;
+	for (ofiter = GET_OFFERS(ch); ofiter; ofiter = ofiter->next) {
+		if (ofiter->type != type) {
+			continue;
+		}
+		if (!(from = is_playing(ofiter->from))) {
+			continue;
+		}
+		if (*name_arg && !is_abbrev(name_arg, GET_NAME(from))) {
+			continue;
+		}
+		
+		// validated
+		if (!offer) {
+			offer = ofiter;
+			if (*name_arg) {
+				break;	// end early if they specified the name
+			}
+		}
+		else {
+			dupe = TRUE;	// whoops, more than 1 valid match
+			break;
+		}
+	}
+	
+	if (!offer) {
+		msg_to_char(ch, "You have no offer like that to %s.\r\n", mode[subcmd]);
+		return;
+	}
+	if (dupe) {
+		msg_to_char(ch, "You have more than one offer for %s. Please specify a name too.\r\n", offer_types[type].name);
+		return;
+	}
+	if (GET_POS(ch) < offer_types[type].min_pos) {
+		msg_to_char(ch, "You can't do that right now.\r\n");
+		return;
+	}
+	
+	if (subcmd == SCMD_ACCEPT) {
+		// ok, we have validated offer so far..
+		if (!(offer_types[type].validate_func)(ch, offer)) {
+			return;
+		}
+	
+		// and finally
+		delete = (offer_types[type].finish_func)(ch, offer);
+	}
+	else {
+		msg_to_char(ch, "You reject the offer for %s.\r\n", offer_types[type].name);
+		if ((from = is_playing(offer->from))) {
+			snprintf(buf, sizeof(buf), "$N has rejected your offer for %s.", offer_types[type].name);
+			act(buf, FALSE, from, NULL, ch, TO_CHAR);
+		}
+		delete = TRUE;
+	}
+	
+	// in either case
+	if (delete) {
+		REMOVE_FROM_LIST(offer, GET_OFFERS(ch), next);
+		free(offer);
+	}
+}
+
 
 ACMD(do_alternate) {
 	extern int isbanned(char *hostname);
@@ -388,6 +835,12 @@ ACMD(do_alternate) {
 	}
 	else if (ch->desc->str) {
 		msg_to_char(ch, "You can't alterante while editing text.\r\n");
+	}
+	else if (ch->desc->snooping) {
+		msg_to_char(ch, "You can't alternate while snooping.\r\n");
+	}
+	else if (GET_OLC_TYPE(ch->desc) != 0) {
+		msg_to_char(ch, "You can't alternate with an OLC editor open.\r\n");
 	}
 	else if (ROOM_OWNER(IN_ROOM(ch)) && empire_is_hostile(ROOM_OWNER(IN_ROOM(ch)), GET_LOYALTY(ch), IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't alternate in hostile territory.\r\n");
@@ -1232,9 +1685,6 @@ ACMD(do_quit) {
 			player_death(ch);
 			died = TRUE;
 		}
-				
-		// store last known level now
-		GET_LAST_KNOWN_LEVEL(ch) = GET_COMPUTED_LEVEL(ch);
 		
 		if (!GET_INVIS_LEV(ch)) {
 			act("$n has left the game.", TRUE, ch, 0, 0, TO_ROOM);
@@ -1279,10 +1729,7 @@ ACMD(do_save) {
 		if (cmd) {
 			msg_to_char(ch, "Saving %s.\r\n", GET_NAME(ch));
 		}
-				
-		// store last known level now
-		GET_LAST_KNOWN_LEVEL(ch) = GET_COMPUTED_LEVEL(ch);
-
+		
 		write_aliases(ch);
 		SAVE_CHAR(ch);
 		Objsave_char(ch, RENT_CRASH);
@@ -1472,6 +1919,11 @@ ACMD(do_summon) {
 	else if (!IS_NPC(ch) && is_abbrev(arg, "materials")) {
 		ability = ABIL_SUMMON_MATERIALS;
 		summon_materials(ch, argument);
+		return;
+	}
+	else if (!IS_NPC(ch) && is_abbrev(arg, "player")) {
+		ability = NO_ABIL;
+		summon_player(ch, argument);
 		return;
 	}
 	else {

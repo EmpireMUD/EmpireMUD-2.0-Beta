@@ -215,7 +215,7 @@ You can mill:
 
 You must do this at a Mill building. Milling will gain Trade skill up to 15.
 
-See also: COOK
+See also: CRAFTING LEVEL, COOK
 #
 MINE MINES
 
@@ -492,12 +492,13 @@ creatures, items, or bodyguards. Each may serve a different purpose, so you
 should consult the help file for the specific summon ability you're using.
 
 See also:
-SUMMON HUMANS  (Vampire ability)
+SUMMON BODYGUARD  (Empire ability)
 SUMMON ANIMALS  (Natural Magic ability)
 SUMMON GUARDS  (Empire ability)
-SUMMON BODYGUARD  (Empire ability)
-SUMMON THUGS  (Stealth ability)
+SUMMON HUMANS  (Vampire ability)
 SUMMON MATERIAlS  (High Sorcery ability)
+SUMMON PLAYER  (at an Astral Nexus)
+SUMMON THUGS  (Stealth ability)
 #
 TENT TENTS
 

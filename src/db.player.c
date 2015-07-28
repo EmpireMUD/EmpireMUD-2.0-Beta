@@ -489,6 +489,7 @@ void free_char(char_data *ch) {
 	struct channel_history_data *history;
 	struct player_slash_channel *slash;
 	struct interaction_item *interact;
+	struct offer_data *offer;
 	struct lore_data *lore;
 	struct coin_data *coin;
 	struct alias_data *a;
@@ -531,6 +532,11 @@ void free_char(char_data *ch) {
 		while ((a = GET_ALIASES(ch)) != NULL) {
 			GET_ALIASES(ch) = (GET_ALIASES(ch))->next;
 			free_alias(a);
+		}
+		
+		while ((offer = GET_OFFERS(ch))) {
+			GET_OFFERS(ch) = offer->next;
+			free(offer);
 		}
 		
 		while ((slash = GET_SLASH_CHANNELS(ch))) {
@@ -704,13 +710,13 @@ void init_player(char_data *ch) {
 	GET_EMPIRE_VNUM(ch) = NOTHING;
 	GET_PLEDGE(ch) = NOTHING;
 	GET_TOMB_ROOM(ch) = NOWHERE;
+	GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch) = NOWHERE;
+	GET_ADVENTURE_SUMMON_RETURN_MAP(ch) = NOWHERE;
 	
 	// spares
-	ch->player_specials->saved.spare25 = NOTHING;
-	ch->player_specials->saved.spare26 = NOTHING;
-	ch->player_specials->saved.spare27 = NOTHING;
-	ch->player_specials->saved.spare28 = NOTHING;
-	ch->player_specials->saved.spare29 = NOTHING;
+	ch->player_specials->saved.spare30 = NOTHING;
+	ch->player_specials->saved.spare31 = NOTHING;
+	ch->player_specials->saved.spare32 = NOTHING;
 }
 
 
@@ -1046,11 +1052,9 @@ int enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	
 	extern bool global_mute_slash_channel_joins;
 	extern int top_idnum;
-	extern const struct wear_data_type wear_data[NUM_WEARS];
 
 	char lbuf[MAX_STRING_LENGTH];
 	int i, iter;
-	double level;
 	empire_data *emp;
 	room_data *load_room = NULL, *map_loc;
 	char_data *ch = d->character;
@@ -1139,23 +1143,12 @@ int enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	affect_total(ch);
 	SAVE_CHAR(ch);
 		
-	// verify class/skill levels are up-to-date
+	// verify class and skill/gear levels are up-to-date
 	update_class(ch);
-	
-	// check equipment levels
-	level = 0;
-	for (iter = 0; iter < NUM_WEARS; ++iter) {
-		if (GET_EQ(ch, iter) && wear_data[iter].adds_gear_level) {
-			level += rate_item(GET_EQ(ch, iter));
-		}
-	}
-	GET_GEAR_LEVEL(ch) = level;
+	determine_gear_level(ch);
 	
 	// clear some player special data
 	GET_MARK_LOCATION(ch) = NOWHERE;
-	GET_RESURRECT_LOCATION(ch) = NOWHERE;
-	GET_RESURRECT_BY(ch) = NOBODY;
-	GET_RESURRECT_ABILITY(ch) = NO_ABIL;
 
 	// re-join slash-channels
 	global_mute_slash_channel_joins = TRUE;
@@ -1400,10 +1393,7 @@ void start_new_character(char_data *ch) {
 			}
 			
 			obj = read_object(archetype[type].gear[iter].vnum);
-			
-			if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-				scale_item_to_level(obj, 1);	// lowest possible scale
-			}
+			scale_item_to_level(obj, 1);	// lowest possible scale
 			
 			if (archetype[type].gear[iter].wear == NOWHERE) {
 				obj_to_char(obj, ch);
@@ -1415,34 +1405,27 @@ void start_new_character(char_data *ch) {
 
 		// misc items
 		obj = read_object(o_GRAVE_MARKER);
-		if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-			scale_item_to_level(obj, 1);	// lowest possible scale
-		}
+		scale_item_to_level(obj, 1);	// lowest possible scale
 		obj_to_char(obj, ch);
 		
 		for (iter = 0; iter < 2; ++iter) {
 			// 2 bread
 			obj = read_object(o_BREAD);
-			if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-				scale_item_to_level(obj, 1);	// lowest possible scale
-			}
+			scale_item_to_level(obj, 1);	// lowest possible scale
 			obj_to_char(obj, ch);
 			
 			// 2 trinket of conveyance
 			obj = read_object(o_TRINKET_OF_CONVEYANCE);
-			if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-				scale_item_to_level(obj, 1);	// lowest possible scale
-			}
+			scale_item_to_level(obj, 1);	// lowest possible scale
 			obj_to_char(obj, ch);
 		}
 		
 		obj = read_object(o_BOWL);
-		if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-			scale_item_to_level(obj, 1);	// lowest possible scale
-		}
+		scale_item_to_level(obj, 1);	// lowest possible scale
 		GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) = GET_DRINK_CONTAINER_CAPACITY(obj);
 		GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = LIQ_WATER;
 		obj_to_char(obj, ch);
+		determine_gear_level(ch);
 	}
 	
 	// apply any bonus traits that needed it

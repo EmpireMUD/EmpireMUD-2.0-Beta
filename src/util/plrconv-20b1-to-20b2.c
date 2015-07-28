@@ -660,6 +660,7 @@ void convert_char_file_u(struct b2_char_file_u *to, struct b1_char_file_u *from)
 	to->player_specials_saved.can_gain_new_skills = from->player_specials_saved.can_gain_new_skills;
 	to->player_specials_saved.can_get_bonus_skills = from->player_specials_saved.can_get_bonus_skills;
 	to->player_specials_saved.skill_level = from->player_specials_saved.skill_level;
+	to->player_specials_saved.last_known_level = from->player_specials_saved.last_known_level;
 	to->player_specials_saved.class_progression = from->player_specials_saved.class_progression;
 	to->player_specials_saved.class_role = from->player_specials_saved.class_role;
 	to->player_specials_saved.character_class = from->player_specials_saved.character_class;

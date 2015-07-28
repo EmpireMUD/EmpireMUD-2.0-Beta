@@ -503,6 +503,7 @@ ACMD(do_ready) {
 	act("Mana twists and swirls around $n's hand and becomes $p!", TRUE, ch, obj, 0, TO_ROOM);
 	
 	equip_char(ch, obj, WEAR_WIELD);
+	determine_gear_level(ch);
 	
 	if (ready_magic_weapon[type].ability != NO_ABIL) {
 		gain_ability_exp(ch, ready_magic_weapon[type].ability, 15);

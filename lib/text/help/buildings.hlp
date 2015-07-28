@@ -28,6 +28,18 @@ Apiaries are made by Advanced Woodworking.
 
 See also: ADVANCED WOODWORKING
 #
+"ASTRAL NEXUS" ASTRALNEXUS
+
+..&C*&0.  Astral Nexus  (Exarch Buildings ability)
+
+Resources:  20 logs, 12 blocks, 12 nocturnium, 20 nexus crystals
+Built on:  plains, desert (in city only)
+
+The astral nexus allows you to summon other players if you have a second player
+present to help you. This only works in cities.
+
+See also: SUMMON PLAYER
+#
 BAKERY
 
 (BB)  Bakery  (Artisans ability)
@@ -242,6 +254,17 @@ to grow rare whitegrass in greater abundance.
 You can pick more herbs than normal before the tile is depleted.
 
 See also: PICK
+#
+"EXARCH BUILDINGS"
+
+Exarch Buildings
+Class ability:  Exarch
+
+This ability allows you to build the following buildings:
+
+..&C*&0. astralnexus  20 logs, 12 blocks, 12 nocturnium, 20 nexus crystals
+
+See also: BUILD, EXARCH
 #
 GRAVE GRAVES "GRAVE MARKER"
 

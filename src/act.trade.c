@@ -96,6 +96,21 @@ obj_data *find_water_container(char_data *ch, obj_data *list) {
 
 
 /**
+* Returns the total level to use for a character's crafts.
+*
+* @param char_data *ch The character to check.
+*/
+int get_crafting_level(char_data *ch) {
+	if (IS_NPC(ch)) {
+		return get_approximate_level(ch) + GET_CRAFTING_BONUS(ch);
+	}
+	else {
+		return GET_SKILL_LEVEL(ch) + GET_CRAFTING_BONUS(ch);
+	}
+}
+
+
+/**
 * This finds a hammer in either tool slot, and returns it.
 *
 * @param char_data *ch The person using the hammer?
@@ -140,6 +155,7 @@ struct {
 } gen_craft_data[] = {
 	{ "error", "erroring", { "", "" } },	// dummy to require scmd
 	
+	// Note: These correspond to CRAFT_TYPE_x so you cannot change the order.
 	{ "forge", "forging", { "You hit the %s on the anvil hard with $p!", "$n hits the %s on the anvil hard with $p!" } },
 	{ "craft", "crafting", { "You continue crafting the %s...", "$n continues crafting the %s..." } },
 	{ "cook", "cooking", { "You continue cooking the %s...", "$n continues cooking the %s..." } },
@@ -208,7 +224,12 @@ void cancel_gen_craft(char_data *ch) {
 
 			// just empty it
 			GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) = 0;
-			obj_to_char_or_room(obj, ch);
+			if (CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
+				obj_to_char(obj, ch);
+			}
+			else {
+				obj_to_room(obj, IN_ROOM(ch));
+			}
 			load_otrigger(obj);
 		}
 	}
@@ -283,7 +304,12 @@ void finish_gen_craft(char_data *ch) {
 	
 		// set it to go bad... very bad
 		GET_OBJ_TIMER(obj) = SOUP_TIMER;
-		obj_to_char_or_room(obj, ch);
+		if (CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
+			obj_to_char(obj, ch);
+		}
+		else {
+			obj_to_room(obj, IN_ROOM(ch));
+		}
 		scale_craftable(obj, ch, type);
 		
 		load_otrigger(obj);
@@ -310,7 +336,7 @@ void finish_gen_craft(char_data *ch) {
 	
 				// where to put it
 				if (CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
-					obj_to_char_or_room(obj, ch);
+					obj_to_char(obj, ch);
 				}
 				else {
 					obj_to_room(obj, IN_ROOM(ch));
@@ -424,14 +450,14 @@ void scale_craftable(obj_data *obj, char_data *ch, craft_data *craft) {
 	int level = 1, psr;
 	obj_data *req;
 	
-	if (!OBJ_FLAGGED(obj, OBJ_SCALABLE) || IS_NPC(ch)) {
+	if (IS_NPC(ch)) {
 		return;
 	}
 	
 	// determine ideal scale level
 	if (craft) {
 		if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING && (req = obj_proto(GET_CRAFT_REQUIRES_OBJ(craft)))) {
-			level = GET_COMPUTED_LEVEL(ch);
+			level = get_crafting_level(ch);
 			
 			// check bounds on the required object
 			if (GET_OBJ_MAX_SCALE_LEVEL(req) > 0) {
@@ -447,7 +473,7 @@ void scale_craftable(obj_data *obj, char_data *ch, craft_data *craft) {
 			}
 			else if (ability_data[GET_CRAFT_ABILITY(craft)].parent_skill == NO_SKILL) {
 				// probably a class skill
-				level = GET_COMPUTED_LEVEL(ch);
+				level = get_crafting_level(ch);
 			}
 			else if ((psr = GET_PARENT_SKILL_REQUIRED(GET_CRAFT_ABILITY(craft))) != NOTHING) {
 				if (psr < BASIC_SKILL_CAP) {
@@ -462,16 +488,16 @@ void scale_craftable(obj_data *obj, char_data *ch, craft_data *craft) {
 			}
 			else {
 				// this is probably unreachable
-				level = GET_COMPUTED_LEVEL(ch);
+				level = get_crafting_level(ch);
 			}
 			
-			// always bound by the computed level
-			level = MIN(level, GET_COMPUTED_LEVEL(ch));
+			// always bound by the crafting level
+			level = MIN(level, get_crafting_level(ch));
 		}
 	}
 	else {
 		// no craft given
-		level = GET_COMPUTED_LEVEL(ch);
+		level = get_crafting_level(ch);
 	}
 	
 	// do it
@@ -611,7 +637,12 @@ void finish_weaving(char_data *ch) {
 
 	obj = read_object(weave_data[type].vnum);
 	
-	obj_to_char_or_room(obj, ch);
+	if (CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
+		obj_to_char(obj, ch);
+	}
+	else {
+		obj_to_room(obj, IN_ROOM(ch));
+	}
 
 	act("You finish weaving $p!", FALSE, ch, obj, 0, TO_CHAR);
 	act("$n finishes weaving $p!", FALSE, ch, obj, 0, TO_ROOM);
@@ -722,6 +753,9 @@ ACMD(do_gen_craft) {
 	}
 	else if (GET_CRAFT_ABILITY(type) != NO_ABIL && !HAS_ABILITY(ch, GET_CRAFT_ABILITY(type))) {
 		msg_to_char(ch, "You need to buy the %s ability to %s that.\r\n", ability_data[GET_CRAFT_ABILITY(type)].name, gen_craft_data[GET_CRAFT_TYPE(type)].command);
+	}
+	else if (GET_CRAFT_MIN_LEVEL(type) > get_crafting_level(ch)) {
+		msg_to_char(ch, "You need to have a crafting level of %d to %s that.\r\n", GET_CRAFT_MIN_LEVEL(type), gen_craft_data[GET_CRAFT_TYPE(type)].command);
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		msg_to_char(ch, "You don't have permission to %s here.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
@@ -933,7 +967,7 @@ ACMD(do_reforge) {
 		msg_to_char(ch, "You can't %s that item.\r\n", reforge_data[subcmd].command);
 	}
 	else if (is_abbrev(arg2, "name")) {
-		// calculate gem cost based on the gear level of the item
+		// calculate gem cost based on the gear rating of the item
 		res[0].vnum = o_IRIDESCENT_IRIS;
 		res[0].amount = MAX(1, rate_item(obj) / 3);
 		
@@ -984,7 +1018,7 @@ ACMD(do_reforge) {
 	else if (is_abbrev(arg2, "renew")) {
 		proto = obj_proto(GET_OBJ_VNUM(obj));
 		
-		// calculate gem cost based on the gear level of the original item
+		// calculate gem cost based on the gear rating of the original item
 		res[0].vnum = o_BLOODSTONE;
 		res[0].amount = MAX(1, (proto ? rate_item(proto) : rate_item(obj)) / 3);
 		
@@ -1015,7 +1049,7 @@ ACMD(do_reforge) {
 			// re-apply
 			new->stolen_timer = old_stolen_time;
 			GET_OBJ_TIMER(new) = old_timer;
-			if (level > 0 && OBJ_FLAGGED(new, OBJ_SCALABLE)) {
+			if (level > 0) {
 				scale_item_to_level(new, level);
 			}
 			
@@ -1037,7 +1071,7 @@ ACMD(do_reforge) {
 		}
 	}
 	else if (is_abbrev(arg2, "superior")) {
-		// calculate gem cost based on the gear level of the item
+		// calculate gem cost based on the gear rating of the item
 		res[0].vnum = o_GLOWING_SEASHELL;
 		res[0].amount = MAX(1, rate_item(obj) / 3);
 		proto = obj_proto(GET_OBJ_VNUM(obj));
@@ -1092,7 +1126,7 @@ ACMD(do_reforge) {
 			// re-apply values
 			new->stolen_timer = old_stolen_time;
 			GET_OBJ_TIMER(new) = old_timer;
-			if (level > 0 && OBJ_FLAGGED(new, OBJ_SCALABLE)) {
+			if (level > 0) {
 				scale_item_to_level(new, level);
 			}
 			

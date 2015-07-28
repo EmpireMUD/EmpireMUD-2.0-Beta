@@ -366,18 +366,14 @@ INTERACTION_FUNC(devastate_crop) {
 	
 	while (num-- > 0) {
 		obj_to_char_or_room((newobj = read_object(interaction->vnum)), ch);
-		if (OBJ_FLAGGED(newobj, OBJ_SCALABLE)) {
-			scale_item_to_level(newobj, 1);	// minimum level
-		}
+		scale_item_to_level(newobj, 1);	// minimum level
 		load_otrigger(newobj);
 	}
 	
 	// additional tree if orchard
 	if (ROOM_CROP_FLAGGED(inter_room, CROPF_IS_ORCHARD)) {
 		obj_to_char_or_room((newobj = read_object(o_TREE)), ch);
-		if (OBJ_FLAGGED(newobj, OBJ_SCALABLE)) {
-			scale_item_to_level(newobj, 1);	// minimum level
-		}
+		scale_item_to_level(newobj, 1);	// minimum level
 		load_otrigger(newobj);
 	}
 	
@@ -860,11 +856,12 @@ ACMD(do_dispel) {
 
 
 ACMD(do_enchant) {
+	extern int get_crafting_level(char_data *ch);
 	extern const double apply_values[];
 	
 	char arg2[MAX_INPUT_LENGTH];
 	obj_data *obj;
-	int iter, type, scale;
+	int iter, type, scale, charlevel;
 	bool found, line, first;		
 	double points_available, first_points = 0.0, second_points = 0.0;
 
@@ -925,8 +922,9 @@ ACMD(do_enchant) {
 	else {
 		extract_resources(ch, enchant_data[type].resources, FALSE);
 		
-		// enchant scale level is whichever is less: obj scale level, or player level
-		scale = MIN(GET_OBJ_CURRENT_SCALE_LEVEL(obj), GET_COMPUTED_LEVEL(ch));
+		// enchant scale level is whichever is less: obj scale level, or player crafting level
+		charlevel = MAX(get_crafting_level(ch), get_approximate_level(ch));
+		scale = MIN(GET_OBJ_CURRENT_SCALE_LEVEL(obj), charlevel);
 		points_available = MAX(1.0, scale / 100.0 * enchant_points_at_100);
 		
 		if (HAS_ABILITY(ch, ABIL_GREATER_ENCHANTMENTS)) {
@@ -1622,10 +1620,14 @@ RITUAL_SETUP_FUNC(start_ritual_of_teleportation) {
 
 
 RITUAL_FINISH_FUNC(perform_ritual_of_teleportation) {
+	void cancel_adventure_summon(char_data *ch);
+	
 	room_data *to_room, *rand_room;
 	int tries, rand_x, rand_y;
+	bool random;
 	
 	to_room = real_room(GET_ACTION_VNUM(ch, 1));
+	random = to_room ? FALSE : TRUE;
 	
 	// if there's no room, find a where
 	tries = 0;
@@ -1652,6 +1654,11 @@ RITUAL_FINISH_FUNC(perform_ritual_of_teleportation) {
 	
 		// reset this in case they teleport onto a wall.
 		GET_LAST_DIR(ch) = NO_DIR;
+		
+		// any existing adventure summon location is no longer valid after a voluntary teleport
+		if (!random) {	// except random teleport
+			cancel_adventure_summon(ch);
+		}
 
 		// trigger block	
 		enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);

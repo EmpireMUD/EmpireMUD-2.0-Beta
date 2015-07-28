@@ -778,8 +778,9 @@ void death_restore(char_data *ch) {
 		}
 	}
 	
-	// remove respawn
+	// remove respawn/rez
 	remove_cooldown_by_type(ch, COOLDOWN_DEATH_RESPAWN);
+	remove_offers_by_type(ch, OFFER_RESURRECTION);
 	
 	// Pools restore
 	GET_HEALTH(ch) = MAX(1, GET_MAX_HEALTH(ch) / 4);
@@ -882,8 +883,6 @@ obj_data *die(char_data *ch, char_data *killer) {
 	// for players, die() ends here, until they respawn or quit
 	if (!IS_NPC(ch)) {
 		add_cooldown(ch, COOLDOWN_DEATH_RESPAWN, config_get_int("death_release_minutes") * SECS_PER_REAL_MIN);
-		GET_RESURRECT_LOCATION(ch) = NOWHERE;	// ensure no pending resurrect
-		GET_RESURRECT_BY(ch) = NOBODY;
 		msg_to_char(ch, "Type 'respawn' to come back at your tomb.\r\n");
 		GET_POS(ch) = POS_DEAD;	// ensure pos
 		return NULL;
@@ -976,7 +975,6 @@ void drop_loot(char_data *mob, char_data *killer) {
 			for (iter = 0; iter < interact->quantity; ++iter) {
 				obj = read_object(interact->vnum);
 				
-				// scale
 				if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
 					// set flags (before scaling)
 					if (!OBJ_FLAGGED(obj, OBJ_GENERIC_DROP)) {
@@ -987,9 +985,10 @@ void drop_loot(char_data *mob, char_data *killer) {
 							SET_BIT(GET_OBJ_EXTRA(obj), OBJ_GROUP_DROP);
 						}
 					}
-					
-					scale_item_to_level(obj, scale_level);
 				}
+				
+				// scale
+				scale_item_to_level(obj, scale_level);
 				
 				// preemptive binding
 				if (OBJ_FLAGGED(obj, OBJ_BIND_ON_PICKUP) && IS_NPC(mob)) {
@@ -1125,6 +1124,7 @@ void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, int 
 	
 	if (IN_ROOM(ch) != loc) {
 		act("$n vanishes in a swirl of light!", TRUE, ch, NULL, NULL, TO_ROOM);
+		GET_LAST_DIR(ch) = NO_DIR;
 	}
 	
 	// move character
@@ -1148,10 +1148,7 @@ void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, int 
 		}
 	}
 	affect_from_char(ch, ATYPE_DEATH_PENALTY);	// in case
-	
-	GET_RESURRECT_LOCATION(ch) = NOWHERE;
-	GET_RESURRECT_BY(ch) = NOBODY;
-	GET_RESURRECT_ABILITY(ch) = NO_ABIL;
+	remove_offers_by_type(ch, OFFER_RESURRECTION);
 
 	// log
 	syslog(SYS_DEATH, GET_INVIS_LEV(ch), TRUE, "%s has been resurrected by %s at %s", GET_NAME(ch), rez_by ? GET_NAME(rez_by) : "(unknown)", room_log_identifier(loc));
@@ -1224,8 +1221,9 @@ void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, int 
 * @return obj_data* The player's corpse object, if any.
 */
 obj_data *player_death(char_data *ch) {
-	obj_data *corpse;
+	void cancel_adventure_summon(char_data *ch);
 	
+	obj_data *corpse;
 	perform_dismount(ch);	// just to be sure
 	death_restore(ch);
 	
@@ -1247,6 +1245,11 @@ obj_data *player_death(char_data *ch) {
 		int duration = config_get_int("seconds_per_death") * (GET_RECENT_DEATH_COUNT(ch) + 1 - config_get_int("deaths_before_penalty")) / SECS_PER_REAL_UPDATE;
 		struct affected_type *af = create_flag_aff(ATYPE_DEATH_PENALTY, duration, AFF_IMMUNE_PHYSICAL | AFF_NO_ATTACK | AFF_STUNNED);
 		affect_join(ch, af, ADD_DURATION);
+	}
+	
+	if (PLR_FLAGGED(ch, PLR_ADVENTURE_SUMMONED)) {
+		GET_LAST_CORPSE_ID(ch) = -1;	// invalidate their last-corpse-id to prevent a rez (they can be adventure-summoned)
+		// don't actually cancel the summon -- they'll get whisked back when they respawn
 	}
 	
 	return corpse;

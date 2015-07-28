@@ -573,9 +573,7 @@ OCMD(do_dgoload) {
 			obj_to_room(object, room);
 		
 			// must scale now if possible
-			if (OBJ_FLAGGED(object, OBJ_SCALABLE)) {
-				scale_item_to_level(object, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
-			}
+			scale_item_to_level(object, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 
 			load_otrigger(object);
 			return;
@@ -584,14 +582,12 @@ OCMD(do_dgoload) {
 		skip_spaces(&target);
 		
 		// if there is still a target, we scale on that number, otherwise default scale
-		if (OBJ_FLAGGED(object, OBJ_SCALABLE)) {
-			if (*target && isdigit(*target)) {
-				scale_item_to_level(object, atoi(target));
-			}
-			else {
-				// default
-				scale_item_to_level(object, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
-			}
+		if (*target && isdigit(*target)) {
+			scale_item_to_level(object, atoi(target));
+		}
+		else {
+			// default
+			scale_item_to_level(object, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 		}
 		
 		tch = get_char_near_obj(obj, arg1);
@@ -599,6 +595,7 @@ OCMD(do_dgoload) {
 			if (*arg2 && (pos = find_eq_pos_script(arg2)) >= 0 && !GET_EQ(tch, pos) && can_wear_on_pos(object, pos)) {
 				equip_char(tch, object, pos);
 				load_otrigger(object);
+				determine_gear_level(tch);
 				return;
 			}
 			obj_to_char(object, tch);
@@ -941,7 +938,8 @@ OCMD(do_oscale) {
 				extract_obj(otarg);
 			}
 			else {
-				obj_log(obj, "oscale: target is not scalable");
+				// attempt to scale anyway
+				scale_item_to_level(otarg, level);
 			}
 		}
 		else {

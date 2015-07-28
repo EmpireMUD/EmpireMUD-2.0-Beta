@@ -1906,15 +1906,15 @@ SHOW(show_account) {
 			if (vbuf.char_specials_saved.idnum == cbuf.char_specials_saved.idnum || (vbuf.player_specials_saved.account_id != 0 && vbuf.player_specials_saved.account_id == cbuf.player_specials_saved.account_id)) {
 				// same account
 				if (is_playing(vbuf.char_specials_saved.idnum) || is_at_menu(vbuf.char_specials_saved.idnum)) {
-					msg_to_char(ch, " &c[%d %s] %s (online)&0%s\r\n", vbuf.player_specials_saved.last_known_level, class_data[vbuf.player_specials_saved.character_class].name, vbuf.name, IS_SET(vbuf.char_specials_saved.act, PLR_DELETED) ? " (deleted)" : "");
+					msg_to_char(ch, " &c[%d %s] %s (online)&0%s\r\n", vbuf.player_specials_saved.highest_recent_level, class_data[vbuf.player_specials_saved.character_class].name, vbuf.name, IS_SET(vbuf.char_specials_saved.act, PLR_DELETED) ? " (deleted)" : "");
 				}
 				else {
 					// not playing but same account
-					msg_to_char(ch, " [%d %s] %s%s\r\n", vbuf.player_specials_saved.last_known_level, class_data[vbuf.player_specials_saved.character_class].name, vbuf.name, IS_SET(vbuf.char_specials_saved.act, PLR_DELETED) ? " (deleted)" : "");
+					msg_to_char(ch, " [%d %s] %s%s\r\n", vbuf.player_specials_saved.highest_recent_level, class_data[vbuf.player_specials_saved.character_class].name, vbuf.name, IS_SET(vbuf.char_specials_saved.act, PLR_DELETED) ? " (deleted)" : "");
 				}
 			}
 			else if (!IS_SET(vbuf.char_specials_saved.act, PLR_DELETED) && !strcmp(vbuf.host, cbuf.host)) {
-				msg_to_char(ch, " &r[%d %s] %s (not on account)&0\r\n", vbuf.player_specials_saved.last_known_level, class_data[vbuf.player_specials_saved.character_class].name, vbuf.name);
+				msg_to_char(ch, " &r[%d %s] %s (not on account)&0\r\n", vbuf.player_specials_saved.highest_recent_level, class_data[vbuf.player_specials_saved.character_class].name, vbuf.name);
 			}
 		}
 	}
@@ -2399,7 +2399,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 			msg_to_char(ch, "Promo code: %s\r\n", promo_codes[GET_PROMO_ID(k)].code);
 		}
 
-		msg_to_char(ch, "Access Level: [&c%d&0], Class: [&c%s&0/&c%s&0], Skill Level: [&c%d&0], Gear Level: [&c%d&0], Total: [&c%d&0]\r\n", GET_ACCESS_LEVEL(k), class_data[GET_CLASS(k)].name, class_role[(int) GET_CLASS_ROLE(k)], GET_SKILL_LEVEL(k), (int) GET_GEAR_LEVEL(k), IN_ROOM(k) ? GET_COMPUTED_LEVEL(k) : GET_LAST_KNOWN_LEVEL(k));
+		msg_to_char(ch, "Access Level: [&c%d&0], Class: [&c%s&0/&c%s&0], Skill Level: [&c%d&0], Gear Level: [&c%d&0], Total: [&c%d&0]\r\n", GET_ACCESS_LEVEL(k), class_data[GET_CLASS(k)].name, class_role[(int) GET_CLASS_ROLE(k)], GET_SKILL_LEVEL(k), GET_GEAR_LEVEL(k), IN_ROOM(k) ? GET_COMPUTED_LEVEL(k) : GET_HIGHEST_RECENT_LEVEL(k));
 		
 		coin_string(GET_PLAYER_COINS(k), buf);
 		msg_to_char(ch, "Coins: %s\r\n", buf);
@@ -2661,7 +2661,7 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 		sprintf(buf + strlen(buf), " (%s %d)", skill_data[ability_data[GET_CRAFT_ABILITY(craft)].parent_skill].name, ability_data[GET_CRAFT_ABILITY(craft)].parent_skill_required);
 	}
 	seconds = GET_CRAFT_TIME(craft) * SECS_PER_REAL_UPDATE;
-	msg_to_char(ch, "Ability: &y%s&0, Time: [&g%d action tick%s&0 | &g%d:%02d&0]\r\n", buf, GET_CRAFT_TIME(craft), PLURAL(GET_CRAFT_TIME(craft)), seconds / SECS_PER_REAL_MIN, seconds % SECS_PER_REAL_MIN);
+	msg_to_char(ch, "Ability: &y%s&0, Level: &g%d&0, Time: [&g%d action tick%s&0 | &g%d:%02d&0]\r\n", buf, GET_CRAFT_MIN_LEVEL(craft), GET_CRAFT_TIME(craft), PLURAL(GET_CRAFT_TIME(craft)), seconds / SECS_PER_REAL_MIN, seconds % SECS_PER_REAL_MIN);
 
 	sprintbit(GET_CRAFT_FLAGS(craft), craft_flags, buf, TRUE);
 	msg_to_char(ch, "Flags: &c%s&0\r\n", buf);
@@ -2750,18 +2750,18 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	struct obj_custom_message *ocm;
 
 	msg_to_char(ch, "Name: '&y%s&0', Aliases: %s\r\n", GET_OBJ_DESC(j, ch, OBJ_DESC_SHORT), GET_OBJ_KEYWORDS(j));
-	
-	if (OBJ_FLAGGED(j, OBJ_SCALABLE)) {
-		sprintf(buf, " (%d-%d)", GET_OBJ_MIN_SCALE_LEVEL(j), GET_OBJ_MAX_SCALE_LEVEL(j));
-	}
-	else if (GET_OBJ_CURRENT_SCALE_LEVEL(j) > 0) {
+
+	if (GET_OBJ_CURRENT_SCALE_LEVEL(j) > 0) {
 		sprintf(buf, " (%d)", GET_OBJ_CURRENT_SCALE_LEVEL(j));
 	}
+	else if (GET_OBJ_MIN_SCALE_LEVEL(j) > 0 || GET_OBJ_MAX_SCALE_LEVEL(j) > 0) {
+		sprintf(buf, " (%d-%d)", GET_OBJ_MIN_SCALE_LEVEL(j), GET_OBJ_MAX_SCALE_LEVEL(j));
+	}
 	else {
-		strcpy(buf, " (unscalable)");
+		strcpy(buf, " (no scale limit)");
 	}
 	
-	msg_to_char(ch, "Gear level: [&g%.2f%s&0], VNum: [&g%5d&0], Type: &c%s&0\r\n", rate_item(j), buf, vnum, item_types[(int) GET_OBJ_TYPE(j)]);
+	msg_to_char(ch, "Gear rating: [&g%.2f%s&0], VNum: [&g%5d&0], Type: &c%s&0\r\n", rate_item(j), buf, vnum, item_types[(int) GET_OBJ_TYPE(j)]);
 	msg_to_char(ch, "L-Des: %s\r\n", GET_OBJ_DESC(j, ch, OBJ_DESC_LONG));
 	
 	if (GET_OBJ_ACTION_DESC(j)) {
@@ -4939,7 +4939,7 @@ ACMD(do_reload) {
 ACMD(do_rescale) {
 	void scale_item_to_level(obj_data *obj, int level);
 
-	obj_data *obj, *new, *proto = NULL;
+	obj_data *obj, *new;
 	char_data *vict;
 	int level;
 	
@@ -4975,34 +4975,28 @@ ACMD(do_rescale) {
 		}
 	}
 	else if ((obj = get_obj_in_list_vis(ch, arg, ch->carrying)) || (obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
+		// TODO this needs the same logical transfer of stats as the object loader in objsave.c uses to update items -paul
+		
 		// item mode
-		if (!OBJ_FLAGGED(obj, OBJ_SCALABLE) && !(proto = obj_proto(GET_OBJ_VNUM(obj)))) {
-			msg_to_char(ch, "That object cannot be rescaled.\r\n");
-		}
-		else if (proto && !OBJ_FLAGGED(proto, OBJ_SCALABLE)) {
-			act("$p is not scalable.", FALSE, ch, obj, NULL, TO_CHAR);
-		}
-		else {
-			if (!OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-				new = read_object(GET_OBJ_VNUM(obj));
-				GET_OBJ_EXTRA(new) |= GET_OBJ_EXTRA(obj) & preserve_flags;
-				
-				// swap binds
-				OBJ_BOUND_TO(new) = OBJ_BOUND_TO(obj);
-				OBJ_BOUND_TO(obj) = NULL;
-				
-				swap_obj_for_obj(obj, new);
-				extract_obj(obj);
-				obj = new;
-			}
+		if (!OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
+			new = read_object(GET_OBJ_VNUM(obj));
+			GET_OBJ_EXTRA(new) |= GET_OBJ_EXTRA(obj) & preserve_flags;
 			
-			scale_item_to_level(obj, level);
+			// swap binds
+			OBJ_BOUND_TO(new) = OBJ_BOUND_TO(obj);
+			OBJ_BOUND_TO(obj) = NULL;
 			
-			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s has rescaled obj %s to level %d at %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), GET_OBJ_CURRENT_SCALE_LEVEL(obj), room_log_identifier(IN_ROOM(ch)));
-			sprintf(buf, "You rescale $p to level %d.", GET_OBJ_CURRENT_SCALE_LEVEL(obj));
-			act(buf, FALSE, ch, obj, NULL, TO_CHAR);
-			act("$n rescales $p.", FALSE, ch, obj, NULL, TO_ROOM);
+			swap_obj_for_obj(obj, new);
+			extract_obj(obj);
+			obj = new;
 		}
+		
+		scale_item_to_level(obj, level);
+		
+		syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s has rescaled obj %s to level %d at %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), GET_OBJ_CURRENT_SCALE_LEVEL(obj), room_log_identifier(IN_ROOM(ch)));
+		sprintf(buf, "You rescale $p to level %d.", GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+		act(buf, FALSE, ch, obj, NULL, TO_CHAR);
+		act("$n rescales $p.", FALSE, ch, obj, NULL, TO_ROOM);
 	}
 	else {
 		msg_to_char(ch, "You don't see %s %s here.\r\n", AN(arg), arg);

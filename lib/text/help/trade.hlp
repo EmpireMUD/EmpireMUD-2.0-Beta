@@ -14,6 +14,20 @@ the person who crafts them. HELP SCALABLE CRAFTS has a full explanation.
 See also: CRAFT, IDENTIFY, FORGE, SEWING, POTTERY, WOODWORKING, SHIPBUILDING,
   REFORGE
 #
+"ALCHEMIST CRAFTS"
+
+Alchemist Crafts
+Class ability: Alchemist
+
+This ability will contain any crafts for the Alchemist class.
+#
+"ANTIQUARIAN CRAFTS"
+
+Antiquarian Crafts
+Class ability: Antiquarian
+
+This ability will contain any crafts for the Antiquarian class.
+#
 ARMORSMITHING ARMORCRAFTING
 
 Armorsmithing (Trade ability)
@@ -29,6 +43,16 @@ A forgemaster with the Armorsmithing specialization can create many armors:
 Armorsmithing -> Sturdy Armors -> Imperial Armors
 
 See also: FORGE, WEAPONCRAFTING, STURDY ARMORS, IMPERIAL ARMORS
+#
+"ARTIFICER CRAFTS"
+
+Artificer Crafts
+Class ability: Artificer
+
+Craft items:
+  clockwork lens array  2 gold dust, 4 iron ingots  (crafter item)
+
+See also: CRAFT
 #
 "BASIC CRAFTS" DYE CRAFT CRAFTS
 
@@ -53,7 +77,7 @@ Basic Crafts:
   violet dye  2 red berries, 1 bileberries, (glassblowing)
   orange dye  2 oranges, 1 magenta arrowfish, (glassblowing)
 
-See also: WOODWORKING
+See also: CRAFTING LEVEL, WOODWORKING
 #
 CLOTHING CLOTHES
 
@@ -103,7 +127,7 @@ Without any skill or ability, you can always cook:
   peach pie  1 basket of peaches, 1 flour
   candied apple  1 apple, apiaries tech for honey
 
-See also: MILL, BAKERY
+See also: CRAFTING LEVEL, MILL, BAKERY
 #
 "DANGEROUS LEATHERS"
 
@@ -193,8 +217,19 @@ With the basic Forge skill, you can create:
   mirror  1 iron ingot
   coin mill  24 iron ingots, 2 imperium ingots
 
-See also: SMELT, WEAPONCRAFTING, ARMORSMITHING, JEWELRY, MASTER BLACKSMITH,
-  IRON BLADES, STURDY ARMORS, DEADLY WEAPONS, IMPERIAL ARMORS
+See also: CRAFTING LEVEL, SMELT, WEAPONCRAFTING, ARMORSMITHING, JEWELRY,
+  MASTER BLACKSMITH, IRON BLADES, STURDY ARMORS, DEADLY WEAPONS,
+  IMPERIAL ARMORS
+#
+"GUILDSMAN CRAFTS"
+
+Guildsman Crafts
+Class ability: Guildsman
+
+Sew items:
+  guild patterned cloth  4 cloth, 2 silver nuggets  (crafter item)
+
+See also: SEW
 #
 HANDLE
 
@@ -467,17 +502,17 @@ A great blacksmith (weapons) or tailor (armors and shields) can use this
 ability in two ways:
 
 Name: You can take a generic item and give it a name. The name must contain
-the original name (except a leading a/an/the). Requires 1 blue iris
-per 3 gear levels on the item.
+the original name (except a leading a/an/the). Requires 1 blue iris per 3 gear
+rating on the item.
 
 Renew: This undoes any enchantments, disenchantments, name, superior quality, 
 and all other effects, and restores the item to its base stats. Requires 1
-bloodstone per 3 gear levels on the base (unmodified) item.
+bloodstone per 3 gear rating on the base (unmodified) item.
 
 Superior: If the item is a crafted item that could have superior qualities,
 this adds those qualities and marks it (superior). You can only use this on
 the normal version of an item that can be made superior, and only if you have
-the correct Master ability. Requires 1 green seashell per 3 gear levels on the
+the correct Master ability. Requires 1 green seashell per 3 gear rating on the
 item.
 
 See also: MASTER BLACKSMITH, MASTER TAILOR
@@ -531,7 +566,7 @@ With basic Sewing, you can make:
 Additional sewing items are available from other abilities in the Trade skill,
 as well as patterns and crafts hidden around the world.
 
-See also: LEATHERWORKING, RAWHIDE STITCHING, CLOTHING
+See also: CRAFTING LEVEL, LEATHERWORKING, RAWHIDE STITCHING, CLOTHING
 #
 SHIPBUILDING "SHIP BUILDING" MANUFACTURE SHIPYARDS "ADVANCED SHIPYARDS" "UPGRADED SHIPYARD" "ADVANCED SHIPS" SHIPS
 
@@ -596,6 +631,23 @@ You can tan some skins into leather at the Tannery.
 
 See also: SEWING, LEATHERWORKING, RAWHIDE STITCHING, TAN
 #
+"SMUGGLER CRAFTS"
+
+Smuggler Crafts
+Class ability: Smuggler
+
+This ability will contain any crafts for the Smuggler class.
+#
+"STEELSMITH CRAFTS"
+
+Steelsmith Crafts
+Class ability: Steelsmith
+
+Forge items:
+  delicate tools  4 iron ingots, 2 nocturnium ingots  (crafter item)
+
+See also: FORGE
+#
 "STURDY ARMORS"
 
 Sturdy Armors (Trade ability)
@@ -623,6 +675,16 @@ You can tan skins into leather. This process will go faster at a tannery. Both
 skins and leathers are used in sewing and crafting.
 
 See also: SKIN
+#
+"TINKER CRAFTS"
+
+Tinker Crafts
+Class ability: Tinker
+
+Forge items:
+  clips and buckles  2 imperium ingots, 4 iron ingots  (crafter item)
+
+See also: FORGE
 #
 WEAPONCRAFTING
 

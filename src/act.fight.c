@@ -380,26 +380,10 @@ ACMD(do_hit) {
 
 
 ACMD(do_respawn) {
-	extern bool can_enter_instance(char_data *ch, struct instance_data *inst);
 	extern room_data *find_load_room(char_data *ch);
-	void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, int ability);
 	extern obj_data *player_death(char_data *ch);
 	
-	room_data *loc;
-	
-	if (!IS_NPC(ch) && !IS_DEAD(ch) && !IS_INJURED(ch, INJ_STAKED) && (loc = real_room(GET_RESURRECT_LOCATION(ch)))) {
-		// respawn due to resurrection
-		if (GET_RESURRECT_TIME(ch) + (5 * SECS_PER_REAL_MIN) < time(0)) {
-			msg_to_char(ch, "Your resurrection has expired.\r\n");
-		}
-		else if (ROOM_INSTANCE(loc) && !can_enter_instance(ch, ROOM_INSTANCE(loc))) {
-			msg_to_char(ch, "You can't seem to resurrect there. Perhaps the adventure is full.\r\n");
-		}
-		else {
-			perform_resurrection(ch, is_playing(GET_RESURRECT_BY(ch)), loc, GET_RESURRECT_ABILITY(ch));
-		}
-	}
-	else if (!IS_DEAD(ch) && !IS_INJURED(ch, INJ_STAKED)) {
+	if (!IS_DEAD(ch) && !IS_INJURED(ch, INJ_STAKED)) {
 		msg_to_char(ch, "You aren't even dead yet!\r\n");
 	}
 	else if (IS_NPC(ch)) {
@@ -492,9 +476,7 @@ ACMD(do_stake) {
 			GET_POS(victim) = POS_RESTING;
 		REMOVE_BIT(INJURY_FLAGS(victim), INJ_STAKED);
 		obj_to_char_or_room((stake = read_object(o_STAKE)), ch);
-		if (OBJ_FLAGGED(stake, OBJ_SCALABLE)) {
-			scale_item_to_level(stake, 1);	// min scale
-		}
+		scale_item_to_level(stake, 1);	// min scale
 		load_otrigger(stake);
 	}
 	else if (!can_fight(ch, victim))
@@ -619,6 +601,7 @@ ACMD(do_summary) {
 }
 
 
+// do_untie -- search hint
 ACMD(do_tie) {
 	void perform_npc_tie(char_data *ch, char_data *victim, int subcmd);
 
@@ -633,6 +616,9 @@ ACMD(do_tie) {
 		msg_to_char(ch, "%sie whom?\r\n", subcmd ? "Unt" : "T");
 	else if (!(victim = get_char_vis(ch, arg, FIND_CHAR_ROOM)))
 		send_config_msg(ch, "no_person");
+	else if (IS_DEAD(victim)) {
+		msg_to_char(ch, "You can't do that to someone who is already dead.\r\n");
+	}
 	else if (IS_NPC(victim) && MOB_FLAGGED(victim, MOB_ANIMAL))
 		perform_npc_tie(ch, victim, subcmd);
 	else if (IS_GOD(victim) || IS_IMMORTAL(victim))

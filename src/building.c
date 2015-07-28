@@ -530,9 +530,7 @@ void finish_dismantle(char_data *ch, room_data *room) {
 			newobj = read_object(GET_CRAFT_REQUIRES_OBJ(type));
 			
 			// scale item to minimum level
-			if (OBJ_FLAGGED(newobj, OBJ_SCALABLE)) {
-				scale_item_to_level(newobj, 0);
-			}
+			scale_item_to_level(newobj, 0);
 			
 			if (IS_NPC(ch)) {
 				obj_to_room(newobj, room);
@@ -787,10 +785,7 @@ void process_dismantling(char_data *ch, room_data *room) {
 
 	if (obj) {
 		// scale item to minimum level
-		if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-			scale_item_to_level(obj, 0);
-		}
-				
+		scale_item_to_level(obj, 0);
 		obj_to_char_or_room(obj, ch);
 		
 		act("$n removes $p from the structure.", FALSE, ch, obj, 0, TO_ROOM | TO_SPAMMY);
@@ -931,6 +926,8 @@ char *vnum_to_interlink(room_vnum vnum) {
 //// MAIN BUILDING COMMANDS //////////////////////////////////////////////////
 
 ACMD(do_build) {
+	extern int get_crafting_level(char_data *ch);
+	
 	room_data *to_room = NULL, *to_rev = NULL;
 	obj_data *found_obj = NULL;
 	empire_data *e = NULL, *emp;
@@ -1039,6 +1036,9 @@ ACMD(do_build) {
 	}
 	else if (GET_CRAFT_ABILITY(type) != NO_ABIL && !HAS_ABILITY(ch, GET_CRAFT_ABILITY(type))) {
 		msg_to_char(ch, "You don't have the skill to erect that structure.\r\n");
+	}
+	else if (GET_CRAFT_MIN_LEVEL(type) > get_crafting_level(ch)) {
+		msg_to_char(ch, "You need to have a crafting level of %d to build that.\r\n", GET_CRAFT_MIN_LEVEL(type));
 	}
 	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE | ROOM_AFF_HAS_INSTANCE)) {
 		msg_to_char(ch, "You can't build here.\r\n");

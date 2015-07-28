@@ -39,6 +39,19 @@ You can clear your entire queue with --, or you can remove specific items with
 
 See also: FASTCASTING
 #
+ACCEPT REJECT OFFERS
+
+Usage:  accept [type] [person]
+        reject [type] [person]
+
+You can accept or reject offers using these commands. You may receive offers
+for resurrection, summoning, and various other things. Offers are only good for
+a short time. If you have more than one open offer of the same type, you must
+specify the name of a player.
+
+Typing accept or reject with no argument will display open offers. If the
+player who sent the offer logs off, you cannot accept the offer.
+#
 AFFECTS
 
 Usage:  affects
@@ -1294,6 +1307,19 @@ alias inf toggle informative;look
 alias pol toggle political;look
 
 See also: ALIAS, IDEA
+#
+"SUMMON PLAYERS"
+
+Command:  summon player <name>
+
+This command allows you to teleport another player to your location. You can
+only summon a player who is grouped with you, and to do so you must be at an
+Astral Nexus with another player. That is, you need two players there
+(including you) to summon a third player.
+
+Players must accept the summon using 'accept'.
+
+See also: ACCEPT, ASTRAL NEXUS
 #
 SURVEY
 

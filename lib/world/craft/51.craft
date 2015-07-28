@@ -1062,4 +1062,19 @@ R
 R
 105 2  # 2x a huge stone block
 S
+#5190
+astralnexus~
+-1 0  # 0x UNKNOWN
+8 248 m 1 -1
+B
+5190 be 0
+R
+124 20  # 20x a heavy log
+R
+105 12  # 12x a huge stone block
+R
+176 12  # 12x an ingot of nocturnium
+R
+1115 20  # 20x a nexus crystal
+S
 $

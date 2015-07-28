@@ -107,7 +107,9 @@ max_player_attribute 15
 num_bonus_trait_daily_skills 5
 num_daily_skill_points 15
 obj_file_timeout 365
+offer_time 75
 pool_bonus_amount 15
+recent_level_minutes 15
 remove_lore_after_years 2
 *
 * Skills configs

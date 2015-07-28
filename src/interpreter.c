@@ -50,6 +50,7 @@ void show_bonus_trait_menu(char_data *ch);
 //// COMMAND PROTOTYPES //////////////////////////////////////////////////////
 
 ACMD(do_abandon);
+ACMD(do_accept);
 ACMD(do_admin_util);
 ACMD(do_advance);
 ACMD(do_adventure);
@@ -510,6 +511,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "/", POS_DEAD, do_slash_channel, NO_MIN, CTYPE_COMM ),
 	
 	SIMPLE_CMD( "at", POS_DEAD, do_at, LVL_START_IMM, CTYPE_IMMORTAL ),
+	SCMD_CMD( "accept", POS_DEAD, do_accept, NO_MIN, CTYPE_UTIL, SCMD_ACCEPT ),
 	SIMPLE_CMD( "adventure", POS_RESTING, do_adventure, NO_MIN, CTYPE_UTIL ),
 	GRANT_CMD( "advance", POS_DEAD, do_advance, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_ADVANCE ),
 	SIMPLE_CMD( "alias", POS_DEAD, do_alias, NO_MIN, CTYPE_UTIL ),
@@ -809,6 +811,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "reforge", POS_STANDING, do_reforge, NO_MIN, NO_GRANTS, SCMD_REFORGE, CTYPE_SKILL, NOBITS, ABIL_REFORGE ),
 	ABILITY_CMD( "regenerate", POS_MORTALLYW, do_regenerate, NO_MIN, CTYPE_COMBAT, ABIL_REGENERATE ),
 	ABILITY_CMD( "rejuvenate", POS_FIGHTING, do_rejuvenate, NO_MIN, CTYPE_SKILL, ABIL_REJUVENATE ),
+	SCMD_CMD( "reject", POS_DEAD, do_accept, NO_MIN, CTYPE_UTIL, SCMD_REJECT ),
 	GRANT_CMD( "reload", POS_DEAD, do_reload, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_RELOAD ),
 	SIMPLE_CMD( "remove", POS_RESTING, do_remove, NO_MIN, CTYPE_COMM ),
 	GRANT_CMD( "rescale", POS_RESTING, do_rescale, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_RESCALE ),

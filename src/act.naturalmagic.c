@@ -1093,7 +1093,8 @@ ACMD(do_moonrise) {
 			charge_ability_cost(ch, MANA, cost, COOLDOWN_MOONRISE, 20 * SECS_PER_REAL_MIN, WAIT_SPELL);
 			msg_to_char(ch, "You let out a bone-chilling howl...\r\n");
 			act("$n lets out a bone-chilling howl...", FALSE, ch, NULL, NULL, TO_ROOM);
-			perform_resurrection(vict, ch, IN_ROOM(ch), ABIL_MOONRISE);
+			act("$N is attempting to resurrect you (use 'accept/reject resurrection').", FALSE, vict, NULL, ch, TO_CHAR | TO_NODARK);
+			add_offer(vict, ch, OFFER_RESURRECTION, ABIL_MOONRISE);
 		}
 	}
 	else if ((corpse = get_obj_in_list_vis(ch, arg, ch->carrying)) || (corpse = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
@@ -1119,13 +1120,8 @@ ACMD(do_moonrise) {
 			charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
 			msg_to_char(ch, "You let out a bone-chilling howl...\r\n");
 			act("$n lets out a bone-chilling howl...", FALSE, ch, NULL, NULL, TO_ROOM);
-			
-			// set up rez data
-			GET_RESURRECT_LOCATION(vict) = GET_ROOM_VNUM(IN_ROOM(ch));
-			GET_RESURRECT_BY(vict) = IS_NPC(ch) ? NOBODY : GET_IDNUM(ch);
-			GET_RESURRECT_ABILITY(vict) = ABIL_MOONRISE;
-			GET_RESURRECT_TIME(vict) = time(0);
-			act("$N is attempting to resurrect you. Type 'respawn' to accept.", FALSE, vict, NULL, ch, TO_CHAR | TO_NODARK);
+			act("$N is attempting to resurrect you (use 'accept/reject resurrection').", FALSE, vict, NULL, ch, TO_CHAR | TO_NODARK);
+			add_offer(vict, ch, OFFER_RESURRECTION, ABIL_MOONRISE);
 		}
 	}
 	else {
@@ -1310,9 +1306,10 @@ ACMD(do_resurrect) {
 		else {
 			// success: resurrect in room
 			charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
-			msg_to_char(ch, "You begin channeling mana...\r\n");
-			act("$n glows with white light as $e begins to channel $s mana...", FALSE, ch, NULL, NULL, TO_ROOM);
-			perform_resurrection(vict, ch, IN_ROOM(ch), ABIL_RESURRECT);
+			act("You begin channeling mana to resurrect $N...", FALSE, ch, NULL, vict, TO_CHAR | TO_NODARK);
+			act("$n glows with white light as $e begins to channel $s mana to resurrect $N...", FALSE, ch, NULL, vict, TO_NOTVICT);
+			act("$N is attempting to resurrect you (use 'accept/reject resurrection').", FALSE, vict, NULL, ch, TO_CHAR | TO_NODARK);
+			add_offer(vict, ch, OFFER_RESURRECTION, ABIL_RESURRECT);
 		}
 	}
 	else if ((corpse = get_obj_in_list_vis(ch, arg, ch->carrying)) || (corpse = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
@@ -1331,20 +1328,15 @@ ACMD(do_resurrect) {
 		}
 		else if (IS_DEAD(vict) || corpse != find_obj(GET_LAST_CORPSE_ID(vict)) || !IS_CORPSE(corpse)) {
 			// victim has died AGAIN
-			act("You can only resurrect $N using $S most recent corpse.", FALSE, ch, NULL, vict, TO_CHAR | TO_NODARK);
+			act("You can't resurrect $N with that corpse.", FALSE, ch, NULL, vict, TO_CHAR | TO_NODARK);
 		}
 		else {
 			// seems legit...
 			charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
 			act("You begin channeling mana to resurrect $N...", FALSE, ch, NULL, vict, TO_CHAR | TO_NODARK);
 			act("$n glows with white light as $e begins to channel $s mana to resurrect $N...", FALSE, ch, NULL, vict, TO_NOTVICT);
-			
-			// set up rez data
-			GET_RESURRECT_LOCATION(vict) = GET_ROOM_VNUM(IN_ROOM(ch));
-			GET_RESURRECT_BY(vict) = IS_NPC(ch) ? NOBODY : GET_IDNUM(ch);
-			GET_RESURRECT_ABILITY(vict) = ABIL_RESURRECT;
-			GET_RESURRECT_TIME(vict) = time(0);
-			act("$N is attempting to resurrect you. Type 'respawn' to accept.", FALSE, vict, NULL, ch, TO_CHAR | TO_NODARK);
+			act("$N is attempting to resurrect you (use 'accept/reject resurrection').", FALSE, vict, NULL, ch, TO_CHAR | TO_NODARK);
+			add_offer(vict, ch, OFFER_RESURRECTION, ABIL_RESURRECT);
 		}
 	}
 	else {

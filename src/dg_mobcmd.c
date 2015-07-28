@@ -557,9 +557,7 @@ ACMD(do_mload) {
 			}
 		
 			// must scale now
-			if (OBJ_FLAGGED(object, OBJ_SCALABLE)) {
-				scale_item_to_level(object, GET_CURRENT_SCALE_LEVEL(ch));
-			}
+			scale_item_to_level(object, GET_CURRENT_SCALE_LEVEL(ch));
 		
 			load_otrigger(object);
 			return;
@@ -568,13 +566,11 @@ ACMD(do_mload) {
 		target = two_arguments(target, arg1, arg2); /* recycling ... */
 		skip_spaces(&target);
 		
-		if (OBJ_FLAGGED(object, OBJ_SCALABLE)) {
-			if (*target && isdigit(*target)) {
-				scale_item_to_level(object, atoi(target));
-			}
-			else {
-				scale_item_to_level(object, GET_CURRENT_SCALE_LEVEL(ch));
-			}
+		if (*target && isdigit(*target)) {
+			scale_item_to_level(object, atoi(target));
+		}
+		else {
+			scale_item_to_level(object, GET_CURRENT_SCALE_LEVEL(ch));
 		}
 		
 		tch = (*arg1 == UID_CHAR) ? get_char(arg1) : get_char_room_vis(ch, arg1);
@@ -1594,7 +1590,8 @@ ACMD(do_mscale) {
 				extract_obj(obj);
 			}
 			else {
-				mob_log(ch, "mscale: target is not scalable");
+				// attempt to scale anyway
+				scale_item_to_level(obj, level);
 			}
 		}
 		else {

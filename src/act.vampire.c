@@ -821,14 +821,13 @@ ACMD(do_bloodsword) {
 	charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
 	obj = read_object(o_BLOODSWORD);
 	
-	if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-		scale_item_to_level(obj, IS_CLASS_ABILITY(ch, ABIL_BLOODSWORD) ? get_approximate_level(ch) : GET_SKILL(ch, SKILL_VAMPIRE));
-	}
+	scale_item_to_level(obj, IS_CLASS_ABILITY(ch, ABIL_BLOODSWORD) ? get_approximate_level(ch) : GET_SKILL(ch, SKILL_VAMPIRE));
 	
 	act("You drain blood from your wrist and mold it into $p.", FALSE, ch, obj, NULL, TO_CHAR);
 	act("$n twists and molds $s own blood into $p.", TRUE, ch, obj, NULL, TO_ROOM);
 	
 	equip_char(ch, obj, WEAR_WIELD);
+	determine_gear_level(ch);
 	
 	gain_ability_exp(ch, ABIL_BLOODSWORD, 20);
 	load_otrigger(obj);

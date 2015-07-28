@@ -1953,8 +1953,6 @@ double rate_item(obj_data *obj) {
 	extern double get_base_dps(obj_data *weapon);
 	extern const double apply_values[];
 	
-	double score_modifier = 0.7;	// in case gear levels are coming out a little too high
-	
 	double score = 0;
 	int iter;
 	
@@ -1995,7 +1993,7 @@ double rate_item(obj_data *obj) {
 		}	
 	}
 
-	return score * score_modifier;
+	return score;
 }
 
 
@@ -2048,6 +2046,9 @@ void command_lag(char_data *ch, int wait_type) {
 					wait = 0.5 RL_SEC;
 				}
 			}
+			else {
+				wait = 0;	// indoors
+			}
 			break;
 		}
 	}
@@ -2055,6 +2056,54 @@ void command_lag(char_data *ch, int wait_type) {
 	if (GET_WAIT_STATE(ch) < wait) {
 		GET_WAIT_STATE(ch) = wait;
 	}
+}
+
+
+/**
+* Calculates a player's gear level, based on what they have equipped.
+*
+* @param char_data *ch The player to set gear level for.
+*/
+void determine_gear_level(char_data *ch) {
+	extern const struct wear_data_type wear_data[NUM_WEARS];
+
+	double total, slots;
+	int avg, level, pos;
+	
+	// sanity check: we really have no work to do for mobs
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	level = total = slots = 0;	// init
+	
+	for (pos = 0; pos < NUM_WEARS; ++pos) {
+		// some items count as more or less than 1 slot
+		slots += wear_data[pos].gear_level_mod;
+		
+		if (GET_EQ(ch, pos)) {
+			total += GET_OBJ_CURRENT_SCALE_LEVEL(GET_EQ(ch, pos)) * wear_data[pos].gear_level_mod;
+			
+			// bonuses
+			if (OBJ_FLAGGED(GET_EQ(ch, pos), OBJ_SUPERIOR)) {
+				total += 10;
+			}
+			if (OBJ_FLAGGED(GET_EQ(ch, pos), OBJ_HARD_DROP)) {
+				total += 10;
+			}
+			if (OBJ_FLAGGED(GET_EQ(ch, pos), OBJ_GROUP_DROP)) {
+				total += 10;
+			}
+		}
+	}
+	
+	// determine average gear level of the player's slots
+	avg = round(total / slots);
+	
+	// player's gear level (which will be added to skill level) is:
+	level = avg + 50 - 100;	// 50 higher than the average scaled level of their gear, -100 to compensate for skill level
+	
+	GET_GEAR_LEVEL(ch) = MAX(level, 0);
 }
 
 
@@ -2124,9 +2173,7 @@ void give_resources(char_data *ch, Resource list[], bool split) {
 				obj = read_object(list[i].vnum);
 				
 				// scale item to minimum level
-				if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-					scale_item_to_level(obj, 0);
-				}
+				scale_item_to_level(obj, 0);
 				
 				obj_to_char_or_room(obj, ch);
 				load_otrigger(obj);

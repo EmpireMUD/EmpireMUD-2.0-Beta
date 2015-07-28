@@ -1156,6 +1156,16 @@ A Stone Wall~
 10 0 djk 0
 0 0 0 -1
 S
+#5175
+Intentionally Left Blank~
+Intentionally Left Blank~
+&0[  ]~
+1 0 0 0
+0 0 0 -1
+D
+This is a placeholder because craft 5175 is used for great walls.
+~
+S
 #5176
 River Gate~
 A River Gate~
@@ -1353,5 +1363,14 @@ breeze flows from inside, sending the hair on your neck to full attention.
 ~
 M
 235 10.00 c
+S
+#5190
+Astral Nexus~
+An Astral Nexus~
+..&C*&?.~
+5 0 bdpP 0
+0 0 0 -1
+C
+summon player <name>~
 S
 $

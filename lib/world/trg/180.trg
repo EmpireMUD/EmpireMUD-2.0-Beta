@@ -208,10 +208,10 @@ wait 5 sec *Global cooldown
 ~
 #18079
 Fiend No Leave~
-0 q 100
+0 s 100
 ~
-%send% %actor% A wall of fire blocks your escape!
-%echoaround% %actor% A wall of fire blocks %actor.name%'s escape!
+%send% %actor% You try to leave, but a wall of fire blocks your escape!
+%echoaround% %actor% %actor.name% tries to leave, but a wall of fire blocks %actor.hisher% escape!
 return 0
 ~
 #18080
@@ -223,5 +223,12 @@ if !(%abilityname%==disarm)
 end
 %send% %actor% You cannot disarm %self.name% - %self.hisher% magic is innate!
 return 0
+~
+#18081
+Fiend No Flee~
+0 c 0
+flee~
+%send% %actor% You turn to flee, but a wall of fire blocks your escape!
+%echoaround% %actor% %actor.name% turns to flee, but a wall of fire blocks %actor.hisher% escape!
 ~
 $

@@ -337,7 +337,7 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 			}
 		}
 		
-		if (OBJ_FLAGGED(new, OBJ_SCALABLE) && GET_OBJ_CURRENT_SCALE_LEVEL(obj) > 0) {
+		if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) > 0) {
 			scale_item_to_level(new, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 		}
 		

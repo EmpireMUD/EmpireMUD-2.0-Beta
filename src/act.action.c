@@ -494,9 +494,7 @@ INTERACTION_FUNC(finish_digging) {
 	else {
 		for (num = 0; num < interaction->quantity; ++num) {
 			obj = read_object(vnum);
-			if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-				scale_item_to_level(obj, 1);	// minimum level
-			}
+			scale_item_to_level(obj, 1);	// minimum level
 			obj_to_char_or_room(obj, ch);
 			load_otrigger(obj);
 			
@@ -530,9 +528,7 @@ INTERACTION_FUNC(finish_gathering) {
 	
 	for (iter = 0; iter < interaction->quantity; ++iter) {
 		obj = read_object(interaction->vnum);
-		if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-			scale_item_to_level(obj, 1);	// minimum level
-		}
+		scale_item_to_level(obj, 1);	// minimum level
 		obj_to_char_or_room(obj, ch);
 		load_otrigger(obj);
 		add_depletion(IN_ROOM(ch), DPLTN_GATHER, TRUE);
@@ -584,9 +580,7 @@ INTERACTION_FUNC(finish_harvesting) {
 		// give them over
 		for (count = 0; count < num; ++count) {
 			obj = read_object(interaction->vnum);
-			if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-				scale_item_to_level(obj, 1);	// minimum level
-			}
+			scale_item_to_level(obj, 1);	// minimum level
 			obj_to_char_or_room(obj, ch);
 			load_otrigger(obj);
 		}
@@ -642,9 +636,7 @@ INTERACTION_FUNC(finish_picking_herb) {
 	// give objs
 	for (iter = 0; iter < num; ++iter) {
 		obj = read_object(vnum);
-		if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-			scale_item_to_level(obj, 1);	// minimum level
-		}
+		scale_item_to_level(obj, 1);	// minimum level
 		obj_to_char_or_room(obj, ch);
 		add_depletion(inter_room, DPLTN_PICK, TRUE);
 		load_otrigger(obj);
@@ -684,9 +676,7 @@ INTERACTION_FUNC(finish_picking_crop) {
 	// give objs
 	for (iter = 0; iter < interaction->quantity; ++iter) {
 		obj = read_object(interaction->vnum);
-		if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-			scale_item_to_level(obj, 1);	// minimum level
-		}
+		scale_item_to_level(obj, 1);	// minimum level
 		obj_to_char_or_room(obj, ch);
 		add_depletion(inter_room, DPLTN_PICK, TRUE);
 		load_otrigger(obj);

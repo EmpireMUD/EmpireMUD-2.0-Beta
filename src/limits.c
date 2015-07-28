@@ -404,6 +404,7 @@ void point_update_char(char_data *ch) {
 * @param char_data *ch The character to update.
 */
 void real_update_char(char_data *ch) {
+	void adventure_unsummon(char_data *ch);
 	extern bool can_wear_item(char_data *ch, obj_data *item, bool send_messages);
 	extern int compute_bonus_exp_per_day(char_data *ch);
 	extern int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname);	
@@ -416,6 +417,11 @@ void real_update_char(char_data *ch) {
 	char_data *room_ch, *next_ch;
 	int result, iter, type;
 	int fol_count, gain;
+	
+	// first check location: this may move the player
+	if (!IS_NPC(ch) && PLR_FLAGGED(ch, PLR_ADVENTURE_SUMMONED) && !IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
+		adventure_unsummon(ch);
+	}
 	
 	// update affects (NPCs get this, too)
 	for (af = ch->affected; af; af = next_af) {
@@ -487,7 +493,13 @@ void real_update_char(char_data *ch) {
 	if (IS_NPC(ch)) {
 		return;
 	}
-
+	
+	// update recent level data if level has gone up or it's been too long since we've seen a higher level
+	if (GET_COMPUTED_LEVEL(ch) >= GET_HIGHEST_RECENT_LEVEL(ch) || (time(0) - GET_RECENT_LEVEL_TIME(ch)) > (config_get_int("recent_level_minutes") * SECS_PER_REAL_MIN)) {
+		GET_HIGHEST_RECENT_LEVEL(ch) = GET_COMPUTED_LEVEL(ch);
+		GET_RECENT_LEVEL_TIME(ch) = time(0);
+	}
+	
 	// very drunk? more confused!
 	if (GET_COND(ch, DRUNK) > 350) {
 		GET_CONFUSED_DIR(ch) = number(0, NUM_SIMPLE_DIRS-1);
@@ -1826,6 +1838,7 @@ int move_gain(char_data *ch, bool info_only) {
 * update for that tick, to avoid iterating a second time over the same data.
 */
 void point_update(bool run_real) {
+	void clean_offers(char_data *ch);
 	void save_daily_cycle();
 	void update_players_online_stats();
 	extern int max_players_today;
@@ -1847,6 +1860,11 @@ void point_update(bool run_real) {
 	// characters
 	for (ch = character_list; ch; ch = next_ch) {
 		next_ch = ch->next;
+		
+		// remove stale offers -- this needs to happen even if dead (resurrect)
+		if (!IS_NPC(ch)) {
+			clean_offers(ch);
+		}
 		
 		if (EXTRACTED(ch) || IS_DEAD(ch)) {
 			continue;

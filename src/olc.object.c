@@ -1079,7 +1079,7 @@ void olc_show_object(char_data *ch) {
 	}
 	
 	*buf = '\0';
-	sprintf(buf + strlen(buf), "[&c%d&0] &c%s&0 (Gear level [&c%.2f&0])\r\n", GET_OLC_VNUM(ch->desc), !obj_proto(GET_OLC_VNUM(ch->desc)) ? "new object" : get_obj_name_by_proto(GET_OLC_VNUM(ch->desc)), rate_item(obj));
+	sprintf(buf + strlen(buf), "[&c%d&0] &c%s&0 (Gear rating [&c%.2f&0])\r\n", GET_OLC_VNUM(ch->desc), !obj_proto(GET_OLC_VNUM(ch->desc)) ? "new object" : get_obj_name_by_proto(GET_OLC_VNUM(ch->desc)), rate_item(obj));
 	sprintf(buf + strlen(buf), "<&ykeywords&0> %s\r\n", GET_OBJ_KEYWORDS(obj));
 	sprintf(buf + strlen(buf), "<&yshortdescription&0> %s\r\n", GET_OBJ_SHORT_DESC(obj));
 	sprintf(buf + strlen(buf), "<&ylongdescription&0> %s\r\n", GET_OBJ_LONG_DESC(obj));
@@ -1100,19 +1100,17 @@ void olc_show_object(char_data *ch) {
 	sprintbit(GET_OBJ_EXTRA(obj), extra_bits, buf1, TRUE);
 	sprintf(buf + strlen(buf), "<&yflags&0> %s\r\n", buf1);
 	
-	if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-		if (GET_OBJ_MIN_SCALE_LEVEL(obj) > 0) {
-			sprintf(buf + strlen(buf), "<&yminlevel&0> %d\r\n", GET_OBJ_MIN_SCALE_LEVEL(obj));
-		}
-		else {
-			sprintf(buf + strlen(buf), "<&yminlevel&0> none\r\n");
-		}
-		if (GET_OBJ_MAX_SCALE_LEVEL(obj) > 0) {
-			sprintf(buf + strlen(buf), "<&ymaxlevel&0> %d\r\n", GET_OBJ_MAX_SCALE_LEVEL(obj));
-		}
-		else {
-			sprintf(buf + strlen(buf), "<&ymaxlevel&0> none\r\n");
-		}
+	if (GET_OBJ_MIN_SCALE_LEVEL(obj) > 0) {
+		sprintf(buf + strlen(buf), "<&yminlevel&0> %d\r\n", GET_OBJ_MIN_SCALE_LEVEL(obj));
+	}
+	else {
+		sprintf(buf + strlen(buf), "<&yminlevel&0> none\r\n");
+	}
+	if (GET_OBJ_MAX_SCALE_LEVEL(obj) > 0) {
+		sprintf(buf + strlen(buf), "<&ymaxlevel&0> %d\r\n", GET_OBJ_MAX_SCALE_LEVEL(obj));
+	}
+	else {
+		sprintf(buf + strlen(buf), "<&ymaxlevel&0> none\r\n");
 	}
 	
 	olc_get_values_display(ch, buf1);
@@ -1676,24 +1674,14 @@ OLC_MODULE(oedit_material) {
 OLC_MODULE(oedit_maxlevel) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	
-	if (!OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-		msg_to_char(ch, "The object isn't scalable.\r\n");
-	}
-	else {
-		GET_OBJ_MAX_SCALE_LEVEL(obj) = olc_process_number(ch, argument, "maximum level", "maxlevel", 0, MAX_INT, GET_OBJ_MAX_SCALE_LEVEL(obj));
-	}
+	GET_OBJ_MAX_SCALE_LEVEL(obj) = olc_process_number(ch, argument, "maximum level", "maxlevel", 0, MAX_INT, GET_OBJ_MAX_SCALE_LEVEL(obj));
 }
 
 
 OLC_MODULE(oedit_minlevel) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
-
-	if (!OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-		msg_to_char(ch, "The object isn't scalable.\r\n");
-	}
-	else {
-		GET_OBJ_MIN_SCALE_LEVEL(obj) = olc_process_number(ch, argument, "minimum level", "minlevel", 0, MAX_INT, GET_OBJ_MIN_SCALE_LEVEL(obj));
-	}
+	
+	GET_OBJ_MIN_SCALE_LEVEL(obj) = olc_process_number(ch, argument, "minimum level", "minlevel", 0, MAX_INT, GET_OBJ_MIN_SCALE_LEVEL(obj));
 }
 
 
