@@ -97,6 +97,9 @@ void adventure_summon(char_data *ch, char *argument) {
 	else if (!can_teleport_to(vict, IN_ROOM(ch), FALSE)) {
 		msg_to_char(ch, "Your target can't be summoned here.\r\n");
 	}
+	else if (PLR_FLAGGED(vict, PLR_ADVENTURE_SUMMONED)) {
+		msg_to_char(ch, "You can't summon someone who is already adventure-summoned.\r\n");
+	}
 	else {
 		act("You start summoning $N...", FALSE, ch, NULL, vict, TO_CHAR);
 		snprintf(buf, sizeof(buf), "$n is trying to summon you to %s (%s) -- use 'accept/reject summon'.", GET_ADV_NAME(inst->adventure), get_room_name(IN_ROOM(ch), FALSE));

@@ -1224,11 +1224,6 @@ obj_data *player_death(char_data *ch) {
 	void cancel_adventure_summon(char_data *ch);
 	
 	obj_data *corpse;
-	
-	if (PLR_FLAGGED(ch, PLR_ADVENTURE_SUMMONED)) {
-		GET_LAST_CORPSE_ID(ch) = -1;	// invalidate their last-corpse-id to prevent a rez (they can be adventure-summoned)
-		// don't actually cancel the summon -- they'll get whisked back when they respawn
-	}
 	perform_dismount(ch);	// just to be sure
 	death_restore(ch);
 	
@@ -1250,6 +1245,11 @@ obj_data *player_death(char_data *ch) {
 		int duration = config_get_int("seconds_per_death") * (GET_RECENT_DEATH_COUNT(ch) + 1 - config_get_int("deaths_before_penalty")) / SECS_PER_REAL_UPDATE;
 		struct affected_type *af = create_flag_aff(ATYPE_DEATH_PENALTY, duration, AFF_IMMUNE_PHYSICAL | AFF_NO_ATTACK | AFF_STUNNED);
 		affect_join(ch, af, ADD_DURATION);
+	}
+	
+	if (PLR_FLAGGED(ch, PLR_ADVENTURE_SUMMONED)) {
+		GET_LAST_CORPSE_ID(ch) = -1;	// invalidate their last-corpse-id to prevent a rez (they can be adventure-summoned)
+		// don't actually cancel the summon -- they'll get whisked back when they respawn
 	}
 	
 	return corpse;
