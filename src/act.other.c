@@ -99,7 +99,7 @@ void adventure_summon(char_data *ch, char *argument) {
 	}
 	else {
 		act("You start summoning $N...", FALSE, ch, NULL, vict, TO_CHAR);
-		snprintf(buf, sizeof(buf), "$n is trying to summon you to %s (%s) -- use 'accept/reject summon'.\r\n", GET_ADV_NAME(inst->adventure), get_room_name(IN_ROOM(ch), FALSE));
+		snprintf(buf, sizeof(buf), "$n is trying to summon you to %s (%s) -- use 'accept/reject summon'.", GET_ADV_NAME(inst->adventure), get_room_name(IN_ROOM(ch), FALSE));
 		act(buf, FALSE, ch, NULL, vict, TO_VICT | TO_SLEEP);
 		add_offer(vict, ch, OFFER_SUMMON, SUMMON_ADVENTURE);
 		command_lag(ch, WAIT_OTHER);
@@ -139,8 +139,10 @@ void adventure_unsummon(char_data *ch) {
 	}
 	
 	act("$n appears in a burst of smoke!", TRUE, ch, NULL, NULL, TO_ROOM);
-	look_at_room(ch);
 	GET_LAST_DIR(ch) = NO_DIR;
+	
+	look_at_room(ch);
+	msg_to_char(ch, "\r\nYou have been returned to your original location after leaving the adventure.\r\n");
 }
 
 
@@ -485,10 +487,10 @@ void summon_player(char_data *ch, char *argument) {
 		
 		act("You start summoning $N...", FALSE, ch, NULL, vict, TO_CHAR);
 		if (HAS_ABILITY(vict, ABIL_NAVIGATION)) {
-			snprintf(buf, sizeof(buf), "$n is trying to summon you to %s (%d, %d) -- use 'accept/reject summon'.\r\n", get_room_name(IN_ROOM(ch), FALSE), X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
+			snprintf(buf, sizeof(buf), "$n is trying to summon you to %s (%d, %d) -- use 'accept/reject summon'.", get_room_name(IN_ROOM(ch), FALSE), X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
 		}
 		else {
-			snprintf(buf, sizeof(buf), "$n is trying to summon you to %s -- use 'accept/reject summon'.\r\n", get_room_name(IN_ROOM(ch), FALSE));
+			snprintf(buf, sizeof(buf), "$n is trying to summon you to %s -- use 'accept/reject summon'.", get_room_name(IN_ROOM(ch), FALSE));
 		}
 		act(buf, FALSE, ch, NULL, vict, TO_VICT | TO_SLEEP);
 		add_offer(vict, ch, OFFER_SUMMON, SUMMON_PLAYER);
