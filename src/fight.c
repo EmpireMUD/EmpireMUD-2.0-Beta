@@ -1221,8 +1221,14 @@ void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, int 
 * @return obj_data* The player's corpse object, if any.
 */
 obj_data *player_death(char_data *ch) {
+	void cancel_adventure_summon(char_data *ch);
+	
 	obj_data *corpse;
 	
+	if (PLR_FLAGGED(ch, PLR_ADVENTURE_SUMMONED)) {
+		GET_LAST_CORPSE_ID(ch) = -1;	// invalidate their last-corpse-id to prevent a rez (they can be adventure-summoned)
+		// don't actually cancel the summon -- they'll get whisked back when they respawn
+	}
 	perform_dismount(ch);	// just to be sure
 	death_restore(ch);
 	

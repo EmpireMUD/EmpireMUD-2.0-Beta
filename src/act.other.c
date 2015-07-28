@@ -37,6 +37,7 @@
 
 // external prototypes
 extern bool can_enter_instance(char_data *ch, struct instance_data *inst);
+extern char *get_room_name(room_data *room, bool color);
 extern char_data *has_familiar(char_data *ch);
 void Objsave_char(char_data *ch, int rent_code);
 void scale_item_to_level(obj_data *obj, int level);
@@ -44,6 +45,118 @@ void scale_item_to_level(obj_data *obj, int level);
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
+
+/**
+* For the "adventure summon <player>" command.
+*
+* @param char_data *ch The player doing the summoning.
+* @param char *argument The typed argument.
+*/
+void adventure_summon(char_data *ch, char *argument) {
+	extern struct instance_data *find_instance_by_room(room_data *room);
+	
+	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	struct instance_data *inst;
+	char_data *vict;
+	
+	one_argument(argument, arg);
+	
+	if (GET_POS(ch) < POS_STANDING) {
+		msg_to_char(ch, "You can't do that right now.\r\n");
+	}
+	else if (!IS_ADVENTURE_ROOM(IN_ROOM(ch)) || !(inst = find_instance_by_room(IN_ROOM(ch)))) {
+		msg_to_char(ch, "You can only use the adventure summon command inside and adventure.\r\n");
+	}
+	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+		msg_to_char(ch, "You don't have permission to summon players here.\r\n");
+	}
+	else if (!*arg) {
+		msg_to_char(ch, "Summon whom to the adventure?\r\n");
+	}
+	else if (!(vict = get_player_vis(ch, arg, FIND_CHAR_WORLD | FIND_NO_DARK))) {
+		send_config_msg(ch, "no_person");
+	}
+	else if (!GROUP(ch) || GROUP(ch) != GROUP(vict)) {
+		msg_to_char(ch, "You can only summon members of your own group.\r\n");
+	}
+	else if (IN_ROOM(vict) == IN_ROOM(ch)) {
+		msg_to_char(ch, "Your target is already here.\r\n");
+	}
+	else if (IS_ADVENTURE_ROOM(IN_ROOM(vict))) {
+		msg_to_char(ch, "You cannot summon someone who is already in an adventure.\r\n");
+	}
+	else if (IS_DEAD(vict)) {
+		msg_to_char(ch, "You cannot summon the dead like that.\r\n");
+	}
+	else if (!can_enter_instance(vict, inst)) {
+		msg_to_char(ch, "Your target can't enter this instance.\r\n");
+	}
+	else if (!can_teleport_to(vict, IN_ROOM(vict), TRUE)) {
+		msg_to_char(ch, "Your target can't be summoned from %s current location.\r\n", HSHR(vict));
+	}
+	else if (!can_teleport_to(vict, IN_ROOM(ch), FALSE)) {
+		msg_to_char(ch, "Your target can't be summoned here.\r\n");
+	}
+	else {
+		act("You start summoning $N...", FALSE, ch, NULL, vict, TO_CHAR);
+		snprintf(buf, sizeof(buf), "$n is trying to summon you to %s (%s) -- use 'accept/reject summon'.\r\n", GET_ADV_NAME(inst->adventure), get_room_name(IN_ROOM(ch), FALSE));
+		act(buf, FALSE, ch, NULL, vict, TO_VICT | TO_SLEEP);
+		add_offer(vict, ch, OFFER_SUMMON, SUMMON_ADVENTURE);
+		command_lag(ch, WAIT_OTHER);
+	}
+}
+
+
+/**
+* Sends a player back to where they came from, if they were adventure-summoned
+* and they left the adventure.
+*
+* @param char_data *ch The person to return back where they came from.
+*/
+void adventure_unsummon(char_data *ch) {
+	extern room_data *find_load_room(char_data *ch);
+	
+	room_data *room, *map;
+	
+	// safety first
+	if (!ch || IS_NPC(ch) || !PLR_FLAGGED(ch, PLR_ADVENTURE_SUMMONED)) {
+		return;
+	}
+	
+	REMOVE_BIT(PLR_FLAGS(ch), PLR_ADVENTURE_SUMMONED);
+	
+	room = real_room(GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch));
+	map = real_room(GET_ADVENTURE_SUMMON_RETURN_MAP(ch));
+	
+	act("$n vanishes in a wisp of smoke!", TRUE, ch, NULL, NULL, TO_ROOM);
+	
+	if (room && map && map == get_map_location_for(room)) {
+		char_to_room(ch, room);
+	}
+	else {
+		// nowhere safe to send back to
+		char_to_room(ch, find_load_room(ch));
+	}
+	
+	act("$n appears in a burst of smoke!", TRUE, ch, NULL, NULL, TO_ROOM);
+	look_at_room(ch);
+	GET_LAST_DIR(ch) = NO_DIR;
+}
+
+
+/**
+* Ensures a character won't be returned home by adventure_unsummon()
+*
+* @param char_data *ch The person to cancel the return-summon data for.
+*/
+void cancel_adventure_summon(char_data *ch) {
+	if (!IS_NPC(ch)) {
+		REMOVE_BIT(PLR_FLAGS(ch), PLR_ADVENTURE_SUMMONED);
+		GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch) = NOWHERE;
+		GET_ADVENTURE_SUMMON_RETURN_MAP(ch) = NOWHERE;
+	}
+}
+
 
 /**
 * This quits out an old character and swaps the descriptor over to the new
@@ -186,7 +299,6 @@ void perform_alternate(char_data *old, char_data *new) {
 * @param char_data *ch The person to display to.
 */
 static void print_group(char_data *ch) {
-	extern char *get_room_name(room_data *room, bool color);
 	extern const char *class_role[NUM_ROLES];
 	extern const char *pool_abbrevs[];
 
@@ -317,8 +429,6 @@ INTERACTION_FUNC(skin_interact) {
 * @param char *argument The typed-in arg.
 */
 void summon_player(char_data *ch, char *argument) {
-	extern char *get_room_name(room_data *room, bool color);
-
 	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	char_data *vict, *ch_iter;
 	bool found;
@@ -350,10 +460,10 @@ void summon_player(char_data *ch, char *argument) {
 		msg_to_char(ch, "You cannot summon the dead like that.\r\n");
 	}
 	else if (!can_teleport_to(vict, IN_ROOM(vict), TRUE)) {
-		msg_to_char(ch, "Your target can't be teleported from %s current location.\r\n", HSHR(vict));
+		msg_to_char(ch, "Your target can't be summoned from %s current location.\r\n", HSHR(vict));
 	}
 	else if (!can_teleport_to(vict, IN_ROOM(ch), FALSE)) {
-		msg_to_char(ch, "Your target can't be teleported here.\r\n");
+		msg_to_char(ch, "Your target can't be summoned here.\r\n");
 	}
 	else {
 		// mostly-valid by now... just a little bit more to check
@@ -381,7 +491,7 @@ void summon_player(char_data *ch, char *argument) {
 			snprintf(buf, sizeof(buf), "$n is trying to summon you to %s -- use 'accept/reject summon'.\r\n", get_room_name(IN_ROOM(ch), FALSE));
 		}
 		act(buf, FALSE, ch, NULL, vict, TO_VICT | TO_SLEEP);
-		add_offer(vict, ch, OFFER_SUMMON, 0);
+		add_offer(vict, ch, OFFER_SUMMON, SUMMON_PLAYER);
 		command_lag(ch, WAIT_OTHER);
 	}
 }
@@ -449,6 +559,7 @@ OFFER_FINISH(ofin_rez) {
 
 OFFER_VALIDATE(oval_summon) {
 	room_data *loc = real_room(offer->location);
+	int type = offer->data;
 	
 	if (!loc) {
 		msg_to_char(ch, "Summon location invalid.\r\n");
@@ -462,6 +573,10 @@ OFFER_VALIDATE(oval_summon) {
 		msg_to_char(ch, "You can't be summoned there right now. Perhaps the adventure is full.\r\n");
 		return FALSE;
 	}
+	if (type == SUMMON_ADVENTURE && IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
+		msg_to_char(ch, "You can't accept an adventure summon while you're already in an adventure.\r\n");
+		return FALSE;
+	}
 	if (!can_teleport_to(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "You can't be teleported out of here.\r\n");
 		return FALSE;
@@ -470,13 +585,26 @@ OFFER_VALIDATE(oval_summon) {
 		msg_to_char(ch, "You can't be teleported to the summon location.\r\n");
 		return FALSE;
 	}
-	// TODO instance full?
 	
 	return TRUE;
 }
 
 OFFER_FINISH(ofin_summon) {
-	room_data *loc = real_room(offer->location);
+	room_data *loc = real_room(offer->location), *map;
+	int type = offer->data;
+	
+	if (type == SUMMON_ADVENTURE) {
+		SET_BIT(PLR_FLAGS(ch), PLR_ADVENTURE_SUMMONED);
+		GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch) = GET_ROOM_VNUM(IN_ROOM(ch));
+		map = get_map_location_for(IN_ROOM(ch));
+		GET_ADVENTURE_SUMMON_RETURN_MAP(ch) = map ? GET_ROOM_VNUM(map) : NOWHERE;
+	}
+	else {
+		// if they accept a normal summon out of an adventure, cancel their group summon
+		if (PLR_FLAGGED(ch, PLR_ADVENTURE_SUMMONED) && ROOM_INSTANCE(IN_ROOM(ch)) != ROOM_INSTANCE(loc)) {
+			cancel_adventure_summon(ch);
+		}
+	}
 	
 	act("$n vanishes in a swirl of light!", TRUE, ch, NULL, NULL, TO_ROOM);
 	char_to_room(ch, loc);
@@ -528,8 +656,8 @@ ACMD(do_accept) {
 		OFFER_VALIDATE(*validate_func);	// returns TRUE to allow, FALSE to prevent accept
 		OFFER_FINISH(*finish_func);	// returns TRUE if it's ok to delete the offer, FALSE if not
 	} offer_types[] = {
-		{ "resurrection", POS_DEAD, oval_rez, ofin_rez },	// uses offer->data for ability
-		{ "summon", POS_STANDING, oval_summon, ofin_summon },
+		{ "resurrection", POS_DEAD, oval_rez, ofin_rez },	// OFFER_RESURRECTION: uses offer->data for ability
+		{ "summon", POS_STANDING, oval_summon, ofin_summon },	// OFFER_SUMMON: uses offer->data for SUMMON_x
 	
 		// end
 		{ "\n", POS_DEAD, NULL, NULL }

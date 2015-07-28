@@ -1930,6 +1930,13 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "can_gain_new_skills")) {
 						snprintf(str, slen, "%d", (!IS_NPC(c) && CAN_GAIN_NEW_SKILLS(c)) ? 1 : 0);
 					}
+					else if (!str_cmp(field, "cancel_adventure_summon")) {
+						void cancel_adventure_summon(char_data *ch);
+						if (!IS_NPC(c)) {
+							cancel_adventure_summon(c);
+						}
+						*str = '\0';
+					}
 					else if (!str_cmp(field, "charge_coins")) {
 						if (subfield && isdigit(*subfield)) {
 							charge_coins(c, (type == MOB_TRIGGER) ? GET_LOYALTY((char_data*)go) : REAL_OTHER_COIN, atoi(subfield));

@@ -404,6 +404,7 @@ void point_update_char(char_data *ch) {
 * @param char_data *ch The character to update.
 */
 void real_update_char(char_data *ch) {
+	void adventure_unsummon(char_data *ch);
 	extern bool can_wear_item(char_data *ch, obj_data *item, bool send_messages);
 	extern int compute_bonus_exp_per_day(char_data *ch);
 	extern int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname);	
@@ -416,6 +417,11 @@ void real_update_char(char_data *ch) {
 	char_data *room_ch, *next_ch;
 	int result, iter, type;
 	int fol_count, gain;
+	
+	// first check location: this may move the player
+	if (!IS_NPC(ch) && PLR_FLAGGED(ch, PLR_ADVENTURE_SUMMONED) && !IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
+		adventure_unsummon(ch);
+	}
 	
 	// update affects (NPCs get this, too)
 	for (af = ch->affected; af; af = next_af) {

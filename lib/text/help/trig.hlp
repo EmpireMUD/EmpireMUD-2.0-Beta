@@ -869,6 +869,9 @@ affect()          - Checks the actor for the affect in the subfield
 blood(amt)        - Returns current blood, or adds/removes blood if amt is set.
 can_afford(amt)   - Checks if the actor has enough coins of any converted type.
 can_gain_new_skills - Checks if the character can gain a new skill from 0.
+cancel_adventure_summon - Call this if a script teleports a player around, to
+                    prevent them from being teleported again if they were
+                    adventure-summoned.
 charge_coins(amt) - Charges the actor a number of coins.
 canbeseen         - True if the actor can be seen by the mob (always true 
                     for non-mob triggers).

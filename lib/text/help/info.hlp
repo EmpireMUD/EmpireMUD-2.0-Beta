@@ -40,13 +40,25 @@ Full multiplaying rules are found by typing POLICY.
 
 See also: ALTERNATE
 #
-ADVENTURE "ADVENTURE ZONE" ZONE
+ADVENTURE "ADVENTURE ZONE" ZONE "ADVENTURE SUMMON"
 
 Usage:  adventure
+        adventure summon <player>
 
 EmpireMUD features instanced adventure zones including caves, magical planes,
 and more. Sometimes you can see them on the 'nearby' command. You can get some
 more information about an adventure using the 'adventure' command.
+
+You can teleport your group to your adventure using 'adventure summon'. This
+will teleport group members from anywhere in the world to the adventure you're
+in. If they leave the adventure for any reason, they will be teleported back
+where they were before (with some exceptions, below).
+
+Adventure summon restrictions:
+- If you die and respawn, you'll be sent back where you were but your corpse
+will not be eligible for resurrection. You can still be summoned back.
+- If you teleport or trinket out, you won't be sent back where you were before
+the adventure summon. (Except random-teleport.)
 
 See also: NEARBY
 #

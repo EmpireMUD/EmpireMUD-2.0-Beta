@@ -1620,10 +1620,14 @@ RITUAL_SETUP_FUNC(start_ritual_of_teleportation) {
 
 
 RITUAL_FINISH_FUNC(perform_ritual_of_teleportation) {
+	void cancel_adventure_summon(char_data *ch);
+	
 	room_data *to_room, *rand_room;
 	int tries, rand_x, rand_y;
+	bool random;
 	
 	to_room = real_room(GET_ACTION_VNUM(ch, 1));
+	random = to_room ? FALSE : TRUE;
 	
 	// if there's no room, find a where
 	tries = 0;
@@ -1650,6 +1654,11 @@ RITUAL_FINISH_FUNC(perform_ritual_of_teleportation) {
 	
 		// reset this in case they teleport onto a wall.
 		GET_LAST_DIR(ch) = NO_DIR;
+		
+		// any existing adventure summon location is no longer valid after a voluntary teleport
+		if (!random) {	// except random teleport
+			cancel_adventure_summon(ch);
+		}
 
 		// trigger block	
 		enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);

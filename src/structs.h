@@ -1255,6 +1255,7 @@ typedef struct trig_data trig_data;
 #define PLR_UNRESTRICT	BIT(17)	/* !walls, !buildings					*/
 #define PLR_KEEP_LAST_LOGIN_INFO  BIT(18)	// in case of players loaded into the game, does not overwrite their playtime or last login info if stored
 #define PLR_EXTRACTED	BIT(19)	// for late-extraction
+#define PLR_ADVENTURE_SUMMONED  BIT(20)	// marks the player for return to whence they came
 
 
 // Preference flags
@@ -1300,6 +1301,11 @@ typedef struct trig_data trig_data;
 #define ROLE_CASTER  3
 #define ROLE_HEALER  4
 #define NUM_ROLES  5
+
+
+// summon types for oval_summon, ofin_summon, and add_offer
+#define SUMMON_PLAYER  0	// normal "summon player" command
+#define SUMMON_ADVENTURE  1	// for adventure_summon()
 
 
 // syslog types
@@ -2266,18 +2272,19 @@ struct player_special_data_saved {
 	double spare23;
 	double spare24;
 	
+	// WARNING: in 2.0b1-b2, these were erroneously initialized to -1 -- TODO next pconvert, fix any spares from 25-34 that are misinitialized
 	bitvector_t spare25; 
 	bitvector_t spare26;
 	bitvector_t spare27;
 	bitvector_t spare28;
 	bitvector_t spare29;
 	
-	// these are initialized to NOTHING/-1
+	// these are initialized to NOTHING/-1 in init_player() -- WARNING: in 2.0b1-b2, these were initialized to 0
 	any_vnum spare30;
 	any_vnum spare31;
 	any_vnum spare32;
-	any_vnum spare33;
-	any_vnum spare34;
+	any_vnum adventure_summon_return_location;	// where to send a player back to if they're outside an adventure
+	any_vnum adventure_summon_return_map;	// map check location for the return loc -- TODO next pconvert, move both of these up
 };
 
 

@@ -1528,7 +1528,19 @@ void show_one_stored_item_to_char(char_data *ch, empire_data *emp, struct empire
 //// COMMANDS ////////////////////////////////////////////////////////////////
 
 ACMD(do_adventure) {
+	void adventure_summon(char_data *ch, char *argument);
+
+	char arg[MAX_STRING_LENGTH];
 	struct instance_data *inst;
+	
+	if (*argument) {
+		argument = any_one_arg(argument, arg);
+		if (is_abbrev(arg, "summon")) {
+			adventure_summon(ch, argument);
+			return;
+		}
+		// otherwise fall through to the rest of the command
+	}
 	
 	if (!(inst = find_instance_by_room(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You are not in or near an adventure zone.\r\n");

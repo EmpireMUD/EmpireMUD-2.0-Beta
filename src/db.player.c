@@ -710,13 +710,13 @@ void init_player(char_data *ch) {
 	GET_EMPIRE_VNUM(ch) = NOTHING;
 	GET_PLEDGE(ch) = NOTHING;
 	GET_TOMB_ROOM(ch) = NOWHERE;
+	GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch) = NOWHERE;
+	GET_ADVENTURE_SUMMON_RETURN_MAP(ch) = NOWHERE;
 	
 	// spares
-	ch->player_specials->saved.spare25 = NOTHING;
-	ch->player_specials->saved.spare26 = NOTHING;
-	ch->player_specials->saved.spare27 = NOTHING;
-	ch->player_specials->saved.spare28 = NOTHING;
-	ch->player_specials->saved.spare29 = NOTHING;
+	ch->player_specials->saved.spare30 = NOTHING;
+	ch->player_specials->saved.spare31 = NOTHING;
+	ch->player_specials->saved.spare32 = NOTHING;
 }
 
 

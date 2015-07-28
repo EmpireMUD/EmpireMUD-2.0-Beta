@@ -356,6 +356,7 @@ const char *player_bits[] = {
 	"!RESTICT",
 	"KEEP-LOGIN",
 	"EXTRACTED",
+	"ADV-SUMMON"
 	"\n"
 };
 
