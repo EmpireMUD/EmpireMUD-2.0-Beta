@@ -290,7 +290,9 @@ See also: AUTO-STORE, KEEP, RETRIEVE, IDENTIFY, INVENTORY, DIPLOMACY,
 SUPERIOR MASTERWORK
 
 The (superior) flag indicates that an item is a masterwork, crafted by a truly
-legendary artisan.
+legendary artisan. Crafts that require tools, such as forge, will go faster
+if the tool you use is superior. Scaled items such as armor and weapons will
+be better in their superior form than without it, even at the same level.
 
 Masterwork abilities:
   Sewing/Leatherworking - Master Tailor

@@ -1345,7 +1345,7 @@ ACMD(do_sire) {
 	else if (IS_NPC(victim))
 		msg_to_char(ch, "You can't sire an NPC.\r\n");
 	else if (IS_VAMPIRE(victim))
-		msg_to_char(ch, "You can't sire a vampire!\r\n");
+		msg_to_char(ch, "It looks like someone already beat you to it!\r\n");
 	else if (IS_GOD(victim) || IS_IMMORTAL(victim))
 		msg_to_char(ch, "You can't sire a deity!\r\n");
 	else {

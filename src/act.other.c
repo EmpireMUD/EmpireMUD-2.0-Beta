@@ -65,7 +65,7 @@ void adventure_summon(char_data *ch, char *argument) {
 		msg_to_char(ch, "You can't do that right now.\r\n");
 	}
 	else if (!IS_ADVENTURE_ROOM(IN_ROOM(ch)) || !(inst = find_instance_by_room(IN_ROOM(ch)))) {
-		msg_to_char(ch, "You can only use the adventure summon command inside and adventure.\r\n");
+		msg_to_char(ch, "You can only use the adventure summon command inside an adventure.\r\n");
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		msg_to_char(ch, "You don't have permission to summon players here.\r\n");
