@@ -241,7 +241,7 @@ Examples:
 
 %teleport% <victim> <location>
 %teleport% all <location>
-%teleport adventure <location>
+%teleport% adventure <location>
 
    Teleport moves the victim to the target. The victim does not need to be in 
 the same room as the mob. If the victim is 'all', all the characters in the 

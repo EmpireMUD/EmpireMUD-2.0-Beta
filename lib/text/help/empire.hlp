@@ -69,7 +69,7 @@ See also: BUILD
 #
 AUTO-BALANCE "AUTO BALANCE" AUTOBALANCE
 
-Auto-balance is a workforce option that requires Skill Labor. A citizen will
+Auto-balance is a workforce option that requires Skilled Labor. A citizen will
 come to work at each of your docks as a dockworker to move your goods from
 other islands where you also have docks.
 
@@ -252,7 +252,7 @@ Commerce also allows you to build the mint building, and mint your own coins:
 
 [MM] mint  12 lumber, 4 nails, 12 blocks, 4 coin mills
 
-See also: BUILD, MINT, WEALTH
+See also: BUILD, MINT, TERRITORY, WEALTH
 #
 CUSTOMIZE "CUSTOMIZE BUILDING"
 
@@ -671,6 +671,7 @@ Inspire (Empire ability)
 
 Usage:  inspire <target | all> <type>
 Cost:  30 move points per person or 60 for 'all'
+Duration:  30 minutes (in same empire) or 5 minutes (if not)
 
 A powerful leader can inspire his friends and allies with a rousing speech.
 It will only be half as effective when used on himself. The 'all' option
@@ -1074,7 +1075,7 @@ Roads also do not count as outside.
 When an empire's members start to time out from lack of gameplay, the empire
 may start losing territory.
 
-See also: CITIES, EMPIRE TIMEOUT, TERRITORY COMMAND
+See also: CITIES, COMMERCE, EMPIRE TIMEOUT, TERRITORY COMMAND
 #
 "TERRITORY COMMAND"
 
