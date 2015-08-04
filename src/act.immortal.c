@@ -5981,7 +5981,7 @@ ACMD(do_wizlock) {
 		}
 		skip_spaces(&argument);
 		if (*argument && value != 0) {	// do not copy message on unlock
-			wizlock_message = str_dup(strcat(argument, "\r\n"));
+			wizlock_message = str_dup(argument);
 		}
 		wizlock_level = value;
 		when = "now";

@@ -2149,8 +2149,9 @@ void nanny(descriptor_data *d, char *arg) {
 				if (wizlock_level) {
 					if (!wizlock_message)
 						SEND_TO_Q("Sorry, new players can't be created at the moment.\r\n", d);
-					else
-						SEND_TO_Q(wizlock_message, d);
+					else {
+						msg_to_desc(d, "%s\r\n", wizlock_message);
+					}
 					syslog(SYS_LOGIN, 0, TRUE, "Request for new char %s denied from [%s] (wizlock)", GET_PC_NAME(d->character), d->host);
 					STATE(d) = CON_CLOSE;
 					return;
@@ -2220,8 +2221,9 @@ void nanny(descriptor_data *d, char *arg) {
 					return;
 				}
 				if (GET_ACCESS_LEVEL(d->character) < wizlock_level) {
-					if (wizlock_message)
-						SEND_TO_Q(wizlock_message, d);
+					if (wizlock_message) {
+						msg_to_desc(d, "%s\r\n", wizlock_message);
+					}
 					else
 						SEND_TO_Q("The game is temporarily restricted... try again later.\r\n", d);
 					STATE(d) = CON_CLOSE;

@@ -517,7 +517,7 @@ void update_reboot(void) {
 	// wizlock last 5 minutes
 	if (reboot_control.time <= 5) {
 		wizlock_level = 1;	// newbie lock
-		sprintf(buf, "This mud is preparing to %s. The %s will happen in about %d minutes.\r\n", reboot_type[reboot_control.type], reboot_type[reboot_control.type], reboot_control.time);
+		sprintf(buf, "This mud is preparing to %s. The %s will happen in about %d minutes.", reboot_type[reboot_control.type], reboot_type[reboot_control.type], reboot_control.time);
 		wizlock_message = str_dup(buf);
 	}
 	
