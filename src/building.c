@@ -1236,11 +1236,6 @@ ACMD(do_dismantle) {
 		return;
 	}
 
-	if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_DISMANTLE)) {
-		msg_to_char(ch, "You can't dismantle this building (use 'nodismantle' to toggle).\r\n");
-		return;
-	}
-
 	if (!has_permission(ch, PRIV_BUILD) || !can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
 		msg_to_char(ch, "You don't have permission to dismantle this building.\r\n");
 		return;
@@ -1249,7 +1244,12 @@ ACMD(do_dismantle) {
 	if (GET_CRAFT_ABILITY(type) != NO_ABIL && !HAS_ABILITY(ch, GET_CRAFT_ABILITY(type))) {
 		msg_to_char(ch, "You don't have the skill needed to dismantle this building properly.\r\n");
 		return;
-		}
+	}
+
+	if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_DISMANTLE)) {
+		msg_to_char(ch, "You can't dismantle this building (use 'nodismantle' to toggle).\r\n");
+		return;
+	}
 
 	// interior only
 	HASH_ITER(interior_hh, interior_world_table, room, next_room) {
