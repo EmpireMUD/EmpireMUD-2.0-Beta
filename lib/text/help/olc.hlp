@@ -3110,15 +3110,6 @@ The following special colors may be used in icons:
  &&? - The tile color of the base terrain.
  &&V - Wall color (walls are colored by enchantments).
 #d
-"SPECIAL PROCEDURE" "SPEC PROC"
-
-A special procedure, or spec proc, is a piece of code attached to an object
-or mobile that makes it behave in some unique way. For example, when you look
-at the port hole in a sailing ship, you see the room outside the ship instead
-of the port hole's look description.
-
-If you are interested in a spec proc, please see the programmer to discuss it.
-#d
 "STRING EDITOR" "TEXT EDITOR" "STRING EDITING"
 
 Note: If you are using the string editor in-game, you must begin commands with
