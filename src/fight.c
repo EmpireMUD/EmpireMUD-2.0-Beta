@@ -854,7 +854,7 @@ obj_data *die(char_data *ch, char_data *killer) {
 
 	// Alert Group if Applicable
 	if (GROUP(ch)) {
-		send_to_group(ch, GROUP(ch), "%s has died.\r\n", GET_NAME(ch));
+		send_to_group(ch, GROUP(ch), "%s has died.", GET_NAME(ch));
 	}
 	
 	// disable things
