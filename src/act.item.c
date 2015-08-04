@@ -3776,7 +3776,7 @@ ACMD(do_retrieve) {
 
 			if ((objn = obj_proto(store->vnum)) && obj_can_be_stored(objn, IN_ROOM(ch))) {
 				if (stored_item_requires_withdraw(objn) && !has_permission(ch, PRIV_WITHDRAW)) {
-					msg_to_char(ch, "You can't withdraw that!\r\n");
+					msg_to_char(ch, "You don't have permission to withdraw that!\r\n");
 					return;
 				}
 				else {
@@ -3806,7 +3806,7 @@ ACMD(do_retrieve) {
 					found = 1;
 					
 					if (stored_item_requires_withdraw(objn) && !has_permission(ch, PRIV_WITHDRAW)) {
-						msg_to_char(ch, "You can't withdraw that!\r\n");
+						msg_to_char(ch, "You don't have permission to withdraw that!\r\n");
 						return;
 					}
 					else {
