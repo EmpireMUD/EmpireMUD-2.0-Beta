@@ -403,9 +403,11 @@ See also: MAGIC ATTIRE, MASTER TAILOR, WEAVE, SEW
 Master Blacksmith (Trade ability)
 
 With this ability, some items you forge will have even greater power. You can
-also forge them more quickly.
+also forge them more quickly. To train this ability, you need to craft items
+like weapons and armor (items that come out superior); it won't work with nails
+or other small items.
 
-See also: FORGE, WEAPONCRAFTING, ARMORSMITHING
+See also: FORGE, WEAPONCRAFTING, ARMORSMITHING, SUPERIOR
 #
 "MASTER FARMER" "MASTER FARMING"
 
@@ -420,21 +422,24 @@ See also: HARVEST, MILL, SHEAR
 Master Craftsman (Trade ability)
 
 This mastery ability improves the quality of certain items from the Pottery
-and woodworking tree. It also allows you to craft the following:
+and woodworking tree.
+
+It also allows you to craft the following:
 
   letheian icon  1 clay, 1 silver bar, 2 seashells, 3 bileberries (skill reset)
 
-See also: POTTERY, FINE POTTERY
+See also: POTTERY, FINE POTTERY, SUPERIOR
 #
 "MASTER TAILOR"
 
 Master Tailor (Trade ability)
 
-Items you sew may have extra effects. For example, the whip provides +1
-strength. (This stacks with enchantments).
+Items you sew will be superior in quality and ability. (This stacks with
+enchantments). You can only level up with this ability by sewing items that
+can come out superior.
 
 See also: RAWHIDE STITCHING, LEATHERWORKING, DANGEROUS LEATHERS,
-  MAGIC ATTIRE, MAGICAL VESTMENTS
+  MAGIC ATTIRE, MAGICAL VESTMENTS, SUPERIOR
 #
 POTTER POTTERY CLAY
 
