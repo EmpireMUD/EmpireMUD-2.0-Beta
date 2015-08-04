@@ -1849,7 +1849,11 @@ void point_update(bool run_real) {
 	
 	// check if the skill cycle must reset (daily)
 	if (time(0) > daily_cycle + SECS_PER_REAL_DAY) {
-		daily_cycle += SECS_PER_REAL_DAY;
+		// put this in a while so that it doesn't repeatedly update if the mud is down for more than a day
+		// but it only adds 1 day at a time so that the cycle time doesn't move
+		while (time(0) > daily_cycle + SECS_PER_REAL_DAY) {
+			daily_cycle += SECS_PER_REAL_DAY;
+		}
 		save_daily_cycle();
 		
 		// reset players seen today too
