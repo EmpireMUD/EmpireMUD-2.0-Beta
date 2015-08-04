@@ -60,7 +60,7 @@ will not be eligible for resurrection. You can still be summoned back.
 - If you teleport or trinket out, you won't be sent back where you were before
 the adventure summon. (Except random-teleport.)
 
-See also: NEARBY
+See also: ACCEPT, NEARBY
 #
 ATTRIBUTES STATS STRENGTH DEXTERITY CHARISMA GREATNESS GRT INTELLIGENCE INTELLECT WITS
 
@@ -146,8 +146,8 @@ equipped it.
 
 Bound items can never be stored or posted for trade, and you can't drop them
 in territory claimed by other empires. Bound items will disappear from the
-ground if left on unclaimed land, like normal. They are safe to leave on
-claimed land or in your private chest.
+ground if left on unclaimed land, like normal. They are safe to leave longer on
+claimed land (although not forever) or in your private chest (no time limit).
 
 You cannot unbind items.
 

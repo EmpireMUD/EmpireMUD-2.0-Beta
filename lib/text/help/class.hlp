@@ -11,7 +11,7 @@ The class command shows your current class, role, and class abilities. You
 can also use this command to change roles. For example, "class role tank".
 
 Class roles are the different tasks a class might be suited for. For example,
-if you class has both Natural Magic and Survival as its core skills, it might
+if your class has both Natural Magic and Survival as its core skills, it might
 be suited to melee damage, caster damage, or healing. You can't perform all
 roles at the same time. You can change your current role using the "class role"
 command.

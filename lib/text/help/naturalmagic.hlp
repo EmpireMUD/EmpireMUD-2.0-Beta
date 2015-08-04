@@ -331,7 +331,7 @@ her health, mana, and moves.
 
 You can target a dead player or the player's most recent corpse.
 
-See also: RESPAWN, RESURRECT
+See also: ACCEPT, RESPAWN, RESURRECT
 #
 "NATURE POTIONS" "WRATH OF NATURE POTIONS"
 
@@ -419,7 +419,7 @@ This ability can return a recently-deceased player to life. The player will
 return with 10% of his or her health, mana, and moves. You can target the dead
 player or the player's most recent corpse.
 
-See also: MOONRISE, RESPAWN
+See also: ACCEPT, MOONRISE, RESPAWN
 #
 "SAGE WEREWOLF FORM"
 

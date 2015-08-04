@@ -191,7 +191,9 @@ LIGHT TORCH
 Usage:  light <item>
 
 To light something, you must have a flint set. You may light sticks to create
-torches.
+torches. You can also light trees or logs to make camp fires.
+
+See also: COOKING FIRE
 #
 MILK
 

@@ -193,11 +193,8 @@ FILE
 Usage:  file <file> <lines>
 
 Displays the last X lines of a file in the shell. This is useful for seeing 
-recent bad password attempts, ideas, and other information. Unfortunately, 
-these files are not refreshed unless the mud actually shuts down (not using the 
-reboot feature). For this reason, the mud should probably be rebooted 
-from time to time so that the autorun script parses the syslog into the 
-smaller logs.
+recent bad password attempts, ideas, and other information. These are only
+parsed out of the syslog when the mud reboots.
 #d
 FORCE
 

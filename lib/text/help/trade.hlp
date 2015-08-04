@@ -530,11 +530,12 @@ level and skills of the person.
 
 For normal craftables, the level range of the ability will determine the upper
 level limit of the item created. For example, the arming sword made by
-Weaponcrafting can only be levels 30 to 50, since that's the level range of
-Weaponcrafting. Abilities bought at levels 50-74 will make crafted items that
-scale as high as 75. Abilities bought at 75-100 make crafted items scaled up to
-100. The actual level will be based on the Trade skill of the crafter, within
-that range. The item will never scale higher than the crafter's total level.
+Iron Blades can only be levels 55 to 75, since that's the level range of
+Iron Blades. Abilities bought at levels 0-49 will make items up to level 50.
+Abilities bought at levels 50-74 will make crafted items that scale as high as
+75. Abilities bought at 75-100 make crafted items scaled up to 100. The actual
+level will be based on the Trade skill of the crafter, within that range. The
+item will never scale higher than the maker's crafting level.
 
 If a craft recipe comes from an adventure zone, loot drop, or other non-ability
 source, it can make an item that scales up to the player's total level -- even
@@ -549,7 +550,7 @@ level.
 The identify command will help you determine if two crafted items are different
 in power, even if they have the same name.
 
-See also: IDENTIFY, SUPERIOR
+See also: CRAFTING LEVEL, IDENTIFY, SUPERIOR
 #
 SEW SEWING
 

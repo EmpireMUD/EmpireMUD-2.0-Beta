@@ -291,6 +291,8 @@ There are also several possible modifier tags:
  - hard: will require two players in the right level range
  - group: will require three players in the right level range
  - boss: will require four players in the right level range
+ 
+See also: LEVELS
 #
 COTTON
 
@@ -344,7 +346,7 @@ This command causes your familiar to leave. You can target the familiar by
 name if it's in the room with you, or else can type 'dismiss familiar' to
 dismiss it anywhere in the world.
 #
-DOUSE BURNING "PUT OUT FIRE"
+DOUSE BURNING "PUT OUT FIRE" "FIRE BRIGADE"
 
 Usage:  douse
 
@@ -352,6 +354,12 @@ In the event of a fire, you may douse it with water from any portable source.
 It may take a lot of water to douse the fire, and you may have to leave and 
 come back. If you don't fully douse it, the flames will slowly rise again, 
 and destroy your structure.
+
+If your empire has a workforce, the fire brigade can also put out fires for
+you. They will always succeed if left alone. However, they do so very slowly
+and are easy targets for enemy players at war.
+
+See also: WORKFORCE
 #
 DRAW
 
@@ -684,7 +692,7 @@ Usage:  kill <victim>
 
 A good way to start a fight.
 
-See also: FLEE
+See also: ASSIST, FLEE
 #
 LAND
 
