@@ -291,11 +291,11 @@ ACMD(do_mount) {
 	else if (!can_use_ability(ch, ABIL_RIDE, NOTHING, 0, NOTHING)) {
 		// sends own msgs
 	}
-	else if (AFF_FLAGGED(ch, AFF_FLY)) {
-		msg_to_char(ch, "You can't mount while flying.\r\n");
-	}
 	else if (GET_MORPH(ch) != MORPH_NONE) {
 		msg_to_char(ch, "You can't ride anything in this form.\r\n");
+	}
+	else if (AFF_FLAGGED(ch, AFF_FLY)) {
+		msg_to_char(ch, "You can't mount while flying.\r\n");
 	}
 	else if (IS_RIDING(ch)) {
 		msg_to_char(ch, "You're already mounted.\r\n");
