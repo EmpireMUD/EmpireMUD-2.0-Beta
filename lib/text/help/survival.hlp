@@ -56,7 +56,7 @@ Herbs you can find:
 
 See also: HERB GARDENS, PICK
 #
-"FIND SHELTER" SHELTER
+"FIND SHELTER" SHELTERS
 
 Find Shelter (Survival ability)
 
@@ -65,6 +65,12 @@ show up on your "build" list but require no materials. When you're done with
 the shelter, be sure to dismantle and abandon it.
 
 Shelters boost regeneration while sleeping.
+
+You can build the following shelters:
+  &y^&0O&y/\&0  caveshelter (mountains)
+  &G^c^^&0  jungleshelter (jungle)
+  .c..  rockshelter (plains, desert)
+  &g^&0T&g^^&0  treeshelter (forest)
 
 See also: BUILD, DISMANTLE, ABANDON
 #
@@ -151,6 +157,7 @@ Usage:  dismount
 
 Once you have learned to Ride, travel becomes faster and easier. With All-
 Terrain Riding, you can coax your mount across rivers and mountains, too.
+Riding lowers the delay during movement, as well as the movement point cost.
 
 When you dismount, the animal you were riding is stored. You can see it on your
 affects list. If you type "mount" again without targetting a new animal, you
@@ -158,13 +165,12 @@ will re-mount your stored ride. If you target a new animal while you already
 have a stored mount, the old one will be released.
 
 If you have a saddle in your inventory, you will automatically equip it when
-you mount up. The saddle will be removed automatically when you dismount --
-If your inventory is full, this can cause you to drop the saddle. You can make
-a simple saddle with Basic Crafts.
+you mount up. The saddle will be removed automatically when you dismount. You
+can make a simple saddle with Basic Crafts.
 
 Flying mounts require All-Terrain Riding, or Fly + Ride, or Dragonriding.
 
-See also: AFFECTS, BASIC CRAFTS, DRAGONRIDING
+See also: AFFECTS, BASIC CRAFTS, DRAGONRIDING, MOVEMENT POINTS
 #
 MOUNTAIN "MOUNTAIN CLIMBING"
 
