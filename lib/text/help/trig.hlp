@@ -887,6 +887,7 @@ can_teleport_room(room) - Character can legally teleport in/out of the room
                     (defaults to current room).
 cha               - The actor's Charisma.
 class             - The actor's class, as a string.
+crafting_level    - The actor's crafting level.
 dex               - The actor's Dexterity.
 disabled          - Returns TRUE if the actor is stunned or otherwise disabled.
 eq()              - This will return the identifier (id) for the object 
@@ -926,6 +927,7 @@ is_pc             - Checks if the actor is a player. Useful when you want a
 level             - The actor's computed level (or scaled level, for mobs).
 mana              - The current mana points of the actor.
 master            - The master of the actor (as an id), or an empty return.
+maxblood          - The maximum blood points of the actor.
 maxhealth         - The maximum hit points of the actor.
 maxmana           - The maximum mana points of the actor.
 maxmove           - The maximum movement points of the actor.

@@ -1992,6 +1992,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "cha") || !str_cmp(field, "charisma")) {
 						snprintf(str, slen, "%d", GET_CHARISMA(c));
 					}
+					else if (!str_cmp(field, "crafting_level")) {
+						extern int get_crafting_level(char_data *ch);
+						snprintf(str, slen, "%d", get_crafting_level(c));
+					}
 
 					break;
 				case 'd':
