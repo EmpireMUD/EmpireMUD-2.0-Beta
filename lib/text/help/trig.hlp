@@ -787,7 +787,9 @@ Special Variables When using field - The variable returns:
 self          - The mob, item, or room running the script. Normal fields may be 
                 used with this.
 instance.id   - Unique id of the adventure instance, if any.
+instance.location - The map/linked location of the instance, if any.
 instance.name - Name of the adventure instance, if any.
+instance.start - The entry room of the instance, if any.
 people.<vnum> - This variable returns the number of people in the room 
                 specified via vnum.
 random.<#>    - This returns a number between 1 and the field value. 

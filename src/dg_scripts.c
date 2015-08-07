@@ -1678,8 +1678,24 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				else if (!str_cmp(field, "id")) {
 					snprintf(str, slen, "%d", inst->id);
 				}
+				else if (!str_cmp(field, "location")) {
+					if (inst->location) {
+						snprintf(str, slen, "%c%d", UID_CHAR, GET_ROOM_VNUM(inst->location) + ROOM_ID_BASE);
+					}
+					else {
+						snprintf(str, slen, "0");
+					}
+				}
 				else if (!str_cmp(field, "name")) {
 					snprintf(str, slen, "%s", GET_ADV_NAME(inst->adventure));
+				}
+				else if (!str_cmp(field, "start")) {
+					if (inst->start) {
+						snprintf(str, slen, "%c%d", UID_CHAR, GET_ROOM_VNUM(inst->start) + ROOM_ID_BASE);
+					}
+					else {
+						snprintf(str, slen, "0");
+					}
 				}
 				else {
 					// no field
