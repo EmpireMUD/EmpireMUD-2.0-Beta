@@ -1223,6 +1223,14 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	
 	// buf is now the completed icon, but has both color codes (&) and variable tile codes (@)
 	if (strchr(buf, '@')) {
+		// here (@.) roadside icon
+		if (strstr(buf, "@.")) {
+			icon = get_icon_from_set(GET_SECT_ICONS(base_sect), tileset);
+			sprintf(buf1, "%s%c", icon->color, GET_SECT_ROADSIDE_ICON(base_sect));
+			str = str_replace("@.", buf1, buf);
+			strcpy(buf, str);
+			free(str);
+		}
 		// east (@e) tile attachment
 		if (strstr(buf, "@e")) {
 			st = r_east ? ROOM_ORIGINAL_SECT(r_east) : ROOM_ORIGINAL_SECT(to_room);

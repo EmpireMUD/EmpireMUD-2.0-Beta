@@ -3099,6 +3099,7 @@ See also: OLC SECTORS
 "SPECIAL ICONS" "ICON CODES"
 
 The following special codes may be used in icons:
+ @. - show the roadside icon for the base tile type here
  @e - show the roadside icon for the tile to the east
  @w - show the roadside icon for the tile to the west
  @u - show a 'v' if the tile to the west is a wall
