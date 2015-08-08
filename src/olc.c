@@ -1595,6 +1595,7 @@ OLC_MODULE(olc_removeindev) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	any_vnum from = NOTHING, to = NOTHING;
 	bool use_adv = FALSE, any = FALSE;
+	struct global_data *glb, *next_glb;
 	craft_data *craft, *next_craft;
 	adv_data *adv = NULL;
 	int iter;
@@ -1661,6 +1662,23 @@ OLC_MODULE(olc_removeindev) {
 			REMOVE_BIT(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT);
 			save_library_file_for_vnum(DB_BOOT_CRAFT, GET_CRAFT_VNUM(craft));
 			msg_to_char(ch, "Removed IN-DEV flag from craft [%d] %s.\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
+			any = TRUE;
+		}
+		
+		HASH_ITER(hh, globals_table, glb, next_glb) {
+			if (GET_GLOBAL_VNUM(glb) < from || GET_GLOBAL_VNUM(glb) > to) {
+				continue;
+			}
+			if (!IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_IN_DEVELOPMENT)) {
+				continue;
+			}
+			if (!player_can_olc_edit(ch, OLC_GLOBAL, GET_GLOBAL_VNUM(glb))) {
+				continue;
+			}
+			
+			REMOVE_BIT(GET_GLOBAL_FLAGS(glb), GLB_FLAG_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_GLB, GET_GLOBAL_VNUM(glb));
+			msg_to_char(ch, "Removed IN-DEV flag from global [%d] %s.\r\n", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
 			any = TRUE;
 		}
 		

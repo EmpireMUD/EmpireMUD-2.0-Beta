@@ -2807,6 +2807,8 @@ This command removes the IN-DEVELOPMENT flag from an adventure and any craft
 recipes in it, or from craft recipes over a given vnum range. It can be used
 to quickly activate a zone.
 
+This also applies to global tables in the range.
+
 See also: OLC CONTROLS, OLC ADVENTURES, ADVEDIT FLAGS, CEDIT FLAGS
 #d
 "OLC ROOM TEMPLATES" "OLC ROOMTEMPLATES" "OLC ROOMS" REDIT
