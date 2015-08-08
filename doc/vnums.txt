@@ -56,6 +56,7 @@ Included Adventure Zones
 [  123] Ruins: Thieves (10110-10114)
 [  125] Ruins: The Goblin Challenge (10200-10224)
 [  140] The Sewer: Ratskins (10011-10027)
+[  141] The Sewer: Goblin Outpost (10450-10499)
 [  160] The Tower Skycleave (10030-10099)
 [  161] Portal to the Primeval (10250-10299)
 [  170] Hamlet of the Undead (10400-10449)
