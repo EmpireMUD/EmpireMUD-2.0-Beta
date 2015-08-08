@@ -5918,6 +5918,18 @@ int sort_crops(crop_data *a, crop_data *b) {
 
 
 /**
+* Simple sorter for the globals hash
+*
+* @param struct global_data *a One element
+* @param struct global_data *b Another element
+* @return int Sort instruction of -1, 0, or 1
+*/
+int sort_globals(struct global_data *a, struct global_data *b) {
+	return GET_GLOBAL_VNUM(a) - GET_GLOBAL_VNUM(b);
+}
+
+
+/**
 * Compare two empires for sorting.
 *
 * @param empire_data *a First empire
