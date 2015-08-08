@@ -1733,6 +1733,7 @@ const char *olc_flag_bits[] = {
 	"!TRIGGER",
 	"!ADVENTURE",
 	"!ROOMTEMPLATE",
+	"!GLOBAL",
 	"\n"
 };
 
@@ -1749,6 +1750,7 @@ const char *olc_type_bits[NUM_OLC_TYPES+1] = {
 	"sector",
 	"adventure",
 	"roomtemplate",
+	"global",
 	"\n"
 };
 
@@ -2616,6 +2618,13 @@ const char *fill_words[] = {
 // GLOBAL_x types
 const char *global_types[] = {
 	"Mob Interactions",
+	"\n"
+};
+
+
+// GLB_FLAG_X global flags
+const char *global_flags[] = {
+	"IN-DEVELOPMENT",
 	"\n"
 };
 

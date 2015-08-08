@@ -241,6 +241,10 @@ typedef struct trig_data trig_data;
 #define GLOBAL_MOB_INTERACTIONS  0
 
 
+// GLB_FLAG_x flags for global_data
+#define GLB_FLAG_IN_DEVELOPMENT  BIT(0)	// not live
+
+
 // Group Defines
 #define GROUP_ANON  BIT(0)	// Group is hidden/anonymous
 
@@ -1657,6 +1661,7 @@ struct global_data {
 	any_vnum vnum;
 	char *name;	// descriptive text
 	int type;	// GLOBAL_x
+	bitvector_t flags;	// GLB_FLAG_x flags
 
 	// constraints
 	bitvector_t type_flags;	// type-dependent
@@ -2125,6 +2130,7 @@ struct descriptor_data {
 	craft_data *olc_craft;	// craft recipe being edited
 	bld_data *olc_building;	// building being edited
 	crop_data *olc_crop;	// crop being edited
+	struct global_data *olc_global;	// global being edited
 	room_template *olc_room_template;	// rmt being edited
 	struct sector_data *olc_sector;	// sector being edited
 	struct trig_data *olc_trigger;	// trigger being edited

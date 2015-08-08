@@ -1348,6 +1348,9 @@ void close_socket(descriptor_data *d) {
 	if (d->olc_crop) {
 		free_crop(d->olc_crop);
 	}
+	if (d->olc_global) {
+		free_global(d->olc_global);
+	}
 	if (d->olc_room_template) {
 		free_room_template(d->olc_room_template);
 	}

@@ -2527,7 +2527,7 @@ void free_global(struct global_data *glb) {
 */
 void parse_global(FILE *fl, any_vnum vnum) {
 	struct global_data *glb, *find;
-	char line[256], str_in[256];
+	char line[256], str_in[256], str_in2[256];
 	int int_in[4];
 
 	CREATE(glb, struct global_data, 1);
@@ -2546,14 +2546,15 @@ void parse_global(FILE *fl, any_vnum vnum) {
 	// line 1
 	GET_GLOBAL_NAME(glb) = fread_string(fl, buf2);
 	
-	// line 2: type flags min_level-max_level
-	if (!get_line(fl, line) || sscanf(line, "%d %s %d-%d", &int_in[0], str_in, &int_in[1], &int_in[2]) != 4) {
+	// line 2: type flags typeflags min_level-max_level
+	if (!get_line(fl, line) || sscanf(line, "%d %s %s %d-%d", &int_in[0], str_in, str_in2, &int_in[1], &int_in[2]) != 5) {
 		log("SYSERR: Format error in line 2 of %s", buf2);
 		exit(1);
 	}
 	
 	GET_GLOBAL_TYPE(glb) = int_in[0];
-	GET_GLOBAL_TYPE_FLAGS(glb) = asciiflag_conv(str_in);
+	GET_GLOBAL_FLAGS(glb) = asciiflag_conv(str_in);
+	GET_GLOBAL_TYPE_FLAGS(glb) = asciiflag_conv(str_in2);
 	GET_GLOBAL_MIN_LEVEL(glb) = int_in[1];
 	GET_GLOBAL_MAX_LEVEL(glb) = int_in[2];
 		
@@ -2591,6 +2592,8 @@ void parse_global(FILE *fl, any_vnum vnum) {
 * @param struct global_data *glb The thing to save.
 */
 void write_global_to_file(FILE *fl, struct global_data *glb) {
+	char temp[MAX_STRING_LENGTH], temp2[MAX_STRING_LENGTH];
+	
 	if (!fl || !glb) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: write_global_to_file called without %s", !fl ? "file" : "global");
 		return;
@@ -2600,7 +2603,9 @@ void write_global_to_file(FILE *fl, struct global_data *glb) {
 	
 	fprintf(fl, "%s~\n", NULLSAFE(GET_GLOBAL_NAME(glb)));
 
-	fprintf(fl, "%d %s %d-%d\n", GET_GLOBAL_TYPE(glb), bitv_to_alpha(GET_GLOBAL_TYPE_FLAGS(glb)), GET_GLOBAL_MIN_LEVEL(glb), GET_GLOBAL_MAX_LEVEL(glb));
+	strcpy(temp, bitv_to_alpha(GET_GLOBAL_FLAGS(glb)));
+	strcpy(temp2, bitv_to_alpha(GET_GLOBAL_TYPE_FLAGS(glb)));
+	fprintf(fl, "%d %s %s %d-%d\n", GET_GLOBAL_TYPE(glb), temp, temp2, GET_GLOBAL_MIN_LEVEL(glb), GET_GLOBAL_MAX_LEVEL(glb));
 
 	// I: interactions
 	write_interactions_to_file(fl, GET_GLOBAL_INTERACTIONS(glb));

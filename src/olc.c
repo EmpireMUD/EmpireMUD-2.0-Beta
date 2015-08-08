@@ -110,6 +110,15 @@ OLC_MODULE(cropedit_xmin);
 OLC_MODULE(cropedit_ymax);
 OLC_MODULE(cropedit_ymin);
 
+// global modules
+OLC_MODULE(gedit_flags);
+OLC_MODULE(gedit_interaction);
+OLC_MODULE(gedit_maxlevel);
+OLC_MODULE(gedit_minlevel);
+OLC_MODULE(gedit_mobflags);
+OLC_MODULE(gedit_name);
+OLC_MODULE(gedit_type);
+
 // mob edit modules
 OLC_MODULE(medit_affects);
 OLC_MODULE(medit_attack);
@@ -241,6 +250,7 @@ void olc_show_adventure(char_data *ch);
 void olc_show_building(char_data *ch);
 void olc_show_craft(char_data *ch);
 void olc_show_crop(char_data *ch);
+void olc_show_global(char_data *ch);
 void olc_show_mobile(char_data *ch);
 void olc_show_object(char_data *ch);
 void olc_show_room_template(char_data *ch);
@@ -250,6 +260,7 @@ extern adv_data *setup_olc_adventure(adv_data *input);
 extern bld_data *setup_olc_building(bld_data *input);
 extern craft_data *setup_olc_craft(craft_data *input);
 extern crop_data *setup_olc_crop(crop_data *input);
+extern struct global_data *setup_olc_global(struct global_data *input);
 extern char_data *setup_olc_mobile(char_data *input);
 extern obj_data *setup_olc_object(obj_data *input);
 extern room_template *setup_olc_room_template(room_template *input);
@@ -261,16 +272,16 @@ extern bool validate_icon(char *icon);
 // master olc command structure
 const struct olc_command_data olc_data[] = {
 	// main commands
-	{ "abort", olc_abort, OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
+	{ "abort", olc_abort, OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
 	{ "audit", olc_audit, OLC_CRAFT | OLC_MOBILE | OLC_OBJECT, NOBITS },
-	{ "copy", olc_copy, OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, NOBITS },
-	{ "delete", olc_delete, OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, OLC_CF_NO_ABBREV },
+	{ "copy", olc_copy, OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, NOBITS },
+	{ "delete", olc_delete, OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, OLC_CF_NO_ABBREV },
 	// "display" command uses the shortcut "." or "olc" with no args, and is in the do_olc function
-	{ "edit", olc_edit, OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, NOBITS },
-	{ "free", olc_free, OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, NOBITS },
-	{ "list", olc_list, OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, NOBITS },
-	{ "save", olc_save, OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
-	{ "search", olc_search, OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ROOM_TEMPLATE, NOBITS },
+	{ "edit", olc_edit, OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, NOBITS },
+	{ "free", olc_free, OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, NOBITS },
+	{ "list", olc_list, OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, NOBITS },
+	{ "save", olc_save, OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
+	{ "search", olc_search, OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ROOM_TEMPLATE, NOBITS },
 	
 	// admin
 	{ "removeindev", olc_removeindev, NOBITS, NOBITS },
@@ -342,6 +353,15 @@ const struct olc_command_data olc_data[] = {
 	{ "xmin", cropedit_xmin, OLC_CROP, OLC_CF_EDITOR },
 	{ "ymax", cropedit_ymax, OLC_CROP, OLC_CF_EDITOR },
 	{ "ymin", cropedit_ymin, OLC_CROP, OLC_CF_EDITOR },
+	
+	// globals commands
+	{ "flags", gedit_flags, OLC_GLOBAL, OLC_CF_EDITOR },
+	{ "interaction", gedit_interaction, OLC_GLOBAL, OLC_CF_EDITOR },
+	{ "maxlevel", gedit_maxlevel, OLC_GLOBAL, OLC_CF_EDITOR },
+	{ "minlevel", gedit_minlevel, OLC_GLOBAL, OLC_CF_EDITOR },
+	{ "mobflags", gedit_mobflags, OLC_GLOBAL, OLC_CF_EDITOR },
+	{ "name", gedit_name, OLC_GLOBAL, OLC_CF_EDITOR },
+	{ "type", gedit_type, OLC_GLOBAL, OLC_CF_EDITOR },
 	
 	// mob commands
 	{ "affects", medit_affects, OLC_MOBILE, OLC_CF_EDITOR },
@@ -587,6 +607,11 @@ OLC_MODULE(olc_abort) {
 				GET_OLC_CROP(ch->desc) = NULL;
 				break;
 			}
+			case OLC_GLOBAL: {
+				free_global(GET_OLC_GLOBAL(ch->desc));
+				GET_OLC_GLOBAL(ch->desc) = NULL;
+				break;
+			}
 			case OLC_MOBILE: {
 				free_char(GET_OLC_MOBILE(ch->desc));
 				GET_OLC_MOBILE(ch->desc) = NULL;
@@ -710,6 +735,7 @@ OLC_MODULE(olc_audit) {
 				break;
 			}
 			*/
+			// OLC_GLOBAL ?
 			case OLC_MOBILE: {
 				extern bool audit_mobile(char_data *mob, char_data *ch);
 				char_data *mob, *next_mob;
@@ -837,6 +863,11 @@ OLC_MODULE(olc_copy) {
 			exists = (crop_proto(from_vnum) != NULL);
 			break;
 		}
+		case OLC_GLOBAL: {
+			found = (global_proto(vnum) != NULL);
+			exists = (global_proto(from_vnum) != NULL);
+			break;
+		}
 		case OLC_MOBILE: {
 			found = (mob_proto(vnum) != NULL);
 			exists = (mob_proto(from_vnum) != NULL);
@@ -933,6 +964,13 @@ OLC_MODULE(olc_copy) {
 			olc_show_crop(ch);
 			break;
 		}
+		case OLC_GLOBAL: {
+			GET_OLC_GLOBAL(ch->desc) = setup_olc_global(global_proto(from_vnum));
+			GET_OLC_GLOBAL(ch->desc)->vnum = vnum;
+			SET_BIT(GET_GLOBAL_FLAGS(GET_OLC_GLOBAL(ch->desc)), GLB_FLAG_IN_DEVELOPMENT);	// ensure flag
+			olc_show_global(ch);
+			break;
+		}
 		case OLC_MOBILE: {
 			// copy over
 			GET_OLC_MOBILE(ch->desc) = setup_olc_mobile(mob_proto(from_vnum));
@@ -984,6 +1022,7 @@ OLC_MODULE(olc_delete) {
 	void olc_delete_building(char_data *ch, bld_vnum vnum);
 	void olc_delete_craft(char_data *ch, craft_vnum vnum);
 	void olc_delete_crop(char_data *ch, crop_vnum vnum);
+	void olc_delete_global(char_data *ch, any_vnum vnum);
 	void olc_delete_mobile(char_data *ch, mob_vnum vnum);
 	void olc_delete_object(char_data *ch, obj_vnum vnum);
 	void olc_delete_room_template(char_data *ch, rmt_vnum vnum);
@@ -1042,6 +1081,10 @@ OLC_MODULE(olc_delete) {
 			olc_delete_crop(ch, vnum);
 			break;
 		}
+		case OLC_GLOBAL: {
+			olc_delete_global(ch, vnum);
+			break;
+		}
 		case OLC_MOBILE: {
 			olc_delete_mobile(ch, vnum);
 			break;
@@ -1086,6 +1129,10 @@ OLC_MODULE(olc_display) {
 		}
 		case OLC_CROP: {
 			olc_show_crop(ch);
+			break;
+		}
+		case OLC_GLOBAL: {
+			olc_show_global(ch);
 			break;
 		}
 		case OLC_MOBILE: {
@@ -1202,6 +1249,13 @@ OLC_MODULE(olc_edit) {
 			olc_show_crop(ch);
 			break;
 		}
+		case OLC_GLOBAL: {
+			// this will set up from existing OR new automatically based on global_proto
+			GET_OLC_GLOBAL(ch->desc) = setup_olc_global(global_proto(vnum));
+			GET_OLC_GLOBAL(ch->desc)->vnum = vnum;			
+			olc_show_global(ch);
+			break;
+		}
 		case OLC_MOBILE: {
 			// this will set up from existing OR new automatically
 			GET_OLC_MOBILE(ch->desc) = setup_olc_mobile(mob_proto(vnum));
@@ -1294,6 +1348,10 @@ OLC_MODULE(olc_free) {
 				}
 				case OLC_CROP: {
 					free = (crop_proto(iter) == NULL);
+					break;
+				}
+				case OLC_GLOBAL: {
+					free = (global_proto(iter) == NULL);
 					break;
 				}
 				case OLC_MOBILE: {
@@ -1415,6 +1473,20 @@ OLC_MODULE(olc_list) {
 					if (GET_CROP_VNUM(crop) >= from_vnum && GET_CROP_VNUM(crop) <= to_vnum) {
 						++count;
 						len += snprintf(buf + len, sizeof(buf) - len, "[%5d] %s\r\n", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
+					}
+				}
+				break;
+			}
+			case OLC_GLOBAL: {
+				struct global_data *glb, *next_glb;
+				HASH_ITER(hh, globals_table, glb, next_glb) {
+					if (len >= sizeof(buf)) {
+						break;
+					}
+					if (GET_GLOBAL_VNUM(glb) >= from_vnum && GET_GLOBAL_VNUM(glb) <= to_vnum) {
+						++count;
+						// TODO could show more info like flags and range
+						len += snprintf(buf + len, sizeof(buf) - len, "[%5d] %s\r\n", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
 					}
 				}
 				break;
@@ -1589,6 +1661,7 @@ OLC_MODULE(olc_save) {
 	void save_olc_building(descriptor_data *desc);
 	void save_olc_craft(descriptor_data *desc);
 	void save_olc_crop(descriptor_data *desc);
+	void save_olc_global(descriptor_data *desc);
 	void save_olc_mobile(descriptor_data *desc);
 	void save_olc_object(descriptor_data *desc);
 	void save_olc_room_template(descriptor_data *desc);
@@ -1632,6 +1705,12 @@ OLC_MODULE(olc_save) {
 				save_olc_crop(ch->desc);
 				free_crop(GET_OLC_CROP(ch->desc));
 				GET_OLC_CROP(ch->desc) = NULL;
+				break;
+			}
+			case OLC_GLOBAL: {
+				save_olc_global(ch->desc);
+				free_global(GET_OLC_GLOBAL(ch->desc));
+				GET_OLC_GLOBAL(ch->desc) = NULL;
 				break;
 			}
 			case OLC_MOBILE: {
@@ -1687,6 +1766,7 @@ OLC_MODULE(olc_search) {
 	void olc_search_building(char_data *ch, bld_vnum vnum);
 	void olc_search_craft(char_data *ch, craft_vnum vnum);
 	void olc_search_crop(char_data *ch, crop_vnum vnum);
+	void olc_search_global(char_data *ch, any_vnum vnum);
 	void olc_search_mob(char_data *ch, mob_vnum vnum);
 	void olc_search_obj(char_data *ch, obj_vnum vnum);
 	void olc_search_room_template(char_data *ch, rmt_vnum vnum);
@@ -1715,6 +1795,10 @@ OLC_MODULE(olc_search) {
 			}
 			case OLC_CROP: {
 				olc_search_crop(ch, vnum);
+				break;
+			}
+			case OLC_GLOBAL: {
+				olc_search_global(ch, vnum);
 				break;
 			}
 			case OLC_MOBILE: {
@@ -2207,6 +2291,9 @@ bool player_can_olc_edit(char_data *ch, int type, any_vnum vnum) {
 			return TRUE;
 		}
 		else if (IS_SET(type, OLC_CROP) && !OLC_FLAGGED(ch, OLC_FLAG_NO_CROP)) {
+			return TRUE;
+		}
+		else if (IS_SET(type, OLC_GLOBAL) && !OLC_FLAGGED(ch, OLC_FLAG_NO_GLOBAL)) {
 			return TRUE;
 		}
 		else if (IS_SET(type, OLC_MOBILE) && !OLC_FLAGGED(ch, OLC_FLAG_NO_MOBILE)) {
@@ -2824,6 +2911,13 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 					crop_data *crop;
 					if ((crop = crop_proto(vnum))) {
 						copyfrom = GET_CROP_INTERACTIONS(crop);
+					}
+					break;
+				}
+				case OLC_GLOBAL: {
+					struct global_data *glb;
+					if ((glb = global_proto(vnum))) {
+						copyfrom = GET_GLOBAL_INTERACTIONS(glb);
 					}
 					break;
 				}
