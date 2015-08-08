@@ -130,6 +130,10 @@ Crops (CROPEDIT):
 - Crops should have a FORAGE interaction for a small single food item.
 - Crops should have a HARVEST interaction for a plantable large item.
 
+Globals (GEDIT):
+- All global tables must be approved by the head builder, because they apply
+  to the entire game rather than just one adventure.
+
 Map (MAPEDIT):
 - Immortals are not generally permitted to make edits to the map. However,
   small aberrations may be fixed, and it's ok to make tiny (few-tile) edits
