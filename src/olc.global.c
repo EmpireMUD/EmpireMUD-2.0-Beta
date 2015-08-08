@@ -43,6 +43,25 @@ void sort_interactions(struct interaction_item **list);
 //// HELPERS /////////////////////////////////////////////////////////////////
 
 /**
+* Checks for common global table problems and reports them to ch.
+*
+* @param struct global_data *global The item to audit.
+* @param char_data *ch The person to report to.
+* @return bool TRUE if any problems were reported; FALSE if all good.
+*/
+bool audit_global(struct global_data *glb, char_data *ch) {
+	bool problem = FALSE;
+
+	if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_IN_DEVELOPMENT)) {
+		olc_audit_msg(ch, GET_GLOBAL_VNUM(glb), "IN-DEVELOPMENT");
+		problem = TRUE;
+	}
+		
+	return problem;
+}
+
+
+/**
 * Creates a new global entry.
 * 
 * @param any_vnum vnum The number to create.

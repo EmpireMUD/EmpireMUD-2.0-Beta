@@ -273,7 +273,7 @@ extern bool validate_icon(char *icon);
 const struct olc_command_data olc_data[] = {
 	// main commands
 	{ "abort", olc_abort, OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
-	{ "audit", olc_audit, OLC_CRAFT | OLC_MOBILE | OLC_OBJECT, NOBITS },
+	{ "audit", olc_audit, OLC_CRAFT | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT, NOBITS },
 	{ "copy", olc_copy, OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, NOBITS },
 	{ "delete", olc_delete, OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, OLC_CF_NO_ABBREV },
 	// "display" command uses the shortcut "." or "olc" with no args, and is in the do_olc function
@@ -735,7 +735,16 @@ OLC_MODULE(olc_audit) {
 				break;
 			}
 			*/
-			// OLC_GLOBAL ?
+			case OLC_GLOBAL: {
+				extern bool audit_global(struct global_data *global, char_data *ch);
+				struct global_data *glb, *next_glb;
+				HASH_ITER(hh, globals_table, glb, next_glb) {
+					if (GET_GLOBAL_VNUM(glb) >= from_vnum && GET_GLOBAL_VNUM(glb) <= to_vnum) {
+						found |= audit_global(glb, ch);
+					}
+				}
+				break;
+			}
 			case OLC_MOBILE: {
 				extern bool audit_mobile(char_data *mob, char_data *ch);
 				char_data *mob, *next_mob;
