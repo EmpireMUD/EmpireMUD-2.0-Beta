@@ -2743,7 +2743,7 @@ void do_stat_global(char_data *ch, struct global_data *glb) {
 	msg_to_char(ch, "Global VNum: [&c%d&0], Type: [&c%s&0], Name: '&c%s&0'\r\n", GET_GLOBAL_VNUM(glb), global_types[GET_GLOBAL_TYPE(glb)], GET_GLOBAL_NAME(glb));
 	
 	sprintbit(GET_GLOBAL_FLAGS(glb), global_flags, buf, TRUE);
-	msg_to_char(ch, "Flags: &y%s&0\r\n", buf);
+	msg_to_char(ch, "Flags: &g%s&0\r\n", buf);
 	
 	switch (GET_GLOBAL_TYPE(glb)) {
 		case GLOBAL_MOB_INTERACTIONS: {
