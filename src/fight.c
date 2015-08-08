@@ -931,6 +931,55 @@ obj_data *die(char_data *ch, char_data *killer) {
 }
 
 
+// this drops the loot to the inventory of the 'ch' who is interacting -- so run it on the mob itself, usually
+INTERACTION_FUNC(loot_interact) {
+	void scale_item_to_level(obj_data *obj, int level);
+	
+	obj_data *obj;
+	int iter, scale_level = 0;
+	
+	// both ch and inter_mob are required
+	if (!ch || !inter_mob) {
+		return FALSE;
+	}
+	
+	// determine scale level for loot
+	scale_level = get_approximate_level(inter_mob);
+	
+	for (iter = 0; iter < interaction->quantity; ++iter) {
+		obj = read_object(interaction->vnum);
+		
+		if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
+			// set flags (before scaling)
+			if (!OBJ_FLAGGED(obj, OBJ_GENERIC_DROP)) {
+				if (MOB_FLAGGED(inter_mob, MOB_HARD)) {
+					SET_BIT(GET_OBJ_EXTRA(obj), OBJ_HARD_DROP);
+				}
+				if (MOB_FLAGGED(inter_mob, MOB_GROUP)) {
+					SET_BIT(GET_OBJ_EXTRA(obj), OBJ_GROUP_DROP);
+				}
+			}
+		}
+		
+		// scale
+		scale_item_to_level(obj, scale_level);
+		
+		// preemptive binding
+		if (OBJ_FLAGGED(obj, OBJ_BIND_ON_PICKUP) && IS_NPC(inter_mob)) {
+			bind_obj_to_tag_list(obj, MOB_TAGGED_BY(inter_mob));
+		}
+		
+		// mark for extract if no player gets it
+		SET_BIT(GET_OBJ_EXTRA(obj), OBJ_UNCOLLECTED_LOOT);
+		
+		obj_to_char(obj, inter_mob);
+		load_otrigger(obj);
+	}
+	
+	return TRUE;
+}
+
+
 /**
 * This goes through a mob's loot table and adds item randomly to inventory,
 * which will later be put in the mob's corpse (or whatever).
@@ -940,20 +989,14 @@ obj_data *die(char_data *ch, char_data *killer) {
 */
 void drop_loot(char_data *mob, char_data *killer) {
 	extern int mob_coins(char_data *mob);
-	void scale_item_to_level(obj_data *obj, int level);
 
-	struct interact_exclusion_data *excl = NULL;
-	struct interaction_item *interact;
 	obj_data *obj;
-	int iter, coins, scale_level = 0;
+	int coins;
 	empire_data *coin_emp;
 
 	if (!mob || !IS_NPC(mob) || MOB_FLAGGED(mob, MOB_NO_LOOT)) {
 		return;
 	}
-	
-	// determine scale level for loot
-	scale_level = get_approximate_level(mob);
 	
 	// loot?
 	if (killer && !IS_NPC(killer) && (!GET_LOYALTY(mob) || GET_LOYALTY(mob) == GET_LOYALTY(killer) || char_has_relationship(killer, mob, DIPL_WAR))) {
@@ -970,41 +1013,8 @@ void drop_loot(char_data *mob, char_data *killer) {
 	}
 
 	// find and drop loot
-	for (interact = mob->interactions; interact; interact = interact->next) {
-		if (interact->type == INTERACT_LOOT && check_exclusion_set(&excl, interact->exclusion_code, interact->percent)) {
-			for (iter = 0; iter < interact->quantity; ++iter) {
-				obj = read_object(interact->vnum);
-				
-				if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-					// set flags (before scaling)
-					if (!OBJ_FLAGGED(obj, OBJ_GENERIC_DROP)) {
-						if (MOB_FLAGGED(mob, MOB_HARD)) {
-							SET_BIT(GET_OBJ_EXTRA(obj), OBJ_HARD_DROP);
-						}
-						if (MOB_FLAGGED(mob, MOB_GROUP)) {
-							SET_BIT(GET_OBJ_EXTRA(obj), OBJ_GROUP_DROP);
-						}
-					}
-				}
-				
-				// scale
-				scale_item_to_level(obj, scale_level);
-				
-				// preemptive binding
-				if (OBJ_FLAGGED(obj, OBJ_BIND_ON_PICKUP) && IS_NPC(mob)) {
-					bind_obj_to_tag_list(obj, MOB_TAGGED_BY(mob));
-				}
-				
-				// mark for extract if no player gets it
-				SET_BIT(GET_OBJ_EXTRA(obj), OBJ_UNCOLLECTED_LOOT);
-				
-				obj_to_char(obj, mob);
-				load_otrigger(obj);
-			}
-		}
-	}
-	
-	free_exclusion_data(excl);
+	run_interactions(mob, mob->interactions, INTERACT_LOOT, IN_ROOM(mob), mob, NULL, loot_interact);
+	run_global_mob_interactions(mob, mob, INTERACT_LOOT, loot_interact);
 }
 
 
