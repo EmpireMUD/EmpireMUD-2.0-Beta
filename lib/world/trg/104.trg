@@ -385,23 +385,29 @@ switch %random.4%
   break
 done
 ~
-#10456
-Wargreyn combat~
+#10453
+Goblin Outpost Melee~
 0 k 10
 ~
-switch %random.3%
+switch %random.2%
+  case 1
+    kick
+  break
+  case 2
+    jab
+  break  
+done
+~
+#10456
+Wargreyn combat~
+0 k 8
+~
+switch %random.2%
   case 1
     bash
   break
   case 2
     disarm
-  break
-  case 3
-    * Hammer spin hits all
-    %echo% Wargreyn begins spinning around the room with her hammer!
-    wait 3 sec
-    %echo% Wargreyn's hammer-spin hits everyone!
-    %aoe% 100 physical
   break
 done
 ~
