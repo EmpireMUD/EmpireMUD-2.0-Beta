@@ -3405,12 +3405,22 @@ int vnum_crop(char *searchname, char_data *ch) {
 */
 int vnum_global(char *searchname, char_data *ch) {
 	struct global_data *iter, *next_iter;
+	char flags[MAX_STRING_LENGTH];
 	int found = 0;
 	
 	HASH_ITER(hh, globals_table, iter, next_iter) {
-		if (multi_isname(searchname, GET_GLOBAL_NAME(iter))) {
-			// TODO this should probably show level range and flags
-			msg_to_char(ch, "%3d. [%5d] %s\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter));
+		if (multi_isname(searchname, GET_GLOBAL_NAME(iter))) {			
+			switch (GET_GLOBAL_TYPE(iter)) {
+				case GLOBAL_MOB_INTERACTIONS: {
+					sprintbit(GET_GLOBAL_TYPE_FLAGS(iter), action_bits, flags, TRUE);
+					msg_to_char(ch, "%3d. [%5d] %s (%d-%d) %s\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), GET_GLOBAL_MIN_LEVEL(iter), GET_GLOBAL_MAX_LEVEL(iter), flags);
+					break;
+				}
+				default: {
+					msg_to_char(ch, "%3d. [%5d] %s\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter));
+					break;
+				}
+			}
 		}
 	}
 	

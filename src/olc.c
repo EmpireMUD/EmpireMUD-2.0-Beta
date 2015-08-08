@@ -1405,7 +1405,7 @@ OLC_MODULE(olc_free) {
 
 // Usage: olc mob list <from vnum> [to vnum]
 OLC_MODULE(olc_list) {	
-	char buf[MAX_STRING_LENGTH*2], buf1[MAX_STRING_LENGTH*2], buf2[MAX_STRING_LENGTH], arg2[MAX_INPUT_LENGTH];
+	char buf[MAX_STRING_LENGTH*2], buf1[MAX_STRING_LENGTH*2], buf2[MAX_STRING_LENGTH], arg2[MAX_INPUT_LENGTH], flags[MAX_STRING_LENGTH];
 	any_vnum from_vnum = NOTHING, to_vnum = NOTHING, iter;
 	int count = 0, len;
 	
@@ -1487,6 +1487,7 @@ OLC_MODULE(olc_list) {
 				break;
 			}
 			case OLC_GLOBAL: {
+				extern const char *action_bits[];
 				struct global_data *glb, *next_glb;
 				HASH_ITER(hh, globals_table, glb, next_glb) {
 					if (len >= sizeof(buf)) {
@@ -1494,8 +1495,17 @@ OLC_MODULE(olc_list) {
 					}
 					if (GET_GLOBAL_VNUM(glb) >= from_vnum && GET_GLOBAL_VNUM(glb) <= to_vnum) {
 						++count;
-						// TODO could show more info like flags and range
-						len += snprintf(buf + len, sizeof(buf) - len, "[%5d] %s\r\n", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
+						switch (GET_GLOBAL_TYPE(glb)) {
+							case GLOBAL_MOB_INTERACTIONS: {
+								sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), action_bits, flags, TRUE);
+								len += snprintf(buf + len, sizeof(buf) - len, "[%5d] %s (%d-%d) %s\r\n", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb), GET_GLOBAL_MIN_LEVEL(glb), GET_GLOBAL_MAX_LEVEL(glb), flags);
+								break;
+							}
+							default: {
+								len += snprintf(buf + len, sizeof(buf) - len, "[%5d] %s\r\n", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
+								break;
+							}
+						}
 					}
 				}
 				break;
