@@ -96,6 +96,9 @@ struct weather_data weather_info;	// the infomation about the weather
 int wizlock_level = 0;	// level of game restriction
 char *wizlock_message = NULL;	// Message sent to people trying to connect
 
+// global stuff
+struct global_data *globals_table = NULL;	// hash table of global_data
+
 // helps
 struct help_index_element *help_table = 0;	// the help table
 int top_of_helpt = 0;	// top of help index table
@@ -180,6 +183,7 @@ struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES] = {
 	{ SECTOR_PREFIX, SECTOR_SUFFIX },	// DB_BOOT_SECTOR
 	{ ADV_PREFIX, ADV_SUFFIX },	// DB_BOOT_ADV
 	{ RMT_PREFIX, RMT_SUFFIX },	// DB_BOOT_RMT
+	{ GLB_PREFIX, GLB_SUFFIX },	// DB_BOOT_GLB
 };
 
 
@@ -370,6 +374,9 @@ void boot_world(void) {
 
 	log("Loading objs and generating index.");
 	index_boot(DB_BOOT_OBJ);
+	
+	log("Loading global tables.");
+	index_boot(DB_BOOT_GLB);
 	
 	log("Loading craft recipes.");
 	index_boot(DB_BOOT_CRAFT);

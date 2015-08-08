@@ -33,6 +33,7 @@
 *   Empire NPC Lib
 *   Exit Lib
 *   Extra Description Lib
+*   Globals Lib
 *   Icon Lib
 *   Interaction Lib
 *   Mobile Lib
@@ -2459,6 +2460,157 @@ void write_extra_descs_to_file(FILE *fl, struct extra_descr_data *list) {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// GLOBALS LIB /////////////////////////////////////////////////////////////
+
+/**
+* Puts a global into the hash table.
+*
+* @param struct global_data *glb The global data to add to the table.
+*/
+void add_global_to_table(struct global_data *glb) {
+	extern int sort_globals(struct global_data *a, struct global_data *b);
+	
+	struct global_data *find;
+	any_vnum vnum;
+	
+	if (glb) {
+		vnum = GET_GLOBAL_VNUM(glb);
+		HASH_FIND_INT(globals_table, &vnum, find);
+		if (!find) {
+			HASH_ADD_INT(globals_table, vnum, glb);
+			HASH_SORT(globals_table, sort_globals);
+		}
+	}
+}
+
+/**
+* Removes a global from the hash table.
+*
+* @param struct global_data *glb The global data to remove from the table.
+*/
+void remove_global_from_table(struct global_data *glb) {
+	HASH_DEL(globals_table, glb);
+}
+
+
+/**
+* frees up memory for a global data item.
+*
+* See also: olc_delete_global
+*
+* @param struct global_data *glb The global data to free.
+*/
+void free_global(struct global_data *glb) {
+	struct global_data *proto = global_proto(GET_GLOBAL_VNUM(glb));
+	struct interaction_item *interact;
+	
+	if (GET_GLOBAL_NAME(glb) && (!proto || GET_GLOBAL_NAME(glb) != GET_GLOBAL_NAME(proto))) {
+		free(GET_GLOBAL_NAME(glb));
+	}
+	
+	if (GET_GLOBAL_INTERACTIONS(glb) && (!proto || GET_GLOBAL_INTERACTIONS(glb) != GET_GLOBAL_INTERACTIONS(proto))) {
+		while ((interact = GET_GLOBAL_INTERACTIONS(glb))) {
+			GET_GLOBAL_INTERACTIONS(glb) = interact->next;
+			free(interact);
+		}
+	}
+	
+	free(glb);
+}
+
+
+/**
+* Read one global from file.
+*
+* @param FILE *fl The open .glb file
+* @param any_vnum vnum The global vnum
+*/
+void parse_global(FILE *fl, any_vnum vnum) {
+	struct global_data *glb, *find;
+	char line[256], str_in[256];
+	int int_in[4];
+
+	CREATE(glb, struct global_data, 1);
+	GET_GLOBAL_VNUM(glb) = vnum;
+
+	HASH_FIND_INT(globals_table, &vnum, find);
+	if (find) {
+		log("WARNING: Duplicate global vnum #%d", vnum);
+		// but have to load it anyway to advance the file
+	}
+	add_global_to_table(glb);
+		
+	// for error messages
+	sprintf(buf2, "global vnum %d", vnum);
+	
+	// line 1
+	GET_GLOBAL_NAME(glb) = fread_string(fl, buf2);
+	
+	// line 2: type flags min_level-max_level
+	if (!get_line(fl, line) || sscanf(line, "%d %s %d-%d", &int_in[0], str_in, &int_in[1], &int_in[2]) != 4) {
+		log("SYSERR: Format error in line 2 of %s", buf2);
+		exit(1);
+	}
+	
+	GET_GLOBAL_TYPE(glb) = int_in[0];
+	GET_GLOBAL_TYPE_FLAGS(glb) = asciiflag_conv(str_in);
+	GET_GLOBAL_MIN_LEVEL(glb) = int_in[1];
+	GET_GLOBAL_MAX_LEVEL(glb) = int_in[2];
+		
+	// optionals
+	for (;;) {
+		if (!get_line(fl, line)) {
+			log("SYSERR: Format error in %s, expecting alphabetic flags", buf2);
+			exit(1);
+		}
+		switch (*line) {
+			case 'I': {	// interaction item
+				parse_interaction(line, &GET_GLOBAL_INTERACTIONS(glb), buf2);
+				break;
+			}
+
+			// end
+			case 'S': {
+				return;
+			}
+			
+			default: {
+				log("SYSERR: Format error in %s, expecting alphabetic flags", buf2);
+				exit(1);
+			}
+		}
+	}
+}
+
+
+/**
+* Outputs one global item in the db file format, starting with a #VNUM and
+* ending with an S.
+*
+* @param FILE *fl The file to write it to.
+* @param struct global_data *glb The thing to save.
+*/
+void write_global_to_file(FILE *fl, struct global_data *glb) {
+	if (!fl || !glb) {
+		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: write_global_to_file called without %s", !fl ? "file" : "global");
+		return;
+	}
+	
+	fprintf(fl, "#%d\n", GET_GLOBAL_VNUM(glb));
+	
+	fprintf(fl, "%s~\n", NULLSAFE(GET_GLOBAL_NAME(glb)));
+
+	fprintf(fl, "%d %s %d-%d\n", GET_GLOBAL_TYPE(glb), bitv_to_alpha(GET_GLOBAL_TYPE_FLAGS(glb)), GET_GLOBAL_MIN_LEVEL(glb), GET_GLOBAL_MAX_LEVEL(glb));
+
+	// I: interactions
+	write_interactions_to_file(fl, GET_GLOBAL_INTERACTIONS(glb));
+	
+	// end
+	fprintf(fl, "S\n");
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// ICON LIB ////////////////////////////////////////////////////////////////
 
 /**
@@ -4659,6 +4811,10 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 					parse_crop(fl, nr);
 					break;
 				}
+				case DB_BOOT_GLB: {
+					parse_global(fl, nr);
+					break;
+				}
 				case DB_BOOT_WLD:
 					parse_room(fl, nr);
 					break;
@@ -4750,7 +4906,7 @@ void index_boot(int mode) {
 
 	if (!rec_count) {
 		// some types don't matter TODO could move this into a config
-		if (mode == DB_BOOT_EMP || mode == DB_BOOT_BOOKS || mode == DB_BOOT_CRAFT || mode == DB_BOOT_BLD || mode == DB_BOOT_ADV || mode == DB_BOOT_RMT || mode == DB_BOOT_WLD) {
+		if (mode == DB_BOOT_EMP || mode == DB_BOOT_BOOKS || mode == DB_BOOT_CRAFT || mode == DB_BOOT_BLD || mode == DB_BOOT_ADV || mode == DB_BOOT_RMT || mode == DB_BOOT_WLD || mode == DB_BOOT_GLB) {
 			// types that don't require any entries and exit early if none
 			return;
 		}
@@ -4799,6 +4955,11 @@ void index_boot(int mode) {
 			log("   %d crops, %d bytes in crop table.", rec_count, size[0]);
 			break;
 		}
+		case DB_BOOT_GLB: {
+			size[0] = sizeof(struct global_data) * rec_count;
+			log("   %d globals, %d bytes in globals table.", rec_count, size[0]);
+			break;
+		}
 		case DB_BOOT_NAMES: {
 			log("   %d name lists.", rec_count);
 			break;
@@ -4841,6 +5002,7 @@ void index_boot(int mode) {
 			case DB_BOOT_BLD:
 			case DB_BOOT_CRAFT:
 			case DB_BOOT_CROP:
+			case DB_BOOT_GLB:
 			case DB_BOOT_OBJ:
 			case DB_BOOT_MOB:
 			case DB_BOOT_EMP:
@@ -4933,6 +5095,15 @@ void save_library_file_for_vnum(int type, any_vnum vnum) {
 			HASH_ITER(hh, crop_table, crop, next_crop) {
 				if (GET_CROP_VNUM(crop) >= (zone * 100) && GET_CROP_VNUM(crop) <= (zone * 100 + 99)) {
 					write_crop_to_file(fl, crop);
+				}
+			}
+			break;
+		}
+		case DB_BOOT_GLB: {
+			struct global_data *glb, *next_glb;
+			HASH_ITER(hh, globals_table, glb, next_glb) {
+				if (GET_GLOBAL_VNUM(glb) >= (zone * 100) && GET_GLOBAL_VNUM(glb) <= (zone * 100 + 99)) {
+					write_global_to_file(fl, glb);
 				}
 			}
 			break;
@@ -5067,6 +5238,24 @@ void write_crop_index(FILE *fl) {
 	
 		if (this != last) {
 			fprintf(fl, "%d%s\n", this, CROP_SUFFIX);
+			last = this;
+		}
+	}
+}
+
+
+// writes entries in the room template index
+void write_globals_index(FILE *fl) {
+	struct global_data *glb, *next_glb;
+	int this, last;
+	
+	last = -1;
+	HASH_ITER(hh, globals_table, glb, next_glb) {
+		// determine "zone number" by vnum
+		this = (int)(GET_GLOBAL_VNUM(glb) / 100);
+	
+		if (this != last) {
+			fprintf(fl, "%d%s\n", this, GLB_SUFFIX);
 			last = this;
 		}
 	}
@@ -5209,6 +5398,10 @@ void save_index(int type) {
 			write_crop_index(fl);
 			break;
 		}
+		case DB_BOOT_GLB: {
+			write_globals_index(fl);
+			break;
+		}
 		case DB_BOOT_MOB: {
 			write_mobile_index(fl);
 			break;
@@ -5320,6 +5513,22 @@ crop_data *crop_proto(crop_vnum vnum) {
 	
 	HASH_FIND_INT(crop_table, &vnum, crop);
 	return crop;
+}
+
+
+/**
+* @param any_vnum vnum Any global vnum
+* @return struct global_data* The global, or NULL if it doesn't exist
+*/
+struct global_data *global_proto(any_vnum vnum) {
+	struct global_data *glb;
+	
+	if (vnum < 0 || vnum == NOTHING) {
+		return NULL;
+	}
+	
+	HASH_FIND_INT(globals_table, &vnum, glb);
+	return glb;
 }
 
 

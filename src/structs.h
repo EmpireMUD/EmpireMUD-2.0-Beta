@@ -237,6 +237,10 @@ typedef struct trig_data trig_data;
 #define BAN_ALL  3
 
 
+// GLOBAL_x types for global_data
+#define GLOBAL_MOB_INTERACTIONS  0
+
+
 // Group Defines
 #define GROUP_ANON  BIT(0)	// Group is hidden/anonymous
 
@@ -1645,6 +1649,24 @@ struct generic_name_data {
 	int size;	// size of names array
 	
 	struct generic_name_data *next;	// LL
+};
+
+
+// for global tables
+struct global_data {
+	any_vnum vnum;
+	char *name;	// descriptive text
+	int type;	// GLOBAL_x
+
+	// constraints
+	bitvector_t type_flags;	// type-dependent
+	int min_level;
+	int max_level;
+
+	// data
+	struct interaction_item *interactions;
+	
+	UT_hash_handle hh;
 };
 
 

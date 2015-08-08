@@ -24,6 +24,7 @@
 *   Descriptor Utils
 *   Empire Utils
 *   Fight Utils
+*   Global Utils
 *   Map Utils
 *   Memory Utils
 *   Mobile Utils
@@ -411,6 +412,18 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 //// FIGHT UTILS /////////////////////////////////////////////////////////////
 
 #define SHOULD_APPEAR(ch)  AFF_FLAGGED(ch, AFF_HIDE | AFF_INVISIBLE)
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// GLOBAL UTILS ////////////////////////////////////////////////////////////
+
+#define GET_GLOBAL_VNUM(glb)  ((glb)->vnum)
+#define GET_GLOBAL_NAME(glb)  ((glb)->name)
+#define GET_GLOBAL_TYPE(glb)  ((glb)->type)
+#define GET_GLOBAL_TYPE_FLAGS(glb)  ((glb)->type_flags)
+#define GET_GLOBAL_MIN_LEVEL(glb)  ((glb)->min_level)
+#define GET_GLOBAL_MAX_LEVEL(glb)  ((glb)->max_level)
+#define GET_GLOBAL_INTERACTIONS(glb)  ((glb)->interactions)
 
 
  //////////////////////////////////////////////////////////////////////////////
