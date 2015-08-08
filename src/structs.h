@@ -1664,7 +1664,8 @@ struct global_data {
 	bitvector_t flags;	// GLB_FLAG_x flags
 
 	// constraints
-	bitvector_t type_flags;	// type-dependent
+	bitvector_t type_flags;	// type-dependent flags
+	bitvector_t type_exclude;	// type-dependent flags
 	int min_level;
 	int max_level;
 

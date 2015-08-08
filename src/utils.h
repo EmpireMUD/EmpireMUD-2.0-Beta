@@ -422,6 +422,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_GLOBAL_NAME(glb)  ((glb)->name)
 #define GET_GLOBAL_TYPE(glb)  ((glb)->type)
 #define GET_GLOBAL_FLAGS(glb)  ((glb)->flags)
+#define GET_GLOBAL_TYPE_EXCLUDE(glb)  ((glb)->type_exclude)
 #define GET_GLOBAL_TYPE_FLAGS(glb)  ((glb)->type_flags)
 #define GET_GLOBAL_MIN_LEVEL(glb)  ((glb)->min_level)
 #define GET_GLOBAL_MAX_LEVEL(glb)  ((glb)->max_level)

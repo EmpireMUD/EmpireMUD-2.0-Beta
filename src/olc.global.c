@@ -271,6 +271,8 @@ void olc_show_global(char_data *ch) {
 		case GLOBAL_MOB_INTERACTIONS: {
 			sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), action_bits, lbuf, TRUE);
 			sprintf(buf + strlen(buf), "<&ymobflags&0> %s\r\n", lbuf);
+			sprintbit(GET_GLOBAL_TYPE_EXCLUDE(glb), action_bits, lbuf, TRUE);
+			sprintf(buf + strlen(buf), "<&ymobexclude&0> %s\r\n", lbuf);
 			break;
 		}
 	}
@@ -316,6 +318,18 @@ OLC_MODULE(gedit_maxlevel) {
 OLC_MODULE(gedit_minlevel) {
 	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
 	GET_GLOBAL_MIN_LEVEL(glb) = olc_process_number(ch, argument, "minimum level", "minlevel", 0, MAX_INT, GET_GLOBAL_MIN_LEVEL(glb));
+}
+
+
+OLC_MODULE(gedit_mobexclude) {
+	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
+	
+	if (GET_GLOBAL_TYPE(glb) != GLOBAL_MOB_INTERACTIONS) {
+		msg_to_char(ch, "You can't set mobexclude on this type.\r\n");
+	}
+	else {
+		GET_GLOBAL_TYPE_EXCLUDE(glb) = olc_process_flag(ch, argument, "mob", "mobexclude", action_bits, GET_GLOBAL_TYPE_EXCLUDE(glb));
+	}
 }
 
 

@@ -115,6 +115,7 @@ OLC_MODULE(gedit_flags);
 OLC_MODULE(gedit_interaction);
 OLC_MODULE(gedit_maxlevel);
 OLC_MODULE(gedit_minlevel);
+OLC_MODULE(gedit_mobexclude);
 OLC_MODULE(gedit_mobflags);
 OLC_MODULE(gedit_name);
 OLC_MODULE(gedit_type);
@@ -359,6 +360,7 @@ const struct olc_command_data olc_data[] = {
 	{ "interaction", gedit_interaction, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "maxlevel", gedit_maxlevel, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "minlevel", gedit_minlevel, OLC_GLOBAL, OLC_CF_EDITOR },
+	{ "mobexclude", gedit_mobexclude, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "mobflags", gedit_mobflags, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "name", gedit_name, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "type", gedit_type, OLC_GLOBAL, OLC_CF_EDITOR },

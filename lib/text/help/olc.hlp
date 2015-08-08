@@ -1271,6 +1271,18 @@ is scaled to this minlevel or higher.
 
 See also: OLC GLOBALS
 #d
+"GEDIT MOBEXCLUDE"
+
+Usage:  .mobexclude [add | remove] <flags>
+
+A 'Mob Interactions' global table may have mob flags set to exclude. If so, the
+global table is only used if a mob DOES NOT have all the flags in this set.
+For example, you can use it to create a set that does not apply to HARD mobs.
+
+These are the same set of flags from HELP MEDIT FLAGS.
+
+See also: OLC GLOBALS
+#d
 "GEDIT MOBFLAGS"
 
 Usage:  .mobflags [add | remove] <flags>
