@@ -619,8 +619,7 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 	sector_data *findsect = NULL;
 	room_template *start_room = room_template_proto(GET_ADV_START_VNUM(adv));
 	bool match_buildon = FALSE;
-	int pos = -1;	// default < 0
-	int dir, iter, sub;
+	int dir, iter, sub, num_found;
 	
 	const int max_tries = 500, max_dir_tries = 10;	// for random checks
 	
@@ -635,7 +634,6 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 	switch (rule->type) {
 		case ADV_LINK_BUILDING_EXISTING: {
 			findbdg = building_proto(rule->value);
-			pos = number(0, stats_get_building_count(findbdg) - 1);
 			break;
 		}
 		case ADV_LINK_BUILDING_NEW: {
@@ -644,12 +642,10 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 		}
 		case ADV_LINK_PORTAL_WORLD: {
 			findsect = sector_proto(rule->value);
-			pos = number(0, stats_get_sector_count(findsect) - 1);
 			break;
 		}
 		case ADV_LINK_PORTAL_BUILDING_EXISTING: {
 			findbdg = building_proto(rule->value);
-			pos = number(0, stats_get_building_count(findbdg) - 1);
 			break;
 		}
 		case ADV_LINK_PORTAL_BUILDING_NEW: {
@@ -665,24 +661,24 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 	// two ways of doing this:
 	if (!match_buildon) {
 		// scan the whole world world
-		HASH_ITER(world_hh, world_table, room, next_room) {
-			if (!validate_one_loc(rule, room)) {
-				continue;
-			}
+		if (findsect || findbdg) {
+			num_found = 0;
+			HASH_ITER(world_hh, world_table, room, next_room) {
+				if (!validate_one_loc(rule, room)) {
+					continue;
+				}
 			
-			// check secondary limits
-			if (!validate_linking_limits(adv, room)) {
-				continue;
-			}
+				// check secondary limits
+				if (!validate_linking_limits(adv, room)) {
+					continue;
+				}
 			
-			// TODO this specifically does not work on ocean without the whole map loaded
-			if (findsect && SECT(room) == findsect && pos-- == 0) {
-				found = room;
-				break;
-			}
-			if (findbdg && BUILDING_VNUM(room) == GET_BLD_VNUM(findbdg) && pos-- == 0) {
-				found = room;
-				break;
+				// TODO this specifically does not work on ocean without the whole map loaded
+				if ((findsect && SECT(room) == findsect) || (findbdg && BUILDING_VNUM(room) == GET_BLD_VNUM(findbdg))) {
+					if (!number(0, num_found++) || !found) {
+						found = room;
+					}
+				}
 			}
 		}
 	}
