@@ -98,7 +98,6 @@ struct global_data *create_global_table_entry(any_vnum vnum) {
 */
 void olc_delete_global(char_data *ch, any_vnum vnum) {
 	void remove_global_from_table(struct global_data *glb);
-	extern const sector_vnum climate_default_sector[NUM_CLIMATES];
 	
 	struct global_data *glb;
 	
