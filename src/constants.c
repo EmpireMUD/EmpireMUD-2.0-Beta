@@ -2613,6 +2613,13 @@ const char *fill_words[] = {
 };
 
 
+// GLOBAL_x types
+const char *global_types[] = {
+	"Mob Interactions",
+	"\n"
+};
+
+
 // INTERACT_x, see also interact_vnum_types, interact_attach_types
 const char *interact_types[] = {
 	"BUTCHER",
