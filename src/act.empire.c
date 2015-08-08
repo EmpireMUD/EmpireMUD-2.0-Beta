@@ -3094,7 +3094,10 @@ ACMD(do_home) {
 		msg_to_char(ch, "Use 'home set' to claim this room.\r\n");
 	}
 	else if (!str_cmp(argument, "set")) {
-		if (GET_POS(ch) < POS_STANDING) {
+		if (PLR_FLAGGED(ch, PLR_ADVENTURE_SUMMONED)) {
+			msg_to_char(ch, "You can't home-set while adventure-summoned.\r\n");
+		}
+		else if (GET_POS(ch) < POS_STANDING) {
 			msg_to_char(ch, "You can't do that right now. You need to be standing.\r\n");
 		}
 		else if (!GET_LOYALTY(ch) || ROOM_OWNER(real) != GET_LOYALTY(ch)) {
@@ -3253,7 +3256,10 @@ ACMD(do_tomb) {
 		}
 	}
 	else if (!str_cmp(argument, "set")) {
-		if (GET_POS(ch) < POS_STANDING) {
+		if (PLR_FLAGGED(ch, PLR_ADVENTURE_SUMMONED)) {
+			msg_to_char(ch, "You can't tomb-set while adventure-summoned.\r\n");
+		}
+		else if (GET_POS(ch) < POS_STANDING) {
 			msg_to_char(ch, "You can't do that right now. You need to be standing.\r\n");
 		}
 		else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
