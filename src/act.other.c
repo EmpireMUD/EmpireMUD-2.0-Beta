@@ -37,6 +37,7 @@
 
 // external prototypes
 extern bool can_enter_instance(char_data *ch, struct instance_data *inst);
+extern bool check_scaling(char_data *mob, char_data *attacker);
 extern char *get_room_name(room_data *room, bool color);
 extern char_data *has_familiar(char_data *ch);
 void Objsave_char(char_data *ch, int rent_code);
@@ -1794,6 +1795,7 @@ ACMD(do_selfdelete) {
 
 ACMD(do_shear) {
 	char_data *mob;
+	bool any;
 
 	one_argument(argument, arg);
 
@@ -1816,7 +1818,12 @@ ACMD(do_shear) {
 		act("$E is already shorn.", FALSE, ch, NULL, mob, TO_CHAR);
 	}
 	else {
-		if (run_interactions(ch, mob->interactions, INTERACT_SHEAR, IN_ROOM(ch), mob, NULL, shear_interact)) {
+		check_scaling(mob, ch);	// ensure mob is scaled -- this matters for global interactions
+		
+		any = run_interactions(ch, mob->interactions, INTERACT_SHEAR, IN_ROOM(ch), mob, NULL, shear_interact);
+		any |= run_global_mob_interactions(ch, mob, INTERACT_SHEAR, shear_interact);
+		
+		if (any) {
 			gain_ability_exp(ch, ABIL_MASTER_FARMER, 5);
 		}
 		else {
@@ -1859,7 +1866,6 @@ ACMD(do_skin) {
 
 
 ACMD(do_summon) {
-	bool check_scaling(char_data *mob, char_data *attacker);
 	extern bool check_vampire_sun(char_data *ch, bool message);
 	void summon_materials(char_data *ch, char *argument);
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
