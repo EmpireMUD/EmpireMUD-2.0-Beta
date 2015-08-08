@@ -50,11 +50,29 @@ void sort_interactions(struct interaction_item **list);
 * @return bool TRUE if any problems were reported; FALSE if all good.
 */
 bool audit_global(struct global_data *glb, char_data *ch) {
+	struct interaction_item *interact;
 	bool problem = FALSE;
 
 	if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_IN_DEVELOPMENT)) {
 		olc_audit_msg(ch, GET_GLOBAL_VNUM(glb), "IN-DEVELOPMENT");
 		problem = TRUE;
+	}
+	if (GET_GLOBAL_MIN_LEVEL(glb) > GET_GLOBAL_MAX_LEVEL(glb)) {
+		olc_audit_msg(ch, GET_GLOBAL_VNUM(glb), "Min level is greater than max level");
+		problem = TRUE;
+	}
+	if ((GET_GLOBAL_TYPE_FLAGS(glb) & GET_GLOBAL_TYPE_EXCLUDE(glb)) != 0) {
+		olc_audit_msg(ch, GET_GLOBAL_VNUM(glb), "Same flags in required and excluded set");
+		problem = TRUE;
+	}
+	
+	for (interact = GET_GLOBAL_INTERACTIONS(glb); interact; interact = interact->next) {
+		if (GET_GLOBAL_TYPE(glb) == GLOBAL_MOB_INTERACTIONS) {
+			if (interact->type != INTERACT_SHEAR && interact->type != INTERACT_LOOT) {
+				olc_audit_msg(ch, GET_GLOBAL_VNUM(glb), "Unsupported interaction type");
+				problem = TRUE;
+			}
+		}
 	}
 		
 	return problem;

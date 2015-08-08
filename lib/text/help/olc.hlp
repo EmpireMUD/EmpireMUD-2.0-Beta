@@ -133,6 +133,7 @@ Crops (CROPEDIT):
 Globals (GEDIT):
 - All global tables must be approved by the head builder, because they apply
   to the entire game rather than just one adventure.
+- Only SHEAR and LOOT mob interactions are supported.
 
 Map (MAPEDIT):
 - Immortals are not generally permitted to make edits to the map. However,
@@ -1313,7 +1314,7 @@ This is the type of global table. Different types are used for different
 things. Each type may have its own properties.
 
 Types:
- Mob Interactions - Used for global loot tables, etc.
+ Mob Interactions - Used for global SHEAR and LOOT tables.
 
 See also: OLC GLOBALS
 #d
