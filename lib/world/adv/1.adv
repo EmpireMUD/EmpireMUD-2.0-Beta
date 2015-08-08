@@ -178,6 +178,34 @@ L
 30 -1 -1
 -1 0 0
 S
+#141
+The Sewer: Goblin Outpost~
+Paul Clarke~
+   Strange sounds are coming from the sewer grate, and waste has been backing
+up into the streets. This can only mean one thing: Goblins! Will you buy the
+goblins' wares, or drive them from the city? This adventure sells 6 crafting
+patterns and 4 unique buildings. You can also fight the goblins solo or in
+pairs, to earn their prized gear.  
+~
+10450 10499 50-100
+30 120 0 2
+L
+2 ab
+9 10450 10451
+-1 0 0
+L
+3 ab
+5009 10450 10451
+-1 0 0
+L
+6 0
+30 -1 -1
+-1 0 0
+L
+5 0
+1440 -1 -1
+-1 0 0
+S
 #160
 The Tower Skycleave~
 Paul Clarke~

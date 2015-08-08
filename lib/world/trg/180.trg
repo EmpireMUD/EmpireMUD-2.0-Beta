@@ -2,11 +2,9 @@
 Fissure eruption~
 2 ab 1
 ~
-%regionecho% %room% 30 The ground shakes beneath your feet!
+%regionecho% %room% 10 You feel a sudden wave of heat from the nearby fissure!
 wait 2 sec
-%regionecho% %room% 20 You feel a sudden wave of heat!
-wait 2 sec
-%regionecho% %room% 7 There is a deep, rumbling roar from far beneath your feet!
+%regionecho% %room% 5 There is a deep, rumbling roar from far beneath your feet!
 %asound% The fissure erupts!
 %echo% A pillar of molten rock the size of a castle flies right past you!
 ~
