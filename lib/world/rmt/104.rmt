@@ -311,4 +311,138 @@ D2
 M 0 10415 100.00 1
 T 10408
 S
+#10450
+The City Sewers~
+   The pungent smell of waste weighs heavily in the air despite the dried-up
+trough that runs the length of the sewer. Goblins have blocked up this portion
+of the tunnels, although they hardly smell better than the city refuse.
+~
+c 0
+D0
+~
+0 10451
+D1
+~
+0 10452
+D2
+~
+0 10453
+D3
+~
+0 10454
+M 0 10450 50.00 5
+M 0 10455 1.00 1
+T 10452
+S
+#10451
+The Rat-Fur Throne~
+   The sewer grate is stopped up with straw, loosely covered with blankets of
+matted rat fur to make room for a grand throne -- at least, to the goblins. It
+appears some ambitious goblin has set up a command post here. Perhaps they're
+planning an invasion?
+   A sign on the wall lists items for sale.
+~
+c 0
+D2
+~
+0 10450
+E
+throne~
+The throne is made of wood, but covered entirely in loosely-stitched rat fur.
+~
+E
+sign list~
+Dryleef sells the following unique buildings:
+ war tent (500 coins)
+ message post (500 coins)
+ lab tent (500 coins)
+ dolmen stone (500 coins)
+
+(Type 'buy <item>' to purchase one.)
+~
+M 0 10450 50.00 5
+M 0 10451 100.00 1
+T 10452
+S
+#10452
+A Makeshift Laboratory~
+   Some enterprising goblin has set up a small laboratory in an alcove in the
+sewer wall. None of the potions looks like anything you'd want to drink, but
+there are some old spellbooks lying about.
+   A sign on the wall lists items for sale.
+~
+c 0
+D3
+~
+0 10450
+E
+spellbooks books~
+The spellbooks are written in goblinese, and you don't speak that.
+~
+E
+potions laboratory~
+On closer inspection, these aren't potions. They are sewage.
+~
+E
+sign list~
+Pimmin sells the following caster craft recipes:
+ violet leopard shawl pattern (500 coins)
+ wildfire gloves pattern (500 coins)
+
+(These require Magical Vestments. Type 'buy <item>' to purchase one.)
+~
+M 0 10450 50.00 5
+M 0 10452 100.00 1
+T 10452
+S
+#10453
+A Blocked Tunnel~
+   The end of the tunnel has been blocked off, with straw mashed against the
+sewer grate. It looks like several goblins have been sleeping here. And from
+the pile of rat bones, they've been cooking here as well.
+   A sign on the wall lists items for sale.
+~
+c 0
+D0
+~
+0 10450
+E
+pile bones~
+It looks like someone has been eating rats.
+~
+E
+sign list~
+Shivsper sells the following melee craft recipes:
+ rat-fur cloak pattern (500 coins)
+ wooden gauntlets pattern (500 coins)
+
+(These require Dangerous Leathers. Type 'buy <item>' to purchase one.)
+~
+M 0 10450 50.00 5
+M 0 10453 100.00 1
+T 10452
+S
+#10454
+The Goblin Forge~
+   The industrious goblins appear to have set up a smithy here in the sewers.
+A heavy, flat block of meteorite ore sits next to a smoldering pit of embers,
+and several ingots of low-grade have been discarded nearby.
+   A sign on the wall lists items for sale.
+~
+c 0
+D1
+~
+0 10450
+E
+sign list~
+Wargreyn sells the following tank craft recipes:
+ mesh cloak pattern (500 coins)
+ heavy goblin gauntlets pattern (500 coins)
+
+(These require Imperial Armors. Type 'buy <item>' to purchase one.)
+~
+M 0 10450 50.00 5
+M 0 10454 100.00 1
+T 10452
+S
 $
