@@ -271,6 +271,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	struct empire_trade_data *trade, *next_trade, *temp;
 	struct trading_post_data *tpd, *next_tpd;
 	obj_data *proto, *obj_iter, *next_obj;
+	struct global_data *glb, *next_glb;
 	room_template *rmt, *next_rmt;
 	sector_data *sect, *next_sect;
 	craft_data *craft, *next_craft;
@@ -403,6 +404,14 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		}
 	}
 	
+	// update globals
+	HASH_ITER(hh, globals_table, glb, next_glb) {
+		found = delete_from_interaction_list(&GET_GLOBAL_INTERACTIONS(glb), TYPE_OBJ, vnum);
+		if (found) {
+			save_library_file_for_vnum(DB_BOOT_GLB, GET_GLOBAL_VNUM(glb));
+		}
+	}
+	
 	// update mobs
 	HASH_ITER(hh, mobile_table, mob, next_mob) {
 		found = delete_from_interaction_list(&mob->interactions, TYPE_OBJ, vnum);
@@ -502,6 +511,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	struct adventure_spawn *asp;
 	struct interaction_item *inter;
 	struct adventure_link_rule *link;
+	struct global_data *glb, *next_glb;
 	craft_data *craft, *next_craft;
 	room_template *rmt, *next_rmt;
 	sector_data *sect, *next_sect;
@@ -574,6 +584,18 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "CRP [%5d] %s\r\n", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
+			}
+		}
+	}
+	
+	// globals
+	HASH_ITER(hh, globals_table, glb, next_glb) {
+		any = FALSE;
+		for (inter = GET_GLOBAL_INTERACTIONS(glb); inter && !any; inter = inter->next) {
+			if (interact_vnum_types[inter->type] == TYPE_OBJ && inter->vnum == vnum) {
+				any = TRUE;
+				++found;
+				size += snprintf(buf + size, sizeof(buf) - size, "GLB [%5d] %s\r\n", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
 			}
 		}
 	}
