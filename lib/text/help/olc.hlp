@@ -40,8 +40,8 @@ Examples:
 
 For notes on the mud's building rules, see HELP BUILDING GUIDE.
  
-See also: OLC CONTROLS, OLC BUILDINGS, OLC CRAFTS, OLC CROPS, OLC MOBILES,
-   OLC OBJECTS, OLC SECTORS, MAP OLC
+See also: OLC CONTROLS, OLC BUILDINGS, OLC CRAFTS, OLC CROPS, OLC GLOBALS,
+   OLC MOBILES, OLC OBJECTS, OLC SECTORS, MAP OLC
 See also: OLC ABORT, OLC AUDIT, OLC COPY, OLC DELETE, OLC EDIT, OLC FREE, 
    OLC LIST, OLC SAVE, OLC SEARCH, OLC LICENSE, TEXT EDITOR, VNUM
 #d
@@ -1234,6 +1234,73 @@ covered by the crops.
 
 See also: OLC CROPS
 #d
+"GEDIT FLAGS"
+
+Usage:  .flags [add | remove] <flags>
+
+This set of flags applies to the global table itself.
+
+Available flags:
+ IN-DEVELOPMENT - Will not be used live.
+
+See also: OLC GLOBALS
+#d
+"GEDIT MAXLEVEL"
+
+Usage:  .maxlevel <level>
+
+This sets the upper limit of the level range for this global table.
+
+For example, a 'Mob Interactions' global table will only be used if the mob
+is scaled to this maxlevel or lower.
+
+See also: OLC GLOBALS
+#d
+"GEDIT MINLEVEL"
+
+Usage:  .minlevel <level>
+
+This sets the lower limit of the level range for this global table.
+
+For example, a 'Mob Interactions' global table will only be used if the mob
+is scaled to this minlevel or higher.
+
+See also: OLC GLOBALS
+#d
+"GEDIT MOBFLAGS"
+
+Usage:  .mobflags [add | remove] <flags>
+
+A 'Mob Interactions' global table may have mob flags set. If so, the global
+table is only used if a mob has ALL of the flags set here. For example, you
+might set a global table to only apply to HARD mobs.
+
+These are the same set of flags from HELP MEDIT FLAGS.
+
+See also: OLC GLOBALS
+#d
+"GEDIT NAME"
+
+Usage:  .name <name>
+
+This lets you set the 'name' property of a global table. Names are only shown
+to the immortal staff, never to players. The name should indicate what this
+table is for.
+
+See also: OLC GLOBALS
+#d
+"GEDIT TYPE"
+
+Usage:  .type <type>
+
+This is the type of global table. Different types are used for different
+things. Each type may have its own properties.
+
+Types:
+ Mob Interactions - Used for global loot tables, etc.
+
+See also: OLC GLOBALS
+#d
 "ITEM SCALING" "OBJ SCALING" "OBJECT SCALING" SCALABLE "SCALABLE FLAG" "SCALING ITEM"
 
 Items can be set to scale to different levels. You can set various traits on
@@ -1557,7 +1624,7 @@ Available mob flags:
 
 See also: OLC MOBILES
 #d
-"MEDIT INTERACTION" "BEDIT INTERACTION" "OEDIT INTERACTION" "REDIT INTERACTION" "SECTEDIT INTERACTION" "CROPEDIT INTERACTION" INTERACTIONS
+"MEDIT INTERACTION" "BEDIT INTERACTION" "OEDIT INTERACTION" "REDIT INTERACTION" "SECTEDIT INTERACTION" "CROPEDIT INTERACTION" "GEDIT INTERACTION" INTERACTIONS
 
 Usage:  .interaction add <type> <quantity> <vnum> <percent> [exclusion code]
         .interaction change <number> <field> <value>
@@ -2569,8 +2636,8 @@ You should set the FORAGE and HARVEST interactions on a crop, usually with a
 GATHER interaction.
 
 All commands in the editor are highlighted in yellow and placed inside <angle
-braces>. You can get help on any of these commands by typing &yHELP CROPEDIT&0.
-<COMMAND>.
+braces>. You can get help on any of these commands by typing &yHELP CROPEDIT
+<COMMAND>&0.
 
 You can close an open editor with .abort or .save.
 
@@ -2582,6 +2649,33 @@ Example:
 For notes on the mud's building rules, see HELP BUILDING GUIDE.
 
 See also: CROPEDIT INTERACTION, OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
+"OLC GLOBALS" GEDIT GLOBALEDIT "GLOBAL EDIT" "GLOBAL OLC"
+
+Usage:  .global <comman>
+        .<command>
+
+The .olc globals editor allows you to add, edit, or delete global tables from
+the world. It provides an in-game menu for controlling features like global
+loot tables.
+
+Any global data that doesn't have an IN-DEVELOPMENT flag will be used by the
+live game system.
+
+All commands in the editor are highlighted in yellow and placed inside <angle
+braces>. You can get help on any of these commands by typing &yHELP GEDIT
+<COMMAND>&0.
+
+You can close an open editor with .abort or .save.
+
+Example:
+ > .global edit 123
+ > .flags IN-DEVELOPMENT
+ > .save
+
+For notes on the mud's building rules, see HELP BUILDING GUIDE.
+
+See also: GEDIT INTERACTION, OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
 #d
 "OLC DELETE"
 
