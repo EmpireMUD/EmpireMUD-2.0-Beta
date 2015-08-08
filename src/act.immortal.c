@@ -2735,16 +2735,20 @@ void do_stat_crop(char_data *ch, crop_data *cp) {
 * @param struct global_data *glb The global to stat.
 */
 void do_stat_global(char_data *ch, struct global_data *glb) {
+	extern const char *global_flags[];
 	extern const char *global_types[];
 	
 	char buf[MAX_STRING_LENGTH];
 	
 	msg_to_char(ch, "Global VNum: [&c%d&0], Type: [&c%s&0], Name: '&c%s&0'\r\n", GET_GLOBAL_VNUM(glb), global_types[GET_GLOBAL_TYPE(glb)], GET_GLOBAL_NAME(glb));
 	
+	sprintbit(GET_GLOBAL_FLAGS(glb), global_flags, buf, TRUE);
+	msg_to_char(ch, "Flags: &y%s&0\r\n", buf);
+	
 	switch (GET_GLOBAL_TYPE(glb)) {
 		case GLOBAL_MOB_INTERACTIONS: {
 			sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), action_bits, buf, TRUE);
-			msg_to_char(ch, "Levels: [&g%d&0-&g%d&0], Flags: &c%s&0\r\n", GET_GLOBAL_MIN_LEVEL(glb), GET_GLOBAL_MAX_LEVEL(glb), buf);
+			msg_to_char(ch, "Levels: [&g%d&0-&g%d&0], Mob Flags: &c%s&0\r\n", GET_GLOBAL_MIN_LEVEL(glb), GET_GLOBAL_MAX_LEVEL(glb), buf);
 			break;
 		}
 	}
