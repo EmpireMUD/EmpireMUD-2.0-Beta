@@ -235,6 +235,41 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 }
 
 
+/**
+* Do the actual work for the %terraform% commands, once everything has been
+* validated.
+*
+* @param room_data *target The room to change.
+* @param sector_data *sect The sector to change it to.
+*/
+void do_dg_terraform(room_data *target, sector_data *sect) {
+	sector_data *old_sect;
+	empire_data *emp;
+	
+	if (!target || !sect) {
+		return;
+	}
+	
+	old_sect = ROOM_ORIGINAL_SECT(target);
+	emp = ROOM_OWNER(target);
+	
+	change_terrain(target, GET_SECT_VNUM(sect));
+
+	// clear these if set
+	REMOVE_BIT(ROOM_AFF_FLAGS(target), ROOM_AFF_PLAYER_MADE);
+	REMOVE_BIT(ROOM_BASE_FLAGS(target), ROOM_AFF_PLAYER_MADE);
+			
+	// preserve old original sect for roads -- TODO this is a special-case
+	if (IS_ROAD(target)) {
+		ROOM_ORIGINAL_SECT(target) = old_sect;
+	}
+
+	if (emp) {
+		read_empire_territory(emp);
+	}
+}
+
+
 void send_char_pos(char_data *ch, int dam) {
 	switch (GET_POS(ch)) {
 		case POS_MORTALLYW:

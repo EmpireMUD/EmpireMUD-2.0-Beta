@@ -51,6 +51,7 @@
 #include "interpreter.h"
 #include "comm.h"
 #include "skills.h"
+#include "vnums.h"
 
 // external vars
 extern int dg_owner_purged;
@@ -867,6 +868,65 @@ ACMD(do_mteleport) {
 			enter_wtrigger(IN_ROOM(vict), vict, NO_DIR);
 		}
 	}
+}
+
+
+ACMD(do_mterraform) {
+	void do_dg_terraform(room_data *target, sector_data *sect);
+
+	char loc_arg[MAX_INPUT_LENGTH], sect_arg[MAX_INPUT_LENGTH];
+	sector_data *sect;
+	room_data *target;
+	sector_vnum vnum;
+
+	if (!MOB_OR_IMPL(ch) || AFF_FLAGGED(ch, AFF_CHARM)) {
+		send_config_msg(ch, "huh_string");
+		return;
+	}
+
+	argument = any_one_word(argument, loc_arg);
+	any_one_word(argument, sect_arg);
+	
+	// usage: %terraform% [location] <sector vnum>
+	if (!*loc_arg) {
+		mob_log(ch, "mterraform: bad syntax");
+		return;
+	}
+	
+	// check number of args
+	if (!*sect_arg) {
+		// only arg is actually sect arg
+		strcpy(sect_arg, loc_arg);
+		target = IN_ROOM(ch);
+	}
+	else {
+		// two arguments
+		target = find_target_room(ch, loc_arg);
+	}
+	
+	if (!target) {
+		mob_log(ch, "mterraform: target is an invalid room");
+		return;
+	}
+	
+	// places you just can't terraform -- fail silently (currently)
+	if (IS_INSIDE(target) || IS_ADVENTURE_ROOM(target) || IS_CITY_CENTER(target)) {
+		return;
+	}
+	
+	if (!isdigit(*sect_arg) || (vnum = atoi(sect_arg)) < 0 || !(sect = sector_proto(vnum))) {
+		mob_log(ch, "mterraform: invalid sector vnum");
+		return;
+	}
+	
+	// validate sect
+	if (SECT_FLAGGED(sect, SECTF_MAP_BUILDING | SECTF_INSIDE | SECTF_ADVENTURE)) {
+		mob_log(ch, "mterraform: sector requires data that can't be set this way");
+		return;
+	}
+
+	// good to go
+	do_dg_terraform(target, sect);
 }
 
 

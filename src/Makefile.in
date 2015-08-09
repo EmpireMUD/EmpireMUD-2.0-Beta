@@ -209,7 +209,7 @@ dg_misc.o: dg_misc.c conf.h sysdep.h structs.h uthash.h dg_scripts.h \
   utils.h comm.h interpreter.h handler.h dg_event.h db.h skills.h
 	$(CC) -c $(CFLAGS) dg_misc.c
 dg_mobcmd.o: dg_mobcmd.c conf.h sysdep.h structs.h uthash.h dg_scripts.h \
-  db.h utils.h handler.h interpreter.h comm.h skills.h
+  db.h utils.h handler.h interpreter.h comm.h skills.h vnums.h
 	$(CC) -c $(CFLAGS) dg_mobcmd.c
 dg_objcmd.o: dg_objcmd.c conf.h sysdep.h structs.h uthash.h dg_scripts.h \
   utils.h comm.h interpreter.h handler.h db.h skills.h
