@@ -281,8 +281,19 @@ void olc_show_global(char_data *ch) {
 	sprintbit(GET_GLOBAL_FLAGS(glb), global_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<&yflags&0> %s\r\n", lbuf);
 	
-	sprintf(buf + strlen(buf), "<&yminlevel&0> %d\r\n", GET_GLOBAL_MIN_LEVEL(glb));
-	sprintf(buf + strlen(buf), "<&ymaxlevel&0> %d\r\n", GET_GLOBAL_MAX_LEVEL(glb));
+	if (GET_GLOBAL_MIN_LEVEL(glb) == 0) {
+		sprintf(buf + strlen(buf), "<&yminlevel&0> none\r\n");
+	}
+	else {
+		sprintf(buf + strlen(buf), "<&yminlevel&0> %d\r\n", GET_GLOBAL_MIN_LEVEL(glb));
+	}
+	
+	if (GET_GLOBAL_MAX_LEVEL(glb) == 0) {
+		sprintf(buf + strlen(buf), "<&ymaxlevel&0> none\r\n");
+	}
+	else {
+		sprintf(buf + strlen(buf), "<&ymaxlevel&0> %d\r\n", GET_GLOBAL_MAX_LEVEL(glb));
+	}
 
 	// type-based data
 	switch (GET_GLOBAL_TYPE(glb)) {

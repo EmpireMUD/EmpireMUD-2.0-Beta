@@ -2993,10 +2993,10 @@ bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERA
 		}
 		
 		// level limits
-		if (GET_CURRENT_SCALE_LEVEL(mob) < GET_GLOBAL_MIN_LEVEL(glb)) {
+		if (GET_GLOBAL_MIN_LEVEL(glb) > 0 && GET_CURRENT_SCALE_LEVEL(mob) < GET_GLOBAL_MIN_LEVEL(glb)) {
 			continue;
 		}
-		if (GET_CURRENT_SCALE_LEVEL(mob) > GET_GLOBAL_MAX_LEVEL(glb)) {
+		if (GET_GLOBAL_MAX_LEVEL(glb) > 0 && GET_CURRENT_SCALE_LEVEL(mob) > GET_GLOBAL_MAX_LEVEL(glb)) {
 			continue;
 		}
 		
