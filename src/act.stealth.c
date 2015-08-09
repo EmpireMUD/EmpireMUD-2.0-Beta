@@ -1142,8 +1142,8 @@ ACMD(do_pickpocket) {
 	else if (vict == ch) {
 		send_to_char("Come on now, that's rather stupid!\r\n", ch);
 	}
-	else if (!IS_NPC(vict) || !MOB_FLAGGED(vict, MOB_HUMAN)) {
-		msg_to_char(ch, "You may only pickpocket human npcs.\r\n");
+	else if (!IS_NPC(vict)) {
+		msg_to_char(ch, "You may only pickpocket npcs.\r\n");
 	}
 	else if ((ch_emp = GET_LOYALTY(ch)) && (vict_emp = GET_LOYALTY(vict)) && has_relationship(ch_emp, vict_emp, DIPL_ALLIED | DIPL_NONAGGR)) {
 		msg_to_char(ch, "You can't pickpocket mobs you are allied or have a non-aggression pact with.\r\n");
@@ -1164,7 +1164,7 @@ ACMD(do_pickpocket) {
 		check_scaling(vict, ch);
 
 		// some random coins (negative coins are not given)
-		if (!GET_LOYALTY(vict) || GET_LOYALTY(vict) == GET_LOYALTY(ch) || char_has_relationship(ch, vict, DIPL_WAR)) {
+		if (MOB_FLAGGED(vict, MOB_HUMAN) && (!GET_LOYALTY(vict) || GET_LOYALTY(vict) == GET_LOYALTY(ch) || char_has_relationship(ch, vict, DIPL_WAR))) {
 			coins = mob_coins(vict);
 		}
 		else {
