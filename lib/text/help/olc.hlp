@@ -1259,6 +1259,8 @@ This sets the upper limit of the level range for this global table.
 For example, a 'Mob Interactions' global table will only be used if the mob
 is scaled to this maxlevel or lower.
 
+You can set the maximum to 0 for "no maximum".
+
 See also: OLC GLOBALS
 #d
 "GEDIT MINLEVEL"
@@ -1269,6 +1271,8 @@ This sets the lower limit of the level range for this global table.
 
 For example, a 'Mob Interactions' global table will only be used if the mob
 is scaled to this minlevel or higher.
+
+You can set the minimum to 0 for "no minimum".
 
 See also: OLC GLOBALS
 #d
