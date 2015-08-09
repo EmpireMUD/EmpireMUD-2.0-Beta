@@ -235,7 +235,7 @@ Triggers and Scripts (TRIGEDIT):
   were dropped as loot by mobs should also already have scaled levels. Mob
   scripts also almost always have a valid scaled level, even if if not in a
   level-locked adventure zone.
-- Adventure zone scripts that use %goto% (or any room-targeting commands) must
+- Adventure zone scripts that use mgoto (or any room-targeting commands) must
   use room targets like i1234 to target by room template vnum instead of live
   room vnum. This will cause it to go to the current instance's version of a
   room template. It only works for room templates in the same adventure zone.

@@ -48,7 +48,7 @@ TRIGEDIT-COMMANDS TRIG-COMMANDS TRIGGER-COMMANDS TRIGEDIT-COMMANDLISTS
 |     remote      |       mhunt         |      otimer      |%adventurecomplete%
 |     return      |     mremember       |     osetval      |    %terraform%   |
 |     switch      |      mforget        |     %scale%      |==================|
-|      case       |       %goto%        | %adventurecomplete% |
+|      case       |       mgoto         | %adventurecomplete% |
 |     break       |       mkill         |    %terraform%      |
 |     done        |       %junk%        |=====================|
 |     while       |      %follow%       |
@@ -308,7 +308,7 @@ mforget <victim>
 #d
 MGOTO %GOTO%
 
-%goto% <target>
+mgoto <target>
    This command moves the mob to the given target. The target may be an object,
 room, or  character, as long as it is not in a private room occupied with two 
 or more characters, or god  room. No message is given. 
@@ -317,9 +317,9 @@ You can use i### to target a room in the mob's current adventure instance by
 its room template vnum instead of live room number (if used in an instanced
 zone).
 
-%goto% 1233
-%goto% Rumble
-%goto% fountain
+mgoto 1233
+mgoto Rumble
+mgoto fountain
 #d
 MJUNK %JUNK%
 
