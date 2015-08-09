@@ -212,7 +212,7 @@ dg_mobcmd.o: dg_mobcmd.c conf.h sysdep.h structs.h uthash.h dg_scripts.h \
   db.h utils.h handler.h interpreter.h comm.h skills.h vnums.h
 	$(CC) -c $(CFLAGS) dg_mobcmd.c
 dg_objcmd.o: dg_objcmd.c conf.h sysdep.h structs.h uthash.h dg_scripts.h \
-  utils.h comm.h interpreter.h handler.h db.h skills.h
+  utils.h comm.h interpreter.h handler.h db.h skills.h vnums.h
 	$(CC) -c $(CFLAGS) dg_objcmd.c
 dg_scripts.o: dg_scripts.c conf.h sysdep.h structs.h uthash.h \
   dg_scripts.h utils.h comm.h interpreter.h handler.h dg_event.h db.h \
@@ -222,7 +222,7 @@ dg_triggers.o: dg_triggers.c conf.h sysdep.h structs.h uthash.h \
   dg_scripts.h utils.h comm.h interpreter.h handler.h db.h skills.h olc.h
 	$(CC) -c $(CFLAGS) dg_triggers.c
 dg_wldcmd.o: dg_wldcmd.c conf.h sysdep.h structs.h uthash.h dg_scripts.h \
-  utils.h comm.h interpreter.h handler.h db.h skills.h
+  utils.h comm.h interpreter.h handler.h db.h skills.h vnums.h
 	$(CC) -c $(CFLAGS) dg_wldcmd.c
 eedit.o: eedit.c conf.h sysdep.h structs.h uthash.h utils.h interpreter.h \
   comm.h handler.h db.h olc.h
