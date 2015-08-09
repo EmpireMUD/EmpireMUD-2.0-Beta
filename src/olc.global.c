@@ -68,7 +68,7 @@ bool audit_global(struct global_data *glb, char_data *ch) {
 	
 	for (interact = GET_GLOBAL_INTERACTIONS(glb); interact; interact = interact->next) {
 		if (GET_GLOBAL_TYPE(glb) == GLOBAL_MOB_INTERACTIONS) {
-			if (interact->type != INTERACT_SHEAR && interact->type != INTERACT_LOOT) {
+			if (interact->type != INTERACT_SHEAR && interact->type != INTERACT_LOOT && interact->type != INTERACT_PICKPOCKET) {
 				olc_audit_msg(ch, GET_GLOBAL_VNUM(glb), "Unsupported interaction type");
 				problem = TRUE;
 			}

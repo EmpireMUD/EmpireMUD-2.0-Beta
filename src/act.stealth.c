@@ -37,6 +37,7 @@ extern const int rev_dir[];
 
 // external funcs
 extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
+void scale_item_to_level(obj_data *obj, int level);
 
 // locals
 int apply_poison(char_data *ch, char_data *vict, int type);
@@ -161,6 +162,22 @@ bool can_steal(char_data *ch, empire_data *emp) {
 	}
 	
 	// got this far...
+	return TRUE;
+}
+
+
+INTERACTION_FUNC(pickpocket_interact) {
+	int iter;
+	obj_data *obj = NULL;
+	
+	for (iter = 0; iter < interaction->quantity; ++iter) {
+		obj = read_object(interaction->vnum);
+		scale_item_to_level(obj, get_approximate_level(inter_mob));
+		obj_to_char(obj, ch);
+		act("You find $p!", FALSE, ch, obj, NULL, TO_CHAR);
+		load_otrigger(obj);
+	}
+		
 	return TRUE;
 }
 
@@ -1104,33 +1121,12 @@ ACMD(do_jab) {
 
 ACMD(do_pickpocket) {
 	extern bool check_scaling(char_data *mob, char_data *attacker);
-	void scale_item_to_level(obj_data *obj, int level);
-	
 	extern int mob_coins(char_data *mob);
 
-	char_data *vict;
-	obj_data *obj = NULL;
-	int prc, total, iter, coins;
-	obj_vnum vnum = NOTHING;
 	empire_data *ch_emp = NULL, *vict_emp = NULL;
-	
-	struct {
-		obj_vnum vnum;
-		double chance;
-	} pocket_data[] = {
-		{ o_STICK, 1 },		{ o_ROCK, 1 },
-		{ o_FLOWER, 1 },	{ o_BREAD, 3 },
-		{ o_APPLE, 1 },		{ o_NUTS, 1 },
-		{ o_BERRIES, 1 },	{ o_DATES, 1 },
-		{ o_FIG, 1 },		{ o_NOCTURNIUM_INGOT, 0.01 },
-		{ o_IMPERIUM_INGOT, 0.01 },	{ o_GOLD, 0.01 },
-		{ o_TENT, 0.3 },
-		{ o_RING_SILVER, 0.05 },	{ o_MIRROR_SILVER, 0.1 },
-		{ o_CANDLE, 1 },
-	
-		{ NOTHING, 0 }
-	};
-
+	char_data *vict;
+	int coins;
+	bool any;
 
 	one_argument(argument, arg);
 
@@ -1166,17 +1162,8 @@ ACMD(do_pickpocket) {
 	}
 	else {
 		check_scaling(vict, ch);
-	
-		prc = number(1, 10000);
-		total = 0;
-		for (iter = 0; vnum == NOTHING && pocket_data[iter].vnum != NOTHING; ++iter) {
-			total += 100 * pocket_data[iter].chance;
-			if (prc <= total) {
-				vnum = pocket_data[iter].vnum;
-			}
-		}
-		
-		// also some random coins (negative coins are not given)
+
+		// some random coins (negative coins are not given)
 		if (!GET_LOYALTY(vict) || GET_LOYALTY(vict) == GET_LOYALTY(ch) || char_has_relationship(ch, vict, DIPL_WAR)) {
 			coins = mob_coins(vict);
 		}
@@ -1188,35 +1175,22 @@ ACMD(do_pickpocket) {
 		if (!CAN_SEE(vict, ch) || !AWAKE(vict) || skill_check(ch, ABIL_PICKPOCKET, DIFF_EASY)) {
 			// success!
 			SET_BIT(MOB_FLAGS(vict), MOB_PICKPOCKETED);
-		
-			if (vnum != NOTHING) {
-				obj = read_object(vnum);
-				scale_item_to_level(obj, get_approximate_level(vict));
-				
-				obj_to_char_or_room(obj, ch);
-			}
+			act("You pick $N's pocket...", FALSE, ch, NULL, vict, TO_CHAR);
+
+			// any will tell us if we got at least 1 item (also sends messages)
+			any = run_interactions(ch, vict->interactions, INTERACT_PICKPOCKET, IN_ROOM(ch), vict, NULL, pickpocket_interact);
+			any |= run_global_mob_interactions(ch, vict, INTERACT_PICKPOCKET, pickpocket_interact);
+			
 			if (coins > 0) {
 				increase_coins(ch, vict_emp, coins);
 			}
 			
 			// messaging
-			if (coins > 0 && obj) {
-				sprintf(buf, "You pick $N's pocket and find $p and %s.", money_amount(vict_emp, coins));
-				act(buf, FALSE, ch, obj, vict, TO_CHAR);
+			if (coins > 0) {
+				msg_to_char(ch, "You find %s!\r\n", money_amount(vict_emp, coins));
 			}
-			else if (coins > 0) {
-				sprintf(buf, "You pick $N's pocket and find %s.", money_amount(vict_emp, coins));
-				act(buf, FALSE, ch, NULL, vict, TO_CHAR);
-			}
-			else if (obj) {
-				act("You pick $N's pocket and find $p!", FALSE, ch, obj, vict, TO_CHAR);
-			}
-			else {
-				act("You find nothing useful in $N's pockets.", FALSE, ch, NULL, vict, TO_CHAR);
-			}
-			
-			if (obj) {
-				load_otrigger(obj);
+			else if (!any) {
+				msg_to_char(ch, "You find nothing of any use.\r\n");
 			}
 		}
 		else {

@@ -262,7 +262,8 @@ typedef struct trig_data trig_data;
 #define INTERACT_GATHER  9
 #define INTERACT_ENCOUNTER  10
 #define INTERACT_LIGHT  11
-#define NUM_INTERACTS  12
+#define INTERACT_PICKPOCKET  12
+#define NUM_INTERACTS  13
 
 
 // mob spawn flags
