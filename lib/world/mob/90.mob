@@ -442,10 +442,6 @@ I 4 171 50.00 1  # LOOT: a gold disc
 I 4 171 50.00 1  # LOOT: a gold disc
 I 4 171 50.00 1  # LOOT: a gold disc
 I 4 171 50.00 1  # LOOT: a gold disc
-I 4 2347 1.00 1 c  # LOOT: the alchemical filter pattern
-I 4 2348 1.00 1 c  # LOOT: the antiquated device design
-I 4 2349 1.00 1 c  # LOOT: the concealed pouch pattern
-I 4 2350 1.00 1 c  # LOOT: the tinker's harness pattern
 S
 #9061
 toad hypnotoad~

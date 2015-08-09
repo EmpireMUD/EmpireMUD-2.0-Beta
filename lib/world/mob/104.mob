@@ -85,10 +85,6 @@ I 4 10418 4.00 1 X  # LOOT: a skeletal horse whip
 I 4 10421 20.00 1 X  # LOOT: a mammoth spear
 I 4 10422 20.00 1 X  # LOOT: an imperium-weave cloak
 I 4 10423 20.00 1 X  # LOOT: shackles of the undead
-I 4 2347 1.00 1 c  # LOOT: the alchemical filter pattern
-I 4 2348 1.00 1 c  # LOOT: the antiquated device design
-I 4 2349 1.00 1 c  # LOOT: the concealed pouch pattern
-I 4 2350 1.00 1 c  # LOOT: the tinker's harness pattern
 T 10405
 T 10406
 T 10410
@@ -170,10 +166,6 @@ I 4 10418 4.00 1 X  # LOOT: a skeletal horse whip
 I 4 10427 20.00 1 X  # LOOT: the infernomancer's flame
 I 4 10428 20.00 1 X  # LOOT: the purifying flame
 I 4 10429 20.00 1 X  # LOOT: a terrifying leather mask
-I 4 2347 1.00 1 c  # LOOT: the alchemical filter pattern
-I 4 2348 1.00 1 c  # LOOT: the antiquated device design
-I 4 2349 1.00 1 c  # LOOT: the concealed pouch pattern
-I 4 2350 1.00 1 c  # LOOT: the tinker's harness pattern
 T 10405
 T 10406
 T 10412
@@ -255,10 +247,6 @@ I 4 10418 4.00 1 X  # LOOT: a skeletal horse whip
 I 4 10433 20.00 1 X  # LOOT: Fiendclaw
 I 4 10434 20.00 1 X  # LOOT: deathlace gloves
 I 4 10435 20.00 1 X  # LOOT: a hanged man's hand
-I 4 2347 1.00 1 c  # LOOT: the alchemical filter pattern
-I 4 2348 1.00 1 c  # LOOT: the antiquated device design
-I 4 2349 1.00 1 c  # LOOT: the concealed pouch pattern
-I 4 2350 1.00 1 c  # LOOT: the tinker's harness pattern
 T 10405
 T 10406
 T 10409
