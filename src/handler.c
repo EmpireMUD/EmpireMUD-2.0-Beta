@@ -2976,13 +2976,18 @@ bool has_interaction(struct interaction_item *list, int type) {
 * @param INTERACTION_FUNC(*func) A callback function to run for the interaction.
 */
 bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERACTION_FUNC(*func)) {
+	extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
+	
 	struct global_data *glb, *next_glb;
 	bool any = FALSE;
+	adv_data *adv;
 	
 	// no work
 	if (!ch || !mob || !IS_NPC(mob) || !func) {
 		return FALSE;
 	}
+	
+	adv = get_adventure_for_vnum(GET_MOB_VNUM(mob));
 
 	HASH_ITER(hh, globals_table, glb, next_glb) {
 		if (GET_GLOBAL_TYPE(glb) != GLOBAL_MOB_INTERACTIONS) {
@@ -3006,6 +3011,11 @@ bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERA
 		}
 		// match ZERO type-excludes
 		if ((MOB_FLAGS(mob) & GET_GLOBAL_TYPE_EXCLUDE(glb)) != 0) {
+			continue;
+		}
+		
+		// check adventure-only -- late-matching because it does more work than other conditions
+		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_ADVENTURE_ONLY) && get_adventure_for_vnum(GET_GLOBAL_VNUM(glb)) != adv) {
 			continue;
 		}
 		

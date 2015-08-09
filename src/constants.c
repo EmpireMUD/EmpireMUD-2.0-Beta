@@ -2625,6 +2625,7 @@ const char *global_types[] = {
 // GLB_FLAG_X global flags
 const char *global_flags[] = {
 	"IN-DEVELOPMENT",
+	"ADVENTURE-ONLY",
 	"\n"
 };
 

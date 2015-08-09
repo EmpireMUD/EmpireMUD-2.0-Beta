@@ -1247,6 +1247,7 @@ This set of flags applies to the global table itself.
 
 Available flags:
  IN-DEVELOPMENT - Will not be used live.
+ ADVENTURE-ONLY - This global table will only apply to the adventure it's in.
 
 See also: OLC GLOBALS
 #d

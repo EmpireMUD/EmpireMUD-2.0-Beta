@@ -243,6 +243,7 @@ typedef struct trig_data trig_data;
 
 // GLB_FLAG_x flags for global_data
 #define GLB_FLAG_IN_DEVELOPMENT  BIT(0)	// not live
+#define GLB_FLAG_ADVENTURE_ONLY  BIT(1)	// does not apply outside same-adventure
 
 
 // Group Defines
