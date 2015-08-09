@@ -2749,7 +2749,7 @@ void do_stat_global(char_data *ch, struct global_data *glb) {
 		case GLOBAL_MOB_INTERACTIONS: {
 			sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), action_bits, buf, TRUE);
 			sprintbit(GET_GLOBAL_TYPE_EXCLUDE(glb), action_bits, buf2, TRUE);
-			msg_to_char(ch, "Levels: [&g%d&0-&g%d&0], Mob Flags: &c%s&0, Exclude: &c%s&0\r\n", GET_GLOBAL_MIN_LEVEL(glb), GET_GLOBAL_MAX_LEVEL(glb), buf, buf2);
+			msg_to_char(ch, "Levels: [&g%s&0], Mob Flags: &c%s&0, Exclude: &c%s&0\r\n", level_range_string(GET_GLOBAL_MIN_LEVEL(glb), GET_GLOBAL_MAX_LEVEL(glb), 0), buf, buf2);
 			break;
 		}
 	}
@@ -3418,7 +3418,7 @@ int vnum_global(char *searchname, char_data *ch) {
 			switch (GET_GLOBAL_TYPE(iter)) {
 				case GLOBAL_MOB_INTERACTIONS: {
 					sprintbit(GET_GLOBAL_TYPE_FLAGS(iter), action_bits, flags, TRUE);
-					msg_to_char(ch, "%3d. [%5d] %s (%d-%d) %s\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), GET_GLOBAL_MIN_LEVEL(iter), GET_GLOBAL_MAX_LEVEL(iter), flags);
+					msg_to_char(ch, "%3d. [%5d] %s (%s) %s\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), level_range_string(GET_GLOBAL_MIN_LEVEL(iter), GET_GLOBAL_MAX_LEVEL(iter), 0), flags);
 					break;
 				}
 				default: {

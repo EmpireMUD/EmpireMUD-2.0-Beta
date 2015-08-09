@@ -2489,6 +2489,37 @@ bool isname(const char *str, const char *namelist) {
 
 
 /**
+* Makes a level range look more elegant. You can omit current.
+*
+* @param int min The low end of the range (0 for none).
+* @param int max The high end of the range (0 for no max).
+* @param int current If it's already scaled, one level (0 for none).
+* @return char* The string.
+*/
+char *level_range_string(int min, int max, int current) {
+	static char output[65];
+	
+	if (current > 0) {
+		snprintf(output, sizeof(output), "%d", current);
+	}
+	else if (min > 0 && max > 0) {
+		snprintf(output, sizeof(output), "%d-%d", min, max);
+	}
+	else if (min > 0) {
+		snprintf(output, sizeof(output), "%d+", min);
+	}
+	else if (max > 0) {
+		snprintf(output, sizeof(output), "1-%d", max);
+	}
+	else {
+		snprintf(output, sizeof(output), "0");
+	}
+	
+	return output;
+}
+
+
+/**
 * This works like isname but checks to see if EVERY word in arg is an abbrev
 * of some word in namelist. E.g. "cl br" is an abbrev of "bricks pile clay",
 * the namelist from "a pile of clay bricks".

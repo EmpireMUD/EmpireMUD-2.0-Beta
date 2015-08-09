@@ -1099,6 +1099,7 @@ extern char *bitv_to_alpha(bitvector_t flags);
 extern char *delete_doubledollar(char *string);
 extern const char *double_percents(const char *string);
 extern bool isname(const char *str, const char *namelist);
+extern char *level_range_string(int min, int max, int current);
 extern bool multi_isname(const char *arg, const char *namelist);
 extern char *CAP(char *txt);
 extern char *fname(const char *namelist);

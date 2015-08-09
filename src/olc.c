@@ -1500,7 +1500,7 @@ OLC_MODULE(olc_list) {
 						switch (GET_GLOBAL_TYPE(glb)) {
 							case GLOBAL_MOB_INTERACTIONS: {
 								sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), action_bits, flags, TRUE);
-								len += snprintf(buf + len, sizeof(buf) - len, "[%5d] %s (%d-%d) %s\r\n", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb), GET_GLOBAL_MIN_LEVEL(glb), GET_GLOBAL_MAX_LEVEL(glb), flags);
+								len += snprintf(buf + len, sizeof(buf) - len, "[%5d] %s (%s) %s\r\n", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb), level_range_string(GET_GLOBAL_MIN_LEVEL(glb), GET_GLOBAL_MAX_LEVEL(glb), 0), flags);
 								break;
 							}
 							default: {
