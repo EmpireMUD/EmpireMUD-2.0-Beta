@@ -55,6 +55,7 @@ extern int find_skill_by_name(char *name);
 void free_varlist(struct trig_var_data *vd);
 extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
 extern bool is_fight_enemy(char_data *ch, char_data *frenemy);	// fight.c
+extern int is_substring(char *sub, char *string);
 extern room_data *obj_room(obj_data *obj);
 trig_data *read_trigger(trig_vnum vnum);
 obj_data *get_object_in_equip(char_data *ch, char *name);
@@ -3319,7 +3320,7 @@ void eval_op(char *op, char *lhs, char *rhs, char *result, void *go, struct scri
 		sprintf(result, "%c", is_abbrev(rhs, lhs) ? '1' : '0');
 	
 	else if (!strcmp("~=", op))
-		sprintf(result, "%c", str_str(lhs, rhs) ? '1' : '0');
+		sprintf(result, "%c", is_substring(rhs, lhs) ? '1' : '0');
 
 	else if (!strcmp("*", op))
 		sprintf(result, "%d", atoi(lhs) * atoi(rhs));
