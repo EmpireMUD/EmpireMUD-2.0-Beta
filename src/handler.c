@@ -59,13 +59,6 @@
 *   Miscellaneous Handlers
 */
 
-
-#define MATCH_ITEM_NAME(str, obj)  (isname((str), GET_OBJ_KEYWORDS(obj)) || (IS_BOOK(obj) && isname((str), get_book_item_name_by_id(GET_BOOK_ID(obj)))) || (IS_DRINK_CONTAINER(obj) && GET_DRINK_CONTAINER_CONTENTS(obj) > 0 && isname((str), drinks[GET_DRINK_CONTAINER_TYPE(obj)])))
-#define MATCH_CHAR_DISGUISED_NAME(str, ch)  (isname((str), PERS((ch),(ch),FALSE)))
-#define MATCH_CHAR_NAME(str, ch)  ((!IS_NPC(ch) && GET_LASTNAME(ch) && isname((str), GET_LASTNAME(ch))) || isname((str), GET_PC_NAME(ch)) || MATCH_CHAR_DISGUISED_NAME(str, ch))
-#define MATCH_CHAR_NAME_ROOM(viewer, str, target)  ((IS_DISGUISED(target) && !IS_IMMORTAL(viewer) && !SAME_EMPIRE(viewer, target)) ? MATCH_CHAR_DISGUISED_NAME(str, target) : MATCH_CHAR_NAME(str, target))
-
-
 // externs
 extern const int confused_dirs[NUM_SIMPLE_DIRS][2][NUM_OF_DIRS];
 extern const char *drinks[];

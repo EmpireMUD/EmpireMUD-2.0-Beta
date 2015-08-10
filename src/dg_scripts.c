@@ -38,6 +38,7 @@ extern int dg_owner_purged;
 extern const char *action_bits[];
 extern const char *affected_bits[];
 extern const char *affect_types[];
+extern const char *drinks[];
 extern const char *extra_bits[];
 extern const char *item_types[];
 extern const char *genders[];
@@ -53,6 +54,7 @@ extern const struct wear_data_type wear_data[NUM_WEARS];
 extern int find_ability_by_name(char *name, bool allow_abbrev);
 extern int find_skill_by_name(char *name);
 void free_varlist(struct trig_var_data *vd);
+extern char *get_book_item_name_by_id(int id);
 extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
 extern bool is_fight_enemy(char_data *ch, char_data *frenemy);	// fight.c
 extern int is_substring(char *sub, char *string);
@@ -2171,6 +2173,15 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					if (!str_cmp(field, "id"))
 						snprintf(str, slen, "%d", GET_ID(c));
 
+					else if (!str_cmp(field, "is_name")) {
+						if (subfield && *subfield && MATCH_CHAR_NAME(subfield, c)) {
+							snprintf(str, slen, "1");
+						}
+						else {
+							snprintf(str, slen, "0");
+						}
+					}
+
 					/* new check for pc/npc status */
 					else if (!str_cmp(field, "is_pc")) {
 						snprintf(str, slen, IS_NPC(c) ? "0" : "1");
@@ -2602,7 +2613,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					
 					else if (!str_cmp(field, "is_name")) {
-						if (subfield && *subfield && multi_isname(subfield, GET_OBJ_KEYWORDS(o))) {
+						if (subfield && *subfield && MATCH_ITEM_NAME(subfield, o)) {
 							snprintf(str, slen, "1");
 						}
 						else {

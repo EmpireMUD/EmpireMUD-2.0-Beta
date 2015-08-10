@@ -938,6 +938,7 @@ is_god            - Returns true if the actor is a God-level player.
 is_hostile(on/off)- If the ()'s are omitted, return value is whether or not the 
                     actor is marked as a Hostile player.
 is_immortal       - Returns true if the actor is an immortal (admin).
+is_name(str)      - Returns true if str is a valid name for the actor.
 is_pc             - Checks if the actor is a player. Useful when you want a 
                     trigger to fire on players and not mobs.
 level             - The actor's computed level (or scaled level, for mobs).
