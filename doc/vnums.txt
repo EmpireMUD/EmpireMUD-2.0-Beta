@@ -64,3 +64,5 @@ Included Adventure Zones
 [  200] Burrow Canyons (11100-11129)
 [  201] The Cursed Chalice of Mill Manor (11130-11159)
 [  281] Mountain Valley: Molten Fiend (18075-18099)
+[  282] Goblin Logging Camp (18100-18124)
+
