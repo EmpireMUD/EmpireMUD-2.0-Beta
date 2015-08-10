@@ -1,0 +1,78 @@
+#18100
+axe logging~
+a logging axe~
+A logging axe is lying here.~
+   This crude iron axe appears to be goblin manufacture. You have no idea how a
+little goblin could wield this massive axe. It's a bit awkward even for you. 
+~
+1 hmp an 7
+0 1 2
+2 0
+A
+2 -1
+A
+9 -1
+S
+#18101
+brew goblin lumberjack vial~
+a goblin lumberjack brew~
+A vial of goblin lumberjack brew is sitting here.~
+   Finally, the explanation for goblins being able to use human sized weapons
+comes to light: as with everything else, they cheat.  
+~
+25 m a 4
+7 1 0
+8 0
+S
+#18102
+sandals goblin pair~
+goblin sandals~
+A pair of goblin sandals is falling apart here.~
+   The only thing more pathetically flimsy than goblin shoes, this pair of
+goblin sandals seems to be falling apart before your eyes.  
+~
+2 mp ag 5
+0 0 0
+7 0
+A
+6 1
+S
+#18103
+cap wooden crude~
+a crude wooden cap~
+A crude wooden cap is lying here.~
+   Goblin lumberjacks tend to abandon precision in favor of enthusiasm. 
+Natural selection eventually developed these thick wooden caps.  
+~
+2 mp ae 2
+0 0 0
+0 0
+A
+1 1
+S
+#18104
+pauldrons lumberjack goblin~
+goblin lumberjack pauldrons~
+A pair of goblin lumberjack pauldrons is lying here.~
+These wooden shoulder plates will deflect up to at least 50% of falling trees!
+~
+2 mp ai 1
+0 0 0
+0 0
+A
+15 1
+S
+#18105
+leggings lumberjack goblin~
+goblin lumberjack leggings~
+A pair of goblin lumberjack leggings is lying here.~
+   These smelly but surprisingly durable leggings are made from the raw hide of
+a warg. Or maybe a rat. It's hard to tell.  
+~
+2 mp af 1
+0 0 0
+7 0
+A
+11 1
+S
+$

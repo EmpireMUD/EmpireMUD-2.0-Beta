@@ -68,4 +68,28 @@ L
 1440 -1 -1
 -1 0 0
 S
+#282
+Goblin Logging Camp~
+Owen Morris~
+   Something has been clearing vast swathes of the woodland to build some kind
+of war machine here! Judging by the smell, only two kinds of pest could have
+been responsible: goblins, or urchins. Judging by the warg bone tent poles,
+it's probably not urchins. Burning their camp to the ground or killing them
+should drive them from the region.  
+~
+18100 18125 10-50
+10 0 d 0
+L
+6 0
+75 -1 -1
+-1 0 0
+L
+5 0
+10080 -1 -1
+-1 0 0
+L
+1 0
+18100 -1 -1
+14 d n
+S
 $
