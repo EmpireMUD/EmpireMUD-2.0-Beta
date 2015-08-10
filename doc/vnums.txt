@@ -55,6 +55,7 @@ Included Adventure Zones
 [  122] Ruins: Three Banditos (10105-10109)
 [  123] Ruins: Thieves (10110-10129)
 [  125] Ruins: The Goblin Challenge (10200-10224)
+[  126] Mountain Cave: Flame Dragon (10300-10329)
 [  140] The Sewer: Ratskins (10011-10027)
 [  141] The Sewer: Goblin Outpost (10450-10499)
 [  160] The Tower Skycleave (10030-10099)
