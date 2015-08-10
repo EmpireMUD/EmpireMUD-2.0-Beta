@@ -2212,12 +2212,14 @@ ACMD(do_diplomacy) {
 
 
 ACMD(do_efind) {
+	char buf[MAX_STRING_LENGTH*2];
 	obj_data *obj;
 	empire_data *emp;
 	int total;
 	bool all = FALSE;
 	room_data *last_rm, *iter, *next_iter;
 	struct efind_group *eg, *next_eg, *list = NULL;
+	size_t size;
 	
 	one_argument(argument, arg);
 	
@@ -2250,39 +2252,45 @@ ACMD(do_efind) {
 		}
 
 		if (total > 0) {
-			strcpy(buf, "You discover:");	// leave off \\r\n
+			size = snprintf(buf, sizeof(buf), "You discover:");	// leave off \r\n
 			last_rm = NULL;
 			
 			for (eg = list; eg; eg = next_eg) {
 				next_eg = eg->next;
 				
+				// length limit check
+				if (size + 24 > sizeof(buf)) {
+					size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+					break;
+				}
+				
 				// first item at this location?
 				if (eg->location != last_rm) {
 					if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
-						sprintf(buf + strlen(buf), "\r\n(%*d, %*d) ", X_PRECISION, X_COORD(eg->location), Y_PRECISION, Y_COORD(eg->location));
+						size += snprintf(buf + size, sizeof(buf) - size, "\r\n(%*d, %*d) ", X_PRECISION, X_COORD(eg->location), Y_PRECISION, Y_COORD(eg->location));
 					}
 					else {
-						strcat(buf, "\r\n");
+						size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
 					}
-					sprintf(buf + strlen(buf), "%s: ", get_room_name(eg->location, FALSE));
+					size += snprintf(buf + size, sizeof(buf) - size, "%s: ", get_room_name(eg->location, FALSE));
 					
 					last_rm = eg->location;
 				}
 				else {
-					strcat(buf, ", ");
+					size += snprintf(buf + size, sizeof(buf) - size, ", ");
 				}
 				
 				if (eg->count > 1) {
-					sprintf(buf + strlen(buf), "%dx ", eg->count);
+					size += snprintf(buf + size, sizeof(buf) - size, "%dx ", eg->count);
 				}
 				
-				strcat(buf, get_obj_desc(eg->obj, ch, OBJ_DESC_SHORT));
+				size += snprintf(buf + size, sizeof(buf) - size, "%s", get_obj_desc(eg->obj, ch, OBJ_DESC_SHORT));
 				free(eg);
 			}
 			// all free! free!
 			list = NULL;
 			
-			strcat(buf, "\r\n");	// training crlf
+			size += snprintf(buf + size, sizeof(buf) - size, "\r\n");	// training crlf
 			page_string(ch->desc, buf, TRUE);
 		}
 		else {
