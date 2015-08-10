@@ -1,0 +1,53 @@
+#10308
+dragonscale leggings~
+10308 1  # 1x dragonscale leggings
+4 199 gh 24 10312
+R
+10006 3  # 3x a dragon scale
+R
+1357 4  # 4x a large piece of leather
+R
+103 6  # 6x a yellow lightning stone
+R
+176 6  # 6x an ingot of nocturnium
+S
+#10309
+dragonweave stockings~
+10309 1  # 1x dragonweave stockings
+4 199 gh 24 10313
+R
+10006 3  # 3x a dragon scale
+R
+1357 4  # 4x a large piece of leather
+R
+103 6  # 6x a yellow lightning stone
+R
+176 6  # 6x an ingot of nocturnium
+S
+#10310
+dragonplate breeches~
+10310 1  # 1x dragonplate breeches
+1 197 h 24 10314
+R
+10006 3  # 3x a dragon scale
+R
+1357 4  # 4x a large piece of leather
+R
+104 6  # 6x a red bloodstone
+R
+177 8  # 8x an imperium ingot
+S
+#10311
+dragonmail chaps~
+10311 1  # 1x dragonmail chaps
+2 182 gh 24 10315
+R
+10006 3  # 3x a dragon scale
+R
+1357 4  # 4x a large piece of leather
+R
+104 6  # 6x a red bloodstone
+R
+177 8  # 8x an imperium ingot
+S
+$

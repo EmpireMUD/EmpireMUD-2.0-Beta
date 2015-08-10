@@ -151,6 +151,28 @@ L
 50 -1 -1
 -1 0 0
 S
+#126
+Mountain Cave: Flame Dragon~
+Paul Clarke~
+   A flame dragon has made its nest in a mountain cave and is terrorizing the
+countryside! Can you hunt it down and kill it? Just follow the swath of
+scorched earth. The dragon is tough -- you might want to bring a partner.  
+~
+10300 10329 100-150
+10 0 d 0
+L
+5 0
+43200 -1 -1
+-1 0 0
+L
+6 0
+75 -1 -1
+-1 0 0
+L
+1 0
+10300 -1 -1
+14 c bdegkln
+S
 #140
 The Sewer: Ratskins~
 Paul Clarke~
@@ -185,7 +207,7 @@ Paul Clarke~
 up into the streets. This can only mean one thing: Goblins! Will you buy the
 goblins' wares, or drive them from the city? This adventure sells 6 crafting
 patterns and 4 unique buildings. You can also fight the goblins solo or in
-pairs, to earn their prized gear.  
+pairs, to earn their prized gear.
 ~
 10450 10499 50-100
 30 120 0 2
