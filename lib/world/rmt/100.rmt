@@ -175,7 +175,6 @@ M 0 10002 10.00 1
 M 0 10003 10.00 1
 M 0 10004 90.00 1
 T 10005
-T 10005
 S
 #10005
 A Hidden Thicket~
@@ -224,7 +223,7 @@ S
 The City Sewers~
    The last fresh breath of air escapes from your lungs and floats out the open
 sewer grate, which shines a column of light from the city above. A narrow ledge
-is all that separates you from the stream of human waste that flows past.  
+is all that separates you from the stream of human waste that flows past.
 ~
 c 0
 D3
