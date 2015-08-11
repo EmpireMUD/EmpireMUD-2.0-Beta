@@ -590,10 +590,11 @@ ACMD(do_admin_util) {
 void do_instance_add(char_data *ch, char *argument) {
 	extern bool can_instance(adv_data *adv);
 	extern room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rule, int *which_dir);
+	extern const bool is_location_rule[];
 
-	struct adventure_link_rule *rule;
+	struct adventure_link_rule *rule, *rule_iter;
+	int num_rules, tries, dir = NO_DIR;
 	bool found = FALSE;
-	int dir = NO_DIR;
 	room_data *loc;
 	adv_vnum vnum;
 	adv_data *adv;
@@ -608,13 +609,26 @@ void do_instance_add(char_data *ch, char *argument) {
 		return;
 	}
 	
-	for (rule = GET_ADV_LINKING(adv); rule; rule = rule->next) {
-		if ((loc = find_location_for_rule(adv, rule, &dir))) {
-			// make it so!
-			if (build_instance_loc(adv, rule, loc, dir)) {
-				found = TRUE;
-				save_instances();
-				break;
+	// randomly choose one rule to attempt
+	for (tries = 0; tries < 5 && !found; ++tries) {
+		num_rules = 0;
+		rule = NULL;
+		for (rule_iter = GET_ADV_LINKING(adv); rule_iter; rule_iter = rule_iter->next) {
+			if (is_location_rule[rule_iter->type]) {
+				// choose one at random
+				if (!number(0, num_rules++) || !rule) {
+					rule = rule_iter;
+				}
+			}
+		}
+	
+		if (rule) {
+			if ((loc = find_location_for_rule(adv, rule, &dir))) {
+				// make it so!
+				if (build_instance_loc(adv, rule, loc, dir)) {
+					found = TRUE;
+					save_instances();
+				}
 			}
 		}
 	}
@@ -2728,6 +2742,40 @@ void do_stat_crop(char_data *ch, crop_data *cp) {
 }
 
 
+/**
+* Show a character stats on a particular global.
+*
+* @param char_data *ch The player requesting stats.
+* @param struct global_data *glb The global to stat.
+*/
+void do_stat_global(char_data *ch, struct global_data *glb) {
+	extern const char *global_flags[];
+	extern const char *global_types[];
+	
+	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
+	
+	msg_to_char(ch, "Global VNum: [&c%d&0], Type: [&c%s&0], Name: '&c%s&0'\r\n", GET_GLOBAL_VNUM(glb), global_types[GET_GLOBAL_TYPE(glb)], GET_GLOBAL_NAME(glb));
+	
+	sprintbit(GET_GLOBAL_FLAGS(glb), global_flags, buf, TRUE);
+	msg_to_char(ch, "Flags: &g%s&0\r\n", buf);
+	
+	switch (GET_GLOBAL_TYPE(glb)) {
+		case GLOBAL_MOB_INTERACTIONS: {
+			sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), action_bits, buf, TRUE);
+			sprintbit(GET_GLOBAL_TYPE_EXCLUDE(glb), action_bits, buf2, TRUE);
+			msg_to_char(ch, "Levels: [&g%s&0], Mob Flags: &c%s&0, Exclude: &c%s&0\r\n", level_range_string(GET_GLOBAL_MIN_LEVEL(glb), GET_GLOBAL_MAX_LEVEL(glb), 0), buf, buf2);
+			break;
+		}
+	}
+	
+	if (GET_GLOBAL_INTERACTIONS(glb)) {
+		send_to_char("Interactions:\r\n", ch);
+		get_interaction_display(GET_GLOBAL_INTERACTIONS(glb), buf);
+		send_to_char(buf, ch);
+	}
+}
+
+
 /* Gives detailed information on an object (j) to ch */
 void do_stat_object(char_data *ch, obj_data *j) {
 	extern const struct material_data materials[NUM_MATERIALS];
@@ -3360,6 +3408,38 @@ int vnum_crop(char *searchname, char_data *ch) {
 	HASH_ITER(hh, crop_table, iter, next_iter) {
 		if (multi_isname(searchname, GET_CROP_NAME(iter)) || multi_isname(searchname, GET_CROP_TITLE(iter))) {
 			msg_to_char(ch, "%3d. [%5d] %s\r\n", ++found, GET_CROP_VNUM(iter), GET_CROP_NAME(iter));
+		}
+	}
+	
+	return found;
+}
+
+
+/**
+* Searches the global db for a match, and prints it to the character.
+*
+* @param char *searchname The search string.
+* @param char_data *ch The player who is searching.
+* @return int The number of matches shown.
+*/
+int vnum_global(char *searchname, char_data *ch) {
+	struct global_data *iter, *next_iter;
+	char flags[MAX_STRING_LENGTH];
+	int found = 0;
+	
+	HASH_ITER(hh, globals_table, iter, next_iter) {
+		if (multi_isname(searchname, GET_GLOBAL_NAME(iter))) {			
+			switch (GET_GLOBAL_TYPE(iter)) {
+				case GLOBAL_MOB_INTERACTIONS: {
+					sprintbit(GET_GLOBAL_TYPE_FLAGS(iter), action_bits, flags, TRUE);
+					msg_to_char(ch, "%3d. [%5d] %s (%s) %s\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), level_range_string(GET_GLOBAL_MIN_LEVEL(iter), GET_GLOBAL_MAX_LEVEL(iter), 0), flags);
+					break;
+				}
+				default: {
+					msg_to_char(ch, "%3d. [%5d] %s\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter));
+					break;
+				}
+			}
 		}
 	}
 	
@@ -5843,6 +5923,11 @@ ACMD(do_vnum) {
 			msg_to_char(ch, "No crops by that name.\r\n");
 		}
 	}
+	else if (is_abbrev(buf, "global")) {
+		if (!vnum_global(buf2, ch)) {
+			msg_to_char(ch, "No globals by that name.\r\n");
+		}
+	}
 	else if (is_abbrev(buf, "roomtemplate")) {
 		if (!vnum_room_template(buf2, ch)) {
 			msg_to_char(ch, "No room templates by that name.\r\n");
@@ -5911,6 +5996,14 @@ ACMD(do_vstat) {
 			return;
 		}
 		do_stat_crop(ch, crop);
+	}
+	else if (is_abbrev(buf, "global")) {
+		struct global_data *glb = global_proto(number);
+		if (!glb) {
+			msg_to_char(ch, "There is no global with that number.\r\n");
+			return;
+		}
+		do_stat_global(ch, glb);
 	}
 	else if (is_abbrev(buf, "mobile")) {
 		if (!mob_proto(number)) {

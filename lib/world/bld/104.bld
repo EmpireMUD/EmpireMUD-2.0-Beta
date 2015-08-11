@@ -7,11 +7,67 @@ A Burning Hamlet~
 D
    You've come across a small hamlet, ablaze and beset by the undead. Most of
 the citizens have fled, but it looks as if the city needs help. With no army to
-come to its rescue, the hamlet's only hope is you!  
+come to its rescue, the hamlet's only hope is you!
 ~
 M
 10416 75.00 0
 M
 10417 75.00 0
+S
+#10479
+Goblin War Tent~
+A Goblin War Tent~
+.&0MM&?.~
+10 0 pr cm
+2 1 5 -1
+D
+   The tent, though magnificent as a feat of goblin engineering, appears to be
+made from hundreds of loosely stitched rat skins, and it smells no better than
+it looks. The tent poles are decorated with the spoils of war including skulls,
+hides, and badly damaged armor. A roaring fire burns in the center of the tent.
+~
+S
+#10480
+Goblin Message Post~
+A Goblin Message Post~
+@.&0P&?@.@.~
+5 0 dpy 0
+0 0 0 -1
+C
+mail check, mail receive, mail send~
+E
+post message~
+   It looks like the goblins have been feeding pigeons to hawks, and using the
+hawks as letter carriers!
+~
+S
+#10481
+Goblin Lab Tent~
+A Goblin Lab Tent~
+..&0M&?.~
+5 0 rs 0
+0 0 0 -1
+C
+brew, mix~
+D
+   This laboratory is little more than a rat-skin tent with a hearth, a fire,
+and some racks for lab supplies. The whole thing has the familiar stench of
+goblin engineering. The lab seems more portable than most alchemy facilities,
+but only marginally.  
+~
+S
+#10482
+Goblin Dolmen~
+A Goblin Dolmen~
+.&0oo&?.~
+10 0 E 0
+0 0 0 -1
+C
+tomb~
+D
+   This is a rough dolmen -- a rock tomb used by goblins. Huge stone blocks
+have been used to make a burial chamber, which is then covered in dirt. Only
+weeds and rubble cover the surface.  
+~
 S
 $

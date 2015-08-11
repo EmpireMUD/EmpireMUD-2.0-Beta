@@ -46,16 +46,17 @@ TRIGEDIT-COMMANDS TRIG-COMMANDS TRIGGER-COMMANDS TRIGEDIT-COMMANDLISTS
 |    makeuid      |       %at%          |       %at%       |       %at%       |
 |    rdelete      |    %transform%      |    %transform%   |      %scale%     |
 |     remote      |       mhunt         |      otimer      |%adventurecomplete%
-|     return      |     mremember       |     osetval      |==================|
-|     switch      |      mforget        |     %scale%         |
-|      case       |       %goto%        | %adventurecomplete% |
-|     break       |       mkill         |=====================|
-|     done        |       %junk%        |
-|     while       |      %follow%       | Further help can be accessed by
-|                 |       %aoe%         | typing: HELP <COMMAND>.
-|                 |       %dot%         |
+|     return      |     mremember       |     osetval      |    %terraform%   |
+|     switch      |      mforget        |     %scale%      |==================|
+|      case       |       mgoto         | %adventurecomplete% |
+|     break       |       mkill         |    %terraform%      |
+|     done        |       %junk%        |=====================|
+|     while       |      %follow%       |
+|                 |       %aoe%         | Further help can be accessed by
+|                 |       %dot%         | typing: HELP <COMMAND>.
 |                 |      %scale%        |
 |                 | %adventurecomplete% |
+|                 |     %terraform%     |
 ========================================|
 See also: TRIG-TYPES, VARIABLES, EXPRESSIONS
 #d
@@ -257,6 +258,21 @@ room template vnum instead of live room number (if used in an instanced zone).
 %teleport% all 17401
 %teleport% %actor% 1300
 #d
+%TERRAFORM% WTERRAFORM OTERRAFORM MTERRAFORM
+
+%terraform% [location] <sector vnum>
+
+This command allows you to make changes to the map, one tile at a time. It is
+usually a bad idea to terraform tiles by coordinates. It's almost always
+safest to do this on the map tile the script is running in.
+
+Some sectors cannot be terraformed.
+
+Example:
+  if (%room.sector% ~= Forest)
+    %terraform% %room% 4412
+  end
+#d
 %ASOUND% OASOUND MASOUND WASOUND ASOUND
 
 %asound% <message>
@@ -292,7 +308,7 @@ mforget <victim>
 #d
 MGOTO %GOTO%
 
-%goto% <target>
+mgoto <target>
    This command moves the mob to the given target. The target may be an object,
 room, or  character, as long as it is not in a private room occupied with two 
 or more characters, or god  room. No message is given. 
@@ -301,9 +317,9 @@ You can use i### to target a room in the mob's current adventure instance by
 its room template vnum instead of live room number (if used in an instanced
 zone).
 
-%goto% 1233
-%goto% Rumble
-%goto% fountain
+mgoto 1233
+mgoto Rumble
+mgoto fountain
 #d
 MJUNK %JUNK%
 
@@ -787,7 +803,9 @@ Special Variables When using field - The variable returns:
 self          - The mob, item, or room running the script. Normal fields may be 
                 used with this.
 instance.id   - Unique id of the adventure instance, if any.
+instance.location - The map/linked location of the instance, if any.
 instance.name - Name of the adventure instance, if any.
+instance.start - The entry room of the instance, if any.
 people.<vnum> - This variable returns the number of people in the room 
                 specified via vnum.
 random.<#>    - This returns a number between 1 and the field value. 
@@ -885,6 +903,7 @@ can_teleport_room(room) - Character can legally teleport in/out of the room
                     (defaults to current room).
 cha               - The actor's Charisma.
 class             - The actor's class, as a string.
+crafting_level    - The actor's crafting level.
 dex               - The actor's Dexterity.
 disabled          - Returns TRUE if the actor is stunned or otherwise disabled.
 eq()              - This will return the identifier (id) for the object 
@@ -919,11 +938,13 @@ is_god            - Returns true if the actor is a God-level player.
 is_hostile(on/off)- If the ()'s are omitted, return value is whether or not the 
                     actor is marked as a Hostile player.
 is_immortal       - Returns true if the actor is an immortal (admin).
+is_name(str)      - Returns true if str is a valid name for the actor.
 is_pc             - Checks if the actor is a player. Useful when you want a 
                     trigger to fire on players and not mobs.
 level             - The actor's computed level (or scaled level, for mobs).
 mana              - The current mana points of the actor.
 master            - The master of the actor (as an id), or an empty return.
+maxblood          - The maximum blood points of the actor.
 maxhealth         - The maximum hit points of the actor.
 maxmana           - The maximum mana points of the actor.
 maxmove           - The maximum movement points of the actor.

@@ -1,0 +1,250 @@
+#10300
+hoard dragons dragon's~
+the dragon's hoard~
+The dragon's hoard is piled here!~
+The hoard is a stack of rare and precious golden coins.
+~
+15 e a 1
+25 0 0
+4 0
+R
+5611 a
+R
+5184 a
+S
+#10301
+egg dragon~
+a dragon egg~
+A dragon egg is sitting here.~
+This dragon egg looks ready to hatch and summon you a noncombat pet!
+Type 'use egg' to summon it.
+~
+3 p a 2
+10301 0 0
+14 0
+T 10301
+S
+#10302
+seeds firefruit fruit~
+some firefruit seeds~
+Some firefruit seeds are scattered on the ground.~
+These seeds have a faint glow.
+~
+3 b a 3
+0 10300 0
+7 468
+S
+#10303
+firefruit fruit seething~
+a seething firefruit~
+A firefruit is flickering and sputtering on the ground.~
+   The firefruit flickers shades of red, orange and yellow. It's warm to the
+touch, but juicy and delicious. It's probably bright enough to see by.
+~
+6 bcel a 3
+24 10300 0
+7 48
+M
+4
+You begin to sweat as you eat $p.~
+M
+5
+$n seems to sweat as $e eats $p.~
+R
+5114 0
+S
+#10304
+charm breath dragons dragon's~
+the dragon's breath charm~
+A dragon's breath charm is lying here.~
+   This charm is made from pure gold and imbued with the breath of a dragon. 
+It's suspended from a gold necklace, and is much heavier than it looks.  
+~
+2 mp ac 1
+0 0 0
+4 0
+A
+9 1
+A
+22 2
+S
+#10305
+charm dragons dragon's ferocity~
+the dragon's ferocity charm~
+A dragon's ferocity charm is lying here.~
+   This charm is made of gold, in the shape of a dragon's tooth, and imbued
+with all the ferocity a dragon can muster. As a result, it's quite heavy.  
+~
+2 mp ac 1
+0 0 0
+4 0
+A
+9 1
+A
+21 2
+S
+#10306
+charm courage dragons dragon's~
+the dragon's courage charm~
+A dragon's courage charm is lying here.~
+   This golden charm is made in the shape of a dragon's eye, and enchanted with
+the courage of a dragon. It's much heavier than it looks.  
+~
+2 mp ac 1
+0 0 0
+4 0
+A
+18 2
+A
+24 1
+A
+12 1
+S
+#10307
+charm wind dragons dragon's~
+the dragon's wind charm~
+A dragon's wind charm is lying here.~
+   This charm is made from gold, in the shape of a dragon wing. It's imbued
+with the wind of a dragon (a fact you try not to think too hard about), and is
+much lighter than it looks.  
+~
+2 mp ac 1
+0 0 0
+0 0
+A
+7 1
+A
+23 2
+S
+#10308
+leggings dragonscale~
+dragonscale leggings~
+Some dragonscale leggings are on the ground.~
+   These leggings are lined with fine cloth, but the outside is made from
+stitched chips of dragonscale.  
+~
+27 mo af 1
+0 0 0
+14 0
+A
+8 1
+A
+2 1
+A
+17 1
+C
+0 175
+S
+#10309
+stockings dragonweave~
+dragonweave stockings~
+Some dragonweave stocking are crumpled here.~
+These leggings are stitched from the sinews of dragonscale.
+~
+27 mo af 2
+0 0 0
+14 0
+A
+8 1
+A
+7 1
+A
+23 1
+C
+0 175
+S
+#10310
+breeches dragonplate~
+dragonplate breeches~
+Some dragonplate breeches are stacked here.~
+These short pants are made from hardened dragonscales, and fastened by imperium.
+~
+27 mo af 2
+3 0 0
+14 0
+A
+2 1
+A
+24 1
+A
+13 2
+A
+12 1
+C
+0 175
+S
+#10311
+chaps dragonmail~
+dragonmail chaps~
+Some dragonmail chaps are piled here.~
+These leggings are made from tiny ringlets of dragonscale.
+~
+27 mo af 3
+1 0 0
+14 0
+A
+2 1
+A
+1 1
+A
+17 2
+C
+0 175
+S
+#10312
+pattern leggings dragonscale~
+the dragonscale leggings pattern~
+The dragonscale leggings pattern is sitting here.~
+Sew (requires Magical Vestments and a fire): dragonscale leggings
+  3x dragon scale
+  4x large piece of leather
+  6x yellow lightning stone
+  6x ingot of nocturnium
+~
+3 0 a 3
+0 0 0
+0 0
+S
+#10313
+pattern stockings dragonweave~
+the dragonweave stockings pattern~
+The dragonweave stockings pattern is sitting here.~
+Sew (requires Magical Vestments and a fire): dragonweave stockings
+  3x dragon scale
+  4x large piece of leather
+  6x yellow lightning stone
+  6x ingot of nocturnium
+~
+3 0 a 4
+0 0 0
+0 0
+S
+#10314
+pattern dragonplate breeches~
+the dragonplate breeches pattern~
+The dragonplate breeches pattern is sitting here.~
+Forge (requires Imperial Armors and a fire): dragonplate breeches
+  3x dragon scale
+  4x large piece of leather
+  6x red bloodstone
+  8x imperium ingot
+~
+3 0 a 5
+0 0 0
+0 0
+S
+#10315
+pattern dragonmail chaps~
+the dragonmail chaps pattern~
+The dragonmail chaps pattern is sitting here.~
+Craft (requires Dangerous Leathers and a fire): dragonmail chaps
+  3x dragon scale
+  4x large piece of leather
+  6x red bloodstone
+  8x imperium ingot
+~
+3 0 a 6
+0 0 0
+0 0
+S
+$

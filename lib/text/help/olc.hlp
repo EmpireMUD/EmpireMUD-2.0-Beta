@@ -40,8 +40,8 @@ Examples:
 
 For notes on the mud's building rules, see HELP BUILDING GUIDE.
  
-See also: OLC CONTROLS, OLC BUILDINGS, OLC CRAFTS, OLC CROPS, OLC MOBILES,
-   OLC OBJECTS, OLC SECTORS, MAP OLC
+See also: OLC CONTROLS, OLC BUILDINGS, OLC CRAFTS, OLC CROPS, OLC GLOBALS,
+   OLC MOBILES, OLC OBJECTS, OLC SECTORS, MAP OLC
 See also: OLC ABORT, OLC AUDIT, OLC COPY, OLC DELETE, OLC EDIT, OLC FREE, 
    OLC LIST, OLC SAVE, OLC SEARCH, OLC LICENSE, TEXT EDITOR, VNUM
 #d
@@ -129,6 +129,11 @@ Crops (CROPEDIT):
 - The map region only matters if the crop grows in the wild (no !WILD flag).
 - Crops should have a FORAGE interaction for a small single food item.
 - Crops should have a HARVEST interaction for a plantable large item.
+
+Globals (GEDIT):
+- All global tables must be approved by the head builder, because they apply
+  to the entire game rather than just one adventure.
+- Only SHEAR, LOOT, and PICKPOCKET mob interactions are supported.
 
 Map (MAPEDIT):
 - Immortals are not generally permitted to make edits to the map. However,
@@ -230,7 +235,7 @@ Triggers and Scripts (TRIGEDIT):
   were dropped as loot by mobs should also already have scaled levels. Mob
   scripts also almost always have a valid scaled level, even if if not in a
   level-locked adventure zone.
-- Adventure zone scripts that use %goto% (or any room-targeting commands) must
+- Adventure zone scripts that use mgoto (or any room-targeting commands) must
   use room targets like i1234 to target by room template vnum instead of live
   room vnum. This will cause it to go to the current instance's version of a
   room template. It only works for room templates in the same adventure zone.
@@ -1234,6 +1239,90 @@ covered by the crops.
 
 See also: OLC CROPS
 #d
+"GEDIT FLAGS"
+
+Usage:  .flags [add | remove] <flags>
+
+This set of flags applies to the global table itself.
+
+Available flags:
+ IN-DEVELOPMENT - Will not be used live.
+ ADVENTURE-ONLY - This global table will only apply to the adventure it's in.
+
+See also: OLC GLOBALS
+#d
+"GEDIT MAXLEVEL"
+
+Usage:  .maxlevel <level>
+
+This sets the upper limit of the level range for this global table.
+
+For example, a 'Mob Interactions' global table will only be used if the mob
+is scaled to this maxlevel or lower.
+
+You can set the maximum to 0 for "no maximum".
+
+See also: OLC GLOBALS
+#d
+"GEDIT MINLEVEL"
+
+Usage:  .minlevel <level>
+
+This sets the lower limit of the level range for this global table.
+
+For example, a 'Mob Interactions' global table will only be used if the mob
+is scaled to this minlevel or higher.
+
+You can set the minimum to 0 for "no minimum".
+
+See also: OLC GLOBALS
+#d
+"GEDIT MOBEXCLUDE"
+
+Usage:  .mobexclude [add | remove] <flags>
+
+A 'Mob Interactions' global table may have mob flags set to exclude. If so, the
+global table is only used if a mob DOES NOT have all the flags in this set.
+For example, you can use it to create a set that does not apply to HARD mobs.
+
+These are the same set of flags from HELP MEDIT FLAGS.
+
+See also: OLC GLOBALS
+#d
+"GEDIT MOBFLAGS"
+
+Usage:  .mobflags [add | remove] <flags>
+
+A 'Mob Interactions' global table may have mob flags set. If so, the global
+table is only used if a mob has ALL of the flags set here. For example, you
+might set a global table to only apply to HARD mobs.
+
+These are the same set of flags from HELP MEDIT FLAGS.
+
+See also: OLC GLOBALS
+#d
+"GEDIT NAME"
+
+Usage:  .name <name>
+
+This lets you set the 'name' property of a global table. Names are only shown
+to the immortal staff, never to players. The name should indicate what this
+table is for.
+
+See also: OLC GLOBALS
+#d
+"GEDIT TYPE"
+
+Usage:  .type <type>
+
+This is the type of global table. Different types are used for different
+things. Each type may have its own properties.
+
+Types:
+ Mob Interactions - Used for global SHEAR, LOOT, and PICKPOCKET tables.
+
+See also: OLC GLOBALS
+#d
 "ITEM SCALING" "OBJ SCALING" "OBJECT SCALING" SCALABLE "SCALABLE FLAG" "SCALING ITEM"
 
 Items can be set to scale to different levels. You can set various traits on
@@ -1557,7 +1646,7 @@ Available mob flags:
 
 See also: OLC MOBILES
 #d
-"MEDIT INTERACTION" "BEDIT INTERACTION" "OEDIT INTERACTION" "REDIT INTERACTION" "SECTEDIT INTERACTION" "CROPEDIT INTERACTION" INTERACTIONS
+"MEDIT INTERACTION" "BEDIT INTERACTION" "OEDIT INTERACTION" "REDIT INTERACTION" "SECTEDIT INTERACTION" "CROPEDIT INTERACTION" "GEDIT INTERACTION" INTERACTIONS
 
 Usage:  .interaction add <type> <quantity> <vnum> <percent> [exclusion code]
         .interaction change <number> <field> <value>
@@ -1576,6 +1665,7 @@ Mob interaction types:
  SHEAR - Items received when the shear command is used in a stable.
  BARDE - Mob loaded when the Barde ability is used in a stable.
  LOOT - Items dropped into the corpse when the mob is killed.
+ PICKPOCKET - Items gained from the pickpocket skill.
  
 Object interaction types:
  LIGHT - Item something is converted into when lit on fire.
@@ -2569,8 +2659,8 @@ You should set the FORAGE and HARVEST interactions on a crop, usually with a
 GATHER interaction.
 
 All commands in the editor are highlighted in yellow and placed inside <angle
-braces>. You can get help on any of these commands by typing &yHELP CROPEDIT&0.
-<COMMAND>.
+braces>. You can get help on any of these commands by typing &yHELP CROPEDIT
+<COMMAND>&0.
 
 You can close an open editor with .abort or .save.
 
@@ -2582,6 +2672,33 @@ Example:
 For notes on the mud's building rules, see HELP BUILDING GUIDE.
 
 See also: CROPEDIT INTERACTION, OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
+"OLC GLOBALS" GEDIT GLOBALEDIT "GLOBAL EDIT" "GLOBAL OLC"
+
+Usage:  .global <comman>
+        .<command>
+
+The .olc globals editor allows you to add, edit, or delete global tables from
+the world. It provides an in-game menu for controlling features like global
+loot tables.
+
+Any global data that doesn't have an IN-DEVELOPMENT flag will be used by the
+live game system.
+
+All commands in the editor are highlighted in yellow and placed inside <angle
+braces>. You can get help on any of these commands by typing &yHELP GEDIT
+<COMMAND>&0.
+
+You can close an open editor with .abort or .save.
+
+Example:
+ > .global edit 123
+ > .flags IN-DEVELOPMENT
+ > .save
+
+For notes on the mud's building rules, see HELP BUILDING GUIDE.
+
+See also: GEDIT INTERACTION, OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
 #d
 "OLC DELETE"
 
@@ -2695,6 +2812,8 @@ Usage:  .removeindev <adventure vnum>
 This command removes the IN-DEVELOPMENT flag from an adventure and any craft
 recipes in it, or from craft recipes over a given vnum range. It can be used
 to quickly activate a zone.
+
+This also applies to global tables in the range.
 
 See also: OLC CONTROLS, OLC ADVENTURES, ADVEDIT FLAGS, CEDIT FLAGS
 #d
@@ -3099,6 +3218,7 @@ See also: OLC SECTORS
 "SPECIAL ICONS" "ICON CODES"
 
 The following special codes may be used in icons:
+ @. - show the roadside icon for the base tile type here
  @e - show the roadside icon for the tile to the east
  @w - show the roadside icon for the tile to the west
  @u - show a 'v' if the tile to the west is a wall

@@ -21,9 +21,7 @@ There are three bedrolls by the best wall, and a tiny fire beneath a missing
 section of roof.
 ~
 acd 0
-M 0 10105 30.00 1
-M 0 10106 30.00 1
-M 0 10107 30.00 1
+M 1 10116 100.00 1
 S
 #10110
 A Collapsed Room~
@@ -33,9 +31,7 @@ standing. There is a small fire here, as if someone has been living amongst the
 ruins.
 ~
 ac 0
-M 1 10110 10.00 1
-M 0 10110 30.00 1
-M 0 10111 30.00 1
-M 0 10112 66.00 1
+M 1 10110 33.00 1
+M 1 10115 100.00 1
 S
 $

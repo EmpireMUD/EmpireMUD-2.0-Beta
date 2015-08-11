@@ -124,16 +124,6 @@
 #define o_FLINT_SET  183
 #define o_SPEARHEAD  186
 
-// pickpocket items
-#define o_MIRROR_SILVER  806
-#define o_CANDLE  851
-#define o_RING_SILVER  2120
-#define o_APPLE  3001
-#define o_NUTS  3013
-#define o_BERRIES  3015
-#define o_DATES  3016
-#define o_FIG  3017
-
 // brewing items
 #define o_APPLES  3002
 #define o_PEACHES  3004

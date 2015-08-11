@@ -237,6 +237,15 @@ typedef struct trig_data trig_data;
 #define BAN_ALL  3
 
 
+// GLOBAL_x types for global_data
+#define GLOBAL_MOB_INTERACTIONS  0
+
+
+// GLB_FLAG_x flags for global_data
+#define GLB_FLAG_IN_DEVELOPMENT  BIT(0)	// not live
+#define GLB_FLAG_ADVENTURE_ONLY  BIT(1)	// does not apply outside same-adventure
+
+
 // Group Defines
 #define GROUP_ANON  BIT(0)	// Group is hidden/anonymous
 
@@ -254,7 +263,8 @@ typedef struct trig_data trig_data;
 #define INTERACT_GATHER  9
 #define INTERACT_ENCOUNTER  10
 #define INTERACT_LIGHT  11
-#define NUM_INTERACTS  12
+#define INTERACT_PICKPOCKET  12
+#define NUM_INTERACTS  13
 
 
 // mob spawn flags
@@ -1648,6 +1658,26 @@ struct generic_name_data {
 };
 
 
+// for global tables
+struct global_data {
+	any_vnum vnum;
+	char *name;	// descriptive text
+	int type;	// GLOBAL_x
+	bitvector_t flags;	// GLB_FLAG_x flags
+
+	// constraints
+	bitvector_t type_flags;	// type-dependent flags
+	bitvector_t type_exclude;	// type-dependent flags
+	int min_level;
+	int max_level;
+
+	// data
+	struct interaction_item *interactions;
+	
+	UT_hash_handle hh;
+};
+
+
 // group member list
 struct group_member_data {
 	char_data *member;
@@ -2103,6 +2133,7 @@ struct descriptor_data {
 	craft_data *olc_craft;	// craft recipe being edited
 	bld_data *olc_building;	// building being edited
 	crop_data *olc_crop;	// crop being edited
+	struct global_data *olc_global;	// global being edited
 	room_template *olc_room_template;	// rmt being edited
 	struct sector_data *olc_sector;	// sector being edited
 	struct trig_data *olc_trigger;	// trigger being edited

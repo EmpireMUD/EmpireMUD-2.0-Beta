@@ -23,6 +23,7 @@
 #include "handler.h"
 #include "db.h"
 #include "skills.h"
+#include "vnums.h"
 
 // external vars
 extern const char *damage_types[];
@@ -457,6 +458,60 @@ WCMD(do_wteleport) {
 }
 
 
+WCMD(do_wterraform) {
+	void do_dg_terraform(room_data *target, sector_data *sect);
+
+	char loc_arg[MAX_INPUT_LENGTH], sect_arg[MAX_INPUT_LENGTH];
+	sector_data *sect;
+	room_data *target;
+	sector_vnum vnum;
+
+	argument = any_one_word(argument, loc_arg);
+	any_one_word(argument, sect_arg);
+	
+	// usage: %terraform% [location] <sector vnum>
+	if (!*loc_arg) {
+		wld_log(room, "oterraform: bad syntax");
+		return;
+	}
+	
+	// check number of args
+	if (!*sect_arg) {
+		// only arg is actually sect arg
+		strcpy(sect_arg, loc_arg);
+		target = room;
+	}
+	else {
+		// two arguments
+		target = get_room(room, loc_arg);
+	}
+	
+	if (!target) {
+		wld_log(room, "oterraform: target is an invalid room");
+		return;
+	}
+	
+	// places you just can't terraform -- fail silently (currently)
+	if (IS_INSIDE(target) || IS_ADVENTURE_ROOM(target) || IS_CITY_CENTER(target)) {
+		return;
+	}
+	
+	if (!isdigit(*sect_arg) || (vnum = atoi(sect_arg)) < 0 || !(sect = sector_proto(vnum))) {
+		wld_log(room, "oterraform: invalid sector vnum");
+		return;
+	}
+	
+	// validate sect
+	if (SECT_FLAGGED(sect, SECTF_MAP_BUILDING | SECTF_INSIDE | SECTF_ADVENTURE)) {
+		wld_log(room, "oterraform: sector requires data that can't be set this way");
+		return;
+	}
+
+	// good to go
+	do_dg_terraform(target, sect);
+}
+
+
 WCMD(do_wforce) {
 	char_data *ch, *next_ch;
 	char arg1[MAX_INPUT_LENGTH], *line;
@@ -879,6 +934,7 @@ const struct wld_command_info wld_cmd_info[] = {
 	{ "wscale", do_wscale, NO_SCMD },
 	{ "wsend", do_wsend, SCMD_WSEND },
 	{ "wteleport", do_wteleport, NO_SCMD },
+	{ "wterraform", do_wterraform, NO_SCMD },
 	{ "wbuildingecho", do_wbuildingecho, NO_SCMD },
 	{ "wregionecho", do_wregionecho, NO_SCMD },
 	{ "wdamage", do_wdamage, NO_SCMD },

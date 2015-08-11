@@ -214,6 +214,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	
 	char_data *proto, *mob_iter, *next_mob;
 	descriptor_data *desc;
+	struct global_data *glb, *next_glb;
 	room_template *rmt, *next_rmt;
 	sector_data *sect, *next_sect;
 	crop_data *crop, *next_crop;
@@ -267,6 +268,14 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 		found |= delete_from_interaction_list(&GET_CROP_INTERACTIONS(crop), TYPE_MOB, vnum);
 		if (found) {
 			save_library_file_for_vnum(DB_BOOT_CROP, GET_CROP_VNUM(crop));
+		}
+	}
+	
+	// update globals
+	HASH_ITER(hh, globals_table, glb, next_glb) {
+		found = delete_from_interaction_list(&GET_GLOBAL_INTERACTIONS(glb), TYPE_MOB, vnum);
+		if (found) {
+			save_library_file_for_vnum(DB_BOOT_GLB, GET_GLOBAL_VNUM(glb));
 		}
 	}
 	
@@ -355,6 +364,7 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 	struct spawn_info *spawn;
 	struct adventure_spawn *asp;
 	struct interaction_item *inter;
+	struct global_data *glb, *next_glb;
 	room_template *rmt, *next_rmt;
 	sector_data *sect, *next_sect;
 	crop_data *crop, *next_crop;
@@ -404,6 +414,18 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "CRP [%5d] %s\r\n", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
+			}
+		}
+	}
+	
+	// globals
+	HASH_ITER(hh, globals_table, glb, next_glb) {
+		any = FALSE;
+		for (inter = GET_GLOBAL_INTERACTIONS(glb); inter && !any; inter = inter->next) {
+			if (interact_vnum_types[inter->type] == TYPE_MOB && inter->vnum == vnum) {
+				any = TRUE;
+				++found;
+				size += snprintf(buf + size, sizeof(buf) - size, "GLB [%5d] %s\r\n", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
 			}
 		}
 	}

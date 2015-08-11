@@ -23,6 +23,7 @@
 #include "handler.h"
 #include "db.h"
 #include "skills.h"
+#include "vnums.h"
 
 // external vars
 extern const char *damage_types[];
@@ -511,6 +512,60 @@ OCMD(do_oteleport) {
 }
 
 
+OCMD(do_oterraform) {
+	void do_dg_terraform(room_data *target, sector_data *sect);
+
+	char loc_arg[MAX_INPUT_LENGTH], sect_arg[MAX_INPUT_LENGTH];
+	sector_data *sect;
+	room_data *orm = obj_room(obj), *target;
+	sector_vnum vnum;
+
+	argument = any_one_word(argument, loc_arg);
+	any_one_word(argument, sect_arg);
+	
+	// usage: %terraform% [location] <sector vnum>
+	if (!*loc_arg) {
+		obj_log(obj, "oterraform: bad syntax");
+		return;
+	}
+	
+	// check number of args
+	if (!*sect_arg) {
+		// only arg is actually sect arg
+		strcpy(sect_arg, loc_arg);
+		target = orm;
+	}
+	else {
+		// two arguments
+		target = get_room(orm, loc_arg);
+	}
+	
+	if (!target) {
+		obj_log(obj, "oterraform: target is an invalid room");
+		return;
+	}
+	
+	// places you just can't terraform -- fail silently (currently)
+	if (IS_INSIDE(target) || IS_ADVENTURE_ROOM(target) || IS_CITY_CENTER(target)) {
+		return;
+	}
+	
+	if (!isdigit(*sect_arg) || (vnum = atoi(sect_arg)) < 0 || !(sect = sector_proto(vnum))) {
+		obj_log(obj, "oterraform: invalid sector vnum");
+		return;
+	}
+	
+	// validate sect
+	if (SECT_FLAGGED(sect, SECTF_MAP_BUILDING | SECTF_INSIDE | SECTF_ADVENTURE)) {
+		obj_log(obj, "oterraform: sector requires data that can't be set this way");
+		return;
+	}
+
+	// good to go
+	do_dg_terraform(target, sect);
+}
+
+
 OCMD(do_dgoload) {
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	
@@ -976,6 +1031,7 @@ const struct obj_command_info obj_cmd_info[] = {
 	{ "osend", do_osend, SCMD_OSEND },
 	{ "osetval", do_osetval, NO_SCMD },
 	{ "oteleport", do_oteleport, NO_SCMD },
+	{ "oterraform", do_oterraform, NO_SCMD },
 	{ "otimer", do_otimer, NO_SCMD },
 	{ "otransform", do_otransform, NO_SCMD },
 	{ "obuildingecho", do_obuildingecho, NO_SCMD }, /* fix by Rumble */

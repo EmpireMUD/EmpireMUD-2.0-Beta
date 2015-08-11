@@ -558,10 +558,6 @@ I 4 10037 100.00 1  # LOOT: a greater skystone
 I 4 10076 15.00 1 X  # LOOT: phoenix bone earrings
 I 4 10075 15.00 1 X  # LOOT: an arcane dagger
 I 4 10074 10.00 1 X  # LOOT: the Grand High Sorcerer robes
-I 4 2347 1.00 1 c  # LOOT: the alchemical filter pattern
-I 4 2348 1.00 1 c  # LOOT: the antiquated device design
-I 4 2349 1.00 1 c  # LOOT: the concealed pouch pattern
-I 4 2350 1.00 1 c  # LOOT: the tinker's harness pattern
 T 10046
 T 10061
 T 10062

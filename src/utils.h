@@ -24,6 +24,7 @@
 *   Descriptor Utils
 *   Empire Utils
 *   Fight Utils
+*   Global Utils
 *   Map Utils
 *   Memory Utils
 *   Mobile Utils
@@ -346,6 +347,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_OLC_BUILDING(desc)  ((desc)->olc_building)
 #define GET_OLC_CRAFT(desc)  ((desc)->olc_craft)
 #define GET_OLC_CROP(desc)  ((desc)->olc_crop)
+#define GET_OLC_GLOBAL(desc)  ((desc)->olc_global)
 #define GET_OLC_MOBILE(desc)  ((desc)->olc_mobile)
 #define GET_OLC_OBJECT(desc)  ((desc)->olc_object)
 #define GET_OLC_ROOM_TEMPLATE(desc)  ((desc)->olc_room_template)
@@ -411,6 +413,20 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 //// FIGHT UTILS /////////////////////////////////////////////////////////////
 
 #define SHOULD_APPEAR(ch)  AFF_FLAGGED(ch, AFF_HIDE | AFF_INVISIBLE)
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// GLOBAL UTILS ////////////////////////////////////////////////////////////
+
+#define GET_GLOBAL_VNUM(glb)  ((glb)->vnum)
+#define GET_GLOBAL_NAME(glb)  ((glb)->name)
+#define GET_GLOBAL_TYPE(glb)  ((glb)->type)
+#define GET_GLOBAL_FLAGS(glb)  ((glb)->flags)
+#define GET_GLOBAL_TYPE_EXCLUDE(glb)  ((glb)->type_exclude)
+#define GET_GLOBAL_TYPE_FLAGS(glb)  ((glb)->type_flags)
+#define GET_GLOBAL_MIN_LEVEL(glb)  ((glb)->min_level)
+#define GET_GLOBAL_MAX_LEVEL(glb)  ((glb)->max_level)
+#define GET_GLOBAL_INTERACTIONS(glb)  ((glb)->interactions)
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1083,6 +1099,7 @@ extern char *bitv_to_alpha(bitvector_t flags);
 extern char *delete_doubledollar(char *string);
 extern const char *double_percents(const char *string);
 extern bool isname(const char *str, const char *namelist);
+extern char *level_range_string(int min, int max, int current);
 extern bool multi_isname(const char *arg, const char *namelist);
 extern char *CAP(char *txt);
 extern char *fname(const char *namelist);

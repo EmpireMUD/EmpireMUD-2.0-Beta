@@ -59,13 +59,6 @@
 *   Miscellaneous Handlers
 */
 
-
-#define MATCH_ITEM_NAME(str, obj)  (isname((str), GET_OBJ_KEYWORDS(obj)) || (IS_BOOK(obj) && isname((str), get_book_item_name_by_id(GET_BOOK_ID(obj)))) || (IS_DRINK_CONTAINER(obj) && GET_DRINK_CONTAINER_CONTENTS(obj) > 0 && isname((str), drinks[GET_DRINK_CONTAINER_TYPE(obj)])))
-#define MATCH_CHAR_DISGUISED_NAME(str, ch)  (isname((str), PERS((ch),(ch),FALSE)))
-#define MATCH_CHAR_NAME(str, ch)  ((!IS_NPC(ch) && GET_LASTNAME(ch) && isname((str), GET_LASTNAME(ch))) || isname((str), GET_PC_NAME(ch)) || MATCH_CHAR_DISGUISED_NAME(str, ch))
-#define MATCH_CHAR_NAME_ROOM(viewer, str, target)  ((IS_DISGUISED(target) && !IS_IMMORTAL(viewer) && !SAME_EMPIRE(viewer, target)) ? MATCH_CHAR_DISGUISED_NAME(str, target) : MATCH_CHAR_NAME(str, target))
-
-
 // externs
 extern const int confused_dirs[NUM_SIMPLE_DIRS][2][NUM_OF_DIRS];
 extern const char *drinks[];
@@ -2964,6 +2957,66 @@ bool has_interaction(struct interaction_item *list, int type) {
 	}
 	
 	return found;
+}
+
+
+/**
+* Attempts to run global mob interactions -- interactions from the globals table.
+*
+* @param char_data *ch The player who is interacting.
+* @param char_data *mob The NPC being interacted-with.
+* @param int type Any INTERACT_x const.
+* @param INTERACTION_FUNC(*func) A callback function to run for the interaction.
+*/
+bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERACTION_FUNC(*func)) {
+	extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
+	
+	struct global_data *glb, *next_glb;
+	bool any = FALSE;
+	adv_data *adv;
+	
+	// no work
+	if (!ch || !mob || !IS_NPC(mob) || !func) {
+		return FALSE;
+	}
+	
+	adv = get_adventure_for_vnum(GET_MOB_VNUM(mob));
+
+	HASH_ITER(hh, globals_table, glb, next_glb) {
+		if (GET_GLOBAL_TYPE(glb) != GLOBAL_MOB_INTERACTIONS) {
+			continue;
+		}
+		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_IN_DEVELOPMENT)) {
+			continue;
+		}
+		
+		// level limits
+		if (GET_GLOBAL_MIN_LEVEL(glb) > 0 && GET_CURRENT_SCALE_LEVEL(mob) < GET_GLOBAL_MIN_LEVEL(glb)) {
+			continue;
+		}
+		if (GET_GLOBAL_MAX_LEVEL(glb) > 0 && GET_CURRENT_SCALE_LEVEL(mob) > GET_GLOBAL_MAX_LEVEL(glb)) {
+			continue;
+		}
+		
+		// match ALL type-flags
+		if ((MOB_FLAGS(mob) & GET_GLOBAL_TYPE_FLAGS(glb)) != GET_GLOBAL_TYPE_FLAGS(glb)) {
+			continue;
+		}
+		// match ZERO type-excludes
+		if ((MOB_FLAGS(mob) & GET_GLOBAL_TYPE_EXCLUDE(glb)) != 0) {
+			continue;
+		}
+		
+		// check adventure-only -- late-matching because it does more work than other conditions
+		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_ADVENTURE_ONLY) && get_adventure_for_vnum(GET_GLOBAL_VNUM(glb)) != adv) {
+			continue;
+		}
+		
+		// we have a match!
+		any |= run_interactions(ch, GET_GLOBAL_INTERACTIONS(glb), type, IN_ROOM(ch), mob, NULL, func);
+	}
+	
+	return any;
 }
 
 

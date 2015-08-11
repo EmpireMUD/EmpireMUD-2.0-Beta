@@ -38,6 +38,7 @@ extern int dg_owner_purged;
 extern const char *action_bits[];
 extern const char *affected_bits[];
 extern const char *affect_types[];
+extern const char *drinks[];
 extern const char *extra_bits[];
 extern const char *item_types[];
 extern const char *genders[];
@@ -53,8 +54,10 @@ extern const struct wear_data_type wear_data[NUM_WEARS];
 extern int find_ability_by_name(char *name, bool allow_abbrev);
 extern int find_skill_by_name(char *name);
 void free_varlist(struct trig_var_data *vd);
+extern char *get_book_item_name_by_id(int id);
 extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
 extern bool is_fight_enemy(char_data *ch, char_data *frenemy);	// fight.c
+extern int is_substring(char *sub, char *string);
 extern room_data *obj_room(obj_data *obj);
 trig_data *read_trigger(trig_vnum vnum);
 obj_data *get_object_in_equip(char_data *ch, char *name);
@@ -1449,6 +1452,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 	char *purge[] = {"mpurge ", "opurge ", "wpurge " };
 	char *scale[] = {"mscale ", "oscale ", "wscale " };
 	char *teleport[] = {"mteleport ", "oteleport ", "wteleport " };
+	char *terraform[] = {"mterraform ", "oterraform ", "wterraform " };
 	/* the x kills a 'shadow' warning in gcc. */
 	char *xdamage[] = {"mdamage ", "odamage ", "wdamage " };
 	char *xaoe[] = {"maoe ", "oaoe ", "waoe " };
@@ -1503,6 +1507,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				snprintf(str, slen, "%s", scale[type]);
 			else if (!str_cmp(var, "teleport"))
 				snprintf(str, slen, "%s", teleport[type]);
+			else if (!str_cmp(var, "terraform"))
+				snprintf(str, slen, "%s", terraform[type]);
 			else if (!str_cmp(var, "damage"))
 				snprintf(str, slen, "%s", xdamage[type]);
 			else if (!str_cmp(var, "aoe"))
@@ -1654,12 +1660,20 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 			}
 			else if (!str_cmp(var, "instance")) {
 				extern struct instance_data *find_instance_by_room(room_data *room);
+				extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 				struct instance_data *inst = NULL;
 				room_data *orm;
 				switch (type) {
-					case MOB_TRIGGER:
-						inst = find_instance_by_room(IN_ROOM((char_data*)go));
+					case MOB_TRIGGER: {
+						// try mob first
+						if (MOB_INSTANCE_ID((char_data*)go) != NOTHING) {
+							inst = get_instance_by_id(MOB_INSTANCE_ID((char_data*)go));
+						}
+						if (!inst) {
+							inst = find_instance_by_room(IN_ROOM((char_data*)go));
+						}
 						break;
+					}
 					case OBJ_TRIGGER:
 						if ((orm = obj_room((obj_data*)go))) {
 							inst = find_instance_by_room(orm);
@@ -1678,8 +1692,24 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				else if (!str_cmp(field, "id")) {
 					snprintf(str, slen, "%d", inst->id);
 				}
+				else if (!str_cmp(field, "location")) {
+					if (inst->location) {
+						snprintf(str, slen, "%c%d", UID_CHAR, GET_ROOM_VNUM(inst->location) + ROOM_ID_BASE);
+					}
+					else {
+						snprintf(str, slen, "0");
+					}
+				}
 				else if (!str_cmp(field, "name")) {
 					snprintf(str, slen, "%s", GET_ADV_NAME(inst->adventure));
+				}
+				else if (!str_cmp(field, "start")) {
+					if (inst->start) {
+						snprintf(str, slen, "%c%d", UID_CHAR, GET_ROOM_VNUM(inst->start) + ROOM_ID_BASE);
+					}
+					else {
+						snprintf(str, slen, "0");
+					}
 				}
 				else {
 					// no field
@@ -1976,6 +2006,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "cha") || !str_cmp(field, "charisma")) {
 						snprintf(str, slen, "%d", GET_CHARISMA(c));
 					}
+					else if (!str_cmp(field, "crafting_level")) {
+						extern int get_crafting_level(char_data *ch);
+						snprintf(str, slen, "%d", get_crafting_level(c));
+					}
 
 					break;
 				case 'd':
@@ -2138,6 +2172,15 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				case 'i':
 					if (!str_cmp(field, "id"))
 						snprintf(str, slen, "%d", GET_ID(c));
+
+					else if (!str_cmp(field, "is_name")) {
+						if (subfield && *subfield && MATCH_CHAR_NAME(subfield, c)) {
+							snprintf(str, slen, "1");
+						}
+						else {
+							snprintf(str, slen, "0");
+						}
+					}
 
 					/* new check for pc/npc status */
 					else if (!str_cmp(field, "is_pc")) {
@@ -2570,7 +2613,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					
 					else if (!str_cmp(field, "is_name")) {
-						if (subfield && *subfield && multi_isname(subfield, GET_OBJ_KEYWORDS(o))) {
+						if (subfield && *subfield && MATCH_ITEM_NAME(subfield, o)) {
 							snprintf(str, slen, "1");
 						}
 						else {
@@ -3296,7 +3339,7 @@ void eval_op(char *op, char *lhs, char *rhs, char *result, void *go, struct scri
 		sprintf(result, "%c", is_abbrev(rhs, lhs) ? '1' : '0');
 	
 	else if (!strcmp("~=", op))
-		sprintf(result, "%c", str_str(lhs, rhs) ? '1' : '0');
+		sprintf(result, "%c", is_substring(rhs, lhs) ? '1' : '0');
 
 	else if (!strcmp("*", op))
 		sprintf(result, "%d", atoi(lhs) * atoi(rhs));
@@ -3399,6 +3442,7 @@ int eval_lhs_op_rhs(char *expr, char *result, void *go, struct script_data *sc, 
 		"<",
 		">",
 		"/=",
+		"~=",
 		"-",
 		"+",
 		"/",

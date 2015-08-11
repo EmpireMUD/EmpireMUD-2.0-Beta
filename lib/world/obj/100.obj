@@ -118,8 +118,6 @@ A
 13 2
 A
 12 1
-C
-0 0
 S
 #10008
 longsword sword red-hot firebrand~
@@ -166,8 +164,6 @@ A
 17 2
 A
 2 1
-C
-0 0
 S
 #10011
 grate sewer~
@@ -185,9 +181,11 @@ the exit~
 A ladder leads up to the sewer's exit.~
 The scent of fresh air wafts down from the sewer's exit.
 ~
-8 0 0 1
+8 0 0 2
 -1 0 0
 2 0
+T 10450
+T 10451
 S
 #10013
 skin rat skins pile filthy~
@@ -212,8 +210,6 @@ A
 2 1
 A
 9 1
-C
-0 0
 S
 #10015
 totem ratskin furry~
@@ -228,8 +224,6 @@ A
 2 1
 A
 9 1
-C
-0 0
 S
 #10016
 meat hunk rat spoiled~
@@ -262,8 +256,6 @@ It doesn't look like this would do much damage.
 13 0
 A
 2 3
-C
-0 0
 S
 #10019
 cloak hooded~
@@ -278,8 +270,6 @@ A
 4 2
 A
 6 1
-C
-0 0
 S
 #10020
 cheese bits~
@@ -305,8 +295,6 @@ A
 1 1
 A
 17 1
-C
-0 0
 S
 #10022
 ring spider-hair hair creepy~
@@ -321,8 +309,6 @@ A
 12 1
 A
 17 1
-C
-0 0
 S
 #10023
 ring lucky shiny~
@@ -337,8 +323,6 @@ A
 8 1
 A
 9 1
-C
-0 0
 S
 #10024
 vial sewage grimy~
@@ -361,8 +345,6 @@ It looks like someone turned a rat's nest into a hat, and you don't know why.
 0 0
 A
 9 1
-C
-0 0
 S
 #10026
 corpse bloated~
@@ -388,8 +370,6 @@ A
 18 1
 A
 15 1
-C
-0 0
 S
 #10030
 buffet bufet~
@@ -446,8 +426,6 @@ The wand is made from a truly gnarly tree branch.
 ~
 1 mo an 1
 0 1 16
-0 0
-C
 0 0
 S
 #10035
@@ -564,8 +542,6 @@ A
 6 2
 A
 11 1
-C
-0 0
 S
 #10043
 robes set page~
@@ -580,8 +556,6 @@ A
 11 1
 A
 6 1
-C
-0 0
 S
 #10044
 book skycleaver spellbook~
@@ -596,8 +570,6 @@ A
 17 2
 A
 16 1
-C
-0 0
 S
 #10045
 robes set apprentice~
@@ -612,8 +584,6 @@ A
 8 1
 A
 9 1
-C
-0 0
 S
 #10046
 whip goblin wrangler green~
@@ -626,8 +596,6 @@ This whip is good for just one thing: goblin wrangling.
 7 0
 A
 17 1
-C
-0 0
 S
 #10047
 pants pair wrangler goblin~
@@ -642,8 +610,6 @@ A
 18 1
 A
 2 2
-C
-0 0
 S
 #10048
 sword shortsword goblin~
@@ -656,8 +622,6 @@ This shortsword was certainly crafted by goblins.
 2 0
 A
 5 -1
-C
-0 0
 S
 #10049
 vest goblin's goblins~
@@ -672,8 +636,6 @@ A
 9 1
 A
 5 -1
-C
-0 0
 S
 #10050
 skull goblin~
@@ -688,8 +650,6 @@ A
 17 1
 A
 5 -1
-C
-0 0
 S
 #10051
 armor goblin pleated set~
@@ -706,8 +666,6 @@ A
 17 1
 A
 18 1
-C
-0 0
 S
 #10052
 vial pixy pixie dust~
@@ -730,8 +688,6 @@ You can see straight through it!
 8 0
 A
 2 1
-C
-0 0
 S
 #10054
 shield glass~
@@ -746,8 +702,6 @@ A
 13 1
 A
 7 4
-C
-0 0
 S
 #10055
 earcuff pointed cuff~
@@ -760,8 +714,6 @@ It's made of copper and gives your ears the impression of having points.
 13 0
 A
 8 1
-C
-0 0
 S
 #10056
 doublet glimmering~
@@ -786,8 +738,6 @@ This appears to be made from a baculum.
 14 0
 A
 9 1
-C
-0 0
 S
 #10058
 pocket double-pocket~
@@ -800,8 +750,6 @@ This appears to be two pockets, occupying the same space.
 11 0
 A
 18 1
-C
-0 0
 S
 #10059
 gauntlet single otherworlder's~
@@ -812,8 +760,6 @@ This strange gauntlet pulses with power.
 1 mo ano 1
 0 1 15
 2 0
-C
-0 0
 S
 #10060
 wristbands otherworlder's otherworldly~
@@ -828,8 +774,6 @@ A
 1 1
 A
 13 1
-C
-0 0
 S
 #10061
 bindings lich~
@@ -846,8 +790,6 @@ A
 9 1
 A
 17 1
-C
-0 0
 S
 #10062
 cloak tattered lich~
@@ -864,8 +806,6 @@ A
 16 1
 A
 7 1
-C
-0 0
 S
 #10063
 club bone large~
@@ -882,8 +822,6 @@ A
 4 -1
 A
 15 1
-C
-0 0
 S
 #10064
 chains ghastly piled~
@@ -896,8 +834,6 @@ These chains are cold to the touch.
 2 0
 A
 18 1
-C
-0 0
 S
 #10065
 backpack armored~
@@ -956,8 +892,6 @@ A
 16 2
 A
 7 1
-C
-0 0
 S
 #10069
 belt silk majestic~
@@ -974,8 +908,6 @@ A
 11 3
 A
 6 1
-C
-0 0
 S
 #10070
 ring impact reverse sparkling~
@@ -990,8 +922,6 @@ A
 12 4
 A
 1 1
-C
-0 0
 S
 #10071
 grimoire arcane barrosh's~
@@ -1008,8 +938,6 @@ A
 7 3
 A
 8 1
-C
-0 0
 S
 #10072
 staff apollus appollus~
@@ -1024,8 +952,6 @@ A
 8 3
 A
 7 3
-C
-0 0
 S
 #10073
 goggles crystal-clear clear pair~
@@ -1056,8 +982,6 @@ A
 16 1
 A
 7 1
-C
-0 0
 S
 #10075
 dagger arcane black~
@@ -1072,8 +996,6 @@ A
 7 3
 A
 16 2
-C
-0 0
 S
 #10076
 earrings bone phoenix pair~
@@ -1086,8 +1008,6 @@ These earrings are made from the bones of an actual phoenix!
 14 0
 A
 9 1
-C
-0 0
 S
 #10077
 handwraps wraps experimental~
@@ -1100,8 +1020,6 @@ You're not really sure what these are, but you found them on somebody's hands.
 10 0
 A
 3 1
-C
-0 0
 S
 #10078
 aura experimental~
@@ -1116,7 +1034,5 @@ A
 12 1
 A
 1 -3
-C
-0 0
 S
 $

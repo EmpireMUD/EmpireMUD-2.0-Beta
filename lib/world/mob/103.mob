@@ -1,0 +1,91 @@
+#10300
+dragon flame~
+the flame dragon~
+A flame dragon is reducing the countryside to ash!
+~
+100 150 dgxA c
+0 0 5 16
+I 0 3012 50.00 4  # BUTCHER: a fillet of raw meat
+I 0 3012 100.00 4  # BUTCHER: a fillet of raw meat
+I 1 10006 100.00 1  # SKIN: a dragon scale
+I 1 1351 50.00 2  # SKIN: a large skin
+I 1 1351 100.00 2  # SKIN: a large skin
+I 4 10300 4.00 1 a  # LOOT: the dragon's hoard
+I 4 10301 4.00 1 a  # LOOT: a dragon egg
+I 4 10312 4.00 1 a  # LOOT: the dragonscale leggings pattern
+I 4 10313 4.00 1 a  # LOOT: the dragonweave stockings pattern
+I 4 10314 4.00 1 a  # LOOT: the dragonplate breeches pattern
+I 4 10315 4.00 1 a  # LOOT: the dragonmail chaps pattern
+I 4 10304 19.00 1 a  # LOOT: the dragon's breath charm
+I 4 10305 19.00 1 a  # LOOT: the dragon's ferocity charm
+I 4 10306 19.00 1 a  # LOOT: the dragon's courage charm
+I 4 10307 19.00 1 a  # LOOT: the dragon's wind charm
+T 10300
+T 10304
+T 10303
+T 10302
+S
+#10301
+dragon hatchling~
+the dragon hatchling~
+A dragon hatchling is rolling about.
+~
+1 1 bdoD mn
+0 0 2 9
+T 10305
+T 10306
+S
+#10302
+rabbit fiery~
+a fiery rabbit~
+A fiery rabbit is hopping about, leaving ashes.
+~
+1 10 djo 0
+0 0 15 9
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 1 1350 100.00 1  # SKIN: a small skin
+S
+#10303
+imp flame little~
+a flame imp~
+A little imp is jumping from flame to flame.
+~
+1 15 doA 0
+0 0 9 16
+S
+#10304
+phoenix scorched~
+a scorched phoenix~
+A scorched phoenix soars low above you!
+~
+100 125 deho m
+0 0 2 12
+S
+#10305
+firefly giant~
+a giant firefly~
+A giant firefly buzzes about.
+~
+5 10 djo m
+0 0 2 12
+S
+#10306
+salamander burning~
+a burning salamander~
+A burning salamander crawls out from some rotting wood.
+~
+10 20 djo 0
+0 0 9 12
+I 0 3012 50.00 1  # BUTCHER: a fillet of raw meat
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 1 1350 100.00 1  # SKIN: a small skin
+S
+#10307
+flame flickering~
+a flickering flame~
+A flickering flame is burning the fields.
+~
+30 50 doA 0
+0 0 18 16
+S
+$

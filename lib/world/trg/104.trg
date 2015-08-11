@@ -348,4 +348,186 @@ end
 %echoaround% %actor% %actor.name% uses %self.shortdesc% and a new mount appears!
 %purge% %self%
 ~
+#10450
+Sewer Ladder: Exit~
+1 c 4
+exit~
+%echoaround% %actor% %actor.name% climbs up out of the sewer.
+%teleport% %actor% %instance.location%
+%echoaround% %actor% %actor.name% climbs up out of the sewer.
+%force% %actor% look
+~
+#10451
+Sewer Ladder: Climb~
+1 c 4
+climb~
+%echoaround% %actor% %actor.name% climbs up out of the sewer.
+%teleport% %actor% %instance.location%
+%echoaround% %actor% %actor.name% climbs up out of the sewer.
+%force% %actor% look
+~
+#10452
+Sewer Environment~
+2 b 5
+~
+switch %random.4%
+  case 1
+    %echo% The sound of dripping echoes in the distance.
+  break
+  case 2
+    %echo% The stench of raw sewage nearly makes you gag.
+  break
+  case 3
+    %echo% Something furry brushes past your ankle!
+  break
+  default
+    %echo% The rancid smell of waste is thick in the air.
+  break
+done
+~
+#10453
+Goblin Outpost Melee~
+0 k 10
+~
+switch %random.2%
+  case 1
+    kick
+  break
+  case 2
+    jab
+  break  
+done
+~
+#10456
+Wargreyn combat~
+0 k 8
+~
+switch %random.2%
+  case 1
+    bash
+  break
+  case 2
+    disarm
+  break
+done
+~
+#10457
+Dryleef purchase~
+0 c 0
+buy~
+eval vnum -1
+set named a thing
+if (!%arg%)
+  %send% %actor% Type 'look sign' to see what's available.
+  halt
+elseif war tent /= %arg%
+  eval vnum 10479
+  set named a goblin war tent
+elseif message post /= %arg%
+  eval vnum 10480
+  set named a goblin message post
+elseif lab tent /= %arg%
+  eval vnum 10481
+  set named a goblin lab tent
+elseif dolmen stone /= %arg%
+  eval vnum 10482
+  set named a goblin dolmen stone
+else
+  %send% %actor% They don't seem to sell '%arg%' here.
+  halt
+end
+if !%actor.can_afford(500)%
+  %send% %actor% %self.name% tells you, 'Human needs 500 coin to buy that.'
+  halt
+end
+nop %actor.charge_coins(500)%
+%load% obj %vnum% %actor% inv
+%send% %actor% You buy %named% for 500 coins.
+%echoaround% %actor% %actor.name% buys %named%.
+~
+#10458
+Pimmin purchase~
+0 c 0
+buy~
+eval vnum -1
+set named a thing
+if (!%arg%)
+  %send% %actor% Type 'look sign' to see what's available.
+  halt
+elseif violet leopard shawl pattern /= %arg%
+  eval vnum 10473
+  set named the violet leopard shawl pattern
+elseif wildfire gloves pattern /= %arg%
+  eval vnum 10474
+  set named the wildfire gloves pattern
+else
+  %send% %actor% They don't seem to sell '%arg%' here.
+  halt
+end
+if !%actor.can_afford(500)%
+  %send% %actor% %self.name% tells you, 'Human needs 500 coin to buy that.'
+  halt
+end
+nop %actor.charge_coins(500)%
+%load% obj %vnum% %actor% inv
+%send% %actor% You buy %named% for 500 coins.
+%echoaround% %actor% %actor.name% buys %named%.
+~
+#10459
+Shivsper Purchase~
+0 c 0
+buy~
+eval vnum -1
+set named a thing
+set ratfur rat-fur cloak pattern
+if (!%arg%)
+  %send% %actor% Type 'look sign' to see what's available.
+  halt
+elseif %ratfur% /= %arg%
+  eval vnum 10475
+  set named the rat-fur cloak pattern
+elseif wooden gauntlets pattern /= %arg%
+  eval vnum 10476
+  set named the wooden gauntlets pattern
+else
+  %send% %actor% They don't seem to sell '%arg%' here.
+  halt
+end
+if !%actor.can_afford(500)%
+  %send% %actor% %self.name% tells you, 'Human needs 500 coin to buy that.'
+  halt
+end
+nop %actor.charge_coins(500)%
+%load% obj %vnum% %actor% inv
+%send% %actor% You buy %named% for 500 coins.
+%echoaround% %actor% %actor.name% buys %named%.
+~
+#10460
+Wargreyn buy~
+0 c 0
+buy~
+eval vnum -1
+set named a thing
+if (!%arg%)
+  %send% %actor% Type 'look sign' to see what's available.
+  halt
+elseif mesh cloak pattern /= %arg%
+  eval vnum 10477
+  set named the mesh cloak pattern
+elseif heavy goblin gauntlets pattern /= %arg%
+  eval vnum 10478
+  set named the heavy goblin gauntlets pattern
+else
+  %send% %actor% They don't seem to sell '%arg%' here.
+  halt
+end
+if !%actor.can_afford(500)%
+  %send% %actor% %self.name% tells you, 'Human needs 500 coin to buy that.'
+  halt
+end
+nop %actor.charge_coins(500)%
+%load% obj %vnum% %actor% inv
+%send% %actor% You buy %named% for 500 coins.
+%echoaround% %actor% %actor.name% buys %named%.
+~
 $

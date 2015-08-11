@@ -85,10 +85,6 @@ I 4 10418 4.00 1 X  # LOOT: a skeletal horse whip
 I 4 10421 20.00 1 X  # LOOT: a mammoth spear
 I 4 10422 20.00 1 X  # LOOT: an imperium-weave cloak
 I 4 10423 20.00 1 X  # LOOT: shackles of the undead
-I 4 2347 1.00 1 c  # LOOT: the alchemical filter pattern
-I 4 2348 1.00 1 c  # LOOT: the antiquated device design
-I 4 2349 1.00 1 c  # LOOT: the concealed pouch pattern
-I 4 2350 1.00 1 c  # LOOT: the tinker's harness pattern
 T 10405
 T 10406
 T 10410
@@ -170,10 +166,6 @@ I 4 10418 4.00 1 X  # LOOT: a skeletal horse whip
 I 4 10427 20.00 1 X  # LOOT: the infernomancer's flame
 I 4 10428 20.00 1 X  # LOOT: the purifying flame
 I 4 10429 20.00 1 X  # LOOT: a terrifying leather mask
-I 4 2347 1.00 1 c  # LOOT: the alchemical filter pattern
-I 4 2348 1.00 1 c  # LOOT: the antiquated device design
-I 4 2349 1.00 1 c  # LOOT: the concealed pouch pattern
-I 4 2350 1.00 1 c  # LOOT: the tinker's harness pattern
 T 10405
 T 10406
 T 10412
@@ -255,10 +247,6 @@ I 4 10418 4.00 1 X  # LOOT: a skeletal horse whip
 I 4 10433 20.00 1 X  # LOOT: Fiendclaw
 I 4 10434 20.00 1 X  # LOOT: deathlace gloves
 I 4 10435 20.00 1 X  # LOOT: a hanged man's hand
-I 4 2347 1.00 1 c  # LOOT: the alchemical filter pattern
-I 4 2348 1.00 1 c  # LOOT: the antiquated device design
-I 4 2349 1.00 1 c  # LOOT: the concealed pouch pattern
-I 4 2350 1.00 1 c  # LOOT: the tinker's harness pattern
 T 10405
 T 10406
 T 10409
@@ -314,5 +302,94 @@ A huge skeletal warmammoth looms down on you.
 ~
 100 120 dejy 0
 0 0 0 5
+S
+#10450
+rat sewer trained~
+a trained sewer rat~
+A trained rat scurries alongside you.
+~
+0 75 adj c
+0 0 7 9
+I 0 10016 50.00 1  # BUTCHER: a hunk of rat meat
+I 1 10013 100.00 1  # SKIN: a rat skin
+T 10014
+S
+#10451
+dryleef vanguard leader goblin~
+Dryleef, vanguard leader~
+Dryleef, leader of the goblin vanguard, is sitting on the throne.
+~
+0 0 bdy 0
+1 0 0 5
+I 4 10452 5.00 1 a  # LOOT: Pimmin's ring
+I 4 10453 5.00 1 a  # LOOT: a bone charm necklace
+I 4 10454 5.00 1 a  # LOOT: a chicken-bone wand
+I 4 10455 5.00 1 a  # LOOT: the goblinward tome
+I 4 10458 5.00 1 a  # LOOT: Shivsper's poison ring
+I 4 10459 5.00 1 a  # LOOT: a gaudy copper chain
+I 4 10460 5.00 1 a  # LOOT: someone else's axe
+I 4 10461 5.00 1 a  # LOOT: a giant dagger
+I 4 10464 5.00 1 a  # LOOT: Wargreyn's ring
+I 4 10465 5.00 1 a  # LOOT: the blacksmith's charm
+I 4 10466 5.00 1 a  # LOOT: the goblinsmith's hammer
+I 4 10467 5.00 1 a  # LOOT: a wargskull shield
+T 10457
+T 10453
+S
+#10452
+pimmin shaman goblin~
+Pimmin, goblin shaman~
+A goblin shaman is swirling a vial with a rat tail.
+~
+0 0 bdxy 0
+2 0 0 16
+I 4 10452 15.00 1 a  # LOOT: Pimmin's ring
+I 4 10453 15.00 1 a  # LOOT: a bone charm necklace
+I 4 10454 15.00 1 a  # LOOT: a chicken-bone wand
+I 4 10455 15.00 1 a  # LOOT: the goblinward tome
+T 10458
+T 10214
+S
+#10453
+shivsper goblin assassin~
+Shivsper, goblin assassin~
+Shivsper throws a dagger at a crude drawing of a human on the wall.
+~
+0 0 bdyz 0
+1 0 0 4
+I 4 10458 15.00 1 a  # LOOT: Shivsper's poison ring
+I 4 10459 15.00 1 a  # LOOT: a gaudy copper chain
+I 4 10460 15.00 1 a  # LOOT: someone else's axe
+I 4 10461 15.00 1 a  # LOOT: a giant dagger
+T 10459
+T 10453
+S
+#10454
+wargreyn goblin smith blacksmith~
+Wargreyn, goblin blacksmith~
+Wargreyn, the goblin smith, is resting by the forge.
+~
+0 0 bdy 0
+2 0 0 6
+I 4 10464 15.00 1 a  # LOOT: Wargreyn's ring
+I 4 10465 15.00 1 a  # LOOT: the blacksmith's charm
+I 4 10466 15.00 1 a  # LOOT: the goblinsmith's hammer
+I 4 10467 15.00 1 a  # LOOT: a wargskull shield
+T 10460
+T 10456
+S
+#10455
+rat war armored giant~
+a giant war rat~
+An giant, armored war rat bares its teeth at you!
+~
+0 0 adjA c
+0 0 7 9
+I 0 10016 50.00 1  # BUTCHER: a hunk of rat meat
+I 1 10013 100.00 1  # SKIN: a rat skin
+I 4 10470 33.00 1 a  # LOOT: a rat-fur saddle
+I 4 10471 33.00 1 a  # LOOT: a goblin go-bag
+I 4 10472 34.00 1 a  # LOOT: some wooden goblin pipes
+T 10014
 S
 $

@@ -37,7 +37,8 @@
 #define OLC_SECTOR  BIT(7)
 #define OLC_ADVENTURE  BIT(8)
 #define OLC_ROOM_TEMPLATE  BIT(9)
-#define NUM_OLC_TYPES  10
+#define OLC_GLOBAL  BIT(10)
+#define NUM_OLC_TYPES  11
 
 
 // olc command flags
@@ -59,6 +60,7 @@
 #define OLC_FLAG_NO_TRIGGER  BIT(9)	// cannot edit triggers
 #define OLC_FLAG_NO_ADVENTURE  BIT(10)	// cannot edit adventures
 #define OLC_FLAG_NO_ROOM_TEMPLATE  BIT(11)	// cannot edit room templates
+#define OLC_FLAG_NO_GLOBAL  BIT(12)	// cannot edit globals
 
 
 // for trigger editing

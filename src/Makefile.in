@@ -33,10 +33,10 @@ OBJFILES = act.action.o act.battle.o act.comm.o act.empire.o act.fight.o \
 	dg_handler.o dg_misc.o dg_mobcmd.o dg_objcmd.o dg_scripts.o dg_triggers.o \
 	dg_wldcmd.o eedit.o fight.o handler.o instance.o interpreter.o limits.o \
 	mail.o mapview.o mobact.o modify.o morph.o objsave.o olc.adventure.o \
-	olc.building.o olc.o olc.craft.o olc.crop.o olc.map.o olc.mobile.o \
-	olc.object.o olc.roomtemplate.o olc.sector.o olc.trigger.o random.o \
-	ships.o skilldata.o skills.o spells.o statistics.o utils.o weather.o \
-	workforce.o
+	olc.building.o olc.o olc.craft.o olc.crop.o olc.global.o olc.map.o \
+	olc.mobile.o olc.object.o olc.roomtemplate.o olc.sector.o olc.trigger.o \
+	random.o ships.o skilldata.o skills.o spells.o statistics.o utils.o \
+	weather.o workforce.o
 
 CXREF_FILES = act.action.c act.battle.c act.comm.c act.empire.c act.fight.c \
 	act.god.c act.highsorcery.c act.immortal.c act.informative.c act.item.c \
@@ -47,10 +47,10 @@ CXREF_FILES = act.action.c act.battle.c act.comm.c act.empire.c act.fight.c \
 	dg_handler.c dg_misc.c dg_mobcmd.c dg_objcmd.c dg_scripts.c dg_triggers.c \
 	dg_wldcmd.c eedit.c fight.c handler.c instance.c interpreter.c limits.c \
 	mail.c mapview.c mobact.c modify.c morph.c objsave.c olc.adventure.c \
-	olc.building.c olc.c olc.craft.c olc.craft.c olc.map.c olc.mobile.c \
-	olc.object.c olc.roomtemplate.c olc.sector.c olc.trigger.c random.c \
-	ships.c skilldata.c skills.c spells.c statistics.c utils.c weather.c \
-	workforce.c
+	olc.building.c olc.c olc.craft.c olc.crop.c olc.global.c olc.map.c \
+	olc.mobile.c olc.object.c olc.roomtemplate.c olc.sector.c olc.trigger.c \
+	random.c ships.c skilldata.c skills.c spells.c statistics.c utils.c \
+	weather.c workforce.c
 
 default: all
 
@@ -209,10 +209,10 @@ dg_misc.o: dg_misc.c conf.h sysdep.h structs.h uthash.h dg_scripts.h \
   utils.h comm.h interpreter.h handler.h dg_event.h db.h skills.h
 	$(CC) -c $(CFLAGS) dg_misc.c
 dg_mobcmd.o: dg_mobcmd.c conf.h sysdep.h structs.h uthash.h dg_scripts.h \
-  db.h utils.h handler.h interpreter.h comm.h skills.h
+  db.h utils.h handler.h interpreter.h comm.h skills.h vnums.h
 	$(CC) -c $(CFLAGS) dg_mobcmd.c
 dg_objcmd.o: dg_objcmd.c conf.h sysdep.h structs.h uthash.h dg_scripts.h \
-  utils.h comm.h interpreter.h handler.h db.h skills.h
+  utils.h comm.h interpreter.h handler.h db.h skills.h vnums.h
 	$(CC) -c $(CFLAGS) dg_objcmd.c
 dg_scripts.o: dg_scripts.c conf.h sysdep.h structs.h uthash.h \
   dg_scripts.h utils.h comm.h interpreter.h handler.h dg_event.h db.h \
@@ -222,7 +222,7 @@ dg_triggers.o: dg_triggers.c conf.h sysdep.h structs.h uthash.h \
   dg_scripts.h utils.h comm.h interpreter.h handler.h db.h skills.h olc.h
 	$(CC) -c $(CFLAGS) dg_triggers.c
 dg_wldcmd.o: dg_wldcmd.c conf.h sysdep.h structs.h uthash.h dg_scripts.h \
-  utils.h comm.h interpreter.h handler.h db.h skills.h
+  utils.h comm.h interpreter.h handler.h db.h skills.h vnums.h
 	$(CC) -c $(CFLAGS) dg_wldcmd.c
 eedit.o: eedit.c conf.h sysdep.h structs.h uthash.h utils.h interpreter.h \
   comm.h handler.h db.h olc.h
@@ -276,6 +276,9 @@ olc.craft.o: olc.craft.c conf.h sysdep.h structs.h uthash.h utils.h \
 olc.crop.o: olc.crop.c conf.h sysdep.h structs.h uthash.h utils.h \
   interpreter.h db.h comm.h olc.h skills.h handler.h
 	$(CC) -c $(CFLAGS) olc.crop.c
+olc.global.o: olc.global.c conf.h sysdep.h structs.h uthash.h utils.h \
+  interpreter.h db.h comm.h olc.h skills.h handler.h
+	$(CC) -c $(CFLAGS) olc.global.c
 olc.map.o: olc.map.c conf.h sysdep.h structs.h uthash.h utils.h \
   interpreter.h handler.h db.h comm.h olc.h vnums.h
 	$(CC) -c $(CFLAGS) olc.map.c

@@ -60,6 +60,17 @@ void unlink_instance_entrance(room_data *room);
 struct instance_data *instance_list = NULL;	// global instance list
 bool instance_save_wait = FALSE;	// prevents repeated instance saving
 
+// ADV_LINK_x: whether or not a rule specifies a possible location (other types are for limits)
+const bool is_location_rule[] = {
+	TRUE,	// ADV_LINK_BUILDING_EXISTING
+	TRUE,	// ADV_LINK_BUILDING_NEW
+	TRUE,	// ADV_LINK_PORTAL_WORLD
+	TRUE,	// ADV_LINK_PORTAL_BUILDING_EXISTING
+	TRUE,	// ADV_LINK_PORTAL_BUILDING_NEW
+	FALSE,	// ADV_LINK_TIME_LIMIT
+	FALSE,	// ADV_LINK_NOT_NEAR_SELF
+};
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// INSTANCE-BUILDING ///////////////////////////////////////////////////////
@@ -619,8 +630,7 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 	sector_data *findsect = NULL;
 	room_template *start_room = room_template_proto(GET_ADV_START_VNUM(adv));
 	bool match_buildon = FALSE;
-	int pos = -1;	// default < 0
-	int dir, iter, sub;
+	int dir, iter, sub, num_found;
 	
 	const int max_tries = 500, max_dir_tries = 10;	// for random checks
 	
@@ -635,7 +645,6 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 	switch (rule->type) {
 		case ADV_LINK_BUILDING_EXISTING: {
 			findbdg = building_proto(rule->value);
-			pos = number(0, stats_get_building_count(findbdg) - 1);
 			break;
 		}
 		case ADV_LINK_BUILDING_NEW: {
@@ -644,12 +653,10 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 		}
 		case ADV_LINK_PORTAL_WORLD: {
 			findsect = sector_proto(rule->value);
-			pos = number(0, stats_get_sector_count(findsect) - 1);
 			break;
 		}
 		case ADV_LINK_PORTAL_BUILDING_EXISTING: {
 			findbdg = building_proto(rule->value);
-			pos = number(0, stats_get_building_count(findbdg) - 1);
 			break;
 		}
 		case ADV_LINK_PORTAL_BUILDING_NEW: {
@@ -665,24 +672,24 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 	// two ways of doing this:
 	if (!match_buildon) {
 		// scan the whole world world
-		HASH_ITER(world_hh, world_table, room, next_room) {
-			if (!validate_one_loc(rule, room)) {
-				continue;
-			}
+		if (findsect || findbdg) {
+			num_found = 0;
+			HASH_ITER(world_hh, world_table, room, next_room) {
+				if (!validate_one_loc(rule, room)) {
+					continue;
+				}
 			
-			// check secondary limits
-			if (!validate_linking_limits(adv, room)) {
-				continue;
-			}
+				// check secondary limits
+				if (!validate_linking_limits(adv, room)) {
+					continue;
+				}
 			
-			// TODO this specifically does not work on ocean without the whole map loaded
-			if (findsect && SECT(room) == findsect && pos-- == 0) {
-				found = room;
-				break;
-			}
-			if (findbdg && BUILDING_VNUM(room) == GET_BLD_VNUM(findbdg) && pos-- == 0) {
-				found = room;
-				break;
+				// TODO this specifically does not work on ocean without the whole map loaded
+				if ((findsect && SECT(room) == findsect) || (findbdg && BUILDING_VNUM(room) == GET_BLD_VNUM(findbdg))) {
+					if (!number(0, num_found++) || !found) {
+						found = room;
+					}
+				}
 			}
 		}
 	}
@@ -746,38 +753,54 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 void generate_adventure_instances(void) {
 	void sort_world_table();
 
-	struct adventure_link_rule *rule;
+	struct adventure_link_rule *rule, *rule_iter;
 	adv_data *iter, *next_iter;
 	room_data *loc;
-	int try, dir = NO_DIR;
+	int try, num_rules, dir = NO_DIR;
+	adv_vnum start_vnum;
 	
 	static adv_vnum last_adv_vnum = NOTHING;	// rotation
+	
+	// prevent it from looping forever
+	start_vnum = last_adv_vnum;
 	
 	// try this twice (allows it to wrap if it hits the end)
 	for (try = 0; try < 2; ++try) {
 		HASH_ITER(hh, adventure_table, iter, next_iter) {
+			// stop if we get back to where we started
+			if (try > 0 && (start_vnum == NOTHING || GET_ADV_VNUM(iter) == start_vnum)) {
+				return;
+			}
 			// skip past the last adventure we instanced
 			if (GET_ADV_VNUM(iter) <= last_adv_vnum) {
 				continue;
 			}
-		
+			
 			if (can_instance(iter)) {
-				// mark it done no matter what -- we only instance 1 per cycle
-				last_adv_vnum = GET_ADV_VNUM(iter);
+				// randomly choose one rule to attempt
+				num_rules = 0;
+				rule = NULL;
+				for (rule_iter = GET_ADV_LINKING(iter); rule_iter; rule_iter = rule_iter->next) {
+					if (is_location_rule[rule_iter->type]) {
+						// choose one at random
+						if (!number(0, num_rules++) || !rule) {
+							rule = rule_iter;
+						}
+					}
+				}
 				
-				for (rule = GET_ADV_LINKING(iter); rule; rule = rule->next) {
+				// did we find one?
+				if (rule) {
 					if ((loc = find_location_for_rule(iter, rule, &dir))) {
 						// make it so!
 						if (build_instance_loc(iter, rule, loc, dir)) {
+							last_adv_vnum = GET_ADV_VNUM(iter);
 							save_instances();
 							// only 1 instance per cycle
 							return;
 						}
 					}
 				}
-				
-				// we ran rules on this one; don't run any more
-				return;
 			}
 		}
 	

@@ -1733,6 +1733,7 @@ const char *olc_flag_bits[] = {
 	"!TRIGGER",
 	"!ADVENTURE",
 	"!ROOMTEMPLATE",
+	"!GLOBAL",
 	"\n"
 };
 
@@ -1749,6 +1750,7 @@ const char *olc_type_bits[NUM_OLC_TYPES+1] = {
 	"sector",
 	"adventure",
 	"roomtemplate",
+	"global",
 	"\n"
 };
 
@@ -2613,6 +2615,21 @@ const char *fill_words[] = {
 };
 
 
+// GLOBAL_x types
+const char *global_types[] = {
+	"Mob Interactions",
+	"\n"
+};
+
+
+// GLB_FLAG_X global flags
+const char *global_flags[] = {
+	"IN-DEVELOPMENT",
+	"ADVENTURE-ONLY",
+	"\n"
+};
+
+
 // INTERACT_x, see also interact_vnum_types, interact_attach_types
 const char *interact_types[] = {
 	"BUTCHER",
@@ -2627,6 +2644,7 @@ const char *interact_types[] = {
 	"GATHER",
 	"ENCOUNTER",
 	"LIGHT",
+	"PICKPOCKET",
 	"\n"
 };
 
@@ -2638,13 +2656,14 @@ const int interact_attach_types[NUM_INTERACTS] = {
 	TYPE_MOB,
 	TYPE_MOB,
 	TYPE_MOB,
+	TYPE_ROOM,	// dig
 	TYPE_ROOM,
 	TYPE_ROOM,
 	TYPE_ROOM,
 	TYPE_ROOM,
 	TYPE_ROOM,
-	TYPE_ROOM,
-	TYPE_OBJ	// light
+	TYPE_OBJ,	// light
+	TYPE_MOB	// pickpocket
 };
 
 
@@ -2661,7 +2680,8 @@ const byte interact_vnum_types[NUM_INTERACTS] = {
 	TYPE_OBJ,
 	TYPE_OBJ,
 	TYPE_MOB,	// encounter
-	TYPE_OBJ
+	TYPE_OBJ,
+	TYPE_OBJ	// pickpocket
 };
 
 

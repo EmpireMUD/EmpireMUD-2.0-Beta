@@ -99,8 +99,6 @@ A
 4 2
 A
 9 1
-C
-0 0
 S
 #10409
 chain steel~
@@ -115,8 +113,6 @@ A
 17 3
 A
 9 1
-C
-0 0
 S
 #10410
 bracers ringmail pair~
@@ -132,8 +128,6 @@ A
 18 3
 A
 13 1
-C
-0 0
 S
 #10411
 ring pearls~
@@ -148,8 +142,6 @@ A
 23 2
 A
 7 1
-C
-0 0
 S
 #10412
 dress village fine~
@@ -191,8 +183,6 @@ A
 18 1
 A
 13 1
-C
-0 0
 S
 #10415
 necklace cloth heirloom~
@@ -210,8 +200,6 @@ A
 7 1
 A
 16 1
-C
-0 0
 S
 #10416
 mace bone giant~
@@ -226,8 +214,6 @@ A
 15 3
 A
 13 1
-C
-0 0
 S
 #10417
 cloak tattered manasilk~
@@ -244,8 +230,6 @@ A
 23 2
 A
 7 1
-C
-0 0
 S
 #10418
 whip horse skeletal~
@@ -273,8 +257,6 @@ A
 16 3
 A
 22 1
-C
-0 0
 S
 #10420
 crop mammoth skeletal~
@@ -300,8 +282,6 @@ A
 17 1
 A
 9 1
-C
-0 0
 S
 #10422
 cloak imperium-weave weave~
@@ -319,8 +299,6 @@ A
 18 3
 A
 12 1
-C
-0 0
 S
 #10423
 shackles undead~
@@ -337,8 +315,6 @@ A
 7 2
 A
 23 1
-C
-0 0
 S
 #10424
 leg necrofiend disjointed~
@@ -354,8 +330,6 @@ A
 17 1
 A
 1 1
-C
-0 0
 S
 #10425
 shield studded bone~
@@ -371,8 +345,6 @@ A
 13 4
 A
 1 1
-C
-0 0
 S
 #10426
 majesty necrofiend's aura strange~
@@ -391,8 +363,6 @@ A
 23 1
 A
 16 1
-C
-0 0
 S
 #10427
 flame infernomancer's magical~
@@ -409,8 +379,6 @@ A
 16 1
 A
 22 1
-C
-0 0
 S
 #10428
 flame purifying white glinting~
@@ -425,8 +393,6 @@ A
 23 3
 A
 7 1
-C
-0 0
 S
 #10429
 mask terrifying leather~
@@ -445,8 +411,6 @@ A
 21 1
 A
 1 1
-C
-0 0
 S
 #10430
 staff twisted necromancer's~
@@ -459,8 +423,6 @@ This twisted old staff is crawling with maggots!
 0 0
 A
 17 1
-C
-0 0
 S
 #10431
 gauntlets pair ghoulsbane~
@@ -478,8 +440,6 @@ A
 1 1
 A
 21 2
-C
-0 0
 S
 #10432
 skirt mail necrotic~
@@ -500,8 +460,6 @@ A
 15 2
 A
 18 2
-C
-0 0
 S
 #10433
 weapon fiendclaw claw vicious~
@@ -518,8 +476,6 @@ A
 13 2
 A
 18 1
-C
-0 0
 S
 #10434
 gloves lace deathlace pair~
@@ -537,8 +493,6 @@ A
 22 2
 A
 17 2
-C
-0 0
 S
 #10435
 hand hanged man's~
@@ -555,7 +509,523 @@ A
 21 1
 A
 9 1
+S
+#10450
+grate sewer~
+an open sewer grate~
+The sewer grate is propped open.~
+The sewer grate is propped open and you can hear sounds coming from beneath.
+~
+8 0 0 2
+-1 0 0
+2 0
+S
+#10451
+grate sewer exit ladder~
+the exit~
+A ladder leads up to the sewer's exit.~
+The scent of fresh air wafts down from the sewer's exit.
+~
+8 0 0 3
+-1 0 0
+2 0
+T 10450
+T 10451
+S
+#10452
+ring pimmin's pimmins~
+Pimmin's ring~
+Pimmin's ring is lying on the ground.~
+The ring is made of copper, but it shines like gold.
+~
+2 mp ab 1
+0 0 0
+13 0
+A
+8 1
+A
+9 1
+S
+#10453
+necklace charm bone~
+a bone charm necklace~
+A bone charm necklace is lying on the ground.~
+The necklace looks to be made mostly from chicken bones.
+~
+2 mp ac 1
+0 0 0
+14 0
+A
+7 2
+A
+16 1
+S
+#10454
+wand chicken-bone bone~
+a chicken-bone wand~
+A chicken-bone wand is lying here.~
+   This double-pronged wand is made from the wishbone of a chicken. Lightning
+arcs between the tips of the wand, enough to make your hair stand up on end.
+~
+1 hmp an 1
+0 3 21
+14 0
+A
+7 1
+S
+#10455
+tome goblinward ward~
+the goblinward tome~
+A goblin tome is lying here.~
+This tome is written in goblinese, and barely legible at that.
+~
+3 mp ao 2
+0 0 0
+7 0
+A
+8 1
+A
+9 1
+A
+16 1
+S
+#10456
+shawl leopard violet~
+a violet leopard shawl~
+A violet leopard shawl is lying here.~
+This goblincraft shawl may be the height of fashion somewhere, but not here.
+~
+27 mo ak 2
+0 0 0
+7 0
+A
+7 2
+A
+16 1
 C
+0 100
+S
+#10457
+gloves wildfire pair~
+wildfire gloves~
+A pair of wildfire gloves is lying here.~
+   These gloves appear to be made from ratskins, and have the faint glow of
+wildfire.
+~
+27 mo ah 2
+0 0 0
+7 0
+A
+9 2
+A
+8 1
+A
+16 1
+C
+0 100
+S
+#10458
+ring shivsper's shivspers poison~
+Shivsper's poison ring~
+Shivsper's poison ring is lying on the ground.~
+This ring hides a tiny compartment for a bit of poison.
+~
+2 mp ab 1
+0 0 0
+13 0
+A
+1 1
+A
+17 2
+S
+#10459
+chain copper gaudy~
+a gaudy copper chain~
+A gaudy copper chain is lying here.~
+This goblincraft chain appears to spell out "BLING" in goblinese.
+~
+2 mp ac 1
+0 0 0
+13 0
+A
+2 1
+A
+17 1
+A
+21 1
+S
+#10460
+axe someone else's elses~
+someone else's axe~
+An axe is lying here.~
+This axe looks too nice to have been made by the goblin you got it from.
+~
+1 emp an 3
+0 3 2
+2 0
+A
+1 1
+S
+#10461
+dagger giant~
+a giant dagger~
+A giant dagger is lying here.~
+This is a giant dagger -- or perhaps a goblin longsword.
+~
+1 imp ano 1
+0 2 4
+2 0
+A
+9 2
+S
+#10462
+cloak rat-fur fur~
+a rat-fur cloak~
+A fur cloak is lying here.~
+This goblincraft cloak looks to be sewn from a dozen rats.
+~
+27 mo ak 2
+1 0 0
+7 0
+A
+2 1
+A
+17 2
+C
+0 100
+S
+#10463
+gauntlets wooden pair~
+wooden gauntlets~
+A pair of wooden gauntlets appear to have been planted here.~
+These gauntlets are unmistakably goblincraft, and smell of pine.
+~
+27 emo ah 2
+1 0 0
 0 0
+A
+1 1
+A
+6 1
+A
+17 1
+C
+0 100
+S
+#10464
+ring wargreyn's wargreyns~
+Wargreyn's ring~
+Wargreyn's ring has been dropped here.~
+This ring is made from volcanic glass. Luckily, it's made for a large goblin.
+~
+2 mp ab 3
+0 0 0
+8 0
+A
+2 1
+A
+18 1
+S
+#10465
+charm blacksmiths blacksmith's~
+the blacksmith's charm~
+A black charm is lying here.~
+This charm appears to have been made by a goblin, but you're not sure how.
+~
+2 mp ac 1
+0 0 0
+2 0
+A
+13 1
+A
+12 1
+S
+#10466
+hammer goblinsmiths goblinsmith's~
+the goblinsmith's hammer~
+A goblinsmith's hammer is lying here.~
+This hammer has made many a goblincraft weapon.
+~
+1 hmp an 1
+0 1 6
+2 0
+A
+2 1
+A
+12 1
+A
+24 1
+S
+#10467
+shield skull wargskull~
+a wargskull shield~
+A skull shield is lying here.~
+This shield is made from a warg skull, coated in imperium!
+~
+23 emp ao 1
+0 0 0
+2 0
+A
+13 2
+A
+15 1
+S
+#10468
+cloak mesh~
+a mesh cloak~
+A mesh cloak is draped on the ground.~
+   This goblincraft cloak is made from a tightly woven metal mesh. Even with a
+tongue like a goblin, you can't say that five times fast.
+~
+27 mo ak 1
+3 0 0
+2 0
+A
+12 1
+A
+24 1
+C
+0 100
+S
+#10469
+gauntlets heavy goblin pair~
+heavy goblin gauntlets~
+A pair of heavy gauntlets is lying here.~
+These goblincraft gauntlets are lined with coarse rat fur.
+~
+27 mo ah 1
+3 0 0
+2 0
+A
+18 1
+A
+13 1
+C
+0 100
+S
+#10470
+saddle rat-fur fur~
+a rat-fur saddle~
+A saddle made of rat fur is lying here.~
+   This saddle is unquestionably goblincraft, and you're not sure what their
+obsession with rat fur is.
+~
+3 mo as 2
+0 0 0
+7 0
+A
+6 1
+A
+3 1
+S
+#10471
+bag goblin go-bag~
+a goblin go-bag~
+A goblin bag is lying here.~
+This goblincraft bag is light and portable.
+~
+24 mo ar 2
+1 0 0
+7 0
+S
+#10472
+pipes wooden goblin set~
+some wooden goblin pipes~
+A set of wooden goblin pipes is lying here.~
+You might be able to play these pipes like an instrument.
+~
+22 0 ao 2
+1 0 0
+0 0
+M
+2
+You play a soft tune on $p.~
+M
+2
+You play $p.~
+M
+2
+You play $p.~
+M
+2
+You hit a sour note on $p.~
+M
+3
+$n plays a soft tune on $p.~
+M
+3
+$n plays $p.~
+M
+3
+$n plays $p.~
+M
+3
+$n hits a sour note on $p.~
+S
+#10473
+pattern violet leopard shawl~
+the violet leopard shawl pattern~
+The violet leopard shawl pattern is lying here.~
+Sew (Magical Vestments): violet leopard shawl
+  6x big cat pelt
+  3x deadly violet dye
+  6x rat skin
+  4x ingot of nocturnium
+  4x yellow lightning stone
+~
+3 0 a 2
+0 0 0
+0 0
+S
+#10474
+pattern wildfire gloves~
+the wildfire gloves pattern~
+The wildfire gloves pattern is lying here.~
+Sew (Magical Vestments): wildfire gloves
+  6x rat skin
+  2x deadly violet dye
+  1x wild fire
+  4x ingot of nocturnium
+  4x yellow lightning stone
+~
+3 0 a 3
+0 0 0
+0 0
+S
+#10475
+pattern cloak rat-fur fur~
+the rat-fur cloak pattern~
+The rat-fur cloak pattern is lying here.~
+Sew (Dangerous Leathers): rat-fur cloak
+  6x large piece of leather
+  6x rat skin
+  4x imperium ingot
+  4x red bloodstone
+~
+3 0 a 3
+0 0 0
+0 0
+S
+#10476
+pattern wooden gauntlets~
+the wooden gauntlets pattern~
+The wooden gauntlets pattern is lying here.~
+Craft (Dangerous Leathers): wooden gauntlets
+  2x stack of lumber
+  6x rat skin
+  4x imperium ingot
+  4x red bloodstone
+~
+3 0 a 3
+0 0 0
+0 0
+S
+#10477
+pattern cloak mesh~
+the mesh cloak pattern~
+The mesh cloak pattern is lying here.~
+Forge (Imperial Armors): mesh cloak
+  8x iron ingot
+  4x imperium ingot
+  6x rat skin
+  4x red bloodstone
+~
+3 0 a 3
+0 0 0
+0 0
+S
+#10478
+pattern heavy goblin gauntlets~
+the heavy goblin gauntlets pattern~
+The heavy goblin gauntlets pattern is lying here.~
+Forge (Imperial Armors): heavy goblin gauntlets
+  8x iron ingot
+  4x imperium ingot
+  6x rat skin
+  4x red bloodstone
+~
+3 0 a 3
+0 0 0
+0 0
+S
+#10479
+tent war goblin~
+a goblin war tent~
+A crumpled, bundled war tent is lying here.~
+   This is a collapsed goblin war tent, bundled up in its own rat skin canopy.
+The tent can be taken down and set up again, but will require some additional
+materials each time.
+
+Usage: build goblinwartent <direction>
+Builds on: plains or desert
+Designatable rooms: forge, bedroom, store room, kitchen
+Rooms: 2
+Citizens: 1
+Features: cooking fire
+Resources required:
+  8x stack of lumber
+  2x pouch of nails
+  8x iron ingot
+~
+3 e a 3
+0 0 0
+7 0
+S
+#10480
+post message goblin disassembled~
+a goblin message post~
+A disassembled goblin message post is lying here.~
+   This is a disassembled goblin message post. Some of the cleverer goblins
+carry these around in order to be able to send and receive letters in the
+field. Whereas more sensible people would use pigeons, the goblins seem to
+prefer birds of prey.
+
+Usage: build goblinmessagepost
+Builds on: plains, desert, forest, grove
+Features: can send and receive mail
+Resources required:
+  1x cut of poultry
+~
+3 e a 4
+0 0 0
+0 0
+S
+#10481
+tent goblin lab~
+a goblin lab tent~
+A goblin lab tent is folded up on the ground.~
+   This tent functions as a semi-portable laboratory, although it requires some
+lumber and nails to set up each time. Goblins often make use of portable build-
+ings, as they hate to settle down for long periods of time.
+
+Usage: build goblinlabtent <direction>
+Builds on: plains or desert
+Features: cooking fire, alchemy
+Resources required:
+  4x stack of lumber
+  1x pouch of nails
+~
+3 e a 2
+0 0 0
+7 0
+S
+#10482
+stone dolmen goblin~
+a goblin dolmen stone~
+A goblin dolmen stone is lying here.~
+   This is a dolmen stone, the capstone for a goblin tomb. Goblins prefer to
+bury their dead in dolmen mounds. But they soon forget about their ancestors
+and will remove the valuable dolmen stones to use for building new tombs.
+
+Usage: build goblindolmen <direction>
+Builds on: plains or desert
+Features: tomb
+Resources required:
+  3x huge stone block
+  10x rock
+~
+3 e a 2
+0 0 0
+1 0
 S
 $

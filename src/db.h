@@ -24,7 +24,8 @@
 #define DB_BOOT_SECTOR  10
 #define DB_BOOT_ADV  11
 #define DB_BOOT_RMT  12
-#define NUM_DB_BOOT_TYPES  13	// total
+#define DB_BOOT_GLB  13
+#define NUM_DB_BOOT_TYPES  14	// total
 
 
 // library sub-dirs
@@ -67,6 +68,7 @@
 #define BLD_PREFIX  LIB_WORLD"bld/"	// building definitions
 #define CRAFT_PREFIX  LIB_WORLD"craft/"	// craft recipes
 #define CROP_PREFIX  LIB_WORLD"crop/"	// crop definitions
+#define GLB_PREFIX  LIB_WORLD"glb/"	// global templates
 #define WLD_PREFIX  LIB_WORLD"wld/"	// room definitions
 #define MOB_PREFIX  LIB_WORLD"mob/"	// monster prototypes
 #define NAMES_PREFIX  LIB_TEXT"names/"	// mob namelists
@@ -86,6 +88,7 @@
 #define CRAFT_SUFFIX  ".craft"	// craft file suffix
 #define CROP_SUFFIX  ".crop"	// crop file suffix
 #define EMPIRE_SUFFIX  ".empire"	// empire file suffix
+#define GLB_SUFFIX  ".glb"	// global suffix
 #define MOB_SUFFIX  ".mob"	// mob suffix for file saves
 #define OBJ_SUFFIX  ".obj"	// obj suffix for file saves
 #define RMT_SUFFIX  ".rmt"	// room template suffix
@@ -210,6 +213,11 @@ void save_all_empires();
 
 // extra descs
 void free_extra_descs(struct extra_descr_data **list);
+
+// globals
+extern struct global_data *globals_table;
+void free_global(struct global_data *glb);
+extern struct global_data *global_proto(any_vnum vnum);
 
 // islands
 extern struct island_info *island_table;
