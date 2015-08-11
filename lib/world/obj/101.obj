@@ -143,15 +143,13 @@ a charming necklace~
 A charming necklace has been discarded on the ground.~
 It's a rather handsome bauble.
 ~
-2 jmo ac 1
+2 mo ac 3
 -1 -1 -1
 4 0
 A
-4 3
+4 2
 A
 11 1
-C
-0 100
 S
 #10112
 beads wooden~
@@ -159,15 +157,13 @@ some wooden beads~
 Some wooden beads are strung together on the ground.~
 It seems like a simple beaded necklace.
 ~
-2 jmo ac 1
+2 mo ac 3
 -1 -1 -1
 0 0
 A
 17 1
 A
-9 3
-C
-0 100
+9 2
 S
 #10113
 chain shifters shifter's strange~
@@ -175,28 +171,24 @@ a shifter's chain~
 A strange chain is lying here.~
 The necklace seems to shift around as your eyes fail to follow it.
 ~
-2 jmo ac 1
+2 mo ac 3
 -1 -1 -1
 13 0
 A
 15 1
 A
-18 3
-C
-0 100
+18 2
 S
 #10114
 shiv talismanic glowing~
 a talismanic shiv~
 A glowing shiv is lying on the ground.~
 ~
-1 ijmo ano 1
+1 imo ano 3
 0 3 4
 0 0
 A
 2 1
-A
-18 1
 S
 #10115
 spawner thieves~
@@ -219,5 +211,144 @@ This item spawns 1-3 banditos then purges itself.
 0 0 0
 0 0
 T 10116
+S
+#10117
+choker silk spidersilk~
+a spidersilk choker~
+A silk choker is lying on the ground.~
+For something sewn of spidersilk, it's surprisingly strong.
+~
+2 mo ac 2
+0 0 0
+7 0
+A
+16 2
+A
+7 1
+S
+#10118
+wand makeshift~
+a makeshift wand~
+A makeshift wand was dropped here.~
+   On closer inspection, this is actually a twig with a lightningstone taped to
+it. How quaint.  
+~
+1 mo an 2
+0 3 22
+0 0
+A
+2 1
+S
+#10119
+star morning old~
+an old morning star~
+An old morning star is propped up here.~
+It's a bit rusted at the edges, but that might just be dry blood.
+~
+1 imo ano 3
+0 3 5
+2 0
+A
+2 1
+S
+#10120
+pants roguish roguesh rogueish~
+roguish pants~
+Some roguish pants are lying here.~
+These pants would look handsome on you, you rogue.
+~
+2 mo af 2
+0 0 0
+7 0
+A
+17 2
+A
+2 1
+S
+#10121
+pants darkfiber~
+darkfiber pants~
+Some darkfiber pants have been left behind.~
+   The pants are hard to see, although you could see yourself in them if you
+were tanking. Or clubbing.  
+~
+2 mo af 2
+0 0 0
+7 0
+A
+18 2
+A
+2 1
+S
+#10122
+pants shadowcraft~
+shadowcraft pants~
+Some shadowcraft pants are lying here.~
+These pants might be crafted from pure shadow by a powerful mage.
+~
+2 mo af 2
+0 0 0
+7 0
+A
+23 2
+A
+8 1
+S
+#10123
+wristcuff cuff brawlers brawler's~
+a brawler's wristcuff~
+A brawler's wristcuff is sitting on the ground.~
+   This looks like it's a former slave cuff, long broken. Wearing it makes you
+feel uplifted.  
+~
+2 mo aj 4
+0 0 0
+2 0
+A
+1 2
+A
+19 1
+S
+#10124
+wristcuff cuff freethinkers freethinker's~
+a freethinker's wristcuff~
+A freethinker's wristcuff is sitting on the ground.~
+   This looks like it's a former slave cuff, long broken. Wearing it makes you
+feel uplifted.  
+~
+2 mo aj 5
+0 0 0
+2 0
+A
+8 2
+A
+19 1
+S
+#10125
+wristcuff cuff adulterers adulterer's~
+an adulterer's wristcuff~
+An adulterer's wristcuff is sitting on the ground.~
+   This looks like it's a former slave cuff, long broken. Wearing it makes you
+feel uplifted.  
+~
+2 mo aj 6
+0 0 0
+2 0
+A
+4 2
+A
+19 1
+S
+#10126
+aura tenebrous~
+a tenebrous aura~
+A tenebrous aura hangs heavy in the air.~
+The aura is dark, shadowy, and certainly mysterious.
+~
+2 o ak 1
+0 0 0
+10 0
+A
+5 1
 S
 $

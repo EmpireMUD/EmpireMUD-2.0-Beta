@@ -306,6 +306,7 @@ eval found 0
 eval Rand %random.100%
 * vnums of the mobs to spawn
 eval vnumSly 10110
+eval vnumSlyBetterloot 10114
 eval vnumChiv 10111
 eval vnumThief 10112
 * Probabilities of each number of non-generic thieves spawning
@@ -320,7 +321,7 @@ if (%Rand% <= %cumulative%) && %found% == 0
   * Spawn both thieves
   %load% mob %vnumChiv%
   %echo% Chiv arrives!
-  %load% mob %vnumSly%
+  %load% mob %vnumSlyBetterloot%
   %echo% Sly arrives!
   * Set found - if not done, this will fall through to lower blocks (Rand will still be less than cumulative)
   eval found 1
