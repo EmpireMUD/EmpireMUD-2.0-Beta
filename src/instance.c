@@ -60,6 +60,17 @@ void unlink_instance_entrance(room_data *room);
 struct instance_data *instance_list = NULL;	// global instance list
 bool instance_save_wait = FALSE;	// prevents repeated instance saving
 
+// ADV_LINK_x: whether or not a rule specifies a possible location (other types are for limits)
+const bool is_location_rule[] = {
+	TRUE,	// ADV_LINK_BUILDING_EXISTING
+	TRUE,	// ADV_LINK_BUILDING_NEW
+	TRUE,	// ADV_LINK_PORTAL_WORLD
+	TRUE,	// ADV_LINK_PORTAL_BUILDING_EXISTING
+	TRUE,	// ADV_LINK_PORTAL_BUILDING_NEW
+	FALSE,	// ADV_LINK_TIME_LIMIT
+	FALSE,	// ADV_LINK_NOT_NEAR_SELF
+};
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// INSTANCE-BUILDING ///////////////////////////////////////////////////////
@@ -742,38 +753,54 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 void generate_adventure_instances(void) {
 	void sort_world_table();
 
-	struct adventure_link_rule *rule;
+	struct adventure_link_rule *rule, *rule_iter;
 	adv_data *iter, *next_iter;
 	room_data *loc;
-	int try, dir = NO_DIR;
+	int try, num_rules, dir = NO_DIR;
+	adv_vnum start_vnum;
 	
 	static adv_vnum last_adv_vnum = NOTHING;	// rotation
+	
+	// prevent it from looping forever
+	start_vnum = last_adv_vnum;
 	
 	// try this twice (allows it to wrap if it hits the end)
 	for (try = 0; try < 2; ++try) {
 		HASH_ITER(hh, adventure_table, iter, next_iter) {
+			// stop if we get back to where we started
+			if (try > 0 && (start_vnum == NOTHING || GET_ADV_VNUM(iter) == start_vnum)) {
+				return;
+			}
 			// skip past the last adventure we instanced
 			if (GET_ADV_VNUM(iter) <= last_adv_vnum) {
 				continue;
 			}
-		
+			
 			if (can_instance(iter)) {
-				// mark it done no matter what -- we only instance 1 per cycle
-				last_adv_vnum = GET_ADV_VNUM(iter);
+				// randomly choose one rule to attempt
+				num_rules = 0;
+				rule = NULL;
+				for (rule_iter = GET_ADV_LINKING(iter); rule_iter; rule_iter = rule_iter->next) {
+					if (is_location_rule[rule_iter->type]) {
+						// choose one at random
+						if (!number(0, num_rules++) || !rule) {
+							rule = rule_iter;
+						}
+					}
+				}
 				
-				for (rule = GET_ADV_LINKING(iter); rule; rule = rule->next) {
+				// did we find one?
+				if (rule) {
 					if ((loc = find_location_for_rule(iter, rule, &dir))) {
 						// make it so!
 						if (build_instance_loc(iter, rule, loc, dir)) {
+							last_adv_vnum = GET_ADV_VNUM(iter);
 							save_instances();
 							// only 1 instance per cycle
 							return;
 						}
 					}
 				}
-				
-				// we ran rules on this one; don't run any more
-				return;
 			}
 		}
 	
