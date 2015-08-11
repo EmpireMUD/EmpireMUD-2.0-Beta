@@ -1,6 +1,6 @@
 #18100
 Lumberjack chop~
-0 ab 100
+0 ab 10
 ~
 if %self.fighting%
   halt
@@ -15,53 +15,52 @@ eval gohome 0
 if (%room.template% == 18100)
   eval gohome 1
 end
+if (%random.20% == 20 && !%self.mob_flagged(SENTINEL)%
+  eval gohome 1
+end
 if (%room.sector% ~= Forest || %room.sector% ~= Jungle || %room.sector% == Grove)
   * Stops the mob from wandering while it works on this tile
   nop %self.add_mob_flag(SENTINEL)%
-  %echo% %self.name% swings %self.hisher% axe hard into a tree!
-  if (%random.4% == 4)
-    if (%room.sector% == Light Forest)
-      %echo% The last tree falls with a mighty crash!
-      %terraform% %room% 0
-      eval gohome 1
-      eval logs %logs% + 1
-    elseif (%room.sector% == Forest)
-      %echo% The tree falls with a mighty crash!
-      %terraform% %room% 1
-      eval logs %logs% + 1
-    elseif (%room.sector% == Shady Forest)
-      %echo% The tree falls with a mighty crash!
-      %terraform% %room% 2
-      eval logs %logs% + 1
-    elseif (%room.sector% == Overgrown Forest)
-      %echo% The tree falls with a mighty crash!
-      %terraform% %room% 3
-      eval logs %logs% + 1
-    elseif (%room.sector% == Grove)
-      %echo% Two trees fall into each other with a mighty crash!
-      %terraform% %room% 20
-      eval logs %logs% + 2
-      eval gohome 1
-      cackle
-    elseif (%room.sector% == Jungle)
-      %echo% The tree falls with a mighty crash!
-      if (%random.3 == 3%)
-        %terraform% %room% 27
-      end
-      eval logs %logs% + 1
-    elseif (%room.sector% == Light Jungle)
-      if (%random.2% == 2)
-        %echo% The last tree falls with a mighty crash!
-        %terraform% %room% 0
-        eval gohome 1
-      else
-        %echo% The tree falls with a mighty crash!
-      end
-      eval logs %logs% + 1
+  if (%room.sector% == Light Forest)
+    %echo% %self.name% fells the last tree with a mighty crash!
+    %terraform% %room% 0
+    eval logs %logs% + 1
+  elseif (%room.sector% == Forest)
+    %echo% %self.name% fells a tree with a mighty crash!
+    %terraform% %room% 1
+    eval logs %logs% + 1
+  elseif (%room.sector% == Shady Forest)
+    %echo% %self.name% fells a tree with a mighty crash!
+    %terraform% %room% 2
+    eval logs %logs% + 1
+  elseif (%room.sector% == Overgrown Forest)
+    %echo% %self.name% fells a tree with a mighty crash!
+    %terraform% %room% 3
+    eval logs %logs% + 1
+  elseif (%room.sector% == Grove)
+    %echo% %self.name% fells two trees!
+    %terraform% %room% 20
+    eval logs %logs% + 2
+    wait 1 sec
+    %echo% The trees fall into each other with a single mighty crash!
+    cackle
+  elseif (%room.sector% == Jungle)
+    %echo% %self.name% fells a tree with a mighty crash!
+    if (%random.3 == 3%)
+      %terraform% %room% 27
     end
+    eval logs %logs% + 1
+  elseif (%room.sector% == Light Jungle)
+    if (%random.2% == 2)
+      %echo% %self.name% fells the last tree with a mighty crash!
+      %terraform% %room% 0
+    else
+      %echo% %self.name% fells a tree with a mighty crash!
+    end
+    eval logs %logs% + 1
   end
 else
-* Tile is clear, can wander now
+  * Tile is clear, can wander now
   nop %self.remove_mob_flag(SENTINEL)%
 end
 remote logs %self.id%
@@ -86,6 +85,8 @@ while %i% < %logs%
   eval i %i% + 1
   %load% obj %loot%
 done
+* Load the goblin retreat timer item
+%at% i18100 %load% obj 18106
 ~
 #18102
 Goblin lumberjack combat~
@@ -102,5 +103,30 @@ switch %random.3%
     outrage
   break
 done
+~
+#18103
+Goblin lumberjack chop echo~
+0 b 50
+~
+if %self.mob_flagged(SENTINEL)%
+  switch %random.3%
+    case 1
+      %echo% %self.name% swings %self.hisher% axe hard into a tree!
+    break
+    case 2
+      %echo% %self.name% hacks wildly at a tree with %self.hisher% axe!
+    break
+    case 3
+      %echo% %self.name% flails furiously at a tree, screaming loudly!
+    break
+  done
+end
+return 0
+~
+#18106
+Goblin camp despawn timer~
+1 f 0
+~
+%adventurecomplete%
 ~
 $

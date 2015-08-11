@@ -3,7 +3,7 @@ axe logging~
 a logging axe~
 A logging axe is lying here.~
    This crude iron axe appears to be goblin manufacture. You have no idea how a
-little goblin could wield this massive axe. It's a bit awkward even for you. 
+little goblin could wield this massive axe. It's a bit awkward even for you.
 ~
 1 hmp an 7
 0 1 2
@@ -18,7 +18,7 @@ brew goblin lumberjack vial~
 a goblin lumberjack brew~
 A vial of goblin lumberjack brew is sitting here.~
    Finally, the explanation for goblins being able to use human sized weapons
-comes to light: as with everything else, they cheat.  
+comes to light: as with everything else, they cheat.
 ~
 25 m a 4
 7 1 0
@@ -29,7 +29,7 @@ sandals goblin pair~
 goblin sandals~
 A pair of goblin sandals is falling apart here.~
    The only thing more pathetically flimsy than goblin shoes, this pair of
-goblin sandals seems to be falling apart before your eyes.  
+goblin sandals seems to be falling apart before your eyes.
 ~
 2 mp ag 5
 0 0 0
@@ -41,8 +41,8 @@ S
 cap wooden crude~
 a crude wooden cap~
 A crude wooden cap is lying here.~
-   Goblin lumberjacks tend to abandon precision in favor of enthusiasm. 
-Natural selection eventually developed these thick wooden caps.  
+   Goblin lumberjacks tend to abandon precision in favor of enthusiasm.
+Natural selection eventually developed these thick wooden caps.
 ~
 2 mp ae 2
 0 0 0
@@ -67,12 +67,23 @@ leggings lumberjack goblin~
 goblin lumberjack leggings~
 A pair of goblin lumberjack leggings is lying here.~
    These smelly but surprisingly durable leggings are made from the raw hide of
-a warg. Or maybe a rat. It's hard to tell.  
+a warg. Or maybe a rat. It's hard to tell.
 ~
 2 mp af 1
 0 0 0
 7 0
 A
 11 1
+S
+#18106
+goblins retreating~
+the retreating goblins~
+The goblins are retreating!~
+This item tracks the time left before the camp disappears.
+~
+3 0 0 2
+0 0 0
+0 6
+T 18106
 S
 $
