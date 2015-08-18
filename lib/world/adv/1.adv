@@ -109,7 +109,7 @@ Paul Clarke~
    You've stumbled onto somebody's campsite in the ruins. From the looks of
 things, it's not someone living the high life. Some of the items appear to be
 quite valuable, so it's safe to assume the person camping here is not the legal
-owner of any of these things.  
+owner of any of these things.
 ~
 10110 10129 25-75
 20 0 c 0
@@ -159,7 +159,7 @@ countryside! Can you hunt it down and kill it? Just follow the swath of
 scorched earth. The dragon is tough -- you might want to bring a partner.
 ~
 10300 10329 100-150
-10 0 d 0
+5 0 d 0
 L
 5 0
 43200 -1 -1

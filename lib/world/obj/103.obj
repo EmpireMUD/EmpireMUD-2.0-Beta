@@ -57,8 +57,8 @@ S
 charm breath dragons dragon's~
 the dragon's breath charm~
 A dragon's breath charm is lying here.~
-   This charm is made from pure gold and imbued with the breath of a dragon. 
-It's suspended from a gold necklace, and is much heavier than it looks.  
+   This charm is made from pure gold and imbued with the breath of a dragon.
+It's suspended from a gold necklace, and is much heavier than it looks.
 ~
 2 mp ac 1
 0 0 0
@@ -73,7 +73,7 @@ charm dragons dragon's ferocity~
 the dragon's ferocity charm~
 A dragon's ferocity charm is lying here.~
    This charm is made of gold, in the shape of a dragon's tooth, and imbued
-with all the ferocity a dragon can muster. As a result, it's quite heavy.  
+with all the ferocity a dragon can muster. As a result, it's quite heavy.
 ~
 2 mp ac 1
 0 0 0
@@ -88,7 +88,7 @@ charm courage dragons dragon's~
 the dragon's courage charm~
 A dragon's courage charm is lying here.~
    This golden charm is made in the shape of a dragon's eye, and enchanted with
-the courage of a dragon. It's much heavier than it looks.  
+the courage of a dragon. It's much heavier than it looks.
 ~
 2 mp ac 1
 0 0 0
@@ -106,7 +106,7 @@ the dragon's wind charm~
 A dragon's wind charm is lying here.~
    This charm is made from gold, in the shape of a dragon wing. It's imbued
 with the wind of a dragon (a fact you try not to think too hard about), and is
-much lighter than it looks.  
+much lighter than it looks.
 ~
 2 mp ac 1
 0 0 0
@@ -121,7 +121,7 @@ leggings dragonscale~
 dragonscale leggings~
 Some dragonscale leggings are on the ground.~
    These leggings are lined with fine cloth, but the outside is made from
-stitched chips of dragonscale.  
+stitched chips of dragonscale.
 ~
 27 mo af 1
 0 0 0
@@ -246,5 +246,16 @@ Craft (requires Dangerous Leathers and a fire): dragonmail chaps
 3 0 a 6
 0 0 0
 0 0
+S
+#10316
+sorrow dragons~
+the sorrow of dragons~
+The sorrow of dragons hangs heavy in the air.~
+A dragon has died and an air of sorrow looms over the cave.
+~
+3 0 0 3
+0 0 0
+10 144
+T 10307
 S
 $

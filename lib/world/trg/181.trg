@@ -12,13 +12,14 @@ end
 eval logs %self.logs%
 eval room %self.room%
 eval gohome 0
+eval cap 30
 if (%room.template% == 18100)
   eval gohome 1
 end
-if (%random.20% == 20 && !%self.mob_flagged(SENTINEL)%
+if (%random.10% == 10 && !%self.mob_flagged(SENTINEL)%
   eval gohome 1
 end
-if (%room.sector% ~= Forest || %room.sector% ~= Jungle || %room.sector% == Grove)
+if (%room.sector% ~= Forest || %room.sector% == Grove) && (%logs% < %cap%)
   * Stops the mob from wandering while it works on this tile
   nop %self.add_mob_flag(SENTINEL)%
   if (%room.sector% == Light Forest)
@@ -44,32 +45,22 @@ if (%room.sector% ~= Forest || %room.sector% ~= Jungle || %room.sector% == Grove
     wait 1 sec
     %echo% The trees fall into each other with a single mighty crash!
     cackle
-  elseif (%room.sector% == Jungle)
-    %echo% %self.name% fells a tree with a mighty crash!
-    if (%random.3 == 3%)
-      %terraform% %room% 27
-    end
-    eval logs %logs% + 1
-  elseif (%room.sector% == Light Jungle)
-    if (%random.2% == 2)
-      %echo% %self.name% fells the last tree with a mighty crash!
-      %terraform% %room% 0
-    else
-      %echo% %self.name% fells a tree with a mighty crash!
-    end
-    eval logs %logs% + 1
   end
 else
   * Tile is clear, can wander now
   nop %self.remove_mob_flag(SENTINEL)%
 end
-remote logs %self.id%
 wait 1 sec
 if (%gohome% && %instance.location%)
   %echo% %self.name% heads back to %self.hisher% camp!
   %teleport% %self% %instance.location%
   %echo% %self.name% returns to the camp!
+if (%logs% > 15 && %random.5%==5)
+    %echo% %self.name% drops off a log at the camp.
+    eval logs %logs%-1
+  end
 end
+remote logs %self.id%
 ~
 #18101
 Lumberjack drop logs~
@@ -105,10 +96,10 @@ switch %random.3%
 done
 ~
 #18103
-Goblin lumberjack chop echo~
+Goblin lumberjack environmental~
 0 b 50
 ~
-if %self.mob_flagged(SENTINEL)%
+if (%self.mob_flagged(SENTINEL)% && !%self.fighting%)
   switch %random.3%
     case 1
       %echo% %self.name% swings %self.hisher% axe hard into a tree!

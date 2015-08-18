@@ -6,26 +6,26 @@ if (%self.fighting% || %self.disabled%)
   halt
 end
 eval room %self.room%
-if (%instance.location% && (%room.template% == 10300 || (%room% != %instance.location% && %random.15% == 15)))
+if (%instance.location% && (%room.template% == 10300 || (%room% != %instance.location% && %random.10% == 10)))
   %echo% %self.name% flies away!
   mgoto %instance.location%
   %echo% %self.name% flies into the cave!
-elseif (%room.sector% == Crop || %room.sector% == Seeded Field || %room.sector% == Jungle Crop || %room.sector% == Jungle Field)
+elseif (%room.sector% == Crop || %room.sector% == Seeded Field || %room.sector% == Jungle Crop || %room.sector% == Jungle Field) 
   %echo% %self.name% scorches the crops!
   %terraform% %room% 10303
-elseif (%room.sector% == Desert Crop || %room.sector% == Sandy Field)
+elseif (%room.sector% == Desert Crop || %room.sector% == Sandy Field) 
   %echo% %self.name% scorches the crops!
   %terraform% %room% 10304
-elseif (%room.sector% == Desert)
+elseif (%room.sector% == Desert) 
   %echo% %self.name% scorches the desert!
   %terraform% %room% 10305
-elseif (%room.sector% ~= Forest || %room.sector% ~= Jungle)
+elseif (%room.sector% ~= Forest || %room.sector% ~= Jungle) 
   %echo% %self.name% scorches the trees!
   %terraform% %room% 10300
-elseif (%room.sector% == Grove)
+elseif (%room.sector% == Grove) 
   %echo% %self.name% scorches the grove!
   %terraform% %room% 10301
-elseif (%room.sector% == Plains)
+elseif (%room.sector% == Plains) 
   %echo% %self.name% scorches the plains!
   %terraform% %room% 10302
 end
@@ -104,13 +104,14 @@ else
 end
 ~
 #10303
-Flame Dragon overcompleter~
+Flame Dragon delay-completer~
 0 f 100
 ~
-%adventurecomplete%
-* in case:
-if %instance.start%
-  %at% %instance.start% %adventurecomplete%
+if %instance.start
+  * Attempt delayed despawn
+  %at% %instance.start% %load% o 10316
+else
+  %adventurecomplete%
 end
 ~
 #10304
@@ -170,5 +171,11 @@ done
 if %count% < 1
   %purge% %self%
 end
+~
+#10307
+Flame dragon despawn timer~
+1 f 0
+~
+%adventurecomplete%
 ~
 $
