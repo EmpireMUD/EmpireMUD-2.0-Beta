@@ -1371,12 +1371,14 @@ void free_empire(empire_data *emp) {
 	extern struct empire_territory_data *global_next_territory_entry;
 	
 	struct empire_storage_data *store;
+	struct empire_unique_storage *eus;
 	struct empire_territory_data *ter;
 	struct empire_npc_data *npc;
 	struct empire_city_data *city;
 	struct empire_political_data *pol;
 	struct empire_trade_data *trade;
 	struct empire_log_data *elog;
+	struct shipping_data *shipd;
 	room_data *room;
 	int iter, pos;
 	
@@ -1398,6 +1400,22 @@ void free_empire(empire_data *emp) {
 		free(store);
 	}
 	emp->store = NULL;
+	
+	// free unique storage
+	while ((eus = EMPIRE_UNIQUE_STORAGE(emp))) {
+		EMPIRE_UNIQUE_STORAGE(emp) = eus->next;
+		if (eus->obj) {
+			extract_obj(eus->obj);
+		}
+	}
+	EMPIRE_UNIQUE_STORAGE(emp) = NULL;
+	
+	// free shipping data
+	while ((shipd = EMPIRE_SHIPPING_LIST(emp))) {
+		EMPIRE_SHIPPING_LIST(emp) = shipd->next;
+		free(shipd);
+	}
+	EMPIRE_SHIPPING_LIST(emp) = NULL;
 	
 	// free cities (while they last)
 	while ((city = emp->city_list)) {
@@ -1488,10 +1506,12 @@ void free_empire(empire_data *emp) {
 * @param empire_data *emp The empire to assign the storage to.
 */
 void load_empire_storage_one(FILE *fl, empire_data *emp) {	
-	int t[6], junk;
+	int t[10], junk;
+	long l_in;
 	char line[1024], str_in[256], buf[MAX_STRING_LENGTH];
 	struct empire_storage_data *store;
 	struct empire_unique_storage *eus, *last_eus = NULL;
+	struct shipping_data *shipd, *last_shipd = NULL;
 	obj_data *obj;
 	
 	if (!fl || !emp) {
@@ -1560,6 +1580,33 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 					last_eus = eus;
 				}
 				
+				break;
+			}
+			case 'V': {	// shipments
+				if (sscanf(line, "V %d %d %d %d %d %ld %d %d", &t[0], &t[1], &t[2], &t[3], &t[4], &l_in, &t[5], &t[6]) != 8) {
+					log("SYSERR: Invalid V line of empire %d: %s", EMPIRE_VNUM(emp), line);
+					exit(0);
+				}
+				
+				CREATE(shipd, struct shipping_data, 1);
+				shipd->vnum = t[0];
+				shipd->amount = t[1];
+				shipd->from_island = t[2];
+				shipd->to_island = t[3];
+				shipd->status = t[4];
+				shipd->status_time = l_in;
+				shipd->ship_homeroom = t[5];
+				shipd->ship_origin = t[6];
+				shipd->next = NULL;
+
+				// append to end
+				if (last_shipd) {
+					last_shipd->next = shipd;
+				}
+				else {
+					EMPIRE_SHIPPING_LIST(emp) = shipd;
+				}
+				last_shipd = shipd;
 				break;
 			}
 
@@ -1931,6 +1978,7 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	}
 	
 	// avoid U (used by empire storage)
+	// avoid V (used by empire storage)
 	
 	// X: trade
 	for (trade = EMPIRE_TRADE(emp); trade; trade = trade->next) {
@@ -1956,6 +2004,7 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 void write_empire_storage_to_file(FILE *fl, empire_data *emp) {	
 	struct empire_storage_data *store;
 	struct empire_unique_storage *eus;
+	struct shipping_data *shipd;
 
 	if (!emp) {
 		return;
@@ -1974,6 +2023,11 @@ void write_empire_storage_to_file(FILE *fl, empire_data *emp) {
 		}
 		fprintf(fl, "U %d %d %s\n", eus->island, eus->amount, bitv_to_alpha(eus->flags));
 		Crash_save_one_obj_to_file(fl, eus->obj, 0);
+	}
+	
+	// V: shipments
+	for (shipd = EMPIRE_SHIPPING_LIST(emp); shipd; shipd = shipd->next) {
+		fprintf(fl, "V %d %d %d %d %d %ld %d %d\n", shipd->vnum, shipd->amount, shipd->from_island, shipd->to_island, shipd->status, shipd->status_time, shipd->ship_homeroom, shipd->ship_origin);
 	}
 
 	fprintf(fl, "S\n");

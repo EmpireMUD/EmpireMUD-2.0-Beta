@@ -811,6 +811,7 @@ void list_cities(char_data *ch, char *argument) {
 	extern int count_city_points_used(empire_data *emp);
 	
 	struct empire_city_data *city;
+	struct island_info *isle;
 	empire_data *emp;
 	int points, used, count;
 	bool found = FALSE;
@@ -839,7 +840,8 @@ void list_cities(char_data *ch, char *argument) {
 		found = TRUE;
 		rl = city->location;
 		prettier_sprintbit(city->traits, empire_trait_types, buf);
-		msg_to_char(ch, "%d. (%*d, %*d) %s (%s/%d), traits: %s\r\n", ++count, X_PRECISION, X_COORD(rl), Y_PRECISION, Y_COORD(rl), city->name, city_type[city->type].name, city_type[city->type].radius, buf);
+		isle = get_island(GET_ISLAND_ID(rl), TRUE);
+		msg_to_char(ch, "%d. (%*d, %*d) %s, on %s (%s/%d), traits: %s\r\n", ++count, X_PRECISION, X_COORD(rl), Y_PRECISION, Y_COORD(rl), city->name, isle->name, city_type[city->type].name, city_type[city->type].radius, buf);
 	}
 	
 	if (!found) {
@@ -2592,6 +2594,8 @@ ACMD(do_enroll) {
 	struct empire_npc_data *npc;
 	struct empire_storage_data *store, *store2;
 	struct empire_city_data *city, *next_city, *temp;
+	struct empire_unique_storage *eus;
+	struct shipping_data *shipd;
 	empire_data *e, *old;
 	room_data *room, *next_room;
 	int j, old_store;
@@ -2718,6 +2722,36 @@ ACMD(do_enroll) {
 				if (store2->amount < old_store || store2->amount > MAX_STORAGE) {
 					store2->amount = MAX_STORAGE;
 				}
+			}
+			
+			// shipping: append to end of current empire's list
+			if (EMPIRE_SHIPPING_LIST(old)) {
+				// find end
+				if ((shipd = EMPIRE_SHIPPING_LIST(e))) {
+					while (shipd->next) {
+						shipd = shipd->next;
+					}
+					shipd->next = EMPIRE_SHIPPING_LIST(old);
+				}
+				else {
+					EMPIRE_SHIPPING_LIST(e) = EMPIRE_SHIPPING_LIST(old);
+				}
+				EMPIRE_SHIPPING_LIST(old) = NULL;
+			}
+			
+			// unique storage: append to end of current empire's list
+			if (EMPIRE_UNIQUE_STORAGE(old)) {
+				// find end
+				if ((eus = EMPIRE_UNIQUE_STORAGE(e))) {
+					while (eus->next) {
+						eus = eus->next;
+					}
+					eus->next = EMPIRE_UNIQUE_STORAGE(old);
+				}
+				else {
+					EMPIRE_UNIQUE_STORAGE(e) = EMPIRE_UNIQUE_STORAGE(old);
+				}
+				EMPIRE_UNIQUE_STORAGE(old) = NULL;
 			}
 			
 			// cities

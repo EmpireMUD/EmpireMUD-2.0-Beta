@@ -1243,6 +1243,28 @@ bonuses from a weapon while it is sheathed.
 
 See also: DRAW, SWAP
 #
+SHIP SHIPPING
+
+Usage:  ship status
+        ship cancel [number] <item>
+        ship <island> [number] <item>
+
+This command allows you to ship stored resources between items automatically,
+using ships at your docks. Once you queue items to be shipped, your NPCs will
+periodically load up empty ships and move them to the target island. You must
+have docks at both ends.
+
+Items will automatically transfer from the empire inventory on the origin
+island to the empire inventory on the destination island, and the ship will
+appear in one of the docks at the destination.
+
+You can only ship and cancel shipments from the island you are currently on,
+but you can see the status of empire shipments all over the world.
+
+Shipments happen every X time and take approximately X time.
+
+See also: DOCKS, EINVENTORY, SHIPBUILDING
+#
 SLEEP
 
 The SLEEP command puts you to sleep, allowing you to regain your stamina more

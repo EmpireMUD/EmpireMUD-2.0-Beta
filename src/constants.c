@@ -1076,6 +1076,7 @@ const char *empire_log_types[] = {
 	"Members",
 	"Territory",
 	"Trade",
+	"Shipping",
 	"\n"
 };
 
@@ -1089,7 +1090,8 @@ const bool show_empire_log_type[] = {
 	TRUE,	// members
 	TRUE,	// territory
 	FALSE,	// trade
-	TRUE	// logins
+	TRUE,	// logins
+	FALSE	// shipments
 };
 
 
@@ -1142,6 +1144,7 @@ const char *priv[] = {
 	"cities",
 	"trade",
 	"logs",
+	"shipping",
 	"\n"
 };
 

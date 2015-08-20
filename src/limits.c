@@ -994,6 +994,7 @@ bool should_delete_empire(empire_data *emp) {
 * @return bool TRUE if the item is still in the world, FALSE if it was extracted
 */
 bool check_autostore(obj_data *obj, bool force) {
+	room_data *real_loc;
 	obj_data *top_obj;
 	empire_data *emp;
 	bool store, unique, full;
@@ -1010,7 +1011,14 @@ bool check_autostore(obj_data *obj, bool force) {
 	
 	// ensure object is in a room, or in an object in a room
 	top_obj = get_top_object(obj);
-	if (!IN_ROOM(top_obj) || IS_ADVENTURE_ROOM(IN_ROOM(top_obj))) {
+	real_loc = IN_ROOM(top_obj);
+	if (!real_loc || IS_ADVENTURE_ROOM(real_loc)) {
+		return TRUE;
+	}
+	
+	// check boat room: items on ships in the Ship Holding Pen do not autostore
+	real_loc = BOAT_ROOM(real_loc);
+	if (!real_loc || BUILDING_VNUM(real_loc) == RTYPE_SHIP_HOLDING_PEN) {
 		return TRUE;
 	}
 	

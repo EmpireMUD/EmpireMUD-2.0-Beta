@@ -834,6 +834,7 @@ Privileges:
   cities: can found and abandon cities
   trade: can set up import and export rules
   logs: can view elogs
+  shipping: can use the ship command to move goods
 
 See also: CLAIM, BUILD, HARVEST, PROMOTE, DEMOTE, CHOP, CEDE, EEDIT, ELOG
 #

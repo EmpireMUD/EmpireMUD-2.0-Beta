@@ -1080,7 +1080,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	}
 
 	/* Hidden buildings */
-	else if (distance(FLAT_X_COORD(map_loc), FLAT_Y_COORD(map_loc), FLAT_X_COORD(map_to_room), FLAT_Y_COORD(map_to_room)) > 2 && ROOM_AFF_FLAGGED(to_room, ROOM_AFF_CHAMELEON)) {
+	else if (!map_loc || !map_to_room || (distance(FLAT_X_COORD(map_loc), FLAT_Y_COORD(map_loc), FLAT_X_COORD(map_to_room), FLAT_Y_COORD(map_to_room)) > 2 && ROOM_AFF_FLAGGED(to_room, ROOM_AFF_CHAMELEON))) {
 		strcat(buf, base_icon->icon);
 		hidden = TRUE;
 	}
@@ -1847,7 +1847,7 @@ ACMD(do_scan) {
 	if (!*argument) {
 		msg_to_char(ch, "Scan which direction?\r\n");
 	}
-	else if (IS_ADVENTURE_ROOM(use_room) || ROOM_IS_CLOSED(use_room)) {	// check map room
+	else if (!use_room || IS_ADVENTURE_ROOM(use_room) || ROOM_IS_CLOSED(use_room)) {	// check map room
 		msg_to_char(ch, "You can only use scan out on the map.\r\n");
 	}
 	else if (!GET_BOAT(IN_ROOM(ch)) && (IS_ADVENTURE_ROOM(IN_ROOM(ch)) || ROOM_IS_CLOSED(IN_ROOM(ch)))) {

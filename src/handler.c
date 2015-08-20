@@ -5207,6 +5207,37 @@ bool delete_stored_resource(empire_data *emp, obj_vnum vnum) {
 
 
 /**
+* Finds empire storage on a given island by item keyword.
+* 
+* @param empire_data *emp The empire whose storage to search.
+* @param int island_id Which island to look on.
+* @param char *keywords The keyword(s) to match using multi_isname().
+* @return struct empire_storage_data* The storage entry, or NULL if no matches.
+*/
+struct empire_storage_data *find_island_storage_by_keywords(empire_data *emp, int island_id, char *keywords) {
+	struct empire_storage_data *store;
+	obj_data *proto;
+	
+	for (store = EMPIRE_STORAGE(emp); store; store = store->next) {
+		if (store->island != island_id) {
+			continue;
+		}
+		if (!(proto = obj_proto(store->vnum))) {
+			continue;
+		}
+		if (!multi_isname(keywords, GET_OBJ_KEYWORDS(proto))) {
+			continue;
+		}
+		
+		// found!
+		return store;
+	}
+	
+	return NULL;
+}
+
+
+/**
 * This is used by the einv sorter (sort_storage) to sort by storage locations,
 * where the order of the storage locations on the object won't matter. The
 * return value is not significant other than it can be used to compare two

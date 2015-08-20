@@ -393,6 +393,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define EMPIRE_LAST_LOGON(emp)  ((emp)->last_logon)
 #define EMPIRE_CHORE(emp, num)  ((emp)->chore_active[(num)])
 #define EMPIRE_SCORE(emp, num)  ((emp)->scores[(num)])
+#define EMPIRE_SHIPPING_LIST(emp)  ((emp)->shipping_list)
 #define EMPIRE_SORT_VALUE(emp)  ((emp)->sort_value)
 #define EMPIRE_UNIQUE_STORAGE(emp)  ((emp)->unique_store)
 
@@ -436,8 +437,8 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define FLAT_X_COORD(room)  (GET_ROOM_VNUM(room) % MAP_WIDTH)
 #define FLAT_Y_COORD(room)  (GET_ROOM_VNUM(room) / MAP_WIDTH)
 
-#define X_COORD(room)  FLAT_X_COORD(get_map_location_for(room))
-#define Y_COORD(room)  FLAT_Y_COORD(get_map_location_for(room))
+extern int X_COORD(room_data *room);	// formerly #define X_COORD(room)  FLAT_X_COORD(get_map_location_for(room))
+extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(get_map_location_for(room))
 
 // wrap x/y "around the edge"
 #define WRAP_X_COORD(x)  (WRAP_X ? (((x) < 0) ? ((x) + MAP_WIDTH) : (((x) >= MAP_WIDTH) ? ((x) - MAP_WIDTH) : (x))) : MAX(0, MIN(MAP_WIDTH-1, (x))))
@@ -925,7 +926,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define SHIFT_DIR(room, dir)  real_shift((room), shift_dir[(dir)][0], shift_dir[(dir)][1])
 
 // island info
-#define GET_ISLAND_ID(room)  (get_map_location_for(room)->island)
+extern int GET_ISLAND_ID(room_data *room);	// formerly #define GET_ISLAND_ID(room)  (get_map_location_for(room)->island)
 #define SET_ISLAND_ID(room, id)  ((room)->island = id)
 
 // room types

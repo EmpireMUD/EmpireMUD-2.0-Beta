@@ -1424,7 +1424,7 @@ room_data *create_ocean_room(room_vnum vnum) {
 	
 	SECT(room) = sector_proto(BASIC_OCEAN);
 	ROOM_ORIGINAL_SECT(room) = SECT(room);
-	GET_ISLAND_ID(room) = NO_ISLAND;
+	SET_ISLAND_ID(room, NO_ISLAND);
 	
 	// only if saveable
 	if (!CAN_UNLOAD_MAP_ROOM(room)) {
