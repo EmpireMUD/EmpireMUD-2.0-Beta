@@ -3876,7 +3876,7 @@ ACMD(do_territory) {
 	empire_data *emp = GET_LOYALTY(ch);
 	room_data *iter, *next_iter;
 	bool outside_only = TRUE, ok;
-	int total;
+	int total, check_x;
 	crop_data *crop = NULL;
 	char *remain;
 	
@@ -3962,7 +3962,16 @@ ACMD(do_territory) {
 		for (node = node_list; node; node = next_node) {
 			next_node = node->next;
 			total += node->count;
-			sprintf(buf + strlen(buf), "%2d tile%s near%s (%*d, %*d) %s\r\n", node->count, (node->count != 1 ? "s" : ""), (node->count == 1 ? " " : ""), X_PRECISION, X_COORD(node->loc), Y_PRECISION, Y_COORD(node->loc), get_room_name(node->loc, FALSE));
+			
+			// territory can be off the map (e.g. ships) and get a -1 here
+			check_x = X_COORD(node->loc);
+			
+			if (check_x >= 0 && check_x < MAP_WIDTH) {
+				sprintf(buf + strlen(buf), "%2d tile%s near%s (%*d, %*d) %s\r\n", node->count, (node->count != 1 ? "s" : ""), (node->count == 1 ? " " : ""), X_PRECISION, check_x, Y_PRECISION, Y_COORD(node->loc), get_room_name(node->loc, FALSE));
+			}
+			else {
+				sprintf(buf + strlen(buf), "%2d tile%s near%s (unknown) %s\r\n", node->count, (node->count != 1 ? "s" : ""), (node->count == 1 ? " " : ""), get_room_name(node->loc, FALSE));
+			}
 			free(node);
 		}
 		
