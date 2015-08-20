@@ -3190,7 +3190,7 @@ room_data *get_map_location_for(room_data *room) {
 		// shortcut
 		return room;
 	}
-	else if (HOME_ROOM(room) == room) {
+	else if (HOME_ROOM(room) == room && BOAT_ROOM(room) == room) {
 		// no home room on the map?
 		return NULL;
 	}

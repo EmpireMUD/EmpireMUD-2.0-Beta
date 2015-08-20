@@ -4446,6 +4446,9 @@ ACMD(do_ship) {
 	int number = 1;
 	size_t size;
 	
+	// SHIPPING_x
+	const char *status_type[] = { "waiting for ship", "en route", "delivered", "\n" };
+	
 	argument = any_one_word(argument, arg1);	// command
 	argument = any_one_word(argument, arg2);	// number or keywords
 	skip_spaces(&argument);	// keywords
@@ -4486,7 +4489,7 @@ ACMD(do_ship) {
 			
 			from_isle = get_island(sd->from_island, TRUE);
 			to_isle = get_island(sd->to_island, TRUE);
-			snprintf(line, sizeof(line), " %dx %s (%s to %s)\r\n", sd->amount, skip_filler(GET_OBJ_SHORT_DESC(proto)), from_isle ? from_isle->name : "unknown", to_isle ? to_isle->name : "unknown");
+			snprintf(line, sizeof(line), " %dx %s (%s to %s, %s)\r\n", sd->amount, skip_filler(GET_OBJ_SHORT_DESC(proto)), from_isle ? from_isle->name : "unknown", to_isle ? to_isle->name : "unknown", status_type[sd->status]);
 			done = TRUE;
 			
 			if (size + strlen(line) >= sizeof(buf)) {
@@ -4530,6 +4533,7 @@ ACMD(do_ship) {
 			
 			// found!
 			msg_to_char(ch, "You cancel the shipment for %d '%s'.\r\n", sd->amount, skip_filler(GET_OBJ_SHORT_DESC(proto)));
+			add_to_empire_storage(GET_LOYALTY(ch), sd->from_island, sd->vnum, sd->amount);
 			
 			REMOVE_FROM_LIST(sd, EMPIRE_SHIPPING_LIST(GET_LOYALTY(ch)), next);
 			free(sd);
