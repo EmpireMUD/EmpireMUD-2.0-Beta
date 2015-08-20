@@ -35,7 +35,6 @@
 struct empire_territory_data *global_next_territory_entry = NULL;
 
 // protos
-void do_chore_auto_balance(empire_data *emp, room_data *room);
 void do_chore_brickmaking(empire_data *emp, room_data *room);
 void do_chore_building(empire_data *emp, room_data *room);
 void do_chore_chopping(empire_data *emp, room_data *room);
@@ -89,7 +88,7 @@ struct empire_chore_type chore_data[NUM_CHORES] = {
 	{ "tanning", TANNER },
 	{ "shearing", SHEARER },
 	{ "minting", COIN_MAKER },
-	{ "auto-balance", DOCKWORKER }
+	{ "auto-balance", DOCKWORKER }	// NOTE: CURRENTLY NOT FUNCTIONING
 };
 
 
@@ -160,9 +159,6 @@ void process_one_chore(empire_data *emp, room_data *room) {
 			do_chore_gardening(emp, room);
 		}
 	
-		if (ROOM_BLD_FLAGGED(room, BLD_DOCKS) && EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR) && EMPIRE_CHORE(emp, CHORE_AUTO_BALANCE)) {
-			do_chore_auto_balance(emp, room);
-		}
 		if (ROOM_BLD_FLAGGED(room, BLD_MINT) && EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR) && EMPIRE_CHORE(emp, CHORE_MINTING)) {
 			do_chore_minting(emp, room);
 		}
@@ -527,96 +523,6 @@ void run_chore_tracker_updates(void) {
 
  /////////////////////////////////////////////////////////////////////////////
 //// CHORE FUNCTIONS ////////////////////////////////////////////////////////
-
-void do_chore_auto_balance(empire_data *emp, room_data *room) {
-	extern int top_island_num;
-	
-	char_data *worker = find_mob_in_room_by_vnum(room, chore_data[CHORE_AUTO_BALANCE].mob);
-	bool can_do = EMPIRE_HAS_TECH_ON_ISLAND(emp, GET_ISLAND_ID(room), TECH_SEAPORT);
-	struct empire_storage_data *store = NULL, *lookup, *to_move;
-	char lbuf[MAX_STRING_LENGTH];
-	int diff = 0, iter, move_amt, my_islands, have_total = 0, done = 0;
-	bool onward;
-	
-	int auto_balance_per_cycle = config_get_int("auto_balance_per_cycle");
-	
-	// first, figure out how many islands this player has seaports on
-	my_islands = 0;
-	for (iter = 0; iter <= top_island_num; ++iter) {
-		if (EMPIRE_HAS_TECH_ON_ISLAND(emp, iter, TECH_SEAPORT)) {
-			++my_islands;
-		}
-	}
-	
-	// really?
-	if (my_islands == 0) {
-		can_do = FALSE;
-	}
-	
-	do {
-		onward = FALSE;
-		
-		// now, look for something we need that's stored on another island but not this one
-		to_move = NULL;
-		for (store = (store ? store->next : EMPIRE_STORAGE(emp)); can_do && store && !to_move; store = store->next) {			
-			// skip any they won't have enough to move anyway
-			if (store->amount <= 1) {
-				continue;
-			}
-		
-			// skip same-island
-			if (store->island == GET_ISLAND_ID(room)) {
-				continue;
-			}
-		
-			// skip islands that don't have seaports
-			if (!EMPIRE_HAS_TECH_ON_ISLAND(emp, store->island, TECH_SEAPORT)) {
-				continue;
-			}
-		
-			// find it, crunch numbers
-			lookup = find_stored_resource(emp, GET_ISLAND_ID(room), store->vnum);
-			have_total = get_total_stored_count(emp, store->vnum);
-			diff = store->amount - (lookup ? lookup->amount : 0);	// max we COULD need to move
-		
-			// do we need some?
-			if ((!lookup || diff > 1) && store->amount > (have_total / my_islands)) {
-				to_move = store;
-				break;
-			}
-		}
-	
-		// ok, try the chore
-		if (worker && to_move && can_do) {
-			if ((time_info.hours % 12) == 0) {
-				move_amt = MIN((auto_balance_per_cycle - done), diff);
-				move_amt = MIN(move_amt, (have_total / my_islands) - (lookup ? lookup->amount : 0));	// never move so much that we'd just move it back
-				move_amt = MAX(1, move_amt); // move at least 1
-				to_move->amount -= move_amt;	// safe: we know it has more than this already
-				add_to_empire_storage(emp, GET_ISLAND_ID(room), to_move->vnum, move_amt);
-		
-				sprintf(lbuf, "$n unloads %s (x%d).", get_obj_name_by_proto(to_move->vnum), move_amt);
-				act(lbuf, FALSE, worker, NULL, NULL, TO_ROOM);
-				
-				if (done == 0) {
-					empire_skillup(emp, ABIL_WORKFORCE, config_get_double("exp_from_workforce"));
-					empire_skillup(emp, ABIL_SKILLED_LABOR, config_get_double("exp_from_workforce"));
-				}
-				
-				// allow repeat
-				done += move_amt;
-				onward = TRUE;
-			}
-		}
-		else if (to_move && can_do) {
-			worker = place_chore_worker(emp, CHORE_AUTO_BALANCE, room);
-		}
-		else if (worker) {
-			SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
-		}
-	} while (onward && done < auto_balance_per_cycle);
-}
-
 
 void do_chore_brickmaking(empire_data *emp, room_data *room) {
 	struct empire_storage_data *store = find_stored_resource(emp, GET_ISLAND_ID(room), o_CLAY);
