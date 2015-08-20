@@ -3063,6 +3063,16 @@ int compute_distance(room_data *from, room_data *to) {
 	int dx = x1 - x2;
 	int dy = y1 - y2;
 	int dist;
+	
+	// short circuit on same-room
+	if (from == to || HOME_ROOM(from) == HOME_ROOM(to)) {
+		return 0;
+	}
+	
+	// infinite distance if they are in an unknown location
+	if (x1 < 0 || x2 < 0 || y1 < 0 || y2 < 0) {
+		return MAP_SIZE;	// maximum distance
+	}
 
 	// adjust for edges
 	if (WRAP_X) {
