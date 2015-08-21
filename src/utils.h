@@ -269,7 +269,6 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define EFFECTIVELY_FLYING(ch)  (IS_RIDING(ch) ? MOUNT_FLAGGED(ch, MOUNT_FLYING) : AFF_FLAGGED(ch, AFF_FLY))
 #define HAS_INFRA(ch)  AFF_FLAGGED(ch, AFF_INFRAVISION)
 #define IS_HUMAN(ch)  (!IS_VAMPIRE(ch))
-#define IS_IN_CITY(ch)  (ROOM_OWNER(IN_ROOM(ch)) ? (find_city(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch)) != NULL) : (GET_LOYALTY(ch) ? (find_city(GET_LOYALTY(ch), IN_ROOM(ch)) != NULL) : FALSE))
 #define IS_MAGE(ch)  (IS_NPC(ch) ? GET_MAX_MANA(ch) > 0 : (GET_SKILL((ch), SKILL_NATURAL_MAGIC) > 0 || GET_SKILL((ch), SKILL_HIGH_SORCERY) > 0))
 #define IS_OUTDOORS(ch)  IS_OUTDOOR_TILE(IN_ROOM(ch))
 #define IS_VAMPIRE(ch)  (IS_NPC(ch) ? MOB_FLAGGED((ch), MOB_VAMPIRE) : PLR_FLAGGED((ch), PLR_VAMPIRE))
@@ -893,7 +892,6 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define DEPLETION_LIMIT(room)  (ROOM_BLD_FLAGGED((room), BLD_HIGH_DEPLETION) ? config_get_int("high_depletion") : config_get_int("common_depletion"))
 #define IS_CITY_CENTER(room)  (BUILDING_VNUM(room) == BUILDING_CITY_CENTER)
 #define IS_DARK(room)  (MAGIC_DARKNESS(room) || (!IS_ANY_BUILDING(room) && ROOM_LIGHTS(room) == 0 && (!ROOM_OWNER(room) || !EMPIRE_HAS_TECH(ROOM_OWNER(room), TECH_CITY_LIGHTS)) && !RMT_FLAGGED((room), RMT_LIGHT) && (weather_info.sunlight == SUN_DARK || RMT_FLAGGED((room), RMT_DARK))))
-#define IS_IN_CITY_ROOM(room)  (ROOM_OWNER(room) ? (find_city(ROOM_OWNER(room), room) != NULL) : FALSE)
 #define IS_LIGHT(room)  (!MAGIC_DARKNESS(room) && WOULD_BE_LIGHT_WITHOUT_MAGIC_DARKNESS(room))
 #define IS_REAL_LIGHT(room)  (!MAGIC_DARKNESS(room) && (!IS_DARK(room) || RMT_FLAGGED((room), RMT_LIGHT) || IS_INSIDE(room) || (ROOM_OWNER(room) && IS_ANY_BUILDING(room))))
 #define ISLAND_FLAGGED(room, flag)  ((GET_ISLAND_ID(room) != NO_ISLAND) ? IS_SET(get_island(GET_ISLAND_ID(room), TRUE)->flags, (flag)) : FALSE)
@@ -1144,6 +1142,9 @@ extern unsigned long long microtime(void);
 // utils from act.action.c
 void cancel_action(char_data *ch);
 void start_action(char_data *ch, int type, int timer, bitvector_t flags);
+
+// utils from act.empire.c
+extern bool is_in_city_for_empire(room_data *loc, empire_data *emp, bool check_wait, bool *too_soon);
 
 // utils from act.informative.c
 extern char *get_obj_desc(obj_data *obj, char_data *ch, int mode);

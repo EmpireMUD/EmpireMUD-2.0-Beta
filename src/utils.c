@@ -786,6 +786,7 @@ void score_empires(void) {
 bool can_build_or_claim_at_war(char_data *ch, room_data *loc) {
 	struct empire_political_data *pol;
 	empire_data *enemy;
+	bool junk;
 	
 	// if they aren't at war, this doesn't apply
 	if (!ch || !is_at_war(GET_LOYALTY(ch))) {
@@ -798,7 +799,7 @@ bool can_build_or_claim_at_war(char_data *ch, room_data *loc) {
 	}
 	
 	// if it's in one of their OWN cities, it's ok
-	if (GET_LOYALTY(ch) && find_city(GET_LOYALTY(ch), loc) != NULL) {
+	if (GET_LOYALTY(ch) && is_in_city_for_empire(loc, GET_LOYALTY(ch), TRUE, &junk)) {
 		return TRUE;
 	}
 	
@@ -806,7 +807,7 @@ bool can_build_or_claim_at_war(char_data *ch, room_data *loc) {
 	for (pol = EMPIRE_DIPLOMACY(GET_LOYALTY(ch)); pol; pol = pol->next) {
 		if (IS_SET(pol->type, DIPL_WAR)) {
 			// not good if they are trying to build in a location owned by the other player while at war
-			if ((enemy = real_empire(pol->id)) && find_city(enemy, loc) != NULL) {
+			if ((enemy = real_empire(pol->id)) && is_in_city_for_empire(loc, enemy, TRUE, &junk)) {
 				return FALSE;
 			}
 		}

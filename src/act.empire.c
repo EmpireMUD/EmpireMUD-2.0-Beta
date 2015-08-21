@@ -807,6 +807,41 @@ void found_city(char_data *ch, char *argument) {
 }
 
 
+/**
+* Determines if a location counts as in-city, and has passed the required wait
+* time since the city was founded.
+*
+* @param room_data *loc The location to check.
+* @param empire_data *emp The empire to check.
+* @param bool check_wait If TRUE, requires the city wait time to have passed.
+* @param bool *too_soon Will be set to TRUE if there was a city but it was founded too recently.
+* @return bool TRUE if in-city, FALSE if not.
+*/
+bool is_in_city_for_empire(room_data *loc, empire_data *emp, bool check_wait, bool *too_soon) {
+	struct empire_city_data *city;
+	int wait = config_get_int("minutes_to_full_city") * SECS_PER_REAL_MIN;
+	
+	*too_soon = FALSE;
+
+	if (!emp) {
+		return FALSE;
+	}
+	
+	for (city = EMPIRE_CITY_LIST(emp); city; city = city->next) {
+		if (compute_distance(loc, city->location) <= city_type[city->type].radius) {
+			if (!check_wait || get_room_extra_data(loc, ROOM_EXTRA_FOUND_TIME) + wait > time(0)) {
+				return TRUE;
+			}
+			else {
+				*too_soon = TRUE;
+			}
+		}
+	}
+	
+	return FALSE;
+}
+
+
 // for do_city
 void list_cities(char_data *ch, char *argument) {
 	extern int count_city_points_used(empire_data *emp);
@@ -866,6 +901,7 @@ void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool 
 	struct empire_city_data *temp;
 	room_data *cityloc, *to_room;
 	int x, y, radius;
+	bool junk;
 	
 	// store location & radius now
 	cityloc = city->location;
@@ -890,7 +926,7 @@ void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool 
 				// check ownership
 				if (to_room && ROOM_OWNER(to_room) == emp) {
 					// warning: never abandon things that are still within another city
-					if (!find_city(emp, to_room)) {
+					if (!is_in_city_for_empire(to_room, emp, FALSE, &junk)) {
 						// check if ACTUALLY within the abandoned city
 						if (compute_distance(cityloc, to_room) <= radius) {
 							abandon_room(to_room);
@@ -1733,6 +1769,7 @@ ACMD(do_cede) {
 	empire_data *e = GET_LOYALTY(ch), *f;
 	room_data *room;
 	char_data *targ;
+	bool junk;
 
 	if (IS_NPC(ch))
 		return;
@@ -1773,7 +1810,7 @@ ACMD(do_cede) {
 		msg_to_char(ch, "You can't cede land to your own empire!\r\n");
 	else if (EMPIRE_CITY_TERRITORY(f) + EMPIRE_OUTSIDE_TERRITORY(f) >= land_can_claim(f, FALSE))
 		msg_to_char(ch, "You can't cede land to %s, %s empire can't own any more land.\r\n", HMHR(targ), HSHR(targ));
-	else if (!find_city(f, room) && EMPIRE_OUTSIDE_TERRITORY(f) >= land_can_claim(f, TRUE)) {
+	else if (!is_in_city_for_empire(room, f, FALSE, &junk) && EMPIRE_OUTSIDE_TERRITORY(f) >= land_can_claim(f, TRUE)) {
 		msg_to_char(ch, "You can't cede land to that empire as it is over its limit for territory outside of cities.\r\n");
 	}
 	else if (is_at_war(f)) {
@@ -1834,6 +1871,7 @@ ACMD(do_city) {
 
 ACMD(do_claim) {
 	empire_data *e;
+	bool junk;
 
 	if (IS_NPC(ch))
 		return;
@@ -1863,7 +1901,7 @@ ACMD(do_claim) {
 	else if (!can_build_or_claim_at_war(ch, IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't claim here while at war with the empire that controls this area.\r\n");
 	}
-	else if (!COUNTS_AS_IN_CITY(IN_ROOM(ch)) && !find_city(e, IN_ROOM(ch)) && EMPIRE_OUTSIDE_TERRITORY(e) >= land_can_claim(e, TRUE)) {
+	else if (!COUNTS_AS_IN_CITY(IN_ROOM(ch)) && !is_in_city_for_empire(IN_ROOM(ch), e, FALSE, &junk) && EMPIRE_OUTSIDE_TERRITORY(e) >= land_can_claim(e, TRUE)) {
 		msg_to_char(ch, "You can't claim this land because you're over the 20%% of your territory that can be outside of cities.\r\n");
 	}
 	else {
@@ -4036,7 +4074,7 @@ ACMD(do_territory) {
 	struct find_territory_node *node_list = NULL, *node, *next_node;
 	empire_data *emp = GET_LOYALTY(ch);
 	room_data *iter, *next_iter;
-	bool outside_only = TRUE, ok;
+	bool outside_only = TRUE, ok, junk;
 	int total, check_x, check_y;
 	crop_data *crop = NULL;
 	char *remain;
@@ -4075,7 +4113,7 @@ ACMD(do_territory) {
 		
 		// owned by the empire?
 		if (ROOM_OWNER(iter) == emp) {
-			if (!outside_only || !find_city(emp, iter)) {
+			if (!outside_only || !is_in_city_for_empire(iter, emp, FALSE, &junk)) {
 				// compare request
 				if (!*argument) {
 					ok = TRUE;

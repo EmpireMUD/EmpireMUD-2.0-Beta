@@ -1529,6 +1529,7 @@ typedef struct trig_data trig_data;
 #define ROOM_EXTRA_GARDEN_WORKFORCE_PROGRESS  11
 #define ROOM_EXTRA_QUARRY_WORKFORCE_PROGRESS  12
 #define ROOM_EXTRA_BUILD_RECIPE  13
+#define ROOM_EXTRA_FOUND_TIME  14
 
 
 // number of different appearances

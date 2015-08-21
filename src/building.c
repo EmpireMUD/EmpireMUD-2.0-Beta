@@ -154,8 +154,9 @@ bool can_build_on(room_data *room, bitvector_t flags) {
 */
 void check_lay_territory(char_data *ch, room_data *room) {
 	empire_data *emp = GET_LOYALTY(ch);
+	bool junk;
 	
-	if (emp && ROOM_OWNER(room) && !find_city(emp, room)) {
+	if (emp && ROOM_OWNER(room) && !is_in_city_for_empire(room, emp, FALSE, &junk)) {
 		read_empire_territory(emp);
 	}
 }
@@ -364,6 +365,7 @@ void disassociate_building(room_data *room) {
 	remove_room_extra_data(room, ROOM_EXTRA_TAVERN_BREWING_TIME);
 	remove_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME);
 	remove_room_extra_data(room, ROOM_EXTRA_BUILD_RECIPE);
+	remove_room_extra_data(room, ROOM_EXTRA_FOUND_TIME);
 
 	// disassociate inside rooms
 	HASH_ITER(interior_hh, interior_world_table, iter, next_iter) {
@@ -884,6 +886,7 @@ void setup_tunnel_entrance(char_data *ch, room_data *room, int dir) {
 	bitvector_t tunnel_flags = 0;	// formerly ROOM_AFF_CHAMELEON;
 	
 	empire_data *emp = get_or_create_empire(ch);
+	bool junk;
 	
 	construct_building(room, BUILDING_TUNNEL);
 		
@@ -891,7 +894,7 @@ void setup_tunnel_entrance(char_data *ch, room_data *room, int dir) {
 	SET_BIT(ROOM_AFF_FLAGS(room), tunnel_flags);
 	COMPLEX_DATA(room)->entrance = dir;
 	if (emp && can_claim(ch) && !ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE)) {
-		if (EMPIRE_OUTSIDE_TERRITORY(emp) < land_can_claim(emp, TRUE) || COUNTS_AS_IN_CITY(room) || find_city(emp, room)) {
+		if (EMPIRE_OUTSIDE_TERRITORY(emp) < land_can_claim(emp, TRUE) || COUNTS_AS_IN_CITY(room) || is_in_city_for_empire(room, emp, FALSE, &junk)) {
 			ROOM_OWNER(room) = emp;
 		}
 	}
@@ -1061,6 +1064,7 @@ ACMD(do_build) {
 	int dir = NORTH;
 	craft_data *iter, *next_iter, *type = NULL, *abbrev_match = NULL;
 	bool found = FALSE, found_any, this_line, is_closed, needs_facing, needs_reverse;
+	bool junk, wait;
 	
 	// simple rules for ch building a given craft
 	#define CHAR_CAN_BUILD(ch, ttype)  (GET_CRAFT_TYPE((ttype)) == CRAFT_TYPE_BUILD && !IS_SET(GET_CRAFT_FLAGS((ttype)), CRAFT_UPGRADE | CRAFT_DISMANTLE_ONLY) && (IS_IMMORTAL(ch) || !IS_SET(GET_CRAFT_FLAGS((ttype)), CRAFT_IN_DEVELOPMENT)) && (GET_CRAFT_ABILITY((ttype)) == NO_ABIL || HAS_ABILITY((ch), GET_CRAFT_ABILITY((ttype)))))
@@ -1158,8 +1162,8 @@ ACMD(do_build) {
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're already busy.\r\n");
 	}
-	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_IN_CITY_ONLY) && !IS_IN_CITY(ch)) {
-		msg_to_char(ch, "You can only build that in a city.\r\n");
+	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_IN_CITY_ONLY) && !is_in_city_for_empire(IN_ROOM(ch), GET_LOYALTY(ch), TRUE, &wait)) {
+		msg_to_char(ch, "You can only build that in a city%s.\r\n", wait ? " (this city was founded too recently)" : "");
 	}
 	else if (GET_CRAFT_ABILITY(type) != NO_ABIL && !HAS_ABILITY(ch, GET_CRAFT_ABILITY(type))) {
 		msg_to_char(ch, "You don't have the skill to erect that structure.\r\n");
@@ -1253,7 +1257,7 @@ ACMD(do_build) {
 	// can_claim checks total available land, but the outside is check done within this block
 	if (can_claim(ch) && !ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE)) {
 		if (e || (e = get_or_create_empire(ch))) {
-			if (EMPIRE_OUTSIDE_TERRITORY(e) < land_can_claim(e, TRUE) || COUNTS_AS_IN_CITY(IN_ROOM(ch)) || find_city(e, IN_ROOM(ch))) {
+			if (EMPIRE_OUTSIDE_TERRITORY(e) < land_can_claim(e, TRUE) || COUNTS_AS_IN_CITY(IN_ROOM(ch)) || is_in_city_for_empire(IN_ROOM(ch), e, FALSE, &junk)) {
 				ROOM_OWNER(IN_ROOM(ch)) = e;
 			}
 		}
@@ -1937,6 +1941,7 @@ ACMD(do_tunnel) {
 ACMD(do_upgrade) {
 	craft_data *iter, *next_iter, *type;
 	bld_vnum upgrade = GET_BLD_UPGRADES_TO(building_proto(BUILDING_VNUM(IN_ROOM(ch))));
+	bool wait, room_wait;
 	
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs cannot use the upgrade command.\r\n");
@@ -1974,8 +1979,8 @@ ACMD(do_upgrade) {
 		else if (GET_CRAFT_ABILITY(type) != NO_ABIL && !HAS_ABILITY(ch, GET_CRAFT_ABILITY(type))) {
 			msg_to_char(ch, "You don't have the required ability to upgrade this building.\r\n");
 		}
-		else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_IN_CITY_ONLY) && !IS_IN_CITY(ch)) {
-			msg_to_char(ch, "You can only upgrade this building in a city.\r\n");
+		else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_IN_CITY_ONLY) && !is_in_city_for_empire(IN_ROOM(ch), GET_LOYALTY(ch), TRUE, &wait) && !is_in_city_for_empire(IN_ROOM(ch), ROOM_OWNER(IN_ROOM(ch)), TRUE, &room_wait)) {
+			msg_to_char(ch, "You can only upgrade this building in a city%s.\r\n", (wait || room_wait) ? " (this city was founded too recently)" : "");
 		}
 		else {
 			// it's good!

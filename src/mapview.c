@@ -1040,7 +1040,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	empire_data *emp, *chemp = GET_LOYALTY(ch);
 	int tileset = pick_season(to_room);
 	struct icon_data *base_icon, *icon, *crop_icon = NULL;
-	bool hidden = FALSE;
+	bool junk, hidden = FALSE;
 	crop_data *cp = crop_proto(ROOM_CROP_TYPE(to_room));
 	sector_data *st, *base_sect = ROOM_ORIGINAL_SECT(to_room);
 	char *base_color, *str;
@@ -1324,7 +1324,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 		if (PRF_FLAGGED(ch, PRF_POLITICAL) && !show_dark) {
 			emp = ROOM_OWNER(to_room);
 			
-			if (chemp && find_city(chemp, to_room)) {
+			if (chemp && is_in_city_for_empire(to_room, chemp, FALSE, &junk)) {
 				strcpy(buf2, get_banner_complement_color(chemp));
 				need_color_terminator = TRUE;
 			}

@@ -2039,6 +2039,7 @@ const char *room_extra_types[] = {
 	"garden workforce progress",
 	"quarry workforce progress",
 	"build recipe",
+	"found time",
 	"\n"
 };
 

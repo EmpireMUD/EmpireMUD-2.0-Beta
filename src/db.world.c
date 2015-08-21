@@ -891,6 +891,7 @@ struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_da
 	// check building exists
 	if (!IS_CITY_CENTER(location)) {
 		construct_building(location, BUILDING_CITY_CENTER);
+		set_room_extra_data(location, ROOM_EXTRA_FOUND_TIME, time(0));
 	}
 	
 	// verify ownership
@@ -1190,6 +1191,7 @@ void read_empire_territory(empire_data *emp) {
 	struct empire_npc_data *npc;
 	room_data *iter, *next_iter;
 	empire_data *e, *next_e;
+	bool junk;
 
 	/* Init empires */
 	HASH_ITER(hh, empire_table, e, next_e) {
@@ -1216,7 +1218,7 @@ void read_empire_territory(empire_data *emp) {
 			if ((e = ROOM_OWNER(iter))) {
 				// only count each building as 1
 				if (HOME_ROOM(iter) == iter) {
-					if (COUNTS_AS_IN_CITY(iter) || find_city(e, iter)) {
+					if (COUNTS_AS_IN_CITY(iter) || is_in_city_for_empire(iter, e, FALSE, &junk)) {
 						EMPIRE_CITY_TERRITORY(e) += 1;
 					}
 					else {
