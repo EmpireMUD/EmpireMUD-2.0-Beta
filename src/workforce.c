@@ -40,6 +40,7 @@ void do_chore_building(empire_data *emp, room_data *room);
 void do_chore_chopping(empire_data *emp, room_data *room);
 void do_chore_digging(empire_data *emp, room_data *room);
 void do_chore_dismantle(empire_data *emp, room_data *room);
+void do_chore_dismantle_mines(empire_data *emp, room_data *room);
 void do_chore_farming(empire_data *emp, room_data *room);
 void do_chore_fire_brigade(empire_data *emp, room_data *room);
 void do_chore_gardening(empire_data *emp, room_data *room);
@@ -162,9 +163,19 @@ void process_one_chore(empire_data *emp, room_data *room) {
 		if (ROOM_BLD_FLAGGED(room, BLD_MINT) && EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR) && EMPIRE_CHORE(emp, CHORE_MINTING)) {
 			do_chore_minting(emp, room);
 		}
-		if (ROOM_BLD_FLAGGED(room, BLD_MINE) && EMPIRE_CHORE(emp, CHORE_MINING)) {
-			do_chore_mining(emp, room);
+		
+		if (ROOM_BLD_FLAGGED(room, BLD_MINE)) {
+			if (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) > 0) {
+				if (EMPIRE_CHORE(emp, CHORE_MINING)) {
+					do_chore_mining(emp, room);
+				}
+			}
+			else if (IS_MAP_BUILDING(room) && !ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_DISMANTLE) && EMPIRE_CHORE(emp, CHORE_DISMANTLE_MINES)) {
+				// no ore left
+				do_chore_dismantle_mines(emp, room);
+			}
 		}
+		
 		if (ROOM_BLD_FLAGGED(room, BLD_POTTER) && EMPIRE_CHORE(emp, CHORE_BRICKMAKING)) {
 			do_chore_brickmaking(emp, room);
 		}
@@ -724,6 +735,30 @@ void do_chore_dismantle(empire_data *emp, room_data *room) {
 	}
 	else {
 		worker = place_chore_worker(emp, CHORE_BUILDING, room);
+	}
+}
+
+
+void do_chore_dismantle_mines(empire_data *emp, room_data *room) {
+	void start_dismantle_building(room_data *loc);
+	
+	char_data *worker = find_mob_in_room_by_vnum(room, chore_data[CHORE_DISMANTLE_MINES].mob);
+	bool can_do = IS_COMPLETE(room);
+	
+	if (worker && can_do) {
+		start_dismantle_building(room);
+		act("$n begins to dismantle the building.\r\n", FALSE, worker, NULL, NULL, TO_ROOM);
+		
+		// if they have the building chore on, we'll keep using the mob
+		if (!EMPIRE_CHORE(emp, CHORE_BUILDING)) {
+			SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
+		}
+	}
+	else if (can_do) {
+		worker = place_chore_worker(emp, CHORE_DISMANTLE_MINES, room);
+	}
+	else if (worker) {
+		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 	}
 }
 

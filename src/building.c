@@ -899,6 +899,137 @@ void setup_tunnel_entrance(char_data *ch, room_data *room, int dir) {
 
 
 /**
+* Starts the dismantle on a building. This sends no messages and starts no
+* actions -- just updates the building to the dismantling state.
+*
+* @param room_data *loc The location to dismantle.
+*/
+void start_dismantle_building(room_data *loc) {
+	Resource composite_resources[MAX_RESOURCES_REQUIRED*2] = { END_RESOURCE_LIST };
+	struct building_resource_type *res, *next_res, *findres, *temp;
+	bool deleted = FALSE, found, upgraded = FALSE;
+	room_data *room, *next_room;
+	char_data *targ, *next_targ;
+	craft_data *type, *up_type;
+	obj_data *obj, *next_obj;
+	bld_data *up_bldg;
+	int iter;
+	
+	if (!IS_MAP_BUILDING(loc)) {
+		log("SYSERR: Attempting to dismantle non-building room #%d", GET_ROOM_VNUM(loc));
+		return;
+	}
+	
+	if (!(type = find_building_list_entry(loc, FIND_BUILD_NORMAL))) {
+		if ((type = find_building_list_entry(loc, FIND_BUILD_UPGRADE))) {
+			upgraded = TRUE;
+		}
+		else {
+			log("SYSERR: Attempting to dismantle non-dismantlable building at #%d", GET_ROOM_VNUM(loc));
+			return;
+		}
+	}
+
+	// interior only
+	HASH_ITER(interior_hh, interior_world_table, room, next_room) {
+		if (HOME_ROOM(room) == loc) {
+			remove_designate_objects(room);
+			delete_room_npcs(room, NULL);
+		
+			for (obj = ROOM_CONTENTS(room); obj; obj = next_obj) {
+				next_obj = obj->next_content;
+				obj_to_room(obj, loc);
+			}
+			for (targ = ROOM_PEOPLE(loc); targ; targ = next_targ) {
+				next_targ = targ->next_in_room;
+				if (!IS_NPC(targ)) {
+					GET_LAST_DIR(targ) = NO_DIR;
+				}
+				char_from_room(targ);
+				char_to_room(targ, loc);
+			}
+		
+			delete_room(room, FALSE);	// must check_all_exits
+			deleted = TRUE;
+		}
+	}
+	
+	if (deleted) {
+		check_all_exits();
+	}
+	
+	// unset private owner
+	if (ROOM_PRIVATE_OWNER(loc) != NOBODY) {
+		COMPLEX_DATA(loc)->private_owner = NOBODY;
+	}
+	
+	// prepare resources:
+	combine_resources(composite_resources, GET_CRAFT_RESOURCES(type));
+	if (upgraded) {
+		up_bldg = find_upgraded_from(building_proto(GET_CRAFT_BUILD_TYPE(type)));
+		up_type = find_build_craft(GET_BLD_VNUM(up_bldg));
+		
+		while (up_bldg && up_type) {
+			combine_resources(composite_resources, GET_CRAFT_RESOURCES(up_type));
+			
+			up_bldg = find_upgraded_from(up_bldg);
+			up_type = find_build_craft(GET_BLD_VNUM(up_bldg));
+		}
+	}
+
+	if (!IS_COMPLETE(loc)) {
+		// room was already started, so dismantle is more complicated
+	
+		// iterate over all building resources
+		for (iter = 0; composite_resources[iter].vnum != NOTHING; ++iter) {
+		
+			// find out if there's already an entry for this resource
+			found = FALSE;
+			for (findres = BUILDING_RESOURCES(loc); findres; findres = findres->next) {
+				if (findres->vnum == composite_resources[iter].vnum) {
+					found = TRUE;
+					// new amount is the difference between the original and the remaining, divided by 2
+					findres->amount = MAX(0, (composite_resources[iter].amount - findres->amount) / 2);
+				}
+			}
+			
+			// didn't find, so they already built that entire resource -- add it at half
+			if (!found && composite_resources[iter].amount/2 > 0) {
+				CREATE(res, struct building_resource_type, 1);
+				res->vnum = composite_resources[iter].vnum;
+				res->amount = composite_resources[iter].amount / 2;
+				
+				res->next = GET_BUILDING_RESOURCES(loc);
+				GET_BUILDING_RESOURCES(loc) = res;
+			}
+		}
+		
+		// check for things that now require 0 and remove them
+		for (res = GET_BUILDING_RESOURCES(loc); res; res = next_res) {
+			next_res = res->next;
+			
+			if (res->amount <= 0) {
+				REMOVE_FROM_LIST(res, GET_BUILDING_RESOURCES(loc), next);
+				free(res);
+			}
+		}
+	}
+	else {
+		// simple setup
+		setup_building_resources(loc, composite_resources, TRUE);
+	}
+	
+	if (ROOM_OWNER(loc)) {
+		read_empire_territory(ROOM_OWNER(loc));
+	}
+
+	SET_BIT(ROOM_AFF_FLAGS(loc), ROOM_AFF_DISMANTLING);
+	SET_BIT(ROOM_BASE_FLAGS(loc), ROOM_AFF_DISMANTLING);
+	delete_room_npcs(loc, NULL);
+}
+
+
+/**
 * This converts a vnum into a semi-obfuscated interlink code.
 *
 * @param room_vnum vnum The vnum to convert.
@@ -1165,17 +1296,8 @@ ACMD(do_build) {
 }
 
 
-ACMD(do_dismantle) {	
-	Resource composite_resources[MAX_RESOURCES_REQUIRED*2] = { END_RESOURCE_LIST };
-	obj_data *obj, *next_obj;
-	char_data *targ, *next_targ;
-	room_data *room, *next_room;
-	struct building_resource_type *res, *next_res, *findres, *temp;
-	int iter;
-	empire_data *emp;
-	bld_data *up_bldg;
-	craft_data *type, *up_type;
-	bool found, upgraded = FALSE, deleted = FALSE;
+ACMD(do_dismantle) {
+	craft_data *type;
 
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs cannot use the dismantle command.\r\n");
@@ -1222,10 +1344,7 @@ ACMD(do_dismantle) {
 	}
 
 	if (!(type = find_building_list_entry(IN_ROOM(ch), FIND_BUILD_NORMAL))) {
-		if ((type = find_building_list_entry(IN_ROOM(ch), FIND_BUILD_UPGRADE))) {
-			upgraded = TRUE;
-		}
-		else {
+		if (!(type = find_building_list_entry(IN_ROOM(ch), FIND_BUILD_UPGRADE))) {
 			msg_to_char(ch, "You can't dismantle anything here.\r\n");
 			return;
 		}
@@ -1250,106 +1369,9 @@ ACMD(do_dismantle) {
 		msg_to_char(ch, "You can't dismantle this building (use 'nodismantle' to toggle).\r\n");
 		return;
 	}
-
-	// interior only
-	HASH_ITER(interior_hh, interior_world_table, room, next_room) {
-		if (HOME_ROOM(room) == IN_ROOM(ch)) {
-			remove_designate_objects(room);
-			delete_room_npcs(room, NULL);
-		
-			for (obj = ROOM_CONTENTS(room); obj; obj = next_obj) {
-				next_obj = obj->next_content;
-				obj_to_room(obj, IN_ROOM(ch));
-			}
-			for (targ = ROOM_PEOPLE(room); targ; targ = next_targ) {
-				next_targ = targ->next_in_room;
-				if (!IS_NPC(targ)) {
-					GET_LAST_DIR(targ) = NO_DIR;
-				}
-				char_from_room(targ);
-				char_to_room(targ, IN_ROOM(ch));
-			}
-		
-			delete_room(room, FALSE);	// must check_all_exits
-			deleted = TRUE;
-		}
-	}
 	
-	if (deleted) {
-		check_all_exits();
-	}
-	
-	// unset private owner
-	if (ROOM_PRIVATE_OWNER(IN_ROOM(ch)) != NOBODY) {
-		COMPLEX_DATA(IN_ROOM(ch))->private_owner = NOBODY;
-	}
-	
-	// prepare resources:
-	combine_resources(composite_resources, GET_CRAFT_RESOURCES(type));
-	if (upgraded) {
-		up_bldg = find_upgraded_from(building_proto(GET_CRAFT_BUILD_TYPE(type)));
-		up_type = find_build_craft(GET_BLD_VNUM(up_bldg));
-		
-		while (up_bldg && up_type) {
-			combine_resources(composite_resources, GET_CRAFT_RESOURCES(up_type));
-			
-			up_bldg = find_upgraded_from(up_bldg);
-			up_type = find_build_craft(GET_BLD_VNUM(up_bldg));
-		}
-	}
-
-	if (!IS_COMPLETE(IN_ROOM(ch))) {
-		// room was already started, so dismantle is more complicated
-	
-		// iterate over all building resources
-		for (iter = 0; composite_resources[iter].vnum != NOTHING; ++iter) {
-		
-			// find out if there's already an entry for this resource
-			found = FALSE;
-			for (findres = BUILDING_RESOURCES(IN_ROOM(ch)); findres; findres = findres->next) {
-				if (findres->vnum == composite_resources[iter].vnum) {
-					found = TRUE;
-					// new amount is the difference between the original and the remaining, divided by 2
-					findres->amount = MAX(0, (composite_resources[iter].amount - findres->amount) / 2);
-				}
-			}
-			
-			// didn't find, so they already built that entire resource -- add it at half
-			if (!found && composite_resources[iter].amount/2 > 0) {
-				CREATE(res, struct building_resource_type, 1);
-				res->vnum = composite_resources[iter].vnum;
-				res->amount = composite_resources[iter].amount / 2;
-				
-				res->next = GET_BUILDING_RESOURCES(IN_ROOM(ch));
-				GET_BUILDING_RESOURCES(IN_ROOM(ch)) = res;
-			}
-		}
-		
-		// check for things that now require 0 and remove them
-		for (res = GET_BUILDING_RESOURCES(IN_ROOM(ch)); res; res = next_res) {
-			next_res = res->next;
-			
-			if (res->amount <= 0) {
-				REMOVE_FROM_LIST(res, GET_BUILDING_RESOURCES(IN_ROOM(ch)), next);
-				free(res);
-			}
-		}
-	}
-	else {
-		// simple setup
-		setup_building_resources(IN_ROOM(ch), composite_resources, TRUE);
-	}
-	
-	if ((emp = ROOM_OWNER(IN_ROOM(ch)))) {
-		read_empire_territory(emp);
-	}
-
-	SET_BIT(ROOM_AFF_FLAGS(IN_ROOM(ch)), ROOM_AFF_DISMANTLING);
-	SET_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_DISMANTLING);
-	delete_room_npcs(IN_ROOM(ch), NULL);
-	
+	start_dismantle_building(IN_ROOM(ch));
 	start_action(ch, ACT_DISMANTLING, 0, NOBITS);
-
 	msg_to_char(ch, "You begin to dismantle the building.\r\n");
 	act("$n begins to dismantle the building.\r\n", FALSE, ch, 0, 0, TO_ROOM);
 	process_dismantling(ch, IN_ROOM(ch));
