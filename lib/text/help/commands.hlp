@@ -921,7 +921,26 @@ around this (you still use the 'enter' command).
 
 Immortals can open portals between any two locations.
 
-See also: PORTAL MAGIC, PORTAL MASTER, COLLAPSE, INFILTRATE
+See also: PORTAL MAGIC, PORTAL MASTER, PORTAL SICKNESS, COLLAPSE, INFILTRATE
+#
+"PORTAL SICKNESS" "PORTALING SICKNESS" "PORTALLING SICKNESS"
+
+Portal sickness is caused by entering magical portals (specifically, portals
+created between portal buildings). If you have too much portal sickness, you
+can't enter a portal.
+
+Portals normally cause one minute of portal sickness. If you portal again
+before it wears off, you'll get five minutes of portal sickness instead. After
+that, you can portal again as soon as your portal sickness is below one minute.
+You can see your current portal sickness by typing 'cooldowns'.
+
+Portal mages only get four minutes of portal sickness. City-to-city portals
+cause just two minutes.
+
+Only entering portals causes portal sickness. You can still open portals while
+you have portal sickness.
+
+See also: COOLDOWNS, ENTER, PORTALS, PORTAL MAGE
 #
 POUR
 

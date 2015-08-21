@@ -2343,6 +2343,7 @@ const char *cooldown_types[] = {
 	"howl",	// 50
 	"diversion",
 	"rogue flag",
+	"portal sickness",	// 53
 	"\n"
 };
 

@@ -453,7 +453,7 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 	struct follow_type *fol, *next_fol;
 	room_data *to_room = real_room(GET_PORTAL_TARGET_VNUM(portal));
 	room_data *was_in = IN_ROOM(ch);
-	bool found;
+	bool found, junk;
 	
 	// safety
 	if (!to_room) {
@@ -489,6 +489,24 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 	look_at_room(ch);
 	command_lag(ch, WAIT_MOVEMENT);
 	
+	// portal sickness
+	if (!IS_NPC(ch) && !IS_IMMORTAL(ch) && GET_OBJ_VNUM(portal) == o_PORTAL) {
+		if (get_cooldown_time(ch, COOLDOWN_PORTAL_SICKNESS) > 0) {
+			if (is_in_city_for_empire(was_in, ROOM_OWNER(was_in), TRUE, &junk) && is_in_city_for_empire(to_room, ROOM_OWNER(to_room), TRUE, &junk)) {
+				add_cooldown(ch, COOLDOWN_PORTAL_SICKNESS, 2 * SECS_PER_REAL_MIN);
+			}
+			else if (HAS_ABILITY(ch, ABIL_PORTAL_MAGIC)) {
+				add_cooldown(ch, COOLDOWN_PORTAL_SICKNESS, 4 * SECS_PER_REAL_MIN);
+			}
+			else {
+				add_cooldown(ch, COOLDOWN_PORTAL_SICKNESS, 5 * SECS_PER_REAL_MIN);
+			}
+		}
+		else {
+			add_cooldown(ch, COOLDOWN_PORTAL_SICKNESS, SECS_PER_REAL_MIN);
+		}
+	}
+	
 	enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
 	entry_memory_mtrigger(ch);
 	greet_mtrigger(ch, NO_DIR);
@@ -498,8 +516,13 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 	for (fol = ch->followers; fol; fol = next_fol) {
 		next_fol = fol->next;
 		if ((IN_ROOM(fol->follower) == was_in) && (GET_POS(fol->follower) >= POS_STANDING) && can_enter_room(fol->follower, to_room)) {
-			act("You follow $N.\r\n", FALSE, fol->follower, 0, ch, TO_CHAR);
-			char_through_portal(fol->follower, portal, TRUE);
+			if (!IS_IMMORTAL(fol->follower) && GET_OBJ_VNUM(portal) == o_PORTAL && get_cooldown_time(fol->follower, COOLDOWN_PORTAL_SICKNESS) > SECS_PER_REAL_MIN) {
+				msg_to_char(ch, "You can't enter a portal until your portal sickness cooldown is under one minute.\r\n");
+			}
+			else {
+				act("You follow $N.\r\n", FALSE, fol->follower, 0, ch, TO_CHAR);
+				char_through_portal(fol->follower, portal, TRUE);
+			}
 		}
 	}
 	
@@ -1223,6 +1246,12 @@ ACMD(do_enter) {
 	
 	if (!can_enter_room(ch, room)) {
 		msg_to_char(ch, "You can't seem to go there. Perhaps it's full.\r\n");
+		return;
+	}
+	
+	// portal sickness
+	if (!IS_IMMORTAL(ch) && GET_OBJ_VNUM(portal) == o_PORTAL && get_cooldown_time(ch, COOLDOWN_PORTAL_SICKNESS) > SECS_PER_REAL_MIN) {
+		msg_to_char(ch, "You can't enter a portal until your portal sickness cooldown is under one minute.\r\n");
 		return;
 	}
 	
