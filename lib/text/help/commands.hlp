@@ -907,8 +907,9 @@ own and allied portals by number.
 
 Typing "portal" with no argument will list portals belonging to your empire
 and its allies. Typing "portal -all" will list all public portals belonging
-to other empires. You can target empire and ally portals by portal number, but
-the -all list can't be targeted this way.
+to other empires. Only places you could portal to from here are listed. You can
+target empire and ally portals by portal number, but the -all list can't be
+targeted this way.
 
 Portals can only connect two locations on the same land mass (continent or
 island) unless your empire has a Portal Master. You can't open a portal at all
