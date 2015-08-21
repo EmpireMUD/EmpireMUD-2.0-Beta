@@ -829,7 +829,7 @@ bool is_in_city_for_empire(room_data *loc, empire_data *emp, bool check_wait, bo
 	
 	for (city = EMPIRE_CITY_LIST(emp); city; city = city->next) {
 		if (compute_distance(loc, city->location) <= city_type[city->type].radius) {
-			if (!check_wait || get_room_extra_data(loc, ROOM_EXTRA_FOUND_TIME) + wait > time(0)) {
+			if (!check_wait || get_room_extra_data(city->location, ROOM_EXTRA_FOUND_TIME) + wait > time(0)) {
 				return TRUE;
 			}
 			else {

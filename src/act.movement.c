@@ -1436,7 +1436,7 @@ ACMD(do_portal) {
 				break;
 			}
 			
-			if (ROOM_OWNER(room) && ROOM_BLD_FLAGGED(room, BLD_PORTAL) && IS_COMPLETE(room) && can_use_room(ch, room, all ? GUESTS_ALLOWED : MEMBERS_AND_ALLIES) && (compute_distance(IN_ROOM(ch), room) <= max_out_of_city_portal || (ch_in_city && is_in_city_for_empire(room, ROOM_OWNER(room), TRUE, &wait_here)))) {
+			if (ROOM_OWNER(room) && ROOM_BLD_FLAGGED(room, BLD_PORTAL) && IS_COMPLETE(room) && can_use_room(ch, room, all ? GUESTS_ALLOWED : MEMBERS_AND_ALLIES) && (!all || (compute_distance(IN_ROOM(ch), room) <= max_out_of_city_portal || (ch_in_city && is_in_city_for_empire(room, ROOM_OWNER(room), TRUE, &wait_here))))) {
 				// only shows owned portals the character can use
 				++count;
 				*line = '\0';
