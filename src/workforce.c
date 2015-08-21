@@ -733,13 +733,12 @@ void do_chore_dismantle(empire_data *emp, room_data *room) {
 		
 		// check for completion
 		if (IS_COMPLETE(room)) {
+			finish_dismantle(worker, room);
+			SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 			if (EMPIRE_CHORE(emp, CHORE_AUTO_ABANDON)) {
 				abandon_room(room);
 				add_chore_tracker(emp);
 			}
-			
-			finish_dismantle(worker, room);
-			SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 			stop_room_action(room, ACT_DISMANTLING, CHORE_BUILDING);
 		}
 
