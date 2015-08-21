@@ -1509,7 +1509,7 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 	int t[10], junk;
 	long l_in;
 	char line[1024], str_in[256], buf[MAX_STRING_LENGTH];
-	struct empire_storage_data *store;
+	struct empire_storage_data *store, *last_store = NULL;
 	struct empire_unique_storage *eus, *last_eus = NULL;
 	struct shipping_data *shipd, *last_shipd = NULL;
 	obj_data *obj;
@@ -1540,8 +1540,14 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 					store->amount = t[1];
 					store->island = t[2];
 
-					store->next = emp->store;
-					emp->store = store;
+					// at end
+					if (last_store) {
+						last_store->next = store;
+					}
+					else {
+						emp->store = store;
+					}
+					last_store = store;
 				}
 				else {
 					log("- removing %dx #%d from empire storage for %s: no such object", t[1], t[0], EMPIRE_NAME(emp));
