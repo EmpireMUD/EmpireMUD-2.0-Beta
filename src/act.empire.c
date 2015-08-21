@@ -3312,7 +3312,7 @@ ACMD(do_islands) {
 		msg_to_char(ch, "You need to purchase the Navigation ability to do that.\r\n");
 		return;
 	}
-	if (!(emp = GET_LOYALTY(ch))) {
+	if (!emp) {
 		msg_to_char(ch, "You must be in an empire to do that.\r\n");
 		return;
 	}
