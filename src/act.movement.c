@@ -1405,7 +1405,7 @@ ACMD(do_portal) {
 	room_data *room, *next_room, *target = NULL;
 	obj_data *portal, *end, *obj;
 	int bsize, lsize, count, num, dist;
-	bool all = FALSE, wait_here, wait_there, ch_in_city;
+	bool all = FALSE, wait_here = FALSE, wait_there = FALSE, ch_in_city;
 	
 	int max_out_of_city_portal = config_get_int("max_out_of_city_portal");
 	
