@@ -1591,6 +1591,7 @@ void init_config_system(void) {
 	init_config(CONFIG_CITY, "disrepair_major", CONFTYPE_INT, "years of disrepair to show major wear");
 	init_config(CONFIG_CITY, "disrepair_limit", CONFTYPE_INT, "years of disrepair before collapse");
 	init_config(CONFIG_CITY, "disrepair_limit_unfinished", CONFTYPE_INT, "years of disrepair before unfinished buildings collapse");
+	init_config(CONFIG_CITY, "max_out_of_city_portal", CONFTYPE_INT, "maximum distance a portal can travel outside of a city");
 	init_config(CONFIG_CITY, "minutes_to_full_city", CONFTYPE_INT, "time it takes for a city to count for in-city-only tasks");
 
 	// empire
