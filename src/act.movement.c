@@ -1406,6 +1406,7 @@ ACMD(do_portal) {
 	obj_data *portal, *end, *obj;
 	int bsize, lsize, count, num, dist;
 	bool all = FALSE, wait_here = FALSE, wait_there = FALSE, ch_in_city;
+	bool there_in_city;
 	
 	int max_out_of_city_portal = config_get_int("max_out_of_city_portal");
 	
@@ -1436,7 +1437,10 @@ ACMD(do_portal) {
 				break;
 			}
 			
-			if (ROOM_OWNER(room) && ROOM_BLD_FLAGGED(room, BLD_PORTAL) && IS_COMPLETE(room) && can_use_room(ch, room, all ? GUESTS_ALLOWED : MEMBERS_AND_ALLIES) && (!all || (compute_distance(IN_ROOM(ch), room) <= max_out_of_city_portal || (ch_in_city && is_in_city_for_empire(room, ROOM_OWNER(room), TRUE, &wait_here))))) {
+			dist = compute_distance(IN_ROOM(ch), room);
+			there_in_city = is_in_city_for_empire(room, ROOM_OWNER(room), TRUE, &wait_there);
+			
+			if (ROOM_OWNER(room) && ROOM_BLD_FLAGGED(room, BLD_PORTAL) && IS_COMPLETE(room) && can_use_room(ch, room, all ? GUESTS_ALLOWED : MEMBERS_AND_ALLIES) && (!all || (dist <= max_out_of_city_portal || (ch_in_city && there_in_city)))) {
 				// only shows owned portals the character can use
 				++count;
 				*line = '\0';
@@ -1453,6 +1457,10 @@ ACMD(do_portal) {
 				}
 				
 				lsize += snprintf(line + lsize, sizeof(line) - lsize, "%s (%s%s&0)", get_room_name(room, FALSE), EMPIRE_BANNER(ROOM_OWNER(room)), EMPIRE_ADJECTIVE(ROOM_OWNER(room)));
+				
+				if (dist > max_out_of_city_portal && (!ch_in_city || !there_in_city)) {
+					lsize += snprintf(line + lsize, sizeof(line) - lsize, " &r(too far)&0");
+				}
 				
 				bsize += snprintf(buf + bsize, sizeof(buf) - bsize, "%s\r\n", line);
 			}
