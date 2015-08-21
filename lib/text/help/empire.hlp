@@ -357,9 +357,10 @@ See also: RIDE
 DISMANTLE-MINES "DISMANTLE MINES"
 
 The dismantle-mines workforce chore will cause mines to be dismantled auto-
-matically when they are empty.
+matically when they are empty. You can prevent this on individual mines using
+the nodismantle command.
 
-See also: WORKFORCE
+See also: NODISMANTLE, WORKFORCE
 #
 EEDIT "EMPIRE EDITOR" "EDIT EMPIRE"
 
