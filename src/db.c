@@ -1529,7 +1529,7 @@ void write_last_boot_version(int version) {
 * Performs some auto-updates when the mud detects a new version.
 */
 void check_version(void) {
-	int last, iter, current;
+	int last, iter, current = NOTHING;
 	
 	#define MATCH_VERSION(name)  (!str_cmp(versions_list[iter], name))
 	
