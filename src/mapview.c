@@ -1848,6 +1848,8 @@ ACMD(do_exits) {
 	
 	struct room_direction_data *ex;
 	room_data *room, *to_room;
+	int check_x, check_y;
+	char coords[80];
 
 	if (subcmd == -1) {
 		room = IN_ROOM(ch);
@@ -1869,11 +1871,20 @@ ACMD(do_exits) {
 					strcat(buf2, "Too dark to tell\r\n");
 				}
 				else {
+					check_x = X_COORD(to_room);	// in case we're not on the map
+					check_y = Y_COORD(to_room);
+					if (CHECK_MAP_BOUNDS(check_x, check_y)) {
+						snprintf(coords, sizeof(coords), "(%d, %d)", check_x, check_y);
+					}
+					else {
+						snprintf(coords, sizeof(coords), "(unknown)");
+					}
+					
 					if (IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
-						sprintf(buf2 + strlen(buf2), "[%d] %s (%d, %d)\r\n", GET_ROOM_VNUM(to_room), get_room_name(to_room, FALSE), X_COORD(to_room), Y_COORD(to_room));
+						sprintf(buf2 + strlen(buf2), "[%d] %s %s\r\n", GET_ROOM_VNUM(to_room), get_room_name(to_room, FALSE), coords);
 					}
 					else if (HAS_ABILITY(ch, ABIL_NAVIGATION) && (HOME_ROOM(to_room) == to_room || !ROOM_IS_CLOSED(to_room)) && X_COORD(to_room) >= 0) {
-						sprintf(buf2 + strlen(buf2), "%s (%d, %d)\r\n", get_room_name(to_room, FALSE), X_COORD(to_room), Y_COORD(to_room));
+						sprintf(buf2 + strlen(buf2), "%s %s\r\n", get_room_name(to_room, FALSE), coords);
 					}
 					else {
 						sprintf(buf2 + strlen(buf2), "%s\r\n", get_room_name(to_room, FALSE));
