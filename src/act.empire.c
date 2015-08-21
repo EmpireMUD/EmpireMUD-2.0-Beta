@@ -3297,7 +3297,7 @@ ACMD(do_islands) {
 		emp = GET_LOYALTY(ch);
 	}
 	else {
-		emp = get_empire_by_name(arg);
+		emp = get_empire_by_name(emp_arg);
 		if (!emp) {
 			msg_to_char(ch, "Unknown empire.\r\n");
 			return;
@@ -3353,7 +3353,7 @@ ACMD(do_islands) {
 		lsize = snprintf(line, sizeof(line), " %s (%d, %d) - ", isle->name, X_COORD(room), Y_COORD(room));
 		
 		if (item->has_territory) {
-			lsize += snprintf(line + lsize, sizeof(line) - lsize, "territory%s", item->einv_size > 0 ? ", " : "");
+			lsize += snprintf(line + lsize, sizeof(line) - lsize, "has territory%s", item->einv_size > 0 ? ", " : "");
 		}
 		if (item->einv_size > 0) {
 			lsize += snprintf(line + lsize, sizeof(line) - lsize, "%d item%s in einventory", item->einv_size, PLURAL(item->einv_size));
