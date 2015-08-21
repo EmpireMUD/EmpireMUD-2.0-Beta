@@ -1018,10 +1018,6 @@ void start_dismantle_building(room_data *loc) {
 		// simple setup
 		setup_building_resources(loc, composite_resources, TRUE);
 	}
-	
-	if (ROOM_OWNER(loc)) {
-		read_empire_territory(ROOM_OWNER(loc));
-	}
 
 	SET_BIT(ROOM_AFF_FLAGS(loc), ROOM_AFF_DISMANTLING);
 	SET_BIT(ROOM_BASE_FLAGS(loc), ROOM_AFF_DISMANTLING);
@@ -1371,6 +1367,9 @@ ACMD(do_dismantle) {
 	}
 	
 	start_dismantle_building(IN_ROOM(ch));
+	if (ROOM_OWNER(IN_ROOM(ch))) {
+		read_empire_territory(ROOM_OWNER(IN_ROOM(ch)));
+	}
 	start_action(ch, ACT_DISMANTLING, 0, NOBITS);
 	msg_to_char(ch, "You begin to dismantle the building.\r\n");
 	act("$n begins to dismantle the building.\r\n", FALSE, ch, 0, 0, TO_ROOM);

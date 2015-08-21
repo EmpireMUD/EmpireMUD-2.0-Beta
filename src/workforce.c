@@ -524,11 +524,26 @@ char_data *place_chore_worker(empire_data *emp, int chore, room_data *room) {
 */
 void run_chore_tracker_updates(void) {
 	struct ctt_type *iter, *next_iter;
+	bool read_all_territory = FALSE;
+	
+	// save work if more than 1
+	if (HASH_COUNT(chore_territory_tracker) > 1) {
+		read_all_territory = TRUE;
+	}
 	
 	HASH_ITER(hh, chore_territory_tracker, iter, next_iter) {
-		read_empire_territory(iter->emp);
+		if (!read_all_territory) {
+			read_empire_territory(iter->emp);
+		}
+		
 		HASH_DEL(chore_territory_tracker, iter);
+		free(iter);
 	}
+	
+	if (read_all_territory) {
+		read_empire_territory(NULL);
+	}
+
 }
 
 
@@ -747,6 +762,7 @@ void do_chore_dismantle_mines(empire_data *emp, room_data *room) {
 	
 	if (worker && can_do) {
 		start_dismantle_building(room);
+		add_chore_tracker(emp);
 		act("$n begins to dismantle the building.\r\n", FALSE, worker, NULL, NULL, TO_ROOM);
 		
 		// if they have the building chore on, we'll keep using the mob

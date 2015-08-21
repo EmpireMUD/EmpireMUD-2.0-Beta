@@ -1181,7 +1181,7 @@ void delete_territory_entry(empire_data *emp, struct empire_territory_data *ter)
 *
 * However, calling this on all empires can get rather slow.
 *
-* @param empire_data *emp The empire to read, or NOTHING for "all".
+* @param empire_data *emp The empire to read, or NULL for "all".
 */
 void read_empire_territory(empire_data *emp) {
 	void read_vault(empire_data *emp);
