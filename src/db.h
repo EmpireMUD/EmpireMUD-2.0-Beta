@@ -127,6 +127,7 @@
 #define INSTANCE_FILE  LIB_ETC"instances"	// instanced adventures
 #define ISLAND_FILE  LIB_ETC"islands"	// island info
 #define TRADING_POST_FILE  LIB_ETC"trading_post"	// for global trade
+#define VERSION_FILE  LIB_ETC"version"	// for version tracking
 
 // map output data
 #define DATA_DIR  "../data/"

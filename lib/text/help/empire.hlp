@@ -67,19 +67,6 @@ The Artisans ability unlocks additional buildings.
 
 See also: BUILD
 #
-AUTO-BALANCE "AUTO BALANCE" AUTOBALANCE
-
-Auto-balance is a workforce option that requires Skilled Labor. A citizen will
-come to work at each of your docks as a dockworker to move your goods from
-other islands where you also have docks.
-
-Dockworkers unload up to 400 items at a time, twice per day. They will continue
-to work until your resources are as evenly balanced as possible.
-
-You must have docks on any island that participates in this exchange.
-
-See also: DOCKS, EINVENTORY, SEAFARING, SKILLED LABOR, WORKFORCE
-#
 BANNER
 
 The empire banner can be changed with the eedit command.
@@ -367,6 +354,13 @@ Dragonriding allows you to ride flying mounts, if you have the Ride ability.
 
 See also: RIDE
 #
+DISMANTLE-MINES "DISMANTLE MINES"
+
+The dismantle-mines workforce chore will cause mines to be dismantled auto-
+matically when they are empty.
+
+See also: WORKFORCE
+#
 EEDIT "EMPIRE EDITOR" "EDIT EMPIRE"
 
 Usage:  eedit <option> <argument>
@@ -444,8 +438,7 @@ Usage:  empireinventory [item | all]
        
 The einventory command shows the contents of all storage buildings and rooms
 for the island you're currently on. It won't work out in the ocean. You can
-use the auto-balance workforce chore to automatically move resources between
-multiple islands.
+use the ship command to move resources between multiple islands.
 
 You can specify an item name to see only matching items. If you specify a name,
 it'll show them whether or not the item is stored on your current island. If
@@ -458,7 +451,7 @@ You can use "warehouse inventory" to see items in warehouse (unique) storage.
 their own empire. If the empire name has more than one word, you can use
 quotation marks.
 
-See also: AUTO-BALANCE, WORKFORCE
+See also: SHIP, WORKFORCE
 #
 "EMPIRE SCORE" ESCORE
 
@@ -1300,11 +1293,8 @@ Workforce types:
   &ytanning:&0 NPCs will tan skins into leather.
   &yshearing:&0 NPCs will shear animals in stables.
   &cminting (skilled):&0 NPCs will mint treasure into coins.
-  &cauto-balance (skilled):&0 einventory will be balanced between islands
-      which have docks.
+  &cdismantle-mines:&0 mines will be dismantled when empty.
   
 Items marked (skilled) require the Skilled Labor ability.
-
-See also: AUTO-BALANCE
 #
 $

@@ -88,7 +88,7 @@ struct empire_chore_type chore_data[NUM_CHORES] = {
 	{ "tanning", TANNER },
 	{ "shearing", SHEARER },
 	{ "minting", COIN_MAKER },
-	{ "auto-balance", DOCKWORKER }	// NOTE: CURRENTLY NOT FUNCTIONING
+	{ "dismantle-mines", BUILDER }
 };
 
 

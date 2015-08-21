@@ -39,6 +39,7 @@
 *   Island Setup
 *   Mobile Loading
 *   Object Loading
+*   Version Checking
 *   Miscellaneous Helpers
 *   Miscellaneous Loaders
 *   Miscellaneous Savers
@@ -200,6 +201,7 @@ void boot_db(void) {
 	void boot_world();
 	void build_player_index();
 	void check_ruined_cities();
+	void check_version();
 	void delete_orphaned_rooms();
 	void init_config_system();
 	void init_skills();
@@ -304,6 +306,9 @@ void boot_db(void) {
 	load_player_data_at_startup();
 
 	boot_time = time(0);
+	
+	log("Checking game version...");
+	check_version();
 
 	log("Boot db -- DONE.");
 }
@@ -1463,6 +1468,95 @@ obj_data *read_object(obj_vnum nr) {
 	assign_triggers(obj, OBJ_TRIGGER);
 
 	return (obj);
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// VERSION CHECKING ////////////////////////////////////////////////////////
+
+// add versions in ascending order: this is used by check_version()
+const char *versions_list[] = {
+	// this system was added in b2.5
+	"b2.5",
+	"\n"	// be sure the list terminates with \n
+};
+
+
+/**
+* Find the version of the last successful boot.
+*
+* @return int a position in versions_list[] or NOTHING
+*/
+int get_last_boot_version(void) {
+	char str[256];
+	FILE *fl;
+	
+	if (!(fl = fopen(VERSION_FILE, "r"))) {
+		return -1;
+	}
+	
+	sprintf(buf, "version file");
+	get_line(fl, str);
+	fclose(fl);
+	
+	return search_block(str, versions_list, TRUE);
+}
+
+/**
+* Writes the version of the last good boot.
+*
+* @param int version Which version id to write (pos in versions_list).
+*/
+// version is pos in versions_list[]
+void write_last_boot_version(int version) {
+	FILE *fl;
+	
+	if (version == NOTHING) {
+		return;
+	}
+	
+	if (!(fl = fopen(VERSION_FILE, "w"))) {
+		log("Unable to write version file. This would cause version updates to be applied repeatedly.");
+		exit(1);
+	}
+	
+	fprintf(fl, "%s\n", versions_list[version]);
+	fclose(fl);
+}
+
+
+/**
+* Performs some auto-updates when the mud detects a new version.
+*/
+void check_version(void) {
+	int last, iter, current;
+	
+	#define MATCH_VERSION(name)  (!str_cmp(versions_list[iter], name))
+	
+	last = get_last_boot_version();
+	
+	// updates for every version since the last boot
+	for (iter = 0; *versions_list[iter] != '\n'; ++iter) {
+		current = iter;
+		
+		// skip versions below last-boot
+		if (last != NOTHING && iter <= last) {
+			continue;
+		}
+		
+		// version-specific updates
+		if (MATCH_VERSION("b2.5")) {
+			log("Applying b2.5 update to empires...");
+			empire_data *emp, *next_emp;
+			HASH_ITER(hh, empire_table, emp, next_emp) {
+				// auto-balance was removed and the same id was used for dismantle-mines
+				EMPIRE_CHORE(emp, CHORE_DISMANTLE_MINES) = FALSE;
+				save_empire(emp);
+			}
+		}
+	}
+	
+	write_last_boot_version(current);
 }
 
 

@@ -605,7 +605,7 @@ typedef struct trig_data trig_data;
 #define CHORE_TANNING  18
 #define CHORE_SHEARING  19
 #define CHORE_MINTING  20
-#define CHORE_AUTO_BALANCE  21
+#define CHORE_DISMANTLE_MINES  21
 #define NUM_CHORES  22		// total
 
 
