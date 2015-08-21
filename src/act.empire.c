@@ -2217,7 +2217,7 @@ ACMD(do_efind) {
 	char buf[MAX_STRING_LENGTH*2];
 	obj_data *obj;
 	empire_data *emp;
-	int total;
+	int check_x, total;
 	bool all = FALSE;
 	room_data *last_rm, *iter, *next_iter;
 	struct efind_group *eg, *next_eg, *list = NULL;
@@ -2269,7 +2269,15 @@ ACMD(do_efind) {
 				// first item at this location?
 				if (eg->location != last_rm) {
 					if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
-						size += snprintf(buf + size, sizeof(buf) - size, "\r\n(%*d, %*d) ", X_PRECISION, X_COORD(eg->location), Y_PRECISION, Y_COORD(eg->location));
+						// count have no coordinates
+						check_x = X_COORD(eg->location);
+						
+						if (check_x >= 0 && check_x < MAP_WIDTH) {
+							size += snprintf(buf + size, sizeof(buf) - size, "\r\n(%*d, %*d) ", X_PRECISION, check_x, Y_PRECISION, Y_COORD(eg->location));
+						}
+						else {
+							size += snprintf(buf + size, sizeof(buf) - size, "\r\n(unknown) ");
+						}
 					}
 					else {
 						size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
