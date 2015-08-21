@@ -1261,7 +1261,8 @@ appear in one of the docks at the destination.
 You can only ship and cancel shipments from the island you are currently on,
 but you can see the status of empire shipments all over the world.
 
-Shipments happen every X time and take approximately X time.
+Shipments happen at 7am and 7pm and take up to 4 days (game time; 2 hours
+real time) or as little as half a day (15 minutes), depending on distance.
 
 See also: DOCKS, EINVENTORY, SHIPBUILDING
 #
