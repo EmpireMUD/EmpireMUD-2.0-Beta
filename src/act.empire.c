@@ -2269,7 +2269,7 @@ ACMD(do_efind) {
 	char buf[MAX_STRING_LENGTH*2];
 	obj_data *obj;
 	empire_data *emp;
-	int check_x, total;
+	int check_x, check_y, total;
 	bool all = FALSE;
 	room_data *last_rm, *iter, *next_iter;
 	struct efind_group *eg, *next_eg, *list = NULL;
@@ -2323,9 +2323,10 @@ ACMD(do_efind) {
 					if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
 						// count have no coordinates
 						check_x = X_COORD(eg->location);
+						check_y = Y_COORD(eg->location);
 						
-						if (check_x >= 0 && check_x < MAP_WIDTH) {
-							size += snprintf(buf + size, sizeof(buf) - size, "\r\n(%*d, %*d) ", X_PRECISION, check_x, Y_PRECISION, Y_COORD(eg->location));
+						if (CHECK_MAP_BOUNDS(check_x, check_y)) {
+							size += snprintf(buf + size, sizeof(buf) - size, "\r\n(%*d, %*d) ", X_PRECISION, check_x, Y_PRECISION, check_y);
 						}
 						else {
 							size += snprintf(buf + size, sizeof(buf) - size, "\r\n(unknown) ");
@@ -4036,7 +4037,7 @@ ACMD(do_territory) {
 	empire_data *emp = GET_LOYALTY(ch);
 	room_data *iter, *next_iter;
 	bool outside_only = TRUE, ok;
-	int total, check_x;
+	int total, check_x, check_y;
 	crop_data *crop = NULL;
 	char *remain;
 	
@@ -4125,9 +4126,10 @@ ACMD(do_territory) {
 			
 			// territory can be off the map (e.g. ships) and get a -1 here
 			check_x = X_COORD(node->loc);
+			check_y = Y_COORD(node->loc);
 			
-			if (check_x >= 0 && check_x < MAP_WIDTH) {
-				sprintf(buf + strlen(buf), "%2d tile%s near%s (%*d, %*d) %s\r\n", node->count, (node->count != 1 ? "s" : ""), (node->count == 1 ? " " : ""), X_PRECISION, check_x, Y_PRECISION, Y_COORD(node->loc), get_room_name(node->loc, FALSE));
+			if (CHECK_MAP_BOUNDS(check_x, check_y)) {
+				sprintf(buf + strlen(buf), "%2d tile%s near%s (%*d, %*d) %s\r\n", node->count, (node->count != 1 ? "s" : ""), (node->count == 1 ? " " : ""), X_PRECISION, check_x, Y_PRECISION, check_y, get_room_name(node->loc, FALSE));
 			}
 			else {
 				sprintf(buf + strlen(buf), "%2d tile%s near%s (unknown) %s\r\n", node->count, (node->count != 1 ? "s" : ""), (node->count == 1 ? " " : ""), get_room_name(node->loc, FALSE));

@@ -441,7 +441,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	struct building_resource_type *res;
 	struct empire_city_data *city;
 	char output[MAX_STRING_LENGTH], shipbuf[256], flagbuf[MAX_STRING_LENGTH], locbuf[128], partialbuf[MAX_STRING_LENGTH];
-	int s, t, mapsize, iter, type, check_x;
+	int s, t, mapsize, iter, type, check_x, check_y;
 	int first_iter, second_iter, xx, yy, magnitude, north;
 	int first_start, first_end, second_start, second_end, temp;
 	bool y_first, invert_x, invert_y, found, comma;
@@ -495,8 +495,9 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	
 	// set up location: may not actually have a map location
 	check_x = X_COORD(room);
-	if (check_x >= 0 && check_x < MAP_WIDTH) {
-		snprintf(locbuf, sizeof(locbuf), "(%d, %d)", check_x, Y_COORD(room));
+	check_y = Y_COORD(room);
+	if (CHECK_MAP_BOUNDS(check_x, check_y)) {
+		snprintf(locbuf, sizeof(locbuf), "(%d, %d)", check_x, check_y);
 	}
 	else {
 		snprintf(locbuf, sizeof(locbuf), "(unknown)");
@@ -1630,7 +1631,7 @@ void perform_mortal_where(char_data *ch, char *arg) {
 	
 	register char_data *i;
 	register descriptor_data *d;
-	int check_x, max_distance = 20;
+	int check_x, check_y, max_distance = 20;
 	bool found = FALSE;
 	
 	if (HAS_ABILITY(ch, ABIL_MASTER_TRACKER)) {
@@ -1663,8 +1664,9 @@ void perform_mortal_where(char_data *ch, char *arg) {
 		
 			if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
 				check_x = X_COORD(IN_ROOM(i));	// not all locations are on the map
-				if (check_x >= 0 && check_x < MAP_WIDTH) {
-					msg_to_char(ch, "%-20s - (%*d, %*d) %s\r\n", PERS(i, ch, 0), X_PRECISION, check_x, Y_PRECISION, Y_COORD(IN_ROOM(i)), get_room_name(IN_ROOM(i), FALSE));
+				check_y = Y_COORD(IN_ROOM(i));
+				if (CHECK_MAP_BOUNDS(check_x, check_y)) {
+					msg_to_char(ch, "%-20s - (%*d, %*d) %s\r\n", PERS(i, ch, 0), X_PRECISION, check_x, Y_PRECISION, check_y, get_room_name(IN_ROOM(i), FALSE));
 				}
 				else {
 					msg_to_char(ch, "%-20s - (unknown) %s\r\n", PERS(i, ch, 0), get_room_name(IN_ROOM(i), FALSE));
@@ -1699,8 +1701,9 @@ void perform_mortal_where(char_data *ch, char *arg) {
 
 			if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
 				check_x = X_COORD(IN_ROOM(i));	// not all locations are on the map
-				if (check_x >= 0 && check_x < MAP_WIDTH) {
-					msg_to_char(ch, "%-25s - (%*d, %*d) %s\r\n", PERS(i, ch, 0), X_PRECISION, check_x, Y_PRECISION, Y_COORD(IN_ROOM(i)), get_room_name(IN_ROOM(i), FALSE));
+				check_y = Y_COORD(IN_ROOM(i));
+				if (CHECK_MAP_BOUNDS(check_x, check_y)) {
+					msg_to_char(ch, "%-25s - (%*d, %*d) %s\r\n", PERS(i, ch, 0), X_PRECISION, check_x, Y_PRECISION, check_y, get_room_name(IN_ROOM(i), FALSE));
 				}
 				else {
 					msg_to_char(ch, "%-25s - (unknown) %s\r\n", PERS(i, ch, 0), get_room_name(IN_ROOM(i), FALSE));
@@ -1722,7 +1725,7 @@ void perform_mortal_where(char_data *ch, char *arg) {
 
 
 void print_object_location(int num, obj_data *obj, char_data *ch, int recur) {
-	int check_x;
+	int check_x, check_y;
 	
 	if (num > 0) {
 		sprintf(buf, "O%3d. %-25s - ", num, GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT));
@@ -1738,8 +1741,9 @@ void print_object_location(int num, obj_data *obj, char_data *ch, int recur) {
 	if (IN_ROOM(obj)) {
 		if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
 			check_x = X_COORD(IN_ROOM(obj));	// not all locations are on the map
-			if (check_x >= 0 && check_x < MAP_WIDTH) {
-				sprintf(buf + strlen(buf), "(%*d, %*d) %s\r\n", X_PRECISION, check_x, Y_PRECISION, Y_COORD(IN_ROOM(obj)), get_room_name(IN_ROOM(obj), FALSE));
+			check_y = Y_COORD(IN_ROOM(obj));
+			if (CHECK_MAP_BOUNDS(check_x, check_y)) {
+				sprintf(buf + strlen(buf), "(%*d, %*d) %s\r\n", X_PRECISION, check_x, Y_PRECISION, check_y, get_room_name(IN_ROOM(obj), FALSE));
 			}
 			else {
 				sprintf(buf + strlen(buf), "(unknown) %s\r\n", get_room_name(IN_ROOM(obj), FALSE));
@@ -1777,7 +1781,7 @@ void perform_immort_where(char_data *ch, char *arg) {
 	register char_data *i;
 	register obj_data *k;
 	descriptor_data *d;
-	int check_x, num = 0, found = 0;
+	int check_x, check_y, num = 0, found = 0;
 
 	if (!*arg) {
 		send_to_char("Players\r\n-------\r\n", ch);
@@ -1787,8 +1791,9 @@ void perform_immort_where(char_data *ch, char *arg) {
 				if (i && CAN_SEE(ch, i) && IN_ROOM(i)) {
 					if (d->original) {
 						check_x = X_COORD(IN_ROOM(d->character));	// not all locations are on the map
-						if (check_x >= 0 && check_x < MAP_WIDTH) {
-							msg_to_char(ch, "%-20s - (%*d, %*d) %s (in %s)\r\n", GET_NAME(i), X_PRECISION, check_x, Y_PRECISION, Y_COORD(IN_ROOM(d->character)), get_room_name(IN_ROOM(d->character), FALSE), GET_NAME(d->character));
+						check_y = Y_COORD(IN_ROOM(d->character));
+						if (CHECK_MAP_BOUNDS(check_x, check_y)) {
+							msg_to_char(ch, "%-20s - (%*d, %*d) %s (in %s)\r\n", GET_NAME(i), X_PRECISION, check_x, Y_PRECISION, check_y, get_room_name(IN_ROOM(d->character), FALSE), GET_NAME(d->character));
 						}
 						else {
 							msg_to_char(ch, "%-20s - (unknown) %s (in %s)\r\n", GET_NAME(i), get_room_name(IN_ROOM(d->character), FALSE), GET_NAME(d->character));
@@ -1796,8 +1801,9 @@ void perform_immort_where(char_data *ch, char *arg) {
 					}
 					else {
 						check_x = X_COORD(IN_ROOM(i));	// not all locations are on the map
-						if (check_x >= 0 && check_x < MAP_WIDTH) {
-							msg_to_char(ch, "%-20s - (%*d, %*d) %s\r\n", GET_NAME(i), X_PRECISION, check_x, Y_PRECISION, Y_COORD(IN_ROOM(i)), get_room_name(IN_ROOM(i), FALSE));
+						check_y = Y_COORD(IN_ROOM(i));
+						if (CHECK_MAP_BOUNDS(check_x, check_y)) {
+							msg_to_char(ch, "%-20s - (%*d, %*d) %s\r\n", GET_NAME(i), X_PRECISION, check_x, Y_PRECISION, check_y, get_room_name(IN_ROOM(i), FALSE));
 						}
 						else {
 							msg_to_char(ch, "%-20s - (unknown) %s\r\n", GET_NAME(i), get_room_name(IN_ROOM(i), FALSE));
@@ -1812,8 +1818,9 @@ void perform_immort_where(char_data *ch, char *arg) {
 			if (CAN_SEE(ch, i) && IN_ROOM(i) && multi_isname(arg, GET_PC_NAME(i))) {
 				found = 1;
 				check_x = X_COORD(IN_ROOM(i));	// not all locations are on the map
-				if (check_x >= 0 && check_x < MAP_WIDTH) {
-					msg_to_char(ch, "M%3d. %-25s - %s(%*d, %*d) %s\r\n", ++num, GET_NAME(i), (IS_NPC(i) && i->proto_script) ? "[TRIG] " : "", X_PRECISION, check_x, Y_PRECISION, Y_COORD(IN_ROOM(i)), get_room_name(IN_ROOM(i), FALSE));
+				check_y = Y_COORD(IN_ROOM(i));
+				if (CHECK_MAP_BOUNDS(check_x, check_y)) {
+					msg_to_char(ch, "M%3d. %-25s - %s(%*d, %*d) %s\r\n", ++num, GET_NAME(i), (IS_NPC(i) && i->proto_script) ? "[TRIG] " : "", X_PRECISION, check_x, Y_PRECISION, check_y, get_room_name(IN_ROOM(i), FALSE));
 				}
 				else {
 					msg_to_char(ch, "M%3d. %-25s - %s(unknown) %s\r\n", ++num, GET_NAME(i), (IS_NPC(i) && i->proto_script) ? "[TRIG] " : "", get_room_name(IN_ROOM(i), FALSE));

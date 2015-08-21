@@ -433,6 +433,9 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
  //////////////////////////////////////////////////////////////////////////////
 //// MAP UTILS ///////////////////////////////////////////////////////////////
 
+// returns TRUE only if both x and y are in the bounds of the map
+#define CHECK_MAP_BOUNDS(x, y)  ((x) >= 0 && (x) < MAP_WIDTH && (y) >= 0 && (y) < MAP_HEIGHT)
+
 // flat coords ASSUME room is on the map -- otherwise use the X_COORD/Y_COORD macros
 #define FLAT_X_COORD(room)  (GET_ROOM_VNUM(room) % MAP_WIDTH)
 #define FLAT_Y_COORD(room)  (GET_ROOM_VNUM(room) / MAP_WIDTH)
@@ -443,7 +446,6 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 // wrap x/y "around the edge"
 #define WRAP_X_COORD(x)  (WRAP_X ? (((x) < 0) ? ((x) + MAP_WIDTH) : (((x) >= MAP_WIDTH) ? ((x) - MAP_WIDTH) : (x))) : MAX(0, MIN(MAP_WIDTH-1, (x))))
 #define WRAP_Y_COORD(y)  (WRAP_Y ? (((y) < 0) ? ((y) + MAP_HEIGHT) : (((y) >= MAP_HEIGHT) ? ((y) - MAP_HEIGHT) : (y))) : MAX(0, MIN(MAP_HEIGHT-1, (y))))
-
 
 
  //////////////////////////////////////////////////////////////////////////////
