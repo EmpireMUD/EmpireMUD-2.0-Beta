@@ -2367,7 +2367,7 @@ char *make_prompt(descriptor_data *d) {
 		*prompt = '\0';
 	}
 	else if (d->showstr_count)
-		sprintf(prompt, "\r[ Return to continue, (q)uit, (r)efresh, (b)ack, or page number (%d/%d) ]", d->showstr_page, d->showstr_count);
+		sprintf(prompt, "\r&0[ Return to continue, (q)uit, (r)efresh, (b)ack, or page number (%d/%d) ]", d->showstr_page, d->showstr_count);
 	else if (d->str && (STATE(d) != CON_PLAYING || d->straight_to_editor))
 		strcpy(prompt, "] ");
 	else if (STATE(d) == CON_PLAYING) {
