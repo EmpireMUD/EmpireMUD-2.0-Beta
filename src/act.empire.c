@@ -32,6 +32,7 @@
 *   Efind Helpers
 *   Import / Export Helpers
 *   Inspire Helpers
+*   Islands Helpers
 *   Tavern Helpers
 *   Territory Helpers
 *   Empire Commands
@@ -1392,6 +1393,57 @@ void perform_inspire(char_data *ch, char_data *vict, int type) {
 		act("$n seems inspired!", FALSE, vict, NULL, NULL, TO_ROOM);
 		gain_ability_exp(ch, ABIL_INSPIRE, 33.4);
 	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// ISLANDS HELPERS /////////////////////////////////////////////////////////
+
+// helper data for do_islands
+struct do_islands_data {
+	int id;
+	bool has_territory;
+	int einv_size;
+	UT_hash_handle hh;
+};
+
+
+/**
+* Helper for do_islands: adds to einv count.
+*
+* @param struct do_islands_data **list Pointer to a do_islands hash.
+* @param int island_id Which island.
+* @param int amount How much einv to add.
+*/
+void do_islands_add_einv(struct do_islands_data **list, int island_id, int amount) {
+	struct do_islands_data *isle;
+	
+	HASH_FIND_INT(*list, &island_id, isle);
+	if (!isle) {
+		CREATE(isle, struct do_islands_data, 1);
+		isle->id = island_id;
+		HASH_ADD_INT(*list, id, isle);
+	}
+	SAFE_ADD(isle->einv_size, amount, INT_MIN, INT_MAX, TRUE);
+}
+
+
+/**
+* Helper for do_islands: marks territory on the island.
+*
+* @param struct do_islands_data **list Pointer to a do_islands hash.
+* @param int island_id Which island.
+*/
+void do_islands_has_territory(struct do_islands_data **list, int island_id) {
+	struct do_islands_data *isle;
+	
+	HASH_FIND_INT(*list, &island_id, isle);
+	if (!isle) {
+		CREATE(isle, struct do_islands_data, 1);
+		isle->id = island_id;
+		HASH_ADD_INT(*list, id, isle);
+	}
+	isle->has_territory = TRUE;
 }
 
 
@@ -3222,6 +3274,106 @@ ACMD(do_home) {
 	else {
 		msg_to_char(ch, "Usage: home [set | unset | clear]\r\n");
 	}
+}
+
+
+ACMD(do_islands) {
+	char output[MAX_STRING_LENGTH*2], line[82], emp_arg[MAX_INPUT_LENGTH];
+	struct do_islands_data *item, *next_item, *list = NULL;
+	struct empire_unique_storage *eus;
+	struct empire_territory_data *ter;
+	struct empire_storage_data *store;
+	struct island_info *isle;
+	empire_data *emp;
+	room_data *room;
+	int id, last_id = -1;
+	size_t size, lsize;
+	bool overflow = FALSE;
+	
+	// imms can target empires
+	any_one_word(argument, emp_arg);
+	if (!*emp_arg || (GET_ACCESS_LEVEL(ch) < LVL_CIMPL && !IS_GRANTED(ch, GRANT_EMPIRES))) {
+		emp = GET_LOYALTY(ch);
+	}
+	else {
+		emp = get_empire_by_name(arg);
+		if (!emp) {
+			msg_to_char(ch, "Unknown empire.\r\n");
+			return;
+		}
+	}
+	
+	if (IS_NPC(ch) || !ch->desc) {
+		msg_to_char(ch, "You can't do that.\r\n");
+		return;
+	}
+	if (!HAS_ABILITY(ch, ABIL_NAVIGATION)) {
+		msg_to_char(ch, "You need to purchase the Navigation ability to do that.\r\n");
+		return;
+	}
+	if (!(emp = GET_LOYALTY(ch))) {
+		msg_to_char(ch, "You must be in an empire to do that.\r\n");
+		return;
+	}
+	
+	// mark your territory
+	for (ter = EMPIRE_TERRITORY_LIST(emp); ter; ter = ter->next) {
+		id = GET_ISLAND_ID(ter->room);
+		
+		if (id != last_id) {
+			last_id = id;
+			
+			if (id != NO_ISLAND) {
+				do_islands_has_territory(&list, id);
+			}
+		}
+	}
+	
+	// compute einv
+	for (store = EMPIRE_STORAGE(emp); store; store = store->next) {
+		do_islands_add_einv(&list, store->island, store->amount);
+	}
+	
+	// add unique storage
+	for (eus = EMPIRE_UNIQUE_STORAGE(emp); eus; eus = eus->next) {
+		do_islands_add_einv(&list, eus->island, eus->amount);
+	}
+	
+	// and then build the display while freeing it up
+	size = snprintf(output, sizeof(output), "%s%s&0 is on the following islands:\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+	
+	if (!list) {
+		size += snprintf(output + size, sizeof(output) - size, " none\r\n");
+	}
+	
+	HASH_ITER(hh, list, item, next_item) {
+		isle = get_island(item->id, TRUE);
+		room = real_room(isle->center);
+		lsize = snprintf(line, sizeof(line), " %s (%d, %d) - ", isle->name, X_COORD(room), Y_COORD(room));
+		
+		if (item->has_territory) {
+			lsize += snprintf(line + lsize, sizeof(line) - lsize, "territory%s", item->einv_size > 0 ? ", " : "");
+		}
+		if (item->einv_size > 0) {
+			lsize += snprintf(line + lsize, sizeof(line) - lsize, "%d item%s in einventory", item->einv_size, PLURAL(item->einv_size));
+		}
+		
+		if (size + lsize + 3 < sizeof(output)) {
+			size += snprintf(output + size, sizeof(output) - size, "%s\r\n", line);
+		}
+		else {
+			overflow = TRUE;
+		}
+		
+		HASH_DEL(list, item);
+		free(item);
+	}
+	
+	if (overflow) {
+		size += snprintf(output + size, sizeof(output) - size, " and more...\r\n");
+	}
+	
+	page_string(ch->desc, output, TRUE);
 }
 
 

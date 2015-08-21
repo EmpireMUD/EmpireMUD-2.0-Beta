@@ -220,6 +220,7 @@ ACMD(do_interlink);
 ACMD(do_inventory);
 ACMD(do_invis);
 ACMD(do_island);
+ACMD(do_islands);
 
 ACMD(do_jab);
 
@@ -710,6 +711,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "interlink", POS_STANDING, do_interlink, NO_MIN, CTYPE_BUILD ),
 	SIMPLE_CMD( "invis", POS_DEAD, do_invis, LVL_GOD, CTYPE_IMMORTAL ),
 	GRANT_CMD( "island", POS_DEAD, do_island, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_ISLAND ),
+	SIMPLE_CMD( "islands", POS_DEAD, do_islands, LVL_APPROVED, CTYPE_EMPIRE ),
 
 	ABILITY_CMD( "jab", POS_FIGHTING, do_jab, NO_MIN, CTYPE_COMBAT, ABIL_JAB ),
 	SCMD_CMD( "junk", POS_RESTING, do_drop, NO_MIN, CTYPE_UTIL, SCMD_JUNK ),
