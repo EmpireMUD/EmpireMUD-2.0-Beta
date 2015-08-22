@@ -366,8 +366,8 @@ char *next_page(char *str) {
 		// skip & colorcodes
 		else if (*str == '&') {
 			++str;
-			if (*str != '&') {
-				++str;
+			if (*str == '&') {	// cause it to print a & in case of &&
+				--str;
 			}
 		}
 
