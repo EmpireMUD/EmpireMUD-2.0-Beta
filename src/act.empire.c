@@ -850,7 +850,7 @@ void list_cities(char_data *ch, char *argument) {
 	struct island_info *isle;
 	empire_data *emp;
 	int points, used, count;
-	bool found = FALSE;
+	bool pending, found = FALSE;
 	room_data *rl;
 	
 	any_one_word(argument, arg);
@@ -877,7 +877,9 @@ void list_cities(char_data *ch, char *argument) {
 		rl = city->location;
 		prettier_sprintbit(city->traits, empire_trait_types, buf);
 		isle = get_island(GET_ISLAND_ID(rl), TRUE);
-		msg_to_char(ch, "%d. (%*d, %*d) %s, on %s (%s/%d), traits: %s\r\n", ++count, X_PRECISION, X_COORD(rl), Y_PRECISION, Y_COORD(rl), city->name, isle->name, city_type[city->type].name, city_type[city->type].radius, buf);
+		
+		pending = (get_room_extra_data(city->location, ROOM_EXTRA_FOUND_TIME) + (config_get_int("minutes_to_full_city") * SECS_PER_REAL_MIN) > time(0));			
+		msg_to_char(ch, "%d. (%*d, %*d) %s, on %s (%s/%d), traits: %s%s\r\n", ++count, X_PRECISION, X_COORD(rl), Y_PRECISION, Y_COORD(rl), city->name, isle->name, city_type[city->type].name, city_type[city->type].radius, buf, pending ? " &r(new)&0" : "");
 	}
 	
 	if (!found) {
