@@ -435,9 +435,7 @@ void perform_reboot(void) {
 	// If this is a reboot, restart the mud!
 	if (reboot_control.type == SCMD_REBOOT) {
 		log("Reboot: performing live reboot");
-				
-		sprintf(buf, "%d", port);
-		sprintf(buf2, "-C%d", mother_desc);
+		
 		chdir("..");
 				
 		// rotate logs -- note: you should also update the autorun script
@@ -457,8 +455,17 @@ void perform_reboot(void) {
 		system("fgrep \"SCRIPT ERR:\" syslog >> log/scripterr");
 		system("cp syslog log/syslog.old");
 		system("echo 'Rebooting EmpireMUD...' > syslog");
-
-		execl("bin/empire", "empire", buf2, buf, (char *) NULL);
+		
+		sprintf(buf, "%d", port);
+		sprintf(buf2, "-C%d", mother_desc);
+		
+		// TODO: should support more of the extra options we might have started up with
+		if (no_rent_check) {
+			execl("bin/empire", "empire", buf2, "q", buf, (char *) NULL);
+		}
+		else {
+			execl("bin/empire", "empire", buf2, buf, (char *) NULL);
+		}
 
 		// If that failed we're still here?
 		perror("reboot: execl");
