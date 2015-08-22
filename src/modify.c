@@ -346,7 +346,7 @@ void string_add(descriptor_data *d, char *str) {
 char *next_page(char *str) {
 	int col = 1, line = 1, spec_code = FALSE;
 
-	for (;; str++) {
+	for (;; ++str) {
 		/* If end of string, return NULL. */
 		if (*str == '\0')
 			return (NULL);
@@ -362,6 +362,14 @@ char *next_page(char *str) {
 		/* Check for the end of an ANSI color code block. */
 		else if (*str == 'm' && spec_code)
 			spec_code = FALSE;
+		
+		// skip & colorcodes
+		else if (*str == '&') {
+			++str;
+			if (*str != '&') {
+				++str;
+			}
+		}
 
 		/* Check for everything else. */
 		else if (!spec_code) {
