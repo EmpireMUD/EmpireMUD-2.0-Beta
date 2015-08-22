@@ -461,7 +461,7 @@ void perform_reboot(void) {
 		
 		// TODO: should support more of the extra options we might have started up with
 		if (no_rent_check) {
-			execl("bin/empire", "empire", buf2, "q", buf, (char *) NULL);
+			execl("bin/empire", "empire", buf2, "-q", buf, (char *) NULL);
 		}
 		else {
 			execl("bin/empire", "empire", buf2, buf, (char *) NULL);
