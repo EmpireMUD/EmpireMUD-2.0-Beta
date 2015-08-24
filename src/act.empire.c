@@ -1738,7 +1738,7 @@ void scan_for_tile(char_data *ch, char *argument) {
 			dist = compute_distance(IN_ROOM(ch), node->loc);
 			dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), node->loc));
 			
-			if (CHECK_MAP_BOUNDS(check_x, check_y)) {
+			if (CHECK_MAP_BOUNDS(check_x, check_y) && HAS_ABILITY(ch, ABIL_NAVIGATION)) {
 				lsize = snprintf(line, sizeof(line), "%2d tile%s %s (%d, %d) - %s", dist, PLURAL(dist), (dir == NO_DIR ? "away" : dirs[dir]), check_x, check_y, get_room_name(node->loc, FALSE));
 			}
 			else {
@@ -1763,6 +1763,8 @@ void scan_for_tile(char_data *ch, char *argument) {
 	else {
 		msg_to_char(ch, "No matching territory found.\r\n");
 	}
+	
+	GET_WAIT_STATE(ch) = 1 RL_SEC;	// short lag for scannings
 }
 
 
