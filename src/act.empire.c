@@ -1720,8 +1720,8 @@ void scan_for_tile(char_data *ch, char *argument) {
 	}
 
 	if (node_list) {
-		node_list = reduce_territory_node_list(node_list);
 		sort_territory_node_list_by_distance(IN_ROOM(ch), &node_list);
+		node_list = reduce_territory_node_list(node_list);
 		
 		size = snprintf(output, sizeof(output), "Nearby tiles matching '%s' within %d tile%s:\r\n", argument, mapsize, PLURAL(mapsize));
 		
