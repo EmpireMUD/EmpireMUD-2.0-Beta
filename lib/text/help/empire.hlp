@@ -762,6 +762,9 @@ start to automatically reduce itself. If the empire times out completely, it
 may lose all its territory. Finally, if no members log on for a very long time,
 the empire itself may crumble to dust.
 
+Note: Players with extremely low average playtime may never count as active
+empire members.
+
 See also: ENROLL, PLEDGE, ROSTER
 #
 MONUMENTS "MONUMENT BUILDINGS"
