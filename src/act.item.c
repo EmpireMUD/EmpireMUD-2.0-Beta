@@ -4512,6 +4512,11 @@ ACMD(do_ship) {
 		msg_to_char(ch, "You can't ship anything from here.\r\n");
 	}
 	else if (!str_cmp(arg1, "cancel")) {
+		if (!*keywords) {
+			msg_to_char(ch, "Cancel which shipment?\r\n");
+			return;
+		}
+		
 		// find a matching entry
 		done = FALSE;
 		for (sd = EMPIRE_SHIPPING_LIST(GET_LOYALTY(ch)); sd; sd = sd->next) {
