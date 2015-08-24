@@ -1648,6 +1648,178 @@ struct find_territory_node *reduce_territory_node_list(struct find_territory_nod
 }
 
 
+/**
+* Scans within the character's mapsize for matching tiles.
+*
+* @param char_data *ch The player.
+* @param char_data *argument The tile to search for.
+*/
+void scan_for_tile(char_data *ch, char *argument) {
+	void sort_territory_node_list_by_distance(room_data *from, struct find_territory_node **node_list);
+	extern const char *dirs[];
+
+	struct find_territory_node *node_list = NULL, *node, *next_node;
+	int dir, dist, mapsize, total, x, y, check_x, check_y;
+	char output[MAX_STRING_LENGTH], line[128];
+	room_data *map, *room;
+	size_t size, lsize;
+	crop_data *crop;
+	bool ok;
+	
+	skip_spaces(&argument);
+	
+	if (!ch->desc) {
+		return;	// don't bother
+	}
+	if (!*argument) {
+		msg_to_char(ch, "Scan for what?\r\n");
+		return;
+	}
+	if (!(map = get_map_location_for(IN_ROOM(ch)))) {
+		msg_to_char(ch, "You can't scan for anything here.\r\n");
+		return;
+	}
+
+	mapsize = GET_MAPSIZE(REAL_CHAR(ch));
+	if (mapsize == 0) {
+		mapsize = config_get_int("default_map_size");
+	}
+	
+	for (x = -mapsize; x <= mapsize; ++x) {
+		for (y = -mapsize; y <= mapsize; ++y) {
+			if (!(room = real_shift(map, x, y))) {
+				continue;
+			}
+			
+			// validate tile
+			ok = FALSE;
+			if (multi_isname(argument, GET_SECT_NAME(SECT(room)))) {
+				ok = TRUE;
+			}
+			else if (GET_BUILDING(room) && multi_isname(argument, GET_BLD_NAME(GET_BUILDING(room)))) {
+				ok = TRUE;
+			}
+			else if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && (crop = crop_proto(ROOM_CROP_TYPE(room))) && multi_isname(argument, GET_CROP_NAME(crop))) {
+				ok = TRUE;
+			}
+			else if (multi_isname(argument, get_room_name(room, FALSE))) {
+				ok = TRUE;
+			}
+			else {
+				continue;
+			}
+			
+			if (ok) {
+				CREATE(node, struct find_territory_node, 1);
+				node->loc = room;
+				node->count = 1;
+				node->next = node_list;
+				node_list = node;
+			}
+		}
+	}
+
+	if (node_list) {
+		node_list = reduce_territory_node_list(node_list);
+		sort_territory_node_list_by_distance(IN_ROOM(ch), &node_list);
+		
+		size = snprintf(output, sizeof(output), "Nearby tiles matching '%s' within %d tile%s:\r\n", argument, mapsize, PLURAL(mapsize));
+		
+		// display and free the nodes
+		total = 0;
+		for (node = node_list; node; node = next_node) {
+			next_node = node->next;
+			total += node->count;
+			
+			// territory can be off the map (e.g. ships) and get a -1 here
+			check_x = X_COORD(node->loc);
+			check_y = Y_COORD(node->loc);
+			
+			dist = compute_distance(IN_ROOM(ch), node->loc);
+			dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), node->loc));
+			
+			if (CHECK_MAP_BOUNDS(check_x, check_y)) {
+				lsize = snprintf(line, sizeof(line), "%2d tile%s %s (%d, %d) - %s", dist, PLURAL(dist), (dir == NO_DIR ? "away" : dirs[dir]), check_x, check_y, get_room_name(node->loc, FALSE));
+			}
+			else {
+				lsize = snprintf(line, sizeof(line), "%2d tile%s %s - %s", dist, PLURAL(dist), (dir == NO_DIR ? "away" : dirs[dir]), get_room_name(node->loc, FALSE));
+			}
+			
+			if (node->count > 1) {
+				lsize += snprintf(line + lsize, sizeof(line) - lsize, " (and %d nearby tile%s)", node->count, PLURAL(node->count));
+			}
+			
+			if (size + lsize + 32 < sizeof(output)) {
+				size += snprintf(output + size, sizeof(output) - size, "%s\r\n", line);
+			}
+			
+			free(node);
+		}
+		
+		node_list = NULL;
+		size += snprintf(output + size, sizeof(output) - size, "Total: %d\r\n", total);
+		page_string(ch->desc, output, TRUE);
+	}
+	else {
+		msg_to_char(ch, "No matching territory found.\r\n");
+	}
+}
+
+
+// quick-switch of linked list positions
+inline struct find_territory_node *switch_node_pos(struct find_territory_node *l1, struct find_territory_node *l2) {
+    l1->next = l2->next;
+    l2->next = l1;
+    return l2;
+}
+
+
+/**
+* Sort a territory node list, by distance from a room.
+*
+* @param room_data *from The room to measure from.
+* @param struct find_territory_node **node_list A pointer to the node list to sort.
+*/
+void sort_territory_node_list_by_distance(room_data *from, struct find_territory_node **node_list) {
+	struct find_territory_node *start, *p, *q, *top;
+    bool changed = TRUE;
+        
+    // safety first
+    if (!from) {
+    	return;
+    }
+    
+    start = *node_list;
+
+	CREATE(top, struct find_territory_node, 1);
+
+    top->next = start;
+    if (start && start->next) {
+    	// q is always one item behind p
+
+        while (changed) {
+            changed = FALSE;
+            q = top;
+            p = top->next;
+            while (p->next != NULL) {
+            	if (compute_distance(from, p->loc) > compute_distance(from, p->next->loc)) {
+					q->next = switch_node_pos(p, p->next);
+					changed = TRUE;
+				}
+				
+                q = p;
+                if (p->next) {
+                    p = p->next;
+                }
+            }
+        }
+    }
+    
+    *node_list = top->next;
+    free(top);
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// EMPIRE COMMANDS /////////////////////////////////////////////////////////
 
@@ -4069,10 +4241,6 @@ ACMD(do_roster) {
 
 
 ACMD(do_territory) {
-	extern bld_data *get_building_by_name(char *name, bool room_only);
-	extern crop_data *get_crop_by_name(char *name);
-	extern sector_data *get_sect_by_name(char *name);
-
 	struct find_territory_node *node_list = NULL, *node, *next_node;
 	empire_data *emp = GET_LOYALTY(ch);
 	room_data *iter, *next_iter;

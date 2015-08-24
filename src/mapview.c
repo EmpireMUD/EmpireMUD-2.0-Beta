@@ -1903,6 +1903,8 @@ ACMD(do_exits) {
 
 
 ACMD(do_scan) {
+	void scan_for_tile(char_data *ch, char *argument);
+
 	int dir;
 	
 	room_data *use_room = get_map_location_for(IN_ROOM(ch));
@@ -1910,7 +1912,7 @@ ACMD(do_scan) {
 	skip_spaces(&argument);
 	
 	if (!*argument) {
-		msg_to_char(ch, "Scan which direction?\r\n");
+		msg_to_char(ch, "Scan which direction or for what type of tile?\r\n");
 	}
 	else if (!use_room || IS_ADVENTURE_ROOM(use_room) || ROOM_IS_CLOSED(use_room)) {	// check map room
 		msg_to_char(ch, "You can only use scan out on the map.\r\n");
@@ -1920,7 +1922,7 @@ ACMD(do_scan) {
 		msg_to_char(ch, "Scan only works out on the map.\r\n");
 	}
 	else if ((dir = parse_direction(ch, argument)) == NO_DIR) {
-		msg_to_char(ch, "Invalid direction.\r\n");
+		scan_for_tile(ch, argument);
 	}
 	else if (dir >= NUM_2D_DIRS) {
 		msg_to_char(ch, "You can't scan that way.\r\n");
