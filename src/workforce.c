@@ -82,14 +82,16 @@ struct empire_chore_type chore_data[NUM_CHORES] = {
 	{ "quarrying", STONECUTTER },
 	{ "nailmaking", NAILMAKER },
 	{ "brickmaking", BRICKMAKER },
-	{ "auto-abandon", BUILDER },	// builder is strictly a safe placeholder here
+	{ "abandon-dismantled", BUILDER },	// builder is strictly a safe placeholder here
 	{ "herb gardening", GARDENER },
 	{ "fire brigade", FIRE_BRIGADE },
 	{ "trapping", TRAPPER },
 	{ "tanning", TANNER },
 	{ "shearing", SHEARER },
 	{ "minting", COIN_MAKER },
-	{ "dismantle-mines", BUILDER }
+	{ "dismantle-mines", BUILDER },
+	{ "abandon-chopped", FELLER },	// mob is strictly a safe placeholder here
+	{ "abandon-farmed", FARMER }	// mob is strictly a safe placeholder here
 };
 
 
@@ -653,7 +655,7 @@ void do_chore_chopping(empire_data *emp, room_data *room) {
 					SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 					stop_room_action(room, ACT_CHOPPING, CHORE_CHOPPING);
 			
-					if (EMPIRE_CHORE(emp, CHORE_AUTO_ABANDON)) {
+					if (EMPIRE_CHORE(emp, CHORE_ABANDON_CHOPPED)) {
 						abandon_room(room);
 						add_chore_tracker(emp);
 					}		
@@ -735,7 +737,7 @@ void do_chore_dismantle(empire_data *emp, room_data *room) {
 		if (IS_COMPLETE(room)) {
 			finish_dismantle(worker, room);
 			SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
-			if (EMPIRE_CHORE(emp, CHORE_AUTO_ABANDON)) {
+			if (EMPIRE_CHORE(emp, CHORE_ABANDON_DISMANTLED)) {
 				abandon_room(room);
 				add_chore_tracker(emp);
 			}
@@ -825,7 +827,7 @@ INTERACTION_FUNC(one_farming_chore) {
 					// stop the chop just in case
 					stop_room_action(inter_room, ACT_CHOPPING, CHORE_CHOPPING);
 					
-					if (EMPIRE_CHORE(emp, CHORE_AUTO_ABANDON)) {
+					if (EMPIRE_CHORE(emp, CHORE_ABANDON_CHOPPED)) {
 						abandon_room(inter_room);
 						add_chore_tracker(emp);
 					}
