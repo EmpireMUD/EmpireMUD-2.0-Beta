@@ -1283,7 +1283,11 @@ appear in one of the docks at the destination.
 You can only ship and cancel shipments from the island you are currently on,
 but you can see the status of empire shipments all over the world.
 
-See also: DOCKS, EINVENTORY, SHIPBUILDING
+If the 'workforce no-work' option is set on a docks, it won't be used by the
+shipping system. You can also set this option on individual ships. (Workforce
+is not required to use the shipping system.)
+
+See also: DOCKS, EINVENTORY, SHIPBUILDING, WORKFORCE
 #
 SLEEP
 

@@ -1624,7 +1624,7 @@ void deliver_shipment(empire_data *emp, struct shipping_data *shipd) {
 
 /**
 * Finds a completed docks building on the given island, belonging to the given
-* empire.
+* empire. It won't find no-work docks.
 *
 * @param empire_data *emp The empire to check.
 * @param int island_id Which island to search.
@@ -1642,6 +1642,9 @@ room_data *find_docks(empire_data *emp, int island_id) {
 			continue;
 		}
 		if (!ROOM_BLD_FLAGGED(ter->room, BLD_DOCKS) || !IS_COMPLETE(ter->room)) {
+			continue;
+		}
+		if (ROOM_AFF_FLAGGED(ter->room, ROOM_AFF_NO_WORK)) {
 			continue;
 		}
 				
@@ -1675,6 +1678,9 @@ obj_data *find_free_ship(empire_data *emp, struct shipping_data *shipd) {
 		if (!ROOM_BLD_FLAGGED(ter->room, BLD_DOCKS) || !IS_COMPLETE(ter->room)) {
 			continue;
 		}
+		if (ROOM_AFF_FLAGGED(ter->room, ROOM_AFF_NO_WORK)) {
+			continue;
+		}
 		
 		// found docks...
 		for (obj = ROOM_CONTENTS(ter->room); obj; obj = obj->next_content) {
@@ -1685,6 +1691,9 @@ obj_data *find_free_ship(empire_data *emp, struct shipping_data *shipd) {
 				continue;
 			}
 			if (ROOM_OWNER(in_ship) != NULL && ROOM_OWNER(in_ship) != emp) {
+				continue;
+			}
+			if (ROOM_AFF_FLAGGED(in_ship, ROOM_AFF_NO_WORK)) {
 				continue;
 			}
 			if (!ship_is_empty(obj)) {
