@@ -934,8 +934,8 @@ before it wears off, you'll get five minutes of portal sickness instead. After
 that, you can portal again as soon as your portal sickness is below one minute.
 You can see your current portal sickness by typing 'cooldowns'.
 
-Portal mages only get four minutes of portal sickness. City-to-city portals
-cause just two minutes.
+Portal mages only get four minutes of portal sickness instead of five. City-to-
+city portals cause just two minutes instead of five.
 
 Only entering portals causes portal sickness. You can still open portals while
 you have portal sickness.
@@ -1267,7 +1267,7 @@ Usage:  ship status
         ship cancel [number] <item>
         ship <island> [number] <item>
 
-This command allows you to ship stored resources between items automatically,
+This command allows you to ship stored resources between islands automatically,
 using ships at your docks. Once you queue items to be shipped, your NPCs will
 periodically load up empty ships and move them to the target island. You must
 have docks at both ends.
