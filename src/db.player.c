@@ -1511,6 +1511,11 @@ static bool member_is_timed_out(time_t created, time_t last_login, int played_ho
 		double avg_min_per_day = 60 * ((double)played_hours / days_played);
 		double timeout;
 		
+		// when playtime drops this low, the character is ALWAYS timed out
+		if (avg_min_per_day <= 1) {
+			return TRUE;
+		}
+		
 		if (avg_min_per_day >= minutes_per_day_full) {
 			timeout = member_timeout_full;
 		}
