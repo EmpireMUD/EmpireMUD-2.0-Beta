@@ -10,22 +10,22 @@ if (%instance.location% && (%room.template% == 10300 || (%room% != %instance.loc
   %echo% %self.name% flies away!
   mgoto %instance.location%
   %echo% %self.name% flies into the cave!
-elseif (%room.sector% == Crop || %room.sector% == Seeded Field || %room.sector% == Jungle Crop || %room.sector% == Jungle Field) 
+elseif (%room.sector% == Crop || %room.sector% == Seeded Field || %room.sector% == Jungle Crop || %room.sector% == Jungle Field)
   %echo% %self.name% scorches the crops!
   %terraform% %room% 10303
-elseif (%room.sector% == Desert Crop || %room.sector% == Sandy Field) 
+elseif (%room.sector% == Desert Crop || %room.sector% == Sandy Field)
   %echo% %self.name% scorches the crops!
   %terraform% %room% 10304
-elseif (%room.sector% == Desert) 
+elseif (%room.sector% == Desert)
   %echo% %self.name% scorches the desert!
   %terraform% %room% 10305
-elseif (%room.sector% ~= Forest || %room.sector% ~= Jungle) 
+elseif (%room.sector% ~= Forest || %room.sector% ~= Jungle)
   %echo% %self.name% scorches the trees!
   %terraform% %room% 10300
-elseif (%room.sector% == Grove) 
+elseif (%room.sector% == Grove)
   %echo% %self.name% scorches the grove!
   %terraform% %room% 10301
-elseif (%room.sector% == Plains) 
+elseif (%room.sector% == Plains)
   %echo% %self.name% scorches the plains!
   %terraform% %room% 10302
 end
@@ -177,5 +177,133 @@ Flame dragon despawn timer~
 1 f 0
 ~
 %adventurecomplete%
+~
+#10330
+Abandoned Dragon Fly Home~
+0 ab 10
+~
+if (%self.fighting% || %self.disabled%)
+  halt
+end
+eval room %self.room%
+if (%instance.location% && %room% != %instance.location% && (%room.template% == 10330 || %room.sector% == Ocean))
+  %echo% %self.name% flies away!
+  mgoto %instance.location%
+  %echo% %self.name% flies into the nest!
+end
+~
+#10331
+Abandoned Nest Spawner~
+1 n 100
+~
+eval vnum 10330 + %random.4% - 1
+%load% m %vnum%
+%purge% %self%
+~
+#10334
+Abandoned Dragon animation~
+0 b 5
+~
+if (%self.fighting% || %self.disabled%)
+  halt
+end
+switch %random.4%
+  case 1
+    %echo% %self.name% flies in circles overhead.
+  break
+  case 2
+    %echo% %self.name% spurts fire into the air.
+  break
+  case 3
+    %echo% %self.name% eyes you warily.
+  break
+  case 4
+    %echo% %self.name% swoops low, then soars back into the air.
+  break
+done
+~
+#10335
+Dragon Whistle use~
+1 c 2
+use~
+eval test %%self.is_name(%arg%)%%
+if !%test%
+  return 0
+  halt
+end
+if (%actor.position% != Standing)
+  %send% %actor% You can't do that right now.
+  halt
+end
+%load% m %self.val0%
+%send% %actor% You use %self.shortdesc% and a dragon mount appears!
+%echoaround% %actor% %actor.name% uses %self.shortdesc% and a dragon mount appears!
+%purge% %self%
+~
+#10336
+Non-Mount Summon~
+1 c 2
+use~
+eval test %%self.is_name(%arg%)%%
+if !%test%
+  return 0
+  halt
+end
+if (%actor.position% != Standing)
+  %send% %actor% You can't do that right now.
+  halt
+end
+%load% m %self.val0%
+eval room_var %self.room%
+eval mob %room_var.people%
+if (%mob% && %mob.vnum% == %self.val0%)
+  %send% %actor% You use %self.shortdesc% and %mob.name% appears!
+  %echoaround% %actor% %actor.name% uses %self.shortdesc% and %mob.name% appears!
+end
+%purge% %self%
+~
+#10337
+Fire Ox animation~
+0 b 5
+~
+if (%self.fighting% || %self.disabled%)
+  halt
+end
+if (%random.2% == 2)
+  %echo% %self.name% releases a demonic moo, and fire spurts from %self.hisher% nostrils.
+else
+  * We need the current terrain.
+  eval room %self.room%
+  if (%room.sector% == Plains || %room.sector% ~= Forest)
+    %echo% %self.name% scorches some grass, and eats it.
+  else
+    %echo% %self.name% spurts fire from %self.hisher% nostrils.
+  end
+end
+~
+#10338
+Dragonguard animation~
+0 b 5
+~
+if (%self.fighting% || %self.disabled%)
+  halt
+end
+switch %random.5%
+  case 1
+    say The only thing that would make this day more beautiful is fire, raining from the sky.
+  break
+  case 2
+    say Pleasant and eternal greetings.
+  break
+  case 3
+    say May the burning eye watch over you.
+  break
+  case 4
+    say All humans must die. Eventually.
+  break
+  case 5
+    say Mortals tremble before the Dragonguard.
+  break
+done
 ~
 $
