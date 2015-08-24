@@ -3201,7 +3201,7 @@ room_data *get_map_location_for(room_data *room) {
 		// shortcut
 		return room;
 	}
-	else if (GET_ROOM_VNUM(HOME_ROOM(room)) >= MAP_SIZE && BOAT_ROOM(room) == room) {
+	else if (GET_ROOM_VNUM(HOME_ROOM(room)) >= MAP_SIZE && BOAT_ROOM(room) == room && !IS_ADVENTURE_ROOM(HOME_ROOM(room))) {
 		// no home room on the map and not in a boat?
 		return NULL;
 	}
