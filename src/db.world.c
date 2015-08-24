@@ -547,6 +547,34 @@ void init_mine(room_data *room, char_data *ch) {
 }
 
 
+/**
+* Converts a trench back into its base sect.
+*
+* @param room_data *room The trench to convert back.
+*/
+void untrench_room(room_data *room) {
+	void stop_room_action(room_data *room, int action, int chore);
+
+	sector_data *to_sect;
+	
+	if (!ROOM_SECT_FLAGGED(room, SECTF_IS_TRENCH)) {
+		return;
+	}
+					
+	// stop BOTH actions -- it's not a trench!
+	stop_room_action(room, ACT_FILLING_IN, NOTHING);
+	stop_room_action(room, ACT_EXCAVATING, NOTHING);
+
+	// de-evolve sect
+	to_sect = reverse_lookup_evolution_for_sector(SECT(room), EVO_TRENCH_START);
+	if (to_sect) {
+		change_terrain(room, GET_SECT_VNUM(to_sect));
+		REMOVE_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_PLAYER_MADE);
+		REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_PLAYER_MADE);
+	}
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// MANAGEMENT //////////////////////////////////////////////////////////////
 
@@ -694,6 +722,7 @@ void update_world(void) {
 // process map-only annual updates
 static void annual_update_map_tile(room_data *room) {
 	empire_data *emp;
+	int trenched, amount;
 	
 	if (BUILDING_VNUM(room) == BUILDING_RUINS_OPEN || BUILDING_VNUM(room) == BUILDING_RUINS_CLOSED) {
 		// roughly 2 real years for average chance for ruins to be gone
@@ -716,6 +745,23 @@ static void annual_update_map_tile(room_data *room) {
 			// 66% chance after 10 years for any building or 2 years for an unfinished one
 			if ((BUILDING_DISREPAIR(room) >= config_get_int("disrepair_limit") && number(0, 2)) || (!IS_COMPLETE(room) && !IS_DISMANTLING(room) && BUILDING_DISREPAIR(room) >= config_get_int("disrepair_limit_unfinished"))) {
 				ruin_one_building(room);
+			}
+		}
+	}
+	
+	// fill in trenches slightly
+	if (ROOM_SECT_FLAGGED(room, SECTF_IS_TRENCH) && (trenched = get_room_extra_data(room, ROOM_EXTRA_TRENCH_PROGRESS)) < 0) {
+		// move halfway toward initial: remember initial value is negative
+		amount = (config_get_int("trench_initial_value") - trenched) / 2;
+		trenched += amount;
+		if (trenched > config_get_int("trench_initial_value") + 10) {
+			set_room_extra_data(room, ROOM_EXTRA_TRENCH_PROGRESS, trenched);
+		}
+		else {
+			// untrench
+			untrench_room(room);
+			if (ROOM_PEOPLE(room)) {
+				act("The trench collapses!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
 			}
 		}
 	}

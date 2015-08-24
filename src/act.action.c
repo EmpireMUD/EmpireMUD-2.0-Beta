@@ -1087,8 +1087,9 @@ void process_excavating(char_data *ch) {
 *
 * @param char_data *ch The filler-inner.
 */
-void process_fillin(char_data *ch) {	
-	sector_data *to_sect;
+void process_fillin(char_data *ch) {
+	void untrench_room(room_data *room);
+
 	int count, total;
 
 	total = 1 + (AFF_FLAGGED(ch, AFF_HASTE) ? 1 : 0) + (HAS_BONUS_TRAIT(ch, BONUS_FAST_CHORES) ? 1 : 0);
@@ -1123,18 +1124,7 @@ void process_fillin(char_data *ch) {
 			if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_PROGRESS) <= config_get_int("trench_initial_value")) {
 				msg_to_char(ch, "You finish filling in the trench!\r\n");
 				act("$n finishes filling in the trench!", FALSE, ch, 0, 0, TO_ROOM);
-				
-				// stop BOTH actions -- it's not a trench!
-				stop_room_action(IN_ROOM(ch), ACT_FILLING_IN, NOTHING);
-				stop_room_action(IN_ROOM(ch), ACT_EXCAVATING, NOTHING);
-
-				// de-evolve sect
-				to_sect = reverse_lookup_evolution_for_sector(SECT(IN_ROOM(ch)), EVO_TRENCH_START);
-				if (to_sect) {
-					change_terrain(IN_ROOM(ch), GET_SECT_VNUM(to_sect));
-					REMOVE_BIT(ROOM_AFF_FLAGS(IN_ROOM(ch)), ROOM_AFF_PLAYER_MADE);
-					REMOVE_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_PLAYER_MADE);
-				}
+				untrench_room(IN_ROOM(ch));
 			}
 		}
 	}
