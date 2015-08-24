@@ -4566,7 +4566,7 @@ ACMD(do_ship) {
 			msg_to_char(ch, "Usage: ship <island> [number] <item>\r\n");
 		}
 		else if (!find_docks(GET_LOYALTY(ch), GET_ISLAND_ID(IN_ROOM(ch)))) {
-			msg_to_char(ch, "This island has no docks.\r\n");
+			msg_to_char(ch, "This island has no docks (docks must not be set no-work).\r\n");
 		}
 		else if (!(to_isle = get_island_by_name(arg1)) && !(to_isle = get_island_by_coords(arg1))) {
 			msg_to_char(ch, "Unknown target island \"%s\".\r\n", arg1);
@@ -4581,7 +4581,7 @@ ACMD(do_ship) {
 			msg_to_char(ch, "You only have %d '%s' stored on this island.\r\n", store->amount, skip_filler(get_obj_name_by_proto(store->vnum)));
 		}
 		else if (!find_docks(GET_LOYALTY(ch), to_isle->id)) {
-			msg_to_char(ch, "%s has no docks.\r\n", to_isle->name);
+			msg_to_char(ch, "%s has no docks (docks must not be set no-work).\r\n", to_isle->name);
 		}
 		else {
 			add_shipping_queue(ch, GET_LOYALTY(ch), GET_ISLAND_ID(IN_ROOM(ch)), to_isle->id, number, store->vnum);
