@@ -256,6 +256,7 @@ void add_chore_tracker(empire_data *add) {
 static bool can_gain_chore_resource(empire_data *emp, room_data *loc, obj_vnum vnum) {
 	int island_count, total_count, island_max, total_max;
 	struct empire_storage_data *store;
+	struct shipping_data *shipd;
 	int island;
 	
 	// safety first!
@@ -274,6 +275,20 @@ static bool can_gain_chore_resource(empire_data *emp, room_data *loc, obj_vnum v
 			
 			if (store->island == island) {
 				island_count += store->amount;
+			}
+		}
+	}
+	
+	// count shipping, too
+	for (shipd = EMPIRE_SHIPPING_LIST(emp); shipd; shipd = shipd->next) {
+		if (shipd->vnum == vnum) {
+			total_count += shipd->amount;
+			
+			if (shipd->status == SHIPPING_QUEUED && shipd->from_island == island) {
+				island_count += shipd->amount;
+			}
+			else if (shipd->to_island == island) {
+				island_count += shipd->amount;
 			}
 		}
 	}
