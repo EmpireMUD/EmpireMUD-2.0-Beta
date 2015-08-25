@@ -357,7 +357,7 @@ typedef struct trig_data trig_data;
 #define BLD_NO_NPC  BIT(9)	// mobs won't walk in
 #define BLD_BARRIER  BIT(10)	// can only go back the direction you came
 #define BLD_TAVERN  BIT(11)	// building functions as a tavern
-#define BLD_COUNTS_AS_CITY  BIT(12)	// never counts toward outside territory
+#define BLD_LARGE_CITY_RADIUS  BIT(12)	// counts as in-city further than normal
 #define BLD_MINE  BIT(13)	// building is minable
 #define BLD_ATTACH_ROAD  BIT(14)	// building connects to roads on the map
 #define BLD_BURNABLE  BIT(15)	// fire! fire!
@@ -1373,7 +1373,7 @@ typedef struct trig_data trig_data;
 #define SECTF_SHOW_ON_POLITICAL_MAPOUT  BIT(14)	// if unclaimed, still shows on the political graphical map
 #define SECTF_MAP_BUILDING  BIT(15)	// shows a building instead of sect tile
 #define SECTF_INSIDE  BIT(16)	// shows a room instead of sect tile; is interior of a building (off-map)
-#define SECTF_COUNTS_AS_CITY  BIT(17)	// does not count as "outside" territory
+#define SECTF_LARGE_CITY_RADIUS  BIT(17)	// counts as in-city much further than normal
 #define SECTF_OBSCURE_VISION  BIT(18)	// blocks catapult, mappc
 #define SECTF_IS_TRENCH  BIT(19)	// excavate-related
 	#define SECTF_UNUSED1  BIT(20)

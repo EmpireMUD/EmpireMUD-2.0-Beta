@@ -402,7 +402,6 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_TOTAL_WEALTH(emp)  (EMPIRE_WEALTH(emp) + (int)(EMPIRE_COINS(emp) * COIN_VALUE))
 
 // definitions
-#define COUNTS_AS_IN_CITY(room)  (ROOM_BLD_FLAGGED(room, BLD_COUNTS_AS_CITY) || ROOM_SECT_FLAGGED(room, SECTF_COUNTS_AS_CITY))
 #define SAME_EMPIRE(ch, vict)  (!IS_NPC(ch) && !IS_NPC(vict) && GET_LOYALTY(ch) != NULL && GET_LOYALTY(ch) == GET_LOYALTY(vict))
 
 // only some types of tiles are kept in the shortlist of territories -- particularly ones with associated chores

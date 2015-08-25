@@ -870,7 +870,7 @@ static void reduce_outside_territory_one(empire_data *emp) {
 		loc = HOME_ROOM(iter);
 		
 		// if owner matches AND it's not in a city
-		if (ROOM_OWNER(loc) == emp && !COUNTS_AS_IN_CITY(loc) && !is_in_city_for_empire(loc, emp, FALSE, &junk)) {
+		if (ROOM_OWNER(loc) == emp && !is_in_city_for_empire(loc, emp, FALSE, &junk)) {
 			// check its distance from each city
 			this_far = 0;
 			for (city = EMPIRE_CITY_LIST(emp); city; city = city->next) {

@@ -894,7 +894,7 @@ void setup_tunnel_entrance(char_data *ch, room_data *room, int dir) {
 	SET_BIT(ROOM_AFF_FLAGS(room), tunnel_flags);
 	COMPLEX_DATA(room)->entrance = dir;
 	if (emp && can_claim(ch) && !ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE)) {
-		if (EMPIRE_OUTSIDE_TERRITORY(emp) < land_can_claim(emp, TRUE) || COUNTS_AS_IN_CITY(room) || is_in_city_for_empire(room, emp, FALSE, &junk)) {
+		if (EMPIRE_OUTSIDE_TERRITORY(emp) < land_can_claim(emp, TRUE) || is_in_city_for_empire(room, emp, FALSE, &junk)) {
 			ROOM_OWNER(room) = emp;
 		}
 	}
@@ -1257,7 +1257,7 @@ ACMD(do_build) {
 	// can_claim checks total available land, but the outside is check done within this block
 	if (can_claim(ch) && !ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE)) {
 		if (e || (e = get_or_create_empire(ch))) {
-			if (EMPIRE_OUTSIDE_TERRITORY(e) < land_can_claim(e, TRUE) || COUNTS_AS_IN_CITY(IN_ROOM(ch)) || is_in_city_for_empire(IN_ROOM(ch), e, FALSE, &junk)) {
+			if (EMPIRE_OUTSIDE_TERRITORY(e) < land_can_claim(e, TRUE) || is_in_city_for_empire(IN_ROOM(ch), e, FALSE, &junk)) {
 				ROOM_OWNER(IN_ROOM(ch)) = e;
 			}
 		}

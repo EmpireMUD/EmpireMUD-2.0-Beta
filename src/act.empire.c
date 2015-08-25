@@ -819,7 +819,10 @@ void found_city(char_data *ch, char *argument) {
 */
 bool is_in_city_for_empire(room_data *loc, empire_data *emp, bool check_wait, bool *too_soon) {
 	struct empire_city_data *city;
+	int dist;
+	
 	int wait = config_get_int("minutes_to_full_city") * SECS_PER_REAL_MIN;
+	bool large_radius = (ROOM_BLD_FLAGGED(loc, BLD_LARGE_CITY_RADIUS) || ROOM_SECT_FLAGGED(loc, SECTF_LARGE_CITY_RADIUS));
 	
 	*too_soon = FALSE;
 
@@ -828,7 +831,9 @@ bool is_in_city_for_empire(room_data *loc, empire_data *emp, bool check_wait, bo
 	}
 	
 	for (city = EMPIRE_CITY_LIST(emp); city; city = city->next) {
-		if (compute_distance(loc, city->location) <= city_type[city->type].radius) {
+		dist = compute_distance(loc, city->location);
+		
+		if (dist <= city_type[city->type].radius || (large_radius && dist <= (3 * city_type[city->type].radius))) {
 			if (!check_wait || (get_room_extra_data(city->location, ROOM_EXTRA_FOUND_TIME) + wait) < time(0)) {
 				return TRUE;
 			}
@@ -2077,7 +2082,7 @@ ACMD(do_claim) {
 	else if (!can_build_or_claim_at_war(ch, IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't claim here while at war with the empire that controls this area.\r\n");
 	}
-	else if (!COUNTS_AS_IN_CITY(IN_ROOM(ch)) && !is_in_city_for_empire(IN_ROOM(ch), e, FALSE, &junk) && EMPIRE_OUTSIDE_TERRITORY(e) >= land_can_claim(e, TRUE)) {
+	else if (!is_in_city_for_empire(IN_ROOM(ch), e, FALSE, &junk) && EMPIRE_OUTSIDE_TERRITORY(e) >= land_can_claim(e, TRUE)) {
 		msg_to_char(ch, "You can't claim this land because you're over the 20%% of your territory that can be outside of cities.\r\n");
 	}
 	else {
