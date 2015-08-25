@@ -238,7 +238,7 @@ dismantle a mine, its mountain will reset when the MUD celebrates a new year
 tile will involve digging a new mine shaft and the mineral found there could be
 completely different.
 
-Mines always count as in-city territory, no matter where you build them.
+Mines count as in-city territory as far away as 3x a city's normal radius.
 
 See HELP IRON GUIDE for help getting started on mining and using iron.
 
