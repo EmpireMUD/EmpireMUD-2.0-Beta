@@ -1,0 +1,231 @@
+#9900
+puppy adorable~
+an adorable puppy~
+An adorable puppy is whining at you.
+~
+1 1 bdoD n
+0 0 0 9
+T 9901
+T 9902
+S
+#9901
+kitten cute~
+a cute kitten~
+A cute kitten is winding its way between your legs.
+~
+1 1 bdoD n
+0 0 0 9
+T 9901
+T 9902
+S
+#9902
+pixie tiny~
+a tiny pixie~
+A tiny pixie is flitting around.
+~
+1 1 bdoD mn
+0 0 18 22
+T 9901
+T 9902
+S
+#9903
+fawn tiny~
+a tiny fawn~
+A tiny fawn is staggering around.
+~
+1 1 bdoD n
+0 0 14 11
+T 9901
+T 9902
+S
+#9904
+cub bear~
+a bear cub~
+A bear cub is rearing up playfully.
+~
+1 1 bdoD n
+0 0 0 9
+T 9901
+T 9902
+S
+#9905
+pup wolf~
+a wolf pup~
+A wolf pup is panting and wagging its tail.
+~
+1 1 bdoD n
+0 0 0 9
+T 9901
+T 9902
+S
+#9906
+a tame hummingbird~
+a tame hummingbird~
+A tame hummingbird flits around you.
+~
+1 1 bdoD mn
+0 0 2 26
+T 9901
+T 9902
+S
+#9907
+butterfly colorful~
+a colorful butterfly~
+A colorful butterfly is fluttering around here.
+~
+1 1 bdoD mn
+0 0 18 22
+T 9901
+T 9902
+S
+#9908
+cobra cuddly~
+a cuddly cobra~
+A cuddly cobra is winding itself around your leg.
+~
+1 1 bdoD n
+0 0 5 9
+T 9901
+T 9902
+S
+#9909
+bat bitsy~
+a bitsy bat~
+A bitsy bat is flapping around here.
+~
+1 1 bdoD mn
+0 0 2 9
+T 9901
+T 9902
+S
+#9910
+fish flying~
+a flying fish~
+A flying fish swims happily past you.
+~
+1 1 bdoD mn
+0 0 6 9
+T 9901
+T 9902
+S
+#9911
+firefly friendly~
+a friendly firefly~
+A friendly firefly is flying happily around here.
+~
+1 1 bdoD mn
+0 0 6 22
+T 9901
+T 9902
+S
+#9912
+spirit fire tame~
+a fire spirit~
+A tame fire spirit is blazing away here.
+~
+1 1 bdoD mn
+0 0 2 16
+T 9901
+T 9902
+S
+#9913
+spirit ice tame~
+an ice spirit~
+A tame ice spirit is freezing the air here.
+~
+1 1 bdoD mn
+0 0 2 20
+T 9901
+T 9902
+S
+#9914
+spirit storm tame~
+a storm spirit~
+A tame storm spirit is sparking and crackling here.
+~
+1 1 bdoD mn
+0 0 2 21
+T 9901
+T 9902
+S
+#9915
+spirit earth tame~
+an earth spirit~
+A tame earth spirit is levitating pebbles here.
+~
+1 1 bdoD mn
+0 0 2 5
+T 9901
+T 9902
+S
+#9916
+spirit lost~
+a lost spirit~
+A lost spirit is wandering aimlessly here.
+~
+1 1 bdoD mn
+0 0 2 21
+T 9901
+T 9902
+S
+#9917
+lizard little~
+a little lizard~
+A little lizard is scuttling around here.
+~
+1 1 bdoD n
+0 0 7 9
+T 9901
+T 9902
+S
+#9918
+dwarf-kobold kobold~
+a dwarf-kobold~
+A dwarf-kobold brandishes its tiny scimitar at you!
+~
+1 1 bdoD n
+0 0 11 1
+T 9901
+T 9902
+S
+#9919
+bug cute~
+a cute bug~
+You have found a cute bug.
+~
+1 1 bdoD n
+0 0 8 9
+T 9901
+T 9902
+S
+#9920
+rock pet~
+a pet rock~
+A pet rock is sitting here.
+~
+1 1 bdoD n
+0 0 15 5
+T 9901
+T 9902
+S
+#9921
+shrub animated cute little~
+an animated shrub~
+An cute little shrub is growing here.
+~
+1 1 bdoD n
+0 0 9 7
+T 9901
+T 9902
+S
+#9922
+eye floating~
+a floating eye~
+A floating eye without a body is staring at you.
+~
+1 1 bdoD n
+0 0 9 20
+T 9901
+T 9902
+S
+$
