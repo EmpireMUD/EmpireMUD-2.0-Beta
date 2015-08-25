@@ -871,15 +871,16 @@ static void reduce_outside_territory_one(empire_data *emp) {
 		
 		// if owner matches AND it's not in a city
 		if (ROOM_OWNER(loc) == emp && !is_in_city_for_empire(loc, emp, FALSE, &junk)) {
-			// check its distance from each city
-			this_far = 0;
+			// check its distance from each city, find the city it's closest to
+			this_far = MAP_SIZE;
 			for (city = EMPIRE_CITY_LIST(emp); city; city = city->next) {
 				dist = compute_distance(loc, city->location);
-				if (dist > this_far) {
+				if (dist < this_far) {
 					this_far = dist;
 				}
 			}
 			
+			// now compare its distance from the closest city, and find the one farthest from a city
 			if (this_far > far_dist) {
 				far_dist = this_far;
 				farthest = loc;
