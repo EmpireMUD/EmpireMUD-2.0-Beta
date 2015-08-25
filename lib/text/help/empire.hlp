@@ -67,19 +67,6 @@ The Artisans ability unlocks additional buildings.
 
 See also: BUILD
 #
-AUTO-BALANCE "AUTO BALANCE" AUTOBALANCE
-
-Auto-balance is a workforce option that requires Skilled Labor. A citizen will
-come to work at each of your docks as a dockworker to move your goods from
-other islands where you also have docks.
-
-Dockworkers unload up to 400 items at a time, twice per day. They will continue
-to work until your resources are as evenly balanced as possible.
-
-You must have docks on any island that participates in this exchange.
-
-See also: DOCKS, EINVENTORY, SEAFARING, SKILLED LABOR, WORKFORCE
-#
 BANNER
 
 The empire banner can be changed with the eedit command.
@@ -176,6 +163,10 @@ The boundaries of the city only show how far its influence reaches. You must
 still claim the territory within the borders if you want it to be part of your
 empire. Other empires can also claim land inside your city boundary, if you
 don't claim it yourself.
+
+There is a 60-minute waiting period between when you found a city, and when it
+counts as a city for things like City Teleportation, certain buildings such as
+the Great Hall, for guard towers, and for some other game rules.
 
 You can get additional city points from accruing at least 4000 wealth, for
 achieving Prominence, and for having at least 10 technologies.
@@ -367,6 +358,14 @@ Dragonriding allows you to ride flying mounts, if you have the Ride ability.
 
 See also: RIDE
 #
+DISMANTLE-MINES "DISMANTLE MINES"
+
+The dismantle-mines workforce chore will cause mines to be dismantled auto-
+matically when they are empty. You can prevent this on individual mines using
+the nodismantle command.
+
+See also: NODISMANTLE, WORKFORCE
+#
 EEDIT "EMPIRE EDITOR" "EDIT EMPIRE"
 
 Usage:  eedit <option> <argument>
@@ -444,8 +443,7 @@ Usage:  empireinventory [item | all]
        
 The einventory command shows the contents of all storage buildings and rooms
 for the island you're currently on. It won't work out in the ocean. You can
-use the auto-balance workforce chore to automatically move resources between
-multiple islands.
+use the ship command to move resources between multiple islands.
 
 You can specify an item name to see only matching items. If you specify a name,
 it'll show them whether or not the item is stored on your current island. If
@@ -458,7 +456,7 @@ You can use "warehouse inventory" to see items in warehouse (unique) storage.
 their own empire. If the empire name has more than one word, you can use
 quotation marks.
 
-See also: AUTO-BALANCE, WORKFORCE
+See also: SHIP, WORKFORCE
 #
 "EMPIRE SCORE" ESCORE
 
@@ -690,6 +688,16 @@ Here are the ways you can inspire:
   Stamina: max moves and move regeneration
   Toughness: max health
 #
+ISLANDS
+
+Usage:  islands
+
+This command lists the islands your empire has territory or einventory on
+(including warehouse storage). You must have the Navigation ability. The
+coordinates for each island are the approximate center of the island.
+
+Note: Immortals with the 'empires' grant can list the islands of any empire.
+#
 LOCKSMITHING
 
 Locksmithing (Empire ability)
@@ -753,6 +761,9 @@ cities, they will begin to auto-abandon. Outside-of-city territory will also
 start to automatically reduce itself. If the empire times out completely, it
 may lose all its territory. Finally, if no members log on for a very long time,
 the empire itself may crumble to dust.
+
+Note: Players with extremely low average playtime may never count as active
+empire members.
 
 See also: ENROLL, PLEDGE, ROSTER
 #
@@ -834,6 +845,7 @@ Privileges:
   cities: can found and abandon cities
   trade: can set up import and export rules
   logs: can view elogs
+  shipping: can use the ship command to move goods
 
 See also: CLAIM, BUILD, HARVEST, PROMOTE, DEMOTE, CHOP, CEDE, EEDIT, ELOG
 #
@@ -1281,19 +1293,17 @@ Workforce types:
   &yquarrying:&0 NPCs will quarry huge stone blocks at the quarry.
   &ynailmaking:&0 NPCs will forge pouches of nails at the forge.
   &ybrickmaking:&0 NPCs will make bricks at the potter.
-  &yauto-abandon:&0 NPCS will abandon a tile when they finish chopping, dis-
-      mantling, or farming (without replanting).
+  &abandon-dismantled:&0 NPCS will abandon a tile when they finish dismantling.
   &cherb gardening (skilled):&0 NPCS will gather herbs in gardens.
   &yfire brigade:&0 NPCs will put out fires.
   &ctrapping (skilled):&0 NPCs will gather skins at trapper's posts.
   &ytanning:&0 NPCs will tan skins into leather.
   &yshearing:&0 NPCs will shear animals in stables.
   &cminting (skilled):&0 NPCs will mint treasure into coins.
-  &cauto-balance (skilled):&0 einventory will be balanced between islands
-      which have docks.
+  &cdismantle-mines:&0 mines will be dismantled when empty.
+  &abandon-chopped:&0 NPCS will abandon a tile when they finish chopping.
+  &abandon-farmed:&0 NPCS will abandon a tile when they finish farming.
   
 Items marked (skilled) require the Skilled Labor ability.
-
-See also: AUTO-BALANCE
 #
 $

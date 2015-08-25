@@ -1076,6 +1076,7 @@ const char *empire_log_types[] = {
 	"Members",
 	"Territory",
 	"Trade",
+	"Shipping",
 	"\n"
 };
 
@@ -1089,7 +1090,8 @@ const bool show_empire_log_type[] = {
 	TRUE,	// members
 	TRUE,	// territory
 	FALSE,	// trade
-	TRUE	// logins
+	TRUE,	// logins
+	FALSE	// shipments
 };
 
 
@@ -1142,6 +1144,7 @@ const char *priv[] = {
 	"cities",
 	"trade",
 	"logs",
+	"shipping",
 	"\n"
 };
 
@@ -2036,6 +2039,7 @@ const char *room_extra_types[] = {
 	"garden workforce progress",
 	"quarry workforce progress",
 	"build recipe",
+	"found time",
 	"\n"
 };
 
@@ -2339,6 +2343,7 @@ const char *cooldown_types[] = {
 	"howl",	// 50
 	"diversion",
 	"rogue flag",
+	"portal sickness",	// 53
 	"\n"
 };
 

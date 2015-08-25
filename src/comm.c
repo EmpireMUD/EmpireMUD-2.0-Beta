@@ -135,7 +135,7 @@ int mother_desc;
 ush_int port;
 
 /* Reboot data (default to a normal reboot once per week) */
-struct reboot_control_data reboot_control = { SCMD_REBOOT, 7 * (24 * 60), SHUTDOWN_NORMAL, FALSE };
+struct reboot_control_data reboot_control = { SCMD_REBOOT, 7.5 * (24 * 60), SHUTDOWN_NORMAL, FALSE };
 
 
 #ifdef __CXREF__
@@ -435,9 +435,7 @@ void perform_reboot(void) {
 	// If this is a reboot, restart the mud!
 	if (reboot_control.type == SCMD_REBOOT) {
 		log("Reboot: performing live reboot");
-				
-		sprintf(buf, "%d", port);
-		sprintf(buf2, "-C%d", mother_desc);
+		
 		chdir("..");
 				
 		// rotate logs -- note: you should also update the autorun script
@@ -457,8 +455,17 @@ void perform_reboot(void) {
 		system("fgrep \"SCRIPT ERR:\" syslog >> log/scripterr");
 		system("cp syslog log/syslog.old");
 		system("echo 'Rebooting EmpireMUD...' > syslog");
-
-		execl("bin/empire", "empire", buf2, buf, (char *) NULL);
+		
+		sprintf(buf, "%d", port);
+		sprintf(buf2, "-C%d", mother_desc);
+		
+		// TODO: should support more of the extra options we might have started up with
+		if (no_rent_check) {
+			execl("bin/empire", "empire", buf2, "-q", buf, (char *) NULL);
+		}
+		else {
+			execl("bin/empire", "empire", buf2, buf, (char *) NULL);
+		}
 
 		// If that failed we're still here?
 		perror("reboot: execl");
@@ -2367,7 +2374,7 @@ char *make_prompt(descriptor_data *d) {
 		*prompt = '\0';
 	}
 	else if (d->showstr_count)
-		sprintf(prompt, "\r[ Return to continue, (q)uit, (r)efresh, (b)ack, or page number (%d/%d) ]", d->showstr_page, d->showstr_count);
+		sprintf(prompt, "\r&0[ Return to continue, (q)uit, (r)efresh, (b)ack, or page number (%d/%d) ]", d->showstr_page, d->showstr_count);
 	else if (d->str && (STATE(d) != CON_PLAYING || d->straight_to_editor))
 		strcpy(prompt, "] ");
 	else if (STATE(d) == CON_PLAYING) {

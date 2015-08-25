@@ -267,6 +267,12 @@ typedef struct trig_data trig_data;
 #define NUM_INTERACTS  13
 
 
+// for the shipping system
+#define SHIPPING_QUEUED  0	// waiting for a ship
+#define SHIPPING_EN_ROUTE  1	// waiting to deliver
+#define SHIPPING_DELIVERED  2	// indicates the ship has been delivered and these can be offloaded to the destination
+
+
 // mob spawn flags
 #define SPAWN_NOCTURNAL  BIT(0)	// a. only spawns at night
 #define SPAWN_DIURNAL  BIT(1)	// b. only spawns during day
@@ -592,15 +598,17 @@ typedef struct trig_data trig_data;
 #define CHORE_QUARRYING  11
 #define CHORE_NAILMAKING  12
 #define CHORE_BRICKMAKING  13
-#define CHORE_AUTO_ABANDON  14
+#define CHORE_ABANDON_DISMANTLED  14
 #define CHORE_HERB_GARDENING  15
 #define CHORE_FIRE_BRIGADE  16
 #define CHORE_TRAPPING  17
 #define CHORE_TANNING  18
 #define CHORE_SHEARING  19
 #define CHORE_MINTING  20
-#define CHORE_AUTO_BALANCE  21
-#define NUM_CHORES  22		// total
+#define CHORE_DISMANTLE_MINES  21
+#define CHORE_ABANDON_CHOPPED  22
+#define CHORE_ABANDON_FARMED  23
+#define NUM_CHORES  24		// total
 
 
 /* Diplomacy types */
@@ -622,6 +630,7 @@ typedef struct trig_data trig_data;
 #define ELOG_TERRITORY  5	// territory changes
 #define ELOG_TRADE  6	// auto-trades
 #define ELOG_LOGINS  7	// login/out/alt (does not save to file)
+#define ELOG_SHIPPING  8	// shipments via do_ship
 
 
 // for empire_unique_storage->flags
@@ -644,7 +653,8 @@ typedef struct trig_data trig_data;
 #define PRIV_CITIES  12	// allows city management
 #define PRIV_TRADE  13	// allows trade route management
 #define PRIV_LOGS  14	// can view empire logs
-#define NUM_PRIVILEGES  15	// total
+#define PRIV_SHIPPING  15	// can use the ship command
+#define NUM_PRIVILEGES  16	// total
 
 
 // for empire scores (e.g. sorting)
@@ -1521,6 +1531,7 @@ typedef struct trig_data trig_data;
 #define ROOM_EXTRA_GARDEN_WORKFORCE_PROGRESS  11
 #define ROOM_EXTRA_QUARRY_WORKFORCE_PROGRESS  12
 #define ROOM_EXTRA_BUILD_RECIPE  13
+#define ROOM_EXTRA_FOUND_TIME  14
 
 
 // number of different appearances
@@ -1783,6 +1794,21 @@ typedef struct resource_data_struct {
 struct ritual_strings {
 	char *to_char;
 	char *to_room;
+};
+
+
+// for the shipping system
+struct shipping_data {
+	obj_vnum vnum;
+	int amount;
+	int from_island;
+	int to_island;
+	int status;	// SHIPPING_x
+	long status_time;	// when it gained that status
+	room_vnum ship_homeroom;	// if a ship is assigned, which one
+	room_vnum ship_origin;	// where the ship is coming from (in case we have to send it back)
+	
+	struct shipping_data *next;
 };
 
 
@@ -2766,6 +2792,7 @@ struct ship_data_struct {
 	int ability;	// NO_ABIL or ABIL_x
 	int resources;
 	int advanced;
+	int cargo_size;
 };
 
 
@@ -2939,6 +2966,7 @@ struct empire_data {
 
 	// linked lists
 	struct empire_political_data *diplomacy;
+	struct shipping_data *shipping_list;
 	struct empire_storage_data *store;
 	struct empire_unique_storage *unique_store;	// LL: eus->next
 	struct empire_trade_data *trade;

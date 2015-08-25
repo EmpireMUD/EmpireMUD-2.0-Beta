@@ -574,7 +574,7 @@ as well as patterns and crafts hidden around the world.
 
 See also: CRAFTING LEVEL, LEATHERWORKING, RAWHIDE STITCHING, CLOTHING
 #
-SHIPBUILDING "SHIP BUILDING" MANUFACTURE SHIPYARDS "ADVANCED SHIPYARDS" "UPGRADED SHIPYARD" "ADVANCED SHIPS" SHIPS
+SHIPBUILDING "SHIP BUILDING" MANUFACTURE SHIPYARDS "ADVANCED SHIPYARDS" "UPGRADED SHIPYARD" "ADVANCED SHIPS"
 
 Shipbuilding (Trade ability)
 Advanced Ships (Trade ability)
@@ -591,15 +591,15 @@ Great ships can be created via the manufacture skill. This can only be done in
 a shipyard, and the vessel can be sailed to a dock when finished.
 
 With basic Shipbuilding you can manufacture:
-  pinnace  30 lumber, 60 nails
-  galley  45 lumber, 90 nails
-  brigantine  60 lumber, 120 nails
+  pinnace  30 lumber, 60 nails  (shipping capacity: 150)
+  galley  45 lumber, 90 nails  (shipping capacity: 300)
+  brigantine  60 lumber, 120 nails  (shipping capacity: 450)
 
 With Advanced ships you can manufacture:
-  argosy  120 lumber, 240 nails
-  galleon  240 lumber, 480 nails
+  argosy  120 lumber, 240 nails  (shipping capacity: 600)
+  galleon  240 lumber, 480 nails  (shipping capacity: 750)
 
-See also: BOARD, DISEMBARK, SAIL, UPGRADE
+See also: BOARD, DISEMBARK, SAIL, SHIP, UPGRADE
 #
 SIEGEWORKS "SIEGE WORKS"
 

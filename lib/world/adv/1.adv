@@ -173,6 +173,28 @@ L
 10300 -1 -1
 14 c bdegkln
 S
+#127
+Abandoned Dragon Nest~
+Paul Clarke~
+   The dragon nest appears abandoned, which means a dragon is on the loose
+nearby. Can you find and defeat it? Be careful, it might take a pair of stout
+adventurers -- but the rewards will be worth it.  
+~
+10330 10359 125-175
+10 0 0 0
+L
+1 0
+10330 -1 -1
+9 c bcdel
+L
+5 0
+43200 -1 -1
+-1 0 0
+L
+6 0
+100 -1 -1
+-1 0 0
+S
 #140
 The Sewer: Ratskins~
 Paul Clarke~

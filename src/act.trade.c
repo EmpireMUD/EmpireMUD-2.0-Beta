@@ -669,6 +669,7 @@ ACMD(do_gen_craft) {
 	bool this_line, found;
 	craft_data *craft, *next_craft, *type = NULL, *abbrev_match = NULL;
 	obj_data *drinkcon = NULL;
+	bool wait, room_wait;
 
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs can't craft.\r\n");
@@ -762,8 +763,8 @@ ACMD(do_gen_craft) {
 	}
 
 	// type checks
-	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_IN_CITY_ONLY) && !IS_IN_CITY(ch)) {
-		msg_to_char(ch, "You can only make that in a city.\r\n");
+	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_IN_CITY_ONLY) && !is_in_city_for_empire(IN_ROOM(ch), GET_LOYALTY(ch), TRUE, &wait) && !is_in_city_for_empire(IN_ROOM(ch), ROOM_OWNER(IN_ROOM(ch)), TRUE, &room_wait)) {
+		msg_to_char(ch, "You can only make that in a city%s.\r\n", (wait || room_wait) ? " (this city was founded too recently)" : "");
 	}
 	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_MILL && (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_MILL) || !IS_COMPLETE(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You need to be in a mill to do that.\r\n");

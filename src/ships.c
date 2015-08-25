@@ -48,13 +48,14 @@ extern int count_objs_in_room(room_data *room);
 
 
 struct ship_data_struct ship_data[] = {
-	{ "pinnace", os_PINNACE, 0, ABIL_SHIPBUILDING, 60, 0 },
-	{ "galley", os_GALLEY, 1, ABIL_SHIPBUILDING, 90, 0 },
-	{ "brigantine", os_BRIGANTINE, 2, ABIL_SHIPBUILDING, 120, 0 },
-	{ "argosy", os_ARGOSY, 3, ABIL_ADVANCED_SHIPS, 240, 1 },
-	{ "galleon", os_GALLEON, 4, ABIL_ADVANCED_SHIPS, 480, 1 },
+	// name, vnum, type, ability, resources (number), is-advanced, cargo-size
+	{ "pinnace", os_PINNACE, 0, ABIL_SHIPBUILDING, 60, 0, 150 },
+	{ "galley", os_GALLEY, 1, ABIL_SHIPBUILDING, 90, 0, 300 },
+	{ "brigantine", os_BRIGANTINE, 2, ABIL_SHIPBUILDING, 120, 0, 450 },
+	{ "argosy", os_ARGOSY, 3, ABIL_ADVANCED_SHIPS, 240, 1, 600 },
+	{ "galleon", os_GALLEON, 4, ABIL_ADVANCED_SHIPS, 480, 1, 750 },
 
-	{ "\n", NOTHING, 0, NO_ABIL, 0, 0 }
+	{ "\n", NOTHING, 0, NO_ABIL, 0, 0, 0 }
 };
 
 // how ships appear in the room

@@ -2811,10 +2811,7 @@ void olc_process_icons(char_data *ch, char *argument, struct icon_data **list) {
 			msg_to_char(ch, "Remove which icon (number)?\r\n");
 		}
 		else if (!str_cmp(arg2, "all")) {
-			while ((icon = *list)) {
-				*list = icon->next;
-				free_icon_set(&icon);
-			}
+			free_icon_set(list);
 			msg_to_char(ch, "You remove all icons.\r\n");
 		}
 		else if (!isdigit(*arg2) || (num = atoi(arg2)) < 1) {

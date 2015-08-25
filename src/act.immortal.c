@@ -758,16 +758,18 @@ void do_instance_nearby(char_data *ch, char *argument) {
 	
 	size = snprintf(buf, sizeof(buf), "Instances within %d tiles:\r\n", distance);
 	
-	for (inst = instance_list; inst; inst = inst->next) {
-		++num;
+	if (loc) {	// skip work if no map location found
+		for (inst = instance_list; inst; inst = inst->next) {
+			++num;
 		
-		inst_loc = inst->location;
-		if (inst_loc && !INSTANCE_FLAGGED(inst, INST_COMPLETED) && compute_distance(loc, inst_loc) <= distance) {
-			++count;
-			instance_list_row(inst, num, line, sizeof(line));
-			size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
-			if (size >= sizeof(buf)) {
-				break;
+			inst_loc = inst->location;
+			if (inst_loc && !INSTANCE_FLAGGED(inst, INST_COMPLETED) && compute_distance(loc, inst_loc) <= distance) {
+				++count;
+				instance_list_row(inst, num, line, sizeof(line));
+				size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
+				if (size >= sizeof(buf)) {
+					break;
+				}
 			}
 		}
 	}

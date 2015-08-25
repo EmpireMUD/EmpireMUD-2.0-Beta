@@ -88,4 +88,156 @@ A flickering flame is burning the fields.
 30 50 doA 0
 0 0 18 16
 S
+#10330
+wyvern wandering~
+a wandering wyvern~
+A wyvern is flying lazily above you.
+~
+125 175 dgxyA cm
+0 0 2 27
+I 0 3012 100.00 4  # BUTCHER: a fillet of raw meat
+I 1 1351 100.00 2  # SKIN: a large skin
+I 1 10006 100.00 1  # SKIN: a dragon scale
+I 4 10339 10.00 3  # LOOT: a basket of dragonfruit
+I 4 10334 8.00 1 a  # LOOT: a wyvern whistle
+I 4 10342 9.00 1 a  # LOOT: the dragonscale wristguard pattern
+I 4 10344 9.00 1 a  # LOOT: the dragonscale bangles pattern
+I 4 10346 9.00 1 a  # LOOT: the dragonscale bracers pattern
+I 4 10348 9.00 1 a  # LOOT: the dragonscale saddle pattern
+I 4 10349 8.00 1 a  # LOOT: an unlucky adventurer's gloves
+I 4 10350 8.00 1 a  # LOOT: an unlucky adventurer's earrings
+I 4 10351 8.00 1 a  # LOOT: an unlucky adventurer's cloak
+I 4 10352 8.00 1 a  # LOOT: an unlucky adventurer's spellbook
+I 4 10353 8.00 1 a  # LOOT: an unlucky adventurer's dagger
+I 4 10354 8.00 1 a  # LOOT: an unlucky adventurer's shield
+I 4 10355 8.00 1 a  # LOOT: an effigy of an unlucky adventurer
+T 10330
+T 10334
+T 10303
+T 10302
+S
+#10331
+dragon bull~
+a bull dragon~
+A bull dragon is stomping around.
+~
+125 175 dgxyA cm
+1 0 2 27
+I 0 3012 100.00 4  # BUTCHER: a fillet of raw meat
+I 1 1351 100.00 2  # SKIN: a large skin
+I 1 10006 100.00 1  # SKIN: a dragon scale
+I 4 10339 10.00 3  # LOOT: a basket of dragonfruit
+I 4 10337 8.00 1 a  # LOOT: a dragon cowbell
+I 4 10342 9.00 1 a  # LOOT: the dragonscale wristguard pattern
+I 4 10344 9.00 1 a  # LOOT: the dragonscale bangles pattern
+I 4 10346 9.00 1 a  # LOOT: the dragonscale bracers pattern
+I 4 10348 9.00 1 a  # LOOT: the dragonscale saddle pattern
+I 4 10349 8.00 1 a  # LOOT: an unlucky adventurer's gloves
+I 4 10350 8.00 1 a  # LOOT: an unlucky adventurer's earrings
+I 4 10351 8.00 1 a  # LOOT: an unlucky adventurer's cloak
+I 4 10352 8.00 1 a  # LOOT: an unlucky adventurer's spellbook
+I 4 10353 8.00 1 a  # LOOT: an unlucky adventurer's dagger
+I 4 10354 8.00 1 a  # LOOT: an unlucky adventurer's shield
+I 4 10355 8.00 1 a  # LOOT: an effigy of an unlucky adventurer
+T 10330
+T 10303
+T 10334
+T 10302
+S
+#10332
+dragon guardian~
+a dragon guardian~
+A dragon guardian stands proudly before you.
+~
+125 175 dgxyA cm
+0 0 2 27
+I 0 3012 100.00 4  # BUTCHER: a fillet of raw meat
+I 1 1351 100.00 2  # SKIN: a large skin
+I 1 10006 100.00 1  # SKIN: a dragon scale
+I 4 10339 10.00 3  # LOOT: a basket of dragonfruit
+I 4 10336 8.00 1 a  # LOOT: a dragonguard stone
+I 4 10342 9.00 1 a  # LOOT: the dragonscale wristguard pattern
+I 4 10344 9.00 1 a  # LOOT: the dragonscale bangles pattern
+I 4 10346 9.00 1 a  # LOOT: the dragonscale bracers pattern
+I 4 10348 9.00 1 a  # LOOT: the dragonscale saddle pattern
+I 4 10349 8.00 1 a  # LOOT: an unlucky adventurer's gloves
+I 4 10350 8.00 1 a  # LOOT: an unlucky adventurer's earrings
+I 4 10351 8.00 1 a  # LOOT: an unlucky adventurer's cloak
+I 4 10352 8.00 1 a  # LOOT: an unlucky adventurer's spellbook
+I 4 10353 8.00 1 a  # LOOT: an unlucky adventurer's dagger
+I 4 10354 8.00 1 a  # LOOT: an unlucky adventurer's shield
+I 4 10355 8.00 1 a  # LOOT: an effigy of an unlucky adventurer
+T 10330
+T 10303
+T 10334
+T 10302
+S
+#10333
+dragon emerald~
+an emerald dragon~
+An emerald dragon is flying above you.
+~
+125 175 dgxyA cm
+0 0 2 27
+I 0 3012 100.00 4  # BUTCHER: a fillet of raw meat
+I 1 1351 100.00 2  # SKIN: a large skin
+I 1 10006 100.00 1  # SKIN: a dragon scale
+I 4 10339 10.00 3  # LOOT: a basket of dragonfruit
+I 4 10335 8.00 1 a  # LOOT: an emerald whistle
+I 4 10342 9.00 1 a  # LOOT: the dragonscale wristguard pattern
+I 4 10344 9.00 1 a  # LOOT: the dragonscale bangles pattern
+I 4 10346 9.00 1 a  # LOOT: the dragonscale bracers pattern
+I 4 10348 9.00 1 a  # LOOT: the dragonscale saddle pattern
+I 4 10349 8.00 1 a  # LOOT: an unlucky adventurer's gloves
+I 4 10350 8.00 1 a  # LOOT: an unlucky adventurer's earrings
+I 4 10351 8.00 1 a  # LOOT: an unlucky adventurer's cloak
+I 4 10352 8.00 1 a  # LOOT: an unlucky adventurer's spellbook
+I 4 10353 8.00 1 a  # LOOT: an unlucky adventurer's dagger
+I 4 10354 8.00 1 a  # LOOT: an unlucky adventurer's shield
+I 4 10355 8.00 1 a  # LOOT: an effigy of an unlucky adventurer
+T 10330
+T 10303
+T 10334
+T 10302
+S
+#10334
+wyvern baby~
+a baby wyvern~
+A baby wyvern flaps around awkwardly.
+~
+1 1 bdoD mn
+0 0 2 9
+T 10305
+T 10306
+S
+#10335
+dragon emerald~
+an emerald dragon~
+An emerald dragon has been saddled and looks ready to fly.
+~
+100 125 bde m
+0 0 2 16
+S
+#10336
+dragonguard guard~
+a dragonguard~
+A dragonguard is patrolling.
+~
+125 175 bdtuAD c
+1 0 2 27
+T 10338
+S
+#10337
+ox fire~
+a fire ox~
+A fire ox is looking for some scorched grass.
+~
+100 125 dfjy 0
+2 0 0 12
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 1 1351 100.00 1  # SKIN: a large skin
+T 10337
+S
 $

@@ -267,33 +267,6 @@ int get_north_for_char(char_data *ch) {
 }
 
 
-/**
-* Determines the cost to portal between two places.
-*
-* @param room_data *from The origin.
-* @param room_data *to The destination.
-* @return int The cost, in nexus crystals.
-*/
-int portal_cost(room_data *from, room_data *to) {
-	int cost, dist;
-	
-	// safety first
-	if (!from || !to) {
-		return 0;
-	}
-	
-	dist = compute_distance(from, to);
-	
-	// free distance
-	if (dist <= 50) {
-		return 0;
-	}
-	
-	cost = MAX(0, ceil(dist / 75.0));
-	return cost;
-}
-
-
  //////////////////////////////////////////////////////////////////////////////
 //// MOVE VALIDATORS /////////////////////////////////////////////////////////
 
@@ -480,7 +453,7 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 	struct follow_type *fol, *next_fol;
 	room_data *to_room = real_room(GET_PORTAL_TARGET_VNUM(portal));
 	room_data *was_in = IN_ROOM(ch);
-	bool found;
+	bool found, junk;
 	
 	// safety
 	if (!to_room) {
@@ -516,6 +489,24 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 	look_at_room(ch);
 	command_lag(ch, WAIT_MOVEMENT);
 	
+	// portal sickness
+	if (!IS_NPC(ch) && !IS_IMMORTAL(ch) && GET_OBJ_VNUM(portal) == o_PORTAL) {
+		if (get_cooldown_time(ch, COOLDOWN_PORTAL_SICKNESS) > 0) {
+			if (is_in_city_for_empire(was_in, ROOM_OWNER(was_in), TRUE, &junk) && is_in_city_for_empire(to_room, ROOM_OWNER(to_room), TRUE, &junk)) {
+				add_cooldown(ch, COOLDOWN_PORTAL_SICKNESS, 2 * SECS_PER_REAL_MIN);
+			}
+			else if (HAS_ABILITY(ch, ABIL_PORTAL_MAGIC)) {
+				add_cooldown(ch, COOLDOWN_PORTAL_SICKNESS, 4 * SECS_PER_REAL_MIN);
+			}
+			else {
+				add_cooldown(ch, COOLDOWN_PORTAL_SICKNESS, 5 * SECS_PER_REAL_MIN);
+			}
+		}
+		else {
+			add_cooldown(ch, COOLDOWN_PORTAL_SICKNESS, SECS_PER_REAL_MIN);
+		}
+	}
+	
 	enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
 	entry_memory_mtrigger(ch);
 	greet_mtrigger(ch, NO_DIR);
@@ -525,8 +516,13 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 	for (fol = ch->followers; fol; fol = next_fol) {
 		next_fol = fol->next;
 		if ((IN_ROOM(fol->follower) == was_in) && (GET_POS(fol->follower) >= POS_STANDING) && can_enter_room(fol->follower, to_room)) {
-			act("You follow $N.\r\n", FALSE, fol->follower, 0, ch, TO_CHAR);
-			char_through_portal(fol->follower, portal, TRUE);
+			if (!IS_IMMORTAL(fol->follower) && GET_OBJ_VNUM(portal) == o_PORTAL && get_cooldown_time(fol->follower, COOLDOWN_PORTAL_SICKNESS) > SECS_PER_REAL_MIN) {
+				msg_to_char(ch, "You can't enter a portal until your portal sickness cooldown is under one minute.\r\n");
+			}
+			else {
+				act("You follow $N.\r\n", FALSE, fol->follower, 0, ch, TO_CHAR);
+				char_through_portal(fol->follower, portal, TRUE);
+			}
 		}
 	}
 	
@@ -1253,6 +1249,12 @@ ACMD(do_enter) {
 		return;
 	}
 	
+	// portal sickness
+	if (!IS_IMMORTAL(ch) && GET_OBJ_VNUM(portal) == o_PORTAL && get_cooldown_time(ch, COOLDOWN_PORTAL_SICKNESS) > SECS_PER_REAL_MIN) {
+		msg_to_char(ch, "You can't enter a portal until your portal sickness cooldown is under one minute.\r\n");
+		return;
+	}
+	
 	// permissions
 	if (ROOM_OWNER(IN_ROOM(ch)) && !IS_IMMORTAL(ch) && !IS_NPC(ch) && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		if (!HAS_ABILITY(ch, ABIL_INFILTRATE)) {
@@ -1431,8 +1433,11 @@ ACMD(do_portal) {
 	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
 	room_data *room, *next_room, *target = NULL;
 	obj_data *portal, *end, *obj;
-	int bsize, lsize, count, num, cost;
-	bool all = FALSE;
+	int bsize, lsize, count, num, dist;
+	bool all = FALSE, wait_here = FALSE, wait_there = FALSE, ch_in_city;
+	bool there_in_city;
+	
+	int max_out_of_city_portal = config_get_int("max_out_of_city_portal");
 	
 	argument = any_one_word(argument, arg);
 	
@@ -1454,13 +1459,17 @@ ACMD(do_portal) {
 		bsize = snprintf(buf, sizeof(buf), "Known portals:\r\n");
 		
 		count = 0;
+		ch_in_city = (is_in_city_for_empire(IN_ROOM(ch), ROOM_OWNER(IN_ROOM(ch)), TRUE, &wait_here) || (!ROOM_OWNER(IN_ROOM(ch)) && is_in_city_for_empire(IN_ROOM(ch), GET_LOYALTY(ch), TRUE, &wait_here)));
 		HASH_ITER(world_hh, world_table, room, next_room) {
 			// early exit
 			if (bsize >= sizeof(buf) - 1) {
 				break;
 			}
 			
-			if (ROOM_OWNER(room) && ROOM_BLD_FLAGGED(room, BLD_PORTAL) && IS_COMPLETE(room) && can_use_room(ch, room, all ? GUESTS_ALLOWED : MEMBERS_AND_ALLIES)) {
+			dist = compute_distance(IN_ROOM(ch), room);
+			there_in_city = is_in_city_for_empire(room, ROOM_OWNER(room), TRUE, &wait_there);
+			
+			if (ROOM_OWNER(room) && ROOM_BLD_FLAGGED(room, BLD_PORTAL) && IS_COMPLETE(room) && can_use_room(ch, room, all ? GUESTS_ALLOWED : MEMBERS_AND_ALLIES) && (!all || (dist <= max_out_of_city_portal || (ch_in_city && there_in_city)))) {
 				// only shows owned portals the character can use
 				++count;
 				*line = '\0';
@@ -1476,8 +1485,11 @@ ACMD(do_portal) {
 					lsize += snprintf(line + lsize, sizeof(line) - lsize, "(%*d, %*d) ", X_PRECISION, X_COORD(room), Y_PRECISION, Y_COORD(room));
 				}
 				
-				cost = portal_cost(IN_ROOM(ch), room);
-				lsize += snprintf(line + lsize, sizeof(line) - lsize, "[%2d] %s (%s%s&0)", portal_cost(IN_ROOM(ch), room), get_room_name(room, FALSE), EMPIRE_BANNER(ROOM_OWNER(room)), EMPIRE_ADJECTIVE(ROOM_OWNER(room)));
+				lsize += snprintf(line + lsize, sizeof(line) - lsize, "%s (%s%s&0)", get_room_name(room, FALSE), EMPIRE_BANNER(ROOM_OWNER(room)), EMPIRE_ADJECTIVE(ROOM_OWNER(room)));
+				
+				if ((dist > max_out_of_city_portal && (!ch_in_city || !there_in_city)) || (!HAS_ABILITY(ch, ABIL_PORTAL_MASTER) && (!GET_LOYALTY(ch) || !EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_MASTER_PORTALS)) && GET_ISLAND_ID(IN_ROOM(ch)) != GET_ISLAND_ID(target))) {
+					lsize += snprintf(line + lsize, sizeof(line) - lsize, " &r(too far)&0");
+				}
 				
 				bsize += snprintf(buf + bsize, sizeof(buf) - bsize, "%s\r\n", line);
 			}
@@ -1541,22 +1553,18 @@ ACMD(do_portal) {
 		}
 	}
 	
-	// cost checks
-	cost = portal_cost(IN_ROOM(ch), target);
-	if (!all_access && cost > 0) {
-		Resource res[2] = { { o_NEXUS_CRYSTAL, cost }, END_RESOURCE_LIST };
-		if (!has_resources(ch, res, FALSE, FALSE)) {
-			msg_to_char(ch, "You need %d nexus crystal%s to open a portal that far.\r\n", cost, PLURAL(cost));
-			return;
+	// check distance
+	if (!all_access) {
+		if (!is_in_city_for_empire(IN_ROOM(ch), ROOM_OWNER(IN_ROOM(ch)), TRUE, &wait_here) || !is_in_city_for_empire(target, ROOM_OWNER(target), TRUE, &wait_there)) {
+			dist = compute_distance(IN_ROOM(ch), target);
+			
+			if (dist > max_out_of_city_portal) {
+				msg_to_char(ch, "You can't open a portal further away than %d tile%s unless both ends are in a city%s.\r\n", max_out_of_city_portal, PLURAL(max_out_of_city_portal), wait_here ? " (this city was founded too recently)" : (wait_there ? " (that city was founded too recently)" : ""));
+				return;
+			}
 		}
-		
-		// charge
-		msg_to_char(ch, "You toss %d nexus crystal%s out onto the ground...\r\n", cost, PLURAL(cost));
-		sprintf(buf, "$n tosses %s nexus crystal%s out onto the ground...", cost > 1 ? "some" : "a", PLURAL(cost));
-		act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
-		extract_resources(ch, res, FALSE);
 	}
-
+	
 	// portal this side
 	portal = read_object(o_PORTAL);
 	GET_OBJ_VAL(portal, VAL_PORTAL_TARGET_VNUM) = GET_ROOM_VNUM(target);

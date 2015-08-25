@@ -35,12 +35,12 @@
 struct empire_territory_data *global_next_territory_entry = NULL;
 
 // protos
-void do_chore_auto_balance(empire_data *emp, room_data *room);
 void do_chore_brickmaking(empire_data *emp, room_data *room);
 void do_chore_building(empire_data *emp, room_data *room);
 void do_chore_chopping(empire_data *emp, room_data *room);
 void do_chore_digging(empire_data *emp, room_data *room);
 void do_chore_dismantle(empire_data *emp, room_data *room);
+void do_chore_dismantle_mines(empire_data *emp, room_data *room);
 void do_chore_farming(empire_data *emp, room_data *room);
 void do_chore_fire_brigade(empire_data *emp, room_data *room);
 void do_chore_gardening(empire_data *emp, room_data *room);
@@ -82,14 +82,16 @@ struct empire_chore_type chore_data[NUM_CHORES] = {
 	{ "quarrying", STONECUTTER },
 	{ "nailmaking", NAILMAKER },
 	{ "brickmaking", BRICKMAKER },
-	{ "auto-abandon", BUILDER },	// builder is strictly a safe placeholder here
+	{ "abandon-dismantled", BUILDER },	// builder is strictly a safe placeholder here
 	{ "herb gardening", GARDENER },
 	{ "fire brigade", FIRE_BRIGADE },
 	{ "trapping", TRAPPER },
 	{ "tanning", TANNER },
 	{ "shearing", SHEARER },
 	{ "minting", COIN_MAKER },
-	{ "auto-balance", DOCKWORKER }
+	{ "dismantle-mines", BUILDER },
+	{ "abandon-chopped", FELLER },	// mob is strictly a safe placeholder here
+	{ "abandon-farmed", FARMER }	// mob is strictly a safe placeholder here
 };
 
 
@@ -160,15 +162,22 @@ void process_one_chore(empire_data *emp, room_data *room) {
 			do_chore_gardening(emp, room);
 		}
 	
-		if (ROOM_BLD_FLAGGED(room, BLD_DOCKS) && EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR) && EMPIRE_CHORE(emp, CHORE_AUTO_BALANCE)) {
-			do_chore_auto_balance(emp, room);
-		}
 		if (ROOM_BLD_FLAGGED(room, BLD_MINT) && EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR) && EMPIRE_CHORE(emp, CHORE_MINTING)) {
 			do_chore_minting(emp, room);
 		}
-		if (ROOM_BLD_FLAGGED(room, BLD_MINE) && EMPIRE_CHORE(emp, CHORE_MINING)) {
-			do_chore_mining(emp, room);
+		
+		if (ROOM_BLD_FLAGGED(room, BLD_MINE)) {
+			if (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) > 0) {
+				if (EMPIRE_CHORE(emp, CHORE_MINING)) {
+					do_chore_mining(emp, room);
+				}
+			}
+			else if (IS_MAP_BUILDING(room) && !ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_DISMANTLE) && EMPIRE_CHORE(emp, CHORE_DISMANTLE_MINES)) {
+				// no ore left
+				do_chore_dismantle_mines(emp, room);
+			}
 		}
+		
 		if (ROOM_BLD_FLAGGED(room, BLD_POTTER) && EMPIRE_CHORE(emp, CHORE_BRICKMAKING)) {
 			do_chore_brickmaking(emp, room);
 		}
@@ -247,6 +256,7 @@ void add_chore_tracker(empire_data *add) {
 static bool can_gain_chore_resource(empire_data *emp, room_data *loc, obj_vnum vnum) {
 	int island_count, total_count, island_max, total_max;
 	struct empire_storage_data *store;
+	struct shipping_data *shipd;
 	int island;
 	
 	// safety first!
@@ -265,6 +275,20 @@ static bool can_gain_chore_resource(empire_data *emp, room_data *loc, obj_vnum v
 			
 			if (store->island == island) {
 				island_count += store->amount;
+			}
+		}
+	}
+	
+	// count shipping, too
+	for (shipd = EMPIRE_SHIPPING_LIST(emp); shipd; shipd = shipd->next) {
+		if (shipd->vnum == vnum) {
+			total_count += shipd->amount;
+			
+			if (shipd->status == SHIPPING_QUEUED && shipd->from_island == island) {
+				island_count += shipd->amount;
+			}
+			else if (shipd->to_island == island) {
+				island_count += shipd->amount;
 			}
 		}
 	}
@@ -517,106 +541,31 @@ char_data *place_chore_worker(empire_data *emp, int chore, room_data *room) {
 */
 void run_chore_tracker_updates(void) {
 	struct ctt_type *iter, *next_iter;
+	bool read_all_territory = FALSE;
+	
+	// save work if more than 1
+	if (HASH_COUNT(chore_territory_tracker) > 1) {
+		read_all_territory = TRUE;
+	}
 	
 	HASH_ITER(hh, chore_territory_tracker, iter, next_iter) {
-		read_empire_territory(iter->emp);
+		if (!read_all_territory) {
+			read_empire_territory(iter->emp);
+		}
+		
 		HASH_DEL(chore_territory_tracker, iter);
+		free(iter);
 	}
+	
+	if (read_all_territory) {
+		read_empire_territory(NULL);
+	}
+
 }
 
 
  /////////////////////////////////////////////////////////////////////////////
 //// CHORE FUNCTIONS ////////////////////////////////////////////////////////
-
-void do_chore_auto_balance(empire_data *emp, room_data *room) {
-	extern int top_island_num;
-	
-	char_data *worker = find_mob_in_room_by_vnum(room, chore_data[CHORE_AUTO_BALANCE].mob);
-	bool can_do = EMPIRE_HAS_TECH_ON_ISLAND(emp, GET_ISLAND_ID(room), TECH_SEAPORT);
-	struct empire_storage_data *store = NULL, *lookup, *to_move;
-	char lbuf[MAX_STRING_LENGTH];
-	int diff = 0, iter, move_amt, my_islands, have_total = 0, done = 0;
-	bool onward;
-	
-	int auto_balance_per_cycle = config_get_int("auto_balance_per_cycle");
-	
-	// first, figure out how many islands this player has seaports on
-	my_islands = 0;
-	for (iter = 0; iter <= top_island_num; ++iter) {
-		if (EMPIRE_HAS_TECH_ON_ISLAND(emp, iter, TECH_SEAPORT)) {
-			++my_islands;
-		}
-	}
-	
-	// really?
-	if (my_islands == 0) {
-		can_do = FALSE;
-	}
-	
-	do {
-		onward = FALSE;
-		
-		// now, look for something we need that's stored on another island but not this one
-		to_move = NULL;
-		for (store = (store ? store->next : EMPIRE_STORAGE(emp)); can_do && store && !to_move; store = store->next) {			
-			// skip any they won't have enough to move anyway
-			if (store->amount <= 1) {
-				continue;
-			}
-		
-			// skip same-island
-			if (store->island == GET_ISLAND_ID(room)) {
-				continue;
-			}
-		
-			// skip islands that don't have seaports
-			if (!EMPIRE_HAS_TECH_ON_ISLAND(emp, store->island, TECH_SEAPORT)) {
-				continue;
-			}
-		
-			// find it, crunch numbers
-			lookup = find_stored_resource(emp, GET_ISLAND_ID(room), store->vnum);
-			have_total = get_total_stored_count(emp, store->vnum);
-			diff = store->amount - (lookup ? lookup->amount : 0);	// max we COULD need to move
-		
-			// do we need some?
-			if ((!lookup || diff > 1) && store->amount > (have_total / my_islands)) {
-				to_move = store;
-				break;
-			}
-		}
-	
-		// ok, try the chore
-		if (worker && to_move && can_do) {
-			if ((time_info.hours % 12) == 0) {
-				move_amt = MIN((auto_balance_per_cycle - done), diff);
-				move_amt = MIN(move_amt, (have_total / my_islands) - (lookup ? lookup->amount : 0));	// never move so much that we'd just move it back
-				move_amt = MAX(1, move_amt); // move at least 1
-				to_move->amount -= move_amt;	// safe: we know it has more than this already
-				add_to_empire_storage(emp, GET_ISLAND_ID(room), to_move->vnum, move_amt);
-		
-				sprintf(lbuf, "$n unloads %s (x%d).", get_obj_name_by_proto(to_move->vnum), move_amt);
-				act(lbuf, FALSE, worker, NULL, NULL, TO_ROOM);
-				
-				if (done == 0) {
-					empire_skillup(emp, ABIL_WORKFORCE, config_get_double("exp_from_workforce"));
-					empire_skillup(emp, ABIL_SKILLED_LABOR, config_get_double("exp_from_workforce"));
-				}
-				
-				// allow repeat
-				done += move_amt;
-				onward = TRUE;
-			}
-		}
-		else if (to_move && can_do) {
-			worker = place_chore_worker(emp, CHORE_AUTO_BALANCE, room);
-		}
-		else if (worker) {
-			SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
-		}
-	} while (onward && done < auto_balance_per_cycle);
-}
-
 
 void do_chore_brickmaking(empire_data *emp, room_data *room) {
 	struct empire_storage_data *store = find_stored_resource(emp, GET_ISLAND_ID(room), o_CLAY);
@@ -721,7 +670,7 @@ void do_chore_chopping(empire_data *emp, room_data *room) {
 					SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 					stop_room_action(room, ACT_CHOPPING, CHORE_CHOPPING);
 			
-					if (EMPIRE_CHORE(emp, CHORE_AUTO_ABANDON)) {
+					if (EMPIRE_CHORE(emp, CHORE_ABANDON_CHOPPED)) {
 						abandon_room(room);
 						add_chore_tracker(emp);
 					}		
@@ -801,13 +750,12 @@ void do_chore_dismantle(empire_data *emp, room_data *room) {
 		
 		// check for completion
 		if (IS_COMPLETE(room)) {
-			if (EMPIRE_CHORE(emp, CHORE_AUTO_ABANDON)) {
+			finish_dismantle(worker, room);
+			SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
+			if (EMPIRE_CHORE(emp, CHORE_ABANDON_DISMANTLED)) {
 				abandon_room(room);
 				add_chore_tracker(emp);
 			}
-			
-			finish_dismantle(worker, room);
-			SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 			stop_room_action(room, ACT_DISMANTLING, CHORE_BUILDING);
 		}
 
@@ -818,6 +766,31 @@ void do_chore_dismantle(empire_data *emp, room_data *room) {
 	}
 	else {
 		worker = place_chore_worker(emp, CHORE_BUILDING, room);
+	}
+}
+
+
+void do_chore_dismantle_mines(empire_data *emp, room_data *room) {
+	void start_dismantle_building(room_data *loc);
+	
+	char_data *worker = find_mob_in_room_by_vnum(room, chore_data[CHORE_DISMANTLE_MINES].mob);
+	bool can_do = IS_COMPLETE(room);
+	
+	if (worker && can_do) {
+		start_dismantle_building(room);
+		add_chore_tracker(emp);
+		act("$n begins to dismantle the building.\r\n", FALSE, worker, NULL, NULL, TO_ROOM);
+		
+		// if they have the building chore on, we'll keep using the mob
+		if (!EMPIRE_CHORE(emp, CHORE_BUILDING)) {
+			SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
+		}
+	}
+	else if (can_do) {
+		worker = place_chore_worker(emp, CHORE_DISMANTLE_MINES, room);
+	}
+	else if (worker) {
+		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 	}
 }
 
@@ -869,7 +842,7 @@ INTERACTION_FUNC(one_farming_chore) {
 					// stop the chop just in case
 					stop_room_action(inter_room, ACT_CHOPPING, CHORE_CHOPPING);
 					
-					if (EMPIRE_CHORE(emp, CHORE_AUTO_ABANDON)) {
+					if (EMPIRE_CHORE(emp, CHORE_ABANDON_CHOPPED)) {
 						abandon_room(inter_room);
 						add_chore_tracker(emp);
 					}

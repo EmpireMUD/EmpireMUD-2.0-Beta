@@ -1566,6 +1566,7 @@ RITUAL_SETUP_FUNC(start_ritual_of_teleportation) {
 	room_data *room, *next_room, *to_room = NULL;
 	struct empire_city_data *city;
 	int subtype = NOWHERE;
+	bool wait;
 	
 	if (!can_teleport_to(ch, IN_ROOM(ch), TRUE) || RMT_FLAGGED(IN_ROOM(ch), RMT_NO_TELEPORT)) {
 		msg_to_char(ch, "You can't teleport out of here.\r\n");
@@ -1605,6 +1606,10 @@ RITUAL_SETUP_FUNC(start_ritual_of_teleportation) {
 		
 		if (get_cooldown_time(ch, COOLDOWN_TELEPORT_CITY) > 0) {
 			msg_to_char(ch, "Your city teleportation is still on cooldown.\r\n");
+			return FALSE;
+		}
+		if (!is_in_city_for_empire(city->location, GET_LOYALTY(ch), TRUE, &wait)) {
+			msg_to_char(ch, "That city was founded too recently to teleport to it.\r\n");
 			return FALSE;
 		}
 	}
@@ -1766,12 +1771,14 @@ RITUAL_FINISH_FUNC(perform_sense_life_ritual) {
 
 
 RITUAL_SETUP_FUNC(start_ritual_of_detection) {
+	bool wait;
+	
 	if (!GET_LOYALTY(ch)) {
 		msg_to_char(ch, "You must be a member of an empire to do this.\r\n");
 		return FALSE;
 	}
-	if (!find_city(GET_LOYALTY(ch), IN_ROOM(ch))) {
-		msg_to_char(ch, "You can only use the Ritual of Detection in one of your own cities.\r\n");
+	if (!is_in_city_for_empire(IN_ROOM(ch), GET_LOYALTY(ch), TRUE, &wait)) {
+		msg_to_char(ch, "You can only use the Ritual of Detection in one of your own cities%s.\r\n", wait ? " (this city was founded too recently)" : "");
 		return FALSE;
 	}
 
@@ -1786,13 +1793,13 @@ RITUAL_FINISH_FUNC(perform_ritual_of_detection) {
 	struct empire_city_data *city;
 	descriptor_data *d;
 	char_data *targ;
-	bool found;
+	bool found, wait;
 	
 	if (!GET_LOYALTY(ch)) {
 		msg_to_char(ch, "The ritual fails as you aren't in any empire.\r\n");
 	}
-	else if (!(city = find_city(GET_LOYALTY(ch), IN_ROOM(ch)))) {
-		msg_to_char(ch, "The ritual fails as you aren't in one of your cities.\r\n");
+	else if (!is_in_city_for_empire(IN_ROOM(ch), GET_LOYALTY(ch), TRUE, &wait) || !(city = find_city(GET_LOYALTY(ch), IN_ROOM(ch)))) {
+		msg_to_char(ch, "The ritual fails as you aren't in one of your cities%s.\r\n", wait ? " (this city was founded too recently)" : "");
 	}
 	else {
 		msg_to_char(ch, "You complete the Ritual of Detection...\r\n");

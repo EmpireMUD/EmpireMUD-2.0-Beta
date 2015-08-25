@@ -258,4 +258,348 @@ A dragon has died and an air of sorrow looms over the cave.
 10 144
 T 10307
 S
+#10331
+nest abandoned~
+the abandoned nest~
+The abandoned nest looks empty.~
+There's nothing in the nest.
+~
+3 0 0 1
+0 0 0
+0 0
+T 10331
+S
+#10334
+whistle wyvern~
+a wyvern whistle~
+A wyvern whistle is lying here.~
+The wyvern whistle can be used to summon a noncombat pet!
+Type 'use whistle' to summon it.
+~
+3 p a 3
+10334 0 0
+14 0
+T 10301
+S
+#10335
+whistle emerald~
+an emerald whistle~
+An emerald whistle is lying here.~
+This whistle is sure to summon an emerald dragon mount.
+Type 'use whistle' to use it.
+~
+3 p a 1
+10335 0 0
+13 0
+T 10335
+S
+#10336
+stone dragonguard guard~
+a dragonguard stone~
+A dragonguard stone has been left behind.~
+   This stone is fire-branded with the sigil of the dragonguard. It is capable
+of summoning a dragonguard to patrol your city just like a cityguard. The
+dragonguard will stay where you summon him, so choose wisely.  
+Type 'use dragonguard' to summon it.
+~
+3 p a 4
+10336 0 0
+1 0
+T 10336
+S
+#10337
+bell cowbell dragon~
+a dragon cowbell~
+A dragon cowbell is lying on the ground.~
+   This cowbell is used by dragons to summon the dread fire ox. A fire ox is
+similar to a cow, except slightly more on fire. Still, they never burn down the
+stable and their milk is top shelf.
+Type 'use cowbell' to summon the fire ox.
+~
+3 p a 2
+10337 0 0
+13 0
+T 10336
+S
+#10338
+dragonfruit fruit scaly~
+a scaly dragonfruit~
+A scaly dragonfruit is lying here.~
+This exotic red fruit has green, scaly leaves coming out of its leathery skin.
+~
+6 0 a 2
+6 0 0
+7 48
+S
+#10339
+dragonfruit fruit basket~
+a basket of dragonfruit~
+A basket of dragonfruit is sitting here.~
+   The leathery red dragonfruits are tipped with green, scaly leaves. They grow
+on a cactus, and as they require little water, they should be easy to farm in
+the desert. You could probably preserve the dragonfruit by making it into jam.
+~
+6 b a 4
+24 10338 0
+7 168
+R
+5114 0
+S
+#10340
+jam dragonfruit jar~
+dragonfruit jam~
+A jar of dragonfruit jam is lying here.~
+The jam is bright red, and doesn't really smell like anything.
+~
+6 0 a 2
+48 0 0
+7 336
+R
+5619 0
+R
+5114 0
+S
+#10341
+object new~
+a dragonscale wristguard~
+A dragonscale wristguard is lying on the ground.~
+   This finely crafted wristguard looks like it could take quite a beating. 
+It's made from actual dragon scales.  
+~
+27 mo aj 1
+3 0 0
+14 0
+A
+13 1
+A
+24 2
+A
+12 2
+C
+125 200
+S
+#10342
+pattern wristguard dragonscale~
+the dragonscale wristguard pattern~
+The dragonscale wristguard pattern is lying here.~
+Forge (Imperial Armors): dragonscale wristguard  [125-200]
+  3x dragon scale
+  2x small piece of leather
+  10x imperium ingot
+  6x red bloodstone
+~
+3 0 a 2
+0 0 0
+0 0
+S
+#10343
+bangles dragonscale~
+dragonscale bangles~
+Some dragonscale bangles have been left here.~
+   These bangles appear to have been cut from dragonscale, a truly rare
+material. What's more, there's a nocturnium mesh woven around them.  
+~
+27 mo aj 1
+0 0 0
+14 0
+A
+8 1
+A
+9 1
+A
+22 2
+C
+125 200
+S
+#10344
+pattern bangles dragonscale~
+the dragonscale bangles pattern~
+The dragonscale bangles pattern is here.~
+Craft (Magical Vestments): dragonscale bangles  [125-200]
+  3x dragon scale
+  10x ingot of nocturnium
+  8x yellow lightning stone
+~
+3 0 a 3
+0 0 0
+0 0
+S
+#10345
+bracers dragonscale~
+dragonscale bracers~
+Some dragonscale bracers are lying here.~
+   These bracers are made from rare dragon scales, fixed to tough leather, and
+edges with sharpened imperium.  
+~
+27 mo aj 2
+1 0 0
+14 0
+A
+1 1
+A
+9 1
+A
+21 2
+C
+125 200
+S
+#10346
+pattern dragonscale bracers~
+the dragonscale bracers pattern~
+The dragonscale bracers pattern is here.~
+Sew (Dangerous Leathers): dragonscale bracers  [125-200]
+  3x dragon scale
+  2x small piece of leather
+  10x imperium ingot
+  6x red bloodstone
+~
+3 0 a 4
+0 0 0
+0 0
+S
+#10347
+saddle dragonscale~
+a dragonscale saddle~
+A dragonscale saddle is lying on the ground.~
+This saddle is made from molded dragon scales!
+~
+3 mo as 1
+0 0 0
+14 0
+A
+7 3
+A
+6 1
+C
+125 200
+S
+#10348
+pattern dragonscale saddle~
+the dragonscale saddle pattern~
+The dragonscale saddle pattern is here.~
+Sew (Dangerous Leathers): dragonscale saddle  [125-200]
+  2x dragon scale
+  8x large piece of leather
+  6x iridescent blue iris
+~
+3 0 a 3
+0 0 0
+0 0
+S
+#10349
+gloves unlucky adventurer's adventurers~
+an unlucky adventurer's gloves~
+An unlucky adventurer's gloves are lying here.~
+The gloves still have bits of the charred flesh of the previous occupant.
+~
+27 mp ah 1
+3 0 0
+2 0
+A
+2 1
+A
+18 2
+A
+13 2
+S
+#10350
+earrings unlucky adventurer's adventurers~
+an unlucky adventurer's earrings~
+An unlucky adventurer's earrings were left here.~
+These earrings still smell of burnt flesh. They're otherwise quite handsome.
+~
+2 mp am 1
+0 0 0
+4 0
+A
+2 1
+A
+9 1
+A
+17 2
+S
+#10351
+cloak unlucky adventurer's adventurers~
+an unlucky adventurer's cloak~
+An unlucky adventurer's cloak is draped here, empty.~
+This cloak is singed around the edges, and smells faintly of burnt hair.
+~
+27 mp ak 1
+0 0 0
+7 0
+A
+8 1
+A
+9 1
+A
+7 1
+A
+23 2
+S
+#10352
+spellbook book adventurer's adventurers unlucky~
+an unlucky adventurer's spellbook~
+An unlucky adventurer has left his spellbook behind.~
+The book looks slightly singed, and there's more dried blood than just the ink.
+~
+3 mp ao 2
+0 0 0
+7 0
+A
+23 3
+A
+7 1
+A
+9 1
+S
+#10353
+dagger unlucky adventurer's adventurers~
+an unlucky adventurer's dagger~
+An unlucky adventurer's dagger is stabbed into the ground.~
+This dagger has plenty of dried blood, but only on the handle.
+~
+1 hmp ano 1
+0 3 4
+2 0
+A
+4 1
+A
+17 1
+S
+#10354
+shield unlucky adventurer's adventurers~
+an unlucky adventurer's shield~
+An unlucky adventurer has lost her shield.~
+This shield looks like it once bore a crest, long scorched off.
+~
+23 mp ao 1
+0 0 0
+13 0
+A
+18 1
+A
+13 2
+A
+24 1
+A
+12 1
+S
+#10355
+effigy unlucky adventurer~
+an effigy of an unlucky adventurer~
+An effigy of an unlucky adventurer is lying here.~
+This clay effigy looks like it spent too long in the kiln.
+~
+3 mp ao 1
+0 0 0
+6 0
+A
+22 2
+A
+9 1
+A
+17 1
+A
+2 1
+S
 $

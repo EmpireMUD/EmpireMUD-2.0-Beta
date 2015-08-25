@@ -806,7 +806,7 @@ static void spawn_one_room(room_data *room) {
 	struct empire_npc_data *npc;
 	char_data *mob, *ch_iter;
 	time_t now = time(0);
-	bool in_city;
+	bool in_city, junk;
 	crop_data *cp;
 	
 	int time_to_empire_emptiness = config_get_int("time_to_empire_emptiness") * SECS_PER_REAL_WEEK;
@@ -871,7 +871,7 @@ static void spawn_one_room(room_data *room) {
 	// set up data for faster checking
 	x_coord = X_COORD(room);
 	y_coord = Y_COORD(room);
-	in_city = (ROOM_OWNER(home) && find_city(ROOM_OWNER(home), room)) ? TRUE : FALSE;
+	in_city = (ROOM_OWNER(home) && is_in_city_for_empire(room, ROOM_OWNER(home), TRUE, &junk)) ? TRUE : FALSE;
 	
 	for (spawn = list; spawn; spawn = spawn->next) {
 		// validate flags

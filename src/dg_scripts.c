@@ -2747,6 +2747,30 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					snprintf(str, slen, "(%s, %s)", "???", "???");
 				}
 			}
+			else if (!str_cmp(field, "empire_adjective")) {
+				if (ROOM_OWNER(r)) {
+					snprintf(str, slen, "%s", EMPIRE_ADJECTIVE(ROOM_OWNER(r)));
+				}
+				else {
+					strcpy(str, "");
+				}
+			}
+			else if (!str_cmp(field, "empire_id")) {
+				if (ROOM_OWNER(r)) {
+					snprintf(str, slen, "%d", EMPIRE_VNUM(ROOM_OWNER(r)));
+				}
+				else {
+					snprintf(str, slen, "0");
+				}
+			}
+			else if (!str_cmp(field, "empire_name")) {
+				if (ROOM_OWNER(r)) {
+					snprintf(str, slen, "%s", EMPIRE_NAME(ROOM_OWNER(r)));
+				}
+				else {
+					strcpy(str, "");
+				}
+			}
 
 			else if (!str_cmp(field, "people")) {
 				char_data *temp_ch;

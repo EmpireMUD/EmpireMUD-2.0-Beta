@@ -269,7 +269,6 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define EFFECTIVELY_FLYING(ch)  (IS_RIDING(ch) ? MOUNT_FLAGGED(ch, MOUNT_FLYING) : AFF_FLAGGED(ch, AFF_FLY))
 #define HAS_INFRA(ch)  AFF_FLAGGED(ch, AFF_INFRAVISION)
 #define IS_HUMAN(ch)  (!IS_VAMPIRE(ch))
-#define IS_IN_CITY(ch)  (ROOM_OWNER(IN_ROOM(ch)) ? (find_city(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch)) != NULL) : (GET_LOYALTY(ch) ? (find_city(GET_LOYALTY(ch), IN_ROOM(ch)) != NULL) : FALSE))
 #define IS_MAGE(ch)  (IS_NPC(ch) ? GET_MAX_MANA(ch) > 0 : (GET_SKILL((ch), SKILL_NATURAL_MAGIC) > 0 || GET_SKILL((ch), SKILL_HIGH_SORCERY) > 0))
 #define IS_OUTDOORS(ch)  IS_OUTDOOR_TILE(IN_ROOM(ch))
 #define IS_VAMPIRE(ch)  (IS_NPC(ch) ? MOB_FLAGGED((ch), MOB_VAMPIRE) : PLR_FLAGGED((ch), PLR_VAMPIRE))
@@ -393,6 +392,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define EMPIRE_LAST_LOGON(emp)  ((emp)->last_logon)
 #define EMPIRE_CHORE(emp, num)  ((emp)->chore_active[(num)])
 #define EMPIRE_SCORE(emp, num)  ((emp)->scores[(num)])
+#define EMPIRE_SHIPPING_LIST(emp)  ((emp)->shipping_list)
 #define EMPIRE_SORT_VALUE(emp)  ((emp)->sort_value)
 #define EMPIRE_UNIQUE_STORAGE(emp)  ((emp)->unique_store)
 
@@ -432,17 +432,19 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
  //////////////////////////////////////////////////////////////////////////////
 //// MAP UTILS ///////////////////////////////////////////////////////////////
 
+// returns TRUE only if both x and y are in the bounds of the map
+#define CHECK_MAP_BOUNDS(x, y)  ((x) >= 0 && (x) < MAP_WIDTH && (y) >= 0 && (y) < MAP_HEIGHT)
+
 // flat coords ASSUME room is on the map -- otherwise use the X_COORD/Y_COORD macros
 #define FLAT_X_COORD(room)  (GET_ROOM_VNUM(room) % MAP_WIDTH)
 #define FLAT_Y_COORD(room)  (GET_ROOM_VNUM(room) / MAP_WIDTH)
 
-#define X_COORD(room)  FLAT_X_COORD(get_map_location_for(room))
-#define Y_COORD(room)  FLAT_Y_COORD(get_map_location_for(room))
+extern int X_COORD(room_data *room);	// formerly #define X_COORD(room)  FLAT_X_COORD(get_map_location_for(room))
+extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(get_map_location_for(room))
 
 // wrap x/y "around the edge"
 #define WRAP_X_COORD(x)  (WRAP_X ? (((x) < 0) ? ((x) + MAP_WIDTH) : (((x) >= MAP_WIDTH) ? ((x) - MAP_WIDTH) : (x))) : MAX(0, MIN(MAP_WIDTH-1, (x))))
 #define WRAP_Y_COORD(y)  (WRAP_Y ? (((y) < 0) ? ((y) + MAP_HEIGHT) : (((y) >= MAP_HEIGHT) ? ((y) - MAP_HEIGHT) : (y))) : MAX(0, MIN(MAP_HEIGHT-1, (y))))
-
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -890,7 +892,6 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define DEPLETION_LIMIT(room)  (ROOM_BLD_FLAGGED((room), BLD_HIGH_DEPLETION) ? config_get_int("high_depletion") : config_get_int("common_depletion"))
 #define IS_CITY_CENTER(room)  (BUILDING_VNUM(room) == BUILDING_CITY_CENTER)
 #define IS_DARK(room)  (MAGIC_DARKNESS(room) || (!IS_ANY_BUILDING(room) && ROOM_LIGHTS(room) == 0 && (!ROOM_OWNER(room) || !EMPIRE_HAS_TECH(ROOM_OWNER(room), TECH_CITY_LIGHTS)) && !RMT_FLAGGED((room), RMT_LIGHT) && (weather_info.sunlight == SUN_DARK || RMT_FLAGGED((room), RMT_DARK))))
-#define IS_IN_CITY_ROOM(room)  (ROOM_OWNER(room) ? (find_city(ROOM_OWNER(room), room) != NULL) : FALSE)
 #define IS_LIGHT(room)  (!MAGIC_DARKNESS(room) && WOULD_BE_LIGHT_WITHOUT_MAGIC_DARKNESS(room))
 #define IS_REAL_LIGHT(room)  (!MAGIC_DARKNESS(room) && (!IS_DARK(room) || RMT_FLAGGED((room), RMT_LIGHT) || IS_INSIDE(room) || (ROOM_OWNER(room) && IS_ANY_BUILDING(room))))
 #define ISLAND_FLAGGED(room, flag)  ((GET_ISLAND_ID(room) != NO_ISLAND) ? IS_SET(get_island(GET_ISLAND_ID(room), TRUE)->flags, (flag)) : FALSE)
@@ -925,7 +926,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define SHIFT_DIR(room, dir)  real_shift((room), shift_dir[(dir)][0], shift_dir[(dir)][1])
 
 // island info
-#define GET_ISLAND_ID(room)  (get_map_location_for(room)->island)
+extern int GET_ISLAND_ID(room_data *room);	// formerly #define GET_ISLAND_ID(room)  (get_map_location_for(room)->island)
 #define SET_ISLAND_ID(room, id)  ((room)->island = id)
 
 // room types
@@ -1141,6 +1142,9 @@ extern unsigned long long microtime(void);
 // utils from act.action.c
 void cancel_action(char_data *ch);
 void start_action(char_data *ch, int type, int timer, bitvector_t flags);
+
+// utils from act.empire.c
+extern bool is_in_city_for_empire(room_data *loc, empire_data *emp, bool check_wait, bool *too_soon);
 
 // utils from act.informative.c
 extern char *get_obj_desc(obj_data *obj, char_data *ch, int mode);

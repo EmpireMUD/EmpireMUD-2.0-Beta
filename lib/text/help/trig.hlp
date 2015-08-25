@@ -835,6 +835,9 @@ Rooms When using field - The variable returns:
  
 contents - The id of the first obj in the room.
 coords   - The (x, y) location of the room on the map.
+empire_adjective - The owner empire's adjective form, if any.
+empire_id - The owner empire's id number, if any.
+empire_name - The owner empire's name, if any.
 (dir)    - The list of flags affecting the exit in the specified direction: 
            north, south, east, west, up or down. The result is either:
            subfield, "vnum"  - vnum of room in direction

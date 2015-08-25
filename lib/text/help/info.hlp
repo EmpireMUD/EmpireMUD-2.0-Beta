@@ -681,10 +681,14 @@ See also: CONSIDER, SCALABLE CRAFTS
 SCAN
 
 Usage:  scan <direction>
+        scan <tile name>
 
 This command shows you the same information as the screen-reader map display,
 but in only one direction. The distance you see on a scan is based on your
 mapsize.
+
+You can also scan for nearby tiles matching a given keyword, such as a building
+or crop name. It will scan a distance up to your mapsize.
 
 Example:
  > scan southwest

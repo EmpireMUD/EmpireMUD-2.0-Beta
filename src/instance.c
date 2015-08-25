@@ -569,6 +569,7 @@ inline bool validate_one_loc(struct adventure_link_rule *rule, room_data *loc) {
 	room_data *home = HOME_ROOM(loc);
 	empire_data *emp;
 	char_data *ch;
+	bool junk;
 	
 	const bitvector_t no_no_flags = ROOM_AFF_UNCLAIMABLE | ROOM_AFF_DISMANTLING | ROOM_AFF_HAS_INSTANCE;
 	
@@ -580,10 +581,10 @@ inline bool validate_one_loc(struct adventure_link_rule *rule, room_data *loc) {
 	// rules based on specific ownership
 	if (LINK_FLAGGED(rule, ADV_LINKF_CITY_ONLY | ADV_LINKF_NO_CITY)) {
 		emp = ROOM_OWNER(home);
-		if (LINK_FLAGGED(rule, ADV_LINKF_CITY_ONLY) && (!emp || !find_city(emp, loc))) {
+		if (LINK_FLAGGED(rule, ADV_LINKF_CITY_ONLY) && (!emp || !is_in_city_for_empire(loc, emp, FALSE, &junk))) {
 			return FALSE;
 		}
-		if (LINK_FLAGGED(rule, ADV_LINKF_NO_CITY) && emp && find_city(emp, loc)) {
+		if (LINK_FLAGGED(rule, ADV_LINKF_NO_CITY) && emp && is_in_city_for_empire(loc, emp, FALSE, &junk)) {
 			return FALSE;
 		}
 	}

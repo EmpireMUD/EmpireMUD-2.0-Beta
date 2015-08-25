@@ -547,6 +547,34 @@ void init_mine(room_data *room, char_data *ch) {
 }
 
 
+/**
+* Converts a trench back into its base sect.
+*
+* @param room_data *room The trench to convert back.
+*/
+void untrench_room(room_data *room) {
+	void stop_room_action(room_data *room, int action, int chore);
+
+	sector_data *to_sect;
+	
+	if (!ROOM_SECT_FLAGGED(room, SECTF_IS_TRENCH)) {
+		return;
+	}
+					
+	// stop BOTH actions -- it's not a trench!
+	stop_room_action(room, ACT_FILLING_IN, NOTHING);
+	stop_room_action(room, ACT_EXCAVATING, NOTHING);
+
+	// de-evolve sect
+	to_sect = reverse_lookup_evolution_for_sector(SECT(room), EVO_TRENCH_START);
+	if (to_sect) {
+		change_terrain(room, GET_SECT_VNUM(to_sect));
+		REMOVE_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_PLAYER_MADE);
+		REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_PLAYER_MADE);
+	}
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// MANAGEMENT //////////////////////////////////////////////////////////////
 
@@ -694,6 +722,7 @@ void update_world(void) {
 // process map-only annual updates
 static void annual_update_map_tile(room_data *room) {
 	empire_data *emp;
+	int trenched, amount;
 	
 	if (BUILDING_VNUM(room) == BUILDING_RUINS_OPEN || BUILDING_VNUM(room) == BUILDING_RUINS_CLOSED) {
 		// roughly 2 real years for average chance for ruins to be gone
@@ -716,6 +745,23 @@ static void annual_update_map_tile(room_data *room) {
 			// 66% chance after 10 years for any building or 2 years for an unfinished one
 			if ((BUILDING_DISREPAIR(room) >= config_get_int("disrepair_limit") && number(0, 2)) || (!IS_COMPLETE(room) && !IS_DISMANTLING(room) && BUILDING_DISREPAIR(room) >= config_get_int("disrepair_limit_unfinished"))) {
 				ruin_one_building(room);
+			}
+		}
+	}
+	
+	// fill in trenches slightly
+	if (ROOM_SECT_FLAGGED(room, SECTF_IS_TRENCH) && (trenched = get_room_extra_data(room, ROOM_EXTRA_TRENCH_PROGRESS)) < 0) {
+		// move halfway toward initial: remember initial value is negative
+		amount = (config_get_int("trench_initial_value") - trenched) / 2;
+		trenched += amount;
+		if (trenched > config_get_int("trench_initial_value") + 10) {
+			set_room_extra_data(room, ROOM_EXTRA_TRENCH_PROGRESS, trenched);
+		}
+		else {
+			// untrench
+			untrench_room(room);
+			if (ROOM_PEOPLE(room)) {
+				act("The trench collapses!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
 			}
 		}
 	}
@@ -891,6 +937,7 @@ struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_da
 	// check building exists
 	if (!IS_CITY_CENTER(location)) {
 		construct_building(location, BUILDING_CITY_CENTER);
+		set_room_extra_data(location, ROOM_EXTRA_FOUND_TIME, time(0));
 	}
 	
 	// verify ownership
@@ -1181,7 +1228,7 @@ void delete_territory_entry(empire_data *emp, struct empire_territory_data *ter)
 *
 * However, calling this on all empires can get rather slow.
 *
-* @param empire_data *emp The empire to read, or NOTHING for "all".
+* @param empire_data *emp The empire to read, or NULL for "all".
 */
 void read_empire_territory(empire_data *emp) {
 	void read_vault(empire_data *emp);
@@ -1190,6 +1237,7 @@ void read_empire_territory(empire_data *emp) {
 	struct empire_npc_data *npc;
 	room_data *iter, *next_iter;
 	empire_data *e, *next_e;
+	bool junk;
 
 	/* Init empires */
 	HASH_ITER(hh, empire_table, e, next_e) {
@@ -1216,7 +1264,7 @@ void read_empire_territory(empire_data *emp) {
 			if ((e = ROOM_OWNER(iter))) {
 				// only count each building as 1
 				if (HOME_ROOM(iter) == iter) {
-					if (COUNTS_AS_IN_CITY(iter) || find_city(e, iter)) {
+					if (COUNTS_AS_IN_CITY(iter) || is_in_city_for_empire(iter, e, FALSE, &junk)) {
 						EMPIRE_CITY_TERRITORY(e) += 1;
 					}
 					else {
@@ -1424,7 +1472,7 @@ room_data *create_ocean_room(room_vnum vnum) {
 	
 	SECT(room) = sector_proto(BASIC_OCEAN);
 	ROOM_ORIGINAL_SECT(room) = SECT(room);
-	GET_ISLAND_ID(room) = NO_ISLAND;
+	SET_ISLAND_ID(room, NO_ISLAND);
 	
 	// only if saveable
 	if (!CAN_UNLOAD_MAP_ROOM(room)) {

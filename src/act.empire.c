@@ -32,6 +32,7 @@
 *   Efind Helpers
 *   Import / Export Helpers
 *   Inspire Helpers
+*   Islands Helpers
 *   Tavern Helpers
 *   Territory Helpers
 *   Empire Commands
@@ -806,14 +807,50 @@ void found_city(char_data *ch, char *argument) {
 }
 
 
+/**
+* Determines if a location counts as in-city, and has passed the required wait
+* time since the city was founded.
+*
+* @param room_data *loc The location to check.
+* @param empire_data *emp The empire to check.
+* @param bool check_wait If TRUE, requires the city wait time to have passed.
+* @param bool *too_soon Will be set to TRUE if there was a city but it was founded too recently.
+* @return bool TRUE if in-city, FALSE if not.
+*/
+bool is_in_city_for_empire(room_data *loc, empire_data *emp, bool check_wait, bool *too_soon) {
+	struct empire_city_data *city;
+	int wait = config_get_int("minutes_to_full_city") * SECS_PER_REAL_MIN;
+	
+	*too_soon = FALSE;
+
+	if (!emp) {
+		return FALSE;
+	}
+	
+	for (city = EMPIRE_CITY_LIST(emp); city; city = city->next) {
+		if (compute_distance(loc, city->location) <= city_type[city->type].radius) {
+			if (!check_wait || (get_room_extra_data(city->location, ROOM_EXTRA_FOUND_TIME) + wait) < time(0)) {
+				return TRUE;
+			}
+			else {
+				*too_soon = TRUE;
+			}
+		}
+	}
+	
+	return FALSE;
+}
+
+
 // for do_city
 void list_cities(char_data *ch, char *argument) {
 	extern int count_city_points_used(empire_data *emp);
 	
 	struct empire_city_data *city;
+	struct island_info *isle;
 	empire_data *emp;
 	int points, used, count;
-	bool found = FALSE;
+	bool pending, found = FALSE;
 	room_data *rl;
 	
 	any_one_word(argument, arg);
@@ -839,7 +876,10 @@ void list_cities(char_data *ch, char *argument) {
 		found = TRUE;
 		rl = city->location;
 		prettier_sprintbit(city->traits, empire_trait_types, buf);
-		msg_to_char(ch, "%d. (%*d, %*d) %s (%s/%d), traits: %s\r\n", ++count, X_PRECISION, X_COORD(rl), Y_PRECISION, Y_COORD(rl), city->name, city_type[city->type].name, city_type[city->type].radius, buf);
+		isle = get_island(GET_ISLAND_ID(rl), TRUE);
+		
+		pending = (get_room_extra_data(city->location, ROOM_EXTRA_FOUND_TIME) + (config_get_int("minutes_to_full_city") * SECS_PER_REAL_MIN) > time(0));			
+		msg_to_char(ch, "%d. (%*d, %*d) %s, on %s (%s/%d), traits: %s%s\r\n", ++count, X_PRECISION, X_COORD(rl), Y_PRECISION, Y_COORD(rl), city->name, isle->name, city_type[city->type].name, city_type[city->type].radius, buf, pending ? " &r(new)&0" : "");
 	}
 	
 	if (!found) {
@@ -863,6 +903,7 @@ void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool 
 	struct empire_city_data *temp;
 	room_data *cityloc, *to_room;
 	int x, y, radius;
+	bool junk;
 	
 	// store location & radius now
 	cityloc = city->location;
@@ -887,7 +928,7 @@ void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool 
 				// check ownership
 				if (to_room && ROOM_OWNER(to_room) == emp) {
 					// warning: never abandon things that are still within another city
-					if (!find_city(emp, to_room)) {
+					if (!is_in_city_for_empire(to_room, emp, FALSE, &junk)) {
 						// check if ACTUALLY within the abandoned city
 						if (compute_distance(cityloc, to_room) <= radius) {
 							abandon_room(to_room);
@@ -1394,6 +1435,57 @@ void perform_inspire(char_data *ch, char_data *vict, int type) {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// ISLANDS HELPERS /////////////////////////////////////////////////////////
+
+// helper data for do_islands
+struct do_islands_data {
+	int id;
+	bool has_territory;
+	int einv_size;
+	UT_hash_handle hh;
+};
+
+
+/**
+* Helper for do_islands: adds to einv count.
+*
+* @param struct do_islands_data **list Pointer to a do_islands hash.
+* @param int island_id Which island.
+* @param int amount How much einv to add.
+*/
+void do_islands_add_einv(struct do_islands_data **list, int island_id, int amount) {
+	struct do_islands_data *isle;
+	
+	HASH_FIND_INT(*list, &island_id, isle);
+	if (!isle) {
+		CREATE(isle, struct do_islands_data, 1);
+		isle->id = island_id;
+		HASH_ADD_INT(*list, id, isle);
+	}
+	SAFE_ADD(isle->einv_size, amount, INT_MIN, INT_MAX, TRUE);
+}
+
+
+/**
+* Helper for do_islands: marks territory on the island.
+*
+* @param struct do_islands_data **list Pointer to a do_islands hash.
+* @param int island_id Which island.
+*/
+void do_islands_has_territory(struct do_islands_data **list, int island_id) {
+	struct do_islands_data *isle;
+	
+	HASH_FIND_INT(*list, &island_id, isle);
+	if (!isle) {
+		CREATE(isle, struct do_islands_data, 1);
+		isle->id = island_id;
+		HASH_ADD_INT(*list, id, isle);
+	}
+	isle->has_territory = TRUE;
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// TAVERN HELPERS //////////////////////////////////////////////////////////
 
 // for do_tavern, BREW_x
@@ -1556,6 +1648,180 @@ struct find_territory_node *reduce_territory_node_list(struct find_territory_nod
 }
 
 
+/**
+* Scans within the character's mapsize for matching tiles.
+*
+* @param char_data *ch The player.
+* @param char_data *argument The tile to search for.
+*/
+void scan_for_tile(char_data *ch, char *argument) {
+	void sort_territory_node_list_by_distance(room_data *from, struct find_territory_node **node_list);
+	extern const char *dirs[];
+
+	struct find_territory_node *node_list = NULL, *node, *next_node;
+	int dir, dist, mapsize, total, x, y, check_x, check_y;
+	char output[MAX_STRING_LENGTH], line[128];
+	room_data *map, *room;
+	size_t size, lsize;
+	crop_data *crop;
+	bool ok;
+	
+	skip_spaces(&argument);
+	
+	if (!ch->desc) {
+		return;	// don't bother
+	}
+	if (!*argument) {
+		msg_to_char(ch, "Scan for what?\r\n");
+		return;
+	}
+	if (!(map = get_map_location_for(IN_ROOM(ch)))) {
+		msg_to_char(ch, "You can't scan for anything here.\r\n");
+		return;
+	}
+
+	mapsize = GET_MAPSIZE(REAL_CHAR(ch));
+	if (mapsize == 0) {
+		mapsize = config_get_int("default_map_size");
+	}
+	
+	for (x = -mapsize; x <= mapsize; ++x) {
+		for (y = -mapsize; y <= mapsize; ++y) {
+			if (!(room = real_shift(map, x, y))) {
+				continue;
+			}
+			
+			// validate tile
+			ok = FALSE;
+			if (multi_isname(argument, GET_SECT_NAME(SECT(room)))) {
+				ok = TRUE;
+			}
+			else if (GET_BUILDING(room) && multi_isname(argument, GET_BLD_NAME(GET_BUILDING(room)))) {
+				ok = TRUE;
+			}
+			else if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && (crop = crop_proto(ROOM_CROP_TYPE(room))) && multi_isname(argument, GET_CROP_NAME(crop))) {
+				ok = TRUE;
+			}
+			else if (multi_isname(argument, get_room_name(room, FALSE))) {
+				ok = TRUE;
+			}
+			else {
+				continue;
+			}
+			
+			if (ok) {
+				CREATE(node, struct find_territory_node, 1);
+				node->loc = room;
+				node->count = 1;
+				node->next = node_list;
+				node_list = node;
+			}
+		}
+	}
+
+	if (node_list) {
+		sort_territory_node_list_by_distance(IN_ROOM(ch), &node_list);
+		node_list = reduce_territory_node_list(node_list);
+		
+		size = snprintf(output, sizeof(output), "Nearby tiles matching '%s' within %d tile%s:\r\n", argument, mapsize, PLURAL(mapsize));
+		
+		// display and free the nodes
+		total = 0;
+		for (node = node_list; node; node = next_node) {
+			next_node = node->next;
+			total += node->count;
+			
+			// territory can be off the map (e.g. ships) and get a -1 here
+			check_x = X_COORD(node->loc);
+			check_y = Y_COORD(node->loc);
+			
+			dist = compute_distance(IN_ROOM(ch), node->loc);
+			dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), node->loc));
+			
+			if (CHECK_MAP_BOUNDS(check_x, check_y) && HAS_ABILITY(ch, ABIL_NAVIGATION)) {
+				lsize = snprintf(line, sizeof(line), "%2d tile%s %s (%d, %d) - %s", dist, PLURAL(dist), (dir == NO_DIR ? "away" : dirs[dir]), check_x, check_y, get_room_name(node->loc, FALSE));
+			}
+			else {
+				lsize = snprintf(line, sizeof(line), "%2d tile%s %s - %s", dist, PLURAL(dist), (dir == NO_DIR ? "away" : dirs[dir]), get_room_name(node->loc, FALSE));
+			}
+			
+			if (node->count > 1) {
+				lsize += snprintf(line + lsize, sizeof(line) - lsize, " (and %d nearby tile%s)", node->count, PLURAL(node->count));
+			}
+			
+			if (size + lsize + 32 < sizeof(output)) {
+				size += snprintf(output + size, sizeof(output) - size, "%s\r\n", line);
+			}
+			
+			free(node);
+		}
+		
+		node_list = NULL;
+		size += snprintf(output + size, sizeof(output) - size, "Total: %d\r\n", total);
+		page_string(ch->desc, output, TRUE);
+	}
+	else {
+		msg_to_char(ch, "No matching territory found.\r\n");
+	}
+	
+	GET_WAIT_STATE(ch) = 1 RL_SEC;	// short lag for scannings
+}
+
+
+// quick-switch of linked list positions
+inline struct find_territory_node *switch_node_pos(struct find_territory_node *l1, struct find_territory_node *l2) {
+    l1->next = l2->next;
+    l2->next = l1;
+    return l2;
+}
+
+
+/**
+* Sort a territory node list, by distance from a room.
+*
+* @param room_data *from The room to measure from.
+* @param struct find_territory_node **node_list A pointer to the node list to sort.
+*/
+void sort_territory_node_list_by_distance(room_data *from, struct find_territory_node **node_list) {
+	struct find_territory_node *start, *p, *q, *top;
+    bool changed = TRUE;
+        
+    // safety first
+    if (!from) {
+    	return;
+    }
+    
+    start = *node_list;
+
+	CREATE(top, struct find_territory_node, 1);
+
+    top->next = start;
+    if (start && start->next) {
+    	// q is always one item behind p
+
+        while (changed) {
+            changed = FALSE;
+            q = top;
+            p = top->next;
+            while (p->next != NULL) {
+            	if (compute_distance(from, p->loc) > compute_distance(from, p->next->loc)) {
+					q->next = switch_node_pos(p, p->next);
+					changed = TRUE;
+				}
+				
+                q = p;
+                if (p->next) {
+                    p = p->next;
+                }
+            }
+        }
+    }
+    
+    *node_list = top->next;
+    free(top);
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// EMPIRE COMMANDS /////////////////////////////////////////////////////////
 
@@ -1679,6 +1945,7 @@ ACMD(do_cede) {
 	empire_data *e = GET_LOYALTY(ch), *f;
 	room_data *room;
 	char_data *targ;
+	bool junk;
 
 	if (IS_NPC(ch))
 		return;
@@ -1719,7 +1986,7 @@ ACMD(do_cede) {
 		msg_to_char(ch, "You can't cede land to your own empire!\r\n");
 	else if (EMPIRE_CITY_TERRITORY(f) + EMPIRE_OUTSIDE_TERRITORY(f) >= land_can_claim(f, FALSE))
 		msg_to_char(ch, "You can't cede land to %s, %s empire can't own any more land.\r\n", HMHR(targ), HSHR(targ));
-	else if (!find_city(f, room) && EMPIRE_OUTSIDE_TERRITORY(f) >= land_can_claim(f, TRUE)) {
+	else if (!is_in_city_for_empire(room, f, FALSE, &junk) && EMPIRE_OUTSIDE_TERRITORY(f) >= land_can_claim(f, TRUE)) {
 		msg_to_char(ch, "You can't cede land to that empire as it is over its limit for territory outside of cities.\r\n");
 	}
 	else if (is_at_war(f)) {
@@ -1780,6 +2047,7 @@ ACMD(do_city) {
 
 ACMD(do_claim) {
 	empire_data *e;
+	bool junk;
 
 	if (IS_NPC(ch))
 		return;
@@ -1809,7 +2077,7 @@ ACMD(do_claim) {
 	else if (!can_build_or_claim_at_war(ch, IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't claim here while at war with the empire that controls this area.\r\n");
 	}
-	else if (!COUNTS_AS_IN_CITY(IN_ROOM(ch)) && !find_city(e, IN_ROOM(ch)) && EMPIRE_OUTSIDE_TERRITORY(e) >= land_can_claim(e, TRUE)) {
+	else if (!COUNTS_AS_IN_CITY(IN_ROOM(ch)) && !is_in_city_for_empire(IN_ROOM(ch), e, FALSE, &junk) && EMPIRE_OUTSIDE_TERRITORY(e) >= land_can_claim(e, TRUE)) {
 		msg_to_char(ch, "You can't claim this land because you're over the 20%% of your territory that can be outside of cities.\r\n");
 	}
 	else {
@@ -2215,7 +2483,7 @@ ACMD(do_efind) {
 	char buf[MAX_STRING_LENGTH*2];
 	obj_data *obj;
 	empire_data *emp;
-	int total;
+	int check_x, check_y, total;
 	bool all = FALSE;
 	room_data *last_rm, *iter, *next_iter;
 	struct efind_group *eg, *next_eg, *list = NULL;
@@ -2267,7 +2535,16 @@ ACMD(do_efind) {
 				// first item at this location?
 				if (eg->location != last_rm) {
 					if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
-						size += snprintf(buf + size, sizeof(buf) - size, "\r\n(%*d, %*d) ", X_PRECISION, X_COORD(eg->location), Y_PRECISION, Y_COORD(eg->location));
+						// count have no coordinates
+						check_x = X_COORD(eg->location);
+						check_y = Y_COORD(eg->location);
+						
+						if (CHECK_MAP_BOUNDS(check_x, check_y)) {
+							size += snprintf(buf + size, sizeof(buf) - size, "\r\n(%*d, %*d) ", X_PRECISION, check_x, Y_PRECISION, check_y);
+						}
+						else {
+							size += snprintf(buf + size, sizeof(buf) - size, "\r\n(unknown) ");
+						}
 					}
 					else {
 						size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
@@ -2592,6 +2869,8 @@ ACMD(do_enroll) {
 	struct empire_npc_data *npc;
 	struct empire_storage_data *store, *store2;
 	struct empire_city_data *city, *next_city, *temp;
+	struct empire_unique_storage *eus;
+	struct shipping_data *shipd;
 	empire_data *e, *old;
 	room_data *room, *next_room;
 	int j, old_store;
@@ -2718,6 +2997,36 @@ ACMD(do_enroll) {
 				if (store2->amount < old_store || store2->amount > MAX_STORAGE) {
 					store2->amount = MAX_STORAGE;
 				}
+			}
+			
+			// shipping: append to end of current empire's list
+			if (EMPIRE_SHIPPING_LIST(old)) {
+				// find end
+				if ((shipd = EMPIRE_SHIPPING_LIST(e))) {
+					while (shipd->next) {
+						shipd = shipd->next;
+					}
+					shipd->next = EMPIRE_SHIPPING_LIST(old);
+				}
+				else {
+					EMPIRE_SHIPPING_LIST(e) = EMPIRE_SHIPPING_LIST(old);
+				}
+				EMPIRE_SHIPPING_LIST(old) = NULL;
+			}
+			
+			// unique storage: append to end of current empire's list
+			if (EMPIRE_UNIQUE_STORAGE(old)) {
+				// find end
+				if ((eus = EMPIRE_UNIQUE_STORAGE(e))) {
+					while (eus->next) {
+						eus = eus->next;
+					}
+					eus->next = EMPIRE_UNIQUE_STORAGE(old);
+				}
+				else {
+					EMPIRE_UNIQUE_STORAGE(e) = EMPIRE_UNIQUE_STORAGE(old);
+				}
+				EMPIRE_UNIQUE_STORAGE(old) = NULL;
 			}
 			
 			// cities
@@ -3180,6 +3489,106 @@ ACMD(do_home) {
 	else {
 		msg_to_char(ch, "Usage: home [set | unset | clear]\r\n");
 	}
+}
+
+
+ACMD(do_islands) {
+	char output[MAX_STRING_LENGTH*2], line[82], emp_arg[MAX_INPUT_LENGTH];
+	struct do_islands_data *item, *next_item, *list = NULL;
+	struct empire_unique_storage *eus;
+	struct empire_territory_data *ter;
+	struct empire_storage_data *store;
+	struct island_info *isle;
+	empire_data *emp;
+	room_data *room;
+	int id, last_id = -1;
+	size_t size, lsize;
+	bool overflow = FALSE;
+	
+	// imms can target empires
+	any_one_word(argument, emp_arg);
+	if (!*emp_arg || (GET_ACCESS_LEVEL(ch) < LVL_CIMPL && !IS_GRANTED(ch, GRANT_EMPIRES))) {
+		emp = GET_LOYALTY(ch);
+	}
+	else {
+		emp = get_empire_by_name(emp_arg);
+		if (!emp) {
+			msg_to_char(ch, "Unknown empire.\r\n");
+			return;
+		}
+	}
+	
+	if (IS_NPC(ch) || !ch->desc) {
+		msg_to_char(ch, "You can't do that.\r\n");
+		return;
+	}
+	if (!HAS_ABILITY(ch, ABIL_NAVIGATION)) {
+		msg_to_char(ch, "You need to purchase the Navigation ability to do that.\r\n");
+		return;
+	}
+	if (!emp) {
+		msg_to_char(ch, "You must be in an empire to do that.\r\n");
+		return;
+	}
+	
+	// mark your territory
+	for (ter = EMPIRE_TERRITORY_LIST(emp); ter; ter = ter->next) {
+		id = GET_ISLAND_ID(ter->room);
+		
+		if (id != last_id) {
+			last_id = id;
+			
+			if (id != NO_ISLAND) {
+				do_islands_has_territory(&list, id);
+			}
+		}
+	}
+	
+	// compute einv
+	for (store = EMPIRE_STORAGE(emp); store; store = store->next) {
+		do_islands_add_einv(&list, store->island, store->amount);
+	}
+	
+	// add unique storage
+	for (eus = EMPIRE_UNIQUE_STORAGE(emp); eus; eus = eus->next) {
+		do_islands_add_einv(&list, eus->island, eus->amount);
+	}
+	
+	// and then build the display while freeing it up
+	size = snprintf(output, sizeof(output), "%s%s&0 is on the following islands:\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+	
+	if (!list) {
+		size += snprintf(output + size, sizeof(output) - size, " none\r\n");
+	}
+	
+	HASH_ITER(hh, list, item, next_item) {
+		isle = get_island(item->id, TRUE);
+		room = real_room(isle->center);
+		lsize = snprintf(line, sizeof(line), " %s (%d, %d) - ", isle->name, X_COORD(room), Y_COORD(room));
+		
+		if (item->has_territory) {
+			lsize += snprintf(line + lsize, sizeof(line) - lsize, "has territory%s", item->einv_size > 0 ? ", " : "");
+		}
+		if (item->einv_size > 0) {
+			lsize += snprintf(line + lsize, sizeof(line) - lsize, "%d item%s in einventory", item->einv_size, PLURAL(item->einv_size));
+		}
+		
+		if (size + lsize + 3 < sizeof(output)) {
+			size += snprintf(output + size, sizeof(output) - size, "%s\r\n", line);
+		}
+		else {
+			overflow = TRUE;
+		}
+		
+		HASH_DEL(list, item);
+		free(item);
+	}
+	
+	if (overflow) {
+		size += snprintf(output + size, sizeof(output) - size, " and more...\r\n");
+	}
+	
+	page_string(ch->desc, output, TRUE);
 }
 
 
@@ -3834,15 +4243,11 @@ ACMD(do_roster) {
 
 
 ACMD(do_territory) {
-	extern bld_data *get_building_by_name(char *name, bool room_only);
-	extern crop_data *get_crop_by_name(char *name);
-	extern sector_data *get_sect_by_name(char *name);
-
 	struct find_territory_node *node_list = NULL, *node, *next_node;
 	empire_data *emp = GET_LOYALTY(ch);
 	room_data *iter, *next_iter;
-	bool outside_only = TRUE, ok;
-	int total;
+	bool outside_only = TRUE, ok, junk;
+	int total, check_x, check_y;
 	crop_data *crop = NULL;
 	char *remain;
 	
@@ -3880,7 +4285,7 @@ ACMD(do_territory) {
 		
 		// owned by the empire?
 		if (ROOM_OWNER(iter) == emp) {
-			if (!outside_only || !find_city(emp, iter)) {
+			if (!outside_only || !is_in_city_for_empire(iter, emp, FALSE, &junk)) {
 				// compare request
 				if (!*argument) {
 					ok = TRUE;
@@ -3928,7 +4333,17 @@ ACMD(do_territory) {
 		for (node = node_list; node; node = next_node) {
 			next_node = node->next;
 			total += node->count;
-			sprintf(buf + strlen(buf), "%2d tile%s near%s (%*d, %*d) %s\r\n", node->count, (node->count != 1 ? "s" : ""), (node->count == 1 ? " " : ""), X_PRECISION, X_COORD(node->loc), Y_PRECISION, Y_COORD(node->loc), get_room_name(node->loc, FALSE));
+			
+			// territory can be off the map (e.g. ships) and get a -1 here
+			check_x = X_COORD(node->loc);
+			check_y = Y_COORD(node->loc);
+			
+			if (CHECK_MAP_BOUNDS(check_x, check_y)) {
+				sprintf(buf + strlen(buf), "%2d tile%s near%s (%*d, %*d) %s\r\n", node->count, (node->count != 1 ? "s" : ""), (node->count == 1 ? " " : ""), X_PRECISION, check_x, Y_PRECISION, check_y, get_room_name(node->loc, FALSE));
+			}
+			else {
+				sprintf(buf + strlen(buf), "%2d tile%s near%s (unknown) %s\r\n", node->count, (node->count != 1 ? "s" : ""), (node->count == 1 ? " " : ""), get_room_name(node->loc, FALSE));
+			}
 			free(node);
 		}
 		

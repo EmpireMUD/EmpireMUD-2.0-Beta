@@ -851,6 +851,7 @@ static void reduce_outside_territory_one(empire_data *emp) {
 	struct empire_city_data *city;
 	room_data *iter, *next_iter, *loc, *farthest;
 	int dist, this_far, far_dist;
+	bool junk;
 	
 	// sanity
 	if (!emp || EMPIRE_IMM_ONLY(emp) || EMPIRE_OUTSIDE_TERRITORY(emp) <= land_can_claim(emp, TRUE)) {
@@ -869,7 +870,7 @@ static void reduce_outside_territory_one(empire_data *emp) {
 		loc = HOME_ROOM(iter);
 		
 		// if owner matches AND it's not in a city
-		if (ROOM_OWNER(loc) == emp && !COUNTS_AS_IN_CITY(loc) && !find_city(emp, loc)) {
+		if (ROOM_OWNER(loc) == emp && !COUNTS_AS_IN_CITY(loc) && !is_in_city_for_empire(loc, emp, FALSE, &junk)) {
 			// check its distance from each city
 			this_far = 0;
 			for (city = EMPIRE_CITY_LIST(emp); city; city = city->next) {
@@ -922,6 +923,7 @@ static void reduce_stale_empires_one(empire_data *emp) {
 	bool outside_only = (EMPIRE_OUTSIDE_TERRITORY(emp) > 0);
 	room_data *iter, *next_iter, *found_room = NULL;
 	int num_found = 0;
+	bool junk;
 	
 	HASH_ITER(world_hh, world_table, iter, next_iter) {
 		// map only
@@ -930,7 +932,7 @@ static void reduce_stale_empires_one(empire_data *emp) {
 		}
 		
 		// caution: do not abandon city centers this way
-		if (ROOM_OWNER(iter) == emp && !IS_CITY_CENTER(iter) && (!outside_only || !find_city(emp, iter))) {
+		if (ROOM_OWNER(iter) == emp && !IS_CITY_CENTER(iter) && (!outside_only || !is_in_city_for_empire(iter, emp, FALSE, &junk))) {
 			if (!number(0, num_found++)) {
 				found_room = iter;
 			}
@@ -994,6 +996,7 @@ bool should_delete_empire(empire_data *emp) {
 * @return bool TRUE if the item is still in the world, FALSE if it was extracted
 */
 bool check_autostore(obj_data *obj, bool force) {
+	room_data *real_loc;
 	obj_data *top_obj;
 	empire_data *emp;
 	bool store, unique, full;
@@ -1010,7 +1013,14 @@ bool check_autostore(obj_data *obj, bool force) {
 	
 	// ensure object is in a room, or in an object in a room
 	top_obj = get_top_object(obj);
-	if (!IN_ROOM(top_obj) || IS_ADVENTURE_ROOM(IN_ROOM(top_obj))) {
+	real_loc = IN_ROOM(top_obj);
+	if (!real_loc || IS_ADVENTURE_ROOM(real_loc)) {
+		return TRUE;
+	}
+	
+	// check boat room: items on ships in the Ship Holding Pen do not autostore
+	real_loc = BOAT_ROOM(real_loc);
+	if (!real_loc || BUILDING_VNUM(real_loc) == RTYPE_SHIP_HOLDING_PEN) {
 		return TRUE;
 	}
 	
@@ -1331,6 +1341,7 @@ void point_update_room(room_data *room) {
 	struct affected_type *af, *next_af;
 	empire_data *emp;
 	time_t now = time(0);
+	bool junk;
 	int count;
 	
 	int allowed_animals = config_get_int("num_duplicates_in_stable");
@@ -1393,7 +1404,8 @@ void point_update_room(room_data *room) {
 				disassociate_building(room);
 				
 				// auto-abandon if not in city
-				if (emp && !find_city(emp, room)) {
+				if (emp && !is_in_city_for_empire(room, emp, TRUE, &junk)) {
+					// does check the city time limit for abandon protection
 					abandon_room(room);
 					read_empire_territory(emp);
 				}

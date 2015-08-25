@@ -786,6 +786,7 @@ void score_empires(void) {
 bool can_build_or_claim_at_war(char_data *ch, room_data *loc) {
 	struct empire_political_data *pol;
 	empire_data *enemy;
+	bool junk;
 	
 	// if they aren't at war, this doesn't apply
 	if (!ch || !is_at_war(GET_LOYALTY(ch))) {
@@ -798,7 +799,7 @@ bool can_build_or_claim_at_war(char_data *ch, room_data *loc) {
 	}
 	
 	// if it's in one of their OWN cities, it's ok
-	if (GET_LOYALTY(ch) && find_city(GET_LOYALTY(ch), loc) != NULL) {
+	if (GET_LOYALTY(ch) && is_in_city_for_empire(loc, GET_LOYALTY(ch), TRUE, &junk)) {
 		return TRUE;
 	}
 	
@@ -806,7 +807,7 @@ bool can_build_or_claim_at_war(char_data *ch, room_data *loc) {
 	for (pol = EMPIRE_DIPLOMACY(GET_LOYALTY(ch)); pol; pol = pol->next) {
 		if (IS_SET(pol->type, DIPL_WAR)) {
 			// not good if they are trying to build in a location owned by the other player while at war
-			if ((enemy = real_empire(pol->id)) && find_city(enemy, loc) != NULL) {
+			if ((enemy = real_empire(pol->id)) && is_in_city_for_empire(loc, enemy, TRUE, &junk)) {
 				return FALSE;
 			}
 		}
@@ -3063,6 +3064,16 @@ int compute_distance(room_data *from, room_data *to) {
 	int dx = x1 - x2;
 	int dy = y1 - y2;
 	int dist;
+	
+	// short circuit on same-room
+	if (from == to || HOME_ROOM(from) == HOME_ROOM(to)) {
+		return 0;
+	}
+	
+	// infinite distance if they are in an unknown location
+	if (x1 < 0 || x2 < 0 || y1 < 0 || y2 < 0) {
+		return MAP_SIZE;	// maximum distance
+	}
 
 	// adjust for edges
 	if (WRAP_X) {
@@ -3177,7 +3188,7 @@ int distance_to_nearest_player(room_data *room) {
 * layers of boats and home rooms.
 *
 * @param room_data *room Any room in the game.
-* @return room_data* A location on the map.
+* @return room_data* A location on the map, or NULL if there is no map location.
 */
 room_data *get_map_location_for(room_data *room) {
 	room_data *working = room, *last;
@@ -3189,6 +3200,14 @@ room_data *get_map_location_for(room_data *room) {
 	else if (GET_ROOM_VNUM(room) < MAP_SIZE) {
 		// shortcut
 		return room;
+	}
+	else if (GET_ROOM_VNUM(HOME_ROOM(room)) >= MAP_SIZE && BOAT_ROOM(room) == room && !IS_ADVENTURE_ROOM(HOME_ROOM(room))) {
+		// no home room on the map and not in a boat?
+		return NULL;
+	}
+	else if (GET_BOAT(room) && GET_ROOM_VNUM(BOAT_ROOM(room)) >= MAP_SIZE) {
+		// in a boat but it's not on the map?
+		return NULL;
 	}
 	
 	do {
@@ -3335,6 +3354,10 @@ bool find_flagged_sect_within_distance_from_room(room_data *room, bitvector_t wi
 	room_data *shift, *real = get_map_location_for(room);
 	bool found = FALSE;
 	
+	if (!real) {	// no map location
+		return FALSE;
+	}
+	
 	for (x = -1 * distance; x <= distance && !found; ++x) {
 		for (y = -1 * distance; y <= distance && !found; ++y) {
 			shift = real_shift(real, x, y);
@@ -3383,6 +3406,10 @@ bool find_sect_within_distance_from_room(room_data *room, sector_vnum sect, int 
 	bool found = FALSE;
 	room_data *shift;
 	int x, y;
+	
+	if (!real) {	// no map location
+		return FALSE;
+	}
 	
 	for (x = -1 * distance; x <= distance && !found; ++x) {
 		for (y = -1 * distance; y <= distance && !found; ++y) {
@@ -3472,6 +3499,25 @@ int get_direction_to(room_data *from, room_data *to) {
 	}
 	
 	return dir;
+}
+
+
+/**
+* Fetch the island id based on the map location of the room. This was a macro,
+* but get_map_location_for() can return a NULL.
+*
+* @param room_data *room The room to check.
+* @return int The island ID, or NO_ISLAND if none.
+*/
+int GET_ISLAND_ID(room_data *room) {
+	room_data *map = get_map_location_for(room);
+	
+	if (map) {
+		return map->island;
+	}
+	else {
+		return NO_ISLAND;
+	}
 }
 
 
@@ -3688,6 +3734,42 @@ room_data *straight_line(room_data *origin, room_data *destination, int iter) {
 	else {
 		// straight line should always stay on the map
 		return NULL;
+	}
+}
+
+
+/**
+* Gets the x-coordinate for a room, based on its map location. This used to be
+* a macro, but it needs to ensure there IS a map location.
+*
+* @param room_data *room The room to get the x-coordinate for.
+* @return int The x-coordinate, or -1 if none.
+*/
+int X_COORD(room_data *room) {
+	room_data *map = get_map_location_for(room);
+	if (map) {
+		return FLAT_X_COORD(map);
+	}
+	else {
+		return -1;
+	}
+}
+
+
+/**
+* Gets the y-coordinate for a room, based on its map location. This used to be
+* a macro, but it needs to ensure there IS a map location.
+*
+* @param room_data *room The room to get the y-coordinate for.
+* @return int The y-coordinate, or -1 if none.
+*/
+int Y_COORD(room_data *room) {
+	room_data *map = get_map_location_for(room);
+	if (map) {
+		return FLAT_Y_COORD(map);
+	}
+	else {
+		return -1;
 	}
 }
 

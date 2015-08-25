@@ -1446,6 +1446,7 @@ void process_tower(room_data *room) {
 	char_data *ch, *found = NULL;
 	struct tower_victim_list *victim_list = NULL, *tvl;
 	int num_victs = 0, pick;
+	bool junk;
 
 	// empire check
 	if (!(emp = ROOM_OWNER(room))) {
@@ -1458,7 +1459,7 @@ void process_tower(room_data *room) {
 	}
 	
 	// building is in city?
-	if (!IS_IN_CITY_ROOM(room)) {
+	if (!is_in_city_for_empire(room, emp, TRUE, &junk)) {
 		return;
 	}
 	
@@ -1952,6 +1953,7 @@ void besiege_room(room_data *to_room, int damage) {
 	obj_data *o, *next_o;
 	empire_data *emp = ROOM_OWNER(to_room);
 	int max_dam;
+	bool junk;
 	room_data *rm, *next_rm;
 	
 	// make sure we only hit the home-room
@@ -1985,7 +1987,8 @@ void besiege_room(room_data *to_room, int damage) {
 		if (BUILDING_DAMAGE(to_room) >= max_dam) {
 			disassociate_building(to_room);
 			// only abandon outside cities
-			if (emp && !find_city(emp, to_room)) {
+			if (emp && !is_in_city_for_empire(to_room, emp, TRUE, &junk)) {
+				// this does check the city found time so that recently-founded cities don't get abandon protection
 				abandon_room(to_room);
 				read_empire_territory(emp);
 			}

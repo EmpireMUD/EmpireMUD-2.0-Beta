@@ -48,9 +48,11 @@ disrepair_limit 10
 disrepair_limit_unfinished 2
 disrepair_major 6
 disrepair_minor 2
+max_out_of_city_portal 50
 min_distance_between_ally_cities 10
 min_distance_between_cities 30
 min_distance_from_city_to_starting_location 25
+minutes_to_full_city 60
 players_per_city_point 2
 *
 * Empire configs
