@@ -45,6 +45,11 @@ blocks that are currently in use.
 9200      |
 9300      |
 9400      V
+9500
+9600
+9700
+9800
+9900  Miscellaneous mini-pets and summoner items
 
 
 Included Adventure Zones
@@ -56,6 +61,7 @@ Included Adventure Zones
 [  123] Ruins: Thieves (10110-10129)
 [  125] Ruins: The Goblin Challenge (10200-10224)
 [  126] Mountain Cave: Flame Dragon (10300-10329)
+[  127] Abandoned Dragon Nest (10330-10359)
 [  140] The Sewer: Ratskins (10011-10027)
 [  141] The Sewer: Goblin Outpost (10450-10499)
 [  160] The Tower Skycleave (10030-10099)
