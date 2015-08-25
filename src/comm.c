@@ -135,7 +135,7 @@ int mother_desc;
 ush_int port;
 
 /* Reboot data (default to a normal reboot once per week) */
-struct reboot_control_data reboot_control = { SCMD_REBOOT, 7 * (24 * 60), SHUTDOWN_NORMAL, FALSE };
+struct reboot_control_data reboot_control = { SCMD_REBOOT, 7.5 * (24 * 60), SHUTDOWN_NORMAL, FALSE };
 
 
 #ifdef __CXREF__
