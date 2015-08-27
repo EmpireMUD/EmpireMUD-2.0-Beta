@@ -287,7 +287,7 @@ static bool can_gain_chore_resource(empire_data *emp, room_data *loc, obj_vnum v
 			if (shipd->status == SHIPPING_QUEUED && shipd->from_island == island) {
 				island_count += shipd->amount;
 			}
-			else if (shipd->to_island == island) {
+			else if (shipd->status != SHIPPING_QUEUED && shipd->to_island == island) {
 				island_count += shipd->amount;
 			}
 		}
