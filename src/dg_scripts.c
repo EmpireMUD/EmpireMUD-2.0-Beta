@@ -1452,6 +1452,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 	char *purge[] = {"mpurge ", "opurge ", "wpurge " };
 	char *scale[] = {"mscale ", "oscale ", "wscale " };
 	char *teleport[] = {"mteleport ", "oteleport ", "wteleport " };
+	char *terracrop[] = {"mterracrop ", "oterracrop ", "wterracrop " };
 	char *terraform[] = {"mterraform ", "oterraform ", "wterraform " };
 	/* the x kills a 'shadow' warning in gcc. */
 	char *xdamage[] = {"mdamage ", "odamage ", "wdamage " };
@@ -1508,6 +1509,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				snprintf(str, slen, "%s", scale[type]);
 			else if (!str_cmp(var, "teleport"))
 				snprintf(str, slen, "%s", teleport[type]);
+			else if (!str_cmp(var, "terracrop"))
+				snprintf(str, slen, "%s", terracrop[type]);
 			else if (!str_cmp(var, "terraform"))
 				snprintf(str, slen, "%s", terraform[type]);
 			else if (!str_cmp(var, "damage"))

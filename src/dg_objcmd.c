@@ -512,6 +512,55 @@ OCMD(do_oteleport) {
 }
 
 
+OCMD(do_oterracrop) {
+	void do_dg_terracrop(room_data *target, crop_data *crop);
+
+	char loc_arg[MAX_INPUT_LENGTH], crop_arg[MAX_INPUT_LENGTH];
+	crop_data *crop;
+	room_data *orm = obj_room(obj), *target;
+	crop_vnum vnum;
+
+	argument = any_one_word(argument, loc_arg);
+	any_one_word(argument, crop_arg);
+	
+	// usage: %terracrop% [location] <crop vnum>
+	if (!*loc_arg) {
+		obj_log(obj, "oterracrop: bad syntax");
+		return;
+	}
+	
+	// check number of args
+	if (!*crop_arg) {
+		// only arg is actually crop arg
+		strcpy(crop_arg, loc_arg);
+		target = orm;
+	}
+	else {
+		// two arguments
+		target = get_room(orm, loc_arg);
+	}
+	
+	if (!target) {
+		obj_log(obj, "oterracrop: target is an invalid room");
+		return;
+	}
+	
+	// places you just can't terracrop -- fail silently (currently)
+	if (IS_INSIDE(target) || IS_ADVENTURE_ROOM(target) || IS_CITY_CENTER(target)) {
+		return;
+	}
+	
+	if (!isdigit(*crop_arg) || (vnum = atoi(crop_arg)) < 0 || !(crop = crop_proto(vnum))) {
+		obj_log(obj, "oterracrop: invalid crop vnum");
+		return;
+	}
+	
+
+	// good to go
+	do_dg_terracrop(target, crop);
+}
+
+
 OCMD(do_oterraform) {
 	void do_dg_terraform(room_data *target, sector_data *sect);
 
@@ -1031,6 +1080,7 @@ const struct obj_command_info obj_cmd_info[] = {
 	{ "osend", do_osend, SCMD_OSEND },
 	{ "osetval", do_osetval, NO_SCMD },
 	{ "oteleport", do_oteleport, NO_SCMD },
+	{ "oterracrop", do_oterracrop, NO_SCMD },
 	{ "oterraform", do_oterraform, NO_SCMD },
 	{ "otimer", do_otimer, NO_SCMD },
 	{ "otransform", do_otransform, NO_SCMD },

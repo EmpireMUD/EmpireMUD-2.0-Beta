@@ -47,16 +47,17 @@ TRIGEDIT-COMMANDS TRIG-COMMANDS TRIGGER-COMMANDS TRIGEDIT-COMMANDLISTS
 |    rdelete      |    %transform%      |    %transform%   |      %scale%     |
 |     remote      |       mhunt         |      otimer      |%adventurecomplete%
 |     return      |     mremember       |     osetval      |    %terraform%   |
-|     switch      |      mforget        |     %scale%      |==================|
-|      case       |       mgoto         | %adventurecomplete% |
+|     switch      |      mforget        |     %scale%      |    %terracrop%   |
+|      case       |       mgoto         | %adventurecomplete% |===============|
 |     break       |       mkill         |    %terraform%      |
-|     done        |       %junk%        |=====================|
-|     while       |      %follow%       |
-|                 |       %aoe%         | Further help can be accessed by
-|                 |       %dot%         | typing: HELP <COMMAND>.
-|                 |      %scale%        |
+|     done        |       %junk%        |    %terracrop%      |
+|     while       |      %follow%       |=====================|
+|                 |       %aoe%         |
+|                 |       %dot%         | Further help can be accessed by
+|                 |      %scale%        | typing: HELP <COMMAND>.
 |                 | %adventurecomplete% |
 |                 |     %terraform%     |
+|                 |     %terracrop%     |
 ========================================|
 See also: TRIG-TYPES, VARIABLES, EXPRESSIONS
 #d
@@ -258,6 +259,23 @@ room template vnum instead of live room number (if used in an instanced zone).
 %teleport% all 17401
 %teleport% %actor% 1300
 #d
+%TERRACROP% WTERRACROP OTERRACROP MTERRACROP
+
+%terracrop% [location] <crop vnum>
+
+This command allows you to make changes to the map, one tile at a time. It is
+usually a bad idea to terracrop tiles by coordinates. It's almost always
+safest to do this on the map tile the script is running in.
+
+Some sectors cannot be terracropped.
+
+Example:
+  if (%room.sector% ~= Forest)
+    %terracrop% %room% 4900
+  end
+
+See also: %TERRAFORM%
+#d
 %TERRAFORM% WTERRAFORM OTERRAFORM MTERRAFORM
 
 %terraform% [location] <sector vnum>
@@ -272,6 +290,8 @@ Example:
   if (%room.sector% ~= Forest)
     %terraform% %room% 4412
   end
+
+See also: %TERRACROP%
 #d
 %ASOUND% OASOUND MASOUND WASOUND ASOUND
 
