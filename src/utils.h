@@ -95,6 +95,7 @@
 #define GET_ADV_FLAGS(adv)  ((adv)->flags)
 #define GET_ADV_LINKING(adv)  ((adv)->linking)
 #define GET_ADV_PLAYER_LIMIT(adv)  ((adv)->player_limit)
+#define GET_ADV_SCRIPTS(adv)  ((adv)->proto_script)
 
 // utils
 #define ADVENTURE_FLAGGED(adv, flg)  (IS_SET(GET_ADV_FLAGS(adv), (flg)) ? TRUE : FALSE)

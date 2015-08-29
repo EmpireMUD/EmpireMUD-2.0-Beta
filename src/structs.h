@@ -1880,6 +1880,9 @@ struct adventure_data {
 	// lists
 	struct adventure_link_rule *linking;
 	
+	// for cleanup triggers
+	struct trig_proto_list *proto_script;	// list of default triggers
+	
 	UT_hash_handle hh;	// adventure_table hash
 };
 

@@ -139,6 +139,9 @@ void free_adventure(adv_data *adv) {
 			free(link);
 		}
 	}
+	if (GET_ADV_SCRIPTS(adv) && (!proto || GET_ADV_SCRIPTS(adv) != GET_ADV_SCRIPTS(proto))) {
+		free_proto_script(adv, ADV_TRIGGER);
+	}
 	
 	free(adv);
 }
@@ -265,6 +268,11 @@ void parse_adventure(FILE *fl, adv_vnum vnum) {
 				return;
 			}
 			
+			case 'T': {	// trigger
+				dg_read_trigger(line, adv, ADV_TRIGGER);
+				break;
+			}
+			
 			default: {
 				log("SYSERR: Format error in %s, expecting alphabetic flags", buf2);
 				exit(1);
@@ -312,6 +320,9 @@ void write_adventure_to_file(FILE *fl, adv_data *adv) {
 		strcpy(temp2, bitv_to_alpha(link->bld_facing));
 		fprintf(fl, "%d %s %s\n", link->dir, temp, temp2);
 	}
+	
+	// T: triggers
+	script_save_to_disk(fl, adv, ADV_TRIGGER);
 	
 	// end
 	fprintf(fl, "S\n");
@@ -4771,6 +4782,9 @@ void script_save_to_disk(FILE *fp, void *item, int type) {
 		t = ((room_data*)item)->proto_script;
 	else if (type == RMT_TRIGGER) {
 		t = ((room_template*)item)->proto_script;
+	}
+	else if (type == ADV_TRIGGER) {
+		t = ((adv_data*)item)->proto_script;
 	}
 	else {
 		log("SYSERR: Invalid type passed to script_save_to_disk()");

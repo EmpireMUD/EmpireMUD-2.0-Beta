@@ -94,6 +94,7 @@ Adventures (ADVEDIT):
   not have a good level to use for those scripts. Mob scripts don't require it.
 - The !NEARBY flag should only be used on zones where a player shouldn't find
   evidence of them nearby, like a thieves' den.
+- Adventure scripts will ONLY run if they are 'Adventure Cleanup' scripts.
 
 Buildings (BEDIT):
 - Designated rooms are also built in the building editor, using the ROOM flag.
@@ -1780,7 +1781,7 @@ You're standing at the foot of a huge giant!
 
 See also: OLC MOBILES
 #d
-"MEDIT SCRIPTS" "OEDIT SCRIPTS" "REDIT SCRIPTS"
+"ADVEDIT SCRIPTS" "MEDIT SCRIPTS" "OEDIT SCRIPTS" "REDIT SCRIPTS"
 
 Usage:  .script add [position] <trigger vnum>
         .script copy <from type> <from vnum>
@@ -1793,6 +1794,8 @@ don't give a position, it will put it at the end.
 
 When you save your olc editor, all live copies of the thing you were editing
 should get the updated script list right away.
+
+Note: Adventure scripts will only work if they are the Adventure Cleanup type.
 
 See also: OLC MOBILES, OLC OBJECTS, OLC TRIGGERS, VNUM
 #d

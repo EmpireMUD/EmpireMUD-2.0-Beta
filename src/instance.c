@@ -1081,6 +1081,13 @@ void prune_instances(void) {
 * @param room_data *room The map (or interior) location that was the anchor for an instance.
 */
 void unlink_instance_entrance(room_data *room) {
+	adv_data *adv = NULL, *temp;
+	
+	// detect adventure
+	if (COMPLEX_DATA(room) && COMPLEX_DATA(room)->instance) {
+		adv = COMPLEX_DATA(room)->instance->adventure;
+	}
+	
 	// exits to it will be cleaned up by delete_room
 	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_TEMPORARY)) {
 		if (ROOM_PEOPLE(room)) {
@@ -1095,6 +1102,19 @@ void unlink_instance_entrance(room_data *room) {
 	// and the home room
 	REMOVE_BIT(ROOM_BASE_FLAGS(HOME_ROOM(room)), ROOM_AFF_HAS_INSTANCE);
 	REMOVE_BIT(ROOM_AFF_FLAGS(HOME_ROOM(room)), ROOM_AFF_HAS_INSTANCE);
+	
+	// check for scripts
+	if (adv && GET_ADV_SCRIPTS(adv)) {
+		CREATE(temp, adv_data, 1);
+		copy_proto_script(adv, temp, ADV_TRIGGER);
+		room->proto_script = temp->proto_script;
+		free(temp);
+		assign_triggers(room, WLD_TRIGGER);
+		adventure_cleanup_wtrigger(room);
+		
+		// TODO this may over-remove scripts if we ever add additional scripts to rooms
+		extract_script(room, WLD_TRIGGER);
+	}
 }
 
 

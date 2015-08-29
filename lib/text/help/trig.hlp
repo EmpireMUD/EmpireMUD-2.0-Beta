@@ -14,8 +14,8 @@ Triggers are broken up into three types by what they are attached to:
 |  TRIGEDIT-ROOM-ABILITY |   TRIGEDIT-OBJ-WEAR     |  TRIGEDIT-MOB-GREET-ALL |
 |  TRIGEDIT-ROOM-LEAVE   |   TRIGEDIT-OBJ-REMOVE   |  TRIGEDIT-MOB-ENTRY     |
 |  TRIGEDIT-ROOM-DOOR    |   TRIGEDIT-OBJ-LOAD     |  TRIGEDIT-MOB-RECEIVE   |
- ========================|   TRIGEDIT-OBJ-ABILITY  |  TRIGEDIT-MOB-FIGHT     |
-                         |   TRIGEDIT-OBJ-LEAVE    |  TRIGEDIT-MOB-HITPRCNT  |
+|  TRIGEDIT-ROOM-ADVCLN  |   TRIGEDIT-OBJ-ABILITY  |  TRIGEDIT-MOB-FIGHT     |
+ ========================|   TRIGEDIT-OBJ-LEAVE    |  TRIGEDIT-MOB-HITPRCNT  |
                          |   TRIGEDIT-OBJ-CONSUME  |  TRIGEDIT-MOB-BRIBE     |
 Further help can be       =========================|  TRIGEDIT-MOB-LOAD      |
 accessed by typing:                                |  TRIGEDIT-MOB-MEMORY    |
@@ -833,8 +833,11 @@ TRIGEDIT-VARIABLES-ROOMS ROOM-VARIABLES %WEATHER% %ID% %NAME% %DIRECTION% TRIGED
 
 Rooms When using field - The variable returns:
  
+building - The name of the building on the room, if any.
 contents - The id of the first obj in the room.
 coords   - The (x, y) location of the room on the map.
+crop     - The name of the crop on the map room, if any.
+distance(target) - The distance between this room and the target.
 empire_adjective - The owner empire's adjective form, if any.
 empire_id - The owner empire's id number, if any.
 empire_name - The owner empire's name, if any.
@@ -1018,7 +1021,8 @@ ROOM-TRIGGERS TRIGEDIT-ROOM-TYPES
  1) Global       HELP TRIGEDIT-ROOM-GLOBAL
  2) Random       HELP TRIGEDIT-ROOM-RANDOM
  3) Command      HELP TRIGEDIT-ROOM-COMMAND
- 4) Speech       HELP TRIGEDIT-ROOM-SPEECH       
+ 4) Speech       HELP TRIGEDIT-ROOM-SPEECH
+ 5) Adventure Cleanup  HELP TRIGEDIT-ROOM-ADVCLN
  6) Zone Reset   HELP TRIGEDIT-ROOM-ZONE       
  7) Enter        HELP TRIGEDIT-ROOM-ENTER        
  8) Drop         HELP TRIGEDIT-ROOM-DROP
@@ -1205,6 +1209,23 @@ fires by modifying numeric arg to the following values:
 100% = 13 seconds
 
 See Also: TRIGEDIT-OBJ-RANDOM, TRIGEDIT-MOB-RANDOM, TRIGEDIT-ROOM-RANDOM
+#d
+TRIGEDIT-ROOM-ADVCLN TRIGEDIT-ROOM-ADVENTURE-CLEANUP "ADVENTURE CLEANUP"
+
+Activated when an adventure is removed from the world, on the room that the
+adventure was linked to (usually on the map or in a building).
+
+Used with return 0 will prevent further triggers (for example, if you terraform
+the room).
+
+Note: This trigger ONLY works when attached to an adventure directly.
+
+Note: You won't have access to %instance% variable information anymore.
+
+Numeric Arg : percent chance this trigger will be activated. 
+
+Variables:
+%room%     - the room it was activated on.
 #d
 TRIGEDIT-ROOM-COMMAND
 

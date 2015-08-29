@@ -719,7 +719,7 @@ void do_stat_trigger(char_data *ch, trig_data *trig) {
 		len += snprintf(sb + len, sizeof(sb)-len, "Trigger Intended Assignment: Objects\r\n");
 		sprintbit(GET_TRIG_TYPE(trig), otrig_types, buf, TRUE);
 	}
-	else if (trig->attach_type == WLD_TRIGGER || trig->attach_type == RMT_TRIGGER) {
+	else if (trig->attach_type == WLD_TRIGGER || trig->attach_type == RMT_TRIGGER || trig->attach_type == ADV_TRIGGER) {
 		len += snprintf(sb + len, sizeof(sb)-len, "Trigger Intended Assignment: Rooms\r\n");
 		sprintbit(GET_TRIG_TYPE(trig), wtrig_types, buf, TRUE);
 	}
@@ -791,7 +791,7 @@ void script_stat (char_data *ch, struct script_data *sc) {
 			msg_to_char(ch, "  Trigger Intended Assignment: Objects\r\n");
 			sprintbit(GET_TRIG_TYPE(t), otrig_types, buf1, TRUE);
 		}
-		else if (t->attach_type == WLD_TRIGGER || t->attach_type == RMT_TRIGGER) {
+		else if (t->attach_type == WLD_TRIGGER || t->attach_type == RMT_TRIGGER || t->attach_type == ADV_TRIGGER) {
 			msg_to_char(ch, "  Trigger Intended Assignment: Rooms\r\n");
 			sprintbit(GET_TRIG_TYPE(t), wtrig_types, buf1, TRUE);
 		}
@@ -1491,6 +1491,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						break;
 					case WLD_TRIGGER:
 					case RMT_TRIGGER:
+					case ADV_TRIGGER:
 						snprintf(str, slen, "%c%d", UID_CHAR, GET_ROOM_VNUM((room_data*)go) + ROOM_ID_BASE);
 						break;
 				}
@@ -1605,6 +1606,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				case WLD_TRIGGER:
 				case RMT_TRIGGER:
+				case ADV_TRIGGER:
 					room = (room_data*) go;
 
 					if ((c = get_char_by_room(room, name))) {
@@ -1635,6 +1637,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						break;
 					case WLD_TRIGGER:
 					case RMT_TRIGGER:
+					case ADV_TRIGGER:
 						r = (room_data*) go;
 						c = NULL;
 						o = NULL;
@@ -1681,6 +1684,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						break;
 					case WLD_TRIGGER:
 					case RMT_TRIGGER:
+					case ADV_TRIGGER:
 						inst = find_instance_by_room((room_data*)go);
 						break;
 				}
@@ -1751,7 +1755,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 								count++;
 							}
 					}
-					else if (type == WLD_TRIGGER || type == RMT_TRIGGER) {
+					else if (type == WLD_TRIGGER || type == RMT_TRIGGER || type == ADV_TRIGGER) {
 						for (c = ((room_data*) go)->people; c; c = c->next_in_room)
 							if (valid_dg_target(c, DG_ALLOW_GODS)) {
 
@@ -2704,6 +2708,35 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 		else if (r) {
 			if (text_processed(field, subfield, vd, str, slen))
 				return;
+
+			else if (!str_cmp(field, "building")) {
+				if (GET_BUILDING(r)) {
+					snprintf(str, slen, "%s", GET_BLD_NAME(GET_BUILDING(r)));
+				}
+				else {
+					*str = '\0';
+				}
+			}
+
+			else if (!str_cmp(field, "crop")) {
+				crop_data *cp;
+				if ((cp = crop_proto(ROOM_CROP_TYPE(r)))) {
+					snprintf(str, slen, "%s", GET_CROP_NAME(cp));
+				}
+				else {
+					*str = '\0';
+				}
+			}
+
+			else if (!str_cmp(field, "distance")) {
+				room_data *targ;
+				if (subfield && *subfield && (targ = get_room(r, subfield))) {
+					snprintf(str, slen, "%d", compute_distance(r, targ));
+				}
+				else {
+					snprintf(str, slen, "%d", MAP_SIZE);
+				}
+			}
 
 			else if (!str_cmp(field, "name")) {
 				extern char *get_room_name(room_data *room, bool color);

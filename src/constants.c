@@ -2534,7 +2534,7 @@ const char *wtrig_types[] = {
 	"Random",
 	"Command",
 	"Speech",
-	"*",
+	"Adventure Cleanup",
 	"Zone Reset",
 	"Enter",
 	"Drop",
@@ -2558,7 +2558,7 @@ const bitvector_t wtrig_argument_types[] = {
 	TRIG_ARG_PERCENT,	// random
 	TRIG_ARG_COMMAND,	// command
 	TRIG_ARG_PHRASE_OR_WORDLIST,	// speech
-	NOBITS,	// 
+	TRIG_ARG_PERCENT,	// adventure cleanup
 	TRIG_ARG_PERCENT,	// zone reset
 	TRIG_ARG_PERCENT,	// enter
 	TRIG_ARG_PERCENT,	// drop
@@ -2582,6 +2582,7 @@ const char *trig_attach_types[] = {
 	"Object",
 	"Room",
 	"*",	// rmt_trigger -- never set on an actual trigger
+	"*",	// adv_trigger -- never set on an actual trigger
 	"\n"
 };
 
@@ -2591,7 +2592,8 @@ const char **trig_attach_type_list[] = {
 	trig_types,
 	otrig_types,
 	wtrig_types,
-	wtrig_types
+	wtrig_types,	// RMT_TRIGGER (not really used)
+	wtrig_types	// ADV_TRIGGER (not really used)
 };
 
 
@@ -2600,7 +2602,8 @@ const bitvector_t *trig_argument_type_list[] = {
 	mtrig_argument_types,	// MOB_TRIGGER
 	otrig_argument_types,	// OBJ_TRIGGER
 	wtrig_argument_types,	// WLD_TRIGGER
-	wtrig_argument_types	// RMT_TRIGGER (not really used)
+	wtrig_argument_types,	// RMT_TRIGGER (not really used)
+	wtrig_argument_types	// ADV_TRIGGER (not really used)
 };
 
 

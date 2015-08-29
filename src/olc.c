@@ -57,6 +57,7 @@ OLC_MODULE(advedit_minlevel);
 OLC_MODULE(advedit_name);
 OLC_MODULE(advedit_playerlimit);
 OLC_MODULE(advedit_reset);
+OLC_MODULE(advedit_script);
 OLC_MODULE(advedit_startvnum);
 
 // building modules
@@ -302,6 +303,7 @@ const struct olc_command_data olc_data[] = {
 	{ "name", advedit_name, OLC_ADVENTURE, OLC_CF_EDITOR },
 	{ "playerlimit", advedit_playerlimit, OLC_ADVENTURE, OLC_CF_EDITOR },
 	{ "reset", advedit_reset, OLC_ADVENTURE, OLC_CF_EDITOR },
+	{ "script", advedit_script, OLC_ADVENTURE, OLC_CF_EDITOR },
 	{ "startvnum", advedit_startvnum, OLC_ADVENTURE, OLC_CF_EDITOR },
 	
 	// building commands
@@ -3501,6 +3503,13 @@ void olc_process_script(char_data *ch, char *argument, struct trig_proto_list **
 			sprintbit(findtype, olc_type_bits, buf, FALSE);
 			
 			switch (findtype) {
+				case OLC_ADVENTURE: {
+					adv_data *adv = adv_proto(vnum);
+					if (adv && trigger_attach == WLD_TRIGGER) {
+						copyfrom = GET_ADV_SCRIPTS(adv);
+					}
+					break;
+				}
 				case OLC_MOBILE: {
 					char_data *mob = mob_proto(vnum);
 					if (mob && trigger_attach == MOB_TRIGGER) {
