@@ -2741,6 +2741,19 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 			}
 
+			else if (!str_cmp(field, "direction")) {
+				extern const char *dirs[];
+				room_data *targ;
+				int dir;
+				
+				if (subfield && *subfield && (targ = get_room(r, subfield)) && (dir = get_direction_to(r, targ)) != NO_DIR) {
+					snprintf(str, slen, "%s", dirs[dir]);
+				}
+				else {
+					*str = '\0';
+				}
+			}
+
 			else if (!str_cmp(field, "name")) {
 				extern char *get_room_name(room_data *room, bool color);
 				snprintf(str, slen, "%s",  get_room_name(r, FALSE));

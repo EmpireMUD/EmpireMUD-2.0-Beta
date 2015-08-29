@@ -858,6 +858,7 @@ contents - The id of the first obj in the room.
 coords   - The (x, y) location of the room on the map.
 crop     - The name of the crop on the map room, if any.
 distance(target) - The distance between this room and the target.
+direction(target) - The approximate direction to the target.
 empire_adjective - The owner empire's adjective form, if any.
 empire_id - The owner empire's id number, if any.
 empire_name - The owner empire's name, if any.
