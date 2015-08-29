@@ -3404,11 +3404,11 @@ void eval_op(char *op, char *lhs, char *rhs, char *result, void *go, struct scri
 	else if (!strcmp("*", op))
 		sprintf(result, "%d", atoi(lhs) * atoi(rhs));
 
-	else if (!strcmp("/", op))
-		sprintf(result, "%d", (n = atoi(rhs)) ? (atoi(lhs) / n) : 0);
-
 	else if (!strcmp("//", op))
 		sprintf(result, "%d", (n = atoi(rhs)) ? (atoi(lhs) % n) : 0);
+
+	else if (!strcmp("/", op))
+		sprintf(result, "%d", (n = atoi(rhs)) ? (atoi(lhs) / n) : 0);
 
 	else if (!strcmp("+", op)) 
 		sprintf(result, "%d", atoi(lhs) + atoi(rhs));
@@ -3508,8 +3508,8 @@ int eval_lhs_op_rhs(char *expr, char *result, void *go, struct script_data *sc, 
 		"~=",
 		"-",
 		"+",
-		"/",
 		"//",
+		"/",
 		"*",
 		"!",
 		"\n"

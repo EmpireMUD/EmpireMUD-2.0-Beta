@@ -1033,7 +1033,7 @@ evaluated from left to right. Parenthesis can be used to group.
 |   +    | addition              | 10 + 15 = 25              |
 |   *    | multiplication        | 10 * 20 = 400             |
 |   /    | division              | 100 / 20 = 5              |
-|   //   | remainder             | 5 % 4 = 1
+|   //   | remainder             | 5 // 4 = 1                |
 |   !    | negation              | !() = 1; !0 = 1; !dog = 0;| 
 --------------------------------------------------------------
 #d
