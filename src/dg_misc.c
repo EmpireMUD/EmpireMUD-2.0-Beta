@@ -243,7 +243,7 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 * @param crop_data *cp The crop to change it to.
 */
 void do_dg_terracrop(room_data *target, crop_data *cp) {
-	sector_data *old_sect, *sect;
+	sector_data *sect;
 	empire_data *emp;
 	
 	if (!target || !cp) {
@@ -251,7 +251,6 @@ void do_dg_terracrop(room_data *target, crop_data *cp) {
 	}
 	
 	emp = ROOM_OWNER(target);
-	old_sect = ROOM_ORIGINAL_SECT(target);
 	
 	if (!(sect = find_first_matching_sector(SECTF_CROP, NOBITS))) {
 		// no crop sects?
