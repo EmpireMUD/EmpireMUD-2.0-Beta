@@ -3504,7 +3504,7 @@ void olc_process_script(char_data *ch, char *argument, struct trig_proto_list **
 			
 			switch (findtype) {
 				case OLC_ADVENTURE: {
-					adv_data *adv = adv_proto(vnum);
+					adv_data *adv = adventure_proto(vnum);
 					if (adv && trigger_attach == WLD_TRIGGER) {
 						copyfrom = GET_ADV_SCRIPTS(adv);
 					}
