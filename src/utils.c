@@ -2372,16 +2372,14 @@ char *CAP(char *txt) {
 * @return int the number of &0-style color codes in the string
 */
 int count_color_codes(char *string) {
-	const char *valid_colors = "rgybmcwRGYBMCW0u?";
-	
 	int iter, count = 0, len = strlen(string);
 	for (iter = 0; iter < len - 1; ++iter) {
-		if (string[iter] == '&' && strchr(valid_colors, string[iter+1])) {
+		if (string[iter] == '&' && string[iter+1] == '&') {
+			++iter;	// advance past the && (not a color code)
+		}
+		if (string[iter] == '&') {
 			++count;
 			++iter;	// advance past the color code
-		}
-		else if (string[iter] == '&' && string[iter+1] == '&') {
-			++iter;	// advance past the &&
 		}
 	}
 	
@@ -2646,19 +2644,11 @@ void replace_question_color(char *input, char *color, char *output) {
 */
 char *show_color_codes(char *string) {
 	static char value[MAX_STRING_LENGTH];
-	int iter, pos = 0;
+	char *ptr;
 	
-	for (iter = 0; iter < strlen(string); ++iter) {
-		if (string[iter] == '&' && pos < MAX_STRING_LENGTH) {
-			value[pos++] = '&';
-		}
-		if (pos < MAX_STRING_LENGTH) {
-			value[pos++] = string[iter];
-		}
-	}
-
-	// terminate	
-	value[MIN(pos, MAX_STRING_LENGTH-1)] = '\0';
+	ptr = str_replace("&", "&&", string);
+	strcpy(value, ptr);
+	free(ptr);
 	
 	return value;
 }
