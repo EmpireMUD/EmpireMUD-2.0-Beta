@@ -2372,11 +2372,16 @@ char *CAP(char *txt) {
 * @return int the number of &0-style color codes in the string
 */
 int count_color_codes(char *string) {
+	const char *valid_colors = "rgybmcwRGYBMCW0u?";
+	
 	int iter, count = 0, len = strlen(string);
 	for (iter = 0; iter < len - 1; ++iter) {
-		if (string[iter] == '&' && string[iter+1] != '&') {
+		if (string[iter] == '&' && strchr(valid_colors, string[iter+1])) {
 			++count;
 			++iter;	// advance past the color code
+		}
+		else if (string[iter] == '&' && string[iter+1] == '&') {
+			++iter;	// advance past the &&
 		}
 	}
 	
