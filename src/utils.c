@@ -2646,16 +2646,14 @@ void replace_question_color(char *input, char *color, char *output) {
 */
 char *show_color_codes(char *string) {
 	static char value[MAX_STRING_LENGTH];
-	char *ptr;
 	int pos = 0;
 	
-	for (ptr = string; *ptr && pos < MAX_STRING_LENGTH; ++ptr) {
-		if (*ptr == '&') {
+	for (; *string; ++string) {
+		if (*string == '&' && pos < MAX_STRING_LENGTH) {
 			value[pos++] = '&';
 		}
-		// verify string length
 		if (pos < MAX_STRING_LENGTH) {
-			value[pos++] = *ptr;
+			value[pos++] = *string;
 		}
 	}
 
