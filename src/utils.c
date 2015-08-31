@@ -2649,18 +2649,18 @@ char *show_color_codes(char *string) {
 	char *ptr;
 	int pos = 0;
 	
-	for (ptr = string; *ptr && pos < sizeof(value); ++ptr) {
+	for (ptr = string; *ptr && pos < MAX_STRING_LENGTH; ++ptr) {
 		if (*ptr == '&') {
 			value[pos++] = '&';
 		}
 		// verify string length
-		if (pos < sizeof(value)) {
+		if (pos < MAX_STRING_LENGTH) {
 			value[pos++] = *ptr;
 		}
 	}
 
 	// terminate	
-	value[MIN(pos, sizeof(value)-1)] = '\0';
+	value[MIN(pos, MAX_STRING_LENGTH-1)] = '\0';
 	
 	return value;
 }
