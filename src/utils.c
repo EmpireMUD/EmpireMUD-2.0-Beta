@@ -2647,10 +2647,20 @@ void replace_question_color(char *input, char *color, char *output) {
 char *show_color_codes(char *string) {
 	static char value[MAX_STRING_LENGTH];
 	char *ptr;
+	int pos = 0;
 	
-	ptr = str_replace("&", "&&", string);
-	strcpy(value, ptr);
-	free(ptr);
+	for (ptr = string; *ptr && pos < sizeof(value); ++ptr) {
+		if (*ptr == '&') {
+			value[pos++] = '&';
+		}
+		// verify string length
+		if (pos < sizeof(value)) {
+			value[pos++] = *ptr;
+		}
+	}
+
+	// terminate	
+	value[MIN(pos, sizeof(value)-1)] = '\0';
 	
 	return value;
 }
