@@ -299,7 +299,7 @@ a dragonguard stone~
 A dragonguard stone has been left behind.~
    This stone is fire-branded with the sigil of the dragonguard. It is capable
 of summoning a dragonguard to patrol your city just like a cityguard. The
-dragonguard will stay where you summon him, so choose wisely.  
+dragonguard will stay where you summon him, so choose wisely.
 Type 'use dragonguard' to summon it.
 ~
 3 p a 4
@@ -360,13 +360,13 @@ R
 5114 0
 S
 #10341
-object new~
+wristguard dragonscale guard~
 a dragonscale wristguard~
 A dragonscale wristguard is lying on the ground.~
-   This finely crafted wristguard looks like it could take quite a beating. 
-It's made from actual dragon scales.  
+   This finely crafted wristguard looks like it could take quite a beating.
+It's made from actual dragon scales.
 ~
-27 mo aj 1
+27 mo aj 2
 3 0 0
 14 0
 A
@@ -397,7 +397,7 @@ bangles dragonscale~
 dragonscale bangles~
 Some dragonscale bangles have been left here.~
    These bangles appear to have been cut from dragonscale, a truly rare
-material. What's more, there's a nocturnium mesh woven around them.  
+material. What's more, there's a nocturnium mesh woven around them.
 ~
 27 mo aj 1
 0 0 0
@@ -429,7 +429,7 @@ bracers dragonscale~
 dragonscale bracers~
 Some dragonscale bracers are lying here.~
    These bracers are made from rare dragon scales, fixed to tough leather, and
-edges with sharpened imperium.  
+edges with sharpened imperium.
 ~
 27 mo aj 2
 1 0 0
