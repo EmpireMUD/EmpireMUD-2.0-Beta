@@ -1,0 +1,147 @@
+#10500
+gardner hooded magiterranean~
+the Magiterranean gardner~
+A hooded gardner is poking at the ground.
+~
+5 80 dv coB
+0 2 0 22
+T 10501
+S
+#10501
+terrier foxglove~
+the foxglove terrier~
+A foxglove terrier runs circles around you.
+~
+1 1 bdoD n
+0 0 0 9
+T 9901
+T 9902
+T 10504
+S
+#10502
+retriever verdant grass-green green~
+the verdant retriever~
+A grass-green verdant retriever is holding a stick in its mouth.
+~
+1 1 bdoD n
+0 0 0 9
+T 9901
+T 9902
+T 10504
+S
+#10503
+poodle petal pink~
+the petal poodle~
+A pink petal poodle wags her tail.
+~
+1 1 bdoD n
+2 0 0 9
+T 9901
+T 9902
+T 10504
+S
+#10504
+spaniel sunflower~
+the sunflower spaniel~
+A sunflower spaniel barks up at the sky.
+~
+1 1 bdoD n
+0 0 0 9
+T 9901
+T 9902
+T 10504
+S
+#10505
+guard skeletal~
+a skeletal guard~
+A skeletal guard marches silently past.
+~
+100 125 dhqtuD c
+0 0 0 1
+S
+#10506
+sheep skeletal skeleton empty~
+a skeletal sheep~
+The empty skeleton of a sheep is frolicking around.
+~
+5 10 djoy 0
+0 0 0 9
+S
+#10507
+chicken undead~
+an undead chicken~
+An undead chicken is pecking mindlessly at the ground.
+~
+1 3 djo 0
+2 0 0 10
+S
+#10508
+hound skeletal~
+a skeletal hound~
+A skeletal hound is lying here as if basking in the sun.
+~
+20 40 djoz c
+0 0 14 9
+S
+#10509
+horse zombie~
+a zombie horse~
+An zombie horse is standing here, skin still falling off it.
+~
+30 60 dejo 0
+0 0 14 11
+I 3 10510 100.00 1 X  # BARDE: a zombie charger
+S
+#10510
+charger zombie armored~
+a zombie charger~
+An armored zombie charger is decomposing valiantly here.
+~
+40 80 bdej 0
+0 0 0 11
+I 4 175 100.00 4  # LOOT: an iron ingot
+I 4 175 75.00 2  # LOOT: an iron ingot
+I 4 175 50.00 2  # LOOT: an iron ingot
+I 4 175 50.00 2  # LOOT: an iron ingot
+S
+#10511
+cat skeletal~
+a skeletal cat~
+A skeletal cat is cleaning its bones.
+~
+10 30 djoz c
+0 0 0 10
+S
+#10512
+skeleton cow skeletal~
+a skeletal cow~
+The skeleton of a cow is trying to graze here.
+~
+5 10 djoy 0
+0 0 0 11
+S
+#10513
+bird decaying zombie~
+a zombie bird~
+A decaying bird flies overhead on tattered wings.
+~
+5 15 djo m
+0 0 2 10
+S
+#10514
+rabbit skeletal~
+a skeletal rabbit~
+A skeletal rabbit hops around.
+~
+1 3 djo 0
+0 0 15 9
+S
+#10515
+vegetable vigilant~
+a vigilant vegetable~
+A vigilant vegetable stalks the fields.
+~
+125 150 doqtu c
+0 0 13 7
+S
+$
