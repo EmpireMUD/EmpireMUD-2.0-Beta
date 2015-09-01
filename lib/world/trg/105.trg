@@ -41,8 +41,8 @@ elseif (%room.sector% ~= Crop && (%room.crop% == axeroot || %room.crop% == puppy
   halt
 else
   * pick a crop -- use start of time as jan 1, 2015: 1420070400
-  * 2635200 seconds in a month
-  eval month ((%timestamp% - 1420070400) / 2635200) // 12
+  * 2628288 seconds in a month
+  eval month ((%timestamp% - 1420070400) / 2628288) // 12
   eval vnum -1
   switch (%month% + 1)
     case 1
@@ -208,8 +208,8 @@ Interdimensional Whirlwind Cleanup~
 2 e 100
 ~
 * pick a crop -- use start of time as jan 1, 2015: 1420070400
-* 2635200 seconds in a month
-eval month ((%timestamp% - 1420070400) / 2635200) // 12
+* 2628288 seconds in a month
+eval month ((%timestamp% - 1420070400) / 2628288) // 12
 eval vnum -1
 switch (%month% + 1)
   case 1
