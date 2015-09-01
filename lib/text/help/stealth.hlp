@@ -31,6 +31,7 @@ Backstab (Stealth ability)
 
 Usage:  backstab [victim]
 Cooldown:  9 seconds
+Cost:  15 move
 
 A brave warrior looks his foe in the eye, but a clever assassin looks his
 target in the back as he strikes. You must wield a stabbing weapon to use this
@@ -46,9 +47,11 @@ Blind (Stealth ability)
 
 Usage:  blind [victim]
 Cooldown:  10 seconds
+Cost:  15 move
 Debuff type:  Stealth
 
-You toss sand in your opponents' eyes, blinding them for 10 seconds.
+You toss sand in your opponents' eyes, blinding them for 10 seconds. Being
+unable to see your foes inflicts a penalty of -50 to To-hit and Dodge.
 
 If you're fighting, this will automatically target your opponent.
 #
@@ -94,6 +97,7 @@ Darkness (Stealth ability)
 
 Usage:  darkness
 Cooldown:  15 seconds
+Cost:  15 move
 
 Master the power of shadow to blanket an area in darkness. It becomes much
 harder to see anything any at all, even where there should be daylight. This
@@ -133,7 +137,7 @@ ESCAPE
 Escape (Stealth ability)
 
 Usage:  escape
-Cost:  10 mv
+Cost:  10 move
 Time:  5 seconds
 
 Escape lets you run for the nearest window and quickly exit the building or
@@ -149,7 +153,7 @@ When you type hide there is a chance that you hide in the room. If hidden you
 can't be seen by other people. Hide is broken by pressing return, regardless
 of whether you typed a command or not.
 
-See also: SEARCH, SNEAK
+See also: SEARCH, SNEAK, SENSE LIFE RITUAL
 #
 HOWL
 
@@ -171,6 +175,7 @@ Class ability: Occultist
 Debuff type: Stealth
 Cost: 50 move
 Cooldown: 30 seconds
+Usage:  shadowcage
 
 You create a cage of shadows, penalizing all enemies. The first victim loses
 dodge equal to 4x your Charisma. Each additional victim loses dodge equal to 2x
@@ -201,10 +206,13 @@ Jab (Stealth ability)
 
 Usage:  jab
 Cooldown:  9 seconds
+Cost:  15 move
 
 Jab your opponent while he's not looking and leave a wound in his side that
 will fester for 15 seconds, dealing additional damage. This ability stacks up
 to 2 times.
+
+This ability requires a stabbing weapon.
 
 See also: CRUCIAL JAB, SHADOW JAB, STAGGER JAB
 #
@@ -263,6 +271,7 @@ Prick (Stealth ability)
 
 Usage:  prick [target]
 Cooldown:  9 seconds
+Cost:  10 move
 
 This ability applies your poison quickly and subtly, and will work even if
 you're not in combat. If your target can't see you, it won't even start
@@ -276,6 +285,8 @@ Sap (Stealth ability)
 
 Usage:  sap <victim>
 Cooldown:  9 seconds
+Cost:  15 move
+Duration:  1 minute
 Debuff type:  Stealth, Stun
 
 This ability will temporarily stun your victim, giving you a moment to collect
@@ -303,7 +314,7 @@ See also: HIDE
 
 Resources:  20 lumber, 6 nails, 20 blocks, 5 imperium ingots
 Built on:  plains, desert
-Chameleon:  .... or &Y....&0
+Chameleon:  &g....&0 or &Y....&0
 
 This ability allows you to build the secret cache, a place to store your
 wealth that is more easily hidden than a vault.
@@ -350,6 +361,7 @@ Shadowstep (Stealth ability)
 
 Usage:  shadowstep <target>
 Cooldown:  1 minute
+Cost:  50 move
 
 Shadowstep allows a talented assassin to step into one shadow and, seemingly,
 appear out of another. This ability takes you instantly to your target. It has
@@ -412,6 +424,7 @@ See also: VAULTCRACKING
 
 Usage:  summon thugs
 Cooldown:  3 minutes
+Cost:  10 move
 
 This ability summons up to (Charisma / 3, rounded up) thugs, who will follow
 you around. This is best combined with the Disguise ability, as you can mask
@@ -426,7 +439,7 @@ Terrify (Stealth ability)
 Usage:  terrify [victim]
 Cooldown:  15 seconds
 Debuff type:  Stealth
-Cost:  15 moves
+Cost:  15 move
 
 Use the power of the shadows to make your foes cower in fear, lowering the
 physical and magical damage they deal by an amount equal to your total level

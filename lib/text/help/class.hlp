@@ -46,6 +46,8 @@ Trade: Steelsmith (Battle), Guildsman (Empire), Artificer (High Sorcery),
         Antiquarian (Vampire)
 Vampire: Reaper (Battle), Ancient (Empire), Lich (High Sorcery), Necromancer
         (Natural Magic), Shade (Stealth), Wight (Survival), Antiquarian (Trade)
+		
+See also: TANK, HEALER, MELEE, CASTER
 #
 ARCHETYPES "STARTING ARCHETYPES" "STARTING CLASS"
 
@@ -64,7 +66,7 @@ The available archetypes are:
  Novice Sorcerer - master the rituals (High Sorcery, Battle, Intelligence)
  Lone Vampire - empowered by blood (Vampire, Battle, Wits)
 #
-"ALCHEMIST CLASS" ALCHEMIST
+"ALCHEMIST CLASS" ALCHEMIST ALCH
 
 Alchemist
 Natural Magic + Trade
@@ -73,9 +75,9 @@ Healer: Alchemist Crafts, Fastcasting, Resurrect
 
 Note: Class abilities are unfinished.
 
-See also: CLASS
+See also: CLASS, HEALER
 #
-"ANCIENT CLASS" ANCIENT
+"ANCIENT CLASS" ANCIENT ANCT
 
 Ancient
 Vampire + Empire
@@ -84,9 +86,9 @@ Melee: Dragonriding
 
 Note: Class abilities are unfinished.
 
-See also: CLASS
+See also: CLASS, MELEE
 #
-"ANTIQUARIAN CLASS"
+"ANTIQUARIAN CLASS" ANTQ
 
 Antiquarian
 Trade + Vampire
@@ -95,9 +97,9 @@ Melee: Antiquarian Crafts
 
 Note: Class abilities are unfinished.
 
-See also: CLASS
+See also: CLASS, MELEE
 #
-"ARCHMAGE CLASS"
+"ARCHMAGE CLASS" ACHM
 
 Archmage
 High Sorcery + Natural Magic
@@ -107,9 +109,9 @@ Healer: Fastcasting, Resurrect
 
 Note: Class abilities are unfinished.
 
-See also: CLASS
+See also: CLASS, CASTER, HEALER
 #
-"ARTIFICER CLASS"
+"ARTIFICER CLASS" ARTF
 
 Artificer
 High Sorcery + Trade
@@ -118,9 +120,9 @@ Caster: Artificer Crafts
 
 Note: Class abilities are unfinished.
 
-See also: CLASS
+See also: CLASS, CASTER
 #
-"ASSASSIN CLASS"
+"ASSASSIN CLASS" ASSN
 
 Assassin
 Battle + Stealth
@@ -129,9 +131,9 @@ Melee: Dual-Wield, Shadow Kick
 
 Note: Class abilities are unfinished.
 
-See also: CLASS
+See also: CLASS, MELEE
 #
-"BANDIT CLASS"
+"BANDIT CLASS" BNDT
 
 Bandit
 Stealth + Survival
@@ -140,9 +142,9 @@ Melee: Crucial Jab, Dual-Wield
 
 Note: Class abilities are unfinished.
 
-See also: CLASS
+See also: CLASS, MELEE
 #
-"BARBARIAN CLASS"
+"BARBARIAN CLASS" BRBN
 
 Barbarian
 Battle + Survival
@@ -152,9 +154,9 @@ Melee: Two-Handed Weapons
 
 Note: Class abilities are unfinished.
 
-See also: CLASS
+See also: CLASS, TANK, MELEE
 #
-"BATTLEMAGE CLASS" "BATTLE MAGE CLASS"
+"BATTLEMAGE CLASS" "BATTLE MAGE CLASS" BTMG
 
 Battlemage
 Battle + High Sorcery
@@ -186,7 +188,7 @@ Caster traits:
 
 See also: HEALER, HIT CAP, MELEE, TANK
 #
-"DUKE CLASS"
+"DUKE CLASS" DUKE
 
 Duke
 Battle + Empire
@@ -196,9 +198,9 @@ Melee: Dragonriding, Two-Handed Weapons
 
 Note: Class abilities are unfinished.
 
-See also: CLASS
+See also: CLASS, TANK, MELEE
 #
-"ELDER CLASS"
+"ELDER CLASS" ELDR
 
 Elder
 Empire + Survival
@@ -207,9 +209,9 @@ Melee: Dragonriding
 
 Note: Class abilities are unfinished.
 
-See also: CLASS
+See also: CLASS, MELEE
 #
-"EXARCH CLASS"
+"EXARCH CLASS" EXRC
 
 Exarch
 Empire + High Sorcery
@@ -218,9 +220,9 @@ Caster: Dragonriding, Exarch Buildings
 
 Note: Class abilities are unfinished.
 
-See also: CLASS
+See also: CLASS, CASTER
 #
-"FERAL CLASS"
+"FERAL CLASS" FERL
 
 Feral
 Natural Magic + Survival
@@ -230,9 +232,9 @@ Healer: Fastcasting, Resurrect, Sage Werewolf Form
 
 Note: Class abilities are unfinished.
 
-See also: CLASS
+See also: CLASS, TANK, HEALER
 #
-"GUILDSMAN CLASS"
+"GUILDSMAN CLASS" GDSM
 
 Guildsman
 Empire + Trade
@@ -241,7 +243,7 @@ Melee: Dragonriding, Guildsman Crafts
 
 Note: Class abilities are unfinished.
 
-See also: CLASS
+See also: CLASS, MELEE
 #
 HEALER HEALING "HEALER ROLE" "HEALING ROLE" "HEALER TRAITS" "HEALING TRAITS"
 
@@ -275,9 +277,9 @@ Caster: Dread Blood Form
 
 Note: Class abilities are unfinished.
 
-See also: CLASS
+See also: CLASS, CASTER
 #
-"LUMINARY CLASS"
+"LUMINARY CLASS" LMNY
 
 Luminary
 Empire + Natural Magic
@@ -290,7 +292,7 @@ their Greatness in addition to the 4 healer traits.
 
 Note: Class abilities are unfinished.
 
-See also: CLASS
+See also: CLASS, CASTER, HEALER
 #
 MELEE "MELEE ROLE" "DPS ROLE" "MELEE DPS ROLE" "MELEE TRAITS"
 
@@ -313,7 +315,7 @@ Melee traits:
 
 See also: CASTER, HEALER, HIT CAP, TANK
 #
-"NECROMANCER CLASS"
+"NECROMANCER CLASS" NECR
 
 Necromancer
 Natural Magic + Vampire
@@ -323,9 +325,9 @@ Healer: Fastcasting, Resurrect
 
 Note: Class abilities are unfinished.
 
-See also: CLASS
+See also: CLASS, CASTER, HEALER
 #
-"OCCULTIST CLASS"
+"OCCULTIST CLASS" OCLT
 
 Occultist
 High Sorcery + Stealth
@@ -334,9 +336,9 @@ Melee: Shadowcage
 
 Note: Class abilities are unfinished.
 
-See also: CLASS
+See also: CLASS, MELEE
 #
-"POWERBROKER CLASS" "POWER BROKER CLASS"
+"POWERBROKER CLASS" "POWER BROKER CLASS" PWBK
 
 Powerbroker
 Empire + Stealth
@@ -345,9 +347,9 @@ Melee: Dragonriding, Stagger Jab
 
 Note: Class abilities are unfinished.
 
-See also: CLASS
+See also: CLASS, MELEE
 #
-"REAPER CLASS"
+"REAPER CLASS" REAP
 
 Reaper
 Battle + Vampire
@@ -357,9 +359,9 @@ Melee: Horrid Form
 
 Note: Class abilities are unfinished.
 
-See also: CLASS
+See also: CLASS, TANK, MELEE
 #
-"SHADE CLASS"
+"SHADE CLASS" SHDE
 
 Shade
 Stealth + Vampire
@@ -368,9 +370,9 @@ Melee: Horrid Form, Shadow Jab
 
 Note: Class abilities are unfinished.
 
-See also: CLASS
+See also: CLASS, MELEE
 #
-"SHADOW WOLF CLASS"
+"SHADOW WOLF CLASS" SHWF
 
 Shadow Wolf
 Natural Magic + Stealth
@@ -380,9 +382,9 @@ Healer: Fastcasting, Moonrise, Sage Werewolf Form
 
 Note: Class abilities are unfinished.
 
-See also: CLASS
+See also: CLASS, MELEE, HEALER
 #
-"SMUGGLER CLASS"
+"SMUGGLER CLASS" SMGL
 
 Smuggler
 Stealth + Trade
@@ -391,9 +393,9 @@ Melee: Diversion, Dual-Wield, Smuggler Crafts
 
 Note: Class abilities are unfinished.
 
-See also: CLASS
+See also: CLASS, MELEE
 #
-"STEELSMITH CLASS" "STEEL SMITH CLASS"
+"STEELSMITH CLASS" "STEEL SMITH CLASS" SMTH
 
 Steelsmith
 Battle + Trade
@@ -402,7 +404,7 @@ Melee: Steelsmith Crafts, Two-Handed Weapons
 
 Note: Class abilities are unfinished.
 
-See also: CLASS
+See also: CLASS, MELEE
 #
 TANK TANKING "TANK ROLE" "TANKING ROLE" "TANK TRAITS" "TANKING ROLE"
 
@@ -428,7 +430,7 @@ Tank traits:
 
 See also: CASTER, DODGE CAP, HEALER, MELEE
 #
-"THEURGE CLASS"
+"THEURGE CLASS" THRG
 
 Theurge
 High Sorcery + Survival
@@ -439,7 +441,7 @@ Note: Class abilities are unfinished.
 
 See also: CLASS
 #
-"TINKER CLASS"
+"TINKER CLASS" TNKR
 
 Tinker
 Survival + Trade
@@ -448,9 +450,9 @@ Melee: Tinker Crafts
 
 Note: Class abilities are unfinished.
 
-See also: CLASS
+See also: CLASS, MELEE
 #
-"WEREWOLF CLASS"
+"WEREWOLF CLASS" WWLF
 
 Werewolf
 Battle + Natural Magic
@@ -464,9 +466,9 @@ allies, and should build their Strength in addition to the 4 healer traits.
 
 Note: Class abilities are unfinished.
 
-See also: CLASS
+See also: CLASS, TANK, MELEE, HEALER
 #
-"WIGHT CLASS"
+"WIGHT CLASS" WGHT
 
 Wight
 Survival + Vampire
@@ -475,6 +477,6 @@ Melee: Horrid Form
 
 Note: Class abilities are unfinished.
 
-See also: CLASS
+See also: CLASS, MELEE
 #
 $~

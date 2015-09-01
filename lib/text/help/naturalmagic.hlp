@@ -101,6 +101,8 @@ CLEANSE
 Cleanse (Natural Magic ability)
 
 Usage:  cleanse [target]
+Cooldown:  9 seconds
+Cost:  30 mana
 
 Nature mages are able to draw on the cleansing powers of their mana and can
 channel it to remove many afflictions. This spell wipes away all but the
@@ -137,6 +139,7 @@ COUNTERSPELL "COUNTER SPELL"
 Counterspell (Natural Magic ability)
 
 Usage:  counterspell
+Duration:  75 seconds
 
 A clever nature mage can set up counterspell magic to deflect the next hostile
 spell cast against him or her. Each counterspell lasts one game hour, or
@@ -147,6 +150,7 @@ EARTHARMOR "EARTH ARMOR"
 Eartharmor (Natural Magic ability)
 
 Usage:  eartharmor <target>
+Cost:  20 mana
 
 This spell allows a nature mage to coat his or her allies in a powerful
 coating of earth, protecting them from some damage. It adds an amount of
@@ -161,6 +165,7 @@ Earthmeld (Natural Magic ability)
 
 Usage:  earthmeld
 Cooldown:  2 minutes (after you rise from the earth)
+Cost:  50 mana
 
 This command lets you sink into the earth, or rise again, using the power of
 Natural Magic. You can do nothing while interred within the earth, but it is
@@ -174,6 +179,7 @@ Entangle (Natural Magic ability)
 
 Usage:  entangle [target]
 Cooldown:  30 seconds
+Cost:  20 mana
 Debuff type:  Natural Magic
 
 Nature mages have the power to entangle their foes in mana, preventing them
@@ -190,6 +196,7 @@ FAMILIAR
 Familiar (Natural Magic ability)
 
 Usage:  familiar <type>
+Cost:  40 mana
 
 Natural Magic users are able to become friends with all sorts of animals, to
 the point where they can summon the aid of a familiar animal. When you call
@@ -228,6 +235,7 @@ FLY FLIGHT
 Fly (Natural Magic ability)
 
 Usage:  fly
+Cost:  50 mana
 
 Powerful nature mages can fly on wings made of pure mana. This allows them
 to soar over seas, mountains, and even walls. If you also have the Ride
@@ -262,6 +270,7 @@ HEAL "HEAL FRIEND" "HEAL PARTY"
 Heal, Heal Friend, Heal Party (Natural Magic ability)
 
 Usage:  heal [person | party]
+Cost:  15+ mana (based on amount healed)
 
 Practitioners of Natural Magic can learn to heal themselves and others using
 mana. It is easiest to heal one's own self, but a powerful user can heal an
@@ -358,6 +367,7 @@ PURIFY
 Purify (Natural Magic ability)
 
 Usage:  purify <person>
+Cost:  50 mana
 
 Purify is used by Natural Magic casters to wipe away serious curses such as
 Vampirism. However, it doesn't work on daywalking vampires.
@@ -396,6 +406,7 @@ Rejuvenate (Natural Magic ability)
 
 Usage:  rejuvenate [target]
 Cooldown:  15 seconds
+Cost:  25 mana
 
 By blessing a person with rejuvenation, a nature mage can cause that person's
 wounds to heal themselves over time. This spell heals the target every 5
@@ -451,6 +462,7 @@ Skybrand (Natural Magic ability)
 
 Usage:  skybrand [target]
 Cooldown:  6 seconds
+Cost:  30 mana
 Debuff type:  Natural Magic
 
 A nature mage can mark a target with the Skybrand, causing the victim to take
@@ -473,6 +485,7 @@ SOULSIGHT "SOUL SIGHT"
 Soulsight (Natural Magic ability)
 
 Usage:  soulsight <target>
+Cost:  5 mana
 
 By looking into a person's soul, a nature mage can learn more about them. This
 will reveal if the target has any spells affecting him.
@@ -487,6 +500,7 @@ Summon Animals (Natural Magic ability)
 
 Usage:  summon animals
 Cooldown:  30 seconds
+Cost:  10 mana
 
 This ability allows you to summon up to (Wits / 3, rounded up) animals from
 the surrounding area. These animals will follow you as their leader, and will
