@@ -260,7 +260,7 @@ Cooldown:  6 seconds
 Cost:  20 move
 
 This command is useful if you want to try and make an attacker hit you instead
-of your poor friend who is being pummeled. You can only 'turn' one animal for
+of your poor friend who is being pummeled. You can only 'turn' one enemy for
 each rescue attempt. This is very useful when working in hunting parties, of
 course.
 
@@ -316,7 +316,7 @@ short your character waits between attacks.
 Your current speed is shown on your score display. A lower speed is better,
 since it is the time between attacks.
 
-See also: SCORE
+See also: SCORE, WITS, HASTEN, SLOW
 #
 "STUNNING BLOW"
 
