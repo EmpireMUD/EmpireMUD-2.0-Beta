@@ -50,7 +50,8 @@ Cooldown:  10 seconds
 Cost:  15 move
 Debuff type:  Stealth
 
-You toss sand in your opponents' eyes, blinding them for 10 seconds.
+You toss sand in your opponents' eyes, blinding them for 10 seconds. Being
+unable to see your foes inflicts a penalty of -50 to To-hit and Dodge.
 
 If you're fighting, this will automatically target your opponent.
 #
