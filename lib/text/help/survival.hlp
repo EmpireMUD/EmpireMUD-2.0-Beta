@@ -74,7 +74,7 @@ You can build the following shelters:
 
 See also: BUILD, DISMANTLE, ABANDON
 #
-FINDER "FINDER SKILL"
+FINDER
 
 Finder (Survival ability)
 
@@ -147,7 +147,7 @@ This ability gives you a 33% chance to dodge a blow that would deal fatal
 damage. You will be briefly stunned and unable to enter commands, for an amount
 of time based on your Dexterity.
 #
-MOUNT DISMOUNT RIDING "RIDE SKILL" "ALL-TERRAIN RIDING" "ALL TERRAIN RIDING" ATR SADDLE
+MOUNT DISMOUNT RIDING RIDE "ALL-TERRAIN RIDING" "ALL TERRAIN RIDING" ATR SADDLE
 
 Ride (Survival ability)
 All-Terrain Riding (Survival ability)
@@ -182,7 +182,7 @@ In order to cross large mountain ranges, you must learn Mountain climbing.
 It still takes a lot of energy to cross, but it's not possible at all
 otherwise.
 #
-NAVIGATION "NAVIGATION SKILL" COORDINATES
+NAVIGATION COORDINATES
 
 Navigation (Survival ability)
 
@@ -216,7 +216,7 @@ or "where" commands, but this ability only functions outdoors.
 
 See also: TRACK, WHERE, UNSEEN PASSING
 #
-PATHFINDING "PATHFIND SKILL"
+PATHFINDING
 
 Pathfinding (Survival ability)
 
@@ -250,7 +250,7 @@ Poison also allows your physical resistance trait to apply to poison damage.
 
 Both of these abilities give skill-ups only when they trigger.
 #
-STAMINA "STAMINA SKILL"
+STAMINA
 
 Stamina (Survival ability)
 
@@ -279,7 +279,7 @@ never get thirsty in the first place.
 
 See also: FILL, DRINK
 #
-TRACK "TRACK SKILL"
+TRACK
 
 Track (Survival ability)
 

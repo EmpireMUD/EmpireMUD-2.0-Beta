@@ -82,7 +82,7 @@ The active attribute in each category cannot go below 1 from equipment; you
 will not be able to use any item that lowers your active attributes below 1.
 There is also currently a maximum rating of 15 in these attributes.
 
-See also: DODGE, EMPIRE GREATNESS, SECONDARY ATTRIBUTES, TO-HIT
+See also: DODGE, EMPIRE GREATNESS, SPEED, TO-HIT
 #
 AUTORECALL "AUTO-RECALL" "AUTO RECALL"
 
@@ -517,7 +517,7 @@ is a good way to see what level (or level range) an instance is scaled to.
 
 See also: ADVENTURE
 #
-LEVEL LEVELS "GEAR LEVELS"
+LEVEL LEVELS "GEAR LEVELS" "SKILL LEVEL"
 
 Unlike many games, where your skills and equipment are based on your level,
 EmpireMUD does it backwards. Your level is based on your skills and gear.

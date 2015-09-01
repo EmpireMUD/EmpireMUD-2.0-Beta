@@ -17,7 +17,7 @@ APPROVE
 
 Usage:  approve <name> <e-mail>
 
-This command approves a character so that he/she can use empire and ubilding
+This command approves a character so that he/she can use empire and building
 commands. You must supply an e-mail address so that players can be verified
 as unique.
 
@@ -253,7 +253,7 @@ Usage:  ghistory
 
 This is the history command for the immortal and god channels.
 
-See also: WIZNET
+See also: WIZNET, GODNET
 #d
 GODNET
 
@@ -316,6 +316,8 @@ A toggle which allows you to see:
 It is expected most immortals will keep HOLYLIGHT on most of the time; it
 exists so that you have the ability to see what mortals see for debugging
 purposes.
+
+See also: TOGGLE
 #d
 HOSTILE "HOSTILE COMMAND"
 
@@ -385,7 +387,7 @@ or her invisibility setting from the last logout.
 If you want to log in invisibly in one login only, type "i" at the MOTD when
 prompted to press any key to enter the game.
 
-See also: INVIS, VISIBLE
+See also: INVIS, VISIBLE, SET
 #d
 ISLAND "ISLAND COMMAND"
 
@@ -471,7 +473,7 @@ Usage:  toggle wiznet
 
 Allows you to hear or ignore messages coming over the wiznet.
 
-See also: WIZNET
+See also: WIZNET, TOGGLE
 #d
 PAGE
 
@@ -493,9 +495,9 @@ Usage:  poofin <message | none>
         poofout <message | none>
 
 Sets the message seen by players when you use GOTO to move to a different
-room. POOFIN with no argument resets your poofin to the default "appears with
-an ear-splitting bang"; POOFOUT with no argument defaults to "disappears in a
-puff of smoke."
+room. POOFIN with no argument displays your poofin (the default is "appears
+with an ear-splitting bang"); POOFOUT defaults to "disappears in a puff of
+smoke."
 
 If you want your name in the middle of the poofin/out message, instead of at
 the beginning, you can use the $n token to place it anywhere. If you don't
@@ -609,6 +611,8 @@ ROOMFLAGS
 Usage:  toggle roomflags
 
 This immortal toggle allows you to see flags and vnums on the "look" command.
+
+See also: TOGGLE
 #d
 SET
 
