@@ -767,7 +767,7 @@ static void annual_update_map_tile(room_data *room) {
 	}
 	
 	// destroy roads -- randomly over time
-	if (IS_ROAD(room) && !ROOM_OWNER(room) && !number(0, 19)) {
+	if (IS_ROAD(room) && !ROOM_OWNER(room) && number(1, 100) <= 2) {
 		// this will tear it back down to its base type
 		disassociate_building(room);
 	}
