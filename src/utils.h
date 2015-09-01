@@ -95,6 +95,7 @@
 #define GET_ADV_FLAGS(adv)  ((adv)->flags)
 #define GET_ADV_LINKING(adv)  ((adv)->linking)
 #define GET_ADV_PLAYER_LIMIT(adv)  ((adv)->player_limit)
+#define GET_ADV_SCRIPTS(adv)  ((adv)->proto_script)
 
 // utils
 #define ADVENTURE_FLAGGED(adv, flg)  (IS_SET(GET_ADV_FLAGS(adv), (flg)) ? TRUE : FALSE)
@@ -402,7 +403,6 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_TOTAL_WEALTH(emp)  (EMPIRE_WEALTH(emp) + (int)(EMPIRE_COINS(emp) * COIN_VALUE))
 
 // definitions
-#define COUNTS_AS_IN_CITY(room)  (ROOM_BLD_FLAGGED(room, BLD_COUNTS_AS_CITY) || ROOM_SECT_FLAGGED(room, SECTF_COUNTS_AS_CITY))
 #define SAME_EMPIRE(ch, vict)  (!IS_NPC(ch) && !IS_NPC(vict) && GET_LOYALTY(ch) != NULL && GET_LOYALTY(ch) == GET_LOYALTY(vict))
 
 // only some types of tiles are kept in the shortlist of territories -- particularly ones with associated chores
@@ -555,7 +555,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 // for stacking, sotring, etc
 #define OBJ_CAN_STACK(obj)  (GET_OBJ_TYPE(obj) != ITEM_CONTAINER && !OBJ_FLAGGED((obj), OBJ_ENCHANTED) && !IN_CHAIR(obj) && !IS_ARROW(obj))
 #define OBJ_CAN_STORE(obj)  ((obj)->storage && !OBJ_BOUND_TO(obj) && !OBJ_FLAGGED((obj), OBJ_SUPERIOR | OBJ_ENCHANTED))
-#define UNIQUE_OBJ_CAN_STORE(obj)  (!OBJ_BOUND_TO(obj) && !OBJ_CAN_STORE(obj) && (!OBJ_FLAGGED((obj), OBJ_LIGHT) || GET_OBJ_TIMER(obj) == UNLIMITED) && !IS_STOLEN(obj))
+#define UNIQUE_OBJ_CAN_STORE(obj)  (!OBJ_BOUND_TO(obj) && !OBJ_CAN_STORE(obj) && !OBJ_FLAGGED((obj), OBJ_JUNK) && (!OBJ_FLAGGED((obj), OBJ_LIGHT) || GET_OBJ_TIMER(obj) == UNLIMITED) && !IS_STOLEN(obj))
 #define OBJ_STACK_FLAGS  (OBJ_SUPERIOR | OBJ_KEEP)
 #define OBJS_ARE_SAME(o1, o2)  (GET_OBJ_VNUM(o1) == GET_OBJ_VNUM(o2) && ((GET_OBJ_EXTRA(o1) & OBJ_STACK_FLAGS) == (GET_OBJ_EXTRA(o2) & OBJ_STACK_FLAGS)) && (!IS_DRINK_CONTAINER(o1) || GET_DRINK_CONTAINER_TYPE(o1) == GET_DRINK_CONTAINER_TYPE(o2)))
 

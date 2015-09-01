@@ -998,6 +998,25 @@ int consume_otrigger(obj_data *obj, char_data *actor, int cmd) {
 *  world triggers
 */
 
+void adventure_cleanup_wtrigger(room_data *room) {
+	char buf[MAX_INPUT_LENGTH];
+	trig_data *t;
+
+	if (!SCRIPT_CHECK(room, WTRIG_ADVENTURE_CLEANUP))
+		return;
+
+	for (t = TRIGGERS(SCRIPT(room)); t; t = t->next) {
+		if (TRIGGER_CHECK(t, WTRIG_ADVENTURE_CLEANUP) && (number(1, 100) <= GET_TRIG_NARG(t))) {
+			union script_driver_data_u sdd;
+			ADD_ROOM_UID_VAR(buf, t, room, "room", 0);
+			sdd.r = room;
+			if (!script_driver(&sdd, t, WLD_TRIGGER, TRIG_NEW)) {
+				break;
+			}
+		}
+	}
+}
+
 void reset_wtrigger(room_data *room) {
 	char buf[MAX_INPUT_LENGTH];
 	trig_data *t;

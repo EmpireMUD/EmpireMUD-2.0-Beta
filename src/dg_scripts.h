@@ -20,6 +20,7 @@
 #define OBJ_TRIGGER  1
 #define WLD_TRIGGER  2
 #define RMT_TRIGGER  3
+#define ADV_TRIGGER  4
 
 /* unless you change this, Puff casts all your dg spells */
 #define DG_CASTER_PROXY 1
@@ -77,7 +78,7 @@
 #define WTRIG_RANDOM           BIT(1)	     /* checked randomly           */
 #define WTRIG_COMMAND          BIT(2)	     /* character types a command  */
 #define WTRIG_SPEECH           BIT(3)      /* a char says word/phrase    */
-
+#define WTRIG_ADVENTURE_CLEANUP  BIT(4)	// called on a map tile or room after an adventure cleans up
 #define WTRIG_RESET            BIT(5)      /* zone has been reset        */
 #define WTRIG_ENTER            BIT(6)	     /* character enters room      */
 #define WTRIG_DROP             BIT(7)      /* something dropped in room  */
@@ -169,6 +170,7 @@ struct script_memory {
 
 
 /* function prototypes from triggers.c (and others) */
+void adventure_cleanup_wtrigger(room_data *room);
 void act_mtrigger(const char_data *ch, char *str, char_data *actor, char_data *victim, obj_data *object, obj_data *target, char *arg);  
 void speech_mtrigger(char_data *actor, char *str);
 void speech_wtrigger(char_data *actor, char *str);

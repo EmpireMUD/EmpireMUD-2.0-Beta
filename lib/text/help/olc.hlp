@@ -94,6 +94,7 @@ Adventures (ADVEDIT):
   not have a good level to use for those scripts. Mob scripts don't require it.
 - The !NEARBY flag should only be used on zones where a player shouldn't find
   evidence of them nearby, like a thieves' den.
+- Adventure scripts will ONLY run if they are 'Adventure Cleanup' scripts.
 
 Buildings (BEDIT):
 - Designated rooms are also built in the building editor, using the ROOM flag.
@@ -715,7 +716,7 @@ Available flags:
  !NPC - mobs won't enter this building
  BARRIER - can only go back the way you came, unless flying
  TAVERN - functions as a tavern (don't set this on the same building as DRINK)
- COUNTS-AS-CITY - always counts as in-city territory
+ LARGE-CITY-RADIUS - counts as in-city much further away than normal
  MINE - can be mined for ore resources
  ATTACH-ROAD - on the ascii map, roads attach to this tile like it's a road
  BURNABLE - will catch fire if a fire is placed inside by a hostile empire
@@ -746,9 +747,9 @@ Available flags:
  !DELETE - will not be deleted for not having a homeroom
  SUMMON-PLAYERS - allows the summon player command
 
-* Note: If you change the COUNTS-AS-CITY flag on existing buildings, territory
-        counts will not update right away. Any empire can force a re-count
-        by claiming or abandoning any tile.
+* Note: If you change the LARGE-CITY-RADIUS flag on existing buildings,
+        territory counts will not update right away. Any empire can force a
+        re-count by claiming or abandoning any tile.
 
 See also: INTERLINK, OLC BUILDINGS
 #d
@@ -1780,7 +1781,7 @@ You're standing at the foot of a huge giant!
 
 See also: OLC MOBILES
 #d
-"MEDIT SCRIPTS" "OEDIT SCRIPTS" "REDIT SCRIPTS"
+"ADVEDIT SCRIPTS" "MEDIT SCRIPTS" "OEDIT SCRIPTS" "REDIT SCRIPTS"
 
 Usage:  .script add [position] <trigger vnum>
         .script copy <from type> <from vnum>
@@ -1793,6 +1794,8 @@ don't give a position, it will put it at the end.
 
 When you save your olc editor, all live copies of the thing you were editing
 should get the updated script list right away.
+
+Note: Adventure scripts will only work if they are the Adventure Cleanup type.
 
 See also: OLC MOBILES, OLC OBJECTS, OLC TRIGGERS, VNUM
 #d
@@ -3124,7 +3127,7 @@ Available sector flags:
  SHOW-ON-POLITICAL-MAPOUT - Still appears on the political version of the graphical map
  MAP-BUILDING - This sector represents a building on the map; shown using building data
  INSIDE-ROOM - This sector represents an interior (designated) ROOM building
- COUNTS-AS-CITY - On empire territory count, this tile counts as in-city anywhere
+ LARGE-CITY-RADIUS - This tile counts as in-city much further away than normal
  OBSCURE-VISION - Players can't be seen here; also blocks catapults and towers
  IS-TRENCH - Sector counts as a trench and fills with water
  * - unused

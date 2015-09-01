@@ -765,6 +765,12 @@ static void annual_update_map_tile(room_data *room) {
 			}
 		}
 	}
+	
+	// destroy roads -- randomly over time
+	if (IS_ROAD(room) && !ROOM_OWNER(room) && number(1, 100) <= 2) {
+		// this will tear it back down to its base type
+		disassociate_building(room);
+	}
 
 	// clean mine data from anything that's not currently a mine
 	if (!ROOM_BLD_FLAGGED(room, BLD_MINE)) {
@@ -1264,7 +1270,7 @@ void read_empire_territory(empire_data *emp) {
 			if ((e = ROOM_OWNER(iter))) {
 				// only count each building as 1
 				if (HOME_ROOM(iter) == iter) {
-					if (COUNTS_AS_IN_CITY(iter) || is_in_city_for_empire(iter, e, FALSE, &junk)) {
+					if (is_in_city_for_empire(iter, e, FALSE, &junk)) {
 						EMPIRE_CITY_TERRITORY(e) += 1;
 					}
 					else {

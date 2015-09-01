@@ -871,6 +871,59 @@ ACMD(do_mteleport) {
 }
 
 
+ACMD(do_mterracrop) {
+	void do_dg_terracrop(room_data *target, crop_data *cp);
+
+	char loc_arg[MAX_INPUT_LENGTH], crop_arg[MAX_INPUT_LENGTH];
+	crop_data *crop;
+	room_data *target;
+	crop_vnum vnum;
+
+	if (!MOB_OR_IMPL(ch) || AFF_FLAGGED(ch, AFF_CHARM)) {
+		send_config_msg(ch, "huh_string");
+		return;
+	}
+
+	argument = any_one_word(argument, loc_arg);
+	any_one_word(argument, crop_arg);
+	
+	// usage: %terracrop% [location] <crop vnum>
+	if (!*loc_arg) {
+		mob_log(ch, "mterracrop: bad syntax");
+		return;
+	}
+	
+	// check number of args
+	if (!*crop_arg) {
+		// only arg is actually crop arg
+		strcpy(crop_arg, loc_arg);
+		target = IN_ROOM(ch);
+	}
+	else {
+		// two arguments
+		target = find_target_room(ch, loc_arg);
+	}
+	
+	if (!target) {
+		mob_log(ch, "mterracrop: target is an invalid room");
+		return;
+	}
+	
+	// places you just can't terracrop -- fail silently (currently)
+	if (IS_INSIDE(target) || IS_ADVENTURE_ROOM(target) || IS_CITY_CENTER(target)) {
+		return;
+	}
+	
+	if (!isdigit(*crop_arg) || (vnum = atoi(crop_arg)) < 0 || !(crop = crop_proto(vnum))) {
+		mob_log(ch, "mterracrop: invalid crop vnum");
+		return;
+	}
+
+	// good to go
+	do_dg_terracrop(target, crop);
+}
+
+
 ACMD(do_mterraform) {
 	void do_dg_terraform(room_data *target, sector_data *sect);
 

@@ -20,6 +20,7 @@
 #include "olc.h"
 #include "skills.h"
 #include "handler.h"
+#include "dg_scripts.h"
 
 /**
 * Contents:
@@ -182,6 +183,7 @@ void save_olc_adventure(descriptor_data *desc) {
 	adv_data *proto, *adv = GET_OLC_ADVENTURE(desc);
 	adv_vnum vnum = GET_OLC_VNUM(desc);
 	struct adventure_link_rule *link;
+	struct trig_proto_list *trig;
 	UT_hash_handle hh;
 	
 	// have a place to save it?
@@ -202,6 +204,10 @@ void save_olc_adventure(descriptor_data *desc) {
 	while ((link = GET_ADV_LINKING(proto))) {
 		GET_ADV_LINKING(proto) = link->next;
 		free(link);
+	}
+	while ((trig = GET_ADV_SCRIPTS(proto))) {
+		GET_ADV_SCRIPTS(proto) = trig->next;
+		free(trig);
 	}
 	
 	// sanity
@@ -278,6 +284,10 @@ adv_data *setup_olc_adventure(adv_data *input) {
 			}
 			last_link = new_link;
 		}
+		
+		// scripts
+		GET_ADV_SCRIPTS(new) = NULL;
+		copy_proto_script(input, new, ADV_TRIGGER);
 	}
 	else {
 		// brand new: some defaults
@@ -394,6 +404,8 @@ void get_adventure_linking_display(struct adventure_link_rule *list, char *save_
 * @param char_data *ch The person who is editing a adventure and will see its display.
 */
 void olc_show_adventure(char_data *ch) {
+	void get_script_display(struct trig_proto_list *list, char *save_buffer);
+
 	adv_data *adv = GET_OLC_ADVENTURE(ch->desc);
 	char lbuf[MAX_STRING_LENGTH];
 	int time;
@@ -438,6 +450,11 @@ void olc_show_adventure(char_data *ch) {
 
 	sprintf(buf + strlen(buf), "Linking rules: <&ylinking&0>\r\n");
 	get_adventure_linking_display(GET_ADV_LINKING(adv), lbuf);
+	strcat(buf, lbuf);
+	
+	// scripts
+	sprintf(buf + strlen(buf), "Adventure Cleanup Scripts: <&yscript&0>\r\n");
+	get_script_display(GET_ADV_SCRIPTS(adv), lbuf);
 	strcat(buf, lbuf);
 		
 	page_string(ch->desc, buf, TRUE);
@@ -783,6 +800,12 @@ OLC_MODULE(advedit_playerlimit) {
 OLC_MODULE(advedit_reset) {
 	adv_data *adv = GET_OLC_ADVENTURE(ch->desc);
 	GET_ADV_RESET_TIME(adv) = olc_process_number(ch, argument, "reset time", "reset", 0, MAX_INT, GET_ADV_RESET_TIME(adv));
+}
+
+
+OLC_MODULE(advedit_script) {
+	adv_data *adv = GET_OLC_ADVENTURE(ch->desc);
+	olc_process_script(ch, argument, &(GET_ADV_SCRIPTS(adv)), WLD_TRIGGER);
 }
 
 

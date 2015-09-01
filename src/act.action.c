@@ -1475,7 +1475,7 @@ void process_panning(char_data *ch) {
 	
 	int short_depletion = config_get_int("short_depletion");
 
-	if (!GET_EQ(ch, WEAR_HOLD) || !OBJ_FLAGGED(GET_EQ(ch, WEAR_HOLD), OBJ_TOOL_PAN)) {
+	if ((!GET_EQ(ch, WEAR_WIELD) || !OBJ_FLAGGED(GET_EQ(ch, WEAR_WIELD), OBJ_TOOL_PAN)) && (!GET_EQ(ch, WEAR_HOLD) || !OBJ_FLAGGED(GET_EQ(ch, WEAR_HOLD), OBJ_TOOL_PAN))) {
 		msg_to_char(ch, "You need to be holding a pan to do that.\r\n");
 		cancel_action(ch);
 	}
@@ -2388,7 +2388,7 @@ ACMD(do_pan) {
 	else if (!find_flagged_sect_within_distance_from_char(ch, SECTF_FRESH_WATER, NOBITS, 1)) {
 		msg_to_char(ch, "You need to be near fresh water to pan for gold.\r\n");
 	}
-	else if (!GET_EQ(ch, WEAR_HOLD) || !OBJ_FLAGGED(GET_EQ(ch, WEAR_HOLD), OBJ_TOOL_PAN)) {
+	else if ((!GET_EQ(ch, WEAR_WIELD) || !OBJ_FLAGGED(GET_EQ(ch, WEAR_WIELD), OBJ_TOOL_PAN)) && (!GET_EQ(ch, WEAR_HOLD) || !OBJ_FLAGGED(GET_EQ(ch, WEAR_HOLD), OBJ_TOOL_PAN))) {
 		msg_to_char(ch, "You need to be holding a pan to do that.\r\n");
 	}
 	else {

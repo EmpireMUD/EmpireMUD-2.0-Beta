@@ -1171,15 +1171,21 @@ bool has_tech_available_room(room_data *room, int tech) {
 * @return int The total claimable land.
 */
 int land_can_claim(empire_data *emp, bool outside_only) {
-	int total = 0;
+	int from_wealth, total = 0;
 	
 	if (emp) {
 		total += EMPIRE_GREATNESS(emp) * config_get_int("land_per_greatness");
 		total += count_tech(emp) * config_get_int("land_per_tech");
 		
 		if (EMPIRE_HAS_TECH(emp, TECH_COMMERCE)) {
-			// TODO this diminish could be configurable
-			total += diminishing_returns((int) (GET_TOTAL_WEALTH(emp) * config_get_double("land_per_wealth")), 5000);
+			// diminishes by an amount equal to non-wealth territory
+			from_wealth = diminishing_returns((int) (GET_TOTAL_WEALTH(emp) * config_get_double("land_per_wealth")), total);
+			
+			// limited to 3x non-wealth territory
+			from_wealth = MIN(from_wealth, total * 3);
+			
+			// for a total of 4x
+			total += from_wealth;
 		}
 	}
 	
@@ -2368,7 +2374,10 @@ char *CAP(char *txt) {
 int count_color_codes(char *string) {
 	int iter, count = 0, len = strlen(string);
 	for (iter = 0; iter < len - 1; ++iter) {
-		if (string[iter] == '&' && string[iter+1] != '&') {
+		if (string[iter] == '&' && string[iter+1] == '&') {
+			++iter;	// advance past the && (not a color code)
+		}
+		if (string[iter] == '&') {
 			++count;
 			++iter;	// advance past the color code
 		}

@@ -287,7 +287,7 @@ static bool can_gain_chore_resource(empire_data *emp, room_data *loc, obj_vnum v
 			if (shipd->status == SHIPPING_QUEUED && shipd->from_island == island) {
 				island_count += shipd->amount;
 			}
-			else if (shipd->to_island == island) {
+			else if (shipd->status != SHIPPING_QUEUED && shipd->to_island == island) {
 				island_count += shipd->amount;
 			}
 		}
@@ -800,12 +800,13 @@ INTERACTION_FUNC(one_farming_chore) {
 	
 	empire_data *emp = ROOM_OWNER(inter_room);
 	sector_data *old_sect;
+	obj_data *proto = obj_proto(interaction->vnum);
 	int amt;
 	
 	int harvest_timer = config_get_int("harvest_timer");
 	int short_depletion = config_get_int("short_depletion");
 	
-	if (emp && can_gain_chore_resource(emp, inter_room, interaction->vnum)) {
+	if (emp && proto && proto->storage && can_gain_chore_resource(emp, inter_room, interaction->vnum)) {
 		// already set up?
 		if (get_room_extra_data(inter_room, ROOM_EXTRA_HARVEST_PROGRESS) <= 0) {
 			set_room_extra_data(inter_room, ROOM_EXTRA_HARVEST_PROGRESS, harvest_timer * (ROOM_CROP_FLAGGED(inter_room, CROPF_IS_ORCHARD) ? 2 : 1));

@@ -908,8 +908,7 @@ You can gain Empire skill up to 15 by quarrying stone. This does not require
 an ability. If you have the "dig" workforce enabled, your citizens will only
 dig if you have a quarry.
 
-Quarries always count as in-city territory for your empire, no matter where
-you build them.
+Quarries count as in-city territory as far away as 3x a city's normal radius.
 
 See also: DEPLETION, DIG
 #

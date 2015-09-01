@@ -63,6 +63,7 @@ void clear_char_abilities(char_data *ch, int skill);
 void delete_instance(struct instance_data *inst);	// instance.c
 void get_icons_display(struct icon_data *list, char *save_buffer);
 void get_interaction_display(struct interaction_item *list, char *save_buffer);
+void get_script_display(struct trig_proto_list *list, char *save_buffer);
 extern char *get_room_name(room_data *room, bool color);
 void save_instances();
 void save_whole_world();
@@ -2259,6 +2260,11 @@ void do_stat_adventure(char_data *ch, adv_data *adv) {
 	
 	get_adventure_linking_display(GET_ADV_LINKING(adv), lbuf);
 	msg_to_char(ch, "Linking rules:\r\n%s", lbuf);
+	
+	if (GET_ADV_SCRIPTS(adv)) {
+		get_script_display(GET_ADV_SCRIPTS(adv), lbuf);
+		msg_to_char(ch, "Scripts:\r\n%s", lbuf);
+	}
 }
 
 
@@ -3229,7 +3235,6 @@ void do_stat_room(char_data *ch) {
 void do_stat_room_template(char_data *ch, room_template *rmt) {
 	extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
 	void get_exit_template_display(struct exit_template *list, char *save_buffer);
-	void get_script_display(struct trig_proto_list *list, char *save_buffer);
 	void get_template_spawns_display(struct adventure_spawn *list, char *save_buffer);
 	extern const char *room_template_flags[];
 	

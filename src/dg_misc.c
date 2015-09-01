@@ -236,6 +236,42 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 
 
 /**
+* Do the actual work for the %terracrop% commands, once everything has been
+* validated.
+*
+* @param room_data *target The room to change.
+* @param crop_data *cp The crop to change it to.
+*/
+void do_dg_terracrop(room_data *target, crop_data *cp) {
+	sector_data *sect;
+	empire_data *emp;
+	
+	if (!target || !cp) {
+		return;
+	}
+	
+	emp = ROOM_OWNER(target);
+	
+	if (!(sect = find_first_matching_sector(SECTF_CROP, NOBITS))) {
+		// no crop sects?
+		return;
+	}
+	else {
+		change_terrain(target, GET_SECT_VNUM(sect));
+		set_room_extra_data(target, ROOM_EXTRA_CROP_TYPE, GET_CROP_VNUM(cp));
+	}
+	
+	// clear these if set
+	REMOVE_BIT(ROOM_AFF_FLAGS(target), ROOM_AFF_PLAYER_MADE);
+	REMOVE_BIT(ROOM_BASE_FLAGS(target), ROOM_AFF_PLAYER_MADE);
+
+	if (emp) {
+		read_empire_territory(emp);
+	}
+}
+
+
+/**
 * Do the actual work for the %terraform% commands, once everything has been
 * validated.
 *
