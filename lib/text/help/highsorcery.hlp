@@ -29,6 +29,7 @@ City Teleportation (High Sorcery ability)
 
 Usage:  ritual teleport <city>
 Cooldown:  15 minutes
+Cost:  15 mana
 
 This ability expands your teleport power to any of your empire's cities. You
 can use the city's name or number. Use "city list" to see available cities.
@@ -52,12 +53,15 @@ on your skill level, with a bonus based on your Intelligence.
 
 In combat, colorburst will automatically target your current opponent if you
 do not provide a target.
+
+See also: TO-HIT
 #
 "DEVASTATION RITUAL" "RITUAL OF DEVASTATION" DEVASTATE
 
 Devastation Ritual (High Sorcery ability)
 
 Usage:  ritual devastation
+Cost:  15 mana (per cycle)
 
 This ritual allows a sorcerer to quickly clear a large area of land through
 ritual magic. It will bring down forests and crops within 3 tiles of the
@@ -85,6 +89,7 @@ Dispel (High Sorcery ability)
 
 Usage:  dispel [target]
 Cooldown:  9 seconds
+Cost:  30 mana
 
 This spell removes any magical or fire-based damage-over-time effects on the
 target.
@@ -142,6 +147,7 @@ Enervate (High Sorcery ability)
 
 Usage:  enervate <victim>
 Cooldown:  75 seconds
+Cost:  20 mana
 Debuff type:  High Sorcery
 
 Your victim is enervated: he loses move regen. You are able to leech some
@@ -177,6 +183,7 @@ MANASHIELD "MANA SHIELD"
 Manashield (High Sorcery ability)
 
 Usage:  manashield
+Cost:  25 mana*
 
 By armoring herself with a manashield, a sorcerer sacrifices part of her mana
 pool for reduced combat damage.
@@ -192,6 +199,7 @@ Mirrorimage (High Sorcery ability)
 
 Usage:  mirrorimage
 Cooldown:  5 minutes
+Cost:  40 mana
 
 This spell creates an identical duplicate of the caster (with reduced health).
 It's good enough to fool at least one of the people hitting you.
@@ -205,6 +213,7 @@ See also: FAMILIAR, DISMISS, ORDER
 Phoenix Rite (High Sorcery ability)
 
 Usage:  rite phoenix
+Cost:  25 mana
 
 A master sorcerer can resurrect herself upon death by preparing properly. Once
 performed, the Phoenix Rite does not expire until it saves you from death.
@@ -240,6 +249,7 @@ See also: PORTAL, PORTAL MASTER
 Portal Master (High Sorcery ability)
 
 Command:  collapse <portal>
+Cost:  15 mana
 
 Becoming a Portal Master removes the range limit on your empire's portals.
 It also allows you to collapse portals yourself.
@@ -262,6 +272,7 @@ rituals to learn more about them.
 Ritual of Burdens (High Sorcery ability)
 
 Usage:  ritual burdens
+Cost:  5 mana
 
 This ritual allows you to carry 6, 12, or 18 more items (based on your level).
 
@@ -274,7 +285,7 @@ See also: RITUAL
 Ritual of Defense (High Sorcery ability)
 
 Usage:  ritual defense
-Cost: 1 imperium spike and 1 bloodstone per wall
+Cost:  15 mana; 1 imperium spike and 1 bloodstone per wall
 
 This ritual enchants a wall to be able to repel anyone flying. It also works
 on gatehouses and river gates. It will go away if you dismantle the building
@@ -290,6 +301,7 @@ See also: RITUAL
 Ritual of Detection (High Sorcery ability)
 
 Usage:  ritual detection
+Cost:  15 mana
 
 This ability finds all players currently in your city, whether hidden, earth-
 melded, invisible, or any other condition. This ability only works inside of a
@@ -302,6 +314,7 @@ See also: RITUAL
 Ritual of Sense Life (High Sorcery skill)
 
 Usage:  ritual senselife
+Cost:  15 mana
 
 This spell works similar to the "search ability" and can find people hidden
 in the room with you, using simple magic.
@@ -314,6 +327,7 @@ Ritual of Teleportation (High Sorcery skill)
 
 Usage:  ritual teleportation [target]
 Cooldown:  15 minutes (teleport home only)
+Cost:  25 mana
 
 With the basic teleportation ability, you can teleport at random (2 to 7 map
 tiles in any direction) or you can teleport to your home. You won't be able to
@@ -328,6 +342,7 @@ See also: CITY TELEPORTATION, RITUAL
 Siege Ritual (High Sorcery ability)
 
 Usage:  ritual siege <direction>
+Cost:  30 mana
 
 This powerful ability is rivaled only by the catapult in its ability to take
 down buildings. Use it to destroy your enemies!
@@ -343,6 +358,7 @@ Siphon (High Sorcery ability)
 
 Usage:  siphon [victim]
 Cooldown:  20 seconds
+Cost:  10 mana
 Debuff type:  High Sorcery
 
 You can steal mana from other casters using the mana siphon ability. If you are
@@ -355,6 +371,7 @@ Slow (High Sorcery ability)
 
 Usage:  slow [victim]
 Cooldown:  75 seconds
+Cost:  20 mana
 Debuff type:  High Sorcery
 
 This ability hexes your victim with lethargy, causing them to attack more
@@ -419,6 +436,7 @@ Summon Swift (High Sorcery ability)
 
 Command:  summon swift <type>
 Cooldown:  1 minute
+Cost:  10 mana
 
 This ability lets you summon a swift mount to your side. These unique mounts
 can be sold to players who aren't sorcerers, or kept for one's self. The swift
@@ -439,6 +457,7 @@ Sunshock (High Sorcery ability)
 
 Usage:  sunshock [victim]
 Cooldown:  9 seconds
+Cost:  25 mana
 Debuff type:  High Sorcery
 
 Sunshock blasts your target with the pure light of the sun. This deals a small
@@ -455,10 +474,11 @@ VIGOR
 Vigor (High Sorcery ability)
 
 Usage:  vigor [target]
+Cost:  15 / 25 / 40 mana
 
 Your target receives a quick boost of movement points, at the cost of move
 regeneration. The strength of this spell is based upon the caster's intell-
-igence.
+igence and High Sorcery level.
 
 The vigor bonus is doubled if the target is not in combat.
 

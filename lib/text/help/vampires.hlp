@@ -42,6 +42,9 @@ Type: passive
 By learning the secrets of the ancient blood, a vampire effectively doubles
 its blood pool. The vampire also gets twice as much blood when drinking
 directly from a live host.
+
+You will gain experience with this ability when drinking blood, more if your
+victim is drained fatally.
 #
 "BAT FORM"
 
@@ -264,8 +267,7 @@ Vampires have the ability to regenerate themselves using blood. This process
 heals them, but makes them hungrier. The command defaults to health, unless
 you specify otherwise.
 
-You can specify an amount to heal, but if you do this, you must specify health
-(you can't let it default to health if you want to heal a certain amount).
+You can specify an amount to heal.
 
 With Vampire up to level 50, this regenerates 1 per blood point. Up to 75,
 it regenerates 1.5. And higher than that, it regenerates 2.5.
@@ -316,6 +318,8 @@ unable to move until someone unstakes it. Staked vampires may choose to use
 
 Example:
   > stake Deacon
+  
+See also: WOODWORKING
 #
 "SUMMON HUMANS"
 
@@ -360,6 +364,10 @@ Usage:  veintap <amount> <container>
 
 Powerful vampires learn to preserve their blood in containers for later use,
 enabling them to travel without a live blood supply sometimes for weeks.
+
+One point of blood will become one ounce, and vice versa.
+
+See also: DRINK
 #
 WEAKEN
 
@@ -367,6 +375,7 @@ Weaken (Vampire ability)
 
 Usage:  weaken [victim]
 Cooldown:  75 seconds
+Cost:  50 blood
 Debuff type:  Vampire
 
 A vampire who is learned in the ways of blood can use her own blood to drain
