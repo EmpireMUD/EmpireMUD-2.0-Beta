@@ -383,7 +383,7 @@ without the skill name, you can see which skills have free resets available.
 It also shows the range in which you can gain the skill, although you can gain
 no more than 10 points from any one ability.
 
-See also: NOSKILL, SPECIALIZE, SKILL CAPS, SKILL DROP, SKILL LEVELS, ABILITY
+See also: NOSKILL, SPECIALIZE, SKILL CAPS, SKILL DROP, TRAINING SKILLS, ABILITY
 POINTS
 #
 "SKILL CAPS" CAPS "MAX SKILL" "MAXIMUM SKILL" "CLASS SKILLS" "SPECIALTY SKILLS" "BASIC SKILLS"
@@ -424,7 +424,7 @@ lose any abilities you purchased above the new level.
 
 See also: SKILL
 #
-"SKILL LEVELS" "SKILL POINTS" "SKILL EXPERIENCE" "SKILLUPS" EXPERIENCE
+"TRAINING SKILLS" "SKILL POINTS" "SKILL EXPERIENCE" "SKILLUPS" EXPERIENCE
 
 The two ways to gain skill levels are:
 - By using "yellow" abilities from the skill's tree (abilities that aren't at
