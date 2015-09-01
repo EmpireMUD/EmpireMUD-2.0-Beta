@@ -383,8 +383,7 @@ without the skill name, you can see which skills have free resets available.
 It also shows the range in which you can gain the skill, although you can gain
 no more than 10 points from any one ability.
 
-See also: NOSKILL, SPECIALIZE, SKILL CAPS, SKILL DROP, SKILL LEVELS, ABILITY
-POINTS
+See also: NOSKILL, SPECIALIZE, SKILL CAPS, SKILL DROP, SKILL LEVELS
 #
 "SKILL CAPS" CAPS "MAX SKILL" "MAXIMUM SKILL" "CLASS SKILLS" "SPECIALTY SKILLS" "BASIC SKILLS"
 
@@ -440,7 +439,7 @@ experience all the way to 100%.
 When your skills hit level 50 or 75, you will not be able to gain additional
 levels in the skill unless you specialize into it.
 
-See also: SKILL CAPS, SPECIALIZE, SKILLS
+See also: SKILL CAPS, SPECIALIZE
 #
 SMELT MELT
 
