@@ -1292,7 +1292,7 @@ Workforce types:
   &yquarrying:&0 NPCs will quarry huge stone blocks at the quarry.
   &ynailmaking:&0 NPCs will forge pouches of nails at the forge.
   &ybrickmaking:&0 NPCs will make bricks at the potter.
-  &abandon-dismantled:&0 NPCS will abandon a tile when they finish dismantling.
+  &yabandon-dismantled:&0 NPCS will abandon a tile when they finish dismantling.
   &cherb gardening (skilled):&0 NPCS will gather herbs in gardens.
   &yfire brigade:&0 NPCs will put out fires.
   &ctrapping (skilled):&0 NPCs will gather skins at trapper's posts.
@@ -1300,8 +1300,8 @@ Workforce types:
   &yshearing:&0 NPCs will shear animals in stables.
   &cminting (skilled):&0 NPCs will mint treasure into coins.
   &cdismantle-mines:&0 mines will be dismantled when empty.
-  &abandon-chopped:&0 NPCS will abandon a tile when they finish chopping.
-  &abandon-farmed:&0 NPCS will abandon a tile when they finish farming.
+  &yabandon-chopped:&0 NPCS will abandon a tile when they finish chopping.
+  &yabandon-farmed:&0 NPCS will abandon a tile when they finish farming.
   
 Items marked (skilled) require the Skilled Labor ability.
 #
