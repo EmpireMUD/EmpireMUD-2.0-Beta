@@ -1281,6 +1281,9 @@ Items will automatically transfer from the empire inventory on the origin
 island to the empire inventory on the destination island, and the ship will
 appear in one of the docks at the destination.
 
+If the destination island's name contains a space, you must surround it with
+double quotes, or use the coordinates of a tile on the island.
+
 You can only ship and cancel shipments from the island you are currently on,
 but you can see the status of empire shipments all over the world.
 
