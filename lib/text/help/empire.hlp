@@ -1027,6 +1027,7 @@ Summon Bodyguard (Empire ability)
 
 Usage:  summon bodyguard
 Cooldown:  5 minutes
+Cost:  25 move
 
 This powerful ability allows an emperor to summon a bodyguard. The bodyguard
 is strong enough to protect against many dangerous situations. He will take
@@ -1043,6 +1044,7 @@ Summon Guards (Empire ability)
 
 Usage:  summon guards
 Cooldown:  3 minutes
+Cost:  25 move
 
 This ability summons up to (Charisma / 2, rounded down) guards. They aren't
 very strong, but they count as city guards and will attack intruders and
