@@ -1687,6 +1687,9 @@ obj_data *find_free_ship(empire_data *emp, struct shipping_data *shipd) {
 			if (!IS_SHIP(obj))  {
 				continue;
 			}
+			if (GET_SHIP_RESOURCES_REMAINING(obj) > 0) {
+				continue;
+			}
 			if (!(in_ship = real_room(GET_SHIP_MAIN_ROOM(obj)))) {
 				continue;
 			}
