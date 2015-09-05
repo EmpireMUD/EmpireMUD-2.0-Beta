@@ -1763,6 +1763,30 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "0");
 					}
 				}
+				else if (!str_cmp(field, "mob")) {	// search for mob in the instance
+					if (subfield && *subfield && isdigit(*subfield)) {
+						char_data *miter, *found_mob = NULL;
+						mob_vnum vnum = atoi(subfield);
+						for (miter = character_list; miter && !found_mob; miter = miter->next) {
+							if (GET_MOB_VNUM(miter) == vnum) {
+								if (MOB_INSTANCE_ID(miter) == inst->id || ROOM_INSTANCE(IN_ROOM(miter)) == inst) {
+									found_mob = miter;
+									break;
+								}
+							}
+						}
+						
+						if (found_mob) {
+							snprintf(str, slen, "%c%d", UID_CHAR, GET_ID(found_mob));
+						}
+						else {
+							*str = '\0';
+						}
+					}
+					else {
+						*str = '\0';
+					}
+				}
 				else if (!str_cmp(field, "name")) {
 					snprintf(str, slen, "%s", GET_ADV_NAME(inst->adventure));
 				}
