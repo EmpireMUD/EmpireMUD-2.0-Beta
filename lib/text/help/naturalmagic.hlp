@@ -213,7 +213,7 @@ Available familiars:
 
 Use "dismiss" to get rid of your familiar.
 
-See also: DISMISS
+See also: DISMISS, ORDER
 #
 FASTCASTING "FAST CASTING"
 
@@ -506,7 +506,7 @@ This ability allows you to summon up to (Wits / 3, rounded up) animals from
 the surrounding area. These animals will follow you as their leader, and will
 take simple orders.
 
-See also: ORDER
+See also: ORDER, SUMMON
 #
 "TOUCH OF FLAME"
 

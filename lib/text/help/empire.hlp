@@ -1035,7 +1035,7 @@ simple orders and will rescue you in battle.
 The bodyguard counts as a familiar, and can be removed with the "dismiss"
 command.
 
-See also: DISMISS
+See also: DISMISS, ORDER, SUMMON
 #
 "SUMMON GUARDS"
 
@@ -1047,6 +1047,8 @@ Cooldown:  3 minutes
 This ability summons up to (Charisma / 2, rounded down) guards. They aren't
 very strong, but they count as city guards and will attack intruders and
 hostile mobs. You can only use this in your empire's own territory.
+
+See also: SUMMON
 #
 "SWAMP ENGINEERING"
 
