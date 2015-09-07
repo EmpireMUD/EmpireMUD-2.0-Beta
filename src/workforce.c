@@ -229,7 +229,7 @@ void process_one_chore(empire_data *emp, room_data *room) {
 * @param int id The island id to find (will create if missing).
 * @return struct empire_workforce_tracker_island* A pointer to the island entry in that tracker.
 */
-static struct empire_workforce_tracker_island *ewt_find_island(struct empire_workforce_tracker *tracker, int id) {
+struct empire_workforce_tracker_island *ewt_find_island(struct empire_workforce_tracker *tracker, int id) {
 	struct empire_workforce_tracker_island *ii;
 	
 	HASH_FIND_INT(tracker->islands, &id, ii);
@@ -252,7 +252,7 @@ static struct empire_workforce_tracker_island *ewt_find_island(struct empire_wor
 * @param obj_vnum vnum What resource.
 * @return struct empire_workforce_tracker* A pointer to the empire's tracker for that resource (guaranteed).
 */
-static struct empire_workforce_tracker *ewt_find_tracker(empire_data *emp, obj_vnum vnum) {
+struct empire_workforce_tracker *ewt_find_tracker(empire_data *emp, obj_vnum vnum) {
 	struct empire_workforce_tracker_island *isle;
 	struct empire_workforce_tracker *tt;
 	struct empire_storage_data *store;
@@ -304,7 +304,7 @@ static struct empire_workforce_tracker *ewt_find_tracker(empire_data *emp, obj_v
 * @param room_data *loc Where they're working (for island info).
 * @param obj_vnum vnum Which resource.
 */
-static void ewt_mark_resource_worker(empire_data *emp, room_data *loc, obj_vnum vnum) {
+void ewt_mark_resource_worker(empire_data *emp, room_data *loc, obj_vnum vnum) {
 	struct empire_workforce_tracker_island *isle;
 	struct empire_workforce_tracker *tt;
 	
@@ -357,7 +357,7 @@ void add_chore_tracker(empire_data *add) {
 * @param obj_vnum which resource
 * @return bool TRUE if the empire is below the cap
 */
-static bool can_gain_chore_resource(empire_data *emp, room_data *loc, obj_vnum vnum) {
+bool can_gain_chore_resource(empire_data *emp, room_data *loc, obj_vnum vnum) {
 	struct empire_workforce_tracker_island *isle;
 	struct empire_workforce_tracker *tt;
 	int island_max, total_max;
@@ -409,7 +409,7 @@ static bool can_gain_chore_resource(empire_data *emp, room_data *loc, obj_vnum v
 * @param int interaction_type Any INTERACT_x types.
 * @return bool TRUE if the empire could gain at least one resource from the interactions on this room.
 */
-static bool can_gain_chore_resource_from_interaction(empire_data *emp, room_data *room, int interaction_type) {
+bool can_gain_chore_resource_from_interaction(empire_data *emp, room_data *room, int interaction_type) {
 	struct interaction_item *interact;
 	bool found_any = FALSE;
 	crop_data *cp;
