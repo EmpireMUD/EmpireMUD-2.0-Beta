@@ -1076,6 +1076,7 @@ const char *empire_log_types[] = {
 	"Members",
 	"Territory",
 	"Trade",
+	"Logins",
 	"Shipping",
 	"\n"
 };
