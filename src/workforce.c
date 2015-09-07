@@ -274,7 +274,7 @@ static struct empire_workforce_tracker *ewt_find_tracker(empire_data *emp, obj_v
 		// count shipping, too
 		for (shipd = EMPIRE_SHIPPING_LIST(emp); shipd; shipd = shipd->next) {
 			if (shipd->vnum == vnum) {
-				tt->total_amount += store->amount;
+				tt->total_amount += shipd->amount;
 				
 				if (shipd->status == SHIPPING_QUEUED) {
 					isle = ewt_find_island(tt, shipd->from_island);
