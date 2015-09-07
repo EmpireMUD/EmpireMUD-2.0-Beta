@@ -236,8 +236,6 @@ struct empire_workforce_tracker_island *ewt_find_island(struct empire_workforce_
 	if (!ii) {
 		CREATE(ii, struct empire_workforce_tracker_island, 1);
 		ii->id = id;
-		ii->amount = 0;
-		ii->workers = 0;
 		HASH_ADD_INT(tracker->islands, id, ii);
 	}
 	return ii;
@@ -262,9 +260,6 @@ struct empire_workforce_tracker *ewt_find_tracker(empire_data *emp, obj_vnum vnu
 	if (!tt) {
 		CREATE(tt, struct empire_workforce_tracker, 1);
 		tt->vnum = vnum;
-		tt->islands = NULL;
-		tt->total_amount = 0;
-		tt->total_workers = 0;
 		HASH_ADD_INT(EMPIRE_WORKFORCE_TRACKER(emp), vnum, tt);
 		
 		// scan for data
