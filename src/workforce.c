@@ -386,7 +386,7 @@ static bool can_gain_chore_resource(empire_data *emp, room_data *loc, obj_vnum v
 		}
 	}
 	else {
-		if (isle->amount + isle->workers < island_max) {
+		if (isle->amount + isle->workers < island_max && tt->total_amount + tt->total_workers < total_max) {
 			return TRUE;
 		}
 	}
