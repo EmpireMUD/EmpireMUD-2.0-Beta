@@ -1321,6 +1321,7 @@ void process_mining(char_data *ch) {
 	obj_data *obj;
 	int count, total;
 	room_data *in_room;
+	obj_vnum vnum;
 
 	total = 1 + (AFF_FLAGGED(ch, AFF_HASTE) ? 1 : 0) + (HAS_BONUS_TRAIT(ch, BONUS_FAST_CHORES) ? 1 : 0);
 	for (count = 0; count < total && GET_ACTION(ch) == ACT_MINING; ++count) {
@@ -1347,7 +1348,14 @@ void process_mining(char_data *ch) {
 			// amount of ore remaining
 			add_to_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_AMOUNT, -1);
 
-			obj = read_object(find_mine_vnum_by_type(get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_TYPE)));
+
+			vnum = find_mine_vnum_by_type(get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_TYPE));
+			// random gold instead of iron
+			if (vnum == o_IRON_ORE && !number(0, 100)) {
+				vnum = o_GOLD;
+			}
+
+			obj = read_object(vnum);
 			obj_to_char_or_room(obj, ch);
 	
 			act("With that last stroke, $p falls from the wall!", FALSE, ch, obj, 0, TO_CHAR);

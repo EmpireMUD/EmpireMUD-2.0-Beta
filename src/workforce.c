@@ -1096,6 +1096,11 @@ void do_chore_mining(empire_data *emp, room_data *room) {
 		if (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) > 0) {
 			// mine ~ every sixth time
 			if (!number(0, 5)) {
+				// random gold instead of iron
+				if (vnum == o_IRON_ORE && !number(0, 100)) {
+					vnum = o_GOLD;
+				}
+				
 				add_to_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT, -1);
 				add_to_empire_storage(emp, GET_ISLAND_ID(room), vnum, 1);
 				empire_skillup(emp, ABIL_WORKFORCE, config_get_double("exp_from_workforce"));
