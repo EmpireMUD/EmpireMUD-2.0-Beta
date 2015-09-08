@@ -380,13 +380,13 @@ static bool can_gain_chore_resource(empire_data *emp, room_data *loc, obj_vnum v
 	total_max = round(island_max * diminishing_returns(EMPIRE_MEMBERS(emp), 5));
 
 	// do we have too much?
-	if (tt->total_amount >= total_max) {
+	if (tt->total_amount + tt->total_workers >= total_max) {
 		if (isle->amount + isle->workers < config_get_int("max_chore_resource_over_total")) {
 			return TRUE;
 		}
 	}
 	else {
-		if (isle->amount + isle->workers < island_max && tt->total_amount + tt->total_workers < total_max) {
+		if (isle->amount + isle->workers < island_max) {
 			return TRUE;
 		}
 	}
@@ -660,8 +660,10 @@ void do_chore_brickmaking(empire_data *emp, room_data *room) {
 		empire_skillup(emp, ABIL_WORKFORCE, config_get_double("exp_from_workforce"));
 	}
 	else if (store && can_do) {
-		worker = place_chore_worker(emp, CHORE_BRICKMAKING, room);
-		ewt_mark_resource_worker(emp, room, o_BRICKS);
+		// place worker
+		if ((worker = place_chore_worker(emp, CHORE_BRICKMAKING, room))) {
+			ewt_mark_resource_worker(emp, room, o_BRICKS);
+		}
 	}
 	else if (worker) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
@@ -762,8 +764,10 @@ void do_chore_chopping(empire_data *emp, room_data *room) {
 		}
 	}
 	else if (can_do) {
-		worker = place_chore_worker(emp, CHORE_CHOPPING, room);
-		ewt_mark_resource_worker(emp, room, o_TREE);
+		// place worker
+		if ((worker = place_chore_worker(emp, CHORE_CHOPPING, room))) {
+			ewt_mark_resource_worker(emp, room, o_TREE);
+		}
 	}
 	else if (worker) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
@@ -1118,8 +1122,10 @@ void do_chore_mining(empire_data *emp, room_data *room) {
 		}
 	}
 	else if (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) > 0 && can_do) {
-		worker = place_chore_worker(emp, CHORE_MINING, room);
-		ewt_mark_resource_worker(emp, room, vnum);
+		// place worker
+		if ((worker = place_chore_worker(emp, CHORE_MINING, room))) {
+			ewt_mark_resource_worker(emp, room, vnum);
+		}
 	}
 	else if (worker) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
@@ -1213,8 +1219,10 @@ void do_chore_nailmaking(empire_data *emp, room_data *room) {
 		}
 	}
 	else if (store && can_do) {
-		worker = place_chore_worker(emp, CHORE_NAILMAKING, room);
-		ewt_mark_resource_worker(emp, room, o_NAILS);
+		// place worker
+		if ((worker = place_chore_worker(emp, CHORE_NAILMAKING, room))) {
+			ewt_mark_resource_worker(emp, room, o_NAILS);
+		}
 	}
 	else if (worker) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
@@ -1244,8 +1252,10 @@ void do_chore_quarrying(empire_data *emp, room_data *room) {
 		}
 	}
 	else if (can_do) {
-		worker = place_chore_worker(emp, CHORE_QUARRYING, room);
-		ewt_mark_resource_worker(emp, room, o_STONE_BLOCK);
+		// place worker
+		if ((worker = place_chore_worker(emp, CHORE_QUARRYING, room))) {
+			ewt_mark_resource_worker(emp, room, o_STONE_BLOCK);
+		}
 	}
 	else if (worker) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
@@ -1274,8 +1284,10 @@ void do_chore_sawing(empire_data *emp, room_data *room) {
 		}
 	}
 	else if (store && can_do) {
-		worker = place_chore_worker(emp, CHORE_SAWING, room);
-		ewt_mark_resource_worker(emp, room, o_LUMBER);
+		// place worker
+		if ((worker = place_chore_worker(emp, CHORE_SAWING, room))) {
+			ewt_mark_resource_worker(emp, room, o_LUMBER);
+		}
 	}
 	else if (worker) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
@@ -1306,8 +1318,10 @@ void do_chore_scraping(empire_data *emp, room_data *room) {
 		}
 	}
 	else if (store && can_do) {
-		worker = place_chore_worker(emp, CHORE_SCRAPING, room);
-		ewt_mark_resource_worker(emp, room, o_LOG);
+		// place worker
+		if ((worker = place_chore_worker(emp, CHORE_SCRAPING, room))) {
+			ewt_mark_resource_worker(emp, room, o_LOG);
+		}
 	}
 	else if (worker) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
@@ -1431,8 +1445,10 @@ void do_chore_trapping(empire_data *emp, room_data *room) {
 		}
 	}
 	else if (can_do) {
-		worker = place_chore_worker(emp, CHORE_TRAPPING, room);
-		ewt_mark_resource_worker(emp, room, vnum);
+		// place worker
+		if ((worker = place_chore_worker(emp, CHORE_TRAPPING, room))) {
+			ewt_mark_resource_worker(emp, room, vnum);
+		}
 	}
 	else if (worker) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
@@ -1472,8 +1488,10 @@ void do_chore_tanning(empire_data *emp, room_data *room) {
 		empire_skillup(emp, ABIL_WORKFORCE, config_get_double("exp_from_workforce"));
 	}
 	else if (store && can_do) {
-		worker = place_chore_worker(emp, CHORE_TANNING, room);
-		ewt_mark_resource_worker(emp, room, store->vnum);
+		// place worker
+		if ((worker = place_chore_worker(emp, CHORE_TANNING, room))) {
+			ewt_mark_resource_worker(emp, room, store->vnum);
+		}
 	}
 	else if (worker) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
@@ -1509,8 +1527,10 @@ void do_chore_weaving(empire_data *emp, room_data *room) {
 		}
 	}
 	else if (store && store->amount >= cost && can_do) {
-		worker = place_chore_worker(emp, CHORE_WEAVING, room);
-		ewt_mark_resource_worker(emp, room, o_CLOTH);
+		// place worker
+		if ((worker = place_chore_worker(emp, CHORE_WEAVING, room))) {
+			ewt_mark_resource_worker(emp, room, o_CLOTH);
+		}
 	}
 	else if (worker) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
