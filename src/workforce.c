@@ -229,7 +229,7 @@ void process_one_chore(empire_data *emp, room_data *room) {
 * @param int id The island id to find (will create if missing).
 * @return struct empire_workforce_tracker_island* A pointer to the island entry in that tracker.
 */
-struct empire_workforce_tracker_island *ewt_find_island(struct empire_workforce_tracker *tracker, int id) {
+static struct empire_workforce_tracker_island *ewt_find_island(struct empire_workforce_tracker *tracker, int id) {
 	struct empire_workforce_tracker_island *ii;
 	
 	HASH_FIND_INT(tracker->islands, &id, ii);
@@ -250,7 +250,7 @@ struct empire_workforce_tracker_island *ewt_find_island(struct empire_workforce_
 * @param obj_vnum vnum What resource.
 * @return struct empire_workforce_tracker* A pointer to the empire's tracker for that resource (guaranteed).
 */
-struct empire_workforce_tracker *ewt_find_tracker(empire_data *emp, obj_vnum vnum) {
+static struct empire_workforce_tracker *ewt_find_tracker(empire_data *emp, obj_vnum vnum) {
 	struct empire_workforce_tracker_island *isle;
 	struct empire_workforce_tracker *tt;
 	struct empire_storage_data *store;
@@ -299,7 +299,7 @@ struct empire_workforce_tracker *ewt_find_tracker(empire_data *emp, obj_vnum vnu
 * @param room_data *loc Where they're working (for island info).
 * @param obj_vnum vnum Which resource.
 */
-void ewt_mark_resource_worker(empire_data *emp, room_data *loc, obj_vnum vnum) {
+static void ewt_mark_resource_worker(empire_data *emp, room_data *loc, obj_vnum vnum) {
 	struct empire_workforce_tracker_island *isle;
 	struct empire_workforce_tracker *tt;
 	
@@ -352,7 +352,7 @@ void add_chore_tracker(empire_data *add) {
 * @param obj_vnum which resource
 * @return bool TRUE if the empire is below the cap
 */
-bool can_gain_chore_resource(empire_data *emp, room_data *loc, obj_vnum vnum) {
+static bool can_gain_chore_resource(empire_data *emp, room_data *loc, obj_vnum vnum) {
 	struct empire_workforce_tracker_island *isle;
 	struct empire_workforce_tracker *tt;
 	int island_max, total_max;
