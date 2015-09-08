@@ -107,7 +107,7 @@ end
 Flame Dragon delay-completer~
 0 f 100
 ~
-if %instance.start
+if %instance.start%
   * Attempt delayed despawn
   %at% %instance.start% %load% o 10316
 else

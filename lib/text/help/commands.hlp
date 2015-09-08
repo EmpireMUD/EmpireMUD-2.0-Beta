@@ -558,7 +558,7 @@ Usage:  group  -- see status on the group
         group kick <name>  -- kick a member from the group
         group leave  -- leave the group you're in
         group leader <name>  -- change leader
-		group new -- create an empty group
+        group new -- create an empty group
 
 Grouping allows multiple players to work on the same challenge, and gives them
 access to a private group channel. You can also type "group" by itself to see

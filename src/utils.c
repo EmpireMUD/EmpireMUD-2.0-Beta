@@ -3319,12 +3319,6 @@ int find_mine_type(int type) {
 obj_vnum find_mine_vnum_by_type(int type) {
 	int t = find_mine_type(type);
 	obj_vnum vnum = (t != NOTHING ? mine_data[t].vnum : o_IRON_ORE);
-
-	// random gold instead of iron
-	if (vnum == o_IRON_ORE && !number(0, 100)) {
-		vnum = o_GOLD;
-	}
-
 	return vnum;
 }
 

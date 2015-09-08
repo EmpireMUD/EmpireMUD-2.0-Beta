@@ -396,6 +396,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define EMPIRE_SHIPPING_LIST(emp)  ((emp)->shipping_list)
 #define EMPIRE_SORT_VALUE(emp)  ((emp)->sort_value)
 #define EMPIRE_UNIQUE_STORAGE(emp)  ((emp)->unique_store)
+#define EMPIRE_WORKFORCE_TRACKER(emp)  ((emp)->ewt_tracker)
 
 // helpers
 #define EMPIRE_HAS_TECH(emp, num)  (EMPIRE_TECH((emp), (num)) > 0)
