@@ -237,7 +237,7 @@ static char *AllocString(const char *apString);
  ANSI colour codes.
  *****************************************************************************/
 
-static const char s_Clean[] = "\033[0;00m";	// Remove colour
+static const char s_Clean[] = "\033[0m";	// Remove colour
 
 static const char s_DarkBlack[] = "\033[0;30m";	// Black foreground
 static const char s_DarkRed[] = "\033[0;31m";	// Red foreground
