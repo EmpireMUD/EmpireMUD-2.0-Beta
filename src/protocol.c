@@ -438,15 +438,14 @@ void ProtocolInput(descriptor_t *apDescriptor, char *apData, int aSize, char *ap
 			}
 
 			if ((pMXPTag = GetMxpTag("MXP=", MXPBuffer)) != NULL) {
-			free(pProtocol->pMXPVersion);
-			pProtocol->pMXPVersion = AllocString(pMXPTag);
+				free(pProtocol->pMXPVersion);
+				pProtocol->pMXPVersion = AllocString(pMXPTag);
 			}
 
 			if (strcmp(pProtocol->pMXPVersion, "Unknown")) {
-			Write(apDescriptor, "\n");
-			sprintf(MXPBuffer, "MXP version %s detected and enabled.\r\n", 
-			pProtocol->pMXPVersion);
-			InfoMessage(apDescriptor, MXPBuffer);
+				Write(apDescriptor, "\n");
+				sprintf(MXPBuffer, "MXP version %s detected and enabled.\r\n", pProtocol->pMXPVersion);
+				InfoMessage(apDescriptor, MXPBuffer);
 			}
 		}
 		else {	// In-band command
@@ -690,13 +689,11 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 						}
 
 						if (!bDone || !bValid) {
-							sprintf(BugString, "BUG: RGB %sground colour '%s' wasn't terminated with ']'.\n", 
-							(tolower(Buffer[0]) == 'f') ? "fore" : "back", &Buffer[1]);
+							sprintf(BugString, "BUG: RGB %sground colour '%s' wasn't terminated with ']'.\n", (tolower(Buffer[0]) == 'f') ? "fore" : "back", &Buffer[1]);
 							ReportBug(BugString);
 						}
 						else if (!IsValidColour(Buffer)) {
-							sprintf(BugString, "BUG: RGB %sground colour '%s' invalid (each digit must be in the range 0-5).\n", 
-							(tolower(Buffer[0]) == 'f') ? "fore" : "back", &Buffer[1]);
+							sprintf(BugString, "BUG: RGB %sground colour '%s' invalid (each digit must be in the range 0-5).\n", (tolower(Buffer[0]) == 'f') ? "fore" : "back", &Buffer[1]);
 							ReportBug(BugString);
 						}
 						else {	// Success
@@ -729,8 +726,7 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 							sprintf(BugString, "BUG: Required MXP version '%s' too long.  Missing ']'?\n", Buffer);
 							ReportBug(BugString);
 						}
-						else if (!strcmp(pProtocol->pMXPVersion, "Unknown") || 
-							strcmp(pProtocol->pMXPVersion, Buffer) < 0) {
+						else if (!strcmp(pProtocol->pMXPVersion, "Unknown") || strcmp(pProtocol->pMXPVersion, Buffer) < 0) {
 							/* Their version of MXP isn't high enough */
 							pProtocol->bBlockMXP = true;
 						}
@@ -1340,50 +1336,50 @@ void MSSPSetPlayers(int aPlayers) {
  *****************************************************************************/
 
 const char *MXPCreateTag(descriptor_t *apDescriptor, const char *apTag) {
-protocol_t *pProtocol = apDescriptor ? apDescriptor->pProtocol : NULL;
+	protocol_t *pProtocol = apDescriptor ? apDescriptor->pProtocol : NULL;
 
-if (pProtocol != NULL && pProtocol->pVariables[eMSDP_MXP]->ValueInt && 
-strlen(apTag) < 1000) {
-static char MXPBuffer [1024];
-sprintf(MXPBuffer, "\033[1z%s\033[7z", apTag);
-return MXPBuffer;
-}
-else {	// Leave the tag as-is, don't try to MXPify it
-return apTag;
-}
+	if (pProtocol != NULL && pProtocol->pVariables[eMSDP_MXP]->ValueInt && strlen(apTag) < 1000) {
+		static char MXPBuffer [1024];
+		sprintf(MXPBuffer, "\033[1z%s\033[7z", apTag);
+		return MXPBuffer;
+	}
+	else {	// Leave the tag as-is, don't try to MXPify it
+		return apTag;
+	}
 }
 
 void MXPSendTag(descriptor_t *apDescriptor, const char *apTag) {
-protocol_t *pProtocol = apDescriptor ? apDescriptor->pProtocol : NULL;
+	protocol_t *pProtocol = apDescriptor ? apDescriptor->pProtocol : NULL;
 
-if (pProtocol != NULL && apTag != NULL && strlen(apTag) < 1000) {
-if (pProtocol->pVariables[eMSDP_MXP]->ValueInt) {
-char MXPBuffer [1024];
-sprintf(MXPBuffer, "\033[1z%s\033[7z\r\n", apTag);
-Write(apDescriptor, MXPBuffer);
-}
-else if (pProtocol->bRenegotiate) {
-/* Tijer pointed out that when MUSHclient autoconnects, it fails 
-* to complete the negotiation.  This workaround will attempt to 
-* renegotiate after the character has connected.
-*/
+	if (pProtocol != NULL && apTag != NULL && strlen(apTag) < 1000) {
+		if (pProtocol->pVariables[eMSDP_MXP]->ValueInt) {
+			char MXPBuffer [1024];
+			sprintf(MXPBuffer, "\033[1z%s\033[7z\r\n", apTag);
+			Write(apDescriptor, MXPBuffer);
+		}
+		else if (pProtocol->bRenegotiate) {
+			/* Tijer pointed out that when MUSHclient autoconnects, it fails 
+			* to complete the negotiation.  This workaround will attempt to 
+			* renegotiate after the character has connected.
+			*/
 
-int i; /* Renegotiate everything except TTYPE */
-for (i = eNEGOTIATED_TTYPE+1; i < eNEGOTIATED_MAX; ++i) {
-pProtocol->Negotiated[i] = false;
-ConfirmNegotiation(apDescriptor, (negotiated_t)i, true, true);
+			int i; /* Renegotiate everything except TTYPE */
+			for (i = eNEGOTIATED_TTYPE+1; i < eNEGOTIATED_MAX; ++i) {
+				pProtocol->Negotiated[i] = false;
+				ConfirmNegotiation(apDescriptor, (negotiated_t)i, true, true);
+			}
+
+			pProtocol->bRenegotiate = false;
+			pProtocol->bNeedMXPVersion = true;
+			Negotiate(apDescriptor);
+		}
+	}
 }
 
-pProtocol->bRenegotiate = false;
-pProtocol->bNeedMXPVersion = true;
-Negotiate(apDescriptor);
-}
-}
-}
 
 /******************************************************************************
-Sound global functions.
-******************************************************************************/
+ Sound global functions.
+ *****************************************************************************/
 
 void SoundSend(descriptor_t *apDescriptor, const char *apTrigger) {
 	const int MaxTriggerLength = 128; /* Used for the buffer size */
@@ -2283,8 +2279,7 @@ static void SendATCP(descriptor_t *apDescriptor, const char *apVariable, const c
 			ATCPBuffer[0] = '\0';
 		}
 		else if (pProtocol->bATCP) {
-			sprintf(ATCPBuffer, "%c%c%c%s %s%c%c", 
-			IAC, SB, TELOPT_ATCP, apVariable, apValue, IAC, SE);
+			sprintf(ATCPBuffer, "%c%c%c%s %s%c%c", IAC, SB, TELOPT_ATCP, apVariable, apValue, IAC, SE);
 		}
 
 		/* Just in case someone calls this function without checking ATCP */
@@ -2443,9 +2438,7 @@ static void SendMSSP(descriptor_t *apDescriptor) {
 		int SizePair;
 
 		/* Retrieve the next MSSP variable/value pair */
-		sprintf(MSSPPair, "%c%s%c%s", MSSP_VAR, MSSPTable[i].pName, MSSP_VAL, 
-		MSSPTable[i].pFunction ? (*MSSPTable[i].pFunction)() : 
-		MSSPTable[i].pValue);
+		sprintf(MSSPPair, "%c%s%c%s", MSSP_VAR, MSSPTable[i].pName, MSSP_VAL, MSSPTable[i].pFunction ? (*MSSPTable[i].pFunction)() : MSSPTable[i].pValue);
 
 		/* Make sure we don't overflow the buffer */
 		SizePair = strlen(MSSPPair);

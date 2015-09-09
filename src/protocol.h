@@ -33,7 +33,7 @@ typedef struct descriptor_data descriptor_t;
 
 
 /******************************************************************************
- If you wish to support traditional mud colour codes, uncomment COLOUR_CHAR.
+ Color support options
  *****************************************************************************/
 
 /* You may replace the '&' with another character if you wish, eg '^' or '@'. */
@@ -42,11 +42,11 @@ typedef struct descriptor_data descriptor_t;
 /* Change this to 'false' if colour codes are off by default (see README.TXT) */
 #define COLOUR_ON_BY_DEFAULT  true
 
-/* Uncomment this if players can also use RGB colour codes such as "^[F135]" */
+/* Uncomment this if players can also use RGB colour codes such as "&[F135]" */
 // #define EXTENDED_COLOUR
 
 /* Uncomment this if invalid colours are displayed rather than being eaten. */
-// #define DISPLAY_INVALID_COLOUR_CODES
+#define DISPLAY_INVALID_COLOUR_CODES
 
 
 /******************************************************************************
