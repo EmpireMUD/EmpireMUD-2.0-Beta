@@ -1952,6 +1952,18 @@ const char *mapout_color_names[] = {
 	"Brown",	// 25
 	"Medium Gray",
 	"Dark Gray",
+	"Dark Blue",
+	"Dark Azure Blue",
+	"Dark Magenta",	// 30
+	"Dark Cyan",
+	"Lime Green",
+	"Dark Lime Green",
+	"Dark Orange",
+	"Pink",	// 35
+	"Dark Pink",
+	"Tan",
+	"Violet",
+	"Deep Violet",	// 39
 	"\n"
 };
 
@@ -1959,34 +1971,86 @@ const char *mapout_color_names[] = {
 // these must match up to mapout_color_names -- do not insert or change the order
 // these must also match up to the map.php generator
 const char mapout_color_tokens[] = {
-	'*',	// 0
-	'?',
-	'0',
-	'1',
-	'2',
-	'3',	// 5
-	'4',
-	'5',
-	'6',
-	'a',
-	'b',	// 10
-	'c',
-	'd',
-	'e',
-	'f',
-	'g',	// 15
-	'h',
-	'i',
-	'j',
-	'k',
-	'l',	// 20
-	'm',
-	'n',
-	'o',
-	'p',
-	'q',	// 25
-	'r',
-	's'
+	'*',	// "Starting Location",	// 0
+	'?',	// "Neutral",
+	'0',	// "Bright White",
+	'1',	// "Bright Red",
+	'2',	// "Bright Green",
+	'3',	// "Bright Yellow",	// 5
+	'4',	// "Bright Blue",
+	'5',	// "Bright Magenta",
+	'6',	// "Bright Cyan",
+	'a',	// "Dark Red",
+	'b',	// "Pale Green",	// 10
+	'c',	// "Yellow-Green",
+	'd',	// "Sea Green",
+	'e',	// "Medium Green",
+	'f',	// "Dark Green",
+	'g',	// "Olive Green",	// 15
+	'h',	// "Ice Blue",
+	'i',	// "Light Blue",
+	'j',	// "Medium Blue",
+	'k',	// "Deep Blue",
+	'l',	// "Light Tan",	// 20
+	'm',	// "Pale Yellow",
+	'n',	// "Peach",
+	'o',	// "Orange",
+	'p',	// "Yellow Brown",
+	'q',	// "Brown",	// 25
+	'r',	// "Medium Gray",
+	's',	// "Dark Gray",
+	't',	// "Dark Blue",
+	'u',	// "Dark Azure Blue",
+	'v',	// "Dark Magenta",	// 30
+	'w',	// "Dark Cyan",
+	'x',	// "Lime Green",
+	'y',	// "Dark Lime Green",
+	'z',	// "Dark Orange",
+	'A',	// "Pink",	// 35
+	'B',	// "Dark Pink",
+	'C',	// "Tan",
+	'D',	// "Violet",
+	'E',	// "Deep Violet",	// 39
+};
+
+
+// this maps a banner color (the 'r' in "&r") to a mapout_color_token character ('1')
+const char banner_to_mapout_token[][2] = {
+	{ '0', '0' },
+	{ 'n', '0' },
+	// non-bright colors:
+	{ 'r', 'a' },
+	{ 'g', 'f' },
+	{ 'b', 't' },
+	{ 'y', 'p' },
+	{ 'm', 'v' },
+	{ 'c', 'w' },
+	{ 'w', 's' },
+	{ 'a', 'u' },
+	{ 'j', 'g' },
+	{ 'l', 'y' },
+	{ 'o', 'z' },
+	{ 'p', 'B' },
+	{ 't', 'q' },
+	{ 'v', 'E' },
+	// bright colors:
+	{ 'R', '1' },
+	{ 'G', '2' },
+	{ 'B', '3' },
+	{ 'Y', '4' },
+	{ 'M', '5' },
+	{ 'C', '6' },
+	{ 'W', '0' },
+	{ 'A', 'j' },
+	{ 'J', 'd' },
+	{ 'L', 'x' },
+	{ 'O', 'o' },
+	{ 'P', 'A' },
+	{ 'T', 'C' },
+	{ 'V', 'D' },
+	
+	// last
+	{ '\n', '\n' }
 };
 
 

@@ -1809,6 +1809,7 @@ void ruin_one_building(room_data *room) {
 * Writes the data files used to generate graphical maps.
 */
 void output_map_to_file(void) {
+	extern const char banner_to_mapout_token[][2];
 	extern const char mapout_color_tokens[];
 	
 	FILE *out, *pol, *cit;
@@ -1818,10 +1819,7 @@ void output_map_to_file(void) {
 	empire_data *emp, *next_emp;
 	sector_data *ocean = sector_proto(BASIC_OCEAN);
 	crop_data *cp;
-	char minibuf[10];
 	room_vnum expecting;
-	
-	char *bannerlist = "0rgybmc";
 	
 	// basic ocean sector is required
 	if (!ocean) {
@@ -1885,21 +1883,16 @@ void output_map_to_file(void) {
 		
 		// political output
 		if ((emp = ROOM_OWNER(room))) {
-			color = 0;
-			for (num = 0; num < strlen(bannerlist); ++num) {
-				sprintf(minibuf, "&%c", bannerlist[num]);
-				if (strstr(EMPIRE_BANNER(emp), minibuf) != NULL) {
-					color = num;
-					break;
-				}
-				sprintf(minibuf, "&%c", UPPER(bannerlist[num]));
-				if (strstr(EMPIRE_BANNER(emp), minibuf) != NULL) {
+			// find the first color in banner_to_mapout_token that is in the banner
+			color = -1;
+			for (num = 0; banner_to_mapout_token[0][0] != '\n'; ++num) {
+				if (strchr(EMPIRE_BANNER(emp), banner_to_mapout_token[num][0])) {
 					color = num;
 					break;
 				}
 			}
-			// banner color
-			fprintf(pol, "%d", color);
+			
+			fprintf(pol, "%c", color != -1 ? banner_to_mapout_token[color][1] : '?');
 		}
 		else {
 			// no owner -- only some sects get printed

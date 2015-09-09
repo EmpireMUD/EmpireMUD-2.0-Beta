@@ -100,6 +100,19 @@ $data = array(
 	'q' => imagecolorallocate($im, 139, 117, 0),	// mountain
 	'r' => imagecolorallocate($im, 193, 193, 193),	// road
 	's' => imagecolorallocate($im, 81, 81, 81),	// building
+	't' => imagecolorallocate($im, 0, 0, 102),	// Dark Blue
+	'u' => imagecolorallocate($im, 0, 76, 153),	// Dark Azure Blue
+	'v' => imagecolorallocate($im, 102, 0, 51),	// Dark Magenta
+	'w' => imagecolorallocate($im, 0, 153, 153),	// Dark Cyan
+	'x' => imagecolorallocate($im, 102, 255, 102),	// Lime Green
+	'y' => imagecolorallocate($im, 0, 153, 0),	// Dark Lime Green
+	'z' => imagecolorallocate($im, 204, 102, 0),	// Dark Orange
+	'A' => imagecolorallocate($im, 255, 153, 204),	// Pink
+	'B' => imagecolorallocate($im, 255, 51, 153),	// Dark Pink
+	'C' => imagecolorallocate($im, 210, 180, 140),	// Tan
+	'D' => imagecolorallocate($im, 127, 0, 255),	// Violet
+	'E' => imagecolorallocate($im, 76, 0, 153),	// Deep Violet
+	
 	);
 
 // map comes out upside-down
