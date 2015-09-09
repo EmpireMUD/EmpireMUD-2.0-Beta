@@ -531,46 +531,46 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 					pCopyFrom = s_Clean;
 					break;
 				case 'r': /* dark red */
-					pCopyFrom = ColourRGB(apDescriptor, "F200");
+					pCopyFrom = ColourRGB(apDescriptor, "F300");
 					break;
 				case 'R': /* light red */
-					pCopyFrom = ColourRGB(apDescriptor, "F500");
+					pCopyFrom = ColourRGB(apDescriptor, "F600");
 					break;
 				case 'g': /* dark green */
-					pCopyFrom = ColourRGB(apDescriptor, "F020");
+					pCopyFrom = ColourRGB(apDescriptor, "F030");
 					break;
 				case 'G': /* light green */
-					pCopyFrom = ColourRGB(apDescriptor, "F050");
+					pCopyFrom = ColourRGB(apDescriptor, "F060");
 					break;
 				case 'y': /* dark yellow */
-					pCopyFrom = ColourRGB(apDescriptor, "F220");
+					pCopyFrom = ColourRGB(apDescriptor, "F330");
 					break;
 				case 'Y': /* light yellow */
-					pCopyFrom = ColourRGB(apDescriptor, "F550");
+					pCopyFrom = ColourRGB(apDescriptor, "F660");
 					break;
 				case 'b': /* dark blue */
-					pCopyFrom = ColourRGB(apDescriptor, "F002");
+					pCopyFrom = ColourRGB(apDescriptor, "F003");
 					break;
 				case 'B': /* light blue */
-					pCopyFrom = ColourRGB(apDescriptor, "F005");
+					pCopyFrom = ColourRGB(apDescriptor, "F006");
 					break;
 				case 'm': /* dark magenta */
-					pCopyFrom = ColourRGB(apDescriptor, "F202");
+					pCopyFrom = ColourRGB(apDescriptor, "F303");
 					break;
 				case 'M': /* light magenta */
-					pCopyFrom = ColourRGB(apDescriptor, "F505");
+					pCopyFrom = ColourRGB(apDescriptor, "F606");
 					break;
 				case 'c': /* dark cyan */
-					pCopyFrom = ColourRGB(apDescriptor, "F022");
+					pCopyFrom = ColourRGB(apDescriptor, "F033");
 					break;
 				case 'C': /* light cyan */
-					pCopyFrom = ColourRGB(apDescriptor, "F055");
+					pCopyFrom = ColourRGB(apDescriptor, "F066");
 					break;
 				case 'w': /* dark white */
-					pCopyFrom = ColourRGB(apDescriptor, "F222");
+					pCopyFrom = ColourRGB(apDescriptor, "F333");
 					break;
 				case 'W': /* light white */
-					pCopyFrom = ColourRGB(apDescriptor, "F555");
+					pCopyFrom = ColourRGB(apDescriptor, "F666");
 					break;
 				case 'a': /* dark azure */
 					pCopyFrom = ColourRGB(apDescriptor, "F014");
@@ -789,46 +789,46 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 					pCopyFrom = s_Clean;
 					break;
 				case 'r': /* dark red */
-					pCopyFrom = ColourRGB(apDescriptor, "F200");
+					pCopyFrom = ColourRGB(apDescriptor, "F300");
 					break;
 				case 'R': /* light red */
-					pCopyFrom = ColourRGB(apDescriptor, "F500");
+					pCopyFrom = ColourRGB(apDescriptor, "F600");
 					break;
 				case 'g': /* dark green */
-					pCopyFrom = ColourRGB(apDescriptor, "F020");
+					pCopyFrom = ColourRGB(apDescriptor, "F030");
 					break;
 				case 'G': /* light green */
-					pCopyFrom = ColourRGB(apDescriptor, "F050");
+					pCopyFrom = ColourRGB(apDescriptor, "F060");
 					break;
 				case 'y': /* dark yellow */
-					pCopyFrom = ColourRGB(apDescriptor, "F220");
+					pCopyFrom = ColourRGB(apDescriptor, "F330");
 					break;
 				case 'Y': /* light yellow */
-					pCopyFrom = ColourRGB(apDescriptor, "F550");
+					pCopyFrom = ColourRGB(apDescriptor, "F660");
 					break;
 				case 'b': /* dark blue */
-					pCopyFrom = ColourRGB(apDescriptor, "F002");
+					pCopyFrom = ColourRGB(apDescriptor, "F003");
 					break;
 				case 'B': /* light blue */
-					pCopyFrom = ColourRGB(apDescriptor, "F005");
+					pCopyFrom = ColourRGB(apDescriptor, "F006");
 					break;
 				case 'm': /* dark magenta */
-					pCopyFrom = ColourRGB(apDescriptor, "F202");
+					pCopyFrom = ColourRGB(apDescriptor, "F303");
 					break;
 				case 'M': /* light magenta */
-					pCopyFrom = ColourRGB(apDescriptor, "F505");
+					pCopyFrom = ColourRGB(apDescriptor, "F606");
 					break;
 				case 'c': /* dark cyan */
-					pCopyFrom = ColourRGB(apDescriptor, "F022");
+					pCopyFrom = ColourRGB(apDescriptor, "F033");
 					break;
 				case 'C': /* light cyan */
-					pCopyFrom = ColourRGB(apDescriptor, "F055");
+					pCopyFrom = ColourRGB(apDescriptor, "F066");
 					break;
 				case 'w': /* dark white */
-					pCopyFrom = ColourRGB(apDescriptor, "F222");
+					pCopyFrom = ColourRGB(apDescriptor, "F333");
 					break;
 				case 'W': /* light white */
-					pCopyFrom = ColourRGB(apDescriptor, "F555");
+					pCopyFrom = ColourRGB(apDescriptor, "F666");
 					break;
 				case 'a': /* dark azure */
 					pCopyFrom = ColourRGB(apDescriptor, "F014");
