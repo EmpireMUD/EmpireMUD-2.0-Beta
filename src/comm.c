@@ -30,7 +30,6 @@
 *   Data
 *   Helpers
 *   Reboot System
-*   Color Handling
 *   Main Game Loop
 *   Messaging
 *   Prompt
@@ -163,21 +162,6 @@ void clear_last_act_message(descriptor_data *desc) {
 	}
 }
 
-
-/**
-* @param char *txt Any string.
-* @param char character The character to search for.
-* @return int The number of occurrences of the character in the string.
-*/
-static int count_chars(char *txt, char character) {
-	int i, cnt = 0;
-
-	for(i = 0; txt[i]; i++)
-		if(txt[i] == character)
-			cnt++;
-
-	return cnt;
-}
 
 /*
  * This may not be pretty but it keeps game_loop() neater than if it was inline.
@@ -592,154 +576,6 @@ void update_reboot(void) {
 		syslog(SYS_SYSTEM, 0, FALSE, "The mud will %s in %d minute%s (type 'confirm' to %s faster)", reboot_type[reboot_control.type], reboot_control.time, PLURAL(reboot_control.time), reboot_type[reboot_control.type]);
 		mortlog("The mud will %s in %d minute%s (type 'confirm' to %s faster)", reboot_type[reboot_control.type], reboot_control.time, PLURAL(reboot_control.time), reboot_type[reboot_control.type]);
 	}
-}
-
-
- //////////////////////////////////////////////////////////////////////////////
-//// COLOR HANDLING //////////////////////////////////////////////////////////
-
-/**
-* Color code processing -- turns & codes into colors
-*
-* @param char *txt The input text
-* @param descriptor_data *t The descriptor we're sending this to
-*/
-char *parse_color(char *txt, descriptor_data *t) {
-	char *new_txt;
-	char *toret;
-	register int iter, pos = 0;
-	int color = (!t->character || (!IS_NPC(t->character) && PRF_FLAGGED(t->character, PRF_COLOR)) ? 1 : 0);
-	int num_codes;
-
-	// count & codes in the string
-	num_codes = count_chars(txt, '&');
-
-	// allocate new text based on how long the codes could possibly be (7 chars each) -- it's okay to allocate too much
-	new_txt = malloc((num_codes * 7) + strlen(txt) + 1);
-
-	// shorthand for the color switch: code is the 1-char code (r from &r) replacement is the "\033[0m" and length is its length in chars
-	#define PARSE_COLOR(code, replacement, length)	\
-		if (color && code != t->last_color_sent) {	\
-			strcpy(new_txt + pos, replacement);	\
-			pos += (length);	\
-			t->last_color_sent = code;	\
-		}
-	
-	// parse color codes
-	for (iter = 0; txt[iter]; iter++) {
-		// is a color code?
-		if (txt[iter] == '&' && txt[iter+1]) {
-			++iter;
-	
-			switch(txt[iter]) {
-				case '0': {		// &0 -- don't use PARSE_COLOR because we ALWAYS want to send the \033[0m
-					if (color) {
-						strcpy(new_txt + pos, "\033[0m");
-						pos += 4;
-						t->last_color_sent = '0';
-					}
-					break;
-				}
-				case 'r': {		// &r
-					PARSE_COLOR('r', "\033[0;31m", 7);
-					break;
-				}
-				case 'R': {		// &R
-					PARSE_COLOR('R', "\033[31;1m", 7);
-					break;
-				}
-				case 'g': {		// &g
-					PARSE_COLOR('g', "\033[0;32m", 7);
-					break;
-				}
-				case 'G': {		// &G
-					PARSE_COLOR('G', "\033[32;1m", 7);
-					break;
-				}
-				case 'y': {		// &y
-					PARSE_COLOR('y', "\033[0;33m", 7);
-					break;
-				}
-				case 'Y': {		// &Y
-					PARSE_COLOR('Y', "\033[33;1m", 7);
-					break;
-				}
-				case 'b': {		// &b
-					PARSE_COLOR('b', "\033[0;34m", 7);
-					break;
-				}
-				case 'B': {		// &B
-					PARSE_COLOR('B', "\033[34;1m", 7);
-					break;
-				}
-				case 'm': {		// &m
-					PARSE_COLOR('m', "\033[0;35m", 7);
-					break;
-				}
-				case 'M': {		// &M
-					PARSE_COLOR('M', "\033[35;1m", 7);
-					break;
-				}
-				case 'c': {		// &c
-					PARSE_COLOR('c', "\033[0;36m", 7);
-					break;
-				}
-				case 'C': {		// &C
-					PARSE_COLOR('C', "\033[36;1m", 7);
-					break;
-				}
-				case 'w': {		// &w
-					PARSE_COLOR('w', "\033[0;37m", 7);
-					break;
-				}
-				case 'W': {		// &W
-					PARSE_COLOR('W', "\033[37;1m", 7);
-					break;
-				}
-				
-				// other
-				
-				case 'u': {		// &u
-					PARSE_COLOR('u', "\033[4m", 4);
-					break;
-				}
-				case '&': {		// &&
-					new_txt[pos] = txt[iter];
-					++pos;
-					break;
-				}
-				case '?': {		// &? (ignore -- handled in mapview)
-					break;
-				}
-				case 'V': {		// &V (ignore -- handled in mapview)
-					break;
-				}
-
-				default: {		// & with any other char after
-					new_txt[pos++] = '&';
-					--iter;
-					break;
-				}
-			}
-		}
-		else {	// NOT a & at txt[iter]
-			new_txt[pos] = txt[iter];
-			++pos;
-		}
-	}
-
-	// terminator
-	new_txt[pos] = '\0';
-	
-	// create a new string to return, to prevent memory loss
-	toret = strdup(new_txt);
-	
-	// free the temporary buffer
-	if (new_txt) {
-		free(new_txt);
-	}
-
-	return toret;
 }
 
 
@@ -1816,7 +1652,7 @@ int new_descriptor(int s) {
 	descriptor_list = newd;
 	
 	ProtocolNegotiate(newd);
-	SEND_TO_Q(parse_color(intros[number(0, num_intros-1)], newd), newd);
+	SEND_TO_Q(intros[number(0, num_intros-1)], newd);
 
 	return (0);
 }
@@ -2162,7 +1998,6 @@ int process_input(descriptor_data *t) {
  *      14 bytes: unused */
 static int process_output(descriptor_data *t) {
 	char i[MAX_SOCK_BUF], *osb = i + 2;
-	char *prompt;
 	int result;
 
 	/* we may need this \r\n for later -- see below */
@@ -2181,9 +2016,7 @@ static int process_output(descriptor_data *t) {
 
 	// add prompt
 	if (!t->pProtocol->WriteOOB) {
-		prompt = make_prompt(t);
-		strncat(i, prompt, MAX_PROMPT_LENGTH);
-		free(prompt);
+		strncat(i, make_prompt(t), MAX_PROMPT_LENGTH);
 	}
 
 	/* now, send the output.  If this is an 'interruption', use the prepended
@@ -2311,7 +2144,7 @@ int write_to_descriptor(socket_t desc, const char *txt) {
 /* Add a new string to a player's output queue */
 void write_to_output(const char *txt, descriptor_data *t) {
 	int size, wantsize;
-	char *new_txt, protocol_txt[MAX_STRING_LENGTH];
+	char protocol_txt[MAX_STRING_LENGTH];
 	//char *overflow_txt = "**OVERFLOW**\r\n";
 
 	/* if we're in the overflow state already, ignore this new output */
@@ -2325,32 +2158,19 @@ void write_to_output(const char *txt, descriptor_data *t) {
 	if (t->pProtocol->WriteOOB > 0) {
 		--t->pProtocol->WriteOOB;
 	}
-
-	new_txt = protocol_txt;//parse_color(protocol_txt, t);
-
-	size = strlen(new_txt);
-	
-	// truncate to MAX_STRING_LENGTH srsly
-	/*
-	if (size > MAX_STRING_LENGTH) {
-		size = MAX_STRING_LENGTH-1;
-		strcpy(new_txt + size - strlen(overflow_txt), overflow_txt);
-	}
-	*/
 	
 	// check that text size is going to fit into a large bufffer
 	if (size + t->bufptr + 1 > LARGE_BUFSIZE) {
 		size = LARGE_BUFSIZE - t->bufptr - 1;
-		new_txt[size] = '\0';
+		protocol_txt[size] = '\0';
 		++buf_overflows;
 	}
 
 	/* if we have enough space, just write to buffer and that's it! */
 	if (t->bufspace > size) {
-		strcpy(t->output + t->bufptr, new_txt);
+		strcpy(t->output + t->bufptr, protocol_txt);
 		t->bufspace -= size;
 		t->bufptr += size;
-		//free(new_txt);
 		return;
 	}
 	
@@ -2369,8 +2189,7 @@ void write_to_output(const char *txt, descriptor_data *t) {
 
 	strcpy(t->large_outbuf->text, t->output);	/* copy to big buffer */
 	t->output = t->large_outbuf->text;	/* make big buffer primary */
-	strcat(t->output, new_txt);
-	//free(new_txt);
+	strcat(t->output, protocol_txt);
 
 	/* set the pointer for the next write */
 	t->bufptr = strlen(t->output);
@@ -2417,8 +2236,6 @@ void write_to_q(const char *txt, struct txt_q *queue, int aliased, bool add_to_h
 
 /**
 * Makes the prompt for the character. 
-*
-* NOTE: You MUST free the result of this; it is a malloc'd string.
 *
 * @param descriptor_data *d The descriptor we're making the prompt for
 * @return char* A pointer to the prompt string.
@@ -2482,10 +2299,11 @@ char *make_prompt(descriptor_data *d) {
 
 		strncat(prompt, prompt_str(d->character), sizeof(prompt) - strlen(prompt) - 1);
 	}
-	else
+	else {
 		*prompt = '\0';
+	}
 
-	return (parse_color(prompt, d));
+	return prompt;
 }
 
 
@@ -2887,7 +2705,6 @@ void game_loop(socket_t mother_desc) {
 	struct timeval last_time, opt_time, process_time, temp_time;
 	struct timeval before_sleep, now, timeout;
 	char comm[MAX_INPUT_LENGTH];
-	char *prompt;
 	descriptor_data *d, *next_d;
 	int missed_pulses, maxdesc, aliased;
 
@@ -3063,11 +2880,9 @@ void game_loop(socket_t mother_desc) {
 			next_d = d->next;
 			
 			if (!d->has_prompt) {
-				prompt = make_prompt(d);
-				if (write_to_descriptor(d->descriptor, prompt) >= 0) {
+				if (write_to_descriptor(d->descriptor, make_prompt(d)) >= 0) {
 					d->has_prompt = 1;
 				}
-				free(prompt);
 			}
 		}
 
