@@ -506,6 +506,9 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 		bool_t bColourOn = COLOUR_ON_BY_DEFAULT;
 	#endif /* COLOUR_CHAR */
 	int i = 0, j = 0; /* Index values */
+	char lastColor[64];
+	
+	*lastColor = '\0';
 
 	protocol_t *pProtocol = apDescriptor ? apDescriptor->pProtocol : NULL;
 	if (pProtocol == NULL || apData == NULL)
@@ -764,9 +767,11 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 			}
 
 			/* Copy the colour code, if any. */
-			if (pCopyFrom != NULL) {
-				while (*pCopyFrom != '\0' && i < MAX_OUTPUT_BUFFER)
+			if (pCopyFrom != NULL && strcmp(pCopyFrom, lastColor)) {
+				strcpy(lastColor, pCopyFrom);
+				while (*pCopyFrom != '\0' && i < MAX_OUTPUT_BUFFER) {
 					Result[i++] = *pCopyFrom++;
+				}
 			}
 		}
 
@@ -905,9 +910,11 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 				}
 
 			/* Copy the colour code, if any. */
-			if (pCopyFrom != NULL) {
-				while (*pCopyFrom != '\0' && i < MAX_OUTPUT_BUFFER)
+			if (pCopyFrom != NULL && strcmp(pCopyFrom, lastColor)) {
+				strcpy(lastColor, pCopyFrom);
+				while (*pCopyFrom != '\0' && i < MAX_OUTPUT_BUFFER) {
 					Result[i++] = *pCopyFrom++;
+				}
 			}
 		}
 		#endif /* COLOUR_CHAR */
