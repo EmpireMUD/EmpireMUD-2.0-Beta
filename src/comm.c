@@ -1997,7 +1997,7 @@ int process_input(descriptor_data *t) {
  *	 2 bytes: extra \r\n for non-comapct
  *      14 bytes: unused */
 static int process_output(descriptor_data *t) {
-	char i[MAX_SOCK_BUF], prompt[MAX_STRING_LENGTH], *osb = i + 2;
+	char i[MAX_SOCK_BUF], *osb = i + 2;
 	int result;
 
 	/* we may need this \r\n for later -- see below */
@@ -2016,10 +2016,11 @@ static int process_output(descriptor_data *t) {
 
 	// add prompt
 	if (!t->pProtocol->WriteOOB) {
-		int size, wantsize;
+		char prompt[MAX_STRING_LENGTH];
+		int wantsize;
 		
 		strcpy(prompt, make_prompt(t));
-		size = wantsize = strlen(prompt);
+		wantsize = strlen(prompt);
 		strncpy(prompt, ProtocolOutput(t, prompt, &wantsize), MAX_STRING_LENGTH);
 		prompt[MAX_STRING_LENGTH-1] = '\0';
 
@@ -2887,7 +2888,15 @@ void game_loop(socket_t mother_desc) {
 			next_d = d->next;
 			
 			if (!d->has_prompt) {
-				if (write_to_descriptor(d->descriptor, make_prompt(d)) >= 0) {
+				char prompt[MAX_STRING_LENGTH];
+				int wantsize;
+		
+				strcpy(prompt, make_prompt(d));
+				wantsize = strlen(prompt);
+				strncpy(prompt, ProtocolOutput(d, prompt, &wantsize), MAX_STRING_LENGTH);
+				prompt[MAX_STRING_LENGTH-1] = '\0';
+				
+				if (write_to_descriptor(d->descriptor, prompt) >= 0) {
 					d->has_prompt = 1;
 				}
 			}
