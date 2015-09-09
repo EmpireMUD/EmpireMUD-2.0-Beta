@@ -520,6 +520,7 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 					pCopyFrom = Tab;
 					break;
 				case 'n':
+				case '0':
 					pCopyFrom = s_Clean;
 					break;
 				case 'r': /* dark red */
@@ -778,6 +779,7 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 					pCopyFrom = ColourChar;
 					break;
 				case 'n':
+				case '0':
 					pCopyFrom = s_Clean;
 					break;
 				case 'r': /* dark red */
