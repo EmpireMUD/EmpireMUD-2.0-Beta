@@ -109,22 +109,19 @@ const char *get_banner_complement_color(empire_data *emp) {
 	
 	// c, C ?
 	
-	if (strchrstr(EMPIRE_BANNER(emp), "rpmbBvVaClvV")) {
+	if (strchrstr(EMPIRE_BANNER(emp), "rpmbBvVaClv")) {
 		return "\t[B321]";	// tan
 	}
-	if (strchrstr(EMPIRE_BANNER(emp), "AGLJyY")) {
+	if (strchrstr(EMPIRE_BANNER(emp), "AGLJyYV")) {
 		return "\t[B210]";	// dark tan
 	}
-	if (strchrstr(EMPIRE_BANNER(emp), "RPM")) {
-		return "\t[B014]";	// dark azure
-	}
 	if (strchrstr(EMPIRE_BANNER(emp), "gj")) {
-		return "\t[B530]";	// orange
+		return "\t[B104]";	// violet
 	}
 	if (strchrstr(EMPIRE_BANNER(emp), "coOTw")) {
 		return "\t[B003]";	// dark blue
 	}
-	if (strchrstr(EMPIRE_BANNER(emp), "t")) {
+	if (strchrstr(EMPIRE_BANNER(emp), "tRPM")) {
 		return "\t[B033]";	// dark cyan
 	}
 	
