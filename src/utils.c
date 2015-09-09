@@ -2748,6 +2748,26 @@ void sprinttype(int type, const char *names[], char *result) {
 }
 
 
+/**
+* Similar to strchr except the 2nd argument is a string.
+*
+* @param const char *haystack The string to search.
+* @param const char *needles A set of characters to search for.
+* @return bool TRUE if any character from needles exists in haystack.
+*/
+bool strchrstr(const char *haystack, const char *needles) {
+	int iter;
+	
+	for (iter = 0; needles[iter] != '\0'; ++iter) {
+		if (strchr(haystack, needles[iter])) {
+			return TRUE;
+		}
+	}
+	
+	return FALSE;
+}
+
+
 /*
  * str_cmp: a case-insensitive version of strcmp().
  * Returns: 0 if equal, > 0 if arg1 > arg2, or < 0 if arg1 < arg2.

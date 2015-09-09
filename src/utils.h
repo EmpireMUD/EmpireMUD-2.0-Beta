@@ -1114,6 +1114,7 @@ extern char *strtolower(char *str);
 extern char *strtoupper(char *str);
 extern int count_color_codes(char *string);
 extern int count_icon_codes(char *string);
+extern bool strchrstr(const char *haystack, const char *needles);
 extern int str_cmp(const char *arg1, const char *arg2);
 extern int strn_cmp(const char *arg1, const char *arg2, int n);
 void prettier_sprintbit(bitvector_t bitvector, const char *names[], char *result);
