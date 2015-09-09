@@ -94,11 +94,12 @@ static const char s_Button3[] = "\005\002Score\002help\006";
 static const char s_Button4[] = "\005\002Equipment\002equipment\006";
 static const char s_Button5[] = "\005\002Inventory\002inventory\006";
 
-static const char s_Gauge1[]  = "\005\002Health\002red\002HEALTH\002HEALTH_MAX\006";
-static const char s_Gauge2[]  = "\005\002Mana\002blue\002MANA\002MANA_MAX\006";
-static const char s_Gauge3[]  = "\005\002Movement\002green\002MOVEMENT\002MOVEMENT_MAX\006";
-static const char s_Gauge4[]  = "\005\002Exp TNL\002yellow\002EXPERIENCE\002EXPERIENCE_MAX\006";
-static const char s_Gauge5[]  = "\005\002Opponent\002darkred\002OPPONENT_HEALTH\002OPPONENT_HEALTH_MAX\006";
+static const char s_Gauge1[] = "\005\002Health\002red\002HEALTH\002HEALTH_MAX\006";
+static const char s_Gauge2[] = "\005\002Mana\002blue\002MANA\002MANA_MAX\006";
+static const char s_Gauge3[] = "\005\002Movement\002green\002MOVEMENT\002MOVEMENT_MAX\006";
+static const char s_Gauge4[] = "\005\002Exp TNL\002yellow\002EXPERIENCE\002EXPERIENCE_MAX\006";
+static const char s_Gauge5[] = "\005\002Opponent\002darkred\002OPPONENT_HEALTH\002OPPONENT_HEALTH_MAX\006";
+
 
 /******************************************************************************
  MSDP variable table.
@@ -114,153 +115,157 @@ static const char s_Gauge5[]  = "\005\002Opponent\002darkred\002OPPONENT_HEALTH\
 #define STRING_WRITE_ONCE(x,y)     true,  true,  true,  false, -1, -1,  0, NULL
 #define STRING_GUI(x)              true,  false, false, true,  -1, -1,  0, x
 
-static variable_name_t VariableNameTable[eMSDP_MAX+1] =  {
+static variable_name_t VariableNameTable[eMSDP_MAX+1] = {
 	/* General */
-	{ eMSDP_CHARACTER_NAME,   "CHARACTER_NAME",   STRING_READ_ONLY }, 
-	{ eMSDP_SERVER_ID,        "SERVER_ID",        STRING_READ_ONLY }, 
-	{ eMSDP_SERVER_TIME,      "SERVER_TIME",      NUMBER_READ_ONLY }, 
-	{ eMSDP_SNIPPET_VERSION,  "SNIPPET_VERSION",  NUMBER_READ_ONLY_SET_TO(SNIPPET_VERSION) }, 
+	{ eMSDP_CHARACTER_NAME, "CHARACTER_NAME", STRING_READ_ONLY }, 
+	{ eMSDP_SERVER_ID, "SERVER_ID", STRING_READ_ONLY }, 
+	{ eMSDP_SERVER_TIME, "SERVER_TIME", NUMBER_READ_ONLY }, 
+	{ eMSDP_SNIPPET_VERSION, "SNIPPET_VERSION", NUMBER_READ_ONLY_SET_TO(SNIPPET_VERSION) }, 
 	
 	/* Character */
-	{ eMSDP_AFFECTS,          "AFFECTS",          STRING_READ_ONLY }, 
-	{ eMSDP_ALIGNMENT,        "ALIGNMENT",        NUMBER_READ_ONLY }, 
-	{ eMSDP_EXPERIENCE,       "EXPERIENCE",       NUMBER_READ_ONLY }, 
-	{ eMSDP_EXPERIENCE_MAX,   "EXPERIENCE_MAX",   NUMBER_READ_ONLY }, 
-	{ eMSDP_EXPERIENCE_TNL,   "EXPERIENCE_TNL",   NUMBER_READ_ONLY }, 
-	{ eMSDP_HEALTH,           "HEALTH",           NUMBER_READ_ONLY }, 
-	{ eMSDP_HEALTH_MAX,       "HEALTH_MAX",       NUMBER_READ_ONLY }, 
-	{ eMSDP_LEVEL,            "LEVEL",            NUMBER_READ_ONLY }, 
-	{ eMSDP_RACE,             "RACE",             STRING_READ_ONLY }, 
-	{ eMSDP_CLASS,            "CLASS",            STRING_READ_ONLY }, 
-	{ eMSDP_MANA,             "MANA",             NUMBER_READ_ONLY }, 
-	{ eMSDP_MANA_MAX,         "MANA_MAX",         NUMBER_READ_ONLY }, 
-	{ eMSDP_WIMPY,            "WIMPY",            NUMBER_READ_ONLY }, 
-	{ eMSDP_PRACTICE,         "PRACTICE",         NUMBER_READ_ONLY }, 
-	{ eMSDP_MONEY,            "MONEY",            NUMBER_READ_ONLY }, 
-	{ eMSDP_MOVEMENT,         "MOVEMENT",         NUMBER_READ_ONLY }, 
-	{ eMSDP_MOVEMENT_MAX,     "MOVEMENT_MAX",     NUMBER_READ_ONLY }, 
-	{ eMSDP_HITROLL,          "HITROLL",          NUMBER_READ_ONLY }, 
-	{ eMSDP_DAMROLL,          "DAMROLL",          NUMBER_READ_ONLY }, 
-	{ eMSDP_AC,               "AC",               NUMBER_READ_ONLY }, 
-	{ eMSDP_STR,              "STR",              NUMBER_READ_ONLY }, 
-	{ eMSDP_INT,              "INT",              NUMBER_READ_ONLY }, 
-	{ eMSDP_WIS,              "WIS",              NUMBER_READ_ONLY }, 
-	{ eMSDP_DEX,              "DEX",              NUMBER_READ_ONLY }, 
-	{ eMSDP_CON,              "CON",              NUMBER_READ_ONLY }, 
-	{ eMSDP_STR_PERM,         "STR_PERM",         NUMBER_READ_ONLY }, 
-	{ eMSDP_INT_PERM,         "INT_PERM",         NUMBER_READ_ONLY }, 
-	{ eMSDP_WIS_PERM,         "WIS_PERM",         NUMBER_READ_ONLY }, 
-	{ eMSDP_DEX_PERM,         "DEX_PERM",         NUMBER_READ_ONLY }, 
-	{ eMSDP_CON_PERM,         "CON_PERM",         NUMBER_READ_ONLY }, 
+	{ eMSDP_AFFECTS, "AFFECTS", STRING_READ_ONLY }, 
+	{ eMSDP_ALIGNMENT, "ALIGNMENT", NUMBER_READ_ONLY }, 
+	{ eMSDP_EXPERIENCE, "EXPERIENCE", NUMBER_READ_ONLY }, 
+	{ eMSDP_EXPERIENCE_MAX, "EXPERIENCE_MAX", NUMBER_READ_ONLY }, 
+	{ eMSDP_EXPERIENCE_TNL, "EXPERIENCE_TNL", NUMBER_READ_ONLY }, 
+	{ eMSDP_HEALTH, "HEALTH", NUMBER_READ_ONLY }, 
+	{ eMSDP_HEALTH_MAX, "HEALTH_MAX", NUMBER_READ_ONLY }, 
+	{ eMSDP_LEVEL, "LEVEL", NUMBER_READ_ONLY }, 
+	{ eMSDP_RACE, "RACE", STRING_READ_ONLY }, 
+	{ eMSDP_CLASS, "CLASS", STRING_READ_ONLY }, 
+	{ eMSDP_MANA, "MANA", NUMBER_READ_ONLY }, 
+	{ eMSDP_MANA_MAX, "MANA_MAX", NUMBER_READ_ONLY }, 
+	{ eMSDP_WIMPY, "WIMPY", NUMBER_READ_ONLY }, 
+	{ eMSDP_PRACTICE, "PRACTICE", NUMBER_READ_ONLY }, 
+	{ eMSDP_MONEY, "MONEY", NUMBER_READ_ONLY }, 
+	{ eMSDP_MOVEMENT, "MOVEMENT", NUMBER_READ_ONLY }, 
+	{ eMSDP_MOVEMENT_MAX, "MOVEMENT_MAX", NUMBER_READ_ONLY }, 
+	{ eMSDP_HITROLL, "HITROLL", NUMBER_READ_ONLY }, 
+	{ eMSDP_DAMROLL, "DAMROLL", NUMBER_READ_ONLY }, 
+	{ eMSDP_AC, "AC", NUMBER_READ_ONLY }, 
+	{ eMSDP_STR, "STR", NUMBER_READ_ONLY }, 
+	{ eMSDP_INT, "INT", NUMBER_READ_ONLY }, 
+	{ eMSDP_WIS, "WIS", NUMBER_READ_ONLY }, 
+	{ eMSDP_DEX, "DEX", NUMBER_READ_ONLY }, 
+	{ eMSDP_CON, "CON", NUMBER_READ_ONLY }, 
+	{ eMSDP_STR_PERM, "STR_PERM", NUMBER_READ_ONLY }, 
+	{ eMSDP_INT_PERM, "INT_PERM", NUMBER_READ_ONLY }, 
+	{ eMSDP_WIS_PERM, "WIS_PERM", NUMBER_READ_ONLY }, 
+	{ eMSDP_DEX_PERM, "DEX_PERM", NUMBER_READ_ONLY }, 
+	{ eMSDP_CON_PERM, "CON_PERM", NUMBER_READ_ONLY }, 
 	
 	/* Combat */
-	{ eMSDP_OPPONENT_HEALTH,  "OPPONENT_HEALTH",  NUMBER_READ_ONLY }, 
-	{ eMSDP_OPPONENT_HEALTH_MAX,"OPPONENT_HEALTH_MAX",NUMBER_READ_ONLY }, 
-	{ eMSDP_OPPONENT_LEVEL,   "OPPONENT_LEVEL",   NUMBER_READ_ONLY }, 
-	{ eMSDP_OPPONENT_NAME,    "OPPONENT_NAME",    STRING_READ_ONLY }, 
+	{ eMSDP_OPPONENT_HEALTH, "OPPONENT_HEALTH", NUMBER_READ_ONLY }, 
+	{ eMSDP_OPPONENT_HEALTH_MAX, "OPPONENT_HEALTH_MAX", NUMBER_READ_ONLY }, 
+	{ eMSDP_OPPONENT_LEVEL, "OPPONENT_LEVEL", NUMBER_READ_ONLY }, 
+	{ eMSDP_OPPONENT_NAME, "OPPONENT_NAME", STRING_READ_ONLY }, 
 	
 	/* World */
-	{ eMSDP_AREA_NAME,        "AREA_NAME",        STRING_READ_ONLY }, 
-	{ eMSDP_ROOM_EXITS,       "ROOM_EXITS",       STRING_READ_ONLY }, 
-	{ eMSDP_ROOM_NAME,        "ROOM_NAME",        STRING_READ_ONLY }, 
-	{ eMSDP_ROOM_VNUM,        "ROOM_VNUM",        NUMBER_READ_ONLY }, 
-	{ eMSDP_WORLD_TIME,       "WORLD_TIME",       NUMBER_READ_ONLY }, 
+	{ eMSDP_AREA_NAME, "AREA_NAME", STRING_READ_ONLY }, 
+	{ eMSDP_ROOM_EXITS, "ROOM_EXITS", STRING_READ_ONLY }, 
+	{ eMSDP_ROOM_NAME, "ROOM_NAME", STRING_READ_ONLY }, 
+	{ eMSDP_ROOM_VNUM, "ROOM_VNUM", NUMBER_READ_ONLY }, 
+	{ eMSDP_WORLD_TIME, "WORLD_TIME", NUMBER_READ_ONLY }, 
 	
 	/* Configurable variables */
-	{ eMSDP_CLIENT_ID,        "CLIENT_ID",        STRING_WRITE_ONCE(1,40) }, 
-	{ eMSDP_CLIENT_VERSION,   "CLIENT_VERSION",   STRING_WRITE_ONCE(1,40) }, 
-	{ eMSDP_PLUGIN_ID,        "PLUGIN_ID",        STRING_WITH_LENGTH_OF(1,40) }, 
-	{ eMSDP_ANSI_COLORS,      "ANSI_COLORS",      BOOLEAN_SET_TO(1) }, 
+	{ eMSDP_CLIENT_ID, "CLIENT_ID", STRING_WRITE_ONCE(1,40) }, 
+	{ eMSDP_CLIENT_VERSION, "CLIENT_VERSION", STRING_WRITE_ONCE(1,40) }, 
+	{ eMSDP_PLUGIN_ID, "PLUGIN_ID", STRING_WITH_LENGTH_OF(1,40) }, 
+	{ eMSDP_ANSI_COLORS, "ANSI_COLORS", BOOLEAN_SET_TO(1) }, 
 	{ eMSDP_XTERM_256_COLORS, "XTERM_256_COLORS", BOOLEAN_SET_TO(0) }, 
-	{ eMSDP_UTF_8,            "UTF_8",            BOOLEAN_SET_TO(0) }, 
-	{ eMSDP_SOUND,            "SOUND",            BOOLEAN_SET_TO(0) }, 
-	{ eMSDP_MXP,              "MXP",              BOOLEAN_SET_TO(0) }, 
+	{ eMSDP_UTF_8, "UTF_8", BOOLEAN_SET_TO(0) }, 
+	{ eMSDP_SOUND, "SOUND", BOOLEAN_SET_TO(0) }, 
+	{ eMSDP_MXP, "MXP", BOOLEAN_SET_TO(0) }, 
 	
 	/* GUI variables */
-	{ eMSDP_BUTTON_1,         "BUTTON_1",         STRING_GUI(s_Button1) }, 
-	{ eMSDP_BUTTON_2,         "BUTTON_2",         STRING_GUI(s_Button2) }, 
-	{ eMSDP_BUTTON_3,         "BUTTON_3",         STRING_GUI(s_Button3) }, 
-	{ eMSDP_BUTTON_4,         "BUTTON_4",         STRING_GUI(s_Button4) }, 
-	{ eMSDP_BUTTON_5,         "BUTTON_5",         STRING_GUI(s_Button5) }, 
-	{ eMSDP_GAUGE_1,          "GAUGE_1",          STRING_GUI(s_Gauge1) }, 
-	{ eMSDP_GAUGE_2,          "GAUGE_2",          STRING_GUI(s_Gauge2) }, 
-	{ eMSDP_GAUGE_3,          "GAUGE_3",          STRING_GUI(s_Gauge3) }, 
-	{ eMSDP_GAUGE_4,          "GAUGE_4",          STRING_GUI(s_Gauge4) }, 
-	{ eMSDP_GAUGE_5,          "GAUGE_5",          STRING_GUI(s_Gauge5) }, 
+	{ eMSDP_BUTTON_1, "BUTTON_1", STRING_GUI(s_Button1) }, 
+	{ eMSDP_BUTTON_2, "BUTTON_2", STRING_GUI(s_Button2) }, 
+	{ eMSDP_BUTTON_3, "BUTTON_3", STRING_GUI(s_Button3) }, 
+	{ eMSDP_BUTTON_4, "BUTTON_4", STRING_GUI(s_Button4) }, 
+	{ eMSDP_BUTTON_5, "BUTTON_5", STRING_GUI(s_Button5) }, 
+	{ eMSDP_GAUGE_1, "GAUGE_1", STRING_GUI(s_Gauge1) }, 
+	{ eMSDP_GAUGE_2, "GAUGE_2", STRING_GUI(s_Gauge2) }, 
+	{ eMSDP_GAUGE_3, "GAUGE_3", STRING_GUI(s_Gauge3) }, 
+	{ eMSDP_GAUGE_4, "GAUGE_4", STRING_GUI(s_Gauge4) }, 
+	{ eMSDP_GAUGE_5, "GAUGE_5", STRING_GUI(s_Gauge5) }, 
 	
-	{ eMSDP_MAX,              "", 0 } /* This must always be last. */
+	{ eMSDP_MAX, "", 0 } /* This must always be last. */
 };
+
 
 /******************************************************************************
  MSSP file-scope variables.
  *****************************************************************************/
 
-static int    s_Players = 0;
-static time_t s_Uptime  = 0;
+static int s_Players = 0;
+static time_t s_Uptime = 0;
+
 
 /******************************************************************************
  Local function prototypes.
  *****************************************************************************/
 
-static void Negotiate               (descriptor_t *apDescriptor);
-static void PerformHandshake        (descriptor_t *apDescriptor, char aCmd, char aProtocol);
-static void PerformSubnegotiation   (descriptor_t *apDescriptor, char aCmd, char *apData, int aSize);
-static void SendNegotiationSequence (descriptor_t *apDescriptor, char aCmd, char aProtocol);
-static bool_t ConfirmNegotiation    (descriptor_t *apDescriptor, negotiated_t aProtocol, bool_t abWillDo, bool_t abSendReply);
+static void Negotiate(descriptor_t *apDescriptor);
+static void PerformHandshake(descriptor_t *apDescriptor, char aCmd, char aProtocol);
+static void PerformSubnegotiation(descriptor_t *apDescriptor, char aCmd, char *apData, int aSize);
+static void SendNegotiationSequence(descriptor_t *apDescriptor, char aCmd, char aProtocol);
+static bool_t ConfirmNegotiation(descriptor_t *apDescriptor, negotiated_t aProtocol, bool_t abWillDo, bool_t abSendReply);
 
-static void ParseMSDP               (descriptor_t *apDescriptor, const char *apData);
-static void ExecuteMSDPPair         (descriptor_t *apDescriptor, const char *apVariable, const char *apValue);
+static void ParseMSDP(descriptor_t *apDescriptor, const char *apData);
+static void ExecuteMSDPPair(descriptor_t *apDescriptor, const char *apVariable, const char *apValue);
 
-static void ParseATCP               (descriptor_t *apDescriptor, const char *apData);
+static void ParseATCP(descriptor_t *apDescriptor, const char *apData);
 #ifdef MUDLET_PACKAGE
-static void SendATCP                (descriptor_t *apDescriptor, const char *apVariable, const char *apValue);
+	static void SendATCP(descriptor_t *apDescriptor, const char *apVariable, const char *apValue);
 #endif /* MUDLET_PACKAGE */
 
-static void SendMSSP                (descriptor_t *apDescriptor);
+static void SendMSSP(descriptor_t *apDescriptor);
 
-static char *GetMxpTag              (const char *apTag, const char *apText);
+static char *GetMxpTag(const char *apTag, const char *apText);
 
-static const char *GetAnsiColour    (bool_t abBackground, int aRed, int aGreen, int aBlue);
-static const char *GetRGBColour     (bool_t abBackground, int aRed, int aGreen, int aBlue);
-static bool_t IsValidColour         (const char *apArgument);
+static const char *GetAnsiColour(bool_t abBackground, int aRed, int aGreen, int aBlue);
+static const char *GetRGBColour(bool_t abBackground, int aRed, int aGreen, int aBlue);
+static bool_t IsValidColour(const char *apArgument);
 
-static bool_t MatchString           (const char *apFirst, const char *apSecond);
-static bool_t PrefixString          (const char *apPart, const char *apWhole);
-static bool_t IsNumber              (const char *apString);
-static char  *AllocString           (const char *apString);
+static bool_t MatchString(const char *apFirst, const char *apSecond);
+static bool_t PrefixString(const char *apPart, const char *apWhole);
+static bool_t IsNumber(const char *apString);
+static char *AllocString(const char *apString);
+
 
 /******************************************************************************
  ANSI colour codes.
  *****************************************************************************/
 
-static const char s_Clean       [] = "\033[0;00m"; /* Remove colour */
+static const char s_Clean[] = "\033[0;00m";	// Remove colour
 
-static const char s_DarkBlack   [] = "\033[0;30m"; /* Black foreground */
-static const char s_DarkRed     [] = "\033[0;31m"; /* Red foreground */
-static const char s_DarkGreen   [] = "\033[0;32m"; /* Green foreground */
-static const char s_DarkYellow  [] = "\033[0;33m"; /* Yellow foreground */
-static const char s_DarkBlue    [] = "\033[0;34m"; /* Blue foreground */
-static const char s_DarkMagenta [] = "\033[0;35m"; /* Magenta foreground */
-static const char s_DarkCyan    [] = "\033[0;36m"; /* Cyan foreground */
-static const char s_DarkWhite   [] = "\033[0;37m"; /* White foreground */
+static const char s_DarkBlack[] = "\033[0;30m";	// Black foreground
+static const char s_DarkRed[] = "\033[0;31m";	// Red foreground
+static const char s_DarkGreen[] = "\033[0;32m";	// Green foreground
+static const char s_DarkYellow[] = "\033[0;33m";	// Yellow foreground
+static const char s_DarkBlue[] = "\033[0;34m";	// Blue foreground
+static const char s_DarkMagenta[] = "\033[0;35m";	// Magenta foreground
+static const char s_DarkCyan[] = "\033[0;36m";	// Cyan foreground
+static const char s_DarkWhite[] = "\033[0;37m";	// White foreground
 
-static const char s_BoldBlack   [] = "\033[1;30m"; /* Grey foreground */
-static const char s_BoldRed     [] = "\033[1;31m"; /* Bright red foreground */
-static const char s_BoldGreen   [] = "\033[1;32m"; /* Bright green foreground */
-static const char s_BoldYellow  [] = "\033[1;33m"; /* Bright yellow foreground */
-static const char s_BoldBlue    [] = "\033[1;34m"; /* Bright blue foreground */
-static const char s_BoldMagenta [] = "\033[1;35m"; /* Bright magenta foreground */
-static const char s_BoldCyan    [] = "\033[1;36m"; /* Bright cyan foreground */
-static const char s_BoldWhite   [] = "\033[1;37m"; /* Bright white foreground */
+static const char s_BoldBlack[] = "\033[1;30m";	// Grey foreground
+static const char s_BoldRed[] = "\033[1;31m";	// Bright red foreground
+static const char s_BoldGreen[] = "\033[1;32m";	// Bright green foreground
+static const char s_BoldYellow[] = "\033[1;33m";	// Bright yellow foreground
+static const char s_BoldBlue[] = "\033[1;34m";	// Bright blue foreground
+static const char s_BoldMagenta[] = "\033[1;35m";	// Bright magenta foreground
+static const char s_BoldCyan[] = "\033[1;36m";	// Bright cyan foreground
+static const char s_BoldWhite[] = "\033[1;37m";	// Bright white foreground
 
-static const char s_BackBlack   [] = "\033[1;40m"; /* Black background */
-static const char s_BackRed     [] = "\033[1;41m"; /* Red background */
-static const char s_BackGreen   [] = "\033[1;42m"; /* Green background */
-static const char s_BackYellow  [] = "\033[1;43m"; /* Yellow background */
-static const char s_BackBlue    [] = "\033[1;44m"; /* Blue background */
-static const char s_BackMagenta [] = "\033[1;45m"; /* Magenta background */
-static const char s_BackCyan    [] = "\033[1;46m"; /* Cyan background */
-static const char s_BackWhite   [] = "\033[1;47m"; /* White background */
+static const char s_BackBlack[] = "\033[1;40m";	// Black background
+static const char s_BackRed[] = "\033[1;41m";	// Red background
+static const char s_BackGreen[] = "\033[1;42m";	// Green background
+static const char s_BackYellow[] = "\033[1;43m";	// Yellow background
+static const char s_BackBlue[] = "\033[1;44m";	// Blue background
+static const char s_BackMagenta[] = "\033[1;45m";	// Magenta background
+static const char s_BackCyan[] = "\033[1;46m";	// Cyan background
+static const char s_BackWhite[] = "\033[1;47m";	// White background
+
 
 /******************************************************************************
  Protocol global functions.
@@ -902,7 +907,7 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 			/* Copy the colour code, if any. */
 			if (pCopyFrom != NULL) {
 				while (*pCopyFrom != '\0' && i < MAX_OUTPUT_BUFFER)
-				Result[i++] = *pCopyFrom++;
+					Result[i++] = *pCopyFrom++;
 			}
 		}
 		#endif /* COLOUR_CHAR */
@@ -1127,7 +1132,7 @@ void MSDPSend(descriptor_t *apDescriptor, variable_t aMSDP) {
 			int RequiredBuffer = strlen(VariableNameTable[aMSDP].pName) + strlen(pProtocol->pVariables[aMSDP]->pValueString) + 12;
 
 			if (RequiredBuffer >= MAX_VARIABLE_LENGTH) {
-				sprintf(MSDPBuffer,  "MSDPSend: %s %d bytes (exceeds MAX_VARIABLE_LENGTH of %d).\n", VariableNameTable[aMSDP].pName, RequiredBuffer, MAX_VARIABLE_LENGTH);
+				sprintf(MSDPBuffer, "MSDPSend: %s %d bytes (exceeds MAX_VARIABLE_LENGTH of %d).\n", VariableNameTable[aMSDP].pName, RequiredBuffer, MAX_VARIABLE_LENGTH);
 				ReportBug(MSDPBuffer);
 				MSDPBuffer[0] = '\0';
 			}
@@ -1267,7 +1272,7 @@ void MSDPSetTable(descriptor_t *apDescriptor, variable_t aMSDP, const char *apVa
 		}
 		else if (VariableNameTable[aMSDP].bString) {
 			const char MsdpTableStart[] = { (char)MSDP_TABLE_OPEN, '\0' };
-			const char MsdpTableStop[]  = { (char)MSDP_TABLE_CLOSE, '\0' };
+			const char MsdpTableStop[] = { (char)MSDP_TABLE_CLOSE, '\0' };
 
 			char *pTable = malloc(strlen(apValue) + 3); /* 3: START, STOP, NUL */
 
@@ -1297,7 +1302,7 @@ void MSDPSetArray(descriptor_t *apDescriptor, variable_t aMSDP, const char *apVa
 		}
 		else if (VariableNameTable[aMSDP].bString) {
 			const char MsdpArrayStart[] = { (char)MSDP_ARRAY_OPEN, '\0' };
-			const char MsdpArrayStop[]  = { (char)MSDP_ARRAY_CLOSE, '\0' };
+			const char MsdpArrayStop[] = { (char)MSDP_ARRAY_CLOSE, '\0' };
 
 			char *pArray = malloc(strlen(apValue) + 3); /* 3: START, STOP, NUL */
 
@@ -1478,7 +1483,7 @@ static void Negotiate(descriptor_t *apDescriptor) {
 	protocol_t *pProtocol = apDescriptor->pProtocol;
 
 	if (pProtocol->bNegotiated) {
-		const char RequestTTYPE   [] = { (char)IAC, (char)SB,   TELOPT_TTYPE, SEND, (char)IAC, (char)SE, '\0' };
+		const char RequestTTYPE[] = { (char)IAC, (char)SB, TELOPT_TTYPE, SEND, (char)IAC, (char)SE, '\0' };
 
 		/* Request the client type if TTYPE is supported. */
 		if (pProtocol->bTTYPE)
@@ -1510,7 +1515,7 @@ static void PerformHandshake(descriptor_t *apDescriptor, char aCmd, char aProtoc
 					pProtocol->bNegotiated = true;
 					Negotiate(apDescriptor);
 
-					/* We may need to renegotiate if they don't reply */            
+					/* We may need to renegotiate if they don't reply */
 					pProtocol->bRenegotiate = true;
 				}
 			}
@@ -1526,7 +1531,7 @@ static void PerformHandshake(descriptor_t *apDescriptor, char aCmd, char aProtoc
 					pProtocol->bNegotiated = true;
 					Negotiate(apDescriptor);
 
-					/* We may need to renegotiate if they don't reply */            
+					/* We may need to renegotiate if they don't reply */
 					pProtocol->bRenegotiate = true;
 				}
 			}
@@ -2325,108 +2330,108 @@ static void SendMSSP(descriptor_t *apDescriptor) {
 	*/
 	static MSSP_t MSSPTable[] = {
 		/* Required */
-		{ "NAME",               MUD_NAME },   /* Change this in protocol.h */
-		{ "PLAYERS",            FUNCTION_CALL(GetMSSP_Players) },
-		{ "UPTIME" ,            FUNCTION_CALL(GetMSSP_Uptime) }, 
+		{ "NAME", MUD_NAME },	// Change this in protocol.h
+		{ "PLAYERS", FUNCTION_CALL(GetMSSP_Players) },
+		{ "UPTIME" , FUNCTION_CALL(GetMSSP_Uptime) }, 
 
 		/* Generic */
-		{ "CRAWL DELAY",        "-1" },
+		{ "CRAWL DELAY", "-1" },
 		/*
-		{ "HOSTNAME",           "" },
-		{ "PORT",               "" },
-		{ "CODEBASE",           "" },
-		{ "CONTACT",            "" },
-		{ "CREATED",            "" },
-		{ "ICON",               "" },
-		{ "IP",                 "" },
-		{ "LANGUAGE",           "" },
-		{ "LOCATION",           "" },
-		{ "MINIMUM AGE",        "" },
-		{ "WEBSITE",            "" },
+		{ "HOSTNAME", "" },
+		{ "PORT", "" },
+		{ "CODEBASE", "" },
+		{ "CONTACT", "" },
+		{ "CREATED", "" },
+		{ "ICON", "" },
+		{ "IP", "" },
+		{ "LANGUAGE", "" },
+		{ "LOCATION", "" },
+		{ "MINIMUM AGE", "" },
+		{ "WEBSITE", "" },
 		*/
 		/* Categorisation */
 		/*
-		{ "FAMILY",             "" },
-		{ "GENRE",              "" },
-		{ "GAMEPLAY",           "" },
-		{ "STATUS",             "" },
-		{ "GAMESYSTEM",         "" },
-		{ "INTERMUD",           "" },
-		{ "SUBGENRE",           "" },
+		{ "FAMILY", "" },
+		{ "GENRE", "" },
+		{ "GAMEPLAY", "" },
+		{ "STATUS", "" },
+		{ "GAMESYSTEM", "" },
+		{ "INTERMUD", "" },
+		{ "SUBGENRE", "" },
 		*/
 		/* World */
 		/*
-		{ "AREAS",              "0" },
-		{ "HELPFILES",          "0" },
-		{ "MOBILES",            "0" },
-		{ "OBJECTS",            "0" },
-		{ "ROOMS",              "0" },
-		{ "CLASSES",            "0" },
-		{ "LEVELS",             "0" },
-		{ "RACES",              "0" },
-		{ "SKILLS",             "0" },
+		{ "AREAS", "0" },
+		{ "HELPFILES", "0" },
+		{ "MOBILES", "0" },
+		{ "OBJECTS", "0" },
+		{ "ROOMS", "0" },
+		{ "CLASSES", "0" },
+		{ "LEVELS", "0" },
+		{ "RACES", "0" },
+		{ "SKILLS", "0" },
 		*/
 		/* Protocols */
 		/*
-		{ "ANSI",               "1" },
-		{ "GMCP",               "0" },
+		{ "ANSI", "1" },
+		{ "GMCP", "0" },
 		#ifdef USING_MCCP
-		{ "MCCP",               "1" },
+		{ "MCCP", "1" },
 		#else
-		{ "MCCP",               "0" },
+		{ "MCCP", "0" },
 		#endif // USING_MCCP
-		{ "MCP",                "0" },
-		{ "MSDP",               "1" },
-		{ "MSP",                "1" },
-		{ "MXP",                "1" },
-		{ "PUEBLO",             "0" },
-		{ "UTF-8",              "1" },
-		{ "VT100",              "0" },
-		{ "XTERM 256 COLORS",   "1" },
+		{ "MCP", "0" },
+		{ "MSDP", "1" },
+		{ "MSP", "1" },
+		{ "MXP", "1" },
+		{ "PUEBLO", "0" },
+		{ "UTF-8", "1" },
+		{ "VT100", "0" },
+		{ "XTERM 256 COLORS", "1" },
 		*/
 		/* Commercial */
 		/*
-		{ "PAY TO PLAY",        "0" },
-		{ "PAY FOR PERKS",      "0" },
+		{ "PAY TO PLAY", "0" },
+		{ "PAY FOR PERKS", "0" },
 		*/
 		/* Hiring */
 		/*
-		{ "HIRING BUILDERS",    "0" },
-		{ "HIRING CODERS",      "0" },
+		{ "HIRING BUILDERS", "0" },
+		{ "HIRING CODERS", "0" },
 		*/
 		/* Extended variables */
 
 		/* World */
 		/*
-		{ "DBSIZE",             "0" },
-		{ "EXITS",              "0" },
+		{ "DBSIZE", "0" },
+		{ "EXITS", "0" },
 		{ "EXTRA DESCRIPTIONS", "0" },
-		{ "MUDPROGS",           "0" },
-		{ "MUDTRIGS",           "0" },
-		{ "RESETS",             "0" },
+		{ "MUDPROGS", "0" },
+		{ "MUDTRIGS", "0" },
+		{ "RESETS", "0" },
 		*/
 		/* Game */
 		/*
-		{ "ADULT MATERIAL",     "0" },
-		{ "MULTICLASSING",      "0" },
-		{ "NEWBIE FRIENDLY",    "0" },
-		{ "PLAYER CITIES",      "0" },
-		{ "PLAYER CLANS",       "0" },
-		{ "PLAYER CRAFTING",    "0" },
-		{ "PLAYER GUILDS",      "0" },
-		{ "EQUIPMENT SYSTEM",   "" },
-		{ "MULTIPLAYING",       "" },
-		{ "PLAYERKILLING",      "" },
-		{ "QUEST SYSTEM",       "" },
-		{ "ROLEPLAYING",        "" },
-		{ "TRAINING SYSTEM",    "" },
-		{ "WORLD ORIGINALITY",  "" },
+		{ "ADULT MATERIAL", "0" },
+		{ "MULTICLASSING", "0" },
+		{ "NEWBIE FRIENDLY", "0" },
+		{ "PLAYER CITIES", "0" },
+		{ "PLAYER CLANS", "0" },
+		{ "PLAYER CRAFTING", "0" },
+		{ "PLAYER GUILDS", "0" },
+		{ "EQUIPMENT SYSTEM", "" },
+		{ "MULTIPLAYING", "" },
+		{ "PLAYERKILLING", "" },
+		{ "QUEST SYSTEM", "" },
+		{ "ROLEPLAYING", "" },
+		{ "TRAINING SYSTEM", "" },
+		{ "WORLD ORIGINALITY", "" },
 		*/
 		/* Protocols */
 		/*
-		{ "ATCP",               "1" },
-		{ "SSL",                "0" },
-		{ "ZMP",                "0" },
+		{ "ATCP", "1" },
+		{ "SSL", "0" },
+		{ "ZMP", "0" },
 		*/
 		{ NULL, NULL } /* This must always be last. */
 	};
@@ -2523,10 +2528,10 @@ static const char *GetRGBColour(bool_t abBackground, int aRed, int aGreen, int a
 	static char Result[16];
 	int ColVal = 16 + (aRed * 36) + (aGreen * 6) + aBlue;
 	sprintf(Result, "\033[%c8;5;%c%c%cm", 
-		'3'+abBackground,	/* Background */
-		'0'+(ColVal/100),	/* Red        */
-		'0'+((ColVal%100)/10),	/* Green      */
-		'0'+(ColVal%10)	/* Blue       */
+		'3'+abBackground,	// Background
+		'0'+(ColVal/100),	// Red
+		'0'+((ColVal%100)/10),	// Green
+		'0'+(ColVal%10)	// Blue
 	);
 	return Result;
 }

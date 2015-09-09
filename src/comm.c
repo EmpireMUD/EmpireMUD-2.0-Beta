@@ -2172,8 +2172,9 @@ static int process_output(descriptor_data *t) {
 	strcpy(osb, t->output);	/* strcpy: OK (t->output:LARGE_BUFSIZE < osb:MAX_SOCK_BUF-2) */
 
 	/* if we're in the overflow state, notify the user */
-	if (t->bufspace == 0)
+	if (t->bufspace == 0 && !t->pProtocol->WriteOOB) {
 		strcat(osb, "**OVERFLOW**\r\n");	/* strcpy: OK (osb:MAX_SOCK_BUF-2 reserves space) */
+	}
 
 	/* add the extra CRLF if the person isn't in compact mode */
 	if (STATE(t) == CON_PLAYING && t->character && !IS_NPC(t->character) && !PRF_FLAGGED(t->character, PRF_COMPACT) && !t->pProtocol->WriteOOB)
