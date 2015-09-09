@@ -1160,7 +1160,7 @@ ACMD(do_page) {
 ACMD(do_recolor) {
 	extern const char *custom_color_types[];
 	
-	char *valid_colors = "rgbymcwRGBYMCW0";
+	char *valid_colors = "rgbymcwajloptvnRGBYMCWAJLOPTV0";
 	
 	char arg[MAX_INPUT_LENGTH];
 	int iter, type;

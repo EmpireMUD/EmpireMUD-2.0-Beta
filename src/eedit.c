@@ -55,7 +55,7 @@ EEDIT(eedit_num_ranks);
 * @return bool TRUE if the banner is valid; FALSE otherwise
 */
 bool check_banner_color_string(char *str) {
-	const char *valid_colors = "rgybmcwRGYBMCW0u";
+	const char *valid_colors = "rgbymcwajloptvnRGBYMCWAJLOPTV0u";
 	
 	bool ok = TRUE;
 	int pos;
