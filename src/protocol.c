@@ -767,7 +767,7 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 			}
 
 			/* Copy the colour code, if any. */
-			if (pCopyFrom != NULL && strcmp(pCopyFrom, lastColor)) {
+			if (pCopyFrom != NULL && (pCopyFrom == ColourChar || strcmp(pCopyFrom, lastColor))) {
 				strcpy(lastColor, pCopyFrom);
 				while (*pCopyFrom != '\0' && i < MAX_OUTPUT_BUFFER) {
 					Result[i++] = *pCopyFrom++;
@@ -910,7 +910,7 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 				}
 
 			/* Copy the colour code, if any. */
-			if (pCopyFrom != NULL && strcmp(pCopyFrom, lastColor)) {
+			if (pCopyFrom != NULL && (pCopyFrom == ColourChar || strcmp(pCopyFrom, lastColor))) {
 				strcpy(lastColor, pCopyFrom);
 				while (*pCopyFrom != '\0' && i < MAX_OUTPUT_BUFFER) {
 					Result[i++] = *pCopyFrom++;
