@@ -102,32 +102,27 @@ bool adjacent_room_is_light(room_data *room) {
 * @param empire_data *emp
 * @return char* The background color that's the opposite of the banner color
 */
-char *get_banner_complement_color(empire_data *emp) {
+const char *get_banner_complement_color(empire_data *emp) {
+	const char *alternate = "yYtT";
+	const char *normal_bg = "\t[B432]";
+	const char *alt_bg = "\t[B025]";
+	
+	int iter;
+	bool alt;
+
 	if (!emp) {
 		return "";
 	}
 	
-	if (strchr(EMPIRE_BANNER(emp), 'r')) {
-		return BACKGROUND_GREEN;
-	}
-	if (strchr(EMPIRE_BANNER(emp), 'g')) {
-		return BACKGROUND_RED;
-	}
-	if (strchr(EMPIRE_BANNER(emp), 'y')) {
-		return BACKGROUND_BLUE;
-	}
-	if (strchr(EMPIRE_BANNER(emp), 'b')) {
-		return BACKGROUND_CYAN;
-	}
-	if (strchr(EMPIRE_BANNER(emp), 'm')) {
-		return BACKGROUND_BLUE;
-	}
-	if (strchr(EMPIRE_BANNER(emp), 'c')) {
-		return BACKGROUND_BLUE;
+	// need alternate bg?
+	alt = FALSE;
+	for (iter = 0; alternate[iter] != '\0'; ++iter) {
+		if (strchr(EMPIRE_BANNER(emp), alternate[iter])) {
+			alt = TRUE;
+		}
 	}
 	
-	// default
-	return BACKGROUND_BLUE;
+	return alt ? alt_bg : normal_bg;
 }
 
 
