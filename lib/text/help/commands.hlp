@@ -157,12 +157,16 @@ Color codes you can use yourself:
 Normal colors:
  &r&&r Red&0        &g&&g Green&0         &y&&y Yellow&0
  &b&&b Blue&0       &m&&m Magenta&0       &c&&c Cyan&0
- &w&&w White&0
+ &a&&a Azure&0      &j&&j Jade&0          &l&&l Lime&0
+ &o&&o Orange&0     &p&&p Pink&0          &t&&t Tan&0
+ &v&&v Violet&0     &w&&w White&0
 
 Bright colors:
  &R&&R Red&0        &G&&G Green&0         &Y&&Y Yellow&0
  &B&&B Blue&0       &M&&M Magenta&0       &C&&C Cyan&0
- &W&&W White&0
+ &A&&A Azure&0      &J&&J Jade&0          &L&&L Lime&0
+ &O&&O Orange&0     &P&&P Pink&0          &T&&T Tan&0
+ &V&&V Violet&0     &W&&W White&0
 #
 ASSIST
 
