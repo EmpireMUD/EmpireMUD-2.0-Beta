@@ -1997,7 +1997,7 @@ int process_input(descriptor_data *t) {
  *	 2 bytes: extra \r\n for non-comapct
  *      14 bytes: unused */
 static int process_output(descriptor_data *t) {
-	char i[MAX_SOCK_BUF], *osb = i + 2;
+	char i[MAX_SOCK_BUF], prompt[MAX_STRING_LENGTH], *osb = i + 2;
 	int result;
 
 	/* we may need this \r\n for later -- see below */
@@ -2016,7 +2016,14 @@ static int process_output(descriptor_data *t) {
 
 	// add prompt
 	if (!t->pProtocol->WriteOOB) {
-		strncat(i, make_prompt(t), MAX_PROMPT_LENGTH);
+		int size, wantsize;
+		
+		strcpy(prompt, make_prompt(t));
+		size = wantsize = strlen(prompt);
+		strncpy(prompt, ProtocolOutput(t, prompt, &wantsize), MAX_STRING_LENGTH);
+		prompt[MAX_STRING_LENGTH-1] = '\0';
+
+		strncat(i, prompt, MAX_PROMPT_LENGTH);
 	}
 
 	/* now, send the output.  If this is an 'interruption', use the prepended
