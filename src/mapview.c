@@ -107,22 +107,17 @@ const char *get_banner_complement_color(empire_data *emp) {
 		return "";
 	}
 	
-	// c, C ?
-	
-	if (strchrstr(EMPIRE_BANNER(emp), "rpmbBvVaClv")) {
+	if (strchrstr(EMPIRE_BANNER(emp), "rpmbBvaCl")) {
 		return "\t[B321]";	// tan
 	}
 	if (strchrstr(EMPIRE_BANNER(emp), "AGLJyYV")) {
 		return "\t[B210]";	// dark tan
 	}
-	if (strchrstr(EMPIRE_BANNER(emp), "gj")) {
-		return "\t[B104]";	// violet
+	if (strchrstr(EMPIRE_BANNER(emp), "gjRPMt")) {
+		return "\t[B222]";	// dark gray
 	}
 	if (strchrstr(EMPIRE_BANNER(emp), "coOTw")) {
 		return "\t[B003]";	// dark blue
-	}
-	if (strchrstr(EMPIRE_BANNER(emp), "tRPM")) {
-		return "\t[B033]";	// dark cyan
 	}
 	
 	// default
