@@ -103,8 +103,8 @@ bool adjacent_room_is_light(room_data *room) {
 * @return char* The background color that's the opposite of the banner color
 */
 const char *get_banner_complement_color(empire_data *emp) {
-	const char *alternate = "yYtT";
-	const char *normal_bg = "\t[B432]";
+	const char *alternate = "yYtToO";
+	const char *normal_bg = "\t[B321]";
 	const char *alt_bg = "\t[B025]";
 	
 	int iter;
