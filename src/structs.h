@@ -2946,6 +2946,25 @@ struct empire_unique_storage {
 };
 
 
+// for the ewt system: island entry
+struct empire_workforce_tracker_island {
+	int id;
+	int amount;
+	int workers;
+	UT_hash_handle hh;
+};
+
+
+// for the ewt system: resource tracker
+struct empire_workforce_tracker {
+	obj_vnum vnum;	// type of resource
+	int total_workers;	// people working this resource
+	int total_amount;	// amount of resource, total
+	struct empire_workforce_tracker_island *islands;	// amount per island
+	UT_hash_handle hh;
+};
+
+
 // The main data structure for the empires
 struct empire_data {
 	empire_vnum vnum;	// empire's virtual number
@@ -2978,6 +2997,7 @@ struct empire_data {
 	// unsaved data
 	struct empire_territory_data *territory_list;	// linked list of buildings/rooms
 	struct empire_city_data *city_list;	// linked list of cities
+	struct empire_workforce_tracker *ewt_tracker;	// workforce tracker
 	
 	// unsaved data
 	int city_terr;	// total territory IN cities

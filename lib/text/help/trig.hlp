@@ -824,6 +824,7 @@ self          - The mob, item, or room running the script. Normal fields may be
                 used with this.
 instance.id   - Unique id of the adventure instance, if any.
 instance.location - The map/linked location of the instance, if any.
+instance.mob(vnum) - Finds a copy of a mob belonging to the instance.
 instance.name - Name of the adventure instance, if any.
 instance.start - The entry room of the instance, if any.
 people.<vnum> - This variable returns the number of people in the room 

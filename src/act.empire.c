@@ -314,6 +314,7 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 	struct einv_type *einv, *next_einv, *list = NULL;
 	obj_vnum vnum, last_vnum = NOTHING;
 	struct empire_storage_data *store;
+	struct shipping_data *shipd;
 	obj_data *proto = NULL;
 	size_t lsize, size;
 	bool all = FALSE, any = FALSE;
@@ -363,6 +364,17 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 		einv->total += store->amount;
 		if (store->island == GET_ISLAND_ID(IN_ROOM(ch))) {
 			einv->local += store->amount;
+		}
+	}
+	
+	// add shipping amounts to totals
+	for (shipd = EMPIRE_SHIPPING_LIST(emp); shipd; shipd = shipd->next) {
+		vnum = shipd->vnum;
+		
+		// have this?
+		HASH_FIND_INT(list, &vnum, einv);
+		if (einv) {
+			einv->total += shipd->amount;
 		}
 	}
 	

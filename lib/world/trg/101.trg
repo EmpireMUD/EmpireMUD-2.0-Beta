@@ -211,7 +211,7 @@ switch %random.3%
     eval ch %room_var.people%
     while %ch%
       eval test %%self.is_enemy(%ch%)%%
-      if %test && %ch.maxmana% > %actor.maxmana%
+      if %test% && %ch.maxmana% > %actor.maxmana%
         %send% %ch% %self.name% is coming for you!
         %echoaround% %ch% %self.name% runs for %ch.name%!
         mkill %ch%

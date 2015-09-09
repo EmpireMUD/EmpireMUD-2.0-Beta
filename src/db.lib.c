@@ -1374,6 +1374,28 @@ void delete_empire(empire_data *emp) {
 
 
 /**
+* Frees a set of workforce trackers.
+*
+* @param struct empire_workforce_tracker **tracker A pointer to the hash table of trackers.
+*/
+void ewt_free_tracker(struct empire_workforce_tracker **tracker) {
+	struct empire_workforce_tracker *ewt, *next_ewt;
+	struct empire_workforce_tracker_island *isle, *next_isle;
+	
+	HASH_ITER(hh, *tracker, ewt, next_ewt) {
+		HASH_ITER(hh, ewt->islands, isle, next_isle) {
+			HASH_DEL(ewt->islands, isle);
+			free(isle);
+		}
+		
+		HASH_DEL(*tracker, ewt);
+		free(ewt);
+	}
+	*tracker = NULL;
+}
+
+
+/**
 * Frees up strings and lists in the empire.
 *
 * @param empire_data *emp The empire to free
@@ -1505,6 +1527,7 @@ void free_empire(empire_data *emp) {
 			free(emp->rank[iter]);
 		}
 	}
+	ewt_free_tracker(&EMPIRE_WORKFORCE_TRACKER(emp));
 	
 	free(emp);
 }

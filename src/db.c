@@ -1478,6 +1478,7 @@ obj_data *read_object(obj_vnum nr) {
 const char *versions_list[] = {
 	// this system was added in b2.5
 	"b2.5",
+	"b2.7",
 	"\n"	// be sure the list terminates with \n
 };
 

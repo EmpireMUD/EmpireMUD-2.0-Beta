@@ -1687,6 +1687,9 @@ obj_data *find_free_ship(empire_data *emp, struct shipping_data *shipd) {
 			if (!IS_SHIP(obj))  {
 				continue;
 			}
+			if (GET_SHIP_RESOURCES_REMAINING(obj) > 0) {
+				continue;
+			}
 			if (!(in_ship = real_room(GET_SHIP_MAIN_ROOM(obj)))) {
 				continue;
 			}
@@ -4446,7 +4449,7 @@ ACMD(do_sheathe) {
 
 
 ACMD(do_ship) {
-	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH * 2], line[1000], keywords[MAX_INPUT_LENGTH];
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH * 3], line[1000], keywords[MAX_INPUT_LENGTH];
 	struct island_info *from_isle, *to_isle;
 	struct empire_storage_data *store;
 	struct shipping_data *sd, *temp;

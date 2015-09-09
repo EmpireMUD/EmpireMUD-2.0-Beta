@@ -85,7 +85,6 @@ else
   if (%vnum% == -1)
     halt
   end
-  
   * do!
   %terracrop% %room% %vnum%
   %echo% %self.name% spreads mana over the land and crops begin to grow!

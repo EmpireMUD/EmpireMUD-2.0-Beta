@@ -355,6 +355,12 @@ void process_manufacturing(char_data *ch) {
 			break;
 		}
 	}
+
+	if (!ship) {
+		msg_to_char(ch, "You try to work on a ship, but there isn't one here!\r\n");
+		GET_ACTION(ch) = ACT_NONE;
+		return;
+	}
 	
 	// this determines type
 	for (iter = 0; *ship_data[iter].name != '\n'; ++iter) {
@@ -362,12 +368,6 @@ void process_manufacturing(char_data *ch) {
 			type = iter;
 			break;
 		}
-	}
-
-	if (!ship) {
-		msg_to_char(ch, "You try to work on a ship, but there isn't one here!\r\n");
-		GET_ACTION(ch) = ACT_NONE;
-		return;
 	}
 	
 	total = 1 + (AFF_FLAGGED(ch, AFF_HASTE) ? 1 : 0) + (HAS_BONUS_TRAIT(ch, BONUS_FAST_CHORES) ? 1 : 0);
