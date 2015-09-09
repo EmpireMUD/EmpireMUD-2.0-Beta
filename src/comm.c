@@ -460,7 +460,7 @@ void perform_reboot(void) {
 		}
 
 		if (reboot_control.type == SCMD_REBOOT && fl) {
-			fprintf(fl, "%d %s %s\n", desc->descriptor, GET_NAME(och), desc->host);
+			fprintf(fl, "%d %s %s %s\n", desc->descriptor, GET_NAME(och), desc->host, CopyoverGet(desc));
 		
 			if (GROUP(och) && GROUP_LEADER(GROUP(och))) {
 				gsize += snprintf(group_data + gsize, sizeof(group_data) - gsize, "G %d %d\n", GET_IDNUM(och), GET_IDNUM(GROUP_LEADER(GROUP(och))));
@@ -3331,7 +3331,7 @@ void reboot_recover(void) {
 	descriptor_data *d;
 	char_data *plr, *ldr;
 	FILE *fp;
-	char host[1024], line[256];
+	char host[1024], protocol_info[1024], line[256];
 	struct char_file_u tmp_store;
 	int desc, player_i, plid, leid;
 	bool fOld;
@@ -3353,9 +3353,12 @@ void reboot_recover(void) {
 	// first pass: load players
 	for (;;) {
 		fOld = TRUE;
-		fscanf(fp, "%d %s %s\n", &desc, name, host);
-		if (desc == -1)
+		fscanf(fp, "%d %s %s %s\n", &desc, name, host, protocol_info);
+		
+		// end indicator (endicator?)
+		if (desc == -1) {
 			break;
+		}
 
 		sprintf(buf, "\r\nRestoring %s...\r\n", name);
 		if (write_to_descriptor(desc, buf) < 0) {
@@ -3381,13 +3384,19 @@ void reboot_recover(void) {
 		if ((player_i = load_char(name, &tmp_store)) >= 0) {
 			store_to_char(&tmp_store, d->character);
 			GET_PFILEPOS(d->character) = player_i;
-			if (!PLR_FLAGGED(d->character, PLR_DELETED))
+			if (!PLR_FLAGGED(d->character, PLR_DELETED)) {
 				REMOVE_BIT(PLR_FLAGS(d->character), PLR_WRITING | PLR_MAILING);
-			else
+			}
+			else {
 				fOld = FALSE;
+			}
 		}
-		else
+		else {
 			fOld = FALSE;
+		}
+		
+		// recover protocol settings
+		CopyoverSet(d, protocol_info);
 
 		if (!fOld) {
 			write_to_descriptor(desc, "\r\nSomehow, your character couldn't be loaded.\r\n");
