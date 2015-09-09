@@ -81,6 +81,7 @@ char *prompt_str(char_data *ch);
 char *replace_prompt_codes(char_data *ch, char *str);
 int get_from_q(struct txt_q *queue, char *dest, int *aliased);
 int get_max_players(void);
+static void msdp_update();
 int new_descriptor(socket_t s);
 int open_logfile(const char *filename, FILE *stderr_fp);
 int perform_alias(descriptor_data *d, char *orig);
@@ -92,8 +93,6 @@ ssize_t perform_socket_read(socket_t desc, char *read_point,size_t space_left);
 ssize_t perform_socket_write(socket_t desc, const char *txt,size_t length);
 static int process_output(descriptor_data *t);
 struct in_addr *get_bind_addr(void);
-void echo_off(descriptor_data *d);
-void echo_on(descriptor_data *d);
 void empire_sleep(struct timeval *timeout);
 void flush_queues(descriptor_data *d);
 void game_loop(socket_t mother_desc);
@@ -189,6 +188,66 @@ inline void empire_sleep(struct timeval *timeout) {
 			perror("SYSERR: Select sleep");
 			exit(1);
 		}
+	}
+}
+
+
+/**
+* From KaVir's protocol snippet (see protocol.c)
+*/
+static void msdp_update(void) {
+	char buf[MAX_STRING_LENGTH];
+	char_data *ch, *pOpponent;
+	descriptor_data *d;
+	int hit_points, PlayerCount = 0;
+
+	for (d = descriptor_list; d; d = d->next) {
+		if ((ch = d->character) && !IS_NPC(ch) && STATE(d) == CON_PLAYING) {
+			++PlayerCount;
+			
+			pOpponent = FIGHTING(ch);
+
+			MSDPSetString(d, eMSDP_CHARACTER_NAME, GET_NAME(ch));
+			MSDPSetNumber(d, eMSDP_ALIGNMENT, 0);	// TODO
+			MSDPSetNumber(d, eMSDP_EXPERIENCE, 0);	// TODO
+
+			MSDPSetNumber(d, eMSDP_HEALTH, GET_HEALTH(ch));
+			MSDPSetNumber(d, eMSDP_HEALTH_MAX, GET_MAX_HEALTH(ch));
+			MSDPSetNumber(d, eMSDP_LEVEL, get_approximate_level(ch));
+
+			snprintf(buf, sizeof(buf), "%s", IS_IMMORTAL(ch) ? "Immortal" : class_data[GET_CLASS(ch)].name);
+			MSDPSetString(d, eMSDP_CLASS, buf);
+
+			MSDPSetNumber(d, eMSDP_MANA, GET_MANA(ch));
+			MSDPSetNumber(d, eMSDP_MANA_MAX, GET_MAX_MANA(ch));
+			MSDPSetNumber(d, eMSDP_WIMPY, 0);	// TODO
+			MSDPSetNumber(d, eMSDP_MONEY, 0);	// TODO
+			MSDPSetNumber(d, eMSDP_MOVEMENT, GET_MOVE(ch));
+			MSDPSetNumber(d, eMSDP_MOVEMENT_MAX, GET_MAX_MOVE(ch));
+			MSDPSetNumber(d, eMSDP_AC, 0);	// TODO
+
+			/* This would be better moved elsewhere */
+			if (pOpponent) {
+				hit_points = (GET_HEALTH(pOpponent) * 100) / GET_MAX_HEALTH(pOpponent);
+				MSDPSetNumber(d, eMSDP_OPPONENT_HEALTH, hit_points);
+				MSDPSetNumber(d, eMSDP_OPPONENT_HEALTH_MAX, 100);
+				MSDPSetNumber(d, eMSDP_OPPONENT_LEVEL, get_approximate_level(pOpponent));
+				MSDPSetString(d, eMSDP_OPPONENT_NAME, PERS(pOpponent, ch, FALSE));
+			}
+			else { // Clear the values
+				MSDPSetNumber(d, eMSDP_OPPONENT_HEALTH, 0);
+				MSDPSetNumber(d, eMSDP_OPPONENT_LEVEL, 0);
+				MSDPSetString(d, eMSDP_OPPONENT_NAME, "");
+			}
+
+			MSDPUpdate(d);
+		}
+
+		/* Ideally this should be called once at startup, and again whenever
+		* someone leaves or joins the mud.  But this works, and it keeps the
+		* snippet simple.  Optimise as you see fit.
+		*/
+	MSSPSetPlayers(PlayerCount);
 	}
 }
 
@@ -862,6 +921,11 @@ void heartbeat(int heart_pulse) {
 			if (debug_log && HEARTBEAT(15)) { log("debug 25:\t%lld", microtime()); }
 		}
 	}
+	
+	// this goes roughly last -- update MSDP users
+	if (HEARTBEAT(1)) {
+		msdp_update();
+	}
 
 	/* Every pulse! Don't want them to stink the place up... */
 	extract_pending_chars();
@@ -938,36 +1002,6 @@ void act(const char *str, int hide_invisible, char_data *ch, obj_data *obj, cons
 		}
 	}
 	Global_ignore_dark = FALSE;
-}
-
-
-/*
- * Turn off echoing (specific to telnet client)
- */
-void echo_off(descriptor_data *d) {
-	char off_string[] = {
-		(char) IAC,
-		(char) WILL,
-		(char) TELOPT_ECHO,
-		(char) 0,
-	};
-
-	SEND_TO_Q(off_string, d);
-}
-
-
-/*
- * Turn on echoing (specific to telnet client)
- */
-void echo_on(descriptor_data *d) {
-	char on_string[] = {
-		(char) IAC,
-		(char) WONT,
-		(char) TELOPT_ECHO,
-		(char) 0
-	};
-
-	SEND_TO_Q(on_string, d);
 }
 
 
@@ -1332,6 +1366,8 @@ void close_socket(descriptor_data *d) {
 	if (d->backstr) {
 		free(d->backstr);
 	}
+	
+	ProtocolDestroy(d->pProtocol);
 
 	// olc data
 	if (d->olc_storage) {
@@ -1522,12 +1558,13 @@ void init_descriptor(descriptor_data *newd, int desc) {
 	newd->has_prompt = 0;
 
 	CREATE(newd->history, char *, HISTORY_SIZE);
+	newd->pProtocol = ProtocolCreate();
 	
 	newd->olc_type = 0;
 	newd->olc_vnum = NOTHING;
 	newd->olc_object = NULL;
 	newd->olc_mobile = NULL;
-
+	
 	if (++last_desc == 1000)
 		last_desc = 1;
 	newd->desc_num = last_desc;
@@ -1777,7 +1814,8 @@ int new_descriptor(int s) {
 	/* prepend to list */
 	newd->next = descriptor_list;
 	descriptor_list = newd;
-
+	
+	ProtocolNegotiate(newd);
 	SEND_TO_Q(parse_color(intros[number(0, num_intros-1)], newd), newd);
 
 	return (0);
@@ -1933,12 +1971,15 @@ ssize_t perform_socket_write(socket_t desc, const char *txt, size_t length) {
  * -gg 1/21/2000
  */
 int process_input(descriptor_data *t) {
+	static char read_buf[MAX_PROTOCOL_BUFFER];
 	int buf_length, do_not_add;
 	ssize_t bytes_read;
 	size_t space_left;
 	char *ptr, *read_point, *write_point, *nl_pos = NULL;
 	char tmp[MAX_INPUT_LENGTH], *input;
 	bool add_to_head = FALSE;
+	
+	*read_buf = '\0';
 
 	/* first, find the point where we left off reading data */
 	buf_length = strlen(t->inbuf);
@@ -1951,12 +1992,20 @@ int process_input(descriptor_data *t) {
 			return (-1);
 		}
 
-		bytes_read = perform_socket_read(t->descriptor, read_point, space_left);
+		bytes_read = perform_socket_read(t->descriptor, read_buf, MAX_PROTOCOL_BUFFER);
 
-		if (bytes_read < 0)	/* Error, disconnect them. */
+		if (bytes_read < 0) {	/* Error, disconnect them. */
 			return (-1);
-		else if (bytes_read == 0)	/* Just blocking, no problems. */
+		}
+		else if (bytes_read >= 0) {
+			read_buf[bytes_read] = '\0';
+			ProtocolInput(t, read_buf, bytes_read, read_point);
+			bytes_read = strlen(read_point);
+		}
+
+		if (bytes_read == 0) {	/* Just blocking, no problems. */
 			return (0);
+		}
 
 		/* at this point, we know we got some data from the read */
 
@@ -2127,17 +2176,19 @@ static int process_output(descriptor_data *t) {
 		strcat(osb, "**OVERFLOW**\r\n");	/* strcpy: OK (osb:MAX_SOCK_BUF-2 reserves space) */
 
 	/* add the extra CRLF if the person isn't in compact mode */
-	if (STATE(t) == CON_PLAYING && t->character && !IS_NPC(t->character) && !PRF_FLAGGED(t->character, PRF_COMPACT))
+	if (STATE(t) == CON_PLAYING && t->character && !IS_NPC(t->character) && !PRF_FLAGGED(t->character, PRF_COMPACT) && !t->pProtocol->WriteOOB)
 		strcat(osb, "\r\n");	/* strcpy: OK (osb:MAX_SOCK_BUF-2 reserves space) */
 
 	// add prompt
-	prompt = make_prompt(t);
-	strncat(i, prompt, MAX_PROMPT_LENGTH);
-	free(prompt);
+	if (!t->pProtocol->WriteOOB) {
+		prompt = make_prompt(t);
+		strncat(i, prompt, MAX_PROMPT_LENGTH);
+		free(prompt);
+	}
 
 	/* now, send the output.  If this is an 'interruption', use the prepended
 	* CRLF, otherwise send the straight output sans CRLF. */
-	if (t->has_prompt && !t->data_left_to_write) {
+	if (t->has_prompt && !t->data_left_to_write && !t->pProtocol->WriteOOB) {
 		t->has_prompt = FALSE;
 		result = write_to_descriptor(t->descriptor, i);
 		if (result >= 2)
@@ -2259,15 +2310,23 @@ int write_to_descriptor(socket_t desc, const char *txt) {
 
 /* Add a new string to a player's output queue */
 void write_to_output(const char *txt, descriptor_data *t) {
-	int size;
-	char *new_txt;
+	int size, wantsize;
+	char *new_txt, protocol_txt[MAX_STRING_LENGTH];
 	char *overflow_txt = "**OVERFLOW**\r\n";
 
 	/* if we're in the overflow state already, ignore this new output */
 	if (t->bufspace == 0)
 		return;
 
-	new_txt = parse_color((char *) txt, t);
+	size = wantsize = strlen(txt);
+	strncpy(protocol_txt, ProtocolOutput(t, txt, &wantsize), MAX_STRING_LENGTH);
+	protocol_txt[MAX_STRING_LENGTH-1] = '\0';
+	size = wantsize;
+	if (t->pProtocol->WriteOOB > 0) {
+		--t->pProtocol->WriteOOB;
+	}
+
+	new_txt = parse_color(protocol_txt, t);
 
 	size = strlen(new_txt);
 	

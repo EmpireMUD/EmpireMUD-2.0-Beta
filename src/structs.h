@@ -53,6 +53,7 @@
 // by searching for CONST_PREFIX_x (e.g. WEAR_x for wear flags).
 
 
+#include "protocol.h" // needed by everything
 #include "uthash.h"	// needed by everything
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2117,7 +2118,9 @@ struct descriptor_data {
 	char **showstr_vector;	// for paging through texts
 	int showstr_count;	// number of pages to page through
 	int showstr_page;	// which page are we currently showing?
-
+	
+	protocol_t *pProtocol; // see protocol.c
+	
 	char **str;	// for the modify-str system
 	char *backstr;	// for the modify-str aborts
 	char *file_storage;	// name of where to save a file

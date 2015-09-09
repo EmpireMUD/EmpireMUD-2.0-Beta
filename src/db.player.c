@@ -1231,7 +1231,9 @@ int enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	greet_mtrigger(ch, NO_DIR);
 	greet_memory_mtrigger(ch);
 	add_to_lookup_table(GET_ID(ch), (void *)ch);
-
+	
+	MXPSendTag(d, "<VERSION>");
+	
 	return load_result;
 }
 
