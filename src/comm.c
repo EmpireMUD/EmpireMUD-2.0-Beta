@@ -2312,7 +2312,7 @@ int write_to_descriptor(socket_t desc, const char *txt) {
 void write_to_output(const char *txt, descriptor_data *t) {
 	int size, wantsize;
 	char *new_txt, protocol_txt[MAX_STRING_LENGTH];
-	char *overflow_txt = "**OVERFLOW**\r\n";
+	//char *overflow_txt = "**OVERFLOW**\r\n";
 
 	/* if we're in the overflow state already, ignore this new output */
 	if (t->bufspace == 0)
@@ -2326,15 +2326,17 @@ void write_to_output(const char *txt, descriptor_data *t) {
 		--t->pProtocol->WriteOOB;
 	}
 
-	new_txt = parse_color(protocol_txt, t);
+	new_txt = protocol_txt;//parse_color(protocol_txt, t);
 
 	size = strlen(new_txt);
 	
 	// truncate to MAX_STRING_LENGTH srsly
+	/*
 	if (size > MAX_STRING_LENGTH) {
 		size = MAX_STRING_LENGTH-1;
 		strcpy(new_txt + size - strlen(overflow_txt), overflow_txt);
 	}
+	*/
 	
 	// check that text size is going to fit into a large bufffer
 	if (size + t->bufptr + 1 > LARGE_BUFSIZE) {
@@ -2348,7 +2350,7 @@ void write_to_output(const char *txt, descriptor_data *t) {
 		strcpy(t->output + t->bufptr, new_txt);
 		t->bufspace -= size;
 		t->bufptr += size;
-		free(new_txt);
+		//free(new_txt);
 		return;
 	}
 	
@@ -2368,7 +2370,7 @@ void write_to_output(const char *txt, descriptor_data *t) {
 	strcpy(t->large_outbuf->text, t->output);	/* copy to big buffer */
 	t->output = t->large_outbuf->text;	/* make big buffer primary */
 	strcat(t->output, new_txt);
-	free(new_txt);
+	//free(new_txt);
 
 	/* set the pointer for the next write */
 	t->bufptr = strlen(t->output);
