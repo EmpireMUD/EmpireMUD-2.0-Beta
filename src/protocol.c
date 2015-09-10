@@ -2530,17 +2530,17 @@ static const char *GetAnsiColour(bool_t abBackground, int aRed, int aGreen, int 
 	else if (aRed == aGreen && aRed == aBlue)
 		return abBackground ? s_BackWhite : aRed >= 4 ? s_BoldWhite : s_DarkWhite;
 	else if (aRed > aGreen && aRed > aBlue)
-		return abBackground ? s_BackRed : aRed >= 3 ? s_BoldRed : s_DarkRed;
+		return abBackground ? s_BackRed : aRed >= 4 ? s_BoldRed : s_DarkRed;
 	else if (aRed == aGreen && aRed > aBlue)
-		return abBackground ? s_BackYellow : aRed >= 3 ? s_BoldYellow : s_DarkYellow;
+		return abBackground ? s_BackYellow : aRed >= 4 ? s_BoldYellow : s_DarkYellow;
 	else if (aRed == aBlue && aRed > aGreen)
-		return abBackground ? s_BackMagenta : aRed >= 3 ? s_BoldMagenta : s_DarkMagenta;
+		return abBackground ? s_BackMagenta : aRed >= 4 ? s_BoldMagenta : s_DarkMagenta;
 	else if (aGreen > aBlue)
-		return abBackground ? s_BackGreen : aGreen >= 3 ? s_BoldGreen : s_DarkGreen;
+		return abBackground ? s_BackGreen : aGreen >= 4 ? s_BoldGreen : s_DarkGreen;
 	else if (aGreen == aBlue)
-		return abBackground ? s_BackCyan : aGreen >= 3 ? s_BoldCyan : s_DarkCyan;
+		return abBackground ? s_BackCyan : aGreen >= 4 ? s_BoldCyan : s_DarkCyan;
 	else {	// aBlue is the highest
-		return abBackground ? s_BackBlue : aBlue >= 3 ? s_BoldBlue : s_DarkBlue;
+		return abBackground ? s_BackBlue : aBlue >= 4 ? s_BoldBlue : s_DarkBlue;
 	}
 }
 
