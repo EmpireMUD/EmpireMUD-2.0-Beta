@@ -165,9 +165,9 @@ void string_add(descriptor_data *d, char *str) {
 	if (!(*d->str)) {
 		if (strlen(str) + 3 > d->max_str) {
 			send_to_char("String too long - Truncated.\r\n", d->character);
-			strcpy(&str[d->max_str - 3], "\r\n");
 			CREATE(*d->str, char, d->max_str);
-			strcpy(*d->str, str);
+			strncpy(*d->str, str, d->max_str);
+			strcpy(*d->str + (d->max_str - 3), "\r\n");
 		}
 		else {
 			CREATE(*d->str, char, strlen(str) + 3);
@@ -175,8 +175,10 @@ void string_add(descriptor_data *d, char *str) {
 		}
 	}
 	else {
-		if (strlen(str) + strlen(*d->str) + 3 > d->max_str)
+		if (strlen(str) + strlen(*d->str) + 3 > d->max_str) {
 			send_to_char("String too long. Last line skipped.\r\n", d->character);
+			return;
+		}
 		else {
 			RECREATE(*d->str, char, strlen(*d->str) + strlen(str) + 3);
 			strcat(*d->str, str);
