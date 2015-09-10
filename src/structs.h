@@ -780,7 +780,7 @@ typedef struct trig_data trig_data;
 #define MAX_SOCK_BUF  (12 * 1024)	// Size of kernel's sock buf
 #define MAX_PROMPT_LENGTH  256	// Max length of rendered prompt
 #define GARBAGE_SPACE  32	// Space for **OVERFLOW** etc
-#define SMALL_BUFSIZE  6144	// Static output buffer size
+#define SMALL_BUFSIZE  8192	// Static output buffer size
 // Max amount of output that can be buffered
 #define LARGE_BUFSIZE  (MAX_SOCK_BUF - GARBAGE_SPACE - MAX_PROMPT_LENGTH)
 
@@ -1570,7 +1570,7 @@ typedef struct trig_data trig_data;
 #define MAX_ROOM_DESCRIPTION  4000
 #define MAX_SKILL_RESETS  10	// number of skill resets you can save up
 #define MAX_STORAGE  1000000	// empire storage cap, must be < MAX_INT
-#define MAX_STRING_LENGTH  10240
+#define MAX_STRING_LENGTH  8192
 
 
 // limits used in char_file_u -- **DO NOT CHANGE** (without a pconvert)
