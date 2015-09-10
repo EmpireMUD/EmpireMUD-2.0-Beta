@@ -1570,7 +1570,7 @@ typedef struct trig_data trig_data;
 #define MAX_ROOM_DESCRIPTION  4000
 #define MAX_SKILL_RESETS  10	// number of skill resets you can save up
 #define MAX_STORAGE  1000000	// empire storage cap, must be < MAX_INT
-#define MAX_STRING_LENGTH  8192
+#define MAX_STRING_LENGTH  10240
 
 
 // limits used in char_file_u -- **DO NOT CHANGE** (without a pconvert)
