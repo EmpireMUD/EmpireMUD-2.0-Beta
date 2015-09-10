@@ -1483,7 +1483,6 @@ Toggles:
   bother - allows "bothersome" things like bite and purify
   rp - shuts off OOC commands
   no-clear - removes the screen-clear before the map display
-  map-pc - show players on the map as <oo>
   map-color - shut off color for just the map
   pvp - turns on/off free pvp; will remain on 5 minutes after toggled off
   informative - informative map coloring -- HELP INFORMATIVE
@@ -1615,8 +1614,6 @@ Usage:  wizlist
 
 Lists the most powerful beings on the MUD. These are the people responsible
 for administering the system.
-
-See also: IMPLEMENTOR
 #
 WOOL
 
