@@ -2819,15 +2819,13 @@ struct help_index_element *find_help_entry(int level, const char *word) {
 
 		for (;;) {
 			mid = (bot + top) / 2;
-			
-			chk = 0;	// 
 
 			if (bot > top) {
 				return NULL;
 			}
-			else if (level >= help_table[mid].level && !(chk = strn_cmp(word, help_table[mid].keyword, minlen))) {
+			else if (!(chk = strn_cmp(word, help_table[mid].keyword, minlen))) {
 				/* trace backwards to find first matching entry. Thanks Jeff Fink! */
-				while ((mid > 0) && (!(chk = strn_cmp(word, help_table[mid - 1].keyword, minlen)) && level >= help_table[mid].level)) {
+				while ((mid > 0) && (!(chk = strn_cmp(word, help_table[mid - 1].keyword, minlen)))) {
 					mid--;
 				}
 				if (level < help_table[mid].level) {
@@ -2841,17 +2839,8 @@ struct help_index_element *find_help_entry(int level, const char *word) {
 				if (chk > 0) {
 					bot = mid + 1;
 				}
-				else if (chk < 0) {
-					top = mid - 1;
-				}
 				else {
-					// attempt to determine
-					if (!strn_cmp(word, help_table[mid - 1].keyword, minlen)) {
-						top = mid - 1;
-					}
-					else {
-						bot = mid + 1;
-					}
+					top = mid - 1;
 				}
 			}
 		}
