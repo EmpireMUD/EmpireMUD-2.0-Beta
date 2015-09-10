@@ -2822,10 +2822,10 @@ struct help_index_element *find_help_entry(int level, const char *word) {
 
 			if (bot > top) {
 				return NULL;
-				}
-			else if (!(chk = strn_cmp(word, help_table[mid].keyword, minlen))) {
+			}
+			else if (level >= help_table[mid].level && !(chk = strn_cmp(word, help_table[mid].keyword, minlen))) {
 				/* trace backwards to find first matching entry. Thanks Jeff Fink! */
-				while ((mid > 0) && (!(chk = strn_cmp(word, help_table[mid - 1].keyword, minlen)))) {
+				while ((mid > 0) && (level < help_table[mid].level || !(chk = strn_cmp(word, help_table[mid - 1].keyword, minlen)))) {
 					mid--;
 				}
 				if (level < help_table[mid].level) {
