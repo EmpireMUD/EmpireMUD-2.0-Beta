@@ -176,8 +176,8 @@ void string_add(descriptor_data *d, char *str) {
 	}
 	else {
 		if (strlen(str) + strlen(*d->str) + 3 > d->max_str) {
-			send_to_char("String too long. Last line skipped.\r\n", d->character);
 			if (action == STRINGADD_OK) {
+				send_to_char("String too long. Last line skipped.\r\n", d->character);
 				return;	// No appending \r\n\0, but still let them save.
 			}
 		}
