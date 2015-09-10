@@ -105,7 +105,7 @@ blood_starvation_level 20
 default_map_size 7
 idle_linkdead_rent_time 5
 idle_rent_time 20
-max_map_size 11
+max_map_size 12
 max_player_attribute 15
 num_bonus_trait_daily_skills 5
 num_daily_skill_points 15
