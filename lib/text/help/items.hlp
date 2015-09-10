@@ -416,7 +416,29 @@ a total of 13 coins.
 
 See also: TRADE COMMAND, TRADE BUY, TRADE CHECK, TRADE COLLECT
 #
-VAULT WAREHOUSE
+VAULT
+
+Building:  Vault (designated)
+Designated in:  portcullis, great hall
+
+Command:  deposit <number> [empire] <coins>
+          warehouse <action> <item keywords>
+
+Having a vault allows you to store coins and precious metals, both for trading
+and to accumulate wealth for your empire. It also offers a more secure version
+of warehouse storage.
+
+Warehouse and vault storage for unique items are identical except that the
+vault requires "withdraw" empire privilege to use it, and warehouse only
+requires that you be a member of the empire. Both use the "warehouse" command.
+
+Items which can be stored in normal resource storage may not be stored using
+the "warehouse" command. Also note that treasure (like gold bars) must be
+stored in the vault using the regular "store" command, not "warehouse".
+
+See also: CASTLE, DESIGNATE, PRIVILEGE, RETRIEVE, STORE, WAREHOUSE
+#
+WAREHOUSE
 
 Building:  {WW}  Warehouse  (Artisans skill)
 Resources:  20 lumber, 8 nails
@@ -428,11 +450,8 @@ Command:  warehouse inventory [item keywords]
           warehouse store [number] <item keywords>
 
 While normal resource storage (e.g. the lumber yard) can store many simple
-items, you must use a warehouse or vault to store items which are unique,
-scaled, enchanted, superior, or otherwise modified. Warehouse and vault storage
-are identical except that the vault requires "withdraw" empire privilege to
-use it, and warehouse only requires that you be a member of the empire. Both
-use the "warehouse" command.
+items, you must use a warehouse (or vault) to store items which are unique,
+scaled, enchanted, superior, or otherwise modified. 
 
 Items which can be stored in normal resource storage may not be stored using
 the "warehouse" command. Also note that treasure (like gold bars) must be
@@ -453,6 +472,6 @@ You retrieve a short sword (x4).
 Note: Immortals can see the warehouse lists for other empires using the syntax
 "warehouse inv <empire> [keywords]".
 
-See also: ARTISANS, KEEP, PRIVILEGE, RETRIEVE, STORE
+See also: ARTISANS, KEEP, RETRIEVE, STORE, VAULT
 #
 $
