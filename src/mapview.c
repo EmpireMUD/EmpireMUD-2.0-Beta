@@ -107,7 +107,7 @@ const char *get_banner_complement_color(empire_data *emp) {
 		return "";
 	}
 
-	if (strchrstr(EMPIRE_BANNER(emp), "rR")) {
+	if (strchrstr(EMPIRE_BANNER(emp), "rRtT")) {
 		return "\t[B100]";
 	}
 	if (strchrstr(EMPIRE_BANNER(emp), "gG")) {
@@ -119,10 +119,13 @@ const char *get_banner_complement_color(empire_data *emp) {
 	if (strchrstr(EMPIRE_BANNER(emp), "mMpPvV")) {
 		return "\t[B101]";
 	}
-	if (strchrstr(EMPIRE_BANNER(emp), "cCbBaAjJ")) {
+	if (strchrstr(EMPIRE_BANNER(emp), "aA")) {
+		return "\t[B001]";
+	}
+	if (strchrstr(EMPIRE_BANNER(emp), "cCbBjJ")) {
 		return "\t[B011]";
 	}
-	if (strchrstr(EMPIRE_BANNER(emp), "wWtT")) {
+	if (strchrstr(EMPIRE_BANNER(emp), "wW")) {
 		return "\t[B111]";
 	}
 	if (strchrstr(EMPIRE_BANNER(emp), "lL")) {
