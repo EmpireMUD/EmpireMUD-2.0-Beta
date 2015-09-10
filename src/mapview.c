@@ -106,7 +106,93 @@ const char *get_banner_complement_color(empire_data *emp) {
 	if (!emp) {
 		return "";
 	}
-	
+
+	if (strchrstr(EMPIRE_BANNER(emp), "r")) {
+		return "\t[B550]";
+	}
+	if (strchrstr(EMPIRE_BANNER(emp), "R")) {
+		return "\t[B100]";
+	}
+	if (strchrstr(EMPIRE_BANNER(emp), "g")) {
+		return "\t[B050]";
+	}
+	if (strchrstr(EMPIRE_BANNER(emp), "G")) {
+		return "\t[B010]";
+	}
+	if (strchrstr(EMPIRE_BANNER(emp), "y")) {
+		return "\t[B550]";
+	}
+	if (strchrstr(EMPIRE_BANNER(emp), "Y")) {
+		return "\t[B110]";
+	}
+	if (strchrstr(EMPIRE_BANNER(emp), "b")) {
+		return "\t[B005]";
+	}
+	if (strchrstr(EMPIRE_BANNER(emp), "B")) {
+		return "\t[B001]";
+	}
+	if (strchrstr(EMPIRE_BANNER(emp), "m")) {
+		return "\t[B505]";
+	}
+	if (strchrstr(EMPIRE_BANNER(emp), "M")) {
+		return "\t[B101]";
+	}
+	if (strchrstr(EMPIRE_BANNER(emp), "c")) {
+		return "\t[B055]";
+	}
+	if (strchrstr(EMPIRE_BANNER(emp), "C")) {
+		return "\t[B011]";
+	}
+	if (strchrstr(EMPIRE_BANNER(emp), "w")) {
+		return "\t[B444]";
+	}
+	if (strchrstr(EMPIRE_BANNER(emp), "W")) {
+		return "\t[B111]";
+	}
+	if (strchrstr(EMPIRE_BANNER(emp), "a")) {
+		return "\t[B012]";
+	}
+	if (strchrstr(EMPIRE_BANNER(emp), "A")) {
+		return "\t[B013]";
+	}
+	if (strchrstr(EMPIRE_BANNER(emp), "j")) {
+		return "\t[B053]";
+	}
+	if (strchrstr(EMPIRE_BANNER(emp), "J")) {
+		return "\t[B031]";
+	}
+	if (strchrstr(EMPIRE_BANNER(emp), "l")) {
+		return "\t[B450]";
+	}
+	if (strchrstr(EMPIRE_BANNER(emp), "L")) {
+		return "\t[B130]";
+	}
+	if (strchrstr(EMPIRE_BANNER(emp), "o")) {
+		return "\t[B540]";
+	}
+	if (strchrstr(EMPIRE_BANNER(emp), "O")) {
+		return "\t[B310]";
+	}
+	if (strchrstr(EMPIRE_BANNER(emp), "p")) {
+		return "\t[B503]";
+	}
+	if (strchrstr(EMPIRE_BANNER(emp), "P")) {
+		return "\t[B301]";
+	}
+	if (strchrstr(EMPIRE_BANNER(emp), "t")) {
+		return "\t[B543]";
+	}
+	if (strchrstr(EMPIRE_BANNER(emp), "T")) {
+		return "\t[B210]";
+	}
+	if (strchrstr(EMPIRE_BANNER(emp), "v")) {
+		return "\t[B305]";
+	}
+	if (strchrstr(EMPIRE_BANNER(emp), "V")) {
+		return "\t[B103]";
+	}
+
+	/*
 	if (strchrstr(EMPIRE_BANNER(emp), "rpmbBvaCl")) {
 		return "\t[B321]";	// tan
 	}
@@ -116,12 +202,10 @@ const char *get_banner_complement_color(empire_data *emp) {
 	if (strchrstr(EMPIRE_BANNER(emp), "gj")) {
 		return "\t[B014]";	// dark azure
 	}
-	if (strchrstr(EMPIRE_BANNER(emp), "coOTw")) {
+	if (strchrstr(EMPIRE_BANNER(emp), "coOTwtRPM")) {
 		return "\t[B003]";	// dark blue
 	}
-	if (strchrstr(EMPIRE_BANNER(emp), "tRPM")) {
-		return "\t[B104]";	// dark cyan
-	}
+	*/
 	
 	// default
 	return "\t[B210]";	// dark tan
