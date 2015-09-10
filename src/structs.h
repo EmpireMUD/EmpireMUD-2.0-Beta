@@ -1289,7 +1289,7 @@ typedef struct trig_data trig_data;
 #define PRF_MORTLOG  BIT(6)	// Views mortlogs, default: ON
 #define PRF_NOREPEAT  BIT(7)	// No repetition of comm commands
 #define PRF_HOLYLIGHT  BIT(8)	// Immortal: Can see in dark
-	#define PRF_COLOR  BIT(9)	// Color
+	#define PRF_UNUSED1  BIT(9)
 #define PRF_NOWIZ  BIT(10)	// Can't hear wizline
 #define PRF_NOMAPCOL  BIT(11)	// Map is not colored
 #define PRF_NOHASSLE  BIT(12)	// Ignored by mobs and triggers

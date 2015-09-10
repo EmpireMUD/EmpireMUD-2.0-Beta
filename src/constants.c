@@ -372,7 +372,7 @@ const char *preference_bits[] = {
 	"MORTLOG",
 	"!REP",
 	"LIGHT",
-	"COLOR",
+		"UNUSED1",
 	"!WIZ",
 	"!MCOL",
 	"!HASSLE",

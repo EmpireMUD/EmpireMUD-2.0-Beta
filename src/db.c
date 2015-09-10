@@ -1479,6 +1479,7 @@ const char *versions_list[] = {
 	// this system was added in b2.5
 	"b2.5",
 	"b2.7",
+	"b2.8",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -1526,10 +1527,18 @@ void write_last_boot_version(int version) {
 }
 
 
+// 2.8 removes the color preference
+PLAYER_UPDATE_FUNC(b2_8_update_players) {
+	REMOVE_BIT(PRF_FLAGS(ch), BIT(9));	// was PRF_COLOR
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
 void check_version(void) {
+	void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func));
+	
 	int last, iter, current = NOTHING;
 	
 	#define MATCH_VERSION(name)  (!str_cmp(versions_list[iter], name))
@@ -1554,6 +1563,10 @@ void check_version(void) {
 				EMPIRE_CHORE(emp, CHORE_DISMANTLE_MINES) = FALSE;
 				save_empire(emp);
 			}
+		}
+		if (MATCH_VERSION("b2.8")) {
+			log("Applying b2.8 update to players...");
+			update_all_players(NULL, b2_8_update_players);
 		}
 	}
 	
