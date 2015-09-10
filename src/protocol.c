@@ -266,6 +266,7 @@ static const char s_BackMagenta[] = "\033[1;45m";	// Magenta background
 static const char s_BackCyan[] = "\033[1;46m";	// Cyan background
 static const char s_BackWhite[] = "\033[1;47m";	// White background
 
+static const char s_Underline[] = "\033[4m";	// underline
 
 /******************************************************************************
  Protocol global functions.
@@ -530,6 +531,9 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 				case '0':
 					pCopyFrom = s_Clean;
 					break;
+				case 'u': // underline
+					pCopyFrom = s_Underline;
+					break;
 				case 'r': /* dark red */
 					pCopyFrom = ColourRGB(apDescriptor, "F300");
 					break;
@@ -787,6 +791,9 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 				case 'n':
 				case '0':
 					pCopyFrom = s_Clean;
+					break;
+				case 'u': // underline
+					pCopyFrom = s_Underline;
 					break;
 				case 'r': /* dark red */
 					pCopyFrom = ColourRGB(apDescriptor, "F300");
