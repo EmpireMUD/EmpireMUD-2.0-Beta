@@ -140,16 +140,11 @@ See also: QUIT
 #
 ANSI COLOR COLORS MAPCOLOR "MAP COLOR" MAP-COLOR &&
 
-Usage:  toggle color
-        toggle map-color
-
-If you have a color-capable terminal and wish to see useful color-coding of
-information, use the COLOR command to turn color on or off.
+Options:  toggle map-color
 
 If you're not on a broadband connection, color may slow down your messages
-very slightly. However, even on dialup, it's barely noticeable. If you only
-want to shut off map color, the "map-color" toggle will remove color codes
-from the world map.
+very slightly. However, even on dialup, it's barely noticeable. Even so, the
+"map-color" toggle will remove color codes from the world map.
 
 Color codes you can use yourself:
  &0&&0 Normal&0     &u&&u Underline&0
@@ -1047,9 +1042,7 @@ RECOLOR "CUSTOM COLORS"
 Usage:  recolor <type> <color code>
 
 You can change the color of many game channels using this command. This can
-be helpful if it's difficult for you to see the default colors. However, if a
-color is hard for you to see, you should consider lightening it in your client
-settings.
+be helpful if it's difficult for you to see the default colors.
 
 In addition to channels, you can also recolor 'status' which includes cooldowns
 and affect-wear-off messages, to make them easier to see in combat.
@@ -1479,12 +1472,10 @@ Toggles:
   brief - see smaller maps and no room descriptions
   compact - no extra newlines
   no-repeat - Some commands will say "ok" instead of typing out your message
-  color - see the world in color
   autokill - don't end combat at incapacitation
   bother - allows "bothersome" things like bite and purify
   rp - shuts off OOC commands
   no-clear - removes the screen-clear before the map display
-  map-pc - show players on the map as <oo>
   map-color - shut off color for just the map
   pvp - turns on/off free pvp; will remain on 5 minutes after toggled off
   informative - informative map coloring -- HELP INFORMATIVE

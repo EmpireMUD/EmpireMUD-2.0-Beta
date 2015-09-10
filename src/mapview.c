@@ -663,7 +663,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 					}
 					else if (to_room != room && !CAN_SEE_IN_DARK_ROOM(ch, to_room) && compute_distance(room, to_room) > distance_can_see(ch) && !adjacent_room_is_light(to_room)) {
 						// normal dark
-						if (PRF_FLAGGED(ch, PRF_COLOR) && !PRF_FLAGGED(ch, PRF_NOMAPCOL)) {
+						if (!PRF_FLAGGED(ch, PRF_NOMAPCOL)) {
 							show_map_to_char(ch, mappc, to_room, options | LRR_SHOW_DARK);
 						}
 						else {

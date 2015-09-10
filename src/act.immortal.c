@@ -942,7 +942,6 @@ struct set_struct {
 		{ "deleted", 	LVL_CIMPL, 	PC, 	BINARY },
 		{ "nowizlist", 	LVL_START_IMM, 	PC, 	BINARY },
 		{ "loadroom", 	LVL_START_IMM, 	PC, 	MISC },
-		{ "color",		LVL_START_IMM, 	PC, 	BINARY },
 		{ "password",	LVL_CIMPL, 	PC, 	MISC },
 		{ "nodelete", 	LVL_CIMPL, 	PC, 	BINARY },
 		{ "noidleout",	LVL_START_IMM,	PC,		BINARY },
@@ -1239,9 +1238,6 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 			send_to_char("Must be 'off' or a room's virtual number.\r\n", ch);
 			return (0);
 		}
-	}
-	else if SET_CASE("color") {
-		SET_OR_REMOVE(PRF_FLAGS(vict), PRF_COLOR);
 	}
 	else if SET_CASE("password") {
 		if (GET_ACCESS_LEVEL(vict) >= LVL_IMPL) {

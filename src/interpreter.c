@@ -1509,7 +1509,6 @@ struct {
 	{ CON_CLAST_NAME },
 	{ CON_QSEX },
 	{ CON_Q_SCREEN_READER },	// skips to CON_Q_HAS_ALT
-	{ CON_QCOLOR },
 	
 	{ CON_Q_HAS_ALT },	// skips to CON_Q_ARCHETYPE
 	{ CON_Q_ALT_NAME },
@@ -1593,10 +1592,6 @@ void prompt_creation(descriptor_data *d) {
 		}
 		case CON_QSEX: {
 			SEND_TO_Q("\r\nWhat is your sex (M/F)? ", d);
-			break;
-		}
-		case CON_QCOLOR: {
-			SEND_TO_Q("\r\nDo you want color on (y/n)? ", d);
 			break;
 		}
 		case CON_Q_ARCHETYPE: {
@@ -2431,22 +2426,6 @@ void nanny(descriptor_data *d, char *arg) {
 				// store for later
 				arg[MAX_REFERRED_BY_LENGTH-1] = '\0';
 				strcpy(GET_REFERRED_BY(d->character), arg);
-			}
-			
-			next_creation_step(d);
-			break;
-		}
-
-		case CON_QCOLOR: {
-			switch (LOWER(*arg)) {
-				case 'y':
-					SET_BIT(PRF_FLAGS(d->character), PRF_COLOR);
-					break;
-				case 'n':
-					break;
-				default:
-					SEND_TO_Q("Please type YES or NO: ", d);
-					return;
 			}
 			
 			next_creation_step(d);

@@ -410,7 +410,7 @@ const struct toggle_data_type toggle_data[] = {
 	{ "brief", TOG_ONOFF, PRF_BRIEF, 0, NULL },
 	{ "political", TOG_ONOFF, PRF_POLITICAL, 0, NULL },
 	
-	{ "color", TOG_ONOFF, PRF_COLOR, 0, NULL },
+	{ "autorecall", TOG_ONOFF, PRF_AUTORECALL, 0, NULL },
 	{ "compact", TOG_ONOFF, PRF_COMPACT, 0, NULL },
 	{ "informative", TOG_ONOFF, PRF_INFORMATIVE, 0, NULL },
 	
@@ -423,7 +423,6 @@ const struct toggle_data_type toggle_data[] = {
 	{ "afk", TOG_ONOFF, PRF_AFK, 0, afk_notify },
 	
 	{ "channel-joins", TOG_OFFON, PRF_NO_CHANNEL_JOINS, 0, NULL },
-	{ "autorecall", TOG_ONOFF, PRF_AUTORECALL, 0, NULL },
 	{ "stealthable", TOG_ONOFF, PRF_STEALTHABLE, LVL_APPROVED, NULL },
 	
 	// imm section
@@ -449,7 +448,7 @@ const char *connected_types[] = {
 	"Get new PW",	// 5
 	"Confirm new PW",
 	"Select sex",
-	"Color?",
+		"UNUSED 1",
 	"Reading MOTD",
 	"Disconnecting",	// 10
 	"Referral?",

@@ -1122,7 +1122,7 @@ typedef struct trig_data trig_data;
 #define CON_NEWPASSWD  5	// Give me a password for x
 #define CON_CNFPASSWD  6	// Please retype password:
 #define CON_QSEX  7	// Sex?
-#define CON_QCOLOR  8	// Color, anyone?
+	#define CON_UNUSED1  8
 #define CON_RMOTD  9	// PRESS RETURN after MOTD
 #define CON_DISCONNECT  10	// In-game disconnection
 #define CON_REFERRAL  11	// referral
@@ -1289,7 +1289,7 @@ typedef struct trig_data trig_data;
 #define PRF_MORTLOG  BIT(6)	// Views mortlogs, default: ON
 #define PRF_NOREPEAT  BIT(7)	// No repetition of comm commands
 #define PRF_HOLYLIGHT  BIT(8)	// Immortal: Can see in dark
-#define PRF_COLOR  BIT(9)	// Color
+	#define PRF_COLOR  BIT(9)	// Color
 #define PRF_NOWIZ  BIT(10)	// Can't hear wizline
 #define PRF_NOMAPCOL  BIT(11)	// Map is not colored
 #define PRF_NOHASSLE  BIT(12)	// Ignored by mobs and triggers
