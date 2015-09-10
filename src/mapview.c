@@ -476,7 +476,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		// auto-detected
 		if (ch->desc && ch->desc->pProtocol->ScreenWidth > 0) {
 			int wide = (ch->desc->pProtocol->ScreenWidth - 3) / 4;
-			int max_size = config_get_int("default_map_size");
+			int max_size = config_get_int("max_map_size");
 			mapsize = MIN(wide, max_size);
 		}
 		else {

@@ -314,7 +314,8 @@ void ProtocolInput(descriptor_t *apDescriptor, char *apData, int aSize, char *ap
  * 
  * The predefined colours are:
  * 
- *   n: no colour (switches colour off)
+ *   n/0: no colour (switches colour off)
+ *   u: underline
  * 
  *   r: dark red                        R: light red
  *   g: dark green                      G: light green
