@@ -505,7 +505,7 @@ void announce_to_slash_channel(struct slash_channel *chan, const char *messg, ..
 
 // picks a deterministic color based on name
 char compute_slash_channel_color(char *name) {
-	char *colors = "rMBbmcRGYygC";
+	char *colors = "rgbymcajloptvRGBYMCAJLOPTV";
 	char *ptr;
 	int sum = 0;
 	
