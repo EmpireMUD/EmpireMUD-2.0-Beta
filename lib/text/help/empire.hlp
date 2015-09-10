@@ -259,6 +259,8 @@ from your empire.
 When editing a custom description, you can use /fi to add linebreaks and indent
 the first line. Generally descriptions look best in the 3-9 line range. You can
 use /h to get more information on editor commands, and /s to save and exit.
+
+See also: STRING EDITOR
 #
 DEDICATE
 
@@ -266,6 +268,8 @@ Usage:  dedicate <person>
 
 Some monuments can be dedicated to a particularly powerful person or god. Once
 dedicated, they can never be re-dedicated, so choose carefully.
+
+To find buildings that can be dedicated, try 'helpsearch dedicate'.
 #
 "DEEP MINES"
 
