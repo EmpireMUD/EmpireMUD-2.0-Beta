@@ -43,7 +43,7 @@ typedef struct descriptor_data descriptor_t;
 #define COLOUR_ON_BY_DEFAULT  true
 
 /* Uncomment this if players can also use RGB colour codes such as "&[F135]" */
-// #define EXTENDED_COLOUR
+#define EXTENDED_COLOUR
 
 /* Uncomment this if invalid colours are displayed rather than being eaten. */
 #define DISPLAY_INVALID_COLOUR_CODES
