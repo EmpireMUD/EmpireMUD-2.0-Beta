@@ -503,7 +503,7 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 	const char LinkStop[] = "\033[1z</send>\033[7z";
 	bool_t bTerminate = false, bUseMXP = false, bUseMSP = false;
 	#ifdef COLOUR_CHAR
-		bool_t bColourOn = COLOUR_ON_BY_DEFAULT;
+		bool_t bColourOn = true;	// always default to true, or many parts of the code won't work correctly -- TODO change all instances of & in the code to \t so this can be a config
 	#endif /* COLOUR_CHAR */
 	int i = 0, j = 0; /* Index values */
 	char lastColor[64];
@@ -876,30 +876,35 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 					bTerminate = true;
 					break;
 
-				#ifdef EXTENDED_COLOUR
-				case '[':
-					if (tolower(apData[++j]) == 'f' || tolower(apData[j]) == 'b') {
-						char Buffer[8] = {'\0'};
-						int Index = 0;
-						bool_t bDone = false, bValid = true;
+				case '[': {	// extended codes
+					if (config_get_bool("allow_extended_color_codes")) {
+						if (tolower(apData[++j]) == 'f' || tolower(apData[j]) == 'b') {
+							char Buffer[8] = {'\0'};
+							int Index = 0;
+							bool_t bDone = false, bValid = true;
 
-						/* Copy the 'f' (foreground) or 'b' (background) */
-						Buffer[Index++] = apData[j++];
+							/* Copy the 'f' (foreground) or 'b' (background) */
+							Buffer[Index++] = apData[j++];
 
-						while (apData[j] != '\0' && !bDone && bValid) {
-							if (apData[j] == ']')
-								bDone = true;
-							else if (Index < 4)
-								Buffer[Index++] = apData[j++];
-							else /* It's too long, so drop out - the colour code may still be valid */
-								bValid = false;
+							while (apData[j] != '\0' && !bDone && bValid) {
+								if (apData[j] == ']')
+									bDone = true;
+								else if (Index < 4)
+									Buffer[Index++] = apData[j++];
+								else /* It's too long, so drop out - the colour code may still be valid */
+									bValid = false;
+							}
+
+							if (bDone && bValid && IsValidColour(Buffer))
+								pCopyFrom = ColourRGB(apDescriptor, Buffer);
 						}
-
-						if (bDone && bValid && IsValidColour(Buffer))
-							pCopyFrom = ColourRGB(apDescriptor, Buffer);
+					}
+					else {	// not allowed
+						Result[i++] = COLOUR_CHAR;
+						Result[i++] = apData[j];
 					}
 					break;
-				#endif /* EXTENDED_COLOUR */
+				}
 
 				default:
 					#ifdef DISPLAY_INVALID_COLOUR_CODES

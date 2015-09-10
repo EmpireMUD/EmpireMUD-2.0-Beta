@@ -2,6 +2,7 @@
 * See init_config_system() in config.c for adding new configs
 *
 * Game configs
+allow_extended_color_codes 0
 huh_string Huh?!?
 no_person No-one by that name here.
 ok_string Okay.

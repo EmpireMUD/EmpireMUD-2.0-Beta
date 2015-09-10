@@ -36,16 +36,10 @@ typedef struct descriptor_data descriptor_t;
  Color support options
  *****************************************************************************/
 
-/* You may replace the '&' with another character if you wish, eg '^' or '@'. */
+// You may replace the '&' with another character if you wish, eg '^' or '@'
 #define COLOUR_CHAR  '&'
 
-/* Change this to 'false' if colour codes are off by default (see README.TXT) */
-#define COLOUR_ON_BY_DEFAULT  true
-
-/* Uncomment this if players can also use RGB colour codes such as "&[F135]" */
-#define EXTENDED_COLOUR
-
-/* Uncomment this if invalid colours are displayed rather than being eaten. */
+// Comment this out if you'd rather have invalid color codes (&x) hidden by the system
 #define DISPLAY_INVALID_COLOUR_CODES
 
 

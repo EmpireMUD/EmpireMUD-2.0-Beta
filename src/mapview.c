@@ -135,21 +135,6 @@ const char *get_banner_complement_color(empire_data *emp) {
 		return "\t[B310]";
 	}
 
-	/*
-	if (strchrstr(EMPIRE_BANNER(emp), "rpmbBvaCl")) {
-		return "\t[B321]";	// tan
-	}
-	if (strchrstr(EMPIRE_BANNER(emp), "AGLJyYV")) {
-		return "\t[B210]";	// dark tan
-	}
-	if (strchrstr(EMPIRE_BANNER(emp), "gj")) {
-		return "\t[B014]";	// dark azure
-	}
-	if (strchrstr(EMPIRE_BANNER(emp), "coOTwtRPM")) {
-		return "\t[B003]";	// dark blue
-	}
-	*/
-	
 	// default
 	return "\t[B210]";	// dark tan
 }

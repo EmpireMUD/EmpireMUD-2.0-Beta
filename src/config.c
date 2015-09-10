@@ -1541,6 +1541,7 @@ void init_config_system(void) {
 	// first set up all the config types
 
 	// game configs
+	init_config(CONFIG_GAME, "allow_extended_color_codes", CONFTYPE_BOOL, "if on, players can use &&[F000] and &&[B000]");
 	init_config(CONFIG_GAME, "starting_year", CONFTYPE_INT, "base year");
 	init_config(CONFIG_GAME, "welcome_message", CONFTYPE_SHORT_STRING, "message shown to all players on login");
 	init_config(CONFIG_GAME, "ok_string", CONFTYPE_SHORT_STRING, "simple Ok message");
