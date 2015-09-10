@@ -777,7 +777,7 @@ typedef struct trig_data trig_data;
 
 
 // Variables for the output buffering system
-#define MAX_SOCK_BUF  (12 * 1024)	// Size of kernel's sock buf
+#define MAX_SOCK_BUF  (24 * 1024)	// Size of kernel's sock buf
 #define MAX_PROMPT_LENGTH  256	// Max length of rendered prompt
 #define GARBAGE_SPACE  32	// Space for **OVERFLOW** etc
 #define SMALL_BUFSIZE  8192	// Static output buffer size
