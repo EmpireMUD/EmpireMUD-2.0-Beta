@@ -1465,7 +1465,9 @@ typedef struct trig_data trig_data;
 #define EVO_NEAR_SECTOR  7	// called when within 2 tiles of [value=sector]
 #define EVO_PLANTS_TO  8	// set when someone plants [no value]
 #define EVO_MAGIC_GROWTH  9	// called when Chant of Nature or similar is called
-#define NUM_EVOS  10	// total
+#define EVO_NOT_ADJACENT  10	// called when NOT adjacent to at least 1 of [value=sector]
+#define EVO_NOT_NEAR_SECTOR  11 // called when NOT within 2 tiles of [value=sector]
+#define NUM_EVOS  12	// total
 
 // evolution value types
 #define EVO_VAL_NONE  0

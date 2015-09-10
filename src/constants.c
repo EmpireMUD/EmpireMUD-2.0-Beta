@@ -1894,11 +1894,13 @@ const char *evo_types[] = {
 	"NEAR-SECTOR",
 	"PLANTS-TO",
 	"MAGIC-GROWTH",
+	"NOT-ADJACENT",
+	"NOT-NEAR-SECTOR",
 	"\n"
 };
 
 
-// EVO_VAL_x -- what type of data the evolution.value uses
+// EVO_x -- what type of data the evolution.value uses
 const int evo_val_types[NUM_EVOS] = {
 	EVO_VAL_NUMBER,	// chopped-down
 	EVO_VAL_NONE,	// crop-grows
@@ -1909,7 +1911,9 @@ const int evo_val_types[NUM_EVOS] = {
 	EVO_VAL_NONE,	// trench-full
 	EVO_VAL_SECTOR,	// near-sector
 	EVO_VAL_NONE,	// plants-to
-	EVO_VAL_NONE	// magic-growth
+	EVO_VAL_NONE,	// magic-growth
+	EVO_VAL_SECTOR,	// not-adjacent
+	EVO_VAL_SECTOR,	// not-near-sector
 };
 
 

@@ -1571,6 +1571,15 @@ static void evolve_one_map_tile(room_data *room) {
 		}
 	}
 	
+	if (!changed && (evo = get_evolution_by_type(SECT(room), EVO_NOT_ADJACENT))) {
+		if (sector_proto(evo->becomes)) {
+			if (count_adjacent_sectors(room, evo->value, TRUE) < 1) {
+				change_terrain(room, evo->becomes);
+				changed = TRUE;
+			}
+		}
+	}
+	
 	if (!changed && (evo = get_evolution_by_type(SECT(room), EVO_ADJACENT_MANY))) {
 		if (sector_proto(evo->becomes)) {
 			if (count_adjacent_sectors(room, evo->value, TRUE) >= 6) {
@@ -1583,6 +1592,15 @@ static void evolve_one_map_tile(room_data *room) {
 	if (!changed && (evo = get_evolution_by_type(SECT(room), EVO_NEAR_SECTOR))) {
 		if (sector_proto(evo->becomes)) {
 			if (find_sect_within_distance_from_room(room, evo->value, config_get_int("nearby_sector_distance"))) {
+				change_terrain(room, evo->becomes);
+				changed = TRUE;
+			}
+		}
+	}
+	
+	if (!changed && (evo = get_evolution_by_type(SECT(room), EVO_NOT_NEAR_SECTOR))) {
+		if (sector_proto(evo->becomes)) {
+			if (!find_sect_within_distance_from_room(room, evo->value, config_get_int("nearby_sector_distance"))) {
 				change_terrain(room, evo->becomes);
 				changed = TRUE;
 			}
