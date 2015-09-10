@@ -107,88 +107,46 @@ const char *get_banner_complement_color(empire_data *emp) {
 		return "";
 	}
 
-	if (strchrstr(EMPIRE_BANNER(emp), "r")) {
-		return "\t[B500]";
-	}
-	if (strchrstr(EMPIRE_BANNER(emp), "R")) {
+	if (strchrstr(EMPIRE_BANNER(emp), "rR")) {
 		return "\t[B100]";
 	}
-	if (strchrstr(EMPIRE_BANNER(emp), "g")) {
-		return "\t[B040]";
-	}
-	if (strchrstr(EMPIRE_BANNER(emp), "G")) {
+	if (strchrstr(EMPIRE_BANNER(emp), "gG")) {
 		return "\t[B010]";
 	}
-	if (strchrstr(EMPIRE_BANNER(emp), "y")) {
-		return "\t[B440]";
-	}
-	if (strchrstr(EMPIRE_BANNER(emp), "Y")) {
+	if (strchrstr(EMPIRE_BANNER(emp), "yY")) {
 		return "\t[B110]";
 	}
-	if (strchrstr(EMPIRE_BANNER(emp), "b")) {
-		return "\t[B005]";
-	}
-	if (strchrstr(EMPIRE_BANNER(emp), "B")) {
+	if (strchrstr(EMPIRE_BANNER(emp), "bB")) {
 		return "\t[B001]";
 	}
-	if (strchrstr(EMPIRE_BANNER(emp), "m")) {
-		return "\t[B505]";
-	}
-	if (strchrstr(EMPIRE_BANNER(emp), "M")) {
+	if (strchrstr(EMPIRE_BANNER(emp), "mM")) {
 		return "\t[B101]";
 	}
-	if (strchrstr(EMPIRE_BANNER(emp), "c")) {
-		return "\t[B044]";
-	}
-	if (strchrstr(EMPIRE_BANNER(emp), "C")) {
+	if (strchrstr(EMPIRE_BANNER(emp), "cC")) {
 		return "\t[B011]";
 	}
-	if (strchrstr(EMPIRE_BANNER(emp), "w")) {
-		return "\t[B444]";
-	}
-	if (strchrstr(EMPIRE_BANNER(emp), "W")) {
+	if (strchrstr(EMPIRE_BANNER(emp), "wW")) {
 		return "\t[B111]";
 	}
-	if (strchrstr(EMPIRE_BANNER(emp), "a")) {
-		return "\t[B001]";
+	if (strchrstr(EMPIRE_BANNER(emp), "aA")) {
+		return "\t[B012]";
 	}
-	if (strchrstr(EMPIRE_BANNER(emp), "A")) {
-		return "\t[B013]";
+	if (strchrstr(EMPIRE_BANNER(emp), "jJ")) {
+		return "\t[B021]";
 	}
-	if (strchrstr(EMPIRE_BANNER(emp), "j")) {
-		return "\t[B053]";
+	if (strchrstr(EMPIRE_BANNER(emp), "lL")) {
+		return "\t[B120]";
 	}
-	if (strchrstr(EMPIRE_BANNER(emp), "J")) {
-		return "\t[B031]";
+	if (strchrstr(EMPIRE_BANNER(emp), "oO")) {
+		return "\t[B510]";
 	}
-	if (strchrstr(EMPIRE_BANNER(emp), "l")) {
-		return "\t[B350]";
+	if (strchrstr(EMPIRE_BANNER(emp), "pP")) {
+		return "\t[B101]";
 	}
-	if (strchrstr(EMPIRE_BANNER(emp), "L")) {
-		return "\t[B130]";
+	if (strchrstr(EMPIRE_BANNER(emp), "tT")) {
+		return "\t[B110]";
 	}
-	if (strchrstr(EMPIRE_BANNER(emp), "o")) {
-		return "\t[B540]";
-	}
-	if (strchrstr(EMPIRE_BANNER(emp), "O")) {
-		return "\t[B310]";
-	}
-	if (strchrstr(EMPIRE_BANNER(emp), "p")) {
-		return "\t[B302]";
-	}
-	if (strchrstr(EMPIRE_BANNER(emp), "P")) {
-		return "\t[B201]";
-	}
-	if (strchrstr(EMPIRE_BANNER(emp), "t")) {
-		return "\t[B432]";
-	}
-	if (strchrstr(EMPIRE_BANNER(emp), "T")) {
-		return "\t[B210]";
-	}
-	if (strchrstr(EMPIRE_BANNER(emp), "v")) {
-		return "\t[B305]";
-	}
-	if (strchrstr(EMPIRE_BANNER(emp), "V")) {
+	if (strchrstr(EMPIRE_BANNER(emp), "vV")) {
 		return "\t[B102]";
 	}
 
