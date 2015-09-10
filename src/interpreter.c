@@ -1999,16 +1999,19 @@ int perform_dupe_check(descriptor_data *d) {
 			SEND_TO_Q("Reconnecting.\r\n", d);
 			act("$n has reconnected.", TRUE, d->character, 0, 0, TO_ROOM);
 			syslog(SYS_LOGIN, GET_INVIS_LEV(d->character), TRUE, "%s [%s] has reconnected.", GET_NAME(d->character), d->host);
+			MXPSendTag(d, "<VERSION>");
 			break;
 		case USURP:
 			SEND_TO_Q("You take over your own body, already in use!\r\n", d);
 			act("$n suddenly keels over in pain, surrounded by a white aura...\r\n"
 				"$n's body has been taken over by a new spirit!", TRUE, d->character, 0, 0, TO_ROOM);
 			syslog(SYS_LOGIN, GET_INVIS_LEV(d->character), TRUE, "%s has re-logged in ... disconnecting old socket.", GET_NAME(d->character));
+			MXPSendTag(d, "<VERSION>");
 			break;
 		case UNSWITCH:
 			SEND_TO_Q("Reconnecting to unswitched char.", d);
 			syslog(SYS_LOGIN, GET_INVIS_LEV(d->character), TRUE, "%s [%s] has reconnected.", GET_NAME(d->character), d->host);
+			MXPSendTag(d, "<VERSION>");
 			break;
 	}
 
