@@ -761,7 +761,7 @@ See also: EXAMINE, GET, READ, TAKE
 #
 MAPSIZE "MAP SIZE"
 
-Usage:  mapsize <size>
+Usage:  mapsize <size | auto>
 
 This allows you to change the size of your map display to better fit the size
 of your screen. Be cautious with large mapsizes because some people are dis-
@@ -771,6 +771,9 @@ Mapsize is the total width of your map in map tiles (4 characters if you're
 using the ascii map; one room if you're using screen-reader mode). The number
 is always odd because you sit in the center of it. A mapsize of 3 shows 1 tile
 in each direction; a mapsize of 15 (standard) shows 7 in each direction.
+
+If you set your mapsize to 'auto', the game will attempt to detect the size of
+your client window.
 
 See also: TOGGLE
 #

@@ -473,7 +473,15 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 
 	mapsize = GET_MAPSIZE(REAL_CHAR(ch));
 	if (mapsize == 0) {
-		mapsize = config_get_int("default_map_size");
+		// auto-detected
+		if (ch->desc && ch->desc->pProtocol->ScreenWidth > 0) {
+			int wide = (ch->desc->pProtocol->ScreenWidth - 3) / 4;
+			int max_size = config_get_int("default_map_size");
+			mapsize = MIN(wide, max_size);
+		}
+		else {
+			mapsize = config_get_int("default_map_size");
+		}
 	}
 
 	if (AFF_FLAGGED(ch, AFF_BLIND)) {
