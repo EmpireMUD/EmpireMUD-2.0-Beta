@@ -129,16 +129,16 @@ const char *get_banner_complement_color(empire_data *emp) {
 		return "\t[B111]";
 	}
 	if (strchrstr(EMPIRE_BANNER(emp), "aA")) {
-		return "\t[B012]";
+		return "\t[B011]";
 	}
 	if (strchrstr(EMPIRE_BANNER(emp), "jJ")) {
-		return "\t[B021]";
+		return "\t[B011]";
 	}
 	if (strchrstr(EMPIRE_BANNER(emp), "lL")) {
 		return "\t[B120]";
 	}
 	if (strchrstr(EMPIRE_BANNER(emp), "oO")) {
-		return "\t[B510]";
+		return "\t[B410]";
 	}
 	if (strchrstr(EMPIRE_BANNER(emp), "pP")) {
 		return "\t[B101]";
@@ -147,7 +147,7 @@ const char *get_banner_complement_color(empire_data *emp) {
 		return "\t[B110]";
 	}
 	if (strchrstr(EMPIRE_BANNER(emp), "vV")) {
-		return "\t[B102]";
+		return "\t[B101]";
 	}
 
 	/*
