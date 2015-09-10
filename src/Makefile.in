@@ -297,7 +297,8 @@ olc.sector.o: olc.sector.c conf.h sysdep.h structs.h uthash.h utils.h \
 olc.trigger.o: olc.trigger.c conf.h sysdep.h structs.h uthash.h utils.h \
   interpreter.h db.h comm.h olc.h handler.h dg_scripts.h dg_event.h
 	$(CC) -c $(CFLAGS) olc.trigger.c
-protocol.o: protocol.c conf.h sysdep.h comm.h protocol.h structs.h utils.h
+protocol.o: protocol.c conf.h sysdep.h comm.h protocol.h structs.h utils.h \
+  handler.h
 	$(CC) -c $(CFLAGS) protocol.c
 random.o: random.c
 	$(CC) -c $(CFLAGS) random.c

@@ -27,6 +27,7 @@
 #include "structs.h"
 #include "utils.h"
 #include "comm.h"
+#include "handler.h"
 
 #ifdef HAVE_ARPA_TELNET_H
 #include <arpa/telnet.h>
