@@ -2847,10 +2847,10 @@ struct help_index_element *find_help_entry(int level, const char *word) {
 				else {
 					// attempt to determine
 					if (!strn_cmp(word, help_table[mid - 1].keyword, minlen)) {
-						bot = mid + 1;
+						top = mid - 1;
 					}
 					else {
-						top = mid - 1;
+						bot = mid + 1;
 					}
 				}
 			}
