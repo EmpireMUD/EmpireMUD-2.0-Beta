@@ -202,7 +202,7 @@ This toggle turns off room descriptions and shrinks the map display from 15 by
 15 to 7 by 7. It reduces disconnects from buffer overflows for people moving
 quickly across the world.
 
-See also: BRIEF, COMPACT, MAPSIZE
+See also: COMPACT, MAPSIZE, TOGGLE
 #
 BUG TYPO IDEA
 
@@ -1262,7 +1262,7 @@ bonuses from a weapon while it is sheathed.
 
 See also: DRAW, SWAP
 #
-SHIP SHIPPING
+"SHIP COMMAND" SHIPPING
 
 Usage:  ship status
         ship cancel [number] <item>
