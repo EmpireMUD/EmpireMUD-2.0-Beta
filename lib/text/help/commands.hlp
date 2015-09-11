@@ -192,7 +192,7 @@ Usage:  board <ship>
 
 This command is used to board a ship in the same room.
 
-See also: DISEMBARK, SAIL, MANUFACTURE, LOAD
+See also: DISEMBARK, SAIL, MANUFACTURE, LOAD, SHIPS
 #
 BRIEF
 
@@ -336,7 +336,7 @@ From the entry room of a ship (the room you're placed in when you board it),
 you may disembark. This can be done even in the ocean, though you may need a
 smaller vessel unless you disembark very close to the shore.
 
-See also: BOARD, SAIL, UNLOAD
+See also: BOARD, SAIL, UNLOAD, SHIPS
 #
 DISMISS
 
@@ -738,7 +738,7 @@ You can load items from your inventory or from the room. Only the Galleon can
 hold items like carts and catapults (or any item that won't fit in your
 inventory).
 
-See also: UNLOAD, BOARD, SAIL
+See also: UNLOAD, BOARD, SAIL, SHIPS
 #
 LOOK EXAMINE
 
@@ -1135,7 +1135,7 @@ can travel on oceans and rivers, through river gates, and under bridges.
 Though this is fairly slow, it is one of the most efficient means of 
 transoceanic travel.
 
-See also: BOARD, DISEMBARK
+See also: BOARD, DISEMBARK, SHIPBUILDING, SHIPS
 #
 SAVE
 
@@ -1292,7 +1292,7 @@ shipping system. You can also set this option on individual ships. (Workforce
 is not required to use the shipping system, but 'workforce no-work' is still
 used to prevent shipping.)
 
-See also: DOCKS, EINVENTORY, SHIPBUILDING, WORKFORCE
+See also: DOCKS, EINVENTORY, SHIPBUILDING, SHIPS, WORKFORCE
 #
 SLEEP
 
@@ -1506,7 +1506,7 @@ Usage:  unload <ship>
 
 This command allows you to unload cargo from a ship at the docks.
 
-See also: LOAD, BOARD, SAIL
+See also: LOAD, BOARD, SAIL, SHIPS
 #
 USE
 

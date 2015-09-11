@@ -574,7 +574,25 @@ as well as patterns and crafts hidden around the world.
 
 See also: CRAFTING LEVEL, LEATHERWORKING, RAWHIDE STITCHING, CLOTHING
 #
-SHIPBUILDING "SHIP BUILDING" MANUFACTURE SHIPYARDS "ADVANCED SHIPYARDS" "UPGRADED SHIPYARD" "ADVANCED SHIPS"
+SHIP SHIPS 
+
+(Disambiguation: Did you mean HELP SHIP COMMAND ?)
+
+The next step up from canoes, ships can be sailed (with 'sail <direction>') at
+a fixed speed, consuming no moves. Multiple players can combine their efforts
+to sail a single ship faster.
+
+Ships can be used to manually transport resources, though you should be wary of
+leaving them unattended, as autostorage while at sea (though slower) will cause
+the ship's cargo to be permanently lost. Each tile of a ship can hold up to 404
+items, but large items count twice each as if they were kept in your inventory.
+
+Your citizens can also use ships to automatically transport resources for you,
+but this is slow and will not use the ship's full capacity.
+
+See also: BOARD, DISEMBARK, SAIL, SHIPBUILDING, SHIPPING
+#
+SHIPBUILDING "SHIP BUILDING" MANUFACTURE SHIPYARDS "ADVANCED SHIPYARDS" "UPGRADED SHIPYARD" "ADVANCED SHIPS" "SHIP LIST"
 
 Shipbuilding (Trade ability)
 Advanced Ships (Trade ability)
@@ -599,7 +617,7 @@ With Advanced ships you can manufacture:
   argosy  120 lumber, 240 nails  (shipping capacity: 600)
   galleon  240 lumber, 480 nails  (shipping capacity: 750)
 
-See also: BOARD, DISEMBARK, SAIL, SHIP, UPGRADE
+See also: BOARD, DISEMBARK, SAIL, SHIPPING, SHIPS, UPGRADE
 #
 SIEGEWORKS "SIEGE WORKS"
 
