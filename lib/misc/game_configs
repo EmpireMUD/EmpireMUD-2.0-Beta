@@ -148,7 +148,6 @@ siteok_everyone 0
 use_autowiz 1
 *
 * Trade configs
-auto_balance_per_cycle 400
 imports_per_day 100
 trading_post_days_to_timeout 60
 trading_post_fee 0.050000

@@ -101,7 +101,7 @@ static const char s_Button5[] = "\005\002Inventory\002inventory\006";
 static const char s_Gauge1[] = "\005\002Health\002red\002HEALTH\002HEALTH_MAX\006";
 static const char s_Gauge2[] = "\005\002Mana\002blue\002MANA\002MANA_MAX\006";
 static const char s_Gauge3[] = "\005\002Movement\002green\002MOVEMENT\002MOVEMENT_MAX\006";
-static const char s_Gauge4[] = "\005\002Exp TNL\002yellow\002EXPERIENCE\002EXPERIENCE_MAX\006";
+static const char s_Gauge4[] = "\005\002Blood\002red\002BLOOD\002BLOOD_MAX\006";
 static const char s_Gauge5[] = "\005\002Opponent\002darkred\002OPPONENT_HEALTH\002OPPONENT_HEALTH_MAX\006";
 
 
