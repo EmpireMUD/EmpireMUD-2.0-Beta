@@ -192,8 +192,6 @@ static void msdp_update(void) {
 			pOpponent = FIGHTING(ch);
 
 			MSDPSetString(d, eMSDP_CHARACTER_NAME, GET_NAME(ch));
-			MSDPSetNumber(d, eMSDP_ALIGNMENT, 0);	// TODO
-			MSDPSetNumber(d, eMSDP_EXPERIENCE, 0);	// TODO
 
 			MSDPSetNumber(d, eMSDP_HEALTH, GET_HEALTH(ch));
 			MSDPSetNumber(d, eMSDP_HEALTH_MAX, GET_MAX_HEALTH(ch));
@@ -204,11 +202,9 @@ static void msdp_update(void) {
 
 			MSDPSetNumber(d, eMSDP_MANA, GET_MANA(ch));
 			MSDPSetNumber(d, eMSDP_MANA_MAX, GET_MAX_MANA(ch));
-			MSDPSetNumber(d, eMSDP_WIMPY, 0);	// TODO
 			MSDPSetNumber(d, eMSDP_MONEY, 0);	// TODO
 			MSDPSetNumber(d, eMSDP_MOVEMENT, GET_MOVE(ch));
 			MSDPSetNumber(d, eMSDP_MOVEMENT_MAX, GET_MAX_MOVE(ch));
-			MSDPSetNumber(d, eMSDP_AC, 0);	// TODO
 
 			/* This would be better moved elsewhere */
 			if (pOpponent) {
