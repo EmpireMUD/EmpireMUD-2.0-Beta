@@ -1523,6 +1523,7 @@ static void evolve_one_map_tile(room_data *room) {
 	extern bool extract_tavern_resources(room_data *room);
 	
 	struct evolution_data *evo;
+	sector_data *original;
 	bool changed;
 	int type;
 	
@@ -1561,6 +1562,7 @@ static void evolve_one_map_tile(room_data *room) {
 	
 	// to avoid running more than one:
 	changed = FALSE;
+	original = SECT(room);
 	
 	// run some evolutions!
 	if (!changed && (evo = get_evolution_by_type(SECT(room), EVO_RANDOM))) {
@@ -1617,22 +1619,29 @@ static void evolve_one_map_tile(room_data *room) {
 
 	// Growing Seeds
 	if (!changed && ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && (evo = get_evolution_by_type(SECT(room), EVO_CROP_GROWS))) {
-		// only going to use the original sect if it was different
-		sector_data *orig = (ROOM_ORIGINAL_SECT(room) != SECT(room)) ? ROOM_ORIGINAL_SECT(room) : NULL;
+		// only going to use the original sect if it was different -- this preserves the stored sect
+		sector_data *stored = (ROOM_ORIGINAL_SECT(room) != SECT(room)) ? ROOM_ORIGINAL_SECT(room) : NULL;
 		
 		if (sector_proto(evo->becomes)) {
 			add_to_room_extra_data(room, ROOM_EXTRA_SEED_TIME, -1);
 			if (get_room_extra_data(room, ROOM_EXTRA_SEED_TIME) <= 0) {
 				type = get_room_extra_data(room, ROOM_EXTRA_CROP_TYPE);	// must preserve this
 				change_terrain(room, evo->becomes);
-				if (orig) {
-					ROOM_ORIGINAL_SECT(room) = orig;
+				if (stored) {
+					ROOM_ORIGINAL_SECT(room) = stored;
 				}
 				set_room_extra_data(room, ROOM_EXTRA_CROP_TYPE, type);
 				remove_depletion(room, DPLTN_PICK);
 				changed = TRUE;
 			}
 		}
+	}
+	
+	// DONE
+
+	// If the new sector has crop data, we should store the original (e.g. a desert that randomly grows into a crop)
+	if (changed && ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && ROOM_ORIGINAL_SECT(room) == SECT(room)) {
+		ROOM_ORIGINAL_SECT(room) = original;
 	}
 }
 
