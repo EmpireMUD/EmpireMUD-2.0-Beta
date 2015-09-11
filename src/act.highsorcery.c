@@ -1985,13 +1985,28 @@ RITUAL_FINISH_FUNC(perform_devastation_ritual) {
 		}
 		else if (ROOM_SECT_FLAGGED(to_room, SECTF_CROP) && (cp = crop_proto(ROOM_CROP_TYPE(to_room))) && has_interaction(GET_CROP_INTERACTIONS(cp), INTERACT_HARVEST)) {
 			run_room_interactions(ch, to_room, INTERACT_HARVEST, devastate_crop);
-			change_terrain(to_room, climate_default_sector[GET_CROP_CLIMATE(cp)]);
+			
+			// check for original sect, which may have been stored
+			if (ROOM_ORIGINAL_SECT(to_room) != SECT(to_room)) {
+				change_terrain(to_room, GET_SECT_VNUM(ROOM_ORIGINAL_SECT(to_room)));
+			}
+			else {
+				// fallback sect
+				change_terrain(to_room, climate_default_sector[GET_CROP_CLIMATE(cp)]);
+			}
 		}
 		else if (ROOM_SECT_FLAGGED(to_room, SECTF_HAS_CROP_DATA) && (cp = crop_proto(ROOM_CROP_TYPE(to_room)))) {
 			msg_to_char(ch, "You devastate the seeded field!\r\n");
 			act("$n's powerful ritual devastates the seeded field!", FALSE, ch, NULL, NULL, TO_ROOM);
 			
-			change_terrain(to_room, climate_default_sector[GET_CROP_CLIMATE(cp)]);
+			// check for original sect, which may have been stored
+			if (ROOM_ORIGINAL_SECT(to_room) != SECT(to_room)) {
+				change_terrain(to_room, GET_SECT_VNUM(ROOM_ORIGINAL_SECT(to_room)));
+			}
+			else {
+				// fallback sect
+				change_terrain(to_room, climate_default_sector[GET_CROP_CLIMATE(cp)]);
+			}
 		}
 		else {
 			msg_to_char(ch, "The Devastation Ritual has failed.\r\n");

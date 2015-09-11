@@ -82,7 +82,15 @@ int change_chop_territory(room_data *room) {
 	
 	if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && ROOM_CROP_FLAGGED(room, CROPF_IS_ORCHARD) && (cp = crop_proto(ROOM_CROP_TYPE(room)))) {
 		trees = 1;
-		change_terrain(room, climate_default_sector[GET_CROP_CLIMATE(cp)]);
+		
+		// check if original sect was stored to the crop
+		if (ROOM_ORIGINAL_SECT(room) != SECT(room)) {
+			change_terrain(room, GET_SECT_VNUM(ROOM_ORIGINAL_SECT(room)));
+		}
+		else {
+			// default
+			change_terrain(room, climate_default_sector[GET_CROP_CLIMATE(cp)]);
+		}
 	}
 	else if ((evo = get_evolution_by_type(SECT(room), EVO_CHOPPED_DOWN))) {
 		trees = evo->value;
@@ -1609,11 +1617,17 @@ static void evolve_one_map_tile(room_data *room) {
 
 	// Growing Seeds
 	if (!changed && ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && (evo = get_evolution_by_type(SECT(room), EVO_CROP_GROWS))) {
+		// only going to use the original sect if it was different
+		sector_data *orig = (ROOM_ORIGINAL_SECT(room) != SECT(room)) ? ROOM_ORIGINAL_SECT(room) : NULL;
+		
 		if (sector_proto(evo->becomes)) {
 			add_to_room_extra_data(room, ROOM_EXTRA_SEED_TIME, -1);
 			if (get_room_extra_data(room, ROOM_EXTRA_SEED_TIME) <= 0) {
-				type = get_room_extra_data(room, ROOM_EXTRA_CROP_TYPE);
+				type = get_room_extra_data(room, ROOM_EXTRA_CROP_TYPE);	// must preserve this
 				change_terrain(room, evo->becomes);
+				if (orig) {
+					ROOM_ORIGINAL_SECT(room) = orig;
+				}
 				set_room_extra_data(room, ROOM_EXTRA_CROP_TYPE, type);
 				remove_depletion(room, DPLTN_PICK);
 				changed = TRUE;
