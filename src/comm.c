@@ -2044,8 +2044,6 @@ static int process_output(descriptor_data *t) {
 		close_socket(t);
 		return (-1);
 	}
-	else if (result == 0)	/* Socket buffer full. Try later. */
-		return (0);
 
 	/* Handle snooping: prepend "% " and send to snooper. */
 	if (t->snoop_by) {
@@ -2053,6 +2051,11 @@ static int process_output(descriptor_data *t) {
 		write_to_output(t->output, t->snoop_by);
 		write_to_output("%%", t->snoop_by);
 	}
+	
+	if (result == 0) {	/* Socket buffer full. Try later. */
+		return (0);
+	}
+	
 	/* The common case: all saved output was handed off to the kernel buffer. */
 	if (result >= t->bufptr) {
 		/* If we were using a large buffer, put the large buffer on the buffer pool
