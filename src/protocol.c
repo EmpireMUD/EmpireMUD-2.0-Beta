@@ -1488,7 +1488,7 @@ void SoundSend(descriptor_t *apDescriptor, const char *apTrigger) {
 const char *ColourRGB(descriptor_t *apDescriptor, const char *apRGB) {
 	protocol_t *pProtocol = apDescriptor ? apDescriptor->pProtocol : NULL;
 
-	if (pProtocol && pProtocol->pVariables[eMSDP_ANSI_COLORS]->ValueInt) {
+	if (pProtocol && pProtocol->pVariables[eMSDP_ANSI_COLORS]->ValueInt && (!apDescriptor->character || !PRF_FLAGGED(REAL_CHAR(apDescriptor->character), PRF_SCREEN_READER))) {
 		if (IsValidColour(apRGB)) {
 			bool_t bBackground = (tolower(apRGB[0]) == 'b');
 			int Red = apRGB[1] - '0';
