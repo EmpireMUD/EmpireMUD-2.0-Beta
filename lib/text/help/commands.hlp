@@ -280,12 +280,12 @@ CONSIDER
 
 Usage:  consider <target>
 
-This command tells you your approximate chances in combat against another
-creature. Use it to determine how well you might fare.
+This command tells you your level difference from another creature, if any.
+Use it to determine how well you might fare. If no level difference is given,
+your level is the same as the target's.
 
-Consider primarily uses the level of your target to indicate your chances of
-success. However, it will also list any mitigating factors, such as immunities,
-that will make the fight harder.
+It will also list any mitigating factors, such as immunities, that will make
+the fight harder, and warn you if you would have difficulty hitting or dodging.
 
 There are also several possible modifier tags:
  - hard: will require two players in the right level range
