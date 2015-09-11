@@ -1,4 +1,4 @@
-CLASS CLASSES "CLASS SKILLS" "CLASS ROLE" ROLE
+CLASS "CLASS SKILLS" "CLASS ROLE" ROLE
 
 When you specialize two skills past 75, they become your "class skills" and
 you are assigned a class. Your class determines how large your health, move,
@@ -9,6 +9,8 @@ Usage:  class [role <type>]
 
 The class command shows your current class, role, and class abilities. You
 can also use this command to change roles. For example, "class role tank".
+You must have a role in order to gain your class's abilities, even if all of
+its roles share them.
 
 Class roles are the different tasks a class might be suited for. For example,
 if your class has both Natural Magic and Survival as its core skills, it might
@@ -21,33 +23,7 @@ Melee: Does physical damage.
 Caster: Does magical damage.
 Healer: Keeps the group alive.
 
-Classes - see HELP <NAME> CLASS
--------------------------------
-Battle: Duke (Empire), Battlemage (High Sorcery), Werewolf (Natural Magic),
-        Assassin (Stealth), Barbarian (Survival), Steelsmith (Trade),
-        Reaper (Vampire)
-Empire: Duke (Battle), Exarch (High Sorcery), Luminary (Natural Magic),
-        Powerbroker (Stealth), Elder (Survival), Guildsman (Trade),
-        Ancient (Vampire)
-High Sorcery: Battlemage (Battle), Exarch (Empire), Archmage (Natural Magic),
-        Occultist (Stealth), Theurge (Survival), Artificer (Trade),
-        Lich (Vampire)
-Natural Magic: Werewolf (Battle), Luminary (Empire), Archmage (High Sorcery),
-        Shadow Wolf (Stealth), Feral (Survival), Alchemist (Trade),
-        Necromancer (Vampire)
-Stealth: Assassin (Battle), Powerbroker (Empire), Occultist (High Sorcery),
-        Shadow Wolf (Natural Magic), Bandit (Survival), Smuggler (Trade),
-        Shade (Vampire)
-Survival: Barbarian (Battle), Elder (Empire), Theurge (High Sorcery),
-        Feral (Natural Magic), Bandit (Stealth), Tinker (Trade),
-        Wight (Vampire)
-Trade: Steelsmith (Battle), Guildsman (Empire), Artificer (High Sorcery),
-        Alchemist (Natural Magic), Smuggler (Stealth), Tinker (Survival),
-        Antiquarian (Vampire)
-Vampire: Reaper (Battle), Ancient (Empire), Lich (High Sorcery), Necromancer
-        (Natural Magic), Shade (Stealth), Wight (Survival), Antiquarian (Trade)
-		
-See also: TANK, HEALER, MELEE, CASTER
+See also: CLASS LIST, TANK, HEALER, MELEE, CASTER
 #
 ARCHETYPES "STARTING ARCHETYPES" "STARTING CLASS"
 
@@ -187,6 +163,38 @@ Caster traits:
  - Bonus-Magical: Any spare points can go here to boost your magical damage.
 
 See also: HEALER, HIT CAP, MELEE, TANK
+#
+"CLASS LIST" CLASSES
+
+(Disambiguation: Did you mean HELP CLASS ?)
+
+Classes - see HELP <NAME> CLASS
+-------------------------------
+Battle: Duke (Empire), Battlemage (High Sorcery), Werewolf (Natural Magic),
+        Assassin (Stealth), Barbarian (Survival), Steelsmith (Trade),
+        Reaper (Vampire)
+Empire: Duke (Battle), Exarch (High Sorcery), Luminary (Natural Magic),
+        Powerbroker (Stealth), Elder (Survival), Guildsman (Trade),
+        Ancient (Vampire)
+High Sorcery: Battlemage (Battle), Exarch (Empire), Archmage (Natural Magic),
+        Occultist (Stealth), Theurge (Survival), Artificer (Trade),
+        Lich (Vampire)
+Natural Magic: Werewolf (Battle), Luminary (Empire), Archmage (High Sorcery),
+        Shadow Wolf (Stealth), Feral (Survival), Alchemist (Trade),
+        Necromancer (Vampire)
+Stealth: Assassin (Battle), Powerbroker (Empire), Occultist (High Sorcery),
+        Shadow Wolf (Natural Magic), Bandit (Survival), Smuggler (Trade),
+        Shade (Vampire)
+Survival: Barbarian (Battle), Elder (Empire), Theurge (High Sorcery),
+        Feral (Natural Magic), Bandit (Stealth), Tinker (Trade),
+        Wight (Vampire)
+Trade: Steelsmith (Battle), Guildsman (Empire), Artificer (High Sorcery),
+        Alchemist (Natural Magic), Smuggler (Stealth), Tinker (Survival),
+        Antiquarian (Vampire)
+Vampire: Reaper (Battle), Ancient (Empire), Lich (High Sorcery), Necromancer
+        (Natural Magic), Shade (Stealth), Wight (Survival), Antiquarian (Trade)
+		
+See also: CLASS
 #
 "DUKE CLASS" DUKE
 
