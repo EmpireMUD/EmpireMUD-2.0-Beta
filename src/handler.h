@@ -289,7 +289,7 @@ extern bool config_get_bool(char *key);
 extern double config_get_double(char *key);
 extern int config_get_int(char *key);
 extern int *config_get_int_array(char *key, int *array_size);
-extern char *config_get_string(char *key);
+extern const char *config_get_string(char *key);
 
 // fight.c
 void appear(char_data *ch);

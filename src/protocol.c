@@ -28,6 +28,9 @@
 #include "utils.h"
 #include "comm.h"
 #include "handler.h"
+#include "db.h"
+#include "skills.h"
+#include "dg_scripts.h"
 
 #ifdef HAVE_ARPA_TELNET_H
 #include <arpa/telnet.h>
@@ -1628,7 +1631,7 @@ static void PerformHandshake(descriptor_t *apDescriptor, char aCmd, char aProtoc
 					pProtocol->bMSDP = true;
 
 					/* Identify the mud to the client. */
-					MSDPSendPair(apDescriptor, "SERVER_ID", MUD_NAME);
+					MSDPSendPair(apDescriptor, "SERVER_ID", config_get_string("mud_name"));
 				}
 			}
 			else if (aCmd == (char)DONT) {
@@ -1764,7 +1767,7 @@ static void PerformHandshake(descriptor_t *apDescriptor, char aCmd, char aProtoc
 					#endif /* MUDLET_PACKAGE */
 
 					/* Identify the mud to the client. */
-					MSDPSendPair(apDescriptor, "SERVER_ID", MUD_NAME);
+					MSDPSendPair(apDescriptor, "SERVER_ID", config_get_string("mud_name"));
 				}
 			}
 			else if (aCmd == (char)WONT) {
@@ -2320,10 +2323,202 @@ static void SendATCP(descriptor_t *apDescriptor, const char *apVariable, const c
  Local MSSP functions.
  *****************************************************************************/
 
+static const char *GetMSSP_Areas() {
+	adv_data *iter, *next_iter;
+	static char buf[256];
+	int count = 0;
+	
+	// open adventures:
+	HASH_ITER(hh, adventure_table, iter, next_iter) {
+		if (!ADVENTURE_FLAGGED(iter, ADV_IN_DEVELOPMENT)) {
+			++count;
+		}
+	}
+	
+	// map areas:
+	count += HASH_COUNT(island_table);
+	
+	snprintf(buf, sizeof(buf), "%d", count);
+	return buf;
+}
+
+static const char *GetMSSP_Classes() {
+	static char buf[256];
+	snprintf(buf, sizeof(buf), "%d", NUM_CLASSES);
+	return buf;
+}
+
+static const char *GetMSSP_Codebase() {
+	extern const char *version;	// constants.c
+	return version;
+}
+
+static const char *GetMSSP_Contact() {
+	return config_get_string("mud_contact");
+}
+
+static const char *GetMSSP_Created() {
+	return config_get_string("mud_created");
+}
+
+static const char *GetMSSP_DB_Size() {
+	static char buf[256];
+	int size = 0;
+
+	// we're not 100% sure what counts toward DB Size, but here is a rough guess
+	size += top_of_p_table + 1;
+	size += HASH_COUNT(empire_table);
+	size += HASH_COUNT(mobile_table);
+	size += HASH_COUNT(object_table);
+	size += HASH_COUNT(adventure_table);
+	size += HASH_CNT(world_hh, world_table);
+	size += HASH_COUNT(building_table);
+	size += HASH_COUNT(room_template_table);
+	size += HASH_COUNT(sector_table);
+	size += HASH_COUNT(crop_table);
+	size += HASH_COUNT(trigger_table);
+	size += HASH_COUNT(craft_table);
+	
+	snprintf(buf, sizeof(buf), "%d", size);
+	return buf;
+}
+
+static const char *GetMSSP_Extra_Descs() {
+	static char buf[256];
+	room_template *rmt, *next_rmt;
+	struct extra_descr_data *ex;
+	obj_data *obj, *next_obj;
+	bld_data *bld, *next_bld;
+	int count = 0;
+	
+	HASH_ITER(hh, object_table, obj, next_obj) {
+		if (GET_OBJ_ACTION_DESC(obj) && *GET_OBJ_ACTION_DESC(obj)) {
+			++count;
+		}
+		for (ex = obj->ex_description; ex; ex = ex->next) {
+			++count;
+		}
+	}
+	HASH_ITER(hh, room_template_table, rmt, next_rmt) {
+		for (ex = GET_RMT_EX_DESCS(rmt); ex; ex = ex->next) {
+			++count;
+		}
+	}
+	HASH_ITER(hh, building_table, bld, next_bld) {
+		for (ex = GET_BLD_EX_DESCS(bld); ex; ex = ex->next) {
+			++count;
+		}
+	}
+	
+	snprintf(buf, sizeof(buf), "%d", count);
+	return buf;
+}
+
+static const char *GetMSSP_Helpfiles() {
+	extern int top_of_helpt;	// db.c
+	static char buf[256];	
+	snprintf(buf, sizeof(buf), "%d", top_of_helpt + 1);
+	return buf;
+}
+
+static const char *GetMSSP_Hiring_Builders() {
+	static char buf[256];	
+	snprintf(buf, sizeof(buf), "%d", config_get_bool("hiring_builders") ? 1 : 0);
+	return buf;
+}
+
+static const char *GetMSSP_Hiring_Coders() {
+	static char buf[256];	
+	snprintf(buf, sizeof(buf), "%d", config_get_bool("hiring_coders") ? 1 : 0);
+	return buf;
+}
+
+static const char *GetMSSP_Hostname() {
+	return config_get_string("mud_hostname");
+}
+
+static const char *GetMSSP_Icon() {
+	return config_get_string("mud_icon");
+}
+
+static const char *GetMSSP_IP() {
+	return config_get_string("mud_ip");
+}
+
+static const char *GetMSSP_Levels() {
+	adv_data *iter, *next_iter;
+	static char buf[256];
+	int max = CLASS_SKILL_CAP;	// to start
+	
+	// find highest level adventure zone:
+	HASH_ITER(hh, adventure_table, iter, next_iter) {
+		if (!ADVENTURE_FLAGGED(iter, ADV_IN_DEVELOPMENT)) {
+			max = MAX(max, GET_ADV_MAX_LEVEL(iter));
+		}
+	}
+	
+	snprintf(buf, sizeof(buf), "%d", max);
+	return buf;
+}
+
+static const char *GetMSSP_Location() {
+	return config_get_string("mud_location");
+}
+
+static const char *GetMSSP_Minimum_Age() {
+	return config_get_string("mud_minimum_age");
+}
+
+static const char *GetMSSP_Mobiles() {
+	static char buf[256];
+	snprintf(buf, sizeof(buf), "%d", HASH_COUNT(mobile_table));
+	return buf;
+}
+
+static const char *GetMSSP_MudName() {
+	return config_get_string("mud_name");
+}
+
+static const char *GetMSSP_Objects() {
+	static char buf[256];
+	snprintf(buf, sizeof(buf), "%d", HASH_COUNT(object_table));
+	return buf;
+}
+
 static const char *GetMSSP_Players() {
 	static char Buffer[32];
 	sprintf(Buffer, "%d", s_Players);
 	return Buffer;
+}
+
+static const char *GetMSSP_Port() {
+	extern ush_int port;	// comm.c
+	static char buf[32];
+	snprintf(buf, sizeof(buf), "%d", port);
+	return buf;
+}
+
+static const char *GetMSSP_Rooms() {
+	static char buf[256];
+	snprintf(buf, sizeof(buf), "%d", HASH_CNT(world_hh, world_table));
+	return buf;
+}
+
+static const char *GetMSSP_Skills() {
+	static char buf[256];
+	// we think this refers more to our concept of "abilities" than "skills"
+	snprintf(buf, sizeof(buf), "%d", NUM_ABILITIES);
+	return buf;
+}
+
+static const char *GetMSSP_Status() {
+	return config_get_string("mud_status");
+}
+
+static const char *GetMSSP_Triggers() {
+	static char buf[256];
+	snprintf(buf, sizeof(buf), "%d", HASH_COUNT(trigger_table));
+	return buf;
 }
 
 static const char *GetMSSP_Uptime() {
@@ -2331,6 +2526,11 @@ static const char *GetMSSP_Uptime() {
 	sprintf(Buffer, "%d", (int)s_Uptime);
 	return Buffer;
 }
+
+static const char *GetMSSP_Website() {
+	return config_get_string("mud_website");
+}
+
 
 /* Macro for readability, but you can remove it if you don't like it */
 #define FUNCTION_CALL(f)  "", f
@@ -2350,55 +2550,52 @@ static void SendMSSP(descriptor_t *apDescriptor) {
 	*/
 	static MSSP_t MSSPTable[] = {
 		/* Required */
-		{ "NAME", MUD_NAME },	// Change this in protocol.h
+		{ "NAME", FUNCTION_CALL(GetMSSP_MudName) },
 		{ "PLAYERS", FUNCTION_CALL(GetMSSP_Players) },
-		{ "UPTIME" , FUNCTION_CALL(GetMSSP_Uptime) }, 
+		{ "UPTIME" , FUNCTION_CALL(GetMSSP_Uptime) },
 
 		/* Generic */
 		{ "CRAWL DELAY", "-1" },
-		/*
-		{ "HOSTNAME", "" },
-		{ "PORT", "" },
-		{ "CODEBASE", "" },
-		{ "CONTACT", "" },
-		{ "CREATED", "" },
-		{ "ICON", "" },
-		{ "IP", "" },
-		{ "LANGUAGE", "" },
-		{ "LOCATION", "" },
-		{ "MINIMUM AGE", "" },
-		{ "WEBSITE", "" },
-		*/
+		
+		{ "HOSTNAME", FUNCTION_CALL(GetMSSP_Hostname) },
+		{ "PORT", FUNCTION_CALL(GetMSSP_Port) },
+		{ "CODEBASE", FUNCTION_CALL(GetMSSP_Codebase) },
+		{ "CONTACT", FUNCTION_CALL(GetMSSP_Contact) },
+		{ "CREATED", FUNCTION_CALL(GetMSSP_Created) },
+		{ "ICON", FUNCTION_CALL(GetMSSP_Icon) },
+		{ "IP", FUNCTION_CALL(GetMSSP_IP) },
+		{ "LANGUAGE", "English" },
+		{ "LOCATION", FUNCTION_CALL(GetMSSP_Location) },
+		{ "MINIMUM AGE", FUNCTION_CALL(GetMSSP_Minimum_Age) },
+		{ "WEBSITE", FUNCTION_CALL(GetMSSP_Website) },
+		
 		/* Categorisation */
-		/*
-		{ "FAMILY", "" },
-		{ "GENRE", "" },
-		{ "GAMEPLAY", "" },
-		{ "STATUS", "" },
-		{ "GAMESYSTEM", "" },
+		{ "FAMILY", "DikuMUD" },
+		{ "GENRE", "Fantasy" },
+		{ "GAMEPLAY", "Adventure, Hack and Slash, Player versus Player, Player versus Environment, Roleplaying, Simulation" },
+		{ "STATUS", FUNCTION_CALL(GetMSSP_Status) },
+		{ "GAMESYSTEM", "Custom" },
 		{ "INTERMUD", "" },
-		{ "SUBGENRE", "" },
-		*/
+		{ "SUBGENRE", "Medieval Fantasy" },
+		
 		/* World */
-		/*
-		{ "AREAS", "0" },
-		{ "HELPFILES", "0" },
-		{ "MOBILES", "0" },
-		{ "OBJECTS", "0" },
-		{ "ROOMS", "0" },
-		{ "CLASSES", "0" },
-		{ "LEVELS", "0" },
+		{ "AREAS", FUNCTION_CALL(GetMSSP_Areas) },
+		{ "HELPFILES", FUNCTION_CALL(GetMSSP_Helpfiles) },
+		{ "MOBILES", FUNCTION_CALL(GetMSSP_Mobiles) },
+		{ "OBJECTS", FUNCTION_CALL(GetMSSP_Objects) },
+		{ "ROOMS", FUNCTION_CALL(GetMSSP_Rooms) },
+		{ "CLASSES", FUNCTION_CALL(GetMSSP_Classes) },
+		{ "LEVELS", FUNCTION_CALL(GetMSSP_Levels) },
 		{ "RACES", "0" },
-		{ "SKILLS", "0" },
-		*/
+		{ "SKILLS", FUNCTION_CALL(GetMSSP_Skills) },
+		
 		/* Protocols */
-		/*
 		{ "ANSI", "1" },
 		{ "GMCP", "0" },
 		#ifdef USING_MCCP
-		{ "MCCP", "1" },
+			{ "MCCP", "1" },
 		#else
-		{ "MCCP", "0" },
+			{ "MCCP", "0" },
 		#endif // USING_MCCP
 		{ "MCP", "0" },
 		{ "MSDP", "1" },
@@ -2408,51 +2605,47 @@ static void SendMSSP(descriptor_t *apDescriptor) {
 		{ "UTF-8", "1" },
 		{ "VT100", "0" },
 		{ "XTERM 256 COLORS", "1" },
-		*/
+		
 		/* Commercial */
-		/*
-		{ "PAY TO PLAY", "0" },
+		{ "PAY TO PLAY", "0" },	// these are prohibited by the license
 		{ "PAY FOR PERKS", "0" },
-		*/
+		
 		/* Hiring */
-		/*
-		{ "HIRING BUILDERS", "0" },
-		{ "HIRING CODERS", "0" },
-		*/
+		{ "HIRING BUILDERS", FUNCTION_CALL(GetMSSP_Hiring_Builders) },
+		{ "HIRING CODERS", FUNCTION_CALL(GetMSSP_Hiring_Coders) },
+		
 		/* Extended variables */
 
 		/* World */
-		/*
-		{ "DBSIZE", "0" },
-		{ "EXITS", "0" },
-		{ "EXTRA DESCRIPTIONS", "0" },
-		{ "MUDPROGS", "0" },
-		{ "MUDTRIGS", "0" },
-		{ "RESETS", "0" },
-		*/
+		{ "DBSIZE", FUNCTION_CALL(GetMSSP_DB_Size) },
+		// { "EXITS", "0" },	// not sure we have a valid response due to the world map
+		{ "EXTRA DESCRIPTIONS", FUNCTION_CALL(GetMSSP_Extra_Descs) },
+		{ "MUDPROGS", "0" },	// feature does not exist
+		{ "MUDTRIGS", FUNCTION_CALL(GetMSSP_Triggers) },
+		{ "RESETS", "0" },	// feature does not exist
+		
 		/* Game */
-		/*
+		
 		{ "ADULT MATERIAL", "0" },
-		{ "MULTICLASSING", "0" },
-		{ "NEWBIE FRIENDLY", "0" },
-		{ "PLAYER CITIES", "0" },
-		{ "PLAYER CLANS", "0" },
-		{ "PLAYER CRAFTING", "0" },
-		{ "PLAYER GUILDS", "0" },
-		{ "EQUIPMENT SYSTEM", "" },
-		{ "MULTIPLAYING", "" },
-		{ "PLAYERKILLING", "" },
-		{ "QUEST SYSTEM", "" },
+		{ "MULTICLASSING", "1" },
+		{ "NEWBIE FRIENDLY", "1" },
+		{ "PLAYER CITIES", "1" },
+		{ "PLAYER CLANS", "1" },
+		{ "PLAYER CRAFTING", "1" },
+		{ "PLAYER GUILDS", "1" },
+		{ "EQUIPMENT SYSTEM", "Level and Skill" },
+		{ "MULTIPLAYING", "No" },
+		{ "PLAYERKILLING", "Restricted" },
+		{ "QUEST SYSTEM", "0" },
 		{ "ROLEPLAYING", "" },
-		{ "TRAINING SYSTEM", "" },
-		{ "WORLD ORIGINALITY", "" },
-		*/
+		{ "TRAINING SYSTEM", "Skill" },
+		{ "WORLD ORIGINALITY", "All Original" },
+		
 		/* Protocols */
-		/*
 		{ "ATCP", "1" },
 		{ "SSL", "0" },
 		{ "ZMP", "0" },
-		*/
+		
 		{ NULL, NULL } /* This must always be last. */
 	};
 

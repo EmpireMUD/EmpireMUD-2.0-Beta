@@ -22,13 +22,6 @@
 #ifndef PROTOCOL_H
 #define PROTOCOL_H
 
-
-/******************************************************************************
- Set your MUD_NAME, and change descriptor_t if necessary.
- *****************************************************************************/
-
-#define MUD_NAME "EmpireMUD"
-
 typedef struct descriptor_data descriptor_t;
 
 

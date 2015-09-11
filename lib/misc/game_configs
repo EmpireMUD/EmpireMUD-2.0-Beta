@@ -3,7 +3,19 @@
 *
 * Game configs
 allow_extended_color_codes 0
+hiring_builders 0
+hiring_coders 0
 huh_string Huh?!?
+mud_contact 
+mud_created 2015
+mud_hostname 
+mud_icon 
+mud_ip 
+mud_location 
+mud_minimum_age 
+mud_name EmpireMUD
+mud_status Live
+mud_website
 no_person No-one by that name here.
 ok_string Okay.
 public_logins 0
