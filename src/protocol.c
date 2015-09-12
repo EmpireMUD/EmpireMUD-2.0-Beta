@@ -846,6 +846,11 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 				case COLOUR_CHAR: /* Two in a row display the actual character */
 					pCopyFrom = ColourChar;
 					break;
+				case '\t': {	// &\t can be triggered by player input and eat a color code, so:
+					pCopyFrom = ColourChar;	// display the &
+					--j;	// skip back one so the \t proceeds as normal
+					break;
+				}
 				case 'n':
 				case '0':
 					pCopyFrom = s_Clean;
