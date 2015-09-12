@@ -555,11 +555,12 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 	const char MXPStart[] = "\033[1z<";
 	const char MXPStop[] = ">\033[7z";
 	const char LinkStart[] = "\033[1z<send>\033[7z";
-	const char LinkStop[] = "\033[1z</send>\033[7z";
-	bool_t bTerminate = false, bUseMXP = false, bUseMSP = false;
+	const char LinkStop[] = "\033[1z</send>\033[7z";	
 	#ifdef COLOUR_CHAR
+		const char ColourChar[] = { COLOUR_CHAR, '\0' };
 		bool_t bColourOn = true;	// always default to true, or many parts of the code won't work correctly -- TODO change all instances of & in the code to \t so this can be a config
 	#endif /* COLOUR_CHAR */
+	bool_t bTerminate = false, bUseMXP = false, bUseMSP = false;
 	int i = 0, j = 0; /* Index values */
 	char lastColor[64];
 	
@@ -815,6 +816,10 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 				case '-':
 					bColourOn = false;
 					break;
+				case COLOUR_CHAR: {	// allows \t& to guarantee a printed & whether COLOUR_CHAR is on or off, unlike && which displays both & if COLOUR_CHAR is undefined
+					pCopyFrom = ColourChar;
+					break;
+				}
 				#endif /* COLOUR_CHAR */
 
 				case '\0':
@@ -835,7 +840,6 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 
 		#ifdef COLOUR_CHAR
 		else if (bColourOn && apData[j] == COLOUR_CHAR) {
-			const char ColourChar[] = { COLOUR_CHAR, '\0' };
 			const char *pCopyFrom = NULL;
 
 			switch (apData[++j]) {
