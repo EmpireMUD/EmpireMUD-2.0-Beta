@@ -1083,10 +1083,10 @@ void send_to_group(char_data *ch, struct group_data *group, const char *msg, ...
 			vsprintf(output, msg, args);
 			
 			if (!IS_NPC(tch) && GET_CUSTOM_COLOR(tch, CUSTOM_COLOR_GSAY)) {
-				msg_to_desc(tch->desc, "&%c[group] %s&0\r\n", GET_CUSTOM_COLOR(tch, CUSTOM_COLOR_GSAY), output);
+				msg_to_desc(tch->desc, "\t%c[group] %s\t0\r\n", GET_CUSTOM_COLOR(tch, CUSTOM_COLOR_GSAY), output);
 			}
 			else {
-				msg_to_desc(tch->desc, "[&Ggroup&0] %s&0\r\n", output);
+				msg_to_desc(tch->desc, "[\tGgroup\t0] %s\t0\r\n", output);
 			}
 			va_end(args);
 		}
