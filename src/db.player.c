@@ -1498,10 +1498,10 @@ static void add_to_account_list(struct empire_member_reader_data **list, empire_
 *
 * @param time_t created The player character's birth time.
 * @param time_t last_login The player's last login time.
-* @param int played_hours Number of hours the player has played, total.
+* @param double played_hours Number of hours the player has played, total.
 * @return bool TRUE if the member has timed out and should not be counted; FALSE if they're ok.
 */
-static bool member_is_timed_out(time_t created, time_t last_login, int played_hours) {	
+static bool member_is_timed_out(time_t created, time_t last_login, double played_hours) {	
 	int member_timeout_full = config_get_int("member_timeout_full") * SECS_PER_REAL_DAY;
 	int member_timeout_newbie = config_get_int("member_timeout_newbie") * SECS_PER_REAL_DAY;
 	int minutes_per_day_full = config_get_int("minutes_per_day_full");
@@ -1512,7 +1512,7 @@ static bool member_is_timed_out(time_t created, time_t last_login, int played_ho
 	}
 	else {
 		double days_played = (double)(time(0) - created) / SECS_PER_REAL_DAY;
-		double avg_min_per_day = 60 * ((double)played_hours / days_played);
+		double avg_min_per_day = 60 * (played_hours / days_played);
 		double timeout;
 		
 		// when playtime drops this low, the character is ALWAYS timed out
@@ -1545,7 +1545,7 @@ static bool member_is_timed_out(time_t created, time_t last_login, int played_ho
 * @return bool TRUE if the member has timed out and should not be counted; FALSE if they're ok.
 */
 bool member_is_timed_out_cfu(struct char_file_u *chdata) {
-	return member_is_timed_out(chdata->birth, chdata->last_logon, chdata->played / SECS_PER_REAL_HOUR);
+	return member_is_timed_out(chdata->birth, chdata->last_logon, ((double)chdata->played) / SECS_PER_REAL_HOUR);
 }
 
 
@@ -1556,7 +1556,7 @@ bool member_is_timed_out_cfu(struct char_file_u *chdata) {
 * @return bool TRUE if the member has timed out and should not be counted; FALSE if they're ok.
 */
 bool member_is_timed_out_ch(char_data *ch) {
-	return member_is_timed_out(ch->player.time.birth, ch->player.time.logon, ch->player.time.played / SECS_PER_REAL_HOUR);
+	return member_is_timed_out(ch->player.time.birth, ch->player.time.logon, ((double)ch->player.time.played) / SECS_PER_REAL_HOUR);
 }
 
 
