@@ -186,12 +186,12 @@ void msdp_update_room(char_data *ch) {
 	extern char *get_room_name(room_data *room, bool color);
 	extern const char *alt_dirs[];
 	
-	char buf[MAX_STRING_LENGTH], area_name[128];
+	char buf[MAX_STRING_LENGTH], area_name[128], exits[256];
 	struct empire_city_data *city;
 	struct instance_data *inst;
 	struct island_info *isle;
+	size_t buf_size, ex_size;
 	descriptor_data *desc;
-	size_t buf_size;
 	
 	// no work
 	if (!ch || !(desc = ch->desc)) {
@@ -231,16 +231,23 @@ void msdp_update_room(char_data *ch) {
 	buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cTERRAIN%c%s", (char)MSDP_VAR, (char)MSDP_VAL, GET_SECT_NAME(SECT(IN_ROOM(ch))));
 
 	buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cEXITS%c%c", (char)MSDP_VAR, (char)MSDP_VAL, (char)MSDP_TABLE_OPEN);
+	*exits = '\0';
+	ex_size = 0;
 	if (COMPLEX_DATA(IN_ROOM(ch)) && ROOM_IS_CLOSED(IN_ROOM(ch))) {
 		struct room_direction_data *ex;
 		for (ex = COMPLEX_DATA(IN_ROOM(ch))->exits; ex; ex = ex->next) {
 			if (ex->room_ptr && !EXIT_FLAGGED(ex, EX_CLOSED)) {
-				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%d", (char)MSDP_VAR, alt_dirs[ex->dir], (char)MSDP_VAL, GET_ROOM_VNUM(ex->room_ptr));
+				ex_size += snprintf(exits + ex_size, sizeof(exits) - ex_size, "%c%s%c%d", (char)MSDP_VAR, alt_dirs[ex->dir], (char)MSDP_VAL, GET_ROOM_VNUM(ex->room_ptr));
 			}
 		}
 	}
-	buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c", (char)MSDP_TABLE_CLOSE);
+	buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%s%c", exits, (char)MSDP_TABLE_CLOSE);
 	MSDPSetTable(desc, eMSDP_ROOM, buf);
+	
+	// simple room data
+	MSDPSetNumber(desc, eMSDP_ROOM_VNUM, GET_ROOM_VNUM(IN_ROOM(ch)));
+	MSDPSetString(desc, eMSDP_ROOM_NAME, get_room_name(IN_ROOM(ch), FALSE));
+	MSDPSetTable(desc, eMSDP_ROOM_EXITS, exits);
 }
 
 

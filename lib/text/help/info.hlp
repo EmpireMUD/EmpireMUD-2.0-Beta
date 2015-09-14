@@ -645,6 +645,9 @@ EmpireMUD supports the following MSDP variables:
 
  AREA_NAME - The name of the adventure, city, or island the player is in
  ROOM - The room data array, see http://tintin.sourceforge.net/msdp/index.php
+ ROOM_EXITS - A table of vnums for each direction -- only indoors
+ ROOM_NAME - Name of the room the character is in
+ ROOM_VNUM - Virtual number of the room the character is in
  WORLD_TIME - Current time (24-hour format)
  WORLD_SEASON - Current season
 
