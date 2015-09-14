@@ -383,15 +383,15 @@ static void msdp_update(void) {
 				MSDPSetNumber(d, eMSDP_EMPIRE_SCORE, get_total_score(GET_LOYALTY(ch)));
 			}
 			else {
-				MSDPSetString(d, eMSDP_EMPIRE_NAME, EMPIRE_NAME(GET_LOYALTY(ch)));
-				MSDPSetString(d, eMSDP_EMPIRE_ADJECTIVE, EMPIRE_ADJECTIVE(GET_LOYALTY(ch)));
-				MSDPSetString(d, eMSDP_EMPIRE_RANK, EMPIRE_RANK(GET_LOYALTY(ch), GET_RANK(ch)-1));
-				MSDPSetNumber(d, eMSDP_EMPIRE_TERRITORY, EMPIRE_CITY_TERRITORY(GET_LOYALTY(ch)) + EMPIRE_OUTSIDE_TERRITORY(GET_LOYALTY(ch)));
-				MSDPSetNumber(d, eMSDP_EMPIRE_TERRITORY_MAX, land_can_claim(GET_LOYALTY(ch), FALSE));
-				MSDPSetNumber(d, eMSDP_EMPIRE_TERRITORY_OUTSIDE, EMPIRE_OUTSIDE_TERRITORY(GET_LOYALTY(ch)));
-				MSDPSetNumber(d, eMSDP_EMPIRE_TERRITORY_OUTSIDE_MAX, land_can_claim(GET_LOYALTY(ch), TRUE));
-				MSDPSetNumber(d, eMSDP_EMPIRE_WEALTH, GET_TOTAL_WEALTH(GET_LOYALTY(ch)));
-				MSDPSetNumber(d, eMSDP_EMPIRE_SCORE, get_total_score(GET_LOYALTY(ch)));
+				MSDPSetString(d, eMSDP_EMPIRE_NAME, "");
+				MSDPSetString(d, eMSDP_EMPIRE_ADJECTIVE, "");
+				MSDPSetString(d, eMSDP_EMPIRE_RANK, "");
+				MSDPSetNumber(d, eMSDP_EMPIRE_TERRITORY, 0);
+				MSDPSetNumber(d, eMSDP_EMPIRE_TERRITORY_MAX, 0);
+				MSDPSetNumber(d, eMSDP_EMPIRE_TERRITORY_OUTSIDE, 0);
+				MSDPSetNumber(d, eMSDP_EMPIRE_TERRITORY_OUTSIDE_MAX, 0);
+				MSDPSetNumber(d, eMSDP_EMPIRE_WEALTH, 0);
+				MSDPSetNumber(d, eMSDP_EMPIRE_SCORE, 0);
 			}
 
 			/* This would be better moved elsewhere */
