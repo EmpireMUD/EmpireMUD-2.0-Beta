@@ -578,17 +578,17 @@ SHIP SHIPS
 
 (Disambiguation: Did you mean HELP SHIP COMMAND ?)
 
-The next step up from canoes, ships can be sailed (with 'sail <direction>') at
-a fixed speed, consuming no moves. Multiple players can combine their efforts
-to sail a single ship faster.
+The most efficient form of ocean travel, ships can be sailed at a fixed speed
+(with 'sail <direction>'), consuming no moves. Multiple players can combine
+their efforts to sail a single ship faster.
 
 Ships can be used to manually transport resources, though you should be wary of
 leaving them unattended, as autostorage while at sea (though slower) will cause
-the ship's cargo to be permanently lost. Each tile of a ship can hold up to 404
+the ship's cargo to be permanently lost. Each room of a ship can hold up to 404
 items, but large items count twice each as if they were kept in your inventory.
 
-Your citizens can also use ships to automatically transport resources for you,
-but this is slow and will not use the ship's full capacity.
+Ships can also be used to transport resources automatically using the ship
+command.
 
 See also: BOARD, DISEMBARK, SAIL, SHIPBUILDING, SHIPPING
 #
