@@ -2862,6 +2862,9 @@ char *strip_color(char *input) {
 		if (input[iter] == '&' && input[iter+1] != '&') {
 			++iter;
 		}
+		else if (input[iter] == '\t' && input[iter+1] != '\t') {
+			++iter;
+		}
 		else {
 			lbuf[pos++] = input[iter];
 		}
