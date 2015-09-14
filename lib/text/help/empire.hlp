@@ -1042,7 +1042,7 @@ simple orders and will rescue you in battle.
 The bodyguard counts as a familiar, and can be removed with the "dismiss"
 command.
 
-See also: DISMISS, ORDER, SUMMON
+See also: DISMISS, ORDER
 #
 "SUMMON GUARDS"
 
@@ -1055,8 +1055,6 @@ Cost:  25 move
 This ability summons up to (Charisma / 2, rounded down) guards. They aren't
 very strong, but they count as city guards and will attack intruders and
 hostile mobs. You can only use this in your empire's own territory.
-
-See also: SUMMON
 #
 "SWAMP ENGINEERING"
 

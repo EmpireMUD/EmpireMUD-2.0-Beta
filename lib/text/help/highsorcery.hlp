@@ -428,7 +428,7 @@ this ability, and it may be used to grab as many items as the sorcerer wishes.
 
 You cannot summon items out of the vault (or other secure locations).
 
-See also: SUMMON, VAULT
+See also: VAULT
 #
 "SUMMON SWIFT"
 
@@ -448,8 +448,6 @@ Types of swift mounts:
   serpent - a long, gigantic snake (requires 51)
   liger - a massive striped cat (requires 76)
   bear - a huge bear with golden fur (requires 76)
-
-See also: SUMMON
 #
 SUNSHOCK "SUN SHOCK"
 
