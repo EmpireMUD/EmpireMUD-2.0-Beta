@@ -479,9 +479,10 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 			int max_size = config_get_int("max_map_size");
 			if (ch->desc->pProtocol->ScreenHeight > 0) {
 				// cap based on height, too (save some room)
-				// -5 saves room for the map, title, blank line, and prompt.
-				// Each additional -1 saves 1 more line below the map.
-				wide = MIN(wide, ((ch->desc->pProtocol->ScreenHeight / 2) - 4));
+				// this saves roughly 4 lines below the map -- if you're going
+				// to play around with it, be sure to test -- the math is not
+				// very straightforward. -paul
+				wide = MIN(wide, ((ch->desc->pProtocol->ScreenHeight - 6) / 2));
 			}
 			mapsize = MIN(wide, max_size);
 		}
