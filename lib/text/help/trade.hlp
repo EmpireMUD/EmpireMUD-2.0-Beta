@@ -538,9 +538,9 @@ level will be based on the Trade skill of the crafter, within that range. The
 item will never scale higher than the maker's crafting level.
 
 If a craft recipe comes from an adventure zone, loot drop, or other non-ability
-source, it can make an item that scales up to the player's total level -- even
-if it requires a certain ability to craft it. Only normal craftable items are
-constrained by the ability's level range. However, the content builder who
+source, it can make an item that scales up to the player's crafting level --
+even if it requires a certain ability to craft it. Only normal craftable items
+are constrained by the ability's level range. However, the content builder who
 added those adventure craft recipes may have set limits on what level the
 craftables may scale to.
 
@@ -574,7 +574,25 @@ as well as patterns and crafts hidden around the world.
 
 See also: CRAFTING LEVEL, LEATHERWORKING, RAWHIDE STITCHING, CLOTHING
 #
-SHIPBUILDING "SHIP BUILDING" MANUFACTURE SHIPYARDS "ADVANCED SHIPYARDS" "UPGRADED SHIPYARD" "ADVANCED SHIPS"
+SHIP SHIPS 
+
+(Disambiguation: Did you mean HELP SHIP COMMAND ?)
+
+The most efficient form of ocean travel, ships can be sailed at a fixed speed
+(with 'sail <direction>'), consuming no moves. Multiple players can combine
+their efforts to sail a single ship faster.
+
+Ships can be used to manually transport resources, though you should be wary of
+leaving them unattended, as autostorage while at sea (though slower) will cause
+the ship's cargo to be permanently lost. Each room of a ship can hold up to 404
+items, but large items count twice each as if they were kept in your inventory.
+
+Ships can also be used to transport resources automatically using the ship
+command.
+
+See also: BOARD, DISEMBARK, SAIL, SHIPBUILDING, SHIPPING
+#
+SHIPBUILDING "SHIP BUILDING" MANUFACTURE SHIPYARDS "ADVANCED SHIPYARDS" "UPGRADED SHIPYARD" "ADVANCED SHIPS" "SHIP LIST"
 
 Shipbuilding (Trade ability)
 Advanced Ships (Trade ability)
@@ -595,11 +613,11 @@ With basic Shipbuilding you can manufacture:
   galley  45 lumber, 90 nails  (shipping capacity: 300)
   brigantine  60 lumber, 120 nails  (shipping capacity: 450)
 
-With Advanced ships you can manufacture:
+With Advanced Ships you can manufacture:
   argosy  120 lumber, 240 nails  (shipping capacity: 600)
   galleon  240 lumber, 480 nails  (shipping capacity: 750)
 
-See also: BOARD, DISEMBARK, SAIL, SHIP, UPGRADE
+See also: BOARD, DISEMBARK, SAIL, SHIPPING, SHIPS, UPGRADE
 #
 SIEGEWORKS "SIEGE WORKS"
 
