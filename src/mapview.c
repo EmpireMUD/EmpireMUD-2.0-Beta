@@ -475,8 +475,12 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	if (mapsize == 0) {
 		// auto-detected
 		if (ch->desc && ch->desc->pProtocol->ScreenWidth > 0) {
-			int wide = (ch->desc->pProtocol->ScreenWidth - 6) / 8;
+			int wide = (ch->desc->pProtocol->ScreenWidth - 6) / 8;	// the /8 is 4 chars per tile, doubled
 			int max_size = config_get_int("max_map_size");
+			if (ch->desc->pProtocol->ScreenHeight > 0) {
+				// cap based on height, too (save some room)
+				wide = MIN(wide, ch->desc->pProtocol->ScreenHeight - 6);
+			}
 			mapsize = MIN(wide, max_size);
 		}
 		else {
