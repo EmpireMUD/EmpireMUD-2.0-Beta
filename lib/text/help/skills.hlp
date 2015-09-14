@@ -357,7 +357,7 @@ Example:
 
   > shoot deer 
 #
-SKILL SKILLS ABILITY ABILITIES "SKILL BUY" "SKILL RESET"
+SKILL SKILLS ABILITY ABILITIES "SKILL BUY" "SKILL RESET" "SKILL LEVELS"
 
 Usage:  skills -- list all skills
         skill <name> -- see abilities in that skill
@@ -502,6 +502,7 @@ SUMMON HUMANS  (Vampire ability)
 SUMMON MATERIAlS  (High Sorcery ability)
 SUMMON PLAYER  (at an Astral Nexus)
 SUMMON THUGS  (Stealth ability)
+ADVENTURE SUMMON  (inside an adventure)
 #
 TENT TENTS
 

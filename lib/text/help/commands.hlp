@@ -191,7 +191,7 @@ Usage:  board <ship>
 
 This command is used to board a ship in the same room.
 
-See also: DISEMBARK, SAIL, MANUFACTURE, LOAD
+See also: DISEMBARK, SAIL, MANUFACTURE, LOAD, SHIPS
 #
 BRIEF
 
@@ -201,7 +201,7 @@ This toggle turns off room descriptions and shrinks the map display from 15 by
 15 to 7 by 7. It reduces disconnects from buffer overflows for people moving
 quickly across the world.
 
-See also: BRIEF, COMPACT, MAPSIZE
+See also: COMPACT, MAPSIZE, TOGGLE
 #
 BUG TYPO IDEA
 
@@ -279,12 +279,12 @@ CONSIDER
 
 Usage:  consider <target>
 
-This command tells you your approximate chances in combat against another
-creature. Use it to determine how well you might fare.
+This command tells you your level difference from another creature, if any.
+Use it to determine how well you might fare. If no level difference is given,
+your level is the same as the target's.
 
-Consider primarily uses the level of your target to indicate your chances of
-success. However, it will also list any mitigating factors, such as immunities,
-that will make the fight harder.
+It will also list any mitigating factors, such as immunities, that will make
+the fight harder, and warn you if you would have difficulty hitting or dodging.
 
 There are also several possible modifier tags:
  - hard: will require two players in the right level range
@@ -335,7 +335,7 @@ From the entry room of a ship (the room you're placed in when you board it),
 you may disembark. This can be done even in the ocean, though you may need a
 smaller vessel unless you disembark very close to the shore.
 
-See also: BOARD, SAIL, UNLOAD
+See also: BOARD, SAIL, UNLOAD, SHIPS
 #
 DISMISS
 
@@ -570,7 +570,7 @@ invite them to the group.
 There is a limit of 4 members in a group at a time. This is intended to help
 balance game encounters against the number of players in the group.
 
-See also: GSAY
+See also: ADVENTURE SUMMON, GSAY
 #
 GSAY GTELL PSAY PTELL
 
@@ -737,7 +737,7 @@ You can load items from your inventory or from the room. Only the Galleon can
 hold items like carts and catapults (or any item that won't fit in your
 inventory).
 
-See also: UNLOAD, BOARD, SAIL
+See also: UNLOAD, BOARD, SAIL, SHIPS
 #
 LOOK EXAMINE
 
@@ -1135,7 +1135,7 @@ can travel on oceans and rivers, through river gates, and under bridges.
 Though this is fairly slow, it is one of the most efficient means of 
 transoceanic travel.
 
-See also: BOARD, DISEMBARK
+See also: BOARD, DISEMBARK, SHIPBUILDING, SHIPS
 #
 SAVE
 
@@ -1262,7 +1262,7 @@ bonuses from a weapon while it is sheathed.
 
 See also: DRAW, SWAP
 #
-SHIP SHIPPING
+"SHIP COMMAND" SHIPPING
 
 Usage:  ship status
         ship cancel [number] <item>
@@ -1281,6 +1281,9 @@ Items will automatically transfer from the empire inventory on the origin
 island to the empire inventory on the destination island, and the ship will
 appear in one of the docks at the destination.
 
+If the destination island's name contains a space, you must surround it with
+double quotes, or use the coordinates of a tile on the island.
+
 You can only ship and cancel shipments from the island you are currently on,
 but you can see the status of empire shipments all over the world.
 
@@ -1289,7 +1292,7 @@ shipping system. You can also set this option on individual ships. (Workforce
 is not required to use the shipping system, but 'workforce no-work' is still
 used to prevent shipping.)
 
-See also: DOCKS, EINVENTORY, SHIPBUILDING, WORKFORCE
+See also: DOCKS, EINVENTORY, SHIPBUILDING, SHIPS, WORKFORCE
 #
 SLEEP
 
@@ -1375,7 +1378,7 @@ Astral Nexus with another player. That is, you need two players there
 
 Players must accept the summon using 'accept'.
 
-See also: ACCEPT, ASTRAL NEXUS
+See also: ACCEPT, ASTRAL NEXUS, SUMMON
 #
 SURVEY
 
@@ -1502,7 +1505,7 @@ Usage:  unload <ship>
 
 This command allows you to unload cargo from a ship at the docks.
 
-See also: LOAD, BOARD, SAIL
+See also: LOAD, BOARD, SAIL, SHIPS
 #
 USE
 
@@ -1610,8 +1613,6 @@ Usage:  wizlist
 
 Lists the most powerful beings on the MUD. These are the people responsible
 for administering the system.
-
-See also: IMPLEMENTOR
 #
 WOOL
 

@@ -259,6 +259,8 @@ from your empire.
 When editing a custom description, you can use /fi to add linebreaks and indent
 the first line. Generally descriptions look best in the 3-9 line range. You can
 use /h to get more information on editor commands, and /s to save and exit.
+
+See also: STRING EDITOR
 #
 DEDICATE
 
@@ -266,6 +268,8 @@ Usage:  dedicate <person>
 
 Some monuments can be dedicated to a particularly powerful person or god. Once
 dedicated, they can never be re-dedicated, so choose carefully.
+
+To find buildings that can be dedicated, try 'helpsearch dedicate'.
 #
 "DEEP MINES"
 
@@ -456,7 +460,7 @@ You can use "warehouse inventory" to see items in warehouse (unique) storage.
 their own empire. If the empire name has more than one word, you can use
 quotation marks.
 
-See also: SHIP, WORKFORCE
+See also: SHIPPING, WORKFORCE
 #
 "EMPIRE SCORE" ESCORE
 
@@ -921,6 +925,8 @@ Usage:  radiance
 Particularly renowned leaders have a radiant aura about them that can be seen
 by all. Activate Radiance to gain +2 Greatness. Radiance remains active until
 you shut it off or die.
+
+See also: GREATNESS
 #
 "RAISE ARMIES" "RAISE ARMIES BUILDINGS"
 
@@ -1027,6 +1033,7 @@ Summon Bodyguard (Empire ability)
 
 Usage:  summon bodyguard
 Cooldown:  5 minutes
+Cost:  25 move
 
 This powerful ability allows an emperor to summon a bodyguard. The bodyguard
 is strong enough to protect against many dangerous situations. He will take
@@ -1035,7 +1042,7 @@ simple orders and will rescue you in battle.
 The bodyguard counts as a familiar, and can be removed with the "dismiss"
 command.
 
-See also: DISMISS
+See also: DISMISS, ORDER
 #
 "SUMMON GUARDS"
 
@@ -1043,6 +1050,7 @@ Summon Guards (Empire ability)
 
 Usage:  summon guards
 Cooldown:  3 minutes
+Cost:  25 move
 
 This ability summons up to (Charisma / 2, rounded down) guards. They aren't
 very strong, but they count as city guards and will attack intruders and
@@ -1292,7 +1300,7 @@ Workforce types:
   &yquarrying:&0 NPCs will quarry huge stone blocks at the quarry.
   &ynailmaking:&0 NPCs will forge pouches of nails at the forge.
   &ybrickmaking:&0 NPCs will make bricks at the potter.
-  &abandon-dismantled:&0 NPCS will abandon a tile when they finish dismantling.
+  &yabandon-dismantled:&0 NPCS will abandon a tile when they finish dismantling.
   &cherb gardening (skilled):&0 NPCS will gather herbs in gardens.
   &yfire brigade:&0 NPCs will put out fires.
   &ctrapping (skilled):&0 NPCs will gather skins at trapper's posts.
@@ -1300,8 +1308,8 @@ Workforce types:
   &yshearing:&0 NPCs will shear animals in stables.
   &cminting (skilled):&0 NPCs will mint treasure into coins.
   &cdismantle-mines:&0 mines will be dismantled when empty.
-  &abandon-chopped:&0 NPCS will abandon a tile when they finish chopping.
-  &abandon-farmed:&0 NPCS will abandon a tile when they finish farming.
+  &yabandon-chopped:&0 NPCS will abandon a tile when they finish chopping.
+  &yabandon-farmed:&0 NPCS will abandon a tile when they finish farming.
   
 Items marked (skilled) require the Skilled Labor ability.
 #

@@ -60,7 +60,7 @@ will not be eligible for resurrection. You can still be summoned back.
 - If you teleport or trinket out, you won't be sent back where you were before
 the adventure summon. (Except random-teleport.)
 
-See also: ACCEPT, NEARBY
+See also: ACCEPT, GROUP, NEARBY
 #
 ATTRIBUTES STATS STRENGTH DEXTERITY CHARISMA GREATNESS GRT INTELLIGENCE INTELLECT WITS
 
@@ -760,7 +760,7 @@ Items are also scaled. In adventures, they are scaled based on the level of
 the mob you got them from. Craftable items are also scaled, based on the skill
 or recipe used to make them, and on the level of the crafter.
 
-See also: CONSIDER, SCALABLE CRAFTS
+See also: CONSIDER, LEVELS, SCALABLE CRAFTS
 #
 SCAN
 

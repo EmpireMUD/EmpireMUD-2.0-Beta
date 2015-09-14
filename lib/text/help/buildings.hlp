@@ -4,7 +4,7 @@ ALCHEMIST
 
 Resources:  4 lumber, 2 nails, 12 bricks
 Built on:  plains, desert
-Stored here:  herbs, poisons, potions
+Stored here:  herbs, poisons
 
 The alchemist is a specialty building that allows you to store and process many
 types of herbs. While you can brew potions and mix poisons using any fire, it
@@ -264,7 +264,7 @@ This ability allows you to build the following buildings:
 
 ..&C*&0. astralnexus  20 logs, 12 blocks, 12 nocturnium, 20 nexus crystals
 
-See also: BUILD, EXARCH
+See also: BUILD, EXARCH CLASS
 #
 GRAVE GRAVES "GRAVE MARKER"
 
