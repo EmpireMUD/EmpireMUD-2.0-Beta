@@ -177,37 +177,218 @@ inline void empire_sleep(struct timeval *timeout) {
 
 
 /**
+* Updates MSDP data for a player's location, to be called when they move.
+*
+* @param char_data *ch The player to update (no effect if no descriptor).
+*/
+void msdp_update_room(char_data *ch) {
+	extern struct instance_data *find_instance_by_room(room_data *room);
+	extern char *get_room_name(room_data *room, bool color);
+	extern const char *alt_dirs[];
+	
+	char buf[MAX_STRING_LENGTH], area_name[128];
+	struct empire_city_data *city;
+	struct instance_data *inst;
+	struct island_info *isle;
+	descriptor_data *desc;
+	size_t buf_size;
+	
+	// no work
+	if (!ch || !(desc = ch->desc)) {
+		return;
+	}
+
+	// determine area name: we'll use it twice
+	if ((inst = find_instance_by_room(IN_ROOM(ch)))) {
+		snprintf(area_name, sizeof(area_name), "%s", GET_ADV_NAME(inst->adventure));
+	}
+	else if ((city = find_city(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch)))) {
+		snprintf(area_name, sizeof(area_name), "%s", city->name);
+	}
+	else if ((isle = get_island(GET_ISLAND_ID(IN_ROOM(ch)), TRUE))) {
+		snprintf(area_name, sizeof(area_name), "%s", isle->name);
+	}
+	else {
+		snprintf(area_name, sizeof(area_name), "Unknown");
+	}
+	MSDPSetString(desc, eMSDP_AREA_NAME, area_name);
+	
+	// room var: table
+	buf_size = snprintf(buf, sizeof(buf), "%cVNUM%c%d", (char)MSDP_VAR, (char)MSDP_VAL, GET_ROOM_VNUM(IN_ROOM(ch)));
+	buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cNAME%c%s", (char)MSDP_VAR, (char)MSDP_VAL, get_room_name(IN_ROOM(ch), FALSE));
+	buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cAREA%c%s", (char)MSDP_VAR, (char)MSDP_VAL, area_name);
+	
+	buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cCOORDS%c%c", (char)MSDP_VAR, (char)MSDP_VAL, (char)MSDP_TABLE_OPEN);
+	if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
+		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cX%c%d", (char)MSDP_VAR, (char)MSDP_VAL, X_COORD(IN_ROOM(ch)));
+		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cY%c%d", (char)MSDP_VAR, (char)MSDP_VAL, Y_COORD(IN_ROOM(ch)));
+	}
+	else {
+		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cX%c0", (char)MSDP_VAR, (char)MSDP_VAL);
+		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cY%c0", (char)MSDP_VAR, (char)MSDP_VAL);
+	}
+	buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cZ%c0%c", (char)MSDP_VAR, (char)MSDP_VAL, (char)MSDP_TABLE_CLOSE);
+	buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cTERRAIN%c%s", (char)MSDP_VAR, (char)MSDP_VAL, GET_SECT_NAME(SECT(IN_ROOM(ch))));
+
+	buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cEXITS%c%c", (char)MSDP_VAR, (char)MSDP_VAL, (char)MSDP_TABLE_OPEN);
+	if (COMPLEX_DATA(IN_ROOM(ch)) && ROOM_IS_CLOSED(IN_ROOM(ch))) {
+		struct room_direction_data *ex;
+		for (ex = COMPLEX_DATA(IN_ROOM(ch))->exits; ex; ex = ex->next) {
+			if (ex->room_ptr && !EXIT_FLAGGED(ex, EX_CLOSED)) {
+				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%d", (char)MSDP_VAR, alt_dirs[ex->dir], (char)MSDP_VAL, GET_ROOM_VNUM(ex->room_ptr));
+			}
+		}
+	}
+	buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c", (char)MSDP_TABLE_CLOSE);
+	MSDPSetTable(desc, eMSDP_ROOM, buf);
+}
+
+
+/**
 * From KaVir's protocol snippet (see protocol.c)
 */
 static void msdp_update(void) {
+	extern int get_block_rating(char_data *ch, bool can_gain_skill);
+	extern int get_blood_upkeep_cost(char_data *ch);
+	extern double get_combat_speed(char_data *ch, int pos);
+	extern int get_crafting_level(char_data *ch);
+	extern int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
+	extern int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill);
+	extern int health_gain(char_data *ch, bool info_only);
+	extern int mana_gain(char_data *ch, bool info_only);
+	extern int move_gain(char_data *ch, bool info_only);
+	extern int pick_season(room_data *room);
+	extern int total_bonus_healing(char_data *ch);
+	extern int get_total_score(empire_data *emp);
+	extern const char *affect_types[];
+	extern const double hit_per_dex;
+	extern const char *seasons[];
+	
 	char buf[MAX_STRING_LENGTH];
 	char_data *ch, *pOpponent;
+	struct affected_type *aff;
 	descriptor_data *d;
 	int hit_points, PlayerCount = 0;
+	size_t buf_size;
 
 	for (d = descriptor_list; d; d = d->next) {
 		if ((ch = d->character) && !IS_NPC(ch) && STATE(d) == CON_PLAYING) {
 			++PlayerCount;
 			
-			pOpponent = FIGHTING(ch);
+			// TODO: Most of this could be moved to set only when it is changed
 
-			MSDPSetString(d, eMSDP_CHARACTER_NAME, GET_NAME(ch));
+			MSDPSetString(d, eMSDP_ACCOUNT_NAME, GET_NAME(ch));
+			MSDPSetString(d, eMSDP_CHARACTER_NAME, PERS(ch, ch, FALSE));
 
 			MSDPSetNumber(d, eMSDP_HEALTH, GET_HEALTH(ch));
 			MSDPSetNumber(d, eMSDP_HEALTH_MAX, GET_MAX_HEALTH(ch));
+			MSDPSetNumber(d, eMSDP_HEALTH_REGEN, health_gain(ch, TRUE));
+			MSDPSetNumber(d, eMSDP_MANA, GET_MANA(ch));
+			MSDPSetNumber(d, eMSDP_MANA_MAX, GET_MAX_MANA(ch));
+			MSDPSetNumber(d, eMSDP_MANA_REGEN, mana_gain(ch, TRUE));
+			MSDPSetNumber(d, eMSDP_MOVEMENT, GET_MOVE(ch));
+			MSDPSetNumber(d, eMSDP_MOVEMENT_MAX, GET_MAX_MOVE(ch));
+			MSDPSetNumber(d, eMSDP_MOVEMENT_REGEN, move_gain(ch, TRUE));
+			MSDPSetNumber(d, eMSDP_BLOOD, GET_BLOOD(ch));
+			MSDPSetNumber(d, eMSDP_BLOOD_MAX, GET_MAX_BLOOD(ch));
+			MSDPSetNumber(d, eMSDP_BLOOD_UPKEEP, get_blood_upkeep_cost(ch));
+			
+			*buf = '\0';
+			buf_size = 0;
+			for (aff = ch->affected; aff; aff = aff->next) {
+				if (!strstr(buf, affect_types[aff->type])) {
+					buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s", (char)MSDP_VAL, affect_types[aff->type]);
+				}
+			}
+			MSDPSetArray(d, eMSDP_AFFECTS, buf);
+			
 			MSDPSetNumber(d, eMSDP_LEVEL, get_approximate_level(ch));
+			MSDPSetNumber(d, eMSDP_SKILL_LEVEL, IS_NPC(ch) ? 0 : GET_SKILL_LEVEL(ch));
+			MSDPSetNumber(d, eMSDP_GEAR_LEVEL, IS_NPC(ch) ? 0 : GET_GEAR_LEVEL(ch));
+			MSDPSetNumber(d, eMSDP_CRAFTING_LEVEL, get_crafting_level(ch));
 
 			snprintf(buf, sizeof(buf), "%s", IS_IMMORTAL(ch) ? "Immortal" : class_data[GET_CLASS(ch)].name);
 			MSDPSetString(d, eMSDP_CLASS, buf);
 
-			MSDPSetNumber(d, eMSDP_MANA, GET_MANA(ch));
-			MSDPSetNumber(d, eMSDP_MANA_MAX, GET_MAX_MANA(ch));
-			MSDPSetNumber(d, eMSDP_MONEY, 0);	// TODO
-			MSDPSetNumber(d, eMSDP_MOVEMENT, GET_MOVE(ch));
-			MSDPSetNumber(d, eMSDP_MOVEMENT_MAX, GET_MAX_MOVE(ch));
+			MSDPSetNumber(d, eMSDP_MONEY, total_coins(ch));
+			MSDPSetNumber(d, eMSDP_BONUS_EXP, IS_NPC(ch) ? 0 : GET_DAILY_BONUS_EXPERIENCE(ch));
+			MSDPSetNumber(d, eMSDP_INVENTORY, IS_CARRYING_N(ch));
+			MSDPSetNumber(d, eMSDP_INVENTORY_MAX, CAN_CARRY_N(ch));
+			
+			MSDPSetNumber(d, eMSDP_STR, GET_STRENGTH(ch));
+			MSDPSetNumber(d, eMSDP_DEX, GET_DEXTERITY(ch));
+			MSDPSetNumber(d, eMSDP_CHA, GET_CHARISMA(ch));
+			MSDPSetNumber(d, eMSDP_GRT, GET_GREATNESS(ch));
+			MSDPSetNumber(d, eMSDP_INT, GET_INTELLIGENCE(ch));
+			MSDPSetNumber(d, eMSDP_WIT, GET_WITS(ch));
+			MSDPSetNumber(d, eMSDP_STR_PERM, GET_REAL_ATT(ch, STRENGTH));
+			MSDPSetNumber(d, eMSDP_DEX_PERM, GET_REAL_ATT(ch, DEXTERITY));
+			MSDPSetNumber(d, eMSDP_CHA_PERM, GET_REAL_ATT(ch, CHARISMA));
+			MSDPSetNumber(d, eMSDP_GRT_PERM, GET_REAL_ATT(ch, GREATNESS));
+			MSDPSetNumber(d, eMSDP_INT_PERM, GET_REAL_ATT(ch, INTELLIGENCE));
+			MSDPSetNumber(d, eMSDP_WIT_PERM, GET_REAL_ATT(ch, WITS));
+			
+			MSDPSetNumber(d, eMSDP_BLOCK, get_block_rating(ch, FALSE));
+			MSDPSetNumber(d, eMSDP_DODGE, get_dodge_modifier(ch, NULL, FALSE) - (hit_per_dex * GET_DEXTERITY(ch)));	// same change made to it in score
+			MSDPSetNumber(d, eMSDP_TO_HIT, get_to_hit(ch, NULL, FALSE, FALSE) - (hit_per_dex * GET_DEXTERITY(ch)));	// same change as in score
+			MSDPSetNumber(d, eMSDP_SPEED, get_combat_speed(ch, WEAR_WIELD));
+			MSDPSetNumber(d, eMSDP_RESIST_PHYSICAL, GET_RESIST_PHYSICAL(ch));
+			MSDPSetNumber(d, eMSDP_RESIST_MAGICAL, GET_RESIST_MAGICAL(ch));
+			MSDPSetNumber(d, eMSDP_BONUS_PHYSICAL, GET_BONUS_PHYSICAL(ch));
+			MSDPSetNumber(d, eMSDP_BONUS_MAGICAL, GET_BONUS_MAGICAL(ch));
+			MSDPSetNumber(d, eMSDP_BONUS_HEALING, total_bonus_healing(ch));
+			
+			MSDPSetNumber(d, eMSDP_BATTLE_LEVEL, IS_NPC(ch) ? 0 : GET_SKILL(ch, SKILL_BATTLE));
+			snprintf(buf, sizeof(buf), "%.2f", IS_NPC(ch) ? 0.0 : GET_SKILL_EXP(ch, SKILL_BATTLE));
+			MSDPSetString(d, eMSDP_BATTLE_EXP, buf);
+			MSDPSetNumber(d, eMSDP_EMPIRE_LEVEL, IS_NPC(ch) ? 0 : GET_SKILL(ch, SKILL_EMPIRE));
+			snprintf(buf, sizeof(buf), "%.2f", IS_NPC(ch) ? 0.0 : GET_SKILL_EXP(ch, SKILL_EMPIRE));
+			MSDPSetString(d, eMSDP_EMPIRE_EXP, buf);
+			MSDPSetNumber(d, eMSDP_HIGH_SORCERY_LEVEL, IS_NPC(ch) ? 0 : GET_SKILL(ch, SKILL_HIGH_SORCERY));
+			snprintf(buf, sizeof(buf), "%.2f", IS_NPC(ch) ? 0.0 : GET_SKILL_EXP(ch, SKILL_HIGH_SORCERY));
+			MSDPSetString(d, eMSDP_HIGH_SORCERY_EXP, buf);
+			MSDPSetNumber(d, eMSDP_NATURAL_MAGIC_LEVEL, IS_NPC(ch) ? 0 : GET_SKILL(ch, SKILL_NATURAL_MAGIC));
+			snprintf(buf, sizeof(buf), "%.2f", IS_NPC(ch) ? 0.0 : GET_SKILL_EXP(ch, SKILL_NATURAL_MAGIC));
+			MSDPSetString(d, eMSDP_NATURAL_MAGIC_EXP, buf);
+			MSDPSetNumber(d, eMSDP_STEALTH_LEVEL, IS_NPC(ch) ? 0 : GET_SKILL(ch, SKILL_STEALTH));
+			snprintf(buf, sizeof(buf), "%.2f", IS_NPC(ch) ? 0.0 : GET_SKILL_EXP(ch, SKILL_STEALTH));
+			MSDPSetString(d, eMSDP_STEALTH_EXP, buf);
+			MSDPSetNumber(d, eMSDP_SURVIVAL_LEVEL, IS_NPC(ch) ? 0 : GET_SKILL(ch, SKILL_SURVIVAL));
+			snprintf(buf, sizeof(buf), "%.2f", IS_NPC(ch) ? 0.0 : GET_SKILL_EXP(ch, SKILL_SURVIVAL));
+			MSDPSetString(d, eMSDP_SURVIVAL_EXP, buf);
+			MSDPSetNumber(d, eMSDP_TRADE_LEVEL, IS_NPC(ch) ? 0 : GET_SKILL(ch, SKILL_TRADE));
+			snprintf(buf, sizeof(buf), "%.2f", IS_NPC(ch) ? 0.0 : GET_SKILL_EXP(ch, SKILL_TRADE));
+			MSDPSetString(d, eMSDP_TRADE_EXP, buf);
+			MSDPSetNumber(d, eMSDP_VAMPIRE_LEVEL, IS_NPC(ch) ? 0 : GET_SKILL(ch, SKILL_VAMPIRE));
+			snprintf(buf, sizeof(buf), "%.2f", IS_NPC(ch) ? 0.0 : GET_SKILL_EXP(ch, SKILL_VAMPIRE));
+			MSDPSetString(d, eMSDP_VAMPIRE_EXP, buf);
+			
+			// empre
+			if (GET_LOYALTY(ch) && !IS_NPC(ch)) {
+				MSDPSetString(d, eMSDP_EMPIRE_NAME, EMPIRE_NAME(GET_LOYALTY(ch)));
+				MSDPSetString(d, eMSDP_EMPIRE_ADJECTIVE, EMPIRE_ADJECTIVE(GET_LOYALTY(ch)));
+				MSDPSetString(d, eMSDP_EMPIRE_RANK, EMPIRE_RANK(GET_LOYALTY(ch), GET_RANK(ch)-1));
+				MSDPSetNumber(d, eMSDP_EMPIRE_TERRITORY, EMPIRE_CITY_TERRITORY(GET_LOYALTY(ch)) + EMPIRE_OUTSIDE_TERRITORY(GET_LOYALTY(ch)));
+				MSDPSetNumber(d, eMSDP_EMPIRE_TERRITORY_MAX, land_can_claim(GET_LOYALTY(ch), FALSE));
+				MSDPSetNumber(d, eMSDP_EMPIRE_TERRITORY_OUTSIDE, EMPIRE_OUTSIDE_TERRITORY(GET_LOYALTY(ch)));
+				MSDPSetNumber(d, eMSDP_EMPIRE_TERRITORY_OUTSIDE_MAX, land_can_claim(GET_LOYALTY(ch), TRUE));
+				MSDPSetNumber(d, eMSDP_EMPIRE_WEALTH, GET_TOTAL_WEALTH(GET_LOYALTY(ch)));
+				MSDPSetNumber(d, eMSDP_EMPIRE_SCORE, get_total_score(GET_LOYALTY(ch)));
+			}
+			else {
+				MSDPSetString(d, eMSDP_EMPIRE_NAME, EMPIRE_NAME(GET_LOYALTY(ch)));
+				MSDPSetString(d, eMSDP_EMPIRE_ADJECTIVE, EMPIRE_ADJECTIVE(GET_LOYALTY(ch)));
+				MSDPSetString(d, eMSDP_EMPIRE_RANK, EMPIRE_RANK(GET_LOYALTY(ch), GET_RANK(ch)-1));
+				MSDPSetNumber(d, eMSDP_EMPIRE_TERRITORY, EMPIRE_CITY_TERRITORY(GET_LOYALTY(ch)) + EMPIRE_OUTSIDE_TERRITORY(GET_LOYALTY(ch)));
+				MSDPSetNumber(d, eMSDP_EMPIRE_TERRITORY_MAX, land_can_claim(GET_LOYALTY(ch), FALSE));
+				MSDPSetNumber(d, eMSDP_EMPIRE_TERRITORY_OUTSIDE, EMPIRE_OUTSIDE_TERRITORY(GET_LOYALTY(ch)));
+				MSDPSetNumber(d, eMSDP_EMPIRE_TERRITORY_OUTSIDE_MAX, land_can_claim(GET_LOYALTY(ch), TRUE));
+				MSDPSetNumber(d, eMSDP_EMPIRE_WEALTH, GET_TOTAL_WEALTH(GET_LOYALTY(ch)));
+				MSDPSetNumber(d, eMSDP_EMPIRE_SCORE, get_total_score(GET_LOYALTY(ch)));
+			}
 
 			/* This would be better moved elsewhere */
-			if (pOpponent) {
+			if ((pOpponent = FIGHTING(ch))) {
 				hit_points = (GET_HEALTH(pOpponent) * 100) / GET_MAX_HEALTH(pOpponent);
 				MSDPSetNumber(d, eMSDP_OPPONENT_HEALTH, hit_points);
 				MSDPSetNumber(d, eMSDP_OPPONENT_HEALTH_MAX, 100);
@@ -219,7 +400,11 @@ static void msdp_update(void) {
 				MSDPSetNumber(d, eMSDP_OPPONENT_LEVEL, 0);
 				MSDPSetString(d, eMSDP_OPPONENT_NAME, "");
 			}
-
+			
+			MSDPSetNumber(d, eMSDP_WORLD_TIME, time_info.hours);
+			MSDPSetString(d, eMSDP_WORLD_SEASON, seasons[pick_season(IN_ROOM(ch))]);
+			
+			// done -- send it
 			MSDPUpdate(d);
 		}
 

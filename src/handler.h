@@ -113,6 +113,7 @@ extern struct coin_data *find_coin_entry(struct coin_data *list, empire_data *em
 extern int increase_coins(char_data *ch, empire_data *emp, int amount);
 extern const char *money_amount(empire_data *type, int amount);
 extern const char *money_desc(empire_data *type, int amount);
+extern int total_coins(char_data *ch);
 
 // cooldown handlers
 void add_cooldown(char_data *ch, int type, int seconds_duration);

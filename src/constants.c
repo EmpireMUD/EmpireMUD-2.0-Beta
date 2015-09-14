@@ -515,16 +515,16 @@ const char *dirs[] = {
 
 // alternate direction names, to allow certain abbrevs in argument parsing -- NUM_OF_DIRS
 const char *alt_dirs[] = {
-	"north",
-	"east",
-	"south",
-	"west",
+	"n",
+	"e",
+	"s",
+	"w",
 	"nw",
 	"ne",
 	"sw",
 	"se",
-	"up",
-	"down",
+	"u",
+	"d",
 	"fore",
 	"starboard",
 	"port",
