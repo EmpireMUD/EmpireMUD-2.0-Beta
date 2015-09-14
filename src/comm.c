@@ -338,7 +338,8 @@ static void msdp_update(void) {
 			MSDPSetNumber(d, eMSDP_BLOCK, get_block_rating(ch, FALSE));
 			MSDPSetNumber(d, eMSDP_DODGE, get_dodge_modifier(ch, NULL, FALSE) - (hit_per_dex * GET_DEXTERITY(ch)));	// same change made to it in score
 			MSDPSetNumber(d, eMSDP_TO_HIT, get_to_hit(ch, NULL, FALSE, FALSE) - (hit_per_dex * GET_DEXTERITY(ch)));	// same change as in score
-			MSDPSetNumber(d, eMSDP_SPEED, get_combat_speed(ch, WEAR_WIELD));
+			snprintf(buf, sizeof(buf), "%.2f", get_combat_speed(ch, WEAR_WIELD));
+			MSDPSetString(d, eMSDP_SPEED, buf);
 			MSDPSetNumber(d, eMSDP_RESIST_PHYSICAL, GET_RESIST_PHYSICAL(ch));
 			MSDPSetNumber(d, eMSDP_RESIST_MAGICAL, GET_RESIST_MAGICAL(ch));
 			MSDPSetNumber(d, eMSDP_BONUS_PHYSICAL, GET_BONUS_PHYSICAL(ch));
