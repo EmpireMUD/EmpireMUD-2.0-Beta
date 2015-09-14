@@ -479,7 +479,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 			int max_size = config_get_int("max_map_size");
 			if (ch->desc->pProtocol->ScreenHeight > 0) {
 				// cap based on height, too (save some room)
-				wide = MIN(wide, (ch->desc->pProtocol->ScreenHeight / 2) - 6);
+				wide = MIN(wide, (ch->desc->pProtocol->ScreenHeight - 5)/2);
 			}
 			mapsize = MIN(wide, max_size);
 		}
