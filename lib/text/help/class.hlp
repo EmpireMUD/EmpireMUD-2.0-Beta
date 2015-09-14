@@ -25,6 +25,38 @@ Healer: Keeps the group alive.
 
 See also: CLASS LIST, TANK, HEALER, MELEE, CASTER
 #
+"CLASS LIST" CLASSES
+
+(Disambiguation: Did you mean HELP CLASS ?)
+
+Classes - see HELP <NAME> CLASS
+-------------------------------
+Battle: Duke (Empire), Battlemage (High Sorcery), Werewolf (Natural Magic),
+        Assassin (Stealth), Barbarian (Survival), Steelsmith (Trade),
+        Reaper (Vampire)
+Empire: Duke (Battle), Exarch (High Sorcery), Luminary (Natural Magic),
+        Powerbroker (Stealth), Elder (Survival), Guildsman (Trade),
+        Ancient (Vampire)
+High Sorcery: Battlemage (Battle), Exarch (Empire), Archmage (Natural Magic),
+        Occultist (Stealth), Theurge (Survival), Artificer (Trade),
+        Lich (Vampire)
+Natural Magic: Werewolf (Battle), Luminary (Empire), Archmage (High Sorcery),
+        Shadow Wolf (Stealth), Feral (Survival), Alchemist (Trade),
+        Necromancer (Vampire)
+Stealth: Assassin (Battle), Powerbroker (Empire), Occultist (High Sorcery),
+        Shadow Wolf (Natural Magic), Bandit (Survival), Smuggler (Trade),
+        Shade (Vampire)
+Survival: Barbarian (Battle), Elder (Empire), Theurge (High Sorcery),
+        Feral (Natural Magic), Bandit (Stealth), Tinker (Trade),
+        Wight (Vampire)
+Trade: Steelsmith (Battle), Guildsman (Empire), Artificer (High Sorcery),
+        Alchemist (Natural Magic), Smuggler (Stealth), Tinker (Survival),
+        Antiquarian (Vampire)
+Vampire: Reaper (Battle), Ancient (Empire), Lich (High Sorcery), Necromancer
+        (Natural Magic), Shade (Stealth), Wight (Survival), Antiquarian (Trade)
+		
+See also: CLASS
+#
 ARCHETYPES "STARTING ARCHETYPES" "STARTING CLASS"
 
 All player characters start with some gear, low attributes, and 30 skill
@@ -163,38 +195,6 @@ Caster traits:
  - Bonus-Magical: Any spare points can go here to boost your magical damage.
 
 See also: HEALER, HIT CAP, MELEE, TANK
-#
-"CLASS LIST" CLASSES
-
-(Disambiguation: Did you mean HELP CLASS ?)
-
-Classes - see HELP <NAME> CLASS
--------------------------------
-Battle: Duke (Empire), Battlemage (High Sorcery), Werewolf (Natural Magic),
-        Assassin (Stealth), Barbarian (Survival), Steelsmith (Trade),
-        Reaper (Vampire)
-Empire: Duke (Battle), Exarch (High Sorcery), Luminary (Natural Magic),
-        Powerbroker (Stealth), Elder (Survival), Guildsman (Trade),
-        Ancient (Vampire)
-High Sorcery: Battlemage (Battle), Exarch (Empire), Archmage (Natural Magic),
-        Occultist (Stealth), Theurge (Survival), Artificer (Trade),
-        Lich (Vampire)
-Natural Magic: Werewolf (Battle), Luminary (Empire), Archmage (High Sorcery),
-        Shadow Wolf (Stealth), Feral (Survival), Alchemist (Trade),
-        Necromancer (Vampire)
-Stealth: Assassin (Battle), Powerbroker (Empire), Occultist (High Sorcery),
-        Shadow Wolf (Natural Magic), Bandit (Survival), Smuggler (Trade),
-        Shade (Vampire)
-Survival: Barbarian (Battle), Elder (Empire), Theurge (High Sorcery),
-        Feral (Natural Magic), Bandit (Stealth), Tinker (Trade),
-        Wight (Vampire)
-Trade: Steelsmith (Battle), Guildsman (Empire), Artificer (High Sorcery),
-        Alchemist (Natural Magic), Smuggler (Stealth), Tinker (Survival),
-        Antiquarian (Vampire)
-Vampire: Reaper (Battle), Ancient (Empire), Lich (High Sorcery), Necromancer
-        (Natural Magic), Shade (Stealth), Wight (Survival), Antiquarian (Trade)
-		
-See also: CLASS
 #
 "DUKE CLASS" DUKE
 
