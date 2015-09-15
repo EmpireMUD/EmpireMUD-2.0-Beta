@@ -19,7 +19,7 @@ end
 if (%random.10% == 10 && !%self.mob_flagged(SENTINEL)%
   eval gohome 1
 end
-if (%room.sector% ~= Forest || %room.sector% == Grove) && (%logs% < %cap%)
+if (%room.sector% ~= Forest || %room.sector% == Grove) && (%logs% < %cap%) && (!%room.empire_id%)
   * Stops the mob from wandering while it works on this tile
   nop %self.add_mob_flag(SENTINEL)%
   if (%room.sector% == Light Forest)
@@ -55,7 +55,7 @@ if (%gohome% && %instance.location%)
   %echo% %self.name% heads back to %self.hisher% camp!
   %teleport% %self% %instance.location%
   %echo% %self.name% returns to the camp!
-if (%logs% > 15 && %random.5%==5)
+  if (%logs% > 15 && %random.5%==5)
     %echo% %self.name% drops off a log at the camp.
     eval logs %logs%-1
   end
