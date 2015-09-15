@@ -304,10 +304,10 @@ static void msdp_update(void) {
 			buf_size = 0;
 			for (aff = ch->affected; aff; aff = aff->next) {
 				if (!strstr(buf, affect_types[aff->type])) {
-					buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s", (char)MSDP_VAL, affect_types[aff->type]);
+					buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%d", (char)MSDP_VAR, affect_types[aff->type], (char)MSDP_VAR, aff->duration * SECS_PER_REAL_UPDATE);
 				}
 			}
-			MSDPSetArray(d, eMSDP_AFFECTS, buf);
+			MSDPSetTable(d, eMSDP_AFFECTS, buf);
 			
 			MSDPSetNumber(d, eMSDP_LEVEL, get_approximate_level(ch));
 			MSDPSetNumber(d, eMSDP_SKILL_LEVEL, IS_NPC(ch) ? 0 : GET_SKILL_LEVEL(ch));
