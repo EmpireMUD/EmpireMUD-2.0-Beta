@@ -54,8 +54,8 @@ void show_string(descriptor_data *d, char *input);
 
 /* local functions */
 void smash_tilde(char *str);
-char *next_page(char *str);
-int count_pages(char *str);
+char *next_page(char *str, descriptor_data *desc);
+int count_pages(char *str, descriptor_data *desc);
 void paginate_string(char *str, descriptor_data *d);
 
 
@@ -165,9 +165,9 @@ void string_add(descriptor_data *d, char *str) {
 	if (!(*d->str)) {
 		if (strlen(str) + 3 > d->max_str) {
 			send_to_char("String too long - Truncated.\r\n", d->character);
-			strcpy(&str[d->max_str - 3], "\r\n");
 			CREATE(*d->str, char, d->max_str);
-			strcpy(*d->str, str);
+			strncpy(*d->str, str, d->max_str);
+			strcpy(*d->str + (d->max_str - 3), "\r\n");
 		}
 		else {
 			CREATE(*d->str, char, strlen(str) + 3);
@@ -175,8 +175,12 @@ void string_add(descriptor_data *d, char *str) {
 		}
 	}
 	else {
-		if (strlen(str) + strlen(*d->str) + 3 > d->max_str)
-			send_to_char("String too long. Last line skipped.\r\n", d->character);
+		if (strlen(str) + strlen(*d->str) + 3 > d->max_str) {
+			if (action == STRINGADD_OK) {
+				send_to_char("String too long. Last line skipped.\r\n", d->character);
+				return;	// No appending \r\n\0, but still let them save.
+			}
+		}
 		else {
 			RECREATE(*d->str, char, strlen(*d->str) + strlen(str) + 3);
 			strcat(*d->str, str);
@@ -337,14 +341,24 @@ void string_add(descriptor_data *d, char *str) {
 * for CircleMUD.  All functions below are his.  --JE 8 Mar 96
 *********************************************************************/
 
+// fallback defaults if these numbers can't be detected
 #define PAGE_LENGTH     22
 #define PAGE_WIDTH      80
 
-/* Traverse down the string until the begining of the next page has been
- * reached.  Return NULL if this is the last page of the string.
- */
-char *next_page(char *str) {
+/**
+* Traverse down the string until the begining of the next page has been
+* reached.  Return NULL if this is the last page of the string.
+*
+* @param char *str The string to get the next page from.
+* @param descriptor_data *desc The descriptor who will receive it (may have their own page size).
+* @return char* The next page.
+*/
+char *next_page(char *str, descriptor_data *desc) {
 	int col = 1, line = 1, spec_code = FALSE;
+	int length, width;
+	
+	length = (desc && desc->pProtocol->ScreenHeight > 0) ? (desc->pProtocol->ScreenHeight - 2) : PAGE_LENGTH;
+	width = (desc && desc->pProtocol->ScreenWidth > 0) ? desc->pProtocol->ScreenWidth : PAGE_WIDTH;
 
 	for (;; ++str) {
 		/* If end of string, return NULL. */
@@ -352,7 +366,7 @@ char *next_page(char *str) {
 			return (NULL);
 
 		/* If we're at the start of the next page, return this fact. */
-		else if (line > PAGE_LENGTH)
+		else if (line > length)
 			return (str);
 
 		/* Check for the begining of an ANSI color code block. */
@@ -384,7 +398,7 @@ char *next_page(char *str) {
 			 * We need to check here and see if we are over the page width,
 			 * and if so, compensate by going to the beginning of the next line.
 			 */
-			else if (col++ > PAGE_WIDTH) {
+			else if (col++ > width) {
 				col = 1;
 				line++;
 			}
@@ -393,11 +407,17 @@ char *next_page(char *str) {
 }
 
 
-/* Function that returns the number of pages in the string. */
-int count_pages(char *str) {
+/**
+* Function that returns the number of pages in the string.
+*
+* @param char *str The string to count pages in.
+* @param descriptor_data *desc The descriptor who will receive it (may have their own page size).
+* @return int The number of pages.
+*/
+int count_pages(char *str, descriptor_data *desc) {
 	int pages;
 
-	for (pages = 1; (str = next_page(str)); pages++);
+	for (pages = 1; (str = next_page(str, desc)); pages++);
 	return (pages);
 }
 
@@ -414,7 +434,7 @@ void paginate_string(char *str, descriptor_data *d) {
 		*(d->showstr_vector) = str;
 
 	for (i = 1; i < d->showstr_count && str; i++)
-		str = d->showstr_vector[i] = next_page(str);
+		str = d->showstr_vector[i] = next_page(str, d);
 
 	d->showstr_page = 0;
 }
@@ -433,7 +453,7 @@ void page_string(descriptor_data *d, char *str, int keep_internal) {
 		return;
 	}
 
-	d->showstr_count = count_pages(str);
+	d->showstr_count = count_pages(str, d);
 	CREATE(d->showstr_vector, char *, d->showstr_count);
 
 	if (keep_internal) {

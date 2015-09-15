@@ -927,10 +927,18 @@ INTERACTION_FUNC(one_farming_chore) {
 				if (EMPIRE_CHORE(emp, CHORE_REPLANTING) && (old_sect = reverse_lookup_evolution_for_sector(SECT(inter_room), EVO_CROP_GROWS))) {
 					// sly-convert back to what it was grown from
 					SECT(inter_room) = old_sect;
+					// we are keeping the original sect the same as it was
 					set_room_extra_data(inter_room, ROOM_EXTRA_SEED_TIME, 60);
 				}
 				else {
-					change_terrain(inter_room, climate_default_sector[GET_CROP_CLIMATE(crop_proto(ROOM_CROP_TYPE(inter_room)))]);
+					// do we have a stored original sect?
+					if (ROOM_ORIGINAL_SECT(inter_room) != SECT(inter_room)) {
+						change_terrain(inter_room, GET_SECT_VNUM(ROOM_ORIGINAL_SECT(inter_room)));
+					}
+					else {
+						// fallback
+						change_terrain(inter_room, climate_default_sector[GET_CROP_CLIMATE(crop_proto(ROOM_CROP_TYPE(inter_room)))]);
+					}
 					
 					// stop the chop just in case
 					stop_room_action(inter_room, ACT_CHOPPING, CHORE_CHOPPING);

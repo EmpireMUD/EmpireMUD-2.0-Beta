@@ -82,7 +82,15 @@ int change_chop_territory(room_data *room) {
 	
 	if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && ROOM_CROP_FLAGGED(room, CROPF_IS_ORCHARD) && (cp = crop_proto(ROOM_CROP_TYPE(room)))) {
 		trees = 1;
-		change_terrain(room, climate_default_sector[GET_CROP_CLIMATE(cp)]);
+		
+		// check if original sect was stored to the crop
+		if (ROOM_ORIGINAL_SECT(room) != SECT(room)) {
+			change_terrain(room, GET_SECT_VNUM(ROOM_ORIGINAL_SECT(room)));
+		}
+		else {
+			// default
+			change_terrain(room, climate_default_sector[GET_CROP_CLIMATE(cp)]);
+		}
 	}
 	else if ((evo = get_evolution_by_type(SECT(room), EVO_CHOPPED_DOWN))) {
 		trees = evo->value;
@@ -1515,6 +1523,7 @@ static void evolve_one_map_tile(room_data *room) {
 	extern bool extract_tavern_resources(room_data *room);
 	
 	struct evolution_data *evo;
+	sector_data *original;
 	bool changed;
 	int type;
 	
@@ -1553,6 +1562,7 @@ static void evolve_one_map_tile(room_data *room) {
 	
 	// to avoid running more than one:
 	changed = FALSE;
+	original = SECT(room);
 	
 	// run some evolutions!
 	if (!changed && (evo = get_evolution_by_type(SECT(room), EVO_RANDOM))) {
@@ -1565,6 +1575,15 @@ static void evolve_one_map_tile(room_data *room) {
 	if (!changed && (evo = get_evolution_by_type(SECT(room), EVO_ADJACENT_ONE))) {
 		if (sector_proto(evo->becomes)) {
 			if (count_adjacent_sectors(room, evo->value, TRUE) >= 1) {
+				change_terrain(room, evo->becomes);
+				changed = TRUE;
+			}
+		}
+	}
+	
+	if (!changed && (evo = get_evolution_by_type(SECT(room), EVO_NOT_ADJACENT))) {
+		if (sector_proto(evo->becomes)) {
+			if (count_adjacent_sectors(room, evo->value, TRUE) < 1) {
 				change_terrain(room, evo->becomes);
 				changed = TRUE;
 			}
@@ -1588,19 +1607,41 @@ static void evolve_one_map_tile(room_data *room) {
 			}
 		}
 	}
+	
+	if (!changed && (evo = get_evolution_by_type(SECT(room), EVO_NOT_NEAR_SECTOR))) {
+		if (sector_proto(evo->becomes)) {
+			if (!find_sect_within_distance_from_room(room, evo->value, config_get_int("nearby_sector_distance"))) {
+				change_terrain(room, evo->becomes);
+				changed = TRUE;
+			}
+		}
+	}
 
 	// Growing Seeds
 	if (!changed && ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && (evo = get_evolution_by_type(SECT(room), EVO_CROP_GROWS))) {
+		// only going to use the original sect if it was different -- this preserves the stored sect
+		sector_data *stored = (ROOM_ORIGINAL_SECT(room) != SECT(room)) ? ROOM_ORIGINAL_SECT(room) : NULL;
+		
 		if (sector_proto(evo->becomes)) {
 			add_to_room_extra_data(room, ROOM_EXTRA_SEED_TIME, -1);
 			if (get_room_extra_data(room, ROOM_EXTRA_SEED_TIME) <= 0) {
-				type = get_room_extra_data(room, ROOM_EXTRA_CROP_TYPE);
+				type = get_room_extra_data(room, ROOM_EXTRA_CROP_TYPE);	// must preserve this
 				change_terrain(room, evo->becomes);
+				if (stored) {
+					ROOM_ORIGINAL_SECT(room) = stored;
+				}
 				set_room_extra_data(room, ROOM_EXTRA_CROP_TYPE, type);
 				remove_depletion(room, DPLTN_PICK);
 				changed = TRUE;
 			}
 		}
+	}
+	
+	// DONE
+
+	// If the new sector has crop data, we should store the original (e.g. a desert that randomly grows into a crop)
+	if (changed && ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && ROOM_ORIGINAL_SECT(room) == SECT(room)) {
+		ROOM_ORIGINAL_SECT(room) = original;
 	}
 }
 
@@ -1809,6 +1850,7 @@ void ruin_one_building(room_data *room) {
 * Writes the data files used to generate graphical maps.
 */
 void output_map_to_file(void) {
+	extern const char banner_to_mapout_token[][2];
 	extern const char mapout_color_tokens[];
 	
 	FILE *out, *pol, *cit;
@@ -1818,10 +1860,7 @@ void output_map_to_file(void) {
 	empire_data *emp, *next_emp;
 	sector_data *ocean = sector_proto(BASIC_OCEAN);
 	crop_data *cp;
-	char minibuf[10];
 	room_vnum expecting;
-	
-	char *bannerlist = "0rgybmc";
 	
 	// basic ocean sector is required
 	if (!ocean) {
@@ -1885,21 +1924,16 @@ void output_map_to_file(void) {
 		
 		// political output
 		if ((emp = ROOM_OWNER(room))) {
-			color = 0;
-			for (num = 0; num < strlen(bannerlist); ++num) {
-				sprintf(minibuf, "&%c", bannerlist[num]);
-				if (strstr(EMPIRE_BANNER(emp), minibuf) != NULL) {
-					color = num;
-					break;
-				}
-				sprintf(minibuf, "&%c", UPPER(bannerlist[num]));
-				if (strstr(EMPIRE_BANNER(emp), minibuf) != NULL) {
+			// find the first color in banner_to_mapout_token that is in the banner
+			color = -1;
+			for (num = 0; banner_to_mapout_token[0][0] != '\n'; ++num) {
+				if (strchr(EMPIRE_BANNER(emp), banner_to_mapout_token[num][0])) {
 					color = num;
 					break;
 				}
 			}
-			// banner color
-			fprintf(pol, "%d", color);
+			
+			fprintf(pol, "%c", color != -1 ? banner_to_mapout_token[color][1] : '?');
 		}
 		else {
 			// no owner -- only some sects get printed

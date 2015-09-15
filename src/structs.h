@@ -53,6 +53,7 @@
 // by searching for CONST_PREFIX_x (e.g. WEAR_x for wear flags).
 
 
+#include "protocol.h" // needed by everything
 #include "uthash.h"	// needed by everything
 
  //////////////////////////////////////////////////////////////////////////////
@@ -776,10 +777,10 @@ typedef struct trig_data trig_data;
 
 
 // Variables for the output buffering system
-#define MAX_SOCK_BUF  (12 * 1024)	// Size of kernel's sock buf
+#define MAX_SOCK_BUF  (24 * 1024)	// Size of kernel's sock buf
 #define MAX_PROMPT_LENGTH  256	// Max length of rendered prompt
 #define GARBAGE_SPACE  32	// Space for **OVERFLOW** etc
-#define SMALL_BUFSIZE  4096	// Static output buffer size
+#define SMALL_BUFSIZE  8192	// Static output buffer size
 // Max amount of output that can be buffered
 #define LARGE_BUFSIZE  (MAX_SOCK_BUF - GARBAGE_SPACE - MAX_PROMPT_LENGTH)
 
@@ -1121,7 +1122,7 @@ typedef struct trig_data trig_data;
 #define CON_NEWPASSWD  5	// Give me a password for x
 #define CON_CNFPASSWD  6	// Please retype password:
 #define CON_QSEX  7	// Sex?
-#define CON_QCOLOR  8	// Color, anyone?
+	#define CON_UNUSED1  8
 #define CON_RMOTD  9	// PRESS RETURN after MOTD
 #define CON_DISCONNECT  10	// In-game disconnection
 #define CON_REFERRAL  11	// referral
@@ -1288,7 +1289,7 @@ typedef struct trig_data trig_data;
 #define PRF_MORTLOG  BIT(6)	// Views mortlogs, default: ON
 #define PRF_NOREPEAT  BIT(7)	// No repetition of comm commands
 #define PRF_HOLYLIGHT  BIT(8)	// Immortal: Can see in dark
-#define PRF_COLOR  BIT(9)	// Color
+	#define PRF_UNUSED1  BIT(9)
 #define PRF_NOWIZ  BIT(10)	// Can't hear wizline
 #define PRF_NOMAPCOL  BIT(11)	// Map is not colored
 #define PRF_NOHASSLE  BIT(12)	// Ignored by mobs and triggers
@@ -1464,7 +1465,9 @@ typedef struct trig_data trig_data;
 #define EVO_NEAR_SECTOR  7	// called when within 2 tiles of [value=sector]
 #define EVO_PLANTS_TO  8	// set when someone plants [no value]
 #define EVO_MAGIC_GROWTH  9	// called when Chant of Nature or similar is called
-#define NUM_EVOS  10	// total
+#define EVO_NOT_ADJACENT  10	// called when NOT adjacent to at least 1 of [value=sector]
+#define EVO_NOT_NEAR_SECTOR  11 // called when NOT within 2 tiles of [value=sector]
+#define NUM_EVOS  12	// total
 
 // evolution value types
 #define EVO_VAL_NONE  0
@@ -2117,7 +2120,9 @@ struct descriptor_data {
 	char **showstr_vector;	// for paging through texts
 	int showstr_count;	// number of pages to page through
 	int showstr_page;	// which page are we currently showing?
-
+	
+	protocol_t *pProtocol; // see protocol.c
+	
 	char **str;	// for the modify-str system
 	char *backstr;	// for the modify-str aborts
 	char *file_storage;	// name of where to save a file

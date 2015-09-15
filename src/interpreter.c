@@ -38,8 +38,6 @@
 */
 
 // external funcs
-void echo_on(descriptor_data *d);
-void echo_off(descriptor_data *d);
 
 // locals
 void set_creation_state(descriptor_data *d, int state);
@@ -1511,7 +1509,6 @@ struct {
 	{ CON_CLAST_NAME },
 	{ CON_QSEX },
 	{ CON_Q_SCREEN_READER },	// skips to CON_Q_HAS_ALT
-	{ CON_QCOLOR },
 	
 	{ CON_Q_HAS_ALT },	// skips to CON_Q_ARCHETYPE
 	{ CON_Q_ALT_NAME },
@@ -1567,14 +1564,14 @@ void prompt_creation(descriptor_data *d) {
 		}
 		case CON_Q_ALT_PASSWORD: {
 			SEND_TO_Q("\r\nEnter the password for that character: ", d);
-			echo_off(d);
+			ProtocolNoEcho(d, true);
 			break;
 		}
 		case CON_NEWPASSWD: {
 			SEND_TO_Q("New character.\r\n\r\n", d);
 			sprintf(buf, "Give me a password for %s: ", GET_PC_NAME(d->character));
 			SEND_TO_Q(buf, d);
-			echo_off(d);
+			ProtocolNoEcho(d, true);
 			break;
 		}
 		case CON_CNFPASSWD: {
@@ -1595,10 +1592,6 @@ void prompt_creation(descriptor_data *d) {
 		}
 		case CON_QSEX: {
 			SEND_TO_Q("\r\nWhat is your sex (M/F)? ", d);
-			break;
-		}
-		case CON_QCOLOR: {
-			SEND_TO_Q("\r\nDo you want color on (y/n)? ", d);
 			break;
 		}
 		case CON_Q_ARCHETYPE: {
@@ -1745,7 +1738,7 @@ void process_alt_password(descriptor_data *d, char *arg) {
 			}
 			else {
 				SEND_TO_Q("Wrong password.\r\nPassword: ", d);
-				echo_off(d);
+				ProtocolNoEcho(d, true);
 			}
 		}
 		else {	// password ok
@@ -2001,16 +1994,19 @@ int perform_dupe_check(descriptor_data *d) {
 			SEND_TO_Q("Reconnecting.\r\n", d);
 			act("$n has reconnected.", TRUE, d->character, 0, 0, TO_ROOM);
 			syslog(SYS_LOGIN, GET_INVIS_LEV(d->character), TRUE, "%s [%s] has reconnected.", GET_NAME(d->character), d->host);
+			MXPSendTag(d, "<VERSION>");
 			break;
 		case USURP:
 			SEND_TO_Q("You take over your own body, already in use!\r\n", d);
 			act("$n suddenly keels over in pain, surrounded by a white aura...\r\n"
 				"$n's body has been taken over by a new spirit!", TRUE, d->character, 0, 0, TO_ROOM);
 			syslog(SYS_LOGIN, GET_INVIS_LEV(d->character), TRUE, "%s has re-logged in ... disconnecting old socket.", GET_NAME(d->character));
+			MXPSendTag(d, "<VERSION>");
 			break;
 		case UNSWITCH:
 			SEND_TO_Q("Reconnecting to unswitched char.", d);
 			syslog(SYS_LOGIN, GET_INVIS_LEV(d->character), TRUE, "%s [%s] has reconnected.", GET_NAME(d->character), d->host);
+			MXPSendTag(d, "<VERSION>");
 			break;
 	}
 
@@ -2122,7 +2118,7 @@ void nanny(descriptor_data *d, char *arg) {
 						REMOVE_BIT(PLR_FLAGS(d->character), PLR_WRITING | PLR_MAILING);
 
 						SEND_TO_Q("Password: ", d);
-						echo_off(d);
+						ProtocolNoEcho(d, true);
 						d->idle_tics = 0;
 						STATE(d) = CON_PASSWORD;
 					}
@@ -2191,9 +2187,9 @@ void nanny(descriptor_data *d, char *arg) {
 			 */
 
 			/* turn echo back on */
-			echo_on(d);
+			ProtocolNoEcho(d, false);
 
-			/* New echo_on() eats the return on telnet. Extra space better than none. */
+			/* New echo-on eats the return on telnet. Extra space better than none. */
 			SEND_TO_Q("\r\n", d);
 
 			if (!*arg) {
@@ -2212,7 +2208,7 @@ void nanny(descriptor_data *d, char *arg) {
 					}
 					else {
 						SEND_TO_Q("Wrong password.\r\nPassword: ", d);
-						echo_off(d);
+						ProtocolNoEcho(d, true);
 					}
 					return;
 				}
@@ -2312,7 +2308,7 @@ void nanny(descriptor_data *d, char *arg) {
 				STATE(d) = CON_NEWPASSWD;
 				return;
 			}
-			echo_on(d);
+			ProtocolNoEcho(d, false);
 			next_creation_step(d);
 			break;
 		}
@@ -2365,7 +2361,7 @@ void nanny(descriptor_data *d, char *arg) {
 			break;
 		}
 		case CON_Q_ALT_PASSWORD: {
-			echo_on(d);
+			ProtocolNoEcho(d, false);
 			SEND_TO_Q("\r\n", d);	// echo-off usually hides the CR
 			process_alt_password(d, arg);
 			break;
@@ -2430,22 +2426,6 @@ void nanny(descriptor_data *d, char *arg) {
 				// store for later
 				arg[MAX_REFERRED_BY_LENGTH-1] = '\0';
 				strcpy(GET_REFERRED_BY(d->character), arg);
-			}
-			
-			next_creation_step(d);
-			break;
-		}
-
-		case CON_QCOLOR: {
-			switch (LOWER(*arg)) {
-				case 'y':
-					SET_BIT(PRF_FLAGS(d->character), PRF_COLOR);
-					break;
-				case 'n':
-					break;
-				default:
-					SEND_TO_Q("Please type YES or NO: ", d);
-					return;
 			}
 			
 			next_creation_step(d);

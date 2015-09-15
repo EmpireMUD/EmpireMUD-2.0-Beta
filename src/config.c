@@ -517,7 +517,7 @@ int *config_get_int_array(char *key, int *array_size) {
 * @param char *key The one-word string key for the config system.
 * @return char* A pointer to the string associated with that key (default: "").
 */
-char *config_get_string(char *key) {
+const char *config_get_string(char *key) {
 	struct config_type *cnf;
 	
 	static char *default_string = "";
@@ -1143,7 +1143,7 @@ void load_config_system_from_file(void) {
 		skip_spaces(&arg);
 		
 		// junk line?
-		if (!*key || !*arg) {
+		if (!*key) {
 			continue;
 		}
 		
@@ -1541,6 +1541,19 @@ void init_config_system(void) {
 	// first set up all the config types
 
 	// game configs
+	init_config(CONFIG_GAME, "allow_extended_color_codes", CONFTYPE_BOOL, "if on, players can use &&[F000] and &&[B000]");
+	init_config(CONFIG_GAME, "hiring_builders", CONFTYPE_BOOL, "whether the mud is hiring builders");
+	init_config(CONFIG_GAME, "hiring_coders", CONFTYPE_BOOL, "whether the mud is hiring coders");
+	init_config(CONFIG_GAME, "mud_contact", CONFTYPE_SHORT_STRING, "email address of an admin");
+	init_config(CONFIG_GAME, "mud_created", CONFTYPE_SHORT_STRING, "year the mud was created");
+	init_config(CONFIG_GAME, "mud_hostname", CONFTYPE_SHORT_STRING, "your mud's hostname");
+	init_config(CONFIG_GAME, "mud_icon", CONFTYPE_SHORT_STRING, "a 32x32 bmp, png, jpg, or gif less than 32kb");
+	init_config(CONFIG_GAME, "mud_ip", CONFTYPE_SHORT_STRING, "ip address of your mud");
+	init_config(CONFIG_GAME, "mud_location", CONFTYPE_SHORT_STRING, "location of the mud server");
+	init_config(CONFIG_GAME, "mud_minimum_age", CONFTYPE_SHORT_STRING, "suggested minimum age to play");
+	init_config(CONFIG_GAME, "mud_name", CONFTYPE_SHORT_STRING, "name of your mud");
+	init_config(CONFIG_GAME, "mud_status", CONFTYPE_SHORT_STRING, "one of: Alpha, Closed Beta, Open Beta, Live");
+	init_config(CONFIG_GAME, "mud_website", CONFTYPE_SHORT_STRING, "your mud's website");
 	init_config(CONFIG_GAME, "starting_year", CONFTYPE_INT, "base year");
 	init_config(CONFIG_GAME, "welcome_message", CONFTYPE_SHORT_STRING, "message shown to all players on login");
 	init_config(CONFIG_GAME, "ok_string", CONFTYPE_SHORT_STRING, "simple Ok message");

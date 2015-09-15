@@ -3097,6 +3097,10 @@ Available types ([value] isn't used unless specified):
     (value is the sector vnum that must be nearby).
  PLANTS-TO - Sector this one becomes when you start to plant a crop on it.
  MAGIC-GROWTH - Sector this one becomes if it is magically forced to grow.
+ NOT-ADJACENT - No matching sector within 1 tile (value is the sector vnum).
+ NOT-NEAR-SECTOR - No matching sector within 2 tiles (value is the sector
+    vnum).
+ 
 
 Examples:
  Jungle: .evolution add CHOPPED-DOWN 1 50% 28

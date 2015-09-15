@@ -45,6 +45,7 @@ void afk_notify(char_data *ch);
  //////////////////////////////////////////////////////////////////////////////
 //// EMPIREMUD CONSTANTS /////////////////////////////////////////////////////
 
+// Shown on the "version" command and sent over MSSP
 const char *version = "EmpireMUD 2.0 beta 2";
 
 
@@ -372,7 +373,7 @@ const char *preference_bits[] = {
 	"MORTLOG",
 	"!REP",
 	"LIGHT",
-	"COLOR",
+		"UNUSED1",
 	"!WIZ",
 	"!MCOL",
 	"!HASSLE",
@@ -410,7 +411,7 @@ const struct toggle_data_type toggle_data[] = {
 	{ "brief", TOG_ONOFF, PRF_BRIEF, 0, NULL },
 	{ "political", TOG_ONOFF, PRF_POLITICAL, 0, NULL },
 	
-	{ "color", TOG_ONOFF, PRF_COLOR, 0, NULL },
+	{ "autorecall", TOG_ONOFF, PRF_AUTORECALL, 0, NULL },
 	{ "compact", TOG_ONOFF, PRF_COMPACT, 0, NULL },
 	{ "informative", TOG_ONOFF, PRF_INFORMATIVE, 0, NULL },
 	
@@ -423,7 +424,6 @@ const struct toggle_data_type toggle_data[] = {
 	{ "afk", TOG_ONOFF, PRF_AFK, 0, afk_notify },
 	
 	{ "channel-joins", TOG_OFFON, PRF_NO_CHANNEL_JOINS, 0, NULL },
-	{ "autorecall", TOG_ONOFF, PRF_AUTORECALL, 0, NULL },
 	{ "stealthable", TOG_ONOFF, PRF_STEALTHABLE, LVL_APPROVED, NULL },
 	
 	// imm section
@@ -449,7 +449,7 @@ const char *connected_types[] = {
 	"Get new PW",	// 5
 	"Confirm new PW",
 	"Select sex",
-	"Color?",
+		"UNUSED 1",
 	"Reading MOTD",
 	"Disconnecting",	// 10
 	"Referral?",
@@ -515,16 +515,16 @@ const char *dirs[] = {
 
 // alternate direction names, to allow certain abbrevs in argument parsing -- NUM_OF_DIRS
 const char *alt_dirs[] = {
-	"north",
-	"east",
-	"south",
-	"west",
+	"n",
+	"e",
+	"s",
+	"w",
 	"nw",
 	"ne",
 	"sw",
 	"se",
-	"up",
-	"down",
+	"u",
+	"d",
 	"fore",
 	"starboard",
 	"port",
@@ -1895,11 +1895,13 @@ const char *evo_types[] = {
 	"NEAR-SECTOR",
 	"PLANTS-TO",
 	"MAGIC-GROWTH",
+	"NOT-ADJACENT",
+	"NOT-NEAR-SECTOR",
 	"\n"
 };
 
 
-// EVO_VAL_x -- what type of data the evolution.value uses
+// EVO_x -- what type of data the evolution.value uses
 const int evo_val_types[NUM_EVOS] = {
 	EVO_VAL_NUMBER,	// chopped-down
 	EVO_VAL_NONE,	// crop-grows
@@ -1910,7 +1912,9 @@ const int evo_val_types[NUM_EVOS] = {
 	EVO_VAL_NONE,	// trench-full
 	EVO_VAL_SECTOR,	// near-sector
 	EVO_VAL_NONE,	// plants-to
-	EVO_VAL_NONE	// magic-growth
+	EVO_VAL_NONE,	// magic-growth
+	EVO_VAL_SECTOR,	// not-adjacent
+	EVO_VAL_SECTOR,	// not-near-sector
 };
 
 
@@ -1952,6 +1956,18 @@ const char *mapout_color_names[] = {
 	"Brown",	// 25
 	"Medium Gray",
 	"Dark Gray",
+	"Dark Blue",
+	"Dark Azure Blue",
+	"Dark Magenta",	// 30
+	"Dark Cyan",
+	"Lime Green",
+	"Dark Lime Green",
+	"Dark Orange",
+	"Pink",	// 35
+	"Dark Pink",
+	"Tan",
+	"Violet",
+	"Deep Violet",	// 39
 	"\n"
 };
 
@@ -1959,34 +1975,86 @@ const char *mapout_color_names[] = {
 // these must match up to mapout_color_names -- do not insert or change the order
 // these must also match up to the map.php generator
 const char mapout_color_tokens[] = {
-	'*',	// 0
-	'?',
-	'0',
-	'1',
-	'2',
-	'3',	// 5
-	'4',
-	'5',
-	'6',
-	'a',
-	'b',	// 10
-	'c',
-	'd',
-	'e',
-	'f',
-	'g',	// 15
-	'h',
-	'i',
-	'j',
-	'k',
-	'l',	// 20
-	'm',
-	'n',
-	'o',
-	'p',
-	'q',	// 25
-	'r',
-	's'
+	'*',	// "Starting Location",	// 0
+	'?',	// "Neutral",
+	'0',	// "Bright White",
+	'1',	// "Bright Red",
+	'2',	// "Bright Green",
+	'3',	// "Bright Yellow",	// 5
+	'4',	// "Bright Blue",
+	'5',	// "Bright Magenta",
+	'6',	// "Bright Cyan",
+	'a',	// "Dark Red",
+	'b',	// "Pale Green",	// 10
+	'c',	// "Yellow-Green",
+	'd',	// "Sea Green",
+	'e',	// "Medium Green",
+	'f',	// "Dark Green",
+	'g',	// "Olive Green",	// 15
+	'h',	// "Ice Blue",
+	'i',	// "Light Blue",
+	'j',	// "Medium Blue",
+	'k',	// "Deep Blue",
+	'l',	// "Light Tan",	// 20
+	'm',	// "Pale Yellow",
+	'n',	// "Peach",
+	'o',	// "Orange",
+	'p',	// "Yellow Brown",
+	'q',	// "Brown",	// 25
+	'r',	// "Medium Gray",
+	's',	// "Dark Gray",
+	't',	// "Dark Blue",
+	'u',	// "Dark Azure Blue",
+	'v',	// "Dark Magenta",	// 30
+	'w',	// "Dark Cyan",
+	'x',	// "Lime Green",
+	'y',	// "Dark Lime Green",
+	'z',	// "Dark Orange",
+	'A',	// "Pink",	// 35
+	'B',	// "Dark Pink",
+	'C',	// "Tan",
+	'D',	// "Violet",
+	'E',	// "Deep Violet",	// 39
+};
+
+
+// this maps a banner color (the 'r' in "&r") to a mapout_color_token character ('1')
+const char banner_to_mapout_token[][2] = {
+	{ '0', '0' },
+	{ 'n', '0' },
+	// non-bright colors:
+	{ 'r', 'a' },
+	{ 'g', 'f' },
+	{ 'b', 't' },
+	{ 'y', 'p' },
+	{ 'm', 'v' },
+	{ 'c', 'w' },
+	{ 'w', 's' },
+	{ 'a', 'u' },
+	{ 'j', 'g' },
+	{ 'l', 'y' },
+	{ 'o', 'z' },
+	{ 'p', 'B' },
+	{ 't', 'q' },
+	{ 'v', 'E' },
+	// bright colors:
+	{ 'R', '1' },
+	{ 'G', '2' },
+	{ 'B', '4' },
+	{ 'Y', '3' },
+	{ 'M', '5' },
+	{ 'C', '6' },
+	{ 'W', '0' },
+	{ 'A', 'j' },
+	{ 'J', 'd' },
+	{ 'L', 'x' },
+	{ 'O', 'o' },
+	{ 'P', 'A' },
+	{ 'T', 'C' },
+	{ 'V', 'D' },
+	
+	// last
+	{ '\n', '\n' }
 };
 
 

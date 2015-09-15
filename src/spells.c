@@ -239,7 +239,7 @@ void perform_chant(char_data *ch) {
 	char lbuf[MAX_STRING_LENGTH];
 	struct evolution_data *evo;
 	int chant = GET_ACTION_VNUM(ch, 0);
-	sector_data *new_sect;
+	sector_data *new_sect, *preserve;
 	crop_vnum cropv;
 	
 	// some chants could be timed...
@@ -294,6 +294,7 @@ void perform_chant(char_data *ch) {
 			if ((evo = get_evolution_by_type(SECT(IN_ROOM(ch)), EVO_MAGIC_GROWTH))) {
 				new_sect = sector_proto(evo->becomes);
 				cropv = ROOM_CROP_TYPE(IN_ROOM(ch));
+				preserve = (ROOM_ORIGINAL_SECT(IN_ROOM(ch)) != SECT(IN_ROOM(ch))) ? ROOM_ORIGINAL_SECT(IN_ROOM(ch)) : NULL;
 				
 				// messaging based on whether or not it's choppable
 				if (new_sect && has_evolution_type(new_sect, EVO_CHOPPED_DOWN)) {
@@ -308,6 +309,9 @@ void perform_chant(char_data *ch) {
 				change_terrain(IN_ROOM(ch), evo->becomes);
 				if (cropv != NOTHING) {
 					set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CROP_TYPE, cropv);
+				}
+				if (preserve) {
+					ROOM_ORIGINAL_SECT(IN_ROOM(ch)) = preserve;
 				}
 				
 				gain_ability_exp(ch, ABIL_CHANT_OF_NATURE, 20);

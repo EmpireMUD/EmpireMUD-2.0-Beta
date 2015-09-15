@@ -100,34 +100,43 @@ bool adjacent_room_is_light(room_data *room) {
 
 /**
 * @param empire_data *emp
-* @return char* The background color that's the opposite of the banner color
+* @return char* The background color that's a good fit for the banner color
 */
-char *get_banner_complement_color(empire_data *emp) {
+const char *get_banner_complement_color(empire_data *emp) {
 	if (!emp) {
 		return "";
 	}
-	
-	if (strchr(EMPIRE_BANNER(emp), 'r')) {
-		return BACKGROUND_GREEN;
+
+	if (strchrstr(EMPIRE_BANNER(emp), "rRtT")) {
+		return "\t[B100]";
 	}
-	if (strchr(EMPIRE_BANNER(emp), 'g')) {
-		return BACKGROUND_RED;
+	if (strchrstr(EMPIRE_BANNER(emp), "gG")) {
+		return "\t[B010]";
 	}
-	if (strchr(EMPIRE_BANNER(emp), 'y')) {
-		return BACKGROUND_BLUE;
+	if (strchrstr(EMPIRE_BANNER(emp), "yY")) {
+		return "\t[B110]";
 	}
-	if (strchr(EMPIRE_BANNER(emp), 'b')) {
-		return BACKGROUND_CYAN;
+	if (strchrstr(EMPIRE_BANNER(emp), "mMpPvV")) {
+		return "\t[B101]";
 	}
-	if (strchr(EMPIRE_BANNER(emp), 'm')) {
-		return BACKGROUND_BLUE;
+	if (strchrstr(EMPIRE_BANNER(emp), "aA")) {
+		return "\t[B001]";
 	}
-	if (strchr(EMPIRE_BANNER(emp), 'c')) {
-		return BACKGROUND_BLUE;
+	if (strchrstr(EMPIRE_BANNER(emp), "cCbBjJ")) {
+		return "\t[B011]";
 	}
-	
+	if (strchrstr(EMPIRE_BANNER(emp), "wW")) {
+		return "\t[B111]";
+	}
+	if (strchrstr(EMPIRE_BANNER(emp), "lL")) {
+		return "\t[B120]";
+	}
+	if (strchrstr(EMPIRE_BANNER(emp), "oO")) {
+		return "\t[B310]";
+	}
+
 	// default
-	return BACKGROUND_BLUE;
+	return "\t[B210]";	// dark tan
 }
 
 
@@ -464,7 +473,22 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 
 	mapsize = GET_MAPSIZE(REAL_CHAR(ch));
 	if (mapsize == 0) {
-		mapsize = config_get_int("default_map_size");
+		// auto-detected
+		if (ch->desc && ch->desc->pProtocol->ScreenWidth > 0) {
+			int wide = (ch->desc->pProtocol->ScreenWidth - 6) / 8;	// the /8 is 4 chars per tile, doubled
+			int max_size = config_get_int("max_map_size");
+			if (ch->desc->pProtocol->ScreenHeight > 0) {
+				// cap based on height, too (save some room)
+				// this saves roughly 4 lines below the map -- if you're going
+				// to play around with it, be sure to test -- the math is not
+				// very straightforward. -paul
+				wide = MIN(wide, ((ch->desc->pProtocol->ScreenHeight - 7) / 2) - 1);	// the -1 at the end is to ensure even/odd numbers have an extra line rather than one too few
+			}
+			mapsize = MIN(wide, max_size);
+		}
+		else {
+			mapsize = config_get_int("default_map_size");
+		}
 	}
 
 	if (AFF_FLAGGED(ch, AFF_BLIND)) {
@@ -654,7 +678,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 					}
 					else if (to_room != room && !CAN_SEE_IN_DARK_ROOM(ch, to_room) && compute_distance(room, to_room) > distance_can_see(ch) && !adjacent_room_is_light(to_room)) {
 						// normal dark
-						if (PRF_FLAGGED(ch, PRF_COLOR) && !PRF_FLAGGED(ch, PRF_NOMAPCOL)) {
+						if (!PRF_FLAGGED(ch, PRF_NOMAPCOL)) {
 							show_map_to_char(ch, mappc, to_room, options | LRR_SHOW_DARK);
 						}
 						else {

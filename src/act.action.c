@@ -598,7 +598,12 @@ INTERACTION_FUNC(finish_harvesting) {
 	}
 
 	// finally, change the terrain
-	if (sect) {
+	if (ROOM_ORIGINAL_SECT(inter_room) != SECT(inter_room)) {
+		// use original terrain (appears to have been stored)
+		change_terrain(inter_room, GET_SECT_VNUM(ROOM_ORIGINAL_SECT(inter_room)));
+	}
+	else if (sect) {
+		// use fallback sect
 		change_terrain(inter_room, GET_SECT_VNUM(sect));
 	}
 	return TRUE;
@@ -2433,6 +2438,7 @@ ACMD(do_plant) {
 	extern const char *climate_types[];
 	
 	struct evolution_data *evo;
+	sector_data *original;
 	obj_data *obj;
 	crop_data *cp;
 	
@@ -2482,7 +2488,9 @@ ACMD(do_plant) {
 		msg_to_char(ch, "Nothing can be planted here.\r\n");
 	}
 	else {
+		original = SECT(IN_ROOM(ch));
 		change_terrain(IN_ROOM(ch), evo->becomes);
+		ROOM_ORIGINAL_SECT(IN_ROOM(ch)) = original;
 		
 		// don't use GET_FOOD_CROP_TYPE because not all plantables are food
 		set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CROP_TYPE, GET_OBJ_VAL(obj, VAL_FOOD_CROP_TYPE));

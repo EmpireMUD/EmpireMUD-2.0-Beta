@@ -1213,6 +1213,7 @@ void char_to_room(char_data *ch, room_data *room) {
 	extern int determine_best_scale_level(char_data *ch, bool check_group);
 	extern struct instance_data *find_instance_by_room(room_data *room);
 	extern int lock_instance_level(room_data *room, int level);
+	void msdp_update_room(char_data *ch);
 	void spawn_mobs_from_center(room_data *center);
 	
 	int pos;
@@ -1260,6 +1261,9 @@ void char_to_room(char_data *ch, room_data *room) {
 		if (!IS_NPC(ch)) {
 			GET_LAST_ROOM(ch) = GET_ROOM_VNUM(room);
 		}
+		
+		// update location
+		msdp_update_room(ch);
 	}
 }
 
@@ -2081,6 +2085,28 @@ const char *money_desc(empire_data *type, int amount) {
 }
 
 
+/**
+* Returns the total amount of coin a player has, without regard to type.
+*
+* @param char_data *ch The player.
+* @return int The total number of coins.
+*/
+int total_coins(char_data *ch) {
+	struct coin_data *coin;
+	int total = 0;
+	
+	if (IS_NPC(ch)) {
+		return 0;
+	}
+	
+	for (coin = GET_PLAYER_COINS(ch); coin; coin = coin->next) {
+		SAFE_ADD(total, coin->amount, INT_MIN, INT_MAX, FALSE);
+	}
+
+	return total;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// COOLDOWN HANDLERS ///////////////////////////////////////////////////////
 
@@ -2822,12 +2848,17 @@ struct help_index_element *find_help_entry(int level, const char *word) {
 
 			if (bot > top) {
 				return NULL;
-				}
+			}
 			else if (!(chk = strn_cmp(word, help_table[mid].keyword, minlen))) {
 				/* trace backwards to find first matching entry. Thanks Jeff Fink! */
 				while ((mid > 0) && (!(chk = strn_cmp(word, help_table[mid - 1].keyword, minlen)))) {
-					mid--;
+					--mid;
 				}
+				// now iterate forward to find the first matching entry the player can use
+				while (mid < top && help_table[mid].level > level && !(chk = strn_cmp(word, help_table[mid + 1].keyword, minlen))) {
+					++mid;
+				}
+				
 				if (level < help_table[mid].level) {
 					return NULL;
 				}

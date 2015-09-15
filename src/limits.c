@@ -176,8 +176,6 @@ void check_expired_cooldowns(void) {
 * Times out players who are sitting at the password or name prompt.
 */
 void check_idle_passwords(void) {
-	void echo_on(descriptor_data *d);
-
 	descriptor_data *d, *next_d;
 
 	for (d = descriptor_list; d; d = next_d) {
@@ -189,7 +187,7 @@ void check_idle_passwords(void) {
 			++d->idle_tics;
 		}
 		else {
-			echo_on(d);
+			ProtocolNoEcho(d, false);
 			SEND_TO_Q("\r\nTimed out... goodbye.\r\n", d);
 			STATE(d) = CON_CLOSE;
 		}

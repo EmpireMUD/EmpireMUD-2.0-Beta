@@ -1174,7 +1174,7 @@ empire_data *create_empire(char_data *ch) {
 	int iter;
 	
 	// &r, etc
-	char *colorlist = "rgybmcRGYBMC";
+	char *colorlist = "rgbymcajloptvnRGBYMCAJLOPTV";
 	int num_colors = 12;
 	
 	// this SHOULD always find a vnum

@@ -47,15 +47,15 @@ void process_add_to_channel_history(struct channel_history_data **history, char 
 // data for public channels
 struct {
 	char *name;	// channel name/verb
-	char *color;	// color code, e.g. &y
+	char *color;	// color code, e.g. \ty
 	int type;	// PUB_COMM_x
 	int min_level;	// absolute minimum
 	bitvector_t ignore_flag;	// PRF_x flag for ignoring this channel
 	int history;
 } pub_comm[NUM_CHANNELS] = {
-	{ "shout", "&y", PUB_COMM_SHORT_RANGE, 0, PRF_DEAF, CHANNEL_HISTORY_SAY },
-	{ "GOD", "&r", PUB_COMM_OOC, LVL_GOD, PRF_NOGODNET, CHANNEL_HISTORY_GOD },
-	{ "IMMORTAL", "&c", PUB_COMM_OOC, LVL_START_IMM, PRF_NOWIZ, CHANNEL_HISTORY_GOD },
+	{ "shout", "\ty", PUB_COMM_SHORT_RANGE, 0, PRF_DEAF, CHANNEL_HISTORY_SAY },
+	{ "GOD", "\tr", PUB_COMM_OOC, LVL_GOD, PRF_NOGODNET, CHANNEL_HISTORY_GOD },
+	{ "IMMORTAL", "\tc", PUB_COMM_OOC, LVL_START_IMM, PRF_NOWIZ, CHANNEL_HISTORY_GOD },
 };
 
 
@@ -166,14 +166,14 @@ void perform_tell(char_data *ch, char_data *vict, char *arg) {
 	}
 	
 	color = (!IS_NPC(vict) && GET_CUSTOM_COLOR(vict, CUSTOM_COLOR_TELL)) ? GET_CUSTOM_COLOR(vict, CUSTOM_COLOR_TELL) : 'r';
-	sprintf(buf, "$o tells you, '%s&%c'&0", arg, color);
-	msg_to_char(vict, "&%c", color);
+	sprintf(buf, "$o tells you, '%s\t%c'\tn", arg, color);
+	msg_to_char(vict, "\t%c", color);
 	act(buf, FALSE, ch, 0, vict, TO_VICT | TO_SLEEP | TO_NODARK);
 	
 	// channel history
 	if (vict->desc && vict->desc->last_act_message) {
 		// the message was sent via act(), we can retrieve it from the desc
-		sprintf(lbuf, "&%c%s", color, vict->desc->last_act_message);
+		sprintf(lbuf, "\t%c%s", color, vict->desc->last_act_message);
 		add_to_channel_history(vict->desc, CHANNEL_HISTORY_TELLS, lbuf);
 	}
 
@@ -187,7 +187,7 @@ void perform_tell(char_data *ch, char_data *vict, char *arg) {
 		
 		color = (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_TELL)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_TELL) : 'r';
 	
-		sprintf(buf, "&%cYou tell $O, '%s&%c'&0", color, arg, color);
+		sprintf(buf, "\t%cYou tell $O, '%s\t%c'\tn", color, arg, color);
 		act(buf, FALSE, ch, 0, vict, TO_CHAR | TO_SLEEP | TO_NODARK);	
 
 		if (ch->desc && ch->desc->last_act_message) {
@@ -349,16 +349,16 @@ ACMD(do_pub_comm) {
 			switch (pub_comm[subcmd].type) {
 				case PUB_COMM_GLOBAL:
 				case PUB_COMM_SHORT_RANGE: {
-					sprintf(msgbuf, "%sYou%s %s%s, '%s%s'&0", pub_comm[subcmd].color, invis_string, pub_comm[subcmd].name, level_string, argument, pub_comm[subcmd].color);
+					sprintf(msgbuf, "%sYou%s %s%s, '%s%s'\tn", pub_comm[subcmd].color, invis_string, pub_comm[subcmd].name, level_string, argument, pub_comm[subcmd].color);
 					break;
 				}
 				case PUB_COMM_OOC:
 				default: {
 					if (emote) {
-						sprintf(msgbuf, "[%s%s&0%s%s] $o %s&0", pub_comm[subcmd].color, pub_comm[subcmd].name, invis_string, level_string, argument);
+						sprintf(msgbuf, "[%s%s\tn%s%s] $o %s\tn", pub_comm[subcmd].color, pub_comm[subcmd].name, invis_string, level_string, argument);
 					}
 					else {
-						sprintf(msgbuf, "[%s%s&0 $o%s%s]: %s&0", pub_comm[subcmd].color, pub_comm[subcmd].name, invis_string, level_string, argument);
+						sprintf(msgbuf, "[%s%s\tn $o%s%s]: %s\tn", pub_comm[subcmd].color, pub_comm[subcmd].name, invis_string, level_string, argument);
 					}
 					break;
 				}
@@ -380,25 +380,25 @@ ACMD(do_pub_comm) {
 				// leading color code is handled later
 				
 				if (!IS_NPC(ch) && (IS_DISGUISED(ch) || GET_MORPH(ch) != MORPH_NONE)) {
-					sprintf(msgbuf, "$n ($o)%s %ss%s, '%s%s'&0", invis_string, pub_comm[subcmd].name, level_string, argument, pub_comm[subcmd].color);
+					sprintf(msgbuf, "$n ($o)%s %ss%s, '%s%s'\tn", invis_string, pub_comm[subcmd].name, level_string, argument, pub_comm[subcmd].color);
 				}
 				else {
-					sprintf(msgbuf, "$n%s %ss%s, '%s%s'&0", invis_string, pub_comm[subcmd].name, level_string, argument, pub_comm[subcmd].color);
+					sprintf(msgbuf, "$n%s %ss%s, '%s%s'\tn", invis_string, pub_comm[subcmd].name, level_string, argument, pub_comm[subcmd].color);
 				}
 				
 				// invis version
-				sprintf(someonebuf, "Someone %ss%s, '%s%s'&0", pub_comm[subcmd].name, level_string, argument, pub_comm[subcmd].color);
+				sprintf(someonebuf, "Someone %ss%s, '%s%s'\tn", pub_comm[subcmd].name, level_string, argument, pub_comm[subcmd].color);
 				break;
 			}
 			case PUB_COMM_OOC:
 			default: {
 				if (emote) {
-					sprintf(msgbuf, "[%s%s&0%s%s] $o %s&0", pub_comm[subcmd].color, pub_comm[subcmd].name, invis_string, level_string, argument);
-					sprintf(someonebuf, "[%s%s&0%s] Someone %s&0", pub_comm[subcmd].color, pub_comm[subcmd].name, level_string, argument);
+					sprintf(msgbuf, "[%s%s\tn%s%s] $o %s\tn", pub_comm[subcmd].color, pub_comm[subcmd].name, invis_string, level_string, argument);
+					sprintf(someonebuf, "[%s%s\tn%s] Someone %s\tn", pub_comm[subcmd].color, pub_comm[subcmd].name, level_string, argument);
 				}
 				else {
-					sprintf(msgbuf, "[%s%s&0 $o%s%s]: %s&0", pub_comm[subcmd].color, pub_comm[subcmd].name, invis_string, level_string, argument);
-					sprintf(someonebuf, "[%s%s&0 Someone%s]: %s&0", pub_comm[subcmd].color, pub_comm[subcmd].name, level_string, argument);
+					sprintf(msgbuf, "[%s%s\tn $o%s%s]: %s\tn", pub_comm[subcmd].color, pub_comm[subcmd].name, invis_string, level_string, argument);
+					sprintf(someonebuf, "[%s%s\tn Someone%s]: %s\tn", pub_comm[subcmd].color, pub_comm[subcmd].name, level_string, argument);
 				}
 				break;
 			}
@@ -486,7 +486,7 @@ void announce_to_slash_channel(struct slash_channel *chan, const char *messg, ..
 	if (messg) {
 		va_start(tArgList, messg);
 		vsprintf(output, messg, tArgList);
-		sprintf(lbuf, "[&%c/%s&0] %s&0\r\n", chan->color, chan->name, output);
+		sprintf(lbuf, "[\t%c/%s\tn] %s\tn\r\n", chan->color, chan->name, output);
 
 		for (d = descriptor_list; d; d = d->next) {
 			if (d->character && STATE(d) == CON_PLAYING && !PLR_FLAGGED(d->character, PLR_WRITING) && !PRF_FLAGGED(d->character, PRF_NO_CHANNEL_JOINS)) {
@@ -505,7 +505,7 @@ void announce_to_slash_channel(struct slash_channel *chan, const char *messg, ..
 
 // picks a deterministic color based on name
 char compute_slash_channel_color(char *name) {
-	char *colors = "rMBbmcRGYygC";
+	char *colors = "rgbymcaLoYjtRvGBlMCAJpOPTV";
 	char *ptr;
 	int sum = 0;
 	
@@ -667,10 +667,10 @@ void speak_on_slash_channel(char_data *ch, struct slash_channel *chan, char *arg
 		color = (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_SLASH)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_SLASH) : '0';
 
 		if (emote) {
-			sprintf(lbuf, "&%c[&%c/%s&%c%s] $o %s&0", color, chan->color, chan->name, color, invis_string, argument);
+			sprintf(lbuf, "\t%c[\t%c/%s\t%c%s] $o %s\tn", color, chan->color, chan->name, color, invis_string, argument);
 		}
 		else {
-			sprintf(lbuf, "&%c[&%c/%s&%c $o%s]: %s&0", color, chan->color, chan->name, color, invis_string, argument);
+			sprintf(lbuf, "\t%c[\t%c/%s\t%c $o%s]: %s\tn", color, chan->color, chan->name, color, invis_string, argument);
 		}
 		act(lbuf, FALSE, ch, 0, 0, TO_CHAR | TO_SLEEP);
 		
@@ -687,10 +687,10 @@ void speak_on_slash_channel(char_data *ch, struct slash_channel *chan, char *arg
 			color = (!IS_NPC(vict) && GET_CUSTOM_COLOR(vict, CUSTOM_COLOR_SLASH)) ? GET_CUSTOM_COLOR(vict, CUSTOM_COLOR_SLASH) : '0';
 
 			if (emote) {
-				sprintf(lbuf, "&%c[&%c/%s&%c%s] %s %s&0", color, chan->color, chan->name, color, CAN_SEE_NO_DARK(vict, ch) ? invis_string : "", !CAN_SEE_NO_DARK(vict, ch) ? "Someone" : "$o", argument);
+				sprintf(lbuf, "\t%c[\t%c/%s\t%c%s] %s %s\tn", color, chan->color, chan->name, color, CAN_SEE_NO_DARK(vict, ch) ? invis_string : "", !CAN_SEE_NO_DARK(vict, ch) ? "Someone" : "$o", argument);
 			}
 			else {
-				sprintf(lbuf, "&%c[&%c/%s&%c %s%s]: %s&0", color, chan->color, chan->name, color, !CAN_SEE_NO_DARK(vict, ch) ? "Someone" : "$o", CAN_SEE_NO_DARK(vict, ch) ? invis_string : "", argument);
+				sprintf(lbuf, "\t%c[\t%c/%s\t%c %s%s]: %s\tn", color, chan->color, chan->name, color, !CAN_SEE_NO_DARK(vict, ch) ? "Someone" : "$o", CAN_SEE_NO_DARK(vict, ch) ? invis_string : "", argument);
 			}
 
 			act(lbuf, FALSE, ch, 0, vict, TO_VICT | TO_SLEEP | TO_NODARK);
@@ -764,7 +764,7 @@ ACMD(do_slash_channel) {
 		found = FALSE;
 		for (slash = GET_SLASH_CHANNELS(ch); slash; slash = slash->next) {
 			if ((chan = find_slash_channel_by_id(slash->id))) {
-				msg_to_char(ch, "  &%c/%s&0\r\n", chan->color, chan->name);
+				msg_to_char(ch, "  \t%c/%s\tn\r\n", chan->color, chan->name);
 				found = TRUE;
 			}
 		}
@@ -797,7 +797,7 @@ ACMD(do_slash_channel) {
 		found = FALSE;
 		for (slash = GET_SLASH_CHANNELS(vict); slash; slash = slash->next) {
 			if ((chan = find_slash_channel_by_id(slash->id)) && (IS_IMMORTAL(ch) || find_on_slash_channel(ch, slash->id))) {
-				msg_to_char(ch, "  &%c/%s&0\r\n", chan->color, chan->name);
+				msg_to_char(ch, "  \t%c/%s\tn\r\n", chan->color, chan->name);
 				found = TRUE;
 			}
 		}
@@ -857,7 +857,7 @@ ACMD(do_slash_channel) {
 					announce_to_slash_channel(chan, "%s has joined the channel", PERS(ch, ch, TRUE));
 				}
 				else {
-					msg_to_char(ch, "You join &%c/%s&0.\r\n", chan->color, chan->name);
+					msg_to_char(ch, "You join \t%c/%s\tn.\r\n", chan->color, chan->name);
 				}
 			}
 		}
@@ -876,7 +876,7 @@ ACMD(do_slash_channel) {
 				announce_to_slash_channel(chan, "%s has left the channel", PERS(ch, ch, TRUE));
 			}
 			else {
-				msg_to_char(ch, "You leave &%c/%s&0.\r\n", chan->color, chan->name);
+				msg_to_char(ch, "You leave \t%c/%s\tn.\r\n", chan->color, chan->name);
 			}
 			
 			remove_stored_slash_channel(ch, chan->name);
@@ -905,7 +905,7 @@ ACMD(do_slash_channel) {
 			msg_to_char(ch, "You're not even on that channel.\r\n");
 		}
 		else {
-			msg_to_char(ch, "Players on &%c/%s&0:\r\n", chan->color, chan->name);
+			msg_to_char(ch, "Players on \t%c/%s\tn:\r\n", chan->color, chan->name);
 			
 			for (desc = descriptor_list; desc; desc = desc->next) {
 				if (desc->character && !IS_NPC(desc->character) && STATE(desc) == CON_PLAYING && find_on_slash_channel(desc->character, chan->id) && CAN_SEE(ch, desc->character)) {
@@ -923,7 +923,7 @@ ACMD(do_slash_channel) {
 			msg_to_char(ch, "You're not even on that channel.\r\n");
 		}
 		else {
-			msg_to_char(ch, "Last %d messages on &%c/%s&0:\r\n", MAX_RECENT_CHANNELS, chan->color, chan->name);
+			msg_to_char(ch, "Last %d messages on \t%c/%s\tn:\r\n", MAX_RECENT_CHANNELS, chan->color, chan->name);
 	
 			for (hist = slash->history; hist; hist = hist->next) {
 				send_to_char(hist->message, ch);
@@ -965,10 +965,10 @@ ACMD(do_gsay) {
 		}
 		else {
 			if (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_GSAY)) {
-				sprintf(normal, "&%c[gsay %s]: %s&0\r\n", GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_GSAY), PERS(ch, ch, TRUE), argument);
+				sprintf(normal, "\t%c[gsay %s]: %s\tn\r\n", GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_GSAY), PERS(ch, ch, TRUE), argument);
 			}
 			else {
-				sprintf(normal, "[&Ggsay&0 %s]: %s&0\r\n", PERS(ch, ch, TRUE), argument);
+				sprintf(normal, "[\tGgsay\tn %s]: %s\tn\r\n", PERS(ch, ch, TRUE), argument);
 			}
 			
 			send_to_char(normal, ch);
@@ -977,8 +977,8 @@ ACMD(do_gsay) {
 			}
 		}
 
-		sprintf(normal, "[&Ggsay&0 $o]: %s&0", argument);
-		sprintf(custom, "&%%c[gsay $o]: %s&0", double_percents(argument));	// leaves in a %c
+		sprintf(normal, "[\tGgsay\tn $o]: %s\tn", argument);
+		sprintf(custom, "\t%%c[gsay $o]: %s\tn", double_percents(argument));	// leaves in a %c
 
 		// message to the party
 		for (desc = descriptor_list; desc; desc = desc->next) {
@@ -1039,7 +1039,7 @@ ACMD(do_history) {
 			}
 			
 			// send message
-			msg_to_char(ch, "%s&0%s", chd_iter->message, (found_crlf ? "" : "\r\n"));
+			msg_to_char(ch, "%s\tn%s", chd_iter->message, (found_crlf ? "" : "\r\n"));
 		}
 	}
 }
@@ -1160,7 +1160,7 @@ ACMD(do_page) {
 ACMD(do_recolor) {
 	extern const char *custom_color_types[];
 	
-	char *valid_colors = "rgbymcwRGBYMCW0";
+	char *valid_colors = "rgbymcwajloptvnRGBYMCWAJLOPTV0";
 	
 	char arg[MAX_INPUT_LENGTH];
 	int iter, type;
@@ -1176,7 +1176,7 @@ ACMD(do_recolor) {
 		msg_to_char(ch, "Your custom colors are set to:\r\n");
 		for (iter = 0; *custom_color_types[iter] != '\n' && iter < MAX_CUSTOM_COLORS; ++iter) {
 			if (GET_CUSTOM_COLOR(ch, iter)) {
-				msg_to_char(ch, " %s: &&%c\r\n", custom_color_types[iter], GET_CUSTOM_COLOR(ch, iter));
+				msg_to_char(ch, " %s: &\t%c\r\n", custom_color_types[iter], GET_CUSTOM_COLOR(ch, iter));
 			}
 			else {
 				msg_to_char(ch, " %s: not set\r\n", custom_color_types[iter]);
@@ -1194,11 +1194,11 @@ ACMD(do_recolor) {
 		msg_to_char(ch, "You no longer have a custom %s color.\r\n", custom_color_types[type]);
 	}
 	else if (strlen(argument) != 2 || *argument != '&' || !strchr(valid_colors, argument[1])) {
-		msg_to_char(ch, "You must specify a single color code (for example, &&r).\r\n");
+		msg_to_char(ch, "You must specify a single color code (for example, &\tr).\r\n");
 	}
 	else {
 		GET_CUSTOM_COLOR(ch, type) = argument[1];	// store just the color code
-		msg_to_char(ch, "Your %s color is now &%c&&%c&0.\r\n", custom_color_types[type], GET_CUSTOM_COLOR(ch, type), GET_CUSTOM_COLOR(ch, type));
+		msg_to_char(ch, "Your %s color is now \t%c\t&%c\tn.\r\n", custom_color_types[type], GET_CUSTOM_COLOR(ch, type), GET_CUSTOM_COLOR(ch, type));
 	}
 }
 
@@ -1264,7 +1264,7 @@ ACMD(do_say) {
 		}
 		
 		// this leaves in a "%c" used for a color code
-		sprintf(string, "$n says,%s '%s&%%c'&0", buf1, double_percents(argument));
+		sprintf(string, "$n says,%s '%s\t%%c'\tn", buf1, double_percents(argument));
 		
 		for (c = ROOM_PEOPLE(IN_ROOM(ch)); c; c = c->next_in_room) {
 			if (REAL_NPC(c) || ch == c || is_ignoring(ch, ch))
@@ -1276,7 +1276,7 @@ ACMD(do_say) {
 			}
 			
 			color = (!IS_NPC(c) && GET_CUSTOM_COLOR(c, ctype)) ? GET_CUSTOM_COLOR(c, ctype) : '0';
-			msg_to_char(c, "&%c", color);
+			msg_to_char(c, "\t%c", color);
 			
 			sprintf(buf, string, color);
 			act(buf, FALSE, ch, 0, c, TO_VICT | DG_NO_TRIG);
@@ -1284,7 +1284,7 @@ ACMD(do_say) {
 			// channel history
 			if (c->desc && c->desc->last_act_message) {
 				// the message was sent via act(), we can retrieve it from the desc
-				sprintf(lbuf, "&%c%s", color, c->desc->last_act_message);
+				sprintf(lbuf, "\t%c%s", color, c->desc->last_act_message);
 				add_to_channel_history(c->desc, CHANNEL_HISTORY_SAY, lbuf);
 			}
 		}
@@ -1294,7 +1294,7 @@ ACMD(do_say) {
 		else {
 			delete_doubledollar(argument);
 			color = (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, ctype)) ? GET_CUSTOM_COLOR(ch, ctype) : '0';
-			sprintf(lbuf, "&%cYou say,%s '%s&%c'&0\r\n", color, buf1, argument, color);
+			sprintf(lbuf, "\t%cYou say,%s '%s\t%c'\tn\r\n", color, buf1, argument, color);
 			send_to_char(lbuf, ch);
 
 			if (ch->desc) {
