@@ -378,6 +378,8 @@ static void want_reduced_color_clean(descriptor_data *desc) {
 		return;
 	}
 	desc->color.want_clean = TRUE;
+	*desc->color.want_fg = '\0';
+	*desc->color.want_bg = '\0';
 }
 
 
