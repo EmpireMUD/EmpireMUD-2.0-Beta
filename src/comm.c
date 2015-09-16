@@ -304,7 +304,7 @@ static void msdp_update(void) {
 			buf_size = 0;
 			for (aff = ch->affected; aff; aff = aff->next) {
 				if (!strstr(buf, affect_types[aff->type])) {
-					buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%d", (char)MSDP_VAR, affect_types[aff->type], (char)MSDP_VAR, aff->duration * SECS_PER_REAL_UPDATE);
+					buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%d", (char)MSDP_VAR, affect_types[aff->type], (char)MSDP_VAL, aff->duration * SECS_PER_REAL_UPDATE);
 				}
 			}
 			MSDPSetTable(d, eMSDP_AFFECTS, buf);
