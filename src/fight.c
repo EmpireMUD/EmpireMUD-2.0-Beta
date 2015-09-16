@@ -652,8 +652,8 @@ int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, i
 			// require at least half of the magical resistance requirement to reduce any
 			if (use_resist > max_resist / 2) {
 				use_resist = MIN(use_resist, max_resist);
-				resist_prc = ((double) use_resist - (max_resist/2.0)) / (max_resist / 2.0);
-				dam = (int) round(dam * (1.0 - resist_prc));
+				resist_prc = ((double) use_resist - (max_resist/2.0)) / (max_resist / 2.0);	
+				dam = (int) round(dam * (1.0 - (resist_prc / 4.0))); // at 1.0 resist_prc, it reduces damage by 25% (1/4)
 			}
 		}
 	
