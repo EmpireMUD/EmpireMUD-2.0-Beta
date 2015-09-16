@@ -409,7 +409,7 @@ static char *flush_reduced_color_codes(descriptor_data *desc) {
 		return output;
 	}
 	
-	if (desc->color.want_clean && !desc->color.is_clean) {
+	if (desc->color.want_clean) {
 		strcat(output, s_Clean);
 		desc->color.is_clean = TRUE;
 		desc->color.want_clean = FALSE;
