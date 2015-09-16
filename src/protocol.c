@@ -331,6 +331,9 @@ static const char s_Underline[] = "\033[4m";	// underline
 * this for foreground, background, or both. The color strings passed here
 * should be like "\033[0;31m", not internal "\tr" or "&r" codes.
 *
+* Use want_reduced_color_clean() and want_reduced_color_underline() instead
+* for &0, &n, &u.
+*
 * @param descriptor_data *desc The connection getting the color code.
 * @param const char *fg The foreground color string requested (NULL if only doing bg).
 * @param const char *bg The background color string requested (NULL if only doing fg).
@@ -340,19 +343,41 @@ static void want_reduced_color_codes(descriptor_data *desc, const char *fg, cons
 		return;
 	}
 	
-	// will use this color only if it doesn't match the last one they received
-	// in the case of sending s_Clean, we will want to do that if there was an underline or a background too
-	if (fg && *fg && (*desc->color.want_fg || strcmp(fg, desc->color.last_fg) || (!strcmp(fg, s_Clean) && (desc->color.is_underline || *desc->color.last_bg)))) {
-		// is it a clear code (will cancel underline and backgrounds)
-		if (!strcmp(fg, s_Clean)) {
-			desc->color.want_underline = FALSE;
-			*desc->color.want_bg = '\0';
+	if (fg && *fg) {
+		// check if they asked for &0 but are repeating the same colors: requesting the same fg as before, (there wasn't a bg or they're requesting the same bg), (there wasn't an underline or they are requesting the same underline)
+		if (desc->color.want_clean && !strcmp(fg, desc->color.last_fg) && (!*desc->color.last_bg || !strcmp(desc->color.want_bg, desc->color.last_bg)) && (!desc->color.is_underline || desc->color.want_underline == desc->color.is_underline)) {
+			// cancel the clean; don't need a new want
+			desc->color.want_clean = FALSE;
 		}
-		snprintf(desc->color.want_fg, COLREDUC_SIZE, "%s", fg);
+		// this happens even if the last one triggered
+		if (strcmp(fg, desc->color.want_fg) && (*desc->color.want_fg || strcmp(fg, desc->color.last_fg) || desc->color.want_clean)) {
+			snprintf(desc->color.want_fg, COLREDUC_SIZE, "%s", fg);
+		}
 	}
-	if (bg && *bg && (*desc->color.want_bg || strcmp(bg, desc->color.last_bg))) {
-		snprintf(desc->color.want_bg, COLREDUC_SIZE, "%s", bg);
+	if (bg && *bg) {
+		// check if they asked for &0 but are repeating the same colors: requesting the same bg as before, (there wasn't a fg or they're requesting the same fg), (there wasn't an underline or they are requesting the same underline)
+		if (desc->color.want_clean && !strcmp(bg, desc->color.last_bg) && (!*desc->color.last_fg || !strcmp(desc->color.want_fg, desc->color.last_fg)) && (!desc->color.is_underline || desc->color.want_underline == desc->color.is_underline)) {
+			// cancel the clean; don't need a new want
+			desc->color.want_clean = FALSE;
+		}
+		// this happens even if the last one triggered
+		if (strcmp(bg, desc->color.want_bg) && (*desc->color.want_bg || strcmp(bg, desc->color.last_bg) || desc->color.want_clean)) {
+			snprintf(desc->color.want_bg, COLREDUC_SIZE, "%s", bg);
+		}
 	}
+}
+
+
+/**
+* Signals that the output is requesting a &0 or &n color terminator.
+*
+* @param descriptor_data *desc The connection getting the clean-color.
+*/
+static void want_reduced_color_clean(descriptor_data *desc) {
+	if (!desc) {
+		return;
+	}
+	desc->color.want_clean = TRUE;
 }
 
 
@@ -384,26 +409,32 @@ static char *flush_reduced_color_codes(descriptor_data *desc) {
 		return output;
 	}
 	
-	// always do fg first because a s_Clean code could wipe out background and underline
-	if (*desc->color.want_fg) {
-		// are we sending a clear code that will cancel underline?
-		if (!strcmp(desc->color.want_fg, s_Clean)) {
-			desc->color.is_underline = FALSE;
-		}
+	if (desc->color.want_clean) {
+		strcat(output, s_Clean);
+		desc->color.is_clean = TRUE;
+		desc->color.want_clean = TRUE;
+		desc->color.is_underline = FALSE;
+		*desc->color.last_fg = '\0';
+		*desc->color.last_bg = '\0';
+	}
 	
+	if (*desc->color.want_fg) {
 		strcat(output, desc->color.want_fg);
 		strcpy(desc->color.last_fg, desc->color.want_fg);
 		*desc->color.want_fg = '\0';
+		desc->color.is_clean = FALSE;
 	}
 	if (*desc->color.want_bg) {
 		strcat(output, desc->color.want_bg);
 		strcpy(desc->color.last_bg, desc->color.want_bg);
 		*desc->color.want_bg = '\0';
+		desc->color.is_clean = FALSE;
 	}
 	if (desc->color.want_underline) {
 		strcat(output, s_Underline);
 		desc->color.is_underline = TRUE;
 		desc->color.want_underline = FALSE;
+		desc->color.is_clean = FALSE;
 	}
 	
 	return output;
@@ -669,7 +700,7 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 					break;
 				case 'n':
 				case '0':
-					want_reduced_color_codes(apDescriptor, s_Clean, NULL);
+					want_reduced_color_clean(apDescriptor);
 					break;
 				case 'u': // underline
 					want_reduced_color_underline(apDescriptor);
@@ -950,7 +981,7 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 				}
 				case 'n':
 				case '0':
-					want_reduced_color_codes(apDescriptor, s_Clean, NULL);
+					want_reduced_color_clean(apDescriptor);
 					break;
 				case 'u': // underline
 					want_reduced_color_underline(apDescriptor);

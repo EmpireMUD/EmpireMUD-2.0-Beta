@@ -2111,8 +2111,10 @@ struct color_reducer {
 	char last_fg[COLREDUC_SIZE];	// last sent foreground
 	char last_bg[COLREDUC_SIZE];	//   " background
 	bool is_underline;	// TRUE if an underline was sent
+	bool is_clean;	// TRUE if a clean code was sent
 	char want_fg[COLREDUC_SIZE];	// last requested (not yet sent) foreground
 	char want_bg[COLREDUC_SIZE];	//   " background
+	bool want_clean;	// TRUE if an &0 or &n color-terminator was requested
 	bool want_underline;	// TRUE if an underline was requested
 };
 

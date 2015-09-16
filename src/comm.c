@@ -1624,9 +1624,11 @@ void init_descriptor(descriptor_data *newd, int desc) {
 	// ensure clean data
 	*newd->color.last_fg = '\0';
 	*newd->color.last_bg = '\0';
+	newd->color.is_clean = FALSE;
 	newd->color.is_underline = FALSE;
 	*newd->color.want_fg = '\0';
 	*newd->color.want_bg = '\0';
+	newd->color.want_clean = FALSE;
 	newd->color.want_underline = FALSE;
 	
 	if (++last_desc == 1000)
