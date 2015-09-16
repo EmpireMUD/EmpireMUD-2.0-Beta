@@ -598,7 +598,8 @@ EmpireMUD supports the following MSDP variables:
  BLOOD_MAX - Maximum blood pool
  BLOOD_UPKEEP - Blood cost per game hour
 
- AFFECTS - Table of current affects and durations
+ AFFECTS - Table of current affects and durations (seconds)
+ COOLDOWNS - Table of cooldowns and their time remaining (seconds)
  LEVEL - Total level
  SKILL_LEVEL - Skill level
  GEAR_LEVEL - Gear level
