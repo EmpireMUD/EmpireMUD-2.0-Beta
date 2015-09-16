@@ -268,10 +268,12 @@ static void msdp_update(void) {
 	extern int total_bonus_healing(char_data *ch);
 	extern int get_total_score(empire_data *emp);
 	extern const char *affect_types[];
+	extern const char *cooldown_types[];
 	extern const double hit_per_dex;
 	extern const char *seasons[];
 	
 	char buf[MAX_STRING_LENGTH];
+	struct cooldown_data *cool;
 	char_data *ch, *pOpponent;
 	struct affected_type *aff;
 	descriptor_data *d;
@@ -300,6 +302,7 @@ static void msdp_update(void) {
 			MSDPSetNumber(d, eMSDP_BLOOD_MAX, GET_MAX_BLOOD(ch));
 			MSDPSetNumber(d, eMSDP_BLOOD_UPKEEP, get_blood_upkeep_cost(ch));
 			
+			// affects
 			*buf = '\0';
 			buf_size = 0;
 			for (aff = ch->affected; aff; aff = aff->next) {
@@ -308,6 +311,16 @@ static void msdp_update(void) {
 				}
 			}
 			MSDPSetTable(d, eMSDP_AFFECTS, buf);
+			
+			// cooldowns
+			*buf = '\0';
+			buf_size = 0;
+			for (cool = ch->cooldowns; cool; cool = cool->next) {
+				if (cool->expire_time > time(0)) {
+					buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%ld", (char)MSDP_VAR, cooldown_types[cool->type], (char)MSDP_VAL, cool->expire_time - time(0));
+				}
+			}
+			MSDPSetTable(d, eMSDP_COOLDOWNS, buf);
 			
 			MSDPSetNumber(d, eMSDP_LEVEL, get_approximate_level(ch));
 			MSDPSetNumber(d, eMSDP_SKILL_LEVEL, IS_NPC(ch) ? 0 : GET_SKILL_LEVEL(ch));
