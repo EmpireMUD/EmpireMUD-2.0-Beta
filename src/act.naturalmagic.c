@@ -308,7 +308,7 @@ ACMD(do_cleanse) {
 			if (!done_aff && (bitv = aff->bitvector) != NOBITS) {
 				// check each bit
 				for (pos = 0; bitv && !done_aff; ++pos, bitv >>= 1) {
-					if (IS_SET(bitv, BIT(1)) && aff_is_bad[pos]) {
+					if (IS_SET(bitv, BIT(0)) && aff_is_bad[pos]) {
 						affect_remove(vict, aff);
 						done_aff = TRUE;
 					}
