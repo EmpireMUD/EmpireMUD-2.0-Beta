@@ -12,13 +12,13 @@
 
 /******************************************************************************
  Protocol snippet by KaVir.  Released into the public domain in February 2011.
- Updates and fixes to this snippet by Paul Clarke, including the repeat color
- code reduction.
 
  In case this is not legally possible:
-
  The copyright holder grants any entity the right to use this work for any 
  purpose, without any conditions, unless such conditions are required by law.
+ 
+ Updates and fixes to this snippet by Paul Clarke, including the repeat color
+ code reduction.
  *****************************************************************************/
 
 #include <alloca.h>
