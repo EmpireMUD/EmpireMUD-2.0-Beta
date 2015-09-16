@@ -412,7 +412,7 @@ static char *flush_reduced_color_codes(descriptor_data *desc) {
 	if (desc->color.want_clean) {
 		strcat(output, s_Clean);
 		desc->color.is_clean = TRUE;
-		desc->color.want_clean = TRUE;
+		desc->color.want_clean = FALSE;
 		desc->color.is_underline = FALSE;
 		*desc->color.last_fg = '\0';
 		*desc->color.last_bg = '\0';
