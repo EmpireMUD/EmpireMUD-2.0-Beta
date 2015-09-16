@@ -12,6 +12,8 @@
 
 /******************************************************************************
  Protocol snippet by KaVir.  Released into the public domain in February 2011.
+ Updates and fixes to this snippet by Paul Clarke, including the repeat color
+ code reduction.
 
  In case this is not legally possible:
 
