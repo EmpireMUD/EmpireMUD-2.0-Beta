@@ -483,6 +483,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 				// to play around with it, be sure to test -- the math is not
 				// very straightforward. -paul
 				wide = MIN(wide, ((ch->desc->pProtocol->ScreenHeight - 7) / 2) - 1);	// the -1 at the end is to ensure even/odd numbers have an extra line rather than one too few
+				wide = MAX(wide, 1);	// otherwise, NAWS sometimes leads to a map with only the player
 			}
 			mapsize = MIN(wide, max_size);
 		}
