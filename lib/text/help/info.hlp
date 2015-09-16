@@ -599,6 +599,8 @@ EmpireMUD supports the following MSDP variables:
  BLOOD_UPKEEP - Blood cost per game hour
 
  AFFECTS - Table of current affects and durations (seconds)
+ DOTS - Damage Over Time affects in nested table format with:
+    Dot Name => (DURATION, TYPE, DAMAGE, STACKS)
  COOLDOWNS - Table of cooldowns and their time remaining (seconds)
  LEVEL - Total level
  SKILL_LEVEL - Skill level

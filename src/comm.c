@@ -269,9 +269,11 @@ static void msdp_update(void) {
 	extern int get_total_score(empire_data *emp);
 	extern const char *affect_types[];
 	extern const char *cooldown_types[];
+	extern const char *damage_types[];
 	extern const double hit_per_dex;
 	extern const char *seasons[];
 	
+	struct over_time_effect_type *dot;
 	char buf[MAX_STRING_LENGTH];
 	struct cooldown_data *cool;
 	char_data *ch, *pOpponent;
@@ -306,11 +308,27 @@ static void msdp_update(void) {
 			*buf = '\0';
 			buf_size = 0;
 			for (aff = ch->affected; aff; aff = aff->next) {
-				if (!strstr(buf, affect_types[aff->type])) {
-					buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%d", (char)MSDP_VAR, affect_types[aff->type], (char)MSDP_VAL, aff->duration * SECS_PER_REAL_UPDATE);
-				}
+				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%d", (char)MSDP_VAR, affect_types[aff->type], (char)MSDP_VAL, (aff->duration == UNLIMITED ? -1 : (aff->duration * SECS_PER_REAL_UPDATE)));
 			}
 			MSDPSetTable(d, eMSDP_AFFECTS, buf);
+			
+			// dots
+			*buf = '\0';
+			buf_size = 0;
+			for (dot = ch->over_time_effects; dot; dot = dot->next) {
+				// each dot has a sub-table
+				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%c", (char)MSDP_VAR, affect_types[dot->type], (char)MSDP_VAL, (char)MSDP_TABLE_OPEN);
+				
+				
+				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cDURATION%c%d", (char)MSDP_VAR, (char)MSDP_VAL, (dot->duration == UNLIMITED ? -1 : (dot->duration * SECS_PER_REAL_UPDATE)));
+				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cTYPE%c%s", (char)MSDP_VAR, (char)MSDP_VAL, damage_types[dot->damage_type]);
+				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cDAMAGE%c%d", (char)MSDP_VAR, (char)MSDP_VAL, dot->damage * dot->stack);
+				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cSTACKS%c%d", (char)MSDP_VAR, (char)MSDP_VAL, dot->stack);
+				
+				// end table
+				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c", (char)MSDP_TABLE_CLOSE);
+			}
+			MSDPSetTable(d, eMSDP_DOTS, buf);
 			
 			// cooldowns
 			*buf = '\0';
@@ -384,7 +402,7 @@ static void msdp_update(void) {
 			snprintf(buf, sizeof(buf), "%.2f", IS_NPC(ch) ? 0.0 : GET_SKILL_EXP(ch, SKILL_VAMPIRE));
 			MSDPSetString(d, eMSDP_VAMPIRE_EXP, buf);
 			
-			// empre
+			// empire
 			if (GET_LOYALTY(ch) && !IS_NPC(ch)) {
 				MSDPSetString(d, eMSDP_EMPIRE_NAME, EMPIRE_NAME(GET_LOYALTY(ch)));
 				MSDPSetString(d, eMSDP_EMPIRE_ADJECTIVE, EMPIRE_ADJECTIVE(GET_LOYALTY(ch)));
