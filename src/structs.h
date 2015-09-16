@@ -1573,6 +1573,7 @@ typedef struct trig_data trig_data;
 #define MAX_SKILL_RESETS  10	// number of skill resets you can save up
 #define MAX_STORAGE  1000000	// empire storage cap, must be < MAX_INT
 #define MAX_STRING_LENGTH  8192
+#define COLREDUC_SIZE  80	// how many characters long a color_reducer string can be
 
 
 // limits used in char_file_u -- **DO NOT CHANGE** (without a pconvert)
@@ -2105,6 +2106,17 @@ struct txt_q {
 };
 
 
+// for descriptor_data, reducing the number of color codes sent to a client
+struct color_reducer {
+	char last_fg[COLREDUC_SIZE];	// last sent foreground
+	char last_bg[COLREDUC_SIZE];	//   " background
+	bool is_underline;	// TRUE if an underline was sent
+	char want_fg[COLREDUC_SIZE];	// last requested (not yet sent) foreground
+	char want_bg[COLREDUC_SIZE];	//   " background
+	bool want_underline;	// TRUE if an underline was requested
+};
+
+
 // descriptors -- the connection to the game
 struct descriptor_data {
 	socket_t descriptor;	// file descriptor for socket
@@ -2122,6 +2134,7 @@ struct descriptor_data {
 	int showstr_page;	// which page are we currently showing?
 	
 	protocol_t *pProtocol; // see protocol.c
+	struct color_reducer color;
 	
 	char **str;	// for the modify-str system
 	char *backstr;	// for the modify-str aborts
@@ -2143,7 +2156,6 @@ struct descriptor_data {
 	bool data_left_to_write;	// indicates there is more data to write, to prevent an extra crlf
 	struct txt_block *large_outbuf;	// ptr to large buffer, if we need it
 	struct txt_q input;	// q of unprocessed input
-	char last_color_sent;  // the last color code that actually transmitted
 
 	char_data *character;	// linked to char
 	char_data *original;	// original char if switched

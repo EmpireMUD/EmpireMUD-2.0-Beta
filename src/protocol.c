@@ -321,6 +321,95 @@ static const char s_BackWhite[] = "\033[1;47m";	// White background
 
 static const char s_Underline[] = "\033[4m";	// underline
 
+
+/******************************************************************************
+ Color reduction system: reduce number of color codes sent.
+ *****************************************************************************/
+
+/**
+* Signals the system that the output is requesting a color code. You can call
+* this for foreground, background, or both. The color strings passed here
+* should be like "\033[0;31m", not internal "\tr" or "&r" codes.
+*
+* @param descriptor_data *desc The connection getting the color code.
+* @param const char *fg The foreground color string requested (NULL if only doing bg).
+* @param const char *bg The background color string requested (NULL if only doing fg).
+*/
+static void want_reduced_color_codes(descriptor_data *desc, const char *fg, const char *bg) {
+	if (!desc) {
+		return;
+	}
+	
+	// will use this color only if it doesn't match the last one they received
+	// in the case of sending s_Clean, we will want to do that if there was an underline or a background too
+	if (fg && *fg && (*desc->color.want_fg || strcmp(fg, desc->color.last_fg) || (!strcmp(fg, s_Clean) && (desc->color.is_underline || *desc->color.last_bg)))) {
+		// is it a clear code (will cancel underline and backgrounds)
+		if (!strcmp(fg, s_Clean)) {
+			desc->color.want_underline = FALSE;
+			*desc->color.want_bg = '\0';
+		}
+		snprintf(desc->color.want_fg, COLREDUC_SIZE, "%s", fg);
+	}
+	if (bg && *bg && (*desc->color.want_bg || strcmp(bg, desc->color.last_bg))) {
+		snprintf(desc->color.want_bg, COLREDUC_SIZE, "%s", bg);
+	}
+}
+
+
+/**
+* Signals that the output is requesting an underline.
+*
+* @param descriptor_data *desc The connection getting the underline.
+*/
+static void want_reduced_color_underline(descriptor_data *desc) {
+	if (!desc) {
+		return;
+	}
+	desc->color.want_underline = TRUE;
+}
+
+
+/**
+* This indicates that we're ready to send all requested color codes, and mark
+* them as sent.
+*
+* @param descriptor_data *desc The person who is getting color codes.
+* @return char* The string of rendered color codes to send.
+*/
+static char *flush_reduced_color_codes(descriptor_data *desc) {
+	static char output[COLREDUC_SIZE * 3 + 1];	// guarantee enough room
+	*output = '\0';
+	
+	if (!desc) {
+		return output;
+	}
+	
+	// always do fg first because a s_Clean code could wipe out background and underline
+	if (*desc->color.want_fg) {
+		// are we sending a clear code that will cancel underline?
+		if (!strcmp(desc->color.want_fg, s_Clean)) {
+			desc->color.is_underline = FALSE;
+		}
+	
+		strcat(output, desc->color.want_fg);
+		strcpy(desc->color.last_fg, desc->color.want_fg);
+		*desc->color.want_fg = '\0';
+	}
+	if (*desc->color.want_bg) {
+		strcat(output, desc->color.want_bg);
+		strcpy(desc->color.last_bg, desc->color.want_bg);
+		*desc->color.want_bg = '\0';
+	}
+	if (desc->color.want_underline) {
+		strcat(output, s_Underline);
+		desc->color.is_underline = TRUE;
+		desc->color.want_underline = FALSE;
+	}
+	
+	return output;
+}
+
+
 /******************************************************************************
  Protocol global functions.
  *****************************************************************************/
@@ -561,9 +650,6 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 	#endif /* COLOUR_CHAR */
 	bool_t bTerminate = false, bUseMXP = false, bUseMSP = false;
 	int i = 0, j = 0; /* Index values */
-	char lastColor[64];
-	
-	*lastColor = '\0';
 
 	protocol_t *pProtocol = apDescriptor ? apDescriptor->pProtocol : NULL;
 	if (pProtocol == NULL || apData == NULL)
@@ -583,94 +669,94 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 					break;
 				case 'n':
 				case '0':
-					pCopyFrom = s_Clean;
+					want_reduced_color_codes(apDescriptor, s_Clean, NULL);
 					break;
 				case 'u': // underline
-					pCopyFrom = s_Underline;
+					want_reduced_color_underline(apDescriptor);
 					break;
 				case 'r': /* dark red */
-					pCopyFrom = ColourRGB(apDescriptor, "F300");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F300"), NULL);
 					break;
 				case 'R': /* light red */
-					pCopyFrom = ColourRGB(apDescriptor, "F500");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F500"), NULL);
 					break;
 				case 'g': /* dark green */
-					pCopyFrom = ColourRGB(apDescriptor, "F030");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F030"), NULL);
 					break;
 				case 'G': /* light green */
-					pCopyFrom = ColourRGB(apDescriptor, "F050");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F050"), NULL);
 					break;
 				case 'y': /* dark yellow */
-					pCopyFrom = ColourRGB(apDescriptor, "F330");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F330"), NULL);
 					break;
 				case 'Y': /* light yellow */
-					pCopyFrom = ColourRGB(apDescriptor, "F550");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F550"), NULL);
 					break;
 				case 'b': /* dark blue */
-					pCopyFrom = ColourRGB(apDescriptor, "F003");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F003"), NULL);
 					break;
 				case 'B': /* light blue */
-					pCopyFrom = ColourRGB(apDescriptor, "F005");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F005"), NULL);
 					break;
 				case 'm': /* dark magenta */
-					pCopyFrom = ColourRGB(apDescriptor, "F303");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F303"), NULL);
 					break;
 				case 'M': /* light magenta */
-					pCopyFrom = ColourRGB(apDescriptor, "F505");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F505"), NULL);
 					break;
 				case 'c': /* dark cyan */
-					pCopyFrom = ColourRGB(apDescriptor, "F033");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F033"), NULL);
 					break;
 				case 'C': /* light cyan */
-					pCopyFrom = ColourRGB(apDescriptor, "F055");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F055"), NULL);
 					break;
 				case 'w': /* dark white */
-					pCopyFrom = ColourRGB(apDescriptor, "F222");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F222"), NULL);
 					break;
 				case 'W': /* light white */
-					pCopyFrom = ColourRGB(apDescriptor, "F555");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F555"), NULL);
 					break;
 				case 'a': /* dark azure */
-					pCopyFrom = ColourRGB(apDescriptor, "F014");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F014"), NULL);
 					break;
 				case 'A': /* light azure */
-					pCopyFrom = ColourRGB(apDescriptor, "F025");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F025"), NULL);
 					break;
 				case 'j': /* dark jade */
-					pCopyFrom = ColourRGB(apDescriptor, "F031");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F031"), NULL);
 					break;
 				case 'J': /* light jade */
-					pCopyFrom = ColourRGB(apDescriptor, "F052");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F052"), NULL);
 					break;
 				case 'l': /* dark lime */
-					pCopyFrom = ColourRGB(apDescriptor, "F140");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F140"), NULL);
 					break;
 				case 'L': /* light lime */
-					pCopyFrom = ColourRGB(apDescriptor, "F250");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F250"), NULL);
 					break;
 				case 'o': /* dark orange */
-					pCopyFrom = ColourRGB(apDescriptor, "F520");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F520"), NULL);
 					break;
 				case 'O': /* light orange */
-					pCopyFrom = ColourRGB(apDescriptor, "F530");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F530"), NULL);
 					break;
 				case 'p': /* dark pink */
-					pCopyFrom = ColourRGB(apDescriptor, "F301");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F301"), NULL);
 					break;
 				case 'P': /* light pink */
-					pCopyFrom = ColourRGB(apDescriptor, "F502");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F502"), NULL);
 					break;
 				case 't': /* dark tan */
-					pCopyFrom = ColourRGB(apDescriptor, "F210");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F210"), NULL);
 					break;
 				case 'T': /* light tan */
-					pCopyFrom = ColourRGB(apDescriptor, "F321");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F321"), NULL);
 					break;
 				case 'v': /* dark violet */
-					pCopyFrom = ColourRGB(apDescriptor, "F104");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F104"), NULL);
 					break;
 				case 'V': /* light violet */
-					pCopyFrom = ColourRGB(apDescriptor, "F205");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F205"), NULL);
 					break;
 				case '(': /* MXP link */
 					if (!pProtocol->bBlockMXP && pProtocol->pVariables[eMSDP_MXP]->ValueInt)
@@ -763,7 +849,12 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 							ReportBug(BugString);
 						}
 						else {	// Success
-							pCopyFrom = ColourRGB(apDescriptor, Buffer);
+							if (tolower(Buffer[0]) == 'b') {	// background
+								want_reduced_color_codes(apDescriptor, NULL, ColourRGB(apDescriptor, Buffer));
+							}
+							else {	// foreground
+								want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, Buffer), NULL);
+							}
 						}
 					}
 					else if (tolower(apData[j]) == 'x') {
@@ -828,9 +919,15 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 					break;
 			}
 
-			/* Copy the colour code, if any. */
-			if (pCopyFrom != NULL && strcmp(pCopyFrom, lastColor)) {
-				strcpy(lastColor, pCopyFrom);
+			// Copy the output, if any
+			if (pCopyFrom != NULL) {
+				// display and flush color codes
+				const char *temp = flush_reduced_color_codes(apDescriptor);
+				while (*temp != '\0' && i < MAX_OUTPUT_BUFFER) {
+					Result[i++] = *temp++;
+				}
+				
+				// requested output
 				while (*pCopyFrom != '\0' && i < MAX_OUTPUT_BUFFER) {
 					Result[i++] = *pCopyFrom++;
 				}
@@ -840,6 +937,7 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 		#ifdef COLOUR_CHAR
 		else if (bColourOn && apData[j] == COLOUR_CHAR) {
 			const char *pCopyFrom = NULL;
+			char storage[8];
 
 			switch (apData[++j]) {
 				case COLOUR_CHAR: /* Two in a row display the actual character */
@@ -852,94 +950,94 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 				}
 				case 'n':
 				case '0':
-					pCopyFrom = s_Clean;
+					want_reduced_color_codes(apDescriptor, s_Clean, NULL);
 					break;
 				case 'u': // underline
-					pCopyFrom = s_Underline;
+					want_reduced_color_underline(apDescriptor);
 					break;
 				case 'r': /* dark red */
-					pCopyFrom = ColourRGB(apDescriptor, "F300");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F300"), NULL);
 					break;
 				case 'R': /* light red */
-					pCopyFrom = ColourRGB(apDescriptor, "F500");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F500"), NULL);
 					break;
 				case 'g': /* dark green */
-					pCopyFrom = ColourRGB(apDescriptor, "F030");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F030"), NULL);
 					break;
 				case 'G': /* light green */
-					pCopyFrom = ColourRGB(apDescriptor, "F050");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F050"), NULL);
 					break;
 				case 'y': /* dark yellow */
-					pCopyFrom = ColourRGB(apDescriptor, "F330");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F330"), NULL);
 					break;
 				case 'Y': /* light yellow */
-					pCopyFrom = ColourRGB(apDescriptor, "F550");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F550"), NULL);
 					break;
 				case 'b': /* dark blue */
-					pCopyFrom = ColourRGB(apDescriptor, "F003");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F003"), NULL);
 					break;
 				case 'B': /* light blue */
-					pCopyFrom = ColourRGB(apDescriptor, "F005");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F005"), NULL);
 					break;
 				case 'm': /* dark magenta */
-					pCopyFrom = ColourRGB(apDescriptor, "F303");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F303"), NULL);
 					break;
 				case 'M': /* light magenta */
-					pCopyFrom = ColourRGB(apDescriptor, "F505");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F505"), NULL);
 					break;
 				case 'c': /* dark cyan */
-					pCopyFrom = ColourRGB(apDescriptor, "F033");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F033"), NULL);
 					break;
 				case 'C': /* light cyan */
-					pCopyFrom = ColourRGB(apDescriptor, "F055");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F055"), NULL);
 					break;
 				case 'w': /* dark white */
-					pCopyFrom = ColourRGB(apDescriptor, "F222");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F222"), NULL);
 					break;
 				case 'W': /* light white */
-					pCopyFrom = ColourRGB(apDescriptor, "F555");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F555"), NULL);
 					break;
 				case 'a': /* dark azure */
-					pCopyFrom = ColourRGB(apDescriptor, "F014");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F014"), NULL);
 					break;
 				case 'A': /* light azure */
-					pCopyFrom = ColourRGB(apDescriptor, "F025");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F025"), NULL);
 					break;
 				case 'j': /* dark jade */
-					pCopyFrom = ColourRGB(apDescriptor, "F031");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F031"), NULL);
 					break;
 				case 'J': /* light jade */
-					pCopyFrom = ColourRGB(apDescriptor, "F052");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F052"), NULL);
 					break;
 				case 'l': /* dark lime */
-					pCopyFrom = ColourRGB(apDescriptor, "F140");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F140"), NULL);
 					break;
 				case 'L': /* light lime */
-					pCopyFrom = ColourRGB(apDescriptor, "F250");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F250"), NULL);
 					break;
 				case 'o': /* dark orange */
-					pCopyFrom = ColourRGB(apDescriptor, "F520");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F520"), NULL);
 					break;
 				case 'O': /* light orange */
-					pCopyFrom = ColourRGB(apDescriptor, "F530");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F530"), NULL);
 					break;
 				case 'p': /* dark pink */
-					pCopyFrom = ColourRGB(apDescriptor, "F301");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F301"), NULL);
 					break;
 				case 'P': /* light pink */
-					pCopyFrom = ColourRGB(apDescriptor, "F502");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F502"), NULL);
 					break;
 				case 't': /* dark tan */
-					pCopyFrom = ColourRGB(apDescriptor, "F210");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F210"), NULL);
 					break;
 				case 'T': /* light tan */
-					pCopyFrom = ColourRGB(apDescriptor, "F321");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F321"), NULL);
 					break;
 				case 'v': /* dark violet */
-					pCopyFrom = ColourRGB(apDescriptor, "F104");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F104"), NULL);
 					break;
 				case 'V': /* light violet */
-					pCopyFrom = ColourRGB(apDescriptor, "F205");
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F205"), NULL);
 					break;
 				case '\0':
 					bTerminate = true;
@@ -964,28 +1062,40 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 									bValid = false;
 							}
 
-							if (bDone && bValid && IsValidColour(Buffer))
-								pCopyFrom = ColourRGB(apDescriptor, Buffer);
+							if (bDone && bValid && IsValidColour(Buffer)) {
+								if (tolower(Buffer[0]) == 'b') {	// background
+									want_reduced_color_codes(apDescriptor, NULL, ColourRGB(apDescriptor, Buffer));
+								}
+								else {	// foreground
+									want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, Buffer), NULL);
+								}
+							}
 						}
 					}
 					else {	// not allowed
-						Result[i++] = COLOUR_CHAR;
-						Result[i++] = apData[j];
+						sprintf(storage, "%c%c", COLOUR_CHAR, apData[j]);
+						pCopyFrom = storage;
 					}
 					break;
 				}
 
 				default:
 					#ifdef DISPLAY_INVALID_COLOUR_CODES
-						Result[i++] = COLOUR_CHAR;
-						Result[i++] = apData[j];
+						sprintf(storage, "%c%c", COLOUR_CHAR, apData[j]);
+						pCopyFrom = storage;
 					#endif /* DISPLAY_INVALID_COLOUR_CODES */
 					break;
 				}
 
-			/* Copy the colour code, if any. */
-			if (pCopyFrom != NULL && (pCopyFrom == ColourChar || strcmp(pCopyFrom, lastColor))) {
-				strcpy(lastColor, pCopyFrom);
+			// Copy the output, if any
+			if (pCopyFrom != NULL) {
+				// display and flush color codes
+				const char *temp = flush_reduced_color_codes(apDescriptor);
+				while (*temp != '\0' && i < MAX_OUTPUT_BUFFER) {
+					Result[i++] = *temp++;
+				}
+				
+				// show requested output
 				while (*pCopyFrom != '\0' && i < MAX_OUTPUT_BUFFER) {
 					Result[i++] = *pCopyFrom++;
 				}
@@ -1004,6 +1114,13 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 			Result[i++] = '?';
 		}
 		else {	// Just copy the character normally
+			// display and flush color codes
+			const char *temp = flush_reduced_color_codes(apDescriptor);
+			while (*temp != '\0' && i < MAX_OUTPUT_BUFFER) {
+				Result[i++] = *temp++;
+			}
+			
+			// copy the character
 			Result[i++] = apData[j];
 		}
 	}
