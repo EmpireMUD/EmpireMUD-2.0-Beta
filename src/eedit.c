@@ -287,7 +287,7 @@ EEDIT(eedit_banner) {
 		msg_to_char(ch, "Set the empire banner to what (HELP COLOR)?\r\n");
 	}
 	else if (!check_banner_color_string(argument)) {
-		msg_to_char(ch, "Invalid banner color (HELP COLOR).\r\n");
+		msg_to_char(ch, "Invalid banner color (HELP COLOR) or too many color codes.\r\n");
 	}
 	else {
 		if (EMPIRE_BANNER(emp)) {
