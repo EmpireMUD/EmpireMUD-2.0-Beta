@@ -851,7 +851,7 @@ ACMD(do_alternate) {
 	else if (ROOM_OWNER(IN_ROOM(ch)) && empire_is_hostile(ROOM_OWNER(IN_ROOM(ch)), GET_LOYALTY(ch), IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't alternate in hostile territory.\r\n");
 	}
-	else if (get_cooldown_time(ch, COOLDOWN_ALTERNATE) > 0) {
+	else if (get_cooldown_time(ch, COOLDOWN_ALTERNATE) > 0 && !IS_IMMORTAL(ch)) {
 		msg_to_char(ch, "You can't alternate again so soon.\r\n");
 	}
 	else if (get_cooldown_time(ch, COOLDOWN_PVP_QUIT_TIMER) > 0 && !IS_IMMORTAL(ch)) {
