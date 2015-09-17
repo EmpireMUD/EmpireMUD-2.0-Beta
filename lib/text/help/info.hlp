@@ -607,6 +607,8 @@ EmpireMUD supports the following MSDP variables:
  GEAR_LEVEL - Gear level
  CRAFTING_LEVEL - Crafting level
  CLASS - Character's class
+ SKILLS - Nested table format with:
+    Skill Name => (LEVEL, EXP, RESETS, NOSKILL)
  MONEY - Total coins
  BONUS_EXP - Daily bonus experience remaining
  INVENTORY - Current inventory size
@@ -624,13 +626,7 @@ EmpireMUD supports the following MSDP variables:
  BONUS_PHYSICAL - Bonus physical damage
  BONUS_MAGICAL - Bonus magical damage
  BONUS_HEALING - Bonus healing
-
- Skill levels: BATTLE_LEVEL, EMPIRE_LEVEL, HIGH_SORCERY_LEVEL,
-    NATURAL_MAGIC_LEVEL, STEALTH_LEVEL, SURVIVAL_LEVEL, TRADE_LEVEL,
-    VAMPIRE_LEVEL
- Skill experience: BATTLE_EXP, EMPIRE_EXP, HIGH_SORCERY_EXP, NATURAL_MAGIC_EXP,
-    STEALTH_EXP, SURVIVAL_EXP, TRADE_EXP, VAMPIRE_EXP
-
+ 
  EMPIRE_NAME - Name of the character's empire
  EMPIRE_ADJECTIVE - Empire's adjective
  EMPIRE_RANK - Character's rank in the empire
