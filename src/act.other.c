@@ -188,11 +188,14 @@ void perform_alternate(char_data *old, char_data *new) {
 	bool show_start = FALSE;
 	int invis_lev, old_invis, last_tell;
 	empire_data *old_emp;
+	bool was_imm;
 	
 	if (!old || !new || !old->desc || new->desc) {
 		log("SYSERR: Attempting invalid peform_alternate with %s, %s, %s, %s", old ? "ok" : "no old", new ? "ok" : "no new", old->desc ? "ok" : "no old desc", new->desc ? "new desc" : "ok");
 		return;
 	}
+	
+	was_imm = IS_IMMORTAL(old);
 
 	/*
 	 * kill off all sockets connected to the same player as the one who is
@@ -297,7 +300,9 @@ void perform_alternate(char_data *old, char_data *new) {
 		send_to_char(START_MESSG, new);
 	}
 	
-	add_cooldown(new, COOLDOWN_ALTERNATE, SECS_PER_REAL_MIN);
+	if (!IS_IMMORTAL(new) && !was_imm) {
+		add_cooldown(new, COOLDOWN_ALTERNATE, SECS_PER_REAL_MIN);
+	}
 	GET_LAST_TELL(new) = last_tell;
 }
 
