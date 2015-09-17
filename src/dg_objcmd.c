@@ -843,7 +843,7 @@ OCMD(do_odot) {
 		type = DAM_PHYSICAL;
 	}
 	
-	script_damage_over_time(ch, get_obj_scale_level(obj, ch), modifier, type, atoi(durarg));
+	script_damage_over_time(ch, get_obj_scale_level(obj, ch), type, modifier, atoi(durarg));
 }
 
 
