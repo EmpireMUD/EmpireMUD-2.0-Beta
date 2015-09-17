@@ -1349,7 +1349,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 		if (PRF_FLAGGED(ch, PRF_POLITICAL) && !show_dark) {
 			emp = ROOM_OWNER(to_room);
 			
-			if (chemp && is_in_city_for_empire(to_room, chemp, FALSE, &junk)) {
+			if (chemp && chemp == emp && is_in_city_for_empire(to_room, chemp, FALSE, &junk)) {
 				strcpy(buf2, get_banner_complement_color(chemp));
 				need_color_terminator = TRUE;
 			}
