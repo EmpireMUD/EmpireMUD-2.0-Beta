@@ -58,8 +58,7 @@ bool check_banner_color_string(char *str) {
 	const char *valid_colors = "rgbymcwajloptvnRGBYMCWAJLOPTV0u";
 	
 	bool ok = TRUE;
-	int pos;
-	char code = 0;
+	int pos, num_codes = 0;
 	
 	for (pos = 0; pos < strlen(str); ++pos) {
 		if (str[pos] == '&') {
@@ -67,8 +66,17 @@ bool check_banner_color_string(char *str) {
 				// trailing &
 				ok = FALSE;
 			}
+			else if (strchr(valid_colors, str[pos+1])) {
+				// this code is ok but count number of non-underlined codes
+				if (str[pos+1] != 'u') {
+					++num_codes;
+				}
+				
+				// skip over
+				++pos;
+			}
 			else {
-				code = str[++pos];
+				ok = FALSE;
 			}
 		}
 		else {
@@ -76,11 +84,9 @@ bool check_banner_color_string(char *str) {
 		}
 	}
 	
-	// check the color code itself
-	if (ok && code > 0) {
-		if (!strchr(valid_colors, code)) {
-			ok = FALSE;
-		}
+	// do not allow multiple colors
+	if (num_codes > 1) {
+		ok = FALSE;
 	}
 	
 	return ok;
@@ -134,12 +140,14 @@ bool valid_empire_name(char *newname) {
 
 
 /**
-* Validates rank names for empires.
+* Validates rank names for empires. This will send an error message.
 *
+* @param char_data *ch The person to send errors to.
 * @param char *newname The proposed name.
 * @return bool TRUE if the name is ok, or FALSE otherwise.
 */
-bool valid_rank_name(char *newname) {
+bool valid_rank_name(char_data *ch, char *newname) {
+	char *upos, *zpos, *npos, *lastpos;
 	int iter;
 	bool ok = TRUE;
 	
@@ -151,8 +159,19 @@ bool valid_rank_name(char *newname) {
 
 	for (iter = 0; iter < strlen(newname) && ok; ++iter) {
 		if (!isalnum(newname[iter]) && !strchr(valid, newname[iter])) {
+			msg_to_char(ch, "You can't use %c in rank names.\r\n", newname[iter]);
 			ok = FALSE;
 		}
+	}
+	
+	// check underline termination
+	upos = reverse_strstr(newname, "&u");
+	zpos = reverse_strstr(newname, "&0");
+	npos = reverse_strstr(newname, "&n");
+	lastpos = (zpos && npos) ? MAX(zpos, npos) : (zpos ? zpos : npos);
+	if (upos && (!lastpos || lastpos < upos)) {
+		msg_to_char(ch, "If you use an underline in a rank name, you must end it with \t&0.\r\n");
+		ok = FALSE;
 	}
 	
 	return ok;
@@ -475,8 +494,9 @@ EEDIT(eedit_rank) {
 	else if ((rnk = find_rank_by_name(emp, arg)) == NOTHING) {
 		msg_to_char(ch, "Invalid rank.\r\n");
 	}
-	else if (!valid_rank_name(argument)) {
-		msg_to_char(ch, "Invalid rank name.\r\n");
+	else if (!valid_rank_name(ch, argument)) {
+		// sends own message
+		// msg_to_char(ch, "Invalid rank name.\r\n");
 	}
 	else {
 		if (EMPIRE_RANK(emp, rnk)) {

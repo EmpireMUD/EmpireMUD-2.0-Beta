@@ -1105,6 +1105,7 @@ extern char *level_range_string(int min, int max, int current);
 extern bool multi_isname(const char *arg, const char *namelist);
 extern char *CAP(char *txt);
 extern char *fname(const char *namelist);
+extern char *reverse_strstr(char *haystack, char *needle);
 extern char *str_dup(const char *source);
 extern char *str_replace(char *search, char *replace, char *subject);
 extern char *str_str(char *cs, char *ct);

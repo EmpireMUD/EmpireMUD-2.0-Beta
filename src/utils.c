@@ -2637,6 +2637,29 @@ void replace_question_color(char *input, char *color, char *output) {
 
 
 /**
+* Finds the last occurrence of needle in haystack.
+*
+* @param const char *haystack The string to search.
+* @param const char *needle The thing to search for.
+* @return char* The last occurrence of needle in haystack, or NULL if it does not occur.
+*/
+char *reverse_strstr(char *haystack, char *needle) {
+	char *found = NULL, *next = haystack;
+	
+	if (!haystack || !needle || !*haystack) {
+		return NULL;
+	}
+	
+	while ((next = strstr(next, needle))) {
+		found = next;
+		++next;
+	}
+	
+	return found;
+}
+
+
+/**
 * Doubles the & in a string so that color codes are displayed to the user.
 *
 * @param char *string The input string.
