@@ -2009,6 +2009,9 @@ int perform_dupe_check(descriptor_data *d) {
 			MXPSendTag(d, "<VERSION>");
 			break;
 	}
+	
+	// guarantee echo is on
+	ProtocolNoEcho(d, false);
 
 	return (1);
 }
