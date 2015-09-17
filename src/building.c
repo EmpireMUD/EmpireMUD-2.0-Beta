@@ -1506,6 +1506,7 @@ ACMD(do_dedicate) {
 
 // Takes subcmd SCMD_DESIGNATE, SCMD_REDESIGNATE
 ACMD(do_designate) {
+	extern struct empire_territory_data *create_territory_entry(empire_data *emp, room_data *room);
 	extern bld_data *get_building_by_name(char *name, bool room_only);
 	void sort_world_table();
 	
@@ -1631,7 +1632,10 @@ ACMD(do_designate) {
 					act(buf, FALSE, ch, 0, vict, TO_VICT);
 				}
 			}
-
+			
+			if (ROOM_OWNER(new)) {
+				create_territory_entry(ROOM_OWNER(new), new);
+			}
 			// sort now just in case
 			sort_world_table();
 		}
