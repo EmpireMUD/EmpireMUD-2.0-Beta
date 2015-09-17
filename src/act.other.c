@@ -31,7 +31,7 @@
 * Contents:
 *   Helpers
 *   Accept/Reject Helpers
-*   Toggle Notifiers
+*   Toggle Callbacks
 *   Commands
 */
 
@@ -639,7 +639,7 @@ OFFER_FINISH(ofin_summon) {
 
 
  //////////////////////////////////////////////////////////////////////////////
-//// TOGGLE NOTIFIERS ////////////////////////////////////////////////////////
+//// TOGGLE CALLBACKS ////////////////////////////////////////////////////////
 
 /**
 * toggle notifier for "toggle afk"
@@ -654,6 +654,43 @@ void afk_notify(char_data *ch) {
 		act("$n is no longer afk.", TRUE, ch, NULL, NULL, TO_ROOM);
 	}
 }
+
+
+/**
+* Ensures political/!map-color are off when informative is on.
+*
+* @param char_data *ch The player.
+*/
+void tog_informative(char_data *ch) {
+	if (PRF_FLAGGED(ch, PRF_INFORMATIVE)) {
+		REMOVE_BIT(PRF_FLAGS(ch), PRF_POLITICAL | PRF_NOMAPCOL);
+	}
+}
+
+
+/**
+* Ensures political/informative are off when !map-color is on.
+*
+* @param char_data *ch The player.
+*/
+void tog_mapcolor(char_data *ch) {
+	if (PRF_FLAGGED(ch, PRF_NOMAPCOL)) {
+		REMOVE_BIT(PRF_FLAGS(ch), PRF_POLITICAL | PRF_INFORMATIVE);
+	}
+}
+
+
+/**
+* Ensures informative/!map-color are off when political is on.
+*
+* @param char_data *ch The player.
+*/
+void tog_political(char_data *ch) {
+	if (PRF_FLAGGED(ch, PRF_POLITICAL)) {
+		REMOVE_BIT(PRF_FLAGS(ch), PRF_INFORMATIVE | PRF_NOMAPCOL);
+	}
+}
+
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2229,9 +2266,9 @@ ACMD(do_toggle) {
 		
 		msg_to_char(ch, "You toggle %s %s%s&0.\r\n", toggle_data[type].name, togcols[toggle_data[type].type][on], tognames[toggle_data[type].type][on]);
 		
-		// maybe notify
-		if (toggle_data[type].notify_func != NULL) {
-			(toggle_data[type].notify_func)(ch);
+		// callback can notify or make additional changes
+		if (toggle_data[type].callback_func != NULL) {
+			(toggle_data[type].callback_func)(ch);
 		}
 	}
 }

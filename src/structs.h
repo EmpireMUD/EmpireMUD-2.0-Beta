@@ -2852,7 +2852,7 @@ struct toggle_data_type {
 	int type;	// TOG_ONOFF, TOG_OFFON
 	bitvector_t bit;	// PRF_x
 	int level;	// required level to see/use toggle
-	void (*notify_func)(char_data *ch);	// optional function to alert changes
+	void (*callback_func)(char_data *ch);	// optional function to alert changes
 };
 
 
