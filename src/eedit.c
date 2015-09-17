@@ -259,8 +259,8 @@ EEDIT(eedit_adjective) {
 	if (!*argument) {
 		msg_to_char(ch, "Set the empire's adjective form to what?\r\n");
 	}
-	else if (count_color_codes(argument) > 0) {
-		msg_to_char(ch, "Empire adjective forms may not contain color codes. Set the banner instead.\r\n");
+	else if (count_color_codes(argument) > 0 || strchr(argument, '&') != NULL) {
+		msg_to_char(ch, "Empire adjective forms may not contain color codes or ampersands. Set the banner instead.\r\n");
 	}
 	else if (strstr(argument, "%") != NULL) {
 		msg_to_char(ch, "Empire adjective forms may not contain the percent sign (%%).\r\n");
@@ -418,8 +418,8 @@ EEDIT(eedit_name) {
 	if (!*argument) {
 		msg_to_char(ch, "Set the empire name to what?\r\n");
 	}
-	else if (count_color_codes(argument) > 0) {
-		msg_to_char(ch, "Empire names may not contain color codes. Set the banner instead.\r\n");
+	else if (count_color_codes(argument) > 0 || strchr(argument, '&') != NULL) {
+		msg_to_char(ch, "Empire names may not contain color codes or ampersands. Set the banner instead.\r\n");
 	}
 	else if (strchr(argument, '%')) {
 		msg_to_char(ch, "Empire names may not contain the percent sign (%%).\r\n");
