@@ -1236,6 +1236,9 @@ int enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 		MXPSendTag(d, "<VERSION>");
 	}
 	
+	// ensure echo is on
+	ProtocolNoEcho(d, false);
+	
 	return load_result;
 }
 
