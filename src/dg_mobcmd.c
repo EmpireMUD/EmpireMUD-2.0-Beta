@@ -1084,10 +1084,10 @@ ACMD(do_maoe) {
 
 
 ACMD(do_mdot) {
-	char name[MAX_INPUT_LENGTH], modarg[MAX_INPUT_LENGTH], durarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH];
+	char name[MAX_INPUT_LENGTH], modarg[MAX_INPUT_LENGTH], durarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH], stackarg[MAX_INPUT_LENGTH];
 	double modifier = 1.0;
 	char_data *vict;
-	int type;
+	int type, max_stacks;
 
 	if (!MOB_OR_IMPL(ch)) {
 		send_config_msg(ch, "huh_string");
@@ -1100,7 +1100,8 @@ ACMD(do_mdot) {
 	argument = one_argument(argument, name);
 	argument = one_argument(argument, modarg);
 	argument = one_argument(argument, durarg);
-	argument = one_argument(argument, typearg);
+	argument = one_argument(argument, typearg);	// optional, default physical
+	argument = one_argument(argument, stackarg);	// optional, default 1
 
 	if (!*name || !*modarg || !*durarg) {
 		mob_log(ch, "mdot: bad syntax");
@@ -1134,7 +1135,8 @@ ACMD(do_mdot) {
 		type = DAM_PHYSICAL;
 	}
 	
-	script_damage_over_time(vict, get_approximate_level(ch), type, modifier, atoi(durarg));
+	max_stacks = (*stackarg ? atoi(stackarg) : 1);
+	script_damage_over_time(vict, get_approximate_level(ch), type, modifier, atoi(durarg), max_stacks);
 }
 
 

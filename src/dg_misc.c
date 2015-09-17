@@ -416,8 +416,9 @@ void script_damage(char_data *vict, char_data *killer, int level, int dam_type, 
 * @param int dam_type A DAM_x type.
 * @param double modifier An amount to modify the damage by (1.0 = full damage).
 * @param int dur_seconds The requested duration, in seconds.
+* @param int max_stacks Number of times this DoT can stack (minimum/default 1).
 */
-void script_damage_over_time(char_data *vict, int level, int dam_type, double modifier, int dur_seconds) {
+void script_damage_over_time(char_data *vict, int level, int dam_type, double modifier, int dur_seconds, int max_stacks) {
 	double dam;
 	
 	if (modifier <= 0 || dur_seconds <= 0) {
@@ -438,6 +439,5 @@ void script_damage_over_time(char_data *vict, int level, int dam_type, double mo
 	}
 
 	// add the affect
-	// TODO support max-stacks
-	apply_dot_effect(vict, ATYPE_DG_AFFECT, ceil((double)dur_seconds / SECS_PER_REAL_UPDATE), dam_type, (int) dam, 1);
+	apply_dot_effect(vict, ATYPE_DG_AFFECT, ceil((double)dur_seconds / SECS_PER_REAL_UPDATE), dam_type, (int) dam, MAX(1, max_stacks));
 }

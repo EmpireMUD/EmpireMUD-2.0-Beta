@@ -254,7 +254,7 @@ room_data *dg_room_of_obj(obj_data *obj);
 void do_dg_cast(void *go, struct script_data *sc, trig_data *trig, int type, char *cmd);
 void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int type, char *cmd);
 void script_damage(char_data *vict, char_data *killer, int level, int dam_type, double modifier);
-void script_damage_over_time(char_data *vict, int level, int dam_type, double modifier, int dur_seconds);
+void script_damage_over_time(char_data *vict, int level, int dam_type, double modifier, int dur_seconds, int max_stacks);
 
 void extract_value(struct script_data *sc, trig_data *trig, char *cmd);
 
