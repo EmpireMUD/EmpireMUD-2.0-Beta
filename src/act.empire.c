@@ -3513,7 +3513,7 @@ ACMD(do_home) {
 
 
 ACMD(do_islands) {
-	char output[MAX_STRING_LENGTH*2], line[82], emp_arg[MAX_INPUT_LENGTH];
+	char output[MAX_STRING_LENGTH*2], line[256], emp_arg[MAX_INPUT_LENGTH];
 	struct do_islands_data *item, *next_item, *list = NULL;
 	struct empire_unique_storage *eus;
 	struct empire_territory_data *ter;
