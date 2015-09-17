@@ -3454,10 +3454,12 @@ ACMD(do_home) {
 			clear_private_owner(GET_IDNUM(ch));
 			
 			// clear out npcs
+			// TODO should this be done for interior rooms, too?
 			if ((ter = find_territory_entry(emp, real))) {
 				while ((npc = ter->npcs)) {
 					if (npc->mob) {
 						act("$n leaves.", TRUE, npc->mob, NULL, NULL, TO_ROOM);
+						GET_EMPIRE_NPC_DATA(npc->mob) = NULL;	// un-link this npc data from the mob, or extract will corrupt memory
 						extract_char(npc->mob);
 						npc->mob = NULL;
 					}
