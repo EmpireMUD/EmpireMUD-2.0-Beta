@@ -863,62 +863,60 @@ static void spawn_one_room(room_data *room) {
 		list = GET_SECT_SPAWNS(SECT(room));
 	}
 	
-	// nothing to spawn?
-	if (list == NULL) {
-		return;
-	}
+	// anything to spawn?
+	if (list) {
+		// set up data for faster checking
+		x_coord = X_COORD(room);
+		y_coord = Y_COORD(room);
+		in_city = (ROOM_OWNER(home) && is_in_city_for_empire(room, ROOM_OWNER(home), TRUE, &junk)) ? TRUE : FALSE;
 	
-	// set up data for faster checking
-	x_coord = X_COORD(room);
-	y_coord = Y_COORD(room);
-	in_city = (ROOM_OWNER(home) && is_in_city_for_empire(room, ROOM_OWNER(home), TRUE, &junk)) ? TRUE : FALSE;
-	
-	for (spawn = list; spawn; spawn = spawn->next) {
-		// validate flags
-		if (IS_SET(spawn->flags, SPAWN_NOCTURNAL) && weather_info.sunlight != SUN_DARK && weather_info.sunlight != SUN_SET)
-			continue;
-		if (IS_SET(spawn->flags, SPAWN_DIURNAL) && weather_info.sunlight != SUN_LIGHT && weather_info.sunlight != SUN_RISE)
-			continue;
-		if (IS_SET(spawn->flags, SPAWN_CLAIMED) && !ROOM_OWNER(home))
-			continue;
-		if (IS_SET(spawn->flags, SPAWN_UNCLAIMED) && ROOM_OWNER(home))
-			continue;
-		if (IS_SET(spawn->flags, SPAWN_CITY) && !in_city)
-			continue;
-		if (IS_SET(spawn->flags, SPAWN_OUT_OF_CITY) && in_city)
-			continue;
-		if (IS_SET(spawn->flags, SPAWN_NORTHERN) && y_coord < (MAP_HEIGHT / 2))
-			continue;
-		if (IS_SET(spawn->flags, SPAWN_SOUTHERN) && y_coord >= (MAP_HEIGHT / 2))
-			continue;
-		if (IS_SET(spawn->flags, SPAWN_EASTERN) && x_coord < (MAP_WIDTH / 2))
-			continue;
-		if (IS_SET(spawn->flags, SPAWN_WESTERN) && x_coord >= (MAP_WIDTH / 2))
-			continue;
+		for (spawn = list; spawn; spawn = spawn->next) {
+			// validate flags
+			if (IS_SET(spawn->flags, SPAWN_NOCTURNAL) && weather_info.sunlight != SUN_DARK && weather_info.sunlight != SUN_SET)
+				continue;
+			if (IS_SET(spawn->flags, SPAWN_DIURNAL) && weather_info.sunlight != SUN_LIGHT && weather_info.sunlight != SUN_RISE)
+				continue;
+			if (IS_SET(spawn->flags, SPAWN_CLAIMED) && !ROOM_OWNER(home))
+				continue;
+			if (IS_SET(spawn->flags, SPAWN_UNCLAIMED) && ROOM_OWNER(home))
+				continue;
+			if (IS_SET(spawn->flags, SPAWN_CITY) && !in_city)
+				continue;
+			if (IS_SET(spawn->flags, SPAWN_OUT_OF_CITY) && in_city)
+				continue;
+			if (IS_SET(spawn->flags, SPAWN_NORTHERN) && y_coord < (MAP_HEIGHT / 2))
+				continue;
+			if (IS_SET(spawn->flags, SPAWN_SOUTHERN) && y_coord >= (MAP_HEIGHT / 2))
+				continue;
+			if (IS_SET(spawn->flags, SPAWN_EASTERN) && x_coord < (MAP_WIDTH / 2))
+				continue;
+			if (IS_SET(spawn->flags, SPAWN_WESTERN) && x_coord >= (MAP_WIDTH / 2))
+				continue;
 
-		// check percent
-		if (number(1, 10000) > (int)(100 * spawn->percent)) {
-			continue;
-		}
+			// check percent
+			if (number(1, 10000) > (int)(100 * spawn->percent)) {
+				continue;
+			}
 		
-		// passed! let's spawn
-		mob = read_mobile(spawn->vnum);
+			// passed! let's spawn
+			mob = read_mobile(spawn->vnum);
 		
-		// ensure loyalty
-		if (ROOM_OWNER(home) && MOB_FLAGGED(mob, MOB_HUMAN | MOB_EMPIRE | MOB_CITYGUARD)) {
-			GET_LOYALTY(mob) = ROOM_OWNER(home);
-		}
+			// ensure loyalty
+			if (ROOM_OWNER(home) && MOB_FLAGGED(mob, MOB_HUMAN | MOB_EMPIRE | MOB_CITYGUARD)) {
+				GET_LOYALTY(mob) = ROOM_OWNER(home);
+			}
 
-		// in case of generic names
-		setup_generic_npc(mob, ROOM_OWNER(home), NOTHING, NOTHING);
+			// in case of generic names
+			setup_generic_npc(mob, ROOM_OWNER(home), NOTHING, NOTHING);
 		
-		// spawn data
-		MOB_SPAWN_TIME(mob) = now;
-		SET_BIT(MOB_FLAGS(mob), MOB_SPAWNED);
+			// spawn data
+			MOB_SPAWN_TIME(mob) = now;
+			SET_BIT(MOB_FLAGS(mob), MOB_SPAWNED);
 				
-		// put in the room
-		char_to_room(mob, room);
-		load_mtrigger(mob);
+			// put in the room
+			char_to_room(mob, room);
+			load_mtrigger(mob);
+		}
 	}
 
 	// spawn interior rooms: recursively
