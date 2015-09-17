@@ -279,7 +279,7 @@ static void msdp_update(void) {
 	char_data *ch, *pOpponent;
 	struct affected_type *aff;
 	descriptor_data *d;
-	int hit_points, PlayerCount = 0;
+	int hit_points, iter, PlayerCount = 0;
 	size_t buf_size;
 
 	for (d = descriptor_list; d; d = d->next) {
@@ -347,6 +347,24 @@ static void msdp_update(void) {
 
 			snprintf(buf, sizeof(buf), "%s", IS_IMMORTAL(ch) ? "Immortal" : class_data[GET_CLASS(ch)].name);
 			MSDPSetString(d, eMSDP_CLASS, buf);
+			
+			// skills
+			*buf = '\0';
+			buf_size = 0;
+			for (iter = 0; iter < NUM_SKILLS; ++iter) {
+				if (GET_SKILL(ch, iter) > 0) {
+					buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%c", (char)MSDP_VAR, skill_data[iter].name, (char)MSDP_VAL, (char)MSDP_TABLE_OPEN);
+					
+					buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cLEVEL%c%d", (char)MSDP_VAR, (char)MSDP_VAL, GET_SKILL(ch, iter));
+					buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cEXP%c%.2f", (char)MSDP_VAR, (char)MSDP_VAL, GET_SKILL_EXP(ch, iter));
+					buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cRESETS%c%d", (char)MSDP_VAR, (char)MSDP_VAL, GET_FREE_SKILL_RESETS(ch, iter));
+					buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cNOSKILL%c%d", (char)MSDP_VAR, (char)MSDP_VAL, NOSKILL_BLOCKED(ch, iter));
+					
+					// end table
+					buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c", (char)MSDP_TABLE_CLOSE);
+				}
+			}
+			MSDPSetTable(d, eMSDP_SKILLS, buf);
 
 			MSDPSetNumber(d, eMSDP_MONEY, total_coins(ch));
 			MSDPSetNumber(d, eMSDP_BONUS_EXP, IS_NPC(ch) ? 0 : GET_DAILY_BONUS_EXPERIENCE(ch));
@@ -376,31 +394,6 @@ static void msdp_update(void) {
 			MSDPSetNumber(d, eMSDP_BONUS_PHYSICAL, GET_BONUS_PHYSICAL(ch));
 			MSDPSetNumber(d, eMSDP_BONUS_MAGICAL, GET_BONUS_MAGICAL(ch));
 			MSDPSetNumber(d, eMSDP_BONUS_HEALING, total_bonus_healing(ch));
-			
-			MSDPSetNumber(d, eMSDP_BATTLE_LEVEL, IS_NPC(ch) ? 0 : GET_SKILL(ch, SKILL_BATTLE));
-			snprintf(buf, sizeof(buf), "%.2f", IS_NPC(ch) ? 0.0 : GET_SKILL_EXP(ch, SKILL_BATTLE));
-			MSDPSetString(d, eMSDP_BATTLE_EXP, buf);
-			MSDPSetNumber(d, eMSDP_EMPIRE_LEVEL, IS_NPC(ch) ? 0 : GET_SKILL(ch, SKILL_EMPIRE));
-			snprintf(buf, sizeof(buf), "%.2f", IS_NPC(ch) ? 0.0 : GET_SKILL_EXP(ch, SKILL_EMPIRE));
-			MSDPSetString(d, eMSDP_EMPIRE_EXP, buf);
-			MSDPSetNumber(d, eMSDP_HIGH_SORCERY_LEVEL, IS_NPC(ch) ? 0 : GET_SKILL(ch, SKILL_HIGH_SORCERY));
-			snprintf(buf, sizeof(buf), "%.2f", IS_NPC(ch) ? 0.0 : GET_SKILL_EXP(ch, SKILL_HIGH_SORCERY));
-			MSDPSetString(d, eMSDP_HIGH_SORCERY_EXP, buf);
-			MSDPSetNumber(d, eMSDP_NATURAL_MAGIC_LEVEL, IS_NPC(ch) ? 0 : GET_SKILL(ch, SKILL_NATURAL_MAGIC));
-			snprintf(buf, sizeof(buf), "%.2f", IS_NPC(ch) ? 0.0 : GET_SKILL_EXP(ch, SKILL_NATURAL_MAGIC));
-			MSDPSetString(d, eMSDP_NATURAL_MAGIC_EXP, buf);
-			MSDPSetNumber(d, eMSDP_STEALTH_LEVEL, IS_NPC(ch) ? 0 : GET_SKILL(ch, SKILL_STEALTH));
-			snprintf(buf, sizeof(buf), "%.2f", IS_NPC(ch) ? 0.0 : GET_SKILL_EXP(ch, SKILL_STEALTH));
-			MSDPSetString(d, eMSDP_STEALTH_EXP, buf);
-			MSDPSetNumber(d, eMSDP_SURVIVAL_LEVEL, IS_NPC(ch) ? 0 : GET_SKILL(ch, SKILL_SURVIVAL));
-			snprintf(buf, sizeof(buf), "%.2f", IS_NPC(ch) ? 0.0 : GET_SKILL_EXP(ch, SKILL_SURVIVAL));
-			MSDPSetString(d, eMSDP_SURVIVAL_EXP, buf);
-			MSDPSetNumber(d, eMSDP_TRADE_LEVEL, IS_NPC(ch) ? 0 : GET_SKILL(ch, SKILL_TRADE));
-			snprintf(buf, sizeof(buf), "%.2f", IS_NPC(ch) ? 0.0 : GET_SKILL_EXP(ch, SKILL_TRADE));
-			MSDPSetString(d, eMSDP_TRADE_EXP, buf);
-			MSDPSetNumber(d, eMSDP_VAMPIRE_LEVEL, IS_NPC(ch) ? 0 : GET_SKILL(ch, SKILL_VAMPIRE));
-			snprintf(buf, sizeof(buf), "%.2f", IS_NPC(ch) ? 0.0 : GET_SKILL_EXP(ch, SKILL_VAMPIRE));
-			MSDPSetString(d, eMSDP_VAMPIRE_EXP, buf);
 			
 			// empire
 			if (GET_LOYALTY(ch) && !IS_NPC(ch)) {
