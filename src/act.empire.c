@@ -1697,6 +1697,7 @@ void scan_for_tile(char_data *ch, char *argument) {
 		return;
 	}
 
+	// TODO should this use a function to get auto-mapsize like map view does?
 	mapsize = GET_MAPSIZE(REAL_CHAR(ch));
 	if (mapsize == 0) {
 		mapsize = config_get_int("default_map_size");
