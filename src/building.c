@@ -366,6 +366,7 @@ void disassociate_building(room_data *room) {
 	remove_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME);
 	remove_room_extra_data(room, ROOM_EXTRA_BUILD_RECIPE);
 	remove_room_extra_data(room, ROOM_EXTRA_FOUND_TIME);
+	remove_room_extra_data(room, ROOM_EXTRA_REDESIGNATE_TIME);
 
 	// disassociate inside rooms
 	HASH_ITER(interior_hh, interior_world_table, iter, next_iter) {
@@ -1568,6 +1569,9 @@ ACMD(do_designate) {
 	}
 	else if (!IS_INSIDE(IN_ROOM(ch)) && subcmd == SCMD_REDESIGNATE)
 		msg_to_char(ch, "You can't redesignate here.\r\n");
+	else if (subcmd == SCMD_REDESIGNATE && get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_REDESIGNATE_TIME) + (config_get_int("redesignate_time") * SECS_PER_REAL_MIN) > time(0)) {
+		msg_to_char(ch, "You can't redesignate this room so soon.\r\n");
+	}
 	else if (BLD_MAX_ROOMS(IN_ROOM(ch)) <= 0)
 		msg_to_char(ch, "You can't designate here.\r\n");
 	else if (subcmd == SCMD_DESIGNATE && (ex = find_exit(IN_ROOM(ch), dir)) && ex->room_ptr)
@@ -1616,6 +1620,8 @@ ACMD(do_designate) {
 		/* set applicable values */
 		COMPLEX_DATA(new)->home_room = home;
 		ROOM_OWNER(new) = ROOM_OWNER(home);
+		
+		set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_REDESIGNATE_TIME, time(0));
 
 		/* send messages */
 		if (subcmd == SCMD_REDESIGNATE) {
