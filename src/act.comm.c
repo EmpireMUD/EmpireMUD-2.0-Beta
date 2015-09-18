@@ -1176,7 +1176,7 @@ ACMD(do_recolor) {
 		msg_to_char(ch, "Your custom colors are set to:\r\n");
 		for (iter = 0; *custom_color_types[iter] != '\n' && iter < MAX_CUSTOM_COLORS; ++iter) {
 			if (GET_CUSTOM_COLOR(ch, iter)) {
-				msg_to_char(ch, " %s: &\t%c\r\n", custom_color_types[iter], GET_CUSTOM_COLOR(ch, iter));
+				msg_to_char(ch, " %s: \t&%c\r\n", custom_color_types[iter], GET_CUSTOM_COLOR(ch, iter));
 			}
 			else {
 				msg_to_char(ch, " %s: not set\r\n", custom_color_types[iter]);
@@ -1194,7 +1194,7 @@ ACMD(do_recolor) {
 		msg_to_char(ch, "You no longer have a custom %s color.\r\n", custom_color_types[type]);
 	}
 	else if (strlen(argument) != 2 || *argument != '&' || !strchr(valid_colors, argument[1])) {
-		msg_to_char(ch, "You must specify a single color code (for example, &\tr).\r\n");
+		msg_to_char(ch, "You must specify a single color code (for example, \t&r).\r\n");
 	}
 	else {
 		GET_CUSTOM_COLOR(ch, type) = argument[1];	// store just the color code
