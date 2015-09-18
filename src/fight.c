@@ -2631,23 +2631,25 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		// anything after this must NOT rely on victim being alive
 		result = damage(ch, victim, dam, w_type, attack_hit_info[w_type].damage_type);
 		
-		if (!IS_NPC(ch) && combat_round && can_gain_skill) {
-			gain_ability_exp(ch, ABIL_FINESSE, 1);
-			if (GET_SKILL(ch, SKILL_BATTLE) < EMPIRE_CHORE_SKILL_CAP) {
-				gain_skill_exp(ch, SKILL_BATTLE, 2);
+		if (combat_round && can_gain_skill) {
+			if (!IS_NPC(ch)) {
+				gain_ability_exp(ch, ABIL_FINESSE, 1);
+				if (GET_SKILL(ch, SKILL_BATTLE) < EMPIRE_CHORE_SKILL_CAP) {
+					gain_skill_exp(ch, SKILL_BATTLE, 2);
+				}
+				if (affected_by_spell(ch, ATYPE_ALACRITY)) {
+					gain_ability_exp(ch, ABIL_ALACRITY, 1);
+				}
+			
+				// fireball skill gain
+				if (GET_EQ(ch, WEAR_WIELD) && GET_OBJ_VNUM(GET_EQ(ch, WEAR_WIELD)) == o_FIREBALL) {
+					gain_ability_exp(ch, ABIL_READY_FIREBALL, 1);
+				}
 			}
-			if (affected_by_spell(ch, ATYPE_ALACRITY)) {
-				gain_ability_exp(ch, ABIL_ALACRITY, 1);
-			}
-			if (result >= 0) {
+			if (!IS_NPC(victim) && result >= 0) {
 				if (affected_by_spell(victim, ATYPE_FORESIGHT)) {
 					gain_ability_exp(victim, ABIL_FORESIGHT, 1);
 				}
-			}
-			
-			// fireball skill gain
-			if (GET_EQ(ch, WEAR_WIELD) && GET_OBJ_VNUM(GET_EQ(ch, WEAR_WIELD)) == o_FIREBALL) {
-				gain_ability_exp(ch, ABIL_READY_FIREBALL, 1);
 			}
 		}
 		
