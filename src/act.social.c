@@ -186,7 +186,7 @@ bool check_social(char_data *ch, char *string, bool exact) {
 	if ((action = find_action(arg, exact)) == NOTHING)
 		return FALSE;
 
-	if (AFF_FLAGGED(ch, AFF_EARTHMELD | AFF_MUMMIFY)) {
+	if (AFF_FLAGGED(ch, AFF_EARTHMELD | AFF_MUMMIFY | AFF_STUNNED) || IS_INJURED(ch, INJ_TIED | INJ_STAKED)) {
 		msg_to_char(ch, "You can't do that right now!\r\n");
 		return TRUE;
 	}
