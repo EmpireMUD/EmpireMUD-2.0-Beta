@@ -5103,6 +5103,11 @@ ACMD(do_restore) {
 		GET_MOVE(vict) = GET_MAX_MOVE(vict);
 		GET_MANA(vict) = GET_MAX_MANA(vict);
 		GET_BLOOD(vict) = GET_MAX_BLOOD(vict);
+		
+		// remove DoTs
+		while (vict->over_time_effects) {
+			dot_remove(vict, vict->over_time_effects);
+		}
 
 		if (GET_POS(vict) < POS_SLEEPING) {
 			GET_POS(vict) = POS_STANDING;

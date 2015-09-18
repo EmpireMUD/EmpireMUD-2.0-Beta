@@ -832,7 +832,7 @@ obj_data *die(char_data *ch, char_data *killer) {
 	if (EXTRACTED(ch)) {
 		return NULL;
 	}
-		
+	
 	// remove all DoTs (BEFORE phoenix)
 	while (ch->over_time_effects) {
 		dot_remove(ch, ch->over_time_effects);
