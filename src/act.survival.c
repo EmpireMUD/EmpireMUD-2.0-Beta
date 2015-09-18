@@ -117,6 +117,12 @@ obj_data *find_best_saddle(char_data *ch) {
 	for (obj = ch->carrying; obj; obj = obj->next_content) {
 		if (CAN_WEAR(obj, ITEM_WEAR_SADDLE) && can_wear_item(ch, obj, FALSE)) {
 			this = rate_item(obj);
+			
+			// give a slight bonus to items that are bound ONLY to this character
+			if (OBJ_BOUND_TO(obj) && OBJ_BOUND_TO(obj)->next == NULL && bind_ok(obj, ch)) {
+				this *= 1.1;
+			}
+			
 			if (this >= best_score) {
 				best = obj;
 				best_score = this;
