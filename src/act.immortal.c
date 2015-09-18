@@ -5382,6 +5382,7 @@ ACMD(do_show) {
 
 
 ACMD(do_slay) {
+	extern bool check_scaling(char_data *mob, char_data *attacker);
 	extern obj_data *die(char_data *ch, char_data *killer);
 	
 	char_data *vict;
@@ -5407,7 +5408,15 @@ ACMD(do_slay) {
 			act("You chop $M to pieces! Ah! The blood!", FALSE, ch, 0, vict, TO_CHAR);
 			act("$N chops you to pieces!", FALSE, vict, 0, ch, TO_CHAR);
 			act("$n brutally slays $N!", FALSE, ch, 0, vict, TO_NOTVICT);
+
+			check_scaling(vict, ch);	// ensure scaling
 			tag_mob(vict, ch);	// ensures loot binding if applicable
+
+			// this would prevent the death
+			if (affected_by_spell(vict, ATYPE_PHOENIX_RITE)) {
+				affect_from_char(vict, ATYPE_PHOENIX_RITE);
+			}
+
 			die(vict, ch);
 		}
 	}
