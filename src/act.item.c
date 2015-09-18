@@ -1664,8 +1664,10 @@ room_data *find_docks(empire_data *emp, int island_id) {
 */
 obj_data *find_free_ship(empire_data *emp, struct shipping_data *shipd) {
 	struct empire_territory_data *ter;
+	struct shipping_data *iter;
 	obj_data *obj;
 	room_data *in_ship;
+	int capacity;
 	
 	if (!emp || shipd->from_island == NO_ISLAND) {
 		return NULL;
@@ -1699,6 +1701,20 @@ obj_data *find_free_ship(empire_data *emp, struct shipping_data *shipd) {
 			if (ROOM_AFF_FLAGGED(in_ship, ROOM_AFF_NO_WORK)) {
 				continue;
 			}
+			
+			// calculate capacity to see if it's full
+			capacity = 0;
+			for (iter = EMPIRE_SHIPPING_LIST(emp); iter; iter = iter->next) {
+				if (iter->ship_homeroom == GET_SHIP_MAIN_ROOM(obj)) {
+					capacity += iter->amount;
+				}
+			}
+			if (capacity >= ship_data[GET_SHIP_TYPE(obj)].cargo_size) {
+				// ship full!
+				continue;
+			}
+			
+			// ensure no players on board
 			if (!ship_is_empty(obj)) {
 				continue;
 			}
