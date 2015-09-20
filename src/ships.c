@@ -860,7 +860,7 @@ ACMD(do_sail) {
 		was_sailing = (GET_ACTION(ch) == ACT_SAILING);
 		start_action(ch, ACT_SAILING, 0);
 		GET_ACTION_VNUM(ch, 0) = dir;
-		msg_to_char(ch, "You start sailing %s.\r\n", dirs[get_direction_for_char(ch, dir)]);
+		msg_to_char(ch, "You %s %s.\r\n", (was_sailing ? "turn the ship" : "start sailing"), dirs[get_direction_for_char(ch, dir)]);
 		
 		// alert whole ship
 		HASH_ITER(interior_hh, interior_world_table, room, next_room) {
@@ -870,7 +870,7 @@ ACMD(do_sail) {
 		
 			for (ch_iter = ROOM_PEOPLE(room); ch_iter; ch_iter = ch_iter->next_in_room) {
 				if (ch_iter != ch && ch_iter->desc) {
-					snprintf(buf, sizeof(buf), "The ship begins to sail %s.", dirs[get_direction_for_char(ch_iter, dir)]);
+					snprintf(buf, sizeof(buf), "The ship %s %s.", (was_sailing ? "turns to the" : "begins to sail"), dirs[get_direction_for_char(ch_iter, dir)]);
 					act(buf, FALSE, ch_iter, NULL, NULL, TO_CHAR);
 				}
 			}
