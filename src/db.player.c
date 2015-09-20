@@ -1232,10 +1232,6 @@ int enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	greet_memory_mtrigger(ch);
 	add_to_lookup_table(GET_ID(ch), (void *)ch);
 	
-	if (fresh) {
-		MXPSendTag(d, "<VERSION>");
-	}
-	
 	// ensure echo is on
 	ProtocolNoEcho(d, false);
 	
