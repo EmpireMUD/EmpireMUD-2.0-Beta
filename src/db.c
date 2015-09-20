@@ -1570,6 +1570,7 @@ void check_version(void) {
 			update_all_players(NULL, b2_8_update_players);
 		}
 		if (MATCH_VERSION("b2.9")) {
+			log("Applying b2.9 update to crops...");
 			// this is actually a bug that occurred on EmpireMUDs that patched
 			// b2.8 on a live copy; this will look for tiles that are in an
 			// error state -- crops that were in the 'seeded' state during the
