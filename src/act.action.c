@@ -1807,6 +1807,7 @@ void process_sailing(char_data *ch) {
 	
 	// attempt to move the ship
 	if (!move_ship(ch, ship, dir)) {
+		look_at_room(ch);	// show them where they stopped
 		cancel_action(ch);
 		return;
 	}
