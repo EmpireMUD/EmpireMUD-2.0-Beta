@@ -219,7 +219,7 @@ void build_player_index(void) {
 void char_to_store(char_data *ch, struct char_file_u *st) {
 	int i, iter;
 	struct affected_type *af;
-	struct over_time_effect_type *dot;
+	struct over_time_effect_type *dot, *last_dot;
 	struct cooldown_data *cd;
 	obj_data *char_eq[NUM_WEARS];
 
@@ -397,9 +397,26 @@ void char_to_store(char_data *ch, struct char_file_u *st) {
 	strcpy(st->pwd, GET_PASSWD(ch));
 
 	/* add spell and eq affections back in now */
-	for (i = 0; i < MAX_AFFECT; i++)
-		if (st->affected[i].type)
+	for (i = 0; i < MAX_AFFECT; i++) {
+		if (st->affected[i].type) {
 			affect_to_char(ch, &st->affected[i]);
+		}
+	}
+	for (i = 0, last_dot = NULL; i < MAX_AFFECT; i++) {
+		if (st->over_time_effects[i].type) {
+			CREATE(dot, struct over_time_effect_type, 1);
+			*dot = st->over_time_effects[i];
+			dot->next = NULL;
+			
+			if (last_dot) {
+				last_dot->next = dot;
+			}
+			else {
+				ch->over_time_effects = dot;
+			}
+			last_dot = dot;
+		}
+	}
 
 	for (i = 0; i < NUM_WEARS; i++) {
 		if (char_eq[i]) {
