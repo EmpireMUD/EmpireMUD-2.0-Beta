@@ -1142,7 +1142,7 @@ ACMD(do_circle) {
 	// check costs
 	need_movement = move_cost(ch, IN_ROOM(ch), found_room, dir, MOVE_NORMAL);
 	
-	if (GET_MOVE(ch) < need_movement) {
+	if (GET_MOVE(ch) < need_movement && !IS_NPC(ch)) {
 		msg_to_char(ch, "You're too tired to circle that way.\r\n");
 		return;
 	}
