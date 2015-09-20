@@ -1480,6 +1480,7 @@ const char *versions_list[] = {
 	"b2.5",
 	"b2.7",
 	"b2.8",
+	"b2.9",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -1567,6 +1568,21 @@ void check_version(void) {
 		if (MATCH_VERSION("b2.8")) {
 			log("Applying b2.8 update to players...");
 			update_all_players(NULL, b2_8_update_players);
+		}
+		if (MATCH_VERSION("b2.9")) {
+			// this is actually a bug that occurred on EmpireMUDs that patched
+			// b2.8 on a live copy; this will look for tiles that are in an
+			// error state -- crops that were in the 'seeded' state during the
+			// b2.8 reboot would have gotten bad original-sect data
+			room_data *room, *next_room;
+			HASH_ITER(world_hh, world_table, room, next_room) {
+				if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && SECT_FLAGGED(ROOM_ORIGINAL_SECT(room), SECTF_HAS_CROP_DATA) && !SECT_FLAGGED(ROOM_ORIGINAL_SECT(room), SECTF_CROP)) {
+					// the fix is just to set the original sect to the current
+					// sect so it will detect a new sect on-harvest instead of
+					// setting it back to seeded
+					ROOM_ORIGINAL_SECT(room) = SECT(room);
+				}
+			}
 		}
 	}
 	
