@@ -858,6 +858,7 @@ ACMD(do_sail) {
 	}
 	else {
 		was_sailing = (GET_ACTION(ch) == ACT_SAILING);
+		GET_ACTION(ch) = ACT_NONE;	// prevents a stops-moving message
 		start_action(ch, ACT_SAILING, 0);
 		GET_ACTION_VNUM(ch, 0) = dir;
 		msg_to_char(ch, "You %s %s.\r\n", (was_sailing ? "turn the ship" : "start sailing"), dirs[get_direction_for_char(ch, dir)]);
