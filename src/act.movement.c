@@ -685,7 +685,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 	/* move points needed is avg. move loss for src and destination sect type */
 	need_movement = move_cost(ch, IN_ROOM(ch), to_room, dir, mode);
 
-	if (GET_MOVE(ch) < need_movement && !IS_NPC(ch)) {
+	if (GET_MOVE(ch) < need_movement && !IS_IMMORTAL(ch) && !IS_NPC(ch)) {
 		if (need_specials_check && ch->master)
 			send_to_char("You are too exhausted to follow.\r\n", ch);
 		else
@@ -714,7 +714,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 	}
 
 	/* Now we know we're allowed to go into the room. */
-	if (GET_ACCESS_LEVEL(ch) < LVL_GOD && !IS_NPC(ch))
+	if (!IS_IMMORTAL(ch) && !IS_NPC(ch))
 		GET_MOVE(ch) -= need_movement;
 
 	REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDE);
@@ -1159,7 +1159,9 @@ ACMD(do_circle) {
 	}
 
 	// work
-	GET_MOVE(ch) -= need_movement;
+	if (!IS_IMMORTAL(ch) && !IS_NPC(ch)) {
+		GET_MOVE(ch) -= need_movement;
+	}
 	char_from_room(ch);
 	char_to_room(ch, found_room);
 	
