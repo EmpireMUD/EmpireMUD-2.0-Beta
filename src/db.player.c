@@ -255,6 +255,10 @@ void char_to_store(char_data *ch, struct char_file_u *st) {
 			st->affected[i].next = 0;
 		}
 	}
+
+	if ((i >= MAX_AFFECT) && af && af->next) {
+		log("SYSERR: WARNING: OUT OF STORE ROOM FOR AFFECTED TYPES!!!");
+	}
 	
 	// over-time effects
 	for (dot = ch->over_time_effects, i = 0; i < MAX_AFFECT; ++i) {
@@ -275,6 +279,10 @@ void char_to_store(char_data *ch, struct char_file_u *st) {
 		}
 	}
 
+	if ((i >= MAX_AFFECT) && dot && dot->next) {
+		log("SYSERR: WARNING: OUT OF STORE ROOM FOR DOT TYPES!!!");
+	}
+
 	/*
 	 * remove the affections so that the raw values are stored; otherwise the
 	 * effects are doubled when the char logs back in.
@@ -286,9 +294,6 @@ void char_to_store(char_data *ch, struct char_file_u *st) {
 	while (ch->over_time_effects) {
 		dot_remove(ch, ch->over_time_effects);
 	}
-
-	if ((i >= MAX_AFFECT) && af && af->next)
-		log("SYSERR: WARNING: OUT OF STORE ROOM FOR AFFECTED TYPES!!!");
 
 	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
 		ch->aff_attributes[iter] = ch->real_attributes[iter];
