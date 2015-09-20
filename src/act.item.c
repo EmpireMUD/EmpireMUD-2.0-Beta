@@ -4537,7 +4537,7 @@ ACMD(do_ship) {
 		}
 		
 		if (!done) {
-			size += snprintf(buf + size, sizeof(buf) - size, " nothing");
+			size += snprintf(buf + size, sizeof(buf) - size, " nothing\r\n");
 		}
 		
 		page_string(ch->desc, buf, TRUE);
