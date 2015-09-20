@@ -780,7 +780,7 @@ LIBRARY_SCMD(bookedit_copy) {
 		msg_to_char(ch, "You're a bit busy already.\r\n");
 	}
 	else {
-		start_action(ch, ACT_COPYING_BOOK, 12, 0);
+		start_action(ch, ACT_COPYING_BOOK, 12);
 		GET_ACTION_VNUM(ch, 0) = book->id;
 		
 		msg_to_char(ch, "You pick up a blank book and begin to copy out '%s'.\r\n", book->title);

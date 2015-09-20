@@ -1121,7 +1121,7 @@ ACMD(do_build) {
 				msg_to_char(ch, "You can't work on a burning building!\r\n");
 			}
 			else {
-				start_action(ch, ACT_BUILDING, 0, NOBITS);
+				start_action(ch, ACT_BUILDING, 0);
 				msg_to_char(ch, "You start building.\r\n");
 				act("$n starts building.", FALSE, ch, 0, 0, TO_ROOM);
 			}
@@ -1282,7 +1282,7 @@ ACMD(do_build) {
 		extract_obj(found_obj);
 	}
 
-	start_action(ch, ACT_BUILDING, 0, NOBITS);
+	start_action(ch, ACT_BUILDING, 0);
 	msg_to_char(ch, "You start to build %s %s!\r\n", AN(GET_CRAFT_NAME(type)), GET_CRAFT_NAME(type));
 	sprintf(buf, "$n begins to build %s %s!", AN(GET_CRAFT_NAME(type)), GET_CRAFT_NAME(type));
 	act(buf, FALSE, ch, 0, 0, TO_ROOM);
@@ -1330,7 +1330,7 @@ ACMD(do_dismantle) {
 	if (IS_DISMANTLING(IN_ROOM(ch))) {
 		msg_to_char(ch, "You begin to dismantle the building.\r\n");
 		act("$n begins to dismantle the building.", FALSE, ch, 0, 0, TO_ROOM);
-		start_action(ch, ACT_DISMANTLING, 0, NOBITS);
+		start_action(ch, ACT_DISMANTLING, 0);
 		return;
 	}
 	
@@ -1375,7 +1375,7 @@ ACMD(do_dismantle) {
 	if (ROOM_OWNER(IN_ROOM(ch))) {
 		read_empire_territory(ROOM_OWNER(IN_ROOM(ch)));
 	}
-	start_action(ch, ACT_DISMANTLING, 0, NOBITS);
+	start_action(ch, ACT_DISMANTLING, 0);
 	msg_to_char(ch, "You begin to dismantle the building.\r\n");
 	act("$n begins to dismantle the building.\r\n", FALSE, ch, 0, 0, TO_ROOM);
 	process_dismantling(ch, IN_ROOM(ch));
@@ -1994,7 +1994,7 @@ ACMD(do_upgrade) {
 		}
 		else {
 			// it's good!
-			start_action(ch, ACT_BUILDING, 0, NOBITS);
+			start_action(ch, ACT_BUILDING, 0);
 
 			attach_building_to_room(building_proto(GET_CRAFT_BUILD_TYPE(type)), IN_ROOM(ch));
 			set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_BUILD_RECIPE, GET_CRAFT_VNUM(type));

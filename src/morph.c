@@ -569,7 +569,7 @@ ACMD(do_morph) {
 			command_lag(ch, WAIT_OTHER);
 		}
 		else {
-			start_action(ch, ACT_MORPHING, config_get_int("morph_timer"), ACT_ANYWHERE);
+			start_action(ch, ACT_MORPHING, config_get_int("morph_timer"));
 			GET_ACTION_VNUM(ch, 0) = morph_to;
 			msg_to_char(ch, "You begin to transform!\r\n");
 		}

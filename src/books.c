@@ -801,7 +801,7 @@ void read_book(char_data *ch, obj_data *obj) {
 		msg_to_char(ch, "It doesn't seem to have any words.\r\n");
 	}
 	else {
-		start_action(ch, ACT_READING, 0, 0);
+		start_action(ch, ACT_READING, 0);
 		GET_ACTION_VNUM(ch, 0) = GET_BOOK_ID(obj);
 		
 		msg_to_char(ch, "You start to read '%s', by %s.\r\n", book->title, book->byline);

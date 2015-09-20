@@ -33,7 +33,6 @@
 */
 
 // external vars
-extern int last_action_rotation;
 
 // external functions
 ACMD(do_gen_craft);
@@ -826,7 +825,7 @@ ACMD(do_gen_craft) {
 			timer /= 2;
 		}
 	
-		start_action(ch, ACT_GEN_CRAFT, timer, 0);
+		start_action(ch, ACT_GEN_CRAFT, timer);
 		GET_ACTION_VNUM(ch, 0) = GET_CRAFT_VNUM(type);
 		
 		if (drinkcon) {
@@ -1207,7 +1206,7 @@ ACMD(do_weave) {
 	}
 	else {
 		extract_resources(ch, weave_data[type].resources, TRUE);
-		start_action(ch, ACT_WEAVING, weave_data[type].time / ((ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_TAILOR) && IS_COMPLETE(IN_ROOM(ch))) ? 4 : 1), 0);
+		start_action(ch, ACT_WEAVING, weave_data[type].time / ((ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_TAILOR) && IS_COMPLETE(IN_ROOM(ch))) ? 4 : 1));
 		
 		GET_ACTION_VNUM(ch, 0) = type;
 		GET_ACTION_VNUM(ch, 1) = weave_data[type].vnum;

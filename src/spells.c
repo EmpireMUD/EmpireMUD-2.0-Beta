@@ -405,7 +405,7 @@ ACMD(do_chant) {
 	sprintf(lbuf, "$n begins the chant of %s.", chant_data[chant].name);
 	act(lbuf, FALSE, ch, NULL, NULL, TO_ROOM);
 	
-	start_action(ch, ACT_CHANTING, -1, 0);
+	start_action(ch, ACT_CHANTING, -1);
 	GET_ACTION_VNUM(ch, 0) = chant;
 }
 

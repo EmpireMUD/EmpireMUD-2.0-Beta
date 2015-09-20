@@ -875,7 +875,7 @@ ACMD(do_escape) {
 		}
 		
 		charge_ability_cost(ch, MOVE, cost, NOTHING, 0, WAIT_ABILITY);
-		start_action(ch, ACT_ESCAPING, 1, 0);
+		start_action(ch, ACT_ESCAPING, 1);
 		GET_WAIT_STATE(ch) = 4 RL_SEC;	// long wait
 	}
 }

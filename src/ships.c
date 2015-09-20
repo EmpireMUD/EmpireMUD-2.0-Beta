@@ -32,7 +32,6 @@
 // external vars
 extern const char *dirs[];
 extern const int rev_dir[];
-extern int last_action_rotation;
 
 // external funcs
 extern int count_objs_in_room(room_data *room);
@@ -370,7 +369,7 @@ void process_manufacturing(char_data *ch) {
 		}
 	}
 	
-	total = 1 + (AFF_FLAGGED(ch, AFF_HASTE) ? 1 : 0) + (HAS_BONUS_TRAIT(ch, BONUS_FAST_CHORES) ? 1 : 0);
+	total = 1;	// number to build at once (add things that speed this up)
 	for (count = 0; count < total && GET_ACTION(ch) == ACT_MANUFACTURING && ship; ++count) {
 		if ((GET_SHIP_RESOURCES_REMAINING(ship) % 2) != 0) {
 			if (!has_resources(ch, iron, TRUE, TRUE))
@@ -670,7 +669,7 @@ ACMD(do_manufacture) {
 	else if (ship) {
 		act("You begin working on $p.", FALSE, ch, ship, 0, TO_CHAR);
 		act("$n begins working on $p.", FALSE, ch, ship, 0, TO_ROOM);
-		start_action(ch, ACT_MANUFACTURING, 1, NOBITS);
+		start_action(ch, ACT_MANUFACTURING, 1);
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED))
 		msg_to_char(ch, "You don't have permission to manufacture ships here.\r\n");
@@ -681,7 +680,7 @@ ACMD(do_manufacture) {
 		ship = create_ship(ship_data[i].vnum, emp, IN_ROOM(ch));
 		msg_to_char(ch, "You begin working on a %s.\r\n", ship_data[i].name);
 		act("$n begins to build a ship.", FALSE, ch, 0, 0, TO_ROOM);
-		start_action(ch, ACT_MANUFACTURING, 1, NOBITS);
+		start_action(ch, ACT_MANUFACTURING, 1);
 		GET_OBJ_VAL(ship, VAL_SHIP_RESOURCES_REMAINING) = ship_data[i].resources;
 	}
 }

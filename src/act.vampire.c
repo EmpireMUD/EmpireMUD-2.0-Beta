@@ -1353,7 +1353,7 @@ ACMD(do_sire) {
 		do_bite(ch, buf, 0, 1);
 		
 		if (GET_FEEDING_FROM(ch)) {
-			start_action(ch, ACT_SIRING, -1, 0);
+			start_action(ch, ACT_SIRING, -1);
 		}
 	}
 }

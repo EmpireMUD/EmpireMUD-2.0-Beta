@@ -4131,7 +4131,7 @@ ACMD(do_reclaim) {
 			log_to_empire(enemy, ELOG_HOSTILITY, "An enemy is trying to reclaim (%d, %d)", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
 			msg_to_char(ch, "You start to reclaim this acre. It will take 5 minutes.\r\n");
 			act("$n starts to reclaim this acre for $s empire!", FALSE, ch, NULL, NULL, TO_ROOM);
-			start_action(ch, ACT_RECLAIMING, 12 * SECS_PER_REAL_UPDATE, 0);
+			start_action(ch, ACT_RECLAIMING, 12 * SECS_PER_REAL_UPDATE);
 			GET_ACTION_VNUM(ch, 0) = ROOM_OWNER(IN_ROOM(ch)) ? EMPIRE_VNUM(ROOM_OWNER(IN_ROOM(ch))) : NOTHING;
 		}
 	}

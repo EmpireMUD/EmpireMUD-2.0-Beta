@@ -766,6 +766,7 @@ typedef struct trig_data trig_data;
 
 
 // misc game configs
+#define ACTION_CYCLE_TIME  6	// seconds per action tick (before haste) -- TODO should this be a config?
 #define SKILLS_PER_CLASS  2	// number of skills that makes up a combo class
 #define HISTORY_SIZE  5	// Keep last 5 commands.
 
@@ -1081,7 +1082,11 @@ typedef struct trig_data trig_data;
 #define ACT_GEN_CRAFT		35
 
 // act flags
-#define ACT_ANYWHERE	BIT(0)
+#define ACTF_ANYWHERE  BIT(0)	// movement won't break it
+#define ACTF_HASTE  BIT(1)	// haste increases speed
+#define ACTF_FAST_CHORES  BIT(2)  // fast-chores increases speed
+#define ACTF_SHOVEL  BIT(3)	// shovel increases speed
+#define ACTF_FINDER  BIT(4)	// finder increases speed
 
 
 // bonus traits
@@ -2278,7 +2283,7 @@ struct player_special_data_saved {
 
 	// action info
 	int action;	// ACT_x
-	int action_rotation;	// used to keep all player actions from happening on the same tick
+	int action_cycle;	// time left before an action tick
 	int action_timer;	// ticks to completion (use varies)
 	room_vnum action_room;	// player location
 	int action_vnum[NUM_ACTION_VNUMS];	// slots for storing action data (use varies)
@@ -2682,6 +2687,7 @@ struct crop_data {
 struct action_data_struct {
 	char *name;	// shown e.g. in sentences or prompt ("digging")
 	char *long_desc;	// shown in room (action description)
+	bitvector_t flags;	// ACTF_x flags
 	void (*process_function)(char_data *ch);	// called on ticks (may be NULL)
 	void (*cancel_function)(char_data *ch);	// called when the action is cancelled early (may be NULL)
 };

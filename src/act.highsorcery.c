@@ -470,7 +470,7 @@ void start_ritual(char_data *ch, int ritual) {
 	// first message
 	send_ritual_messages(ch, ritual, 0);
 	
-	start_action(ch, ACT_RITUAL, 0, NOBITS);
+	start_action(ch, ACT_RITUAL, 0);
 	GET_ACTION_VNUM(ch, 0) = ritual;
 }
 
@@ -2178,5 +2178,5 @@ ACMD(do_study) {
 	msg_to_char(ch, "You pick up a book to study.\r\n");
 	act("$n picks up a book to study.", FALSE, ch, NULL, NULL, TO_ROOM);
 	
-	start_action(ch, ACT_STUDYING, 0, 0);
+	start_action(ch, ACT_STUDYING, 0);
 }
