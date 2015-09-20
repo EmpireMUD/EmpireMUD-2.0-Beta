@@ -1468,6 +1468,9 @@ ACMD(do_herd) {
 
 	if (IS_NPC(ch))
 		return;
+	else if (IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
+		msg_to_char(ch, "You can't herd anything in an adventure.\r\n");
+	}
 	else if (!*arg || !*buf)
 		msg_to_char(ch, "Who do you want to herd, and which direction?\r\n");
 	else if (!(victim = get_char_vis(ch, arg, FIND_CHAR_ROOM)))
