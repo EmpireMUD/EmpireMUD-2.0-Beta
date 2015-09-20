@@ -1080,6 +1080,7 @@ typedef struct trig_data trig_data;
 #define ACT_READING			33
 #define ACT_COPYING_BOOK	34
 #define ACT_GEN_CRAFT		35
+#define ACT_SAILING			36
 
 // act flags
 #define ACTF_ANYWHERE  BIT(0)	// movement won't break it
@@ -1087,6 +1088,7 @@ typedef struct trig_data trig_data;
 #define ACTF_FAST_CHORES  BIT(2)  // fast-chores increases speed
 #define ACTF_SHOVEL  BIT(3)	// shovel increases speed
 #define ACTF_FINDER  BIT(4)	// finder increases speed
+#define ACTF_ALWAYS_FAST  BIT(5)	// this action is always faster
 
 
 // bonus traits

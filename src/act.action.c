@@ -52,6 +52,7 @@ obj_data *has_shovel(char_data *ch);
 void cancel_chipping(char_data *ch);
 void cancel_gen_craft(char_data *ch);
 void cancel_minting(char_data *ch);
+void cancel_sailing(char_data *ch);
 void cancel_sawing(char_data *ch);
 void cancel_scraping(char_data *ch);
 void cancel_siring(char_data *ch);
@@ -90,6 +91,7 @@ void process_prospecting(char_data *ch);
 void process_quarrying(char_data *ch);
 void process_reading(char_data *ch);
 void process_reclaim(char_data *ch);
+void process_sailing(char_data *ch);
 void process_scraping(char_data *ch);
 void process_siring(char_data *ch);
 void process_smelting(char_data *ch);
@@ -138,6 +140,7 @@ const struct action_data_struct action_data[] = {
 	{ "reading", "is reading a book.", NOBITS, process_reading, NULL },	// ACT_READING
 	{ "copying", "is writing out a copy of a book.", NOBITS, process_copying_book, NULL },	// ACT_COPYING_BOOK
 	{ "crafting", "is working on something.", NOBITS, process_gen_craft, cancel_gen_craft },	// ACT_GEN_CRAFT
+	{ "sailing", "is sailing the ship.", ACTF_ALWAYS_FAST, process_sailing, cancel_sailing },	// ACT_SAILING
 
 	{ "\n", "\n", NOBITS, NULL, NULL }
 };
@@ -247,6 +250,9 @@ void update_actions(void) {
 		speed = 1;	// default is 1 second per second
 		
 		// things that modify speed...
+		if (IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_ALWAYS_FAST)) {
+			speed += 1;
+		}
 		if (IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_HASTE) && AFF_FLAGGED(ch, AFF_HASTE)) {
 			speed += 1;
 		}
@@ -330,6 +336,28 @@ void cancel_minting(char_data *ch) {
 	obj_data *obj = read_object(GET_ACTION_VNUM(ch, 0));
 	obj_to_char_or_room(obj, ch);
 	load_otrigger(obj);
+}
+
+
+/**
+* Alerts people that the ship stops moving.
+*
+* @param char_data *ch The sailer.
+*/
+void cancel_sailing(char_data *ch) {
+	room_data *room, *next_room;
+	obj_data *ship;
+	
+	// no ship? no work
+	if (!(ship = GET_BOAT(HOME_ROOM(IN_ROOM(ch))))) {
+		return;
+	}
+	
+	HASH_ITER(interior_hh, interior_world_table, room, next_room) {
+		if (HOME_ROOM(room) == IN_ROOM(ch) && ROOM_PEOPLE(room)) {
+			act("The ship stops moving.", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
+		}
+	}
 }
 
 
@@ -1749,6 +1777,38 @@ void process_quarrying(char_data *ch) {
 		if (in_room == IN_ROOM(ch)) {
 			start_quarrying(ch);
 		}
+	}
+}
+
+
+/**
+* Tick update for sailing action.
+*
+* @param char_data *ch The character doing the sailing.
+*/
+void process_sailing(char_data *ch) {
+	extern bool move_ship(char_data *ch, obj_data *ship, int dir);
+	extern bool only_one_sailing(char_data *ch, obj_data *ship);
+
+	int dir = GET_ACTION_VNUM(ch, 0);
+	obj_data *ship;
+	
+	// not on a ship?
+	if (!(ship = GET_BOAT(HOME_ROOM(IN_ROOM(ch))))) {
+		cancel_action(ch);
+		return;
+	}
+	
+	if (!only_one_sailing(ch, ship)) {
+		msg_to_char(ch, "Someone else is sailing the ship right now.\r\n");
+		GET_ACTION(ch) = ACT_NONE;	// silent stop -- no message to the whole ship
+		return;
+	}
+	
+	// attempt to move the ship
+	if (!move_ship(ch, ship, dir)) {
+		cancel_action(ch);
+		return;
 	}
 }
 

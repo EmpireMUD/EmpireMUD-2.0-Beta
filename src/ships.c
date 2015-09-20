@@ -306,6 +306,139 @@ int load_all_objs_to_boat(char_data *ch, room_data *from, room_data *to, obj_dat
 }
 
 
+/**
+* Attempt to move a ship. This may send an error message if it fails.
+*
+* @param char_data *ch The person trying to move the ship (optional: may be NULL).
+* @param obj_data *ship The ship to move.
+* @param int dir Which direction to move it.
+* @return bool TRUE if it moved, FALSE if it was blocked.
+*/
+bool move_ship(char_data *ch, obj_data *ship, int dir) {
+	extern const char *from_dir[];
+	
+	room_data *deck, *to_room = NULL, *was_in, *room, *next_room;
+	struct room_direction_data *ex;
+	char_data *ch_iter;
+	
+	// sanity
+	if (!ship || !IS_SHIP(ship) || dir == NO_DIR || dir >= NUM_2D_DIRS) {
+		return FALSE;
+	}
+	if (!(deck = real_room(GET_SHIP_MAIN_ROOM(ship)))) {
+		return FALSE;
+	}
+	
+	if (ch && !can_use_room(ch, deck, MEMBERS_ONLY)) {
+		msg_to_char(ch, "You don't have permission to sail this ship.\r\n");
+		return FALSE;
+	}
+
+	// targeting
+	if (ROOM_IS_CLOSED(IN_ROOM(ship))) {
+		if ((ex = find_exit(IN_ROOM(ship), dir))) {
+			to_room = ex->room_ptr;
+		}
+		else {
+			to_room = NULL;
+		}
+	}
+	else {
+		to_room = real_shift(IN_ROOM(ship), shift_dir[dir][0], shift_dir[dir][1]);
+	}
+	if (!to_room) {
+		if (ch) {
+			msg_to_char(ch, "The ship can't sail any further %s.\r\n", dirs[get_direction_for_char(ch, dir)]);
+		}
+		return FALSE;
+	}
+	
+	// checks based on target
+	if (!CAN_SAIL_IN(to_room)) {
+		if (ch) {
+			msg_to_char(ch, "You can't sail that direction.\r\n");
+		}
+		return FALSE;
+	}
+	if (!IS_COMPLETE(to_room)) {
+		if (ch) {
+			msg_to_char(ch, "You can't sail in until it's complete.\r\n");
+		}
+		return FALSE;
+	}
+	if (ch && !ROOM_IS_CLOSED(IN_ROOM(ship)) && ROOM_IS_CLOSED(to_room) && !can_use_room(ch, to_room, GUESTS_ALLOWED) && !IS_IMMORTAL(ch)) {
+		msg_to_char(ch, "You don't have permission to sail there.\r\n");
+		return FALSE;
+	}
+	
+	// let's do this
+	was_in = IN_ROOM(ship);
+	
+	// notify leaving
+	for (ch_iter = ROOM_PEOPLE(IN_ROOM(ship)); ch_iter; ch_iter = ch_iter->next_in_room) {
+		if (ch_iter->desc) {
+			sprintf(buf, "$p sails %s.", dirs[get_direction_for_char(ch_iter, dir)]);
+			act(buf, TRUE, ch_iter, ship, 0, TO_CHAR);
+		}
+	}
+			
+	obj_to_room(ship, to_room);
+	check_for_ships_present(was_in);	// update old room
+	check_for_ships_present(to_room);	// update new room
+	
+	for (ch_iter = ROOM_PEOPLE(IN_ROOM(ship)); ch_iter; ch_iter = ch_iter->next_in_room) {
+		if (ch_iter->desc) {
+			sprintf(buf, "$p sails in from %s.", from_dir[get_direction_for_char(ch_iter, dir)]);
+			act(buf, TRUE, ch_iter, ship, 0, TO_CHAR);
+		}
+	}
+	
+	// alert whole ship
+	HASH_ITER(interior_hh, interior_world_table, room, next_room) {
+		if (HOME_ROOM(room) != deck) {
+			continue;
+		}
+		
+		for (ch_iter = ROOM_PEOPLE(room); ch_iter; ch_iter = ch_iter->next_in_room) {
+			if (ch_iter->desc) {
+				snprintf(buf, sizeof(buf), "The ship sails %s.", dirs[get_direction_for_char(ch_iter, dir)]);
+				act(buf, FALSE, ch_iter, NULL, NULL, TO_CHAR | TO_SPAMMY);
+			}
+		}
+	}
+	
+	return TRUE;
+}
+
+
+/**
+* @param char_data *ch The person who may be sailing.
+* @param obj_data *ship The ship they are sailing or wanting to sail.
+* @return bool TRUE if nobody else is sailing it; FALSE if someone else is.
+*/
+bool only_one_sailing(char_data *ch, obj_data *ship) {
+	room_data *room, *next_room;
+	char_data *ch_iter;
+	
+	if (!ship) {
+		return FALSE;
+	}
+	
+	HASH_ITER(interior_hh, interior_world_table, room, next_room) {
+		if (HOME_ROOM(room) != HOME_ROOM(IN_ROOM(ch))) {
+			continue;
+		}
+		for (ch_iter = ROOM_PEOPLE(room); ch_iter; ch_iter = ch_iter->next_in_room) {
+			if (ch_iter != ch && !IS_NPC(ch_iter) && GET_ACTION(ch_iter) == ACT_SAILING) {
+				return FALSE;
+			}
+		}
+	}
+	
+	return TRUE;
+}
+
+
 /*
  * Returns:
  *  -2: nothing could be unloaded, docks are full
@@ -687,86 +820,62 @@ ACMD(do_manufacture) {
 
 
 ACMD(do_sail) {
-	extern const char *from_dir[];
-
-	struct room_direction_data *ex;
-	char_data *vict;
+	room_data *room, *next_room;
+	char_data *ch_iter;
+	bool was_sailing;
 	obj_data *ship;
 	int dir;
-	room_data *to_room, *was_in = NULL;
 
 	skip_spaces(&argument);
 	
 	// basics
-	if (!(ship = GET_BOAT(HOME_ROOM(IN_ROOM(ch))))) {
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "You can't do that.\r\n");
+	}
+	else if (!*argument && GET_ACTION(ch) == ACT_SAILING) {
+		cancel_action(ch);
+	}
+	else if (GET_ACTION(ch) != ACT_NONE && GET_ACTION(ch) != ACT_SAILING) {
+		msg_to_char(ch, "You're too busy doing something else.\r\n");
+	}
+	else if (!(ship = GET_BOAT(HOME_ROOM(IN_ROOM(ch))))) {
 		msg_to_char(ch, "You can only sail on a ship.\r\n");
-		return;
 	}
-	if (!can_use_room(ch, HOME_ROOM(IN_ROOM(ch)), MEMBERS_ONLY)) {
+	else if (!can_use_room(ch, HOME_ROOM(IN_ROOM(ch)), MEMBERS_ONLY)) {
 		msg_to_char(ch, "You don't have permission to sail this ship.\r\n");
-		return;
 	}
-	if (!*argument) {
+	else if (!only_one_sailing(ch, ship)) {
+		msg_to_char(ch, "Someone else is sailing this ship right now.\r\n");
+	}
+	else if (!*argument) {
 		msg_to_char(ch, "Which direction would you like to sail?\r\n");
-		return;
 	}
-	if ((dir = parse_direction(ch, argument)) == NO_DIR || dir >= NUM_2D_DIRS) {
+	else if ((dir = parse_direction(ch, argument)) == NO_DIR || dir >= NUM_2D_DIRS) {
 		msg_to_char(ch, "You can't sail that direction.\r\n");
-		return;
 	}
-	
-	// targeting
-	if (ROOM_IS_CLOSED(IN_ROOM(ship))) {
-		if (!(ex = find_exit(IN_ROOM(ship), dir))) {
-			msg_to_char(ch, "You can't sail that direction!\r\n");
-			return;
-		}
-
-		to_room = ex->room_ptr;
+	else if (GET_ACTION(ch) == ACT_SAILING && GET_ACTION_VNUM(ch, 0) == dir) {
+		msg_to_char(ch, "You are already sailing that way.\r\n");
 	}
 	else {
-		to_room = real_shift(IN_ROOM(ship), shift_dir[dir][0], shift_dir[dir][1]);
-	}
-	
-	// checks based on target
-	if (!to_room || !CAN_SAIL_IN(to_room)) {
-		msg_to_char(ch, "You can't sail that direction.\r\n");
-		return;
-	}
-	if (!IS_COMPLETE(to_room)) {
-		msg_to_char(ch, "You can't sail in until it's complete.\r\n");
-		return;
-	}
-	if (!ROOM_IS_CLOSED(IN_ROOM(ship)) && ROOM_IS_CLOSED(to_room) && !can_use_room(ch, to_room, GUESTS_ALLOWED) && !IS_IMMORTAL(ch)) {
-		msg_to_char(ch, "You don't have permission to sail there.\r\n");
-		return;
-	}
-
-	// let's do this
-	was_in = IN_ROOM(ship);
-	
-	// notify leaving
-	for (vict = ROOM_PEOPLE(IN_ROOM(ship)); vict; vict = vict->next_in_room) {
-		if (vict->desc) {
-			sprintf(buf, "$p sails %s.", dirs[get_direction_for_char(vict, dir)]);
-			act(buf, TRUE, vict, ship, 0, TO_CHAR);
+		was_sailing = (GET_ACTION(ch) == ACT_SAILING);
+		start_action(ch, ACT_SAILING, 0);
+		GET_ACTION_VNUM(ch, 0) = dir;
+		msg_to_char(ch, "You start sailing %s.\r\n", dirs[get_direction_for_char(ch, dir)]);
+		
+		// alert whole ship
+		HASH_ITER(interior_hh, interior_world_table, room, next_room) {
+			if (HOME_ROOM(room) != HOME_ROOM(IN_ROOM(ch))) {
+				continue;
+			}
+		
+			for (ch_iter = ROOM_PEOPLE(room); ch_iter; ch_iter = ch_iter->next_in_room) {
+				if (ch_iter != ch && ch_iter->desc) {
+					snprintf(buf, sizeof(buf), "The ship begins to sail %s.", dirs[get_direction_for_char(ch_iter, dir)]);
+					act(buf, FALSE, ch_iter, NULL, NULL, TO_CHAR);
+				}
+			}
 		}
 	}
-			
-	obj_to_room(ship, to_room);
-	check_for_ships_present(was_in);	// update old room
-	check_for_ships_present(to_room);	// update new room
-	
-	for (vict = ROOM_PEOPLE(IN_ROOM(ship)); vict; vict = vict->next_in_room) {
-		if (vict->desc) {
-			sprintf(buf, "$p sails in from %s.", from_dir[get_direction_for_char(vict, dir)]);
-			act(buf, TRUE, vict, ship, 0, TO_CHAR | TO_SPAMMY);
-		}
-	}
-	
-	// looking at the room you're in while on a ship shows the surrounding area
-	look_at_room_by_loc(ch, IN_ROOM(ch), NOBITS);
-	command_lag(ch, WAIT_OTHER);
 }
 
 
