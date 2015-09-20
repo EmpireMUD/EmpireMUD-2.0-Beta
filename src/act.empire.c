@@ -3628,7 +3628,7 @@ ACMD(do_tavern) {
 		}
 	}
 	
-	if (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_TAVERN)) {
+	if (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_TAVERN) || !IS_COMPLETE(IN_ROOM(ch))) {
 		show_tavern_status(ch);
 		msg_to_char(ch, "You can only change what's being brewed while actually in the tavern.\r\n");
 	}
