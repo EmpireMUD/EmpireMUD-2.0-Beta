@@ -1854,7 +1854,7 @@ ACMD(do_nodismantle) {
 
 
 ACMD(do_tunnel) {
-	bitvector_t exit_bld_flags = BLD_ON_PLAINS | BLD_ANY_FOREST | BLD_ON_DESERT | BLD_FACING_CROP | BLD_ON_GROVE;
+	bitvector_t exit_bld_flags = BLD_ON_PLAINS | BLD_ANY_FOREST | BLD_ON_DESERT | BLD_FACING_CROP | BLD_ON_GROVE | BLD_FACING_OPEN_BUILDING;
 	bitvector_t mountain_bld_flags = BLD_ON_MOUNTAIN;
 
 	room_data *entrance, *exit = NULL, *to_room, *last_room = NULL, *past_exit;
