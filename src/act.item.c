@@ -2476,6 +2476,12 @@ void trade_post(char_data *ch, char *argument) {
 	else if (IS_STOLEN(obj)) {
 		msg_to_char(ch, "You can't post stolen items.\r\n");
 	}
+	else if (OBJ_FLAGGED(obj, OBJ_JUNK)) {
+		msg_to_char(ch, "You can't post junk for sale.\r\n");
+	}
+	else if (GET_OBJ_TIMER(obj) > 0) {
+		msg_to_char(ch, "You can't post items with timers on them for sale.\r\n");
+	}
 	else if ((cost = atoi(costarg)) < 1) {
 		msg_to_char(ch, "You must charge at least 1 coin.\r\n");
 	}
