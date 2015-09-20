@@ -1672,6 +1672,8 @@ struct find_territory_node *reduce_territory_node_list(struct find_territory_nod
 * @param char_data *argument The tile to search for.
 */
 void scan_for_tile(char_data *ch, char *argument) {
+	extern byte distance_can_see(char_data *ch);
+	extern int get_map_radius(char_data *ch);
 	void sort_territory_node_list_by_distance(room_data *from, struct find_territory_node **node_list);
 	extern const char *dirs[];
 
@@ -1697,15 +1699,21 @@ void scan_for_tile(char_data *ch, char *argument) {
 		return;
 	}
 
-	// TODO should this use a function to get auto-mapsize like map view does?
-	mapsize = GET_MAPSIZE(REAL_CHAR(ch));
-	if (mapsize == 0) {
-		mapsize = config_get_int("default_map_size");
-	}
+	mapsize = get_map_radius(ch);
 	
 	for (x = -mapsize; x <= mapsize; ++x) {
 		for (y = -mapsize; y <= mapsize; ++y) {
 			if (!(room = real_shift(map, x, y))) {
+				continue;
+			}
+			
+			// actual distance check (compute circle)
+			if (compute_distance(room, IN_ROOM(ch)) > mapsize) {
+				continue;
+			}
+			
+			// darkness check
+			if (room != IN_ROOM(ch) && !CAN_SEE_IN_DARK_ROOM(ch, room) && compute_distance(room, IN_ROOM(ch)) > distance_can_see(ch) && !adjacent_room_is_light(room)) {
 				continue;
 			}
 			

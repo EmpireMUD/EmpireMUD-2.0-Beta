@@ -171,6 +171,42 @@ struct icon_data *get_icon_from_set(struct icon_data *set, int type) {
 
 
 /**
+* Detects the player's effective map radius size -- how far away the player
+* can see, as displayed on the map. This is controlled by the 'mapsize'
+* command, which actually sets the diameter.
+*
+* @param char_data *ch The person to get mapsize for.
+* @return int The map radius.
+*/
+int get_map_radius(char_data *ch) {
+	int mapsize;
+
+	mapsize = GET_MAPSIZE(REAL_CHAR(ch));
+	if (mapsize == 0) {
+		// auto-detected
+		if (ch->desc && ch->desc->pProtocol->ScreenWidth > 0) {
+			int wide = (ch->desc->pProtocol->ScreenWidth - 6) / 8;	// the /8 is 4 chars per tile, doubled
+			int max_size = config_get_int("max_map_size");
+			if (ch->desc->pProtocol->ScreenHeight > 0) {
+				// cap based on height, too (save some room)
+				// this saves roughly 4 lines below the map -- if you're going
+				// to play around with it, be sure to test -- the math is not
+				// very straightforward. -paul
+				wide = MIN(wide, ((ch->desc->pProtocol->ScreenHeight - 7) / 2) - 1);	// the -1 at the end is to ensure even/odd numbers have an extra line rather than one too few
+				wide = MAX(wide, 1);	// otherwise, NAWS sometimes leads to a map with only the player
+			}
+			mapsize = MIN(wide, max_size);
+		}
+		else {
+			mapsize = config_get_int("default_map_size");
+		}
+	}
+	
+	return mapsize;
+}
+
+
+/**
 * Returns the mineral name for a room with mine data.
 *
 * @param room_data *room The room
@@ -471,26 +507,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	if (!ch || !ch->desc)
 		return;
 
-	mapsize = GET_MAPSIZE(REAL_CHAR(ch));
-	if (mapsize == 0) {
-		// auto-detected
-		if (ch->desc && ch->desc->pProtocol->ScreenWidth > 0) {
-			int wide = (ch->desc->pProtocol->ScreenWidth - 6) / 8;	// the /8 is 4 chars per tile, doubled
-			int max_size = config_get_int("max_map_size");
-			if (ch->desc->pProtocol->ScreenHeight > 0) {
-				// cap based on height, too (save some room)
-				// this saves roughly 4 lines below the map -- if you're going
-				// to play around with it, be sure to test -- the math is not
-				// very straightforward. -paul
-				wide = MIN(wide, ((ch->desc->pProtocol->ScreenHeight - 7) / 2) - 1);	// the -1 at the end is to ensure even/odd numbers have an extra line rather than one too few
-				wide = MAX(wide, 1);	// otherwise, NAWS sometimes leads to a map with only the player
-			}
-			mapsize = MIN(wide, max_size);
-		}
-		else {
-			mapsize = config_get_int("default_map_size");
-		}
-	}
+	mapsize = get_map_radius(ch);
 
 	if (AFF_FLAGGED(ch, AFF_BLIND)) {
 		msg_to_char(ch, "You see nothing but infinite darkness...\r\n");
