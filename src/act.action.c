@@ -225,7 +225,7 @@ void update_actions(void) {
 		ch = desc->character;
 		
 		// basic disqualifiers
-		if (!ch || STATE(desc) == CON_PLAYING || IS_NPC(ch) || GET_ACTION(ch) == ACT_NONE) {
+		if (!ch || STATE(desc) != CON_PLAYING || IS_NPC(ch) || GET_ACTION(ch) == ACT_NONE) {
 			continue;
 		}
 		
