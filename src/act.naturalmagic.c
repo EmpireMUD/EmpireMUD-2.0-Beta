@@ -212,7 +212,6 @@ void apply_potion(char_data *ch, int type, int scale) {
 			value = 0;
 		}
 		
-		// TODO the cast_by here needs to be the poisoner
 		af = create_aff(potion_data[type].atype, 24 MUD_HOURS, potion_data[type].apply, value, potion_data[type].aff, ch);
 		affect_join(ch, af, 0);
 	}
