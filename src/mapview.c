@@ -1087,6 +1087,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	sector_data *st, *base_sect = ROOM_ORIGINAL_SECT(to_room);
 	char *base_color, *str;
 	room_data *map_loc = get_map_location_for(IN_ROOM(ch)), *map_to_room = get_map_location_for(to_room);
+	obj_data *on_ship;
 	
 	// options
 	bool show_dark = IS_SET(options, LRR_SHOW_DARK) ? TRUE : FALSE;
@@ -1129,6 +1130,22 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	}
 	else if (!show_dark && !PRF_FLAGGED(ch, PRF_INFORMATIVE | PRF_POLITICAL) && show_pc_in_room(ch, to_room, mappc)) {
 		return;
+	}
+	
+	// ship present -- in specific cases where it overrides the normal icon
+	else if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_SHIP_PRESENT) && (ROOM_SECT_FLAGGED(to_room, SECTF_FRESH_WATER | SECTF_OCEAN) || ((on_ship = GET_BOAT(HOME_ROOM(IN_ROOM(ch)))) && to_room == IN_ROOM(on_ship)))) {
+		// show boats in room
+		if (ROOM_SECT_FLAGGED(to_room, SECTF_FRESH_WATER)) {
+			strcat(buf, boat_icon_river);
+		}
+		else if (ROOM_SECT_FLAGGED(to_room, SECTF_OCEAN)) {
+			strcat(buf, boat_icon_ocean);
+		}
+		else {
+			// should never hit this case
+			icon = get_icon_from_set(GET_SECT_ICONS(SECT(to_room)), tileset);
+			strcat(buf, icon->icon);
+		}
 	}
 
 	/* Hidden buildings */
@@ -1233,20 +1250,6 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 		}
 		else {
 			sprintf(buf + strlen(buf), "&?%c", GET_SECT_ROADSIDE_ICON(base_sect));
-		}
-	}
-	else if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_SHIP_PRESENT) && ROOM_SECT_FLAGGED(to_room, SECTF_FRESH_WATER | SECTF_OCEAN)) {
-		// show boats in room
-		if (ROOM_SECT_FLAGGED(to_room, SECTF_FRESH_WATER)) {
-			strcat(buf, boat_icon_river);
-		}
-		else if (ROOM_SECT_FLAGGED(to_room, SECTF_OCEAN)) {
-			strcat(buf, boat_icon_ocean);
-		}
-		else {
-			// should never hit this case
-			icon = get_icon_from_set(GET_SECT_ICONS(SECT(to_room)), tileset);
-			strcat(buf, icon->icon);
 		}
 	}
 	else if (ROOM_SECT_FLAGGED(to_room, SECTF_CROP) && cp) {
