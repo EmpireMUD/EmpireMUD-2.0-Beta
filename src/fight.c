@@ -498,11 +498,20 @@ double get_weapon_speed(obj_data *weapon) {
 * @return bool TRUE if it's an ally of ch, or FALSE.
 */
 bool is_fight_ally(char_data *ch, char_data *frenemy) {
-	char_data *fighting = FIGHTING(frenemy);
+	char_data *fighting = FIGHTING(frenemy), *ch_iter, *fr_iter;
 	
-	// self is ally
-	if (ch == frenemy) {
-		return TRUE;
+	// check "master" tree up both sides == people are allies if ch (or any of ch's masters) are the same as frenemy (or any of frenemy's masters)
+	ch_iter = ch;
+	while (ch_iter) {
+		fr_iter = frenemy;
+		while (fr_iter) {
+			if (ch_iter == fr_iter) {
+				// self is ally!
+				return TRUE;
+			}
+			fr_iter = fr_iter->master;
+		}
+		ch_iter = ch_iter->master;
 	}
 	
 	if (fighting) {
