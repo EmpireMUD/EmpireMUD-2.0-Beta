@@ -1033,6 +1033,9 @@ void process_digging(char_data *ch) {
 				if (get_depletion(IN_ROOM(ch), DPLTN_DIG) < DEPLETION_LIMIT(IN_ROOM(ch))) {
 					start_digging(ch);
 				}
+				else {
+					msg_to_char(ch, "There don't seem to be any other good rocks here.\r\n");
+				}
 			}
 		}
 		else {
