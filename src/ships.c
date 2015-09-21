@@ -401,7 +401,12 @@ bool move_ship(char_data *ch, obj_data *ship, int dir) {
 		
 		for (ch_iter = ROOM_PEOPLE(room); ch_iter; ch_iter = ch_iter->next_in_room) {
 			if (ch_iter->desc) {
-				snprintf(buf, sizeof(buf), "The ship sails %s.", dirs[get_direction_for_char(ch_iter, dir)]);
+				if (HAS_ABILITY(ch_iter, ABIL_NAVIGATION)) {
+					snprintf(buf, sizeof(buf), "The ship sails %s (%d, %d).", dirs[get_direction_for_char(ch_iter, dir)], X_COORD(IN_ROOM(ship)), Y_COORD(IN_ROOM(ship)));
+				}
+				else {
+					snprintf(buf, sizeof(buf), "The ship sails %s.", dirs[get_direction_for_char(ch_iter, dir)]);
+				}
 				act(buf, FALSE, ch_iter, NULL, NULL, TO_CHAR | TO_SPAMMY);
 			}
 		}
