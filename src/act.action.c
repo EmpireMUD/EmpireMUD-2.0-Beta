@@ -354,7 +354,7 @@ void cancel_sailing(char_data *ch) {
 	}
 	
 	HASH_ITER(interior_hh, interior_world_table, room, next_room) {
-		if (HOME_ROOM(room) == IN_ROOM(ch) && ROOM_PEOPLE(room)) {
+		if (HOME_ROOM(room) == HOME_ROOM(IN_ROOM(ch)) && ROOM_PEOPLE(room)) {
 			act("The ship stops moving.", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
 		}
 	}
