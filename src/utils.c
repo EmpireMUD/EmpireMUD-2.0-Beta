@@ -468,7 +468,7 @@ void process_import_pair(empire_data *emp, empire_data *partner, int *limit) {
 		}
 		
 		// do we need it?
-		my_amt = get_total_stored_count(emp, trade->vnum);
+		my_amt = get_total_stored_count(emp, trade->vnum, TRUE);	// count shipping
 		if (my_amt >= trade->limit) {
 			continue;
 		}
@@ -479,7 +479,7 @@ void process_import_pair(empire_data *emp, empire_data *partner, int *limit) {
 		}
 		
 		// do they have enough?
-		their_amt = get_total_stored_count(partner, trade->vnum);
+		their_amt = get_total_stored_count(partner, trade->vnum, FALSE);	// don't count shipping -- it's not tradable
 		if (their_amt <= p_trade->limit) {
 			continue;
 		}
@@ -521,13 +521,13 @@ void process_import_pair(empire_data *emp, empire_data *partner, int *limit) {
 		found_any = FALSE;
 		for (iter = 0; iter < trade_list_size && *limit < imports_per_day; ++iter) {
 			// do they still have any?
-			their_amt = get_total_stored_count(partner, trade_list[iter]->vnum);
+			their_amt = get_total_stored_count(partner, trade_list[iter]->vnum, FALSE);	// don't count shipping; it's not tradable
 			if (their_amt <= partner_list[iter]->limit) {
 				continue;
 			}
 
 			// do we still it?
-			my_amt = get_total_stored_count(emp, trade_list[iter]->vnum);
+			my_amt = get_total_stored_count(emp, trade_list[iter]->vnum, TRUE);	// do count shipping
 			if (my_amt >= trade_list[iter]->limit) {
 				continue;
 			}

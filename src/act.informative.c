@@ -1510,7 +1510,7 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 * @param bool show_zero Forces an amount of 0, in case this is only being shown for the "total" reference and there are actually 0 here.
 */
 void show_one_stored_item_to_char(char_data *ch, empire_data *emp, struct empire_storage_data *store, bool show_zero) {
-	int total = get_total_stored_count(emp, store->vnum);
+	int total = get_total_stored_count(emp, store->vnum, TRUE);
 	char lbuf[MAX_INPUT_LENGTH];
 	
 	if (total > store->amount || show_zero) {

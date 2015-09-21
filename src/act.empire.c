@@ -1245,7 +1245,7 @@ void do_import_list(char_data *ch, empire_data *emp, char *argument, int subcmd)
 			}
 			
 			// figure out indicator
-			haveamt = get_total_stored_count(use_emp, trade->vnum);
+			haveamt = get_total_stored_count(use_emp, trade->vnum, TRUE);
 			if (use_type == TRADE_IMPORT && haveamt >= trade->limit) {
 				strcpy(indicator, " &r(full)&0");
 			}
@@ -1310,7 +1310,7 @@ void do_import_analysis(char_data *ch, empire_data *emp, char *argument, int sub
 				continue;
 			}
 			
-			haveamt = get_total_stored_count(iter, trade->vnum);
+			haveamt = get_total_stored_count(iter, trade->vnum, TRUE);
 			has_avail = (find_type == TRADE_EXPORT) ? (haveamt > trade->limit) : FALSE;
 			is_buying = (find_type == TRADE_IMPORT) ? (haveamt < trade->limit) : FALSE;
 			rate = exchange_rate(iter, emp);

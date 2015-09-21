@@ -5321,10 +5321,12 @@ struct empire_storage_data *find_stored_resource(empire_data *emp, int island, o
 *
 * @param empire_data *emp The empire to check.
 * @param obj_vnum vnum The item to look for.
+* @param bool count_shipping If TRUE, also count items in the shipping system.
 * @return int The total number the empire has stored.
 */
-int get_total_stored_count(empire_data *emp, obj_vnum vnum) {
+int get_total_stored_count(empire_data *emp, obj_vnum vnum, bool count_shipping) {
 	struct empire_storage_data *sto;
+	struct shipping_data *shipd;
 	int count = 0;
 	
 	if (!emp) {
@@ -5333,7 +5335,15 @@ int get_total_stored_count(empire_data *emp, obj_vnum vnum) {
 	
 	for (sto = EMPIRE_STORAGE(emp); sto; sto = sto->next) {
 		if (sto->vnum == vnum) {
-			count += sto->amount;
+			SAFE_ADD(count, sto->amount, INT_MIN, INT_MAX, TRUE);
+		}
+	}
+	
+	if (count_shipping) {
+		for (shipd = EMPIRE_SHIPPING_LIST(emp); shipd; shipd = shipd->next) {
+			if (shipd->vnum == vnum) {
+				SAFE_ADD(count, shipd->amount, INT_MIN, INT_MAX, TRUE);
+			}
 		}
 	}
 	
