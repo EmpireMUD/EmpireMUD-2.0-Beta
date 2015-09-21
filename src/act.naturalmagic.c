@@ -248,18 +248,6 @@ ACMD(do_cleanse) {
 	int pos, cost = 30;
 	bool done_aff;
 	
-	// a list of affects cleanse should ignore
-	int exclude_blacklist[] = {
-		ATYPE_MANASHIELD,	// has a max-mana penalty
-		ATYPE_VIGOR,	// has a move regen penalty
-		ATYPE_MUMMIFY,	// has a strange set of affs
-		ATYPE_DEATHSHROUD,	// has a strange set of affs
-		ATYPE_DEATH_PENALTY,	// is a penalty
-		ATYPE_WAR_DELAY,	// is a penalty
-		ATYPE_CONFERRED,	// is a penalty
-		-1	// last
-	};
-	
 	one_argument(argument, arg);
 	
 	if (!can_use_ability(ch, ABIL_CLEANSE, MANA, cost, COOLDOWN_CLEANSE)) {
@@ -446,7 +434,7 @@ ACMD(do_confer) {
 		// attempt to find an existing confer effect that matches and just add to its amount
 		found_existing = found_ch = FALSE;
 		for (aff_iter = vict->affected; aff_iter; aff_iter = aff_iter->next) {
-			if (aff_iter->type == ATYPE_CONFER && aff_iter->location == confer_list[type].apply) {
+			if (aff_iter->type == ATYPE_CONFER && aff_iter->cast_by == CAST_BY_ID(ch) && aff_iter->location == confer_list[type].apply) {
 				found_existing = TRUE;
 				aff_iter->modifier += amt;
 				match_duration = aff_iter->duration;	// store this to match it later
