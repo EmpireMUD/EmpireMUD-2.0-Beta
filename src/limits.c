@@ -187,7 +187,9 @@ void check_idle_passwords(void) {
 			++d->idle_tics;
 		}
 		else {
-			ProtocolNoEcho(d, false);
+			if (STATE(d) == CON_PASSWORD) {
+				ProtocolNoEcho(d, false);
+			}
 			SEND_TO_Q("\r\nTimed out... goodbye.\r\n", d);
 			STATE(d) = CON_CLOSE;
 		}

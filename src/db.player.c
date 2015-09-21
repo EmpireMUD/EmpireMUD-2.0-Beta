@@ -1256,8 +1256,8 @@ int enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	greet_memory_mtrigger(ch);
 	add_to_lookup_table(GET_ID(ch), (void *)ch);
 	
-	// ensure echo is on
-	ProtocolNoEcho(d, false);
+	// ensure echo is on -- no, this could cause a duplicate echo-on and lead to an echo loop
+	// ProtocolNoEcho(d, false);
 	
 	return load_result;
 }
