@@ -1245,7 +1245,7 @@ int enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	// ensure player has penalty if at war
 	if (fresh && GET_LOYALTY(ch) && is_at_war(GET_LOYALTY(ch))) {
 		int duration = config_get_int("war_login_delay") / SECS_PER_REAL_UPDATE;
-		struct affected_type *af = create_flag_aff(ATYPE_WAR_DELAY, duration, AFF_IMMUNE_PHYSICAL | AFF_NO_ATTACK | AFF_STUNNED);
+		struct affected_type *af = create_flag_aff(ATYPE_WAR_DELAY, duration, AFF_IMMUNE_PHYSICAL | AFF_NO_ATTACK | AFF_STUNNED, ch);
 		affect_join(ch, af, ADD_DURATION);
 	}
 

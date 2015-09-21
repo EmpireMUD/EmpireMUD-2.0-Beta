@@ -420,7 +420,7 @@ ACMD(do_nightsight) {
 	else {
 		msg_to_char(ch, "You activate nightsight.\r\n");
 		act("$n's eyes flash and take on a pale red glow.", TRUE, ch, NULL, NULL, TO_ROOM);
-		af = create_flag_aff(ATYPE_NIGHTSIGHT, UNLIMITED, AFF_INFRAVISION);
+		af = create_flag_aff(ATYPE_NIGHTSIGHT, UNLIMITED, AFF_INFRAVISION, ch);
 		affect_join(ch, af, 0);
 	}
 

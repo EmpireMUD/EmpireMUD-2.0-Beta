@@ -1136,7 +1136,7 @@ ACMD(do_mdot) {
 	}
 	
 	max_stacks = (*stackarg ? atoi(stackarg) : 1);
-	script_damage_over_time(vict, get_approximate_level(ch), type, modifier, atoi(durarg), max_stacks);
+	script_damage_over_time(vict, get_approximate_level(ch), type, modifier, atoi(durarg), max_stacks, ch);
 }
 
 

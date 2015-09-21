@@ -183,11 +183,11 @@ ACMD(do_damage_spell) {
 		// damage returns -1 on death
 		if (result > 0 && !IS_DEAD(vict) && !EXTRACTED(vict) && (damage_spell[type].aff_immunity == NOBITS || !AFF_FLAGGED(vict, damage_spell[type].aff_immunity))) {
 			if (damage_spell[type].aff_type > 0) {
-				af = create_aff(damage_spell[type].aff_type, damage_spell[type].duration, damage_spell[type].apply, damage_spell[type].modifier, damage_spell[type].aff_flag);
+				af = create_aff(damage_spell[type].aff_type, damage_spell[type].duration, damage_spell[type].apply, damage_spell[type].modifier, damage_spell[type].aff_flag, ch);
 				affect_join(vict, af, 0);
 			}
 			if (damage_spell[type].dot_type > 0) {
-				apply_dot_effect(vict, damage_spell[type].dot_type, damage_spell[type].dot_duration, damage_spell[type].dot_damage_type, damage_spell[type].dot_damage, damage_spell[type].dot_max_stacks);
+				apply_dot_effect(vict, damage_spell[type].dot_type, damage_spell[type].dot_duration, damage_spell[type].dot_damage_type, damage_spell[type].dot_damage, damage_spell[type].dot_max_stacks, ch);
 			}
 		}
 	}

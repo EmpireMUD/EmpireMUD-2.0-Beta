@@ -493,7 +493,7 @@ int apply_poison(char_data *ch, char_data *vict, int type) {
 	// atype
 	if (poison_data[type].atype > 0) {
 		
-		af = create_aff(poison_data[type].atype, 2 MUD_HOURS, poison_data[type].apply, poison_data[type].mod * (HAS_ABILITY(ch, ABIL_DEADLY_POISONS) ? 2 : 1), poison_data[type].aff);
+		af = create_aff(poison_data[type].atype, 2 MUD_HOURS, poison_data[type].apply, poison_data[type].mod * (HAS_ABILITY(ch, ABIL_DEADLY_POISONS) ? 2 : 1), poison_data[type].aff, ch);
 		affect_join(vict, af, poison_data[type].allow_stack ? (AVG_DURATION|ADD_MODIFIER) : 0);
 		
 		if (!messaged) {
@@ -507,7 +507,7 @@ int apply_poison(char_data *ch, char_data *vict, int type) {
 	
 	// dot
 	if (poison_data[type].dot_type > 0) {
-		apply_dot_effect(vict, poison_data[type].dot_type, poison_data[type].dot_duration, poison_data[type].dot_damage_type, poison_data[type].dot_damage * (HAS_ABILITY(ch, ABIL_DEADLY_POISONS) ? 2 : 1), poison_data[type].dot_max_stacks);
+		apply_dot_effect(vict, poison_data[type].dot_type, poison_data[type].dot_duration, poison_data[type].dot_damage_type, poison_data[type].dot_damage * (HAS_ABILITY(ch, ABIL_DEADLY_POISONS) ? 2 : 1), poison_data[type].dot_max_stacks, ch);
 		
 		if (!messaged) {
 			act("You feel ill as you are poisoned!", FALSE, vict, NULL, NULL, TO_CHAR);
@@ -671,7 +671,7 @@ ACMD(do_blind) {
 			act("$n tosses a handful of sand into your eyes!\r\n&rYou're blind!&0", FALSE, ch, NULL, vict, TO_VICT);
 			act("$n tosses a handful of sand into $N's eyes!", FALSE, ch, NULL, vict, TO_NOTVICT);
 			
-			af = create_flag_aff(ATYPE_BLIND, 2, AFF_BLIND);
+			af = create_flag_aff(ATYPE_BLIND, 2, AFF_BLIND, ch);
 			affect_join(vict, af, 0);
 		
 			engage_combat(ch, vict, TRUE);
@@ -713,6 +713,7 @@ ACMD(do_darkness) {
 
 		CREATE(af, struct affected_type, 1);
 		af->type = ATYPE_DARKNESS;
+		af->cast_by = CAST_BY_ID(ch);
 		af->duration = 6;
 		af->modifier = 0;
 		af->location = APPLY_NONE;
@@ -838,7 +839,7 @@ ACMD(do_diversion) {
 				value = ceil(GET_CHARISMA(ch) * (first ? 1.0 : 0.5));
 				first = FALSE;
 				
-				af = create_mod_aff(ATYPE_DIVERSION, 3, APPLY_WITS, -value);
+				af = create_mod_aff(ATYPE_DIVERSION, 3, APPLY_WITS, -value, ch);
 				affect_join(victim, af, NOBITS);
 				
 				msg_to_char(victim, "You can't seem to focus on the battle!\r\n");
@@ -954,7 +955,7 @@ ACMD(do_howl) {
 				value = GET_CHARISMA(ch) * (first ? 4 : 2);
 				first = FALSE;
 				
-				af = create_mod_aff(ATYPE_HOWL, 3, APPLY_TO_HIT, -value);
+				af = create_mod_aff(ATYPE_HOWL, 3, APPLY_TO_HIT, -value, ch);
 				affect_join(victim, af, NOBITS);
 				
 				msg_to_char(victim, "You are too scared to aim effectively!\r\n");
@@ -1091,26 +1092,26 @@ ACMD(do_jab) {
 		}
 		
 		if (hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FALSE) > 0) {
-			apply_dot_effect(vict, ATYPE_JABBED, 3, DAM_PHYSICAL, get_ability_level(ch, ABIL_JAB) / 24, 2);
+			apply_dot_effect(vict, ATYPE_JABBED, 3, DAM_PHYSICAL, get_ability_level(ch, ABIL_JAB) / 24, 2, ch);
 			
 			if (!HAS_ABILITY(ch, ABIL_STAGGER_JAB) && !AFF_FLAGGED(vict, AFF_IMMUNE_STEALTH)) {
 				struct affected_type *af;
 				int value = ceil(GET_CHARISMA(ch) / 5);
-				af = create_mod_aff(ATYPE_STAGGER_JAB, 3, APPLY_TO_HIT, -value);
+				af = create_mod_aff(ATYPE_STAGGER_JAB, 3, APPLY_TO_HIT, -value, ch);
 				affect_join(vict, af, ADD_MODIFIER);
 			}
 			
 			if (HAS_ABILITY(ch, ABIL_CRUCIAL_JAB) && !AFF_FLAGGED(vict, AFF_IMMUNE_STEALTH)) {
 				struct affected_type *af;
 				int value = round(GET_COMPUTED_LEVEL(ch) / 80);
-				af = create_mod_aff(ATYPE_CRUCIAL_JAB, 2, APPLY_DEXTERITY, -value);
+				af = create_mod_aff(ATYPE_CRUCIAL_JAB, 2, APPLY_DEXTERITY, -value, ch);
 				affect_join(vict, af, NOBITS);
 			}
 			
 			if (HAS_ABILITY(ch, ABIL_SHADOW_JAB) && !AFF_FLAGGED(vict, AFF_IMMUNE_STEALTH)) {
 				struct affected_type *af;
 				int value = ceil(GET_CHARISMA(ch) / 5);
-				af = create_mod_aff(ATYPE_SHADOW_JAB, 3, APPLY_DEXTERITY, -value);
+				af = create_mod_aff(ATYPE_SHADOW_JAB, 3, APPLY_DEXTERITY, -value, ch);
 				affect_join(vict, af, ADD_MODIFIER);
 			}
 		}
@@ -1318,7 +1319,7 @@ ACMD(do_sap) {
 		act("$n saps $N in the back of the head.", TRUE, ch, NULL, vict, TO_NOTVICT);
 		
 		if (success) {
-			af = create_flag_aff(ATYPE_SAP, REAL_UPDATES_PER_MIN, AFF_STUNNED);
+			af = create_flag_aff(ATYPE_SAP, REAL_UPDATES_PER_MIN, AFF_STUNNED, ch);
 			affect_join(vict, af, 0);
 			
 			msg_to_char(vict, "You are momentarily stunned!\r\n");
@@ -1420,7 +1421,7 @@ ACMD(do_shadowcage) {
 				value = GET_CHARISMA(ch) * (first ? 4 : 2);
 				first = FALSE;
 				
-				af = create_mod_aff(ATYPE_SHADOWCAGE, 3, APPLY_DODGE, -value);
+				af = create_mod_aff(ATYPE_SHADOWCAGE, 3, APPLY_DODGE, -value, ch);
 				affect_join(victim, af, NOBITS);
 				
 				msg_to_char(victim, "You can't seem to dodge as well in the shadowcage!\r\n");
@@ -1714,9 +1715,9 @@ ACMD(do_terrify) {
 		
 		if (skill_check(ch, ABIL_TERRIFY, DIFF_HARD) && !AFF_FLAGGED(victim, AFF_IMMUNE_STEALTH)) {
 			value = round(GET_COMPUTED_LEVEL(ch) / 30);
-			af = create_mod_aff(ATYPE_TERRIFY, 0.5 * REAL_UPDATES_PER_MIN, APPLY_BONUS_PHYSICAL, -value);
+			af = create_mod_aff(ATYPE_TERRIFY, 0.5 * REAL_UPDATES_PER_MIN, APPLY_BONUS_PHYSICAL, -value, ch);
 			affect_join(victim, af, 0);
-			af = create_mod_aff(ATYPE_TERRIFY, 0.5 * REAL_UPDATES_PER_MIN, APPLY_BONUS_MAGICAL, -value);
+			af = create_mod_aff(ATYPE_TERRIFY, 0.5 * REAL_UPDATES_PER_MIN, APPLY_BONUS_MAGICAL, -value, ch);
 			affect_join(victim, af, 0);
 			
 			msg_to_char(victim, "You are terrified!\r\n");

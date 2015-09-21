@@ -1429,7 +1429,7 @@ void perform_inspire(char_data *ch, char_data *vict, int type) {
 	if (inspire_data[type].first_apply != APPLY_NONE) {
 		value = round((points * (two ? 0.5 : 1.0)) / apply_values[inspire_data[type].first_apply]);
 		if (value > 0) {
-			af = create_mod_aff(ATYPE_INSPIRE, time, inspire_data[type].first_apply, value);
+			af = create_mod_aff(ATYPE_INSPIRE, time, inspire_data[type].first_apply, value, ch);
 			affect_join(vict, af, 0);
 			any = TRUE;
 		}
@@ -1437,7 +1437,7 @@ void perform_inspire(char_data *ch, char_data *vict, int type) {
 	if (inspire_data[type].second_apply != APPLY_NONE) {
 		value = round((points * 0.5) / apply_values[inspire_data[type].second_apply]);
 		if (value > 0) {
-			af = create_mod_aff(ATYPE_INSPIRE, time, inspire_data[type].second_apply, value);
+			af = create_mod_aff(ATYPE_INSPIRE, time, inspire_data[type].second_apply, value, ch);
 			affect_join(vict, af, 0);
 			any = TRUE;
 		}
@@ -4005,7 +4005,7 @@ ACMD(do_radiance) {
 		return;
 	}
 	else {
-		af = create_mod_aff(ATYPE_RADIANCE, -1, APPLY_GREATNESS, 2);
+		af = create_mod_aff(ATYPE_RADIANCE, -1, APPLY_GREATNESS, 2, ch);
 		affect_join(ch, af, 0);
 		
 		msg_to_char(ch, "You project a radiant aura!\r\n");

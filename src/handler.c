@@ -682,13 +682,15 @@ bool affected_by_spell_and_apply(char_data *ch, int type, int apply) {
 * @param int location APPLY_x
 * @param int modifier +/- amount
 * @param bitvector_t bitvector AFF_x
+* @param char_data *cast_by The caster who made the effect (may be NULL; use the person themselves for penalty effects as those won't cleanse).
 * @return struct affected_type* The created af
 */
-struct affected_type *create_aff(int type, int duration, int location, int modifier, bitvector_t bitvector) {
+struct affected_type *create_aff(int type, int duration, int location, int modifier, bitvector_t bitvector, char_data *cast_by) {
 	struct affected_type *af;
 	
 	CREATE(af, struct affected_type, 1);
 	af->type = type;
+	af->cast_by = cast_by ? CAST_BY_ID(cast_by) : 0;
 	af->duration = duration;
 	af->modifier = modifier;
 	af->location = location;
@@ -705,14 +707,16 @@ struct affected_type *create_aff(int type, int duration, int location, int modif
 * @param sh_int damage_type DAM_x type.
 * @param sh_int damage How much damage to do per 5-seconds.
 * @param sh_int max_stack Number of times this can stack when re-applied before it expires.
+* @param sh_int char_data *cast_by The caster.
 */
-void apply_dot_effect(char_data *ch, sh_int type, sh_int duration, sh_int damage_type, sh_int damage, sh_int max_stack) {
+void apply_dot_effect(char_data *ch, sh_int type, sh_int duration, sh_int damage_type, sh_int damage, sh_int max_stack, char_data *cast_by) {
 	struct over_time_effect_type *iter, *dot;
 	bool found = FALSE;
+	int id = (cast_by ? CAST_BY_ID(cast_by) : 0);
 	
 	// first see if they already have one
 	for (iter = ch->over_time_effects; iter && !found; iter = iter->next) {
-		if (iter->type == type && iter->damage_type == damage_type && iter->damage == damage) {
+		if (iter->type == type && iter->cast_by == id && iter->damage_type == damage_type && iter->damage == damage) {
 			// refresh effect
 			iter->duration = MAX(iter->duration, duration);
 			if (iter->stack < MIN(iter->max_stack, max_stack)) {
@@ -728,6 +732,7 @@ void apply_dot_effect(char_data *ch, sh_int type, sh_int duration, sh_int damage
 		ch->over_time_effects = dot;
 		
 		dot->type = type;
+		dot->cast_by = id;
 		dot->duration = duration;
 		dot->damage_type = damage_type;
 		dot->damage = damage;

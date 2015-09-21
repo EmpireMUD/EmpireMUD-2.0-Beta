@@ -67,14 +67,14 @@ void affect_to_room(room_data *room, struct affected_type *af);
 void affect_total(char_data *ch);
 extern bool affected_by_spell(char_data *ch, int type);
 extern bool affected_by_spell_and_apply(char_data *ch, int type, int apply);
-extern struct affected_type *create_aff(int type, int duration, int location, int modifier, bitvector_t bitvector);
-void apply_dot_effect(char_data *ch, sh_int type, sh_int duration, sh_int damage_type, sh_int damage, sh_int max_stack);
+extern struct affected_type *create_aff(int type, int duration, int location, int modifier, bitvector_t bitvector, char_data *cast_by);
+void apply_dot_effect(char_data *ch, sh_int type, sh_int duration, sh_int damage_type, sh_int damage, sh_int max_stack, char_data *cast_by);
 void dot_remove(char_data *ch, struct over_time_effect_type *dot);
 extern bool room_affected_by_spell(room_data *room, int type);
 
 // affect shortcut macros
-#define create_flag_aff(type, duration, bit)  create_aff((type), (duration), APPLY_NONE, 0, (bit))
-#define create_mod_aff(type, duration, loc, mod)  create_aff((type), (duration), (loc), (mod), 0)
+#define create_flag_aff(type, duration, bit, cast_by)  create_aff((type), (duration), APPLY_NONE, 0, (bit), (cast_by))
+#define create_mod_aff(type, duration, loc, mod, cast_by)  create_aff((type), (duration), (loc), (mod), 0, (cast_by))
 
 // character handlers
 extern bool char_from_chair(char_data *ch);
