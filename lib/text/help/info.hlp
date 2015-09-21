@@ -429,7 +429,7 @@ like (1/5) is the number and maximum number of stacks.
 Physical DoTs can be removed by firstaid. Magical and poison DoTs can be
 removed by cleanse.
 
-See also: AFFECTS, CLEANSE, FIRSTAID, SCORE
+See also: AFFECTS, CLEANSE, DISPEL, FIRSTAID, SCORE
 #
 FARMING CROPS ORCHARDS AGRICULTURE APPLES WHEAT CORN HOPS COTTON BARLEY PEACHES CHERRIES ORANGES RICE OLIVES PEAS GOURDS
 
@@ -531,7 +531,9 @@ Skill level: This level is determined by your top 3 skills, and is currently
 
 Gear level: Your gear level raises your total level to 50 more than the average
    level of the gear you have equipped (except sheathed weapons, clothes, and
-   some other slots). You can see it by typing "eq".
+   items in the ranged slot). You can see it by typing "eq". Some item flags
+   which make the item more powerful, such as superior and drop flags, raise
+   the effective levels of items for this purpose.
 
 Composite level: This is the sum of your skill and gear levels. It is the
    number used for scaling mobs to fight you. This is the level shown on your
