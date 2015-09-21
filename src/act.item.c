@@ -1665,6 +1665,7 @@ room_data *find_docks(empire_data *emp, int island_id) {
 obj_data *find_free_ship(empire_data *emp, struct shipping_data *shipd) {
 	struct empire_territory_data *ter;
 	struct shipping_data *iter;
+	bool already_used;
 	obj_data *obj;
 	room_data *in_ship;
 	int capacity;
@@ -1702,15 +1703,19 @@ obj_data *find_free_ship(empire_data *emp, struct shipping_data *shipd) {
 				continue;
 			}
 			
-			// calculate capacity to see if it's full
+			// calculate capacity to see if it's full, and check if it's already used for a different island
 			capacity = 0;
-			for (iter = EMPIRE_SHIPPING_LIST(emp); iter; iter = iter->next) {
+			already_used = FALSE;
+			for (iter = EMPIRE_SHIPPING_LIST(emp); iter && !already_used; iter = iter->next) {
 				if (iter->ship_homeroom == GET_SHIP_MAIN_ROOM(obj)) {
 					capacity += iter->amount;
+					if (iter->from_island != shipd->from_island || iter->to_island != shipd->to_island) {
+						already_used = TRUE;
+					}
 				}
 			}
-			if (capacity >= ship_data[GET_SHIP_TYPE(obj)].cargo_size) {
-				// ship full!
+			if (already_used || capacity >= ship_data[GET_SHIP_TYPE(obj)].cargo_size) {
+				// ship full or in use
 				continue;
 			}
 			
@@ -1870,15 +1875,18 @@ void process_shipping_one(empire_data *emp) {
 	struct shipping_data *shipd, *next_shipd;
 	obj_data *last_ship = NULL;
 	bool full, changed = FALSE;
+	int last_from = NO_ISLAND, last_to = NO_ISLAND;
 	
 	for (shipd = EMPIRE_SHIPPING_LIST(emp); shipd; shipd = next_shipd) {
 		next_shipd = shipd->next;
 		
 		switch (shipd->status) {
 			case SHIPPING_QUEUED: {
-				if (!last_ship) {
+				if (!last_ship || last_from != shipd->from_island || last_to != shipd->to_island) {
 					// attempt to find a(nother) ship
 					last_ship = find_free_ship(emp, shipd);
+					last_from = shipd->from_island;
+					last_to = shipd->to_island;
 				}
 				
 				// this only works if we found a ship to use (or had a free one)
