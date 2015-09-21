@@ -1135,16 +1135,11 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	// ship present -- in specific cases where it overrides the normal icon
 	else if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_SHIP_PRESENT) && (ROOM_SECT_FLAGGED(to_room, SECTF_FRESH_WATER | SECTF_OCEAN) || ((on_ship = GET_BOAT(HOME_ROOM(IN_ROOM(ch)))) && to_room == IN_ROOM(on_ship)))) {
 		// show boats in room
-		if (ROOM_SECT_FLAGGED(to_room, SECTF_FRESH_WATER)) {
-			strcat(buf, boat_icon_river);
-		}
-		else if (ROOM_SECT_FLAGGED(to_room, SECTF_OCEAN)) {
+		if (ROOM_SECT_FLAGGED(to_room, SECTF_OCEAN)) {
 			strcat(buf, boat_icon_ocean);
 		}
-		else {
-			// should never hit this case
-			icon = get_icon_from_set(GET_SECT_ICONS(SECT(to_room)), tileset);
-			strcat(buf, icon->icon);
+		else {	// general else ... could be: if (ROOM_SECT_FLAGGED(to_room, SECTF_FRESH_WATER))
+			strcat(buf, boat_icon_river);
 		}
 	}
 
