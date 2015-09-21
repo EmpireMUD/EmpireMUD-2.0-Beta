@@ -1128,12 +1128,14 @@ Examples:
 #
 SAIL
 
-Usage:  sail <direction>
+Usage:  sail <direction> [distance]
 
 You can sail the ship from any location inside, for your convenience. Ships
 can travel on oceans and rivers, through river gates, and under bridges. 
 Though this is fairly slow, it is one of the most efficient means of 
 transoceanic travel.
+
+If you specify a distance, you will only sail that many tiles.
 
 Once you've started sailing, the ship will move every few seconds in that
 direction, for as long as you're sailing it. You can type 'sail' again to

@@ -1812,6 +1812,19 @@ void process_sailing(char_data *ch) {
 		cancel_action(ch);
 		return;
 	}
+	
+	// limited distance?
+	if (GET_ACTION_VNUM(ch, 1) > 0) {
+		GET_ACTION_VNUM(ch, 1) -= 1;
+		
+		// arrived!
+		if (GET_ACTION_VNUM(ch, 1) <= 0) {
+			look_at_room(ch);	// show them where they stopped
+			msg_to_char(ch, "\r\n");	// extra linebreak between look and "ship stops"
+			cancel_action(ch);
+			return;
+		}
+	}
 }
 
 

@@ -825,19 +825,21 @@ ACMD(do_manufacture) {
 
 
 ACMD(do_sail) {
+	char dir_arg[MAX_INPUT_LENGTH], dist_arg[MAX_INPUT_LENGTH];
 	room_data *room, *next_room;
+	bool was_sailing, same_dir;
 	char_data *ch_iter;
-	bool was_sailing;
 	obj_data *ship;
-	int dir;
+	int dir, dist = -1;
 
-	skip_spaces(&argument);
+	// 2nd arg (dist) is optional
+	two_arguments(argument, dir_arg, dist_arg);
 	
 	// basics
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "You can't do that.\r\n");
 	}
-	else if (!*argument && GET_ACTION(ch) == ACT_SAILING) {
+	else if (!*dir_arg && GET_ACTION(ch) == ACT_SAILING) {
 		cancel_action(ch);
 	}
 	else if (GET_ACTION(ch) != ACT_NONE && GET_ACTION(ch) != ACT_SAILING) {
@@ -852,32 +854,45 @@ ACMD(do_sail) {
 	else if (!only_one_sailing(ch, ship)) {
 		msg_to_char(ch, "Someone else is sailing this ship right now.\r\n");
 	}
-	else if (!*argument) {
+	else if (!*dir_arg) {
 		msg_to_char(ch, "Which direction would you like to sail?\r\n");
 	}
-	else if ((dir = parse_direction(ch, argument)) == NO_DIR || dir >= NUM_2D_DIRS) {
+	else if ((dir = parse_direction(ch, dir_arg)) == NO_DIR || dir >= NUM_2D_DIRS) {
 		msg_to_char(ch, "You can't sail that direction.\r\n");
 	}
-	else if (GET_ACTION(ch) == ACT_SAILING && GET_ACTION_VNUM(ch, 0) == dir) {
+	else if (GET_ACTION(ch) == ACT_SAILING && GET_ACTION_VNUM(ch, 0) == dir && !*dist_arg) {
 		msg_to_char(ch, "You are already sailing that way.\r\n");
+	}
+	else if (*dist_arg && (!isdigit(*dist_arg) || (dist = atoi(dist_arg)) < 1)) {
+		msg_to_char(ch, "Sail how far!?\r\n");
 	}
 	else {
 		was_sailing = (GET_ACTION(ch) == ACT_SAILING);
+		same_dir = (was_sailing && (dir == GET_ACTION_VNUM(ch, 0)));
 		GET_ACTION(ch) = ACT_NONE;	// prevents a stops-moving message
 		start_action(ch, ACT_SAILING, 0);
 		GET_ACTION_VNUM(ch, 0) = dir;
-		msg_to_char(ch, "You %s %s.\r\n", (was_sailing ? "turn the ship" : "start sailing"), dirs[get_direction_for_char(ch, dir)]);
+		GET_ACTION_VNUM(ch, 1) = dist;	// may be -1 for continuous
+		
+		if (same_dir) {
+			msg_to_char(ch, "You will now stop after %d tiles.\r\n", dist);
+		}
+		else {
+			msg_to_char(ch, "You %s %s.\r\n", (was_sailing ? "turn the ship" : "start sailing"), dirs[get_direction_for_char(ch, dir)]);
+		}
 		
 		// alert whole ship
-		HASH_ITER(interior_hh, interior_world_table, room, next_room) {
-			if (HOME_ROOM(room) != HOME_ROOM(IN_ROOM(ch))) {
-				continue;
-			}
+		if (!same_dir) {
+			HASH_ITER(interior_hh, interior_world_table, room, next_room) {
+				if (HOME_ROOM(room) != HOME_ROOM(IN_ROOM(ch))) {
+					continue;
+				}
 		
-			for (ch_iter = ROOM_PEOPLE(room); ch_iter; ch_iter = ch_iter->next_in_room) {
-				if (ch_iter != ch && ch_iter->desc) {
-					snprintf(buf, sizeof(buf), "The ship %s %s.", (was_sailing ? "turns to the" : "begins to sail"), dirs[get_direction_for_char(ch_iter, dir)]);
-					act(buf, FALSE, ch_iter, NULL, NULL, TO_CHAR);
+				for (ch_iter = ROOM_PEOPLE(room); ch_iter; ch_iter = ch_iter->next_in_room) {
+					if (ch_iter != ch && ch_iter->desc) {
+						snprintf(buf, sizeof(buf), "The ship %s %s.", (was_sailing ? "turns to the" : "begins to sail"), dirs[get_direction_for_char(ch_iter, dir)]);
+						act(buf, FALSE, ch_iter, NULL, NULL, TO_CHAR);
+					}
 				}
 			}
 		}
