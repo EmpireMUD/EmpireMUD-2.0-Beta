@@ -1120,6 +1120,8 @@ int enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 		if (load_room && !PLR_FLAGGED(ch, PLR_LOADROOM)) {
 			map_loc = get_map_location_for(load_room);
 			if (GET_LOAD_ROOM_CHECK(ch) == NOWHERE || !map_loc || GET_ROOM_VNUM(map_loc) != GET_LOAD_ROOM_CHECK(ch)) {
+				// ensure they are on the same continent they used to be when it finds them a new loadroom
+				GET_LAST_ROOM(ch) = GET_LOAD_ROOM_CHECK(ch);
 				load_room = NULL;
 			}
 		}
