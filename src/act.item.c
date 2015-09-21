@@ -1919,9 +1919,17 @@ void process_shipping_one(empire_data *emp) {
 		}
 	}
 	
-	// did we have an unsailed ship?
-	if (last_ship) {
-		sail_shipment(emp, last_ship);
+	// check for unsailed ships
+	for (shipd = EMPIRE_SHIPPING_LIST(emp); shipd; shipd = next_shipd) {
+		next_shipd = shipd->next;
+		
+		if (shipd->status == SHIPPING_QUEUED && shipd->ship_homeroom != NOWHERE) {
+			room_data *deck = real_room(shipd->ship_homeroom);
+			obj_data *boat = deck ? GET_BOAT(deck) : NULL;
+			if (boat) {
+				sail_shipment(emp, boat);
+			}
+		}
 	}
 	
 	if (changed) {
