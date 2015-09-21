@@ -292,7 +292,7 @@ There are also several possible modifier tags:
  - group: will require three players in the right level range
  - boss: will require four players in the right level range
  
-See also: LEVELS
+See also: DROP FLAGS, LEVELS
 #
 COTTON
 
