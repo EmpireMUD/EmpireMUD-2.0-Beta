@@ -853,11 +853,9 @@ ACMD(do_slash_channel) {
 			
 			// announce it (this also messages the player)
 			if (!global_mute_slash_channel_joins) {
+				msg_to_char(ch, "You join \t%c/%s\tn.\r\n", chan->color, chan->name);
 				if (GET_INVIS_LEV(ch) <= LVL_APPROVED) {
 					announce_to_slash_channel(chan, "%s has joined the channel", PERS(ch, ch, TRUE));
-				}
-				else {
-					msg_to_char(ch, "You join \t%c/%s\tn.\r\n", chan->color, chan->name);
 				}
 			}
 		}
@@ -871,12 +869,10 @@ ACMD(do_slash_channel) {
 			msg_to_char(ch, "You're not even on that channel.\r\n");
 		}
 		else {
-			// announce (player will see it)
+			// announce
+			msg_to_char(ch, "You leave \t%c/%s\tn.\r\n", chan->color, chan->name);
 			if (GET_INVIS_LEV(ch) <= LVL_APPROVED) {
 				announce_to_slash_channel(chan, "%s has left the channel", PERS(ch, ch, TRUE));
-			}
-			else {
-				msg_to_char(ch, "You leave \t%c/%s\tn.\r\n", chan->color, chan->name);
 			}
 			
 			remove_stored_slash_channel(ch, chan->name);
