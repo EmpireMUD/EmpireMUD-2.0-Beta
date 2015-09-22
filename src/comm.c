@@ -163,6 +163,27 @@ void clear_last_act_message(descriptor_data *desc) {
 }
 
 
+/**
+* Determines if a descriptor number is already in use. These numbers loop
+* at 1000 and, in rare cases, we come back up on a number in use.
+*
+* @param int num The number to check.
+* @return bool TRUE if num is in use; FALSE if not.
+*/
+bool desc_num_in_use(int num) {
+	descriptor_data *desc;
+	
+	for (desc = descriptor_list; desc; desc = desc->next) {
+		if (desc->desc_num == num) {
+			return TRUE;
+		}
+	}
+	
+	// clear
+	return FALSE;
+}
+
+
 /*
  * This may not be pretty but it keeps game_loop() neater than if it was inline.
  */
@@ -1594,6 +1615,7 @@ int get_max_players(void) {
 
 void init_descriptor(descriptor_data *newd, int desc) {
 	static int last_desc = 0;
+	int start;
 
 	newd->descriptor = desc;
 	newd->connected = CON_GET_NAME;
@@ -1624,8 +1646,14 @@ void init_descriptor(descriptor_data *newd, int desc) {
 	newd->color.want_clean = FALSE;
 	newd->color.want_underline = FALSE;
 	
-	if (++last_desc == 1000)
-		last_desc = 1;
+	// find a free desc num
+	start = last_desc;
+	do {
+		if (++last_desc == 1000) {
+			last_desc = 1;
+		}
+	} while (desc_num_in_use(last_desc) && last_desc != start);	// prevent infinite loop
+	
 	newd->desc_num = last_desc;
 }
 
