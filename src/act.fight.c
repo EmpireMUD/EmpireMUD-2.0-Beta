@@ -696,6 +696,11 @@ ACMD(do_throw) {
 	if (!to_room) {
 		return;
 	}
+	
+	if (OBJ_BOUND_TO(obj) && ROOM_OWNER(to_room) && ROOM_OWNER(to_room) != GET_LOYALTY(ch)) {
+		msg_to_char(ch, "You can't throw bound items there.\r\n");
+		return;
+	}
 
 	/* If we came up with a room, lets throw! */
 
