@@ -741,6 +741,9 @@ ACMD(do_disenchant) {
 	else if (ABILITY_TRIGGERS(ch, NULL, obj, ABIL_DISENCHANT)) {
 		return;
 	}
+	else if (!bind_ok(obj, ch)) {
+		msg_to_char(ch, "You can't disenchant something that is bound to someone else.\r\n");
+	}
 	else if (!OBJ_FLAGGED(obj, OBJ_ENCHANTED)) {
 		act("$p is not even enchanted.", FALSE, ch, obj, NULL, TO_CHAR);
 	}
