@@ -1899,6 +1899,9 @@ ACMD(do_skin) {
 	else if (GET_CORPSE_NPC_VNUM(obj) == NOTHING || !(proto = mob_proto(GET_CORPSE_NPC_VNUM(obj)))) {
 		msg_to_char(ch, "You can't skin that.\r\n");
 	}
+	else if (!bind_ok(obj, ch)) {
+		msg_to_char(ch, "You can't skin a corpse that is bound to someone else.\r\n");
+	}
 	else if (IS_SET(GET_CORPSE_FLAGS(obj), CORPSE_EATEN))
 		msg_to_char(ch, "It's too badly mangled to get any amount of usable skin.\r\n");
 	else if (IS_SET(GET_CORPSE_FLAGS(obj), CORPSE_SKINNED))

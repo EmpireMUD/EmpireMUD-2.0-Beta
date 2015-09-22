@@ -613,8 +613,8 @@ int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname) {
 	
 	// don't let people drop bound items in other people's territory
 	if (mode != SCMD_JUNK && OBJ_BOUND_TO(obj) && ROOM_OWNER(IN_ROOM(ch)) && ROOM_OWNER(IN_ROOM(ch)) != GET_LOYALTY(ch)) {
-		msg_to_char(ch, "You can't drop bound items here.\r\n");
-		return -1;
+		act("$p: You can't drop bound items here.", FALSE, ch, obj, NULL, TO_CHAR);
+		return 0;	// don't break a drop-all
 	}
 	
 	// count items
