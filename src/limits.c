@@ -1300,8 +1300,8 @@ void real_update_obj(obj_data *obj) {
 	if (OBJ_FLAGGED(obj, OBJ_LIGHT) && IN_ROOM(obj) && IS_ANY_BUILDING(IN_ROOM(obj))) {
 		home = HOME_ROOM(IN_ROOM(obj));
 		if (ROOM_BLD_FLAGGED(home, BLD_BURNABLE) && !BUILDING_BURNING(home)) {
-			// only items with an empire id are considered: you can't burn stuff down by accident
-			if (obj->last_empire_id != NOTHING) {
+			// only items with an empire id are considered: you can't burn stuff down by accident (unless the building is unowned)
+			if (obj->last_empire_id != NOTHING || !ROOM_OWNER(home)) {
 				// check that the empire is at war
 				emp = ROOM_OWNER(home);
 				enemy = real_empire(obj->last_empire_id);
