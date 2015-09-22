@@ -2216,7 +2216,13 @@ void remove_cooldown_by_type(char_data *ch, int type) {
 * @param room_data *room The room to abandon.
 */
 void abandon_room(room_data *room) {
+	void clear_private_owner(int id);
+	
 	room_data *iter, *next_iter, *home = HOME_ROOM(room);
+	
+	if (ROOM_PRIVATE_OWNER(room) != NOBODY) {
+		clear_private_owner(ROOM_PRIVATE_OWNER(room));
+	}
 	
 	perform_abandon_room(room);
 
