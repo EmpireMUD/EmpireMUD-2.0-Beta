@@ -31,7 +31,7 @@
 * Contents:
 *   Helpers
 *   Accept/Reject Helpers
-*   Toggle Notifiers
+*   Toggle Callbacks
 *   Commands
 */
 
@@ -188,11 +188,14 @@ void perform_alternate(char_data *old, char_data *new) {
 	bool show_start = FALSE;
 	int invis_lev, old_invis, last_tell;
 	empire_data *old_emp;
+	bool was_imm;
 	
 	if (!old || !new || !old->desc || new->desc) {
 		log("SYSERR: Attempting invalid peform_alternate with %s, %s, %s, %s", old ? "ok" : "no old", new ? "ok" : "no new", old->desc ? "ok" : "no old desc", new->desc ? "new desc" : "ok");
 		return;
 	}
+	
+	was_imm = IS_IMMORTAL(old);
 
 	/*
 	 * kill off all sockets connected to the same player as the one who is
@@ -297,7 +300,9 @@ void perform_alternate(char_data *old, char_data *new) {
 		send_to_char(START_MESSG, new);
 	}
 	
-	add_cooldown(new, COOLDOWN_ALTERNATE, SECS_PER_REAL_MIN);
+	if (!IS_IMMORTAL(new) && !was_imm) {
+		add_cooldown(new, COOLDOWN_ALTERNATE, SECS_PER_REAL_MIN);
+	}
 	GET_LAST_TELL(new) = last_tell;
 }
 
@@ -634,7 +639,7 @@ OFFER_FINISH(ofin_summon) {
 
 
  //////////////////////////////////////////////////////////////////////////////
-//// TOGGLE NOTIFIERS ////////////////////////////////////////////////////////
+//// TOGGLE CALLBACKS ////////////////////////////////////////////////////////
 
 /**
 * toggle notifier for "toggle afk"
@@ -649,6 +654,43 @@ void afk_notify(char_data *ch) {
 		act("$n is no longer afk.", TRUE, ch, NULL, NULL, TO_ROOM);
 	}
 }
+
+
+/**
+* Ensures political/!map-color are off when informative is on.
+*
+* @param char_data *ch The player.
+*/
+void tog_informative(char_data *ch) {
+	if (PRF_FLAGGED(ch, PRF_INFORMATIVE)) {
+		REMOVE_BIT(PRF_FLAGS(ch), PRF_POLITICAL | PRF_NOMAPCOL);
+	}
+}
+
+
+/**
+* Ensures political/informative are off when !map-color is on.
+*
+* @param char_data *ch The player.
+*/
+void tog_mapcolor(char_data *ch) {
+	if (PRF_FLAGGED(ch, PRF_NOMAPCOL)) {
+		REMOVE_BIT(PRF_FLAGS(ch), PRF_POLITICAL | PRF_INFORMATIVE);
+	}
+}
+
+
+/**
+* Ensures informative/!map-color are off when political is on.
+*
+* @param char_data *ch The player.
+*/
+void tog_political(char_data *ch) {
+	if (PRF_FLAGGED(ch, PRF_POLITICAL)) {
+		REMOVE_BIT(PRF_FLAGS(ch), PRF_INFORMATIVE | PRF_NOMAPCOL);
+	}
+}
+
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -851,7 +893,7 @@ ACMD(do_alternate) {
 	else if (ROOM_OWNER(IN_ROOM(ch)) && empire_is_hostile(ROOM_OWNER(IN_ROOM(ch)), GET_LOYALTY(ch), IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't alternate in hostile territory.\r\n");
 	}
-	else if (get_cooldown_time(ch, COOLDOWN_ALTERNATE) > 0) {
+	else if (get_cooldown_time(ch, COOLDOWN_ALTERNATE) > 0 && !IS_IMMORTAL(ch)) {
 		msg_to_char(ch, "You can't alternate again so soon.\r\n");
 	}
 	else if (get_cooldown_time(ch, COOLDOWN_PVP_QUIT_TIMER) > 0 && !IS_IMMORTAL(ch)) {
@@ -1426,6 +1468,9 @@ ACMD(do_herd) {
 
 	if (IS_NPC(ch))
 		return;
+	else if (IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
+		msg_to_char(ch, "You can't herd anything in an adventure.\r\n");
+	}
 	else if (!*arg || !*buf)
 		msg_to_char(ch, "Who do you want to herd, and which direction?\r\n");
 	else if (!(victim = get_char_vis(ch, arg, FIND_CHAR_ROOM)))
@@ -2224,9 +2269,9 @@ ACMD(do_toggle) {
 		
 		msg_to_char(ch, "You toggle %s %s%s&0.\r\n", toggle_data[type].name, togcols[toggle_data[type].type][on], tognames[toggle_data[type].type][on]);
 		
-		// maybe notify
-		if (toggle_data[type].notify_func != NULL) {
-			(toggle_data[type].notify_func)(ch);
+		// callback can notify or make additional changes
+		if (toggle_data[type].callback_func != NULL) {
+			(toggle_data[type].callback_func)(ch);
 		}
 	}
 }

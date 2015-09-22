@@ -267,6 +267,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define CAN_SEE_IN_DARK_ROOM(ch, room)  ((WOULD_BE_LIGHT_WITHOUT_MAGIC_DARKNESS(room) || (room == IN_ROOM(ch) && (HAS_ABILITY(ch, ABIL_BY_MOONLIGHT))) || CAN_SEE_IN_DARK(ch)) && (!MAGIC_DARKNESS(room) || CAN_SEE_IN_MAGIC_DARKNESS(ch)))
 #define CAN_SEE_IN_MAGIC_DARKNESS(ch)  (IS_NPC(ch) ? (get_approximate_level(ch) > 100) : HAS_ABILITY((ch), ABIL_DARKNESS))
 #define CAN_SPEND_BLOOD(ch)  (!AFF_FLAGGED(ch, AFF_CANT_SPEND_BLOOD))
+#define CAST_BY_ID(ch)  (IS_NPC(ch) ? (-1 * GET_MOB_VNUM(ch)) : GET_IDNUM(ch))
 #define EFFECTIVELY_FLYING(ch)  (IS_RIDING(ch) ? MOUNT_FLAGGED(ch, MOUNT_FLYING) : AFF_FLAGGED(ch, AFF_FLY))
 #define HAS_INFRA(ch)  AFF_FLAGGED(ch, AFF_INFRAVISION)
 #define IS_HUMAN(ch)  (!IS_VAMPIRE(ch))
@@ -745,7 +746,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_ACCOUNT_ID(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.account_id))
 #define GET_ACTION(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.action))
 #define GET_ACTION_ROOM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.action_room))
-#define GET_ACTION_ROTATION(ch) CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.action_rotation))
+#define GET_ACTION_CYCLE(ch) CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.action_cycle))
 #define GET_ACTION_TIMER(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.action_timer))
 #define GET_ACTION_VNUM(ch, n)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.action_vnum[(n)]))
 #define GET_ADMIN_NOTES(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.admin_notes))
@@ -1105,6 +1106,7 @@ extern char *level_range_string(int min, int max, int current);
 extern bool multi_isname(const char *arg, const char *namelist);
 extern char *CAP(char *txt);
 extern char *fname(const char *namelist);
+extern char *reverse_strstr(char *haystack, char *needle);
 extern char *str_dup(const char *source);
 extern char *str_replace(char *search, char *replace, char *subject);
 extern char *str_str(char *cs, char *ct);
@@ -1143,7 +1145,7 @@ extern unsigned long long microtime(void);
 
 // utils from act.action.c
 void cancel_action(char_data *ch);
-void start_action(char_data *ch, int type, int timer, bitvector_t flags);
+void start_action(char_data *ch, int type, int timer);
 
 // utils from act.empire.c
 extern bool is_in_city_for_empire(room_data *loc, empire_data *emp, bool check_wait, bool *too_soon);

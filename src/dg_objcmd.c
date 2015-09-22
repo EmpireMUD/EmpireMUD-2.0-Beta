@@ -262,7 +262,7 @@ OCMD(do_oregionecho) {
 				}
 				
 				if (!indoor_only || IS_OUTDOORS(targ)) {
-					msg_to_desc(desc, "%s\r\n", msg);
+					msg_to_desc(desc, "%s\r\n", CAP(msg));
 				}
 			}
 		}
@@ -805,15 +805,16 @@ OCMD(do_oaoe) {
 
 
 OCMD(do_odot) {
-	char name[MAX_INPUT_LENGTH], modarg[MAX_INPUT_LENGTH], durarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH];
+	char name[MAX_INPUT_LENGTH], modarg[MAX_INPUT_LENGTH], durarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH], stackarg[MAX_INPUT_LENGTH];
 	double modifier = 1.0;
 	char_data *ch;
-	int type;
+	int type, max_stacks;
 
 	argument = one_argument(argument, name);
 	argument = one_argument(argument, modarg);
 	argument = one_argument(argument, durarg);
-	argument = one_argument(argument, typearg);	// optional
+	argument = one_argument(argument, typearg);	// optional, default: physical
+	argument = one_argument(argument, stackarg);	// optional, default: 1
 
 	/* who cares if it's a number ? if not it'll just be 0 */
 	if (!*name || !*modarg || !*durarg) {
@@ -843,7 +844,8 @@ OCMD(do_odot) {
 		type = DAM_PHYSICAL;
 	}
 	
-	script_damage_over_time(ch, get_obj_scale_level(obj, ch), modifier, type, atoi(durarg));
+	max_stacks = (*stackarg ? atoi(stackarg) : 1);
+	script_damage_over_time(ch, get_obj_scale_level(obj, ch), type, modifier, atoi(durarg), max_stacks, NULL);
 }
 
 

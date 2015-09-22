@@ -366,6 +366,7 @@ void disassociate_building(room_data *room) {
 	remove_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME);
 	remove_room_extra_data(room, ROOM_EXTRA_BUILD_RECIPE);
 	remove_room_extra_data(room, ROOM_EXTRA_FOUND_TIME);
+	remove_room_extra_data(room, ROOM_EXTRA_REDESIGNATE_TIME);
 
 	// disassociate inside rooms
 	HASH_ITER(interior_hh, interior_world_table, iter, next_iter) {
@@ -1120,7 +1121,7 @@ ACMD(do_build) {
 				msg_to_char(ch, "You can't work on a burning building!\r\n");
 			}
 			else {
-				start_action(ch, ACT_BUILDING, 0, NOBITS);
+				start_action(ch, ACT_BUILDING, 0);
 				msg_to_char(ch, "You start building.\r\n");
 				act("$n starts building.", FALSE, ch, 0, 0, TO_ROOM);
 			}
@@ -1281,7 +1282,7 @@ ACMD(do_build) {
 		extract_obj(found_obj);
 	}
 
-	start_action(ch, ACT_BUILDING, 0, NOBITS);
+	start_action(ch, ACT_BUILDING, 0);
 	msg_to_char(ch, "You start to build %s %s!\r\n", AN(GET_CRAFT_NAME(type)), GET_CRAFT_NAME(type));
 	sprintf(buf, "$n begins to build %s %s!", AN(GET_CRAFT_NAME(type)), GET_CRAFT_NAME(type));
 	act(buf, FALSE, ch, 0, 0, TO_ROOM);
@@ -1329,7 +1330,7 @@ ACMD(do_dismantle) {
 	if (IS_DISMANTLING(IN_ROOM(ch))) {
 		msg_to_char(ch, "You begin to dismantle the building.\r\n");
 		act("$n begins to dismantle the building.", FALSE, ch, 0, 0, TO_ROOM);
-		start_action(ch, ACT_DISMANTLING, 0, NOBITS);
+		start_action(ch, ACT_DISMANTLING, 0);
 		return;
 	}
 	
@@ -1374,7 +1375,7 @@ ACMD(do_dismantle) {
 	if (ROOM_OWNER(IN_ROOM(ch))) {
 		read_empire_territory(ROOM_OWNER(IN_ROOM(ch)));
 	}
-	start_action(ch, ACT_DISMANTLING, 0, NOBITS);
+	start_action(ch, ACT_DISMANTLING, 0);
 	msg_to_char(ch, "You begin to dismantle the building.\r\n");
 	act("$n begins to dismantle the building.\r\n", FALSE, ch, 0, 0, TO_ROOM);
 	process_dismantling(ch, IN_ROOM(ch));
@@ -1506,6 +1507,7 @@ ACMD(do_dedicate) {
 
 // Takes subcmd SCMD_DESIGNATE, SCMD_REDESIGNATE
 ACMD(do_designate) {
+	extern struct empire_territory_data *create_territory_entry(empire_data *emp, room_data *room);
 	extern bld_data *get_building_by_name(char *name, bool room_only);
 	void sort_world_table();
 	
@@ -1567,6 +1569,9 @@ ACMD(do_designate) {
 	}
 	else if (!IS_INSIDE(IN_ROOM(ch)) && subcmd == SCMD_REDESIGNATE)
 		msg_to_char(ch, "You can't redesignate here.\r\n");
+	else if (subcmd == SCMD_REDESIGNATE && get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_REDESIGNATE_TIME) + (config_get_int("redesignate_time") * SECS_PER_REAL_MIN) > time(0)) {
+		msg_to_char(ch, "You can't redesignate this room so soon.\r\n");
+	}
 	else if (BLD_MAX_ROOMS(IN_ROOM(ch)) <= 0)
 		msg_to_char(ch, "You can't designate here.\r\n");
 	else if (subcmd == SCMD_DESIGNATE && (ex = find_exit(IN_ROOM(ch), dir)) && ex->room_ptr)
@@ -1615,6 +1620,8 @@ ACMD(do_designate) {
 		/* set applicable values */
 		COMPLEX_DATA(new)->home_room = home;
 		ROOM_OWNER(new) = ROOM_OWNER(home);
+		
+		set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_REDESIGNATE_TIME, time(0));
 
 		/* send messages */
 		if (subcmd == SCMD_REDESIGNATE) {
@@ -1631,7 +1638,10 @@ ACMD(do_designate) {
 					act(buf, FALSE, ch, 0, vict, TO_VICT);
 				}
 			}
-
+			
+			if (ROOM_OWNER(new)) {
+				create_territory_entry(ROOM_OWNER(new), new);
+			}
 			// sort now just in case
 			sort_world_table();
 		}
@@ -1844,7 +1854,7 @@ ACMD(do_nodismantle) {
 
 
 ACMD(do_tunnel) {
-	bitvector_t exit_bld_flags = BLD_ON_PLAINS | BLD_ANY_FOREST | BLD_ON_DESERT | BLD_FACING_CROP | BLD_ON_GROVE;
+	bitvector_t exit_bld_flags = BLD_ON_PLAINS | BLD_ANY_FOREST | BLD_ON_DESERT | BLD_FACING_CROP | BLD_ON_GROVE | BLD_FACING_OPEN_BUILDING;
 	bitvector_t mountain_bld_flags = BLD_ON_MOUNTAIN;
 
 	room_data *entrance, *exit = NULL, *to_room, *last_room = NULL, *past_exit;
@@ -1984,7 +1994,7 @@ ACMD(do_upgrade) {
 		}
 		else {
 			// it's good!
-			start_action(ch, ACT_BUILDING, 0, NOBITS);
+			start_action(ch, ACT_BUILDING, 0);
 
 			attach_building_to_room(building_proto(GET_CRAFT_BUILD_TYPE(type)), IN_ROOM(ch));
 			set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_BUILD_RECIPE, GET_CRAFT_VNUM(type));

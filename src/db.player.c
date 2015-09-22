@@ -219,7 +219,7 @@ void build_player_index(void) {
 void char_to_store(char_data *ch, struct char_file_u *st) {
 	int i, iter;
 	struct affected_type *af;
-	struct over_time_effect_type *dot;
+	struct over_time_effect_type *dot, *last_dot;
 	struct cooldown_data *cd;
 	obj_data *char_eq[NUM_WEARS];
 
@@ -255,6 +255,10 @@ void char_to_store(char_data *ch, struct char_file_u *st) {
 			st->affected[i].next = 0;
 		}
 	}
+
+	if ((i >= MAX_AFFECT) && af && af->next) {
+		log("SYSERR: WARNING: OUT OF STORE ROOM FOR AFFECTED TYPES!!!");
+	}
 	
 	// over-time effects
 	for (dot = ch->over_time_effects, i = 0; i < MAX_AFFECT; ++i) {
@@ -275,6 +279,10 @@ void char_to_store(char_data *ch, struct char_file_u *st) {
 		}
 	}
 
+	if ((i >= MAX_AFFECT) && dot && dot->next) {
+		log("SYSERR: WARNING: OUT OF STORE ROOM FOR DOT TYPES!!!");
+	}
+
 	/*
 	 * remove the affections so that the raw values are stored; otherwise the
 	 * effects are doubled when the char logs back in.
@@ -286,9 +294,6 @@ void char_to_store(char_data *ch, struct char_file_u *st) {
 	while (ch->over_time_effects) {
 		dot_remove(ch, ch->over_time_effects);
 	}
-
-	if ((i >= MAX_AFFECT) && af && af->next)
-		log("SYSERR: WARNING: OUT OF STORE ROOM FOR AFFECTED TYPES!!!");
 
 	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
 		ch->aff_attributes[iter] = ch->real_attributes[iter];
@@ -392,9 +397,26 @@ void char_to_store(char_data *ch, struct char_file_u *st) {
 	strcpy(st->pwd, GET_PASSWD(ch));
 
 	/* add spell and eq affections back in now */
-	for (i = 0; i < MAX_AFFECT; i++)
-		if (st->affected[i].type)
+	for (i = 0; i < MAX_AFFECT; i++) {
+		if (st->affected[i].type) {
 			affect_to_char(ch, &st->affected[i]);
+		}
+	}
+	for (i = 0, last_dot = NULL; i < MAX_AFFECT; i++) {
+		if (st->over_time_effects[i].type) {
+			CREATE(dot, struct over_time_effect_type, 1);
+			*dot = st->over_time_effects[i];
+			dot->next = NULL;
+			
+			if (last_dot) {
+				last_dot->next = dot;
+			}
+			else {
+				ch->over_time_effects = dot;
+			}
+			last_dot = dot;
+		}
+	}
 
 	for (i = 0; i < NUM_WEARS; i++) {
 		if (char_eq[i]) {
@@ -1098,6 +1120,8 @@ int enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 		if (load_room && !PLR_FLAGGED(ch, PLR_LOADROOM)) {
 			map_loc = get_map_location_for(load_room);
 			if (GET_LOAD_ROOM_CHECK(ch) == NOWHERE || !map_loc || GET_ROOM_VNUM(map_loc) != GET_LOAD_ROOM_CHECK(ch)) {
+				// ensure they are on the same continent they used to be when it finds them a new loadroom
+				GET_LAST_ROOM(ch) = GET_LOAD_ROOM_CHECK(ch);
 				load_room = NULL;
 			}
 		}
@@ -1221,7 +1245,7 @@ int enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	// ensure player has penalty if at war
 	if (fresh && GET_LOYALTY(ch) && is_at_war(GET_LOYALTY(ch))) {
 		int duration = config_get_int("war_login_delay") / SECS_PER_REAL_UPDATE;
-		struct affected_type *af = create_flag_aff(ATYPE_WAR_DELAY, duration, AFF_IMMUNE_PHYSICAL | AFF_NO_ATTACK | AFF_STUNNED);
+		struct affected_type *af = create_flag_aff(ATYPE_WAR_DELAY, duration, AFF_IMMUNE_PHYSICAL | AFF_NO_ATTACK | AFF_STUNNED, ch);
 		affect_join(ch, af, ADD_DURATION);
 	}
 
@@ -1232,9 +1256,8 @@ int enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	greet_memory_mtrigger(ch);
 	add_to_lookup_table(GET_ID(ch), (void *)ch);
 	
-	if (fresh) {
-		MXPSendTag(d, "<VERSION>");
-	}
+	// ensure echo is on -- no, this could cause a duplicate echo-on and lead to an echo loop
+	// ProtocolNoEcho(d, false);
 	
 	return load_result;
 }

@@ -394,7 +394,7 @@ void olc_show_craft(char_data *ch) {
 	sprintf(buf + strlen(buf), "<&ylevelrequired&0> %d\r\n", GET_CRAFT_MIN_LEVEL(craft));
 
 	if (GET_CRAFT_TYPE(craft) != CRAFT_TYPE_BUILD) {
-		seconds = (GET_CRAFT_TIME(craft) * SECS_PER_REAL_UPDATE);
+		seconds = (GET_CRAFT_TIME(craft) * ACTION_CYCLE_TIME);
 		sprintf(buf + strlen(buf), "<&ytime&0> %d action tick%s (%d:%02d)\r\n", GET_CRAFT_TIME(craft), (GET_CRAFT_TIME(craft) != 1 ? "s" : ""), seconds / 60, seconds % 60);
 	}
 

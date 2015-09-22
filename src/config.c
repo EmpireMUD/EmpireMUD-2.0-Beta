@@ -1623,6 +1623,7 @@ void init_config_system(void) {
 	init_config(CONFIG_EMPIRE, "newbie_island_day_limit", CONFTYPE_INT, "number of days old an empire can be before losing newbie island claims");
 	init_config(CONFIG_EMPIRE, "whole_empire_timeout", CONFTYPE_INT, "days to empire appearing idle");
 	init_config(CONFIG_EMPIRE, "empire_log_ttl", CONFTYPE_INT, "how many days elogs last");
+	init_config(CONFIG_EMPIRE, "redesignate_time", CONFTYPE_INT, "minutes until you can redesignate a room again");
 
 	// items
 	init_config(CONFIG_MOBS, "auto_update_items", CONFTYPE_BOOL, "uses item version numbers to automatically update items");

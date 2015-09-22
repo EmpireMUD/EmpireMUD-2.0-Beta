@@ -113,6 +113,18 @@ The first tier of crafter items comes at level 100:
 See also: ARTIFICER, CRAFT, ENCHANT, FORGE, GUILDSMAN, SCORE, SEW, STEELSMITH,
    TINKER
 #
+"DROP FLAGS" "LOOT QUALITY FLAGS" "HARD DROP" "GROUP DROP" "GENERIC DROP" HARD-DROP GROUP-DROP GENERIC-DROP 
+
+Items dropped by enemies intended for larger groups are usually slightly more
+powerful than others of the same level, to compensate for the increased
+difficulty of obtaining them. This is represented by a note based on the group
+size recommended to fight the mob, displayed when the item is identified.
+
+Items which can be obtained from enemies of varying difficulties are often not
+eligible for these flags, and are indicated by a GENERIC-DROP flag.
+
+See also: CONSIDER, IDENTIFY
+#
 "IRIDESCENT BLUE IRIS" "IRIDESCENT IRIS" "BLUE IRIS" IRIS
 
 Iridescent Blue Iris (resource)

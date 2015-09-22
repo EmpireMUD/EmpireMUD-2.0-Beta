@@ -117,6 +117,12 @@ obj_data *find_best_saddle(char_data *ch) {
 	for (obj = ch->carrying; obj; obj = obj->next_content) {
 		if (CAN_WEAR(obj, ITEM_WEAR_SADDLE) && can_wear_item(ch, obj, FALSE)) {
 			this = rate_item(obj);
+			
+			// give a slight bonus to items that are bound ONLY to this character
+			if (OBJ_BOUND_TO(obj) && OBJ_BOUND_TO(obj)->next == NULL && bind_ok(obj, ch)) {
+				this *= 1.1;
+			}
+			
 			if (this >= best_score) {
 				best = obj;
 				best_score = this;
@@ -236,7 +242,7 @@ ACMD(do_fish) {
 		return;
 	}
 	else {
-		start_action(ch, ACT_FISHING, fishing_timer / (skill_check(ch, ABIL_FISH, DIFF_EASY) ? 2 : 1), 0);
+		start_action(ch, ACT_FISHING, fishing_timer / (skill_check(ch, ABIL_FISH, DIFF_EASY) ? 2 : 1));
 		
 		msg_to_char(ch, "You begin looking for fish...\r\n");
 		act("$n begins looking for fish.", TRUE, ch, 0, 0, TO_ROOM);
@@ -414,7 +420,7 @@ ACMD(do_nightsight) {
 	else {
 		msg_to_char(ch, "You activate nightsight.\r\n");
 		act("$n's eyes flash and take on a pale red glow.", TRUE, ch, NULL, NULL, TO_ROOM);
-		af = create_flag_aff(ATYPE_NIGHTSIGHT, UNLIMITED, AFF_INFRAVISION);
+		af = create_flag_aff(ATYPE_NIGHTSIGHT, UNLIMITED, AFF_INFRAVISION, ch);
 		affect_join(ch, af, 0);
 	}
 

@@ -79,7 +79,7 @@ This designates a new room in a building as a specific room type. You must
 specify which direction this new room will be. The first room after the
 entrance must lie directly across from the entrance. After that, you may
 choose any direction you like. Each building is limited on how many rooms it
-may have.
+may have. You can only redesignate rooms once per 60 minutes.
 
 Room types:
  baths - Identical to the free-standing building (castle only)

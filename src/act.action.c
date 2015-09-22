@@ -27,6 +27,7 @@
 * Contents:
 *   Control Data
 *   Core Action Functions
+*   Helpers
 *   Action Cancelers
 *   Action Starters
 *   Action Finishers
@@ -44,10 +45,14 @@ extern obj_data *find_chip_weapon(char_data *ch);
 extern obj_data *has_sharp_tool(char_data *ch);
 void scale_item_to_level(obj_data *obj, int level);
 
+// local prototypes
+obj_data *has_shovel(char_data *ch);
+
 // cancel protos
 void cancel_chipping(char_data *ch);
 void cancel_gen_craft(char_data *ch);
 void cancel_minting(char_data *ch);
+void cancel_sailing(char_data *ch);
 void cancel_sawing(char_data *ch);
 void cancel_scraping(char_data *ch);
 void cancel_siring(char_data *ch);
@@ -86,6 +91,7 @@ void process_prospecting(char_data *ch);
 void process_quarrying(char_data *ch);
 void process_reading(char_data *ch);
 void process_reclaim(char_data *ch);
+void process_sailing(char_data *ch);
 void process_scraping(char_data *ch);
 void process_siring(char_data *ch);
 void process_smelting(char_data *ch);
@@ -98,49 +104,46 @@ void process_weaving(char_data *ch);
 
 // ACT_x
 const struct action_data_struct action_data[] = {
-	{ "", "", NULL, NULL },	// ACT_NONE
-	{ "digging", "is digging at the ground.", process_digging, NULL },	// ACT_DIGGING
-	{ "gathering", "is gathering sticks.", process_gathering, NULL },	// ACT_GATHERING
-	{ "chopping", "is chopping down trees.", process_chop, NULL },	// ACT_CHOPPING
-	{ "building", "is hard at work building.", process_build_action, NULL },	// ACT_BUILDING
-	{ "dismantling", "is dismantling the building.", process_dismantle_action, NULL },	// ACT_DISMANTLING
-	{ "harvesting", "is harvesting the crop.", process_harvesting, NULL },	// ACT_HARVESTING
-	{ "planting", "is planting seeds.", process_planting, NULL },	// ACT_PLANTING
-	{ "mining", "is mining at the walls.", process_mining, NULL },	// ACT_MINING
-	{ "minting", "is minting coins.", process_minting, cancel_minting },	// ACT_MINTING
-	{ "fishing", "is fishing.", process_fishing, NULL },	// ACT_FISHING
-	{ "smelting", "is melting down ore.", process_smelting, cancel_smelting },	// ACT_MELTING
-	{ "manufacturing", "is working on the ship.", process_manufacturing, NULL },	// ACT_MANUFACTURING
-	{ "chipping", "is chipping rocks.", process_chipping, cancel_chipping },	// ACT_CHIPPING
-	{ "panning", "is panning for gold.", process_panning, NULL },	// ACT_PANNING
-	{ "music", "is playing soothing music.", process_music, NULL },	// ACT_MUSIC
-	{ "excavating", "is excavating a trench.", process_excavating, NULL },	// ACT_EXCAVATING
-	{ "siring", "is hunched over.", process_siring, cancel_siring },	// ACT_SIRING
-	{ "picking", "is looking around at the ground.", process_picking, NULL },	// ACT_PICKING
-	{ "morphing", "is morphing and changing shape!", process_morphing, NULL },	// ACT_MORPHING
-	{ "scraping", "is scraping at a tree.", process_scraping, cancel_scraping },	// ACT_SCRAPING
-	{ "bathing", "is bathing in the water.", process_bathing, NULL },	// ACT_BATHING
-	{ "chanting", "is chanting a strange song.", perform_chant, NULL },	// ACT_CHANTING
-	{ "prospecting", "is prospecting.", process_prospecting, NULL },	// ACT_PROSPECTING
-	{ "filling", "is filling in the trench.", process_fillin, NULL },	// ACT_FILLING_IN
-	{ "reclaiming", "is reclaiming this acre!", process_reclaim, NULL },	// ACT_RECLAIMING
-	{ "escaping", "is running toward the window!", process_escaping, NULL },	// ACT_ESCAPING
-	{ "studying", "is reading a book.", perform_study, NULL },	// ACT_STUDYING
-	{ "ritual", "is performing an arcane ritual.", perform_ritual, NULL },	// ACT_RITUAL
-	{ "sawing", "is sawing lumber.", perform_saw, cancel_sawing },	// ACT_SAWING
-	{ "quarrying", "is quarrying stone.", process_quarrying, NULL },	// ACT_QUARRYING
-	{ "weaving", "is weaving some cloth.", process_weaving, cancel_weaving },	// ACT_WEAVING
-	{ "tanning", "is tanning leather.", process_tanning, cancel_tanning },	// ACT_TANNING
-	{ "reading", "is reading a book.", process_reading, NULL },	// ACT_READING
-	{ "copying", "is writing out a copy of a book.", process_copying_book, NULL },	// ACT_COPYING_BOOK
-	{ "crafting", "is working on something.", process_gen_craft, cancel_gen_craft },	// ACT_GEN_CRAFT
+	{ "", "", NOBITS, NULL, NULL },	// ACT_NONE
+	{ "digging", "is digging at the ground.", ACTF_SHOVEL | ACTF_FINDER | ACTF_HASTE | ACTF_FAST_CHORES, process_digging, NULL },	// ACT_DIGGING
+	{ "gathering", "is gathering sticks.", ACTF_FINDER | ACTF_HASTE | ACTF_FAST_CHORES, process_gathering, NULL },	// ACT_GATHERING
+	{ "chopping", "is chopping down trees.", ACTF_HASTE | ACTF_FAST_CHORES, process_chop, NULL },	// ACT_CHOPPING
+	{ "building", "is hard at work building.", ACTF_HASTE | ACTF_FAST_CHORES, process_build_action, NULL },	// ACT_BUILDING
+	{ "dismantling", "is dismantling the building.", ACTF_HASTE | ACTF_FAST_CHORES, process_dismantle_action, NULL },	// ACT_DISMANTLING
+	{ "harvesting", "is harvesting the crop.", ACTF_HASTE | ACTF_FAST_CHORES, process_harvesting, NULL },	// ACT_HARVESTING
+	{ "planting", "is planting seeds.", ACTF_HASTE | ACTF_FAST_CHORES, process_planting, NULL },	// ACT_PLANTING
+	{ "mining", "is mining at the walls.", ACTF_HASTE | ACTF_FAST_CHORES, process_mining, NULL },	// ACT_MINING
+	{ "minting", "is minting coins.", ACTF_FAST_CHORES, process_minting, cancel_minting },	// ACT_MINTING
+	{ "fishing", "is fishing.", NOBITS, process_fishing, NULL },	// ACT_FISHING
+	{ "smelting", "is melting down ore.", ACTF_FAST_CHORES, process_smelting, cancel_smelting },	// ACT_MELTING
+	{ "manufacturing", "is working on the ship.", ACTF_HASTE | ACTF_FAST_CHORES, process_manufacturing, NULL },	// ACT_MANUFACTURING
+	{ "chipping", "is chipping rocks.", ACTF_FAST_CHORES, process_chipping, cancel_chipping },	// ACT_CHIPPING
+	{ "panning", "is panning for gold.", ACTF_FINDER, process_panning, NULL },	// ACT_PANNING
+	{ "music", "is playing soothing music.", ACTF_ANYWHERE | ACTF_HASTE, process_music, NULL },	// ACT_MUSIC
+	{ "excavating", "is excavating a trench.", ACTF_HASTE | ACTF_FAST_CHORES, process_excavating, NULL },	// ACT_EXCAVATING
+	{ "siring", "is hunched over.", NOBITS, process_siring, cancel_siring },	// ACT_SIRING
+	{ "picking", "is looking around at the ground.", ACTF_FINDER | ACTF_HASTE | ACTF_FAST_CHORES, process_picking, NULL },	// ACT_PICKING
+	{ "morphing", "is morphing and changing shape!", ACTF_ANYWHERE, process_morphing, NULL },	// ACT_MORPHING
+	{ "scraping", "is scraping at a tree.", ACTF_HASTE | ACTF_FAST_CHORES, process_scraping, cancel_scraping },	// ACT_SCRAPING
+	{ "bathing", "is bathing in the water.", NOBITS, process_bathing, NULL },	// ACT_BATHING
+	{ "chanting", "is chanting a strange song.", NOBITS, perform_chant, NULL },	// ACT_CHANTING
+	{ "prospecting", "is prospecting.", NOBITS, process_prospecting, NULL },	// ACT_PROSPECTING
+	{ "filling", "is filling in the trench.", ACTF_HASTE | ACTF_FAST_CHORES, process_fillin, NULL },	// ACT_FILLING_IN
+	{ "reclaiming", "is reclaiming this acre!", NOBITS, process_reclaim, NULL },	// ACT_RECLAIMING
+	{ "escaping", "is running toward the window!", NOBITS, process_escaping, NULL },	// ACT_ESCAPING
+	{ "studying", "is reading a book.", NOBITS, perform_study, NULL },	// ACT_STUDYING
+	{ "ritual", "is performing an arcane ritual.", NOBITS, perform_ritual, NULL },	// ACT_RITUAL
+	{ "sawing", "is sawing lumber.", ACTF_HASTE | ACTF_FAST_CHORES, perform_saw, cancel_sawing },	// ACT_SAWING
+	{ "quarrying", "is quarrying stone.", ACTF_HASTE | ACTF_FAST_CHORES, process_quarrying, NULL },	// ACT_QUARRYING
+	{ "weaving", "is weaving some cloth.", ACTF_FAST_CHORES, process_weaving, cancel_weaving },	// ACT_WEAVING
+	{ "tanning", "is tanning leather.", ACTF_FAST_CHORES, process_tanning, cancel_tanning },	// ACT_TANNING
+	{ "reading", "is reading a book.", NOBITS, process_reading, NULL },	// ACT_READING
+	{ "copying", "is writing out a copy of a book.", NOBITS, process_copying_book, NULL },	// ACT_COPYING_BOOK
+	{ "crafting", "is working on something.", NOBITS, process_gen_craft, cancel_gen_craft },	// ACT_GEN_CRAFT
+	{ "sailing", "is sailing the ship.", ACTF_ALWAYS_FAST, process_sailing, cancel_sailing },	// ACT_SAILING
 
-	{ "\n", "\n", NULL, NULL }
+	{ "\n", "\n", NOBITS, NULL, NULL }
 };
-
-
-// local vars
-int last_action_rotation = 0;	// each player is on a different 1-second action rotation
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -170,27 +173,20 @@ void cancel_action(char_data *ch) {
 * @param char_data *ch The actor
 * @param int type ACT_x const
 * @param int timer Countdown in action ticks
-* @param bitvector_t flags ACT_x flags (ACT_ANYWHERE)
 */
-void start_action(char_data *ch, int type, int timer, bitvector_t flags) {
+void start_action(char_data *ch, int type, int timer) {
 	// safety first
 	if (GET_ACTION(ch) != ACT_NONE) {
 		cancel_action(ch);
 	}
 
 	GET_ACTION(ch) = type;
+	GET_ACTION_CYCLE(ch) = ACTION_CYCLE_TIME;
 	GET_ACTION_TIMER(ch) = timer;
-	GET_ACTION_ROTATION(ch) = last_action_rotation;
 	GET_ACTION_VNUM(ch, 0) = 0;
 	GET_ACTION_VNUM(ch, 1) = 0;
 	GET_ACTION_VNUM(ch, 2) = 0;
-	
-	if (IS_SET(flags, ACT_ANYWHERE)) {
-		GET_ACTION_ROOM(ch) = NOWHERE;
-	}
-	else {
-		GET_ACTION_ROOM(ch) = GET_ROOM_VNUM(IN_ROOM(ch));
-	}
+	GET_ACTION_ROOM(ch) = GET_ROOM_VNUM(IN_ROOM(ch));
 }
 
 
@@ -220,44 +216,99 @@ void stop_room_action(room_data *room, int action, int chore) {
 
 
 /**
-* This is the main processor for periodic actions (ACT_x).
+* This is the main processor for periodic actions (ACT_x), once per second.
 */
 void update_actions(void) {
 	descriptor_data *desc;
 	char_data *ch;
-
-	// action rotations keep players from all being on the same tick
-	if (++last_action_rotation > 4) {
-		last_action_rotation = 0;
-	}
+	int speed;
 
 	// only players with active connections can process actions
 	for (desc = descriptor_list; desc; desc = desc->next) {
 		ch = desc->character;
 		
-		// basic qualifiers
-		if (STATE(desc) == CON_PLAYING && ch && !IS_NPC(ch) && GET_ACTION(ch) != ACT_NONE && GET_ACTION_ROTATION(ch) == last_action_rotation) {
-			// things which terminate actions
-			if (GET_ACTION_ROOM(ch) != NOWHERE && GET_ROOM_VNUM(IN_ROOM(ch)) != GET_ACTION_ROOM(ch)) {
-				cancel_action(ch);
-			}
-			else if (FIGHTING(ch) || GET_POS(ch) < POS_STANDING || IS_WRITING(ch)) {
-				cancel_action(ch);
-			}
-			else if ((GET_FEEDING_FROM(ch) || GET_FED_ON_BY(ch)) && GET_ACTION(ch) != ACT_SIRING) {
-				cancel_action(ch);
-			}
-			else {
-				// end hide at this point, as if they had typed a command each tick
-				REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDE);
-				
-				if (action_data[GET_ACTION(ch)].process_function != NULL) {
-					// call the process function
-					(action_data[GET_ACTION(ch)].process_function)(ch);
-				}
+		// basic disqualifiers
+		if (!ch || STATE(desc) != CON_PLAYING || IS_NPC(ch) || GET_ACTION(ch) == ACT_NONE) {
+			continue;
+		}
+		
+		// things which terminate actions
+		if (!IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_ANYWHERE) && GET_ROOM_VNUM(IN_ROOM(ch)) != GET_ACTION_ROOM(ch)) {
+			cancel_action(ch);
+			continue;
+		}
+		if (FIGHTING(ch) || GET_POS(ch) < POS_STANDING || IS_WRITING(ch)) {
+			cancel_action(ch);
+			continue;
+		}
+		if ((GET_FEEDING_FROM(ch) || GET_FED_ON_BY(ch)) && GET_ACTION(ch) != ACT_SIRING) {
+			cancel_action(ch);
+			continue;
+		}
+		
+		// action-cycle is time remaining -- compute how fast we go through it
+		speed = 1;	// default is 1 second per second
+		
+		// things that modify speed...
+		if (IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_ALWAYS_FAST)) {
+			speed += 1;
+		}
+		if (IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_HASTE) && AFF_FLAGGED(ch, AFF_HASTE)) {
+			speed += 1;
+		}
+		if (IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_FAST_CHORES) && HAS_BONUS_TRAIT(ch, BONUS_FAST_CHORES)) {
+			speed += 1;
+		}
+		if (IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_FINDER) && HAS_ABILITY(ch, ABIL_FINDER)) {
+			speed += 1;
+			gain_ability_exp(ch, ABIL_FINDER, 0.1);
+		}
+		if (IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_SHOVEL) && has_shovel(ch)) {
+			speed += 1;
+		}
+		
+		GET_ACTION_CYCLE(ch) -= speed;
+		
+		if (GET_ACTION_CYCLE(ch) <= 0) {
+			// reset cycle timer
+			GET_ACTION_CYCLE(ch) = ACTION_CYCLE_TIME;
+			
+			// end hide at this point, as if they had typed a command each tick
+			REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDE);
+			
+			if (action_data[GET_ACTION(ch)].process_function != NULL) {
+				// call the process function
+				(action_data[GET_ACTION(ch)].process_function)(ch);
 			}
 		}
 	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// HELPERS /////////////////////////////////////////////////////////////////
+
+/**
+* Finds a shovel for the character.
+*
+* @param char_data *ch The person who might have a shovel.
+* @return obj_data* The character's shovel, or NULL if they have none.
+*/
+obj_data *has_shovel(char_data *ch) {
+	obj_data *shovel = NULL;
+	int iter;
+	
+	// list of valid slots; terminate with -1
+	int slots[] = { WEAR_WIELD, WEAR_HOLD, WEAR_SHEATH_1, WEAR_SHEATH_2, -1 };
+	
+	for (iter = 0; slots[iter] != -1; ++iter) {
+		shovel = GET_EQ(ch, slots[iter]);
+		if (shovel && OBJ_FLAGGED(shovel, OBJ_TOOL_SHOVEL)) {
+			return shovel;
+		}
+	}
+	
+	return NULL;
 }
 
 
@@ -285,6 +336,28 @@ void cancel_minting(char_data *ch) {
 	obj_data *obj = read_object(GET_ACTION_VNUM(ch, 0));
 	obj_to_char_or_room(obj, ch);
 	load_otrigger(obj);
+}
+
+
+/**
+* Alerts people that the ship stops moving.
+*
+* @param char_data *ch The sailer.
+*/
+void cancel_sailing(char_data *ch) {
+	room_data *room, *next_room;
+	obj_data *ship;
+	
+	// no ship? no work
+	if (!(ship = GET_BOAT(HOME_ROOM(IN_ROOM(ch))))) {
+		return;
+	}
+	
+	HASH_ITER(interior_hh, interior_world_table, room, next_room) {
+		if (HOME_ROOM(room) == HOME_ROOM(IN_ROOM(ch)) && ROOM_PEOPLE(room)) {
+			act("The ship stops moving.", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
+		}
+	}
 }
 
 
@@ -368,7 +441,7 @@ void start_chopping(char_data *ch) {
 		msg_to_char(ch, "There's nothing left here to chop.\r\n");
 	}
 	else {
-		start_action(ch, ACT_CHOPPING, 0, 0);
+		start_action(ch, ACT_CHOPPING, 0);
 
 		// ensure progress data is set up
 		if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CHOP_PROGRESS) <= 0) {
@@ -390,7 +463,7 @@ static void start_digging(char_data *ch) {
 	int dig_base_timer = config_get_int("dig_base_timer");
 	
 	if (CAN_INTERACT_ROOM(IN_ROOM(ch), INTERACT_DIG)) {
-		start_action(ch, ACT_DIGGING, dig_base_timer / (HAS_ABILITY(ch, ABIL_FINDER) ? 2 : 1), 0);
+		start_action(ch, ACT_DIGGING, dig_base_timer);
 
 		send_to_char("You begin to dig into the ground.\r\n", ch);
 		act("$n kneels down and begins to dig.", TRUE, ch, 0, 0, TO_ROOM);
@@ -408,7 +481,7 @@ void start_mining(char_data *ch) {
 	
 	if (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_MINE) && IS_COMPLETE(IN_ROOM(ch))) {
 		if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_AMOUNT) > 0) {
-			start_action(ch, ACT_MINING, mining_timer, 0);
+			start_action(ch, ACT_MINING, mining_timer);
 			
 			msg_to_char(ch, "You look for a suitable place and begin to mine.\r\n");
 			act("$n finds a suitable place and begins to mine.", FALSE, ch, 0, 0, TO_ROOM);
@@ -432,7 +505,7 @@ void start_panning(char_data *ch) {
 	int panning_timer = config_get_int("panning_timer");
 	
 	if (find_flagged_sect_within_distance_from_char(ch, SECTF_FRESH_WATER, NOBITS, 1)) {
-		start_action(ch, ACT_PANNING, panning_timer / (HAS_ABILITY(ch, ABIL_FINDER) ? 2 : 1), 0);
+		start_action(ch, ACT_PANNING, panning_timer);
 		
 		msg_to_char(ch, "You kneel down and begin panning at the shore.\r\n");
 		act("$n kneels down and begins panning at the shore.", TRUE, ch, 0, 0, TO_ROOM);
@@ -448,7 +521,7 @@ void start_panning(char_data *ch) {
 void start_picking(char_data *ch) {
 	int pick_base_timer = config_get_int("pick_base_timer");
 	
-	start_action(ch, ACT_PICKING, pick_base_timer / (HAS_ABILITY(ch, ABIL_FINDER) ? 2 : 1), 0);
+	start_action(ch, ACT_PICKING, pick_base_timer);
 	send_to_char("You begin looking around.\r\n", ch);
 }
 
@@ -464,7 +537,7 @@ void start_quarrying(char_data *ch) {
 			msg_to_char(ch, "There's not enough stone left to cut here.\r\n");
 		}
 		else {
-			start_action(ch, ACT_QUARRYING, 12, 0);
+			start_action(ch, ACT_QUARRYING, 12);
 			send_to_char("You begin to quarry the stone.\r\n", ch);
 			act("$n begins to quarry the stone.", TRUE, ch, 0, 0, TO_ROOM);
 		}
@@ -512,9 +585,6 @@ INTERACTION_FUNC(finish_digging) {
 		if (obj) {
 			act(buf1, FALSE, ch, obj, 0, TO_CHAR);
 			act("$n pulls $p from the ground!", FALSE, ch, obj, 0, TO_ROOM);
-		
-			// if they have this, it levels now
-			gain_ability_exp(ch, ABIL_FINDER, 5);
 		}
 	}
 	
@@ -549,9 +619,6 @@ INTERACTION_FUNC(finish_gathering) {
 			gain_skill_exp(ch, SKILL_SURVIVAL, 10);
 		}
 		// action does not end normally
-		
-		// if they have this, it levels now
-		gain_ability_exp(ch, ABIL_FINDER, 5);
 		
 		return TRUE;
 	}
@@ -656,9 +723,6 @@ INTERACTION_FUNC(finish_picking_herb) {
 			act("You find $p!", FALSE, ch, obj, 0, TO_CHAR);
 		}
 		act("$n finds $p!", TRUE, ch, obj, 0, TO_ROOM);
-		
-		// if they have this, it levels now
-		gain_ability_exp(ch, ABIL_FINDER, 5);
 	}
 	else {
 		msg_to_char(ch, "You find nothing.\r\n");
@@ -731,15 +795,7 @@ void perform_saw(char_data *ch) {
 	if (skill_check(ch, ABIL_WOODWORKING, DIFF_EASY)) {
 		GET_ACTION_TIMER(ch) -= 1;
 	}
-	
-	if (AFF_FLAGGED(ch, AFF_HASTE)) {
-		GET_ACTION_TIMER(ch) -= 1;
-	}
-	
-	if (HAS_BONUS_TRAIT(ch, BONUS_FAST_CHORES)) {
-		GET_ACTION_TIMER(ch) -= 1;
-	}
-
+		
 	if (GET_ACTION_TIMER(ch) <= 0) {
 		GET_ACTION(ch) = ACT_NONE;
 		
@@ -818,7 +874,7 @@ void process_build_action(char_data *ch) {
 	
 	int count, total;
 
-	total = 1 + (AFF_FLAGGED(ch, AFF_HASTE) ? 1 : 0) + (HAS_BONUS_TRAIT(ch, BONUS_FAST_CHORES) ? 1 : 0);
+	total = 1;	// number of materials to attach in one go (add things that speed up building)
 	for (count = 0; count < total && GET_ACTION(ch) == ACT_BUILDING; ++count) {
 		process_build(ch, IN_ROOM(ch));
 	}
@@ -839,11 +895,7 @@ void process_chipping(char_data *ch) {
 	}
 	else {
 		GET_ACTION_TIMER(ch) -= 1;
-		
-		if (HAS_BONUS_TRAIT(ch, BONUS_FAST_CHORES)) {
-			GET_ACTION_TIMER(ch) -= 1;
-		}
-		
+				
 		if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
 			msg_to_char(ch, "You chip away at the piece of rock...\r\n");
 		}
@@ -900,8 +952,7 @@ void process_chop(char_data *ch) {
 	int count, total, trees = 1;
 	obj_data *obj;
 	
-	total = 1 + (AFF_FLAGGED(ch, AFF_HASTE) ? 1 : 0) + (HAS_BONUS_TRAIT(ch, BONUS_FAST_CHORES) ? 1 : 0);
-
+	total = 1;	// number of times to chop (add things that speed up chop)
 	for (count = 0; count < total && GET_ACTION(ch) == ACT_CHOPPING; ++count) {
 		if (!GET_EQ(ch, WEAR_WIELD) || GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) != TYPE_SLICE) {
 			send_to_char("You need to be wielding an axe to chop.\r\n", ch);
@@ -965,17 +1016,7 @@ void process_digging(char_data *ch) {
 
 	// decrement timer
 	GET_ACTION_TIMER(ch) -= 1;
-	
-	// detect shovel in either hand
-	if ((GET_EQ(ch, WEAR_WIELD) && OBJ_FLAGGED(GET_EQ(ch, WEAR_WIELD), OBJ_TOOL_SHOVEL)) || (GET_EQ(ch, WEAR_HOLD) && OBJ_FLAGGED(GET_EQ(ch, WEAR_HOLD), OBJ_TOOL_SHOVEL))) {
-		GET_ACTION_TIMER(ch) -= 1;
-	}
-	
-	// fast chores?
-	if (HAS_BONUS_TRAIT(ch, BONUS_FAST_CHORES)) {
-		GET_ACTION_TIMER(ch) -= 1;
-	}
-	
+		
 	// done?
 	if (GET_ACTION_TIMER(ch) <= 0) {
 		GET_ACTION(ch) = ACT_NONE;
@@ -991,6 +1032,9 @@ void process_digging(char_data *ch) {
 			if (GET_ACTION(ch) == ACT_NONE && in_room == IN_ROOM(ch)) {
 				if (get_depletion(IN_ROOM(ch), DPLTN_DIG) < DEPLETION_LIMIT(IN_ROOM(ch))) {
 					start_digging(ch);
+				}
+				else {
+					msg_to_char(ch, "There don't seem to be any other good rocks here.\r\n");
 				}
 			}
 		}
@@ -1018,7 +1062,7 @@ void process_dismantle_action(char_data *ch) {
 	
 	int count, total;
 	
-	total = 1 + (AFF_FLAGGED(ch, AFF_HASTE) ? 1 : 0) + (HAS_BONUS_TRAIT(ch, BONUS_FAST_CHORES) ? 1 : 0);
+	total = 1;	// number of mats to dismantle at once (add things that speed up dismantle)
 	for (count = 0; count < total && GET_ACTION(ch) == ACT_DISMANTLING; ++count) {
 		process_dismantling(ch, IN_ROOM(ch));
 	}
@@ -1047,9 +1091,9 @@ void process_escaping(char_data *ch) {
 void process_excavating(char_data *ch) {	
 	int count, total;
 
-	total = 1 + (AFF_FLAGGED(ch, AFF_HASTE) ? 1 : 0) + (HAS_BONUS_TRAIT(ch, BONUS_FAST_CHORES) ? 1 : 0);
+	total = 1;	// shovelfuls at once (add things that speed up excavate)
 	for (count = 0; count < total && GET_ACTION(ch) == ACT_EXCAVATING; ++count) {
-		if ((!GET_EQ(ch, WEAR_HOLD) || !OBJ_FLAGGED(GET_EQ(ch, WEAR_HOLD), OBJ_TOOL_SHOVEL)) && (!GET_EQ(ch, WEAR_WIELD) || !OBJ_FLAGGED(GET_EQ(ch, WEAR_WIELD), OBJ_TOOL_SHOVEL))) {
+		if (!has_shovel(ch)) {
 			msg_to_char(ch, "You need a shovel to excavate.\r\n");
 			cancel_action(ch);
 		}
@@ -1097,9 +1141,9 @@ void process_fillin(char_data *ch) {
 
 	int count, total;
 
-	total = 1 + (AFF_FLAGGED(ch, AFF_HASTE) ? 1 : 0) + (HAS_BONUS_TRAIT(ch, BONUS_FAST_CHORES) ? 1 : 0);
+	total = 1;	// shovelfuls to fill in at once (add things that speed up fillin)
 	for (count = 0; count < total && GET_ACTION(ch) == ACT_FILLING_IN; ++count) {
-		if ((!GET_EQ(ch, WEAR_HOLD) || !OBJ_FLAGGED(GET_EQ(ch, WEAR_HOLD), OBJ_TOOL_SHOVEL)) && (!GET_EQ(ch, WEAR_WIELD) || !OBJ_FLAGGED(GET_EQ(ch, WEAR_WIELD), OBJ_TOOL_SHOVEL))) {
+		if (!has_shovel(ch)) {
 			msg_to_char(ch, "You need a shovel to fill in the trench.\r\n");
 			cancel_action(ch);
 		}
@@ -1186,7 +1230,7 @@ void process_fishing(char_data *ch) {
 	}
 	else {
 		// restart action first
-		start_action(ch, ACT_FISHING, fishing_timer / (skill_check(ch, ABIL_FISH, DIFF_EASY) ? 2 : 1), 0);
+		start_action(ch, ACT_FISHING, fishing_timer / (skill_check(ch, ABIL_FISH, DIFF_EASY) ? 2 : 1));
 
 		// find loot
 		prc = 0;
@@ -1229,11 +1273,7 @@ void process_gathering(char_data *ch) {
 	}
 	act("$n searches around on the ground...", TRUE, ch, 0, 0, TO_ROOM | TO_SPAMMY);
 	GET_ACTION_TIMER(ch) -= 1;
-	
-	if (HAS_BONUS_TRAIT(ch, BONUS_FAST_CHORES)) {
-		GET_ACTION_TIMER(ch) -= 1;
-	}
-	
+		
 	// done ?
 	if (GET_ACTION_TIMER(ch) <= 0) {
 		if (get_depletion(IN_ROOM(ch), DPLTN_GATHER) >= gather_depletion) {
@@ -1244,7 +1284,7 @@ void process_gathering(char_data *ch) {
 			if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_GATHER, finish_gathering)) {
 				// check repeatability
 				if (CAN_INTERACT_ROOM(IN_ROOM(ch), INTERACT_GATHER)) {
-					GET_ACTION_TIMER(ch) = gather_base_timer / (HAS_ABILITY(ch, ABIL_FINDER) ? 2 : 1);
+					GET_ACTION_TIMER(ch) = gather_base_timer;
 				}
 				else {
 					GET_ACTION(ch) = ACT_NONE;
@@ -1292,7 +1332,7 @@ void process_harvesting(char_data *ch) {
 	}
 	
 	// update progress (on the room, not the player's action timer)
-	add_to_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_HARVEST_PROGRESS, -1 * (1 + (HAS_BONUS_TRAIT(ch, BONUS_FAST_CHORES) ? 1 : 0) + GET_STRENGTH(ch) * (AFF_FLAGGED(ch, AFF_HASTE) ? 2 : 1)));
+	add_to_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_HARVEST_PROGRESS, -1 * (1 + GET_STRENGTH(ch)));
 
 	if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_HARVEST_PROGRESS) <= 0) {
 		// lower limit
@@ -1328,7 +1368,7 @@ void process_mining(char_data *ch) {
 	room_data *in_room;
 	obj_vnum vnum;
 
-	total = 1 + (AFF_FLAGGED(ch, AFF_HASTE) ? 1 : 0) + (HAS_BONUS_TRAIT(ch, BONUS_FAST_CHORES) ? 1 : 0);
+	total = 1;	// pick swings at once (add things that speed up mining)
 	for (count = 0; count < total && GET_ACTION(ch) == ACT_MINING; ++count) {
 		if (!GET_EQ(ch, WEAR_WIELD) || ((GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) != TYPE_PICK) && GET_OBJ_VNUM(GET_EQ(ch, WEAR_WIELD)) != o_HANDAXE)) {
 			send_to_char("You're not using the proper tool for mining!\r\n", ch);
@@ -1401,9 +1441,6 @@ void process_minting(char_data *ch) {
 	}
 	
 	GET_ACTION_TIMER(ch) -= 1;
-	if (HAS_BONUS_TRAIT(ch, BONUS_FAST_CHORES)) {
-		GET_ACTION_TIMER(ch) -= 1;
-	}
 	
 	if (GET_ACTION_TIMER(ch) > 0) {
 		if (!number(0, 1)) {
@@ -1514,9 +1551,6 @@ void process_panning(char_data *ch) {
 				add_depletion(IN_ROOM(ch), DPLTN_PAN, TRUE);
 				load_otrigger(obj);
 				
-				// if they have this, it levels now
-				gain_ability_exp(ch, ABIL_FINDER, 5);
-				
 				if (in_room == IN_ROOM(ch)) {
 					start_panning(ch);
 				}
@@ -1548,11 +1582,7 @@ void process_picking(char_data *ch) {
 
 	// decrement
 	GET_ACTION_TIMER(ch) -= 1;
-	
-	if (HAS_BONUS_TRAIT(ch, BONUS_FAST_CHORES)) {
-		GET_ACTION_TIMER(ch) -= 1;
-	}
-	
+		
 	if (GET_ACTION_TIMER(ch) <= 0) {
 		GET_ACTION(ch) = ACT_NONE;
 		
@@ -1593,11 +1623,7 @@ void process_picking(char_data *ch) {
 void process_planting(char_data *ch) {
 	// decrement
 	GET_ACTION_TIMER(ch) -= 1;
-	
-	if (HAS_BONUS_TRAIT(ch, BONUS_FAST_CHORES)) {
-		GET_ACTION_TIMER(ch) -= 1;
-	}
-	
+		
 	// starts at 4
 	switch (GET_ACTION_TIMER(ch)) {
 		case 3: {
@@ -1704,11 +1730,7 @@ void process_quarrying(char_data *ch) {
 	obj_data *obj;
 	
 	GET_ACTION_TIMER(ch) -= 1;
-	
-	if (HAS_BONUS_TRAIT(ch, BONUS_FAST_CHORES)) {
-		GET_ACTION_TIMER(ch) -= 1;
-	}
-	
+		
 	if (GET_ACTION_TIMER(ch) > 0) {
 		// tick messages
 		switch (number(0, 9)) {
@@ -1763,6 +1785,53 @@ void process_quarrying(char_data *ch) {
 
 
 /**
+* Tick update for sailing action.
+*
+* @param char_data *ch The character doing the sailing.
+*/
+void process_sailing(char_data *ch) {
+	extern bool move_ship(char_data *ch, obj_data *ship, int dir);
+	extern bool only_one_sailing(char_data *ch, obj_data *ship);
+
+	int dir = GET_ACTION_VNUM(ch, 0);
+	obj_data *ship;
+	
+	// not on a ship?
+	if (!(ship = GET_BOAT(HOME_ROOM(IN_ROOM(ch))))) {
+		cancel_action(ch);
+		return;
+	}
+	
+	if (!only_one_sailing(ch, ship)) {
+		msg_to_char(ch, "Someone else is sailing the ship right now.\r\n");
+		GET_ACTION(ch) = ACT_NONE;	// silent stop -- no message to the whole ship
+		return;
+	}
+	
+	// attempt to move the ship
+	if (!move_ship(ch, ship, dir)) {
+		look_at_room(ch);	// show them where they stopped
+		msg_to_char(ch, "\r\n");	// extra linebreak between look and "ship stops"
+		cancel_action(ch);
+		return;
+	}
+	
+	// limited distance?
+	if (GET_ACTION_VNUM(ch, 1) > 0) {
+		GET_ACTION_VNUM(ch, 1) -= 1;
+		
+		// arrived!
+		if (GET_ACTION_VNUM(ch, 1) <= 0) {
+			look_at_room(ch);	// show them where they stopped
+			msg_to_char(ch, "\r\n");	// extra linebreak between look and "ship stops"
+			cancel_action(ch);
+			return;
+		}
+	}
+}
+
+
+/**
 * Tick update for scrape action.
 *
 * @param char_data *ch The scraper.
@@ -1779,7 +1848,7 @@ void process_scraping(char_data *ch) {
 	}
 	else {
 		// skilled work
-		GET_ACTION_TIMER(ch) -= 1 + (skill_check(ch, ABIL_WOODWORKING, DIFF_EASY) ? 1 : 0) + (AFF_FLAGGED(ch, AFF_HASTE) ? 1 : 0) + (HAS_BONUS_TRAIT(ch, BONUS_FAST_CHORES) ? 1 : 0);
+		GET_ACTION_TIMER(ch) -= 1 + (skill_check(ch, ABIL_WOODWORKING, DIFF_EASY) ? 1 : 0);
 	
 		// messaging -- to player only
 		if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
@@ -1846,11 +1915,7 @@ void process_smelting(char_data *ch) {
 
 	// decrement
 	GET_ACTION_TIMER(ch) -= 1;
-
-	if (HAS_BONUS_TRAIT(ch, BONUS_FAST_CHORES)) {
-		GET_ACTION_TIMER(ch) -= 1;
-	}
-
+	
 	if (GET_ACTION_TIMER(ch) > 0) {
 		if (!number(0, 2) && !PRF_FLAGGED(ch, PRF_NOSPAM)) {
 			msg_to_char(ch, "You watch as the metal forms in the fire.\r\n");
@@ -1909,10 +1974,6 @@ void process_tanning(char_data *ch) {
 		
 	GET_ACTION_TIMER(ch) -= (BUILDING_VNUM(IN_ROOM(ch)) == BUILDING_TANNERY ? 4 : 1);
 	
-	if (HAS_BONUS_TRAIT(ch, BONUS_FAST_CHORES)) {
-		GET_ACTION_TIMER(ch) -= 1;
-	}
-
 	if (GET_ACTION_TIMER(ch) <= 0) {
 		/* Find the entry in the table */
 		for (iter = 0; type == NOTHING && tan_data[iter].from != NOTHING; ++iter) {
@@ -1985,11 +2046,7 @@ void process_weaving(char_data *ch) {
 	void finish_weaving(char_data *ch);
 	
 	GET_ACTION_TIMER(ch) -= 1;
-	
-	if (HAS_BONUS_TRAIT(ch, BONUS_FAST_CHORES)) {
-		GET_ACTION_TIMER(ch) -= 1;
-	}
-	
+		
 	if (GET_ACTION_TIMER(ch) > 0) {
 		if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
 			msg_to_char(ch, "You carefully weave %s...\r\n", get_obj_name_by_proto(GET_ACTION_VNUM(ch, 1)));
@@ -2022,7 +2079,7 @@ ACMD(do_bathe) {
 		msg_to_char(ch, "There isn't even any water in the baths yet!\r\n");
 	}
 	else {
-		start_action(ch, ACT_BATHING, 4, 0);
+		start_action(ch, ACT_BATHING, 4);
 
 		msg_to_char(ch, "You undress and climb into the water!\r\n");
 		act("$n undresses and climbs into the water!", FALSE, ch, 0, 0, TO_ROOM);
@@ -2057,7 +2114,7 @@ ACMD(do_chip) {
 		msg_to_char(ch, "You need to be using some kind of hammer to chip it.\r\n");
 	}
 	else {
-		start_action(ch, ACT_CHIPPING, chip_timer, 0);
+		start_action(ch, ACT_CHIPPING, chip_timer);
 		GET_ACTION_VNUM(ch, 0) = GET_OBJ_VNUM(target);
 		
 		act("You begin to chip at $p.", FALSE, ch, target, 0, TO_CHAR);
@@ -2142,11 +2199,11 @@ ACMD(do_excavate) {
 		// 1st check: allies ok
 		msg_to_char(ch, "You don't have permission to excavate here!\r\n");
 	}
-	else if ((!GET_EQ(ch, WEAR_HOLD) || !OBJ_FLAGGED(GET_EQ(ch, WEAR_HOLD), OBJ_TOOL_SHOVEL)) && (!GET_EQ(ch, WEAR_WIELD) || !OBJ_FLAGGED(GET_EQ(ch, WEAR_WIELD), OBJ_TOOL_SHOVEL))) {
+	else if (!has_shovel(ch)) {
 		msg_to_char(ch, "You need a shovel to excavate.\r\n");
 	}
 	else if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_IS_TRENCH) && get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_PROGRESS) < 0) {
-		start_action(ch, ACT_EXCAVATING, 0, 0);
+		start_action(ch, ACT_EXCAVATING, 0);
 		msg_to_char(ch, "You begin to excavate a trench.\r\n");
 	}
 	else if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_IS_TRENCH)) {
@@ -2163,7 +2220,7 @@ ACMD(do_excavate) {
 		msg_to_char(ch, "You don't have permission to excavate here!\r\n");
 	}
 	else {
-		start_action(ch, ACT_EXCAVATING, 0, 0);
+		start_action(ch, ACT_EXCAVATING, 0);
 		
 		msg_to_char(ch, "You begin to excavate a trench.\r\n");
 		act("$n begins excavating a trench.", FALSE, ch, 0, 0, TO_ROOM);
@@ -2195,12 +2252,12 @@ ACMD(do_fillin) {
 		// 1st check: allies can help
 		msg_to_char(ch, "You don't have permission to fill in here!\r\n");
 	}
-	else if ((!GET_EQ(ch, WEAR_HOLD) || !OBJ_FLAGGED(GET_EQ(ch, WEAR_HOLD), OBJ_TOOL_SHOVEL)) && (!GET_EQ(ch, WEAR_WIELD) || !OBJ_FLAGGED(GET_EQ(ch, WEAR_WIELD), OBJ_TOOL_SHOVEL))) {
+	else if (!has_shovel(ch)) {
 		msg_to_char(ch, "You need a shovel to do that.\r\n");
 	}
 	else if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_IS_TRENCH)) {
 		// already a trench -- just fill in
-		start_action(ch, ACT_FILLING_IN, 0, 0);
+		start_action(ch, ACT_FILLING_IN, 0);
 		msg_to_char(ch, "You begin to fill in the trench.\r\n");
 		
 		// already finished the trench? start it back to -1 (otherwise, just continue)
@@ -2220,7 +2277,7 @@ ACMD(do_fillin) {
 		msg_to_char(ch, "You don't have permission to fill in here!\r\n");
 	}
 	else {
-		start_action(ch, ACT_FILLING_IN, 0, 0);
+		start_action(ch, ACT_FILLING_IN, 0);
 		msg_to_char(ch, "You block off the water and begin to fill in the trench.\r\n");
 
 		// set it up
@@ -2248,7 +2305,7 @@ ACMD(do_gather) {
 		msg_to_char(ch, "You don't have permission to gather here.\r\n");
 	}
 	else {
-		start_action(ch, ACT_GATHERING, gather_base_timer / (HAS_ABILITY(ch, ABIL_FINDER) ? 2 : 1), 0);
+		start_action(ch, ACT_GATHERING, gather_base_timer);
 		
 		send_to_char("You begin looking around for sticks.\r\n", ch);
 	}
@@ -2288,7 +2345,7 @@ ACMD(do_harvest) {
 		msg_to_char(ch, "You aren't using the proper tool for that.\r\n");
 	}
 	else {
-		start_action(ch, ACT_HARVESTING, 0, 0);
+		start_action(ch, ACT_HARVESTING, 0);
 
 		// ensure progress is set up
 		if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_HARVEST_PROGRESS) == 0) {
@@ -2379,7 +2436,7 @@ ACMD(do_mint) {
 		act("You melt down $p and pour it into the coin mill...", FALSE, ch, obj, NULL, TO_CHAR);
 		act("$n melts down $p and pours it into the coin mill...", FALSE, ch, obj, NULL, TO_ROOM);
 		
-		start_action(ch, ACT_MINTING, 2 * GET_WEALTH_VALUE(obj), 0);
+		start_action(ch, ACT_MINTING, 2 * GET_WEALTH_VALUE(obj));
 		GET_ACTION_VNUM(ch, 0) = GET_OBJ_VNUM(obj);
 		GET_ACTION_VNUM(ch, 1) = GET_WEALTH_VALUE(obj) * (1/COIN_VALUE);
 		extract_obj(obj);
@@ -2498,7 +2555,7 @@ ACMD(do_plant) {
 		
 		extract_obj(obj);
 		
-		start_action(ch, ACT_PLANTING, 4, 0);
+		start_action(ch, ACT_PLANTING, 4);
 		
 		msg_to_char(ch, "You kneel and begin digging holes to plant %s here.\r\n", GET_CROP_NAME(cp));
 		sprintf(buf, "$n kneels and begins to plant %s here.", GET_CROP_NAME(cp));
@@ -2525,7 +2582,7 @@ ACMD(do_play) {
 		msg_to_char(ch, "This instrument can't be played.\r\n");
 	}
 	else {
-		start_action(ch, ACT_MUSIC, 0, ACT_ANYWHERE);
+		start_action(ch, ACT_MUSIC, 0);
 		
 		act("You begin to play $p.", FALSE, ch, obj, 0, TO_CHAR);
 		act("$n begins to play $p.", FALSE, ch, obj, 0, TO_ROOM);
@@ -2552,7 +2609,7 @@ ACMD(do_prospect) {
 		return;
 	}
 	else {
-		start_action(ch, ACT_PROSPECTING, 6, 0);
+		start_action(ch, ACT_PROSPECTING, 6);
 
 		send_to_char("You begin prospecting...\r\n", ch);
 		act("$n begins prospecting...", TRUE, ch, 0, 0, TO_ROOM);
@@ -2608,7 +2665,7 @@ ACMD(do_saw) {
 		msg_to_char(ch, "You can't saw that!\r\n");
 	}
 	else {
-		start_action(ch, ACT_SAWING, 8, 0);
+		start_action(ch, ACT_SAWING, 8);
 		GET_ACTION_VNUM(ch, 0) = GET_OBJ_VNUM(obj);
 
 		act("You begin sawing $p.", FALSE, ch, obj, 0, TO_CHAR);
@@ -2643,7 +2700,7 @@ ACMD(do_scrape) {
 		msg_to_char(ch, "You need to be using a sharp tool to scrape anything.\r\n");
 	}
 	else {
-		start_action(ch, ACT_SCRAPING, 6, 0);
+		start_action(ch, ACT_SCRAPING, 6);
 
 		act("You begin scraping $p.", FALSE, ch, obj, 0, TO_CHAR);
 		act("$n begins scraping $p.", TRUE, ch, obj, 0, TO_ROOM);
@@ -2711,7 +2768,7 @@ ACMD(do_smelt) {
 				msg_to_char(ch, "You'll need %d of them to smelt.\r\n", smelt_data[type].from_amt);
 			}
 			else {
-				start_action(ch, ACT_MELTING, smelt_timer, 0);
+				start_action(ch, ACT_MELTING, smelt_timer);
 				GET_ACTION_VNUM(ch, 0) = smelt_data[type].from;
 				
 				sprintf(buf, "You begin to smelt $p");
@@ -2793,7 +2850,7 @@ ACMD(do_tan) {
 			return;
 		}
 
-		start_action(ch, ACT_TANNING, tan_timer, 0);
+		start_action(ch, ACT_TANNING, tan_timer);
 		GET_ACTION_VNUM(ch, 0) = GET_OBJ_VNUM(obj);
 		act("You begin to tan $p.", FALSE, ch, obj, 0, TO_CHAR);
 		act("$n begins to tan $p.", FALSE, ch, obj, 0, TO_ROOM);

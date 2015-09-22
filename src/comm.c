@@ -268,14 +268,18 @@ static void msdp_update(void) {
 	extern int total_bonus_healing(char_data *ch);
 	extern int get_total_score(empire_data *emp);
 	extern const char *affect_types[];
+	extern const char *cooldown_types[];
+	extern const char *damage_types[];
 	extern const double hit_per_dex;
 	extern const char *seasons[];
 	
+	struct over_time_effect_type *dot;
 	char buf[MAX_STRING_LENGTH];
+	struct cooldown_data *cool;
 	char_data *ch, *pOpponent;
 	struct affected_type *aff;
 	descriptor_data *d;
-	int hit_points, PlayerCount = 0;
+	int hit_points, iter, PlayerCount = 0;
 	size_t buf_size;
 
 	for (d = descriptor_list; d; d = d->next) {
@@ -300,14 +304,41 @@ static void msdp_update(void) {
 			MSDPSetNumber(d, eMSDP_BLOOD_MAX, GET_MAX_BLOOD(ch));
 			MSDPSetNumber(d, eMSDP_BLOOD_UPKEEP, get_blood_upkeep_cost(ch));
 			
+			// affects
 			*buf = '\0';
 			buf_size = 0;
 			for (aff = ch->affected; aff; aff = aff->next) {
-				if (!strstr(buf, affect_types[aff->type])) {
-					buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%d", (char)MSDP_VAR, affect_types[aff->type], (char)MSDP_VAR, aff->duration * SECS_PER_REAL_UPDATE);
-				}
+				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%d", (char)MSDP_VAR, affect_types[aff->type], (char)MSDP_VAL, (aff->duration == UNLIMITED ? -1 : (aff->duration * SECS_PER_REAL_UPDATE)));
 			}
 			MSDPSetTable(d, eMSDP_AFFECTS, buf);
+			
+			// dots
+			*buf = '\0';
+			buf_size = 0;
+			for (dot = ch->over_time_effects; dot; dot = dot->next) {
+				// each dot has a sub-table
+				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%c", (char)MSDP_VAR, affect_types[dot->type], (char)MSDP_VAL, (char)MSDP_TABLE_OPEN);
+				
+				
+				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cDURATION%c%d", (char)MSDP_VAR, (char)MSDP_VAL, (dot->duration == UNLIMITED ? -1 : (dot->duration * SECS_PER_REAL_UPDATE)));
+				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cTYPE%c%s", (char)MSDP_VAR, (char)MSDP_VAL, damage_types[dot->damage_type]);
+				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cDAMAGE%c%d", (char)MSDP_VAR, (char)MSDP_VAL, dot->damage * dot->stack);
+				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cSTACKS%c%d", (char)MSDP_VAR, (char)MSDP_VAL, dot->stack);
+				
+				// end table
+				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c", (char)MSDP_TABLE_CLOSE);
+			}
+			MSDPSetTable(d, eMSDP_DOTS, buf);
+			
+			// cooldowns
+			*buf = '\0';
+			buf_size = 0;
+			for (cool = ch->cooldowns; cool; cool = cool->next) {
+				if (cool->expire_time > time(0)) {
+					buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%ld", (char)MSDP_VAR, cooldown_types[cool->type], (char)MSDP_VAL, cool->expire_time - time(0));
+				}
+			}
+			MSDPSetTable(d, eMSDP_COOLDOWNS, buf);
 			
 			MSDPSetNumber(d, eMSDP_LEVEL, get_approximate_level(ch));
 			MSDPSetNumber(d, eMSDP_SKILL_LEVEL, IS_NPC(ch) ? 0 : GET_SKILL_LEVEL(ch));
@@ -316,6 +347,24 @@ static void msdp_update(void) {
 
 			snprintf(buf, sizeof(buf), "%s", IS_IMMORTAL(ch) ? "Immortal" : class_data[GET_CLASS(ch)].name);
 			MSDPSetString(d, eMSDP_CLASS, buf);
+			
+			// skills
+			*buf = '\0';
+			buf_size = 0;
+			for (iter = 0; iter < NUM_SKILLS; ++iter) {
+				if (GET_SKILL(ch, iter) > 0) {
+					buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%c", (char)MSDP_VAR, skill_data[iter].name, (char)MSDP_VAL, (char)MSDP_TABLE_OPEN);
+					
+					buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cLEVEL%c%d", (char)MSDP_VAR, (char)MSDP_VAL, GET_SKILL(ch, iter));
+					buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cEXP%c%.2f", (char)MSDP_VAR, (char)MSDP_VAL, GET_SKILL_EXP(ch, iter));
+					buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cRESETS%c%d", (char)MSDP_VAR, (char)MSDP_VAL, GET_FREE_SKILL_RESETS(ch, iter));
+					buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cNOSKILL%c%d", (char)MSDP_VAR, (char)MSDP_VAL, NOSKILL_BLOCKED(ch, iter));
+					
+					// end table
+					buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c", (char)MSDP_TABLE_CLOSE);
+				}
+			}
+			MSDPSetTable(d, eMSDP_SKILLS, buf);
 
 			MSDPSetNumber(d, eMSDP_MONEY, total_coins(ch));
 			MSDPSetNumber(d, eMSDP_BONUS_EXP, IS_NPC(ch) ? 0 : GET_DAILY_BONUS_EXPERIENCE(ch));
@@ -346,32 +395,7 @@ static void msdp_update(void) {
 			MSDPSetNumber(d, eMSDP_BONUS_MAGICAL, GET_BONUS_MAGICAL(ch));
 			MSDPSetNumber(d, eMSDP_BONUS_HEALING, total_bonus_healing(ch));
 			
-			MSDPSetNumber(d, eMSDP_BATTLE_LEVEL, IS_NPC(ch) ? 0 : GET_SKILL(ch, SKILL_BATTLE));
-			snprintf(buf, sizeof(buf), "%.2f", IS_NPC(ch) ? 0.0 : GET_SKILL_EXP(ch, SKILL_BATTLE));
-			MSDPSetString(d, eMSDP_BATTLE_EXP, buf);
-			MSDPSetNumber(d, eMSDP_EMPIRE_LEVEL, IS_NPC(ch) ? 0 : GET_SKILL(ch, SKILL_EMPIRE));
-			snprintf(buf, sizeof(buf), "%.2f", IS_NPC(ch) ? 0.0 : GET_SKILL_EXP(ch, SKILL_EMPIRE));
-			MSDPSetString(d, eMSDP_EMPIRE_EXP, buf);
-			MSDPSetNumber(d, eMSDP_HIGH_SORCERY_LEVEL, IS_NPC(ch) ? 0 : GET_SKILL(ch, SKILL_HIGH_SORCERY));
-			snprintf(buf, sizeof(buf), "%.2f", IS_NPC(ch) ? 0.0 : GET_SKILL_EXP(ch, SKILL_HIGH_SORCERY));
-			MSDPSetString(d, eMSDP_HIGH_SORCERY_EXP, buf);
-			MSDPSetNumber(d, eMSDP_NATURAL_MAGIC_LEVEL, IS_NPC(ch) ? 0 : GET_SKILL(ch, SKILL_NATURAL_MAGIC));
-			snprintf(buf, sizeof(buf), "%.2f", IS_NPC(ch) ? 0.0 : GET_SKILL_EXP(ch, SKILL_NATURAL_MAGIC));
-			MSDPSetString(d, eMSDP_NATURAL_MAGIC_EXP, buf);
-			MSDPSetNumber(d, eMSDP_STEALTH_LEVEL, IS_NPC(ch) ? 0 : GET_SKILL(ch, SKILL_STEALTH));
-			snprintf(buf, sizeof(buf), "%.2f", IS_NPC(ch) ? 0.0 : GET_SKILL_EXP(ch, SKILL_STEALTH));
-			MSDPSetString(d, eMSDP_STEALTH_EXP, buf);
-			MSDPSetNumber(d, eMSDP_SURVIVAL_LEVEL, IS_NPC(ch) ? 0 : GET_SKILL(ch, SKILL_SURVIVAL));
-			snprintf(buf, sizeof(buf), "%.2f", IS_NPC(ch) ? 0.0 : GET_SKILL_EXP(ch, SKILL_SURVIVAL));
-			MSDPSetString(d, eMSDP_SURVIVAL_EXP, buf);
-			MSDPSetNumber(d, eMSDP_TRADE_LEVEL, IS_NPC(ch) ? 0 : GET_SKILL(ch, SKILL_TRADE));
-			snprintf(buf, sizeof(buf), "%.2f", IS_NPC(ch) ? 0.0 : GET_SKILL_EXP(ch, SKILL_TRADE));
-			MSDPSetString(d, eMSDP_TRADE_EXP, buf);
-			MSDPSetNumber(d, eMSDP_VAMPIRE_LEVEL, IS_NPC(ch) ? 0 : GET_SKILL(ch, SKILL_VAMPIRE));
-			snprintf(buf, sizeof(buf), "%.2f", IS_NPC(ch) ? 0.0 : GET_SKILL_EXP(ch, SKILL_VAMPIRE));
-			MSDPSetString(d, eMSDP_VAMPIRE_EXP, buf);
-			
-			// empre
+			// empire
 			if (GET_LOYALTY(ch) && !IS_NPC(ch)) {
 				MSDPSetString(d, eMSDP_EMPIRE_NAME, EMPIRE_NAME(GET_LOYALTY(ch)));
 				MSDPSetString(d, eMSDP_EMPIRE_ADJECTIVE, EMPIRE_ADJECTIVE(GET_LOYALTY(ch)));
@@ -1589,6 +1613,16 @@ void init_descriptor(descriptor_data *newd, int desc) {
 	newd->olc_vnum = NOTHING;
 	newd->olc_object = NULL;
 	newd->olc_mobile = NULL;
+	
+	// ensure clean data
+	*newd->color.last_fg = '\0';
+	*newd->color.last_bg = '\0';
+	newd->color.is_clean = FALSE;
+	newd->color.is_underline = FALSE;
+	*newd->color.want_fg = '\0';
+	*newd->color.want_bg = '\0';
+	newd->color.want_clean = FALSE;
+	newd->color.want_underline = FALSE;
 	
 	if (++last_desc == 1000)
 		last_desc = 1;

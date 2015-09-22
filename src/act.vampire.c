@@ -644,7 +644,7 @@ ACMD(do_alacrity) {
 		act("$n seems to speed up!", TRUE, ch, 0, 0, TO_ROOM);
 	}
 	
-	af = create_flag_aff(ATYPE_ALACRITY, UNLIMITED, AFF_HASTE);
+	af = create_flag_aff(ATYPE_ALACRITY, UNLIMITED, AFF_HASTE, ch);
 	affect_join(ch, af, 0);
 
 	charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
@@ -872,7 +872,7 @@ ACMD(do_boost) {
 			msg_to_char(ch, "Your strength is already boosted!\r\n");
 		}
 		else {
-			af = create_mod_aff(ATYPE_BOOST, 3 MUD_HOURS, APPLY_STRENGTH, 1 + (skill_check(ch, ABIL_BOOST, DIFF_HARD) ? 1 : 0));
+			af = create_mod_aff(ATYPE_BOOST, 3 MUD_HOURS, APPLY_STRENGTH, 1 + (skill_check(ch, ABIL_BOOST, DIFF_HARD) ? 1 : 0), ch);
 			affect_join(ch, af, AVG_DURATION | ADD_MODIFIER);
 
 			charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
@@ -891,7 +891,7 @@ ACMD(do_boost) {
 			msg_to_char(ch, "Your dexterity is already boosted!\r\n");
 		}
 		else {
-			af = create_mod_aff(ATYPE_BOOST, 3 MUD_HOURS, APPLY_DEXTERITY, 1 + (skill_check(ch, ABIL_BOOST, DIFF_HARD) ? 1 : 0));
+			af = create_mod_aff(ATYPE_BOOST, 3 MUD_HOURS, APPLY_DEXTERITY, 1 + (skill_check(ch, ABIL_BOOST, DIFF_HARD) ? 1 : 0), ch);
 			affect_join(ch, af, AVG_DURATION | ADD_MODIFIER);
 
 			charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
@@ -945,7 +945,7 @@ ACMD(do_claws) {
 	msg_to_char(ch, "Your fingers grow into grotesque claws!\r\n");
 	act("$n's fingers grow into giant claws!", TRUE, ch, 0, 0, TO_ROOM);
 	
-	af = create_flag_aff(ATYPE_CLAWS, UNLIMITED, AFF_CLAWS);
+	af = create_flag_aff(ATYPE_CLAWS, UNLIMITED, AFF_CLAWS, ch);
 	affect_join(ch, af, 0);
 
 	charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
@@ -1060,7 +1060,7 @@ ACMD(do_deathshroud) {
 		msg_to_char(ch, "You fall to the ground, dead!\r\n");
 		act("$n falls to the ground, dead!", TRUE, ch, 0, 0, TO_ROOM);
 
-		af = create_flag_aff(ATYPE_DEATHSHROUD, UNLIMITED, AFF_DEATHSHROUD);
+		af = create_flag_aff(ATYPE_DEATHSHROUD, UNLIMITED, AFF_DEATHSHROUD, ch);
 		affect_join(ch, af, 0);
 
 		GET_POS(ch) = POS_SLEEPING;
@@ -1124,7 +1124,7 @@ ACMD(do_majesty) {
 		msg_to_char(ch, "You create a sense of supernatural majesty about yourself.\r\n");
 		act("$n glows majestically.", TRUE, ch, 0, 0, TO_ROOM);
 
-		af = create_flag_aff(ATYPE_MAJESTY, UNLIMITED, AFF_MAJESTY);
+		af = create_flag_aff(ATYPE_MAJESTY, UNLIMITED, AFF_MAJESTY, ch);
 		affect_join(ch, af, 0);
 	}
 	
@@ -1166,7 +1166,7 @@ ACMD(do_mummify) {
 		GET_POS(ch) = POS_SLEEPING;
 		charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
 
-		af = create_aff(ATYPE_MUMMIFY, -1, APPLY_NONE, 0, AFF_IMMUNE_PHYSICAL | AFF_MUMMIFY | AFF_NO_ATTACK);
+		af = create_aff(ATYPE_MUMMIFY, -1, APPLY_NONE, 0, AFF_IMMUNE_PHYSICAL | AFF_MUMMIFY | AFF_NO_ATTACK, ch);
 		affect_join(ch, af, 0);
 		
 		gain_ability_exp(ch, ABIL_MUMMIFY, 50);
@@ -1353,7 +1353,7 @@ ACMD(do_sire) {
 		do_bite(ch, buf, 0, 1);
 		
 		if (GET_FEEDING_FROM(ch)) {
-			start_action(ch, ACT_SIRING, -1, 0);
+			start_action(ch, ACT_SIRING, -1);
 		}
 	}
 }
@@ -1379,7 +1379,7 @@ ACMD(do_soulmask) {
 	}
 	else {
 		if (skill_check(ch, ABIL_SOULMASK, DIFF_EASY)) {
-			af = create_flag_aff(ATYPE_SOULMASK, UNLIMITED, AFF_SOULMASK);
+			af = create_flag_aff(ATYPE_SOULMASK, UNLIMITED, AFF_SOULMASK, ch);
 			affect_join(ch, af, 0);
 		}
 		msg_to_char(ch, "You conceal your magical aura!\r\n");
@@ -1481,7 +1481,7 @@ ACMD(do_weaken) {
 		act("$n spreads some of $s blood on $N...", TRUE, ch, 0, victim, TO_NOTVICT);
 
 		if (!AFF_FLAGGED(victim, AFF_IMMUNE_VAMPIRE)) {
-			af = create_mod_aff(ATYPE_WEAKEN, 1 MUD_HOURS, APPLY_STRENGTH, -1 * MIN(2, GET_STRENGTH(victim)-1));
+			af = create_mod_aff(ATYPE_WEAKEN, 1 MUD_HOURS, APPLY_STRENGTH, -1 * MIN(2, GET_STRENGTH(victim)-1), ch);
 			affect_join(victim, af, 0);
 			msg_to_char(victim, "You feel weak!\r\n");
 			act("$n hunches over in pain!", TRUE, victim, 0, 0, TO_ROOM);

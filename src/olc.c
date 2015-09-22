@@ -2306,9 +2306,6 @@ bool player_can_olc_edit(char_data *ch, int type, any_vnum vnum) {
 	else if (IS_SET(type, OLC_MAP) && !OLC_FLAGGED(ch, OLC_FLAG_MAP_EDIT)) {
 		return FALSE;
 	}
-	else if (IS_SET(type, OLC_SECTOR) && !OLC_FLAGGED(ch, OLC_FLAG_SECTORS)) {
-		return FALSE;
-	}
 	else if (IS_SET(type, OLC_ADVENTURE)) {
 		if (OLC_FLAGGED(ch, OLC_FLAG_NO_ADVENTURE)) {
 			return FALSE;
@@ -2347,6 +2344,9 @@ bool player_can_olc_edit(char_data *ch, int type, any_vnum vnum) {
 			return TRUE;
 		}
 		else if (IS_SET(type, OLC_TRIGGER) && !OLC_FLAGGED(ch, OLC_FLAG_NO_TRIGGER)) {
+			return TRUE;
+		}
+		else if (IS_SET(type, OLC_SECTOR) && OLC_FLAGGED(ch, OLC_FLAG_SECTORS)) {
 			return TRUE;
 		}
 	}

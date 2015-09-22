@@ -171,6 +171,42 @@ struct icon_data *get_icon_from_set(struct icon_data *set, int type) {
 
 
 /**
+* Detects the player's effective map radius size -- how far away the player
+* can see, as displayed on the map. This is controlled by the 'mapsize'
+* command, which actually sets the diameter.
+*
+* @param char_data *ch The person to get mapsize for.
+* @return int The map radius.
+*/
+int get_map_radius(char_data *ch) {
+	int mapsize;
+
+	mapsize = GET_MAPSIZE(REAL_CHAR(ch));
+	if (mapsize == 0) {
+		// auto-detected
+		if (ch->desc && ch->desc->pProtocol->ScreenWidth > 0) {
+			int wide = (ch->desc->pProtocol->ScreenWidth - 6) / 8;	// the /8 is 4 chars per tile, doubled
+			int max_size = config_get_int("max_map_size");
+			if (ch->desc->pProtocol->ScreenHeight > 0) {
+				// cap based on height, too (save some room)
+				// this saves roughly 4 lines below the map -- if you're going
+				// to play around with it, be sure to test -- the math is not
+				// very straightforward. -paul
+				wide = MIN(wide, ((ch->desc->pProtocol->ScreenHeight - 7) / 2) - 1);	// the -1 at the end is to ensure even/odd numbers have an extra line rather than one too few
+				wide = MAX(wide, 1);	// otherwise, NAWS sometimes leads to a map with only the player
+			}
+			mapsize = MIN(wide, max_size);
+		}
+		else {
+			mapsize = config_get_int("default_map_size");
+		}
+	}
+	
+	return mapsize;
+}
+
+
+/**
 * Returns the mineral name for a room with mine data.
 *
 * @param room_data *room The room
@@ -471,25 +507,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	if (!ch || !ch->desc)
 		return;
 
-	mapsize = GET_MAPSIZE(REAL_CHAR(ch));
-	if (mapsize == 0) {
-		// auto-detected
-		if (ch->desc && ch->desc->pProtocol->ScreenWidth > 0) {
-			int wide = (ch->desc->pProtocol->ScreenWidth - 6) / 8;	// the /8 is 4 chars per tile, doubled
-			int max_size = config_get_int("max_map_size");
-			if (ch->desc->pProtocol->ScreenHeight > 0) {
-				// cap based on height, too (save some room)
-				// this saves roughly 4 lines below the map -- if you're going
-				// to play around with it, be sure to test -- the math is not
-				// very straightforward. -paul
-				wide = MIN(wide, ((ch->desc->pProtocol->ScreenHeight - 7) / 2) - 1);	// the -1 at the end is to ensure even/odd numbers have an extra line rather than one too few
-			}
-			mapsize = MIN(wide, max_size);
-		}
-		else {
-			mapsize = config_get_int("default_map_size");
-		}
-	}
+	mapsize = get_map_radius(ch);
 
 	if (AFF_FLAGGED(ch, AFF_BLIND)) {
 		msg_to_char(ch, "You see nothing but infinite darkness...\r\n");
@@ -1069,6 +1087,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	sector_data *st, *base_sect = ROOM_ORIGINAL_SECT(to_room);
 	char *base_color, *str;
 	room_data *map_loc = get_map_location_for(IN_ROOM(ch)), *map_to_room = get_map_location_for(to_room);
+	obj_data *on_ship;
 	
 	// options
 	bool show_dark = IS_SET(options, LRR_SHOW_DARK) ? TRUE : FALSE;
@@ -1109,8 +1128,19 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	if (to_room == IN_ROOM(ch)) {
 		sprintf(buf, "&0<%soo&0>", chemp ? EMPIRE_BANNER(chemp) : "");
 	}
-	else if (!show_dark && show_pc_in_room(ch, to_room, mappc)) {
+	else if (!show_dark && !PRF_FLAGGED(ch, PRF_INFORMATIVE | PRF_POLITICAL) && show_pc_in_room(ch, to_room, mappc)) {
 		return;
+	}
+	
+	// ship present -- in specific cases where it overrides the normal icon
+	else if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_SHIP_PRESENT) && (ROOM_SECT_FLAGGED(to_room, SECTF_FRESH_WATER | SECTF_OCEAN) || ((on_ship = GET_BOAT(HOME_ROOM(IN_ROOM(ch)))) && to_room == IN_ROOM(on_ship)))) {
+		// show boats in room
+		if (ROOM_SECT_FLAGGED(to_room, SECTF_OCEAN)) {
+			strcat(buf, boat_icon_ocean);
+		}
+		else {	// general else ... could be: if (ROOM_SECT_FLAGGED(to_room, SECTF_FRESH_WATER))
+			strcat(buf, boat_icon_river);
+		}
 	}
 
 	/* Hidden buildings */
@@ -1215,20 +1245,6 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 		}
 		else {
 			sprintf(buf + strlen(buf), "&?%c", GET_SECT_ROADSIDE_ICON(base_sect));
-		}
-	}
-	else if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_SHIP_PRESENT) && ROOM_SECT_FLAGGED(to_room, SECTF_FRESH_WATER | SECTF_OCEAN)) {
-		// show boats in room
-		if (ROOM_SECT_FLAGGED(to_room, SECTF_FRESH_WATER)) {
-			strcat(buf, boat_icon_river);
-		}
-		else if (ROOM_SECT_FLAGGED(to_room, SECTF_OCEAN)) {
-			strcat(buf, boat_icon_ocean);
-		}
-		else {
-			// should never hit this case
-			icon = get_icon_from_set(GET_SECT_ICONS(SECT(to_room)), tileset);
-			strcat(buf, icon->icon);
 		}
 	}
 	else if (ROOM_SECT_FLAGGED(to_room, SECTF_CROP) && cp) {
@@ -1348,7 +1364,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 		if (PRF_FLAGGED(ch, PRF_POLITICAL) && !show_dark) {
 			emp = ROOM_OWNER(to_room);
 			
-			if (chemp && is_in_city_for_empire(to_room, chemp, FALSE, &junk)) {
+			if (chemp && (chemp == emp || find_city(chemp, to_room)) && is_in_city_for_empire(to_room, chemp, FALSE, &junk)) {
 				strcpy(buf2, get_banner_complement_color(chemp));
 				need_color_terminator = TRUE;
 			}

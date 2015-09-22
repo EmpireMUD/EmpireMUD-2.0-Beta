@@ -498,11 +498,20 @@ double get_weapon_speed(obj_data *weapon) {
 * @return bool TRUE if it's an ally of ch, or FALSE.
 */
 bool is_fight_ally(char_data *ch, char_data *frenemy) {
-	char_data *fighting = FIGHTING(frenemy);
+	char_data *fighting = FIGHTING(frenemy), *ch_iter, *fr_iter;
 	
-	// self is ally
-	if (ch == frenemy) {
-		return TRUE;
+	// check "master" tree up both sides == people are allies if ch (or any of ch's masters) are the same as frenemy (or any of frenemy's masters)
+	ch_iter = ch;
+	while (ch_iter) {
+		fr_iter = frenemy;
+		while (fr_iter) {
+			if (ch_iter == fr_iter) {
+				// self is ally!
+				return TRUE;
+			}
+			fr_iter = fr_iter->master;
+		}
+		ch_iter = ch_iter->master;
 	}
 	
 	if (fighting) {
@@ -652,8 +661,8 @@ int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, i
 			// require at least half of the magical resistance requirement to reduce any
 			if (use_resist > max_resist / 2) {
 				use_resist = MIN(use_resist, max_resist);
-				resist_prc = ((double) use_resist - (max_resist/2.0)) / (max_resist / 2.0);
-				dam = (int) round(dam * (1.0 - resist_prc));
+				resist_prc = ((double) use_resist - (max_resist/2.0)) / (max_resist / 2.0);	
+				dam = (int) round(dam * (1.0 - (resist_prc / 4.0))); // at 1.0 resist_prc, it reduces damage by 25% (1/4)
 			}
 		}
 	
@@ -832,7 +841,7 @@ obj_data *die(char_data *ch, char_data *killer) {
 	if (EXTRACTED(ch)) {
 		return NULL;
 	}
-		
+	
 	// remove all DoTs (BEFORE phoenix)
 	while (ch->over_time_effects) {
 		dot_remove(ch, ch->over_time_effects);
@@ -1253,7 +1262,7 @@ obj_data *player_death(char_data *ch) {
 	// penalize after so many deaths
 	if (GET_RECENT_DEATH_COUNT(ch) >= config_get_int("deaths_before_penalty") || (is_at_war(GET_LOYALTY(ch)) && GET_RECENT_DEATH_COUNT(ch) >= config_get_int("deaths_before_penalty_war"))) {
 		int duration = config_get_int("seconds_per_death") * (GET_RECENT_DEATH_COUNT(ch) + 1 - config_get_int("deaths_before_penalty")) / SECS_PER_REAL_UPDATE;
-		struct affected_type *af = create_flag_aff(ATYPE_DEATH_PENALTY, duration, AFF_IMMUNE_PHYSICAL | AFF_NO_ATTACK | AFF_STUNNED);
+		struct affected_type *af = create_flag_aff(ATYPE_DEATH_PENALTY, duration, AFF_IMMUNE_PHYSICAL | AFF_NO_ATTACK | AFF_STUNNED, ch);
 		affect_join(ch, af, ADD_DURATION);
 	}
 	
@@ -2631,23 +2640,25 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		// anything after this must NOT rely on victim being alive
 		result = damage(ch, victim, dam, w_type, attack_hit_info[w_type].damage_type);
 		
-		if (!IS_NPC(ch) && combat_round && can_gain_skill) {
-			gain_ability_exp(ch, ABIL_FINESSE, 1);
-			if (GET_SKILL(ch, SKILL_BATTLE) < EMPIRE_CHORE_SKILL_CAP) {
-				gain_skill_exp(ch, SKILL_BATTLE, 2);
+		if (combat_round && can_gain_skill) {
+			if (!IS_NPC(ch)) {
+				gain_ability_exp(ch, ABIL_FINESSE, 1);
+				if (GET_SKILL(ch, SKILL_BATTLE) < EMPIRE_CHORE_SKILL_CAP) {
+					gain_skill_exp(ch, SKILL_BATTLE, 2);
+				}
+				if (affected_by_spell(ch, ATYPE_ALACRITY)) {
+					gain_ability_exp(ch, ABIL_ALACRITY, 1);
+				}
+			
+				// fireball skill gain
+				if (GET_EQ(ch, WEAR_WIELD) && GET_OBJ_VNUM(GET_EQ(ch, WEAR_WIELD)) == o_FIREBALL) {
+					gain_ability_exp(ch, ABIL_READY_FIREBALL, 1);
+				}
 			}
-			if (affected_by_spell(ch, ATYPE_ALACRITY)) {
-				gain_ability_exp(ch, ABIL_ALACRITY, 1);
-			}
-			if (result >= 0) {
+			if (!IS_NPC(victim) && result >= 0) {
 				if (affected_by_spell(victim, ATYPE_FORESIGHT)) {
 					gain_ability_exp(victim, ABIL_FORESIGHT, 1);
 				}
-			}
-			
-			// fireball skill gain
-			if (GET_EQ(ch, WEAR_WIELD) && GET_OBJ_VNUM(GET_EQ(ch, WEAR_WIELD)) == o_FIREBALL) {
-				gain_ability_exp(ch, ABIL_READY_FIREBALL, 1);
 			}
 		}
 		
@@ -2660,7 +2671,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		if (result > 0 && !EXTRACTED(victim) && !IS_DEAD(victim) && IN_ROOM(victim) == IN_ROOM(ch)) {
 			// cut deep: players only
 			if (!IS_NPC(ch) && !AFF_FLAGGED(victim, AFF_IMMUNE_BATTLE) && skill_check(ch, ABIL_CUT_DEEP, DIFF_RARELY) && weapon && attack_hit_info[w_type].weapon_type == WEAPON_SHARP) {
-				apply_dot_effect(victim, ATYPE_CUT_DEEP, CHOOSE_BY_ABILITY_LEVEL(cut_deep_durations, ch, ABIL_CUT_DEEP), DAM_PHYSICAL, 5, 5);
+				apply_dot_effect(victim, ATYPE_CUT_DEEP, CHOOSE_BY_ABILITY_LEVEL(cut_deep_durations, ch, ABIL_CUT_DEEP), DAM_PHYSICAL, 5, 5, ch);
 				
 				act("You cut deep wounds in $N -- $E is bleeding!", FALSE, ch, NULL, victim, TO_CHAR);
 				act("$n's last attack cuts deep -- you are bleeding!", FALSE, ch, NULL, victim, TO_VICT);
@@ -2673,7 +2684,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		
 			// stunning blow: players only
 			if (!IS_NPC(ch) && !AFF_FLAGGED(victim, AFF_IMMUNE_BATTLE | AFF_IMMUNE_STUN) && skill_check(ch, ABIL_STUNNING_BLOW, DIFF_RARELY) && weapon && attack_hit_info[w_type].weapon_type == WEAPON_BLUNT) {
-				af = create_flag_aff(ATYPE_STUNNING_BLOW, CHOOSE_BY_ABILITY_LEVEL(stunning_blow_durations, ch, ABIL_STUNNING_BLOW), AFF_STUNNED);
+				af = create_flag_aff(ATYPE_STUNNING_BLOW, CHOOSE_BY_ABILITY_LEVEL(stunning_blow_durations, ch, ABIL_STUNNING_BLOW), AFF_STUNNED, ch);
 				affect_join(victim, af, 0);
 				
 				act("That last blow seems to stun $N!", FALSE, ch, NULL, victim, TO_CHAR);

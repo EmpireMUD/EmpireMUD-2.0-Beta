@@ -40,6 +40,9 @@
 
 // external funcs
 void afk_notify(char_data *ch);
+void tog_informative(char_data *ch);
+void tog_mapcolor(char_data *ch);
+void tog_political(char_data *ch);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -409,13 +412,13 @@ const struct toggle_data_type toggle_data[] = {
 	
 	{ "shout", TOG_OFFON, PRF_DEAF, 0, NULL },
 	{ "brief", TOG_ONOFF, PRF_BRIEF, 0, NULL },
-	{ "political", TOG_ONOFF, PRF_POLITICAL, 0, NULL },
+	{ "political", TOG_ONOFF, PRF_POLITICAL, 0, tog_political },
 	
 	{ "autorecall", TOG_ONOFF, PRF_AUTORECALL, 0, NULL },
 	{ "compact", TOG_ONOFF, PRF_COMPACT, 0, NULL },
-	{ "informative", TOG_ONOFF, PRF_INFORMATIVE, 0, NULL },
+	{ "informative", TOG_ONOFF, PRF_INFORMATIVE, 0, tog_informative },
 	
-	{ "map-color", TOG_OFFON, PRF_NOMAPCOL, 0, NULL },
+	{ "map-color", TOG_OFFON, PRF_NOMAPCOL, 0, tog_mapcolor },
 	{ "no-repeat", TOG_ONOFF, PRF_NOREPEAT, 0, NULL },
 	{ "screen-reader", TOG_ONOFF, PRF_SCREEN_READER, 0, NULL },
 	
@@ -2109,6 +2112,7 @@ const char *room_extra_types[] = {
 	"quarry workforce progress",
 	"build recipe",
 	"found time",
+	"redesignate time",
 	"\n"
 };
 

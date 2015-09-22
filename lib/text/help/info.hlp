@@ -429,7 +429,7 @@ like (1/5) is the number and maximum number of stacks.
 Physical DoTs can be removed by firstaid. Magical and poison DoTs can be
 removed by cleanse.
 
-See also: AFFECTS, CLEANSE, FIRSTAID, SCORE
+See also: AFFECTS, CLEANSE, DISPEL, FIRSTAID, SCORE
 #
 FARMING CROPS ORCHARDS AGRICULTURE APPLES WHEAT CORN HOPS COTTON BARLEY PEACHES CHERRIES ORANGES RICE OLIVES PEAS GOURDS
 
@@ -531,7 +531,9 @@ Skill level: This level is determined by your top 3 skills, and is currently
 
 Gear level: Your gear level raises your total level to 50 more than the average
    level of the gear you have equipped (except sheathed weapons, clothes, and
-   some other slots). You can see it by typing "eq".
+   items in the ranged slot). You can see it by typing "eq". Some item flags
+   which make the item more powerful, such as superior and drop flags, raise
+   the effective levels of items for this purpose.
 
 Composite level: This is the sum of your skill and gear levels. It is the
    number used for scaling mobs to fight you. This is the level shown on your
@@ -598,12 +600,17 @@ EmpireMUD supports the following MSDP variables:
  BLOOD_MAX - Maximum blood pool
  BLOOD_UPKEEP - Blood cost per game hour
 
- AFFECTS - Array of current affects
+ AFFECTS - Table of current affects and durations (seconds)
+ DOTS - Damage Over Time affects in nested table format with:
+    Dot Name => (DURATION, TYPE, DAMAGE, STACKS)
+ COOLDOWNS - Table of cooldowns and their time remaining (seconds)
  LEVEL - Total level
  SKILL_LEVEL - Skill level
  GEAR_LEVEL - Gear level
  CRAFTING_LEVEL - Crafting level
  CLASS - Character's class
+ SKILLS - Nested table format with:
+    Skill Name => (LEVEL, EXP, RESETS, NOSKILL)
  MONEY - Total coins
  BONUS_EXP - Daily bonus experience remaining
  INVENTORY - Current inventory size
@@ -621,13 +628,7 @@ EmpireMUD supports the following MSDP variables:
  BONUS_PHYSICAL - Bonus physical damage
  BONUS_MAGICAL - Bonus magical damage
  BONUS_HEALING - Bonus healing
-
- Skill levels: BATTLE_LEVEL, EMPIRE_LEVEL, HIGH_SORCERY_LEVEL,
-    NATURAL_MAGIC_LEVEL, STEALTH_LEVEL, SURVIVAL_LEVEL, TRADE_LEVEL,
-    VAMPIRE_LEVEL
- Skill experience: BATTLE_EXP, EMPIRE_EXP, HIGH_SORCERY_EXP, NATURAL_MAGIC_EXP,
-    STEALTH_EXP, SURVIVAL_EXP, TRADE_EXP, VAMPIRE_EXP
-
+ 
  EMPIRE_NAME - Name of the character's empire
  EMPIRE_ADJECTIVE - Empire's adjective
  EMPIRE_RANK - Character's rank in the empire

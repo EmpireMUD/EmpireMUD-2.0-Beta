@@ -91,6 +91,14 @@ bool audit_object(obj_data *obj, char_data *ch) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Infinite light");
 		problem = TRUE;
 	}
+	if (OBJ_FLAGGED(obj, OBJ_HARD_DROP | OBJ_GROUP_DROP)) {
+		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Loot quality flags set");
+		problem = TRUE;
+	}
+	if (OBJ_FLAGGED(obj, OBJ_BIND_ON_EQUIP) && OBJ_FLAGGED(obj, OBJ_BIND_ON_PICKUP)) {
+		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Two bind flags");
+		problem = TRUE;
+	}
 	if (!is_adventure && OBJ_FLAGGED(obj, OBJ_SCALABLE) && GET_OBJ_MAX_SCALE_LEVEL(obj) == 0) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "No maximum scale level on non-adventure obj");
 		problem = TRUE;

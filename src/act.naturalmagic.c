@@ -212,7 +212,7 @@ void apply_potion(char_data *ch, int type, int scale) {
 			value = 0;
 		}
 		
-		af = create_aff(potion_data[type].atype, 24 MUD_HOURS, potion_data[type].apply, value, potion_data[type].aff);
+		af = create_aff(potion_data[type].atype, 24 MUD_HOURS, potion_data[type].apply, value, potion_data[type].aff, ch);
 		affect_join(ch, af, 0);
 	}
 	
@@ -245,20 +245,8 @@ ACMD(do_cleanse) {
 	struct affected_type *aff, *next_aff;
 	bitvector_t bitv;
 	char_data *vict = ch;
-	int pos, iter, cost = 30;
-	bool done_aff, uncleansable;
-	
-	// a list of affects cleanse should ignore
-	int exclude_blacklist[] = {
-		ATYPE_MANASHIELD,	// has a max-mana penalty
-		ATYPE_VIGOR,	// has a move regen penalty
-		ATYPE_MUMMIFY,	// has a strange set of affs
-		ATYPE_DEATHSHROUD,	// has a strange set of affs
-		ATYPE_DEATH_PENALTY,	// is a penalty
-		ATYPE_WAR_DELAY,	// is a penalty
-		ATYPE_CONFERRED,	// is a penalty
-		-1	// last
-	};
+	int pos, cost = 30;
+	bool done_aff;
 	
 	one_argument(argument, arg);
 	
@@ -288,15 +276,8 @@ ACMD(do_cleanse) {
 		for (aff = vict->affected; aff; aff = next_aff) {
 			next_aff = aff->next;
 			
-			// ensure not uncleansable
-			uncleansable = FALSE;
-			for (iter = 0; exclude_blacklist[iter] != -1; ++iter) {
-				if (aff->type == exclude_blacklist[iter]) {
-					uncleansable = TRUE;
-					break;
-				}
-			}
-			if (uncleansable) {
+			// can't cleanse penalties (things cast by self)
+			if (aff->cast_by == CAST_BY_ID(vict)) {
 				continue;
 			}
 			
@@ -308,7 +289,7 @@ ACMD(do_cleanse) {
 			if (!done_aff && (bitv = aff->bitvector) != NOBITS) {
 				// check each bit
 				for (pos = 0; bitv && !done_aff; ++pos, bitv >>= 1) {
-					if (IS_SET(bitv, BIT(1)) && aff_is_bad[pos]) {
+					if (IS_SET(bitv, BIT(0)) && aff_is_bad[pos]) {
 						affect_remove(vict, aff);
 						done_aff = TRUE;
 					}
@@ -320,15 +301,8 @@ ACMD(do_cleanse) {
 		for (dot = vict->over_time_effects; dot; dot = next_dot) {
 			next_dot = dot->next;
 			
-			// ensure not uncleansable
-			uncleansable = FALSE;
-			for (iter = 0; exclude_blacklist[iter] != -1; ++iter) {
-				if (dot->type == exclude_blacklist[iter]) {
-					uncleansable = TRUE;
-					break;
-				}
-			}
-			if (uncleansable) {
+			// can't cleanse penalties (things cast by self)
+			if (dot->cast_by == CAST_BY_ID(vict)) {
 				continue;
 			}
 
@@ -460,7 +434,7 @@ ACMD(do_confer) {
 		// attempt to find an existing confer effect that matches and just add to its amount
 		found_existing = found_ch = FALSE;
 		for (aff_iter = vict->affected; aff_iter; aff_iter = aff_iter->next) {
-			if (aff_iter->type == ATYPE_CONFER && aff_iter->location == confer_list[type].apply) {
+			if (aff_iter->type == ATYPE_CONFER && aff_iter->cast_by == CAST_BY_ID(ch) && aff_iter->location == confer_list[type].apply) {
 				found_existing = TRUE;
 				aff_iter->modifier += amt;
 				match_duration = aff_iter->duration;	// store this to match it later
@@ -492,7 +466,7 @@ ACMD(do_confer) {
 		}
 		else {
 			// did not find existing: add if needed
-			aff = create_mod_aff(ATYPE_CONFER, duration, confer_list[type].apply, amt);
+			aff = create_mod_aff(ATYPE_CONFER, duration, confer_list[type].apply, amt, ch);
 			
 			// use affect_to_char instead of affect_join because we will allow multiple copies of this with different durations
 			affect_to_char(vict, aff);
@@ -502,7 +476,7 @@ ACMD(do_confer) {
 		// separately ...
 		if (!found_ch) {
 			// need a new strength effect on ch
-			aff = create_mod_aff(ATYPE_CONFERRED, duration, APPLY_STRENGTH, -1);
+			aff = create_mod_aff(ATYPE_CONFERRED, duration, APPLY_STRENGTH, -1, ch);
 			
 			// use affect_to_char instead of affect_join because we will allow multiple copies of this with different durations
 			affect_to_char(ch, aff);
@@ -531,7 +505,7 @@ ACMD(do_counterspell) {
 		msg_to_char(ch, "You ready a counterspell.\r\n");
 		act("$n flickers momentarily with a blue-white aura.", TRUE, ch, NULL, NULL, TO_ROOM);
 		
-		af = create_flag_aff(ATYPE_COUNTERSPELL, 1 MUD_HOURS, 0);
+		af = create_flag_aff(ATYPE_COUNTERSPELL, 1 MUD_HOURS, 0, ch);
 		affect_join(ch, af, 0);
 	}
 }
@@ -571,7 +545,7 @@ ACMD(do_eartharmor) {
 	// 100/14 = 7 resistance at max level
 	amount = get_ability_level(ch, ABIL_EARTHARMOR) / 14.0;
 	amount += GET_INTELLIGENCE(ch) / 3.0;
-	af = create_mod_aff(ATYPE_EARTHARMOR, 30, APPLY_RESIST_PHYSICAL, (int)amount);
+	af = create_mod_aff(ATYPE_EARTHARMOR, 30, APPLY_RESIST_PHYSICAL, (int)amount, ch);
 	
 	if (ch == vict) {
 		msg_to_char(ch, "You form a thick layer of mana over your body, and it hardens to solid earth!\r\n");
@@ -650,7 +624,7 @@ ACMD(do_earthmeld) {
 	act("$n dissolves into pure mana and sinks right into the ground!", TRUE, ch, 0, 0, TO_ROOM);
 	GET_POS(ch) = POS_SLEEPING;
 
-	af = create_aff(ATYPE_EARTHMELD, -1, APPLY_NONE, 0, AFF_NO_TARGET_IN_ROOM | AFF_NO_SEE_IN_ROOM | AFF_EARTHMELD);
+	af = create_aff(ATYPE_EARTHMELD, -1, APPLY_NONE, 0, AFF_NO_TARGET_IN_ROOM | AFF_NO_SEE_IN_ROOM | AFF_EARTHMELD, ch);
 	affect_join(ch, af, 0);
 	
 	gain_ability_exp(ch, ABIL_EARTHMELD, 15);
@@ -710,7 +684,7 @@ ACMD(do_entangle) {
 		act("$n shoots vines of green mana at you, entangling you!", FALSE, ch, NULL, vict, TO_VICT);
 		act("$n shoots vines of green mana at $N, entangling $M!", FALSE, ch, NULL, vict, TO_NOTVICT);
 	
-		af = create_aff(ATYPE_ENTANGLE, 6, APPLY_DEXTERITY, -1, AFF_ENTANGLED);
+		af = create_aff(ATYPE_ENTANGLE, 6, APPLY_DEXTERITY, -1, AFF_ENTANGLED, ch);
 		affect_join(vict, af, 0);
 
 		engage_combat(ch, vict, FALSE);
@@ -861,7 +835,7 @@ ACMD(do_fly) {
 	
 	charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
 	
-	af = create_flag_aff(ATYPE_FLY, CHOOSE_BY_ABILITY_LEVEL(fly_durations, ch, ABIL_FLY), AFF_FLY);
+	af = create_flag_aff(ATYPE_FLY, CHOOSE_BY_ABILITY_LEVEL(fly_durations, ch, ABIL_FLY), AFF_FLY, ch);
 	affect_join(ch, af, 0);
 	
 	msg_to_char(ch, "You concentrate for a moment...\r\nSparkling blue wings made of pure mana erupt from your back!\r\n");
@@ -901,7 +875,7 @@ ACMD(do_hasten) {
 			act("$n touches $N on the arm. Veins of red mana streak down $S skin and $E seems to move a little faster.", FALSE, ch, NULL, vict, TO_NOTVICT);
 		}
 		
-		af = create_flag_aff(ATYPE_HASTEN, CHOOSE_BY_ABILITY_LEVEL(durations, ch, ABIL_HASTEN), AFF_HASTE);
+		af = create_flag_aff(ATYPE_HASTEN, CHOOSE_BY_ABILITY_LEVEL(durations, ch, ABIL_HASTEN), AFF_HASTE, ch);
 		affect_join(vict, af, 0);
 		
 		gain_ability_exp(ch, ABIL_HASTEN, 15);
@@ -1266,7 +1240,7 @@ ACMD(do_rejuvenate) {
 		act("$n surrounds $N with the bright white mana of rejuvenation.", FALSE, ch, NULL, vict, TO_NOTVICT);
 	}
 	
-	af = create_mod_aff(ATYPE_REJUVENATE, 6, APPLY_HEAL_OVER_TIME, amount);
+	af = create_mod_aff(ATYPE_REJUVENATE, 6, APPLY_HEAL_OVER_TIME, amount, ch);
 	affect_join(vict, af, 0);
 	
 	gain_ability_exp(ch, ABIL_REJUVENATE, 15);
@@ -1396,7 +1370,7 @@ ACMD(do_skybrand) {
 		act("$n marks you with a glowing blue skybrand!", FALSE, ch, NULL, vict, TO_VICT);
 		act("$n marks $N with a glowing blue skybrand!", FALSE, ch, NULL, vict, TO_NOTVICT);
 	
-		apply_dot_effect(vict, ATYPE_SKYBRAND, 6, DAM_MAGICAL, get_ability_level(ch, ABIL_SKYBRAND) / 24, 3);
+		apply_dot_effect(vict, ATYPE_SKYBRAND, 6, DAM_MAGICAL, get_ability_level(ch, ABIL_SKYBRAND) / 24, 3, ch);
 		engage_combat(ch, vict, FALSE);
 	}
 

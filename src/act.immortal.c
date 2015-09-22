@@ -2678,7 +2678,7 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 	if (GET_CRAFT_ABILITY(craft) != NO_ABIL && ability_data[GET_CRAFT_ABILITY(craft)].parent_skill != NO_SKILL) {
 		sprintf(buf + strlen(buf), " (%s %d)", skill_data[ability_data[GET_CRAFT_ABILITY(craft)].parent_skill].name, ability_data[GET_CRAFT_ABILITY(craft)].parent_skill_required);
 	}
-	seconds = GET_CRAFT_TIME(craft) * SECS_PER_REAL_UPDATE;
+	seconds = GET_CRAFT_TIME(craft) * ACTION_CYCLE_TIME;
 	msg_to_char(ch, "Ability: &y%s&0, Level: &g%d&0, Time: [&g%d action tick%s&0 | &g%d:%02d&0]\r\n", buf, GET_CRAFT_MIN_LEVEL(craft), GET_CRAFT_TIME(craft), PLURAL(GET_CRAFT_TIME(craft)), seconds / SECS_PER_REAL_MIN, seconds % SECS_PER_REAL_MIN);
 
 	sprintbit(GET_CRAFT_FLAGS(craft), craft_flags, buf, TRUE);
@@ -5103,6 +5103,11 @@ ACMD(do_restore) {
 		GET_MOVE(vict) = GET_MAX_MOVE(vict);
 		GET_MANA(vict) = GET_MAX_MANA(vict);
 		GET_BLOOD(vict) = GET_MAX_BLOOD(vict);
+		
+		// remove DoTs
+		while (vict->over_time_effects) {
+			dot_remove(vict, vict->over_time_effects);
+		}
 
 		if (GET_POS(vict) < POS_SLEEPING) {
 			GET_POS(vict) = POS_STANDING;
@@ -5382,6 +5387,7 @@ ACMD(do_show) {
 
 
 ACMD(do_slay) {
+	extern bool check_scaling(char_data *mob, char_data *attacker);
 	extern obj_data *die(char_data *ch, char_data *killer);
 	
 	char_data *vict;
@@ -5407,7 +5413,15 @@ ACMD(do_slay) {
 			act("You chop $M to pieces! Ah! The blood!", FALSE, ch, 0, vict, TO_CHAR);
 			act("$N chops you to pieces!", FALSE, vict, 0, ch, TO_CHAR);
 			act("$n brutally slays $N!", FALSE, ch, 0, vict, TO_NOTVICT);
+
+			check_scaling(vict, ch);	// ensure scaling
 			tag_mob(vict, ch);	// ensures loot binding if applicable
+
+			// this would prevent the death
+			if (affected_by_spell(vict, ATYPE_PHOENIX_RITE)) {
+				affect_from_char(vict, ATYPE_PHOENIX_RITE);
+			}
+
 			die(vict, ch);
 		}
 	}

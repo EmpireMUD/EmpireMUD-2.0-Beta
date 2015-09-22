@@ -105,12 +105,20 @@ See Also: DEATH, %DAMAGE%, %DOT%
 #d
 %DOT% ODOT MDOT WDOT
 
-%dot% <victim> <modifier> <duration> [damage type]
+%dot% <victim> <modifier> <duration> [damage type] [max stacks]
 
-Adds a scaled DoT -- Damage-over-Time -- effect to the target.
+Adds a scaled DoT -- Damage-Over-Time -- effect to the target.
 
 You can optionally specify a damage type (physical, magical, fire, poison,
 direct).
+
+You can also optionally specify a maximum number of stacks. If a %dot% hits
+again while the victim already has that dot, it will add its damage and stack,
+resetting the duration on the existing effect. If it has hit its maximum, it
+will only refresh the time on the whole stack. If you don't specify, it will
+not stack (max 1).
+
+NOTE: If you want to use max stacks, you must also provide the damage type.
 
 See Also: %DAMAGE%, %AOE%
 #d

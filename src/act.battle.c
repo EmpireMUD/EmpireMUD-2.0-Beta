@@ -137,7 +137,7 @@ ACMD(do_bash) {
 
 		if (damage(ch, vict, dam, ATTACK_BASH, DAM_PHYSICAL) > 0) {	/* -1 = dead, 0 = miss */
 			if (!AFF_FLAGGED(vict, AFF_IMMUNE_BATTLE | AFF_IMMUNE_STUN)) {
-				af = create_flag_aff(ATYPE_BASH, 1, AFF_STUNNED);
+				af = create_flag_aff(ATYPE_BASH, 1, AFF_STUNNED, ch);
 				affect_join(vict, af, 0);
 		
 				// release other saps here
@@ -198,7 +198,7 @@ ACMD(do_disarm) {
 			act("$n disarms you! (Your weapon will not work until it wears off.)", FALSE, ch, 0, victim, TO_VICT);
 			act("$n skillfully disarms $N!", TRUE, ch, 0, victim, TO_NOTVICT);
 
-			af = create_flag_aff(ATYPE_DISARM, CHOOSE_BY_ABILITY_LEVEL(disarm_levels, ch, ABIL_DISARM), AFF_DISARM);
+			af = create_flag_aff(ATYPE_DISARM, CHOOSE_BY_ABILITY_LEVEL(disarm_levels, ch, ABIL_DISARM), AFF_DISARM, ch);
 			affect_join(victim, af, 0);
 		}
 		
@@ -320,7 +320,7 @@ ACMD(do_heartstop) {
 		
 		gain_ability_exp(ch, ABIL_HEARTSTOP, 15);
 
-		af = create_flag_aff(ATYPE_HEARTSTOP, 4, AFF_CANT_SPEND_BLOOD);
+		af = create_flag_aff(ATYPE_HEARTSTOP, 4, AFF_CANT_SPEND_BLOOD, ch);
 		affect_join(victim, af, ADD_DURATION);
 
 		msg_to_char(victim, "Your blood becomes inert!\r\n");
@@ -376,9 +376,9 @@ ACMD(do_kick) {
 		if (HAS_ABILITY(ch, ABIL_SHADOW_KICK) && !AFF_FLAGGED(vict, AFF_IMMUNE_BATTLE)) {
 			struct affected_type *af;
 			int value = round(GET_COMPUTED_LEVEL(ch) / 50);
-			af = create_mod_aff(ATYPE_SHADOW_KICK, 2, APPLY_BONUS_PHYSICAL, -value);
+			af = create_mod_aff(ATYPE_SHADOW_KICK, 2, APPLY_BONUS_PHYSICAL, -value, ch);
 			affect_join(vict, af, 0);
-			af = create_mod_aff(ATYPE_SHADOW_KICK, 2, APPLY_BONUS_MAGICAL, -value);
+			af = create_mod_aff(ATYPE_SHADOW_KICK, 2, APPLY_BONUS_MAGICAL, -value, ch);
 			affect_join(vict, af, 0);
 		}
 	
