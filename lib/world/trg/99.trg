@@ -17,9 +17,10 @@ eval test %%actor.varexists(%varname%)%%
 if %test%
   eval tt %%actor.%varname%%%
   if (%timestamp% - %tt%) < 1800
-    %send% %actor% You have used %self.shortdesc% too recently.
-eval diff (%tt% - %timestamp%) + 1800
-%send% %actor% You must wait %diff% seconds.
+    eval diff (%tt% - %timestamp%) + 1800
+    eval diff2 %diff%/60
+    eval diff %diff%//60
+    %send% %actor% You must wait %diff2%:%diff% to use %self.shortdesc% again.
     halt
   end
 end
