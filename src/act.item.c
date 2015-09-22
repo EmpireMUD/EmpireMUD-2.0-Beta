@@ -770,7 +770,7 @@ static bool perform_get_from_container(char_data *ch, obj_data *obj, obj_data *c
 			return TRUE;
 		}
 	}
-	return FALSE;
+	return TRUE;	// return TRUE even though it failed -- don't break "get all" loops
 }
 
 
@@ -877,7 +877,7 @@ static bool perform_get_from_room(char_data *ch, obj_data *obj) {
 		get_check_money(ch, obj);
 		return TRUE;
 	}
-	return FALSE;
+	return TRUE;	// return TRUE even though it failed -- don't break "get all" loops
 }
 
 
