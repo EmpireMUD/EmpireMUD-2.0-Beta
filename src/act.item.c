@@ -4400,11 +4400,17 @@ ACMD(do_retrieve) {
 	if (count == 0) {
 		msg_to_char(ch, "There is nothing stored here!\r\n");
 	}
+	else {
+		// remove the "ceded" bit on this room (it was used)
+		if (GET_LOYALTY(ch) == room_emp) {
+			remove_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CEDED);
+		}
 
-	/* save the empire */
-	SAVE_CHAR(ch);
-	save_empire(emp);
-	read_vault(emp);
+		/* save the empire */
+		SAVE_CHAR(ch);
+		save_empire(emp);
+		read_vault(emp);
+	}
 }
 
 
@@ -4789,11 +4795,18 @@ ACMD(do_store) {
 			}
 		}
 	}
+	
+	if (done > 0) {
+		// remove the "ceded" bit on this room
+		if (GET_LOYALTY(ch) == room_emp) {
+			remove_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CEDED);
+		}
 
-	/* save the empire */
-	SAVE_CHAR(ch);
-	save_empire(emp);
-	read_vault(emp);
+		/* save the empire */
+		SAVE_CHAR(ch);
+		save_empire(emp);
+		read_vault(emp);
+	}
 }
 
 

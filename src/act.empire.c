@@ -1969,7 +1969,7 @@ ACMD(do_barde) {
 ACMD(do_cede) {
 	char arg2[MAX_INPUT_LENGTH];
 	empire_data *e = GET_LOYALTY(ch), *f;
-	room_data *room;
+	room_data *room, *iter, *next_iter;
 	char_data *targ;
 	bool junk;
 
@@ -2025,6 +2025,14 @@ ACMD(do_cede) {
 
 		abandon_room(room);
 		claim_room(room, f);
+		
+		// mark as ceded
+		set_room_extra_data(room, ROOM_EXTRA_CEDED, 1);
+		HASH_ITER(interior_hh, interior_world_table, iter, next_iter) {
+			if (HOME_ROOM(iter) == room) {
+				set_room_extra_data(iter, ROOM_EXTRA_CEDED, 1);
+			}
+		}
 
 		/* Transfers wealth, etc */
 		read_empire_territory(e);

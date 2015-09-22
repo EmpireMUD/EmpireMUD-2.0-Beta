@@ -2113,6 +2113,7 @@ const char *room_extra_types[] = {
 	"build recipe",
 	"found time",
 	"redesignate time",
+	"ceded",
 	"\n"
 };
 

@@ -2249,10 +2249,12 @@ void claim_room(room_data *room, empire_data *emp) {
 	room_data *iter, *next_iter;
 	
 	ROOM_OWNER(room) = emp;
+	remove_room_extra_data(room, ROOM_EXTRA_CEDED);	// not ceded if just claimed
 
 	HASH_ITER(interior_hh, interior_world_table, iter, next_iter) {
 		if (HOME_ROOM(iter) == home) {
 			ROOM_OWNER(iter) = emp;
+			remove_room_extra_data(iter, ROOM_EXTRA_CEDED);	// not ceded if just claimed
 		}
 	}
 }
