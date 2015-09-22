@@ -857,6 +857,10 @@ static bool perform_get_from_room(char_data *ch, obj_data *obj) {
 		}
 	}
 	if (can_take_obj(ch, obj) && get_otrigger(obj, ch)) {
+		if (IS_CARRYING_N(ch) + GET_OBJ_INVENTORY_SIZE(obj) > CAN_CARRY_N(ch)) {
+			act("$p: you can't hold any more items.", FALSE, ch, obj, 0, TO_CHAR);
+			return FALSE;
+		}
 		// last-minute scaling: scale to its minimum (adventures will override this on their own)
 		scale_item_to_level(obj, GET_OBJ_MIN_SCALE_LEVEL(obj));
 		
