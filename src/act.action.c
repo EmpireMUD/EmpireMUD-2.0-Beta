@@ -1729,6 +1729,12 @@ void process_quarrying(char_data *ch) {
 	room_data *in_room;
 	obj_data *obj;
 	
+	if (BUILDING_VNUM(IN_ROOM(ch)) != BUILDING_QUARRY || get_depletion(IN_ROOM(ch), DPLTN_QUARRY) >= config_get_int("common_depletion")) {
+		msg_to_char(ch, "You can't quarry anything here.\r\n");
+		cancel_action(ch);
+		return;
+	}
+	
 	GET_ACTION_TIMER(ch) -= 1;
 		
 	if (GET_ACTION_TIMER(ch) > 0) {
