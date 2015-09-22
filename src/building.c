@@ -316,6 +316,14 @@ void construct_tunnel(char_data *ch, int dir, room_data *entrance, room_data *ex
 	
 	// link the final tunnel room
 	create_exit(last_room, exit, dir, TRUE);
+	
+	// get it all added to territory
+	if (ROOM_OWNER(entrance)) {
+		read_empire_territory(ROOM_OWNER(entrance));
+	}
+	if (ROOM_OWNER(exit) && ROOM_OWNER(exit) != ROOM_OWNER(entrance)) {
+		read_empire_territory(ROOM_OWNER(exit));
+	}
 }
 
 
