@@ -2670,7 +2670,8 @@ char *show_color_codes(char *string) {
 	char *ptr;
 	
 	ptr = str_replace("&", "&&", string);
-	strcpy(value, ptr);
+	strncpy(value, ptr, MAX_STRING_LENGTH);
+	value[MAX_STRING_LENGTH-1] = '\0';	// safety
 	free(ptr);
 	
 	return value;
