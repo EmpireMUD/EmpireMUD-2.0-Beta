@@ -712,7 +712,7 @@ ACMD(do_bite) {
 				appear(ch);
 
 			/* if the person isn't biteable, gotta roll! */
-			if ((IS_NPC(victim) || !PRF_FLAGGED(victim, PRF_BOTHERABLE)) && AWAKE(victim)) {
+			if ((IS_NPC(victim) || !PRF_FLAGGED(victim, PRF_BOTHERABLE)) && AWAKE(victim) && !IS_INJURED(victim, INJ_TIED | INJ_STAKED)) {
 				success = check_hit_vs_dodge(ch, victim, FALSE);
 
 				if (!success && !MOB_FLAGGED(victim, MOB_ANIMAL)) {
