@@ -398,7 +398,7 @@ typedef struct trig_data trig_data;
 #define BLD_ON_DESERT  BIT(4)
 #define BLD_ON_RIVER  BIT(5)
 #define BLD_ON_JUNGLE  BIT(6)
-	#define BLD_ON_UNUSED2  BIT(7)
+#define BLD_ON_NOT_PLAYER_MADE  BIT(7)
 #define BLD_ON_OCEAN  BIT(8)
 #define BLD_ON_OASIS  BIT(9)
 #define BLD_FACING_CROP  BIT(10)	// use only for facing, not for on

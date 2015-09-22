@@ -139,9 +139,9 @@ void special_building_setup(char_data *ch, room_data *room) {
 bool can_build_on(room_data *room, bitvector_t flags) {
 	#define CLEAR_OPEN_BUILDING(r)	(IS_MAP_BUILDING(r) && ROOM_BLD_FLAGGED((r), BLD_OPEN) && !ROOM_BLD_FLAGGED((r), BLD_BARRIER) && (IS_COMPLETE(r) || !SECT_FLAGGED(ROOM_ORIGINAL_SECT(r), SECTF_FRESH_WATER | SECTF_OCEAN)))
 
-	return (
+	return (!IS_SET(flags, BLD_ON_NOT_PLAYER_MADE) || !ROOM_AFF_FLAGGED(room, ROOM_AFF_PLAYER_MADE)) && (
 		IS_SET(GET_SECT_BUILD_FLAGS(SECT(room)), flags) || 
-		(IS_SET(flags, BLD_FACING_OPEN_BUILDING) && CLEAR_OPEN_BUILDING(room))	// one special case -- any thoughts on a generic case? -pc
+		(IS_SET(flags, BLD_FACING_OPEN_BUILDING) && CLEAR_OPEN_BUILDING(room))
 	);
 }
 

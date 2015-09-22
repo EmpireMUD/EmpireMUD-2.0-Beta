@@ -1774,7 +1774,7 @@ const char *bld_on_flags[] = {
 	"desert",
 	"river",
 	"jungle",
-		"*",
+	"not player made",
 	"ocean",
 	"oasis",
 	"crops",
