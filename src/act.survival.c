@@ -168,6 +168,9 @@ ACMD(do_butcher) {
 	else if (!IS_CORPSE(corpse)) {
 		msg_to_char(ch, "You can only butcher a corpse.\r\n");
 	}
+	else if (!bind_ok(corpse, ch)) {
+		msg_to_char(ch, "You can't butcher a corpse that is bound to someone else.\r\n");
+	}
 	else if (GET_CORPSE_NPC_VNUM(corpse) == NOTHING || !(proto = mob_proto(GET_CORPSE_NPC_VNUM(corpse)))) {
 		msg_to_char(ch, "You can't get any good meat out of that.\r\n");
 	}
