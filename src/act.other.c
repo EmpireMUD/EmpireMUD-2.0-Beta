@@ -42,6 +42,7 @@ extern char *get_room_name(room_data *room, bool color);
 extern char_data *has_familiar(char_data *ch);
 void Objsave_char(char_data *ch, int rent_code);
 void scale_item_to_level(obj_data *obj, int level);
+extern char *show_color_codes(char *string);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1172,7 +1173,7 @@ ACMD(do_gen_write) {
 		send_to_char("That must be a mistake...\r\n", ch);
 		return;
 	}
-	syslog(SYS_INFO, GET_INVIS_LEV(ch), FALSE, "%s %s: %s", GET_NAME(ch), name, argument);
+	syslog(SYS_INFO, GET_INVIS_LEV(ch), FALSE, "%s %s: %s", GET_NAME(ch), name, show_color_codes(argument));
 
 	if (stat(filename, &fbuf) < 0) {
 		perror("SYSERR: Can't stat() file");
@@ -1639,9 +1640,7 @@ ACMD(do_order) {
 
 
 // Either displays current prompt, or sets one; takes SCMD_PROMPT or SCMD_FPROMPT
-ACMD(do_prompt) {
-	extern char *show_color_codes(char *string);
-	
+ACMD(do_prompt) {	
 	char *types[] = { "prompt", "fprompt" };
 	char **prompt;
 	

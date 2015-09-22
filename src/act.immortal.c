@@ -68,6 +68,7 @@ extern char *get_room_name(room_data *room, bool color);
 void save_instances();
 void save_whole_world();
 void scale_mob_to_level(char_data *mob, int level);
+extern char *show_color_codes(char *string);
 void update_class(char_data *ch);
 
 // locals
@@ -4238,7 +4239,7 @@ ACMD(do_file) {
 		}
 		get_line(req_file, buf);
 	}
-	page_string(ch->desc, output, 1);
+	page_string(ch->desc, show_color_codes(output), TRUE);
 
 	fclose(req_file);
 }
