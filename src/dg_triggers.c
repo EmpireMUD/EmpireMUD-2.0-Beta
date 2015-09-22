@@ -209,7 +209,7 @@ int greet_mtrigger(char_data *actor, int dir) {
 		if (!SCRIPT_CHECK(ch, MTRIG_GREET | MTRIG_GREET_ALL) || (ch == actor) || AFF_FLAGGED(ch, AFF_CHARM)) {
 			continue;
 		}
-		if (!SCRIPT_CHECK(ch, MTRIG_GREET_ALL) && (!AWAKE(ch) || FIGHTING(ch))) {
+		if (!SCRIPT_CHECK(ch, MTRIG_GREET_ALL) && (!AWAKE(ch) || FIGHTING(ch) || AFF_FLAGGED(actor, AFF_SNEAK))) {
 			continue;
 		}
 
