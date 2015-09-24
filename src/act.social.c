@@ -478,6 +478,8 @@ ACMD(do_roll) {
 	int num, size, total, iter;
 	struct group_member_data *mem;
 	
+	int max_num = 1000;
+	
 	// convert any "d" in the argument to a space, e.g. 2d6 dice
 	for (iter = 0; iter < strlen(argument); ++iter) {
 		if (LOWER(argument[iter]) == 'd') {
@@ -503,6 +505,11 @@ ACMD(do_roll) {
 	if (num <= 0 || size <= 0) {
 		msg_to_char(ch, "Usage: roll [number of dice] [size of dice]\r\n");
 		return;
+	}
+	if (num > max_num) {
+		msg_to_char(ch, "You can roll at most %d dice at one time.\r\n", max_num);
+		num = MIN(num, max_num);
+		// not fatal
 	}
 	
 	total = 0;
