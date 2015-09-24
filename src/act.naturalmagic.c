@@ -599,7 +599,7 @@ ACMD(do_earthmeld) {
 		return;
 	}
 	
-	if (IS_ADVENTURE_ROOM(IN_ROOM(ch)) && (!RMT_FLAGGED(IN_ROOM(ch), RMT_OUTDOOR) || RMT_FLAGGED(IN_ROOM(ch), RMT_NEED_BOAT))) {
+	if (IS_ADVENTURE_ROOM(IN_ROOM(ch)) && (!RMT_FLAGGED(IN_ROOM(ch), RMT_OUTDOOR) || ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_NEED_BOAT) || RMT_FLAGGED(IN_ROOM(ch), RMT_NEED_BOAT))) {
 		msg_to_char(ch, "You can't earthmeld without natural ground below you!\r\n");
 		return;
 	}

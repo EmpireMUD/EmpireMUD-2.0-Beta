@@ -388,6 +388,7 @@ typedef struct trig_data trig_data;
 #define BLD_BEDROOM  BIT(39)	// boosts regen when sleeping
 #define BLD_NO_DELETE  BIT(40)	// will not be deleted for not having a homeroom
 #define BLD_SUMMON_PLAYER  BIT(41)	// can use the summon player command
+#define BLD_NEED_BOAT  BIT(42)	// requires a boat to enter
 
 
 // Terrain flags for do_build -- these match up with build_on flags for building crafts

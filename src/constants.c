@@ -1830,6 +1830,7 @@ const char *bld_flags[] = {
 	"BEDROOM",
 	"!DELETE",
 	"SUMMON-PLAYER",
+	"NEED-BOAT",
 	"\n"
 };
 

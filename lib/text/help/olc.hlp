@@ -745,7 +745,8 @@ Available flags:
  PORTAL - functions as a portal building
  BEDROOM - boosts regen while sleeping
  !DELETE - will not be deleted for not having a homeroom
- SUMMON-PLAYERS - allows the summon player command
+ SUMMON-PLAYER - allows the summon player command
+ NEED-BOAT - requires a boat, flying, or swimming to enter
 
 * Note: If you change the LARGE-CITY-RADIUS flag on existing buildings,
         territory counts will not update right away. Any empire can force a
