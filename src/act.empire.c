@@ -592,13 +592,35 @@ void city_traits(char_data *ch, char *argument) {
 
 
 void claim_city(char_data *ch, char *argument) {
+	char arg1[MAX_INPUT_LENGTH];
 	empire_data *emp = GET_LOYALTY(ch);
 	struct empire_city_data *city;
 	int x, y, radius;
 	room_data *iter, *next_iter, *to_room, *center, *home;
-	bool found = FALSE;
+	bool found = FALSE, all = FALSE;
+	int len;
 	
-	skip_spaces(&argument);
+	// look for the "all" at the end
+	len = strlen(argument);
+	if (!str_cmp(argument + len - 4, " all")) {
+		argument[len - 4] = '\0';
+		all = TRUE;
+	}
+	else if (!str_cmp(argument + len - 5, " -all")) {
+		argument[len - 5] = '\0';
+		all = TRUE;
+	}
+	else if (!str_cmp(argument + len - 3, " -a")) {
+		argument[len - 3] = '\0';
+		all = TRUE;
+	}
+	
+	// remove trailing spaces
+	while (argument[strlen(argument)-1] == ' ') {
+		argument[strlen(argument)-1] = '\0';
+	}
+	
+	any_one_word(argument, arg1);	// city name
 	
 	// check legality
 	if (!emp) {
@@ -609,11 +631,11 @@ void claim_city(char_data *ch, char *argument) {
 		msg_to_char(ch, "You don't have permission to claim territory.\r\n");
 		return;
 	}
-	if (!*argument) {
-		msg_to_char(ch, "Usage: city claim <name>\r\n");
+	if (!*arg1) {
+		msg_to_char(ch, "Usage: city claim <name> [all]\r\n");
 		return;
 	}
-	if (!(city = find_city_by_name(emp, argument))) {
+	if (!(city = find_city_by_name(emp, arg1))) {
 		msg_to_char(ch, "Your empire has no city by that name.\r\n");
 		return;
 	}
@@ -628,7 +650,18 @@ void claim_city(char_data *ch, char *argument) {
 		for (y = -1 * radius; y <= radius && can_claim(ch); ++y) {
 			to_room = real_shift(center, x, y);
 			
-			if (to_room && compute_distance(center, to_room) <= radius && SECT(to_room) != ROOM_ORIGINAL_SECT(to_room) && !ROOM_OWNER(to_room) && !ROOM_AFF_FLAGGED(to_room, ROOM_AFF_HAS_INSTANCE)) {
+			if (!to_room || compute_distance(center, to_room) > radius) {
+				continue;
+			}
+			if (ROOM_OWNER(to_room) || ROOM_AFF_FLAGGED(to_room, ROOM_AFF_HAS_INSTANCE)) {
+				continue;
+			}
+			if (ROOM_SECT_FLAGGED(to_room, SECTF_NO_CLAIM)) {
+				continue;
+			}
+			
+			// ok...
+			if (all || (SECT(to_room) != ROOM_ORIGINAL_SECT(to_room))) {
 				found = TRUE;
 				claim_room(to_room, emp);
 				

@@ -191,8 +191,9 @@ your city.
 - &ccity downgrade <name>&0: This downgrades the given city by 1 level, or
     removes its city status entirely if it was at the minimum.
 
-- &ccity claim <name>&0: This claims all unclaimed structures within the borders
-    of the city, up to your maximum territory. 
+- &ccity claim <name> [all]&0: This claims all unclaimed structures within
+    the borders of the city, up to your maximum territory -- or, all tiles with
+    the 'all' option.
 
 - &ccity abandon <name>&0: This abolishes the city, refunds your city points, and
     un-claims all territory within the city border.
