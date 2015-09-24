@@ -1983,7 +1983,7 @@ ACMD(do_cede) {
 		msg_to_char(ch, "You own no territory.\r\n");
 	else if (!*arg)
 		msg_to_char(ch, "Usage: cede <person> (x, y)\r\n");
-	else if (!(targ = get_char_vis(ch, arg, FIND_CHAR_WORLD | FIND_NO_DARK)))
+	else if (!(targ = get_player_vis(ch, arg, FIND_CHAR_WORLD | FIND_NO_DARK)))
 		send_config_msg(ch, "no_person");
 	else if (IS_NPC(targ))
 		msg_to_char(ch, "You can't cede land to NPCs!\r\n");
@@ -3655,8 +3655,13 @@ ACMD(do_tavern) {
 		msg_to_char(ch, "You need the workforce privilege to change what this tavern is brewing.\r\n");
 	}
 	else if (!*arg || type == NOTHING) {
-		show_tavern_status(ch);
-		msg_to_char(ch, "This tavern is currently brewing %s.\r\n", tavern_data[get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TAVERN_TYPE)].name);
+		if (type == NOTHING) {
+			msg_to_char(ch, "Invalid tavern type. ");	// deliberate lack of CRLF
+		}
+		else {
+			show_tavern_status(ch);
+			msg_to_char(ch, "This tavern is currently brewing %s.\r\n", tavern_data[get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TAVERN_TYPE)].name);
+		}
 		send_to_char("You can have it make:\r\n", ch);
 		for (iter = 0; *tavern_data[iter].name != '\n'; ++iter) {
 			msg_to_char(ch, " %s", tavern_data[iter].name);
