@@ -2314,7 +2314,7 @@ struct player_special_data_saved {
 	bool can_gain_new_skills;	// not required to keep skills at zero
 	bool can_get_bonus_skills;	// can buy extra 75's
 	sh_int skill_level;  // levels computed based on class skills
-	sh_int highest_recent_level;	// only updated periodically, to prevent level drops (also good for getting offline level)
+	sh_int highest_known_level;	// maximum level ever achieved (used for gear restrictions)
 	ubyte class_progression;	// % of the way from SPECIALTY_SKILL_CAP to CLASS_SKILL_CAP
 	ubyte class_role;	// ROLE_x chosen by the player
 	sh_int character_class;  // character's class as determined by top skills
@@ -2347,13 +2347,13 @@ struct player_special_data_saved {
 	sh_int spare11;
 	sh_int spare12;
 	sh_int spare13;
-	sh_int spare14;
+	sh_int last_known_level;	// set on save/quit/alt -- TODO next pconvert, move this up with highest_known_level
 	
 	int spare15;
 	int spare16;
 	int spare17;
 	int spare18;
-	int recent_level_time;	// used with highest_recent_level -- TODO during next pconvert, change this to a long and move it up
+	int recent_level_time;	// no longer used, but may have data set if you ran b2.9 or earlier -- TODO should be removed in the b2->b3 pconvert
 	
 	double spare20;
 	double spare21;

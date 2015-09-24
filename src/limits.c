@@ -495,10 +495,11 @@ void real_update_char(char_data *ch) {
 	}
 	
 	// update recent level data if level has gone up or it's been too long since we've seen a higher level
-	if (GET_COMPUTED_LEVEL(ch) >= GET_HIGHEST_RECENT_LEVEL(ch) || (time(0) - GET_RECENT_LEVEL_TIME(ch)) > (config_get_int("recent_level_minutes") * SECS_PER_REAL_MIN)) {
-		GET_HIGHEST_RECENT_LEVEL(ch) = GET_COMPUTED_LEVEL(ch);
-		GET_RECENT_LEVEL_TIME(ch) = time(0);
+	if (GET_COMPUTED_LEVEL(ch) > GET_HIGHEST_KNOWN_LEVEL(ch)) {
+		GET_HIGHEST_KNOWN_LEVEL(ch) = GET_COMPUTED_LEVEL(ch);
 	}
+	// update the last-known-level
+	GET_LAST_KNOWN_LEVEL(ch) = GET_COMPUTED_LEVEL(ch);
 	
 	// very drunk? more confused!
 	if (GET_COND(ch, DRUNK) > 350) {

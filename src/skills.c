@@ -1476,7 +1476,7 @@ bool can_wear_item(char_data *ch, obj_data *item, bool send_messages) {
 				}
 				return FALSE;
 			}
-			if (GET_HIGHEST_RECENT_LEVEL(ch) < level_min) {
+			if (GET_HIGHEST_KNOWN_LEVEL(ch) < level_min) {
 				if (send_messages) {
 					snprintf(buf, sizeof(buf), "You need to be level %d to use $p.", level_min);
 					act(buf, FALSE, ch, item, NULL, TO_CHAR);

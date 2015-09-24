@@ -227,6 +227,7 @@ void perform_alternate(char_data *old, char_data *new) {
 	}
 	
 	// save old char...
+	GET_LAST_KNOWN_LEVEL(old) = GET_COMPUTED_LEVEL(old);
 	Objsave_char(old, RENT_RENTED);
 	SAVE_CHAR(old);
 	
@@ -1761,6 +1762,7 @@ ACMD(do_quit) {
 			}
 		}
 		
+		GET_LAST_KNOWN_LEVEL(ch) = GET_COMPUTED_LEVEL(ch);
 		Objsave_char(ch, RENT_RENTED);
 		save_char(ch, died ? NULL : IN_ROOM(ch));
 		
@@ -1781,6 +1783,7 @@ ACMD(do_save) {
 		}
 		
 		write_aliases(ch);
+		GET_LAST_KNOWN_LEVEL(ch) = GET_COMPUTED_LEVEL(ch);
 		SAVE_CHAR(ch);
 		Objsave_char(ch, RENT_CRASH);
 	}

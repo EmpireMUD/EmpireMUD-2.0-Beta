@@ -988,13 +988,13 @@ char *one_who_line(char_data *ch, bool shortlist) {
 	// level/class info
 	if (!IS_GOD(ch) && !IS_IMMORTAL(ch)) {
 		if (shortlist) {
-			size += snprintf(out + size, sizeof(out) - size, "[%3d] ", GET_HIGHEST_RECENT_LEVEL(ch));
+			size += snprintf(out + size, sizeof(out) - size, "[%3d] ", GET_COMPUTED_LEVEL(ch));
 		}
 		else if (GET_CLASS(ch) != CLASS_NONE) {
-			size += snprintf(out + size, sizeof(out) - size, "[%3d %s] ", GET_HIGHEST_RECENT_LEVEL(ch), class_data[GET_CLASS(ch)].abbrev);
+			size += snprintf(out + size, sizeof(out) - size, "[%3d %s] ", GET_COMPUTED_LEVEL(ch), class_data[GET_CLASS(ch)].abbrev);
 		}
 		else {	// classless
-			size += snprintf(out + size, sizeof(out) - size, "[%3d Advn] ", GET_HIGHEST_RECENT_LEVEL(ch));
+			size += snprintf(out + size, sizeof(out) - size, "[%3d Advn] ", GET_COMPUTED_LEVEL(ch));
 		}
 	}
 	
@@ -1106,10 +1106,10 @@ char *partial_who(char_data *ch, char *name_search, int low, int high, empire_da
 		if (!CAN_SEE_GLOBAL(ch, tch)) {
 			continue;
 		}
-		if (low != 0 && GET_HIGHEST_RECENT_LEVEL(tch) < low) {
+		if (low != 0 && GET_COMPUTED_LEVEL(tch) < low) {
 			continue;
 		}
-		if (high != 0 && GET_HIGHEST_RECENT_LEVEL(tch) > high) {
+		if (high != 0 && GET_COMPUTED_LEVEL(tch) > high) {
 			continue;
 		}
 		if (type == WHO_MORTALS && (IS_GOD(tch) || IS_IMMORTAL(tch)))
@@ -2434,9 +2434,7 @@ ACMD(do_whois) {
 
 	// show class (but don't bother for immortals, as they generally have all skills
 	if (!IS_GOD(victim) && !IS_IMMORTAL(victim)) {
-		// level = file ? GET_HIGHEST_RECENT_LEVEL(victim) : GET_COMPUTED_LEVEL(victim);
-		// always show highest recent level
-		level = GET_HIGHEST_RECENT_LEVEL(victim);
+		level = file ? GET_LAST_KNOWN_LEVEL(victim) : GET_COMPUTED_LEVEL(victim);
 		
 		if (GET_CLASS(victim) != CLASS_NONE) {
 			msg_to_char(ch, "Class: %d %s (%s)\r\n", level, class_data[GET_PC_CLASS(victim)].name, class_role[(int) GET_CLASS_ROLE(victim)]);
