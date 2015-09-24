@@ -1464,7 +1464,7 @@ ACMD(do_herd) {
 	struct room_direction_data *ex;
 	char_data *victim;
 	int dir;
-	room_data *to_room;
+	room_data *to_room, *was_in;
 
 	two_arguments(argument, arg, buf);
 
@@ -1506,10 +1506,14 @@ ACMD(do_herd) {
 		msg_to_char(ch, "You can only herd an animal through the entrance.\r\n");
 	}
 	else {
+		was_in = IN_ROOM(ch);
+		
 		if (perform_move(victim, dir, TRUE, 0)) {
 			act("You skillfully herd $N.", FALSE, ch, 0, victim, TO_CHAR);
 			act("$n skillfully herds $N.", FALSE, ch, 0, victim, TO_ROOM);
-			if (!perform_move(ch, dir, FALSE, 0)) {
+			
+			// only attempt to move ch if they weren't moved already (e.g. by following)
+			if (IN_ROOM(ch) == was_in && !perform_move(ch, dir, FALSE, 0)) {
 				char_to_room(victim, IN_ROOM(ch));
 			}
 		}
