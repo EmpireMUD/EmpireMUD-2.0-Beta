@@ -628,7 +628,7 @@ void claim_city(char_data *ch, char *argument) {
 		for (y = -1 * radius; y <= radius && can_claim(ch); ++y) {
 			to_room = real_shift(center, x, y);
 			
-			if (to_room && SECT(to_room) != ROOM_ORIGINAL_SECT(to_room) && !ROOM_OWNER(to_room) && !ROOM_AFF_FLAGGED(to_room, ROOM_AFF_HAS_INSTANCE)) {
+			if (to_room && compute_distance(center, to_room) <= radius && SECT(to_room) != ROOM_ORIGINAL_SECT(to_room) && !ROOM_OWNER(to_room) && !ROOM_AFF_FLAGGED(to_room, ROOM_AFF_HAS_INSTANCE)) {
 				found = TRUE;
 				claim_room(to_room, emp);
 				
