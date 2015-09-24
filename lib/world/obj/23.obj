@@ -835,13 +835,13 @@ A chemist's cleansing cap lies discarded here.~
    This stylish leather cap has a flip-down visor which doubles as an air
 purifier to protect you from noxious alchemical fumes!
 ~
-2 p ae 10
+2 p ae 11
 0 0 0
 7 0
 A
 25 50
 C
-200 200
+150 150
 S
 #2356
 apparatus arcane antiquated~
@@ -850,13 +850,13 @@ An antiquated arcane apparatus lies forgotten here.~
    This strange device, made in the image of an ancient relic, helps guide your
 movements while crafting.
 ~
-2 p ao 5
+2 p ao 6
 0 0 0
 3 0
 A
 25 50
 C
-200 200
+150 150
 S
 #2357
 sash smuggling silk superb~
@@ -865,13 +865,13 @@ A superb silk sash is lying here.~
    This innocent-looking cloth belt has dozens and dozens of hidden pouches
 sewn into the inside of the fabric!
 ~
-2 p al 4
+2 p al 5
 0 0 0
 11 0
 A
 25 50
 C
-200 200
+150 150
 S
 #2358
 trappings tinker's tinkers traveling~
@@ -881,12 +881,12 @@ A traveling tinker's trappings are lying here.~
 attached to a traveler's outfit would probably let you work very efficiently
 on the move if you knew how to use it.
 ~
-2 p ad 5
+2 p ad 6
 0 0 0
 2 0
 A
 25 50
 C
-200 200
+150 150
 S
 $
