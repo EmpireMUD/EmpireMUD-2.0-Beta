@@ -889,6 +889,11 @@ ACMD(do_hide) {
 		return;
 	}
 	
+	if (GET_POS(ch) == POS_FIGHTING || is_fighting(ch)) {
+		msg_to_char(ch, "You can't hide in combat!\r\n");
+		return;
+	}
+	
 	if (IS_RIDING(ch)) {
 		msg_to_char(ch, "You can't hide while mounted!\r\n");
 		return;
