@@ -732,7 +732,7 @@ static void annual_update_map_tile(room_data *room) {
 	empire_data *emp;
 	int trenched, amount;
 	
-	if (BUILDING_VNUM(room) == BUILDING_RUINS_OPEN || BUILDING_VNUM(room) == BUILDING_RUINS_CLOSED) {
+	if (BUILDING_VNUM(room) == BUILDING_RUINS_OPEN || BUILDING_VNUM(room) == BUILDING_RUINS_CLOSED || BUILDING_VNUM(room) == BUILDING_RUINS_FLOODED) {
 		// roughly 2 real years for average chance for ruins to be gone
 		if (!number(0, 89)) {
 			disassociate_building(room);
@@ -1814,6 +1814,7 @@ void ruin_one_building(room_data *room) {
 	bool closed = ROOM_IS_CLOSED(room) ? TRUE : FALSE;
 	int dir = BUILDING_ENTRANCE(room);
 	room_data *to_room;
+	bld_vnum type;
 	
 	// abandon first -- this will take care of accessory rooms, too
 	abandon_room(room);
@@ -1827,7 +1828,16 @@ void ruin_one_building(room_data *room) {
 	}
 
 	// basic setup
-	construct_building(room, closed ? BUILDING_RUINS_CLOSED : BUILDING_RUINS_OPEN);
+	if (SECT_FLAGGED(ROOM_ORIGINAL_SECT(room), SECTF_FRESH_WATER | SECTF_OCEAN)) {
+		type = BUILDING_RUINS_FLOODED;
+	}
+	else if (closed) {
+		type = BUILDING_RUINS_CLOSED;
+	}
+	else {
+		type = BUILDING_RUINS_OPEN;
+	}
+	construct_building(room, type);
 	COMPLEX_DATA(room)->entrance = dir;
 	
 	// make the exit

@@ -688,7 +688,8 @@ static bool check_one_city_for_ruin(empire_data *emp, struct empire_city_data *c
 				
 				if (to_room && ROOM_OWNER(to_room) == emp) {
 					// is any building, and isn't ruins?
-					if (IS_ANY_BUILDING(to_room) && !ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_DISREPAIR) && BUILDING_VNUM(to_room) != BUILDING_RUINS_OPEN && BUILDING_VNUM(to_room) != BUILDING_RUINS_CLOSED) {
+					// TODO: maybe need a ruins flag, as we are up to 3 ruins
+					if (IS_ANY_BUILDING(to_room) && !ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_DISREPAIR) && BUILDING_VNUM(to_room) != BUILDING_RUINS_OPEN && BUILDING_VNUM(to_room) != BUILDING_RUINS_FLOODED && BUILDING_VNUM(to_room) != BUILDING_RUINS_CLOSED) {
 						found_building = TRUE;
 					}
 				}

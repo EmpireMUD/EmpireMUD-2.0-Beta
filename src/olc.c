@@ -147,6 +147,7 @@ OLC_MODULE(mapedit_pass_walls);
 OLC_MODULE(mapedit_room_description);
 OLC_MODULE(mapedit_room_name);
 OLC_MODULE(mapedit_roomtype);
+OLC_MODULE(mapedit_ruin);
 OLC_MODULE(mapedit_terrain);
 OLC_MODULE(mapedit_unclaimable);
 
@@ -393,6 +394,7 @@ const struct olc_command_data olc_data[] = {
 	{ "name", mapedit_room_name, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "passwalls", mapedit_pass_walls, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "roomtype", mapedit_roomtype, OLC_MAP, OLC_CF_MAP_EDIT },
+	{ "ruin", mapedit_ruin, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "terrain", mapedit_terrain, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "unclaimable", mapedit_unclaimable, OLC_MAP, OLC_CF_MAP_EDIT },
 	

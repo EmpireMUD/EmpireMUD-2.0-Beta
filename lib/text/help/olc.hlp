@@ -1391,6 +1391,7 @@ The following commands are available:
  name - Customize the room title.
  passwalls - Able to move on the map unblocked by walls, interiors, etc.
  roomtype - Change the type of an interior room.
+ ruin - Turn a building to ruins.
  terrain - Change the tile you're standing on.
  unclaimable - Make a tile or square of tiles unclaimable (or not).
 
@@ -1523,6 +1524,12 @@ any available room type. Rooms are created with the building editor, and any
 building with the ROOM flag can be set this way.
 
 See also: MAP OLC, OLC BUILDINGS
+#d
+"MAPEDIT RUINS"
+
+Usage:  .map ruin
+
+This command will reduce a map building to ruins.
 #d
 "MAPEDIT TERRAIN"
 
