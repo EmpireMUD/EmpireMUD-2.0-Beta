@@ -1560,25 +1560,24 @@ static void evolve_one_map_tile(room_data *room) {
 	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_EVOLVE) || !GET_SECT_EVOS(SECT(room))) {
 		return;
 	}
-	
-	// rooms that are the entrance for other rooms do not evolve
-	if (is_entrance(room)) {
-		return;
-	}
-	
+		
 	// to avoid running more than one:
 	changed = FALSE;
 	original = SECT(room);
 	
+	// NOTE: the is_entrance() check is after the get_evolution_by_type to
+	// avoid checking entrance on every tile -- only check the ones that passed
+	// the random
+	
 	// run some evolutions!
-	if (!changed && (evo = get_evolution_by_type(SECT(room), EVO_RANDOM))) {
+	if (!changed && (evo = get_evolution_by_type(SECT(room), EVO_RANDOM)) && !is_entrance(room)) {
 		if (sector_proto(evo->becomes)) {
 			change_terrain(room, evo->becomes);
 			changed = TRUE;
 		}
 	}
 	
-	if (!changed && (evo = get_evolution_by_type(SECT(room), EVO_ADJACENT_ONE))) {
+	if (!changed && (evo = get_evolution_by_type(SECT(room), EVO_ADJACENT_ONE)) && !is_entrance(room)) {
 		if (sector_proto(evo->becomes)) {
 			if (count_adjacent_sectors(room, evo->value, TRUE) >= 1) {
 				change_terrain(room, evo->becomes);
@@ -1587,7 +1586,7 @@ static void evolve_one_map_tile(room_data *room) {
 		}
 	}
 	
-	if (!changed && (evo = get_evolution_by_type(SECT(room), EVO_NOT_ADJACENT))) {
+	if (!changed && (evo = get_evolution_by_type(SECT(room), EVO_NOT_ADJACENT)) && !is_entrance(room)) {
 		if (sector_proto(evo->becomes)) {
 			if (count_adjacent_sectors(room, evo->value, TRUE) < 1) {
 				change_terrain(room, evo->becomes);
@@ -1596,7 +1595,7 @@ static void evolve_one_map_tile(room_data *room) {
 		}
 	}
 	
-	if (!changed && (evo = get_evolution_by_type(SECT(room), EVO_ADJACENT_MANY))) {
+	if (!changed && (evo = get_evolution_by_type(SECT(room), EVO_ADJACENT_MANY)) && !is_entrance(room)) {
 		if (sector_proto(evo->becomes)) {
 			if (count_adjacent_sectors(room, evo->value, TRUE) >= 6) {
 				change_terrain(room, evo->becomes);
@@ -1605,7 +1604,7 @@ static void evolve_one_map_tile(room_data *room) {
 		}
 	}
 	
-	if (!changed && (evo = get_evolution_by_type(SECT(room), EVO_NEAR_SECTOR))) {
+	if (!changed && (evo = get_evolution_by_type(SECT(room), EVO_NEAR_SECTOR)) && !is_entrance(room)) {
 		if (sector_proto(evo->becomes)) {
 			if (find_sect_within_distance_from_room(room, evo->value, config_get_int("nearby_sector_distance"))) {
 				change_terrain(room, evo->becomes);
@@ -1614,7 +1613,7 @@ static void evolve_one_map_tile(room_data *room) {
 		}
 	}
 	
-	if (!changed && (evo = get_evolution_by_type(SECT(room), EVO_NOT_NEAR_SECTOR))) {
+	if (!changed && (evo = get_evolution_by_type(SECT(room), EVO_NOT_NEAR_SECTOR)) && !is_entrance(room)) {
 		if (sector_proto(evo->becomes)) {
 			if (!find_sect_within_distance_from_room(room, evo->value, config_get_int("nearby_sector_distance"))) {
 				change_terrain(room, evo->becomes);
@@ -1623,7 +1622,7 @@ static void evolve_one_map_tile(room_data *room) {
 		}
 	}
 
-	// Growing Seeds
+	// Growing Seeds: NOTE: this one does not check is_entrance
 	if (!changed && ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && (evo = get_evolution_by_type(SECT(room), EVO_CROP_GROWS))) {
 		// only going to use the original sect if it was different -- this preserves the stored sect
 		sector_data *stored = (ROOM_ORIGINAL_SECT(room) != SECT(room)) ? ROOM_ORIGINAL_SECT(room) : NULL;
