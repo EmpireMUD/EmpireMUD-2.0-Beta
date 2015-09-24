@@ -1521,6 +1521,7 @@ void decustomize_room(room_data *room) {
 // evolutions for 1 tile
 static void evolve_one_map_tile(room_data *room) {
 	extern bool extract_tavern_resources(room_data *room);
+	extern bool is_entrance(room_data *room);
 	
 	struct evolution_data *evo;
 	sector_data *original;
@@ -1555,8 +1556,13 @@ static void evolve_one_map_tile(room_data *room) {
 		}
 	}
 	
-	// no further action if !evolve
-	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_EVOLVE)) {
+	// no further action if !evolve or if no evos
+	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_EVOLVE) || !GET_SECT_EVOS(SECT(room))) {
+		return;
+	}
+	
+	// rooms that are the entrance for other rooms do not evolve
+	if (is_entrance(room)) {
 		return;
 	}
 	
