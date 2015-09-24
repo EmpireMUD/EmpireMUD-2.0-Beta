@@ -572,7 +572,7 @@ void real_update_char(char_data *ch) {
 	}
 
 	/* moving on.. */
-	if (GET_POS(ch) < POS_STUNNED) {
+	if (GET_POS(ch) < POS_STUNNED || (GET_POS(ch) == POS_STUNNED && health_gain(ch, TRUE) <= 0)) {
 		GET_HEALTH(ch) -= 1;
 		update_pos(ch);
 		if (GET_POS(ch) == POS_DEAD) {
