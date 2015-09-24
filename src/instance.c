@@ -686,7 +686,7 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 				}
 			
 				// TODO this specifically does not work on ocean without the whole map loaded
-				if ((findsect && SECT(room) == findsect) || (findbdg && BUILDING_VNUM(room) == GET_BLD_VNUM(findbdg))) {
+				if ((findsect && SECT(room) == findsect) || (findbdg && BUILDING_VNUM(room) == GET_BLD_VNUM(findbdg) && IS_COMPLETE(room))) {
 					if (!number(0, num_found++) || !found) {
 						found = room;
 					}
