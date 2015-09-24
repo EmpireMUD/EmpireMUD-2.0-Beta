@@ -2007,6 +2007,8 @@ int perform_dupe_check(descriptor_data *d) {
 			break;
 	}
 	
+	MXPSendTag(d, "<VERSION>");
+	
 	// guarantee echo is on -- no, this could lead to an echo loop
 	// ProtocolNoEcho(d, false);
 
