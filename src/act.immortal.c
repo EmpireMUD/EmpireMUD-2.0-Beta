@@ -2794,6 +2794,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	extern double get_weapon_speed(obj_data *weapon);
 	extern struct ship_data_struct ship_data[];
 	extern const char *armor_types[NUM_ARMOR_TYPES+1];
+	extern const struct poison_data_type poison_data[];
 
 	int i, found;
 	room_data *room;
@@ -2876,6 +2877,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 
 	switch (GET_OBJ_TYPE(j)) {
 		case ITEM_POISON: {
+			msg_to_char(ch, "Poison type: %s\r\n", poison_data[GET_POISON_TYPE(j)].name);
 			msg_to_char(ch, "Charges remaining: %d\r\n", GET_POISON_CHARGES(j));
 			break;
 		}

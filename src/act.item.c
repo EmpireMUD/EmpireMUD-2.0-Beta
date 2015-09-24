@@ -289,6 +289,8 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	
 	switch (GET_OBJ_TYPE(obj)) {
 		case ITEM_POISON: {
+			extern const struct poison_data_type poison_data[];
+			msg_to_char(ch, "Poison type: %s\r\n", poison_data[GET_POISON_TYPE(obj)].name);
 			msg_to_char(ch, "Has %d charges remaining.\r\n", GET_POISON_CHARGES(obj));
 			break;
 		}
