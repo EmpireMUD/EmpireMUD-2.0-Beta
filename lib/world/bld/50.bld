@@ -149,4 +149,13 @@ The City Center~
 1000 0 do 0
 0 0 0 -1
 S
+#5010
+Ruins Flooded~
+Some Flooded Ruins~
+&?~&0|\&?~~
+1 -1 dQ 0
+0 0 0 -1
+C
+dismantle~
+S
 $
