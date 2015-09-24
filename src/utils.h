@@ -1061,6 +1061,7 @@ extern char *two_arguments(char *argument, char *first_arg, char *second_arg);
 // permission utils from utils.c
 extern bool can_build_or_claim_at_war(char_data *ch, room_data *loc);
 extern bool can_use_room(char_data *ch, room_data *room, int mode);
+extern bool emp_can_use_room(empire_data *emp, room_data *room, int mode);
 extern bool has_permission(char_data *ch, int type);
 extern bool has_tech_available(char_data *ch, int tech);
 extern bool has_tech_available_room(room_data *room, int tech);
