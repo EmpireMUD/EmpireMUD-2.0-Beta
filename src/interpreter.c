@@ -2269,7 +2269,6 @@ void nanny(descriptor_data *d, char *arg) {
 				}
 
 				send_motd(d);
-				
 				MXPSendTag(d, "<VERSION>");
 				
 				/* Check bad passwords */
@@ -2449,6 +2448,8 @@ void nanny(descriptor_data *d, char *arg) {
 			init_player(d->character);
 			SAVE_CHAR(d->character);
 			send_motd(d);
+			MXPSendTag(d, "<VERSION>");
+			
 			SEND_TO_Q("\r\n*** Press ENTER: ", d);
 			STATE(d) = CON_RMOTD;
 
@@ -2650,6 +2651,8 @@ void nanny(descriptor_data *d, char *arg) {
 
 				// and send them to the motd
 				send_motd(d);
+				MXPSendTag(d, "<VERSION>");
+				
 				SEND_TO_Q("\r\n*** Press ENTER: ", d);
 				STATE(d) = CON_RMOTD;
 			}
