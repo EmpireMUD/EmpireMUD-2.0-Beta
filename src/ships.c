@@ -903,7 +903,7 @@ ACMD(do_sail) {
 ACMD(do_unload_boat) {
 	obj_data *ship;
 	room_data *room, *next_room, *ship_room;
-	int val;
+	int val = 0;
 	bool more = FALSE;
 
 	one_argument(argument, arg);
@@ -937,6 +937,9 @@ ACMD(do_unload_boat) {
 		}
 		if (more) {
 			msg_to_char(ch, "You can't unload anything else, the docks are full!\r\n");
+		}
+		else if (val == 0) {
+			msg_to_char(ch, "There was nothing to unload from that ship.\r\n");
 		}
 	}
 }
