@@ -903,10 +903,12 @@ void look_in_direction(char_data *ch, int dir) {
 	extern const char *from_dir[];
 	extern const int rev_dir[];
 	
+	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
 	char_data *c;
-	int i;
 	room_data *to_room;
 	struct room_direction_data *ex;
+	int last_comma_pos, prev_comma_pos;
+	size_t bufsize;
 	
 	// weather override
 	if (IS_OUTDOORS(ch) && dir == UP && !find_exit(IN_ROOM(ch), dir)) {
@@ -917,37 +919,39 @@ void look_in_direction(char_data *ch, int dir) {
 	if (ROOM_IS_CLOSED(IN_ROOM(ch))) {
 		if (COMPLEX_DATA(IN_ROOM(ch)) && (ex = find_exit(IN_ROOM(ch), dir))) {
 			if (EXIT_FLAGGED(ex, EX_CLOSED) && ex->keyword) {
-				sprintf(buf, "The %s is closed.\r\n", fname(ex->keyword));
-				send_to_char(buf, ch);
+				msg_to_char(ch, "The %s is closed.\r\n", fname(ex->keyword));
 			}
 			else if (EXIT_FLAGGED(ex, EX_ISDOOR) && ex->keyword) {
-				sprintf(buf, "The %s is open.\r\n", fname(ex->keyword));
-				send_to_char(buf, ch);
+				msg_to_char(ch, "The %s is open.\r\n", fname(ex->keyword));
 			}
 			if (!EXIT_FLAGGED(ex, EX_CLOSED)) {
 				*buf = '\0';
+				bufsize = 0;
+				last_comma_pos = prev_comma_pos = -1;
+				
 				to_room = ex->room_ptr;
 				if (CAN_SEE_IN_DARK_ROOM(ch, to_room)) {
 					for (c = ROOM_PEOPLE(to_room); c; c = c->next_in_room) {
 						if (CAN_SEE(ch, c)) {
-							sprintf(buf+strlen(buf), "%s, ", PERS(c, c, 0));
+							bufsize += snprintf(buf + bufsize, sizeof(buf) - bufsize, "%s, ", PERS(c, ch, FALSE));
+							if (last_comma_pos != -1) {
+								prev_comma_pos = last_comma_pos;
+							}
+							last_comma_pos = bufsize - 2;
 						}
 					}
 				}
 
 				/* Now, we clean up that buf */
 				if (*buf) {
-					sprintf(buf+strlen(buf)-2, ".\r\n");
-
-					for (i = strlen(buf)-1; i > 0; i--) {
-						if (buf[i] == ',') {
-							sprintf(buf1, buf + i+1);
-							buf[i] = '\0';
-							strcat(buf, " and");
-							strcat(buf, buf1);
-							break;
-						}
+					if (last_comma_pos != -1) {
+						bufsize = last_comma_pos + snprintf(buf + last_comma_pos, sizeof(buf) - last_comma_pos, ".\r\n");
 					}
+					if (prev_comma_pos != -1) {
+						strcpy(buf2, buf + prev_comma_pos + 1);
+						bufsize = snprintf(buf + prev_comma_pos, sizeof(buf) - prev_comma_pos, " and%s", buf2);
+					}
+
 					msg_to_char(ch, "You see %s", buf);
 				}
 				else {
@@ -961,7 +965,9 @@ void look_in_direction(char_data *ch, int dir) {
 	}
 	else {
 		// map look
+		bufsize = 0;
 		*buf = '\0';
+		last_comma_pos = prev_comma_pos = -1;
 		
 		// dirs not shown on map
 		if (dir == UP) {
@@ -1009,7 +1015,11 @@ void look_in_direction(char_data *ch, int dir) {
 		if (CAN_SEE_IN_DARK_ROOM(ch, to_room)) {
 			for (c = ROOM_PEOPLE(to_room); c; c = c->next_in_room) {
 				if (CAN_SEE(ch, c)) {
-					sprintf(buf+strlen(buf), "%s, ", PERS(c, c, 0));
+					bufsize += snprintf(buf + bufsize, sizeof(buf) - bufsize, "%s, ", PERS(c, ch, FALSE));
+					if (last_comma_pos != -1) {
+						prev_comma_pos = last_comma_pos;
+					}
+					last_comma_pos = bufsize - 2;
 				}
 			}
 		}
@@ -1020,7 +1030,11 @@ void look_in_direction(char_data *ch, int dir) {
 			if (CAN_SEE_IN_DARK_ROOM(ch, to_room)) {
 				for (c = ROOM_PEOPLE(to_room); c; c = c->next_in_room) {
 					if (CAN_SEE(ch, c)) {
-						sprintf(buf+strlen(buf), "%s, ", PERS(c, c, 0));
+						bufsize += snprintf(buf + bufsize, sizeof(buf) - bufsize, "%s, ", PERS(c, ch, FALSE));
+						if (last_comma_pos != -1) {
+							prev_comma_pos = last_comma_pos;
+						}
+						last_comma_pos = bufsize - 2;
 					}
 				}
 			}
@@ -1030,7 +1044,11 @@ void look_in_direction(char_data *ch, int dir) {
 				if (CAN_SEE_IN_DARK_ROOM(ch, to_room)) {
 					for (c = ROOM_PEOPLE(to_room); c; c = c->next_in_room) {
 						if (CAN_SEE(ch, c)) {
-							sprintf(buf+strlen(buf), "%s, ", PERS(c, c, 0));
+							bufsize += snprintf(buf + bufsize, sizeof(buf) - bufsize, "%s, ", PERS(c, ch, FALSE));
+							if (last_comma_pos != -1) {
+								prev_comma_pos = last_comma_pos;
+							}
+							last_comma_pos = bufsize - 2;
 						}
 					}
 				}
@@ -1039,17 +1057,14 @@ void look_in_direction(char_data *ch, int dir) {
 
 		/* Now, we clean up that buf */
 		if (*buf) {
-			sprintf(buf+strlen(buf)-2, ".\r\n");
-
-			for (i = strlen(buf)-1; i > 0; i--) {
-				if (buf[i] == ',') {
-					sprintf(buf1, buf + i+1);
-					buf[i] = '\0';
-					strcat(buf, " and");
-					strcat(buf, buf1);
-					break;
-				}
+			if (last_comma_pos != -1) {
+				bufsize = last_comma_pos + snprintf(buf + last_comma_pos, sizeof(buf) - last_comma_pos, ".\r\n");
 			}
+			if (prev_comma_pos != -1) {
+				strcpy(buf2, buf + prev_comma_pos + 1);
+				bufsize = snprintf(buf + prev_comma_pos, sizeof(buf) - prev_comma_pos, " and%s", buf2);
+			}
+			
 			msg_to_char(ch, "You see %s", buf);
 		}
 		else {
