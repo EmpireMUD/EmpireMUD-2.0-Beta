@@ -907,7 +907,7 @@ void look_in_direction(char_data *ch, int dir) {
 	char_data *c;
 	room_data *to_room;
 	struct room_direction_data *ex;
-	int last_comma_pos, prev_comma_pos;
+	int last_comma_pos, prev_comma_pos, num_commas;
 	size_t bufsize;
 	
 	// weather override
@@ -928,6 +928,7 @@ void look_in_direction(char_data *ch, int dir) {
 				*buf = '\0';
 				bufsize = 0;
 				last_comma_pos = prev_comma_pos = -1;
+				num_commas = 0;
 				
 				to_room = ex->room_ptr;
 				if (CAN_SEE_IN_DARK_ROOM(ch, to_room)) {
@@ -938,6 +939,7 @@ void look_in_direction(char_data *ch, int dir) {
 								prev_comma_pos = last_comma_pos;
 							}
 							last_comma_pos = bufsize - 2;
+							++num_commas;
 						}
 					}
 				}
@@ -949,7 +951,7 @@ void look_in_direction(char_data *ch, int dir) {
 					}
 					if (prev_comma_pos != -1) {
 						strcpy(buf2, buf + prev_comma_pos + 1);
-						bufsize = snprintf(buf + prev_comma_pos, sizeof(buf) - prev_comma_pos, ", and%s", buf2);
+						bufsize = snprintf(buf + prev_comma_pos, sizeof(buf) - prev_comma_pos, "%s and%s", (num_commas > 2 ? "," : ""), buf2);
 					}
 
 					msg_to_char(ch, "You see %s", buf);
@@ -968,6 +970,7 @@ void look_in_direction(char_data *ch, int dir) {
 		bufsize = 0;
 		*buf = '\0';
 		last_comma_pos = prev_comma_pos = -1;
+		num_commas = 0;
 		
 		// dirs not shown on map
 		if (dir == UP) {
@@ -1020,6 +1023,7 @@ void look_in_direction(char_data *ch, int dir) {
 						prev_comma_pos = last_comma_pos;
 					}
 					last_comma_pos = bufsize - 2;
+					++num_commas;
 				}
 			}
 		}
@@ -1035,6 +1039,7 @@ void look_in_direction(char_data *ch, int dir) {
 							prev_comma_pos = last_comma_pos;
 						}
 						last_comma_pos = bufsize - 2;
+						++num_commas;
 					}
 				}
 			}
@@ -1049,6 +1054,7 @@ void look_in_direction(char_data *ch, int dir) {
 								prev_comma_pos = last_comma_pos;
 							}
 							last_comma_pos = bufsize - 2;
+							++num_commas;
 						}
 					}
 				}
@@ -1062,7 +1068,7 @@ void look_in_direction(char_data *ch, int dir) {
 			}
 			if (prev_comma_pos != -1) {
 				strcpy(buf2, buf + prev_comma_pos + 1);
-				bufsize = snprintf(buf + prev_comma_pos, sizeof(buf) - prev_comma_pos, ", and%s", buf2);
+				bufsize = snprintf(buf + prev_comma_pos, sizeof(buf) - prev_comma_pos, "%s and%s", (num_commas > 2 ? "," : ""), buf2);
 			}
 			
 			msg_to_char(ch, "You see %s", buf);
