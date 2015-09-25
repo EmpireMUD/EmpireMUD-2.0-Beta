@@ -736,6 +736,7 @@ void found_city(char_data *ch, char *argument) {
 	
 	empire_data *emp = get_or_create_empire(ch);
 	empire_data *emp_iter, *next_emp;
+	struct island_info *isle;
 	int iter, dist;
 	struct empire_city_data *city;
 	
@@ -755,6 +756,10 @@ void found_city(char_data *ch, char *argument) {
 	}
 	if (GET_RANK(ch) < EMPIRE_PRIV(emp, PRIV_CITIES)) {
 		msg_to_char(ch, "You don't have permission to found cities.\r\n");
+		return;
+	}
+	if ((isle = get_island(GET_ISLAND_ID(IN_ROOM(ch)), TRUE)) && IS_SET(isle->flags, ISLE_NEWBIE) && !config_get_bool("cities_on_newbie_islands")) {
+		msg_to_char(ch, "You can't found a city on a newbie island.\r\n");
 		return;
 	}
 	if (ROOM_IS_CLOSED(IN_ROOM(ch)) || COMPLEX_DATA(IN_ROOM(ch)) || IS_WATER_SECT(SECT(IN_ROOM(ch))) || ROOM_SECT_FLAGGED(IN_ROOM(ch), nocity_flags)) {

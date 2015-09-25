@@ -1600,6 +1600,7 @@ void init_config_system(void) {
 	init_config(CONFIG_CITY, "min_distance_between_cities", CONFTYPE_INT, "tiles between city centers");
 	init_config(CONFIG_CITY, "min_distance_between_ally_cities", CONFTYPE_INT, "tiles between cities belonging to allies");
 	init_config(CONFIG_CITY, "min_distance_from_city_to_starting_location", CONFTYPE_INT, "tiles between a city and a starting location");
+	init_config(CONFIG_CITY, "cities_on_newbie_islands", CONFTYPE_BOOL, "whether or not cities can be founded on newbie islands");
 	init_config(CONFIG_CITY, "city_trait_radius", CONFTYPE_INT, "tiles away that a city's traits are used instead of empire traits");
 	init_config(CONFIG_CITY, "disrepair_minor", CONFTYPE_INT, "years of disrepair to show wear");
 	init_config(CONFIG_CITY, "disrepair_major", CONFTYPE_INT, "years of disrepair to show major wear");
