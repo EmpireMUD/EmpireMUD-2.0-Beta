@@ -553,8 +553,8 @@ INTERACTION_FUNC(finish_digging) {
 	obj_data *obj = NULL;
 	int num;
 	
-	// vnum override: clay happens near water tiles when NOT on rough terrain
-	if (!ROOM_SECT_FLAGGED(inter_room, SECTF_ROUGH) && find_flagged_sect_within_distance_from_char(ch, SECTF_FRESH_WATER | SECTF_OCEAN, NOBITS, 1)) {
+	// vnum override: clay happens near water tiles when NOT on rough terrain or in a building
+	if (!ROOM_SECT_FLAGGED(inter_room, SECTF_ROUGH) && !GET_BUILDING(inter_room) && find_flagged_sect_within_distance_from_char(ch, SECTF_FRESH_WATER | SECTF_OCEAN, NOBITS, 1)) {
 		if (number(0, 4)) {
 			vnum = o_CLAY;
 		}
