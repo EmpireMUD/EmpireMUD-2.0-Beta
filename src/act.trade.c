@@ -407,6 +407,11 @@ void process_gen_craft(char_data *ch) {
 		if (weapon && OBJ_FLAGGED(weapon, OBJ_SUPERIOR)) {
 			GET_ACTION_TIMER(ch) -= 1;
 		}
+		
+		// tailor bonus for weave
+		if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_WEAVE && ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_TAILOR) && IS_COMPLETE(IN_ROOM(ch))) {
+			GET_ACTION_TIMER(ch) -= 3;
+		}
 
 		if (GET_ACTION_TIMER(ch) <= 0) {
 			finish_gen_craft(ch);
