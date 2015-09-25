@@ -1258,7 +1258,7 @@ ACMD(do_enter) {
 	}
 	
 	// permissions
-	if (ROOM_OWNER(IN_ROOM(ch)) && !IS_IMMORTAL(ch) && !IS_NPC(ch) && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+	if (ROOM_OWNER(IN_ROOM(ch)) && !IS_IMMORTAL(ch) && !IS_NPC(ch) && (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) || !can_use_room(ch, room, GUESTS_ALLOWED))) {
 		if (!HAS_ABILITY(ch, ABIL_INFILTRATE)) {
 			msg_to_char(ch, "You don't have permission to enter that.\r\n");
 			return;
