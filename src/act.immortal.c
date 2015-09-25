@@ -4058,7 +4058,9 @@ ACMD(do_echo) {
 			}
 		
 			// send to vict
-			act(lbuf, FALSE, ch, obj, vict, TO_VICT | TO_IGNORE_BAD_CODE);
+			if (vict != ch) {
+				act(lbuf, FALSE, ch, obj, vict, TO_VICT | TO_IGNORE_BAD_CODE);
+			}
 		
 			// channel history
 			if (vict->desc && vict->desc->last_act_message) {
