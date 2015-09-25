@@ -949,7 +949,7 @@ void look_in_direction(char_data *ch, int dir) {
 					}
 					if (prev_comma_pos != -1) {
 						strcpy(buf2, buf + prev_comma_pos + 1);
-						bufsize = snprintf(buf + prev_comma_pos, sizeof(buf) - prev_comma_pos, " and%s", buf2);
+						bufsize = snprintf(buf + prev_comma_pos, sizeof(buf) - prev_comma_pos, ", and%s", buf2);
 					}
 
 					msg_to_char(ch, "You see %s", buf);
@@ -1062,7 +1062,7 @@ void look_in_direction(char_data *ch, int dir) {
 			}
 			if (prev_comma_pos != -1) {
 				strcpy(buf2, buf + prev_comma_pos + 1);
-				bufsize = snprintf(buf + prev_comma_pos, sizeof(buf) - prev_comma_pos, " and%s", buf2);
+				bufsize = snprintf(buf + prev_comma_pos, sizeof(buf) - prev_comma_pos, ", and%s", buf2);
 			}
 			
 			msg_to_char(ch, "You see %s", buf);
