@@ -1188,7 +1188,8 @@ void check_newbie_islands(void) {
 			
 			cni->count += 1;
 			
-			if (cni->count > num_of_start_locs) {
+			// num_of_start_locs is poorly names -- it's really the highest start loc number, so we add 1
+			if (cni->count > num_of_start_locs + 1) {
 				log_to_empire(emp, ELOG_TERRITORY, "(%d, %d) abandoned on newbie island", FLAT_X_COORD(room), FLAT_Y_COORD(room));
 				abandon_room(room);
 			}
