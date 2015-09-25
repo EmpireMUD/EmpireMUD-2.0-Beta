@@ -903,7 +903,7 @@ void look_in_direction(char_data *ch, int dir) {
 	extern const char *from_dir[];
 	extern const int rev_dir[];
 	
-	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH - 9], buf2[MAX_STRING_LENGTH - 9];	// save room for the "You see "
 	char_data *c;
 	room_data *to_room;
 	struct room_direction_data *ex;
