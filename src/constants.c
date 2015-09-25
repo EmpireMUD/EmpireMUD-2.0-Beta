@@ -1053,6 +1053,7 @@ const char *craft_types[] = {
 	"BREW",
 	"MIX",
 	"BUILD",
+	"WEAVE",
 	"\n"
 };
 

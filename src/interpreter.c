@@ -413,7 +413,6 @@ ACMD(do_warehouse);
 ACMD(do_weaken);
 ACMD(do_wear);
 ACMD(do_weather);
-ACMD(do_weave);
 ACMD(do_where);
 ACMD(do_whereami);
 ACMD(do_who);
@@ -944,7 +943,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "wear", POS_RESTING, do_wear, NO_MIN, CTYPE_UTIL ),
 	ABILITY_CMD( "weaken", POS_FIGHTING, do_weaken, NO_MIN, CTYPE_COMBAT, ABIL_WEAKEN ),
 	SIMPLE_CMD( "weather", POS_RESTING, do_weather, NO_MIN, CTYPE_UTIL ),
-	STANDARD_CMD( "weave", POS_STANDING, do_weave, LVL_APPROVED, NO_GRANTS, NO_SCMD, CTYPE_EMPIRE, CMD_NO_ANIMALS, NO_ABIL ),
+	STANDARD_CMD( "weave", POS_STANDING, do_gen_craft, LVL_APPROVED, NO_GRANTS, CRAFT_TYPE_WEAVE, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	STANDARD_CMD( "who", POS_DEAD, do_who, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_COMM, CMD_STAY_HIDDEN, NO_ABIL ),
 	STANDARD_CMD( "whois", POS_DEAD, do_whois, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_COMM, CMD_STAY_HIDDEN, NO_ABIL ),
 	SIMPLE_CMD( "where", POS_RESTING, do_where, NO_MIN, CTYPE_COMM ),

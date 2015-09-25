@@ -547,6 +547,7 @@ typedef struct trig_data trig_data;
 #define CRAFT_TYPE_BREW  6
 #define CRAFT_TYPE_MIX  7
 #define CRAFT_TYPE_BUILD  8
+#define CRAFT_TYPE_WEAVE  9
 
 
 // Craft Flags for do_gen_craft
@@ -1078,7 +1079,7 @@ typedef struct trig_data trig_data;
 #define ACT_RITUAL			28
 #define ACT_SAWING			29
 #define ACT_QUARRYING		30
-#define ACT_WEAVING			31
+	#define ACT_UNUSED1			31	// formerly weaving
 #define ACT_TANNING			32
 #define ACT_READING			33
 #define ACT_COPYING_BOOK	34

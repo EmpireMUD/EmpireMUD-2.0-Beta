@@ -28,7 +28,6 @@
 *   Helpers
 *   Generic Craft (craft, forge, sew, cook)
 *   Reforge / Refashion
-*   Weave
 *   Commands
 */
 
@@ -164,7 +163,9 @@ struct {
 	{ "mix", "mixing", { "The poison bubbles as you stir it...", "$n stirs the bubbling poison..." } },
 	
 	// build is special and doesn't use do_gen_craft, so doesn't really use this data
-	{ "build", "building", { "You work on the building...", "$n works on the building..." } }
+	{ "build", "building", { "You work on the building...", "$n works on the building..." } },
+	
+	{ "weave", "weaving", { "You carefully weave the %s...", "$n carefully weaves the %s..." } }
 };
 
 
@@ -621,41 +622,12 @@ struct {
 
 
 void cancel_weaving(char_data *ch) {
-	if (GET_ACTION(ch) == ACT_WEAVING) {
-		GET_ACTION(ch) = ACT_NONE;
-		give_resources(ch, weave_data[GET_ACTION_VNUM(ch, 0)].resources, FALSE);
-	}
+	// TODO remove
 }
 
 
 void finish_weaving(char_data *ch) {
-	int type = GET_ACTION_VNUM(ch, 0);
-	obj_data *obj;
-
-	GET_ACTION(ch) = ACT_NONE;
-
-	obj = read_object(weave_data[type].vnum);
-	
-	if (CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
-		obj_to_char(obj, ch);
-	}
-	else {
-		obj_to_room(obj, IN_ROOM(ch));
-	}
-
-	act("You finish weaving $p!", FALSE, ch, obj, 0, TO_CHAR);
-	act("$n finishes weaving $p!", FALSE, ch, obj, 0, TO_ROOM);
-	
-	if (weave_data[type].ability != NO_ABIL) {
-		gain_ability_exp(ch, weave_data[type].ability, 10);
-	}
-	else {
-		if (GET_SKILL(ch, SKILL_TRADE) < EMPIRE_CHORE_SKILL_CAP) {
-			gain_skill_exp(ch, SKILL_TRADE, 10);
-		}
-	}
-	
-	load_otrigger(obj);
+	// TODO remove
 }
 
 
@@ -1146,74 +1118,5 @@ ACMD(do_reforge) {
 	}
 	else {
 		msg_to_char(ch, "That's not a valid %s option.\r\n", reforge_data[subcmd].command);
-	}
-}
-
-
-ACMD(do_weave) {
-	int type = NOTHING, iter = 0;
-	bool this_line, any;
-	
-	one_argument(argument, arg);
-
-	/* Find what they picked */
-	if (*arg) {
-		for (iter = 0; *weave_data[iter].name != '\n'; ++iter) {
-			if (is_abbrev(arg, weave_data[iter].name) && (weave_data[iter].ability == NO_ABIL || HAS_ABILITY(ch, weave_data[iter].ability))) {
-				type = iter;
-				break;
-			}
-		}
-	}
-
-	if (GET_ACTION(ch) == ACT_WEAVING) {
-		act("You stop weaving.", FALSE, ch, 0, 0, TO_CHAR);
-		cancel_action(ch);
-	}
-	else if (GET_ACTION(ch) != ACT_NONE) {
-		msg_to_char(ch, "You're already busy doing something else.\r\n");
-	}
-	else if (!*arg || type == NOTHING) {
-		msg_to_char(ch, "You can weave:\r\n");
-		this_line = any = FALSE;
-		for (iter = 0; *weave_data[iter].name != '\n'; ++iter) {
-			if (*weave_data[iter].name == '\t') {
-				if (this_line) {
-					msg_to_char(ch, "\r\n");
-					this_line = FALSE;
-				}
-			}
-			else if (weave_data[iter].ability == NO_ABIL || HAS_ABILITY(ch, weave_data[iter].ability)) {
-				msg_to_char(ch, "%s%s", (this_line ? ", " : " "), weave_data[iter].name);
-				this_line = TRUE;
-				any = TRUE;
-			}
-		}
-		
-		if (!any) {
-			msg_to_char(ch, " nothing\r\n");
-		}
-		
-		if (this_line) {
-			msg_to_char(ch, "\r\n");
-		}
-	}
-	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
-		msg_to_char(ch, "You don't have permission to do that here.\r\n");
-	}
-	else if (!has_resources(ch, weave_data[type].resources, TRUE, TRUE)) {
-		// message sent by has_resources
-	}
-	else {
-		extract_resources(ch, weave_data[type].resources, TRUE);
-		start_action(ch, ACT_WEAVING, weave_data[type].time / ((ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_TAILOR) && IS_COMPLETE(IN_ROOM(ch))) ? 4 : 1));
-		
-		GET_ACTION_VNUM(ch, 0) = type;
-		GET_ACTION_VNUM(ch, 1) = weave_data[type].vnum;
-
-		sprintf(buf, "You begin weaving %s.", get_obj_name_by_proto(weave_data[type].vnum));
-		act(buf, FALSE, ch, 0, 0, TO_CHAR);
-		sprintf(buf1, "$n begins weaving %s.", get_obj_name_by_proto(weave_data[type].vnum));
-		act(buf1, TRUE, ch, 0, 0, TO_ROOM);
 	}
 }

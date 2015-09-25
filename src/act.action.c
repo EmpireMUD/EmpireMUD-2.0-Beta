@@ -58,7 +58,6 @@ void cancel_scraping(char_data *ch);
 void cancel_siring(char_data *ch);
 void cancel_smelting(char_data *ch);
 void cancel_tanning(char_data *ch);
-void cancel_weaving(char_data *ch);
 
 // process protos
 void perform_chant(char_data *ch);
@@ -96,7 +95,6 @@ void process_scraping(char_data *ch);
 void process_siring(char_data *ch);
 void process_smelting(char_data *ch);
 void process_tanning(char_data *ch);
-void process_weaving(char_data *ch);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -135,7 +133,7 @@ const struct action_data_struct action_data[] = {
 	{ "ritual", "is performing an arcane ritual.", NOBITS, perform_ritual, NULL },	// ACT_RITUAL
 	{ "sawing", "is sawing lumber.", ACTF_HASTE | ACTF_FAST_CHORES, perform_saw, cancel_sawing },	// ACT_SAWING
 	{ "quarrying", "is quarrying stone.", ACTF_HASTE | ACTF_FAST_CHORES, process_quarrying, NULL },	// ACT_QUARRYING
-	{ "weaving", "is weaving some cloth.", ACTF_FAST_CHORES, process_weaving, cancel_weaving },	// ACT_WEAVING
+		{ "unknown", "is doing something.", NOBITS, NULL, NULL },	// ACT_UNUSED1
 	{ "tanning", "is tanning leather.", ACTF_FAST_CHORES, process_tanning, cancel_tanning },	// ACT_TANNING
 	{ "reading", "is reading a book.", NOBITS, process_reading, NULL },	// ACT_READING
 	{ "copying", "is writing out a copy of a book.", NOBITS, process_copying_book, NULL },	// ACT_COPYING_BOOK
@@ -2039,27 +2037,6 @@ void process_tanning(char_data *ch) {
 				break;
 			}
 		}
-	}
-}
-
-
-/**
-* Tick update for weave action.
-*
-* @param char_data *ch The weaver.
-*/
-void process_weaving(char_data *ch) {
-	void finish_weaving(char_data *ch);
-	
-	GET_ACTION_TIMER(ch) -= 1;
-		
-	if (GET_ACTION_TIMER(ch) > 0) {
-		if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
-			msg_to_char(ch, "You carefully weave %s...\r\n", get_obj_name_by_proto(GET_ACTION_VNUM(ch, 1)));
-		}
-	}
-	else {
-		finish_weaving(ch);
 	}
 }
 
