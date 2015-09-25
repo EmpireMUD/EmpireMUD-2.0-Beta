@@ -1690,13 +1690,15 @@ void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options)
 void perform_mortal_where(char_data *ch, char *arg) {
 	extern struct instance_data *find_instance_by_room(room_data *room);
 	
-	register char_data *i;
-	register descriptor_data *d;
-	int check_x, check_y, max_distance = 20;
-	bool found = FALSE;
+	int check_x, check_y, closest, dist, max_distance;
+	descriptor_data *d;
+	char_data *i, *found = NULL;
 	
 	if (HAS_ABILITY(ch, ABIL_MASTER_TRACKER)) {
 		max_distance = 75;
+	}
+	else {
+		max_distance = 20;
 	}
 	
 	command_lag(ch, WAIT_OTHER);
@@ -1740,12 +1742,14 @@ void perform_mortal_where(char_data *ch, char *arg) {
 		}
 	}
 	else {			/* print only FIRST char, not all. */
+		found = NULL;
+		closest = MAP_SIZE;
 		for (i = character_list; i; i = i->next) {
 			if (i == ch || !IN_ROOM(i) || !CAN_RECOGNIZE(ch, i))
 				continue;
 			if (!multi_isname(arg, GET_PC_NAME(i)))
 				continue;
-			if (compute_distance(IN_ROOM(ch), IN_ROOM(i)) > max_distance)
+			if ((dist = compute_distance(IN_ROOM(ch), IN_ROOM(i))) > max_distance)
 				continue;
 			if (IS_ADVENTURE_ROOM(IN_ROOM(i)) && find_instance_by_room(IN_ROOM(ch)) != find_instance_by_room(IN_ROOM(i))) {
 				// not in same adventure
@@ -1759,7 +1763,15 @@ void perform_mortal_where(char_data *ch, char *arg) {
 				gain_ability_exp(i, ABIL_UNSEEN_PASSING, 10);
 				continue;
 			}
+			
+			// trying to find closest
+			if (!found || dist < closest) {
+				found = i;
+				closest = dist;
+			}
+		}
 
+		if (found) {
 			if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
 				check_x = X_COORD(IN_ROOM(i));	// not all locations are on the map
 				check_y = Y_COORD(IN_ROOM(i));
@@ -1774,11 +1786,8 @@ void perform_mortal_where(char_data *ch, char *arg) {
 				msg_to_char(ch, "%-25s - %s\r\n", PERS(i, ch, 0), get_room_name(IN_ROOM(i), FALSE));
 			}
 			gain_ability_exp(ch, ABIL_MASTER_TRACKER, 10);
-			found = TRUE;
-			break;
 		}
-		
-		if (!found) {
+		else {
 			send_to_char("No-one around by that name.\r\n", ch);
 		}
 	}
