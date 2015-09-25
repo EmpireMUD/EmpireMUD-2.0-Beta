@@ -1773,17 +1773,17 @@ void perform_mortal_where(char_data *ch, char *arg) {
 
 		if (found) {
 			if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
-				check_x = X_COORD(IN_ROOM(i));	// not all locations are on the map
-				check_y = Y_COORD(IN_ROOM(i));
+				check_x = X_COORD(IN_ROOM(found));	// not all locations are on the map
+				check_y = Y_COORD(IN_ROOM(found));
 				if (CHECK_MAP_BOUNDS(check_x, check_y)) {
-					msg_to_char(ch, "%-25s - (%*d, %*d) %s\r\n", PERS(i, ch, 0), X_PRECISION, check_x, Y_PRECISION, check_y, get_room_name(IN_ROOM(i), FALSE));
+					msg_to_char(ch, "%-25s - (%*d, %*d) %s\r\n", PERS(found, ch, FALSE), X_PRECISION, check_x, Y_PRECISION, check_y, get_room_name(IN_ROOM(found), FALSE));
 				}
 				else {
-					msg_to_char(ch, "%-25s - (unknown) %s\r\n", PERS(i, ch, 0), get_room_name(IN_ROOM(i), FALSE));
+					msg_to_char(ch, "%-25s - (unknown) %s\r\n", PERS(found, ch, FALSE), get_room_name(IN_ROOM(found), FALSE));
 				}
 			}
 			else {
-				msg_to_char(ch, "%-25s - %s\r\n", PERS(i, ch, 0), get_room_name(IN_ROOM(i), FALSE));
+				msg_to_char(ch, "%-25s - %s\r\n", PERS(found, ch, 0), get_room_name(IN_ROOM(found), FALSE));
 			}
 			gain_ability_exp(ch, ABIL_MASTER_TRACKER, 10);
 		}
