@@ -310,8 +310,10 @@ The following adventure flags are available:
  !NEARBY - Instances do not show up when players type nearby.
  ROTATABLE - Each instance will have a random orientation (whole zone rotates).
  CONFUSING-RANDOMS - The instancer will not logically match random exits.
+ !NEWBIE - Will not spawn on newbie islands.
+ NEWBIE-ONLY - Only spawns on newbie islands.
 
-See also: OLC ADVENTURES, OLC REMOVEINDEV
+See also: ADVEDIT MINLEVEL, OLC ADVENTURES, OLC REMOVEINDEV
 #d
 "ADVEDIT LIMIT" "INSTANCE LIMIT"
 
@@ -480,6 +482,8 @@ Usage:  .maxlevel <number>
 These settings control the minimum and maximum levels for an adventure zone.
 These are set in terms of players' composite level (the level number given by
 their skills and gear).
+
+Adventures whose minimum level is over 25 will not spawn on newbie islands.
 
 The OLC LEVELS help file has additional notes on how to choose levels.
 

@@ -305,6 +305,8 @@ typedef struct trig_data trig_data;
 #define ADV_NO_NEARBY  BIT(3)	// hide from mortal nearby command
 #define ADV_ROTATABLE  BIT(4)	// random rotation on instantiate
 #define ADV_CONFUSING_RANDOMS  BIT(5)	// random exits do not need to match
+#define ADV_NO_NEWBIE  BIT(6)	// prevents spawning on newbie islands
+#define ADV_NEWBIE_ONLY  BIT(7)	// only spawns on newbie islands
 
 
 // adventure link rule types

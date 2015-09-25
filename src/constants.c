@@ -108,6 +108,8 @@ const char *adventure_flags[] = {
 	"!NEARBY",
 	"ROTATABLE",
 	"CONFUSING-RANDOMS",
+	"!NEWBIE",
+	"NEWBIE-ONLY",
 	"\n"
 };
 

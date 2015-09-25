@@ -1724,6 +1724,7 @@ void init_config_system(void) {
 	init_config(CONFIG_WORLD, "interlink_mountain_limit", CONFTYPE_INT, "how many intervening tiles may be mountain");
 	init_config(CONFIG_WORLD, "generic_facing", CONFTYPE_BITVECTOR, "build-facing flags for generic buildings");
 		init_config_custom("generic_facing", config_show_bitvector, config_edit_bitvector, (void*)bld_on_flags);
+	init_config(CONFIG_WORLD, "newbie_adventure_cap", CONFTYPE_INT, "highest adventure min-level that can spawn on newbie islands");
 	init_config(CONFIG_WORLD, "arctic_percent", CONFTYPE_DOUBLE, "what percent of top/bottom of the map is arctic");
 	init_config(CONFIG_WORLD, "tropics_percent", CONFTYPE_DOUBLE, "what percent of the middle of the map is tropics");
 

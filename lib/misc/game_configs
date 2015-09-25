@@ -180,6 +180,7 @@ interlink_distance 4
 interlink_mountain_limit 1
 interlink_river_limit 0
 nearby_sector_distance 2
+newbie_adventure_cap 25
 ocean_pool_size 1000
 tropics_percent 35.000000
 water_crop_distance 4
