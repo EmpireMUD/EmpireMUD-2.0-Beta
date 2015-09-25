@@ -181,7 +181,8 @@ int max_playing = 300;	// maximum number of players allowed before game starts t
 
 // if you have a player whose connection causes lag when they first connect,
 // adding their IPv4 address here will prevent the mud from doing a nameserver
-// lookup.
+// lookup. This will do partial-matching if you omit the end of the IP address.
+// For example, "192.168." will match anything starting with that.
 const char *slow_nameserver_ips[] = {
 	"\n"	// put this last
 };
