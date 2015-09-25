@@ -1663,6 +1663,7 @@ void init_config_system(void) {
 	init_config(CONFIG_PLAYERS, "num_bonus_trait_daily_skills", CONFTYPE_INT, "bonus trait for skillups");
 	init_config(CONFIG_PLAYERS, "idle_rent_time", CONFTYPE_INT, "how many ticks before a player is idle-rented");
 	init_config(CONFIG_PLAYERS, "idle_linkdead_rent_time", CONFTYPE_INT, "how many ticks before a linkdead player is idle-rented");
+	init_config(CONFIG_PLAYERS, "max_capitals_in_name", CONFTYPE_INT, "how many uppercase letters can be in a player name (0 for unlimited)");
 	init_config(CONFIG_PLAYERS, "max_player_attribute", CONFTYPE_INT, "how high primary player attributes go");
 	init_config(CONFIG_PLAYERS, "obj_file_timeout", CONFTYPE_INT, "lifetime of normal player inventory files, in days");
 	init_config(CONFIG_PLAYERS, "remove_lore_after_years", CONFTYPE_INT, "game years to clean some lore types");

@@ -2018,10 +2018,23 @@ int perform_dupe_check(descriptor_data *d) {
 
 // basic name validation and processing
 int _parse_name(char *arg, char *name) {
-	int i;
+	int i, iter, caps;
+	int max_caps = config_get_int("max_capitals_in_name");
 
 	/* skip whitespaces */
 	for (; isspace(*arg); arg++);
+	
+	if (max_caps > 0) {
+		caps = 0;
+		for (iter = 0; iter < strlen(arg); ++iter) {
+			if (isupper(arg[iter])) {
+				++caps;
+			}
+		}
+		if (caps > max_caps) {
+			return 1;
+		}
+	}
 	
 	// don't allow leading apostrophe or dash
 	if (*arg == '\'' || *arg == '-') {
