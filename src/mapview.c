@@ -1745,7 +1745,7 @@ void perform_mortal_where(char_data *ch, char *arg) {
 		found = NULL;
 		closest = MAP_SIZE;
 		for (i = character_list; i; i = i->next) {
-			if (i == ch || !IN_ROOM(i) || !CAN_RECOGNIZE(ch, i))
+			if (i == ch || !IN_ROOM(i) || !CAN_RECOGNIZE(ch, i) || !CAN_SEE(ch, i))
 				continue;
 			if (!multi_isname(arg, GET_PC_NAME(i)))
 				continue;
