@@ -1690,7 +1690,7 @@ void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options)
 void perform_mortal_where(char_data *ch, char *arg) {
 	extern struct instance_data *find_instance_by_room(room_data *room);
 	
-	int check_x, check_y, closest, dist, max_distance;
+	int check_x, check_y, closest, dir, dist, max_distance;
 	descriptor_data *d;
 	char_data *i, *found = NULL;
 	
@@ -1710,7 +1710,7 @@ void perform_mortal_where(char_data *ch, char *arg) {
 				continue;
 			if (!CAN_SEE(ch, i) || !CAN_RECOGNIZE(ch, i))
 				continue;
-			if (compute_distance(IN_ROOM(ch), IN_ROOM(i)) > max_distance)
+			if ((dist = compute_distance(IN_ROOM(ch), IN_ROOM(i))) > max_distance)
 				continue;
 			if (IS_ADVENTURE_ROOM(IN_ROOM(i)) && find_instance_by_room(IN_ROOM(ch)) != find_instance_by_room(IN_ROOM(i))) {
 				// not in same adventure
@@ -1724,19 +1724,23 @@ void perform_mortal_where(char_data *ch, char *arg) {
 				gain_ability_exp(i, ABIL_UNSEEN_PASSING, 10);
 				continue;
 			}
+			
+			dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), IN_ROOM(i)));
+			// dist already set for us
 		
 			if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
 				check_x = X_COORD(IN_ROOM(i));	// not all locations are on the map
 				check_y = Y_COORD(IN_ROOM(i));
+				
 				if (CHECK_MAP_BOUNDS(check_x, check_y)) {
-					msg_to_char(ch, "%-20s - (%*d, %*d) %s\r\n", PERS(i, ch, 0), X_PRECISION, check_x, Y_PRECISION, check_y, get_room_name(IN_ROOM(i), FALSE));
+					msg_to_char(ch, "%-20s - (%*d, %*d) %s, %d tile%s %s\r\n", PERS(i, ch, 0), X_PRECISION, check_x, Y_PRECISION, check_y, get_room_name(IN_ROOM(i), FALSE), dist, PLURAL(dist), (dir != NO_DIR ? dirs[dir] : "away"));
 				}
 				else {
-					msg_to_char(ch, "%-20s - (unknown) %s\r\n", PERS(i, ch, 0), get_room_name(IN_ROOM(i), FALSE));
+					msg_to_char(ch, "%-20s - (unknown) %s, %d tile%s %s\r\n", PERS(i, ch, 0), get_room_name(IN_ROOM(i), FALSE), dist, PLURAL(dist), (dir != NO_DIR ? dirs[dir] : "away"));
 				}
 			}
 			else {
-				msg_to_char(ch, "%-20s - %s\r\n", PERS(i, ch, 0), get_room_name(IN_ROOM(i), FALSE));
+				msg_to_char(ch, "%-20s - %s, %d tile%s %s\r\n", PERS(i, ch, 0), get_room_name(IN_ROOM(i), FALSE), dist, PLURAL(dist), (dir != NO_DIR ? dirs[dir] : "away"));
 			}
 			gain_ability_exp(ch, ABIL_MASTER_TRACKER, 10);
 		}
@@ -1772,18 +1776,21 @@ void perform_mortal_where(char_data *ch, char *arg) {
 		}
 
 		if (found) {
+			dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), IN_ROOM(found)));
+			// distance is already set for us as 'closest'
+			
 			if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
 				check_x = X_COORD(IN_ROOM(found));	// not all locations are on the map
 				check_y = Y_COORD(IN_ROOM(found));
 				if (CHECK_MAP_BOUNDS(check_x, check_y)) {
-					msg_to_char(ch, "%-25s - (%*d, %*d) %s\r\n", PERS(found, ch, FALSE), X_PRECISION, check_x, Y_PRECISION, check_y, get_room_name(IN_ROOM(found), FALSE));
+					msg_to_char(ch, "%-25s - (%*d, %*d) %s, %d tile%s %s\r\n", PERS(found, ch, FALSE), X_PRECISION, check_x, Y_PRECISION, check_y, get_room_name(IN_ROOM(found), FALSE), closest, PLURAL(closest), (dir != NO_DIR ? dirs[dir] : "away"));
 				}
 				else {
-					msg_to_char(ch, "%-25s - (unknown) %s\r\n", PERS(found, ch, FALSE), get_room_name(IN_ROOM(found), FALSE));
+					msg_to_char(ch, "%-25s - (unknown) %s, %d tile%s %s\r\n", PERS(found, ch, FALSE), get_room_name(IN_ROOM(found), FALSE), closest, PLURAL(closest), (dir != NO_DIR ? dirs[dir] : "away"));
 				}
 			}
 			else {
-				msg_to_char(ch, "%-25s - %s\r\n", PERS(found, ch, 0), get_room_name(IN_ROOM(found), FALSE));
+				msg_to_char(ch, "%-25s - %s, %d tile%s %s\r\n", PERS(found, ch, 0), get_room_name(IN_ROOM(found), FALSE), closest, PLURAL(closest), (dir != NO_DIR ? dirs[dir] : "away"));
 			}
 			gain_ability_exp(ch, ABIL_MASTER_TRACKER, 10);
 		}
