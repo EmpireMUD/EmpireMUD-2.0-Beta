@@ -310,8 +310,10 @@ The following adventure flags are available:
  !NEARBY - Instances do not show up when players type nearby.
  ROTATABLE - Each instance will have a random orientation (whole zone rotates).
  CONFUSING-RANDOMS - The instancer will not logically match random exits.
+ !NEWBIE - Will not spawn on newbie islands.
+ NEWBIE-ONLY - Only spawns on newbie islands.
 
-See also: OLC ADVENTURES, OLC REMOVEINDEV
+See also: ADVEDIT MINLEVEL, OLC ADVENTURES, OLC REMOVEINDEV
 #d
 "ADVEDIT LIMIT" "INSTANCE LIMIT"
 
@@ -480,6 +482,8 @@ Usage:  .maxlevel <number>
 These settings control the minimum and maximum levels for an adventure zone.
 These are set in terms of players' composite level (the level number given by
 their skills and gear).
+
+Adventures whose minimum level is over 25 will not spawn on newbie islands.
 
 The OLC LEVELS help file has additional notes on how to choose levels.
 
@@ -745,7 +749,8 @@ Available flags:
  PORTAL - functions as a portal building
  BEDROOM - boosts regen while sleeping
  !DELETE - will not be deleted for not having a homeroom
- SUMMON-PLAYERS - allows the summon player command
+ SUMMON-PLAYER - allows the summon player command
+ NEED-BOAT - requires a boat, flying, or swimming to enter
 
 * Note: If you change the LARGE-CITY-RADIUS flag on existing buildings,
         territory counts will not update right away. Any empire can force a
@@ -1390,6 +1395,7 @@ The following commands are available:
  name - Customize the room title.
  passwalls - Able to move on the map unblocked by walls, interiors, etc.
  roomtype - Change the type of an interior room.
+ ruin - Turn a building to ruins.
  terrain - Change the tile you're standing on.
  unclaimable - Make a tile or square of tiles unclaimable (or not).
 
@@ -1523,6 +1529,12 @@ building with the ROOM flag can be set this way.
 
 See also: MAP OLC, OLC BUILDINGS
 #d
+"MAPEDIT RUINS"
+
+Usage:  .map ruin
+
+This command will reduce a map building to ruins.
+#d
 "MAPEDIT TERRAIN"
 
 Usage:  .map terrain <type>
@@ -1587,7 +1599,7 @@ The following attack types are available:
 13. fire - physical fire like a torch
 14. vampire claws
 15. crush - animals or giants
-16. hit - normal punching (no weapon)
+16. hit - normal punching (no weapon, or disarmed physical weapon)
 17. magic fire - fireball
 18. lightning staff
 19. burn staff
@@ -1600,6 +1612,7 @@ The following attack types are available:
 26. tail swipe - animals
 27. peck - animals
 28. gore - animals
+29. mana blast - normal magical attack (e.g. disarmed mage)
 
 See also: OLC MOBILES
 #d
@@ -2486,7 +2499,7 @@ The following weapon types are available:
 13. fire - torch
 14. vampire claws
 15. crush - animals or giants
-16. hit - normal punching (no weapon)
+16. hit - normal punching (no weapon, or disarmed physical weapon)
 17. magic fire - fireball
 18. lightning staff
 19. burn staff
@@ -2499,6 +2512,7 @@ The following weapon types are available:
 26. tail swipe - animals
 27. peck - animals
 28. gore - animals
+29. mana blast - normal magical attack (e.g. disarmed mage)
 
 See also: OLC OBJECTS
 #d

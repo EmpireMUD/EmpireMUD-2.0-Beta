@@ -29,6 +29,7 @@
 *   Master Chore Control
 *   EWT Tracker
 *   Helpers
+*   Generic Craft Workforce
 *   Chore Functions
 */
 
@@ -50,17 +51,23 @@ void do_chore_mining(empire_data *emp, room_data *room);
 void do_chore_minting(empire_data *emp, room_data *room);
 void do_chore_nailmaking(empire_data *emp, room_data *room);
 void do_chore_quarrying(empire_data *emp, room_data *room);
-void do_chore_sawing(empire_data *emp, room_data *room);
 void do_chore_scraping(empire_data *emp, room_data *room);
 void do_chore_shearing(empire_data *emp, room_data *room);
 void do_chore_smelting(empire_data *emp, room_data *room);
 void do_chore_trapping(empire_data *emp, room_data *room);
 void do_chore_tanning(empire_data *emp, room_data *room);
-void do_chore_weaving(empire_data *emp, room_data *room);
 
 // external functions
 void empire_skillup(empire_data *emp, int ability, double amount);	// skills.c
 void stop_room_action(room_data *room, int action, int chore);	// act.action.c
+
+// gen_craft protos:
+#define CHORE_GEN_CRAFT_VALIDATOR(name)  bool (name)(empire_data *emp, room_data *room, int chore, craft_data *craft)
+CHORE_GEN_CRAFT_VALIDATOR(chore_nexus_crystals);
+CHORE_GEN_CRAFT_VALIDATOR(chore_sawing);
+CHORE_GEN_CRAFT_VALIDATOR(chore_weaving);
+
+void do_chore_gen_craft(empire_data *emp, room_data *room, int chore, CHORE_GEN_CRAFT_VALIDATOR(*validator));
 
 
  /////////////////////////////////////////////////////////////////////////////
@@ -92,7 +99,8 @@ struct empire_chore_type chore_data[NUM_CHORES] = {
 	{ "minting", COIN_MAKER },
 	{ "dismantle-mines", BUILDER },
 	{ "abandon-chopped", FELLER },	// mob is strictly a safe placeholder here
-	{ "abandon-farmed", FARMER }	// mob is strictly a safe placeholder here
+	{ "abandon-farmed", FARMER },	// mob is strictly a safe placeholder here
+	{ "nexus crystals", APPRENTICE_EXARCH },
 };
 
 
@@ -186,7 +194,7 @@ void process_one_chore(empire_data *emp, room_data *room) {
 			do_chore_smelting(emp, room);
 		}
 		if (ROOM_BLD_FLAGGED(room, BLD_TAILOR) && EMPIRE_CHORE(emp, CHORE_WEAVING)) {
-			do_chore_weaving(emp, room);
+			do_chore_gen_craft(emp, room, CHORE_WEAVING, chore_weaving);
 		}
 		if (ROOM_BLD_FLAGGED(room, BLD_FORGE) && EMPIRE_CHORE(emp, CHORE_NAILMAKING)) {
 			do_chore_nailmaking(emp, room);
@@ -213,7 +221,10 @@ void process_one_chore(empire_data *emp, room_data *room) {
 			do_chore_quarrying(emp, room);
 		}
 		if (BUILDING_VNUM(room) == BUILDING_LUMBER_YARD && EMPIRE_CHORE(emp, CHORE_SAWING)) {
-			do_chore_sawing(emp, room);
+			do_chore_gen_craft(emp, room, CHORE_SAWING, chore_sawing);
+		}
+		if (BUILDING_VNUM(room) == RTYPE_SORCERER_TOWER && EMPIRE_CHORE(emp, CHORE_NEXUS_CRYSTALS) && EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR) && EMPIRE_HAS_TECH(emp, TECH_EXARCH_CRAFTS)) {
+			do_chore_gen_craft(emp, room, CHORE_NEXUS_CRYSTALS, chore_nexus_crystals);
 		}
 	}
 }
@@ -640,6 +651,152 @@ void run_chore_tracker_updates(void) {
 		read_empire_territory(NULL);
 	}
 
+}
+
+
+ /////////////////////////////////////////////////////////////////////////////
+//// GENERIC CRAFT WORKFORCE ////////////////////////////////////////////////
+
+/**
+* Function passed to do_chore_gen_craft()
+*
+* @param empire_data *emp The empire doing the chore.
+* @param room_data *room The room the chore is in.
+* @param int chore CHORE_x const for this chore.
+* @param craft_data *craft The craft to validate.
+* @return bool TRUE if this workforce chore can work this craft, FALSE if not
+*/
+CHORE_GEN_CRAFT_VALIDATOR(chore_nexus_crystals) {
+	if (GET_CRAFT_OBJECT(craft) != o_NEXUS_CRYSTAL) {
+		return FALSE;
+	}
+	// success
+	return TRUE;
+}
+
+
+/**
+* Function passed to do_chore_gen_craft()
+*
+* @param empire_data *emp The empire doing the chore.
+* @param room_data *room The room the chore is in.
+* @param int chore CHORE_x const for this chore.
+* @param craft_data *craft The craft to validate.
+* @return bool TRUE if this workforce chore can work this craft, FALSE if not
+*/
+CHORE_GEN_CRAFT_VALIDATOR(chore_sawing) {
+	if (GET_CRAFT_TYPE(craft) != CRAFT_TYPE_WORKFORCE) {
+		return FALSE;
+	}
+	if (GET_CRAFT_ABILITY(craft) != ABIL_WORKFORCE_SAWING) {
+		return FALSE;
+	}
+	// success
+	return TRUE;
+}
+
+
+/**
+* Function passed to do_chore_gen_craft()
+*
+* @param empire_data *emp The empire doing the chore.
+* @param room_data *room The room the chore is in.
+* @param int chore CHORE_x const for this chore.
+* @param craft_data *craft The craft to validate.
+* @return bool TRUE if this workforce chore can work this craft, FALSE if not
+*/
+CHORE_GEN_CRAFT_VALIDATOR(chore_weaving) {
+	if (GET_CRAFT_TYPE(craft) != CRAFT_TYPE_WEAVE) {
+		return FALSE;
+	}
+	// won't weave things higher level than BASIC_SKILL_CAP
+	if (GET_CRAFT_ABILITY(craft) != NO_ABIL && ability_data[GET_CRAFT_ABILITY(craft)].parent_skill_required > BASIC_SKILL_CAP) {
+		return FALSE;
+	}
+	// success
+	return TRUE;
+}
+
+
+/**
+* Can manage any craft in the craft_table, validated by the 'validator' arg.
+*
+* @param empire_data *emp The empire doing the chore.
+* @param room_data *room The room the chore is in.
+* @param int chore CHORE_x const for this chore.
+* @param CHORE_GEN_CRAFT_VALIDATOR *validator A function that validates a craft.
+*/
+void do_chore_gen_craft(empire_data *emp, room_data *room, int chore, CHORE_GEN_CRAFT_VALIDATOR(*validator)) {
+	extern struct gen_craft_data_t gen_craft_data[];
+	
+	struct empire_storage_data *store = NULL;
+	char_data *worker = find_mob_in_room_by_vnum(room, chore_data[chore].mob);
+	craft_data *craft, *next_craft, *do_craft = NULL;
+	int iter, crafts_found;
+	char buf[256];
+	bool has_res;
+	
+	// find a craft we can do
+	crafts_found = 0;
+	HASH_ITER(hh, craft_table, craft, next_craft) {
+		// must be a live recipe
+		if (CRAFT_FLAGGED(craft, CRAFT_IN_DEVELOPMENT)) {
+			continue;
+		}
+		// pass through validator function
+		if (!validator || !(validator)(emp, room, chore, craft)) {
+			continue;
+		}
+		
+		// can we gain any of it?
+		if (!can_gain_chore_resource(emp, room, GET_CRAFT_OBJECT(craft))) {
+			continue;
+		}
+		
+		// check resources...
+		has_res = TRUE;
+		for (iter = 0; iter < MAX_RESOURCES_REQUIRED && GET_CRAFT_RESOURCES(craft)[iter].vnum != NOTHING && has_res; ++iter) {
+			if (!(store = find_stored_resource(emp, GET_ISLAND_ID(room), GET_CRAFT_RESOURCES(craft)[iter].vnum)) || store->amount < GET_CRAFT_RESOURCES(craft)[iter].amount) {
+				has_res = FALSE;
+			}
+		}
+		if (!has_res) {
+			continue;
+		}
+		
+		// found one! (pick at radom if more than one)
+		if (!number(0, crafts_found++) || !do_craft) {
+			do_craft = craft;
+		}
+	}
+	
+	// now attempt to do the chore
+	if (worker && do_craft) {
+		ewt_mark_resource_worker(emp, room, GET_CRAFT_OBJECT(do_craft));
+	
+		// charge resources (we pre-validated)
+		for (iter = 0; iter < MAX_RESOURCES_REQUIRED && GET_CRAFT_RESOURCES(do_craft)[iter].vnum != NOTHING; ++iter) {
+			charge_stored_resource(emp, GET_ISLAND_ID(room), GET_CRAFT_RESOURCES(do_craft)[iter].vnum, GET_CRAFT_RESOURCES(do_craft)[iter].amount);
+		}
+
+		add_to_empire_storage(emp, GET_ISLAND_ID(room), GET_CRAFT_OBJECT(do_craft), GET_CRAFT_QUANTITY(do_craft));
+		empire_skillup(emp, ABIL_WORKFORCE, config_get_double("exp_from_workforce"));
+		
+		// only send message if someone else is present (don't bother verifying it's a player)
+		if (ROOM_PEOPLE(IN_ROOM(worker))->next_in_room) {
+			snprintf(buf, sizeof(buf), "$n finishes %s %s.", gen_craft_data[GET_CRAFT_TYPE(do_craft)].verb, get_obj_name_by_proto(GET_CRAFT_OBJECT(do_craft)));
+			act(buf, FALSE, worker, NULL, NULL, TO_ROOM);
+		}
+	}
+	else if (do_craft) {
+		// place worker
+		if ((worker = place_chore_worker(emp, chore, room))) {
+			ewt_mark_resource_worker(emp, room, GET_CRAFT_OBJECT(do_craft));
+		}
+	}
+	else if (worker) {
+		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
+	}
 }
 
 
@@ -1271,38 +1428,6 @@ void do_chore_quarrying(empire_data *emp, room_data *room) {
 }
 
 
-void do_chore_sawing(empire_data *emp, room_data *room) {
-	struct empire_storage_data *store = find_stored_resource(emp, GET_ISLAND_ID(room), o_TREE);
-	char_data *worker = find_mob_in_room_by_vnum(room, chore_data[CHORE_SAWING].mob);
-	bool can_do = can_gain_chore_resource(emp, room, o_LUMBER);
-	
-	if (worker && can_do) {
-		ewt_mark_resource_worker(emp, room, o_LUMBER);
-		
-		if (store && store->amount > 0) {
-			charge_stored_resource(emp, GET_ISLAND_ID(room), store->vnum, 1);
-			add_to_empire_storage(emp, GET_ISLAND_ID(room), o_LUMBER, 2);
-			
-			act("$n finishes sawing a pile of lumber.", FALSE, worker, NULL, NULL, TO_ROOM);
-			empire_skillup(emp, ABIL_WORKFORCE, config_get_double("exp_from_workforce"));
-		}
-		else {
-			// no trees remain: mark for despawn
-			SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
-		}
-	}
-	else if (store && can_do) {
-		// place worker
-		if ((worker = place_chore_worker(emp, CHORE_SAWING, room))) {
-			ewt_mark_resource_worker(emp, room, o_LUMBER);
-		}
-	}
-	else if (worker) {
-		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
-	}
-}
-
-
 void do_chore_scraping(empire_data *emp, room_data *room) {
 	struct empire_storage_data *store = find_stored_resource(emp, GET_ISLAND_ID(room), o_TREE);
 	char_data *worker = find_mob_in_room_by_vnum(room, chore_data[CHORE_SCRAPING].mob);
@@ -1499,45 +1624,6 @@ void do_chore_tanning(empire_data *emp, room_data *room) {
 		// place worker
 		if ((worker = place_chore_worker(emp, CHORE_TANNING, room))) {
 			ewt_mark_resource_worker(emp, room, store->vnum);
-		}
-	}
-	else if (worker) {
-		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
-	}
-}
-
-
-void do_chore_weaving(empire_data *emp, room_data *room) {
-	struct empire_storage_data *store = NULL;
-	char_data *worker = find_mob_in_room_by_vnum(room, chore_data[CHORE_WEAVING].mob);
-	bool can_do = can_gain_chore_resource(emp, room, o_CLOTH);
-	int cost = 2;
-
-	// cotton first
-	if (!(store = find_stored_resource(emp, GET_ISLAND_ID(room), o_COTTON)) || store->amount < cost) {
-		// wool instead
-		store = find_stored_resource(emp, GET_ISLAND_ID(room), o_WOOL);
-	}
-	
-	if (worker && can_do) {		
-		if (store && store->amount >= cost) {
-			ewt_mark_resource_worker(emp, room, o_CLOTH);
-			
-			charge_stored_resource(emp, GET_ISLAND_ID(room), store->vnum, cost);
-			add_to_empire_storage(emp, GET_ISLAND_ID(room), o_CLOTH, 1);
-			
-			act("$n finishes weaving some cloth.", FALSE, worker, NULL, NULL, TO_ROOM);
-			empire_skillup(emp, ABIL_WORKFORCE, config_get_double("exp_from_workforce"));
-		}
-		else {
-			// no resources remain: mark for despawn
-			SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
-		}
-	}
-	else if (store && store->amount >= cost && can_do) {
-		// place worker
-		if ((worker = place_chore_worker(emp, CHORE_WEAVING, room))) {
-			ewt_mark_resource_worker(emp, room, o_CLOTH);
 		}
 	}
 	else if (worker) {

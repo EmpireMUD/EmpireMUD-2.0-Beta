@@ -732,7 +732,7 @@ static void annual_update_map_tile(room_data *room) {
 	empire_data *emp;
 	int trenched, amount;
 	
-	if (BUILDING_VNUM(room) == BUILDING_RUINS_OPEN || BUILDING_VNUM(room) == BUILDING_RUINS_CLOSED) {
+	if (BUILDING_VNUM(room) == BUILDING_RUINS_OPEN || BUILDING_VNUM(room) == BUILDING_RUINS_CLOSED || BUILDING_VNUM(room) == BUILDING_RUINS_FLOODED) {
 		// roughly 2 real years for average chance for ruins to be gone
 		if (!number(0, 89)) {
 			disassociate_building(room);
@@ -1521,6 +1521,7 @@ void decustomize_room(room_data *room) {
 // evolutions for 1 tile
 static void evolve_one_map_tile(room_data *room) {
 	extern bool extract_tavern_resources(room_data *room);
+	extern bool is_entrance(room_data *room);
 	
 	struct evolution_data *evo;
 	sector_data *original;
@@ -1555,24 +1556,28 @@ static void evolve_one_map_tile(room_data *room) {
 		}
 	}
 	
-	// no further action if !evolve
-	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_EVOLVE)) {
+	// no further action if !evolve or if no evos
+	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_EVOLVE) || !GET_SECT_EVOS(SECT(room))) {
 		return;
 	}
-	
+		
 	// to avoid running more than one:
 	changed = FALSE;
 	original = SECT(room);
 	
+	// NOTE: the is_entrance() check is after the get_evolution_by_type to
+	// avoid checking entrance on every tile -- only check the ones that passed
+	// the random
+	
 	// run some evolutions!
-	if (!changed && (evo = get_evolution_by_type(SECT(room), EVO_RANDOM))) {
+	if (!changed && (evo = get_evolution_by_type(SECT(room), EVO_RANDOM)) && !is_entrance(room)) {
 		if (sector_proto(evo->becomes)) {
 			change_terrain(room, evo->becomes);
 			changed = TRUE;
 		}
 	}
 	
-	if (!changed && (evo = get_evolution_by_type(SECT(room), EVO_ADJACENT_ONE))) {
+	if (!changed && (evo = get_evolution_by_type(SECT(room), EVO_ADJACENT_ONE)) && !is_entrance(room)) {
 		if (sector_proto(evo->becomes)) {
 			if (count_adjacent_sectors(room, evo->value, TRUE) >= 1) {
 				change_terrain(room, evo->becomes);
@@ -1581,7 +1586,7 @@ static void evolve_one_map_tile(room_data *room) {
 		}
 	}
 	
-	if (!changed && (evo = get_evolution_by_type(SECT(room), EVO_NOT_ADJACENT))) {
+	if (!changed && (evo = get_evolution_by_type(SECT(room), EVO_NOT_ADJACENT)) && !is_entrance(room)) {
 		if (sector_proto(evo->becomes)) {
 			if (count_adjacent_sectors(room, evo->value, TRUE) < 1) {
 				change_terrain(room, evo->becomes);
@@ -1590,7 +1595,7 @@ static void evolve_one_map_tile(room_data *room) {
 		}
 	}
 	
-	if (!changed && (evo = get_evolution_by_type(SECT(room), EVO_ADJACENT_MANY))) {
+	if (!changed && (evo = get_evolution_by_type(SECT(room), EVO_ADJACENT_MANY)) && !is_entrance(room)) {
 		if (sector_proto(evo->becomes)) {
 			if (count_adjacent_sectors(room, evo->value, TRUE) >= 6) {
 				change_terrain(room, evo->becomes);
@@ -1599,7 +1604,7 @@ static void evolve_one_map_tile(room_data *room) {
 		}
 	}
 	
-	if (!changed && (evo = get_evolution_by_type(SECT(room), EVO_NEAR_SECTOR))) {
+	if (!changed && (evo = get_evolution_by_type(SECT(room), EVO_NEAR_SECTOR)) && !is_entrance(room)) {
 		if (sector_proto(evo->becomes)) {
 			if (find_sect_within_distance_from_room(room, evo->value, config_get_int("nearby_sector_distance"))) {
 				change_terrain(room, evo->becomes);
@@ -1608,7 +1613,7 @@ static void evolve_one_map_tile(room_data *room) {
 		}
 	}
 	
-	if (!changed && (evo = get_evolution_by_type(SECT(room), EVO_NOT_NEAR_SECTOR))) {
+	if (!changed && (evo = get_evolution_by_type(SECT(room), EVO_NOT_NEAR_SECTOR)) && !is_entrance(room)) {
 		if (sector_proto(evo->becomes)) {
 			if (!find_sect_within_distance_from_room(room, evo->value, config_get_int("nearby_sector_distance"))) {
 				change_terrain(room, evo->becomes);
@@ -1617,7 +1622,7 @@ static void evolve_one_map_tile(room_data *room) {
 		}
 	}
 
-	// Growing Seeds
+	// Growing Seeds: NOTE: this one does not check is_entrance
 	if (!changed && ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && (evo = get_evolution_by_type(SECT(room), EVO_CROP_GROWS))) {
 		// only going to use the original sect if it was different -- this preserves the stored sect
 		sector_data *stored = (ROOM_ORIGINAL_SECT(room) != SECT(room)) ? ROOM_ORIGINAL_SECT(room) : NULL;
@@ -1814,6 +1819,7 @@ void ruin_one_building(room_data *room) {
 	bool closed = ROOM_IS_CLOSED(room) ? TRUE : FALSE;
 	int dir = BUILDING_ENTRANCE(room);
 	room_data *to_room;
+	bld_vnum type;
 	
 	// abandon first -- this will take care of accessory rooms, too
 	abandon_room(room);
@@ -1827,7 +1833,16 @@ void ruin_one_building(room_data *room) {
 	}
 
 	// basic setup
-	construct_building(room, closed ? BUILDING_RUINS_CLOSED : BUILDING_RUINS_OPEN);
+	if (SECT_FLAGGED(ROOM_ORIGINAL_SECT(room), SECTF_FRESH_WATER | SECTF_OCEAN)) {
+		type = BUILDING_RUINS_FLOODED;
+	}
+	else if (closed) {
+		type = BUILDING_RUINS_CLOSED;
+	}
+	else {
+		type = BUILDING_RUINS_OPEN;
+	}
+	construct_building(room, type);
 	COMPLEX_DATA(room)->entrance = dir;
 	
 	// make the exit

@@ -55,6 +55,7 @@ void scale_item_to_level(obj_data *obj, int level);
 
 // locals
 #define WHITESPACE " \t"	// used by some of the string functions
+bool emp_can_use_room(empire_data *emp, room_data *room, int mode);
 bool is_trading_with(empire_data *emp, empire_data *partner);
 void score_empires();
 
@@ -1053,6 +1054,35 @@ bool can_claim(char_data *ch) {
 bool can_use_room(char_data *ch, room_data *room, int mode) {
 	room_data *homeroom = HOME_ROOM(room);
 
+	// no owner?
+	if (!ROOM_OWNER(homeroom)) {
+		return TRUE;
+	}
+	// empire ownership
+	if (ROOM_OWNER(homeroom) == GET_LOYALTY(ch)) {
+		// private room?
+		if (ROOM_PRIVATE_OWNER(homeroom) == NOBODY || ROOM_PRIVATE_OWNER(homeroom) == GET_IDNUM(ch) || GET_RANK(ch) == EMPIRE_NUM_RANKS(ROOM_OWNER(homeroom))) {
+			return TRUE;
+		}
+	}
+	
+	// otherwise it's just whether ch's empire can use it
+	return emp_can_use_room(GET_LOYALTY(ch), room, mode);
+}
+
+
+/**
+* Determines if an empire can use a room (e.g. send a ship through it).
+* Unclaimable rooms are ok for GUESTS_ALLOWED.
+*
+* @param empire_data *emp The empire trying to use it.
+* @param room_data *room The location.
+* @param int mode -- GUESTS_ALLOWED, MEMBERS_AND_ALLIES, MEMBERS_ONLY
+* @return bool TRUE if emp can use room, FALSE otherwise
+*/
+bool emp_can_use_room(empire_data *emp, room_data *room, int mode) {
+	room_data *homeroom = HOME_ROOM(room);
+
 	// unclaimable always denies MEMBERS_x
 	if (mode != GUESTS_ALLOWED && ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE)) {
 		return FALSE;
@@ -1066,14 +1096,11 @@ bool can_use_room(char_data *ch, room_data *room, int mode) {
 		return TRUE;
 	}
 	// empire ownership
-	if (ROOM_OWNER(homeroom) == GET_LOYALTY(ch)) {
-		// private room?
-		if (ROOM_PRIVATE_OWNER(homeroom) == NOBODY || ROOM_PRIVATE_OWNER(homeroom) == GET_IDNUM(ch) || GET_RANK(ch) == EMPIRE_NUM_RANKS(ROOM_OWNER(homeroom))) {
-			return TRUE;
-		}
+	if (ROOM_OWNER(homeroom) == emp) {
+		return TRUE;
 	}
 	// check allies if not a private room
-	if (mode != MEMBERS_ONLY && ROOM_PRIVATE_OWNER(homeroom) == NOBODY && has_relationship(ROOM_OWNER(homeroom), GET_LOYALTY(ch), DIPL_ALLIED)) {
+	if (mode != MEMBERS_ONLY && ROOM_PRIVATE_OWNER(homeroom) == NOBODY && has_relationship(ROOM_OWNER(homeroom), emp, DIPL_ALLIED)) {
 		return TRUE;
 	}
 	
@@ -1095,7 +1122,12 @@ bool has_permission(char_data *ch, int type) {
 	if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_AND_ALLIES)) {
 		return FALSE;
 	}
-	else if (emp && GET_RANK(ch) < EMPIRE_PRIV(emp, type)) {
+	else if (emp && GET_LOYALTY(ch) == emp && GET_RANK(ch) < EMPIRE_PRIV(emp, type)) {
+		// for empire members only
+		return FALSE;
+	}
+	else if (emp && GET_LOYALTY(ch) != emp && EMPIRE_PRIV(emp, type) > 1) {
+		// allies can't use things that are above rank 1 in the owner's empire
 		return FALSE;
 	}
 	

@@ -205,7 +205,7 @@ void random_encounter(char_data *ch) {
 	}
 	
 	// water encounters don't trigger if the player has a boat
-	if ((IS_WATER_SECT(SECT(IN_ROOM(ch))) || RMT_FLAGGED(IN_ROOM(ch), RMT_NEED_BOAT)) && has_boat(ch)) {
+	if ((IS_WATER_SECT(SECT(IN_ROOM(ch))) || ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_NEED_BOAT) || RMT_FLAGGED(IN_ROOM(ch), RMT_NEED_BOAT)) && has_boat(ch)) {
 		return;
 	}
 

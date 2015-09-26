@@ -413,7 +413,6 @@ ACMD(do_warehouse);
 ACMD(do_weaken);
 ACMD(do_wear);
 ACMD(do_weather);
-ACMD(do_weave);
 ACMD(do_where);
 ACMD(do_whereami);
 ACMD(do_who);
@@ -944,7 +943,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "wear", POS_RESTING, do_wear, NO_MIN, CTYPE_UTIL ),
 	ABILITY_CMD( "weaken", POS_FIGHTING, do_weaken, NO_MIN, CTYPE_COMBAT, ABIL_WEAKEN ),
 	SIMPLE_CMD( "weather", POS_RESTING, do_weather, NO_MIN, CTYPE_UTIL ),
-	STANDARD_CMD( "weave", POS_STANDING, do_weave, LVL_APPROVED, NO_GRANTS, NO_SCMD, CTYPE_EMPIRE, CMD_NO_ANIMALS, NO_ABIL ),
+	STANDARD_CMD( "weave", POS_STANDING, do_gen_craft, LVL_APPROVED, NO_GRANTS, CRAFT_TYPE_WEAVE, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	STANDARD_CMD( "who", POS_DEAD, do_who, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_COMM, CMD_STAY_HIDDEN, NO_ABIL ),
 	STANDARD_CMD( "whois", POS_DEAD, do_whois, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_COMM, CMD_STAY_HIDDEN, NO_ABIL ),
 	SIMPLE_CMD( "where", POS_RESTING, do_where, NO_MIN, CTYPE_COMM ),
@@ -2007,6 +2006,8 @@ int perform_dupe_check(descriptor_data *d) {
 			break;
 	}
 	
+	MXPSendTag(d, "<VERSION>");
+	
 	// guarantee echo is on -- no, this could lead to an echo loop
 	// ProtocolNoEcho(d, false);
 
@@ -2016,10 +2017,23 @@ int perform_dupe_check(descriptor_data *d) {
 
 // basic name validation and processing
 int _parse_name(char *arg, char *name) {
-	int i;
+	int i, iter, caps;
+	int max_caps = config_get_int("max_capitals_in_name");
 
 	/* skip whitespaces */
 	for (; isspace(*arg); arg++);
+	
+	if (max_caps > 0) {
+		caps = 0;
+		for (iter = 0; iter < strlen(arg); ++iter) {
+			if (isupper(arg[iter])) {
+				++caps;
+			}
+		}
+		if (caps > max_caps) {
+			return 1;
+		}
+	}
 	
 	// don't allow leading apostrophe or dash
 	if (*arg == '\'' || *arg == '-') {
@@ -2267,7 +2281,6 @@ void nanny(descriptor_data *d, char *arg) {
 				}
 
 				send_motd(d);
-				
 				MXPSendTag(d, "<VERSION>");
 				
 				/* Check bad passwords */
@@ -2447,6 +2460,8 @@ void nanny(descriptor_data *d, char *arg) {
 			init_player(d->character);
 			SAVE_CHAR(d->character);
 			send_motd(d);
+			MXPSendTag(d, "<VERSION>");
+			
 			SEND_TO_Q("\r\n*** Press ENTER: ", d);
 			STATE(d) = CON_RMOTD;
 
@@ -2648,6 +2663,8 @@ void nanny(descriptor_data *d, char *arg) {
 
 				// and send them to the motd
 				send_motd(d);
+				MXPSendTag(d, "<VERSION>");
+				
 				SEND_TO_Q("\r\n*** Press ENTER: ", d);
 				STATE(d) = CON_RMOTD;
 			}

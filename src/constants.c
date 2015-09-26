@@ -108,6 +108,8 @@ const char *adventure_flags[] = {
 	"!NEARBY",
 	"ROTATABLE",
 	"CONFUSING-RANDOMS",
+	"!NEWBIE",
+	"NEWBIE-ONLY",
 	"\n"
 };
 
@@ -1051,6 +1053,8 @@ const char *craft_types[] = {
 	"BREW",
 	"MIX",
 	"BUILD",
+	"WEAVE",
+	"WORKFORCE",
 	"\n"
 };
 
@@ -1120,6 +1124,7 @@ const char *techs[] = {
 	"Master Portals",
 	"Skilled Labor",
 	"Trade Routes",
+	"Exarch Crafts",
 	"\n"
 };
 
@@ -1149,6 +1154,9 @@ const char *priv[] = {
 	"trade",
 	"logs",
 	"shipping",
+	"homes",
+	"storage",
+	"warehouse",
 	"\n"
 };
 
@@ -1708,7 +1716,8 @@ struct attack_hit_type attack_hit_info[NUM_ATTACK_TYPES] = {
 	{ "swipe", "swipe", "swipes", { 3.6, 3.8, 4.0 }, WEAPON_BLUNT, DAM_PHYSICAL },
 	{ "tail swipe", "swipe", "swipes", { 4.0, 4.2, 4.4 }, WEAPON_BLUNT, DAM_PHYSICAL },
 	{ "peck", "peck", "pecks", { 2.6, 2.8, 3.0 }, WEAPON_BLUNT, DAM_PHYSICAL },
-	{ "gore", "gore", "gores", { 3.9, 4.1, 4.3 }, WEAPON_BLUNT, DAM_PHYSICAL }
+	{ "gore", "gore", "gores", { 3.9, 4.1, 4.3 }, WEAPON_BLUNT, DAM_PHYSICAL },
+	{ "mana blast", "blast", "blasts", { 2.8, 3.0, 3.2 }, WEAPON_MAGIC, DAM_MAGICAL }
 };
 
 
@@ -1830,6 +1839,7 @@ const char *bld_flags[] = {
 	"BEDROOM",
 	"!DELETE",
 	"SUMMON-PLAYER",
+	"NEED-BOAT",
 	"\n"
 };
 
@@ -2113,6 +2123,7 @@ const char *room_extra_types[] = {
 	"build recipe",
 	"found time",
 	"redesignate time",
+	"ceded",
 	"\n"
 };
 

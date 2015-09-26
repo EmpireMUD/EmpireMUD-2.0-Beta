@@ -227,6 +227,7 @@ void perform_alternate(char_data *old, char_data *new) {
 	}
 	
 	// save old char...
+	GET_LAST_KNOWN_LEVEL(old) = GET_COMPUTED_LEVEL(old);
 	Objsave_char(old, RENT_RENTED);
 	SAVE_CHAR(old);
 	
@@ -352,7 +353,7 @@ static void print_group(char_data *ch) {
 			
 			// show location if different
 			if (IN_ROOM(k) != IN_ROOM(ch)) {
-				if (HAS_ABILITY(ch, ABIL_NAVIGATION) && X_COORD(IN_ROOM(k)) >= 0) {
+				if (HAS_ABILITY(ch, ABIL_NAVIGATION) && (IS_NPC(k) || HAS_ABILITY(k, ABIL_NAVIGATION)) && X_COORD(IN_ROOM(k)) >= 0) {
 					snprintf(loc, sizeof(loc), " - %s (%d, %d)", get_room_name(IN_ROOM(k), FALSE), X_COORD(IN_ROOM(k)), Y_COORD(IN_ROOM(k)));
 				}
 				else {
@@ -1463,7 +1464,7 @@ ACMD(do_herd) {
 	struct room_direction_data *ex;
 	char_data *victim;
 	int dir;
-	room_data *to_room;
+	room_data *to_room, *was_in;
 
 	two_arguments(argument, arg, buf);
 
@@ -1505,10 +1506,14 @@ ACMD(do_herd) {
 		msg_to_char(ch, "You can only herd an animal through the entrance.\r\n");
 	}
 	else {
+		was_in = IN_ROOM(ch);
+		
 		if (perform_move(victim, dir, TRUE, 0)) {
 			act("You skillfully herd $N.", FALSE, ch, 0, victim, TO_CHAR);
 			act("$n skillfully herds $N.", FALSE, ch, 0, victim, TO_ROOM);
-			if (!perform_move(ch, dir, FALSE, 0)) {
+			
+			// only attempt to move ch if they weren't moved already (e.g. by following)
+			if (IN_ROOM(ch) == was_in && !perform_move(ch, dir, FALSE, 0)) {
 				char_to_room(victim, IN_ROOM(ch));
 			}
 		}
@@ -1761,6 +1766,7 @@ ACMD(do_quit) {
 			}
 		}
 		
+		GET_LAST_KNOWN_LEVEL(ch) = GET_COMPUTED_LEVEL(ch);
 		Objsave_char(ch, RENT_RENTED);
 		save_char(ch, died ? NULL : IN_ROOM(ch));
 		
@@ -1781,6 +1787,7 @@ ACMD(do_save) {
 		}
 		
 		write_aliases(ch);
+		GET_LAST_KNOWN_LEVEL(ch) = GET_COMPUTED_LEVEL(ch);
 		SAVE_CHAR(ch);
 		Objsave_char(ch, RENT_CRASH);
 	}
@@ -1898,6 +1905,9 @@ ACMD(do_skin) {
 		msg_to_char(ch, "You can only skin corpses.\r\n");
 	else if (GET_CORPSE_NPC_VNUM(obj) == NOTHING || !(proto = mob_proto(GET_CORPSE_NPC_VNUM(obj)))) {
 		msg_to_char(ch, "You can't skin that.\r\n");
+	}
+	else if (!bind_ok(obj, ch)) {
+		msg_to_char(ch, "You can't skin a corpse that is bound to someone else.\r\n");
 	}
 	else if (IS_SET(GET_CORPSE_FLAGS(obj), CORPSE_EATEN))
 		msg_to_char(ch, "It's too badly mangled to get any amount of usable skin.\r\n");

@@ -495,10 +495,11 @@ void real_update_char(char_data *ch) {
 	}
 	
 	// update recent level data if level has gone up or it's been too long since we've seen a higher level
-	if (GET_COMPUTED_LEVEL(ch) >= GET_HIGHEST_RECENT_LEVEL(ch) || (time(0) - GET_RECENT_LEVEL_TIME(ch)) > (config_get_int("recent_level_minutes") * SECS_PER_REAL_MIN)) {
-		GET_HIGHEST_RECENT_LEVEL(ch) = GET_COMPUTED_LEVEL(ch);
-		GET_RECENT_LEVEL_TIME(ch) = time(0);
+	if (GET_COMPUTED_LEVEL(ch) > GET_HIGHEST_KNOWN_LEVEL(ch)) {
+		GET_HIGHEST_KNOWN_LEVEL(ch) = GET_COMPUTED_LEVEL(ch);
 	}
+	// update the last-known-level
+	GET_LAST_KNOWN_LEVEL(ch) = GET_COMPUTED_LEVEL(ch);
 	
 	// very drunk? more confused!
 	if (GET_COND(ch, DRUNK) > 350) {
@@ -572,7 +573,7 @@ void real_update_char(char_data *ch) {
 	}
 
 	/* moving on.. */
-	if (GET_POS(ch) < POS_STUNNED) {
+	if (GET_POS(ch) < POS_STUNNED || (GET_POS(ch) == POS_STUNNED && health_gain(ch, TRUE) <= 0)) {
 		GET_HEALTH(ch) -= 1;
 		update_pos(ch);
 		if (GET_POS(ch) == POS_DEAD) {
@@ -688,7 +689,8 @@ static bool check_one_city_for_ruin(empire_data *emp, struct empire_city_data *c
 				
 				if (to_room && ROOM_OWNER(to_room) == emp) {
 					// is any building, and isn't ruins?
-					if (IS_ANY_BUILDING(to_room) && !ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_DISREPAIR) && BUILDING_VNUM(to_room) != BUILDING_RUINS_OPEN && BUILDING_VNUM(to_room) != BUILDING_RUINS_CLOSED) {
+					// TODO: maybe need a ruins flag, as we are up to 3 ruins
+					if (IS_ANY_BUILDING(to_room) && !ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_DISREPAIR) && BUILDING_VNUM(to_room) != BUILDING_RUINS_OPEN && BUILDING_VNUM(to_room) != BUILDING_RUINS_FLOODED && BUILDING_VNUM(to_room) != BUILDING_RUINS_CLOSED) {
 						found_building = TRUE;
 					}
 				}

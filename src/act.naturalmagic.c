@@ -599,7 +599,7 @@ ACMD(do_earthmeld) {
 		return;
 	}
 	
-	if (IS_ADVENTURE_ROOM(IN_ROOM(ch)) && (!RMT_FLAGGED(IN_ROOM(ch), RMT_OUTDOOR) || RMT_FLAGGED(IN_ROOM(ch), RMT_NEED_BOAT))) {
+	if (IS_ADVENTURE_ROOM(IN_ROOM(ch)) && (!RMT_FLAGGED(IN_ROOM(ch), RMT_OUTDOOR) || ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_NEED_BOAT) || RMT_FLAGGED(IN_ROOM(ch), RMT_NEED_BOAT))) {
 		msg_to_char(ch, "You can't earthmeld without natural ground below you!\r\n");
 		return;
 	}
@@ -1280,8 +1280,8 @@ ACMD(do_resurrect) {
 		else {
 			// success: resurrect in room
 			charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
-			act("You begin channeling mana to resurrect $N...", FALSE, ch, NULL, vict, TO_CHAR | TO_NODARK);
-			act("$n glows with white light as $e begins to channel $s mana to resurrect $N...", FALSE, ch, NULL, vict, TO_NOTVICT);
+			act("You begin channeling mana to resurrect $O...", FALSE, ch, NULL, vict, TO_CHAR | TO_NODARK);
+			act("$n glows with white light as $e begins to channel $s mana to resurrect $O...", FALSE, ch, NULL, vict, TO_NOTVICT);
 			act("$N is attempting to resurrect you (use 'accept/reject resurrection').", FALSE, vict, NULL, ch, TO_CHAR | TO_NODARK);
 			add_offer(vict, ch, OFFER_RESURRECTION, ABIL_RESURRECT);
 		}
@@ -1307,8 +1307,8 @@ ACMD(do_resurrect) {
 		else {
 			// seems legit...
 			charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
-			act("You begin channeling mana to resurrect $N...", FALSE, ch, NULL, vict, TO_CHAR | TO_NODARK);
-			act("$n glows with white light as $e begins to channel $s mana to resurrect $N...", FALSE, ch, NULL, vict, TO_NOTVICT);
+			act("You begin channeling mana to resurrect $O...", FALSE, ch, NULL, vict, TO_CHAR | TO_NODARK);
+			act("$n glows with white light as $e begins to channel $s mana to resurrect $O...", FALSE, ch, NULL, vict, TO_NOTVICT);
 			act("$N is attempting to resurrect you (use 'accept/reject resurrection').", FALSE, vict, NULL, ch, TO_CHAR | TO_NODARK);
 			add_offer(vict, ch, OFFER_RESURRECTION, ABIL_RESURRECT);
 		}

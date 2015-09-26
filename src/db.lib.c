@@ -4996,7 +4996,7 @@ void index_boot(int mode) {
 	while (*buf1 != '$') {
 		sprintf(buf2, "%s%s", prefix, buf1);
 		if (!(db_file = fopen(buf2, "r"))) {
-			log("SYSERR: File '%s' listed in '%s/%s': %s", buf2, prefix, index_filename, strerror(errno));
+			log("SYSERR: File '%s' listed in '%s%s': %s", buf2, prefix, index_filename, strerror(errno));
 			fscanf(index, "%s\n", buf1);
 			continue;
 		}

@@ -10,7 +10,7 @@ violet dye~
 1307 1  # 1x deadly violet dye
 2 198 c 4 -1
 R
-3015 2  # 2x UNKNOWN
+3015 2  # 2x some red berries
 R
 1205 1  # 1x some bileberries
 S
@@ -31,5 +31,19 @@ R
 175 24  # 24x an iron ingot
 R
 177 2  # 2x an imperium ingot
+S
+#1358
+wool cloth~
+1359 1  # 1x a bolt of cloth
+9 55 0 12 -1
+R
+1358 2  # 2x some wool
+S
+#1359
+cloth~
+1359 1  # 1x a bolt of cloth
+9 55 0 12 -1
+R
+144 2  # 2x a basket of cotton
 S
 $

@@ -820,6 +820,7 @@ void heartbeat(int heart_pulse) {
 	void check_death_respawn();
 	void check_expired_cooldowns();
 	void check_idle_passwords();
+	void check_newbie_islands();
 	void check_wars();
 	void chore_update();
 	void extract_pending_chars();
@@ -961,6 +962,8 @@ void heartbeat(int heart_pulse) {
 	if (HEARTBEAT(12 * SECS_PER_REAL_HOUR)) {
 		reduce_city_overages();
 		if (debug_log && HEARTBEAT(15)) { log("debug 20:\t%lld", microtime()); }
+		check_newbie_islands();
+		if (debug_log && HEARTBEAT(15)) { log("debug 20.5:\t%lld", microtime()); }
 	}
 	
 	if (HEARTBEAT(SECS_PER_REAL_HOUR)) {
@@ -1737,7 +1740,7 @@ bool is_slow_ip(char *ip) {
 	int iter;
 	
 	for (iter = 0; *slow_nameserver_ips[iter] != '\n'; ++iter) {
-		if (!strcmp(ip, slow_nameserver_ips[iter])) {
+		if (!strncmp(ip, slow_nameserver_ips[iter], strlen(slow_nameserver_ips[iter]))) {
 			return TRUE;
 		}
 	}

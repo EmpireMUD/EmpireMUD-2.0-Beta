@@ -1920,15 +1920,15 @@ SHOW(show_account) {
 			if (vbuf.char_specials_saved.idnum == cbuf.char_specials_saved.idnum || (vbuf.player_specials_saved.account_id != 0 && vbuf.player_specials_saved.account_id == cbuf.player_specials_saved.account_id)) {
 				// same account
 				if (is_playing(vbuf.char_specials_saved.idnum) || is_at_menu(vbuf.char_specials_saved.idnum)) {
-					msg_to_char(ch, " &c[%d %s] %s (online)&0%s\r\n", vbuf.player_specials_saved.highest_recent_level, class_data[vbuf.player_specials_saved.character_class].name, vbuf.name, IS_SET(vbuf.char_specials_saved.act, PLR_DELETED) ? " (deleted)" : "");
+					msg_to_char(ch, " &c[%d %s] %s (online)&0%s\r\n", vbuf.player_specials_saved.last_known_level, class_data[vbuf.player_specials_saved.character_class].name, vbuf.name, IS_SET(vbuf.char_specials_saved.act, PLR_DELETED) ? " (deleted)" : "");
 				}
 				else {
 					// not playing but same account
-					msg_to_char(ch, " [%d %s] %s%s\r\n", vbuf.player_specials_saved.highest_recent_level, class_data[vbuf.player_specials_saved.character_class].name, vbuf.name, IS_SET(vbuf.char_specials_saved.act, PLR_DELETED) ? " (deleted)" : "");
+					msg_to_char(ch, " [%d %s] %s%s\r\n", vbuf.player_specials_saved.last_known_level, class_data[vbuf.player_specials_saved.character_class].name, vbuf.name, IS_SET(vbuf.char_specials_saved.act, PLR_DELETED) ? " (deleted)" : "");
 				}
 			}
 			else if (!IS_SET(vbuf.char_specials_saved.act, PLR_DELETED) && !strcmp(vbuf.host, cbuf.host)) {
-				msg_to_char(ch, " &r[%d %s] %s (not on account)&0\r\n", vbuf.player_specials_saved.highest_recent_level, class_data[vbuf.player_specials_saved.character_class].name, vbuf.name);
+				msg_to_char(ch, " &r[%d %s] %s (not on account)&0\r\n", vbuf.player_specials_saved.last_known_level, class_data[vbuf.player_specials_saved.character_class].name, vbuf.name);
 			}
 		}
 	}
@@ -2418,7 +2418,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 			msg_to_char(ch, "Promo code: %s\r\n", promo_codes[GET_PROMO_ID(k)].code);
 		}
 
-		msg_to_char(ch, "Access Level: [&c%d&0], Class: [&c%s&0/&c%s&0], Skill Level: [&c%d&0], Gear Level: [&c%d&0], Total: [&c%d&0]\r\n", GET_ACCESS_LEVEL(k), class_data[GET_CLASS(k)].name, class_role[(int) GET_CLASS_ROLE(k)], GET_SKILL_LEVEL(k), GET_GEAR_LEVEL(k), IN_ROOM(k) ? GET_COMPUTED_LEVEL(k) : GET_HIGHEST_RECENT_LEVEL(k));
+		msg_to_char(ch, "Access Level: [&c%d&0], Class: [&c%s&0/&c%s&0], Skill Level: [&c%d&0], Gear Level: [&c%d&0], Total: [&c%d&0]\r\n", GET_ACCESS_LEVEL(k), class_data[GET_CLASS(k)].name, class_role[(int) GET_CLASS_ROLE(k)], GET_SKILL_LEVEL(k), GET_GEAR_LEVEL(k), IN_ROOM(k) ? GET_COMPUTED_LEVEL(k) : GET_LAST_KNOWN_LEVEL(k));
 		
 		coin_string(GET_PLAYER_COINS(k), buf);
 		msg_to_char(ch, "Coins: %s\r\n", buf);
@@ -2794,6 +2794,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	extern double get_weapon_speed(obj_data *weapon);
 	extern struct ship_data_struct ship_data[];
 	extern const char *armor_types[NUM_ARMOR_TYPES+1];
+	extern const struct poison_data_type poison_data[];
 
 	int i, found;
 	room_data *room;
@@ -2876,6 +2877,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 
 	switch (GET_OBJ_TYPE(j)) {
 		case ITEM_POISON: {
+			msg_to_char(ch, "Poison type: %s\r\n", poison_data[GET_POISON_TYPE(j)].name);
 			msg_to_char(ch, "Charges remaining: %d\r\n", GET_POISON_CHARGES(j));
 			break;
 		}
@@ -4056,7 +4058,9 @@ ACMD(do_echo) {
 			}
 		
 			// send to vict
-			act(lbuf, FALSE, ch, obj, vict, TO_VICT | TO_IGNORE_BAD_CODE);
+			if (vict != ch) {
+				act(lbuf, FALSE, ch, obj, vict, TO_VICT | TO_IGNORE_BAD_CODE);
+			}
 		
 			// channel history
 			if (vict->desc && vict->desc->last_act_message) {

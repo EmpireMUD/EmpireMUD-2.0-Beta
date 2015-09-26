@@ -244,7 +244,7 @@ ACMD(do_sacrifice) {
 			for (obj = ch->carrying; obj; obj = next_obj) {
 				next_obj = obj->next_content;
 				
-				if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
+				if (OBJ_FLAGGED(obj, OBJ_KEEP) || !bind_ok(obj, ch)) {
 					continue;
 				}
 				
@@ -253,7 +253,7 @@ ACMD(do_sacrifice) {
 			for (obj = ROOM_CONTENTS(IN_ROOM(ch)); obj; obj = next_obj) {
 				next_obj = obj->next_content;
 				
-				if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
+				if (OBJ_FLAGGED(obj, OBJ_KEEP) || !bind_ok(obj, ch)) {
 					continue;
 				}
 
@@ -285,7 +285,7 @@ ACMD(do_sacrifice) {
 			if (!next_obj && can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) && !IN_ROOM(obj))
 				next_obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)));
 			
-			if (CAN_WEAR(obj, ITEM_WEAR_TAKE) && !OBJ_FLAGGED(obj, OBJ_KEEP)) {
+			if (CAN_WEAR(obj, ITEM_WEAR_TAKE) && !OBJ_FLAGGED(obj, OBJ_KEEP) && bind_ok(obj, ch)) {
 				amount += perform_sacrifice(ch, god, obj, TRUE);
 				any = TRUE;
 			}
@@ -302,6 +302,9 @@ ACMD(do_sacrifice) {
 			msg_to_char(ch, "You don't seem to have any %ss to sacrifice.\r\n", arg);
 		else if (!CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
 			msg_to_char(ch, "You can't sacrifice that!\r\n");
+		}
+		else if (!bind_ok(obj, ch)) {
+			msg_to_char(ch, "You can't sacrifice an item that's bound to someone else.\r\n");
 		}
 		else {
 			amount += perform_sacrifice(ch, god, obj, TRUE);

@@ -191,8 +191,9 @@ your city.
 - &ccity downgrade <name>&0: This downgrades the given city by 1 level, or
     removes its city status entirely if it was at the minimum.
 
-- &ccity claim <name>&0: This claims all unclaimed structures within the borders
-    of the city, up to your maximum territory. 
+- &ccity claim <name> [all]&0: This claims all unclaimed structures within
+    the borders of the city, up to your maximum territory -- or, all tiles with
+    the 'all' option.
 
 - &ccity abandon <name>&0: This abolishes the city, refunds your city points, and
     un-claims all territory within the city border.
@@ -845,7 +846,7 @@ Privileges:
   chop: can chop trees on claimed land
   cede: can abandon/cede empire lands
   enroll: can add new members
-  withdraw: can take gold from the vault
+  withdraw: can take gold and items from the vault
   diplomacy: can set up diplomatic relations with other empires
   customize: can customize claimed buildings
   workforce: can turn workforce chores on and off
@@ -854,6 +855,9 @@ Privileges:
   trade: can set up import and export rules
   logs: can view elogs
   shipping: can use the ship command to move goods
+  homes: can set a home
+  storage: can retrieve from storage buildings
+  warehouse: can retrieve unique items from the warehouse
 
 See also: CLAIM, BUILD, HARVEST, PROMOTE, DEMOTE, CHOP, CEDE, EEDIT, ELOG
 #
@@ -1314,7 +1318,11 @@ Workforce types:
   &cdismantle-mines:&0 mines will be dismantled when empty.
   &yabandon-chopped:&0 NPCS will abandon a tile when they finish chopping.
   &yabandon-farmed:&0 NPCS will abandon a tile when they finish farming.
+  &cnexus crystals (skilled):&0 Will make nexus crystals at the sorcery tower;
+     requires both Exarch Crafts and Skilled Labor.
   
 Items marked (skilled) require the Skilled Labor ability.
+
+See also: EXARCH CRAFTS
 #
 $

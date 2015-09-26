@@ -289,6 +289,8 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	
 	switch (GET_OBJ_TYPE(obj)) {
 		case ITEM_POISON: {
+			extern const struct poison_data_type poison_data[];
+			msg_to_char(ch, "Poison type: %s\r\n", poison_data[GET_POISON_TYPE(obj)].name);
 			msg_to_char(ch, "Has %d charges remaining.\r\n", GET_POISON_CHARGES(obj));
 			break;
 		}
@@ -613,8 +615,8 @@ int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname) {
 	
 	// don't let people drop bound items in other people's territory
 	if (mode != SCMD_JUNK && OBJ_BOUND_TO(obj) && ROOM_OWNER(IN_ROOM(ch)) && ROOM_OWNER(IN_ROOM(ch)) != GET_LOYALTY(ch)) {
-		msg_to_char(ch, "You can't drop bound items here.\r\n");
-		return -1;
+		act("$p: You can't drop bound items here.", FALSE, ch, obj, NULL, TO_CHAR);
+		return 0;	// don't break a drop-all
 	}
 	
 	// count items
@@ -2752,6 +2754,10 @@ void warehouse_retrieve(char_data *ch, char *argument) {
 		msg_to_char(ch, "You don't have permission to withdraw items here.\r\n");
 		return;
 	}
+	if (!imm_access && ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_WAREHOUSE) && !has_permission(ch, PRIV_WAREHOUSE)) {
+		msg_to_char(ch, "You don't have permission to withdraw items here.\r\n");
+		return;
+	}
 	
 	// detect leading number (amount to retrieve) with a space
 	tmp = any_one_arg(argument, junk);
@@ -3969,7 +3975,7 @@ ACMD(do_pour) {
 			return;
 		}
 		if (!*arg2) {		/* no 2nd argument */
-			if (IS_COMPLETE(IN_ROOM(ch)) && ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_DRINK | BLD_TAVERN)) {
+			if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_DRINK) || find_flagged_sect_within_distance_from_char(ch, SECTF_DRINK, NOBITS, 1) || (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_DRINK | BLD_TAVERN) && IS_COMPLETE(IN_ROOM(ch)))) {
 				fill_from_room(ch, to_obj);
 				return;
 			}
@@ -4290,6 +4296,10 @@ ACMD(do_retrieve) {
 		msg_to_char(ch, "You can't store or retrieve resources unless you're a member of an empire.\r\n");
 		return;
 	}
+	if (GET_RANK(ch) < EMPIRE_PRIV(emp, PRIV_STORAGE)) {
+		msg_to_char(ch, "You aren't high enough rank to retrieve from the empire inventory.\r\n");
+		return;
+	}
 	if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) || (room_emp && emp != room_emp && !has_relationship(emp, room_emp, DIPL_TRADE))) {
 		msg_to_char(ch, "You need to establish a trade pact to retrieve anything here.\r\n");
 		return;
@@ -4400,11 +4410,17 @@ ACMD(do_retrieve) {
 	if (count == 0) {
 		msg_to_char(ch, "There is nothing stored here!\r\n");
 	}
+	else {
+		// remove the "ceded" bit on this room (it was used)
+		if (GET_LOYALTY(ch) == room_emp) {
+			remove_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CEDED);
+		}
 
-	/* save the empire */
-	SAVE_CHAR(ch);
-	save_empire(emp);
-	read_vault(emp);
+		/* save the empire */
+		SAVE_CHAR(ch);
+		save_empire(emp);
+		read_vault(emp);
+	}
 }
 
 
@@ -4789,11 +4805,18 @@ ACMD(do_store) {
 			}
 		}
 	}
+	
+	if (done > 0) {
+		// remove the "ceded" bit on this room
+		if (GET_LOYALTY(ch) == room_emp) {
+			remove_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CEDED);
+		}
 
-	/* save the empire */
-	SAVE_CHAR(ch);
-	save_empire(emp);
-	read_vault(emp);
+		/* save the empire */
+		SAVE_CHAR(ch);
+		save_empire(emp);
+		read_vault(emp);
+	}
 }
 
 

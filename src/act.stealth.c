@@ -889,6 +889,11 @@ ACMD(do_hide) {
 		return;
 	}
 	
+	if (GET_POS(ch) == POS_FIGHTING || is_fighting(ch)) {
+		msg_to_char(ch, "You can't hide in combat!\r\n");
+		return;
+	}
+	
 	if (IS_RIDING(ch)) {
 		msg_to_char(ch, "You can't hide while mounted!\r\n");
 		return;
@@ -1620,6 +1625,9 @@ ACMD(do_steal) {
 	}
 	else if (!emp) {
 		msg_to_char(ch, "Nothing is stored here that you can steal.\r\n");
+	}
+	else if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CEDED)) {
+		msg_to_char(ch, "You can't steal from a building which was ceded to an empire but never used by that empire.\r\n");
 	}
 	else if (!*arg) {
 		if (!(inventory_store_building(ch, IN_ROOM(ch), emp))) {
