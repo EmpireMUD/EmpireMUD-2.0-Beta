@@ -252,7 +252,6 @@
 #define STEALTH_MASTER  221
 #define DIGGER  224
 #define SCRAPER  227
-#define HIGH_SORCERER  228
 #define REPAIRMAN  229
 #define THUG  230
 #define CITY_GUARD  251
@@ -269,3 +268,4 @@
 #define SHEARER  268
 #define COIN_MAKER  269
 #define DOCKWORKER  270
+#define APPRENTICE_EXARCH  271

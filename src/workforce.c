@@ -100,7 +100,7 @@ struct empire_chore_type chore_data[NUM_CHORES] = {
 	{ "dismantle-mines", BUILDER },
 	{ "abandon-chopped", FELLER },	// mob is strictly a safe placeholder here
 	{ "abandon-farmed", FARMER },	// mob is strictly a safe placeholder here
-	{ "nexus-crystal", HIGH_SORCERER },
+	{ "nexus-crystal", APPRENTICE_EXARCH },
 };
 
 
