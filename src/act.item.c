@@ -2754,6 +2754,10 @@ void warehouse_retrieve(char_data *ch, char *argument) {
 		msg_to_char(ch, "You don't have permission to withdraw items here.\r\n");
 		return;
 	}
+	if (!imm_access && ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_WAREHOUSE) && !has_permission(ch, PRIV_WAREHOUSE)) {
+		msg_to_char(ch, "You don't have permission to withdraw items here.\r\n");
+		return;
+	}
 	
 	// detect leading number (amount to retrieve) with a space
 	tmp = any_one_arg(argument, junk);
@@ -4290,6 +4294,10 @@ ACMD(do_retrieve) {
 	}
 	if (!(emp = GET_LOYALTY(ch))) {
 		msg_to_char(ch, "You can't store or retrieve resources unless you're a member of an empire.\r\n");
+		return;
+	}
+	if (GET_RANK(ch) < EMPIRE_PRIV(emp, PRIV_STORAGE)) {
+		msg_to_char(ch, "You aren't high enough rank to retrieve from the empire inventory.\r\n");
 		return;
 	}
 	if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) || (room_emp && emp != room_emp && !has_relationship(emp, room_emp, DIPL_TRADE))) {

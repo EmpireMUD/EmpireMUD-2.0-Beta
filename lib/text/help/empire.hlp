@@ -842,7 +842,7 @@ Privileges:
   chop: can chop trees on claimed land
   cede: can abandon/cede empire lands
   enroll: can add new members
-  withdraw: can take gold from the vault
+  withdraw: can take gold and items from the vault
   diplomacy: can set up diplomatic relations with other empires
   customize: can customize claimed buildings
   workforce: can turn workforce chores on and off
@@ -851,6 +851,9 @@ Privileges:
   trade: can set up import and export rules
   logs: can view elogs
   shipping: can use the ship command to move goods
+  homes: can set a home
+  storage: can retrieve from storage buildings
+  warehouse: can retrieve unique items from the warehouse
 
 See also: CLAIM, BUILD, HARVEST, PROMOTE, DEMOTE, CHOP, CEDE, EEDIT, ELOG
 #

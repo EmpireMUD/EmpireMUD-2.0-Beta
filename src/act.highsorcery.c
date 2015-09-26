@@ -500,6 +500,10 @@ void summon_materials(char_data *ch, char *argument) {
 		msg_to_char(ch, "You can't summon empire materials if you're not in an empire.\r\n");
 		return;
 	}
+	if (GET_RANK(ch) < EMPIRE_PRIV(emp, PRIV_STORAGE)) {
+		msg_to_char(ch, "You aren't high enough rank to retrieve from the empire inventory.\r\n");
+		return;
+	}
 	
 	if (GET_ISLAND_ID(IN_ROOM(ch)) == NO_ISLAND) {
 		msg_to_char(ch, "You can't summon materials here.\r\n");

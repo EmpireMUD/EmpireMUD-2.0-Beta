@@ -3492,6 +3492,9 @@ ACMD(do_home) {
 		else if (!GET_LOYALTY(ch) || ROOM_OWNER(real) != GET_LOYALTY(ch)) {
 			msg_to_char(ch, "You need to own a building to make it your home.\r\n");
 		}
+		else if (!has_permission(ch, PRIV_HOMES)) {
+			msg_to_char(ch, "You aren't high enough rank to set a home.\r\n");
+		}
 		else if (ROOM_PRIVATE_OWNER(real) == GET_IDNUM(ch)) {
 			msg_to_char(ch, "But it's already your home!\r\n");
 		}

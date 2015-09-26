@@ -1122,7 +1122,12 @@ bool has_permission(char_data *ch, int type) {
 	if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_AND_ALLIES)) {
 		return FALSE;
 	}
-	else if (emp && GET_RANK(ch) < EMPIRE_PRIV(emp, type)) {
+	else if (emp && GET_LOYALTY(ch) == emp && GET_RANK(ch) < EMPIRE_PRIV(emp, type)) {
+		// for empire members only
+		return FALSE;
+	}
+	else if (emp && GET_LOYALTY(ch) != emp && EMPIRE_PRIV(emp, type) > 1) {
+		// allies can't use things that are above rank 1 in the owner's empire
 		return FALSE;
 	}
 	

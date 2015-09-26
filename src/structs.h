@@ -661,7 +661,10 @@ typedef struct trig_data trig_data;
 #define PRIV_TRADE  13	// allows trade route management
 #define PRIV_LOGS  14	// can view empire logs
 #define PRIV_SHIPPING  15	// can use the ship command
-#define NUM_PRIVILEGES  16	// total
+#define PRIV_HOMES  16	// can set a home
+#define PRIV_STORAGE  17	// can retrieve from storage
+#define PRIV_WAREHOUSE  18	// can retrieve from warehouse
+#define NUM_PRIVILEGES  19	// total
 
 
 // for empire scores (e.g. sorting)

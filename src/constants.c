@@ -1154,6 +1154,9 @@ const char *priv[] = {
 	"trade",
 	"logs",
 	"shipping",
+	"homes",
+	"storage",
+	"warehouse",
 	"\n"
 };
 
