@@ -100,7 +100,7 @@ struct empire_chore_type chore_data[NUM_CHORES] = {
 	{ "dismantle-mines", BUILDER },
 	{ "abandon-chopped", FELLER },	// mob is strictly a safe placeholder here
 	{ "abandon-farmed", FARMER },	// mob is strictly a safe placeholder here
-	{ "nexus-crystal", APPRENTICE_EXARCH },
+	{ "nexus crystals", APPRENTICE_EXARCH },
 };
 
 
@@ -741,10 +741,6 @@ void do_chore_gen_craft(empire_data *emp, room_data *room, int chore, CHORE_GEN_
 	HASH_ITER(hh, craft_table, craft, next_craft) {
 		// must be a live recipe
 		if (CRAFT_FLAGGED(craft, CRAFT_IN_DEVELOPMENT)) {
-			continue;
-		}
-		// must not have a requires-object
-		if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING) {
 			continue;
 		}
 		// pass through validator function
