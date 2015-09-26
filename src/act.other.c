@@ -42,6 +42,7 @@ extern char *get_room_name(room_data *room, bool color);
 extern char_data *has_familiar(char_data *ch);
 void Objsave_char(char_data *ch, int rent_code);
 void scale_item_to_level(obj_data *obj, int level);
+void scale_mob_as_familiar(char_data *mob, char_data *master);
 extern char *show_color_codes(char *string);
 
 
@@ -2178,7 +2179,7 @@ ACMD(do_summon) {
 			setup_generic_npc(mob, emp, NOTHING, NOTHING);
 
 			// try to scale mob to the summoner
-			check_scaling(mob, ch);
+			scale_mob_as_familiar(mob, ch);
 			
 			// spawn data
 			SET_BIT(MOB_FLAGS(mob), MOB_SPAWNED | MOB_NO_LOOT);

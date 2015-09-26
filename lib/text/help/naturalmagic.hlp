@@ -96,6 +96,41 @@ tiniest seed into a majestic tree in mere moments. It can also grow crops.
 
 See also: CHANT
 #
+"CLASS FAMILIARS" "SPIRIT WOLF FAMILIAR" "DIRE WOLF FAMILIAR" "MOON RABBIT FAMILIAR" "GRIFFIN FAMILIAR" "MANTICORE FAMILIAR" "PHOENIX FAMILIAR" "SCORPION SHADOW FAMILIAR" "OWL SHADOW FAMILIAR" "BASILISK FAMILIAR" "SALAMANDER FAMILIAR" "SKELETAL HULK FAMILIAR" "BANSHEE FAMILIAR"
+
+Each Natural Magic class has its own set of familiars. These are summoned with
+the 'familiar' command, but don't require the regular Familiar ability. Some
+class roles have different familiars than other roles in the same class.
+
+Werewolf:
+  Spirit Wolf (tank) - Will debuff the enemy.
+  Dire Wolf (melee) - Attacks the enemy.
+  Moon Rabbit (healer) - Buffs the party.
+
+Luminary:
+  Manticore - Attacks the enemy.
+  Griffin - Tanks for the party.
+
+Archmage:
+  Phoenix (healer) - Buffs the party.
+  Caster has no familiar, but Mirror Image counts as one.
+
+Shadow Wolf:
+  Scorpion Shadow (melee) - Debuffs the enemy.
+  Owl Shadow (healer) - Buffs the party.
+
+Feral:
+  Basilisk - Debuffs the enemy.
+
+Alchemist:
+  Salamander - Buffs the party.
+
+Necromancer:
+  Skeletal Hulk (caster) - Attacks the enemy.
+  Banshee (healer) - Debuffs the enemy.
+
+See also: CLASSES, FAMILIAR, MIRROR IMAGE
+#
 CLEANSE
 
 Cleanse (Natural Magic ability)
@@ -207,11 +242,12 @@ Magic.
 
 Available familiars:
   cat - A low-level familiar for novice mages.
-  saber-tooth - A larger cat with a bigger bite.
-  sphinx - A powerful familiar that will tank for you in combat.
-  griffin - A powerful familiar that will tank for you in combat.
+  saber-toothed cat - A larger cat with a bigger bite.
+  sphinx - A familiar that will tank for you in combat.
+  giant tortoise - A stronger tank who deals no damage, but protects better.
 
-Use "dismiss" to get rid of your familiar.
+Each natural magic class has its own familiars, too. Use "dismiss" to get rid
+of your familiar.
 
 See also: DISMISS, ORDER
 #
