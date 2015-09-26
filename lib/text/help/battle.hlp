@@ -112,6 +112,9 @@ the disarm affect wears off, it will still be in your <wield> slot.
 Disarmed players lose their weapon damage, and will make basic unarmed 'hit'
 attacks (unless the disarmed weapon was a caster weapon, in which case they
 receive a basic 'mana blast' attack instead).
+
+Disarmed mobs lose half their damage and their attack type is changed to 'hit'
+or 'mana blast'.
 #
 "DUAL-WIELD" "DUAL WIELD"
 
