@@ -51,7 +51,6 @@ void do_chore_mining(empire_data *emp, room_data *room);
 void do_chore_minting(empire_data *emp, room_data *room);
 void do_chore_nailmaking(empire_data *emp, room_data *room);
 void do_chore_quarrying(empire_data *emp, room_data *room);
-void do_chore_sawing(empire_data *emp, room_data *room);
 void do_chore_scraping(empire_data *emp, room_data *room);
 void do_chore_shearing(empire_data *emp, room_data *room);
 void do_chore_smelting(empire_data *emp, room_data *room);
@@ -63,18 +62,8 @@ void empire_skillup(empire_data *emp, int ability, double amount);	// skills.c
 void stop_room_action(room_data *room, int action, int chore);	// act.action.c
 
 // gen_craft protos:
-
-/**
-* Function passed to do_chore_gen_craft()
-*
-* @param empire_data *emp The empire doing the chore.
-* @param room_data *room The room the chore is in.
-* @param int chore CHORE_x const for this chore.
-* @param craft_data *craft The craft to validate.
-* @return bool TRUE if this workforce chore can work this craft, FALSE if not
-*/
 #define CHORE_GEN_CRAFT_VALIDATOR(name)  bool (name)(empire_data *emp, room_data *room, int chore, craft_data *craft)
-
+CHORE_GEN_CRAFT_VALIDATOR(chore_sawing);
 CHORE_GEN_CRAFT_VALIDATOR(chore_weaving);
 
 void do_chore_gen_craft(empire_data *emp, room_data *room, int chore, CHORE_GEN_CRAFT_VALIDATOR(*validator));
@@ -230,7 +219,7 @@ void process_one_chore(empire_data *emp, room_data *room) {
 			do_chore_quarrying(emp, room);
 		}
 		if (BUILDING_VNUM(room) == BUILDING_LUMBER_YARD && EMPIRE_CHORE(emp, CHORE_SAWING)) {
-			do_chore_sawing(emp, room);
+			do_chore_gen_craft(emp, room, CHORE_SAWING, chore_sawing);
 		}
 	}
 }
@@ -663,8 +652,36 @@ void run_chore_tracker_updates(void) {
  /////////////////////////////////////////////////////////////////////////////
 //// GENERIC CRAFT WORKFORCE ////////////////////////////////////////////////
 
+/**
+* Function passed to do_chore_gen_craft()
+*
+* @param empire_data *emp The empire doing the chore.
+* @param room_data *room The room the chore is in.
+* @param int chore CHORE_x const for this chore.
+* @param craft_data *craft The craft to validate.
+* @return bool TRUE if this workforce chore can work this craft, FALSE if not
+*/
+CHORE_GEN_CRAFT_VALIDATOR(chore_sawing) {
+	if (GET_CRAFT_TYPE(craft) != CRAFT_TYPE_WORKFORCE) {
+		return FALSE;
+	}
+	if (GET_CRAFT_ABILITY(craft) != ABIL_WORKFORCE_SAWING) {
+		return FALSE;
+	}
+	// success
+	return TRUE;
+}
 
-// validator: weaving
+
+/**
+* Function passed to do_chore_gen_craft()
+*
+* @param empire_data *emp The empire doing the chore.
+* @param room_data *room The room the chore is in.
+* @param int chore CHORE_x const for this chore.
+* @param craft_data *craft The craft to validate.
+* @return bool TRUE if this workforce chore can work this craft, FALSE if not
+*/
 CHORE_GEN_CRAFT_VALIDATOR(chore_weaving) {
 	if (GET_CRAFT_TYPE(craft) != CRAFT_TYPE_WEAVE) {
 		return FALSE;
@@ -1384,38 +1401,6 @@ void do_chore_quarrying(empire_data *emp, room_data *room) {
 		// place worker
 		if ((worker = place_chore_worker(emp, CHORE_QUARRYING, room))) {
 			ewt_mark_resource_worker(emp, room, o_STONE_BLOCK);
-		}
-	}
-	else if (worker) {
-		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
-	}
-}
-
-
-void do_chore_sawing(empire_data *emp, room_data *room) {
-	struct empire_storage_data *store = find_stored_resource(emp, GET_ISLAND_ID(room), o_TREE);
-	char_data *worker = find_mob_in_room_by_vnum(room, chore_data[CHORE_SAWING].mob);
-	bool can_do = can_gain_chore_resource(emp, room, o_LUMBER);
-	
-	if (worker && can_do) {
-		ewt_mark_resource_worker(emp, room, o_LUMBER);
-		
-		if (store && store->amount > 0) {
-			charge_stored_resource(emp, GET_ISLAND_ID(room), store->vnum, 1);
-			add_to_empire_storage(emp, GET_ISLAND_ID(room), o_LUMBER, 2);
-			
-			act("$n finishes sawing a pile of lumber.", FALSE, worker, NULL, NULL, TO_ROOM);
-			empire_skillup(emp, ABIL_WORKFORCE, config_get_double("exp_from_workforce"));
-		}
-		else {
-			// no trees remain: mark for despawn
-			SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
-		}
-	}
-	else if (store && can_do) {
-		// place worker
-		if ((worker = place_chore_worker(emp, CHORE_SAWING, room))) {
-			ewt_mark_resource_worker(emp, room, o_LUMBER);
 		}
 	}
 	else if (worker) {

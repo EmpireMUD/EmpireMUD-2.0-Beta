@@ -181,13 +181,11 @@
 #define o_WORN_STATUETTE  1305
 #define o_NAILS  1306
 
-// skins and cloths
+// skins
 #define o_SMALL_SKIN  1350
 #define o_LARGE_SKIN  1351
 #define o_SMALL_LEATHER  1356
 #define o_LARGE_LEATHER  1357
-#define o_WOOL  1358
-#define o_CLOTH  1359
 
 // newbie gear
 #define o_STAFF  1107

@@ -321,6 +321,9 @@ void init_skills() {
 	setup_class_ability(ABIL_TWO_HANDED_WEAPONS, "Two-Handed Weapons");
 	setup_class_ability(ABIL_WARD_AGAINST_MAGIC, "Ward Against Magic");
 	
+	// Workforce abilities (ties into do_chore_gen_craft()), they are essentially class abilities with no class
+	setup_class_ability(ABIL_WORKFORCE_SAWING, "Workforce Sawing");
+	
 	sort_skills_and_abilities();
 }
 
