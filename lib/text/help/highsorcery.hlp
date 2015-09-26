@@ -427,7 +427,8 @@ This ability actually allows the sorcerer to open a tiny portal to the empire's
 storage buildings, and pull out the materials he needs. There is no range on
 this ability, and it may be used to grab as many items as the sorcerer wishes.
 
-You cannot summon items out of the vault (or other secure locations).
+You cannot summon items out of the vault (or other secure locations), and you
+must have the "storage" empire privilege to use this ability at all.
 
 See also: VAULT
 #
