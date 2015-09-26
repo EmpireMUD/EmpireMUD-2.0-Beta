@@ -146,11 +146,7 @@ obj_data *has_hammer(char_data *ch) {
 
 
 // CRAFT_TYPE_x
-struct {
-	char *command;
-	char *verb;
-	char *strings[2];
-} gen_craft_data[] = {
+struct gen_craft_data_t gen_craft_data[] = {
 	{ "error", "erroring", { "", "" } },	// dummy to require scmd
 	
 	// Note: These correspond to CRAFT_TYPE_x so you cannot change the order.
