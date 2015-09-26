@@ -732,7 +732,7 @@ See also: FORGE, IRON BLADES, DEADLY WEAPONS
 #
 WEAVE
 
-Command:  weave <item>
+Command:  weave [number] <item>
 
 Weaving converts raw materials into cloth. You can weave anywhere, but it goes
 much faster at the tailor shop.
