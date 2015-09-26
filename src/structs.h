@@ -2659,6 +2659,14 @@ struct craft_data {
 };
 
 
+// act.trade.c: For 
+struct gen_craft_data_t {
+	char *command;	// "forge"
+	char *verb;	// "forging"
+	char *strings[2];	// periodic message { to char, to room }
+};
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// CROP STRUCTS ////////////////////////////////////////////////////////////
 

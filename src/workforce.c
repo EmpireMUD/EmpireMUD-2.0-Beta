@@ -1508,36 +1508,74 @@ void do_chore_tanning(empire_data *emp, room_data *room) {
 
 
 void do_chore_weaving(empire_data *emp, room_data *room) {
+	extern struct gen_craft_data_t gen_craft_data[];
+	
 	struct empire_storage_data *store = NULL;
 	char_data *worker = find_mob_in_room_by_vnum(room, chore_data[CHORE_WEAVING].mob);
-	bool can_do = can_gain_chore_resource(emp, room, o_CLOTH);
-	int cost = 2;
-
-	// cotton first
-	if (!(store = find_stored_resource(emp, GET_ISLAND_ID(room), o_COTTON)) || store->amount < cost) {
-		// wool instead
-		store = find_stored_resource(emp, GET_ISLAND_ID(room), o_WOOL);
+	craft_data *craft, *next_craft, *do_craft = NULL;
+	char buf[256];
+	bool has_res;
+	int iter;
+	
+	// find a craft we can do
+	HASH_ITER(hh, craft_table, craft, next_craft) {
+		// must be a live weaving recipe
+		if (CRAFT_FLAGGED(craft, CRAFT_IN_DEVELOPMENT) || GET_CRAFT_TYPE(craft) != CRAFT_TYPE_WEAVE) {
+			continue;
+		}
+		
+		// won't craft things higher level than BASIC_SKILL_CAP
+		if (GET_CRAFT_ABILITY(craft) != NO_ABIL && ability_data[GET_CRAFT_ABILITY(craft)].parent_skill_required > BASIC_SKILL_CAP) {
+			continue;
+		}
+		// must not have a requires-object
+		if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING) {
+			continue;
+		}
+		
+		// can we gain any of it?
+		if (!can_gain_chore_resource(emp, room, GET_CRAFT_OBJECT(craft))) {
+			continue;
+		}
+		
+		// check resources...
+		has_res = TRUE;
+		for (iter = 0; iter < MAX_RESOURCES_REQUIRED && GET_CRAFT_RESOURCES(craft)[iter].vnum != NOTHING && has_res; ++iter) {
+			if (!(store = find_stored_resource(emp, GET_ISLAND_ID(room), GET_CRAFT_RESOURCES(craft)[iter].vnum)) || store->amount < GET_CRAFT_RESOURCES(craft)[iter].amount) {
+				has_res = FALSE;
+			}
+		}
+		if (!has_res) {
+			continue;
+		}
+		
+		// found one!
+		do_craft = craft;
+		break;
 	}
 	
-	if (worker && can_do) {		
-		if (store && store->amount >= cost) {
-			ewt_mark_resource_worker(emp, room, o_CLOTH);
-			
-			charge_stored_resource(emp, GET_ISLAND_ID(room), store->vnum, cost);
-			add_to_empire_storage(emp, GET_ISLAND_ID(room), o_CLOTH, 1);
-			
-			act("$n finishes weaving some cloth.", FALSE, worker, NULL, NULL, TO_ROOM);
-			empire_skillup(emp, ABIL_WORKFORCE, config_get_double("exp_from_workforce"));
+	// now attempt to do the chore
+	if (worker && do_craft) {
+		ewt_mark_resource_worker(emp, room, GET_CRAFT_OBJECT(do_craft));
+	
+		// charge resources (we pre-validated)
+		for (iter = 0; iter < MAX_RESOURCES_REQUIRED && GET_CRAFT_RESOURCES(do_craft)[iter].vnum != NOTHING; ++iter) {
+			charge_stored_resource(emp, GET_ISLAND_ID(room), GET_CRAFT_RESOURCES(do_craft)[iter].vnum, GET_CRAFT_RESOURCES(do_craft)[iter].amount);
 		}
-		else {
-			// no resources remain: mark for despawn
-			SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
+
+		add_to_empire_storage(emp, GET_ISLAND_ID(room), GET_CRAFT_OBJECT(do_craft), GET_CRAFT_QUANTITY(do_craft));
+		empire_skillup(emp, ABIL_WORKFORCE, config_get_double("exp_from_workforce"));
+		
+		// only send message if someone else is present (don't bother verifying it's a player)
+		if (ROOM_PEOPLE(IN_ROOM(worker))->next_in_room) {
+			snprintf(buf, sizeof(buf), "$n finishes %s %s.", gen_craft_data[GET_CRAFT_TYPE(do_craft)].verb, get_obj_name_by_proto(GET_CRAFT_OBJECT(do_craft)));
+			act(buf, FALSE, worker, NULL, NULL, TO_ROOM);
 		}
 	}
-	else if (store && store->amount >= cost && can_do) {
+	else if (do_craft) {
 		// place worker
 		if ((worker = place_chore_worker(emp, CHORE_WEAVING, room))) {
-			ewt_mark_resource_worker(emp, room, o_CLOTH);
+			ewt_mark_resource_worker(emp, room, GET_CRAFT_OBJECT(do_craft));
 		}
 	}
 	else if (worker) {
