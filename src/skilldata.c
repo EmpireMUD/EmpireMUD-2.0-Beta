@@ -300,7 +300,7 @@ void init_skills() {
 	setup_class_ability(ABIL_DREAD_BLOOD_FORM, "Dread Blood Form");
 	setup_class_ability(ABIL_DIVERSION, "Diversion");
 	setup_class_ability(ABIL_DUAL_WIELD, "Dual-Wield");
-	setup_class_ability(ABIL_EXARCH_BUILDINGS, "Exarch Buildings");
+	setup_class_ability(ABIL_EXARCH_CRAFTS, "Exarch Crafts");
 	setup_class_ability(ABIL_FASTCASTING, "Fastcasting");
 	setup_class_ability(ABIL_GUILDSMAN_CRAFTS, "Guildsman Crafts");
 	setup_class_ability(ABIL_HORRID_FORM, "Horrid Form");

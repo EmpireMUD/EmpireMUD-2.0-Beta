@@ -1124,6 +1124,7 @@ const char *techs[] = {
 	"Master Portals",
 	"Skilled Labor",
 	"Trade Routes",
+	"Exarch Crafts",
 	"\n"
 };
 

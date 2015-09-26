@@ -690,7 +690,8 @@ typedef struct trig_data trig_data;
 #define TECH_MASTER_PORTALS  9
 #define TECH_SKILLED_LABOR  10
 #define TECH_TRADE_ROUTES  11
-#define NUM_TECHS  12
+#define TECH_EXARCH_CRAFTS  12
+#define NUM_TECHS  13
 
 
 // for empire_trade_data

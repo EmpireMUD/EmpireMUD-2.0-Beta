@@ -335,6 +335,9 @@ char *ability_color(char_data *ch, int abil) {
 void adjust_abilities_to_empire(char_data *ch, empire_data *emp, bool add) {
 	int mod = (add ? 1 : -1);
 	
+	if (HAS_ABILITY(ch, ABIL_EXARCH_CRAFTS)) {
+		EMPIRE_TECH(emp, TECH_EXARCH_CRAFTS) += mod;
+	}
 	if (HAS_ABILITY(ch, ABIL_WORKFORCE)) {
 		EMPIRE_TECH(emp, TECH_WORKFORCE) += mod;
 	}
