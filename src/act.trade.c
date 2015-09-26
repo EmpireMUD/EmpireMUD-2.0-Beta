@@ -601,38 +601,6 @@ bool validate_item_rename(char_data *ch, obj_data *obj, char *name) {
 
 
  //////////////////////////////////////////////////////////////////////////////
-//// WEAVE ///////////////////////////////////////////////////////////////////
-
-// TODO should this be in act.action.c instead?
-
-#define WEAVE_LINE_BREAK { "\t", 0, 0, NO_ABIL, { END_RESOURCE_LIST } }
-
-struct {
-	char *name;
-	int time;	// in action ticks
-	obj_vnum vnum;
-	int ability;	// NO_ABIL for none
-	Resource resources[5];
-} weave_data[] = {
-	{ "cloth", 12, o_CLOTH, ABIL_SEWING, { { o_COTTON, 2 }, END_RESOURCE_LIST } },
-	{ "wool cloth", 12, o_CLOTH, ABIL_SEWING, { { o_WOOL, 2 }, END_RESOURCE_LIST } },
-	
-	// last
-	{ "\n", 0, 0, NO_ABIL, { END_RESOURCE_LIST } },
-};
-
-
-void cancel_weaving(char_data *ch) {
-	// TODO remove
-}
-
-
-void finish_weaving(char_data *ch) {
-	// TODO remove
-}
-
-
- //////////////////////////////////////////////////////////////////////////////
 //// COMMANDS ////////////////////////////////////////////////////////////////
 
 // subcmd must be CRAFT_TYPE_x
