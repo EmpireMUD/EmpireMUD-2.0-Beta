@@ -204,6 +204,9 @@ int get_attack_type(char_data *ch, obj_data *weapon) {
 		else if (!IS_NPC(ch) && GET_MORPH(ch) != MORPH_NONE) {
 			w_type = get_morph_attack_type(ch);
 		}
+		else if (AFF_FLAGGED(ch, AFF_DISARM) && weapon && IS_WEAPON(weapon) && attack_hit_info[GET_WEAPON_TYPE(weapon)].damage_type == DAM_MAGICAL) {
+			w_type = TYPE_MANA_BLAST;
+		}
 		else {
 			w_type = TYPE_HIT;
 		}
@@ -2492,12 +2495,13 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		return -1;
 	}
 	
-	// weapons not allowed if disarmed
+	w_type = get_attack_type(ch, weapon);
+	victim_emp = GET_LOYALTY(victim);
+	
+	// weapons not allowed if disarmed (do this after get_attack type, which accounts for this)
 	if (AFF_FLAGGED(ch, AFF_DISARM)) {
 		weapon = NULL;
 	}
-	w_type = get_attack_type(ch, weapon);
-	victim_emp = GET_LOYALTY(victim);
 	
 	// look for an instance to lock
 	if (!IS_NPC(ch) && IS_ADVENTURE_ROOM(IN_ROOM(ch)) && COMPLEX_DATA(IN_ROOM(ch)) && (inst = COMPLEX_DATA(IN_ROOM(ch))->instance)) {

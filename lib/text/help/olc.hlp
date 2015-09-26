@@ -1599,7 +1599,7 @@ The following attack types are available:
 13. fire - physical fire like a torch
 14. vampire claws
 15. crush - animals or giants
-16. hit - normal punching (no weapon)
+16. hit - normal punching (no weapon, or disarmed physical weapon)
 17. magic fire - fireball
 18. lightning staff
 19. burn staff
@@ -1612,6 +1612,7 @@ The following attack types are available:
 26. tail swipe - animals
 27. peck - animals
 28. gore - animals
+29. mana blast - normal magical attack (e.g. disarmed mage)
 
 See also: OLC MOBILES
 #d
@@ -2498,7 +2499,7 @@ The following weapon types are available:
 13. fire - torch
 14. vampire claws
 15. crush - animals or giants
-16. hit - normal punching (no weapon)
+16. hit - normal punching (no weapon, or disarmed physical weapon)
 17. magic fire - fireball
 18. lightning staff
 19. burn staff
@@ -2511,6 +2512,7 @@ The following weapon types are available:
 26. tail swipe - animals
 27. peck - animals
 28. gore - animals
+29. mana blast - normal magical attack (e.g. disarmed mage)
 
 See also: OLC OBJECTS
 #d

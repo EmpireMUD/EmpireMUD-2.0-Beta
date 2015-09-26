@@ -453,7 +453,7 @@ extern bool skill_check(char_data *ch, int ability, int difficulty);
 #define TYPE_FIRE  12
 #define TYPE_VAMPIRE_CLAWS  13
 #define TYPE_CRUSH  14	// animal-only
-#define TYPE_HIT  15
+#define TYPE_HIT  15	// default physical
 #define TYPE_MAGIC_FIRE  16
 #define TYPE_LIGHTNING_STAFF  17
 #define TYPE_BURN_STAFF  18
@@ -466,8 +466,9 @@ extern bool skill_check(char_data *ch, int ability, int difficulty);
 #define TYPE_TAIL_SWIPE  25	// animal
 #define TYPE_PECK  26	// animal
 #define TYPE_GORE  27	// animal
+#define TYPE_MANA_BLAST  28	// default magical
 
-#define NUM_ATTACK_TYPES  28	// total
+#define NUM_ATTACK_TYPES  29	// total
 
 // helpfulment
 #define IS_WEAPON_TYPE(type) (((type) >= TYPE_RESERVED) && ((type) < TYPE_SUFFERING))
