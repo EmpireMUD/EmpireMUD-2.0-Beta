@@ -108,6 +108,10 @@ not have to type the target name -- it will target him automatically.
 
 If you are disarmed, you don't have to re-equip your weapon yourself. When
 the disarm affect wears off, it will still be in your <wield> slot.
+
+Disarmed foes lose their weapon damage, and will make basic unarmed 'hit'
+attacks (unless the disarmed weapon was a caster weapon, in which case they
+receive a basic 'mana blast' attack instead).
 #
 "DUAL-WIELD" "DUAL WIELD"
 
