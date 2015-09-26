@@ -1318,7 +1318,7 @@ Workforce types:
   &ydismantle-mines:&0 mines will be dismantled when empty.
   &yabandon-chopped:&0 NPCs will abandon a tile when they finish chopping.
   &yabandon-farmed:&0 NPCs will abandon a tile when they finish farming.
-  &cnexus crystals (skilled):&0 Will make nexus crystals at the sorcery tower;
+  &cnexus-crystal (skilled):&0 Will make nexus crystals at the sorcery tower;
      requires both Exarch Crafts and Skilled Labor.
   
 Items marked (skilled) require the Skilled Labor ability.
