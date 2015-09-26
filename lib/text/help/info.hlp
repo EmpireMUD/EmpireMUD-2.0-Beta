@@ -573,6 +573,89 @@ base move points at level 100 is based on your class. The easiest ways to get
 more move points at any level are to make a walking stick or a good pair of
 shoes.
 #
+MSDP "MUD SERVER DATA PROTOCOL" "MSDP VARIABLES" "MSDP VARS"
+
+MSDP is the Mud Server Data Protocol, a way for mud clients to receive out-of-
+band information (data not displayed in-game) on request. You can learn more
+about it by searching the internet for MSDP + your mud client, or at this
+website: http://tintin.sourceforge.net/msdp/index.php
+
+EmpireMUD supports the following MSDP variables:
+
+ ACCOUNT_NAME - The player's login name
+ CHARACTER_NAME - The character's full name
+ SERVER_ID - The name of the MUD
+ SNIPPET_VERSION - Version of KaVir's protocol snippet used for MSDP
+
+ HEALTH - Current health
+ HEALTH_MAX - Maximum health
+ HEALTH_REGEN - Health regained per 5 seconds
+ MANA - Current mana
+ MANA_MAX - Maximum mana
+ MANA_REGEN - Mana regained per 5 seconds
+ MOVEMENT - Current movement points
+ MOVEMENT_MAX - Maximum movement points
+ MOVEMENT_REGEN - Movement points regained per 5 seconds
+ BLOOD - Current blood points
+ BLOOD_MAX - Maximum blood pool
+ BLOOD_UPKEEP - Blood cost per game hour
+
+ AFFECTS - Table of current affects and durations (seconds)
+ DOTS - Damage Over Time affects in nested table format with:
+    Dot Name => (DURATION, TYPE, DAMAGE, STACKS)
+ COOLDOWNS - Table of cooldowns and their time remaining (seconds)
+ LEVEL - Total level
+ SKILL_LEVEL - Skill level
+ GEAR_LEVEL - Gear level
+ CRAFTING_LEVEL - Crafting level
+ CLASS - Character's class
+ SKILLS - Nested table format with:
+    Skill Name => (LEVEL, EXP, RESETS, NOSKILL)
+ MONEY - Total coins
+ BONUS_EXP - Daily bonus experience remaining
+ INVENTORY - Current inventory size
+ INVENTORY_MAX - Maximum inventory size
+
+ Current attributes: STR, DEX, CHA, GRT, INT, WIT
+ Natural attributes: STR_PERM, DEX_PERM, CHA_PERM, GRT_PERM, INT_PERM, WIT_PERM
+
+ BLOCK - Block rating
+ DODGE - Dodge rating (without dexterity)
+ TO_HIT - To-Hit rating (without dexterity)
+ SPEED - Current weapon attack speed (main hand)
+ RESIST_PHYSICAL - Amount of physical resistance
+ RESIST_MAGICAL - Amount of magical resistance
+ BONUS_PHYSICAL - Bonus physical damage
+ BONUS_MAGICAL - Bonus magical damage
+ BONUS_HEALING - Bonus healing
+ 
+ EMPIRE_NAME - Name of the character's empire
+ EMPIRE_ADJECTIVE - Empire's adjective
+ EMPIRE_RANK - Character's rank in the empire
+ EMPIRE_TERRITORY - Empire's current territory level
+ EMPIRE_TERRITORY_MAX - Empire's maximum territory
+ EMPIRE_TERRITORY_OUTSIDE - Empire's current out-of-city territory
+ EMPIRE_TERRITORY_OUTSIDE_MAX - Empire's maximum out-of-city territory
+ EMPIRE_WEALTH - Empire's total wealth
+ EMPIRE_SCORE - Empire's total score
+
+ OPPONENT_HEALTH - In combat, the opponent's health percent
+ OPPONENT_HEALTH_MAX - Always 100 (when in combat)
+ OPPONENT_LEVEL - In combat, the opponent's level
+ OPPONENT_NAME - In combat, the opponent's name
+
+ AREA_NAME - The name of the adventure, city, or island the player is in
+ ROOM - The room data array, see http://tintin.sourceforge.net/msdp/index.php
+ ROOM_EXITS - A table of vnums for each direction -- only indoors
+ ROOM_NAME - Name of the room the character is in
+ ROOM_VNUM - Virtual number of the room the character is in
+ WORLD_TIME - Current time (24-hour format)
+ WORLD_SEASON - Current season
+
+ The following GUI variables are provided, for a generic GUI:
+  BUTTON_1, BUTTON_2, BUTTON_3, BUTTON_4, BUTTON_5
+  GAUGE_1, GAUGE_2, GAUGE_3, GAUGE_4, GAUGE_5
+#
 MUDSTATS
 
 Usage:  mudstats <option>

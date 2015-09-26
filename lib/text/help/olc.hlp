@@ -928,7 +928,7 @@ The following flags are available:
  desert - a desert or a road that was built on desert
  river - a river tile
  jungle - any jungle tile
- * - UNUSED
+ not player made - can't be (e.g.) a river tile made by a player
  ocean - an ocean tile
  oasis - an oasis tile
  crops - any crop or seeded tile
@@ -963,7 +963,7 @@ The following flags are available:
  desert - a desert or a road that was built on desert
  river - a river tile
  jungle - any jungle tile
- * - UNUSED
+ not player made - can't be (e.g.) a river tile made by a player
  ocean - an ocean tile
  oasis - an oasis tile
  crops - *** do not use for buildon
@@ -3037,7 +3037,7 @@ Available flags:
  desert - a flat, arid sector
  river - a fresh-water sector
  jungle - any jungle tile
- * - 
+ not player made - DO NOT SET on .buildflags
  ocean - a salt-water tile
  oasis - an arid water source
  crops - any crop tile, should ONLY be used for 'buildfacing'
@@ -3097,6 +3097,10 @@ Available types ([value] isn't used unless specified):
     (value is the sector vnum that must be nearby).
  PLANTS-TO - Sector this one becomes when you start to plant a crop on it.
  MAGIC-GROWTH - Sector this one becomes if it is magically forced to grow.
+ NOT-ADJACENT - No matching sector within 1 tile (value is the sector vnum).
+ NOT-NEAR-SECTOR - No matching sector within 2 tiles (value is the sector
+    vnum).
+ 
 
 Examples:
  Jungle: .evolution add CHOPPED-DOWN 1 50% 28

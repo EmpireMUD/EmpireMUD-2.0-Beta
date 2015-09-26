@@ -682,13 +682,15 @@ bool affected_by_spell_and_apply(char_data *ch, int type, int apply) {
 * @param int location APPLY_x
 * @param int modifier +/- amount
 * @param bitvector_t bitvector AFF_x
+* @param char_data *cast_by The caster who made the effect (may be NULL; use the person themselves for penalty effects as those won't cleanse).
 * @return struct affected_type* The created af
 */
-struct affected_type *create_aff(int type, int duration, int location, int modifier, bitvector_t bitvector) {
+struct affected_type *create_aff(int type, int duration, int location, int modifier, bitvector_t bitvector, char_data *cast_by) {
 	struct affected_type *af;
 	
 	CREATE(af, struct affected_type, 1);
 	af->type = type;
+	af->cast_by = cast_by ? CAST_BY_ID(cast_by) : 0;
 	af->duration = duration;
 	af->modifier = modifier;
 	af->location = location;
@@ -705,14 +707,16 @@ struct affected_type *create_aff(int type, int duration, int location, int modif
 * @param sh_int damage_type DAM_x type.
 * @param sh_int damage How much damage to do per 5-seconds.
 * @param sh_int max_stack Number of times this can stack when re-applied before it expires.
+* @param sh_int char_data *cast_by The caster.
 */
-void apply_dot_effect(char_data *ch, sh_int type, sh_int duration, sh_int damage_type, sh_int damage, sh_int max_stack) {
+void apply_dot_effect(char_data *ch, sh_int type, sh_int duration, sh_int damage_type, sh_int damage, sh_int max_stack, char_data *cast_by) {
 	struct over_time_effect_type *iter, *dot;
 	bool found = FALSE;
+	int id = (cast_by ? CAST_BY_ID(cast_by) : 0);
 	
 	// first see if they already have one
 	for (iter = ch->over_time_effects; iter && !found; iter = iter->next) {
-		if (iter->type == type && iter->damage_type == damage_type && iter->damage == damage) {
+		if (iter->type == type && iter->cast_by == id && iter->damage_type == damage_type && iter->damage == damage) {
 			// refresh effect
 			iter->duration = MAX(iter->duration, duration);
 			if (iter->stack < MIN(iter->max_stack, max_stack)) {
@@ -728,6 +732,7 @@ void apply_dot_effect(char_data *ch, sh_int type, sh_int duration, sh_int damage
 		ch->over_time_effects = dot;
 		
 		dot->type = type;
+		dot->cast_by = id;
 		dot->duration = duration;
 		dot->damage_type = damage_type;
 		dot->damage = damage;
@@ -1213,6 +1218,7 @@ void char_to_room(char_data *ch, room_data *room) {
 	extern int determine_best_scale_level(char_data *ch, bool check_group);
 	extern struct instance_data *find_instance_by_room(room_data *room);
 	extern int lock_instance_level(room_data *room, int level);
+	void msdp_update_room(char_data *ch);
 	void spawn_mobs_from_center(room_data *center);
 	
 	int pos;
@@ -1260,6 +1266,9 @@ void char_to_room(char_data *ch, room_data *room) {
 		if (!IS_NPC(ch)) {
 			GET_LAST_ROOM(ch) = GET_ROOM_VNUM(room);
 		}
+		
+		// update location
+		msdp_update_room(ch);
 	}
 }
 
@@ -2081,6 +2090,28 @@ const char *money_desc(empire_data *type, int amount) {
 }
 
 
+/**
+* Returns the total amount of coin a player has, without regard to type.
+*
+* @param char_data *ch The player.
+* @return int The total number of coins.
+*/
+int total_coins(char_data *ch) {
+	struct coin_data *coin;
+	int total = 0;
+	
+	if (IS_NPC(ch)) {
+		return 0;
+	}
+	
+	for (coin = GET_PLAYER_COINS(ch); coin; coin = coin->next) {
+		SAFE_ADD(total, coin->amount, INT_MIN, INT_MAX, FALSE);
+	}
+
+	return total;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// COOLDOWN HANDLERS ///////////////////////////////////////////////////////
 
@@ -2185,7 +2216,13 @@ void remove_cooldown_by_type(char_data *ch, int type) {
 * @param room_data *room The room to abandon.
 */
 void abandon_room(room_data *room) {
+	void clear_private_owner(int id);
+	
 	room_data *iter, *next_iter, *home = HOME_ROOM(room);
+	
+	if (ROOM_PRIVATE_OWNER(room) != NOBODY) {
+		clear_private_owner(ROOM_PRIVATE_OWNER(room));
+	}
 	
 	perform_abandon_room(room);
 
@@ -2822,12 +2859,17 @@ struct help_index_element *find_help_entry(int level, const char *word) {
 
 			if (bot > top) {
 				return NULL;
-				}
+			}
 			else if (!(chk = strn_cmp(word, help_table[mid].keyword, minlen))) {
 				/* trace backwards to find first matching entry. Thanks Jeff Fink! */
 				while ((mid > 0) && (!(chk = strn_cmp(word, help_table[mid - 1].keyword, minlen)))) {
-					mid--;
+					--mid;
 				}
+				// now iterate forward to find the first matching entry the player can use
+				while (mid < top && help_table[mid].level > level && !(chk = strn_cmp(word, help_table[mid + 1].keyword, minlen))) {
+					++mid;
+				}
+				
 				if (level < help_table[mid].level) {
 					return NULL;
 				}
@@ -5285,10 +5327,12 @@ struct empire_storage_data *find_stored_resource(empire_data *emp, int island, o
 *
 * @param empire_data *emp The empire to check.
 * @param obj_vnum vnum The item to look for.
+* @param bool count_shipping If TRUE, also count items in the shipping system.
 * @return int The total number the empire has stored.
 */
-int get_total_stored_count(empire_data *emp, obj_vnum vnum) {
+int get_total_stored_count(empire_data *emp, obj_vnum vnum, bool count_shipping) {
 	struct empire_storage_data *sto;
+	struct shipping_data *shipd;
 	int count = 0;
 	
 	if (!emp) {
@@ -5297,7 +5341,15 @@ int get_total_stored_count(empire_data *emp, obj_vnum vnum) {
 	
 	for (sto = EMPIRE_STORAGE(emp); sto; sto = sto->next) {
 		if (sto->vnum == vnum) {
-			count += sto->amount;
+			SAFE_ADD(count, sto->amount, INT_MIN, INT_MAX, TRUE);
+		}
+	}
+	
+	if (count_shipping) {
+		for (shipd = EMPIRE_SHIPPING_LIST(emp); shipd; shipd = shipd->next) {
+			if (shipd->vnum == vnum) {
+				SAFE_ADD(count, shipd->amount, INT_MIN, INT_MAX, TRUE);
+			}
 		}
 	}
 	

@@ -53,6 +53,7 @@
 // by searching for CONST_PREFIX_x (e.g. WEAR_x for wear flags).
 
 
+#include "protocol.h" // needed by everything
 #include "uthash.h"	// needed by everything
 
  //////////////////////////////////////////////////////////////////////////////
@@ -397,7 +398,7 @@ typedef struct trig_data trig_data;
 #define BLD_ON_DESERT  BIT(4)
 #define BLD_ON_RIVER  BIT(5)
 #define BLD_ON_JUNGLE  BIT(6)
-	#define BLD_ON_UNUSED2  BIT(7)
+#define BLD_ON_NOT_PLAYER_MADE  BIT(7)
 #define BLD_ON_OCEAN  BIT(8)
 #define BLD_ON_OASIS  BIT(9)
 #define BLD_FACING_CROP  BIT(10)	// use only for facing, not for on
@@ -765,6 +766,7 @@ typedef struct trig_data trig_data;
 
 
 // misc game configs
+#define ACTION_CYCLE_TIME  6	// seconds per action tick (before haste) -- TODO should this be a config?
 #define SKILLS_PER_CLASS  2	// number of skills that makes up a combo class
 #define HISTORY_SIZE  5	// Keep last 5 commands.
 
@@ -776,10 +778,10 @@ typedef struct trig_data trig_data;
 
 
 // Variables for the output buffering system
-#define MAX_SOCK_BUF  (12 * 1024)	// Size of kernel's sock buf
+#define MAX_SOCK_BUF  (24 * 1024)	// Size of kernel's sock buf
 #define MAX_PROMPT_LENGTH  256	// Max length of rendered prompt
 #define GARBAGE_SPACE  32	// Space for **OVERFLOW** etc
-#define SMALL_BUFSIZE  4096	// Static output buffer size
+#define SMALL_BUFSIZE  8192	// Static output buffer size
 // Max amount of output that can be buffered
 #define LARGE_BUFSIZE  (MAX_SOCK_BUF - GARBAGE_SPACE - MAX_PROMPT_LENGTH)
 
@@ -1078,9 +1080,15 @@ typedef struct trig_data trig_data;
 #define ACT_READING			33
 #define ACT_COPYING_BOOK	34
 #define ACT_GEN_CRAFT		35
+#define ACT_SAILING			36
 
 // act flags
-#define ACT_ANYWHERE	BIT(0)
+#define ACTF_ANYWHERE  BIT(0)	// movement won't break it
+#define ACTF_HASTE  BIT(1)	// haste increases speed
+#define ACTF_FAST_CHORES  BIT(2)  // fast-chores increases speed
+#define ACTF_SHOVEL  BIT(3)	// shovel increases speed
+#define ACTF_FINDER  BIT(4)	// finder increases speed
+#define ACTF_ALWAYS_FAST  BIT(5)	// this action is always faster
 
 
 // bonus traits
@@ -1121,7 +1129,7 @@ typedef struct trig_data trig_data;
 #define CON_NEWPASSWD  5	// Give me a password for x
 #define CON_CNFPASSWD  6	// Please retype password:
 #define CON_QSEX  7	// Sex?
-#define CON_QCOLOR  8	// Color, anyone?
+	#define CON_UNUSED1  8
 #define CON_RMOTD  9	// PRESS RETURN after MOTD
 #define CON_DISCONNECT  10	// In-game disconnection
 #define CON_REFERRAL  11	// referral
@@ -1288,7 +1296,7 @@ typedef struct trig_data trig_data;
 #define PRF_MORTLOG  BIT(6)	// Views mortlogs, default: ON
 #define PRF_NOREPEAT  BIT(7)	// No repetition of comm commands
 #define PRF_HOLYLIGHT  BIT(8)	// Immortal: Can see in dark
-#define PRF_COLOR  BIT(9)	// Color
+	#define PRF_UNUSED1  BIT(9)
 #define PRF_NOWIZ  BIT(10)	// Can't hear wizline
 #define PRF_NOMAPCOL  BIT(11)	// Map is not colored
 #define PRF_NOHASSLE  BIT(12)	// Ignored by mobs and triggers
@@ -1464,7 +1472,9 @@ typedef struct trig_data trig_data;
 #define EVO_NEAR_SECTOR  7	// called when within 2 tiles of [value=sector]
 #define EVO_PLANTS_TO  8	// set when someone plants [no value]
 #define EVO_MAGIC_GROWTH  9	// called when Chant of Nature or similar is called
-#define NUM_EVOS  10	// total
+#define EVO_NOT_ADJACENT  10	// called when NOT adjacent to at least 1 of [value=sector]
+#define EVO_NOT_NEAR_SECTOR  11 // called when NOT within 2 tiles of [value=sector]
+#define NUM_EVOS  12	// total
 
 // evolution value types
 #define EVO_VAL_NONE  0
@@ -1532,6 +1542,7 @@ typedef struct trig_data trig_data;
 #define ROOM_EXTRA_QUARRY_WORKFORCE_PROGRESS  12
 #define ROOM_EXTRA_BUILD_RECIPE  13
 #define ROOM_EXTRA_FOUND_TIME  14
+#define ROOM_EXTRA_REDESIGNATE_TIME  15
 
 
 // number of different appearances
@@ -1570,6 +1581,7 @@ typedef struct trig_data trig_data;
 #define MAX_SKILL_RESETS  10	// number of skill resets you can save up
 #define MAX_STORAGE  1000000	// empire storage cap, must be < MAX_INT
 #define MAX_STRING_LENGTH  8192
+#define COLREDUC_SIZE  80	// how many characters long a color_reducer string can be
 
 
 // limits used in char_file_u -- **DO NOT CHANGE** (without a pconvert)
@@ -2102,6 +2114,19 @@ struct txt_q {
 };
 
 
+// for descriptor_data, reducing the number of color codes sent to a client
+struct color_reducer {
+	char last_fg[COLREDUC_SIZE];	// last sent foreground
+	char last_bg[COLREDUC_SIZE];	//   " background
+	bool is_underline;	// TRUE if an underline was sent
+	bool is_clean;	// TRUE if a clean code was sent
+	char want_fg[COLREDUC_SIZE];	// last requested (not yet sent) foreground
+	char want_bg[COLREDUC_SIZE];	//   " background
+	bool want_clean;	// TRUE if an &0 or &n color-terminator was requested
+	bool want_underline;	// TRUE if an underline was requested
+};
+
+
 // descriptors -- the connection to the game
 struct descriptor_data {
 	socket_t descriptor;	// file descriptor for socket
@@ -2117,7 +2142,10 @@ struct descriptor_data {
 	char **showstr_vector;	// for paging through texts
 	int showstr_count;	// number of pages to page through
 	int showstr_page;	// which page are we currently showing?
-
+	
+	protocol_t *pProtocol; // see protocol.c
+	struct color_reducer color;
+	
 	char **str;	// for the modify-str system
 	char *backstr;	// for the modify-str aborts
 	char *file_storage;	// name of where to save a file
@@ -2138,7 +2166,6 @@ struct descriptor_data {
 	bool data_left_to_write;	// indicates there is more data to write, to prevent an extra crlf
 	struct txt_block *large_outbuf;	// ptr to large buffer, if we need it
 	struct txt_q input;	// q of unprocessed input
-	char last_color_sent;  // the last color code that actually transmitted
 
 	char_data *character;	// linked to char
 	char_data *original;	// original char if switched
@@ -2258,7 +2285,7 @@ struct player_special_data_saved {
 
 	// action info
 	int action;	// ACT_x
-	int action_rotation;	// used to keep all player actions from happening on the same tick
+	int action_cycle;	// time left before an action tick
 	int action_timer;	// ticks to completion (use varies)
 	room_vnum action_room;	// player location
 	int action_vnum[NUM_ACTION_VNUMS];	// slots for storing action data (use varies)
@@ -2662,6 +2689,7 @@ struct crop_data {
 struct action_data_struct {
 	char *name;	// shown e.g. in sentences or prompt ("digging")
 	char *long_desc;	// shown in room (action description)
+	bitvector_t flags;	// ACTF_x flags
 	void (*process_function)(char_data *ch);	// called on ticks (may be NULL)
 	void (*cancel_function)(char_data *ch);	// called when the action is cancelled early (may be NULL)
 };
@@ -2832,7 +2860,7 @@ struct toggle_data_type {
 	int type;	// TOG_ONOFF, TOG_OFFON
 	bitvector_t bit;	// PRF_x
 	int level;	// required level to see/use toggle
-	void (*notify_func)(char_data *ch);	// optional function to alert changes
+	void (*callback_func)(char_data *ch);	// optional function to alert changes
 };
 
 

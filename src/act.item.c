@@ -743,12 +743,12 @@ static bool perform_get_from_container(char_data *ch, obj_data *obj, obj_data *c
 			return FALSE;
 		}		
 	}
+	if (IS_CARRYING_N(ch) + GET_OBJ_INVENTORY_SIZE(obj) > CAN_CARRY_N(ch)) {
+		act("$p: you can't hold any more items.", FALSE, ch, obj, 0, TO_CHAR);
+		return FALSE;
+	}
 	if (mode == FIND_OBJ_INV || can_take_obj(ch, obj)) {
-		if (IS_CARRYING_N(ch) + GET_OBJ_INVENTORY_SIZE(obj) > CAN_CARRY_N(ch)) {
-			act("$p: you can't hold any more items.", FALSE, ch, obj, 0, TO_CHAR);
-			return FALSE;
-		}
-		else if (get_otrigger(obj, ch)) {
+		if (get_otrigger(obj, ch)) {
 			// last-minute scaling: scale to its minimum (adventures will override this on their own)
 			scale_item_to_level(obj, GET_OBJ_MIN_SCALE_LEVEL(obj));
 			
@@ -770,7 +770,7 @@ static bool perform_get_from_container(char_data *ch, obj_data *obj, obj_data *c
 			return TRUE;
 		}
 	}
-	return FALSE;
+	return TRUE;	// return TRUE even though it failed -- don't break "get all" loops
 }
 
 
@@ -856,6 +856,10 @@ static bool perform_get_from_room(char_data *ch, obj_data *obj) {
 			return FALSE;
 		}
 	}
+	if (IS_CARRYING_N(ch) + GET_OBJ_INVENTORY_SIZE(obj) > CAN_CARRY_N(ch)) {
+		act("$p: you can't hold any more items.", FALSE, ch, obj, 0, TO_CHAR);
+		return FALSE;
+	}
 	if (can_take_obj(ch, obj) && get_otrigger(obj, ch)) {
 		// last-minute scaling: scale to its minimum (adventures will override this on their own)
 		scale_item_to_level(obj, GET_OBJ_MIN_SCALE_LEVEL(obj));
@@ -877,7 +881,7 @@ static bool perform_get_from_room(char_data *ch, obj_data *obj) {
 		get_check_money(ch, obj);
 		return TRUE;
 	}
-	return FALSE;
+	return TRUE;	// return TRUE even though it failed -- don't break "get all" loops
 }
 
 
@@ -1664,8 +1668,11 @@ room_data *find_docks(empire_data *emp, int island_id) {
 */
 obj_data *find_free_ship(empire_data *emp, struct shipping_data *shipd) {
 	struct empire_territory_data *ter;
+	struct shipping_data *iter;
+	bool already_used;
 	obj_data *obj;
 	room_data *in_ship;
+	int capacity;
 	
 	if (!emp || shipd->from_island == NO_ISLAND) {
 		return NULL;
@@ -1699,6 +1706,24 @@ obj_data *find_free_ship(empire_data *emp, struct shipping_data *shipd) {
 			if (ROOM_AFF_FLAGGED(in_ship, ROOM_AFF_NO_WORK)) {
 				continue;
 			}
+			
+			// calculate capacity to see if it's full, and check if it's already used for a different island
+			capacity = 0;
+			already_used = FALSE;
+			for (iter = EMPIRE_SHIPPING_LIST(emp); iter && !already_used; iter = iter->next) {
+				if (iter->ship_homeroom == GET_SHIP_MAIN_ROOM(obj)) {
+					capacity += iter->amount;
+					if (iter->from_island != shipd->from_island || iter->to_island != shipd->to_island) {
+						already_used = TRUE;
+					}
+				}
+			}
+			if (already_used || capacity >= ship_data[GET_SHIP_TYPE(obj)].cargo_size) {
+				// ship full or in use
+				continue;
+			}
+			
+			// ensure no players on board
 			if (!ship_is_empty(obj)) {
 				continue;
 			}
@@ -1854,15 +1879,18 @@ void process_shipping_one(empire_data *emp) {
 	struct shipping_data *shipd, *next_shipd;
 	obj_data *last_ship = NULL;
 	bool full, changed = FALSE;
+	int last_from = NO_ISLAND, last_to = NO_ISLAND;
 	
 	for (shipd = EMPIRE_SHIPPING_LIST(emp); shipd; shipd = next_shipd) {
 		next_shipd = shipd->next;
 		
 		switch (shipd->status) {
 			case SHIPPING_QUEUED: {
-				if (!last_ship) {
+				if (!last_ship || last_from != shipd->from_island || last_to != shipd->to_island) {
 					// attempt to find a(nother) ship
 					last_ship = find_free_ship(emp, shipd);
+					last_from = shipd->from_island;
+					last_to = shipd->to_island;
 				}
 				
 				// this only works if we found a ship to use (or had a free one)
@@ -1895,9 +1923,17 @@ void process_shipping_one(empire_data *emp) {
 		}
 	}
 	
-	// did we have an unsailed ship?
-	if (last_ship) {
-		sail_shipment(emp, last_ship);
+	// check for unsailed ships
+	for (shipd = EMPIRE_SHIPPING_LIST(emp); shipd; shipd = next_shipd) {
+		next_shipd = shipd->next;
+		
+		if (shipd->status == SHIPPING_QUEUED && shipd->ship_homeroom != NOWHERE) {
+			room_data *deck = real_room(shipd->ship_homeroom);
+			obj_data *boat = deck ? GET_BOAT(deck) : NULL;
+			if (boat) {
+				sail_shipment(emp, boat);
+			}
+		}
 	}
 	
 	if (changed) {
@@ -2459,6 +2495,12 @@ void trade_post(char_data *ch, char *argument) {
 	}
 	else if (IS_STOLEN(obj)) {
 		msg_to_char(ch, "You can't post stolen items.\r\n");
+	}
+	else if (OBJ_FLAGGED(obj, OBJ_JUNK)) {
+		msg_to_char(ch, "You can't post junk for sale.\r\n");
+	}
+	else if (GET_OBJ_TIMER(obj) > 0) {
+		msg_to_char(ch, "You can't post items with timers on them for sale.\r\n");
 	}
 	else if ((cost = atoi(costarg)) < 1) {
 		msg_to_char(ch, "You must charge at least 1 coin.\r\n");
@@ -4515,7 +4557,7 @@ ACMD(do_ship) {
 		}
 		
 		if (!done) {
-			size += snprintf(buf + size, sizeof(buf) - size, " nothing");
+			size += snprintf(buf + size, sizeof(buf) - size, " nothing\r\n");
 		}
 		
 		page_string(ch->desc, buf, TRUE);

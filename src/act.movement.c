@@ -685,7 +685,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 	/* move points needed is avg. move loss for src and destination sect type */
 	need_movement = move_cost(ch, IN_ROOM(ch), to_room, dir, mode);
 
-	if (GET_MOVE(ch) < need_movement && !IS_NPC(ch)) {
+	if (GET_MOVE(ch) < need_movement && !IS_IMMORTAL(ch) && !IS_NPC(ch)) {
 		if (need_specials_check && ch->master)
 			send_to_char("You are too exhausted to follow.\r\n", ch);
 		else
@@ -714,7 +714,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 	}
 
 	/* Now we know we're allowed to go into the room. */
-	if (GET_ACCESS_LEVEL(ch) < LVL_GOD && !IS_NPC(ch))
+	if (!IS_IMMORTAL(ch) && !IS_NPC(ch))
 		GET_MOVE(ch) -= need_movement;
 
 	REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDE);
@@ -1142,7 +1142,7 @@ ACMD(do_circle) {
 	// check costs
 	need_movement = move_cost(ch, IN_ROOM(ch), found_room, dir, MOVE_NORMAL);
 	
-	if (GET_MOVE(ch) < need_movement) {
+	if (GET_MOVE(ch) < need_movement && !IS_IMMORTAL(ch) && !IS_NPC(ch)) {
 		msg_to_char(ch, "You're too tired to circle that way.\r\n");
 		return;
 	}
@@ -1159,7 +1159,9 @@ ACMD(do_circle) {
 	}
 
 	// work
-	GET_MOVE(ch) -= need_movement;
+	if (!IS_IMMORTAL(ch) && !IS_NPC(ch)) {
+		GET_MOVE(ch) -= need_movement;
+	}
 	char_from_room(ch);
 	char_to_room(ch, found_room);
 	
@@ -1420,6 +1422,13 @@ ACMD(do_lead) {
 ACMD(do_move) {
 	extern int get_north_for_char(char_data *ch);
 	extern const int confused_dirs[NUM_SIMPLE_DIRS][2][NUM_OF_DIRS];
+	
+	// this blocks normal moves but not flee
+	if (is_fighting(ch)) {
+		msg_to_char(ch, "You can't move while fighting!\r\n");
+		return;
+	}
+	
 	perform_move(ch, confused_dirs[get_north_for_char(ch)][0][subcmd], FALSE, MOVE_NORMAL);
 }
 

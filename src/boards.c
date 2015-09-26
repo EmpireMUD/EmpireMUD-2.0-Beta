@@ -158,6 +158,11 @@ ACMD(do_read) {
 	
 	one_argument(argument, arg);
 	
+	if (!*arg) {
+		msg_to_char(ch, "Read what?\r\n");
+		return;
+	}
+	
 	// try to find a book or mail in inventory
 	if (*argument && (obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
 		if (IS_BOOK(obj)) {

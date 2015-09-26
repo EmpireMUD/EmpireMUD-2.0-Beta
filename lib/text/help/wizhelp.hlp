@@ -667,7 +667,6 @@ drunk          BOTH    MISC         Drunkenness
 hunger         BOTH    MISC         Hunger level
 thirst         BOTH    MISC         Thirst level
 
-color          PC      BINARY       Color preference
 deleted        PC      BINARY       Player deleted
 frozen         PC      BINARY       Player is frozen
 ipmask         PC      BINARY       IP address is hidden

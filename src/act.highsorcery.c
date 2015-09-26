@@ -470,7 +470,7 @@ void start_ritual(char_data *ch, int ritual) {
 	// first message
 	send_ritual_messages(ch, ritual, 0);
 	
-	start_action(ch, ACT_RITUAL, 0, NOBITS);
+	start_action(ch, ACT_RITUAL, 0);
 	GET_ACTION_VNUM(ch, 0) = ritual;
 }
 
@@ -711,7 +711,7 @@ ACMD(do_colorburst) {
 		
 		amt = CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_COLORBURST) - GET_INTELLIGENCE(ch);
 	
-		af = create_mod_aff(ATYPE_COLORBURST, 6, APPLY_TO_HIT, amt);
+		af = create_mod_aff(ATYPE_COLORBURST, 6, APPLY_TO_HIT, amt, ch);
 		affect_join(vict, af, 0);
 
 		engage_combat(ch, vict, FALSE);
@@ -1043,9 +1043,9 @@ ACMD(do_enervate) {
 		act("$n shouts somthing at you... The world takes on a reddish hue and you feel your stamina drain.", FALSE, ch, NULL, vict, TO_VICT);
 		act("$n shouts some kind of hex at $N, who starts to glow red and seems weakened!", FALSE, ch, NULL, vict, TO_NOTVICT);
 	
-		af = create_mod_aff(ATYPE_ENERVATE, 1 MUD_HOURS, APPLY_MOVE_REGEN, -1 * GET_INTELLIGENCE(ch) / 2);
+		af = create_mod_aff(ATYPE_ENERVATE, 1 MUD_HOURS, APPLY_MOVE_REGEN, -1 * GET_INTELLIGENCE(ch) / 2, ch);
 		affect_join(vict, af, 0);
-		af2 = create_mod_aff(ATYPE_ENERVATE_GAIN, 1 MUD_HOURS, APPLY_MOVE_REGEN, CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_ENERVATE));
+		af2 = create_mod_aff(ATYPE_ENERVATE_GAIN, 1 MUD_HOURS, APPLY_MOVE_REGEN, CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_ENERVATE), ch);
 		affect_join(ch, af2, 0);
 
 		engage_combat(ch, vict, FALSE);
@@ -1088,7 +1088,7 @@ ACMD(do_foresight) {
 		
 		amt = CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_FORESIGHT) + GET_INTELLIGENCE(ch);
 		
-		af = create_mod_aff(ATYPE_FORESIGHT, 12 MUD_HOURS, APPLY_DODGE, amt);
+		af = create_mod_aff(ATYPE_FORESIGHT, 12 MUD_HOURS, APPLY_DODGE, amt, ch);
 		affect_join(vict, af, 0);
 		
 		gain_ability_exp(ch, ABIL_FORESIGHT, 15);
@@ -1126,9 +1126,9 @@ ACMD(do_manashield) {
 		
 		amt = CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_MANASHIELD) + (GET_INTELLIGENCE(ch) / 3);
 		
-		af1 = create_mod_aff(ATYPE_MANASHIELD, 24 MUD_HOURS, APPLY_MANA, -25);
-		af2 = create_mod_aff(ATYPE_MANASHIELD, 24 MUD_HOURS, APPLY_RESIST_PHYSICAL, amt);
-		af3 = create_mod_aff(ATYPE_MANASHIELD, 24 MUD_HOURS, APPLY_RESIST_MAGICAL, amt);
+		af1 = create_mod_aff(ATYPE_MANASHIELD, 24 MUD_HOURS, APPLY_MANA, -25, ch);
+		af2 = create_mod_aff(ATYPE_MANASHIELD, 24 MUD_HOURS, APPLY_RESIST_PHYSICAL, amt, ch);
+		af3 = create_mod_aff(ATYPE_MANASHIELD, 24 MUD_HOURS, APPLY_RESIST_MAGICAL, amt, ch);
 		affect_join(ch, af1, 0);
 		affect_join(ch, af2, 0);
 		affect_join(ch, af3, 0);
@@ -1378,10 +1378,10 @@ ACMD(do_siphon) {
 		act("$n shouts something at you... The world takes on a violet glow and you feel your mana siphoned away.", FALSE, ch, NULL, vict, TO_VICT);
 		act("$n shouts some kind of hex at $N, who starts to glow violet as mana flows away from $S skin!", FALSE, ch, NULL, vict, TO_NOTVICT);
 
-		af = create_mod_aff(ATYPE_SIPHON, 4, APPLY_MANA_REGEN, CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_SIPHON));
+		af = create_mod_aff(ATYPE_SIPHON, 4, APPLY_MANA_REGEN, CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_SIPHON), ch);
 		affect_join(ch, af, 0);
 		
-		af = create_mod_aff(ATYPE_SIPHON_DRAIN, 4, APPLY_MANA_REGEN, -1 * CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_SIPHON));
+		af = create_mod_aff(ATYPE_SIPHON_DRAIN, 4, APPLY_MANA_REGEN, -1 * CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_SIPHON), ch);
 		affect_join(vict, af, 0);
 
 		engage_combat(ch, vict, FALSE);
@@ -1446,7 +1446,7 @@ ACMD(do_slow) {
 		act("$n shouts something at you... The world takes on a gray tone and you more lethargic.", FALSE, ch, NULL, vict, TO_VICT);
 		act("$n shouts some kind of hex at $N, who starts to move sluggishly and starts to glow gray!", FALSE, ch, NULL, vict, TO_NOTVICT);
 	
-		af = create_flag_aff(ATYPE_SLOW, CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_SLOW), AFF_SLOW);
+		af = create_flag_aff(ATYPE_SLOW, CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_SLOW), AFF_SLOW, ch);
 		affect_join(vict, af, 0);
 
 		engage_combat(ch, vict, FALSE);
@@ -1524,7 +1524,8 @@ ACMD(do_vigor) {
 		
 		GET_MOVE(vict) = MIN(GET_MAX_MOVE(vict), GET_MOVE(vict) + gain);
 		
-		af = create_mod_aff(ATYPE_VIGOR, 1 MUD_HOURS, APPLY_MOVE_REGEN, -5);
+		// the cast_by on this is vict himself, because it is a penalty and this will block cleanse
+		af = create_mod_aff(ATYPE_VIGOR, 1 MUD_HOURS, APPLY_MOVE_REGEN, -5, vict);
 		affect_join(vict, af, 0);
 		
 		gain_ability_exp(ch, ABIL_VIGOR, 33.4);
@@ -1555,7 +1556,7 @@ RITUAL_FINISH_FUNC(perform_ritual_of_burdens) {
 	msg_to_char(ch, "You feel the weight of the world lift from your shoulders!\r\n");
 	act("$n seems uplifted!", FALSE, ch, NULL, NULL, TO_ROOM);
 	
-	af = create_mod_aff(ATYPE_UNBURDENED, 24 MUD_HOURS, APPLY_INVENTORY, CHOOSE_BY_ABILITY_LEVEL(burden_levels, ch, ABIL_RITUAL_OF_BURDENS));
+	af = create_mod_aff(ATYPE_UNBURDENED, 24 MUD_HOURS, APPLY_INVENTORY, CHOOSE_BY_ABILITY_LEVEL(burden_levels, ch, ABIL_RITUAL_OF_BURDENS), ch);
 	affect_join(ch, af, 0);	
 	
 	gain_ability_exp(ch, ABIL_RITUAL_OF_BURDENS, 25);
@@ -1690,7 +1691,7 @@ RITUAL_FINISH_FUNC(perform_phoenix_rite) {
 	msg_to_char(ch, "The flames on the remaining candles shoot toward you and form the crest of the Phoenix!\r\n");
 	act("The flames on the remaining candles shoot toward $n and form a huge fiery bird around $m!", FALSE, ch, NULL, NULL, TO_ROOM);
 
-	af = create_mod_aff(ATYPE_PHOENIX_RITE, UNLIMITED, APPLY_NONE, 0);
+	af = create_mod_aff(ATYPE_PHOENIX_RITE, UNLIMITED, APPLY_NONE, 0, ch);
 	affect_join(ch, af, 0);
 
 	gain_ability_exp(ch, ABIL_PHOENIX_RITE, 10);
@@ -1985,13 +1986,28 @@ RITUAL_FINISH_FUNC(perform_devastation_ritual) {
 		}
 		else if (ROOM_SECT_FLAGGED(to_room, SECTF_CROP) && (cp = crop_proto(ROOM_CROP_TYPE(to_room))) && has_interaction(GET_CROP_INTERACTIONS(cp), INTERACT_HARVEST)) {
 			run_room_interactions(ch, to_room, INTERACT_HARVEST, devastate_crop);
-			change_terrain(to_room, climate_default_sector[GET_CROP_CLIMATE(cp)]);
+			
+			// check for original sect, which may have been stored
+			if (ROOM_ORIGINAL_SECT(to_room) != SECT(to_room)) {
+				change_terrain(to_room, GET_SECT_VNUM(ROOM_ORIGINAL_SECT(to_room)));
+			}
+			else {
+				// fallback sect
+				change_terrain(to_room, climate_default_sector[GET_CROP_CLIMATE(cp)]);
+			}
 		}
 		else if (ROOM_SECT_FLAGGED(to_room, SECTF_HAS_CROP_DATA) && (cp = crop_proto(ROOM_CROP_TYPE(to_room)))) {
 			msg_to_char(ch, "You devastate the seeded field!\r\n");
 			act("$n's powerful ritual devastates the seeded field!", FALSE, ch, NULL, NULL, TO_ROOM);
 			
-			change_terrain(to_room, climate_default_sector[GET_CROP_CLIMATE(cp)]);
+			// check for original sect, which may have been stored
+			if (ROOM_ORIGINAL_SECT(to_room) != SECT(to_room)) {
+				change_terrain(to_room, GET_SECT_VNUM(ROOM_ORIGINAL_SECT(to_room)));
+			}
+			else {
+				// fallback sect
+				change_terrain(to_room, climate_default_sector[GET_CROP_CLIMATE(cp)]);
+			}
 		}
 		else {
 			msg_to_char(ch, "The Devastation Ritual has failed.\r\n");
@@ -2163,5 +2179,5 @@ ACMD(do_study) {
 	msg_to_char(ch, "You pick up a book to study.\r\n");
 	act("$n picks up a book to study.", FALSE, ch, NULL, NULL, TO_ROOM);
 	
-	start_action(ch, ACT_STUDYING, 0, 0);
+	start_action(ch, ACT_STUDYING, 0);
 }

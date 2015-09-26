@@ -1510,7 +1510,7 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 * @param bool show_zero Forces an amount of 0, in case this is only being shown for the "total" reference and there are actually 0 here.
 */
 void show_one_stored_item_to_char(char_data *ch, empire_data *emp, struct empire_storage_data *store, bool show_zero) {
-	int total = get_total_stored_count(emp, store->vnum);
+	int total = get_total_stored_count(emp, store->vnum, TRUE);
 	char lbuf[MAX_INPUT_LENGTH];
 	
 	if (total > store->amount || show_zero) {
@@ -1846,8 +1846,8 @@ ACMD(do_helpsearch) {
 	bool found;
 	size_t size;
 	
-	// this removes leading filler words, which are going to show up in a lot of helps
-	one_argument(argument, arg);
+	delete_doubledollar(argument);
+	one_argument(argument, arg);	// this removes leading filler words, which are going to show up in a lot of helps
 	
 	if (!ch->desc) {
 		// don't bother
@@ -1946,8 +1946,8 @@ ACMD(do_look) {
 }
 
 
-ACMD(do_mapsize) {	
-	int size, cur;
+ACMD(do_mapsize) {
+	int size;
 	
 	// NOTE: player picks the total size, but we store it as distance
 	
@@ -1957,13 +1957,18 @@ ACMD(do_mapsize) {
 		return;
 	}
 	
-	cur = GET_MAPSIZE(ch);
-	if (cur == 0) {
-		cur = config_get_int("default_map_size");
-	}
-	
 	if (!*argument) {
-		msg_to_char(ch, "Current map size: %d\r\n", cur * 2 + 1);
+		if (GET_MAPSIZE(ch) > 0) {
+			msg_to_char(ch, "Current map size: %d\r\n", GET_MAPSIZE(ch) * 2 + 1);
+		}
+		else {
+			msg_to_char(ch, "Your map size is set to automatic.\r\n");
+		}
+	}
+	else if (!str_cmp(argument, "auto")) {
+		GET_MAPSIZE(ch) = 0;
+		msg_to_char(ch, "Your map size is now automatic.\r\n");
+	
 	}
 	else if ((size = atoi(argument)) < 3 || size > (config_get_int("max_map_size") * 2 + 1)) {
 		msg_to_char(ch, "You must choose a size between 3 and %d.\r\n", config_get_int("max_map_size") * 2 + 1);

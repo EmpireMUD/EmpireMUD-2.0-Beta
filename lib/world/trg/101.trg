@@ -105,12 +105,12 @@ Swamp Rat combat~
 ~
 wait 10
 %echo% %self.name% bites deep!
-%send %actor% You dont feel so good...
+%send% %actor% You don't feel so good...
 %echoaround% %actor% %actor.name% doesnt look so good...
 %dot% %actor% 200 30
 ~
 #10105
-Berk comabt~
+Berk combat~
 0 k 15
 ~
 if !%actor.affect(disarm)%

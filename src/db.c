@@ -1479,6 +1479,8 @@ const char *versions_list[] = {
 	// this system was added in b2.5
 	"b2.5",
 	"b2.7",
+	"b2.8",
+	"b2.9",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -1526,10 +1528,18 @@ void write_last_boot_version(int version) {
 }
 
 
+// 2.8 removes the color preference
+PLAYER_UPDATE_FUNC(b2_8_update_players) {
+	REMOVE_BIT(PRF_FLAGS(ch), BIT(9));	// was PRF_COLOR
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
 void check_version(void) {
+	void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func));
+	
 	int last, iter, current = NOTHING;
 	
 	#define MATCH_VERSION(name)  (!str_cmp(versions_list[iter], name))
@@ -1553,6 +1563,37 @@ void check_version(void) {
 				// auto-balance was removed and the same id was used for dismantle-mines
 				EMPIRE_CHORE(emp, CHORE_DISMANTLE_MINES) = FALSE;
 				save_empire(emp);
+			}
+		}
+		if (MATCH_VERSION("b2.8")) {
+			log("Applying b2.8 update to players...");
+			update_all_players(NULL, b2_8_update_players);
+		}
+		if (MATCH_VERSION("b2.9")) {
+			log("Applying b2.9 update to crops...");
+			// this is actually a bug that occurred on EmpireMUDs that patched
+			// b2.8 on a live copy; this will look for tiles that are in an
+			// error state -- crops that were in the 'seeded' state during the
+			// b2.8 reboot would have gotten bad original-sect data
+			room_data *room, *next_room;
+			HASH_ITER(world_hh, world_table, room, next_room) {
+				if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && SECT_FLAGGED(ROOM_ORIGINAL_SECT(room), SECTF_HAS_CROP_DATA) && !SECT_FLAGGED(ROOM_ORIGINAL_SECT(room), SECTF_CROP)) {
+					// normal case: crop with a 'Seeded' original sect
+					// the fix is just to set the original sect to the current
+					// sect so it will detect a new sect on-harvest instead of
+					// setting it back to seeded
+					ROOM_ORIGINAL_SECT(room) = SECT(room);
+				}
+				else if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && !ROOM_SECT_FLAGGED(room, SECTF_CROP) && SECT(room) == ROOM_ORIGINAL_SECT(room)) {
+					// second error case: a Seeded crop with itself as its
+					// original sect: detect a new original sect
+					extern const sector_vnum climate_default_sector[NUM_CLIMATES];
+					sector_data *sect;
+					crop_data *cp;
+					if ((cp = crop_proto(ROOM_CROP_TYPE(room))) && (sect = sector_proto(climate_default_sector[GET_CROP_CLIMATE(cp)]))) {
+						ROOM_ORIGINAL_SECT(room) = sect;
+					}
+				}
 			}
 		}
 	}

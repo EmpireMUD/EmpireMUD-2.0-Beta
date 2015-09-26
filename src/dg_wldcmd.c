@@ -269,7 +269,7 @@ WCMD(do_wregionecho) {
 				}
 				
 				if (!indoor_only || IS_OUTDOORS(targ)) {
-					msg_to_desc(desc, "%s\r\n", msg);
+					msg_to_desc(desc, "%s\r\n", CAP(msg));
 				}
 			}
 		}
@@ -831,15 +831,16 @@ WCMD(do_waoe) {
 
 
 WCMD(do_wdot) {
-	char name[MAX_INPUT_LENGTH], modarg[MAX_INPUT_LENGTH], durarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH];
+	char name[MAX_INPUT_LENGTH], modarg[MAX_INPUT_LENGTH], durarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH], stackarg[MAX_INPUT_LENGTH];
 	double modifier = 1.0;
 	char_data *ch;
-	int type;
+	int type, max_stacks;
 
 	argument = one_argument(argument, name);
 	argument = one_argument(argument, modarg);
 	argument = one_argument(argument, durarg);
-	argument = one_argument(argument, typearg);	// optional
+	argument = one_argument(argument, typearg);	// optional, defualt: physical
+	argument = one_argument(argument, stackarg);	// optional, defualt: 1
 
 	if (!*name || !*modarg || !*durarg) {
 		wld_log(room, "dot: bad syntax");
@@ -868,7 +869,8 @@ WCMD(do_wdot) {
 		type = DAM_PHYSICAL;
 	}
 
-	script_damage_over_time(ch, get_room_scale_level(room, ch), type, modifier, atoi(durarg));
+	max_stacks = (*stackarg ? atoi(stackarg) : 1);
+	script_damage_over_time(ch, get_room_scale_level(room, ch), type, modifier, atoi(durarg), max_stacks, NULL);
 }
 
 

@@ -67,14 +67,14 @@ void affect_to_room(room_data *room, struct affected_type *af);
 void affect_total(char_data *ch);
 extern bool affected_by_spell(char_data *ch, int type);
 extern bool affected_by_spell_and_apply(char_data *ch, int type, int apply);
-extern struct affected_type *create_aff(int type, int duration, int location, int modifier, bitvector_t bitvector);
-void apply_dot_effect(char_data *ch, sh_int type, sh_int duration, sh_int damage_type, sh_int damage, sh_int max_stack);
+extern struct affected_type *create_aff(int type, int duration, int location, int modifier, bitvector_t bitvector, char_data *cast_by);
+void apply_dot_effect(char_data *ch, sh_int type, sh_int duration, sh_int damage_type, sh_int damage, sh_int max_stack, char_data *cast_by);
 void dot_remove(char_data *ch, struct over_time_effect_type *dot);
 extern bool room_affected_by_spell(room_data *room, int type);
 
 // affect shortcut macros
-#define create_flag_aff(type, duration, bit)  create_aff((type), (duration), APPLY_NONE, 0, (bit))
-#define create_mod_aff(type, duration, loc, mod)  create_aff((type), (duration), (loc), (mod), 0)
+#define create_flag_aff(type, duration, bit, cast_by)  create_aff((type), (duration), APPLY_NONE, 0, (bit), (cast_by))
+#define create_mod_aff(type, duration, loc, mod, cast_by)  create_aff((type), (duration), (loc), (mod), 0, (cast_by))
 
 // character handlers
 extern bool char_from_chair(char_data *ch);
@@ -113,6 +113,7 @@ extern struct coin_data *find_coin_entry(struct coin_data *list, empire_data *em
 extern int increase_coins(char_data *ch, empire_data *emp, int amount);
 extern const char *money_amount(empire_data *type, int amount);
 extern const char *money_desc(empire_data *type, int amount);
+extern int total_coins(char_data *ch);
 
 // cooldown handlers
 void add_cooldown(char_data *ch, int type, int seconds_duration);
@@ -253,7 +254,7 @@ extern bool delete_stored_resource(empire_data *emp, obj_vnum vnum);
 extern struct empire_storage_data *find_island_storage_by_keywords(empire_data *emp, int island_id, char *keywords);
 extern int find_lowest_storage_loc(obj_data *obj);
 extern struct empire_storage_data *find_stored_resource(empire_data *emp, int island, obj_vnum vnum);
-extern int get_total_stored_count(empire_data *emp, obj_vnum vnum);
+extern int get_total_stored_count(empire_data *emp, obj_vnum vnum, bool count_shipping);
 extern bool obj_can_be_stored(obj_data *obj, room_data *loc);
 extern bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_data *store, bool stolen);
 extern int store_resource(char_data *ch, empire_data *emp, obj_data *obj);
@@ -289,7 +290,7 @@ extern bool config_get_bool(char *key);
 extern double config_get_double(char *key);
 extern int config_get_int(char *key);
 extern int *config_get_int_array(char *key, int *array_size);
-extern char *config_get_string(char *key);
+extern const char *config_get_string(char *key);
 
 // fight.c
 void appear(char_data *ch);

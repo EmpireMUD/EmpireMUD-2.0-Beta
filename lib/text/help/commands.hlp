@@ -140,28 +140,27 @@ See also: QUIT
 #
 ANSI COLOR COLORS MAPCOLOR "MAP COLOR" MAP-COLOR &&
 
-Usage:  toggle color
-        toggle map-color
-
-If you have a color-capable terminal and wish to see useful color-coding of
-information, use the COLOR command to turn color on or off.
+Options:  toggle map-color
 
 If you're not on a broadband connection, color may slow down your messages
-very slightly. However, even on dialup, it's barely noticeable. If you only
-want to shut off map color, the "map-color" toggle will remove color codes
-from the world map.
+very slightly. However, even on dialup, it's barely noticeable. Even so, the
+"map-color" toggle will remove color codes from the world map.
 
 Color codes you can use yourself:
  &0&&0 Normal&0     &u&&u Underline&0
 
 Normal colors:
- &r&&r Red&0        &g&&g Green&0         &y&&y Yellow&0
- &b&&b Blue&0       &m&&m Magenta&0       &c&&c Cyan&0
+ &r&&r Red&0        &p&&p Pink&0        &m&&m Magenta&0    &v&&v Violet&0
+ &b&&b Blue&0       &a&&a Azure&0       &c&&c Cyan&0
+ &g&&g Green&0      &l&&l Lime&0        &j&&j Jade&0
+ &y&&y Yellow&0     &o&&o Orange&0      &t&&t Tan&0
  &w&&w White&0
 
 Bright colors:
- &R&&R Red&0        &G&&G Green&0         &Y&&Y Yellow&0
- &B&&B Blue&0       &M&&M Magenta&0       &C&&C Cyan&0
+ &R&&R Red&0        &P&&P Pink&0        &M&&M Magenta&0    &V&&V Violet&0
+ &B&&B Blue&0       &A&&A Azure&0       &C&&C Cyan&0          
+ &G&&G Green&0      &L&&L Lime&0        &J&&J Jade&0
+ &Y&&Y Yellow&0     &O&&O Orange&0      &T&&T Tan&0
  &W&&W White&0
 #
 ASSIST
@@ -762,7 +761,7 @@ See also: EXAMINE, GET, READ, TAKE
 #
 MAPSIZE "MAP SIZE"
 
-Usage:  mapsize <size>
+Usage:  mapsize <size | auto>
 
 This allows you to change the size of your map display to better fit the size
 of your screen. Be cautious with large mapsizes because some people are dis-
@@ -772,6 +771,9 @@ Mapsize is the total width of your map in map tiles (4 characters if you're
 using the ascii map; one room if you're using screen-reader mode). The number
 is always odd because you sit in the center of it. A mapsize of 3 shows 1 tile
 in each direction; a mapsize of 15 (standard) shows 7 in each direction.
+
+If you set your mapsize to 'auto', the game will attempt to detect the size of
+your client window.
 
 See also: TOGGLE
 #
@@ -1043,9 +1045,7 @@ RECOLOR "CUSTOM COLORS"
 Usage:  recolor <type> <color code>
 
 You can change the color of many game channels using this command. This can
-be helpful if it's difficult for you to see the default colors. However, if a
-color is hard for you to see, you should consider lightening it in your client
-settings.
+be helpful if it's difficult for you to see the default colors.
 
 In addition to channels, you can also recolor 'status' which includes cooldowns
 and affect-wear-off messages, to make them easier to see in combat.
@@ -1128,14 +1128,21 @@ Examples:
 #
 SAIL
 
-Usage:  sail <direction>
+Usage:  sail <direction> [distance]
 
 You can sail the ship from any location inside, for your convenience. Ships
 can travel on oceans and rivers, through river gates, and under bridges. 
 Though this is fairly slow, it is one of the most efficient means of 
 transoceanic travel.
 
-See also: BOARD, DISEMBARK, SHIPBUILDING, SHIPS
+If you specify a distance, you will only sail that many tiles.
+
+Once you've started sailing, the ship will move every few seconds in that
+direction, for as long as you're sailing it. You can type 'sail' again to
+stop, or to change directions. If you don't like seeing the messages each time
+the ship moves, you can 'toggle action-spam'.
+
+See also: BOARD, DISEMBARK, SHIPBUILDING, SHIPS, STOP, TOGGLE
 #
 SAVE
 
@@ -1478,7 +1485,6 @@ Toggles:
   brief - see smaller maps and no room descriptions
   compact - no extra newlines
   no-repeat - Some commands will say "ok" instead of typing out your message
-  color - see the world in color
   autokill - don't end combat at incapacitation
   bother - allows "bothersome" things like bite and purify
   rp - shuts off OOC commands

@@ -1245,7 +1245,7 @@ void do_import_list(char_data *ch, empire_data *emp, char *argument, int subcmd)
 			}
 			
 			// figure out indicator
-			haveamt = get_total_stored_count(use_emp, trade->vnum);
+			haveamt = get_total_stored_count(use_emp, trade->vnum, TRUE);
 			if (use_type == TRADE_IMPORT && haveamt >= trade->limit) {
 				strcpy(indicator, " &r(full)&0");
 			}
@@ -1310,7 +1310,7 @@ void do_import_analysis(char_data *ch, empire_data *emp, char *argument, int sub
 				continue;
 			}
 			
-			haveamt = get_total_stored_count(iter, trade->vnum);
+			haveamt = get_total_stored_count(iter, trade->vnum, TRUE);
 			has_avail = (find_type == TRADE_EXPORT) ? (haveamt > trade->limit) : FALSE;
 			is_buying = (find_type == TRADE_IMPORT) ? (haveamt < trade->limit) : FALSE;
 			rate = exchange_rate(iter, emp);
@@ -1429,7 +1429,7 @@ void perform_inspire(char_data *ch, char_data *vict, int type) {
 	if (inspire_data[type].first_apply != APPLY_NONE) {
 		value = round((points * (two ? 0.5 : 1.0)) / apply_values[inspire_data[type].first_apply]);
 		if (value > 0) {
-			af = create_mod_aff(ATYPE_INSPIRE, time, inspire_data[type].first_apply, value);
+			af = create_mod_aff(ATYPE_INSPIRE, time, inspire_data[type].first_apply, value, ch);
 			affect_join(vict, af, 0);
 			any = TRUE;
 		}
@@ -1437,7 +1437,7 @@ void perform_inspire(char_data *ch, char_data *vict, int type) {
 	if (inspire_data[type].second_apply != APPLY_NONE) {
 		value = round((points * 0.5) / apply_values[inspire_data[type].second_apply]);
 		if (value > 0) {
-			af = create_mod_aff(ATYPE_INSPIRE, time, inspire_data[type].second_apply, value);
+			af = create_mod_aff(ATYPE_INSPIRE, time, inspire_data[type].second_apply, value, ch);
 			affect_join(vict, af, 0);
 			any = TRUE;
 		}
@@ -1672,6 +1672,8 @@ struct find_territory_node *reduce_territory_node_list(struct find_territory_nod
 * @param char_data *argument The tile to search for.
 */
 void scan_for_tile(char_data *ch, char *argument) {
+	extern byte distance_can_see(char_data *ch);
+	extern int get_map_radius(char_data *ch);
 	void sort_territory_node_list_by_distance(room_data *from, struct find_territory_node **node_list);
 	extern const char *dirs[];
 
@@ -1697,14 +1699,21 @@ void scan_for_tile(char_data *ch, char *argument) {
 		return;
 	}
 
-	mapsize = GET_MAPSIZE(REAL_CHAR(ch));
-	if (mapsize == 0) {
-		mapsize = config_get_int("default_map_size");
-	}
+	mapsize = get_map_radius(ch);
 	
 	for (x = -mapsize; x <= mapsize; ++x) {
 		for (y = -mapsize; y <= mapsize; ++y) {
 			if (!(room = real_shift(map, x, y))) {
+				continue;
+			}
+			
+			// actual distance check (compute circle)
+			if (compute_distance(room, IN_ROOM(ch)) > mapsize) {
+				continue;
+			}
+			
+			// darkness check
+			if (room != IN_ROOM(ch) && !CAN_SEE_IN_DARK_ROOM(ch, room) && compute_distance(room, IN_ROOM(ch)) > distance_can_see(ch) && !adjacent_room_is_light(room)) {
 				continue;
 			}
 			
@@ -3437,6 +3446,9 @@ ACMD(do_home) {
 		else if (!GET_LOYALTY(ch) || ROOM_OWNER(real) != GET_LOYALTY(ch)) {
 			msg_to_char(ch, "You need to own a building to make it your home.\r\n");
 		}
+		else if (ROOM_PRIVATE_OWNER(real) == GET_IDNUM(ch)) {
+			msg_to_char(ch, "But it's already your home!\r\n");
+		}
 		else if (ROOM_PRIVATE_OWNER(real) != NOBODY && GET_RANK(ch) < EMPIRE_NUM_RANKS(emp)) {
 			msg_to_char(ch, "Someone already owns this home.\r\n");
 		}
@@ -3451,10 +3463,12 @@ ACMD(do_home) {
 			clear_private_owner(GET_IDNUM(ch));
 			
 			// clear out npcs
+			// TODO should this be done for interior rooms, too?
 			if ((ter = find_territory_entry(emp, real))) {
 				while ((npc = ter->npcs)) {
 					if (npc->mob) {
 						act("$n leaves.", TRUE, npc->mob, NULL, NULL, TO_ROOM);
+						GET_EMPIRE_NPC_DATA(npc->mob) = NULL;	// un-link this npc data from the mob, or extract will corrupt memory
 						extract_char(npc->mob);
 						npc->mob = NULL;
 					}
@@ -3510,7 +3524,7 @@ ACMD(do_home) {
 
 
 ACMD(do_islands) {
-	char output[MAX_STRING_LENGTH*2], line[82], emp_arg[MAX_INPUT_LENGTH];
+	char output[MAX_STRING_LENGTH*2], line[256], emp_arg[MAX_INPUT_LENGTH];
 	struct do_islands_data *item, *next_item, *list = NULL;
 	struct empire_unique_storage *eus;
 	struct empire_territory_data *ter;
@@ -3622,7 +3636,7 @@ ACMD(do_tavern) {
 		}
 	}
 	
-	if (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_TAVERN)) {
+	if (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_TAVERN) || !IS_COMPLETE(IN_ROOM(ch))) {
 		show_tavern_status(ch);
 		msg_to_char(ch, "You can only change what's being brewed while actually in the tavern.\r\n");
 	}
@@ -3991,7 +4005,7 @@ ACMD(do_radiance) {
 		return;
 	}
 	else {
-		af = create_mod_aff(ATYPE_RADIANCE, -1, APPLY_GREATNESS, 2);
+		af = create_mod_aff(ATYPE_RADIANCE, -1, APPLY_GREATNESS, 2, ch);
 		affect_join(ch, af, 0);
 		
 		msg_to_char(ch, "You project a radiant aura!\r\n");
@@ -4117,7 +4131,7 @@ ACMD(do_reclaim) {
 			log_to_empire(enemy, ELOG_HOSTILITY, "An enemy is trying to reclaim (%d, %d)", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
 			msg_to_char(ch, "You start to reclaim this acre. It will take 5 minutes.\r\n");
 			act("$n starts to reclaim this acre for $s empire!", FALSE, ch, NULL, NULL, TO_ROOM);
-			start_action(ch, ACT_RECLAIMING, 12 * SECS_PER_REAL_UPDATE, 0);
+			start_action(ch, ACT_RECLAIMING, 12 * SECS_PER_REAL_UPDATE);
 			GET_ACTION_VNUM(ch, 0) = ROOM_OWNER(IN_ROOM(ch)) ? EMPIRE_VNUM(ROOM_OWNER(IN_ROOM(ch))) : NOTHING;
 		}
 	}

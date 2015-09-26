@@ -176,8 +176,6 @@ void check_expired_cooldowns(void) {
 * Times out players who are sitting at the password or name prompt.
 */
 void check_idle_passwords(void) {
-	void echo_on(descriptor_data *d);
-
 	descriptor_data *d, *next_d;
 
 	for (d = descriptor_list; d; d = next_d) {
@@ -189,7 +187,9 @@ void check_idle_passwords(void) {
 			++d->idle_tics;
 		}
 		else {
-			echo_on(d);
+			if (STATE(d) == CON_PASSWORD) {
+				ProtocolNoEcho(d, false);
+			}
 			SEND_TO_Q("\r\nTimed out... goodbye.\r\n", d);
 			STATE(d) = CON_CLOSE;
 		}
@@ -440,7 +440,7 @@ void real_update_char(char_data *ch) {
 			
 			// special case -- add immunity
 			if (IS_SET(af->bitvector, AFF_STUNNED) && config_get_int("stun_immunity_time") > 0) {
-				immune = create_flag_aff(ATYPE_STUN_IMMUNITY, config_get_int("stun_immunity_time") / SECS_PER_REAL_UPDATE, AFF_IMMUNE_STUN);
+				immune = create_flag_aff(ATYPE_STUN_IMMUNITY, config_get_int("stun_immunity_time") / SECS_PER_REAL_UPDATE, AFF_IMMUNE_STUN, ch);
 				affect_join(ch, immune, 0);
 			}
 			
@@ -1300,8 +1300,8 @@ void real_update_obj(obj_data *obj) {
 	if (OBJ_FLAGGED(obj, OBJ_LIGHT) && IN_ROOM(obj) && IS_ANY_BUILDING(IN_ROOM(obj))) {
 		home = HOME_ROOM(IN_ROOM(obj));
 		if (ROOM_BLD_FLAGGED(home, BLD_BURNABLE) && !BUILDING_BURNING(home)) {
-			// only items with an empire id are considered: you can't burn stuff down by accident
-			if (obj->last_empire_id != NOTHING) {
+			// only items with an empire id are considered: you can't burn stuff down by accident (unless the building is unowned)
+			if (obj->last_empire_id != NOTHING || !ROOM_OWNER(home)) {
 				// check that the empire is at war
 				emp = ROOM_OWNER(home);
 				enemy = real_empire(obj->last_empire_id);
