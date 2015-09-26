@@ -201,6 +201,15 @@ int get_attack_type(char_data *ch, obj_data *weapon) {
 		else if (IS_NPC(ch) && (MOB_ATTACK_TYPE(ch) != 0) && !AFF_FLAGGED(ch, AFF_DISARM)) {
 			w_type = MOB_ATTACK_TYPE(ch);
 		}
+		else if (IS_NPC(ch) && (MOB_ATTACK_TYPE(ch) != 0) && AFF_FLAGGED(ch, AFF_DISARM)) {
+			// disarmed mob
+			if (attack_hit_info[MOB_ATTACK_TYPE(ch)].damage_type == DAM_MAGICAL) {
+				w_type = TYPE_MANA_BLAST;
+			}
+			else {
+				w_type = TYPE_HIT;
+			}
+		}
 		else if (!IS_NPC(ch) && GET_MORPH(ch) != MORPH_NONE) {
 			w_type = get_morph_attack_type(ch);
 		}
