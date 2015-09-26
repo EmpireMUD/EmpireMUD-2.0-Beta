@@ -833,6 +833,10 @@ members must be at least the privilege's rank (or higher). For example, if
 Most privileges only apply to claimed land. All members can chop on unclaimed
 land, regardless of privilege.
 
+Members of allied empires can only use privileges available at rank 1 to your
+empire's members while on your territory, no matter what rank they have in
+their own empires.
+
 Privileges:
   claim: can claim new lands for the empire
   build: can build on claimed land
