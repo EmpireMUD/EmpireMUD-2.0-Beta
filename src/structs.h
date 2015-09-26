@@ -548,6 +548,7 @@ typedef struct trig_data trig_data;
 #define CRAFT_TYPE_MIX  7
 #define CRAFT_TYPE_BUILD  8
 #define CRAFT_TYPE_WEAVE  9
+#define CRAFT_TYPE_WORKFORCE  10
 
 
 // Craft Flags for do_gen_craft

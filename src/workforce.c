@@ -1551,7 +1551,7 @@ void do_chore_weaving(empire_data *emp, room_data *room) {
 		}
 		
 		// found one! (pick at radom if more than one)
-		if (!number(0, ++crafts_found) || !do_craft) {
+		if (!number(0, crafts_found++) || !do_craft) {
 			do_craft = craft;
 		}
 	}

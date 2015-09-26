@@ -161,7 +161,8 @@ struct gen_craft_data_t gen_craft_data[] = {
 	// build is special and doesn't use do_gen_craft, so doesn't really use this data
 	{ "build", "building", { "You work on the building...", "$n works on the building..." } },
 	
-	{ "weave", "weaving", { "You carefully weave the %s...", "$n carefully weaves the %s..." } }
+	{ "weave", "weaving", { "You carefully weave the %s...", "$n carefully weaves the %s..." } },
+	{ "workforce", "produces", { "You work on the %s...", "$n work on the %s..." } }	// not used by players
 };
 
 
