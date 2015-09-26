@@ -1513,11 +1513,12 @@ void do_chore_weaving(empire_data *emp, room_data *room) {
 	struct empire_storage_data *store = NULL;
 	char_data *worker = find_mob_in_room_by_vnum(room, chore_data[CHORE_WEAVING].mob);
 	craft_data *craft, *next_craft, *do_craft = NULL;
+	int iter, crafts_found;
 	char buf[256];
 	bool has_res;
-	int iter;
 	
 	// find a craft we can do
+	crafts_found = 0;
 	HASH_ITER(hh, craft_table, craft, next_craft) {
 		// must be a live weaving recipe
 		if (CRAFT_FLAGGED(craft, CRAFT_IN_DEVELOPMENT) || GET_CRAFT_TYPE(craft) != CRAFT_TYPE_WEAVE) {
@@ -1549,9 +1550,10 @@ void do_chore_weaving(empire_data *emp, room_data *room) {
 			continue;
 		}
 		
-		// found one!
-		do_craft = craft;
-		break;
+		// found one! (pick at radom if more than one)
+		if (!number(0, ++crafts_found) || !do_craft) {
+			do_craft = craft;
+		}
 	}
 	
 	// now attempt to do the chore
