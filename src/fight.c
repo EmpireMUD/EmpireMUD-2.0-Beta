@@ -2504,6 +2504,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		return -1;
 	}
 	
+	// set up some vars
 	w_type = get_attack_type(ch, weapon);
 	victim_emp = GET_LOYALTY(victim);
 	
@@ -2512,7 +2513,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		weapon = NULL;
 	}
 	
-	// look for an instance to lock
+	// look for an instance to lock (before running triggers)
 	if (!IS_NPC(ch) && IS_ADVENTURE_ROOM(IN_ROOM(ch)) && COMPLEX_DATA(IN_ROOM(ch)) && (inst = COMPLEX_DATA(IN_ROOM(ch))->instance)) {
 		if (ADVENTURE_FLAGGED(inst->adventure, ADV_LOCK_LEVEL_ON_COMBAT) && !IS_IMMORTAL(ch)) {
 			lock_instance_level(IN_ROOM(ch), determine_best_scale_level(ch, TRUE));
@@ -2521,6 +2522,11 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 
 	/* check if the character has a fight trigger */
 	fight_mtrigger(ch);
+	
+	// some mobs can run fight triggers when they are hitting, but never actually hit
+	if (IS_NPC(ch) && MOB_FLAGGED(ch, MOB_NO_ATTACK)) {
+		return 0;
+	}
 	
 	// hostile activity triggers distrust unless the victim is pvp-flagged or already hostile
 	if (!IS_NPC(ch) && victim_emp && GET_LOYALTY(ch) != victim_emp) {
