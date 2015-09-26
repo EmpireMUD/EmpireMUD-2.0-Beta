@@ -511,7 +511,7 @@ void save_olc_mobile(descriptor_data *desc) {
 	}
 	
 	// slight sanity checking
-	if (GET_MAX_SCALE_LEVEL(mob) < GET_MIN_SCALE_LEVEL(mob)) {
+	if (GET_MAX_SCALE_LEVEL(mob) < GET_MIN_SCALE_LEVEL(mob) && GET_MAX_SCALE_LEVEL(mob) > 0) {
 		GET_MAX_SCALE_LEVEL(mob) = GET_MIN_SCALE_LEVEL(mob);
 	}
 	
