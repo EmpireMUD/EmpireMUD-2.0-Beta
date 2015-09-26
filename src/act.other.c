@@ -1057,6 +1057,8 @@ ACMD(do_customize) {
 
 
 ACMD(do_dismiss) {
+	bool despawn_familiar(char_data *ch, mob_vnum vnum);
+	
 	char_data *vict;
 	
 	one_argument(argument, arg);
@@ -1066,15 +1068,11 @@ ACMD(do_dismiss) {
 	}
 	else if (!strn_cmp(arg, "famil", 5) && is_abbrev(arg, "familiar")) {
 		// requires abbrev of at least "famil"
-		if (!(vict = has_familiar(ch))) {
+		if (!despawn_familiar(ch, NOTHING)) {
 			msg_to_char(ch, "You do not have a familiar to dismiss.\r\n");
 		}
 		else {
-			if (IN_ROOM(ch) != IN_ROOM(vict)) {
-				msg_to_char(ch, "You dismiss %s.\r\n", PERS(vict, vict, FALSE));
-			}
-			act("$n is dismissed and vanishes!", TRUE, vict, NULL, NULL, TO_ROOM);
-			extract_char(vict);
+			send_config_msg(ch, "ok_string");
 		}
 	}
 	else if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {

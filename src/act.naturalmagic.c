@@ -70,6 +70,43 @@ int ancestral_healing(char_data *ch) {
 
 
 /**
+* Finds a familiar belonging to ch that has the matching vnum and despawns it.
+* 
+* @param char_data *ch The player to find familiars for.
+* @param mob_vnum vnum Despawn only if matching this vnum (NOTHING for all familiars).
+* @return bool TRUE if it despawned a mob; FALSE if not.
+*/
+bool despawn_familiar(char_data *ch, mob_vnum vnum) {
+	char_data *iter, *next_iter;
+	bool any = FALSE;
+	
+	for (iter = character_list; iter; iter = next_iter) {
+		next_iter = iter->next;
+		
+		if (!IS_NPC(iter)) {
+			continue;
+		}
+		if (!MOB_FLAGGED(iter, MOB_FAMILIAR)) {
+			continue;
+		}
+		if (iter->master != ch) {
+			continue;
+		}
+		
+		if (vnum != NOTHING && GET_MOB_VNUM(iter) != vnum) {
+			continue;
+		}
+		
+		act("$n leaves.", TRUE, iter, NULL, NULL, TO_ROOM);
+		extract_char(iter);
+		any = TRUE;
+	}
+	
+	return any;
+}
+
+
+/**
 * @param char_data *ch The person.
 * @return int The total Bonus-Healing trait for that person, with any modifiers.
 */
