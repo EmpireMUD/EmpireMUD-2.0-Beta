@@ -1315,9 +1315,9 @@ Workforce types:
   &ytanning:&0 NPCs will tan skins into leather.
   &yshearing:&0 NPCs will shear animals in stables.
   &cminting (skilled):&0 NPCs will mint treasure into coins.
-  &cdismantle-mines:&0 mines will be dismantled when empty.
-  &yabandon-chopped:&0 NPCS will abandon a tile when they finish chopping.
-  &yabandon-farmed:&0 NPCS will abandon a tile when they finish farming.
+  &ydismantle-mines:&0 mines will be dismantled when empty.
+  &yabandon-chopped:&0 NPCs will abandon a tile when they finish chopping.
+  &yabandon-farmed:&0 NPCs will abandon a tile when they finish farming.
   &cnexus crystals (skilled):&0 Will make nexus crystals at the sorcery tower;
      requires both Exarch Crafts and Skilled Labor.
   
