@@ -1147,8 +1147,8 @@ ACMD(do_manashield) {
 
 
 ACMD(do_mirrorimage) {
-	bool check_scaling(char_data *mob, char_data *attacker);
 	extern char_data *has_familiar(char_data *ch);
+	void scale_mob_as_familiar(char_data *mob, char_data *master);
 	
 	char_data *mob, *other;
 	obj_data *wield;
@@ -1173,7 +1173,7 @@ ACMD(do_mirrorimage) {
 	mob = read_mobile(vnum);
 	
 	// scale mob to the summoner -- so it won't change its attributes later
-	check_scaling(mob, ch);
+	scale_mob_as_familiar(mob, ch);
 	
 	char_to_room(mob, IN_ROOM(ch));
 	

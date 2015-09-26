@@ -1639,7 +1639,7 @@ Available mob flags:
  MOUNTAIN-WALK - Can cross mountain tiles.
  AQUATIC - Can cross water tiles, but won't move on land.
  *PLURAL - Uses the pronouns 'their', 'they', and 'them' in act messages.
- * - DO NOT SET
+ NO-ATTACK - Mob can be in combat, but will not hit
  SPAWNED - De-spawns after 5 minutes if no players are nearby.
  CHAMPION - Will rescue its master in combat.
  EMPIRE - Will not be saved through reboots.

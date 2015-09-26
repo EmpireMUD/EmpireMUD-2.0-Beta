@@ -43,6 +43,7 @@ extern int perform_move(char_data *ch, int dir, int need_specials_check, byte mo
 // local protos
 void end_pursuit(char_data *ch, char_data *target);
 struct generic_name_data *get_generic_name_list(int name_set, int sex);
+void scale_mob_to_level(char_data *mob, int level);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1054,6 +1055,24 @@ int determine_best_scale_level(char_data *ch, bool check_group) {
 	return level;	
 }
 
+
+/**
+* Scales a mob below the master's level like a familiar.
+*
+* @param char_data *mob The mob to scale.
+* @param char_data *master The person to base it on.
+*/
+void scale_mob_as_familiar(char_data *mob, char_data *master) {
+	int scale_level;
+	
+	scale_level = get_approximate_level(master);
+	if (scale_level > CLASS_SKILL_CAP + 25) {
+		scale_level -= 25;
+	}
+	scale_mob_to_level(mob, scale_level);
+}
+
+
 /**
 * This scales one NPC to the level of a player or NPC, or as closely as
 * allowed.
@@ -1062,7 +1081,6 @@ int determine_best_scale_level(char_data *ch, bool check_group) {
 * @param char_data *ch The creature to scale based on.
 */
 void scale_mob_for_character(char_data *mob, char_data *ch) {
-	void scale_mob_to_level(char_data *mob, int level);
 	scale_mob_to_level(mob, determine_best_scale_level(ch, TRUE));
 }
 

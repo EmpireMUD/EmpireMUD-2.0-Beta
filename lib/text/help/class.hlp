@@ -79,7 +79,7 @@ The available archetypes are:
 Alchemist
 Natural Magic + Trade
 
-Healer: Alchemist Crafts, Fastcasting, Resurrect
+Healer: Alchemist Crafts, Fastcasting, Resurrect, Salamander (familiar)
 
 Note: Class abilities are unfinished.
 
@@ -113,7 +113,7 @@ Archmage
 High Sorcery + Natural Magic
 
 Caster: Resurrect
-Healer: Fastcasting, Resurrect
+Healer: Fastcasting, Phoenix (familiar), Resurrect
 
 Note: Class abilities are unfinished.
 
@@ -235,8 +235,8 @@ See also: CLASS, CASTER
 Feral
 Natural Magic + Survival
 
-Tank: Resurrect, Towering Werewolf Form
-Healer: Fastcasting, Resurrect, Sage Werewolf Form
+Tank: Basilisk (familiar), Resurrect, Towering Werewolf Form
+Healer: Basilisk (familiar), Fastcasting, Resurrect, Sage Werewolf Form
 
 Note: Class abilities are unfinished.
 
@@ -292,8 +292,9 @@ See also: CLASS, CASTER
 Luminary
 Empire + Natural Magic
 
-Caster: Dragonriding, Resurrect
-Healer: Ancestral Healing, Dragonriding, Fastcasting, Resurrect
+Caster: Dragonriding, Manticore (familiar), Griffin (familiar), Resurrect
+Healer: Ancestral Healing, Dragonriding, Fastcasting, Manticore (familiar),
+        Griffin (familiar), Resurrect
 
 Luminary Healers gain additional healing power from Greatness and should build
 their Greatness in addition to the 4 healer traits.
@@ -328,8 +329,8 @@ See also: CASTER, HEALER, HIT CAP, TANK
 Necromancer
 Natural Magic + Vampire
 
-Caster: Dread Blood Form, Resurrect
-Healer: Fastcasting, Resurrect
+Caster: Dread Blood Form, Resurrect, Skeletal Hulk (familiar)
+Healer: Banshee (familiar), Fastcasting, Resurrect
 
 Note: Class abilities are unfinished.
 
@@ -385,8 +386,8 @@ See also: CLASS, MELEE
 Shadow Wolf
 Natural Magic + Stealth
 
-Melee: Howl, Moonrise, Savage Werewolf Form
-Healer: Fastcasting, Moonrise, Sage Werewolf Form
+Melee: Howl, Moonrise, Savage Werewolf Form, Scorpion Shadow (familiar)
+Healer: Fastcasting, Moonrise, Owl Shadow (familiar), Sage Werewolf Form
 
 Note: Class abilities are unfinished.
 
@@ -465,9 +466,9 @@ See also: CLASS, MELEE
 Werewolf
 Battle + Natural Magic
 
-Tank: Resurrect, Towering Werewolf Form
-Melee: Resurrect, Savage Werewolf Form
-Healer: Confer, Fastcasting, Resurrect, Sage Werewolf Form
+Tank: Resurrect, Spirit Wolf (familiar), Towering Werewolf Form
+Melee: Dire Wolf (familiar), Resurrect, Savage Werewolf Form
+Healer: Confer, Fastcasting, Moon Rabbit (familiar), Resurrect, Sage Werewolf Form
 
 Healer Werewolves can convert Strength into buffs for themselves and their
 allies, and should build their Strength in addition to the 4 healer traits.

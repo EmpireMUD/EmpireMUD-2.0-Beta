@@ -644,7 +644,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "edelete", POS_DEAD, do_edelete, LVL_CIMPL, GRANT_EMPIRES, NO_SCMD, CTYPE_EMPIRE, CMD_NO_ABBREV, NO_ABIL ),
 
 	SCMD_CMD( "fill", POS_STANDING, do_pour, NO_MIN, CTYPE_UTIL, SCMD_FILL ),
-	ABILITY_CMD( "familiar", POS_STANDING, do_familiar, NO_MIN, CTYPE_SKILL, ABIL_FAMILIAR ),
+	SIMPLE_CMD( "familiar", POS_STANDING, do_familiar, NO_MIN, CTYPE_SKILL ),
 	SIMPLE_CMD( "feed", POS_STANDING, do_feed, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "file", POS_DEAD, do_file, LVL_START_IMM, CTYPE_IMMORTAL ),
 	STANDARD_CMD( "fillin", POS_STANDING, do_fillin, LVL_APPROVED, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),

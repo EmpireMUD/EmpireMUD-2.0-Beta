@@ -698,9 +698,8 @@ ACMD(do_entangle) {
 
 
 ACMD(do_familiar) {
+	void scale_mob_as_familiar(char_data *mob, char_data *master);
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
-	
-	bool check_scaling(char_data *mob, char_data *attacker);
 	
 	char_data *mob;
 	int iter, type;
@@ -709,15 +708,30 @@ ACMD(do_familiar) {
 	struct {
 		char *name;
 		int ability;
-		int level;	// skill level required
+		int level;	// natural magic level required
 		mob_vnum vnum;
 		int cost;
 	} familiars[] = {
+		// base familiars
 		{ "cat", ABIL_FAMILIAR, 0, FAMILIAR_CAT, 40 },
-		{ "saber-tooth", ABIL_FAMILIAR, 51, FAMILIAR_SABERTOOTH, 40 },
+		{ "saber-toothed cat", ABIL_FAMILIAR, 51, FAMILIAR_SABERTOOTH, 40 },
 		{ "sphinx", ABIL_FAMILIAR, 76, FAMILIAR_SPHINX, 40 },
-		{ "griffin", ABIL_FAMILIAR, 100, FAMILIAR_GRIFFIN, 40 },
+		{ "giant tortoise", ABIL_FAMILIAR, 100, FAMILIAR_GIANT_TORTOISE, 40 },
 		
+		// class animals
+		{ "griffin", ABIL_GRIFFIN, 100, FAMILIAR_GRIFFIN, 40 },
+		{ "dire wolf", ABIL_DIRE_WOLF, 100, FAMILIAR_DIRE_WOLF, 40 },
+		{ "moon rabbit", ABIL_MOON_RABBIT, 100, FAMILIAR_MOON_RABBIT, 40 },
+		{ "spirit wolf", ABIL_SPIRIT_WOLF, 100, FAMILIAR_SPIRIT_WOLF, 40 },
+		{ "manticore", ABIL_MANTICORE, 100, FAMILIAR_MANTICORE, 40 },
+		{ "phoenix", ABIL_PHOENIX, 100, FAMILIAR_PHOENIX, 40 },
+		{ "scorpion shadow", ABIL_SCORPION_SHADOW, 100, FAMILIAR_SCORPION_SHADOW, 40 },
+		{ "owl shadow", ABIL_OWL_SHADOW, 100, FAMILIAR_OWL_SHADOW, 40 },
+		{ "basilisk", ABIL_BASILISK, 100, FAMILIAR_BASILISK, 40 },
+		{ "salamander", ABIL_SALAMANDER, 100, FAMILIAR_SALAMANDER, 40 },
+		{ "skeletal hulk", ABIL_SKELETAL_HULK, 100, FAMILIAR_SKELETAL_HULK, 40 },
+		{ "banshee", ABIL_BANSHEE, 100, FAMILIAR_BANSHEE, 40 },
+
 		{ "\n", NO_ABIL, 0, NOTHING, 0 }
 	};
 	
@@ -726,17 +740,20 @@ ACMD(do_familiar) {
 		return;
 	}
 	
-	one_argument(argument, arg);
+	skip_spaces(&argument);
 	
 	// no-arg: just list
-	if (!*arg) {
+	if (!*argument) {
 		msg_to_char(ch, "Summon which familiar:");
 		any = FALSE;
 		for (iter = 0; *familiars[iter].name != '\n'; ++iter) {
 			if (!IS_NPC(ch) && familiars[iter].ability != NO_ABIL && !HAS_ABILITY(ch, familiars[iter].ability)) {
 				continue;
 			}
-			if (GET_SKILL_LEVEL(ch) < familiars[iter].level) {
+			if (familiars[iter].ability != NO_ABIL && ability_data[familiars[iter].ability].parent_skill != NO_SKILL && GET_SKILL(ch, ability_data[familiars[iter].ability].parent_skill != NO_SKILL) < familiars[iter].level) {
+				continue;
+			}
+			if (familiars[iter].ability == NO_ABIL && GET_SKILL_LEVEL(ch) < familiars[iter].level) {
 				continue;
 			}
 			
@@ -758,10 +775,13 @@ ACMD(do_familiar) {
 		if (!IS_NPC(ch) && familiars[iter].ability != NO_ABIL && !HAS_ABILITY(ch, familiars[iter].ability)) {
 			continue;
 		}
-		if (GET_SKILL_LEVEL(ch) < familiars[iter].level) {
+		if (familiars[iter].ability != NO_ABIL && ability_data[familiars[iter].ability].parent_skill != NO_SKILL && GET_SKILL(ch, ability_data[familiars[iter].ability].parent_skill != NO_SKILL) < familiars[iter].level) {
 			continue;
 		}
-		if (is_abbrev(arg, familiars[iter].name)) {
+		if (familiars[iter].ability == NO_ABIL && GET_SKILL_LEVEL(ch) < familiars[iter].level) {
+			continue;
+		}
+		if (is_abbrev(argument, familiars[iter].name)) {
 			type = iter;
 			break;
 		}
@@ -788,7 +808,7 @@ ACMD(do_familiar) {
 	setup_generic_npc(mob, GET_LOYALTY(ch), NOTHING, NOTHING);
 	
 	// scale to summoner
-	check_scaling(mob, ch);
+	scale_mob_as_familiar(mob, ch);
 	
 	char_to_room(mob, IN_ROOM(ch));
 	

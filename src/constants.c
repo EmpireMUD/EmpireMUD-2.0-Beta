@@ -1217,7 +1217,7 @@ const char *action_bits[] = {
 	"MOUNTAIN-WALK",	// 10
 	"AQUATIC",
 	"*PLURAL",
-	"*",
+	"NO-ATTACK",
 	"SPAWNED",
 	"CHAMPION",	// 15
 	"EMPIRE",
