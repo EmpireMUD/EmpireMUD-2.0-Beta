@@ -1620,7 +1620,7 @@ ACMD(do_steal) {
 	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_STEAL)) {
 		return;
 	}
-	else if (!can_steal(ch, emp)) {
+	else if (!IS_IMMORTAL(ch) && !can_steal(ch, emp)) {
 		// sends own message
 	}
 	else if (!emp) {
