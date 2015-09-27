@@ -1353,10 +1353,10 @@ WHO_SORTER(sort_who_access_level) {
 
 WHO_SORTER(sort_who_role_level) {
 	if (a->role != b->role) {
-		return b->role - a->role;
+		return a->role - b->role;
 	}
 	if (a->computed_level != b->computed_level) {
-		return b->computed_level - a->computed_level;
+		return a->computed_level - b->computed_level;
 	}
 	return 0;
 }
