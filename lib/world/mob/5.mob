@@ -45,6 +45,7 @@ A little moon rabbit glows as it hops around its master's feet.
 ~
 100 0 dno cfm
 0 0 15 10
+T 505
 S
 #506
 tortoise giant familiar~
@@ -61,6 +62,7 @@ A spirit wolf flitters in and out of sight as it leaps about.
 ~
 100 0 dno cfm
 0 0 0 10
+T 507
 S
 #508
 manticore huge familiar~
