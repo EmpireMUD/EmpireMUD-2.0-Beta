@@ -1396,7 +1396,7 @@ char_data *get_char_room_vis(char_data *ch, char *name) {
 	}
 
 	for (i = ROOM_PEOPLE(IN_ROOM(ch)); i && j <= number && !found; i = i->next_in_room) {
-		if (CAN_SEE(ch, i) && !AFF_FLAGGED(i, AFF_NO_TARGET_IN_ROOM) && MATCH_CHAR_NAME_ROOM(ch, tmp, i)) {
+		if (CAN_SEE(ch, i) && WIZHIDE_OK(ch, i) && !AFF_FLAGGED(i, AFF_NO_TARGET_IN_ROOM) && MATCH_CHAR_NAME_ROOM(ch, tmp, i)) {
 			if (++j == number) {
 				found = i;
 			}
@@ -1461,6 +1461,9 @@ char_data *get_player_vis(char_data *ch, char *name, bitvector_t flags) {
 	for (i = character_list; i && !found; i = i->next) {
 		if (IS_NPC(i))
 			continue;
+		if (IS_SET(flags, FIND_CHAR_ROOM) && !WIZHIDE_OK(ch, i)) {
+			continue;
+		}
 		if (IS_SET(flags, FIND_CHAR_ROOM) && IN_ROOM(i) != IN_ROOM(ch))
 			continue;
 		if (IS_SET(flags, FIND_CHAR_ROOM) && AFF_FLAGGED(i, AFF_NO_TARGET_IN_ROOM))
