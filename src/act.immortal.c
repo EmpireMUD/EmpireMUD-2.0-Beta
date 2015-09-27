@@ -128,10 +128,7 @@ static void perform_goto(char_data *ch, room_data *to_room) {
 		if (REAL_NPC(t) || t == ch) {
 			continue;
 		}
-		if (!CAN_SEE(t, ch)) {
-			continue;
-		}
-		if (IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_WIZHIDE) && (IS_NPC(t) || !PRF_FLAGGED(t, PRF_HOLYLIGHT))) {
+		if (!CAN_SEE(t, ch) || !WIZHIDE_OK(t, ch)) {
 			continue;
 		}
 
@@ -156,10 +153,7 @@ static void perform_goto(char_data *ch, room_data *to_room) {
 		if (REAL_NPC(t) || t == ch) {
 			continue;
 		}
-		if (!CAN_SEE(t, ch)) {
-			continue;
-		}
-		if (IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_WIZHIDE) && (IS_NPC(t) || !PRF_FLAGGED(t, PRF_HOLYLIGHT))) {
+		if (!CAN_SEE(t, ch) || !WIZHIDE_OK(t, ch)) {
 			continue;
 		}
 		

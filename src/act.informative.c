@@ -705,7 +705,7 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 	if (AFF_FLAGGED(i, AFF_NO_SEE_IN_ROOM) && !PRF_FLAGGED(ch, PRF_HOLYLIGHT)) {
 		return;
 	}
-	if (IS_IMMORTAL(i) && PRF_FLAGGED(i, PRF_WIZHIDE) && !PRF_FLAGGED(ch, PRF_HOLYLIGHT)) {
+	if (!WIZHIDE_OK(ch, i)) {
 		return;
 	}
 
@@ -1583,7 +1583,7 @@ char *partial_who(char_data *ch, char *name_search, int low, int high, empire_da
 			continue;
 		if (rp && !PRF_FLAGGED(tch, PRF_RP))
 			continue;
-		if (IS_IMMORTAL(tch) && PRF_FLAGGED(tch, PRF_INCOGNITO) && GET_ACCESS_LEVEL(ch) < GET_ACCESS_LEVEL(tch))
+		if (!INCOGNITO_OK(ch, tch))
 			continue;
 
 		// show one char

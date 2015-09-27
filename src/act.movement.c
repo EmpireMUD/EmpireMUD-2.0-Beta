@@ -766,10 +766,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 				if (vict == ch || !vict->desc) {
 					continue;
 				}
-				if (!CAN_SEE(vict, ch)) {
-					continue;
-				}
-				if (IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_WIZHIDE) && (IS_NPC(vict) || !PRF_FLAGGED(vict, PRF_HOLYLIGHT))) {
+				if (!CAN_SEE(vict, ch) || !WIZHIDE_OK(vict, ch)) {
 					continue;
 				}
 
@@ -848,10 +845,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 					if (vict == ch || !vict->desc) {
 						continue;
 					}
-					if (!CAN_SEE(vict, ch)) {
-						continue;
-					}
-					if (IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_WIZHIDE) && (IS_NPC(vict) || !PRF_FLAGGED(vict, PRF_HOLYLIGHT))) {
+					if (!CAN_SEE(vict, ch) || !WIZHIDE_OK(vict, ch)) {
 						continue;
 					}
 					
