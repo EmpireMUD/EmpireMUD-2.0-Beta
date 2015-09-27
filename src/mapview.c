@@ -502,7 +502,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	bool ship_partial = IS_SET(options, LRR_SHIP_PARTIAL) ? TRUE : FALSE;
 	bool has_ship = GET_BOAT(IN_ROOM(ch)) ? TRUE : FALSE;
 	bool show_title = !has_ship || ship_partial;
-	bool force_map = IS_SET(options, LRR_FORCE_MAP) ? TRUE : FALSE;
+	bool look_out = IS_SET(options, LRR_LOOK_OUT) ? TRUE : FALSE;
 
 	// begin with the sanity check
 	if (!ch || !ch->desc)
@@ -515,13 +515,13 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		return;
 	}
 
-	if (!force_map && AFF_FLAGGED(ch, AFF_EARTHMELD) && IS_ANY_BUILDING(IN_ROOM(ch))) {
+	if (!look_out && AFF_FLAGGED(ch, AFF_EARTHMELD) && IS_ANY_BUILDING(IN_ROOM(ch))) {
 		msg_to_char(ch, "You are beneath a building.\r\n");
 		return;
 	}
 
 	// check for ship
-	if (!ship_partial && GET_BOAT(IN_ROOM(ch))) {
+	if (!look_out && !ship_partial && GET_BOAT(IN_ROOM(ch))) {
 		look_at_room_by_loc(ch, IN_ROOM(GET_BOAT(IN_ROOM(ch))), LRR_SHIP_PARTIAL);
 	}
 
@@ -568,7 +568,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	}
 
 	// show the room
-	if (!ROOM_IS_CLOSED(room) || force_map) {
+	if (!ROOM_IS_CLOSED(room) || look_out) {
 		// map rooms:
 		
 		if (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
@@ -752,6 +752,11 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 			}
 			free(mappc);
 		}		
+		return;
+	}
+	
+	if (look_out) {
+		// nothing else to show on a look-out
 		return;
 	}
 	

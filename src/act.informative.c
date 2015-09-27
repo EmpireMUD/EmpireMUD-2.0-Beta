@@ -2066,13 +2066,13 @@ ACMD(do_look) {
 				msg_to_char(ch, "You can't do that from here.\r\n");
 			}
 			else if (map == IN_ROOM(ch) && !ROOM_IS_CLOSED(IN_ROOM(ch))) {
-				look_at_room(ch);
+				look_at_room_by_loc(ch, map, LRR_LOOK_OUT);
 			}
 			else if (!IS_IMMORTAL(ch) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_LOOK_OUT) && !RMT_FLAGGED(IN_ROOM(ch), RMT_LOOK_OUT)) {
 				msg_to_char(ch, "You can't do that from here.\r\n");
 			}
 			else {
-				look_at_room_by_loc(ch, map, LRR_FORCE_MAP);
+				look_at_room_by_loc(ch, map, LRR_LOOK_OUT);
 			}
 		}
 		else if (is_abbrev(arg, "in"))
