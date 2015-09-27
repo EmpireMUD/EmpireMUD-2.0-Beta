@@ -2240,8 +2240,12 @@ ACMD(do_toggle) {
 	
 	const char *togcols[NUM_TOG_TYPES][2] = { { "&r", "&g" }, { "&g", "&r" } };
 	const char *tognames[NUM_TOG_TYPES][2] = { { "off", "on" }, { "on", "off" } };
+	const char *imm_color = "\ty";
+	const char *clear_color = "\t0";
 
 	int iter, type = NOTHING, count, on;
+	bool imm;
+	bool screenreader = PRF_FLAGGED(ch, PRF_SCREEN_READER);
 	
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs do not have toggles.\r\n");
@@ -2261,12 +2265,18 @@ ACMD(do_toggle) {
 		
 		for (iter = count = 0; *toggle_data[iter].name != '\n'; ++iter) {
 			if (toggle_data[iter].level <= GET_ACCESS_LEVEL(ch)) {
-				on = PRF_FLAGGED(ch, toggle_data[iter].bit) ? 1 : 0;
-				msg_to_char(ch, " [%s%3.3s&0] %-15.15s%s", togcols[toggle_data[iter].type][on], tognames[toggle_data[iter].type][on], toggle_data[iter].name, (!(++count % 3) ? "\r\n" : ""));
+				on = (PRF_FLAGGED(ch, toggle_data[iter].bit) ? 1 : 0);
+				imm = (toggle_data[iter].level >= LVL_START_IMM);
+				if (screenreader) {
+					msg_to_char(ch, "%s: %s\r\n", toggle_data[iter].name, tognames[toggle_data[iter].type][on]);
+				}
+				else {
+					msg_to_char(ch, " %s[%s%3.3s%s] %-15.15s%s%s", imm ? imm_color : "", togcols[toggle_data[iter].type][on], imm ? imm_color : clear_color, tognames[toggle_data[iter].type][on], toggle_data[iter].name, clear_color, (!(++count % 3) ? "\r\n" : ""));
+				}
 			}
 		}
 		
-		if (count % 3) {
+		if (count % 3 && !screenreader) {
 			send_to_char("\r\n", ch);
 		}
 	}
