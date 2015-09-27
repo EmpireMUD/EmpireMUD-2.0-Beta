@@ -1498,6 +1498,9 @@ char *one_who_line(char_data *ch, bool shortlist, bool screenreader) {
 	if (GET_INVIS_LEV(ch)) {
 		size += snprintf(out + size, sizeof(out) - size, " (i%d)", GET_INVIS_LEV(ch));
 	}
+	if (IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_INCOGNITO)) {
+		size += snprintf(out + size, sizeof(out) - size, " (incog)");
+	}
 	else if (AFF_FLAGGED(ch, AFF_INVISIBLE)) {
 		size += snprintf(out + size, sizeof(out) - size, " (invis)");
 	}
@@ -1576,6 +1579,8 @@ char *partial_who(char_data *ch, char *name_search, int low, int high, empire_da
 		if (empire_who && GET_LOYALTY(tch) != empire_who)
 			continue;
 		if (rp && !PRF_FLAGGED(tch, PRF_RP))
+			continue;
+		if (IS_IMMORTAL(tch) && PRF_FLAGGED(tch, PRF_INCOGNITO) && GET_ACCESS_LEVEL(ch) < GET_ACCESS_LEVEL(tch))
 			continue;
 
 		// show one char

@@ -1505,6 +1505,7 @@ Immortal toggles:
   holylight - allows immortals to see in the dark
   roomflags - shows room flags, vnums, and other info to immortals
   idle-out - if off, the immortal will not disconnect from idling
+  incognito - if on, the immortal does not appear on 'who' to lower players
 #
 UNLOAD BOATUNLOAD
 
