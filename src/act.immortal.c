@@ -955,6 +955,7 @@ struct set_struct {
 		{ "ipmask",		LVL_START_IMM,	PC,		BINARY },
 		{ "multiok",	LVL_START_IMM,	PC,		BINARY },
 		{ "vampire",	LVL_START_IMM,	PC, 	BINARY },
+		{ "wizhide",	LVL_START_IMM,	PC,		BINARY },
 		{ "account",	LVL_START_IMM,	PC,		MISC },
 		{ "bonus",		LVL_START_IMM,	PC,		MISC },
 		{ "grants",		LVL_CIMPL,	PC,		MISC },
@@ -1116,6 +1117,9 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 	}
 	else if SET_CASE("incognito") {
 		SET_OR_REMOVE(PRF_FLAGS(vict), PRF_INCOGNITO);
+	}
+	else if SET_CASE("wizhide") {
+		SET_OR_REMOVE(PRF_FLAGS(vict), PRF_WIZHIDE);
 	}
 	else if SET_CASE("multiok") {
 		SET_OR_REMOVE(PLR_FLAGS(vict), PLR_MULTIOK);

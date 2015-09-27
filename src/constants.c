@@ -396,6 +396,7 @@ const char *preference_bits[] = {
 	"!SPAM",
 	"SCREENREADER",
 	"STEALTHABLE",
+	"WIZHIDE",
 	"\n"
 };
 
@@ -439,6 +440,8 @@ const struct toggle_data_type toggle_data[] = {
 	{ "hassle", TOG_OFFON, PRF_NOHASSLE, LVL_START_IMM, NULL },
 	{ "idle-out", TOG_OFFON, PRF_NO_IDLE_OUT, LVL_START_IMM, NULL },
 	{ "incognito", TOG_ONOFF, PRF_INCOGNITO, LVL_START_IMM, NULL },
+	
+	{ "wizhide", TOG_ONOFF, PRF_WIZHIDE, LVL_START_IMM, NULL },
 	
 	// this goes last
 	{ "\n", 0, NOBITS, 0, NULL }
