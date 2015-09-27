@@ -2240,7 +2240,7 @@ ACMD(do_toggle) {
 	
 	const char *togcols[NUM_TOG_TYPES][2] = { { "\tr", "\tg" }, { "\tg", "\tr" } };
 	const char *tognames[NUM_TOG_TYPES][2] = { { "off", "on" }, { "on", "off" } };
-	const char *imm_color = "\ty";
+	const char *imm_color = "\tc";
 	const char *clear_color = "\t0";
 
 	int iter, type = NOTHING, count, on;
@@ -2268,7 +2268,7 @@ ACMD(do_toggle) {
 				on = (PRF_FLAGGED(ch, toggle_data[iter].bit) ? 1 : 0);
 				imm = (toggle_data[iter].level >= LVL_START_IMM);
 				if (screenreader) {
-					msg_to_char(ch, "%s: %s\r\n", toggle_data[iter].name, tognames[toggle_data[iter].type][on]);
+					msg_to_char(ch, "%s: %s%s\r\n", toggle_data[iter].name, tognames[toggle_data[iter].type][on], imm ? " (immortal)" : "");
 				}
 				else {
 					msg_to_char(ch, " %s[%s%3.3s%s] %-15.15s%s%s", imm ? imm_color : "", togcols[toggle_data[iter].type][on], tognames[toggle_data[iter].type][on], imm ? imm_color : clear_color, toggle_data[iter].name, clear_color, (!(++count % 3) ? "\r\n" : ""));
