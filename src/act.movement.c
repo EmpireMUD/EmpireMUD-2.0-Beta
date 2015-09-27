@@ -727,10 +727,10 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 	else if (IS_RIDING(ch)) {
 		move_type = MOB_MOVE_RIDE;
 	}
-	else if (move_type == MOB_MOVE_WALK && ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_FRESH_WATER | SECTF_OCEAN)) {
+	else if (move_type == MOB_MOVE_WALK && ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_FRESH_WATER | SECTF_OCEAN) && move_type != MOB_MOVE_FLY) {
 		move_type = MOB_MOVE_SWIM;
 	}
-	else if (move_type == MOB_MOVE_WALK && ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH)) {
+	else if (move_type == MOB_MOVE_WALK && ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH) && move_type != MOB_MOVE_FLY) {
 		move_type = MOB_MOVE_CLIMB;
 	}
 	// tweak for people in boats
