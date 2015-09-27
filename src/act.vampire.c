@@ -791,6 +791,7 @@ ACMD(do_bloodsword) {
 	void scale_item_to_level(obj_data *obj, int level);
 
 	obj_data *obj;
+	int scale_level;
 	int cost = 40;
 
 	if (IS_NPC(ch)) {
@@ -821,7 +822,14 @@ ACMD(do_bloodsword) {
 	charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
 	obj = read_object(o_BLOODSWORD);
 	
-	scale_item_to_level(obj, IS_CLASS_ABILITY(ch, ABIL_BLOODSWORD) ? get_approximate_level(ch) : GET_SKILL(ch, SKILL_VAMPIRE));
+	if (IS_CLASS_ABILITY(ch, ABIL_BLOODSWORD)) {
+		scale_level = get_approximate_level(ch);
+	}
+	else {
+		scale_level = MIN(get_approximate_level(ch), GET_SKILL(ch, SKILL_VAMPIRE));
+	}
+	
+	scale_item_to_level(obj, scale_level);
 	
 	act("You drain blood from your wrist and mold it into $p.", FALSE, ch, obj, NULL, TO_CHAR);
 	act("$n twists and molds $s own blood into $p.", TRUE, ch, obj, NULL, TO_ROOM);
