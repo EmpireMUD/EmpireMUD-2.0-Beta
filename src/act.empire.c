@@ -4271,6 +4271,8 @@ ACMD(do_reward) {
 
 ACMD(do_roster) {
 	extern bool member_is_timed_out_cfu(struct char_file_u *chdata);
+	extern const char *class_role[NUM_ROLES];
+	extern const char *class_role_color[NUM_ROLES];
 
 	char buf[MAX_STRING_LENGTH * 2], buf1[MAX_STRING_LENGTH * 2], arg[MAX_STRING_LENGTH];
 	struct char_file_u chdata;
@@ -4302,7 +4304,12 @@ ACMD(do_roster) {
 				tmp = is_playing(chdata.char_specials_saved.idnum);
 			
 				timed_out = member_is_timed_out_cfu(&chdata);
-				size += snprintf(buf + size, sizeof(buf) - size, "[%d %s] <%s&0> %s%s&0", tmp ? GET_COMPUTED_LEVEL(tmp) : chdata.player_specials_saved.last_known_level, class_data[tmp ? GET_CLASS(tmp) : chdata.player_specials_saved.character_class].name, EMPIRE_RANK(e, (tmp ? GET_RANK(tmp) : chdata.player_specials_saved.rank) - 1), (timed_out ? "&r" : ""), chdata.name);
+				if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+					size += snprintf(buf + size, sizeof(buf) - size, "[%d %s %s] <%s&0> %s%s&0", tmp ? GET_COMPUTED_LEVEL(tmp) : chdata.player_specials_saved.last_known_level, class_data[tmp ? GET_CLASS(tmp) : chdata.player_specials_saved.character_class].name, class_role[tmp ? GET_CLASS_ROLE(tmp) : chdata.player_specials_saved.class_role], EMPIRE_RANK(e, (tmp ? GET_RANK(tmp) : chdata.player_specials_saved.rank) - 1), (timed_out ? "&r" : ""), chdata.name);
+				}
+				else {	// not screenreader
+					size += snprintf(buf + size, sizeof(buf) - size, "[%d %s%s\t0] <%s&0> %s%s&0", tmp ? GET_COMPUTED_LEVEL(tmp) : chdata.player_specials_saved.last_known_level, class_role_color[tmp ? GET_CLASS_ROLE(tmp) : chdata.player_specials_saved.class_role], class_data[tmp ? GET_CLASS(tmp) : chdata.player_specials_saved.character_class].name, EMPIRE_RANK(e, (tmp ? GET_RANK(tmp) : chdata.player_specials_saved.rank) - 1), (timed_out ? "&r" : ""), chdata.name);
+				}
 								
 				// online/not
 				if (tmp) {
