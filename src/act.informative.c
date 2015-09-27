@@ -978,17 +978,17 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 *
 * @param char_data *ch The person to get WHO info for.
 * @param bool shortlist If TRUE, only gets a short entry.
-* @param bool no_color If TRUE, skip color codes -- viewers can't see them
+* @param bool screenreader If TRUE, shows slightly differently
 * @return char* A pointer to the output.
 */
-char *one_who_line(char_data *ch, bool shortlist, bool no_color) {
+char *one_who_line(char_data *ch, bool shortlist, bool screenreader) {
 	static char out[MAX_STRING_LENGTH];
 	char buf[MAX_STRING_LENGTH], buf1[MAX_STRING_LENGTH], show_role[24];
 	int num, size = 0;
 	
 	*out = '\0';
 	
-	if (no_color && GET_CLASS_ROLE(ch) != ROLE_NONE) {
+	if (screenreader && GET_CLASS_ROLE(ch) != ROLE_NONE) {
 		snprintf(show_role, sizeof(show_role), " %s", class_role[GET_CLASS_ROLE(ch)]);
 	}
 	else {
@@ -998,13 +998,13 @@ char *one_who_line(char_data *ch, bool shortlist, bool no_color) {
 	// level/class info
 	if (!IS_GOD(ch) && !IS_IMMORTAL(ch)) {
 		if (shortlist) {
-			size += snprintf(out + size, sizeof(out) - size, "[%s%3d%s] ", no_color ? "" : class_role_color[GET_CLASS_ROLE(ch)], GET_COMPUTED_LEVEL(ch), no_color ? "" : "\t0");
+			size += snprintf(out + size, sizeof(out) - size, "[%s%3d%s] ", screenreader ? "" : class_role_color[GET_CLASS_ROLE(ch)], GET_COMPUTED_LEVEL(ch), screenreader ? "" : "\t0");
 		}
 		else if (GET_CLASS(ch) != CLASS_NONE) {
-			size += snprintf(out + size, sizeof(out) - size, "[%3d %s%s%s] ", GET_COMPUTED_LEVEL(ch), no_color ? "" : class_role_color[GET_CLASS_ROLE(ch)], class_data[GET_CLASS(ch)].abbrev, no_color ? show_role : "\t0");
+			size += snprintf(out + size, sizeof(out) - size, "[%3d %s%s%s] ", GET_COMPUTED_LEVEL(ch), screenreader ? "" : class_role_color[GET_CLASS_ROLE(ch)], screenreader ? class_data[GET_CLASS(ch)].name : class_data[GET_CLASS(ch)].abbrev, screenreader ? show_role : "\t0");
 		}
 		else {	// classless
-			size += snprintf(out + size, sizeof(out) - size, "[%3d %sAdvn%s] ", GET_COMPUTED_LEVEL(ch), no_color ? "" : class_role_color[GET_CLASS_ROLE(ch)], no_color ? show_role : "\t0");
+			size += snprintf(out + size, sizeof(out) - size, "[%3d %sAdvn%s] ", GET_COMPUTED_LEVEL(ch), screenreader ? "" : class_role_color[GET_CLASS_ROLE(ch)], screenreader ? show_role : "\t0");
 		}
 	}
 	
