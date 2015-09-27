@@ -304,6 +304,16 @@ Usage:  handbook
 
 Guidelines for having an Immortal character -- you should read it.
 #d
+HASSLE NOHASSLE "NO HASSLE"
+
+Usage:  toggle hassle
+
+Prevents you from activating command triggers and stops mobs from fighting you.
+This toggle is also used by some other triggers to check if you're an immortal
+who doesn't want to be interfered with.
+
+See also: TOGGLE
+#d
 HOLYLIGHT
 
 Usage:  toggle holylight
@@ -317,7 +327,7 @@ It is expected most immortals will keep HOLYLIGHT on most of the time; it
 exists so that you have the ability to see what mortals see for debugging
 purposes.
 
-See also: TOGGLE
+See also: TOGGLE, WIZHIDE
 #d
 HOSTILE "HOSTILE COMMAND"
 
@@ -332,6 +342,15 @@ the hostile cooldown.
 
 See also: FORGIVE, STAT, THIEF
 #d
+IDLE-OUT IDLEOUT "IDLE OUT"
+
+Usage:  toggle idle-out
+
+This immortal toggle prevents you from being disconnected due to long periods
+of inactivity. You can still idle out if you lose your link.
+
+See also: TOGGLE
+#d
 IMOTD
 
 Usage:  imotd
@@ -341,6 +360,16 @@ information on commands recently added, new features and other important
 information that immortals should be aware of.
 
 See also: MOTD
+#d
+INCOGNITO
+
+Usage: toggle incognito
+
+This command prevents you from appearing to players with lower access levels on
+the "who" list. You will still be visible in your room, and people can still
+send you tells.
+
+See also: INVIS, TOGGLE, WIZHIDE
 #d
 INSTANCE INSTANCES
 
@@ -375,7 +404,7 @@ Examples:
   > invis
   > invis 3
 
-See also: INVSTART, VISIBLE
+See also: INCOGNITO, INVSTART, VISIBLE, WIZHIDE
 #d
 INVSTART INVISSTART "INVIS START" "INV START" "START INVISIBLE"
 
@@ -914,6 +943,20 @@ WIZHELP
 Usage:  wizhelp
 
 Gives a list of the special commands available at your level.
+#d
+WIZHIDE
+
+Usage: toggle wizhide
+
+This command prevents you from appearing in the room to players with lower
+access levels and players without holylight. They cannot target you in the
+room, and your poofin, poofout and movement will be invisible, along with most
+other room messages you cause. Mortals will still see any messages sent
+directly to them, such as if you look at them.
+
+You'll still show up in the "who" list, and players can still send you tells.
+
+See also: INVIS, HOLYLIGHT, TOGGLE, WIZHIDE
 #d
 WIZLOCK
 

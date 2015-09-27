@@ -279,8 +279,8 @@ Usage:  shout <message>
 See also HELP SLASH-CHANNELS for global channels like /ooc and /newbie.
 
 These are channels reserved for specific purposes. Messages on these channels
-reach everyone who is monitoring them. You can turn channels on and off using
-the "toggle" command.
+reach everyone who is monitoring them. You can turn the "shout" and "tell"
+channels on and off using the "toggle" command.
 
 The following channels are available on EmpireMUD:
 
