@@ -508,6 +508,7 @@ typedef struct trig_data trig_data;
 #define AFF_IMMUNE_STEALTH  BIT(28)	// C. Immune to stealth debuffs
 #define AFF_IMMUNE_VAMPIRE  BIT(29)	// D. Immune to vampire debuffs
 #define AFF_IMMUNE_STUN  BIT(30)	// E. Cannot be hit by stun effects
+#define AFF_ORDERED  BIT(31)	// F. Has been issued an order from a player
 
 
 // Injury flags -- IS_INJURED

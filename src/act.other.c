@@ -1618,7 +1618,9 @@ ACMD(do_order) {
 				act("$n has an indifferent look.", FALSE, vict, 0, 0, TO_ROOM);
 			else {
 				send_config_msg(ch, "ok_string");
+				SET_BIT(AFF_FLAGS(vict), AFF_ORDERED);
 				command_interpreter(vict, message);
+				REMOVE_BIT(AFF_FLAGS(vict), AFF_ORDERED);
 			}
 		}
 		else {			/* This is order "followers" */
@@ -1631,7 +1633,9 @@ ACMD(do_order) {
 				if (org_room == IN_ROOM(k->follower))
 					if (AFF_FLAGGED(k->follower, AFF_CHARM)) {
 						found = TRUE;
+						SET_BIT(AFF_FLAGS(k->follower), AFF_ORDERED);
 						command_interpreter(k->follower, message);
+						REMOVE_BIT(AFF_FLAGS(k->follower), AFF_ORDERED);
 					}
 			}
 			if (found)

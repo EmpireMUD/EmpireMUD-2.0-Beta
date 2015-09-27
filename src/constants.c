@@ -726,6 +726,7 @@ const char *affected_bits[] = {
 	"!STEALTH",
 	"!VAMPIRE",
 	"!STUN",
+	"*ORDERED",
 	"\n"
 };
 
@@ -762,6 +763,7 @@ const char *affected_bits_consider[] = {
 	"$E is immune to Stealth debuffs.",	// !stealth
 	"$E is immune to Vampire debuffs.",	// !vampire
 	"$E is immune to stuns.",	// !stun
+	"",	// ordred
 	"\n"
 };
 
@@ -789,6 +791,7 @@ const bool aff_is_bad[] = {
 	TRUE,	// stunned
 	TRUE,	// stoned
 	TRUE,	// !blood
+	FALSE,
 	FALSE,
 	FALSE,
 	FALSE,
@@ -2537,6 +2540,7 @@ const char *trig_types[] = {
 	"Leave",
 	"Door",
 	"Leave-All",
+	"Fight-Charmed",
 	"\n"
 };
 

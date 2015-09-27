@@ -126,7 +126,7 @@ ACMD(do_madventurecomplete) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM)) {
+	if (AFF_FLAGGED(ch, AFF_ORDERED)) {
 		return;
 	}
 	
@@ -146,7 +146,7 @@ ACMD(do_masound) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM))
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
 
 	if (!*argument) {
@@ -180,7 +180,7 @@ ACMD(do_mkill) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM))
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
 
 	one_argument(argument, arg);
@@ -243,7 +243,7 @@ ACMD(do_mjunk) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM))
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
 
 	one_argument(argument, arg);
@@ -293,7 +293,7 @@ ACMD(do_mechoaround) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM))
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
 
 	p = one_argument(argument, arg);
@@ -330,7 +330,7 @@ ACMD(do_msend) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM))
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
 
 	p = one_argument(argument, arg);
@@ -365,7 +365,7 @@ ACMD(do_mecho) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM))
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
 
 	if (!*argument) {
@@ -388,7 +388,7 @@ ACMD(do_mbuildingecho) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM))
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
 
 	msg = any_one_word(argument, room_number);
@@ -428,7 +428,7 @@ ACMD(do_mregionecho) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM))
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
 
 	argument = any_one_word(argument, room_number);
@@ -492,7 +492,7 @@ ACMD(do_mload) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM))
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
 
 	if (ch->desc && GET_ACCESS_LEVEL(ch->desc->original) < LVL_CIMPL) {
@@ -617,7 +617,7 @@ ACMD(do_mpurge) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM))
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
 
 	if (ch->desc && (GET_ACCESS_LEVEL(ch->desc->original) < LVL_CIMPL))
@@ -687,7 +687,7 @@ ACMD(do_mgoto) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM))
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
 
 	one_word(argument, arg);
@@ -722,7 +722,7 @@ ACMD(do_mat) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM))
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
 
 	argument = one_word(argument, arg);
@@ -780,7 +780,7 @@ ACMD(do_mteleport) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM))
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
 
 	argument = one_argument(argument, arg1);
@@ -879,7 +879,7 @@ ACMD(do_mterracrop) {
 	room_data *target;
 	crop_vnum vnum;
 
-	if (!MOB_OR_IMPL(ch) || AFF_FLAGGED(ch, AFF_CHARM)) {
+	if (!MOB_OR_IMPL(ch) || AFF_FLAGGED(ch, AFF_ORDERED)) {
 		send_config_msg(ch, "huh_string");
 		return;
 	}
@@ -932,7 +932,7 @@ ACMD(do_mterraform) {
 	room_data *target;
 	sector_vnum vnum;
 
-	if (!MOB_OR_IMPL(ch) || AFF_FLAGGED(ch, AFF_CHARM)) {
+	if (!MOB_OR_IMPL(ch) || AFF_FLAGGED(ch, AFF_ORDERED)) {
 		send_config_msg(ch, "huh_string");
 		return;
 	}
@@ -994,7 +994,7 @@ ACMD(do_mdamage) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM))
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
 
 	argument = two_arguments(argument, name, modarg);
@@ -1050,7 +1050,7 @@ ACMD(do_maoe) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM))
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
 
 	two_arguments(argument, modarg, typearg);
@@ -1094,7 +1094,7 @@ ACMD(do_mdot) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM))
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
 
 	argument = one_argument(argument, name);
@@ -1152,7 +1152,7 @@ ACMD(do_mforce) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM))
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
 
 	if (ch->desc && (GET_ACCESS_LEVEL(ch->desc->original) < LVL_CIMPL))
@@ -1214,7 +1214,7 @@ ACMD(do_mhunt) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM))
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
 
 	if (!IS_NPC(ch)) {
@@ -1262,7 +1262,7 @@ ACMD(do_mremember) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM))
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
 
 	if (ch->desc && (GET_ACCESS_LEVEL(ch->desc->original) < LVL_CIMPL))
@@ -1316,7 +1316,7 @@ ACMD(do_mforget) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM))
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
 
 	if (ch->desc && (GET_ACCESS_LEVEL(ch->desc->original) < LVL_CIMPL))
@@ -1379,7 +1379,7 @@ ACMD(do_mtransform) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM))
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
 
 	if (ch->desc || !IS_NPC(ch)) {
@@ -1482,7 +1482,7 @@ ACMD(do_mdoor) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM))
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
 
 	argument = one_word(argument, target);
@@ -1574,7 +1574,7 @@ ACMD(do_mfollow) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM))
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
 
 	one_argument(argument, buf);
@@ -1650,7 +1650,7 @@ ACMD(do_mscale) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM))
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
 
 	if (ch->desc && (GET_ACCESS_LEVEL(ch->desc->original) < LVL_CIMPL))
