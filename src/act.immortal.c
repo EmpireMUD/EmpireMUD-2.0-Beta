@@ -125,9 +125,17 @@ static void perform_goto(char_data *ch, room_data *to_room) {
 	}
 
 	for (t = ROOM_PEOPLE(IN_ROOM(ch)); t; t = t->next_in_room) {
-		if (!REAL_NPC(t) && t != ch && CAN_SEE(t, ch)) {
-			act(buf, TRUE, ch, 0, t, TO_VICT);
+		if (REAL_NPC(t) || t == ch) {
+			continue;
 		}
+		if (!CAN_SEE(t, ch)) {
+			continue;
+		}
+		if (IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_WIZHIDE) && (IS_NPC(t) || !PRF_FLAGGED(t, PRF_HOLYLIGHT))) {
+			continue;
+		}
+
+		act(buf, TRUE, ch, 0, t, TO_VICT);
 	}
 
 	char_from_room(ch);
@@ -145,9 +153,17 @@ static void perform_goto(char_data *ch, room_data *to_room) {
 	}
 
 	for (t = ROOM_PEOPLE(IN_ROOM(ch)); t; t = t->next_in_room) {
-		if (!REAL_NPC(t) && t != ch && CAN_SEE(t, ch)) {
-			act(buf, TRUE, ch, 0, t, TO_VICT);
+		if (REAL_NPC(t) || t == ch) {
+			continue;
 		}
+		if (!CAN_SEE(t, ch)) {
+			continue;
+		}
+		if (IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_WIZHIDE) && (IS_NPC(t) || !PRF_FLAGGED(t, PRF_HOLYLIGHT))) {
+			continue;
+		}
+		
+		act(buf, TRUE, ch, 0, t, TO_VICT);
 	}
 	
 	look_at_room(ch);

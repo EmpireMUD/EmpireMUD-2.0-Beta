@@ -763,19 +763,25 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 		}
 		if (*buf2 && (!ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_SILENT) || number(0, 4))) {
 			for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict; vict = vict->next_in_room) {
-				if (vict != ch && vict->desc) {
-					// adjust direction
-					if (strstr(buf2, "%s") != NULL) {
-						sprintf(lbuf, buf2, dirs[get_direction_for_char(vict, dir)]);
-					}
-					else {
-						strcpy(lbuf, buf2);
-					}
-
-					if (CAN_SEE(vict, ch)) {
-						act(lbuf, TRUE, ch, cart, vict, TO_VICT);
-					}
+				if (vict == ch || !vict->desc) {
+					continue;
 				}
+				if (!CAN_SEE(vict, ch)) {
+					continue;
+				}
+				if (IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_WIZHIDE) && (IS_NPC(vict) || !PRF_FLAGGED(vict, PRF_HOLYLIGHT))) {
+					continue;
+				}
+
+				// adjust direction
+				if (strstr(buf2, "%s") != NULL) {
+					sprintf(lbuf, buf2, dirs[get_direction_for_char(vict, dir)]);
+				}
+				else {
+					strcpy(lbuf, buf2);
+				}
+				
+				act(lbuf, TRUE, ch, cart, vict, TO_VICT);
 			}
 		}
 	}
@@ -839,19 +845,25 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 				sprintf(buf2, "$n %s up from %%s.", mob_move_types[move_type]);
 
 				for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict; vict = vict->next_in_room) {
-					if (vict != ch && vict->desc) {
-						// adjust direction
-						if (strstr(buf2, "%s")) {
-							sprintf(lbuf, buf2, from_dir[get_direction_for_char(vict, dir)]);
-						}
-						else {
-							strcpy(lbuf, buf);
-						}
-
-						if (CAN_SEE(vict, ch)) {
-							act(lbuf, TRUE, ch, cart, vict, TO_VICT);
-						}
+					if (vict == ch || !vict->desc) {
+						continue;
 					}
+					if (!CAN_SEE(vict, ch)) {
+						continue;
+					}
+					if (IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_WIZHIDE) && (IS_NPC(vict) || !PRF_FLAGGED(vict, PRF_HOLYLIGHT))) {
+						continue;
+					}
+					
+					// adjust direction
+					if (strstr(buf2, "%s")) {
+						sprintf(lbuf, buf2, from_dir[get_direction_for_char(vict, dir)]);
+					}
+					else {
+						strcpy(lbuf, buf);
+					}
+
+					act(lbuf, TRUE, ch, cart, vict, TO_VICT);
 				}
 				break;
 			}
