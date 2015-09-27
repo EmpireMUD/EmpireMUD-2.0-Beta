@@ -163,6 +163,8 @@ benefit if you are not using a shield.
 There is a maximum 50% chance to block. The amount of Block required to hit
 this cap is based on the level of your opponent.
 
+You cannot block magical attacks without the Ward Against Magic ability.
+
 Block cap:
 - Start with the mob's level divided by 2 (half)
 - For hard mobs, raise the total by 10%
