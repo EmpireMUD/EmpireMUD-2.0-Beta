@@ -2,7 +2,7 @@
 Helm~
 The Helm~
 ~
-0 0 amHI 0
+0 0 amHIR 0
 0 0 0 -1
 C
 disembark, sail~
@@ -16,7 +16,7 @@ S
 On Deck~
 On Deck~
 ~
-0 0 amHI 0
+0 0 amHIR 0
 0 0 0 -1
 C
 disembark, sail~
@@ -30,7 +30,7 @@ S
 Cargo Hold~
 In the Cargo Hold~
 ~
-0 0 amHI 0
+0 0 amHIR 0
 0 0 0 -1
 C
 disembark, sail, unload~
@@ -44,7 +44,7 @@ S
 Below Deck~
 Below Deck~
 ~
-0 0 amHI 0
+0 0 amHIR 0
 0 0 0 -1
 C
 disembark, sail, unload~
@@ -86,7 +86,7 @@ S
 Top of the Tower~
 The Top of the Tower~
 ~
-0 0 a l
+0 0 aR l
 0 0 0 228
 C
 inventory, retrieve, store, study~

@@ -78,7 +78,7 @@ a phoenix~
 A small phoenix alights on its master's shoulder.
 ~
 100 0 dno cfm
-0 0 0 10
+0 0 2 10
 S
 #510
 shadow scorpion familiar~
@@ -86,7 +86,7 @@ the scorpion shadow~
 Something is casting the shadow of a scorpion on the ground!
 ~
 100 0 dno cfm
-0 0 0 10
+0 0 9 10
 S
 #511
 shadow owl familiar~
@@ -94,7 +94,7 @@ the owl shadow~
 Something is casting the shadow of an owl on the ground!
 ~
 100 0 dno cfm
-0 0 0 10
+0 0 9 10
 S
 #512
 basilisk familiar~
@@ -126,6 +126,6 @@ a banshee~
 A banshee hovers at her master's side.
 ~
 100 0 dno cfm
-2 0 0 10
+2 0 2 10
 S
 $
