@@ -678,6 +678,7 @@ noidleout      PC      BINARY       Won't idle out
 notitle        PC      BINARY       Can't change title
 nowizlist      PC      BINARY       Doesn't show on wizlist
 siteok         PC      BINARY       Can log in through ban
+wizhide        PC      BINARY       Turns on/off wizhide
 
 scale          NPC     NUMBER       Rescales a mob to a given level
 

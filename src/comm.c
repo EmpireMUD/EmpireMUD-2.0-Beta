@@ -1070,6 +1070,9 @@ void act(const char *str, int hide_invisible, char_data *ch, obj_data *obj, cons
 					continue;
 				if (IS_SET(type, TO_NOTVICT) && to == vict_obj)
 					continue;
+				if (!IS_NPC(ch) && IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_WIZHIDE) && IN_ROOM(ch) == IN_ROOM(to) && (IS_NPC(to) || !PRF_FLAGGED(to, PRF_HOLYLIGHT)) && !Global_ignore_dark) {
+					continue;
+				}
 				perform_act(str, ch, obj, vict_obj, to, IS_SET(type, TO_IGNORE_BAD_CODE) != 0);
 			}
 		}
