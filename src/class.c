@@ -230,7 +230,7 @@ const char *class_role[NUM_ROLES] = {
 // ROLE_x (2/2): role colors for who list
 const char *class_role_color[NUM_ROLES] = {
 	"\t0",
-	"\tt",	// tank
+	"\ty",	// tank
 	"\tr",	// melee
 	"\ta",	// caster
 	"\tj"	// healer
