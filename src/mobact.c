@@ -1099,6 +1099,7 @@ void scale_mob_to_level(char_data *mob, int level) {
 	double value, target;
 	int low_level, mid_level, high_level, over_level;
 	int room_lev = 0, room_min = 0, room_max = 0;
+	int pools_down[NUM_POOLS];
 	int iter;
 	
 	// sanity
@@ -1132,6 +1133,11 @@ void scale_mob_to_level(char_data *mob, int level) {
 	// insanity!
 	if (level <= 0) {
 		return;
+	}
+	
+	// store how far down they are on pools
+	for (iter = 0; iter < NUM_POOLS; ++iter) {
+		pools_down[iter] = mob->points.max_pools[iter] - mob->points.current_pools[iter];
 	}
 	
 	// set up: determine how many levels the mob gets in each level range
@@ -1230,10 +1236,11 @@ void scale_mob_to_level(char_data *mob, int level) {
 	
 	// cleanup
 	for (iter = 0; iter < NUM_POOLS; ++iter) {
-		mob->points.current_pools[iter] = mob->points.max_pools[iter];
+		mob->points.current_pools[iter] = mob->points.max_pools[iter] - pools_down[iter];
 	}
 	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
 		mob->aff_attributes[iter] = mob->real_attributes[iter];
 	}
 	affect_total(mob);
+	update_pos(mob);
 }
