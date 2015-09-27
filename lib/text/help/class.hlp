@@ -175,6 +175,17 @@ Note: Class abilities are unfinished.
 
 See also: CLASS
 #
+BUFF "BUFF ROLE" "BUFFS ROLE" "BUFFER ROLE"
+
+A person with the "buff" group role is one who casts beneficial spells on other
+members of the party. In most cases, this is in addition to performing another
+role like healer or caster.
+
+Some familiars perform only the buff role -- they cast spells on the party but
+don't deal or take damage.
+
+See also: CLASS FAMILIARS, DEBUFF
+#
 CASTER "CASTER ROLE" "MAGIC DPS" "CASTER DPS" "CASTER TRAITS"
 
 The caster role, a type of DPS (damage-per-second) role, is meant to deal as
@@ -195,6 +206,18 @@ Caster traits:
  - Bonus-Magical: Any spare points can go here to boost your magical damage.
 
 See also: HEALER, HIT CAP, MELEE, TANK
+#
+DEBUFF "DEBUFF ROLE" "DEBUFFS ROLE" "DEBUFFER ROLE"
+
+The "debuff" group role is someone who inflicts penalties such as "blind" on
+the enemy in combat, in order to make it easier for the party to fight the
+enemy. In most cases, this is in addition to performing another role like
+melee or tank.
+
+Some familiars perform only the debuff role -- they cast spells on the enemy
+but don't deal or take damage.
+
+See also: BUFF, CLASS FAMILIARS
 #
 "DUKE CLASS" DUKE
 

@@ -426,10 +426,10 @@ Class ability:  Werewolf (healer)
 Familiar type:  buff
 
 The moon rabbit familiar will use the following abilities in combat:
-- Replenish: +(level/3) mana to master
-- Re-energize: +(level/20) mana-regen to master
-- Bright as the moon: +(level/20) resist physical/magical on party
-- Moon's protection: +(level/10) resist physical/magical on the tank
+- Replenish: +(level/3) mana to master (instant)
+- Re-energize: +(level/20) mana-regen to master (30 sec)
+- Bright as the moon: +(level/20) resist physical/magical on party (30 sec)
+- Moon's protection: +(level/10) resist physical/magical on the tank (30 sec)
 
 See also: BUFF, FAMILIAR, WEREWOLF CLASS
 #
@@ -668,10 +668,10 @@ Class ability:  Werewolf (tank)
 Familiar type:  debuff
 
 The spirit wolf familiar will use the following abilities in combat:
-- Bolt of Lightning: -2 Dexterity on enemy
-- Clap of Thunder: -20 Dodge on enemy
-- Bark/Blurred Vision: -20 To-Hit on enemy
-- Bite/Ghost Energy: Magical DoT on enemy
+- Bolt of Lightning: -2 Dexterity on enemy (30 sec)
+- Clap of Thunder: -20 Dodge on enemy (30 sec)
+- Bark/Blurred Vision: -20 To-Hit on enemy (30 sec)
+- Bite/Ghost Energy: Magical DoT on enemy (30 sec)
 
 See also: DEBUFF, FAMILIAR, WEREWOLF CLASS
 #
