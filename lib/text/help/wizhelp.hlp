@@ -669,6 +669,7 @@ thirst         BOTH    MISC         Thirst level
 
 deleted        PC      BINARY       Player deleted
 frozen         PC      BINARY       Player is frozen
+incognito      PC      BINARY       Turns on/off incognito mode (imms only)
 ipmask         PC      BINARY       IP address is hidden
 multiok        PC      BINARY       Can multi-play
 muted          PC      BINARY       Player is muted
