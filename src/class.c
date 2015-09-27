@@ -217,13 +217,23 @@ const struct class_data_type class_data[NUM_CLASSES] = {
 };
 
 
-// ROLE_x
+// ROLE_x (1/2): role names
 const char *class_role[NUM_ROLES] = {
 	"none",
 	"Tank",
 	"Melee",
 	"Caster",
 	"Healer"
+};
+
+
+// ROLE_x (2/2): role colors for who list
+const char *class_role_color[NUM_ROLES] = {
+	"\t0",
+	"\tt",	// tank
+	"\tr",	// melee
+	"\ta",	// caster
+	"\tj"	// healer
 };
 
 

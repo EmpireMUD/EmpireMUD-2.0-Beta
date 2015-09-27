@@ -34,6 +34,8 @@
 
 // extern variables
 extern struct city_metadata_type city_type[];
+extern const char *class_role[NUM_ROLES];
+extern const char *class_role_color[NUM_ROLES];
 extern const char *dirs[];
 extern struct help_index_element *help_table;
 extern int top_of_helpt;
@@ -976,25 +978,33 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 *
 * @param char_data *ch The person to get WHO info for.
 * @param bool shortlist If TRUE, only gets a short entry.
+* @param bool no_color If TRUE, skip color codes -- viewers can't see them
 * @return char* A pointer to the output.
 */
-char *one_who_line(char_data *ch, bool shortlist) {
+char *one_who_line(char_data *ch, bool shortlist, bool no_color) {
 	static char out[MAX_STRING_LENGTH];
-	char buf[MAX_STRING_LENGTH], buf1[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH], buf1[MAX_STRING_LENGTH], show_role[24];
 	int num, size = 0;
 	
 	*out = '\0';
 	
+	if (no_color && GET_CLASS_ROLE(ch) != ROLE_NONE) {
+		snprintf(show_role, sizeof(show_role), " %s", class_role[GET_CLASS_ROLE(ch)]);
+	}
+	else {
+		*show_role = '\0';
+	}
+	
 	// level/class info
 	if (!IS_GOD(ch) && !IS_IMMORTAL(ch)) {
 		if (shortlist) {
-			size += snprintf(out + size, sizeof(out) - size, "[%3d] ", GET_COMPUTED_LEVEL(ch));
+			size += snprintf(out + size, sizeof(out) - size, "[%s%3d%s] ", no_color ? "" : class_role_color[GET_CLASS_ROLE(ch)], GET_COMPUTED_LEVEL(ch), no_color ? "" : "\t0");
 		}
 		else if (GET_CLASS(ch) != CLASS_NONE) {
-			size += snprintf(out + size, sizeof(out) - size, "[%3d %s] ", GET_COMPUTED_LEVEL(ch), class_data[GET_CLASS(ch)].abbrev);
+			size += snprintf(out + size, sizeof(out) - size, "[%3d %s%s%s] ", GET_COMPUTED_LEVEL(ch), no_color ? "" : class_role_color[GET_CLASS_ROLE(ch)], class_data[GET_CLASS(ch)].abbrev, no_color ? show_role : "\t0");
 		}
 		else {	// classless
-			size += snprintf(out + size, sizeof(out) - size, "[%3d Advn] ", GET_COMPUTED_LEVEL(ch));
+			size += snprintf(out + size, sizeof(out) - size, "[%3d %sAdvn%s] ", GET_COMPUTED_LEVEL(ch), no_color ? "" : class_role_color[GET_CLASS_ROLE(ch)], no_color ? show_role : "\t0");
 		}
 	}
 	
@@ -1125,7 +1135,7 @@ char *partial_who(char_data *ch, char *name_search, int low, int high, empire_da
 
 		// show one char
 		++count;
-		size += snprintf(whobuf + size, sizeof(whobuf) - size, "%s", one_who_line(tch, shortlist));
+		size += snprintf(whobuf + size, sizeof(whobuf) - size, "%s", one_who_line(tch, shortlist, PRF_FLAGGED(ch, PRF_SCREEN_READER)));
 		
 		// columnar spacing
 		if (shortlist) {
@@ -2405,7 +2415,6 @@ ACMD(do_who) {
 
 ACMD(do_whois) {
 	void read_lore(char_data *ch);
-	extern const char *class_role[NUM_ROLES];
 	extern const char *level_names[][2];
 	
 	char_data *victim = NULL;
@@ -2437,7 +2446,7 @@ ACMD(do_whois) {
 		level = file ? GET_LAST_KNOWN_LEVEL(victim) : GET_COMPUTED_LEVEL(victim);
 		
 		if (GET_CLASS(victim) != CLASS_NONE) {
-			msg_to_char(ch, "Class: %d %s (%s)\r\n", level, class_data[GET_PC_CLASS(victim)].name, class_role[(int) GET_CLASS_ROLE(victim)]);
+			msg_to_char(ch, "Class: %d %s (%s%s\t0)\r\n", level, class_data[GET_PC_CLASS(victim)].name, class_role_color[GET_CLASS_ROLE(victim)], class_role[GET_CLASS_ROLE(victim)]);
 		}
 		else {
 			msg_to_char(ch, "Level: %d\r\n", level);
