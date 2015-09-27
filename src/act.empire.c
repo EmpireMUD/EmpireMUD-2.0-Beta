@@ -680,7 +680,7 @@ void claim_city(char_data *ch, char *argument) {
 			}
 		}
 				
-		msg_to_char(ch, "You have claimed all %s in the %s of %s.\r\n", city_type[city->type].name, city->name, all ? "tiles" : "unclaimed structures");
+		msg_to_char(ch, "You have claimed all %s in the %s of %s.\r\n", all ? "tiles" : "unclaimed structures", city_type[city->type].name, city->name);
 		read_empire_territory(emp);
 		save_empire(emp);
 	}
