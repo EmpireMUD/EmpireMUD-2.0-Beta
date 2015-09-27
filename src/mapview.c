@@ -1147,7 +1147,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	// start with the sector color
 	strcpy(buf, base_color);
 
-	if (to_room == IN_ROOM(ch)) {
+	if (to_room == IN_ROOM(ch) && !ROOM_IS_CLOSED(IN_ROOM(ch))) {
 		sprintf(buf, "&0<%soo&0>", chemp ? EMPIRE_BANNER(chemp) : "");
 	}
 	else if (!show_dark && !PRF_FLAGGED(ch, PRF_INFORMATIVE | PRF_POLITICAL) && show_pc_in_room(ch, to_room, mappc)) {
