@@ -2238,7 +2238,7 @@ ACMD(do_title) {
 ACMD(do_toggle) {
 	extern const struct toggle_data_type toggle_data[];	// constants.c
 	
-	const char *togcols[NUM_TOG_TYPES][2] = { { "&r", "&g" }, { "&g", "&r" } };
+	const char *togcols[NUM_TOG_TYPES][2] = { { "\tr", "\tg" }, { "\tg", "\tr" } };
 	const char *tognames[NUM_TOG_TYPES][2] = { { "off", "on" }, { "on", "off" } };
 	const char *imm_color = "\ty";
 	const char *clear_color = "\t0";
@@ -2271,7 +2271,7 @@ ACMD(do_toggle) {
 					msg_to_char(ch, "%s: %s\r\n", toggle_data[iter].name, tognames[toggle_data[iter].type][on]);
 				}
 				else {
-					msg_to_char(ch, " %s[%s%3.3s%s] %-15.15s%s%s", imm ? imm_color : "", togcols[toggle_data[iter].type][on], imm ? imm_color : clear_color, tognames[toggle_data[iter].type][on], toggle_data[iter].name, clear_color, (!(++count % 3) ? "\r\n" : ""));
+					msg_to_char(ch, " %s[%s%3.3s%s] %-15.15s%s%s", imm ? imm_color : "", togcols[toggle_data[iter].type][on], tognames[toggle_data[iter].type][on], imm ? imm_color : clear_color, toggle_data[iter].name, clear_color, (!(++count % 3) ? "\r\n" : ""));
 				}
 			}
 		}
