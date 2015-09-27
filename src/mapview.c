@@ -500,9 +500,9 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	
 	// options
 	bool ship_partial = IS_SET(options, LRR_SHIP_PARTIAL) ? TRUE : FALSE;
-	bool has_ship = GET_BOAT(IN_ROOM(ch)) ? TRUE : FALSE;
-	bool show_title = !has_ship || ship_partial;
 	bool look_out = IS_SET(options, LRR_LOOK_OUT) ? TRUE : FALSE;
+	bool has_ship = GET_BOAT(IN_ROOM(ch)) ? TRUE : FALSE;
+	bool show_title = !has_ship || ship_partial || look_out;
 
 	// begin with the sanity check
 	if (!ch || !ch->desc)
