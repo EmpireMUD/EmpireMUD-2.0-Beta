@@ -2042,6 +2042,7 @@ ACMD(do_look) {
 	void look_in_direction(char_data *ch, int dir);
 	
 	char arg2[MAX_INPUT_LENGTH];
+	room_data *map;
 	int look_type;
 
 	if (!ch->desc)
@@ -2060,6 +2061,20 @@ ACMD(do_look) {
 
 		if (!*arg)			/* "look" alone, without an argument at all */
 			look_at_room(ch);
+		else if (!str_cmp(arg, "out")) {
+			if (!(map = get_map_location_for(IN_ROOM(ch)))) {
+				msg_to_char(ch, "You can't do that from here.\r\n");
+			}
+			else if (map == IN_ROOM(ch)) {
+				look_at_room(ch);
+			}
+			else if (!IS_IMMORTAL(ch) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_LOOK_OUT) && !RMT_FLAGGED(IN_ROOM(ch), RMT_LOOK_OUT)) {
+				msg_to_char(ch, "You can't do that from here.\r\n");
+			}
+			else {
+				look_at_room_by_loc(ch, map, LRR_FORCE_MAP);
+			}
+		}
 		else if (is_abbrev(arg, "in"))
 			look_in_obj(ch, arg2);
 		/* did the char type 'look <direction>?' */

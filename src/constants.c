@@ -160,6 +160,7 @@ const char *room_template_flags[] = {
 	"PEACEFUL",
 	"NEED-BOAT",
 	"!TELEPORT",
+	"LOOK-OUT",
 	"\n"
 };
 
@@ -1847,6 +1848,7 @@ const char *bld_flags[] = {
 	"!DELETE",
 	"SUMMON-PLAYER",
 	"NEED-BOAT",
+	"LOOK-OUT",
 	"\n"
 };
 

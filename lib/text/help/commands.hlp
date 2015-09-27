@@ -744,6 +744,7 @@ LOOK EXAMINE
 Usage:  look
         look [in | at] [the] <item>
         look <direction>
+        look out
 
 For studying your surroundings. Examine and look do the same thing.
 

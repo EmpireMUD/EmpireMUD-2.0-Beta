@@ -342,6 +342,7 @@ typedef struct trig_data trig_data;
 #define RMT_PEACEFUL  BIT(4)	// e. no attacking/saferoom
 #define RMT_NEED_BOAT  BIT(5)	// f. requires a boat
 #define RMT_NO_TELEPORT  BIT(6)	// g. cannot teleport in/out
+#define RMT_LOOK_OUT  BIT(7)	// h. can see the map using "look out"
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -391,6 +392,7 @@ typedef struct trig_data trig_data;
 #define BLD_NO_DELETE  BIT(40)	// will not be deleted for not having a homeroom
 #define BLD_SUMMON_PLAYER  BIT(41)	// can use the summon player command
 #define BLD_NEED_BOAT  BIT(42)	// requires a boat to enter
+#define BLD_LOOK_OUT  BIT(43)	// can see the map using "look out"
 
 
 // Terrain flags for do_build -- these match up with build_on flags for building crafts
