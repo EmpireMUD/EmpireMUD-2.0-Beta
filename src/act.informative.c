@@ -2065,7 +2065,7 @@ ACMD(do_look) {
 			if (!(map = get_map_location_for(IN_ROOM(ch)))) {
 				msg_to_char(ch, "You can't do that from here.\r\n");
 			}
-			else if (map == IN_ROOM(ch)) {
+			else if (map == IN_ROOM(ch) && !ROOM_IS_CLOSED(IN_ROOM(ch))) {
 				look_at_room(ch);
 			}
 			else if (!IS_IMMORTAL(ch) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_LOOK_OUT) && !RMT_FLAGGED(IN_ROOM(ch), RMT_LOOK_OUT)) {
