@@ -1345,7 +1345,7 @@ struct who_entry {
 
 WHO_SORTER(sort_who_access_level) {
 	if (a->access_level != b->access_level) {
-		return b->access_level - a->access_level;
+		return a->access_level - b->access_level;
 	}
 	return 0;
 }
