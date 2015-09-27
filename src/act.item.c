@@ -740,6 +740,10 @@ static bool perform_get_from_container(char_data *ch, obj_data *obj, obj_data *c
 	if (!IS_IMMORTAL(ch) && IN_ROOM(cont) && LAST_OWNER_ID(cont) != idnum && LAST_OWNER_ID(obj) != idnum && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		stealing = TRUE;
 		
+		if (!PRF_FLAGGED(ch, PRF_STEALTHABLE)) {
+			msg_to_char(ch, "You cannot steal because your 'stealthable' toggle is off.\r\n");
+			return FALSE;
+		}
 		if (emp && !can_steal(ch, emp)) {
 			// sends own message
 			return FALSE;
@@ -759,7 +763,10 @@ static bool perform_get_from_container(char_data *ch, obj_data *obj, obj_data *c
 			act("$n gets $p from $P.", TRUE, ch, obj, cont, TO_ROOM);
 			
 			if (stealing) {
-				if (emp && !skill_check(ch, ABIL_STEAL, DIFF_HARD)) {
+				if (emp && IS_IMMORTAL(ch)) {
+					syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s stealing %s from %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), EMPIRE_NAME(emp));
+				}
+				else if (emp && !skill_check(ch, ABIL_STEAL, DIFF_HARD)) {
 					log_to_empire(emp, ELOG_HOSTILITY, "Theft at (%d, %d)", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
 				}
 				
@@ -853,6 +860,10 @@ static bool perform_get_from_room(char_data *ch, obj_data *obj) {
 	if (!IS_IMMORTAL(ch) && LAST_OWNER_ID(obj) != idnum && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		stealing = TRUE;
 		
+		if (!PRF_FLAGGED(ch, PRF_STEALTHABLE)) {
+			msg_to_char(ch, "You cannot steal because your 'stealthable' toggle is off.\r\n");
+			return FALSE;
+		}
 		if (emp && !can_steal(ch, emp)) {
 			// sends own message
 			return FALSE;
@@ -871,7 +882,10 @@ static bool perform_get_from_room(char_data *ch, obj_data *obj) {
 		act("$n gets $p.", TRUE, ch, obj, 0, TO_ROOM);
 					
 		if (stealing) {
-			if (emp && !skill_check(ch, ABIL_STEAL, DIFF_HARD)) {
+			if (emp && IS_IMMORTAL(ch)) {
+				syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s stealing %s from %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), EMPIRE_NAME(emp));
+			}
+			else if (emp && !skill_check(ch, ABIL_STEAL, DIFF_HARD)) {
 				log_to_empire(emp, ELOG_HOSTILITY, "Theft at (%d, %d)", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
 			}
 			
