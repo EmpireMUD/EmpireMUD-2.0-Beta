@@ -3564,6 +3564,48 @@ int vnum_trigger(char *searchname, char_data *ch) {
  //////////////////////////////////////////////////////////////////////////////
 //// COMMANDS ////////////////////////////////////////////////////////////////
 
+ACMD(do_addnotes) {
+	char notes[MAX_ADMIN_NOTES_LENGTH];
+	char_data *vict = NULL;
+	bool file = FALSE;
+	
+	argument = one_argument(argument, arg);	// target
+	skip_spaces(&argument);	// text to add
+	
+	if (!*arg || !*argument) {
+		msg_to_char(ch, "Usage: addnotes <name> <text>\r\n");
+	}
+	else if (!(vict = find_or_load_player(arg, &file))) {
+		send_to_char("There is no such player.\r\n", ch);
+	}
+	else if (GET_ACCESS_LEVEL(vict) >= GET_ACCESS_LEVEL(ch)) {
+		msg_to_char(ch, "You cannot add notes for players of that level.\r\n");
+	}
+	else if (strlen(GET_ADMIN_NOTES(vict)) + strlen(argument) + 2 > MAX_ADMIN_NOTES_LENGTH) {
+		msg_to_char(ch, "Notes too long, unable to add text. Use editnotes instead.\r\n");
+	}
+	else {
+		snprintf(notes, sizeof(notes), "%s%s\r\n", GET_ADMIN_NOTES(vict), argument);
+		strcpy(GET_ADMIN_NOTES(vict), notes);	// strcpy OK: same length
+		
+		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has added notes for %s", GET_NAME(ch), GET_NAME(vict));
+		msg_to_char(ch, "Notes added to %s.\r\n", GET_NAME(vict));
+		
+		if (file) {
+			store_loaded_char(vict);
+			file = FALSE;
+		}
+		else {
+			SAVE_CHAR(vict);
+		}
+	}
+	
+	// in case
+	if (vict && file) {
+		free_char(vict);
+	}
+}
+
 
 ACMD(do_advance) {
 	void start_new_character(char_data *ch);
