@@ -3203,7 +3203,7 @@ ACMD(do_esay) {
 	char_data *tch;
 	int level = 0, i;
 	empire_data *e;
-	bool emote = FALSE;
+	bool emote = FALSE, extra_color = FALSE;
 	char buf[MAX_STRING_LENGTH], lstring[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH], output[MAX_STRING_LENGTH], color[8];
 
 	if (IS_NPC(ch))
@@ -3232,14 +3232,15 @@ ACMD(do_esay) {
 	if (*argument == '#') {
 		half_chop(argument, arg, buf);
 		strcpy(argument, buf);
-		for (i = 0; i < strlen(arg); i++)
-			if (arg[i] == '_')
+		for (i = 0; i < strlen(arg); i++) {
+			if (arg[i] == '_') {
 				arg[i] = ' ';
-		for (i = 0; i < EMPIRE_NUM_RANKS(e); i++)
-			if (is_abbrev(arg+1, EMPIRE_RANK(e, i)))
-				break;
-		if (i < EMPIRE_NUM_RANKS(e))
+			}
+		}
+		i = find_rank_by_name(e, arg+1);
+		if (i != NOTHING) {
 			level = i;
+		}
 	}
 	if (*argument == '*') {
 		argument++;
@@ -3247,12 +3248,15 @@ ACMD(do_esay) {
 	}
 	skip_spaces(&argument);
 
-	level++;
+	level++;	// 1-based, not 0-based
 
-	if (level > 1)
-		sprintf(lstring, " <%s\t0>", EMPIRE_RANK(e, level-1));
-	else
+	if (level > 1) {
+		sprintf(lstring, " <%s%%s>", EMPIRE_RANK(e, level-1));
+		extra_color = TRUE;
+	}
+	else {
 		*lstring = '\0';
+	}
 
 	/* Since we cut up the string, we have to check again */
 	if (!*argument) {
@@ -3278,7 +3282,12 @@ ACMD(do_esay) {
 		}
 
 		sprintf(color, "\t%c", GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_ESAY) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_ESAY) : '0');
-		sprintf(output, buf, color, color);
+		if (extra_color) {
+			sprintf(output, buf, color, color, color);
+		}
+		else {
+			sprintf(output, buf, color, color);
+		}
 		
 		act(output, FALSE, ch, 0, 0, TO_CHAR | TO_SLEEP | TO_NODARK);
 		
