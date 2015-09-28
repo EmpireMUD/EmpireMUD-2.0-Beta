@@ -2523,23 +2523,11 @@ char *make_prompt(descriptor_data *d) {
 	else if (STATE(d) == CON_PLAYING) {
 		*prompt = '\0';
 		
-		if (!IS_NPC(d->character)) {
-			if (get_cooldown_time(d->character, COOLDOWN_ROGUE_FLAG) > 0) {
-				strcat(prompt, "\tM(rogue) ");
-			}
-			else if (get_cooldown_time(d->character, COOLDOWN_HOSTILE_FLAG) > 0) {
-				strcat(prompt, "\tm(hostile) ");
-			}
-		}
-
 		// show idle after 10 minutes
 		if ((d->character->char_specials.timer * SECS_PER_MUD_HOUR / SECS_PER_REAL_MIN) >= 10) {
 			strcat(prompt, "\tr[IDLE] ");
 		}
-
-		if (!IS_NPC(d->character) && PRF_FLAGGED(d->character, PRF_RP))
-			sprintf(prompt + strlen(prompt), "\tm[RP] ");
-				
+		
 		// olc info
 		if (GET_OLC_TYPE(d) != 0) {
 			strcat(prompt, prompt_olc_info(d->character));
@@ -2605,18 +2593,18 @@ char *prompt_str(char_data *ch) {
 		}
 		else if (IS_MAGE(ch)) {
 			if (IS_VAMPIRE(ch)) {
-				str = "\t0|%i/%u/%n %bb [%t]> ";
+				str = "\t0|%i/%u/%n %bb [%C] [%t]> ";
 			}
 			else {
-				str = "\t0|%i/%u/%n> ";
+				str = "\t0|%i/%u/%n [%C]> ";
 			}
 		}
 		else {
 			if (IS_VAMPIRE(ch)) {
-				str = "\t0|%i/%u %bb [%t]> ";
+				str = "\t0|%i/%u %bb [%C] [%t]> ";
 			}
 			else {
-				str = "\t0|%i/%u> ";
+				str = "\t0|%i/%u [%C]> ";
 			}
 		}
 	}
@@ -2654,7 +2642,7 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 	for (;;) {
 		if (*str == '%') {
 			switch (*(++str)) {
-				case 'c': {	// player conditions
+				case 'c': {	// player conditions (abbrevs)
 					sprintf(i, "%s%s%s%s%s%s%s%s%s",
 								PRF_FLAGGED(ch, PRF_AFK) ? "A" : "",
 							   	IS_DRUNK(ch) ? "D" : "",
@@ -2669,7 +2657,71 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					tmp = i;
 					break;
 				}
-				case 'C': {	// Immortal conditions
+				case 'C': {	// player conditions (words)
+					*i = '\0';
+					if (PRF_FLAGGED(ch, PRF_AFK)) {
+						sprintf(i + strlen(i), "%s\trafk", (*i ? " " : ""));
+					}
+					if (IS_DRUNK(ch)) {
+						sprintf(i + strlen(i), "%s\t0drunk", (*i ? " " : ""));
+					}
+					if (EFFECTIVELY_FLYING(ch)) {
+						sprintf(i + strlen(i), "%s\t0flying", (*i ? " " : ""));
+					}
+					if (IS_HUNGRY(ch)) {
+						sprintf(i + strlen(i), "%s\t0hungry", (*i ? " " : ""));
+					}
+					if (!IS_NPC(ch) && GET_MORPH(ch) != MORPH_NONE) {
+						sprintf(i + strlen(i), "%s\t0morphed", (*i ? " " : ""));
+					}
+					if (IS_PVP_FLAGGED(ch)) {
+						sprintf(i + strlen(i), "%s\tRpvp", (*i ? " " : ""));
+					}
+					if (IS_RIDING(ch)) {
+						sprintf(i + strlen(i), "%s\t0riding", (*i ? " " : ""));
+					}
+					if (PRF_FLAGGED(ch, PRF_RP)) {
+						sprintf(i + strlen(i), "%s\tmrp", (*i ? " " : ""));
+					}
+					if (IS_BLOOD_STARVED(ch)) {
+						sprintf(i + strlen(i), "%s\t0starved", (*i ? " " : ""));
+					}
+					if (IS_THIRSTY(ch)) {
+						sprintf(i + strlen(i), "%s\t0thirsty", (*i ? " " : ""));
+					}
+					if (!IS_NPC(ch)) {
+						if (get_cooldown_time(ch, COOLDOWN_ROGUE_FLAG) > 0) {
+							sprintf(i + strlen(i), "%s\tMrogue", (*i ? " " : ""));
+						}
+						else if (get_cooldown_time(ch, COOLDOWN_HOSTILE_FLAG) > 0) {
+							sprintf(i + strlen(i), "%s\tmhostile", (*i ? " " : ""));
+						}
+					}
+					
+					strcat(i, "\t0");
+					tmp = i;
+					break;
+				}
+				case 'x': {	// Immortal conditions (abbrevs)
+					*i = '\0';
+					if (!IS_NPC(ch) && GET_INVIS_LEV(ch) > 0) {
+						sprintf(i + strlen(i), "\tri%d", GET_INVIS_LEV(ch));
+					}
+					if (IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_INCOGNITO)) {
+						sprintf(i + strlen(i), "\tbI");
+					}
+					if (IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_WIZHIDE)) {
+						sprintf(i + strlen(i), "\tcW");
+					}
+					if (wizlock_level > 0 && IS_IMMORTAL(ch)) {
+						sprintf(i + strlen(i), "\tgw%d", wizlock_level);
+					}
+					
+					strcat(i, "\t0");
+					tmp = i;
+					break;
+				}
+				case 'X': {	// Immortal conditions (words)
 					*i = '\0';
 					if (!IS_NPC(ch) && GET_INVIS_LEV(ch) > 0) {
 						sprintf(i + strlen(i), "%s\tri%d", (*i ? " " : ""), GET_INVIS_LEV(ch));
