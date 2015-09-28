@@ -2600,7 +2600,10 @@ char *prompt_str(char_data *ch) {
 
 	// default prompts
 	if (!str || !*str) {
-		if (IS_MAGE(ch)) {
+		if (IS_IMMORTAL(ch)) {
+			str = "\t0|%C> ";
+		}
+		else if (IS_MAGE(ch)) {
 			if (IS_VAMPIRE(ch)) {
 				str = "\t0|%i/%u/%n %bb [%t]> ";
 			}
