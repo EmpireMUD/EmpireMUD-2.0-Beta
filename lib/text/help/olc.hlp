@@ -3253,7 +3253,7 @@ The following special colors may be used in icons:
  &&? - The tile color of the base terrain.
  &&V - Wall color (walls are colored by enchantments).
 #d
-"STRING EDITOR" "TEXT EDITOR" "STRING EDITING"
+"STRING EDITOR" "TEXT EDITOR" "STRING EDITING" ,
 
 Note: If you are using the string editor in-game, you must begin commands with
 a comma (,). Only text you type starting with a , will be added to the string.
