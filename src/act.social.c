@@ -291,7 +291,7 @@ void perform_action(char_data *ch, int act_nr, char *argument) {
 				sprintf(hbuf, "&%c%s", (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) ? GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE) : '0', c->desc->last_act_message);
 				add_to_channel_history(c->desc, CHANNEL_HISTORY_SAY, hbuf);
 			}
-			else if (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
+			if (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
 				// terminate color just in case
 				msg_to_char(c, "&0");
 			}
@@ -332,7 +332,7 @@ void perform_action(char_data *ch, int act_nr, char *argument) {
 				sprintf(hbuf, "&%c%s", (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) ? GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE) : '0', c->desc->last_act_message);
 				add_to_channel_history(c->desc, CHANNEL_HISTORY_SAY, hbuf);
 			}
-			else if (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
+			if (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
 				// terminate color just in case
 				msg_to_char(c, "&0");
 			}
@@ -381,7 +381,7 @@ void perform_action(char_data *ch, int act_nr, char *argument) {
 					sprintf(hbuf, "&%c%s", (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) ? GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE) : '0', c->desc->last_act_message);
 					add_to_channel_history(c->desc, CHANNEL_HISTORY_SAY, hbuf);
 				}
-				else if (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
+				if (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
 					// terminate color just in case
 					msg_to_char(c, "&0");
 				}
