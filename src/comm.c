@@ -2645,41 +2645,41 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 				case 'c': {	// player conditions (words)
 					*i = '\0';
 					if (PRF_FLAGGED(ch, PRF_AFK)) {
-						sprintf(i + strlen(i), "%s\trA", (*i ? " " : ""));
+						strcat(i, "\trA");
 					}
 					if (IS_DRUNK(ch)) {
-						sprintf(i + strlen(i), "%s\t0D", (*i ? " " : ""));
+						strcat(i, "\t0D");
 					}
 					if (EFFECTIVELY_FLYING(ch)) {
-						sprintf(i + strlen(i), "%s\t0F", (*i ? " " : ""));
+						strcat(i, "\t0F");
 					}
 					if (IS_HUNGRY(ch)) {
-						sprintf(i + strlen(i), "%s\t0H", (*i ? " " : ""));
+						strcat(i, "\t0H");
 					}
 					if (!IS_NPC(ch) && GET_MORPH(ch) != MORPH_NONE) {
-						sprintf(i + strlen(i), "%s\t0M", (*i ? " " : ""));
+						strcat(i, "\t0M");
 					}
 					if (IS_PVP_FLAGGED(ch)) {
-						sprintf(i + strlen(i), "%s\tRP", (*i ? " " : ""));
+						strcat(i, "\tRP");
 					}
 					if (IS_RIDING(ch)) {
-						sprintf(i + strlen(i), "%s\t0R", (*i ? " " : ""));
+						strcat(i, "\t0R");
 					}
 					if (PRF_FLAGGED(ch, PRF_RP)) {
-						sprintf(i + strlen(i), "%s\tmR", (*i ? " " : ""));
+						strcat(i, "\tmR");
 					}
 					if (IS_BLOOD_STARVED(ch)) {
-						sprintf(i + strlen(i), "%s\t0S", (*i ? " " : ""));
+						strcat(i, "\t0S");
 					}
 					if (IS_THIRSTY(ch)) {
-						sprintf(i + strlen(i), "%s\t0T", (*i ? " " : ""));
+						strcat(i, "\t0T");
 					}
 					if (!IS_NPC(ch)) {
 						if (get_cooldown_time(ch, COOLDOWN_ROGUE_FLAG) > 0) {
-							sprintf(i + strlen(i), "%s\tMR", (*i ? " " : ""));
+							strcat(i, "\tMR");
 						}
 						else if (get_cooldown_time(ch, COOLDOWN_HOSTILE_FLAG) > 0) {
-							sprintf(i + strlen(i), "%s\tmH", (*i ? " " : ""));
+							strcat(i, "\tmH");
 						}
 					}
 					
@@ -2746,10 +2746,10 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 						sprintf(i + strlen(i), "\tri%d", GET_INVIS_LEV(ch));
 					}
 					if (IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_INCOGNITO)) {
-						sprintf(i + strlen(i), "\tbI");
+						strcat(i, "\tbI");
 					}
 					if (IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_WIZHIDE)) {
-						sprintf(i + strlen(i), "\tcW");
+						strcat(i, "\tcW");
 					}
 					if (wizlock_level > 0 && IS_IMMORTAL(ch)) {
 						sprintf(i + strlen(i), "\tgw%d", wizlock_level);
