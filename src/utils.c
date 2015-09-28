@@ -2406,10 +2406,16 @@ char *CAP(char *txt) {
 int count_color_codes(char *string) {
 	int iter, count = 0, len = strlen(string);
 	for (iter = 0; iter < len - 1; ++iter) {
-		if (string[iter] == '&' && string[iter+1] == '&') {
+		if (string[iter] == '\t' && string[iter+1] == '\t') {
+			++iter;	// advance past the \t\t (not a color code)
+		}
+		else if (string[iter] == '\t' && string[iter+1] == '&') {
+			++iter;	// advance past the \t& (not a color code)
+		}
+		else if (string[iter] == '&' && string[iter+1] == '&') {
 			++iter;	// advance past the && (not a color code)
 		}
-		if (string[iter] == '&') {
+		else if (string[iter] == '&' || string[iter] == '\t') {
 			++count;
 			++iter;	// advance past the color code
 		}
@@ -2429,6 +2435,14 @@ int count_double_ampersands(char *string) {
 		if (string[iter] == '&' && string[iter+1] == '&') {
 			++count;
 			++iter;	// advance past the second &
+		}
+		else if (string[iter] == '\t' && string[iter+1] == '&') {
+			++count;
+			++iter;	// advance past the & in \t&
+		}
+		else if (string[iter] == '\t' && string[iter+1] == '\t') {
+			++count;
+			++iter;	// advance past the second \t in \t\t (similar to an &&)
 		}
 	}
 	

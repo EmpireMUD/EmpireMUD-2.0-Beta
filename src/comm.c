@@ -2517,50 +2517,35 @@ char *make_prompt(descriptor_data *d) {
 		*prompt = '\0';
 	}
 	else if (d->showstr_count)
-		sprintf(prompt, "\r&0[ Return to continue, (q)uit, (r)efresh, (b)ack, or page number (%d/%d) ]", d->showstr_page, d->showstr_count);
+		sprintf(prompt, "\r\t0[ Return to continue, (q)uit, (r)efresh, (b)ack, or page number (%d/%d) ]", d->showstr_page, d->showstr_count);
 	else if (d->str && (STATE(d) != CON_PLAYING || d->straight_to_editor))
 		strcpy(prompt, "] ");
 	else if (STATE(d) == CON_PLAYING) {
 		*prompt = '\0';
-
-		if (!IS_NPC(d->character) && GET_INVIS_LEV(d->character))
-			sprintf(prompt + strlen(prompt), "&r(i%d) ", GET_INVIS_LEV(d->character));
-
-		if (wizlock_level > 0 && GET_ACCESS_LEVEL(d->character) >= LVL_START_IMM)
-			sprintf(prompt + strlen(prompt), "&g(w%d) ", wizlock_level);
 		
 		if (!IS_NPC(d->character)) {
 			if (get_cooldown_time(d->character, COOLDOWN_ROGUE_FLAG) > 0) {
-				strcat(prompt, "&M(rogue) ");
+				strcat(prompt, "\tM(rogue) ");
 			}
 			else if (get_cooldown_time(d->character, COOLDOWN_HOSTILE_FLAG) > 0) {
-				strcat(prompt, "&m(hostile) ");
+				strcat(prompt, "\tm(hostile) ");
 			}
 		}
 
-		// IS_AFK is caused by the prf or timer>10
-		if (IS_AFK(d->character)) {
-			if (PRF_FLAGGED(d->character, PRF_AFK)) {
-				strcat(prompt, "&r[AFK] ");
-			}
-			else {
-				strcat(prompt, "&r[IDLE] ");
-			}
+		// show idle after 10 minutes
+		if ((d->character->char_specials.timer * SECS_PER_MUD_HOUR / SECS_PER_REAL_MIN) >= 10) {
+			strcat(prompt, "\tr[IDLE] ");
 		}
 
 		if (!IS_NPC(d->character) && PRF_FLAGGED(d->character, PRF_RP))
-			sprintf(prompt + strlen(prompt), "&m[RP] ");
-		
-		if (IS_PVP_FLAGGED(d->character)) {
-			strcat(prompt, "&R(PVP) ");
-		}
-		
+			sprintf(prompt + strlen(prompt), "\tm[RP] ");
+				
 		// olc info
 		if (GET_OLC_TYPE(d) != 0) {
 			strcat(prompt, prompt_olc_info(d->character));
 		}
 
-		strcat(prompt, "&0");
+		strcat(prompt, "\t0");
 
 		strncat(prompt, prompt_str(d->character), sizeof(prompt) - strlen(prompt) - 1);
 	}
@@ -2583,13 +2568,13 @@ char *prompt_color_by_prc(int cur, int max) {
 	int prc = cur * 100 / MAX(1, max);
 	
 	if (prc >= 90) {
-		return "&g";
+		return "\tg";
 	}
 	else if (prc >= 25) {
-		return "&y";
+		return "\ty";
 	}
 	else {
-		return "&r";
+		return "\tr";
 	}
 }
 
@@ -2617,18 +2602,18 @@ char *prompt_str(char_data *ch) {
 	if (!str || !*str) {
 		if (IS_MAGE(ch)) {
 			if (IS_VAMPIRE(ch)) {
-				str = "&0|%i/%u/%n %bb [%t]> ";
+				str = "\t0|%i/%u/%n %bb [%t]> ";
 			}
 			else {
-				str = "&0|%i/%u/%n> ";
+				str = "\t0|%i/%u/%n> ";
 			}
 		}
 		else {
 			if (IS_VAMPIRE(ch)) {
-				str = "&0|%i/%u %bb [%t]> ";
+				str = "\t0|%i/%u %bb [%t]> ";
 			}
 			else {
-				str = "&0|%i/%u> ";
+				str = "\t0|%i/%u> ";
 			}
 		}
 	}
@@ -2666,18 +2651,40 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 	for (;;) {
 		if (*str == '%') {
 			switch (*(++str)) {
-				case 'c':	/* Conditions */
-					sprintf(i, "%s%s%s%s%s%s%s",
+				case 'c': {	// player conditions
+					sprintf(i, "%s%s%s%s%s%s%s%s%s",
+								PRF_FLAGGED(ch, PRF_AFK) ? "A" : "",
 							   	IS_DRUNK(ch) ? "D" : "",
 							   	EFFECTIVELY_FLYING(ch) ? "F" : "",
 							   	IS_HUNGRY(ch) ? "H" : "",
 							   	(!IS_NPC(ch) && GET_MORPH(ch) != MORPH_NONE) ? "M" : "",
+								IS_PVP_FLAGGED(ch) ? "\tRP\t0" : "",
 							   	IS_RIDING(ch) ? "R" : "",
 							   	(IS_BLOOD_STARVED(ch)) ? "S" : "",
 							   	IS_THIRSTY(ch) ? "T" : ""
 							   	);
 					tmp = i;
 					break;
+				}
+				case 'C': {	// Immortal conditions
+					*i = '\0';
+					if (!IS_NPC(ch) && GET_INVIS_LEV(ch) > 0) {
+						sprintf(i + strlen(i), "%s\trri%d", (*i ? " " : ""), GET_INVIS_LEV(ch));
+					}
+					if (IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_INCOGNITO)) {
+						sprintf(i + strlen(i), "%s\tbincog", (*i ? " " : ""));
+					}
+					if (IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_WIZHIDE)) {
+						sprintf(i + strlen(i), "%s\tcwizhide", (*i ? " " : ""));
+					}
+					if (wizlock_level > 0 && IS_IMMORTAL(ch)) {
+						sprintf(i + strlen(i), "%s\tgw%d", (*i ? " " : ""), wizlock_level);
+					}
+					
+					strcat(i, "\t0");
+					tmp = i;
+					break;
+				}
 				case 'e': {	// %e enemy's health percent
 					if ((vict = FIGHTING(ch))) {
 						sprintf(i, "%d%%", GET_HEALTH(vict) * 100 / MAX(1, GET_MAX_HEALTH(vict)));
@@ -2710,7 +2717,7 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					break;
 				}
 				case 'h':	// %h current health
-					sprintf(i, "%s%d&0", prompt_color_by_prc(GET_HEALTH(ch), GET_MAX_HEALTH(ch)), MAX(0, GET_HEALTH(ch)));
+					sprintf(i, "%s%d\t0", prompt_color_by_prc(GET_HEALTH(ch), GET_MAX_HEALTH(ch)), MAX(0, GET_HEALTH(ch)));
 					tmp = i;
 					break;
 				case 'H':	// %H max health
@@ -2722,7 +2729,7 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					tmp = i;
 					break;
 				case 'v':	// %v current move
-					sprintf(i, "%s%d&0", prompt_color_by_prc(GET_MOVE(ch), GET_MAX_MOVE(ch)), MAX(0, GET_MOVE(ch)));
+					sprintf(i, "%s%d\t0", prompt_color_by_prc(GET_MOVE(ch), GET_MAX_MOVE(ch)), MAX(0, GET_MOVE(ch)));
 					tmp = i;
 					break;
 				case 'V':	// %V max move
@@ -2734,7 +2741,7 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					tmp = i;
 					break;
 				case 'm':	// %m current mana
-					sprintf(i, "%s%d&0", prompt_color_by_prc(GET_MANA(ch), GET_MAX_MANA(ch)), MAX(0, GET_MANA(ch)));
+					sprintf(i, "%s%d\t0", prompt_color_by_prc(GET_MANA(ch), GET_MAX_MANA(ch)), MAX(0, GET_MANA(ch)));
 					tmp = i;
 					break;
 				case 'M':	// %M max mana
@@ -2747,7 +2754,7 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					break;
 				case 'b':	// %b current blood
 					if (IS_VAMPIRE(ch))
-						sprintf(i, "%s%d&0", prompt_color_by_prc(GET_BLOOD(ch), GET_MAX_BLOOD(ch)), GET_BLOOD(ch));
+						sprintf(i, "%s%d\t0", prompt_color_by_prc(GET_BLOOD(ch), GET_MAX_BLOOD(ch)), GET_BLOOD(ch));
 					else
 						sprintf(i, "%%%c", *str);
 					tmp = i;
@@ -2772,15 +2779,15 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 						strcpy(spare, "am");
 
 					if (time_info.hours == 6)
-						sprintf(i, "&C%d%s&0", time_info.hours > 12 ? time_info.hours - 12 : time_info.hours, spare);
+						sprintf(i, "\tC%d%s\t0", time_info.hours > 12 ? time_info.hours - 12 : time_info.hours, spare);
 					else if (time_info.hours < 19 && time_info.hours > 6)
-						sprintf(i, "&Y%d%s&0", time_info.hours > 12 ? time_info.hours - 12 : time_info.hours, spare);
+						sprintf(i, "\tY%d%s\t0", time_info.hours > 12 ? time_info.hours - 12 : time_info.hours, spare);
 					else if (time_info.hours == 19)
-						sprintf(i, "&R%d%s&0", time_info.hours > 12 ? time_info.hours - 12 : time_info.hours, spare);
+						sprintf(i, "\tR%d%s\t0", time_info.hours > 12 ? time_info.hours - 12 : time_info.hours, spare);
 					else if (time_info.hours == 0)
-						sprintf(i, "&B12am&0");
+						sprintf(i, "\tB12am\t0");
 					else
-						sprintf(i, "&B%d%s&0", time_info.hours > 12 ? time_info.hours - 12 : time_info.hours, spare);
+						sprintf(i, "\tB%d%s\t0", time_info.hours > 12 ? time_info.hours - 12 : time_info.hours, spare);
 					tmp = i;
 					break;
 				case 'a': {	// action
@@ -2837,7 +2844,7 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 
 	*cp = '\0';
 
-	strcat(pbuf, "&0");
+	strcat(pbuf, "\t0");
 	return (pbuf);
 }
 

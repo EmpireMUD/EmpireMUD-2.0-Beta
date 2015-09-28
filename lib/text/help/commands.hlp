@@ -994,7 +994,8 @@ Here are the prompt codes and what they do:
   %e  % health of enemy   %f  % health of enemy's focus (the tank)
                           %F  Current/total health of enemy's focus (if player)
   
-  %c  Conditions (hunger, thirst)
+  %c  conditions (afk, hunger, thirst, etc)
+  %C  immortal conditions (imms only)
   %s  bonus skill exp left today
 
 For immortals:
