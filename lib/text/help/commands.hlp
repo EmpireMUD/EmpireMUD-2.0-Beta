@@ -981,7 +981,7 @@ to see your normal prompt in combat.
 Typing "prompt off" will remove your prompt entirely, and "prompt default"
 will restore your default prompt.
 
-The base prompt is: &&0|%i/%u>
+The base prompt is: &&0|%i/%u [%C]> 
 
 Here are the prompt codes and what they do:
   %h  Current health      %v  Current moves      %m  Current mana
@@ -994,8 +994,8 @@ Here are the prompt codes and what they do:
   %e  % health of enemy   %f  % health of enemy's focus (the tank)
                           %F  Current/total health of enemy's focus (if player)
   
-  %c  conditions, abbreviated (afk, hunger, thirst, etc)
-  %C  conditions, as words
+  %c  conditions abbreviated (afk, hunger, thirst, etc)
+  %C  conditions as words
   %s  bonus skill exp left today
   
   %x  immortal conditions abbreviated

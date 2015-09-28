@@ -2376,7 +2376,7 @@ char *prompt_olc_info(char_data *ch) {
 	
 	sprintbit(GET_OLC_TYPE(ch->desc), olc_type_bits, typename, FALSE);
 	
-	snprintf(output, sizeof(output), "&c[%c%d] ", LOWER(typename[0]), GET_OLC_VNUM(ch->desc));
+	snprintf(output, sizeof(output), "%c%d", LOWER(typename[0]), GET_OLC_VNUM(ch->desc));
 	return output;
 }
 

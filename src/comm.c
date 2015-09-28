@@ -2506,8 +2506,6 @@ void write_to_q(const char *txt, struct txt_q *queue, int aliased, bool add_to_h
 * @return char* A pointer to the prompt string.
 */
 char *make_prompt(descriptor_data *d) {
-	extern char *prompt_olc_info(char_data *ch);
-
 	static char prompt[MAX_STRING_LENGTH];
 
 	/* Note, prompt is truncated at MAX_PROMPT_LENGTH chars (structs.h )*/
@@ -2525,15 +2523,8 @@ char *make_prompt(descriptor_data *d) {
 		
 		// show idle after 10 minutes
 		if ((d->character->char_specials.timer * SECS_PER_MUD_HOUR / SECS_PER_REAL_MIN) >= 10) {
-			strcat(prompt, "\tr[IDLE] ");
+			strcat(prompt, "\tr[IDLE]\t0 ");
 		}
-		
-		// olc info
-		if (GET_OLC_TYPE(d) != 0) {
-			strcat(prompt, prompt_olc_info(d->character));
-		}
-
-		strcat(prompt, "\t0");
 
 		strncat(prompt, prompt_str(d->character), sizeof(prompt) - strlen(prompt) - 1);
 	}
@@ -2742,14 +2733,17 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 				}
 				case 'x': {	// Immortal conditions (abbrevs)
 					*i = '\0';
-					if (!IS_NPC(ch) && GET_INVIS_LEV(ch) > 0) {
-						sprintf(i + strlen(i), "\tri%d", GET_INVIS_LEV(ch));
-					}
 					if (IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_INCOGNITO)) {
 						strcat(i, "\tbI");
 					}
 					if (IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_WIZHIDE)) {
 						strcat(i, "\tcW");
+					}
+					if (!IS_NPC(ch) && GET_INVIS_LEV(ch) > 0) {
+						sprintf(i + strlen(i), "\tri%d", GET_INVIS_LEV(ch));
+					}
+					if (ch->desc && GET_OLC_TYPE(ch->desc) != 0) {
+						strcat(i, "\tcO");
 					}
 					if (wizlock_level > 0 && IS_IMMORTAL(ch)) {
 						sprintf(i + strlen(i), "\tgw%d", wizlock_level);
@@ -2765,9 +2759,6 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 				}
 				case 'X': {	// Immortal conditions (words)
 					*i = '\0';
-					if (!IS_NPC(ch) && GET_INVIS_LEV(ch) > 0) {
-						sprintf(i + strlen(i), "%s\trinvis-%d", (*i ? " " : ""), GET_INVIS_LEV(ch));
-					}
 					if (IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_INCOGNITO)) {
 						sprintf(i + strlen(i), "%s\tbincog", (*i ? " " : ""));
 					}
@@ -2776,6 +2767,13 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					}
 					if (wizlock_level > 0 && IS_IMMORTAL(ch)) {
 						sprintf(i + strlen(i), "%s\tgwizlock-%d", (*i ? " " : ""), wizlock_level);
+					}
+					if (!IS_NPC(ch) && GET_INVIS_LEV(ch) > 0) {
+						sprintf(i + strlen(i), "%s\trinvis-%d", (*i ? " " : ""), GET_INVIS_LEV(ch));
+					}
+					if (ch->desc && GET_OLC_TYPE(ch->desc) != 0) {
+						extern char *prompt_olc_info(char_data *ch);
+						sprintf(i + strlen(i), "%s\tcolc-%s", (*i ? " " : ""), prompt_olc_info(ch));
 					}
 					
 					if (!*i) {
