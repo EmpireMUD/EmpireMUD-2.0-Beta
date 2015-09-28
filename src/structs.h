@@ -342,6 +342,7 @@ typedef struct trig_data trig_data;
 #define RMT_PEACEFUL  BIT(4)	// e. no attacking/saferoom
 #define RMT_NEED_BOAT  BIT(5)	// f. requires a boat
 #define RMT_NO_TELEPORT  BIT(6)	// g. cannot teleport in/out
+#define RMT_LOOK_OUT  BIT(7)	// h. can see the map using "look out"
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -391,6 +392,7 @@ typedef struct trig_data trig_data;
 #define BLD_NO_DELETE  BIT(40)	// will not be deleted for not having a homeroom
 #define BLD_SUMMON_PLAYER  BIT(41)	// can use the summon player command
 #define BLD_NEED_BOAT  BIT(42)	// requires a boat to enter
+#define BLD_LOOK_OUT  BIT(43)	// can see the map using "look out"
 
 
 // Terrain flags for do_build -- these match up with build_on flags for building crafts
@@ -508,6 +510,7 @@ typedef struct trig_data trig_data;
 #define AFF_IMMUNE_STEALTH  BIT(28)	// C. Immune to stealth debuffs
 #define AFF_IMMUNE_VAMPIRE  BIT(29)	// D. Immune to vampire debuffs
 #define AFF_IMMUNE_STUN  BIT(30)	// E. Cannot be hit by stun effects
+#define AFF_ORDERED  BIT(31)	// F. Has been issued an order from a player
 
 
 // Injury flags -- IS_INJURED
@@ -1306,7 +1309,7 @@ typedef struct trig_data trig_data;
 #define PRF_MORTLOG  BIT(6)	// Views mortlogs, default: ON
 #define PRF_NOREPEAT  BIT(7)	// No repetition of comm commands
 #define PRF_HOLYLIGHT  BIT(8)	// Immortal: Can see in dark
-	#define PRF_UNUSED1  BIT(9)
+#define PRF_INCOGNITO  BIT(9)	// Immortal: Can't be seen on the who list
 #define PRF_NOWIZ  BIT(10)	// Can't hear wizline
 #define PRF_NOMAPCOL  BIT(11)	// Map is not colored
 #define PRF_NOHASSLE  BIT(12)	// Ignored by mobs and triggers
@@ -1324,6 +1327,7 @@ typedef struct trig_data trig_data;
 #define PRF_NOSPAM  BIT(24)	// blocks periodic action messages
 #define PRF_SCREEN_READER  BIT(25)	// player is visually impaired and using a screen reader that can't read the map
 #define PRF_STEALTHABLE  BIT(26)	// player can steal (rather than be prevented from accidentally stealing)
+#define PRF_WIZHIDE  BIT(27)	// player can't be seen in the room
 
 
 // Rent codes

@@ -1057,6 +1057,8 @@ ACMD(do_customize) {
 
 
 ACMD(do_dismiss) {
+	bool despawn_familiar(char_data *ch, mob_vnum vnum);
+	
 	char_data *vict;
 	
 	one_argument(argument, arg);
@@ -1066,15 +1068,11 @@ ACMD(do_dismiss) {
 	}
 	else if (!strn_cmp(arg, "famil", 5) && is_abbrev(arg, "familiar")) {
 		// requires abbrev of at least "famil"
-		if (!(vict = has_familiar(ch))) {
+		if (!despawn_familiar(ch, NOTHING)) {
 			msg_to_char(ch, "You do not have a familiar to dismiss.\r\n");
 		}
 		else {
-			if (IN_ROOM(ch) != IN_ROOM(vict)) {
-				msg_to_char(ch, "You dismiss %s.\r\n", PERS(vict, vict, FALSE));
-			}
-			act("$n is dismissed and vanishes!", TRUE, vict, NULL, NULL, TO_ROOM);
-			extract_char(vict);
+			send_config_msg(ch, "ok_string");
 		}
 	}
 	else if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
@@ -1620,7 +1618,9 @@ ACMD(do_order) {
 				act("$n has an indifferent look.", FALSE, vict, 0, 0, TO_ROOM);
 			else {
 				send_config_msg(ch, "ok_string");
+				SET_BIT(AFF_FLAGS(vict), AFF_ORDERED);
 				command_interpreter(vict, message);
+				REMOVE_BIT(AFF_FLAGS(vict), AFF_ORDERED);
 			}
 		}
 		else {			/* This is order "followers" */
@@ -1633,7 +1633,9 @@ ACMD(do_order) {
 				if (org_room == IN_ROOM(k->follower))
 					if (AFF_FLAGGED(k->follower, AFF_CHARM)) {
 						found = TRUE;
+						SET_BIT(AFF_FLAGS(k->follower), AFF_ORDERED);
 						command_interpreter(k->follower, message);
+						REMOVE_BIT(AFF_FLAGS(k->follower), AFF_ORDERED);
 					}
 			}
 			if (found)
@@ -2236,10 +2238,14 @@ ACMD(do_title) {
 ACMD(do_toggle) {
 	extern const struct toggle_data_type toggle_data[];	// constants.c
 	
-	const char *togcols[NUM_TOG_TYPES][2] = { { "&r", "&g" }, { "&g", "&r" } };
+	const char *togcols[NUM_TOG_TYPES][2] = { { "\tr", "\tg" }, { "\tg", "\tr" } };
 	const char *tognames[NUM_TOG_TYPES][2] = { { "off", "on" }, { "on", "off" } };
+	const char *imm_color = "\tc";
+	const char *clear_color = "\t0";
 
 	int iter, type = NOTHING, count, on;
+	bool imm;
+	bool screenreader = PRF_FLAGGED(ch, PRF_SCREEN_READER);
 	
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs do not have toggles.\r\n");
@@ -2259,12 +2265,18 @@ ACMD(do_toggle) {
 		
 		for (iter = count = 0; *toggle_data[iter].name != '\n'; ++iter) {
 			if (toggle_data[iter].level <= GET_ACCESS_LEVEL(ch)) {
-				on = PRF_FLAGGED(ch, toggle_data[iter].bit) ? 1 : 0;
-				msg_to_char(ch, " [%s%3.3s&0] %-15.15s%s", togcols[toggle_data[iter].type][on], tognames[toggle_data[iter].type][on], toggle_data[iter].name, (!(++count % 3) ? "\r\n" : ""));
+				on = (PRF_FLAGGED(ch, toggle_data[iter].bit) ? 1 : 0);
+				imm = (toggle_data[iter].level >= LVL_START_IMM);
+				if (screenreader) {
+					msg_to_char(ch, "%s: %s%s\r\n", toggle_data[iter].name, tognames[toggle_data[iter].type][on], imm ? " (immortal)" : "");
+				}
+				else {
+					msg_to_char(ch, " %s[%s%3.3s%s] %-15.15s%s%s", imm ? imm_color : "", togcols[toggle_data[iter].type][on], tognames[toggle_data[iter].type][on], imm ? imm_color : clear_color, toggle_data[iter].name, clear_color, (!(++count % 3) ? "\r\n" : ""));
+				}
 			}
 		}
 		
-		if (count % 3) {
+		if (count % 3 && !screenreader) {
 			send_to_char("\r\n", ch);
 		}
 	}

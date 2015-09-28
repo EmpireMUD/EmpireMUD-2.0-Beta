@@ -18,12 +18,13 @@ Triggers are broken up into three types by what they are attached to:
  ========================|   TRIGEDIT-OBJ-LEAVE    |  TRIGEDIT-MOB-HITPRCNT  |
                          |   TRIGEDIT-OBJ-CONSUME  |  TRIGEDIT-MOB-BRIBE     |
 Further help can be       =========================|  TRIGEDIT-MOB-LOAD      |
-accessed by typing:                                |  TRIGEDIT-MOB-MEMORY    |
-HELP <TYPE>.                                       |  TRIGEDIT-MOB-ABILITY   |
-i.e. HELP TRIGEDIT-MOB-ACT                         |  TRIGEDIT-MOB-LEAVE     |
-                                                   |  TRIGEDIT-MOB-LEAVE-ALL |
-                                                   |  TRIGEDIT-MOB-DOOR      |
-See also: TRIG-COMMANDS, VARIABLES, EXPRESSIONS     =========================
+accessed by typing:                             |     TRIGEDIT-MOB-MEMORY    |
+HELP <TYPE>.                                    |     TRIGEDIT-MOB-ABILITY   |
+i.e. HELP TRIGEDIT-MOB-ACT                      |     TRIGEDIT-MOB-LEAVE     |
+                                                |     TRIGEDIT-MOB-LEAVE-ALL |
+                                                |     TRIGEDIT-MOB-DOOR      |
+                                                | TRIGEDIT-MOB-FIGHT-CHARMED |
+See also: TRIG-COMMANDS, VARIABLES, EXPRESSIONS  ============================
 #d
 TRIGEDIT-COMMANDS TRIG-COMMANDS TRIGGER-COMMANDS TRIGEDIT-COMMANDLISTS
  
@@ -979,6 +980,7 @@ is_pc             - Checks if the actor is a player. Useful when you want a
                     trigger to fire on players and not mobs.
 level             - The actor's computed level (or scaled level, for mobs).
 mana              - The current mana points of the actor.
+mana(amount)      - Add/subtract mana on the actor.
 master            - The master of the actor (as an id), or an empty return.
 maxblood          - The maximum blood points of the actor.
 maxhealth         - The maximum hit points of the actor.
@@ -986,6 +988,7 @@ maxmana           - The maximum mana points of the actor.
 maxmove           - The maximum movement points of the actor.
 mob_flagged(flag) - Returns TRUE if the NPC has the given flag, e.g. VAMPIRE.
 move              - The movement points of the actor.
+move(amount)      - Add/subtract movement points on the actor.
 name              - The actor's name (the short description for mobs).
 next_in_room      - The next actor in the room as a variable (id) nice to 
                     use for loops, or an empty return.
@@ -1096,6 +1099,7 @@ MOB-TRIGGERS MOBILE-TRIGGERS TRIGEDIT-MOB-TYPES
 17) Leave       HELP TRIGEDIT-MOB-LEAVE          
 18) Door        HELP TRIGEDIT-MOB-DOOR                    
 17) Leave-All   HELP TRIGEDIT-MOB-LEAVE-ALL
+18) Fight-Charmed  HELP TRIGEDIT-MOB-FIGHT-CHARMED
 #d
 TRIGEDIT-OBJ-GET
 
@@ -1487,15 +1491,18 @@ Variables:
 %actor%  - the character handing the object to the mobile
 %object% - the object being handed over           
 #d
-TRIGEDIT-MOB-FIGHT
+TRIGEDIT-MOB-FIGHT TRIGEDIT-MOB-FIGHT-CHARMED
  
 Activated each round of fighting, after the mobile has had all of its attacks.
- 
+
 Numeric Arg : percent chance this trigger will be activated.
 Argument    : not used.
 
 Variables:
 %actor% - the character this mobile is fighting
+
+Using the Fight-Charmed type will work even on charmed creatures, like
+familiars.
 #d
 TRIGEDIT-MOB-HITPERCENT TRIGEDIT-MOB-HITPRCNT 
  

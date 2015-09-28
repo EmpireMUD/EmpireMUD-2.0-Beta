@@ -125,9 +125,14 @@ static void perform_goto(char_data *ch, room_data *to_room) {
 	}
 
 	for (t = ROOM_PEOPLE(IN_ROOM(ch)); t; t = t->next_in_room) {
-		if (!REAL_NPC(t) && t != ch && CAN_SEE(t, ch)) {
-			act(buf, TRUE, ch, 0, t, TO_VICT);
+		if (REAL_NPC(t) || t == ch) {
+			continue;
 		}
+		if (!CAN_SEE(t, ch) || !WIZHIDE_OK(t, ch)) {
+			continue;
+		}
+
+		act(buf, TRUE, ch, 0, t, TO_VICT);
 	}
 
 	char_from_room(ch);
@@ -145,9 +150,14 @@ static void perform_goto(char_data *ch, room_data *to_room) {
 	}
 
 	for (t = ROOM_PEOPLE(IN_ROOM(ch)); t; t = t->next_in_room) {
-		if (!REAL_NPC(t) && t != ch && CAN_SEE(t, ch)) {
-			act(buf, TRUE, ch, 0, t, TO_VICT);
+		if (REAL_NPC(t) || t == ch) {
+			continue;
 		}
+		if (!CAN_SEE(t, ch) || !WIZHIDE_OK(t, ch)) {
+			continue;
+		}
+		
+		act(buf, TRUE, ch, 0, t, TO_VICT);
 	}
 	
 	look_at_room(ch);
@@ -951,9 +961,11 @@ struct set_struct {
 		{ "lastname",	LVL_START_IMM,	PC,		MISC },
 		{ "muted",		LVL_START_IMM,	PC, 	BINARY },
 		{ "name",		LVL_CIMPL,	PC,		MISC },
+		{ "incognito",	LVL_START_IMM,	PC,		BINARY },
 		{ "ipmask",		LVL_START_IMM,	PC,		BINARY },
 		{ "multiok",	LVL_START_IMM,	PC,		BINARY },
 		{ "vampire",	LVL_START_IMM,	PC, 	BINARY },
+		{ "wizhide",	LVL_START_IMM,	PC,		BINARY },
 		{ "account",	LVL_START_IMM,	PC,		MISC },
 		{ "bonus",		LVL_START_IMM,	PC,		MISC },
 		{ "grants",		LVL_CIMPL,	PC,		MISC },
@@ -1112,6 +1124,12 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 	}
 	else if SET_CASE("ipmask") {
 		SET_OR_REMOVE(PLR_FLAGS(vict), PLR_IPMASK);
+	}
+	else if SET_CASE("incognito") {
+		SET_OR_REMOVE(PRF_FLAGS(vict), PRF_INCOGNITO);
+	}
+	else if SET_CASE("wizhide") {
+		SET_OR_REMOVE(PRF_FLAGS(vict), PRF_WIZHIDE);
 	}
 	else if SET_CASE("multiok") {
 		SET_OR_REMOVE(PLR_FLAGS(vict), PLR_MULTIOK);
@@ -3545,6 +3563,48 @@ int vnum_trigger(char *searchname, char_data *ch) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// COMMANDS ////////////////////////////////////////////////////////////////
+
+ACMD(do_addnotes) {
+	char notes[MAX_ADMIN_NOTES_LENGTH];
+	char_data *vict = NULL;
+	bool file = FALSE;
+	
+	argument = one_argument(argument, arg);	// target
+	skip_spaces(&argument);	// text to add
+	
+	if (!*arg || !*argument) {
+		msg_to_char(ch, "Usage: addnotes <name> <text>\r\n");
+	}
+	else if (!(vict = find_or_load_player(arg, &file))) {
+		send_to_char("There is no such player.\r\n", ch);
+	}
+	else if (GET_ACCESS_LEVEL(vict) >= GET_ACCESS_LEVEL(ch)) {
+		msg_to_char(ch, "You cannot add notes for players of that level.\r\n");
+	}
+	else if (strlen(GET_ADMIN_NOTES(vict)) + strlen(argument) + 2 > MAX_ADMIN_NOTES_LENGTH) {
+		msg_to_char(ch, "Notes too long, unable to add text. Use editnotes instead.\r\n");
+	}
+	else {
+		snprintf(notes, sizeof(notes), "%s%s\r\n", GET_ADMIN_NOTES(vict), argument);
+		strcpy(GET_ADMIN_NOTES(vict), notes);	// strcpy OK: same length
+		
+		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has added notes for %s", GET_NAME(ch), GET_NAME(vict));
+		msg_to_char(ch, "Notes added to %s.\r\n", GET_NAME(vict));
+		
+		if (file) {
+			store_loaded_char(vict);
+			file = FALSE;
+		}
+		else {
+			SAVE_CHAR(vict);
+		}
+	}
+	
+	// in case
+	if (vict && file) {
+		free_char(vict);
+	}
+}
 
 
 ACMD(do_advance) {

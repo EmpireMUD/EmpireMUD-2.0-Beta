@@ -415,11 +415,14 @@ void fight_mtrigger(char_data *ch) {
 	trig_data *t;
 	char buf[MAX_INPUT_LENGTH];
 
-	if (!SCRIPT_CHECK(ch, MTRIG_FIGHT) || !FIGHTING(ch) || AFF_FLAGGED(ch, AFF_CHARM))
+	if (!SCRIPT_CHECK(ch, MTRIG_FIGHT | MTRIG_FIGHT_CHARMED) || !FIGHTING(ch))
 		return;
 
 	for (t = TRIGGERS(SCRIPT(ch)); t; t = t->next) {
-		if (TRIGGER_CHECK(t, MTRIG_FIGHT) && (number(1, 100) <= GET_TRIG_NARG(t))){
+		if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_FIGHT_CHARMED)) {
+			continue;
+		}
+		if (TRIGGER_CHECK(t, MTRIG_FIGHT | MTRIG_FIGHT_CHARMED) && (number(1, 100) <= GET_TRIG_NARG(t))) {
 			union script_driver_data_u sdd;
 
 			actor = FIGHTING(ch);

@@ -1070,6 +1070,9 @@ void act(const char *str, int hide_invisible, char_data *ch, obj_data *obj, cons
 					continue;
 				if (IS_SET(type, TO_NOTVICT) && to == vict_obj)
 					continue;
+				if (!WIZHIDE_OK(to, ch)) {
+					continue;
+				}
 				perform_act(str, ch, obj, vict_obj, to, IS_SET(type, TO_IGNORE_BAD_CODE) != 0);
 			}
 		}

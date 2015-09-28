@@ -56,6 +56,7 @@ int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_sk
 double get_weapon_speed(obj_data *weapon);
 void heal(char_data *ch, char_data *vict, int amount);
 int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round);
+extern int lock_instance_level(room_data *room, int level);
 obj_data *make_corpse(char_data *ch);
 void perform_execute(char_data *ch, char_data *victim, int attacktype, int damtype);
 void trigger_distrust_from_hostile(char_data *ch, empire_data *emp);
@@ -2175,6 +2176,7 @@ bool check_combat_position(char_data *ch, double speed) {
  *	> 0	How much damage done.
  */
 int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damtype) {
+	struct instance_data *inst;
 	int iter;
 	bool full_miss = (dam <= 0);
 	
@@ -2187,6 +2189,13 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 		log("SYSERR: Attempt to damage corpse '%s' in room #%d by '%s'.", GET_NAME(victim), GET_ROOM_VNUM(IN_ROOM(victim)), GET_NAME(ch));
 		die(victim, ch);
 		return (-1);			/* -je, 7/7/92 */
+	}
+	
+	// look for an instance to lock (before running triggers)
+	if (!IS_NPC(ch) && IS_ADVENTURE_ROOM(IN_ROOM(ch)) && COMPLEX_DATA(IN_ROOM(ch)) && (inst = COMPLEX_DATA(IN_ROOM(ch))->instance)) {
+		if (ADVENTURE_FLAGGED(inst->adventure, ADV_LOCK_LEVEL_ON_COMBAT) && !IS_IMMORTAL(ch)) {
+			lock_instance_level(IN_ROOM(ch), determine_best_scale_level(ch, TRUE));
+		}
 	}
 	
 	check_scaling(victim, ch);
@@ -2483,7 +2492,6 @@ void heal(char_data *ch, char_data *vict, int amount) {
 int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 	void add_pursuit(char_data *ch, char_data *target);
 	extern int apply_poison(char_data *ch, char_data *vict, int type);
-	extern int lock_instance_level(room_data *room, int level);
 	
 	struct instance_data *inst;
 	int w_type;

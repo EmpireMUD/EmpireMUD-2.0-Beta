@@ -795,6 +795,7 @@ LOOK EXAMINE
 Usage:  look
         look [in | at] [the] <item>
         look <direction>
+        look out
 
 For studying your surroundings. Examine and look do the same thing.
 
@@ -1578,6 +1579,8 @@ Immortal toggles:
   holylight - allows immortals to see in the dark
   roomflags - shows room flags, vnums, and other info to immortals
   idle-out - if off, the immortal will not disconnect from idling
+  incognito - if on, the immortal does not appear on 'who' to lower players
+  wizhide - if on, the immortal can't be seen in rooms but is not invisible
 #
 UNLOAD BOATUNLOAD
 

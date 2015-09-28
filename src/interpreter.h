@@ -219,3 +219,4 @@ struct alias_data {
 // for look_at_room_by_loc -- option flags
 #define LRR_SHIP_PARTIAL  BIT(0)	// shows only part of the room, for use on ships.
 #define LRR_SHOW_DARK  BIT(1)	// for passing to show_map_to_char
+#define LRR_FORCE_MAP  BIT(2)	// show map even indoors

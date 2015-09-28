@@ -160,6 +160,7 @@ const char *room_template_flags[] = {
 	"PEACEFUL",
 	"NEED-BOAT",
 	"!TELEPORT",
+	"LOOK-OUT",
 	"\n"
 };
 
@@ -378,7 +379,7 @@ const char *preference_bits[] = {
 	"MORTLOG",
 	"!REP",
 	"LIGHT",
-		"UNUSED1",
+	"INCOGNITO",
 	"!WIZ",
 	"!MCOL",
 	"!HASSLE",
@@ -396,6 +397,7 @@ const char *preference_bits[] = {
 	"!SPAM",
 	"SCREENREADER",
 	"STEALTHABLE",
+	"WIZHIDE",
 	"\n"
 };
 
@@ -438,6 +440,9 @@ const struct toggle_data_type toggle_data[] = {
 	
 	{ "hassle", TOG_OFFON, PRF_NOHASSLE, LVL_START_IMM, NULL },
 	{ "idle-out", TOG_OFFON, PRF_NO_IDLE_OUT, LVL_START_IMM, NULL },
+	{ "incognito", TOG_ONOFF, PRF_INCOGNITO, LVL_START_IMM, NULL },
+	
+	{ "wizhide", TOG_ONOFF, PRF_WIZHIDE, LVL_START_IMM, NULL },
 	
 	// this goes last
 	{ "\n", 0, NOBITS, 0, NULL }
@@ -726,6 +731,7 @@ const char *affected_bits[] = {
 	"!STEALTH",
 	"!VAMPIRE",
 	"!STUN",
+	"*ORDERED",
 	"\n"
 };
 
@@ -762,6 +768,7 @@ const char *affected_bits_consider[] = {
 	"$E is immune to Stealth debuffs.",	// !stealth
 	"$E is immune to Vampire debuffs.",	// !vampire
 	"$E is immune to stuns.",	// !stun
+	"",	// ordred
 	"\n"
 };
 
@@ -789,6 +796,7 @@ const bool aff_is_bad[] = {
 	TRUE,	// stunned
 	TRUE,	// stoned
 	TRUE,	// !blood
+	FALSE,
 	FALSE,
 	FALSE,
 	FALSE,
@@ -1840,6 +1848,7 @@ const char *bld_flags[] = {
 	"!DELETE",
 	"SUMMON-PLAYER",
 	"NEED-BOAT",
+	"LOOK-OUT",
 	"\n"
 };
 
@@ -2537,6 +2546,7 @@ const char *trig_types[] = {
 	"Leave",
 	"Door",
 	"Leave-All",
+	"Fight-Charmed",
 	"\n"
 };
 

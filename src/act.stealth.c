@@ -1620,7 +1620,7 @@ ACMD(do_steal) {
 	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_STEAL)) {
 		return;
 	}
-	else if (!can_steal(ch, emp)) {
+	else if (!IS_IMMORTAL(ch) && !can_steal(ch, emp)) {
 		// sends own message
 	}
 	else if (!emp) {
@@ -1654,7 +1654,10 @@ ACMD(do_steal) {
 				}
 				else {
 					// SUCCESS!
-					if (!skill_check(ch, ABIL_STEAL, DIFF_HARD)) {
+					if (IS_IMMORTAL(ch)) {
+						syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s stealing %s from %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(proto), EMPIRE_NAME(emp));
+					}
+					else if (!skill_check(ch, ABIL_STEAL, DIFF_HARD)) {
 						log_to_empire(emp, ELOG_HOSTILITY, "Theft at (%d, %d)", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
 					}
 

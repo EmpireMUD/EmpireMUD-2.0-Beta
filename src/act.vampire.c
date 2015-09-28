@@ -1016,7 +1016,9 @@ ACMD(do_command) {
 			SET_BIT(AFF_FLAGS(victim), AFF_CHARM);
 			
 			// do
+			SET_BIT(AFF_FLAGS(victim), AFF_ORDERED);
 			command_interpreter(victim, to_do);
+			REMOVE_BIT(AFF_FLAGS(victim), AFF_ORDERED);
 			
 			if (un_charm && !EXTRACTED(victim)) {
 				REMOVE_BIT(AFF_FLAGS(victim), AFF_CHARM);
