@@ -2669,7 +2669,7 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 				case 'C': {	// Immortal conditions
 					*i = '\0';
 					if (!IS_NPC(ch) && GET_INVIS_LEV(ch) > 0) {
-						sprintf(i + strlen(i), "%s\trri%d", (*i ? " " : ""), GET_INVIS_LEV(ch));
+						sprintf(i + strlen(i), "%s\tri%d", (*i ? " " : ""), GET_INVIS_LEV(ch));
 					}
 					if (IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_INCOGNITO)) {
 						sprintf(i + strlen(i), "%s\tbincog", (*i ? " " : ""));
