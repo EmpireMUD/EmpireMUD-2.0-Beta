@@ -2642,18 +2642,52 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 	for (;;) {
 		if (*str == '%') {
 			switch (*(++str)) {
-				case 'c': {	// player conditions (abbrevs)
-					sprintf(i, "%s%s%s%s%s%s%s%s%s",
-								PRF_FLAGGED(ch, PRF_AFK) ? "A" : "",
-							   	IS_DRUNK(ch) ? "D" : "",
-							   	EFFECTIVELY_FLYING(ch) ? "F" : "",
-							   	IS_HUNGRY(ch) ? "H" : "",
-							   	(!IS_NPC(ch) && GET_MORPH(ch) != MORPH_NONE) ? "M" : "",
-								IS_PVP_FLAGGED(ch) ? "\tRP\t0" : "",
-							   	IS_RIDING(ch) ? "R" : "",
-							   	(IS_BLOOD_STARVED(ch)) ? "S" : "",
-							   	IS_THIRSTY(ch) ? "T" : ""
-							   	);
+				case 'c': {	// player conditions (words)
+					*i = '\0';
+					if (PRF_FLAGGED(ch, PRF_AFK)) {
+						sprintf(i + strlen(i), "%s\trA", (*i ? " " : ""));
+					}
+					if (IS_DRUNK(ch)) {
+						sprintf(i + strlen(i), "%s\t0D", (*i ? " " : ""));
+					}
+					if (EFFECTIVELY_FLYING(ch)) {
+						sprintf(i + strlen(i), "%s\t0F", (*i ? " " : ""));
+					}
+					if (IS_HUNGRY(ch)) {
+						sprintf(i + strlen(i), "%s\t0H", (*i ? " " : ""));
+					}
+					if (!IS_NPC(ch) && GET_MORPH(ch) != MORPH_NONE) {
+						sprintf(i + strlen(i), "%s\t0M", (*i ? " " : ""));
+					}
+					if (IS_PVP_FLAGGED(ch)) {
+						sprintf(i + strlen(i), "%s\tRP", (*i ? " " : ""));
+					}
+					if (IS_RIDING(ch)) {
+						sprintf(i + strlen(i), "%s\t0R", (*i ? " " : ""));
+					}
+					if (PRF_FLAGGED(ch, PRF_RP)) {
+						sprintf(i + strlen(i), "%s\tmR", (*i ? " " : ""));
+					}
+					if (IS_BLOOD_STARVED(ch)) {
+						sprintf(i + strlen(i), "%s\t0S", (*i ? " " : ""));
+					}
+					if (IS_THIRSTY(ch)) {
+						sprintf(i + strlen(i), "%s\t0T", (*i ? " " : ""));
+					}
+					if (!IS_NPC(ch)) {
+						if (get_cooldown_time(ch, COOLDOWN_ROGUE_FLAG) > 0) {
+							sprintf(i + strlen(i), "%s\tMR", (*i ? " " : ""));
+						}
+						else if (get_cooldown_time(ch, COOLDOWN_HOSTILE_FLAG) > 0) {
+							sprintf(i + strlen(i), "%s\tmH", (*i ? " " : ""));
+						}
+					}
+					
+					if (!*i) {
+						strcpy(i, "\t-");
+					}
+					
+					strcat(i, "\t0");
 					tmp = i;
 					break;
 				}
@@ -2698,6 +2732,10 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 						}
 					}
 					
+					if (!*i) {
+						strcpy(i, "\t--");
+					}
+					
 					strcat(i, "\t0");
 					tmp = i;
 					break;
@@ -2717,6 +2755,10 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 						sprintf(i + strlen(i), "\tgw%d", wizlock_level);
 					}
 					
+					if (!*i) {
+						strcpy(i, "\t-");
+					}
+					
 					strcat(i, "\t0");
 					tmp = i;
 					break;
@@ -2724,7 +2766,7 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 				case 'X': {	// Immortal conditions (words)
 					*i = '\0';
 					if (!IS_NPC(ch) && GET_INVIS_LEV(ch) > 0) {
-						sprintf(i + strlen(i), "%s\tri%d", (*i ? " " : ""), GET_INVIS_LEV(ch));
+						sprintf(i + strlen(i), "%s\trinvis-%d", (*i ? " " : ""), GET_INVIS_LEV(ch));
 					}
 					if (IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_INCOGNITO)) {
 						sprintf(i + strlen(i), "%s\tbincog", (*i ? " " : ""));
@@ -2733,7 +2775,11 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 						sprintf(i + strlen(i), "%s\tcwizhide", (*i ? " " : ""));
 					}
 					if (wizlock_level > 0 && IS_IMMORTAL(ch)) {
-						sprintf(i + strlen(i), "%s\tgw%d", (*i ? " " : ""), wizlock_level);
+						sprintf(i + strlen(i), "%s\tgwizlock-%d", (*i ? " " : ""), wizlock_level);
+					}
+					
+					if (!*i) {
+						strcpy(i, "\t--");
 					}
 					
 					strcat(i, "\t0");
