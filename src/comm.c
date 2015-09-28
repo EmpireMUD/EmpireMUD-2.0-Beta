@@ -64,6 +64,7 @@ extern char *help;
 
 // external functions
 void Crash_save_all();
+extern char *flush_reduced_color_codes(descriptor_data *desc);
 void mobile_activity(void);
 void show_string(descriptor_data *d, char *input);
 int isbanned(char *hostname);
@@ -2280,6 +2281,9 @@ static int process_output(descriptor_data *t) {
 		wantsize = strlen(prompt);
 		strncpy(prompt, ProtocolOutput(t, prompt, &wantsize), MAX_STRING_LENGTH);
 		prompt[MAX_STRING_LENGTH-1] = '\0';
+				
+		// force a color code flush
+		snprintf(prompt + strlen(prompt), sizeof(prompt) - strlen(prompt), "%s", flush_reduced_color_codes(t));
 
 		strncat(i, prompt, MAX_PROMPT_LENGTH);
 	}
@@ -3079,7 +3083,6 @@ void signal_setup(void) {
  * such as mobile_activity().
  */
 void game_loop(socket_t mother_desc) {
-	extern char *flush_reduced_color_codes(descriptor_data *desc);
 	void reset_time(void);
 
 	fd_set input_set, output_set, exc_set, null_set;
