@@ -2506,8 +2506,6 @@ void write_to_q(const char *txt, struct txt_q *queue, int aliased, bool add_to_h
 * @return char* A pointer to the prompt string.
 */
 char *make_prompt(descriptor_data *d) {
-	extern char *flush_reduced_color_codes(descriptor_data *desc);
-	
 	static char prompt[MAX_STRING_LENGTH];
 
 	/* Note, prompt is truncated at MAX_PROMPT_LENGTH chars (structs.h )*/
@@ -2534,9 +2532,6 @@ char *make_prompt(descriptor_data *d) {
 	else {
 		*prompt = '\0';
 	}
-	
-	// force a color code flush
-	snprintf(prompt + strlen(prompt), sizeof(prompt) - strlen(prompt), "%s", flush_reduced_color_codes(d));
 
 	return prompt;
 }
@@ -3084,6 +3079,7 @@ void signal_setup(void) {
  * such as mobile_activity().
  */
 void game_loop(socket_t mother_desc) {
+	extern char *flush_reduced_color_codes(descriptor_data *desc);
 	void reset_time(void);
 
 	fd_set input_set, output_set, exc_set, null_set;
@@ -3272,6 +3268,9 @@ void game_loop(socket_t mother_desc) {
 				wantsize = strlen(prompt);
 				strncpy(prompt, ProtocolOutput(d, prompt, &wantsize), MAX_STRING_LENGTH);
 				prompt[MAX_STRING_LENGTH-1] = '\0';
+				
+				// force a color code flush
+				snprintf(prompt + strlen(prompt), sizeof(prompt) - strlen(prompt), "%s", flush_reduced_color_codes(d));
 				
 				if (write_to_descriptor(d->descriptor, prompt) >= 0) {
 					d->has_prompt = 1;
