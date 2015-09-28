@@ -981,7 +981,7 @@ to see your normal prompt in combat.
 Typing "prompt off" will remove your prompt entirely, and "prompt default"
 will restore your default prompt.
 
-The base prompt is: &&0|%i/%u [%C]> 
+The base prompt is: &&0|%i/%u [&&y%C&&0]> 
 
 Here are the prompt codes and what they do:
   %h  Current health      %v  Current moves      %m  Current mana
