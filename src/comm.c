@@ -2580,22 +2580,22 @@ char *prompt_str(char_data *ch) {
 	// default prompts
 	if (!str || !*str) {
 		if (IS_IMMORTAL(ch)) {
-			str = "\t0|%C %X> ";
+			str = "\t0|\tc%C \tg%X\t0> ";
 		}
 		else if (IS_MAGE(ch)) {
 			if (IS_VAMPIRE(ch)) {
-				str = "\t0|%i/%u/%n %bb [%C] [%t]> ";
+				str = "\t0|%i/%u/%n %bb [\ty%C\t0] [%t]> ";
 			}
 			else {
-				str = "\t0|%i/%u/%n [%C]> ";
+				str = "\t0|%i/%u/%n [\ty%C\t0]> ";
 			}
 		}
 		else {
 			if (IS_VAMPIRE(ch)) {
-				str = "\t0|%i/%u %bb [%C] [%t]> ";
+				str = "\t0|%i/%u %bb [\ty%C\t0] [%t]> ";
 			}
 			else {
-				str = "\t0|%i/%u [%C]> ";
+				str = "\t0|%i/%u [\ty%C\t0]> ";
 			}
 		}
 	}
