@@ -3250,7 +3250,7 @@ ACMD(do_esay) {
 	level++;
 
 	if (level > 1)
-		sprintf(lstring, " <%s&0>", EMPIRE_RANK(e, level-1));
+		sprintf(lstring, " <%s\t0>", EMPIRE_RANK(e, level-1));
 	else
 		*lstring = '\0';
 
@@ -3262,10 +3262,10 @@ ACMD(do_esay) {
 
 	// NOTE: both modes will leave in 2 '%s' for color codes
 	if (emote) {
-		sprintf(buf, "%%s[%sEMPIRE%%s%s] $o %s&0", EMPIRE_BANNER(e), lstring, double_percents(argument));
+		sprintf(buf, "%%s[%sEMPIRE%%s%s] $o %s\t0", EMPIRE_BANNER(e), lstring, double_percents(argument));
 	}
 	else {
-		sprintf(buf, "%%s[%sEMPIRE%%s $o%s]: %s", EMPIRE_BANNER(e), lstring, double_percents(argument));
+		sprintf(buf, "%%s[%sEMPIRE%%s $o%s]: %s\t0", EMPIRE_BANNER(e), lstring, double_percents(argument));
 	}
 
 	if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
@@ -3277,7 +3277,7 @@ ACMD(do_esay) {
 			clear_last_act_message(ch->desc);
 		}
 
-		sprintf(color, "&%c", GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_ESAY) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_ESAY) : '0');
+		sprintf(color, "\t%c", GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_ESAY) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_ESAY) : '0');
 		sprintf(output, buf, color, color);
 		
 		act(output, FALSE, ch, 0, 0, TO_CHAR | TO_SLEEP | TO_NODARK);
@@ -3296,7 +3296,7 @@ ACMD(do_esay) {
 		else {
 			clear_last_act_message(d);
 			
-			sprintf(color, "&%c", GET_CUSTOM_COLOR(tch, CUSTOM_COLOR_ESAY) ? GET_CUSTOM_COLOR(tch, CUSTOM_COLOR_ESAY) : '0');
+			sprintf(color, "\t%c", GET_CUSTOM_COLOR(tch, CUSTOM_COLOR_ESAY) ? GET_CUSTOM_COLOR(tch, CUSTOM_COLOR_ESAY) : '0');
 			sprintf(output, buf, color, color);
 			act(output, FALSE, ch, 0, tch, TO_VICT | TO_SLEEP | TO_NODARK);
 			
