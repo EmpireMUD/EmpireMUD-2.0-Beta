@@ -2506,6 +2506,8 @@ void write_to_q(const char *txt, struct txt_q *queue, int aliased, bool add_to_h
 * @return char* A pointer to the prompt string.
 */
 char *make_prompt(descriptor_data *d) {
+	extern char *flush_reduced_color_codes(descriptor_data *desc);
+	
 	static char prompt[MAX_STRING_LENGTH];
 
 	/* Note, prompt is truncated at MAX_PROMPT_LENGTH chars (structs.h )*/
@@ -2532,6 +2534,9 @@ char *make_prompt(descriptor_data *d) {
 	else {
 		*prompt = '\0';
 	}
+	
+	// force a color code flush
+	snprintf(prompt + strlen(prompt), sizeof(prompt) - strlen(prompt), "%s", flush_reduced_color_codes(d));
 
 	return prompt;
 }

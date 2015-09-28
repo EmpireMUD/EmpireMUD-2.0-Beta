@@ -388,7 +388,7 @@ static void want_reduced_color_underline(descriptor_data *desc) {
 * @param descriptor_data *desc The person who is getting color codes.
 * @return char* The string of rendered color codes to send.
 */
-static char *flush_reduced_color_codes(descriptor_data *desc) {
+char *flush_reduced_color_codes(descriptor_data *desc) {
 	static char output[COLREDUC_SIZE * 3 + 1];	// guarantee enough room
 	*output = '\0';
 	
