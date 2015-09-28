@@ -2681,7 +2681,7 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					}
 					
 					if (!*i) {
-						strcpy(i, "\t-");
+						strcpy(i, "\t0-");
 					}
 					
 					strcat(i, "\t0");
@@ -2757,7 +2757,7 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					}
 					
 					if (!*i) {
-						strcpy(i, "\t-");
+						strcpy(i, "\t0-");
 					}
 					
 					strcat(i, "\t0");
