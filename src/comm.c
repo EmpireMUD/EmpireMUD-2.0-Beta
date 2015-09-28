@@ -2526,7 +2526,8 @@ char *make_prompt(descriptor_data *d) {
 			strcat(prompt, "\tr[IDLE]\t0 ");
 		}
 
-		strncat(prompt, prompt_str(d->character), sizeof(prompt) - strlen(prompt) - 1);
+		// append rendered prompt
+		snprintf(prompt + strlen(prompt), sizeof(prompt) - strlen(prompt), "%s", prompt_str(d->character));
 	}
 	else {
 		*prompt = '\0';
