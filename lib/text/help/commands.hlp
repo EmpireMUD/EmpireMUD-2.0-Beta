@@ -77,10 +77,11 @@ AFK "AFK TOGGLE"
 
 Usage:  toggle afk
 
-This toggle causes a small &r[AFK]&0 flag to appear after your title on the
-"who" list, indicating to other players that you are away-from-keyboard.
+This toggle causes a small &r(AFK)&0 flag to appear after your title on the
+"who" list, indicating to other players that you are away-from-keyboard. You
+can also see it in your prompt with %c or %C (conditions).
 
-See also: TOGGLE
+See also: PROMPT, TOGGLE
 #
 ALIAS ALIASES
 
