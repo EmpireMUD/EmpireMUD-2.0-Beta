@@ -2589,7 +2589,7 @@ char *prompt_str(char_data *ch) {
 	// default prompts
 	if (!str || !*str) {
 		if (IS_IMMORTAL(ch)) {
-			str = "\t0|%C> ";
+			str = "\t0|%C %X> ";
 		}
 		else if (IS_MAGE(ch)) {
 			if (IS_VAMPIRE(ch)) {
