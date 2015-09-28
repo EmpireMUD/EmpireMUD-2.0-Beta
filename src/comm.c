@@ -2584,7 +2584,7 @@ char *prompt_str(char_data *ch) {
 		}
 		else if (IS_MAGE(ch)) {
 			if (IS_VAMPIRE(ch)) {
-				str = "\t0|%i/%u/%n %d [\ty%C\t0] [%t]> ";
+				str = "\t0|%i/%u/%n/%d [\ty%C\t0] [%t]> ";
 			}
 			else {
 				str = "\t0|%i/%u/%n [\ty%C\t0]> ";
@@ -2592,7 +2592,7 @@ char *prompt_str(char_data *ch) {
 		}
 		else {
 			if (IS_VAMPIRE(ch)) {
-				str = "\t0|%i/%u %d [\ty%C\t0] [%t]> ";
+				str = "\t0|%i/%u/%d [\ty%C\t0] [%t]> ";
 			}
 			else {
 				str = "\t0|%i/%u [\ty%C\t0]> ";
