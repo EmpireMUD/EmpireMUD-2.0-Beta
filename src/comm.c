@@ -2584,7 +2584,7 @@ char *prompt_str(char_data *ch) {
 		}
 		else if (IS_MAGE(ch)) {
 			if (IS_VAMPIRE(ch)) {
-				str = "\t0|%i/%u/%n %bb [\ty%C\t0] [%t]> ";
+				str = "\t0|%i/%u/%n %d [\ty%C\t0] [%t]> ";
 			}
 			else {
 				str = "\t0|%i/%u/%n [\ty%C\t0]> ";
@@ -2592,7 +2592,7 @@ char *prompt_str(char_data *ch) {
 		}
 		else {
 			if (IS_VAMPIRE(ch)) {
-				str = "\t0|%i/%u %bb [\ty%C\t0] [%t]> ";
+				str = "\t0|%i/%u %d [\ty%C\t0] [%t]> ";
 			}
 			else {
 				str = "\t0|%i/%u [\ty%C\t0]> ";
@@ -2621,6 +2621,7 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 	extern const char *health_levels[];
 	extern const char *move_levels[];
 	extern const char *mana_levels[];
+	extern const char *blood_levels[];
 	extern struct action_data_struct action_data[];
 	
 	static char pbuf[MAX_STRING_LENGTH];
@@ -2732,20 +2733,22 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 				}
 				case 'x': {	// Immortal conditions (abbrevs)
 					*i = '\0';
-					if (IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_INCOGNITO)) {
-						strcat(i, "\tbI");
-					}
-					if (IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_WIZHIDE)) {
-						strcat(i, "\tcW");
-					}
-					if (!IS_NPC(ch) && GET_INVIS_LEV(ch) > 0) {
-						sprintf(i + strlen(i), "\tri%d", GET_INVIS_LEV(ch));
-					}
-					if (ch->desc && GET_OLC_TYPE(ch->desc) != 0) {
-						strcat(i, "\tcO");
-					}
-					if (wizlock_level > 0 && IS_IMMORTAL(ch)) {
-						sprintf(i + strlen(i), "\tgw%d", wizlock_level);
+					if (IS_IMMORTAL(ch)) {
+						if (PRF_FLAGGED(ch, PRF_INCOGNITO)) {
+							strcat(i, "\tbI");
+						}
+						if (PRF_FLAGGED(ch, PRF_WIZHIDE)) {
+							strcat(i, "\tcW");
+						}
+						if (wizlock_level > 0) {
+							sprintf(i + strlen(i), "\tgw%d", wizlock_level);
+						}
+						if (!IS_NPC(ch) && GET_INVIS_LEV(ch) > 0) {
+							sprintf(i + strlen(i), "\tri%d", GET_INVIS_LEV(ch));
+						}
+						if (ch->desc && GET_OLC_TYPE(ch->desc) != 0) {
+							strcat(i, "\tcO");
+						}
 					}
 					
 					if (!*i) {
@@ -2758,21 +2761,23 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 				}
 				case 'X': {	// Immortal conditions (words)
 					*i = '\0';
-					if (IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_INCOGNITO)) {
-						sprintf(i + strlen(i), "%sincog", (*i ? " " : ""));
-					}
-					if (IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_WIZHIDE)) {
-						sprintf(i + strlen(i), "%swizhide", (*i ? " " : ""));
-					}
-					if (wizlock_level > 0 && IS_IMMORTAL(ch)) {
-						sprintf(i + strlen(i), "%swizlock-%d", (*i ? " " : ""), wizlock_level);
-					}
-					if (!IS_NPC(ch) && GET_INVIS_LEV(ch) > 0) {
-						sprintf(i + strlen(i), "%sinvis-%d", (*i ? " " : ""), GET_INVIS_LEV(ch));
-					}
-					if (ch->desc && GET_OLC_TYPE(ch->desc) != 0) {
-						extern char *prompt_olc_info(char_data *ch);
-						sprintf(i + strlen(i), "%solc-%s", (*i ? " " : ""), prompt_olc_info(ch));
+					if (IS_IMMORTAL(ch)) {
+						if (PRF_FLAGGED(ch, PRF_INCOGNITO)) {
+							sprintf(i + strlen(i), "%sincog", (*i ? " " : ""));
+						}
+						if (PRF_FLAGGED(ch, PRF_WIZHIDE)) {
+							sprintf(i + strlen(i), "%swizhide", (*i ? " " : ""));
+						}
+						if (wizlock_level > 0) {
+							sprintf(i + strlen(i), "%swizlock-%d", (*i ? " " : ""), wizlock_level);
+						}
+						if (!IS_NPC(ch) && GET_INVIS_LEV(ch) > 0) {
+							sprintf(i + strlen(i), "%sinvis-%d", (*i ? " " : ""), GET_INVIS_LEV(ch));
+						}
+						if (ch->desc && GET_OLC_TYPE(ch->desc) != 0) {
+							extern char *prompt_olc_info(char_data *ch);
+							sprintf(i + strlen(i), "%solc-%s", (*i ? " " : ""), prompt_olc_info(ch));
+						}
 					}
 					
 					if (!*i) {
@@ -2863,6 +2868,11 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 						sprintf(i, "%%%c", *str);
 					tmp = i;
 					break;
+				case 'd': {	// %d blood as text
+					sprintf(i, "%s", blood_levels[MIN(10, MAX(0, GET_BLOOD(ch)) * 10 / MAX(1, GET_MAX_BLOOD(ch)))]);
+					tmp = i;
+					break;
+				}
 				case 's': {	// %s bonus exp available
 					sprintf(i, "%d", GET_DAILY_BONUS_EXPERIENCE(ch));
 					tmp = i;

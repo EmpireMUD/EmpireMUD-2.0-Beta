@@ -988,8 +988,9 @@ Here are the prompt codes and what they do:
   %H  Maximum health      %V  Maximum moves      %M  Maximum mana
   %i  Health text         %u  Move text          %n  Mana text
   
-  %b  Current blood       %t  Time               %_  Line break
+  %b  Current blood       %t  Time
   %B  Maximum blood       %a  Current action
+  %d  Blood text          %_  Line break
   
   %e  % health of enemy   %f  % health of enemy's focus (the tank)
                           %F  Current/total health of enemy's focus (if player)
@@ -997,12 +998,11 @@ Here are the prompt codes and what they do:
   %c  conditions abbreviated (afk, hunger, thirst, etc)
   %C  conditions as words
   %s  bonus skill exp left today
-  
-  %x  immortal conditions abbreviated
-  %X  immortal conditions as words
 
 For immortals:
   %r  Sector/building/room number
+  %x  immortal conditions abbreviated
+  %X  immortal conditions as words
 
 See also: PROMPT SUGGESTIONS
 #

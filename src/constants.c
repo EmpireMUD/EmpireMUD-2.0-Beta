@@ -857,6 +857,23 @@ const char *mana_levels[] = {
 };
 
 
+// for prompt -- 0-10 relates to 0-100% blood
+const char *blood_levels[] = {
+	"no blood",	// 0
+	"extremely blood-starved",
+	"blood-starved",
+	"low blood",
+	"half blood",
+	"half blood",	// 5
+	"half blood",
+	"lots of blood",
+	"high blood",
+	"high blood",
+	"satiated",	// 10
+	"\n"
+};
+
+
 /* SEX_x */
 const char *genders[] = {
 	"neutral",
