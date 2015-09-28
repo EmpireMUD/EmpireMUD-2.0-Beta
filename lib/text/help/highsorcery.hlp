@@ -412,7 +412,8 @@ STUDY
 Usage:  study
 
 By sitting down to study High Sorcery, you can begin to unlock its secrets.
-You must do this on the top floor of a Tower of Sorcery.
+You must do this on the top floor of a Tower of Sorcery. You can only gain
+your first level by studying in this way.
 
 See also: HIGH SORCERY, SORCERY TOWER
 #
@@ -426,7 +427,8 @@ This ability actually allows the sorcerer to open a tiny portal to the empire's
 storage buildings, and pull out the materials he needs. There is no range on
 this ability, and it may be used to grab as many items as the sorcerer wishes.
 
-You cannot summon items out of the vault (or other secure locations).
+You cannot summon items out of the vault (or other secure locations), and you
+must have the "storage" empire privilege to use this ability at all.
 
 See also: VAULT
 #

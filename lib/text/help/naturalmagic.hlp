@@ -278,14 +278,15 @@ Magic.
 
 Available familiars:
   cat - A low-level familiar for novice mages.
-  saber-toothed cat - A larger cat with a bigger bite.
-  sphinx - A familiar that will tank for you in combat.
+  saber-toothed cat - A larger cat with a bigger bite. (requires 50)
+  sphinx - A familiar that will tank for you in combat. (requires 75)
   giant tortoise - A stronger tank who deals no damage, but protects better.
+  (requires 100)
 
 Each natural magic class has its own familiars, too. Use "dismiss" to get rid
 of your familiar.
 
-See also: DISMISS, ORDER
+See also: CLASS FAMILIARS, DISMISS, ORDER
 #
 FASTCASTING "FAST CASTING"
 

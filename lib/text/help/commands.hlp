@@ -52,6 +52,16 @@ specify the name of a player.
 Typing accept or reject with no argument will display open offers. If the
 player who sent the offer logs off, you cannot accept the offer.
 #
+ACTION-SPAM ACTIONSPAM "ACTION SPAM"
+
+Usage:  toggle action-spam
+
+This toggles disable the periodic messages of various continuous actions, like
+crafting and some chores. You will still see messages when these tasks are
+completed.
+
+See also: TOGGLE
+#
 AFFECTS
 
 Usage:  affects
@@ -62,6 +72,15 @@ you, along with their durations and a short summary of what they modify.
 Affects are automatically shown at the bottom of the score.
 
 See also: SCORE
+#
+AFK "AFK TOGGLE"
+
+Usage:  toggle afk
+
+This toggle causes a small &r[AFK]&0 flag to appear after your title on the
+"who" list, indicating to other players that you are away-from-keyboard.
+
+See also: TOGGLE
 #
 ALIAS ALIASES
 
@@ -138,7 +157,7 @@ information on these rules.
 
 See also: QUIT
 #
-ANSI COLOR COLORS MAPCOLOR "MAP COLOR" MAP-COLOR &&
+ANSI COLORS MAPCOLOR "MAP COLOR" MAP-COLOR &&
 
 Options:  toggle map-color
 
@@ -162,6 +181,8 @@ Bright colors:
  &G&&G Green&0      &L&&L Lime&0        &J&&J Jade&0
  &Y&&Y Yellow&0     &O&&O Orange&0      &T&&T Tan&0
  &W&&W White&0
+ 
+See also: BANNER, INFORMATIVE, POLITICAL, RECOLOR, TOGGLE
 #
 ASSIST
 
@@ -175,6 +196,19 @@ you're assisting is fighting.
   > assist Doctor
 
 See also: FLEE, KILL
+#
+AUTOKILL
+
+Usage:  toggle autokill
+
+Use this toggle if you don't want to kill your opponent in combat, and you'll
+stop attacking when they drop into unconsciousness. They will still need help,
+or they'll eventually die anyhow.
+
+Enemies with a modifier tag (see HELP CONSIDER) will always die upon reaching 0
+health, regardless of your autokill setting.
+
+See also: TOGGLE
 #
 AVOID
 
@@ -192,6 +226,14 @@ Usage:  board <ship>
 This command is used to board a ship in the same room.
 
 See also: DISEMBARK, SAIL, MANUFACTURE, LOAD, SHIPS
+#
+BOTHER NOBOTHER
+
+When enabled, this toggle protects you from having your character affected by
+various other commands - you cannot be sired, you cannot be purified of
+vampirism, and vampires can't bite you unless you're restrained or unconscious.
+
+See also: BITE, PURIFY, SIRE
 #
 BRIEF
 
@@ -230,6 +272,15 @@ You should always use a secure password and should never tell this password to
 anybody else. Password sharing is not allowed and you are still responsible for
 everything your character says and does if you give the password to someone
 else.
+#
+CHANNEL-JOINS CHANNELJOINS "CHANNEL JOINS"
+
+Usage:  toggle channel-joins
+
+This toggles the messages which display when a player joins or leaves a
+slash-channel you are currently in.
+
+See also: SLASH-CHANNELS, TOGGLE
 #
 CIRCLE
 
@@ -845,6 +896,8 @@ Usage:  toggle no-repeat
 This command toggles whether or not you see your communication echoed back to
 you (i.e., from commands such as SAY, SHOUT, /OOC, etc). Useful if you have
 a slow connection or if it just annoys you.
+
+See also: TOGGLE
 #
 NOTELL "NO TELL"
 
@@ -887,7 +940,7 @@ Usage:  toggle political
 This toggle changes your map colors from environmental to political. You will
 see each acre colored with the banner of the empire who owns it.
 
-See also: BANNER
+See also: BANNER, TOGGLE
 #
 PORTAL PORTALS ENTER
 
@@ -1131,6 +1184,15 @@ Examples:
  > roll 2d6
  You roll 2d6 and get: 11
 #
+RP "RP TOGGLE"
+
+Usage:  toggle rp
+
+This toggle indicates to others that you are currently roleplaying with a &m(RP)&0
+tag next to your name on the "who" list.
+
+See also: TOGGLE
+#
 SAIL
 
 Usage:  sail <direction> [distance]
@@ -1178,7 +1240,7 @@ You can use ' as a shorthand for say, and " for oocsay, as in:
 
   > 'hello there.
 
-See also: GSAY, IGNORE, NOREPEAT, REPLY, SLASH CHANNELS
+See also: GSAY, IGNORE, NOREPEAT, NOTELL, REPLY, SLASH CHANNELS
 #
 SAYHISTORY
 
@@ -1252,6 +1314,8 @@ Usage:  toggle scrolling
 This toggle turns off the page breaks sent when a character receives a long
 amount of information. The information is sent all at once, as preferred by
 some people for features like the WHO list.
+
+See also: TOGGLE
 #
 SELFDELETE "SELF DELETE" SELF-DELETE DELETE
 
@@ -1335,6 +1399,16 @@ The SOCIALS command generates a canonical listing of all available socials.
   > socials
 
 See also: EMOTE
+#
+STEALTHABLE
+
+Usage:  toggle stealthable
+
+This toggle prevents you from accidentally performing stealth actions (for
+example picking up an item on another empire's territory). It must be enabled
+in order to use most PvP stealth commands.
+
+See also: GET, INFILTRATE, PICKPOCKET, STEAL, TOGGLE
 #
 STOP
 
@@ -1492,8 +1566,7 @@ Toggles:
   no-repeat - Some commands will say "ok" instead of typing out your message
   autokill - don't end combat at incapacitation
   bother - allows "bothersome" things like bite and purify
-  rp - shuts off OOC commands
-  no-clear - removes the screen-clear before the map display
+  rp - Whether or not you are roleplaying
   map-color - shut off color for just the map
   pvp - turns on/off free pvp; will remain on 5 minutes after toggled off
   informative - informative map coloring -- HELP INFORMATIVE
@@ -1588,6 +1661,9 @@ Usage:  who [min-maxlevel] [-n name] [-e [empire]] [-r] [-s]
 Lists the people currently in the game. Some people may be invisible. Command-
 line options can be used to limit the listing. The parameters can be specified
 on the command-line in any order.
+
+The color of the player's class name (if not white) indicates their role, if
+any: &aCaster&0, &jHealer&0, &yTank&0 or &rMelee&0.
 
 min-max    Specify a level range, e.g. 100-200
 -e [name]  members of your own empire or the one you specify (use quotes for

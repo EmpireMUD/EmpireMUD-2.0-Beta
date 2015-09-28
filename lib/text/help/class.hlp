@@ -74,7 +74,7 @@ The available archetypes are:
  Novice Sorcerer - master the rituals (High Sorcery, Battle, Intelligence)
  Lone Vampire - empowered by blood (Vampire, Battle, Wits)
 #
-"ALCHEMIST CLASS" ALCHEMIST ALCH
+"ALCHEMIST CLASS" ALCH
 
 Alchemist
 Natural Magic + Trade
@@ -194,6 +194,9 @@ Intelligence. The caster should never be taking direct damage from mobs in
 combat. When choosing gear, potions, and buffs for your caster character, focus
 on the caster traits below. Other traits don't contribute to caster DPS.
 
+The class names of casters appear in &aazure&0 on the "who" list and the empire
+roster.
+
 Caster tips:
  - Let the tank start the fight.
  - Tell the healer if you need healing -- he may be focused on the tank.
@@ -284,6 +287,9 @@ damage or taking damage. When choosing gear, potions, and buffs for your healer
 character, focus on the healer traits below. Other traits don't contribute to
 healing.
 
+The class names of healers appear in &jjade&0 on the "who" list and the
+empire roster.
+
 Healer tips:
  - Put the tank's health in your prompt with %f/%F.
  - If you don't have mana to waste, don't try to contribute to combat damage
@@ -333,6 +339,9 @@ the combat damage (along with casters). This role requires Dexterity/To-Hit,
 Wits, and Strength. The melee role should avoid taking damage in combat. When
 choosing gear, potions, and buffs for your melee character, focus on the
 melee traits below. Other traits don't contribute to melee DPS.
+
+The class names of melee DPS characters appear in &rred&0 on the "who" list
+and the empire roster.
 
 Melee tips:
  - Let the tank start the fight.
@@ -445,6 +454,9 @@ high hitpoints and damage mitigation (like resistance and dodge). Tanks don't
 need Strength or Wits, because those are related to dealing damage. When
 choosing gear, potions, and buffs for your tank character, you only need to
 worry about the tank traits listed below
+
+The class names of tanks appear in &yyellow&0 on the "who" list and the
+empire roster.
 
 Tanking tips:
  - The tank should start combat with all mobs so they are hitting him, rather

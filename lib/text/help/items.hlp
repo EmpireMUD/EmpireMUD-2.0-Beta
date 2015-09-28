@@ -249,6 +249,9 @@ This command is used to get items from a storage building. You may use
 "retrieve all" to fill up your inventory with items, but may not specify which
 item to retrieve if you do.
 
+If you don't have the "storage" empire privilege, you can't retrieve items
+(although you can store them).
+
 If you're visiting another empire, you can store and retrieve your own items
 on credit from their public (or allied) buildings, IF you have a trade pact.
 
@@ -286,6 +289,9 @@ Usage:  store <item>
 It is recommended that you keep most of your extra resources stored. Items left
 on the ground in claimed territory will eventually be stored by the empire's
 citizens.
+
+If you don't have the "storage" empire privilege, you can store items, but
+can't retrieve them.
 
 Unique, enchanted, superior, or otherwise-modified items can't be stored in
 regular storage buildings, but you can store them with the "warehouse" command
@@ -442,7 +448,7 @@ of warehouse storage.
 
 Warehouse and vault storage for unique items are identical except that the
 vault requires "withdraw" empire privilege to use it, and warehouse only
-requires that you be a member of the empire. Both use the "warehouse" command.
+requires the "warehouse" privilege. Both use the "warehouse" command.
 
 Items which can be stored in normal resource storage may not be stored using
 the "warehouse" command. Also note that treasure (like gold bars) must be
@@ -463,11 +469,11 @@ Command:  warehouse inventory [item keywords]
 
 While normal resource storage (e.g. the lumber yard) can store many simple
 items, you must use a warehouse (or vault) to store items which are unique,
-scaled, enchanted, superior, or otherwise modified. 
+scaled, enchanted, superior, or otherwise modified.
 
-Items which can be stored in normal resource storage may not be stored using
-the "warehouse" command. Also note that treasure (like gold bars) must be
-stored in the vault using the regular "store" command, not "warehouse".
+You must have the "warehouse" empire privilege to withdraw items from warehouse
+storage. Items which can be stored in normal resource storage may not be stored
+using the "warehouse" command.
 
 The "warehouse list" will give you a numbered list of things on your current
 island that match the keywords (or all items if you don't give keywords). You
