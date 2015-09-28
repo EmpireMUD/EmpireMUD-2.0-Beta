@@ -32,7 +32,8 @@ TRIGEDIT-COMMANDS TRIG-COMMANDS TRIGGER-COMMANDS TRIGEDIT-COMMANDLISTS
  ==============================================================================
 |  * (comment)    |      %send%         |      %send%      |      %send%      |
 |      nop        |      %echo%         |      %echo%      |      %echo%      |
-|    attach       |   %echoaround%      |   %echoaround%   |   %echoaround%   |
+|    attach       |    %echoaround%     |   %echoaround%   |   %echoaround%   |
+|                 |    %echoneither%    |   %echoneither%  |   %echoneither%  |
 |    global       |      %door%         |      %door%      |      %door%      |
 |    context      |     %force%         |     %force%      |     %force%      |
 |     eval        |      %load%         |      %load%      |      %load%      |
@@ -139,7 +140,7 @@ flags       -  value will be the new door flags bitvector as defined here:
 name        - value is the name of the door in the specified direction.
 room        - value is the vnum of the room this direction leads to
 #d
-%ECHO% %ECHOAROUND% %SEND% TRIG-SEND %BUILDINGECHO% BUILDINGECHO ZECHOAROUND ECHOAROUND OECHO WECHO MECHO OECHOAROUND WECHOAROUND MECHOAROUD OSEND WSEND MSEND BUILDINGECHO
+%ECHO% %ECHOAROUND% %ECHONEITHER% %SEND% TRIG-SEND %BUILDINGECHO% BUILDINGECHO ZECHOAROUND ECHOAROUND OECHO WECHO MECHO OECHOAROUND WECHOAROUND MECHOAROUD OSEND WSEND MSEND BUILDINGECHO MECHONEITHER OECHONEITHER WECHONEITHER
 
 %echo% <message>
    Message is sent to all non-sleeping characters in the same room that this 
@@ -148,6 +149,9 @@ script is executing in.
 %echoaround% <victim> <message>
    Message will be sent to all characters in the room with victim, except for 
 the victim.
+
+%echoneither% <person> <person> <message>
+   Message will be sent to all characters in the room EXCEPT the two people.
 
 %send% <victim> <message>
    Message will be sent to the victim only.

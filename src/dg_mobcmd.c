@@ -319,6 +319,58 @@ ACMD(do_mechoaround) {
 }
 
 
+// prints the message to everyone except two targets
+ACMD(do_mechoneither) {
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+	char_data *vict1, *vict2, *iter;
+	char *p;
+
+	if (!MOB_OR_IMPL(ch)) {
+		send_config_msg(ch, "huh_string");
+		return;
+	}
+
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
+		return;
+
+	p = two_arguments(argument, arg1, arg2);
+	skip_spaces(&p);
+
+	if (!*arg1 || !*arg2 || !*p) {
+		mob_log(ch, "mechoneither called with missing arguments");
+		return;
+	}
+
+	if (*arg1 == UID_CHAR) {
+		if (!(vict1 = get_char(arg1))) {
+			mob_log(ch, "mechoneither: vict 1 (%s) does not exist", arg1);
+			return;
+		}
+	}
+	else if (!(vict1 = get_char_room_vis(ch, arg1))) {
+		mob_log(ch, "mechoneither: vict 1 (%s) does not exist", arg1);
+		return;
+	}
+
+	if (*arg2 == UID_CHAR) {
+		if (!(vict2 = get_char(arg2))) {
+			mob_log(ch, "mechoneither: vict 2 (%s) does not exist", arg2);
+			return;
+		}
+	}
+	else if (!(vict2 = get_char_room_vis(ch, arg2))) {
+		mob_log(ch, "mechoneither: vict 2 (%s) does not exist", arg2);
+		return;
+	}
+
+	for (iter = ROOM_PEOPLE(IN_ROOM(vict1)); iter; iter = iter->next_in_room) {
+		if (iter->desc && iter != vict1 && iter != vict2) {
+			sub_write(p, iter, TRUE, TO_CHAR);
+		}
+	}
+}
+
+
 /* sends the message to only the victim */
 ACMD(do_msend) {
 	char arg[MAX_INPUT_LENGTH];

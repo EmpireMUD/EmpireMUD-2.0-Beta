@@ -1502,6 +1502,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 	char *send_cmd[] = {"msend ", "osend ", "wsend " };
 	char *echo_cmd[] = {"mecho ", "oecho ", "wecho " };
 	char *echoaround_cmd[] = {"mechoaround ", "oechoaround ", "wechoaround " };
+	char *echoneither_cmd[] = {"mechoneither ", "oechoneither ", "wechoneither " };
 	char *door[] = {"mdoor ", "odoor ", "wdoor " };
 	char *force[] = {"mforce ", "oforce ", "wforce " };
 	char *load[] = {"mload ", "oload ", "wload " };
@@ -1581,6 +1582,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				snprintf(str, slen, "%s", echo_cmd[type]);
 			else if (!str_cmp(var, "echoaround"))
 				snprintf(str, slen, "%s", echoaround_cmd[type]);
+			else if (!str_cmp(var, "echoneither"))
+				snprintf(str, slen, "%s", echoneither_cmd[type]);
 			else if (!str_cmp(var, "buildingecho"))
 				snprintf(str, slen, "%s", buildingecho[type]);
 			else if (!str_cmp(var, "regionecho"))

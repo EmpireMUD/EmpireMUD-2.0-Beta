@@ -490,8 +490,10 @@ Class ability:  Archmage (healer)
 Familiar type:  buff
 
 The phoenix familiar will use the following abilities in combat:
-
-(TODO)
+- Blaze with Power: +(level/20) bonus healing to master (30 sec)
+- Healing Warmth: heals the tank (instant)
+- Healing Fire: smaller heal for the whole party (instant)
+- Burning Passion: +(level/30) bonus physical/magical damage to party (30 sec)
 
 See also: BUFF, FAMILIAR, ARCHMAGE CLASS
 #
@@ -608,8 +610,10 @@ Class ability:  Shadow Wolf (melee)
 Familiar type:  debuff
 
 The scorpion shadow familiar will use the following abilities in combat:
-
-(TODO)
+- Creeping Venom: slows an enemy (30 sec)
+- Shadow Venom: -(level/20) bonus physical/magical damage on enemy (30 sec)
+- Numbing Venom: -4 Wits on enemy (30 sec)
+- Agonizing Venom: Poison DoT on enemy (30 sec)
 
 See also: DEBUFF, FAMILIAR, SHADOW WOLF CLASS
 #

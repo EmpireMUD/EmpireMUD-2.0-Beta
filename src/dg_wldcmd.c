@@ -176,6 +176,37 @@ WCMD(do_wecho) {
 }
 
 
+// prints the message to everyone except two targets
+WCMD(do_wechoneither) {
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+	char_data *vict1, *vict2, *iter;
+	char *p;
+
+	p = two_arguments(argument, arg1, arg2);
+	skip_spaces(&p);
+
+	if (!*arg1 || !*arg2 || !*p) {
+		wld_log(room, "oechoneither called with missing arguments");
+		return;
+	}
+	
+	if (!(vict1 = get_char_by_room(room, arg1))) {
+		wld_log(room, "oechoneither: vict 1 (%s) does not exist", arg1);
+		return;
+	}
+	if (!(vict2 = get_char_by_room(room, arg2))) {
+		wld_log(room, "oechoneither: vict 2 (%s) does not exist", arg2);
+		return;
+	}
+	
+	for (iter = ROOM_PEOPLE(room); iter; iter = iter->next_in_room) {
+		if (iter->desc && iter != vict1 && iter != vict2) {
+			sub_write(p, iter, TRUE, TO_CHAR);
+		}
+	}
+}
+
+
 WCMD(do_wsend) {
 	char buf[MAX_INPUT_LENGTH], *msg;
 	char_data *ch;
@@ -978,6 +1009,7 @@ const struct wld_command_info wld_cmd_info[] = {
 	{ "wdoor", do_wdoor, NO_SCMD },
 	{ "wecho", do_wecho, NO_SCMD },
 	{ "wechoaround", do_wsend, SCMD_WECHOAROUND },
+	{ "wechoneither", do_wechoneither, NO_SCMD },
 	{ "wforce", do_wforce, NO_SCMD },
 	{ "wload", do_wload, NO_SCMD },
 	{ "wpurge", do_wpurge, NO_SCMD },
