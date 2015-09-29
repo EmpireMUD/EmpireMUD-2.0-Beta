@@ -164,6 +164,9 @@
 // The big question...
 #define CAN_SEE(sub, obj)  (Global_ignore_dark ? CAN_SEE_NO_DARK(sub, obj) : CAN_SEE_DARK(sub, obj))
 
+#define WIZHIDE_OK(sub, obj)  (!IS_IMMORTAL(obj) || !PRF_FLAGGED((obj), PRF_WIZHIDE) || (!IS_NPC(sub) && GET_ACCESS_LEVEL(sub) >= GET_ACCESS_LEVEL(obj) && PRF_FLAGGED((sub), PRF_HOLYLIGHT)))
+#define INCOGNITO_OK(sub, obj)  (!IS_IMMORTAL(obj) || !PRF_FLAGGED((obj), PRF_INCOGNITO) || GET_ACCESS_LEVEL(sub) >= GET_ACCESS_LEVEL(obj))
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// CAN SEE OBJ UTILS ///////////////////////////////////////////////////////
@@ -775,7 +778,8 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_LAST_CORPSE_ID(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.last_corpse_id))
 #define GET_LAST_DEATH_TIME(ch)  CHECK_PLAYER_SPECIAL(REAL_CHAR(ch), (REAL_CHAR(ch)->player_specials->saved.last_death_time))
 #define GET_LAST_DIR(ch)  CHECK_PLAYER_SPECIAL(REAL_CHAR(ch), (REAL_CHAR(ch)->player_specials->saved.last_direction))
-#define GET_HIGHEST_RECENT_LEVEL(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.highest_recent_level))
+#define GET_LAST_KNOWN_LEVEL(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.last_known_level))
+#define GET_HIGHEST_KNOWN_LEVEL(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.highest_known_level))
 #define GET_LAST_ROOM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.last_room))
 #define GET_LAST_TIP(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.last_tip))
 #define GET_LOADROOM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.load_room))
@@ -793,7 +797,6 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_PROMO_ID(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.promo_id))
 #define GET_RANK(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.rank))
 #define GET_RECENT_DEATH_COUNT(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.recent_death_count))
-#define GET_RECENT_LEVEL_TIME(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.recent_level_time))
 #define GET_REFERRED_BY(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.referred_by))
 #define GET_RESOURCE(ch, i)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.resources[i]))
 #define GET_REWARDED_TODAY(ch, pos)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.rewarded_today[(pos)]))
@@ -1061,6 +1064,7 @@ extern char *two_arguments(char *argument, char *first_arg, char *second_arg);
 // permission utils from utils.c
 extern bool can_build_or_claim_at_war(char_data *ch, room_data *loc);
 extern bool can_use_room(char_data *ch, room_data *room, int mode);
+extern bool emp_can_use_room(empire_data *emp, room_data *room, int mode);
 extern bool has_permission(char_data *ch, int type);
 extern bool has_tech_available(char_data *ch, int tech);
 extern bool has_tech_available_room(room_data *room, int tech);

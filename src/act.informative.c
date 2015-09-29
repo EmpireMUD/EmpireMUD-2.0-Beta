@@ -29,11 +29,14 @@
 *   Look Assist Functions
 *   Character Display Functions
 *   Object Display Functions
+*   Who List Parts
 *   Commands
 */
 
 // extern variables
 extern struct city_metadata_type city_type[];
+extern const char *class_role[NUM_ROLES];
+extern const char *class_role_color[NUM_ROLES];
 extern const char *dirs[];
 extern struct help_index_element *help_table;
 extern int top_of_helpt;
@@ -52,11 +55,6 @@ void list_one_char(char_data *i, char_data *ch, int num);
 void look_at_char(char_data *i, char_data *ch, bool show_eq);
 void show_obj_to_char(obj_data *obj, char_data *ch, int mode);
 void show_one_stored_item_to_char(char_data *ch, empire_data *emp, struct empire_storage_data *store, bool show_zero);
-
-// for the who list
-#define WHO_MORTALS  0
-#define WHO_GODS  1
-#define WHO_IMMORTALS  2
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -707,6 +705,9 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 	if (AFF_FLAGGED(i, AFF_NO_SEE_IN_ROOM) && !PRF_FLAGGED(ch, PRF_HOLYLIGHT)) {
 		return;
 	}
+	if (!WIZHIDE_OK(ch, i)) {
+		return;
+	}
 
 	if (num > 1) {
 		msg_to_char(ch, "(%2d) ", num);
@@ -861,7 +862,7 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 	}
 	
 	// these 
-	if (AFF_FLAGGED(i, AFF_NO_SEE_IN_ROOM) && IS_IMMORTAL(ch)) {
+	if ((AFF_FLAGGED(i, AFF_NO_SEE_IN_ROOM) || (IS_IMMORTAL(i) && PRF_FLAGGED(i, PRF_WIZHIDE))) && PRF_FLAGGED(ch, PRF_HOLYLIGHT)) {
 		if (AFF_FLAGGED(i, AFF_EARTHMELD)) {
 			act("...$e is earthmelded.", FALSE, i, 0, ch, TO_VICT);
 		}
@@ -968,205 +969,6 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 			GET_WAIT_STATE(ch) = MAX(GET_WAIT_STATE(ch), 0.5 RL_SEC);
 		}
 	}
-}
-
-
-/**
-* Get the "who" display for one person.
-*
-* @param char_data *ch The person to get WHO info for.
-* @param bool shortlist If TRUE, only gets a short entry.
-* @return char* A pointer to the output.
-*/
-char *one_who_line(char_data *ch, bool shortlist) {
-	static char out[MAX_STRING_LENGTH];
-	char buf[MAX_STRING_LENGTH], buf1[MAX_STRING_LENGTH];
-	int num, size = 0;
-	
-	*out = '\0';
-	
-	// level/class info
-	if (!IS_GOD(ch) && !IS_IMMORTAL(ch)) {
-		if (shortlist) {
-			size += snprintf(out + size, sizeof(out) - size, "[%3d] ", GET_HIGHEST_RECENT_LEVEL(ch));
-		}
-		else if (GET_CLASS(ch) != CLASS_NONE) {
-			size += snprintf(out + size, sizeof(out) - size, "[%3d %s] ", GET_HIGHEST_RECENT_LEVEL(ch), class_data[GET_CLASS(ch)].abbrev);
-		}
-		else {	// classless
-			size += snprintf(out + size, sizeof(out) - size, "[%3d Advn] ", GET_HIGHEST_RECENT_LEVEL(ch));
-		}
-	}
-	
-	// rank
-	if (GET_LOYALTY(ch)) {
-		size += snprintf(out + size, sizeof(out) - size, "<%s&0> ", EMPIRE_RANK(GET_LOYALTY(ch), GET_RANK(ch)-1));
-	}
-
-	// name
-	size += snprintf(out + size, sizeof(out) - size, "%s", PERS(ch, ch, TRUE));
-	
-	// shortlist ends here
-	if (shortlist) {
-		num = count_color_codes(out);
-		sprintf(buf, "%%-%d.%ds", 35 + 2 * num, 35 + 2 * num);
-		strcpy(buf1, out);
-		
-		size = snprintf(out, sizeof(out), buf, buf1);
-		
-		// append invis even in short list
-		if (GET_INVIS_LEV(ch)) {
-			size += snprintf(out + size, sizeof(out) - size, " (i%d)", GET_INVIS_LEV(ch));
-		}
-		
-		return out;
-	}
-	
-	// title
-	size += snprintf(out + size, sizeof(out) - size, "%s&0", GET_TITLE(ch));
-	
-	// tags
-	if (IS_AFK(ch)) {
-		size += snprintf(out + size, sizeof(out) - size, " &r[AFK]&0");
-	}
-	if ((ch->char_specials.timer * SECS_PER_MUD_HOUR / SECS_PER_REAL_MIN) >= 5) {
-		size += snprintf(out + size, sizeof(out) - size, " (idle: %d)", (ch->char_specials.timer * SECS_PER_MUD_HOUR / SECS_PER_REAL_MIN));
-	}
-	if (IS_PVP_FLAGGED(ch)) {
-		size += snprintf(out + size, sizeof(out) - size, " &R(PVP)&0");
-	}
-	if (PRF_FLAGGED(ch, PRF_RP)) {
-		size += snprintf(out + size, sizeof(out) - size, " &m(RP)&0");
-	}
-	if (get_cooldown_time(ch, COOLDOWN_ROGUE_FLAG) > 0) {
-		size += snprintf(out + size, sizeof(out) - size, " &M(rogue)&0");
-	}
-
-	if (GET_INVIS_LEV(ch)) {
-		size += snprintf(out + size, sizeof(out) - size, " (i%d)", GET_INVIS_LEV(ch));
-	}
-	else if (AFF_FLAGGED(ch, AFF_INVISIBLE)) {
-		size += snprintf(out + size, sizeof(out) - size, " (invis)");
-	}
-	if (PLR_FLAGGED(ch, PLR_WRITING)) {
-		size += snprintf(out + size, sizeof(out) - size, " &c(writing)&0");
-	}
-	if (PRF_FLAGGED(ch, PRF_DEAF)) {
-		size += snprintf(out + size, sizeof(out) - size, " (deaf)");
-	}
-	if (PRF_FLAGGED(ch, PRF_NOTELL)) {
-		size += snprintf(out + size, sizeof(out) - size, " (notell)");
-	}
-
-	size += snprintf(out + size, sizeof(out) - size, "&0\r\n");
-	return out;
-}
-
-
-/**
-* Builds part of the WHO list.
-*
-* @param char_data *ch The person performing the who command.
-* @param char *name_search If filtering names, the filter string.
-* @param int low Minimum level to show.
-* @param int high Maximum level to show.
-* @param empire_data *empire_who If not null, only shows members of that empire.
-* @param bool rp If TRUE, only shows RP players.
-* @param bool shortlist If TRUE, gets the columnar short form.
-* @param int type WHO_MORTALS, WHO_GODS, or WHO_IMMORTALS
-* @return char* The who output for imms.
-*/
-char *partial_who(char_data *ch, char *name_search, int low, int high, empire_data *empire_who, bool rp, bool shortlist, int type) {
-	extern int max_players_today;
-	extern int max_players_this_uptime;
-	
-	static char who_output[MAX_STRING_LENGTH];
-	char whobuf[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH], online[MAX_STRING_LENGTH];
-	descriptor_data *d;
-	char_data *tch;
-	int iter, count = 0, size;
-	
-	// WHO_x
-	const char *who_titles[] = { "Mortals", "Gods", "Immortals" };
-
-	*whobuf = '\0';	// lines of chars
-	size = 0;	// whobuf size
-
-	for (d = descriptor_list; d; d = d->next) {
-		if (STATE(d) != CON_PLAYING)
-			continue;
-
-		if (d->original)
-			tch = d->original;
-		else if (!(tch = d->character))
-			continue;
-
-		if (*name_search && !is_abbrev(name_search, PERS(tch, tch, 1)) && !strstr(GET_TITLE(tch), name_search))
-			continue;
-		if (!CAN_SEE_GLOBAL(ch, tch)) {
-			continue;
-		}
-		if (low != 0 && GET_HIGHEST_RECENT_LEVEL(tch) < low) {
-			continue;
-		}
-		if (high != 0 && GET_HIGHEST_RECENT_LEVEL(tch) > high) {
-			continue;
-		}
-		if (type == WHO_MORTALS && (IS_GOD(tch) || IS_IMMORTAL(tch)))
-			continue;
-		if (type == WHO_GODS && !IS_GOD(tch))
-			continue;
-		if (type == WHO_IMMORTALS && !IS_IMMORTAL(tch))
-			continue;
-		if (empire_who && GET_LOYALTY(tch) != empire_who)
-			continue;
-		if (rp && !PRF_FLAGGED(tch, PRF_RP))
-			continue;
-
-		// show one char
-		++count;
-		size += snprintf(whobuf + size, sizeof(whobuf) - size, "%s", one_who_line(tch, shortlist));
-		
-		// columnar spacing
-		if (shortlist) {
-			size += snprintf(whobuf + size, sizeof(whobuf) - size, "%s", !(count % 2) ? "\r\n" : " ");
-		}
-	}
-
-	if (*whobuf) {
-		// repurposing size
-		size = 0;
-		
-		if (type == WHO_MORTALS) {
-			// update counts in case
-			max_players_today = MAX(max_players_today, count);
-			max_players_this_uptime = MAX(max_players_this_uptime, count);
-			snprintf(online, sizeof(online), "%d online (max today %d, this uptime %d)", count, max_players_today, max_players_this_uptime);
-		}
-		else {
-			snprintf(online, sizeof(online), "%d online", count);
-		}
-		
-		size += snprintf(who_output + size, sizeof(who_output) - size, "%s: %s", who_titles[type], online);
-
-		// divider
-		*buf = '\0';
-		for (iter = 0; iter < strlen(who_output); ++iter) {
-			buf[iter] = '-';
-		}
-		buf[iter] = '\0';
-		
-		size += snprintf(who_output + size, sizeof(who_output) - size, "\r\n%s\r\n%s", buf, whobuf);
-		
-		if (shortlist && (count % 2)) {
-			size += snprintf(who_output + size, sizeof(who_output) - size, "\r\n");
-		}
-	}
-	else {
-		*who_output = '\0';
-	}
-	
-	return who_output;
 }
 
 
@@ -1525,6 +1327,331 @@ void show_one_stored_item_to_char(char_data *ch, empire_data *emp, struct empire
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// WHO LIST PARTS //////////////////////////////////////////////////////////
+
+// who types
+#define WHO_MORTALS  0
+#define WHO_GODS  1
+#define WHO_IMMORTALS  2
+
+#define WHO_SORTER(name)  int (name)(struct who_entry *a, struct who_entry *b)
+
+// for sortable who list
+struct who_entry {
+	int access_level;
+	int computed_level;
+	int role;
+	char *string;
+	struct who_entry *next;
+};
+
+
+WHO_SORTER(sort_who_access_level) {
+	if (a->access_level != b->access_level) {
+		return a->access_level - b->access_level;
+	}
+	return 0;
+}
+
+
+WHO_SORTER(sort_who_role_level) {
+	if (a->role != b->role) {
+		return a->role - b->role;
+	}
+	if (a->computed_level != b->computed_level) {
+		return a->computed_level - b->computed_level;
+	}
+	return 0;
+}
+
+
+// quick-switch of linked list positions
+inline struct who_entry *switch_who_pos(struct who_entry *l1, struct who_entry *l2) {
+    l1->next = l2->next;
+    l2->next = l1;
+    return l2;
+}
+
+
+/**
+* Sorts a who list using a sort function.
+*
+* @param struct who_entry **node_list A pointer to the linked list to sort.
+* @param WHO_SORTER(*compare_func) A sorter function.
+*/
+void sort_who_entries(struct who_entry **node_list, WHO_SORTER(*compare_func)) {
+	struct who_entry *start, *p, *q, *top;
+    bool changed = TRUE;
+        
+    // safety first
+    if (!node_list || !compare_func) {
+    	return;
+    }
+    
+    start = *node_list;
+
+	CREATE(top, struct who_entry, 1);
+
+    top->next = start;
+    if (start && start->next) {
+    	// q is always one item behind p
+
+        while (changed) {
+            changed = FALSE;
+            q = top;
+            p = top->next;
+            while (p->next != NULL) {
+            	if ((compare_func)(p, p->next) > 0) {
+					q->next = switch_who_pos(p, p->next);
+					changed = TRUE;
+				}
+				
+                q = p;
+                if (p->next) {
+                    p = p->next;
+                }
+            }
+        }
+    }
+    
+    *node_list = top->next;
+    free(top);
+}
+
+
+/**
+* Get the "who" display for one person.
+*
+* @param char_data *ch The person to get WHO info for.
+* @param bool shortlist If TRUE, only gets a short entry.
+* @param bool screenreader If TRUE, shows slightly differently
+* @return char* A pointer to the output.
+*/
+char *one_who_line(char_data *ch, bool shortlist, bool screenreader) {
+	static char out[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH], buf1[MAX_STRING_LENGTH], show_role[24];
+	int num, size = 0;
+	
+	*out = '\0';
+	
+	if (screenreader && GET_CLASS_ROLE(ch) != ROLE_NONE) {
+		snprintf(show_role, sizeof(show_role), " %s", class_role[GET_CLASS_ROLE(ch)]);
+	}
+	else {
+		*show_role = '\0';
+	}
+	
+	// level/class info
+	if (!IS_GOD(ch) && !IS_IMMORTAL(ch)) {
+		if (shortlist) {
+			size += snprintf(out + size, sizeof(out) - size, "[%s%3d%s] ", screenreader ? "" : class_role_color[GET_CLASS_ROLE(ch)], GET_COMPUTED_LEVEL(ch), screenreader ? "" : "\t0");
+		}
+		else if (GET_CLASS(ch) != CLASS_NONE) {
+			size += snprintf(out + size, sizeof(out) - size, "[%3d %s%s%s] ", GET_COMPUTED_LEVEL(ch), screenreader ? "" : class_role_color[GET_CLASS_ROLE(ch)], screenreader ? class_data[GET_CLASS(ch)].name : class_data[GET_CLASS(ch)].abbrev, screenreader ? show_role : "\t0");
+		}
+		else {	// classless
+			size += snprintf(out + size, sizeof(out) - size, "[%3d %sAdvn%s] ", GET_COMPUTED_LEVEL(ch), screenreader ? "" : class_role_color[GET_CLASS_ROLE(ch)], screenreader ? show_role : "\t0");
+		}
+	}
+	
+	// rank
+	if (GET_LOYALTY(ch)) {
+		size += snprintf(out + size, sizeof(out) - size, "<%s&0> ", EMPIRE_RANK(GET_LOYALTY(ch), GET_RANK(ch)-1));
+	}
+
+	// name
+	size += snprintf(out + size, sizeof(out) - size, "%s", PERS(ch, ch, TRUE));
+	
+	// shortlist ends here
+	if (shortlist) {
+		num = count_color_codes(out);
+		sprintf(buf, "%%-%d.%ds", 35 + 2 * num, 35 + 2 * num);
+		strcpy(buf1, out);
+		
+		size = snprintf(out, sizeof(out), buf, buf1);
+		
+		// append invis even in short list
+		if (GET_INVIS_LEV(ch)) {
+			size += snprintf(out + size, sizeof(out) - size, " (i%d)", GET_INVIS_LEV(ch));
+		}
+		
+		return out;
+	}
+	
+	// title
+	size += snprintf(out + size, sizeof(out) - size, "%s&0", GET_TITLE(ch));
+	
+	// tags
+	if (IS_AFK(ch)) {
+		size += snprintf(out + size, sizeof(out) - size, " &r(AFK)&0");
+	}
+	if ((ch->char_specials.timer * SECS_PER_MUD_HOUR / SECS_PER_REAL_MIN) >= 5) {
+		size += snprintf(out + size, sizeof(out) - size, " (idle: %d)", (ch->char_specials.timer * SECS_PER_MUD_HOUR / SECS_PER_REAL_MIN));
+	}
+	if (IS_PVP_FLAGGED(ch)) {
+		size += snprintf(out + size, sizeof(out) - size, " &R(PVP)&0");
+	}
+	if (PRF_FLAGGED(ch, PRF_RP)) {
+		size += snprintf(out + size, sizeof(out) - size, " &m(RP)&0");
+	}
+	if (get_cooldown_time(ch, COOLDOWN_ROGUE_FLAG) > 0) {
+		size += snprintf(out + size, sizeof(out) - size, " &M(rogue)&0");
+	}
+
+	if (GET_INVIS_LEV(ch)) {
+		size += snprintf(out + size, sizeof(out) - size, " (i%d)", GET_INVIS_LEV(ch));
+	}
+	if (IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_INCOGNITO)) {
+		size += snprintf(out + size, sizeof(out) - size, " (incog)");
+	}
+	else if (AFF_FLAGGED(ch, AFF_INVISIBLE)) {
+		size += snprintf(out + size, sizeof(out) - size, " (invis)");
+	}
+	if (PLR_FLAGGED(ch, PLR_WRITING)) {
+		size += snprintf(out + size, sizeof(out) - size, " &c(writing)&0");
+	}
+	if (PRF_FLAGGED(ch, PRF_DEAF)) {
+		size += snprintf(out + size, sizeof(out) - size, " (deaf)");
+	}
+	if (PRF_FLAGGED(ch, PRF_NOTELL)) {
+		size += snprintf(out + size, sizeof(out) - size, " (notell)");
+	}
+
+	size += snprintf(out + size, sizeof(out) - size, "&0\r\n");
+	return out;
+}
+
+
+/**
+* Builds part of the WHO list.
+*
+* @param char_data *ch The person performing the who command.
+* @param char *name_search If filtering names, the filter string.
+* @param int low Minimum level to show.
+* @param int high Maximum level to show.
+* @param empire_data *empire_who If not null, only shows members of that empire.
+* @param bool rp If TRUE, only shows RP players.
+* @param bool shortlist If TRUE, gets the columnar short form.
+* @param int type WHO_MORTALS, WHO_GODS, or WHO_IMMORTALS
+* @return char* The who output for imms.
+*/
+char *partial_who(char_data *ch, char *name_search, int low, int high, empire_data *empire_who, bool rp, bool shortlist, int type) {
+	extern int max_players_today;
+	extern int max_players_this_uptime;
+	
+	static char who_output[MAX_STRING_LENGTH];
+	struct who_entry *list = NULL, *entry, *next_entry;
+	char whobuf[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH], online[MAX_STRING_LENGTH];
+	descriptor_data *d;
+	char_data *tch;
+	int iter, count = 0, size;
+	
+	// WHO_x
+	const char *who_titles[] = { "Mortals", "Gods", "Immortals" };
+	WHO_SORTER(*who_sorters[]) = { sort_who_role_level, sort_who_role_level, sort_who_access_level };
+
+	*whobuf = '\0';	// lines of chars
+	size = 0;	// whobuf size
+
+	for (d = descriptor_list; d; d = d->next) {
+		if (STATE(d) != CON_PLAYING)
+			continue;
+
+		if (d->original)
+			tch = d->original;
+		else if (!(tch = d->character))
+			continue;
+
+		if (*name_search && !is_abbrev(name_search, PERS(tch, tch, 1)) && !strstr(GET_TITLE(tch), name_search))
+			continue;
+		if (!CAN_SEE_GLOBAL(ch, tch)) {
+			continue;
+		}
+		if (low != 0 && GET_COMPUTED_LEVEL(tch) < low) {
+			continue;
+		}
+		if (high != 0 && GET_COMPUTED_LEVEL(tch) > high) {
+			continue;
+		}
+		if (type == WHO_MORTALS && (IS_GOD(tch) || IS_IMMORTAL(tch)))
+			continue;
+		if (type == WHO_GODS && !IS_GOD(tch))
+			continue;
+		if (type == WHO_IMMORTALS && !IS_IMMORTAL(tch))
+			continue;
+		if (empire_who && GET_LOYALTY(tch) != empire_who)
+			continue;
+		if (rp && !PRF_FLAGGED(tch, PRF_RP))
+			continue;
+		if (!INCOGNITO_OK(ch, tch))
+			continue;
+
+		// show one char
+		++count;
+		CREATE(entry, struct who_entry, 1);
+		entry->access_level = GET_ACCESS_LEVEL(tch);
+		entry->computed_level = GET_COMPUTED_LEVEL(tch);
+		entry->role = GET_CLASS_ROLE(tch);
+		entry->string = str_dup(one_who_line(tch, shortlist, PRF_FLAGGED(ch, PRF_SCREEN_READER)));
+		entry->next = list;
+		list = entry;
+	}
+	
+	sort_who_entries(&list, who_sorters[type]);
+
+	for (entry = list; entry; entry = next_entry) {
+		next_entry = entry->next;
+		
+		size += snprintf(whobuf + size, sizeof(whobuf) - size, "%s", entry->string);
+		
+		// columnar spacing
+		if (shortlist) {
+			size += snprintf(whobuf + size, sizeof(whobuf) - size, "%s", !(count % 2) ? "\r\n" : " ");
+		}
+		
+		free(entry->string);
+		free(entry);
+	}
+	list = NULL;
+
+	if (*whobuf) {
+		// repurposing size
+		size = 0;
+		
+		if (type == WHO_MORTALS) {
+			// update counts in case
+			max_players_today = MAX(max_players_today, count);
+			max_players_this_uptime = MAX(max_players_this_uptime, count);
+			snprintf(online, sizeof(online), "%d online (max today %d, this uptime %d)", count, max_players_today, max_players_this_uptime);
+		}
+		else {
+			snprintf(online, sizeof(online), "%d online", count);
+		}
+		
+		size += snprintf(who_output + size, sizeof(who_output) - size, "%s: %s", who_titles[type], online);
+
+		// divider
+		*buf = '\0';
+		for (iter = 0; iter < strlen(who_output); ++iter) {
+			buf[iter] = '-';
+		}
+		buf[iter] = '\0';
+		
+		size += snprintf(who_output + size, sizeof(who_output) - size, "\r\n%s\r\n%s", buf, whobuf);
+		
+		if (shortlist && (count % 2)) {
+			size += snprintf(who_output + size, sizeof(who_output) - size, "\r\n");
+		}
+	}
+	else {
+		*who_output = '\0';
+	}
+	
+	return who_output;
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// COMMANDS ////////////////////////////////////////////////////////////////
 
 ACMD(do_adventure) {
@@ -1846,8 +1973,8 @@ ACMD(do_helpsearch) {
 	bool found;
 	size_t size;
 	
-	// this removes leading filler words, which are going to show up in a lot of helps
-	one_argument(argument, arg);
+	delete_doubledollar(argument);
+	one_argument(argument, arg);	// this removes leading filler words, which are going to show up in a lot of helps
 	
 	if (!ch->desc) {
 		// don't bother
@@ -1915,6 +2042,7 @@ ACMD(do_look) {
 	void look_in_direction(char_data *ch, int dir);
 	
 	char arg2[MAX_INPUT_LENGTH];
+	room_data *map;
 	int look_type;
 
 	if (!ch->desc)
@@ -1933,6 +2061,20 @@ ACMD(do_look) {
 
 		if (!*arg)			/* "look" alone, without an argument at all */
 			look_at_room(ch);
+		else if (!str_cmp(arg, "out")) {
+			if (!(map = get_map_location_for(IN_ROOM(ch)))) {
+				msg_to_char(ch, "You can't do that from here.\r\n");
+			}
+			else if (map == IN_ROOM(ch) && !ROOM_IS_CLOSED(IN_ROOM(ch))) {
+				look_at_room_by_loc(ch, map, LRR_LOOK_OUT);
+			}
+			else if (!IS_IMMORTAL(ch) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_LOOK_OUT) && !RMT_FLAGGED(IN_ROOM(ch), RMT_LOOK_OUT)) {
+				msg_to_char(ch, "You can't do that from here.\r\n");
+			}
+			else {
+				look_at_room_by_loc(ch, map, LRR_LOOK_OUT);
+			}
+		}
 		else if (is_abbrev(arg, "in"))
 			look_in_obj(ch, arg2);
 		/* did the char type 'look <direction>?' */
@@ -2405,7 +2547,6 @@ ACMD(do_who) {
 
 ACMD(do_whois) {
 	void read_lore(char_data *ch);
-	extern const char *class_role[NUM_ROLES];
 	extern const char *level_names[][2];
 	
 	char_data *victim = NULL;
@@ -2434,12 +2575,10 @@ ACMD(do_whois) {
 
 	// show class (but don't bother for immortals, as they generally have all skills
 	if (!IS_GOD(victim) && !IS_IMMORTAL(victim)) {
-		// level = file ? GET_HIGHEST_RECENT_LEVEL(victim) : GET_COMPUTED_LEVEL(victim);
-		// always show highest recent level
-		level = GET_HIGHEST_RECENT_LEVEL(victim);
+		level = file ? GET_LAST_KNOWN_LEVEL(victim) : GET_COMPUTED_LEVEL(victim);
 		
 		if (GET_CLASS(victim) != CLASS_NONE) {
-			msg_to_char(ch, "Class: %d %s (%s)\r\n", level, class_data[GET_PC_CLASS(victim)].name, class_role[(int) GET_CLASS_ROLE(victim)]);
+			msg_to_char(ch, "Class: %d %s (%s%s\t0)\r\n", level, class_data[GET_PC_CLASS(victim)].name, class_role_color[GET_CLASS_ROLE(victim)], class_role[GET_CLASS_ROLE(victim)]);
 		}
 		else {
 			msg_to_char(ch, "Level: %d\r\n", level);

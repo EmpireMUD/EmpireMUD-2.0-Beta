@@ -22,6 +22,7 @@
 #define BUILDING_RUINS_CLOSED  5007	// custom icons and db.world.c
 #define BUILDING_TUNNEL  5008  // building.c
 #define BUILDING_CITY_CENTER  5009
+#define BUILDING_RUINS_FLOODED  5010	// water ruins
 
 #define BUILDING_FENCE  5112
 #define BUILDING_GATE  5113
@@ -180,13 +181,11 @@
 #define o_WORN_STATUETTE  1305
 #define o_NAILS  1306
 
-// skins and cloths
+// skins
 #define o_SMALL_SKIN  1350
 #define o_LARGE_SKIN  1351
 #define o_SMALL_LEATHER  1356
 #define o_LARGE_LEATHER  1357
-#define o_WOOL  1358
-#define o_CLOTH  1359
 
 // newbie gear
 #define o_STAFF  1107
@@ -239,6 +238,18 @@
 #define FAMILIAR_SABERTOOTH  501
 #define FAMILIAR_SPHINX  502
 #define FAMILIAR_GRIFFIN  503
+#define FAMILIAR_DIRE_WOLF  504
+#define FAMILIAR_MOON_RABBIT  505
+#define FAMILIAR_GIANT_TORTOISE  506
+#define FAMILIAR_SPIRIT_WOLF  507
+#define FAMILIAR_MANTICORE  508
+#define FAMILIAR_PHOENIX  509
+#define FAMILIAR_SCORPION_SHADOW  510
+#define FAMILIAR_OWL_SHADOW  511
+#define FAMILIAR_BASILISK  512
+#define FAMILIAR_SALAMANDER  513
+#define FAMILIAR_SKELETAL_HULK  514
+#define FAMILIAR_BANSHEE  515
 
 
 // empire mobs
@@ -269,3 +280,4 @@
 #define SHEARER  268
 #define COIN_MAKER  269
 #define DOCKWORKER  270
+#define APPRENTICE_EXARCH  271

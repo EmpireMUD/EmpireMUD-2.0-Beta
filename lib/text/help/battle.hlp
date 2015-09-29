@@ -108,6 +108,13 @@ not have to type the target name -- it will target him automatically.
 
 If you are disarmed, you don't have to re-equip your weapon yourself. When
 the disarm affect wears off, it will still be in your <wield> slot.
+
+Disarmed players lose their weapon damage, and will make basic unarmed 'hit'
+attacks (unless the disarmed weapon was a caster weapon, in which case they
+receive a basic 'mana blast' attack instead).
+
+Disarmed mobs lose half their damage and their attack type is changed to 'hit'
+or 'mana blast'.
 #
 "DUAL-WIELD" "DUAL WIELD"
 
@@ -289,7 +296,8 @@ This training allows you to hold shields in your offhand and use them to
 block attacks. When you successfully block an attack, you take no damage
 from it.
 
-You must be holding a shield to block attacks.
+You must be holding a shield to block attacks, and you cannot normally block
+magical attacks.
 
 See also:  BLOCK, HOLD
 #
@@ -352,8 +360,8 @@ Ward Against Magic
 Class ability: Barbarian, Reaper
 
 This ability allows characters to block magical attacks with their shields,
-albeit at a reduced rate. Only 50% of the character's block rating applies to
-blocking magical attacks.
+albeit at a reduced rate. Your normal block chance is halved against magical
+attacks.
 
 See also: BLOCK
 #

@@ -1,5 +1,7 @@
 ALCHEMIST
 
+(Disambiguation: Did you mean HELP ALCHEMIST CLASS ?)
+
 (AA)  Alchemist  (Artisans ability)
 
 Resources:  4 lumber, 2 nails, 12 bricks
@@ -30,7 +32,7 @@ See also: ADVANCED WOODWORKING
 #
 "ASTRAL NEXUS" ASTRALNEXUS
 
-..&C*&0.  Astral Nexus  (Exarch Buildings ability)
+..&C*&0.  Astral Nexus  (Exarch Crafts ability)
 
 Resources:  20 logs, 12 blocks, 12 nocturnium, 20 nexus crystals
 Built on:  plains, desert (in city only)
@@ -255,16 +257,18 @@ You can pick more herbs than normal before the tile is depleted.
 
 See also: PICK
 #
-"EXARCH BUILDINGS"
+"EXARCH CRAFTS"
 
-Exarch Buildings
+Exarch Crafts
 Class ability:  Exarch
 
 This ability allows you to build the following buildings:
+  ..&C*&0. astralnexus  20 logs, 12 blocks, 12 nocturnium, 20 nexus crystals
 
-..&C*&0. astralnexus  20 logs, 12 blocks, 12 nocturnium, 20 nexus crystals
+Allows the following workforce options:
+  nexus crystals - Also requires Skilled Labor
 
-See also: BUILD, EXARCH CLASS
+See also: BUILD, EXARCH CLASS, SKILLED LABOR
 #
 GRAVE GRAVES "GRAVE MARKER"
 

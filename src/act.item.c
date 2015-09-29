@@ -289,6 +289,8 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	
 	switch (GET_OBJ_TYPE(obj)) {
 		case ITEM_POISON: {
+			extern const struct poison_data_type poison_data[];
+			msg_to_char(ch, "Poison type: %s\r\n", poison_data[GET_POISON_TYPE(obj)].name);
 			msg_to_char(ch, "Has %d charges remaining.\r\n", GET_POISON_CHARGES(obj));
 			break;
 		}
@@ -613,8 +615,8 @@ int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname) {
 	
 	// don't let people drop bound items in other people's territory
 	if (mode != SCMD_JUNK && OBJ_BOUND_TO(obj) && ROOM_OWNER(IN_ROOM(ch)) && ROOM_OWNER(IN_ROOM(ch)) != GET_LOYALTY(ch)) {
-		msg_to_char(ch, "You can't drop bound items here.\r\n");
-		return -1;
+		act("$p: You can't drop bound items here.", FALSE, ch, obj, NULL, TO_CHAR);
+		return 0;	// don't break a drop-all
 	}
 	
 	// count items
@@ -735,20 +737,24 @@ static bool perform_get_from_container(char_data *ch, obj_data *obj, obj_data *c
 		act("$p: item is bound to someone else.", FALSE, ch, obj, NULL, TO_CHAR);
 		return TRUE;	// don't break loop
 	}
-	if (!IS_IMMORTAL(ch) && IN_ROOM(cont) && LAST_OWNER_ID(cont) != idnum && LAST_OWNER_ID(obj) != idnum && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+	if (IN_ROOM(cont) && LAST_OWNER_ID(cont) != idnum && LAST_OWNER_ID(obj) != idnum && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		stealing = TRUE;
 		
-		if (emp && !can_steal(ch, emp)) {
+		if (!PRF_FLAGGED(ch, PRF_STEALTHABLE)) {
+			msg_to_char(ch, "You cannot steal because your 'stealthable' toggle is off.\r\n");
+			return FALSE;
+		}
+		if (!IS_IMMORTAL(ch) && emp && !can_steal(ch, emp)) {
 			// sends own message
 			return FALSE;
 		}		
 	}
+	if (IS_CARRYING_N(ch) + GET_OBJ_INVENTORY_SIZE(obj) > CAN_CARRY_N(ch)) {
+		act("$p: you can't hold any more items.", FALSE, ch, obj, 0, TO_CHAR);
+		return FALSE;
+	}
 	if (mode == FIND_OBJ_INV || can_take_obj(ch, obj)) {
-		if (IS_CARRYING_N(ch) + GET_OBJ_INVENTORY_SIZE(obj) > CAN_CARRY_N(ch)) {
-			act("$p: you can't hold any more items.", FALSE, ch, obj, 0, TO_CHAR);
-			return FALSE;
-		}
-		else if (get_otrigger(obj, ch)) {
+		if (get_otrigger(obj, ch)) {
 			// last-minute scaling: scale to its minimum (adventures will override this on their own)
 			scale_item_to_level(obj, GET_OBJ_MIN_SCALE_LEVEL(obj));
 			
@@ -757,20 +763,25 @@ static bool perform_get_from_container(char_data *ch, obj_data *obj, obj_data *c
 			act("$n gets $p from $P.", TRUE, ch, obj, cont, TO_ROOM);
 			
 			if (stealing) {
-				if (emp && !skill_check(ch, ABIL_STEAL, DIFF_HARD)) {
+				if (emp && IS_IMMORTAL(ch)) {
+					syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s stealing %s from %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), EMPIRE_NAME(emp));
+				}
+				else if (emp && !skill_check(ch, ABIL_STEAL, DIFF_HARD)) {
 					log_to_empire(emp, ELOG_HOSTILITY, "Theft at (%d, %d)", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
 				}
 				
-				GET_STOLEN_TIMER(obj) = time(0);
-				trigger_distrust_from_stealth(ch, emp);
-				gain_ability_exp(ch, ABIL_STEAL, 50);
+				if (!IS_IMMORTAL(ch)) {
+					GET_STOLEN_TIMER(obj) = time(0);
+					trigger_distrust_from_stealth(ch, emp);
+					gain_ability_exp(ch, ABIL_STEAL, 50);
+				}
 			}
 			
 			get_check_money(ch, obj);
 			return TRUE;
 		}
 	}
-	return FALSE;
+	return TRUE;	// return TRUE even though it failed -- don't break "get all" loops
 }
 
 
@@ -848,13 +859,21 @@ static bool perform_get_from_room(char_data *ch, obj_data *obj) {
 		act("$p: item is bound to someone else.", FALSE, ch, obj, NULL, TO_CHAR);
 		return TRUE;	// don't break loop
 	}
-	if (!IS_IMMORTAL(ch) && LAST_OWNER_ID(obj) != idnum && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+	if (LAST_OWNER_ID(obj) != idnum && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		stealing = TRUE;
 		
-		if (emp && !can_steal(ch, emp)) {
+		if (!PRF_FLAGGED(ch, PRF_STEALTHABLE)) {
+			msg_to_char(ch, "You cannot steal because your 'stealthable' toggle is off.\r\n");
+			return FALSE;
+		}
+		if (!IS_IMMORTAL(ch) && emp && !can_steal(ch, emp)) {
 			// sends own message
 			return FALSE;
 		}
+	}
+	if (IS_CARRYING_N(ch) + GET_OBJ_INVENTORY_SIZE(obj) > CAN_CARRY_N(ch)) {
+		act("$p: you can't hold any more items.", FALSE, ch, obj, 0, TO_CHAR);
+		return FALSE;
 	}
 	if (can_take_obj(ch, obj) && get_otrigger(obj, ch)) {
 		// last-minute scaling: scale to its minimum (adventures will override this on their own)
@@ -865,19 +884,24 @@ static bool perform_get_from_room(char_data *ch, obj_data *obj) {
 		act("$n gets $p.", TRUE, ch, obj, 0, TO_ROOM);
 					
 		if (stealing) {
-			if (emp && !skill_check(ch, ABIL_STEAL, DIFF_HARD)) {
+			if (emp && IS_IMMORTAL(ch)) {
+				syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s stealing %s from %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), EMPIRE_NAME(emp));
+			}
+			else if (emp && !skill_check(ch, ABIL_STEAL, DIFF_HARD)) {
 				log_to_empire(emp, ELOG_HOSTILITY, "Theft at (%d, %d)", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
 			}
 			
-			GET_STOLEN_TIMER(obj) = time(0);
-			trigger_distrust_from_stealth(ch, emp);
-			gain_ability_exp(ch, ABIL_STEAL, 50);
+			if (!IS_IMMORTAL(ch)) {
+				GET_STOLEN_TIMER(obj) = time(0);
+				trigger_distrust_from_stealth(ch, emp);
+				gain_ability_exp(ch, ABIL_STEAL, 50);
+			}
 		}
 		
 		get_check_money(ch, obj);
 		return TRUE;
 	}
-	return FALSE;
+	return TRUE;	// return TRUE even though it failed -- don't break "get all" loops
 }
 
 
@@ -2748,6 +2772,10 @@ void warehouse_retrieve(char_data *ch, char *argument) {
 		msg_to_char(ch, "You don't have permission to withdraw items here.\r\n");
 		return;
 	}
+	if (!imm_access && ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_WAREHOUSE) && !has_permission(ch, PRIV_WAREHOUSE)) {
+		msg_to_char(ch, "You don't have permission to withdraw items here.\r\n");
+		return;
+	}
 	
 	// detect leading number (amount to retrieve) with a space
 	tmp = any_one_arg(argument, junk);
@@ -3965,7 +3993,7 @@ ACMD(do_pour) {
 			return;
 		}
 		if (!*arg2) {		/* no 2nd argument */
-			if (IS_COMPLETE(IN_ROOM(ch)) && ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_DRINK | BLD_TAVERN)) {
+			if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_DRINK) || find_flagged_sect_within_distance_from_char(ch, SECTF_DRINK, NOBITS, 1) || (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_DRINK | BLD_TAVERN) && IS_COMPLETE(IN_ROOM(ch)))) {
 				fill_from_room(ch, to_obj);
 				return;
 			}
@@ -4286,6 +4314,10 @@ ACMD(do_retrieve) {
 		msg_to_char(ch, "You can't store or retrieve resources unless you're a member of an empire.\r\n");
 		return;
 	}
+	if (GET_RANK(ch) < EMPIRE_PRIV(emp, PRIV_STORAGE)) {
+		msg_to_char(ch, "You aren't high enough rank to retrieve from the empire inventory.\r\n");
+		return;
+	}
 	if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) || (room_emp && emp != room_emp && !has_relationship(emp, room_emp, DIPL_TRADE))) {
 		msg_to_char(ch, "You need to establish a trade pact to retrieve anything here.\r\n");
 		return;
@@ -4396,11 +4428,17 @@ ACMD(do_retrieve) {
 	if (count == 0) {
 		msg_to_char(ch, "There is nothing stored here!\r\n");
 	}
+	else {
+		// remove the "ceded" bit on this room (it was used)
+		if (GET_LOYALTY(ch) == room_emp) {
+			remove_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CEDED);
+		}
 
-	/* save the empire */
-	SAVE_CHAR(ch);
-	save_empire(emp);
-	read_vault(emp);
+		/* save the empire */
+		SAVE_CHAR(ch);
+		save_empire(emp);
+		read_vault(emp);
+	}
 }
 
 
@@ -4785,11 +4823,18 @@ ACMD(do_store) {
 			}
 		}
 	}
+	
+	if (done > 0) {
+		// remove the "ceded" bit on this room
+		if (GET_LOYALTY(ch) == room_emp) {
+			remove_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CEDED);
+		}
 
-	/* save the empire */
-	SAVE_CHAR(ch);
-	save_empire(emp);
-	read_vault(emp);
+		/* save the empire */
+		SAVE_CHAR(ch);
+		save_empire(emp);
+		read_vault(emp);
+	}
 }
 
 

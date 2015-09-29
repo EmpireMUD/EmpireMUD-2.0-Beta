@@ -559,16 +559,19 @@ bool validate_linking_limits(adv_data *adv, room_data *loc) {
 * at all. It does NOT check the sector/building/bld_on rules -- that is done
 * in find_location_for_rule, which calls this.
 *
+* @param adv_data *adv The adventure we are linking.
 * @param struct adventure_link_rule *rule The linking rule we're trying.
 * @param room_data *loc A location to test.
 * @return bool TRUE if the location seems ok.
 */
-inline bool validate_one_loc(struct adventure_link_rule *rule, room_data *loc) {
+bool validate_one_loc(adv_data *adv, struct adventure_link_rule *rule, room_data *loc) {
 	extern bool is_entrance(room_data *room);
 	
 	room_data *home = HOME_ROOM(loc);
+	struct island_info *isle;
 	empire_data *emp;
 	char_data *ch;
+	int island_id;
 	bool junk;
 	
 	const bitvector_t no_no_flags = ROOM_AFF_UNCLAIMABLE | ROOM_AFF_DISMANTLING | ROOM_AFF_HAS_INSTANCE;
@@ -576,6 +579,24 @@ inline bool validate_one_loc(struct adventure_link_rule *rule, room_data *loc) {
 	// ownership check
 	if (ROOM_OWNER(home) && !LINK_FLAGGED(rule, ADV_LINKF_CLAIMED_OK | ADV_LINKF_CITY_ONLY)) {
 		return FALSE;
+	}
+	
+	// newbie island checks
+	if ((island_id = GET_ISLAND_ID(loc)) != NO_ISLAND) {
+		isle = get_island(island_id, TRUE);
+		if (IS_SET(isle->flags, ISLE_NEWBIE)) {	// is newbie island
+			if (GET_ADV_MIN_LEVEL(adv) > config_get_int("newbie_adventure_cap") && !ADVENTURE_FLAGGED(adv, ADV_NEWBIE_ONLY)) {
+				return FALSE;
+			}
+			if (ADVENTURE_FLAGGED(adv, ADV_NO_NEWBIE)) {
+				return FALSE;
+			}
+		}
+		else {	// not newbie
+			if (ADVENTURE_FLAGGED(adv, ADV_NEWBIE_ONLY)) {
+				return FALSE;
+			}
+		}
 	}
 	
 	// rules based on specific ownership
@@ -676,7 +697,7 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 		if (findsect || findbdg) {
 			num_found = 0;
 			HASH_ITER(world_hh, world_table, room, next_room) {
-				if (!validate_one_loc(rule, room)) {
+				if (!validate_one_loc(adv, rule, room)) {
 					continue;
 				}
 			
@@ -686,7 +707,7 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 				}
 			
 				// TODO this specifically does not work on ocean without the whole map loaded
-				if ((findsect && SECT(room) == findsect) || (findbdg && BUILDING_VNUM(room) == GET_BLD_VNUM(findbdg))) {
+				if ((findsect && SECT(room) == findsect) || (findbdg && BUILDING_VNUM(room) == GET_BLD_VNUM(findbdg) && IS_COMPLETE(room))) {
 					if (!number(0, num_found++) || !found) {
 						found = room;
 					}
@@ -703,7 +724,7 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 				continue;
 			}
 
-			if (!validate_one_loc(rule, loc)) {
+			if (!validate_one_loc(adv, rule, loc)) {
 				continue;
 			}
 			

@@ -1396,7 +1396,7 @@ char_data *get_char_room_vis(char_data *ch, char *name) {
 	}
 
 	for (i = ROOM_PEOPLE(IN_ROOM(ch)); i && j <= number && !found; i = i->next_in_room) {
-		if (CAN_SEE(ch, i) && !AFF_FLAGGED(i, AFF_NO_TARGET_IN_ROOM) && MATCH_CHAR_NAME_ROOM(ch, tmp, i)) {
+		if (CAN_SEE(ch, i) && WIZHIDE_OK(ch, i) && !AFF_FLAGGED(i, AFF_NO_TARGET_IN_ROOM) && MATCH_CHAR_NAME_ROOM(ch, tmp, i)) {
 			if (++j == number) {
 				found = i;
 			}
@@ -1461,6 +1461,9 @@ char_data *get_player_vis(char_data *ch, char *name, bitvector_t flags) {
 	for (i = character_list; i && !found; i = i->next) {
 		if (IS_NPC(i))
 			continue;
+		if (IS_SET(flags, FIND_CHAR_ROOM) && !WIZHIDE_OK(ch, i)) {
+			continue;
+		}
 		if (IS_SET(flags, FIND_CHAR_ROOM) && IN_ROOM(i) != IN_ROOM(ch))
 			continue;
 		if (IS_SET(flags, FIND_CHAR_ROOM) && AFF_FLAGGED(i, AFF_NO_TARGET_IN_ROOM))
@@ -2216,7 +2219,13 @@ void remove_cooldown_by_type(char_data *ch, int type) {
 * @param room_data *room The room to abandon.
 */
 void abandon_room(room_data *room) {
+	void clear_private_owner(int id);
+	
 	room_data *iter, *next_iter, *home = HOME_ROOM(room);
+	
+	if (ROOM_PRIVATE_OWNER(room) != NOBODY) {
+		clear_private_owner(ROOM_PRIVATE_OWNER(room));
+	}
 	
 	perform_abandon_room(room);
 
@@ -2243,10 +2252,12 @@ void claim_room(room_data *room, empire_data *emp) {
 	room_data *iter, *next_iter;
 	
 	ROOM_OWNER(room) = emp;
+	remove_room_extra_data(room, ROOM_EXTRA_CEDED);	// not ceded if just claimed
 
 	HASH_ITER(interior_hh, interior_world_table, iter, next_iter) {
 		if (HOME_ROOM(iter) == home) {
 			ROOM_OWNER(iter) = emp;
+			remove_room_extra_data(iter, ROOM_EXTRA_CEDED);	// not ceded if just claimed
 		}
 	}
 }

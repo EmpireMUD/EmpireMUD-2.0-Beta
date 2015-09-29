@@ -64,6 +64,7 @@ extern char *help;
 
 // external functions
 void Crash_save_all();
+extern char *flush_reduced_color_codes(descriptor_data *desc);
 void mobile_activity(void);
 void show_string(descriptor_data *d, char *input);
 int isbanned(char *hostname);
@@ -160,6 +161,27 @@ void clear_last_act_message(descriptor_data *desc) {
 		free(desc->last_act_message);
 		desc->last_act_message = NULL;
 	}
+}
+
+
+/**
+* Determines if a descriptor number is already in use. These numbers loop
+* at 1000 and, in rare cases, we come back up on a number in use.
+*
+* @param int num The number to check.
+* @return bool TRUE if num is in use; FALSE if not.
+*/
+bool desc_num_in_use(int num) {
+	descriptor_data *desc;
+	
+	for (desc = descriptor_list; desc; desc = desc->next) {
+		if (desc->desc_num == num) {
+			return TRUE;
+		}
+	}
+	
+	// clear
+	return FALSE;
 }
 
 
@@ -799,6 +821,7 @@ void heartbeat(int heart_pulse) {
 	void check_death_respawn();
 	void check_expired_cooldowns();
 	void check_idle_passwords();
+	void check_newbie_islands();
 	void check_wars();
 	void chore_update();
 	void extract_pending_chars();
@@ -940,6 +963,8 @@ void heartbeat(int heart_pulse) {
 	if (HEARTBEAT(12 * SECS_PER_REAL_HOUR)) {
 		reduce_city_overages();
 		if (debug_log && HEARTBEAT(15)) { log("debug 20:\t%lld", microtime()); }
+		check_newbie_islands();
+		if (debug_log && HEARTBEAT(15)) { log("debug 20.5:\t%lld", microtime()); }
 	}
 	
 	if (HEARTBEAT(SECS_PER_REAL_HOUR)) {
@@ -1046,6 +1071,9 @@ void act(const char *str, int hide_invisible, char_data *ch, obj_data *obj, cons
 					continue;
 				if (IS_SET(type, TO_NOTVICT) && to == vict_obj)
 					continue;
+				if (!WIZHIDE_OK(to, ch)) {
+					continue;
+				}
 				perform_act(str, ch, obj, vict_obj, to, IS_SET(type, TO_IGNORE_BAD_CODE) != 0);
 			}
 		}
@@ -1594,6 +1622,7 @@ int get_max_players(void) {
 
 void init_descriptor(descriptor_data *newd, int desc) {
 	static int last_desc = 0;
+	int start;
 
 	newd->descriptor = desc;
 	newd->connected = CON_GET_NAME;
@@ -1624,8 +1653,14 @@ void init_descriptor(descriptor_data *newd, int desc) {
 	newd->color.want_clean = FALSE;
 	newd->color.want_underline = FALSE;
 	
-	if (++last_desc == 1000)
-		last_desc = 1;
+	// find a free desc num
+	start = last_desc;
+	do {
+		if (++last_desc == 1000) {
+			last_desc = 1;
+		}
+	} while (desc_num_in_use(last_desc) && last_desc != start);	// prevent infinite loop
+	
 	newd->desc_num = last_desc;
 }
 
@@ -1709,7 +1744,7 @@ bool is_slow_ip(char *ip) {
 	int iter;
 	
 	for (iter = 0; *slow_nameserver_ips[iter] != '\n'; ++iter) {
-		if (!strcmp(ip, slow_nameserver_ips[iter])) {
+		if (!strncmp(ip, slow_nameserver_ips[iter], strlen(slow_nameserver_ips[iter]))) {
 			return TRUE;
 		}
 	}
@@ -2246,6 +2281,9 @@ static int process_output(descriptor_data *t) {
 		wantsize = strlen(prompt);
 		strncpy(prompt, ProtocolOutput(t, prompt, &wantsize), MAX_STRING_LENGTH);
 		prompt[MAX_STRING_LENGTH-1] = '\0';
+				
+		// force a color code flush
+		snprintf(prompt + strlen(prompt), sizeof(prompt) - strlen(prompt), "%s", flush_reduced_color_codes(t));
 
 		strncat(i, prompt, MAX_PROMPT_LENGTH);
 	}
@@ -2472,8 +2510,6 @@ void write_to_q(const char *txt, struct txt_q *queue, int aliased, bool add_to_h
 * @return char* A pointer to the prompt string.
 */
 char *make_prompt(descriptor_data *d) {
-	extern char *prompt_olc_info(char_data *ch);
-
 	static char prompt[MAX_STRING_LENGTH];
 
 	/* Note, prompt is truncated at MAX_PROMPT_LENGTH chars (structs.h )*/
@@ -2483,52 +2519,19 @@ char *make_prompt(descriptor_data *d) {
 		*prompt = '\0';
 	}
 	else if (d->showstr_count)
-		sprintf(prompt, "\r&0[ Return to continue, (q)uit, (r)efresh, (b)ack, or page number (%d/%d) ]", d->showstr_page, d->showstr_count);
+		sprintf(prompt, "\r\t0[ Return to continue, (q)uit, (r)efresh, (b)ack, or page number (%d/%d) ]", d->showstr_page, d->showstr_count);
 	else if (d->str && (STATE(d) != CON_PLAYING || d->straight_to_editor))
 		strcpy(prompt, "] ");
 	else if (STATE(d) == CON_PLAYING) {
 		*prompt = '\0';
-
-		if (!IS_NPC(d->character) && GET_INVIS_LEV(d->character))
-			sprintf(prompt + strlen(prompt), "&r(i%d) ", GET_INVIS_LEV(d->character));
-
-		if (wizlock_level > 0 && GET_ACCESS_LEVEL(d->character) >= LVL_START_IMM)
-			sprintf(prompt + strlen(prompt), "&g(w%d) ", wizlock_level);
 		
-		if (!IS_NPC(d->character)) {
-			if (get_cooldown_time(d->character, COOLDOWN_ROGUE_FLAG) > 0) {
-				strcat(prompt, "&M(rogue) ");
-			}
-			else if (get_cooldown_time(d->character, COOLDOWN_HOSTILE_FLAG) > 0) {
-				strcat(prompt, "&m(hostile) ");
-			}
+		// show idle after 10 minutes
+		if ((d->character->char_specials.timer * SECS_PER_MUD_HOUR / SECS_PER_REAL_MIN) >= 10) {
+			strcat(prompt, "\tr[IDLE]\t0 ");
 		}
 
-		// IS_AFK is caused by the prf or timer>10
-		if (IS_AFK(d->character)) {
-			if (PRF_FLAGGED(d->character, PRF_AFK)) {
-				strcat(prompt, "&r[AFK] ");
-			}
-			else {
-				strcat(prompt, "&r[IDLE] ");
-			}
-		}
-
-		if (!IS_NPC(d->character) && PRF_FLAGGED(d->character, PRF_RP))
-			sprintf(prompt + strlen(prompt), "&m[RP] ");
-		
-		if (IS_PVP_FLAGGED(d->character)) {
-			strcat(prompt, "&R(PVP) ");
-		}
-		
-		// olc info
-		if (GET_OLC_TYPE(d) != 0) {
-			strcat(prompt, prompt_olc_info(d->character));
-		}
-
-		strcat(prompt, "&0");
-
-		strncat(prompt, prompt_str(d->character), sizeof(prompt) - strlen(prompt) - 1);
+		// append rendered prompt
+		snprintf(prompt + strlen(prompt), sizeof(prompt) - strlen(prompt), "%s", prompt_str(d->character));
 	}
 	else {
 		*prompt = '\0';
@@ -2549,13 +2552,13 @@ char *prompt_color_by_prc(int cur, int max) {
 	int prc = cur * 100 / MAX(1, max);
 	
 	if (prc >= 90) {
-		return "&g";
+		return "\tg";
 	}
 	else if (prc >= 25) {
-		return "&y";
+		return "\ty";
 	}
 	else {
-		return "&r";
+		return "\tr";
 	}
 }
 
@@ -2581,20 +2584,23 @@ char *prompt_str(char_data *ch) {
 
 	// default prompts
 	if (!str || !*str) {
-		if (IS_MAGE(ch)) {
+		if (IS_IMMORTAL(ch)) {
+			str = "\t0|\tc%C \tg%X\t0> ";
+		}
+		else if (IS_MAGE(ch)) {
 			if (IS_VAMPIRE(ch)) {
-				str = "&0|%i/%u/%n %bb [%t]> ";
+				str = "\t0|%i/%u/%n/%d [\ty%C\t0] [%t]> ";
 			}
 			else {
-				str = "&0|%i/%u/%n> ";
+				str = "\t0|%i/%u/%n [\ty%C\t0]> ";
 			}
 		}
 		else {
 			if (IS_VAMPIRE(ch)) {
-				str = "&0|%i/%u %bb [%t]> ";
+				str = "\t0|%i/%u/%d [\ty%C\t0] [%t]> ";
 			}
 			else {
-				str = "&0|%i/%u> ";
+				str = "\t0|%i/%u [\ty%C\t0]> ";
 			}
 		}
 	}
@@ -2620,6 +2626,7 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 	extern const char *health_levels[];
 	extern const char *move_levels[];
 	extern const char *mana_levels[];
+	extern const char *blood_levels[];
 	extern struct action_data_struct action_data[];
 	
 	static char pbuf[MAX_STRING_LENGTH];
@@ -2632,18 +2639,159 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 	for (;;) {
 		if (*str == '%') {
 			switch (*(++str)) {
-				case 'c':	/* Conditions */
-					sprintf(i, "%s%s%s%s%s%s%s",
-							   	IS_DRUNK(ch) ? "D" : "",
-							   	EFFECTIVELY_FLYING(ch) ? "F" : "",
-							   	IS_HUNGRY(ch) ? "H" : "",
-							   	(!IS_NPC(ch) && GET_MORPH(ch) != MORPH_NONE) ? "M" : "",
-							   	IS_RIDING(ch) ? "R" : "",
-							   	(IS_BLOOD_STARVED(ch)) ? "S" : "",
-							   	IS_THIRSTY(ch) ? "T" : ""
-							   	);
+				case 'c': {	// player conditions (words)
+					*i = '\0';
+					if (PRF_FLAGGED(ch, PRF_AFK)) {
+						strcat(i, "\trA");
+					}
+					if (IS_DRUNK(ch)) {
+						strcat(i, "\t0D");
+					}
+					if (EFFECTIVELY_FLYING(ch)) {
+						strcat(i, "\t0F");
+					}
+					if (IS_HUNGRY(ch)) {
+						strcat(i, "\t0H");
+					}
+					if (!IS_NPC(ch) && GET_MORPH(ch) != MORPH_NONE) {
+						strcat(i, "\t0M");
+					}
+					if (IS_PVP_FLAGGED(ch)) {
+						strcat(i, "\tRP");
+					}
+					if (IS_RIDING(ch)) {
+						strcat(i, "\t0R");
+					}
+					if (PRF_FLAGGED(ch, PRF_RP)) {
+						strcat(i, "\tmR");
+					}
+					if (IS_BLOOD_STARVED(ch)) {
+						strcat(i, "\t0S");
+					}
+					if (IS_THIRSTY(ch)) {
+						strcat(i, "\t0T");
+					}
+					if (!IS_NPC(ch)) {
+						if (get_cooldown_time(ch, COOLDOWN_ROGUE_FLAG) > 0) {
+							strcat(i, "\tMR");
+						}
+						else if (get_cooldown_time(ch, COOLDOWN_HOSTILE_FLAG) > 0) {
+							strcat(i, "\tmH");
+						}
+					}
+					
+					if (!*i) {
+						strcpy(i, "\t0-");
+					}
+					
+					strcat(i, "\t0");
 					tmp = i;
 					break;
+				}
+				case 'C': {	// player conditions (words)
+					*i = '\0';
+					if (PRF_FLAGGED(ch, PRF_AFK)) {
+						sprintf(i + strlen(i), "%safk", (*i ? " " : ""));
+					}
+					if (IS_DRUNK(ch)) {
+						sprintf(i + strlen(i), "%sdrunk", (*i ? " " : ""));
+					}
+					if (EFFECTIVELY_FLYING(ch)) {
+						sprintf(i + strlen(i), "%sflying", (*i ? " " : ""));
+					}
+					if (IS_HUNGRY(ch)) {
+						sprintf(i + strlen(i), "%shungry", (*i ? " " : ""));
+					}
+					if (!IS_NPC(ch) && GET_MORPH(ch) != MORPH_NONE) {
+						sprintf(i + strlen(i), "%smorphed", (*i ? " " : ""));
+					}
+					if (IS_PVP_FLAGGED(ch)) {
+						sprintf(i + strlen(i), "%spvp", (*i ? " " : ""));
+					}
+					if (IS_RIDING(ch)) {
+						sprintf(i + strlen(i), "%sriding", (*i ? " " : ""));
+					}
+					if (PRF_FLAGGED(ch, PRF_RP)) {
+						sprintf(i + strlen(i), "%srp", (*i ? " " : ""));
+					}
+					if (IS_BLOOD_STARVED(ch)) {
+						sprintf(i + strlen(i), "%sstarved", (*i ? " " : ""));
+					}
+					if (IS_THIRSTY(ch)) {
+						sprintf(i + strlen(i), "%sthirsty", (*i ? " " : ""));
+					}
+					if (!IS_NPC(ch)) {
+						if (get_cooldown_time(ch, COOLDOWN_ROGUE_FLAG) > 0) {
+							sprintf(i + strlen(i), "%srogue", (*i ? " " : ""));
+						}
+						else if (get_cooldown_time(ch, COOLDOWN_HOSTILE_FLAG) > 0) {
+							sprintf(i + strlen(i), "%shostile", (*i ? " " : ""));
+						}
+					}
+					
+					if (!*i) {
+						strcpy(i, "--");
+					}
+					
+					tmp = i;
+					break;
+				}
+				case 'x': {	// Immortal conditions (abbrevs)
+					*i = '\0';
+					if (IS_IMMORTAL(ch)) {
+						if (PRF_FLAGGED(ch, PRF_INCOGNITO)) {
+							strcat(i, "\tbI");
+						}
+						if (PRF_FLAGGED(ch, PRF_WIZHIDE)) {
+							strcat(i, "\tcW");
+						}
+						if (wizlock_level > 0) {
+							sprintf(i + strlen(i), "\tgw%d", wizlock_level);
+						}
+						if (!IS_NPC(ch) && GET_INVIS_LEV(ch) > 0) {
+							sprintf(i + strlen(i), "\tri%d", GET_INVIS_LEV(ch));
+						}
+						if (ch->desc && GET_OLC_TYPE(ch->desc) != 0) {
+							strcat(i, "\tcO");
+						}
+					}
+					
+					if (!*i) {
+						strcpy(i, "\t0-");
+					}
+					
+					strcat(i, "\t0");
+					tmp = i;
+					break;
+				}
+				case 'X': {	// Immortal conditions (words)
+					*i = '\0';
+					if (IS_IMMORTAL(ch)) {
+						if (PRF_FLAGGED(ch, PRF_INCOGNITO)) {
+							sprintf(i + strlen(i), "%sincog", (*i ? " " : ""));
+						}
+						if (PRF_FLAGGED(ch, PRF_WIZHIDE)) {
+							sprintf(i + strlen(i), "%swizhide", (*i ? " " : ""));
+						}
+						if (wizlock_level > 0) {
+							sprintf(i + strlen(i), "%swizlock-%d", (*i ? " " : ""), wizlock_level);
+						}
+						if (!IS_NPC(ch) && GET_INVIS_LEV(ch) > 0) {
+							sprintf(i + strlen(i), "%sinvis-%d", (*i ? " " : ""), GET_INVIS_LEV(ch));
+						}
+						if (ch->desc && GET_OLC_TYPE(ch->desc) != 0) {
+							extern char *prompt_olc_info(char_data *ch);
+							sprintf(i + strlen(i), "%solc-%s", (*i ? " " : ""), prompt_olc_info(ch));
+						}
+					}
+					
+					if (!*i) {
+						strcpy(i, "--");
+					}
+					
+					tmp = i;
+					break;
+				}
 				case 'e': {	// %e enemy's health percent
 					if ((vict = FIGHTING(ch))) {
 						sprintf(i, "%d%%", GET_HEALTH(vict) * 100 / MAX(1, GET_MAX_HEALTH(vict)));
@@ -2676,7 +2824,7 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					break;
 				}
 				case 'h':	// %h current health
-					sprintf(i, "%s%d&0", prompt_color_by_prc(GET_HEALTH(ch), GET_MAX_HEALTH(ch)), MAX(0, GET_HEALTH(ch)));
+					sprintf(i, "%s%d\t0", prompt_color_by_prc(GET_HEALTH(ch), GET_MAX_HEALTH(ch)), MAX(0, GET_HEALTH(ch)));
 					tmp = i;
 					break;
 				case 'H':	// %H max health
@@ -2688,7 +2836,7 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					tmp = i;
 					break;
 				case 'v':	// %v current move
-					sprintf(i, "%s%d&0", prompt_color_by_prc(GET_MOVE(ch), GET_MAX_MOVE(ch)), MAX(0, GET_MOVE(ch)));
+					sprintf(i, "%s%d\t0", prompt_color_by_prc(GET_MOVE(ch), GET_MAX_MOVE(ch)), MAX(0, GET_MOVE(ch)));
 					tmp = i;
 					break;
 				case 'V':	// %V max move
@@ -2700,7 +2848,7 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					tmp = i;
 					break;
 				case 'm':	// %m current mana
-					sprintf(i, "%s%d&0", prompt_color_by_prc(GET_MANA(ch), GET_MAX_MANA(ch)), MAX(0, GET_MANA(ch)));
+					sprintf(i, "%s%d\t0", prompt_color_by_prc(GET_MANA(ch), GET_MAX_MANA(ch)), MAX(0, GET_MANA(ch)));
 					tmp = i;
 					break;
 				case 'M':	// %M max mana
@@ -2713,7 +2861,7 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					break;
 				case 'b':	// %b current blood
 					if (IS_VAMPIRE(ch))
-						sprintf(i, "%s%d&0", prompt_color_by_prc(GET_BLOOD(ch), GET_MAX_BLOOD(ch)), GET_BLOOD(ch));
+						sprintf(i, "%s%d\t0", prompt_color_by_prc(GET_BLOOD(ch), GET_MAX_BLOOD(ch)), GET_BLOOD(ch));
 					else
 						sprintf(i, "%%%c", *str);
 					tmp = i;
@@ -2725,6 +2873,11 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 						sprintf(i, "%%%c", *str);
 					tmp = i;
 					break;
+				case 'd': {	// %d blood as text
+					sprintf(i, "%s", blood_levels[MIN(10, MAX(0, GET_BLOOD(ch)) * 10 / MAX(1, GET_MAX_BLOOD(ch)))]);
+					tmp = i;
+					break;
+				}
 				case 's': {	// %s bonus exp available
 					sprintf(i, "%d", GET_DAILY_BONUS_EXPERIENCE(ch));
 					tmp = i;
@@ -2738,15 +2891,15 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 						strcpy(spare, "am");
 
 					if (time_info.hours == 6)
-						sprintf(i, "&C%d%s&0", time_info.hours > 12 ? time_info.hours - 12 : time_info.hours, spare);
+						sprintf(i, "\tC%d%s\t0", time_info.hours > 12 ? time_info.hours - 12 : time_info.hours, spare);
 					else if (time_info.hours < 19 && time_info.hours > 6)
-						sprintf(i, "&Y%d%s&0", time_info.hours > 12 ? time_info.hours - 12 : time_info.hours, spare);
+						sprintf(i, "\tY%d%s\t0", time_info.hours > 12 ? time_info.hours - 12 : time_info.hours, spare);
 					else if (time_info.hours == 19)
-						sprintf(i, "&R%d%s&0", time_info.hours > 12 ? time_info.hours - 12 : time_info.hours, spare);
+						sprintf(i, "\tR%d%s\t0", time_info.hours > 12 ? time_info.hours - 12 : time_info.hours, spare);
 					else if (time_info.hours == 0)
-						sprintf(i, "&B12am&0");
+						sprintf(i, "\tB12am\t0");
 					else
-						sprintf(i, "&B%d%s&0", time_info.hours > 12 ? time_info.hours - 12 : time_info.hours, spare);
+						sprintf(i, "\tB%d%s\t0", time_info.hours > 12 ? time_info.hours - 12 : time_info.hours, spare);
 					tmp = i;
 					break;
 				case 'a': {	// action
@@ -2803,7 +2956,7 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 
 	*cp = '\0';
 
-	strcat(pbuf, "&0");
+	strcat(pbuf, "\t0");
 	return (pbuf);
 }
 
@@ -3118,6 +3271,9 @@ void game_loop(socket_t mother_desc) {
 				wantsize = strlen(prompt);
 				strncpy(prompt, ProtocolOutput(d, prompt, &wantsize), MAX_STRING_LENGTH);
 				prompt[MAX_STRING_LENGTH-1] = '\0';
+				
+				// force a color code flush
+				snprintf(prompt + strlen(prompt), sizeof(prompt) - strlen(prompt), "%s", flush_reduced_color_codes(d));
 				
 				if (write_to_descriptor(d->descriptor, prompt) >= 0) {
 					d->has_prompt = 1;

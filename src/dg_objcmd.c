@@ -269,6 +269,38 @@ OCMD(do_oregionecho) {
 	}
 }
 
+
+// prints the message to everyone except two targets
+OCMD(do_oechoneither) {
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+	char_data *vict1, *vict2, *iter;
+	char *p;
+
+	p = two_arguments(argument, arg1, arg2);
+	skip_spaces(&p);
+
+	if (!*arg1 || !*arg2 || !*p) {
+		obj_log(obj, "oechoneither called with missing arguments");
+		return;
+	}
+	
+	if (!(vict1 = get_char_by_obj(obj, arg1))) {
+		obj_log(obj, "oechoneither: vict 1 (%s) does not exist", arg1);
+		return;
+	}
+	if (!(vict2 = get_char_by_obj(obj, arg2))) {
+		obj_log(obj, "oechoneither: vict 2 (%s) does not exist", arg2);
+		return;
+	}
+	
+	for (iter = ROOM_PEOPLE(IN_ROOM(vict1)); iter; iter = iter->next_in_room) {
+		if (iter->desc && iter != vict1 && iter != vict2) {
+			sub_write(p, iter, TRUE, TO_CHAR);
+		}
+	}
+}
+
+
 OCMD(do_osend) {
 	char buf[MAX_INPUT_LENGTH], *msg;
 	char_data *ch;
@@ -1075,6 +1107,7 @@ const struct obj_command_info obj_cmd_info[] = {
 	{ "odot", do_odot,   NO_SCMD },
 	{ "oecho", do_oecho, NO_SCMD },
 	{ "oechoaround", do_osend, SCMD_OECHOAROUND },
+	{ "oechoneither", do_oechoneither, NO_SCMD },
 	{ "oforce", do_oforce, NO_SCMD },
 	{ "oload", do_dgoload, NO_SCMD },
 	{ "opurge", do_opurge, NO_SCMD },

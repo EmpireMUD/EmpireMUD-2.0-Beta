@@ -74,12 +74,12 @@ The available archetypes are:
  Novice Sorcerer - master the rituals (High Sorcery, Battle, Intelligence)
  Lone Vampire - empowered by blood (Vampire, Battle, Wits)
 #
-"ALCHEMIST CLASS" ALCHEMIST ALCH
+"ALCHEMIST CLASS" ALCH
 
 Alchemist
 Natural Magic + Trade
 
-Healer: Alchemist Crafts, Fastcasting, Resurrect
+Healer: Alchemist Crafts, Fastcasting, Resurrect, Salamander (familiar)
 
 Note: Class abilities are unfinished.
 
@@ -113,7 +113,7 @@ Archmage
 High Sorcery + Natural Magic
 
 Caster: Resurrect
-Healer: Fastcasting, Resurrect
+Healer: Fastcasting, Phoenix (familiar), Resurrect
 
 Note: Class abilities are unfinished.
 
@@ -175,6 +175,17 @@ Note: Class abilities are unfinished.
 
 See also: CLASS
 #
+BUFF "BUFF ROLE" "BUFFS ROLE" "BUFFER ROLE"
+
+A person with the "buff" group role is one who casts beneficial spells on other
+members of the party. In most cases, this is in addition to performing another
+role like healer or caster.
+
+Some familiars perform only the buff role -- they cast spells on the party but
+don't deal or take damage.
+
+See also: CLASS FAMILIARS, DEBUFF
+#
 CASTER "CASTER ROLE" "MAGIC DPS" "CASTER DPS" "CASTER TRAITS"
 
 The caster role, a type of DPS (damage-per-second) role, is meant to deal as
@@ -182,6 +193,9 @@ much magical damage as possible. This role needs Dexterity/To-Hit, Wits, and
 Intelligence. The caster should never be taking direct damage from mobs in
 combat. When choosing gear, potions, and buffs for your caster character, focus
 on the caster traits below. Other traits don't contribute to caster DPS.
+
+The class names of casters appear in &aazure&0 on the "who" list and the empire
+roster.
 
 Caster tips:
  - Let the tank start the fight.
@@ -195,6 +209,18 @@ Caster traits:
  - Bonus-Magical: Any spare points can go here to boost your magical damage.
 
 See also: HEALER, HIT CAP, MELEE, TANK
+#
+DEBUFF "DEBUFF ROLE" "DEBUFFS ROLE" "DEBUFFER ROLE"
+
+The "debuff" group role is someone who inflicts penalties such as "blind" on
+the enemy in combat, in order to make it easier for the party to fight the
+enemy. In most cases, this is in addition to performing another role like
+melee or tank.
+
+Some familiars perform only the debuff role -- they cast spells on the enemy
+but don't deal or take damage.
+
+See also: BUFF, CLASS FAMILIARS
 #
 "DUKE CLASS" DUKE
 
@@ -224,7 +250,7 @@ See also: CLASS, MELEE
 Exarch
 Empire + High Sorcery
 
-Caster: Dragonriding, Exarch Buildings
+Caster: Dragonriding, Exarch Crafts
 
 Note: Class abilities are unfinished.
 
@@ -235,8 +261,8 @@ See also: CLASS, CASTER
 Feral
 Natural Magic + Survival
 
-Tank: Resurrect, Towering Werewolf Form
-Healer: Fastcasting, Resurrect, Sage Werewolf Form
+Tank: Basilisk (familiar), Resurrect, Towering Werewolf Form
+Healer: Basilisk (familiar), Fastcasting, Resurrect, Sage Werewolf Form
 
 Note: Class abilities are unfinished.
 
@@ -260,6 +286,9 @@ Intelligence only, as the other attributes are generally related to dealing
 damage or taking damage. When choosing gear, potions, and buffs for your healer
 character, focus on the healer traits below. Other traits don't contribute to
 healing.
+
+The class names of healers appear in &jjade&0 on the "who" list and the
+empire roster.
 
 Healer tips:
  - Put the tank's health in your prompt with %f/%F.
@@ -292,8 +321,9 @@ See also: CLASS, CASTER
 Luminary
 Empire + Natural Magic
 
-Caster: Dragonriding, Resurrect
-Healer: Ancestral Healing, Dragonriding, Fastcasting, Resurrect
+Caster: Dragonriding, Manticore (familiar), Griffin (familiar), Resurrect
+Healer: Ancestral Healing, Dragonriding, Fastcasting, Manticore (familiar),
+        Griffin (familiar), Resurrect
 
 Luminary Healers gain additional healing power from Greatness and should build
 their Greatness in addition to the 4 healer traits.
@@ -309,6 +339,9 @@ the combat damage (along with casters). This role requires Dexterity/To-Hit,
 Wits, and Strength. The melee role should avoid taking damage in combat. When
 choosing gear, potions, and buffs for your melee character, focus on the
 melee traits below. Other traits don't contribute to melee DPS.
+
+The class names of melee DPS characters appear in &rred&0 on the "who" list
+and the empire roster.
 
 Melee tips:
  - Let the tank start the fight.
@@ -328,8 +361,8 @@ See also: CASTER, HEALER, HIT CAP, TANK
 Necromancer
 Natural Magic + Vampire
 
-Caster: Dread Blood Form, Resurrect
-Healer: Fastcasting, Resurrect
+Caster: Dread Blood Form, Resurrect, Skeletal Hulk (familiar)
+Healer: Banshee (familiar), Fastcasting, Resurrect
 
 Note: Class abilities are unfinished.
 
@@ -385,8 +418,8 @@ See also: CLASS, MELEE
 Shadow Wolf
 Natural Magic + Stealth
 
-Melee: Howl, Moonrise, Savage Werewolf Form
-Healer: Fastcasting, Moonrise, Sage Werewolf Form
+Melee: Howl, Moonrise, Savage Werewolf Form, Scorpion Shadow (familiar)
+Healer: Fastcasting, Moonrise, Owl Shadow (familiar), Sage Werewolf Form
 
 Note: Class abilities are unfinished.
 
@@ -421,6 +454,9 @@ high hitpoints and damage mitigation (like resistance and dodge). Tanks don't
 need Strength or Wits, because those are related to dealing damage. When
 choosing gear, potions, and buffs for your tank character, you only need to
 worry about the tank traits listed below
+
+The class names of tanks appear in &yyellow&0 on the "who" list and the
+empire roster.
 
 Tanking tips:
  - The tank should start combat with all mobs so they are hitting him, rather
@@ -465,9 +501,9 @@ See also: CLASS, MELEE
 Werewolf
 Battle + Natural Magic
 
-Tank: Resurrect, Towering Werewolf Form
-Melee: Resurrect, Savage Werewolf Form
-Healer: Confer, Fastcasting, Resurrect, Sage Werewolf Form
+Tank: Resurrect, Spirit Wolf (familiar), Towering Werewolf Form
+Melee: Dire Wolf (familiar), Resurrect, Savage Werewolf Form
+Healer: Confer, Fastcasting, Moon Rabbit (familiar), Resurrect, Sage Werewolf Form
 
 Healer Werewolves can convert Strength into buffs for themselves and their
 allies, and should build their Strength in addition to the 4 healer traits.

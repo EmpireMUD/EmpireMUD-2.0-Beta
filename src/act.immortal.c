@@ -68,6 +68,7 @@ extern char *get_room_name(room_data *room, bool color);
 void save_instances();
 void save_whole_world();
 void scale_mob_to_level(char_data *mob, int level);
+extern char *show_color_codes(char *string);
 void update_class(char_data *ch);
 
 // locals
@@ -124,9 +125,14 @@ static void perform_goto(char_data *ch, room_data *to_room) {
 	}
 
 	for (t = ROOM_PEOPLE(IN_ROOM(ch)); t; t = t->next_in_room) {
-		if (!REAL_NPC(t) && t != ch && CAN_SEE(t, ch)) {
-			act(buf, TRUE, ch, 0, t, TO_VICT);
+		if (REAL_NPC(t) || t == ch) {
+			continue;
 		}
+		if (!CAN_SEE(t, ch) || !WIZHIDE_OK(t, ch)) {
+			continue;
+		}
+
+		act(buf, TRUE, ch, 0, t, TO_VICT);
 	}
 
 	char_from_room(ch);
@@ -144,9 +150,14 @@ static void perform_goto(char_data *ch, room_data *to_room) {
 	}
 
 	for (t = ROOM_PEOPLE(IN_ROOM(ch)); t; t = t->next_in_room) {
-		if (!REAL_NPC(t) && t != ch && CAN_SEE(t, ch)) {
-			act(buf, TRUE, ch, 0, t, TO_VICT);
+		if (REAL_NPC(t) || t == ch) {
+			continue;
 		}
+		if (!CAN_SEE(t, ch) || !WIZHIDE_OK(t, ch)) {
+			continue;
+		}
+		
+		act(buf, TRUE, ch, 0, t, TO_VICT);
 	}
 	
 	look_at_room(ch);
@@ -950,9 +961,11 @@ struct set_struct {
 		{ "lastname",	LVL_START_IMM,	PC,		MISC },
 		{ "muted",		LVL_START_IMM,	PC, 	BINARY },
 		{ "name",		LVL_CIMPL,	PC,		MISC },
+		{ "incognito",	LVL_START_IMM,	PC,		BINARY },
 		{ "ipmask",		LVL_START_IMM,	PC,		BINARY },
 		{ "multiok",	LVL_START_IMM,	PC,		BINARY },
 		{ "vampire",	LVL_START_IMM,	PC, 	BINARY },
+		{ "wizhide",	LVL_START_IMM,	PC,		BINARY },
 		{ "account",	LVL_START_IMM,	PC,		MISC },
 		{ "bonus",		LVL_START_IMM,	PC,		MISC },
 		{ "grants",		LVL_CIMPL,	PC,		MISC },
@@ -1111,6 +1124,12 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 	}
 	else if SET_CASE("ipmask") {
 		SET_OR_REMOVE(PLR_FLAGS(vict), PLR_IPMASK);
+	}
+	else if SET_CASE("incognito") {
+		SET_OR_REMOVE(PRF_FLAGS(vict), PRF_INCOGNITO);
+	}
+	else if SET_CASE("wizhide") {
+		SET_OR_REMOVE(PRF_FLAGS(vict), PRF_WIZHIDE);
 	}
 	else if SET_CASE("multiok") {
 		SET_OR_REMOVE(PLR_FLAGS(vict), PLR_MULTIOK);
@@ -1919,15 +1938,15 @@ SHOW(show_account) {
 			if (vbuf.char_specials_saved.idnum == cbuf.char_specials_saved.idnum || (vbuf.player_specials_saved.account_id != 0 && vbuf.player_specials_saved.account_id == cbuf.player_specials_saved.account_id)) {
 				// same account
 				if (is_playing(vbuf.char_specials_saved.idnum) || is_at_menu(vbuf.char_specials_saved.idnum)) {
-					msg_to_char(ch, " &c[%d %s] %s (online)&0%s\r\n", vbuf.player_specials_saved.highest_recent_level, class_data[vbuf.player_specials_saved.character_class].name, vbuf.name, IS_SET(vbuf.char_specials_saved.act, PLR_DELETED) ? " (deleted)" : "");
+					msg_to_char(ch, " &c[%d %s] %s (online)&0%s\r\n", vbuf.player_specials_saved.last_known_level, class_data[vbuf.player_specials_saved.character_class].name, vbuf.name, IS_SET(vbuf.char_specials_saved.act, PLR_DELETED) ? " (deleted)" : "");
 				}
 				else {
 					// not playing but same account
-					msg_to_char(ch, " [%d %s] %s%s\r\n", vbuf.player_specials_saved.highest_recent_level, class_data[vbuf.player_specials_saved.character_class].name, vbuf.name, IS_SET(vbuf.char_specials_saved.act, PLR_DELETED) ? " (deleted)" : "");
+					msg_to_char(ch, " [%d %s] %s%s\r\n", vbuf.player_specials_saved.last_known_level, class_data[vbuf.player_specials_saved.character_class].name, vbuf.name, IS_SET(vbuf.char_specials_saved.act, PLR_DELETED) ? " (deleted)" : "");
 				}
 			}
 			else if (!IS_SET(vbuf.char_specials_saved.act, PLR_DELETED) && !strcmp(vbuf.host, cbuf.host)) {
-				msg_to_char(ch, " &r[%d %s] %s (not on account)&0\r\n", vbuf.player_specials_saved.highest_recent_level, class_data[vbuf.player_specials_saved.character_class].name, vbuf.name);
+				msg_to_char(ch, " &r[%d %s] %s (not on account)&0\r\n", vbuf.player_specials_saved.last_known_level, class_data[vbuf.player_specials_saved.character_class].name, vbuf.name);
 			}
 		}
 	}
@@ -2417,7 +2436,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 			msg_to_char(ch, "Promo code: %s\r\n", promo_codes[GET_PROMO_ID(k)].code);
 		}
 
-		msg_to_char(ch, "Access Level: [&c%d&0], Class: [&c%s&0/&c%s&0], Skill Level: [&c%d&0], Gear Level: [&c%d&0], Total: [&c%d&0]\r\n", GET_ACCESS_LEVEL(k), class_data[GET_CLASS(k)].name, class_role[(int) GET_CLASS_ROLE(k)], GET_SKILL_LEVEL(k), GET_GEAR_LEVEL(k), IN_ROOM(k) ? GET_COMPUTED_LEVEL(k) : GET_HIGHEST_RECENT_LEVEL(k));
+		msg_to_char(ch, "Access Level: [&c%d&0], Class: [&c%s&0/&c%s&0], Skill Level: [&c%d&0], Gear Level: [&c%d&0], Total: [&c%d&0]\r\n", GET_ACCESS_LEVEL(k), class_data[GET_CLASS(k)].name, class_role[(int) GET_CLASS_ROLE(k)], GET_SKILL_LEVEL(k), GET_GEAR_LEVEL(k), IN_ROOM(k) ? GET_COMPUTED_LEVEL(k) : GET_LAST_KNOWN_LEVEL(k));
 		
 		coin_string(GET_PLAYER_COINS(k), buf);
 		msg_to_char(ch, "Coins: %s\r\n", buf);
@@ -2793,6 +2812,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	extern double get_weapon_speed(obj_data *weapon);
 	extern struct ship_data_struct ship_data[];
 	extern const char *armor_types[NUM_ARMOR_TYPES+1];
+	extern const struct poison_data_type poison_data[];
 
 	int i, found;
 	room_data *room;
@@ -2875,6 +2895,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 
 	switch (GET_OBJ_TYPE(j)) {
 		case ITEM_POISON: {
+			msg_to_char(ch, "Poison type: %s\r\n", poison_data[GET_POISON_TYPE(j)].name);
 			msg_to_char(ch, "Charges remaining: %d\r\n", GET_POISON_CHARGES(j));
 			break;
 		}
@@ -3543,6 +3564,48 @@ int vnum_trigger(char *searchname, char_data *ch) {
  //////////////////////////////////////////////////////////////////////////////
 //// COMMANDS ////////////////////////////////////////////////////////////////
 
+ACMD(do_addnotes) {
+	char notes[MAX_ADMIN_NOTES_LENGTH];
+	char_data *vict = NULL;
+	bool file = FALSE;
+	
+	argument = one_argument(argument, arg);	// target
+	skip_spaces(&argument);	// text to add
+	
+	if (!*arg || !*argument) {
+		msg_to_char(ch, "Usage: addnotes <name> <text>\r\n");
+	}
+	else if (!(vict = find_or_load_player(arg, &file))) {
+		send_to_char("There is no such player.\r\n", ch);
+	}
+	else if (GET_ACCESS_LEVEL(vict) >= GET_ACCESS_LEVEL(ch)) {
+		msg_to_char(ch, "You cannot add notes for players of that level.\r\n");
+	}
+	else if (strlen(GET_ADMIN_NOTES(vict)) + strlen(argument) + 2 > MAX_ADMIN_NOTES_LENGTH) {
+		msg_to_char(ch, "Notes too long, unable to add text. Use editnotes instead.\r\n");
+	}
+	else {
+		snprintf(notes, sizeof(notes), "%s%s\r\n", GET_ADMIN_NOTES(vict), argument);
+		strcpy(GET_ADMIN_NOTES(vict), notes);	// strcpy OK: same length
+		
+		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has added notes for %s", GET_NAME(ch), GET_NAME(vict));
+		msg_to_char(ch, "Notes added to %s.\r\n", GET_NAME(vict));
+		
+		if (file) {
+			store_loaded_char(vict);
+			file = FALSE;
+		}
+		else {
+			SAVE_CHAR(vict);
+		}
+	}
+	
+	// in case
+	if (vict && file) {
+		free_char(vict);
+	}
+}
+
 
 ACMD(do_advance) {
 	void start_new_character(char_data *ch);
@@ -4055,7 +4118,9 @@ ACMD(do_echo) {
 			}
 		
 			// send to vict
-			act(lbuf, FALSE, ch, obj, vict, TO_VICT | TO_IGNORE_BAD_CODE);
+			if (vict != ch) {
+				act(lbuf, FALSE, ch, obj, vict, TO_VICT | TO_IGNORE_BAD_CODE);
+			}
 		
 			// channel history
 			if (vict->desc && vict->desc->last_act_message) {
@@ -4238,7 +4303,7 @@ ACMD(do_file) {
 		}
 		get_line(req_file, buf);
 	}
-	page_string(ch->desc, output, 1);
+	page_string(ch->desc, show_color_codes(output), TRUE);
 
 	fclose(req_file);
 }

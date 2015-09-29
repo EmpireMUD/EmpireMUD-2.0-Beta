@@ -43,6 +43,7 @@ extern int perform_move(char_data *ch, int dir, int need_specials_check, byte mo
 // local protos
 void end_pursuit(char_data *ch, char_data *target);
 struct generic_name_data *get_generic_name_list(int name_set, int sex);
+void scale_mob_to_level(char_data *mob, int level);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -205,7 +206,7 @@ void random_encounter(char_data *ch) {
 	}
 	
 	// water encounters don't trigger if the player has a boat
-	if ((IS_WATER_SECT(SECT(IN_ROOM(ch))) || RMT_FLAGGED(IN_ROOM(ch), RMT_NEED_BOAT)) && has_boat(ch)) {
+	if ((IS_WATER_SECT(SECT(IN_ROOM(ch))) || ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_NEED_BOAT) || RMT_FLAGGED(IN_ROOM(ch), RMT_NEED_BOAT)) && has_boat(ch)) {
 		return;
 	}
 
@@ -1054,6 +1055,24 @@ int determine_best_scale_level(char_data *ch, bool check_group) {
 	return level;	
 }
 
+
+/**
+* Scales a mob below the master's level like a familiar.
+*
+* @param char_data *mob The mob to scale.
+* @param char_data *master The person to base it on.
+*/
+void scale_mob_as_familiar(char_data *mob, char_data *master) {
+	int scale_level;
+	
+	scale_level = get_approximate_level(master);
+	if (scale_level > CLASS_SKILL_CAP + 25) {
+		scale_level -= 25;
+	}
+	scale_mob_to_level(mob, scale_level);
+}
+
+
 /**
 * This scales one NPC to the level of a player or NPC, or as closely as
 * allowed.
@@ -1062,7 +1081,6 @@ int determine_best_scale_level(char_data *ch, bool check_group) {
 * @param char_data *ch The creature to scale based on.
 */
 void scale_mob_for_character(char_data *mob, char_data *ch) {
-	void scale_mob_to_level(char_data *mob, int level);
 	scale_mob_to_level(mob, determine_best_scale_level(ch, TRUE));
 }
 
@@ -1081,6 +1099,7 @@ void scale_mob_to_level(char_data *mob, int level) {
 	double value, target;
 	int low_level, mid_level, high_level, over_level;
 	int room_lev = 0, room_min = 0, room_max = 0;
+	int pools_down[NUM_POOLS];
 	int iter;
 	
 	// sanity
@@ -1114,6 +1133,11 @@ void scale_mob_to_level(char_data *mob, int level) {
 	// insanity!
 	if (level <= 0) {
 		return;
+	}
+	
+	// store how far down they are on pools
+	for (iter = 0; iter < NUM_POOLS; ++iter) {
+		pools_down[iter] = mob->points.max_pools[iter] - mob->points.current_pools[iter];
 	}
 	
 	// set up: determine how many levels the mob gets in each level range
@@ -1212,10 +1236,11 @@ void scale_mob_to_level(char_data *mob, int level) {
 	
 	// cleanup
 	for (iter = 0; iter < NUM_POOLS; ++iter) {
-		mob->points.current_pools[iter] = mob->points.max_pools[iter];
+		mob->points.current_pools[iter] = mob->points.max_pools[iter] - pools_down[iter];
 	}
 	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
 		mob->aff_attributes[iter] = mob->real_attributes[iter];
 	}
 	affect_total(mob);
+	update_pos(mob);
 }

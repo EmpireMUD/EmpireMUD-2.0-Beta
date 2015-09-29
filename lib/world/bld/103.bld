@@ -2,7 +2,7 @@
 Mountain Cave~
 A Dark Cave in the Mountainside~
 &y/()\~
-100 0 be 0
+100 0 beR 0
 0 0 0 -1
 D
    The cave is small and would be easy to miss if not for the scorched
@@ -20,7 +20,7 @@ E
 nest cave~
    This shallow cliffside cave has the remains of a huge nest made of huge tree
 branches. Parts of the nest are scorched, but it seems it's been some time
-since the dragon was here.  
+since the dragon was here.
 ~
 S
 $

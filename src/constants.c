@@ -108,6 +108,8 @@ const char *adventure_flags[] = {
 	"!NEARBY",
 	"ROTATABLE",
 	"CONFUSING-RANDOMS",
+	"!NEWBIE",
+	"NEWBIE-ONLY",
 	"\n"
 };
 
@@ -158,6 +160,7 @@ const char *room_template_flags[] = {
 	"PEACEFUL",
 	"NEED-BOAT",
 	"!TELEPORT",
+	"LOOK-OUT",
 	"\n"
 };
 
@@ -376,7 +379,7 @@ const char *preference_bits[] = {
 	"MORTLOG",
 	"!REP",
 	"LIGHT",
-		"UNUSED1",
+	"INCOGNITO",
 	"!WIZ",
 	"!MCOL",
 	"!HASSLE",
@@ -394,6 +397,7 @@ const char *preference_bits[] = {
 	"!SPAM",
 	"SCREENREADER",
 	"STEALTHABLE",
+	"WIZHIDE",
 	"\n"
 };
 
@@ -436,6 +440,9 @@ const struct toggle_data_type toggle_data[] = {
 	
 	{ "hassle", TOG_OFFON, PRF_NOHASSLE, LVL_START_IMM, NULL },
 	{ "idle-out", TOG_OFFON, PRF_NO_IDLE_OUT, LVL_START_IMM, NULL },
+	{ "incognito", TOG_ONOFF, PRF_INCOGNITO, LVL_START_IMM, NULL },
+	
+	{ "wizhide", TOG_ONOFF, PRF_WIZHIDE, LVL_START_IMM, NULL },
 	
 	// this goes last
 	{ "\n", 0, NOBITS, 0, NULL }
@@ -724,6 +731,7 @@ const char *affected_bits[] = {
 	"!STEALTH",
 	"!VAMPIRE",
 	"!STUN",
+	"*ORDERED",
 	"\n"
 };
 
@@ -760,6 +768,7 @@ const char *affected_bits_consider[] = {
 	"$E is immune to Stealth debuffs.",	// !stealth
 	"$E is immune to Vampire debuffs.",	// !vampire
 	"$E is immune to stuns.",	// !stun
+	"",	// ordred
 	"\n"
 };
 
@@ -787,6 +796,7 @@ const bool aff_is_bad[] = {
 	TRUE,	// stunned
 	TRUE,	// stoned
 	TRUE,	// !blood
+	FALSE,
 	FALSE,
 	FALSE,
 	FALSE,
@@ -843,6 +853,23 @@ const char *mana_levels[] = {
 	"high mana",
 	"high mana",
 	"full mana",	// 10
+	"\n"
+};
+
+
+// for prompt -- 0-10 relates to 0-100% blood
+const char *blood_levels[] = {
+	"no blood",	// 0
+	"extremely blood-starved",
+	"blood-starved",
+	"low blood",
+	"half blood",
+	"half blood",	// 5
+	"half blood",
+	"lots of blood",
+	"high blood",
+	"high blood",
+	"satiated",	// 10
 	"\n"
 };
 
@@ -1051,6 +1078,8 @@ const char *craft_types[] = {
 	"BREW",
 	"MIX",
 	"BUILD",
+	"WEAVE",
+	"WORKFORCE",
 	"\n"
 };
 
@@ -1120,6 +1149,7 @@ const char *techs[] = {
 	"Master Portals",
 	"Skilled Labor",
 	"Trade Routes",
+	"Exarch Crafts",
 	"\n"
 };
 
@@ -1149,6 +1179,9 @@ const char *priv[] = {
 	"trade",
 	"logs",
 	"shipping",
+	"homes",
+	"storage",
+	"warehouse",
 	"\n"
 };
 
@@ -1209,7 +1242,7 @@ const char *action_bits[] = {
 	"MOUNTAIN-WALK",	// 10
 	"AQUATIC",
 	"*PLURAL",
-	"*",
+	"NO-ATTACK",
 	"SPAWNED",
 	"CHAMPION",	// 15
 	"EMPIRE",
@@ -1708,7 +1741,8 @@ struct attack_hit_type attack_hit_info[NUM_ATTACK_TYPES] = {
 	{ "swipe", "swipe", "swipes", { 3.6, 3.8, 4.0 }, WEAPON_BLUNT, DAM_PHYSICAL },
 	{ "tail swipe", "swipe", "swipes", { 4.0, 4.2, 4.4 }, WEAPON_BLUNT, DAM_PHYSICAL },
 	{ "peck", "peck", "pecks", { 2.6, 2.8, 3.0 }, WEAPON_BLUNT, DAM_PHYSICAL },
-	{ "gore", "gore", "gores", { 3.9, 4.1, 4.3 }, WEAPON_BLUNT, DAM_PHYSICAL }
+	{ "gore", "gore", "gores", { 3.9, 4.1, 4.3 }, WEAPON_BLUNT, DAM_PHYSICAL },
+	{ "mana blast", "blast", "blasts", { 2.8, 3.0, 3.2 }, WEAPON_MAGIC, DAM_MAGICAL }
 };
 
 
@@ -1774,7 +1808,7 @@ const char *bld_on_flags[] = {
 	"desert",
 	"river",
 	"jungle",
-		"*",
+	"not player made",
 	"ocean",
 	"oasis",
 	"crops",
@@ -1830,6 +1864,8 @@ const char *bld_flags[] = {
 	"BEDROOM",
 	"!DELETE",
 	"SUMMON-PLAYER",
+	"NEED-BOAT",
+	"LOOK-OUT",
 	"\n"
 };
 
@@ -2113,6 +2149,7 @@ const char *room_extra_types[] = {
 	"build recipe",
 	"found time",
 	"redesignate time",
+	"ceded",
 	"\n"
 };
 
@@ -2526,6 +2563,7 @@ const char *trig_types[] = {
 	"Leave",
 	"Door",
 	"Leave-All",
+	"Fight-Charmed",
 	"\n"
 };
 

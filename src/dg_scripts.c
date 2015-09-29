@@ -1502,6 +1502,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 	char *send_cmd[] = {"msend ", "osend ", "wsend " };
 	char *echo_cmd[] = {"mecho ", "oecho ", "wecho " };
 	char *echoaround_cmd[] = {"mechoaround ", "oechoaround ", "wechoaround " };
+	char *echoneither_cmd[] = {"mechoneither ", "oechoneither ", "wechoneither " };
 	char *door[] = {"mdoor ", "odoor ", "wdoor " };
 	char *force[] = {"mforce ", "oforce ", "wforce " };
 	char *load[] = {"mload ", "oload ", "wload " };
@@ -1581,6 +1582,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				snprintf(str, slen, "%s", echo_cmd[type]);
 			else if (!str_cmp(var, "echoaround"))
 				snprintf(str, slen, "%s", echoaround_cmd[type]);
+			else if (!str_cmp(var, "echoneither"))
+				snprintf(str, slen, "%s", echoneither_cmd[type]);
 			else if (!str_cmp(var, "buildingecho"))
 				snprintf(str, slen, "%s", buildingecho[type]);
 			else if (!str_cmp(var, "regionecho"))
@@ -2364,14 +2367,26 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "maxblood"))
 						snprintf(str, slen, "%d", GET_MAX_BLOOD(c));
 
-					else if (!str_cmp(field, "mana"))
+					else if (!str_cmp(field, "mana")) {
+						int amt;
+						if (subfield && *subfield && (amt = atoi(subfield))) {
+							GET_MANA(c) += amt;
+							GET_MANA(c) = MIN(GET_MAX_MANA(c), MAX(GET_MANA(c), 0));
+						}
 						snprintf(str, slen, "%d", GET_MANA(c));
+					}
 
 					else if (!str_cmp(field, "maxmana"))
 						snprintf(str, slen, "%d", GET_MAX_MANA(c));
 
-					else if (!str_cmp(field, "move"))
+					else if (!str_cmp(field, "move")) {
+						int amt;
+						if (subfield && *subfield && (amt = atoi(subfield))) {
+							GET_MOVE(c) += amt;
+							GET_MOVE(c) = MIN(GET_MAX_MOVE(c), MAX(GET_MOVE(c), 0));
+						}
 						snprintf(str, slen, "%d", GET_MOVE(c));
+					}
 
 					else if (!str_cmp(field, "maxmove"))
 						snprintf(str, slen, "%d", GET_MAX_MOVE(c));

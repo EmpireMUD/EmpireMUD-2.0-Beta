@@ -310,8 +310,10 @@ The following adventure flags are available:
  !NEARBY - Instances do not show up when players type nearby.
  ROTATABLE - Each instance will have a random orientation (whole zone rotates).
  CONFUSING-RANDOMS - The instancer will not logically match random exits.
+ !NEWBIE - Will not spawn on newbie islands.
+ NEWBIE-ONLY - Only spawns on newbie islands.
 
-See also: OLC ADVENTURES, OLC REMOVEINDEV
+See also: ADVEDIT MINLEVEL, OLC ADVENTURES, OLC REMOVEINDEV
 #d
 "ADVEDIT LIMIT" "INSTANCE LIMIT"
 
@@ -480,6 +482,8 @@ Usage:  .maxlevel <number>
 These settings control the minimum and maximum levels for an adventure zone.
 These are set in terms of players' composite level (the level number given by
 their skills and gear).
+
+Adventures whose minimum level is over 25 will not spawn on newbie islands.
 
 The OLC LEVELS help file has additional notes on how to choose levels.
 
@@ -745,7 +749,9 @@ Available flags:
  PORTAL - functions as a portal building
  BEDROOM - boosts regen while sleeping
  !DELETE - will not be deleted for not having a homeroom
- SUMMON-PLAYERS - allows the summon player command
+ SUMMON-PLAYER - allows the summon player command
+ NEED-BOAT - requires a boat, flying, or swimming to enter
+ LOOK-OUT - can see the map using "look out"
 
 * Note: If you change the LARGE-CITY-RADIUS flag on existing buildings,
         territory counts will not update right away. Any empire can force a
@@ -928,7 +934,7 @@ The following flags are available:
  desert - a desert or a road that was built on desert
  river - a river tile
  jungle - any jungle tile
- * - UNUSED
+ not player made - can't be (e.g.) a river tile made by a player
  ocean - an ocean tile
  oasis - an oasis tile
  crops - any crop or seeded tile
@@ -963,7 +969,7 @@ The following flags are available:
  desert - a desert or a road that was built on desert
  river - a river tile
  jungle - any jungle tile
- * - UNUSED
+ not player made - can't be (e.g.) a river tile made by a player
  ocean - an ocean tile
  oasis - an oasis tile
  crops - *** do not use for buildon
@@ -1390,6 +1396,7 @@ The following commands are available:
  name - Customize the room title.
  passwalls - Able to move on the map unblocked by walls, interiors, etc.
  roomtype - Change the type of an interior room.
+ ruin - Turn a building to ruins.
  terrain - Change the tile you're standing on.
  unclaimable - Make a tile or square of tiles unclaimable (or not).
 
@@ -1523,6 +1530,12 @@ building with the ROOM flag can be set this way.
 
 See also: MAP OLC, OLC BUILDINGS
 #d
+"MAPEDIT RUINS"
+
+Usage:  .map ruin
+
+This command will reduce a map building to ruins.
+#d
 "MAPEDIT TERRAIN"
 
 Usage:  .map terrain <type>
@@ -1587,7 +1600,7 @@ The following attack types are available:
 13. fire - physical fire like a torch
 14. vampire claws
 15. crush - animals or giants
-16. hit - normal punching (no weapon)
+16. hit - normal punching (no weapon, or disarmed physical weapon)
 17. magic fire - fireball
 18. lightning staff
 19. burn staff
@@ -1600,6 +1613,7 @@ The following attack types are available:
 26. tail swipe - animals
 27. peck - animals
 28. gore - animals
+29. mana blast - normal magical attack (e.g. disarmed mage)
 
 See also: OLC MOBILES
 #d
@@ -1626,7 +1640,7 @@ Available mob flags:
  MOUNTAIN-WALK - Can cross mountain tiles.
  AQUATIC - Can cross water tiles, but won't move on land.
  *PLURAL - Uses the pronouns 'their', 'they', and 'them' in act messages.
- * - DO NOT SET
+ NO-ATTACK - Mob can be in combat, but will not hit
  SPAWNED - De-spawns after 5 minutes if no players are nearby.
  CHAMPION - Will rescue its master in combat.
  EMPIRE - Will not be saved through reboots.
@@ -2486,7 +2500,7 @@ The following weapon types are available:
 13. fire - torch
 14. vampire claws
 15. crush - animals or giants
-16. hit - normal punching (no weapon)
+16. hit - normal punching (no weapon, or disarmed physical weapon)
 17. magic fire - fireball
 18. lightning staff
 19. burn staff
@@ -2499,6 +2513,7 @@ The following weapon types are available:
 26. tail swipe - animals
 27. peck - animals
 28. gore - animals
+29. mana blast - normal magical attack (e.g. disarmed mage)
 
 See also: OLC OBJECTS
 #d
@@ -2970,6 +2985,7 @@ The following room template flags are available:
  PEACEFUL - No combat allowed.
  NEED-BOAT - Requires a boat, swimming, or fly.
  !TELEPORT - Cannot teleport in or out.
+ LOOK-OUT - can see the map using "look out"
 
 See also: OLC ROOM TEMPLATES
 #d
@@ -3037,7 +3053,7 @@ Available flags:
  desert - a flat, arid sector
  river - a fresh-water sector
  jungle - any jungle tile
- * - 
+ not player made - DO NOT SET on .buildflags
  ocean - a salt-water tile
  oasis - an arid water source
  crops - any crop tile, should ONLY be used for 'buildfacing'

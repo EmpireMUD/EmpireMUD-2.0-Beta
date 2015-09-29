@@ -46,7 +46,7 @@ extern const char *from_dir[];
 #define MOVE_EARTHMELD	4
 #define MOVE_SWIM		5	// swim skill
 
-#define WATER_SECT(room)		(ROOM_SECT_FLAGGED((room), SECTF_FRESH_WATER | SECTF_OCEAN) || RMT_FLAGGED((room), RMT_NEED_BOAT) || (IS_WATER_BUILDING(room) && !IS_COMPLETE(room) && SECT_FLAGGED(ROOM_ORIGINAL_SECT(room), SECTF_FRESH_WATER | SECTF_OCEAN)))
+#define WATER_SECT(room)		(ROOM_SECT_FLAGGED((room), SECTF_FRESH_WATER | SECTF_OCEAN) || ROOM_BLD_FLAGGED((room), BLD_NEED_BOAT) || RMT_FLAGGED((room), RMT_NEED_BOAT) || (IS_WATER_BUILDING(room) && !IS_COMPLETE(room) && SECT_FLAGGED(ROOM_ORIGINAL_SECT(room), SECTF_FRESH_WATER | SECTF_OCEAN)))
 #define DEEP_WATER_SECT(room)	(ROOM_SECT_FLAGGED((room), SECTF_OCEAN))
 
 
@@ -721,16 +721,16 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 	
 	// determine real move type
 	move_type = IS_NPC(ch) ? MOB_MOVE_TYPE(ch) : MOB_MOVE_WALK;
-	if (AFF_FLAGGED(ch, AFF_FLY)) {
+	if (AFF_FLAGGED(ch, AFF_FLY) && !IS_NPC(ch)) {
 		move_type = MOB_MOVE_FLY;
 	}
 	else if (IS_RIDING(ch)) {
 		move_type = MOB_MOVE_RIDE;
 	}
-	else if (move_type == MOB_MOVE_WALK && ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_FRESH_WATER | SECTF_OCEAN)) {
+	else if (move_type == MOB_MOVE_WALK && ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_FRESH_WATER | SECTF_OCEAN) && move_type != MOB_MOVE_FLY) {
 		move_type = MOB_MOVE_SWIM;
 	}
-	else if (move_type == MOB_MOVE_WALK && ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH)) {
+	else if (move_type == MOB_MOVE_WALK && ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH) && move_type != MOB_MOVE_FLY) {
 		move_type = MOB_MOVE_CLIMB;
 	}
 	// tweak for people in boats
@@ -763,19 +763,22 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 		}
 		if (*buf2 && (!ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_SILENT) || number(0, 4))) {
 			for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict; vict = vict->next_in_room) {
-				if (vict != ch && vict->desc) {
-					// adjust direction
-					if (strstr(buf2, "%s") != NULL) {
-						sprintf(lbuf, buf2, dirs[get_direction_for_char(vict, dir)]);
-					}
-					else {
-						strcpy(lbuf, buf2);
-					}
-
-					if (CAN_SEE(vict, ch)) {
-						act(lbuf, TRUE, ch, cart, vict, TO_VICT);
-					}
+				if (vict == ch || !vict->desc) {
+					continue;
 				}
+				if (!CAN_SEE(vict, ch) || !WIZHIDE_OK(vict, ch)) {
+					continue;
+				}
+
+				// adjust direction
+				if (strstr(buf2, "%s") != NULL) {
+					sprintf(lbuf, buf2, dirs[get_direction_for_char(vict, dir)]);
+				}
+				else {
+					strcpy(lbuf, buf2);
+				}
+				
+				act(lbuf, TRUE, ch, cart, vict, TO_VICT);
 			}
 		}
 	}
@@ -839,19 +842,22 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 				sprintf(buf2, "$n %s up from %%s.", mob_move_types[move_type]);
 
 				for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict; vict = vict->next_in_room) {
-					if (vict != ch && vict->desc) {
-						// adjust direction
-						if (strstr(buf2, "%s")) {
-							sprintf(lbuf, buf2, from_dir[get_direction_for_char(vict, dir)]);
-						}
-						else {
-							strcpy(lbuf, buf);
-						}
-
-						if (CAN_SEE(vict, ch)) {
-							act(lbuf, TRUE, ch, cart, vict, TO_VICT);
-						}
+					if (vict == ch || !vict->desc) {
+						continue;
 					}
+					if (!CAN_SEE(vict, ch) || !WIZHIDE_OK(vict, ch)) {
+						continue;
+					}
+					
+					// adjust direction
+					if (strstr(buf2, "%s")) {
+						sprintf(lbuf, buf2, from_dir[get_direction_for_char(vict, dir)]);
+					}
+					else {
+						strcpy(lbuf, buf);
+					}
+
+					act(lbuf, TRUE, ch, cart, vict, TO_VICT);
 				}
 				break;
 			}
@@ -1258,7 +1264,7 @@ ACMD(do_enter) {
 	}
 	
 	// permissions
-	if (ROOM_OWNER(IN_ROOM(ch)) && !IS_IMMORTAL(ch) && !IS_NPC(ch) && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+	if (ROOM_OWNER(IN_ROOM(ch)) && !IS_IMMORTAL(ch) && !IS_NPC(ch) && (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) || !can_use_room(ch, room, GUESTS_ALLOWED))) {
 		if (!HAS_ABILITY(ch, ABIL_INFILTRATE)) {
 			msg_to_char(ch, "You don't have permission to enter that.\r\n");
 			return;

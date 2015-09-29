@@ -74,7 +74,7 @@ The empire banner can be changed with the eedit command.
 It's a good idea to choose a distinct color so that people can see your empire
 on the political map.
 
-See also: ANSI, COLOR, EMPIRE, POLITICAL, EEDIT
+See also: COLOR, EMPIRE, POLITICAL, EEDIT
 #
 BARDE BARDING "ARMORED HORSE"
 
@@ -191,8 +191,9 @@ your city.
 - &ccity downgrade <name>&0: This downgrades the given city by 1 level, or
     removes its city status entirely if it was at the minimum.
 
-- &ccity claim <name>&0: This claims all unclaimed structures within the borders
-    of the city, up to your maximum territory. 
+- &ccity claim <name> [all]&0: This claims all unclaimed structures within
+    the borders of the city, up to your maximum territory -- or, all tiles with
+    the 'all' option.
 
 - &ccity abandon <name>&0: This abolishes the city, refunds your city points, and
     un-claims all territory within the city border.
@@ -833,6 +834,10 @@ members must be at least the privilege's rank (or higher). For example, if
 Most privileges only apply to claimed land. All members can chop on unclaimed
 land, regardless of privilege.
 
+Members of allied empires can only use privileges available at rank 1 to your
+empire's members while on your territory, no matter what rank they have in
+their own empires.
+
 Privileges:
   claim: can claim new lands for the empire
   build: can build on claimed land
@@ -841,7 +846,7 @@ Privileges:
   chop: can chop trees on claimed land
   cede: can abandon/cede empire lands
   enroll: can add new members
-  withdraw: can take gold from the vault
+  withdraw: can take gold and items from the vault
   diplomacy: can set up diplomatic relations with other empires
   customize: can customize claimed buildings
   workforce: can turn workforce chores on and off
@@ -850,6 +855,9 @@ Privileges:
   trade: can set up import and export rules
   logs: can view elogs
   shipping: can use the ship command to move goods
+  homes: can set a home
+  storage: can retrieve from storage buildings
+  warehouse: can retrieve unique items from the warehouse
 
 See also: CLAIM, BUILD, HARVEST, PROMOTE, DEMOTE, CHOP, CEDE, EEDIT, ELOG
 #
@@ -996,7 +1004,10 @@ ROSTER
 Usage:  roster
 
 This command shows you the members of your empire and lets you know who's on-
-line and who's been gone a while.
+line and who's been gone a while. The color of the player's class name (if not
+white) indicates their role, if any: &aCaster&0, &jHealer&0, &yTank&0 or &rMelee&0.
+
+See also: CLASS, WHO
 #
 SEAFARING "SEAFARING BUILDINGS"
 
@@ -1307,10 +1318,14 @@ Workforce types:
   &ytanning:&0 NPCs will tan skins into leather.
   &yshearing:&0 NPCs will shear animals in stables.
   &cminting (skilled):&0 NPCs will mint treasure into coins.
-  &cdismantle-mines:&0 mines will be dismantled when empty.
-  &yabandon-chopped:&0 NPCS will abandon a tile when they finish chopping.
-  &yabandon-farmed:&0 NPCS will abandon a tile when they finish farming.
+  &ydismantle-mines:&0 mines will be dismantled when empty.
+  &yabandon-chopped:&0 NPCs will abandon a tile when they finish chopping.
+  &yabandon-farmed:&0 NPCs will abandon a tile when they finish farming.
+  &cnexus-crystal (skilled):&0 Will make nexus crystals at the sorcery tower;
+     requires both Exarch Crafts and Skilled Labor.
   
 Items marked (skilled) require the Skilled Labor ability.
+
+See also: EXARCH CRAFTS
 #
 $

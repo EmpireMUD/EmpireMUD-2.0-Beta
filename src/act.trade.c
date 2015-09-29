@@ -28,7 +28,6 @@
 *   Helpers
 *   Generic Craft (craft, forge, sew, cook)
 *   Reforge / Refashion
-*   Weave
 *   Commands
 */
 
@@ -147,11 +146,7 @@ obj_data *has_hammer(char_data *ch) {
 
 
 // CRAFT_TYPE_x
-struct {
-	char *command;
-	char *verb;
-	char *strings[2];
-} gen_craft_data[] = {
+struct gen_craft_data_t gen_craft_data[] = {
 	{ "error", "erroring", { "", "" } },	// dummy to require scmd
 	
 	// Note: These correspond to CRAFT_TYPE_x so you cannot change the order.
@@ -164,7 +159,10 @@ struct {
 	{ "mix", "mixing", { "The poison bubbles as you stir it...", "$n stirs the bubbling poison..." } },
 	
 	// build is special and doesn't use do_gen_craft, so doesn't really use this data
-	{ "build", "building", { "You work on the building...", "$n works on the building..." } }
+	{ "build", "building", { "You work on the building...", "$n works on the building..." } },
+	
+	{ "weave", "weaving", { "You carefully weave the %s...", "$n carefully weaves the %s..." } },
+	{ "workforce", "producing", { "You work on the %s...", "$n work on the %s..." } }	// not used by players
 };
 
 
@@ -406,6 +404,11 @@ void process_gen_craft(char_data *ch) {
 		if (weapon && OBJ_FLAGGED(weapon, OBJ_SUPERIOR)) {
 			GET_ACTION_TIMER(ch) -= 1;
 		}
+		
+		// tailor bonus for weave
+		if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_WEAVE && ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_TAILOR) && IS_COMPLETE(IN_ROOM(ch))) {
+			GET_ACTION_TIMER(ch) -= 3;
+		}
 
 		if (GET_ACTION_TIMER(ch) <= 0) {
 			finish_gen_craft(ch);
@@ -599,67 +602,6 @@ bool validate_item_rename(char_data *ch, obj_data *obj, char *name) {
 
 
  //////////////////////////////////////////////////////////////////////////////
-//// WEAVE ///////////////////////////////////////////////////////////////////
-
-// TODO should this be in act.action.c instead?
-
-#define WEAVE_LINE_BREAK { "\t", 0, 0, NO_ABIL, { END_RESOURCE_LIST } }
-
-struct {
-	char *name;
-	int time;	// in action ticks
-	obj_vnum vnum;
-	int ability;	// NO_ABIL for none
-	Resource resources[5];
-} weave_data[] = {
-	{ "cloth", 12, o_CLOTH, ABIL_SEWING, { { o_COTTON, 2 }, END_RESOURCE_LIST } },
-	{ "wool cloth", 12, o_CLOTH, ABIL_SEWING, { { o_WOOL, 2 }, END_RESOURCE_LIST } },
-	
-	// last
-	{ "\n", 0, 0, NO_ABIL, { END_RESOURCE_LIST } },
-};
-
-
-void cancel_weaving(char_data *ch) {
-	if (GET_ACTION(ch) == ACT_WEAVING) {
-		GET_ACTION(ch) = ACT_NONE;
-		give_resources(ch, weave_data[GET_ACTION_VNUM(ch, 0)].resources, FALSE);
-	}
-}
-
-
-void finish_weaving(char_data *ch) {
-	int type = GET_ACTION_VNUM(ch, 0);
-	obj_data *obj;
-
-	GET_ACTION(ch) = ACT_NONE;
-
-	obj = read_object(weave_data[type].vnum);
-	
-	if (CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
-		obj_to_char(obj, ch);
-	}
-	else {
-		obj_to_room(obj, IN_ROOM(ch));
-	}
-
-	act("You finish weaving $p!", FALSE, ch, obj, 0, TO_CHAR);
-	act("$n finishes weaving $p!", FALSE, ch, obj, 0, TO_ROOM);
-	
-	if (weave_data[type].ability != NO_ABIL) {
-		gain_ability_exp(ch, weave_data[type].ability, 10);
-	}
-	else {
-		if (GET_SKILL(ch, SKILL_TRADE) < EMPIRE_CHORE_SKILL_CAP) {
-			gain_skill_exp(ch, SKILL_TRADE, 10);
-		}
-	}
-	
-	load_otrigger(obj);
-}
-
-
- //////////////////////////////////////////////////////////////////////////////
 //// COMMANDS ////////////////////////////////////////////////////////////////
 
 // subcmd must be CRAFT_TYPE_x
@@ -757,9 +699,6 @@ ACMD(do_gen_craft) {
 	else if (GET_CRAFT_MIN_LEVEL(type) > get_crafting_level(ch)) {
 		msg_to_char(ch, "You need to have a crafting level of %d to %s that.\r\n", GET_CRAFT_MIN_LEVEL(type), gen_craft_data[GET_CRAFT_TYPE(type)].command);
 	}
-	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
-		msg_to_char(ch, "You don't have permission to %s here.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
-	}
 
 	// type checks
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_IN_CITY_ONLY) && !is_in_city_for_empire(IN_ROOM(ch), GET_LOYALTY(ch), TRUE, &wait) && !is_in_city_for_empire(IN_ROOM(ch), ROOM_OWNER(IN_ROOM(ch)), TRUE, &room_wait)) {
@@ -806,7 +745,7 @@ ACMD(do_gen_craft) {
 	else if (GET_CRAFT_REQUIRES_OBJ(type) != NOTHING && !get_obj_in_list_vnum(GET_CRAFT_REQUIRES_OBJ(type), ch->carrying)) {
 		msg_to_char(ch, "You need %s to make that.\r\n", get_obj_name_by_proto(GET_CRAFT_REQUIRES_OBJ(type)));
 	}
-	else if (!has_resources(ch, GET_CRAFT_RESOURCES(type), TRUE, TRUE)) {
+	else if (!has_resources(ch, GET_CRAFT_RESOURCES(type), can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), TRUE)) {
 		// this sends its own message ("You need X more of ...")
 		//msg_to_char(ch, "You don't have the resources to %s that.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
 	}
@@ -836,7 +775,7 @@ ACMD(do_gen_craft) {
 		// how many
 		GET_ACTION_VNUM(ch, 2) = num;
 		
-		extract_resources(ch, GET_CRAFT_RESOURCES(type), TRUE);
+		extract_resources(ch, GET_CRAFT_RESOURCES(type), can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED));
 		
 		msg_to_char(ch, "You start %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 		sprintf(buf, "$n starts %s.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
@@ -974,11 +913,11 @@ ACMD(do_reforge) {
 		if (!validate_item_rename(ch, obj, argument)) {
 			// sends own message
 		}
-		else if (!has_resources(ch, res, TRUE, TRUE)) {
+		else if (!has_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), TRUE)) {
 			// sends own message
 		}
 		else {
-			extract_resources(ch, res, TRUE);
+			extract_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED));
 			
 			// prepare
 			sprintf(buf1, "You name %s $p!", GET_OBJ_SHORT_DESC(obj));
@@ -1025,11 +964,11 @@ ACMD(do_reforge) {
 		if (!proto) {
 			msg_to_char(ch, "You can't renew that.\r\n");
 		}
-		else if (!has_resources(ch, res, TRUE, TRUE)) {
+		else if (!has_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), TRUE)) {
 			// sends own message
 		}
 		else {
-			extract_resources(ch, res, TRUE);
+			extract_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED));
 			
 			// actual reforging: just junk it and load a new one
 			old_stolen_time = obj->stolen_timer;
@@ -1085,11 +1024,11 @@ ACMD(do_reforge) {
 		else if (GET_CRAFT_ABILITY(ctype) == NO_ABIL || get_mastery_ability(GET_CRAFT_ABILITY(ctype)) == NO_ABIL || !HAS_ABILITY(ch, get_mastery_ability(GET_CRAFT_ABILITY(ctype)))) {
 			msg_to_char(ch, "You don't have the mastery to make that item superior.\r\n");
 		}
-		else if (!has_resources(ch, res, TRUE, TRUE)) {
+		else if (!has_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), TRUE)) {
 			// sends own message
 		}
 		else {
-			extract_resources(ch, res, TRUE);
+			extract_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED));
 			
 			// actual reforging: just junk it and load a new one
 			old_stolen_time = obj->stolen_timer;
@@ -1146,74 +1085,5 @@ ACMD(do_reforge) {
 	}
 	else {
 		msg_to_char(ch, "That's not a valid %s option.\r\n", reforge_data[subcmd].command);
-	}
-}
-
-
-ACMD(do_weave) {
-	int type = NOTHING, iter = 0;
-	bool this_line, any;
-	
-	one_argument(argument, arg);
-
-	/* Find what they picked */
-	if (*arg) {
-		for (iter = 0; *weave_data[iter].name != '\n'; ++iter) {
-			if (is_abbrev(arg, weave_data[iter].name) && (weave_data[iter].ability == NO_ABIL || HAS_ABILITY(ch, weave_data[iter].ability))) {
-				type = iter;
-				break;
-			}
-		}
-	}
-
-	if (GET_ACTION(ch) == ACT_WEAVING) {
-		act("You stop weaving.", FALSE, ch, 0, 0, TO_CHAR);
-		cancel_action(ch);
-	}
-	else if (GET_ACTION(ch) != ACT_NONE) {
-		msg_to_char(ch, "You're already busy doing something else.\r\n");
-	}
-	else if (!*arg || type == NOTHING) {
-		msg_to_char(ch, "You can weave:\r\n");
-		this_line = any = FALSE;
-		for (iter = 0; *weave_data[iter].name != '\n'; ++iter) {
-			if (*weave_data[iter].name == '\t') {
-				if (this_line) {
-					msg_to_char(ch, "\r\n");
-					this_line = FALSE;
-				}
-			}
-			else if (weave_data[iter].ability == NO_ABIL || HAS_ABILITY(ch, weave_data[iter].ability)) {
-				msg_to_char(ch, "%s%s", (this_line ? ", " : " "), weave_data[iter].name);
-				this_line = TRUE;
-				any = TRUE;
-			}
-		}
-		
-		if (!any) {
-			msg_to_char(ch, " nothing\r\n");
-		}
-		
-		if (this_line) {
-			msg_to_char(ch, "\r\n");
-		}
-	}
-	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
-		msg_to_char(ch, "You don't have permission to do that here.\r\n");
-	}
-	else if (!has_resources(ch, weave_data[type].resources, TRUE, TRUE)) {
-		// message sent by has_resources
-	}
-	else {
-		extract_resources(ch, weave_data[type].resources, TRUE);
-		start_action(ch, ACT_WEAVING, weave_data[type].time / ((ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_TAILOR) && IS_COMPLETE(IN_ROOM(ch))) ? 4 : 1));
-		
-		GET_ACTION_VNUM(ch, 0) = type;
-		GET_ACTION_VNUM(ch, 1) = weave_data[type].vnum;
-
-		sprintf(buf, "You begin weaving %s.", get_obj_name_by_proto(weave_data[type].vnum));
-		act(buf, FALSE, ch, 0, 0, TO_CHAR);
-		sprintf(buf1, "$n begins weaving %s.", get_obj_name_by_proto(weave_data[type].vnum));
-		act(buf1, TRUE, ch, 0, 0, TO_ROOM);
 	}
 }

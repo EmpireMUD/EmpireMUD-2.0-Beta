@@ -42,6 +42,8 @@ extern char *get_room_name(room_data *room, bool color);
 extern char_data *has_familiar(char_data *ch);
 void Objsave_char(char_data *ch, int rent_code);
 void scale_item_to_level(obj_data *obj, int level);
+void scale_mob_as_familiar(char_data *mob, char_data *master);
+extern char *show_color_codes(char *string);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -226,6 +228,7 @@ void perform_alternate(char_data *old, char_data *new) {
 	}
 	
 	// save old char...
+	GET_LAST_KNOWN_LEVEL(old) = GET_COMPUTED_LEVEL(old);
 	Objsave_char(old, RENT_RENTED);
 	SAVE_CHAR(old);
 	
@@ -351,7 +354,7 @@ static void print_group(char_data *ch) {
 			
 			// show location if different
 			if (IN_ROOM(k) != IN_ROOM(ch)) {
-				if (HAS_ABILITY(ch, ABIL_NAVIGATION) && X_COORD(IN_ROOM(k)) >= 0) {
+				if (HAS_ABILITY(ch, ABIL_NAVIGATION) && (IS_NPC(k) || HAS_ABILITY(k, ABIL_NAVIGATION)) && X_COORD(IN_ROOM(k)) >= 0) {
 					snprintf(loc, sizeof(loc), " - %s (%d, %d)", get_room_name(IN_ROOM(k), FALSE), X_COORD(IN_ROOM(k)), Y_COORD(IN_ROOM(k)));
 				}
 				else {
@@ -1054,6 +1057,8 @@ ACMD(do_customize) {
 
 
 ACMD(do_dismiss) {
+	bool despawn_familiar(char_data *ch, mob_vnum vnum);
+	
 	char_data *vict;
 	
 	one_argument(argument, arg);
@@ -1063,15 +1068,11 @@ ACMD(do_dismiss) {
 	}
 	else if (!strn_cmp(arg, "famil", 5) && is_abbrev(arg, "familiar")) {
 		// requires abbrev of at least "famil"
-		if (!(vict = has_familiar(ch))) {
+		if (!despawn_familiar(ch, NOTHING)) {
 			msg_to_char(ch, "You do not have a familiar to dismiss.\r\n");
 		}
 		else {
-			if (IN_ROOM(ch) != IN_ROOM(vict)) {
-				msg_to_char(ch, "You dismiss %s.\r\n", PERS(vict, vict, FALSE));
-			}
-			act("$n is dismissed and vanishes!", TRUE, vict, NULL, NULL, TO_ROOM);
-			extract_char(vict);
+			send_config_msg(ch, "ok_string");
 		}
 	}
 	else if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
@@ -1172,7 +1173,7 @@ ACMD(do_gen_write) {
 		send_to_char("That must be a mistake...\r\n", ch);
 		return;
 	}
-	syslog(SYS_INFO, GET_INVIS_LEV(ch), FALSE, "%s %s: %s", GET_NAME(ch), name, argument);
+	syslog(SYS_INFO, GET_INVIS_LEV(ch), FALSE, "%s %s: %s", GET_NAME(ch), name, show_color_codes(argument));
 
 	if (stat(filename, &fbuf) < 0) {
 		perror("SYSERR: Can't stat() file");
@@ -1462,7 +1463,7 @@ ACMD(do_herd) {
 	struct room_direction_data *ex;
 	char_data *victim;
 	int dir;
-	room_data *to_room;
+	room_data *to_room, *was_in;
 
 	two_arguments(argument, arg, buf);
 
@@ -1504,10 +1505,14 @@ ACMD(do_herd) {
 		msg_to_char(ch, "You can only herd an animal through the entrance.\r\n");
 	}
 	else {
+		was_in = IN_ROOM(ch);
+		
 		if (perform_move(victim, dir, TRUE, 0)) {
 			act("You skillfully herd $N.", FALSE, ch, 0, victim, TO_CHAR);
 			act("$n skillfully herds $N.", FALSE, ch, 0, victim, TO_ROOM);
-			if (!perform_move(ch, dir, FALSE, 0)) {
+			
+			// only attempt to move ch if they weren't moved already (e.g. by following)
+			if (IN_ROOM(ch) == was_in && !perform_move(ch, dir, FALSE, 0)) {
 				char_to_room(victim, IN_ROOM(ch));
 			}
 		}
@@ -1613,7 +1618,9 @@ ACMD(do_order) {
 				act("$n has an indifferent look.", FALSE, vict, 0, 0, TO_ROOM);
 			else {
 				send_config_msg(ch, "ok_string");
+				SET_BIT(AFF_FLAGS(vict), AFF_ORDERED);
 				command_interpreter(vict, message);
+				REMOVE_BIT(AFF_FLAGS(vict), AFF_ORDERED);
 			}
 		}
 		else {			/* This is order "followers" */
@@ -1626,7 +1633,9 @@ ACMD(do_order) {
 				if (org_room == IN_ROOM(k->follower))
 					if (AFF_FLAGGED(k->follower, AFF_CHARM)) {
 						found = TRUE;
+						SET_BIT(AFF_FLAGS(k->follower), AFF_ORDERED);
 						command_interpreter(k->follower, message);
+						REMOVE_BIT(AFF_FLAGS(k->follower), AFF_ORDERED);
 					}
 			}
 			if (found)
@@ -1639,9 +1648,7 @@ ACMD(do_order) {
 
 
 // Either displays current prompt, or sets one; takes SCMD_PROMPT or SCMD_FPROMPT
-ACMD(do_prompt) {
-	extern char *show_color_codes(char *string);
-	
+ACMD(do_prompt) {	
 	char *types[] = { "prompt", "fprompt" };
 	char **prompt;
 	
@@ -1762,6 +1769,7 @@ ACMD(do_quit) {
 			}
 		}
 		
+		GET_LAST_KNOWN_LEVEL(ch) = GET_COMPUTED_LEVEL(ch);
 		Objsave_char(ch, RENT_RENTED);
 		save_char(ch, died ? NULL : IN_ROOM(ch));
 		
@@ -1782,6 +1790,7 @@ ACMD(do_save) {
 		}
 		
 		write_aliases(ch);
+		GET_LAST_KNOWN_LEVEL(ch) = GET_COMPUTED_LEVEL(ch);
 		SAVE_CHAR(ch);
 		Objsave_char(ch, RENT_CRASH);
 	}
@@ -1899,6 +1908,9 @@ ACMD(do_skin) {
 		msg_to_char(ch, "You can only skin corpses.\r\n");
 	else if (GET_CORPSE_NPC_VNUM(obj) == NOTHING || !(proto = mob_proto(GET_CORPSE_NPC_VNUM(obj)))) {
 		msg_to_char(ch, "You can't skin that.\r\n");
+	}
+	else if (!bind_ok(obj, ch)) {
+		msg_to_char(ch, "You can't skin a corpse that is bound to someone else.\r\n");
 	}
 	else if (IS_SET(GET_CORPSE_FLAGS(obj), CORPSE_EATEN))
 		msg_to_char(ch, "It's too badly mangled to get any amount of usable skin.\r\n");
@@ -2169,7 +2181,7 @@ ACMD(do_summon) {
 			setup_generic_npc(mob, emp, NOTHING, NOTHING);
 
 			// try to scale mob to the summoner
-			check_scaling(mob, ch);
+			scale_mob_as_familiar(mob, ch);
 			
 			// spawn data
 			SET_BIT(MOB_FLAGS(mob), MOB_SPAWNED | MOB_NO_LOOT);
@@ -2226,10 +2238,14 @@ ACMD(do_title) {
 ACMD(do_toggle) {
 	extern const struct toggle_data_type toggle_data[];	// constants.c
 	
-	const char *togcols[NUM_TOG_TYPES][2] = { { "&r", "&g" }, { "&g", "&r" } };
+	const char *togcols[NUM_TOG_TYPES][2] = { { "\tr", "\tg" }, { "\tg", "\tr" } };
 	const char *tognames[NUM_TOG_TYPES][2] = { { "off", "on" }, { "on", "off" } };
+	const char *imm_color = "\tc";
+	const char *clear_color = "\t0";
 
 	int iter, type = NOTHING, count, on;
+	bool imm;
+	bool screenreader = PRF_FLAGGED(ch, PRF_SCREEN_READER);
 	
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs do not have toggles.\r\n");
@@ -2249,12 +2265,18 @@ ACMD(do_toggle) {
 		
 		for (iter = count = 0; *toggle_data[iter].name != '\n'; ++iter) {
 			if (toggle_data[iter].level <= GET_ACCESS_LEVEL(ch)) {
-				on = PRF_FLAGGED(ch, toggle_data[iter].bit) ? 1 : 0;
-				msg_to_char(ch, " [%s%3.3s&0] %-15.15s%s", togcols[toggle_data[iter].type][on], tognames[toggle_data[iter].type][on], toggle_data[iter].name, (!(++count % 3) ? "\r\n" : ""));
+				on = (PRF_FLAGGED(ch, toggle_data[iter].bit) ? 1 : 0);
+				imm = (toggle_data[iter].level >= LVL_START_IMM);
+				if (screenreader) {
+					msg_to_char(ch, "%s: %s%s\r\n", toggle_data[iter].name, tognames[toggle_data[iter].type][on], imm ? " (immortal)" : "");
+				}
+				else {
+					msg_to_char(ch, " %s[%s%3.3s%s] %-15.15s%s%s", imm ? imm_color : "", togcols[toggle_data[iter].type][on], tognames[toggle_data[iter].type][on], imm ? imm_color : clear_color, toggle_data[iter].name, clear_color, (!(++count % 3) ? "\r\n" : ""));
+				}
 			}
 		}
 		
-		if (count % 3) {
+		if (count % 3 && !screenreader) {
 			send_to_char("\r\n", ch);
 		}
 	}

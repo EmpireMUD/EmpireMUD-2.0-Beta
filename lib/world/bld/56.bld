@@ -17,7 +17,7 @@ S
 Bedroom~
 A Bedroom~
 ~
-0 0 aHIN m
+0 0 aHINR m
 0 1 0 -1
 C
 sleep~
@@ -34,7 +34,7 @@ S
 Dining Room~
 The Dining Room~
 ~
-0 0 a m
+0 0 aR m
 0 0 0 -1
 D
    This is one of the most important rooms: the dining room. Here, guests
@@ -78,7 +78,7 @@ S
 Great Hall~
 The Great Hall~
 ~
-0 0 a i
+0 0 aR i
 0 0 0 -1
 D
    This is the Great Hall, a room lined with magnificent suits of armor and
@@ -111,7 +111,7 @@ S
 Kitchen~
 The Kitchen~
 ~
-0 0 ar m
+0 0 arR m
 0 0 0 214
 C
 cook~
@@ -144,7 +144,7 @@ S
 Sitting Room~
 The Sitting Room~
 ~
-0 0 a m
+0 0 aR m
 0 0 0 -1
 D
    You are now in the sitting room, second in sociability only to the dining
@@ -269,7 +269,7 @@ S
 Sky Bridge~
 A Sky Bridge~
 ~
-0 0 a f
+0 0 aR f
 0 0 0 -1
 D
    A rope bridge is all that supports you as you pass from tree to tree.

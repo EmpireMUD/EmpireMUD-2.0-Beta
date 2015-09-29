@@ -889,6 +889,11 @@ ACMD(do_hide) {
 		return;
 	}
 	
+	if (GET_POS(ch) == POS_FIGHTING || is_fighting(ch)) {
+		msg_to_char(ch, "You can't hide in combat!\r\n");
+		return;
+	}
+	
 	if (IS_RIDING(ch)) {
 		msg_to_char(ch, "You can't hide while mounted!\r\n");
 		return;
@@ -1615,11 +1620,14 @@ ACMD(do_steal) {
 	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_STEAL)) {
 		return;
 	}
-	else if (!can_steal(ch, emp)) {
+	else if (!IS_IMMORTAL(ch) && !can_steal(ch, emp)) {
 		// sends own message
 	}
 	else if (!emp) {
 		msg_to_char(ch, "Nothing is stored here that you can steal.\r\n");
+	}
+	else if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CEDED)) {
+		msg_to_char(ch, "You can't steal from a building which was ceded to an empire but never used by that empire.\r\n");
 	}
 	else if (!*arg) {
 		if (!(inventory_store_building(ch, IN_ROOM(ch), emp))) {
@@ -1646,7 +1654,10 @@ ACMD(do_steal) {
 				}
 				else {
 					// SUCCESS!
-					if (!skill_check(ch, ABIL_STEAL, DIFF_HARD)) {
+					if (IS_IMMORTAL(ch)) {
+						syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s stealing %s from %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(proto), EMPIRE_NAME(emp));
+					}
+					else if (!skill_check(ch, ABIL_STEAL, DIFF_HARD)) {
 						log_to_empire(emp, ELOG_HOSTILITY, "Theft at (%d, %d)", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
 					}
 

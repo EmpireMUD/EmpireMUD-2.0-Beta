@@ -292,6 +292,21 @@ OLC_MODULE(mapedit_room_description) {
 }
 
 
+OLC_MODULE(mapedit_ruin) {
+	void ruin_one_building(room_data *room);	// db.world.c
+
+	room_data *room = HOME_ROOM(IN_ROOM(ch));
+	
+	if (GET_ROOM_VNUM(room) >= MAP_SIZE || !GET_BUILDING(room)) {
+		msg_to_char(ch, "You can only ruin map buildings.\r\n");
+	}
+	else {
+		msg_to_char(ch, "Ok.\r\n");
+		ruin_one_building(room);
+	}
+}
+
+
 OLC_MODULE(mapedit_exits) {
 	extern room_data *create_room();
 	extern const char *dirs[];

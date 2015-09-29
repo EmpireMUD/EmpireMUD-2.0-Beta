@@ -56,6 +56,34 @@ tapir: jungle or swamp
 
 See also: MORPH
 #
+"BANSHEE FAMILIAR"
+
+Banshee
+Class ability:  Necromancer (healer)
+Familiar type:  debuff
+
+The banshee familiar will use the following abilities in combat:
+- Soul-shattering wail: -(level/20) Resist-Physical/Magical on enemies (30 sec)
+- Terrifying wail: -10 To-Hit on enemies (30 sec)
+- Heart-wrenching wail: -(level/30) Bonus-Physical/Magical on enemies (30 sec)
+- Blood-curdling wail: Magical DoT on enemies (30 sec)
+
+See also: DEBUFF, FAMILIAR, NECROMANCER CLASS
+#
+"BASILISK FAMILIAR"
+
+Basilisk
+Class ability:  Feral
+Familiar type:  debuff
+
+The basilisk familiar will use the following abilities in combat:
+- Marble gaze: +20 Block on the tank (30 sec)
+- Quartzite gaze: -(level/20) Bonus-Physical/Magical on enemy (30 sec)
+- Basalt gaze: -4 Wits on enemy (30 sec)
+- Granite gaze: -20 To-Hit on enemy (30 sec)
+
+See also: DEBUFF, FAMILIAR, FERAL CLASS
+#
 BREW
 
 Usage:  brew [number] <potion>
@@ -95,6 +123,42 @@ a single vertical stream, pulling it up through the ground and growing the
 tiniest seed into a majestic tree in mere moments. It can also grow crops.
 
 See also: CHANT
+#
+"CLASS FAMILIARS"
+
+Each Natural Magic class has its own set of familiars. These are summoned with
+the 'familiar' command, but don't require the regular Familiar ability. Some
+class roles have different familiars than other roles in the same class.
+
+Werewolf:
+  Spirit Wolf (tank) - Will debuff the enemy.
+  Dire Wolf (melee) - Attacks the enemy.
+  Moon Rabbit (healer) - Buffs the party.
+
+Luminary:
+  Manticore - Attacks the enemy.
+  Griffin - Tanks for the party.
+
+Archmage:
+  Phoenix (healer) - Buffs the party.
+  Caster has no familiar, but Mirror Image counts as one.
+
+Shadow Wolf:
+  Scorpion Shadow (melee) - Debuffs the enemy.
+  Owl Shadow (healer) - Buffs the party.
+
+Feral:
+  Basilisk - Debuffs the enemy.
+
+Alchemist:
+  Salamander - Buffs the party.
+
+Necromancer:
+  Skeletal Hulk (caster) - Attacks the enemy.
+  Banshee (healer) - Debuffs the enemy.
+
+See also: HELP <NAME> FAMILIAR
+See also: CLASSES, FAMILIAR, MIRROR IMAGE
 #
 CLEANSE
 
@@ -144,6 +208,17 @@ Duration:  75 seconds
 A clever nature mage can set up counterspell magic to deflect the next hostile
 spell cast against him or her. Each counterspell lasts one game hour, or
 until it deflects a spell.
+#
+"DIRE WOLF FAMILIAR"
+
+Dire Wolf
+Class ability:  Werewolf (melee)
+Familiar type:  melee
+
+The dire wolf will assist you in combat, adding to the damage against your
+enemy.
+
+See also: FAMILIAR, WEREWOLF CLASS
 #
 EARTHARMOR "EARTH ARMOR"
 
@@ -207,13 +282,15 @@ Magic.
 
 Available familiars:
   cat - A low-level familiar for novice mages.
-  saber-tooth - A larger cat with a bigger bite.
-  sphinx - A powerful familiar that will tank for you in combat.
-  griffin - A powerful familiar that will tank for you in combat.
+  saber-toothed cat - A larger cat with a bigger bite. (requires 50)
+  sphinx - A familiar that will tank for you in combat. (requires 75)
+  giant tortoise - A stronger tank who deals no damage, but protects better.
+    (requires 100)
 
-Use "dismiss" to get rid of your familiar.
+Each natural magic class has its own familiars, too. Use "dismiss" to get rid
+of your familiar.
 
-See also: DISMISS, ORDER
+See also: CLASS FAMILIARS, DISMISS, ORDER
 #
 FASTCASTING "FAST CASTING"
 
@@ -252,6 +329,17 @@ Gift of Nature (Natural Magic ability)
 Nature mages blessed with the Gift of Nature have 35% more mana than those
 without it. This modifies your total mana, so anything else that increases
 your mana pool will be modified by Gift of Nature.
+#
+"GRIFFIN FAMILIAR"
+
+Griffin
+Class ability:  Luminary
+Familiar type:  tank
+
+The griffin is a powerful familiar that will rescue party members in combat,
+and tank for them.
+
+See also: FAMILIAR, LUMINARY CLASS
 #
 HASTEN HASTE
 
@@ -325,6 +413,31 @@ tinue to take damage for several seconds.
 If you cast this spell without a target, it will hit the person you are
 fighting.
 #
+"MANTICORE FAMILIAR"
+
+Manticore
+Class ability:  Luminary
+Familiar type:  melee
+
+The manticore will assist you in combat, adding to the damage against your
+enemy.
+
+See also: FAMILIAR, LUMINARY CLASS
+#
+"MOON RABBIT FAMILIAR"
+
+Moon Rabbit
+Class ability:  Werewolf (healer)
+Familiar type:  buff
+
+The moon rabbit familiar will use the following abilities in combat:
+- Replenish: +(level/3) Mana to master (instant)
+- Re-energize: +(level/20) Mana-Regen to master (30 sec)
+- Bright as the moon: +(level/20) Resist-Physical/Magical on party (30 sec)
+- Moon's protection: +(level/10) Resist-Physical/Magical on the tank (30 sec)
+
+See also: BUFF, FAMILIAR, WEREWOLF CLASS
+#
 MOONRISE
 
 Moonrise
@@ -361,6 +474,34 @@ Wrath of Nature Potions (Natural Magic ability)
   * If you also know Healing Elixirs, wrath potions will come out superior.
 
 See also: BREW, HEALING ELIXIRS, QUAFF
+#
+"OWL SHADOW FAMILIAR"
+
+Owl Shadow
+Class ability:  Shadow Wolf (healer)
+Familiar type:  buff
+
+The owl shadow familiar will use the following abilities in combat:
+- Dark Wings: +20 Dodge on tank (30 sec)
+- Healing Darkness: +(level/20) Heal-Over-Time on party (30 sec)
+- Invigorating Darkness: +(level/5) Move points on party (instant)
+- Brilliant Darkness: +2 Wits on party (30 sec)
+
+See also: BUFF, FAMILIAR, SHADOW WOLF CLASS
+#
+"PHOENIX FAMILIAR"
+
+Phoenix
+Class ability:  Archmage (healer)
+Familiar type:  buff
+
+The phoenix familiar will use the following abilities in combat:
+- Blaze with Power: +(level/20) bonus healing to master (30 sec)
+- Healing Warmth: heals the tank (instant)
+- Healing Fire: smaller heal for the whole party (instant)
+- Burning Passion: +(level/30) bonus physical/magical damage to party (30 sec)
+
+See also: BUFF, FAMILIAR, ARCHMAGE CLASS
 #
 PURIFY
 
@@ -444,6 +585,20 @@ The sage wolf form is a strong healer.
 
 See also: MORPH
 #
+"SALAMANDER FAMILIAR"
+
+Salamander
+Class ability:  Alchemist
+Familiar type:  buff
+
+The salamander familiar will use the following abilities in combat:
+- Alchemist's Fire: +(level/4) Bonus-Healing on master (10 sec)
+- Soothing flames: +(level/4) Heal-Over-Time on tank (10 sec)
+- Guardian flames: +20 Dodge on tank (10 sec)
+- Ember surge: +(level/30) Bonus-Physical/Magical on party (30 sec)
+
+See also: BUFF, FAMILIAR, ALCHEMIST CLASS
+#
 "SAVAGE WEREWOLF FORM"
 
 Savage Werewolf Form
@@ -455,6 +610,31 @@ Cost:  50 move (100 in combat)
 The savage wolf form is strong in melee combat.
 
 See also: MORPH
+#
+"SCORPION SHADOW FAMILIAR"
+
+Scorpion Shadow
+Class ability:  Shadow Wolf (melee)
+Familiar type:  debuff
+
+The scorpion shadow familiar will use the following abilities in combat:
+- Creeping Venom: slows an enemy (30 sec)
+- Shadow Venom: -(level/20) bonus physical/magical damage on enemy (30 sec)
+- Numbing Venom: -4 Wits on enemy (30 sec)
+- Agonizing Venom: Poison DoT on enemy (30 sec)
+
+See also: DEBUFF, FAMILIAR, SHADOW WOLF CLASS
+#
+"SKELETAL HULK FAMILIAR"
+
+Skeletal Hulk
+Class ability:  Necromancer (caster)
+Familiar type:  melee
+
+The skeletal hulk will assist you in combat, adding to the damage against your
+enemy.
+
+See also: FAMILIAR, NECROMANCER CLASS
 #
 SKYBRAND
 
@@ -493,6 +673,20 @@ will reveal if the target has any spells affecting him.
 Soulsight can be blocked by Soulmask.
 
 See also: SOULMASK
+#
+"SPIRIT WOLF FAMILIAR"
+
+Spirit Wolf
+Class ability:  Werewolf (tank)
+Familiar type:  debuff
+
+The spirit wolf familiar will use the following abilities in combat:
+- Bolt of Lightning: -2 Dexterity on enemy (30 sec)
+- Clap of Thunder: -20 Dodge on enemy (30 sec)
+- Bark/Blurred Vision: -20 To-Hit on enemy (30 sec)
+- Bite/Ghost Energy: Magical DoT on enemy (30 sec)
+
+See also: DEBUFF, FAMILIAR, WEREWOLF CLASS
 #
 "SUMMON ANIMALS"
 

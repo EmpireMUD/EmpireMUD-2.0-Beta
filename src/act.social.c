@@ -291,7 +291,7 @@ void perform_action(char_data *ch, int act_nr, char *argument) {
 				sprintf(hbuf, "&%c%s", (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) ? GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE) : '0', c->desc->last_act_message);
 				add_to_channel_history(c->desc, CHANNEL_HISTORY_SAY, hbuf);
 			}
-			else if (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
+			if (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
 				// terminate color just in case
 				msg_to_char(c, "&0");
 			}
@@ -332,7 +332,7 @@ void perform_action(char_data *ch, int act_nr, char *argument) {
 				sprintf(hbuf, "&%c%s", (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) ? GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE) : '0', c->desc->last_act_message);
 				add_to_channel_history(c->desc, CHANNEL_HISTORY_SAY, hbuf);
 			}
-			else if (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
+			if (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
 				// terminate color just in case
 				msg_to_char(c, "&0");
 			}
@@ -381,7 +381,7 @@ void perform_action(char_data *ch, int act_nr, char *argument) {
 					sprintf(hbuf, "&%c%s", (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) ? GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE) : '0', c->desc->last_act_message);
 					add_to_channel_history(c->desc, CHANNEL_HISTORY_SAY, hbuf);
 				}
-				else if (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
+				if (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
 					// terminate color just in case
 					msg_to_char(c, "&0");
 				}
@@ -478,6 +478,8 @@ ACMD(do_roll) {
 	int num, size, total, iter;
 	struct group_member_data *mem;
 	
+	int max_num = 1000;
+	
 	// convert any "d" in the argument to a space, e.g. 2d6 dice
 	for (iter = 0; iter < strlen(argument); ++iter) {
 		if (LOWER(argument[iter]) == 'd') {
@@ -503,6 +505,11 @@ ACMD(do_roll) {
 	if (num <= 0 || size <= 0) {
 		msg_to_char(ch, "Usage: roll [number of dice] [size of dice]\r\n");
 		return;
+	}
+	if (num > max_num) {
+		msg_to_char(ch, "You can roll at most %d dice at one time.\r\n", max_num);
+		num = MIN(num, max_num);
+		// not fatal
 	}
 	
 	total = 0;

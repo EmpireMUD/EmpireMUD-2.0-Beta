@@ -712,7 +712,7 @@ ACMD(do_disembark) {
 ACMD(do_load_boat) {
 	obj_data *ship, *to_load = NULL;
 	room_data *room, *next_room, *ship_room;
-	int val;
+	int val = -1;
 	bool done = FALSE;
 
 	two_arguments(argument, arg, buf);
@@ -761,7 +761,10 @@ ACMD(do_load_boat) {
 				/* else nothing was loaded at all to this room */
 			}
 		}
-		if (!to_load && !done) {
+		if (val == -1 && !done) {
+			msg_to_char(ch, "There was nothing to load.\r\n");
+		}
+		else if (!to_load && !done) {
 			act("$p is full.", FALSE, ch, ship, 0, TO_CHAR);
 		}
 	}
@@ -903,7 +906,7 @@ ACMD(do_sail) {
 ACMD(do_unload_boat) {
 	obj_data *ship;
 	room_data *room, *next_room, *ship_room;
-	int val;
+	int val = 0;
 	bool more = FALSE;
 
 	one_argument(argument, arg);
@@ -937,6 +940,9 @@ ACMD(do_unload_boat) {
 		}
 		if (more) {
 			msg_to_char(ch, "You can't unload anything else, the docks are full!\r\n");
+		}
+		else if (val == 0) {
+			msg_to_char(ch, "There was nothing to unload from that ship.\r\n");
 		}
 	}
 }

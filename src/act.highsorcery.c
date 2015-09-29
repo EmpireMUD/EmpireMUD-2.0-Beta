@@ -500,6 +500,10 @@ void summon_materials(char_data *ch, char *argument) {
 		msg_to_char(ch, "You can't summon empire materials if you're not in an empire.\r\n");
 		return;
 	}
+	if (GET_RANK(ch) < EMPIRE_PRIV(emp, PRIV_STORAGE)) {
+		msg_to_char(ch, "You aren't high enough rank to retrieve from the empire inventory.\r\n");
+		return;
+	}
 	
 	if (GET_ISLAND_ID(IN_ROOM(ch)) == NO_ISLAND) {
 		msg_to_char(ch, "You can't summon materials here.\r\n");
@@ -740,6 +744,9 @@ ACMD(do_disenchant) {
 	}
 	else if (ABILITY_TRIGGERS(ch, NULL, obj, ABIL_DISENCHANT)) {
 		return;
+	}
+	else if (!bind_ok(obj, ch)) {
+		msg_to_char(ch, "You can't disenchant something that is bound to someone else.\r\n");
 	}
 	else if (!OBJ_FLAGGED(obj, OBJ_ENCHANTED)) {
 		act("$p is not even enchanted.", FALSE, ch, obj, NULL, TO_CHAR);
@@ -1140,8 +1147,8 @@ ACMD(do_manashield) {
 
 
 ACMD(do_mirrorimage) {
-	bool check_scaling(char_data *mob, char_data *attacker);
 	extern char_data *has_familiar(char_data *ch);
+	void scale_mob_as_familiar(char_data *mob, char_data *master);
 	
 	char_data *mob, *other;
 	obj_data *wield;
@@ -1166,7 +1173,7 @@ ACMD(do_mirrorimage) {
 	mob = read_mobile(vnum);
 	
 	// scale mob to the summoner -- so it won't change its attributes later
-	check_scaling(mob, ch);
+	scale_mob_as_familiar(mob, ch);
 	
 	char_to_room(mob, IN_ROOM(ch));
 	

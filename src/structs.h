@@ -305,6 +305,8 @@ typedef struct trig_data trig_data;
 #define ADV_NO_NEARBY  BIT(3)	// hide from mortal nearby command
 #define ADV_ROTATABLE  BIT(4)	// random rotation on instantiate
 #define ADV_CONFUSING_RANDOMS  BIT(5)	// random exits do not need to match
+#define ADV_NO_NEWBIE  BIT(6)	// prevents spawning on newbie islands
+#define ADV_NEWBIE_ONLY  BIT(7)	// only spawns on newbie islands
 
 
 // adventure link rule types
@@ -340,6 +342,7 @@ typedef struct trig_data trig_data;
 #define RMT_PEACEFUL  BIT(4)	// e. no attacking/saferoom
 #define RMT_NEED_BOAT  BIT(5)	// f. requires a boat
 #define RMT_NO_TELEPORT  BIT(6)	// g. cannot teleport in/out
+#define RMT_LOOK_OUT  BIT(7)	// h. can see the map using "look out"
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -388,6 +391,8 @@ typedef struct trig_data trig_data;
 #define BLD_BEDROOM  BIT(39)	// boosts regen when sleeping
 #define BLD_NO_DELETE  BIT(40)	// will not be deleted for not having a homeroom
 #define BLD_SUMMON_PLAYER  BIT(41)	// can use the summon player command
+#define BLD_NEED_BOAT  BIT(42)	// requires a boat to enter
+#define BLD_LOOK_OUT  BIT(43)	// can see the map using "look out"
 
 
 // Terrain flags for do_build -- these match up with build_on flags for building crafts
@@ -398,7 +403,7 @@ typedef struct trig_data trig_data;
 #define BLD_ON_DESERT  BIT(4)
 #define BLD_ON_RIVER  BIT(5)
 #define BLD_ON_JUNGLE  BIT(6)
-	#define BLD_ON_UNUSED2  BIT(7)
+#define BLD_ON_NOT_PLAYER_MADE  BIT(7)
 #define BLD_ON_OCEAN  BIT(8)
 #define BLD_ON_OASIS  BIT(9)
 #define BLD_FACING_CROP  BIT(10)	// use only for facing, not for on
@@ -505,6 +510,7 @@ typedef struct trig_data trig_data;
 #define AFF_IMMUNE_STEALTH  BIT(28)	// C. Immune to stealth debuffs
 #define AFF_IMMUNE_VAMPIRE  BIT(29)	// D. Immune to vampire debuffs
 #define AFF_IMMUNE_STUN  BIT(30)	// E. Cannot be hit by stun effects
+#define AFF_ORDERED  BIT(31)	// F. Has been issued an order from a player
 
 
 // Injury flags -- IS_INJURED
@@ -544,6 +550,8 @@ typedef struct trig_data trig_data;
 #define CRAFT_TYPE_BREW  6
 #define CRAFT_TYPE_MIX  7
 #define CRAFT_TYPE_BUILD  8
+#define CRAFT_TYPE_WEAVE  9
+#define CRAFT_TYPE_WORKFORCE  10
 
 
 // Craft Flags for do_gen_craft
@@ -609,7 +617,8 @@ typedef struct trig_data trig_data;
 #define CHORE_DISMANTLE_MINES  21
 #define CHORE_ABANDON_CHOPPED  22
 #define CHORE_ABANDON_FARMED  23
-#define NUM_CHORES  24		// total
+#define CHORE_NEXUS_CRYSTALS  24
+#define NUM_CHORES  25		// total
 
 
 /* Diplomacy types */
@@ -655,7 +664,10 @@ typedef struct trig_data trig_data;
 #define PRIV_TRADE  13	// allows trade route management
 #define PRIV_LOGS  14	// can view empire logs
 #define PRIV_SHIPPING  15	// can use the ship command
-#define NUM_PRIVILEGES  16	// total
+#define PRIV_HOMES  16	// can set a home
+#define PRIV_STORAGE  17	// can retrieve from storage
+#define PRIV_WAREHOUSE  18	// can retrieve from warehouse
+#define NUM_PRIVILEGES  19	// total
 
 
 // for empire scores (e.g. sorting)
@@ -685,7 +697,8 @@ typedef struct trig_data trig_data;
 #define TECH_MASTER_PORTALS  9
 #define TECH_SKILLED_LABOR  10
 #define TECH_TRADE_ROUTES  11
-#define NUM_TECHS  12
+#define TECH_EXARCH_CRAFTS  12
+#define NUM_TECHS  13
 
 
 // for empire_trade_data
@@ -809,7 +822,7 @@ typedef struct trig_data trig_data;
 #define MOB_MOUNTAINWALK  BIT(10)	// k. Walks on mountains
 #define MOB_AQUATIC  BIT(11)	// l. Mob lives in the water only
 #define MOB_PLURAL  BIT(12)	// m. Mob represents 2+ creatures
-	#define MOB_UNUSED1  BIT(13)	// no longer used
+#define MOB_NO_ATTACK  BIT(13)	// n. the mob can be in combat, but will never hit
 #define MOB_SPAWNED  BIT(14)	// o. Mob was spawned and should despawn if nobody is around
 #define MOB_CHAMPION  BIT(15)	// p. Mob auto-rescues its master
 #define MOB_EMPIRE  BIT(16)	// q. empire NPC
@@ -1075,7 +1088,7 @@ typedef struct trig_data trig_data;
 #define ACT_RITUAL			28
 #define ACT_SAWING			29
 #define ACT_QUARRYING		30
-#define ACT_WEAVING			31
+	#define ACT_UNUSED1			31	// formerly weaving
 #define ACT_TANNING			32
 #define ACT_READING			33
 #define ACT_COPYING_BOOK	34
@@ -1296,7 +1309,7 @@ typedef struct trig_data trig_data;
 #define PRF_MORTLOG  BIT(6)	// Views mortlogs, default: ON
 #define PRF_NOREPEAT  BIT(7)	// No repetition of comm commands
 #define PRF_HOLYLIGHT  BIT(8)	// Immortal: Can see in dark
-	#define PRF_UNUSED1  BIT(9)
+#define PRF_INCOGNITO  BIT(9)	// Immortal: Can't be seen on the who list
 #define PRF_NOWIZ  BIT(10)	// Can't hear wizline
 #define PRF_NOMAPCOL  BIT(11)	// Map is not colored
 #define PRF_NOHASSLE  BIT(12)	// Ignored by mobs and triggers
@@ -1314,6 +1327,7 @@ typedef struct trig_data trig_data;
 #define PRF_NOSPAM  BIT(24)	// blocks periodic action messages
 #define PRF_SCREEN_READER  BIT(25)	// player is visually impaired and using a screen reader that can't read the map
 #define PRF_STEALTHABLE  BIT(26)	// player can steal (rather than be prevented from accidentally stealing)
+#define PRF_WIZHIDE  BIT(27)	// player can't be seen in the room
 
 
 // Rent codes
@@ -1543,6 +1557,7 @@ typedef struct trig_data trig_data;
 #define ROOM_EXTRA_BUILD_RECIPE  13
 #define ROOM_EXTRA_FOUND_TIME  14
 #define ROOM_EXTRA_REDESIGNATE_TIME  15
+#define ROOM_EXTRA_CEDED  16	// used to mark that a room was ceded to someone and never used by the empire, to prevent cede+steal
 
 
 // number of different appearances
@@ -2312,7 +2327,7 @@ struct player_special_data_saved {
 	bool can_gain_new_skills;	// not required to keep skills at zero
 	bool can_get_bonus_skills;	// can buy extra 75's
 	sh_int skill_level;  // levels computed based on class skills
-	sh_int highest_recent_level;	// only updated periodically, to prevent level drops (also good for getting offline level)
+	sh_int highest_known_level;	// maximum level ever achieved (used for gear restrictions)
 	ubyte class_progression;	// % of the way from SPECIALTY_SKILL_CAP to CLASS_SKILL_CAP
 	ubyte class_role;	// ROLE_x chosen by the player
 	sh_int character_class;  // character's class as determined by top skills
@@ -2345,13 +2360,13 @@ struct player_special_data_saved {
 	sh_int spare11;
 	sh_int spare12;
 	sh_int spare13;
-	sh_int spare14;
+	sh_int last_known_level;	// set on save/quit/alt -- TODO next pconvert, move this up with highest_known_level
 	
 	int spare15;
 	int spare16;
 	int spare17;
 	int spare18;
-	int recent_level_time;	// used with highest_recent_level -- TODO during next pconvert, change this to a long and move it up
+	int recent_level_time;	// no longer used, but may have data set if you ran b2.9 or earlier -- TODO should be removed in the b2->b3 pconvert
 	
 	double spare20;
 	double spare21;
@@ -2651,6 +2666,14 @@ struct craft_data {
 	
 	UT_hash_handle hh;	// craft_table hash
 	UT_hash_handle sorted_hh;	// sorted_crafts hash
+};
+
+
+// act.trade.c: For 
+struct gen_craft_data_t {
+	char *command;	// "forge"
+	char *verb;	// "forging"
+	char *strings[2];	// periodic message { to char, to room }
 };
 
 

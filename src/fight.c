@@ -56,6 +56,7 @@ int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_sk
 double get_weapon_speed(obj_data *weapon);
 void heal(char_data *ch, char_data *vict, int amount);
 int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round);
+extern int lock_instance_level(room_data *room, int level);
 obj_data *make_corpse(char_data *ch);
 void perform_execute(char_data *ch, char_data *victim, int attacktype, int damtype);
 void trigger_distrust_from_hostile(char_data *ch, empire_data *emp);
@@ -201,8 +202,20 @@ int get_attack_type(char_data *ch, obj_data *weapon) {
 		else if (IS_NPC(ch) && (MOB_ATTACK_TYPE(ch) != 0) && !AFF_FLAGGED(ch, AFF_DISARM)) {
 			w_type = MOB_ATTACK_TYPE(ch);
 		}
+		else if (IS_NPC(ch) && (MOB_ATTACK_TYPE(ch) != 0) && AFF_FLAGGED(ch, AFF_DISARM)) {
+			// disarmed mob
+			if (attack_hit_info[MOB_ATTACK_TYPE(ch)].damage_type == DAM_MAGICAL) {
+				w_type = TYPE_MANA_BLAST;
+			}
+			else {
+				w_type = TYPE_HIT;
+			}
+		}
 		else if (!IS_NPC(ch) && GET_MORPH(ch) != MORPH_NONE) {
 			w_type = get_morph_attack_type(ch);
+		}
+		else if (AFF_FLAGGED(ch, AFF_DISARM) && weapon && IS_WEAPON(weapon) && attack_hit_info[GET_WEAPON_TYPE(weapon)].damage_type == DAM_MAGICAL) {
+			w_type = TYPE_MANA_BLAST;
 		}
 		else {
 			w_type = TYPE_HIT;
@@ -2077,7 +2090,7 @@ void check_auto_assist(char_data *ch) {
 		}
 		
 		// already busy
-		if (ch == ch_iter || FIGHTING(ch) == ch_iter || GET_POS(ch_iter) < POS_STANDING || FIGHTING(ch_iter) || !CAN_SEE(ch_iter, FIGHTING(ch))) {
+		if (ch == ch_iter || FIGHTING(ch) == ch_iter || GET_POS(ch_iter) < POS_STANDING || FIGHTING(ch_iter) || AFF_FLAGGED(ch_iter, AFF_STUNNED) || IS_INJURED(ch_iter, INJ_TIED | INJ_STAKED) || !CAN_SEE(ch_iter, FIGHTING(ch))) {
 			continue;
 		}
 		
@@ -2163,6 +2176,7 @@ bool check_combat_position(char_data *ch, double speed) {
  *	> 0	How much damage done.
  */
 int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damtype) {
+	struct instance_data *inst;
 	int iter;
 	bool full_miss = (dam <= 0);
 	
@@ -2175,6 +2189,13 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 		log("SYSERR: Attempt to damage corpse '%s' in room #%d by '%s'.", GET_NAME(victim), GET_ROOM_VNUM(IN_ROOM(victim)), GET_NAME(ch));
 		die(victim, ch);
 		return (-1);			/* -je, 7/7/92 */
+	}
+	
+	// look for an instance to lock (before running triggers)
+	if (!IS_NPC(ch) && IS_ADVENTURE_ROOM(IN_ROOM(ch)) && COMPLEX_DATA(IN_ROOM(ch)) && (inst = COMPLEX_DATA(IN_ROOM(ch))->instance)) {
+		if (ADVENTURE_FLAGGED(inst->adventure, ADV_LOCK_LEVEL_ON_COMBAT) && !IS_IMMORTAL(ch)) {
+			lock_instance_level(IN_ROOM(ch), determine_best_scale_level(ch, TRUE));
+		}
 	}
 	
 	check_scaling(victim, ch);
@@ -2471,7 +2492,6 @@ void heal(char_data *ch, char_data *vict, int amount) {
 int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 	void add_pursuit(char_data *ch, char_data *target);
 	extern int apply_poison(char_data *ch, char_data *vict, int type);
-	extern int lock_instance_level(room_data *room, int level);
 	
 	struct instance_data *inst;
 	int w_type;
@@ -2492,14 +2512,16 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		return -1;
 	}
 	
-	// weapons not allowed if disarmed
-	if (AFF_FLAGGED(ch, AFF_DISARM)) {
-		weapon = NULL;
-	}
+	// set up some vars
 	w_type = get_attack_type(ch, weapon);
 	victim_emp = GET_LOYALTY(victim);
 	
-	// look for an instance to lock
+	// weapons not allowed if disarmed (do this after get_attack type, which accounts for this)
+	if (AFF_FLAGGED(ch, AFF_DISARM)) {
+		weapon = NULL;
+	}
+	
+	// look for an instance to lock (before running triggers)
 	if (!IS_NPC(ch) && IS_ADVENTURE_ROOM(IN_ROOM(ch)) && COMPLEX_DATA(IN_ROOM(ch)) && (inst = COMPLEX_DATA(IN_ROOM(ch))->instance)) {
 		if (ADVENTURE_FLAGGED(inst->adventure, ADV_LOCK_LEVEL_ON_COMBAT) && !IS_IMMORTAL(ch)) {
 			lock_instance_level(IN_ROOM(ch), determine_best_scale_level(ch, TRUE));
@@ -2508,6 +2530,11 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 
 	/* check if the character has a fight trigger */
 	fight_mtrigger(ch);
+	
+	// some mobs can run fight triggers when they are hitting, but never actually hit
+	if (IS_NPC(ch) && MOB_FLAGGED(ch, MOB_NO_ATTACK)) {
+		return 0;
+	}
 	
 	// hostile activity triggers distrust unless the victim is pvp-flagged or already hostile
 	if (!IS_NPC(ch) && victim_emp && GET_LOYALTY(ch) != victim_emp) {

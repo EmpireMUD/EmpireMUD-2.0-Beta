@@ -592,13 +592,35 @@ void city_traits(char_data *ch, char *argument) {
 
 
 void claim_city(char_data *ch, char *argument) {
+	char arg1[MAX_INPUT_LENGTH];
 	empire_data *emp = GET_LOYALTY(ch);
 	struct empire_city_data *city;
 	int x, y, radius;
 	room_data *iter, *next_iter, *to_room, *center, *home;
-	bool found = FALSE;
+	bool found = FALSE, all = FALSE;
+	int len;
 	
-	skip_spaces(&argument);
+	// look for the "all" at the end
+	len = strlen(argument);
+	if (!str_cmp(argument + len - 4, " all")) {
+		argument[len - 4] = '\0';
+		all = TRUE;
+	}
+	else if (!str_cmp(argument + len - 5, " -all")) {
+		argument[len - 5] = '\0';
+		all = TRUE;
+	}
+	else if (!str_cmp(argument + len - 3, " -a")) {
+		argument[len - 3] = '\0';
+		all = TRUE;
+	}
+	
+	// remove trailing spaces
+	while (argument[strlen(argument)-1] == ' ') {
+		argument[strlen(argument)-1] = '\0';
+	}
+	
+	any_one_word(argument, arg1);	// city name
 	
 	// check legality
 	if (!emp) {
@@ -609,11 +631,11 @@ void claim_city(char_data *ch, char *argument) {
 		msg_to_char(ch, "You don't have permission to claim territory.\r\n");
 		return;
 	}
-	if (!*argument) {
-		msg_to_char(ch, "Usage: city claim <name>\r\n");
+	if (!*arg1) {
+		msg_to_char(ch, "Usage: city claim <name> [all]\r\n");
 		return;
 	}
-	if (!(city = find_city_by_name(emp, argument))) {
+	if (!(city = find_city_by_name(emp, arg1))) {
 		msg_to_char(ch, "Your empire has no city by that name.\r\n");
 		return;
 	}
@@ -628,7 +650,18 @@ void claim_city(char_data *ch, char *argument) {
 		for (y = -1 * radius; y <= radius && can_claim(ch); ++y) {
 			to_room = real_shift(center, x, y);
 			
-			if (to_room && SECT(to_room) != ROOM_ORIGINAL_SECT(to_room) && !ROOM_OWNER(to_room) && !ROOM_AFF_FLAGGED(to_room, ROOM_AFF_HAS_INSTANCE)) {
+			if (!to_room || compute_distance(center, to_room) > radius) {
+				continue;
+			}
+			if (ROOM_OWNER(to_room) || ROOM_AFF_FLAGGED(to_room, ROOM_AFF_HAS_INSTANCE)) {
+				continue;
+			}
+			if (ROOM_SECT_FLAGGED(to_room, SECTF_NO_CLAIM)) {
+				continue;
+			}
+			
+			// ok...
+			if (all || (SECT(to_room) != ROOM_ORIGINAL_SECT(to_room))) {
 				found = TRUE;
 				claim_room(to_room, emp);
 				
@@ -647,12 +680,12 @@ void claim_city(char_data *ch, char *argument) {
 			}
 		}
 				
-		msg_to_char(ch, "You have claimed all unclaimed structures in the %s of %s.\r\n", city_type[city->type].name, city->name);
+		msg_to_char(ch, "You have claimed all %s in the %s of %s.\r\n", all ? "tiles" : "unclaimed structures", city_type[city->type].name, city->name);
 		read_empire_territory(emp);
 		save_empire(emp);
 	}
 	else {
-		msg_to_char(ch, "The %s of %s has no unclaimed structures.\r\n", city_type[city->type].name, city->name);
+		msg_to_char(ch, "The %s of %s has no unclaimed %s.\r\n", city_type[city->type].name, city->name, all ? "tiles" : "structures");
 	}
 }
 
@@ -703,6 +736,7 @@ void found_city(char_data *ch, char *argument) {
 	
 	empire_data *emp = get_or_create_empire(ch);
 	empire_data *emp_iter, *next_emp;
+	struct island_info *isle;
 	int iter, dist;
 	struct empire_city_data *city;
 	
@@ -722,6 +756,10 @@ void found_city(char_data *ch, char *argument) {
 	}
 	if (GET_RANK(ch) < EMPIRE_PRIV(emp, PRIV_CITIES)) {
 		msg_to_char(ch, "You don't have permission to found cities.\r\n");
+		return;
+	}
+	if ((isle = get_island(GET_ISLAND_ID(IN_ROOM(ch)), TRUE)) && IS_SET(isle->flags, ISLE_NEWBIE) && !config_get_bool("cities_on_newbie_islands")) {
+		msg_to_char(ch, "You can't found a city on a newbie island.\r\n");
 		return;
 	}
 	if (ROOM_IS_CLOSED(IN_ROOM(ch)) || COMPLEX_DATA(IN_ROOM(ch)) || IS_WATER_SECT(SECT(IN_ROOM(ch))) || ROOM_SECT_FLAGGED(IN_ROOM(ch), nocity_flags)) {
@@ -1969,7 +2007,7 @@ ACMD(do_barde) {
 ACMD(do_cede) {
 	char arg2[MAX_INPUT_LENGTH];
 	empire_data *e = GET_LOYALTY(ch), *f;
-	room_data *room;
+	room_data *room, *iter, *next_iter;
 	char_data *targ;
 	bool junk;
 
@@ -1983,7 +2021,7 @@ ACMD(do_cede) {
 		msg_to_char(ch, "You own no territory.\r\n");
 	else if (!*arg)
 		msg_to_char(ch, "Usage: cede <person> (x, y)\r\n");
-	else if (!(targ = get_char_vis(ch, arg, FIND_CHAR_WORLD | FIND_NO_DARK)))
+	else if (!(targ = get_player_vis(ch, arg, FIND_CHAR_WORLD | FIND_NO_DARK)))
 		send_config_msg(ch, "no_person");
 	else if (IS_NPC(targ))
 		msg_to_char(ch, "You can't cede land to NPCs!\r\n");
@@ -2025,6 +2063,14 @@ ACMD(do_cede) {
 
 		abandon_room(room);
 		claim_room(room, f);
+		
+		// mark as ceded
+		set_room_extra_data(room, ROOM_EXTRA_CEDED, 1);
+		HASH_ITER(interior_hh, interior_world_table, iter, next_iter) {
+			if (HOME_ROOM(iter) == room) {
+				set_room_extra_data(iter, ROOM_EXTRA_CEDED, 1);
+			}
+		}
 
 		/* Transfers wealth, etc */
 		read_empire_territory(e);
@@ -3157,7 +3203,7 @@ ACMD(do_esay) {
 	char_data *tch;
 	int level = 0, i;
 	empire_data *e;
-	bool emote = FALSE;
+	bool emote = FALSE, extra_color = FALSE;
 	char buf[MAX_STRING_LENGTH], lstring[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH], output[MAX_STRING_LENGTH], color[8];
 
 	if (IS_NPC(ch))
@@ -3186,14 +3232,15 @@ ACMD(do_esay) {
 	if (*argument == '#') {
 		half_chop(argument, arg, buf);
 		strcpy(argument, buf);
-		for (i = 0; i < strlen(arg); i++)
-			if (arg[i] == '_')
+		for (i = 0; i < strlen(arg); i++) {
+			if (arg[i] == '_') {
 				arg[i] = ' ';
-		for (i = 0; i < EMPIRE_NUM_RANKS(e); i++)
-			if (is_abbrev(arg+1, EMPIRE_RANK(e, i)))
-				break;
-		if (i < EMPIRE_NUM_RANKS(e))
+			}
+		}
+		i = find_rank_by_name(e, arg+1);
+		if (i != NOTHING) {
 			level = i;
+		}
 	}
 	if (*argument == '*') {
 		argument++;
@@ -3201,12 +3248,15 @@ ACMD(do_esay) {
 	}
 	skip_spaces(&argument);
 
-	level++;
+	level++;	// 1-based, not 0-based
 
-	if (level > 1)
-		sprintf(lstring, " <%s&0>", EMPIRE_RANK(e, level-1));
-	else
+	if (level > 1) {
+		sprintf(lstring, " <%s%%s>", EMPIRE_RANK(e, level-1));
+		extra_color = TRUE;
+	}
+	else {
 		*lstring = '\0';
+	}
 
 	/* Since we cut up the string, we have to check again */
 	if (!*argument) {
@@ -3216,10 +3266,10 @@ ACMD(do_esay) {
 
 	// NOTE: both modes will leave in 2 '%s' for color codes
 	if (emote) {
-		sprintf(buf, "%%s[%sEMPIRE%%s%s] $o %s&0", EMPIRE_BANNER(e), lstring, double_percents(argument));
+		sprintf(buf, "%%s[%sEMPIRE%%s%s] $o %s\t0", EMPIRE_BANNER(e), lstring, double_percents(argument));
 	}
 	else {
-		sprintf(buf, "%%s[%sEMPIRE%%s $o%s]: %s", EMPIRE_BANNER(e), lstring, double_percents(argument));
+		sprintf(buf, "%%s[%sEMPIRE%%s $o%s]: %s\t0", EMPIRE_BANNER(e), lstring, double_percents(argument));
 	}
 
 	if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
@@ -3231,8 +3281,13 @@ ACMD(do_esay) {
 			clear_last_act_message(ch->desc);
 		}
 
-		sprintf(color, "&%c", GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_ESAY) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_ESAY) : '0');
-		sprintf(output, buf, color, color);
+		sprintf(color, "\t%c", GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_ESAY) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_ESAY) : '0');
+		if (extra_color) {
+			sprintf(output, buf, color, color, color);
+		}
+		else {
+			sprintf(output, buf, color, color);
+		}
 		
 		act(output, FALSE, ch, 0, 0, TO_CHAR | TO_SLEEP | TO_NODARK);
 		
@@ -3250,7 +3305,7 @@ ACMD(do_esay) {
 		else {
 			clear_last_act_message(d);
 			
-			sprintf(color, "&%c", GET_CUSTOM_COLOR(tch, CUSTOM_COLOR_ESAY) ? GET_CUSTOM_COLOR(tch, CUSTOM_COLOR_ESAY) : '0');
+			sprintf(color, "\t%c", GET_CUSTOM_COLOR(tch, CUSTOM_COLOR_ESAY) ? GET_CUSTOM_COLOR(tch, CUSTOM_COLOR_ESAY) : '0');
 			sprintf(output, buf, color, color);
 			act(output, FALSE, ch, 0, tch, TO_VICT | TO_SLEEP | TO_NODARK);
 			
@@ -3445,6 +3500,9 @@ ACMD(do_home) {
 		}
 		else if (!GET_LOYALTY(ch) || ROOM_OWNER(real) != GET_LOYALTY(ch)) {
 			msg_to_char(ch, "You need to own a building to make it your home.\r\n");
+		}
+		else if (!has_permission(ch, PRIV_HOMES)) {
+			msg_to_char(ch, "You aren't high enough rank to set a home.\r\n");
 		}
 		else if (ROOM_PRIVATE_OWNER(real) == GET_IDNUM(ch)) {
 			msg_to_char(ch, "But it's already your home!\r\n");
@@ -3647,8 +3705,13 @@ ACMD(do_tavern) {
 		msg_to_char(ch, "You need the workforce privilege to change what this tavern is brewing.\r\n");
 	}
 	else if (!*arg || type == NOTHING) {
-		show_tavern_status(ch);
-		msg_to_char(ch, "This tavern is currently brewing %s.\r\n", tavern_data[get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TAVERN_TYPE)].name);
+		if (type == NOTHING) {
+			msg_to_char(ch, "Invalid tavern type. ");	// deliberate lack of CRLF
+		}
+		else {
+			show_tavern_status(ch);
+			msg_to_char(ch, "This tavern is currently brewing %s.\r\n", tavern_data[get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TAVERN_TYPE)].name);
+		}
 		send_to_char("You can have it make:\r\n", ch);
 		for (iter = 0; *tavern_data[iter].name != '\n'; ++iter) {
 			msg_to_char(ch, " %s", tavern_data[iter].name);
@@ -4217,6 +4280,8 @@ ACMD(do_reward) {
 
 ACMD(do_roster) {
 	extern bool member_is_timed_out_cfu(struct char_file_u *chdata);
+	extern const char *class_role[NUM_ROLES];
+	extern const char *class_role_color[NUM_ROLES];
 
 	char buf[MAX_STRING_LENGTH * 2], buf1[MAX_STRING_LENGTH * 2], arg[MAX_STRING_LENGTH];
 	struct char_file_u chdata;
@@ -4248,7 +4313,12 @@ ACMD(do_roster) {
 				tmp = is_playing(chdata.char_specials_saved.idnum);
 			
 				timed_out = member_is_timed_out_cfu(&chdata);
-				size += snprintf(buf + size, sizeof(buf) - size, "[%d %s] <%s&0> %s%s&0", tmp ? GET_COMPUTED_LEVEL(tmp) : chdata.player_specials_saved.highest_recent_level, class_data[tmp ? GET_CLASS(tmp) : chdata.player_specials_saved.character_class].name, EMPIRE_RANK(e, (tmp ? GET_RANK(tmp) : chdata.player_specials_saved.rank) - 1), (timed_out ? "&r" : ""), chdata.name);
+				if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+					size += snprintf(buf + size, sizeof(buf) - size, "[%d %s %s] <%s&0> %s%s&0", tmp ? GET_COMPUTED_LEVEL(tmp) : chdata.player_specials_saved.last_known_level, class_data[tmp ? GET_CLASS(tmp) : chdata.player_specials_saved.character_class].name, class_role[tmp ? GET_CLASS_ROLE(tmp) : chdata.player_specials_saved.class_role], EMPIRE_RANK(e, (tmp ? GET_RANK(tmp) : chdata.player_specials_saved.rank) - 1), (timed_out ? "&r" : ""), chdata.name);
+				}
+				else {	// not screenreader
+					size += snprintf(buf + size, sizeof(buf) - size, "[%d %s%s\t0] <%s&0> %s%s&0", tmp ? GET_COMPUTED_LEVEL(tmp) : chdata.player_specials_saved.last_known_level, class_role_color[tmp ? GET_CLASS_ROLE(tmp) : chdata.player_specials_saved.class_role], class_data[tmp ? GET_CLASS(tmp) : chdata.player_specials_saved.character_class].name, EMPIRE_RANK(e, (tmp ? GET_RANK(tmp) : chdata.player_specials_saved.rank) - 1), (timed_out ? "&r" : ""), chdata.name);
+				}
 								
 				// online/not
 				if (tmp) {

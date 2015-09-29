@@ -151,7 +151,7 @@ claimed land (although not forever) or in your private chest (no time limit).
 
 You cannot unbind items.
 
-See also: HOME
+See also: TAGS, HOME
 #
 BLOCK "BLOCK CAP"
 
@@ -162,6 +162,8 @@ benefit if you are not using a shield.
 
 There is a maximum 50% chance to block. The amount of Block required to hit
 this cap is based on the level of your opponent.
+
+You cannot block magical attacks without the Ward Against Magic ability.
 
 Block cap:
 - Start with the mob's level divided by 2 (half)
@@ -277,8 +279,8 @@ Usage:  shout <message>
 See also HELP SLASH-CHANNELS for global channels like /ooc and /newbie.
 
 These are channels reserved for specific purposes. Messages on these channels
-reach everyone who is monitoring them. You can turn channels on and off using
-the "toggle" command.
+reach everyone who is monitoring them. You can turn the "shout" and "tell"
+channels on and off using the "toggle" command.
 
 The following channels are available on EmpireMUD:
 
@@ -833,6 +835,8 @@ her group. This ensures that these players receive credit for the kill, plus
 any bind-on-pickup loot the mob drops.
 
 If the mob is out of combat long enough to heal, it will also reset its tags.
+
+See also: BINDING
 #
 TIP TIPS "TIP OF THE DAY" HINT
 

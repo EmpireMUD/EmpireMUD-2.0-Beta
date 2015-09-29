@@ -137,11 +137,11 @@ void special_building_setup(char_data *ch, room_data *room) {
 * @return TRUE if valid, FALSE if not
 */
 bool can_build_on(room_data *room, bitvector_t flags) {
-	#define CLEAR_OPEN_BUILDING(r)	(IS_MAP_BUILDING(r) && ROOM_BLD_FLAGGED((r), BLD_OPEN) && !ROOM_BLD_FLAGGED((r), BLD_BARRIER) && !SECT_FLAGGED(ROOM_ORIGINAL_SECT(r), SECTF_FRESH_WATER | SECTF_OCEAN))
+	#define CLEAR_OPEN_BUILDING(r)	(IS_MAP_BUILDING(r) && ROOM_BLD_FLAGGED((r), BLD_OPEN) && !ROOM_BLD_FLAGGED((r), BLD_BARRIER) && (IS_COMPLETE(r) || !SECT_FLAGGED(ROOM_ORIGINAL_SECT(r), SECTF_FRESH_WATER | SECTF_OCEAN)))
 
-	return (
+	return (!IS_SET(flags, BLD_ON_NOT_PLAYER_MADE) || !ROOM_AFF_FLAGGED(room, ROOM_AFF_PLAYER_MADE)) && (
 		IS_SET(GET_SECT_BUILD_FLAGS(SECT(room)), flags) || 
-		(IS_SET(flags, BLD_FACING_OPEN_BUILDING) && CLEAR_OPEN_BUILDING(room))	// one special case -- any thoughts on a generic case? -pc
+		(IS_SET(flags, BLD_FACING_OPEN_BUILDING) && CLEAR_OPEN_BUILDING(room))
 	);
 }
 
@@ -316,6 +316,14 @@ void construct_tunnel(char_data *ch, int dir, room_data *entrance, room_data *ex
 	
 	// link the final tunnel room
 	create_exit(last_room, exit, dir, TRUE);
+	
+	// get it all added to territory
+	if (ROOM_OWNER(entrance)) {
+		read_empire_territory(ROOM_OWNER(entrance));
+	}
+	if (ROOM_OWNER(exit) && ROOM_OWNER(exit) != ROOM_OWNER(entrance)) {
+		read_empire_territory(ROOM_OWNER(exit));
+	}
 }
 
 
@@ -1363,6 +1371,11 @@ ACMD(do_dismantle) {
 
 	if (GET_CRAFT_ABILITY(type) != NO_ABIL && !HAS_ABILITY(ch, GET_CRAFT_ABILITY(type))) {
 		msg_to_char(ch, "You don't have the skill needed to dismantle this building properly.\r\n");
+		return;
+	}
+	
+	if (SECT_FLAGGED(ROOM_ORIGINAL_SECT(IN_ROOM(ch)), SECTF_FRESH_WATER | SECTF_OCEAN) && is_entrance(IN_ROOM(ch))) {
+		msg_to_char(ch, "You can't dismantle here because it's the entrance for another building.\r\n");
 		return;
 	}
 

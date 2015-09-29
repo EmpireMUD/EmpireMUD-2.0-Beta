@@ -50,13 +50,12 @@ bool green_skill_deadend(char_data *ch, int skill);
 * @param int abil The ability to sell
 */
 void check_skill_sell(char_data *ch, int abil) {
+	bool despawn_familiar(char_data *ch, mob_vnum vnum);
 	void end_majesty(char_data *ch);
-	extern char_data *has_familiar(char_data *ch);
 	void remove_armor_by_type(char_data *ch, int armor_type);
 	void retract_claws(char_data *ch);
 	void undisguise(char_data *ch);	
 	
-	char_data *vict;
 	obj_data *obj;
 	bool found = TRUE;	// inverted detection, see default below
 	
@@ -74,6 +73,14 @@ void check_skill_sell(char_data *ch, int abil) {
 			}
 			break;
 		}
+		case ABIL_BANSHEE: {
+			despawn_familiar(ch, FAMILIAR_BANSHEE);
+			break;
+		}
+		case ABIL_BASILISK: {
+			despawn_familiar(ch, FAMILIAR_BASILISK);
+			break;
+		}
 		case ABIL_BAT_FORM: {
 			if (GET_MORPH(ch) == MORPH_BAT) {
 				perform_morph(ch, MORPH_NONE);
@@ -87,6 +94,10 @@ void check_skill_sell(char_data *ch, int abil) {
 					unequip_char_to_inventory(ch, WEAR_WIELD);
 				}
 			}
+			break;
+		}
+		case ABIL_SUMMON_BODYGUARD: {
+			despawn_familiar(ch, BODYGUARD);
 			break;
 		}
 		case ABIL_BOOST: {
@@ -120,6 +131,10 @@ void check_skill_sell(char_data *ch, int abil) {
 			}
 			break;
 		}
+		case ABIL_DIRE_WOLF: {
+			despawn_familiar(ch, FAMILIAR_DIRE_WOLF);
+			break;
+		}
 		case ABIL_DISGUISE: {
 			if (IS_DISGUISED(ch)) {
 				undisguise(ch);
@@ -140,12 +155,10 @@ void check_skill_sell(char_data *ch, int abil) {
 			break;
 		}
 		case ABIL_FAMILIAR: {
-			if ((vict = has_familiar(ch)) && !vict->desc) {
-				if (GET_MOB_VNUM(vict) == FAMILIAR_CAT || GET_MOB_VNUM(vict) == FAMILIAR_SABERTOOTH || GET_MOB_VNUM(vict) == FAMILIAR_SPHINX || GET_MOB_VNUM(vict) == FAMILIAR_GRIFFIN) {
-					act("$n vanishes.", FALSE, vict, NULL, NULL, TO_ROOM);
-					extract_char(vict);
-				}
-			}
+			despawn_familiar(ch, FAMILIAR_CAT);
+			despawn_familiar(ch, FAMILIAR_SABERTOOTH);
+			despawn_familiar(ch, FAMILIAR_SPHINX);
+			despawn_familiar(ch, FAMILIAR_GIANT_TORTOISE);
 			break;
 		}
 		case ABIL_FISH: {
@@ -160,6 +173,10 @@ void check_skill_sell(char_data *ch, int abil) {
 		}
 		case ABIL_FORESIGHT: {
 			affect_from_char(ch, ATYPE_FORESIGHT);
+			break;
+		}
+		case ABIL_GRIFFIN: {
+			despawn_familiar(ch, FAMILIAR_GRIFFIN);
 			break;
 		}
 		case ABIL_HEAVY_ARMOR: {
@@ -184,21 +201,26 @@ void check_skill_sell(char_data *ch, int abil) {
 			affect_from_char(ch, ATYPE_MANASHIELD);
 			break;
 		}
+		case ABIL_MANTICORE: {
+			despawn_familiar(ch, FAMILIAR_MANTICORE);
+			break;
+		}
 		case ABIL_MEDIUM_ARMOR: {
 			remove_armor_by_type(ch, ARMOR_MEDIUM);
 			break;
 		}
 		case ABIL_MIRRORIMAGE: {
-			if ((vict = has_familiar(ch)) && !vict->desc && GET_MOB_VNUM(vict) == MIRROR_IMAGE_MOB) {
-				act("$n vanishes.", FALSE, vict, NULL, NULL, TO_ROOM);
-				extract_char(vict);
-			}
+			despawn_familiar(ch, MIRROR_IMAGE_MOB);
 			break;
 		}
 		case ABIL_MIST_FORM: {
 			if (GET_MORPH(ch) == MORPH_MIST) {
 				perform_morph(ch, MORPH_NONE);
 			}
+			break;
+		}
+		case ABIL_MOON_RABBIT: {
+			despawn_familiar(ch, FAMILIAR_MOON_RABBIT);
 			break;
 		}
 		case ABIL_MUMMIFY: {
@@ -218,6 +240,14 @@ void check_skill_sell(char_data *ch, int abil) {
 				act("The glow in $n's eyes fades.", TRUE, ch, NULL, NULL, TO_ROOM);
 				affect_from_char(ch, ATYPE_NIGHTSIGHT);
 			}
+			break;
+		}
+		case ABIL_OWL_SHADOW: {
+			despawn_familiar(ch, FAMILIAR_OWL_SHADOW);
+			break;
+		}
+		case ABIL_PHOENIX: {
+			despawn_familiar(ch, FAMILIAR_PHOENIX);
 			break;
 		}
 		case ABIL_PHOENIX_RITE: {
@@ -251,6 +281,14 @@ void check_skill_sell(char_data *ch, int abil) {
 			}
 			break;
 		}
+		case ABIL_SALAMANDER: {
+			despawn_familiar(ch, FAMILIAR_SALAMANDER);
+			break;
+		}
+		case ABIL_SCORPION_SHADOW: {
+			despawn_familiar(ch, FAMILIAR_SCORPION_SHADOW);
+			break;
+		}
 		case ABIL_SAGE_WEREWOLF_FORM: {
 			if (GET_MORPH(ch) == MORPH_SAGE_WEREWOLF) {
 				perform_morph(ch, MORPH_NONE);
@@ -272,6 +310,14 @@ void check_skill_sell(char_data *ch, int abil) {
 		}
 		case ABIL_SIPHON: {
 			affect_from_char(ch, ATYPE_SIPHON);
+			break;
+		}
+		case ABIL_SKELETAL_HULK: {
+			despawn_familiar(ch, FAMILIAR_SKELETAL_HULK);
+			break;
+		}
+		case ABIL_SPIRIT_WOLF: {
+			despawn_familiar(ch, FAMILIAR_SPIRIT_WOLF);
 			break;
 		}
 		case ABIL_TOWERING_WEREWOLF_FORM: {
@@ -335,6 +381,9 @@ char *ability_color(char_data *ch, int abil) {
 void adjust_abilities_to_empire(char_data *ch, empire_data *emp, bool add) {
 	int mod = (add ? 1 : -1);
 	
+	if (HAS_ABILITY(ch, ABIL_EXARCH_CRAFTS)) {
+		EMPIRE_TECH(emp, TECH_EXARCH_CRAFTS) += mod;
+	}
 	if (HAS_ABILITY(ch, ABIL_WORKFORCE)) {
 		EMPIRE_TECH(emp, TECH_WORKFORCE) += mod;
 	}
@@ -1476,7 +1525,7 @@ bool can_wear_item(char_data *ch, obj_data *item, bool send_messages) {
 				}
 				return FALSE;
 			}
-			if (GET_HIGHEST_RECENT_LEVEL(ch) < level_min) {
+			if (GET_HIGHEST_KNOWN_LEVEL(ch) < level_min) {
 				if (send_messages) {
 					snprintf(buf, sizeof(buf), "You need to be level %d to use $p.", level_min);
 					act(buf, FALSE, ch, item, NULL, TO_CHAR);

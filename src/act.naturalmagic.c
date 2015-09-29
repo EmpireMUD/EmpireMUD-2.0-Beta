@@ -70,6 +70,43 @@ int ancestral_healing(char_data *ch) {
 
 
 /**
+* Finds a familiar belonging to ch that has the matching vnum and despawns it.
+* 
+* @param char_data *ch The player to find familiars for.
+* @param mob_vnum vnum Despawn only if matching this vnum (NOTHING for all familiars).
+* @return bool TRUE if it despawned a mob; FALSE if not.
+*/
+bool despawn_familiar(char_data *ch, mob_vnum vnum) {
+	char_data *iter, *next_iter;
+	bool any = FALSE;
+	
+	for (iter = character_list; iter; iter = next_iter) {
+		next_iter = iter->next;
+		
+		if (!IS_NPC(iter)) {
+			continue;
+		}
+		if (!MOB_FLAGGED(iter, MOB_FAMILIAR)) {
+			continue;
+		}
+		if (iter->master != ch) {
+			continue;
+		}
+		
+		if (vnum != NOTHING && GET_MOB_VNUM(iter) != vnum) {
+			continue;
+		}
+		
+		act("$n leaves.", TRUE, iter, NULL, NULL, TO_ROOM);
+		extract_char(iter);
+		any = TRUE;
+	}
+	
+	return any;
+}
+
+
+/**
 * @param char_data *ch The person.
 * @return int The total Bonus-Healing trait for that person, with any modifiers.
 */
@@ -599,7 +636,7 @@ ACMD(do_earthmeld) {
 		return;
 	}
 	
-	if (IS_ADVENTURE_ROOM(IN_ROOM(ch)) && (!RMT_FLAGGED(IN_ROOM(ch), RMT_OUTDOOR) || RMT_FLAGGED(IN_ROOM(ch), RMT_NEED_BOAT))) {
+	if (IS_ADVENTURE_ROOM(IN_ROOM(ch)) && (!RMT_FLAGGED(IN_ROOM(ch), RMT_OUTDOOR) || ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_NEED_BOAT) || RMT_FLAGGED(IN_ROOM(ch), RMT_NEED_BOAT))) {
 		msg_to_char(ch, "You can't earthmeld without natural ground below you!\r\n");
 		return;
 	}
@@ -698,9 +735,8 @@ ACMD(do_entangle) {
 
 
 ACMD(do_familiar) {
+	void scale_mob_as_familiar(char_data *mob, char_data *master);
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
-	
-	bool check_scaling(char_data *mob, char_data *attacker);
 	
 	char_data *mob;
 	int iter, type;
@@ -709,15 +745,30 @@ ACMD(do_familiar) {
 	struct {
 		char *name;
 		int ability;
-		int level;	// skill level required
+		int level;	// natural magic level required
 		mob_vnum vnum;
 		int cost;
 	} familiars[] = {
+		// base familiars
 		{ "cat", ABIL_FAMILIAR, 0, FAMILIAR_CAT, 40 },
-		{ "saber-tooth", ABIL_FAMILIAR, 51, FAMILIAR_SABERTOOTH, 40 },
+		{ "saber-toothed cat", ABIL_FAMILIAR, 51, FAMILIAR_SABERTOOTH, 40 },
 		{ "sphinx", ABIL_FAMILIAR, 76, FAMILIAR_SPHINX, 40 },
-		{ "griffin", ABIL_FAMILIAR, 100, FAMILIAR_GRIFFIN, 40 },
+		{ "giant tortoise", ABIL_FAMILIAR, 100, FAMILIAR_GIANT_TORTOISE, 40 },
 		
+		// class animals
+		{ "griffin", ABIL_GRIFFIN, 100, FAMILIAR_GRIFFIN, 40 },
+		{ "dire wolf", ABIL_DIRE_WOLF, 100, FAMILIAR_DIRE_WOLF, 40 },
+		{ "moon rabbit", ABIL_MOON_RABBIT, 100, FAMILIAR_MOON_RABBIT, 40 },
+		{ "spirit wolf", ABIL_SPIRIT_WOLF, 100, FAMILIAR_SPIRIT_WOLF, 40 },
+		{ "manticore", ABIL_MANTICORE, 100, FAMILIAR_MANTICORE, 40 },
+		{ "phoenix", ABIL_PHOENIX, 100, FAMILIAR_PHOENIX, 40 },
+		{ "scorpion shadow", ABIL_SCORPION_SHADOW, 100, FAMILIAR_SCORPION_SHADOW, 40 },
+		{ "owl shadow", ABIL_OWL_SHADOW, 100, FAMILIAR_OWL_SHADOW, 40 },
+		{ "basilisk", ABIL_BASILISK, 100, FAMILIAR_BASILISK, 40 },
+		{ "salamander", ABIL_SALAMANDER, 100, FAMILIAR_SALAMANDER, 40 },
+		{ "skeletal hulk", ABIL_SKELETAL_HULK, 100, FAMILIAR_SKELETAL_HULK, 40 },
+		{ "banshee", ABIL_BANSHEE, 100, FAMILIAR_BANSHEE, 40 },
+
 		{ "\n", NO_ABIL, 0, NOTHING, 0 }
 	};
 	
@@ -726,17 +777,20 @@ ACMD(do_familiar) {
 		return;
 	}
 	
-	one_argument(argument, arg);
+	skip_spaces(&argument);
 	
 	// no-arg: just list
-	if (!*arg) {
+	if (!*argument) {
 		msg_to_char(ch, "Summon which familiar:");
 		any = FALSE;
 		for (iter = 0; *familiars[iter].name != '\n'; ++iter) {
 			if (!IS_NPC(ch) && familiars[iter].ability != NO_ABIL && !HAS_ABILITY(ch, familiars[iter].ability)) {
 				continue;
 			}
-			if (GET_SKILL_LEVEL(ch) < familiars[iter].level) {
+			if (familiars[iter].ability != NO_ABIL && ability_data[familiars[iter].ability].parent_skill != NO_SKILL && GET_SKILL(ch, ability_data[familiars[iter].ability].parent_skill) < familiars[iter].level) {
+				continue;
+			}
+			if (familiars[iter].ability == NO_ABIL && GET_SKILL_LEVEL(ch) < familiars[iter].level) {
 				continue;
 			}
 			
@@ -758,10 +812,13 @@ ACMD(do_familiar) {
 		if (!IS_NPC(ch) && familiars[iter].ability != NO_ABIL && !HAS_ABILITY(ch, familiars[iter].ability)) {
 			continue;
 		}
-		if (GET_SKILL_LEVEL(ch) < familiars[iter].level) {
+		if (familiars[iter].ability != NO_ABIL && ability_data[familiars[iter].ability].parent_skill != NO_SKILL && GET_SKILL(ch, ability_data[familiars[iter].ability].parent_skill) < familiars[iter].level) {
 			continue;
 		}
-		if (is_abbrev(arg, familiars[iter].name)) {
+		if (familiars[iter].ability == NO_ABIL && GET_SKILL_LEVEL(ch) < familiars[iter].level) {
+			continue;
+		}
+		if (is_abbrev(argument, familiars[iter].name)) {
 			type = iter;
 			break;
 		}
@@ -788,7 +845,7 @@ ACMD(do_familiar) {
 	setup_generic_npc(mob, GET_LOYALTY(ch), NOTHING, NOTHING);
 	
 	// scale to summoner
-	check_scaling(mob, ch);
+	scale_mob_as_familiar(mob, ch);
 	
 	char_to_room(mob, IN_ROOM(ch));
 	
@@ -1280,8 +1337,8 @@ ACMD(do_resurrect) {
 		else {
 			// success: resurrect in room
 			charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
-			act("You begin channeling mana to resurrect $N...", FALSE, ch, NULL, vict, TO_CHAR | TO_NODARK);
-			act("$n glows with white light as $e begins to channel $s mana to resurrect $N...", FALSE, ch, NULL, vict, TO_NOTVICT);
+			act("You begin channeling mana to resurrect $O...", FALSE, ch, NULL, vict, TO_CHAR | TO_NODARK);
+			act("$n glows with white light as $e begins to channel $s mana to resurrect $O...", FALSE, ch, NULL, vict, TO_NOTVICT);
 			act("$N is attempting to resurrect you (use 'accept/reject resurrection').", FALSE, vict, NULL, ch, TO_CHAR | TO_NODARK);
 			add_offer(vict, ch, OFFER_RESURRECTION, ABIL_RESURRECT);
 		}
@@ -1307,8 +1364,8 @@ ACMD(do_resurrect) {
 		else {
 			// seems legit...
 			charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
-			act("You begin channeling mana to resurrect $N...", FALSE, ch, NULL, vict, TO_CHAR | TO_NODARK);
-			act("$n glows with white light as $e begins to channel $s mana to resurrect $N...", FALSE, ch, NULL, vict, TO_NOTVICT);
+			act("You begin channeling mana to resurrect $O...", FALSE, ch, NULL, vict, TO_CHAR | TO_NODARK);
+			act("$n glows with white light as $e begins to channel $s mana to resurrect $O...", FALSE, ch, NULL, vict, TO_NOTVICT);
 			act("$N is attempting to resurrect you (use 'accept/reject resurrection').", FALSE, vict, NULL, ch, TO_CHAR | TO_NODARK);
 			add_offer(vict, ch, OFFER_RESURRECTION, ABIL_RESURRECT);
 		}

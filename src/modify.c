@@ -705,11 +705,13 @@ void parse_action(int command, char *string, descriptor_data *d) {
 			}
 			else if ((total_len = ((strlen(t) - strlen(s)) + strlen(*d->str))) <= d->max_str) {
 				if ((replaced = replace_str(d->str, s, t, rep_all, d->max_str)) > 0) {
-					sprintf(buf, "Replaced %d occurrence%sof '%s' with '%s'.\r\n", replaced, replaced != 1 ? "s " : " ", s, t);
+					char temp[MAX_STRING_LENGTH];
+					strcpy(temp, show_color_codes(t));
+					sprintf(buf, "Replaced %d occurrence%sof '%s' with '%s'.\r\n", replaced, replaced != 1 ? "s " : " ", show_color_codes(s), temp);
 					SEND_TO_Q(buf, d);
 				}
 				else if (replaced == 0) {
-					 sprintf(buf, "String '%s' not found.\r\n", s);
+					 sprintf(buf, "String '%s' not found.\r\n", show_color_codes(s));
 					 SEND_TO_Q(buf, d);
 				 }
 				else

@@ -56,6 +56,7 @@ trench_initial_value -500
 * City configs
 bonus_city_point_techs 10
 bonus_city_point_wealth 4000
+cities_on_newbie_islands 0
 city_trait_radius 100
 disrepair_limit 10
 disrepair_limit_unfinished 2
@@ -118,6 +119,7 @@ blood_starvation_level 20
 default_map_size 7
 idle_linkdead_rent_time 5
 idle_rent_time 20
+max_capitals_in_name 2
 max_map_size 12
 max_player_attribute 15
 num_bonus_trait_daily_skills 5
@@ -125,7 +127,6 @@ num_daily_skill_points 15
 obj_file_timeout 365
 offer_time 75
 pool_bonus_amount 15
-recent_level_minutes 15
 remove_lore_after_years 2
 *
 * Skills configs
@@ -180,6 +181,7 @@ interlink_distance 4
 interlink_mountain_limit 1
 interlink_river_limit 0
 nearby_sector_distance 2
+newbie_adventure_cap 25
 ocean_pool_size 1000
 tropics_percent 35.000000
 water_crop_distance 4

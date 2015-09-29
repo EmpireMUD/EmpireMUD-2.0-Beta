@@ -49,6 +49,7 @@ void show_bonus_trait_menu(char_data *ch);
 
 ACMD(do_abandon);
 ACMD(do_accept);
+ACMD(do_addnotes);
 ACMD(do_admin_util);
 ACMD(do_advance);
 ACMD(do_adventure);
@@ -413,7 +414,6 @@ ACMD(do_warehouse);
 ACMD(do_weaken);
 ACMD(do_wear);
 ACMD(do_weather);
-ACMD(do_weave);
 ACMD(do_where);
 ACMD(do_whereami);
 ACMD(do_who);
@@ -435,6 +435,7 @@ ACMD(do_mkill);
 ACMD(do_mjunk);
 ACMD(do_mdoor);
 ACMD(do_mechoaround);
+ACMD(do_mechoneither);
 ACMD(do_msend);
 ACMD(do_mecho);
 ACMD(do_mload);
@@ -515,6 +516,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "at", POS_DEAD, do_at, LVL_START_IMM, CTYPE_IMMORTAL ),
 	SCMD_CMD( "accept", POS_DEAD, do_accept, NO_MIN, CTYPE_UTIL, SCMD_ACCEPT ),
 	SIMPLE_CMD( "adventure", POS_RESTING, do_adventure, NO_MIN, CTYPE_UTIL ),
+	GRANT_CMD( "addnotes", POS_STANDING, do_addnotes, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_EDITNOTES ),
 	GRANT_CMD( "advance", POS_DEAD, do_advance, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_ADVANCE ),
 	SIMPLE_CMD( "alias", POS_DEAD, do_alias, NO_MIN, CTYPE_UTIL ),
 	ABILITY_CMD( "alacrity", POS_RESTING, do_alacrity, NO_MIN, CTYPE_SKILL, ABIL_ALACRITY ),
@@ -645,7 +647,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "edelete", POS_DEAD, do_edelete, LVL_CIMPL, GRANT_EMPIRES, NO_SCMD, CTYPE_EMPIRE, CMD_NO_ABBREV, NO_ABIL ),
 
 	SCMD_CMD( "fill", POS_STANDING, do_pour, NO_MIN, CTYPE_UTIL, SCMD_FILL ),
-	ABILITY_CMD( "familiar", POS_STANDING, do_familiar, NO_MIN, CTYPE_SKILL, ABIL_FAMILIAR ),
+	SIMPLE_CMD( "familiar", POS_STANDING, do_familiar, NO_MIN, CTYPE_SKILL ),
 	SIMPLE_CMD( "feed", POS_STANDING, do_feed, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "file", POS_DEAD, do_file, LVL_START_IMM, CTYPE_IMMORTAL ),
 	STANDARD_CMD( "fillin", POS_STANDING, do_fillin, LVL_APPROVED, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
@@ -903,7 +905,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "tellhistory", POS_DEAD, do_history, NO_MIN, CTYPE_COMM, CHANNEL_HISTORY_TELLS ),
 	ABILITY_CMD( "terrify", POS_FIGHTING, do_terrify, NO_MIN, CTYPE_COMBAT, ABIL_TERRIFY ),
 	SIMPLE_CMD( "territory", POS_DEAD, do_territory, LVL_APPROVED, CTYPE_EMPIRE ),
-	SIMPLE_CMD( "throw", POS_FIGHTING, do_throw, LVL_APPROVED, CTYPE_COMBAT ),
+	STANDARD_CMD( "throw", POS_FIGHTING, do_throw, LVL_APPROVED, NO_GRANTS, NO_SCMD, CTYPE_COMBAT, CMD_NO_ANIMALS, NO_ABIL ),
 	STANDARD_CMD( "thaw", POS_DEAD, do_wizutil, LVL_CIMPL, GRANT_FREEZE, SCMD_THAW, CTYPE_IMMORTAL, CMD_NO_ANIMALS, NO_ABIL ),
 	SCMD_CMD( "tie", POS_STANDING, do_tie, NO_MIN, CTYPE_COMBAT, FALSE ),
 	SIMPLE_CMD( "time", POS_DEAD, do_time, NO_MIN, CTYPE_UTIL ),
@@ -944,7 +946,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "wear", POS_RESTING, do_wear, NO_MIN, CTYPE_UTIL ),
 	ABILITY_CMD( "weaken", POS_FIGHTING, do_weaken, NO_MIN, CTYPE_COMBAT, ABIL_WEAKEN ),
 	SIMPLE_CMD( "weather", POS_RESTING, do_weather, NO_MIN, CTYPE_UTIL ),
-	STANDARD_CMD( "weave", POS_STANDING, do_weave, LVL_APPROVED, NO_GRANTS, NO_SCMD, CTYPE_EMPIRE, CMD_NO_ANIMALS, NO_ABIL ),
+	STANDARD_CMD( "weave", POS_STANDING, do_gen_craft, LVL_APPROVED, NO_GRANTS, CRAFT_TYPE_WEAVE, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	STANDARD_CMD( "who", POS_DEAD, do_who, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_COMM, CMD_STAY_HIDDEN, NO_ABIL ),
 	STANDARD_CMD( "whois", POS_DEAD, do_whois, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_COMM, CMD_STAY_HIDDEN, NO_ABIL ),
 	SIMPLE_CMD( "where", POS_RESTING, do_where, NO_MIN, CTYPE_COMM ),
@@ -977,6 +979,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "mdoor", POS_DEAD, do_mdoor, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
 	STANDARD_CMD( "mecho", POS_DEAD, do_mecho, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
 	STANDARD_CMD( "mechoaround", POS_DEAD, do_mechoaround, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
+	STANDARD_CMD( "mechoneither", POS_DEAD, do_mechoneither, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
 	STANDARD_CMD( "msend", POS_DEAD, do_msend, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
 	STANDARD_CMD( "mload", POS_DEAD, do_mload, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
 	STANDARD_CMD( "mpurge", POS_DEAD, do_mpurge, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
@@ -2007,6 +2010,8 @@ int perform_dupe_check(descriptor_data *d) {
 			break;
 	}
 	
+	MXPSendTag(d, "<VERSION>");
+	
 	// guarantee echo is on -- no, this could lead to an echo loop
 	// ProtocolNoEcho(d, false);
 
@@ -2016,10 +2021,23 @@ int perform_dupe_check(descriptor_data *d) {
 
 // basic name validation and processing
 int _parse_name(char *arg, char *name) {
-	int i;
+	int i, iter, caps;
+	int max_caps = config_get_int("max_capitals_in_name");
 
 	/* skip whitespaces */
 	for (; isspace(*arg); arg++);
+	
+	if (max_caps > 0) {
+		caps = 0;
+		for (iter = 0; iter < strlen(arg); ++iter) {
+			if (isupper(arg[iter])) {
+				++caps;
+			}
+		}
+		if (caps > max_caps) {
+			return 1;
+		}
+	}
 	
 	// don't allow leading apostrophe or dash
 	if (*arg == '\'' || *arg == '-') {
@@ -2267,7 +2285,6 @@ void nanny(descriptor_data *d, char *arg) {
 				}
 
 				send_motd(d);
-				
 				MXPSendTag(d, "<VERSION>");
 				
 				/* Check bad passwords */
@@ -2447,6 +2464,8 @@ void nanny(descriptor_data *d, char *arg) {
 			init_player(d->character);
 			SAVE_CHAR(d->character);
 			send_motd(d);
+			MXPSendTag(d, "<VERSION>");
+			
 			SEND_TO_Q("\r\n*** Press ENTER: ", d);
 			STATE(d) = CON_RMOTD;
 
@@ -2648,6 +2667,8 @@ void nanny(descriptor_data *d, char *arg) {
 
 				// and send them to the motd
 				send_motd(d);
+				MXPSendTag(d, "<VERSION>");
+				
 				SEND_TO_Q("\r\n*** Press ENTER: ", d);
 				STATE(d) = CON_RMOTD;
 			}
