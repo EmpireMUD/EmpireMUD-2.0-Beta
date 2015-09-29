@@ -79,6 +79,7 @@ A small phoenix alights on its master's shoulder.
 ~
 100 0 dno cfm
 0 0 2 10
+T 509
 S
 #510
 shadow scorpion familiar~
@@ -87,6 +88,7 @@ Something is casting the shadow of a scorpion on the ground!
 ~
 100 0 dno cfm
 0 0 9 10
+T 510
 S
 #511
 shadow owl familiar~
@@ -95,6 +97,7 @@ Something is casting the shadow of an owl on the ground!
 ~
 100 0 dno cfm
 0 0 9 10
+T 511
 S
 #512
 basilisk familiar~
@@ -103,6 +106,7 @@ A basilisk curls around its master and hisses.
 ~
 100 0 dno cfm
 0 0 0 10
+T 512
 S
 #513
 salamander familiar~
@@ -111,6 +115,7 @@ A large salamander is smoldering at its master's feet.
 ~
 100 0 dno cfm
 0 0 0 10
+T 513
 S
 #514
 hulk skeletal familiar~
@@ -127,5 +132,6 @@ A banshee hovers at her master's side.
 ~
 100 0 dno cfm
 2 0 2 10
+T 515
 S
 $
