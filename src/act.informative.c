@@ -2223,6 +2223,11 @@ ACMD(do_nearby) {
 		return;
 	}
 	
+	if (RMT_FLAGGED(IN_ROOM(ch), RMT_NO_LOCATION)) {
+		msg_to_char(ch, "You can't use nearby from here.\r\n");
+		return;
+	}
+	
 	size = snprintf(buf, sizeof(buf), "You find nearby:\r\n");
 
 	// check starting locations

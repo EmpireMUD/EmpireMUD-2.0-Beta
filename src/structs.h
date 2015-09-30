@@ -343,6 +343,7 @@ typedef struct trig_data trig_data;
 #define RMT_NEED_BOAT  BIT(5)	// f. requires a boat
 #define RMT_NO_TELEPORT  BIT(6)	// g. cannot teleport in/out
 #define RMT_LOOK_OUT  BIT(7)	// h. can see the map using "look out"
+#define RMT_NO_LOCATION  BIT(8)	// i. don't show a location, disables where
 
 
  //////////////////////////////////////////////////////////////////////////////

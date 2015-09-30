@@ -161,6 +161,7 @@ const char *room_template_flags[] = {
 	"NEED-BOAT",
 	"!TELEPORT",
 	"LOOK-OUT",
+	"!LOCATION",
 	"\n"
 };
 

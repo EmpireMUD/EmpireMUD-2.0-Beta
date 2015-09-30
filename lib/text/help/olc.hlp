@@ -2986,6 +2986,7 @@ The following room template flags are available:
  NEED-BOAT - Requires a boat, swimming, or fly.
  !TELEPORT - Cannot teleport in or out.
  LOOK-OUT - can see the map using "look out"
+ !LOCATION - no location shown; disables "where"
 
 See also: OLC ROOM TEMPLATES
 #d

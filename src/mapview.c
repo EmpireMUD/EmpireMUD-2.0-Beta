@@ -559,7 +559,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		
 		sprintf(output, "[%d] %s%s %s&0 %s[ %s]\r\n", GET_ROOM_VNUM(room), get_room_name(room, TRUE), shipbuf, locbuf, (SCRIPT(room) ? "[TRIG] " : ""), flagbuf);
 	}
-	else if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
+	else if (HAS_ABILITY(ch, ABIL_NAVIGATION) && !RMT_FLAGGED(IN_ROOM(ch), RMT_NO_LOCATION)) {
 		// need navigation to see coords
 		sprintf(output, "%s%s %s&0\r\n", get_room_name(room, TRUE), shipbuf, locbuf);
 	}
@@ -1697,6 +1697,7 @@ void perform_mortal_where(char_data *ch, char *arg) {
 	extern struct instance_data *find_instance_by_room(room_data *room);
 	
 	int check_x, check_y, closest, dir, dist, max_distance;
+	struct instance_data *ch_inst, *i_inst;
 	descriptor_data *d;
 	char_data *i, *found = NULL;
 	
@@ -1718,9 +1719,19 @@ void perform_mortal_where(char_data *ch, char *arg) {
 				continue;
 			if ((dist = compute_distance(IN_ROOM(ch), IN_ROOM(i))) > max_distance)
 				continue;
-			if (IS_ADVENTURE_ROOM(IN_ROOM(i)) && find_instance_by_room(IN_ROOM(ch)) != find_instance_by_room(IN_ROOM(i))) {
-				// not in same adventure
-				continue;
+			
+			ch_inst = find_instance_by_room(IN_ROOM(ch));
+			i_inst = find_instance_by_room(IN_ROOM(i));
+			if (ch_inst != i_inst || IS_ADVENTURE_ROOM(IN_ROOM(i)) != !IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
+				// not in same adventure...
+				if (RMT_FLAGGED(IN_ROOM(ch), RMT_NO_LOCATION) || RMT_FLAGGED(IN_ROOM(i), RMT_NO_LOCATION)) {
+					// one or the other is set no-location
+					continue;
+				}
+				if (ADVENTURE_FLAGGED(i_inst->adventure, ADV_NO_NEARBY)) {
+					// target's adventure is !nearby
+					continue;
+				}
 			}
 			if (HAS_ABILITY(i, ABIL_NO_TRACE) && IS_OUTDOORS(i)) {
 				gain_ability_exp(i, ABIL_NO_TRACE, 10);
@@ -1738,7 +1749,7 @@ void perform_mortal_where(char_data *ch, char *arg) {
 				check_x = X_COORD(IN_ROOM(i));	// not all locations are on the map
 				check_y = Y_COORD(IN_ROOM(i));
 				
-				if (CHECK_MAP_BOUNDS(check_x, check_y)) {
+				if (CHECK_MAP_BOUNDS(check_x, check_y) && !RMT_FLAGGED(IN_ROOM(i), RMT_NO_LOCATION)) {
 					msg_to_char(ch, "%-20s - (%*d, %*d) %s, %d tile%s %s\r\n", PERS(i, ch, 0), X_PRECISION, check_x, Y_PRECISION, check_y, get_room_name(IN_ROOM(i), FALSE), dist, PLURAL(dist), (dir != NO_DIR ? dirs[dir] : "away"));
 				}
 				else {
@@ -1761,9 +1772,19 @@ void perform_mortal_where(char_data *ch, char *arg) {
 				continue;
 			if ((dist = compute_distance(IN_ROOM(ch), IN_ROOM(i))) > max_distance)
 				continue;
-			if (IS_ADVENTURE_ROOM(IN_ROOM(i)) && find_instance_by_room(IN_ROOM(ch)) != find_instance_by_room(IN_ROOM(i))) {
-				// not in same adventure
-				continue;
+				
+			ch_inst = find_instance_by_room(IN_ROOM(ch));
+			i_inst = find_instance_by_room(IN_ROOM(i));
+			if (i_inst != ch_inst || find_instance_by_room(IN_ROOM(ch)) != find_instance_by_room(IN_ROOM(i))) {
+				// not in same adventure...
+				if (RMT_FLAGGED(IN_ROOM(ch), RMT_NO_LOCATION) || RMT_FLAGGED(IN_ROOM(i), RMT_NO_LOCATION)) {
+					// one or the other is set no-location
+					continue;
+				}
+				if (ADVENTURE_FLAGGED(i_inst->adventure, ADV_NO_NEARBY)) {
+					// target's adventure is !nearby
+					continue;
+				}
 			}
 			if (HAS_ABILITY(i, ABIL_NO_TRACE) && IS_OUTDOORS(i)) {
 				gain_ability_exp(i, ABIL_NO_TRACE, 10);
@@ -1788,7 +1809,7 @@ void perform_mortal_where(char_data *ch, char *arg) {
 			if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
 				check_x = X_COORD(IN_ROOM(found));	// not all locations are on the map
 				check_y = Y_COORD(IN_ROOM(found));
-				if (CHECK_MAP_BOUNDS(check_x, check_y)) {
+				if (CHECK_MAP_BOUNDS(check_x, check_y) && !RMT_FLAGGED(IN_ROOM(found), RMT_NO_LOCATION)) {
 					msg_to_char(ch, "%-25s - (%*d, %*d) %s, %d tile%s %s\r\n", PERS(found, ch, FALSE), X_PRECISION, check_x, Y_PRECISION, check_y, get_room_name(IN_ROOM(found), FALSE), closest, PLURAL(closest), (dir != NO_DIR ? dirs[dir] : "away"));
 				}
 				else {
@@ -1966,7 +1987,7 @@ ACMD(do_exits) {
 					if (IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
 						sprintf(buf2 + strlen(buf2), "[%d] %s %s\r\n", GET_ROOM_VNUM(to_room), get_room_name(to_room, FALSE), coords);
 					}
-					else if (HAS_ABILITY(ch, ABIL_NAVIGATION) && (HOME_ROOM(to_room) == to_room || !ROOM_IS_CLOSED(to_room)) && X_COORD(to_room) >= 0) {
+					else if (HAS_ABILITY(ch, ABIL_NAVIGATION) && !RMT_FLAGGED(to_room, RMT_NO_LOCATION) && (HOME_ROOM(to_room) == to_room || !ROOM_IS_CLOSED(to_room)) && X_COORD(to_room) >= 0) {
 						sprintf(buf2 + strlen(buf2), "%s %s\r\n", get_room_name(to_room, FALSE), coords);
 					}
 					else {
