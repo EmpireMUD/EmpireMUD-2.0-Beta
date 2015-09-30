@@ -574,7 +574,7 @@ void SoundSend(descriptor_t *apDescriptor, const char *apTrigger);
  * 
  * If you wish to embed colours in strings, use ProtocolOutput().
  */
-const char *ColourRGB(descriptor_t *apDescriptor, const char *apRGB);
+const char *ColourRGB(descriptor_t *apDescriptor, const char *apRGB, const char *ansiBackup);
 
 /******************************************************************************
  Unicode (UTF-8 conversion) functions.
