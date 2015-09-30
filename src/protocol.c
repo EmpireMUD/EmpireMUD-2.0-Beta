@@ -2919,23 +2919,22 @@ static char *GetMxpTag(const char *apTag, const char *apText) {
  *****************************************************************************/
 
 static const char *GetAnsiColour(bool_t abBackground, int aRed, int aGreen, int aBlue) {
-	if (aRed == aGreen && aRed == aBlue && aRed < 2)
+	if ( aRed == aGreen && aRed == aBlue && aRed < 2)
 		return abBackground ? s_BackBlack : aRed >= 1 ? s_BoldBlack : s_DarkBlack;
-	else if (aRed == aGreen && aRed == aBlue)
+	else if ( aRed == aGreen && aRed == aBlue )
 		return abBackground ? s_BackWhite : aRed >= 4 ? s_BoldWhite : s_DarkWhite;
-	else if (aRed > aGreen && aRed > aBlue)
-		return abBackground ? s_BackRed : aRed >= 4 ? s_BoldRed : s_DarkRed;
-	else if (aRed == aGreen && aRed > aBlue)
-		return abBackground ? s_BackYellow : aRed >= 4 ? s_BoldYellow : s_DarkYellow;
-	else if (aRed == aBlue && aRed > aGreen)
-		return abBackground ? s_BackMagenta : aRed >= 4 ? s_BoldMagenta : s_DarkMagenta;
-	else if (aGreen > aBlue)
-		return abBackground ? s_BackGreen : aGreen >= 4 ? s_BoldGreen : s_DarkGreen;
-	else if (aGreen == aBlue)
-		return abBackground ? s_BackCyan : aGreen >= 4 ? s_BoldCyan : s_DarkCyan;
-	else {	// aBlue is the highest
-		return abBackground ? s_BackBlue : aBlue >= 4 ? s_BoldBlue : s_DarkBlue;
-	}
+	else if ( aRed > aGreen && aRed > aBlue )
+		return abBackground ? s_BackRed : aRed >= 3 ? s_BoldRed : s_DarkRed;
+	else if ( aRed == aGreen && aRed > aBlue )
+		return abBackground ? s_BackYellow : aRed >= 3 ? s_BoldYellow : s_DarkYellow;
+	else if ( aRed == aBlue && aRed > aGreen )
+		return abBackground ? s_BackMagenta : aRed >= 3 ? s_BoldMagenta : s_DarkMagenta;
+	else if ( aGreen > aBlue )
+		return abBackground ? s_BackGreen : aGreen >= 3 ? s_BoldGreen : s_DarkGreen;
+	else if ( aGreen == aBlue )
+		return abBackground ? s_BackCyan : aGreen >= 3 ? s_BoldCyan : s_DarkCyan;
+	else /* aBlue is the highest */
+		return abBackground ? s_BackBlue : aBlue >= 3 ? s_BoldBlue : s_DarkBlue;
 }
 
 static const char *GetRGBColour(bool_t abBackground, int aRed, int aGreen, int aBlue) {
