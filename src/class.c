@@ -46,6 +46,7 @@ const struct class_data_type class_data[NUM_CLASSES] = {
 		{
 			{ ROLE_TANK, { ABIL_DRAGONRIDING, ABIL_NOBLE_BEARING, ROLE_ABIL_END } },
 			{ ROLE_MELEE, { ABIL_DRAGONRIDING, ABIL_TWO_HANDED_WEAPONS, ROLE_ABIL_END } },
+			{ ROLE_UTILITY, { ABIL_DRAGONRIDING, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
@@ -76,6 +77,7 @@ const struct class_data_type class_data[NUM_CLASSES] = {
 	{ "Steelsmith", "Smth", { SKILL_BATTLE, SKILL_TRADE },  { 300, 200, 100, 0 },
 		{
 			{ ROLE_MELEE, { ABIL_STEELSMITH_CRAFTS, ABIL_TWO_HANDED_WEAPONS, ROLE_ABIL_END } },
+			{ ROLE_UTILITY, { ABIL_STEELSMITH_CRAFTS, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
@@ -89,6 +91,7 @@ const struct class_data_type class_data[NUM_CLASSES] = {
 	{ "Exarch", "Exrc", { SKILL_EMPIRE, SKILL_HIGH_SORCERY },  { 150, 150, 300, 0 },
 		{
 			{ ROLE_CASTER, { ABIL_DRAGONRIDING, ABIL_EXARCH_CRAFTS, ROLE_ABIL_END } },
+			{ ROLE_UTILITY, { ABIL_DRAGONRIDING, ABIL_EXARCH_CRAFTS, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
@@ -96,6 +99,7 @@ const struct class_data_type class_data[NUM_CLASSES] = {
 		{
 			{ ROLE_CASTER, { ABIL_DRAGONRIDING, ABIL_GRIFFIN, ABIL_MANTICORE, ABIL_RESURRECT, ROLE_ABIL_END } },
 			{ ROLE_HEALER, { ABIL_ANCESTRAL_HEALING, ABIL_DRAGONRIDING, ABIL_FASTCASTING, ABIL_GRIFFIN, ABIL_MANTICORE, ABIL_RESURRECT, ROLE_ABIL_END } },
+			{ ROLE_UTILITY, { ABIL_DRAGONRIDING, ABIL_GRIFFIN, ABIL_MANTICORE, ABIL_RESURRECT, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
@@ -108,18 +112,20 @@ const struct class_data_type class_data[NUM_CLASSES] = {
 	{ "Elder", "Eldr", { SKILL_EMPIRE, SKILL_SURVIVAL },  { 200, 200, 200, 0 },
 		{
 			{ ROLE_MELEE, { ABIL_DRAGONRIDING, ROLE_ABIL_END } },
+			{ ROLE_UTILITY, { ABIL_DRAGONRIDING, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
 	{ "Guildsman", "Gdsm", { SKILL_EMPIRE, SKILL_TRADE },  { 200, 200, 200, 0 },
 		{
-			{ ROLE_MELEE, { ABIL_DRAGONRIDING, ABIL_GUILDSMAN_CRAFTS, ROLE_ABIL_END } },
+			{ ROLE_UTILITY, { ABIL_DRAGONRIDING, ABIL_GUILDSMAN_CRAFTS, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
 	{ "Ancient", "Anct", { SKILL_EMPIRE, SKILL_VAMPIRE },  { 200, 200, 200, 0 },
 		{
 			{ ROLE_MELEE, { ABIL_DRAGONRIDING, ROLE_ABIL_END } },
+			{ ROLE_UTILITY, { ABIL_DRAGONRIDING, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
@@ -137,11 +143,15 @@ const struct class_data_type class_data[NUM_CLASSES] = {
 		}
 	},
 	{ "Theurge", "Thrg", { SKILL_HIGH_SORCERY, SKILL_SURVIVAL },  { 200, 100, 300, 0 },
-		{ ROLE_LIST_END }
+		{
+			{ ROLE_UTILITY, { ROLE_ABIL_END } },
+			ROLE_LIST_END
+		}
 	},
 	{ "Artificer", "Artf", { SKILL_HIGH_SORCERY, SKILL_TRADE },  { 150, 150, 300, 0 },
 		{
 			{ ROLE_CASTER, { ABIL_ARTIFICER_CRAFTS, ROLE_ABIL_END } },
+			{ ROLE_UTILITY, { ABIL_ARTIFICER_CRAFTS, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
@@ -168,6 +178,7 @@ const struct class_data_type class_data[NUM_CLASSES] = {
 	{ "Alchemist", "Alch", { SKILL_NATURAL_MAGIC, SKILL_TRADE },  { 150, 150, 300, 0 },
 		{
 			{ ROLE_HEALER, { ABIL_ALCHEMIST_CRAFTS, ABIL_FASTCASTING, ABIL_RESURRECT, ABIL_SALAMANDER, ROLE_ABIL_END } },
+			{ ROLE_UTILITY, { ABIL_ALCHEMIST_CRAFTS, ABIL_RESURRECT, ABIL_SALAMANDER, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
@@ -187,6 +198,7 @@ const struct class_data_type class_data[NUM_CLASSES] = {
 	{ "Smuggler", "Smgl", { SKILL_STEALTH, SKILL_TRADE },  { 200, 300, 100, 0 },
 		{
 			{ ROLE_MELEE, { ABIL_DIVERSION, ABIL_DUAL_WIELD, ABIL_SMUGGLER_CRAFTS, ROLE_ABIL_END } },
+			{ ROLE_UTILITY, { ABIL_SMUGGLER_CRAFTS, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
@@ -199,6 +211,7 @@ const struct class_data_type class_data[NUM_CLASSES] = {
 	{ "Tinker", "Tnkr", { SKILL_SURVIVAL, SKILL_TRADE },  { 250, 250, 100, 0 },
 		{
 			{ ROLE_MELEE, { ABIL_TINKER_CRAFTS, ROLE_ABIL_END } },
+			{ ROLE_UTILITY, { ABIL_TINKER_CRAFTS, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
@@ -211,6 +224,7 @@ const struct class_data_type class_data[NUM_CLASSES] = {
 	{ "Antiquarian", "Antq", { SKILL_TRADE, SKILL_VAMPIRE },  { 200, 200, 200, 0 },
 		{
 			{ ROLE_MELEE, { ABIL_ANTIQUARIAN_CRAFTS, ROLE_ABIL_END } },
+			{ ROLE_UTILITY, { ABIL_ANTIQUARIAN_CRAFTS, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	}
@@ -223,7 +237,8 @@ const char *class_role[NUM_ROLES] = {
 	"Tank",
 	"Melee",
 	"Caster",
-	"Healer"
+	"Healer",
+	"Utility"
 };
 
 
@@ -233,7 +248,8 @@ const char *class_role_color[NUM_ROLES] = {
 	"\ty",	// tank
 	"\tr",	// melee
 	"\ta",	// caster
-	"\tj"	// healer
+	"\tj",	// healer
+	"\tm"	// utility
 };
 
 

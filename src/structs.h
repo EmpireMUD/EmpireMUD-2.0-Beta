@@ -1343,7 +1343,8 @@ typedef struct trig_data trig_data;
 #define ROLE_MELEE  2
 #define ROLE_CASTER  3
 #define ROLE_HEALER  4
-#define NUM_ROLES  5
+#define ROLE_UTILITY  5
+#define NUM_ROLES  6
 
 
 // summon types for oval_summon, ofin_summon, and add_offer
