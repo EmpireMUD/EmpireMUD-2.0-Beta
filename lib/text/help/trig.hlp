@@ -1271,9 +1271,12 @@ TRIGEDIT-ROOM-COMMAND
 Activates when commands are performed in the room.
 Does not work for immortals with !hassle.
 
-Numeric Arg : not used.
-Argument    : text which must be part of the command typed to filter out 
-              uninteresting commands.
+String: The command to catch. If you are using a real game command, put the
+   entire word in here; the trigger will also match abbreviations. If you are
+   instead adding a new command, it will only work if the player types an exact
+   match OR the player abbreviates your command with something that isn't an
+   abbreviation for a real command ("c" abbreviates the real command "chop", 
+   not a script command like "canoodle").
 
 If 0 is returned by the trigger, character will receive the same message as 
 if the trigger did not exist, and any other command triggers will be checked.
@@ -1392,9 +1395,12 @@ TRIGEDIT-MOB-COMMAND
 Activates when commands are performed in the same room as the mobile.
 Does not work for immortals with !hassle.
 
-Numeric Arg : not used.
-Argument    : text which must be part of the command typed to filter out 
-              uninteresting commands.
+String: The command to catch. If you are using a real game command, put the
+   entire word in here; the trigger will also match abbreviations. If you are
+   instead adding a new command, it will only work if the player types an exact
+   match OR the player abbreviates your command with something that isn't an
+   abbreviation for a real command ("c" abbreviates the real command "chop", 
+   not a script command like "canoodle").
 
 If 0 is returned by the trigger, character will receive the same message as 
 if the trigger did not exist, and any other command triggers will be checked.
@@ -1618,15 +1624,13 @@ TRIGEDIT-OBJ-COMMAND TRIGEDIT-OBJECT-COMMAND TRIG-OBJ-COMMAND
 Activates when commands are performed in the same room as the object.
 Does not work for immortals with !hassle.
 
-Numeric Arg : a bitfield to indicate where the object must be in order to cause 
-              the trigger to activate. 
-              Bits: 1: In character's worn equipment.
-                    2: In character's carried inventory.
-                    4: In same room with the character.
-                       These bits can be set at once by adding the values.
-                       7= worn, inv, room. 3 = worn, inv. 5 = worn, room.
-Argument    : text which must be part of the command typed to filter out 
-              uninteresting commands.
+Location: Where the item must be in order to trigger (inventory, worn, room).
+String: The command to catch. If you are using a real game command, put the
+   entire word in here; the trigger will also match abbreviations. If you are
+   instead adding a new command, it will only work if the player types an exact
+   match OR the player abbreviates your command with something that isn't an
+   abbreviation for a real command ("c" abbreviates the real command "chop", 
+   not a script command like "canoodle").
 
 If 0 is returned by the trigger, character will receive the same message as 
 if the trigger did not exist, and any other command triggers will be checked.
