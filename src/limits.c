@@ -79,6 +79,11 @@ void check_attribute_gear(char_data *ch) {
 		return;
 	}
 	
+	// don't bother if morphed -- let them keep using gear, but not equip any more
+	if (GET_MORPH(ch) != MORPH_NONE) {
+		return;
+	}
+	
 	// ensure work to do (shortcut)
 	found = FALSE;
 	for (iter = 0; primary_attributes[iter] != NOTHING; ++iter) {
