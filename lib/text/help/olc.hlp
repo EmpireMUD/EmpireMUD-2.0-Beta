@@ -901,7 +901,7 @@ craft recipe editor to create a new building recipe for the upgraded building,
 and mark it as UPGRADE. This building will only need a regular craft recipe,
 and only if it's buildable.
 
-See also: OLC BUILDINGS, UPGRADE, VNUM	
+See also: OLC BUILDINGS, UPGRADE, VNUM
 #d
 "CEDIT ABILITY"
 
