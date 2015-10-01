@@ -365,7 +365,7 @@ OCMD(do_otransform) {
 	else if (!isdigit(*arg)) 
 		obj_log(obj, "otransform: bad argument");
 	else {
-		o = read_object(atoi(arg));
+		o = read_object(atoi(arg), TRUE);
 		if (o == NULL) {
 			obj_log(obj, "otransform: bad object vnum");
 			return;
@@ -677,7 +677,7 @@ OCMD(do_dgoload) {
 	}
 
 	if (is_abbrev(arg1, "mob")) {
-		if ((mob = read_mobile(number)) == NULL) {
+		if ((mob = read_mobile(number, TRUE)) == NULL) {
 			obj_log(obj, "oload: bad mob vnum");
 			return;
 		}
@@ -695,7 +695,7 @@ OCMD(do_dgoload) {
 		load_mtrigger(mob);
 	}
 	else if (is_abbrev(arg1, "obj")) {
-		if ((object = read_object(number)) == NULL) {
+		if ((object = read_object(number, TRUE)) == NULL) {
 			obj_log(obj, "oload: bad object vnum");
 			return;
 		}
@@ -1018,7 +1018,7 @@ OCMD(do_oat)  {
 		return;
 	}
 
-	object = read_object(GET_OBJ_VNUM(obj));
+	object = read_object(GET_OBJ_VNUM(obj), TRUE);
 	if (!object)
 		return;
 
@@ -1067,7 +1067,7 @@ OCMD(do_oscale) {
 				scale_item_to_level(otarg, level);
 			}
 			else if ((proto = obj_proto(GET_OBJ_VNUM(otarg))) && OBJ_FLAGGED(proto, OBJ_SCALABLE)) {
-				fresh = read_object(GET_OBJ_VNUM(otarg));
+				fresh = read_object(GET_OBJ_VNUM(otarg), TRUE);
 				scale_item_to_level(fresh, level);
 				swap_obj_for_obj(otarg, fresh);
 				if (otarg == obj) {

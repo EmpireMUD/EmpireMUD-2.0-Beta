@@ -1581,7 +1581,7 @@ ACMD(do_portal) {
 	}
 	
 	// portal this side
-	portal = read_object(o_PORTAL);
+	portal = read_object(o_PORTAL, TRUE);
 	GET_OBJ_VAL(portal, VAL_PORTAL_TARGET_VNUM) = GET_ROOM_VNUM(target);
 	GET_OBJ_TIMER(portal) = 5;
 	obj_to_room(portal, IN_ROOM(ch));
@@ -1598,7 +1598,7 @@ ACMD(do_portal) {
 	load_otrigger(portal);
 	
 	// portal other side
-	end = read_object(o_PORTAL);
+	end = read_object(o_PORTAL, TRUE);
 	GET_OBJ_VAL(end, VAL_PORTAL_TARGET_VNUM) = GET_ROOM_VNUM(IN_ROOM(ch));
 	GET_OBJ_TIMER(end) = 5;
 	obj_to_room(end, target);

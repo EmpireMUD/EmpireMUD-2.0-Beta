@@ -1621,7 +1621,7 @@ void perform_npc_tie(char_data *ch, char_data *victim, int subcmd) {
 		act("$n unties you!", FALSE, ch, 0, victim, TO_VICT | TO_SLEEP);
 		act("$n unties $N.", FALSE, ch, 0, victim, TO_NOTVICT);
 		REMOVE_BIT(MOB_FLAGS(victim), MOB_TIED);
-		obj_to_char((rope = read_object(o_ROPE)), ch);
+		obj_to_char((rope = read_object(o_ROPE, TRUE)), ch);
 		load_otrigger(rope);
 	}
 	else if (!MOB_FLAGGED(victim, MOB_ANIMAL)) {

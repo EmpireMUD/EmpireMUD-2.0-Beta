@@ -838,7 +838,7 @@ ACMD(do_familiar) {
 	}
 	
 	charge_ability_cost(ch, MANA, familiars[type].cost, NOTHING, 0, WAIT_SPELL);
-	mob = read_mobile(familiars[type].vnum);
+	mob = read_mobile(familiars[type].vnum, TRUE);
 	if (IS_NPC(ch)) {
 		MOB_INSTANCE_ID(mob) = MOB_INSTANCE_ID(ch);
 	}

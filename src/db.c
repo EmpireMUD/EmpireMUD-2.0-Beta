@@ -1383,12 +1383,14 @@ void clear_char(char_data *ch) {
 
 
 /**
-* Create a new mobile from a prototype.
+* Create a new mobile from a prototype. You should almost always call this with
+* with_triggers = TRUE.
 *
 * @param mob_vnum nr The number to load.
+* @param bool with_triggers If TRUE, attaches all triggers.
 * @return char_data* The instantiated mob.
 */
-char_data *read_mobile(mob_vnum nr) {
+char_data *read_mobile(mob_vnum nr, bool with_triggers) {
 	char_data *mob, *proto;
 	int iter;
 
@@ -1429,8 +1431,10 @@ char_data *read_mobile(mob_vnum nr) {
 	/* find_char helper */
 	add_to_lookup_table(GET_ID(mob), (void *)mob);
 
-	copy_proto_script(proto, mob, MOB_TRIGGER);
-	assign_triggers(mob, MOB_TRIGGER);
+	if (with_triggers) {
+		copy_proto_script(proto, mob, MOB_TRIGGER);
+		assign_triggers(mob, MOB_TRIGGER);
+	}
 
 	return (mob);
 }
@@ -1477,12 +1481,14 @@ obj_data *create_obj(void) {
 
 
 /**
-* Create a new object from a prototype..
+* Create a new object from a prototype. You should almost always call this with
+* with_triggers = TRUE.
 *
 * @param obj_vnum nr The object vnum to load.
+* @param bool with_triggers If TRUE, attaches all triggers.
 * @return obj_data* The instantiated item.
 */
-obj_data *read_object(obj_vnum nr) {
+obj_data *read_object(obj_vnum nr, bool with_triggers) {
 	obj_data *obj, *proto;
 	
 	if (!(proto = obj_proto(nr))) {
@@ -1504,8 +1510,10 @@ obj_data *read_object(obj_vnum nr) {
 	/* find_obj helper */
 	add_to_lookup_table(GET_ID(obj), (void *)obj);
 	
-	copy_proto_script(proto, obj, OBJ_TRIGGER);
-	assign_triggers(obj, OBJ_TRIGGER);
+	if (with_triggers) {
+		copy_proto_script(proto, obj, OBJ_TRIGGER);
+		assign_triggers(obj, OBJ_TRIGGER);
+	}
 
 	return (obj);
 }

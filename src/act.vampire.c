@@ -820,7 +820,7 @@ ACMD(do_bloodsword) {
 	}
 	
 	charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
-	obj = read_object(o_BLOODSWORD);
+	obj = read_object(o_BLOODSWORD, TRUE);
 	
 	if (IS_CLASS_ABILITY(ch, ABIL_BLOODSWORD)) {
 		scale_level = get_approximate_level(ch);

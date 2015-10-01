@@ -1419,7 +1419,7 @@ void start_new_character(char_data *ch) {
 				continue;
 			}
 			
-			obj = read_object(archetype[type].gear[iter].vnum);
+			obj = read_object(archetype[type].gear[iter].vnum, TRUE);
 			scale_item_to_level(obj, 1);	// lowest possible scale
 			
 			if (archetype[type].gear[iter].wear == NOWHERE) {
@@ -1431,23 +1431,23 @@ void start_new_character(char_data *ch) {
 		}
 
 		// misc items
-		obj = read_object(o_GRAVE_MARKER);
+		obj = read_object(o_GRAVE_MARKER, TRUE);
 		scale_item_to_level(obj, 1);	// lowest possible scale
 		obj_to_char(obj, ch);
 		
 		for (iter = 0; iter < 2; ++iter) {
 			// 2 bread
-			obj = read_object(o_BREAD);
+			obj = read_object(o_BREAD, TRUE);
 			scale_item_to_level(obj, 1);	// lowest possible scale
 			obj_to_char(obj, ch);
 			
 			// 2 trinket of conveyance
-			obj = read_object(o_TRINKET_OF_CONVEYANCE);
+			obj = read_object(o_TRINKET_OF_CONVEYANCE, TRUE);
 			scale_item_to_level(obj, 1);	// lowest possible scale
 			obj_to_char(obj, ch);
 		}
 		
-		obj = read_object(o_BOWL);
+		obj = read_object(o_BOWL, TRUE);
 		scale_item_to_level(obj, 1);	// lowest possible scale
 		GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) = GET_DRINK_CONTAINER_CAPACITY(obj);
 		GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = LIQ_WATER;

@@ -384,7 +384,7 @@ INTERACTION_FUNC(light_obj_interact) {
 	
 	for (num = 0; num < interaction->quantity; ++num) {
 		// load
-		new = read_object(vnum);
+		new = read_object(vnum, TRUE);
 		scale_item_to_level(new, GET_OBJ_CURRENT_SCALE_LEVEL(inter_item));
 		
 		// ownership

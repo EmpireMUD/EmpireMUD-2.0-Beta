@@ -171,7 +171,7 @@ INTERACTION_FUNC(pickpocket_interact) {
 	obj_data *obj = NULL;
 	
 	for (iter = 0; iter < interaction->quantity; ++iter) {
-		obj = read_object(interaction->vnum);
+		obj = read_object(interaction->vnum, TRUE);
 		scale_item_to_level(obj, get_approximate_level(inter_mob));
 		obj_to_char(obj, ch);
 		act("You find $p!", FALSE, ch, obj, NULL, TO_CHAR);

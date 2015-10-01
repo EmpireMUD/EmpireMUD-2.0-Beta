@@ -217,7 +217,7 @@ void cancel_gen_craft(char_data *ch) {
 
 		// load the drink container back
 		if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_SOUP)) {
-			obj = read_object(GET_ACTION_VNUM(ch, 1));
+			obj = read_object(GET_ACTION_VNUM(ch, 1), TRUE);
 
 			// just empty it
 			GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) = 0;
@@ -294,7 +294,7 @@ void finish_gen_craft(char_data *ch) {
 	// soup handling
 	if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_SOUP)) {
 		// load the drink container back
-		obj = read_object(GET_ACTION_VNUM(ch, 1));
+		obj = read_object(GET_ACTION_VNUM(ch, 1), TRUE);
 	
 		GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) = MIN(GET_CRAFT_QUANTITY(type), GET_DRINK_CONTAINER_CAPACITY(obj));
 		GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = GET_CRAFT_OBJECT(type);
@@ -324,7 +324,7 @@ void finish_gen_craft(char_data *ch) {
 		if (obj_proto(GET_CRAFT_OBJECT(type))) {
 			for (iter = 0; iter < amt; ++iter) {
 				// load and master it
-				obj = read_object(GET_CRAFT_OBJECT(type));
+				obj = read_object(GET_CRAFT_OBJECT(type), TRUE);
 				if (OBJ_FLAGGED(obj, OBJ_SCALABLE) && master_ability != NO_ABIL && HAS_ABILITY(ch, master_ability)) {
 					applied_master = TRUE;
 					SET_BIT(GET_OBJ_EXTRA(obj), OBJ_SUPERIOR);
@@ -975,7 +975,7 @@ ACMD(do_reforge) {
 			old_timer = GET_OBJ_TIMER(obj);
 			level = GET_OBJ_CURRENT_SCALE_LEVEL(obj);
 			
-			new = read_object(GET_OBJ_VNUM(proto));
+			new = read_object(GET_OBJ_VNUM(proto), TRUE);
 			GET_OBJ_EXTRA(new) |= GET_OBJ_EXTRA(obj) & preserve_flags;
 			
 			// transfer bindings
@@ -1035,7 +1035,7 @@ ACMD(do_reforge) {
 			old_timer = GET_OBJ_TIMER(obj);
 			level = GET_OBJ_CURRENT_SCALE_LEVEL(obj);
 			
-			new = read_object(GET_OBJ_VNUM(proto));
+			new = read_object(GET_OBJ_VNUM(proto), TRUE);
 			GET_OBJ_EXTRA(new) |= GET_OBJ_EXTRA(obj) & preserve_flags;
 			
 			// transfer bindings

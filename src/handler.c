@@ -3461,6 +3461,7 @@ obj_data *copy_warehouse_obj(obj_data *input) {
 	extern struct extra_descr_data *copy_extra_descs(struct extra_descr_data *list);
 
 	obj_data *obj, *proto;
+	trig_data *trig;
 	int iter;
 	
 	if (!input) {
@@ -3472,8 +3473,7 @@ obj_data *copy_warehouse_obj(obj_data *input) {
 	
 	// create dupe
 	if (proto) {
-		obj = read_object(GET_OBJ_VNUM(input));
-		
+		obj = read_object(GET_OBJ_VNUM(input), FALSE);	// no scripts
 	}
 	else {
 		obj = create_obj();
@@ -3482,6 +3482,19 @@ obj_data *copy_warehouse_obj(obj_data *input) {
 	// error in either case?
 	if (!obj) {
 		return NULL;
+	}
+	
+	// copy only existing scripts
+	if (SCRIPT(input)) {
+		if (!SCRIPT(obj)) {
+			CREATE(SCRIPT(obj), struct script_data, 1);
+		}
+
+		for (trig = TRIGGERS(SCRIPT(input)); trig; trig = trig->next) {
+			add_trigger(SCRIPT(obj), read_trigger(GET_TRIG_VNUM(trig)), -1);
+		}
+		
+		// TODO should also copy variables, if they have been made to save to file yet
 	}
 	
 	// pointer copies
@@ -5430,7 +5443,7 @@ bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_da
 		return FALSE;
 	}
 
-	obj = read_object(store->vnum);
+	obj = read_object(store->vnum, TRUE);
 	available = store->amount - 1;	// for later
 	charge_stored_resource(emp, GET_ISLAND_ID(IN_ROOM(ch)), store->vnum, 1);
 

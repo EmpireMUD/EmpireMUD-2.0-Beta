@@ -532,7 +532,7 @@ LIBRARY_SCMD(library_checkout) {
 		msg_to_char(ch, "No such book is shelved here.\r\n");
 	}
 	else {
-		obj = read_object(o_BOOK);
+		obj = read_object(o_BOOK, TRUE);
 		GET_OBJ_VAL(obj, VAL_BOOK_ID) = book->id;
 		obj_to_char_or_room(obj, ch);
 		

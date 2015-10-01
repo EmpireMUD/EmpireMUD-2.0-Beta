@@ -25,6 +25,7 @@
 #include "db.h"
 #include "interpreter.h"
 #include "utils.h"
+#include "dg_scripts.h"
 
 /**
 * Contents:
@@ -101,7 +102,7 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 	
 	// load based on vnum or, if NOTHING, create anonymous object
 	if (proto) {
-		obj = read_object(vnum);
+		obj = read_object(vnum, FALSE);
 	}
 	else {
 		// what we do here depends on input ... if the vnum was real, but no proto, it's a deleted obj
@@ -280,6 +281,14 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 				OBJ_BOUND_TO(obj) = bind;
 			}
 		}
+		else if (OBJ_FILE_TAG(line, "Trigger:", length)) {
+			if (sscanf(line + length + 1, "%d", &i_in[0]) && real_trigger(i_in[0])) {
+				if (!SCRIPT(obj)) {
+					CREATE(SCRIPT(obj), struct script_data, 1);
+				}
+				add_trigger(SCRIPT(obj), read_trigger(i_in[0]), -1);
+			}
+		}
 		
 		// ignore anything else
 		else {
@@ -287,6 +296,7 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 		}
 	}
 	
+	// we were not guaranteed an object
 	if (obj) {
 		ensure_safe_obj(obj);
 	}
@@ -294,7 +304,7 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 	// check versioning: load a new version
 	if (obj && proto && OBJ_VERSION(obj) < OBJ_VERSION(proto) && config_get_bool("auto_update_items")) {
 		// TODO rewrite this as a generic rescale obj function AND make changes to live objects update players in-game (and trading post, einv, and rooms)
-		new = read_object(vnum);
+		new = read_object(vnum, TRUE);
 		GET_OBJ_EXTRA(new) |= GET_OBJ_EXTRA(obj) & (OBJ_SUPERIOR | OBJ_KEEP);
 		if (!OBJ_FLAGGED(new, OBJ_GENERIC_DROP)) {
 			GET_OBJ_EXTRA(new) |= GET_OBJ_EXTRA(obj) & (OBJ_HARD_DROP | OBJ_GROUP_DROP);
@@ -753,6 +763,17 @@ void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location) {
 	// who it's bound to
 	for (bind = OBJ_BOUND_TO(obj); bind; bind = bind->next) {
 		fprintf(fl, "Bound-to: %d\n", bind->idnum);
+	}
+	
+	// scripts
+	if (SCRIPT(obj)) {
+		trig_data *trig;
+		
+		for (trig = TRIGGERS(SCRIPT(obj)); trig; trig = trig->next) {
+			fprintf(fl, "Trigger: %d\n", GET_TRIG_VNUM(trig));
+		}
+		
+		// TODO could save SCRIPT(obj)->global_vars here too
 	}
 	
 	fprintf(fl, "End\n");

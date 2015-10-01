@@ -969,7 +969,7 @@ INTERACTION_FUNC(loot_interact) {
 	scale_level = get_approximate_level(inter_mob);
 	
 	for (iter = 0; iter < interaction->quantity; ++iter) {
-		obj = read_object(interaction->vnum);
+		obj = read_object(interaction->vnum, TRUE);
 		
 		if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
 			// set flags (before scaling)
@@ -1050,7 +1050,7 @@ obj_data *make_corpse(char_data *ch) {
 	int i;
 	bool human = (!IS_NPC(ch) || MOB_FLAGGED(ch, MOB_HUMAN));
 
-	corpse = read_object(o_CORPSE);
+	corpse = read_object(o_CORPSE, TRUE);
 	
 	// store as person's last corpse id
 	if (!IS_NPC(ch)) {
@@ -1107,7 +1107,7 @@ obj_data *make_corpse(char_data *ch) {
 		
 		// rope if it was pulling or tied
 		if (GET_PULLING(ch) || MOB_FLAGGED(ch, MOB_TIED)) {
-			obj_to_obj(read_object(o_ROPE), corpse);
+			obj_to_obj(read_object(o_ROPE, TRUE), corpse);
 		}
 
 		IS_CARRYING_N(ch) = 0;

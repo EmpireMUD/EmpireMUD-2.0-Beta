@@ -4715,7 +4715,7 @@ ACMD(do_load) {
 			send_to_char("There is no monster with that number.\r\n", ch);
 			return;
 		}
-		mob = read_mobile(number);
+		mob = read_mobile(number, TRUE);
 		setup_generic_npc(mob, NULL, NOTHING, NOTHING);
 		char_to_room(mob, IN_ROOM(ch));
 
@@ -4729,7 +4729,7 @@ ACMD(do_load) {
 			send_to_char("There is no object with that number.\r\n", ch);
 			return;
 		}
-		obj = read_object(number);
+		obj = read_object(number, TRUE);
 		if (CAN_WEAR(obj, ITEM_WEAR_TAKE))
 			obj_to_char(obj, ch);
 		else
@@ -5127,7 +5127,8 @@ ACMD(do_rescale) {
 		
 		// item mode
 		if (!OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-			new = read_object(GET_OBJ_VNUM(obj));
+			// TODO should this copy triggers instead of attaching new ones?
+			new = read_object(GET_OBJ_VNUM(obj), TRUE);
 			GET_OBJ_EXTRA(new) |= GET_OBJ_EXTRA(obj) & preserve_flags;
 			
 			// swap binds
@@ -6092,7 +6093,7 @@ ACMD(do_vstat) {
 			send_to_char("There is no monster with that number.\r\n", ch);
 			return;
 		}
-		mob = read_mobile(number);
+		mob = read_mobile(number, TRUE);
 		// put it somewhere, briefly
 		char_to_room(mob, world_table);
 		do_stat_character(ch, mob);
@@ -6103,7 +6104,7 @@ ACMD(do_vstat) {
 			send_to_char("There is no object with that number.\r\n", ch);
 			return;
 		}
-		obj = read_object(number);
+		obj = read_object(number, TRUE);
 		do_stat_object(ch, obj);
 		extract_obj(obj);
 	}

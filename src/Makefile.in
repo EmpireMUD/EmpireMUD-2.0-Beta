@@ -259,7 +259,7 @@ morph.o: morph.c conf.h sysdep.h structs.h uthash.h utils.h comm.h db.h \
   skills.h handler.h interpreter.h dg_scripts.h
 	$(CC) -c $(CFLAGS) morph.c
 objsave.o: objsave.c conf.h sysdep.h structs.h uthash.h comm.h handler.h \
-  db.h interpreter.h utils.h
+  db.h interpreter.h utils.h dg_scripts.h
 	$(CC) -c $(CFLAGS) objsave.c
 olc.adventure.o: olc.adventure.c conf.h sysdep.h structs.h uthash.h \
   utils.h interpreter.h db.h comm.h olc.h skills.h handler.h dg_scripts.h

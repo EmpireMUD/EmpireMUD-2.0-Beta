@@ -1963,7 +1963,7 @@ ACMD(do_barde) {
 				}
 				
 				for (num = 0; num < interact->quantity; ++num) {
-					newmob = read_mobile(interact->vnum);
+					newmob = read_mobile(interact->vnum, TRUE);
 					setup_generic_npc(newmob, GET_LOYALTY(mob), MOB_DYNAMIC_NAME(mob), MOB_DYNAMIC_SEX(mob));
 					char_to_room(newmob, IN_ROOM(ch));
 					MOB_INSTANCE_ID(newmob) = MOB_INSTANCE_ID(ch);
@@ -3544,7 +3544,7 @@ ACMD(do_home) {
 			HASH_ITER(interior_hh, interior_world_table, iter, next_iter) {
 				// TODO consider a trigger like RoomUpdate that passes a var like %update% == homeset
 				if (HOME_ROOM(iter) == real && BUILDING_VNUM(iter) == RTYPE_BEDROOM) {
-					obj_to_room((obj = read_object(o_HOME_CHEST)), iter);
+					obj_to_room((obj = read_object(o_HOME_CHEST, TRUE)), iter);
 					load_otrigger(obj);
 				}
 			}

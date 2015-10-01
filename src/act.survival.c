@@ -46,7 +46,7 @@ INTERACTION_FUNC(butcher_interact) {
 	}
 	
 	for (num = 0; num < interaction->quantity; ++num) {
-		fillet = read_object(interaction->vnum);
+		fillet = read_object(interaction->vnum, TRUE);
 		scale_item_to_level(fillet, 1);	// minimum level
 		obj_to_char_or_room(fillet, ch);
 		load_otrigger(fillet);
@@ -85,7 +85,7 @@ INTERACTION_FUNC(do_one_forage) {
 	num += skill_check(ch, ABIL_FORAGE, DIFF_HARD) ? 1 : 0;
 	
 	for (iter = 0; iter < num; ++iter) {
-		obj = read_object(interaction->vnum);
+		obj = read_object(interaction->vnum, TRUE);
 		scale_item_to_level(obj, 1);	// minimum level
 		obj_to_char_or_room(obj, ch);
 		add_depletion(inter_room, DPLTN_FORAGE, TRUE);
@@ -363,7 +363,7 @@ ACMD(do_mount) {
 		
 		// check for abandoning old mount
 		if (mob && GET_MOUNT_VNUM(ch) != NOTHING && mob_proto(GET_MOUNT_VNUM(ch))) {
-			temp = read_mobile(GET_MOUNT_VNUM(ch));
+			temp = read_mobile(GET_MOUNT_VNUM(ch), TRUE);
 			char_to_room(temp, IN_ROOM(ch));
 			setup_generic_npc(temp, GET_LOYALTY(ch), NOTHING, NOTHING);
 			
@@ -376,7 +376,7 @@ ACMD(do_mount) {
 
 		// load a copy of the mount mob, if there wasn't one (i.e. re-mounting the stored mount)
 		if (!mob) {
-			mob = read_mobile(GET_MOUNT_VNUM(ch));
+			mob = read_mobile(GET_MOUNT_VNUM(ch), TRUE);
 			char_to_room(mob, IN_ROOM(ch));
 		}
 

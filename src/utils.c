@@ -2247,7 +2247,7 @@ void give_resources(char_data *ch, Resource list[], bool split) {
 
 		for (j = 0; j < remaining; j++) {
 			if (obj_proto(list[i].vnum)) {
-				obj = read_object(list[i].vnum);
+				obj = read_object(list[i].vnum, TRUE);
 				
 				// scale item to minimum level
 				scale_item_to_level(obj, 0);

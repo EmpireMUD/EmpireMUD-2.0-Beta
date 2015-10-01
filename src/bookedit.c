@@ -751,7 +751,7 @@ void process_copying_book(char_data *ch) {
 			msg_to_char(ch, "You finish copying the book, but there was an error and it's illegible.\r\n");
 		}
 		else {
-			obj = read_object(o_BOOK);
+			obj = read_object(o_BOOK, TRUE);
 			GET_OBJ_VAL(obj, VAL_BOOK_ID) = book->id;
 			obj_to_char_or_room(obj, ch);
 		

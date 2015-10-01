@@ -389,7 +389,7 @@ INTERACTION_FUNC(shear_interact) {
 	}
 	
 	for (iter = 0; iter < amt; ++iter) {
-		obj = read_object(interaction->vnum);
+		obj = read_object(interaction->vnum, TRUE);
 		obj_to_char_or_room(obj, ch);
 		load_otrigger(obj);
 	}
@@ -422,7 +422,7 @@ INTERACTION_FUNC(skin_interact) {
 	command_lag(ch, WAIT_OTHER);
 		
 	for (num = 0; num < interaction->quantity; ++num) {
-		obj = read_object(interaction->vnum);
+		obj = read_object(interaction->vnum, TRUE);
 		scale_item_to_level(obj, 1);	// min scale
 		obj_to_char_or_room(obj, ch);
 		load_otrigger(obj);
@@ -1412,7 +1412,7 @@ ACMD(do_harness) {
 	else if (subcmd && !GET_PULLING(victim))
 		act("$E isn't harnessed.", FALSE, ch, 0, victim, TO_CHAR);
 	else if (subcmd) {
-		obj_to_char((rope = read_object(o_ROPE)), ch);
+		obj_to_char((rope = read_object(o_ROPE, TRUE)), ch);
 		cart = GET_PULLING(victim);
 		if (GET_PULLED_BY(cart, 0) == victim) {
 			cart->pulled_by1 = NULL;
@@ -2169,7 +2169,7 @@ ACMD(do_summon) {
 
 	for (iter = 0; iter < max; ++iter) {
 		if (skill_check(ch, ability, DIFF_MEDIUM)) {
-			mob = read_mobile(vnum);
+			mob = read_mobile(vnum, TRUE);
 			if (IS_NPC(ch)) {
 				MOB_INSTANCE_ID(mob) = MOB_INSTANCE_ID(ch);
 			}
