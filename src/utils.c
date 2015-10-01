@@ -2146,6 +2146,44 @@ void determine_gear_level(char_data *ch) {
 }
 
 
+/**
+* Raises a person from sleeping+ to standing (or fighting) if possible.
+* 
+* @param char_data *ch The person to try to wake/stand.
+* @return bool TRUE if the character ended up standing (>= fighting), FALSE if not.
+*/
+bool wake_and_stand(char_data *ch) {
+	char buf[MAX_STRING_LENGTH];
+	bool was_sleeping = FALSE;
+	
+	switch (GET_POS(ch)) {
+		case POS_SLEEPING: {
+			was_sleeping = TRUE;
+			// no break -- drop through
+		}
+		case POS_RESTING:
+		case POS_SITTING: {
+			GET_POS(ch) = POS_STANDING;
+			msg_to_char(ch, "You %sget up.\r\n", (was_sleeping ? "awaken and " : ""));
+			snprintf(buf, sizeof(buf), "$n %sgets up.", (was_sleeping ? "awakens and " : ""));
+			act(buf, TRUE, ch, NULL, NULL, TO_ROOM);
+			// no break -- drop through
+		}
+		case POS_FIGHTING:
+		case POS_STANDING: {
+			// at this point definitely standing, or close enough
+			return TRUE;
+		}
+		default: {
+			// can't do anything with any other pos
+			return FALSE;
+		}
+	}
+	
+	return FALSE;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// RESOURCE UTILS //////////////////////////////////////////////////////////
 
