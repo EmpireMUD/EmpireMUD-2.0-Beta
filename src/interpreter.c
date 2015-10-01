@@ -1885,6 +1885,32 @@ void send_motd(descriptor_data *d) {
 }
 
 
+/**
+* Sends the MOTD, MXP tags, and other data that should be shown when a player
+* logs in, which may happen in several different ways.
+*
+* @param descriptor_data *desc The person to send it to.
+* @param int bad_pws Number of bad password attempts, which sometimes must be retrieved and cleared ahead of time.
+*/
+void send_login_motd(descriptor_data *desc, int bad_pws) {
+	send_motd(desc);
+	MXPSendTag(desc, "<VERSION>");
+	
+	/* Check bad passwords */
+	if (bad_pws) {
+		sprintf(buf, "\r\n\r\n\007\007\007&r%d LOGIN FAILURE%s SINCE LAST SUCCESSFUL LOGIN.&0\r\n", bad_pws, (bad_pws > 1) ? "S" : "");
+		SEND_TO_Q(buf, desc);
+		GET_BAD_PWS(desc->character) = 0;
+	}
+
+	/* Check previous logon */
+	if (desc->character->prev_host) {
+		sprintf(buf, "Your last login was on %6.10s from %s.\r\n", ctime(&desc->character->prev_logon), desc->character->prev_host);
+		SEND_TO_Q(buf, desc);
+	}
+}
+
+
 /*
  * XXX: Make immortals 'return' instead of being disconnected when switched
  *      into person returns.  This function seems a bit over-extended too.
@@ -2284,22 +2310,8 @@ void nanny(descriptor_data *d, char *arg) {
 					STATE(d) = CON_BONUS_EXISTING;
 					return;
 				}
-
-				send_motd(d);
-				MXPSendTag(d, "<VERSION>");
 				
-				/* Check bad passwords */
-				if (load_result) {
-					sprintf(buf, "\r\n\r\n\007\007\007&r%d LOGIN FAILURE%s SINCE LAST SUCCESSFUL LOGIN.&0\r\n", load_result, (load_result > 1) ? "S" : "");
-					SEND_TO_Q(buf, d);
-					GET_BAD_PWS(d->character) = 0;
-				}
-
-				/* Check previous logon */
-				if (d->character->prev_host) {
-					sprintf(buf, "Your last login was on %6.10s from %s.\r\n", ctime(&d->character->prev_logon), d->character->prev_host);
-					SEND_TO_Q(buf, d);
-				}
+				send_login_motd(d, load_result);
 				
 				// send on to motd
 				SEND_TO_Q("\r\n*** Press ENTER: ", d);
@@ -2464,8 +2476,8 @@ void nanny(descriptor_data *d, char *arg) {
 			}
 			init_player(d->character);
 			SAVE_CHAR(d->character);
-			send_motd(d);
-			MXPSendTag(d, "<VERSION>");
+			
+			send_login_motd(d, GET_BAD_PWS(d->character));
 			
 			SEND_TO_Q("\r\n*** Press ENTER: ", d);
 			STATE(d) = CON_RMOTD;
@@ -2667,8 +2679,7 @@ void nanny(descriptor_data *d, char *arg) {
 				}
 
 				// and send them to the motd
-				send_motd(d);
-				MXPSendTag(d, "<VERSION>");
+				send_login_motd(d, GET_BAD_PWS(d->character));
 				
 				SEND_TO_Q("\r\n*** Press ENTER: ", d);
 				STATE(d) = CON_RMOTD;
