@@ -348,7 +348,7 @@ ACMD(do_cleanse) {
 			}
 		}
 
-		if (GET_COND(vict, DRUNK) > 0) {
+		if (!IS_NPC(vict) && GET_COND(vict, DRUNK) > 0) {
 			gain_condition(vict, DRUNK, -1 * GET_COND(vict, DRUNK));
 		}
 		
