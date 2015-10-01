@@ -165,7 +165,7 @@
 #define CAN_SEE(sub, obj)  (Global_ignore_dark ? CAN_SEE_NO_DARK(sub, obj) : CAN_SEE_DARK(sub, obj))
 
 #define WIZHIDE_OK(sub, obj)  (!IS_IMMORTAL(obj) || !PRF_FLAGGED((obj), PRF_WIZHIDE) || (!IS_NPC(sub) && GET_ACCESS_LEVEL(sub) >= GET_ACCESS_LEVEL(obj) && PRF_FLAGGED((sub), PRF_HOLYLIGHT)))
-#define INCOGNITO_OK(sub, obj)  (!IS_IMMORTAL(obj) || !PRF_FLAGGED((obj), PRF_INCOGNITO) || GET_ACCESS_LEVEL(sub) >= GET_ACCESS_LEVEL(obj))
+#define INCOGNITO_OK(sub, obj)  (!IS_IMMORTAL(obj) || IS_IMMORTAL(sub) || !PRF_FLAGGED((obj), PRF_INCOGNITO))
 
 
  //////////////////////////////////////////////////////////////////////////////

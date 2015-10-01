@@ -370,9 +370,8 @@ INCOGNITO
 
 Usage: toggle incognito
 
-This command prevents you from appearing to players with lower access levels on
-the "who" list. You will still be visible in your room, and people can still
-send you tells.
+This command prevents you from appearing to mortals on the "who" list. You will
+still be visible in your room, and people can still send you tells.
 
 See also: INVIS, TOGGLE, WIZHIDE
 #d
