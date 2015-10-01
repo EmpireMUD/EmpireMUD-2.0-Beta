@@ -743,6 +743,9 @@ ACMD(do_disguise) {
 	else if (!can_use_ability(ch, ABIL_DISGUISE, NOTHING, 0, NOTHING)) {
 		// sends own message
 	}
+	else if (GET_MORPH(ch) != MORPH_NONE) {
+		msg_to_char(ch, "You can't disguise yourself while morphed.\r\n");
+	}
 	else if (!*arg) {
 		msg_to_char(ch, "Disguise yourself as whom?\r\n");
 	}
