@@ -1013,7 +1013,7 @@ cpp_extern const struct command_info cmd_info[] = {
  */
 void command_interpreter(char_data *ch, char *argument) {
 	extern bool check_social(char_data *ch, char *string, bool exact);
-	int cmd, length, cont, iter;
+	int cmd, length, iter;
 	char *line;
 
 	/* just drop to next line for hitting CR */
@@ -1040,20 +1040,9 @@ void command_interpreter(char_data *ch, char *argument) {
 		arg[iter] = LOWER(arg[iter]);
 	}
 
-	/*
-	* Script check:
-	* Since all command triggers check for valid_dg_target before acting, the levelcheck
-	* here has been removed. 
-	*/
-	cont = command_wtrigger(ch, arg, line);              /* any world triggers ? */
-	if (!cont) {
-		cont = command_mtrigger(ch, arg, line);   /* any mobile triggers ? */
-	}
-	if (!cont) {
-		cont = command_otrigger(ch, arg, line);   /* any object triggers ? */
-	}
-	if (cont) {
-		return;                                    /* yes, command trigger took over */
+	// Command trigger (1/3): exact match on typed-in word
+	if (check_command_trigger(ch, arg, line, CMDTRG_EXACT)) {
+		return;
 	}
 
 	/* otherwise, find the command */
@@ -1090,8 +1079,14 @@ void command_interpreter(char_data *ch, char *argument) {
 		// do the social instead.
 		return;
 	}
-	else if (*cmd_info[cmd].command == '\n')
+	else if (*cmd_info[cmd].command == '\n') {
+		// Command trigger (2/3): abbrev match on non-matching command
+		if (check_command_trigger(ch, arg, line, CMDTRG_ABBREV)) {
+			return;
+		}
+		// otherwise, no match
 		send_config_msg(ch, "huh_string");
+	}
 	else if (!IS_NPC(ch) && PLR_FLAGGED(ch, PLR_FROZEN))
 		send_to_char("You try, but the mind-numbing cold prevents you...\r\n", ch);
 	else if (IS_SET(cmd_info[cmd].flags, CMD_NOT_RP) && !IS_NPC(ch) && !IS_GOD(ch) && !IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_RP)) {
@@ -1152,6 +1147,12 @@ void command_interpreter(char_data *ch, char *argument) {
 				break;
 		}
 	}
+
+	// Command trigger (3/3): exact match on abbreviated command
+	else if (check_command_trigger(ch, (char*)cmd_info[cmd].command, line, CMDTRG_EXACT)) {
+		return;
+	}
+	
 	else {
 		((*cmd_info[cmd].command_pointer) (ch, line, cmd, cmd_info[cmd].subcmd));
 	}

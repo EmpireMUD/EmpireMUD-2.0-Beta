@@ -294,7 +294,17 @@ int entry_mtrigger(char_data *ch) {
 	return 1;
 }
 
-int command_mtrigger(char_data *actor, char *cmd, char *argument) {
+
+/**
+* Command trigger (mob).
+*
+* @param char_data *actor The person typing a command.
+* @param char *cmd The command as-typed (first word).
+* @param char *argument Any arguments (remaining text).
+* @param int mode CMDTRG_EXACT or CMDTRG_ABBREV.
+* @return int 1 if a trigger ran (stop); 0 if not (ok to continue).
+*/
+int command_mtrigger(char_data *actor, char *cmd, char *argument, int mode) {
 	char_data *ch, *ch_next;
 	trig_data *t;
 	char buf[MAX_INPUT_LENGTH];
@@ -316,7 +326,7 @@ int command_mtrigger(char_data *actor, char *cmd, char *argument) {
 					continue;
 				}
 
-				if (*GET_TRIG_ARG(t)=='*' || !strn_cmp(GET_TRIG_ARG(t), cmd, strlen(GET_TRIG_ARG(t)))) {
+				if (*GET_TRIG_ARG(t) == '*' || (mode == CMDTRG_EXACT && !str_cmp(cmd, GET_TRIG_ARG(t))) || (mode == CMDTRG_ABBREV && is_abbrev(cmd, GET_TRIG_ARG(t)))) {
 					union script_driver_data_u sdd;
 					ADD_UID_VAR(buf, t, actor, "actor", 0);
 					skip_spaces(&argument);
@@ -708,22 +718,38 @@ int get_otrigger(obj_data *obj, char_data *actor) {
 }
 
 
-/* checks for command trigger on specific object. assumes obj has cmd trig */
-int cmd_otrig(obj_data *obj, char_data *actor, char *cmd, char *argument, int type) {
+/**
+* Command trigger (obj) sub-processor.
+*
+* @param obj_data *obj The item to check.
+* @param char_data *actor The person typing a command.
+* @param char *cmd The command as-typed (first word).
+* @param char *argument Any arguments (remaining text).
+* @param int type Location: OCMD_EQUIP, etc.
+* @param int mode CMDTRG_EXACT or CMDTRG_ABBREV.
+* @return int 1 if a trigger ran (stop); 0 if not (ok to continue).
+*/
+int cmd_otrig(obj_data *obj, char_data *actor, char *cmd, char *argument, int type, int mode) {
 	trig_data *t;
 	char buf[MAX_INPUT_LENGTH];
 
 	if (obj && SCRIPT_CHECK(obj, OTRIG_COMMAND)) {
 		for (t = TRIGGERS(SCRIPT(obj)); t; t = t->next) {
+			// not a command trigger
 			if (!TRIGGER_CHECK(t, OTRIG_COMMAND))
 				continue;
+			
+			// bad location
+			if (!IS_SET(GET_TRIG_NARG(t), type)) {
+				continue;
+			}
 
-			if (IS_SET(GET_TRIG_NARG(t), type) && (!GET_TRIG_ARG(t) || !*GET_TRIG_ARG(t))) {
+			if (!GET_TRIG_ARG(t) || !*GET_TRIG_ARG(t)) {
 				syslog(SYS_ERROR, LVL_BUILDER, TRUE, "SYSERR: O-Command Trigger #%d has no text argument!", GET_TRIG_VNUM(t));
 				continue;
 			}
 
-			if (IS_SET(GET_TRIG_NARG(t), type) && (*GET_TRIG_ARG(t)=='*' || !strn_cmp(GET_TRIG_ARG(t), cmd, strlen(GET_TRIG_ARG(t))))) {
+			if (*GET_TRIG_ARG(t) == '*' || (mode == CMDTRG_EXACT && !str_cmp(cmd, GET_TRIG_ARG(t))) || (mode == CMDTRG_ABBREV && is_abbrev(cmd, GET_TRIG_ARG(t)))) {
 				ADD_UID_VAR(buf, t, actor, "actor", 0);
 				skip_spaces(&argument);
 				add_var(&GET_TRIG_VARS(t), "arg", argument, 0);
@@ -742,7 +768,16 @@ int cmd_otrig(obj_data *obj, char_data *actor, char *cmd, char *argument, int ty
 }
 
 
-int command_otrigger(char_data *actor, char *cmd, char *argument) {
+/**
+* Command trigger (obj).
+*
+* @param char_data *actor The person typing a command.
+* @param char *cmd The command as-typed (first word).
+* @param char *argument Any arguments (remaining text).
+* @param int mode CMDTRG_EXACT or CMDTRG_ABBREV.
+* @return int 1 if a trigger ran (stop); 0 if not (ok to continue).
+*/
+int command_otrigger(char_data *actor, char *cmd, char *argument, int mode) {
 	obj_data *obj;
 	int i;
 
@@ -751,15 +786,15 @@ int command_otrigger(char_data *actor, char *cmd, char *argument) {
 		return 0;
 
 	for (i = 0; i < NUM_WEARS; i++)
-		if (cmd_otrig(GET_EQ(actor, i), actor, cmd, argument, OCMD_EQUIP))
+		if (cmd_otrig(GET_EQ(actor, i), actor, cmd, argument, OCMD_EQUIP, mode))
 			return 1;
 
 	for (obj = actor->carrying; obj; obj = obj->next_content)
-		if (cmd_otrig(obj, actor, cmd, argument, OCMD_INVEN))
+		if (cmd_otrig(obj, actor, cmd, argument, OCMD_INVEN, mode))
 			return 1;
 
 	for (obj = ROOM_CONTENTS(IN_ROOM(actor)); obj; obj = obj->next_content)
-		if (cmd_otrig(obj, actor, cmd, argument, OCMD_ROOM))
+		if (cmd_otrig(obj, actor, cmd, argument, OCMD_ROOM, mode))
 			return 1;
 
 	return 0;
@@ -1082,7 +1117,16 @@ int enter_wtrigger(room_data *room, char_data *actor, int dir) {
 }
 
 
-int command_wtrigger(char_data *actor, char *cmd, char *argument) {
+/**
+* Command trigger (room).
+*
+* @param char_data *actor The person typing a command.
+* @param char *cmd The command as-typed (first word).
+* @param char *argument Any arguments (remaining text).
+* @param int mode CMDTRG_EXACT or CMDTRG_ABBREV.
+* @return int 1 if a trigger ran (stop); 0 if not (ok to continue).
+*/
+int command_wtrigger(char_data *actor, char *cmd, char *argument, int mode) {
 	room_data *room;
 	trig_data *t;
 	char buf[MAX_INPUT_LENGTH];
@@ -1104,7 +1148,7 @@ int command_wtrigger(char_data *actor, char *cmd, char *argument) {
 			continue;
 		}
 
-		if (*GET_TRIG_ARG(t)=='*' || !strn_cmp(GET_TRIG_ARG(t), cmd, strlen(GET_TRIG_ARG(t)))) {
+		if (*GET_TRIG_ARG(t) == '*' || (mode == CMDTRG_EXACT && !str_cmp(cmd, GET_TRIG_ARG(t))) || (mode == CMDTRG_ABBREV && is_abbrev(cmd, GET_TRIG_ARG(t)))) {
 			union script_driver_data_u sdd;
 			ADD_ROOM_UID_VAR(buf, t, room, "room", 0);
 			ADD_UID_VAR(buf, t, actor, "actor", 0);
@@ -1261,4 +1305,27 @@ int door_wtrigger(char_data *actor, int subcmd, int dir) {
 	}
 
 	return 1;
+}
+
+
+/**
+* Checks all triggers for a command match.
+*
+* @param char_data *actor The person typing a command.
+* @param char *cmd The command as-typed (first word).
+* @param char *argument Any arguments (remaining text).
+* @param int mode CMDTRG_EXACT or CMDTRG_ABBREV.
+* @return bool TRUE means hit-trigger/stop; FALSE means continue execution
+*/
+bool check_command_trigger(char_data *actor, char *cmd, char *argument, int mode) {
+	int cont = 0;
+
+	cont = command_wtrigger(actor, cmd, argument, mode);	// world trigs
+	if (!cont) {
+		cont = command_mtrigger(actor, cmd, argument, mode);	// mob trigs
+	}
+	if (!cont) {
+		cont = command_otrigger(actor, cmd, argument, mode);	// obj trigs
+	}
+	return cont;
 }
