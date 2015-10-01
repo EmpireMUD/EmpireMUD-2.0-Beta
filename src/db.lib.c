@@ -3961,7 +3961,11 @@ void parse_room(FILE *fl, room_vnum vnum) {
 				break;
 			}
 			
-			case 'T': {	// trigger
+			case 'T': {	// trigger (deprecated)
+				// NOTE: prior to b2.11, trigger prototypes were saved and read
+				// this way they are no longer saved this way at all, but this
+				// must be left in to be backwards-compatbile. If your mud has
+				// been up since b2.11, you can safely remove this block.
 				dg_read_trigger(line, room, WLD_TRIGGER);
 				break;
 			}
@@ -4150,14 +4154,14 @@ void write_room_to_file(FILE *fl, room_data *room) {
 			fprintf(fl, "D%d\n%s~\n%s %d\n", ex->dir, buf2, bitv_to_alpha(ex->exit_info), ex->to_room);
 		}
 	}
+
+	// NOTE: Prior to b2.11, this saved T as prototype triggers, but this is
+	// no longer used: script_save_to_disk(fl, room, WLD_TRIGGER);
 	
 	// Z: extra data
 	for (red = room->extra_data; red; red = red->next) {
 		fprintf(fl, "Z\n%d %d\n", red->type, red->value);
 	}
-	
-	// T, V: triggers
-	script_save_to_disk(fl, room, WLD_TRIGGER);
 	
 	// end
 	fprintf(fl, "S\n");
