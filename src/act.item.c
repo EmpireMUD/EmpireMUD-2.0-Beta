@@ -519,7 +519,7 @@ void perform_remove(char_data *ch, int pos) {
 static void perform_wear(char_data *ch, obj_data *obj, int where) {
 	extern const int apply_attribute[];
 	extern const int primary_attributes[];
-	int iter, app;
+	int iter, app, type, val;
 
 	/* first, make sure that the wear position is valid. */
 	if (!CAN_WEAR(obj, wear_data[where].item_wear)) {
@@ -531,17 +531,23 @@ static void perform_wear(char_data *ch, obj_data *obj, int where) {
 	if (GET_EQ(ch, where) && wear_data[where].cascade_pos != NO_WEAR) {
 		where = wear_data[where].cascade_pos;
 	}
-
-	// make sure it wouldn't drop any primary attribute below 1
+	
+	// check weakness (check all applies first, in case they contradict like -1str +2str)
 	for (iter = 0; primary_attributes[iter] != NOTHING; ++iter) {
+		type = primary_attributes[iter];
+		val = GET_ATT(ch, type);
 		for (app = 0; app < MAX_OBJ_AFFECT; app++) {
-			if (apply_attribute[(int) obj->affected[app].location] == primary_attributes[iter] && GET_ATT(ch, primary_attributes[iter]) + obj->affected[app].modifier < 1) {
-				act("You are too weak to use $p!", FALSE, ch, obj, 0, TO_CHAR);
-				return;
+			if (apply_attribute[(int) obj->affected[app].location] == type) {
+				val += obj->affected[app].modifier;
 			}
 		}
-	}
 		
+		if (val < 1) {
+			act("You are too weak to use $p!", FALSE, ch, obj, 0, TO_CHAR);
+			return;
+		}
+	}
+	
 	if (where == WEAR_SADDLE && !IS_RIDING(ch)) {
 		msg_to_char(ch, "You can't wear a saddle while you're not riding anything.\r\n");
 		return;
