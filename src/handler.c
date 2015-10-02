@@ -68,7 +68,11 @@ extern struct complex_room_data *init_complex_data();
 void write_lore(char_data *ch);
 const struct wear_data_type wear_data[NUM_WEARS];
 
+// external funcs
+void scale_item_to_level(obj_data *obj, int level);
+
 // locals
+static void add_obj_binding(int idnum, struct obj_binding **list);
 void remove_lore_record(char_data *ch, struct lore_data *lore);
 
 // local file scope variables
@@ -3611,6 +3615,83 @@ void extract_obj(obj_data *obj) {
 
 
 /**
+* Makes a fresh copy of an object, preserving certain flags such as superior
+* and keep. All temporary properties including bindings are copied over. You
+* can swap it out using swap_obj_for_obj() or any other method, then extract
+* the original object when done.
+*
+* @param obj_data *obj The item to load a fresh copy of.
+* @param int scale_level If >0, will scale the new copy to that level.
+* @return obj_data* The new object.
+*/
+obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
+	struct obj_binding *bind;
+	obj_data *proto, *new;
+	
+	if (!obj || !(proto = obj_proto(GET_OBJ_VNUM(obj)))) {
+		// get a normal 'bug' object
+		return read_object(0, TRUE);
+	}
+
+	new = read_object(GET_OBJ_VNUM(obj), TRUE);
+	
+	// preserve some flags
+	GET_OBJ_EXTRA(new) |= GET_OBJ_EXTRA(obj) & (OBJ_SUPERIOR | OBJ_KEEP);
+	if (!OBJ_FLAGGED(new, OBJ_GENERIC_DROP)) {
+		GET_OBJ_EXTRA(new) |= GET_OBJ_EXTRA(obj) & (OBJ_HARD_DROP | OBJ_GROUP_DROP);
+	}
+	
+	// copy bindings	
+	for (bind = OBJ_BOUND_TO(obj); bind; bind = bind->next) {
+		add_obj_binding(bind->idnum, &OBJ_BOUND_TO(new));
+	}
+	
+	GET_OBJ_TIMER(new) = GET_OBJ_TIMER(obj);
+	GET_AUTOSTORE_TIMER(new) = GET_AUTOSTORE_TIMER(obj);
+	new->stolen_timer = obj->stolen_timer;
+	new->last_owner_id = obj->last_owner_id;
+	new->last_empire_id = obj->last_empire_id;
+	
+	// certain things that must always copy over
+	switch (GET_OBJ_TYPE(new)) {
+		case ITEM_ARROW: {
+			GET_OBJ_VAL(new, VAL_ARROW_QUANTITY) = GET_OBJ_VAL(obj, VAL_ARROW_QUANTITY);
+			break;
+		}
+		case ITEM_BOOK: {
+			GET_OBJ_VAL(new, VAL_BOOK_ID) = GET_OBJ_VAL(obj, VAL_BOOK_ID);
+			break;
+		}
+		case ITEM_DRINKCON: {
+			GET_OBJ_VAL(new, VAL_DRINK_CONTAINER_CONTENTS) = GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS);
+			GET_OBJ_VAL(new, VAL_DRINK_CONTAINER_TYPE) = GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE);
+			break;
+		}
+		case ITEM_PORTAL: {
+			GET_OBJ_VAL(new, VAL_PORTAL_TARGET_VNUM) = GET_OBJ_VAL(obj, VAL_PORTAL_TARGET_VNUM);
+			break;
+		}
+		case ITEM_POISON: {
+			GET_OBJ_VAL(new, VAL_POISON_CHARGES) = GET_OBJ_VAL(obj, VAL_POISON_CHARGES);
+			break;
+		}
+		case ITEM_SHIP: {
+			GET_OBJ_VAL(new, VAL_SHIP_RESOURCES_REMAINING) = GET_OBJ_VAL(obj, VAL_SHIP_RESOURCES_REMAINING);
+			GET_OBJ_VAL(new, VAL_SHIP_MAIN_ROOM) = GET_OBJ_VAL(obj, VAL_SHIP_MAIN_ROOM);
+			break;
+		}
+	}
+	
+
+	if (scale_level > 0) {
+		scale_item_to_level(new, scale_level);
+	}
+	
+	return obj;	
+}
+
+
+/**
 * Compares two items for identicallity. These may be highly-customized items.
 * 
 * @param obj_data *obj_a First object to compare.
@@ -3875,8 +3956,6 @@ void check_obj_in_void(obj_data *obj) {
 * @param int pos the WEAR_x spot to it
 */
 void equip_char(char_data *ch, obj_data *obj, int pos) {
-	void scale_item_to_level(obj_data *obj, int level);
-	
 	int j;
 
 	if (pos < 0 || pos >= NUM_WEARS) {

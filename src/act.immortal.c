@@ -5090,8 +5090,6 @@ ACMD(do_rescale) {
 	obj_data *obj, *new;
 	char_data *vict;
 	int level;
-	
-	bitvector_t preserve_flags = OBJ_SUPERIOR | OBJ_HARD_DROP | OBJ_GROUP_DROP | OBJ_KEEP;	// flags to copy over if obj is reloaded
 
 	argument = one_argument(argument, arg);
 	skip_spaces(&argument);
@@ -5123,24 +5121,16 @@ ACMD(do_rescale) {
 		}
 	}
 	else if ((obj = get_obj_in_list_vis(ch, arg, ch->carrying)) || (obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
-		// TODO this needs the same logical transfer of stats as the object loader in objsave.c uses to update items -paul
-		
 		// item mode
-		if (!OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-			// TODO should this copy triggers instead of attaching new ones?
-			new = read_object(GET_OBJ_VNUM(obj), TRUE);
-			GET_OBJ_EXTRA(new) |= GET_OBJ_EXTRA(obj) & preserve_flags;
-			
-			// swap binds
-			OBJ_BOUND_TO(new) = OBJ_BOUND_TO(obj);
-			OBJ_BOUND_TO(obj) = NULL;
-			
+		if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
+			scale_item_to_level(obj, level);
+		}
+		else {
+			new = fresh_copy_obj(obj, level);
 			swap_obj_for_obj(obj, new);
 			extract_obj(obj);
 			obj = new;
 		}
-		
-		scale_item_to_level(obj, level);
 		
 		syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s has rescaled obj %s to level %d at %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), GET_OBJ_CURRENT_SCALE_LEVEL(obj), room_log_identifier(IN_ROOM(ch)));
 		sprintf(buf, "You rescale $p to level %d.", GET_OBJ_CURRENT_SCALE_LEVEL(obj));

@@ -303,54 +303,7 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 	
 	// check versioning: load a new version
 	if (obj && proto && OBJ_VERSION(obj) < OBJ_VERSION(proto) && config_get_bool("auto_update_items")) {
-		// TODO rewrite this as a generic rescale obj function AND make changes to live objects update players in-game (and trading post, einv, and rooms)
-		new = read_object(vnum, TRUE);
-		GET_OBJ_EXTRA(new) |= GET_OBJ_EXTRA(obj) & (OBJ_SUPERIOR | OBJ_KEEP);
-		if (!OBJ_FLAGGED(new, OBJ_GENERIC_DROP)) {
-			GET_OBJ_EXTRA(new) |= GET_OBJ_EXTRA(obj) & (OBJ_HARD_DROP | OBJ_GROUP_DROP);
-		}
-		OBJ_BOUND_TO(new) = OBJ_BOUND_TO(obj);
-		OBJ_BOUND_TO(obj) = NULL;
-		GET_OBJ_TIMER(new) = GET_OBJ_TIMER(obj);
-		GET_AUTOSTORE_TIMER(new) = GET_AUTOSTORE_TIMER(obj);
-		new->stolen_timer = obj->stolen_timer;
-		new->last_owner_id = obj->last_owner_id;
-		new->last_empire_id = obj->last_empire_id;
-		
-		// certain things that must always copy over
-		switch (GET_OBJ_TYPE(new)) {
-			case ITEM_ARROW: {
-				GET_OBJ_VAL(new, VAL_ARROW_QUANTITY) = GET_OBJ_VAL(obj, VAL_ARROW_QUANTITY);
-				break;
-			}
-			case ITEM_BOOK: {
-				GET_OBJ_VAL(new, VAL_BOOK_ID) = GET_OBJ_VAL(obj, VAL_BOOK_ID);
-				break;
-			}
-			case ITEM_DRINKCON: {
-				GET_OBJ_VAL(new, VAL_DRINK_CONTAINER_CONTENTS) = GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS);
-				GET_OBJ_VAL(new, VAL_DRINK_CONTAINER_TYPE) = GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE);
-				break;
-			}
-			case ITEM_PORTAL: {
-				GET_OBJ_VAL(new, VAL_PORTAL_TARGET_VNUM) = GET_OBJ_VAL(obj, VAL_PORTAL_TARGET_VNUM);
-				break;
-			}
-			case ITEM_POISON: {
-				GET_OBJ_VAL(new, VAL_POISON_CHARGES) = GET_OBJ_VAL(obj, VAL_POISON_CHARGES);
-				break;
-			}
-			case ITEM_SHIP: {
-				GET_OBJ_VAL(new, VAL_SHIP_RESOURCES_REMAINING) = GET_OBJ_VAL(obj, VAL_SHIP_RESOURCES_REMAINING);
-				GET_OBJ_VAL(new, VAL_SHIP_MAIN_ROOM) = GET_OBJ_VAL(obj, VAL_SHIP_MAIN_ROOM);
-				break;
-			}
-		}
-		
-		if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) > 0) {
-			scale_item_to_level(new, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
-		}
-		
+		new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));		
 		extract_obj(obj);
 		obj = new;
 		
