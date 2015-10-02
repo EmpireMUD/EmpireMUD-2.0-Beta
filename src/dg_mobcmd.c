@@ -1061,7 +1061,7 @@ ACMD(do_mdamage) {
 	if (*modarg) {
 		modifier = atof(modarg) / 100.0;
 	}
-	modifier *= scale_modifier_by_mob(ch, modifier);
+	modifier = scale_modifier_by_mob(ch, modifier);
 
 	if (*name == UID_CHAR) {
 		if (!(vict = get_char(name))) {
@@ -1122,7 +1122,7 @@ ACMD(do_maoe) {
 		type = DAM_PHYSICAL;
 	}
 	
-	modifier *= scale_modifier_by_mob(ch, modifier);
+	modifier = scale_modifier_by_mob(ch, modifier);
 	
 	level = get_approximate_level(ch);
 	for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict; vict = next_vict) {
@@ -1163,7 +1163,7 @@ ACMD(do_mdot) {
 	if (*modarg) {
 		modifier = atof(modarg) / 100.0;
 	}
-	modifier *= scale_modifier_by_mob(ch, modifier);
+	modifier = scale_modifier_by_mob(ch, modifier);
 
 	if (*name == UID_CHAR) {
 		if (!(vict = get_char(name))) {
