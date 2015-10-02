@@ -1585,6 +1585,7 @@ PLAYER_UPDATE_FUNC(b2_8_update_players) {
 
 // 2.11 loads inventories and attaches triggers
 PLAYER_UPDATE_FUNC(b2_11_update_players) {
+	extern int Objload_char(char_data *ch, int dolog);
 	void Objsave_char(char_data *ch, int rent_code);
 	
 	obj_data *obj, *proto;
@@ -1594,6 +1595,8 @@ PLAYER_UPDATE_FUNC(b2_11_update_players) {
 	if (!is_file) {
 		return;
 	}
+	
+	Objload_char(ch, FALSE);
 	
 	// inventory
 	for (obj = ch->carrying; obj; obj = obj->next_content) {
