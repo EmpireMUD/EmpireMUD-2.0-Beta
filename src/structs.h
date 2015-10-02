@@ -619,7 +619,8 @@ typedef struct trig_data trig_data;
 #define CHORE_ABANDON_CHOPPED  22
 #define CHORE_ABANDON_FARMED  23
 #define CHORE_NEXUS_CRYSTALS  24
-#define NUM_CHORES  25		// total
+#define CHORE_MILLING  25
+#define NUM_CHORES  26		// total
 
 
 /* Diplomacy types */

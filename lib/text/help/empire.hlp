@@ -1323,6 +1323,7 @@ Workforce types:
   &yabandon-farmed:&0 NPCs will abandon a tile when they finish farming.
   &cnexus-crystal (skilled):&0 Will make nexus crystals at the sorcery tower;
      requires both Exarch Crafts and Skilled Labor.
+  &ymilling:&0 Will mill grains into flour.
   
 Items marked (skilled) require the Skilled Labor ability.
 
