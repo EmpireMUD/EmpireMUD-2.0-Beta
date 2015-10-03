@@ -3388,7 +3388,7 @@ int vnum_book(char *searchname, char_data *ch) {
 	
 	HASH_ITER(hh, book_table, book, next_book) {
 		if (multi_isname(searchname, book->title) || multi_isname(searchname, book->byline)) {
-			msg_to_char(ch, "%3d. [%5d] %s (%s)\r\n", ++found, book->vnum, book->title, book->byline);
+			msg_to_char(ch, "%3d. [%5d] %s\t0 (%s\t0)\r\n", ++found, book->vnum, book->title, book->byline);
 		}
 	}
 

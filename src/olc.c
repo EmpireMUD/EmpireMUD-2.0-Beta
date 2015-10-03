@@ -60,6 +60,15 @@ OLC_MODULE(advedit_reset);
 OLC_MODULE(advedit_script);
 OLC_MODULE(advedit_startvnum);
 
+// book modules
+OLC_MODULE(booked_author);
+OLC_MODULE(booked_byline);
+OLC_MODULE(booked_item_description);
+OLC_MODULE(booked_item_name);
+OLC_MODULE(booked_license);
+OLC_MODULE(booked_paragraphs);
+OLC_MODULE(booked_title);
+
 // building modules
 OLC_MODULE(bedit_affects);
 OLC_MODULE(bedit_artisan);
@@ -308,6 +317,15 @@ const struct olc_command_data olc_data[] = {
 	{ "reset", advedit_reset, OLC_ADVENTURE, OLC_CF_EDITOR },
 	{ "script", advedit_script, OLC_ADVENTURE, OLC_CF_EDITOR },
 	{ "startvnum", advedit_startvnum, OLC_ADVENTURE, OLC_CF_EDITOR },
+	
+	// books
+	{ "author", booked_author, OLC_BOOK, OLC_CF_EDITOR },
+	{ "byline", booked_byline, OLC_BOOK, OLC_CF_EDITOR },
+	{ "description", booked_item_description, OLC_BOOK, OLC_CF_EDITOR },
+	{ "item", booked_item_name, OLC_BOOK, OLC_CF_EDITOR },
+	{ "license", booked_license, OLC_BOOK, OLC_CF_EDITOR },
+	{ "paragraphs", booked_paragraphs, OLC_BOOK, OLC_CF_EDITOR },
+	{ "title", booked_title, OLC_BOOK, OLC_CF_EDITOR },
 	
 	// building commands
 	{ "affects", bedit_affects, OLC_BUILDING, OLC_CF_EDITOR },
@@ -1499,7 +1517,7 @@ OLC_MODULE(olc_list) {
 					}
 					if (book->vnum >= from_vnum && book->vnum <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "[%5d] %s (%s)\r\n", book->vnum, book->title, book->byline);
+						len += snprintf(buf + len, sizeof(buf) - len, "[%5d] %s\t0 (%s\t0)\r\n", book->vnum, book->title, book->byline);
 					}
 				}
 			}

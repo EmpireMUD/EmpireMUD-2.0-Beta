@@ -803,7 +803,7 @@ LIBRARY_SCMD(bookedit_list) {
 		else {
 			*buf1 = '\0';
 		}
-		size += snprintf(buf + size, sizeof(buf) - size, "%s%d. %s (%s)\r\n", buf1, ++count, book->title, book->byline);
+		size += snprintf(buf + size, sizeof(buf) - size, "%s%d. %s\t0 (%s\t0)\r\n", buf1, ++count, book->title, book->byline);
 	}
 
 	if (count == 0) {
