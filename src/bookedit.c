@@ -23,7 +23,6 @@
 #include "dg_scripts.h"
 #include "olc.h"
 
-
 /**
 * Contents:
 *   Helpers
