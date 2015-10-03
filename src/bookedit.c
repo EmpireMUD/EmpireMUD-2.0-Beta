@@ -407,28 +407,28 @@ void olc_show_book(char_data *ch) {
 	*buf = '\0';
 
 	if (imm) {
-		sprintf(buf + strlen(buf), "[&c%d&0] &c%s&0\r\n", GET_OLC_VNUM(ch->desc), !find_book_by_vnum(book->vnum) ? "new book" : find_book_by_vnum(book->vnum)->title);
+		sprintf(buf + strlen(buf), "[\tc%d\t0] \tc%s\t0\r\n", GET_OLC_VNUM(ch->desc), !find_book_by_vnum(book->vnum) ? "new book" : find_book_by_vnum(book->vnum)->title);
 	}
 	else {
-		sprintf(buf + strlen(buf), "&cEmpireMUD Book Editor: %s&0\r\n", !find_book_by_vnum(book->vnum) ? "new book" : find_book_by_vnum(book->vnum)->title);
+		sprintf(buf + strlen(buf), "\tcEmpireMUD Book Editor: %s\t0\r\n", !find_book_by_vnum(book->vnum) ? "new book" : find_book_by_vnum(book->vnum)->title);
 	}
 	
-	sprintf(buf + strlen(buf), "<&ytitle&0> %s\r\n", NULLSAFE(book->title));
-	sprintf(buf + strlen(buf), "<&ybyline&0> %s\r\n", NULLSAFE(book->byline));
-	sprintf(buf + strlen(buf), "<&yitem&0> %s\r\n", NULLSAFE(book->item_name));
-	sprintf(buf + strlen(buf), "<&ydescription&0>\r\n%s", NULLSAFE(book->item_description));
+	sprintf(buf + strlen(buf), "<\tytitle\t0> %s\r\n", NULLSAFE(book->title));
+	sprintf(buf + strlen(buf), "<\tybyline\t0> %s\r\n", NULLSAFE(book->byline));
+	sprintf(buf + strlen(buf), "<\tyitem\t0> %s\r\n", NULLSAFE(book->item_name));
+	sprintf(buf + strlen(buf), "<\tydescription\t0>\r\n%s", NULLSAFE(book->item_description));
 	
 	count = 0;
 	for (para = book->paragraphs; para; para = para->next) {
 		++count;
 	}
-	sprintf(buf + strlen(buf), "<&yparagraphs&0> %d (list, edit, new, delete)\r\n", count);
+	sprintf(buf + strlen(buf), "<\typaragraphs\t0> %d (list, edit, new, delete)\r\n", count);
 	
 	if (imm) {
-		sprintf(buf + strlen(buf), "<&yauthor&0> %s\r\n", (book->author != 0 && get_name_by_id(book->author)) ? get_name_by_id(book->author) : "nobody");
+		sprintf(buf + strlen(buf), "<\tyauthor\t0> %s\r\n", (book->author != 0 && get_name_by_id(book->author)) ? get_name_by_id(book->author) : "nobody");
 	}
 	else {
-		sprintf(buf + strlen(buf), "<&ylicense&0>, <&ysave&0>, <&yabort&0>\r\n");
+		sprintf(buf + strlen(buf), "<\tylicense\t0>, <\tysave\t0>, <\tyabort\t0>\r\n");
 	}
 	
 	page_string(ch->desc, buf, TRUE);
@@ -546,7 +546,7 @@ OLC_MODULE(booked_paragraphs) {
 		
 		for (para = book->paragraphs, count = 1; para; para = para->next, ++count) {
 			if ((from == -1 || from <= count) && (to == -1 || to >= count)) {
-				size += snprintf(buf + size, sizeof(buf) - size, "\r\n&cParagraph %d&0\r\n%s", count, NULLSAFE(para->text));
+				size += snprintf(buf + size, sizeof(buf) - size, "\r\n\tcParagraph %d\t0\r\n%s", count, NULLSAFE(para->text));
 			}
 		}
 		
@@ -692,7 +692,7 @@ LIBRARY_SCMD(bookedit_abort) {
 		msg_to_char(ch, "You aren't editing a book.\r\n");
 	}
 	else if (ch->desc->str) {
-		msg_to_char(ch, "Close your text editor (&y,/h&0) before aborting the book editor.\r\n");
+		msg_to_char(ch, "Close your text editor (\ty,/h\t0) before aborting the book editor.\r\n");
 	}
 	else {
 		free_book(GET_OLC_BOOK(ch->desc));
@@ -834,7 +834,7 @@ LIBRARY_SCMD(bookedit_save) {
 		msg_to_char(ch, "You aren't editing a book.\r\n");
 	}
 	else if (ch->desc->str) {
-		msg_to_char(ch, "Close your text editor (&y,/h&0) before saving the book.\r\n");
+		msg_to_char(ch, "Close your text editor (\ty,/h\t0) before saving the book.\r\n");
 	}
 	else {
 		save_olc_book(ch->desc);
