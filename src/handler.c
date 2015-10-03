@@ -3687,7 +3687,7 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 		scale_item_to_level(new, scale_level);
 	}
 	
-	return obj;	
+	return new;
 }
 
 
