@@ -424,10 +424,11 @@ void olc_show_book(char_data *ch) {
 	}
 	sprintf(buf + strlen(buf), "<&yparagraphs&0> %d (list, edit, new, delete)\r\n", count);
 	
-	sprintf(buf + strlen(buf), "<&ylicense&0>\r\n");
-	
 	if (imm) {
 		sprintf(buf + strlen(buf), "<&yauthor&0> %s\r\n", (book->author != 0 && get_name_by_id(book->author)) ? get_name_by_id(book->author) : "nobody");
+	}
+	else {
+		sprintf(buf + strlen(buf), "<&ylicense&0>, <&ysave&0>, <&yabort&0>\r\n");
 	}
 	
 	page_string(ch->desc, buf, TRUE);
