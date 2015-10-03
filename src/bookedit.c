@@ -527,6 +527,11 @@ OLC_MODULE(booked_paragraphs) {
 		char arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
 		int count, from = -1, to = -1;
 		
+		if (!book->paragraphs) {
+			msg_to_char(ch, "You have not added any paragraphs.\r\n");
+			return;
+		}
+		
 		half_chop(argument, arg2, arg3);	// optional "from" "to"
 		if (*arg2) {
 			from = atoi(arg2) ? atoi(arg2) : -1;
@@ -540,7 +545,7 @@ OLC_MODULE(booked_paragraphs) {
 		
 		for (para = book->paragraphs, count = 1; para; para = para->next, ++count) {
 			if ((from == -1 || from <= count) && (to == -1 || to >= count)) {
-				size += snprintf(buf + size, sizeof(buf) - size, "&cParagraph %d&0\r\n%s\r\n", count, NULLSAFE(para->text));
+				size += snprintf(buf + size, sizeof(buf) - size, "\r\n&cParagraph %d&0\r\n%s", count, NULLSAFE(para->text));
 			}
 		}
 		
@@ -610,8 +615,13 @@ OLC_MODULE(booked_paragraphs) {
 				last = para;
 			}
 		
-			if (!found && last) {
-				last->next = new;
+			if (!found) {
+				if (last) {
+					last->next = new;
+				}
+				else {
+					book->paragraphs = new;
+				}
 				found = TRUE;
 			}
 		}
