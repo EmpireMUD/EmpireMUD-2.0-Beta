@@ -9,58 +9,6 @@ digging in the mountains.
 
 See also: DIG
 #
-BOOKEDIT "BOOK EDIT"
-
-Usage:  bookedit list -- list books you wrote
-        bookedit copy <book> -- write out a fresh copy of one of your books
-        bookedit write <book | new> -- edit a book
-
-The bookedit command lets you create books to fill the world's libraries.
-In order to work on books, you need to build a library -- one of the Grand
-Monuments.
-
-You can pick books for 'copy' and 'write' by name or number. The 'list' command
-gives you the numbers.
-
-When you use the 'write' command, it will take you to the book editor. This
-editor has its own 'help' command to assist you in using it.
-
-Steps to getting your book into a library:
-1. Write the book using "bookedit write"
-2. Make a physical copy of the book using "bookedit copy" (this takes a minute)
-3. Take your copy to any library and type "library shelve" to put your book into
-   circulation in that building
-4. You can use "library checkout" to get another copy of your book out
-
-Type "HELP BOOK TIPS" for more notes on book editing.
-
-See also: LIBRARY
-#
-"BOOK TIPS"
-
-These tips will help you with the BOOKEDIT command:
-
-You set several properties:
-- title: The story name as it appears in the library.
-- byline: The author the story is credited to.
-- item name: The way the item appears in your inventory ("a book")
-- item description: How the book is described when you look at it.
-
-Books are arranged into paragraphs which are shown to the reader every 20
-seconds. You should keep each paragraph down to just a few lines. Since telnet
-uses a standard 80-character display, you should keep your lines 80 characters
-or less.
-
-Type /c to clear the text editor when you start a new paragraph or description.
-Otherwise, the default text will still be in there. You can use /d1 to delete
-line 1 if you left it in anyway.
-
-The easiest way to format your paragraphs is to type /fi in the text editor.
-This also works on the item description. But if your whole text fits on 1 line
-under 80 characters, you probably don't need the indent.
-
-See also: BOOKEDIT, LIBRARY
-#
 BRICKS "CLAY BRICKS"
 
 Clay bricks (resource)
@@ -179,30 +127,6 @@ The (large) flag on items indicates that the item is over-sized and takes up
 2 inventory slots.
 
 All other items take up 1 inventory slot.
-#
-LIBRARY
-
-Building:  [^^]  Library  (Grand Monuments)
-Resources:  100 lumber, 40 nails, 48 blocks
-Command:  library browse  -- see books shelved here
-          library checkout <book>  -- grab a copy of a book
-          library shelve <item>  -- put a book away on the shelves
-          library burn <book>  -- remove all copies of a book from this library
-
-You can collect books and put them into your own library, which is a Grand
-Monument in the Empire skill tree. Once you shelve a book in your library, you
-can take as many copies of it as you want. The only way to permanently remove
-it form your collection is to use the "burn" command.
-
-The 'checkout' and 'burn' commands target books in the library's collection,
-not items in your inventory. You can pick these books by name or by number.
-Use the 'browse' command to see the numbers, but beware that these may change
-as new books are catalogued and sorted.
-
-If you have written a book with bookedit, you can always make a new copy of it
-using 'bookedit copy'.
-
-See also: BOOKEDIT, KEEP
 #
 "LIGHTNING STONE" "YELLOW LIGHTNING STONE" "YELLOW STONE"
 
