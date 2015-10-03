@@ -17,6 +17,7 @@
 *   #define Section
 *     Miscellaneous Defines
 *     Adventure Defines
+*     Book Defines
 *     Building Defines
 *     Character Defines
 *     Craft Defines
@@ -32,6 +33,7 @@
 *   Structs Section
 *     Miscellaneous Structs
 *     Adventure Structs
+*     Book Structs
 *     Building Structs
 *     Mobile Structs
 *     Player Structs
@@ -167,7 +169,8 @@ typedef unsigned long long	bitvector_t;
 // vnums
 typedef int any_vnum;
 typedef any_vnum adv_vnum;	// for adventure zones
-typedef any_vnum bld_vnum;	// for building[].vnum
+typedef any_vnum bld_vnum;	// for buildings
+typedef any_vnum book_vnum;	// for the book_table
 typedef any_vnum craft_vnum;	// craft recipe's vnum
 typedef any_vnum crop_vnum;	// crop's vnum
 typedef any_vnum empire_vnum;	// empire virtual number
@@ -344,6 +347,21 @@ typedef struct trig_data trig_data;
 #define RMT_NO_TELEPORT  BIT(6)	// g. cannot teleport in/out
 #define RMT_LOOK_OUT  BIT(7)	// h. can see the map using "look out"
 #define RMT_NO_LOCATION  BIT(8)	// i. don't show a location, disables where
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// BOOK DEFINES ////////////////////////////////////////////////////////////
+
+// BOOK_x: book flags
+// no flags defined or implemented (but a 'bits' field is saved to file)
+
+
+// misc
+#define DEFAULT_BOOK  0	// in case of errors
+#define MAX_BOOK_TITLE  40
+#define MAX_BOOK_BYLINE  40
+#define MAX_BOOK_ITEM_NAME  20
+#define MAX_BOOK_PARAGRAPH  4000
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1153,7 +1171,7 @@ typedef struct trig_data trig_data;
 #define CON_QLAST_NAME  13	// Do you have a last..
 #define CON_SLAST_NAME  14  // And what is it?
 #define CON_CLAST_NAME  15	// Did I get that right?
-#define CON_BOOKEDIT  16	// authorship
+	#define CON_UNUSED2  16
 #define CON_Q_HAS_ALT  17	// Do you have an alt?
 #define CON_Q_ALT_NAME  18	// Type alt's name
 #define CON_Q_ALT_PASSWORD  19	// Type alt's password
@@ -1999,6 +2017,41 @@ struct room_template {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// BOOK STRUCTS ////////////////////////////////////////////////////////////
+
+// Just helps keep a unique list of authors
+struct author_data {
+	int idnum;
+	UT_hash_handle hh;	// author_table
+};
+
+
+// data for a book
+struct book_data {
+	book_vnum vnum;
+	
+	int author;
+	unsigned int bits;
+	char *title;
+	char *byline;
+	char *item_name;
+	char *item_description;
+	
+	struct paragraph_data *paragraphs;	// linked list
+	struct library_data *in_libraries;	// places this book is kept
+	
+	UT_hash_handle hh;	// book_table
+};
+
+
+// linked list of locations the book occurs
+struct library_data {
+	room_vnum location;
+	struct library_data *next;
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// BUILDING STRUCTS ////////////////////////////////////////////////////////
 
 // building_table
@@ -2083,22 +2136,6 @@ struct pursuit_data {
 
  //////////////////////////////////////////////////////////////////////////////
 //// PLAYER STRUCTS //////////////////////////////////////////////////////////
-
-// for book editing
-struct bookedit_data {
-	int id;
-	int mode;
-	bool changed;
-	
-	unsigned int bits;
-	char *title;
-	char *byline;
-	char *item_name;
-	char *item_description;
-	
-	struct paragraph_data *paragraphs;	// linked list
-};
-
 
 // used in descriptor for personal channel histories -- act.comm.c
 struct channel_history_data {
@@ -2195,14 +2232,13 @@ struct descriptor_data {
 	char *last_act_message;	// stores the last thing act() sent to this desc
 	struct channel_history_data *channel_history[NUM_CHANNEL_HISTORY_TYPES];	// histories
 	
-	struct bookedit_data *bookedit;	// for book editing
-	
 	// olc
 	int olc_type;	// OLC_OBJECT, etc -- only when an editor is open
 	char *olc_storage;	// a character buffer created and used by some olc modes
 	any_vnum olc_vnum;	// vnum being edited
 	
 	adv_data *olc_adventure;	// adv being edited
+	struct book_data *olc_book;	// book being edited
 	obj_data *olc_object;	// item being edited
 	char_data *olc_mobile;	// mobile being edited
 	craft_data *olc_craft;	// craft recipe being edited

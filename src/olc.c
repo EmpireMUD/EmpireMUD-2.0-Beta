@@ -250,6 +250,7 @@ extern bool valid_room_template_vnum(rmt_vnum vnum);
 
 // prototypes
 void olc_show_adventure(char_data *ch);
+void olc_show_book(char_data *ch);
 void olc_show_building(char_data *ch);
 void olc_show_craft(char_data *ch);
 void olc_show_crop(char_data *ch);
@@ -260,6 +261,7 @@ void olc_show_room_template(char_data *ch);
 void olc_show_sector(char_data *ch);
 void olc_show_trigger(char_data *ch);
 extern adv_data *setup_olc_adventure(adv_data *input);
+extern struct book_data *setup_olc_book(struct book_data *input);
 extern bld_data *setup_olc_building(bld_data *input);
 extern craft_data *setup_olc_craft(craft_data *input);
 extern crop_data *setup_olc_crop(crop_data *input);
@@ -275,15 +277,15 @@ extern bool validate_icon(char *icon);
 // master olc command structure
 const struct olc_command_data olc_data[] = {
 	// main commands
-	{ "abort", olc_abort, OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
+	{ "abort", olc_abort, OLC_BOOK | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
 	{ "audit", olc_audit, OLC_CRAFT | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT, NOBITS },
-	{ "copy", olc_copy, OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, NOBITS },
-	{ "delete", olc_delete, OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, OLC_CF_NO_ABBREV },
+	{ "copy", olc_copy, OLC_BOOK | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, NOBITS },
+	{ "delete", olc_delete, OLC_BOOK | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, OLC_CF_NO_ABBREV },
 	// "display" command uses the shortcut "." or "olc" with no args, and is in the do_olc function
-	{ "edit", olc_edit, OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, NOBITS },
-	{ "free", olc_free, OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, NOBITS },
-	{ "list", olc_list, OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, NOBITS },
-	{ "save", olc_save, OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
+	{ "edit", olc_edit, OLC_BOOK | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, NOBITS },
+	{ "free", olc_free, OLC_BOOK | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, NOBITS },
+	{ "list", olc_list, OLC_BOOK | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, NOBITS },
+	{ "save", olc_save, OLC_BOOK | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
 	{ "search", olc_search, OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ROOM_TEMPLATE, NOBITS },
 	
 	// admin
@@ -598,6 +600,11 @@ OLC_MODULE(olc_abort) {
 				GET_OLC_ADVENTURE(ch->desc) = NULL;
 				break;
 			}
+			case OLC_BOOK: {
+				free_book(GET_OLC_BOOK(ch->desc));
+				GET_OLC_BOOK(ch->desc) = NULL;
+				break;
+			}
 			case OLC_BUILDING: {
 				free_building(GET_OLC_BUILDING(ch->desc));
 				GET_OLC_BUILDING(ch->desc) = NULL;
@@ -863,6 +870,11 @@ OLC_MODULE(olc_copy) {
 			exists = (adventure_proto(from_vnum) != NULL);
 			break;
 		}
+		case OLC_BOOK: {
+			found = (find_book_by_vnum(vnum) != NULL);
+			exists = (find_book_by_vnum(from_vnum) != NULL);
+			break;
+		}
 		case OLC_BUILDING: {
 			found = (building_proto(vnum) != NULL);
 			exists = (building_proto(from_vnum) != NULL);
@@ -959,6 +971,12 @@ OLC_MODULE(olc_copy) {
 			olc_show_adventure(ch);
 			break;
 		}
+		case OLC_BOOK: {
+			GET_OLC_BOOK(ch->desc) = setup_olc_book(find_book_by_vnum(from_vnum));
+			GET_OLC_BOOK(ch->desc)->vnum = vnum;
+			olc_show_book(ch);
+			break;
+		}
 		case OLC_BUILDING: {
 			GET_OLC_BUILDING(ch->desc) = setup_olc_building(building_proto(from_vnum));
 			GET_OLC_BUILDING(ch->desc)->vnum = vnum;
@@ -1034,6 +1052,7 @@ OLC_MODULE(olc_copy) {
 
 OLC_MODULE(olc_delete) {
 	void olc_delete_adventure(char_data *ch, adv_vnum vnum);
+	void olc_delete_book(char_data *ch, book_vnum vnum);
 	void olc_delete_building(char_data *ch, bld_vnum vnum);
 	void olc_delete_craft(char_data *ch, craft_vnum vnum);
 	void olc_delete_crop(char_data *ch, crop_vnum vnum);
@@ -1084,6 +1103,10 @@ OLC_MODULE(olc_delete) {
 			olc_delete_adventure(ch, vnum);
 			break;
 		}
+		case OLC_BOOK: {
+			olc_delete_book(ch, vnum);
+			break;
+		}
 		case OLC_BUILDING: {
 			olc_delete_building(ch, vnum);
 			break;
@@ -1132,6 +1155,10 @@ OLC_MODULE(olc_display) {
 	switch (GET_OLC_TYPE(ch->desc)) {
 		case OLC_ADVENTURE: {
 			olc_show_adventure(ch);
+			break;
+		}
+		case OLC_BOOK: {
+			olc_show_book(ch);
 			break;
 		}
 		case OLC_BUILDING: {
@@ -1241,6 +1268,13 @@ OLC_MODULE(olc_edit) {
 			GET_OLC_ADVENTURE(ch->desc) = setup_olc_adventure(adventure_proto(vnum));
 			GET_OLC_ADVENTURE(ch->desc)->vnum = vnum;
 			olc_show_adventure(ch);
+			break;
+		}
+		case OLC_BOOK: {
+			// this sets up either new or existing automatically
+			GET_OLC_BOOK(ch->desc) = setup_olc_book(find_book_by_vnum(vnum));
+			GET_OLC_BOOK(ch->desc)->vnum = vnum;			
+			olc_show_book(ch);
 			break;
 		}
 		case OLC_BUILDING: {
@@ -1353,6 +1387,10 @@ OLC_MODULE(olc_free) {
 					free = (adventure_proto(iter) == NULL);
 					break;
 				}
+				case OLC_BOOK: {
+					free = (find_book_by_vnum(iter) == NULL);
+					break;
+				}
 				case OLC_BUILDING: {
 					free = (building_proto(iter) == NULL);
 					break;
@@ -1452,6 +1490,18 @@ OLC_MODULE(olc_list) {
 					}
 				}
 				break;
+			}
+			case OLC_BOOK: {
+				struct book_data *book, *next_book;
+				HASH_ITER(hh, book_table, book, next_book) {
+					if (len >= sizeof(buf)) {
+						break;
+					}
+					if (book->vnum >= from_vnum && book->vnum <= to_vnum) {
+						++count;
+						len += snprintf(buf + len, sizeof(buf) - len, "[%5d] %s (%s)\r\n", book->vnum, book->title, book->byline);
+					}
+				}
 			}
 			case OLC_BUILDING: {
 				bld_data *bld, *next_bld;
@@ -1701,6 +1751,7 @@ OLC_MODULE(olc_removeindev) {
 
 OLC_MODULE(olc_save) {
 	void save_olc_adventure(descriptor_data *desc);
+	void save_olc_book(descriptor_data *desc);
 	void save_olc_building(descriptor_data *desc);
 	void save_olc_craft(descriptor_data *desc);
 	void save_olc_crop(descriptor_data *desc);
@@ -1730,6 +1781,12 @@ OLC_MODULE(olc_save) {
 				save_olc_adventure(ch->desc);
 				free_adventure(GET_OLC_ADVENTURE(ch->desc));
 				GET_OLC_ADVENTURE(ch->desc) = NULL;
+				break;
+			}
+			case OLC_BOOK: {
+				save_olc_book(ch->desc);
+				free_book(GET_OLC_BOOK(ch->desc));
+				GET_OLC_BOOK(ch->desc) = NULL;
 				break;
 			}
 			case OLC_BUILDING: {
@@ -2307,6 +2364,10 @@ bool player_can_olc_edit(char_data *ch, int type, any_vnum vnum) {
 	}
 	else if (IS_SET(type, OLC_MAP) && !OLC_FLAGGED(ch, OLC_FLAG_MAP_EDIT)) {
 		return FALSE;
+	}
+	else if (IS_SET(type, OLC_BOOK) && find_book_by_vnum(vnum) && find_book_by_vnum(vnum)->author == GET_IDNUM(ch)) {
+		// own book
+		return TRUE;
 	}
 	else if (IS_SET(type, OLC_ADVENTURE)) {
 		if (OLC_FLAGGED(ch, OLC_FLAG_NO_ADVENTURE)) {

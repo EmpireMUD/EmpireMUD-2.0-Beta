@@ -512,6 +512,10 @@ cpp_extern const struct command_info cmd_info[] = {
 
 	/* now, the main list */
 	SIMPLE_CMD( "/", POS_DEAD, do_slash_channel, NO_MIN, CTYPE_COMM ),
+
+	// . is "olc" for imms but "bookedit" for mortals
+	GRANT_CMD( ".", POS_DEAD, do_olc, LVL_BUILDER, CTYPE_OLC, GRANT_OLC ),
+	SCMD_CMD( ".", POS_STANDING, do_library, LVL_APPROVED, CTYPE_UTIL, SCMD_BOOKEDIT ),
 	
 	SIMPLE_CMD( "at", POS_DEAD, do_at, LVL_START_IMM, CTYPE_IMMORTAL ),
 	SCMD_CMD( "accept", POS_DEAD, do_accept, NO_MIN, CTYPE_UTIL, SCMD_ACCEPT ),
@@ -771,7 +775,6 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "\"", POS_RESTING, do_say, NO_MIN, CTYPE_COMM, SCMD_OOCSAY ),
 	ABILITY_CMD( "outrage", POS_FIGHTING, do_outrage, NO_MIN, CTYPE_COMBAT, ABIL_OUTRAGE ),
 	GRANT_CMD( "olc", POS_DEAD, do_olc, LVL_BUILDER, CTYPE_OLC, GRANT_OLC ),
-	GRANT_CMD( ".", POS_DEAD, do_olc, LVL_BUILDER, CTYPE_OLC, GRANT_OLC ),
 
 	SIMPLE_CMD( "put", POS_RESTING, do_put, NO_MIN, CTYPE_MOVE ),
 	GRANT_CMD( "page", POS_DEAD, do_page, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_PAGE ),
@@ -2091,7 +2094,6 @@ void nanny(descriptor_data *d, char *arg) {
 	extern int enter_player_game(descriptor_data *d, int dolog, bool fresh);
 	extern int isbanned(char *hostname);
 	extern int num_earned_bonus_traits(char_data *ch);
-	void parse_bookedit(descriptor_data *d, char *arg);
 	void start_new_character(char_data *ch);
 	extern int Valid_Name(char *newname);
 	
@@ -2109,11 +2111,6 @@ void nanny(descriptor_data *d, char *arg) {
 	skip_spaces(&arg);
 
 	switch (STATE(d)) {
-		case CON_BOOKEDIT: {
-			parse_bookedit(d, arg);
-			break;
-		}
-
 		case CON_GET_NAME: {	/* wait for input of name */
 			if (d->character == NULL) {
 				CREATE(d->character, char_data, 1);

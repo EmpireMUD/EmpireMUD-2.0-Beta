@@ -62,7 +62,6 @@
 // externs
 extern const int confused_dirs[NUM_SIMPLE_DIRS][2][NUM_OF_DIRS];
 extern const char *drinks[];
-extern char *get_book_item_name_by_id(int id);
 extern int get_north_for_char(char_data *ch);
 extern struct complex_room_data *init_complex_data();
 void write_lore(char_data *ch);

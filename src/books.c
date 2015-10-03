@@ -20,36 +20,67 @@
 #include "handler.h"
 #include "db.h"
 #include "vnums.h"
-#include "books.h"
 #include "dg_scripts.h"
 
 /**
 * Contents:
 *   Data
+*   Author Tracking
 *   Core Functions
 *   Library
 *   Reading
 */
 
-// protos
-void ensure_author_in_list(int idnum, bool save_if_add);
+// local protos
 
 
  //////////////////////////////////////////////////////////////////////////////
 //// DATA ////////////////////////////////////////////////////////////////////
 
-struct book_data *book_list = NULL;	// linked list
-int *author_list = NULL;	// assists in saving the master file, sorted numerically
-int size_of_author_list = 0;	// for iteration
-int top_book_id = 0;	// for id assignment
+struct book_data *book_table = NULL;	// hash table
+struct author_data *author_table = NULL;	// hash table of authors
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// AUTHOR TRACKING /////////////////////////////////////////////////////////
+
+/**
+* @param struct author_data *a One element
+* @param struct author_data *b Another element
+* @return int Sort instruction of -1, 0, or 1
+*/
+int author_sort(struct author_data *a, struct author_data *b) {
+	return a->idnum - b->idnum;
+}
+
+
+/**
+* Marks that an author has at least one book, in author_table.
+*
+* @param int idnum The author's player idnum.
+*/
+void add_book_author(int idnum) {
+	struct author_data *auth;
+	
+	HASH_FIND_INT(author_table, &idnum, auth);
+	if (!auth) {
+		CREATE(auth, struct author_data, 1);
+		auth->idnum = idnum;
+		HASH_ADD_INT(author_table, idnum, auth);
+		HASH_SORT(author_table, author_sort);
+	}
+}
+
 
 
  //////////////////////////////////////////////////////////////////////////////
 //// CORE FUNCTIONS //////////////////////////////////////////////////////////
 
 // parse 1 book file
-void parse_book(FILE *fl, int book_id) {	
-	struct book_data *book, *book_ctr;
+void parse_book(FILE *fl, book_vnum vnum) {
+	void add_book_to_table(struct book_data *book);
+
+	struct book_data *book;
 	struct library_data *libr, *libr_ctr;
 	struct paragraph_data *para, *para_ctr;
 	
@@ -57,29 +88,12 @@ void parse_book(FILE *fl, int book_id) {
 	int lvar[2];
 	char line[256], astr[256];
 	
-	sprintf(buf2, "book #%d", book_id);
+	sprintf(buf2, "book #%d", vnum);
 	
-	// update top id
-	top_book_id = MAX(top_book_id, book_id);
-
 	CREATE(book, struct book_data, 1);
-	book->next = NULL;
-	
-	if (book_list) {
-		// append to end
-		book_ctr = book_list;
-		while (book_ctr->next) {
-			book_ctr = book_ctr->next;
-		}
-		book_ctr->next = book;
-	}
-	else {
-		book_list = book;
-	}
-
-	// data!
-	book->id = book_id;
-	
+	book->vnum = vnum;
+	add_book_to_table(book);
+		
 	// author
 	if (!get_line(fl, line)) {
 		log("SYSERR: Expecting author id for %s but file ended", buf2);
@@ -91,7 +105,7 @@ void parse_book(FILE *fl, int book_id) {
 	}
 	else {
 		book->author = lvar[0];
-		ensure_author_in_list(lvar[0], FALSE);
+		add_book_author(lvar[0]);
 		
 		book->bits |= asciiflag_conv(astr);
 	}
@@ -191,7 +205,7 @@ void save_author_books(int idnum) {
 	char filename[MAX_STRING_LENGTH], tempfile[MAX_STRING_LENGTH], temp[MAX_STRING_LENGTH];
 	struct paragraph_data *para;
 	struct library_data *libr;
-	struct book_data *book;
+	struct book_data *book, *next_book;
 	FILE *fl;
 	
 	sprintf(filename, "%s%d%s", BOOK_PREFIX, idnum, BOOK_SUFFIX);
@@ -203,7 +217,7 @@ void save_author_books(int idnum) {
 		exit(1);
 	}
 
-	for (book = book_list; book; book = book->next) {
+	HASH_ITER(hh, book_table, book, next_book) {
 		if (book->author == idnum) {
 			strcpy(temp, NULLSAFE(book->item_description));
 			strip_crlf(temp);
@@ -214,7 +228,7 @@ void save_author_books(int idnum) {
 						"%s~\n"
 						"%s~\n"
 						"%s~\n",
-						book->id, book->author, book->bits, book->title, book->byline, book->item_name, temp);
+						book->vnum, book->author, book->bits, book->title, book->byline, book->item_name, temp);
 			
 			// 'P': paragraph
 			for (para = book->paragraphs; para; para = para->next) {
@@ -238,16 +252,13 @@ void save_author_books(int idnum) {
 }
 
 
-
-
-
 /**
 * saves the author index file, e.g. when a new author is added
 */
 void save_author_index(void) {
 	char filename[MAX_STRING_LENGTH], tempfile[MAX_STRING_LENGTH];
+	struct author_data *author, *next_author;
 	FILE *fl;
-	int iter;
 	
 	sprintf(filename, "%s%s", BOOK_PREFIX, INDEX_FILE);
 	strcpy(tempfile, filename);
@@ -258,8 +269,8 @@ void save_author_index(void) {
 		exit(1);
 	}
 	
-	for (iter = 0; iter < size_of_author_list; ++iter) {
-		fprintf(fl, "%d%s\n", author_list[iter], BOOK_SUFFIX);
+	HASH_ITER(hh, author_table, author, next_author) {
+		fprintf(fl, "%d%s\n", author->idnum, BOOK_SUFFIX);
 	}
 	
 	fprintf(fl, "$~\n");
@@ -269,131 +280,18 @@ void save_author_index(void) {
 
 
 /**
-* This function just ensures a certain author is in the list, and adds it if
-* it isn't.
-*
-* @param int idnum e.g. GET_IDNUM(ch)
-*/
-void ensure_author_in_list(int idnum, bool save_if_add) {
-	int *newlist;
-	int iter;
-	bool found = FALSE;
-	
-	for (iter = 0; !found && iter < size_of_author_list; ++iter) {
-		if (author_list[iter] == idnum) {
-			found = TRUE;
-		}
-	}
-	
-	if (!found) {
-		CREATE(newlist, int, size_of_author_list + 1);
-		
-		for (iter = 0; iter < size_of_author_list; ++iter) {
-			if (author_list[iter] < idnum) {
-				newlist[iter] = author_list[iter];
-			}
-			else if (author_list[iter] == idnum) {
-				// this ... should not happen...
-				newlist[iter] = author_list[iter];
-				found = TRUE;
-			}
-			else if (author_list[iter] > idnum) {
-				newlist[iter+1] = author_list[iter];
-				if (!found) {
-					newlist[iter] = idnum;
-					found = TRUE;
-				}
-			}
-		}
-		
-		if (!found) {
-			// didn't find it? iter is still at the end of the list
-			newlist[iter] = idnum;
-		}
-		
-		++size_of_author_list;
-		if (author_list) {
-			free(author_list);
-		}
-		author_list = newlist;
-		
-		if (save_if_add) {
-			save_author_index();
-		}
-	}
-}
-
-
-/**
-* @param int id any book id
+* @param book_vnum vnum The book to find.
 * @return struct book_data* the book data, or NULL
 */
-struct book_data *find_book_by_id(int id) {
-	struct book_data *book, *found = NULL;
+struct book_data *find_book_by_vnum(book_vnum vnum) {
+	struct book_data *book;
 	
-	for (book = book_list; book && !found; book = book->next) {
-		if (book->id == id) {
-			found = book;
-		}
+	if (vnum < 0 || vnum == NOTHING) {
+		return NULL;
 	}
 	
-	return found;
-}
-
-
-/**
-* @param int id any book id
-* @return string The "item name" for the book
-*/
-char *get_book_item_name_by_id(int id) {
-	struct book_data *book, *found = NULL;
-	static char lbuf[MAX_INPUT_LENGTH];
-	
-	for (book = book_list; book && !found; book = book->next) {
-		if (book->id == id) {
-			found = book;
-		}
-	}
-	
-	if (found) {
-		strcpy(lbuf, found->item_name);
-		return lbuf;
-	}
-	else if (id != DEFAULT_BOOK) {
-		return get_book_item_name_by_id(DEFAULT_BOOK);
-	}
-	else {
-		strcpy(lbuf, "an unknown book");
-		return lbuf;
-	}
-}
-
-
-/**
-* @param int id any book id
-* @return string The "item description" for the book
-*/
-char *get_book_item_description_by_id(int id) {
-	struct book_data *book, *found = NULL;
-	static char lbuf[MAX_INPUT_LENGTH];
-	
-	for (book = book_list; book && !found; book = book->next) {
-		if (book->id == id) {
-			found = book;
-		}
-	}
-	
-	if (found) {
-		strcpy(lbuf, found->item_description);
-		return lbuf;
-	}
-	else if (id != DEFAULT_BOOK) {
-		return get_book_item_description_by_id(DEFAULT_BOOK);
-	}
-	else {
-		strcpy(lbuf, "Something went wrong loading this description.\r\n");
-		return lbuf;
-	}
+	HASH_FIND_INT(book_table, &vnum, book);
+	return book;
 }
 
 
@@ -403,7 +301,7 @@ char *get_book_item_description_by_id(int id) {
 * @return struct book_data* either the book in this library, or NULL
 */
 struct book_data *find_book_in_library(char *argument, room_data *room) {
-	struct book_data *book, *by_name = NULL, *found = NULL;
+	struct book_data *book, *next_book, *by_name = NULL, *found = NULL;
 	struct library_data *libr;
 	int num = NOTHING;
 	
@@ -412,7 +310,7 @@ struct book_data *find_book_in_library(char *argument, room_data *room) {
 	}
 	
 	// find by number or name
-	for (book = book_list; book && !found; book = book->next) {
+	HASH_ITER(hh, book_table, book, next_book) {
 		for (libr = book->in_libraries; libr && !found; libr = libr->next) {
 			if (libr->location == GET_ROOM_VNUM(room)) {
 				if (num != NOTHING && --num == 0) {
@@ -423,6 +321,7 @@ struct book_data *find_book_in_library(char *argument, room_data *room) {
 					// title match
 					if (num == NOTHING) {
 						found = book;
+						break;	// perfect match -- done
 					}
 					else if (by_name == NULL) {
 						by_name = book;
@@ -447,7 +346,7 @@ struct book_data *find_book_in_library(char *argument, room_data *room) {
 * @return struct book_data* either the book, or NULL
 */
 struct book_data *find_book_by_author(char *argument, int idnum) {
-	struct book_data *book, *by_name = NULL, *found = NULL;
+	struct book_data *book, *next_book, *by_name = NULL, *found = NULL;
 	int num = NOTHING;
 	
 	if (is_number(argument)) {
@@ -455,16 +354,18 @@ struct book_data *find_book_by_author(char *argument, int idnum) {
 	}
 	
 	// find by number or name
-	for (book = book_list; book && !found; book = book->next) {
+	HASH_ITER(hh, book_table, book, next_book) {
 		if (book->author == idnum) {
 			if (num != NOTHING && --num == 0) {
 				// found by number!
 				found = book;
+				break;
 			}
 			else if (is_abbrev(argument, book->title)) {
 				// title match
 				if (num == NOTHING) {
 					found = book;
+					break;
 				}
 				else if (by_name == NULL) {
 					by_name = book;
@@ -482,24 +383,60 @@ struct book_data *find_book_by_author(char *argument, int idnum) {
 }
 
 
+/**
+* Finds a free book vnum.
+*
+* @return book_vnum A new book vnum.
+*/
+book_vnum find_new_book_vnum(void) {
+	struct book_data *book, *next_book;
+	descriptor_data *desc;
+	int max_id = 0;
+	
+	// check descriptors
+	for (desc = descriptor_list; desc; desc = desc->next) {
+		if (GET_OLC_BOOK(desc)) {
+			max_id = MAX(max_id, GET_OLC_BOOK(desc)->vnum);
+		}
+	}
+	
+	// check existing books
+	HASH_ITER(hh, book_table, book, next_book) {
+		max_id = MAX(max_id, book->vnum);
+	}
+	
+	return max_id + 1;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// LIBRARY /////////////////////////////////////////////////////////////////
 
 // externs
+LIBRARY_SCMD(bookedit_abort);
+LIBRARY_SCMD(bookedit_author);
+LIBRARY_SCMD(bookedit_byline);
 LIBRARY_SCMD(bookedit_copy);
+LIBRARY_SCMD(bookedit_delete);
+LIBRARY_SCMD(bookedit_item_description);
+LIBRARY_SCMD(bookedit_item_name);
+LIBRARY_SCMD(bookedit_license);
 LIBRARY_SCMD(bookedit_list);
+LIBRARY_SCMD(bookedit_paragraphs);
+LIBRARY_SCMD(bookedit_save);
+LIBRARY_SCMD(bookedit_title);
 LIBRARY_SCMD(bookedit_write);
 
 
 LIBRARY_SCMD(library_browse) {
-	struct book_data *book;
+	struct book_data *book, *next_book;
 	struct library_data *libr;
 	int count = 0;
 
 	if (ch->desc) {
 		sprintf(buf, "Books shelved here:\r\n");
 	
-		for (book = book_list; book; book = book->next) {
+		HASH_ITER(hh, book_table, book, next_book) {
 			for (libr = book->in_libraries; libr; libr = libr->next) {
 				if (libr->location == GET_ROOM_VNUM(IN_ROOM(ch))) {
 					sprintf(buf + strlen(buf), "%d. %s (%s)\r\n", ++count, book->title, book->byline);
@@ -511,7 +448,7 @@ LIBRARY_SCMD(library_browse) {
 			strcat(buf, "  none\r\n");
 		}
 		
-		page_string(ch->desc, buf, 1);
+		page_string(ch->desc, buf, TRUE);
 	}	
 	else {
 		// no desc?
@@ -533,7 +470,7 @@ LIBRARY_SCMD(library_checkout) {
 	}
 	else {
 		obj = read_object(o_BOOK, TRUE);
-		GET_OBJ_VAL(obj, VAL_BOOK_ID) = book->id;
+		GET_OBJ_VAL(obj, VAL_BOOK_ID) = book->vnum;
 		obj_to_char_or_room(obj, ch);
 		
 		msg_to_char(ch, "You find a copy of %s on the shelf and take it.\r\n", book->title);
@@ -549,7 +486,7 @@ int perform_shelve(char_data *ch, obj_data *obj) {
 	struct library_data *libr, *libr_ctr;
 	bool found = FALSE;
 	
-	if (!IS_BOOK(obj) || !(book = find_book_by_id(GET_BOOK_ID(obj)))) {
+	if (!IS_BOOK(obj) || !(book = find_book_by_vnum(GET_BOOK_ID(obj)))) {
 		act("You can't shelve $p!", FALSE, ch, obj, NULL, TO_CHAR);
 		return 0;
 	}
@@ -712,28 +649,47 @@ LIBRARY_SCMD(library_burn) {
 }
 
 
+
+#define LIBR_REQ_LIBRARY  BIT(0)	// must be in library
+#define LIBR_REQ_EDITOR  BIT(1)	// only with an open book editor
+
+
 struct {
 	int subcmd;
 	char *name;
 	int level;
+	bitvector_t flags;
 	void (*func)(char_data *ch, char *argument);
 } library_command[] = {
-	{ SCMD_LIBRARY, "browse", 0, library_browse },
-	{ SCMD_LIBRARY, "checkout", 0, library_checkout },
-	{ SCMD_LIBRARY, "shelve", LVL_APPROVED, library_shelve },
-	{ SCMD_LIBRARY, "burn", LVL_APPROVED, library_burn },
+	{ SCMD_LIBRARY, "browse", 0, LIBR_REQ_LIBRARY, library_browse },
+	{ SCMD_LIBRARY, "checkout", 0, LIBR_REQ_LIBRARY, library_checkout },
+	{ SCMD_LIBRARY, "shelve", LIBR_REQ_LIBRARY, LVL_APPROVED, library_shelve },
+	{ SCMD_LIBRARY, "burn", LIBR_REQ_LIBRARY, LVL_APPROVED, library_burn },
 	
-	{ SCMD_BOOKEDIT, "list", LVL_APPROVED, bookedit_list },
-	{ SCMD_BOOKEDIT, "copy", LVL_APPROVED, bookedit_copy },
-	{ SCMD_BOOKEDIT, "write", LVL_APPROVED, bookedit_write },
+	{ SCMD_BOOKEDIT, "list", LVL_APPROVED, LIBR_REQ_LIBRARY, bookedit_list },
+	{ SCMD_BOOKEDIT, "copy", LVL_APPROVED, LIBR_REQ_LIBRARY, bookedit_copy },
+	{ SCMD_BOOKEDIT, "delete", LVL_APPROVED, LIBR_REQ_LIBRARY, bookedit_delete },
+	{ SCMD_BOOKEDIT, "write", LVL_APPROVED, LIBR_REQ_LIBRARY, bookedit_write },
+	
+	{ SCMD_BOOKEDIT, "abort", LVL_APPROVED, LIBR_REQ_EDITOR, bookedit_abort },
+	{ SCMD_BOOKEDIT, "author", LVL_APPROVED, LIBR_REQ_EDITOR, bookedit_author },
+	{ SCMD_BOOKEDIT, "byline", LVL_APPROVED, LIBR_REQ_EDITOR, bookedit_byline },
+	{ SCMD_BOOKEDIT, "description", LVL_APPROVED, LIBR_REQ_EDITOR, bookedit_item_description },
+	{ SCMD_BOOKEDIT, "item", LVL_APPROVED, LIBR_REQ_EDITOR, bookedit_item_name },
+	{ SCMD_BOOKEDIT, "license", LVL_APPROVED, LIBR_REQ_EDITOR, bookedit_license },
+	{ SCMD_BOOKEDIT, "paragraphs", LVL_APPROVED, LIBR_REQ_EDITOR, bookedit_paragraphs },
+	{ SCMD_BOOKEDIT, "save", LVL_APPROVED, LIBR_REQ_EDITOR, bookedit_save },
+	{ SCMD_BOOKEDIT, "title", LVL_APPROVED, LIBR_REQ_EDITOR, bookedit_title },
 
 	// last!
-	{ SCMD_LIBRARY, "\n", 0, NULL }
+	{ SCMD_LIBRARY, "\n", 0, NOBITS, NULL }
 };
 
 
 // this is both "library" and "bookedit"
 ACMD(do_library) {
+	void olc_show_book(char_data *ch);
+	
 	char arg2[MAX_INPUT_LENGTH];
 	int iter, pos = NOTHING;
 	bool comma;
@@ -745,20 +701,17 @@ ACMD(do_library) {
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "Mobs are illiterate.\r\n");
 	}
-	else if (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_LIBRARY) && !IS_IMMORTAL(ch)) {
-		msg_to_char(ch, "You must be inside a library to do this.\r\n");
+	else if (!ch->desc) {
+		msg_to_char(ch, "You can't do that right now.\r\n");
 	}
-	else if (!IS_IMMORTAL(ch) && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
-		msg_to_char(ch, "You don't have permission to use this library.\r\n");
-	}
-	else if (!IS_COMPLETE(IN_ROOM(ch)) && !IS_IMMORTAL(ch)) {
-		msg_to_char(ch, "The library is unfinished and has no books.\r\n");
+	else if (!*arg && GET_OLC_BOOK(ch->desc)) {
+		olc_show_book(ch);
 	}
 	else if (!*arg) {
 		msg_to_char(ch, "You can use the following %s commands:", types[subcmd]);
 		comma = FALSE;
 		for (iter = 0; *(library_command[iter].name) != '\n'; ++iter) {
-			if (library_command[iter].level <= GET_ACCESS_LEVEL(ch) && library_command[iter].subcmd == subcmd) {
+			if (library_command[iter].level <= GET_ACCESS_LEVEL(ch) && library_command[iter].subcmd == subcmd && (!IS_SET(library_command[iter].flags, LIBR_REQ_EDITOR) || GET_OLC_BOOK(ch->desc))) {
 				msg_to_char(ch, "%s%s", comma ? ", " : " ", library_command[iter].name);
 				comma = TRUE;
 			}
@@ -775,6 +728,18 @@ ACMD(do_library) {
 		
 		if (pos == NOTHING) {
 			msg_to_char(ch, "Invalid %s command.\r\n", types[subcmd]);
+		}
+		else if (IS_SET(library_command[pos].flags, LIBR_REQ_LIBRARY) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_LIBRARY)) {
+			msg_to_char(ch, "You must be inside a library to do this.\r\n");
+		}
+		else if (IS_SET(library_command[pos].flags, LIBR_REQ_LIBRARY) && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+			msg_to_char(ch, "You don't have permission to use this library.\r\n");
+		}
+		else if (IS_SET(library_command[pos].flags, LIBR_REQ_LIBRARY) && !IS_COMPLETE(IN_ROOM(ch))) {
+			msg_to_char(ch, "The library is unfinished and has no books.\r\n");
+		}
+		else if (IS_SET(library_command[pos].flags, LIBR_REQ_EDITOR) && !GET_OLC_BOOK(ch->desc)) {
+			msg_to_char(ch, "You aren't currently editing a book.\r\n");
 		}
 		else {
 			// pass off to specialized function
@@ -797,8 +762,8 @@ void read_book(char_data *ch, obj_data *obj) {
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're too busy right now.\r\n");
 	}
-	else if (!(book = find_book_by_id(GET_BOOK_ID(obj)))) {
-		msg_to_char(ch, "It doesn't seem to have any words.\r\n");
+	else if (!(book = find_book_by_vnum(GET_BOOK_ID(obj)))) {
+		msg_to_char(ch, "The book is old and badly damaged; you can't read it.\r\n");
 	}
 	else {
 		start_action(ch, ACT_READING, 0);
@@ -828,8 +793,8 @@ void process_reading(char_data *ch) {
 		msg_to_char(ch, "You seem to have lost your book.\r\n");
 		GET_ACTION(ch) = ACT_NONE;
 	}
-	else if (!(book = find_book_by_id(GET_ACTION_VNUM(ch, 0)))) {
-		msg_to_char(ch, "The book seems to be blank.\r\n");
+	else if (!(book = find_book_by_vnum(GET_ACTION_VNUM(ch, 0)))) {
+		msg_to_char(ch, "The book is too badly damaged to read.\r\n");
 		GET_ACTION(ch) = ACT_NONE;
 	}
 	else {

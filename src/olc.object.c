@@ -16,7 +16,6 @@
 #include "utils.h"
 #include "interpreter.h"
 #include "db.h"
-#include "books.h"
 #include "comm.h"
 #include "olc.h"
 #include "skills.h"
@@ -49,7 +48,6 @@ extern const char *wear_bits[];
 // external funcs
 extern double get_base_dps(obj_data *weapon);
 extern double get_weapon_speed(obj_data *weapon);
-extern struct book_data *find_book_by_id(int id);
 
 // locals
 char **get_weapon_types_string();
@@ -184,7 +182,7 @@ bool audit_object(obj_data *obj, char_data *ch) {
 			break;
 		}
 		case ITEM_BOOK: {
-			if (!find_book_by_id(GET_BOOK_ID(obj))) {
+			if (!find_book_by_vnum(GET_BOOK_ID(obj))) {
 				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Book type invalid");
 				problem = TRUE;
 			}
@@ -1047,7 +1045,7 @@ void olc_get_values_display(char_data *ch, char *storage) {
 			break;
 		}
 		case ITEM_BOOK: {
-			book = find_book_by_id(GET_BOOK_ID(obj));
+			book = find_book_by_vnum(GET_BOOK_ID(obj));
 			sprintf(storage + strlen(storage), "<&ybook&0> [%d] %s\r\n", GET_BOOK_ID(obj), (book ? book->title : "not set"));
 			break;
 		}
@@ -1387,8 +1385,8 @@ OLC_MODULE(oedit_book) {
 		msg_to_char(ch, "You can only set book id on a book.\r\n");
 	}
 	else {
-		GET_OBJ_VAL(obj, VAL_BOOK_ID) = olc_process_number(ch, argument, "book id", "book", 0, top_book_id, GET_OBJ_VAL(obj, VAL_BOOK_ID));
-		book = find_book_by_id(GET_BOOK_ID(obj));
+		GET_OBJ_VAL(obj, VAL_BOOK_ID) = olc_process_number(ch, argument, "book id", "book", 0, MAX_INT, GET_OBJ_VAL(obj, VAL_BOOK_ID));
+		book = find_book_by_vnum(GET_BOOK_ID(obj));
 		
 		if (!book) {
 			msg_to_char(ch, "Invalid book id. Old id %d restored.\r\n", old);

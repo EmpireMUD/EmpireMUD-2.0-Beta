@@ -38,7 +38,8 @@
 #define OLC_ADVENTURE  BIT(8)
 #define OLC_ROOM_TEMPLATE  BIT(9)
 #define OLC_GLOBAL  BIT(10)
-#define NUM_OLC_TYPES  11
+#define OLC_BOOK  BIT(11)
+#define NUM_OLC_TYPES  12
 
 
 // olc command flags

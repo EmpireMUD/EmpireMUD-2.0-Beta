@@ -468,7 +468,7 @@ const char *connected_types[] = {
 	"Last name?",
 	"Get last name",
 	"Cnf last name",	// 15
-	"Bookedit",
+		"UNUSED 2",
 	"Have alt?",
 	"Alt name",
 	"Alt password",
@@ -1793,6 +1793,7 @@ const char *olc_type_bits[NUM_OLC_TYPES+1] = {
 	"adventure",
 	"roomtemplate",
 	"global",
+	"book",
 	"\n"
 };
 

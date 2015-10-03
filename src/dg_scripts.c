@@ -54,7 +54,6 @@ extern const struct wear_data_type wear_data[NUM_WEARS];
 extern int find_ability_by_name(char *name, bool allow_abbrev);
 extern int find_skill_by_name(char *name);
 void free_varlist(struct trig_var_data *vd);
-extern char *get_book_item_name_by_id(int id);
 extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
 extern bool is_fight_enemy(char_data *ch, char_data *frenemy);	// fight.c
 extern int is_substring(char *sub, char *string);

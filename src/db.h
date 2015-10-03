@@ -180,6 +180,11 @@ extern struct instance_data *instance_list;
 void free_adventure(adv_data *adv);
 extern adv_data *adventure_proto(adv_vnum vnum);
 
+// books
+extern struct book_data *book_table;
+extern struct author_data *author_table;
+void free_book(struct book_data *book);
+
 // buildings
 extern bld_data *building_table;
 void free_building(bld_data *building);

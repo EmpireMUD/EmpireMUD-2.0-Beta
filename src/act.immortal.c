@@ -3382,6 +3382,27 @@ int vnum_adventure(char *searchname, char_data *ch) {
 * @param char_data *ch The player who is searching.
 * @return int The number of matches shown.
 */
+int vnum_book(char *searchname, char_data *ch) {
+	struct book_data *book, *next_book;
+	int found = 0;
+	
+	HASH_ITER(hh, book_table, book, next_book) {
+		if (multi_isname(searchname, book->title) || multi_isname(searchname, book->byline)) {
+			msg_to_char(ch, "%3d. [%5d] %s (%s)\r\n", ++found, book->vnum, book->title, book->byline);
+		}
+	}
+
+	return (found);
+}
+
+
+/**
+* Searches the building db for a match, and prints it to the character.
+*
+* @param char *searchname The search string.
+* @param char_data *ch The player who is searching.
+* @return int The number of matches shown.
+*/
 int vnum_building(char *searchname, char_data *ch) {
 	bld_data *iter, *next_iter;
 	int found = 0;
@@ -5961,10 +5982,17 @@ ACMD(do_users) {
 
 
 ACMD(do_vnum) {
+	char buf[MAX_INPUT_LENGTH], buf2[MAX_INPUT_LENGTH];
+	
 	half_chop(argument, buf, buf2);
 
 	if (!*buf || !*buf2) {
 		send_to_char("Usage: vnum <type> <name>\r\n", ch);
+	}
+	else if (is_abbrev(buf, "book")) {
+		if (!vnum_book(buf2, ch)) {
+			send_to_char("No books by that name.\r\n", ch);
+		}
 	}
 	else if (is_abbrev(buf, "mob")) {
 		if (!vnum_mobile(buf2, ch)) {
