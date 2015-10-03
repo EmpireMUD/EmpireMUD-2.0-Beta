@@ -923,32 +923,62 @@ void reduce_outside_territory(void) {
 
 
 /**
-* Removes claimed land, one tile at a time, from very stale empires.
+* Removes claimed land, one tile at a time, from very stale empires. Since
+* these empires have been gone a long time, there's no need to do this in any
+* fancy order.
 *
 * @param empire_data *emp The empire to reduce.
 */
 static void reduce_stale_empires_one(empire_data *emp) {
 	bool outside_only = (EMPIRE_OUTSIDE_TERRITORY(emp) > 0);
 	room_data *iter, *next_iter, *found_room = NULL;
-	int num_found = 0;
 	bool junk;
 	
-	HASH_ITER(world_hh, world_table, iter, next_iter) {
-		// map only
-		if (GET_ROOM_VNUM(iter) >= MAP_SIZE) {
-			continue;
-		}
-		
-		// caution: do not abandon city centers this way
-		if (ROOM_OWNER(iter) == emp && !IS_CITY_CENTER(iter) && (!outside_only || !is_in_city_for_empire(iter, emp, FALSE, &junk))) {
-			if (!number(0, num_found++)) {
-				found_room = iter;
+	// try interior first -- we'll take the first secondary room we find
+	if (!outside_only) {
+		HASH_ITER(interior_hh, interior_world_table, iter, next_iter) {
+			// only want rooms owned by this empire and only if they are their own home room (like a ship)
+			if (ROOM_OWNER(iter) != emp || HOME_ROOM(iter) != iter) {
+				continue;
 			}
+			// only looking for secondary territory
+			if (!ROOM_BLD_FLAGGED(iter, BLD_SECONDARY_TERRITORY)) {
+				continue;
+			}
+		
+			// found one!
+			found_room = iter;
+			break;
 		}
 	}
 	
+	if (!found_room) {
+		// otherwise find a random room
+		HASH_ITER(world_hh, world_table, iter, next_iter) {
+			// map only
+			if (GET_ROOM_VNUM(iter) >= MAP_SIZE) {
+				continue;
+			}
+			if (ROOM_OWNER(iter) != emp) {
+				continue;
+			}
+			// caution: do not abandon city centers this way
+			if (IS_CITY_CENTER(iter)) {
+				continue;
+			}
+			if (outside_only && is_in_city_for_empire(iter, emp, FALSE, &junk)) {
+				continue;
+			}
+			
+			// first match
+			found_room = iter;
+			break;
+		}
+	}
+	
+	// did we find one?
 	if (found_room) {
-		// this is only called on VERY stale empires (no members), so there's no need to log this abandon
+		// this is only called on VERY stale empires (no members), so there's no real need to log this abandon
 		abandon_room(found_room);
 		read_empire_territory(emp);
 	}
