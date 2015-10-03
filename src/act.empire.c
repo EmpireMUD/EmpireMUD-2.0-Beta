@@ -880,6 +880,11 @@ bool is_in_city_for_empire(room_data *loc, empire_data *emp, bool check_wait, bo
 		return FALSE;
 	}
 	
+	// secondary territory counts as in-city
+	if (ROOM_BLD_FLAGGED(loc, BLD_SECONDARY_TERRITORY)) {
+		return TRUE;
+	}
+	
 	for (city = EMPIRE_CITY_LIST(emp); city; city = city->next) {
 		dist = compute_distance(loc, city->location);
 		

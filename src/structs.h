@@ -394,6 +394,7 @@ typedef struct trig_data trig_data;
 #define BLD_SUMMON_PLAYER  BIT(41)	// can use the summon player command
 #define BLD_NEED_BOAT  BIT(42)	// requires a boat to enter
 #define BLD_LOOK_OUT  BIT(43)	// can see the map using "look out"
+#define BLD_SECONDARY_TERRITORY  BIT(44)	// similar to a ship -- counts as territory off the map
 
 
 // Terrain flags for do_build -- these match up with build_on flags for building crafts

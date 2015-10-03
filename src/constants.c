@@ -1867,6 +1867,7 @@ const char *bld_flags[] = {
 	"SUMMON-PLAYER",
 	"NEED-BOAT",
 	"LOOK-OUT",
+	"2ND-TERRITORY",
 	"\n"
 };
 
