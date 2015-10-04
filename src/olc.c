@@ -270,7 +270,7 @@ void olc_show_room_template(char_data *ch);
 void olc_show_sector(char_data *ch);
 void olc_show_trigger(char_data *ch);
 extern adv_data *setup_olc_adventure(adv_data *input);
-extern struct book_data *setup_olc_book(struct book_data *input);
+extern book_data *setup_olc_book(book_data *input);
 extern bld_data *setup_olc_building(bld_data *input);
 extern craft_data *setup_olc_craft(craft_data *input);
 extern crop_data *setup_olc_crop(crop_data *input);
@@ -1510,7 +1510,7 @@ OLC_MODULE(olc_list) {
 				break;
 			}
 			case OLC_BOOK: {
-				struct book_data *book, *next_book;
+				book_data *book, *next_book;
 				HASH_ITER(hh, book_table, book, next_book) {
 					if (len >= sizeof(buf)) {
 						break;

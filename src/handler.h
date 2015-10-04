@@ -286,9 +286,9 @@ extern int parse_direction(char_data *ch, char *dir);
 void perform_remove(char_data *ch, int pos);
 
 // books.c
-extern struct book_data *find_book_by_vnum(book_vnum vnum);
-extern struct book_data *find_book_by_author(char *argument, int idnum);
-extern struct book_data *find_book_in_library(char *argument, room_data *room);
+extern book_data *find_book_by_vnum(book_vnum vnum);
+extern book_data *find_book_by_author(char *argument, int idnum);
+extern book_data *find_book_in_library(char *argument, room_data *room);
 
 // config.c
 extern bitvector_t config_get_bitvector(char *key);

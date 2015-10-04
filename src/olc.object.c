@@ -971,7 +971,7 @@ obj_data *setup_olc_object(obj_data *input) {
 */
 void olc_get_values_display(char_data *ch, char *storage) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
-	struct book_data *book;
+	book_data *book;
 	char temp[MAX_STRING_LENGTH];
 	
 	*storage = '\0';
@@ -1379,7 +1379,7 @@ OLC_MODULE(oedit_automint) {
 OLC_MODULE(oedit_book) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	int old = GET_OBJ_VAL(obj, VAL_BOOK_ID);
-	struct book_data *book;
+	book_data *book;
 	
 	if (!IS_BOOK(obj)) {
 		msg_to_char(ch, "You can only set book id on a book.\r\n");

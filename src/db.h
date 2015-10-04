@@ -181,9 +181,9 @@ void free_adventure(adv_data *adv);
 extern adv_data *adventure_proto(adv_vnum vnum);
 
 // books
-extern struct book_data *book_table;
+extern book_data *book_table;
 extern struct author_data *author_table;
-void free_book(struct book_data *book);
+void free_book(book_data *book);
 
 // buildings
 extern bld_data *building_table;

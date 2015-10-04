@@ -185,6 +185,7 @@ typedef any_vnum trig_vnum;	// for dg scripts
 // For simplicity...
 typedef struct adventure_data adv_data;
 typedef struct bld_data bld_data;
+typedef struct book_data book_data;
 typedef struct char_data char_data;
 typedef struct craft_data craft_data;
 typedef struct crop_data crop_data;
@@ -2238,7 +2239,7 @@ struct descriptor_data {
 	any_vnum olc_vnum;	// vnum being edited
 	
 	adv_data *olc_adventure;	// adv being edited
-	struct book_data *olc_book;	// book being edited
+	book_data *olc_book;	// book being edited
 	obj_data *olc_object;	// item being edited
 	char_data *olc_mobile;	// mobile being edited
 	craft_data *olc_craft;	// craft recipe being edited

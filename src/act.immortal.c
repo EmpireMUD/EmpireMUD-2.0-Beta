@@ -2287,9 +2287,9 @@ void do_stat_adventure(char_data *ch, adv_data *adv) {
 * Show the stats on a book.
 *
 * @param char_data *ch The player requesting stats.
-* @param struct book_data *book The book to stat.
+* @param book_data *book The book to stat.
 */
-void do_stat_book(char_data *ch, struct book_data *book) {
+void do_stat_book(char_data *ch, book_data *book) {
 	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
 	struct paragraph_data *para;
 	size_t size = 0;
@@ -2944,7 +2944,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 
 	switch (GET_OBJ_TYPE(j)) {
 		case ITEM_BOOK: {
-			struct book_data *book = find_book_by_vnum(GET_BOOK_ID(j));
+			book_data *book = find_book_by_vnum(GET_BOOK_ID(j));
 			msg_to_char(ch, "Book: %d - %s\r\n", GET_BOOK_ID(j), (book ? book->title : "unknown"));
 			break;
 		}
@@ -3437,7 +3437,7 @@ int vnum_adventure(char *searchname, char_data *ch) {
 * @return int The number of matches shown.
 */
 int vnum_book(char *searchname, char_data *ch) {
-	struct book_data *book, *next_book;
+	book_data *book, *next_book;
 	int found = 0;
 	
 	HASH_ITER(hh, book_table, book, next_book) {
@@ -6137,7 +6137,7 @@ ACMD(do_vstat) {
 		do_stat_building(ch, bld);
 	}
 	else if (is_abbrev(buf, "book")) {	// deliberately after 'building'
-		struct book_data *book = find_book_by_vnum(number);
+		book_data *book = find_book_by_vnum(number);
 		if (!book) {
 			msg_to_char(ch, "There is no book with that number.\r\n");
 			return;

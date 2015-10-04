@@ -44,7 +44,7 @@ const char *bookedit_license_display =
 
 
 // local protos
-void remove_book_from_table(struct book_data *book);
+void remove_book_from_table(book_data *book);
 
 // external funcs
 void add_book_author(int idnum);
@@ -58,12 +58,12 @@ void save_author_index();
 /**
 * Puts a book in the hash table.
 *
-* @param struct book_data *book The book to add to the table.
+* @param book_data *book The book to add to the table.
 */
-void add_book_to_table(struct book_data *book) {
-	extern int sort_book_table(struct book_data *a, struct book_data *b);
+void add_book_to_table(book_data *book) {
+	extern int sort_book_table(book_data *a, book_data *b);
 	
-	struct book_data *find;
+	book_data *find;
 	book_vnum vnum;
 	
 	if (book) {
@@ -78,13 +78,41 @@ void add_book_to_table(struct book_data *book) {
 
 
 /**
+* Make an obj copy of a book.
+*
+* @param book_data *book The book data.
+* @return obj_data* The object copy.
+*/
+obj_data *create_book_obj(book_data *book) {
+	char buf[MAX_STRING_LENGTH];
+	obj_data *obj;
+	
+	obj = create_obj();
+	
+	GET_OBJ_SHORT_DESC(obj) = str_dup(NULLSAFE(book->item_name));
+	snprintf(buf, sizeof(buf), "book %s", skip_filler(NULLSAFE(book->item_name)));
+	GET_OBJ_KEYWORDS(obj) = str_dup(buf);
+	snprintf(buf, sizeof(buf), "Someone has left %s here.", NULLSAFE(book->item_name));
+	GET_OBJ_LONG_DESC(obj) = str_dup(buf);
+	GET_OBJ_ACTION_DESC(obj) = str_dup(NULLSAFE(book->item_description));
+	
+	GET_OBJ_TYPE(obj) = ITEM_BOOK;
+	GET_OBJ_WEAR(obj) = ITEM_WEAR_TAKE;
+	GET_OBJ_TIMER(obj) = UNLIMITED;
+	GET_OBJ_VAL(obj, VAL_BOOK_ID) = book->vnum;
+	
+	return obj;
+}
+
+
+/**
 * Creates a new book table entry.
 * 
 * @param book_vnum vnum The number to create.
-* @return struct book_data* The new book.
+* @return book_data* The new book.
 */
-struct book_data *create_book_table_entry(book_vnum vnum, int author) {
-	struct book_data *book;
+book_data *create_book_table_entry(book_vnum vnum, int author) {
+	book_data *book;
 	
 	// sanity
 	if (find_book_by_vnum(vnum)) {
@@ -92,7 +120,7 @@ struct book_data *create_book_table_entry(book_vnum vnum, int author) {
 		return find_book_by_vnum(vnum);
 	}
 	
-	CREATE(book, struct book_data, 1);
+	CREATE(book, book_data, 1);
 	book->vnum = vnum;
 	add_book_to_table(book);
 	
@@ -113,10 +141,10 @@ struct book_data *create_book_table_entry(book_vnum vnum, int author) {
 *
 * See also: olc_delete_book
 *
-* @param struct book_data *book The book to free.
+* @param book_data *book The book to free.
 */
-void free_book(struct book_data *book) {
-	struct book_data *proto = find_book_by_vnum(book->vnum);
+void free_book(book_data *book) {
+	book_data *proto = find_book_by_vnum(book->vnum);
 	struct paragraph_data *para;
 	
 	if (book->title && (!proto || book->title != proto->title)) {
@@ -155,7 +183,7 @@ void free_book(struct book_data *book) {
 * @param book_vnum vnum The vnum to delete.
 */
 void olc_delete_book(char_data *ch, book_vnum vnum) {
-	struct book_data *book;
+	book_data *book;
 	int author;
 	
 	if (!(book = find_book_by_vnum(vnum))) {
@@ -181,8 +209,7 @@ void olc_delete_book(char_data *ch, book_vnum vnum) {
 
 // processes timed action for bookedit_copy
 void process_copying_book(char_data *ch) {
-	char buf[MAX_STRING_LENGTH];
-	struct book_data *book;
+	book_data *book;
 	obj_data *obj;
 	
 	GET_ACTION_TIMER(ch) -= 1;
@@ -194,20 +221,7 @@ void process_copying_book(char_data *ch) {
 			msg_to_char(ch, "You finish copying the book, but there was an error and it's illegible.\r\n");
 		}
 		else {
-			obj = create_obj();
-			
-			GET_OBJ_SHORT_DESC(obj) = str_dup(NULLSAFE(book->item_name));
-			snprintf(buf, sizeof(buf), "book %s", skip_filler(NULLSAFE(book->item_name)));
-			GET_OBJ_KEYWORDS(obj) = str_dup(buf);
-			snprintf(buf, sizeof(buf), "Someone has left %s here.", NULLSAFE(book->item_name));
-			GET_OBJ_LONG_DESC(obj) = str_dup(buf);
-			GET_OBJ_ACTION_DESC(obj) = str_dup(NULLSAFE(book->item_description));
-			
-			GET_OBJ_TYPE(obj) = ITEM_BOOK;
-			GET_OBJ_WEAR(obj) = ITEM_WEAR_TAKE;
-			GET_OBJ_TIMER(obj) = UNLIMITED;
-			GET_OBJ_VAL(obj, VAL_BOOK_ID) = book->vnum;
-			
+			obj = create_book_obj(book);
 			obj_to_char(obj, ch);
 			
 			msg_to_char(ch, "You finish a fresh copy of %s!\r\n", book->title);
@@ -224,9 +238,9 @@ void process_copying_book(char_data *ch) {
 /**
 * Removes a book from the hash table.
 *
-* @param struct book_data *book The book to remove from the table.
+* @param book_data *book The book to remove from the table.
 */
-void remove_book_from_table(struct book_data *book) {
+void remove_book_from_table(book_data *book) {
 	HASH_DEL(book_table, book);
 }
 
@@ -237,7 +251,7 @@ void remove_book_from_table(struct book_data *book) {
 * @param descriptor_data *desc The descriptor who is saving.
 */
 void save_olc_book(descriptor_data *desc) {
-	struct book_data *proto, *book = GET_OLC_BOOK(desc);
+	book_data *proto, *book = GET_OLC_BOOK(desc);
 	book_vnum vnum = GET_OLC_VNUM(desc);
 	struct paragraph_data *para;
 	struct library_data *libr;
@@ -322,14 +336,14 @@ void save_olc_book(descriptor_data *desc) {
 /**
 * Creates a copy of a book, or clears a new one, for editing.
 * 
-* @param struct book_data *input The book to copy, or NULL to make a new one.
-* @return struct book_data* The copied book.
+* @param book_data *input The book to copy, or NULL to make a new one.
+* @return book_data* The copied book.
 */
-struct book_data *setup_olc_book(struct book_data *input) {
+book_data *setup_olc_book(book_data *input) {
 	struct paragraph_data *para, *copy, *last;
-	struct book_data *new;
+	book_data *new;
 	
-	CREATE(new, struct book_data, 1);
+	CREATE(new, book_data, 1);
 	
 	if (input) {
 		// copy normal data
@@ -375,11 +389,11 @@ struct book_data *setup_olc_book(struct book_data *input) {
 /**
 * Simple sorter for the book hash
 *
-* @param struct book_data *a One element
-* @param struct book_data *b Another element
+* @param book_data *a One element
+* @param book_data *b Another element
 * @return int Sort instruction of -1, 0, or 1
 */
-int sort_book_table(struct book_data *a, struct book_data *b) {
+int sort_book_table(book_data *a, book_data *b) {
 	return a->vnum - b->vnum;
 }
 
@@ -394,7 +408,7 @@ int sort_book_table(struct book_data *a, struct book_data *b) {
 * @param char_data *ch The person who is editing a book and will see its display.
 */
 void olc_show_book(char_data *ch) {
-	struct book_data *book = GET_OLC_BOOK(ch->desc);
+	book_data *book = GET_OLC_BOOK(ch->desc);
 	char buf[MAX_STRING_LENGTH];
 	struct paragraph_data *para;
 	bool imm = IS_IMMORTAL(ch);
@@ -439,7 +453,7 @@ void olc_show_book(char_data *ch) {
 //// EDIT MODULES ////////////////////////////////////////////////////////////
 
 OLC_MODULE(booked_author) {
-	struct book_data *book = GET_OLC_BOOK(ch->desc);
+	book_data *book = GET_OLC_BOOK(ch->desc);
 	int id;
 	
 	if (!IS_IMMORTAL(ch)) {
@@ -472,7 +486,7 @@ OLC_MODULE(booked_author) {
 
 
 OLC_MODULE(booked_byline) {
-	struct book_data *book = GET_OLC_BOOK(ch->desc);
+	book_data *book = GET_OLC_BOOK(ch->desc);
 
 	if (strlen(argument) - (2 * count_color_codes(argument)) > MAX_BOOK_BYLINE) {
 		msg_to_char(ch, "Book bylines may not be more than %d characters long.\r\n", MAX_BOOK_TITLE);
@@ -484,7 +498,7 @@ OLC_MODULE(booked_byline) {
 
 
 OLC_MODULE(booked_item_description) {
-	struct book_data *book = GET_OLC_BOOK(ch->desc);
+	book_data *book = GET_OLC_BOOK(ch->desc);
 	
 	if (ch->desc->str) {
 		msg_to_char(ch, "You are already editing a string.\r\n");
@@ -496,7 +510,7 @@ OLC_MODULE(booked_item_description) {
 
 
 OLC_MODULE(booked_item_name) {
-	struct book_data *book = GET_OLC_BOOK(ch->desc);
+	book_data *book = GET_OLC_BOOK(ch->desc);
 
 	if (count_color_codes(argument) > 0) {
 		msg_to_char(ch, "Book item names may not contain color codes.\r\n");
@@ -520,7 +534,7 @@ OLC_MODULE(booked_license) {
 
 OLC_MODULE(booked_paragraphs) {
 	char arg1[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
-	struct book_data *book = GET_OLC_BOOK(ch->desc);
+	book_data *book = GET_OLC_BOOK(ch->desc);
 	struct paragraph_data *para, *new, *last, *temp;
 	size_t size;
 	
@@ -676,7 +690,7 @@ OLC_MODULE(booked_paragraphs) {
 
 
 OLC_MODULE(booked_title) {
-	struct book_data *book = GET_OLC_BOOK(ch->desc);
+	book_data *book = GET_OLC_BOOK(ch->desc);
 	
 	if (strlen(argument) - (2 * count_color_codes(argument)) > MAX_BOOK_TITLE) {
 		msg_to_char(ch, "Book titles may not be more than %d characters long.\r\n", MAX_BOOK_TITLE);
@@ -719,7 +733,7 @@ LIBRARY_SCMD(bookedit_byline) {
 
 
 LIBRARY_SCMD(bookedit_copy) {
-	struct book_data *book;
+	book_data *book;
 	
 	skip_spaces(&argument);
 	
@@ -749,7 +763,7 @@ LIBRARY_SCMD(bookedit_copy) {
 
 
 LIBRARY_SCMD(bookedit_delete) {
-	struct book_data *book = NULL;
+	book_data *book = NULL;
 	descriptor_data *desc;
 	bool found;
 	
@@ -804,7 +818,7 @@ LIBRARY_SCMD(bookedit_license) {
 
 
 LIBRARY_SCMD(bookedit_list) {
-	struct book_data *book, *next_book;
+	book_data *book, *next_book;
 	char buf[MAX_STRING_LENGTH], buf1[MAX_STRING_LENGTH];
 	int count = 0;
 	size_t size;
@@ -865,7 +879,7 @@ LIBRARY_SCMD(bookedit_title) {
 LIBRARY_SCMD(bookedit_write) {
 	extern book_vnum top_book_vnum;
 
-	struct book_data *book = NULL;
+	book_data *book = NULL;
 	descriptor_data *desc;
 	bool found;
 	

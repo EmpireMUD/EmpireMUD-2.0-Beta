@@ -153,7 +153,6 @@
 
 // core objects
 #define o_CORPSE  1000
-#define o_BOOK  1001
 #define o_HOME_CHEST  1010
 
 // Skill tree items

@@ -35,7 +35,7 @@
  //////////////////////////////////////////////////////////////////////////////
 //// DATA ////////////////////////////////////////////////////////////////////
 
-struct book_data *book_table = NULL;	// hash table
+book_data *book_table = NULL;	// hash table
 struct author_data *author_table = NULL;	// hash table of authors
 book_vnum top_book_vnum = 0;	// need a persistent top vnum because re-using a book vnum causes funny issues with obj copies of the book
 
@@ -77,9 +77,9 @@ void add_book_author(int idnum) {
 
 // parse 1 book file
 void parse_book(FILE *fl, book_vnum vnum) {
-	void add_book_to_table(struct book_data *book);
+	void add_book_to_table(book_data *book);
 
-	struct book_data *book;
+	book_data *book;
 	struct library_data *libr, *libr_ctr;
 	struct paragraph_data *para, *para_ctr;
 	
@@ -89,7 +89,7 @@ void parse_book(FILE *fl, book_vnum vnum) {
 	
 	sprintf(buf2, "book #%d", vnum);
 	
-	CREATE(book, struct book_data, 1);
+	CREATE(book, book_data, 1);
 	book->vnum = vnum;
 	add_book_to_table(book);
 	
@@ -206,7 +206,7 @@ void save_author_books(int idnum) {
 	char filename[MAX_STRING_LENGTH], tempfile[MAX_STRING_LENGTH], temp[MAX_STRING_LENGTH];
 	struct paragraph_data *para;
 	struct library_data *libr;
-	struct book_data *book, *next_book;
+	book_data *book, *next_book;
 	FILE *fl;
 	
 	sprintf(filename, "%s%d%s", BOOK_PREFIX, idnum, BOOK_SUFFIX);
@@ -282,10 +282,10 @@ void save_author_index(void) {
 
 /**
 * @param book_vnum vnum The book to find.
-* @return struct book_data* the book data, or NULL
+* @return book_data* the book data, or NULL
 */
-struct book_data *find_book_by_vnum(book_vnum vnum) {
-	struct book_data *book;
+book_data *find_book_by_vnum(book_vnum vnum) {
+	book_data *book;
 	
 	if (vnum < 0 || vnum == NOTHING) {
 		return NULL;
@@ -299,10 +299,10 @@ struct book_data *find_book_by_vnum(book_vnum vnum) {
 /**
 * @param char *argument user input
 * @param room_data *room the location of the library
-* @return struct book_data* either the book in this library, or NULL
+* @return book_data* either the book in this library, or NULL
 */
-struct book_data *find_book_in_library(char *argument, room_data *room) {
-	struct book_data *book, *next_book, *by_name = NULL, *found = NULL;
+book_data *find_book_in_library(char *argument, room_data *room) {
+	book_data *book, *next_book, *by_name = NULL, *found = NULL;
 	struct library_data *libr;
 	int num = NOTHING;
 	
@@ -344,10 +344,10 @@ struct book_data *find_book_in_library(char *argument, room_data *room) {
 /**
 * @param char *argument user input
 * @param int idnum an author's idnum
-* @return struct book_data* either the book, or NULL
+* @return book_data* either the book, or NULL
 */
-struct book_data *find_book_by_author(char *argument, int idnum) {
-	struct book_data *book, *next_book, *by_name = NULL, *found = NULL;
+book_data *find_book_by_author(char *argument, int idnum) {
+	book_data *book, *next_book, *by_name = NULL, *found = NULL;
 	int num = NOTHING;
 	
 	if (is_number(argument)) {
@@ -404,7 +404,7 @@ LIBRARY_SCMD(bookedit_write);
 
 
 LIBRARY_SCMD(library_browse) {
-	struct book_data *book, *next_book;
+	book_data *book, *next_book;
 	struct library_data *libr;
 	int count = 0;
 
@@ -432,8 +432,10 @@ LIBRARY_SCMD(library_browse) {
 
 
 LIBRARY_SCMD(library_checkout) {
+	extern obj_data *create_book_obj(book_data *book);
+	
 	obj_data *obj;
-	struct book_data *book;
+	book_data *book;
 	
 	skip_spaces(&argument);
 	
@@ -444,9 +446,8 @@ LIBRARY_SCMD(library_checkout) {
 		msg_to_char(ch, "No such book is shelved here.\r\n");
 	}
 	else {
-		obj = read_object(o_BOOK, TRUE);
-		GET_OBJ_VAL(obj, VAL_BOOK_ID) = book->vnum;
-		obj_to_char_or_room(obj, ch);
+		obj = create_book_obj(book);
+		obj_to_char(obj, ch);
 		
 		msg_to_char(ch, "You find a copy of %s on the shelf and take it.\r\n", book->title);
 		act("$n picks up $p off a shelf.", TRUE, ch, obj, NULL, TO_ROOM);
@@ -457,7 +458,7 @@ LIBRARY_SCMD(library_checkout) {
 
 // actually shelves a book -- 99% of sanity checks done before this
 int perform_shelve(char_data *ch, obj_data *obj) {
-	struct book_data *book;
+	book_data *book;
 	struct library_data *libr, *libr_ctr;
 	bool found = FALSE;
 	
@@ -591,7 +592,7 @@ LIBRARY_SCMD(library_shelve) {
 
 
 LIBRARY_SCMD(library_burn) {
-	struct book_data *book;
+	book_data *book;
 	struct library_data *libr, *next_libr, *temp;
 	
 	skip_spaces(&argument);
@@ -729,7 +730,7 @@ ACMD(do_library) {
 //// READING /////////////////////////////////////////////////////////////////
 
 void read_book(char_data *ch, obj_data *obj) {
-	struct book_data *book;
+	book_data *book;
 
 	if (!IS_BOOK(obj)) {
 		msg_to_char(ch, "You can't read that!\r\n");
@@ -754,7 +755,7 @@ void read_book(char_data *ch, obj_data *obj) {
 void process_reading(char_data *ch) {
 	obj_data *obj;
 	bool found = FALSE;
-	struct book_data *book;
+	book_data *book;
 	struct paragraph_data *para;
 	int pos;
 	
