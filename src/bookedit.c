@@ -445,6 +445,9 @@ OLC_MODULE(booked_author) {
 	if (!IS_IMMORTAL(ch)) {
 		msg_to_char(ch, "You can't change the book's author id.\r\n");
 	}
+	else if (!*argument) {
+		msg_to_char(ch, "Set the author to who (idnum, name, or nobody)?\r\n");
+	}
 	else if (!str_cmp(argument, "nobody") || !str_cmp(argument, "none")) {
 		book->author = 0;
 		msg_to_char(ch, "You set the book's author to nobody.\r\n");
