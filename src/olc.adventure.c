@@ -166,7 +166,7 @@ bool audit_adventure(adv_data *adv, char_data *ch, bool only_one) {
 		olc_audit(ch, OLC_GLOBAL, buf);
 	}
 	
-	return problem;
+	return only_one ? TRUE : problem;	// prevents the no-problems message
 }
 
 
