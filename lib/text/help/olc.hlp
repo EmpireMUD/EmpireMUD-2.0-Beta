@@ -2553,6 +2553,8 @@ See also: OLC
 Usage:  .<type> audit <from vnum> <to vnum>
 
 This will audit all things in a range of vnums for common problems.
+
+Auditing a single adventure will also run sub-auditors on all its contents.
 #d
 "OLC COPY"
 

@@ -82,6 +82,10 @@ bool audit_adventure(adv_data *adv, char_data *ch, bool only_one) {
 		olc_audit_msg(ch, GET_ADV_VNUM(adv), "Description not set");
 		problem = TRUE;
 	}
+	if (!room_template_proto(GET_ADV_START_VNUM(adv))) {
+		olc_audit_msg(ch, GET_ADV_VNUM(adv), "Missing start room vnum %d", GET_ADV_START_VNUM(adv));
+		problem = TRUE;
+	}
 	if (GET_ADV_MIN_LEVEL(adv) > GET_ADV_MAX_LEVEL(adv) && GET_ADV_MAX_LEVEL(adv) != 0) {
 		olc_audit_msg(ch, GET_ADV_VNUM(adv), "Max level is lower than min level");
 		problem = TRUE;
