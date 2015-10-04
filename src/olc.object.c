@@ -1309,8 +1309,8 @@ OLC_MODULE(oedit_apply) {
 		}
 	}
 	else if (is_abbrev(arg1, "change")) {
-		half_chop(arg2, num_arg, arg1);
-		half_chop(arg1, type_arg, val_arg);
+		strcpy(num_arg, arg2);
+		half_chop(arg3, type_arg, val_arg);
 		
 		if (!*num_arg || !isdigit(*num_arg) || !*type_arg || !*val_arg) {
 			msg_to_char(ch, "Usage: apply change <number> <value | type> <new value>\r\n");
