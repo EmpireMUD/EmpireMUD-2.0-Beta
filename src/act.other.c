@@ -885,13 +885,13 @@ ACMD(do_alternate) {
 		command_lag(ch, WAIT_OTHER);
 	}
 	else if (ch->desc->str) {
-		msg_to_char(ch, "You can't alterante while editing text.\r\n");
+		msg_to_char(ch, "You can't alterante while editing text (use ,/save or ,/abort first).\r\n");
 	}
 	else if (ch->desc->snooping) {
 		msg_to_char(ch, "You can't alternate while snooping.\r\n");
 	}
 	else if (GET_OLC_TYPE(ch->desc) != 0) {
-		msg_to_char(ch, "You can't alternate with an OLC editor open.\r\n");
+		msg_to_char(ch, "You can't alternate with an editor open (use .save or .abort first).\r\n");
 	}
 	else if (ROOM_OWNER(IN_ROOM(ch)) && empire_is_hostile(ROOM_OWNER(IN_ROOM(ch)), GET_LOYALTY(ch), IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't alternate in hostile territory.\r\n");
