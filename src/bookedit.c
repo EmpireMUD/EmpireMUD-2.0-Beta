@@ -461,7 +461,7 @@ OLC_MODULE(booked_author) {
 			msg_to_char(ch, "You set the book's author id to %d (%s).\r\n", id, (id == 0 || !get_name_by_id(id)) ? "nobody" : CAP(get_name_by_id(id)));
 		}
 	}
-	else if (!(id = get_id_by_name(argument))) {
+	else if ((id = get_id_by_name(argument)) <= 0) {
 		msg_to_char(ch, "Unable to find character '%s'.\r\n", argument);
 	}
 	else {
