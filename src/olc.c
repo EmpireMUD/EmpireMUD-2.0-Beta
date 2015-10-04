@@ -2431,6 +2431,10 @@ bool player_can_olc_edit(char_data *ch, int type, any_vnum vnum) {
 		else if (IS_SET(type, OLC_SECTOR) && OLC_FLAGGED(ch, OLC_FLAG_SECTORS)) {
 			return TRUE;
 		}
+		else if (IS_SET(type, OLC_BOOK)) {
+			// no special permissions for books
+			return TRUE;
+		}
 	}
 
 	// nope	
