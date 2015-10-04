@@ -2019,6 +2019,7 @@ See also: OEDIT CAPACITY, OLC OBJECTS
 "OEDIT CUSTOM" "CUSTOM MESSAGES"
 
 Usage:  .custom add <type> <message>
+        .custom change <number> <type | message> <value>
         .custom remove <number | all>
 
 You can set custom messages on objects for various actions. These messages
