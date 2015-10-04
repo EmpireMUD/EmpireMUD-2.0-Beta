@@ -738,6 +738,12 @@ LIBRARY_SCMD(bookedit_copy) {
 		
 		msg_to_char(ch, "You pick up a blank book and begin to copy out '%s'.\r\n", book->title);
 		act("$n begins to write out a copy of a book.", TRUE, ch, NULL, NULL, TO_ROOM);
+		
+		// rapido!
+		if (IS_IMMORTAL(ch)) {
+			GET_ACTION_TIMER(ch) = 0;
+			process_copying_book(ch);
+		}
 	}
 }
 
