@@ -2312,7 +2312,7 @@ void do_stat_book(char_data *ch, struct book_data *book) {
 		txt = para->text;
 		skip_spaces(&txt);
 		len = strlen(txt);
-		len = MIN(len, 52);	// aiming for full page width then a ...
+		len = MIN(len, 62);	// aiming for full page width then a ...
 		snprintf(line, sizeof(line), "Paragraph %*d: %-*.*s...", (num >= 10 ? 2 : 1), count, len, len, txt);
 		if ((ptr = strstr(line, "\r\n"))) {	// line ended early?
 			sprintf(ptr, "...");	// overwrite the crlf
