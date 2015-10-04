@@ -860,6 +860,8 @@ LIBRARY_SCMD(bookedit_write) {
 	extern book_vnum top_book_vnum;
 
 	struct book_data *book = NULL;
+	descriptor_data *desc;
+	bool found;
 	
 	skip_spaces(&argument);
 	
@@ -876,6 +878,20 @@ LIBRARY_SCMD(bookedit_write) {
 	if (str_cmp(argument, "new") && !(book = find_book_by_author(argument, GET_IDNUM(ch)))) {
 		msg_to_char(ch, "No such book.\r\n");
 		return;
+	}
+	
+	// make sure nobody else is already editing it
+	if (book) {
+		found = FALSE;
+		for (desc = descriptor_list; desc && !found; desc = desc->next) {
+			if (GET_OLC_TYPE(desc) == OLC_BOOK && GET_OLC_VNUM(desc) == book->vnum) {
+				found = TRUE;
+			}
+		}
+		if (found) {
+			msg_to_char(ch, "Someone else is already editing that book.\r\n");
+			return;
+		}
 	}
 
 	// begin editor
