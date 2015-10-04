@@ -2887,8 +2887,9 @@ void olc_process_icons(char_data *ch, char *argument, struct icon_data **list) {
 	extern const char *icon_types[];
 	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], arg4[MAX_INPUT_LENGTH];
+	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
 	char lbuf[MAX_INPUT_LENGTH];
-	struct icon_data *icon, *temp;
+	struct icon_data *icon, *change, *temp;
 	int iter, loc, num;
 	bool found;
 	
@@ -2961,11 +2962,71 @@ void olc_process_icons(char_data *ch, char *argument, struct icon_data **list) {
 
 			sort_icon_set(list);
 			strcpy(lbuf, show_color_codes(arg4));
-			msg_to_char(ch, "You add %s: %s %s\r\n", icon_types[loc], show_color_codes(arg3), lbuf);
+			msg_to_char(ch, "You add %s: %s %s%s&0 %s\r\n", icon_types[loc], show_color_codes(arg3), arg3, arg4, lbuf);
+		}
+	}
+	else if (is_abbrev(arg1, "change")) {
+		half_chop(arg2, num_arg, arg1);
+		half_chop(arg1, type_arg, val_arg);
+		
+		if (!*num_arg || !isdigit(*num_arg) || !*type_arg || !*val_arg) {
+			msg_to_char(ch, "Usage: icons change <number> <type | color | icon> <value>\r\n");
+			return;
+		}
+		
+		// find which one to change
+		num = atoi(num_arg);
+		change = NULL;
+		for (icon = *list; icon && !change; icon = icon->next) {
+			if (--num == 0) {
+				change = icon;
+				break;
+			}
+		}
+		
+		if (!change) {
+			msg_to_char(ch, "Invalid icon number.\r\n");
+		}
+		else if (is_abbrev(type_arg, "type")) {
+			if ((loc = search_block(val_arg, icon_types, FALSE)) == NOTHING) {
+				msg_to_char(ch, "Invalid type.\r\n");
+			}
+			else {
+				change->type = loc;
+				msg_to_char(ch, "Icon %d changed to type %s.\r\n", atoi(num_arg), icon_types[loc]);
+			}
+		}
+		else if (is_abbrev(type_arg, "color")) {
+			if (strlen(val_arg) != 2 || !check_banner_color_string(val_arg)) {
+				msg_to_char(ch, "You must specify a single color code, starting with &&.\r\n");
+			}
+			else {
+				if (change->color) {
+					free(change->color);
+				}
+				change->color = str_dup(val_arg);
+				msg_to_char(ch, "Icon %d changed to color code %s.\r\n", atoi(num_arg), show_color_codes(val_arg));
+			}
+		}
+		else if (is_abbrev(type_arg, "icon")) {
+			if (!validate_icon(val_arg)) {
+				msg_to_char(ch, "You must specify an icon that is 4 characters long, not counting color codes.\r\n");
+			}
+			else {
+				if (change->icon) {
+					free(change->icon);
+				}
+				change->icon = str_dup(val_arg);
+				msg_to_char(ch, "Icon %d changed to: %s%s&0 %s\r\n", atoi(num_arg), icon->color, val_arg, show_color_codes(val_arg));
+			}
+		}
+		else {
+			msg_to_char(ch, "You can only change the type, color, or icon.\r\n");
 		}
 	}
 	else {
 		msg_to_char(ch, "Usage: icons add <type> <color code> <icon>\r\n");
+		msg_to_char(ch, "Usage: icons change <number> <type | color | icon> <value>\r\n");
 		msg_to_char(ch, "Usage: icons remove <number | all>\r\n");
 		msg_to_char(ch, "Available types:\r\n");
 		

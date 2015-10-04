@@ -3162,6 +3162,7 @@ See also: OLC SECTORS
 "SECTEDIT ICONS" "CROPEDIT ICONS"
 
 Usage:  .icons add <type> <color code> <icon>
+        .icons change <number> <type | color | icon> <value>
         .icons remove <number | all>
 
 EmpireMUD uses four different seasons and the biggest change between them is
