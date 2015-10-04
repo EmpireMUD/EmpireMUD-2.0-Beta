@@ -2296,10 +2296,10 @@ void do_stat_book(char_data *ch, struct book_data *book) {
 	int count, len, num;
 	char *ptr, *txt;
 	
-	size += snprintf(buf + size, sizeof(buf) - size, "Book VNum: [\tc%d\t0], Author: \tc%s\t0 (\tc%d\t0)\r\n", book->vnum, get_name_by_id(book->author) ? CAP(get_name_by_id(book->author)) : "nobody", book->author);
+	size += snprintf(buf + size, sizeof(buf) - size, "Book VNum: [\tc%d\t0], Author: \ty%s\t0 (\tc%d\t0)\r\n", book->vnum, get_name_by_id(book->author) ? CAP(get_name_by_id(book->author)) : "nobody", book->author);
 	size += snprintf(buf + size, sizeof(buf) - size, "Title: %s\r\n", book->title);
 	size += snprintf(buf + size, sizeof(buf) - size, "Byline: %s\r\n", book->byline);
-	size += snprintf(buf + size, sizeof(buf) - size, "Item: [\tc%s\t0]\r\n", book->item_name);
+	size += snprintf(buf + size, sizeof(buf) - size, "Item: [%s]\r\n", book->item_name);
 	size += snprintf(buf + size, sizeof(buf) - size, "%s", book->item_description);	// desc has its own crlf
 	
 	// precompute number of paragraphs
