@@ -1520,6 +1520,7 @@ OLC_MODULE(olc_list) {
 						len += snprintf(buf + len, sizeof(buf) - len, "[%5d] %s\t0 (%s\t0)\r\n", book->vnum, book->title, book->byline);
 					}
 				}
+				break;
 			}
 			case OLC_BUILDING: {
 				bld_data *bld, *next_bld;
