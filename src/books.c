@@ -31,14 +31,13 @@
 *   Reading
 */
 
-// local protos
-
 
  //////////////////////////////////////////////////////////////////////////////
 //// DATA ////////////////////////////////////////////////////////////////////
 
 struct book_data *book_table = NULL;	// hash table
 struct author_data *author_table = NULL;	// hash table of authors
+book_vnum top_book_vnum = 0;	// need a persistent top vnum because re-using a book vnum causes funny issues with obj copies of the book
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -93,7 +92,9 @@ void parse_book(FILE *fl, book_vnum vnum) {
 	CREATE(book, struct book_data, 1);
 	book->vnum = vnum;
 	add_book_to_table(book);
-		
+	
+	top_book_vnum = MAX(top_book_vnum, vnum);
+	
 	// author
 	if (!get_line(fl, line)) {
 		log("SYSERR: Expecting author id for %s but file ended", buf2);
@@ -380,32 +381,6 @@ struct book_data *find_book_by_author(char *argument, int idnum) {
 	}
 	
 	return found;
-}
-
-
-/**
-* Finds a free book vnum.
-*
-* @return book_vnum A new book vnum.
-*/
-book_vnum find_new_book_vnum(void) {
-	struct book_data *book, *next_book;
-	descriptor_data *desc;
-	int max_id = 0;
-	
-	// check descriptors
-	for (desc = descriptor_list; desc; desc = desc->next) {
-		if (GET_OLC_BOOK(desc)) {
-			max_id = MAX(max_id, GET_OLC_BOOK(desc)->vnum);
-		}
-	}
-	
-	// check existing books
-	HASH_ITER(hh, book_table, book, next_book) {
-		max_id = MAX(max_id, book->vnum);
-	}
-	
-	return max_id + 1;
 }
 
 
