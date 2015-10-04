@@ -837,6 +837,7 @@ See also: BEDIT DESIGNATE, OLC BUILDINGS
 
 Usage:  .spawns add <mob vnum> <percent> [flags]
         .spawns copy <from type> <from vnum>
+        .spawns change <number> <vnum | percent | flags> <value>
         .spawns remove <number | all>
         .spawns list
 

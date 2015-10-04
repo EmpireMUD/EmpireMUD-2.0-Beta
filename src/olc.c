@@ -3373,9 +3373,11 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 void olc_process_spawns(char_data *ch, char *argument, struct spawn_info **list) {
 	extern const char *spawn_flags[];
 
-	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], *flagarg, *tmp;
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
+	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
+	char *flagarg, *tmp;
 	int loc, num, iter, count, findtype;
-	struct spawn_info *spawn, *temp, *copyfrom = NULL;
+	struct spawn_info *spawn, *change, *temp, *copyfrom = NULL;
 	sector_data *sect;
 	any_vnum vnum;
 	double prc;
@@ -3438,6 +3440,58 @@ void olc_process_spawns(char_data *ch, char *argument, struct spawn_info **list)
 				smart_copy_spawns(list, copyfrom);
 				msg_to_char(ch, "Spawns copied from %s %d.\r\n", buf, vnum);
 			}
+		}
+	}
+	else if (is_abbrev(arg1, "change")) {
+		half_chop(arg2, num_arg, arg1);
+		half_chop(arg1, type_arg, val_arg);
+		
+		if (!*num_arg || !isdigit(*num_arg) || !*type_arg || !*val_arg) {
+			msg_to_char(ch, "Usage: spawn change <number> <vnum | percent | flags> <value>\r\n");
+			return;
+		}
+		
+		// find which one to change
+		num = atoi(num_arg);
+		change = NULL;
+		for (spawn = *list; spawn && !change; spawn = spawn->next) {
+			if (--num == 0) {
+				change = spawn;
+				break;
+			}
+		}
+		
+		if (!change) {
+			msg_to_char(ch, "Invalid spawn number.\r\n");
+		}
+		else if (is_abbrev(type_arg, "vnum")) {
+			if (!isdigit(*val_arg) || (vnum = atoi(val_arg)) < 0) {
+				msg_to_char(ch, "Invalid vnum '%s'.\r\n", val_arg);
+			}
+			else if (!mob_proto(vnum)) {
+				msg_to_char(ch, "Invalid mobile vnum '%s'.\r\n", val_arg);
+			}
+			else {
+				change->vnum = vnum;
+				msg_to_char(ch, "Spawn %d changed to vnum %d (%s).\r\n", atoi(num_arg), vnum, get_mob_name_by_proto(vnum));
+			}
+		}
+		else if (is_abbrev(type_arg, "percent")) {
+			prc = atof(val_arg);
+			
+			if (prc < .01 || prc > 100.00) {
+				msg_to_char(ch, "Percentage must be between .01 and 100; '%s' given.\r\n", val_arg);
+			}
+			else {
+				change->percent = prc;
+				msg_to_char(ch, "Spawn %d changed to %.2f percent.\r\n", atoi(num_arg), prc);
+			}
+		}
+		else if (is_abbrev(type_arg, "flags")) {
+			spawn->flags = olc_process_flag(ch, val_arg, "spawn", "spawn change flags", spawn_flags, spawn->flags);
+		}
+		else {
+			msg_to_char(ch, "You can only change the vnum, percent, or flags.\r\n");
 		}
 	}
 	else if (is_abbrev(arg1, "remove")) {
@@ -3534,6 +3588,7 @@ void olc_process_spawns(char_data *ch, char *argument, struct spawn_info **list)
 	else {
 		msg_to_char(ch, "Usage: spawn add <vnum> <percent> [flags]\r\n");
 		msg_to_char(ch, "Usage: spawn copy <from type> <from vnum>\r\n");
+		msg_to_char(ch, "Usage: spawn change <number> <vnum | percent | flags> <value>\r\n");
 		msg_to_char(ch, "Usage: spawn remove <number | all>\r\n");
 		msg_to_char(ch, "Usage: spawn list\r\n");
 		msg_to_char(ch, "Available flags:\r\n");
