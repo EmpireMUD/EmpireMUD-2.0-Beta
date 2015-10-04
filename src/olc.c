@@ -2279,7 +2279,7 @@ bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach
 		struct audint_t *set;
 		UT_hash_handle hh;
 	};
-	struct audint_s *as, *next_as, *set;
+	struct audint_s *as, *next_as, *set = NULL;
 	struct audint_t *at, *next_at;
 	
 	for (iter = list; iter; iter = iter->next) {
