@@ -2268,6 +2268,7 @@ See also: OLC OBJECTS
 "OEDIT STORAGE"
 
 Usage:  .storage add <building vnum> [flags]
+        .storage change <number> <building | flags> <value>
         .storage remove <number | all>
 
 This command lets you set where an object may be stored. An object type may

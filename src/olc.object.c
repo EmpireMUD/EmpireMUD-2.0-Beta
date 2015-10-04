@@ -1931,8 +1931,9 @@ OLC_MODULE(oedit_storage) {
 	
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], *flagarg;
+	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
 	int loc, num, iter;
-	struct obj_storage_type *store, *temp;
+	struct obj_storage_type *store, *change, *temp;
 	bld_vnum bld;
 	bool found;
 	
@@ -2016,8 +2017,48 @@ OLC_MODULE(oedit_storage) {
 			msg_to_char(ch, "You add storage in the %s with flags: %s\r\n", GET_BLD_NAME(building_proto(store->building_type)), buf1);
 		}
 	}
+	else if (is_abbrev(arg1, "change")) {
+		half_chop(arg2, num_arg, arg1);
+		half_chop(arg1, type_arg, val_arg);
+		
+		if (!*num_arg || !isdigit(*num_arg) || !*type_arg || !*val_arg) {
+			msg_to_char(ch, "Usage: storage change <number> <building | flags> <value>\r\n");
+			return;
+		}
+		
+		// find which one to change
+		num = atoi(num_arg);
+		change = NULL;
+		for (store = obj->storage; store && !change; store = store->next) {
+			if (--num == 0) {
+				change = store;
+				break;
+			}
+		}
+		
+		if (!change) {
+			msg_to_char(ch, "Invalid storage number.\r\n");
+		}
+		else if (is_abbrev(type_arg, "building") || is_abbrev(type_arg, "room")) {
+			bld = atoi(val_arg);
+			if (!isdigit(*val_arg) || !building_proto(bld)) {
+				msg_to_char(ch, "Invalid building vnum '%s'.\r\n", val_arg);
+			}
+			else {
+				change->building_type = bld;
+				msg_to_char(ch, "Storage %d changed to building %d (%s).\r\n", atoi(num_arg), bld, GET_BLD_NAME(building_proto(bld)));
+			}
+		}
+		else if (is_abbrev(type_arg, "flags")) {
+			change->flags = olc_process_flag(ch, val_arg, "storage", "storage change flags", storage_bits, change->flags);
+		}
+		else {
+			msg_to_char(ch, "You can only change the building/room or flags.\r\n");
+		}
+	}
 	else {
 		msg_to_char(ch, "Usage: storage add <building/room> [flags]\r\n");
+		msg_to_char(ch, "Usage: storage change <number> <building | flags> <value>\r\n");
 		msg_to_char(ch, "Usage: storage remove <number | all>\r\n");
 		msg_to_char(ch, "Available flags:\r\n");
 		
