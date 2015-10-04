@@ -26,6 +26,7 @@
 *   Core Command
 *   Common Modules
 *   Common Displays
+*   Auditors
 *   Helpers
 */
 
@@ -246,6 +247,9 @@ OLC_MODULE(tedit_types);
 
 
 // externs
+extern const char *interact_types[];
+extern const int interact_attach_types[NUM_INTERACTS];
+extern const byte interact_vnum_types[NUM_INTERACTS];
 extern const char *olc_flag_bits[];
 extern const char *olc_type_bits[NUM_OLC_TYPES+1];
 
@@ -287,7 +291,7 @@ extern bool validate_icon(char *icon);
 const struct olc_command_data olc_data[] = {
 	// main commands
 	{ "abort", olc_abort, OLC_BOOK | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
-	{ "audit", olc_audit, OLC_ADVENTURE | OLC_CRAFT | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT, NOBITS },
+	{ "audit", olc_audit, OLC_ADVENTURE | OLC_BUILDING | OLC_CRAFT | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT, NOBITS },
 	{ "copy", olc_copy, OLC_BOOK | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, NOBITS },
 	{ "delete", olc_delete, OLC_BOOK | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, OLC_CF_NO_ABBREV },
 	// "display" command uses the shortcut "." or "olc" with no args, and is in the do_olc function
@@ -723,21 +727,16 @@ OLC_MODULE(olc_audit) {
 				}
 				break;
 			}
-			/*
 			case OLC_BUILDING: {
+				extern bool audit_building(bld_data *bld, char_data *ch);
 				bld_data *bld, *next_bld;
 				HASH_ITER(hh, building_table, bld, next_bld) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (GET_BLD_VNUM(bld) >= from_vnum && GET_BLD_VNUM(bld) <= to_vnum) {
-						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "[%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
+						found |= audit_building(bld, ch);
 					}
 				}
 				break;
 			}
-			*/
 			case OLC_CRAFT: {
 				extern bool audit_craft(craft_data *craft, char_data *ch);
 				craft_data *craft, *next_craft;
@@ -2227,6 +2226,144 @@ void get_script_display(struct trig_proto_list *list, char *save_buffer) {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// AUDITORS ////////////////////////////////////////////////////////////////
+
+/**
+* Checks for common extra description problems and reports them to ch.
+*
+* @param any_vnum vnum The vnum of the thing we're reporting on (obj, etc).
+* @param struct extra_descr_data *list The list to check.
+* @param char_data *ch The person to report to.
+* @return bool TRUE if any problems were reported; FALSE if all good.
+*/
+bool audit_extra_descs(any_vnum vnum, struct extra_descr_data *list, char_data *ch) {
+	struct extra_descr_data *iter;
+	bool problem = FALSE;
+	
+	for (iter = list; iter; iter = iter->next) {
+		if (!iter->keyword || !*skip_filler(iter->keyword)) {
+			olc_audit_msg(ch, vnum, "Extra desc: bad keywords");
+			problem = TRUE;
+		}
+		if (!iter->description || !*iter->description || !str_cmp(iter->description, "Nothing.\r\n")) {
+			olc_audit_msg(ch, vnum, "Extra desc '%s': bad description", NULLSAFE(iter->keyword));
+			problem = TRUE;
+		}
+	}
+	
+	return problem;
+}
+
+
+/**
+* Checks for common interaction problems and reports them to ch.
+*
+* @param any_vnum vnum The vnum of the thing we're reporting on (obj, etc).
+* @param struct interaction_item *list The list to check.
+* @param int attach_type The type to accept (e.g. TYPE_MOB).
+* @param char_data *ch The person to report to.
+* @return bool TRUE if any problems were reported; FALSE if all good.
+*/
+bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach_type, char_data *ch) {
+	struct interaction_item *iter;
+	bool problem = FALSE;
+	int code, type;
+	
+	struct audint_t {
+		int code;
+		double percent;
+		UT_hash_handle hh;
+	};
+	struct audint_s {
+		int type;
+		struct audint_t *set;
+		UT_hash_handle hh;
+	};
+	struct audint_s *as, *next_as, *set;
+	struct audint_t *at, *next_at;
+	
+	for (iter = list; iter; iter = iter->next) {
+		if (interact_attach_types[iter->type] != attach_type) {
+			olc_audit_msg(ch, vnum, "Bad interaction: %s", interact_types[iter->type]);
+			problem = TRUE;
+		}
+		
+		// track cumulative percent
+		if (iter->exclusion_code) {
+			type = iter->type;
+			HASH_FIND_INT(set, &type, as);
+			if (!as) {
+				CREATE(as, struct audint_s, 1);
+				as->type = type;
+				HASH_ADD_INT(set, type, as);
+			}
+		
+			code = iter->exclusion_code;
+			HASH_FIND_INT(as->set, &code, at);
+			if (!at) {
+				CREATE(at, struct audint_t, 1);
+				at->code = code;
+				HASH_ADD_INT(as->set, code, at);
+			}
+			at->percent += iter->percent;
+		}
+	}
+	
+	HASH_ITER(hh, set, as, next_as) {
+		HASH_ITER(hh, as->set, at, next_at) {
+			if (at->percent > 100.0) {
+				olc_audit_msg(ch, vnum, "Interaction %s exclusion set '%c' totals %.2f%%\r\n", interact_types[as->type], (char)at->code, at->percent);
+				problem = TRUE;
+			}
+			free(at);
+		}
+		free(as);
+	}
+	
+	return problem;
+}
+
+
+/**
+* Checks for common spawn list problems and reports them to ch.
+*
+* @param any_vnum vnum The vnum of the thing we're reporting on (obj, etc).
+* @param struct spawn_info *list The list to check.
+* @param char_data *ch The person to report to.
+* @return bool TRUE if any problems were reported; FALSE if all good.
+*/
+bool audit_spawns(any_vnum vnum, struct spawn_info *list, char_data *ch) {
+	struct spawn_info *iter;
+	bool problem = FALSE;
+	
+	for (iter = list; iter; iter = iter->next) {
+		if (IS_SET(iter->flags, SPAWN_NOCTURNAL) && IS_SET(iter->flags, SPAWN_DIURNAL)) {
+			olc_audit_msg(ch, vnum, "Spawn for mob %d (%s) has conflicting flags", iter->vnum, get_mob_name_by_proto(iter->vnum));
+			problem = TRUE;
+		}
+		if (IS_SET(iter->flags, SPAWN_CLAIMED) && IS_SET(iter->flags, SPAWN_UNCLAIMED)) {
+			olc_audit_msg(ch, vnum, "Spawn for mob %d (%s) has conflicting flags", iter->vnum, get_mob_name_by_proto(iter->vnum));
+			problem = TRUE;
+		}
+		if (IS_SET(iter->flags, SPAWN_CITY) && IS_SET(iter->flags, SPAWN_OUT_OF_CITY)) {
+			olc_audit_msg(ch, vnum, "Spawn for mob %d (%s) has conflicting flags", iter->vnum, get_mob_name_by_proto(iter->vnum));
+			problem = TRUE;
+		}
+		if (IS_SET(iter->flags, SPAWN_NORTHERN) && IS_SET(iter->flags, SPAWN_SOUTHERN)) {
+			olc_audit_msg(ch, vnum, "Spawn for mob %d (%s) has conflicting flags", iter->vnum, get_mob_name_by_proto(iter->vnum));
+			problem = TRUE;
+		}
+		if (IS_SET(iter->flags, SPAWN_EASTERN) && IS_SET(iter->flags, SPAWN_WESTERN)) {
+			olc_audit_msg(ch, vnum, "Spawn for mob %d (%s) has conflicting flags", iter->vnum, get_mob_name_by_proto(iter->vnum));
+			problem = TRUE;
+		}
+	}
+
+	return problem;
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
 
 /**
@@ -3049,11 +3186,7 @@ void olc_process_icons(char_data *ch, char *argument, struct icon_data **list) {
 * @param struct interaction_item **list A pointer to an interaction list to modify.
 * @param int attach_type TYPE_MOB or TYPE_ROOM for interactions that attach to different types of things.
 */
-void olc_process_interactions(char_data *ch, char *argument, struct interaction_item **list, int attach_type) {
-	extern const char *interact_types[];
-	extern const int interact_attach_types[NUM_INTERACTS];
-	extern const byte interact_vnum_types[NUM_INTERACTS];
-	
+void olc_process_interactions(char_data *ch, char *argument, struct interaction_item **list, int attach_type) {	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], arg4[MAX_INPUT_LENGTH], arg5[MAX_INPUT_LENGTH], arg6[MAX_INPUT_LENGTH];
 	struct interaction_item *interact, *prev, *to_move, *temp, *a, *b, *a_next, *b_next, *copyfrom = NULL, *change;
 	struct interaction_item iitem;

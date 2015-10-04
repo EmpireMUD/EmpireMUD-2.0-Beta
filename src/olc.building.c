@@ -45,6 +45,57 @@ void sort_interactions(struct interaction_item **list);
 //// HELPERS /////////////////////////////////////////////////////////////////
 
 /**
+* Checks for common building problems and reports them to ch.
+*
+* @param bld_data *bld The building to audit.
+* @param char_data *ch The person to report to.
+* @return bool TRUE if any problems were reported; FALSE if all good.
+*/
+bool audit_building(bld_data *bld, char_data *ch) {
+	extern bool audit_extra_descs(any_vnum vnum, struct extra_descr_data *list, char_data *ch);
+	extern bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach_type, char_data *ch);
+	extern bool audit_spawns(any_vnum vnum, struct spawn_info *list, char_data *ch);
+	
+	bool problem = FALSE;
+	
+	if (!str_cmp(GET_BLD_NAME(bld), "Unnamed Building")) {
+		olc_audit_msg(ch, GET_BLD_VNUM(bld), "Name not set");
+		problem = TRUE;
+	}
+	if (!str_cmp(GET_BLD_TITLE(bld), "An Unnamed Building")) {
+		olc_audit_msg(ch, GET_BLD_VNUM(bld), "Title not set");
+		problem = TRUE;
+	}
+	if (!IS_SET(GET_BLD_FLAGS(bld), BLD_ROOM) && !str_cmp(GET_BLD_ICON(bld), "&0[  ]")) {
+		olc_audit_msg(ch, GET_BLD_VNUM(bld), "Icon not set");
+		problem = TRUE;
+	}
+	if (!IS_SET(GET_BLD_FLAGS(bld), BLD_OPEN) && (!GET_BLD_DESC(bld) || !*GET_BLD_DESC(bld) || !str_cmp(GET_BLD_DESC(bld), "Nothing.\r\n"))) {
+		olc_audit_msg(ch, GET_BLD_VNUM(bld), "Description");
+		problem = TRUE;
+	}
+	if (GET_BLD_EXTRA_ROOMS(bld) > 0 && IS_SET(GET_BLD_FLAGS(bld), BLD_ROOM)) {
+		olc_audit_msg(ch, GET_BLD_VNUM(bld), "Designated room has extra rooms set");
+		problem = TRUE;
+	}
+	if (GET_BLD_EXTRA_ROOMS(bld) > 0 && GET_BLD_DESIGNATE_FLAGS(bld) == NOBITS) {
+		olc_audit_msg(ch, GET_BLD_VNUM(bld), "Has extra rooms but no designate flags");
+		problem = TRUE;
+	}
+	if (IS_SET(GET_BLD_FLAGS(bld), BLD_ROOM) && IS_SET(GET_BLD_FLAGS(bld), BLD_OPEN | BLD_CLOSED | BLD_TWO_ENTRANCES | BLD_ATTACH_ROAD | BLD_INTERLINK | BLD_SECONDARY_TERRITORY)) {
+		olc_audit_msg(ch, GET_BLD_VNUM(bld), "Designated room has incompatible flag(s)");
+		problem = TRUE;
+	}
+	
+	problem |= audit_extra_descs(GET_BLD_VNUM(bld), GET_BLD_EX_DESCS(bld), ch);
+	problem |= audit_spawns(GET_BLD_VNUM(bld), GET_BLD_SPAWNS(bld), ch);
+	problem |= audit_interactions(GET_BLD_VNUM(bld), GET_BLD_INTERACTIONS(bld), TYPE_ROOM, ch);
+	
+	return problem;
+}
+
+
+/**
 * Creates a new building entry.
 * 
 * @param bld_vnum vnum The number to create.
