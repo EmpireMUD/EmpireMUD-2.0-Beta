@@ -182,7 +182,7 @@ bool audit_object(obj_data *obj, char_data *ch) {
 			break;
 		}
 		case ITEM_BOOK: {
-			if (!find_book_by_vnum(GET_BOOK_ID(obj))) {
+			if (!book_proto(GET_BOOK_ID(obj))) {
 				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Book type invalid");
 				problem = TRUE;
 			}
@@ -1045,7 +1045,7 @@ void olc_get_values_display(char_data *ch, char *storage) {
 			break;
 		}
 		case ITEM_BOOK: {
-			book = find_book_by_vnum(GET_BOOK_ID(obj));
+			book = book_proto(GET_BOOK_ID(obj));
 			sprintf(storage + strlen(storage), "<&ybook&0> [%d] %s\r\n", GET_BOOK_ID(obj), (book ? book->title : "not set"));
 			break;
 		}
@@ -1386,7 +1386,7 @@ OLC_MODULE(oedit_book) {
 	}
 	else {
 		GET_OBJ_VAL(obj, VAL_BOOK_ID) = olc_process_number(ch, argument, "book id", "book", 0, MAX_INT, GET_OBJ_VAL(obj, VAL_BOOK_ID));
-		book = find_book_by_vnum(GET_BOOK_ID(obj));
+		book = book_proto(GET_BOOK_ID(obj));
 		
 		if (!book) {
 			msg_to_char(ch, "Invalid book id. Old id %d restored.\r\n", old);

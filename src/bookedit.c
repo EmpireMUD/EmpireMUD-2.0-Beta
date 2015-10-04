@@ -115,9 +115,9 @@ book_data *create_book_table_entry(book_vnum vnum, int author) {
 	book_data *book;
 	
 	// sanity
-	if (find_book_by_vnum(vnum)) {
+	if (book_proto(vnum)) {
 		log("SYSERR: Attempting to insert book at existing vnum %d", vnum);
-		return find_book_by_vnum(vnum);
+		return book_proto(vnum);
 	}
 	
 	CREATE(book, book_data, 1);
@@ -144,7 +144,7 @@ book_data *create_book_table_entry(book_vnum vnum, int author) {
 * @param book_data *book The book to free.
 */
 void free_book(book_data *book) {
-	book_data *proto = find_book_by_vnum(book->vnum);
+	book_data *proto = book_proto(book->vnum);
 	struct paragraph_data *para;
 	
 	if (book->title && (!proto || book->title != proto->title)) {
@@ -186,7 +186,7 @@ void olc_delete_book(char_data *ch, book_vnum vnum) {
 	book_data *book;
 	int author;
 	
-	if (!(book = find_book_by_vnum(vnum))) {
+	if (!(book = book_proto(vnum))) {
 		msg_to_char(ch, "There is no such book %d.\r\n", vnum);
 		return;
 	}
@@ -217,7 +217,7 @@ void process_copying_book(char_data *ch) {
 	if (GET_ACTION_TIMER(ch) <= 0) {
 		GET_ACTION(ch) = ACT_NONE;
 		
-		if (!(book = find_book_by_vnum(GET_ACTION_VNUM(ch, 0)))) {
+		if (!(book = book_proto(GET_ACTION_VNUM(ch, 0)))) {
 			msg_to_char(ch, "You finish copying the book, but there was an error and it's illegible.\r\n");
 		}
 		else {
@@ -259,7 +259,7 @@ void save_olc_book(descriptor_data *desc) {
 	int author_change = -1;
 	
 	// have a place to save it?
-	if (!(proto = find_book_by_vnum(vnum))) {
+	if (!(proto = book_proto(vnum))) {
 		proto = create_book_table_entry(vnum, book->author);
 	}
 	
@@ -421,10 +421,10 @@ void olc_show_book(char_data *ch) {
 	*buf = '\0';
 
 	if (imm) {
-		sprintf(buf + strlen(buf), "[\tc%d\t0] \tc%s\t0\r\n", GET_OLC_VNUM(ch->desc), !find_book_by_vnum(book->vnum) ? "new book" : find_book_by_vnum(book->vnum)->title);
+		sprintf(buf + strlen(buf), "[\tc%d\t0] \tc%s\t0\r\n", GET_OLC_VNUM(ch->desc), !book_proto(book->vnum) ? "new book" : book_proto(book->vnum)->title);
 	}
 	else {
-		sprintf(buf + strlen(buf), "\tcEmpireMUD Book Editor: %s\t0\r\n", !find_book_by_vnum(book->vnum) ? "new book" : find_book_by_vnum(book->vnum)->title);
+		sprintf(buf + strlen(buf), "\tcEmpireMUD Book Editor: %s\t0\r\n", !book_proto(book->vnum) ? "new book" : book_proto(book->vnum)->title);
 	}
 	
 	sprintf(buf + strlen(buf), "<\tytitle\t0> %s\r\n", NULLSAFE(book->title));

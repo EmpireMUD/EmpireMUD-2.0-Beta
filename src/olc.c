@@ -889,8 +889,8 @@ OLC_MODULE(olc_copy) {
 			break;
 		}
 		case OLC_BOOK: {
-			found = (find_book_by_vnum(vnum) != NULL);
-			exists = (find_book_by_vnum(from_vnum) != NULL);
+			found = (book_proto(vnum) != NULL);
+			exists = (book_proto(from_vnum) != NULL);
 			break;
 		}
 		case OLC_BUILDING: {
@@ -990,7 +990,7 @@ OLC_MODULE(olc_copy) {
 			break;
 		}
 		case OLC_BOOK: {
-			GET_OLC_BOOK(ch->desc) = setup_olc_book(find_book_by_vnum(from_vnum));
+			GET_OLC_BOOK(ch->desc) = setup_olc_book(book_proto(from_vnum));
 			GET_OLC_BOOK(ch->desc)->vnum = vnum;
 			olc_show_book(ch);
 			break;
@@ -1290,7 +1290,7 @@ OLC_MODULE(olc_edit) {
 		}
 		case OLC_BOOK: {
 			// this sets up either new or existing automatically
-			GET_OLC_BOOK(ch->desc) = setup_olc_book(find_book_by_vnum(vnum));
+			GET_OLC_BOOK(ch->desc) = setup_olc_book(book_proto(vnum));
 			GET_OLC_BOOK(ch->desc)->vnum = vnum;			
 			olc_show_book(ch);
 			break;
@@ -1406,7 +1406,7 @@ OLC_MODULE(olc_free) {
 					break;
 				}
 				case OLC_BOOK: {
-					free = (find_book_by_vnum(iter) == NULL);
+					free = (book_proto(iter) == NULL);
 					break;
 				}
 				case OLC_BUILDING: {
@@ -2384,7 +2384,7 @@ bool player_can_olc_edit(char_data *ch, int type, any_vnum vnum) {
 	else if (IS_SET(type, OLC_MAP) && !OLC_FLAGGED(ch, OLC_FLAG_MAP_EDIT)) {
 		return FALSE;
 	}
-	else if (IS_SET(type, OLC_BOOK) && find_book_by_vnum(vnum) && find_book_by_vnum(vnum)->author == GET_IDNUM(ch)) {
+	else if (IS_SET(type, OLC_BOOK) && book_proto(vnum) && book_proto(vnum)->author == GET_IDNUM(ch)) {
 		// own book
 		return TRUE;
 	}

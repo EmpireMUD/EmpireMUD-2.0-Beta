@@ -75,6 +75,22 @@ void add_book_author(int idnum) {
  //////////////////////////////////////////////////////////////////////////////
 //// CORE FUNCTIONS //////////////////////////////////////////////////////////
 
+/**
+* @param book_vnum vnum The book to find.
+* @return book_data* the book data, or NULL
+*/
+book_data *book_proto(book_vnum vnum) {
+	book_data *book;
+	
+	if (vnum < 0 || vnum == NOTHING) {
+		return NULL;
+	}
+	
+	HASH_FIND_INT(book_table, &vnum, book);
+	return book;
+}
+
+
 // parse 1 book file
 void parse_book(FILE *fl, book_vnum vnum) {
 	void add_book_to_table(book_data *book);
@@ -281,22 +297,6 @@ void save_author_index(void) {
 
 
 /**
-* @param book_vnum vnum The book to find.
-* @return book_data* the book data, or NULL
-*/
-book_data *find_book_by_vnum(book_vnum vnum) {
-	book_data *book;
-	
-	if (vnum < 0 || vnum == NOTHING) {
-		return NULL;
-	}
-	
-	HASH_FIND_INT(book_table, &vnum, book);
-	return book;
-}
-
-
-/**
 * @param char *argument user input
 * @param room_data *room the location of the library
 * @return book_data* either the book in this library, or NULL
@@ -462,7 +462,7 @@ int perform_shelve(char_data *ch, obj_data *obj) {
 	struct library_data *libr, *libr_ctr;
 	bool found = FALSE;
 	
-	if (!IS_BOOK(obj) || !(book = find_book_by_vnum(GET_BOOK_ID(obj)))) {
+	if (!IS_BOOK(obj) || !(book = book_proto(GET_BOOK_ID(obj)))) {
 		act("You can't shelve $p!", FALSE, ch, obj, NULL, TO_CHAR);
 		return 0;
 	}
@@ -738,7 +738,7 @@ void read_book(char_data *ch, obj_data *obj) {
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're too busy right now.\r\n");
 	}
-	else if (!(book = find_book_by_vnum(GET_BOOK_ID(obj)))) {
+	else if (!(book = book_proto(GET_BOOK_ID(obj)))) {
 		msg_to_char(ch, "The book is old and badly damaged; you can't read it.\r\n");
 	}
 	else {
@@ -769,7 +769,7 @@ void process_reading(char_data *ch) {
 		msg_to_char(ch, "You seem to have lost your book.\r\n");
 		GET_ACTION(ch) = ACT_NONE;
 	}
-	else if (!(book = find_book_by_vnum(GET_ACTION_VNUM(ch, 0)))) {
+	else if (!(book = book_proto(GET_ACTION_VNUM(ch, 0)))) {
 		msg_to_char(ch, "The book is too badly damaged to read.\r\n");
 		GET_ACTION(ch) = ACT_NONE;
 	}

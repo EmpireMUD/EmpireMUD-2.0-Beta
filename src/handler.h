@@ -286,7 +286,7 @@ extern int parse_direction(char_data *ch, char *dir);
 void perform_remove(char_data *ch, int pos);
 
 // books.c
-extern book_data *find_book_by_vnum(book_vnum vnum);
+extern book_data *book_proto(book_vnum vnum);
 extern book_data *find_book_by_author(char *argument, int idnum);
 extern book_data *find_book_in_library(char *argument, room_data *room);
 

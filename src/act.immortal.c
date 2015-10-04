@@ -2944,7 +2944,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 
 	switch (GET_OBJ_TYPE(j)) {
 		case ITEM_BOOK: {
-			book_data *book = find_book_by_vnum(GET_BOOK_ID(j));
+			book_data *book = book_proto(GET_BOOK_ID(j));
 			msg_to_char(ch, "Book: %d - %s\r\n", GET_BOOK_ID(j), (book ? book->title : "unknown"));
 			break;
 		}
@@ -6137,7 +6137,7 @@ ACMD(do_vstat) {
 		do_stat_building(ch, bld);
 	}
 	else if (is_abbrev(buf, "book")) {	// deliberately after 'building'
-		book_data *book = find_book_by_vnum(number);
+		book_data *book = book_proto(number);
 		if (!book) {
 			msg_to_char(ch, "There is no book with that number.\r\n");
 			return;
