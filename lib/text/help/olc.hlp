@@ -2063,9 +2063,8 @@ See also: ITEM SCALING, OEDIT MISSILESPEED, OEDIT WEAPONTYPE, OLC OBJECTS
 "OEDIT EXTRA" "OEDIT EXTRA DESCRIPTIONS" "BEDIT EXTRA" "BEDIT EXTRA DESCRIPTIONS" "REDIT EXTRA" "REDIT EXTRA DESCRIPTIONS"
 
 Usage:  .extra add <keywords>
+        .extra change <number> <description | keywords> [value]
         .extra remove <number | all>
-        .extra keywords <number> <new keywords>
-        .extra description <number>
 
 This command lets you add or edit extra descriptions. These are additional
 descriptions that the player may 'look' at. 

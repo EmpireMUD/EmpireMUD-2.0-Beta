@@ -2772,8 +2772,9 @@ int olc_process_type(char_data *ch, char *argument, char *name, char *command, c
 void olc_process_extra_desc(char_data *ch, char *argument, struct extra_descr_data **list) {
 	void setup_extra_desc_editor(char_data *ch, struct extra_descr_data *ex);
 	
-	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
-	struct extra_descr_data *ex, *find_ex, *temp;
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
+	struct extra_descr_data *ex, *change, *find_ex, *temp;
 	int num;
 	
 	half_chop(argument, arg1, arg2);
@@ -2838,39 +2839,42 @@ void olc_process_extra_desc(char_data *ch, char *argument, struct extra_descr_da
 			msg_to_char(ch, "You remove extra description %d.\r\n", num);
 		}
 	}
-	else if (is_abbrev(arg1, "keywords")) {
-		// split the args
-		strcpy(buf, arg2);
-		half_chop(buf, arg2, arg3);
+	else if (is_abbrev(arg1, "change")) {
+		half_chop(arg2, num_arg, arg1);
+		half_chop(arg1, type_arg, val_arg);
 		
-		if (!*arg3) {
-			msg_to_char(ch, "Usage: extra keywords <number> <new keywords>\r\n");
+		if (!*num_arg || !isdigit(*num_arg) || !*type_arg) {
+			msg_to_char(ch, "Usage: extra change <number> <keywords | description> [value]\r\n");
+			return;
 		}
-		else if (!(ex = find_extra_desc_by_num(*list, num))) {
-			msg_to_char(ch, "invalid extra desc number.\r\n");
+		
+		// find which one to change
+		if (!(change = find_extra_desc_by_num(*list, atoi(num_arg)))) {
+			msg_to_char(ch, "Invalid extra desc number.\r\n");
 		}
-		else {
-			if (ex->keyword) {
-				free(ex->keyword);
+		else if (is_abbrev(type_arg, "keywords")) {
+			if (!*val_arg) {
+				msg_to_char(ch, "Change the keywords to what?\r\n");
 			}
-			ex->keyword = str_dup(arg3);
-			
-			msg_to_char(ch, "You change the keywords to: %s\r\n", arg3);
+			else {
+				if (change->keyword) {
+					free(change->keyword);
+				}
+				change->keyword = str_dup(val_arg);
+				msg_to_char(ch, "Extra description %d keywords changed to: %s\r\n", atoi(num_arg), val_arg);
+			}
 		}
-	}
-	else if (is_abbrev(arg1, "description")) {
-		if (!(ex = find_extra_desc_by_num(*list, num))) {
-			msg_to_char(ch, "invalid extra desc number.\r\n");
+		else if (is_abbrev(type_arg, "description")) {
+			setup_extra_desc_editor(ch, change);
 		}
 		else {
-			setup_extra_desc_editor(ch, ex);
+			msg_to_char(ch, "You can only change the keywords or description.\r\n");
 		}
 	}
 	else {
 		msg_to_char(ch, "Usage: extra add <keywords>\r\n");
+		msg_to_char(ch, "Usage: extra change <number> <keywords | description> [value]\r\n");
 		msg_to_char(ch, "Usage: extra remove <number | all>\r\n");
-		msg_to_char(ch, "Usage: extra keywords <number> <new keywords>\r\n");
-		msg_to_char(ch, "Usage: extra description <number>\r\n");
 	}
 }
 
