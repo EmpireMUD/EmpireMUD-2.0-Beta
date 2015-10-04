@@ -2293,8 +2293,8 @@ void do_stat_book(char_data *ch, struct book_data *book) {
 	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
 	struct paragraph_data *para;
 	size_t size = 0;
-	int count, len;
-	char *ptr;
+	int count, len, num;
+	char *ptr, *txt;
 	
 	size += snprintf(buf + size, sizeof(buf) - size, "Book VNum: [\tc%d\t0], Author: \tc%s\t0 (\tc%d\t0)\r\n", book->vnum, get_name_by_id(book->author) ? CAP(get_name_by_id(book->author)) : "nobody", book->author);
 	size += snprintf(buf + size, sizeof(buf) - size, "Title: %s\r\n", book->title);
@@ -2302,10 +2302,18 @@ void do_stat_book(char_data *ch, struct book_data *book) {
 	size += snprintf(buf + size, sizeof(buf) - size, "Item: [\tc%s\t0]\r\n", book->item_name);
 	size += snprintf(buf + size, sizeof(buf) - size, "%s", book->item_description);	// desc has its own crlf
 	
+	// precompute number of paragraphs
+	num = 0;
+	for (para = book->paragraphs; para; para = para->next) {
+		++num;
+	}
+	
 	for (para = book->paragraphs, count = 1; para; para = para->next, ++count) {
-		len = strlen(para->text);
+		txt = para->text;
+		skip_spaces(&txt);
+		len = strlen(txt);
 		len = MIN(len, 52);	// aiming for full page width then a ...
-		snprintf(line, sizeof(line), "Paragraph %2d: %-*.*s...", count, len, len, para->text);
+		snprintf(line, sizeof(line), "Paragraph %*d: %-*.*s...", (num >= 10 ? 2 : 1), count, len, len, txt);
 		if ((ptr = strstr(line, "\r\n"))) {	// line ended early?
 			sprintf(ptr, "...");	// overwrite the crlf
 		}
