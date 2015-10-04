@@ -2943,6 +2943,11 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	}
 
 	switch (GET_OBJ_TYPE(j)) {
+		case ITEM_BOOK: {
+			struct book_data *book = find_book_by_vnum(GET_BOOK_ID(j));
+			msg_to_char(ch, "Book: %d - %s\r\n", GET_BOOK_ID(j), (book ? book->title : "unknown"));
+			break;
+		}
 		case ITEM_POISON: {
 			msg_to_char(ch, "Poison type: %s\r\n", poison_data[GET_POISON_TYPE(j)].name);
 			msg_to_char(ch, "Charges remaining: %d\r\n", GET_POISON_CHARGES(j));
