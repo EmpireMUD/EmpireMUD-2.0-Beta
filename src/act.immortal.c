@@ -2284,6 +2284,47 @@ void do_stat_adventure(char_data *ch, adv_data *adv) {
 
 
 /**
+* Show the stats on a book.
+*
+* @param char_data *ch The player requesting stats.
+* @param struct book_data *book The book to stat.
+*/
+void do_stat_book(char_data *ch, struct book_data *book) {
+	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	struct paragraph_data *para;
+	size_t size = 0;
+	int count, len;
+	char *ptr;
+	
+	size += snprintf(buf + size, sizeof(buf) - size, "Book VNum: [\tc%d\t0], Author: \tc%s\t0 (\tc%d\t0)\r\n", book->vnum, get_name_by_id(book->author) ? CAP(get_name_by_id(book->author)) : "nobody", book->author);
+	size += snprintf(buf + size, sizeof(buf) - size, "Title: %s\r\n", book->title);
+	size += snprintf(buf + size, sizeof(buf) - size, "Byline: %s\r\n", book->byline);
+	size += snprintf(buf + size, sizeof(buf) - size, "Item: [\tc%s\t0]\r\n", book->item_name);
+	size += snprintf(buf + size, sizeof(buf) - size, "%s", book->item_description);	// desc has its own crlf
+	
+	for (para = book->paragraphs, count = 1; para; para = para->next, ++count) {
+		len = strlen(para->text);
+		len = MIN(len, 52);	// aiming for full page width then a ...
+		snprintf(line, sizeof(line), "Paragraph %2d: %-*.*s...", count, len, len, para->text);
+		if ((ptr = strstr(line, "\r\n"))) {	// line ended early?
+			sprintf(ptr, "...");	// overwrite the crlf
+		}
+		
+		// too big?
+		if (size + strlen(line) + 2 >= sizeof(buf)) {
+			break;
+		}
+		
+		size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", line);
+	}
+	
+	if (ch->desc) {
+		page_string(ch->desc, buf, TRUE);
+	}
+}
+
+
+/**
 * Show a character stats on a particular building.
 *
 * @param char_data *ch The player requesting stats.
@@ -6081,6 +6122,14 @@ ACMD(do_vstat) {
 			return;
 		}
 		do_stat_building(ch, bld);
+	}
+	else if (is_abbrev(buf, "book")) {	// deliberately after 'building'
+		struct book_data *book = find_book_by_vnum(number);
+		if (!book) {
+			msg_to_char(ch, "There is no book with that number.\r\n");
+			return;
+		}
+		do_stat_book(ch, book);
 	}
 	else if (is_abbrev(buf, "craft")) {
 		craft_data *craft = craft_proto(number);

@@ -934,7 +934,7 @@ Usage:  vstat <type> <vnum>
 
 Used to stat a prototypical object by virtual number.
 
-Valid types are: adventure, building, craft, crop, global, obj, mob,
+Valid types are: adventure, building, book, craft, crop, global, obj, mob,
                  roomtemplate, sector
 
 Examples:
