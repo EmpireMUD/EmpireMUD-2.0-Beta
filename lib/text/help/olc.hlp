@@ -3090,6 +3090,7 @@ See also: OLC SECTORS
 "SECTEDIT EVOLUTIONS"
 
 Usage:  .evolution add <type> [value] <percent> <becomes sector vnum>
+        .evolution change <number> <type | value | percent | sector> <new value>
         .evolution remove <number | all>
 
 This command lets you add or remove an evolution from a sector. Evolutions are

@@ -511,8 +511,9 @@ OLC_MODULE(sectedit_evolution) {
 	void sort_evolutions(sector_data *sect);
 	
 	sector_data *st = GET_OLC_SECTOR(ch->desc);
-	struct evolution_data *evo, *temp;
+	struct evolution_data *evo, *change, *temp;
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], valstr[MAX_INPUT_LENGTH], *sectarg, *tmp;
+	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
 	int num, iter, evo_type, value;
 	sector_data *to_sect, *vsect;
 	double prc;
@@ -605,8 +606,7 @@ OLC_MODULE(sectedit_evolution) {
 			if (!*arg3 || !*sectarg || !isdigit(*sectarg)) {
 				msg_to_char(ch, "Usage: evolution add <type> [value] <percent> <sector vnum>\r\n");
 			}
-			else if ((prc = atof(arg3)) <= .0099 || prc > 100.00) {
-				// used .0099 because of float math coming out with errors like .01 < .01
+			else if ((prc = atof(arg3)) < .01 || prc > 100.00) {
 				msg_to_char(ch, "Percentage must be between .01 and 100; '%s' given.\r\n", arg3);
 			}
 			else if (!(to_sect = sector_proto(atoi(sectarg)))) {
@@ -628,8 +628,102 @@ OLC_MODULE(sectedit_evolution) {
 			}
 		}
 	}
+	else if (is_abbrev(arg1, "change")) {
+		half_chop(arg2, num_arg, arg1);
+		half_chop(arg1, type_arg, val_arg);
+		
+		if (!*num_arg || !isdigit(*num_arg) || !*type_arg || !*val_arg) {
+			msg_to_char(ch, "Usage: evolution change <number> <type | value | percent | sector> <new value>\r\n");
+			return;
+		}
+		
+		// find which one to change
+		num = atoi(num_arg);
+		change = NULL;
+		for (evo = st->evolution; evo && !change; evo = evo->next) {
+			if (--num == 0) {
+				change = evo;
+				break;
+			}
+		}
+		
+		if (!change) {
+			msg_to_char(ch, "Invalid evolution number.\r\n");
+		}
+		else if (is_abbrev(type_arg, "type")) {
+			if ((evo_type = search_block(val_arg, evo_types, FALSE)) == NOTHING) {
+				msg_to_char(ch, "Invalid type.\r\n");
+			}
+			else {
+				change->type = evo_type;
+				msg_to_char(ch, "Evolution %d changed to type %s.\r\n", atoi(num_arg), evo_types[evo_type]);
+			}
+		}
+		else if (is_abbrev(type_arg, "value")) {
+			// this is based on existing type
+			switch (evo_val_types[change->type]) {
+				case EVO_VAL_SECTOR: {
+					if (!*val_arg || !isdigit(*val_arg) || !(vsect = sector_proto(atoi(val_arg)))) {
+						msg_to_char(ch, "Invalid sector type '%s'.\r\n", val_arg);
+						return;
+					}
+					
+					sprintf(valstr, "%d %s", GET_SECT_VNUM(vsect), GET_SECT_NAME(vsect));
+					value = GET_SECT_VNUM(vsect);
+					break;
+				}
+				case EVO_VAL_NUMBER: {
+					if (!*val_arg || (!isdigit(*val_arg) && *val_arg != '-')) {
+						msg_to_char(ch, "Invalid numerical argument '%s'.\r\n", val_arg);
+						return;
+					}
+					
+					value = atoi(val_arg);
+					sprintf(valstr, "%d", value);
+					break;
+				}
+				case EVO_VAL_NONE:
+				default: {
+					msg_to_char(ch, "That evolution type does not have a value.\r\n");
+					return;
+				}
+			}
+			
+			change->value = value;
+			msg_to_char(ch, "Evolution %d changed to value %s.\r\n", atoi(num_arg), valstr);
+		}
+		else if (is_abbrev(type_arg, "percent")) {
+			prc = atof(val_arg);
+			
+			if (prc < .01 || prc > 100.00) {
+				msg_to_char(ch, "Percentage must be between .01 and 100; '%s' given.\r\n", val_arg);
+			}
+			else {
+				change->percent = prc;
+				msg_to_char(ch, "Evolution %d changed to %.2f percent.\r\n", atoi(num_arg), prc);
+			}
+		}
+		else if (is_abbrev(type_arg, "sector")) {
+			if (!(to_sect = sector_proto(atoi(val_arg)))) {
+				msg_to_char(ch, "Invalid sector type '%s'.\r\n", val_arg);
+			}
+			else {
+				change->becomes = GET_SECT_VNUM(to_sect);
+				msg_to_char(ch, "Evolution %d now becomes sector %d %s.\r\n", atoi(num_arg), GET_SECT_VNUM(to_sect), GET_SECT_NAME(to_sect));
+			}
+		}
+		else {
+			msg_to_char(ch, "You can only change the vnum, percent, or flags.\r\n");
+		}
+		
+		// if any of them hit (safe to do this anyway)
+		if (change) {
+			sort_evolutions(st);
+		}
+	}
 	else {
 		msg_to_char(ch, "Usage: evolution add <type> [value] <percent> <sector vnum>\r\n");
+		msg_to_char(ch, "Usage: evolution change <number> <type | value | percent | sector> <new value>\r\n");
 		msg_to_char(ch, "Usage: evolution remove <number | all>\r\n");
 		msg_to_char(ch, "Available types:\r\n");
 		
