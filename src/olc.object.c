@@ -1654,7 +1654,7 @@ OLC_MODULE(oedit_custom) {
 			}
 			else {
 				change->type = msgtype;
-				msg_to_char(ch, "Custom message %d changed to type %s.\r\n", atoi(num_arg), obj_custom_types[type]);
+				msg_to_char(ch, "Custom message %d changed to type %s.\r\n", atoi(num_arg), obj_custom_types[msgtype]);
 			}
 		}
 		else if (is_abbrev(type_arg, "message")) {
