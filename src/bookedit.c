@@ -425,7 +425,7 @@ void olc_show_book(char_data *ch) {
 	sprintf(buf + strlen(buf), "<\typaragraphs\t0> %d (list, edit, new, delete)\r\n", count);
 	
 	if (imm) {
-		sprintf(buf + strlen(buf), "<\tyauthor\t0> %s\r\n", (book->author != 0 && get_name_by_id(book->author)) ? get_name_by_id(book->author) : "nobody");
+		sprintf(buf + strlen(buf), "<\tyauthor\t0> %s\r\n", (book->author != 0 && get_name_by_id(book->author)) ? CAP(get_name_by_id(book->author)) : "nobody");
 	}
 	else {
 		sprintf(buf + strlen(buf), "<\tylicense\t0>, <\tysave\t0>, <\tyabort\t0>\r\n");
@@ -455,7 +455,7 @@ OLC_MODULE(booked_author) {
 		}
 		else {
 			book->author = id;
-			msg_to_char(ch, "You set the book's author id to %d (%s).\r\n", id, (id == 0 || !get_name_by_id(id)) ? "nobody" : get_name_by_id(id));
+			msg_to_char(ch, "You set the book's author id to %d (%s).\r\n", id, (id == 0 || !get_name_by_id(id)) ? "nobody" : CAP(get_name_by_id(id)));
 		}
 	}
 	else if (!(id = get_id_by_name(argument))) {
@@ -463,7 +463,7 @@ OLC_MODULE(booked_author) {
 	}
 	else {
 		book->author = id;
-		msg_to_char(ch, "You set the book's author id to %s (%d).\r\n", (id == 0 || !get_name_by_id(id)) ? "nobody" : get_name_by_id(id), id);
+		msg_to_char(ch, "You set the book's author id to %s (%d).\r\n", (id == 0 || !get_name_by_id(id)) ? "nobody" : CAP(get_name_by_id(id)), id);
 	}
 }
 
