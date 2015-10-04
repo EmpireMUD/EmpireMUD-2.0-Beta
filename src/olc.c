@@ -287,7 +287,7 @@ extern bool validate_icon(char *icon);
 const struct olc_command_data olc_data[] = {
 	// main commands
 	{ "abort", olc_abort, OLC_BOOK | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
-	{ "audit", olc_audit, OLC_CRAFT | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT, NOBITS },
+	{ "audit", olc_audit, OLC_ADVENTURE | OLC_CRAFT | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT, NOBITS },
 	{ "copy", olc_copy, OLC_BOOK | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, NOBITS },
 	{ "delete", olc_delete, OLC_BOOK | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, OLC_CF_NO_ABBREV },
 	// "display" command uses the shortcut "." or "olc" with no args, and is in the do_olc function
@@ -686,7 +686,7 @@ OLC_MODULE(olc_abort) {
 
 
 // Usage: olc mob audit <from vnum> [to vnum]
-OLC_MODULE(olc_audit) {	
+OLC_MODULE(olc_audit) {
 	char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	any_vnum from_vnum = NOTHING, to_vnum = NOTHING, iter;
 	bool found = FALSE;
@@ -713,20 +713,17 @@ OLC_MODULE(olc_audit) {
 		
 		// types that use hashes
 		switch (type) {
-			/*
 			case OLC_ADVENTURE: {
+				extern bool audit_adventure(adv_data *adv, char_data *ch, bool only_one);
 				adv_data *adv, *next_adv;
 				HASH_ITER(hh, adventure_table, adv, next_adv) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (GET_ADV_VNUM(adv) >= from_vnum && GET_ADV_VNUM(adv) <= to_vnum) {
-						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "[%5d] %s (%d-%d)\r\n", GET_ADV_VNUM(adv), GET_ADV_NAME(adv), GET_ADV_START_VNUM(adv), GET_ADV_END_VNUM(adv));
+						found |= audit_adventure(adv, ch, (from_vnum == to_vnum));
 					}
 				}
 				break;
 			}
+			/*
 			case OLC_BUILDING: {
 				bld_data *bld, *next_bld;
 				HASH_ITER(hh, building_table, bld, next_bld) {
