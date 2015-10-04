@@ -713,7 +713,7 @@ OLC_MODULE(sectedit_evolution) {
 			}
 		}
 		else {
-			msg_to_char(ch, "You can only change the vnum, percent, or flags.\r\n");
+			msg_to_char(ch, "You can only change the type, value, percent, or sector.\r\n");
 		}
 		
 		// if any of them hit (safe to do this anyway)

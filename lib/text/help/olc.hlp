@@ -1864,6 +1864,7 @@ See also: HARNESS, OLC OBJECTS
 "OEDIT APPLY" APPLIES
 
 Usage:  .apply add <value> <type>
+        .apply change <number> <value | type> <new value>
         .apply remove <number | all>
 
 Applies are bonuses (or penalties) that an item gives to the player who is

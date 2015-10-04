@@ -1242,7 +1242,8 @@ OLC_MODULE(oedit_animalsrequired) {
 OLC_MODULE(oedit_apply) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
-	int loc, num, iter;
+	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
+	int loc, num, iter, change;
 	bool found;
 	
 	// arg1 arg2 arg3
@@ -1307,8 +1308,54 @@ OLC_MODULE(oedit_apply) {
 			}
 		}
 	}
+	else if (is_abbrev(arg1, "change")) {
+		half_chop(arg2, num_arg, arg1);
+		half_chop(arg1, type_arg, val_arg);
+		
+		if (!*num_arg || !isdigit(*num_arg) || !*type_arg || !*val_arg) {
+			msg_to_char(ch, "Usage: apply change <number> <value | type> <new value>\r\n");
+			return;
+		}
+		
+		// find which one to change
+		num = atoi(num_arg);
+		change = -1;
+		for (iter = 0; iter < MAX_OBJ_AFFECT && change == -1; ++iter) {
+			if (obj->affected[iter].location != APPLY_NONE && --num == 0) {
+				change = iter;
+				break;
+			}
+		}
+		
+		if (change == -1) {
+			msg_to_char(ch, "Invalid apply number.\r\n");
+		}
+		else if (is_abbrev(type_arg, "value")) {
+			num = atoi(val_arg);
+			if ((!isdigit(*val_arg) && *val_arg != '-') || num == 0) {
+				msg_to_char(ch, "Invalid value '%s'.\r\n", val_arg);
+			}
+			else {
+				obj->affected[change].modifier = num;
+				msg_to_char(ch, "Apply %d changed to value %+d.\r\n", atoi(num_arg), num);
+			}
+		}
+		else if (is_abbrev(type_arg, "type")) {
+			if ((loc = search_block(val_arg, apply_types, FALSE)) == NOTHING) {
+				msg_to_char(ch, "Invalid type.\r\n");
+			}
+			else {
+				obj->affected[change].location = loc;
+				msg_to_char(ch, "Apply %d changed to type %s.\r\n", atoi(num_arg), apply_types[loc]);
+			}
+		}
+		else {
+			msg_to_char(ch, "You can only change the value or type.\r\n");
+		}
+	}
 	else {
 		msg_to_char(ch, "Usage: apply add <value> <type>\r\n");
+		msg_to_char(ch, "Usage: apply change <number> <value | type> <new value>\r\n");
 		msg_to_char(ch, "Usage: apply remove <number | all>\r\n");
 		msg_to_char(ch, "Available types:\r\n");
 		
