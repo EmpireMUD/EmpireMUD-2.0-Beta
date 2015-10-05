@@ -2249,6 +2249,10 @@ bool audit_extra_descs(any_vnum vnum, struct extra_descr_data *list, char_data *
 			olc_audit_msg(ch, vnum, "Extra desc '%s': bad description", NULLSAFE(iter->keyword));
 			problem = TRUE;
 		}
+		else if (!strn_cmp(iter->description, "Nothing.", 8)) {
+			olc_audit_msg(ch, vnum, "Extra desc '%s': description starting with 'Nothing.'", NULLSAFE(iter->keyword));
+			problem = TRUE;
+		}
 	}
 	
 	return problem;

@@ -71,7 +71,11 @@ bool audit_building(bld_data *bld, char_data *ch) {
 		problem = TRUE;
 	}
 	if (!IS_SET(GET_BLD_FLAGS(bld), BLD_OPEN) && (!GET_BLD_DESC(bld) || !*GET_BLD_DESC(bld) || !str_cmp(GET_BLD_DESC(bld), "Nothing.\r\n"))) {
-		olc_audit_msg(ch, GET_BLD_VNUM(bld), "Description");
+		olc_audit_msg(ch, GET_BLD_VNUM(bld), "Description not set");
+		problem = TRUE;
+	}
+	else if (!strn_cmp(GET_BLD_DESC(bld), "Nothing.", 8)) {
+		olc_audit_msg(ch, GET_BLD_VNUM(bld), "Description starting with 'Nothing.'");
 		problem = TRUE;
 	}
 	if (GET_BLD_EXTRA_ROOMS(bld) > 0 && IS_SET(GET_BLD_FLAGS(bld), BLD_ROOM)) {
