@@ -494,7 +494,7 @@ See also: CITY, EXPEL, PROMOTE, PRIVILEGE, PLEDGE
 ESAY ETALK EHISTORY EMPIREHISTORY
 
 Usage:  etalk <text>
-        etalk #level <text>
+        etalk #<rank> <text>
         ehistory
 
 Allows you to talk to your empire on a private channel, even from the other
@@ -504,9 +504,17 @@ activities you might be participating in.
 The ehistory command shows you the last 20 messages you received on the empire
 channel.
 
+You can start your message with a # followed by an empire rank to send the
+message to only members of that rank or higher. If multiple ranks have similar
+names, the lowest will be used. Spaces must be replaced with underscores, and
+you can abbreviate - for example, #high_l will send to "High Lords".
+
+You can start chats with * (asterisk) to make them channel-emotes.
+
 Examples:
  > etalk Hi guys!
  > etalk #high_lord Hi, High Lords!
+ > etalk #lord *bows before the other lords.
 #
 EXCAVATE EXCAVATION TRENCH MOAT FILLIN
 

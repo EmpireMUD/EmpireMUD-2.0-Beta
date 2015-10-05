@@ -275,6 +275,8 @@ Some powers allow you to change shape, using the morph command. Morphing takes
 a few seconds, but if you're in combat you can morph instantly at a higher
 cost than normal.
 
+Morphing will override your current disguise until you change back.
+
 See also: ANIMAL FORMS, WOLF FORM, BAT FORM, HORRID FORM, MIST FORM
 #
 NOSKILL

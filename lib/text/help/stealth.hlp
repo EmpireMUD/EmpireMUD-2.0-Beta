@@ -120,6 +120,8 @@ Usage:  disguise <person>
 A savvy rogue learns to blend into his surroundings. With this ability, you can
 look like any human NPC. If you behave like one as well, you might find you
 disappear into the crowd.
+
+Morphing will override your current disguise until you change back.
 #
 DIVERSION
 
@@ -229,6 +231,9 @@ A skilled thief can lift small items from an unsuspecting victim.
 You can only pickpocket NPCs, and even then only human ones. This ability does
 not remove items you see in their inventories, only "pocket items". The result
 is largely random. Each NPC can only be pickpocketed once.
+
+NPCs more than 50 levels above you will always catch you if you try to
+pickpocket them.
 #
 POISON POISONS "DEADLY POISONS" MIX
 
