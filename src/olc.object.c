@@ -67,22 +67,64 @@ bool audit_object(obj_data *obj, char_data *ch) {
 	extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
 	
 	bool is_adventure = (get_adventure_for_vnum(GET_OBJ_VNUM(obj)) != NULL);
+	char temp[MAX_STRING_LENGTH], *ptr;
 	bool problem = FALSE;
 	
 	if (!str_cmp(GET_OBJ_KEYWORDS(obj), "object new")) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Keywords not set");
 		problem = TRUE;
 	}
+	
+	ptr = GET_OBJ_KEYWORDS(obj);
+	do {
+		ptr = any_one_arg(ptr, temp);
+		if (*temp && !str_str(GET_OBJ_SHORT_DESC(obj), temp) && !str_str(GET_OBJ_LONG_DESC(obj), temp)) {
+			olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Keyword '%s' not found in strings", temp);
+			problem = TRUE;
+		}
+	} while (*ptr);
+	
 	if (!str_cmp(GET_OBJ_LONG_DESC(obj), "A new object is sitting here.")) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Long desc not set");
+		problem = TRUE;
+	}
+	if (!ispunct(GET_OBJ_LONG_DESC(obj)[strlen(GET_OBJ_LONG_DESC(obj)) - 1])) {
+		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Long desc missing punctuation");
+		problem = TRUE;
+	}
+	if (islower(*GET_OBJ_LONG_DESC(obj))) {
+		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Long desc not capitalized");
 		problem = TRUE;
 	}
 	if (!str_cmp(GET_OBJ_SHORT_DESC(obj), "a new object")) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Short desc not set");
 		problem = TRUE;
 	}
-	if (!GET_OBJ_ACTION_DESC(obj) || !*GET_OBJ_ACTION_DESC(obj)) {
+	any_one_arg(GET_OBJ_SHORT_DESC(obj), temp);
+	if (fill_word(temp) && isupper(*temp)) {
+		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Short desc capitalized");
+		problem = TRUE;
+	}
+	if (ispunct(GET_OBJ_SHORT_DESC(obj)[strlen(GET_OBJ_SHORT_DESC(obj)) - 1])) {
+		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Short desc has punctuation");
+		problem = TRUE;
+	}
+	
+	ptr = GET_OBJ_SHORT_DESC(obj);
+	do {
+		ptr = any_one_arg(ptr, temp);
+		if (*temp && !fill_word(temp) && !isname(temp, GET_OBJ_KEYWORDS(obj))) {
+			olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Suggested missing keyword '%s'", temp);
+			problem = TRUE;
+		}
+	} while (*ptr);
+	
+	if (!GET_OBJ_ACTION_DESC(obj) || !*GET_OBJ_ACTION_DESC(obj) || !str_cmp(GET_OBJ_ACTION_DESC(obj), "Nothing.\r\n")) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Look desc not set");
+		problem = TRUE;
+	}
+	else if (!strn_cmp(GET_OBJ_ACTION_DESC(obj), "Nothing.", 8)) {
+		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Look desc starting with 'Nothing.'");
 		problem = TRUE;
 	}
 	if (OBJ_FLAGGED(obj, OBJ_LIGHT) && GET_OBJ_TIMER(obj) <= 0) {
@@ -99,6 +141,14 @@ bool audit_object(obj_data *obj, char_data *ch) {
 	}
 	if (!is_adventure && OBJ_FLAGGED(obj, OBJ_SCALABLE) && GET_OBJ_MAX_SCALE_LEVEL(obj) == 0) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "No maximum scale level on non-adventure obj");
+		problem = TRUE;
+	}
+	if (OBJ_FLAGGED(obj, OBJ_SCALABLE) && obj->storage) {
+		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Scalable object has storage locations");
+		problem = TRUE;
+	}
+	if (OBJ_FLAGGED(obj, OBJ_SCALABLE) && !OBJ_FLAGGED(obj, OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP)) {
+		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Scalable object has no bind flags");
 		problem = TRUE;
 	}
 	

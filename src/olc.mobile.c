@@ -55,18 +55,56 @@ bool audit_mobile(char_data *mob, char_data *ch) {
 	extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
 	
 	bool is_adventure = (get_adventure_for_vnum(GET_MOB_VNUM(mob)) != NULL);
+	char temp[MAX_STRING_LENGTH], *ptr;
 	bool problem = FALSE;
 
 	if (!str_cmp(GET_PC_NAME(mob), "mobile new")) {
 		olc_audit_msg(ch, GET_MOB_VNUM(mob), "Keywords not set");
 		problem = TRUE;
 	}
+	
+	ptr = GET_PC_NAME(mob);
+	do {
+		ptr = any_one_arg(ptr, temp);
+		if (*temp && !str_str(GET_SHORT_DESC(mob), temp) && !str_str(GET_LONG_DESC(mob), temp)) {
+			olc_audit_msg(ch, GET_MOB_VNUM(mob), "Keyword '%s' not found in strings", temp);
+			problem = TRUE;
+		}
+	} while (*ptr);
+	
 	if (!str_cmp(GET_SHORT_DESC(mob), "a new mobile")) {
 		olc_audit_msg(ch, GET_MOB_VNUM(mob), "Short desc not set");
 		problem = TRUE;
 	}
+	any_one_arg(GET_SHORT_DESC(mob), temp);
+	if (fill_word(temp) && isupper(*temp)) {
+		olc_audit_msg(ch, GET_MOB_VNUM(mob), "Short desc capitalized");
+		problem = TRUE;
+	}
+	if (ispunct(GET_SHORT_DESC(mob)[strlen(GET_SHORT_DESC(mob)) - 1])) {
+		olc_audit_msg(ch, GET_MOB_VNUM(mob), "Short desc has punctuation");
+		problem = TRUE;
+	}
+	
+	ptr = GET_SHORT_DESC(mob);
+	do {
+		ptr = any_one_arg(ptr, temp);
+		if (*temp && !fill_word(temp) && !isname(temp, GET_PC_NAME(mob))) {
+			olc_audit_msg(ch, GET_MOB_VNUM(mob), "Suggested missing keyword '%s'", temp);
+			problem = TRUE;
+		}
+	} while (*ptr);
+	
 	if (!str_cmp(GET_LONG_DESC(mob), "A new mobile is standing here.\r\n")) {
 		olc_audit_msg(ch, GET_MOB_VNUM(mob), "Long desc not set");
+		problem = TRUE;
+	}
+	if (!ispunct(GET_LONG_DESC(mob)[strlen(GET_LONG_DESC(mob)) - 3])) {
+		olc_audit_msg(ch, GET_MOB_VNUM(mob), "Long desc missing punctuation");
+		problem = TRUE;
+	}
+	if (islower(*GET_LONG_DESC(mob))) {
+		olc_audit_msg(ch, GET_MOB_VNUM(mob), "Long desc not capitalized");
 		problem = TRUE;
 	}
 	if (!is_adventure && GET_MAX_SCALE_LEVEL(mob) == 0) {
