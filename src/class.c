@@ -106,6 +106,7 @@ const struct class_data_type class_data[NUM_CLASSES] = {
 	{ "Powerbroker", "Pwbk", { SKILL_EMPIRE, SKILL_STEALTH },  { 200, 300, 100, 0 },
 		{
 			{ ROLE_MELEE, { ABIL_DRAGONRIDING, ABIL_STAGGER_JAB, ROLE_ABIL_END } },
+			{ ROLE_UTILITY, { ABIL_DRAGONRIDING, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
