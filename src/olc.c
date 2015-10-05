@@ -1511,7 +1511,7 @@ OLC_MODULE(olc_list) {
 		return;
 	}
 	
-	if (!*argument || !found_from) {
+	if (!found_from) {	// no useful args
 		msg_to_char(ch, "Usage: list <from vnum> [to vnum] [-d]\r\n");
 	}
 	else if (from_vnum < 0) {
