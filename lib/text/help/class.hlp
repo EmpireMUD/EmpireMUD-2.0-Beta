@@ -18,10 +18,12 @@ be suited to melee damage, caster damage, or healing. You can't perform all
 roles at the same time. You can change your current role using the "class role"
 command.
 
-Tank: Takes all the damage in combat.
-Melee: Does physical damage.
-Caster: Does magical damage.
-Healer: Keeps the group alive.
+&yTank&0: Takes all the damage in combat.
+&rMelee&0: Does physical damage.
+&aCaster&0: Does magical damage.
+&jHealer&0: Keeps the group alive.
+
+The colors shown above are used to display class roles on 'who' and 'roster'.
 
 See also: CLASS LIST, TANK, HEALER, MELEE, CASTER
 #
