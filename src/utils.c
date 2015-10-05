@@ -2146,6 +2146,44 @@ void determine_gear_level(char_data *ch) {
 }
 
 
+/**
+* Raises a person from sleeping+ to standing (or fighting) if possible.
+* 
+* @param char_data *ch The person to try to wake/stand.
+* @return bool TRUE if the character ended up standing (>= fighting), FALSE if not.
+*/
+bool wake_and_stand(char_data *ch) {
+	char buf[MAX_STRING_LENGTH];
+	bool was_sleeping = FALSE;
+	
+	switch (GET_POS(ch)) {
+		case POS_SLEEPING: {
+			was_sleeping = TRUE;
+			// no break -- drop through
+		}
+		case POS_RESTING:
+		case POS_SITTING: {
+			GET_POS(ch) = POS_STANDING;
+			msg_to_char(ch, "You %sget up.\r\n", (was_sleeping ? "awaken and " : ""));
+			snprintf(buf, sizeof(buf), "$n %sgets up.", (was_sleeping ? "awakens and " : ""));
+			act(buf, TRUE, ch, NULL, NULL, TO_ROOM);
+			// no break -- drop through
+		}
+		case POS_FIGHTING:
+		case POS_STANDING: {
+			// at this point definitely standing, or close enough
+			return TRUE;
+		}
+		default: {
+			// can't do anything with any other pos
+			return FALSE;
+		}
+	}
+	
+	return FALSE;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// RESOURCE UTILS //////////////////////////////////////////////////////////
 
@@ -2209,7 +2247,7 @@ void give_resources(char_data *ch, Resource list[], bool split) {
 
 		for (j = 0; j < remaining; j++) {
 			if (obj_proto(list[i].vnum)) {
-				obj = read_object(list[i].vnum);
+				obj = read_object(list[i].vnum, TRUE);
 				
 				// scale item to minimum level
 				scale_item_to_level(obj, 0);
@@ -2406,10 +2444,16 @@ char *CAP(char *txt) {
 int count_color_codes(char *string) {
 	int iter, count = 0, len = strlen(string);
 	for (iter = 0; iter < len - 1; ++iter) {
-		if (string[iter] == '&' && string[iter+1] == '&') {
+		if (string[iter] == '\t' && string[iter+1] == '\t') {
+			++iter;	// advance past the \t\t (not a color code)
+		}
+		else if (string[iter] == '\t' && string[iter+1] == '&') {
+			++iter;	// advance past the \t& (not a color code)
+		}
+		else if (string[iter] == '&' && string[iter+1] == '&') {
 			++iter;	// advance past the && (not a color code)
 		}
-		if (string[iter] == '&') {
+		else if (string[iter] == '&' || string[iter] == '\t') {
 			++count;
 			++iter;	// advance past the color code
 		}
@@ -2429,6 +2473,14 @@ int count_double_ampersands(char *string) {
 		if (string[iter] == '&' && string[iter+1] == '&') {
 			++count;
 			++iter;	// advance past the second &
+		}
+		else if (string[iter] == '\t' && string[iter+1] == '&') {
+			++count;
+			++iter;	// advance past the & in \t&
+		}
+		else if (string[iter] == '\t' && string[iter+1] == '\t') {
+			++count;
+			++iter;	// advance past the second \t in \t\t (similar to an &&)
 		}
 	}
 	

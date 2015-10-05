@@ -165,7 +165,7 @@
 #define CAN_SEE(sub, obj)  (Global_ignore_dark ? CAN_SEE_NO_DARK(sub, obj) : CAN_SEE_DARK(sub, obj))
 
 #define WIZHIDE_OK(sub, obj)  (!IS_IMMORTAL(obj) || !PRF_FLAGGED((obj), PRF_WIZHIDE) || (!IS_NPC(sub) && GET_ACCESS_LEVEL(sub) >= GET_ACCESS_LEVEL(obj) && PRF_FLAGGED((sub), PRF_HOLYLIGHT)))
-#define INCOGNITO_OK(sub, obj)  (!IS_IMMORTAL(obj) || !PRF_FLAGGED((obj), PRF_INCOGNITO) || GET_ACCESS_LEVEL(sub) >= GET_ACCESS_LEVEL(obj))
+#define INCOGNITO_OK(sub, obj)  (!IS_IMMORTAL(obj) || IS_IMMORTAL(sub) || !PRF_FLAGGED((obj), PRF_INCOGNITO))
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -348,6 +348,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_OLC_VNUM(desc)  ((desc)->olc_vnum)
 #define GET_OLC_STORAGE(desc)  ((desc)->olc_storage)
 #define GET_OLC_ADVENTURE(desc)  ((desc)->olc_adventure)
+#define GET_OLC_BOOK(desc)  ((desc)->olc_book)
 #define GET_OLC_BUILDING(desc)  ((desc)->olc_building)
 #define GET_OLC_CRAFT(desc)  ((desc)->olc_craft)
 #define GET_OLC_CROP(desc)  ((desc)->olc_crop)
@@ -1094,6 +1095,7 @@ extern double rate_item(obj_data *obj);
 // player functions from utils.c
 void command_lag(char_data *ch, int wait_type);
 void determine_gear_level(char_data *ch);
+extern bool wake_and_stand(char_data *ch);
 
 // resource functions from utils.c
 void extract_resources(char_data *ch, Resource list[], bool ground);

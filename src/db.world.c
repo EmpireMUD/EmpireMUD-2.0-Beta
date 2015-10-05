@@ -989,7 +989,7 @@ void reset_one_room(room_data *room) {
 	for (reset = room->reset_commands; reset; reset = reset->next) {
 		switch (reset->command) {
 			case 'M': {	// read a mobile
-				mob = read_mobile(reset->arg1);
+				mob = read_mobile(reset->arg1, FALSE);	// no scripts
 				MOB_FLAGS(mob) = asciiflag_conv(reset->sarg1);
 				char_to_room(mob, room);
 				
@@ -1074,8 +1074,8 @@ void reset_one_room(room_data *room) {
 				else if (reset->arg1 == WLD_TRIGGER) {
 					if (!room->script) {
 						CREATE(room->script, struct script_data, 1);
-						add_trigger(room->script, read_trigger(reset->arg2), -1);
 					}
+					add_trigger(room->script, read_trigger(reset->arg2), -1);
 				}
 				break;
 			}

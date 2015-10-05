@@ -354,7 +354,7 @@ static void print_group(char_data *ch) {
 			
 			// show location if different
 			if (IN_ROOM(k) != IN_ROOM(ch)) {
-				if (HAS_ABILITY(ch, ABIL_NAVIGATION) && (IS_NPC(k) || HAS_ABILITY(k, ABIL_NAVIGATION)) && X_COORD(IN_ROOM(k)) >= 0) {
+				if (HAS_ABILITY(ch, ABIL_NAVIGATION) && !RMT_FLAGGED(IN_ROOM(k), RMT_NO_LOCATION) && (IS_NPC(k) || HAS_ABILITY(k, ABIL_NAVIGATION)) && X_COORD(IN_ROOM(k)) >= 0) {
 					snprintf(loc, sizeof(loc), " - %s (%d, %d)", get_room_name(IN_ROOM(k), FALSE), X_COORD(IN_ROOM(k)), Y_COORD(IN_ROOM(k)));
 				}
 				else {
@@ -389,7 +389,7 @@ INTERACTION_FUNC(shear_interact) {
 	}
 	
 	for (iter = 0; iter < amt; ++iter) {
-		obj = read_object(interaction->vnum);
+		obj = read_object(interaction->vnum, TRUE);
 		obj_to_char_or_room(obj, ch);
 		load_otrigger(obj);
 	}
@@ -422,7 +422,7 @@ INTERACTION_FUNC(skin_interact) {
 	command_lag(ch, WAIT_OTHER);
 		
 	for (num = 0; num < interaction->quantity; ++num) {
-		obj = read_object(interaction->vnum);
+		obj = read_object(interaction->vnum, TRUE);
 		scale_item_to_level(obj, 1);	// min scale
 		obj_to_char_or_room(obj, ch);
 		load_otrigger(obj);
@@ -885,13 +885,13 @@ ACMD(do_alternate) {
 		command_lag(ch, WAIT_OTHER);
 	}
 	else if (ch->desc->str) {
-		msg_to_char(ch, "You can't alterante while editing text.\r\n");
+		msg_to_char(ch, "You can't alterante while editing text (use ,/save or ,/abort first).\r\n");
 	}
 	else if (ch->desc->snooping) {
 		msg_to_char(ch, "You can't alternate while snooping.\r\n");
 	}
 	else if (GET_OLC_TYPE(ch->desc) != 0) {
-		msg_to_char(ch, "You can't alternate with an OLC editor open.\r\n");
+		msg_to_char(ch, "You can't alternate with an editor open (use .save or .abort first).\r\n");
 	}
 	else if (ROOM_OWNER(IN_ROOM(ch)) && empire_is_hostile(ROOM_OWNER(IN_ROOM(ch)), GET_LOYALTY(ch), IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't alternate in hostile territory.\r\n");
@@ -1412,7 +1412,7 @@ ACMD(do_harness) {
 	else if (subcmd && !GET_PULLING(victim))
 		act("$E isn't harnessed.", FALSE, ch, 0, victim, TO_CHAR);
 	else if (subcmd) {
-		obj_to_char((rope = read_object(o_ROPE)), ch);
+		obj_to_char((rope = read_object(o_ROPE, TRUE)), ch);
 		cart = GET_PULLING(victim);
 		if (GET_PULLED_BY(cart, 0) == victim) {
 			cart->pulled_by1 = NULL;
@@ -2169,7 +2169,7 @@ ACMD(do_summon) {
 
 	for (iter = 0; iter < max; ++iter) {
 		if (skill_check(ch, ability, DIFF_MEDIUM)) {
-			mob = read_mobile(vnum);
+			mob = read_mobile(vnum, TRUE);
 			if (IS_NPC(ch)) {
 				MOB_INSTANCE_ID(mob) = MOB_INSTANCE_ID(ch);
 			}

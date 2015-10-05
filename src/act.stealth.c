@@ -171,7 +171,7 @@ INTERACTION_FUNC(pickpocket_interact) {
 	obj_data *obj = NULL;
 	
 	for (iter = 0; iter < interaction->quantity; ++iter) {
-		obj = read_object(interaction->vnum);
+		obj = read_object(interaction->vnum, TRUE);
 		scale_item_to_level(obj, get_approximate_level(inter_mob));
 		obj_to_char(obj, ch);
 		act("You find $p!", FALSE, ch, obj, NULL, TO_CHAR);
@@ -743,6 +743,9 @@ ACMD(do_disguise) {
 	else if (!can_use_ability(ch, ABIL_DISGUISE, NOTHING, 0, NOTHING)) {
 		// sends own message
 	}
+	else if (GET_MORPH(ch) != MORPH_NONE) {
+		msg_to_char(ch, "You can't disguise yourself while morphed.\r\n");
+	}
 	else if (!*arg) {
 		msg_to_char(ch, "Disguise yourself as whom?\r\n");
 	}
@@ -1130,9 +1133,9 @@ ACMD(do_pickpocket) {
 	extern int mob_coins(char_data *mob);
 
 	empire_data *ch_emp = NULL, *vict_emp = NULL;
+	bool any, low_level;
 	char_data *vict;
 	int coins;
-	bool any;
 
 	one_argument(argument, arg);
 
@@ -1178,7 +1181,9 @@ ACMD(do_pickpocket) {
 		}
 		vict_emp = GET_LOYALTY(vict);	// in case not set earlier
 		
-		if (!CAN_SEE(vict, ch) || !AWAKE(vict) || skill_check(ch, ABIL_PICKPOCKET, DIFF_EASY)) {
+		low_level = (get_approximate_level(ch) + 50 < get_approximate_level(vict));
+		
+		if (!low_level && (!CAN_SEE(vict, ch) || !AWAKE(vict) || AFF_FLAGGED(vict, AFF_STUNNED) || skill_check(ch, ABIL_PICKPOCKET, DIFF_EASY))) {
 			// success!
 			SET_BIT(MOB_FLAGS(vict), MOB_PICKPOCKETED);
 			act("You pick $N's pocket...", FALSE, ch, NULL, vict, TO_CHAR);
@@ -1200,6 +1205,10 @@ ACMD(do_pickpocket) {
 			}
 		}
 		else {
+			if (!AWAKE(vict)) {
+				wake_and_stand(vict);
+			}
+			
 			// fail
 			act("You try to pickpocket $N, but $E catches you!", FALSE, ch, NULL, vict, TO_CHAR);
 			act("$n tries to pick your pocket, but you catch $m in the act!", FALSE, ch, NULL, vict, TO_VICT);

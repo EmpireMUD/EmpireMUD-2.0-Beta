@@ -752,6 +752,7 @@ Available flags:
  SUMMON-PLAYER - allows the summon player command
  NEED-BOAT - requires a boat, flying, or swimming to enter
  LOOK-OUT - can see the map using "look out"
+ 2ND-TERRITORY - like a ship, counts as territory off the map
 
 * Note: If you change the LARGE-CITY-RADIUS flag on existing buildings,
         territory counts will not update right away. Any empire can force a
@@ -836,6 +837,7 @@ See also: BEDIT DESIGNATE, OLC BUILDINGS
 
 Usage:  .spawns add <mob vnum> <percent> [flags]
         .spawns copy <from type> <from vnum>
+        .spawns change <number> <vnum | percent | flags> <value>
         .spawns remove <number | all>
         .spawns list
 
@@ -901,7 +903,7 @@ craft recipe editor to create a new building recipe for the upgraded building,
 and mark it as UPGRADE. This building will only need a regular craft recipe,
 and only if it's buildable.
 
-See also: OLC BUILDINGS, UPGRADE, VNUM	
+See also: OLC BUILDINGS, UPGRADE, VNUM
 #d
 "CEDIT ABILITY"
 
@@ -1862,6 +1864,7 @@ See also: HARNESS, OLC OBJECTS
 "OEDIT APPLY" APPLIES
 
 Usage:  .apply add <value> <type>
+        .apply change <number> <value | type> <new value>
         .apply remove <number | all>
 
 Applies are bonuses (or penalties) that an item gives to the player who is
@@ -2016,6 +2019,7 @@ See also: OEDIT CAPACITY, OLC OBJECTS
 "OEDIT CUSTOM" "CUSTOM MESSAGES"
 
 Usage:  .custom add <type> <message>
+        .custom change <number> <type | message> <value>
         .custom remove <number | all>
 
 You can set custom messages on objects for various actions. These messages
@@ -2059,9 +2063,8 @@ See also: ITEM SCALING, OEDIT MISSILESPEED, OEDIT WEAPONTYPE, OLC OBJECTS
 "OEDIT EXTRA" "OEDIT EXTRA DESCRIPTIONS" "BEDIT EXTRA" "BEDIT EXTRA DESCRIPTIONS" "REDIT EXTRA" "REDIT EXTRA DESCRIPTIONS"
 
 Usage:  .extra add <keywords>
+        .extra change <number> <description | keywords> [value]
         .extra remove <number | all>
-        .extra keywords <number> <new keywords>
-        .extra description <number>
 
 This command lets you add or edit extra descriptions. These are additional
 descriptions that the player may 'look' at. 
@@ -2265,6 +2268,7 @@ See also: OLC OBJECTS
 "OEDIT STORAGE"
 
 Usage:  .storage add <building vnum> [flags]
+        .storage change <number> <building | flags> <value>
         .storage remove <number | all>
 
 This command lets you set where an object may be stored. An object type may
@@ -2549,6 +2553,8 @@ See also: OLC
 Usage:  .<type> audit <from vnum> <to vnum>
 
 This will audit all things in a range of vnums for common problems.
+
+Auditing a single adventure will also run sub-auditors on all its contents.
 #d
 "OLC COPY"
 
@@ -2986,6 +2992,7 @@ The following room template flags are available:
  NEED-BOAT - Requires a boat, swimming, or fly.
  !TELEPORT - Cannot teleport in or out.
  LOOK-OUT - can see the map using "look out"
+ !LOCATION - no location shown; disables "where"
 
 See also: OLC ROOM TEMPLATES
 #d
@@ -3087,6 +3094,7 @@ See also: OLC SECTORS
 "SECTEDIT EVOLUTIONS"
 
 Usage:  .evolution add <type> [value] <percent> <becomes sector vnum>
+        .evolution change <number> <type | value | percent | sector> <new value>
         .evolution remove <number | all>
 
 This command lets you add or remove an evolution from a sector. Evolutions are
@@ -3159,6 +3167,7 @@ See also: OLC SECTORS
 "SECTEDIT ICONS" "CROPEDIT ICONS"
 
 Usage:  .icons add <type> <color code> <icon>
+        .icons change <number> <type | color | icon> <value>
         .icons remove <number | all>
 
 EmpireMUD uses four different seasons and the biggest change between them is

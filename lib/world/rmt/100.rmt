@@ -526,7 +526,7 @@ would be hard to estimate the cost of the ebony wood. The foyer seems larger
 than is possible, based on the tower's appearance from the outside, but with
 the nocturnium construction, it's possible the inside is simply larger.
 ~
-cd 0
+cdh 0
 D0
 ~
 0 10058
@@ -542,7 +542,7 @@ The Ground Floor~
 here on the ground floor. The view above you is the cascading spiral of the
 underside of the stairs above. An archway in the wall leads to a small cafe.
 ~
-c 0
+ch 0
 D1
 ~
 0 10048
@@ -561,7 +561,7 @@ how busy it seems to get in here. Even the brick walls are immaculate, perhaps
 due to a spell cast by the sorcerers. A sign next to the door here reads 'Quiet
 - Class in Session'.
 ~
-c 0
+ch 0
 D7
 ~
 0 10031
@@ -579,7 +579,7 @@ The Base of the Staircase~
 floor hallway becomes a staircase. A large archway just at the start of the
 stairs leads to the gift shoppe, which happily trades in skystones.
 ~
-c 0
+ch 0
 D5
 ~
 0 10032
@@ -599,7 +599,7 @@ to some illusion. The floors on the second level are wood, and echoes less than
 the brick staircase. It does nothing, however, to muffle the shrieks of goblins
 in the distance.
 ~
-cd 0
+cdh 0
 D9
 ~
 0 10033
@@ -614,7 +614,7 @@ masters, from the first to the last. The frames are interrupted by a large door
 marked 'Caution: Goblins', from which you can hear strange, small, high-pitched
 shrieks.
 ~
-c 0
+ch 0
 D4
 ~
 0 10034
@@ -633,7 +633,7 @@ Skycleave. You can't see the outside from here, but the door marked 'Pixy
 Races' is covered in glowing yellow dust, sometimes in a shape resembling a
 small bird, which must have smacked into it.
 ~
-c 0
+ch 0
 D6
 ~
 0 10035
@@ -653,7 +653,7 @@ apprentices practice their experiments and conduct their research, hoping to
 join the upper echelons of Skycleave's hierarchy. As if to inspire them, the
 wall is lined with portraits of former masters of the tower.
 ~
-c 0
+ch 0
 D7
 ~
 0 10036
@@ -671,7 +671,7 @@ the Tower Skycleave's former masters comes to an apparent end here at the
 stairs, where its current leaders, Knezz, Barosh, and Celiya occupy the final
 three frames.
 ~
-c 0
+ch 0
 D5
 ~
 0 10037
@@ -686,7 +686,7 @@ and wooden walls paneled over the brick structure of the Tower Skycleave.
 Though the curved hallway is long, you hardly feel tired. At times, the curve
 is so subtle that it just seems like one endless, ascending hallway.
 ~
-cd 0
+cdh 0
 D9
 ~
 0 10038
@@ -701,7 +701,7 @@ Residents - sorcerers who have earned their place in the upper echelon, but
 who are still working to master the magical sciences. Most of the doors are
 shut and locked, and perhaps mystically muffled.
 ~
-c 0
+ch 0
 D4
 ~
 0 10039
@@ -717,7 +717,7 @@ The Third Floor~
 but it isn't having much luck. The sorcerer who enchanted it must be too busy
 to pay attention.
 ~
-c 0
+ch 0
 D6
 ~
 0 10040
@@ -736,7 +736,7 @@ The Third Floor~
 emanating from the door marked 'Lich Labs'. As you listen carefully, you manage
 to make out a low wailing coming from behind the door.
 ~
-c 0
+ch 0
 D7
 ~
 0 10041
@@ -755,7 +755,7 @@ The Base of the Staircase~
 staircase. There are windows here, unlike much of the hallway, and you suddenly
 remember how high you've climbed up the long spiral of the Tower Skycleave.
 ~
-c 0
+ch 0
 D5
 ~
 0 10042
@@ -770,7 +770,7 @@ find the floor's tiles change to a mosaic of soft, wooden shapes that form an
 entrancing pattern. The windows next to the stairs show off the tower's immense
 height, and you can see much of the countryside.
 ~
-cd 0
+cdh 0
 D9
 ~
 0 10043
@@ -786,7 +786,7 @@ Celiya, who oversees the tower's residency program. Her desk is made of sturdy
 oak, and the walls are covered in locked glass cases displaying relics,
 trophies, and books of all kinds.
 ~
-c 0
+ch 0
 D4
 ~
 0 10044
@@ -802,7 +802,7 @@ uncomfortable chair. The only book is on a pedestal, and is blank, perhaps a
 work in progress. The floor has small piles of dust, perhaps the remnants of
 former pieces of furniture, or Barrosh's most recent experiment.
 ~
-c 0
+ch 0
 D6
 ~
 0 10045
@@ -820,7 +820,7 @@ of the year for nearly a century, meaning all those portraits of former masters
 on the second floor must be ancient indeed. The office is lined in black
 nocturnium, which seems to glow from some angles.
 ~
-c 0
+ch 0
 D7
 ~
 0 10046
@@ -833,7 +833,7 @@ hallway. The walls here have been papered over with pictures of birds and
 flowers. There is a wooden bar with several strange machines that burble and
 steam. A sign indicates that you can buy coffee or wine.
 ~
-c 0
+ch 0
 D3
 ~
 0 10031
@@ -905,7 +905,7 @@ center of the chamber is a low table covered in a glass done with a tiny,
 pixy-sized track inside. To the side of it is a coin slot, enchanted to handle
 wagers and payouts.
 ~
-c 0
+ch 0
 D3
 ~
 0 10036
@@ -984,7 +984,7 @@ primarily to tourists. The second floor is where the apprentices conduct their
 experiments. The third floor has more advanced research, while the top floor
 holds the offices of the tower's masters.
 ~
-cd 0
+cdh 0
 D5
 ~
 0 10031

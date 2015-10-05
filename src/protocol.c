@@ -388,7 +388,7 @@ static void want_reduced_color_underline(descriptor_data *desc) {
 * @param descriptor_data *desc The person who is getting color codes.
 * @return char* The string of rendered color codes to send.
 */
-static char *flush_reduced_color_codes(descriptor_data *desc) {
+char *flush_reduced_color_codes(descriptor_data *desc) {
 	static char output[COLREDUC_SIZE * 3 + 1];	// guarantee enough room
 	*output = '\0';
 	
@@ -688,93 +688,95 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 				case 'n':
 				case '0':
 					want_reduced_color_clean(apDescriptor);
+					// ideally we'll change to this, but need a terminator for the underline
+					// want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F555", s_Clean), NULL);
 					break;
 				case 'u': // underline
 					want_reduced_color_underline(apDescriptor);
 					break;
 				case 'r': /* dark red */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F300"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F300", s_DarkRed), NULL);
 					break;
 				case 'R': /* light red */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F500"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F500", s_BoldRed), NULL);
 					break;
 				case 'g': /* dark green */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F030"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F030", s_DarkGreen), NULL);
 					break;
 				case 'G': /* light green */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F050"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F050", s_BoldGreen), NULL);
 					break;
 				case 'y': /* dark yellow */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F330"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F330", s_DarkYellow), NULL);
 					break;
 				case 'Y': /* light yellow */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F550"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F550", s_BoldYellow), NULL);
 					break;
 				case 'b': /* dark blue */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F003"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F003", s_DarkBlue), NULL);
 					break;
 				case 'B': /* light blue */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F005"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F005", s_BoldBlue), NULL);
 					break;
 				case 'm': /* dark magenta */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F303"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F303", s_DarkMagenta), NULL);
 					break;
 				case 'M': /* light magenta */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F505"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F505", s_BoldMagenta), NULL);
 					break;
 				case 'c': /* dark cyan */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F033"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F033", s_DarkCyan), NULL);
 					break;
 				case 'C': /* light cyan */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F055"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F055", s_BoldCyan), NULL);
 					break;
 				case 'w': /* dark white */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F222"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F222", s_DarkWhite), NULL);
 					break;
 				case 'W': /* light white */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F555"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F555", s_BoldWhite), NULL);
 					break;
 				case 'a': /* dark azure */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F014"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F014", s_DarkBlue), NULL);
 					break;
 				case 'A': /* light azure */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F025"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F025", s_BoldBlue), NULL);
 					break;
 				case 'j': /* dark jade */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F031"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F031", s_DarkGreen), NULL);
 					break;
 				case 'J': /* light jade */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F052"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F052", s_BoldGreen), NULL);
 					break;
 				case 'l': /* dark lime */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F140"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F140", s_BoldGreen), NULL);
 					break;
 				case 'L': /* light lime */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F250"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F250", s_BoldGreen), NULL);
 					break;
 				case 'o': /* dark orange */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F520"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F520", s_DarkYellow), NULL);
 					break;
 				case 'O': /* light orange */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F530"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F530", s_DarkYellow), NULL);
 					break;
 				case 'p': /* dark pink */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F301"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F301", s_DarkMagenta), NULL);
 					break;
 				case 'P': /* light pink */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F502"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F502", s_BoldMagenta), NULL);
 					break;
 				case 't': /* dark tan */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F210"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F210", s_DarkYellow), NULL);
 					break;
 				case 'T': /* light tan */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F321"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F321", s_DarkYellow), NULL);
 					break;
 				case 'v': /* dark violet */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F104"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F104", s_DarkBlue), NULL);
 					break;
 				case 'V': /* light violet */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F205"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F205", s_DarkMagenta), NULL);
 					break;
 				case '(': /* MXP link */
 					if (!pProtocol->bBlockMXP && pProtocol->pVariables[eMSDP_MXP]->ValueInt)
@@ -868,10 +870,10 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 						}
 						else {	// Success
 							if (tolower(Buffer[0]) == 'b') {	// background
-								want_reduced_color_codes(apDescriptor, NULL, ColourRGB(apDescriptor, Buffer));
+								want_reduced_color_codes(apDescriptor, NULL, ColourRGB(apDescriptor, Buffer, NULL));
 							}
 							else {	// foreground
-								want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, Buffer), NULL);
+								want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, Buffer, NULL), NULL);
 							}
 						}
 					}
@@ -969,93 +971,95 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 				case 'n':
 				case '0':
 					want_reduced_color_clean(apDescriptor);
+					// ideally we'll change to this, but need a terminator for the underline
+					// want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F555", s_Clean), NULL);
 					break;
 				case 'u': // underline
 					want_reduced_color_underline(apDescriptor);
 					break;
 				case 'r': /* dark red */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F300"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F300", s_DarkRed), NULL);
 					break;
 				case 'R': /* light red */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F500"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F500", s_BoldRed), NULL);
 					break;
 				case 'g': /* dark green */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F030"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F030", s_DarkGreen), NULL);
 					break;
 				case 'G': /* light green */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F050"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F050", s_BoldGreen), NULL);
 					break;
 				case 'y': /* dark yellow */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F330"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F330", s_DarkYellow), NULL);
 					break;
 				case 'Y': /* light yellow */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F550"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F550", s_BoldYellow), NULL);
 					break;
 				case 'b': /* dark blue */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F003"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F003", s_DarkBlue), NULL);
 					break;
 				case 'B': /* light blue */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F005"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F005", s_BoldBlue), NULL);
 					break;
 				case 'm': /* dark magenta */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F303"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F303", s_DarkMagenta), NULL);
 					break;
 				case 'M': /* light magenta */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F505"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F505", s_BoldMagenta), NULL);
 					break;
 				case 'c': /* dark cyan */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F033"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F033", s_DarkCyan), NULL);
 					break;
 				case 'C': /* light cyan */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F055"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F055", s_BoldCyan), NULL);
 					break;
 				case 'w': /* dark white */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F222"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F222", s_DarkWhite), NULL);
 					break;
 				case 'W': /* light white */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F555"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F555", s_BoldWhite), NULL);
 					break;
 				case 'a': /* dark azure */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F014"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F014", s_DarkBlue), NULL);
 					break;
 				case 'A': /* light azure */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F025"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F025", s_BoldBlue), NULL);
 					break;
 				case 'j': /* dark jade */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F031"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F031", s_DarkGreen), NULL);
 					break;
 				case 'J': /* light jade */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F052"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F052", s_BoldGreen), NULL);
 					break;
 				case 'l': /* dark lime */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F140"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F140", s_BoldGreen), NULL);
 					break;
 				case 'L': /* light lime */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F250"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F250", s_BoldGreen), NULL);
 					break;
 				case 'o': /* dark orange */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F520"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F520", s_DarkYellow), NULL);
 					break;
 				case 'O': /* light orange */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F530"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F530", s_DarkYellow), NULL);
 					break;
 				case 'p': /* dark pink */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F301"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F301", s_DarkMagenta), NULL);
 					break;
 				case 'P': /* light pink */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F502"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F502", s_BoldMagenta), NULL);
 					break;
 				case 't': /* dark tan */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F210"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F210", s_DarkYellow), NULL);
 					break;
 				case 'T': /* light tan */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F321"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F321", s_DarkYellow), NULL);
 					break;
 				case 'v': /* dark violet */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F104"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F104", s_DarkBlue), NULL);
 					break;
 				case 'V': /* light violet */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F205"), NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F205", s_DarkMagenta), NULL);
 					break;
 				case '\0':
 					bTerminate = true;
@@ -1082,10 +1086,10 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 
 							if (bDone && bValid && IsValidColour(Buffer)) {
 								if (tolower(Buffer[0]) == 'b') {	// background
-									want_reduced_color_codes(apDescriptor, NULL, ColourRGB(apDescriptor, Buffer));
+									want_reduced_color_codes(apDescriptor, NULL, ColourRGB(apDescriptor, Buffer, NULL));
 								}
 								else {	// foreground
-									want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, Buffer), NULL);
+									want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, Buffer, NULL), NULL);
 								}
 							}
 						}
@@ -1628,8 +1632,12 @@ void SoundSend(descriptor_t *apDescriptor, const char *apTrigger) {
  Colour global functions.
  *****************************************************************************/
 
-const char *ColourRGB(descriptor_t *apDescriptor, const char *apRGB) {
+const char *ColourRGB(descriptor_t *apDescriptor, const char *apRGB, const char *ansiBackup) {
 	protocol_t *pProtocol = apDescriptor ? apDescriptor->pProtocol : NULL;
+	
+	if (ansiBackup && !pProtocol->pVariables[eMSDP_XTERM_256_COLORS]->ValueInt) {
+		return ansiBackup;
+	}
 
 	if (pProtocol && pProtocol->pVariables[eMSDP_ANSI_COLORS]->ValueInt && (!apDescriptor->character || !PRF_FLAGGED(REAL_CHAR(apDescriptor->character), PRF_SCREEN_READER))) {
 		if (IsValidColour(apRGB)) {
@@ -1642,7 +1650,7 @@ const char *ColourRGB(descriptor_t *apDescriptor, const char *apRGB) {
 				return GetRGBColour(bBackground, Red, Green, Blue);
 			}
 			else { /* Use regular ANSI colour */
-				return GetAnsiColour(bBackground, Red, Green, Blue);
+				return ansiBackup ? ansiBackup : GetAnsiColour(bBackground, Red, Green, Blue);
 			}
 		}
 		else {	// Invalid colour - use this to clear any existing colour.
@@ -2911,23 +2919,22 @@ static char *GetMxpTag(const char *apTag, const char *apText) {
  *****************************************************************************/
 
 static const char *GetAnsiColour(bool_t abBackground, int aRed, int aGreen, int aBlue) {
-	if (aRed == aGreen && aRed == aBlue && aRed < 2)
+	if ( aRed == aGreen && aRed == aBlue && aRed < 2)
 		return abBackground ? s_BackBlack : aRed >= 1 ? s_BoldBlack : s_DarkBlack;
-	else if (aRed == aGreen && aRed == aBlue)
+	else if ( aRed == aGreen && aRed == aBlue )
 		return abBackground ? s_BackWhite : aRed >= 4 ? s_BoldWhite : s_DarkWhite;
-	else if (aRed > aGreen && aRed > aBlue)
-		return abBackground ? s_BackRed : aRed >= 4 ? s_BoldRed : s_DarkRed;
-	else if (aRed == aGreen && aRed > aBlue)
-		return abBackground ? s_BackYellow : aRed >= 4 ? s_BoldYellow : s_DarkYellow;
-	else if (aRed == aBlue && aRed > aGreen)
-		return abBackground ? s_BackMagenta : aRed >= 4 ? s_BoldMagenta : s_DarkMagenta;
-	else if (aGreen > aBlue)
-		return abBackground ? s_BackGreen : aGreen >= 4 ? s_BoldGreen : s_DarkGreen;
-	else if (aGreen == aBlue)
-		return abBackground ? s_BackCyan : aGreen >= 4 ? s_BoldCyan : s_DarkCyan;
-	else {	// aBlue is the highest
-		return abBackground ? s_BackBlue : aBlue >= 4 ? s_BoldBlue : s_DarkBlue;
-	}
+	else if ( aRed > aGreen && aRed > aBlue )
+		return abBackground ? s_BackRed : aRed >= 3 ? s_BoldRed : s_DarkRed;
+	else if ( aRed == aGreen && aRed > aBlue )
+		return abBackground ? s_BackYellow : aRed >= 3 ? s_BoldYellow : s_DarkYellow;
+	else if ( aRed == aBlue && aRed > aGreen )
+		return abBackground ? s_BackMagenta : aRed >= 3 ? s_BoldMagenta : s_DarkMagenta;
+	else if ( aGreen > aBlue )
+		return abBackground ? s_BackGreen : aGreen >= 3 ? s_BoldGreen : s_DarkGreen;
+	else if ( aGreen == aBlue )
+		return abBackground ? s_BackCyan : aGreen >= 3 ? s_BoldCyan : s_DarkCyan;
+	else /* aBlue is the highest */
+		return abBackground ? s_BackBlue : aBlue >= 3 ? s_BoldBlue : s_DarkBlue;
 }
 
 static const char *GetRGBColour(bool_t abBackground, int aRed, int aGreen, int aBlue) {

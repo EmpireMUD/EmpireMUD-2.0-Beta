@@ -148,14 +148,14 @@ static void build_instance_entrance(struct instance_data *inst, struct adventure
 		case ADV_LINK_PORTAL_BUILDING_EXISTING:
 		case ADV_LINK_PORTAL_BUILDING_NEW: {
 			if (obj_proto(rule->portal_in)) {
-				portal = read_object(rule->portal_in);
+				portal = read_object(rule->portal_in, TRUE);
 				GET_OBJ_VAL(portal, VAL_PORTAL_TARGET_VNUM) = GET_ROOM_VNUM(inst->start);
 				obj_to_room(portal, loc);
 				act("$p spins open!", FALSE, NULL, portal, NULL, TO_ROOM);
 				load_otrigger(portal);
 			}
 			if (obj_proto(rule->portal_out)) {
-				portal = read_object(rule->portal_out);
+				portal = read_object(rule->portal_out, TRUE);
 				GET_OBJ_VAL(portal, VAL_PORTAL_TARGET_VNUM) = GET_ROOM_VNUM(loc);
 				obj_to_room(portal, inst->start);
 				act("$p spins open!", FALSE, NULL, portal, NULL, TO_ROOM);
@@ -972,7 +972,7 @@ static void reset_instance_room(struct instance_data *inst, room_data *room) {
 			switch (spawn->type) {
 				case ADV_SPAWN_MOB: {
 					if (mob_proto(spawn->vnum) && count_mobs_in_instance(inst, spawn->vnum) < spawn->limit) {
-						mob = read_mobile(spawn->vnum);
+						mob = read_mobile(spawn->vnum, TRUE);
 						MOB_INSTANCE_ID(mob) = inst->id;
 						setup_generic_npc(mob, NULL, NOTHING, NOTHING);
 						char_to_room(mob, room);
@@ -986,7 +986,7 @@ static void reset_instance_room(struct instance_data *inst, room_data *room) {
 				}
 				case ADV_SPAWN_OBJ: {
 					if (obj_proto(spawn->vnum) && count_objs_in_instance(inst, spawn->vnum) < spawn->limit) {
-						obj = read_object(spawn->vnum);
+						obj = read_object(spawn->vnum, TRUE);
 						instance_obj_setup(inst, obj);
 						obj_to_room(obj, room);
 						if (inst->level > 0) {

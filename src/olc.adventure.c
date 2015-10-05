@@ -46,6 +46,131 @@ void init_adventure(adv_data *adv);
 //// HELPERS /////////////////////////////////////////////////////////////////
 
 /**
+* Checks for common adventure problems and reports them to ch.
+*
+* @param adv_data *adv The adventure to audit.
+* @param char_data *ch The person to report to.
+* @param bool only_one If TRUE, we are only auditing 1 adventure (so do extended checks).
+* @return bool TRUE if any problems were reported; FALSE if all good.
+*/
+bool audit_adventure(adv_data *adv, char_data *ch, bool only_one) {
+	OLC_MODULE(olc_audit);
+	
+	struct adventure_link_rule *link;
+	char buf[MAX_STRING_LENGTH];
+	struct trig_proto_list *tpl;
+	bool found_limit, problem = FALSE;
+	trig_data *trig;
+	
+	if (GET_ADV_START_VNUM(adv) == 0 || GET_ADV_END_VNUM(adv) == 0) {
+		olc_audit_msg(ch, GET_ADV_VNUM(adv), "Vnums not set");
+		problem = TRUE;
+	}
+	if (GET_ADV_START_VNUM(adv) > GET_ADV_END_VNUM(adv)) {
+		olc_audit_msg(ch, GET_ADV_VNUM(adv), "Bad vnum set");
+		problem = TRUE;
+	}
+	if (!str_cmp(GET_ADV_NAME(adv), "Unnamed Adventure Zone") || !*GET_ADV_NAME(adv)) {
+		olc_audit_msg(ch, GET_ADV_VNUM(adv), "Name not set");
+		problem = TRUE;
+	}
+	if (!str_cmp(GET_ADV_AUTHOR(adv), "Unknown") || !*GET_ADV_AUTHOR(adv)) {
+		olc_audit_msg(ch, GET_ADV_VNUM(adv), "Name not set");
+		problem = TRUE;
+	}
+	if (!GET_ADV_DESCRIPTION(adv) || !*GET_ADV_DESCRIPTION(adv) || !str_cmp(GET_ADV_DESCRIPTION(adv), "Nothing.\r\n")) {
+		olc_audit_msg(ch, GET_ADV_VNUM(adv), "Description not set");
+		problem = TRUE;
+	}
+	if (!room_template_proto(GET_ADV_START_VNUM(adv))) {
+		olc_audit_msg(ch, GET_ADV_VNUM(adv), "Missing start room vnum %d", GET_ADV_START_VNUM(adv));
+		problem = TRUE;
+	}
+	if (GET_ADV_MIN_LEVEL(adv) > GET_ADV_MAX_LEVEL(adv) && GET_ADV_MAX_LEVEL(adv) != 0) {
+		olc_audit_msg(ch, GET_ADV_VNUM(adv), "Max level is lower than min level");
+		problem = TRUE;
+	}
+	if (GET_ADV_MAX_INSTANCES(adv) > 50) {
+		olc_audit_msg(ch, GET_ADV_VNUM(adv), "Unusually high max-instances: %d", GET_ADV_MAX_INSTANCES(adv));
+		problem = TRUE;
+	}
+	if (ADVENTURE_FLAGGED(adv, ADV_IN_DEVELOPMENT)) {
+		olc_audit_msg(ch, GET_ADV_VNUM(adv), "IN-DEVELOPMENT");
+		problem = TRUE;
+	}
+	if (ADVENTURE_FLAGGED(adv, ADV_LOCK_LEVEL_ON_ENTER) && ADVENTURE_FLAGGED(adv, ADV_LOCK_LEVEL_ON_COMBAT)) {
+		olc_audit_msg(ch, GET_ADV_VNUM(adv), "Multiple lock flags");
+		problem = TRUE;
+	}
+	if (ADVENTURE_FLAGGED(adv, ADV_NO_NEWBIE) && ADVENTURE_FLAGGED(adv, ADV_NEWBIE_ONLY)) {
+		olc_audit_msg(ch, GET_ADV_VNUM(adv), "!NEWBIE and NEWBIE-ONLY");
+		problem = TRUE;
+	}
+	
+	// check linking
+	found_limit = FALSE;
+	for (link = GET_ADV_LINKING(adv); link; link = link->next) {
+		switch (link->type) {
+			case ADV_LINK_BUILDING_EXISTING:
+			case ADV_LINK_BUILDING_NEW: {
+				bld_data *bld = building_proto(link->value);
+				if (bld && IS_SET(GET_BLD_FLAGS(bld), BLD_OPEN)) {
+					olc_audit_msg(ch, GET_ADV_VNUM(adv), "Links to open building");
+					problem = TRUE;
+				}
+				break;
+			}
+			case ADV_LINK_TIME_LIMIT: {
+				found_limit = TRUE;
+				break;
+			}
+		}
+	}
+	
+	if (!found_limit) {
+		olc_audit_msg(ch, GET_ADV_VNUM(adv), "No time limit");
+		problem = TRUE;
+	}
+
+	// check scripts
+	for (tpl = GET_ADV_SCRIPTS(adv); tpl; tpl = tpl->next) {
+		if (!(trig = real_trigger(tpl->vnum))) {
+			continue;
+		}
+		if (trig->attach_type != WLD_TRIGGER || !IS_SET(GET_TRIG_TYPE(trig), WTRIG_ADVENTURE_CLEANUP)) {
+			olc_audit_msg(ch, GET_ADV_VNUM(adv), "Non-cleanup trigger");
+			problem = TRUE;
+		}
+	}
+
+	// sub-audits
+	if (only_one && GET_ADV_START_VNUM(adv) <= GET_ADV_END_VNUM(adv)) {
+		snprintf(buf, sizeof(buf), "%d %d", GET_ADV_START_VNUM(adv), GET_ADV_END_VNUM(adv));
+		msg_to_char(ch, "Crafts:\r\n");
+		olc_audit(ch, OLC_CRAFT, buf);
+		msg_to_char(ch, "Mobs:\r\n");
+		olc_audit(ch, OLC_MOBILE, buf);
+		msg_to_char(ch, "Objects:\r\n");
+		olc_audit(ch, OLC_OBJECT, buf);
+		msg_to_char(ch, "Buildings:\r\n");
+		olc_audit(ch, OLC_BUILDING, buf);
+		msg_to_char(ch, "Triggers:\r\n");
+		olc_audit(ch, OLC_TRIGGER, buf);
+		msg_to_char(ch, "Crops:\r\n");
+		olc_audit(ch, OLC_CROP, buf);
+		msg_to_char(ch, "Sectors:\r\n");
+		olc_audit(ch, OLC_SECTOR, buf);
+		msg_to_char(ch, "Room Templates:\r\n");
+		olc_audit(ch, OLC_ROOM_TEMPLATE, buf);
+		msg_to_char(ch, "Globals:\r\n");
+		olc_audit(ch, OLC_GLOBAL, buf);
+	}
+	
+	return only_one ? TRUE : problem;	// prevents the no-problems message
+}
+
+
+/**
 * Creates a new adventure zone entry.
 * 
 * @param adv_vnum vnum The number to create.

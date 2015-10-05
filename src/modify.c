@@ -21,7 +21,6 @@
 #include "comm.h"
 #include "mail.h"
 #include "boards.h"
-#include "books.h"
 #include "olc.h"
 
 
@@ -193,9 +192,8 @@ void string_add(descriptor_data *d, char *str) {
 	
 	switch (action) {
 		case STRINGADD_ABORT:
-			// if (STATE(d) == CON_BOOKEDIT) {
 			// only if not mailing/board-writing
-			if ((d->mail_to <= 0) && (STATE(d) == CON_PLAYING || STATE(d) == CON_BOOKEDIT)) {
+			if ((d->mail_to <= 0) && STATE(d) == CON_PLAYING) {
 				free(*d->str);
 				*d->str = d->backstr;
 				d->backstr = NULL;
@@ -300,14 +298,6 @@ void string_add(descriptor_data *d, char *str) {
 				free(d->file_storage);
 			}
 			d->file_storage = NULL;
-		}
-		else if (STATE(d) == CON_BOOKEDIT) {
-			if (action == STRINGADD_ABORT) {
-				SEND_TO_Q("Edit aborted.\r\n", d);
-			}
-			
-			SEND_TO_Q("Press ENTER to return to the menu.\r\n", d);
-			d->bookedit->mode = BOOKEDIT_MENU;
 		}
 		else {
 			if (action != STRINGADD_ABORT) {

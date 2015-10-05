@@ -10,7 +10,10 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 
+// command types
 #define ACMD(name)		void name(char_data *ch, char *argument, int cmd, int subcmd)
+#define LIBRARY_SCMD(name)  void name(char_data *ch, char *argument)
+
 
 // prototypes
 void command_interpreter(char_data *ch, char *argument);
@@ -219,4 +222,4 @@ struct alias_data {
 // for look_at_room_by_loc -- option flags
 #define LRR_SHIP_PARTIAL  BIT(0)	// shows only part of the room, for use on ships.
 #define LRR_SHOW_DARK  BIT(1)	// for passing to show_map_to_char
-#define LRR_FORCE_MAP  BIT(2)	// show map even indoors
+#define LRR_LOOK_OUT  BIT(2)	// show map even indoors

@@ -105,6 +105,11 @@
 #define MAX_SCRIPT_DEPTH      10          /* maximum depth triggers can recurse into each other */
 
 
+// used for command triggers
+#define CMDTRG_EXACT  0
+#define CMDTRG_ABBREV  1
+
+
 /* one line of the trigger */
 struct cmdlist_element {
 	char *cmd;				/* one line of a trigger */
@@ -188,9 +193,10 @@ int give_otrigger(obj_data *obj, char_data *actor, char_data *victim);
 int receive_mtrigger(char_data *ch, char_data *actor, obj_data *obj);
 int wear_otrigger(obj_data *obj, char_data *actor, int where);
 int remove_otrigger(obj_data *obj, char_data *actor);
-int command_mtrigger(char_data *actor, char *cmd, char *argument);
-int command_otrigger(char_data *actor, char *cmd, char *argument);
-int command_wtrigger(char_data *actor, char *cmd, char *argument);
+int command_mtrigger(char_data *actor, char *cmd, char *argument, int mode);
+int command_otrigger(char_data *actor, char *cmd, char *argument, int mode);
+int command_wtrigger(char_data *actor, char *cmd, char *argument, int mode);
+bool check_command_trigger(char_data *actor, char *cmd, char *argument, int mode);
 int death_mtrigger(char_data *ch, char_data *actor);
 void fight_mtrigger(char_data *ch);
 void hitprcnt_mtrigger(char_data *ch);

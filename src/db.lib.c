@@ -2309,7 +2309,7 @@ char_data *spawn_empire_npc_to_room(empire_data *emp, struct empire_npc_data *np
 	
 	char_data *mob;
 	
-	mob = read_mobile((override_mob == NOTHING) ? npc->vnum : override_mob);
+	mob = read_mobile((override_mob == NOTHING) ? npc->vnum : override_mob, TRUE);
 	
 	GET_EMPIRE_NPC_DATA(mob) = npc;
 	npc->mob = mob;
@@ -3842,19 +3842,19 @@ void parse_room(FILE *fl, room_vnum vnum) {
 						reset->sarg2 = strdup(str2);
 					}
 				}
-				else if (strchr("TY", reset->command) != NULL) {	// trigger or generic-mob: 3-arg command
-					// trigger_type trigger_vnum room_vnum
+				else if (strchr("Y", reset->command) != NULL) {	// generic-mob: 3-arg command
 					// generic-sex generic-name empire-id
 					if (sscanf(ptr, " %d %d %d ", &reset->arg1, &reset->arg2, &reset->arg3) != 3) {
 						error = TRUE;
 					}
 				}
-				else if (strchr("CD", reset->command) != NULL) {	/* a 2-arg command */
+				else if (strchr("CDT", reset->command) != NULL) {	/* C, D, Trigger: a 2-arg command */
+					// trigger_type trigger_vnum
 					if (sscanf(ptr, " %d %d ", &reset->arg1, &reset->arg2) != 2) {
 						error = TRUE;
 					}
 				}
-				else if (strchr("M", reset->command) != NULL) {	// mob: 3 args
+				else if (strchr("M", reset->command) != NULL) {	// Mob: 3 args
 					if (sscanf(ptr, " %d %s %d ", &reset->arg1, str1, &reset->arg2) != 3) {
 						error = TRUE;
 					}
@@ -3961,7 +3961,11 @@ void parse_room(FILE *fl, room_vnum vnum) {
 				break;
 			}
 			
-			case 'T': {	// trigger
+			case 'T': {	// trigger (deprecated)
+				// NOTE: prior to b2.11, trigger prototypes were saved and read
+				// this way they are no longer saved this way at all, but this
+				// must be left in to be backwards-compatbile. If your mud has
+				// been up since b2.11, you can safely remove this block.
 				dg_read_trigger(line, room, WLD_TRIGGER);
 				break;
 			}
@@ -4022,6 +4026,7 @@ void write_room_to_file(FILE *fl, room_data *room) {
 	struct room_extra_data *red;
 	struct depletion_data *dep;
 	struct cooldown_data *cool;
+	trig_data *trig;
 	char_data *mob;
 	
 	if (!fl || !room) {
@@ -4050,6 +4055,12 @@ void write_room_to_file(FILE *fl, room_data *room) {
 				fprintf(fl, "C O\n");
 			}
 		}
+		// triggers: C T type vnum
+		if (SCRIPT(room)) {
+			for (trig = TRIGGERS(SCRIPT(room)); trig; trig = trig->next) {
+				fprintf(fl, "C T %d %d\n", WLD_TRIGGER, GET_TRIG_VNUM(trig));
+			}
+		}
 		if (ROOM_PEOPLE(room)) {
 			for (mob = ROOM_PEOPLE(room); mob; mob = mob->next_in_room) {
 				if (mob && IS_NPC(mob) && !MOB_FLAGGED(mob, MOB_EMPIRE | MOB_FAMILIAR)) {
@@ -4070,11 +4081,18 @@ void write_room_to_file(FILE *fl, room_data *room) {
 					for (cool = mob->cooldowns; cool; cool = cool->next) {
 						fprintf(fl, "C C %d %d\n", cool->type, (int)(cool->expire_time - time(0)));
 					}
+					
+					// triggers: C T type vnum
+					if (SCRIPT(mob)) {
+						for (trig = TRIGGERS(SCRIPT(mob)); trig; trig = trig->next) {
+							fprintf(fl, "C T %d %d\n", MOB_TRIGGER, GET_TRIG_VNUM(trig));
+						}
+					}
 				}
 			}
 		}
 		
-		// TODO triggers and vars?
+		// TODO script vars?
 	}
 
 	// E affects
@@ -4136,14 +4154,14 @@ void write_room_to_file(FILE *fl, room_data *room) {
 			fprintf(fl, "D%d\n%s~\n%s %d\n", ex->dir, buf2, bitv_to_alpha(ex->exit_info), ex->to_room);
 		}
 	}
+
+	// NOTE: Prior to b2.11, this saved T as prototype triggers, but this is
+	// no longer used: script_save_to_disk(fl, room, WLD_TRIGGER);
 	
 	// Z: extra data
 	for (red = room->extra_data; red; red = red->next) {
 		fprintf(fl, "Z\n%d %d\n", red->type, red->value);
 	}
-	
-	// T, V: triggers
-	script_save_to_disk(fl, room, WLD_TRIGGER);
 	
 	// end
 	fprintf(fl, "S\n");

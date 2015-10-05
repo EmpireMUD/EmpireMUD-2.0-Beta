@@ -269,6 +269,38 @@ OCMD(do_oregionecho) {
 	}
 }
 
+
+// prints the message to everyone except two targets
+OCMD(do_oechoneither) {
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+	char_data *vict1, *vict2, *iter;
+	char *p;
+
+	p = two_arguments(argument, arg1, arg2);
+	skip_spaces(&p);
+
+	if (!*arg1 || !*arg2 || !*p) {
+		obj_log(obj, "oechoneither called with missing arguments");
+		return;
+	}
+	
+	if (!(vict1 = get_char_by_obj(obj, arg1))) {
+		obj_log(obj, "oechoneither: vict 1 (%s) does not exist", arg1);
+		return;
+	}
+	if (!(vict2 = get_char_by_obj(obj, arg2))) {
+		obj_log(obj, "oechoneither: vict 2 (%s) does not exist", arg2);
+		return;
+	}
+	
+	for (iter = ROOM_PEOPLE(IN_ROOM(vict1)); iter; iter = iter->next_in_room) {
+		if (iter->desc && iter != vict1 && iter != vict2) {
+			sub_write(p, iter, TRUE, TO_CHAR);
+		}
+	}
+}
+
+
 OCMD(do_osend) {
 	char buf[MAX_INPUT_LENGTH], *msg;
 	char_data *ch;
@@ -333,7 +365,7 @@ OCMD(do_otransform) {
 	else if (!isdigit(*arg)) 
 		obj_log(obj, "otransform: bad argument");
 	else {
-		o = read_object(atoi(arg));
+		o = read_object(atoi(arg), TRUE);
 		if (o == NULL) {
 			obj_log(obj, "otransform: bad object vnum");
 			return;
@@ -645,7 +677,7 @@ OCMD(do_dgoload) {
 	}
 
 	if (is_abbrev(arg1, "mob")) {
-		if ((mob = read_mobile(number)) == NULL) {
+		if ((mob = read_mobile(number, TRUE)) == NULL) {
 			obj_log(obj, "oload: bad mob vnum");
 			return;
 		}
@@ -663,7 +695,7 @@ OCMD(do_dgoload) {
 		load_mtrigger(mob);
 	}
 	else if (is_abbrev(arg1, "obj")) {
-		if ((object = read_object(number)) == NULL) {
+		if ((object = read_object(number, TRUE)) == NULL) {
 			obj_log(obj, "oload: bad object vnum");
 			return;
 		}
@@ -986,7 +1018,7 @@ OCMD(do_oat)  {
 		return;
 	}
 
-	object = read_object(GET_OBJ_VNUM(obj));
+	object = read_object(GET_OBJ_VNUM(obj), TRUE);
 	if (!object)
 		return;
 
@@ -1035,7 +1067,7 @@ OCMD(do_oscale) {
 				scale_item_to_level(otarg, level);
 			}
 			else if ((proto = obj_proto(GET_OBJ_VNUM(otarg))) && OBJ_FLAGGED(proto, OBJ_SCALABLE)) {
-				fresh = read_object(GET_OBJ_VNUM(otarg));
+				fresh = read_object(GET_OBJ_VNUM(otarg), TRUE);
 				scale_item_to_level(fresh, level);
 				swap_obj_for_obj(otarg, fresh);
 				if (otarg == obj) {
@@ -1075,6 +1107,7 @@ const struct obj_command_info obj_cmd_info[] = {
 	{ "odot", do_odot,   NO_SCMD },
 	{ "oecho", do_oecho, NO_SCMD },
 	{ "oechoaround", do_osend, SCMD_OECHOAROUND },
+	{ "oechoneither", do_oechoneither, NO_SCMD },
 	{ "oforce", do_oforce, NO_SCMD },
 	{ "oload", do_dgoload, NO_SCMD },
 	{ "opurge", do_opurge, NO_SCMD },

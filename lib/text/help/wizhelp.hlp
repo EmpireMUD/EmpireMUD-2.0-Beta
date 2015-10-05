@@ -370,9 +370,8 @@ INCOGNITO
 
 Usage: toggle incognito
 
-This command prevents you from appearing to players with lower access levels on
-the "who" list. You will still be visible in your room, and people can still
-send you tells.
+This command prevents you from appearing to mortals on the "who" list. You will
+still be visible in your room, and people can still send you tells.
 
 See also: INVIS, TOGGLE, WIZHIDE
 #d
@@ -914,7 +913,7 @@ Gives a list of the virtual numbers of objects or mobiles which have the
 specified name. If you specify more than one keyword, it will find things
 that match ALL of those keywords.
 
-Valid types are: adventure, building, craft, crop, global, obj, mob, 
+Valid types are: adventure, book, building, craft, crop, global, obj, mob, 
                  roomtemplate, sector
 
 Examples:
@@ -935,7 +934,7 @@ Usage:  vstat <type> <vnum>
 
 Used to stat a prototypical object by virtual number.
 
-Valid types are: adventure, building, craft, crop, global, obj, mob,
+Valid types are: adventure, building, book, craft, crop, global, obj, mob,
                  roomtemplate, sector
 
 Examples:

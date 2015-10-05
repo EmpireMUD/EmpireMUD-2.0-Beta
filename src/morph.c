@@ -456,7 +456,14 @@ void perform_morph(char_data *ch, ubyte form) {
 * @param int morph_to any MORPH_x const
 */
 void finish_morphing(char_data *ch, int morph_to) {
+	void undisguise(char_data *ch);
+
 	char lbuf[MAX_STRING_LENGTH];
+	
+	// can't be disguised while morphed
+	if (IS_DISGUISED(ch) && morph_to != MORPH_NONE) {
+		undisguise(ch);
+	}
 	
 	sprintf(lbuf, "%s has become $n!", PERS(ch, ch, FALSE));
 

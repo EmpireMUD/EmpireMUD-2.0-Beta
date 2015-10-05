@@ -880,6 +880,11 @@ bool is_in_city_for_empire(room_data *loc, empire_data *emp, bool check_wait, bo
 		return FALSE;
 	}
 	
+	// secondary territory counts as in-city
+	if (ROOM_BLD_FLAGGED(loc, BLD_SECONDARY_TERRITORY)) {
+		return TRUE;
+	}
+	
 	for (city = EMPIRE_CITY_LIST(emp); city; city = city->next) {
 		dist = compute_distance(loc, city->location);
 		
@@ -1963,7 +1968,7 @@ ACMD(do_barde) {
 				}
 				
 				for (num = 0; num < interact->quantity; ++num) {
-					newmob = read_mobile(interact->vnum);
+					newmob = read_mobile(interact->vnum, TRUE);
 					setup_generic_npc(newmob, GET_LOYALTY(mob), MOB_DYNAMIC_NAME(mob), MOB_DYNAMIC_SEX(mob));
 					char_to_room(newmob, IN_ROOM(ch));
 					MOB_INSTANCE_ID(newmob) = MOB_INSTANCE_ID(ch);
@@ -3203,7 +3208,7 @@ ACMD(do_esay) {
 	char_data *tch;
 	int level = 0, i;
 	empire_data *e;
-	bool emote = FALSE;
+	bool emote = FALSE, extra_color = FALSE;
 	char buf[MAX_STRING_LENGTH], lstring[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH], output[MAX_STRING_LENGTH], color[8];
 
 	if (IS_NPC(ch))
@@ -3232,14 +3237,15 @@ ACMD(do_esay) {
 	if (*argument == '#') {
 		half_chop(argument, arg, buf);
 		strcpy(argument, buf);
-		for (i = 0; i < strlen(arg); i++)
-			if (arg[i] == '_')
+		for (i = 0; i < strlen(arg); i++) {
+			if (arg[i] == '_') {
 				arg[i] = ' ';
-		for (i = 0; i < EMPIRE_NUM_RANKS(e); i++)
-			if (is_abbrev(arg+1, EMPIRE_RANK(e, i)))
-				break;
-		if (i < EMPIRE_NUM_RANKS(e))
+			}
+		}
+		i = find_rank_by_name(e, arg+1);
+		if (i != NOTHING) {
 			level = i;
+		}
 	}
 	if (*argument == '*') {
 		argument++;
@@ -3247,12 +3253,15 @@ ACMD(do_esay) {
 	}
 	skip_spaces(&argument);
 
-	level++;
+	level++;	// 1-based, not 0-based
 
-	if (level > 1)
-		sprintf(lstring, " <%s&0>", EMPIRE_RANK(e, level-1));
-	else
+	if (level > 1) {
+		sprintf(lstring, " <%s%%s>", EMPIRE_RANK(e, level-1));
+		extra_color = TRUE;
+	}
+	else {
 		*lstring = '\0';
+	}
 
 	/* Since we cut up the string, we have to check again */
 	if (!*argument) {
@@ -3262,10 +3271,10 @@ ACMD(do_esay) {
 
 	// NOTE: both modes will leave in 2 '%s' for color codes
 	if (emote) {
-		sprintf(buf, "%%s[%sEMPIRE%%s%s] $o %s&0", EMPIRE_BANNER(e), lstring, double_percents(argument));
+		sprintf(buf, "%%s[%sEMPIRE%%s%s] $o %s\t0", EMPIRE_BANNER(e), lstring, double_percents(argument));
 	}
 	else {
-		sprintf(buf, "%%s[%sEMPIRE%%s $o%s]: %s", EMPIRE_BANNER(e), lstring, double_percents(argument));
+		sprintf(buf, "%%s[%sEMPIRE%%s $o%s]: %s\t0", EMPIRE_BANNER(e), lstring, double_percents(argument));
 	}
 
 	if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
@@ -3277,8 +3286,13 @@ ACMD(do_esay) {
 			clear_last_act_message(ch->desc);
 		}
 
-		sprintf(color, "&%c", GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_ESAY) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_ESAY) : '0');
-		sprintf(output, buf, color, color);
+		sprintf(color, "\t%c", GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_ESAY) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_ESAY) : '0');
+		if (extra_color) {
+			sprintf(output, buf, color, color, color);
+		}
+		else {
+			sprintf(output, buf, color, color);
+		}
 		
 		act(output, FALSE, ch, 0, 0, TO_CHAR | TO_SLEEP | TO_NODARK);
 		
@@ -3296,7 +3310,7 @@ ACMD(do_esay) {
 		else {
 			clear_last_act_message(d);
 			
-			sprintf(color, "&%c", GET_CUSTOM_COLOR(tch, CUSTOM_COLOR_ESAY) ? GET_CUSTOM_COLOR(tch, CUSTOM_COLOR_ESAY) : '0');
+			sprintf(color, "\t%c", GET_CUSTOM_COLOR(tch, CUSTOM_COLOR_ESAY) ? GET_CUSTOM_COLOR(tch, CUSTOM_COLOR_ESAY) : '0');
 			sprintf(output, buf, color, color);
 			act(output, FALSE, ch, 0, tch, TO_VICT | TO_SLEEP | TO_NODARK);
 			
@@ -3535,7 +3549,7 @@ ACMD(do_home) {
 			HASH_ITER(interior_hh, interior_world_table, iter, next_iter) {
 				// TODO consider a trigger like RoomUpdate that passes a var like %update% == homeset
 				if (HOME_ROOM(iter) == real && BUILDING_VNUM(iter) == RTYPE_BEDROOM) {
-					obj_to_room((obj = read_object(o_HOME_CHEST)), iter);
+					obj_to_room((obj = read_object(o_HOME_CHEST, TRUE)), iter);
 					load_otrigger(obj);
 				}
 			}

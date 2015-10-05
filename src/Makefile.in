@@ -161,10 +161,10 @@ boards.o: boards.c conf.h sysdep.h structs.h uthash.h utils.h comm.h db.h \
   boards.h interpreter.h handler.h vnums.h
 	$(CC) -c $(CFLAGS) boards.c
 bookedit.o: bookedit.c conf.h sysdep.h structs.h uthash.h utils.h comm.h \
-  handler.h interpreter.h db.h vnums.h books.h dg_scripts.h
+  handler.h interpreter.h db.h vnums.h dg_scripts.h
 	$(CC) -c $(CFLAGS) bookedit.c
 books.o: books.c conf.h sysdep.h structs.h uthash.h utils.h comm.h \
-  interpreter.h handler.h db.h vnums.h books.h dg_scripts.h
+  interpreter.h handler.h db.h vnums.h dg_scripts.h
 	$(CC) -c $(CFLAGS) books.c
 building.o: building.c conf.h sysdep.h structs.h uthash.h utils.h comm.h \
   interpreter.h handler.h db.h skills.h vnums.h dg_scripts.h
@@ -253,13 +253,13 @@ mobact.o: mobact.c conf.h sysdep.h structs.h uthash.h utils.h db.h comm.h \
   interpreter.h handler.h skills.h dg_scripts.h
 	$(CC) -c $(CFLAGS) mobact.c
 modify.o: modify.c conf.h sysdep.h structs.h uthash.h utils.h \
-  interpreter.h handler.h db.h comm.h mail.h boards.h books.h olc.h
+  interpreter.h handler.h db.h comm.h mail.h boards.h olc.h
 	$(CC) -c $(CFLAGS) modify.c
 morph.o: morph.c conf.h sysdep.h structs.h uthash.h utils.h comm.h db.h \
   skills.h handler.h interpreter.h dg_scripts.h
 	$(CC) -c $(CFLAGS) morph.c
 objsave.o: objsave.c conf.h sysdep.h structs.h uthash.h comm.h handler.h \
-  db.h interpreter.h utils.h
+  db.h interpreter.h utils.h dg_scripts.h
 	$(CC) -c $(CFLAGS) objsave.c
 olc.adventure.o: olc.adventure.c conf.h sysdep.h structs.h uthash.h \
   utils.h interpreter.h db.h comm.h olc.h skills.h handler.h dg_scripts.h
@@ -286,7 +286,7 @@ olc.mobile.o: olc.mobile.c conf.h sysdep.h structs.h uthash.h utils.h \
   interpreter.h db.h comm.h olc.h skills.h handler.h dg_scripts.h
 	$(CC) -c $(CFLAGS) olc.mobile.c
 olc.object.o: olc.object.c conf.h sysdep.h structs.h uthash.h utils.h \
-  interpreter.h db.h books.h comm.h olc.h skills.h handler.h dg_scripts.h
+  interpreter.h db.h comm.h olc.h skills.h handler.h dg_scripts.h
 	$(CC) -c $(CFLAGS) olc.object.c
 olc.roomtemplate.o: olc.roomtemplate.c conf.h sysdep.h structs.h uthash.h \
   utils.h interpreter.h db.h comm.h olc.h skills.h handler.h dg_scripts.h

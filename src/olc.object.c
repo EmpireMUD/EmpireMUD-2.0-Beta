@@ -16,7 +16,6 @@
 #include "utils.h"
 #include "interpreter.h"
 #include "db.h"
-#include "books.h"
 #include "comm.h"
 #include "olc.h"
 #include "skills.h"
@@ -49,7 +48,6 @@ extern const char *wear_bits[];
 // external funcs
 extern double get_base_dps(obj_data *weapon);
 extern double get_weapon_speed(obj_data *weapon);
-extern struct book_data *find_book_by_id(int id);
 
 // locals
 char **get_weapon_types_string();
@@ -184,7 +182,7 @@ bool audit_object(obj_data *obj, char_data *ch) {
 			break;
 		}
 		case ITEM_BOOK: {
-			if (!find_book_by_id(GET_BOOK_ID(obj))) {
+			if (!book_proto(GET_BOOK_ID(obj))) {
 				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Book type invalid");
 				problem = TRUE;
 			}
@@ -973,7 +971,7 @@ obj_data *setup_olc_object(obj_data *input) {
 */
 void olc_get_values_display(char_data *ch, char *storage) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
-	struct book_data *book;
+	book_data *book;
 	char temp[MAX_STRING_LENGTH];
 	
 	*storage = '\0';
@@ -1047,7 +1045,7 @@ void olc_get_values_display(char_data *ch, char *storage) {
 			break;
 		}
 		case ITEM_BOOK: {
-			book = find_book_by_id(GET_BOOK_ID(obj));
+			book = book_proto(GET_BOOK_ID(obj));
 			sprintf(storage + strlen(storage), "<&ybook&0> [%d] %s\r\n", GET_BOOK_ID(obj), (book ? book->title : "not set"));
 			break;
 		}
@@ -1244,7 +1242,8 @@ OLC_MODULE(oedit_animalsrequired) {
 OLC_MODULE(oedit_apply) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
-	int loc, num, iter;
+	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
+	int loc, num, iter, change;
 	bool found;
 	
 	// arg1 arg2 arg3
@@ -1309,8 +1308,54 @@ OLC_MODULE(oedit_apply) {
 			}
 		}
 	}
+	else if (is_abbrev(arg1, "change")) {
+		strcpy(num_arg, arg2);
+		half_chop(arg3, type_arg, val_arg);
+		
+		if (!*num_arg || !isdigit(*num_arg) || !*type_arg || !*val_arg) {
+			msg_to_char(ch, "Usage: apply change <number> <value | type> <new value>\r\n");
+			return;
+		}
+		
+		// find which one to change
+		num = atoi(num_arg);
+		change = -1;
+		for (iter = 0; iter < MAX_OBJ_AFFECT && change == -1; ++iter) {
+			if (obj->affected[iter].location != APPLY_NONE && --num == 0) {
+				change = iter;
+				break;
+			}
+		}
+		
+		if (change == -1) {
+			msg_to_char(ch, "Invalid apply number.\r\n");
+		}
+		else if (is_abbrev(type_arg, "value")) {
+			num = atoi(val_arg);
+			if ((!isdigit(*val_arg) && *val_arg != '-') || num == 0) {
+				msg_to_char(ch, "Invalid value '%s'.\r\n", val_arg);
+			}
+			else {
+				obj->affected[change].modifier = num;
+				msg_to_char(ch, "Apply %d changed to value %+d.\r\n", atoi(num_arg), num);
+			}
+		}
+		else if (is_abbrev(type_arg, "type")) {
+			if ((loc = search_block(val_arg, apply_types, FALSE)) == NOTHING) {
+				msg_to_char(ch, "Invalid type.\r\n");
+			}
+			else {
+				obj->affected[change].location = loc;
+				msg_to_char(ch, "Apply %d changed to type %s.\r\n", atoi(num_arg), apply_types[loc]);
+			}
+		}
+		else {
+			msg_to_char(ch, "You can only change the value or type.\r\n");
+		}
+	}
 	else {
 		msg_to_char(ch, "Usage: apply add <value> <type>\r\n");
+		msg_to_char(ch, "Usage: apply change <number> <value | type> <new value>\r\n");
 		msg_to_char(ch, "Usage: apply remove <number | all>\r\n");
 		msg_to_char(ch, "Available types:\r\n");
 		
@@ -1381,14 +1426,14 @@ OLC_MODULE(oedit_automint) {
 OLC_MODULE(oedit_book) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	int old = GET_OBJ_VAL(obj, VAL_BOOK_ID);
-	struct book_data *book;
+	book_data *book;
 	
 	if (!IS_BOOK(obj)) {
 		msg_to_char(ch, "You can only set book id on a book.\r\n");
 	}
 	else {
-		GET_OBJ_VAL(obj, VAL_BOOK_ID) = olc_process_number(ch, argument, "book id", "book", 0, top_book_id, GET_OBJ_VAL(obj, VAL_BOOK_ID));
-		book = find_book_by_id(GET_BOOK_ID(obj));
+		GET_OBJ_VAL(obj, VAL_BOOK_ID) = olc_process_number(ch, argument, "book id", "book", 0, MAX_INT, GET_OBJ_VAL(obj, VAL_BOOK_ID));
+		book = book_proto(GET_BOOK_ID(obj));
 		
 		if (!book) {
 			msg_to_char(ch, "Invalid book id. Old id %d restored.\r\n", old);
@@ -1501,8 +1546,9 @@ OLC_MODULE(oedit_contents) {
 OLC_MODULE(oedit_custom) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], *msgstr;
+	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
 	int num, iter, msgtype;
-	struct obj_custom_message *ocm, *temp;
+	struct obj_custom_message *ocm, *change, *temp;
 	bool found;
 	
 	// arg1 arg2
@@ -1580,8 +1626,51 @@ OLC_MODULE(oedit_custom) {
 			msg_to_char(ch, "You add a custom '%s' message:\r\n%s\r\n", obj_custom_types[ocm->type], ocm->msg);			
 		}
 	}
+	else if (is_abbrev(arg1, "change")) {
+		half_chop(arg2, num_arg, arg1);
+		half_chop(arg1, type_arg, val_arg);
+		
+		if (!*num_arg || !isdigit(*num_arg) || !*type_arg || !*val_arg) {
+			msg_to_char(ch, "Usage: custom change <number> <type | message> <value>\r\n");
+			return;
+		}
+		
+		// find which one to change
+		num = atoi(num_arg);
+		change = NULL;
+		for (ocm = obj->custom_msgs; ocm && !change; ocm = ocm->next) {
+			if (--num == 0) {
+				change = ocm;
+				break;
+			}
+		}
+		
+		if (!change) {
+			msg_to_char(ch, "Invalid custom message number.\r\n");
+		}
+		else if (is_abbrev(type_arg, "type")) {
+			if ((msgtype = search_block(val_arg, obj_custom_types, FALSE)) == NOTHING) {
+				msg_to_char(ch, "Invalid type '%s'.\r\n", val_arg);
+			}
+			else {
+				change->type = msgtype;
+				msg_to_char(ch, "Custom message %d changed to type %s.\r\n", atoi(num_arg), obj_custom_types[msgtype]);
+			}
+		}
+		else if (is_abbrev(type_arg, "message")) {
+			if (change->msg) {
+				free(change->msg);
+			}
+			change->msg = str_dup(val_arg);
+			msg_to_char(ch, "Custom message %d changed to: %s\r\n", atoi(num_arg), val_arg);
+		}
+		else {
+			msg_to_char(ch, "You can only change the type or message.\r\n");
+		}
+	}
 	else {
 		msg_to_char(ch, "Usage: custom add <type> <message>\r\n");
+		msg_to_char(ch, "Usage: custom change <number> <type | message> <value>\r\n");
 		msg_to_char(ch, "Usage: custom remove <number | all>\r\n");
 		msg_to_char(ch, "Available types:\r\n");
 		for (iter = 0; *obj_custom_types[iter] != '\n'; ++iter) {
@@ -1886,8 +1975,9 @@ OLC_MODULE(oedit_storage) {
 	
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], *flagarg;
+	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
 	int loc, num, iter;
-	struct obj_storage_type *store, *temp;
+	struct obj_storage_type *store, *change, *temp;
 	bld_vnum bld;
 	bool found;
 	
@@ -1971,8 +2061,48 @@ OLC_MODULE(oedit_storage) {
 			msg_to_char(ch, "You add storage in the %s with flags: %s\r\n", GET_BLD_NAME(building_proto(store->building_type)), buf1);
 		}
 	}
+	else if (is_abbrev(arg1, "change")) {
+		half_chop(arg2, num_arg, arg1);
+		half_chop(arg1, type_arg, val_arg);
+		
+		if (!*num_arg || !isdigit(*num_arg) || !*type_arg || !*val_arg) {
+			msg_to_char(ch, "Usage: storage change <number> <building | flags> <value>\r\n");
+			return;
+		}
+		
+		// find which one to change
+		num = atoi(num_arg);
+		change = NULL;
+		for (store = obj->storage; store && !change; store = store->next) {
+			if (--num == 0) {
+				change = store;
+				break;
+			}
+		}
+		
+		if (!change) {
+			msg_to_char(ch, "Invalid storage number.\r\n");
+		}
+		else if (is_abbrev(type_arg, "building") || is_abbrev(type_arg, "room")) {
+			bld = atoi(val_arg);
+			if (!isdigit(*val_arg) || !building_proto(bld)) {
+				msg_to_char(ch, "Invalid building vnum '%s'.\r\n", val_arg);
+			}
+			else {
+				change->building_type = bld;
+				msg_to_char(ch, "Storage %d changed to building %d (%s).\r\n", atoi(num_arg), bld, GET_BLD_NAME(building_proto(bld)));
+			}
+		}
+		else if (is_abbrev(type_arg, "flags")) {
+			change->flags = olc_process_flag(ch, val_arg, "storage", "storage change flags", storage_bits, change->flags);
+		}
+		else {
+			msg_to_char(ch, "You can only change the building/room or flags.\r\n");
+		}
+	}
 	else {
 		msg_to_char(ch, "Usage: storage add <building/room> [flags]\r\n");
+		msg_to_char(ch, "Usage: storage change <number> <building | flags> <value>\r\n");
 		msg_to_char(ch, "Usage: storage remove <number | all>\r\n");
 		msg_to_char(ch, "Available flags:\r\n");
 		

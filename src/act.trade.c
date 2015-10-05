@@ -217,7 +217,7 @@ void cancel_gen_craft(char_data *ch) {
 
 		// load the drink container back
 		if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_SOUP)) {
-			obj = read_object(GET_ACTION_VNUM(ch, 1));
+			obj = read_object(GET_ACTION_VNUM(ch, 1), TRUE);
 
 			// just empty it
 			GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) = 0;
@@ -294,7 +294,7 @@ void finish_gen_craft(char_data *ch) {
 	// soup handling
 	if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_SOUP)) {
 		// load the drink container back
-		obj = read_object(GET_ACTION_VNUM(ch, 1));
+		obj = read_object(GET_ACTION_VNUM(ch, 1), TRUE);
 	
 		GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) = MIN(GET_CRAFT_QUANTITY(type), GET_DRINK_CONTAINER_CAPACITY(obj));
 		GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = GET_CRAFT_OBJECT(type);
@@ -324,7 +324,7 @@ void finish_gen_craft(char_data *ch) {
 		if (obj_proto(GET_CRAFT_OBJECT(type))) {
 			for (iter = 0; iter < amt; ++iter) {
 				// load and master it
-				obj = read_object(GET_CRAFT_OBJECT(type));
+				obj = read_object(GET_CRAFT_OBJECT(type), TRUE);
 				if (OBJ_FLAGGED(obj, OBJ_SCALABLE) && master_ability != NO_ABIL && HAS_ABILITY(ch, master_ability)) {
 					applied_master = TRUE;
 					SET_BIT(GET_OBJ_EXTRA(obj), OBJ_SUPERIOR);
@@ -699,9 +699,6 @@ ACMD(do_gen_craft) {
 	else if (GET_CRAFT_MIN_LEVEL(type) > get_crafting_level(ch)) {
 		msg_to_char(ch, "You need to have a crafting level of %d to %s that.\r\n", GET_CRAFT_MIN_LEVEL(type), gen_craft_data[GET_CRAFT_TYPE(type)].command);
 	}
-	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
-		msg_to_char(ch, "You don't have permission to %s here.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
-	}
 
 	// type checks
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_IN_CITY_ONLY) && !is_in_city_for_empire(IN_ROOM(ch), GET_LOYALTY(ch), TRUE, &wait) && !is_in_city_for_empire(IN_ROOM(ch), ROOM_OWNER(IN_ROOM(ch)), TRUE, &room_wait)) {
@@ -748,7 +745,7 @@ ACMD(do_gen_craft) {
 	else if (GET_CRAFT_REQUIRES_OBJ(type) != NOTHING && !get_obj_in_list_vnum(GET_CRAFT_REQUIRES_OBJ(type), ch->carrying)) {
 		msg_to_char(ch, "You need %s to make that.\r\n", get_obj_name_by_proto(GET_CRAFT_REQUIRES_OBJ(type)));
 	}
-	else if (!has_resources(ch, GET_CRAFT_RESOURCES(type), TRUE, TRUE)) {
+	else if (!has_resources(ch, GET_CRAFT_RESOURCES(type), can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), TRUE)) {
 		// this sends its own message ("You need X more of ...")
 		//msg_to_char(ch, "You don't have the resources to %s that.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
 	}
@@ -778,7 +775,7 @@ ACMD(do_gen_craft) {
 		// how many
 		GET_ACTION_VNUM(ch, 2) = num;
 		
-		extract_resources(ch, GET_CRAFT_RESOURCES(type), TRUE);
+		extract_resources(ch, GET_CRAFT_RESOURCES(type), can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED));
 		
 		msg_to_char(ch, "You start %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 		sprintf(buf, "$n starts %s.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
@@ -916,11 +913,11 @@ ACMD(do_reforge) {
 		if (!validate_item_rename(ch, obj, argument)) {
 			// sends own message
 		}
-		else if (!has_resources(ch, res, TRUE, TRUE)) {
+		else if (!has_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), TRUE)) {
 			// sends own message
 		}
 		else {
-			extract_resources(ch, res, TRUE);
+			extract_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED));
 			
 			// prepare
 			sprintf(buf1, "You name %s $p!", GET_OBJ_SHORT_DESC(obj));
@@ -967,18 +964,18 @@ ACMD(do_reforge) {
 		if (!proto) {
 			msg_to_char(ch, "You can't renew that.\r\n");
 		}
-		else if (!has_resources(ch, res, TRUE, TRUE)) {
+		else if (!has_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), TRUE)) {
 			// sends own message
 		}
 		else {
-			extract_resources(ch, res, TRUE);
+			extract_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED));
 			
 			// actual reforging: just junk it and load a new one
 			old_stolen_time = obj->stolen_timer;
 			old_timer = GET_OBJ_TIMER(obj);
 			level = GET_OBJ_CURRENT_SCALE_LEVEL(obj);
 			
-			new = read_object(GET_OBJ_VNUM(proto));
+			new = read_object(GET_OBJ_VNUM(proto), TRUE);
 			GET_OBJ_EXTRA(new) |= GET_OBJ_EXTRA(obj) & preserve_flags;
 			
 			// transfer bindings
@@ -1027,18 +1024,18 @@ ACMD(do_reforge) {
 		else if (GET_CRAFT_ABILITY(ctype) == NO_ABIL || get_mastery_ability(GET_CRAFT_ABILITY(ctype)) == NO_ABIL || !HAS_ABILITY(ch, get_mastery_ability(GET_CRAFT_ABILITY(ctype)))) {
 			msg_to_char(ch, "You don't have the mastery to make that item superior.\r\n");
 		}
-		else if (!has_resources(ch, res, TRUE, TRUE)) {
+		else if (!has_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), TRUE)) {
 			// sends own message
 		}
 		else {
-			extract_resources(ch, res, TRUE);
+			extract_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED));
 			
 			// actual reforging: just junk it and load a new one
 			old_stolen_time = obj->stolen_timer;
 			old_timer = GET_OBJ_TIMER(obj);
 			level = GET_OBJ_CURRENT_SCALE_LEVEL(obj);
 			
-			new = read_object(GET_OBJ_VNUM(proto));
+			new = read_object(GET_OBJ_VNUM(proto), TRUE);
 			GET_OBJ_EXTRA(new) |= GET_OBJ_EXTRA(obj) & preserve_flags;
 			
 			// transfer bindings

@@ -1006,7 +1006,7 @@ OLC_MODULE(rmedit_spawns) {
 			prc = atof(argument);
 			
 			if (prc < .01 || prc > 100.00) {
-				msg_to_char(ch, "Percentage must be between .01 and 100; '%s' given.\r\n", prc_arg);
+				msg_to_char(ch, "Percentage must be between .01 and 100; '%s' given.\r\n", argument);
 			}
 			else {
 				change->percent = prc;

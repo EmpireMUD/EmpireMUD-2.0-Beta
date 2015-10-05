@@ -56,7 +56,7 @@ Trade: Steelsmith (Battle), Guildsman (Empire), Artificer (High Sorcery),
         Antiquarian (Vampire)
 Vampire: Reaper (Battle), Ancient (Empire), Lich (High Sorcery), Necromancer
         (Natural Magic), Shade (Stealth), Wight (Survival), Antiquarian (Trade)
-		
+
 See also: CLASS
 #
 ARCHETYPES "STARTING ARCHETYPES" "STARTING CLASS"
@@ -82,6 +82,7 @@ Alchemist
 Natural Magic + Trade
 
 Healer: Alchemist Crafts, Fastcasting, Resurrect, Salamander (familiar)
+Utility: Alchemist Crafts, Resurrect, Salamander (familiar)
 
 Note: Class abilities are unfinished.
 
@@ -93,6 +94,7 @@ Ancient
 Vampire + Empire
 
 Melee: Dragonriding
+Utility: Dragonriding
 
 Note: Class abilities are unfinished.
 
@@ -104,6 +106,7 @@ Antiquarian
 Trade + Vampire
 
 Melee: Antiquarian Crafts
+Utility: Antiquarian Crafts
 
 Note: Class abilities are unfinished.
 
@@ -127,6 +130,7 @@ Artificer
 High Sorcery + Trade
 
 Caster: Artificer Crafts
+Utility: Artificer Crafts
 
 Note: Class abilities are unfinished.
 
@@ -231,6 +235,7 @@ Battle + Empire
 
 Tank: Dragonriding, Noble Bearing
 Melee: Dragonriding, Two-Handed Weapons
+Utility: Dragonriding
 
 Note: Class abilities are unfinished.
 
@@ -242,6 +247,7 @@ Elder
 Empire + Survival
 
 Melee: Dragonriding
+Utility: Dragonriding
 
 Note: Class abilities are unfinished.
 
@@ -253,6 +259,7 @@ Exarch
 Empire + High Sorcery
 
 Caster: Dragonriding, Exarch Crafts
+Utility: Dragonriding, Exarch Crafts
 
 Note: Class abilities are unfinished.
 
@@ -275,7 +282,7 @@ See also: CLASS, TANK, HEALER
 Guildsman
 Empire + Trade
 
-Melee: Dragonriding, Guildsman Crafts
+Utility: Dragonriding, Guildsman Crafts
 
 Note: Class abilities are unfinished.
 
@@ -323,9 +330,10 @@ See also: CLASS, CASTER
 Luminary
 Empire + Natural Magic
 
-Caster: Dragonriding, Manticore (familiar), Griffin (familiar), Resurrect
+Caster: Dragonriding, Griffin (familiar), Manticore (familiar), Resurrect
 Healer: Ancestral Healing, Dragonriding, Fastcasting, Manticore (familiar),
         Griffin (familiar), Resurrect
+Utility: Dragonriding, Griffin (familiar), Manticore (familiar), Resurrect
 
 Luminary Healers gain additional healing power from Greatness and should build
 their Greatness in addition to the 4 healer traits.
@@ -433,6 +441,7 @@ Smuggler
 Stealth + Trade
 
 Melee: Diversion, Dual-Wield, Smuggler Crafts
+Utility: Smuggler Crafts
 
 Note: Class abilities are unfinished.
 
@@ -444,6 +453,7 @@ Steelsmith
 Battle + Trade
 
 Melee: Steelsmith Crafts, Two-Handed Weapons
+Utility: Steelsmith Crafts
 
 Note: Class abilities are unfinished.
 
@@ -481,7 +491,7 @@ See also: CASTER, DODGE CAP, HEALER, MELEE
 Theurge
 High Sorcery + Survival
 
-No class abilities assigned.
+Utility: none
 
 Note: Class abilities are unfinished.
 
@@ -493,6 +503,7 @@ Tinker
 Survival + Trade
 
 Melee: Tinker Crafts
+Utility: Tinker Crafts
 
 Note: Class abilities are unfinished.
 
