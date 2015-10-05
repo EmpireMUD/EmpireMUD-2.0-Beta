@@ -291,7 +291,7 @@ extern bool validate_icon(char *icon);
 const struct olc_command_data olc_data[] = {
 	// main commands
 	{ "abort", olc_abort, OLC_BOOK | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
-	{ "audit", olc_audit, OLC_ADVENTURE | OLC_BUILDING | OLC_CRAFT | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT, NOBITS },
+	{ "audit", olc_audit, OLC_ADVENTURE | OLC_BUILDING | OLC_CRAFT | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_ROOM_TEMPLATE, NOBITS },
 	{ "copy", olc_copy, OLC_BOOK | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, NOBITS },
 	{ "delete", olc_delete, OLC_BOOK | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, OLC_CF_NO_ABBREV },
 	// "display" command uses the shortcut "." or "olc" with no args, and is in the do_olc function
@@ -792,20 +792,17 @@ OLC_MODULE(olc_audit) {
 				}
 				break;
 			}
-			/*
 			case OLC_ROOM_TEMPLATE: {
+				extern bool audit_room_template(room_template *rmt, char_data *ch);
 				room_template *rmt, *next_rmt;
 				HASH_ITER(hh, room_template_table, rmt, next_rmt) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (GET_RMT_VNUM(rmt) >= from_vnum && GET_RMT_VNUM(rmt) <= to_vnum) {
-						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "[%5d] %s\r\n", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
+						found |= audit_room_template(rmt, ch);
 					}
 				}
 				break;
 			}
+			/*
 			case OLC_SECTOR: {
 				sector_data *sect, *next_sect;
 				HASH_ITER(hh, sector_table, sect, next_sect) {
@@ -2341,6 +2338,10 @@ bool audit_spawns(any_vnum vnum, struct spawn_info *list, char_data *ch) {
 	bool problem = FALSE;
 	
 	for (iter = list; iter; iter = iter->next) {
+		if (!mob_proto(iter->vnum)) {
+			olc_audit_msg(ch, vnum, "Spawn for mob %d: mob does not exist", iter->vnum);
+			problem = TRUE;
+		}
 		if (IS_SET(iter->flags, SPAWN_NOCTURNAL) && IS_SET(iter->flags, SPAWN_DIURNAL)) {
 			olc_audit_msg(ch, vnum, "Spawn for mob %d (%s) has conflicting flags", iter->vnum, get_mob_name_by_proto(iter->vnum));
 			problem = TRUE;
