@@ -22,10 +22,11 @@ command.
 &rMelee&0: Does physical damage.
 &aCaster&0: Does magical damage.
 &jHealer&0: Keeps the group alive.
+&mUtility&0: Doesn't fight; builds or crafts instead.
 
 The colors shown above are used to display class roles on 'who' and 'roster'.
 
-See also: CLASS LIST, TANK, HEALER, MELEE, CASTER
+See also: CLASS LIST, TANK, HEALER, MELEE, CASTER, UTILITY
 #
 "CLASS LIST" CLASSES
 
@@ -86,7 +87,7 @@ Utility: Alchemist Crafts, Resurrect, Salamander (familiar)
 
 Note: Class abilities are unfinished.
 
-See also: CLASS, HEALER
+See also: CLASS, HEALER, UTILITY
 #
 "ANCIENT CLASS" ANCIENT ANCT
 
@@ -98,7 +99,7 @@ Utility: Dragonriding
 
 Note: Class abilities are unfinished.
 
-See also: CLASS, MELEE
+See also: CLASS, MELEE, UTILITY
 #
 "ANTIQUARIAN CLASS" ANTQ
 
@@ -110,7 +111,7 @@ Utility: Antiquarian Crafts
 
 Note: Class abilities are unfinished.
 
-See also: CLASS, MELEE
+See also: CLASS, MELEE, UTILITY
 #
 "ARCHMAGE CLASS" ACHM
 
@@ -134,7 +135,7 @@ Utility: Artificer Crafts
 
 Note: Class abilities are unfinished.
 
-See also: CLASS, CASTER
+See also: CLASS, CASTER, UTILITY
 #
 "ASSASSIN CLASS" ASSN
 
@@ -239,7 +240,7 @@ Utility: Dragonriding
 
 Note: Class abilities are unfinished.
 
-See also: CLASS, TANK, MELEE
+See also: CLASS, TANK, MELEE, UTILITY
 #
 "ELDER CLASS" ELDR
 
@@ -251,7 +252,7 @@ Utility: Dragonriding
 
 Note: Class abilities are unfinished.
 
-See also: CLASS, MELEE
+See also: CLASS, MELEE, UTILITY
 #
 "EXARCH CLASS" EXRC
 
@@ -263,7 +264,7 @@ Utility: Dragonriding, Exarch Crafts
 
 Note: Class abilities are unfinished.
 
-See also: CLASS, CASTER
+See also: CLASS, CASTER, UTILITY
 #
 "FERAL CLASS" FERL
 
@@ -286,7 +287,7 @@ Utility: Dragonriding, Guildsman Crafts
 
 Note: Class abilities are unfinished.
 
-See also: CLASS, MELEE
+See also: CLASS, MELEE, UTILITY
 #
 HEALER HEALING "HEALER ROLE" "HEALING ROLE" "HEALER TRAITS" "HEALING TRAITS"
 
@@ -340,7 +341,7 @@ their Greatness in addition to the 4 healer traits.
 
 Note: Class abilities are unfinished.
 
-See also: CLASS, CASTER, HEALER
+See also: CLASS, CASTER, HEALER, UTILITY
 #
 MELEE "MELEE ROLE" "DPS ROLE" "MELEE DPS ROLE" "MELEE TRAITS"
 
@@ -445,7 +446,7 @@ Utility: Smuggler Crafts
 
 Note: Class abilities are unfinished.
 
-See also: CLASS, MELEE
+See also: CLASS, MELEE, UTILITY
 #
 "STEELSMITH CLASS" "STEEL SMITH CLASS" SMTH
 
@@ -457,7 +458,7 @@ Utility: Steelsmith Crafts
 
 Note: Class abilities are unfinished.
 
-See also: CLASS, MELEE
+See also: CLASS, MELEE, UTILITY
 #
 TANK TANKING "TANK ROLE" "TANKING ROLE" "TANK TRAITS" "TANKING ROLE"
 
@@ -495,7 +496,7 @@ Utility: none
 
 Note: Class abilities are unfinished.
 
-See also: CLASS
+See also: CLASS, UTILITY
 #
 "TINKER CLASS" TNKR
 
@@ -507,7 +508,18 @@ Utility: Tinker Crafts
 
 Note: Class abilities are unfinished.
 
-See also: CLASS, MELEE
+See also: CLASS, MELEE, UTILITY
+#
+"UTILITY ROLE"
+
+Utility characters are usually noncombatants like crafters or builders. They're
+entirely capable of fighting, but they don't get the advantage that the class
+abilities of the combat roles provide.
+
+The class names of utility characters appear in &mmagenta&0 on the "who" list
+and the empire roster.
+
+See also: CASTER, HEALER, MELEE, TANK
 #
 "WEREWOLF CLASS" WWLF
 
