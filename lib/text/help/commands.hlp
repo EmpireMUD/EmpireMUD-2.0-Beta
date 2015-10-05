@@ -158,7 +158,7 @@ information on these rules.
 
 See also: QUIT
 #
-ANSI COLORS MAPCOLOR "MAP COLOR" MAP-COLOR &&
+ANSI COLOR COLORS MAPCOLOR "MAP COLOR" MAP-COLOR &&
 
 Options:  toggle map-color
 
