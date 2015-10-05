@@ -180,6 +180,27 @@ room_template *create_room_template_table_entry(rmt_vnum vnum) {
 
 
 /**
+* For the .list command.
+*
+* @param room_template *rmt The thing to list.
+* @param bool detail If TRUE, provide additional details
+* @return char* The line to show (without a CRLF).
+*/
+char *list_one_room_template(room_template *rmt, bool detail) {
+	static char output[MAX_STRING_LENGTH];
+	
+	if (detail) {
+		snprintf(output, sizeof(output), "[%5d] %s", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
+	}
+	else {
+		snprintf(output, sizeof(output), "[%5d] %s", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
+	}
+	
+	return output;
+}
+
+
+/**
 * Processes the automatic addition of a "matching exit" to a room, from another
 * room template.
 *

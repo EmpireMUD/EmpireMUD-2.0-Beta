@@ -105,6 +105,27 @@ bool delete_sector_from_evolutions(sector_vnum vnum, struct evolution_data **lis
 
 
 /**
+* For the .list command.
+*
+* @param sector_data *sect The thing to list.
+* @param bool detail If TRUE, provide additional details
+* @return char* The line to show (without a CRLF).
+*/
+char *list_one_sector(sector_data *sect, bool detail) {
+	static char output[MAX_STRING_LENGTH];
+	
+	if (detail) {
+		snprintf(output, sizeof(output), "[%5d] %s", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
+	}
+	else {
+		snprintf(output, sizeof(output), "[%5d] %s", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
+	}
+	
+	return output;
+}
+
+
+/**
 * WARNING: This function actually deletes a sector.
 *
 * @param char_data *ch The person doing the deleting.

@@ -1459,28 +1459,67 @@ OLC_MODULE(olc_free) {
 
 
 // Usage: olc mob list <from vnum> [to vnum]
-OLC_MODULE(olc_list) {	
-	char buf[MAX_STRING_LENGTH*2], buf1[MAX_STRING_LENGTH*2], buf2[MAX_STRING_LENGTH], arg2[MAX_INPUT_LENGTH], flags[MAX_STRING_LENGTH];
+OLC_MODULE(olc_list) {
+	char buf[MAX_STRING_LENGTH*2], buf1[MAX_STRING_LENGTH*2], buf2[MAX_STRING_LENGTH];
+	char arg[MAX_INPUT_LENGTH];
 	any_vnum from_vnum = NOTHING, to_vnum = NOTHING, iter;
+	bool found_from = FALSE, found_to = FALSE;
+	bool show_details = FALSE;
 	int count = 0, len;
 	
-	// allow - or :
+	skip_spaces(&argument);
+	
+	// allow - or : before the first space
 	for (iter = 0; iter < strlen(argument); ++iter) {
 		if (argument[iter] == '-' || argument[iter] == ':') {
 			argument[iter] = ' ';
 		}
+		else if (argument[iter] == ' ') {
+			break;
+		}
 	}
-	half_chop(argument, arg, arg2);
 	
-	if (!*arg || !isdigit(*arg) || (*arg2 && !isdigit(*arg2))) {
-		msg_to_char(ch, "Usage: list <from vnum> [to vnum]\r\n");
+	// process argument
+	while (*argument) {
+		argument = any_one_arg(argument, arg);
+		
+		// first argument must be a "from" vnum
+		if (!found_from) {
+			if (!isdigit(*arg)) {
+				msg_to_char(ch, "Invalid vnum.\r\n");
+				return;
+			}
+			from_vnum = atoi(arg);
+			found_from = TRUE;
+			continue;
+		}
+		
+		if (!found_to && isdigit(*arg)) {
+			to_vnum = atoi(arg);
+			found_to = TRUE;
+			continue;
+		}
+		
+		// other types of args:
+		if ((!strn_cmp(arg, "-d", 2) && is_abbrev(arg, "-details")) || (!strn_cmp(arg, "--d", 3) && is_abbrev(arg, "--details"))) {
+			show_details = TRUE;
+			continue;
+		}
+		
+		// reached an error
+		msg_to_char(ch, "Usage: list <from vnum> [to vnum] [-d]\r\n");
+		return;
 	}
-	else if ((from_vnum = atoi(arg)) < 0 || (to_vnum = atoi(arg2)) < 0 ) {
+	
+	if (!*argument || !found_from) {
+		msg_to_char(ch, "Usage: list <from vnum> [to vnum] [-d]\r\n");
+	}
+	else if (from_vnum < 0) {
 		msg_to_char(ch, "Invalid vnum range.\r\n");
 	}
 	else {
 		// 2nd vnum optional
-		if (!*arg2) {
+		if (to_vnum == NOTHING) {
 			to_vnum = from_vnum;
 		}
 	
@@ -1490,6 +1529,7 @@ OLC_MODULE(olc_list) {
 		// types that use hashes
 		switch (type) {
 			case OLC_ADVENTURE: {
+				extern char *list_one_adventure(adv_data *adv, bool detail);
 				adv_data *adv, *next_adv;
 				HASH_ITER(hh, adventure_table, adv, next_adv) {
 					if (len >= sizeof(buf)) {
@@ -1497,12 +1537,13 @@ OLC_MODULE(olc_list) {
 					}
 					if (GET_ADV_VNUM(adv) >= from_vnum && GET_ADV_VNUM(adv) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "[%5d] %s (%d-%d)\r\n", GET_ADV_VNUM(adv), GET_ADV_NAME(adv), GET_ADV_START_VNUM(adv), GET_ADV_END_VNUM(adv));
+						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_adventure(adv, show_details));
 					}
 				}
 				break;
 			}
 			case OLC_BOOK: {
+				extern char *list_one_book(book_data *book, bool detail);
 				book_data *book, *next_book;
 				HASH_ITER(hh, book_table, book, next_book) {
 					if (len >= sizeof(buf)) {
@@ -1510,12 +1551,13 @@ OLC_MODULE(olc_list) {
 					}
 					if (book->vnum >= from_vnum && book->vnum <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "[%5d] %s\t0 (%s\t0)\r\n", book->vnum, book->title, book->byline);
+						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_book(book, show_details));
 					}
 				}
 				break;
 			}
 			case OLC_BUILDING: {
+				extern char *list_one_building(bld_data *bld, bool detail);
 				bld_data *bld, *next_bld;
 				HASH_ITER(hh, building_table, bld, next_bld) {
 					if (len >= sizeof(buf)) {
@@ -1523,12 +1565,13 @@ OLC_MODULE(olc_list) {
 					}
 					if (GET_BLD_VNUM(bld) >= from_vnum && GET_BLD_VNUM(bld) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "[%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
+						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_building(bld, show_details));
 					}
 				}
 				break;
 			}
 			case OLC_CRAFT: {
+				extern char *list_one_craft(craft_data *craft, bool detail);
 				craft_data *craft, *next_craft;
 				HASH_ITER(hh, craft_table, craft, next_craft) {
 					if (len >= sizeof(buf)) {
@@ -1536,12 +1579,13 @@ OLC_MODULE(olc_list) {
 					}
 					if (GET_CRAFT_VNUM(craft) >= from_vnum && GET_CRAFT_VNUM(craft) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "[%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
+						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_craft(craft, show_details));
 					}
 				}
 				break;
 			}
 			case OLC_CROP: {
+				extern char *list_one_crop(crop_data *crop, bool detail);
 				crop_data *crop, *next_crop;
 				HASH_ITER(hh, crop_table, crop, next_crop) {
 					if (len >= sizeof(buf)) {
@@ -1549,13 +1593,13 @@ OLC_MODULE(olc_list) {
 					}
 					if (GET_CROP_VNUM(crop) >= from_vnum && GET_CROP_VNUM(crop) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "[%5d] %s\r\n", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
+						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_crop(crop, show_details));
 					}
 				}
 				break;
 			}
 			case OLC_GLOBAL: {
-				extern const char *action_bits[];
+				extern char *list_one_global(struct global_data *glb, bool detail);
 				struct global_data *glb, *next_glb;
 				HASH_ITER(hh, globals_table, glb, next_glb) {
 					if (len >= sizeof(buf)) {
@@ -1563,22 +1607,13 @@ OLC_MODULE(olc_list) {
 					}
 					if (GET_GLOBAL_VNUM(glb) >= from_vnum && GET_GLOBAL_VNUM(glb) <= to_vnum) {
 						++count;
-						switch (GET_GLOBAL_TYPE(glb)) {
-							case GLOBAL_MOB_INTERACTIONS: {
-								sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), action_bits, flags, TRUE);
-								len += snprintf(buf + len, sizeof(buf) - len, "[%5d] %s (%s) %s\r\n", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb), level_range_string(GET_GLOBAL_MIN_LEVEL(glb), GET_GLOBAL_MAX_LEVEL(glb), 0), flags);
-								break;
-							}
-							default: {
-								len += snprintf(buf + len, sizeof(buf) - len, "[%5d] %s\r\n", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
-								break;
-							}
-						}
+						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_global(glb, show_details));
 					}
 				}
 				break;
 			}
 			case OLC_MOBILE: {
+				extern char *list_one_mobile(char_data *mob, bool detail);
 				char_data *mob, *next_mob;
 				HASH_ITER(hh, mobile_table, mob, next_mob) {
 					if (len >= sizeof(buf)) {
@@ -1586,12 +1621,13 @@ OLC_MODULE(olc_list) {
 					}
 					if (GET_MOB_VNUM(mob) >= from_vnum && GET_MOB_VNUM(mob) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "[%5d] %s\r\n", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
+						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_mobile(mob, show_details));
 					}
 				}
 				break;
 			}
 			case OLC_OBJECT: {
+				extern char *list_one_object(obj_data *obj, bool detail);
 				obj_data *obj, *next_obj;
 				HASH_ITER(hh, object_table, obj, next_obj) {
 					if (len >= sizeof(buf)) {
@@ -1599,12 +1635,13 @@ OLC_MODULE(olc_list) {
 					}
 					if (GET_OBJ_VNUM(obj) >= from_vnum && GET_OBJ_VNUM(obj) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "[%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_object(obj, show_details));
 					}
 				}
 				break;
 			}
 			case OLC_ROOM_TEMPLATE: {
+				extern char *list_one_room_template(room_template *rmt, bool detail);
 				room_template *rmt, *next_rmt;
 				HASH_ITER(hh, room_template_table, rmt, next_rmt) {
 					if (len >= sizeof(buf)) {
@@ -1612,12 +1649,13 @@ OLC_MODULE(olc_list) {
 					}
 					if (GET_RMT_VNUM(rmt) >= from_vnum && GET_RMT_VNUM(rmt) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "[%5d] %s\r\n", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
+						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_room_template(rmt, show_details));
 					}
 				}
 				break;
 			}
 			case OLC_SECTOR: {
+				extern char *list_one_sector(sector_data *sect, bool detail);
 				sector_data *sect, *next_sect;
 				HASH_ITER(hh, sector_table, sect, next_sect) {
 					if (len >= sizeof(buf)) {
@@ -1625,12 +1663,13 @@ OLC_MODULE(olc_list) {
 					}
 					if (GET_SECT_VNUM(sect) >= from_vnum && GET_SECT_VNUM(sect) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "[%5d] %s\r\n", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
+						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_sector(sect, show_details));
 					}
 				}
 				break;
 			}
 			case OLC_TRIGGER: {
+				extern char *list_one_trigger(trig_data *trig, bool detail);
 				trig_data *trig, *next_trig;
 				HASH_ITER(hh, trigger_table, trig, next_trig) {
 					if (len >= sizeof(buf)) {
@@ -1638,7 +1677,7 @@ OLC_MODULE(olc_list) {
 					}
 					if (GET_TRIG_VNUM(trig) >= from_vnum && GET_TRIG_VNUM(trig) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "[%5d] %s\r\n", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig));
+						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_trigger(trig, show_details));
 					}
 				}
 				break;

@@ -314,6 +314,27 @@ char **get_weapon_types_string(void) {
 
 
 /**
+* For the .list command.
+*
+* @param obj_data *obj The thing to list.
+* @param bool detail If TRUE, provide additional details
+* @return char* The line to show (without a CRLF).
+*/
+char *list_one_object(obj_data *obj, bool detail) {
+	static char output[MAX_STRING_LENGTH];
+	
+	if (detail) {
+		snprintf(output, sizeof(output), "[%5d] %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+	}
+	else {
+		snprintf(output, sizeof(output), "[%5d] %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+	}
+	
+	return output;
+}
+
+
+/**
 * WARNING: This function actually deletes an object from the world.
 *
 * @param char_data *ch The person doing the deleting.

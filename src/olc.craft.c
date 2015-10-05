@@ -151,6 +151,27 @@ craft_data *create_craft_table_entry(craft_vnum vnum) {
 
 
 /**
+* For the .list command.
+*
+* @param craft_data *craft The thing to list.
+* @param bool detail If TRUE, provide additional details
+* @return char* The line to show (without a CRLF).
+*/
+char *list_one_craft(craft_data *craft, bool detail) {
+	static char output[MAX_STRING_LENGTH];
+	
+	if (detail) {
+		snprintf(output, sizeof(output), "[%5d] %s", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
+	}
+	else {
+		snprintf(output, sizeof(output), "[%5d] %s", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
+	}
+	
+	return output;
+}
+
+
+/**
 * WARNING: This function actually deletes a craft recipe.
 *
 * @param char_data *ch The person doing the deleting.

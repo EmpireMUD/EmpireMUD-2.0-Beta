@@ -134,6 +134,27 @@ bld_data *create_building_table_entry(bld_vnum vnum) {
 
 
 /**
+* For the .list command.
+*
+* @param bld_data *bld The thing to list.
+* @param bool detail If TRUE, provide additional details
+* @return char* The line to show (without a CRLF).
+*/
+char *list_one_building(bld_data *bld, bool detail) {
+	static char output[MAX_STRING_LENGTH];
+	
+	if (detail) {
+		snprintf(output, sizeof(output), "[%5d] %s", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
+	}
+	else {
+		snprintf(output, sizeof(output), "[%5d] %s", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
+	}
+	
+	return output;
+}
+
+
+/**
 * WARNING: This function actually deletes a building.
 *
 * @param char_data *ch The person doing the deleting.

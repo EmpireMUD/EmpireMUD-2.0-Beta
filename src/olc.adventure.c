@@ -261,6 +261,27 @@ bool delete_link_rule_by_type_value(struct adventure_link_rule **list, int type,
 
 
 /**
+* For the .list command.
+*
+* @param adv_data *adv The thing to list.
+* @param bool detail If TRUE, provide additional details
+* @return char* The line to show (without a CRLF).
+*/
+char *list_one_adventure(adv_data *adv, bool detail) {
+	static char output[MAX_STRING_LENGTH];
+	
+	if (detail) {
+		snprintf(output, sizeof(output), "[%5d] %s (%d-%d)", GET_ADV_VNUM(adv), GET_ADV_NAME(adv), GET_ADV_START_VNUM(adv), GET_ADV_END_VNUM(adv));
+	}
+	else {
+		snprintf(output, sizeof(output), "[%5d] %s", GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
+	}
+	
+	return output;
+}
+
+
+/**
 * WARNING: This function actually deletes an adventure zone.
 *
 * @param char_data *ch The person doing the deleting.

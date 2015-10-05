@@ -175,6 +175,27 @@ void free_book(book_data *book) {
 
 
 /**
+* For the .list command.
+*
+* @param book_data *book The thing to list.
+* @param bool detail If TRUE, provide additional details
+* @return char* The line to show (without a CRLF).
+*/
+char *list_one_book(book_data *book, bool detail) {
+	static char output[MAX_STRING_LENGTH];
+	
+	if (detail) {
+		snprintf(output, sizeof(output), "[%5d] %s\t0 (%s\t0)", book->vnum, book->title, book->byline);
+	}
+	else {
+		snprintf(output, sizeof(output), "[%5d] %s\t0", book->vnum, book->title);
+	}
+	
+	return output;
+}
+
+
+/**
 * WARNING: This function actually deletes a book. This can be called without
 * the 'ch' parameter to delete a book without logging or messaging, e.g. a
 * delete by the author.

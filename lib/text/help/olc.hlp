@@ -2767,13 +2767,14 @@ of the olc 'list' command.
 
 See also: OLC LIST, VNUM
 #d
-"OLC LIST" OLIST MLIST
+"OLC LIST" OLIST MLIST RLIST
 
-Usage:  .<type> list <from vnum> <to vnum>
+Usage:  .<type> list <from vnum> [to vnum] [-d]
 
 This command lists all objects (or mobs, or whatever) between two vnums
 (inclusive). If the range is too long, it cuts off the list and you can try
-again with a narrower range of vnums.
+again with a narrower range of vnums. If you provide the -d (--details)
+argument, more information is shown per line.
 
 To look up items by name, use the 'vnum' command.
 

@@ -245,6 +245,27 @@ bool delete_from_spawn_template_list(struct adventure_spawn **list, int spawn_ty
 
 
 /**
+* For the .list command.
+*
+* @param char_data *mob The thing to list.
+* @param bool detail If TRUE, provide additional details
+* @return char* The line to show (without a CRLF).
+*/
+char *list_one_mobile(char_data *mob, bool detail) {
+	static char output[MAX_STRING_LENGTH];
+	
+	if (detail) {
+		snprintf(output, sizeof(output), "[%5d] %s", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
+	}
+	else {
+		snprintf(output, sizeof(output), "[%5d] %s", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
+	}
+	
+	return output;
+}
+
+
+/**
 * WARNING: This function actually deletes a mobile from the world.
 *
 * @param char_data *ch The person doing the deleting.

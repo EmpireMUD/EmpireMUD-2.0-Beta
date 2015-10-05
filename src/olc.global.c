@@ -109,6 +109,45 @@ struct global_data *create_global_table_entry(any_vnum vnum) {
 
 
 /**
+* For the .list command.
+*
+* @param struct global_data *glb The thing to list.
+* @param bool detail If TRUE, provide additional details
+* @return char* The line to show (without a CRLF).
+*/
+char *list_one_global(struct global_data *glb, bool detail) {
+	extern const char *action_bits[];
+	
+	static char output[MAX_STRING_LENGTH];
+	char flags[MAX_STRING_LENGTH];
+
+	switch (GET_GLOBAL_TYPE(glb)) {
+		case GLOBAL_MOB_INTERACTIONS: {
+			if (detail) {
+				sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), action_bits, flags, TRUE);
+				snprintf(output, sizeof(output), "[%5d] %s (%s) %s", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb), level_range_string(GET_GLOBAL_MIN_LEVEL(glb), GET_GLOBAL_MAX_LEVEL(glb), 0), flags);
+			}
+			else {
+				snprintf(output, sizeof(output), "[%5d] %s", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
+			}
+			break;
+		}
+		default: {
+			if (detail) {
+				snprintf(output, sizeof(output), "[%5d] %s", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
+			}
+			else {
+				snprintf(output, sizeof(output), "[%5d] %s", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
+			}
+			break;
+		}
+	}
+		
+	return output;
+}
+
+
+/**
 * WARNING: This function actually deletes a global.
 *
 * @param char_data *ch The person doing the deleting.
