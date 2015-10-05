@@ -74,7 +74,7 @@ bool audit_building(bld_data *bld, char_data *ch) {
 		olc_audit_msg(ch, GET_BLD_VNUM(bld), "Description not set");
 		problem = TRUE;
 	}
-	else if (!strn_cmp(GET_BLD_DESC(bld), "Nothing.", 8)) {
+	else if (!IS_SET(GET_BLD_FLAGS(bld), BLD_OPEN) && !strn_cmp(GET_BLD_DESC(bld), "Nothing.", 8)) {
 		olc_audit_msg(ch, GET_BLD_VNUM(bld), "Description starting with 'Nothing.'");
 		problem = TRUE;
 	}

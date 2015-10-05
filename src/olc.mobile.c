@@ -89,6 +89,10 @@ bool audit_mobile(char_data *mob, char_data *ch) {
 	ptr = GET_SHORT_DESC(mob);
 	do {
 		ptr = any_one_arg(ptr, temp);
+		// remove trailing punctuation
+		while (*temp && ispunct(temp[strlen(temp)-1])) {
+			temp[strlen(temp)-1] = '\0';
+		}
 		if (*temp && !fill_word(temp) && !reserved_word(temp) && !isname(temp, GET_PC_NAME(mob))) {
 			olc_audit_msg(ch, GET_MOB_VNUM(mob), "Suggested missing keyword '%s'", temp);
 			problem = TRUE;
