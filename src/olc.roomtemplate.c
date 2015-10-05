@@ -66,6 +66,10 @@ bool audit_room_template(room_template *rmt, char_data *ch) {
 	bool problem = FALSE;
 	trig_data *trig;
 	
+	if (!my_adv) {
+		olc_audit_msg(ch, GET_RMT_VNUM(rmt), "Not part of any adventure");
+		problem = TRUE;
+	}
 	if (!strcmp(GET_RMT_TITLE(rmt), "An Unnamed Room")) {
 		olc_audit_msg(ch, GET_RMT_VNUM(rmt), "Title not set");
 		problem = TRUE;
