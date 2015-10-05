@@ -101,7 +101,7 @@ bool audit_object(obj_data *obj, char_data *ch) {
 		problem = TRUE;
 	}
 	any_one_arg(GET_OBJ_SHORT_DESC(obj), temp);
-	if (fill_word(temp) && isupper(*temp)) {
+	if ((fill_word(temp) || reserved_word(temp)) && isupper(*temp)) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Short desc capitalized");
 		problem = TRUE;
 	}
@@ -113,7 +113,7 @@ bool audit_object(obj_data *obj, char_data *ch) {
 	ptr = GET_OBJ_SHORT_DESC(obj);
 	do {
 		ptr = any_one_arg(ptr, temp);
-		if (*temp && !fill_word(temp) && !isname(temp, GET_OBJ_KEYWORDS(obj))) {
+		if (*temp && !fill_word(temp) && !reserved_word(temp) && !isname(temp, GET_OBJ_KEYWORDS(obj))) {
 			olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Suggested missing keyword '%s'", temp);
 			problem = TRUE;
 		}
