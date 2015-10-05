@@ -2816,6 +2816,7 @@ const char *reserved_words[] = {
 	"me",
 	"all",
 	"room",
+	"of",
 	"someone",
 	"something",
 	"\n"
