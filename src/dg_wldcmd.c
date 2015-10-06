@@ -700,7 +700,7 @@ WCMD(do_wload) {
 	}
 
 	if (is_abbrev(arg1, "mob")) {
-		if ((mob = read_mobile(number)) == NULL) {
+		if ((mob = read_mobile(number, TRUE)) == NULL) {
 			wld_log(room, "wload: bad mob vnum");
 			return;
 		}
@@ -724,7 +724,7 @@ WCMD(do_wload) {
 	}
 
 	else if (is_abbrev(arg1, "obj")) {
-		if ((object = read_object(number)) == NULL) {
+		if ((object = read_object(number, TRUE)) == NULL) {
 			wld_log(room, "wload: bad object vnum");
 			return;
 		}
@@ -976,7 +976,7 @@ WCMD(do_wscale) {
 				scale_item_to_level(obj, level);
 			}
 			else if ((proto = obj_proto(GET_OBJ_VNUM(obj))) && OBJ_FLAGGED(proto, OBJ_SCALABLE)) {
-				fresh = read_object(GET_OBJ_VNUM(obj));
+				fresh = read_object(GET_OBJ_VNUM(obj), TRUE);
 				scale_item_to_level(fresh, level);
 				swap_obj_for_obj(obj, fresh);
 				extract_obj(obj);

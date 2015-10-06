@@ -109,7 +109,7 @@ static obj_data *create_ship(obj_vnum vnum, empire_data *owner, room_data *to_ro
 	for (i = 0; i < 8; i++)
 		spare[i] = NULL;
 
-	ship = read_object(vnum);
+	ship = read_object(vnum, TRUE);
 	type = GET_SHIP_TYPE(ship);
 
 	/* The main room */

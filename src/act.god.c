@@ -143,7 +143,7 @@ ACMD(do_create) {
 		if (GET_RESOURCE(ch, mat) >= cost || imm_access) {
 			++count;
 			GET_RESOURCE(ch, mat) = MAX(0, GET_RESOURCE(ch, mat) - cost);
-			obj = read_object(GET_OBJ_VNUM(proto));
+			obj = read_object(GET_OBJ_VNUM(proto), TRUE);
 			SET_BIT(GET_OBJ_EXTRA(obj), OBJ_CREATED);
 			
 			if (!CAN_WEAR(obj, ITEM_WEAR_TAKE)) {

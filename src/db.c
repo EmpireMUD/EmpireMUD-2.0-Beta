@@ -1383,12 +1383,14 @@ void clear_char(char_data *ch) {
 
 
 /**
-* Create a new mobile from a prototype.
+* Create a new mobile from a prototype. You should almost always call this with
+* with_triggers = TRUE.
 *
 * @param mob_vnum nr The number to load.
+* @param bool with_triggers If TRUE, attaches all triggers.
 * @return char_data* The instantiated mob.
 */
-char_data *read_mobile(mob_vnum nr) {
+char_data *read_mobile(mob_vnum nr, bool with_triggers) {
 	char_data *mob, *proto;
 	int iter;
 
@@ -1429,8 +1431,10 @@ char_data *read_mobile(mob_vnum nr) {
 	/* find_char helper */
 	add_to_lookup_table(GET_ID(mob), (void *)mob);
 
-	copy_proto_script(proto, mob, MOB_TRIGGER);
-	assign_triggers(mob, MOB_TRIGGER);
+	if (with_triggers) {
+		copy_proto_script(proto, mob, MOB_TRIGGER);
+		assign_triggers(mob, MOB_TRIGGER);
+	}
 
 	return (mob);
 }
@@ -1477,12 +1481,14 @@ obj_data *create_obj(void) {
 
 
 /**
-* Create a new object from a prototype..
+* Create a new object from a prototype. You should almost always call this with
+* with_triggers = TRUE.
 *
 * @param obj_vnum nr The object vnum to load.
+* @param bool with_triggers If TRUE, attaches all triggers.
 * @return obj_data* The instantiated item.
 */
-obj_data *read_object(obj_vnum nr) {
+obj_data *read_object(obj_vnum nr, bool with_triggers) {
 	obj_data *obj, *proto;
 	
 	if (!(proto = obj_proto(nr))) {
@@ -1504,8 +1510,10 @@ obj_data *read_object(obj_vnum nr) {
 	/* find_obj helper */
 	add_to_lookup_table(GET_ID(obj), (void *)obj);
 	
-	copy_proto_script(proto, obj, OBJ_TRIGGER);
-	assign_triggers(obj, OBJ_TRIGGER);
+	if (with_triggers) {
+		copy_proto_script(proto, obj, OBJ_TRIGGER);
+		assign_triggers(obj, OBJ_TRIGGER);
+	}
 
 	return (obj);
 }
@@ -1521,6 +1529,7 @@ const char *versions_list[] = {
 	"b2.7",
 	"b2.8",
 	"b2.9",
+	"b2.11",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -1571,6 +1580,42 @@ void write_last_boot_version(int version) {
 // 2.8 removes the color preference
 PLAYER_UPDATE_FUNC(b2_8_update_players) {
 	REMOVE_BIT(PRF_FLAGS(ch), BIT(9));	// was PRF_COLOR
+}
+
+
+// 2.11 loads inventories and attaches triggers
+PLAYER_UPDATE_FUNC(b2_11_update_players) {
+	extern int Objload_char(char_data *ch, int dolog);
+	void Objsave_char(char_data *ch, int rent_code);
+	
+	obj_data *obj, *proto;
+	int iter;
+	
+	// no work if in-game (covered by other parts of the update)
+	if (!is_file) {
+		return;
+	}
+	
+	Objload_char(ch, FALSE);
+	
+	// inventory
+	for (obj = ch->carrying; obj; obj = obj->next_content) {
+		if ((proto = obj_proto(GET_OBJ_VNUM(obj)))) {
+			copy_proto_script(proto, obj, OBJ_TRIGGER);
+			assign_triggers(obj, OBJ_TRIGGER);
+		}
+	}
+	
+	// eq
+	for (iter = 0; iter < NUM_WEARS; ++iter) {
+		if (GET_EQ(ch, iter) && (proto = obj_proto(GET_OBJ_VNUM(GET_EQ(ch, iter))))) {
+			copy_proto_script(proto, GET_EQ(ch, iter), OBJ_TRIGGER);
+			assign_triggers(GET_EQ(ch, iter), OBJ_TRIGGER);
+		}
+	}
+	
+	// save gear
+	Objsave_char(ch, RENT_RENTED);
 }
 
 
@@ -1635,6 +1680,59 @@ void check_version(void) {
 					}
 				}
 			}
+		}
+		if (MATCH_VERSION("b2.11")) {
+			void save_trading_post();
+			void save_whole_world();
+			
+			struct empire_unique_storage *eus;
+			struct trading_post_data *tpd;
+			empire_data *emp, *next_emp;
+			char_data *mob, *mobpr;
+			obj_data *obj, *objpr;
+			
+			log("Applying b2.11 update:");
+			log(" - assigning mob triggers...");
+			for (mob = character_list; mob; mob = mob->next) {
+				if (IS_NPC(mob) && (mobpr = mob_proto(GET_MOB_VNUM(mob)))) {
+					copy_proto_script(mobpr, mob, MOB_TRIGGER);
+					assign_triggers(mob, MOB_TRIGGER);
+				}
+			}
+			
+			log(" - assigning triggers to object list...");
+			for (obj = object_list; obj; obj = obj->next) {
+				if ((objpr = obj_proto(GET_OBJ_VNUM(obj)))) {
+					copy_proto_script(objpr, obj, OBJ_TRIGGER);
+					assign_triggers(obj, OBJ_TRIGGER);
+				}
+			}
+			
+			log(" - assigning triggers to warehouse objects...");
+			HASH_ITER(hh, empire_table, emp, next_emp) {
+				for (eus = EMPIRE_UNIQUE_STORAGE(emp); eus; eus = eus->next) {
+					if (eus->obj && (objpr = obj_proto(GET_OBJ_VNUM(eus->obj)))) {
+						copy_proto_script(objpr, eus->obj, OBJ_TRIGGER);
+						assign_triggers(eus->obj, OBJ_TRIGGER);
+					}
+				}
+			}
+			
+			log(" - assigning triggers to trading post objects...");
+			for (tpd = trading_list; tpd; tpd = tpd->next) {
+				if (tpd->obj && (objpr = obj_proto(GET_OBJ_VNUM(tpd->obj)))) {
+					copy_proto_script(objpr, tpd->obj, OBJ_TRIGGER);
+					assign_triggers(tpd->obj, OBJ_TRIGGER);
+				}
+			}
+			
+			log(" - assigning triggers to player inventories...");
+			update_all_players(NULL, b2_11_update_players);
+			
+			// ensure everything gets saved this way since we won't do this again
+			save_all_empires();
+			save_trading_post();
+			save_whole_world();
 		}
 	}
 	

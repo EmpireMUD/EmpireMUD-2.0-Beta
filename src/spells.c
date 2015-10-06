@@ -494,7 +494,7 @@ ACMD(do_ready) {
 	}
 	
 	GET_MANA(ch) -= cost;
-	obj = read_object(ready_magic_weapon[type].vnum);
+	obj = read_object(ready_magic_weapon[type].vnum, TRUE);
 	
 	// damage based on skill
 	if (ready_magic_weapon[type].ability != NO_ABIL) {		

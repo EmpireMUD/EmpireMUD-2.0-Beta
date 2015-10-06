@@ -161,6 +161,7 @@ const char *room_template_flags[] = {
 	"NEED-BOAT",
 	"!TELEPORT",
 	"LOOK-OUT",
+	"!LOCATION",
 	"\n"
 };
 
@@ -467,7 +468,7 @@ const char *connected_types[] = {
 	"Last name?",
 	"Get last name",
 	"Cnf last name",	// 15
-	"Bookedit",
+		"UNUSED 2",
 	"Have alt?",
 	"Alt name",
 	"Alt password",
@@ -1792,6 +1793,7 @@ const char *olc_type_bits[NUM_OLC_TYPES+1] = {
 	"adventure",
 	"roomtemplate",
 	"global",
+	"book",
 	"\n"
 };
 
@@ -1866,6 +1868,7 @@ const char *bld_flags[] = {
 	"SUMMON-PLAYER",
 	"NEED-BOAT",
 	"LOOK-OUT",
+	"2ND-TERRITORY",
 	"\n"
 };
 
@@ -2813,6 +2816,7 @@ const char *reserved_words[] = {
 	"me",
 	"all",
 	"room",
+	"of",
 	"someone",
 	"something",
 	"\n"

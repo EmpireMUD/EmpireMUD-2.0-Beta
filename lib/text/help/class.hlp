@@ -18,12 +18,15 @@ be suited to melee damage, caster damage, or healing. You can't perform all
 roles at the same time. You can change your current role using the "class role"
 command.
 
-Tank: Takes all the damage in combat.
-Melee: Does physical damage.
-Caster: Does magical damage.
-Healer: Keeps the group alive.
+&yTank&0: Takes all the damage in combat.
+&rMelee&0: Does physical damage.
+&aCaster&0: Does magical damage.
+&jHealer&0: Keeps the group alive.
+&mUtility&0: Doesn't fight; builds or crafts instead.
 
-See also: CLASS LIST, TANK, HEALER, MELEE, CASTER
+The colors shown above are used to display class roles on "who" and "roster".
+
+See also: CLASS LIST, TANK, HEALER, MELEE, CASTER, UTILITY
 #
 "CLASS LIST" CLASSES
 
@@ -54,7 +57,7 @@ Trade: Steelsmith (Battle), Guildsman (Empire), Artificer (High Sorcery),
         Antiquarian (Vampire)
 Vampire: Reaper (Battle), Ancient (Empire), Lich (High Sorcery), Necromancer
         (Natural Magic), Shade (Stealth), Wight (Survival), Antiquarian (Trade)
-		
+
 See also: CLASS
 #
 ARCHETYPES "STARTING ARCHETYPES" "STARTING CLASS"
@@ -80,10 +83,11 @@ Alchemist
 Natural Magic + Trade
 
 Healer: Alchemist Crafts, Fastcasting, Resurrect, Salamander (familiar)
+Utility: Alchemist Crafts, Resurrect, Salamander (familiar)
 
 Note: Class abilities are unfinished.
 
-See also: CLASS, HEALER
+See also: CLASS, HEALER, UTILITY
 #
 "ANCIENT CLASS" ANCIENT ANCT
 
@@ -91,10 +95,11 @@ Ancient
 Vampire + Empire
 
 Melee: Dragonriding
+Utility: Dragonriding
 
 Note: Class abilities are unfinished.
 
-See also: CLASS, MELEE
+See also: CLASS, MELEE, UTILITY
 #
 "ANTIQUARIAN CLASS" ANTQ
 
@@ -102,10 +107,11 @@ Antiquarian
 Trade + Vampire
 
 Melee: Antiquarian Crafts
+Utility: Antiquarian Crafts
 
 Note: Class abilities are unfinished.
 
-See also: CLASS, MELEE
+See also: CLASS, MELEE, UTILITY
 #
 "ARCHMAGE CLASS" ACHM
 
@@ -125,10 +131,11 @@ Artificer
 High Sorcery + Trade
 
 Caster: Artificer Crafts
+Utility: Artificer Crafts
 
 Note: Class abilities are unfinished.
 
-See also: CLASS, CASTER
+See also: CLASS, CASTER, UTILITY
 #
 "ASSASSIN CLASS" ASSN
 
@@ -229,10 +236,11 @@ Battle + Empire
 
 Tank: Dragonriding, Noble Bearing
 Melee: Dragonriding, Two-Handed Weapons
+Utility: Dragonriding
 
 Note: Class abilities are unfinished.
 
-See also: CLASS, TANK, MELEE
+See also: CLASS, TANK, MELEE, UTILITY
 #
 "ELDER CLASS" ELDR
 
@@ -240,10 +248,11 @@ Elder
 Empire + Survival
 
 Melee: Dragonriding
+Utility: Dragonriding
 
 Note: Class abilities are unfinished.
 
-See also: CLASS, MELEE
+See also: CLASS, MELEE, UTILITY
 #
 "EXARCH CLASS" EXRC
 
@@ -251,10 +260,11 @@ Exarch
 Empire + High Sorcery
 
 Caster: Dragonriding, Exarch Crafts
+Utility: Dragonriding, Exarch Crafts
 
 Note: Class abilities are unfinished.
 
-See also: CLASS, CASTER
+See also: CLASS, CASTER, UTILITY
 #
 "FERAL CLASS" FERL
 
@@ -273,11 +283,11 @@ See also: CLASS, TANK, HEALER
 Guildsman
 Empire + Trade
 
-Melee: Dragonriding, Guildsman Crafts
+Utility: Dragonriding, Guildsman Crafts
 
 Note: Class abilities are unfinished.
 
-See also: CLASS, MELEE
+See also: CLASS, MELEE, UTILITY
 #
 HEALER HEALING "HEALER ROLE" "HEALING ROLE" "HEALER TRAITS" "HEALING TRAITS"
 
@@ -321,16 +331,17 @@ See also: CLASS, CASTER
 Luminary
 Empire + Natural Magic
 
-Caster: Dragonriding, Manticore (familiar), Griffin (familiar), Resurrect
+Caster: Dragonriding, Griffin (familiar), Manticore (familiar), Resurrect
 Healer: Ancestral Healing, Dragonriding, Fastcasting, Manticore (familiar),
         Griffin (familiar), Resurrect
+Utility: Dragonriding, Griffin (familiar), Manticore (familiar), Resurrect
 
 Luminary Healers gain additional healing power from Greatness and should build
 their Greatness in addition to the 4 healer traits.
 
 Note: Class abilities are unfinished.
 
-See also: CLASS, CASTER, HEALER
+See also: CLASS, CASTER, HEALER, UTILITY
 #
 MELEE "MELEE ROLE" "DPS ROLE" "MELEE DPS ROLE" "MELEE TRAITS"
 
@@ -385,6 +396,7 @@ Powerbroker
 Empire + Stealth
 
 Melee: Dragonriding, Stagger Jab
+Utility: Dragonriding
 
 Note: Class abilities are unfinished.
 
@@ -431,10 +443,11 @@ Smuggler
 Stealth + Trade
 
 Melee: Diversion, Dual-Wield, Smuggler Crafts
+Utility: Smuggler Crafts
 
 Note: Class abilities are unfinished.
 
-See also: CLASS, MELEE
+See also: CLASS, MELEE, UTILITY
 #
 "STEELSMITH CLASS" "STEEL SMITH CLASS" SMTH
 
@@ -442,10 +455,11 @@ Steelsmith
 Battle + Trade
 
 Melee: Steelsmith Crafts, Two-Handed Weapons
+Utility: Steelsmith Crafts
 
 Note: Class abilities are unfinished.
 
-See also: CLASS, MELEE
+See also: CLASS, MELEE, UTILITY
 #
 TANK TANKING "TANK ROLE" "TANKING ROLE" "TANK TRAITS" "TANKING ROLE"
 
@@ -479,11 +493,11 @@ See also: CASTER, DODGE CAP, HEALER, MELEE
 Theurge
 High Sorcery + Survival
 
-No class abilities assigned.
+Utility: none
 
 Note: Class abilities are unfinished.
 
-See also: CLASS
+See also: CLASS, UTILITY
 #
 "TINKER CLASS" TNKR
 
@@ -491,10 +505,22 @@ Tinker
 Survival + Trade
 
 Melee: Tinker Crafts
+Utility: Tinker Crafts
 
 Note: Class abilities are unfinished.
 
-See also: CLASS, MELEE
+See also: CLASS, MELEE, UTILITY
+#
+"UTILITY ROLE"
+
+Utility characters are usually noncombatants like crafters or builders. They're
+entirely capable of fighting, but they don't get the advantage that the class
+abilities of the combat roles provide.
+
+The class names of utility characters appear in &mmagenta&0 on the "who" list
+and the empire roster.
+
+See also: CASTER, HEALER, MELEE, TANK
 #
 "WEREWOLF CLASS" WWLF
 

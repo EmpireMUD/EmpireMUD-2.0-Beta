@@ -112,6 +112,27 @@ trig_data *create_trigger_table_entry(trig_vnum vnum) {
 
 
 /**
+* For the .list command.
+*
+* @param trig_data *trig The thing to list.
+* @param bool detail If TRUE, provide additional details
+* @return char* The line to show (without a CRLF).
+*/
+char *list_one_trigger(trig_data *trig, bool detail) {
+	static char output[MAX_STRING_LENGTH];
+	
+	if (detail) {
+		snprintf(output, sizeof(output), "[%5d] %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig));
+	}
+	else {
+		snprintf(output, sizeof(output), "[%5d] %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig));
+	}
+	
+	return output;
+}
+
+
+/**
 * Removes triggers from a live set of scripts, by vnum.
 *
 * @param struct script_data *script The script to remove triggers from.

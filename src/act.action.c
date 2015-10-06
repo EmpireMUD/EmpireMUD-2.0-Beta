@@ -319,7 +319,7 @@ obj_data *has_shovel(char_data *ch) {
 * @param char_data *ch The chipper chap
 */
 void cancel_chipping(char_data *ch) {
-	obj_data *obj = read_object(GET_ACTION_VNUM(ch, 0));
+	obj_data *obj = read_object(GET_ACTION_VNUM(ch, 0), TRUE);
 	obj_to_char_or_room(obj, ch);
 	load_otrigger(obj);
 }
@@ -331,7 +331,7 @@ void cancel_chipping(char_data *ch) {
 * @param char_data *ch The minting man.
 */
 void cancel_minting(char_data *ch) {
-	obj_data *obj = read_object(GET_ACTION_VNUM(ch, 0));
+	obj_data *obj = read_object(GET_ACTION_VNUM(ch, 0), TRUE);
 	obj_to_char_or_room(obj, ch);
 	load_otrigger(obj);
 }
@@ -365,7 +365,7 @@ void cancel_sailing(char_data *ch) {
 * @param char_data *ch The sawyer
 */
 void cancel_sawing(char_data *ch) {
-	obj_data *obj = read_object(GET_ACTION_VNUM(ch, 0));
+	obj_data *obj = read_object(GET_ACTION_VNUM(ch, 0), TRUE);
 	obj_to_char_or_room(obj, ch);
 	load_otrigger(obj);
 }
@@ -377,7 +377,7 @@ void cancel_sawing(char_data *ch) {
 * @param char_data *ch The scraper
 */
 void cancel_scraping(char_data *ch) {
-	obj_data *obj = read_object(o_TREE);
+	obj_data *obj = read_object(o_TREE, TRUE);
 	obj_to_char_or_room(obj, ch);
 	load_otrigger(obj);
 }
@@ -401,7 +401,7 @@ void cancel_smelting(char_data *ch) {
 	
 	if (type != NOTHING) {
 		for (iter = 0; iter < smelt_data[type].from_amt; ++iter) {
-			obj = read_object(smelt_data[type].from);
+			obj = read_object(smelt_data[type].from, TRUE);
 			obj_to_char_or_room(obj, ch);
 			load_otrigger(obj);
 		}
@@ -415,7 +415,7 @@ void cancel_smelting(char_data *ch) {
 * @param char_data *ch Mr. Tanner
 */
 void cancel_tanning(char_data *ch) {
-	obj_data *obj = read_object(GET_ACTION_VNUM(ch, 0));
+	obj_data *obj = read_object(GET_ACTION_VNUM(ch, 0), TRUE);
 	obj_to_char_or_room(obj, ch);
 	load_otrigger(obj);
 }
@@ -564,7 +564,7 @@ INTERACTION_FUNC(finish_digging) {
 	}
 	else {
 		for (num = 0; num < interaction->quantity; ++num) {
-			obj = read_object(vnum);
+			obj = read_object(vnum, TRUE);
 			scale_item_to_level(obj, 1);	// minimum level
 			obj_to_char_or_room(obj, ch);
 			load_otrigger(obj);
@@ -595,7 +595,7 @@ INTERACTION_FUNC(finish_gathering) {
 	int iter;
 	
 	for (iter = 0; iter < interaction->quantity; ++iter) {
-		obj = read_object(interaction->vnum);
+		obj = read_object(interaction->vnum, TRUE);
 		scale_item_to_level(obj, 1);	// minimum level
 		obj_to_char_or_room(obj, ch);
 		load_otrigger(obj);
@@ -644,7 +644,7 @@ INTERACTION_FUNC(finish_harvesting) {
 	
 		// give them over
 		for (count = 0; count < num; ++count) {
-			obj = read_object(interaction->vnum);
+			obj = read_object(interaction->vnum, TRUE);
 			scale_item_to_level(obj, 1);	// minimum level
 			obj_to_char_or_room(obj, ch);
 			load_otrigger(obj);
@@ -705,7 +705,7 @@ INTERACTION_FUNC(finish_picking_herb) {
 
 	// give objs
 	for (iter = 0; iter < num; ++iter) {
-		obj = read_object(vnum);
+		obj = read_object(vnum, TRUE);
 		scale_item_to_level(obj, 1);	// minimum level
 		obj_to_char_or_room(obj, ch);
 		add_depletion(inter_room, DPLTN_PICK, TRUE);
@@ -742,7 +742,7 @@ INTERACTION_FUNC(finish_picking_crop) {
 	
 	// give objs
 	for (iter = 0; iter < interaction->quantity; ++iter) {
-		obj = read_object(interaction->vnum);
+		obj = read_object(interaction->vnum, TRUE);
 		scale_item_to_level(obj, 1);	// minimum level
 		obj_to_char_or_room(obj, ch);
 		add_depletion(inter_room, DPLTN_PICK, TRUE);
@@ -799,7 +799,7 @@ void perform_saw(char_data *ch) {
 		
 		// 2x lumber, always
 		for (iter = 0; iter < 2; ++iter) {
-			obj = read_object(o_LUMBER);
+			obj = read_object(o_LUMBER, TRUE);
 			obj_to_char_or_room(obj, ch);
 			load_otrigger(obj);
 		}
@@ -903,7 +903,7 @@ void process_chipping(char_data *ch) {
 			
 			switch (GET_ACTION_VNUM(ch, 0)) {
 				case o_ROCK: {
-					obj = read_object(o_CHIPPED);
+					obj = read_object(o_CHIPPED, TRUE);
 					obj_to_char_or_room(obj, ch);
 					msg_to_char(ch, "It splits open!\r\n");
 					if (GET_SKILL(ch, SKILL_TRADE) < EMPIRE_CHORE_SKILL_CAP) {
@@ -913,7 +913,7 @@ void process_chipping(char_data *ch) {
 					break;
 				}
 				case o_CHIPPED: {
-					obj = read_object(o_HANDAXE);
+					obj = read_object(o_HANDAXE, TRUE);
 					obj_to_char_or_room(obj, ch);
 					act("You have crafted $p!", FALSE, ch, obj, 0, TO_CHAR);
 					if (GET_SKILL(ch, SKILL_TRADE) < EMPIRE_CHORE_SKILL_CAP) {
@@ -923,7 +923,7 @@ void process_chipping(char_data *ch) {
 					break;
 				}
 				case o_HANDAXE: {
-					obj = read_object(o_SPEARHEAD);
+					obj = read_object(o_SPEARHEAD, TRUE);
 					obj_to_char_or_room(obj, ch);
 					act("You have crafted $p!", FALSE, ch, obj, 0, TO_CHAR);
 					if (GET_SKILL(ch, SKILL_TRADE) < EMPIRE_CHORE_SKILL_CAP) {
@@ -978,7 +978,7 @@ void process_chop(char_data *ch) {
 			
 			// give a tree
 			while (trees-- > 0) {
-				obj = read_object(o_TREE);
+				obj = read_object(o_TREE, TRUE);
 				obj_to_char_or_room(obj, ch);
 				load_otrigger(obj);
 			}
@@ -1242,7 +1242,7 @@ void process_fishing(char_data *ch) {
 
 		// dole loot
 		if (vnum != NOTHING) {
-			obj = read_object(vnum);
+			obj = read_object(vnum, TRUE);
 			obj_to_char_or_room(obj, ch);
 			
 			add_depletion(IN_ROOM(ch), DPLTN_FISH, TRUE);
@@ -1398,7 +1398,7 @@ void process_mining(char_data *ch) {
 				vnum = o_GOLD;
 			}
 
-			obj = read_object(vnum);
+			obj = read_object(vnum, TRUE);
 			obj_to_char_or_room(obj, ch);
 	
 			act("With that last stroke, $p falls from the wall!", FALSE, ch, obj, 0, TO_CHAR);
@@ -1544,7 +1544,7 @@ void process_panning(char_data *ch) {
 			
 			if (!number(0, 19) && get_depletion(IN_ROOM(ch), DPLTN_PAN) <= short_depletion) {
 				in_room = IN_ROOM(ch);
-				obj_to_char_or_room((obj = read_object(o_GOLD_SMALL)), ch);
+				obj_to_char_or_room((obj = read_object(o_GOLD_SMALL, TRUE)), ch);
 				act("You find $p!", FALSE, ch, obj, 0, TO_CHAR);
 				add_depletion(IN_ROOM(ch), DPLTN_PAN, TRUE);
 				load_otrigger(obj);
@@ -1770,7 +1770,7 @@ void process_quarrying(char_data *ch) {
 		
 		add_depletion(IN_ROOM(ch), DPLTN_QUARRY, TRUE);
 		
-		obj = read_object(vnum);
+		obj = read_object(vnum, TRUE);
 		obj_to_char_or_room(obj, ch);
 		act("You give the plug drill one final swing and pry loose $p!", FALSE, ch, obj, 0, TO_CHAR);
 		act("$n hits the plug drill hard with a hammer and pries loose $p!", FALSE, ch, obj, 0, TO_ROOM);
@@ -1863,12 +1863,12 @@ void process_scraping(char_data *ch) {
 		if (GET_ACTION_TIMER(ch) <= 0) {
 			GET_ACTION(ch) = ACT_NONE;
 			
-			obj_to_char_or_room((obj = read_object(o_LOG)), ch);
+			obj_to_char_or_room((obj = read_object(o_LOG, TRUE)), ch);
 			
 			// sticks!
 			total = number(2, 5);
 			for (count = 0; count < total; ++count) {
-				stick = read_object(o_STICK);
+				stick = read_object(o_STICK, TRUE);
 				obj_to_char_or_room(stick, ch);
 				load_otrigger(stick);
 			}
@@ -1942,7 +1942,7 @@ void process_smelting(char_data *ch) {
 		}
 		else {
 			for (iter = 0; iter < smelt_data[type].to_amt; ++iter) {
-				obj_to_char_or_room((obj = read_object(smelt_data[type].to)), ch);
+				obj_to_char_or_room((obj = read_object(smelt_data[type].to, TRUE)), ch);
 				load_otrigger(obj);
 			}
 
@@ -1991,7 +1991,7 @@ void process_tanning(char_data *ch) {
 			return;
 		}
 
-		obj_to_char_or_room((obj = read_object(tan_data[type].to)), ch);
+		obj_to_char_or_room((obj = read_object(tan_data[type].to, TRUE)), ch);
 
 		act("You finish tanning $p.", FALSE, ch, obj, 0, TO_CHAR);
 		act("$n finishes tanning $p.", TRUE, ch, obj, 0, TO_ROOM);

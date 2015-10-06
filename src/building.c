@@ -538,7 +538,7 @@ void finish_dismantle(char_data *ch, room_data *room) {
 	// check for required obj and return it
 	if ((type = find_building_list_entry(IN_ROOM(ch), FIND_BUILD_NORMAL)) || (type = find_building_list_entry(IN_ROOM(ch), FIND_BUILD_UPGRADE))) {
 		if (GET_CRAFT_REQUIRES_OBJ(type) != NOTHING && (proto = obj_proto(GET_CRAFT_REQUIRES_OBJ(type))) && !OBJ_FLAGGED(proto, OBJ_SINGLE_USE)) {
-			newobj = read_object(GET_CRAFT_REQUIRES_OBJ(type));
+			newobj = read_object(GET_CRAFT_REQUIRES_OBJ(type), TRUE);
 			
 			// scale item to minimum level
 			scale_item_to_level(newobj, 0);
@@ -784,7 +784,7 @@ void process_dismantling(char_data *ch, room_data *room) {
 		}
 		
 		if (res->amount > 0) {
-			obj = read_object(res->vnum);
+			obj = read_object(res->vnum, TRUE);
 			res->amount -= 1;
 		}
 			
@@ -1617,13 +1617,13 @@ ACMD(do_designate) {
 		// add new objects
 		switch (GET_BLD_VNUM(type)) {
 			case RTYPE_STUDY: {
-				obj_to_room((obj = read_object(BOARD_MORT)), new);
+				obj_to_room((obj = read_object(BOARD_MORT, TRUE)), new);
 				load_otrigger(obj);
 				break;
 			}
 			case RTYPE_BEDROOM: {
 				if (ROOM_PRIVATE_OWNER(HOME_ROOM(IN_ROOM(ch))) != NOBODY) {
-					obj_to_room((obj = read_object(o_HOME_CHEST)), new);
+					obj_to_room((obj = read_object(o_HOME_CHEST, TRUE)), new);
 					load_otrigger(obj);
 				}
 				break;

@@ -560,7 +560,7 @@ ACMD(do_mload) {
 	}
 
 	if (is_abbrev(arg1, "mob")) {
-		if ((mob = read_mobile(number)) == NULL) {
+		if ((mob = read_mobile(number, TRUE)) == NULL) {
 			mob_log(ch, "mload: bad mob vnum");
 			return;
 		}
@@ -591,7 +591,7 @@ ACMD(do_mload) {
 		}
 	}
 	else if (is_abbrev(arg1, "obj")) {
-		if ((object = read_object(number)) == NULL) {
+		if ((object = read_object(number, TRUE)) == NULL) {
 			mob_log(ch, "mload: bad object vnum");
 			return;
 		}
@@ -1061,7 +1061,7 @@ ACMD(do_mdamage) {
 	if (*modarg) {
 		modifier = atof(modarg) / 100.0;
 	}
-	modifier *= scale_modifier_by_mob(ch, modifier);
+	modifier = scale_modifier_by_mob(ch, modifier);
 
 	if (*name == UID_CHAR) {
 		if (!(vict = get_char(name))) {
@@ -1122,7 +1122,7 @@ ACMD(do_maoe) {
 		type = DAM_PHYSICAL;
 	}
 	
-	modifier *= scale_modifier_by_mob(ch, modifier);
+	modifier = scale_modifier_by_mob(ch, modifier);
 	
 	level = get_approximate_level(ch);
 	for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict; vict = next_vict) {
@@ -1163,7 +1163,7 @@ ACMD(do_mdot) {
 	if (*modarg) {
 		modifier = atof(modarg) / 100.0;
 	}
-	modifier *= scale_modifier_by_mob(ch, modifier);
+	modifier = scale_modifier_by_mob(ch, modifier);
 
 	if (*name == UID_CHAR) {
 		if (!(vict = get_char(name))) {
@@ -1450,10 +1450,10 @@ ACMD(do_mtransform) {
 		mob_log(ch, "mtransform: bad argument");
 	else {
 		if (isdigit(*arg))
-			m = read_mobile(atoi(arg));
+			m = read_mobile(atoi(arg), TRUE);
 		else {
 			keep_attr = 0;
-			m = read_mobile(atoi(arg+1));
+			m = read_mobile(atoi(arg+1), TRUE);
 		}
 		if (m == NULL) {
 			mob_log(ch, "mtransform: bad mobile vnum");
@@ -1751,7 +1751,7 @@ ACMD(do_mscale) {
 				scale_item_to_level(obj, level);
 			}
 			else if ((proto = obj_proto(GET_OBJ_VNUM(obj))) && OBJ_FLAGGED(proto, OBJ_SCALABLE)) {
-				fresh = read_object(GET_OBJ_VNUM(obj));
+				fresh = read_object(GET_OBJ_VNUM(obj), TRUE);
 				scale_item_to_level(fresh, level);
 				swap_obj_for_obj(obj, fresh);
 				extract_obj(obj);

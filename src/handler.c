@@ -62,13 +62,16 @@
 // externs
 extern const int confused_dirs[NUM_SIMPLE_DIRS][2][NUM_OF_DIRS];
 extern const char *drinks[];
-extern char *get_book_item_name_by_id(int id);
 extern int get_north_for_char(char_data *ch);
 extern struct complex_room_data *init_complex_data();
 void write_lore(char_data *ch);
 const struct wear_data_type wear_data[NUM_WEARS];
 
+// external funcs
+void scale_item_to_level(obj_data *obj, int level);
+
 // locals
+static void add_obj_binding(int idnum, struct obj_binding **list);
 void remove_lore_record(char_data *ch, struct lore_data *lore);
 
 // local file scope variables
@@ -3461,6 +3464,7 @@ obj_data *copy_warehouse_obj(obj_data *input) {
 	extern struct extra_descr_data *copy_extra_descs(struct extra_descr_data *list);
 
 	obj_data *obj, *proto;
+	trig_data *trig;
 	int iter;
 	
 	if (!input) {
@@ -3472,8 +3476,7 @@ obj_data *copy_warehouse_obj(obj_data *input) {
 	
 	// create dupe
 	if (proto) {
-		obj = read_object(GET_OBJ_VNUM(input));
-		
+		obj = read_object(GET_OBJ_VNUM(input), FALSE);	// no scripts
 	}
 	else {
 		obj = create_obj();
@@ -3482,6 +3485,19 @@ obj_data *copy_warehouse_obj(obj_data *input) {
 	// error in either case?
 	if (!obj) {
 		return NULL;
+	}
+	
+	// copy only existing scripts
+	if (SCRIPT(input)) {
+		if (!SCRIPT(obj)) {
+			CREATE(SCRIPT(obj), struct script_data, 1);
+		}
+
+		for (trig = TRIGGERS(SCRIPT(input)); trig; trig = trig->next) {
+			add_trigger(SCRIPT(obj), read_trigger(GET_TRIG_VNUM(trig)), -1);
+		}
+		
+		// TODO should also copy variables, if they have been made to save to file yet
 	}
 	
 	// pointer copies
@@ -3594,6 +3610,83 @@ void extract_obj(obj_data *obj) {
 	}
 
 	free_obj(obj);
+}
+
+
+/**
+* Makes a fresh copy of an object, preserving certain flags such as superior
+* and keep. All temporary properties including bindings are copied over. You
+* can swap it out using swap_obj_for_obj() or any other method, then extract
+* the original object when done.
+*
+* @param obj_data *obj The item to load a fresh copy of.
+* @param int scale_level If >0, will scale the new copy to that level.
+* @return obj_data* The new object.
+*/
+obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
+	struct obj_binding *bind;
+	obj_data *proto, *new;
+	
+	if (!obj || !(proto = obj_proto(GET_OBJ_VNUM(obj)))) {
+		// get a normal 'bug' object
+		return read_object(0, TRUE);
+	}
+
+	new = read_object(GET_OBJ_VNUM(obj), TRUE);
+	
+	// preserve some flags
+	GET_OBJ_EXTRA(new) |= GET_OBJ_EXTRA(obj) & (OBJ_SUPERIOR | OBJ_KEEP);
+	if (!OBJ_FLAGGED(new, OBJ_GENERIC_DROP)) {
+		GET_OBJ_EXTRA(new) |= GET_OBJ_EXTRA(obj) & (OBJ_HARD_DROP | OBJ_GROUP_DROP);
+	}
+	
+	// copy bindings	
+	for (bind = OBJ_BOUND_TO(obj); bind; bind = bind->next) {
+		add_obj_binding(bind->idnum, &OBJ_BOUND_TO(new));
+	}
+	
+	GET_OBJ_TIMER(new) = GET_OBJ_TIMER(obj);
+	GET_AUTOSTORE_TIMER(new) = GET_AUTOSTORE_TIMER(obj);
+	new->stolen_timer = obj->stolen_timer;
+	new->last_owner_id = obj->last_owner_id;
+	new->last_empire_id = obj->last_empire_id;
+	
+	// certain things that must always copy over
+	switch (GET_OBJ_TYPE(new)) {
+		case ITEM_ARROW: {
+			GET_OBJ_VAL(new, VAL_ARROW_QUANTITY) = GET_OBJ_VAL(obj, VAL_ARROW_QUANTITY);
+			break;
+		}
+		case ITEM_BOOK: {
+			GET_OBJ_VAL(new, VAL_BOOK_ID) = GET_OBJ_VAL(obj, VAL_BOOK_ID);
+			break;
+		}
+		case ITEM_DRINKCON: {
+			GET_OBJ_VAL(new, VAL_DRINK_CONTAINER_CONTENTS) = GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS);
+			GET_OBJ_VAL(new, VAL_DRINK_CONTAINER_TYPE) = GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE);
+			break;
+		}
+		case ITEM_PORTAL: {
+			GET_OBJ_VAL(new, VAL_PORTAL_TARGET_VNUM) = GET_OBJ_VAL(obj, VAL_PORTAL_TARGET_VNUM);
+			break;
+		}
+		case ITEM_POISON: {
+			GET_OBJ_VAL(new, VAL_POISON_CHARGES) = GET_OBJ_VAL(obj, VAL_POISON_CHARGES);
+			break;
+		}
+		case ITEM_SHIP: {
+			GET_OBJ_VAL(new, VAL_SHIP_RESOURCES_REMAINING) = GET_OBJ_VAL(obj, VAL_SHIP_RESOURCES_REMAINING);
+			GET_OBJ_VAL(new, VAL_SHIP_MAIN_ROOM) = GET_OBJ_VAL(obj, VAL_SHIP_MAIN_ROOM);
+			break;
+		}
+	}
+	
+
+	if (scale_level > 0) {
+		scale_item_to_level(new, scale_level);
+	}
+	
+	return new;
 }
 
 
@@ -3862,8 +3955,6 @@ void check_obj_in_void(obj_data *obj) {
 * @param int pos the WEAR_x spot to it
 */
 void equip_char(char_data *ch, obj_data *obj, int pos) {
-	void scale_item_to_level(obj_data *obj, int level);
-	
 	int j;
 
 	if (pos < 0 || pos >= NUM_WEARS) {
@@ -5430,7 +5521,7 @@ bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_da
 		return FALSE;
 	}
 
-	obj = read_object(store->vnum);
+	obj = read_object(store->vnum, TRUE);
 	available = store->amount - 1;	// for later
 	charge_stored_resource(emp, GET_ISLAND_ID(IN_ROOM(ch)), store->vnum, 1);
 

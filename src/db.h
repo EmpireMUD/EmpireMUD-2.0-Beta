@@ -180,6 +180,11 @@ extern struct instance_data *instance_list;
 void free_adventure(adv_data *adv);
 extern adv_data *adventure_proto(adv_vnum vnum);
 
+// books
+extern book_data *book_table;
+extern struct author_data *author_table;
+void free_book(book_data *book);
+
 // buildings
 extern bld_data *building_table;
 void free_building(bld_data *building);
@@ -234,7 +239,7 @@ extern char_data *mobile_table;
 extern int top_of_p_table;
 extern struct player_index_element *player_table;
 void init_player(char_data *ch);
-extern char_data *read_mobile(mob_vnum nr);
+extern char_data *read_mobile(mob_vnum nr, bool with_triggers);
 extern char_data *mob_proto(mob_vnum vnum);
 void clear_char(char_data *ch);
 void reset_char(char_data *ch);
@@ -257,7 +262,7 @@ obj_data *create_obj(void);
 void clear_object(obj_data *obj);
 void free_obj(obj_data *obj);
 obj_data *obj_proto(obj_vnum vnum);
-obj_data *read_object(obj_vnum nr);
+obj_data *read_object(obj_vnum nr, bool with_triggers);
 
 // players
 extern struct group_data *group_list;

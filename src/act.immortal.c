@@ -2284,6 +2284,55 @@ void do_stat_adventure(char_data *ch, adv_data *adv) {
 
 
 /**
+* Show the stats on a book.
+*
+* @param char_data *ch The player requesting stats.
+* @param book_data *book The book to stat.
+*/
+void do_stat_book(char_data *ch, book_data *book) {
+	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	struct paragraph_data *para;
+	size_t size = 0;
+	int count, len, num;
+	char *ptr, *txt;
+	
+	size += snprintf(buf + size, sizeof(buf) - size, "Book VNum: [\tc%d\t0], Author: \ty%s\t0 (\tc%d\t0)\r\n", book->vnum, get_name_by_id(book->author) ? CAP(get_name_by_id(book->author)) : "nobody", book->author);
+	size += snprintf(buf + size, sizeof(buf) - size, "Title: %s\r\n", book->title);
+	size += snprintf(buf + size, sizeof(buf) - size, "Byline: %s\r\n", book->byline);
+	size += snprintf(buf + size, sizeof(buf) - size, "Item: [%s]\r\n", book->item_name);
+	size += snprintf(buf + size, sizeof(buf) - size, "%s", book->item_description);	// desc has its own crlf
+	
+	// precompute number of paragraphs
+	num = 0;
+	for (para = book->paragraphs; para; para = para->next) {
+		++num;
+	}
+	
+	for (para = book->paragraphs, count = 1; para; para = para->next, ++count) {
+		txt = para->text;
+		skip_spaces(&txt);
+		len = strlen(txt);
+		len = MIN(len, 62);	// aiming for full page width then a ...
+		snprintf(line, sizeof(line), "Paragraph %*d: %-*.*s...", (num >= 10 ? 2 : 1), count, len, len, txt);
+		if ((ptr = strstr(line, "\r\n"))) {	// line ended early?
+			sprintf(ptr, "...");	// overwrite the crlf
+		}
+		
+		// too big?
+		if (size + strlen(line) + 2 >= sizeof(buf)) {
+			break;
+		}
+		
+		size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", line);
+	}
+	
+	if (ch->desc) {
+		page_string(ch->desc, buf, TRUE);
+	}
+}
+
+
+/**
 * Show a character stats on a particular building.
 *
 * @param char_data *ch The player requesting stats.
@@ -2894,6 +2943,11 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	}
 
 	switch (GET_OBJ_TYPE(j)) {
+		case ITEM_BOOK: {
+			book_data *book = book_proto(GET_BOOK_ID(j));
+			msg_to_char(ch, "Book: %d - %s\r\n", GET_BOOK_ID(j), (book ? book->title : "unknown"));
+			break;
+		}
 		case ITEM_POISON: {
 			msg_to_char(ch, "Poison type: %s\r\n", poison_data[GET_POISON_TYPE(j)].name);
 			msg_to_char(ch, "Charges remaining: %d\r\n", GET_POISON_CHARGES(j));
@@ -3372,6 +3426,27 @@ int vnum_adventure(char *searchname, char_data *ch) {
 	}
 	
 	return found;
+}
+
+
+/**
+* Searches the building db for a match, and prints it to the character.
+*
+* @param char *searchname The search string.
+* @param char_data *ch The player who is searching.
+* @return int The number of matches shown.
+*/
+int vnum_book(char *searchname, char_data *ch) {
+	book_data *book, *next_book;
+	int found = 0;
+	
+	HASH_ITER(hh, book_table, book, next_book) {
+		if (multi_isname(searchname, book->title) || multi_isname(searchname, book->byline)) {
+			msg_to_char(ch, "%3d. [%5d] %s\t0 (%s\t0)\r\n", ++found, book->vnum, book->title, book->byline);
+		}
+	}
+
+	return (found);
 }
 
 
@@ -4715,7 +4790,7 @@ ACMD(do_load) {
 			send_to_char("There is no monster with that number.\r\n", ch);
 			return;
 		}
-		mob = read_mobile(number);
+		mob = read_mobile(number, TRUE);
 		setup_generic_npc(mob, NULL, NOTHING, NOTHING);
 		char_to_room(mob, IN_ROOM(ch));
 
@@ -4729,7 +4804,7 @@ ACMD(do_load) {
 			send_to_char("There is no object with that number.\r\n", ch);
 			return;
 		}
-		obj = read_object(number);
+		obj = read_object(number, TRUE);
 		if (CAN_WEAR(obj, ITEM_WEAR_TAKE))
 			obj_to_char(obj, ch);
 		else
@@ -5090,8 +5165,6 @@ ACMD(do_rescale) {
 	obj_data *obj, *new;
 	char_data *vict;
 	int level;
-	
-	bitvector_t preserve_flags = OBJ_SUPERIOR | OBJ_HARD_DROP | OBJ_GROUP_DROP | OBJ_KEEP;	// flags to copy over if obj is reloaded
 
 	argument = one_argument(argument, arg);
 	skip_spaces(&argument);
@@ -5123,23 +5196,16 @@ ACMD(do_rescale) {
 		}
 	}
 	else if ((obj = get_obj_in_list_vis(ch, arg, ch->carrying)) || (obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
-		// TODO this needs the same logical transfer of stats as the object loader in objsave.c uses to update items -paul
-		
 		// item mode
-		if (!OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-			new = read_object(GET_OBJ_VNUM(obj));
-			GET_OBJ_EXTRA(new) |= GET_OBJ_EXTRA(obj) & preserve_flags;
-			
-			// swap binds
-			OBJ_BOUND_TO(new) = OBJ_BOUND_TO(obj);
-			OBJ_BOUND_TO(obj) = NULL;
-			
+		if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
+			scale_item_to_level(obj, level);
+		}
+		else {
+			new = fresh_copy_obj(obj, level);
 			swap_obj_for_obj(obj, new);
 			extract_obj(obj);
 			obj = new;
 		}
-		
-		scale_item_to_level(obj, level);
 		
 		syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s has rescaled obj %s to level %d at %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), GET_OBJ_CURRENT_SCALE_LEVEL(obj), room_log_identifier(IN_ROOM(ch)));
 		sprintf(buf, "You rescale $p to level %d.", GET_OBJ_CURRENT_SCALE_LEVEL(obj));
@@ -5970,10 +6036,17 @@ ACMD(do_users) {
 
 
 ACMD(do_vnum) {
+	char buf[MAX_INPUT_LENGTH], buf2[MAX_INPUT_LENGTH];
+	
 	half_chop(argument, buf, buf2);
 
 	if (!*buf || !*buf2) {
 		send_to_char("Usage: vnum <type> <name>\r\n", ch);
+	}
+	else if (is_abbrev(buf, "book")) {
+		if (!vnum_book(buf2, ch)) {
+			send_to_char("No books by that name.\r\n", ch);
+		}
 	}
 	else if (is_abbrev(buf, "mob")) {
 		if (!vnum_mobile(buf2, ch)) {
@@ -6063,6 +6136,14 @@ ACMD(do_vstat) {
 		}
 		do_stat_building(ch, bld);
 	}
+	else if (is_abbrev(buf, "book")) {	// deliberately after 'building'
+		book_data *book = book_proto(number);
+		if (!book) {
+			msg_to_char(ch, "There is no book with that number.\r\n");
+			return;
+		}
+		do_stat_book(ch, book);
+	}
 	else if (is_abbrev(buf, "craft")) {
 		craft_data *craft = craft_proto(number);
 		if (!craft) {
@@ -6092,7 +6173,7 @@ ACMD(do_vstat) {
 			send_to_char("There is no monster with that number.\r\n", ch);
 			return;
 		}
-		mob = read_mobile(number);
+		mob = read_mobile(number, TRUE);
 		// put it somewhere, briefly
 		char_to_room(mob, world_table);
 		do_stat_character(ch, mob);
@@ -6103,7 +6184,7 @@ ACMD(do_vstat) {
 			send_to_char("There is no object with that number.\r\n", ch);
 			return;
 		}
-		obj = read_object(number);
+		obj = read_object(number, TRUE);
 		do_stat_object(ch, obj);
 		extract_obj(obj);
 	}

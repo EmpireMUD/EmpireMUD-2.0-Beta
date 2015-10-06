@@ -1043,7 +1043,6 @@ void show_character_affects(char_data *ch, char_data *to) {
 */
 char *get_obj_desc(obj_data *obj, char_data *ch, int mode) {
 	extern const char *drinks[];
-	extern char *get_book_item_name_by_id(int id);
 	extern const struct material_data materials[NUM_MATERIALS];
 
 	static char output[MAX_STRING_LENGTH];
@@ -1054,10 +1053,7 @@ char *get_obj_desc(obj_data *obj, char_data *ch, int mode) {
 	/* sdesc will be empty unless the short desc is modified */
 	*sdesc = '\0';
 
-	if (IS_BOOK(obj)) {
-		strcpy(sdesc, get_book_item_name_by_id(GET_BOOK_ID(obj)));
-	}
-	else if (IS_DRINK_CONTAINER(obj) && GET_DRINK_CONTAINER_CONTENTS(obj) > 0) {
+	if (IS_DRINK_CONTAINER(obj) && GET_DRINK_CONTAINER_CONTENTS(obj) > 0) {
 		sprintf(sdesc, "%s of %s", GET_OBJ_SHORT_DESC(obj), drinks[GET_DRINK_CONTAINER_TYPE(obj)]);
 	}
 	else if (IS_ARROW(obj)) {
@@ -1217,7 +1213,6 @@ void list_obj_to_char(obj_data *list, char_data *ch, int mode, int show) {
  * This function screams bitvector... -gg 6/45/98
  */
 void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
-	extern char *get_book_item_description_by_id(int id);
 	extern int Board_show_board(int board_type, char_data *ch, char *arg, obj_data *board);
 	extern int board_loaded;
 	void init_boards(void);
@@ -1267,9 +1262,6 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 				if (Board_show_board(board_type, ch, "board", obj))
 					return;
 			strcpy(buf, "You see nothing special.");
-		}
-		else if (IS_BOOK(obj)) {
-			strcpy(buf, get_book_item_description_by_id(GET_BOOK_ID(obj)));
 		}
 		else if (GET_OBJ_TYPE(obj) == ITEM_MAIL) {
 			page_string(ch->desc, GET_OBJ_ACTION_DESC(obj) ? GET_OBJ_ACTION_DESC(obj) : "It's blank.\r\n", 1);
@@ -2220,6 +2212,11 @@ ACMD(do_nearby) {
 	room_data *loc;
 	
 	if (!ch->desc) {
+		return;
+	}
+	
+	if (RMT_FLAGGED(IN_ROOM(ch), RMT_NO_LOCATION)) {
+		msg_to_char(ch, "You can't use nearby from here.\r\n");
 		return;
 	}
 	

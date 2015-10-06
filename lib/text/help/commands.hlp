@@ -158,7 +158,7 @@ information on these rules.
 
 See also: QUIT
 #
-ANSI COLORS MAPCOLOR "MAP COLOR" MAP-COLOR &&
+ANSI COLOR COLORS MAPCOLOR "MAP COLOR" MAP-COLOR &&
 
 Options:  toggle map-color
 
@@ -1584,7 +1584,7 @@ Immortal toggles:
   holylight - allows immortals to see in the dark
   roomflags - shows room flags, vnums, and other info to immortals
   idle-out - if off, the immortal will not disconnect from idling
-  incognito - if on, the immortal does not appear on 'who' to lower players
+  incognito - if on, the immortal does not appear on 'who' to mortals
   wizhide - if on, the immortal can't be seen in rooms but is not invisible
 #
 UNLOAD BOATUNLOAD
@@ -1664,7 +1664,7 @@ line options can be used to limit the listing. The parameters can be specified
 on the command-line in any order.
 
 The color of the player's class name (if not white) indicates their role, if
-any: &aCaster&0, &jHealer&0, &yTank&0 or &rMelee&0.
+any: &aCaster&0, &jHealer&0, &yTank&0, &rMelee&0, or &mUtility&0.
 
 min-max    Specify a level range, e.g. 100-200
 -e [name]  members of your own empire or the one you specify (use quotes for

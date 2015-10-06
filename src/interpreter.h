@@ -10,7 +10,10 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 
+// command types
 #define ACMD(name)		void name(char_data *ch, char *argument, int cmd, int subcmd)
+#define LIBRARY_SCMD(name)  void name(char_data *ch, char *argument)
+
 
 // prototypes
 void command_interpreter(char_data *ch, char *argument);

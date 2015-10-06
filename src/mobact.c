@@ -171,7 +171,7 @@ INTERACTION_FUNC(run_one_encounter) {
 	bool any = FALSE;
 	
 	for (iter = 0; iter < interaction->quantity; ++iter) {
-		aggr = read_mobile(interaction->vnum);
+		aggr = read_mobile(interaction->vnum, TRUE);
 		setup_generic_npc(aggr, NULL, NOTHING, NOTHING);
 		if (COMPLEX_DATA(IN_ROOM(ch)) && COMPLEX_DATA(IN_ROOM(ch))->instance) {
 			MOB_INSTANCE_ID(aggr) = COMPLEX_DATA(IN_ROOM(ch))->instance->id;
@@ -900,7 +900,7 @@ static void spawn_one_room(room_data *room) {
 			}
 		
 			// passed! let's spawn
-			mob = read_mobile(spawn->vnum);
+			mob = read_mobile(spawn->vnum, TRUE);
 		
 			// ensure loyalty
 			if (ROOM_OWNER(home) && MOB_FLAGGED(mob, MOB_HUMAN | MOB_EMPIRE | MOB_CITYGUARD)) {

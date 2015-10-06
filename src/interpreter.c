@@ -512,6 +512,10 @@ cpp_extern const struct command_info cmd_info[] = {
 
 	/* now, the main list */
 	SIMPLE_CMD( "/", POS_DEAD, do_slash_channel, NO_MIN, CTYPE_COMM ),
+
+	// . is "olc" for imms but "bookedit" for mortals
+	GRANT_CMD( ".", POS_DEAD, do_olc, LVL_BUILDER, CTYPE_OLC, GRANT_OLC ),
+	SCMD_CMD( ".", POS_STANDING, do_library, LVL_APPROVED, CTYPE_UTIL, SCMD_BOOKEDIT ),
 	
 	SIMPLE_CMD( "at", POS_DEAD, do_at, LVL_START_IMM, CTYPE_IMMORTAL ),
 	SCMD_CMD( "accept", POS_DEAD, do_accept, NO_MIN, CTYPE_UTIL, SCMD_ACCEPT ),
@@ -771,7 +775,6 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "\"", POS_RESTING, do_say, NO_MIN, CTYPE_COMM, SCMD_OOCSAY ),
 	ABILITY_CMD( "outrage", POS_FIGHTING, do_outrage, NO_MIN, CTYPE_COMBAT, ABIL_OUTRAGE ),
 	GRANT_CMD( "olc", POS_DEAD, do_olc, LVL_BUILDER, CTYPE_OLC, GRANT_OLC ),
-	GRANT_CMD( ".", POS_DEAD, do_olc, LVL_BUILDER, CTYPE_OLC, GRANT_OLC ),
 
 	SIMPLE_CMD( "put", POS_RESTING, do_put, NO_MIN, CTYPE_MOVE ),
 	GRANT_CMD( "page", POS_DEAD, do_page, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_PAGE ),
@@ -1013,7 +1016,7 @@ cpp_extern const struct command_info cmd_info[] = {
  */
 void command_interpreter(char_data *ch, char *argument) {
 	extern bool check_social(char_data *ch, char *string, bool exact);
-	int cmd, length, cont, iter;
+	int cmd, length, iter;
 	char *line;
 
 	/* just drop to next line for hitting CR */
@@ -1040,20 +1043,9 @@ void command_interpreter(char_data *ch, char *argument) {
 		arg[iter] = LOWER(arg[iter]);
 	}
 
-	/*
-	* Script check:
-	* Since all command triggers check for valid_dg_target before acting, the levelcheck
-	* here has been removed. 
-	*/
-	cont = command_wtrigger(ch, arg, line);              /* any world triggers ? */
-	if (!cont) {
-		cont = command_mtrigger(ch, arg, line);   /* any mobile triggers ? */
-	}
-	if (!cont) {
-		cont = command_otrigger(ch, arg, line);   /* any object triggers ? */
-	}
-	if (cont) {
-		return;                                    /* yes, command trigger took over */
+	// Command trigger (1/3): exact match on typed-in word
+	if (check_command_trigger(ch, arg, line, CMDTRG_EXACT)) {
+		return;
 	}
 
 	/* otherwise, find the command */
@@ -1090,8 +1082,14 @@ void command_interpreter(char_data *ch, char *argument) {
 		// do the social instead.
 		return;
 	}
-	else if (*cmd_info[cmd].command == '\n')
+	else if (*cmd_info[cmd].command == '\n') {
+		// Command trigger (2/3): abbrev match on non-matching command
+		if (check_command_trigger(ch, arg, line, CMDTRG_ABBREV)) {
+			return;
+		}
+		// otherwise, no match
 		send_config_msg(ch, "huh_string");
+	}
 	else if (!IS_NPC(ch) && PLR_FLAGGED(ch, PLR_FROZEN))
 		send_to_char("You try, but the mind-numbing cold prevents you...\r\n", ch);
 	else if (IS_SET(cmd_info[cmd].flags, CMD_NOT_RP) && !IS_NPC(ch) && !IS_GOD(ch) && !IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_RP)) {
@@ -1152,6 +1150,12 @@ void command_interpreter(char_data *ch, char *argument) {
 				break;
 		}
 	}
+
+	// Command trigger (3/3): exact match on abbreviated command
+	else if (check_command_trigger(ch, (char*)cmd_info[cmd].command, line, CMDTRG_EXACT)) {
+		return;
+	}
+	
 	else {
 		((*cmd_info[cmd].command_pointer) (ch, line, cmd, cmd_info[cmd].subcmd));
 	}
@@ -1884,6 +1888,32 @@ void send_motd(descriptor_data *d) {
 }
 
 
+/**
+* Sends the MOTD, MXP tags, and other data that should be shown when a player
+* logs in, which may happen in several different ways.
+*
+* @param descriptor_data *desc The person to send it to.
+* @param int bad_pws Number of bad password attempts, which sometimes must be retrieved and cleared ahead of time.
+*/
+void send_login_motd(descriptor_data *desc, int bad_pws) {
+	send_motd(desc);
+	MXPSendTag(desc, "<VERSION>");
+	
+	/* Check bad passwords */
+	if (bad_pws) {
+		sprintf(buf, "\r\n\r\n\007\007\007&r%d LOGIN FAILURE%s SINCE LAST SUCCESSFUL LOGIN.&0\r\n", bad_pws, (bad_pws > 1) ? "S" : "");
+		SEND_TO_Q(buf, desc);
+		GET_BAD_PWS(desc->character) = 0;
+	}
+
+	/* Check previous logon */
+	if (desc->character->prev_host) {
+		sprintf(buf, "Your last login was on %6.10s from %s.\r\n", ctime(&desc->character->prev_logon), desc->character->prev_host);
+		SEND_TO_Q(buf, desc);
+	}
+}
+
+
 /*
  * XXX: Make immortals 'return' instead of being disconnected when switched
  *      into person returns.  This function seems a bit over-extended too.
@@ -2064,7 +2094,6 @@ void nanny(descriptor_data *d, char *arg) {
 	extern int enter_player_game(descriptor_data *d, int dolog, bool fresh);
 	extern int isbanned(char *hostname);
 	extern int num_earned_bonus_traits(char_data *ch);
-	void parse_bookedit(descriptor_data *d, char *arg);
 	void start_new_character(char_data *ch);
 	extern int Valid_Name(char *newname);
 	
@@ -2082,11 +2111,6 @@ void nanny(descriptor_data *d, char *arg) {
 	skip_spaces(&arg);
 
 	switch (STATE(d)) {
-		case CON_BOOKEDIT: {
-			parse_bookedit(d, arg);
-			break;
-		}
-
 		case CON_GET_NAME: {	/* wait for input of name */
 			if (d->character == NULL) {
 				CREATE(d->character, char_data, 1);
@@ -2283,22 +2307,8 @@ void nanny(descriptor_data *d, char *arg) {
 					STATE(d) = CON_BONUS_EXISTING;
 					return;
 				}
-
-				send_motd(d);
-				MXPSendTag(d, "<VERSION>");
 				
-				/* Check bad passwords */
-				if (load_result) {
-					sprintf(buf, "\r\n\r\n\007\007\007&r%d LOGIN FAILURE%s SINCE LAST SUCCESSFUL LOGIN.&0\r\n", load_result, (load_result > 1) ? "S" : "");
-					SEND_TO_Q(buf, d);
-					GET_BAD_PWS(d->character) = 0;
-				}
-
-				/* Check previous logon */
-				if (d->character->prev_host) {
-					sprintf(buf, "Your last login was on %6.10s from %s.\r\n", ctime(&d->character->prev_logon), d->character->prev_host);
-					SEND_TO_Q(buf, d);
-				}
+				send_login_motd(d, load_result);
 				
 				// send on to motd
 				SEND_TO_Q("\r\n*** Press ENTER: ", d);
@@ -2463,8 +2473,8 @@ void nanny(descriptor_data *d, char *arg) {
 			}
 			init_player(d->character);
 			SAVE_CHAR(d->character);
-			send_motd(d);
-			MXPSendTag(d, "<VERSION>");
+			
+			send_login_motd(d, GET_BAD_PWS(d->character));
 			
 			SEND_TO_Q("\r\n*** Press ENTER: ", d);
 			STATE(d) = CON_RMOTD;
@@ -2666,8 +2676,7 @@ void nanny(descriptor_data *d, char *arg) {
 				}
 
 				// and send them to the motd
-				send_motd(d);
-				MXPSendTag(d, "<VERSION>");
+				send_login_motd(d, GET_BAD_PWS(d->character));
 				
 				SEND_TO_Q("\r\n*** Press ENTER: ", d);
 				STATE(d) = CON_RMOTD;

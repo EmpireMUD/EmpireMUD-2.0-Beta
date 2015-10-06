@@ -365,14 +365,14 @@ INTERACTION_FUNC(devastate_crop) {
 	act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
 	
 	while (num-- > 0) {
-		obj_to_char_or_room((newobj = read_object(interaction->vnum)), ch);
+		obj_to_char_or_room((newobj = read_object(interaction->vnum, TRUE)), ch);
 		scale_item_to_level(newobj, 1);	// minimum level
 		load_otrigger(newobj);
 	}
 	
 	// additional tree if orchard
 	if (ROOM_CROP_FLAGGED(inter_room, CROPF_IS_ORCHARD)) {
-		obj_to_char_or_room((newobj = read_object(o_TREE)), ch);
+		obj_to_char_or_room((newobj = read_object(o_TREE, TRUE)), ch);
 		scale_item_to_level(newobj, 1);	// minimum level
 		load_otrigger(newobj);
 	}
@@ -785,7 +785,7 @@ ACMD(do_disenchant) {
 			}
 		
 			if (vnum != NOTHING) {
-				reward = read_object(vnum);
+				reward = read_object(vnum, TRUE);
 				obj_to_char_or_room(reward, ch);
 				act("You manage to weave the freed mana into $p!", FALSE, ch, reward, NULL, TO_CHAR);
 				act("$n weaves the freed mana into $p!", TRUE, ch, reward, NULL, TO_ROOM);
@@ -1170,7 +1170,7 @@ ACMD(do_mirrorimage) {
 	}
 	
 	charge_ability_cost(ch, MANA, cost, COOLDOWN_MIRRORIMAGE, 5 * SECS_PER_REAL_MIN, WAIT_COMBAT_SPELL);
-	mob = read_mobile(vnum);
+	mob = read_mobile(vnum, TRUE);
 	
 	// scale mob to the summoner -- so it won't change its attributes later
 	scale_mob_as_familiar(mob, ch);
@@ -1987,7 +1987,7 @@ RITUAL_FINISH_FUNC(perform_devastation_ritual) {
 			act("$n's powerful ritual devastates the forest!", FALSE, ch, NULL, NULL, TO_ROOM);
 			
 			while (num-- > 0) {
-				obj_to_char_or_room((newobj = read_object(o_TREE)), ch);
+				obj_to_char_or_room((newobj = read_object(o_TREE, TRUE)), ch);
 				load_otrigger(newobj);
 			}
 		}

@@ -1453,6 +1453,9 @@ void close_socket(descriptor_data *d) {
 	if (d->olc_adventure) {
 		free_adventure(d->olc_adventure);
 	}
+	if (d->olc_book) {
+		free_book(d->olc_book);
+	}
 	if (d->olc_craft) {
 		free_craft(d->olc_craft);
 	}

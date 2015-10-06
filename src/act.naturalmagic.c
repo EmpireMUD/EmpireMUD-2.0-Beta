@@ -348,7 +348,7 @@ ACMD(do_cleanse) {
 			}
 		}
 
-		if (GET_COND(vict, DRUNK) > 0) {
+		if (!IS_NPC(vict) && GET_COND(vict, DRUNK) > 0) {
 			gain_condition(vict, DRUNK, -1 * GET_COND(vict, DRUNK));
 		}
 		
@@ -838,7 +838,7 @@ ACMD(do_familiar) {
 	}
 	
 	charge_ability_cost(ch, MANA, familiars[type].cost, NOTHING, 0, WAIT_SPELL);
-	mob = read_mobile(familiars[type].vnum);
+	mob = read_mobile(familiars[type].vnum, TRUE);
 	if (IS_NPC(ch)) {
 		MOB_INSTANCE_ID(mob) = MOB_INSTANCE_ID(ch);
 	}

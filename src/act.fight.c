@@ -475,7 +475,7 @@ ACMD(do_stake) {
 		if (GET_HEALTH(victim) > 0)
 			GET_POS(victim) = POS_RESTING;
 		REMOVE_BIT(INJURY_FLAGS(victim), INJ_STAKED);
-		obj_to_char_or_room((stake = read_object(o_STAKE)), ch);
+		obj_to_char_or_room((stake = read_object(o_STAKE, TRUE)), ch);
 		scale_item_to_level(stake, 1);	// min scale
 		load_otrigger(stake);
 	}
@@ -634,7 +634,7 @@ ACMD(do_tie) {
 		GET_HEALTH(victim) = MAX(1, GET_HEALTH(victim));
 		GET_POS(victim) = POS_RESTING;
 		REMOVE_BIT(INJURY_FLAGS(victim), INJ_TIED);
-		obj_to_char((rope = read_object(o_ROPE)), ch);
+		obj_to_char((rope = read_object(o_ROPE, TRUE)), ch);
 		load_otrigger(rope);
 	}
 	else if (GET_POS(victim) >= POS_SLEEPING)

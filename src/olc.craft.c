@@ -67,10 +67,6 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft requires no resources");
 		problem = TRUE;
 	}
-	if (!IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_SOUP) && (GET_CRAFT_OBJECT(craft) == NOTHING || !obj_proto(GET_CRAFT_OBJECT(craft))) && (GET_CRAFT_BUILD_TYPE(craft) == NOTHING || !building_proto(GET_CRAFT_BUILD_TYPE(craft)))) {
-		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft makes nothing");
-		problem = TRUE;
-	}
 	if (!str_cmp(GET_CRAFT_NAME(craft), "unnamed recipe")) {
 		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft not named");
 		problem = TRUE;
@@ -79,21 +75,45 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft type not set");
 		problem = TRUE;
 	}
-	if (GET_CRAFT_TYPE(craft) != CRAFT_TYPE_BUILD && GET_CRAFT_OBJECT(craft) != NOTHING && GET_CRAFT_OBJECT(craft) != GET_CRAFT_VNUM(craft)) {
-		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft creates item with different vnum");
-		problem = TRUE;
+	
+	// different types of crafts
+	if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD) {	// buildings only
+		if (GET_CRAFT_BUILD_TYPE(craft) == NOTHING || !building_proto(GET_CRAFT_BUILD_TYPE(craft))) {
+			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft makes nothing");
+			problem = TRUE;
+		}
+		if (GET_CRAFT_BUILD_TYPE(craft) != NOTHING && GET_CRAFT_BUILD_TYPE(craft) != GET_CRAFT_VNUM(craft)) {
+			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft creates building with different vnum");
+			problem = TRUE;
+		}
 	}
-	if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD && GET_CRAFT_BUILD_TYPE(craft) != NOTHING && GET_CRAFT_BUILD_TYPE(craft) != GET_CRAFT_VNUM(craft)) {
-		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft creates building with different vnum");
-		problem = TRUE;
+	else if (CRAFT_FLAGGED(craft, CRAFT_SOUP)) {	// soups only
+		if (GET_CRAFT_OBJECT(craft) < 0 || GET_CRAFT_OBJECT(craft) > NUM_LIQUIDS) {
+			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Invalid liquid type on soup recipe");
+			problem = TRUE;
+		}
 	}
-	if (GET_CRAFT_QUANTITY(craft) == 0 && GET_CRAFT_TYPE(craft) != CRAFT_TYPE_BUILD) {
-		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft creates 0 quantity");
-		problem = TRUE;
+	else {	// normal craft (neither building nor soup)
+		if (GET_CRAFT_OBJECT(craft) == NOTHING || !obj_proto(GET_CRAFT_OBJECT(craft))) {
+			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft makes nothing");
+			problem = TRUE;
+		}
+		if (GET_CRAFT_OBJECT(craft) != NOTHING && GET_CRAFT_OBJECT(craft) != GET_CRAFT_VNUM(craft)) {
+			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft creates item with different vnum");
+			problem = TRUE;
+		}
 	}
-	if (GET_CRAFT_TIME(craft) == 0 && GET_CRAFT_TYPE(craft) != CRAFT_TYPE_BUILD) {
-		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft requires 0 time");
-		problem = TRUE;
+	
+	// anything not a building
+	if (GET_CRAFT_TYPE(craft) != CRAFT_TYPE_BUILD) {
+		if (GET_CRAFT_QUANTITY(craft) == 0) {
+			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft creates 0 quantity");
+			problem = TRUE;
+		}
+		if (GET_CRAFT_TIME(craft) == 0) {
+			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft requires 0 time");
+			problem = TRUE;
+		}
 	}
 		
 	return problem;
@@ -127,6 +147,27 @@ craft_data *create_craft_table_entry(craft_vnum vnum) {
 	save_library_file_for_vnum(DB_BOOT_CRAFT, vnum);
 
 	return craft;
+}
+
+
+/**
+* For the .list command.
+*
+* @param craft_data *craft The thing to list.
+* @param bool detail If TRUE, provide additional details
+* @return char* The line to show (without a CRLF).
+*/
+char *list_one_craft(craft_data *craft, bool detail) {
+	static char output[MAX_STRING_LENGTH];
+	
+	if (detail) {
+		snprintf(output, sizeof(output), "[%5d] %s", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
+	}
+	else {
+		snprintf(output, sizeof(output), "[%5d] %s", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
+	}
+	
+	return output;
 }
 
 
