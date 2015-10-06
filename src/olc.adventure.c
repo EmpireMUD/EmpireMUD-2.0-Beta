@@ -271,7 +271,28 @@ char *list_one_adventure(adv_data *adv, bool detail) {
 	static char output[MAX_STRING_LENGTH];
 	
 	if (detail) {
-		snprintf(output, sizeof(output), "[%5d] %s [%d-%d] (%s)", GET_ADV_VNUM(adv), GET_ADV_NAME(adv), GET_ADV_START_VNUM(adv), GET_ADV_END_VNUM(adv), level_range_string(GET_ADV_MIN_LEVEL(adv), GET_ADV_MAX_LEVEL(adv), 0));
+		int count_mobs = 0, count_objs = 0, count_rooms = 0;
+		room_template *rmt, *next_rmt;
+		char_data *mob, *next_mob;
+		obj_data *obj, *next_obj;
+		
+		HASH_ITER(hh, mobile_table, mob, next_mob) {
+			if (GET_MOB_VNUM(mob) >= GET_ADV_START_VNUM(adv) && GET_MOB_VNUM(mob) <= GET_ADV_END_VNUM(adv)) {
+				++count_mobs;
+			}
+		}
+		HASH_ITER(hh, object_table, obj, next_obj) {
+			if (GET_OBJ_VNUM(obj) >= GET_ADV_START_VNUM(adv) && GET_OBJ_VNUM(obj) <= GET_ADV_END_VNUM(adv)) {
+				++count_objs;
+			}
+		}
+		HASH_ITER(hh, room_template_table, rmt, next_rmt) {
+			if (GET_RMT_VNUM(rmt) >= GET_ADV_START_VNUM(adv) && GET_RMT_VNUM(rmt) <= GET_ADV_END_VNUM(adv)) {
+				++count_rooms;
+			}
+		}
+		
+		snprintf(output, sizeof(output), "[%5d] %s [%d-%d] (%s) %d mob%s, %d obj%s, %d room%s", GET_ADV_VNUM(adv), GET_ADV_NAME(adv), GET_ADV_START_VNUM(adv), GET_ADV_END_VNUM(adv), level_range_string(GET_ADV_MIN_LEVEL(adv), GET_ADV_MAX_LEVEL(adv), 0), count_mobs, PLURAL(count_mobs), count_objs, PLURAL(count_objs), count_rooms, PLURAL(count_rooms));
 	}
 	else {
 		snprintf(output, sizeof(output), "[%5d] %s", GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
