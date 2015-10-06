@@ -1728,7 +1728,7 @@ void perform_mortal_where(char_data *ch, char *arg) {
 					// one or the other is set no-location
 					continue;
 				}
-				if (ADVENTURE_FLAGGED(i_inst->adventure, ADV_NO_NEARBY)) {
+				if (i_inst && ADVENTURE_FLAGGED(i_inst->adventure, ADV_NO_NEARBY)) {
 					// target's adventure is !nearby
 					continue;
 				}
@@ -1781,7 +1781,7 @@ void perform_mortal_where(char_data *ch, char *arg) {
 					// one or the other is set no-location
 					continue;
 				}
-				if (ADVENTURE_FLAGGED(i_inst->adventure, ADV_NO_NEARBY)) {
+				if (i_inst && ADVENTURE_FLAGGED(i_inst->adventure, ADV_NO_NEARBY)) {
 					// target's adventure is !nearby
 					continue;
 				}
