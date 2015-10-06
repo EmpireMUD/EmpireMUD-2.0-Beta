@@ -253,9 +253,19 @@ bool delete_from_spawn_template_list(struct adventure_spawn **list, int spawn_ty
 */
 char *list_one_mobile(char_data *mob, bool detail) {
 	static char output[MAX_STRING_LENGTH];
+	char flags[MAX_STRING_LENGTH];
+	
+	bitvector_t show_flags = MOB_BRING_A_FRIEND | MOB_SENTINEL | MOB_AGGRESSIVE | MOB_MOUNTABLE | MOB_ANIMAL | MOB_AQUATIC | MOB_NO_ATTACK | MOB_SPAWNED | MOB_CHAMPION | MOB_FAMILIAR | MOB_EMPIRE | MOB_CITYGUARD | MOB_GROUP | MOB_HARD | MOB_DPS | MOB_TANK | MOB_CASTER | MOB_VAMPIRE | MOB_HUMAN;
 	
 	if (detail) {
-		snprintf(output, sizeof(output), "[%5d] %s", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
+		if (IS_SET(MOB_FLAGS(mob), show_flags)) {
+			sprintbit(MOB_FLAGS(mob) & show_flags, action_bits, flags, TRUE);
+		}
+		else {
+			*flags = '\0';
+		}
+		
+		snprintf(output, sizeof(output), "[%5d] %s (%s) %s", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob), level_range_string(GET_MIN_SCALE_LEVEL(mob), GET_MAX_SCALE_LEVEL(mob), 0), flags);
 	}
 	else {
 		snprintf(output, sizeof(output), "[%5d] %s", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));

@@ -139,6 +139,10 @@ bool audit_object(obj_data *obj, char_data *ch) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Loot quality flags set");
 		problem = TRUE;
 	}
+	if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
+		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "KEEP flag");
+		problem = TRUE;
+	}
 	if (OBJ_FLAGGED(obj, OBJ_BIND_ON_EQUIP) && OBJ_FLAGGED(obj, OBJ_BIND_ON_PICKUP)) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Two bind flags");
 		problem = TRUE;
@@ -322,9 +326,18 @@ char **get_weapon_types_string(void) {
 */
 char *list_one_object(obj_data *obj, bool detail) {
 	static char output[MAX_STRING_LENGTH];
+	char flags[MAX_STRING_LENGTH];
+	
+	bitvector_t show_flags = OBJ_SUPERIOR | OBJ_ENCHANTED | OBJ_SCALABLE | OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP | OBJ_NO_AUTOSTORE | OBJ_HARD_DROP | OBJ_GROUP_DROP | OBJ_GENERIC_DROP;
 	
 	if (detail) {
-		snprintf(output, sizeof(output), "[%5d] %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+		if (IS_SET(GET_OBJ_EXTRA(obj), show_flags)) {
+			sprintbit(GET_OBJ_EXTRA(obj) & show_flags, extra_bits, flags, TRUE);
+		}
+		else {
+			*flags = '\0';
+		}
+		snprintf(output, sizeof(output), "[%5d] %s (%s) %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj), level_range_string(GET_OBJ_MIN_SCALE_LEVEL(obj), GET_OBJ_MAX_SCALE_LEVEL(obj), 0), flags);
 	}
 	else {
 		snprintf(output, sizeof(output), "[%5d] %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
