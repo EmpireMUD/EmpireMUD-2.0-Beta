@@ -980,7 +980,10 @@ WIZNET ;
 
 The immortal communication channel.
 
-Usage:  wiznet [#level] <text>
+As with most similar channels, you can start chats with * (asterisk) to make
+them channel-emotes.
+
+Usage:  wiznet [#<level>] <text>
 
 Examples:
 
