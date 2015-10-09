@@ -189,11 +189,12 @@ void perform_immort_invis(char_data *ch, int level) {
 
 /* Immortal visible command, different than mortals' */
 void perform_immort_vis(char_data *ch) {
-	if (GET_INVIS_LEV(ch) == 0 && !AFF_FLAGGED(ch, AFF_HIDE)) {
+	if (GET_INVIS_LEV(ch) == 0 && !AFF_FLAGGED(ch, AFF_HIDE) && !PRF_FLAGGED(ch, PRF_WIZHIDE | PRF_INCOGNITO)) {
 		send_to_char("You are already fully visible.\r\n", ch);
 		return;
 	}
-
+	
+	REMOVE_BIT(PRF_FLAGS(ch), PRF_WIZHIDE | PRF_INCOGNITO);
 	GET_INVIS_LEV(ch) = 0;
 	appear(ch);
 	send_to_char("You are now fully visible.\r\n", ch);

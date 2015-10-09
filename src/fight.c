@@ -1951,6 +1951,7 @@ bool can_fight(char_data *ch, char_data *victim) {
 * @param char_data *ch The person who will appear.
 */
 void appear(char_data *ch) {
+	affects_from_char_by_aff_flag(ch, AFF_HIDE | AFF_INVISIBLE);
 	REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDE | AFF_INVISIBLE);
 
 	if (GET_ACCESS_LEVEL(ch) < LVL_GOD) {
