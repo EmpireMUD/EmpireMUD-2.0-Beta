@@ -6044,11 +6044,6 @@ ACMD(do_vnum) {
 	if (!*buf || !*buf2) {
 		send_to_char("Usage: vnum <type> <name>\r\n", ch);
 	}
-	else if (is_abbrev(buf, "book")) {
-		if (!vnum_book(buf2, ch)) {
-			send_to_char("No books by that name.\r\n", ch);
-		}
-	}
 	else if (is_abbrev(buf, "mob")) {
 		if (!vnum_mobile(buf2, ch)) {
 			send_to_char("No mobiles by that name.\r\n", ch);
@@ -6072,6 +6067,11 @@ ACMD(do_vnum) {
 	else if (is_abbrev(buf, "building")) {
 		if (!vnum_building(buf2, ch)) {
 			msg_to_char(ch, "No buildings by that name.\r\n");
+		}
+	}
+	else if (is_abbrev(buf, "book")) {
+		if (!vnum_book(buf2, ch)) {
+			send_to_char("No books by that name.\r\n", ch);
 		}
 	}
 	else if (is_abbrev(buf, "crop")) {
