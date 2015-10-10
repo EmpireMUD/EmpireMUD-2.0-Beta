@@ -1456,7 +1456,7 @@ ACMD(do_soulsight) {
 		return;
 	}
 	else {
-		charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
+		charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_NONE);
 
 		act("$n's eyes flash briefly.", TRUE, ch, NULL, NULL, TO_ROOM);
 
