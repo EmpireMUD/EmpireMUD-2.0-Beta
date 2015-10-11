@@ -1204,7 +1204,7 @@ typedef struct trig_data trig_data;
 #define NUM_CONDS  3	// WARNING do not change: used in char_file_u
 
 
-// Grant flags allow players to use abilities below the required access level
+// GRANT_X: Grant flags allow players to use abilities below the required access level
 #define GRANT_ADVANCE  BIT(0)
 #define GRANT_BAN  BIT(1)
 #define GRANT_CLEARABILITIES  BIT(2)
@@ -1241,6 +1241,7 @@ typedef struct trig_data trig_data;
 #define GRANT_HOSTILE  BIT(33)
 #define GRANT_SLAY  BIT(34)
 #define GRANT_ISLAND  BIT(35)
+#define GRANT_OMODIFY  BIT(36)
 
 
 // Lore types

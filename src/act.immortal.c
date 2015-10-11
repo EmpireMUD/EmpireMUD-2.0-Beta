@@ -47,6 +47,7 @@ extern const char *bonus_bits[];
 extern const char *climate_types[];
 extern const char *dirs[];
 extern const char *drinks[];
+extern const char *extra_bits[];
 extern const char *genders[];
 extern const char *grant_bits[];
 extern const char *island_bits[];
@@ -2848,7 +2849,6 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	extern const struct material_data materials[NUM_MATERIALS];
 	extern const char *wear_bits[];
 	extern const char *item_types[];
-	extern const char *extra_bits[];
 	extern const char *container_bits[];
 	extern const char *obj_custom_types[];
 	extern const char *storage_bits[];
@@ -4877,6 +4877,74 @@ ACMD(do_moveeinv) {
 		else {
 			msg_to_char(ch, "No items to move.\r\n");
 		}
+	}
+}
+
+
+ACMD(do_omodify) {
+	char obj_arg[MAX_INPUT_LENGTH], field_arg[MAX_INPUT_LENGTH];
+	obj_data *obj, *proto;
+	
+	argument = one_argument(argument, obj_arg);
+	argument = any_one_arg(argument, field_arg);
+	skip_spaces(&argument);	// remainder
+	
+	if (!*obj_arg || !*field_arg) {
+		msg_to_char(ch, "Usage: omodify <object> <field> <value>\r\n");
+	}
+	else if (!(obj = get_obj_in_list_vis(ch, obj_arg, ch->carrying)) && !(obj = get_obj_in_list_vis(ch, obj_arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
+		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(obj_arg), obj_arg);
+	}
+	else if (is_abbrev(field_arg, "flags")) {
+		GET_OBJ_EXTRA(obj) = olc_process_flag(ch, argument, "extra", "omodify object flags", extra_bits, GET_OBJ_EXTRA(obj));
+	}
+	else if (is_abbrev(field_arg, "keywords")) {
+		if (!*argument) {
+			msg_to_char(ch, "Set the keywords to what?\r\n");
+		}
+		else {
+			if (GET_OBJ_KEYWORDS(obj) && (!(proto = obj_proto(GET_OBJ_VNUM(obj))) || GET_OBJ_KEYWORDS(obj) != GET_OBJ_KEYWORDS(proto))) {
+				free(GET_OBJ_KEYWORDS(obj));
+			}
+			GET_OBJ_KEYWORDS(obj) = str_dup(argument);
+			msg_to_char(ch, "You change its keywords to '%s'.\r\n", GET_OBJ_KEYWORDS(obj));
+		}
+	}
+	else if (is_abbrev(field_arg, "longdescription")) {
+		if (!*argument) {
+			msg_to_char(ch, "Set the long description to what?\r\n");
+		}
+		else {
+			if (GET_OBJ_LONG_DESC(obj) && (!(proto = obj_proto(GET_OBJ_VNUM(obj))) || GET_OBJ_LONG_DESC(obj) != GET_OBJ_LONG_DESC(proto))) {
+				free(GET_OBJ_LONG_DESC(obj));
+			}
+			GET_OBJ_LONG_DESC(obj) = str_dup(argument);
+			msg_to_char(ch, "You change its long description to '%s'.\r\n", GET_OBJ_LONG_DESC(obj));
+		}
+	}
+	else if (is_abbrev(field_arg, "shortdescription")) {
+		if (!*argument) {
+			msg_to_char(ch, "Set the short description to what?\r\n");
+		}
+		else {
+			if (GET_OBJ_SHORT_DESC(obj) && (!(proto = obj_proto(GET_OBJ_VNUM(obj))) || GET_OBJ_SHORT_DESC(obj) != GET_OBJ_SHORT_DESC(proto))) {
+				free(GET_OBJ_SHORT_DESC(obj));
+			}
+			GET_OBJ_SHORT_DESC(obj) = str_dup(argument);
+			msg_to_char(ch, "You change its short description to '%s'.\r\n", GET_OBJ_SHORT_DESC(obj));
+		}
+	}
+	else if (is_abbrev(field_arg, "timer")) {
+		if (!*argument || (!isdigit(*argument) && *argument != '-')) {
+			msg_to_char(ch, "Set the timer to what?\r\n");
+		}
+		else {
+			GET_OBJ_TIMER(obj) = atoi(argument);
+			msg_to_char(ch, "You change its timer to %d.\r\n", GET_OBJ_TIMER(obj));
+		}
+	}
+	else {
+		msg_to_char(ch, "Invalid field.\r\n");
 	}
 }
 
