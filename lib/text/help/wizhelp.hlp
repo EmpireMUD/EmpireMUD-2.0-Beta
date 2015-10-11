@@ -525,6 +525,9 @@ You can change the following fields:
   shortdescription - The text used to build strings, and in the inventory.
   timer - The decay timer on the item (-1 for no decay).
 
+Setting the keywords, longdescription, or shortdescription to "none" will
+restore its strings from the prototype (if one exists).
+
 See also: GRANT, OEDIT
 #d
 PAGE

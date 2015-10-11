@@ -4903,11 +4903,19 @@ ACMD(do_oset) {
 			msg_to_char(ch, "Set the keywords to what?\r\n");
 		}
 		else {
-			if (GET_OBJ_KEYWORDS(obj) && (!(proto = obj_proto(GET_OBJ_VNUM(obj))) || GET_OBJ_KEYWORDS(obj) != GET_OBJ_KEYWORDS(proto))) {
+			proto = obj_proto(GET_OBJ_VNUM(obj));
+			
+			if (GET_OBJ_KEYWORDS(obj) && (!proto || GET_OBJ_KEYWORDS(obj) != GET_OBJ_KEYWORDS(proto))) {
 				free(GET_OBJ_KEYWORDS(obj));
 			}
-			GET_OBJ_KEYWORDS(obj) = str_dup(argument);
-			msg_to_char(ch, "You change its keywords to '%s'.\r\n", GET_OBJ_KEYWORDS(obj));
+			if (proto && !str_cmp(argument, "none")) {
+				GET_OBJ_KEYWORDS(obj) = GET_OBJ_KEYWORDS(proto);
+				msg_to_char(ch, "You restore its original keywords.\r\n");
+			}
+			else {
+				GET_OBJ_KEYWORDS(obj) = str_dup(argument);
+				msg_to_char(ch, "You change its keywords to '%s'.\r\n", GET_OBJ_KEYWORDS(obj));
+			}
 		}
 	}
 	else if (is_abbrev(field_arg, "longdescription")) {
@@ -4915,11 +4923,19 @@ ACMD(do_oset) {
 			msg_to_char(ch, "Set the long description to what?\r\n");
 		}
 		else {
-			if (GET_OBJ_LONG_DESC(obj) && (!(proto = obj_proto(GET_OBJ_VNUM(obj))) || GET_OBJ_LONG_DESC(obj) != GET_OBJ_LONG_DESC(proto))) {
+			proto = obj_proto(GET_OBJ_VNUM(obj));
+			
+			if (GET_OBJ_LONG_DESC(obj) && (!proto || GET_OBJ_LONG_DESC(obj) != GET_OBJ_LONG_DESC(proto))) {
 				free(GET_OBJ_LONG_DESC(obj));
 			}
-			GET_OBJ_LONG_DESC(obj) = str_dup(argument);
-			msg_to_char(ch, "You change its long description to '%s'.\r\n", GET_OBJ_LONG_DESC(obj));
+			if (proto && !str_cmp(argument, "none")) {
+				GET_OBJ_LONG_DESC(obj) = GET_OBJ_LONG_DESC(proto);
+				msg_to_char(ch, "You restore its original long description.\r\n");
+			}
+			else {
+				GET_OBJ_LONG_DESC(obj) = str_dup(argument);
+				msg_to_char(ch, "You change its long description to '%s'.\r\n", GET_OBJ_LONG_DESC(obj));
+			}
 		}
 	}
 	else if (is_abbrev(field_arg, "shortdescription")) {
@@ -4927,11 +4943,19 @@ ACMD(do_oset) {
 			msg_to_char(ch, "Set the short description to what?\r\n");
 		}
 		else {
-			if (GET_OBJ_SHORT_DESC(obj) && (!(proto = obj_proto(GET_OBJ_VNUM(obj))) || GET_OBJ_SHORT_DESC(obj) != GET_OBJ_SHORT_DESC(proto))) {
+			proto = obj_proto(GET_OBJ_VNUM(obj));
+			
+			if (GET_OBJ_SHORT_DESC(obj) && (!proto || GET_OBJ_SHORT_DESC(obj) != GET_OBJ_SHORT_DESC(proto))) {
 				free(GET_OBJ_SHORT_DESC(obj));
 			}
-			GET_OBJ_SHORT_DESC(obj) = str_dup(argument);
-			msg_to_char(ch, "You change its short description to '%s'.\r\n", GET_OBJ_SHORT_DESC(obj));
+			if (proto && !str_cmp(argument, "none")) {
+				GET_OBJ_SHORT_DESC(obj) = GET_OBJ_SHORT_DESC(proto);
+				msg_to_char(ch, "You restore its original short description.\r\n");
+			}
+			else {
+				GET_OBJ_SHORT_DESC(obj) = str_dup(argument);
+				msg_to_char(ch, "You change its short description to '%s'.\r\n", GET_OBJ_SHORT_DESC(obj));
+			}
 		}
 	}
 	else if (is_abbrev(field_arg, "timer")) {
