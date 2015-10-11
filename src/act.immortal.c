@@ -4898,7 +4898,7 @@ ACMD(do_omodify) {
 	else if (is_abbrev(field_arg, "flags")) {
 		GET_OBJ_EXTRA(obj) = olc_process_flag(ch, argument, "extra", "omodify object flags", extra_bits, GET_OBJ_EXTRA(obj));
 	}
-	else if (is_abbrev(field_arg, "keywords")) {
+	else if (is_abbrev(field_arg, "keywords") || is_abbrev(field_arg, "aliases")) {
 		if (!*argument) {
 			msg_to_char(ch, "Set the keywords to what?\r\n");
 		}
