@@ -189,11 +189,12 @@ void perform_immort_invis(char_data *ch, int level) {
 
 /* Immortal visible command, different than mortals' */
 void perform_immort_vis(char_data *ch) {
-	if (GET_INVIS_LEV(ch) == 0 && !AFF_FLAGGED(ch, AFF_HIDE)) {
+	if (GET_INVIS_LEV(ch) == 0 && !AFF_FLAGGED(ch, AFF_HIDE) && !PRF_FLAGGED(ch, PRF_WIZHIDE | PRF_INCOGNITO)) {
 		send_to_char("You are already fully visible.\r\n", ch);
 		return;
 	}
-
+	
+	REMOVE_BIT(PRF_FLAGS(ch), PRF_WIZHIDE | PRF_INCOGNITO);
 	GET_INVIS_LEV(ch) = 0;
 	appear(ch);
 	send_to_char("You are now fully visible.\r\n", ch);
@@ -6043,11 +6044,6 @@ ACMD(do_vnum) {
 	if (!*buf || !*buf2) {
 		send_to_char("Usage: vnum <type> <name>\r\n", ch);
 	}
-	else if (is_abbrev(buf, "book")) {
-		if (!vnum_book(buf2, ch)) {
-			send_to_char("No books by that name.\r\n", ch);
-		}
-	}
 	else if (is_abbrev(buf, "mob")) {
 		if (!vnum_mobile(buf2, ch)) {
 			send_to_char("No mobiles by that name.\r\n", ch);
@@ -6071,6 +6067,11 @@ ACMD(do_vnum) {
 	else if (is_abbrev(buf, "building")) {
 		if (!vnum_building(buf2, ch)) {
 			msg_to_char(ch, "No buildings by that name.\r\n");
+		}
+	}
+	else if (is_abbrev(buf, "book")) {
+		if (!vnum_book(buf2, ch)) {
+			send_to_char("No books by that name.\r\n", ch);
 		}
 	}
 	else if (is_abbrev(buf, "crop")) {
