@@ -335,7 +335,7 @@ void construct_tunnel(char_data *ch, int dir, room_data *entrance, room_data *ex
 */
 void disassociate_building(room_data *room) {
 	void decustomize_room(room_data *room);
-	extern struct instance_data *find_instance_by_room(room_data *room);
+	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 	void remove_designate_objects(room_data *room);
 	
 	room_data *iter, *next_iter;
@@ -343,7 +343,7 @@ void disassociate_building(room_data *room) {
 	bool deleted = FALSE;
 	
 	// delete any open instance here
-	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE) && (inst = find_instance_by_room(room))) {
+	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE) && (inst = find_instance_by_room(room, FALSE))) {
 		SET_BIT(inst->flags, INST_COMPLETED);
 	}
 	

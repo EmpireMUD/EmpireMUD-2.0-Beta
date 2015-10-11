@@ -56,7 +56,7 @@ extern char *show_color_codes(char *string);
 * @param char *argument The typed argument.
 */
 void adventure_summon(char_data *ch, char *argument) {
-	extern struct instance_data *find_instance_by_room(room_data *room);
+	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 	
 	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	struct instance_data *inst;
@@ -67,7 +67,7 @@ void adventure_summon(char_data *ch, char *argument) {
 	if (GET_POS(ch) < POS_STANDING) {
 		msg_to_char(ch, "You can't do that right now.\r\n");
 	}
-	else if (!IS_ADVENTURE_ROOM(IN_ROOM(ch)) || !(inst = find_instance_by_room(IN_ROOM(ch)))) {
+	else if (!IS_ADVENTURE_ROOM(IN_ROOM(ch)) || !(inst = find_instance_by_room(IN_ROOM(ch), FALSE))) {
 		msg_to_char(ch, "You can only use the adventure summon command inside an adventure.\r\n");
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {

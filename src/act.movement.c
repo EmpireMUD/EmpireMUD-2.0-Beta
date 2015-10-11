@@ -113,7 +113,7 @@ void add_tracks(char_data *ch, room_data *room, byte dir) {
 */
 bool can_enter_room(char_data *ch, room_data *room) {
 	extern bool can_enter_instance(char_data *ch, struct instance_data *inst);
-	extern struct instance_data *find_instance_by_room(room_data *room);
+	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 	
 	struct instance_data *inst;
 	
@@ -123,9 +123,9 @@ bool can_enter_room(char_data *ch, room_data *room) {
 	}
 	
 	// player limit
-	if (IS_ADVENTURE_ROOM(room) && (inst = find_instance_by_room(room))) {
+	if (IS_ADVENTURE_ROOM(room) && (inst = find_instance_by_room(room, FALSE))) {
 		// only if not already in there
-		if (!IS_ADVENTURE_ROOM(IN_ROOM(ch)) || find_instance_by_room(IN_ROOM(ch)) != inst) {
+		if (!IS_ADVENTURE_ROOM(IN_ROOM(ch)) || find_instance_by_room(IN_ROOM(ch), FALSE) != inst) {
 			if (!can_enter_instance(ch, inst)) {
 				return FALSE;
 			}

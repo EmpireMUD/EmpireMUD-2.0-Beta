@@ -1220,7 +1220,7 @@ void char_from_room(char_data *ch) {
 */
 void char_to_room(char_data *ch, room_data *room) {
 	extern int determine_best_scale_level(char_data *ch, bool check_group);
-	extern struct instance_data *find_instance_by_room(room_data *room);
+	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 	extern int lock_instance_level(room_data *room, int level);
 	void msdp_update_room(char_data *ch);
 	void spawn_mobs_from_center(room_data *center);
@@ -1260,7 +1260,7 @@ void char_to_room(char_data *ch, room_data *room) {
 		}
 		
 		// look for an instance to lock
-		if (!IS_NPC(ch) && IS_ADVENTURE_ROOM(room) && (inst = find_instance_by_room(room))) {
+		if (!IS_NPC(ch) && IS_ADVENTURE_ROOM(room) && (inst = find_instance_by_room(room, FALSE))) {
 			if (ADVENTURE_FLAGGED(inst->adventure, ADV_LOCK_LEVEL_ON_ENTER) && !IS_IMMORTAL(ch)) {
 				lock_instance_level(room, determine_best_scale_level(ch, TRUE));
 			}

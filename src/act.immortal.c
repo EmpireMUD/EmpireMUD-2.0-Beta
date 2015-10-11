@@ -65,7 +65,6 @@ void get_icons_display(struct icon_data *list, char *save_buffer);
 void get_interaction_display(struct interaction_item *list, char *save_buffer);
 void get_script_display(struct trig_proto_list *list, char *save_buffer);
 extern char *get_room_name(room_data *room, bool color);
-void save_instances();
 void save_whole_world();
 void scale_mob_to_level(char_data *mob, int level);
 extern char *show_color_codes(char *string);
@@ -640,7 +639,6 @@ void do_instance_add(char_data *ch, char *argument) {
 				// make it so!
 				if (build_instance_loc(adv, rule, loc, dir)) {
 					found = TRUE;
-					save_instances();
 				}
 			}
 		}
@@ -678,7 +676,6 @@ void do_instance_delete(char_data *ch, char *argument) {
 			}
 			msg_to_char(ch, "Instance of %s deleted.\r\n", GET_ADV_NAME(inst->adventure));
 			delete_instance(inst);
-			save_instances();
 			break;
 		}
 	}
@@ -708,8 +705,6 @@ void do_instance_delete_all(char_data *ch, char *argument) {
 			delete_instance(inst);
 		}
 	}
-	
-	save_instances();
 	
 	if (count > 0) {
 		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s deleted %d instances of %s", GET_REAL_NAME(ch), count, GET_ADV_NAME(adv));
@@ -793,7 +788,7 @@ void do_instance_nearby(char_data *ch, char *argument) {
 
 
 void do_instance_reset(char_data *ch, char *argument) {
-	extern struct instance_data *find_instance_by_room(room_data *room);
+	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 	void reset_instance(struct instance_data *inst);
 
 	struct instance_data *inst;
@@ -821,7 +816,7 @@ void do_instance_reset(char_data *ch, char *argument) {
 	}
 	else {
 		// no argument
-		if (!(inst = find_instance_by_room(IN_ROOM(ch)))) {
+		if (!(inst = find_instance_by_room(IN_ROOM(ch), FALSE))) {
 			msg_to_char(ch, "You are not in or near an adventure zone instance.\r\n");
 			return;
 		}
@@ -895,7 +890,6 @@ void do_instance_test(char_data *ch, char *argument) {
 	
 	if (build_instance_loc(adv, &rule, IN_ROOM(ch), DIR_RANDOM)) {
 		found = TRUE;
-		save_instances();
 	}
 	
 	if (found) {

@@ -1694,7 +1694,7 @@ void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options)
 //// WHERE FUNCTIONS /////////////////////////////////////////////////////////
 
 void perform_mortal_where(char_data *ch, char *arg) {
-	extern struct instance_data *find_instance_by_room(room_data *room);
+	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 	
 	int check_x, check_y, closest, dir, dist, max_distance;
 	struct instance_data *ch_inst, *i_inst;
@@ -1720,8 +1720,8 @@ void perform_mortal_where(char_data *ch, char *arg) {
 			if ((dist = compute_distance(IN_ROOM(ch), IN_ROOM(i))) > max_distance)
 				continue;
 			
-			ch_inst = find_instance_by_room(IN_ROOM(ch));
-			i_inst = find_instance_by_room(IN_ROOM(i));
+			ch_inst = find_instance_by_room(IN_ROOM(ch), FALSE);
+			i_inst = find_instance_by_room(IN_ROOM(i), FALSE);
 			if (ch_inst != i_inst || IS_ADVENTURE_ROOM(IN_ROOM(i)) != !IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
 				// not in same adventure...
 				if (RMT_FLAGGED(IN_ROOM(ch), RMT_NO_LOCATION) || RMT_FLAGGED(IN_ROOM(i), RMT_NO_LOCATION)) {
@@ -1773,9 +1773,9 @@ void perform_mortal_where(char_data *ch, char *arg) {
 			if ((dist = compute_distance(IN_ROOM(ch), IN_ROOM(i))) > max_distance)
 				continue;
 				
-			ch_inst = find_instance_by_room(IN_ROOM(ch));
-			i_inst = find_instance_by_room(IN_ROOM(i));
-			if (i_inst != ch_inst || find_instance_by_room(IN_ROOM(ch)) != find_instance_by_room(IN_ROOM(i))) {
+			ch_inst = find_instance_by_room(IN_ROOM(ch), FALSE);
+			i_inst = find_instance_by_room(IN_ROOM(i), FALSE);
+			if (i_inst != ch_inst || find_instance_by_room(IN_ROOM(ch), FALSE) != find_instance_by_room(IN_ROOM(i), FALSE)) {
 				// not in same adventure...
 				if (RMT_FLAGGED(IN_ROOM(ch), RMT_NO_LOCATION) || RMT_FLAGGED(IN_ROOM(i), RMT_NO_LOCATION)) {
 					// one or the other is set no-location

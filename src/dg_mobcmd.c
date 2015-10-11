@@ -819,7 +819,7 @@ ACMD(do_mat) {
 * everyone in the current room to the specified location
 */
 ACMD(do_mteleport) {
-	extern struct instance_data *find_instance_by_room(room_data *room);
+	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	room_data *target;
