@@ -497,6 +497,11 @@ void check_for_bad_buildings(void) {
 			log(" removing building at %d for bad building type", GET_ROOM_VNUM(room));
 			disassociate_building(room);
 		}
+		else if (IS_CITY_CENTER(room) && (!ROOM_OWNER(room) || !find_city_entry(ROOM_OWNER(room), room))) {
+			// city center with no matching city
+			log(" removing city center at %d for lack of city entry", GET_ROOM_VNUM(room));
+			disassociate_building(room);
+		}
 		else if (GET_ROOM_VNUM(room) >= MAP_SIZE && ROOM_SECT_FLAGGED(room, SECTF_INSIDE) && !GET_BUILDING(room)) {
 			// designated room
 			log(" deleting room %d for bad building type", GET_ROOM_VNUM(room));
