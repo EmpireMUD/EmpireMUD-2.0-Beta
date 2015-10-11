@@ -511,9 +511,9 @@ Allows you to hear or ignore messages coming over the wiznet.
 
 See also: WIZNET, TOGGLE
 #d
-OMODIFY "RESTRING OBJECT"
+OSET "RESTRING OBJECT"
 
-Usage:  omodify <object> <field> <value>
+Usage:  oset <object> <field> <value>
 
 This command lets you modify an item in the world. It does not change the
 item's prototype; to do that you must use OLC. This command is grantable.

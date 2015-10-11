@@ -4881,7 +4881,7 @@ ACMD(do_moveeinv) {
 }
 
 
-ACMD(do_omodify) {
+ACMD(do_oset) {
 	char obj_arg[MAX_INPUT_LENGTH], field_arg[MAX_INPUT_LENGTH];
 	obj_data *obj, *proto;
 	
@@ -4890,13 +4890,13 @@ ACMD(do_omodify) {
 	skip_spaces(&argument);	// remainder
 	
 	if (!*obj_arg || !*field_arg) {
-		msg_to_char(ch, "Usage: omodify <object> <field> <value>\r\n");
+		msg_to_char(ch, "Usage: oset <object> <field> <value>\r\n");
 	}
 	else if (!(obj = get_obj_in_list_vis(ch, obj_arg, ch->carrying)) && !(obj = get_obj_in_list_vis(ch, obj_arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
 		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(obj_arg), obj_arg);
 	}
 	else if (is_abbrev(field_arg, "flags")) {
-		GET_OBJ_EXTRA(obj) = olc_process_flag(ch, argument, "extra", "omodify object flags", extra_bits, GET_OBJ_EXTRA(obj));
+		GET_OBJ_EXTRA(obj) = olc_process_flag(ch, argument, "extra", "oset name flags", extra_bits, GET_OBJ_EXTRA(obj));
 	}
 	else if (is_abbrev(field_arg, "keywords") || is_abbrev(field_arg, "aliases")) {
 		if (!*argument) {

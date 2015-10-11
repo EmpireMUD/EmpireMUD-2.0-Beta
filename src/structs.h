@@ -1241,7 +1241,7 @@ typedef struct trig_data trig_data;
 #define GRANT_HOSTILE  BIT(33)
 #define GRANT_SLAY  BIT(34)
 #define GRANT_ISLAND  BIT(35)
-#define GRANT_OMODIFY  BIT(36)
+#define GRANT_OSET  BIT(36)
 
 
 // Lore types

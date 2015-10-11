@@ -338,7 +338,7 @@ const char *grant_bits[] = {
 	"hostile",
 	"slay",
 	"island",	// 35
-	"omodify",
+	"oset",
 	"\n"
 };
 
