@@ -24,6 +24,7 @@
 #include "interpreter.h"
 #include "skills.h"
 #include "dg_scripts.h"
+#include "vnums.h"
 
 /**
 * Contents:
@@ -2423,6 +2424,11 @@ void perform_abandon_room(room_data *room) {
 
 	if (ROOM_PRIVATE_OWNER(room) != NOBODY) {
 		COMPLEX_DATA(room)->private_owner = NOBODY;
+	}
+	
+	// if a city center is abandoned, destroy it
+	if (IS_CITY_CENTER(room)) {
+		disassociate_building(room);
 	}
 }
 
