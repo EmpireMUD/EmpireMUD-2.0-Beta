@@ -3657,6 +3657,20 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 	new->last_owner_id = obj->last_owner_id;
 	new->last_empire_id = obj->last_empire_id;
 	
+	// custom strings?
+	if (GET_OBJ_SHORT_DESC(obj) && GET_OBJ_SHORT_DESC(obj) != GET_OBJ_SHORT_DESC(proto)) {
+		GET_OBJ_SHORT_DESC(new) = str_dup(GET_OBJ_SHORT_DESC(obj));
+	}
+	if (GET_OBJ_LONG_DESC(obj) && GET_OBJ_LONG_DESC(obj) != GET_OBJ_LONG_DESC(proto)) {
+		GET_OBJ_LONG_DESC(new) = str_dup(GET_OBJ_LONG_DESC(obj));
+	}
+	if (GET_OBJ_KEYWORDS(obj) && GET_OBJ_KEYWORDS(obj) != GET_OBJ_KEYWORDS(proto)) {
+		GET_OBJ_KEYWORDS(new) = str_dup(GET_OBJ_KEYWORDS(obj));
+	}
+	if (GET_OBJ_ACTION_DESC(obj) && GET_OBJ_ACTION_DESC(obj) != GET_OBJ_ACTION_DESC(proto)) {
+		GET_OBJ_ACTION_DESC(new) = str_dup(GET_OBJ_ACTION_DESC(obj));
+	}
+	
 	// certain things that must always copy over
 	switch (GET_OBJ_TYPE(new)) {
 		case ITEM_ARROW: {
