@@ -510,10 +510,10 @@ void summon_player(char_data *ch, char *argument) {
 		
 		act("You start summoning $N...", FALSE, ch, NULL, vict, TO_CHAR);
 		if (HAS_ABILITY(vict, ABIL_NAVIGATION)) {
-			snprintf(buf, sizeof(buf), "$n is trying to summon you to %s (%d, %d) -- use 'accept/reject summon'.", get_room_name(IN_ROOM(ch), FALSE), X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
+			snprintf(buf, sizeof(buf), "$o is trying to summon you to %s (%d, %d) -- use 'accept/reject summon'.", get_room_name(IN_ROOM(ch), FALSE), X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
 		}
 		else {
-			snprintf(buf, sizeof(buf), "$n is trying to summon you to %s -- use 'accept/reject summon'.", get_room_name(IN_ROOM(ch), FALSE));
+			snprintf(buf, sizeof(buf), "$o is trying to summon you to %s -- use 'accept/reject summon'.", get_room_name(IN_ROOM(ch), FALSE));
 		}
 		act(buf, FALSE, ch, NULL, vict, TO_VICT | TO_SLEEP);
 		add_offer(vict, ch, OFFER_SUMMON, SUMMON_PLAYER);
