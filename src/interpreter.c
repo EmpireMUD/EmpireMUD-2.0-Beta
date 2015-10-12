@@ -1315,6 +1315,7 @@ int perform_alias(descriptor_data *d, char *orig) {
 
 /* The interface to the outside world: do_alias */
 ACMD(do_alias) {
+	extern char *show_color_codes(char *string);
 	void write_aliases(char_data *ch);
 	
 	char *repl;
@@ -1331,7 +1332,7 @@ ACMD(do_alias) {
 			send_to_char(" None.\r\n", ch);
 		else {
 			while (a != NULL) {
-				sprintf(buf, "%-15s %s\r\n", a->alias, a->replacement);
+				sprintf(buf, "%-15s %s\r\n", a->alias, show_color_codes(a->replacement));
 				send_to_char(buf, ch);
 				a = a->next;
 			}
