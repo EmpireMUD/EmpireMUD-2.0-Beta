@@ -1824,11 +1824,11 @@ ACMD(do_lay) {
 ACMD(do_maintain) {
 	Resource res[3] = { { o_LUMBER, BUILDING_DISREPAIR(IN_ROOM(ch)) }, { o_NAILS, BUILDING_DISREPAIR(IN_ROOM(ch)) }, END_RESOURCE_LIST };
 	
-	if (BUILDING_DISREPAIR(IN_ROOM(ch)) <= 0) {
-		msg_to_char(ch, "It needs no maintenance.\r\n");
-	}
-	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+	if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		msg_to_char(ch, "You can't perform maintenance here.\r\n");
+	}
+	else if (BUILDING_DISREPAIR(IN_ROOM(ch)) <= 0) {
+		msg_to_char(ch, "It needs no maintenance.\r\n");
 	}
 	else if (!has_resources(ch, res, TRUE, TRUE)) {
 		// sends own messages
