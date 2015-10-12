@@ -6056,10 +6056,8 @@ int sort_globals(struct global_data *a, struct global_data *b) {
 int sort_empires(empire_data *a, empire_data *b) {
 	extern int get_total_score(empire_data *emp);
 	
-	int whole_empire_timeout = config_get_int("whole_empire_timeout") * SECS_PER_REAL_DAY;
-	
-	bool a_timeout = (EMPIRE_LAST_LOGON(a) < (time(0) - whole_empire_timeout)) ? TRUE : FALSE;
-	bool b_timeout = (EMPIRE_LAST_LOGON(b) < (time(0) - whole_empire_timeout)) ? TRUE : FALSE;
+	bool a_timeout = EMPIRE_IS_TIMED_OUT(a);
+	bool b_timeout = EMPIRE_IS_TIMED_OUT(b);
 
 	int a_score = get_total_score(a), b_score = get_total_score(b);
 

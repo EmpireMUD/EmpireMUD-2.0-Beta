@@ -406,6 +406,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 // helpers
 #define EMPIRE_HAS_TECH(emp, num)  (EMPIRE_TECH((emp), (num)) > 0)
 #define EMPIRE_HAS_TECH_ON_ISLAND(emp, ii, tt)  (((emp) && (ii) != NO_ISLAND) ? EMPIRE_ISLAND_TECH(emp, ii, tt) : FALSE)
+#define EMPIRE_IS_TIMED_OUT(emp)  (EMPIRE_LAST_LOGON(emp) + (config_get_int("whole_empire_timeout") * SECS_PER_REAL_DAY) < time(0))
 #define GET_TOTAL_WEALTH(emp)  (EMPIRE_WEALTH(emp) + (int)(EMPIRE_COINS(emp) * COIN_VALUE))
 
 // definitions

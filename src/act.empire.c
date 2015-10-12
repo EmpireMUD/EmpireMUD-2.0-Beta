@@ -2776,8 +2776,6 @@ ACMD(do_emotd) {
 
 
 ACMD(do_empires) {
-	int whole_empire_timeout = config_get_int("whole_empire_timeout") * SECS_PER_REAL_DAY;
-
 	empire_data *e, *emp, *next_emp;
 	char_data *vict = NULL;
 	int min = 1, count;
@@ -2882,7 +2880,7 @@ ACMD(do_empires) {
 		if (!all && (EMPIRE_CITY_TERRITORY(emp) + EMPIRE_OUTSIDE_TERRITORY(emp)) <= 0) {
 			continue;
 		}
-		if (!all && EMPIRE_LAST_LOGON(emp) < (time(0) - whole_empire_timeout)) {
+		if (!all && EMPIRE_IS_TIMED_OUT(emp)) {
 			continue;
 		}
 		
