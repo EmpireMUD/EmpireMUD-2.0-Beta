@@ -3520,6 +3520,11 @@ ACMD(do_home) {
 			msg_to_char(ch, "You can't make this your home right now.\r\n");
 		}
 		else {
+			// if someone is overriding it
+			if (ROOM_PRIVATE_OWNER(real) != NOBODY) {
+				clear_private_owner(ROOM_PRIVATE_OWNER(real));
+			}
+			
 			// allow the player to set home here
 			clear_private_owner(GET_IDNUM(ch));
 			
