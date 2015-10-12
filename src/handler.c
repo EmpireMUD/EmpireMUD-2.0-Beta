@@ -4168,7 +4168,7 @@ void obj_to_char(obj_data *object, char_data *ch) {
 * @param char_data *ch The person to try to give it to.
 */
 void obj_to_char_or_room(obj_data *obj, char_data *ch) {
-	if (IS_CARRYING_N(ch) + GET_OBJ_INVENTORY_SIZE(obj) > CAN_CARRY_N(ch) && IN_ROOM(ch)) {
+	if (!IS_NPC(ch) && IS_CARRYING_N(ch) + GET_OBJ_INVENTORY_SIZE(obj) > CAN_CARRY_N(ch) && IN_ROOM(ch)) {
 		// bind it to the player anyway, as if they received it, if it's BoP
 		if (OBJ_FLAGGED(obj, OBJ_BIND_ON_PICKUP)) {
 			bind_obj_to_player(obj, ch);

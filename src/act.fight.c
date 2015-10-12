@@ -107,7 +107,7 @@ ACMD(do_catapult) {
 		msg_to_char(ch, "You don't even have a catapult.\r\n");
 	else if (!*argument)
 		msg_to_char(ch, "Which direction would you like to shoot?\r\n");
-	else if (!has_resources(ch, rocks, FALSE, TRUE))
+	else if (!has_resources(ch, rocks, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), TRUE))
 		{ /* This line intentionally left blank */ }
 	else if ((dir = parse_direction(ch, argument)) == NO_DIR)
 		msg_to_char(ch, "Which direction is that?\r\n");
@@ -134,7 +134,7 @@ ACMD(do_catapult) {
 			msg_to_char(ch, "You can't attack that acre!\r\n");
 			return;
 		}
-		extract_resources(ch, rocks, FALSE);
+		extract_resources(ch, rocks, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED));
 		sprintf(buf, "You shoot $p %s!", dirs[get_direction_for_char(ch, dir)]);
 		act(buf, FALSE, ch, catapult, 0, TO_CHAR);
 		

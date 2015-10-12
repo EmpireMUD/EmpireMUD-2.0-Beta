@@ -584,7 +584,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 		}
 	}
 	
-	if (!IS_IMMORTAL(ch) && IS_CARRYING_N(ch) > CAN_CARRY_N(ch)) {
+	if (!IS_IMMORTAL(ch) && !IS_NPC(ch) && IS_CARRYING_N(ch) > CAN_CARRY_N(ch)) {
 		msg_to_char(ch, "You are overburdened and cannot move.\r\n");
 		return FALSE;
 	}
@@ -1040,7 +1040,7 @@ ACMD(do_circle) {
 		return;
 	}
 	
-	if (!IS_IMMORTAL(ch) && IS_CARRYING_N(ch) > CAN_CARRY_N(ch)) {
+	if (!IS_IMMORTAL(ch) && !IS_NPC(ch) && IS_CARRYING_N(ch) > CAN_CARRY_N(ch)) {
 		msg_to_char(ch, "You are overburdened and cannot move.\r\n");
 		return;
 	}
@@ -1247,7 +1247,7 @@ ACMD(do_enter) {
 		return;
 	}
 	
-	if (!IS_IMMORTAL(ch) && IS_CARRYING_N(ch) > CAN_CARRY_N(ch)) {
+	if (!IS_IMMORTAL(ch) && !IS_NPC(ch) && IS_CARRYING_N(ch) > CAN_CARRY_N(ch)) {
 		msg_to_char(ch, "You are overburdened and cannot move.\r\n");
 		return;
 	}
