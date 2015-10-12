@@ -1124,7 +1124,7 @@ ACMD(do_moonrise) {
 			charge_ability_cost(ch, MANA, cost, COOLDOWN_MOONRISE, 20 * SECS_PER_REAL_MIN, WAIT_SPELL);
 			msg_to_char(ch, "You let out a bone-chilling howl...\r\n");
 			act("$n lets out a bone-chilling howl...", FALSE, ch, NULL, NULL, TO_ROOM);
-			act("$N is attempting to resurrect you (use 'accept/reject resurrection').", FALSE, vict, NULL, ch, TO_CHAR | TO_NODARK);
+			act("$O is attempting to resurrect you (use 'accept/reject resurrection').", FALSE, vict, NULL, ch, TO_CHAR | TO_NODARK);
 			add_offer(vict, ch, OFFER_RESURRECTION, ABIL_MOONRISE);
 		}
 	}
@@ -1151,7 +1151,7 @@ ACMD(do_moonrise) {
 			charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
 			msg_to_char(ch, "You let out a bone-chilling howl...\r\n");
 			act("$n lets out a bone-chilling howl...", FALSE, ch, NULL, NULL, TO_ROOM);
-			act("$N is attempting to resurrect you (use 'accept/reject resurrection').", FALSE, vict, NULL, ch, TO_CHAR | TO_NODARK);
+			act("$O is attempting to resurrect you (use 'accept/reject resurrection').", FALSE, vict, NULL, ch, TO_CHAR | TO_NODARK);
 			add_offer(vict, ch, OFFER_RESURRECTION, ABIL_MOONRISE);
 		}
 	}
@@ -1339,7 +1339,7 @@ ACMD(do_resurrect) {
 			charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
 			act("You begin channeling mana to resurrect $O...", FALSE, ch, NULL, vict, TO_CHAR | TO_NODARK);
 			act("$n glows with white light as $e begins to channel $s mana to resurrect $O...", FALSE, ch, NULL, vict, TO_NOTVICT);
-			act("$N is attempting to resurrect you (use 'accept/reject resurrection').", FALSE, vict, NULL, ch, TO_CHAR | TO_NODARK);
+			act("$O is attempting to resurrect you (use 'accept/reject resurrection').", FALSE, vict, NULL, ch, TO_CHAR | TO_NODARK);
 			add_offer(vict, ch, OFFER_RESURRECTION, ABIL_RESURRECT);
 		}
 	}
@@ -1366,7 +1366,7 @@ ACMD(do_resurrect) {
 			charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
 			act("You begin channeling mana to resurrect $O...", FALSE, ch, NULL, vict, TO_CHAR | TO_NODARK);
 			act("$n glows with white light as $e begins to channel $s mana to resurrect $O...", FALSE, ch, NULL, vict, TO_NOTVICT);
-			act("$N is attempting to resurrect you (use 'accept/reject resurrection').", FALSE, vict, NULL, ch, TO_CHAR | TO_NODARK);
+			act("$O is attempting to resurrect you (use 'accept/reject resurrection').", FALSE, vict, NULL, ch, TO_CHAR | TO_NODARK);
 			add_offer(vict, ch, OFFER_RESURRECTION, ABIL_RESURRECT);
 		}
 	}

@@ -108,7 +108,7 @@ void adventure_summon(char_data *ch, char *argument) {
 	}
 	else {
 		act("You start summoning $N...", FALSE, ch, NULL, vict, TO_CHAR);
-		snprintf(buf, sizeof(buf), "$n is trying to summon you to %s (%s) -- use 'accept/reject summon'.", GET_ADV_NAME(inst->adventure), get_room_name(IN_ROOM(ch), FALSE));
+		snprintf(buf, sizeof(buf), "$o is trying to summon you to %s (%s) -- use 'accept/reject summon'.", GET_ADV_NAME(inst->adventure), get_room_name(IN_ROOM(ch), FALSE));
 		act(buf, FALSE, ch, NULL, vict, TO_VICT | TO_SLEEP);
 		add_offer(vict, ch, OFFER_SUMMON, SUMMON_ADVENTURE);
 		command_lag(ch, WAIT_OTHER);
@@ -744,7 +744,7 @@ ACMD(do_accept) {
 				}
 				
 				ts = time(0) - offer->time;
-				msg_to_char(ch, " %s - %s (%d seconds left)\r\n", GET_NAME(from), offer_types[offer->type].name, MAX(0, max_duration - ts));
+				msg_to_char(ch, " %s - %s (%d seconds left)\r\n", PERS(from, ch, TRUE), offer_types[offer->type].name, MAX(0, max_duration - ts));
 				found = TRUE;
 			}
 			if (!found) {
