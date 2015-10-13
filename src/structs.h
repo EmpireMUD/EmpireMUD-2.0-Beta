@@ -801,7 +801,7 @@ typedef struct trig_data trig_data;
 
 
 // misc game configs
-#define ACTION_CYCLE_TIME  6	// seconds per action tick (before haste) -- TODO should this be a config?
+#define ACTION_CYCLE_TIME  5	// seconds per action tick (before haste) -- TODO should this be a config?
 #define SKILLS_PER_CLASS  2	// number of skills that makes up a combo class
 #define HISTORY_SIZE  5	// Keep last 5 commands.
 
