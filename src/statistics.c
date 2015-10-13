@@ -132,7 +132,7 @@ void display_statistics_to_char(char_data *ch) {
 	
 	// build strings
 	HASH_ITER(hh, empire_table, emp, next_emp) {
-		if (EMPIRE_IMM_ONLY(emp) && EMPIRE_IS_TIMED_OUT(emp)) {
+		if (EMPIRE_IMM_ONLY(emp) || EMPIRE_IS_TIMED_OUT(emp)) {
 			continue;
 		}
 		
