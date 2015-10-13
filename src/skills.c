@@ -1577,6 +1577,9 @@ bool has_cooking_fire(char_data *ch) {
 	if (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_COOKING_FIRE)) {	
 		return TRUE;
 	}
+	if (RMT_FLAGGED(IN_ROOM(ch), RMT_COOKING_FIRE)) {	
+		return TRUE;
+	}
 	
 	for (obj = ROOM_CONTENTS(IN_ROOM(ch)); obj; obj = obj->next_content) {
 		if (OBJ_FLAGGED(obj, OBJ_LIGHT) && !CAN_WEAR(obj, ITEM_WEAR_TAKE)) {

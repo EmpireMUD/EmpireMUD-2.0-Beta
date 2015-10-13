@@ -338,7 +338,7 @@ typedef struct trig_data trig_data;
 #define INST_COMPLETED  BIT(0)	// instance is done and can be cleaned up
 
 
-// room template flags
+// RMT_X: room template flags
 #define RMT_OUTDOOR  BIT(0)	// a. sun during day
 #define RMT_DARK  BIT(1)	// b. requires a light at all times
 #define RMT_LIGHT  BIT(2)	// c. never requires a light
@@ -348,6 +348,8 @@ typedef struct trig_data trig_data;
 #define RMT_NO_TELEPORT  BIT(6)	// g. cannot teleport in/out
 #define RMT_LOOK_OUT  BIT(7)	// h. can see the map using "look out"
 #define RMT_NO_LOCATION  BIT(8)	// i. don't show a location, disables where
+#define RMT_PIGEON_POST  BIT(9)	// j. can use mail here
+#define RMT_COOKING_FIRE  BIT(10)	// k. can cook here
 
 
  //////////////////////////////////////////////////////////////////////////////

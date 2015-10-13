@@ -162,6 +162,8 @@ const char *room_template_flags[] = {
 	"!TELEPORT",
 	"LOOK-OUT",
 	"!LOCATION",
+	"PIGEON-POST",
+	"COOKING-FIRE",
 	"\n"
 };
 
