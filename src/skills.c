@@ -320,6 +320,10 @@ void check_skill_sell(char_data *ch, int abil) {
 			despawn_familiar(ch, FAMILIAR_SPIRIT_WOLF);
 			break;
 		}
+		case ABIL_SOULMASK: {
+			affect_from_char(ch, ATYPE_SOULMASK);
+			break;
+		}
 		case ABIL_TOWERING_WEREWOLF_FORM: {
 			if (GET_MORPH(ch) == MORPH_TOWERING_WEREWOLF) {
 				perform_morph(ch, MORPH_NONE);

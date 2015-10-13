@@ -47,6 +47,7 @@ extern const char *bonus_bits[];
 extern const char *climate_types[];
 extern const char *dirs[];
 extern const char *drinks[];
+extern const char *extra_bits[];
 extern const char *genders[];
 extern const char *grant_bits[];
 extern const char *island_bits[];
@@ -65,7 +66,6 @@ void get_icons_display(struct icon_data *list, char *save_buffer);
 void get_interaction_display(struct interaction_item *list, char *save_buffer);
 void get_script_display(struct trig_proto_list *list, char *save_buffer);
 extern char *get_room_name(room_data *room, bool color);
-void save_instances();
 void save_whole_world();
 void scale_mob_to_level(char_data *mob, int level);
 extern char *show_color_codes(char *string);
@@ -640,7 +640,6 @@ void do_instance_add(char_data *ch, char *argument) {
 				// make it so!
 				if (build_instance_loc(adv, rule, loc, dir)) {
 					found = TRUE;
-					save_instances();
 				}
 			}
 		}
@@ -678,7 +677,6 @@ void do_instance_delete(char_data *ch, char *argument) {
 			}
 			msg_to_char(ch, "Instance of %s deleted.\r\n", GET_ADV_NAME(inst->adventure));
 			delete_instance(inst);
-			save_instances();
 			break;
 		}
 	}
@@ -708,8 +706,6 @@ void do_instance_delete_all(char_data *ch, char *argument) {
 			delete_instance(inst);
 		}
 	}
-	
-	save_instances();
 	
 	if (count > 0) {
 		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s deleted %d instances of %s", GET_REAL_NAME(ch), count, GET_ADV_NAME(adv));
@@ -793,7 +789,7 @@ void do_instance_nearby(char_data *ch, char *argument) {
 
 
 void do_instance_reset(char_data *ch, char *argument) {
-	extern struct instance_data *find_instance_by_room(room_data *room);
+	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 	void reset_instance(struct instance_data *inst);
 
 	struct instance_data *inst;
@@ -821,7 +817,7 @@ void do_instance_reset(char_data *ch, char *argument) {
 	}
 	else {
 		// no argument
-		if (!(inst = find_instance_by_room(IN_ROOM(ch)))) {
+		if (!(inst = find_instance_by_room(IN_ROOM(ch), FALSE))) {
 			msg_to_char(ch, "You are not in or near an adventure zone instance.\r\n");
 			return;
 		}
@@ -895,7 +891,6 @@ void do_instance_test(char_data *ch, char *argument) {
 	
 	if (build_instance_loc(adv, &rule, IN_ROOM(ch), DIR_RANDOM)) {
 		found = TRUE;
-		save_instances();
 	}
 	
 	if (found) {
@@ -2854,7 +2849,6 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	extern const struct material_data materials[NUM_MATERIALS];
 	extern const char *wear_bits[];
 	extern const char *item_types[];
-	extern const char *extra_bits[];
 	extern const char *container_bits[];
 	extern const char *obj_custom_types[];
 	extern const char *storage_bits[];
@@ -4883,6 +4877,98 @@ ACMD(do_moveeinv) {
 		else {
 			msg_to_char(ch, "No items to move.\r\n");
 		}
+	}
+}
+
+
+ACMD(do_oset) {
+	char obj_arg[MAX_INPUT_LENGTH], field_arg[MAX_INPUT_LENGTH];
+	obj_data *obj, *proto;
+	
+	argument = one_argument(argument, obj_arg);
+	argument = any_one_arg(argument, field_arg);
+	skip_spaces(&argument);	// remainder
+	
+	if (!*obj_arg || !*field_arg) {
+		msg_to_char(ch, "Usage: oset <object> <field> <value>\r\n");
+	}
+	else if (!(obj = get_obj_in_list_vis(ch, obj_arg, ch->carrying)) && !(obj = get_obj_in_list_vis(ch, obj_arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
+		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(obj_arg), obj_arg);
+	}
+	else if (is_abbrev(field_arg, "flags")) {
+		GET_OBJ_EXTRA(obj) = olc_process_flag(ch, argument, "extra", "oset name flags", extra_bits, GET_OBJ_EXTRA(obj));
+	}
+	else if (is_abbrev(field_arg, "keywords") || is_abbrev(field_arg, "aliases")) {
+		if (!*argument) {
+			msg_to_char(ch, "Set the keywords to what?\r\n");
+		}
+		else {
+			proto = obj_proto(GET_OBJ_VNUM(obj));
+			
+			if (GET_OBJ_KEYWORDS(obj) && (!proto || GET_OBJ_KEYWORDS(obj) != GET_OBJ_KEYWORDS(proto))) {
+				free(GET_OBJ_KEYWORDS(obj));
+			}
+			if (proto && !str_cmp(argument, "none")) {
+				GET_OBJ_KEYWORDS(obj) = GET_OBJ_KEYWORDS(proto);
+				msg_to_char(ch, "You restore its original keywords.\r\n");
+			}
+			else {
+				GET_OBJ_KEYWORDS(obj) = str_dup(argument);
+				msg_to_char(ch, "You change its keywords to '%s'.\r\n", GET_OBJ_KEYWORDS(obj));
+			}
+		}
+	}
+	else if (is_abbrev(field_arg, "longdescription")) {
+		if (!*argument) {
+			msg_to_char(ch, "Set the long description to what?\r\n");
+		}
+		else {
+			proto = obj_proto(GET_OBJ_VNUM(obj));
+			
+			if (GET_OBJ_LONG_DESC(obj) && (!proto || GET_OBJ_LONG_DESC(obj) != GET_OBJ_LONG_DESC(proto))) {
+				free(GET_OBJ_LONG_DESC(obj));
+			}
+			if (proto && !str_cmp(argument, "none")) {
+				GET_OBJ_LONG_DESC(obj) = GET_OBJ_LONG_DESC(proto);
+				msg_to_char(ch, "You restore its original long description.\r\n");
+			}
+			else {
+				GET_OBJ_LONG_DESC(obj) = str_dup(argument);
+				msg_to_char(ch, "You change its long description to '%s'.\r\n", GET_OBJ_LONG_DESC(obj));
+			}
+		}
+	}
+	else if (is_abbrev(field_arg, "shortdescription")) {
+		if (!*argument) {
+			msg_to_char(ch, "Set the short description to what?\r\n");
+		}
+		else {
+			proto = obj_proto(GET_OBJ_VNUM(obj));
+			
+			if (GET_OBJ_SHORT_DESC(obj) && (!proto || GET_OBJ_SHORT_DESC(obj) != GET_OBJ_SHORT_DESC(proto))) {
+				free(GET_OBJ_SHORT_DESC(obj));
+			}
+			if (proto && !str_cmp(argument, "none")) {
+				GET_OBJ_SHORT_DESC(obj) = GET_OBJ_SHORT_DESC(proto);
+				msg_to_char(ch, "You restore its original short description.\r\n");
+			}
+			else {
+				GET_OBJ_SHORT_DESC(obj) = str_dup(argument);
+				msg_to_char(ch, "You change its short description to '%s'.\r\n", GET_OBJ_SHORT_DESC(obj));
+			}
+		}
+	}
+	else if (is_abbrev(field_arg, "timer")) {
+		if (!*argument || (!isdigit(*argument) && *argument != '-')) {
+			msg_to_char(ch, "Set the timer to what?\r\n");
+		}
+		else {
+			GET_OBJ_TIMER(obj) = atoi(argument);
+			msg_to_char(ch, "You change its timer to %d.\r\n", GET_OBJ_TIMER(obj));
+		}
+	}
+	else {
+		msg_to_char(ch, "Invalid field.\r\n");
 	}
 }
 

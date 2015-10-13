@@ -479,7 +479,7 @@ void add_trd_owner(room_vnum vnum, empire_vnum owner) {
 * startup and should also be called any time a building is deleted.
 */
 void check_for_bad_buildings(void) {
-	extern struct instance_data *find_instance_by_room(room_data *room);
+	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 	void unlink_instance_entrance(room_data *room);
 
 	struct obj_storage_type *store, *next_store, *temp;
@@ -497,6 +497,11 @@ void check_for_bad_buildings(void) {
 			log(" removing building at %d for bad building type", GET_ROOM_VNUM(room));
 			disassociate_building(room);
 		}
+		else if (IS_CITY_CENTER(room) && (!ROOM_OWNER(room) || !find_city_entry(ROOM_OWNER(room), room))) {
+			// city center with no matching city
+			log(" removing city center at %d for lack of city entry", GET_ROOM_VNUM(room));
+			disassociate_building(room);
+		}
 		else if (GET_ROOM_VNUM(room) >= MAP_SIZE && ROOM_SECT_FLAGGED(room, SECTF_INSIDE) && !GET_BUILDING(room)) {
 			// designated room
 			log(" deleting room %d for bad building type", GET_ROOM_VNUM(room));
@@ -509,7 +514,7 @@ void check_for_bad_buildings(void) {
 			delete_room(room, FALSE);	// must check_all_exits
 			deleted = TRUE;
 		}
-		else if (ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE) && !find_instance_by_room(room)) {
+		else if (ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE) && !find_instance_by_room(room, TRUE)) {
 			// room is marked as an instance entrance, but no instance is associated with it
 			log(" unlinking instance entrance room %d for no association with an instance", GET_ROOM_VNUM(room));
 			unlink_instance_entrance(room);

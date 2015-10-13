@@ -33,7 +33,7 @@ extern int dg_owner_purged;
 // external functions
 void obj_command_interpreter(obj_data *obj, char *argument);
 void send_char_pos(char_data *ch, int dam);
-extern struct instance_data *find_instance_by_room(room_data *room);
+extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 char_data *get_char_by_obj(obj_data *obj, char *name);
 obj_data *get_obj_by_obj(obj_data *obj, char *name);
 room_data *get_room(room_data *ref, char *name);
@@ -498,7 +498,7 @@ OCMD(do_oteleport) {
 	}
 	else if (!str_cmp(arg1, "adventure")) {
 		// teleport all players in the adventure
-		if (!orm || !(inst = find_instance_by_room(orm))) {
+		if (!orm || !(inst = find_instance_by_room(orm, FALSE))) {
 			obj_log(obj, "oteleport: 'adventure' mode called outside any adventure");
 			return;
 		}
@@ -673,7 +673,7 @@ OCMD(do_dgoload) {
 	}
 	
 	if (obj_room(obj)) {
-		inst = find_instance_by_room(obj_room(obj));
+		inst = find_instance_by_room(obj_room(obj), FALSE);
 	}
 
 	if (is_abbrev(arg1, "mob")) {

@@ -641,8 +641,8 @@ void mobile_activity(void) {
 					// linkdead player
 					continue;
 				}
-				if (IS_NPC(vict) && (MOB_FLAGGED(vict, MOB_AGGRESSIVE) || !MOB_FLAGGED(vict, MOB_HUMAN))) {
-					// they will attack humans but not aggro humans
+				if (IS_NPC(vict) && (IS_ADVENTURE_ROOM(IN_ROOM(vict)) || MOB_FLAGGED(vict, MOB_AGGRESSIVE) || !MOB_FLAGGED(vict, MOB_HUMAN))) {
+					// they will attack humans but not aggro-humans, and not inadventures
 					continue;
 				}
 				if (!CAN_AGGRO(ch, vict) || !can_fight(ch, vict)) {

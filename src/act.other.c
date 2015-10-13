@@ -56,7 +56,7 @@ extern char *show_color_codes(char *string);
 * @param char *argument The typed argument.
 */
 void adventure_summon(char_data *ch, char *argument) {
-	extern struct instance_data *find_instance_by_room(room_data *room);
+	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 	
 	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	struct instance_data *inst;
@@ -67,7 +67,7 @@ void adventure_summon(char_data *ch, char *argument) {
 	if (GET_POS(ch) < POS_STANDING) {
 		msg_to_char(ch, "You can't do that right now.\r\n");
 	}
-	else if (!IS_ADVENTURE_ROOM(IN_ROOM(ch)) || !(inst = find_instance_by_room(IN_ROOM(ch)))) {
+	else if (!IS_ADVENTURE_ROOM(IN_ROOM(ch)) || !(inst = find_instance_by_room(IN_ROOM(ch), FALSE))) {
 		msg_to_char(ch, "You can only use the adventure summon command inside an adventure.\r\n");
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
@@ -108,7 +108,7 @@ void adventure_summon(char_data *ch, char *argument) {
 	}
 	else {
 		act("You start summoning $N...", FALSE, ch, NULL, vict, TO_CHAR);
-		snprintf(buf, sizeof(buf), "$n is trying to summon you to %s (%s) -- use 'accept/reject summon'.", GET_ADV_NAME(inst->adventure), get_room_name(IN_ROOM(ch), FALSE));
+		snprintf(buf, sizeof(buf), "$o is trying to summon you to %s (%s) -- use 'accept/reject summon'.", GET_ADV_NAME(inst->adventure), get_room_name(IN_ROOM(ch), FALSE));
 		act(buf, FALSE, ch, NULL, vict, TO_VICT | TO_SLEEP);
 		add_offer(vict, ch, OFFER_SUMMON, SUMMON_ADVENTURE);
 		command_lag(ch, WAIT_OTHER);
@@ -510,10 +510,10 @@ void summon_player(char_data *ch, char *argument) {
 		
 		act("You start summoning $N...", FALSE, ch, NULL, vict, TO_CHAR);
 		if (HAS_ABILITY(vict, ABIL_NAVIGATION)) {
-			snprintf(buf, sizeof(buf), "$n is trying to summon you to %s (%d, %d) -- use 'accept/reject summon'.", get_room_name(IN_ROOM(ch), FALSE), X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
+			snprintf(buf, sizeof(buf), "$o is trying to summon you to %s (%d, %d) -- use 'accept/reject summon'.", get_room_name(IN_ROOM(ch), FALSE), X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
 		}
 		else {
-			snprintf(buf, sizeof(buf), "$n is trying to summon you to %s -- use 'accept/reject summon'.", get_room_name(IN_ROOM(ch), FALSE));
+			snprintf(buf, sizeof(buf), "$o is trying to summon you to %s -- use 'accept/reject summon'.", get_room_name(IN_ROOM(ch), FALSE));
 		}
 		act(buf, FALSE, ch, NULL, vict, TO_VICT | TO_SLEEP);
 		add_offer(vict, ch, OFFER_SUMMON, SUMMON_PLAYER);
@@ -744,7 +744,7 @@ ACMD(do_accept) {
 				}
 				
 				ts = time(0) - offer->time;
-				msg_to_char(ch, " %s - %s (%d seconds left)\r\n", GET_NAME(from), offer_types[offer->type].name, MAX(0, max_duration - ts));
+				msg_to_char(ch, " %s - %s (%d seconds left)\r\n", PERS(from, ch, TRUE), offer_types[offer->type].name, MAX(0, max_duration - ts));
 				found = TRUE;
 			}
 			if (!found) {

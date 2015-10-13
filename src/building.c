@@ -335,7 +335,7 @@ void construct_tunnel(char_data *ch, int dir, room_data *entrance, room_data *ex
 */
 void disassociate_building(room_data *room) {
 	void decustomize_room(room_data *room);
-	extern struct instance_data *find_instance_by_room(room_data *room);
+	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 	void remove_designate_objects(room_data *room);
 	
 	room_data *iter, *next_iter;
@@ -343,7 +343,7 @@ void disassociate_building(room_data *room) {
 	bool deleted = FALSE;
 	
 	// delete any open instance here
-	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE) && (inst = find_instance_by_room(room))) {
+	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE) && (inst = find_instance_by_room(room, FALSE))) {
 		SET_BIT(inst->flags, INST_COMPLETED);
 	}
 	
@@ -1824,11 +1824,11 @@ ACMD(do_lay) {
 ACMD(do_maintain) {
 	Resource res[3] = { { o_LUMBER, BUILDING_DISREPAIR(IN_ROOM(ch)) }, { o_NAILS, BUILDING_DISREPAIR(IN_ROOM(ch)) }, END_RESOURCE_LIST };
 	
-	if (BUILDING_DISREPAIR(IN_ROOM(ch)) <= 0) {
-		msg_to_char(ch, "It needs no maintenance.\r\n");
-	}
-	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+	if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		msg_to_char(ch, "You can't perform maintenance here.\r\n");
+	}
+	else if (BUILDING_DISREPAIR(IN_ROOM(ch)) <= 0) {
+		msg_to_char(ch, "It needs no maintenance.\r\n");
 	}
 	else if (!has_resources(ch, res, TRUE, TRUE)) {
 		// sends own messages

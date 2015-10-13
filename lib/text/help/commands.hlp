@@ -20,7 +20,7 @@ Examples:
 
 See also: ALIAS
 #
-+ - -- "INPUT QUEUE" "COMMAND QUEUE" "INPUT LAG" "COMMAND LAG" WAIT QUEUE
++ - -- "INPUT QUEUE" "COMMAND QUEUE" "INPUT LAG" "COMMAND LAG" QUEUE
 
 The + and - commands allow you to manipulate your input queue. Some commands,
 such as abilities, cause a small amount of "command lag". Anything you type

@@ -77,7 +77,7 @@ static void wear_message(char_data *ch, obj_data *obj, int where);
 * @return bool TRUE if ch can take obj.
 */
 static bool can_take_obj(char_data *ch, obj_data *obj) {
-	if (IS_CARRYING_N(ch) + GET_OBJ_INVENTORY_SIZE(obj) > CAN_CARRY_N(ch)) {
+	if (!IS_NPC(ch) && IS_CARRYING_N(ch) + GET_OBJ_INVENTORY_SIZE(obj) > CAN_CARRY_N(ch)) {
 		act("$p: you can't carry that many items.", FALSE, ch, obj, 0, TO_CHAR);
 		return FALSE;
 	}
@@ -755,7 +755,7 @@ static bool perform_get_from_container(char_data *ch, obj_data *obj, obj_data *c
 			return FALSE;
 		}		
 	}
-	if (IS_CARRYING_N(ch) + GET_OBJ_INVENTORY_SIZE(obj) > CAN_CARRY_N(ch)) {
+	if (!IS_NPC(ch) && IS_CARRYING_N(ch) + GET_OBJ_INVENTORY_SIZE(obj) > CAN_CARRY_N(ch)) {
 		act("$p: you can't hold any more items.", FALSE, ch, obj, 0, TO_CHAR);
 		return FALSE;
 	}
@@ -877,7 +877,7 @@ static bool perform_get_from_room(char_data *ch, obj_data *obj) {
 			return FALSE;
 		}
 	}
-	if (IS_CARRYING_N(ch) + GET_OBJ_INVENTORY_SIZE(obj) > CAN_CARRY_N(ch)) {
+	if (!IS_NPC(ch) && IS_CARRYING_N(ch) + GET_OBJ_INVENTORY_SIZE(obj) > CAN_CARRY_N(ch)) {
 		act("$p: you can't hold any more items.", FALSE, ch, obj, 0, TO_CHAR);
 		return FALSE;
 	}
@@ -1000,7 +1000,8 @@ static void perform_give(char_data *ch, char_data *vict, obj_data *obj) {
 		act("$p: item is bound.", FALSE, ch, obj, vict, TO_CHAR);
 		return;
 	}
-
+	
+	// NPCs usually have no carry limit, but 'give' is an exception because otherwise crazy ensues
 	if (IS_CARRYING_N(vict) + GET_OBJ_INVENTORY_SIZE(obj) > CAN_CARRY_N(vict)) {
 		act("$N seems to have $S hands full.", FALSE, ch, 0, vict, TO_CHAR);
 		return;

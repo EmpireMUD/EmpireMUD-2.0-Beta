@@ -44,7 +44,7 @@ extern const char *month_name[];
 extern const struct wear_data_type wear_data[NUM_WEARS];
 
 // external functions
-extern struct instance_data *find_instance_by_room(room_data *room);
+extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 extern char *get_room_name(room_data *room, bool color);
 extern char *morph_string(char_data *ch, byte type);
 
@@ -1661,7 +1661,7 @@ ACMD(do_adventure) {
 		// otherwise fall through to the rest of the command
 	}
 	
-	if (!(inst = find_instance_by_room(IN_ROOM(ch)))) {
+	if (!(inst = find_instance_by_room(IN_ROOM(ch), FALSE))) {
 		msg_to_char(ch, "You are not in or near an adventure zone.\r\n");
 		return;
 	}
@@ -2359,7 +2359,7 @@ ACMD(do_survey) {
 	}
 	
 	// adventure info
-	if (find_instance_by_room(IN_ROOM(ch))) {
+	if (find_instance_by_room(IN_ROOM(ch), FALSE)) {
 		do_adventure(ch, "", 0, 0);
 	}
 }

@@ -1220,7 +1220,7 @@ void char_from_room(char_data *ch) {
 */
 void char_to_room(char_data *ch, room_data *room) {
 	extern int determine_best_scale_level(char_data *ch, bool check_group);
-	extern struct instance_data *find_instance_by_room(room_data *room);
+	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 	extern int lock_instance_level(room_data *room, int level);
 	void msdp_update_room(char_data *ch);
 	void spawn_mobs_from_center(room_data *center);
@@ -1260,7 +1260,7 @@ void char_to_room(char_data *ch, room_data *room) {
 		}
 		
 		// look for an instance to lock
-		if (!IS_NPC(ch) && IS_ADVENTURE_ROOM(room) && (inst = find_instance_by_room(room))) {
+		if (!IS_NPC(ch) && IS_ADVENTURE_ROOM(room) && (inst = find_instance_by_room(room, FALSE))) {
 			if (ADVENTURE_FLAGGED(inst->adventure, ADV_LOCK_LEVEL_ON_ENTER) && !IS_IMMORTAL(ch)) {
 				lock_instance_level(room, determine_best_scale_level(ch, TRUE));
 			}
@@ -3657,6 +3657,20 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 	new->last_owner_id = obj->last_owner_id;
 	new->last_empire_id = obj->last_empire_id;
 	
+	// custom strings?
+	if (GET_OBJ_SHORT_DESC(obj) && GET_OBJ_SHORT_DESC(obj) != GET_OBJ_SHORT_DESC(proto)) {
+		GET_OBJ_SHORT_DESC(new) = str_dup(GET_OBJ_SHORT_DESC(obj));
+	}
+	if (GET_OBJ_LONG_DESC(obj) && GET_OBJ_LONG_DESC(obj) != GET_OBJ_LONG_DESC(proto)) {
+		GET_OBJ_LONG_DESC(new) = str_dup(GET_OBJ_LONG_DESC(obj));
+	}
+	if (GET_OBJ_KEYWORDS(obj) && GET_OBJ_KEYWORDS(obj) != GET_OBJ_KEYWORDS(proto)) {
+		GET_OBJ_KEYWORDS(new) = str_dup(GET_OBJ_KEYWORDS(obj));
+	}
+	if (GET_OBJ_ACTION_DESC(obj) && GET_OBJ_ACTION_DESC(obj) != GET_OBJ_ACTION_DESC(proto)) {
+		GET_OBJ_ACTION_DESC(new) = str_dup(GET_OBJ_ACTION_DESC(obj));
+	}
+	
 	// certain things that must always copy over
 	switch (GET_OBJ_TYPE(new)) {
 		case ITEM_ARROW: {
@@ -4154,7 +4168,7 @@ void obj_to_char(obj_data *object, char_data *ch) {
 * @param char_data *ch The person to try to give it to.
 */
 void obj_to_char_or_room(obj_data *obj, char_data *ch) {
-	if (IS_CARRYING_N(ch) + GET_OBJ_INVENTORY_SIZE(obj) > CAN_CARRY_N(ch) && IN_ROOM(ch)) {
+	if (!IS_NPC(ch) && IS_CARRYING_N(ch) + GET_OBJ_INVENTORY_SIZE(obj) > CAN_CARRY_N(ch) && IN_ROOM(ch)) {
 		// bind it to the player anyway, as if they received it, if it's BoP
 		if (OBJ_FLAGGED(obj, OBJ_BIND_ON_PICKUP)) {
 			bind_obj_to_player(obj, ch);

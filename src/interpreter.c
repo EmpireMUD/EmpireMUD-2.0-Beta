@@ -264,6 +264,7 @@ ACMD(do_nodismantle);
 ACMD(do_noskill);
 
 ACMD(do_olc);
+ACMD(do_oset);
 ACMD(do_order);
 ACMD(do_outrage);
 
@@ -769,6 +770,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "notitle", POS_DEAD, do_wizutil, LVL_CIMPL, CTYPE_IMMORTAL, SCMD_NOTITLE ),
 
 	SIMPLE_CMD( "order", POS_RESTING, do_order, NO_MIN, CTYPE_COMM ),
+	GRANT_CMD( "oset", POS_DEAD, do_oset, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_OSET ),
 	SCMD_CMD( "open", POS_SITTING, do_gen_door, NO_MIN, CTYPE_MOVE, SCMD_OPEN ),
 	SCMD_CMD( "oocsay", POS_RESTING, do_say, NO_MIN, CTYPE_COMM, SCMD_OOCSAY ),
 	SCMD_CMD( "osay", POS_RESTING, do_say, NO_MIN, CTYPE_COMM, SCMD_OOCSAY ),
@@ -1313,6 +1315,7 @@ int perform_alias(descriptor_data *d, char *orig) {
 
 /* The interface to the outside world: do_alias */
 ACMD(do_alias) {
+	extern char *show_color_codes(char *string);
 	void write_aliases(char_data *ch);
 	
 	char *repl;
@@ -1329,7 +1332,7 @@ ACMD(do_alias) {
 			send_to_char(" None.\r\n", ch);
 		else {
 			while (a != NULL) {
-				sprintf(buf, "%-15s %s\r\n", a->alias, a->replacement);
+				sprintf(buf, "%-15s %s\r\n", a->alias, show_color_codes(a->replacement));
 				send_to_char(buf, ch);
 				a = a->next;
 			}

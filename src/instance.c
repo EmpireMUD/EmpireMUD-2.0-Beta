@@ -51,7 +51,6 @@ any_vnum get_new_instance_id(void);
 static void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct adventure_link_rule *rule, room_data *loc, int dir, int rotation);
 struct instance_data *real_instance(any_vnum instance_id);
 void reset_instance(struct instance_data *inst);
-void save_instances();
 static void scale_instance_to_level(struct instance_data *inst, int level);
 void unlink_instance_entrance(room_data *room);
 
@@ -817,7 +816,6 @@ void generate_adventure_instances(void) {
 						// make it so!
 						if (build_instance_loc(iter, rule, loc, dir)) {
 							last_adv_vnum = GET_ADV_VNUM(iter);
-							save_instances();
 							// only 1 instance per cycle
 							return;
 						}
@@ -917,7 +915,6 @@ int delete_all_instances(adv_data *adv) {
 		}
 	}
 	
-	save_instances();
 	return count;
 }
 
@@ -1026,7 +1023,6 @@ void reset_instance(struct instance_data *inst) {
 */
 void reset_instances(void) {
 	struct instance_data *inst;
-	bool any = FALSE;
 	
 	for (inst = instance_list; inst; inst = inst->next) {
 		// never reset?
@@ -1039,11 +1035,6 @@ void reset_instances(void) {
 		}
 		
 		reset_instance(inst);
-		any = TRUE;
-	}
-	
-	if (any) {
-		save_instances();
 	}
 }
 
@@ -1090,7 +1081,6 @@ void prune_instances(void) {
 	
 	if (save) {	
 		check_all_exits();
-		save_instances();
 	}
 }
 
@@ -1409,9 +1399,10 @@ struct instance_data *real_instance(any_vnum instance_id) {
 
 /**
 * @param room_data *room Any world location.
+* @param bool check_homeroom If TRUE, also checks for extended instance (the homeroom is marked ROOM_AFF_HAS_INSTANCE too, to prevent claiming, etc)
 * @return struct instance_data* An instance associated with that room (maybe one it's the map location for), or NULL if none.
 */
-struct instance_data *find_instance_by_room(room_data *room) {
+struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom) {
 	struct instance_data *inst;
 	
 	if (!room) {
@@ -1425,7 +1416,7 @@ struct instance_data *find_instance_by_room(room_data *room) {
 	
 	// check if it's the location for one
 	for (inst = instance_list; inst; inst = inst->next) {
-		if (inst->location == room) {
+		if (inst->location == room || (check_homeroom && HOME_ROOM(inst->location) == room)) {
 			return inst;
 		}
 	}
@@ -1606,7 +1597,6 @@ int lock_instance_level(room_data *room, int level) {
 void mark_instance_completed(struct instance_data *inst) {
 	if (inst) {
 		SET_BIT(inst->flags, INST_COMPLETED);
-		save_instances();
 	}
 }
 
@@ -1732,6 +1722,4 @@ static void scale_instance_to_level(struct instance_data *inst, int level) {
 			}
 		}
 	}
-	
-	save_instances();
 }

@@ -67,4 +67,11 @@ R
 R
 1306 4  # 4x a pouch of nails
 S
+#5010
+flooded ruins dismantle~
+-1 0  # 0x UNKNOWN
+8 -1 l 1 -1
+B
+5010 0 0
+S
 $

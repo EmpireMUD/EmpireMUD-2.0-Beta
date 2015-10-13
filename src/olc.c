@@ -3440,7 +3440,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 		vnum = atoi(arg4);
 		prc = atof(arg5);
 		
-		if (!*arg2 || !*arg3 || !*arg4 || !*arg5 || !isdigit(*arg3) || !isdigit(*arg4) || !isdigit(*arg5)) {
+		if (!*arg2 || !*arg3 || !*arg4 || !*arg5 || !isdigit(*arg3) || !isdigit(*arg4) || (!isdigit(*arg5) && *arg5 != '.')) {
 			msg_to_char(ch, "Usage: interaction add <type> <quantity> <vnum> <percent> [exclusion code]\r\n");
 		}
 		else if ((loc = search_block(arg2, interact_types, FALSE)) == NOTHING || interact_attach_types[loc] != attach_type) {

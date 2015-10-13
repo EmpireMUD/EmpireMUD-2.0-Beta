@@ -46,7 +46,7 @@ extern const struct wear_data_type wear_data[NUM_WEARS];
 // external funcs
 extern obj_data *die(char_data *ch, char_data *killer);
 void death_log(char_data *ch, char_data *killer, int type);
-extern struct instance_data *find_instance_by_room(room_data *room);
+extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 extern room_data *obj_room(obj_data *obj);
 void out_of_blood(char_data *ch);
 void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool full_abandon);
@@ -1573,9 +1573,9 @@ bool can_teleport_to(char_data *ch, room_data *loc, bool check_owner) {
 	}
 	
 	// player limit, maybe
-	if (IS_ADVENTURE_ROOM(loc) && (inst = find_instance_by_room(loc))) {
+	if (IS_ADVENTURE_ROOM(loc) && (inst = find_instance_by_room(loc, FALSE))) {
 		// only if not already in there
-		if (!IS_ADVENTURE_ROOM(IN_ROOM(ch)) || find_instance_by_room(IN_ROOM(ch)) != inst) {
+		if (!IS_ADVENTURE_ROOM(IN_ROOM(ch)) || find_instance_by_room(IN_ROOM(ch), FALSE) != inst) {
 			if (!can_enter_instance(ch, inst)) {
 				return FALSE;
 			}

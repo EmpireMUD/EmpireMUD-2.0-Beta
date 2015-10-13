@@ -204,7 +204,7 @@ inline void empire_sleep(struct timeval *timeout) {
 * @param char_data *ch The player to update (no effect if no descriptor).
 */
 void msdp_update_room(char_data *ch) {
-	extern struct instance_data *find_instance_by_room(room_data *room);
+	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 	extern char *get_room_name(room_data *room, bool color);
 	extern const char *alt_dirs[];
 	
@@ -221,7 +221,7 @@ void msdp_update_room(char_data *ch) {
 	}
 
 	// determine area name: we'll use it twice
-	if ((inst = find_instance_by_room(IN_ROOM(ch)))) {
+	if ((inst = find_instance_by_room(IN_ROOM(ch), FALSE))) {
 		snprintf(area_name, sizeof(area_name), "%s", GET_ADV_NAME(inst->adventure));
 	}
 	else if ((city = find_city(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch)))) {

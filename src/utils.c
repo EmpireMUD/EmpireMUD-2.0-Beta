@@ -2120,18 +2120,18 @@ void determine_gear_level(char_data *ch) {
 		// some items count as more or less than 1 slot
 		slots += wear_data[pos].gear_level_mod;
 		
-		if (GET_EQ(ch, pos)) {
+		if (GET_EQ(ch, pos) && wear_data[pos].gear_level_mod > 0) {
 			total += GET_OBJ_CURRENT_SCALE_LEVEL(GET_EQ(ch, pos)) * wear_data[pos].gear_level_mod;
 			
 			// bonuses
 			if (OBJ_FLAGGED(GET_EQ(ch, pos), OBJ_SUPERIOR)) {
-				total += 10;
+				total += 10 * wear_data[pos].gear_level_mod;
 			}
 			if (OBJ_FLAGGED(GET_EQ(ch, pos), OBJ_HARD_DROP)) {
-				total += 10;
+				total += 10 * wear_data[pos].gear_level_mod;
 			}
 			if (OBJ_FLAGGED(GET_EQ(ch, pos), OBJ_GROUP_DROP)) {
-				total += 10;
+				total += 10 * wear_data[pos].gear_level_mod;
 			}
 		}
 	}

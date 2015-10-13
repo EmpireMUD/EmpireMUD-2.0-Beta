@@ -292,11 +292,10 @@ room_data *create_room(void) {
 */
 void delete_room(room_data *room, bool check_exits) {
 	void extract_pending_chars();
-	extern struct instance_data *find_instance_by_room(room_data *room);
+	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 	void Objsave_char(char_data *ch, int rent_code);
 	void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool full_abandon);
 	void relocate_players(room_data *room, room_data *to_room);
-	void save_instances(void);
 
 	struct room_direction_data *ex, *next_ex, *temp;
 	struct empire_territory_data *ter, *next_ter;
@@ -307,7 +306,6 @@ void delete_room(room_data *room, bool check_exits) {
 	struct track_data *track;
 	struct affected_type *af;
 	struct reset_com *reset;
-	bool save_inst = FALSE;
 	char_data *c, *next_c;
 	obj_data *o, *next_o;
 	empire_data *emp, *next_emp;
@@ -319,7 +317,7 @@ void delete_room(room_data *room, bool check_exits) {
 	}
 	
 	// delete any open instance here
-	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE) && (inst = find_instance_by_room(room))) {
+	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE) && (inst = find_instance_by_room(room, FALSE))) {
 		SET_BIT(inst->flags, INST_COMPLETED);
 	}
 	
@@ -443,17 +441,14 @@ void delete_room(room_data *room, bool check_exits) {
 		if (inst->location == room) {
 			SET_BIT(inst->flags, INST_COMPLETED);
 			inst->location = NULL;
-			save_inst = TRUE;
 		}
 		if (inst->start == room) {
 			SET_BIT(inst->flags, INST_COMPLETED);
 			inst->start = NULL;
-			save_inst = TRUE;
 		}
 		for (iter = 0; iter < inst->size; ++iter) {
 			if (inst->room[iter] == room) {
 				inst->room[iter] = NULL;
-				save_inst = TRUE;
 			}
 		}
 	}
@@ -486,11 +481,7 @@ void delete_room(room_data *room, bool check_exits) {
 	
 	// free the room
 	free(room);
-	
-	if (save_inst) {
-		save_instances();
-	}
-	
+		
 	// maybe
 	// world_is_sorted = FALSE;
 	need_world_index = TRUE;
@@ -636,6 +627,8 @@ void save_world_index(void) {
 * Executes a full-world save.
 */
 void save_whole_world(void) {
+	void save_instances();
+	
 	room_data *iter, *next_iter;
 	room_vnum vnum;
 	int block, last;
@@ -672,6 +665,7 @@ void save_whole_world(void) {
 	
 	// ensure this
 	save_world_index();
+	save_instances();
 }
 
 
