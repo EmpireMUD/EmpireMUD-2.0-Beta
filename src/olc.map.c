@@ -66,6 +66,9 @@ OLC_MODULE(mapedit_build) {
 	else if (!IS_SET(GET_BLD_FLAGS(bld), BLD_OPEN) && (dir = parse_direction(ch, dir_arg)) == NO_DIR) {
 		msg_to_char(ch, "Invalid direction.\r\n");
 	}
+	else if (dir != NO_DIR && dir >= NUM_2D_DIRS) {
+		msg_to_char(ch, "Invalid direction.\r\n");
+	}
 	else if (dir != NO_DIR && (!SHIFT_DIR(IN_ROOM(ch), dir) || (IS_SET(GET_BLD_FLAGS(bld), BLD_TWO_ENTRANCES) && !SHIFT_DIR(IN_ROOM(ch), rev_dir[dir])))) {
 		msg_to_char(ch, "You can't face it that direction.\r\n");
 	}
