@@ -147,6 +147,7 @@ OLC_MODULE(medit_sex);
 OLC_MODULE(medit_short_description);
 
 // map modules
+OLC_MODULE(mapedit_build);
 OLC_MODULE(mapedit_complete_room);
 OLC_MODULE(mapedit_decustomize);
 OLC_MODULE(mapedit_delete_exit);
@@ -408,6 +409,7 @@ const struct olc_command_data olc_data[] = {
 	{ "shortdescription", medit_short_description, OLC_MOBILE, OLC_CF_EDITOR },
 	
 	// map commands
+	{ "build", mapedit_build, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "complete", mapedit_complete_room, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "decustomize", mapedit_decustomize, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "deleteexit", mapedit_delete_exit, OLC_MAP, OLC_CF_MAP_EDIT },

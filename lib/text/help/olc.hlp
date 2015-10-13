@@ -1406,6 +1406,20 @@ For notes on the mud's building rules, see HELP BUILDING GUIDE.
 
 See also: OLC
 #d
+"MAPEDIT BUILD"
+
+Usage:  .map build <building vnum> [direction]
+
+This command creates a building instantly, without needing a craft recipe. It
+can be built on virtually any map tile, so be careful when using this. Its main
+purpose is to add special buildings to the map without needing a build recipe.
+
+Example:
+ > .map build 5118
+ > .map build 5120 north
+
+See also: MAP OLC
+#d
 "MAPEDIT COMPLETE"
 
 Usage:  .map complete
