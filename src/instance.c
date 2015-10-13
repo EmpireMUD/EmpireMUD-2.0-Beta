@@ -573,7 +573,7 @@ bool validate_one_loc(adv_data *adv, struct adventure_link_rule *rule, room_data
 	int island_id;
 	bool junk;
 	
-	const bitvector_t no_no_flags = ROOM_AFF_UNCLAIMABLE | ROOM_AFF_DISMANTLING | ROOM_AFF_HAS_INSTANCE;
+	const bitvector_t no_no_flags = ROOM_AFF_DISMANTLING | ROOM_AFF_HAS_INSTANCE;
 	
 	// ownership check
 	if (ROOM_OWNER(home) && !LINK_FLAGGED(rule, ADV_LINKF_CLAIMED_OK | ADV_LINKF_CITY_ONLY)) {
