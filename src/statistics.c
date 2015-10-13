@@ -136,13 +136,13 @@ void display_statistics_to_char(char_data *ch) {
 			continue;
 		}
 		
-		if (populous_empire != NOTHING && EMPIRE_GREATNESS(emp) >= populous_empire) {
+		if (populous_empire != NOTHING && EMPIRE_MEMBERS(emp) >= populous_empire) {
 			snprintf(populous_str + strlen(populous_str), sizeof(populous_str) - strlen(populous_str), "%s%s%s&0", (*populous_str ? ", " : ""), EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 		}
-		if (wealthiest_empire != NOTHING && EMPIRE_GREATNESS(emp) >= wealthiest_empire) {
+		if (wealthiest_empire != NOTHING && GET_TOTAL_WEALTH(emp) >= wealthiest_empire) {
 			snprintf(wealthiest_str + strlen(wealthiest_str), sizeof(wealthiest_str) - strlen(wealthiest_str), "%s%s%s&0", (*wealthiest_str ? ", " : ""), EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 		}
-		if (famous_empire != NOTHING && EMPIRE_GREATNESS(emp) >= famous_empire) {
+		if (famous_empire != NOTHING && EMPIRE_FAME(emp) >= famous_empire) {
 			snprintf(famous_str + strlen(famous_str), sizeof(famous_str) - strlen(famous_str), "%s%s%s&0", (*famous_str ? ", " : ""), EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 		}
 		if (greatest_empire != NOTHING && EMPIRE_GREATNESS(emp) >= greatest_empire) {
