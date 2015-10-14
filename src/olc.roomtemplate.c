@@ -188,9 +188,20 @@ room_template *create_room_template_table_entry(rmt_vnum vnum) {
 */
 char *list_one_room_template(room_template *rmt, bool detail) {
 	static char output[MAX_STRING_LENGTH];
+	char flags[MAX_STRING_LENGTH];
+	
+	bitvector_t show_flags = RMT_OUTDOOR | RMT_DARK | RMT_LIGHT | RMT_NO_MOB | RMT_NO_TELEPORT | RMT_LOOK_OUT | RMT_NO_LOCATION;
 	
 	if (detail) {
-		snprintf(output, sizeof(output), "[%5d] %s", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
+		if (IS_SET(GET_RMT_FLAGS(rmt), show_flags)) {
+			strcpy(flags, " - ");
+			sprintbit(GET_RMT_FLAGS(rmt) & show_flags, room_template_flags, flags + 3, TRUE);
+		}
+		else {
+			*flags = '\0';
+		}
+		
+		snprintf(output, sizeof(output), "[%5d] %s%s", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt), flags);
 	}
 	else {
 		snprintf(output, sizeof(output), "[%5d] %s", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
