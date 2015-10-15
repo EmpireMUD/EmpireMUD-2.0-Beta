@@ -86,6 +86,7 @@ static void build_instance_entrance(struct instance_data *inst, struct adventure
 	void special_building_setup(char_data *ch, room_data *room);
 	void complete_building(room_data *room);
 	
+	char_data *mob, *next_mob;
 	obj_data *portal;
 	bld_data *bdg;
 	int my_dir;
@@ -93,6 +94,15 @@ static void build_instance_entrance(struct instance_data *inst, struct adventure
 	// nothing to link to!
 	if (!inst->start) {
 		return;
+	}
+	
+	// purge mobs in the room
+	for (mob = ROOM_PEOPLE(loc); mob; mob = next_mob) {
+		next_mob = mob->next_in_room;
+		
+		if (IS_NPC(mob)) {
+			extract_char(mob);
+		}
 	}
 	
 	// ADV_LINK_x part 1: things that need buildings added
@@ -580,6 +590,18 @@ bool validate_one_loc(adv_data *adv, struct adventure_link_rule *rule, room_data
 		return FALSE;
 	}
 	
+	// certain room flags are always no-gos
+	if (ROOM_AFF_FLAGGED(loc, no_no_flags) || ROOM_AFF_FLAGGED(home, no_no_flags)) {
+		return FALSE;
+	}
+	
+	// do not generate instances in front of players
+	for (ch = ROOM_PEOPLE(loc); ch; ch = ch->next_in_room) {
+		if (!IS_NPC(ch)) {
+			return FALSE;
+		}
+	}
+	
 	// newbie island checks
 	if ((island_id = GET_ISLAND_ID(loc)) != NO_ISLAND) {
 		isle = get_island(island_id, TRUE);
@@ -609,23 +631,11 @@ bool validate_one_loc(adv_data *adv, struct adventure_link_rule *rule, room_data
 		}
 	}
 	
-	// certain room flags are always no-gos
-	if (ROOM_AFF_FLAGGED(loc, no_no_flags) || ROOM_AFF_FLAGGED(home, no_no_flags)) {
-		return FALSE;
-	}
-	
 	// room is an entrance for something?
 	if (rule->type == ADV_LINK_BUILDING_NEW || rule->type == ADV_LINK_PORTAL_BUILDING_NEW) {
 		bld_data *bdg = building_proto(rule->value);
 		
 		if (!IS_SET(GET_BLD_FLAGS(bdg), BLD_OPEN) && is_entrance(loc)) {
-			return FALSE;
-		}
-	}
-	
-	// do not generate instances in front of players
-	for (ch = ROOM_PEOPLE(loc); ch; ch = ch->next_in_room) {
-		if (!IS_NPC(ch)) {
 			return FALSE;
 		}
 	}
