@@ -531,7 +531,7 @@ ACMD(do_class) {
 				msg_to_char(ch, " Available class roles:\r\n");
 				
 				for (iter = 0; class_data[GET_CLASS(ch)].role[iter].role != ROLE_NONE; ++iter) {
-					msg_to_char(ch, "  %s%s\t0%s: ", class_role_color[class_data[GET_CLASS(ch)].role[iter].role], class_role[class_data[GET_CLASS(ch)].role[iter].role], (GET_CLASS_ROLE(ch) && class_data[GET_CLASS(ch)].role[iter].role) ? " (current)" : "");
+					msg_to_char(ch, "  %s%s\t0%s: ", class_role_color[class_data[GET_CLASS(ch)].role[iter].role], class_role[class_data[GET_CLASS(ch)].role[iter].role], (GET_CLASS_ROLE(ch) == class_data[GET_CLASS(ch)].role[iter].role) ? " (current)" : "");
 					
 					for (ab_iter = 0, comma = FALSE; class_data[GET_CLASS(ch)].role[iter].ability[ab_iter] != ROLE_ABIL_END; ++ab_iter, comma = TRUE) {
 						abil = class_data[GET_CLASS(ch)].role[iter].ability[ab_iter];
