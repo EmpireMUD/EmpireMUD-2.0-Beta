@@ -746,14 +746,15 @@ static bool perform_get_from_container(char_data *ch, obj_data *obj, obj_data *c
 	if (IN_ROOM(cont) && LAST_OWNER_ID(cont) != idnum && LAST_OWNER_ID(obj) != idnum && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		stealing = TRUE;
 		
-		if (!PRF_FLAGGED(ch, PRF_STEALTHABLE)) {
-			msg_to_char(ch, "You cannot steal because your 'stealthable' toggle is off.\r\n");
-			return FALSE;
-		}
 		if (!IS_IMMORTAL(ch) && emp && !can_steal(ch, emp)) {
 			// sends own message
 			return FALSE;
-		}		
+		}
+		if (!PRF_FLAGGED(ch, PRF_STEALTHABLE)) {
+			// can_steal() technically checks this, but it isn't always called
+			msg_to_char(ch, "You cannot steal because your 'stealthable' toggle is off.\r\n");
+			return FALSE;
+		}
 	}
 	if (!IS_NPC(ch) && IS_CARRYING_N(ch) + GET_OBJ_INVENTORY_SIZE(obj) > CAN_CARRY_N(ch)) {
 		act("$p: you can't hold any more items.", FALSE, ch, obj, 0, TO_CHAR);
@@ -868,12 +869,13 @@ static bool perform_get_from_room(char_data *ch, obj_data *obj) {
 	if (LAST_OWNER_ID(obj) != idnum && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		stealing = TRUE;
 		
-		if (!PRF_FLAGGED(ch, PRF_STEALTHABLE)) {
-			msg_to_char(ch, "You cannot steal because your 'stealthable' toggle is off.\r\n");
-			return FALSE;
-		}
 		if (!IS_IMMORTAL(ch) && emp && !can_steal(ch, emp)) {
 			// sends own message
+			return FALSE;
+		}
+		if (!PRF_FLAGGED(ch, PRF_STEALTHABLE)) {
+			// can_steal() technically checks this, but it isn't always called
+			msg_to_char(ch, "You cannot steal because your 'stealthable' toggle is off.\r\n");
 			return FALSE;
 		}
 	}
