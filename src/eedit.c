@@ -151,7 +151,7 @@ bool valid_rank_name(char_data *ch, char *newname) {
 	int iter;
 	bool ok = TRUE;
 	
-	char *valid = " -&'";
+	char *valid = " -&'%";
 	
 	if ((strlen(newname) - 2*count_color_codes(newname)) > MAX_RANK_LENGTH) {
 		ok = FALSE;
