@@ -1228,6 +1228,12 @@ ACMD(do_enter) {
 		return;
 	}
 	
+	if (AFF_FLAGGED(ch, AFF_CHARM) && ch->master && IN_ROOM(ch) == IN_ROOM(ch->master)) {
+		msg_to_char(ch, "The thought of leaving your master makes you weep.\r\n");
+		act("$n bursts into tears.", FALSE, ch, NULL, NULL, TO_ROOM);
+		return;
+	}
+	
 	one_argument(argument, arg);
 	
 	if (!*arg) {
