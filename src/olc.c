@@ -1986,6 +1986,7 @@ OLC_MODULE(olc_search) {
 OLC_MODULE(olc_set_flags) {
 	char_data *vict = NULL;
 	bool file = FALSE;
+	bitvector_t old;
 	
 	argument = one_argument(argument, arg);
 	skip_spaces(&argument);
@@ -2003,18 +2004,23 @@ OLC_MODULE(olc_set_flags) {
 		msg_to_char(ch, "You can't set that on a person of such level.\r\n");
 	}
 	else {
+		old = GET_OLC_FLAGS(vict);
 		GET_OLC_FLAGS(vict) = olc_process_flag(ch, argument, "olc", "setflags", olc_flag_bits, GET_OLC_FLAGS(vict));
-		sprintbit(GET_OLC_FLAGS(vict), olc_flag_bits, buf, TRUE);
-		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has set olc flags for %s to: %s", GET_NAME(ch), GET_NAME(vict), buf);
-		msg_to_char(ch, "%s saved.\r\n", GET_NAME(vict));
 		
-		if (file) {
-			store_loaded_char(vict);
-			file = FALSE;
-			vict = NULL;
-		}
-		else {
-			SAVE_CHAR(vict);
+		// they didn't necessarily make any changes
+		if (GET_OLC_FLAGS(vict) != old) {
+			sprintbit(GET_OLC_FLAGS(vict), olc_flag_bits, buf, TRUE);
+			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has set olc flags for %s to: %s", GET_NAME(ch), GET_NAME(vict), buf);
+			msg_to_char(ch, "%s saved.\r\n", GET_NAME(vict));
+		
+			if (file) {
+				store_loaded_char(vict);
+				file = FALSE;
+				vict = NULL;
+			}
+			else {
+				SAVE_CHAR(vict);
+			}
 		}
 	}
 	
