@@ -4700,6 +4700,9 @@ ACMD(do_island) {
 		else if (strlen(argument) > MAX_ISLAND_NAME) {
 			msg_to_char(ch, "Island names may not be longer than %d characters.\r\n", MAX_ISLAND_NAME);
 		}
+		else if (strchr(argument, '"')) {
+			msg_to_char(ch, "Island names may not contain quotation marks.\r\n");
+		}
 		else {
 			send_config_msg(ch, "ok_string");
 			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has renamed island %d (%s) to %s", GET_NAME(ch), isle->id, NULLSAFE(isle->name), argument);
