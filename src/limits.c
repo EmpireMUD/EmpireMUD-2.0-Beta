@@ -372,6 +372,9 @@ void point_update_char(char_data *ch) {
 					GET_HEALTH(ch) = GET_MAX_HEALTH(ch);
 					GET_MOVE(ch) = GET_MAX_MOVE(ch);
 					GET_MANA(ch) = GET_MAX_MANA(ch);
+					if (GET_POS(ch) < POS_SLEEPING) {
+						GET_POS(ch) = POS_STANDING;
+					}
 				}
 			}
 		}
