@@ -739,6 +739,8 @@ void init_player(char_data *ch) {
 	ch->player_specials->saved.spare30 = NOTHING;
 	ch->player_specials->saved.spare31 = NOTHING;
 	ch->player_specials->saved.spare32 = NOTHING;
+	ch->player_specials->saved.spare33 = NOTHING;
+	ch->player_specials->saved.spare34 = NOTHING;
 }
 
 
