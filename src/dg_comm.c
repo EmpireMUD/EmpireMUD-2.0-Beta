@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: dg_comm.c                                       EmpireMUD 2.0b2 *
+*   File: dg_comm.c                                       EmpireMUD 2.0b3 *
 *  Usage: string and messaging functions for DG Scripts                   *
 *                                                                         *
 *  DG Scripts code had no header info in this file                        *

@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: skilldata.c                                     EmpireMUD 2.0b2 *
+*   File: skilldata.c                                     EmpireMUD 2.0b3 *
 *  Usage: skill definitions                                               *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

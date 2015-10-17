@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: statistics.c                                    EmpireMUD 2.0b2 *
+*   File: statistics.c                                    EmpireMUD 2.0b3 *
 *  Usage: code related game stats                                         *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

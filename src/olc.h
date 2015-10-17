@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: olc.h                                           EmpireMUD 2.0b2 *
+*   File: olc.h                                           EmpireMUD 2.0b3 *
 *  Usage: On-Line Creation header file                                    *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

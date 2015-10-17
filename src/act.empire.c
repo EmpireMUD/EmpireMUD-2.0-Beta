@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.empire.c                                    EmpireMUD 2.0b2 *
+*   File: act.empire.c                                    EmpireMUD 2.0b3 *
 *  Usage: stores all of the empire-related commands                       *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.trade.c                                     EmpireMUD 2.0b2 *
+*   File: act.trade.c                                     EmpireMUD 2.0b3 *
 *  Usage: code related to crafting and the trade skill                    *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

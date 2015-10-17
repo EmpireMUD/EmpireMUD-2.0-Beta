@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: limits.c                                        EmpireMUD 2.0b2 *
+*   File: limits.c                                        EmpireMUD 2.0b3 *
 *  Usage: Periodic updates and limiters                                   *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

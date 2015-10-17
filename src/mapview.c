@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: mapview.c                                       EmpireMUD 2.0b2 *
+*   File: mapview.c                                       EmpireMUD 2.0b3 *
 *  Usage: Map display functions                                           *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: objsave.c                                       EmpireMUD 2.0b2 *
+*   File: objsave.c                                       EmpireMUD 2.0b3 *
 *  Usage: loading/saving player objects for rent and crash-save           *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

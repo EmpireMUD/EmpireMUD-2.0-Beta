@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: mail.c                                          EmpireMUD 2.0b2 *
+*   File: mail.c                                          EmpireMUD 2.0b3 *
 *  Usage: Internal funcs and player spec-procs of mud-mail system         *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

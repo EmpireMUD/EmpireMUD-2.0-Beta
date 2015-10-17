@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.movement.c                                  EmpireMUD 2.0b2 *
+*   File: act.movement.c                                  EmpireMUD 2.0b3 *
 *  Usage: movement commands, door handling, & sleep/rest/etc state        *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.immortal.c                                  EmpireMUD 2.0b2 *
+*   File: act.immortal.c                                  EmpireMUD 2.0b3 *
 *  Usage: Player-level imm commands and other goodies                     *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

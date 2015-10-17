@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: db.h                                            EmpireMUD 2.0b2 *
+*   File: db.h                                            EmpireMUD 2.0b3 *
 *  Usage: header file for database handling                               *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

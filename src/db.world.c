@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: db.world.c                                      EmpireMUD 2.0b2 *
+*   File: db.world.c                                      EmpireMUD 2.0b3 *
 *  Usage: Modify functions for the map, interior, and game world          *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
