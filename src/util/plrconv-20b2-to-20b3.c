@@ -731,17 +731,14 @@ void convert_char_file_u(struct b3_char_file_u *to, struct b2_char_file_u *from)
 		to->points.extra_attributes[iter] = (iter < b2_TOTAL_EXTRA_ATTRIBUTES) ? from->points.extra_attributes[iter] : 0;
 	}
 	for (iter = 0; iter < b3_NUM_POOLS; ++iter) {
-		to->points.deficit[iter] = 0;	// initialize
+		to->points.deficit[iter] = (iter < b2_NUM_POOLS) ? from->points.deficit[iter] : 0;
 	}
-	to->points.deficit[HEALTH] = from->player_specials_saved.health_deficit;
-	to->points.deficit[MOVE] = from->player_specials_saved.move_deficit;
-	to->points.deficit[MANA] = from->player_specials_saved.mana_deficit;
 
 	// affected_type
 	for (iter = 0; iter < b3_MAX_AFFECT; ++iter) {
 		if (iter < b2_MAX_AFFECT) {
 			to->affected[iter].type = from->affected[iter].type;
-			to->affected[iter].cast_by = from->affected[iter].casy_by;
+			to->affected[iter].cast_by = from->affected[iter].cast_by;
 			to->affected[iter].duration = from->affected[iter].duration;
 			to->affected[iter].modifier = from->affected[iter].modifier;
 			to->affected[iter].location = from->affected[iter].location;
