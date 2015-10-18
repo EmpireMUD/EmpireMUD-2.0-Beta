@@ -1535,6 +1535,7 @@ const char *versions_list[] = {
 	"b2.8",
 	"b2.9",
 	"b2.11",
+	"b3.0",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -1738,6 +1739,31 @@ void check_version(void) {
 			save_all_empires();
 			save_trading_post();
 			save_whole_world();
+		}
+		if (MATCH_VERSION("b3.0")) {
+			log("Applying b3.0 update to crops...");
+			// this is a repeat of the b2.9 update, but should fix additional
+			// rooms
+			room_data *room, *next_room;
+			HASH_ITER(world_hh, world_table, room, next_room) {
+				if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && SECT_FLAGGED(ROOM_ORIGINAL_SECT(room), SECTF_HAS_CROP_DATA) && !SECT_FLAGGED(ROOM_ORIGINAL_SECT(room), SECTF_CROP)) {
+					// normal case: crop with a 'Seeded' original sect
+					// the fix is just to set the original sect to the current
+					// sect so it will detect a new sect on-harvest instead of
+					// setting it back to seeded
+					ROOM_ORIGINAL_SECT(room) = SECT(room);
+				}
+				else if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && !ROOM_SECT_FLAGGED(room, SECTF_CROP) && SECT_FLAGGED(ROOM_ORIGINAL_SECT(room), SECTF_HAS_CROP_DATA) && !SECT_FLAGGED(ROOM_ORIGINAL_SECT(room), SECTF_CROP)) {
+					// second error case: a Seeded crop with a Seeded crop as
+					// its original sect: detect a new original sect
+					extern const sector_vnum climate_default_sector[NUM_CLIMATES];
+					sector_data *sect;
+					crop_data *cp;
+					if ((cp = crop_proto(ROOM_CROP_TYPE(room))) && (sect = sector_proto(climate_default_sector[GET_CROP_CLIMATE(cp)]))) {
+						ROOM_ORIGINAL_SECT(room) = sect;
+					}
+				}
+			}
 		}
 	}
 	
