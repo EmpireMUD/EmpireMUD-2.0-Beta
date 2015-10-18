@@ -2,7 +2,10 @@
 Updating EmpireMUD from 2.0b1 to 2.0b2:
 =======================================
 
-WARNING: You will need to convert your playerfile for this upgrade.
+WARNING: You will need to convert your playerfile for this upgrade. If you used
+any of the "spare" variables in player_special_data_saved, you need to update
+the playerfile converter to preserve your spares. If you haven't made any code
+changes, that step isn't necessary.
 
 Step by step instructions:
 
