@@ -2105,6 +2105,7 @@ void nanny(descriptor_data *d, char *arg) {
 	char buf[MAX_STRING_LENGTH], tmp_name[MAX_INPUT_LENGTH];
 	int load_result, i, j, iter;
 	bool help, show_start = FALSE;
+	char_data *temp_char;
 
 	skip_spaces(&arg);
 
@@ -2116,6 +2117,7 @@ void nanny(descriptor_data *d, char *arg) {
 				CREATE(d->character->player_specials, struct player_special_data, 1);
 				d->character->desc = d;
 			}
+			
 			if (!*arg) {
 				SET_BIT(PLR_FLAGS(d->character), PLR_KEEP_LAST_LOGIN_INFO);	// prevent login storing
 				STATE(d) = CON_CLOSE;
@@ -2130,7 +2132,11 @@ void nanny(descriptor_data *d, char *arg) {
 					SEND_TO_Q("Invalid name, please try another.\r\nName: ", d);
 					return;
 				}
-				if ((d->character = load_player(tmp_name))) {
+				if ((temp_char = load_player(tmp_name))) {
+					free_char(d->character);
+					d->character = temp_char;	// can't load directly; overwrites the existing char
+					d->character->desc = d;
+					
 					/* undo it just in case they are set */
 					REMOVE_BIT(PLR_FLAGS(d->character), PLR_WRITING | PLR_MAILING);
 
