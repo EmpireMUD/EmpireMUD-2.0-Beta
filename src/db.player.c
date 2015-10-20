@@ -359,6 +359,7 @@ void parse_account(FILE *fl, int nr) {
 				if (sscanf(line, "P %s", str_in) == 1) {
 					CREATE(plr, struct account_player, 1);
 					plr->name = str_dup(str_in);
+					strtolower(plr->name);	// ensure lowercase
 					
 					// add to end
 					if (last_plr) {
@@ -529,7 +530,6 @@ void write_account_to_file(FILE *fl, account_data *acct) {
 * @param player_index_data *plr The player to add.
 */
 void add_player_to_table(player_index_data *plr) {
-	char name[MAX_STRING_LENGTH];
 	player_index_data *find;
 	int idnum = plr->idnum;
 	
@@ -543,9 +543,8 @@ void add_player_to_table(player_index_data *plr) {
 	
 	// by name: ensure name is lowercase
 	find = NULL;
-	strcpy(name, plr->name);
-	strtolower(name);
-	HASH_FIND(name_hh, player_table_by_name, name, (unsigned)strlen(name), find);
+	strtolower(plr->name);	// ensure always lower
+	HASH_FIND(name_hh, player_table_by_name, plr->name, (unsigned)strlen(plr->name), find);
 	if (!find) {
 		HASH_ADD(name_hh, player_table_by_name, name, strlen(plr->name), plr);
 		HASH_SRT(name_hh, player_table_by_name, sort_players_by_name);
@@ -571,6 +570,8 @@ void build_player_index(void) {
 	HASH_ITER(hh, account_table, acct, next_acct) {
 		acct->last_logon = 0;	// reset
 		
+		log("Debug: loading account %d", acct->id);
+		
 		// update top account id
 		top_account_id = MAX(top_account_id, acct->id);
 		
@@ -579,6 +580,7 @@ void build_player_index(void) {
 			next_plr = plr->next;
 			
 			if (!plr->player) {
+				log("Debug: - loading %s", plr->name);
 				ch = NULL;
 				
 				// load the character
