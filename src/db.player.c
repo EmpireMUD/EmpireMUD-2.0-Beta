@@ -1541,7 +1541,7 @@ void update_player_index(player_index_data *index, char_data *ch) {
 	if (index->fullname) {
 		free(index->fullname);
 	}
-	index->fullname = PERS(ch, ch, TRUE);
+	index->fullname = str_dup(PERS(ch, ch, TRUE));
 	
 	index->account_id = GET_ACCOUNT(ch) ? GET_ACCOUNT(ch)->id : 0;	// may not be set yet
 	index->last_logon = ch->prev_logon;
