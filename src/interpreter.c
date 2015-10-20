@@ -2132,7 +2132,7 @@ void nanny(descriptor_data *d, char *arg) {
 					SEND_TO_Q("Invalid name, please try another.\r\nName: ", d);
 					return;
 				}
-				if ((temp_char = load_player(tmp_name))) {
+				if ((temp_char = load_player(tmp_name, TRUE))) {
 					free_char(d->character);
 					d->character = temp_char;	// can't load directly; overwrites the existing char
 					d->character->desc = d;

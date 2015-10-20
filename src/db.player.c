@@ -53,7 +53,7 @@ void update_class(char_data *ch);
 // local protos
 void clear_player(char_data *ch);
 static bool member_is_timed_out(time_t created, time_t last_login, double played_hours);
-char_data *read_player_from_file(FILE *fl, char *name);
+char_data *read_player_from_file(FILE *fl, char *name, bool normal);
 int sort_players_by_idnum(player_index_data *a, player_index_data *b);
 int sort_players_by_name(player_index_data *a, player_index_data *b);
 void write_player_to_file(FILE *fl, char_data *ch);
@@ -80,7 +80,7 @@ char_data *find_or_load_player(char *name, bool *is_file) {
 	
 	if ((index = find_player_index_by_name(name))) {
 		if (!(ch = is_playing(index->idnum))) {
-			if ((ch = load_player(index->name))) {
+			if ((ch = load_player(index->name, TRUE))) {
 				*is_file = TRUE;
 			}
 		}
@@ -570,8 +570,6 @@ void build_player_index(void) {
 	HASH_ITER(hh, account_table, acct, next_acct) {
 		acct->last_logon = 0;	// reset
 		
-		log("Debug: loading account %d", acct->id);
-		
 		// update top account id
 		top_account_id = MAX(top_account_id, acct->id);
 		
@@ -580,12 +578,10 @@ void build_player_index(void) {
 			next_plr = plr->next;
 			
 			if (!plr->player) {
-				log("Debug: - loading %s", plr->name);
-				ch = NULL;
-				
 				// load the character
+				ch = NULL;
 				if (plr->name && *plr->name) {
-					ch = load_player(plr->name);
+					ch = load_player(plr->name, FALSE);
 				}
 				
 				// could not load character for this entry
@@ -786,8 +782,15 @@ void free_char(char_data *ch) {
 * - no aliases
 * - no equipment or inventory
 * - no script variables
+*
+* Note on the 'normal' parameter: If FALSE, it won't try to attach the player
+* to an account or index. This is done during initial startup ONLY.
+*
+* @param char_data *name The player's login name.
+* @param bool normal Pass TRUE for this.
+* @return char_data* The loaded player, or NULL if none exists.
 */
-char_data *load_player(char *name) {
+char_data *load_player(char *name, bool normal) {
 	char filename[256];
 	char_data *ch;
 	FILE *fl;
@@ -801,7 +804,7 @@ char_data *load_player(char *name) {
 		return NULL;
 	}
 	
-	ch = read_player_from_file(fl, name);
+	ch = read_player_from_file(fl, name, normal);
 	
 	fclose(fl);
 	return ch;
@@ -813,9 +816,10 @@ char_data *load_player(char *name) {
 *
 * @param FILE *fl The open file, for reading.
 * @param char *name The name of the player we are trying to load.
+* @param bool normal Always pass TRUE except during startup (won't link index/account if FALSE).
 * @return char_data* The loaded character.
 */
-char_data *read_player_from_file(FILE *fl, char *name) {
+char_data *read_player_from_file(FILE *fl, char *name, bool normal) {
 	char line[MAX_INPUT_LENGTH], error[MAX_STRING_LENGTH], str_in[MAX_INPUT_LENGTH];
 	struct slash_channel *slash, *last_slash = NULL;
 	int account_id = NOTHING, ignore_pos = 0, reward_pos = 0;
@@ -1399,10 +1403,12 @@ char_data *read_player_from_file(FILE *fl, char *name) {
 	}
 	
 	// have account?
-	if (!(acct = find_account(account_id))) {
-		acct = create_account_for_player(ch);
+	if (normal) {
+		if (!(acct = find_account(account_id))) {
+			acct = create_account_for_player(ch);
+		}
+		GET_ACCOUNT(ch) = acct;
 	}
-	GET_ACCOUNT(ch) = acct;
 	
 	// safety
 	REMOVE_BIT(PLR_FLAGS(ch), PLR_EXTRACTED | PLR_DONTSET);

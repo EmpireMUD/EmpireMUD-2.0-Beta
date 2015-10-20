@@ -259,7 +259,7 @@ void save_char(char_data *ch, room_data *load_room);
 void update_player_index(player_index_data *index, char_data *ch);
 extern char_data *find_or_load_player(char *name, bool *is_file);
 void store_loaded_char(char_data *ch);
-char_data *load_player(char *name);
+char_data *load_player(char *name, bool normal);
 
 // objects
 extern obj_data *object_list;

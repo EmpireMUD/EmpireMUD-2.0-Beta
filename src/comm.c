@@ -3583,7 +3583,7 @@ void reboot_recover(void) {
 
 		d->connected = CON_CLOSE;
 				
-		d->character = load_player(name);
+		d->character = load_player(name, TRUE);
 		if (d->character) {
 			REMOVE_BIT(PLR_FLAGS(d->character), PLR_WRITING | PLR_MAILING);
 			d->character->desc = d;

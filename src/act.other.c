@@ -921,7 +921,7 @@ ACMD(do_alternate) {
 	}
 	else {
 		// prepare
-		newch = load_player(index->name);
+		newch = load_player(index->name, TRUE);
 		
 		if (!newch) {
 			msg_to_char(ch, "Unknown character.\r\n");
