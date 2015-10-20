@@ -2147,8 +2147,7 @@ void nanny(descriptor_data *d, char *arg) {
 						SEND_TO_Q("Invalid name, please try another.\r\nName: ", d);
 						return;
 					}
-					CREATE(GET_PC_NAME(d->character), char, strlen(tmp_name) + 1);
-					strcpy(GET_PC_NAME(d->character), CAP(tmp_name));
+					GET_PC_NAME(d->character) = str_dup(CAP(tmp_name));
 
 					sprintf(buf, "Did I get that right, %s (Y/N)? ", tmp_name);
 					SEND_TO_Q(buf, d);
