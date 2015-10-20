@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.god.c                                       EmpireMUD 2.0b2 *
+*   File: act.god.c                                       EmpireMUD 2.0b3 *
 *  Usage: Player-level God commands                                       *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -143,7 +143,7 @@ ACMD(do_create) {
 		if (GET_RESOURCE(ch, mat) >= cost || imm_access) {
 			++count;
 			GET_RESOURCE(ch, mat) = MAX(0, GET_RESOURCE(ch, mat) - cost);
-			obj = read_object(GET_OBJ_VNUM(proto));
+			obj = read_object(GET_OBJ_VNUM(proto), TRUE);
 			SET_BIT(GET_OBJ_EXTRA(obj), OBJ_CREATED);
 			
 			if (!CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
@@ -153,10 +153,7 @@ ACMD(do_create) {
 				obj_to_char_or_room(obj, ch);
 			}
 			
-			if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-				scale_item_to_level(obj, 1);	// minimum level
-			}
-			
+			scale_item_to_level(obj, 1);	// minimum level
 			load_otrigger(obj);
 		}
 		else {
@@ -247,7 +244,7 @@ ACMD(do_sacrifice) {
 			for (obj = ch->carrying; obj; obj = next_obj) {
 				next_obj = obj->next_content;
 				
-				if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
+				if (OBJ_FLAGGED(obj, OBJ_KEEP) || !bind_ok(obj, ch)) {
 					continue;
 				}
 				
@@ -256,7 +253,7 @@ ACMD(do_sacrifice) {
 			for (obj = ROOM_CONTENTS(IN_ROOM(ch)); obj; obj = next_obj) {
 				next_obj = obj->next_content;
 				
-				if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
+				if (OBJ_FLAGGED(obj, OBJ_KEEP) || !bind_ok(obj, ch)) {
 					continue;
 				}
 
@@ -288,7 +285,7 @@ ACMD(do_sacrifice) {
 			if (!next_obj && can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) && !IN_ROOM(obj))
 				next_obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)));
 			
-			if (CAN_WEAR(obj, ITEM_WEAR_TAKE) && !OBJ_FLAGGED(obj, OBJ_KEEP)) {
+			if (CAN_WEAR(obj, ITEM_WEAR_TAKE) && !OBJ_FLAGGED(obj, OBJ_KEEP) && bind_ok(obj, ch)) {
 				amount += perform_sacrifice(ch, god, obj, TRUE);
 				any = TRUE;
 			}
@@ -305,6 +302,9 @@ ACMD(do_sacrifice) {
 			msg_to_char(ch, "You don't seem to have any %ss to sacrifice.\r\n", arg);
 		else if (!CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
 			msg_to_char(ch, "You can't sacrifice that!\r\n");
+		}
+		else if (!bind_ok(obj, ch)) {
+			msg_to_char(ch, "You can't sacrifice an item that's bound to someone else.\r\n");
 		}
 		else {
 			amount += perform_sacrifice(ch, god, obj, TRUE);

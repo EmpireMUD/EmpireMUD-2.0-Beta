@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: building.c                                      EmpireMUD 2.0b2 *
+*   File: building.c                                      EmpireMUD 2.0b3 *
 *  Usage: Miscellaneous player-level commands                             *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -137,11 +137,11 @@ void special_building_setup(char_data *ch, room_data *room) {
 * @return TRUE if valid, FALSE if not
 */
 bool can_build_on(room_data *room, bitvector_t flags) {
-	#define CLEAR_OPEN_BUILDING(r)	(IS_MAP_BUILDING(r) && ROOM_BLD_FLAGGED((r), BLD_OPEN) && !ROOM_BLD_FLAGGED((r), BLD_BARRIER) && !SECT_FLAGGED(ROOM_ORIGINAL_SECT(r), SECTF_FRESH_WATER | SECTF_OCEAN))
+	#define CLEAR_OPEN_BUILDING(r)	(IS_MAP_BUILDING(r) && ROOM_BLD_FLAGGED((r), BLD_OPEN) && !ROOM_BLD_FLAGGED((r), BLD_BARRIER) && (IS_COMPLETE(r) || !SECT_FLAGGED(ROOM_ORIGINAL_SECT(r), SECTF_FRESH_WATER | SECTF_OCEAN)))
 
-	return (
+	return (!IS_SET(flags, BLD_ON_NOT_PLAYER_MADE) || !ROOM_AFF_FLAGGED(room, ROOM_AFF_PLAYER_MADE)) && (
 		IS_SET(GET_SECT_BUILD_FLAGS(SECT(room)), flags) || 
-		(IS_SET(flags, BLD_FACING_OPEN_BUILDING) && CLEAR_OPEN_BUILDING(room))	// one special case -- any thoughts on a generic case? -pc
+		(IS_SET(flags, BLD_FACING_OPEN_BUILDING) && CLEAR_OPEN_BUILDING(room))
 	);
 }
 
@@ -154,8 +154,9 @@ bool can_build_on(room_data *room, bitvector_t flags) {
 */
 void check_lay_territory(char_data *ch, room_data *room) {
 	empire_data *emp = GET_LOYALTY(ch);
+	bool junk;
 	
-	if (emp && ROOM_OWNER(room) && !find_city(emp, room)) {
+	if (emp && ROOM_OWNER(room) && !is_in_city_for_empire(room, emp, FALSE, &junk)) {
 		read_empire_territory(emp);
 	}
 }
@@ -315,6 +316,14 @@ void construct_tunnel(char_data *ch, int dir, room_data *entrance, room_data *ex
 	
 	// link the final tunnel room
 	create_exit(last_room, exit, dir, TRUE);
+	
+	// get it all added to territory
+	if (ROOM_OWNER(entrance)) {
+		read_empire_territory(ROOM_OWNER(entrance));
+	}
+	if (ROOM_OWNER(exit) && ROOM_OWNER(exit) != ROOM_OWNER(entrance)) {
+		read_empire_territory(ROOM_OWNER(exit));
+	}
 }
 
 
@@ -326,7 +335,7 @@ void construct_tunnel(char_data *ch, int dir, room_data *entrance, room_data *ex
 */
 void disassociate_building(room_data *room) {
 	void decustomize_room(room_data *room);
-	extern struct instance_data *find_instance_by_room(room_data *room);
+	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 	void remove_designate_objects(room_data *room);
 	
 	room_data *iter, *next_iter;
@@ -334,7 +343,7 @@ void disassociate_building(room_data *room) {
 	bool deleted = FALSE;
 	
 	// delete any open instance here
-	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE) && (inst = find_instance_by_room(room))) {
+	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE) && (inst = find_instance_by_room(room, FALSE))) {
 		SET_BIT(inst->flags, INST_COMPLETED);
 	}
 	
@@ -364,6 +373,8 @@ void disassociate_building(room_data *room) {
 	remove_room_extra_data(room, ROOM_EXTRA_TAVERN_BREWING_TIME);
 	remove_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME);
 	remove_room_extra_data(room, ROOM_EXTRA_BUILD_RECIPE);
+	remove_room_extra_data(room, ROOM_EXTRA_FOUND_TIME);
+	remove_room_extra_data(room, ROOM_EXTRA_REDESIGNATE_TIME);
 
 	// disassociate inside rooms
 	HASH_ITER(interior_hh, interior_world_table, iter, next_iter) {
@@ -527,12 +538,10 @@ void finish_dismantle(char_data *ch, room_data *room) {
 	// check for required obj and return it
 	if ((type = find_building_list_entry(IN_ROOM(ch), FIND_BUILD_NORMAL)) || (type = find_building_list_entry(IN_ROOM(ch), FIND_BUILD_UPGRADE))) {
 		if (GET_CRAFT_REQUIRES_OBJ(type) != NOTHING && (proto = obj_proto(GET_CRAFT_REQUIRES_OBJ(type))) && !OBJ_FLAGGED(proto, OBJ_SINGLE_USE)) {
-			newobj = read_object(GET_CRAFT_REQUIRES_OBJ(type));
+			newobj = read_object(GET_CRAFT_REQUIRES_OBJ(type), TRUE);
 			
 			// scale item to minimum level
-			if (OBJ_FLAGGED(newobj, OBJ_SCALABLE)) {
-				scale_item_to_level(newobj, 0);
-			}
+			scale_item_to_level(newobj, 0);
 			
 			if (IS_NPC(ch)) {
 				obj_to_room(newobj, room);
@@ -775,7 +784,7 @@ void process_dismantling(char_data *ch, room_data *room) {
 		}
 		
 		if (res->amount > 0) {
-			obj = read_object(res->vnum);
+			obj = read_object(res->vnum, TRUE);
 			res->amount -= 1;
 		}
 			
@@ -787,10 +796,7 @@ void process_dismantling(char_data *ch, room_data *room) {
 
 	if (obj) {
 		// scale item to minimum level
-		if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-			scale_item_to_level(obj, 0);
-		}
-				
+		scale_item_to_level(obj, 0);
 		obj_to_char_or_room(obj, ch);
 		
 		act("$n removes $p from the structure.", FALSE, ch, obj, 0, TO_ROOM | TO_SPAMMY);
@@ -889,6 +895,7 @@ void setup_tunnel_entrance(char_data *ch, room_data *room, int dir) {
 	bitvector_t tunnel_flags = 0;	// formerly ROOM_AFF_CHAMELEON;
 	
 	empire_data *emp = get_or_create_empire(ch);
+	bool junk;
 	
 	construct_building(room, BUILDING_TUNNEL);
 		
@@ -896,10 +903,137 @@ void setup_tunnel_entrance(char_data *ch, room_data *room, int dir) {
 	SET_BIT(ROOM_AFF_FLAGS(room), tunnel_flags);
 	COMPLEX_DATA(room)->entrance = dir;
 	if (emp && can_claim(ch) && !ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE)) {
-		if (EMPIRE_OUTSIDE_TERRITORY(emp) < land_can_claim(emp, TRUE) || COUNTS_AS_IN_CITY(room) || find_city(emp, room)) {
+		if (EMPIRE_OUTSIDE_TERRITORY(emp) < land_can_claim(emp, TRUE) || is_in_city_for_empire(room, emp, FALSE, &junk)) {
 			ROOM_OWNER(room) = emp;
 		}
 	}
+}
+
+
+/**
+* Starts the dismantle on a building. This sends no messages and starts no
+* actions -- just updates the building to the dismantling state.
+*
+* @param room_data *loc The location to dismantle.
+*/
+void start_dismantle_building(room_data *loc) {
+	Resource composite_resources[MAX_RESOURCES_REQUIRED*2] = { END_RESOURCE_LIST };
+	struct building_resource_type *res, *next_res, *findres, *temp;
+	bool deleted = FALSE, found, upgraded = FALSE;
+	room_data *room, *next_room;
+	char_data *targ, *next_targ;
+	craft_data *type, *up_type;
+	obj_data *obj, *next_obj;
+	bld_data *up_bldg;
+	int iter;
+	
+	if (!IS_MAP_BUILDING(loc)) {
+		log("SYSERR: Attempting to dismantle non-building room #%d", GET_ROOM_VNUM(loc));
+		return;
+	}
+	
+	if (!(type = find_building_list_entry(loc, FIND_BUILD_NORMAL))) {
+		if ((type = find_building_list_entry(loc, FIND_BUILD_UPGRADE))) {
+			upgraded = TRUE;
+		}
+		else {
+			log("SYSERR: Attempting to dismantle non-dismantlable building at #%d", GET_ROOM_VNUM(loc));
+			return;
+		}
+	}
+
+	// interior only
+	HASH_ITER(interior_hh, interior_world_table, room, next_room) {
+		if (HOME_ROOM(room) == loc) {
+			remove_designate_objects(room);
+			delete_room_npcs(room, NULL);
+		
+			for (obj = ROOM_CONTENTS(room); obj; obj = next_obj) {
+				next_obj = obj->next_content;
+				obj_to_room(obj, loc);
+			}
+			for (targ = ROOM_PEOPLE(loc); targ; targ = next_targ) {
+				next_targ = targ->next_in_room;
+				if (!IS_NPC(targ)) {
+					GET_LAST_DIR(targ) = NO_DIR;
+				}
+				char_from_room(targ);
+				char_to_room(targ, loc);
+			}
+		
+			delete_room(room, FALSE);	// must check_all_exits
+			deleted = TRUE;
+		}
+	}
+	
+	if (deleted) {
+		check_all_exits();
+	}
+	
+	// unset private owner
+	if (ROOM_PRIVATE_OWNER(loc) != NOBODY) {
+		COMPLEX_DATA(loc)->private_owner = NOBODY;
+	}
+	
+	// prepare resources:
+	combine_resources(composite_resources, GET_CRAFT_RESOURCES(type));
+	if (upgraded) {
+		up_bldg = find_upgraded_from(building_proto(GET_CRAFT_BUILD_TYPE(type)));
+		up_type = find_build_craft(GET_BLD_VNUM(up_bldg));
+		
+		while (up_bldg && up_type) {
+			combine_resources(composite_resources, GET_CRAFT_RESOURCES(up_type));
+			
+			up_bldg = find_upgraded_from(up_bldg);
+			up_type = find_build_craft(GET_BLD_VNUM(up_bldg));
+		}
+	}
+
+	if (!IS_COMPLETE(loc)) {
+		// room was already started, so dismantle is more complicated
+	
+		// iterate over all building resources
+		for (iter = 0; composite_resources[iter].vnum != NOTHING; ++iter) {
+		
+			// find out if there's already an entry for this resource
+			found = FALSE;
+			for (findres = BUILDING_RESOURCES(loc); findres; findres = findres->next) {
+				if (findres->vnum == composite_resources[iter].vnum) {
+					found = TRUE;
+					// new amount is the difference between the original and the remaining, divided by 2
+					findres->amount = MAX(0, (composite_resources[iter].amount - findres->amount) / 2);
+				}
+			}
+			
+			// didn't find, so they already built that entire resource -- add it at half
+			if (!found && composite_resources[iter].amount/2 > 0) {
+				CREATE(res, struct building_resource_type, 1);
+				res->vnum = composite_resources[iter].vnum;
+				res->amount = composite_resources[iter].amount / 2;
+				
+				res->next = GET_BUILDING_RESOURCES(loc);
+				GET_BUILDING_RESOURCES(loc) = res;
+			}
+		}
+		
+		// check for things that now require 0 and remove them
+		for (res = GET_BUILDING_RESOURCES(loc); res; res = next_res) {
+			next_res = res->next;
+			
+			if (res->amount <= 0) {
+				REMOVE_FROM_LIST(res, GET_BUILDING_RESOURCES(loc), next);
+				free(res);
+			}
+		}
+	}
+	else {
+		// simple setup
+		setup_building_resources(loc, composite_resources, TRUE);
+	}
+
+	SET_BIT(ROOM_AFF_FLAGS(loc), ROOM_AFF_DISMANTLING);
+	SET_BIT(ROOM_BASE_FLAGS(loc), ROOM_AFF_DISMANTLING);
+	delete_room_npcs(loc, NULL);
 }
 
 
@@ -931,12 +1065,15 @@ char *vnum_to_interlink(room_vnum vnum) {
 //// MAIN BUILDING COMMANDS //////////////////////////////////////////////////
 
 ACMD(do_build) {
+	extern int get_crafting_level(char_data *ch);
+	
 	room_data *to_room = NULL, *to_rev = NULL;
 	obj_data *found_obj = NULL;
 	empire_data *e = NULL, *emp;
 	int dir = NORTH;
 	craft_data *iter, *next_iter, *type = NULL, *abbrev_match = NULL;
 	bool found = FALSE, found_any, this_line, is_closed, needs_facing, needs_reverse;
+	bool junk, wait;
 	
 	// simple rules for ch building a given craft
 	#define CHAR_CAN_BUILD(ch, ttype)  (GET_CRAFT_TYPE((ttype)) == CRAFT_TYPE_BUILD && !IS_SET(GET_CRAFT_FLAGS((ttype)), CRAFT_UPGRADE | CRAFT_DISMANTLE_ONLY) && (IS_IMMORTAL(ch) || !IS_SET(GET_CRAFT_FLAGS((ttype)), CRAFT_IN_DEVELOPMENT)) && (GET_CRAFT_ABILITY((ttype)) == NO_ABIL || HAS_ABILITY((ch), GET_CRAFT_ABILITY((ttype)))))
@@ -992,7 +1129,7 @@ ACMD(do_build) {
 				msg_to_char(ch, "You can't work on a burning building!\r\n");
 			}
 			else {
-				start_action(ch, ACT_BUILDING, 0, NOBITS);
+				start_action(ch, ACT_BUILDING, 0);
 				msg_to_char(ch, "You start building.\r\n");
 				act("$n starts building.", FALSE, ch, 0, 0, TO_ROOM);
 			}
@@ -1034,11 +1171,14 @@ ACMD(do_build) {
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're already busy.\r\n");
 	}
-	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_IN_CITY_ONLY) && !IS_IN_CITY(ch)) {
-		msg_to_char(ch, "You can only build that in a city.\r\n");
+	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_IN_CITY_ONLY) && !is_in_city_for_empire(IN_ROOM(ch), GET_LOYALTY(ch), TRUE, &wait)) {
+		msg_to_char(ch, "You can only build that in a city%s.\r\n", wait ? " (this city was founded too recently)" : "");
 	}
 	else if (GET_CRAFT_ABILITY(type) != NO_ABIL && !HAS_ABILITY(ch, GET_CRAFT_ABILITY(type))) {
 		msg_to_char(ch, "You don't have the skill to erect that structure.\r\n");
+	}
+	else if (GET_CRAFT_MIN_LEVEL(type) > get_crafting_level(ch)) {
+		msg_to_char(ch, "You need to have a crafting level of %d to build that.\r\n", GET_CRAFT_MIN_LEVEL(type));
 	}
 	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE | ROOM_AFF_HAS_INSTANCE)) {
 		msg_to_char(ch, "You can't build here.\r\n");
@@ -1126,7 +1266,7 @@ ACMD(do_build) {
 	// can_claim checks total available land, but the outside is check done within this block
 	if (can_claim(ch) && !ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE)) {
 		if (e || (e = get_or_create_empire(ch))) {
-			if (EMPIRE_OUTSIDE_TERRITORY(e) < land_can_claim(e, TRUE) || COUNTS_AS_IN_CITY(IN_ROOM(ch)) || find_city(e, IN_ROOM(ch))) {
+			if (EMPIRE_OUTSIDE_TERRITORY(e) < land_can_claim(e, TRUE) || is_in_city_for_empire(IN_ROOM(ch), e, FALSE, &junk)) {
 				ROOM_OWNER(IN_ROOM(ch)) = e;
 			}
 		}
@@ -1150,7 +1290,7 @@ ACMD(do_build) {
 		extract_obj(found_obj);
 	}
 
-	start_action(ch, ACT_BUILDING, 0, NOBITS);
+	start_action(ch, ACT_BUILDING, 0);
 	msg_to_char(ch, "You start to build %s %s!\r\n", AN(GET_CRAFT_NAME(type)), GET_CRAFT_NAME(type));
 	sprintf(buf, "$n begins to build %s %s!", AN(GET_CRAFT_NAME(type)), GET_CRAFT_NAME(type));
 	act(buf, FALSE, ch, 0, 0, TO_ROOM);
@@ -1165,17 +1305,8 @@ ACMD(do_build) {
 }
 
 
-ACMD(do_dismantle) {	
-	Resource composite_resources[MAX_RESOURCES_REQUIRED*2] = { END_RESOURCE_LIST };
-	obj_data *obj, *next_obj;
-	char_data *targ, *next_targ;
-	room_data *room, *next_room;
-	struct building_resource_type *res, *next_res, *findres, *temp;
-	int iter;
-	empire_data *emp;
-	bld_data *up_bldg;
-	craft_data *type, *up_type;
-	bool found, upgraded = FALSE, deleted = FALSE;
+ACMD(do_dismantle) {
+	craft_data *type;
 
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs cannot use the dismantle command.\r\n");
@@ -1207,7 +1338,7 @@ ACMD(do_dismantle) {
 	if (IS_DISMANTLING(IN_ROOM(ch))) {
 		msg_to_char(ch, "You begin to dismantle the building.\r\n");
 		act("$n begins to dismantle the building.", FALSE, ch, 0, 0, TO_ROOM);
-		start_action(ch, ACT_DISMANTLING, 0, NOBITS);
+		start_action(ch, ACT_DISMANTLING, 0);
 		return;
 	}
 	
@@ -1222,10 +1353,7 @@ ACMD(do_dismantle) {
 	}
 
 	if (!(type = find_building_list_entry(IN_ROOM(ch), FIND_BUILD_NORMAL))) {
-		if ((type = find_building_list_entry(IN_ROOM(ch), FIND_BUILD_UPGRADE))) {
-			upgraded = TRUE;
-		}
-		else {
+		if (!(type = find_building_list_entry(IN_ROOM(ch), FIND_BUILD_UPGRADE))) {
 			msg_to_char(ch, "You can't dismantle anything here.\r\n");
 			return;
 		}
@@ -1233,11 +1361,6 @@ ACMD(do_dismantle) {
 
 	if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE)) {
 		msg_to_char(ch, "You can't dismantle this.\r\n");
-		return;
-	}
-
-	if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_DISMANTLE)) {
-		msg_to_char(ch, "You can't dismantle this building (use 'nodismantle' to toggle).\r\n");
 		return;
 	}
 
@@ -1249,107 +1372,23 @@ ACMD(do_dismantle) {
 	if (GET_CRAFT_ABILITY(type) != NO_ABIL && !HAS_ABILITY(ch, GET_CRAFT_ABILITY(type))) {
 		msg_to_char(ch, "You don't have the skill needed to dismantle this building properly.\r\n");
 		return;
-		}
-
-	// interior only
-	HASH_ITER(interior_hh, interior_world_table, room, next_room) {
-		if (HOME_ROOM(room) == IN_ROOM(ch)) {
-			remove_designate_objects(room);
-			delete_room_npcs(room, NULL);
-		
-			for (obj = ROOM_CONTENTS(room); obj; obj = next_obj) {
-				next_obj = obj->next_content;
-				obj_to_room(obj, IN_ROOM(ch));
-			}
-			for (targ = ROOM_PEOPLE(room); targ; targ = next_targ) {
-				next_targ = targ->next_in_room;
-				if (!IS_NPC(targ)) {
-					GET_LAST_DIR(targ) = NO_DIR;
-				}
-				char_from_room(targ);
-				char_to_room(targ, IN_ROOM(ch));
-			}
-		
-			delete_room(room, FALSE);	// must check_all_exits
-			deleted = TRUE;
-		}
 	}
 	
-	if (deleted) {
-		check_all_exits();
-	}
-	
-	// unset private owner
-	if (ROOM_PRIVATE_OWNER(IN_ROOM(ch)) != NOBODY) {
-		COMPLEX_DATA(IN_ROOM(ch))->private_owner = NOBODY;
-	}
-	
-	// prepare resources:
-	combine_resources(composite_resources, GET_CRAFT_RESOURCES(type));
-	if (upgraded) {
-		up_bldg = find_upgraded_from(building_proto(GET_CRAFT_BUILD_TYPE(type)));
-		up_type = find_build_craft(GET_BLD_VNUM(up_bldg));
-		
-		while (up_bldg && up_type) {
-			combine_resources(composite_resources, GET_CRAFT_RESOURCES(up_type));
-			
-			up_bldg = find_upgraded_from(up_bldg);
-			up_type = find_build_craft(GET_BLD_VNUM(up_bldg));
-		}
+	if (SECT_FLAGGED(ROOM_ORIGINAL_SECT(IN_ROOM(ch)), SECTF_FRESH_WATER | SECTF_OCEAN) && is_entrance(IN_ROOM(ch))) {
+		msg_to_char(ch, "You can't dismantle here because it's the entrance for another building.\r\n");
+		return;
 	}
 
-	if (!IS_COMPLETE(IN_ROOM(ch))) {
-		// room was already started, so dismantle is more complicated
-	
-		// iterate over all building resources
-		for (iter = 0; composite_resources[iter].vnum != NOTHING; ++iter) {
-		
-			// find out if there's already an entry for this resource
-			found = FALSE;
-			for (findres = BUILDING_RESOURCES(IN_ROOM(ch)); findres; findres = findres->next) {
-				if (findres->vnum == composite_resources[iter].vnum) {
-					found = TRUE;
-					// new amount is the difference between the original and the remaining, divided by 2
-					findres->amount = MAX(0, (composite_resources[iter].amount - findres->amount) / 2);
-				}
-			}
-			
-			// didn't find, so they already built that entire resource -- add it at half
-			if (!found && composite_resources[iter].amount/2 > 0) {
-				CREATE(res, struct building_resource_type, 1);
-				res->vnum = composite_resources[iter].vnum;
-				res->amount = composite_resources[iter].amount / 2;
-				
-				res->next = GET_BUILDING_RESOURCES(IN_ROOM(ch));
-				GET_BUILDING_RESOURCES(IN_ROOM(ch)) = res;
-			}
-		}
-		
-		// check for things that now require 0 and remove them
-		for (res = GET_BUILDING_RESOURCES(IN_ROOM(ch)); res; res = next_res) {
-			next_res = res->next;
-			
-			if (res->amount <= 0) {
-				REMOVE_FROM_LIST(res, GET_BUILDING_RESOURCES(IN_ROOM(ch)), next);
-				free(res);
-			}
-		}
-	}
-	else {
-		// simple setup
-		setup_building_resources(IN_ROOM(ch), composite_resources, TRUE);
+	if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_DISMANTLE)) {
+		msg_to_char(ch, "You can't dismantle this building (use 'nodismantle' to toggle).\r\n");
+		return;
 	}
 	
-	if ((emp = ROOM_OWNER(IN_ROOM(ch)))) {
-		read_empire_territory(emp);
+	start_dismantle_building(IN_ROOM(ch));
+	if (ROOM_OWNER(IN_ROOM(ch))) {
+		read_empire_territory(ROOM_OWNER(IN_ROOM(ch)));
 	}
-
-	SET_BIT(ROOM_AFF_FLAGS(IN_ROOM(ch)), ROOM_AFF_DISMANTLING);
-	SET_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_DISMANTLING);
-	delete_room_npcs(IN_ROOM(ch), NULL);
-	
-	start_action(ch, ACT_DISMANTLING, 0, NOBITS);
-
+	start_action(ch, ACT_DISMANTLING, 0);
 	msg_to_char(ch, "You begin to dismantle the building.\r\n");
 	act("$n begins to dismantle the building.\r\n", FALSE, ch, 0, 0, TO_ROOM);
 	process_dismantling(ch, IN_ROOM(ch));
@@ -1481,6 +1520,7 @@ ACMD(do_dedicate) {
 
 // Takes subcmd SCMD_DESIGNATE, SCMD_REDESIGNATE
 ACMD(do_designate) {
+	extern struct empire_territory_data *create_territory_entry(empire_data *emp, room_data *room);
 	extern bld_data *get_building_by_name(char *name, bool room_only);
 	void sort_world_table();
 	
@@ -1542,6 +1582,9 @@ ACMD(do_designate) {
 	}
 	else if (!IS_INSIDE(IN_ROOM(ch)) && subcmd == SCMD_REDESIGNATE)
 		msg_to_char(ch, "You can't redesignate here.\r\n");
+	else if (subcmd == SCMD_REDESIGNATE && get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_REDESIGNATE_TIME) + (config_get_int("redesignate_time") * SECS_PER_REAL_MIN) > time(0)) {
+		msg_to_char(ch, "You can't redesignate this room so soon.\r\n");
+	}
 	else if (BLD_MAX_ROOMS(IN_ROOM(ch)) <= 0)
 		msg_to_char(ch, "You can't designate here.\r\n");
 	else if (subcmd == SCMD_DESIGNATE && (ex = find_exit(IN_ROOM(ch), dir)) && ex->room_ptr)
@@ -1574,13 +1617,13 @@ ACMD(do_designate) {
 		// add new objects
 		switch (GET_BLD_VNUM(type)) {
 			case RTYPE_STUDY: {
-				obj_to_room((obj = read_object(BOARD_MORT)), new);
+				obj_to_room((obj = read_object(BOARD_MORT, TRUE)), new);
 				load_otrigger(obj);
 				break;
 			}
 			case RTYPE_BEDROOM: {
 				if (ROOM_PRIVATE_OWNER(HOME_ROOM(IN_ROOM(ch))) != NOBODY) {
-					obj_to_room((obj = read_object(o_HOME_CHEST)), new);
+					obj_to_room((obj = read_object(o_HOME_CHEST, TRUE)), new);
 					load_otrigger(obj);
 				}
 				break;
@@ -1590,6 +1633,8 @@ ACMD(do_designate) {
 		/* set applicable values */
 		COMPLEX_DATA(new)->home_room = home;
 		ROOM_OWNER(new) = ROOM_OWNER(home);
+		
+		set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_REDESIGNATE_TIME, time(0));
 
 		/* send messages */
 		if (subcmd == SCMD_REDESIGNATE) {
@@ -1606,7 +1651,10 @@ ACMD(do_designate) {
 					act(buf, FALSE, ch, 0, vict, TO_VICT);
 				}
 			}
-
+			
+			if (ROOM_OWNER(new)) {
+				create_territory_entry(ROOM_OWNER(new), new);
+			}
 			// sort now just in case
 			sort_world_table();
 		}
@@ -1776,11 +1824,11 @@ ACMD(do_lay) {
 ACMD(do_maintain) {
 	Resource res[3] = { { o_LUMBER, BUILDING_DISREPAIR(IN_ROOM(ch)) }, { o_NAILS, BUILDING_DISREPAIR(IN_ROOM(ch)) }, END_RESOURCE_LIST };
 	
-	if (BUILDING_DISREPAIR(IN_ROOM(ch)) <= 0) {
-		msg_to_char(ch, "It needs no maintenance.\r\n");
-	}
-	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+	if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		msg_to_char(ch, "You can't perform maintenance here.\r\n");
+	}
+	else if (BUILDING_DISREPAIR(IN_ROOM(ch)) <= 0) {
+		msg_to_char(ch, "It needs no maintenance.\r\n");
 	}
 	else if (!has_resources(ch, res, TRUE, TRUE)) {
 		// sends own messages
@@ -1819,7 +1867,7 @@ ACMD(do_nodismantle) {
 
 
 ACMD(do_tunnel) {
-	bitvector_t exit_bld_flags = BLD_ON_PLAINS | BLD_ANY_FOREST | BLD_ON_DESERT | BLD_FACING_CROP | BLD_ON_GROVE;
+	bitvector_t exit_bld_flags = BLD_ON_PLAINS | BLD_ANY_FOREST | BLD_ON_DESERT | BLD_FACING_CROP | BLD_ON_GROVE | BLD_FACING_OPEN_BUILDING;
 	bitvector_t mountain_bld_flags = BLD_ON_MOUNTAIN;
 
 	room_data *entrance, *exit = NULL, *to_room, *last_room = NULL, *past_exit;
@@ -1916,6 +1964,7 @@ ACMD(do_tunnel) {
 ACMD(do_upgrade) {
 	craft_data *iter, *next_iter, *type;
 	bld_vnum upgrade = GET_BLD_UPGRADES_TO(building_proto(BUILDING_VNUM(IN_ROOM(ch))));
+	bool wait, room_wait;
 	
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs cannot use the upgrade command.\r\n");
@@ -1953,12 +2002,12 @@ ACMD(do_upgrade) {
 		else if (GET_CRAFT_ABILITY(type) != NO_ABIL && !HAS_ABILITY(ch, GET_CRAFT_ABILITY(type))) {
 			msg_to_char(ch, "You don't have the required ability to upgrade this building.\r\n");
 		}
-		else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_IN_CITY_ONLY) && !IS_IN_CITY(ch)) {
-			msg_to_char(ch, "You can only upgrade this building in a city.\r\n");
+		else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_IN_CITY_ONLY) && !is_in_city_for_empire(IN_ROOM(ch), GET_LOYALTY(ch), TRUE, &wait) && !is_in_city_for_empire(IN_ROOM(ch), ROOM_OWNER(IN_ROOM(ch)), TRUE, &room_wait)) {
+			msg_to_char(ch, "You can only upgrade this building in a city%s.\r\n", (wait || room_wait) ? " (this city was founded too recently)" : "");
 		}
 		else {
 			// it's good!
-			start_action(ch, ACT_BUILDING, 0, NOBITS);
+			start_action(ch, ACT_BUILDING, 0);
 
 			attach_building_to_room(building_proto(GET_CRAFT_BUILD_TYPE(type)), IN_ROOM(ch));
 			set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_BUILD_RECIPE, GET_CRAFT_VNUM(type));

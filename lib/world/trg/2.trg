@@ -75,6 +75,7 @@ end
 %force% %actor% look
 eval last_hestian_time %timestamp%
 remote last_hestian_time %actor.id%
+nop %actor.cancel_adventure_summon%
 ~
 #258
 Peace Pipe Toker~
@@ -150,6 +151,7 @@ end
 %force% %actor% look
 eval last_conveyance_time %timestamp%
 remote last_conveyance_time %actor.id%
+nop %actor.cancel_adventure_summon%
 %purge% %self%
 ~
 #263

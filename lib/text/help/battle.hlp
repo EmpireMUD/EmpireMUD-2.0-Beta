@@ -55,6 +55,7 @@ Bash (Battle ability)
 
 Usage:  bash [target]
 Cooldown:  9 seconds
+Cost:  15 move
 Debuff type:  Battle, Stun
 
 Bash your target with your weapon and send him flying to the ground. When you
@@ -98,6 +99,7 @@ Disarm (Battle ability)
 
 Usage:  disarm [target]
 Cooldown:  30 seconds
+Cost:  15 move
 Debuff type:  Battle
 
 In battle you can disarm your target, reducing the damage he deals by knocking
@@ -106,6 +108,13 @@ not have to type the target name -- it will target him automatically.
 
 If you are disarmed, you don't have to re-equip your weapon yourself. When
 the disarm affect wears off, it will still be in your <wield> slot.
+
+Disarmed players lose their weapon damage, and will make basic unarmed 'hit'
+attacks (unless the disarmed weapon was a caster weapon, in which case they
+receive a basic 'mana blast' attack instead).
+
+Disarmed mobs lose half their damage and their attack type is changed to 'hit'
+or 'mana blast'.
 #
 "DUAL-WIELD" "DUAL WIELD"
 
@@ -139,12 +148,15 @@ Finesse (Battle ability)
 With finesse, your melee attacks happen faster, leading to more damage overall.
 As a basic ability, attacks are 10% faster. As a specialty ability, they are
 15% faster. As a class ability, they are 20% faster.
+
+See also: SPEED
 #
 FIRSTAID "FIRST AID"
 
 Firstaid (Battle ability)
 
 Usage:  firstaid [target]
+Cost:  20 move
 
 Treat small wounds on the battlefield (but not while in combat). It can remove
 physical and poison DoT effects, too.
@@ -162,6 +174,7 @@ Heartstop (Battle ability)
 
 Usage:  heartstop [target]
 Cooldown:  30 seconds
+Cost:  30 move
 Debuff type:  Battle
 
 Learn to fight vampires and win as you find the right spot to hit to stop them
@@ -173,6 +186,7 @@ Kick (Battle ability)
 
 Usage:  kick [victim]
 Cooldown:  6 seconds
+Cost:  10 move
 
 Kick is a special attack that does bonus damage outside of the combat round.
 
@@ -239,7 +253,7 @@ This ability gives at least +10 dodge automatically.
 As a specialty ability, it gives +5% total dodge.
 As a class ability, it gives +10% total dodge.
 
-This dodge bonus is refleced on your 'score'.
+This dodge bonus is reflected on your 'score'.
 
 See also: SHIELD BLOCK, QUICK BLOCK, BLOCK ARROWS, MEDIUM ARMOR, OUTRAGE,
     HEAVY ARMOR, RESCUE, DISARM
@@ -250,9 +264,10 @@ Rescue (Battle ability)
 
 Usage:  rescue [victim]
 Cooldown:  6 seconds
+Cost:  20 move
 
 This command is useful if you want to try and make an attacker hit you instead
-of your poor friend who is being pummeled. You can only 'turn' one animal for
+of your poor friend who is being pummeled. You can only 'turn' one enemy for
 each rescue attempt. This is very useful when working in hunting parties, of
 course.
 
@@ -271,12 +286,6 @@ Usage:  respawn
 When your character has died, you can still observe for a short time. When you
 are ready to respawn, use this command.
 
-You can also use this command to accept a resurrection even after you have
-left your corpse. If you do, you will be returned to the corpse's location and
-your health/move/mana levels may change again. These resurrection offers only
-last for five minutes, and then expire. You also can't be resurrected after
-respawning if you quit and re-enter, die again, or if there is a reboot.
-
 See also: DEATH, TOMB
 #
 "SHIELD BLOCK" SHIELDS
@@ -287,7 +296,8 @@ This training allows you to hold shields in your offhand and use them to
 block attacks. When you successfully block an attack, you take no damage
 from it.
 
-You must be holding a shield to block attacks.
+You must be holding a shield to block attacks, and you cannot normally block
+magical attacks.
 
 See also:  BLOCK, HOLD
 #
@@ -314,7 +324,7 @@ short your character waits between attacks.
 Your current speed is shown on your score display. A lower speed is better,
 since it is the time between attacks.
 
-See also: SCORE
+See also: SCORE, WITS, HASTEN, SLOW
 #
 "STUNNING BLOW"
 
@@ -350,7 +360,9 @@ Ward Against Magic
 Class ability: Barbarian, Reaper
 
 This ability allows characters to block magical attacks with their shields,
-albeit at a reduced rate. Only 50% of the character's block rating applies to
-blocking magical attacks.
+albeit at a reduced rate. Your normal block chance is halved against magical
+attacks.
+
+See also: BLOCK
 #
 $

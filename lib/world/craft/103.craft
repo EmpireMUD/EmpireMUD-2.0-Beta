@@ -1,0 +1,108 @@
+#10308
+dragonscale leggings~
+10308 1  # 1x dragonscale leggings
+4 199 gh 24 10312
+R
+10006 3  # 3x a dragon scale
+R
+1357 4  # 4x a large piece of leather
+R
+103 6  # 6x a yellow lightning stone
+R
+176 6  # 6x an ingot of nocturnium
+S
+#10309
+dragonweave stockings~
+10309 1  # 1x dragonweave stockings
+4 199 gh 24 10313
+R
+10006 3  # 3x a dragon scale
+R
+1357 4  # 4x a large piece of leather
+R
+103 6  # 6x a yellow lightning stone
+R
+176 6  # 6x an ingot of nocturnium
+S
+#10310
+dragonplate breeches~
+10310 1  # 1x dragonplate breeches
+1 197 h 24 10314
+R
+10006 3  # 3x a dragon scale
+R
+1357 4  # 4x a large piece of leather
+R
+104 6  # 6x a red bloodstone
+R
+177 8  # 8x an imperium ingot
+S
+#10311
+dragonmail chaps~
+10311 1  # 1x dragonmail chaps
+2 182 gh 24 10315
+R
+10006 3  # 3x a dragon scale
+R
+1357 4  # 4x a large piece of leather
+R
+104 6  # 6x a red bloodstone
+R
+177 8  # 8x an imperium ingot
+S
+#10340
+dragonfruit jam~
+10340 1  # 1x dragonfruit jam
+3 -1 ch 15 10339
+R
+10339 3  # 3x a basket of dragonfruit
+S
+#10341
+dragonscale wristguard~
+10341 1  # 1x a dragonscale wristguard
+1 197 0 30 10342
+R
+10006 3  # 3x a dragon scale
+R
+1356 2  # 2x a small piece of leather
+R
+177 10  # 10x an imperium ingot
+R
+104 6  # 6x a red bloodstone
+S
+#10343
+dragonscale bangles~
+10341 1  # 1x a dragonscale wristguard
+2 199 g 30 10344
+R
+10006 3  # 3x a dragon scale
+R
+176 10  # 10x an ingot of nocturnium
+R
+103 8  # 8x a yellow lightning stone
+S
+#10345
+dragonscale bracers~
+10345 1  # 1x dragonscale bracers
+4 182 g 30 10346
+R
+10006 3  # 3x a dragon scale
+R
+1356 2  # 2x a small piece of leather
+R
+177 10  # 10x an imperium ingot
+R
+104 6  # 6x a red bloodstone
+S
+#10347
+dragonscale saddle~
+10347 1  # 1x a dragonscale saddle
+4 182 g 30 10348
+R
+10006 2  # 2x a dragon scale
+R
+1357 8  # 8x a large piece of leather
+R
+1206 6  # 6x an iridescent blue iris
+S
+$

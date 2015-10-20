@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: dg_db_scripts.c                                 EmpireMUD 2.0b2 *
+*   File: dg_db_scripts.c                                 EmpireMUD 2.0b3 *
 *  Usage: Contains routines to handle db functions for scripts and trigs  *
 *                                                                         *
 *  DG Scripts code by egreen, 1996/09/30 21:27:54, revision 3.7           *
@@ -168,6 +168,7 @@ void dg_read_trigger(char *line, void *proto, int type) {
 	char_data *mob;
 	room_data *room;
 	room_template *rmt;
+	adv_data *adv;
 	trig_data *trproto;
 	struct trig_proto_list *trg_proto, *new_trg;
 
@@ -190,6 +191,9 @@ void dg_read_trigger(char *line, void *proto, int type) {
 			case RMT_TRIGGER:
 				syslog(SYS_ERROR, LVL_BUILDER, TRUE,  "SYSERR: dg_read_trigger: Trigger vnum #%d asked for but non-existant! (room:%d)", vnum, ((room_template*)proto)->vnum);
 				break;
+			case ADV_TRIGGER:
+				syslog(SYS_ERROR, LVL_BUILDER, TRUE,  "SYSERR: dg_read_trigger: Trigger vnum #%d asked for but non-existant! (room:%d)", vnum, ((adv_data*)proto)->vnum);
+				break;
 			default:
 				syslog(SYS_ERROR, LVL_BUILDER, TRUE, "SYSERR: dg_read_trigger: Trigger vnum #%d asked for but non-existant! (?)", vnum);
 				break;
@@ -198,6 +202,23 @@ void dg_read_trigger(char *line, void *proto, int type) {
 	}
 
 	switch(type) {
+		case ADV_TRIGGER: {
+			CREATE(new_trg, struct trig_proto_list, 1);
+			new_trg->vnum = vnum;
+			new_trg->next = NULL;
+			adv = (adv_data*)proto;
+			trg_proto = GET_ADV_SCRIPTS(adv);
+			if (!trg_proto) {
+				GET_ADV_SCRIPTS(adv) = trg_proto = new_trg;
+			}
+			else {
+				while (trg_proto->next) {
+					trg_proto = trg_proto->next;
+				}
+				trg_proto->next = new_trg;
+			}
+			break;
+		}
 		case MOB_TRIGGER:
 			CREATE(new_trg, struct trig_proto_list, 1);
 			new_trg->vnum = vnum;

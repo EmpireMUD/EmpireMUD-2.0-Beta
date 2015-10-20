@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: db.lib.c                                        EmpireMUD 2.0b2 *
+*   File: db.lib.c                                        EmpireMUD 2.0b3 *
 *  Usage: Primary read/write functions for game world data                *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -33,6 +33,7 @@
 *   Empire NPC Lib
 *   Exit Lib
 *   Extra Description Lib
+*   Globals Lib
 *   Icon Lib
 *   Interaction Lib
 *   Mobile Lib
@@ -137,6 +138,9 @@ void free_adventure(adv_data *adv) {
 			GET_ADV_LINKING(adv) = link->next;
 			free(link);
 		}
+	}
+	if (GET_ADV_SCRIPTS(adv) && (!proto || GET_ADV_SCRIPTS(adv) != GET_ADV_SCRIPTS(proto))) {
+		free_proto_script(adv, ADV_TRIGGER);
 	}
 	
 	free(adv);
@@ -264,6 +268,11 @@ void parse_adventure(FILE *fl, adv_vnum vnum) {
 				return;
 			}
 			
+			case 'T': {	// trigger
+				dg_read_trigger(line, adv, ADV_TRIGGER);
+				break;
+			}
+			
 			default: {
 				log("SYSERR: Format error in %s, expecting alphabetic flags", buf2);
 				exit(1);
@@ -311,6 +320,9 @@ void write_adventure_to_file(FILE *fl, adv_data *adv) {
 		strcpy(temp2, bitv_to_alpha(link->bld_facing));
 		fprintf(fl, "%d %s %s\n", link->dir, temp, temp2);
 	}
+	
+	// T: triggers
+	script_save_to_disk(fl, adv, ADV_TRIGGER);
 	
 	// end
 	fprintf(fl, "S\n");
@@ -785,6 +797,17 @@ void parse_craft(FILE *fl, craft_vnum vnum) {
 				GET_CRAFT_BUILD_FACING(craft) = asciiflag_conv(str_in2);
 				break;
 			}
+			
+			// L: Minimum crafting level
+			case 'L': {
+				if (!get_line(fl, line) || sscanf(line, "%d", &int_in[0]) != 1) {
+					log("SYSERR: Format error in L section of craft recipe #%d", vnum);
+					exit(1);
+				}
+				
+				GET_CRAFT_MIN_LEVEL(craft) = int_in[0];
+				break;
+			}
 
 			// resources: vnum amount
 			case 'R': {
@@ -846,6 +869,11 @@ void write_craft_to_file(FILE *fl, craft_data *craft) {
 		
 		fprintf(fl, "B\n");
 		fprintf(fl, "%d %s %s\n", GET_CRAFT_BUILD_TYPE(craft), temp1, temp2);
+	}
+	
+	if (GET_CRAFT_MIN_LEVEL(craft) > 0) {
+		fprintf(fl, "L\n");
+		fprintf(fl, "%d\n", GET_CRAFT_MIN_LEVEL(craft));
 	}
 	
 	for (iter = 0; iter < MAX_RESOURCES_REQUIRED && GET_CRAFT_RESOURCES(craft)[iter].vnum != NOTHING; ++iter) {
@@ -1146,7 +1174,7 @@ empire_data *create_empire(char_data *ch) {
 	int iter;
 	
 	// &r, etc
-	char *colorlist = "rgybmcRGYBMC";
+	char *colorlist = "rgbymcajloptvnRGBYMCAJLOPTV";
 	int num_colors = 12;
 	
 	// this SHOULD always find a vnum
@@ -1346,6 +1374,28 @@ void delete_empire(empire_data *emp) {
 
 
 /**
+* Frees a set of workforce trackers.
+*
+* @param struct empire_workforce_tracker **tracker A pointer to the hash table of trackers.
+*/
+void ewt_free_tracker(struct empire_workforce_tracker **tracker) {
+	struct empire_workforce_tracker *ewt, *next_ewt;
+	struct empire_workforce_tracker_island *isle, *next_isle;
+	
+	HASH_ITER(hh, *tracker, ewt, next_ewt) {
+		HASH_ITER(hh, ewt->islands, isle, next_isle) {
+			HASH_DEL(ewt->islands, isle);
+			free(isle);
+		}
+		
+		HASH_DEL(*tracker, ewt);
+		free(ewt);
+	}
+	*tracker = NULL;
+}
+
+
+/**
 * Frees up strings and lists in the empire.
 *
 * @param empire_data *emp The empire to free
@@ -1354,12 +1404,14 @@ void free_empire(empire_data *emp) {
 	extern struct empire_territory_data *global_next_territory_entry;
 	
 	struct empire_storage_data *store;
+	struct empire_unique_storage *eus;
 	struct empire_territory_data *ter;
 	struct empire_npc_data *npc;
 	struct empire_city_data *city;
 	struct empire_political_data *pol;
 	struct empire_trade_data *trade;
 	struct empire_log_data *elog;
+	struct shipping_data *shipd;
 	room_data *room;
 	int iter, pos;
 	
@@ -1381,6 +1433,22 @@ void free_empire(empire_data *emp) {
 		free(store);
 	}
 	emp->store = NULL;
+	
+	// free unique storage
+	while ((eus = EMPIRE_UNIQUE_STORAGE(emp))) {
+		EMPIRE_UNIQUE_STORAGE(emp) = eus->next;
+		if (eus->obj) {
+			extract_obj(eus->obj);
+		}
+	}
+	EMPIRE_UNIQUE_STORAGE(emp) = NULL;
+	
+	// free shipping data
+	while ((shipd = EMPIRE_SHIPPING_LIST(emp))) {
+		EMPIRE_SHIPPING_LIST(emp) = shipd->next;
+		free(shipd);
+	}
+	EMPIRE_SHIPPING_LIST(emp) = NULL;
 	
 	// free cities (while they last)
 	while ((city = emp->city_list)) {
@@ -1459,6 +1527,7 @@ void free_empire(empire_data *emp) {
 			free(emp->rank[iter]);
 		}
 	}
+	ewt_free_tracker(&EMPIRE_WORKFORCE_TRACKER(emp));
 	
 	free(emp);
 }
@@ -1471,10 +1540,12 @@ void free_empire(empire_data *emp) {
 * @param empire_data *emp The empire to assign the storage to.
 */
 void load_empire_storage_one(FILE *fl, empire_data *emp) {	
-	int t[6], junk;
+	int t[10], junk;
+	long l_in;
 	char line[1024], str_in[256], buf[MAX_STRING_LENGTH];
-	struct empire_storage_data *store;
+	struct empire_storage_data *store, *last_store = NULL;
 	struct empire_unique_storage *eus, *last_eus = NULL;
+	struct shipping_data *shipd, *last_shipd = NULL;
 	obj_data *obj;
 	
 	if (!fl || !emp) {
@@ -1503,8 +1574,14 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 					store->amount = t[1];
 					store->island = t[2];
 
-					store->next = emp->store;
-					emp->store = store;
+					// at end
+					if (last_store) {
+						last_store->next = store;
+					}
+					else {
+						emp->store = store;
+					}
+					last_store = store;
 				}
 				else {
 					log("- removing %dx #%d from empire storage for %s: no such object", t[1], t[0], EMPIRE_NAME(emp));
@@ -1543,6 +1620,33 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 					last_eus = eus;
 				}
 				
+				break;
+			}
+			case 'V': {	// shipments
+				if (sscanf(line, "V %d %d %d %d %d %ld %d %d", &t[0], &t[1], &t[2], &t[3], &t[4], &l_in, &t[5], &t[6]) != 8) {
+					log("SYSERR: Invalid V line of empire %d: %s", EMPIRE_VNUM(emp), line);
+					exit(0);
+				}
+				
+				CREATE(shipd, struct shipping_data, 1);
+				shipd->vnum = t[0];
+				shipd->amount = t[1];
+				shipd->from_island = t[2];
+				shipd->to_island = t[3];
+				shipd->status = t[4];
+				shipd->status_time = l_in;
+				shipd->ship_homeroom = t[5];
+				shipd->ship_origin = t[6];
+				shipd->next = NULL;
+
+				// append to end
+				if (last_shipd) {
+					last_shipd->next = shipd;
+				}
+				else {
+					EMPIRE_SHIPPING_LIST(emp) = shipd;
+				}
+				last_shipd = shipd;
 				break;
 			}
 
@@ -1914,6 +2018,7 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	}
 	
 	// avoid U (used by empire storage)
+	// avoid V (used by empire storage)
 	
 	// X: trade
 	for (trade = EMPIRE_TRADE(emp); trade; trade = trade->next) {
@@ -1939,6 +2044,7 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 void write_empire_storage_to_file(FILE *fl, empire_data *emp) {	
 	struct empire_storage_data *store;
 	struct empire_unique_storage *eus;
+	struct shipping_data *shipd;
 
 	if (!emp) {
 		return;
@@ -1957,6 +2063,11 @@ void write_empire_storage_to_file(FILE *fl, empire_data *emp) {
 		}
 		fprintf(fl, "U %d %d %s\n", eus->island, eus->amount, bitv_to_alpha(eus->flags));
 		Crash_save_one_obj_to_file(fl, eus->obj, 0);
+	}
+	
+	// V: shipments
+	for (shipd = EMPIRE_SHIPPING_LIST(emp); shipd; shipd = shipd->next) {
+		fprintf(fl, "V %d %d %d %d %d %ld %d %d\n", shipd->vnum, shipd->amount, shipd->from_island, shipd->to_island, shipd->status, shipd->status_time, shipd->ship_homeroom, shipd->ship_origin);
 	}
 
 	fprintf(fl, "S\n");
@@ -2198,7 +2309,7 @@ char_data *spawn_empire_npc_to_room(empire_data *emp, struct empire_npc_data *np
 	
 	char_data *mob;
 	
-	mob = read_mobile((override_mob == NOTHING) ? npc->vnum : override_mob);
+	mob = read_mobile((override_mob == NOTHING) ? npc->vnum : override_mob, TRUE);
 	
 	GET_EMPIRE_NPC_DATA(mob) = npc;
 	npc->mob = mob;
@@ -2439,6 +2550,164 @@ void write_extra_descs_to_file(FILE *fl, struct extra_descr_data *list) {
 		strip_crlf(temp);
 		fprintf(fl, "%s~\n", temp);
 	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// GLOBALS LIB /////////////////////////////////////////////////////////////
+
+/**
+* Puts a global into the hash table.
+*
+* @param struct global_data *glb The global data to add to the table.
+*/
+void add_global_to_table(struct global_data *glb) {
+	extern int sort_globals(struct global_data *a, struct global_data *b);
+	
+	struct global_data *find;
+	any_vnum vnum;
+	
+	if (glb) {
+		vnum = GET_GLOBAL_VNUM(glb);
+		HASH_FIND_INT(globals_table, &vnum, find);
+		if (!find) {
+			HASH_ADD_INT(globals_table, vnum, glb);
+			HASH_SORT(globals_table, sort_globals);
+		}
+	}
+}
+
+/**
+* Removes a global from the hash table.
+*
+* @param struct global_data *glb The global data to remove from the table.
+*/
+void remove_global_from_table(struct global_data *glb) {
+	HASH_DEL(globals_table, glb);
+}
+
+
+/**
+* frees up memory for a global data item.
+*
+* See also: olc_delete_global
+*
+* @param struct global_data *glb The global data to free.
+*/
+void free_global(struct global_data *glb) {
+	struct global_data *proto = global_proto(GET_GLOBAL_VNUM(glb));
+	struct interaction_item *interact;
+	
+	if (GET_GLOBAL_NAME(glb) && (!proto || GET_GLOBAL_NAME(glb) != GET_GLOBAL_NAME(proto))) {
+		free(GET_GLOBAL_NAME(glb));
+	}
+	
+	if (GET_GLOBAL_INTERACTIONS(glb) && (!proto || GET_GLOBAL_INTERACTIONS(glb) != GET_GLOBAL_INTERACTIONS(proto))) {
+		while ((interact = GET_GLOBAL_INTERACTIONS(glb))) {
+			GET_GLOBAL_INTERACTIONS(glb) = interact->next;
+			free(interact);
+		}
+	}
+	
+	free(glb);
+}
+
+
+/**
+* Read one global from file.
+*
+* @param FILE *fl The open .glb file
+* @param any_vnum vnum The global vnum
+*/
+void parse_global(FILE *fl, any_vnum vnum) {
+	struct global_data *glb, *find;
+	char line[256], str_in[256], str_in2[256], str_in3[256];
+	int int_in[4];
+
+	CREATE(glb, struct global_data, 1);
+	GET_GLOBAL_VNUM(glb) = vnum;
+
+	HASH_FIND_INT(globals_table, &vnum, find);
+	if (find) {
+		log("WARNING: Duplicate global vnum #%d", vnum);
+		// but have to load it anyway to advance the file
+	}
+	add_global_to_table(glb);
+		
+	// for error messages
+	sprintf(buf2, "global vnum %d", vnum);
+	
+	// line 1
+	GET_GLOBAL_NAME(glb) = fread_string(fl, buf2);
+	
+	// line 2: type flags typeflags typeexclude min_level-max_level
+	if (!get_line(fl, line) || sscanf(line, "%d %s %s %s %d-%d", &int_in[0], str_in, str_in2, str_in3, &int_in[1], &int_in[2]) != 6) {
+		log("SYSERR: Format error in line 2 of %s", buf2);
+		exit(1);
+	}
+	
+	GET_GLOBAL_TYPE(glb) = int_in[0];
+	GET_GLOBAL_FLAGS(glb) = asciiflag_conv(str_in);
+	GET_GLOBAL_TYPE_FLAGS(glb) = asciiflag_conv(str_in2);
+	GET_GLOBAL_TYPE_EXCLUDE(glb) = asciiflag_conv(str_in3);
+	GET_GLOBAL_MIN_LEVEL(glb) = int_in[1];
+	GET_GLOBAL_MAX_LEVEL(glb) = int_in[2];
+		
+	// optionals
+	for (;;) {
+		if (!get_line(fl, line)) {
+			log("SYSERR: Format error in %s, expecting alphabetic flags", buf2);
+			exit(1);
+		}
+		switch (*line) {
+			case 'I': {	// interaction item
+				parse_interaction(line, &GET_GLOBAL_INTERACTIONS(glb), buf2);
+				break;
+			}
+
+			// end
+			case 'S': {
+				return;
+			}
+			
+			default: {
+				log("SYSERR: Format error in %s, expecting alphabetic flags", buf2);
+				exit(1);
+			}
+		}
+	}
+}
+
+
+/**
+* Outputs one global item in the db file format, starting with a #VNUM and
+* ending with an S.
+*
+* @param FILE *fl The file to write it to.
+* @param struct global_data *glb The thing to save.
+*/
+void write_global_to_file(FILE *fl, struct global_data *glb) {
+	char temp[MAX_STRING_LENGTH], temp2[MAX_STRING_LENGTH], temp3[MAX_STRING_LENGTH];
+	
+	if (!fl || !glb) {
+		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: write_global_to_file called without %s", !fl ? "file" : "global");
+		return;
+	}
+	
+	fprintf(fl, "#%d\n", GET_GLOBAL_VNUM(glb));
+	
+	fprintf(fl, "%s~\n", NULLSAFE(GET_GLOBAL_NAME(glb)));
+
+	strcpy(temp, bitv_to_alpha(GET_GLOBAL_FLAGS(glb)));
+	strcpy(temp2, bitv_to_alpha(GET_GLOBAL_TYPE_FLAGS(glb)));
+	strcpy(temp3, bitv_to_alpha(GET_GLOBAL_TYPE_EXCLUDE(glb)));
+	fprintf(fl, "%d %s %s %s %d-%d\n", GET_GLOBAL_TYPE(glb), temp, temp2, temp3, GET_GLOBAL_MIN_LEVEL(glb), GET_GLOBAL_MAX_LEVEL(glb));
+
+	// I: interactions
+	write_interactions_to_file(fl, GET_GLOBAL_INTERACTIONS(glb));
+	
+	// end
+	fprintf(fl, "S\n");
 }
 
 
@@ -3386,7 +3655,7 @@ void write_obj_to_file(FILE *fl, obj_data *obj) {
 	}
 	
 	// C: scaling
-	if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
+	if (GET_OBJ_MIN_SCALE_LEVEL(obj) > 0 || GET_OBJ_MAX_SCALE_LEVEL(obj) > 0) {
 		fprintf(fl, "C\n");
 		fprintf(fl, "%d %d\n", GET_OBJ_MIN_SCALE_LEVEL(obj), GET_OBJ_MAX_SCALE_LEVEL(obj));
 	}
@@ -3573,19 +3842,19 @@ void parse_room(FILE *fl, room_vnum vnum) {
 						reset->sarg2 = strdup(str2);
 					}
 				}
-				else if (strchr("TY", reset->command) != NULL) {	// trigger or generic-mob: 3-arg command
-					// trigger_type trigger_vnum room_vnum
+				else if (strchr("Y", reset->command) != NULL) {	// generic-mob: 3-arg command
 					// generic-sex generic-name empire-id
 					if (sscanf(ptr, " %d %d %d ", &reset->arg1, &reset->arg2, &reset->arg3) != 3) {
 						error = TRUE;
 					}
 				}
-				else if (strchr("CD", reset->command) != NULL) {	/* a 2-arg command */
+				else if (strchr("CDT", reset->command) != NULL) {	/* C, D, Trigger: a 2-arg command */
+					// trigger_type trigger_vnum
 					if (sscanf(ptr, " %d %d ", &reset->arg1, &reset->arg2) != 2) {
 						error = TRUE;
 					}
 				}
-				else if (strchr("M", reset->command) != NULL) {	// mob: 3 args
+				else if (strchr("M", reset->command) != NULL) {	// Mob: 3 args
 					if (sscanf(ptr, " %d %s %d ", &reset->arg1, str1, &reset->arg2) != 3) {
 						error = TRUE;
 					}
@@ -3692,7 +3961,11 @@ void parse_room(FILE *fl, room_vnum vnum) {
 				break;
 			}
 			
-			case 'T': {	// trigger
+			case 'T': {	// trigger (deprecated)
+				// NOTE: prior to b2.11, trigger prototypes were saved and read
+				// this way they are no longer saved this way at all, but this
+				// must be left in to be backwards-compatbile. If your mud has
+				// been up since b2.11, you can safely remove this block.
 				dg_read_trigger(line, room, WLD_TRIGGER);
 				break;
 			}
@@ -3753,6 +4026,7 @@ void write_room_to_file(FILE *fl, room_data *room) {
 	struct room_extra_data *red;
 	struct depletion_data *dep;
 	struct cooldown_data *cool;
+	trig_data *trig;
 	char_data *mob;
 	
 	if (!fl || !room) {
@@ -3781,6 +4055,12 @@ void write_room_to_file(FILE *fl, room_data *room) {
 				fprintf(fl, "C O\n");
 			}
 		}
+		// triggers: C T type vnum
+		if (SCRIPT(room)) {
+			for (trig = TRIGGERS(SCRIPT(room)); trig; trig = trig->next) {
+				fprintf(fl, "C T %d %d\n", WLD_TRIGGER, GET_TRIG_VNUM(trig));
+			}
+		}
 		if (ROOM_PEOPLE(room)) {
 			for (mob = ROOM_PEOPLE(room); mob; mob = mob->next_in_room) {
 				if (mob && IS_NPC(mob) && !MOB_FLAGGED(mob, MOB_EMPIRE | MOB_FAMILIAR)) {
@@ -3801,11 +4081,18 @@ void write_room_to_file(FILE *fl, room_data *room) {
 					for (cool = mob->cooldowns; cool; cool = cool->next) {
 						fprintf(fl, "C C %d %d\n", cool->type, (int)(cool->expire_time - time(0)));
 					}
+					
+					// triggers: C T type vnum
+					if (SCRIPT(mob)) {
+						for (trig = TRIGGERS(SCRIPT(mob)); trig; trig = trig->next) {
+							fprintf(fl, "C T %d %d\n", MOB_TRIGGER, GET_TRIG_VNUM(trig));
+						}
+					}
 				}
 			}
 		}
 		
-		// TODO triggers and vars?
+		// TODO script vars?
 	}
 
 	// E affects
@@ -3867,14 +4154,14 @@ void write_room_to_file(FILE *fl, room_data *room) {
 			fprintf(fl, "D%d\n%s~\n%s %d\n", ex->dir, buf2, bitv_to_alpha(ex->exit_info), ex->to_room);
 		}
 	}
+
+	// NOTE: Prior to b2.11, this saved T as prototype triggers, but this is
+	// no longer used: script_save_to_disk(fl, room, WLD_TRIGGER);
 	
 	// Z: extra data
 	for (red = room->extra_data; red; red = red->next) {
 		fprintf(fl, "Z\n%d %d\n", red->type, red->value);
 	}
-	
-	// T, V: triggers
-	script_save_to_disk(fl, room, WLD_TRIGGER);
 	
 	// end
 	fprintf(fl, "S\n");
@@ -4537,6 +4824,9 @@ void script_save_to_disk(FILE *fp, void *item, int type) {
 	else if (type == RMT_TRIGGER) {
 		t = ((room_template*)item)->proto_script;
 	}
+	else if (type == ADV_TRIGGER) {
+		t = ((adv_data*)item)->proto_script;
+	}
 	else {
 		log("SYSERR: Invalid type passed to script_save_to_disk()");
 		return;
@@ -4643,6 +4933,10 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 					parse_crop(fl, nr);
 					break;
 				}
+				case DB_BOOT_GLB: {
+					parse_global(fl, nr);
+					break;
+				}
 				case DB_BOOT_WLD:
 					parse_room(fl, nr);
 					break;
@@ -4720,7 +5014,7 @@ void index_boot(int mode) {
 	while (*buf1 != '$') {
 		sprintf(buf2, "%s%s", prefix, buf1);
 		if (!(db_file = fopen(buf2, "r"))) {
-			log("SYSERR: File '%s' listed in '%s/%s': %s", buf2, prefix, index_filename, strerror(errno));
+			log("SYSERR: File '%s' listed in '%s%s': %s", buf2, prefix, index_filename, strerror(errno));
 			fscanf(index, "%s\n", buf1);
 			continue;
 		}
@@ -4734,7 +5028,7 @@ void index_boot(int mode) {
 
 	if (!rec_count) {
 		// some types don't matter TODO could move this into a config
-		if (mode == DB_BOOT_EMP || mode == DB_BOOT_BOOKS || mode == DB_BOOT_CRAFT || mode == DB_BOOT_BLD || mode == DB_BOOT_ADV || mode == DB_BOOT_RMT || mode == DB_BOOT_WLD) {
+		if (mode == DB_BOOT_EMP || mode == DB_BOOT_BOOKS || mode == DB_BOOT_CRAFT || mode == DB_BOOT_BLD || mode == DB_BOOT_ADV || mode == DB_BOOT_RMT || mode == DB_BOOT_WLD || mode == DB_BOOT_GLB) {
 			// types that don't require any entries and exit early if none
 			return;
 		}
@@ -4783,6 +5077,11 @@ void index_boot(int mode) {
 			log("   %d crops, %d bytes in crop table.", rec_count, size[0]);
 			break;
 		}
+		case DB_BOOT_GLB: {
+			size[0] = sizeof(struct global_data) * rec_count;
+			log("   %d globals, %d bytes in globals table.", rec_count, size[0]);
+			break;
+		}
 		case DB_BOOT_NAMES: {
 			log("   %d name lists.", rec_count);
 			break;
@@ -4825,6 +5124,7 @@ void index_boot(int mode) {
 			case DB_BOOT_BLD:
 			case DB_BOOT_CRAFT:
 			case DB_BOOT_CROP:
+			case DB_BOOT_GLB:
 			case DB_BOOT_OBJ:
 			case DB_BOOT_MOB:
 			case DB_BOOT_EMP:
@@ -4917,6 +5217,15 @@ void save_library_file_for_vnum(int type, any_vnum vnum) {
 			HASH_ITER(hh, crop_table, crop, next_crop) {
 				if (GET_CROP_VNUM(crop) >= (zone * 100) && GET_CROP_VNUM(crop) <= (zone * 100 + 99)) {
 					write_crop_to_file(fl, crop);
+				}
+			}
+			break;
+		}
+		case DB_BOOT_GLB: {
+			struct global_data *glb, *next_glb;
+			HASH_ITER(hh, globals_table, glb, next_glb) {
+				if (GET_GLOBAL_VNUM(glb) >= (zone * 100) && GET_GLOBAL_VNUM(glb) <= (zone * 100 + 99)) {
+					write_global_to_file(fl, glb);
 				}
 			}
 			break;
@@ -5051,6 +5360,24 @@ void write_crop_index(FILE *fl) {
 	
 		if (this != last) {
 			fprintf(fl, "%d%s\n", this, CROP_SUFFIX);
+			last = this;
+		}
+	}
+}
+
+
+// writes entries in the room template index
+void write_globals_index(FILE *fl) {
+	struct global_data *glb, *next_glb;
+	int this, last;
+	
+	last = -1;
+	HASH_ITER(hh, globals_table, glb, next_glb) {
+		// determine "zone number" by vnum
+		this = (int)(GET_GLOBAL_VNUM(glb) / 100);
+	
+		if (this != last) {
+			fprintf(fl, "%d%s\n", this, GLB_SUFFIX);
 			last = this;
 		}
 	}
@@ -5193,6 +5520,10 @@ void save_index(int type) {
 			write_crop_index(fl);
 			break;
 		}
+		case DB_BOOT_GLB: {
+			write_globals_index(fl);
+			break;
+		}
 		case DB_BOOT_MOB: {
 			write_mobile_index(fl);
 			break;
@@ -5304,6 +5635,22 @@ crop_data *crop_proto(crop_vnum vnum) {
 	
 	HASH_FIND_INT(crop_table, &vnum, crop);
 	return crop;
+}
+
+
+/**
+* @param any_vnum vnum Any global vnum
+* @return struct global_data* The global, or NULL if it doesn't exist
+*/
+struct global_data *global_proto(any_vnum vnum) {
+	struct global_data *glb;
+	
+	if (vnum < 0 || vnum == NOTHING) {
+		return NULL;
+	}
+	
+	HASH_FIND_INT(globals_table, &vnum, glb);
+	return glb;
 }
 
 
@@ -5688,6 +6035,18 @@ int sort_crops(crop_data *a, crop_data *b) {
 
 
 /**
+* Simple sorter for the globals hash
+*
+* @param struct global_data *a One element
+* @param struct global_data *b Another element
+* @return int Sort instruction of -1, 0, or 1
+*/
+int sort_globals(struct global_data *a, struct global_data *b) {
+	return GET_GLOBAL_VNUM(a) - GET_GLOBAL_VNUM(b);
+}
+
+
+/**
 * Compare two empires for sorting.
 *
 * @param empire_data *a First empire
@@ -5697,10 +6056,8 @@ int sort_crops(crop_data *a, crop_data *b) {
 int sort_empires(empire_data *a, empire_data *b) {
 	extern int get_total_score(empire_data *emp);
 	
-	int whole_empire_timeout = config_get_int("whole_empire_timeout") * SECS_PER_REAL_DAY;
-	
-	bool a_timeout = (EMPIRE_LAST_LOGON(a) < (time(0) - whole_empire_timeout)) ? TRUE : FALSE;
-	bool b_timeout = (EMPIRE_LAST_LOGON(b) < (time(0) - whole_empire_timeout)) ? TRUE : FALSE;
+	bool a_timeout = EMPIRE_IS_TIMED_OUT(a);
+	bool b_timeout = EMPIRE_IS_TIMED_OUT(b);
 
 	int a_score = get_total_score(a), b_score = get_total_score(b);
 

@@ -1,10 +1,12 @@
 ALCHEMIST
 
+(Disambiguation: Did you mean HELP ALCHEMIST CLASS ?)
+
 (AA)  Alchemist  (Artisans ability)
 
 Resources:  4 lumber, 2 nails, 12 bricks
 Built on:  plains, desert
-Stored here:  herbs, poisons, potions
+Stored here:  herbs, poisons
 
 The alchemist is a specialty building that allows you to store and process many
 types of herbs. While you can brew potions and mix poisons using any fire, it
@@ -27,6 +29,18 @@ an empire with apiaries.
 Apiaries are made by Advanced Woodworking.
 
 See also: ADVANCED WOODWORKING
+#
+"ASTRAL NEXUS" ASTRALNEXUS
+
+..&C*&0.  Astral Nexus  (Exarch Crafts ability)
+
+Resources:  20 logs, 12 blocks, 12 nocturnium, 20 nexus crystals
+Built on:  plains, desert (in city only)
+
+The astral nexus allows you to summon other players if you have a second player
+present to help you. This only works in cities.
+
+See also: SUMMON PLAYER
 #
 BAKERY
 
@@ -78,7 +92,7 @@ Built on:  river
 Once completed, a bridge allows you to cross river tiles without a boat. You
 can also sail ships under the bridges. Nobody knows how.
 
-Bridges always count as in-city territory, no matter where you build them.
+Bridges count as in-city territory as far away as 3x a city's normal radius.
 #
 BURROWHAVEN "BURROW HAVEN" "STRANGE BURROW"
 
@@ -184,8 +198,8 @@ Built on: plains or desert, facing water
 Clay pits are reinforced areas where fresh clay can be dug deeper, safer than
 digging on unprepared ground. You can dig more clay from them before depletion.
 
-Clay pits always count as in-city territory for your empire, no matter where
-you build them.
+Clay pits Mines count as in-city territory as far away as 3x a city's normal
+radius.
 
 See also: DIG
 #
@@ -243,6 +257,19 @@ You can pick more herbs than normal before the tile is depleted.
 
 See also: PICK
 #
+"EXARCH CRAFTS"
+
+Exarch Crafts
+Class ability:  Exarch
+
+This ability allows you to build the following buildings:
+  ..&C*&0. astralnexus  20 logs, 12 blocks, 12 nocturnium, 20 nexus crystals
+
+Allows the following workforce options:
+  nexus crystals - Also requires Skilled Labor
+
+See also: BUILD, EXARCH CLASS, SKILLED LABOR
+#
 GRAVE GRAVES "GRAVE MARKER"
 
 New players, optimistic and eager to explore the world, leave home with a
@@ -280,7 +307,7 @@ Resources:  20 sticks
 Built on:  plains, desert
 
 Fences will block the movement of NPCs, but not players. They count as in-city
-territory, no matter where you build them.
+territory as far away as 3x a city's normal radius.
 
 See also: GATE
 #

@@ -79,7 +79,7 @@ This designates a new room in a building as a specific room type. You must
 specify which direction this new room will be. The first room after the
 entrance must lie directly across from the entrance. After that, you may
 choose any direction you like. Each building is limited on how many rooms it
-may have.
+may have. You can only redesignate rooms once per 60 minutes.
 
 Room types:
  baths - Identical to the free-standing building (castle only)
@@ -191,7 +191,9 @@ LIGHT TORCH
 Usage:  light <item>
 
 To light something, you must have a flint set. You may light sticks to create
-torches.
+torches. You can also light trees or logs to make camp fires.
+
+See also: COOKING FIRE
 #
 MILK
 
@@ -215,7 +217,7 @@ You can mill:
 
 You must do this at a Mill building. Milling will gain Trade skill up to 15.
 
-See also: COOK
+See also: CRAFTING LEVEL, COOK
 #
 MINE MINES
 
@@ -236,7 +238,7 @@ dismantle a mine, its mountain will reset when the MUD celebrates a new year
 tile will involve digging a new mine shaft and the mineral found there could be
 completely different.
 
-Mines always count as in-city territory, no matter where you build them.
+Mines count as in-city territory as far away as 3x a city's normal radius.
 
 See HELP IRON GUIDE for help getting started on mining and using iron.
 
@@ -272,6 +274,8 @@ Usage:  morph <form>
 Some powers allow you to change shape, using the morph command. Morphing takes
 a few seconds, but if you're in combat you can morph instantly at a higher
 cost than normal.
+
+Morphing will remove your disguise, if you have one.
 
 See also: ANIMAL FORMS, WOLF FORM, BAT FORM, HORRID FORM, MIST FORM
 #
@@ -355,7 +359,7 @@ Example:
 
   > shoot deer 
 #
-SKILL SKILLS ABILITY ABILITIES "SKILL BUY" "SKILL RESET"
+SKILL SKILLS ABILITY ABILITIES "SKILL BUY" "SKILL RESET" "SKILL LEVELS"
 
 Usage:  skills -- list all skills
         skill <name> -- see abilities in that skill
@@ -381,7 +385,8 @@ without the skill name, you can see which skills have free resets available.
 It also shows the range in which you can gain the skill, although you can gain
 no more than 10 points from any one ability.
 
-See also: NOSKILL, SPECIALIZE, SKILL CAPS, SKILL DROP, SKILL LEVELS
+See also: NOSKILL, SPECIALIZE, SKILL CAPS, SKILL DROP, TRAINING SKILLS, ABILITY
+POINTS
 #
 "SKILL CAPS" CAPS "MAX SKILL" "MAXIMUM SKILL" "CLASS SKILLS" "SPECIALTY SKILLS" "BASIC SKILLS"
 
@@ -421,10 +426,10 @@ lose any abilities you purchased above the new level.
 
 See also: SKILL
 #
-"SKILL LEVELS" "SKILL POINTS" "SKILL EXPERIENCE" "SKILLUPS" EXPERIENCE
+"TRAINING SKILLS" "SKILL POINTS" "SKILL EXPERIENCE" "SKILLUPS" EXPERIENCE
 
 The two ways to gain skill levels are:
-- By using "green" abilities from the skill's tree (abilities that aren't at
+- By using "yellow" abilities from the skill's tree (abilities that aren't at
   max).
 - For skills under level 15, you can usually gain skill by doing "chores". See
   the help file for each skill tree for more information on leveling it.
@@ -437,7 +442,7 @@ experience all the way to 100%.
 When your skills hit level 50 or 75, you will not be able to gain additional
 levels in the skill unless you specialize into it.
 
-See also: SKILL CAPS, SPECIALIZE
+See also: SKILL CAPS, SPECIALIZE, SKILLS
 #
 SMELT MELT
 
@@ -492,12 +497,14 @@ creatures, items, or bodyguards. Each may serve a different purpose, so you
 should consult the help file for the specific summon ability you're using.
 
 See also:
-SUMMON HUMANS  (Vampire ability)
+SUMMON BODYGUARD  (Empire ability)
 SUMMON ANIMALS  (Natural Magic ability)
 SUMMON GUARDS  (Empire ability)
-SUMMON BODYGUARD  (Empire ability)
-SUMMON THUGS  (Stealth ability)
+SUMMON HUMANS  (Vampire ability)
 SUMMON MATERIAlS  (High Sorcery ability)
+SUMMON PLAYER  (at an Astral Nexus)
+SUMMON THUGS  (Stealth ability)
+ADVENTURE SUMMON  (inside an adventure)
 #
 TENT TENTS
 

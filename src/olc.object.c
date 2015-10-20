@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: olc.object.c                                    EmpireMUD 2.0b2 *
+*   File: olc.object.c                                    EmpireMUD 2.0b3 *
 *  Usage: OLC for items                                                   *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -16,7 +16,6 @@
 #include "utils.h"
 #include "interpreter.h"
 #include "db.h"
-#include "books.h"
 #include "comm.h"
 #include "olc.h"
 #include "skills.h"
@@ -49,7 +48,6 @@ extern const char *wear_bits[];
 // external funcs
 extern double get_base_dps(obj_data *weapon);
 extern double get_weapon_speed(obj_data *weapon);
-extern struct book_data *find_book_by_id(int id);
 
 // locals
 char **get_weapon_types_string();
@@ -69,30 +67,96 @@ bool audit_object(obj_data *obj, char_data *ch) {
 	extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
 	
 	bool is_adventure = (get_adventure_for_vnum(GET_OBJ_VNUM(obj)) != NULL);
+	char temp[MAX_STRING_LENGTH], *ptr;
 	bool problem = FALSE;
 	
 	if (!str_cmp(GET_OBJ_KEYWORDS(obj), "object new")) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Keywords not set");
 		problem = TRUE;
 	}
+	
+	ptr = GET_OBJ_KEYWORDS(obj);
+	do {
+		ptr = any_one_arg(ptr, temp);
+		if (*temp && !str_str(GET_OBJ_SHORT_DESC(obj), temp) && !str_str(GET_OBJ_LONG_DESC(obj), temp)) {
+			olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Keyword '%s' not found in strings", temp);
+			problem = TRUE;
+		}
+	} while (*ptr);
+	
 	if (!str_cmp(GET_OBJ_LONG_DESC(obj), "A new object is sitting here.")) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Long desc not set");
+		problem = TRUE;
+	}
+	if (!ispunct(GET_OBJ_LONG_DESC(obj)[strlen(GET_OBJ_LONG_DESC(obj)) - 1])) {
+		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Long desc missing punctuation");
+		problem = TRUE;
+	}
+	if (islower(*GET_OBJ_LONG_DESC(obj))) {
+		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Long desc not capitalized");
 		problem = TRUE;
 	}
 	if (!str_cmp(GET_OBJ_SHORT_DESC(obj), "a new object")) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Short desc not set");
 		problem = TRUE;
 	}
-	if (!GET_OBJ_ACTION_DESC(obj) || !*GET_OBJ_ACTION_DESC(obj)) {
+	any_one_arg(GET_OBJ_SHORT_DESC(obj), temp);
+	if ((fill_word(temp) || reserved_word(temp)) && isupper(*temp)) {
+		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Short desc capitalized");
+		problem = TRUE;
+	}
+	if (ispunct(GET_OBJ_SHORT_DESC(obj)[strlen(GET_OBJ_SHORT_DESC(obj)) - 1])) {
+		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Short desc has punctuation");
+		problem = TRUE;
+	}
+	
+	ptr = GET_OBJ_SHORT_DESC(obj);
+	do {
+		ptr = any_one_arg(ptr, temp);
+		// remove trailing punctuation
+		while (*temp && ispunct(temp[strlen(temp)-1])) {
+			temp[strlen(temp)-1] = '\0';
+		}
+		if (*temp && !fill_word(temp) && !reserved_word(temp) && !isname(temp, GET_OBJ_KEYWORDS(obj))) {
+			olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Suggested missing keyword '%s'", temp);
+			problem = TRUE;
+		}
+	} while (*ptr);
+	
+	if (!GET_OBJ_ACTION_DESC(obj) || !*GET_OBJ_ACTION_DESC(obj) || !str_cmp(GET_OBJ_ACTION_DESC(obj), "Nothing.\r\n")) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Look desc not set");
+		problem = TRUE;
+	}
+	else if (!strn_cmp(GET_OBJ_ACTION_DESC(obj), "Nothing.", 8)) {
+		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Look desc starting with 'Nothing.'");
 		problem = TRUE;
 	}
 	if (OBJ_FLAGGED(obj, OBJ_LIGHT) && GET_OBJ_TIMER(obj) <= 0) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Infinite light");
 		problem = TRUE;
 	}
+	if (OBJ_FLAGGED(obj, OBJ_HARD_DROP | OBJ_GROUP_DROP)) {
+		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Loot quality flags set");
+		problem = TRUE;
+	}
+	if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
+		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "KEEP flag");
+		problem = TRUE;
+	}
+	if (OBJ_FLAGGED(obj, OBJ_BIND_ON_EQUIP) && OBJ_FLAGGED(obj, OBJ_BIND_ON_PICKUP)) {
+		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Two bind flags");
+		problem = TRUE;
+	}
 	if (!is_adventure && OBJ_FLAGGED(obj, OBJ_SCALABLE) && GET_OBJ_MAX_SCALE_LEVEL(obj) == 0) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "No maximum scale level on non-adventure obj");
+		problem = TRUE;
+	}
+	if (OBJ_FLAGGED(obj, OBJ_SCALABLE) && obj->storage) {
+		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Scalable object has storage locations");
+		problem = TRUE;
+	}
+	if (OBJ_FLAGGED(obj, OBJ_SCALABLE) && !OBJ_FLAGGED(obj, OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP)) {
+		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Scalable object has no bind flags");
 		problem = TRUE;
 	}
 	
@@ -176,7 +240,7 @@ bool audit_object(obj_data *obj, char_data *ch) {
 			break;
 		}
 		case ITEM_BOOK: {
-			if (!find_book_by_id(GET_BOOK_ID(obj))) {
+			if (!book_proto(GET_BOOK_ID(obj))) {
 				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Book type invalid");
 				problem = TRUE;
 			}
@@ -254,6 +318,36 @@ char **get_weapon_types_string(void) {
 
 
 /**
+* For the .list command.
+*
+* @param obj_data *obj The thing to list.
+* @param bool detail If TRUE, provide additional details
+* @return char* The line to show (without a CRLF).
+*/
+char *list_one_object(obj_data *obj, bool detail) {
+	static char output[MAX_STRING_LENGTH];
+	char flags[MAX_STRING_LENGTH];
+	
+	bitvector_t show_flags = OBJ_SUPERIOR | OBJ_ENCHANTED | OBJ_SCALABLE | OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP | OBJ_NO_AUTOSTORE | OBJ_HARD_DROP | OBJ_GROUP_DROP | OBJ_GENERIC_DROP;
+	
+	if (detail) {
+		if (IS_SET(GET_OBJ_EXTRA(obj), show_flags)) {
+			sprintbit(GET_OBJ_EXTRA(obj) & show_flags, extra_bits, flags, TRUE);
+		}
+		else {
+			*flags = '\0';
+		}
+		snprintf(output, sizeof(output), "[%5d] %s (%s) %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj), level_range_string(GET_OBJ_MIN_SCALE_LEVEL(obj), GET_OBJ_MAX_SCALE_LEVEL(obj), 0), flags);
+	}
+	else {
+		snprintf(output, sizeof(output), "[%5d] %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+	}
+	
+	return output;
+}
+
+
+/**
 * WARNING: This function actually deletes an object from the world.
 *
 * @param char_data *ch The person doing the deleting.
@@ -271,6 +365,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	struct empire_trade_data *trade, *next_trade, *temp;
 	struct trading_post_data *tpd, *next_tpd;
 	obj_data *proto, *obj_iter, *next_obj;
+	struct global_data *glb, *next_glb;
 	room_template *rmt, *next_rmt;
 	sector_data *sect, *next_sect;
 	craft_data *craft, *next_craft;
@@ -403,6 +498,14 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		}
 	}
 	
+	// update globals
+	HASH_ITER(hh, globals_table, glb, next_glb) {
+		found = delete_from_interaction_list(&GET_GLOBAL_INTERACTIONS(glb), TYPE_OBJ, vnum);
+		if (found) {
+			save_library_file_for_vnum(DB_BOOT_GLB, GET_GLOBAL_VNUM(glb));
+		}
+	}
+	
 	// update mobs
 	HASH_ITER(hh, mobile_table, mob, next_mob) {
 		found = delete_from_interaction_list(&mob->interactions, TYPE_OBJ, vnum);
@@ -502,6 +605,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	struct adventure_spawn *asp;
 	struct interaction_item *inter;
 	struct adventure_link_rule *link;
+	struct global_data *glb, *next_glb;
 	craft_data *craft, *next_craft;
 	room_template *rmt, *next_rmt;
 	sector_data *sect, *next_sect;
@@ -574,6 +678,18 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "CRP [%5d] %s\r\n", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
+			}
+		}
+	}
+	
+	// globals
+	HASH_ITER(hh, globals_table, glb, next_glb) {
+		any = FALSE;
+		for (inter = GET_GLOBAL_INTERACTIONS(glb); inter && !any; inter = inter->next) {
+			if (interact_vnum_types[inter->type] == TYPE_OBJ && inter->vnum == vnum) {
+				any = TRUE;
+				++found;
+				size += snprintf(buf + size, sizeof(buf) - size, "GLB [%5d] %s\r\n", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
 			}
 		}
 	}
@@ -943,7 +1059,7 @@ obj_data *setup_olc_object(obj_data *input) {
 */
 void olc_get_values_display(char_data *ch, char *storage) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
-	struct book_data *book;
+	book_data *book;
 	char temp[MAX_STRING_LENGTH];
 	
 	*storage = '\0';
@@ -1017,7 +1133,7 @@ void olc_get_values_display(char_data *ch, char *storage) {
 			break;
 		}
 		case ITEM_BOOK: {
-			book = find_book_by_id(GET_BOOK_ID(obj));
+			book = book_proto(GET_BOOK_ID(obj));
 			sprintf(storage + strlen(storage), "<&ybook&0> [%d] %s\r\n", GET_BOOK_ID(obj), (book ? book->title : "not set"));
 			break;
 		}
@@ -1079,7 +1195,7 @@ void olc_show_object(char_data *ch) {
 	}
 	
 	*buf = '\0';
-	sprintf(buf + strlen(buf), "[&c%d&0] &c%s&0 (Gear level [&c%.2f&0])\r\n", GET_OLC_VNUM(ch->desc), !obj_proto(GET_OLC_VNUM(ch->desc)) ? "new object" : get_obj_name_by_proto(GET_OLC_VNUM(ch->desc)), rate_item(obj));
+	sprintf(buf + strlen(buf), "[&c%d&0] &c%s&0 (Gear rating [&c%.2f&0])\r\n", GET_OLC_VNUM(ch->desc), !obj_proto(GET_OLC_VNUM(ch->desc)) ? "new object" : get_obj_name_by_proto(GET_OLC_VNUM(ch->desc)), rate_item(obj));
 	sprintf(buf + strlen(buf), "<&ykeywords&0> %s\r\n", GET_OBJ_KEYWORDS(obj));
 	sprintf(buf + strlen(buf), "<&yshortdescription&0> %s\r\n", GET_OBJ_SHORT_DESC(obj));
 	sprintf(buf + strlen(buf), "<&ylongdescription&0> %s\r\n", GET_OBJ_LONG_DESC(obj));
@@ -1100,19 +1216,17 @@ void olc_show_object(char_data *ch) {
 	sprintbit(GET_OBJ_EXTRA(obj), extra_bits, buf1, TRUE);
 	sprintf(buf + strlen(buf), "<&yflags&0> %s\r\n", buf1);
 	
-	if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-		if (GET_OBJ_MIN_SCALE_LEVEL(obj) > 0) {
-			sprintf(buf + strlen(buf), "<&yminlevel&0> %d\r\n", GET_OBJ_MIN_SCALE_LEVEL(obj));
-		}
-		else {
-			sprintf(buf + strlen(buf), "<&yminlevel&0> none\r\n");
-		}
-		if (GET_OBJ_MAX_SCALE_LEVEL(obj) > 0) {
-			sprintf(buf + strlen(buf), "<&ymaxlevel&0> %d\r\n", GET_OBJ_MAX_SCALE_LEVEL(obj));
-		}
-		else {
-			sprintf(buf + strlen(buf), "<&ymaxlevel&0> none\r\n");
-		}
+	if (GET_OBJ_MIN_SCALE_LEVEL(obj) > 0) {
+		sprintf(buf + strlen(buf), "<&yminlevel&0> %d\r\n", GET_OBJ_MIN_SCALE_LEVEL(obj));
+	}
+	else {
+		sprintf(buf + strlen(buf), "<&yminlevel&0> none\r\n");
+	}
+	if (GET_OBJ_MAX_SCALE_LEVEL(obj) > 0) {
+		sprintf(buf + strlen(buf), "<&ymaxlevel&0> %d\r\n", GET_OBJ_MAX_SCALE_LEVEL(obj));
+	}
+	else {
+		sprintf(buf + strlen(buf), "<&ymaxlevel&0> none\r\n");
 	}
 	
 	olc_get_values_display(ch, buf1);
@@ -1216,7 +1330,8 @@ OLC_MODULE(oedit_animalsrequired) {
 OLC_MODULE(oedit_apply) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
-	int loc, num, iter;
+	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
+	int loc, num, iter, change;
 	bool found;
 	
 	// arg1 arg2 arg3
@@ -1281,8 +1396,54 @@ OLC_MODULE(oedit_apply) {
 			}
 		}
 	}
+	else if (is_abbrev(arg1, "change")) {
+		strcpy(num_arg, arg2);
+		half_chop(arg3, type_arg, val_arg);
+		
+		if (!*num_arg || !isdigit(*num_arg) || !*type_arg || !*val_arg) {
+			msg_to_char(ch, "Usage: apply change <number> <value | type> <new value>\r\n");
+			return;
+		}
+		
+		// find which one to change
+		num = atoi(num_arg);
+		change = -1;
+		for (iter = 0; iter < MAX_OBJ_AFFECT && change == -1; ++iter) {
+			if (obj->affected[iter].location != APPLY_NONE && --num == 0) {
+				change = iter;
+				break;
+			}
+		}
+		
+		if (change == -1) {
+			msg_to_char(ch, "Invalid apply number.\r\n");
+		}
+		else if (is_abbrev(type_arg, "value")) {
+			num = atoi(val_arg);
+			if ((!isdigit(*val_arg) && *val_arg != '-') || num == 0) {
+				msg_to_char(ch, "Invalid value '%s'.\r\n", val_arg);
+			}
+			else {
+				obj->affected[change].modifier = num;
+				msg_to_char(ch, "Apply %d changed to value %+d.\r\n", atoi(num_arg), num);
+			}
+		}
+		else if (is_abbrev(type_arg, "type")) {
+			if ((loc = search_block(val_arg, apply_types, FALSE)) == NOTHING) {
+				msg_to_char(ch, "Invalid type.\r\n");
+			}
+			else {
+				obj->affected[change].location = loc;
+				msg_to_char(ch, "Apply %d changed to type %s.\r\n", atoi(num_arg), apply_types[loc]);
+			}
+		}
+		else {
+			msg_to_char(ch, "You can only change the value or type.\r\n");
+		}
+	}
 	else {
 		msg_to_char(ch, "Usage: apply add <value> <type>\r\n");
+		msg_to_char(ch, "Usage: apply change <number> <value | type> <new value>\r\n");
 		msg_to_char(ch, "Usage: apply remove <number | all>\r\n");
 		msg_to_char(ch, "Available types:\r\n");
 		
@@ -1353,14 +1514,14 @@ OLC_MODULE(oedit_automint) {
 OLC_MODULE(oedit_book) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	int old = GET_OBJ_VAL(obj, VAL_BOOK_ID);
-	struct book_data *book;
+	book_data *book;
 	
 	if (!IS_BOOK(obj)) {
 		msg_to_char(ch, "You can only set book id on a book.\r\n");
 	}
 	else {
-		GET_OBJ_VAL(obj, VAL_BOOK_ID) = olc_process_number(ch, argument, "book id", "book", 0, top_book_id, GET_OBJ_VAL(obj, VAL_BOOK_ID));
-		book = find_book_by_id(GET_BOOK_ID(obj));
+		GET_OBJ_VAL(obj, VAL_BOOK_ID) = olc_process_number(ch, argument, "book id", "book", 0, MAX_INT, GET_OBJ_VAL(obj, VAL_BOOK_ID));
+		book = book_proto(GET_BOOK_ID(obj));
 		
 		if (!book) {
 			msg_to_char(ch, "Invalid book id. Old id %d restored.\r\n", old);
@@ -1473,8 +1634,9 @@ OLC_MODULE(oedit_contents) {
 OLC_MODULE(oedit_custom) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], *msgstr;
+	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
 	int num, iter, msgtype;
-	struct obj_custom_message *ocm, *temp;
+	struct obj_custom_message *ocm, *change, *temp;
 	bool found;
 	
 	// arg1 arg2
@@ -1552,8 +1714,51 @@ OLC_MODULE(oedit_custom) {
 			msg_to_char(ch, "You add a custom '%s' message:\r\n%s\r\n", obj_custom_types[ocm->type], ocm->msg);			
 		}
 	}
+	else if (is_abbrev(arg1, "change")) {
+		half_chop(arg2, num_arg, arg1);
+		half_chop(arg1, type_arg, val_arg);
+		
+		if (!*num_arg || !isdigit(*num_arg) || !*type_arg || !*val_arg) {
+			msg_to_char(ch, "Usage: custom change <number> <type | message> <value>\r\n");
+			return;
+		}
+		
+		// find which one to change
+		num = atoi(num_arg);
+		change = NULL;
+		for (ocm = obj->custom_msgs; ocm && !change; ocm = ocm->next) {
+			if (--num == 0) {
+				change = ocm;
+				break;
+			}
+		}
+		
+		if (!change) {
+			msg_to_char(ch, "Invalid custom message number.\r\n");
+		}
+		else if (is_abbrev(type_arg, "type")) {
+			if ((msgtype = search_block(val_arg, obj_custom_types, FALSE)) == NOTHING) {
+				msg_to_char(ch, "Invalid type '%s'.\r\n", val_arg);
+			}
+			else {
+				change->type = msgtype;
+				msg_to_char(ch, "Custom message %d changed to type %s.\r\n", atoi(num_arg), obj_custom_types[msgtype]);
+			}
+		}
+		else if (is_abbrev(type_arg, "message")) {
+			if (change->msg) {
+				free(change->msg);
+			}
+			change->msg = str_dup(val_arg);
+			msg_to_char(ch, "Custom message %d changed to: %s\r\n", atoi(num_arg), val_arg);
+		}
+		else {
+			msg_to_char(ch, "You can only change the type or message.\r\n");
+		}
+	}
 	else {
 		msg_to_char(ch, "Usage: custom add <type> <message>\r\n");
+		msg_to_char(ch, "Usage: custom change <number> <type | message> <value>\r\n");
 		msg_to_char(ch, "Usage: custom remove <number | all>\r\n");
 		msg_to_char(ch, "Available types:\r\n");
 		for (iter = 0; *obj_custom_types[iter] != '\n'; ++iter) {
@@ -1676,24 +1881,14 @@ OLC_MODULE(oedit_material) {
 OLC_MODULE(oedit_maxlevel) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	
-	if (!OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-		msg_to_char(ch, "The object isn't scalable.\r\n");
-	}
-	else {
-		GET_OBJ_MAX_SCALE_LEVEL(obj) = olc_process_number(ch, argument, "maximum level", "maxlevel", 0, MAX_INT, GET_OBJ_MAX_SCALE_LEVEL(obj));
-	}
+	GET_OBJ_MAX_SCALE_LEVEL(obj) = olc_process_number(ch, argument, "maximum level", "maxlevel", 0, MAX_INT, GET_OBJ_MAX_SCALE_LEVEL(obj));
 }
 
 
 OLC_MODULE(oedit_minlevel) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
-
-	if (!OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-		msg_to_char(ch, "The object isn't scalable.\r\n");
-	}
-	else {
-		GET_OBJ_MIN_SCALE_LEVEL(obj) = olc_process_number(ch, argument, "minimum level", "minlevel", 0, MAX_INT, GET_OBJ_MIN_SCALE_LEVEL(obj));
-	}
+	
+	GET_OBJ_MIN_SCALE_LEVEL(obj) = olc_process_number(ch, argument, "minimum level", "minlevel", 0, MAX_INT, GET_OBJ_MIN_SCALE_LEVEL(obj));
 }
 
 
@@ -1868,8 +2063,9 @@ OLC_MODULE(oedit_storage) {
 	
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], *flagarg;
+	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
 	int loc, num, iter;
-	struct obj_storage_type *store, *temp;
+	struct obj_storage_type *store, *change, *temp;
 	bld_vnum bld;
 	bool found;
 	
@@ -1953,8 +2149,48 @@ OLC_MODULE(oedit_storage) {
 			msg_to_char(ch, "You add storage in the %s with flags: %s\r\n", GET_BLD_NAME(building_proto(store->building_type)), buf1);
 		}
 	}
+	else if (is_abbrev(arg1, "change")) {
+		half_chop(arg2, num_arg, arg1);
+		half_chop(arg1, type_arg, val_arg);
+		
+		if (!*num_arg || !isdigit(*num_arg) || !*type_arg || !*val_arg) {
+			msg_to_char(ch, "Usage: storage change <number> <building | flags> <value>\r\n");
+			return;
+		}
+		
+		// find which one to change
+		num = atoi(num_arg);
+		change = NULL;
+		for (store = obj->storage; store && !change; store = store->next) {
+			if (--num == 0) {
+				change = store;
+				break;
+			}
+		}
+		
+		if (!change) {
+			msg_to_char(ch, "Invalid storage number.\r\n");
+		}
+		else if (is_abbrev(type_arg, "building") || is_abbrev(type_arg, "room")) {
+			bld = atoi(val_arg);
+			if (!isdigit(*val_arg) || !building_proto(bld)) {
+				msg_to_char(ch, "Invalid building vnum '%s'.\r\n", val_arg);
+			}
+			else {
+				change->building_type = bld;
+				msg_to_char(ch, "Storage %d changed to building %d (%s).\r\n", atoi(num_arg), bld, GET_BLD_NAME(building_proto(bld)));
+			}
+		}
+		else if (is_abbrev(type_arg, "flags")) {
+			change->flags = olc_process_flag(ch, val_arg, "storage", "storage change flags", storage_bits, change->flags);
+		}
+		else {
+			msg_to_char(ch, "You can only change the building/room or flags.\r\n");
+		}
+	}
 	else {
 		msg_to_char(ch, "Usage: storage add <building/room> [flags]\r\n");
+		msg_to_char(ch, "Usage: storage change <number> <building | flags> <value>\r\n");
 		msg_to_char(ch, "Usage: storage remove <number | all>\r\n");
 		msg_to_char(ch, "Available flags:\r\n");
 		

@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: skills.h                                        EmpireMUD 2.0b2 *
+*   File: skills.h                                        EmpireMUD 2.0b3 *
 *  Usage: header file for classes, skills, and combat                     *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -367,8 +367,28 @@ extern bool skill_check(char_data *ch, int ability, int difficulty);
 #define ABIL_FASTCASTING  238
 #define ABIL_ANCESTRAL_HEALING  239
 #define ABIL_CONFER  240
-
-#define NUM_ABILITIES  241		// must be <= MAX_ABILITIES (400; structs.h)
+#define ABIL_STEELSMITH_CRAFTS  241
+#define ABIL_GUILDSMAN_CRAFTS  242
+#define ABIL_ARTIFICER_CRAFTS  243
+#define ABIL_ALCHEMIST_CRAFTS  244
+#define ABIL_SMUGGLER_CRAFTS  245
+#define ABIL_TINKER_CRAFTS  246
+#define ABIL_ANTIQUARIAN_CRAFTS  247
+#define ABIL_EXARCH_CRAFTS  248
+#define ABIL_WORKFORCE_SAWING  249
+#define ABIL_GRIFFIN  250
+#define ABIL_DIRE_WOLF  251
+#define ABIL_MOON_RABBIT  252
+#define ABIL_SPIRIT_WOLF  253
+#define ABIL_MANTICORE  254
+#define ABIL_PHOENIX  255
+#define ABIL_SCORPION_SHADOW  256
+#define ABIL_OWL_SHADOW  257
+#define ABIL_BASILISK  258
+#define ABIL_SALAMANDER  259
+#define ABIL_SKELETAL_HULK  260
+#define ABIL_BANSHEE  261
+#define NUM_ABILITIES  262		// must be <= MAX_ABILITIES (400; structs.h)
 
 
 // cooldowns -- see COOLDOWN_x in constants.c
@@ -425,6 +445,7 @@ extern bool skill_check(char_data *ch, int ability, int difficulty);
 #define COOLDOWN_HOWL  50
 #define COOLDOWN_DIVERSION  51
 #define COOLDOWN_ROGUE_FLAG  52
+#define COOLDOWN_PORTAL_SICKNESS  53
 
 
 /* WEAPON ATTACK TYPES */
@@ -444,7 +465,7 @@ extern bool skill_check(char_data *ch, int ability, int difficulty);
 #define TYPE_FIRE  12
 #define TYPE_VAMPIRE_CLAWS  13
 #define TYPE_CRUSH  14	// animal-only
-#define TYPE_HIT  15
+#define TYPE_HIT  15	// default physical
 #define TYPE_MAGIC_FIRE  16
 #define TYPE_LIGHTNING_STAFF  17
 #define TYPE_BURN_STAFF  18
@@ -457,8 +478,9 @@ extern bool skill_check(char_data *ch, int ability, int difficulty);
 #define TYPE_TAIL_SWIPE  25	// animal
 #define TYPE_PECK  26	// animal
 #define TYPE_GORE  27	// animal
+#define TYPE_MANA_BLAST  28	// default magical
 
-#define NUM_ATTACK_TYPES  28	// total
+#define NUM_ATTACK_TYPES  29	// total
 
 // helpfulment
 #define IS_WEAPON_TYPE(type) (((type) >= TYPE_RESERVED) && ((type) < TYPE_SUFFERING))

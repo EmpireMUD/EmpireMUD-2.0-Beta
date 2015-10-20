@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: plrconv.c                                       EmpireMUD 2.0b2 *
+*   File: plrconv.c                                       EmpireMUD 2.0b3 *
 *  Usage: convert player file structures without wiping                   *
 *                                                                         *
 *  Credits: This is a cheap mock-up of play2to3.c which is included in    *
@@ -270,7 +270,7 @@ void convert_char_file_u(struct char_file_u *to, struct OLD_char_file_u *from) {
 	to->player_specials_saved.daily_bonus_experience = from->player_specials_saved.daily_bonus_experience;
 	
 	to->player_specials_saved.action = from->player_specials_saved.action;
-	to->player_specials_saved.action_rotation = from->player_specials_saved.action_rotation;
+	to->player_specials_saved.action_cycle = from->player_specials_saved.action_rotation;
 	to->player_specials_saved.action_timer = from->player_specials_saved.action_timer;
 	to->player_specials_saved.action_room = from->player_specials_saved.action_room;
 	for (iter = 0; iter < NUM_ACTION_VNUMS; ++iter) {

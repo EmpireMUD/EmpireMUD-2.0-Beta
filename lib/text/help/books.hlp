@@ -1,0 +1,282 @@
+BOOK BOOKS
+
+EmpireMUD features a book editor and a library system. You can collect books in
+your library, or even write your own. When you shelve a book in your library,
+it becomes permanently available for checkout at that library. Once you've
+written a book in the book editor, you can create as many copies of that book
+as you like.
+
+The following help files have more information on books:
+  BOOKEDIT - An introduction to the editor.
+  BOOK TIPS - Additional notes on creating books.
+  LIBRARY - The command to shelve books and check them out.
+#
+BOOKEDIT "BOOK EDIT" "BOOK EDITOR"
+
+Usage:  bookedit list -- list books you wrote
+        bookedit copy <book> -- write out a fresh copy of one of your books
+        bookedit delete <book> -- permanently delete a book you've written
+        bookedit write <book | new> -- edit a book
+
+The bookedit command lets you create books to fill the world's libraries.
+In order to work on books, you need to build a library -- one of the Grand
+Monuments.
+
+You can pick books for 'copy', 'delete', and 'write' by name or number. The
+'list' command gives you the numbers.
+
+The 'write' command opens the book editor. You can continue to play the game
+while editing the book, and can even leave the library. Once you have a book
+editor open, the 'bookedit' command (or '.' for short) will display the editor
+again, and any word shown like <&ycommand&0> can be used as a command to change
+the option it displays. You can get help on any of those options with &yHELP
+BOOKEDIT COMMAND&0.
+
+You can close the book editor with "bookedit save" or "bookedit abort".
+
+Example:
+ > bookedit write new
+ > bookedit title A Dreary Recollection of Facts
+ > bookedit save
+
+See also: BOOKEDIT SAVE, BOOK TIPS, LIBRARY
+#
+"BOOKEDIT ABORT"
+
+Usage:  bookedit abort
+
+This command will discard any changes to your open book editor, and close the
+editor. None of your work will be saved.
+
+See also: BOOKEDIT SAVE
+#
+"BOOKEDIT AUTHOR"
+
+Usage:  .author <id | name | nobody>
+
+This command changes the game's internal "author" id for the book. Players can
+only edit books for which they are set as the author. This option is only
+available to immortals who are editing the book.
+
+Normally, you shouldn't change a book's author. But if a player deleted one
+of his characters and wanted the books moved to another character, this would
+permit that.
+
+See also: BOOKEDIT
+#d
+"BOOKEDIT BYLINE"
+
+Usage:  bookedit byline <name>
+        .byline <name>
+
+This command changes the authorship credit on the book. Books default to the
+author's character name. However, players may wish to attribute books to other
+names and are free to choose any byline they like.
+
+See also: BOOKEDIT
+#
+"BOOKEDIT COMMANDS" "BOOKEDIT PROPERTY"
+
+In the book editor, information is displayed as:
+<&yproperty&0> Information
+
+The <&yproperty&0> is both the label for the information, and the command that
+is used to change it. For example, you could change this with:
+> bookedit property New Information
+
+The 'bookedit' command itself can be abbreviated as '.' instead, so you could
+also change that property like this>
+> .property New Information
+
+For any property in the book editor, you can also get help on it with &yHELP
+BOOKEDIT PROPERTY&0.
+
+You can save and exit with '.save', or you can cancel your changes and exit
+with '.abort'.
+
+See also: BOOKEDIT, BOOKEDIT SAVE, BOOK TIPS
+#
+"BOOKEDIT COPY"
+
+Usage:  bookedit copy <book>
+
+This command creates a physical copy of a book you have written. Once copied,
+the book will appear in your inventory and can be shelved in libraries or given
+to other players. You can create as many copies of your book as you like.
+
+You must be in a library to do this.
+
+See also: BOOKEDIT, LIBRARY
+#
+"BOOKEDIT DELETE"
+
+Usage:  bookedit delete <book>
+
+This command permanently deletes a book that you wrote. There is no way to
+recover a book once deleted.
+
+Any copies of the deleted book will still exist, but will no longer be
+readable.
+
+You must be in a library to do this.
+
+See also: BOOKEDIT, LIBRARY
+#
+"BOOKEDIT DESCRIPTION"
+
+Usage:  bookedit description
+        .description
+
+This command allows you to edit the book's item description. This is the text
+shown to players who type "look at book". The command will open a text editor.
+
+You should usually format the description with /fi if it is longer than one
+line (80 characters). This ensures consistent formatting for everyone. Item
+descriptions are usually only 1 to 3 lines long.
+
+See also: BOOKEDIT, TEXT EDITOR
+#
+"BOOKEDIT ITEM"
+
+Usage:  bookedit item <text>
+        .item <text>
+
+This command sets the 'item name' for your book. This is the name that will
+appear in your inventory when you have a copy of the book, and it is also used
+to build sentences. It is not the same as the title of the book.
+
+The name should be formatted like "a book" or "a dusty old tome". Item names
+usually start with "a", "an", or "the". Only proper nouns are capitalized.
+
+The name should usually be short, and should not contain color codes.
+
+See also: BOOKEDIT
+#
+"BOOKEDIT LICENSE"
+
+
+
+See also: BOOKEDIT
+#
+"BOOKEDIT LIST"
+
+Usage:  bookedit list
+
+This command lists all the books you have written, and gives numbers for them.
+These numbers can be used as shortcuts for other bookedit commands like 'copy'.
+
+You must be in a library to do this.
+
+See also: BOOKEDIT, LIBRARY
+#
+"BOOKEDIT PARAGRAPHS"
+
+Usage:  bookedit paragraphs
+        .paragraphs list [from] [to]
+        .paragraphs edit <number>
+        .paragraphs new [number]
+        .paragraphs delete <number>
+
+This command is used to add, edit, and remove paragraphs from your book. Each
+paragraph should be kept to just 4 or 5 lines. When players read the book, it
+is shown to them at a rate of one paragraph every few seconds.
+
+The 'new' and 'edit' commands will both open a text editor. You should use the
+/fi formatter on the paragraph before typing /s to save it.
+
+See also: BOOKEDIT, TEXT EDITOR
+#
+"BOOKEDIT SAVE"
+
+Usage:  bookedit save
+
+This will save your changes in the book editor, and close the editor.
+
+See also: BOOKEDIT ABORT
+#
+"BOOKEDIT TITLE"
+
+Usage:  bookedit title <text>
+        .title <text>
+
+This command sets the book's title. Titles should usually be short -- save
+the bulky text for the paragraphs. The title is shown on the 'library' and
+'bookedit' lists.
+
+Usually, every word of a title is capitalized (except short connecting words
+like "in" and "an").
+
+See also: BOOKEDIT, LIBRARY
+#
+"BOOKEDIT WRITE"
+
+Usage:  bookedit write <book | new>
+
+This command opens the book editor. You can update existing books, or start
+new ones this way. None of your changes will be applied until you use
+"bookedit save". You can also cancel with "bookedit abort". You must be in
+a library to start writing a book, but you can leave without interrupting
+your progress.
+
+Typing "bookedit" (or ".") will show the book you're currently editing again.
+
+See HELP BOOKEDIT COMMANDS for more information on using the book editor.
+
+See also: BOOKEDIT, LIBRARY
+#
+"BOOK TIPS"
+
+These tips will help you with the BOOKEDIT command:
+
+You set several properties:
+- title: The story name as it appears in the library.
+- byline: The author the story is credited to.
+- item name: The way the item appears in your inventory ("a book")
+- item description: How the book is described when you look at it.
+
+Books are arranged into paragraphs which are shown to the reader every 20
+seconds. You should keep each paragraph down to just a few lines. Since telnet
+uses a standard 80-character display, you should keep your lines 79 characters
+or less.
+
+Type /c to clear the text editor when you start a new paragraph or description.
+Otherwise, the default text will still be in there. You can use /d1 to delete
+line 1 if you left it in anyway.
+
+The easiest way to format your paragraphs is to type /fi in the text editor.
+This also works on the item description. But if your whole text fits on 1 line
+under 80 characters, you probably don't need the indent.
+
+Steps to getting your book into a library:
+1. Write the book using "bookedit write"
+2. Make a physical copy of the book using "bookedit copy" (this takes a minute)
+3. Take your copy to any library and type "library shelve" to put your book into
+   circulation in that building
+4. You can use "library checkout" to get another copy of your book out
+
+See also: BOOKEDIT, LIBRARY
+#
+LIBRARY
+
+Building:  [^^]  Library  (Grand Monuments)
+Resources:  100 lumber, 40 nails, 48 blocks
+Command:  library browse  -- see books shelved here
+          library checkout <book>  -- grab a copy of a book
+          library shelve <item>  -- put a book away on the shelves
+          library burn <book>  -- remove all copies of a book from this library
+
+You can collect books and put them into your own library, which is a Grand
+Monument in the Empire skill tree. Once you shelve a book in your library, you
+can take as many copies of it as you want. The only way to permanently remove
+it form your collection is to use the 'library burn' command.
+
+The 'checkout' and 'burn' commands target books in the library's collection,
+not items in your inventory. You can pick these books by name or by number.
+Use the 'browse' command to see the numbers.
+
+If you have written a book with bookedit, you can always make a new copy of it
+using 'bookedit copy'.
+
+See also: BOOKEDIT, KEEP
+#
+$

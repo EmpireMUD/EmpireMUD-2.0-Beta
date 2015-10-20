@@ -105,12 +105,12 @@ Swamp Rat combat~
 ~
 wait 10
 %echo% %self.name% bites deep!
-%send %actor% You dont feel so good...
+%send% %actor% You don't feel so good...
 %echoaround% %actor% %actor.name% doesnt look so good...
 %dot% %actor% 200 30
 ~
 #10105
-Berk comabt~
+Berk combat~
 0 k 15
 ~
 if !%actor.affect(disarm)%
@@ -211,7 +211,7 @@ switch %random.3%
     eval ch %room_var.people%
     while %ch%
       eval test %%self.is_enemy(%ch%)%%
-      if %test && %ch.maxmana% > %actor.maxmana%
+      if %test% && %ch.maxmana% > %actor.maxmana%
         %send% %ch% %self.name% is coming for you!
         %echoaround% %ch% %self.name% runs for %ch.name%!
         mkill %ch%
@@ -294,5 +294,146 @@ Baby dragon death~
 %load% mob 9060
 %echo% A massive green dragon crashes through the roof!
 return 0
+~
+#10115
+Thieves spawner~
+1 n 100
+~
+* Warning: This script completely ignores spawn limits! Don't use it in instances that reset often
+* Set up variables: cumulative is the cumulative probability of all results so far (including the current one, found indicates we've rolled something and should stop checking
+eval cumulative 0
+eval found 0
+eval Rand %random.100%
+* vnums of the mobs to spawn
+eval vnumSly 10110
+eval vnumSlyBetterloot 10114
+eval vnumChiv 10111
+eval vnumThief 10112
+* Probabilities of each number of non-generic thieves spawning
+* Treat this as an exclusive interaction list
+eval Double 20
+eval Single 80
+* Independant chance of spawning the generic thief
+eval Generic 50
+* There is probably a way to do this with a loop...
+eval cumulative %cumulative% + %Double%
+if (%Rand% <= %cumulative%) && %found% == 0
+  * Spawn both thieves
+  %load% mob %vnumChiv%
+  %echo% Chiv arrives!
+  %load% mob %vnumSlyBetterloot%
+  %echo% Sly arrives!
+  * Set found - if not done, this will fall through to lower blocks (Rand will still be less than cumulative)
+  eval found 1
+end
+eval cumulative %cumulative% + %Single%
+if (%Rand% <= %cumulative%) && %found% == 0
+  * Choose a thief to spawn
+  switch %random.2%
+    case 1
+      * Chiv
+      %load% mob %vnumChiv%
+      %echo% Chiv arrives!
+    break
+    case 2
+      * Sly
+      %load% mob %vnumSly%
+      %echo% Sly arrives!
+    break
+  done
+  * Set found - if not done, this will fall through to lower blocks (Rand will still be less than cumulative)
+  eval found 1
+end
+if %random.100% <= %Generic%
+  * Spawn the generic thief
+  %load% mob %vnumThief%
+  %echo% A thief arrives!
+end
+%purge% %self%
+~
+#10116
+Banditos spawner~
+1 n 100
+~
+* Warning: This script completely ignores spawn limits! Don't use it in instances that reset often
+* Set up variables: cumulative is the cumulative probability of all results so far (including the current one, found indicates we've rolled something and should stop checking
+eval cumulative 0
+eval found 0
+eval Rand %random.100%
+* vnums of the mobs to spawn
+eval vnumBerk 10105
+eval vnumJorr 10106
+eval vnumTranc 10107
+* Probabilities of each number of banditos spawning
+* Treat this as an exclusive interaction list
+eval Triple 4
+eval Double 30
+eval Single 66
+* There is probably a way to do this with a loop...
+eval cumulative %cumulative% + %Triple%
+if (%Rand% <= %cumulative%) && %found% == 0
+  * Spawn all 3 banditos
+  %load% mob %vnumBerk%
+  %echo% Berk arrives!
+  %load% mob %vnumJorr%
+  %echo% Jorr arrives!
+  %load% mob %vnumTranc%
+  %echo% Tranc arrives!
+  * Set found - if not done, this will fall through to lower blocks (Rand will still be less than cumulative)
+  eval found 1
+end
+eval cumulative %cumulative% + %Double%
+if (%Rand% <= %cumulative%) && %found% == 0
+  * Choose a bandito NOT to spawn
+  switch %random.3%
+    case 1
+      * Berk + Jorr
+      %load% mob %vnumBerk%
+      %echo% Berk arrives!
+      %load% mob %vnumJorr%
+      %echo% Jorr arrives!
+    break
+    case 2
+      * Berk + Tranc
+      %load% mob %vnumBerk%
+      %echo% Berk arrives!
+      %load% mob %vnumTranc%
+      %echo% Tranc arrives!
+    break
+    case 3
+      * Jorr + Tranc
+      %load% mob %vnumJorr%
+      %echo% Jorr arrives!
+      %load% mob %vnumTranc%
+      %echo% Tranc arrives!
+    break
+  done
+  * Set found - if not done, this will fall through to lower blocks (Rand will still be less than cumulative)
+  eval found 1
+end
+eval cumulative %cumulative% + %Single%
+if (%Rand% <= %cumulative%) && %found% == 0
+  * Choose a bandito to spawn
+  switch %random.3%
+    case 1
+      * Berk
+      %load% mob %vnumBerk%
+      %echo% Berk arrives!
+    break
+    case 2
+      * Tranc
+      %load% mob %vnumTranc%
+      %echo% Tranc arrives!
+    break
+    case 3
+      * Jorr
+      %load% mob %vnumJorr%
+      %echo% Jorr arrives!
+    break
+  done
+  * Set found - if not done, this will fall through to lower blocks (Rand will still be less than cumulative)
+  eval found 1
+end
+%purge% %self%
 ~
 $

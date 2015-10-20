@@ -1,0 +1,126 @@
+#10502
+pickled glowkra~
+10502 1  # 1x a jar of pickled glowkra
+3 -1 cgh 12 10501
+R
+10501 4  # 4x a handful of glowkra pods
+S
+#10503
+seafood glowkra gumbo~
+10503 1  # 1x seafood glowkra gumbo
+3 -1 gh 12 10501
+R
+10501 2  # 2x a handful of glowkra pods
+R
+1303 2  # 2x a magenta arrowfish
+R
+3011 1  # 1x a sack of dried rice
+S
+#10505
+dragonstooth sceptre~
+10505 1  # 1x a dragonstooth sceptre
+2 54 0 12 10504
+R
+10504 10  # 10x a dragon's tooth
+R
+162 4  # 4x a pile of gold dust
+S
+#10508
+spadebrush shovel~
+10508 1  # 1x a spadebrush shovel
+2 198 g 12 10507
+R
+10507 6  # 6x a bundle of spadebrush
+S
+#10511
+ironflour~
+10511 2  # 2x a sack of ironflour
+5 -1 0 12 10510
+R
+10510 1  # 1x a bushel of bladegrass
+S
+#10512
+ironbread~
+10512 1  # 1x an ironbread ration
+3 -1 0 12 10511
+R
+10511 2  # 2x a sack of ironflour
+S
+#10517
+magic mushroom potion~
+10517 1  # 1x a magic mushroom potion
+6 113 f 3 10516
+L
+100
+R
+10516 4  # 4x a basket of magic mushrooms
+R
+1203 6  # 6x some magewhisper sepals
+S
+#10520
+figgy pudding~
+10520 1  # 1x a figgy pudding
+3 -1 h 6 10519
+R
+10519 2  # 2x a basket of pudding figs
+S
+#10522
+dried figs~
+10522 1  # 1x a pouch of dried figs
+3 -1 h 9 10519
+R
+10519 1  # 1x a basket of pudding figs
+S
+#10525
+ironflour~
+10511 1  # 1x a sack of ironflour
+5 -1 0 12 10525
+R
+10525 1  # 1x an axeroot
+S
+#10526
+axeroot chopper~
+10526 1  # 1x an axeroot chopper
+2 198 0 6 10525
+R
+10525 1  # 1x an axeroot
+R
+919 1  # 1x a wooden handle
+S
+#10527
+spade-axe~
+10527 1  # 1x a spade-axe
+2 203 g 6 10525
+L
+150
+R
+10525 1  # 1x an axeroot
+R
+10507 3  # 3x a bundle of spadebrush
+S
+#10530
+bladegrass arrows~
+10530 1  # 1x a quiver of bladegrass arrows
+2 101 gh 6 10510
+R
+10510 1  # 1x a bushel of bladegrass
+S
+#10533
+thorn pick~
+10533 1  # 1x a thorn pick
+2 198 g 12 10532
+R
+10532 3  # 3x a pickthorn stalk
+S
+#10534
+pick-and-pan~
+10534 1  # 1x a pick-and-pan
+2 203 g 6 10532
+L
+150
+R
+10532 2  # 2x a pickthorn stalk
+R
+10510 2  # 2x a bushel of bladegrass
+S
+$

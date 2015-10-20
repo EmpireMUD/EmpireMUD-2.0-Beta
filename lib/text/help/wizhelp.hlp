@@ -4,29 +4,14 @@ Usage:  advance <victim> <access level>
 
 ADVANCE moves a player to a new access level. If used to promote a player to an
 immortal level, and if you have the autowiz program installed, the wizlist and
-godlist will automatically be recreated.
+godlist will automatically be recreated. This command is grantable.
 
 Don't confuse access levels with skill/gear levels.
 
 Example:
   > advance rasmussen 4
 
-See also: SET
-#d
-APPROVE
-
-Usage:  approve <name> <e-mail>
-
-This command approves a character so that he/she can use empire and ubilding
-commands. You must supply an e-mail address so that players can be verified
-as unique.
-
-The reasons for only having 1 approved mortal are:
- - You could build 10x faster with 10 approved mortals
- - Your resources would be exponential with 5 guys chopping trees at once
- - Your empire could claim the entire world if it had those extra members
-
-Keep it fair.
+See also: GRANT, SET
 #d
 AT WIZAT
 
@@ -53,11 +38,13 @@ Usage:  authorize <name>
 
 This command is used if the mud requires character authorization. Authorization
 is configured via the "config game" command. If it's shut off, players will
-automatically authorize during character creation.
+automatically authorize during character creation. This command is grantable.
 
 If you wish to use authorization on your EmpireMUD, you should turn on the
 'require_auth' game config and then either use the 'authorize' command
 manually, or set up an automatic system.
+
+See also: GRANT
 #d
 AUTOWIZ
 
@@ -78,14 +65,14 @@ that site. Banning a site SELECTively allows only players with site-ok flags
 to log in from that site. Ban with no argument returns a list of currently
 banned sites.
 
-Unban removes the ban.
+Unban removes the ban. This command is grantable.
 
 Examples:
 
   > ban all whitehouse.gov
   > unban ai.mit.edu
 
-See also: WIZLOCK
+See also: GRANT, WIZLOCK
 #d
 CLEARABILITIES
 
@@ -93,9 +80,9 @@ Usage:  clearabilities <player> <skill | all>
 
 This command resets the abilities for the target player. They keep their skill
 percentages, but may re-purchase all their abilities. You can either target a
-specific skill, or "all".
+specific skill, or "all". This command is grantable.
 
-See also: SET
+See also: GRANT, SET
 #d
 CONFIG
 
@@ -134,11 +121,11 @@ Usage:  dc <descriptor number>
 
 DC (DisConnect) is used to disconnect a socket. If used on a playing socket,
 the player will lose his/her link, but, unlike PURGE, will not extract the
-player or dump the player's inventory on the ground.
+player or dump the player's inventory on the ground. This command is grantable.
 
 DC is also useful for disconnecting people who are stuck in character creation.
 
-See also: USERS
+See also: GRANT, USERS
 #d
 DISTANCE
 
@@ -162,7 +149,8 @@ ECHO displays a string to everyone in your room.
 GECHO displays the string to everyone in the game.
 SEND displays the string to a particular person.
 
-Regular ECHO supports @target and #item just like emote.
+Regular ECHO supports @target and #item just like emote. All three of these
+commands are grantable.
 
 Examples:
 
@@ -170,7 +158,7 @@ Examples:
   > gecho Hi, everyone in the game, isn't this annoying?
   > send rasmussen You are being watched.
 
-See also: EMOTE
+See also: EMOTE, GRANT
 #d
 EDELETE
 
@@ -178,26 +166,30 @@ Usage:  edelete <empire>
 
 Immortal tool to delete an empire.
 #d
-EDITNOTES NOTES "PLAYER NOTES" "ADMIN NOTES" "EDIT NOTES"
+EDITNOTES ADDNOTES NOTES "PLAYER NOTES" "ADMIN NOTES" "EDIT NOTES" "ADD NOTES" "SHOW NOTES"
 
 Usage:  editnotes <player>
+        addnotes <player> <text>
         show notes <player>
 
 You can edit and leave notes about a player, to help inform other immortals
 of disciplinary issues or unusual authorizations. Any immortal can see the
 notes on any player below his own level, and can only set notes on players
-below his own level.
+below his own level. Editnotes command is grantable, and includes addnotes.
+
+Editnotes opens a text editor; addnotes just adds a line to the existing notes.
+Notes have a 240-character limit; raising this requires converting the player
+file.
+
+See also: GRANT
 #d
 FILE
 
 Usage:  file <file> <lines>
 
 Displays the last X lines of a file in the shell. This is useful for seeing 
-recent bad password attempts, ideas, and other information. Unfortunately, 
-these files are not refreshed unless the mud actually shuts down (not using the 
-reboot feature). For this reason, the mud should probably be rebooted 
-from time to time so that the autorun script parses the syslog into the 
-smaller logs.
+recent bad password attempts, ideas, and other information. These are only
+parsed out of the syslog when the mud reboots.
 #d
 FORCE
 
@@ -205,7 +197,7 @@ Usage:  force <victim | all | room> <command> <arguments>
 
 FORCE forces a character, either monster or player, to perform a certain
 action. FORCE ALL forces everyone in the game; FORCE ROOM forces everyone in
-your room.
+your room. This command is grantable.
 
 Only the Implementor level can force all/room.
 
@@ -216,6 +208,8 @@ Example:
 
 If you are invisible to the one being forced, the force will be performed
 silently.
+
+See also: GRANT
 #d
 FORGIVE
 
@@ -227,7 +221,9 @@ This command forgives the following conditions:
  - empire defect timer
  - pvp flag cooldown
 
-See also: HOSTILE
+This command is grantable.
+
+See also: GRANT, sHOSTILE
 #d
 FREEZE THAW
 
@@ -236,12 +232,13 @@ Usage:  freeze <victim>
 
 FREEZE, originally invented on CircleMUD (we think), is used to prevent a
 player from playing. If frozen, the game will ignore all commands entered by
-the player, including QUIT, until the player is unfrozen with THAW.
+the player, including QUIT, until the player is unfrozen with THAW. Freeze is
+grantable, and includes thaw.
 
 Obviously, this command should only be used in extreme disciplinary
 circumstances.
 
-See also: SET -> FROZEN
+See also: GRANT, SET -> FROZEN
 #d
 FULLSAVE
 
@@ -256,7 +253,7 @@ Usage:  ghistory
 
 This is the history command for the immortal and god channels.
 
-See also: WIZNET
+See also: WIZNET, GODNET
 #d
 GODNET
 
@@ -273,7 +270,8 @@ Usage:  goto <location>
 
 These commands are used to transports yourself and others to different rooms.
 GOTO allows you to go to other rooms; TRANS transports a person from wherever
-they are to the room you're in, or another location.
+they are to the room you're in, or another location. The transfer command is
+grantable.
 
 For both GOTO and TRANS, the location specifier can be either a virtual room
 number, or the name of a character or object.
@@ -286,7 +284,7 @@ Examples:
   > trans dog 3001
   > trans dog 2.dog
 
-See also: POOFIN, POOFOUT, WIZAT
+See also: GRANT, POOFIN, POOFOUT, WIZAT
 #d
 GRANTS
 
@@ -299,13 +297,25 @@ Most of the grant names correspond to actual commands, but some are special:
  olc - Allows .olc, vnum, and vstat.
  olc-controls - Allows .setflags, .setminvnum, and .setmaxvnum.
 
-See also: OLC-CONTROLS 
+Try 'helpsearch grantable' to find grantable commands.
+
+See also: OLC-CONTROLS
 #d
 HANDBOOK
 
 Usage:  handbook
 
 Guidelines for having an Immortal character -- you should read it.
+#d
+HASSLE NOHASSLE "NO HASSLE"
+
+Usage:  toggle hassle
+
+Prevents you from activating command triggers and stops mobs from fighting you.
+This toggle is also used by some other triggers to check if you're an immortal
+who doesn't want to be interfered with.
+
+See also: TOGGLE
 #d
 HOLYLIGHT
 
@@ -319,6 +329,8 @@ A toggle which allows you to see:
 It is expected most immortals will keep HOLYLIGHT on most of the time; it
 exists so that you have the ability to see what mortals see for debugging
 purposes.
+
+See also: TOGGLE, WIZHIDE
 #d
 HOSTILE "HOSTILE COMMAND"
 
@@ -326,12 +338,21 @@ Usage:  hostile <victim>
 
 This immortal command causes a player to be marked as hostile. It should only
 be used when someone is doing something that should really allow guards and
-other players to attack them, but doesn't.
+other players to attack them, but doesn't. This command is grantable.
 
 You can tell if someone is hostile by doing a 'stat' on them and looking for
 the hostile cooldown.
 
-See also: FORGIVE, STAT, THIEF
+See also: FORGIVE, GRANT, STAT, THIEF
+#d
+IDLE-OUT IDLEOUT "IDLE OUT"
+
+Usage:  toggle idle-out
+
+This immortal toggle prevents you from being disconnected due to long periods
+of inactivity. You can still idle out if you lose your link.
+
+See also: TOGGLE
 #d
 IMOTD
 
@@ -343,6 +364,15 @@ information that immortals should be aware of.
 
 See also: MOTD
 #d
+INCOGNITO
+
+Usage: toggle incognito
+
+This command prevents you from appearing to mortals on the "who" list. You will
+still be visible in your room, and people can still send you tells.
+
+See also: INVIS, TOGGLE, WIZHIDE
+#d
 INSTANCE INSTANCES
 
 Usage:  instance <list | add | delete | deleteall | nearby | reset | test> [argument]
@@ -350,7 +380,7 @@ Usage:  instance <list | add | delete | deleteall | nearby | reset | test> [argu
 This command allows immortals to list and manage adventure zone instances.
 The 'list' command can be used to see all instances, or all instances for one
 adventure zone (vnum). To see only instances near you, use the 'nearby' feature
-and, optionally, provide a distance.
+and, optionally, provide a distance. The instance command is grantable.
 
 The 'delete' command deletes by number in the list.
 
@@ -362,6 +392,8 @@ instance number you target.
 
 The 'test' command will link an instance to the room you're in, using a generic
 portal, even if that instance cannot be linked.
+
+See also: GRANT
 #d
 INVIS INVISIBLE
 
@@ -376,7 +408,7 @@ Examples:
   > invis
   > invis 3
 
-See also: INVSTART, VISIBLE
+See also: INCOGNITO, INVSTART, VISIBLE, WIZHIDE
 #d
 INVSTART INVISSTART "INVIS START" "INV START" "START INVISIBLE"
 
@@ -388,7 +420,7 @@ or her invisibility setting from the last logout.
 If you want to log in invisibly in one login only, type "i" at the MOTD when
 prompted to press any key to enter the game.
 
-See also: INVIS, VISIBLE
+See also: INVIS, VISIBLE, SET
 #d
 ISLAND "ISLAND COMMAND"
 
@@ -397,11 +429,13 @@ Usage:  island list
         island flags <id> [add | remove] <flags>
 
 This immortal command allows the game's staff to name islands and apply
-properties to them.
+properties to them. This command is grantable.
 
 Island flags:
  NEWBIE - Wipes claims periodically
  !AGGRO - Prevents aggro mobs, and guard towers won't fire
+
+See also: GRANT
 #d
 LAST
 
@@ -423,7 +457,7 @@ Usage:  load <mob | obj> <virtual number>
 
 LOAD is used to create mobiles and objects. The first argument specifies if
 you are trying to load a mobile or an object; the second is the virtual
-number.
+number. This command is grantable.
 
 Example:
 
@@ -433,7 +467,7 @@ Example:
   > load mob 1
   You create a snarling wolf.
 
-See also: VNUM
+See also: GRANT, VNUM
 #d
 MOVEEINV "MOVE EINV" "MOVE EMPIRE INVENTORY"
 
@@ -454,9 +488,10 @@ MUTE
 Usage:  mute <victim>
 
 MUTE is used to shut a player up. When muted, a player will not be able to
-use most communication channels until he/she is unmuted.
+use most communication channels until he/she is unmuted. This command is
+grantable.
 
-See also: FLAGS
+See also: FLAGS, GRANT
 #d
 NOTITLE
 
@@ -474,14 +509,34 @@ Usage:  toggle wiznet
 
 Allows you to hear or ignore messages coming over the wiznet.
 
-See also: WIZNET
+See also: WIZNET, TOGGLE
+#d
+OSET "RESTRING OBJECT"
+
+Usage:  oset <object> <field> <value>
+
+This command lets you modify an item in the world. It does not change the
+item's prototype; to do that you must use OLC. This command is grantable.
+
+You can change the following fields:
+  flags - Item flags like FAST and HARD-DROP.
+  keywords - The words that can be used to target the object.
+  longdescription - The text shown on the ground.
+  shortdescription - The text used to build strings, and in the inventory.
+  timer - The decay timer on the item (-1 for no decay).
+
+Setting the keywords, longdescription, or shortdescription to "none" will
+restore its strings from the prototype (if one exists).
+
+See also: GRANT, OEDIT
 #d
 PAGE
 
 Usage:  page <player | all> <message>
 
 PAGE is used to send a message, along with a beep, to another player. Use
-PAGE ALL to send a message and a beep to everyone in the game.
+PAGE ALL to send a message and a beep to everyone in the game. This command is
+grantable.
 
 Examples:
 
@@ -489,6 +544,8 @@ Examples:
   > page all GAME WILL BE SHUTTING DOWN IN 10 MINUTES
 
 Do not abuse this command.
+
+See also: GRANT
 #d
 POOFIN POOFOUT
 
@@ -496,9 +553,9 @@ Usage:  poofin <message | none>
         poofout <message | none>
 
 Sets the message seen by players when you use GOTO to move to a different
-room. POOFIN with no argument resets your poofin to the default "appears with
-an ear-splitting bang"; POOFOUT with no argument defaults to "disappears in a
-puff of smoke."
+room. POOFIN with no argument displays your poofin (the default is "appears
+with an ear-splitting bang"); POOFOUT defaults to "disappears in a puff of
+smoke."
 
 If you want your name in the middle of the poofin/out message, instead of at
 the beginning, you can use the $n token to place it anywhere. If you don't
@@ -521,7 +578,7 @@ Purge destroys things. If used with no arguments, it will clear a room of all
 mobiles and objects, but will not harm players. If the argument is an object,
 that object (and all of its contents, if any) will be destroyed. If the
 argument is a mobile, the mobile will be destroyed, leaving its inventory and
-equipment lying on the ground.
+equipment lying on the ground. This command is grantable.
 
 If the argument is the name of a player, the player's inventory and equipment
 will drop on the ground and the player will lose his/her connection. For this
@@ -534,7 +591,7 @@ Examples:
   > purge sword
   > purge dragon
 
-See also: DC
+See also: DC, GRANT
 #d
 RANDOM
 
@@ -553,14 +610,16 @@ However, players also enjoy some warning and may appreciate knowing that
 you're going to reboot. It may also interrupt their fighting.
 
 To reboot immediately, use the 'now' option. Otherwise, typing it with no
-arguments displays the current status.
+arguments displays the current status. This command is grantable.
+
+See also: GRANT
 #d
 RELOAD
 
 Usage:  reload < '*' | all | file >
 
 Reload is used to reload text files such as the MOTD from disk into memory. 
-Reload * reloads all the text files below.
+Reload * reloads all the text files below. This command is grantable.
 
 Valid files are:
 
@@ -576,6 +635,8 @@ Valid files are:
   policy     (/mud_dir/lib/text/policies)
   wizlist    (/mud_dir/lib/text/wizlist)
   xhelp      (/mud_dir/lib/text/help/*)
+
+See also: GRANT
 #d
 RESCALE
 
@@ -583,21 +644,26 @@ Usage:  rescale <mob/item> <level>
 
 This command allows you to rescale a mob or item. It checks for a matching mob
 in the room first, then an item in your inventory, then an item on the ground.
+This command is grantable.
 
 The level you choose will still be constrained by the mob/item's minimum and
 maximum scale value.
 
 Caution: Rescaling an item will almost always cause it to be re-loaded and it
 will lose any enchantments or modifications.
+
+See also: GRANT
 #d
 RESTORE
 
 Usage:  restore <player | mobile>
 
 RESTORE restores a player or mobile to full hit, mana, and movement points.
-It also resets all cooldowns.
+It also resets all cooldowns. This command is grantable.
 
 If used on immortals, it also sets all skill levels to 100%.
+
+See also: GRANT
 #d
 RETURN
 
@@ -612,13 +678,15 @@ ROOMFLAGS
 Usage:  toggle roomflags
 
 This immortal toggle allows you to see flags and vnums on the "look" command.
+
+See also: TOGGLE
 #d
 SET
 
 Usage:  set [file | player] <character> <field> <value>
 
 SET is an extremely powerful command, capable of setting dozens of aspects of
-characters, both players and mobiles.
+characters, both players and mobiles. This command is grantable.
 
 SET PLAYER forces set to look for a player and not a mobile; useful for
 players with names such as 'guard'.
@@ -666,9 +734,9 @@ drunk          BOTH    MISC         Drunkenness
 hunger         BOTH    MISC         Hunger level
 thirst         BOTH    MISC         Thirst level
 
-color          PC      BINARY       Color preference
 deleted        PC      BINARY       Player deleted
 frozen         PC      BINARY       Player is frozen
+incognito      PC      BINARY       Turns on/off incognito mode (imms only)
 ipmask         PC      BINARY       IP address is hidden
 multiok        PC      BINARY       Can multi-play
 muted          PC      BINARY       Player is muted
@@ -677,10 +745,11 @@ noidleout      PC      BINARY       Won't idle out
 notitle        PC      BINARY       Can't change title
 nowizlist      PC      BINARY       Doesn't show on wizlist
 siteok         PC      BINARY       Can log in through ban
+wizhide        PC      BINARY       Turns on/off wizhide
 
 scale          NPC     NUMBER       Rescales a mob to a given level
 
-See also: GRANTS, STAT
+See also: GRANT, STAT
 #d
 SHOW
 
@@ -727,9 +796,10 @@ pause - Create a file called 'pause' in Empire's root directory; do not
 You can also set a timer, giving the players some warning before the reboot.
 
 If you type this command with no arguments, it will give the current status.
-If you want to shutdown with no timer, use the 'now' option.
+If you want to shutdown with no timer, use the 'now' option. This command is
+grantable.
 
-See also: REBOOT
+See also: GRANT, REBOOT
 #d
 SLAY
 
@@ -737,19 +807,24 @@ Usage:  slay
 
 This is an instant-kill power for the Implementor which was originally part of
 CircleMUD's normal kill command. It has been filtered out because we found it
-to be easier to have it separate.
+to be easier to have it separate. This command is grantable.
+
+See also: GRANT
 #d
 SNOOP
 
 Usage:  snoop [player]
 
 Snoop allows you to listen in on another player's session; everything the
-player sees or types will be displayed on your terminal preceded by a '%'.
+player sees or types will be displayed on your terminal preceded by a '%'. This
+command is grantable.
 
 Obviously, there are many ethical considerations to the use of this command;
 snoop should be used minimally, and only for disciplinary purposes.
 
 Type snoop <your name> or just snoop to stop snooping.
+
+See also: GRANT
 #d
 STAT
 
@@ -784,9 +859,9 @@ Usage:  switch <monster>
 
 SWITCH is used to take over the body of mobiles; useful for interactive
 adventures. If the monster in which you are switched is killed you will be
-returned to your own body.
+returned to your own body. This command is grantable.
 
-See also: RETURN
+See also: GRANT, RETURN
 #d
 SYSLOG
 
@@ -804,7 +879,10 @@ TEDIT
 
 Usage:  tedit <message>
 
-Allows you to alter a game message or text file from within the game.
+Allows you to alter a game message or text file from within the game. This
+command is grantable.
+
+See also: GRANT
 #d
 TELEPORT
 
@@ -821,9 +899,10 @@ UNBIND
 Usage:  unbind <item>
 
 This immortal command removes the binding on an object that is bind-on-equip
-or bind-on-pickup. It will re-bind to the next mortal it's given to.
+or bind-on-pickup. It will re-bind to the next mortal it's given to. This
+command is grantable.
 
-See also: BINDING
+See also: BINDING, GRANT
 #d
 UPTIME
 
@@ -838,7 +917,7 @@ Usage:  users [switches]
 USERS gives a list of all sockets (i.e., connections) currently active on the
 MUD. The multi-column display shows the socket number (used by DC), class,
 level, and name of the player connected, connection state, idle time, and
-hostname.
+hostname. This command is grantable.
 
 The following switches are available:
 
@@ -849,7 +928,7 @@ The following switches are available:
 -n <name>  Show the socket with <name> associated with it.
 -h <host>  Show all sockets from <host>.
 
-See also: DC
+See also: DC, GRANT
 #d
 UTILITY
 
@@ -878,7 +957,7 @@ Gives a list of the virtual numbers of objects or mobiles which have the
 specified name. If you specify more than one keyword, it will find things
 that match ALL of those keywords.
 
-Valid types are: adventure, building, craft, crop, obj, mob, 
+Valid types are: adventure, book, building, craft, crop, global, obj, mob, 
                  roomtemplate, sector
 
 Examples:
@@ -899,7 +978,7 @@ Usage:  vstat <type> <vnum>
 
 Used to stat a prototypical object by virtual number.
 
-Valid types are: adventure, building, craft, crop, obj, mob,
+Valid types are: adventure, building, book, craft, crop, global, obj, mob,
                  roomtemplate, sector
 
 Examples:
@@ -915,6 +994,20 @@ Usage:  wizhelp
 
 Gives a list of the special commands available at your level.
 #d
+WIZHIDE
+
+Usage: toggle wizhide
+
+This command prevents you from appearing in the room to players with lower
+access levels and players without holylight. They cannot target you in the
+room, and your poofin, poofout and movement will be invisible, along with most
+other room messages you cause. Mortals will still see any messages sent
+directly to them, such as if you look at them.
+
+You'll still show up in the "who" list, and players can still send you tells.
+
+See also: INVIS, HOLYLIGHT, TOGGLE, WIZHIDE
+#d
 WIZLOCK
 
 Usage:  wizlock [value] [message]
@@ -923,15 +1016,20 @@ WIZLOCK allows you to restrict the game. WIZLOCK 1 prevents new characters
 from being created. WIZLOCK n prevents new characters and allows only
 characters level n and above to log on. WIZLOCK with no argument displays the
 current WIZLOCK level. You can also send a message to people trying to
-connect.
+connect. This command is grantable.
 
-See also: BAN
+The current wizlock level appears on the %x/%X prompt codes.
+
+See also: BAN, GRANT
 #d
 WIZNET ;
 
 The immortal communication channel.
 
-Usage:  wiznet [#level] <text>
+As with most similar channels, you can start chats with * (asterisk) to make
+them channel-emotes.
+
+Usage:  wiznet [#<level>] <text>
 
 Examples:
 

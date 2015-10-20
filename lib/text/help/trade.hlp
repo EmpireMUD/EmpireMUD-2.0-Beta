@@ -14,6 +14,20 @@ the person who crafts them. HELP SCALABLE CRAFTS has a full explanation.
 See also: CRAFT, IDENTIFY, FORGE, SEWING, POTTERY, WOODWORKING, SHIPBUILDING,
   REFORGE
 #
+"ALCHEMIST CRAFTS"
+
+Alchemist Crafts
+Class ability: Alchemist
+
+This ability will contain any crafts for the Alchemist class.
+#
+"ANTIQUARIAN CRAFTS"
+
+Antiquarian Crafts
+Class ability: Antiquarian
+
+This ability will contain any crafts for the Antiquarian class.
+#
 ARMORSMITHING ARMORCRAFTING
 
 Armorsmithing (Trade ability)
@@ -29,6 +43,16 @@ A forgemaster with the Armorsmithing specialization can create many armors:
 Armorsmithing -> Sturdy Armors -> Imperial Armors
 
 See also: FORGE, WEAPONCRAFTING, STURDY ARMORS, IMPERIAL ARMORS
+#
+"ARTIFICER CRAFTS"
+
+Artificer Crafts
+Class ability: Artificer
+
+Craft items:
+  clockwork lens array  2 gold dust, 4 iron ingots  (crafter item)
+
+See also: CRAFT
 #
 "BASIC CRAFTS" DYE CRAFT CRAFTS
 
@@ -53,7 +77,7 @@ Basic Crafts:
   violet dye  2 red berries, 1 bileberries, (glassblowing)
   orange dye  2 oranges, 1 magenta arrowfish, (glassblowing)
 
-See also: WOODWORKING
+See also: CRAFTING LEVEL, WOODWORKING
 #
 CLOTHING CLOTHES
 
@@ -103,7 +127,7 @@ Without any skill or ability, you can always cook:
   peach pie  1 basket of peaches, 1 flour
   candied apple  1 apple, apiaries tech for honey
 
-See also: MILL, BAKERY
+See also: CRAFTING LEVEL, MILL, BAKERY
 #
 "DANGEROUS LEATHERS"
 
@@ -193,8 +217,19 @@ With the basic Forge skill, you can create:
   mirror  1 iron ingot
   coin mill  24 iron ingots, 2 imperium ingots
 
-See also: SMELT, WEAPONCRAFTING, ARMORSMITHING, JEWELRY, MASTER BLACKSMITH,
-  IRON BLADES, STURDY ARMORS, DEADLY WEAPONS, IMPERIAL ARMORS
+See also: CRAFTING LEVEL, SMELT, WEAPONCRAFTING, ARMORSMITHING, JEWELRY,
+  MASTER BLACKSMITH, IRON BLADES, STURDY ARMORS, DEADLY WEAPONS,
+  IMPERIAL ARMORS
+#
+"GUILDSMAN CRAFTS"
+
+Guildsman Crafts
+Class ability: Guildsman
+
+Sew items:
+  guild patterned cloth  4 cloth, 2 silver nuggets  (crafter item)
+
+See also: SEW
 #
 HANDLE
 
@@ -368,9 +403,11 @@ See also: MAGIC ATTIRE, MASTER TAILOR, WEAVE, SEW
 Master Blacksmith (Trade ability)
 
 With this ability, some items you forge will have even greater power. You can
-also forge them more quickly.
+also forge them more quickly. To train this ability, you need to craft items
+like weapons and armor (items that come out superior); it won't work with nails
+or other small items.
 
-See also: FORGE, WEAPONCRAFTING, ARMORSMITHING
+See also: FORGE, WEAPONCRAFTING, ARMORSMITHING, SUPERIOR
 #
 "MASTER FARMER" "MASTER FARMING"
 
@@ -385,21 +422,24 @@ See also: HARVEST, MILL, SHEAR
 Master Craftsman (Trade ability)
 
 This mastery ability improves the quality of certain items from the Pottery
-and woodworking tree. It also allows you to craft the following:
+and woodworking tree.
+
+It also allows you to craft the following:
 
   letheian icon  1 clay, 1 silver bar, 2 seashells, 3 bileberries (skill reset)
 
-See also: POTTERY, FINE POTTERY
+See also: POTTERY, FINE POTTERY, SUPERIOR
 #
 "MASTER TAILOR"
 
 Master Tailor (Trade ability)
 
-Items you sew may have extra effects. For example, the whip provides +1
-strength. (This stacks with enchantments).
+Items you sew will be superior in quality and ability. (This stacks with
+enchantments). You can only level up with this ability by sewing items that
+can come out superior.
 
 See also: RAWHIDE STITCHING, LEATHERWORKING, DANGEROUS LEATHERS,
-  MAGIC ATTIRE, MAGICAL VESTMENTS
+  MAGIC ATTIRE, MAGICAL VESTMENTS, SUPERIOR
 #
 POTTER POTTERY CLAY
 
@@ -467,17 +507,17 @@ A great blacksmith (weapons) or tailor (armors and shields) can use this
 ability in two ways:
 
 Name: You can take a generic item and give it a name. The name must contain
-the original name (except a leading a/an/the). Requires 1 blue iris
-per 3 gear levels on the item.
+the original name (except a leading a/an/the). Requires 1 blue iris per 3 gear
+rating on the item.
 
 Renew: This undoes any enchantments, disenchantments, name, superior quality, 
 and all other effects, and restores the item to its base stats. Requires 1
-bloodstone per 3 gear levels on the base (unmodified) item.
+bloodstone per 3 gear rating on the base (unmodified) item.
 
 Superior: If the item is a crafted item that could have superior qualities,
 this adds those qualities and marks it (superior). You can only use this on
 the normal version of an item that can be made superior, and only if you have
-the correct Master ability. Requires 1 green seashell per 3 gear levels on the
+the correct Master ability. Requires 1 green seashell per 3 gear rating on the
 item.
 
 See also: MASTER BLACKSMITH, MASTER TAILOR
@@ -490,16 +530,17 @@ level and skills of the person.
 
 For normal craftables, the level range of the ability will determine the upper
 level limit of the item created. For example, the arming sword made by
-Weaponcrafting can only be levels 30 to 50, since that's the level range of
-Weaponcrafting. Abilities bought at levels 50-74 will make crafted items that
-scale as high as 75. Abilities bought at 75-100 make crafted items scaled up to
-100. The actual level will be based on the Trade skill of the crafter, within
-that range. The item will never scale higher than the crafter's total level.
+Iron Blades can only be levels 55 to 75, since that's the level range of
+Iron Blades. Abilities bought at levels 0-49 will make items up to level 50.
+Abilities bought at levels 50-74 will make crafted items that scale as high as
+75. Abilities bought at 75-100 make crafted items scaled up to 100. The actual
+level will be based on the Trade skill of the crafter, within that range. The
+item will never scale higher than the maker's crafting level.
 
 If a craft recipe comes from an adventure zone, loot drop, or other non-ability
-source, it can make an item that scales up to the player's total level -- even
-if it requires a certain ability to craft it. Only normal craftable items are
-constrained by the ability's level range. However, the content builder who
+source, it can make an item that scales up to the player's crafting level --
+even if it requires a certain ability to craft it. Only normal craftable items
+are constrained by the ability's level range. However, the content builder who
 added those adventure craft recipes may have set limits on what level the
 craftables may scale to.
 
@@ -509,7 +550,7 @@ level.
 The identify command will help you determine if two crafted items are different
 in power, even if they have the same name.
 
-See also: IDENTIFY, SUPERIOR
+See also: CRAFTING LEVEL, IDENTIFY, SUPERIOR
 #
 SEW SEWING
 
@@ -531,9 +572,27 @@ With basic Sewing, you can make:
 Additional sewing items are available from other abilities in the Trade skill,
 as well as patterns and crafts hidden around the world.
 
-See also: LEATHERWORKING, RAWHIDE STITCHING, CLOTHING
+See also: CRAFTING LEVEL, LEATHERWORKING, RAWHIDE STITCHING, CLOTHING
 #
-SHIPBUILDING "SHIP BUILDING" MANUFACTURE SHIPYARDS "ADVANCED SHIPYARDS" "UPGRADED SHIPYARD" "ADVANCED SHIPS" SHIPS
+SHIP SHIPS 
+
+(Disambiguation: Did you mean HELP SHIP COMMAND ?)
+
+The most efficient form of ocean travel, ships can be sailed at a fixed speed
+(with 'sail <direction>'), consuming no moves. Multiple players can combine
+their efforts to sail a single ship faster.
+
+Ships can be used to manually transport resources, though you should be wary of
+leaving them unattended, as autostorage while at sea (though slower) will cause
+the ship's cargo to be permanently lost. Each room of a ship can hold up to 404
+items, but large items count twice each as if they were kept in your inventory.
+
+Ships can also be used to transport resources automatically using the ship
+command.
+
+See also: BOARD, DISEMBARK, SAIL, SHIPBUILDING, SHIPPING
+#
+SHIPBUILDING "SHIP BUILDING" MANUFACTURE SHIPYARDS "ADVANCED SHIPYARDS" "UPGRADED SHIPYARD" "ADVANCED SHIPS" "SHIP LIST"
 
 Shipbuilding (Trade ability)
 Advanced Ships (Trade ability)
@@ -550,15 +609,15 @@ Great ships can be created via the manufacture skill. This can only be done in
 a shipyard, and the vessel can be sailed to a dock when finished.
 
 With basic Shipbuilding you can manufacture:
-  pinnace  30 lumber, 60 nails
-  galley  45 lumber, 90 nails
-  brigantine  60 lumber, 120 nails
+  pinnace  30 lumber, 60 nails  (shipping capacity: 150)
+  galley  45 lumber, 90 nails  (shipping capacity: 300)
+  brigantine  60 lumber, 120 nails  (shipping capacity: 450)
 
-With Advanced ships you can manufacture:
-  argosy  120 lumber, 240 nails
-  galleon  240 lumber, 480 nails
+With Advanced Ships you can manufacture:
+  argosy  120 lumber, 240 nails  (shipping capacity: 600)
+  galleon  240 lumber, 480 nails  (shipping capacity: 750)
 
-See also: BOARD, DISEMBARK, SAIL, UPGRADE
+See also: BOARD, DISEMBARK, SAIL, SHIPPING, SHIPS, UPGRADE
 #
 SIEGEWORKS "SIEGE WORKS"
 
@@ -596,6 +655,23 @@ You can tan some skins into leather at the Tannery.
 
 See also: SEWING, LEATHERWORKING, RAWHIDE STITCHING, TAN
 #
+"SMUGGLER CRAFTS"
+
+Smuggler Crafts
+Class ability: Smuggler
+
+This ability will contain any crafts for the Smuggler class.
+#
+"STEELSMITH CRAFTS"
+
+Steelsmith Crafts
+Class ability: Steelsmith
+
+Forge items:
+  delicate tools  4 iron ingots, 2 nocturnium ingots  (crafter item)
+
+See also: FORGE
+#
 "STURDY ARMORS"
 
 Sturdy Armors (Trade ability)
@@ -624,6 +700,16 @@ skins and leathers are used in sewing and crafting.
 
 See also: SKIN
 #
+"TINKER CRAFTS"
+
+Tinker Crafts
+Class ability: Tinker
+
+Forge items:
+  clips and buckles  2 imperium ingots, 4 iron ingots  (crafter item)
+
+See also: FORGE
+#
 WEAPONCRAFTING
 
 Weaponcrafting (Trade ability)
@@ -646,7 +732,7 @@ See also: FORGE, IRON BLADES, DEADLY WEAPONS
 #
 WEAVE
 
-Command:  weave <item>
+Command:  weave [number] <item>
 
 Weaving converts raw materials into cloth. You can weave anywhere, but it goes
 much faster at the tailor shop.

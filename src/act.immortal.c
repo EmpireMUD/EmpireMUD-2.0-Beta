@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.immortal.c                                  EmpireMUD 2.0b2 *
+*   File: act.immortal.c                                  EmpireMUD 2.0b3 *
 *  Usage: Player-level imm commands and other goodies                     *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -47,6 +47,7 @@ extern const char *bonus_bits[];
 extern const char *climate_types[];
 extern const char *dirs[];
 extern const char *drinks[];
+extern const char *extra_bits[];
 extern const char *genders[];
 extern const char *grant_bits[];
 extern const char *island_bits[];
@@ -63,10 +64,11 @@ void clear_char_abilities(char_data *ch, int skill);
 void delete_instance(struct instance_data *inst);	// instance.c
 void get_icons_display(struct icon_data *list, char *save_buffer);
 void get_interaction_display(struct interaction_item *list, char *save_buffer);
+void get_script_display(struct trig_proto_list *list, char *save_buffer);
 extern char *get_room_name(room_data *room, bool color);
-void save_instances();
 void save_whole_world();
 void scale_mob_to_level(char_data *mob, int level);
+extern char *show_color_codes(char *string);
 void update_class(char_data *ch);
 
 // locals
@@ -123,9 +125,14 @@ static void perform_goto(char_data *ch, room_data *to_room) {
 	}
 
 	for (t = ROOM_PEOPLE(IN_ROOM(ch)); t; t = t->next_in_room) {
-		if (!REAL_NPC(t) && t != ch && CAN_SEE(t, ch)) {
-			act(buf, TRUE, ch, 0, t, TO_VICT);
+		if (REAL_NPC(t) || t == ch) {
+			continue;
 		}
+		if (!CAN_SEE(t, ch) || !WIZHIDE_OK(t, ch)) {
+			continue;
+		}
+
+		act(buf, TRUE, ch, 0, t, TO_VICT);
 	}
 
 	char_from_room(ch);
@@ -143,9 +150,14 @@ static void perform_goto(char_data *ch, room_data *to_room) {
 	}
 
 	for (t = ROOM_PEOPLE(IN_ROOM(ch)); t; t = t->next_in_room) {
-		if (!REAL_NPC(t) && t != ch && CAN_SEE(t, ch)) {
-			act(buf, TRUE, ch, 0, t, TO_VICT);
+		if (REAL_NPC(t) || t == ch) {
+			continue;
 		}
+		if (!CAN_SEE(t, ch) || !WIZHIDE_OK(t, ch)) {
+			continue;
+		}
+		
+		act(buf, TRUE, ch, 0, t, TO_VICT);
 	}
 	
 	look_at_room(ch);
@@ -177,11 +189,12 @@ void perform_immort_invis(char_data *ch, int level) {
 
 /* Immortal visible command, different than mortals' */
 void perform_immort_vis(char_data *ch) {
-	if (GET_INVIS_LEV(ch) == 0 && !AFF_FLAGGED(ch, AFF_HIDE)) {
+	if (GET_INVIS_LEV(ch) == 0 && !AFF_FLAGGED(ch, AFF_HIDE) && !PRF_FLAGGED(ch, PRF_WIZHIDE | PRF_INCOGNITO)) {
 		send_to_char("You are already fully visible.\r\n", ch);
 		return;
 	}
-
+	
+	REMOVE_BIT(PRF_FLAGS(ch), PRF_WIZHIDE | PRF_INCOGNITO);
 	GET_INVIS_LEV(ch) = 0;
 	appear(ch);
 	send_to_char("You are now fully visible.\r\n", ch);
@@ -590,10 +603,11 @@ ACMD(do_admin_util) {
 void do_instance_add(char_data *ch, char *argument) {
 	extern bool can_instance(adv_data *adv);
 	extern room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rule, int *which_dir);
+	extern const bool is_location_rule[];
 
-	struct adventure_link_rule *rule;
+	struct adventure_link_rule *rule, *rule_iter;
+	int num_rules, tries, dir = NO_DIR;
 	bool found = FALSE;
-	int dir = NO_DIR;
 	room_data *loc;
 	adv_vnum vnum;
 	adv_data *adv;
@@ -608,13 +622,25 @@ void do_instance_add(char_data *ch, char *argument) {
 		return;
 	}
 	
-	for (rule = GET_ADV_LINKING(adv); rule; rule = rule->next) {
-		if ((loc = find_location_for_rule(adv, rule, &dir))) {
-			// make it so!
-			if (build_instance_loc(adv, rule, loc, dir)) {
-				found = TRUE;
-				save_instances();
-				break;
+	// randomly choose one rule to attempt
+	for (tries = 0; tries < 5 && !found; ++tries) {
+		num_rules = 0;
+		rule = NULL;
+		for (rule_iter = GET_ADV_LINKING(adv); rule_iter; rule_iter = rule_iter->next) {
+			if (is_location_rule[rule_iter->type]) {
+				// choose one at random
+				if (!number(0, num_rules++) || !rule) {
+					rule = rule_iter;
+				}
+			}
+		}
+	
+		if (rule) {
+			if ((loc = find_location_for_rule(adv, rule, &dir))) {
+				// make it so!
+				if (build_instance_loc(adv, rule, loc, dir)) {
+					found = TRUE;
+				}
 			}
 		}
 	}
@@ -651,7 +677,6 @@ void do_instance_delete(char_data *ch, char *argument) {
 			}
 			msg_to_char(ch, "Instance of %s deleted.\r\n", GET_ADV_NAME(inst->adventure));
 			delete_instance(inst);
-			save_instances();
 			break;
 		}
 	}
@@ -681,8 +706,6 @@ void do_instance_delete_all(char_data *ch, char *argument) {
 			delete_instance(inst);
 		}
 	}
-	
-	save_instances();
 	
 	if (count > 0) {
 		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s deleted %d instances of %s", GET_REAL_NAME(ch), count, GET_ADV_NAME(adv));
@@ -744,16 +767,18 @@ void do_instance_nearby(char_data *ch, char *argument) {
 	
 	size = snprintf(buf, sizeof(buf), "Instances within %d tiles:\r\n", distance);
 	
-	for (inst = instance_list; inst; inst = inst->next) {
-		++num;
+	if (loc) {	// skip work if no map location found
+		for (inst = instance_list; inst; inst = inst->next) {
+			++num;
 		
-		inst_loc = inst->location;
-		if (inst_loc && !INSTANCE_FLAGGED(inst, INST_COMPLETED) && compute_distance(loc, inst_loc) <= distance) {
-			++count;
-			instance_list_row(inst, num, line, sizeof(line));
-			size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
-			if (size >= sizeof(buf)) {
-				break;
+			inst_loc = inst->location;
+			if (inst_loc && !INSTANCE_FLAGGED(inst, INST_COMPLETED) && compute_distance(loc, inst_loc) <= distance) {
+				++count;
+				instance_list_row(inst, num, line, sizeof(line));
+				size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
+				if (size >= sizeof(buf)) {
+					break;
+				}
 			}
 		}
 	}
@@ -764,7 +789,7 @@ void do_instance_nearby(char_data *ch, char *argument) {
 
 
 void do_instance_reset(char_data *ch, char *argument) {
-	extern struct instance_data *find_instance_by_room(room_data *room);
+	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 	void reset_instance(struct instance_data *inst);
 
 	struct instance_data *inst;
@@ -792,7 +817,7 @@ void do_instance_reset(char_data *ch, char *argument) {
 	}
 	else {
 		// no argument
-		if (!(inst = find_instance_by_room(IN_ROOM(ch)))) {
+		if (!(inst = find_instance_by_room(IN_ROOM(ch), FALSE))) {
 			msg_to_char(ch, "You are not in or near an adventure zone instance.\r\n");
 			return;
 		}
@@ -866,7 +891,6 @@ void do_instance_test(char_data *ch, char *argument) {
 	
 	if (build_instance_loc(adv, &rule, IN_ROOM(ch), DIR_RANDOM)) {
 		found = TRUE;
-		save_instances();
 	}
 	
 	if (found) {
@@ -925,7 +949,6 @@ struct set_struct {
 		{ "deleted", 	LVL_CIMPL, 	PC, 	BINARY },
 		{ "nowizlist", 	LVL_START_IMM, 	PC, 	BINARY },
 		{ "loadroom", 	LVL_START_IMM, 	PC, 	MISC },
-		{ "color",		LVL_START_IMM, 	PC, 	BINARY },
 		{ "password",	LVL_CIMPL, 	PC, 	MISC },
 		{ "nodelete", 	LVL_CIMPL, 	PC, 	BINARY },
 		{ "noidleout",	LVL_START_IMM,	PC,		BINARY },
@@ -934,9 +957,11 @@ struct set_struct {
 		{ "lastname",	LVL_START_IMM,	PC,		MISC },
 		{ "muted",		LVL_START_IMM,	PC, 	BINARY },
 		{ "name",		LVL_CIMPL,	PC,		MISC },
+		{ "incognito",	LVL_START_IMM,	PC,		BINARY },
 		{ "ipmask",		LVL_START_IMM,	PC,		BINARY },
 		{ "multiok",	LVL_START_IMM,	PC,		BINARY },
 		{ "vampire",	LVL_START_IMM,	PC, 	BINARY },
+		{ "wizhide",	LVL_START_IMM,	PC,		BINARY },
 		{ "account",	LVL_START_IMM,	PC,		MISC },
 		{ "bonus",		LVL_START_IMM,	PC,		MISC },
 		{ "grants",		LVL_CIMPL,	PC,		MISC },
@@ -1096,6 +1121,12 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 	else if SET_CASE("ipmask") {
 		SET_OR_REMOVE(PLR_FLAGS(vict), PLR_IPMASK);
 	}
+	else if SET_CASE("incognito") {
+		SET_OR_REMOVE(PRF_FLAGS(vict), PRF_INCOGNITO);
+	}
+	else if SET_CASE("wizhide") {
+		SET_OR_REMOVE(PRF_FLAGS(vict), PRF_WIZHIDE);
+	}
 	else if SET_CASE("multiok") {
 		SET_OR_REMOVE(PLR_FLAGS(vict), PLR_MULTIOK);
 	}
@@ -1222,9 +1253,6 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 			send_to_char("Must be 'off' or a room's virtual number.\r\n", ch);
 			return (0);
 		}
-	}
-	else if SET_CASE("color") {
-		SET_OR_REMOVE(PRF_FLAGS(vict), PRF_COLOR);
 	}
 	else if SET_CASE("password") {
 		if (GET_ACCESS_LEVEL(vict) >= LVL_IMPL) {
@@ -2243,6 +2271,60 @@ void do_stat_adventure(char_data *ch, adv_data *adv) {
 	
 	get_adventure_linking_display(GET_ADV_LINKING(adv), lbuf);
 	msg_to_char(ch, "Linking rules:\r\n%s", lbuf);
+	
+	if (GET_ADV_SCRIPTS(adv)) {
+		get_script_display(GET_ADV_SCRIPTS(adv), lbuf);
+		msg_to_char(ch, "Scripts:\r\n%s", lbuf);
+	}
+}
+
+
+/**
+* Show the stats on a book.
+*
+* @param char_data *ch The player requesting stats.
+* @param book_data *book The book to stat.
+*/
+void do_stat_book(char_data *ch, book_data *book) {
+	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	struct paragraph_data *para;
+	size_t size = 0;
+	int count, len, num;
+	char *ptr, *txt;
+	
+	size += snprintf(buf + size, sizeof(buf) - size, "Book VNum: [\tc%d\t0], Author: \ty%s\t0 (\tc%d\t0)\r\n", book->vnum, get_name_by_id(book->author) ? CAP(get_name_by_id(book->author)) : "nobody", book->author);
+	size += snprintf(buf + size, sizeof(buf) - size, "Title: %s\r\n", book->title);
+	size += snprintf(buf + size, sizeof(buf) - size, "Byline: %s\r\n", book->byline);
+	size += snprintf(buf + size, sizeof(buf) - size, "Item: [%s]\r\n", book->item_name);
+	size += snprintf(buf + size, sizeof(buf) - size, "%s", book->item_description);	// desc has its own crlf
+	
+	// precompute number of paragraphs
+	num = 0;
+	for (para = book->paragraphs; para; para = para->next) {
+		++num;
+	}
+	
+	for (para = book->paragraphs, count = 1; para; para = para->next, ++count) {
+		txt = para->text;
+		skip_spaces(&txt);
+		len = strlen(txt);
+		len = MIN(len, 62);	// aiming for full page width then a ...
+		snprintf(line, sizeof(line), "Paragraph %*d: %-*.*s...", (num >= 10 ? 2 : 1), count, len, len, txt);
+		if ((ptr = strstr(line, "\r\n"))) {	// line ended early?
+			sprintf(ptr, "...");	// overwrite the crlf
+		}
+		
+		// too big?
+		if (size + strlen(line) + 2 >= sizeof(buf)) {
+			break;
+		}
+		
+		size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", line);
+	}
+	
+	if (ch->desc) {
+		page_string(ch->desc, buf, TRUE);
+	}
 }
 
 
@@ -2399,7 +2481,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 			msg_to_char(ch, "Promo code: %s\r\n", promo_codes[GET_PROMO_ID(k)].code);
 		}
 
-		msg_to_char(ch, "Access Level: [&c%d&0], Class: [&c%s&0/&c%s&0], Skill Level: [&c%d&0], Gear Level: [&c%d&0], Total: [&c%d&0]\r\n", GET_ACCESS_LEVEL(k), class_data[GET_CLASS(k)].name, class_role[(int) GET_CLASS_ROLE(k)], GET_SKILL_LEVEL(k), (int) GET_GEAR_LEVEL(k), IN_ROOM(k) ? GET_COMPUTED_LEVEL(k) : GET_LAST_KNOWN_LEVEL(k));
+		msg_to_char(ch, "Access Level: [&c%d&0], Class: [&c%s&0/&c%s&0], Skill Level: [&c%d&0], Gear Level: [&c%d&0], Total: [&c%d&0]\r\n", GET_ACCESS_LEVEL(k), class_data[GET_CLASS(k)].name, class_role[(int) GET_CLASS_ROLE(k)], GET_SKILL_LEVEL(k), GET_GEAR_LEVEL(k), IN_ROOM(k) ? GET_COMPUTED_LEVEL(k) : GET_LAST_KNOWN_LEVEL(k));
 		
 		coin_string(GET_PLAYER_COINS(k), buf);
 		msg_to_char(ch, "Coins: %s\r\n", buf);
@@ -2660,8 +2742,8 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 	if (GET_CRAFT_ABILITY(craft) != NO_ABIL && ability_data[GET_CRAFT_ABILITY(craft)].parent_skill != NO_SKILL) {
 		sprintf(buf + strlen(buf), " (%s %d)", skill_data[ability_data[GET_CRAFT_ABILITY(craft)].parent_skill].name, ability_data[GET_CRAFT_ABILITY(craft)].parent_skill_required);
 	}
-	seconds = GET_CRAFT_TIME(craft) * SECS_PER_REAL_UPDATE;
-	msg_to_char(ch, "Ability: &y%s&0, Time: [&g%d action tick%s&0 | &g%d:%02d&0]\r\n", buf, GET_CRAFT_TIME(craft), PLURAL(GET_CRAFT_TIME(craft)), seconds / SECS_PER_REAL_MIN, seconds % SECS_PER_REAL_MIN);
+	seconds = GET_CRAFT_TIME(craft) * ACTION_CYCLE_TIME;
+	msg_to_char(ch, "Ability: &y%s&0, Level: &g%d&0, Time: [&g%d action tick%s&0 | &g%d:%02d&0]\r\n", buf, GET_CRAFT_MIN_LEVEL(craft), GET_CRAFT_TIME(craft), PLURAL(GET_CRAFT_TIME(craft)), seconds / SECS_PER_REAL_MIN, seconds % SECS_PER_REAL_MIN);
 
 	sprintbit(GET_CRAFT_FLAGS(craft), craft_flags, buf, TRUE);
 	msg_to_char(ch, "Flags: &c%s&0\r\n", buf);
@@ -2728,12 +2810,45 @@ void do_stat_crop(char_data *ch, crop_data *cp) {
 }
 
 
+/**
+* Show a character stats on a particular global.
+*
+* @param char_data *ch The player requesting stats.
+* @param struct global_data *glb The global to stat.
+*/
+void do_stat_global(char_data *ch, struct global_data *glb) {
+	extern const char *global_flags[];
+	extern const char *global_types[];
+	
+	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
+	
+	msg_to_char(ch, "Global VNum: [&c%d&0], Type: [&c%s&0], Name: '&c%s&0'\r\n", GET_GLOBAL_VNUM(glb), global_types[GET_GLOBAL_TYPE(glb)], GET_GLOBAL_NAME(glb));
+	
+	sprintbit(GET_GLOBAL_FLAGS(glb), global_flags, buf, TRUE);
+	msg_to_char(ch, "Flags: &g%s&0\r\n", buf);
+	
+	switch (GET_GLOBAL_TYPE(glb)) {
+		case GLOBAL_MOB_INTERACTIONS: {
+			sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), action_bits, buf, TRUE);
+			sprintbit(GET_GLOBAL_TYPE_EXCLUDE(glb), action_bits, buf2, TRUE);
+			msg_to_char(ch, "Levels: [&g%s&0], Mob Flags: &c%s&0, Exclude: &c%s&0\r\n", level_range_string(GET_GLOBAL_MIN_LEVEL(glb), GET_GLOBAL_MAX_LEVEL(glb), 0), buf, buf2);
+			break;
+		}
+	}
+	
+	if (GET_GLOBAL_INTERACTIONS(glb)) {
+		send_to_char("Interactions:\r\n", ch);
+		get_interaction_display(GET_GLOBAL_INTERACTIONS(glb), buf);
+		send_to_char(buf, ch);
+	}
+}
+
+
 /* Gives detailed information on an object (j) to ch */
 void do_stat_object(char_data *ch, obj_data *j) {
 	extern const struct material_data materials[NUM_MATERIALS];
 	extern const char *wear_bits[];
 	extern const char *item_types[];
-	extern const char *extra_bits[];
 	extern const char *container_bits[];
 	extern const char *obj_custom_types[];
 	extern const char *storage_bits[];
@@ -2741,6 +2856,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	extern double get_weapon_speed(obj_data *weapon);
 	extern struct ship_data_struct ship_data[];
 	extern const char *armor_types[NUM_ARMOR_TYPES+1];
+	extern const struct poison_data_type poison_data[];
 
 	int i, found;
 	room_data *room;
@@ -2750,18 +2866,18 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	struct obj_custom_message *ocm;
 
 	msg_to_char(ch, "Name: '&y%s&0', Aliases: %s\r\n", GET_OBJ_DESC(j, ch, OBJ_DESC_SHORT), GET_OBJ_KEYWORDS(j));
-	
-	if (OBJ_FLAGGED(j, OBJ_SCALABLE)) {
-		sprintf(buf, " (%d-%d)", GET_OBJ_MIN_SCALE_LEVEL(j), GET_OBJ_MAX_SCALE_LEVEL(j));
-	}
-	else if (GET_OBJ_CURRENT_SCALE_LEVEL(j) > 0) {
+
+	if (GET_OBJ_CURRENT_SCALE_LEVEL(j) > 0) {
 		sprintf(buf, " (%d)", GET_OBJ_CURRENT_SCALE_LEVEL(j));
 	}
+	else if (GET_OBJ_MIN_SCALE_LEVEL(j) > 0 || GET_OBJ_MAX_SCALE_LEVEL(j) > 0) {
+		sprintf(buf, " (%d-%d)", GET_OBJ_MIN_SCALE_LEVEL(j), GET_OBJ_MAX_SCALE_LEVEL(j));
+	}
 	else {
-		strcpy(buf, " (unscalable)");
+		strcpy(buf, " (no scale limit)");
 	}
 	
-	msg_to_char(ch, "Gear level: [&g%.2f%s&0], VNum: [&g%5d&0], Type: &c%s&0\r\n", rate_item(j), buf, vnum, item_types[(int) GET_OBJ_TYPE(j)]);
+	msg_to_char(ch, "Gear rating: [&g%.2f%s&0], VNum: [&g%5d&0], Type: &c%s&0\r\n", rate_item(j), buf, vnum, item_types[(int) GET_OBJ_TYPE(j)]);
 	msg_to_char(ch, "L-Des: %s\r\n", GET_OBJ_DESC(j, ch, OBJ_DESC_LONG));
 	
 	if (GET_OBJ_ACTION_DESC(j)) {
@@ -2822,7 +2938,13 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	}
 
 	switch (GET_OBJ_TYPE(j)) {
+		case ITEM_BOOK: {
+			book_data *book = book_proto(GET_BOOK_ID(j));
+			msg_to_char(ch, "Book: %d - %s\r\n", GET_BOOK_ID(j), (book ? book->title : "unknown"));
+			break;
+		}
 		case ITEM_POISON: {
+			msg_to_char(ch, "Poison type: %s\r\n", poison_data[GET_POISON_TYPE(j)].name);
 			msg_to_char(ch, "Charges remaining: %d\r\n", GET_POISON_CHARGES(j));
 			break;
 		}
@@ -3179,7 +3301,6 @@ void do_stat_room(char_data *ch) {
 void do_stat_room_template(char_data *ch, room_template *rmt) {
 	extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
 	void get_exit_template_display(struct exit_template *list, char *save_buffer);
-	void get_script_display(struct trig_proto_list *list, char *save_buffer);
 	void get_template_spawns_display(struct adventure_spawn *list, char *save_buffer);
 	extern const char *room_template_flags[];
 	
@@ -3310,6 +3431,27 @@ int vnum_adventure(char *searchname, char_data *ch) {
 * @param char_data *ch The player who is searching.
 * @return int The number of matches shown.
 */
+int vnum_book(char *searchname, char_data *ch) {
+	book_data *book, *next_book;
+	int found = 0;
+	
+	HASH_ITER(hh, book_table, book, next_book) {
+		if (multi_isname(searchname, book->title) || multi_isname(searchname, book->byline)) {
+			msg_to_char(ch, "%3d. [%5d] %s\t0 (%s\t0)\r\n", ++found, book->vnum, book->title, book->byline);
+		}
+	}
+
+	return (found);
+}
+
+
+/**
+* Searches the building db for a match, and prints it to the character.
+*
+* @param char *searchname The search string.
+* @param char_data *ch The player who is searching.
+* @return int The number of matches shown.
+*/
 int vnum_building(char *searchname, char_data *ch) {
 	bld_data *iter, *next_iter;
 	int found = 0;
@@ -3360,6 +3502,38 @@ int vnum_crop(char *searchname, char_data *ch) {
 	HASH_ITER(hh, crop_table, iter, next_iter) {
 		if (multi_isname(searchname, GET_CROP_NAME(iter)) || multi_isname(searchname, GET_CROP_TITLE(iter))) {
 			msg_to_char(ch, "%3d. [%5d] %s\r\n", ++found, GET_CROP_VNUM(iter), GET_CROP_NAME(iter));
+		}
+	}
+	
+	return found;
+}
+
+
+/**
+* Searches the global db for a match, and prints it to the character.
+*
+* @param char *searchname The search string.
+* @param char_data *ch The player who is searching.
+* @return int The number of matches shown.
+*/
+int vnum_global(char *searchname, char_data *ch) {
+	struct global_data *iter, *next_iter;
+	char flags[MAX_STRING_LENGTH];
+	int found = 0;
+	
+	HASH_ITER(hh, globals_table, iter, next_iter) {
+		if (multi_isname(searchname, GET_GLOBAL_NAME(iter))) {			
+			switch (GET_GLOBAL_TYPE(iter)) {
+				case GLOBAL_MOB_INTERACTIONS: {
+					sprintbit(GET_GLOBAL_TYPE_FLAGS(iter), action_bits, flags, TRUE);
+					msg_to_char(ch, "%3d. [%5d] %s (%s) %s\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), level_range_string(GET_GLOBAL_MIN_LEVEL(iter), GET_GLOBAL_MAX_LEVEL(iter), 0), flags);
+					break;
+				}
+				default: {
+					msg_to_char(ch, "%3d. [%5d] %s\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter));
+					break;
+				}
+			}
 		}
 	}
 	
@@ -3459,6 +3633,48 @@ int vnum_trigger(char *searchname, char_data *ch) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// COMMANDS ////////////////////////////////////////////////////////////////
+
+ACMD(do_addnotes) {
+	char notes[MAX_ADMIN_NOTES_LENGTH];
+	char_data *vict = NULL;
+	bool file = FALSE;
+	
+	argument = one_argument(argument, arg);	// target
+	skip_spaces(&argument);	// text to add
+	
+	if (!*arg || !*argument) {
+		msg_to_char(ch, "Usage: addnotes <name> <text>\r\n");
+	}
+	else if (!(vict = find_or_load_player(arg, &file))) {
+		send_to_char("There is no such player.\r\n", ch);
+	}
+	else if (GET_ACCESS_LEVEL(vict) >= GET_ACCESS_LEVEL(ch)) {
+		msg_to_char(ch, "You cannot add notes for players of that level.\r\n");
+	}
+	else if (strlen(GET_ADMIN_NOTES(vict)) + strlen(argument) + 2 > MAX_ADMIN_NOTES_LENGTH) {
+		msg_to_char(ch, "Notes too long, unable to add text. Use editnotes instead.\r\n");
+	}
+	else {
+		snprintf(notes, sizeof(notes), "%s%s\r\n", GET_ADMIN_NOTES(vict), argument);
+		strcpy(GET_ADMIN_NOTES(vict), notes);	// strcpy OK: same length
+		
+		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has added notes for %s", GET_NAME(ch), GET_NAME(vict));
+		msg_to_char(ch, "Notes added to %s.\r\n", GET_NAME(vict));
+		
+		if (file) {
+			store_loaded_char(vict);
+			file = FALSE;
+		}
+		else {
+			SAVE_CHAR(vict);
+		}
+	}
+	
+	// in case
+	if (vict && file) {
+		free_char(vict);
+	}
+}
 
 
 ACMD(do_advance) {
@@ -3972,7 +4188,9 @@ ACMD(do_echo) {
 			}
 		
 			// send to vict
-			act(lbuf, FALSE, ch, obj, vict, TO_VICT | TO_IGNORE_BAD_CODE);
+			if (vict != ch) {
+				act(lbuf, FALSE, ch, obj, vict, TO_VICT | TO_IGNORE_BAD_CODE);
+			}
 		
 			// channel history
 			if (vict->desc && vict->desc->last_act_message) {
@@ -4155,7 +4373,7 @@ ACMD(do_file) {
 		}
 		get_line(req_file, buf);
 	}
-	page_string(ch->desc, output, 1);
+	page_string(ch->desc, show_color_codes(output), TRUE);
 
 	fclose(req_file);
 }
@@ -4482,6 +4700,9 @@ ACMD(do_island) {
 		else if (strlen(argument) > MAX_ISLAND_NAME) {
 			msg_to_char(ch, "Island names may not be longer than %d characters.\r\n", MAX_ISLAND_NAME);
 		}
+		else if (strchr(argument, '"')) {
+			msg_to_char(ch, "Island names may not contain quotation marks.\r\n");
+		}
 		else {
 			send_config_msg(ch, "ok_string");
 			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has renamed island %d (%s) to %s", GET_NAME(ch), isle->id, NULLSAFE(isle->name), argument);
@@ -4567,7 +4788,7 @@ ACMD(do_load) {
 			send_to_char("There is no monster with that number.\r\n", ch);
 			return;
 		}
-		mob = read_mobile(number);
+		mob = read_mobile(number, TRUE);
 		setup_generic_npc(mob, NULL, NOTHING, NOTHING);
 		char_to_room(mob, IN_ROOM(ch));
 
@@ -4581,7 +4802,7 @@ ACMD(do_load) {
 			send_to_char("There is no object with that number.\r\n", ch);
 			return;
 		}
-		obj = read_object(number);
+		obj = read_object(number, TRUE);
 		if (CAN_WEAR(obj, ITEM_WEAR_TAKE))
 			obj_to_char(obj, ch);
 		else
@@ -4659,6 +4880,98 @@ ACMD(do_moveeinv) {
 		else {
 			msg_to_char(ch, "No items to move.\r\n");
 		}
+	}
+}
+
+
+ACMD(do_oset) {
+	char obj_arg[MAX_INPUT_LENGTH], field_arg[MAX_INPUT_LENGTH];
+	obj_data *obj, *proto;
+	
+	argument = one_argument(argument, obj_arg);
+	argument = any_one_arg(argument, field_arg);
+	skip_spaces(&argument);	// remainder
+	
+	if (!*obj_arg || !*field_arg) {
+		msg_to_char(ch, "Usage: oset <object> <field> <value>\r\n");
+	}
+	else if (!(obj = get_obj_in_list_vis(ch, obj_arg, ch->carrying)) && !(obj = get_obj_in_list_vis(ch, obj_arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
+		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(obj_arg), obj_arg);
+	}
+	else if (is_abbrev(field_arg, "flags")) {
+		GET_OBJ_EXTRA(obj) = olc_process_flag(ch, argument, "extra", "oset name flags", extra_bits, GET_OBJ_EXTRA(obj));
+	}
+	else if (is_abbrev(field_arg, "keywords") || is_abbrev(field_arg, "aliases")) {
+		if (!*argument) {
+			msg_to_char(ch, "Set the keywords to what?\r\n");
+		}
+		else {
+			proto = obj_proto(GET_OBJ_VNUM(obj));
+			
+			if (GET_OBJ_KEYWORDS(obj) && (!proto || GET_OBJ_KEYWORDS(obj) != GET_OBJ_KEYWORDS(proto))) {
+				free(GET_OBJ_KEYWORDS(obj));
+			}
+			if (proto && !str_cmp(argument, "none")) {
+				GET_OBJ_KEYWORDS(obj) = GET_OBJ_KEYWORDS(proto);
+				msg_to_char(ch, "You restore its original keywords.\r\n");
+			}
+			else {
+				GET_OBJ_KEYWORDS(obj) = str_dup(argument);
+				msg_to_char(ch, "You change its keywords to '%s'.\r\n", GET_OBJ_KEYWORDS(obj));
+			}
+		}
+	}
+	else if (is_abbrev(field_arg, "longdescription")) {
+		if (!*argument) {
+			msg_to_char(ch, "Set the long description to what?\r\n");
+		}
+		else {
+			proto = obj_proto(GET_OBJ_VNUM(obj));
+			
+			if (GET_OBJ_LONG_DESC(obj) && (!proto || GET_OBJ_LONG_DESC(obj) != GET_OBJ_LONG_DESC(proto))) {
+				free(GET_OBJ_LONG_DESC(obj));
+			}
+			if (proto && !str_cmp(argument, "none")) {
+				GET_OBJ_LONG_DESC(obj) = GET_OBJ_LONG_DESC(proto);
+				msg_to_char(ch, "You restore its original long description.\r\n");
+			}
+			else {
+				GET_OBJ_LONG_DESC(obj) = str_dup(argument);
+				msg_to_char(ch, "You change its long description to '%s'.\r\n", GET_OBJ_LONG_DESC(obj));
+			}
+		}
+	}
+	else if (is_abbrev(field_arg, "shortdescription")) {
+		if (!*argument) {
+			msg_to_char(ch, "Set the short description to what?\r\n");
+		}
+		else {
+			proto = obj_proto(GET_OBJ_VNUM(obj));
+			
+			if (GET_OBJ_SHORT_DESC(obj) && (!proto || GET_OBJ_SHORT_DESC(obj) != GET_OBJ_SHORT_DESC(proto))) {
+				free(GET_OBJ_SHORT_DESC(obj));
+			}
+			if (proto && !str_cmp(argument, "none")) {
+				GET_OBJ_SHORT_DESC(obj) = GET_OBJ_SHORT_DESC(proto);
+				msg_to_char(ch, "You restore its original short description.\r\n");
+			}
+			else {
+				GET_OBJ_SHORT_DESC(obj) = str_dup(argument);
+				msg_to_char(ch, "You change its short description to '%s'.\r\n", GET_OBJ_SHORT_DESC(obj));
+			}
+		}
+	}
+	else if (is_abbrev(field_arg, "timer")) {
+		if (!*argument || (!isdigit(*argument) && *argument != '-')) {
+			msg_to_char(ch, "Set the timer to what?\r\n");
+		}
+		else {
+			GET_OBJ_TIMER(obj) = atoi(argument);
+			msg_to_char(ch, "You change its timer to %d.\r\n", GET_OBJ_TIMER(obj));
+		}
+	}
+	else {
+		msg_to_char(ch, "Invalid field.\r\n");
 	}
 }
 
@@ -4939,11 +5252,9 @@ ACMD(do_reload) {
 ACMD(do_rescale) {
 	void scale_item_to_level(obj_data *obj, int level);
 
-	obj_data *obj, *new, *proto = NULL;
+	obj_data *obj, *new;
 	char_data *vict;
 	int level;
-	
-	bitvector_t preserve_flags = OBJ_SUPERIOR | OBJ_HARD_DROP | OBJ_GROUP_DROP | OBJ_KEEP;	// flags to copy over if obj is reloaded
 
 	argument = one_argument(argument, arg);
 	skip_spaces(&argument);
@@ -4976,33 +5287,20 @@ ACMD(do_rescale) {
 	}
 	else if ((obj = get_obj_in_list_vis(ch, arg, ch->carrying)) || (obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
 		// item mode
-		if (!OBJ_FLAGGED(obj, OBJ_SCALABLE) && !(proto = obj_proto(GET_OBJ_VNUM(obj)))) {
-			msg_to_char(ch, "That object cannot be rescaled.\r\n");
-		}
-		else if (proto && !OBJ_FLAGGED(proto, OBJ_SCALABLE)) {
-			act("$p is not scalable.", FALSE, ch, obj, NULL, TO_CHAR);
+		if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
+			scale_item_to_level(obj, level);
 		}
 		else {
-			if (!OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-				new = read_object(GET_OBJ_VNUM(obj));
-				GET_OBJ_EXTRA(new) |= GET_OBJ_EXTRA(obj) & preserve_flags;
-				
-				// swap binds
-				OBJ_BOUND_TO(new) = OBJ_BOUND_TO(obj);
-				OBJ_BOUND_TO(obj) = NULL;
-				
-				swap_obj_for_obj(obj, new);
-				extract_obj(obj);
-				obj = new;
-			}
-			
-			scale_item_to_level(obj, level);
-			
-			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s has rescaled obj %s to level %d at %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), GET_OBJ_CURRENT_SCALE_LEVEL(obj), room_log_identifier(IN_ROOM(ch)));
-			sprintf(buf, "You rescale $p to level %d.", GET_OBJ_CURRENT_SCALE_LEVEL(obj));
-			act(buf, FALSE, ch, obj, NULL, TO_CHAR);
-			act("$n rescales $p.", FALSE, ch, obj, NULL, TO_ROOM);
+			new = fresh_copy_obj(obj, level);
+			swap_obj_for_obj(obj, new);
+			extract_obj(obj);
+			obj = new;
 		}
+		
+		syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s has rescaled obj %s to level %d at %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), GET_OBJ_CURRENT_SCALE_LEVEL(obj), room_log_identifier(IN_ROOM(ch)));
+		sprintf(buf, "You rescale $p to level %d.", GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+		act(buf, FALSE, ch, obj, NULL, TO_CHAR);
+		act("$n rescales $p.", FALSE, ch, obj, NULL, TO_ROOM);
 	}
 	else {
 		msg_to_char(ch, "You don't see %s %s here.\r\n", AN(arg), arg);
@@ -5026,6 +5324,11 @@ ACMD(do_restore) {
 		GET_MOVE(vict) = GET_MAX_MOVE(vict);
 		GET_MANA(vict) = GET_MAX_MANA(vict);
 		GET_BLOOD(vict) = GET_MAX_BLOOD(vict);
+		
+		// remove DoTs
+		while (vict->over_time_effects) {
+			dot_remove(vict, vict->over_time_effects);
+		}
 
 		if (GET_POS(vict) < POS_SLEEPING) {
 			GET_POS(vict) = POS_STANDING;
@@ -5305,6 +5608,7 @@ ACMD(do_show) {
 
 
 ACMD(do_slay) {
+	extern bool check_scaling(char_data *mob, char_data *attacker);
 	extern obj_data *die(char_data *ch, char_data *killer);
 	
 	char_data *vict;
@@ -5330,7 +5634,15 @@ ACMD(do_slay) {
 			act("You chop $M to pieces! Ah! The blood!", FALSE, ch, 0, vict, TO_CHAR);
 			act("$N chops you to pieces!", FALSE, vict, 0, ch, TO_CHAR);
 			act("$n brutally slays $N!", FALSE, ch, 0, vict, TO_NOTVICT);
+
+			check_scaling(vict, ch);	// ensure scaling
 			tag_mob(vict, ch);	// ensures loot binding if applicable
+
+			// this would prevent the death
+			if (affected_by_spell(vict, ATYPE_PHOENIX_RITE)) {
+				affect_from_char(vict, ATYPE_PHOENIX_RITE);
+			}
+
 			die(vict, ch);
 		}
 	}
@@ -5814,6 +6126,8 @@ ACMD(do_users) {
 
 
 ACMD(do_vnum) {
+	char buf[MAX_INPUT_LENGTH], buf2[MAX_INPUT_LENGTH];
+	
 	half_chop(argument, buf, buf2);
 
 	if (!*buf || !*buf2) {
@@ -5844,9 +6158,19 @@ ACMD(do_vnum) {
 			msg_to_char(ch, "No buildings by that name.\r\n");
 		}
 	}
+	else if (is_abbrev(buf, "book")) {
+		if (!vnum_book(buf2, ch)) {
+			send_to_char("No books by that name.\r\n", ch);
+		}
+	}
 	else if (is_abbrev(buf, "crop")) {
 		if (!vnum_crop(buf2, ch)) {
 			msg_to_char(ch, "No crops by that name.\r\n");
+		}
+	}
+	else if (is_abbrev(buf, "global")) {
+		if (!vnum_global(buf2, ch)) {
+			msg_to_char(ch, "No globals by that name.\r\n");
 		}
 	}
 	else if (is_abbrev(buf, "roomtemplate")) {
@@ -5902,6 +6226,14 @@ ACMD(do_vstat) {
 		}
 		do_stat_building(ch, bld);
 	}
+	else if (is_abbrev(buf, "book")) {	// deliberately after 'building'
+		book_data *book = book_proto(number);
+		if (!book) {
+			msg_to_char(ch, "There is no book with that number.\r\n");
+			return;
+		}
+		do_stat_book(ch, book);
+	}
 	else if (is_abbrev(buf, "craft")) {
 		craft_data *craft = craft_proto(number);
 		if (!craft) {
@@ -5918,12 +6250,20 @@ ACMD(do_vstat) {
 		}
 		do_stat_crop(ch, crop);
 	}
+	else if (is_abbrev(buf, "global")) {
+		struct global_data *glb = global_proto(number);
+		if (!glb) {
+			msg_to_char(ch, "There is no global with that number.\r\n");
+			return;
+		}
+		do_stat_global(ch, glb);
+	}
 	else if (is_abbrev(buf, "mobile")) {
 		if (!mob_proto(number)) {
 			send_to_char("There is no monster with that number.\r\n", ch);
 			return;
 		}
-		mob = read_mobile(number);
+		mob = read_mobile(number, TRUE);
 		// put it somewhere, briefly
 		char_to_room(mob, world_table);
 		do_stat_character(ch, mob);
@@ -5934,7 +6274,7 @@ ACMD(do_vstat) {
 			send_to_char("There is no object with that number.\r\n", ch);
 			return;
 		}
-		obj = read_object(number);
+		obj = read_object(number, TRUE);
 		do_stat_object(ch, obj);
 		extract_obj(obj);
 	}
@@ -5987,7 +6327,7 @@ ACMD(do_wizlock) {
 		}
 		skip_spaces(&argument);
 		if (*argument && value != 0) {	// do not copy message on unlock
-			wizlock_message = str_dup(strcat(argument, "\r\n"));
+			wizlock_message = str_dup(argument);
 		}
 		wizlock_level = value;
 		when = "now";

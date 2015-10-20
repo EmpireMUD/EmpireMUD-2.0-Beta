@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: dg_wldcmd.c                                     EmpireMUD 2.0b2 *
+*   File: dg_wldcmd.c                                     EmpireMUD 2.0b3 *
 *  Usage: contains the command_interpreter for rooms, room commands.      *
 *                                                                         *
 *  DG Scripts code by galion, 1996/08/05 03:27:07, revision 3.12          *
@@ -23,6 +23,7 @@
 #include "handler.h"
 #include "db.h"
 #include "skills.h"
+#include "vnums.h"
 
 // external vars
 extern const char *damage_types[];
@@ -32,7 +33,7 @@ extern const char *dirs[];
 void send_char_pos(char_data *ch, int dam);
 void die(char_data *ch, char_data *killer);
 void sub_write(char *arg, char_data *ch, byte find_invis, int targets);
-extern struct instance_data *find_instance_by_room(room_data *room);
+extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 char_data *get_char_by_room(room_data *room, char *name);
 room_data *get_room(room_data *ref, char *name);
 obj_data *get_obj_by_room(room_data *room, char *name);
@@ -175,6 +176,37 @@ WCMD(do_wecho) {
 }
 
 
+// prints the message to everyone except two targets
+WCMD(do_wechoneither) {
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+	char_data *vict1, *vict2, *iter;
+	char *p;
+
+	p = two_arguments(argument, arg1, arg2);
+	skip_spaces(&p);
+
+	if (!*arg1 || !*arg2 || !*p) {
+		wld_log(room, "oechoneither called with missing arguments");
+		return;
+	}
+	
+	if (!(vict1 = get_char_by_room(room, arg1))) {
+		wld_log(room, "oechoneither: vict 1 (%s) does not exist", arg1);
+		return;
+	}
+	if (!(vict2 = get_char_by_room(room, arg2))) {
+		wld_log(room, "oechoneither: vict 2 (%s) does not exist", arg2);
+		return;
+	}
+	
+	for (iter = ROOM_PEOPLE(room); iter; iter = iter->next_in_room) {
+		if (iter->desc && iter != vict1 && iter != vict2) {
+			sub_write(p, iter, TRUE, TO_CHAR);
+		}
+	}
+}
+
+
 WCMD(do_wsend) {
 	char buf[MAX_INPUT_LENGTH], *msg;
 	char_data *ch;
@@ -268,7 +300,7 @@ WCMD(do_wregionecho) {
 				}
 				
 				if (!indoor_only || IS_OUTDOORS(targ)) {
-					msg_to_desc(desc, "%s\r\n", msg);
+					msg_to_desc(desc, "%s\r\n", CAP(msg));
 				}
 			}
 		}
@@ -457,6 +489,108 @@ WCMD(do_wteleport) {
 }
 
 
+WCMD(do_wterracrop) {
+	void do_dg_terracrop(room_data *target, crop_data *crop);
+
+	char loc_arg[MAX_INPUT_LENGTH], crop_arg[MAX_INPUT_LENGTH];
+	crop_data *crop;
+	room_data *target;
+	crop_vnum vnum;
+
+	argument = any_one_word(argument, loc_arg);
+	any_one_word(argument, crop_arg);
+	
+	// usage: %terracrop% [location] <crop vnum>
+	if (!*loc_arg) {
+		wld_log(room, "oterracrop: bad syntax");
+		return;
+	}
+	
+	// check number of args
+	if (!*crop_arg) {
+		// only arg is actually crop arg
+		strcpy(crop_arg, loc_arg);
+		target = room;
+	}
+	else {
+		// two arguments
+		target = get_room(room, loc_arg);
+	}
+	
+	if (!target) {
+		wld_log(room, "oterracrop: target is an invalid room");
+		return;
+	}
+	
+	// places you just can't terracrop -- fail silently (currently)
+	if (IS_INSIDE(target) || IS_ADVENTURE_ROOM(target) || IS_CITY_CENTER(target)) {
+		return;
+	}
+	
+	if (!isdigit(*crop_arg) || (vnum = atoi(crop_arg)) < 0 || !(crop = crop_proto(vnum))) {
+		wld_log(room, "oterracrop: invalid crop vnum");
+		return;
+	}
+
+	// good to go
+	do_dg_terracrop(target, crop);
+}
+
+
+WCMD(do_wterraform) {
+	void do_dg_terraform(room_data *target, sector_data *sect);
+
+	char loc_arg[MAX_INPUT_LENGTH], sect_arg[MAX_INPUT_LENGTH];
+	sector_data *sect;
+	room_data *target;
+	sector_vnum vnum;
+
+	argument = any_one_word(argument, loc_arg);
+	any_one_word(argument, sect_arg);
+	
+	// usage: %terraform% [location] <sector vnum>
+	if (!*loc_arg) {
+		wld_log(room, "oterraform: bad syntax");
+		return;
+	}
+	
+	// check number of args
+	if (!*sect_arg) {
+		// only arg is actually sect arg
+		strcpy(sect_arg, loc_arg);
+		target = room;
+	}
+	else {
+		// two arguments
+		target = get_room(room, loc_arg);
+	}
+	
+	if (!target) {
+		wld_log(room, "oterraform: target is an invalid room");
+		return;
+	}
+	
+	// places you just can't terraform -- fail silently (currently)
+	if (IS_INSIDE(target) || IS_ADVENTURE_ROOM(target) || IS_CITY_CENTER(target)) {
+		return;
+	}
+	
+	if (!isdigit(*sect_arg) || (vnum = atoi(sect_arg)) < 0 || !(sect = sector_proto(vnum))) {
+		wld_log(room, "oterraform: invalid sector vnum");
+		return;
+	}
+	
+	// validate sect
+	if (SECT_FLAGGED(sect, SECTF_MAP_BUILDING | SECTF_INSIDE | SECTF_ADVENTURE)) {
+		wld_log(room, "oterraform: sector requires data that can't be set this way");
+		return;
+	}
+
+	// good to go
+	do_dg_terraform(target, sect);
+}
+
+
 WCMD(do_wforce) {
 	char_data *ch, *next_ch;
 	char arg1[MAX_INPUT_LENGTH], *line;
@@ -550,7 +684,7 @@ WCMD(do_wload) {
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
-	struct instance_data *inst = find_instance_by_room(room);
+	struct instance_data *inst = find_instance_by_room(room, FALSE);
 	int number = 0;
 	char_data *mob, *tch;
 	obj_data *object, *cnt;
@@ -566,7 +700,7 @@ WCMD(do_wload) {
 	}
 
 	if (is_abbrev(arg1, "mob")) {
-		if ((mob = read_mobile(number)) == NULL) {
+		if ((mob = read_mobile(number, TRUE)) == NULL) {
 			wld_log(room, "wload: bad mob vnum");
 			return;
 		}
@@ -590,7 +724,7 @@ WCMD(do_wload) {
 	}
 
 	else if (is_abbrev(arg1, "obj")) {
-		if ((object = read_object(number)) == NULL) {
+		if ((object = read_object(number, TRUE)) == NULL) {
 			wld_log(room, "wload: bad object vnum");
 			return;
 		}
@@ -619,7 +753,7 @@ WCMD(do_wload) {
 		if (*target && isdigit(*target)) {
 			scale_item_to_level(object, atoi(target));
 		}
-		else if ((inst = find_instance_by_room(room)) && inst->level > 0) {
+		else if ((inst = find_instance_by_room(room, FALSE)) && inst->level > 0) {
 			// scaling by locked adventure
 			scale_item_to_level(object, inst->level);
 		}
@@ -629,6 +763,7 @@ WCMD(do_wload) {
 			if (*arg2 && (pos = find_eq_pos_script(arg2)) >= 0 && !GET_EQ(tch, pos) && can_wear_on_pos(object, pos)) {
 				equip_char(tch, object, pos);
 				load_otrigger(object);
+				determine_gear_level(tch);
 				return;
 			}
 			obj_to_char(object, tch);
@@ -727,15 +862,16 @@ WCMD(do_waoe) {
 
 
 WCMD(do_wdot) {
-	char name[MAX_INPUT_LENGTH], modarg[MAX_INPUT_LENGTH], durarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH];
+	char name[MAX_INPUT_LENGTH], modarg[MAX_INPUT_LENGTH], durarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH], stackarg[MAX_INPUT_LENGTH];
 	double modifier = 1.0;
 	char_data *ch;
-	int type;
+	int type, max_stacks;
 
 	argument = one_argument(argument, name);
 	argument = one_argument(argument, modarg);
 	argument = one_argument(argument, durarg);
-	argument = one_argument(argument, typearg);	// optional
+	argument = one_argument(argument, typearg);	// optional, defualt: physical
+	argument = one_argument(argument, stackarg);	// optional, defualt: 1
 
 	if (!*name || !*modarg || !*durarg) {
 		wld_log(room, "dot: bad syntax");
@@ -764,7 +900,8 @@ WCMD(do_wdot) {
 		type = DAM_PHYSICAL;
 	}
 
-	script_damage_over_time(ch, get_room_scale_level(room, ch), type, modifier, atoi(durarg));
+	max_stacks = (*stackarg ? atoi(stackarg) : 1);
+	script_damage_over_time(ch, get_room_scale_level(room, ch), type, modifier, atoi(durarg), max_stacks, NULL);
 }
 
 
@@ -809,7 +946,7 @@ WCMD(do_wscale) {
 	else if (*lvl_arg) {
 		level = atoi(lvl_arg);
 	}
-	else if ((inst = find_instance_by_room(room))) {
+	else if ((inst = find_instance_by_room(room, FALSE))) {
 		level = inst->level;
 	}
 	else {
@@ -839,13 +976,14 @@ WCMD(do_wscale) {
 				scale_item_to_level(obj, level);
 			}
 			else if ((proto = obj_proto(GET_OBJ_VNUM(obj))) && OBJ_FLAGGED(proto, OBJ_SCALABLE)) {
-				fresh = read_object(GET_OBJ_VNUM(obj));
+				fresh = read_object(GET_OBJ_VNUM(obj), TRUE);
 				scale_item_to_level(fresh, level);
 				swap_obj_for_obj(obj, fresh);
 				extract_obj(obj);
 			}
 			else {
-				wld_log(room, "wscale: target is not scalable");
+				// attempt to scale anyway
+				scale_item_to_level(obj, level);
 			}
 		}
 		else 
@@ -871,12 +1009,15 @@ const struct wld_command_info wld_cmd_info[] = {
 	{ "wdoor", do_wdoor, NO_SCMD },
 	{ "wecho", do_wecho, NO_SCMD },
 	{ "wechoaround", do_wsend, SCMD_WECHOAROUND },
+	{ "wechoneither", do_wechoneither, NO_SCMD },
 	{ "wforce", do_wforce, NO_SCMD },
 	{ "wload", do_wload, NO_SCMD },
 	{ "wpurge", do_wpurge, NO_SCMD },
 	{ "wscale", do_wscale, NO_SCMD },
 	{ "wsend", do_wsend, SCMD_WSEND },
 	{ "wteleport", do_wteleport, NO_SCMD },
+	{ "wterracrop", do_wterracrop, NO_SCMD },
+	{ "wterraform", do_wterraform, NO_SCMD },
 	{ "wbuildingecho", do_wbuildingecho, NO_SCMD },
 	{ "wregionecho", do_wregionecho, NO_SCMD },
 	{ "wdamage", do_wdamage, NO_SCMD },

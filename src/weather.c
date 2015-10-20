@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: weather.c                                       EmpireMUD 2.0b2 *
+*   File: weather.c                                       EmpireMUD 2.0b3 *
 *  Usage: functions handling time and the weather                         *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -33,7 +33,8 @@ void weather_and_time(int mode) {
 
 
 void another_hour(int mode) {
-	void annual_world_update();
+	void annual_world_update();	
+	void process_shipping();
 
 	descriptor_data *d;
 
@@ -50,6 +51,9 @@ void another_hour(int mode) {
 					}
 				}
 				send_to_outdoor("The sun rises over the horizon.\r\n");
+				
+				// 7am shipment
+				process_shipping();
 				break;
 			case 8:
 				weather_info.sunlight = SUN_LIGHT;
@@ -61,6 +65,9 @@ void another_hour(int mode) {
 			case 19:
 				weather_info.sunlight = SUN_SET;
 				send_to_outdoor("The sun slowly disappears beneath the horizon.\r\n");
+				
+				// 7pm shipment
+				process_shipping();
 				break;
 			case 20:
 				weather_info.sunlight = SUN_DARK;

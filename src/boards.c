@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: boards.c                                        EmpireMUD 2.0b2 *
+*   File: boards.c                                        EmpireMUD 2.0b3 *
 *  Usage: handling of multiple bulletin boards                            *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -157,6 +157,11 @@ ACMD(do_read) {
 	int board_type;
 	
 	one_argument(argument, arg);
+	
+	if (!*arg) {
+		msg_to_char(ch, "Read what?\r\n");
+		return;
+	}
 	
 	// try to find a book or mail in inventory
 	if (*argument && (obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {

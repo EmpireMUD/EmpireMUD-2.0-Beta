@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: map.c                                           EmpireMUD 2.0b2 *
+*   File: map.c                                           EmpireMUD 2.0b3 *
 *  Usage: procedural map generator for EmpireMUD                          *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

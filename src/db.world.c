@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: db.world.c                                      EmpireMUD 2.0b2 *
+*   File: db.world.c                                      EmpireMUD 2.0b3 *
 *  Usage: Modify functions for the map, interior, and game world          *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -82,7 +82,15 @@ int change_chop_territory(room_data *room) {
 	
 	if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && ROOM_CROP_FLAGGED(room, CROPF_IS_ORCHARD) && (cp = crop_proto(ROOM_CROP_TYPE(room)))) {
 		trees = 1;
-		change_terrain(room, climate_default_sector[GET_CROP_CLIMATE(cp)]);
+		
+		// check if original sect was stored to the crop
+		if (ROOM_ORIGINAL_SECT(room) != SECT(room)) {
+			change_terrain(room, GET_SECT_VNUM(ROOM_ORIGINAL_SECT(room)));
+		}
+		else {
+			// default
+			change_terrain(room, climate_default_sector[GET_CROP_CLIMATE(cp)]);
+		}
 	}
 	else if ((evo = get_evolution_by_type(SECT(room), EVO_CHOPPED_DOWN))) {
 		trees = evo->value;
@@ -284,11 +292,10 @@ room_data *create_room(void) {
 */
 void delete_room(room_data *room, bool check_exits) {
 	void extract_pending_chars();
-	extern struct instance_data *find_instance_by_room(room_data *room);
+	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 	void Objsave_char(char_data *ch, int rent_code);
 	void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool full_abandon);
 	void relocate_players(room_data *room, room_data *to_room);
-	void save_instances(void);
 
 	struct room_direction_data *ex, *next_ex, *temp;
 	struct empire_territory_data *ter, *next_ter;
@@ -299,7 +306,6 @@ void delete_room(room_data *room, bool check_exits) {
 	struct track_data *track;
 	struct affected_type *af;
 	struct reset_com *reset;
-	bool save_inst = FALSE;
 	char_data *c, *next_c;
 	obj_data *o, *next_o;
 	empire_data *emp, *next_emp;
@@ -311,7 +317,7 @@ void delete_room(room_data *room, bool check_exits) {
 	}
 	
 	// delete any open instance here
-	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE) && (inst = find_instance_by_room(room))) {
+	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE) && (inst = find_instance_by_room(room, FALSE))) {
 		SET_BIT(inst->flags, INST_COMPLETED);
 	}
 	
@@ -435,17 +441,14 @@ void delete_room(room_data *room, bool check_exits) {
 		if (inst->location == room) {
 			SET_BIT(inst->flags, INST_COMPLETED);
 			inst->location = NULL;
-			save_inst = TRUE;
 		}
 		if (inst->start == room) {
 			SET_BIT(inst->flags, INST_COMPLETED);
 			inst->start = NULL;
-			save_inst = TRUE;
 		}
 		for (iter = 0; iter < inst->size; ++iter) {
 			if (inst->room[iter] == room) {
 				inst->room[iter] = NULL;
-				save_inst = TRUE;
 			}
 		}
 	}
@@ -478,11 +481,7 @@ void delete_room(room_data *room, bool check_exits) {
 	
 	// free the room
 	free(room);
-	
-	if (save_inst) {
-		save_instances();
-	}
-	
+		
 	// maybe
 	// world_is_sorted = FALSE;
 	need_world_index = TRUE;
@@ -547,6 +546,34 @@ void init_mine(room_data *room, char_data *ch) {
 }
 
 
+/**
+* Converts a trench back into its base sect.
+*
+* @param room_data *room The trench to convert back.
+*/
+void untrench_room(room_data *room) {
+	void stop_room_action(room_data *room, int action, int chore);
+
+	sector_data *to_sect;
+	
+	if (!ROOM_SECT_FLAGGED(room, SECTF_IS_TRENCH)) {
+		return;
+	}
+					
+	// stop BOTH actions -- it's not a trench!
+	stop_room_action(room, ACT_FILLING_IN, NOTHING);
+	stop_room_action(room, ACT_EXCAVATING, NOTHING);
+
+	// de-evolve sect
+	to_sect = reverse_lookup_evolution_for_sector(SECT(room), EVO_TRENCH_START);
+	if (to_sect) {
+		change_terrain(room, GET_SECT_VNUM(to_sect));
+		REMOVE_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_PLAYER_MADE);
+		REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_PLAYER_MADE);
+	}
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// MANAGEMENT //////////////////////////////////////////////////////////////
 
@@ -600,6 +627,8 @@ void save_world_index(void) {
 * Executes a full-world save.
 */
 void save_whole_world(void) {
+	void save_instances();
+	
 	room_data *iter, *next_iter;
 	room_vnum vnum;
 	int block, last;
@@ -636,6 +665,7 @@ void save_whole_world(void) {
 	
 	// ensure this
 	save_world_index();
+	save_instances();
 }
 
 
@@ -694,8 +724,9 @@ void update_world(void) {
 // process map-only annual updates
 static void annual_update_map_tile(room_data *room) {
 	empire_data *emp;
+	int trenched, amount;
 	
-	if (BUILDING_VNUM(room) == BUILDING_RUINS_OPEN || BUILDING_VNUM(room) == BUILDING_RUINS_CLOSED) {
+	if (BUILDING_VNUM(room) == BUILDING_RUINS_OPEN || BUILDING_VNUM(room) == BUILDING_RUINS_CLOSED || BUILDING_VNUM(room) == BUILDING_RUINS_FLOODED) {
 		// roughly 2 real years for average chance for ruins to be gone
 		if (!number(0, 89)) {
 			disassociate_building(room);
@@ -718,6 +749,29 @@ static void annual_update_map_tile(room_data *room) {
 				ruin_one_building(room);
 			}
 		}
+	}
+	
+	// fill in trenches slightly
+	if (ROOM_SECT_FLAGGED(room, SECTF_IS_TRENCH) && (trenched = get_room_extra_data(room, ROOM_EXTRA_TRENCH_PROGRESS)) < 0) {
+		// move halfway toward initial: remember initial value is negative
+		amount = (config_get_int("trench_initial_value") - trenched) / 2;
+		trenched += amount;
+		if (trenched > config_get_int("trench_initial_value") + 10) {
+			set_room_extra_data(room, ROOM_EXTRA_TRENCH_PROGRESS, trenched);
+		}
+		else {
+			// untrench
+			untrench_room(room);
+			if (ROOM_PEOPLE(room)) {
+				act("The trench collapses!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
+			}
+		}
+	}
+	
+	// destroy roads -- randomly over time
+	if (IS_ROAD(room) && !ROOM_OWNER(room) && number(1, 100) <= 2) {
+		// this will tear it back down to its base type
+		disassociate_building(room);
 	}
 
 	// clean mine data from anything that's not currently a mine
@@ -891,6 +945,7 @@ struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_da
 	// check building exists
 	if (!IS_CITY_CENTER(location)) {
 		construct_building(location, BUILDING_CITY_CENTER);
+		set_room_extra_data(location, ROOM_EXTRA_FOUND_TIME, time(0));
 	}
 	
 	// verify ownership
@@ -928,7 +983,7 @@ void reset_one_room(room_data *room) {
 	for (reset = room->reset_commands; reset; reset = reset->next) {
 		switch (reset->command) {
 			case 'M': {	// read a mobile
-				mob = read_mobile(reset->arg1);
+				mob = read_mobile(reset->arg1, FALSE);	// no scripts
 				MOB_FLAGS(mob) = asciiflag_conv(reset->sarg1);
 				char_to_room(mob, room);
 				
@@ -1013,8 +1068,8 @@ void reset_one_room(room_data *room) {
 				else if (reset->arg1 == WLD_TRIGGER) {
 					if (!room->script) {
 						CREATE(room->script, struct script_data, 1);
-						add_trigger(room->script, read_trigger(reset->arg2), -1);
 					}
+					add_trigger(room->script, read_trigger(reset->arg2), -1);
 				}
 				break;
 			}
@@ -1181,7 +1236,7 @@ void delete_territory_entry(empire_data *emp, struct empire_territory_data *ter)
 *
 * However, calling this on all empires can get rather slow.
 *
-* @param empire_data *emp The empire to read, or NOTHING for "all".
+* @param empire_data *emp The empire to read, or NULL for "all".
 */
 void read_empire_territory(empire_data *emp) {
 	void read_vault(empire_data *emp);
@@ -1190,6 +1245,7 @@ void read_empire_territory(empire_data *emp) {
 	struct empire_npc_data *npc;
 	room_data *iter, *next_iter;
 	empire_data *e, *next_e;
+	bool junk;
 
 	/* Init empires */
 	HASH_ITER(hh, empire_table, e, next_e) {
@@ -1216,7 +1272,7 @@ void read_empire_territory(empire_data *emp) {
 			if ((e = ROOM_OWNER(iter))) {
 				// only count each building as 1
 				if (HOME_ROOM(iter) == iter) {
-					if (COUNTS_AS_IN_CITY(iter) || find_city(e, iter)) {
+					if (is_in_city_for_empire(iter, e, FALSE, &junk)) {
 						EMPIRE_CITY_TERRITORY(e) += 1;
 					}
 					else {
@@ -1424,7 +1480,7 @@ room_data *create_ocean_room(room_vnum vnum) {
 	
 	SECT(room) = sector_proto(BASIC_OCEAN);
 	ROOM_ORIGINAL_SECT(room) = SECT(room);
-	GET_ISLAND_ID(room) = NO_ISLAND;
+	SET_ISLAND_ID(room, NO_ISLAND);
 	
 	// only if saveable
 	if (!CAN_UNLOAD_MAP_ROOM(room)) {
@@ -1459,8 +1515,10 @@ void decustomize_room(room_data *room) {
 // evolutions for 1 tile
 static void evolve_one_map_tile(room_data *room) {
 	extern bool extract_tavern_resources(room_data *room);
+	extern bool is_entrance(room_data *room);
 	
 	struct evolution_data *evo;
+	sector_data *original;
 	bool changed;
 	int type;
 	
@@ -1492,23 +1550,28 @@ static void evolve_one_map_tile(room_data *room) {
 		}
 	}
 	
-	// no further action if !evolve
-	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_EVOLVE)) {
+	// no further action if !evolve or if no evos
+	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_EVOLVE) || !GET_SECT_EVOS(SECT(room))) {
 		return;
 	}
-	
+		
 	// to avoid running more than one:
 	changed = FALSE;
+	original = SECT(room);
+	
+	// NOTE: the is_entrance() check is after the get_evolution_by_type to
+	// avoid checking entrance on every tile -- only check the ones that passed
+	// the random
 	
 	// run some evolutions!
-	if (!changed && (evo = get_evolution_by_type(SECT(room), EVO_RANDOM))) {
+	if (!changed && (evo = get_evolution_by_type(SECT(room), EVO_RANDOM)) && !is_entrance(room)) {
 		if (sector_proto(evo->becomes)) {
 			change_terrain(room, evo->becomes);
 			changed = TRUE;
 		}
 	}
 	
-	if (!changed && (evo = get_evolution_by_type(SECT(room), EVO_ADJACENT_ONE))) {
+	if (!changed && (evo = get_evolution_by_type(SECT(room), EVO_ADJACENT_ONE)) && !is_entrance(room)) {
 		if (sector_proto(evo->becomes)) {
 			if (count_adjacent_sectors(room, evo->value, TRUE) >= 1) {
 				change_terrain(room, evo->becomes);
@@ -1517,7 +1580,16 @@ static void evolve_one_map_tile(room_data *room) {
 		}
 	}
 	
-	if (!changed && (evo = get_evolution_by_type(SECT(room), EVO_ADJACENT_MANY))) {
+	if (!changed && (evo = get_evolution_by_type(SECT(room), EVO_NOT_ADJACENT)) && !is_entrance(room)) {
+		if (sector_proto(evo->becomes)) {
+			if (count_adjacent_sectors(room, evo->value, TRUE) < 1) {
+				change_terrain(room, evo->becomes);
+				changed = TRUE;
+			}
+		}
+	}
+	
+	if (!changed && (evo = get_evolution_by_type(SECT(room), EVO_ADJACENT_MANY)) && !is_entrance(room)) {
 		if (sector_proto(evo->becomes)) {
 			if (count_adjacent_sectors(room, evo->value, TRUE) >= 6) {
 				change_terrain(room, evo->becomes);
@@ -1526,7 +1598,7 @@ static void evolve_one_map_tile(room_data *room) {
 		}
 	}
 	
-	if (!changed && (evo = get_evolution_by_type(SECT(room), EVO_NEAR_SECTOR))) {
+	if (!changed && (evo = get_evolution_by_type(SECT(room), EVO_NEAR_SECTOR)) && !is_entrance(room)) {
 		if (sector_proto(evo->becomes)) {
 			if (find_sect_within_distance_from_room(room, evo->value, config_get_int("nearby_sector_distance"))) {
 				change_terrain(room, evo->becomes);
@@ -1534,19 +1606,41 @@ static void evolve_one_map_tile(room_data *room) {
 			}
 		}
 	}
+	
+	if (!changed && (evo = get_evolution_by_type(SECT(room), EVO_NOT_NEAR_SECTOR)) && !is_entrance(room)) {
+		if (sector_proto(evo->becomes)) {
+			if (!find_sect_within_distance_from_room(room, evo->value, config_get_int("nearby_sector_distance"))) {
+				change_terrain(room, evo->becomes);
+				changed = TRUE;
+			}
+		}
+	}
 
-	// Growing Seeds
+	// Growing Seeds: NOTE: this one does not check is_entrance
 	if (!changed && ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && (evo = get_evolution_by_type(SECT(room), EVO_CROP_GROWS))) {
+		// only going to use the original sect if it was different -- this preserves the stored sect
+		sector_data *stored = (ROOM_ORIGINAL_SECT(room) != SECT(room)) ? ROOM_ORIGINAL_SECT(room) : NULL;
+		
 		if (sector_proto(evo->becomes)) {
 			add_to_room_extra_data(room, ROOM_EXTRA_SEED_TIME, -1);
 			if (get_room_extra_data(room, ROOM_EXTRA_SEED_TIME) <= 0) {
-				type = get_room_extra_data(room, ROOM_EXTRA_CROP_TYPE);
+				type = get_room_extra_data(room, ROOM_EXTRA_CROP_TYPE);	// must preserve this
 				change_terrain(room, evo->becomes);
+				if (stored) {
+					ROOM_ORIGINAL_SECT(room) = stored;
+				}
 				set_room_extra_data(room, ROOM_EXTRA_CROP_TYPE, type);
 				remove_depletion(room, DPLTN_PICK);
 				changed = TRUE;
 			}
 		}
+	}
+	
+	// DONE
+
+	// If the new sector has crop data, we should store the original (e.g. a desert that randomly grows into a crop)
+	if (changed && ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && ROOM_ORIGINAL_SECT(room) == SECT(room)) {
+		ROOM_ORIGINAL_SECT(room) = original;
 	}
 }
 
@@ -1719,6 +1813,7 @@ void ruin_one_building(room_data *room) {
 	bool closed = ROOM_IS_CLOSED(room) ? TRUE : FALSE;
 	int dir = BUILDING_ENTRANCE(room);
 	room_data *to_room;
+	bld_vnum type;
 	
 	// abandon first -- this will take care of accessory rooms, too
 	abandon_room(room);
@@ -1732,7 +1827,16 @@ void ruin_one_building(room_data *room) {
 	}
 
 	// basic setup
-	construct_building(room, closed ? BUILDING_RUINS_CLOSED : BUILDING_RUINS_OPEN);
+	if (SECT_FLAGGED(ROOM_ORIGINAL_SECT(room), SECTF_FRESH_WATER | SECTF_OCEAN)) {
+		type = BUILDING_RUINS_FLOODED;
+	}
+	else if (closed) {
+		type = BUILDING_RUINS_CLOSED;
+	}
+	else {
+		type = BUILDING_RUINS_OPEN;
+	}
+	construct_building(room, type);
 	COMPLEX_DATA(room)->entrance = dir;
 	
 	// make the exit
@@ -1755,6 +1859,7 @@ void ruin_one_building(room_data *room) {
 * Writes the data files used to generate graphical maps.
 */
 void output_map_to_file(void) {
+	extern const char banner_to_mapout_token[][2];
 	extern const char mapout_color_tokens[];
 	
 	FILE *out, *pol, *cit;
@@ -1764,10 +1869,7 @@ void output_map_to_file(void) {
 	empire_data *emp, *next_emp;
 	sector_data *ocean = sector_proto(BASIC_OCEAN);
 	crop_data *cp;
-	char minibuf[10];
 	room_vnum expecting;
-	
-	char *bannerlist = "0rgybmc";
 	
 	// basic ocean sector is required
 	if (!ocean) {
@@ -1831,21 +1933,16 @@ void output_map_to_file(void) {
 		
 		// political output
 		if ((emp = ROOM_OWNER(room))) {
-			color = 0;
-			for (num = 0; num < strlen(bannerlist); ++num) {
-				sprintf(minibuf, "&%c", bannerlist[num]);
-				if (strstr(EMPIRE_BANNER(emp), minibuf) != NULL) {
-					color = num;
-					break;
-				}
-				sprintf(minibuf, "&%c", UPPER(bannerlist[num]));
-				if (strstr(EMPIRE_BANNER(emp), minibuf) != NULL) {
+			// find the first color in banner_to_mapout_token that is in the banner
+			color = -1;
+			for (num = 0; banner_to_mapout_token[0][0] != '\n'; ++num) {
+				if (strchr(EMPIRE_BANNER(emp), banner_to_mapout_token[num][0])) {
 					color = num;
 					break;
 				}
 			}
-			// banner color
-			fprintf(pol, "%d", color);
+			
+			fprintf(pol, "%c", color != -1 ? banner_to_mapout_token[color][1] : '?');
 		}
 		else {
 			// no owner -- only some sects get printed

@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: spells.c                                        EmpireMUD 2.0b2 *
+*   File: spells.c                                        EmpireMUD 2.0b3 *
 *  Usage: implementation for spells                                       *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -183,11 +183,11 @@ ACMD(do_damage_spell) {
 		// damage returns -1 on death
 		if (result > 0 && !IS_DEAD(vict) && !EXTRACTED(vict) && (damage_spell[type].aff_immunity == NOBITS || !AFF_FLAGGED(vict, damage_spell[type].aff_immunity))) {
 			if (damage_spell[type].aff_type > 0) {
-				af = create_aff(damage_spell[type].aff_type, damage_spell[type].duration, damage_spell[type].apply, damage_spell[type].modifier, damage_spell[type].aff_flag);
+				af = create_aff(damage_spell[type].aff_type, damage_spell[type].duration, damage_spell[type].apply, damage_spell[type].modifier, damage_spell[type].aff_flag, ch);
 				affect_join(vict, af, 0);
 			}
 			if (damage_spell[type].dot_type > 0) {
-				apply_dot_effect(vict, damage_spell[type].dot_type, damage_spell[type].dot_duration, damage_spell[type].dot_damage_type, damage_spell[type].dot_damage, damage_spell[type].dot_max_stacks);
+				apply_dot_effect(vict, damage_spell[type].dot_type, damage_spell[type].dot_duration, damage_spell[type].dot_damage_type, damage_spell[type].dot_damage, damage_spell[type].dot_max_stacks, ch);
 			}
 		}
 	}
@@ -239,7 +239,7 @@ void perform_chant(char_data *ch) {
 	char lbuf[MAX_STRING_LENGTH];
 	struct evolution_data *evo;
 	int chant = GET_ACTION_VNUM(ch, 0);
-	sector_data *new_sect;
+	sector_data *new_sect, *preserve;
 	crop_vnum cropv;
 	
 	// some chants could be timed...
@@ -294,6 +294,7 @@ void perform_chant(char_data *ch) {
 			if ((evo = get_evolution_by_type(SECT(IN_ROOM(ch)), EVO_MAGIC_GROWTH))) {
 				new_sect = sector_proto(evo->becomes);
 				cropv = ROOM_CROP_TYPE(IN_ROOM(ch));
+				preserve = (ROOM_ORIGINAL_SECT(IN_ROOM(ch)) != SECT(IN_ROOM(ch))) ? ROOM_ORIGINAL_SECT(IN_ROOM(ch)) : NULL;
 				
 				// messaging based on whether or not it's choppable
 				if (new_sect && has_evolution_type(new_sect, EVO_CHOPPED_DOWN)) {
@@ -308,6 +309,9 @@ void perform_chant(char_data *ch) {
 				change_terrain(IN_ROOM(ch), evo->becomes);
 				if (cropv != NOTHING) {
 					set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CROP_TYPE, cropv);
+				}
+				if (preserve) {
+					ROOM_ORIGINAL_SECT(IN_ROOM(ch)) = preserve;
 				}
 				
 				gain_ability_exp(ch, ABIL_CHANT_OF_NATURE, 20);
@@ -401,7 +405,7 @@ ACMD(do_chant) {
 	sprintf(lbuf, "$n begins the chant of %s.", chant_data[chant].name);
 	act(lbuf, FALSE, ch, NULL, NULL, TO_ROOM);
 	
-	start_action(ch, ACT_CHANTING, -1, 0);
+	start_action(ch, ACT_CHANTING, -1);
 	GET_ACTION_VNUM(ch, 0) = chant;
 }
 
@@ -490,7 +494,7 @@ ACMD(do_ready) {
 	}
 	
 	GET_MANA(ch) -= cost;
-	obj = read_object(ready_magic_weapon[type].vnum);
+	obj = read_object(ready_magic_weapon[type].vnum, TRUE);
 	
 	// damage based on skill
 	if (ready_magic_weapon[type].ability != NO_ABIL) {		
@@ -503,6 +507,7 @@ ACMD(do_ready) {
 	act("Mana twists and swirls around $n's hand and becomes $p!", TRUE, ch, obj, 0, TO_ROOM);
 	
 	equip_char(ch, obj, WEAR_WIELD);
+	determine_gear_level(ch);
 	
 	if (ready_magic_weapon[type].ability != NO_ABIL) {
 		gain_ability_exp(ch, ready_magic_weapon[type].ability, 15);

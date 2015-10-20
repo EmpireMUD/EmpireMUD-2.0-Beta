@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: utils.c                                         EmpireMUD 2.0b2 *
+*   File: utils.c                                         EmpireMUD 2.0b3 *
 *  Usage: various internal functions of a utility nature                  *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -55,6 +55,7 @@ void scale_item_to_level(obj_data *obj, int level);
 
 // locals
 #define WHITESPACE " \t"	// used by some of the string functions
+bool emp_can_use_room(empire_data *emp, room_data *room, int mode);
 bool is_trading_with(empire_data *emp, empire_data *partner);
 void score_empires();
 
@@ -468,7 +469,7 @@ void process_import_pair(empire_data *emp, empire_data *partner, int *limit) {
 		}
 		
 		// do we need it?
-		my_amt = get_total_stored_count(emp, trade->vnum);
+		my_amt = get_total_stored_count(emp, trade->vnum, TRUE);	// count shipping
 		if (my_amt >= trade->limit) {
 			continue;
 		}
@@ -479,7 +480,7 @@ void process_import_pair(empire_data *emp, empire_data *partner, int *limit) {
 		}
 		
 		// do they have enough?
-		their_amt = get_total_stored_count(partner, trade->vnum);
+		their_amt = get_total_stored_count(partner, trade->vnum, FALSE);	// don't count shipping -- it's not tradable
 		if (their_amt <= p_trade->limit) {
 			continue;
 		}
@@ -521,13 +522,13 @@ void process_import_pair(empire_data *emp, empire_data *partner, int *limit) {
 		found_any = FALSE;
 		for (iter = 0; iter < trade_list_size && *limit < imports_per_day; ++iter) {
 			// do they still have any?
-			their_amt = get_total_stored_count(partner, trade_list[iter]->vnum);
+			their_amt = get_total_stored_count(partner, trade_list[iter]->vnum, FALSE);	// don't count shipping; it's not tradable
 			if (their_amt <= partner_list[iter]->limit) {
 				continue;
 			}
 
 			// do we still it?
-			my_amt = get_total_stored_count(emp, trade_list[iter]->vnum);
+			my_amt = get_total_stored_count(emp, trade_list[iter]->vnum, TRUE);	// do count shipping
 			if (my_amt >= trade_list[iter]->limit) {
 				continue;
 			}
@@ -786,6 +787,7 @@ void score_empires(void) {
 bool can_build_or_claim_at_war(char_data *ch, room_data *loc) {
 	struct empire_political_data *pol;
 	empire_data *enemy;
+	bool junk;
 	
 	// if they aren't at war, this doesn't apply
 	if (!ch || !is_at_war(GET_LOYALTY(ch))) {
@@ -798,7 +800,7 @@ bool can_build_or_claim_at_war(char_data *ch, room_data *loc) {
 	}
 	
 	// if it's in one of their OWN cities, it's ok
-	if (GET_LOYALTY(ch) && find_city(GET_LOYALTY(ch), loc) != NULL) {
+	if (GET_LOYALTY(ch) && is_in_city_for_empire(loc, GET_LOYALTY(ch), TRUE, &junk)) {
 		return TRUE;
 	}
 	
@@ -806,7 +808,7 @@ bool can_build_or_claim_at_war(char_data *ch, room_data *loc) {
 	for (pol = EMPIRE_DIPLOMACY(GET_LOYALTY(ch)); pol; pol = pol->next) {
 		if (IS_SET(pol->type, DIPL_WAR)) {
 			// not good if they are trying to build in a location owned by the other player while at war
-			if ((enemy = real_empire(pol->id)) && find_city(enemy, loc) != NULL) {
+			if ((enemy = real_empire(pol->id)) && is_in_city_for_empire(loc, enemy, TRUE, &junk)) {
 				return FALSE;
 			}
 		}
@@ -1052,6 +1054,35 @@ bool can_claim(char_data *ch) {
 bool can_use_room(char_data *ch, room_data *room, int mode) {
 	room_data *homeroom = HOME_ROOM(room);
 
+	// no owner?
+	if (!ROOM_OWNER(homeroom)) {
+		return TRUE;
+	}
+	// empire ownership
+	if (ROOM_OWNER(homeroom) == GET_LOYALTY(ch)) {
+		// private room?
+		if (ROOM_PRIVATE_OWNER(homeroom) == NOBODY || ROOM_PRIVATE_OWNER(homeroom) == GET_IDNUM(ch) || GET_RANK(ch) == EMPIRE_NUM_RANKS(ROOM_OWNER(homeroom))) {
+			return TRUE;
+		}
+	}
+	
+	// otherwise it's just whether ch's empire can use it
+	return emp_can_use_room(GET_LOYALTY(ch), room, mode);
+}
+
+
+/**
+* Determines if an empire can use a room (e.g. send a ship through it).
+* Unclaimable rooms are ok for GUESTS_ALLOWED.
+*
+* @param empire_data *emp The empire trying to use it.
+* @param room_data *room The location.
+* @param int mode -- GUESTS_ALLOWED, MEMBERS_AND_ALLIES, MEMBERS_ONLY
+* @return bool TRUE if emp can use room, FALSE otherwise
+*/
+bool emp_can_use_room(empire_data *emp, room_data *room, int mode) {
+	room_data *homeroom = HOME_ROOM(room);
+
 	// unclaimable always denies MEMBERS_x
 	if (mode != GUESTS_ALLOWED && ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE)) {
 		return FALSE;
@@ -1065,14 +1096,11 @@ bool can_use_room(char_data *ch, room_data *room, int mode) {
 		return TRUE;
 	}
 	// empire ownership
-	if (ROOM_OWNER(homeroom) == GET_LOYALTY(ch)) {
-		// private room?
-		if (ROOM_PRIVATE_OWNER(homeroom) == NOBODY || ROOM_PRIVATE_OWNER(homeroom) == GET_IDNUM(ch) || GET_RANK(ch) == EMPIRE_NUM_RANKS(ROOM_OWNER(homeroom))) {
-			return TRUE;
-		}
+	if (ROOM_OWNER(homeroom) == emp) {
+		return TRUE;
 	}
 	// check allies if not a private room
-	if (mode != MEMBERS_ONLY && ROOM_PRIVATE_OWNER(homeroom) == NOBODY && has_relationship(ROOM_OWNER(homeroom), GET_LOYALTY(ch), DIPL_ALLIED)) {
+	if (mode != MEMBERS_ONLY && ROOM_PRIVATE_OWNER(homeroom) == NOBODY && has_relationship(ROOM_OWNER(homeroom), emp, DIPL_ALLIED)) {
 		return TRUE;
 	}
 	
@@ -1094,7 +1122,12 @@ bool has_permission(char_data *ch, int type) {
 	if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_AND_ALLIES)) {
 		return FALSE;
 	}
-	else if (emp && GET_RANK(ch) < EMPIRE_PRIV(emp, type)) {
+	else if (emp && GET_LOYALTY(ch) == emp && GET_RANK(ch) < EMPIRE_PRIV(emp, type)) {
+		// for empire members only
+		return FALSE;
+	}
+	else if (emp && GET_LOYALTY(ch) != emp && EMPIRE_PRIV(emp, type) > 1) {
+		// allies can't use things that are above rank 1 in the owner's empire
 		return FALSE;
 	}
 	
@@ -1170,15 +1203,21 @@ bool has_tech_available_room(room_data *room, int tech) {
 * @return int The total claimable land.
 */
 int land_can_claim(empire_data *emp, bool outside_only) {
-	int total = 0;
+	int from_wealth, total = 0;
 	
 	if (emp) {
 		total += EMPIRE_GREATNESS(emp) * config_get_int("land_per_greatness");
 		total += count_tech(emp) * config_get_int("land_per_tech");
 		
 		if (EMPIRE_HAS_TECH(emp, TECH_COMMERCE)) {
-			// TODO this diminish could be configurable
-			total += diminishing_returns((int) (GET_TOTAL_WEALTH(emp) * config_get_double("land_per_wealth")), 5000);
+			// diminishes by an amount equal to non-wealth territory
+			from_wealth = diminishing_returns((int) (GET_TOTAL_WEALTH(emp) * config_get_double("land_per_wealth")), total);
+			
+			// limited to 3x non-wealth territory
+			from_wealth = MIN(from_wealth, total * 3);
+			
+			// for a total of 4x
+			total += from_wealth;
 		}
 	}
 	
@@ -1953,8 +1992,6 @@ double rate_item(obj_data *obj) {
 	extern double get_base_dps(obj_data *weapon);
 	extern const double apply_values[];
 	
-	double score_modifier = 0.7;	// in case gear levels are coming out a little too high
-	
 	double score = 0;
 	int iter;
 	
@@ -1995,7 +2032,7 @@ double rate_item(obj_data *obj) {
 		}	
 	}
 
-	return score * score_modifier;
+	return score;
 }
 
 
@@ -2048,6 +2085,9 @@ void command_lag(char_data *ch, int wait_type) {
 					wait = 0.5 RL_SEC;
 				}
 			}
+			else {
+				wait = 0;	// indoors
+			}
 			break;
 		}
 	}
@@ -2055,6 +2095,92 @@ void command_lag(char_data *ch, int wait_type) {
 	if (GET_WAIT_STATE(ch) < wait) {
 		GET_WAIT_STATE(ch) = wait;
 	}
+}
+
+
+/**
+* Calculates a player's gear level, based on what they have equipped.
+*
+* @param char_data *ch The player to set gear level for.
+*/
+void determine_gear_level(char_data *ch) {
+	extern const struct wear_data_type wear_data[NUM_WEARS];
+
+	double total, slots;
+	int avg, level, pos;
+	
+	// sanity check: we really have no work to do for mobs
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	level = total = slots = 0;	// init
+	
+	for (pos = 0; pos < NUM_WEARS; ++pos) {
+		// some items count as more or less than 1 slot
+		slots += wear_data[pos].gear_level_mod;
+		
+		if (GET_EQ(ch, pos) && wear_data[pos].gear_level_mod > 0) {
+			total += GET_OBJ_CURRENT_SCALE_LEVEL(GET_EQ(ch, pos)) * wear_data[pos].gear_level_mod;
+			
+			// bonuses
+			if (OBJ_FLAGGED(GET_EQ(ch, pos), OBJ_SUPERIOR)) {
+				total += 10 * wear_data[pos].gear_level_mod;
+			}
+			if (OBJ_FLAGGED(GET_EQ(ch, pos), OBJ_HARD_DROP)) {
+				total += 10 * wear_data[pos].gear_level_mod;
+			}
+			if (OBJ_FLAGGED(GET_EQ(ch, pos), OBJ_GROUP_DROP)) {
+				total += 10 * wear_data[pos].gear_level_mod;
+			}
+		}
+	}
+	
+	// determine average gear level of the player's slots
+	avg = round(total / slots);
+	
+	// player's gear level (which will be added to skill level) is:
+	level = avg + 50 - 100;	// 50 higher than the average scaled level of their gear, -100 to compensate for skill level
+	
+	GET_GEAR_LEVEL(ch) = MAX(level, 0);
+}
+
+
+/**
+* Raises a person from sleeping+ to standing (or fighting) if possible.
+* 
+* @param char_data *ch The person to try to wake/stand.
+* @return bool TRUE if the character ended up standing (>= fighting), FALSE if not.
+*/
+bool wake_and_stand(char_data *ch) {
+	char buf[MAX_STRING_LENGTH];
+	bool was_sleeping = FALSE;
+	
+	switch (GET_POS(ch)) {
+		case POS_SLEEPING: {
+			was_sleeping = TRUE;
+			// no break -- drop through
+		}
+		case POS_RESTING:
+		case POS_SITTING: {
+			GET_POS(ch) = POS_STANDING;
+			msg_to_char(ch, "You %sget up.\r\n", (was_sleeping ? "awaken and " : ""));
+			snprintf(buf, sizeof(buf), "$n %sgets up.", (was_sleeping ? "awakens and " : ""));
+			act(buf, TRUE, ch, NULL, NULL, TO_ROOM);
+			// no break -- drop through
+		}
+		case POS_FIGHTING:
+		case POS_STANDING: {
+			// at this point definitely standing, or close enough
+			return TRUE;
+		}
+		default: {
+			// can't do anything with any other pos
+			return FALSE;
+		}
+	}
+	
+	return FALSE;
 }
 
 
@@ -2121,12 +2247,10 @@ void give_resources(char_data *ch, Resource list[], bool split) {
 
 		for (j = 0; j < remaining; j++) {
 			if (obj_proto(list[i].vnum)) {
-				obj = read_object(list[i].vnum);
+				obj = read_object(list[i].vnum, TRUE);
 				
 				// scale item to minimum level
-				if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-					scale_item_to_level(obj, 0);
-				}
+				scale_item_to_level(obj, 0);
 				
 				obj_to_char_or_room(obj, ch);
 				load_otrigger(obj);
@@ -2320,7 +2444,16 @@ char *CAP(char *txt) {
 int count_color_codes(char *string) {
 	int iter, count = 0, len = strlen(string);
 	for (iter = 0; iter < len - 1; ++iter) {
-		if (string[iter] == '&' && string[iter+1] != '&') {
+		if (string[iter] == '\t' && string[iter+1] == '\t') {
+			++iter;	// advance past the \t\t (not a color code)
+		}
+		else if (string[iter] == '\t' && string[iter+1] == '&') {
+			++iter;	// advance past the \t& (not a color code)
+		}
+		else if (string[iter] == '&' && string[iter+1] == '&') {
+			++iter;	// advance past the && (not a color code)
+		}
+		else if (string[iter] == '&' || string[iter] == '\t') {
 			++count;
 			++iter;	// advance past the color code
 		}
@@ -2340,6 +2473,14 @@ int count_double_ampersands(char *string) {
 		if (string[iter] == '&' && string[iter+1] == '&') {
 			++count;
 			++iter;	// advance past the second &
+		}
+		else if (string[iter] == '\t' && string[iter+1] == '&') {
+			++count;
+			++iter;	// advance past the & in \t&
+		}
+		else if (string[iter] == '\t' && string[iter+1] == '\t') {
+			++count;
+			++iter;	// advance past the second \t in \t\t (similar to an &&)
 		}
 	}
 	
@@ -2438,6 +2579,37 @@ bool isname(const char *str, const char *namelist) {
 
 	free(newlist);
 	return found;
+}
+
+
+/**
+* Makes a level range look more elegant. You can omit current.
+*
+* @param int min The low end of the range (0 for none).
+* @param int max The high end of the range (0 for no max).
+* @param int current If it's already scaled, one level (0 for none).
+* @return char* The string.
+*/
+char *level_range_string(int min, int max, int current) {
+	static char output[65];
+	
+	if (current > 0) {
+		snprintf(output, sizeof(output), "%d", current);
+	}
+	else if (min > 0 && max > 0) {
+		snprintf(output, sizeof(output), "%d-%d", min, max);
+	}
+	else if (min > 0) {
+		snprintf(output, sizeof(output), "%d+", min);
+	}
+	else if (max > 0) {
+		snprintf(output, sizeof(output), "1-%d", max);
+	}
+	else {
+		snprintf(output, sizeof(output), "0");
+	}
+	
+	return output;
 }
 
 
@@ -2549,6 +2721,29 @@ void replace_question_color(char *input, char *color, char *output) {
 
 
 /**
+* Finds the last occurrence of needle in haystack.
+*
+* @param const char *haystack The string to search.
+* @param const char *needle The thing to search for.
+* @return char* The last occurrence of needle in haystack, or NULL if it does not occur.
+*/
+char *reverse_strstr(char *haystack, char *needle) {
+	char *found = NULL, *next = haystack;
+	
+	if (!haystack || !needle || !*haystack) {
+		return NULL;
+	}
+	
+	while ((next = strstr(next, needle))) {
+		found = next;
+		++next;
+	}
+	
+	return found;
+}
+
+
+/**
 * Doubles the & in a string so that color codes are displayed to the user.
 *
 * @param char *string The input string.
@@ -2559,7 +2754,8 @@ char *show_color_codes(char *string) {
 	char *ptr;
 	
 	ptr = str_replace("&", "&&", string);
-	strcpy(value, ptr);
+	strncpy(value, ptr, MAX_STRING_LENGTH);
+	value[MAX_STRING_LENGTH-1] = '\0';	// safety
 	free(ptr);
 	
 	return value;
@@ -2660,6 +2856,26 @@ void sprinttype(int type, const char *names[], char *result) {
 }
 
 
+/**
+* Similar to strchr except the 2nd argument is a string.
+*
+* @param const char *haystack The string to search.
+* @param const char *needles A set of characters to search for.
+* @return bool TRUE if any character from needles exists in haystack.
+*/
+bool strchrstr(const char *haystack, const char *needles) {
+	int iter;
+	
+	for (iter = 0; needles[iter] != '\0'; ++iter) {
+		if (strchr(haystack, needles[iter])) {
+			return TRUE;
+		}
+	}
+	
+	return FALSE;
+}
+
+
 /*
  * str_cmp: a case-insensitive version of strcmp().
  * Returns: 0 if equal, > 0 if arg1 > arg2, or < 0 if arg1 < arg2.
@@ -2752,6 +2968,9 @@ char *strip_color(char *input) {
 
 	for (iter = 0, pos = 0; pos < (MAX_STRING_LENGTH-1) && iter < strlen(input); ++iter) {
 		if (input[iter] == '&' && input[iter+1] != '&') {
+			++iter;
+		}
+		else if (input[iter] == '\t' && input[iter+1] != '\t') {
 			++iter;
 		}
 		else {
@@ -2985,6 +3204,16 @@ int compute_distance(room_data *from, room_data *to) {
 	int dx = x1 - x2;
 	int dy = y1 - y2;
 	int dist;
+	
+	// short circuit on same-room
+	if (from == to || HOME_ROOM(from) == HOME_ROOM(to)) {
+		return 0;
+	}
+	
+	// infinite distance if they are in an unknown location
+	if (x1 < 0 || x2 < 0 || y1 < 0 || y2 < 0) {
+		return MAP_SIZE;	// maximum distance
+	}
 
 	// adjust for edges
 	if (WRAP_X) {
@@ -3099,7 +3328,7 @@ int distance_to_nearest_player(room_data *room) {
 * layers of boats and home rooms.
 *
 * @param room_data *room Any room in the game.
-* @return room_data* A location on the map.
+* @return room_data* A location on the map, or NULL if there is no map location.
 */
 room_data *get_map_location_for(room_data *room) {
 	room_data *working = room, *last;
@@ -3111,6 +3340,14 @@ room_data *get_map_location_for(room_data *room) {
 	else if (GET_ROOM_VNUM(room) < MAP_SIZE) {
 		// shortcut
 		return room;
+	}
+	else if (GET_ROOM_VNUM(HOME_ROOM(room)) >= MAP_SIZE && BOAT_ROOM(room) == room && !IS_ADVENTURE_ROOM(HOME_ROOM(room))) {
+		// no home room on the map and not in a boat?
+		return NULL;
+	}
+	else if (GET_BOAT(room) && GET_ROOM_VNUM(BOAT_ROOM(room)) >= MAP_SIZE) {
+		// in a boat but it's not on the map?
+		return NULL;
 	}
 	
 	do {
@@ -3213,12 +3450,6 @@ int find_mine_type(int type) {
 obj_vnum find_mine_vnum_by_type(int type) {
 	int t = find_mine_type(type);
 	obj_vnum vnum = (t != NOTHING ? mine_data[t].vnum : o_IRON_ORE);
-
-	// random gold instead of iron
-	if (vnum == o_IRON_ORE && !number(0, 100)) {
-		vnum = o_GOLD;
-	}
-
 	return vnum;
 }
 
@@ -3256,6 +3487,10 @@ bool find_flagged_sect_within_distance_from_room(room_data *room, bitvector_t wi
 	int x, y;
 	room_data *shift, *real = get_map_location_for(room);
 	bool found = FALSE;
+	
+	if (!real) {	// no map location
+		return FALSE;
+	}
 	
 	for (x = -1 * distance; x <= distance && !found; ++x) {
 		for (y = -1 * distance; y <= distance && !found; ++y) {
@@ -3305,6 +3540,10 @@ bool find_sect_within_distance_from_room(room_data *room, sector_vnum sect, int 
 	bool found = FALSE;
 	room_data *shift;
 	int x, y;
+	
+	if (!real) {	// no map location
+		return FALSE;
+	}
 	
 	for (x = -1 * distance; x <= distance && !found; ++x) {
 		for (y = -1 * distance; y <= distance && !found; ++y) {
@@ -3394,6 +3633,25 @@ int get_direction_to(room_data *from, room_data *to) {
 	}
 	
 	return dir;
+}
+
+
+/**
+* Fetch the island id based on the map location of the room. This was a macro,
+* but get_map_location_for() can return a NULL.
+*
+* @param room_data *room The room to check.
+* @return int The island ID, or NO_ISLAND if none.
+*/
+int GET_ISLAND_ID(room_data *room) {
+	room_data *map = get_map_location_for(room);
+	
+	if (map) {
+		return map->island;
+	}
+	else {
+		return NO_ISLAND;
+	}
 }
 
 
@@ -3610,6 +3868,42 @@ room_data *straight_line(room_data *origin, room_data *destination, int iter) {
 	else {
 		// straight line should always stay on the map
 		return NULL;
+	}
+}
+
+
+/**
+* Gets the x-coordinate for a room, based on its map location. This used to be
+* a macro, but it needs to ensure there IS a map location.
+*
+* @param room_data *room The room to get the x-coordinate for.
+* @return int The x-coordinate, or -1 if none.
+*/
+int X_COORD(room_data *room) {
+	room_data *map = get_map_location_for(room);
+	if (map) {
+		return FLAT_X_COORD(map);
+	}
+	else {
+		return -1;
+	}
+}
+
+
+/**
+* Gets the y-coordinate for a room, based on its map location. This used to be
+* a macro, but it needs to ensure there IS a map location.
+*
+* @param room_data *room The room to get the y-coordinate for.
+* @return int The y-coordinate, or -1 if none.
+*/
+int Y_COORD(room_data *room) {
+	room_data *map = get_map_location_for(room);
+	if (map) {
+		return FLAT_Y_COORD(map);
+	}
+	else {
+		return -1;
 	}
 }
 

@@ -2,7 +2,7 @@
 Hut~
 A Small Hut~
 .&0()&?.~
-5 0 p 0
+5 0 pR 0
 0 1 0 -1
 D
    You are standing inside a small hut. The walls and ceiling are constructed
@@ -16,7 +16,7 @@ S
 Cabin~
 A Log Cabin~
 &0(--)~
-10 0 p em
+10 0 pR em
 0 2 0 -1
 D
    You are huddled inside a cozy log cabin. It is made of large, stripped
@@ -29,7 +29,7 @@ S
 Small House~
 A Small House~
 &0(==)~
-10 0 p em
+10 0 pR em
 2 2 0 -1
 D
    You are standing inside a small, cozy house. The walls are made of wood
@@ -42,7 +42,7 @@ S
 Mud Hut~
 A Mud Hut~
 .&0()&?.~
-10 0 p 0
+10 0 pR 0
 0 1 0 -1
 D
    The walls flake around; this hut has a feeling of instability. It is made
@@ -54,7 +54,7 @@ S
 Pueblo~
 A Pueblo~
 .&0[]&?.~
-15 0 0 em
+15 0 R em
 2 2 0 -1
 D
    Made of rocks and mud with logs for support, the pueblo is one of the
@@ -67,7 +67,7 @@ S
 Cliff Dwelling~
 A Cliff Dwelling~
 [==]~
-50 0 ef dem
+50 0 efR dem
 3 2 0 -1
 D
    An entire home is etched into the side of the cliff! This construction
@@ -138,7 +138,7 @@ S
 Forge~
 A Hot Forge~
 &0(FF)~
-20 0 pq 0
+20 0 pqR 0
 0 0 0 212
 C
 forge, smelt~
@@ -155,7 +155,7 @@ S
 Mill~
 The Mill~
 &0(MM)~
-15 0 pz 0
+15 0 pzR 0
 0 0 0 210
 C
 inventory, mill, retrieve, store~
@@ -172,7 +172,7 @@ S
 Potter~
 A Potter's Hut~
 &0(PP)~
-15 0 prA 0
+15 0 prAR 0
 0 0 0 211
 C
 craft, retrieve, store, inventory~
@@ -189,7 +189,7 @@ S
 Stable~
 A Noisy Stable~
 &0(SS)~
-15 0 bgpt 0
+15 0 bgptR 0
 0 0 0 213
 C
 harness, herd, inventory, milk, mount, retrieve, shear, store~
@@ -224,7 +224,7 @@ S
 Cannery~
 A Cannery~
 &0{CC}~
-10 0 bp 0
+10 0 bpR 0
 0 0 0 -1
 C
 inventory, retrieve, store~
@@ -239,7 +239,7 @@ S
 Foundry~
 A Foundry~
 &0{FF}~
-10 0 b 0
+10 0 bR 0
 0 0 0 -1
 C
 inventory, retrieve, smelt, store~
@@ -253,7 +253,7 @@ S
 Granary~
 A Tall Granary~
 &0{GG}~
-10 0 bp 0
+10 0 bpR 0
 0 0 0 -1
 C
 inventory, retrieve, store~
@@ -303,7 +303,7 @@ S
 Smokehouse~
 The Smokehouse~
 &0{SS}~
-15 0 br 0
+15 0 brR 0
 0 0 0 -1
 C
 retrieve, store~
@@ -319,7 +319,7 @@ S
 Tannery~
 The Tannery~
 &0{TT}~
-15 0 bp 0
+15 0 bpR 0
 0 0 0 -1
 C
 inventory, retrieve, store~
@@ -335,7 +335,7 @@ S
 Utility Shed~
 The Utility Shed~
 &0{UU}~
-15 0 bp 0
+15 0 bpR 0
 0 0 0 -1
 C
 inventory, retrieve, store~
@@ -373,7 +373,7 @@ S
 Stone House~
 A Stone House~
 &0[--]~
-15 0 0 em
+15 0 R em
 3 2 0 -1
 D
    You are standing in the entrance to a stone house. While its supporting
@@ -386,7 +386,7 @@ S
 Large House~
 A Large Brick House~
 &0[==]~
-15 0 0 em
+15 0 R em
 5 4 0 -1
 D
    You are standing inside a rather large house. It's made of brick,
@@ -399,7 +399,7 @@ S
 Tree House~
 A High Tree House~
 ^&0()&?^~
-20 0 p fm
+20 0 pR fm
 3 2 0 -1
 A
 d
@@ -414,7 +414,7 @@ S
 Tree Complex~
 A Complex of Trees~
 ^&0[]&?^~
-20 0 f fm
+20 0 fR fm
 7 4 0 -1
 A
 d
@@ -456,7 +456,7 @@ S
 Alchemist~
 The Alchemist~
 &0(AA)~
-15 0 prs 0
+15 0 prsR 0
 0 0 0 231
 C
 brew, mix, retrieve, store~
@@ -474,7 +474,7 @@ S
 Apiary~
 An Apiary~
 &0{BB}~
-15 0 pv 0
+15 0 pvR 0
 0 0 0 218
 D
    The room is hot and you begin sweating as soon as you enter. Bees swarm
@@ -488,7 +488,7 @@ S
 Bakery~
 The Bakery~
 &0(BB)~
-15 0 pr 0
+15 0 prR 0
 0 0 0 214
 C
 cook~
@@ -512,7 +512,7 @@ S
 Carpenter~
 The Carpenter~
 &0(CC)~
-15 0 bp 0
+15 0 bpR 0
 0 0 0 217
 C
 craft, harness~
@@ -527,7 +527,7 @@ S
 Glass Blower~
 The Glass Blower~
 &0(GG)~
-15 0 pw 0
+15 0 pwR 0
 0 0 0 215
 C
 craft~
@@ -544,7 +544,7 @@ S
 Pigeon Post~
 The Pigeon Post~
 &0[PP]~
-15 0 py 0
+15 0 pyR 0
 0 0 0 263
 C
 mail check, mail receive, mail send~
@@ -563,7 +563,7 @@ S
 Tailor~
 The Tailor~
 &0(TT)~
-15 0 pB 0
+15 0 pBR 0
 0 0 0 219
 C
 retrieve, sew, store~
@@ -580,7 +580,7 @@ S
 Tavern~
 The Tavern~
 &0[TT]~
-15 0 lp 0
+15 0 lpR 0
 0 0 0 220
 C
 fill, tavern~
@@ -618,7 +618,7 @@ S
 Warehouse~
 A Warehouse~
 &0{WW}~
-15 0 bpJ 0
+15 0 bpJR 0
 0 0 0 -1
 C
 warehouse~
@@ -719,7 +719,7 @@ S
 Shrine~
 A Shrine~
 &0.{}.~
-15 1 h 0
+15 1 hR 0
 0 0 0 -1
 C
 dedicate~
@@ -734,7 +734,7 @@ S
 Temple~
 A Temple~
 &0[[]]~
-15 4 h 0
+15 4 hR 0
 0 0 0 -1
 C
 dedicate~
@@ -751,7 +751,7 @@ S
 Library~
 A Grand Library~
 &0[^^]~
-25 10 u 0
+25 10 uR 0
 0 0 0 -1
 C
 library, bookedit~
@@ -769,7 +769,7 @@ S
 High Temple~
 The High Temple~
 &0[||]~
-25 10 fh de
+25 10 fhR de
 5 0 0 -1
 C
 dedicate~
@@ -870,7 +870,7 @@ S
 Swamp Hut~
 A Swamp Hut~
 ~&0/\&?~~
-15 0 p em
+15 0 pR em
 3 2 0 -1
 D
    This hut, crude though it looks from the outside, seems to keep out the
@@ -884,7 +884,7 @@ S
 Swamp Manor~
 A Manor House~
 ~&0[]&?~~
-15 0 0 em
+15 0 R em
 5 4 0 -1
 D
    The manor house is large and elegant, perhaps a relic of earlier days.
@@ -897,7 +897,7 @@ S
 Swamp Complex~
 A Complex in the Swamp~
 ~&0()&?~~
-20 0 f em
+20 0 fR em
 7 4 0 -1
 A
 d
@@ -918,7 +918,7 @@ S
 Trapper~
 The Trapper's Post~
 &g^/\^~
-15 0 bp 0
+15 0 bpR 0
 0 0 0 -1
 D
    The trapper's post is little more than a cabin and some tents surrounded
@@ -936,7 +936,7 @@ S
 Baths~
 The Baths~
 &0[&b~~&0]~
-20 0 iC 0
+20 0 iCR 0
 0 0 0 -1
 C
 bathe~
@@ -994,7 +994,7 @@ S
 Tower of Sorcery~
 The Tower of Sorcery~
 .&b||&?.~
-50 1 0 eflm
+50 1 R eflm
 2 1 0 -1
 C
 inventory, retrieve, store~
@@ -1013,7 +1013,7 @@ S
 Portcullis~
 A Great Portcullis~
 @U&0[]@V~
-60 0 fo abeghijkm
+60 0 foR abeghijkm
 30 0 0 -1
 D
    You are standing beneath a great portcullis. This is the entrance to a
@@ -1030,7 +1030,7 @@ S
 Great Hall~
 The Great Hall~
 &0[**]~
-60 0 f abeghijkm
+60 0 fR abeghijkm
 30 0 0 -1
 D
    This is the Great Hall, a room lined with magnificent suits of armor and
@@ -1043,7 +1043,7 @@ S
 Guard Tower~
 A Guard Tower~
 @U&0TT@V~
-15 0 bp 0
+15 0 bpR 0
 0 0 0 -1
 C
 upgrade~
@@ -1063,7 +1063,7 @@ S
 Advanced Guard Tower~
 An Advanced Guard Tower~
 &0'TT'~
-15 0 bp 0
+15 0 bpR 0
 0 0 0 -1
 C
 upgrade~
@@ -1083,7 +1083,7 @@ S
 Superior Guard Tower~
 A Superior Guard Tower~
 &0"TT"~
-20 0 b 0
+20 0 bR 0
 0 0 0 -1
 D
    This is a well-constructed guard tower. It is tall, allowing it to see
@@ -1098,7 +1098,7 @@ S
 Outpost~
 An Outpost in the Mountains~
 .&0/\&?.~
-50 0 e 0
+50 0 eR 0
 0 0 5 -1
 D
    Mountain outposts such as this are quickly constructed for mountain
@@ -1113,7 +1113,7 @@ S
 Barracks~
 The Barracks~
 &0[BB]~
-40 0 f ehm
+40 0 fR ehm
 10 0 20 -1
 D
    These are the military barracks, where soldiers are housed and trained. The
@@ -1126,7 +1126,7 @@ S
 Training Yard~
 The Training Yard~
 &0[  ]~
-40 0 f ehm
+40 0 fR ehm
 10 0 20 -1
 D
    The yard is filled with practice dummies and bales of hay, some spattered
@@ -1139,7 +1139,7 @@ S
 Gatehouse~
 The Gatehouse~
 @U&0||@V~
-20 0 bcgo 0
+20 0 bcgoR 0
 0 0 0 -1
 D
    The gatehouse is a welcoming sight for weary travellers. It signifies the
@@ -1156,11 +1156,21 @@ A Stone Wall~
 10 0 djk 0
 0 0 0 -1
 S
+#5175
+Intentionally Left Blank~
+Intentionally Left Blank~
+&0[  ]~
+1 0 0 0
+0 0 0 -1
+D
+This is a placeholder because craft 5175 is used for great walls.
+~
+S
 #5176
 River Gate~
 A River Gate~
 @U&0||@V~
-40 0 bcD 0
+40 0 bcDR 0
 0 0 0 -1
 D
    The river has been fortified against intrusion. This massive structure
@@ -1224,7 +1234,7 @@ S
 Mint~
 The Mint~
 &0[MM]~
-20 5 F 0
+20 5 FR 0
 0 0 0 -1
 C
 exchange, mint~
@@ -1243,7 +1253,7 @@ S
 Trading Post~
 The Trading Post~
 &0[$$]~
-15 0 pK 0
+15 0 pKR 0
 0 0 0 -1
 C
 trade <check | list | buy | cancel | collect | identify | post>~
@@ -1293,7 +1303,7 @@ S
 Rickety House~
 A Rickety Old House~
 .&0[]&?.~
-25 0 0 aem
+25 0 R aem
 6 1 0 -1
 D
    You're in the entrance to a rickety old house. The place is in poor
@@ -1308,7 +1318,7 @@ S
 Strange Burrow~
 A Strange Burrow~
 ^&0[]&?^~
-25 0 0 adem
+25 0 R adem
 6 1 0 -1
 A
 d
@@ -1325,7 +1335,7 @@ S
 Old Pueblo~
 An Old Pueblo~
 .&0[]&?.~
-25 0 0 aem
+25 0 R aem
 6 1 0 -1
 D
    The dry, caked sides of the pueblo have begun to crumble. Parts of the
@@ -1341,7 +1351,7 @@ S
 Obscure Cave~
 An Obscure Cave~
 /&0()&?\~
-25 0 0 adem
+25 0 R adem
 6 1 0 -1
 A
 d
@@ -1353,5 +1363,14 @@ breeze flows from inside, sending the hair on your neck to full attention.
 ~
 M
 235 10.00 c
+S
+#5190
+Astral Nexus~
+An Astral Nexus~
+..&C*&?.~
+5 0 bdpP 0
+0 0 0 -1
+C
+summon player <name>~
 S
 $

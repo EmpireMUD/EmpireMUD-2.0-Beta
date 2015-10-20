@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.survival.c                                  EmpireMUD 2.0b2 *
+*   File: act.survival.c                                  EmpireMUD 2.0b3 *
 *  Usage: code related to the Survival skill and its abilities            *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -46,10 +46,8 @@ INTERACTION_FUNC(butcher_interact) {
 	}
 	
 	for (num = 0; num < interaction->quantity; ++num) {
-		fillet = read_object(interaction->vnum);
-		if (OBJ_FLAGGED(fillet, OBJ_SCALABLE)) {
-			scale_item_to_level(fillet, 1);	// minimum level
-		}
+		fillet = read_object(interaction->vnum, TRUE);
+		scale_item_to_level(fillet, 1);	// minimum level
 		obj_to_char_or_room(fillet, ch);
 		load_otrigger(fillet);
 	}
@@ -87,10 +85,8 @@ INTERACTION_FUNC(do_one_forage) {
 	num += skill_check(ch, ABIL_FORAGE, DIFF_HARD) ? 1 : 0;
 	
 	for (iter = 0; iter < num; ++iter) {
-		obj = read_object(interaction->vnum);
-		if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-			scale_item_to_level(obj, 1);	// minimum level
-		}
+		obj = read_object(interaction->vnum, TRUE);
+		scale_item_to_level(obj, 1);	// minimum level
 		obj_to_char_or_room(obj, ch);
 		add_depletion(inter_room, DPLTN_FORAGE, TRUE);
 		load_otrigger(obj);
@@ -121,6 +117,12 @@ obj_data *find_best_saddle(char_data *ch) {
 	for (obj = ch->carrying; obj; obj = obj->next_content) {
 		if (CAN_WEAR(obj, ITEM_WEAR_SADDLE) && can_wear_item(ch, obj, FALSE)) {
 			this = rate_item(obj);
+			
+			// give a slight bonus to items that are bound ONLY to this character
+			if (OBJ_BOUND_TO(obj) && OBJ_BOUND_TO(obj)->next == NULL && bind_ok(obj, ch)) {
+				this *= 1.1;
+			}
+			
 			if (this >= best_score) {
 				best = obj;
 				best_score = this;
@@ -165,6 +167,9 @@ ACMD(do_butcher) {
 	}
 	else if (!IS_CORPSE(corpse)) {
 		msg_to_char(ch, "You can only butcher a corpse.\r\n");
+	}
+	else if (!bind_ok(corpse, ch)) {
+		msg_to_char(ch, "You can't butcher a corpse that is bound to someone else.\r\n");
 	}
 	else if (GET_CORPSE_NPC_VNUM(corpse) == NOTHING || !(proto = mob_proto(GET_CORPSE_NPC_VNUM(corpse)))) {
 		msg_to_char(ch, "You can't get any good meat out of that.\r\n");
@@ -240,7 +245,7 @@ ACMD(do_fish) {
 		return;
 	}
 	else {
-		start_action(ch, ACT_FISHING, fishing_timer / (skill_check(ch, ABIL_FISH, DIFF_EASY) ? 2 : 1), 0);
+		start_action(ch, ACT_FISHING, fishing_timer / (skill_check(ch, ABIL_FISH, DIFF_EASY) ? 2 : 1));
 		
 		msg_to_char(ch, "You begin looking for fish...\r\n");
 		act("$n begins looking for fish.", TRUE, ch, 0, 0, TO_ROOM);
@@ -295,11 +300,11 @@ ACMD(do_mount) {
 	else if (!can_use_ability(ch, ABIL_RIDE, NOTHING, 0, NOTHING)) {
 		// sends own msgs
 	}
-	else if (AFF_FLAGGED(ch, AFF_FLY)) {
-		msg_to_char(ch, "You can't mount while flying.\r\n");
-	}
 	else if (GET_MORPH(ch) != MORPH_NONE) {
 		msg_to_char(ch, "You can't ride anything in this form.\r\n");
+	}
+	else if (AFF_FLAGGED(ch, AFF_FLY)) {
+		msg_to_char(ch, "You can't mount while flying.\r\n");
 	}
 	else if (IS_RIDING(ch)) {
 		msg_to_char(ch, "You're already mounted.\r\n");
@@ -352,12 +357,13 @@ ACMD(do_mount) {
 			saddle = find_best_saddle(ch);
 			if (saddle) {
 				equip_char(ch, saddle, WEAR_SADDLE);
+				determine_gear_level(ch);
 			}
 		}
 		
 		// check for abandoning old mount
 		if (mob && GET_MOUNT_VNUM(ch) != NOTHING && mob_proto(GET_MOUNT_VNUM(ch))) {
-			temp = read_mobile(GET_MOUNT_VNUM(ch));
+			temp = read_mobile(GET_MOUNT_VNUM(ch), TRUE);
 			char_to_room(temp, IN_ROOM(ch));
 			setup_generic_npc(temp, GET_LOYALTY(ch), NOTHING, NOTHING);
 			
@@ -370,7 +376,7 @@ ACMD(do_mount) {
 
 		// load a copy of the mount mob, if there wasn't one (i.e. re-mounting the stored mount)
 		if (!mob) {
-			mob = read_mobile(GET_MOUNT_VNUM(ch));
+			mob = read_mobile(GET_MOUNT_VNUM(ch), TRUE);
 			char_to_room(mob, IN_ROOM(ch));
 		}
 
@@ -417,7 +423,7 @@ ACMD(do_nightsight) {
 	else {
 		msg_to_char(ch, "You activate nightsight.\r\n");
 		act("$n's eyes flash and take on a pale red glow.", TRUE, ch, NULL, NULL, TO_ROOM);
-		af = create_flag_aff(ATYPE_NIGHTSIGHT, UNLIMITED, AFF_INFRAVISION);
+		af = create_flag_aff(ATYPE_NIGHTSIGHT, UNLIMITED, AFF_INFRAVISION, ch);
 		affect_join(ch, af, 0);
 	}
 

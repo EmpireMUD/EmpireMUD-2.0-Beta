@@ -29,8 +29,6 @@ The goblin shoes are in disrepair.
 11 0
 A
 11 1
-C
-0 0
 S
 #10203
 coins goblin pile tarnished~
@@ -41,8 +39,6 @@ It doesn't look like there are too many coins here.
 11 m a 1
 1 -1 0
 2 0
-C
-0 0
 S
 #10204
 saddle goblincraft~
@@ -55,8 +51,6 @@ The saddle appears to be in good condition!
 7 0
 A
 6 1
-C
-0 0
 S
 #10205
 necklace tarnished~
@@ -71,8 +65,6 @@ A
 4 -1
 A
 11 1
-C
-0 0
 S
 #10206
 timepiece goblin strange~
@@ -87,8 +79,6 @@ A
 4 2
 A
 9 1
-C
-0 0
 S
 #10207
 gloves open-fingered fingered pair~
@@ -103,8 +93,6 @@ A
 21 2
 A
 17 1
-C
-0 0
 S
 #10208
 collar goblin~
@@ -117,8 +105,6 @@ The collar looks strong enough to protect the neck.
 2 0
 A
 15 1
-C
-0 0
 S
 #10209
 earring warg-bone bone strange~
@@ -133,8 +119,6 @@ A
 22 2
 A
 17 1
-C
-0 0
 S
 #10210
 club bone zelkab's~
@@ -149,8 +133,6 @@ A
 12 -1
 A
 17 1
-C
-0 0
 S
 #10211
 gauntlets armored zelkab's pair~
@@ -165,8 +147,6 @@ A
 21 1
 A
 17 1
-C
-0 0
 S
 #10212
 staff bone glowing garlgarl's~
@@ -181,8 +161,6 @@ A
 4 -1
 A
 23 3
-C
-0 0
 S
 #10213
 belt herbs garlgarl's~
@@ -197,8 +175,6 @@ A
 23 1
 A
 7 1
-C
-0 0
 S
 #10214
 bow firebranded branded filks's~
@@ -211,8 +187,6 @@ The bow appears to be goblincraft.
 0 0
 A
 17 1
-C
-0 0
 S
 #10215
 arrows bundle goblin~
@@ -222,8 +196,6 @@ The goblincraft arrows seem strong, but small.
 ~
 21 m a 1
 0 1 0
-0 0
-C
 0 0
 S
 #10216
@@ -241,8 +213,6 @@ A
 17 1
 A
 9 1
-C
-0 0
 S
 #10217
 belt heavy walts's~
@@ -261,8 +231,6 @@ A
 17 1
 A
 6 1
-C
-0 0
 S
 #10218
 waistband band armored nilbog's~
@@ -279,8 +247,6 @@ A
 9 -1
 A
 18 2
-C
-0 0
 S
 #10219
 helm wargskull skull Nilbog's~
@@ -299,8 +265,6 @@ A
 18 1
 A
 13 1
-C
-0 0
 S
 #10220
 wristbands flaming pair furl's~
@@ -321,8 +285,6 @@ A
 17 1
 B
 c
-C
-0 0
 S
 #10221
 wristbands armored pair furl's~
@@ -341,8 +303,6 @@ A
 18 1
 A
 6 1
-C
-0 0
 S
 #10225
 hole~
@@ -714,8 +674,6 @@ A
 17 1
 A
 21 1
-C
-0 0
 S
 #10256
 wristband dracosaur scale~
@@ -730,8 +688,6 @@ A
 16 1
 A
 22 1
-C
-0 0
 S
 #10257
 spawner miniboss dracosaur~
@@ -757,8 +713,6 @@ A
 23 1
 A
 7 1
-C
-0 0
 S
 #10259
 satchel primitive~
@@ -771,8 +725,6 @@ This small satchel is made from dracosaur leather, and is quite durable.
 7 0
 A
 15 1
-C
-0 0
 S
 #10260
 spawner trash dracosaur~
@@ -1147,13 +1099,15 @@ The bone crown of the primeval is lying here.~
 ancient form of dragon that existed before the age of man. Only someone who has
 conquered that lost age would dare wear this.
 ~
-2 o ae 1
+2 o ae 2
 0 0 0
 14 0
 A
 5 3
 A
 4 1
+C
+0 125
 S
 #10285
 pattern bone crown primeval~

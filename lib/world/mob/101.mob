@@ -73,12 +73,21 @@ sly thief~
 Sly~
 A thief is hunched in the corner.
 ~
-0 0 abdvA 0
+0 0 abdv D
 1 0 0 4
-I 4 10111 5.00 1 X  # LOOT: a charming necklace
-I 4 10112 5.00 1 X  # LOOT: some wooden beads
-I 4 10113 5.00 1 X  # LOOT: a shifter's chain
-I 4 10114 5.00 1 X  # LOOT: a talismanic shiv
+I 4 10114 10.00 1 a  # LOOT: a talismanic shiv
+I 4 10118 10.00 1 a  # LOOT: a makeshift wand
+I 4 10119 10.00 1 a  # LOOT: an old morning star
+I 4 10111 7.00 1 a  # LOOT: a charming necklace
+I 4 10112 7.00 1 a  # LOOT: some wooden beads
+I 4 10113 7.00 1 a  # LOOT: a shifter's chain
+I 4 10117 7.00 1 a  # LOOT: a spidersilk choker
+I 4 10120 7.00 1 a  # LOOT: roguish pants
+I 4 10121 7.00 1 a  # LOOT: darkfiber pants
+I 4 10122 7.00 1 a  # LOOT: shadowcraft pants
+I 4 10123 7.00 1 a  # LOOT: a brawler's wristcuff
+I 4 10124 7.00 1 a  # LOOT: a freethinker's wristcuff
+I 4 10125 7.00 1 a  # LOOT: an adulterer's wristcuff
 T 10113
 T 10111
 T 10000
@@ -88,12 +97,21 @@ chiv thief~
 Chiv~
 A thief is warming her hands by the fire.
 ~
-0 0 abdvA 0
+0 0 abdv D
 2 0 0 4
-I 4 10111 5.00 1 X  # LOOT: a charming necklace
-I 4 10112 5.00 1 X  # LOOT: some wooden beads
-I 4 10113 5.00 1 X  # LOOT: a shifter's chain
-I 4 10114 5.00 1 X  # LOOT: a talismanic shiv
+I 4 10114 10.00 1 a  # LOOT: a talismanic shiv
+I 4 10118 10.00 1 a  # LOOT: a makeshift wand
+I 4 10119 10.00 1 a  # LOOT: an old morning star
+I 4 10111 7.00 1 a  # LOOT: a charming necklace
+I 4 10112 7.00 1 a  # LOOT: some wooden beads
+I 4 10113 7.00 1 a  # LOOT: a shifter's chain
+I 4 10117 7.00 1 a  # LOOT: a spidersilk choker
+I 4 10120 7.00 1 a  # LOOT: roguish pants
+I 4 10121 7.00 1 a  # LOOT: darkfiber pants
+I 4 10122 7.00 1 a  # LOOT: shadowcraft pants
+I 4 10123 7.00 1 a  # LOOT: a brawler's wristcuff
+I 4 10124 7.00 1 a  # LOOT: a freethinker's wristcuff
+I 4 10125 7.00 1 a  # LOOT: an adulterer's wristcuff
 T 10113
 T 10112
 T 10000
@@ -103,8 +121,21 @@ thief~
 a thief~
 A thief is leaning against the wall.
 ~
-0 0 abdvz 0
+0 0 abdvz D
 2 0 0 4
+I 4 10114 5.00 1 a  # LOOT: a talismanic shiv
+I 4 10118 5.00 1 a  # LOOT: a makeshift wand
+I 4 10119 5.00 1 a  # LOOT: an old morning star
+I 4 10111 3.00 1 a  # LOOT: a charming necklace
+I 4 10112 3.50 1 a  # LOOT: some wooden beads
+I 4 10113 3.50 1 a  # LOOT: a shifter's chain
+I 4 10117 3.50 1 a  # LOOT: a spidersilk choker
+I 4 10120 3.50 1 a  # LOOT: roguish pants
+I 4 10121 3.50 1 a  # LOOT: darkfiber pants
+I 4 10122 3.50 1 a  # LOOT: shadowcraft pants
+I 4 10123 3.50 1 a  # LOOT: a brawler's wristcuff
+I 4 10124 3.50 1 a  # LOOT: a freethinker's wristcuff
+I 4 10125 3.50 1 a  # LOOT: an adulterer's wristcuff
 T 10113
 T 10000
 S
@@ -115,10 +146,34 @@ A baby dragon has hatched!
 ~
 0 0 bdy c
 0 0 2 9
-I 0 3012 100.00 1  # BUTCHER: UNKNOWN
-I 1 10006 10.00 1  # SKIN: a dragon scale
-I 1 1351 100.00 1  # SKIN: a large skin
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 1 10006 100.00 1  # SKIN: a dragon scale
 T 10024
 T 10114
+S
+#10114
+sly thief~
+Sly~
+A thief is hunched in the corner.
+~
+0 0 abdv D
+1 0 0 4
+I 4 10126 100.00 1  # LOOT: a tenebrous aura
+I 4 10114 10.00 1 a  # LOOT: a talismanic shiv
+I 4 10118 10.00 1 a  # LOOT: a makeshift wand
+I 4 10119 10.00 1 a  # LOOT: an old morning star
+I 4 10111 7.00 1 a  # LOOT: a charming necklace
+I 4 10112 7.00 1 a  # LOOT: some wooden beads
+I 4 10113 7.00 1 a  # LOOT: a shifter's chain
+I 4 10117 7.00 1 a  # LOOT: a spidersilk choker
+I 4 10120 7.00 1 a  # LOOT: roguish pants
+I 4 10121 7.00 1 a  # LOOT: darkfiber pants
+I 4 10122 7.00 1 a  # LOOT: shadowcraft pants
+I 4 10123 7.00 1 a  # LOOT: a brawler's wristcuff
+I 4 10124 7.00 1 a  # LOOT: a freethinker's wristcuff
+I 4 10125 7.00 1 a  # LOOT: an adulterer's wristcuff
+T 10113
+T 10111
+T 10000
 S
 $

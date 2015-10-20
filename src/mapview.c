@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: mapview.c                                       EmpireMUD 2.0b2 *
+*   File: mapview.c                                       EmpireMUD 2.0b3 *
 *  Usage: Map display functions                                           *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -100,34 +100,43 @@ bool adjacent_room_is_light(room_data *room) {
 
 /**
 * @param empire_data *emp
-* @return char* The background color that's the opposite of the banner color
+* @return char* The background color that's a good fit for the banner color
 */
-char *get_banner_complement_color(empire_data *emp) {
+const char *get_banner_complement_color(empire_data *emp) {
 	if (!emp) {
 		return "";
 	}
-	
-	if (strchr(EMPIRE_BANNER(emp), 'r')) {
-		return BACKGROUND_GREEN;
+
+	if (strchrstr(EMPIRE_BANNER(emp), "rRtT")) {
+		return "\t[B100]";
 	}
-	if (strchr(EMPIRE_BANNER(emp), 'g')) {
-		return BACKGROUND_RED;
+	if (strchrstr(EMPIRE_BANNER(emp), "gG")) {
+		return "\t[B010]";
 	}
-	if (strchr(EMPIRE_BANNER(emp), 'y')) {
-		return BACKGROUND_BLUE;
+	if (strchrstr(EMPIRE_BANNER(emp), "yY")) {
+		return "\t[B110]";
 	}
-	if (strchr(EMPIRE_BANNER(emp), 'b')) {
-		return BACKGROUND_CYAN;
+	if (strchrstr(EMPIRE_BANNER(emp), "mMpPvV")) {
+		return "\t[B101]";
 	}
-	if (strchr(EMPIRE_BANNER(emp), 'm')) {
-		return BACKGROUND_BLUE;
+	if (strchrstr(EMPIRE_BANNER(emp), "aA")) {
+		return "\t[B001]";
 	}
-	if (strchr(EMPIRE_BANNER(emp), 'c')) {
-		return BACKGROUND_BLUE;
+	if (strchrstr(EMPIRE_BANNER(emp), "cCbBjJ")) {
+		return "\t[B011]";
 	}
-	
+	if (strchrstr(EMPIRE_BANNER(emp), "wW")) {
+		return "\t[B111]";
+	}
+	if (strchrstr(EMPIRE_BANNER(emp), "lL")) {
+		return "\t[B120]";
+	}
+	if (strchrstr(EMPIRE_BANNER(emp), "oO")) {
+		return "\t[B310]";
+	}
+
 	// default
-	return BACKGROUND_BLUE;
+	return "\t[B210]";	// dark tan
 }
 
 
@@ -158,6 +167,42 @@ struct icon_data *get_icon_from_set(struct icon_data *set, int type) {
 	}
 	
 	return found;
+}
+
+
+/**
+* Detects the player's effective map radius size -- how far away the player
+* can see, as displayed on the map. This is controlled by the 'mapsize'
+* command, which actually sets the diameter.
+*
+* @param char_data *ch The person to get mapsize for.
+* @return int The map radius.
+*/
+int get_map_radius(char_data *ch) {
+	int mapsize;
+
+	mapsize = GET_MAPSIZE(REAL_CHAR(ch));
+	if (mapsize == 0) {
+		// auto-detected
+		if (ch->desc && ch->desc->pProtocol->ScreenWidth > 0) {
+			int wide = (ch->desc->pProtocol->ScreenWidth - 6) / 8;	// the /8 is 4 chars per tile, doubled
+			int max_size = config_get_int("max_map_size");
+			if (ch->desc->pProtocol->ScreenHeight > 0) {
+				// cap based on height, too (save some room)
+				// this saves roughly 4 lines below the map -- if you're going
+				// to play around with it, be sure to test -- the math is not
+				// very straightforward. -paul
+				wide = MIN(wide, ((ch->desc->pProtocol->ScreenHeight - 7) / 2) - 1);	// the -1 at the end is to ensure even/odd numbers have an extra line rather than one too few
+				wide = MAX(wide, 1);	// otherwise, NAWS sometimes leads to a map with only the player
+			}
+			mapsize = MIN(wide, max_size);
+		}
+		else {
+			mapsize = config_get_int("default_map_size");
+		}
+	}
+	
+	return mapsize;
 }
 
 
@@ -440,8 +485,8 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	struct mappc_data *pc, *next_pc;
 	struct building_resource_type *res;
 	struct empire_city_data *city;
-	char output[MAX_STRING_LENGTH], shipbuf[256], flagbuf[MAX_STRING_LENGTH], partialbuf[MAX_STRING_LENGTH];
-	int s, t, mapsize, iter, type;
+	char output[MAX_STRING_LENGTH], shipbuf[256], flagbuf[MAX_STRING_LENGTH], locbuf[128], partialbuf[MAX_STRING_LENGTH];
+	int s, t, mapsize, iter, type, check_x, check_y;
 	int first_iter, second_iter, xx, yy, magnitude, north;
 	int first_start, first_end, second_start, second_end, temp;
 	bool y_first, invert_x, invert_y, found, comma;
@@ -455,30 +500,28 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	
 	// options
 	bool ship_partial = IS_SET(options, LRR_SHIP_PARTIAL) ? TRUE : FALSE;
+	bool look_out = IS_SET(options, LRR_LOOK_OUT) ? TRUE : FALSE;
 	bool has_ship = GET_BOAT(IN_ROOM(ch)) ? TRUE : FALSE;
-	bool show_title = !has_ship || ship_partial;
+	bool show_title = !has_ship || ship_partial || look_out;
 
 	// begin with the sanity check
 	if (!ch || !ch->desc)
 		return;
 
-	mapsize = GET_MAPSIZE(REAL_CHAR(ch));
-	if (mapsize == 0) {
-		mapsize = config_get_int("default_map_size");
-	}
+	mapsize = get_map_radius(ch);
 
 	if (AFF_FLAGGED(ch, AFF_BLIND)) {
 		msg_to_char(ch, "You see nothing but infinite darkness...\r\n");
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_EARTHMELD) && IS_ANY_BUILDING(IN_ROOM(ch))) {
+	if (!look_out && AFF_FLAGGED(ch, AFF_EARTHMELD) && IS_ANY_BUILDING(IN_ROOM(ch))) {
 		msg_to_char(ch, "You are beneath a building.\r\n");
 		return;
 	}
 
 	// check for ship
-	if (!ship_partial && GET_BOAT(IN_ROOM(ch))) {
+	if (!look_out && !ship_partial && GET_BOAT(IN_ROOM(ch))) {
 		look_at_room_by_loc(ch, IN_ROOM(GET_BOAT(IN_ROOM(ch))), LRR_SHIP_PARTIAL);
 	}
 
@@ -492,6 +535,16 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	else {
 		*shipbuf = '\0';
 	}
+	
+	// set up location: may not actually have a map location
+	check_x = X_COORD(room);
+	check_y = Y_COORD(room);
+	if (CHECK_MAP_BOUNDS(check_x, check_y)) {
+		snprintf(locbuf, sizeof(locbuf), "(%d, %d)", check_x, check_y);
+	}
+	else {
+		snprintf(locbuf, sizeof(locbuf), "(unknown)");
+	}
 
 	if (IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
 		sprintbit(ROOM_AFF_FLAGS(IN_ROOM(ch)), room_aff_bits, flagbuf, TRUE);
@@ -504,18 +557,18 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 			snprintf(flagbuf + strlen(flagbuf), sizeof(flagbuf) - strlen(flagbuf), "| %s", partialbuf);
 		}
 		
-		sprintf(output, "[%d] %s%s (%d, %d)&0 %s[ %s]\r\n", GET_ROOM_VNUM(room), get_room_name(room, TRUE), shipbuf, X_COORD(room), Y_COORD(room), (SCRIPT(room) ? "[TRIG] " : ""), flagbuf);
+		sprintf(output, "[%d] %s%s %s&0 %s[ %s]\r\n", GET_ROOM_VNUM(room), get_room_name(room, TRUE), shipbuf, locbuf, (SCRIPT(room) ? "[TRIG] " : ""), flagbuf);
 	}
-	else if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
+	else if (HAS_ABILITY(ch, ABIL_NAVIGATION) && !RMT_FLAGGED(IN_ROOM(ch), RMT_NO_LOCATION)) {
 		// need navigation to see coords
-		sprintf(output, "%s%s (%d, %d)&0\r\n", get_room_name(room, TRUE), shipbuf, X_COORD(room), Y_COORD(room));
+		sprintf(output, "%s%s %s&0\r\n", get_room_name(room, TRUE), shipbuf, locbuf);
 	}
 	else {
 		sprintf(output, "%s%s&0\r\n", get_room_name(room, TRUE), shipbuf);
 	}
 
 	// show the room
-	if (!ROOM_IS_CLOSED(room)) {
+	if (!ROOM_IS_CLOSED(room) || look_out) {
 		// map rooms:
 		
 		if (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
@@ -644,7 +697,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 					}
 					else if (to_room != room && !CAN_SEE_IN_DARK_ROOM(ch, to_room) && compute_distance(room, to_room) > distance_can_see(ch) && !adjacent_room_is_light(to_room)) {
 						// normal dark
-						if (PRF_FLAGGED(ch, PRF_COLOR) && !PRF_FLAGGED(ch, PRF_NOMAPCOL)) {
+						if (!PRF_FLAGGED(ch, PRF_NOMAPCOL)) {
 							show_map_to_char(ch, mappc, to_room, options | LRR_SHOW_DARK);
 						}
 						else {
@@ -699,6 +752,11 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 			}
 			free(mappc);
 		}		
+		return;
+	}
+	
+	if (look_out) {
+		// nothing else to show on a look-out
 		return;
 	}
 	
@@ -851,10 +909,12 @@ void look_in_direction(char_data *ch, int dir) {
 	extern const char *from_dir[];
 	extern const int rev_dir[];
 	
+	char buf[MAX_STRING_LENGTH - 9], buf2[MAX_STRING_LENGTH - 9];	// save room for the "You see "
 	char_data *c;
-	int i;
 	room_data *to_room;
 	struct room_direction_data *ex;
+	int last_comma_pos, prev_comma_pos, num_commas;
+	size_t bufsize;
 	
 	// weather override
 	if (IS_OUTDOORS(ch) && dir == UP && !find_exit(IN_ROOM(ch), dir)) {
@@ -865,37 +925,41 @@ void look_in_direction(char_data *ch, int dir) {
 	if (ROOM_IS_CLOSED(IN_ROOM(ch))) {
 		if (COMPLEX_DATA(IN_ROOM(ch)) && (ex = find_exit(IN_ROOM(ch), dir))) {
 			if (EXIT_FLAGGED(ex, EX_CLOSED) && ex->keyword) {
-				sprintf(buf, "The %s is closed.\r\n", fname(ex->keyword));
-				send_to_char(buf, ch);
+				msg_to_char(ch, "The %s is closed.\r\n", fname(ex->keyword));
 			}
 			else if (EXIT_FLAGGED(ex, EX_ISDOOR) && ex->keyword) {
-				sprintf(buf, "The %s is open.\r\n", fname(ex->keyword));
-				send_to_char(buf, ch);
+				msg_to_char(ch, "The %s is open.\r\n", fname(ex->keyword));
 			}
 			if (!EXIT_FLAGGED(ex, EX_CLOSED)) {
 				*buf = '\0';
+				bufsize = 0;
+				last_comma_pos = prev_comma_pos = -1;
+				num_commas = 0;
+				
 				to_room = ex->room_ptr;
 				if (CAN_SEE_IN_DARK_ROOM(ch, to_room)) {
 					for (c = ROOM_PEOPLE(to_room); c; c = c->next_in_room) {
 						if (CAN_SEE(ch, c)) {
-							sprintf(buf+strlen(buf), "%s, ", PERS(c, c, 0));
+							bufsize += snprintf(buf + bufsize, sizeof(buf) - bufsize, "%s, ", PERS(c, ch, FALSE));
+							if (last_comma_pos != -1) {
+								prev_comma_pos = last_comma_pos;
+							}
+							last_comma_pos = bufsize - 2;
+							++num_commas;
 						}
 					}
 				}
 
 				/* Now, we clean up that buf */
 				if (*buf) {
-					sprintf(buf+strlen(buf)-2, ".\r\n");
-
-					for (i = strlen(buf)-1; i > 0; i--) {
-						if (buf[i] == ',') {
-							sprintf(buf1, buf + i+1);
-							buf[i] = '\0';
-							strcat(buf, " and");
-							strcat(buf, buf1);
-							break;
-						}
+					if (last_comma_pos != -1) {
+						bufsize = last_comma_pos + snprintf(buf + last_comma_pos, sizeof(buf) - last_comma_pos, ".\r\n");
 					}
+					if (prev_comma_pos != -1) {
+						strcpy(buf2, buf + prev_comma_pos + 1);
+						bufsize = snprintf(buf + prev_comma_pos, sizeof(buf) - prev_comma_pos, "%s and%s", (num_commas > 2 ? "," : ""), buf2);
+					}
+
 					msg_to_char(ch, "You see %s", buf);
 				}
 				else {
@@ -909,7 +973,10 @@ void look_in_direction(char_data *ch, int dir) {
 	}
 	else {
 		// map look
+		bufsize = 0;
 		*buf = '\0';
+		last_comma_pos = prev_comma_pos = -1;
+		num_commas = 0;
 		
 		// dirs not shown on map
 		if (dir == UP) {
@@ -957,7 +1024,12 @@ void look_in_direction(char_data *ch, int dir) {
 		if (CAN_SEE_IN_DARK_ROOM(ch, to_room)) {
 			for (c = ROOM_PEOPLE(to_room); c; c = c->next_in_room) {
 				if (CAN_SEE(ch, c)) {
-					sprintf(buf+strlen(buf), "%s, ", PERS(c, c, 0));
+					bufsize += snprintf(buf + bufsize, sizeof(buf) - bufsize, "%s, ", PERS(c, ch, FALSE));
+					if (last_comma_pos != -1) {
+						prev_comma_pos = last_comma_pos;
+					}
+					last_comma_pos = bufsize - 2;
+					++num_commas;
 				}
 			}
 		}
@@ -968,7 +1040,12 @@ void look_in_direction(char_data *ch, int dir) {
 			if (CAN_SEE_IN_DARK_ROOM(ch, to_room)) {
 				for (c = ROOM_PEOPLE(to_room); c; c = c->next_in_room) {
 					if (CAN_SEE(ch, c)) {
-						sprintf(buf+strlen(buf), "%s, ", PERS(c, c, 0));
+						bufsize += snprintf(buf + bufsize, sizeof(buf) - bufsize, "%s, ", PERS(c, ch, FALSE));
+						if (last_comma_pos != -1) {
+							prev_comma_pos = last_comma_pos;
+						}
+						last_comma_pos = bufsize - 2;
+						++num_commas;
 					}
 				}
 			}
@@ -978,7 +1055,12 @@ void look_in_direction(char_data *ch, int dir) {
 				if (CAN_SEE_IN_DARK_ROOM(ch, to_room)) {
 					for (c = ROOM_PEOPLE(to_room); c; c = c->next_in_room) {
 						if (CAN_SEE(ch, c)) {
-							sprintf(buf+strlen(buf), "%s, ", PERS(c, c, 0));
+							bufsize += snprintf(buf + bufsize, sizeof(buf) - bufsize, "%s, ", PERS(c, ch, FALSE));
+							if (last_comma_pos != -1) {
+								prev_comma_pos = last_comma_pos;
+							}
+							last_comma_pos = bufsize - 2;
+							++num_commas;
 						}
 					}
 				}
@@ -987,17 +1069,14 @@ void look_in_direction(char_data *ch, int dir) {
 
 		/* Now, we clean up that buf */
 		if (*buf) {
-			sprintf(buf+strlen(buf)-2, ".\r\n");
-
-			for (i = strlen(buf)-1; i > 0; i--) {
-				if (buf[i] == ',') {
-					sprintf(buf1, buf + i+1);
-					buf[i] = '\0';
-					strcat(buf, " and");
-					strcat(buf, buf1);
-					break;
-				}
+			if (last_comma_pos != -1) {
+				bufsize = last_comma_pos + snprintf(buf + last_comma_pos, sizeof(buf) - last_comma_pos, ".\r\n");
 			}
+			if (prev_comma_pos != -1) {
+				strcpy(buf2, buf + prev_comma_pos + 1);
+				bufsize = snprintf(buf + prev_comma_pos, sizeof(buf) - prev_comma_pos, "%s and%s", (num_commas > 2 ? "," : ""), buf2);
+			}
+			
 			msg_to_char(ch, "You see %s", buf);
 		}
 		else {
@@ -1030,11 +1109,12 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	empire_data *emp, *chemp = GET_LOYALTY(ch);
 	int tileset = pick_season(to_room);
 	struct icon_data *base_icon, *icon, *crop_icon = NULL;
-	bool hidden = FALSE;
+	bool junk, hidden = FALSE;
 	crop_data *cp = crop_proto(ROOM_CROP_TYPE(to_room));
 	sector_data *st, *base_sect = ROOM_ORIGINAL_SECT(to_room);
 	char *base_color, *str;
 	room_data *map_loc = get_map_location_for(IN_ROOM(ch)), *map_to_room = get_map_location_for(to_room);
+	obj_data *on_ship;
 	
 	// options
 	bool show_dark = IS_SET(options, LRR_SHOW_DARK) ? TRUE : FALSE;
@@ -1072,15 +1152,26 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	// start with the sector color
 	strcpy(buf, base_color);
 
-	if (to_room == IN_ROOM(ch)) {
+	if (to_room == IN_ROOM(ch) && !ROOM_IS_CLOSED(IN_ROOM(ch))) {
 		sprintf(buf, "&0<%soo&0>", chemp ? EMPIRE_BANNER(chemp) : "");
 	}
-	else if (!show_dark && show_pc_in_room(ch, to_room, mappc)) {
+	else if (!show_dark && !PRF_FLAGGED(ch, PRF_INFORMATIVE | PRF_POLITICAL) && show_pc_in_room(ch, to_room, mappc)) {
 		return;
+	}
+	
+	// ship present -- in specific cases where it overrides the normal icon
+	else if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_SHIP_PRESENT) && (ROOM_SECT_FLAGGED(to_room, SECTF_FRESH_WATER | SECTF_OCEAN) || ((on_ship = GET_BOAT(HOME_ROOM(IN_ROOM(ch)))) && to_room == IN_ROOM(on_ship)))) {
+		// show boats in room
+		if (ROOM_SECT_FLAGGED(to_room, SECTF_OCEAN)) {
+			strcat(buf, boat_icon_ocean);
+		}
+		else {	// general else ... could be: if (ROOM_SECT_FLAGGED(to_room, SECTF_FRESH_WATER))
+			strcat(buf, boat_icon_river);
+		}
 	}
 
 	/* Hidden buildings */
-	else if (distance(FLAT_X_COORD(map_loc), FLAT_Y_COORD(map_loc), FLAT_X_COORD(map_to_room), FLAT_Y_COORD(map_to_room)) > 2 && ROOM_AFF_FLAGGED(to_room, ROOM_AFF_CHAMELEON)) {
+	else if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_CHAMELEON) && (!map_loc || !map_to_room || distance(FLAT_X_COORD(map_loc), FLAT_Y_COORD(map_loc), FLAT_X_COORD(map_to_room), FLAT_Y_COORD(map_to_room)) > 2)) {
 		strcat(buf, base_icon->icon);
 		hidden = TRUE;
 	}
@@ -1183,20 +1274,6 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 			sprintf(buf + strlen(buf), "&?%c", GET_SECT_ROADSIDE_ICON(base_sect));
 		}
 	}
-	else if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_SHIP_PRESENT) && ROOM_SECT_FLAGGED(to_room, SECTF_FRESH_WATER | SECTF_OCEAN)) {
-		// show boats in room
-		if (ROOM_SECT_FLAGGED(to_room, SECTF_FRESH_WATER)) {
-			strcat(buf, boat_icon_river);
-		}
-		else if (ROOM_SECT_FLAGGED(to_room, SECTF_OCEAN)) {
-			strcat(buf, boat_icon_ocean);
-		}
-		else {
-			// should never hit this case
-			icon = get_icon_from_set(GET_SECT_ICONS(SECT(to_room)), tileset);
-			strcat(buf, icon->icon);
-		}
-	}
 	else if (ROOM_SECT_FLAGGED(to_room, SECTF_CROP) && cp) {
 		strcat(buf, crop_icon->icon);
 	}
@@ -1223,6 +1300,14 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	
 	// buf is now the completed icon, but has both color codes (&) and variable tile codes (@)
 	if (strchr(buf, '@')) {
+		// here (@.) roadside icon
+		if (strstr(buf, "@.")) {
+			icon = get_icon_from_set(GET_SECT_ICONS(base_sect), tileset);
+			sprintf(buf1, "%s%c", icon->color, GET_SECT_ROADSIDE_ICON(base_sect));
+			str = str_replace("@.", buf1, buf);
+			strcpy(buf, str);
+			free(str);
+		}
 		// east (@e) tile attachment
 		if (strstr(buf, "@e")) {
 			st = r_east ? ROOM_ORIGINAL_SECT(r_east) : ROOM_ORIGINAL_SECT(to_room);
@@ -1306,7 +1391,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 		if (PRF_FLAGGED(ch, PRF_POLITICAL) && !show_dark) {
 			emp = ROOM_OWNER(to_room);
 			
-			if (chemp && find_city(chemp, to_room)) {
+			if (chemp && (chemp == emp || find_city(chemp, to_room)) && is_in_city_for_empire(to_room, chemp, FALSE, &junk)) {
 				strcpy(buf2, get_banner_complement_color(chemp));
 				need_color_terminator = TRUE;
 			}
@@ -1609,15 +1694,18 @@ void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options)
 //// WHERE FUNCTIONS /////////////////////////////////////////////////////////
 
 void perform_mortal_where(char_data *ch, char *arg) {
-	extern struct instance_data *find_instance_by_room(room_data *room);
+	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 	
-	register char_data *i;
-	register descriptor_data *d;
-	int max_distance = 20;
-	bool found = FALSE;
+	int check_x, check_y, closest, dir, dist, max_distance;
+	struct instance_data *ch_inst, *i_inst;
+	descriptor_data *d;
+	char_data *i, *found = NULL;
 	
 	if (HAS_ABILITY(ch, ABIL_MASTER_TRACKER)) {
 		max_distance = 75;
+	}
+	else {
+		max_distance = 20;
 	}
 	
 	command_lag(ch, WAIT_OTHER);
@@ -1629,11 +1717,21 @@ void perform_mortal_where(char_data *ch, char *arg) {
 				continue;
 			if (!CAN_SEE(ch, i) || !CAN_RECOGNIZE(ch, i))
 				continue;
-			if (compute_distance(IN_ROOM(ch), IN_ROOM(i)) > max_distance)
+			if ((dist = compute_distance(IN_ROOM(ch), IN_ROOM(i))) > max_distance)
 				continue;
-			if (IS_ADVENTURE_ROOM(IN_ROOM(i)) && find_instance_by_room(IN_ROOM(ch)) != find_instance_by_room(IN_ROOM(i))) {
-				// not in same adventure
-				continue;
+			
+			ch_inst = find_instance_by_room(IN_ROOM(ch), FALSE);
+			i_inst = find_instance_by_room(IN_ROOM(i), FALSE);
+			if (ch_inst != i_inst || IS_ADVENTURE_ROOM(IN_ROOM(i)) != !IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
+				// not in same adventure...
+				if (RMT_FLAGGED(IN_ROOM(ch), RMT_NO_LOCATION) || RMT_FLAGGED(IN_ROOM(i), RMT_NO_LOCATION)) {
+					// one or the other is set no-location
+					continue;
+				}
+				if (i_inst && ADVENTURE_FLAGGED(i_inst->adventure, ADV_NO_NEARBY)) {
+					// target's adventure is !nearby
+					continue;
+				}
 			}
 			if (HAS_ABILITY(i, ABIL_NO_TRACE) && IS_OUTDOORS(i)) {
 				gain_ability_exp(i, ABIL_NO_TRACE, 10);
@@ -1643,27 +1741,50 @@ void perform_mortal_where(char_data *ch, char *arg) {
 				gain_ability_exp(i, ABIL_UNSEEN_PASSING, 10);
 				continue;
 			}
+			
+			dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), IN_ROOM(i)));
+			// dist already set for us
 		
 			if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
-				msg_to_char(ch, "%-20s - (%*d, %*d) %s\r\n", PERS(i, ch, 0), X_PRECISION, X_COORD(IN_ROOM(i)), Y_PRECISION, Y_COORD(IN_ROOM(i)), get_room_name(IN_ROOM(i), FALSE));
+				check_x = X_COORD(IN_ROOM(i));	// not all locations are on the map
+				check_y = Y_COORD(IN_ROOM(i));
+				
+				if (CHECK_MAP_BOUNDS(check_x, check_y) && !RMT_FLAGGED(IN_ROOM(i), RMT_NO_LOCATION)) {
+					msg_to_char(ch, "%-20s - (%*d, %*d) %s, %d tile%s %s\r\n", PERS(i, ch, 0), X_PRECISION, check_x, Y_PRECISION, check_y, get_room_name(IN_ROOM(i), FALSE), dist, PLURAL(dist), (dir != NO_DIR ? dirs[dir] : "away"));
+				}
+				else {
+					msg_to_char(ch, "%-20s - (unknown) %s, %d tile%s %s\r\n", PERS(i, ch, 0), get_room_name(IN_ROOM(i), FALSE), dist, PLURAL(dist), (dir != NO_DIR ? dirs[dir] : "away"));
+				}
 			}
 			else {
-				msg_to_char(ch, "%-20s - %s\r\n", PERS(i, ch, 0), get_room_name(IN_ROOM(i), FALSE));
+				msg_to_char(ch, "%-20s - %s, %d tile%s %s\r\n", PERS(i, ch, 0), get_room_name(IN_ROOM(i), FALSE), dist, PLURAL(dist), (dir != NO_DIR ? dirs[dir] : "away"));
 			}
 			gain_ability_exp(ch, ABIL_MASTER_TRACKER, 10);
 		}
 	}
 	else {			/* print only FIRST char, not all. */
+		found = NULL;
+		closest = MAP_SIZE;
 		for (i = character_list; i; i = i->next) {
-			if (i == ch || !IN_ROOM(i) || !CAN_RECOGNIZE(ch, i))
+			if (i == ch || !IN_ROOM(i) || !CAN_RECOGNIZE(ch, i) || !CAN_SEE(ch, i))
 				continue;
 			if (!multi_isname(arg, GET_PC_NAME(i)))
 				continue;
-			if (compute_distance(IN_ROOM(ch), IN_ROOM(i)) > max_distance)
+			if ((dist = compute_distance(IN_ROOM(ch), IN_ROOM(i))) > max_distance)
 				continue;
-			if (IS_ADVENTURE_ROOM(IN_ROOM(i)) && find_instance_by_room(IN_ROOM(ch)) != find_instance_by_room(IN_ROOM(i))) {
-				// not in same adventure
-				continue;
+				
+			ch_inst = find_instance_by_room(IN_ROOM(ch), FALSE);
+			i_inst = find_instance_by_room(IN_ROOM(i), FALSE);
+			if (i_inst != ch_inst || find_instance_by_room(IN_ROOM(ch), FALSE) != find_instance_by_room(IN_ROOM(i), FALSE)) {
+				// not in same adventure...
+				if (RMT_FLAGGED(IN_ROOM(ch), RMT_NO_LOCATION) || RMT_FLAGGED(IN_ROOM(i), RMT_NO_LOCATION)) {
+					// one or the other is set no-location
+					continue;
+				}
+				if (i_inst && ADVENTURE_FLAGGED(i_inst->adventure, ADV_NO_NEARBY)) {
+					// target's adventure is !nearby
+					continue;
+				}
 			}
 			if (HAS_ABILITY(i, ABIL_NO_TRACE) && IS_OUTDOORS(i)) {
 				gain_ability_exp(i, ABIL_NO_TRACE, 10);
@@ -1673,19 +1794,34 @@ void perform_mortal_where(char_data *ch, char *arg) {
 				gain_ability_exp(i, ABIL_UNSEEN_PASSING, 10);
 				continue;
 			}
+			
+			// trying to find closest
+			if (!found || dist < closest) {
+				found = i;
+				closest = dist;
+			}
+		}
 
+		if (found) {
+			dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), IN_ROOM(found)));
+			// distance is already set for us as 'closest'
+			
 			if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
-				msg_to_char(ch, "%-25s - (%*d, %*d) %s\r\n", PERS(i, ch, 0), X_PRECISION, X_COORD(IN_ROOM(i)), Y_PRECISION, Y_COORD(IN_ROOM(i)), get_room_name(IN_ROOM(i), FALSE));
+				check_x = X_COORD(IN_ROOM(found));	// not all locations are on the map
+				check_y = Y_COORD(IN_ROOM(found));
+				if (CHECK_MAP_BOUNDS(check_x, check_y) && !RMT_FLAGGED(IN_ROOM(found), RMT_NO_LOCATION)) {
+					msg_to_char(ch, "%-25s - (%*d, %*d) %s, %d tile%s %s\r\n", PERS(found, ch, FALSE), X_PRECISION, check_x, Y_PRECISION, check_y, get_room_name(IN_ROOM(found), FALSE), closest, PLURAL(closest), (dir != NO_DIR ? dirs[dir] : "away"));
+				}
+				else {
+					msg_to_char(ch, "%-25s - (unknown) %s, %d tile%s %s\r\n", PERS(found, ch, FALSE), get_room_name(IN_ROOM(found), FALSE), closest, PLURAL(closest), (dir != NO_DIR ? dirs[dir] : "away"));
+				}
 			}
 			else {
-				msg_to_char(ch, "%-25s - %s\r\n", PERS(i, ch, 0), get_room_name(IN_ROOM(i), FALSE));
+				msg_to_char(ch, "%-25s - %s, %d tile%s %s\r\n", PERS(found, ch, 0), get_room_name(IN_ROOM(found), FALSE), closest, PLURAL(closest), (dir != NO_DIR ? dirs[dir] : "away"));
 			}
 			gain_ability_exp(ch, ABIL_MASTER_TRACKER, 10);
-			found = TRUE;
-			break;
 		}
-		
-		if (!found) {
+		else {
 			send_to_char("No-one around by that name.\r\n", ch);
 		}
 	}
@@ -1693,6 +1829,8 @@ void perform_mortal_where(char_data *ch, char *arg) {
 
 
 void print_object_location(int num, obj_data *obj, char_data *ch, int recur) {
+	int check_x, check_y;
+	
 	if (num > 0) {
 		sprintf(buf, "O%3d. %-25s - ", num, GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT));
 	}
@@ -1706,7 +1844,14 @@ void print_object_location(int num, obj_data *obj, char_data *ch, int recur) {
 
 	if (IN_ROOM(obj)) {
 		if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
-			sprintf(buf + strlen(buf), "(%*d, %*d) %s\r\n", X_PRECISION, X_COORD(IN_ROOM(obj)), Y_PRECISION, Y_COORD(IN_ROOM(obj)), get_room_name(IN_ROOM(obj), FALSE));
+			check_x = X_COORD(IN_ROOM(obj));	// not all locations are on the map
+			check_y = Y_COORD(IN_ROOM(obj));
+			if (CHECK_MAP_BOUNDS(check_x, check_y)) {
+				sprintf(buf + strlen(buf), "(%*d, %*d) %s\r\n", X_PRECISION, check_x, Y_PRECISION, check_y, get_room_name(IN_ROOM(obj), FALSE));
+			}
+			else {
+				sprintf(buf + strlen(buf), "(unknown) %s\r\n", get_room_name(IN_ROOM(obj), FALSE));
+			}
 		}
 		else {
 			sprintf(buf + strlen(buf), "%s\r\n", get_room_name(IN_ROOM(obj), FALSE));
@@ -1740,7 +1885,7 @@ void perform_immort_where(char_data *ch, char *arg) {
 	register char_data *i;
 	register obj_data *k;
 	descriptor_data *d;
-	int num = 0, found = 0;
+	int check_x, check_y, num = 0, found = 0;
 
 	if (!*arg) {
 		send_to_char("Players\r\n-------\r\n", ch);
@@ -1749,10 +1894,24 @@ void perform_immort_where(char_data *ch, char *arg) {
 				i = (d->original ? d->original : d->character);
 				if (i && CAN_SEE(ch, i) && IN_ROOM(i)) {
 					if (d->original) {
-						msg_to_char(ch, "%-20s - (%*d, %*d) %s (in %s)\r\n", GET_NAME(i), X_PRECISION, X_COORD(IN_ROOM(d->character)), Y_PRECISION, Y_COORD(IN_ROOM(d->character)), get_room_name(IN_ROOM(d->character), FALSE), GET_NAME(d->character));
+						check_x = X_COORD(IN_ROOM(d->character));	// not all locations are on the map
+						check_y = Y_COORD(IN_ROOM(d->character));
+						if (CHECK_MAP_BOUNDS(check_x, check_y)) {
+							msg_to_char(ch, "%-20s - (%*d, %*d) %s (in %s)\r\n", GET_NAME(i), X_PRECISION, check_x, Y_PRECISION, check_y, get_room_name(IN_ROOM(d->character), FALSE), GET_NAME(d->character));
+						}
+						else {
+							msg_to_char(ch, "%-20s - (unknown) %s (in %s)\r\n", GET_NAME(i), get_room_name(IN_ROOM(d->character), FALSE), GET_NAME(d->character));
+						}
 					}
 					else {
-						msg_to_char(ch, "%-20s - (%*d, %*d) %s\r\n", GET_NAME(i), X_PRECISION, X_COORD(IN_ROOM(i)), Y_PRECISION, Y_COORD(IN_ROOM(i)), get_room_name(IN_ROOM(i), FALSE));
+						check_x = X_COORD(IN_ROOM(i));	// not all locations are on the map
+						check_y = Y_COORD(IN_ROOM(i));
+						if (CHECK_MAP_BOUNDS(check_x, check_y)) {
+							msg_to_char(ch, "%-20s - (%*d, %*d) %s\r\n", GET_NAME(i), X_PRECISION, check_x, Y_PRECISION, check_y, get_room_name(IN_ROOM(i), FALSE));
+						}
+						else {
+							msg_to_char(ch, "%-20s - (unknown) %s\r\n", GET_NAME(i), get_room_name(IN_ROOM(i), FALSE));
+						}
 					}
 				}
 			}
@@ -1762,7 +1921,14 @@ void perform_immort_where(char_data *ch, char *arg) {
 		for (i = character_list; i; i = i->next) {
 			if (CAN_SEE(ch, i) && IN_ROOM(i) && multi_isname(arg, GET_PC_NAME(i))) {
 				found = 1;
-				msg_to_char(ch, "M%3d. %-25s - %s(%*d, %*d) %s\r\n", ++num, GET_NAME(i), (IS_NPC(i) && i->proto_script) ? "[TRIG] " : "", X_PRECISION, X_COORD(IN_ROOM(i)), Y_PRECISION, Y_COORD(IN_ROOM(i)), get_room_name(IN_ROOM(i), FALSE));
+				check_x = X_COORD(IN_ROOM(i));	// not all locations are on the map
+				check_y = Y_COORD(IN_ROOM(i));
+				if (CHECK_MAP_BOUNDS(check_x, check_y)) {
+					msg_to_char(ch, "M%3d. %-25s - %s(%*d, %*d) %s\r\n", ++num, GET_NAME(i), (IS_NPC(i) && i->proto_script) ? "[TRIG] " : "", X_PRECISION, check_x, Y_PRECISION, check_y, get_room_name(IN_ROOM(i), FALSE));
+				}
+				else {
+					msg_to_char(ch, "M%3d. %-25s - %s(unknown) %s\r\n", ++num, GET_NAME(i), (IS_NPC(i) && i->proto_script) ? "[TRIG] " : "", get_room_name(IN_ROOM(i), FALSE));
+				}
 			}
 		}
 		for (num = 0, k = object_list; k; k = k->next) {
@@ -1786,6 +1952,8 @@ ACMD(do_exits) {
 	
 	struct room_direction_data *ex;
 	room_data *room, *to_room;
+	int check_x, check_y;
+	char coords[80];
 
 	if (subcmd == -1) {
 		room = IN_ROOM(ch);
@@ -1807,11 +1975,20 @@ ACMD(do_exits) {
 					strcat(buf2, "Too dark to tell\r\n");
 				}
 				else {
-					if (IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
-						sprintf(buf2 + strlen(buf2), "[%d] %s (%d, %d)\r\n", GET_ROOM_VNUM(to_room), get_room_name(to_room, FALSE), X_COORD(to_room), Y_COORD(to_room));
+					check_x = X_COORD(to_room);	// in case we're not on the map
+					check_y = Y_COORD(to_room);
+					if (CHECK_MAP_BOUNDS(check_x, check_y)) {
+						snprintf(coords, sizeof(coords), "(%d, %d)", check_x, check_y);
 					}
-					else if (HAS_ABILITY(ch, ABIL_NAVIGATION) && (HOME_ROOM(to_room) == to_room || !ROOM_IS_CLOSED(to_room))) {
-						sprintf(buf2 + strlen(buf2), "%s (%d, %d)\r\n", get_room_name(to_room, FALSE), X_COORD(to_room), Y_COORD(to_room));
+					else {
+						snprintf(coords, sizeof(coords), "(unknown)");
+					}
+					
+					if (IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
+						sprintf(buf2 + strlen(buf2), "[%d] %s %s\r\n", GET_ROOM_VNUM(to_room), get_room_name(to_room, FALSE), coords);
+					}
+					else if (HAS_ABILITY(ch, ABIL_NAVIGATION) && !RMT_FLAGGED(to_room, RMT_NO_LOCATION) && (HOME_ROOM(to_room) == to_room || !ROOM_IS_CLOSED(to_room)) && X_COORD(to_room) >= 0) {
+						sprintf(buf2 + strlen(buf2), "%s %s\r\n", get_room_name(to_room, FALSE), coords);
 					}
 					else {
 						sprintf(buf2 + strlen(buf2), "%s\r\n", get_room_name(to_room, FALSE));
@@ -1830,6 +2007,8 @@ ACMD(do_exits) {
 
 
 ACMD(do_scan) {
+	void scan_for_tile(char_data *ch, char *argument);
+
 	int dir;
 	
 	room_data *use_room = get_map_location_for(IN_ROOM(ch));
@@ -1837,9 +2016,9 @@ ACMD(do_scan) {
 	skip_spaces(&argument);
 	
 	if (!*argument) {
-		msg_to_char(ch, "Scan which direction?\r\n");
+		msg_to_char(ch, "Scan which direction or for what type of tile?\r\n");
 	}
-	else if (IS_ADVENTURE_ROOM(use_room) || ROOM_IS_CLOSED(use_room)) {	// check map room
+	else if (!use_room || IS_ADVENTURE_ROOM(use_room) || ROOM_IS_CLOSED(use_room)) {	// check map room
 		msg_to_char(ch, "You can only use scan out on the map.\r\n");
 	}
 	else if (!GET_BOAT(IN_ROOM(ch)) && (IS_ADVENTURE_ROOM(IN_ROOM(ch)) || ROOM_IS_CLOSED(IN_ROOM(ch)))) {
@@ -1847,7 +2026,7 @@ ACMD(do_scan) {
 		msg_to_char(ch, "Scan only works out on the map.\r\n");
 	}
 	else if ((dir = parse_direction(ch, argument)) == NO_DIR) {
-		msg_to_char(ch, "Invalid direction.\r\n");
+		scan_for_tile(ch, argument);
 	}
 	else if (dir >= NUM_2D_DIRS) {
 		msg_to_char(ch, "You can't scan that way.\r\n");

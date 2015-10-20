@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.item.c                                      EmpireMUD 2.0b2 *
+*   File: act.item.c                                      EmpireMUD 2.0b3 *
 *  Usage: object handling routines -- get/drop and container handling     *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -33,7 +33,7 @@
 *   Give Helpers
 *   Liquid Helpers
 *   Scaling
-*   Special Helpers
+*   Shipping System
 *   Trade Command Functions
 *   Warehouse Command Functions
 *   Commands
@@ -42,6 +42,7 @@
 // extern variables
 extern const char *drinks[];
 extern int drink_aff[][3];
+extern struct ship_data_struct ship_data[];
 extern const struct wear_data_type wear_data[NUM_WEARS];
 
 // extern functions
@@ -54,8 +55,12 @@ void save_trading_post();
 void trigger_distrust_from_stealth(char_data *ch, empire_data *emp);
 
 // local protos
+room_data *find_docks(empire_data *emp, int island_id);
 int get_wear_by_item_wear(bitvector_t item_wear);
+void move_ship_to_destination(empire_data *emp, struct shipping_data *shipd, room_data *to_room);
+void sail_shipment(empire_data *emp, obj_data *boat);
 void scale_item_to_level(obj_data *obj, int level);
+bool ship_is_empty(obj_data *ship);
 static void wear_message(char_data *ch, obj_data *obj, int where);
 
 // local stuff
@@ -72,7 +77,7 @@ static void wear_message(char_data *ch, obj_data *obj, int where);
 * @return bool TRUE if ch can take obj.
 */
 static bool can_take_obj(char_data *ch, obj_data *obj) {
-	if (IS_CARRYING_N(ch) + GET_OBJ_INVENTORY_SIZE(obj) > CAN_CARRY_N(ch)) {
+	if (!IS_NPC(ch) && IS_CARRYING_N(ch) + GET_OBJ_INVENTORY_SIZE(obj) > CAN_CARRY_N(ch)) {
 		act("$p: you can't carry that many items.", FALSE, ch, obj, 0, TO_CHAR);
 		return FALSE;
 	}
@@ -197,6 +202,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	char lbuf[MAX_STRING_LENGTH], location[MAX_STRING_LENGTH];
 	bld_data *bld;
 	int iter, found;
+	double rating;
 	
 	// ONLY flags to show
 	bitvector_t show_obj_flags = OBJ_LIGHT | OBJ_SUPERIOR | OBJ_ENCHANTED | OBJ_JUNK | OBJ_TWO_HANDED | OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP | OBJ_HARD_DROP | OBJ_GROUP_DROP | OBJ_GENERIC_DROP;
@@ -258,11 +264,12 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	
 	// only show gear if equippable (has more than ITEM_WEAR_TRADE)
 	if ((GET_OBJ_WEAR(obj) & ~ITEM_WEAR_TAKE) != NOBITS) {
-		msg_to_char(ch, "Gear level: %.1f", rate_item(obj));
 		if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) > 0) {
-			msg_to_char(ch, " (scaled to %d)", GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			msg_to_char(ch, "Level: %d\r\n", GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 		}
-		msg_to_char(ch, "\r\n");
+		if ((rating = rate_item(obj)) > 0) {
+			msg_to_char(ch, "Gear rating: %.1f\r\n", rating);
+		}
 		
 		prettier_sprintbit(GET_OBJ_WEAR(obj) & ~ITEM_WEAR_TAKE, wear_bits, buf);
 		msg_to_char(ch, "Can be worn on: %s\r\n", buf);
@@ -282,6 +289,8 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	
 	switch (GET_OBJ_TYPE(obj)) {
 		case ITEM_POISON: {
+			extern const struct poison_data_type poison_data[];
+			msg_to_char(ch, "Poison type: %s\r\n", poison_data[GET_POISON_TYPE(obj)].name);
 			msg_to_char(ch, "Has %d charges remaining.\r\n", GET_POISON_CHARGES(obj));
 			break;
 		}
@@ -375,11 +384,8 @@ INTERACTION_FUNC(light_obj_interact) {
 	
 	for (num = 0; num < interaction->quantity; ++num) {
 		// load
-		new = read_object(vnum);
-		
-		if (OBJ_FLAGGED(new, OBJ_SCALABLE)) {
-			scale_item_to_level(new, GET_OBJ_CURRENT_SCALE_LEVEL(inter_item));
-		}
+		new = read_object(vnum, TRUE);
+		scale_item_to_level(new, GET_OBJ_CURRENT_SCALE_LEVEL(inter_item));
 		
 		// ownership
 		new->last_owner_id = GET_IDNUM(ch);
@@ -505,6 +511,7 @@ void perform_remove(char_data *ch, int pos) {
 		
 		// this may extract it, or drop it
 		unequip_char_to_inventory(ch, pos);
+		determine_gear_level(ch);
 	}
 }
 
@@ -512,7 +519,7 @@ void perform_remove(char_data *ch, int pos) {
 static void perform_wear(char_data *ch, obj_data *obj, int where) {
 	extern const int apply_attribute[];
 	extern const int primary_attributes[];
-	int iter, app;
+	int iter, app, type, val;
 
 	/* first, make sure that the wear position is valid. */
 	if (!CAN_WEAR(obj, wear_data[where].item_wear)) {
@@ -524,17 +531,23 @@ static void perform_wear(char_data *ch, obj_data *obj, int where) {
 	if (GET_EQ(ch, where) && wear_data[where].cascade_pos != NO_WEAR) {
 		where = wear_data[where].cascade_pos;
 	}
-
-	// make sure it wouldn't drop any primary attribute below 1
+	
+	// check weakness (check all applies first, in case they contradict like -1str +2str)
 	for (iter = 0; primary_attributes[iter] != NOTHING; ++iter) {
+		type = primary_attributes[iter];
+		val = GET_ATT(ch, type);
 		for (app = 0; app < MAX_OBJ_AFFECT; app++) {
-			if (apply_attribute[(int) obj->affected[app].location] == primary_attributes[iter] && GET_ATT(ch, primary_attributes[iter]) + obj->affected[app].modifier < 1) {
-				act("You are too weak to use $p!", FALSE, ch, obj, 0, TO_CHAR);
-				return;
+			if (apply_attribute[(int) obj->affected[app].location] == type) {
+				val += obj->affected[app].modifier;
 			}
 		}
-	}
 		
+		if (val < 1) {
+			act("You are too weak to use $p!", FALSE, ch, obj, 0, TO_CHAR);
+			return;
+		}
+	}
+	
 	if (where == WEAR_SADDLE && !IS_RIDING(ch)) {
 		msg_to_char(ch, "You can't wear a saddle while you're not riding anything.\r\n");
 		return;
@@ -552,6 +565,7 @@ static void perform_wear(char_data *ch, obj_data *obj, int where) {
 
 	wear_message(ch, obj, where);
 	equip_char(ch, obj, where);
+	determine_gear_level(ch);
 }
 
 
@@ -607,8 +621,8 @@ int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname) {
 	
 	// don't let people drop bound items in other people's territory
 	if (mode != SCMD_JUNK && OBJ_BOUND_TO(obj) && ROOM_OWNER(IN_ROOM(ch)) && ROOM_OWNER(IN_ROOM(ch)) != GET_LOYALTY(ch)) {
-		msg_to_char(ch, "You can't drop bound items here.\r\n");
-		return -1;
+		act("$p: You can't drop bound items here.", FALSE, ch, obj, NULL, TO_CHAR);
+		return 0;	// don't break a drop-all
 	}
 	
 	// count items
@@ -729,44 +743,52 @@ static bool perform_get_from_container(char_data *ch, obj_data *obj, obj_data *c
 		act("$p: item is bound to someone else.", FALSE, ch, obj, NULL, TO_CHAR);
 		return TRUE;	// don't break loop
 	}
-	if (!IS_IMMORTAL(ch) && IN_ROOM(cont) && LAST_OWNER_ID(cont) != idnum && LAST_OWNER_ID(obj) != idnum && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+	if (IN_ROOM(cont) && LAST_OWNER_ID(cont) != idnum && LAST_OWNER_ID(obj) != idnum && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		stealing = TRUE;
 		
-		if (emp && !can_steal(ch, emp)) {
+		if (!IS_IMMORTAL(ch) && emp && !can_steal(ch, emp)) {
 			// sends own message
 			return FALSE;
-		}		
-	}
-	if (mode == FIND_OBJ_INV || can_take_obj(ch, obj)) {
-		if (IS_CARRYING_N(ch) + GET_OBJ_INVENTORY_SIZE(obj) > CAN_CARRY_N(ch)) {
-			act("$p: you can't hold any more items.", FALSE, ch, obj, 0, TO_CHAR);
+		}
+		if (!PRF_FLAGGED(ch, PRF_STEALTHABLE)) {
+			// can_steal() technically checks this, but it isn't always called
+			msg_to_char(ch, "You cannot steal because your 'stealthable' toggle is off.\r\n");
 			return FALSE;
 		}
-		else if (get_otrigger(obj, ch)) {
+	}
+	if (!IS_NPC(ch) && IS_CARRYING_N(ch) + GET_OBJ_INVENTORY_SIZE(obj) > CAN_CARRY_N(ch)) {
+		act("$p: you can't hold any more items.", FALSE, ch, obj, 0, TO_CHAR);
+		return FALSE;
+	}
+	if (mode == FIND_OBJ_INV || can_take_obj(ch, obj)) {
+		if (get_otrigger(obj, ch)) {
 			// last-minute scaling: scale to its minimum (adventures will override this on their own)
-			if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-				scale_item_to_level(obj, GET_OBJ_MIN_SCALE_LEVEL(obj));
-			}
+			scale_item_to_level(obj, GET_OBJ_MIN_SCALE_LEVEL(obj));
 			
 			obj_to_char(obj, ch);
 			act("You get $p from $P.", FALSE, ch, obj, cont, TO_CHAR);
 			act("$n gets $p from $P.", TRUE, ch, obj, cont, TO_ROOM);
 			
 			if (stealing) {
-				if (emp && !skill_check(ch, ABIL_STEAL, DIFF_HARD)) {
+				if (emp && IS_IMMORTAL(ch)) {
+					syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s stealing %s from %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), EMPIRE_NAME(emp));
+				}
+				else if (emp && !skill_check(ch, ABIL_STEAL, DIFF_HARD)) {
 					log_to_empire(emp, ELOG_HOSTILITY, "Theft at (%d, %d)", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
 				}
 				
-				GET_STOLEN_TIMER(obj) = time(0);
-				trigger_distrust_from_stealth(ch, emp);
-				gain_ability_exp(ch, ABIL_STEAL, 50);
+				if (!IS_IMMORTAL(ch)) {
+					GET_STOLEN_TIMER(obj) = time(0);
+					trigger_distrust_from_stealth(ch, emp);
+					gain_ability_exp(ch, ABIL_STEAL, 50);
+				}
 			}
 			
 			get_check_money(ch, obj);
 			return TRUE;
 		}
 	}
-	return FALSE;
+	return TRUE;	// return TRUE even though it failed -- don't break "get all" loops
 }
 
 
@@ -844,38 +866,50 @@ static bool perform_get_from_room(char_data *ch, obj_data *obj) {
 		act("$p: item is bound to someone else.", FALSE, ch, obj, NULL, TO_CHAR);
 		return TRUE;	// don't break loop
 	}
-	if (!IS_IMMORTAL(ch) && LAST_OWNER_ID(obj) != idnum && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+	if (LAST_OWNER_ID(obj) != idnum && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		stealing = TRUE;
 		
-		if (emp && !can_steal(ch, emp)) {
+		if (!IS_IMMORTAL(ch) && emp && !can_steal(ch, emp)) {
 			// sends own message
 			return FALSE;
 		}
+		if (!PRF_FLAGGED(ch, PRF_STEALTHABLE)) {
+			// can_steal() technically checks this, but it isn't always called
+			msg_to_char(ch, "You cannot steal because your 'stealthable' toggle is off.\r\n");
+			return FALSE;
+		}
+	}
+	if (!IS_NPC(ch) && IS_CARRYING_N(ch) + GET_OBJ_INVENTORY_SIZE(obj) > CAN_CARRY_N(ch)) {
+		act("$p: you can't hold any more items.", FALSE, ch, obj, 0, TO_CHAR);
+		return FALSE;
 	}
 	if (can_take_obj(ch, obj) && get_otrigger(obj, ch)) {
 		// last-minute scaling: scale to its minimum (adventures will override this on their own)
-		if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-			scale_item_to_level(obj, GET_OBJ_MIN_SCALE_LEVEL(obj));
-		}
+		scale_item_to_level(obj, GET_OBJ_MIN_SCALE_LEVEL(obj));
 		
 		obj_to_char(obj, ch);
 		act("You get $p.", FALSE, ch, obj, 0, TO_CHAR);
 		act("$n gets $p.", TRUE, ch, obj, 0, TO_ROOM);
 					
 		if (stealing) {
-			if (emp && !skill_check(ch, ABIL_STEAL, DIFF_HARD)) {
+			if (emp && IS_IMMORTAL(ch)) {
+				syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s stealing %s from %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), EMPIRE_NAME(emp));
+			}
+			else if (emp && !skill_check(ch, ABIL_STEAL, DIFF_HARD)) {
 				log_to_empire(emp, ELOG_HOSTILITY, "Theft at (%d, %d)", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
 			}
 			
-			GET_STOLEN_TIMER(obj) = time(0);
-			trigger_distrust_from_stealth(ch, emp);
-			gain_ability_exp(ch, ABIL_STEAL, 50);
+			if (!IS_IMMORTAL(ch)) {
+				GET_STOLEN_TIMER(obj) = time(0);
+				trigger_distrust_from_stealth(ch, emp);
+				gain_ability_exp(ch, ABIL_STEAL, 50);
+			}
 		}
 		
 		get_check_money(ch, obj);
 		return TRUE;
 	}
-	return FALSE;
+	return TRUE;	// return TRUE even though it failed -- don't break "get all" loops
 }
 
 
@@ -968,7 +1002,8 @@ static void perform_give(char_data *ch, char_data *vict, obj_data *obj) {
 		act("$p: item is bound.", FALSE, ch, obj, vict, TO_CHAR);
 		return;
 	}
-
+	
+	// NPCs usually have no carry limit, but 'give' is an exception because otherwise crazy ensues
 	if (IS_CARRYING_N(vict) + GET_OBJ_INVENTORY_SIZE(obj) > CAN_CARRY_N(vict)) {
 		act("$N seems to have $S hands full.", FALSE, ch, 0, vict, TO_CHAR);
 		return;
@@ -1189,7 +1224,7 @@ void scale_item_to_level(obj_data *obj, int level) {
 	int room_lev = 0, room_min = 0, room_max = 0, sig;
 	double share, this_share, points_to_give, per_point;
 	room_data *room = NULL;
-	obj_data *top_obj;
+	obj_data *top_obj, *proto;
 	bitvector_t bits;
 	
 	// configure this here
@@ -1199,11 +1234,6 @@ void scale_item_to_level(obj_data *obj, int level) {
 	
 	// WEAR_POS_x: modifier based on best wear type
 	const double wear_pos_modifier[] = { 0.75, 1.0 };
-
-	if (!OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-		log("SYSERR: Attempting to scale item which is not scalable or is already scaled: %s", GET_OBJ_SHORT_DESC(obj));
-		return;
-	}
 	
 	// determine any scale constraints from the room
 	top_obj = get_top_object(obj);
@@ -1244,6 +1274,17 @@ void scale_item_to_level(obj_data *obj, int level) {
 	// hard lower limit -- the stats are the same at 0 or 1, but 0 shows as "unscalable" because unscalable items have 0 scale level
 	level = MAX(1, level);
 	
+	// if it's not scalable, we can still set its scale level if the prototype is not scalable
+	// (if the prototype IS scalable, but this instance isn't, we can't rescale it this way)
+	if (!OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
+		if (GET_OBJ_VNUM(obj) != NOTHING && (proto = obj_proto(GET_OBJ_VNUM(obj))) && !OBJ_FLAGGED(proto, OBJ_SCALABLE)) {
+			GET_OBJ_CURRENT_SCALE_LEVEL(obj) = level;
+		}
+		
+		// can't do anything else here
+		return;
+	}
+	
 	// scale data
 	REMOVE_BIT(GET_OBJ_EXTRA(obj), OBJ_SCALABLE);
 	GET_OBJ_CURRENT_SCALE_LEVEL(obj) = level;
@@ -1265,7 +1306,8 @@ void scale_item_to_level(obj_data *obj, int level) {
 	
 	// first check applies, count share/bonus
 	for (iter = 0; iter < MAX_OBJ_AFFECT; ++iter) {
-		if (obj->affected[iter].location != APPLY_NONE && obj->affected[iter].location != APPLY_GREATNESS) {
+		// TODO non-scalable traits should be an array
+		if (obj->affected[iter].location != APPLY_NONE && obj->affected[iter].location != APPLY_GREATNESS && obj->affected[iter].location != APPLY_CRAFTING) {
 			SHARE_OR_BONUS(obj->affected[iter].modifier);
 		}
 	}
@@ -1429,7 +1471,8 @@ void scale_item_to_level(obj_data *obj, int level) {
 	
 	// distribute points: applies
 	for (iter = 0; iter < MAX_OBJ_AFFECT; ++iter) {
-		if (obj->affected[iter].location != APPLY_NONE && obj->affected[iter].location != APPLY_GREATNESS) {
+		// TODO non-scalable traits should be an array
+		if (obj->affected[iter].location != APPLY_NONE && obj->affected[iter].location != APPLY_GREATNESS && obj->affected[iter].location != APPLY_CRAFTING) {
 			this_share = MAX(0, MIN(share, points_to_give));
 			// raw amount
 			per_point = (1.0 / apply_values[(int)obj->affected[iter].location]);
@@ -1449,6 +1492,560 @@ void scale_item_to_level(obj_data *obj, int level) {
 	
 	// cleanup
 	#undef SHARE_OR_BONUS
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// SHIPPING SYSTEM /////////////////////////////////////////////////////////
+
+
+/**
+* Queues up a shipping order and messages the character.
+*
+* @param char_data *ch The person queueing the shipment.
+* @param empire_data *emp The empire that is shipping.
+* @param int from_island The origin island id.
+* @param int to_island The destination island id.
+* @param int number The quantity to ship.
+* @param obj_vnum vnum What item to ship.
+*/
+void add_shipping_queue(char_data *ch, empire_data *emp, int from_island, int to_island, int number, obj_vnum vnum) {
+	struct shipping_data *sd, *temp;
+	struct island_info *isle;
+	bool done;
+	
+	if (!emp || from_island == NO_ISLAND || to_island == NO_ISLAND || number < 0 || vnum == NOTHING) {
+		msg_to_char(ch, "Unable to set up shipping: invalid inpue.\r\n");
+		return;
+	}
+	
+	// try to add to existing order
+	done = FALSE;
+	for (sd = EMPIRE_SHIPPING_LIST(emp); sd && !done; sd = sd->next) {
+		if (sd->vnum != vnum) {
+			continue;
+		}
+		if (sd->from_island != from_island || sd->to_island != to_island) {
+			continue;
+		}
+		if (sd->status != SHIPPING_QUEUED) {
+			continue;
+		}
+		
+		// found one to add to!
+		sd->amount += number;
+		done = TRUE;
+		break;
+	}
+	
+	if (!done) {
+		// add shipping order
+		CREATE(sd, struct shipping_data, 1);
+		sd->vnum = vnum;
+		sd->amount = number;
+		sd->from_island = from_island;
+		sd->to_island = to_island;
+		sd->status = SHIPPING_QUEUED;
+		sd->status_time = time(0);
+		sd->ship_homeroom = NOWHERE;
+		sd->ship_origin = NOWHERE;
+		sd->next = NULL;
+		
+		// add to end
+		if ((temp = EMPIRE_SHIPPING_LIST(emp))) {
+			while (temp->next) {
+				temp = temp->next;
+			}
+			temp->next = sd;
+		}
+		else {
+			EMPIRE_SHIPPING_LIST(emp) = sd;
+		}
+	}
+	
+	// charge resources
+	charge_stored_resource(emp, from_island, vnum, number);
+	save_empire(emp);
+	
+	// messaging
+	isle = get_island(to_island, TRUE);
+	msg_to_char(ch, "You set %d '%s' to ship to %s.\r\n", number, skip_filler(get_obj_name_by_proto(vnum)), isle ? isle->name : "an unknown island");
+}
+
+
+/**
+* @param struct shipping_data *shipd The shipment.
+* @return int Time (in seconds) this shipment takes.
+*/
+int calculate_shipping_time(struct shipping_data *shipd) {
+	struct island_info *from, *to;
+	room_data *from_center, *to_center;
+	int dist, max, cost;
+	
+	from = get_island(shipd->from_island, FALSE);
+	to = get_island(shipd->to_island, FALSE);
+	
+	// unable to find islands?
+	if (!from || !to) {
+		return 0;
+	}
+	
+	from_center = real_room(from->center);
+	to_center = real_room(to->center);
+	
+	// unable to find locations?
+	if (!from_center || !to_center) {
+		return 0;
+	}
+	
+	dist = compute_distance(from_center, to_center);
+	
+	// maximum distance (further distances cost nothing): lesser of height/width
+	max = MIN(MAP_WIDTH, MAP_HEIGHT);
+	dist = MIN(dist, max);
+	
+	// time cost as a percentage of 2 real hours
+	cost = (int) (((double)dist / max) * (2.0 * SECS_PER_REAL_HOUR));
+	
+	return cost;
+}
+
+
+/**
+* Unloads a shipment at its destination island (or the origin, if it can't find
+* docks). This frees the shipment data afterwards.
+*
+* @param empire_data *emp The empire whose shipment it is.
+* @param struct shipping_data *shipd Which shipment to deliver.
+*/
+void deliver_shipment(empire_data *emp, struct shipping_data *shipd) {
+	bool have_ship = (shipd->ship_homeroom != NOWHERE);
+	struct shipping_data *iter, *temp;
+	room_data *dock;
+	
+	// mark all shipments on this ship "delivered" (if we still have a ship)
+	if (have_ship) {
+		for (iter = shipd; iter; iter = iter->next) {
+			if (iter->ship_homeroom == shipd->ship_homeroom) {
+				iter->status = SHIPPING_DELIVERED;
+			}
+		}
+	}
+	
+	if ((dock = find_docks(emp, shipd->to_island))) {
+		// unload the shipment at the destination
+		log_to_empire(emp, ELOG_SHIPPING, "%dx %s: shipped to %s", shipd->amount, get_obj_name_by_proto(shipd->vnum), get_island(shipd->to_island, TRUE)->name);
+		add_to_empire_storage(emp, shipd->to_island, shipd->vnum, shipd->amount);
+		if (have_ship) {
+			move_ship_to_destination(emp, shipd, dock);
+		}
+	}
+	else {
+		// no docks -- unload the shipment at home
+		log_to_empire(emp, ELOG_SHIPPING, "%dx %s: returned to %s", shipd->amount, get_obj_name_by_proto(shipd->vnum), get_island(shipd->from_island, TRUE)->name);
+		add_to_empire_storage(emp, shipd->from_island, shipd->vnum, shipd->amount);
+		if (have_ship) {
+			move_ship_to_destination(emp, shipd, real_room(shipd->ship_origin));
+		}
+	}
+	
+	// and delete this entry from the list
+	REMOVE_FROM_LIST(shipd, EMPIRE_SHIPPING_LIST(emp), next);
+	free(shipd);
+}
+
+
+/**
+* Finds a completed docks building on the given island, belonging to the given
+* empire. It won't find no-work docks.
+*
+* @param empire_data *emp The empire to check.
+* @param int island_id Which island to search.
+* @return room_data* The found docks room, or NULL for none.
+*/
+room_data *find_docks(empire_data *emp, int island_id) {
+	struct empire_territory_data *ter;
+	
+	if (!emp || island_id == NO_ISLAND) {
+		return NULL;
+	}
+	
+	for (ter = EMPIRE_TERRITORY_LIST(emp); ter; ter = ter->next) {
+		if (GET_ISLAND_ID(ter->room) != island_id) {
+			continue;
+		}
+		if (!ROOM_BLD_FLAGGED(ter->room, BLD_DOCKS) || !IS_COMPLETE(ter->room)) {
+			continue;
+		}
+		if (ROOM_AFF_FLAGGED(ter->room, ROOM_AFF_NO_WORK)) {
+			continue;
+		}
+				
+		return ter->room;
+	}
+	
+	return NULL;
+}
+
+
+/**
+* Finds a ship to use for a given cargo. Any ship on this island is good.
+*
+* @param empire_data *emp The empire that is shipping.
+* @param struct shipping_data *shipd The shipment.
+* @return obj_data* A ship, or NULL if none.
+*/
+obj_data *find_free_ship(empire_data *emp, struct shipping_data *shipd) {
+	struct empire_territory_data *ter;
+	struct shipping_data *iter;
+	bool already_used;
+	obj_data *obj;
+	room_data *in_ship;
+	int capacity;
+	
+	if (!emp || shipd->from_island == NO_ISLAND) {
+		return NULL;
+	}
+	
+	for (ter = EMPIRE_TERRITORY_LIST(emp); ter; ter = ter->next) {
+		if (GET_ISLAND_ID(ter->room) != shipd->from_island) {
+			continue;
+		}
+		if (!ROOM_BLD_FLAGGED(ter->room, BLD_DOCKS) || !IS_COMPLETE(ter->room)) {
+			continue;
+		}
+		if (ROOM_AFF_FLAGGED(ter->room, ROOM_AFF_NO_WORK)) {
+			continue;
+		}
+		
+		// found docks...
+		for (obj = ROOM_CONTENTS(ter->room); obj; obj = obj->next_content) {
+			if (!IS_SHIP(obj))  {
+				continue;
+			}
+			if (GET_SHIP_RESOURCES_REMAINING(obj) > 0) {
+				continue;
+			}
+			if (!(in_ship = real_room(GET_SHIP_MAIN_ROOM(obj)))) {
+				continue;
+			}
+			if (ROOM_OWNER(in_ship) != NULL && ROOM_OWNER(in_ship) != emp) {
+				continue;
+			}
+			if (ROOM_AFF_FLAGGED(in_ship, ROOM_AFF_NO_WORK)) {
+				continue;
+			}
+			
+			// calculate capacity to see if it's full, and check if it's already used for a different island
+			capacity = 0;
+			already_used = FALSE;
+			for (iter = EMPIRE_SHIPPING_LIST(emp); iter && !already_used; iter = iter->next) {
+				if (iter->ship_homeroom == GET_SHIP_MAIN_ROOM(obj)) {
+					capacity += iter->amount;
+					if (iter->from_island != shipd->from_island || iter->to_island != shipd->to_island) {
+						already_used = TRUE;
+					}
+				}
+			}
+			if (already_used || capacity >= ship_data[GET_SHIP_TYPE(obj)].cargo_size) {
+				// ship full or in use
+				continue;
+			}
+			
+			// ensure no players on board
+			if (!ship_is_empty(obj)) {
+				continue;
+			}
+			
+			// looks like we actually found one!
+			return obj;
+		}
+	}
+	
+	return NULL;
+}
+
+
+/**
+* Finds/creates a holding pen for ships during the shipping system.
+*
+* @return room_data* The ship holding pen.
+*/
+room_data *get_ship_pen(void) {
+	extern room_data *create_room();
+
+	room_data *room, *iter, *next_iter;
+	
+	HASH_ITER(interior_hh, interior_world_table, iter, next_iter) {
+		if (GET_BUILDING(iter) && GET_BLD_VNUM(GET_BUILDING(iter)) == RTYPE_SHIP_HOLDING_PEN) {
+			return iter;
+		}
+	}
+	
+	// did not find -- make one
+	room = create_room();
+	attach_building_to_room(building_proto(RTYPE_SHIP_HOLDING_PEN), room);
+	
+	return room;
+}
+
+
+/**
+* Attaches a shipment to a boat, and splits the shipment if the boat is full.
+* If you are iterating over the shipping list and have already grabbed
+* shipd->next, you should re-grab it after calling this, as split shipments
+* will be added immediately after.
+*
+* @param empire_data *emp The empire who is shipping.
+* @param struct shipping_data *shipd The 
+*/
+void load_shipment(struct empire_data *emp, struct shipping_data *shipd, obj_data *boat, bool *full) {
+	struct shipping_data *iter, *newd;
+	int capacity;
+
+	// on bad input, just tell them it was full and hope for better results next time
+	if (!emp || !shipd || !boat || GET_SHIP_TYPE(boat) == NOTHING || GET_SHIP_MAIN_ROOM(boat) == NOWHERE) {
+		*full = TRUE;
+		return;
+	}
+	
+	// calculate capacity
+	capacity = 0;
+	for (iter = EMPIRE_SHIPPING_LIST(emp); iter; iter = iter->next) {
+		if (iter->ship_homeroom == GET_SHIP_MAIN_ROOM(boat)) {
+			capacity += iter->amount;
+		}
+	}
+	
+	// this shouldn't be possible... but just in case
+	if (capacity >= ship_data[GET_SHIP_TYPE(boat)].cargo_size) {
+		*full = TRUE;
+		return;
+	}
+	
+	// ship full? need to split
+	if (capacity + shipd->amount > ship_data[GET_SHIP_TYPE(boat)].cargo_size) {
+		CREATE(newd, struct shipping_data, 1);
+		newd->vnum = shipd->vnum;
+		newd->amount = shipd->amount - (ship_data[GET_SHIP_TYPE(boat)].cargo_size - capacity);	// only what's left
+		newd->from_island = shipd->from_island;
+		newd->to_island = shipd->to_island;
+		newd->status = SHIPPING_QUEUED;
+		newd->status_time = shipd->status_time;
+		newd->ship_homeroom = NOWHERE;
+		newd->ship_origin = NOWHERE;
+		
+		// put right after shipd in the list
+		newd->next = shipd->next;
+		shipd->next = newd;
+		
+		// remove overage
+		shipd->amount = ship_data[GET_SHIP_TYPE(boat)].cargo_size - capacity;
+		*full = TRUE;
+	}
+	else {
+		*full = ((shipd->amount + capacity) >= ship_data[GET_SHIP_TYPE(boat)].cargo_size);
+	}
+	
+	// mark it as attached to this boat
+	shipd->ship_homeroom = GET_SHIP_MAIN_ROOM(boat);
+}
+
+
+/**
+* This function attempts to find the ship for a particular shipment, and send
+* it to the room of your choice (may be the destination OR origin). The
+* shipment's ship homeroom will be set to NOWHERE, to avoid re-moving ships.
+*
+* @param empire_data *emp The empire whose shipment it is.
+* @param struct shipping_data *shipd The shipment data.
+* @param room_data *to_room Which room to send it to.
+*/
+void move_ship_to_destination(empire_data *emp, struct shipping_data *shipd, room_data *to_room) {
+	struct shipping_data *iter;
+	room_data *ship_room;
+	obj_data *boat;
+	room_vnum old;
+
+	// sanity
+	if (!emp || !shipd || !to_room || shipd->ship_homeroom == NOWHERE) {
+		return;
+	}
+	
+	// find ship's home room
+	if (!(ship_room = real_real_room(shipd->ship_homeroom))) {
+		shipd->ship_homeroom = NOWHERE;
+		return;
+	}
+	
+	// find the ship itself
+	if (!(boat = GET_BOAT(ship_room))) {
+		shipd->ship_homeroom = NOWHERE;
+		return;
+	}
+	
+	act("$p sails away.", FALSE, NULL, boat, NULL, TO_ROOM);
+	obj_to_room(boat, to_room);
+	act("$p sails in.", FALSE, NULL, boat, NULL, TO_ROOM);
+	
+	// remove the ship homeroom from all shipments that were on this ship (including this one)
+	old = shipd->ship_homeroom;
+	for (iter = EMPIRE_SHIPPING_LIST(emp); iter; iter = iter->next) {
+		if (iter->ship_homeroom == old) {
+			iter->ship_homeroom = NOWHERE;
+		}
+	}
+}
+
+
+/**
+* Run one shipping cycle for an empire. This runs every 12 game hours -- at
+* 7am and 7pm.
+*
+* @param empire_data *emp The empire to run.
+*/
+void process_shipping_one(empire_data *emp) {
+	struct shipping_data *shipd, *next_shipd;
+	obj_data *last_ship = NULL;
+	bool full, changed = FALSE;
+	int last_from = NO_ISLAND, last_to = NO_ISLAND;
+	
+	for (shipd = EMPIRE_SHIPPING_LIST(emp); shipd; shipd = next_shipd) {
+		next_shipd = shipd->next;
+		
+		switch (shipd->status) {
+			case SHIPPING_QUEUED: {
+				if (!last_ship || last_from != shipd->from_island || last_to != shipd->to_island) {
+					// attempt to find a(nother) ship
+					last_ship = find_free_ship(emp, shipd);
+					last_from = shipd->from_island;
+					last_to = shipd->to_island;
+				}
+				
+				// this only works if we found a ship to use (or had a free one)
+				if (last_ship) {
+					changed = TRUE;
+					load_shipment(emp, shipd, last_ship, &full);
+
+					// update next_shipd in case shipd was split (from full ship)
+					next_shipd = shipd->next;
+					
+					if (full) {
+						sail_shipment(emp, last_ship);
+						last_ship = NULL;
+					}
+				}
+				break;
+			}
+			case SHIPPING_EN_ROUTE: {
+				if (time(0) > shipd->status_time + calculate_shipping_time(shipd)) {
+					deliver_shipment(emp, shipd);
+					changed = TRUE;
+				}
+				break;
+			}
+			case SHIPPING_DELIVERED: {
+				deliver_shipment(emp, shipd);
+				changed = TRUE;
+				break;
+			}
+		}
+	}
+	
+	// check for unsailed ships
+	for (shipd = EMPIRE_SHIPPING_LIST(emp); shipd; shipd = next_shipd) {
+		next_shipd = shipd->next;
+		
+		if (shipd->status == SHIPPING_QUEUED && shipd->ship_homeroom != NOWHERE) {
+			room_data *deck = real_room(shipd->ship_homeroom);
+			obj_data *boat = deck ? GET_BOAT(deck) : NULL;
+			if (boat) {
+				sail_shipment(emp, boat);
+			}
+		}
+	}
+	
+	if (changed) {
+		save_empire(emp);
+	}
+}
+
+
+/**
+* Runs a shipping cycle for all empires. This runs every 12 game hours -- at
+* 7am and 7pm.
+*/
+void process_shipping(void) {
+	empire_data *emp, *next_emp;
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		if (EMPIRE_SHIPPING_LIST(emp)) {
+			process_shipping_one(emp);
+		}
+	}
+}
+
+
+/**
+* Puts the ship out to sea (in the holding pen), and ensures all its contents
+* are marked en-route.
+*
+* @param empire_data *emp The empire sending the shipment.
+* @param obj_data *boat The ship object.
+*/
+void sail_shipment(empire_data *emp, obj_data *boat) {
+	struct shipping_data *iter;
+
+	// sanity
+	if (!emp|| !boat || GET_SHIP_MAIN_ROOM(boat) == NOWHERE) {
+		return;
+	}
+	
+	// verify contents
+	for (iter = EMPIRE_SHIPPING_LIST(emp); iter; iter = iter->next) {
+		if (iter->ship_homeroom == GET_SHIP_MAIN_ROOM(boat)) {
+			iter->status = SHIPPING_EN_ROUTE;
+			iter->status_time = time(0);
+			iter->ship_origin = GET_ROOM_VNUM(IN_ROOM(boat));
+		}
+	}
+	
+	act("$p sails away.", FALSE, NULL, boat, NULL, TO_ROOM);
+	obj_to_room(boat, get_ship_pen());
+	act("$p sails in.", FALSE, NULL, boat, NULL, TO_ROOM);
+}
+
+
+/**
+* Determines if a ship has any players in it.
+*
+* @param obj_data *ship The ship to check.
+* @return bool TRUE if the ship is empty, FALSE if it has players inside.
+*/
+bool ship_is_empty(obj_data *ship) {
+	room_data *ship_room, *iter, *next_iter;
+	char_data *ch;
+	
+	if (!ship || !IS_SHIP(ship) || !(ship_room = real_room(GET_SHIP_MAIN_ROOM(ship)))) {
+		return FALSE;
+	}
+	
+	// check all interior rooms
+	HASH_ITER(interior_hh, interior_world_table, iter, next_iter) {
+		if (HOME_ROOM(iter) != ship_room) {
+			continue;
+		}
+		
+		for (ch = ROOM_PEOPLE(iter); ch; ch = ch->next_in_room) {
+			if (!IS_NPC(ch)) {
+				// not empty!
+				return FALSE;
+			}
+		}
+	}
+	
+	// didn't find anybody
+	return TRUE;
 }
 
 
@@ -1512,7 +2109,7 @@ void trade_check(char_data *ch, char *argument) {
 			*scale = '\0';
 		}
 		
-		snprintf(line, sizeof(line), "%s%2d. %s: %d coin%s [%.1f]%s%s&0\r\n", IS_SET(tpd->state, TPD_EXPIRED) ? "&r" : "", ++count, GET_OBJ_SHORT_DESC(tpd->obj), tpd->buy_cost, PLURAL(tpd->buy_cost), rate_item(tpd->obj), scale, IS_SET(tpd->state, TPD_EXPIRED) ? " (expired)" : "");
+		snprintf(line, sizeof(line), "%s%2d. %s: %d coin%s%s%s&0\r\n", IS_SET(tpd->state, TPD_EXPIRED) ? "&r" : "", ++count, GET_OBJ_SHORT_DESC(tpd->obj), tpd->buy_cost, PLURAL(tpd->buy_cost), scale, IS_SET(tpd->state, TPD_EXPIRED) ? " (expired)" : "");
 		
 		if (size + strlen(line) < sizeof(output)) {
 			size += snprintf(output + size, sizeof(output) - size, "%s", line);
@@ -1593,7 +2190,7 @@ void trade_list(char_data *ch, char *argument) {
 			*exchange = '\0';
 		}
 		
-		snprintf(line, sizeof(line), "%s%2d. %s: %d%s %s [%.1f]%s%s%s%s%s&0\r\n", (tpd->player == GET_IDNUM(ch)) ? "&r" : (can_wear ? "" : "&R"), ++count, GET_OBJ_SHORT_DESC(tpd->obj), tpd->buy_cost, exchange, (coin_emp ? EMPIRE_ADJECTIVE(coin_emp) : "misc"), rate_item(tpd->obj), scale, (OBJ_FLAGGED(tpd->obj, OBJ_SUPERIOR) ? " (sup)" : ""), OBJ_FLAGGED(tpd->obj, OBJ_ENCHANTED) ? " (ench)" : "", (tpd->player == GET_IDNUM(ch)) ? " (your auction)" : "", can_wear ? "" : " (can't use)");
+		snprintf(line, sizeof(line), "%s%2d. %s: %d%s %s%s%s%s%s%s&0\r\n", (tpd->player == GET_IDNUM(ch)) ? "&r" : (can_wear ? "" : "&R"), ++count, GET_OBJ_SHORT_DESC(tpd->obj), tpd->buy_cost, exchange, (coin_emp ? EMPIRE_ADJECTIVE(coin_emp) : "misc"), scale, (OBJ_FLAGGED(tpd->obj, OBJ_SUPERIOR) ? " (sup)" : ""), OBJ_FLAGGED(tpd->obj, OBJ_ENCHANTED) ? " (ench)" : "", (tpd->player == GET_IDNUM(ch)) ? " (your auction)" : "", can_wear ? "" : " (can't use)");
 		
 		if (size + strlen(line) < sizeof(output)) {
 			size += snprintf(output + size, sizeof(output) - size, "%s", line);
@@ -1915,7 +2512,7 @@ void trade_post(char_data *ch, char *argument) {
 	
 	if (!*itemarg || !*costarg) {
 		msg_to_char(ch, "Usage: trade post <item> <cost> [time]\r\n");
-		msg_to_char(ch, "It costs 1 coin per gear level to post an item (minimum 1; refundable).\r\n");
+		msg_to_char(ch, "It costs 1 coin per gear rating to post an item (minimum 1; refundable).\r\n");
 		msg_to_char(ch, "The item must be in your inventory. Cost is number of your empire's coins.\r\n");
 		msg_to_char(ch, "Time is in real hours (default: %d).\r\n", config_get_int("trading_post_max_hours"));
 	}
@@ -1927,6 +2524,12 @@ void trade_post(char_data *ch, char *argument) {
 	}
 	else if (IS_STOLEN(obj)) {
 		msg_to_char(ch, "You can't post stolen items.\r\n");
+	}
+	else if (OBJ_FLAGGED(obj, OBJ_JUNK)) {
+		msg_to_char(ch, "You can't post junk for sale.\r\n");
+	}
+	else if (GET_OBJ_TIMER(obj) > 0) {
+		msg_to_char(ch, "You can't post items with timers on them for sale.\r\n");
 	}
 	else if ((cost = atoi(costarg)) < 1) {
 		msg_to_char(ch, "You must charge at least 1 coin.\r\n");
@@ -2175,6 +2778,10 @@ void warehouse_retrieve(char_data *ch, char *argument) {
 		return;
 	}
 	if (!imm_access && ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_VAULT) && !has_permission(ch, PRIV_WITHDRAW)) {
+		msg_to_char(ch, "You don't have permission to withdraw items here.\r\n");
+		return;
+	}
+	if (!imm_access && ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_WAREHOUSE) && !has_permission(ch, PRIV_WAREHOUSE)) {
 		msg_to_char(ch, "You don't have permission to withdraw items here.\r\n");
 		return;
 	}
@@ -3395,7 +4002,7 @@ ACMD(do_pour) {
 			return;
 		}
 		if (!*arg2) {		/* no 2nd argument */
-			if (IS_COMPLETE(IN_ROOM(ch)) && ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_DRINK | BLD_TAVERN)) {
+			if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_DRINK) || find_flagged_sect_within_distance_from_char(ch, SECTF_DRINK, NOBITS, 1) || (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_DRINK | BLD_TAVERN) && IS_COMPLETE(IN_ROOM(ch)))) {
 				fill_from_room(ch, to_obj);
 				return;
 			}
@@ -3716,6 +4323,10 @@ ACMD(do_retrieve) {
 		msg_to_char(ch, "You can't store or retrieve resources unless you're a member of an empire.\r\n");
 		return;
 	}
+	if (GET_RANK(ch) < EMPIRE_PRIV(emp, PRIV_STORAGE)) {
+		msg_to_char(ch, "You aren't high enough rank to retrieve from the empire inventory.\r\n");
+		return;
+	}
 	if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) || (room_emp && emp != room_emp && !has_relationship(emp, room_emp, DIPL_TRADE))) {
 		msg_to_char(ch, "You need to establish a trade pact to retrieve anything here.\r\n");
 		return;
@@ -3771,7 +4382,7 @@ ACMD(do_retrieve) {
 
 			if ((objn = obj_proto(store->vnum)) && obj_can_be_stored(objn, IN_ROOM(ch))) {
 				if (stored_item_requires_withdraw(objn) && !has_permission(ch, PRIV_WITHDRAW)) {
-					msg_to_char(ch, "You can't withdraw that!\r\n");
+					msg_to_char(ch, "You don't have permission to withdraw that!\r\n");
 					return;
 				}
 				else {
@@ -3801,7 +4412,7 @@ ACMD(do_retrieve) {
 					found = 1;
 					
 					if (stored_item_requires_withdraw(objn) && !has_permission(ch, PRIV_WITHDRAW)) {
-						msg_to_char(ch, "You can't withdraw that!\r\n");
+						msg_to_char(ch, "You don't have permission to withdraw that!\r\n");
 						return;
 					}
 					else {
@@ -3826,11 +4437,17 @@ ACMD(do_retrieve) {
 	if (count == 0) {
 		msg_to_char(ch, "There is nothing stored here!\r\n");
 	}
+	else {
+		// remove the "ceded" bit on this room (it was used)
+		if (GET_LOYALTY(ch) == room_emp) {
+			remove_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CEDED);
+		}
 
-	/* save the empire */
-	SAVE_CHAR(ch);
-	save_empire(emp);
-	read_vault(emp);
+		/* save the empire */
+		SAVE_CHAR(ch);
+		save_empire(emp);
+		read_vault(emp);
+	}
 }
 
 
@@ -3913,6 +4530,151 @@ ACMD(do_sheathe) {
 
 	obj_to_char(unequip_char(ch, WEAR_WIELD), ch);
 	perform_wear(ch, obj, loc);
+}
+
+
+ACMD(do_ship) {
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH * 3], line[1000], keywords[MAX_INPUT_LENGTH];
+	struct island_info *from_isle, *to_isle;
+	struct empire_storage_data *store;
+	struct shipping_data *sd, *temp;
+	bool done, gave_number = FALSE;
+	obj_data *proto;
+	int number = 1;
+	size_t size;
+	
+	// SHIPPING_x
+	const char *status_type[] = { "waiting for ship", "en route", "delivered", "\n" };
+	
+	argument = any_one_word(argument, arg1);	// command
+	argument = any_one_word(argument, arg2);	// number or keywords
+	skip_spaces(&argument);	// keywords
+	
+	if (isdigit(*arg2)) {
+		number = atoi(arg2);
+		gave_number = TRUE;
+		snprintf(keywords, sizeof(keywords), "%s", argument);
+	}
+	else {
+		// concatenate arg2 and argument back together, it's just keywords
+		snprintf(keywords, sizeof(keywords), "%s%s%s", arg2, *argument ? " " : "", argument);
+	}
+	
+	if (IS_NPC(ch) || !GET_LOYALTY(ch) || !ch->desc) {
+		msg_to_char(ch, "You can't use the shipping system unless you're in an empire.\r\n");
+	}
+	else if (GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_SHIPPING)) {
+		msg_to_char(ch, "You don't have permission to ship anything.\r\n");
+	}
+	else if (!*arg1) {
+		msg_to_char(ch, "Usage: ship status\r\n");
+		msg_to_char(ch, "Usage: ship cancel [number] <item>\r\n");
+		msg_to_char(ch, "Usage: ship <island> [number] <item>\r\n");
+	}
+	else if (!str_cmp(arg1, "status") || !str_cmp(arg1, "stat")) {
+		size = snprintf(buf, sizeof(buf), "Shipping queue for %s:\r\n", EMPIRE_NAME(GET_LOYALTY(ch)));
+		
+		done = FALSE;
+		for (sd = EMPIRE_SHIPPING_LIST(GET_LOYALTY(ch)); sd; sd = sd->next) {
+			if (!(proto = obj_proto(sd->vnum))) {
+				continue;
+			}
+			if (*keywords && !multi_isname(keywords, GET_OBJ_KEYWORDS(proto))) {
+				// skip non-matching keywords, if-requested
+				continue;
+			}
+			
+			from_isle = get_island(sd->from_island, TRUE);
+			to_isle = get_island(sd->to_island, TRUE);
+			snprintf(line, sizeof(line), " %dx %s (%s to %s, %s)\r\n", sd->amount, skip_filler(GET_OBJ_SHORT_DESC(proto)), from_isle ? from_isle->name : "unknown", to_isle ? to_isle->name : "unknown", status_type[sd->status]);
+			done = TRUE;
+			
+			if (size + strlen(line) >= sizeof(buf)) {
+				// too long
+				size += snprintf(buf + size, sizeof(buf) - size, " ...\r\n");
+				break;
+			}
+			else {
+				size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
+			}
+		}
+		
+		if (!done) {
+			size += snprintf(buf + size, sizeof(buf) - size, " nothing\r\n");
+		}
+		
+		page_string(ch->desc, buf, TRUE);
+	}
+	else if (GET_ISLAND_ID(IN_ROOM(ch)) == NO_ISLAND) {
+		msg_to_char(ch, "You can't ship anything from here.\r\n");
+	}
+	else if (!str_cmp(arg1, "cancel")) {
+		if (!*keywords) {
+			msg_to_char(ch, "Cancel which shipment?\r\n");
+			return;
+		}
+		
+		// find a matching entry
+		done = FALSE;
+		for (sd = EMPIRE_SHIPPING_LIST(GET_LOYALTY(ch)); sd; sd = sd->next) {
+			if (sd->status != SHIPPING_QUEUED || sd->ship_homeroom != NOWHERE) {
+				continue;	// never cancel one in progress
+			}
+			if (sd->from_island != GET_ISLAND_ID(IN_ROOM(ch))) {
+				continue;
+			}
+			if (gave_number && number != sd->amount) {
+				continue;
+			}
+			if (!(proto = obj_proto(sd->vnum))) {
+				continue;
+			}
+			if (!multi_isname(keywords, GET_OBJ_KEYWORDS(proto))) {
+				continue;
+			}
+			
+			// found!
+			msg_to_char(ch, "You cancel the shipment for %d '%s'.\r\n", sd->amount, skip_filler(GET_OBJ_SHORT_DESC(proto)));
+			add_to_empire_storage(GET_LOYALTY(ch), sd->from_island, sd->vnum, sd->amount);
+			
+			REMOVE_FROM_LIST(sd, EMPIRE_SHIPPING_LIST(GET_LOYALTY(ch)), next);
+			free(sd);
+			save_empire(GET_LOYALTY(ch));
+			
+			done = TRUE;
+			break;	// only allow 1st match
+		}
+		
+		if (!done) {
+			msg_to_char(ch, "No shipments like that found to cancel.\r\n");
+		}
+	}
+	else {
+		if (number < 1 || !*keywords) {
+			msg_to_char(ch, "Usage: ship <island> [number] <item>\r\n");
+		}
+		else if (!find_docks(GET_LOYALTY(ch), GET_ISLAND_ID(IN_ROOM(ch)))) {
+			msg_to_char(ch, "This island has no docks (docks must not be set no-work).\r\n");
+		}
+		else if (!(to_isle = get_island_by_name(arg1)) && !(to_isle = get_island_by_coords(arg1))) {
+			msg_to_char(ch, "Unknown target island \"%s\".\r\n", arg1);
+		}
+		else if (to_isle->id == GET_ISLAND_ID(IN_ROOM(ch))) {
+			msg_to_char(ch, "You are already on that island.\r\n");
+		}
+		else if (!(store = find_island_storage_by_keywords(GET_LOYALTY(ch), GET_ISLAND_ID(IN_ROOM(ch)), keywords))) {
+			msg_to_char(ch, "You don't seem to have any '%s' stored on this island to ship.\r\n", keywords);
+		}
+		else if (store->amount < number) {
+			msg_to_char(ch, "You only have %d '%s' stored on this island.\r\n", store->amount, skip_filler(get_obj_name_by_proto(store->vnum)));
+		}
+		else if (!find_docks(GET_LOYALTY(ch), to_isle->id)) {
+			msg_to_char(ch, "%s has no docks (docks must not be set no-work).\r\n", to_isle->name);
+		}
+		else {
+			add_shipping_queue(ch, GET_LOYALTY(ch), GET_ISLAND_ID(IN_ROOM(ch)), to_isle->id, number, store->vnum);
+		}
+	}
 }
 
 
@@ -4070,11 +4832,18 @@ ACMD(do_store) {
 			}
 		}
 	}
+	
+	if (done > 0) {
+		// remove the "ceded" bit on this room
+		if (GET_LOYALTY(ch) == room_emp) {
+			remove_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CEDED);
+		}
 
-	/* save the empire */
-	SAVE_CHAR(ch);
-	save_empire(emp);
-	read_vault(emp);
+		/* save the empire */
+		SAVE_CHAR(ch);
+		save_empire(emp);
+		read_vault(emp);
+	}
 }
 
 

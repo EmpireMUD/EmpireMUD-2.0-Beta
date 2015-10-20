@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: interpreter.c                                   EmpireMUD 2.0b2 *
+*   File: interpreter.c                                   EmpireMUD 2.0b3 *
 *  Usage: parse user commands, search for specials, call ACMD functions   *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -38,8 +38,6 @@
 */
 
 // external funcs
-void echo_on(descriptor_data *d);
-void echo_off(descriptor_data *d);
 
 // locals
 void set_creation_state(descriptor_data *d, int state);
@@ -50,6 +48,8 @@ void show_bonus_trait_menu(char_data *ch);
 //// COMMAND PROTOTYPES //////////////////////////////////////////////////////
 
 ACMD(do_abandon);
+ACMD(do_accept);
+ACMD(do_addnotes);
 ACMD(do_admin_util);
 ACMD(do_advance);
 ACMD(do_adventure);
@@ -219,6 +219,7 @@ ACMD(do_interlink);
 ACMD(do_inventory);
 ACMD(do_invis);
 ACMD(do_island);
+ACMD(do_islands);
 
 ACMD(do_jab);
 
@@ -263,6 +264,7 @@ ACMD(do_nodismantle);
 ACMD(do_noskill);
 
 ACMD(do_olc);
+ACMD(do_oset);
 ACMD(do_order);
 ACMD(do_outrage);
 
@@ -337,6 +339,7 @@ ACMD(do_shadowcage);
 ACMD(do_shadowstep);
 ACMD(do_shear);
 ACMD(do_sheathe);
+ACMD(do_ship);
 ACMD(do_shoot);
 ACMD(do_show);
 ACMD(do_siphon);
@@ -412,7 +415,6 @@ ACMD(do_warehouse);
 ACMD(do_weaken);
 ACMD(do_wear);
 ACMD(do_weather);
-ACMD(do_weave);
 ACMD(do_where);
 ACMD(do_whereami);
 ACMD(do_who);
@@ -434,6 +436,7 @@ ACMD(do_mkill);
 ACMD(do_mjunk);
 ACMD(do_mdoor);
 ACMD(do_mechoaround);
+ACMD(do_mechoneither);
 ACMD(do_msend);
 ACMD(do_mecho);
 ACMD(do_mload);
@@ -444,6 +447,8 @@ ACMD(do_mat);
 ACMD(do_mdamage);
 ACMD(do_mdot);
 ACMD(do_mteleport);
+ACMD(do_mterracrop);
+ACMD(do_mterraform);
 ACMD(do_mforce);
 ACMD(do_mhunt);
 ACMD(do_mremember);
@@ -508,9 +513,15 @@ cpp_extern const struct command_info cmd_info[] = {
 
 	/* now, the main list */
 	SIMPLE_CMD( "/", POS_DEAD, do_slash_channel, NO_MIN, CTYPE_COMM ),
+
+	// . is "olc" for imms but "bookedit" for mortals
+	GRANT_CMD( ".", POS_DEAD, do_olc, LVL_BUILDER, CTYPE_OLC, GRANT_OLC ),
+	SCMD_CMD( ".", POS_STANDING, do_library, LVL_APPROVED, CTYPE_UTIL, SCMD_BOOKEDIT ),
 	
 	SIMPLE_CMD( "at", POS_DEAD, do_at, LVL_START_IMM, CTYPE_IMMORTAL ),
+	SCMD_CMD( "accept", POS_DEAD, do_accept, NO_MIN, CTYPE_UTIL, SCMD_ACCEPT ),
 	SIMPLE_CMD( "adventure", POS_RESTING, do_adventure, NO_MIN, CTYPE_UTIL ),
+	GRANT_CMD( "addnotes", POS_STANDING, do_addnotes, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_EDITNOTES ),
 	GRANT_CMD( "advance", POS_DEAD, do_advance, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_ADVANCE ),
 	SIMPLE_CMD( "alias", POS_DEAD, do_alias, NO_MIN, CTYPE_UTIL ),
 	ABILITY_CMD( "alacrity", POS_RESTING, do_alacrity, NO_MIN, CTYPE_SKILL, ABIL_ALACRITY ),
@@ -641,7 +652,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "edelete", POS_DEAD, do_edelete, LVL_CIMPL, GRANT_EMPIRES, NO_SCMD, CTYPE_EMPIRE, CMD_NO_ABBREV, NO_ABIL ),
 
 	SCMD_CMD( "fill", POS_STANDING, do_pour, NO_MIN, CTYPE_UTIL, SCMD_FILL ),
-	ABILITY_CMD( "familiar", POS_STANDING, do_familiar, NO_MIN, CTYPE_SKILL, ABIL_FAMILIAR ),
+	SIMPLE_CMD( "familiar", POS_STANDING, do_familiar, NO_MIN, CTYPE_SKILL ),
 	SIMPLE_CMD( "feed", POS_STANDING, do_feed, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "file", POS_DEAD, do_file, LVL_START_IMM, CTYPE_IMMORTAL ),
 	STANDARD_CMD( "fillin", POS_STANDING, do_fillin, LVL_APPROVED, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
@@ -706,6 +717,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "interlink", POS_STANDING, do_interlink, NO_MIN, CTYPE_BUILD ),
 	SIMPLE_CMD( "invis", POS_DEAD, do_invis, LVL_GOD, CTYPE_IMMORTAL ),
 	GRANT_CMD( "island", POS_DEAD, do_island, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_ISLAND ),
+	SIMPLE_CMD( "islands", POS_DEAD, do_islands, LVL_APPROVED, CTYPE_EMPIRE ),
 
 	ABILITY_CMD( "jab", POS_FIGHTING, do_jab, NO_MIN, CTYPE_COMBAT, ABIL_JAB ),
 	SCMD_CMD( "junk", POS_RESTING, do_drop, NO_MIN, CTYPE_UTIL, SCMD_JUNK ),
@@ -758,13 +770,13 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "notitle", POS_DEAD, do_wizutil, LVL_CIMPL, CTYPE_IMMORTAL, SCMD_NOTITLE ),
 
 	SIMPLE_CMD( "order", POS_RESTING, do_order, NO_MIN, CTYPE_COMM ),
+	GRANT_CMD( "oset", POS_DEAD, do_oset, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_OSET ),
 	SCMD_CMD( "open", POS_SITTING, do_gen_door, NO_MIN, CTYPE_MOVE, SCMD_OPEN ),
 	SCMD_CMD( "oocsay", POS_RESTING, do_say, NO_MIN, CTYPE_COMM, SCMD_OOCSAY ),
 	SCMD_CMD( "osay", POS_RESTING, do_say, NO_MIN, CTYPE_COMM, SCMD_OOCSAY ),
 	SCMD_CMD( "\"", POS_RESTING, do_say, NO_MIN, CTYPE_COMM, SCMD_OOCSAY ),
 	ABILITY_CMD( "outrage", POS_FIGHTING, do_outrage, NO_MIN, CTYPE_COMBAT, ABIL_OUTRAGE ),
 	GRANT_CMD( "olc", POS_DEAD, do_olc, LVL_BUILDER, CTYPE_OLC, GRANT_OLC ),
-	GRANT_CMD( ".", POS_DEAD, do_olc, LVL_BUILDER, CTYPE_OLC, GRANT_OLC ),
 
 	SIMPLE_CMD( "put", POS_RESTING, do_put, NO_MIN, CTYPE_MOVE ),
 	GRANT_CMD( "page", POS_DEAD, do_page, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_PAGE ),
@@ -809,6 +821,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "reforge", POS_STANDING, do_reforge, NO_MIN, NO_GRANTS, SCMD_REFORGE, CTYPE_SKILL, NOBITS, ABIL_REFORGE ),
 	ABILITY_CMD( "regenerate", POS_MORTALLYW, do_regenerate, NO_MIN, CTYPE_COMBAT, ABIL_REGENERATE ),
 	ABILITY_CMD( "rejuvenate", POS_FIGHTING, do_rejuvenate, NO_MIN, CTYPE_SKILL, ABIL_REJUVENATE ),
+	SCMD_CMD( "reject", POS_DEAD, do_accept, NO_MIN, CTYPE_UTIL, SCMD_REJECT ),
 	GRANT_CMD( "reload", POS_DEAD, do_reload, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_RELOAD ),
 	SIMPLE_CMD( "remove", POS_RESTING, do_remove, NO_MIN, CTYPE_COMM ),
 	GRANT_CMD( "rescale", POS_RESTING, do_rescale, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_RESCALE ),
@@ -848,6 +861,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	ABILITY_CMD( "shadowstep", POS_STANDING, do_shadowstep, NO_MIN, CTYPE_MOVE, ABIL_SHADOWSTEP ),
 	STANDARD_CMD( "shear", POS_STANDING, do_shear, LVL_APPROVED, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "sheathe", POS_RESTING, do_sheathe, NO_MIN, CTYPE_COMBAT ),
+	SIMPLE_CMD( "ship", POS_RESTING, do_ship, LVL_APPROVED, CTYPE_EMPIRE ),
 	SIMPLE_CMD( "shoot", POS_STANDING, do_shoot, NO_MIN, CTYPE_COMBAT ),
 	SCMD_CMD( "shout", POS_RESTING, do_pub_comm, NO_MIN, CTYPE_COMM, SCMD_SHOUT ),
 	SIMPLE_CMD( "show", POS_DEAD, do_show, LVL_START_IMM, CTYPE_IMMORTAL ),
@@ -896,7 +910,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "tellhistory", POS_DEAD, do_history, NO_MIN, CTYPE_COMM, CHANNEL_HISTORY_TELLS ),
 	ABILITY_CMD( "terrify", POS_FIGHTING, do_terrify, NO_MIN, CTYPE_COMBAT, ABIL_TERRIFY ),
 	SIMPLE_CMD( "territory", POS_DEAD, do_territory, LVL_APPROVED, CTYPE_EMPIRE ),
-	SIMPLE_CMD( "throw", POS_FIGHTING, do_throw, LVL_APPROVED, CTYPE_COMBAT ),
+	STANDARD_CMD( "throw", POS_FIGHTING, do_throw, LVL_APPROVED, NO_GRANTS, NO_SCMD, CTYPE_COMBAT, CMD_NO_ANIMALS, NO_ABIL ),
 	STANDARD_CMD( "thaw", POS_DEAD, do_wizutil, LVL_CIMPL, GRANT_FREEZE, SCMD_THAW, CTYPE_IMMORTAL, CMD_NO_ANIMALS, NO_ABIL ),
 	SCMD_CMD( "tie", POS_STANDING, do_tie, NO_MIN, CTYPE_COMBAT, FALSE ),
 	SIMPLE_CMD( "time", POS_DEAD, do_time, NO_MIN, CTYPE_UTIL ),
@@ -937,7 +951,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "wear", POS_RESTING, do_wear, NO_MIN, CTYPE_UTIL ),
 	ABILITY_CMD( "weaken", POS_FIGHTING, do_weaken, NO_MIN, CTYPE_COMBAT, ABIL_WEAKEN ),
 	SIMPLE_CMD( "weather", POS_RESTING, do_weather, NO_MIN, CTYPE_UTIL ),
-	STANDARD_CMD( "weave", POS_STANDING, do_weave, LVL_APPROVED, NO_GRANTS, NO_SCMD, CTYPE_EMPIRE, CMD_NO_ANIMALS, NO_ABIL ),
+	STANDARD_CMD( "weave", POS_STANDING, do_gen_craft, LVL_APPROVED, NO_GRANTS, CRAFT_TYPE_WEAVE, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	STANDARD_CMD( "who", POS_DEAD, do_who, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_COMM, CMD_STAY_HIDDEN, NO_ABIL ),
 	STANDARD_CMD( "whois", POS_DEAD, do_whois, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_COMM, CMD_STAY_HIDDEN, NO_ABIL ),
 	SIMPLE_CMD( "where", POS_RESTING, do_where, NO_MIN, CTYPE_COMM ),
@@ -970,6 +984,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "mdoor", POS_DEAD, do_mdoor, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
 	STANDARD_CMD( "mecho", POS_DEAD, do_mecho, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
 	STANDARD_CMD( "mechoaround", POS_DEAD, do_mechoaround, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
+	STANDARD_CMD( "mechoneither", POS_DEAD, do_mechoneither, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
 	STANDARD_CMD( "msend", POS_DEAD, do_msend, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
 	STANDARD_CMD( "mload", POS_DEAD, do_mload, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
 	STANDARD_CMD( "mpurge", POS_DEAD, do_mpurge, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
@@ -977,6 +992,8 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "mat", POS_DEAD, do_mat, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
 	STANDARD_CMD( "mscale", POS_DEAD, do_mscale, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
 	STANDARD_CMD( "mteleport", POS_DEAD, do_mteleport, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
+	STANDARD_CMD( "mterracrop", POS_DEAD, do_mterracrop, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
+	STANDARD_CMD( "mterraform", POS_DEAD, do_mterraform, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
 	STANDARD_CMD( "mforce", POS_DEAD, do_mforce, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
 	STANDARD_CMD( "mhunt", POS_DEAD, do_mhunt, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
 	STANDARD_CMD( "mremember", POS_DEAD, do_mremember, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
@@ -1001,7 +1018,7 @@ cpp_extern const struct command_info cmd_info[] = {
  */
 void command_interpreter(char_data *ch, char *argument) {
 	extern bool check_social(char_data *ch, char *string, bool exact);
-	int cmd, length, cont, iter;
+	int cmd, length, iter;
 	char *line;
 
 	/* just drop to next line for hitting CR */
@@ -1028,20 +1045,9 @@ void command_interpreter(char_data *ch, char *argument) {
 		arg[iter] = LOWER(arg[iter]);
 	}
 
-	/*
-	* Script check:
-	* Since all command triggers check for valid_dg_target before acting, the levelcheck
-	* here has been removed. 
-	*/
-	cont = command_wtrigger(ch, arg, line);              /* any world triggers ? */
-	if (!cont) {
-		cont = command_mtrigger(ch, arg, line);   /* any mobile triggers ? */
-	}
-	if (!cont) {
-		cont = command_otrigger(ch, arg, line);   /* any object triggers ? */
-	}
-	if (cont) {
-		return;                                    /* yes, command trigger took over */
+	// Command trigger (1/3): exact match on typed-in word
+	if (check_command_trigger(ch, arg, line, CMDTRG_EXACT)) {
+		return;
 	}
 
 	/* otherwise, find the command */
@@ -1078,8 +1084,14 @@ void command_interpreter(char_data *ch, char *argument) {
 		// do the social instead.
 		return;
 	}
-	else if (*cmd_info[cmd].command == '\n')
+	else if (*cmd_info[cmd].command == '\n') {
+		// Command trigger (2/3): abbrev match on non-matching command
+		if (check_command_trigger(ch, arg, line, CMDTRG_ABBREV)) {
+			return;
+		}
+		// otherwise, no match
 		send_config_msg(ch, "huh_string");
+	}
 	else if (!IS_NPC(ch) && PLR_FLAGGED(ch, PLR_FROZEN))
 		send_to_char("You try, but the mind-numbing cold prevents you...\r\n", ch);
 	else if (IS_SET(cmd_info[cmd].flags, CMD_NOT_RP) && !IS_NPC(ch) && !IS_GOD(ch) && !IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_RP)) {
@@ -1140,6 +1152,12 @@ void command_interpreter(char_data *ch, char *argument) {
 				break;
 		}
 	}
+
+	// Command trigger (3/3): exact match on abbreviated command
+	else if (check_command_trigger(ch, (char*)cmd_info[cmd].command, line, CMDTRG_EXACT)) {
+		return;
+	}
+	
 	else {
 		((*cmd_info[cmd].command_pointer) (ch, line, cmd, cmd_info[cmd].subcmd));
 	}
@@ -1297,6 +1315,7 @@ int perform_alias(descriptor_data *d, char *orig) {
 
 /* The interface to the outside world: do_alias */
 ACMD(do_alias) {
+	extern char *show_color_codes(char *string);
 	void write_aliases(char_data *ch);
 	
 	char *repl;
@@ -1313,7 +1332,7 @@ ACMD(do_alias) {
 			send_to_char(" None.\r\n", ch);
 		else {
 			while (a != NULL) {
-				sprintf(buf, "%-15s %s\r\n", a->alias, a->replacement);
+				sprintf(buf, "%-15s %s\r\n", a->alias, show_color_codes(a->replacement));
 				send_to_char(buf, ch);
 				a = a->next;
 			}
@@ -1500,7 +1519,6 @@ struct {
 	{ CON_CLAST_NAME },
 	{ CON_QSEX },
 	{ CON_Q_SCREEN_READER },	// skips to CON_Q_HAS_ALT
-	{ CON_QCOLOR },
 	
 	{ CON_Q_HAS_ALT },	// skips to CON_Q_ARCHETYPE
 	{ CON_Q_ALT_NAME },
@@ -1556,14 +1574,14 @@ void prompt_creation(descriptor_data *d) {
 		}
 		case CON_Q_ALT_PASSWORD: {
 			SEND_TO_Q("\r\nEnter the password for that character: ", d);
-			echo_off(d);
+			ProtocolNoEcho(d, true);
 			break;
 		}
 		case CON_NEWPASSWD: {
 			SEND_TO_Q("New character.\r\n\r\n", d);
 			sprintf(buf, "Give me a password for %s: ", GET_PC_NAME(d->character));
 			SEND_TO_Q(buf, d);
-			echo_off(d);
+			ProtocolNoEcho(d, true);
 			break;
 		}
 		case CON_CNFPASSWD: {
@@ -1584,10 +1602,6 @@ void prompt_creation(descriptor_data *d) {
 		}
 		case CON_QSEX: {
 			SEND_TO_Q("\r\nWhat is your sex (M/F)? ", d);
-			break;
-		}
-		case CON_QCOLOR: {
-			SEND_TO_Q("\r\nDo you want color on (y/n)? ", d);
 			break;
 		}
 		case CON_Q_ARCHETYPE: {
@@ -1734,7 +1748,7 @@ void process_alt_password(descriptor_data *d, char *arg) {
 			}
 			else {
 				SEND_TO_Q("Wrong password.\r\nPassword: ", d);
-				echo_off(d);
+				ProtocolNoEcho(d, true);
 			}
 		}
 		else {	// password ok
@@ -1877,6 +1891,32 @@ void send_motd(descriptor_data *d) {
 }
 
 
+/**
+* Sends the MOTD, MXP tags, and other data that should be shown when a player
+* logs in, which may happen in several different ways.
+*
+* @param descriptor_data *desc The person to send it to.
+* @param int bad_pws Number of bad password attempts, which sometimes must be retrieved and cleared ahead of time.
+*/
+void send_login_motd(descriptor_data *desc, int bad_pws) {
+	send_motd(desc);
+	MXPSendTag(desc, "<VERSION>");
+	
+	/* Check bad passwords */
+	if (bad_pws) {
+		sprintf(buf, "\r\n\r\n\007\007\007&r%d LOGIN FAILURE%s SINCE LAST SUCCESSFUL LOGIN.&0\r\n", bad_pws, (bad_pws > 1) ? "S" : "");
+		SEND_TO_Q(buf, desc);
+		GET_BAD_PWS(desc->character) = 0;
+	}
+
+	/* Check previous logon */
+	if (desc->character->prev_host) {
+		sprintf(buf, "Your last login was on %6.10s from %s.\r\n", ctime(&desc->character->prev_logon), desc->character->prev_host);
+		SEND_TO_Q(buf, desc);
+	}
+}
+
+
 /*
  * XXX: Make immortals 'return' instead of being disconnected when switched
  *      into person returns.  This function seems a bit over-extended too.
@@ -2002,6 +2042,11 @@ int perform_dupe_check(descriptor_data *d) {
 			syslog(SYS_LOGIN, GET_INVIS_LEV(d->character), TRUE, "%s [%s] has reconnected.", GET_NAME(d->character), d->host);
 			break;
 	}
+	
+	MXPSendTag(d, "<VERSION>");
+	
+	// guarantee echo is on -- no, this could lead to an echo loop
+	// ProtocolNoEcho(d, false);
 
 	return (1);
 }
@@ -2009,10 +2054,23 @@ int perform_dupe_check(descriptor_data *d) {
 
 // basic name validation and processing
 int _parse_name(char *arg, char *name) {
-	int i;
+	int i, iter, caps;
+	int max_caps = config_get_int("max_capitals_in_name");
 
 	/* skip whitespaces */
 	for (; isspace(*arg); arg++);
+	
+	if (max_caps > 0) {
+		caps = 0;
+		for (iter = 0; iter < strlen(arg); ++iter) {
+			if (isupper(arg[iter])) {
+				++caps;
+			}
+		}
+		if (caps > max_caps) {
+			return 1;
+		}
+	}
 	
 	// don't allow leading apostrophe or dash
 	if (*arg == '\'' || *arg == '-') {
@@ -2039,7 +2097,6 @@ void nanny(descriptor_data *d, char *arg) {
 	extern int enter_player_game(descriptor_data *d, int dolog, bool fresh);
 	extern int isbanned(char *hostname);
 	extern int num_earned_bonus_traits(char_data *ch);
-	void parse_bookedit(descriptor_data *d, char *arg);
 	void start_new_character(char_data *ch);
 	extern int Valid_Name(char *newname);
 	
@@ -2057,11 +2114,6 @@ void nanny(descriptor_data *d, char *arg) {
 	skip_spaces(&arg);
 
 	switch (STATE(d)) {
-		case CON_BOOKEDIT: {
-			parse_bookedit(d, arg);
-			break;
-		}
-
 		case CON_GET_NAME: {	/* wait for input of name */
 			if (d->character == NULL) {
 				CREATE(d->character, char_data, 1);
@@ -2111,7 +2163,7 @@ void nanny(descriptor_data *d, char *arg) {
 						REMOVE_BIT(PLR_FLAGS(d->character), PLR_WRITING | PLR_MAILING);
 
 						SEND_TO_Q("Password: ", d);
-						echo_off(d);
+						ProtocolNoEcho(d, true);
 						d->idle_tics = 0;
 						STATE(d) = CON_PASSWORD;
 					}
@@ -2146,8 +2198,9 @@ void nanny(descriptor_data *d, char *arg) {
 				if (wizlock_level) {
 					if (!wizlock_message)
 						SEND_TO_Q("Sorry, new players can't be created at the moment.\r\n", d);
-					else
-						SEND_TO_Q(wizlock_message, d);
+					else {
+						msg_to_desc(d, "%s\r\n", wizlock_message);
+					}
 					syslog(SYS_LOGIN, 0, TRUE, "Request for new char %s denied from [%s] (wizlock)", GET_PC_NAME(d->character), d->host);
 					STATE(d) = CON_CLOSE;
 					return;
@@ -2179,9 +2232,9 @@ void nanny(descriptor_data *d, char *arg) {
 			 */
 
 			/* turn echo back on */
-			echo_on(d);
+			ProtocolNoEcho(d, false);
 
-			/* New echo_on() eats the return on telnet. Extra space better than none. */
+			/* New echo-on eats the return on telnet. Extra space better than none. */
 			SEND_TO_Q("\r\n", d);
 
 			if (!*arg) {
@@ -2200,7 +2253,7 @@ void nanny(descriptor_data *d, char *arg) {
 					}
 					else {
 						SEND_TO_Q("Wrong password.\r\nPassword: ", d);
-						echo_off(d);
+						ProtocolNoEcho(d, true);
 					}
 					return;
 				}
@@ -2217,8 +2270,9 @@ void nanny(descriptor_data *d, char *arg) {
 					return;
 				}
 				if (GET_ACCESS_LEVEL(d->character) < wizlock_level) {
-					if (wizlock_message)
-						SEND_TO_Q(wizlock_message, d);
+					if (wizlock_message) {
+						msg_to_desc(d, "%s\r\n", wizlock_message);
+					}
 					else
 						SEND_TO_Q("The game is temporarily restricted... try again later.\r\n", d);
 					STATE(d) = CON_CLOSE;
@@ -2256,21 +2310,8 @@ void nanny(descriptor_data *d, char *arg) {
 					STATE(d) = CON_BONUS_EXISTING;
 					return;
 				}
-
-				send_motd(d);
-
-				/* Check bad passwords */
-				if (load_result) {
-					sprintf(buf, "\r\n\r\n\007\007\007&r%d LOGIN FAILURE%s SINCE LAST SUCCESSFUL LOGIN.&0\r\n", load_result, (load_result > 1) ? "S" : "");
-					SEND_TO_Q(buf, d);
-					GET_BAD_PWS(d->character) = 0;
-				}
-
-				/* Check previous logon */
-				if (d->character->prev_host) {
-					sprintf(buf, "Your last login was on %6.10s from %s.\r\n", ctime(&d->character->prev_logon), d->character->prev_host);
-					SEND_TO_Q(buf, d);
-				}
+				
+				send_login_motd(d, load_result);
 				
 				// send on to motd
 				SEND_TO_Q("\r\n*** Press ENTER: ", d);
@@ -2299,7 +2340,7 @@ void nanny(descriptor_data *d, char *arg) {
 				STATE(d) = CON_NEWPASSWD;
 				return;
 			}
-			echo_on(d);
+			ProtocolNoEcho(d, false);
 			next_creation_step(d);
 			break;
 		}
@@ -2352,7 +2393,7 @@ void nanny(descriptor_data *d, char *arg) {
 			break;
 		}
 		case CON_Q_ALT_PASSWORD: {
-			echo_on(d);
+			ProtocolNoEcho(d, false);
 			SEND_TO_Q("\r\n", d);	// echo-off usually hides the CR
 			process_alt_password(d, arg);
 			break;
@@ -2423,22 +2464,6 @@ void nanny(descriptor_data *d, char *arg) {
 			break;
 		}
 
-		case CON_QCOLOR: {
-			switch (LOWER(*arg)) {
-				case 'y':
-					SET_BIT(PRF_FLAGS(d->character), PRF_COLOR);
-					break;
-				case 'n':
-					break;
-				default:
-					SEND_TO_Q("Please type YES or NO: ", d);
-					return;
-			}
-			
-			next_creation_step(d);
-			break;
-		}
-
 		case CON_FINISH_CREATION: {
 			// some finalization
 
@@ -2451,7 +2476,9 @@ void nanny(descriptor_data *d, char *arg) {
 			}
 			init_player(d->character);
 			SAVE_CHAR(d->character);
-			send_motd(d);
+			
+			send_login_motd(d, GET_BAD_PWS(d->character));
+			
 			SEND_TO_Q("\r\n*** Press ENTER: ", d);
 			STATE(d) = CON_RMOTD;
 
@@ -2652,7 +2679,8 @@ void nanny(descriptor_data *d, char *arg) {
 				}
 
 				// and send them to the motd
-				send_motd(d);
+				send_login_motd(d, GET_BAD_PWS(d->character));
+				
 				SEND_TO_Q("\r\n*** Press ENTER: ", d);
 				STATE(d) = CON_RMOTD;
 			}

@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: handler.h                                       EmpireMUD 2.0b2 *
+*   File: handler.h                                       EmpireMUD 2.0b3 *
 *  Usage: header file: prototypes of handling and utility functions       *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -12,7 +12,6 @@
 
  //////////////////////////////////////////////////////////////////////////////
 //// HANDLER CONSTS //////////////////////////////////////////////////////////
-
 
 // for affect_join()
 #define ADD_DURATION	BIT(0)
@@ -42,6 +41,15 @@
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// HANDLER MACROS //////////////////////////////////////////////////////////
+
+#define MATCH_ITEM_NAME(str, obj)  (isname((str), GET_OBJ_KEYWORDS(obj)) || (IS_DRINK_CONTAINER(obj) && GET_DRINK_CONTAINER_CONTENTS(obj) > 0 && isname((str), drinks[GET_DRINK_CONTAINER_TYPE(obj)])))
+#define MATCH_CHAR_DISGUISED_NAME(str, ch)  (isname((str), PERS((ch),(ch),FALSE)))
+#define MATCH_CHAR_NAME(str, ch)  ((!IS_NPC(ch) && GET_LASTNAME(ch) && isname((str), GET_LASTNAME(ch))) || isname((str), GET_PC_NAME(ch)) || MATCH_CHAR_DISGUISED_NAME(str, ch))
+#define MATCH_CHAR_NAME_ROOM(viewer, str, target)  ((IS_DISGUISED(target) && !IS_IMMORTAL(viewer) && !SAME_EMPIRE(viewer, target)) ? MATCH_CHAR_DISGUISED_NAME(str, target) : MATCH_CHAR_NAME(str, target))
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// handler.c protos ////////////////////////////////////////////////////////
 
 // affect handlers
@@ -59,14 +67,14 @@ void affect_to_room(room_data *room, struct affected_type *af);
 void affect_total(char_data *ch);
 extern bool affected_by_spell(char_data *ch, int type);
 extern bool affected_by_spell_and_apply(char_data *ch, int type, int apply);
-extern struct affected_type *create_aff(int type, int duration, int location, int modifier, bitvector_t bitvector);
-void apply_dot_effect(char_data *ch, sh_int type, sh_int duration, sh_int damage_type, sh_int damage, sh_int max_stack);
+extern struct affected_type *create_aff(int type, int duration, int location, int modifier, bitvector_t bitvector, char_data *cast_by);
+void apply_dot_effect(char_data *ch, sh_int type, sh_int duration, sh_int damage_type, sh_int damage, sh_int max_stack, char_data *cast_by);
 void dot_remove(char_data *ch, struct over_time_effect_type *dot);
 extern bool room_affected_by_spell(room_data *room, int type);
 
 // affect shortcut macros
-#define create_flag_aff(type, duration, bit)  create_aff((type), (duration), APPLY_NONE, 0, (bit))
-#define create_mod_aff(type, duration, loc, mod)  create_aff((type), (duration), (loc), (mod), 0)
+#define create_flag_aff(type, duration, bit, cast_by)  create_aff((type), (duration), APPLY_NONE, 0, (bit), (cast_by))
+#define create_mod_aff(type, duration, loc, mod, cast_by)  create_aff((type), (duration), (loc), (mod), 0, (cast_by))
 
 // character handlers
 extern bool char_from_chair(char_data *ch);
@@ -105,6 +113,7 @@ extern struct coin_data *find_coin_entry(struct coin_data *list, empire_data *em
 extern int increase_coins(char_data *ch, empire_data *emp, int amount);
 extern const char *money_amount(empire_data *type, int amount);
 extern const char *money_desc(empire_data *type, int amount);
+extern int total_coins(char_data *ch);
 
 // cooldown handlers
 void add_cooldown(char_data *ch, int type, int seconds_duration);
@@ -148,6 +157,7 @@ extern bool check_exclusion_set(struct interact_exclusion_data **set, char code,
 extern struct interact_exclusion_data *find_exclusion_data(struct interact_exclusion_data **set, char code);
 void free_exclusion_data(struct interact_exclusion_data *list);
 extern bool has_interaction(struct interaction_item *list, int type);
+extern bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERACTION_FUNC(*func));
 extern bool run_interactions(char_data *ch, struct interaction_item *run_list, int type, room_data *inter_room, char_data *inter_mob, obj_data *inter_item, INTERACTION_FUNC(*func));
 extern bool run_room_interactions(char_data *ch, room_data *room, int type, INTERACTION_FUNC(*func));
 
@@ -166,6 +176,7 @@ void add_to_object_list(obj_data *obj);
 extern obj_data *copy_warehouse_obj(obj_data *input);
 void empty_obj_before_extract(obj_data *obj);
 void extract_obj(obj_data *obj);
+extern obj_data *fresh_copy_obj(obj_data *obj, int scale_level);
 extern bool objs_are_identical(obj_data *obj_a, obj_data *obj_b);
 void remove_from_object_list(obj_data *obj);
 
@@ -207,6 +218,10 @@ extern obj_data *get_obj_vis(char_data *ch, char *name);
 extern obj_data *get_object_in_equip_vis(char_data *ch, char *arg, obj_data *equipment[], int *pos);
 extern obj_data *get_obj_world(char *name);
 
+// offer handlers
+extern struct offer_data *add_offer(char_data *ch, char_data *from, int type, int data);
+void remove_offers_by_type(char_data *ch, int type);
+
 // resource depletion handlers
 void add_depletion(room_data *room, int type, bool multiple);
 extern int get_depletion(room_data *room, int type);
@@ -237,9 +252,10 @@ sector_data *reverse_lookup_evolution_for_sector(sector_data *in_sect, int evo_t
 void add_to_empire_storage(empire_data *emp, int island, obj_vnum vnum, int amount);
 extern bool charge_stored_resource(empire_data *emp, int island, obj_vnum vnum, int amount);
 extern bool delete_stored_resource(empire_data *emp, obj_vnum vnum);
-int find_lowest_storage_loc(obj_data *obj);
+extern struct empire_storage_data *find_island_storage_by_keywords(empire_data *emp, int island_id, char *keywords);
+extern int find_lowest_storage_loc(obj_data *obj);
 extern struct empire_storage_data *find_stored_resource(empire_data *emp, int island, obj_vnum vnum);
-extern int get_total_stored_count(empire_data *emp, obj_vnum vnum);
+extern int get_total_stored_count(empire_data *emp, obj_vnum vnum, bool count_shipping);
 extern bool obj_can_be_stored(obj_data *obj, room_data *loc);
 extern bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_data *store, bool stolen);
 extern int store_resource(char_data *ch, empire_data *emp, obj_data *obj);
@@ -269,13 +285,18 @@ extern int parse_direction(char_data *ch, char *dir);
 // act.item.c
 void perform_remove(char_data *ch, int pos);
 
+// books.c
+extern book_data *book_proto(book_vnum vnum);
+extern book_data *find_book_by_author(char *argument, int idnum);
+extern book_data *find_book_in_library(char *argument, room_data *room);
+
 // config.c
 extern bitvector_t config_get_bitvector(char *key);
 extern bool config_get_bool(char *key);
 extern double config_get_double(char *key);
 extern int config_get_int(char *key);
 extern int *config_get_int_array(char *key, int *array_size);
-extern char *config_get_string(char *key);
+extern const char *config_get_string(char *key);
 
 // fight.c
 void appear(char_data *ch);

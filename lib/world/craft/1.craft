@@ -1,3 +1,10 @@
+#125
+saw~
+125 2  # 2x a stack of lumber
+10 249 0 1 -1
+R
+120 1  # 1x a large tree
+S
 #183
 flint set~
 183 1  # 1x a flint set

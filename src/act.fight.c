@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.fight.c                                     EmpireMUD 2.0b2 *
+*   File: act.fight.c                                     EmpireMUD 2.0b3 *
 *  Usage: non-skill commands and functions related to the fight system    *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -107,7 +107,7 @@ ACMD(do_catapult) {
 		msg_to_char(ch, "You don't even have a catapult.\r\n");
 	else if (!*argument)
 		msg_to_char(ch, "Which direction would you like to shoot?\r\n");
-	else if (!has_resources(ch, rocks, FALSE, TRUE))
+	else if (!has_resources(ch, rocks, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), TRUE))
 		{ /* This line intentionally left blank */ }
 	else if ((dir = parse_direction(ch, argument)) == NO_DIR)
 		msg_to_char(ch, "Which direction is that?\r\n");
@@ -134,7 +134,7 @@ ACMD(do_catapult) {
 			msg_to_char(ch, "You can't attack that acre!\r\n");
 			return;
 		}
-		extract_resources(ch, rocks, FALSE);
+		extract_resources(ch, rocks, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED));
 		sprintf(buf, "You shoot $p %s!", dirs[get_direction_for_char(ch, dir)]);
 		act(buf, FALSE, ch, catapult, 0, TO_CHAR);
 		
@@ -380,26 +380,10 @@ ACMD(do_hit) {
 
 
 ACMD(do_respawn) {
-	extern bool can_enter_instance(char_data *ch, struct instance_data *inst);
 	extern room_data *find_load_room(char_data *ch);
-	void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, int ability);
 	extern obj_data *player_death(char_data *ch);
 	
-	room_data *loc;
-	
-	if (!IS_NPC(ch) && !IS_DEAD(ch) && !IS_INJURED(ch, INJ_STAKED) && (loc = real_room(GET_RESURRECT_LOCATION(ch)))) {
-		// respawn due to resurrection
-		if (GET_RESURRECT_TIME(ch) + (5 * SECS_PER_REAL_MIN) < time(0)) {
-			msg_to_char(ch, "Your resurrection has expired.\r\n");
-		}
-		else if (ROOM_INSTANCE(loc) && !can_enter_instance(ch, ROOM_INSTANCE(loc))) {
-			msg_to_char(ch, "You can't seem to resurrect there. Perhaps the adventure is full.\r\n");
-		}
-		else {
-			perform_resurrection(ch, is_playing(GET_RESURRECT_BY(ch)), loc, GET_RESURRECT_ABILITY(ch));
-		}
-	}
-	else if (!IS_DEAD(ch) && !IS_INJURED(ch, INJ_STAKED)) {
+	if (!IS_DEAD(ch) && !IS_INJURED(ch, INJ_STAKED)) {
 		msg_to_char(ch, "You aren't even dead yet!\r\n");
 	}
 	else if (IS_NPC(ch)) {
@@ -491,10 +475,8 @@ ACMD(do_stake) {
 		if (GET_HEALTH(victim) > 0)
 			GET_POS(victim) = POS_RESTING;
 		REMOVE_BIT(INJURY_FLAGS(victim), INJ_STAKED);
-		obj_to_char_or_room((stake = read_object(o_STAKE)), ch);
-		if (OBJ_FLAGGED(stake, OBJ_SCALABLE)) {
-			scale_item_to_level(stake, 1);	// min scale
-		}
+		obj_to_char_or_room((stake = read_object(o_STAKE, TRUE)), ch);
+		scale_item_to_level(stake, 1);	// min scale
 		load_otrigger(stake);
 	}
 	else if (!can_fight(ch, victim))
@@ -619,6 +601,7 @@ ACMD(do_summary) {
 }
 
 
+// do_untie -- search hint
 ACMD(do_tie) {
 	void perform_npc_tie(char_data *ch, char_data *victim, int subcmd);
 
@@ -633,6 +616,9 @@ ACMD(do_tie) {
 		msg_to_char(ch, "%sie whom?\r\n", subcmd ? "Unt" : "T");
 	else if (!(victim = get_char_vis(ch, arg, FIND_CHAR_ROOM)))
 		send_config_msg(ch, "no_person");
+	else if (IS_DEAD(victim)) {
+		msg_to_char(ch, "You can't do that to someone who is already dead.\r\n");
+	}
 	else if (IS_NPC(victim) && MOB_FLAGGED(victim, MOB_ANIMAL))
 		perform_npc_tie(ch, victim, subcmd);
 	else if (IS_GOD(victim) || IS_IMMORTAL(victim))
@@ -648,7 +634,7 @@ ACMD(do_tie) {
 		GET_HEALTH(victim) = MAX(1, GET_HEALTH(victim));
 		GET_POS(victim) = POS_RESTING;
 		REMOVE_BIT(INJURY_FLAGS(victim), INJ_TIED);
-		obj_to_char((rope = read_object(o_ROPE)), ch);
+		obj_to_char((rope = read_object(o_ROPE, TRUE)), ch);
 		load_otrigger(rope);
 	}
 	else if (GET_POS(victim) >= POS_SLEEPING)
@@ -708,6 +694,11 @@ ACMD(do_throw) {
 	
 	// safety
 	if (!to_room) {
+		return;
+	}
+	
+	if (OBJ_BOUND_TO(obj) && ROOM_OWNER(to_room) && ROOM_OWNER(to_room) != GET_LOYALTY(ch)) {
+		msg_to_char(ch, "You can't throw bound items there.\r\n");
 		return;
 	}
 

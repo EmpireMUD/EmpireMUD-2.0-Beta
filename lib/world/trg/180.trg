@@ -2,11 +2,9 @@
 Fissure eruption~
 2 ab 1
 ~
-%regionecho% %room% 30 The ground shakes beneath your feet!
+%regionecho% %room% 10 You feel a sudden wave of heat from the nearby fissure!
 wait 2 sec
-%regionecho% %room% 20 You feel a sudden wave of heat!
-wait 2 sec
-%regionecho% %room% 7 There is a deep, rumbling roar from far beneath your feet!
+%regionecho% %room% 5 There is a deep, rumbling roar from far beneath your feet!
 %asound% The fissure erupts!
 %echo% A pillar of molten rock the size of a castle flies right past you!
 ~
@@ -208,10 +206,10 @@ wait 5 sec *Global cooldown
 ~
 #18079
 Fiend No Leave~
-0 q 100
+0 s 100
 ~
-%send% %actor% A wall of fire blocks your escape!
-%echoaround% %actor% A wall of fire blocks %actor.name%'s escape!
+%send% %actor% You try to leave, but a wall of fire blocks your escape!
+%echoaround% %actor% %actor.name% tries to leave, but a wall of fire blocks %actor.hisher% escape!
 return 0
 ~
 #18080
@@ -223,5 +221,12 @@ if !(%abilityname%==disarm)
 end
 %send% %actor% You cannot disarm %self.name% - %self.hisher% magic is innate!
 return 0
+~
+#18081
+Fiend No Flee~
+0 c 0
+flee~
+%send% %actor% You turn to flee, but a wall of fire blocks your escape!
+%echoaround% %actor% %actor.name% turns to flee, but a wall of fire blocks %actor.hisher% escape!
 ~
 $

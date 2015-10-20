@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: olc.mobile.c                                    EmpireMUD 2.0b2 *
+*   File: olc.mobile.c                                    EmpireMUD 2.0b3 *
 *  Usage: OLC for mobs                                                    *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -55,18 +55,60 @@ bool audit_mobile(char_data *mob, char_data *ch) {
 	extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
 	
 	bool is_adventure = (get_adventure_for_vnum(GET_MOB_VNUM(mob)) != NULL);
+	char temp[MAX_STRING_LENGTH], *ptr;
 	bool problem = FALSE;
 
 	if (!str_cmp(GET_PC_NAME(mob), "mobile new")) {
 		olc_audit_msg(ch, GET_MOB_VNUM(mob), "Keywords not set");
 		problem = TRUE;
 	}
+	
+	ptr = GET_PC_NAME(mob);
+	do {
+		ptr = any_one_arg(ptr, temp);
+		if (*temp && !str_str(GET_SHORT_DESC(mob), temp) && !str_str(GET_LONG_DESC(mob), temp)) {
+			olc_audit_msg(ch, GET_MOB_VNUM(mob), "Keyword '%s' not found in strings", temp);
+			problem = TRUE;
+		}
+	} while (*ptr);
+	
 	if (!str_cmp(GET_SHORT_DESC(mob), "a new mobile")) {
 		olc_audit_msg(ch, GET_MOB_VNUM(mob), "Short desc not set");
 		problem = TRUE;
 	}
+	any_one_arg(GET_SHORT_DESC(mob), temp);
+	if ((fill_word(temp) || reserved_word(temp)) && isupper(*temp)) {
+		olc_audit_msg(ch, GET_MOB_VNUM(mob), "Short desc capitalized");
+		problem = TRUE;
+	}
+	if (ispunct(GET_SHORT_DESC(mob)[strlen(GET_SHORT_DESC(mob)) - 1])) {
+		olc_audit_msg(ch, GET_MOB_VNUM(mob), "Short desc has punctuation");
+		problem = TRUE;
+	}
+	
+	ptr = GET_SHORT_DESC(mob);
+	do {
+		ptr = any_one_arg(ptr, temp);
+		// remove trailing punctuation
+		while (*temp && ispunct(temp[strlen(temp)-1])) {
+			temp[strlen(temp)-1] = '\0';
+		}
+		if (*temp && !fill_word(temp) && !reserved_word(temp) && !isname(temp, GET_PC_NAME(mob))) {
+			olc_audit_msg(ch, GET_MOB_VNUM(mob), "Suggested missing keyword '%s'", temp);
+			problem = TRUE;
+		}
+	} while (*ptr);
+	
 	if (!str_cmp(GET_LONG_DESC(mob), "A new mobile is standing here.\r\n")) {
 		olc_audit_msg(ch, GET_MOB_VNUM(mob), "Long desc not set");
+		problem = TRUE;
+	}
+	if (!ispunct(GET_LONG_DESC(mob)[strlen(GET_LONG_DESC(mob)) - 3])) {
+		olc_audit_msg(ch, GET_MOB_VNUM(mob), "Long desc missing punctuation");
+		problem = TRUE;
+	}
+	if (islower(*GET_LONG_DESC(mob))) {
+		olc_audit_msg(ch, GET_MOB_VNUM(mob), "Long desc not capitalized");
 		problem = TRUE;
 	}
 	if (!is_adventure && GET_MAX_SCALE_LEVEL(mob) == 0) {
@@ -203,6 +245,37 @@ bool delete_from_spawn_template_list(struct adventure_spawn **list, int spawn_ty
 
 
 /**
+* For the .list command.
+*
+* @param char_data *mob The thing to list.
+* @param bool detail If TRUE, provide additional details
+* @return char* The line to show (without a CRLF).
+*/
+char *list_one_mobile(char_data *mob, bool detail) {
+	static char output[MAX_STRING_LENGTH];
+	char flags[MAX_STRING_LENGTH];
+	
+	bitvector_t show_flags = MOB_BRING_A_FRIEND | MOB_SENTINEL | MOB_AGGRESSIVE | MOB_MOUNTABLE | MOB_ANIMAL | MOB_AQUATIC | MOB_NO_ATTACK | MOB_SPAWNED | MOB_CHAMPION | MOB_FAMILIAR | MOB_EMPIRE | MOB_CITYGUARD | MOB_GROUP | MOB_HARD | MOB_DPS | MOB_TANK | MOB_CASTER | MOB_VAMPIRE | MOB_HUMAN;
+	
+	if (detail) {
+		if (IS_SET(MOB_FLAGS(mob), show_flags)) {
+			sprintbit(MOB_FLAGS(mob) & show_flags, action_bits, flags, TRUE);
+		}
+		else {
+			*flags = '\0';
+		}
+		
+		snprintf(output, sizeof(output), "[%5d] %s (%s) %s", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob), level_range_string(GET_MIN_SCALE_LEVEL(mob), GET_MAX_SCALE_LEVEL(mob), 0), flags);
+	}
+	else {
+		snprintf(output, sizeof(output), "[%5d] %s", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
+	}
+	
+	return output;
+}
+
+
+/**
 * WARNING: This function actually deletes a mobile from the world.
 *
 * @param char_data *ch The person doing the deleting.
@@ -214,6 +287,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	
 	char_data *proto, *mob_iter, *next_mob;
 	descriptor_data *desc;
+	struct global_data *glb, *next_glb;
 	room_template *rmt, *next_rmt;
 	sector_data *sect, *next_sect;
 	crop_data *crop, *next_crop;
@@ -267,6 +341,14 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 		found |= delete_from_interaction_list(&GET_CROP_INTERACTIONS(crop), TYPE_MOB, vnum);
 		if (found) {
 			save_library_file_for_vnum(DB_BOOT_CROP, GET_CROP_VNUM(crop));
+		}
+	}
+	
+	// update globals
+	HASH_ITER(hh, globals_table, glb, next_glb) {
+		found = delete_from_interaction_list(&GET_GLOBAL_INTERACTIONS(glb), TYPE_MOB, vnum);
+		if (found) {
+			save_library_file_for_vnum(DB_BOOT_GLB, GET_GLOBAL_VNUM(glb));
 		}
 	}
 	
@@ -355,6 +437,7 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 	struct spawn_info *spawn;
 	struct adventure_spawn *asp;
 	struct interaction_item *inter;
+	struct global_data *glb, *next_glb;
 	room_template *rmt, *next_rmt;
 	sector_data *sect, *next_sect;
 	crop_data *crop, *next_crop;
@@ -404,6 +487,18 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "CRP [%5d] %s\r\n", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
+			}
+		}
+	}
+	
+	// globals
+	HASH_ITER(hh, globals_table, glb, next_glb) {
+		any = FALSE;
+		for (inter = GET_GLOBAL_INTERACTIONS(glb); inter && !any; inter = inter->next) {
+			if (interact_vnum_types[inter->type] == TYPE_MOB && inter->vnum == vnum) {
+				any = TRUE;
+				++found;
+				size += snprintf(buf + size, sizeof(buf) - size, "GLB [%5d] %s\r\n", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
 			}
 		}
 	}
@@ -489,7 +584,7 @@ void save_olc_mobile(descriptor_data *desc) {
 	}
 	
 	// slight sanity checking
-	if (GET_MAX_SCALE_LEVEL(mob) < GET_MIN_SCALE_LEVEL(mob)) {
+	if (GET_MAX_SCALE_LEVEL(mob) < GET_MIN_SCALE_LEVEL(mob) && GET_MAX_SCALE_LEVEL(mob) > 0) {
 		GET_MAX_SCALE_LEVEL(mob) = GET_MIN_SCALE_LEVEL(mob);
 	}
 	

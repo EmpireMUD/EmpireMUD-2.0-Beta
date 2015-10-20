@@ -1,33 +1,137 @@
 #500
 cat black familiar~
 a black cat~
-A sleek black cat sits and stares at you.
+A black cat curls around its master's ankles.
 ~
-10 40 djo cf
+10 50 do cfm
 0 0 0 10
 S
 #501
-saber-toothed sabertoothed toothed cat large familiar~
+saber-toothed sabertoothed toothed cat familiar~
 a saber-toothed cat~
-A large saber-toothed cat is eyeing you carefully.
+A saber-toothed cat is eyeing you from its master's side.
 ~
-50 70 djo cf
+50 100 do cfm
 0 0 0 10
 S
 #502
-sphinx large deadly familiar~
+sphinx familiar~
 a sphinx~
-A large, deadly sphinx is pacing back and forth.
+A deadly sphinx paces back and forth beside its master.
 ~
-75 90 djop cf
+75 100 dop cfm
 0 0 0 10
 S
 #503
-griffin terrifying familiar~
+griffin familiar~
 a griffin~
-A terrifying griffin sits perched, waiting to strike.
+A griffin sits beside its master, sharpening its talons on its beak.
 ~
-100 120 djop cf
+100 0 dopy cfm
 0 0 0 10
+S
+#504
+wolf dire familiar~
+a dire wolf~
+A dire wolf hunches low and bares its fangs.
+~
+100 0 doz cfm
+0 0 0 9
+S
+#505
+rabbit moon familiar~
+a moon rabbit~
+A little moon rabbit glows as it hops around its master's feet.
+~
+100 0 dno cfm
+0 0 15 10
+T 505
+S
+#506
+tortoise giant familiar~
+a giant tortoise~
+A giant tortoise eyes you placidly.
+~
+100 0 dnopy cfm
+0 0 16 10
+S
+#507
+wolf spirit familiar~
+a spirit wolf~
+A spirit wolf flitters in and out of sight as it leaps about.
+~
+100 0 dno cfm
+0 0 0 10
+T 507
+S
+#508
+manticore huge familiar~
+a huge manticore~
+A huge manticore is waving its dangerously spined tail.
+~
+100 0 doz cfm
+0 0 0 27
+S
+#509
+phoenix familiar~
+a phoenix~
+A small phoenix alights on its master's shoulder.
+~
+100 0 dno cfm
+0 0 2 10
+T 509
+S
+#510
+shadow scorpion familiar~
+the scorpion shadow~
+Something is casting the shadow of a scorpion on the ground!
+~
+100 0 dno cfm
+0 0 9 10
+T 510
+S
+#511
+shadow owl familiar~
+the owl shadow~
+Something is casting the shadow of an owl on the ground!
+~
+100 0 dno cfm
+0 0 9 10
+T 511
+S
+#512
+basilisk familiar~
+a basilisk~
+A basilisk curls around its master and hisses.
+~
+100 0 dno cfm
+0 0 0 10
+T 512
+S
+#513
+salamander familiar~
+a salamander~
+A large salamander is smoldering at its master's feet.
+~
+100 0 dno cfm
+0 0 0 10
+T 513
+S
+#514
+hulk skeletal familiar~
+a skeletal hulk~
+A skeletal hulk looms over you.
+~
+100 0 doz cfm
+0 0 0 10
+S
+#515
+banshee familiar~
+a banshee~
+A banshee hovers at her master's side.
+~
+100 0 dno cfm
+2 0 2 10
+T 515
 S
 $

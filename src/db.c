@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: db.c                                            EmpireMUD 2.0b2 *
+*   File: db.c                                            EmpireMUD 2.0b3 *
 *  Usage: Loading/saving chars, booting/resetting world, internal funcs   *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -39,6 +39,7 @@
 *   Island Setup
 *   Mobile Loading
 *   Object Loading
+*   Version Checking
 *   Miscellaneous Helpers
 *   Miscellaneous Loaders
 *   Miscellaneous Savers
@@ -95,6 +96,9 @@ struct time_info_data time_info;	// the infomation about the time
 struct weather_data weather_info;	// the infomation about the weather
 int wizlock_level = 0;	// level of game restriction
 char *wizlock_message = NULL;	// Message sent to people trying to connect
+
+// global stuff
+struct global_data *globals_table = NULL;	// hash table of global_data
 
 // helps
 struct help_index_element *help_table = 0;	// the help table
@@ -180,6 +184,7 @@ struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES] = {
 	{ SECTOR_PREFIX, SECTOR_SUFFIX },	// DB_BOOT_SECTOR
 	{ ADV_PREFIX, ADV_SUFFIX },	// DB_BOOT_ADV
 	{ RMT_PREFIX, RMT_SUFFIX },	// DB_BOOT_RMT
+	{ GLB_PREFIX, GLB_SUFFIX },	// DB_BOOT_GLB
 };
 
 
@@ -196,6 +201,7 @@ void boot_db(void) {
 	void boot_world();
 	void build_player_index();
 	void check_ruined_cities();
+	void check_version();
 	void delete_orphaned_rooms();
 	void init_config_system();
 	void init_skills();
@@ -300,6 +306,9 @@ void boot_db(void) {
 	load_player_data_at_startup();
 
 	boot_time = time(0);
+	
+	log("Checking game version...");
+	check_version();
 
 	log("Boot db -- DONE.");
 }
@@ -370,6 +379,9 @@ void boot_world(void) {
 
 	log("Loading objs and generating index.");
 	index_boot(DB_BOOT_OBJ);
+	
+	log("Loading global tables.");
+	index_boot(DB_BOOT_GLB);
 	
 	log("Loading craft recipes.");
 	index_boot(DB_BOOT_CRAFT);
@@ -467,7 +479,7 @@ void add_trd_owner(room_vnum vnum, empire_vnum owner) {
 * startup and should also be called any time a building is deleted.
 */
 void check_for_bad_buildings(void) {
-	extern struct instance_data *find_instance_by_room(room_data *room);
+	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 	void unlink_instance_entrance(room_data *room);
 
 	struct obj_storage_type *store, *next_store, *temp;
@@ -485,6 +497,11 @@ void check_for_bad_buildings(void) {
 			log(" removing building at %d for bad building type", GET_ROOM_VNUM(room));
 			disassociate_building(room);
 		}
+		else if (IS_CITY_CENTER(room) && (!ROOM_OWNER(room) || !find_city_entry(ROOM_OWNER(room), room))) {
+			// city center with no matching city
+			log(" removing city center at %d for lack of city entry", GET_ROOM_VNUM(room));
+			disassociate_building(room);
+		}
 		else if (GET_ROOM_VNUM(room) >= MAP_SIZE && ROOM_SECT_FLAGGED(room, SECTF_INSIDE) && !GET_BUILDING(room)) {
 			// designated room
 			log(" deleting room %d for bad building type", GET_ROOM_VNUM(room));
@@ -497,7 +514,7 @@ void check_for_bad_buildings(void) {
 			delete_room(room, FALSE);	// must check_all_exits
 			deleted = TRUE;
 		}
-		else if (ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE) && !find_instance_by_room(room)) {
+		else if (ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE) && !find_instance_by_room(room, TRUE)) {
 			// room is marked as an instance entrance, but no instance is associated with it
 			log(" unlinking instance entrance room %d for no association with an instance", GET_ROOM_VNUM(room));
 			unlink_instance_entrance(room);
@@ -1072,7 +1089,7 @@ void index_boot_help(void) {
 	while (*buf1 != '$') {
 		sprintf(buf2, "%s%s", prefix, buf1);
 		if (!(db_file = fopen(buf2, "r"))) {
-			log("SYSERR: File '%s' listed in '%s/%s': %s", buf2, prefix, index_filename, strerror(errno));
+			log("SYSERR: File '%s' listed in '%s%s': %s", buf2, prefix, index_filename, strerror(errno));
 			fscanf(index, "%s\n", buf1);
 			continue;
 		}
@@ -1131,13 +1148,35 @@ void index_boot_help(void) {
 * Checks the newbie islands and applies their rules (abandons land).
 */
 void check_newbie_islands(void) {
-	struct island_info *isle = NULL;
+	struct island_info *isle = NULL, *ii, *next_ii;
 	room_data *room, *next_room;
-	int last_isle = -1;
+	int num_newbie_isles, last_isle = -1;
 	empire_data *emp;
+	empire_vnum vnum;
+	
+	// for limit-tracking
+	struct cni_track {
+		empire_vnum vnum;	// which empire
+		int count;	// how many
+		UT_hash_handle hh;
+	};
+	struct cni_track *cni, *next_cni, *list = NULL;
+	
+	// count islands
+	num_newbie_isles = 0;
+	HASH_ITER(hh, island_table, ii, next_ii) {
+		if (IS_SET(ii->flags, ISLE_NEWBIE)) {
+			++num_newbie_isles;
+		}
+	}
 	
 	HASH_ITER(world_hh, world_table, room, next_room) {
 		if (GET_ROOM_VNUM(room) >= MAP_SIZE || GET_ISLAND_ID(room) == NO_ISLAND) {
+			continue;
+		}
+		
+		// ensure ownership and that the empire is "not new"
+		if (!(emp = ROOM_OWNER(room)) || (EMPIRE_CREATE_TIME(emp) + (config_get_int("newbie_island_day_limit") * SECS_PER_REAL_DAY)) > time(0)) {
 			continue;
 		}
 		
@@ -1148,11 +1187,29 @@ void check_newbie_islands(void) {
 		
 		// apply newbie rules?
 		if (IS_SET(isle->flags, ISLE_NEWBIE)) {
-			if ((emp = ROOM_OWNER(room)) && (EMPIRE_CREATE_TIME(emp) + (config_get_int("newbie_island_day_limit") * SECS_PER_REAL_DAY)) < time(0)) {
+			
+			// find/make tracker
+			vnum = EMPIRE_VNUM(emp);
+			HASH_FIND_INT(list, &vnum, cni);
+			if (!cni) {
+				CREATE(cni, struct cni_track, 1);
+				cni->vnum = vnum;
+				HASH_ADD_INT(list, vnum, cni);
+			}
+			
+			cni->count += 1;
+			
+			if (cni->count > num_newbie_isles) {
 				log_to_empire(emp, ELOG_TERRITORY, "(%d, %d) abandoned on newbie island", FLAT_X_COORD(room), FLAT_Y_COORD(room));
 				abandon_room(room);
 			}
 		}
+	}
+	
+	// clean up
+	HASH_ITER(hh, list, cni, next_cni) {
+		HASH_DEL(list, cni);
+		free(cni);
 	}
 }
 
@@ -1331,12 +1388,14 @@ void clear_char(char_data *ch) {
 
 
 /**
-* Create a new mobile from a prototype.
+* Create a new mobile from a prototype. You should almost always call this with
+* with_triggers = TRUE.
 *
 * @param mob_vnum nr The number to load.
+* @param bool with_triggers If TRUE, attaches all triggers.
 * @return char_data* The instantiated mob.
 */
-char_data *read_mobile(mob_vnum nr) {
+char_data *read_mobile(mob_vnum nr, bool with_triggers) {
 	char_data *mob, *proto;
 	int iter;
 
@@ -1377,8 +1436,10 @@ char_data *read_mobile(mob_vnum nr) {
 	/* find_char helper */
 	add_to_lookup_table(GET_ID(mob), (void *)mob);
 
-	copy_proto_script(proto, mob, MOB_TRIGGER);
-	assign_triggers(mob, MOB_TRIGGER);
+	if (with_triggers) {
+		copy_proto_script(proto, mob, MOB_TRIGGER);
+		assign_triggers(mob, MOB_TRIGGER);
+	}
 
 	return (mob);
 }
@@ -1425,12 +1486,14 @@ obj_data *create_obj(void) {
 
 
 /**
-* Create a new object from a prototype..
+* Create a new object from a prototype. You should almost always call this with
+* with_triggers = TRUE.
 *
 * @param obj_vnum nr The object vnum to load.
+* @param bool with_triggers If TRUE, attaches all triggers.
 * @return obj_data* The instantiated item.
 */
-obj_data *read_object(obj_vnum nr) {
+obj_data *read_object(obj_vnum nr, bool with_triggers) {
 	obj_data *obj, *proto;
 	
 	if (!(proto = obj_proto(nr))) {
@@ -1452,10 +1515,259 @@ obj_data *read_object(obj_vnum nr) {
 	/* find_obj helper */
 	add_to_lookup_table(GET_ID(obj), (void *)obj);
 	
-	copy_proto_script(proto, obj, OBJ_TRIGGER);
-	assign_triggers(obj, OBJ_TRIGGER);
+	if (with_triggers) {
+		copy_proto_script(proto, obj, OBJ_TRIGGER);
+		assign_triggers(obj, OBJ_TRIGGER);
+	}
 
 	return (obj);
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// VERSION CHECKING ////////////////////////////////////////////////////////
+
+// add versions in ascending order: this is used by check_version()
+const char *versions_list[] = {
+	// this system was added in b2.5
+	"b2.5",
+	"b2.7",
+	"b2.8",
+	"b2.9",
+	"b2.11",
+	"b3.0",
+	"\n"	// be sure the list terminates with \n
+};
+
+
+/**
+* Find the version of the last successful boot.
+*
+* @return int a position in versions_list[] or NOTHING
+*/
+int get_last_boot_version(void) {
+	char str[256];
+	FILE *fl;
+	
+	if (!(fl = fopen(VERSION_FILE, "r"))) {
+		return -1;
+	}
+	
+	sprintf(buf, "version file");
+	get_line(fl, str);
+	fclose(fl);
+	
+	return search_block(str, versions_list, TRUE);
+}
+
+/**
+* Writes the version of the last good boot.
+*
+* @param int version Which version id to write (pos in versions_list).
+*/
+// version is pos in versions_list[]
+void write_last_boot_version(int version) {
+	FILE *fl;
+	
+	if (version == NOTHING) {
+		return;
+	}
+	
+	if (!(fl = fopen(VERSION_FILE, "w"))) {
+		log("Unable to write version file. This would cause version updates to be applied repeatedly.");
+		exit(1);
+	}
+	
+	fprintf(fl, "%s\n", versions_list[version]);
+	fclose(fl);
+}
+
+
+// 2.8 removes the color preference
+PLAYER_UPDATE_FUNC(b2_8_update_players) {
+	REMOVE_BIT(PRF_FLAGS(ch), BIT(9));	// was PRF_COLOR
+}
+
+
+// 2.11 loads inventories and attaches triggers
+PLAYER_UPDATE_FUNC(b2_11_update_players) {
+	extern int Objload_char(char_data *ch, int dolog);
+	void Objsave_char(char_data *ch, int rent_code);
+	
+	obj_data *obj, *proto;
+	int iter;
+	
+	// no work if in-game (covered by other parts of the update)
+	if (!is_file) {
+		return;
+	}
+	
+	Objload_char(ch, FALSE);
+	
+	// inventory
+	for (obj = ch->carrying; obj; obj = obj->next_content) {
+		if ((proto = obj_proto(GET_OBJ_VNUM(obj)))) {
+			copy_proto_script(proto, obj, OBJ_TRIGGER);
+			assign_triggers(obj, OBJ_TRIGGER);
+		}
+	}
+	
+	// eq
+	for (iter = 0; iter < NUM_WEARS; ++iter) {
+		if (GET_EQ(ch, iter) && (proto = obj_proto(GET_OBJ_VNUM(GET_EQ(ch, iter))))) {
+			copy_proto_script(proto, GET_EQ(ch, iter), OBJ_TRIGGER);
+			assign_triggers(GET_EQ(ch, iter), OBJ_TRIGGER);
+		}
+	}
+	
+	// save gear
+	Objsave_char(ch, RENT_RENTED);
+}
+
+
+/**
+* Performs some auto-updates when the mud detects a new version.
+*/
+void check_version(void) {
+	void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func));
+	
+	int last, iter, current = NOTHING;
+	
+	#define MATCH_VERSION(name)  (!str_cmp(versions_list[iter], name))
+	
+	last = get_last_boot_version();
+	
+	// updates for every version since the last boot
+	for (iter = 0; *versions_list[iter] != '\n'; ++iter) {
+		current = iter;
+		
+		// skip versions below last-boot
+		if (last != NOTHING && iter <= last) {
+			continue;
+		}
+		
+		// version-specific updates
+		if (MATCH_VERSION("b2.5")) {
+			log("Applying b2.5 update to empires...");
+			empire_data *emp, *next_emp;
+			HASH_ITER(hh, empire_table, emp, next_emp) {
+				// auto-balance was removed and the same id was used for dismantle-mines
+				EMPIRE_CHORE(emp, CHORE_DISMANTLE_MINES) = FALSE;
+				save_empire(emp);
+			}
+		}
+		if (MATCH_VERSION("b2.8")) {
+			log("Applying b2.8 update to players...");
+			update_all_players(NULL, b2_8_update_players);
+		}
+		if (MATCH_VERSION("b2.9")) {
+			log("Applying b2.9 update to crops...");
+			// this is actually a bug that occurred on EmpireMUDs that patched
+			// b2.8 on a live copy; this will look for tiles that are in an
+			// error state -- crops that were in the 'seeded' state during the
+			// b2.8 reboot would have gotten bad original-sect data
+			room_data *room, *next_room;
+			HASH_ITER(world_hh, world_table, room, next_room) {
+				if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && SECT_FLAGGED(ROOM_ORIGINAL_SECT(room), SECTF_HAS_CROP_DATA) && !SECT_FLAGGED(ROOM_ORIGINAL_SECT(room), SECTF_CROP)) {
+					// normal case: crop with a 'Seeded' original sect
+					// the fix is just to set the original sect to the current
+					// sect so it will detect a new sect on-harvest instead of
+					// setting it back to seeded
+					ROOM_ORIGINAL_SECT(room) = SECT(room);
+				}
+				else if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && !ROOM_SECT_FLAGGED(room, SECTF_CROP) && SECT(room) == ROOM_ORIGINAL_SECT(room)) {
+					// second error case: a Seeded crop with itself as its
+					// original sect: detect a new original sect
+					extern const sector_vnum climate_default_sector[NUM_CLIMATES];
+					sector_data *sect;
+					crop_data *cp;
+					if ((cp = crop_proto(ROOM_CROP_TYPE(room))) && (sect = sector_proto(climate_default_sector[GET_CROP_CLIMATE(cp)]))) {
+						ROOM_ORIGINAL_SECT(room) = sect;
+					}
+				}
+			}
+		}
+		if (MATCH_VERSION("b2.11")) {
+			void save_trading_post();
+			void save_whole_world();
+			
+			struct empire_unique_storage *eus;
+			struct trading_post_data *tpd;
+			empire_data *emp, *next_emp;
+			char_data *mob, *mobpr;
+			obj_data *obj, *objpr;
+			
+			log("Applying b2.11 update:");
+			log(" - assigning mob triggers...");
+			for (mob = character_list; mob; mob = mob->next) {
+				if (IS_NPC(mob) && (mobpr = mob_proto(GET_MOB_VNUM(mob)))) {
+					copy_proto_script(mobpr, mob, MOB_TRIGGER);
+					assign_triggers(mob, MOB_TRIGGER);
+				}
+			}
+			
+			log(" - assigning triggers to object list...");
+			for (obj = object_list; obj; obj = obj->next) {
+				if ((objpr = obj_proto(GET_OBJ_VNUM(obj)))) {
+					copy_proto_script(objpr, obj, OBJ_TRIGGER);
+					assign_triggers(obj, OBJ_TRIGGER);
+				}
+			}
+			
+			log(" - assigning triggers to warehouse objects...");
+			HASH_ITER(hh, empire_table, emp, next_emp) {
+				for (eus = EMPIRE_UNIQUE_STORAGE(emp); eus; eus = eus->next) {
+					if (eus->obj && (objpr = obj_proto(GET_OBJ_VNUM(eus->obj)))) {
+						copy_proto_script(objpr, eus->obj, OBJ_TRIGGER);
+						assign_triggers(eus->obj, OBJ_TRIGGER);
+					}
+				}
+			}
+			
+			log(" - assigning triggers to trading post objects...");
+			for (tpd = trading_list; tpd; tpd = tpd->next) {
+				if (tpd->obj && (objpr = obj_proto(GET_OBJ_VNUM(tpd->obj)))) {
+					copy_proto_script(objpr, tpd->obj, OBJ_TRIGGER);
+					assign_triggers(tpd->obj, OBJ_TRIGGER);
+				}
+			}
+			
+			log(" - assigning triggers to player inventories...");
+			update_all_players(NULL, b2_11_update_players);
+			
+			// ensure everything gets saved this way since we won't do this again
+			save_all_empires();
+			save_trading_post();
+			save_whole_world();
+		}
+		if (MATCH_VERSION("b3.0")) {
+			log("Applying b3.0 update to crops...");
+			// this is a repeat of the b2.9 update, but should fix additional
+			// rooms
+			room_data *room, *next_room;
+			HASH_ITER(world_hh, world_table, room, next_room) {
+				if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && SECT_FLAGGED(ROOM_ORIGINAL_SECT(room), SECTF_HAS_CROP_DATA) && !SECT_FLAGGED(ROOM_ORIGINAL_SECT(room), SECTF_CROP)) {
+					// normal case: crop with a 'Seeded' original sect
+					// the fix is just to set the original sect to the current
+					// sect so it will detect a new sect on-harvest instead of
+					// setting it back to seeded
+					ROOM_ORIGINAL_SECT(room) = SECT(room);
+				}
+				else if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && !ROOM_SECT_FLAGGED(room, SECTF_CROP) && SECT_FLAGGED(ROOM_ORIGINAL_SECT(room), SECTF_HAS_CROP_DATA) && !SECT_FLAGGED(ROOM_ORIGINAL_SECT(room), SECTF_CROP)) {
+					// second error case: a Seeded crop with a Seeded crop as
+					// its original sect: detect a new original sect
+					extern const sector_vnum climate_default_sector[NUM_CLIMATES];
+					sector_data *sect;
+					crop_data *cp;
+					if ((cp = crop_proto(ROOM_CROP_TYPE(room))) && (sect = sector_proto(climate_default_sector[GET_CROP_CLIMATE(cp)]))) {
+						ROOM_ORIGINAL_SECT(room) = sect;
+					}
+				}
+			}
+		}
+	}
+	
+	write_last_boot_version(current);
 }
 
 

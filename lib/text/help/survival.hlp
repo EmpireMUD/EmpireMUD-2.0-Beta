@@ -56,7 +56,7 @@ Herbs you can find:
 
 See also: HERB GARDENS, PICK
 #
-"FIND SHELTER" SHELTER
+"FIND SHELTER" SHELTERS
 
 Find Shelter (Survival ability)
 
@@ -66,9 +66,15 @@ the shelter, be sure to dismantle and abandon it.
 
 Shelters boost regeneration while sleeping.
 
+You can build the following shelters:
+  &y^&0O&y/\&0  caveshelter (mountains)
+  &G^c^^&0  jungleshelter (jungle)
+  .c..  rockshelter (plains, desert)
+  &g^&0T&g^^&0  treeshelter (forest)
+
 See also: BUILD, DISMANTLE, ABANDON
 #
-FINDER "FINDER SKILL"
+FINDER
 
 Finder (Survival ability)
 
@@ -141,7 +147,7 @@ This ability gives you a 33% chance to dodge a blow that would deal fatal
 damage. You will be briefly stunned and unable to enter commands, for an amount
 of time based on your Dexterity.
 #
-MOUNT DISMOUNT RIDING "RIDE SKILL" "ALL-TERRAIN RIDING" "ALL TERRAIN RIDING" ATR SADDLE
+MOUNT DISMOUNT RIDING RIDE "ALL-TERRAIN RIDING" "ALL TERRAIN RIDING" ATR SADDLE
 
 Ride (Survival ability)
 All-Terrain Riding (Survival ability)
@@ -151,6 +157,7 @@ Usage:  dismount
 
 Once you have learned to Ride, travel becomes faster and easier. With All-
 Terrain Riding, you can coax your mount across rivers and mountains, too.
+Riding lowers the delay during movement, as well as the movement point cost.
 
 When you dismount, the animal you were riding is stored. You can see it on your
 affects list. If you type "mount" again without targetting a new animal, you
@@ -158,13 +165,12 @@ will re-mount your stored ride. If you target a new animal while you already
 have a stored mount, the old one will be released.
 
 If you have a saddle in your inventory, you will automatically equip it when
-you mount up. The saddle will be removed automatically when you dismount --
-If your inventory is full, this can cause you to drop the saddle. You can make
-a simple saddle with Basic Crafts.
+you mount up. The saddle will be removed automatically when you dismount. You
+can make a simple saddle with Basic Crafts.
 
 Flying mounts require All-Terrain Riding, or Fly + Ride, or Dragonriding.
 
-See also: AFFECTS, BASIC CRAFTS, DRAGONRIDING
+See also: AFFECTS, BASIC CRAFTS, DRAGONRIDING, MOVEMENT POINTS
 #
 MOUNTAIN "MOUNTAIN CLIMBING"
 
@@ -176,7 +182,7 @@ In order to cross large mountain ranges, you must learn Mountain climbing.
 It still takes a lot of energy to cross, but it's not possible at all
 otherwise.
 #
-NAVIGATION "NAVIGATION SKILL" COORDINATES
+NAVIGATION COORDINATES
 
 Navigation (Survival ability)
 
@@ -210,7 +216,7 @@ or "where" commands, but this ability only functions outdoors.
 
 See also: TRACK, WHERE, UNSEEN PASSING
 #
-PATHFINDING "PATHFIND SKILL"
+PATHFINDING
 
 Pathfinding (Survival ability)
 
@@ -244,7 +250,7 @@ Poison also allows your physical resistance trait to apply to poison damage.
 
 Both of these abilities give skill-ups only when they trigger.
 #
-STAMINA "STAMINA SKILL"
+STAMINA
 
 Stamina (Survival ability)
 
@@ -261,7 +267,7 @@ Swimming allows you to move through river and ocean squares without a canoe
 or ship. However, sharks are attracted to the splashing of swimmers and will
 attack you if you are in the ocean.
 
-See also: CANOE, SHIP
+See also: CANOE, SHIPBUILDING
 #
 THIRST "SATED THIRST"
 
@@ -273,7 +279,7 @@ never get thirsty in the first place.
 
 See also: FILL, DRINK
 #
-TRACK "TRACK SKILL"
+TRACK
 
 Track (Survival ability)
 

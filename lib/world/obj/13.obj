@@ -4,7 +4,7 @@ a glowing green seashell~
 A glowing green seashell is sitting on the ground.~
 The seashell can be used in certain crafts and enchantments.
 ~
-3 l a
+3 l a 1
 0 0 0
 1 0
 R
@@ -18,7 +18,7 @@ a striped barbfish~
 The remains of a striped barbfish is rotting here.~
 You can eat the fish.
 ~
-6 kl a
+6 kl a 1
 24 0 0
 7 168
 R
@@ -30,7 +30,7 @@ a giant linefish~
 The remains of a giant linefish is rotting here.~
 You can eat the fish.
 ~
-6 k a
+6 k a 1
 24 0 0
 7 168
 R
@@ -42,7 +42,7 @@ a magenta arrowfish~
 The remains of a magenta arrowfish is rotting here.~
 You can eat the fish.
 ~
-6 k a
+6 k a 1
 24 0 0
 7 168
 R
@@ -54,7 +54,7 @@ some sea junk~
 A pile of sea junk has been left here.~
 It looks worthless.
 ~
-3 k a
+3 k a 1
 0 0 0
 1 0
 S
@@ -64,7 +64,7 @@ a worn old statuette~
 A worn old statuette is lying in the dust.~
 You're not sure what it is, but it looks like you could hold it.
 ~
-3 jl ao
+3 jl ao 1
 0 0 0
 1 0
 A
@@ -76,7 +76,7 @@ a pouch of nails~
 A pouch of nails is sitting here.~
 Nails are used for building.
 ~
-3 l a
+3 l a 1
 0 0 0
 2 0
 M
@@ -101,7 +101,7 @@ hold it up to the light, you can see its true color is a deep, deep violet.
 This dye, made from a mix of wild berries, imbues a fabric with unusual
 properties.
 ~
-3 l a
+3 l a 1
 0 0 0
 8 0
 R
@@ -115,7 +115,7 @@ A vial of deep orange dye is sitting here.~
 pigment of a magenta arrowfish. It has an unusual glow in dim light, like it
 catches and amplifies every ray of light that hits it.
 ~
-3 l a
+3 l a 1
 0 0 0
 8 0
 R
@@ -127,7 +127,7 @@ a heavy coin mill~
 There is a coin mill here.~
 Coin mills are required to build a mint.
 ~
-3 el a
+3 el a 1
 0 0 0
 2 0
 M
@@ -143,7 +143,7 @@ a small skin~
 A small pile of skin is stacked on the ground.~
 Skin can be tanned to make leather.
 ~
-3 l a
+3 l a 1
 0 0 0
 7 0
 R
@@ -155,7 +155,7 @@ a large skin~
 A large pile of skin is stacked on the ground.~
 Skin can be tanned to make leather.
 ~
-3 l a
+3 l a 1
 0 0 0
 7 0
 R
@@ -167,7 +167,7 @@ a luxurious fox fur~
 A fox fur is crumpled on the ground.~
 Fox fur is used in some types of clothing.
 ~
-3 0 a
+3 0 a 1
 0 0 0
 7 0
 R
@@ -179,7 +179,7 @@ a big cat pelt~
 A big cat pelt is lying here.~
 This pelt, from a dangerous big cat, can be made into fancy clothing.
 ~
-3 l a
+3 l a 1
 0 0 0
 7 0
 R
@@ -191,7 +191,7 @@ a shark skin~
 A shark skin is drying on the ground.~
 The shark skin is smooth one way, rough the other.
 ~
-3 0 a
+3 0 a 1
 0 0 0
 7 0
 R
@@ -203,7 +203,7 @@ some snakeskin~
 Some snakeskin is crumpled on the ground.~
 The snakeskin can be used for certain crafts.
 ~
-3 l a
+3 l a 1
 0 0 0
 7 0
 R
@@ -215,7 +215,7 @@ a small piece of leather~
 A pile of small pieces of leather is sitting here.~
 Leather can be sewn into armor.
 ~
-3 l a
+3 l a 1
 0 0 0
 7 0
 R
@@ -229,7 +229,7 @@ a large piece of leather~
 A pile of large pieces of leather is sitting here.~
 Leather can be sewn into armor.
 ~
-3 l a
+3 l a 1
 0 0 0
 7 0
 R
@@ -241,7 +241,7 @@ some wool~
 Some wool is scattered on the ground.~
 You can weave the wool into cloth.
 ~
-3 0 a
+3 l a 2
 0 0 0
 7 0
 R
@@ -253,7 +253,7 @@ a bolt of cloth~
 A bolt of cloth is lying on the ground.~
 This simple cloth is used to sew clothing.
 ~
-3 l a
+3 l a 1
 0 0 0
 7 0
 R

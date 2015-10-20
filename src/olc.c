@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: olc.c                                           EmpireMUD 2.0b2 *
+*   File: olc.c                                           EmpireMUD 2.0b3 *
 *  Usage: On-Line Creation at player level                                *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -26,6 +26,7 @@
 *   Core Command
 *   Common Modules
 *   Common Displays
+*   Auditors
 *   Helpers
 */
 
@@ -57,7 +58,17 @@ OLC_MODULE(advedit_minlevel);
 OLC_MODULE(advedit_name);
 OLC_MODULE(advedit_playerlimit);
 OLC_MODULE(advedit_reset);
+OLC_MODULE(advedit_script);
 OLC_MODULE(advedit_startvnum);
+
+// book modules
+OLC_MODULE(booked_author);
+OLC_MODULE(booked_byline);
+OLC_MODULE(booked_item_description);
+OLC_MODULE(booked_item_name);
+OLC_MODULE(booked_license);
+OLC_MODULE(booked_paragraphs);
+OLC_MODULE(booked_title);
 
 // building modules
 OLC_MODULE(bedit_affects);
@@ -86,6 +97,7 @@ OLC_MODULE(cedit_buildon);
 OLC_MODULE(cedit_builds);
 OLC_MODULE(cedit_creates);
 OLC_MODULE(cedit_flags);
+OLC_MODULE(cedit_levelrequired);
 OLC_MODULE(cedit_liquid);
 OLC_MODULE(cedit_name);
 OLC_MODULE(cedit_quantity);
@@ -109,6 +121,16 @@ OLC_MODULE(cropedit_xmin);
 OLC_MODULE(cropedit_ymax);
 OLC_MODULE(cropedit_ymin);
 
+// global modules
+OLC_MODULE(gedit_flags);
+OLC_MODULE(gedit_interaction);
+OLC_MODULE(gedit_maxlevel);
+OLC_MODULE(gedit_minlevel);
+OLC_MODULE(gedit_mobexclude);
+OLC_MODULE(gedit_mobflags);
+OLC_MODULE(gedit_name);
+OLC_MODULE(gedit_type);
+
 // mob edit modules
 OLC_MODULE(medit_affects);
 OLC_MODULE(medit_attack);
@@ -125,6 +147,7 @@ OLC_MODULE(medit_sex);
 OLC_MODULE(medit_short_description);
 
 // map modules
+OLC_MODULE(mapedit_build);
 OLC_MODULE(mapedit_complete_room);
 OLC_MODULE(mapedit_decustomize);
 OLC_MODULE(mapedit_delete_exit);
@@ -135,6 +158,7 @@ OLC_MODULE(mapedit_pass_walls);
 OLC_MODULE(mapedit_room_description);
 OLC_MODULE(mapedit_room_name);
 OLC_MODULE(mapedit_roomtype);
+OLC_MODULE(mapedit_ruin);
 OLC_MODULE(mapedit_terrain);
 OLC_MODULE(mapedit_unclaimable);
 
@@ -224,6 +248,9 @@ OLC_MODULE(tedit_types);
 
 
 // externs
+extern const char *interact_types[];
+extern const int interact_attach_types[NUM_INTERACTS];
+extern const byte interact_vnum_types[NUM_INTERACTS];
 extern const char *olc_flag_bits[];
 extern const char *olc_type_bits[NUM_OLC_TYPES+1];
 
@@ -237,18 +264,22 @@ extern bool valid_room_template_vnum(rmt_vnum vnum);
 
 // prototypes
 void olc_show_adventure(char_data *ch);
+void olc_show_book(char_data *ch);
 void olc_show_building(char_data *ch);
 void olc_show_craft(char_data *ch);
 void olc_show_crop(char_data *ch);
+void olc_show_global(char_data *ch);
 void olc_show_mobile(char_data *ch);
 void olc_show_object(char_data *ch);
 void olc_show_room_template(char_data *ch);
 void olc_show_sector(char_data *ch);
 void olc_show_trigger(char_data *ch);
 extern adv_data *setup_olc_adventure(adv_data *input);
+extern book_data *setup_olc_book(book_data *input);
 extern bld_data *setup_olc_building(bld_data *input);
 extern craft_data *setup_olc_craft(craft_data *input);
 extern crop_data *setup_olc_crop(crop_data *input);
+extern struct global_data *setup_olc_global(struct global_data *input);
 extern char_data *setup_olc_mobile(char_data *input);
 extern obj_data *setup_olc_object(obj_data *input);
 extern room_template *setup_olc_room_template(room_template *input);
@@ -260,16 +291,16 @@ extern bool validate_icon(char *icon);
 // master olc command structure
 const struct olc_command_data olc_data[] = {
 	// main commands
-	{ "abort", olc_abort, OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
-	{ "audit", olc_audit, OLC_CRAFT | OLC_MOBILE | OLC_OBJECT, NOBITS },
-	{ "copy", olc_copy, OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, NOBITS },
-	{ "delete", olc_delete, OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, OLC_CF_NO_ABBREV },
+	{ "abort", olc_abort, OLC_BOOK | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
+	{ "audit", olc_audit, OLC_ADVENTURE | OLC_BUILDING | OLC_CRAFT | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_ROOM_TEMPLATE, NOBITS },
+	{ "copy", olc_copy, OLC_BOOK | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, NOBITS },
+	{ "delete", olc_delete, OLC_BOOK | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, OLC_CF_NO_ABBREV },
 	// "display" command uses the shortcut "." or "olc" with no args, and is in the do_olc function
-	{ "edit", olc_edit, OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, NOBITS },
-	{ "free", olc_free, OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, NOBITS },
-	{ "list", olc_list, OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, NOBITS },
-	{ "save", olc_save, OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
-	{ "search", olc_search, OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ROOM_TEMPLATE, NOBITS },
+	{ "edit", olc_edit, OLC_BOOK | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, NOBITS },
+	{ "free", olc_free, OLC_BOOK | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, NOBITS },
+	{ "list", olc_list, OLC_BOOK | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, NOBITS },
+	{ "save", olc_save, OLC_BOOK | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
+	{ "search", olc_search, OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ROOM_TEMPLATE, NOBITS },
 	
 	// admin
 	{ "removeindev", olc_removeindev, NOBITS, NOBITS },
@@ -289,7 +320,17 @@ const struct olc_command_data olc_data[] = {
 	{ "name", advedit_name, OLC_ADVENTURE, OLC_CF_EDITOR },
 	{ "playerlimit", advedit_playerlimit, OLC_ADVENTURE, OLC_CF_EDITOR },
 	{ "reset", advedit_reset, OLC_ADVENTURE, OLC_CF_EDITOR },
+	{ "script", advedit_script, OLC_ADVENTURE, OLC_CF_EDITOR },
 	{ "startvnum", advedit_startvnum, OLC_ADVENTURE, OLC_CF_EDITOR },
+	
+	// books
+	{ "author", booked_author, OLC_BOOK, OLC_CF_EDITOR },
+	{ "byline", booked_byline, OLC_BOOK, OLC_CF_EDITOR },
+	{ "description", booked_item_description, OLC_BOOK, OLC_CF_EDITOR },
+	{ "item", booked_item_name, OLC_BOOK, OLC_CF_EDITOR },
+	{ "license", booked_license, OLC_BOOK, OLC_CF_EDITOR },
+	{ "paragraphs", booked_paragraphs, OLC_BOOK, OLC_CF_EDITOR },
+	{ "title", booked_title, OLC_BOOK, OLC_CF_EDITOR },
 	
 	// building commands
 	{ "affects", bedit_affects, OLC_BUILDING, OLC_CF_EDITOR },
@@ -318,6 +359,7 @@ const struct olc_command_data olc_data[] = {
 	{ "buildon", cedit_buildon, OLC_CRAFT, OLC_CF_EDITOR },
 	{ "creates", cedit_creates, OLC_CRAFT, OLC_CF_EDITOR },
 	{ "flags", cedit_flags, OLC_CRAFT, OLC_CF_EDITOR },
+	{ "levelrequired", cedit_levelrequired, OLC_CRAFT, OLC_CF_EDITOR },
 	{ "liquid", cedit_liquid, OLC_CRAFT, OLC_CF_EDITOR },
 	{ "name", cedit_name, OLC_CRAFT, OLC_CF_EDITOR },
 	{ "quantity", cedit_quantity, OLC_CRAFT, OLC_CF_EDITOR },
@@ -341,6 +383,16 @@ const struct olc_command_data olc_data[] = {
 	{ "ymax", cropedit_ymax, OLC_CROP, OLC_CF_EDITOR },
 	{ "ymin", cropedit_ymin, OLC_CROP, OLC_CF_EDITOR },
 	
+	// globals commands
+	{ "flags", gedit_flags, OLC_GLOBAL, OLC_CF_EDITOR },
+	{ "interaction", gedit_interaction, OLC_GLOBAL, OLC_CF_EDITOR },
+	{ "maxlevel", gedit_maxlevel, OLC_GLOBAL, OLC_CF_EDITOR },
+	{ "minlevel", gedit_minlevel, OLC_GLOBAL, OLC_CF_EDITOR },
+	{ "mobexclude", gedit_mobexclude, OLC_GLOBAL, OLC_CF_EDITOR },
+	{ "mobflags", gedit_mobflags, OLC_GLOBAL, OLC_CF_EDITOR },
+	{ "name", gedit_name, OLC_GLOBAL, OLC_CF_EDITOR },
+	{ "type", gedit_type, OLC_GLOBAL, OLC_CF_EDITOR },
+	
 	// mob commands
 	{ "affects", medit_affects, OLC_MOBILE, OLC_CF_EDITOR },
 	{ "attack", medit_attack, OLC_MOBILE, OLC_CF_EDITOR },
@@ -357,6 +409,7 @@ const struct olc_command_data olc_data[] = {
 	{ "shortdescription", medit_short_description, OLC_MOBILE, OLC_CF_EDITOR },
 	
 	// map commands
+	{ "build", mapedit_build, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "complete", mapedit_complete_room, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "decustomize", mapedit_decustomize, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "deleteexit", mapedit_delete_exit, OLC_MAP, OLC_CF_MAP_EDIT },
@@ -367,6 +420,7 @@ const struct olc_command_data olc_data[] = {
 	{ "name", mapedit_room_name, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "passwalls", mapedit_pass_walls, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "roomtype", mapedit_roomtype, OLC_MAP, OLC_CF_MAP_EDIT },
+	{ "ruin", mapedit_ruin, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "terrain", mapedit_terrain, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "unclaimable", mapedit_unclaimable, OLC_MAP, OLC_CF_MAP_EDIT },
 	
@@ -570,6 +624,11 @@ OLC_MODULE(olc_abort) {
 				GET_OLC_ADVENTURE(ch->desc) = NULL;
 				break;
 			}
+			case OLC_BOOK: {
+				free_book(GET_OLC_BOOK(ch->desc));
+				GET_OLC_BOOK(ch->desc) = NULL;
+				break;
+			}
 			case OLC_BUILDING: {
 				free_building(GET_OLC_BUILDING(ch->desc));
 				GET_OLC_BUILDING(ch->desc) = NULL;
@@ -583,6 +642,11 @@ OLC_MODULE(olc_abort) {
 			case OLC_CROP: {
 				free_crop(GET_OLC_CROP(ch->desc));
 				GET_OLC_CROP(ch->desc) = NULL;
+				break;
+			}
+			case OLC_GLOBAL: {
+				free_global(GET_OLC_GLOBAL(ch->desc));
+				GET_OLC_GLOBAL(ch->desc) = NULL;
 				break;
 			}
 			case OLC_MOBILE: {
@@ -628,7 +692,7 @@ OLC_MODULE(olc_abort) {
 
 
 // Usage: olc mob audit <from vnum> [to vnum]
-OLC_MODULE(olc_audit) {	
+OLC_MODULE(olc_audit) {
 	char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	any_vnum from_vnum = NOTHING, to_vnum = NOTHING, iter;
 	bool found = FALSE;
@@ -655,34 +719,26 @@ OLC_MODULE(olc_audit) {
 		
 		// types that use hashes
 		switch (type) {
-			/*
 			case OLC_ADVENTURE: {
+				extern bool audit_adventure(adv_data *adv, char_data *ch, bool only_one);
 				adv_data *adv, *next_adv;
 				HASH_ITER(hh, adventure_table, adv, next_adv) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (GET_ADV_VNUM(adv) >= from_vnum && GET_ADV_VNUM(adv) <= to_vnum) {
-						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "[%5d] %s (%d-%d)\r\n", GET_ADV_VNUM(adv), GET_ADV_NAME(adv), GET_ADV_START_VNUM(adv), GET_ADV_END_VNUM(adv));
+						found |= audit_adventure(adv, ch, (from_vnum == to_vnum));
 					}
 				}
 				break;
 			}
 			case OLC_BUILDING: {
+				extern bool audit_building(bld_data *bld, char_data *ch);
 				bld_data *bld, *next_bld;
 				HASH_ITER(hh, building_table, bld, next_bld) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (GET_BLD_VNUM(bld) >= from_vnum && GET_BLD_VNUM(bld) <= to_vnum) {
-						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "[%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
+						found |= audit_building(bld, ch);
 					}
 				}
 				break;
 			}
-			*/
 			case OLC_CRAFT: {
 				extern bool audit_craft(craft_data *craft, char_data *ch);
 				craft_data *craft, *next_craft;
@@ -708,6 +764,16 @@ OLC_MODULE(olc_audit) {
 				break;
 			}
 			*/
+			case OLC_GLOBAL: {
+				extern bool audit_global(struct global_data *global, char_data *ch);
+				struct global_data *glb, *next_glb;
+				HASH_ITER(hh, globals_table, glb, next_glb) {
+					if (GET_GLOBAL_VNUM(glb) >= from_vnum && GET_GLOBAL_VNUM(glb) <= to_vnum) {
+						found |= audit_global(glb, ch);
+					}
+				}
+				break;
+			}
 			case OLC_MOBILE: {
 				extern bool audit_mobile(char_data *mob, char_data *ch);
 				char_data *mob, *next_mob;
@@ -728,20 +794,17 @@ OLC_MODULE(olc_audit) {
 				}
 				break;
 			}
-			/*
 			case OLC_ROOM_TEMPLATE: {
+				extern bool audit_room_template(room_template *rmt, char_data *ch);
 				room_template *rmt, *next_rmt;
 				HASH_ITER(hh, room_template_table, rmt, next_rmt) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (GET_RMT_VNUM(rmt) >= from_vnum && GET_RMT_VNUM(rmt) <= to_vnum) {
-						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "[%5d] %s\r\n", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
+						found |= audit_room_template(rmt, ch);
 					}
 				}
 				break;
 			}
+			/*
 			case OLC_SECTOR: {
 				sector_data *sect, *next_sect;
 				HASH_ITER(hh, sector_table, sect, next_sect) {
@@ -820,6 +883,11 @@ OLC_MODULE(olc_copy) {
 			exists = (adventure_proto(from_vnum) != NULL);
 			break;
 		}
+		case OLC_BOOK: {
+			found = (book_proto(vnum) != NULL);
+			exists = (book_proto(from_vnum) != NULL);
+			break;
+		}
 		case OLC_BUILDING: {
 			found = (building_proto(vnum) != NULL);
 			exists = (building_proto(from_vnum) != NULL);
@@ -833,6 +901,11 @@ OLC_MODULE(olc_copy) {
 		case OLC_CROP: {
 			found = (crop_proto(vnum) != NULL);
 			exists = (crop_proto(from_vnum) != NULL);
+			break;
+		}
+		case OLC_GLOBAL: {
+			found = (global_proto(vnum) != NULL);
+			exists = (global_proto(from_vnum) != NULL);
 			break;
 		}
 		case OLC_MOBILE: {
@@ -911,6 +984,12 @@ OLC_MODULE(olc_copy) {
 			olc_show_adventure(ch);
 			break;
 		}
+		case OLC_BOOK: {
+			GET_OLC_BOOK(ch->desc) = setup_olc_book(book_proto(from_vnum));
+			GET_OLC_BOOK(ch->desc)->vnum = vnum;
+			olc_show_book(ch);
+			break;
+		}
 		case OLC_BUILDING: {
 			GET_OLC_BUILDING(ch->desc) = setup_olc_building(building_proto(from_vnum));
 			GET_OLC_BUILDING(ch->desc)->vnum = vnum;
@@ -929,6 +1008,13 @@ OLC_MODULE(olc_copy) {
 			GET_OLC_CROP(ch->desc)->vnum = vnum;
 			SET_BIT(GET_OLC_CROP(ch->desc)->flags, CROPF_NOT_WILD);	// ensure flag
 			olc_show_crop(ch);
+			break;
+		}
+		case OLC_GLOBAL: {
+			GET_OLC_GLOBAL(ch->desc) = setup_olc_global(global_proto(from_vnum));
+			GET_OLC_GLOBAL(ch->desc)->vnum = vnum;
+			SET_BIT(GET_GLOBAL_FLAGS(GET_OLC_GLOBAL(ch->desc)), GLB_FLAG_IN_DEVELOPMENT);	// ensure flag
+			olc_show_global(ch);
 			break;
 		}
 		case OLC_MOBILE: {
@@ -979,9 +1065,11 @@ OLC_MODULE(olc_copy) {
 
 OLC_MODULE(olc_delete) {
 	void olc_delete_adventure(char_data *ch, adv_vnum vnum);
+	void olc_delete_book(char_data *ch, book_vnum vnum);
 	void olc_delete_building(char_data *ch, bld_vnum vnum);
 	void olc_delete_craft(char_data *ch, craft_vnum vnum);
 	void olc_delete_crop(char_data *ch, crop_vnum vnum);
+	void olc_delete_global(char_data *ch, any_vnum vnum);
 	void olc_delete_mobile(char_data *ch, mob_vnum vnum);
 	void olc_delete_object(char_data *ch, obj_vnum vnum);
 	void olc_delete_room_template(char_data *ch, rmt_vnum vnum);
@@ -1028,6 +1116,10 @@ OLC_MODULE(olc_delete) {
 			olc_delete_adventure(ch, vnum);
 			break;
 		}
+		case OLC_BOOK: {
+			olc_delete_book(ch, vnum);
+			break;
+		}
 		case OLC_BUILDING: {
 			olc_delete_building(ch, vnum);
 			break;
@@ -1038,6 +1130,10 @@ OLC_MODULE(olc_delete) {
 		}
 		case OLC_CROP: {
 			olc_delete_crop(ch, vnum);
+			break;
+		}
+		case OLC_GLOBAL: {
+			olc_delete_global(ch, vnum);
 			break;
 		}
 		case OLC_MOBILE: {
@@ -1074,6 +1170,10 @@ OLC_MODULE(olc_display) {
 			olc_show_adventure(ch);
 			break;
 		}
+		case OLC_BOOK: {
+			olc_show_book(ch);
+			break;
+		}
 		case OLC_BUILDING: {
 			olc_show_building(ch);
 			break;
@@ -1084,6 +1184,10 @@ OLC_MODULE(olc_display) {
 		}
 		case OLC_CROP: {
 			olc_show_crop(ch);
+			break;
+		}
+		case OLC_GLOBAL: {
+			olc_show_global(ch);
 			break;
 		}
 		case OLC_MOBILE: {
@@ -1179,6 +1283,13 @@ OLC_MODULE(olc_edit) {
 			olc_show_adventure(ch);
 			break;
 		}
+		case OLC_BOOK: {
+			// this sets up either new or existing automatically
+			GET_OLC_BOOK(ch->desc) = setup_olc_book(book_proto(vnum));
+			GET_OLC_BOOK(ch->desc)->vnum = vnum;			
+			olc_show_book(ch);
+			break;
+		}
 		case OLC_BUILDING: {
 			// this sets up either new or existing automatically
 			GET_OLC_BUILDING(ch->desc) = setup_olc_building(building_proto(vnum));
@@ -1198,6 +1309,13 @@ OLC_MODULE(olc_edit) {
 			GET_OLC_CROP(ch->desc) = setup_olc_crop(crop_proto(vnum));
 			GET_OLC_CROP(ch->desc)->vnum = vnum;			
 			olc_show_crop(ch);
+			break;
+		}
+		case OLC_GLOBAL: {
+			// this will set up from existing OR new automatically based on global_proto
+			GET_OLC_GLOBAL(ch->desc) = setup_olc_global(global_proto(vnum));
+			GET_OLC_GLOBAL(ch->desc)->vnum = vnum;			
+			olc_show_global(ch);
 			break;
 		}
 		case OLC_MOBILE: {
@@ -1282,6 +1400,10 @@ OLC_MODULE(olc_free) {
 					free = (adventure_proto(iter) == NULL);
 					break;
 				}
+				case OLC_BOOK: {
+					free = (book_proto(iter) == NULL);
+					break;
+				}
 				case OLC_BUILDING: {
 					free = (building_proto(iter) == NULL);
 					break;
@@ -1292,6 +1414,10 @@ OLC_MODULE(olc_free) {
 				}
 				case OLC_CROP: {
 					free = (crop_proto(iter) == NULL);
+					break;
+				}
+				case OLC_GLOBAL: {
+					free = (global_proto(iter) == NULL);
 					break;
 				}
 				case OLC_MOBILE: {
@@ -1335,28 +1461,67 @@ OLC_MODULE(olc_free) {
 
 
 // Usage: olc mob list <from vnum> [to vnum]
-OLC_MODULE(olc_list) {	
-	char buf[MAX_STRING_LENGTH*2], buf1[MAX_STRING_LENGTH*2], buf2[MAX_STRING_LENGTH], arg2[MAX_INPUT_LENGTH];
+OLC_MODULE(olc_list) {
+	char buf[MAX_STRING_LENGTH*2], buf1[MAX_STRING_LENGTH*2], buf2[MAX_STRING_LENGTH];
+	char arg[MAX_INPUT_LENGTH];
 	any_vnum from_vnum = NOTHING, to_vnum = NOTHING, iter;
+	bool found_from = FALSE, found_to = FALSE;
+	bool show_details = FALSE;
 	int count = 0, len;
 	
-	// allow - or :
+	skip_spaces(&argument);
+	
+	// allow - or : before the first space
 	for (iter = 0; iter < strlen(argument); ++iter) {
 		if (argument[iter] == '-' || argument[iter] == ':') {
 			argument[iter] = ' ';
 		}
+		else if (argument[iter] == ' ') {
+			break;
+		}
 	}
-	half_chop(argument, arg, arg2);
 	
-	if (!*arg || !isdigit(*arg) || (*arg2 && !isdigit(*arg2))) {
-		msg_to_char(ch, "Usage: list <from vnum> [to vnum]\r\n");
+	// process argument
+	while (*argument) {
+		argument = any_one_arg(argument, arg);
+		
+		// first argument must be a "from" vnum
+		if (!found_from) {
+			if (!isdigit(*arg)) {
+				msg_to_char(ch, "Invalid vnum.\r\n");
+				return;
+			}
+			from_vnum = atoi(arg);
+			found_from = TRUE;
+			continue;
+		}
+		
+		if (!found_to && isdigit(*arg)) {
+			to_vnum = atoi(arg);
+			found_to = TRUE;
+			continue;
+		}
+		
+		// other types of args:
+		if ((!strn_cmp(arg, "-d", 2) && is_abbrev(arg, "-details")) || (!strn_cmp(arg, "--d", 3) && is_abbrev(arg, "--details"))) {
+			show_details = TRUE;
+			continue;
+		}
+		
+		// reached an error
+		msg_to_char(ch, "Usage: list <from vnum> [to vnum] [-d]\r\n");
+		return;
 	}
-	else if ((from_vnum = atoi(arg)) < 0 || (to_vnum = atoi(arg2)) < 0 ) {
+	
+	if (!found_from) {	// no useful args
+		msg_to_char(ch, "Usage: list <from vnum> [to vnum] [-d]\r\n");
+	}
+	else if (from_vnum < 0) {
 		msg_to_char(ch, "Invalid vnum range.\r\n");
 	}
 	else {
 		// 2nd vnum optional
-		if (!*arg2) {
+		if (to_vnum == NOTHING) {
 			to_vnum = from_vnum;
 		}
 	
@@ -1366,6 +1531,7 @@ OLC_MODULE(olc_list) {
 		// types that use hashes
 		switch (type) {
 			case OLC_ADVENTURE: {
+				extern char *list_one_adventure(adv_data *adv, bool detail);
 				adv_data *adv, *next_adv;
 				HASH_ITER(hh, adventure_table, adv, next_adv) {
 					if (len >= sizeof(buf)) {
@@ -1373,12 +1539,27 @@ OLC_MODULE(olc_list) {
 					}
 					if (GET_ADV_VNUM(adv) >= from_vnum && GET_ADV_VNUM(adv) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "[%5d] %s (%d-%d)\r\n", GET_ADV_VNUM(adv), GET_ADV_NAME(adv), GET_ADV_START_VNUM(adv), GET_ADV_END_VNUM(adv));
+						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_adventure(adv, show_details));
+					}
+				}
+				break;
+			}
+			case OLC_BOOK: {
+				extern char *list_one_book(book_data *book, bool detail);
+				book_data *book, *next_book;
+				HASH_ITER(hh, book_table, book, next_book) {
+					if (len >= sizeof(buf)) {
+						break;
+					}
+					if (book->vnum >= from_vnum && book->vnum <= to_vnum) {
+						++count;
+						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_book(book, show_details));
 					}
 				}
 				break;
 			}
 			case OLC_BUILDING: {
+				extern char *list_one_building(bld_data *bld, bool detail);
 				bld_data *bld, *next_bld;
 				HASH_ITER(hh, building_table, bld, next_bld) {
 					if (len >= sizeof(buf)) {
@@ -1386,12 +1567,13 @@ OLC_MODULE(olc_list) {
 					}
 					if (GET_BLD_VNUM(bld) >= from_vnum && GET_BLD_VNUM(bld) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "[%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
+						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_building(bld, show_details));
 					}
 				}
 				break;
 			}
 			case OLC_CRAFT: {
+				extern char *list_one_craft(craft_data *craft, bool detail);
 				craft_data *craft, *next_craft;
 				HASH_ITER(hh, craft_table, craft, next_craft) {
 					if (len >= sizeof(buf)) {
@@ -1399,12 +1581,13 @@ OLC_MODULE(olc_list) {
 					}
 					if (GET_CRAFT_VNUM(craft) >= from_vnum && GET_CRAFT_VNUM(craft) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "[%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
+						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_craft(craft, show_details));
 					}
 				}
 				break;
 			}
 			case OLC_CROP: {
+				extern char *list_one_crop(crop_data *crop, bool detail);
 				crop_data *crop, *next_crop;
 				HASH_ITER(hh, crop_table, crop, next_crop) {
 					if (len >= sizeof(buf)) {
@@ -1412,12 +1595,27 @@ OLC_MODULE(olc_list) {
 					}
 					if (GET_CROP_VNUM(crop) >= from_vnum && GET_CROP_VNUM(crop) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "[%5d] %s\r\n", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
+						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_crop(crop, show_details));
+					}
+				}
+				break;
+			}
+			case OLC_GLOBAL: {
+				extern char *list_one_global(struct global_data *glb, bool detail);
+				struct global_data *glb, *next_glb;
+				HASH_ITER(hh, globals_table, glb, next_glb) {
+					if (len >= sizeof(buf)) {
+						break;
+					}
+					if (GET_GLOBAL_VNUM(glb) >= from_vnum && GET_GLOBAL_VNUM(glb) <= to_vnum) {
+						++count;
+						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_global(glb, show_details));
 					}
 				}
 				break;
 			}
 			case OLC_MOBILE: {
+				extern char *list_one_mobile(char_data *mob, bool detail);
 				char_data *mob, *next_mob;
 				HASH_ITER(hh, mobile_table, mob, next_mob) {
 					if (len >= sizeof(buf)) {
@@ -1425,12 +1623,13 @@ OLC_MODULE(olc_list) {
 					}
 					if (GET_MOB_VNUM(mob) >= from_vnum && GET_MOB_VNUM(mob) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "[%5d] %s\r\n", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
+						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_mobile(mob, show_details));
 					}
 				}
 				break;
 			}
 			case OLC_OBJECT: {
+				extern char *list_one_object(obj_data *obj, bool detail);
 				obj_data *obj, *next_obj;
 				HASH_ITER(hh, object_table, obj, next_obj) {
 					if (len >= sizeof(buf)) {
@@ -1438,12 +1637,13 @@ OLC_MODULE(olc_list) {
 					}
 					if (GET_OBJ_VNUM(obj) >= from_vnum && GET_OBJ_VNUM(obj) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "[%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_object(obj, show_details));
 					}
 				}
 				break;
 			}
 			case OLC_ROOM_TEMPLATE: {
+				extern char *list_one_room_template(room_template *rmt, bool detail);
 				room_template *rmt, *next_rmt;
 				HASH_ITER(hh, room_template_table, rmt, next_rmt) {
 					if (len >= sizeof(buf)) {
@@ -1451,12 +1651,13 @@ OLC_MODULE(olc_list) {
 					}
 					if (GET_RMT_VNUM(rmt) >= from_vnum && GET_RMT_VNUM(rmt) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "[%5d] %s\r\n", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
+						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_room_template(rmt, show_details));
 					}
 				}
 				break;
 			}
 			case OLC_SECTOR: {
+				extern char *list_one_sector(sector_data *sect, bool detail);
 				sector_data *sect, *next_sect;
 				HASH_ITER(hh, sector_table, sect, next_sect) {
 					if (len >= sizeof(buf)) {
@@ -1464,12 +1665,13 @@ OLC_MODULE(olc_list) {
 					}
 					if (GET_SECT_VNUM(sect) >= from_vnum && GET_SECT_VNUM(sect) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "[%5d] %s\r\n", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
+						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_sector(sect, show_details));
 					}
 				}
 				break;
 			}
 			case OLC_TRIGGER: {
+				extern char *list_one_trigger(trig_data *trig, bool detail);
 				trig_data *trig, *next_trig;
 				HASH_ITER(hh, trigger_table, trig, next_trig) {
 					if (len >= sizeof(buf)) {
@@ -1477,7 +1679,7 @@ OLC_MODULE(olc_list) {
 					}
 					if (GET_TRIG_VNUM(trig) >= from_vnum && GET_TRIG_VNUM(trig) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "[%5d] %s\r\n", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig));
+						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_trigger(trig, show_details));
 					}
 				}
 				break;
@@ -1500,6 +1702,7 @@ OLC_MODULE(olc_removeindev) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	any_vnum from = NOTHING, to = NOTHING;
 	bool use_adv = FALSE, any = FALSE;
+	struct global_data *glb, *next_glb;
 	craft_data *craft, *next_craft;
 	adv_data *adv = NULL;
 	int iter;
@@ -1569,6 +1772,23 @@ OLC_MODULE(olc_removeindev) {
 			any = TRUE;
 		}
 		
+		HASH_ITER(hh, globals_table, glb, next_glb) {
+			if (GET_GLOBAL_VNUM(glb) < from || GET_GLOBAL_VNUM(glb) > to) {
+				continue;
+			}
+			if (!IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_IN_DEVELOPMENT)) {
+				continue;
+			}
+			if (!player_can_olc_edit(ch, OLC_GLOBAL, GET_GLOBAL_VNUM(glb))) {
+				continue;
+			}
+			
+			REMOVE_BIT(GET_GLOBAL_FLAGS(glb), GLB_FLAG_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_GLB, GET_GLOBAL_VNUM(glb));
+			msg_to_char(ch, "Removed IN-DEV flag from global [%d] %s.\r\n", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
+			any = TRUE;
+		}
+		
 		if (!any) {
 			msg_to_char(ch, "No in-development flags to remove.\r\n");
 		}
@@ -1584,9 +1804,11 @@ OLC_MODULE(olc_removeindev) {
 
 OLC_MODULE(olc_save) {
 	void save_olc_adventure(descriptor_data *desc);
+	void save_olc_book(descriptor_data *desc);
 	void save_olc_building(descriptor_data *desc);
 	void save_olc_craft(descriptor_data *desc);
 	void save_olc_crop(descriptor_data *desc);
+	void save_olc_global(descriptor_data *desc);
 	void save_olc_mobile(descriptor_data *desc);
 	void save_olc_object(descriptor_data *desc);
 	void save_olc_room_template(descriptor_data *desc);
@@ -1614,6 +1836,12 @@ OLC_MODULE(olc_save) {
 				GET_OLC_ADVENTURE(ch->desc) = NULL;
 				break;
 			}
+			case OLC_BOOK: {
+				save_olc_book(ch->desc);
+				free_book(GET_OLC_BOOK(ch->desc));
+				GET_OLC_BOOK(ch->desc) = NULL;
+				break;
+			}
 			case OLC_BUILDING: {
 				save_olc_building(ch->desc);
 				free_building(GET_OLC_BUILDING(ch->desc));
@@ -1630,6 +1858,12 @@ OLC_MODULE(olc_save) {
 				save_olc_crop(ch->desc);
 				free_crop(GET_OLC_CROP(ch->desc));
 				GET_OLC_CROP(ch->desc) = NULL;
+				break;
+			}
+			case OLC_GLOBAL: {
+				save_olc_global(ch->desc);
+				free_global(GET_OLC_GLOBAL(ch->desc));
+				GET_OLC_GLOBAL(ch->desc) = NULL;
 				break;
 			}
 			case OLC_MOBILE: {
@@ -1685,6 +1919,7 @@ OLC_MODULE(olc_search) {
 	void olc_search_building(char_data *ch, bld_vnum vnum);
 	void olc_search_craft(char_data *ch, craft_vnum vnum);
 	void olc_search_crop(char_data *ch, crop_vnum vnum);
+	void olc_search_global(char_data *ch, any_vnum vnum);
 	void olc_search_mob(char_data *ch, mob_vnum vnum);
 	void olc_search_obj(char_data *ch, obj_vnum vnum);
 	void olc_search_room_template(char_data *ch, rmt_vnum vnum);
@@ -1713,6 +1948,10 @@ OLC_MODULE(olc_search) {
 			}
 			case OLC_CROP: {
 				olc_search_crop(ch, vnum);
+				break;
+			}
+			case OLC_GLOBAL: {
+				olc_search_global(ch, vnum);
 				break;
 			}
 			case OLC_MOBILE: {
@@ -1747,6 +1986,7 @@ OLC_MODULE(olc_search) {
 OLC_MODULE(olc_set_flags) {
 	char_data *vict = NULL;
 	bool file = FALSE;
+	bitvector_t old;
 	
 	argument = one_argument(argument, arg);
 	skip_spaces(&argument);
@@ -1764,18 +2004,23 @@ OLC_MODULE(olc_set_flags) {
 		msg_to_char(ch, "You can't set that on a person of such level.\r\n");
 	}
 	else {
+		old = GET_OLC_FLAGS(vict);
 		GET_OLC_FLAGS(vict) = olc_process_flag(ch, argument, "olc", "setflags", olc_flag_bits, GET_OLC_FLAGS(vict));
-		sprintbit(GET_OLC_FLAGS(vict), olc_flag_bits, buf, TRUE);
-		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has set olc flags for %s to: %s", GET_NAME(ch), GET_NAME(vict), buf);
-		msg_to_char(ch, "%s saved.\r\n", GET_NAME(vict));
 		
-		if (file) {
-			store_loaded_char(vict);
-			file = FALSE;
-			vict = NULL;
-		}
-		else {
-			SAVE_CHAR(vict);
+		// they didn't necessarily make any changes
+		if (GET_OLC_FLAGS(vict) != old) {
+			sprintbit(GET_OLC_FLAGS(vict), olc_flag_bits, buf, TRUE);
+			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has set olc flags for %s to: %s", GET_NAME(ch), GET_NAME(vict), buf);
+			msg_to_char(ch, "%s saved.\r\n", GET_NAME(vict));
+		
+			if (file) {
+				store_loaded_char(vict);
+				file = FALSE;
+				vict = NULL;
+			}
+			else {
+				SAVE_CHAR(vict);
+			}
 		}
 	}
 	
@@ -2025,6 +2270,152 @@ void get_script_display(struct trig_proto_list *list, char *save_buffer) {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// AUDITORS ////////////////////////////////////////////////////////////////
+
+/**
+* Checks for common extra description problems and reports them to ch.
+*
+* @param any_vnum vnum The vnum of the thing we're reporting on (obj, etc).
+* @param struct extra_descr_data *list The list to check.
+* @param char_data *ch The person to report to.
+* @return bool TRUE if any problems were reported; FALSE if all good.
+*/
+bool audit_extra_descs(any_vnum vnum, struct extra_descr_data *list, char_data *ch) {
+	struct extra_descr_data *iter;
+	bool problem = FALSE;
+	
+	for (iter = list; iter; iter = iter->next) {
+		if (!iter->keyword || !*skip_filler(iter->keyword)) {
+			olc_audit_msg(ch, vnum, "Extra desc: bad keywords");
+			problem = TRUE;
+		}
+		if (!iter->description || !*iter->description || !str_cmp(iter->description, "Nothing.\r\n")) {
+			olc_audit_msg(ch, vnum, "Extra desc '%s': bad description", NULLSAFE(iter->keyword));
+			problem = TRUE;
+		}
+		else if (!strn_cmp(iter->description, "Nothing.", 8)) {
+			olc_audit_msg(ch, vnum, "Extra desc '%s': description starting with 'Nothing.'", NULLSAFE(iter->keyword));
+			problem = TRUE;
+		}
+	}
+	
+	return problem;
+}
+
+
+/**
+* Checks for common interaction problems and reports them to ch.
+*
+* @param any_vnum vnum The vnum of the thing we're reporting on (obj, etc).
+* @param struct interaction_item *list The list to check.
+* @param int attach_type The type to accept (e.g. TYPE_MOB).
+* @param char_data *ch The person to report to.
+* @return bool TRUE if any problems were reported; FALSE if all good.
+*/
+bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach_type, char_data *ch) {
+	struct interaction_item *iter;
+	bool problem = FALSE;
+	int code, type;
+	
+	struct audint_t {
+		int code;
+		double percent;
+		UT_hash_handle hh;
+	};
+	struct audint_s {
+		int type;
+		struct audint_t *set;
+		UT_hash_handle hh;
+	};
+	struct audint_s *as, *next_as, *set = NULL;
+	struct audint_t *at, *next_at;
+	
+	for (iter = list; iter; iter = iter->next) {
+		if (interact_attach_types[iter->type] != attach_type) {
+			olc_audit_msg(ch, vnum, "Bad interaction: %s", interact_types[iter->type]);
+			problem = TRUE;
+		}
+		
+		// track cumulative percent
+		if (iter->exclusion_code) {
+			type = iter->type;
+			HASH_FIND_INT(set, &type, as);
+			if (!as) {
+				CREATE(as, struct audint_s, 1);
+				as->type = type;
+				HASH_ADD_INT(set, type, as);
+			}
+		
+			code = iter->exclusion_code;
+			HASH_FIND_INT(as->set, &code, at);
+			if (!at) {
+				CREATE(at, struct audint_t, 1);
+				at->code = code;
+				HASH_ADD_INT(as->set, code, at);
+			}
+			at->percent += iter->percent;
+		}
+	}
+	
+	HASH_ITER(hh, set, as, next_as) {
+		HASH_ITER(hh, as->set, at, next_at) {
+			if (at->percent > 100.0) {
+				olc_audit_msg(ch, vnum, "Interaction %s exclusion set '%c' totals %.2f%%", interact_types[as->type], (char)at->code, at->percent);
+				problem = TRUE;
+			}
+			free(at);
+		}
+		free(as);
+	}
+	
+	return problem;
+}
+
+
+/**
+* Checks for common spawn list problems and reports them to ch.
+*
+* @param any_vnum vnum The vnum of the thing we're reporting on (obj, etc).
+* @param struct spawn_info *list The list to check.
+* @param char_data *ch The person to report to.
+* @return bool TRUE if any problems were reported; FALSE if all good.
+*/
+bool audit_spawns(any_vnum vnum, struct spawn_info *list, char_data *ch) {
+	struct spawn_info *iter;
+	bool problem = FALSE;
+	
+	for (iter = list; iter; iter = iter->next) {
+		if (!mob_proto(iter->vnum)) {
+			olc_audit_msg(ch, vnum, "Spawn for mob %d: mob does not exist", iter->vnum);
+			problem = TRUE;
+		}
+		if (IS_SET(iter->flags, SPAWN_NOCTURNAL) && IS_SET(iter->flags, SPAWN_DIURNAL)) {
+			olc_audit_msg(ch, vnum, "Spawn for mob %d (%s) has conflicting flags", iter->vnum, get_mob_name_by_proto(iter->vnum));
+			problem = TRUE;
+		}
+		if (IS_SET(iter->flags, SPAWN_CLAIMED) && IS_SET(iter->flags, SPAWN_UNCLAIMED)) {
+			olc_audit_msg(ch, vnum, "Spawn for mob %d (%s) has conflicting flags", iter->vnum, get_mob_name_by_proto(iter->vnum));
+			problem = TRUE;
+		}
+		if (IS_SET(iter->flags, SPAWN_CITY) && IS_SET(iter->flags, SPAWN_OUT_OF_CITY)) {
+			olc_audit_msg(ch, vnum, "Spawn for mob %d (%s) has conflicting flags", iter->vnum, get_mob_name_by_proto(iter->vnum));
+			problem = TRUE;
+		}
+		if (IS_SET(iter->flags, SPAWN_NORTHERN) && IS_SET(iter->flags, SPAWN_SOUTHERN)) {
+			olc_audit_msg(ch, vnum, "Spawn for mob %d (%s) has conflicting flags", iter->vnum, get_mob_name_by_proto(iter->vnum));
+			problem = TRUE;
+		}
+		if (IS_SET(iter->flags, SPAWN_EASTERN) && IS_SET(iter->flags, SPAWN_WESTERN)) {
+			olc_audit_msg(ch, vnum, "Spawn for mob %d (%s) has conflicting flags", iter->vnum, get_mob_name_by_proto(iter->vnum));
+			problem = TRUE;
+		}
+	}
+
+	return problem;
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
 
 /**
@@ -2179,8 +2570,9 @@ bool player_can_olc_edit(char_data *ch, int type, any_vnum vnum) {
 	else if (IS_SET(type, OLC_MAP) && !OLC_FLAGGED(ch, OLC_FLAG_MAP_EDIT)) {
 		return FALSE;
 	}
-	else if (IS_SET(type, OLC_SECTOR) && !OLC_FLAGGED(ch, OLC_FLAG_SECTORS)) {
-		return FALSE;
+	else if (IS_SET(type, OLC_BOOK) && book_proto(vnum) && book_proto(vnum)->author == GET_IDNUM(ch)) {
+		// own book
+		return TRUE;
 	}
 	else if (IS_SET(type, OLC_ADVENTURE)) {
 		if (OLC_FLAGGED(ch, OLC_FLAG_NO_ADVENTURE)) {
@@ -2207,6 +2599,9 @@ bool player_can_olc_edit(char_data *ch, int type, any_vnum vnum) {
 		else if (IS_SET(type, OLC_CROP) && !OLC_FLAGGED(ch, OLC_FLAG_NO_CROP)) {
 			return TRUE;
 		}
+		else if (IS_SET(type, OLC_GLOBAL) && !OLC_FLAGGED(ch, OLC_FLAG_NO_GLOBAL)) {
+			return TRUE;
+		}
 		else if (IS_SET(type, OLC_MOBILE) && !OLC_FLAGGED(ch, OLC_FLAG_NO_MOBILE)) {
 			return TRUE;
 		}
@@ -2217,6 +2612,13 @@ bool player_can_olc_edit(char_data *ch, int type, any_vnum vnum) {
 			return TRUE;
 		}
 		else if (IS_SET(type, OLC_TRIGGER) && !OLC_FLAGGED(ch, OLC_FLAG_NO_TRIGGER)) {
+			return TRUE;
+		}
+		else if (IS_SET(type, OLC_SECTOR) && OLC_FLAGGED(ch, OLC_FLAG_SECTORS)) {
+			return TRUE;
+		}
+		else if (IS_SET(type, OLC_BOOK)) {
+			// no special permissions for books
 			return TRUE;
 		}
 	}
@@ -2244,7 +2646,7 @@ char *prompt_olc_info(char_data *ch) {
 	
 	sprintbit(GET_OLC_TYPE(ch->desc), olc_type_bits, typename, FALSE);
 	
-	snprintf(output, sizeof(output), "&c[%c%d] ", LOWER(typename[0]), GET_OLC_VNUM(ch->desc));
+	snprintf(output, sizeof(output), "%c%d", LOWER(typename[0]), GET_OLC_VNUM(ch->desc));
 	return output;
 }
 
@@ -2556,8 +2958,9 @@ int olc_process_type(char_data *ch, char *argument, char *name, char *command, c
 void olc_process_extra_desc(char_data *ch, char *argument, struct extra_descr_data **list) {
 	void setup_extra_desc_editor(char_data *ch, struct extra_descr_data *ex);
 	
-	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
-	struct extra_descr_data *ex, *find_ex, *temp;
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
+	struct extra_descr_data *ex, *change, *find_ex, *temp;
 	int num;
 	
 	half_chop(argument, arg1, arg2);
@@ -2622,39 +3025,42 @@ void olc_process_extra_desc(char_data *ch, char *argument, struct extra_descr_da
 			msg_to_char(ch, "You remove extra description %d.\r\n", num);
 		}
 	}
-	else if (is_abbrev(arg1, "keywords")) {
-		// split the args
-		strcpy(buf, arg2);
-		half_chop(buf, arg2, arg3);
+	else if (is_abbrev(arg1, "change")) {
+		half_chop(arg2, num_arg, arg1);
+		half_chop(arg1, type_arg, val_arg);
 		
-		if (!*arg3) {
-			msg_to_char(ch, "Usage: extra keywords <number> <new keywords>\r\n");
+		if (!*num_arg || !isdigit(*num_arg) || !*type_arg) {
+			msg_to_char(ch, "Usage: extra change <number> <keywords | description> [value]\r\n");
+			return;
 		}
-		else if (!(ex = find_extra_desc_by_num(*list, num))) {
-			msg_to_char(ch, "invalid extra desc number.\r\n");
+		
+		// find which one to change
+		if (!(change = find_extra_desc_by_num(*list, atoi(num_arg)))) {
+			msg_to_char(ch, "Invalid extra desc number.\r\n");
 		}
-		else {
-			if (ex->keyword) {
-				free(ex->keyword);
+		else if (is_abbrev(type_arg, "keywords")) {
+			if (!*val_arg) {
+				msg_to_char(ch, "Change the keywords to what?\r\n");
 			}
-			ex->keyword = str_dup(arg3);
-			
-			msg_to_char(ch, "You change the keywords to: %s\r\n", arg3);
+			else {
+				if (change->keyword) {
+					free(change->keyword);
+				}
+				change->keyword = str_dup(val_arg);
+				msg_to_char(ch, "Extra description %d keywords changed to: %s\r\n", atoi(num_arg), val_arg);
+			}
 		}
-	}
-	else if (is_abbrev(arg1, "description")) {
-		if (!(ex = find_extra_desc_by_num(*list, num))) {
-			msg_to_char(ch, "invalid extra desc number.\r\n");
+		else if (is_abbrev(type_arg, "description")) {
+			setup_extra_desc_editor(ch, change);
 		}
 		else {
-			setup_extra_desc_editor(ch, ex);
+			msg_to_char(ch, "You can only change the keywords or description.\r\n");
 		}
 	}
 	else {
 		msg_to_char(ch, "Usage: extra add <keywords>\r\n");
+		msg_to_char(ch, "Usage: extra change <number> <keywords | description> [value]\r\n");
 		msg_to_char(ch, "Usage: extra remove <number | all>\r\n");
-		msg_to_char(ch, "Usage: extra keywords <number> <new keywords>\r\n");
-		msg_to_char(ch, "Usage: extra description <number>\r\n");
 	}
 }
 
@@ -2671,8 +3077,9 @@ void olc_process_icons(char_data *ch, char *argument, struct icon_data **list) {
 	extern const char *icon_types[];
 	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], arg4[MAX_INPUT_LENGTH];
+	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
 	char lbuf[MAX_INPUT_LENGTH];
-	struct icon_data *icon, *temp;
+	struct icon_data *icon, *change, *temp;
 	int iter, loc, num;
 	bool found;
 	
@@ -2683,10 +3090,7 @@ void olc_process_icons(char_data *ch, char *argument, struct icon_data **list) {
 			msg_to_char(ch, "Remove which icon (number)?\r\n");
 		}
 		else if (!str_cmp(arg2, "all")) {
-			while ((icon = *list)) {
-				*list = icon->next;
-				free_icon_set(&icon);
-			}
+			free_icon_set(list);
 			msg_to_char(ch, "You remove all icons.\r\n");
 		}
 		else if (!isdigit(*arg2) || (num = atoi(arg2)) < 1) {
@@ -2748,11 +3152,71 @@ void olc_process_icons(char_data *ch, char *argument, struct icon_data **list) {
 
 			sort_icon_set(list);
 			strcpy(lbuf, show_color_codes(arg4));
-			msg_to_char(ch, "You add %s: %s %s\r\n", icon_types[loc], show_color_codes(arg3), lbuf);
+			msg_to_char(ch, "You add %s: %s %s%s&0 %s\r\n", icon_types[loc], show_color_codes(arg3), arg3, arg4, lbuf);
+		}
+	}
+	else if (is_abbrev(arg1, "change")) {
+		half_chop(arg2, num_arg, arg1);
+		half_chop(arg1, type_arg, val_arg);
+		
+		if (!*num_arg || !isdigit(*num_arg) || !*type_arg || !*val_arg) {
+			msg_to_char(ch, "Usage: icons change <number> <type | color | icon> <value>\r\n");
+			return;
+		}
+		
+		// find which one to change
+		num = atoi(num_arg);
+		change = NULL;
+		for (icon = *list; icon && !change; icon = icon->next) {
+			if (--num == 0) {
+				change = icon;
+				break;
+			}
+		}
+		
+		if (!change) {
+			msg_to_char(ch, "Invalid icon number.\r\n");
+		}
+		else if (is_abbrev(type_arg, "type")) {
+			if ((loc = search_block(val_arg, icon_types, FALSE)) == NOTHING) {
+				msg_to_char(ch, "Invalid type.\r\n");
+			}
+			else {
+				change->type = loc;
+				msg_to_char(ch, "Icon %d changed to type %s.\r\n", atoi(num_arg), icon_types[loc]);
+			}
+		}
+		else if (is_abbrev(type_arg, "color")) {
+			if (strlen(val_arg) != 2 || !check_banner_color_string(val_arg)) {
+				msg_to_char(ch, "You must specify a single color code, starting with &&.\r\n");
+			}
+			else {
+				if (change->color) {
+					free(change->color);
+				}
+				change->color = str_dup(val_arg);
+				msg_to_char(ch, "Icon %d changed to color code %s.\r\n", atoi(num_arg), show_color_codes(val_arg));
+			}
+		}
+		else if (is_abbrev(type_arg, "icon")) {
+			if (!validate_icon(val_arg)) {
+				msg_to_char(ch, "You must specify an icon that is 4 characters long, not counting color codes.\r\n");
+			}
+			else {
+				if (change->icon) {
+					free(change->icon);
+				}
+				change->icon = str_dup(val_arg);
+				msg_to_char(ch, "Icon %d changed to: %s%s&0 %s\r\n", atoi(num_arg), icon->color, val_arg, show_color_codes(val_arg));
+			}
+		}
+		else {
+			msg_to_char(ch, "You can only change the type, color, or icon.\r\n");
 		}
 	}
 	else {
 		msg_to_char(ch, "Usage: icons add <type> <color code> <icon>\r\n");
+		msg_to_char(ch, "Usage: icons change <number> <type | color | icon> <value>\r\n");
 		msg_to_char(ch, "Usage: icons remove <number | all>\r\n");
 		msg_to_char(ch, "Available types:\r\n");
 		
@@ -2774,11 +3238,7 @@ void olc_process_icons(char_data *ch, char *argument, struct icon_data **list) {
 * @param struct interaction_item **list A pointer to an interaction list to modify.
 * @param int attach_type TYPE_MOB or TYPE_ROOM for interactions that attach to different types of things.
 */
-void olc_process_interactions(char_data *ch, char *argument, struct interaction_item **list, int attach_type) {
-	extern const char *interact_types[];
-	extern const int interact_attach_types[NUM_INTERACTS];
-	extern const byte interact_vnum_types[NUM_INTERACTS];
-	
+void olc_process_interactions(char_data *ch, char *argument, struct interaction_item **list, int attach_type) {	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], arg4[MAX_INPUT_LENGTH], arg5[MAX_INPUT_LENGTH], arg6[MAX_INPUT_LENGTH];
 	struct interaction_item *interact, *prev, *to_move, *temp, *a, *b, *a_next, *b_next, *copyfrom = NULL, *change;
 	struct interaction_item iitem;
@@ -2822,6 +3282,13 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 					crop_data *crop;
 					if ((crop = crop_proto(vnum))) {
 						copyfrom = GET_CROP_INTERACTIONS(crop);
+					}
+					break;
+				}
+				case OLC_GLOBAL: {
+					struct global_data *glb;
+					if ((glb = global_proto(vnum))) {
+						copyfrom = GET_GLOBAL_INTERACTIONS(glb);
 					}
 					break;
 				}
@@ -2981,7 +3448,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 		vnum = atoi(arg4);
 		prc = atof(arg5);
 		
-		if (!*arg2 || !*arg3 || !*arg4 || !*arg5 || !isdigit(*arg3) || !isdigit(*arg4) || !isdigit(*arg5)) {
+		if (!*arg2 || !*arg3 || !*arg4 || !*arg5 || !isdigit(*arg3) || !isdigit(*arg4) || (!isdigit(*arg5) && *arg5 != '.')) {
 			msg_to_char(ch, "Usage: interaction add <type> <quantity> <vnum> <percent> [exclusion code]\r\n");
 		}
 		else if ((loc = search_block(arg2, interact_types, FALSE)) == NOTHING || interact_attach_types[loc] != attach_type) {
@@ -3153,9 +3620,11 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 void olc_process_spawns(char_data *ch, char *argument, struct spawn_info **list) {
 	extern const char *spawn_flags[];
 
-	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], *flagarg, *tmp;
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
+	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
+	char *flagarg, *tmp;
 	int loc, num, iter, count, findtype;
-	struct spawn_info *spawn, *temp, *copyfrom = NULL;
+	struct spawn_info *spawn, *change, *temp, *copyfrom = NULL;
 	sector_data *sect;
 	any_vnum vnum;
 	double prc;
@@ -3218,6 +3687,58 @@ void olc_process_spawns(char_data *ch, char *argument, struct spawn_info **list)
 				smart_copy_spawns(list, copyfrom);
 				msg_to_char(ch, "Spawns copied from %s %d.\r\n", buf, vnum);
 			}
+		}
+	}
+	else if (is_abbrev(arg1, "change")) {
+		half_chop(arg2, num_arg, arg1);
+		half_chop(arg1, type_arg, val_arg);
+		
+		if (!*num_arg || !isdigit(*num_arg) || !*type_arg || !*val_arg) {
+			msg_to_char(ch, "Usage: spawn change <number> <vnum | percent | flags> <value>\r\n");
+			return;
+		}
+		
+		// find which one to change
+		num = atoi(num_arg);
+		change = NULL;
+		for (spawn = *list; spawn && !change; spawn = spawn->next) {
+			if (--num == 0) {
+				change = spawn;
+				break;
+			}
+		}
+		
+		if (!change) {
+			msg_to_char(ch, "Invalid spawn number.\r\n");
+		}
+		else if (is_abbrev(type_arg, "vnum")) {
+			if (!isdigit(*val_arg) || (vnum = atoi(val_arg)) < 0) {
+				msg_to_char(ch, "Invalid vnum '%s'.\r\n", val_arg);
+			}
+			else if (!mob_proto(vnum)) {
+				msg_to_char(ch, "Invalid mobile vnum '%s'.\r\n", val_arg);
+			}
+			else {
+				change->vnum = vnum;
+				msg_to_char(ch, "Spawn %d changed to vnum %d (%s).\r\n", atoi(num_arg), vnum, get_mob_name_by_proto(vnum));
+			}
+		}
+		else if (is_abbrev(type_arg, "percent")) {
+			prc = atof(val_arg);
+			
+			if (prc < .01 || prc > 100.00) {
+				msg_to_char(ch, "Percentage must be between .01 and 100; '%s' given.\r\n", val_arg);
+			}
+			else {
+				change->percent = prc;
+				msg_to_char(ch, "Spawn %d changed to %.2f percent.\r\n", atoi(num_arg), prc);
+			}
+		}
+		else if (is_abbrev(type_arg, "flags")) {
+			spawn->flags = olc_process_flag(ch, val_arg, "spawn", "spawn change flags", spawn_flags, spawn->flags);
+		}
+		else {
+			msg_to_char(ch, "You can only change the vnum, percent, or flags.\r\n");
 		}
 	}
 	else if (is_abbrev(arg1, "remove")) {
@@ -3314,6 +3835,7 @@ void olc_process_spawns(char_data *ch, char *argument, struct spawn_info **list)
 	else {
 		msg_to_char(ch, "Usage: spawn add <vnum> <percent> [flags]\r\n");
 		msg_to_char(ch, "Usage: spawn copy <from type> <from vnum>\r\n");
+		msg_to_char(ch, "Usage: spawn change <number> <vnum | percent | flags> <value>\r\n");
 		msg_to_char(ch, "Usage: spawn remove <number | all>\r\n");
 		msg_to_char(ch, "Usage: spawn list\r\n");
 		msg_to_char(ch, "Available flags:\r\n");
@@ -3369,6 +3891,13 @@ void olc_process_script(char_data *ch, char *argument, struct trig_proto_list **
 			sprintbit(findtype, olc_type_bits, buf, FALSE);
 			
 			switch (findtype) {
+				case OLC_ADVENTURE: {
+					adv_data *adv = adventure_proto(vnum);
+					if (adv && trigger_attach == WLD_TRIGGER) {
+						copyfrom = GET_ADV_SCRIPTS(adv);
+					}
+					break;
+				}
 				case OLC_MOBILE: {
 					char_data *mob = mob_proto(vnum);
 					if (mob && trigger_attach == MOB_TRIGGER) {

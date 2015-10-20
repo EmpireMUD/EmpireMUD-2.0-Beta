@@ -1,0 +1,566 @@
+#10500
+pod glowkra glowing vegetable~
+a glowkra pod~
+Someone has dropped a glowing vegetable.~
+   It has a faint sky-blue glow, although not enough to light the way. This
+appears to be a magi-netically modified crop from the deranged druids of the
+Magiterranean.
+~
+6 0 a 5
+6 0 0
+7 48
+M
+5
+$n pops a glowing seedpod into $s mouth.~
+M
+4
+You pop a glowing seedpod into your mouth.~
+S
+#10501
+pods handful glowkra~
+a handful of glowkra pods~
+A handful of glowkra pods are scattered on the ground.~
+   The glowkra are a bright sky-blue fruit that seems to have a faint glow.
+You've heard they glow brighter when pickled. You also have a good recipe for
+seafood glowkra gumbo that just needs some magenta arrowfish and some rice.
+This strange crop is surely the work of the mad druids of the Magiterranean.
+~
+6 b a 5
+24 10500 0
+7 168
+R
+5114 0
+S
+#10502
+jar pickled glowkra pickles~
+a jar of pickled glowkra~
+A jar of pickled glowkra is shining away.~
+   This jar contains freshly pickled glowkra pods. It's bright enough to light
+the way at night.
+~
+6 c a 4
+48 0 0
+8 336
+C
+0 10
+M
+4
+You pop a glowing pod into your mouth from $p.~
+M
+5
+$n pops a glowing pod into $s mouth from $p.~
+R
+5114 0
+T 10500
+S
+#10503
+gumbo glowkra seafood plate~
+seafood glowkra gumbo~
+A plate of seafood glowkra gumbo is resting here.~
+   This dish has the rich smell of garlic, pepper, fish, and okra. The okra
+seem to be glowing.
+~
+6 0 a 4
+48 0 0
+0 336
+M
+4
+You can taste the fresh fish as you eat $p.~
+M
+4
+You can taste the fresh glowkra as you eat $p.~
+S
+#10504
+tooth dragon's dragons~
+a dragon's tooth~
+A dragon's tooth is lying here.~
+   You can plant these magi-netically engineered dragons' teeth in a field to
+grow more, or use several of them to summon a skeletal guard for your empire.
+
+Craft (Jewelry): dragonstooth sceptre
+ 10x dragon's tooth
+  4x gold dust
+~
+3 b a 7
+0 10502 0
+14 0
+R
+5164 0
+R
+5511 0
+S
+#10505
+sceptre dragonstooth~
+a dragonstooth sceptre~
+A dragonstooth sceptre is lying here.~
+   In addition to being majestic and evil-looking, this sceptre can be used
+with 'use sceptre' when wielded to summon skeleton minions to guard your
+empire!
+~
+1 ho an 3
+0 2 5
+14 0
+A
+5 1
+T 10505
+S
+#10506
+seeds spadebrush handful~
+a handful of spadebrush seeds~
+A handful of spadebrush seeds is scattered here.~
+   These magi-netically modified seeds can be used to plant spadebrush, or as a
+light snack.
+~
+6 b a 2
+3 10501 0
+0 48
+C
+0 1
+R
+5116 0
+S
+#10507
+spadebrush bundle~
+a bundle of spadebrush~
+A bundle of spadebrush is lying here.~
+   Spadebrush is a plant that has been magi-netically engineered by the druids
+of the Magiterranean to make handy spades for digging.
+
+Craft (requires Basic Crafts): spadebrush shovel
+ 6x bundle of spadebrush
+~
+3 k a 3
+0 0 0
+0 336
+R
+5116 0
+S
+#10508
+shovel spadebrush~
+a spadebrush shovel~
+A spadebrush shovel is poking out of the ground.~
+This shovel is made from the mystical spadebrush plant.
+~
+1 eou ao 1
+0 4 5
+0 0
+C
+25 25
+R
+5121 0
+R
+5610 0
+S
+#10509
+seeds bladegrass handful~
+a handful of bladegrass seeds~
+A handful of bladegrass seeds is lying here.~
+   These magi-netically modified wheat grains can be used to plant razor-sharp
+bladegrass in temperate climates. But good luck eating them.
+~
+3 b a 5
+0 10503 0
+2 168
+R
+5116 0
+S
+#10510
+bladegrass bushel~
+a bushel of bladegrass~
+A bushel of bladegrass is lying here.~
+   This bundle of razor-sharp metallic wheat must have been magi-netically
+modified! It could be milled into long-lasting ironflour, or crafted into
+bladegrass arrows!
+
+Craft (Archery): bladegrass arrows
+  1x bushel of bladegrass
+~
+3 0 a 5
+0 0 0
+2 0
+R
+5116 0
+S
+#10511
+ironflour sack~
+a sack of ironflour~
+A sack of ironflour is sitting on the ground.~
+   This sack of ground, magi-netically engineered bladegrass can be cooked
+(forged?) into long-lasting iron rations.
+
+Cook (no skill required): ironbread
+  2x sack of ironflour
+~
+3 0 a 5
+0 0 0
+2 0
+R
+5109 0
+R
+5606 0
+S
+#10512
+ration ironbread~
+an ironbread ration~
+An ironbread ration has been dropped here.~
+   This hard bread is cooked, or perhaps forged, from magi-netically engineered
+bladegrass, using the ancient techniques of the Dwarves! It keeps for months
+and is rich in iron. Actually, it might even be made of iron.
+~
+6 0 a 6
+120 0 0
+2 0
+M
+4
+You bite into $p. You can feel your teeth screaming in pain.~
+M
+5
+$n bites into $p, whimpering slightly.~
+M
+4
+You bite into $p with a sound like tearing metal.~
+M
+5
+$n bites into $p with a sound like tearing metal.~
+R
+5606 0
+S
+#10513
+gemfruit unripe~
+an unripe gemfruit~
+An unripe gemfruit is lying here.~
+   This magi-netically engineered crystalline apple-like fruit looks rather
+soft and underripe, but possibly edible.
+~
+6 0 a 6
+6 0 0
+7 48
+R
+5114 0
+S
+#10514
+gemfruits sparkling basket~
+a basket of sparkling gemfruits~
+A basket of sparkling gemfruits is lying here.~
+   This beautiful fruit will eventually decay if not stored or eaten, leaving
+behind a magical crystal. It can also be planted to grow more gemfruit.
+~
+6 b a 11
+48 10504 0
+12 168
+T 10514
+S
+#10515
+mushroom magic~
+a magic mushroom~
+A magic mushroom is lying here.~
+You trip while looking at the mushroom.
+~
+6 0 a 4
+1 0 0
+7 48
+M
+4
+You chew $p until your mouth is dry, and suddenly you don't feel so good...~
+T 10502
+S
+#10516
+basket mushrooms magic~
+a basket of magic mushrooms~
+A basket of magic mushrooms is sitting here.~
+   These mushrooms don't look terribly appetizing, but those druids sure were
+growing a lot of them.
+
+Brew (Healing Elixirs): magic mushroom potion
+  4x basket of magic mushrooms
+  6x magewhisper sepals
+~
+6 b a 6
+24 10505 0
+7 168
+M
+4
+You chew $p until your mouth is dry, and suddenly you don't feel so good...~
+R
+5606 0
+T 10503
+S
+#10517
+potion magic mushroom~
+a magic mushroom potion~
+A magic mushroom is lying here.~
+This foul-smelling mana potion is made from magic mushrooms.
+~
+25 m a 3
+4 1 0
+8 0
+C
+0 200
+S
+#10518
+fig unripe~
+an unripe fig~
+An unripe fig is lying here.~
+This fig looks a little under-ripe, but it's strangely mushy.
+~
+6 0 a 2
+6 0 0
+7 48
+S
+#10519
+basket pudding figs~
+a basket of pudding figs~
+A basket of pudding figs is sitting on the ground.~
+   These pudding figs seem to be the latest magi-netically modified fruit crop
+from the druids of the Magiterranean.
+
+Cook: figgy pudding
+ 2x basket of pudding figs
+~
+6 b a 3
+24 10506 0
+7 168
+R
+5114 0
+S
+#10520
+pudding figgy~
+a figgy pudding~
+A figgy pudding has been left on the ground.~
+   This figgy pudding has the mystical smell of druidic herbs. Somehow, it's
+still warm and each bite reminds you of home.
+~
+6 0 a 1
+48 0 0
+7 336
+S
+#10521
+leaf fig~
+a fig leaf~
+A fig leaf has fallen here.~
+This fig leaf looks just big enough to hide your shame.
+~
+2 o al 2
+0 0 0
+0 0
+C
+1 1
+S
+#10522
+pouch dried figs~
+a pouch of dried figs~
+A pouch of dried figs is lying here.~
+These figs are dried, but still have the moist taste of pudding.
+~
+6 0 a 4
+48 0 0
+7 672
+M
+4
+You eat $p. The figs are surprisingly moist.~
+R
+5606 0
+S
+#10523
+beans magic handful~
+a handful of magic beans~
+A handful of magic beans is scattered here.~
+   These beans look strangely ordinary... You can't believe anyone would sell a
+whole cow just for these.
+~
+6 bk a 4
+6 10507 0
+10 48
+S
+#10524
+leaves dark gray grey axeroot~
+some axeroot leaves~
+Some dark gray leaves are lying here.~
+   These dark gray leaves come from the axeroot plant, one of the many strange
+magi-netically modified plants collected by druids.
+~
+6 0 a 1
+6 0 0
+2 48
+S
+#10525
+axeroot root~
+an axeroot~
+An axeroot is lying here, uprooted.~
+   The magi-netically engineered axeroot grows in a distinctive blade shape,
+and need only be sharpened to make a suitable chopper. You can also plant it to
+start a new crop.
+
+Craft (Basic Crafts): axeroot chopper
+ 1x axeroot
+ 1x wooden handle
+
+Craft (Master Craftsman, level 150): spade-axe
+ 1x axeroot
+ 3x bundle of spadebrush
+~
+3 be a 6
+0 10508 0
+2 168
+R
+5116 0
+S
+#10526
+chopper axeroot~
+an axeroot chopper~
+An axeroot chopper sticks up from the ground.~
+   This trusty axe is made from a sharpened axeroot, one of the bizarre plants
+created by the druids of the Magiterranean in their magi-netically modified
+foods program.
+~
+1 0 an 2
+0 5 2
+2 0
+R
+5121 0
+R
+5610 0
+S
+#10527
+spade-axe axe~
+a spade-axe~
+A spade-axe is sticking out of the ground.~
+   This strange multi-tool is made from an axeroot and a spadebrush, and looks
+to be good for both chopping and digging. It's no wonder the Magiterranean
+druids have been magi-netically engineering new plants. This is useful!
+~
+1 emou an 4
+0 1 2
+2 0
+S
+#10528
+chowberries crunchy~
+some crunchy chowberries~
+Some chowberries are scattered on the ground.~
+   This handful of berries is surprisingly crunchy. Surely this was thought up
+by some half-fiveleafed Magiterranean druid working late in the magi-netic
+engineering lab.
+~
+6 0 a 2
+6 0 0
+7 48
+M
+4
+You crunch away on $p.~
+M
+5
+$n crunches away on $p.~
+S
+#10529
+pod puppy~
+a puppy pod~
+A puppy pod is sitting on the ground.~
+   The latest innovation from the Magiterranean druids, this magi-netically
+engineered puppy pod can be used to grow a furry friend. Grow your own best
+friend!
+Type 'use pod' to summon a temporary puppy pet.
+~
+3 be a 3
+0 10509 0
+0 336
+R
+5111 0
+T 10506
+S
+#10530
+arrows bladegrass metallic quiver~
+a quiver of bladegrass arrows~
+A quiver of metallic bladegrass arrows is lying here.~
+   The tips and fletching of these razor-sharp arrows use leaves of
+magi-netically engineered bladegrass, while the shaft is made from a piece of
+stalk. They look rather vicious.
+~
+21 m a 1
+10 2 0
+2 0
+C
+0 50
+S
+#10531
+fruit pickthorn red~
+a red pickthorn fruit~
+A pickthorn fruit is lying here.~
+   This strange red fruit comes from the pickthorn plant, which was
+magi-netically engineered by a group of druids to grow natural tools.
+~
+6 b a 1
+6 10510 0
+0 48
+S
+#10532
+stalk pickthorn~
+a pickthorn stalk~
+A pickthorn stalk seems planted here.~
+   The pickthorn is a plant magi-netically engineed by Magiterranean druids to
+grow useful tools on unused farmland.
+
+Craft (Basic Crafts): thorn pick
+  3x pickthorn stalk
+
+Craft (Master Craftsman, level 150): pick-and-pan
+ 2x pickthorn stalk
+ 2x bushel of bladegrass
+~
+3 0 a 6
+0 0 0
+0 0
+R
+5118 0
+S
+#10533
+pick thorn~
+a thorn pick~
+A thorn pick is stuck into the ground.~
+   This plant-based pick was made from a pickthorn plant, magi-netically
+modified from a woody desert plant into a temperate tool. What will those
+Magiterranean druids come up with next?
+~
+1 0 an 3
+0 3 8
+2 0
+R
+5121 0
+R
+5610 0
+S
+#10534
+pick-and-pan pan~
+a pick-and-pan~
+A pick-and-pan is lying on the ground.~
+   The pick and pan is a multi-tool made from magi-netically engineered
+pickthorn and bladegrass. It can be used for mining metals, or for panning them
+in the stream.
+~
+1 emot an 2
+0 1 8
+0 0
+S
+#10535
+vines vigilant bundle~
+a bundle of vigilant vines~
+A bundle of guardian vines is piled up here.~
+   These vicious magi-netically engineered vines can be planted in your cities,
+and will grow carnivorous flora to attack invaders.
+~
+3 b a 9
+0 10511 0
+7 168
+R
+5111 0
+S
+#10536
+ashes~
+some ashes~
+Some ashes are scattered on the ground.~
+You find only ash, suitable for feeding no one.
+~
+3 k a 1
+0 0 0
+14 6
+S
+$

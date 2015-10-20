@@ -1,0 +1,19 @@
+#18100
+lumberjack goblin~
+a goblin lumberjack~
+A goblin lumberjack is attacking trees with a greataxe here!
+~
+10 50 dy c
+0 0 0 2
+I 4 18100 10.00 1 a  # LOOT: a logging axe
+I 4 18101 10.00 3 a  # LOOT: a goblin lumberjack brew
+I 4 18102 10.00 1 a  # LOOT: goblin sandals
+I 4 18103 10.00 1 a  # LOOT: a crude wooden cap
+I 4 18104 10.00 1 a  # LOOT: goblin lumberjack pauldrons
+I 4 18105 10.00 1 a  # LOOT: goblin lumberjack leggings
+T 18100
+T 18101
+T 18102
+T 18103
+S
+$

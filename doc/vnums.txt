@@ -45,6 +45,11 @@ blocks that are currently in use.
 9200      |
 9300      |
 9400      V
+9500
+9600
+9700
+9800
+9900  Miscellaneous mini-pets and summoner items
 
 
 Included Adventure Zones
@@ -53,12 +58,17 @@ Included Adventure Zones
 [  120] Mountain Cave: Red Dragon (10006-10010)
 [  121] The Swamp Hag (10100-10104)
 [  122] Ruins: Three Banditos (10105-10109)
-[  123] Ruins: Thieves (10110-10114)
+[  123] Ruins: Thieves (10110-10129)
 [  125] Ruins: The Goblin Challenge (10200-10224)
+[  126] Mountain Cave: Flame Dragon (10300-10329)
+[  127] Abandoned Dragon Nest (10330-10359)
 [  140] The Sewer: Ratskins (10011-10027)
+[  141] The Sewer: Goblin Outpost (10450-10499)
 [  160] The Tower Skycleave (10030-10099)
 [  161] Portal to the Primeval (10250-10299)
 [  170] Hamlet of the Undead (10400-10449)
 [  200] Burrow Canyons (11100-11129)
 [  201] The Cursed Chalice of Mill Manor (11130-11159)
 [  281] Mountain Valley: Molten Fiend (18075-18099)
+[  282] Goblin Logging Camp (18100-18124)
+

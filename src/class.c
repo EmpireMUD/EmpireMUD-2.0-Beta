@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: class.c                                         EmpireMUD 2.0b2 *
+*   File: class.c                                         EmpireMUD 2.0b3 *
 *  Usage: code related to classes                                         *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -46,6 +46,7 @@ const struct class_data_type class_data[NUM_CLASSES] = {
 		{
 			{ ROLE_TANK, { ABIL_DRAGONRIDING, ABIL_NOBLE_BEARING, ROLE_ABIL_END } },
 			{ ROLE_MELEE, { ABIL_DRAGONRIDING, ABIL_TWO_HANDED_WEAPONS, ROLE_ABIL_END } },
+			{ ROLE_UTILITY, { ABIL_DRAGONRIDING, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
@@ -54,9 +55,9 @@ const struct class_data_type class_data[NUM_CLASSES] = {
 	},
 	{ "Werewolf", "Wwlf", { SKILL_BATTLE, SKILL_NATURAL_MAGIC },  { 200, 200, 200, 0 },
 		{
-			{ ROLE_TANK, { ABIL_RESURRECT, ABIL_TOWERING_WEREWOLF_FORM, ROLE_ABIL_END } },
-			{ ROLE_MELEE, { ABIL_RESURRECT, ABIL_SAVAGE_WEREWOLF_FORM, ROLE_ABIL_END } },
-			{ ROLE_HEALER, { ABIL_CONFER, ABIL_FASTCASTING, ABIL_RESURRECT, ABIL_SAGE_WEREWOLF_FORM, ROLE_ABIL_END } },
+			{ ROLE_TANK, { ABIL_RESURRECT, ABIL_SPIRIT_WOLF, ABIL_TOWERING_WEREWOLF_FORM, ROLE_ABIL_END } },
+			{ ROLE_MELEE, { ABIL_DIRE_WOLF, ABIL_RESURRECT, ABIL_SAVAGE_WEREWOLF_FORM, ROLE_ABIL_END } },
+			{ ROLE_HEALER, { ABIL_CONFER, ABIL_FASTCASTING, ABIL_MOON_RABBIT, ABIL_RESURRECT, ABIL_SAGE_WEREWOLF_FORM, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
@@ -75,7 +76,8 @@ const struct class_data_type class_data[NUM_CLASSES] = {
 	},
 	{ "Steelsmith", "Smth", { SKILL_BATTLE, SKILL_TRADE },  { 300, 200, 100, 0 },
 		{
-			{ ROLE_MELEE, { ABIL_TWO_HANDED_WEAPONS, ROLE_ABIL_END } },
+			{ ROLE_MELEE, { ABIL_STEELSMITH_CRAFTS, ABIL_TWO_HANDED_WEAPONS, ROLE_ABIL_END } },
+			{ ROLE_UTILITY, { ABIL_STEELSMITH_CRAFTS, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
@@ -88,45 +90,50 @@ const struct class_data_type class_data[NUM_CLASSES] = {
 	},
 	{ "Exarch", "Exrc", { SKILL_EMPIRE, SKILL_HIGH_SORCERY },  { 150, 150, 300, 0 },
 		{
-			{ ROLE_CASTER, { ABIL_DRAGONRIDING, ROLE_ABIL_END } },
+			{ ROLE_CASTER, { ABIL_DRAGONRIDING, ABIL_EXARCH_CRAFTS, ROLE_ABIL_END } },
+			{ ROLE_UTILITY, { ABIL_DRAGONRIDING, ABIL_EXARCH_CRAFTS, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
 	{ "Luminary", "Lmny", { SKILL_EMPIRE, SKILL_NATURAL_MAGIC },  { 150, 150, 300, 0 },
 		{
-			{ ROLE_CASTER, { ABIL_DRAGONRIDING, ABIL_RESURRECT, ROLE_ABIL_END } },
-			{ ROLE_HEALER, { ABIL_ANCESTRAL_HEALING, ABIL_FASTCASTING, ABIL_DRAGONRIDING, ABIL_RESURRECT, ROLE_ABIL_END } },
+			{ ROLE_CASTER, { ABIL_DRAGONRIDING, ABIL_GRIFFIN, ABIL_MANTICORE, ABIL_RESURRECT, ROLE_ABIL_END } },
+			{ ROLE_HEALER, { ABIL_ANCESTRAL_HEALING, ABIL_DRAGONRIDING, ABIL_FASTCASTING, ABIL_GRIFFIN, ABIL_MANTICORE, ABIL_RESURRECT, ROLE_ABIL_END } },
+			{ ROLE_UTILITY, { ABIL_DRAGONRIDING, ABIL_GRIFFIN, ABIL_MANTICORE, ABIL_RESURRECT, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
 	{ "Powerbroker", "Pwbk", { SKILL_EMPIRE, SKILL_STEALTH },  { 200, 300, 100, 0 },
 		{
 			{ ROLE_MELEE, { ABIL_DRAGONRIDING, ABIL_STAGGER_JAB, ROLE_ABIL_END } },
+			{ ROLE_UTILITY, { ABIL_DRAGONRIDING, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
 	{ "Elder", "Eldr", { SKILL_EMPIRE, SKILL_SURVIVAL },  { 200, 200, 200, 0 },
 		{
 			{ ROLE_MELEE, { ABIL_DRAGONRIDING, ROLE_ABIL_END } },
+			{ ROLE_UTILITY, { ABIL_DRAGONRIDING, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
 	{ "Guildsman", "Gdsm", { SKILL_EMPIRE, SKILL_TRADE },  { 200, 200, 200, 0 },
 		{
-			{ ROLE_MELEE, { ABIL_DRAGONRIDING, ROLE_ABIL_END } },
+			{ ROLE_UTILITY, { ABIL_DRAGONRIDING, ABIL_GUILDSMAN_CRAFTS, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
 	{ "Ancient", "Anct", { SKILL_EMPIRE, SKILL_VAMPIRE },  { 200, 200, 200, 0 },
 		{
 			{ ROLE_MELEE, { ABIL_DRAGONRIDING, ROLE_ABIL_END } },
+			{ ROLE_UTILITY, { ABIL_DRAGONRIDING, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
 	{ "Archmage", "Achm", { SKILL_HIGH_SORCERY, SKILL_NATURAL_MAGIC },  { 150, 150, 300, 0 },
 		{
 			{ ROLE_CASTER, { ABIL_RESURRECT, ROLE_ABIL_END } },
-			{ ROLE_HEALER, { ABIL_FASTCASTING, ABIL_RESURRECT, ROLE_ABIL_END } },
+			{ ROLE_HEALER, { ABIL_FASTCASTING, ABIL_PHOENIX, ABIL_RESURRECT, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
@@ -137,10 +144,17 @@ const struct class_data_type class_data[NUM_CLASSES] = {
 		}
 	},
 	{ "Theurge", "Thrg", { SKILL_HIGH_SORCERY, SKILL_SURVIVAL },  { 200, 100, 300, 0 },
-		{ ROLE_LIST_END }
+		{
+			{ ROLE_UTILITY, { ROLE_ABIL_END } },
+			ROLE_LIST_END
+		}
 	},
 	{ "Artificer", "Artf", { SKILL_HIGH_SORCERY, SKILL_TRADE },  { 150, 150, 300, 0 },
-		{ ROLE_LIST_END }
+		{
+			{ ROLE_CASTER, { ABIL_ARTIFICER_CRAFTS, ROLE_ABIL_END } },
+			{ ROLE_UTILITY, { ABIL_ARTIFICER_CRAFTS, ROLE_ABIL_END } },
+			ROLE_LIST_END
+		}
 	},
 	{ "Lich", "Lich", { SKILL_HIGH_SORCERY, SKILL_VAMPIRE },  { 150, 150, 300, 0 },
 		{
@@ -150,28 +164,29 @@ const struct class_data_type class_data[NUM_CLASSES] = {
 	},
 	{ "Shadow Wolf", "ShWf", { SKILL_NATURAL_MAGIC, SKILL_STEALTH },  { 100, 200, 300, 0 },
 		{
-			{ ROLE_MELEE, { ABIL_HOWL, ABIL_MOONRISE, ABIL_SAVAGE_WEREWOLF_FORM, ROLE_ABIL_END } },
-			{ ROLE_HEALER, { ABIL_FASTCASTING, ABIL_MOONRISE, ABIL_SAGE_WEREWOLF_FORM, ROLE_ABIL_END } },
+			{ ROLE_MELEE, { ABIL_HOWL, ABIL_MOONRISE, ABIL_SAVAGE_WEREWOLF_FORM, ABIL_SCORPION_SHADOW, ROLE_ABIL_END } },
+			{ ROLE_HEALER, { ABIL_FASTCASTING, ABIL_MOONRISE, ABIL_OWL_SHADOW, ABIL_SAGE_WEREWOLF_FORM, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
 	{ "Feral", "Ferl", { SKILL_NATURAL_MAGIC, SKILL_SURVIVAL },  { 150, 150, 300, 0 },
 		{
-			{ ROLE_TANK, { ABIL_RESURRECT, ABIL_TOWERING_WEREWOLF_FORM, ROLE_ABIL_END } },
-			{ ROLE_HEALER, { ABIL_FASTCASTING, ABIL_RESURRECT, ABIL_SAGE_WEREWOLF_FORM, ROLE_ABIL_END } },
+			{ ROLE_TANK, { ABIL_BASILISK, ABIL_RESURRECT, ABIL_TOWERING_WEREWOLF_FORM, ROLE_ABIL_END } },
+			{ ROLE_HEALER, { ABIL_BASILISK, ABIL_FASTCASTING, ABIL_RESURRECT, ABIL_SAGE_WEREWOLF_FORM, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
 	{ "Alchemist", "Alch", { SKILL_NATURAL_MAGIC, SKILL_TRADE },  { 150, 150, 300, 0 },
 		{
-			{ ROLE_HEALER, { ABIL_FASTCASTING, ABIL_RESURRECT, ROLE_ABIL_END } },
+			{ ROLE_HEALER, { ABIL_ALCHEMIST_CRAFTS, ABIL_FASTCASTING, ABIL_RESURRECT, ABIL_SALAMANDER, ROLE_ABIL_END } },
+			{ ROLE_UTILITY, { ABIL_ALCHEMIST_CRAFTS, ABIL_RESURRECT, ABIL_SALAMANDER, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
 	{ "Necromancer", "Necr", { SKILL_NATURAL_MAGIC, SKILL_VAMPIRE },  { 150, 150, 300, 0 },
 		{
-			{ ROLE_CASTER, { ABIL_DREAD_BLOOD_FORM, ABIL_RESURRECT, ROLE_ABIL_END } },
-			{ ROLE_HEALER, { ABIL_FASTCASTING, ABIL_RESURRECT, ROLE_ABIL_END } },
+			{ ROLE_CASTER, { ABIL_DREAD_BLOOD_FORM, ABIL_RESURRECT, ABIL_SKELETAL_HULK, ROLE_ABIL_END } },
+			{ ROLE_HEALER, { ABIL_BANSHEE, ABIL_FASTCASTING, ABIL_RESURRECT, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
@@ -183,7 +198,8 @@ const struct class_data_type class_data[NUM_CLASSES] = {
 	},
 	{ "Smuggler", "Smgl", { SKILL_STEALTH, SKILL_TRADE },  { 200, 300, 100, 0 },
 		{
-			{ ROLE_MELEE, { ABIL_DIVERSION, ABIL_DUAL_WIELD, ROLE_ABIL_END } },
+			{ ROLE_MELEE, { ABIL_DIVERSION, ABIL_DUAL_WIELD, ABIL_SMUGGLER_CRAFTS, ROLE_ABIL_END } },
+			{ ROLE_UTILITY, { ABIL_SMUGGLER_CRAFTS, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
@@ -194,7 +210,11 @@ const struct class_data_type class_data[NUM_CLASSES] = {
 		}
 	},
 	{ "Tinker", "Tnkr", { SKILL_SURVIVAL, SKILL_TRADE },  { 250, 250, 100, 0 },
-		{ ROLE_LIST_END }
+		{
+			{ ROLE_MELEE, { ABIL_TINKER_CRAFTS, ROLE_ABIL_END } },
+			{ ROLE_UTILITY, { ABIL_TINKER_CRAFTS, ROLE_ABIL_END } },
+			ROLE_LIST_END
+		}
 	},
 	{ "Wight", "Wght", { SKILL_SURVIVAL, SKILL_VAMPIRE },  { 300, 200, 100, 0 },
 		{
@@ -203,18 +223,34 @@ const struct class_data_type class_data[NUM_CLASSES] = {
 		}
 	},
 	{ "Antiquarian", "Antq", { SKILL_TRADE, SKILL_VAMPIRE },  { 200, 200, 200, 0 },
-		{ ROLE_LIST_END }
+		{
+			{ ROLE_MELEE, { ABIL_ANTIQUARIAN_CRAFTS, ROLE_ABIL_END } },
+			{ ROLE_UTILITY, { ABIL_ANTIQUARIAN_CRAFTS, ROLE_ABIL_END } },
+			ROLE_LIST_END
+		}
 	}
 };
 
 
-// ROLE_x
+// ROLE_x (1/2): role names
 const char *class_role[NUM_ROLES] = {
 	"none",
 	"Tank",
 	"Melee",
 	"Caster",
-	"Healer"
+	"Healer",
+	"Utility"
+};
+
+
+// ROLE_x (2/2): role colors for who list
+const char *class_role_color[NUM_ROLES] = {
+	"\t0",
+	"\ty",	// tank
+	"\tr",	// melee
+	"\ta",	// caster
+	"\tj",	// healer
+	"\tm"	// utility
 };
 
 
@@ -488,14 +524,14 @@ ACMD(do_class) {
 			msg_to_char(ch, "You don't have a class. You can earn your class by raising two skills to 76 or higher.\r\n");
 		}
 		else {
-			msg_to_char(ch, "%s\r\nClass: %s (%s) %d/%d/%d\r\n", PERS(ch, ch, TRUE), class_data[GET_CLASS(ch)].name, class_role[(int) GET_CLASS_ROLE(ch)], GET_SKILL_LEVEL(ch), (int) GET_GEAR_LEVEL(ch), GET_COMPUTED_LEVEL(ch));
+			msg_to_char(ch, "%s\r\nClass: %s%s (%s)\t0 %d/%d/%d\r\n", PERS(ch, ch, TRUE), class_role_color[GET_CLASS_ROLE(ch)], class_data[GET_CLASS(ch)].name, class_role[(int) GET_CLASS_ROLE(ch)], GET_SKILL_LEVEL(ch), GET_GEAR_LEVEL(ch), GET_COMPUTED_LEVEL(ch));
 			
 			// only show roles if there are any
 			if (class_data[GET_CLASS(ch)].role[0].role != ROLE_NONE) {
 				msg_to_char(ch, " Available class roles:\r\n");
 				
 				for (iter = 0; class_data[GET_CLASS(ch)].role[iter].role != ROLE_NONE; ++iter) {
-					msg_to_char(ch, "  %s: ", class_role[class_data[GET_CLASS(ch)].role[iter].role]);
+					msg_to_char(ch, "  %s%s\t0%s: ", class_role_color[class_data[GET_CLASS(ch)].role[iter].role], class_role[class_data[GET_CLASS(ch)].role[iter].role], (GET_CLASS_ROLE(ch) == class_data[GET_CLASS(ch)].role[iter].role) ? " (current)" : "");
 					
 					for (ab_iter = 0, comma = FALSE; class_data[GET_CLASS(ch)].role[iter].ability[ab_iter] != ROLE_ABIL_END; ++ab_iter, comma = TRUE) {
 						abil = class_data[GET_CLASS(ch)].role[iter].ability[ab_iter];

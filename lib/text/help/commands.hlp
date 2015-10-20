@@ -20,7 +20,7 @@ Examples:
 
 See also: ALIAS
 #
-+ - -- "INPUT QUEUE" "COMMAND QUEUE" "INPUT LAG" "COMMAND LAG" WAIT QUEUE
++ - -- "INPUT QUEUE" "COMMAND QUEUE" "INPUT LAG" "COMMAND LAG" QUEUE
 
 The + and - commands allow you to manipulate your input queue. Some commands,
 such as abilities, cause a small amount of "command lag". Anything you type
@@ -39,6 +39,29 @@ You can clear your entire queue with --, or you can remove specific items with
 
 See also: FASTCASTING
 #
+ACCEPT REJECT OFFERS
+
+Usage:  accept [type] [person]
+        reject [type] [person]
+
+You can accept or reject offers using these commands. You may receive offers
+for resurrection, summoning, and various other things. Offers are only good for
+a short time. If you have more than one open offer of the same type, you must
+specify the name of a player.
+
+Typing accept or reject with no argument will display open offers. If the
+player who sent the offer logs off, you cannot accept the offer.
+#
+ACTION-SPAM ACTIONSPAM "ACTION SPAM"
+
+Usage:  toggle action-spam
+
+This toggles disable the periodic messages of various continuous actions, like
+crafting and some chores. You will still see messages when these tasks are
+completed.
+
+See also: TOGGLE
+#
 AFFECTS
 
 Usage:  affects
@@ -49,6 +72,16 @@ you, along with their durations and a short summary of what they modify.
 Affects are automatically shown at the bottom of the score.
 
 See also: SCORE
+#
+AFK "AFK TOGGLE"
+
+Usage:  toggle afk
+
+This toggle causes a small &r(AFK)&0 flag to appear after your title on the
+"who" list, indicating to other players that you are away-from-keyboard. You
+can also see it in your prompt with %c or %C (conditions).
+
+See also: PROMPT, TOGGLE
 #
 ALIAS ALIASES
 
@@ -127,29 +160,30 @@ See also: QUIT
 #
 ANSI COLOR COLORS MAPCOLOR "MAP COLOR" MAP-COLOR &&
 
-Usage:  toggle color
-        toggle map-color
-
-If you have a color-capable terminal and wish to see useful color-coding of
-information, use the COLOR command to turn color on or off.
+Options:  toggle map-color
 
 If you're not on a broadband connection, color may slow down your messages
-very slightly. However, even on dialup, it's barely noticeable. If you only
-want to shut off map color, the "map-color" toggle will remove color codes
-from the world map.
+very slightly. However, even on dialup, it's barely noticeable. Even so, the
+"map-color" toggle will remove color codes from the world map.
 
 Color codes you can use yourself:
  &0&&0 Normal&0     &u&&u Underline&0
 
 Normal colors:
- &r&&r Red&0        &g&&g Green&0         &y&&y Yellow&0
- &b&&b Blue&0       &m&&m Magenta&0       &c&&c Cyan&0
+ &r&&r Red&0        &p&&p Pink&0        &m&&m Magenta&0    &v&&v Violet&0
+ &b&&b Blue&0       &a&&a Azure&0       &c&&c Cyan&0
+ &g&&g Green&0      &l&&l Lime&0        &j&&j Jade&0
+ &y&&y Yellow&0     &o&&o Orange&0      &t&&t Tan&0
  &w&&w White&0
 
 Bright colors:
- &R&&R Red&0        &G&&G Green&0         &Y&&Y Yellow&0
- &B&&B Blue&0       &M&&M Magenta&0       &C&&C Cyan&0
+ &R&&R Red&0        &P&&P Pink&0        &M&&M Magenta&0    &V&&V Violet&0
+ &B&&B Blue&0       &A&&A Azure&0       &C&&C Cyan&0          
+ &G&&G Green&0      &L&&L Lime&0        &J&&J Jade&0
+ &Y&&Y Yellow&0     &O&&O Orange&0      &T&&T Tan&0
  &W&&W White&0
+ 
+See also: BANNER, INFORMATIVE, POLITICAL, RECOLOR, TOGGLE
 #
 ASSIST
 
@@ -163,6 +197,19 @@ you're assisting is fighting.
   > assist Doctor
 
 See also: FLEE, KILL
+#
+AUTOKILL
+
+Usage:  toggle autokill
+
+Use this toggle if you don't want to kill your opponent in combat, and you'll
+stop attacking when they drop into unconsciousness. They will still need help,
+or they'll eventually die anyhow.
+
+Enemies with a modifier tag (see HELP CONSIDER) will always die upon reaching 0
+health, regardless of your autokill setting.
+
+See also: TOGGLE
 #
 AVOID
 
@@ -179,7 +226,15 @@ Usage:  board <ship>
 
 This command is used to board a ship in the same room.
 
-See also: DISEMBARK, SAIL, MANUFACTURE, LOAD
+See also: DISEMBARK, SAIL, MANUFACTURE, LOAD, SHIPS
+#
+BOTHER NOBOTHER
+
+When enabled, this toggle protects you from having your character affected by
+various other commands - you cannot be sired, you cannot be purified of
+vampirism, and vampires can't bite you unless you're restrained or unconscious.
+
+See also: BITE, PURIFY, SIRE
 #
 BRIEF
 
@@ -189,7 +244,7 @@ This toggle turns off room descriptions and shrinks the map display from 15 by
 15 to 7 by 7. It reduces disconnects from buffer overflows for people moving
 quickly across the world.
 
-See also: BRIEF, COMPACT, MAPSIZE
+See also: COMPACT, MAPSIZE, TOGGLE
 #
 BUG TYPO IDEA
 
@@ -218,6 +273,15 @@ You should always use a secure password and should never tell this password to
 anybody else. Password sharing is not allowed and you are still responsible for
 everything your character says and does if you give the password to someone
 else.
+#
+CHANNEL-JOINS CHANNELJOINS "CHANNEL JOINS"
+
+Usage:  toggle channel-joins
+
+This toggles the messages which display when a player joins or leaves a
+slash-channel you are currently in.
+
+See also: SLASH-CHANNELS, TOGGLE
 #
 CIRCLE
 
@@ -267,17 +331,19 @@ CONSIDER
 
 Usage:  consider <target>
 
-This command tells you your approximate chances in combat against another
-creature. Use it to determine how well you might fare.
+This command tells you your level difference from another creature, if any.
+Use it to determine how well you might fare. If no level difference is given,
+your level is the same as the target's.
 
-Consider primarily uses the level of your target to indicate your chances of
-success. However, it will also list any mitigating factors, such as immunities,
-that will make the fight harder.
+It will also list any mitigating factors, such as immunities, that will make
+the fight harder, and warn you if you would have difficulty hitting or dodging.
 
 There are also several possible modifier tags:
  - hard: will require two players in the right level range
  - group: will require three players in the right level range
  - boss: will require four players in the right level range
+ 
+See also: DROP FLAGS, LEVELS
 #
 COTTON
 
@@ -321,7 +387,7 @@ From the entry room of a ship (the room you're placed in when you board it),
 you may disembark. This can be done even in the ocean, though you may need a
 smaller vessel unless you disembark very close to the shore.
 
-See also: BOARD, SAIL, UNLOAD
+See also: BOARD, SAIL, UNLOAD, SHIPS
 #
 DISMISS
 
@@ -331,7 +397,7 @@ This command causes your familiar to leave. You can target the familiar by
 name if it's in the room with you, or else can type 'dismiss familiar' to
 dismiss it anywhere in the world.
 #
-DOUSE BURNING "PUT OUT FIRE"
+DOUSE BURNING "PUT OUT FIRE" "FIRE BRIGADE"
 
 Usage:  douse
 
@@ -339,6 +405,12 @@ In the event of a fire, you may douse it with water from any portable source.
 It may take a lot of water to douse the fire, and you may have to leave and 
 come back. If you don't fully douse it, the flames will slowly rise again, 
 and destroy your structure.
+
+If your empire has a workforce, the fire brigade can also put out fires for
+you. They will always succeed if left alone. However, they do so very slowly
+and are easy targets for enemy players at war.
+
+See also: WORKFORCE
 #
 DRAW
 
@@ -537,6 +609,7 @@ Usage:  group  -- see status on the group
         group kick <name>  -- kick a member from the group
         group leave  -- leave the group you're in
         group leader <name>  -- change leader
+        group new -- create an empty group
 
 Grouping allows multiple players to work on the same challenge, and gives them
 access to a private group channel. You can also type "group" by itself to see
@@ -549,7 +622,7 @@ invite them to the group.
 There is a limit of 4 members in a group at a time. This is intended to help
 balance game encounters against the number of players in the group.
 
-See also: GSAY
+See also: ADVENTURE SUMMON, GSAY
 #
 GSAY GTELL PSAY PTELL
 
@@ -671,7 +744,7 @@ Usage:  kill <victim>
 
 A good way to start a fight.
 
-See also: FLEE
+See also: ASSIST, FLEE
 #
 LAND
 
@@ -700,8 +773,8 @@ the Empire skill.
 
 Roads count as their base terrain for most building functions, so you can
 build things facing roads, and can usually build right over a road -- but the
-road underneath will be lost. Roads also count as in-city territory for your
-empire, no matter where you lay them.
+road underneath will be lost. Roads count as in-city territory as far away as
+3x a city's normal radius.
 
 See also: EMPIRE, ROADSIGN
 #
@@ -716,13 +789,14 @@ You can load items from your inventory or from the room. Only the Galleon can
 hold items like carts and catapults (or any item that won't fit in your
 inventory).
 
-See also: UNLOAD, BOARD, SAIL
+See also: UNLOAD, BOARD, SAIL, SHIPS
 #
 LOOK EXAMINE
 
 Usage:  look
         look [in | at] [the] <item>
         look <direction>
+        look out
 
 For studying your surroundings. Examine and look do the same thing.
 
@@ -740,7 +814,7 @@ See also: EXAMINE, GET, READ, TAKE
 #
 MAPSIZE "MAP SIZE"
 
-Usage:  mapsize <size>
+Usage:  mapsize <size | auto>
 
 This allows you to change the size of your map display to better fit the size
 of your screen. Be cautious with large mapsizes because some people are dis-
@@ -750,6 +824,9 @@ Mapsize is the total width of your map in map tiles (4 characters if you're
 using the ascii map; one room if you're using screen-reader mode). The number
 is always odd because you sit in the center of it. A mapsize of 3 shows 1 tile
 in each direction; a mapsize of 15 (standard) shows 7 in each direction.
+
+If you set your mapsize to 'auto', the game will attempt to detect the size of
+your client window.
 
 See also: TOGGLE
 #
@@ -820,6 +897,8 @@ Usage:  toggle no-repeat
 This command toggles whether or not you see your communication echoed back to
 you (i.e., from commands such as SAY, SHOUT, /OOC, etc). Useful if you have
 a slow connection or if it just annoys you.
+
+See also: TOGGLE
 #
 NOTELL "NO TELL"
 
@@ -862,11 +941,11 @@ Usage:  toggle political
 This toggle changes your map colors from environmental to political. You will
 see each acre colored with the banner of the empire who owns it.
 
-See also: BANNER
+See also: BANNER, TOGGLE
 #
 PORTAL PORTALS ENTER
 
-Building:  ~&b][&0~ portal  20 logs, 12 blocks  (High Sorcery ability)
+Building:  ~&b][&0~ portal  20 logs, 12 blocks, 20 nexus crystal  (High Sorcery ability)
 Built on:  plains, desert
 Fame:  1
 Commands:  portal [destination]
@@ -878,9 +957,7 @@ mission to use both buildings. The portal will stay open for a few minutes.
 You can target the portal building on the other end using either its co-
 ordinates, or the name of a person who is at the other side.
 
-Portals over 50 map tiles away cost 1 nexus crystal per 75 tiles, rounded up.
-These crystals can be crafted from magical gems by any portal mage, and stored
-at the portal building.
+Portals have a maximum distance of 50 tiles unless both ends are in a city.
 
 You can portal to specific coordinates by using parentheses (123, 456) or by
 typing the coordinates with no space -- 123,456 -- but you can target your
@@ -888,8 +965,9 @@ own and allied portals by number.
 
 Typing "portal" with no argument will list portals belonging to your empire
 and its allies. Typing "portal -all" will list all public portals belonging
-to other empires. You can target empire and ally portals by portal number, but
-the -all list can't be targeted this way.
+to other empires. Only places you could portal to from here are listed. You can
+target empire and ally portals by portal number, but the -all list can't be
+targeted this way.
 
 Portals can only connect two locations on the same land mass (continent or
 island) unless your empire has a Portal Master. You can't open a portal at all
@@ -901,7 +979,26 @@ around this (you still use the 'enter' command).
 
 Immortals can open portals between any two locations.
 
-See also: PORTAL MAGIC, PORTAL MASTER, COLLAPSE, INFILTRATE
+See also: PORTAL MAGIC, PORTAL MASTER, PORTAL SICKNESS, COLLAPSE, INFILTRATE
+#
+"PORTAL SICKNESS" "PORTALING SICKNESS" "PORTALLING SICKNESS"
+
+Portal sickness is caused by entering magical portals (specifically, portals
+created between portal buildings). If you have too much portal sickness, you
+can't enter a portal.
+
+Portals normally cause one minute of portal sickness. If you portal again
+before it wears off, you'll get five minutes of portal sickness instead. After
+that, you can portal again as soon as your portal sickness is below one minute.
+You can see your current portal sickness by typing 'cooldowns'.
+
+Portal mages only get four minutes of portal sickness instead of five. City-to-
+city portals cause just two minutes instead of five.
+
+Only entering portals causes portal sickness. You can still open portals while
+you have portal sickness.
+
+See also: COOLDOWNS, ENTER, PORTALS, PORTAL MAGE
 #
 POUR
 
@@ -938,24 +1035,28 @@ to see your normal prompt in combat.
 Typing "prompt off" will remove your prompt entirely, and "prompt default"
 will restore your default prompt.
 
-The base prompt is: &&0|%i/%u>
+The base prompt is: &&0|%i/%u [&&y%C&&0]> 
 
 Here are the prompt codes and what they do:
   %h  Current health      %v  Current moves      %m  Current mana
   %H  Maximum health      %V  Maximum moves      %M  Maximum mana
   %i  Health text         %u  Move text          %n  Mana text
   
-  %b  Current blood       %t  Time               %_  Line break
+  %b  Current blood       %t  Time
   %B  Maximum blood       %a  Current action
+  %d  Blood text          %_  Line break
   
   %e  % health of enemy   %f  % health of enemy's focus (the tank)
                           %F  Current/total health of enemy's focus (if player)
   
-  %c  Conditions (hunger, thirst)
+  %c  conditions abbreviated (afk, hunger, thirst, etc)
+  %C  conditions as words
   %s  bonus skill exp left today
 
 For immortals:
   %r  Sector/building/room number
+  %x  immortal conditions abbreviated
+  %X  immortal conditions as words
 
 See also: PROMPT SUGGESTIONS
 #
@@ -1003,9 +1104,7 @@ RECOLOR "CUSTOM COLORS"
 Usage:  recolor <type> <color code>
 
 You can change the color of many game channels using this command. This can
-be helpful if it's difficult for you to see the default colors. However, if a
-color is hard for you to see, you should consider lightening it in your client
-settings.
+be helpful if it's difficult for you to see the default colors.
 
 In addition to channels, you can also recolor 'status' which includes cooldowns
 and affect-wear-off messages, to make them easier to see in combat.
@@ -1086,16 +1185,32 @@ Examples:
  > roll 2d6
  You roll 2d6 and get: 11
 #
+RP "RP TOGGLE"
+
+Usage:  toggle rp
+
+This toggle indicates to others that you are currently roleplaying with a &m(RP)&0
+tag next to your name on the "who" list.
+
+See also: TOGGLE
+#
 SAIL
 
-Usage:  sail <direction>
+Usage:  sail <direction> [distance]
 
 You can sail the ship from any location inside, for your convenience. Ships
 can travel on oceans and rivers, through river gates, and under bridges. 
 Though this is fairly slow, it is one of the most efficient means of 
 transoceanic travel.
 
-See also: BOARD, DISEMBARK
+If you specify a distance, you will only sail that many tiles.
+
+Once you've started sailing, the ship will move every few seconds in that
+direction, for as long as you're sailing it. You can type 'sail' again to
+stop, or to change directions. If you don't like seeing the messages each time
+the ship moves, you can 'toggle action-spam'.
+
+See also: BOARD, DISEMBARK, SHIPBUILDING, SHIPS, STOP, TOGGLE
 #
 SAVE
 
@@ -1126,7 +1241,7 @@ You can use ' as a shorthand for say, and " for oocsay, as in:
 
   > 'hello there.
 
-See also: GSAY, IGNORE, NOREPEAT, REPLY, SLASH CHANNELS
+See also: GSAY, IGNORE, NOREPEAT, NOTELL, REPLY, SLASH CHANNELS
 #
 SAYHISTORY
 
@@ -1200,6 +1315,8 @@ Usage:  toggle scrolling
 This toggle turns off the page breaks sent when a character receives a long
 amount of information. The information is sent all at once, as preferred by
 some people for features like the WHO list.
+
+See also: TOGGLE
 #
 SELFDELETE "SELF DELETE" SELF-DELETE DELETE
 
@@ -1221,6 +1338,38 @@ your inventory. Any regular weapon can be sheathed. You do not gain attribute
 bonuses from a weapon while it is sheathed.
 
 See also: DRAW, SWAP
+#
+"SHIP COMMAND" SHIPPING
+
+Usage:  ship status
+        ship cancel [number] <item>
+        ship <island> [number] <item>
+
+This command allows you to ship stored resources between islands using ships at
+your docks. You don't have to be at the docks to queue shipments -- only on
+the island you're shipping from. Once you queue items to be shipped, your NPCs
+will load up empty ships and move them to the target island. You must have
+docks at both ends.
+
+Shipments happen at 7am and 7pm and take up to 4 days (game time; 2 hours
+real time) or as little as half a day (15 minutes), depending on distance.
+
+Items will automatically transfer from the empire inventory on the origin
+island to the empire inventory on the destination island, and the ship will
+appear in one of the docks at the destination.
+
+If the destination island's name contains a space, you must surround it with
+double quotes, or use the coordinates of a tile on the island.
+
+You can only ship and cancel shipments from the island you are currently on,
+but you can see the status of empire shipments all over the world.
+
+If the 'workforce no-work' option is set on a docks, it won't be used by the
+shipping system. You can also set this option on individual ships. (Workforce
+is not required to use the shipping system, but 'workforce no-work' is still
+used to prevent shipping.)
+
+See also: DOCKS, EINVENTORY, SHIPBUILDING, SHIPS, WORKFORCE
 #
 SLEEP
 
@@ -1251,6 +1400,16 @@ The SOCIALS command generates a canonical listing of all available socials.
   > socials
 
 See also: EMOTE
+#
+STEALTHABLE
+
+Usage:  toggle stealthable
+
+This toggle prevents you from accidentally performing stealth actions (for
+example picking up an item on another empire's territory). It must be enabled
+in order to use most PvP stealth commands.
+
+See also: GET, INFILTRATE, PICKPOCKET, STEAL, TOGGLE
 #
 STOP
 
@@ -1294,6 +1453,19 @@ alias inf toggle informative;look
 alias pol toggle political;look
 
 See also: ALIAS, IDEA
+#
+"SUMMON PLAYERS"
+
+Command:  summon player <name>
+
+This command allows you to teleport another player to your location. You can
+only summon a player who is grouped with you, and to do so you must be at an
+Astral Nexus with another player. That is, you need two players there
+(including you) to summon a third player.
+
+Players must accept the summon using 'accept'.
+
+See also: ACCEPT, ASTRAL NEXUS, SUMMON
 #
 SURVEY
 
@@ -1393,12 +1565,9 @@ Toggles:
   brief - see smaller maps and no room descriptions
   compact - no extra newlines
   no-repeat - Some commands will say "ok" instead of typing out your message
-  color - see the world in color
   autokill - don't end combat at incapacitation
   bother - allows "bothersome" things like bite and purify
-  rp - shuts off OOC commands
-  no-clear - removes the screen-clear before the map display
-  map-pc - show players on the map as <oo>
+  rp - Whether or not you are roleplaying
   map-color - shut off color for just the map
   pvp - turns on/off free pvp; will remain on 5 minutes after toggled off
   informative - informative map coloring -- HELP INFORMATIVE
@@ -1415,6 +1584,8 @@ Immortal toggles:
   holylight - allows immortals to see in the dark
   roomflags - shows room flags, vnums, and other info to immortals
   idle-out - if off, the immortal will not disconnect from idling
+  incognito - if on, the immortal does not appear on 'who' to mortals
+  wizhide - if on, the immortal can't be seen in rooms but is not invisible
 #
 UNLOAD BOATUNLOAD
 
@@ -1422,7 +1593,7 @@ Usage:  unload <ship>
 
 This command allows you to unload cargo from a ship at the docks.
 
-See also: LOAD, BOARD, SAIL
+See also: LOAD, BOARD, SAIL, SHIPS
 #
 USE
 
@@ -1492,6 +1663,9 @@ Lists the people currently in the game. Some people may be invisible. Command-
 line options can be used to limit the listing. The parameters can be specified
 on the command-line in any order.
 
+The color of the player's class name (if not white) indicates their role, if
+any: &aCaster&0, &jHealer&0, &yTank&0, &rMelee&0, or &mUtility&0.
+
 min-max    Specify a level range, e.g. 100-200
 -e [name]  members of your own empire or the one you specify (use quotes for
            empires with names longer than one word)
@@ -1530,8 +1704,6 @@ Usage:  wizlist
 
 Lists the most powerful beings on the MUD. These are the people responsible
 for administering the system.
-
-See also: IMPLEMENTOR
 #
 WOOL
 

@@ -40,15 +40,27 @@ Full multiplaying rules are found by typing POLICY.
 
 See also: ALTERNATE
 #
-ADVENTURE "ADVENTURE ZONE" ZONE
+ADVENTURE "ADVENTURE ZONE" ZONE "ADVENTURE SUMMON"
 
 Usage:  adventure
+        adventure summon <player>
 
 EmpireMUD features instanced adventure zones including caves, magical planes,
 and more. Sometimes you can see them on the 'nearby' command. You can get some
 more information about an adventure using the 'adventure' command.
 
-See also: NEARBY
+You can teleport your group to your adventure using 'adventure summon'. This
+will teleport group members from anywhere in the world to the adventure you're
+in. If they leave the adventure for any reason, they will be teleported back
+where they were before (with some exceptions, below).
+
+Adventure summon restrictions:
+- If you die and respawn, you'll be sent back where you were but your corpse
+will not be eligible for resurrection. You can still be summoned back.
+- If you teleport or trinket out, you won't be sent back where you were before
+the adventure summon. (Except random-teleport.)
+
+See also: ACCEPT, GROUP, NEARBY
 #
 ATTRIBUTES STATS STRENGTH DEXTERITY CHARISMA GREATNESS GRT INTELLIGENCE INTELLECT WITS
 
@@ -70,7 +82,7 @@ The active attribute in each category cannot go below 1 from equipment; you
 will not be able to use any item that lowers your active attributes below 1.
 There is also currently a maximum rating of 15 in these attributes.
 
-See also: DODGE, EMPIRE GREATNESS, SECONDARY ATTRIBUTES, TO-HIT
+See also: DODGE, EMPIRE GREATNESS, SPEED, TO-HIT
 #
 AUTORECALL "AUTO-RECALL" "AUTO RECALL"
 
@@ -134,12 +146,12 @@ equipped it.
 
 Bound items can never be stored or posted for trade, and you can't drop them
 in territory claimed by other empires. Bound items will disappear from the
-ground if left on unclaimed land, like normal. They are safe to leave on
-claimed land or in your private chest.
+ground if left on unclaimed land, like normal. They are safe to leave longer on
+claimed land (although not forever) or in your private chest (no time limit).
 
 You cannot unbind items.
 
-See also: HOME
+See also: TAGS, HOME
 #
 BLOCK "BLOCK CAP"
 
@@ -150,6 +162,8 @@ benefit if you are not using a shield.
 
 There is a maximum 50% chance to block. The amount of Block required to hit
 this cap is based on the level of your opponent.
+
+You cannot block magical attacks without the Ward Against Magic ability.
 
 Block cap:
 - Start with the mob's level divided by 2 (half)
@@ -265,8 +279,8 @@ Usage:  shout <message>
 See also HELP SLASH-CHANNELS for global channels like /ooc and /newbie.
 
 These are channels reserved for specific purposes. Messages on these channels
-reach everyone who is monitoring them. You can turn channels on and off using
-the "toggle" command.
+reach everyone who is monitoring them. You can turn the "shout" and "tell"
+channels on and off using the "toggle" command.
 
 The following channels are available on EmpireMUD:
 
@@ -417,7 +431,7 @@ like (1/5) is the number and maximum number of stacks.
 Physical DoTs can be removed by firstaid. Magical and poison DoTs can be
 removed by cleanse.
 
-See also: AFFECTS, CLEANSE, FIRSTAID, SCORE
+See also: AFFECTS, CLEANSE, DISPEL, FIRSTAID, SCORE
 #
 FARMING CROPS ORCHARDS AGRICULTURE APPLES WHEAT CORN HOPS COTTON BARLEY PEACHES CHERRIES ORANGES RICE OLIVES PEAS GOURDS
 
@@ -505,7 +519,7 @@ is a good way to see what level (or level range) an instance is scaled to.
 
 See also: ADVENTURE
 #
-LEVEL LEVELS "GEAR LEVELS"
+LEVEL LEVELS "GEAR LEVELS" "SKILL LEVEL"
 
 Unlike many games, where your skills and equipment are based on your level,
 EmpireMUD does it backwards. Your level is based on your skills and gear.
@@ -517,18 +531,19 @@ Skill level: This level is determined by your top 3 skills, and is currently
    in parentheses on your "score". Skill levels are grouped into three ranges:
    Basic (up to 50), Specialty (up to 75), and Class (up to 100).
 
-Gear level: The bonuses you receive from your equipment form your gear level.
-   There is no upper limit on this number, and any gear you have equipped
-   (except sheathed weapons) contributes to your gear level. You can see it
-   by typing "eq".
+Gear level: Your gear level raises your total level to 50 more than the average
+   level of the gear you have equipped (except sheathed weapons, clothes, and
+   items in the ranged slot). You can see it by typing "eq". Some item flags
+   which make the item more powerful, such as superior and drop flags, raise
+   the effective levels of items for this purpose.
 
 Composite level: This is the sum of your skill and gear levels. It is the
    number used for scaling mobs to fight you. This is the level shown on your
    "score".
 
-Note: You can't use gear that's above your current level range. For example,
-   a person in the 51-75 level range can only use items that are scaled up
-   to level 75.
+Note: You can't use gear that's more than 25 levels above you (50 for BoP
+   items). Your highest recent level is used, so you should still be able to
+   remove all your gear and re-equip it.
 
 See also: CLASS, SCALING
 #
@@ -555,10 +570,93 @@ Move points are the basic energy pool for physical effort. It takes move points
 to walk around, and it takes move points to use many physical abilities like
 Kick or Shadowstep.
 
-All players begin with 100 mana points and start to rise around level 80. Your
+All players begin with 100 move points and start to rise around level 80. Your
 base move points at level 100 is based on your class. The easiest ways to get
 more move points at any level are to make a walking stick or a good pair of
 shoes.
+#
+MSDP "MUD SERVER DATA PROTOCOL" "MSDP VARIABLES" "MSDP VARS"
+
+MSDP is the Mud Server Data Protocol, a way for mud clients to receive out-of-
+band information (data not displayed in-game) on request. You can learn more
+about it by searching the internet for MSDP + your mud client, or at this
+website: http://tintin.sourceforge.net/msdp/index.php
+
+EmpireMUD supports the following MSDP variables:
+
+ ACCOUNT_NAME - The player's login name
+ CHARACTER_NAME - The character's full name
+ SERVER_ID - The name of the MUD
+ SNIPPET_VERSION - Version of KaVir's protocol snippet used for MSDP
+
+ HEALTH - Current health
+ HEALTH_MAX - Maximum health
+ HEALTH_REGEN - Health regained per 5 seconds
+ MANA - Current mana
+ MANA_MAX - Maximum mana
+ MANA_REGEN - Mana regained per 5 seconds
+ MOVEMENT - Current movement points
+ MOVEMENT_MAX - Maximum movement points
+ MOVEMENT_REGEN - Movement points regained per 5 seconds
+ BLOOD - Current blood points
+ BLOOD_MAX - Maximum blood pool
+ BLOOD_UPKEEP - Blood cost per game hour
+
+ AFFECTS - Table of current affects and durations (seconds)
+ DOTS - Damage Over Time affects in nested table format with:
+    Dot Name => (DURATION, TYPE, DAMAGE, STACKS)
+ COOLDOWNS - Table of cooldowns and their time remaining (seconds)
+ LEVEL - Total level
+ SKILL_LEVEL - Skill level
+ GEAR_LEVEL - Gear level
+ CRAFTING_LEVEL - Crafting level
+ CLASS - Character's class
+ SKILLS - Nested table format with:
+    Skill Name => (LEVEL, EXP, RESETS, NOSKILL)
+ MONEY - Total coins
+ BONUS_EXP - Daily bonus experience remaining
+ INVENTORY - Current inventory size
+ INVENTORY_MAX - Maximum inventory size
+
+ Current attributes: STR, DEX, CHA, GRT, INT, WIT
+ Natural attributes: STR_PERM, DEX_PERM, CHA_PERM, GRT_PERM, INT_PERM, WIT_PERM
+
+ BLOCK - Block rating
+ DODGE - Dodge rating (without dexterity)
+ TO_HIT - To-Hit rating (without dexterity)
+ SPEED - Current weapon attack speed (main hand)
+ RESIST_PHYSICAL - Amount of physical resistance
+ RESIST_MAGICAL - Amount of magical resistance
+ BONUS_PHYSICAL - Bonus physical damage
+ BONUS_MAGICAL - Bonus magical damage
+ BONUS_HEALING - Bonus healing
+ 
+ EMPIRE_NAME - Name of the character's empire
+ EMPIRE_ADJECTIVE - Empire's adjective
+ EMPIRE_RANK - Character's rank in the empire
+ EMPIRE_TERRITORY - Empire's current territory level
+ EMPIRE_TERRITORY_MAX - Empire's maximum territory
+ EMPIRE_TERRITORY_OUTSIDE - Empire's current out-of-city territory
+ EMPIRE_TERRITORY_OUTSIDE_MAX - Empire's maximum out-of-city territory
+ EMPIRE_WEALTH - Empire's total wealth
+ EMPIRE_SCORE - Empire's total score
+
+ OPPONENT_HEALTH - In combat, the opponent's health percent
+ OPPONENT_HEALTH_MAX - Always 100 (when in combat)
+ OPPONENT_LEVEL - In combat, the opponent's level
+ OPPONENT_NAME - In combat, the opponent's name
+
+ AREA_NAME - The name of the adventure, city, or island the player is in
+ ROOM - The room data array, see http://tintin.sourceforge.net/msdp/index.php
+ ROOM_EXITS - A table of vnums for each direction -- only indoors
+ ROOM_NAME - Name of the room the character is in
+ ROOM_VNUM - Virtual number of the room the character is in
+ WORLD_TIME - Current time (24-hour format)
+ WORLD_SEASON - Current season
+
+ The following GUI variables are provided, for a generic GUI:
+  BUTTON_1, BUTTON_2, BUTTON_3, BUTTON_4, BUTTON_5
+  GAUGE_1, GAUGE_2, GAUGE_3, GAUGE_4, GAUGE_5
 #
 MUDSTATS
 
@@ -665,15 +763,19 @@ Items are also scaled. In adventures, they are scaled based on the level of
 the mob you got them from. Craftable items are also scaled, based on the skill
 or recipe used to make them, and on the level of the crafter.
 
-See also: CONSIDER, SCALABLE CRAFTS
+See also: CONSIDER, LEVELS, SCALABLE CRAFTS
 #
 SCAN
 
 Usage:  scan <direction>
+        scan <tile name>
 
 This command shows you the same information as the screen-reader map display,
 but in only one direction. The distance you see on a scan is based on your
 mapsize.
+
+You can also scan for nearby tiles matching a given keyword, such as a building
+or crop name. It will scan a distance up to your mapsize.
 
 Example:
  > scan southwest
@@ -688,7 +790,7 @@ blacksmith at a forge.
 
 See also: DIG, EXCAVATE, FORGE
 #
-"SLASH CHANNELS" SLASH-CHANNELS / /JOIN /CHECK /LEAVE /WHO /HISTORY HISTORY VC "VIRTUAL CHANNELS"
+"SLASH CHANNELS" SLASH-CHANNELS SLASHCHANNELS / /JOIN /CHECK /LEAVE /WHO /HISTORY HISTORY VC "VIRTUAL CHANNELS"
 
 Usage:  /join <channel>
         /leave <channel>
@@ -733,6 +835,8 @@ her group. This ensures that these players receive credit for the kill, plus
 any bind-on-pickup loot the mob drops.
 
 If the mob is out of combat long enough to heal, it will also reset its tags.
+
+See also: BINDING
 #
 TIP TIPS "TIP OF THE DAY" HINT
 

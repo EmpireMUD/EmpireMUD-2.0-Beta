@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: comm.c                                          EmpireMUD 2.0b2 *
+*   File: comm.c                                          EmpireMUD 2.0b3 *
 *  Usage: Communication, socket handling, main(), central game loop       *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -30,7 +30,6 @@
 *   Data
 *   Helpers
 *   Reboot System
-*   Color Handling
 *   Main Game Loop
 *   Messaging
 *   Prompt
@@ -65,6 +64,7 @@ extern char *help;
 
 // external functions
 void Crash_save_all();
+extern char *flush_reduced_color_codes(descriptor_data *desc);
 void mobile_activity(void);
 void show_string(descriptor_data *d, char *input);
 int isbanned(char *hostname);
@@ -81,6 +81,7 @@ char *prompt_str(char_data *ch);
 char *replace_prompt_codes(char_data *ch, char *str);
 int get_from_q(struct txt_q *queue, char *dest, int *aliased);
 int get_max_players(void);
+static void msdp_update();
 int new_descriptor(socket_t s);
 int open_logfile(const char *filename, FILE *stderr_fp);
 int perform_alias(descriptor_data *d, char *orig);
@@ -92,8 +93,6 @@ ssize_t perform_socket_read(socket_t desc, char *read_point,size_t space_left);
 ssize_t perform_socket_write(socket_t desc, const char *txt,size_t length);
 static int process_output(descriptor_data *t);
 struct in_addr *get_bind_addr(void);
-void echo_off(descriptor_data *d);
-void echo_on(descriptor_data *d);
 void empire_sleep(struct timeval *timeout);
 void flush_queues(descriptor_data *d);
 void game_loop(socket_t mother_desc);
@@ -135,7 +134,7 @@ int mother_desc;
 ush_int port;
 
 /* Reboot data (default to a normal reboot once per week) */
-struct reboot_control_data reboot_control = { SCMD_REBOOT, 7 * (24 * 60), SHUTDOWN_NORMAL, FALSE };
+struct reboot_control_data reboot_control = { SCMD_REBOOT, 7.5 * (24 * 60), SHUTDOWN_NORMAL, FALSE };
 
 
 #ifdef __CXREF__
@@ -166,19 +165,25 @@ void clear_last_act_message(descriptor_data *desc) {
 
 
 /**
-* @param char *txt Any string.
-* @param char character The character to search for.
-* @return int The number of occurrences of the character in the string.
+* Determines if a descriptor number is already in use. These numbers loop
+* at 1000 and, in rare cases, we come back up on a number in use.
+*
+* @param int num The number to check.
+* @return bool TRUE if num is in use; FALSE if not.
 */
-static int count_chars(char *txt, char character) {
-	int i, cnt = 0;
-
-	for(i = 0; txt[i]; i++)
-		if(txt[i] == character)
-			cnt++;
-
-	return cnt;
+bool desc_num_in_use(int num) {
+	descriptor_data *desc;
+	
+	for (desc = descriptor_list; desc; desc = desc->next) {
+		if (desc->desc_num == num) {
+			return TRUE;
+		}
+	}
+	
+	// clear
+	return FALSE;
 }
+
 
 /*
  * This may not be pretty but it keeps game_loop() neater than if it was inline.
@@ -189,6 +194,279 @@ inline void empire_sleep(struct timeval *timeout) {
 			perror("SYSERR: Select sleep");
 			exit(1);
 		}
+	}
+}
+
+
+/**
+* Updates MSDP data for a player's location, to be called when they move.
+*
+* @param char_data *ch The player to update (no effect if no descriptor).
+*/
+void msdp_update_room(char_data *ch) {
+	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
+	extern char *get_room_name(room_data *room, bool color);
+	extern const char *alt_dirs[];
+	
+	char buf[MAX_STRING_LENGTH], area_name[128], exits[256];
+	struct empire_city_data *city;
+	struct instance_data *inst;
+	struct island_info *isle;
+	size_t buf_size, ex_size;
+	descriptor_data *desc;
+	
+	// no work
+	if (!ch || !(desc = ch->desc)) {
+		return;
+	}
+
+	// determine area name: we'll use it twice
+	if ((inst = find_instance_by_room(IN_ROOM(ch), FALSE))) {
+		snprintf(area_name, sizeof(area_name), "%s", GET_ADV_NAME(inst->adventure));
+	}
+	else if ((city = find_city(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch)))) {
+		snprintf(area_name, sizeof(area_name), "%s", city->name);
+	}
+	else if ((isle = get_island(GET_ISLAND_ID(IN_ROOM(ch)), TRUE))) {
+		snprintf(area_name, sizeof(area_name), "%s", isle->name);
+	}
+	else {
+		snprintf(area_name, sizeof(area_name), "Unknown");
+	}
+	MSDPSetString(desc, eMSDP_AREA_NAME, area_name);
+	
+	// room var: table
+	buf_size = snprintf(buf, sizeof(buf), "%cVNUM%c%d", (char)MSDP_VAR, (char)MSDP_VAL, GET_ROOM_VNUM(IN_ROOM(ch)));
+	buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cNAME%c%s", (char)MSDP_VAR, (char)MSDP_VAL, get_room_name(IN_ROOM(ch), FALSE));
+	buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cAREA%c%s", (char)MSDP_VAR, (char)MSDP_VAL, area_name);
+	
+	buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cCOORDS%c%c", (char)MSDP_VAR, (char)MSDP_VAL, (char)MSDP_TABLE_OPEN);
+	if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
+		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cX%c%d", (char)MSDP_VAR, (char)MSDP_VAL, X_COORD(IN_ROOM(ch)));
+		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cY%c%d", (char)MSDP_VAR, (char)MSDP_VAL, Y_COORD(IN_ROOM(ch)));
+	}
+	else {
+		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cX%c0", (char)MSDP_VAR, (char)MSDP_VAL);
+		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cY%c0", (char)MSDP_VAR, (char)MSDP_VAL);
+	}
+	buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cZ%c0%c", (char)MSDP_VAR, (char)MSDP_VAL, (char)MSDP_TABLE_CLOSE);
+	buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cTERRAIN%c%s", (char)MSDP_VAR, (char)MSDP_VAL, GET_SECT_NAME(SECT(IN_ROOM(ch))));
+
+	buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cEXITS%c%c", (char)MSDP_VAR, (char)MSDP_VAL, (char)MSDP_TABLE_OPEN);
+	*exits = '\0';
+	ex_size = 0;
+	if (COMPLEX_DATA(IN_ROOM(ch)) && ROOM_IS_CLOSED(IN_ROOM(ch))) {
+		struct room_direction_data *ex;
+		for (ex = COMPLEX_DATA(IN_ROOM(ch))->exits; ex; ex = ex->next) {
+			if (ex->room_ptr && !EXIT_FLAGGED(ex, EX_CLOSED)) {
+				ex_size += snprintf(exits + ex_size, sizeof(exits) - ex_size, "%c%s%c%d", (char)MSDP_VAR, alt_dirs[ex->dir], (char)MSDP_VAL, GET_ROOM_VNUM(ex->room_ptr));
+			}
+		}
+	}
+	buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%s%c", exits, (char)MSDP_TABLE_CLOSE);
+	MSDPSetTable(desc, eMSDP_ROOM, buf);
+	
+	// simple room data
+	MSDPSetNumber(desc, eMSDP_ROOM_VNUM, GET_ROOM_VNUM(IN_ROOM(ch)));
+	MSDPSetString(desc, eMSDP_ROOM_NAME, get_room_name(IN_ROOM(ch), FALSE));
+	MSDPSetTable(desc, eMSDP_ROOM_EXITS, exits);
+}
+
+
+/**
+* From KaVir's protocol snippet (see protocol.c)
+*/
+static void msdp_update(void) {
+	extern int get_block_rating(char_data *ch, bool can_gain_skill);
+	extern int get_blood_upkeep_cost(char_data *ch);
+	extern double get_combat_speed(char_data *ch, int pos);
+	extern int get_crafting_level(char_data *ch);
+	extern int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
+	extern int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill);
+	extern int health_gain(char_data *ch, bool info_only);
+	extern int mana_gain(char_data *ch, bool info_only);
+	extern int move_gain(char_data *ch, bool info_only);
+	extern int pick_season(room_data *room);
+	extern int total_bonus_healing(char_data *ch);
+	extern int get_total_score(empire_data *emp);
+	extern const char *affect_types[];
+	extern const char *cooldown_types[];
+	extern const char *damage_types[];
+	extern const double hit_per_dex;
+	extern const char *seasons[];
+	
+	struct over_time_effect_type *dot;
+	char buf[MAX_STRING_LENGTH];
+	struct cooldown_data *cool;
+	char_data *ch, *pOpponent;
+	struct affected_type *aff;
+	descriptor_data *d;
+	int hit_points, iter, PlayerCount = 0;
+	size_t buf_size;
+
+	for (d = descriptor_list; d; d = d->next) {
+		if ((ch = d->character) && !IS_NPC(ch) && STATE(d) == CON_PLAYING) {
+			++PlayerCount;
+			
+			// TODO: Most of this could be moved to set only when it is changed
+
+			MSDPSetString(d, eMSDP_ACCOUNT_NAME, GET_NAME(ch));
+			MSDPSetString(d, eMSDP_CHARACTER_NAME, PERS(ch, ch, FALSE));
+
+			MSDPSetNumber(d, eMSDP_HEALTH, GET_HEALTH(ch));
+			MSDPSetNumber(d, eMSDP_HEALTH_MAX, GET_MAX_HEALTH(ch));
+			MSDPSetNumber(d, eMSDP_HEALTH_REGEN, health_gain(ch, TRUE));
+			MSDPSetNumber(d, eMSDP_MANA, GET_MANA(ch));
+			MSDPSetNumber(d, eMSDP_MANA_MAX, GET_MAX_MANA(ch));
+			MSDPSetNumber(d, eMSDP_MANA_REGEN, mana_gain(ch, TRUE));
+			MSDPSetNumber(d, eMSDP_MOVEMENT, GET_MOVE(ch));
+			MSDPSetNumber(d, eMSDP_MOVEMENT_MAX, GET_MAX_MOVE(ch));
+			MSDPSetNumber(d, eMSDP_MOVEMENT_REGEN, move_gain(ch, TRUE));
+			MSDPSetNumber(d, eMSDP_BLOOD, GET_BLOOD(ch));
+			MSDPSetNumber(d, eMSDP_BLOOD_MAX, GET_MAX_BLOOD(ch));
+			MSDPSetNumber(d, eMSDP_BLOOD_UPKEEP, get_blood_upkeep_cost(ch));
+			
+			// affects
+			*buf = '\0';
+			buf_size = 0;
+			for (aff = ch->affected; aff; aff = aff->next) {
+				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%d", (char)MSDP_VAR, affect_types[aff->type], (char)MSDP_VAL, (aff->duration == UNLIMITED ? -1 : (aff->duration * SECS_PER_REAL_UPDATE)));
+			}
+			MSDPSetTable(d, eMSDP_AFFECTS, buf);
+			
+			// dots
+			*buf = '\0';
+			buf_size = 0;
+			for (dot = ch->over_time_effects; dot; dot = dot->next) {
+				// each dot has a sub-table
+				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%c", (char)MSDP_VAR, affect_types[dot->type], (char)MSDP_VAL, (char)MSDP_TABLE_OPEN);
+				
+				
+				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cDURATION%c%d", (char)MSDP_VAR, (char)MSDP_VAL, (dot->duration == UNLIMITED ? -1 : (dot->duration * SECS_PER_REAL_UPDATE)));
+				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cTYPE%c%s", (char)MSDP_VAR, (char)MSDP_VAL, damage_types[dot->damage_type]);
+				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cDAMAGE%c%d", (char)MSDP_VAR, (char)MSDP_VAL, dot->damage * dot->stack);
+				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cSTACKS%c%d", (char)MSDP_VAR, (char)MSDP_VAL, dot->stack);
+				
+				// end table
+				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c", (char)MSDP_TABLE_CLOSE);
+			}
+			MSDPSetTable(d, eMSDP_DOTS, buf);
+			
+			// cooldowns
+			*buf = '\0';
+			buf_size = 0;
+			for (cool = ch->cooldowns; cool; cool = cool->next) {
+				if (cool->expire_time > time(0)) {
+					buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%ld", (char)MSDP_VAR, cooldown_types[cool->type], (char)MSDP_VAL, cool->expire_time - time(0));
+				}
+			}
+			MSDPSetTable(d, eMSDP_COOLDOWNS, buf);
+			
+			MSDPSetNumber(d, eMSDP_LEVEL, get_approximate_level(ch));
+			MSDPSetNumber(d, eMSDP_SKILL_LEVEL, IS_NPC(ch) ? 0 : GET_SKILL_LEVEL(ch));
+			MSDPSetNumber(d, eMSDP_GEAR_LEVEL, IS_NPC(ch) ? 0 : GET_GEAR_LEVEL(ch));
+			MSDPSetNumber(d, eMSDP_CRAFTING_LEVEL, get_crafting_level(ch));
+
+			snprintf(buf, sizeof(buf), "%s", IS_IMMORTAL(ch) ? "Immortal" : class_data[GET_CLASS(ch)].name);
+			MSDPSetString(d, eMSDP_CLASS, buf);
+			
+			// skills
+			*buf = '\0';
+			buf_size = 0;
+			for (iter = 0; iter < NUM_SKILLS; ++iter) {
+				if (GET_SKILL(ch, iter) > 0) {
+					buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%c", (char)MSDP_VAR, skill_data[iter].name, (char)MSDP_VAL, (char)MSDP_TABLE_OPEN);
+					
+					buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cLEVEL%c%d", (char)MSDP_VAR, (char)MSDP_VAL, GET_SKILL(ch, iter));
+					buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cEXP%c%.2f", (char)MSDP_VAR, (char)MSDP_VAL, GET_SKILL_EXP(ch, iter));
+					buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cRESETS%c%d", (char)MSDP_VAR, (char)MSDP_VAL, GET_FREE_SKILL_RESETS(ch, iter));
+					buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cNOSKILL%c%d", (char)MSDP_VAR, (char)MSDP_VAL, NOSKILL_BLOCKED(ch, iter));
+					
+					// end table
+					buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c", (char)MSDP_TABLE_CLOSE);
+				}
+			}
+			MSDPSetTable(d, eMSDP_SKILLS, buf);
+
+			MSDPSetNumber(d, eMSDP_MONEY, total_coins(ch));
+			MSDPSetNumber(d, eMSDP_BONUS_EXP, IS_NPC(ch) ? 0 : GET_DAILY_BONUS_EXPERIENCE(ch));
+			MSDPSetNumber(d, eMSDP_INVENTORY, IS_CARRYING_N(ch));
+			MSDPSetNumber(d, eMSDP_INVENTORY_MAX, CAN_CARRY_N(ch));
+			
+			MSDPSetNumber(d, eMSDP_STR, GET_STRENGTH(ch));
+			MSDPSetNumber(d, eMSDP_DEX, GET_DEXTERITY(ch));
+			MSDPSetNumber(d, eMSDP_CHA, GET_CHARISMA(ch));
+			MSDPSetNumber(d, eMSDP_GRT, GET_GREATNESS(ch));
+			MSDPSetNumber(d, eMSDP_INT, GET_INTELLIGENCE(ch));
+			MSDPSetNumber(d, eMSDP_WIT, GET_WITS(ch));
+			MSDPSetNumber(d, eMSDP_STR_PERM, GET_REAL_ATT(ch, STRENGTH));
+			MSDPSetNumber(d, eMSDP_DEX_PERM, GET_REAL_ATT(ch, DEXTERITY));
+			MSDPSetNumber(d, eMSDP_CHA_PERM, GET_REAL_ATT(ch, CHARISMA));
+			MSDPSetNumber(d, eMSDP_GRT_PERM, GET_REAL_ATT(ch, GREATNESS));
+			MSDPSetNumber(d, eMSDP_INT_PERM, GET_REAL_ATT(ch, INTELLIGENCE));
+			MSDPSetNumber(d, eMSDP_WIT_PERM, GET_REAL_ATT(ch, WITS));
+			
+			MSDPSetNumber(d, eMSDP_BLOCK, get_block_rating(ch, FALSE));
+			MSDPSetNumber(d, eMSDP_DODGE, get_dodge_modifier(ch, NULL, FALSE) - (hit_per_dex * GET_DEXTERITY(ch)));	// same change made to it in score
+			MSDPSetNumber(d, eMSDP_TO_HIT, get_to_hit(ch, NULL, FALSE, FALSE) - (hit_per_dex * GET_DEXTERITY(ch)));	// same change as in score
+			snprintf(buf, sizeof(buf), "%.2f", get_combat_speed(ch, WEAR_WIELD));
+			MSDPSetString(d, eMSDP_SPEED, buf);
+			MSDPSetNumber(d, eMSDP_RESIST_PHYSICAL, GET_RESIST_PHYSICAL(ch));
+			MSDPSetNumber(d, eMSDP_RESIST_MAGICAL, GET_RESIST_MAGICAL(ch));
+			MSDPSetNumber(d, eMSDP_BONUS_PHYSICAL, GET_BONUS_PHYSICAL(ch));
+			MSDPSetNumber(d, eMSDP_BONUS_MAGICAL, GET_BONUS_MAGICAL(ch));
+			MSDPSetNumber(d, eMSDP_BONUS_HEALING, total_bonus_healing(ch));
+			
+			// empire
+			if (GET_LOYALTY(ch) && !IS_NPC(ch)) {
+				MSDPSetString(d, eMSDP_EMPIRE_NAME, EMPIRE_NAME(GET_LOYALTY(ch)));
+				MSDPSetString(d, eMSDP_EMPIRE_ADJECTIVE, EMPIRE_ADJECTIVE(GET_LOYALTY(ch)));
+				MSDPSetString(d, eMSDP_EMPIRE_RANK, strip_color(EMPIRE_RANK(GET_LOYALTY(ch), GET_RANK(ch)-1)));
+				MSDPSetNumber(d, eMSDP_EMPIRE_TERRITORY, EMPIRE_CITY_TERRITORY(GET_LOYALTY(ch)) + EMPIRE_OUTSIDE_TERRITORY(GET_LOYALTY(ch)));
+				MSDPSetNumber(d, eMSDP_EMPIRE_TERRITORY_MAX, land_can_claim(GET_LOYALTY(ch), FALSE));
+				MSDPSetNumber(d, eMSDP_EMPIRE_TERRITORY_OUTSIDE, EMPIRE_OUTSIDE_TERRITORY(GET_LOYALTY(ch)));
+				MSDPSetNumber(d, eMSDP_EMPIRE_TERRITORY_OUTSIDE_MAX, land_can_claim(GET_LOYALTY(ch), TRUE));
+				MSDPSetNumber(d, eMSDP_EMPIRE_WEALTH, GET_TOTAL_WEALTH(GET_LOYALTY(ch)));
+				MSDPSetNumber(d, eMSDP_EMPIRE_SCORE, get_total_score(GET_LOYALTY(ch)));
+			}
+			else {
+				MSDPSetString(d, eMSDP_EMPIRE_NAME, "");
+				MSDPSetString(d, eMSDP_EMPIRE_ADJECTIVE, "");
+				MSDPSetString(d, eMSDP_EMPIRE_RANK, "");
+				MSDPSetNumber(d, eMSDP_EMPIRE_TERRITORY, 0);
+				MSDPSetNumber(d, eMSDP_EMPIRE_TERRITORY_MAX, 0);
+				MSDPSetNumber(d, eMSDP_EMPIRE_TERRITORY_OUTSIDE, 0);
+				MSDPSetNumber(d, eMSDP_EMPIRE_TERRITORY_OUTSIDE_MAX, 0);
+				MSDPSetNumber(d, eMSDP_EMPIRE_WEALTH, 0);
+				MSDPSetNumber(d, eMSDP_EMPIRE_SCORE, 0);
+			}
+
+			/* This would be better moved elsewhere */
+			if ((pOpponent = FIGHTING(ch))) {
+				hit_points = (GET_HEALTH(pOpponent) * 100) / GET_MAX_HEALTH(pOpponent);
+				MSDPSetNumber(d, eMSDP_OPPONENT_HEALTH, hit_points);
+				MSDPSetNumber(d, eMSDP_OPPONENT_HEALTH_MAX, 100);
+				MSDPSetNumber(d, eMSDP_OPPONENT_LEVEL, get_approximate_level(pOpponent));
+				MSDPSetString(d, eMSDP_OPPONENT_NAME, PERS(pOpponent, ch, FALSE));
+			}
+			else { // Clear the values
+				MSDPSetNumber(d, eMSDP_OPPONENT_HEALTH, 0);
+				MSDPSetNumber(d, eMSDP_OPPONENT_LEVEL, 0);
+				MSDPSetString(d, eMSDP_OPPONENT_NAME, "");
+			}
+			
+			MSDPSetNumber(d, eMSDP_WORLD_TIME, time_info.hours);
+			MSDPSetString(d, eMSDP_WORLD_SEASON, seasons[pick_season(IN_ROOM(ch))]);
+			
+			// done -- send it
+			MSDPUpdate(d);
+		}
+
+		/* Ideally this should be called once at startup, and again whenever
+		* someone leaves or joins the mud.  But this works, and it keeps the
+		* snippet simple.  Optimise as you see fit.
+		*/
+	MSSPSetPlayers(PlayerCount);
 	}
 }
 
@@ -401,7 +679,7 @@ void perform_reboot(void) {
 		}
 
 		if (reboot_control.type == SCMD_REBOOT && fl) {
-			fprintf(fl, "%d %s %s\n", desc->descriptor, GET_NAME(och), desc->host);
+			fprintf(fl, "%d %s %s %s\n", desc->descriptor, GET_NAME(och), desc->host, CopyoverGet(desc));
 		
 			if (GROUP(och) && GROUP_LEADER(GROUP(och))) {
 				gsize += snprintf(group_data + gsize, sizeof(group_data) - gsize, "G %d %d\n", GET_IDNUM(och), GET_IDNUM(GROUP_LEADER(GROUP(och))));
@@ -435,9 +713,7 @@ void perform_reboot(void) {
 	// If this is a reboot, restart the mud!
 	if (reboot_control.type == SCMD_REBOOT) {
 		log("Reboot: performing live reboot");
-				
-		sprintf(buf, "%d", port);
-		sprintf(buf2, "-C%d", mother_desc);
+		
 		chdir("..");
 				
 		// rotate logs -- note: you should also update the autorun script
@@ -457,8 +733,17 @@ void perform_reboot(void) {
 		system("fgrep \"SCRIPT ERR:\" syslog >> log/scripterr");
 		system("cp syslog log/syslog.old");
 		system("echo 'Rebooting EmpireMUD...' > syslog");
-
-		execl("bin/empire", "empire", buf2, buf, (char *) NULL);
+		
+		sprintf(buf, "%d", port);
+		sprintf(buf2, "-C%d", mother_desc);
+		
+		// TODO: should support more of the extra options we might have started up with
+		if (no_rent_check) {
+			execl("bin/empire", "empire", buf2, "-q", buf, (char *) NULL);
+		}
+		else {
+			execl("bin/empire", "empire", buf2, buf, (char *) NULL);
+		}
 
 		// If that failed we're still here?
 		perror("reboot: execl");
@@ -517,7 +802,7 @@ void update_reboot(void) {
 	// wizlock last 5 minutes
 	if (reboot_control.time <= 5) {
 		wizlock_level = 1;	// newbie lock
-		sprintf(buf, "This mud is preparing to %s. The %s will happen in about %d minutes.\r\n", reboot_type[reboot_control.type], reboot_type[reboot_control.type], reboot_control.time);
+		sprintf(buf, "This mud is preparing to %s. The %s will happen in about %d minutes.", reboot_type[reboot_control.type], reboot_type[reboot_control.type], reboot_control.time);
 		wizlock_message = str_dup(buf);
 	}
 	
@@ -530,160 +815,13 @@ void update_reboot(void) {
 
 
  //////////////////////////////////////////////////////////////////////////////
-//// COLOR HANDLING //////////////////////////////////////////////////////////
-
-/**
-* Color code processing -- turns & codes into colors
-*
-* @param char *txt The input text
-* @param descriptor_data *t The descriptor we're sending this to
-*/
-char *parse_color(char *txt, descriptor_data *t) {
-	char *new_txt;
-	char *toret;
-	register int iter, pos = 0;
-	int color = (!t->character || (!IS_NPC(t->character) && PRF_FLAGGED(t->character, PRF_COLOR)) ? 1 : 0);
-	int num_codes;
-
-	// count & codes in the string
-	num_codes = count_chars(txt, '&');
-
-	// allocate new text based on how long the codes could possibly be (7 chars each) -- it's okay to allocate too much
-	new_txt = malloc((num_codes * 7) + strlen(txt) + 1);
-
-	// shorthand for the color switch: code is the 1-char code (r from &r) replacement is the "\033[0m" and length is its length in chars
-	#define PARSE_COLOR(code, replacement, length)	\
-		if (color && code != t->last_color_sent) {	\
-			strcpy(new_txt + pos, replacement);	\
-			pos += (length);	\
-			t->last_color_sent = code;	\
-		}
-	
-	// parse color codes
-	for (iter = 0; txt[iter]; iter++) {
-		// is a color code?
-		if (txt[iter] == '&' && txt[iter+1]) {
-			++iter;
-	
-			switch(txt[iter]) {
-				case '0': {		// &0 -- don't use PARSE_COLOR because we ALWAYS want to send the \033[0m
-					if (color) {
-						strcpy(new_txt + pos, "\033[0m");
-						pos += 4;
-						t->last_color_sent = '0';
-					}
-					break;
-				}
-				case 'r': {		// &r
-					PARSE_COLOR('r', "\033[0;31m", 7);
-					break;
-				}
-				case 'R': {		// &R
-					PARSE_COLOR('R', "\033[31;1m", 7);
-					break;
-				}
-				case 'g': {		// &g
-					PARSE_COLOR('g', "\033[0;32m", 7);
-					break;
-				}
-				case 'G': {		// &G
-					PARSE_COLOR('G', "\033[32;1m", 7);
-					break;
-				}
-				case 'y': {		// &y
-					PARSE_COLOR('y', "\033[0;33m", 7);
-					break;
-				}
-				case 'Y': {		// &Y
-					PARSE_COLOR('Y', "\033[33;1m", 7);
-					break;
-				}
-				case 'b': {		// &b
-					PARSE_COLOR('b', "\033[0;34m", 7);
-					break;
-				}
-				case 'B': {		// &B
-					PARSE_COLOR('B', "\033[34;1m", 7);
-					break;
-				}
-				case 'm': {		// &m
-					PARSE_COLOR('m', "\033[0;35m", 7);
-					break;
-				}
-				case 'M': {		// &M
-					PARSE_COLOR('M', "\033[35;1m", 7);
-					break;
-				}
-				case 'c': {		// &c
-					PARSE_COLOR('c', "\033[0;36m", 7);
-					break;
-				}
-				case 'C': {		// &C
-					PARSE_COLOR('C', "\033[36;1m", 7);
-					break;
-				}
-				case 'w': {		// &w
-					PARSE_COLOR('w', "\033[0;37m", 7);
-					break;
-				}
-				case 'W': {		// &W
-					PARSE_COLOR('W', "\033[37;1m", 7);
-					break;
-				}
-				
-				// other
-				
-				case 'u': {		// &u
-					PARSE_COLOR('u', "\033[4m", 4);
-					break;
-				}
-				case '&': {		// &&
-					new_txt[pos] = txt[iter];
-					++pos;
-					break;
-				}
-				case '?': {		// &? (ignore -- handled in mapview)
-					break;
-				}
-				case 'V': {		// &V (ignore -- handled in mapview)
-					break;
-				}
-
-				default: {		// & with any other char after
-					new_txt[pos++] = '&';
-					--iter;
-					break;
-				}
-			}
-		}
-		else {	// NOT a & at txt[iter]
-			new_txt[pos] = txt[iter];
-			++pos;
-		}
-	}
-
-	// terminator
-	new_txt[pos] = '\0';
-	
-	// create a new string to return, to prevent memory loss
-	toret = strdup(new_txt);
-	
-	// free the temporary buffer
-	if (new_txt) {
-		free(new_txt);
-	}
-
-	return toret;
-}
-
-
- //////////////////////////////////////////////////////////////////////////////
 //// MAIN GAME LOOP //////////////////////////////////////////////////////////
 
 void heartbeat(int heart_pulse) {
 	void check_death_respawn();
 	void check_expired_cooldowns();
 	void check_idle_passwords();
+	void check_newbie_islands();
 	void check_wars();
 	void chore_update();
 	void extract_pending_chars();
@@ -825,6 +963,8 @@ void heartbeat(int heart_pulse) {
 	if (HEARTBEAT(12 * SECS_PER_REAL_HOUR)) {
 		reduce_city_overages();
 		if (debug_log && HEARTBEAT(15)) { log("debug 20:\t%lld", microtime()); }
+		check_newbie_islands();
+		if (debug_log && HEARTBEAT(15)) { log("debug 20.5:\t%lld", microtime()); }
 	}
 	
 	if (HEARTBEAT(SECS_PER_REAL_HOUR)) {
@@ -854,6 +994,11 @@ void heartbeat(int heart_pulse) {
 			process_imports();
 			if (debug_log && HEARTBEAT(15)) { log("debug 25:\t%lld", microtime()); }
 		}
+	}
+	
+	// this goes roughly last -- update MSDP users
+	if (HEARTBEAT(1)) {
+		msdp_update();
 	}
 
 	/* Every pulse! Don't want them to stink the place up... */
@@ -926,41 +1071,14 @@ void act(const char *str, int hide_invisible, char_data *ch, obj_data *obj, cons
 					continue;
 				if (IS_SET(type, TO_NOTVICT) && to == vict_obj)
 					continue;
+				if (ch && !WIZHIDE_OK(to, ch)) {
+					continue;
+				}
 				perform_act(str, ch, obj, vict_obj, to, IS_SET(type, TO_IGNORE_BAD_CODE) != 0);
 			}
 		}
 	}
 	Global_ignore_dark = FALSE;
-}
-
-
-/*
- * Turn off echoing (specific to telnet client)
- */
-void echo_off(descriptor_data *d) {
-	char off_string[] = {
-		(char) IAC,
-		(char) WILL,
-		(char) TELOPT_ECHO,
-		(char) 0,
-	};
-
-	SEND_TO_Q(off_string, d);
-}
-
-
-/*
- * Turn on echoing (specific to telnet client)
- */
-void echo_on(descriptor_data *d) {
-	char on_string[] = {
-		(char) IAC,
-		(char) WONT,
-		(char) TELOPT_ECHO,
-		(char) 0
-	};
-
-	SEND_TO_Q(on_string, d);
 }
 
 
@@ -1210,10 +1328,10 @@ void send_to_group(char_data *ch, struct group_data *group, const char *msg, ...
 			vsprintf(output, msg, args);
 			
 			if (!IS_NPC(tch) && GET_CUSTOM_COLOR(tch, CUSTOM_COLOR_GSAY)) {
-				msg_to_desc(tch->desc, "&%c[group] %s&0\r\n", GET_CUSTOM_COLOR(tch, CUSTOM_COLOR_GSAY), output);
+				msg_to_desc(tch->desc, "\t%c[group] %s\t0\r\n", GET_CUSTOM_COLOR(tch, CUSTOM_COLOR_GSAY), output);
 			}
 			else {
-				msg_to_desc(tch->desc, "[&Ggroup&0] %s&0\r\n", output);
+				msg_to_desc(tch->desc, "[\tGgroup\t0] %s\t0\r\n", output);
 			}
 			va_end(args);
 		}
@@ -1325,6 +1443,8 @@ void close_socket(descriptor_data *d) {
 	if (d->backstr) {
 		free(d->backstr);
 	}
+	
+	ProtocolDestroy(d->pProtocol);
 
 	// olc data
 	if (d->olc_storage) {
@@ -1332,6 +1452,9 @@ void close_socket(descriptor_data *d) {
 	}
 	if (d->olc_adventure) {
 		free_adventure(d->olc_adventure);
+	}
+	if (d->olc_book) {
+		free_book(d->olc_book);
 	}
 	if (d->olc_craft) {
 		free_craft(d->olc_craft);
@@ -1347,6 +1470,9 @@ void close_socket(descriptor_data *d) {
 	}
 	if (d->olc_crop) {
 		free_crop(d->olc_crop);
+	}
+	if (d->olc_global) {
+		free_global(d->olc_global);
 	}
 	if (d->olc_room_template) {
 		free_room_template(d->olc_room_template);
@@ -1499,6 +1625,7 @@ int get_max_players(void) {
 
 void init_descriptor(descriptor_data *newd, int desc) {
 	static int last_desc = 0;
+	int start;
 
 	newd->descriptor = desc;
 	newd->connected = CON_GET_NAME;
@@ -1512,14 +1639,31 @@ void init_descriptor(descriptor_data *newd, int desc) {
 	newd->has_prompt = 0;
 
 	CREATE(newd->history, char *, HISTORY_SIZE);
+	newd->pProtocol = ProtocolCreate();
 	
 	newd->olc_type = 0;
 	newd->olc_vnum = NOTHING;
 	newd->olc_object = NULL;
 	newd->olc_mobile = NULL;
-
-	if (++last_desc == 1000)
-		last_desc = 1;
+	
+	// ensure clean data
+	*newd->color.last_fg = '\0';
+	*newd->color.last_bg = '\0';
+	newd->color.is_clean = FALSE;
+	newd->color.is_underline = FALSE;
+	*newd->color.want_fg = '\0';
+	*newd->color.want_bg = '\0';
+	newd->color.want_clean = FALSE;
+	newd->color.want_underline = FALSE;
+	
+	// find a free desc num
+	start = last_desc;
+	do {
+		if (++last_desc == 1000) {
+			last_desc = 1;
+		}
+	} while (desc_num_in_use(last_desc) && last_desc != start);	// prevent infinite loop
+	
 	newd->desc_num = last_desc;
 }
 
@@ -1603,7 +1747,7 @@ bool is_slow_ip(char *ip) {
 	int iter;
 	
 	for (iter = 0; *slow_nameserver_ips[iter] != '\n'; ++iter) {
-		if (!strcmp(ip, slow_nameserver_ips[iter])) {
+		if (!strncmp(ip, slow_nameserver_ips[iter], strlen(slow_nameserver_ips[iter]))) {
 			return TRUE;
 		}
 	}
@@ -1767,8 +1911,9 @@ int new_descriptor(int s) {
 	/* prepend to list */
 	newd->next = descriptor_list;
 	descriptor_list = newd;
-
-	SEND_TO_Q(parse_color(intros[number(0, num_intros-1)], newd), newd);
+	
+	ProtocolNegotiate(newd);
+	SEND_TO_Q(intros[number(0, num_intros-1)], newd);
 
 	return (0);
 }
@@ -1923,12 +2068,15 @@ ssize_t perform_socket_write(socket_t desc, const char *txt, size_t length) {
  * -gg 1/21/2000
  */
 int process_input(descriptor_data *t) {
+	static char read_buf[MAX_PROTOCOL_BUFFER];
 	int buf_length, do_not_add;
 	ssize_t bytes_read;
 	size_t space_left;
 	char *ptr, *read_point, *write_point, *nl_pos = NULL;
 	char tmp[MAX_INPUT_LENGTH], *input;
 	bool add_to_head = FALSE;
+	
+	*read_buf = '\0';
 
 	/* first, find the point where we left off reading data */
 	buf_length = strlen(t->inbuf);
@@ -1941,12 +2089,20 @@ int process_input(descriptor_data *t) {
 			return (-1);
 		}
 
-		bytes_read = perform_socket_read(t->descriptor, read_point, space_left);
+		bytes_read = perform_socket_read(t->descriptor, read_buf, MAX_PROTOCOL_BUFFER);
 
-		if (bytes_read < 0)	/* Error, disconnect them. */
+		if (bytes_read < 0) {	/* Error, disconnect them. */
 			return (-1);
-		else if (bytes_read == 0)	/* Just blocking, no problems. */
+		}
+		else if (bytes_read >= 0) {
+			read_buf[bytes_read] = '\0';
+			ProtocolInput(t, read_buf, bytes_read, read_point);
+			bytes_read = strlen(read_point);
+		}
+
+		if (bytes_read == 0) {	/* Just blocking, no problems. */
 			return (0);
+		}
 
 		/* at this point, we know we got some data from the read */
 
@@ -2103,7 +2259,6 @@ int process_input(descriptor_data *t) {
  *      14 bytes: unused */
 static int process_output(descriptor_data *t) {
 	char i[MAX_SOCK_BUF], *osb = i + 2;
-	char *prompt;
 	int result;
 
 	/* we may need this \r\n for later -- see below */
@@ -2117,17 +2272,28 @@ static int process_output(descriptor_data *t) {
 		strcat(osb, "**OVERFLOW**\r\n");	/* strcpy: OK (osb:MAX_SOCK_BUF-2 reserves space) */
 
 	/* add the extra CRLF if the person isn't in compact mode */
-	if (STATE(t) == CON_PLAYING && t->character && !IS_NPC(t->character) && !PRF_FLAGGED(t->character, PRF_COMPACT))
+	if (STATE(t) == CON_PLAYING && t->character && !IS_NPC(t->character) && !PRF_FLAGGED(t->character, PRF_COMPACT) && !t->pProtocol->WriteOOB)
 		strcat(osb, "\r\n");	/* strcpy: OK (osb:MAX_SOCK_BUF-2 reserves space) */
 
 	// add prompt
-	prompt = make_prompt(t);
-	strncat(i, prompt, MAX_PROMPT_LENGTH);
-	free(prompt);
+	if (!t->pProtocol->WriteOOB) {
+		char prompt[MAX_STRING_LENGTH];
+		int wantsize;
+		
+		strcpy(prompt, make_prompt(t));
+		wantsize = strlen(prompt);
+		strncpy(prompt, ProtocolOutput(t, prompt, &wantsize), MAX_STRING_LENGTH);
+		prompt[MAX_STRING_LENGTH-1] = '\0';
+				
+		// force a color code flush
+		snprintf(prompt + strlen(prompt), sizeof(prompt) - strlen(prompt), "%s", flush_reduced_color_codes(t));
+
+		strncat(i, prompt, MAX_PROMPT_LENGTH);
+	}
 
 	/* now, send the output.  If this is an 'interruption', use the prepended
 	* CRLF, otherwise send the straight output sans CRLF. */
-	if (t->has_prompt && !t->data_left_to_write) {
+	if (t->has_prompt && !t->data_left_to_write && !t->pProtocol->WriteOOB) {
 		t->has_prompt = FALSE;
 		result = write_to_descriptor(t->descriptor, i);
 		if (result >= 2)
@@ -2249,37 +2415,34 @@ int write_to_descriptor(socket_t desc, const char *txt) {
 
 /* Add a new string to a player's output queue */
 void write_to_output(const char *txt, descriptor_data *t) {
-	int size;
-	char *new_txt;
-	char *overflow_txt = "**OVERFLOW**\r\n";
+	int size, wantsize;
+	char protocol_txt[MAX_STRING_LENGTH];
+	//char *overflow_txt = "**OVERFLOW**\r\n";
 
 	/* if we're in the overflow state already, ignore this new output */
 	if (t->bufspace == 0)
 		return;
 
-	new_txt = parse_color((char *) txt, t);
-
-	size = strlen(new_txt);
-	
-	// truncate to MAX_STRING_LENGTH srsly
-	if (size > MAX_STRING_LENGTH) {
-		size = MAX_STRING_LENGTH-1;
-		strcpy(new_txt + size - strlen(overflow_txt), overflow_txt);
+	size = wantsize = strlen(txt);
+	strncpy(protocol_txt, ProtocolOutput(t, txt, &wantsize), MAX_STRING_LENGTH);
+	protocol_txt[MAX_STRING_LENGTH-1] = '\0';
+	size = wantsize;
+	if (t->pProtocol->WriteOOB > 0) {
+		--t->pProtocol->WriteOOB;
 	}
 	
 	// check that text size is going to fit into a large bufffer
 	if (size + t->bufptr + 1 > LARGE_BUFSIZE) {
 		size = LARGE_BUFSIZE - t->bufptr - 1;
-		new_txt[size] = '\0';
+		protocol_txt[size] = '\0';
 		++buf_overflows;
 	}
 
 	/* if we have enough space, just write to buffer and that's it! */
 	if (t->bufspace > size) {
-		strcpy(t->output + t->bufptr, new_txt);
+		strcpy(t->output + t->bufptr, protocol_txt);
 		t->bufspace -= size;
 		t->bufptr += size;
-		free(new_txt);
 		return;
 	}
 	
@@ -2298,8 +2461,7 @@ void write_to_output(const char *txt, descriptor_data *t) {
 
 	strcpy(t->large_outbuf->text, t->output);	/* copy to big buffer */
 	t->output = t->large_outbuf->text;	/* make big buffer primary */
-	strcat(t->output, new_txt);
-	free(new_txt);
+	strcat(t->output, protocol_txt);
 
 	/* set the pointer for the next write */
 	t->bufptr = strlen(t->output);
@@ -2347,14 +2509,10 @@ void write_to_q(const char *txt, struct txt_q *queue, int aliased, bool add_to_h
 /**
 * Makes the prompt for the character. 
 *
-* NOTE: You MUST free the result of this; it is a malloc'd string.
-*
 * @param descriptor_data *d The descriptor we're making the prompt for
 * @return char* A pointer to the prompt string.
 */
 char *make_prompt(descriptor_data *d) {
-	extern char *prompt_olc_info(char_data *ch);
-
 	static char prompt[MAX_STRING_LENGTH];
 
 	/* Note, prompt is truncated at MAX_PROMPT_LENGTH chars (structs.h )*/
@@ -2364,57 +2522,25 @@ char *make_prompt(descriptor_data *d) {
 		*prompt = '\0';
 	}
 	else if (d->showstr_count)
-		sprintf(prompt, "\r[ Return to continue, (q)uit, (r)efresh, (b)ack, or page number (%d/%d) ]", d->showstr_page, d->showstr_count);
+		sprintf(prompt, "\r\t0[ Return to continue, (q)uit, (r)efresh, (b)ack, or page number (%d/%d) ]", d->showstr_page, d->showstr_count);
 	else if (d->str && (STATE(d) != CON_PLAYING || d->straight_to_editor))
 		strcpy(prompt, "] ");
 	else if (STATE(d) == CON_PLAYING) {
 		*prompt = '\0';
-
-		if (!IS_NPC(d->character) && GET_INVIS_LEV(d->character))
-			sprintf(prompt + strlen(prompt), "&r(i%d) ", GET_INVIS_LEV(d->character));
-
-		if (wizlock_level > 0 && GET_ACCESS_LEVEL(d->character) >= LVL_START_IMM)
-			sprintf(prompt + strlen(prompt), "&g(w%d) ", wizlock_level);
 		
-		if (!IS_NPC(d->character)) {
-			if (get_cooldown_time(d->character, COOLDOWN_ROGUE_FLAG) > 0) {
-				strcat(prompt, "&M(rogue) ");
-			}
-			else if (get_cooldown_time(d->character, COOLDOWN_HOSTILE_FLAG) > 0) {
-				strcat(prompt, "&m(hostile) ");
-			}
+		// show idle after 10 minutes
+		if ((d->character->char_specials.timer * SECS_PER_MUD_HOUR / SECS_PER_REAL_MIN) >= 10) {
+			strcat(prompt, "\tr[IDLE]\t0 ");
 		}
 
-		// IS_AFK is caused by the prf or timer>10
-		if (IS_AFK(d->character)) {
-			if (PRF_FLAGGED(d->character, PRF_AFK)) {
-				strcat(prompt, "&r[AFK] ");
-			}
-			else {
-				strcat(prompt, "&r[IDLE] ");
-			}
-		}
-
-		if (!IS_NPC(d->character) && PRF_FLAGGED(d->character, PRF_RP))
-			sprintf(prompt + strlen(prompt), "&m[RP] ");
-		
-		if (IS_PVP_FLAGGED(d->character)) {
-			strcat(prompt, "&R(PVP) ");
-		}
-		
-		// olc info
-		if (GET_OLC_TYPE(d) != 0) {
-			strcat(prompt, prompt_olc_info(d->character));
-		}
-
-		strcat(prompt, "&0");
-
-		strncat(prompt, prompt_str(d->character), sizeof(prompt) - strlen(prompt) - 1);
+		// append rendered prompt
+		snprintf(prompt + strlen(prompt), sizeof(prompt) - strlen(prompt), "%s", prompt_str(d->character));
 	}
-	else
+	else {
 		*prompt = '\0';
+	}
 
-	return (parse_color(prompt, d));
+	return prompt;
 }
 
 
@@ -2429,13 +2555,13 @@ char *prompt_color_by_prc(int cur, int max) {
 	int prc = cur * 100 / MAX(1, max);
 	
 	if (prc >= 90) {
-		return "&g";
+		return "\tg";
 	}
 	else if (prc >= 25) {
-		return "&y";
+		return "\ty";
 	}
 	else {
-		return "&r";
+		return "\tr";
 	}
 }
 
@@ -2461,20 +2587,23 @@ char *prompt_str(char_data *ch) {
 
 	// default prompts
 	if (!str || !*str) {
-		if (IS_MAGE(ch)) {
+		if (IS_IMMORTAL(ch)) {
+			str = "\t0|\tc%C \tg%X\t0> ";
+		}
+		else if (IS_MAGE(ch)) {
 			if (IS_VAMPIRE(ch)) {
-				str = "&0|%i/%u/%n %bb [%t]> ";
+				str = "\t0|%i/%u/%n/%d [\ty%C\t0] [%t]> ";
 			}
 			else {
-				str = "&0|%i/%u/%n> ";
+				str = "\t0|%i/%u/%n [\ty%C\t0]> ";
 			}
 		}
 		else {
 			if (IS_VAMPIRE(ch)) {
-				str = "&0|%i/%u %bb [%t]> ";
+				str = "\t0|%i/%u/%d [\ty%C\t0] [%t]> ";
 			}
 			else {
-				str = "&0|%i/%u> ";
+				str = "\t0|%i/%u [\ty%C\t0]> ";
 			}
 		}
 	}
@@ -2500,6 +2629,7 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 	extern const char *health_levels[];
 	extern const char *move_levels[];
 	extern const char *mana_levels[];
+	extern const char *blood_levels[];
 	extern struct action_data_struct action_data[];
 	
 	static char pbuf[MAX_STRING_LENGTH];
@@ -2512,18 +2642,159 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 	for (;;) {
 		if (*str == '%') {
 			switch (*(++str)) {
-				case 'c':	/* Conditions */
-					sprintf(i, "%s%s%s%s%s%s%s",
-							   	IS_DRUNK(ch) ? "D" : "",
-							   	EFFECTIVELY_FLYING(ch) ? "F" : "",
-							   	IS_HUNGRY(ch) ? "H" : "",
-							   	(!IS_NPC(ch) && GET_MORPH(ch) != MORPH_NONE) ? "M" : "",
-							   	IS_RIDING(ch) ? "R" : "",
-							   	(IS_BLOOD_STARVED(ch)) ? "S" : "",
-							   	IS_THIRSTY(ch) ? "T" : ""
-							   	);
+				case 'c': {	// player conditions (words)
+					*i = '\0';
+					if (PRF_FLAGGED(ch, PRF_AFK)) {
+						strcat(i, "\trA");
+					}
+					if (IS_DRUNK(ch)) {
+						strcat(i, "\t0D");
+					}
+					if (EFFECTIVELY_FLYING(ch)) {
+						strcat(i, "\t0F");
+					}
+					if (IS_HUNGRY(ch)) {
+						strcat(i, "\t0H");
+					}
+					if (!IS_NPC(ch) && GET_MORPH(ch) != MORPH_NONE) {
+						strcat(i, "\t0M");
+					}
+					if (IS_PVP_FLAGGED(ch)) {
+						strcat(i, "\tRP");
+					}
+					if (IS_RIDING(ch)) {
+						strcat(i, "\t0R");
+					}
+					if (PRF_FLAGGED(ch, PRF_RP)) {
+						strcat(i, "\tmR");
+					}
+					if (IS_BLOOD_STARVED(ch)) {
+						strcat(i, "\t0S");
+					}
+					if (IS_THIRSTY(ch)) {
+						strcat(i, "\t0T");
+					}
+					if (!IS_NPC(ch)) {
+						if (get_cooldown_time(ch, COOLDOWN_ROGUE_FLAG) > 0) {
+							strcat(i, "\tMR");
+						}
+						else if (get_cooldown_time(ch, COOLDOWN_HOSTILE_FLAG) > 0) {
+							strcat(i, "\tmH");
+						}
+					}
+					
+					if (!*i) {
+						strcpy(i, "\t0-");
+					}
+					
+					strcat(i, "\t0");
 					tmp = i;
 					break;
+				}
+				case 'C': {	// player conditions (words)
+					*i = '\0';
+					if (PRF_FLAGGED(ch, PRF_AFK)) {
+						sprintf(i + strlen(i), "%safk", (*i ? " " : ""));
+					}
+					if (IS_DRUNK(ch)) {
+						sprintf(i + strlen(i), "%sdrunk", (*i ? " " : ""));
+					}
+					if (EFFECTIVELY_FLYING(ch)) {
+						sprintf(i + strlen(i), "%sflying", (*i ? " " : ""));
+					}
+					if (IS_HUNGRY(ch)) {
+						sprintf(i + strlen(i), "%shungry", (*i ? " " : ""));
+					}
+					if (!IS_NPC(ch) && GET_MORPH(ch) != MORPH_NONE) {
+						sprintf(i + strlen(i), "%smorphed", (*i ? " " : ""));
+					}
+					if (IS_PVP_FLAGGED(ch)) {
+						sprintf(i + strlen(i), "%spvp", (*i ? " " : ""));
+					}
+					if (IS_RIDING(ch)) {
+						sprintf(i + strlen(i), "%sriding", (*i ? " " : ""));
+					}
+					if (PRF_FLAGGED(ch, PRF_RP)) {
+						sprintf(i + strlen(i), "%srp", (*i ? " " : ""));
+					}
+					if (IS_BLOOD_STARVED(ch)) {
+						sprintf(i + strlen(i), "%sstarved", (*i ? " " : ""));
+					}
+					if (IS_THIRSTY(ch)) {
+						sprintf(i + strlen(i), "%sthirsty", (*i ? " " : ""));
+					}
+					if (!IS_NPC(ch)) {
+						if (get_cooldown_time(ch, COOLDOWN_ROGUE_FLAG) > 0) {
+							sprintf(i + strlen(i), "%srogue", (*i ? " " : ""));
+						}
+						else if (get_cooldown_time(ch, COOLDOWN_HOSTILE_FLAG) > 0) {
+							sprintf(i + strlen(i), "%shostile", (*i ? " " : ""));
+						}
+					}
+					
+					if (!*i) {
+						strcpy(i, "--");
+					}
+					
+					tmp = i;
+					break;
+				}
+				case 'x': {	// Immortal conditions (abbrevs)
+					*i = '\0';
+					if (IS_IMMORTAL(ch)) {
+						if (PRF_FLAGGED(ch, PRF_INCOGNITO)) {
+							strcat(i, "\tbI");
+						}
+						if (PRF_FLAGGED(ch, PRF_WIZHIDE)) {
+							strcat(i, "\tcW");
+						}
+						if (wizlock_level > 0) {
+							sprintf(i + strlen(i), "\tgw%d", wizlock_level);
+						}
+						if (!IS_NPC(ch) && GET_INVIS_LEV(ch) > 0) {
+							sprintf(i + strlen(i), "\tri%d", GET_INVIS_LEV(ch));
+						}
+						if (ch->desc && GET_OLC_TYPE(ch->desc) != 0) {
+							strcat(i, "\tcO");
+						}
+					}
+					
+					if (!*i) {
+						strcpy(i, "\t0-");
+					}
+					
+					strcat(i, "\t0");
+					tmp = i;
+					break;
+				}
+				case 'X': {	// Immortal conditions (words)
+					*i = '\0';
+					if (IS_IMMORTAL(ch)) {
+						if (PRF_FLAGGED(ch, PRF_INCOGNITO)) {
+							sprintf(i + strlen(i), "%sincog", (*i ? " " : ""));
+						}
+						if (PRF_FLAGGED(ch, PRF_WIZHIDE)) {
+							sprintf(i + strlen(i), "%swizhide", (*i ? " " : ""));
+						}
+						if (wizlock_level > 0) {
+							sprintf(i + strlen(i), "%swizlock-%d", (*i ? " " : ""), wizlock_level);
+						}
+						if (!IS_NPC(ch) && GET_INVIS_LEV(ch) > 0) {
+							sprintf(i + strlen(i), "%sinvis-%d", (*i ? " " : ""), GET_INVIS_LEV(ch));
+						}
+						if (ch->desc && GET_OLC_TYPE(ch->desc) != 0) {
+							extern char *prompt_olc_info(char_data *ch);
+							sprintf(i + strlen(i), "%solc-%s", (*i ? " " : ""), prompt_olc_info(ch));
+						}
+					}
+					
+					if (!*i) {
+						strcpy(i, "--");
+					}
+					
+					tmp = i;
+					break;
+				}
 				case 'e': {	// %e enemy's health percent
 					if ((vict = FIGHTING(ch))) {
 						sprintf(i, "%d%%", GET_HEALTH(vict) * 100 / MAX(1, GET_MAX_HEALTH(vict)));
@@ -2556,7 +2827,7 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					break;
 				}
 				case 'h':	// %h current health
-					sprintf(i, "%s%d&0", prompt_color_by_prc(GET_HEALTH(ch), GET_MAX_HEALTH(ch)), MAX(0, GET_HEALTH(ch)));
+					sprintf(i, "%s%d\t0", prompt_color_by_prc(GET_HEALTH(ch), GET_MAX_HEALTH(ch)), MAX(0, GET_HEALTH(ch)));
 					tmp = i;
 					break;
 				case 'H':	// %H max health
@@ -2568,7 +2839,7 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					tmp = i;
 					break;
 				case 'v':	// %v current move
-					sprintf(i, "%s%d&0", prompt_color_by_prc(GET_MOVE(ch), GET_MAX_MOVE(ch)), MAX(0, GET_MOVE(ch)));
+					sprintf(i, "%s%d\t0", prompt_color_by_prc(GET_MOVE(ch), GET_MAX_MOVE(ch)), MAX(0, GET_MOVE(ch)));
 					tmp = i;
 					break;
 				case 'V':	// %V max move
@@ -2580,7 +2851,7 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					tmp = i;
 					break;
 				case 'm':	// %m current mana
-					sprintf(i, "%s%d&0", prompt_color_by_prc(GET_MANA(ch), GET_MAX_MANA(ch)), MAX(0, GET_MANA(ch)));
+					sprintf(i, "%s%d\t0", prompt_color_by_prc(GET_MANA(ch), GET_MAX_MANA(ch)), MAX(0, GET_MANA(ch)));
 					tmp = i;
 					break;
 				case 'M':	// %M max mana
@@ -2593,7 +2864,7 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					break;
 				case 'b':	// %b current blood
 					if (IS_VAMPIRE(ch))
-						sprintf(i, "%s%d&0", prompt_color_by_prc(GET_BLOOD(ch), GET_MAX_BLOOD(ch)), GET_BLOOD(ch));
+						sprintf(i, "%s%d\t0", prompt_color_by_prc(GET_BLOOD(ch), GET_MAX_BLOOD(ch)), GET_BLOOD(ch));
 					else
 						sprintf(i, "%%%c", *str);
 					tmp = i;
@@ -2605,6 +2876,11 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 						sprintf(i, "%%%c", *str);
 					tmp = i;
 					break;
+				case 'd': {	// %d blood as text
+					sprintf(i, "%s", blood_levels[MIN(10, MAX(0, GET_BLOOD(ch)) * 10 / MAX(1, GET_MAX_BLOOD(ch)))]);
+					tmp = i;
+					break;
+				}
 				case 's': {	// %s bonus exp available
 					sprintf(i, "%d", GET_DAILY_BONUS_EXPERIENCE(ch));
 					tmp = i;
@@ -2618,15 +2894,15 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 						strcpy(spare, "am");
 
 					if (time_info.hours == 6)
-						sprintf(i, "&C%d%s&0", time_info.hours > 12 ? time_info.hours - 12 : time_info.hours, spare);
+						sprintf(i, "\tC%d%s\t0", time_info.hours > 12 ? time_info.hours - 12 : time_info.hours, spare);
 					else if (time_info.hours < 19 && time_info.hours > 6)
-						sprintf(i, "&Y%d%s&0", time_info.hours > 12 ? time_info.hours - 12 : time_info.hours, spare);
+						sprintf(i, "\tY%d%s\t0", time_info.hours > 12 ? time_info.hours - 12 : time_info.hours, spare);
 					else if (time_info.hours == 19)
-						sprintf(i, "&R%d%s&0", time_info.hours > 12 ? time_info.hours - 12 : time_info.hours, spare);
+						sprintf(i, "\tR%d%s\t0", time_info.hours > 12 ? time_info.hours - 12 : time_info.hours, spare);
 					else if (time_info.hours == 0)
-						sprintf(i, "&B12am&0");
+						sprintf(i, "\tB12am\t0");
 					else
-						sprintf(i, "&B%d%s&0", time_info.hours > 12 ? time_info.hours - 12 : time_info.hours, spare);
+						sprintf(i, "\tB%d%s\t0", time_info.hours > 12 ? time_info.hours - 12 : time_info.hours, spare);
 					tmp = i;
 					break;
 				case 'a': {	// action
@@ -2683,7 +2959,7 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 
 	*cp = '\0';
 
-	strcat(pbuf, "&0");
+	strcat(pbuf, "\t0");
 	return (pbuf);
 }
 
@@ -2816,7 +3092,6 @@ void game_loop(socket_t mother_desc) {
 	struct timeval last_time, opt_time, process_time, temp_time;
 	struct timeval before_sleep, now, timeout;
 	char comm[MAX_INPUT_LENGTH];
-	char *prompt;
 	descriptor_data *d, *next_d;
 	int missed_pulses, maxdesc, aliased;
 
@@ -2992,11 +3267,20 @@ void game_loop(socket_t mother_desc) {
 			next_d = d->next;
 			
 			if (!d->has_prompt) {
-				prompt = make_prompt(d);
+				char prompt[MAX_STRING_LENGTH];
+				int wantsize;
+		
+				strcpy(prompt, make_prompt(d));
+				wantsize = strlen(prompt);
+				strncpy(prompt, ProtocolOutput(d, prompt, &wantsize), MAX_STRING_LENGTH);
+				prompt[MAX_STRING_LENGTH-1] = '\0';
+				
+				// force a color code flush
+				snprintf(prompt + strlen(prompt), sizeof(prompt) - strlen(prompt), "%s", flush_reduced_color_codes(d));
+				
 				if (write_to_descriptor(d->descriptor, prompt) >= 0) {
 					d->has_prompt = 1;
 				}
-				free(prompt);
 			}
 		}
 
@@ -3262,7 +3546,7 @@ void reboot_recover(void) {
 	descriptor_data *d;
 	char_data *plr, *ldr;
 	FILE *fp;
-	char host[1024], line[256];
+	char host[1024], protocol_info[1024], line[256];
 	struct char_file_u tmp_store;
 	int desc, player_i, plid, leid;
 	bool fOld;
@@ -3284,9 +3568,12 @@ void reboot_recover(void) {
 	// first pass: load players
 	for (;;) {
 		fOld = TRUE;
-		fscanf(fp, "%d %s %s\n", &desc, name, host);
-		if (desc == -1)
+		fscanf(fp, "%d %s %s %s\n", &desc, name, host, protocol_info);
+		
+		// end indicator (endicator?)
+		if (desc == -1) {
 			break;
+		}
 
 		sprintf(buf, "\r\nRestoring %s...\r\n", name);
 		if (write_to_descriptor(desc, buf) < 0) {
@@ -3312,13 +3599,19 @@ void reboot_recover(void) {
 		if ((player_i = load_char(name, &tmp_store)) >= 0) {
 			store_to_char(&tmp_store, d->character);
 			GET_PFILEPOS(d->character) = player_i;
-			if (!PLR_FLAGGED(d->character, PLR_DELETED))
+			if (!PLR_FLAGGED(d->character, PLR_DELETED)) {
 				REMOVE_BIT(PLR_FLAGS(d->character), PLR_WRITING | PLR_MAILING);
-			else
+			}
+			else {
 				fOld = FALSE;
+			}
 		}
-		else
+		else {
 			fOld = FALSE;
+		}
+		
+		// recover protocol settings
+		CopyoverSet(d, protocol_info);
 
 		if (!fOld) {
 			write_to_descriptor(desc, "\r\nSomehow, your character couldn't be loaded.\r\n");

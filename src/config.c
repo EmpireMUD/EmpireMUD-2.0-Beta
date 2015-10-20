@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: config.c                                        EmpireMUD 2.0b2 *
+*   File: config.c                                        EmpireMUD 2.0b3 *
 *  Usage: Configuration of various aspects of CircleMUD operation         *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -181,7 +181,8 @@ int max_playing = 300;	// maximum number of players allowed before game starts t
 
 // if you have a player whose connection causes lag when they first connect,
 // adding their IPv4 address here will prevent the mud from doing a nameserver
-// lookup.
+// lookup. This will do partial-matching if you omit the end of the IP address.
+// For example, "192.168." will match anything starting with that.
 const char *slow_nameserver_ips[] = {
 	"\n"	// put this last
 };
@@ -517,7 +518,7 @@ int *config_get_int_array(char *key, int *array_size) {
 * @param char *key The one-word string key for the config system.
 * @return char* A pointer to the string associated with that key (default: "").
 */
-char *config_get_string(char *key) {
+const char *config_get_string(char *key) {
 	struct config_type *cnf;
 	
 	static char *default_string = "";
@@ -1143,7 +1144,7 @@ void load_config_system_from_file(void) {
 		skip_spaces(&arg);
 		
 		// junk line?
-		if (!*key || !*arg) {
+		if (!*key) {
 			continue;
 		}
 		
@@ -1541,6 +1542,19 @@ void init_config_system(void) {
 	// first set up all the config types
 
 	// game configs
+	init_config(CONFIG_GAME, "allow_extended_color_codes", CONFTYPE_BOOL, "if on, players can use &&[F000] and &&[B000]");
+	init_config(CONFIG_GAME, "hiring_builders", CONFTYPE_BOOL, "whether the mud is hiring builders");
+	init_config(CONFIG_GAME, "hiring_coders", CONFTYPE_BOOL, "whether the mud is hiring coders");
+	init_config(CONFIG_GAME, "mud_contact", CONFTYPE_SHORT_STRING, "email address of an admin");
+	init_config(CONFIG_GAME, "mud_created", CONFTYPE_SHORT_STRING, "year the mud was created");
+	init_config(CONFIG_GAME, "mud_hostname", CONFTYPE_SHORT_STRING, "your mud's hostname");
+	init_config(CONFIG_GAME, "mud_icon", CONFTYPE_SHORT_STRING, "a 32x32 bmp, png, jpg, or gif less than 32kb");
+	init_config(CONFIG_GAME, "mud_ip", CONFTYPE_SHORT_STRING, "ip address of your mud");
+	init_config(CONFIG_GAME, "mud_location", CONFTYPE_SHORT_STRING, "location of the mud server");
+	init_config(CONFIG_GAME, "mud_minimum_age", CONFTYPE_SHORT_STRING, "suggested minimum age to play");
+	init_config(CONFIG_GAME, "mud_name", CONFTYPE_SHORT_STRING, "name of your mud");
+	init_config(CONFIG_GAME, "mud_status", CONFTYPE_SHORT_STRING, "one of: Alpha, Closed Beta, Open Beta, Live");
+	init_config(CONFIG_GAME, "mud_website", CONFTYPE_SHORT_STRING, "your mud's website");
 	init_config(CONFIG_GAME, "starting_year", CONFTYPE_INT, "base year");
 	init_config(CONFIG_GAME, "welcome_message", CONFTYPE_SHORT_STRING, "message shown to all players on login");
 	init_config(CONFIG_GAME, "ok_string", CONFTYPE_SHORT_STRING, "simple Ok message");
@@ -1586,11 +1600,14 @@ void init_config_system(void) {
 	init_config(CONFIG_CITY, "min_distance_between_cities", CONFTYPE_INT, "tiles between city centers");
 	init_config(CONFIG_CITY, "min_distance_between_ally_cities", CONFTYPE_INT, "tiles between cities belonging to allies");
 	init_config(CONFIG_CITY, "min_distance_from_city_to_starting_location", CONFTYPE_INT, "tiles between a city and a starting location");
+	init_config(CONFIG_CITY, "cities_on_newbie_islands", CONFTYPE_BOOL, "whether or not cities can be founded on newbie islands");
 	init_config(CONFIG_CITY, "city_trait_radius", CONFTYPE_INT, "tiles away that a city's traits are used instead of empire traits");
 	init_config(CONFIG_CITY, "disrepair_minor", CONFTYPE_INT, "years of disrepair to show wear");
 	init_config(CONFIG_CITY, "disrepair_major", CONFTYPE_INT, "years of disrepair to show major wear");
 	init_config(CONFIG_CITY, "disrepair_limit", CONFTYPE_INT, "years of disrepair before collapse");
 	init_config(CONFIG_CITY, "disrepair_limit_unfinished", CONFTYPE_INT, "years of disrepair before unfinished buildings collapse");
+	init_config(CONFIG_CITY, "max_out_of_city_portal", CONFTYPE_INT, "maximum distance a portal can travel outside of a city");
+	init_config(CONFIG_CITY, "minutes_to_full_city", CONFTYPE_INT, "time it takes for a city to count for in-city-only tasks");
 
 	// empire
 	init_config(CONFIG_EMPIRE, "land_per_greatness", CONFTYPE_INT, "territory per 1 Greatness");
@@ -1608,6 +1625,7 @@ void init_config_system(void) {
 	init_config(CONFIG_EMPIRE, "newbie_island_day_limit", CONFTYPE_INT, "number of days old an empire can be before losing newbie island claims");
 	init_config(CONFIG_EMPIRE, "whole_empire_timeout", CONFTYPE_INT, "days to empire appearing idle");
 	init_config(CONFIG_EMPIRE, "empire_log_ttl", CONFTYPE_INT, "how many days elogs last");
+	init_config(CONFIG_EMPIRE, "redesignate_time", CONFTYPE_INT, "minutes until you can redesignate a room again");
 
 	// items
 	init_config(CONFIG_MOBS, "auto_update_items", CONFTYPE_BOOL, "uses item version numbers to automatically update items");
@@ -1647,12 +1665,14 @@ void init_config_system(void) {
 	init_config(CONFIG_PLAYERS, "num_bonus_trait_daily_skills", CONFTYPE_INT, "bonus trait for skillups");
 	init_config(CONFIG_PLAYERS, "idle_rent_time", CONFTYPE_INT, "how many ticks before a player is idle-rented");
 	init_config(CONFIG_PLAYERS, "idle_linkdead_rent_time", CONFTYPE_INT, "how many ticks before a linkdead player is idle-rented");
+	init_config(CONFIG_PLAYERS, "max_capitals_in_name", CONFTYPE_INT, "how many uppercase letters can be in a player name (0 for unlimited)");
 	init_config(CONFIG_PLAYERS, "max_player_attribute", CONFTYPE_INT, "how high primary player attributes go");
 	init_config(CONFIG_PLAYERS, "obj_file_timeout", CONFTYPE_INT, "lifetime of normal player inventory files, in days");
 	init_config(CONFIG_PLAYERS, "remove_lore_after_years", CONFTYPE_INT, "game years to clean some lore types");
 	init_config(CONFIG_PLAYERS, "default_map_size", CONFTYPE_INT, "distance from the player that can be seen");
 	init_config(CONFIG_PLAYERS, "max_map_size", CONFTYPE_INT, "highest view radius a player may set");
 	init_config(CONFIG_PLAYERS, "blood_starvation_level", CONFTYPE_INT, "how low blood gets before a vampire is starving");
+	init_config(CONFIG_PLAYERS, "offer_time", CONFTYPE_INT, "seconds an offer is good for, for accept/reject");
 	
 	// skills
 	init_config(CONFIG_SKILLS, "exp_from_workforce", CONFTYPE_DOUBLE, "amount of exp gained per chore completion");
@@ -1676,7 +1696,6 @@ void init_config_system(void) {
 
 	// trade
 	init_config(CONFIG_TRADE, "imports_per_day", CONFTYPE_INT, "how many max items an empire will import per day");
-	init_config(CONFIG_TRADE, "auto_balance_per_cycle", CONFTYPE_INT, "how many items auto-balance can move at a time");
 	init_config(CONFIG_TRADE, "trading_post_max_hours", CONFTYPE_INT, "how long a trade can be posted for");
 	init_config(CONFIG_TRADE, "trading_post_days_to_timeout", CONFTYPE_INT, "number of days to log in and collect");
 	init_config(CONFIG_TRADE, "trading_post_fee", CONFTYPE_DOUBLE, "% cut of the sale price");
@@ -1706,6 +1725,7 @@ void init_config_system(void) {
 	init_config(CONFIG_WORLD, "interlink_mountain_limit", CONFTYPE_INT, "how many intervening tiles may be mountain");
 	init_config(CONFIG_WORLD, "generic_facing", CONFTYPE_BITVECTOR, "build-facing flags for generic buildings");
 		init_config_custom("generic_facing", config_show_bitvector, config_edit_bitvector, (void*)bld_on_flags);
+	init_config(CONFIG_WORLD, "newbie_adventure_cap", CONFTYPE_INT, "highest adventure min-level that can spawn on newbie islands");
 	init_config(CONFIG_WORLD, "arctic_percent", CONFTYPE_DOUBLE, "what percent of top/bottom of the map is arctic");
 	init_config(CONFIG_WORLD, "tropics_percent", CONFTYPE_DOUBLE, "what percent of the middle of the map is tropics");
 

@@ -1,5 +1,5 @@
 /* ************************************************************************
-*  file: purgeplay.c                                      EmpireMUD 2.0b2 * 
+*  file: purgeplay.c                                      EmpireMUD 2.0b3 * 
 *  Usage: purge useless chars from playerfile                             *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

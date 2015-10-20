@@ -14,16 +14,17 @@ Triggers are broken up into three types by what they are attached to:
 |  TRIGEDIT-ROOM-ABILITY |   TRIGEDIT-OBJ-WEAR     |  TRIGEDIT-MOB-GREET-ALL |
 |  TRIGEDIT-ROOM-LEAVE   |   TRIGEDIT-OBJ-REMOVE   |  TRIGEDIT-MOB-ENTRY     |
 |  TRIGEDIT-ROOM-DOOR    |   TRIGEDIT-OBJ-LOAD     |  TRIGEDIT-MOB-RECEIVE   |
- ========================|   TRIGEDIT-OBJ-ABILITY  |  TRIGEDIT-MOB-FIGHT     |
-                         |   TRIGEDIT-OBJ-LEAVE    |  TRIGEDIT-MOB-HITPRCNT  |
+|  TRIGEDIT-ROOM-ADVCLN  |   TRIGEDIT-OBJ-ABILITY  |  TRIGEDIT-MOB-FIGHT     |
+ ========================|   TRIGEDIT-OBJ-LEAVE    |  TRIGEDIT-MOB-HITPRCNT  |
                          |   TRIGEDIT-OBJ-CONSUME  |  TRIGEDIT-MOB-BRIBE     |
 Further help can be       =========================|  TRIGEDIT-MOB-LOAD      |
-accessed by typing:                                |  TRIGEDIT-MOB-MEMORY    |
-HELP <TYPE>.                                       |  TRIGEDIT-MOB-ABILITY   |
-i.e. HELP TRIGEDIT-MOB-ACT                         |  TRIGEDIT-MOB-LEAVE     |
-                                                   |  TRIGEDIT-MOB-LEAVE-ALL |
-                                                   |  TRIGEDIT-MOB-DOOR      |
-See also: TRIG-COMMANDS, VARIABLES, EXPRESSIONS     =========================
+accessed by typing:                             |     TRIGEDIT-MOB-MEMORY    |
+HELP <TYPE>.                                    |     TRIGEDIT-MOB-ABILITY   |
+i.e. HELP TRIGEDIT-MOB-ACT                      |     TRIGEDIT-MOB-LEAVE     |
+                                                |     TRIGEDIT-MOB-LEAVE-ALL |
+                                                |     TRIGEDIT-MOB-DOOR      |
+                                                | TRIGEDIT-MOB-FIGHT-CHARMED |
+See also: TRIG-COMMANDS, VARIABLES, EXPRESSIONS  ============================
 #d
 TRIGEDIT-COMMANDS TRIG-COMMANDS TRIGGER-COMMANDS TRIGEDIT-COMMANDLISTS
  
@@ -31,7 +32,8 @@ TRIGEDIT-COMMANDS TRIG-COMMANDS TRIGGER-COMMANDS TRIGEDIT-COMMANDLISTS
  ==============================================================================
 |  * (comment)    |      %send%         |      %send%      |      %send%      |
 |      nop        |      %echo%         |      %echo%      |      %echo%      |
-|    attach       |   %echoaround%      |   %echoaround%   |   %echoaround%   |
+|    attach       |    %echoaround%     |   %echoaround%   |   %echoaround%   |
+|                 |    %echoneither%    |   %echoneither%  |   %echoneither%  |
 |    global       |      %door%         |      %door%      |      %door%      |
 |    context      |     %force%         |     %force%      |     %force%      |
 |     eval        |      %load%         |      %load%      |      %load%      |
@@ -46,16 +48,18 @@ TRIGEDIT-COMMANDS TRIG-COMMANDS TRIGGER-COMMANDS TRIGEDIT-COMMANDLISTS
 |    makeuid      |       %at%          |       %at%       |       %at%       |
 |    rdelete      |    %transform%      |    %transform%   |      %scale%     |
 |     remote      |       mhunt         |      otimer      |%adventurecomplete%
-|     return      |     mremember       |     osetval      |==================|
-|     switch      |      mforget        |     %scale%         |
-|      case       |       %goto%        | %adventurecomplete% |
-|     break       |       mkill         |=====================|
-|     done        |       %junk%        |
-|     while       |      %follow%       | Further help can be accessed by
-|                 |       %aoe%         | typing: HELP <COMMAND>.
-|                 |       %dot%         |
-|                 |      %scale%        |
+|     return      |     mremember       |     osetval      |    %terraform%   |
+|     switch      |      mforget        |     %scale%      |    %terracrop%   |
+|      case       |       mgoto         | %adventurecomplete% |===============|
+|     break       |       mkill         |    %terraform%      |
+|     done        |       %junk%        |    %terracrop%      |
+|     while       |      %follow%       |=====================|
+|                 |       %aoe%         |
+|                 |       %dot%         | Further help can be accessed by
+|                 |      %scale%        | typing: HELP <COMMAND>.
 |                 | %adventurecomplete% |
+|                 |     %terraform%     |
+|                 |     %terracrop%     |
 ========================================|
 See also: TRIG-TYPES, VARIABLES, EXPRESSIONS
 #d
@@ -103,12 +107,20 @@ See Also: DEATH, %DAMAGE%, %DOT%
 #d
 %DOT% ODOT MDOT WDOT
 
-%dot% <victim> <modifier> <duration> [damage type]
+%dot% <victim> <modifier> <duration> [damage type] [max stacks]
 
-Adds a scaled DoT -- Damage-over-Time -- effect to the target.
+Adds a scaled DoT -- Damage-Over-Time -- effect to the target.
 
 You can optionally specify a damage type (physical, magical, fire, poison,
 direct).
+
+You can also optionally specify a maximum number of stacks. If a %dot% hits
+again while the victim already has that dot, it will add its damage and stack,
+resetting the duration on the existing effect. If it has hit its maximum, it
+will only refresh the time on the whole stack. If you don't specify, it will
+not stack (max 1).
+
+NOTE: If you want to use max stacks, you must also provide the damage type.
 
 See Also: %DAMAGE%, %AOE%
 #d
@@ -128,7 +140,7 @@ flags       -  value will be the new door flags bitvector as defined here:
 name        - value is the name of the door in the specified direction.
 room        - value is the vnum of the room this direction leads to
 #d
-%ECHO% %ECHOAROUND% %SEND% TRIG-SEND %BUILDINGECHO% BUILDINGECHO ZECHOAROUND ECHOAROUND OECHO WECHO MECHO OECHOAROUND WECHOAROUND MECHOAROUD OSEND WSEND MSEND BUILDINGECHO
+%ECHO% %ECHOAROUND% %ECHONEITHER% %SEND% TRIG-SEND %BUILDINGECHO% BUILDINGECHO ZECHOAROUND ECHOAROUND OECHO WECHO MECHO OECHOAROUND WECHOAROUND MECHOAROUND OSEND WSEND MSEND MBUILDINGECHO MECHONEITHER OECHONEITHER WECHONEITHER
 
 %echo% <message>
    Message is sent to all non-sleeping characters in the same room that this 
@@ -137,6 +149,9 @@ script is executing in.
 %echoaround% <victim> <message>
    Message will be sent to all characters in the room with victim, except for 
 the victim.
+
+%echoneither% <person> <person> <message>
+   Message will be sent to all characters in the room EXCEPT the two people.
 
 %send% <victim> <message>
    Message will be sent to the victim only.
@@ -241,7 +256,7 @@ Examples:
 
 %teleport% <victim> <location>
 %teleport% all <location>
-%teleport adventure <location>
+%teleport% adventure <location>
 
    Teleport moves the victim to the target. The victim does not need to be in 
 the same room as the mob. If the victim is 'all', all the characters in the 
@@ -256,6 +271,40 @@ room template vnum instead of live room number (if used in an instanced zone).
 
 %teleport% all 17401
 %teleport% %actor% 1300
+#d
+%TERRACROP% WTERRACROP OTERRACROP MTERRACROP
+
+%terracrop% [location] <crop vnum>
+
+This command allows you to make changes to the map, one tile at a time. It is
+usually a bad idea to terracrop tiles by coordinates. It's almost always
+safest to do this on the map tile the script is running in.
+
+Some sectors cannot be terracropped.
+
+Example:
+  if (%room.sector% ~= Forest)
+    %terracrop% %room% 4900
+  end
+
+See also: %TERRAFORM%
+#d
+%TERRAFORM% WTERRAFORM OTERRAFORM MTERRAFORM
+
+%terraform% [location] <sector vnum>
+
+This command allows you to make changes to the map, one tile at a time. It is
+usually a bad idea to terraform tiles by coordinates. It's almost always
+safest to do this on the map tile the script is running in.
+
+Some sectors cannot be terraformed.
+
+Example:
+  if (%room.sector% ~= Forest)
+    %terraform% %room% 4412
+  end
+
+See also: %TERRACROP%
 #d
 %ASOUND% OASOUND MASOUND WASOUND ASOUND
 
@@ -292,7 +341,7 @@ mforget <victim>
 #d
 MGOTO %GOTO%
 
-%goto% <target>
+mgoto <target>
    This command moves the mob to the given target. The target may be an object,
 room, or  character, as long as it is not in a private room occupied with two 
 or more characters, or god  room. No message is given. 
@@ -301,9 +350,9 @@ You can use i### to target a room in the mob's current adventure instance by
 its room template vnum instead of live room number (if used in an instanced
 zone).
 
-%goto% 1233
-%goto% Rumble
-%goto% fountain
+mgoto 1233
+mgoto Rumble
+mgoto fountain
 #d
 MJUNK %JUNK%
 
@@ -787,7 +836,10 @@ Special Variables When using field - The variable returns:
 self          - The mob, item, or room running the script. Normal fields may be 
                 used with this.
 instance.id   - Unique id of the adventure instance, if any.
+instance.location - The map/linked location of the instance, if any.
+instance.mob(vnum) - Finds a copy of a mob belonging to the instance.
 instance.name - Name of the adventure instance, if any.
+instance.start - The entry room of the instance, if any.
 people.<vnum> - This variable returns the number of people in the room 
                 specified via vnum.
 random.<#>    - This returns a number between 1 and the field value. 
@@ -815,8 +867,15 @@ TRIGEDIT-VARIABLES-ROOMS ROOM-VARIABLES %WEATHER% %ID% %NAME% %DIRECTION% TRIGED
 
 Rooms When using field - The variable returns:
  
+building - The name of the building on the room, if any.
 contents - The id of the first obj in the room.
 coords   - The (x, y) location of the room on the map.
+crop     - The name of the crop on the map room, if any.
+distance(target) - The distance between this room and the target.
+direction(target) - The approximate direction to the target.
+empire_adjective - The owner empire's adjective form, if any.
+empire_id - The owner empire's id number, if any.
+empire_name - The owner empire's name, if any.
 (dir)    - The list of flags affecting the exit in the specified direction: 
            north, south, east, west, up or down. The result is either:
            subfield, "vnum"  - vnum of room in direction
@@ -869,6 +928,9 @@ affect()          - Checks the actor for the affect in the subfield
 blood(amt)        - Returns current blood, or adds/removes blood if amt is set.
 can_afford(amt)   - Checks if the actor has enough coins of any converted type.
 can_gain_new_skills - Checks if the character can gain a new skill from 0.
+cancel_adventure_summon - Call this if a script teleports a player around, to
+                    prevent them from being teleported again if they were
+                    adventure-summoned.
 charge_coins(amt) - Charges the actor a number of coins.
 canbeseen         - True if the actor can be seen by the mob (always true 
                     for non-mob triggers).
@@ -882,6 +944,7 @@ can_teleport_room(room) - Character can legally teleport in/out of the room
                     (defaults to current room).
 cha               - The actor's Charisma.
 class             - The actor's class, as a string.
+crafting_level    - The actor's crafting level.
 dex               - The actor's Dexterity.
 disabled          - Returns TRUE if the actor is stunned or otherwise disabled.
 eq()              - This will return the identifier (id) for the object 
@@ -916,16 +979,20 @@ is_god            - Returns true if the actor is a God-level player.
 is_hostile(on/off)- If the ()'s are omitted, return value is whether or not the 
                     actor is marked as a Hostile player.
 is_immortal       - Returns true if the actor is an immortal (admin).
+is_name(str)      - Returns true if str is a valid name for the actor.
 is_pc             - Checks if the actor is a player. Useful when you want a 
                     trigger to fire on players and not mobs.
 level             - The actor's computed level (or scaled level, for mobs).
 mana              - The current mana points of the actor.
+mana(amount)      - Add/subtract mana on the actor.
 master            - The master of the actor (as an id), or an empty return.
+maxblood          - The maximum blood points of the actor.
 maxhealth         - The maximum hit points of the actor.
 maxmana           - The maximum mana points of the actor.
 maxmove           - The maximum movement points of the actor.
 mob_flagged(flag) - Returns TRUE if the NPC has the given flag, e.g. VAMPIRE.
 move              - The movement points of the actor.
+move(amount)      - Add/subtract movement points on the actor.
 name              - The actor's name (the short description for mobs).
 next_in_room      - The next actor in the room as a variable (id) nice to 
                     use for loops, or an empty return.
@@ -983,6 +1050,7 @@ evaluated from left to right. Parenthesis can be used to group.
 |   +    | addition              | 10 + 15 = 25              |
 |   *    | multiplication        | 10 * 20 = 400             |
 |   /    | division              | 100 / 20 = 5              |
+|   //   | remainder             | 5 // 4 = 1                |
 |   !    | negation              | !() = 1; !0 = 1; !dog = 0;| 
 --------------------------------------------------------------
 #d
@@ -991,7 +1059,8 @@ ROOM-TRIGGERS TRIGEDIT-ROOM-TYPES
  1) Global       HELP TRIGEDIT-ROOM-GLOBAL
  2) Random       HELP TRIGEDIT-ROOM-RANDOM
  3) Command      HELP TRIGEDIT-ROOM-COMMAND
- 4) Speech       HELP TRIGEDIT-ROOM-SPEECH       
+ 4) Speech       HELP TRIGEDIT-ROOM-SPEECH
+ 5) Adventure Cleanup  HELP TRIGEDIT-ROOM-ADVCLN
  6) Zone Reset   HELP TRIGEDIT-ROOM-ZONE       
  7) Enter        HELP TRIGEDIT-ROOM-ENTER        
  8) Drop         HELP TRIGEDIT-ROOM-DROP
@@ -1034,6 +1103,7 @@ MOB-TRIGGERS MOBILE-TRIGGERS TRIGEDIT-MOB-TYPES
 17) Leave       HELP TRIGEDIT-MOB-LEAVE          
 18) Door        HELP TRIGEDIT-MOB-DOOR                    
 17) Leave-All   HELP TRIGEDIT-MOB-LEAVE-ALL
+18) Fight-Charmed  HELP TRIGEDIT-MOB-FIGHT-CHARMED
 #d
 TRIGEDIT-OBJ-GET
 
@@ -1179,14 +1249,34 @@ fires by modifying numeric arg to the following values:
 
 See Also: TRIGEDIT-OBJ-RANDOM, TRIGEDIT-MOB-RANDOM, TRIGEDIT-ROOM-RANDOM
 #d
+TRIGEDIT-ROOM-ADVCLN TRIGEDIT-ROOM-ADVENTURE-CLEANUP "ADVENTURE CLEANUP"
+
+Activated when an adventure is removed from the world, on the room that the
+adventure was linked to (usually on the map or in a building).
+
+Used with return 0 will prevent further triggers (for example, if you terraform
+the room).
+
+Note: This trigger ONLY works when attached to an adventure directly.
+
+Note: You won't have access to %instance% variable information anymore.
+
+Numeric Arg : percent chance this trigger will be activated. 
+
+Variables:
+%room%     - the room it was activated on.
+#d
 TRIGEDIT-ROOM-COMMAND
 
 Activates when commands are performed in the room.
 Does not work for immortals with !hassle.
 
-Numeric Arg : not used.
-Argument    : text which must be part of the command typed to filter out 
-              uninteresting commands.
+String: The command to catch. If you are using a real game command, put the
+   entire word in here; the trigger will also match abbreviations. If you are
+   instead adding a new command, it will only work if the player types an exact
+   match OR the player abbreviates your command with something that isn't an
+   abbreviation for a real command ("c" abbreviates the real command "chop", 
+   not a script command like "canoodle").
 
 If 0 is returned by the trigger, character will receive the same message as 
 if the trigger did not exist, and any other command triggers will be checked.
@@ -1305,9 +1395,12 @@ TRIGEDIT-MOB-COMMAND
 Activates when commands are performed in the same room as the mobile.
 Does not work for immortals with !hassle.
 
-Numeric Arg : not used.
-Argument    : text which must be part of the command typed to filter out 
-              uninteresting commands.
+String: The command to catch. If you are using a real game command, put the
+   entire word in here; the trigger will also match abbreviations. If you are
+   instead adding a new command, it will only work if the player types an exact
+   match OR the player abbreviates your command with something that isn't an
+   abbreviation for a real command ("c" abbreviates the real command "chop", 
+   not a script command like "canoodle").
 
 If 0 is returned by the trigger, character will receive the same message as 
 if the trigger did not exist, and any other command triggers will be checked.
@@ -1408,15 +1501,18 @@ Variables:
 %actor%  - the character handing the object to the mobile
 %object% - the object being handed over           
 #d
-TRIGEDIT-MOB-FIGHT
+TRIGEDIT-MOB-FIGHT TRIGEDIT-MOB-FIGHT-CHARMED
  
 Activated each round of fighting, after the mobile has had all of its attacks.
- 
+
 Numeric Arg : percent chance this trigger will be activated.
 Argument    : not used.
 
 Variables:
 %actor% - the character this mobile is fighting
+
+Using the Fight-Charmed type will work even on charmed creatures, like
+familiars.
 #d
 TRIGEDIT-MOB-HITPERCENT TRIGEDIT-MOB-HITPRCNT 
  
@@ -1528,15 +1624,13 @@ TRIGEDIT-OBJ-COMMAND TRIGEDIT-OBJECT-COMMAND TRIG-OBJ-COMMAND
 Activates when commands are performed in the same room as the object.
 Does not work for immortals with !hassle.
 
-Numeric Arg : a bitfield to indicate where the object must be in order to cause 
-              the trigger to activate. 
-              Bits: 1: In character's worn equipment.
-                    2: In character's carried inventory.
-                    4: In same room with the character.
-                       These bits can be set at once by adding the values.
-                       7= worn, inv, room. 3 = worn, inv. 5 = worn, room.
-Argument    : text which must be part of the command typed to filter out 
-              uninteresting commands.
+Location: Where the item must be in order to trigger (inventory, worn, room).
+String: The command to catch. If you are using a real game command, put the
+   entire word in here; the trigger will also match abbreviations. If you are
+   instead adding a new command, it will only work if the player types an exact
+   match OR the player abbreviates your command with something that isn't an
+   abbreviation for a real command ("c" abbreviates the real command "chop", 
+   not a script command like "canoodle").
 
 If 0 is returned by the trigger, character will receive the same message as 
 if the trigger did not exist, and any other command triggers will be checked.
@@ -1970,7 +2064,7 @@ detach sword all        - detach all triggers from the sword.
 
 See also: ATTACH, TRIG-DETACH, TRIG-ATTACH, OLC, TRIGEDIT, STAT, ROOMFLAGS
 #d
-TRIG-ATTACH
+TRIG-ATTACH TATTACH
 
 Usage:  attach vnum id
 
@@ -1985,7 +2079,7 @@ and %actor.id% are examples of id numbers, for use with this command.)
 
 See Also: ATTACH, DETACH, TRIG-DETACH
 #d
-TRIG-DETACH
+TRIG-DETACH TDETACH
 
 Usage:  detach <vnum | all> id
 

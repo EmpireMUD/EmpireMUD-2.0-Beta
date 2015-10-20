@@ -1,0 +1,23 @@
+#10300
+A Scorched Nest~
+   It looks like something has built a nest from scorched branches at the back
+of the cave. From the looks of the nest, it must be at least the size of a
+full-grown man. And from the burning embers, it probably isn't far away.
+~
+cd 0
+M 0 10300 100.00 1
+S
+#10330
+Inside a Massive Nest~
+   You have climbed into a massive dragon nest, made from giant branches and
+whole trees. It's difficult to tell how long since the dragon was last here,
+but it did leave scorch marks.  
+~
+ag 0
+E
+scorch marks~
+It looks like dragon's breath left these scorch marks.
+~
+M 1 10331 100.00 1
+S
+$

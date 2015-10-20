@@ -1,0 +1,21 @@
+#9000
+Pickpocket master list~
+0 0 v 0 0-0
+I 12 121 1.00 1 a  # PICKPOCKET: a stick
+I 12 100 1.00 1 a  # PICKPOCKET: a rock
+I 12 123 1.00 1 a  # PICKPOCKET: a small flower
+I 12 3313 3.00 1 a  # PICKPOCKET: a loaf of bread
+I 12 3001 1.00 1 a  # PICKPOCKET: a green apple
+I 12 3013 1.00 1 a  # PICKPOCKET: a handful of nuts
+I 12 3015 1.00 1 a  # PICKPOCKET: some red berries
+I 12 3016 1.00 1 a  # PICKPOCKET: a handful of dates
+I 12 3017 1.00 1 a  # PICKPOCKET: a plump fig
+I 12 176 0.01 1 a  # PICKPOCKET: an ingot of nocturnium
+I 12 177 0.01 1 a  # PICKPOCKET: an imperium ingot
+I 12 162 0.01 1 a  # PICKPOCKET: a pile of gold dust
+I 12 2036 0.30 1 a  # PICKPOCKET: a collapsed tent
+I 12 2120 0.05 1 a  # PICKPOCKET: a small silver ring
+I 12 806 0.10 1 a  # PICKPOCKET: a silver looking glass
+I 12 851 3.00 1 a  # PICKPOCKET: an unlit candle
+S
+$

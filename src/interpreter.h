@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: interpreter.h                                   EmpireMUD 2.0b2 *
+*   File: interpreter.h                                   EmpireMUD 2.0b3 *
 *  Usage: header file: public procs, macro defs, subcommand defines       *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -10,7 +10,10 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 
+// command types
 #define ACMD(name)		void name(char_data *ch, char *argument, int cmd, int subcmd)
+#define LIBRARY_SCMD(name)  void name(char_data *ch, char *argument)
+
 
 // prototypes
 void command_interpreter(char_data *ch, char *argument);
@@ -81,6 +84,10 @@ struct alias_data {
 
 // to avoid magic-numbering in things that don't use subcmds
 #define NO_SCMD  0
+
+// for do_accept
+#define SCMD_ACCEPT  0
+#define SCMD_REJECT  1
 
 /* do_gen_ps */
 #define SCMD_INFO		0
@@ -215,3 +222,4 @@ struct alias_data {
 // for look_at_room_by_loc -- option flags
 #define LRR_SHIP_PARTIAL  BIT(0)	// shows only part of the room, for use on ships.
 #define LRR_SHOW_DARK  BIT(1)	// for passing to show_map_to_char
+#define LRR_LOOK_OUT  BIT(2)	// show map even indoors

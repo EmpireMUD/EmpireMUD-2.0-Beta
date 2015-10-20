@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.trade.c                                     EmpireMUD 2.0b2 *
+*   File: act.trade.c                                     EmpireMUD 2.0b3 *
 *  Usage: code related to crafting and the trade skill                    *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -28,12 +28,10 @@
 *   Helpers
 *   Generic Craft (craft, forge, sew, cook)
 *   Reforge / Refashion
-*   Weave
 *   Commands
 */
 
 // external vars
-extern int last_action_rotation;
 
 // external functions
 ACMD(do_gen_craft);
@@ -96,6 +94,21 @@ obj_data *find_water_container(char_data *ch, obj_data *list) {
 
 
 /**
+* Returns the total level to use for a character's crafts.
+*
+* @param char_data *ch The character to check.
+*/
+int get_crafting_level(char_data *ch) {
+	if (IS_NPC(ch)) {
+		return get_approximate_level(ch) + GET_CRAFTING_BONUS(ch);
+	}
+	else {
+		return GET_SKILL_LEVEL(ch) + GET_CRAFTING_BONUS(ch);
+	}
+}
+
+
+/**
 * This finds a hammer in either tool slot, and returns it.
 *
 * @param char_data *ch The person using the hammer?
@@ -133,13 +146,10 @@ obj_data *has_hammer(char_data *ch) {
 
 
 // CRAFT_TYPE_x
-struct {
-	char *command;
-	char *verb;
-	char *strings[2];
-} gen_craft_data[] = {
+struct gen_craft_data_t gen_craft_data[] = {
 	{ "error", "erroring", { "", "" } },	// dummy to require scmd
 	
+	// Note: These correspond to CRAFT_TYPE_x so you cannot change the order.
 	{ "forge", "forging", { "You hit the %s on the anvil hard with $p!", "$n hits the %s on the anvil hard with $p!" } },
 	{ "craft", "crafting", { "You continue crafting the %s...", "$n continues crafting the %s..." } },
 	{ "cook", "cooking", { "You continue cooking the %s...", "$n continues cooking the %s..." } },
@@ -149,7 +159,10 @@ struct {
 	{ "mix", "mixing", { "The poison bubbles as you stir it...", "$n stirs the bubbling poison..." } },
 	
 	// build is special and doesn't use do_gen_craft, so doesn't really use this data
-	{ "build", "building", { "You work on the building...", "$n works on the building..." } }
+	{ "build", "building", { "You work on the building...", "$n works on the building..." } },
+	
+	{ "weave", "weaving", { "You carefully weave the %s...", "$n carefully weaves the %s..." } },
+	{ "workforce", "producing", { "You work on the %s...", "$n work on the %s..." } }	// not used by players
 };
 
 
@@ -204,11 +217,16 @@ void cancel_gen_craft(char_data *ch) {
 
 		// load the drink container back
 		if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_SOUP)) {
-			obj = read_object(GET_ACTION_VNUM(ch, 1));
+			obj = read_object(GET_ACTION_VNUM(ch, 1), TRUE);
 
 			// just empty it
 			GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) = 0;
-			obj_to_char_or_room(obj, ch);
+			if (CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
+				obj_to_char(obj, ch);
+			}
+			else {
+				obj_to_room(obj, IN_ROOM(ch));
+			}
 			load_otrigger(obj);
 		}
 	}
@@ -276,14 +294,19 @@ void finish_gen_craft(char_data *ch) {
 	// soup handling
 	if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_SOUP)) {
 		// load the drink container back
-		obj = read_object(GET_ACTION_VNUM(ch, 1));
+		obj = read_object(GET_ACTION_VNUM(ch, 1), TRUE);
 	
 		GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) = MIN(GET_CRAFT_QUANTITY(type), GET_DRINK_CONTAINER_CAPACITY(obj));
 		GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = GET_CRAFT_OBJECT(type);
 	
 		// set it to go bad... very bad
 		GET_OBJ_TIMER(obj) = SOUP_TIMER;
-		obj_to_char_or_room(obj, ch);
+		if (CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
+			obj_to_char(obj, ch);
+		}
+		else {
+			obj_to_room(obj, IN_ROOM(ch));
+		}
 		scale_craftable(obj, ch, type);
 		
 		load_otrigger(obj);
@@ -301,7 +324,7 @@ void finish_gen_craft(char_data *ch) {
 		if (obj_proto(GET_CRAFT_OBJECT(type))) {
 			for (iter = 0; iter < amt; ++iter) {
 				// load and master it
-				obj = read_object(GET_CRAFT_OBJECT(type));
+				obj = read_object(GET_CRAFT_OBJECT(type), TRUE);
 				if (OBJ_FLAGGED(obj, OBJ_SCALABLE) && master_ability != NO_ABIL && HAS_ABILITY(ch, master_ability)) {
 					applied_master = TRUE;
 					SET_BIT(GET_OBJ_EXTRA(obj), OBJ_SUPERIOR);
@@ -310,7 +333,7 @@ void finish_gen_craft(char_data *ch) {
 	
 				// where to put it
 				if (CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
-					obj_to_char_or_room(obj, ch);
+					obj_to_char(obj, ch);
 				}
 				else {
 					obj_to_room(obj, IN_ROOM(ch));
@@ -381,6 +404,11 @@ void process_gen_craft(char_data *ch) {
 		if (weapon && OBJ_FLAGGED(weapon, OBJ_SUPERIOR)) {
 			GET_ACTION_TIMER(ch) -= 1;
 		}
+		
+		// tailor bonus for weave
+		if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_WEAVE && ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_TAILOR) && IS_COMPLETE(IN_ROOM(ch))) {
+			GET_ACTION_TIMER(ch) -= 3;
+		}
 
 		if (GET_ACTION_TIMER(ch) <= 0) {
 			finish_gen_craft(ch);
@@ -424,14 +452,14 @@ void scale_craftable(obj_data *obj, char_data *ch, craft_data *craft) {
 	int level = 1, psr;
 	obj_data *req;
 	
-	if (!OBJ_FLAGGED(obj, OBJ_SCALABLE) || IS_NPC(ch)) {
+	if (IS_NPC(ch)) {
 		return;
 	}
 	
 	// determine ideal scale level
 	if (craft) {
 		if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING && (req = obj_proto(GET_CRAFT_REQUIRES_OBJ(craft)))) {
-			level = GET_COMPUTED_LEVEL(ch);
+			level = get_crafting_level(ch);
 			
 			// check bounds on the required object
 			if (GET_OBJ_MAX_SCALE_LEVEL(req) > 0) {
@@ -447,7 +475,7 @@ void scale_craftable(obj_data *obj, char_data *ch, craft_data *craft) {
 			}
 			else if (ability_data[GET_CRAFT_ABILITY(craft)].parent_skill == NO_SKILL) {
 				// probably a class skill
-				level = GET_COMPUTED_LEVEL(ch);
+				level = get_crafting_level(ch);
 			}
 			else if ((psr = GET_PARENT_SKILL_REQUIRED(GET_CRAFT_ABILITY(craft))) != NOTHING) {
 				if (psr < BASIC_SKILL_CAP) {
@@ -462,16 +490,16 @@ void scale_craftable(obj_data *obj, char_data *ch, craft_data *craft) {
 			}
 			else {
 				// this is probably unreachable
-				level = GET_COMPUTED_LEVEL(ch);
+				level = get_crafting_level(ch);
 			}
 			
-			// always bound by the computed level
-			level = MIN(level, GET_COMPUTED_LEVEL(ch));
+			// always bound by the crafting level
+			level = MIN(level, get_crafting_level(ch));
 		}
 	}
 	else {
 		// no craft given
-		level = GET_COMPUTED_LEVEL(ch);
+		level = get_crafting_level(ch);
 	}
 	
 	// do it
@@ -574,62 +602,6 @@ bool validate_item_rename(char_data *ch, obj_data *obj, char *name) {
 
 
  //////////////////////////////////////////////////////////////////////////////
-//// WEAVE ///////////////////////////////////////////////////////////////////
-
-// TODO should this be in act.action.c instead?
-
-#define WEAVE_LINE_BREAK { "\t", 0, 0, NO_ABIL, { END_RESOURCE_LIST } }
-
-struct {
-	char *name;
-	int time;	// in action ticks
-	obj_vnum vnum;
-	int ability;	// NO_ABIL for none
-	Resource resources[5];
-} weave_data[] = {
-	{ "cloth", 12, o_CLOTH, ABIL_SEWING, { { o_COTTON, 2 }, END_RESOURCE_LIST } },
-	{ "wool cloth", 12, o_CLOTH, ABIL_SEWING, { { o_WOOL, 2 }, END_RESOURCE_LIST } },
-	
-	// last
-	{ "\n", 0, 0, NO_ABIL, { END_RESOURCE_LIST } },
-};
-
-
-void cancel_weaving(char_data *ch) {
-	if (GET_ACTION(ch) == ACT_WEAVING) {
-		GET_ACTION(ch) = ACT_NONE;
-		give_resources(ch, weave_data[GET_ACTION_VNUM(ch, 0)].resources, FALSE);
-	}
-}
-
-
-void finish_weaving(char_data *ch) {
-	int type = GET_ACTION_VNUM(ch, 0);
-	obj_data *obj;
-
-	GET_ACTION(ch) = ACT_NONE;
-
-	obj = read_object(weave_data[type].vnum);
-	
-	obj_to_char_or_room(obj, ch);
-
-	act("You finish weaving $p!", FALSE, ch, obj, 0, TO_CHAR);
-	act("$n finishes weaving $p!", FALSE, ch, obj, 0, TO_ROOM);
-	
-	if (weave_data[type].ability != NO_ABIL) {
-		gain_ability_exp(ch, weave_data[type].ability, 10);
-	}
-	else {
-		if (GET_SKILL(ch, SKILL_TRADE) < EMPIRE_CHORE_SKILL_CAP) {
-			gain_skill_exp(ch, SKILL_TRADE, 10);
-		}
-	}
-	
-	load_otrigger(obj);
-}
-
-
- //////////////////////////////////////////////////////////////////////////////
 //// COMMANDS ////////////////////////////////////////////////////////////////
 
 // subcmd must be CRAFT_TYPE_x
@@ -638,6 +610,7 @@ ACMD(do_gen_craft) {
 	bool this_line, found;
 	craft_data *craft, *next_craft, *type = NULL, *abbrev_match = NULL;
 	obj_data *drinkcon = NULL;
+	bool wait, room_wait;
 
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs can't craft.\r\n");
@@ -723,13 +696,13 @@ ACMD(do_gen_craft) {
 	else if (GET_CRAFT_ABILITY(type) != NO_ABIL && !HAS_ABILITY(ch, GET_CRAFT_ABILITY(type))) {
 		msg_to_char(ch, "You need to buy the %s ability to %s that.\r\n", ability_data[GET_CRAFT_ABILITY(type)].name, gen_craft_data[GET_CRAFT_TYPE(type)].command);
 	}
-	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
-		msg_to_char(ch, "You don't have permission to %s here.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
+	else if (GET_CRAFT_MIN_LEVEL(type) > get_crafting_level(ch)) {
+		msg_to_char(ch, "You need to have a crafting level of %d to %s that.\r\n", GET_CRAFT_MIN_LEVEL(type), gen_craft_data[GET_CRAFT_TYPE(type)].command);
 	}
 
 	// type checks
-	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_IN_CITY_ONLY) && !IS_IN_CITY(ch)) {
-		msg_to_char(ch, "You can only make that in a city.\r\n");
+	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_IN_CITY_ONLY) && !is_in_city_for_empire(IN_ROOM(ch), GET_LOYALTY(ch), TRUE, &wait) && !is_in_city_for_empire(IN_ROOM(ch), ROOM_OWNER(IN_ROOM(ch)), TRUE, &room_wait)) {
+		msg_to_char(ch, "You can only make that in a city%s.\r\n", (wait || room_wait) ? " (this city was founded too recently)" : "");
 	}
 	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_MILL && (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_MILL) || !IS_COMPLETE(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You need to be in a mill to do that.\r\n");
@@ -772,7 +745,7 @@ ACMD(do_gen_craft) {
 	else if (GET_CRAFT_REQUIRES_OBJ(type) != NOTHING && !get_obj_in_list_vnum(GET_CRAFT_REQUIRES_OBJ(type), ch->carrying)) {
 		msg_to_char(ch, "You need %s to make that.\r\n", get_obj_name_by_proto(GET_CRAFT_REQUIRES_OBJ(type)));
 	}
-	else if (!has_resources(ch, GET_CRAFT_RESOURCES(type), TRUE, TRUE)) {
+	else if (!has_resources(ch, GET_CRAFT_RESOURCES(type), can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), TRUE)) {
 		// this sends its own message ("You need X more of ...")
 		//msg_to_char(ch, "You don't have the resources to %s that.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
 	}
@@ -791,7 +764,7 @@ ACMD(do_gen_craft) {
 			timer /= 2;
 		}
 	
-		start_action(ch, ACT_GEN_CRAFT, timer, 0);
+		start_action(ch, ACT_GEN_CRAFT, timer);
 		GET_ACTION_VNUM(ch, 0) = GET_CRAFT_VNUM(type);
 		
 		if (drinkcon) {
@@ -802,7 +775,7 @@ ACMD(do_gen_craft) {
 		// how many
 		GET_ACTION_VNUM(ch, 2) = num;
 		
-		extract_resources(ch, GET_CRAFT_RESOURCES(type), TRUE);
+		extract_resources(ch, GET_CRAFT_RESOURCES(type), can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED));
 		
 		msg_to_char(ch, "You start %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 		sprintf(buf, "$n starts %s.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
@@ -933,18 +906,18 @@ ACMD(do_reforge) {
 		msg_to_char(ch, "You can't %s that item.\r\n", reforge_data[subcmd].command);
 	}
 	else if (is_abbrev(arg2, "name")) {
-		// calculate gem cost based on the gear level of the item
+		// calculate gem cost based on the gear rating of the item
 		res[0].vnum = o_IRIDESCENT_IRIS;
 		res[0].amount = MAX(1, rate_item(obj) / 3);
 		
 		if (!validate_item_rename(ch, obj, argument)) {
 			// sends own message
 		}
-		else if (!has_resources(ch, res, TRUE, TRUE)) {
+		else if (!has_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), TRUE)) {
 			// sends own message
 		}
 		else {
-			extract_resources(ch, res, TRUE);
+			extract_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED));
 			
 			// prepare
 			sprintf(buf1, "You name %s $p!", GET_OBJ_SHORT_DESC(obj));
@@ -984,25 +957,25 @@ ACMD(do_reforge) {
 	else if (is_abbrev(arg2, "renew")) {
 		proto = obj_proto(GET_OBJ_VNUM(obj));
 		
-		// calculate gem cost based on the gear level of the original item
+		// calculate gem cost based on the gear rating of the original item
 		res[0].vnum = o_BLOODSTONE;
 		res[0].amount = MAX(1, (proto ? rate_item(proto) : rate_item(obj)) / 3);
 		
 		if (!proto) {
 			msg_to_char(ch, "You can't renew that.\r\n");
 		}
-		else if (!has_resources(ch, res, TRUE, TRUE)) {
+		else if (!has_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), TRUE)) {
 			// sends own message
 		}
 		else {
-			extract_resources(ch, res, TRUE);
+			extract_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED));
 			
 			// actual reforging: just junk it and load a new one
 			old_stolen_time = obj->stolen_timer;
 			old_timer = GET_OBJ_TIMER(obj);
 			level = GET_OBJ_CURRENT_SCALE_LEVEL(obj);
 			
-			new = read_object(GET_OBJ_VNUM(proto));
+			new = read_object(GET_OBJ_VNUM(proto), TRUE);
 			GET_OBJ_EXTRA(new) |= GET_OBJ_EXTRA(obj) & preserve_flags;
 			
 			// transfer bindings
@@ -1015,7 +988,7 @@ ACMD(do_reforge) {
 			// re-apply
 			new->stolen_timer = old_stolen_time;
 			GET_OBJ_TIMER(new) = old_timer;
-			if (level > 0 && OBJ_FLAGGED(new, OBJ_SCALABLE)) {
+			if (level > 0) {
 				scale_item_to_level(new, level);
 			}
 			
@@ -1037,7 +1010,7 @@ ACMD(do_reforge) {
 		}
 	}
 	else if (is_abbrev(arg2, "superior")) {
-		// calculate gem cost based on the gear level of the item
+		// calculate gem cost based on the gear rating of the item
 		res[0].vnum = o_GLOWING_SEASHELL;
 		res[0].amount = MAX(1, rate_item(obj) / 3);
 		proto = obj_proto(GET_OBJ_VNUM(obj));
@@ -1051,18 +1024,18 @@ ACMD(do_reforge) {
 		else if (GET_CRAFT_ABILITY(ctype) == NO_ABIL || get_mastery_ability(GET_CRAFT_ABILITY(ctype)) == NO_ABIL || !HAS_ABILITY(ch, get_mastery_ability(GET_CRAFT_ABILITY(ctype)))) {
 			msg_to_char(ch, "You don't have the mastery to make that item superior.\r\n");
 		}
-		else if (!has_resources(ch, res, TRUE, TRUE)) {
+		else if (!has_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), TRUE)) {
 			// sends own message
 		}
 		else {
-			extract_resources(ch, res, TRUE);
+			extract_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED));
 			
 			// actual reforging: just junk it and load a new one
 			old_stolen_time = obj->stolen_timer;
 			old_timer = GET_OBJ_TIMER(obj);
 			level = GET_OBJ_CURRENT_SCALE_LEVEL(obj);
 			
-			new = read_object(GET_OBJ_VNUM(proto));
+			new = read_object(GET_OBJ_VNUM(proto), TRUE);
 			GET_OBJ_EXTRA(new) |= GET_OBJ_EXTRA(obj) & preserve_flags;
 			
 			// transfer bindings
@@ -1092,7 +1065,7 @@ ACMD(do_reforge) {
 			// re-apply values
 			new->stolen_timer = old_stolen_time;
 			GET_OBJ_TIMER(new) = old_timer;
-			if (level > 0 && OBJ_FLAGGED(new, OBJ_SCALABLE)) {
+			if (level > 0) {
 				scale_item_to_level(new, level);
 			}
 			
@@ -1112,74 +1085,5 @@ ACMD(do_reforge) {
 	}
 	else {
 		msg_to_char(ch, "That's not a valid %s option.\r\n", reforge_data[subcmd].command);
-	}
-}
-
-
-ACMD(do_weave) {
-	int type = NOTHING, iter = 0;
-	bool this_line, any;
-	
-	one_argument(argument, arg);
-
-	/* Find what they picked */
-	if (*arg) {
-		for (iter = 0; *weave_data[iter].name != '\n'; ++iter) {
-			if (is_abbrev(arg, weave_data[iter].name) && (weave_data[iter].ability == NO_ABIL || HAS_ABILITY(ch, weave_data[iter].ability))) {
-				type = iter;
-				break;
-			}
-		}
-	}
-
-	if (GET_ACTION(ch) == ACT_WEAVING) {
-		act("You stop weaving.", FALSE, ch, 0, 0, TO_CHAR);
-		cancel_action(ch);
-	}
-	else if (GET_ACTION(ch) != ACT_NONE) {
-		msg_to_char(ch, "You're already busy doing something else.\r\n");
-	}
-	else if (!*arg || type == NOTHING) {
-		msg_to_char(ch, "You can weave:\r\n");
-		this_line = any = FALSE;
-		for (iter = 0; *weave_data[iter].name != '\n'; ++iter) {
-			if (*weave_data[iter].name == '\t') {
-				if (this_line) {
-					msg_to_char(ch, "\r\n");
-					this_line = FALSE;
-				}
-			}
-			else if (weave_data[iter].ability == NO_ABIL || HAS_ABILITY(ch, weave_data[iter].ability)) {
-				msg_to_char(ch, "%s%s", (this_line ? ", " : " "), weave_data[iter].name);
-				this_line = TRUE;
-				any = TRUE;
-			}
-		}
-		
-		if (!any) {
-			msg_to_char(ch, " nothing\r\n");
-		}
-		
-		if (this_line) {
-			msg_to_char(ch, "\r\n");
-		}
-	}
-	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
-		msg_to_char(ch, "You don't have permission to do that here.\r\n");
-	}
-	else if (!has_resources(ch, weave_data[type].resources, TRUE, TRUE)) {
-		// message sent by has_resources
-	}
-	else {
-		extract_resources(ch, weave_data[type].resources, TRUE);
-		start_action(ch, ACT_WEAVING, weave_data[type].time / ((ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_TAILOR) && IS_COMPLETE(IN_ROOM(ch))) ? 4 : 1), 0);
-		
-		GET_ACTION_VNUM(ch, 0) = type;
-		GET_ACTION_VNUM(ch, 1) = weave_data[type].vnum;
-
-		sprintf(buf, "You begin weaving %s.", get_obj_name_by_proto(weave_data[type].vnum));
-		act(buf, FALSE, ch, 0, 0, TO_CHAR);
-		sprintf(buf1, "$n begins weaving %s.", get_obj_name_by_proto(weave_data[type].vnum));
-		act(buf1, TRUE, ch, 0, 0, TO_ROOM);
 	}
 }

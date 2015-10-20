@@ -40,8 +40,8 @@ Examples:
 
 For notes on the mud's building rules, see HELP BUILDING GUIDE.
  
-See also: OLC CONTROLS, OLC BUILDINGS, OLC CRAFTS, OLC CROPS, OLC MOBILES,
-   OLC OBJECTS, OLC SECTORS, MAP OLC
+See also: OLC CONTROLS, OLC BUILDINGS, OLC CRAFTS, OLC CROPS, OLC GLOBALS,
+   OLC MOBILES, OLC OBJECTS, OLC SECTORS, MAP OLC
 See also: OLC ABORT, OLC AUDIT, OLC COPY, OLC DELETE, OLC EDIT, OLC FREE, 
    OLC LIST, OLC SAVE, OLC SEARCH, OLC LICENSE, TEXT EDITOR, VNUM
 #d
@@ -94,6 +94,7 @@ Adventures (ADVEDIT):
   not have a good level to use for those scripts. Mob scripts don't require it.
 - The !NEARBY flag should only be used on zones where a player shouldn't find
   evidence of them nearby, like a thieves' den.
+- Adventure scripts will ONLY run if they are 'Adventure Cleanup' scripts.
 
 Buildings (BEDIT):
 - Designated rooms are also built in the building editor, using the ROOM flag.
@@ -129,6 +130,11 @@ Crops (CROPEDIT):
 - The map region only matters if the crop grows in the wild (no !WILD flag).
 - Crops should have a FORAGE interaction for a small single food item.
 - Crops should have a HARVEST interaction for a plantable large item.
+
+Globals (GEDIT):
+- All global tables must be approved by the head builder, because they apply
+  to the entire game rather than just one adventure.
+- Only SHEAR, LOOT, and PICKPOCKET mob interactions are supported.
 
 Map (MAPEDIT):
 - Immortals are not generally permitted to make edits to the map. However,
@@ -230,7 +236,7 @@ Triggers and Scripts (TRIGEDIT):
   were dropped as loot by mobs should also already have scaled levels. Mob
   scripts also almost always have a valid scaled level, even if if not in a
   level-locked adventure zone.
-- Adventure zone scripts that use %goto% (or any room-targeting commands) must
+- Adventure zone scripts that use mgoto (or any room-targeting commands) must
   use room targets like i1234 to target by room template vnum instead of live
   room vnum. This will cause it to go to the current instance's version of a
   room template. It only works for room templates in the same adventure zone.
@@ -304,8 +310,10 @@ The following adventure flags are available:
  !NEARBY - Instances do not show up when players type nearby.
  ROTATABLE - Each instance will have a random orientation (whole zone rotates).
  CONFUSING-RANDOMS - The instancer will not logically match random exits.
+ !NEWBIE - Will not spawn on newbie islands.
+ NEWBIE-ONLY - Only spawns on newbie islands.
 
-See also: OLC ADVENTURES, OLC REMOVEINDEV
+See also: ADVEDIT MINLEVEL, OLC ADVENTURES, OLC REMOVEINDEV
 #d
 "ADVEDIT LIMIT" "INSTANCE LIMIT"
 
@@ -474,6 +482,8 @@ Usage:  .maxlevel <number>
 These settings control the minimum and maximum levels for an adventure zone.
 These are set in terms of players' composite level (the level number given by
 their skills and gear).
+
+Adventures whose minimum level is over 25 will not spawn on newbie islands.
 
 The OLC LEVELS help file has additional notes on how to choose levels.
 
@@ -710,7 +720,7 @@ Available flags:
  !NPC - mobs won't enter this building
  BARRIER - can only go back the way you came, unless flying
  TAVERN - functions as a tavern (don't set this on the same building as DRINK)
- COUNTS-AS-CITY - always counts as in-city territory
+ LARGE-CITY-RADIUS - counts as in-city much further away than normal
  MINE - can be mined for ore resources
  ATTACH-ROAD - on the ascii map, roads attach to this tile like it's a road
  BURNABLE - will catch fire if a fire is placed inside by a hostile empire
@@ -738,10 +748,15 @@ Available flags:
  HIGH-DEPLETION - has more resources than a normal tile
  PORTAL - functions as a portal building
  BEDROOM - boosts regen while sleeping
+ !DELETE - will not be deleted for not having a homeroom
+ SUMMON-PLAYER - allows the summon player command
+ NEED-BOAT - requires a boat, flying, or swimming to enter
+ LOOK-OUT - can see the map using "look out"
+ 2ND-TERRITORY - like a ship, counts as territory off the map
 
-* Note: If you change the COUNTS-AS-CITY flag on existing buildings, territory
-        counts will not update right away. Any empire can force a re-count
-        by claiming or abandoning any tile.
+* Note: If you change the LARGE-CITY-RADIUS flag on existing buildings,
+        territory counts will not update right away. Any empire can force a
+        re-count by claiming or abandoning any tile.
 
 See also: INTERLINK, OLC BUILDINGS
 #d
@@ -822,6 +837,7 @@ See also: BEDIT DESIGNATE, OLC BUILDINGS
 
 Usage:  .spawns add <mob vnum> <percent> [flags]
         .spawns copy <from type> <from vnum>
+        .spawns change <number> <vnum | percent | flags> <value>
         .spawns remove <number | all>
         .spawns list
 
@@ -887,7 +903,7 @@ craft recipe editor to create a new building recipe for the upgraded building,
 and mark it as UPGRADE. This building will only need a regular craft recipe,
 and only if it's buildable.
 
-See also: OLC BUILDINGS, UPGRADE, VNUM	
+See also: OLC BUILDINGS, UPGRADE, VNUM
 #d
 "CEDIT ABILITY"
 
@@ -920,7 +936,7 @@ The following flags are available:
  desert - a desert or a road that was built on desert
  river - a river tile
  jungle - any jungle tile
- * - UNUSED
+ not player made - can't be (e.g.) a river tile made by a player
  ocean - an ocean tile
  oasis - an oasis tile
  crops - any crop or seeded tile
@@ -955,7 +971,7 @@ The following flags are available:
  desert - a desert or a road that was built on desert
  river - a river tile
  jungle - any jungle tile
- * - UNUSED
+ not player made - can't be (e.g.) a river tile made by a player
  ocean - an ocean tile
  oasis - an oasis tile
  crops - *** do not use for buildon
@@ -1017,6 +1033,17 @@ Available flags:
  IN-CITY-ONLY - a craft or building can only be made in a city radius
 
 See also: CEDIT TYPE, OLC CRAFTS, OLC REMOVEINDEV
+#d
+"CEDIT LEVELREQUIRED" "CEDIT LEVEL REQUIRED"
+
+Usage:  .levelrequired <level>
+
+This lets you set the crafting level required to make a craft. It works on any
+type of craft. This uses the 'Crafting' trait shown on score, and the +CRAFTING
+apply from items. Crafting level includes skill level, so a requirement of 100
+would only require that the player be skill level 100.
+
+See also: OLC CRAFTS
 #d
 "CEDIT LIQUID"
 
@@ -1221,6 +1248,90 @@ covered by the crops.
 
 See also: OLC CROPS
 #d
+"GEDIT FLAGS"
+
+Usage:  .flags [add | remove] <flags>
+
+This set of flags applies to the global table itself.
+
+Available flags:
+ IN-DEVELOPMENT - Will not be used live.
+ ADVENTURE-ONLY - This global table will only apply to the adventure it's in.
+
+See also: OLC GLOBALS
+#d
+"GEDIT MAXLEVEL"
+
+Usage:  .maxlevel <level>
+
+This sets the upper limit of the level range for this global table.
+
+For example, a 'Mob Interactions' global table will only be used if the mob
+is scaled to this maxlevel or lower.
+
+You can set the maximum to 0 for "no maximum".
+
+See also: OLC GLOBALS
+#d
+"GEDIT MINLEVEL"
+
+Usage:  .minlevel <level>
+
+This sets the lower limit of the level range for this global table.
+
+For example, a 'Mob Interactions' global table will only be used if the mob
+is scaled to this minlevel or higher.
+
+You can set the minimum to 0 for "no minimum".
+
+See also: OLC GLOBALS
+#d
+"GEDIT MOBEXCLUDE"
+
+Usage:  .mobexclude [add | remove] <flags>
+
+A 'Mob Interactions' global table may have mob flags set to exclude. If so, the
+global table is only used if a mob DOES NOT have all the flags in this set.
+For example, you can use it to create a set that does not apply to HARD mobs.
+
+These are the same set of flags from HELP MEDIT FLAGS.
+
+See also: OLC GLOBALS
+#d
+"GEDIT MOBFLAGS"
+
+Usage:  .mobflags [add | remove] <flags>
+
+A 'Mob Interactions' global table may have mob flags set. If so, the global
+table is only used if a mob has ALL of the flags set here. For example, you
+might set a global table to only apply to HARD mobs.
+
+These are the same set of flags from HELP MEDIT FLAGS.
+
+See also: OLC GLOBALS
+#d
+"GEDIT NAME"
+
+Usage:  .name <name>
+
+This lets you set the 'name' property of a global table. Names are only shown
+to the immortal staff, never to players. The name should indicate what this
+table is for.
+
+See also: OLC GLOBALS
+#d
+"GEDIT TYPE"
+
+Usage:  .type <type>
+
+This is the type of global table. Different types are used for different
+things. Each type may have its own properties.
+
+Types:
+ Mob Interactions - Used for global SHEAR, LOOT, and PICKPOCKET tables.
+
+See also: OLC GLOBALS
+#d
 "ITEM SCALING" "OBJ SCALING" "OBJECT SCALING" SCALABLE "SCALABLE FLAG" "SCALING ITEM"
 
 Items can be set to scale to different levels. You can set various traits on
@@ -1287,12 +1398,27 @@ The following commands are available:
  name - Customize the room title.
  passwalls - Able to move on the map unblocked by walls, interiors, etc.
  roomtype - Change the type of an interior room.
+ ruin - Turn a building to ruins.
  terrain - Change the tile you're standing on.
  unclaimable - Make a tile or square of tiles unclaimable (or not).
 
 For notes on the mud's building rules, see HELP BUILDING GUIDE.
 
 See also: OLC
+#d
+"MAPEDIT BUILD"
+
+Usage:  .map build <building vnum> [direction]
+
+This command creates a building instantly, without needing a craft recipe. It
+can be built on virtually any map tile, so be careful when using this. Its main
+purpose is to add special buildings to the map without needing a build recipe.
+
+Example:
+ > .map build 5118
+ > .map build 5120 north
+
+See also: MAP OLC
 #d
 "MAPEDIT COMPLETE"
 
@@ -1420,6 +1546,12 @@ building with the ROOM flag can be set this way.
 
 See also: MAP OLC, OLC BUILDINGS
 #d
+"MAPEDIT RUINS"
+
+Usage:  .map ruin
+
+This command will reduce a map building to ruins.
+#d
 "MAPEDIT TERRAIN"
 
 Usage:  .map terrain <type>
@@ -1484,7 +1616,7 @@ The following attack types are available:
 13. fire - physical fire like a torch
 14. vampire claws
 15. crush - animals or giants
-16. hit - normal punching (no weapon)
+16. hit - normal punching (no weapon, or disarmed physical weapon)
 17. magic fire - fireball
 18. lightning staff
 19. burn staff
@@ -1497,6 +1629,7 @@ The following attack types are available:
 26. tail swipe - animals
 27. peck - animals
 28. gore - animals
+29. mana blast - normal magical attack (e.g. disarmed mage)
 
 See also: OLC MOBILES
 #d
@@ -1523,7 +1656,7 @@ Available mob flags:
  MOUNTAIN-WALK - Can cross mountain tiles.
  AQUATIC - Can cross water tiles, but won't move on land.
  *PLURAL - Uses the pronouns 'their', 'they', and 'them' in act messages.
- * - DO NOT SET
+ NO-ATTACK - Mob can be in combat, but will not hit
  SPAWNED - De-spawns after 5 minutes if no players are nearby.
  CHAMPION - Will rescue its master in combat.
  EMPIRE - Will not be saved through reboots.
@@ -1544,7 +1677,7 @@ Available mob flags:
 
 See also: OLC MOBILES
 #d
-"MEDIT INTERACTION" "BEDIT INTERACTION" "OEDIT INTERACTION" "REDIT INTERACTION" "SECTEDIT INTERACTION" "CROPEDIT INTERACTION" INTERACTIONS
+"MEDIT INTERACTION" "BEDIT INTERACTION" "OEDIT INTERACTION" "REDIT INTERACTION" "SECTEDIT INTERACTION" "CROPEDIT INTERACTION" "GEDIT INTERACTION" INTERACTIONS
 
 Usage:  .interaction add <type> <quantity> <vnum> <percent> [exclusion code]
         .interaction change <number> <field> <value>
@@ -1563,6 +1696,7 @@ Mob interaction types:
  SHEAR - Items received when the shear command is used in a stable.
  BARDE - Mob loaded when the Barde ability is used in a stable.
  LOOT - Items dropped into the corpse when the mob is killed.
+ PICKPOCKET - Items gained from the pickpocket skill.
  
 Object interaction types:
  LIGHT - Item something is converted into when lit on fire.
@@ -1677,7 +1811,7 @@ You're standing at the foot of a huge giant!
 
 See also: OLC MOBILES
 #d
-"MEDIT SCRIPTS" "OEDIT SCRIPTS" "REDIT SCRIPTS"
+"ADVEDIT SCRIPTS" "MEDIT SCRIPTS" "OEDIT SCRIPTS" "REDIT SCRIPTS"
 
 Usage:  .script add [position] <trigger vnum>
         .script copy <from type> <from vnum>
@@ -1690,6 +1824,8 @@ don't give a position, it will put it at the end.
 
 When you save your olc editor, all live copies of the thing you were editing
 should get the updated script list right away.
+
+Note: Adventure scripts will only work if they are the Adventure Cleanup type.
 
 See also: OLC MOBILES, OLC OBJECTS, OLC TRIGGERS, VNUM
 #d
@@ -1742,6 +1878,7 @@ See also: HARNESS, OLC OBJECTS
 "OEDIT APPLY" APPLIES
 
 Usage:  .apply add <value> <type>
+        .apply change <number> <value | type> <new value>
         .apply remove <number | all>
 
 Applies are bonuses (or penalties) that an item gives to the player who is
@@ -1770,6 +1907,7 @@ using it. The following applies are available. Most are self-explanatory:
  BONUS-MAGICAL - added to magical damage
  BONUS-HEALING - added to damage healed (by abilities this player uses)
  RESIST-MAGICAL - magical damage reduction
+ CRAFTING - bonus to craft level
 
 See also: OLC OBJECTS
 #d
@@ -1895,6 +2033,7 @@ See also: OEDIT CAPACITY, OLC OBJECTS
 "OEDIT CUSTOM" "CUSTOM MESSAGES"
 
 Usage:  .custom add <type> <message>
+        .custom change <number> <type | message> <value>
         .custom remove <number | all>
 
 You can set custom messages on objects for various actions. These messages
@@ -1938,9 +2077,8 @@ See also: ITEM SCALING, OEDIT MISSILESPEED, OEDIT WEAPONTYPE, OLC OBJECTS
 "OEDIT EXTRA" "OEDIT EXTRA DESCRIPTIONS" "BEDIT EXTRA" "BEDIT EXTRA DESCRIPTIONS" "REDIT EXTRA" "REDIT EXTRA DESCRIPTIONS"
 
 Usage:  .extra add <keywords>
+        .extra change <number> <description | keywords> [value]
         .extra remove <number | all>
-        .extra keywords <number> <new keywords>
-        .extra description <number>
 
 This command lets you add or edit extra descriptions. These are additional
 descriptions that the player may 'look' at. 
@@ -2144,6 +2282,7 @@ See also: OLC OBJECTS
 "OEDIT STORAGE"
 
 Usage:  .storage add <building vnum> [flags]
+        .storage change <number> <building | flags> <value>
         .storage remove <number | all>
 
 This command lets you set where an object may be stored. An object type may
@@ -2379,7 +2518,7 @@ The following weapon types are available:
 13. fire - torch
 14. vampire claws
 15. crush - animals or giants
-16. hit - normal punching (no weapon)
+16. hit - normal punching (no weapon, or disarmed physical weapon)
 17. magic fire - fireball
 18. lightning staff
 19. burn staff
@@ -2392,6 +2531,7 @@ The following weapon types are available:
 26. tail swipe - animals
 27. peck - animals
 28. gore - animals
+29. mana blast - normal magical attack (e.g. disarmed mage)
 
 See also: OLC OBJECTS
 #d
@@ -2427,6 +2567,8 @@ See also: OLC
 Usage:  .<type> audit <from vnum> <to vnum>
 
 This will audit all things in a range of vnums for common problems.
+
+Auditing a single adventure will also run sub-auditors on all its contents.
 #d
 "OLC COPY"
 
@@ -2555,8 +2697,8 @@ You should set the FORAGE and HARVEST interactions on a crop, usually with a
 GATHER interaction.
 
 All commands in the editor are highlighted in yellow and placed inside <angle
-braces>. You can get help on any of these commands by typing &yHELP CROPEDIT&0.
-<COMMAND>.
+braces>. You can get help on any of these commands by typing &yHELP CROPEDIT
+<COMMAND>&0.
 
 You can close an open editor with .abort or .save.
 
@@ -2568,6 +2710,33 @@ Example:
 For notes on the mud's building rules, see HELP BUILDING GUIDE.
 
 See also: CROPEDIT INTERACTION, OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
+"OLC GLOBALS" GEDIT GLOBALEDIT "GLOBAL EDIT" "GLOBAL OLC"
+
+Usage:  .global <comman>
+        .<command>
+
+The .olc globals editor allows you to add, edit, or delete global tables from
+the world. It provides an in-game menu for controlling features like global
+loot tables.
+
+Any global data that doesn't have an IN-DEVELOPMENT flag will be used by the
+live game system.
+
+All commands in the editor are highlighted in yellow and placed inside <angle
+braces>. You can get help on any of these commands by typing &yHELP GEDIT
+<COMMAND>&0.
+
+You can close an open editor with .abort or .save.
+
+Example:
+ > .global edit 123
+ > .flags IN-DEVELOPMENT
+ > .save
+
+For notes on the mud's building rules, see HELP BUILDING GUIDE.
+
+See also: GEDIT INTERACTION, OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
 #d
 "OLC DELETE"
 
@@ -2612,13 +2781,14 @@ of the olc 'list' command.
 
 See also: OLC LIST, VNUM
 #d
-"OLC LIST" OLIST MLIST
+"OLC LIST" OLIST MLIST RLIST
 
-Usage:  .<type> list <from vnum> <to vnum>
+Usage:  .<type> list <from vnum> [to vnum] [-d]
 
 This command lists all objects (or mobs, or whatever) between two vnums
 (inclusive). If the range is too long, it cuts off the list and you can try
-again with a narrower range of vnums.
+again with a narrower range of vnums. If you provide the -d (--details)
+argument, more information is shown per line.
 
 To look up items by name, use the 'vnum' command.
 
@@ -2681,6 +2851,8 @@ Usage:  .removeindev <adventure vnum>
 This command removes the IN-DEVELOPMENT flag from an adventure and any craft
 recipes in it, or from craft recipes over a given vnum range. It can be used
 to quickly activate a zone.
+
+This also applies to global tables in the range.
 
 See also: OLC CONTROLS, OLC ADVENTURES, ADVEDIT FLAGS, CEDIT FLAGS
 #d
@@ -2834,6 +3006,10 @@ The following room template flags are available:
  PEACEFUL - No combat allowed.
  NEED-BOAT - Requires a boat, swimming, or fly.
  !TELEPORT - Cannot teleport in or out.
+ LOOK-OUT - can see the map using "look out"
+ !LOCATION - no location shown; disables "where"
+ PIGEON-POST - can send mail here
+ COOKING-FIRE - can cook here
 
 See also: OLC ROOM TEMPLATES
 #d
@@ -2901,7 +3077,7 @@ Available flags:
  desert - a flat, arid sector
  river - a fresh-water sector
  jungle - any jungle tile
- * - 
+ not player made - DO NOT SET on .buildflags
  ocean - a salt-water tile
  oasis - an arid water source
  crops - any crop tile, should ONLY be used for 'buildfacing'
@@ -2935,6 +3111,7 @@ See also: OLC SECTORS
 "SECTEDIT EVOLUTIONS"
 
 Usage:  .evolution add <type> [value] <percent> <becomes sector vnum>
+        .evolution change <number> <type | value | percent | sector> <new value>
         .evolution remove <number | all>
 
 This command lets you add or remove an evolution from a sector. Evolutions are
@@ -2961,6 +3138,10 @@ Available types ([value] isn't used unless specified):
     (value is the sector vnum that must be nearby).
  PLANTS-TO - Sector this one becomes when you start to plant a crop on it.
  MAGIC-GROWTH - Sector this one becomes if it is magically forced to grow.
+ NOT-ADJACENT - No matching sector within 1 tile (value is the sector vnum).
+ NOT-NEAR-SECTOR - No matching sector within 2 tiles (value is the sector
+    vnum).
+ 
 
 Examples:
  Jungle: .evolution add CHOPPED-DOWN 1 50% 28
@@ -2991,7 +3172,7 @@ Available sector flags:
  SHOW-ON-POLITICAL-MAPOUT - Still appears on the political version of the graphical map
  MAP-BUILDING - This sector represents a building on the map; shown using building data
  INSIDE-ROOM - This sector represents an interior (designated) ROOM building
- COUNTS-AS-CITY - On empire territory count, this tile counts as in-city anywhere
+ LARGE-CITY-RADIUS - This tile counts as in-city much further away than normal
  OBSCURE-VISION - Players can't be seen here; also blocks catapults and towers
  IS-TRENCH - Sector counts as a trench and fills with water
  * - unused
@@ -3003,6 +3184,7 @@ See also: OLC SECTORS
 "SECTEDIT ICONS" "CROPEDIT ICONS"
 
 Usage:  .icons add <type> <color code> <icon>
+        .icons change <number> <type | color | icon> <value>
         .icons remove <number | all>
 
 EmpireMUD uses four different seasons and the biggest change between them is
@@ -3085,6 +3267,7 @@ See also: OLC SECTORS
 "SPECIAL ICONS" "ICON CODES"
 
 The following special codes may be used in icons:
+ @. - show the roadside icon for the base tile type here
  @e - show the roadside icon for the tile to the east
  @w - show the roadside icon for the tile to the west
  @u - show a 'v' if the tile to the west is a wall
@@ -3096,16 +3279,7 @@ The following special colors may be used in icons:
  &&? - The tile color of the base terrain.
  &&V - Wall color (walls are colored by enchantments).
 #d
-"SPECIAL PROCEDURE" "SPEC PROC"
-
-A special procedure, or spec proc, is a piece of code attached to an object
-or mobile that makes it behave in some unique way. For example, when you look
-at the port hole in a sailing ship, you see the room outside the ship instead
-of the port hole's look description.
-
-If you are interested in a spec proc, please see the programmer to discuss it.
-#d
-"STRING EDITOR" "TEXT EDITOR" "STRING EDITING"
+"STRING EDITOR" "TEXT EDITOR" "STRING EDITING" ,
 
 Note: If you are using the string editor in-game, you must begin commands with
 a comma (,). Only text you type starting with a , will be added to the string.

@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: ships.c                                         EmpireMUD 2.0b2 *
+*   File: ships.c                                         EmpireMUD 2.0b3 *
 *  Usage: code related to boating                                         *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -32,7 +32,6 @@
 // external vars
 extern const char *dirs[];
 extern const int rev_dir[];
-extern int last_action_rotation;
 
 // external funcs
 extern int count_objs_in_room(room_data *room);
@@ -48,13 +47,14 @@ extern int count_objs_in_room(room_data *room);
 
 
 struct ship_data_struct ship_data[] = {
-	{ "pinnace", os_PINNACE, 0, ABIL_SHIPBUILDING, 60, 0 },
-	{ "galley", os_GALLEY, 1, ABIL_SHIPBUILDING, 90, 0 },
-	{ "brigantine", os_BRIGANTINE, 2, ABIL_SHIPBUILDING, 120, 0 },
-	{ "argosy", os_ARGOSY, 3, ABIL_ADVANCED_SHIPS, 240, 1 },
-	{ "galleon", os_GALLEON, 4, ABIL_ADVANCED_SHIPS, 480, 1 },
+	// name, vnum, type, ability, resources (number), is-advanced, cargo-size
+	{ "pinnace", os_PINNACE, 0, ABIL_SHIPBUILDING, 60, 0, 150 },
+	{ "galley", os_GALLEY, 1, ABIL_SHIPBUILDING, 90, 0, 300 },
+	{ "brigantine", os_BRIGANTINE, 2, ABIL_SHIPBUILDING, 120, 0, 450 },
+	{ "argosy", os_ARGOSY, 3, ABIL_ADVANCED_SHIPS, 240, 1, 600 },
+	{ "galleon", os_GALLEON, 4, ABIL_ADVANCED_SHIPS, 480, 1, 750 },
 
-	{ "\n", NOTHING, 0, NO_ABIL, 0, 0 }
+	{ "\n", NOTHING, 0, NO_ABIL, 0, 0, 0 }
 };
 
 // how ships appear in the room
@@ -109,7 +109,7 @@ static obj_data *create_ship(obj_vnum vnum, empire_data *owner, room_data *to_ro
 	for (i = 0; i < 8; i++)
 		spare[i] = NULL;
 
-	ship = read_object(vnum);
+	ship = read_object(vnum, TRUE);
 	type = GET_SHIP_TYPE(ship);
 
 	/* The main room */
@@ -306,6 +306,144 @@ int load_all_objs_to_boat(char_data *ch, room_data *from, room_data *to, obj_dat
 }
 
 
+/**
+* Attempt to move a ship. This may send an error message if it fails.
+*
+* @param char_data *ch The person trying to move the ship (optional: may be NULL).
+* @param obj_data *ship The ship to move.
+* @param int dir Which direction to move it.
+* @return bool TRUE if it moved, FALSE if it was blocked.
+*/
+bool move_ship(char_data *ch, obj_data *ship, int dir) {
+	extern const char *from_dir[];
+	
+	room_data *deck, *to_room = NULL, *was_in, *room, *next_room;
+	struct room_direction_data *ex;
+	char_data *ch_iter;
+	
+	// sanity
+	if (!ship || !IS_SHIP(ship) || dir == NO_DIR || dir >= NUM_2D_DIRS) {
+		return FALSE;
+	}
+	if (!(deck = real_room(GET_SHIP_MAIN_ROOM(ship)))) {
+		return FALSE;
+	}
+	
+	if (ch && !can_use_room(ch, deck, MEMBERS_ONLY)) {
+		msg_to_char(ch, "You don't have permission to sail this ship.\r\n");
+		return FALSE;
+	}
+
+	// targeting
+	if (ROOM_IS_CLOSED(IN_ROOM(ship))) {
+		if ((ex = find_exit(IN_ROOM(ship), dir))) {
+			to_room = ex->room_ptr;
+		}
+		else {
+			to_room = NULL;
+		}
+	}
+	else {
+		to_room = real_shift(IN_ROOM(ship), shift_dir[dir][0], shift_dir[dir][1]);
+	}
+	if (!to_room) {
+		if (ch) {
+			msg_to_char(ch, "The ship can't sail any further %s.\r\n", dirs[get_direction_for_char(ch, dir)]);
+		}
+		return FALSE;
+	}
+	
+	// checks based on target
+	if (!CAN_SAIL_IN(to_room)) {
+		if (ch) {
+			msg_to_char(ch, "You can't sail that direction.\r\n");
+		}
+		return FALSE;
+	}
+	if (!IS_COMPLETE(to_room)) {
+		if (ch) {
+			msg_to_char(ch, "You can't sail in until it's complete.\r\n");
+		}
+		return FALSE;
+	}
+	if (ch && !ROOM_IS_CLOSED(IN_ROOM(ship)) && ROOM_IS_CLOSED(to_room) && !can_use_room(ch, to_room, GUESTS_ALLOWED) && !IS_IMMORTAL(ch)) {
+		msg_to_char(ch, "You don't have permission to sail there.\r\n");
+		return FALSE;
+	}
+	
+	// let's do this
+	was_in = IN_ROOM(ship);
+	
+	// notify leaving
+	for (ch_iter = ROOM_PEOPLE(IN_ROOM(ship)); ch_iter; ch_iter = ch_iter->next_in_room) {
+		if (ch_iter->desc) {
+			sprintf(buf, "$p sails %s.", dirs[get_direction_for_char(ch_iter, dir)]);
+			act(buf, TRUE, ch_iter, ship, 0, TO_CHAR);
+		}
+	}
+			
+	obj_to_room(ship, to_room);
+	check_for_ships_present(was_in);	// update old room
+	check_for_ships_present(to_room);	// update new room
+	
+	for (ch_iter = ROOM_PEOPLE(IN_ROOM(ship)); ch_iter; ch_iter = ch_iter->next_in_room) {
+		if (ch_iter->desc) {
+			sprintf(buf, "$p sails in from %s.", from_dir[get_direction_for_char(ch_iter, dir)]);
+			act(buf, TRUE, ch_iter, ship, 0, TO_CHAR);
+		}
+	}
+	
+	// alert whole ship
+	HASH_ITER(interior_hh, interior_world_table, room, next_room) {
+		if (HOME_ROOM(room) != deck) {
+			continue;
+		}
+		
+		for (ch_iter = ROOM_PEOPLE(room); ch_iter; ch_iter = ch_iter->next_in_room) {
+			if (ch_iter->desc) {
+				if (HAS_ABILITY(ch_iter, ABIL_NAVIGATION)) {
+					snprintf(buf, sizeof(buf), "The ship sails %s (%d, %d).", dirs[get_direction_for_char(ch_iter, dir)], X_COORD(IN_ROOM(ship)), Y_COORD(IN_ROOM(ship)));
+				}
+				else {
+					snprintf(buf, sizeof(buf), "The ship sails %s.", dirs[get_direction_for_char(ch_iter, dir)]);
+				}
+				act(buf, FALSE, ch_iter, NULL, NULL, TO_CHAR | TO_SPAMMY);
+			}
+		}
+	}
+	
+	return TRUE;
+}
+
+
+/**
+* @param char_data *ch The person who may be sailing.
+* @param obj_data *ship The ship they are sailing or wanting to sail.
+* @return bool TRUE if nobody else is sailing it; FALSE if someone else is.
+*/
+bool only_one_sailing(char_data *ch, obj_data *ship) {
+	room_data *room, *next_room;
+	char_data *ch_iter;
+	
+	if (!ship) {
+		return FALSE;
+	}
+	
+	HASH_ITER(interior_hh, interior_world_table, room, next_room) {
+		if (HOME_ROOM(room) != HOME_ROOM(IN_ROOM(ch))) {
+			continue;
+		}
+		for (ch_iter = ROOM_PEOPLE(room); ch_iter; ch_iter = ch_iter->next_in_room) {
+			if (ch_iter != ch && !IS_NPC(ch_iter) && GET_ACTION(ch_iter) == ACT_SAILING) {
+				return FALSE;
+			}
+		}
+	}
+	
+	return TRUE;
+}
+
+
 /*
  * Returns:
  *  -2: nothing could be unloaded, docks are full
@@ -354,6 +492,12 @@ void process_manufacturing(char_data *ch) {
 			break;
 		}
 	}
+
+	if (!ship) {
+		msg_to_char(ch, "You try to work on a ship, but there isn't one here!\r\n");
+		GET_ACTION(ch) = ACT_NONE;
+		return;
+	}
 	
 	// this determines type
 	for (iter = 0; *ship_data[iter].name != '\n'; ++iter) {
@@ -362,14 +506,8 @@ void process_manufacturing(char_data *ch) {
 			break;
 		}
 	}
-
-	if (!ship) {
-		msg_to_char(ch, "You try to work on a ship, but there isn't one here!\r\n");
-		GET_ACTION(ch) = ACT_NONE;
-		return;
-	}
 	
-	total = 1 + (AFF_FLAGGED(ch, AFF_HASTE) ? 1 : 0) + (HAS_BONUS_TRAIT(ch, BONUS_FAST_CHORES) ? 1 : 0);
+	total = 1;	// number to build at once (add things that speed this up)
 	for (count = 0; count < total && GET_ACTION(ch) == ACT_MANUFACTURING && ship; ++count) {
 		if ((GET_SHIP_RESOURCES_REMAINING(ship) % 2) != 0) {
 			if (!has_resources(ch, iron, TRUE, TRUE))
@@ -443,7 +581,7 @@ ACMD(do_board) {
 		msg_to_char(ch, "You can't lead an animal on board from here.\r\n");
 	else if (GET_SHIP_RESOURCES_REMAINING(ship) > 0)
 		msg_to_char(ch, "You can't board the ship until it's finished!\r\n");
-	else if (!IS_IMMORTAL(ch) && IS_CARRYING_N(ch) > CAN_CARRY_N(ch)) {
+	else if (!IS_IMMORTAL(ch) && !IS_NPC(ch) && IS_CARRYING_N(ch) > CAN_CARRY_N(ch)) {
 		msg_to_char(ch, "You are overburdened and cannot move.\r\n");
 	}
 	else {
@@ -513,7 +651,7 @@ ACMD(do_disembark) {
 		msg_to_char(ch, "You can't disembark while riding.\r\n");
 	else if (GET_LEADING(ch) && IN_ROOM(GET_LEADING(ch)) == IN_ROOM(ch) && (leading = GET_LEADING(ch)) && BUILDING_VNUM(IN_ROOM(ship)) != BUILDING_DOCKS)
 		msg_to_char(ch, "You can't lead an animal off the ship unless it's at a dock.\r\n");
-	else if (!IS_IMMORTAL(ch) && IS_CARRYING_N(ch) > CAN_CARRY_N(ch)) {
+	else if (!IS_IMMORTAL(ch) && !IS_NPC(ch) && IS_CARRYING_N(ch) > CAN_CARRY_N(ch)) {
 		msg_to_char(ch, "You are overburdened and cannot move.\r\n");
 	}
 	else {
@@ -574,7 +712,7 @@ ACMD(do_disembark) {
 ACMD(do_load_boat) {
 	obj_data *ship, *to_load = NULL;
 	room_data *room, *next_room, *ship_room;
-	int val;
+	int val = -1;
 	bool done = FALSE;
 
 	two_arguments(argument, arg, buf);
@@ -623,7 +761,10 @@ ACMD(do_load_boat) {
 				/* else nothing was loaded at all to this room */
 			}
 		}
-		if (!to_load && !done) {
+		if (val == -1 && !done) {
+			msg_to_char(ch, "There was nothing to load.\r\n");
+		}
+		else if (!to_load && !done) {
 			act("$p is full.", FALSE, ch, ship, 0, TO_CHAR);
 		}
 	}
@@ -669,7 +810,7 @@ ACMD(do_manufacture) {
 	else if (ship) {
 		act("You begin working on $p.", FALSE, ch, ship, 0, TO_CHAR);
 		act("$n begins working on $p.", FALSE, ch, ship, 0, TO_ROOM);
-		start_action(ch, ACT_MANUFACTURING, 1, NOBITS);
+		start_action(ch, ACT_MANUFACTURING, 1);
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED))
 		msg_to_char(ch, "You don't have permission to manufacture ships here.\r\n");
@@ -680,100 +821,92 @@ ACMD(do_manufacture) {
 		ship = create_ship(ship_data[i].vnum, emp, IN_ROOM(ch));
 		msg_to_char(ch, "You begin working on a %s.\r\n", ship_data[i].name);
 		act("$n begins to build a ship.", FALSE, ch, 0, 0, TO_ROOM);
-		start_action(ch, ACT_MANUFACTURING, 1, NOBITS);
+		start_action(ch, ACT_MANUFACTURING, 1);
 		GET_OBJ_VAL(ship, VAL_SHIP_RESOURCES_REMAINING) = ship_data[i].resources;
 	}
 }
 
 
 ACMD(do_sail) {
-	extern const char *from_dir[];
-
-	struct room_direction_data *ex;
-	char_data *vict;
+	char dir_arg[MAX_INPUT_LENGTH], dist_arg[MAX_INPUT_LENGTH];
+	room_data *room, *next_room;
+	bool was_sailing, same_dir;
+	char_data *ch_iter;
 	obj_data *ship;
-	int dir;
-	room_data *to_room, *was_in = NULL;
+	int dir, dist = -1;
 
-	skip_spaces(&argument);
+	// 2nd arg (dist) is optional
+	two_arguments(argument, dir_arg, dist_arg);
 	
 	// basics
-	if (!(ship = GET_BOAT(HOME_ROOM(IN_ROOM(ch))))) {
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "You can't do that.\r\n");
+	}
+	else if (!*dir_arg && GET_ACTION(ch) == ACT_SAILING) {
+		cancel_action(ch);
+	}
+	else if (GET_ACTION(ch) != ACT_NONE && GET_ACTION(ch) != ACT_SAILING) {
+		msg_to_char(ch, "You're too busy doing something else.\r\n");
+	}
+	else if (!(ship = GET_BOAT(HOME_ROOM(IN_ROOM(ch))))) {
 		msg_to_char(ch, "You can only sail on a ship.\r\n");
-		return;
 	}
-	if (!can_use_room(ch, HOME_ROOM(IN_ROOM(ch)), MEMBERS_ONLY)) {
+	else if (!can_use_room(ch, HOME_ROOM(IN_ROOM(ch)), MEMBERS_ONLY)) {
 		msg_to_char(ch, "You don't have permission to sail this ship.\r\n");
-		return;
 	}
-	if (!*argument) {
+	else if (!only_one_sailing(ch, ship)) {
+		msg_to_char(ch, "Someone else is sailing this ship right now.\r\n");
+	}
+	else if (!*dir_arg) {
 		msg_to_char(ch, "Which direction would you like to sail?\r\n");
-		return;
 	}
-	if ((dir = parse_direction(ch, argument)) == NO_DIR || dir >= NUM_2D_DIRS) {
+	else if ((dir = parse_direction(ch, dir_arg)) == NO_DIR || dir >= NUM_2D_DIRS) {
 		msg_to_char(ch, "You can't sail that direction.\r\n");
-		return;
 	}
-	
-	// targeting
-	if (ROOM_IS_CLOSED(IN_ROOM(ship))) {
-		if (!(ex = find_exit(IN_ROOM(ship), dir))) {
-			msg_to_char(ch, "You can't sail that direction!\r\n");
-			return;
-		}
-
-		to_room = ex->room_ptr;
+	else if (GET_ACTION(ch) == ACT_SAILING && GET_ACTION_VNUM(ch, 0) == dir && !*dist_arg) {
+		msg_to_char(ch, "You are already sailing that way.\r\n");
+	}
+	else if (*dist_arg && (!isdigit(*dist_arg) || (dist = atoi(dist_arg)) < 1)) {
+		msg_to_char(ch, "Sail how far!?\r\n");
 	}
 	else {
-		to_room = real_shift(IN_ROOM(ship), shift_dir[dir][0], shift_dir[dir][1]);
-	}
-	
-	// checks based on target
-	if (!to_room || !CAN_SAIL_IN(to_room)) {
-		msg_to_char(ch, "You can't sail that direction.\r\n");
-		return;
-	}
-	if (!IS_COMPLETE(to_room)) {
-		msg_to_char(ch, "You can't sail in until it's complete.\r\n");
-		return;
-	}
-	if (!ROOM_IS_CLOSED(IN_ROOM(ship)) && ROOM_IS_CLOSED(to_room) && !can_use_room(ch, to_room, GUESTS_ALLOWED) && !IS_IMMORTAL(ch)) {
-		msg_to_char(ch, "You don't have permission to sail there.\r\n");
-		return;
-	}
-
-	// let's do this
-	was_in = IN_ROOM(ship);
-	
-	// notify leaving
-	for (vict = ROOM_PEOPLE(IN_ROOM(ship)); vict; vict = vict->next_in_room) {
-		if (vict->desc) {
-			sprintf(buf, "$p sails %s.", dirs[get_direction_for_char(vict, dir)]);
-			act(buf, TRUE, vict, ship, 0, TO_CHAR);
+		was_sailing = (GET_ACTION(ch) == ACT_SAILING);
+		same_dir = (was_sailing && (dir == GET_ACTION_VNUM(ch, 0)));
+		GET_ACTION(ch) = ACT_NONE;	// prevents a stops-moving message
+		start_action(ch, ACT_SAILING, 0);
+		GET_ACTION_VNUM(ch, 0) = dir;
+		GET_ACTION_VNUM(ch, 1) = dist;	// may be -1 for continuous
+		
+		if (same_dir) {
+			msg_to_char(ch, "You will now stop after %d tiles.\r\n", dist);
+		}
+		else {
+			msg_to_char(ch, "You %s %s.\r\n", (was_sailing ? "turn the ship" : "start sailing"), dirs[get_direction_for_char(ch, dir)]);
+		}
+		
+		// alert whole ship
+		if (!same_dir) {
+			HASH_ITER(interior_hh, interior_world_table, room, next_room) {
+				if (HOME_ROOM(room) != HOME_ROOM(IN_ROOM(ch))) {
+					continue;
+				}
+		
+				for (ch_iter = ROOM_PEOPLE(room); ch_iter; ch_iter = ch_iter->next_in_room) {
+					if (ch_iter != ch && ch_iter->desc) {
+						snprintf(buf, sizeof(buf), "The ship %s %s.", (was_sailing ? "turns to the" : "begins to sail"), dirs[get_direction_for_char(ch_iter, dir)]);
+						act(buf, FALSE, ch_iter, NULL, NULL, TO_CHAR);
+					}
+				}
+			}
 		}
 	}
-			
-	obj_to_room(ship, to_room);
-	check_for_ships_present(was_in);	// update old room
-	check_for_ships_present(to_room);	// update new room
-	
-	for (vict = ROOM_PEOPLE(IN_ROOM(ship)); vict; vict = vict->next_in_room) {
-		if (vict->desc) {
-			sprintf(buf, "$p sails in from %s.", from_dir[get_direction_for_char(vict, dir)]);
-			act(buf, TRUE, vict, ship, 0, TO_CHAR | TO_SPAMMY);
-		}
-	}
-	
-	// looking at the room you're in while on a ship shows the surrounding area
-	look_at_room_by_loc(ch, IN_ROOM(ch), NOBITS);
-	command_lag(ch, WAIT_OTHER);
 }
 
 
 ACMD(do_unload_boat) {
 	obj_data *ship;
 	room_data *room, *next_room, *ship_room;
-	int val;
+	int val = 0;
 	bool more = FALSE;
 
 	one_argument(argument, arg);
@@ -807,6 +940,9 @@ ACMD(do_unload_boat) {
 		}
 		if (more) {
 			msg_to_char(ch, "You can't unload anything else, the docks are full!\r\n");
+		}
+		else if (val == 0) {
+			msg_to_char(ch, "There was nothing to unload from that ship.\r\n");
 		}
 	}
 }

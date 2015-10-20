@@ -67,19 +67,6 @@ The Artisans ability unlocks additional buildings.
 
 See also: BUILD
 #
-AUTO-BALANCE "AUTO BALANCE" AUTOBALANCE
-
-Auto-balance is a workforce option that requires Skill Labor. A citizen will
-come to work at each of your docks as a dockworker to move your goods from
-other islands where you also have docks.
-
-Dockworkers unload up to 400 items at a time, twice per day. They will continue
-to work until your resources are as evenly balanced as possible.
-
-You must have docks on any island that participates in this exchange.
-
-See also: DOCKS, EINVENTORY, SEAFARING, SKILLED LABOR, WORKFORCE
-#
 BANNER
 
 The empire banner can be changed with the eedit command.
@@ -87,7 +74,7 @@ The empire banner can be changed with the eedit command.
 It's a good idea to choose a distinct color so that people can see your empire
 on the political map.
 
-See also: ANSI, COLOR, EMPIRE, POLITICAL, EEDIT
+See also: COLOR, EMPIRE, POLITICAL, EEDIT
 #
 BARDE BARDING "ARMORED HORSE"
 
@@ -177,6 +164,10 @@ still claim the territory within the borders if you want it to be part of your
 empire. Other empires can also claim land inside your city boundary, if you
 don't claim it yourself.
 
+There is a 60-minute waiting period between when you found a city, and when it
+counts as a city for things like City Teleportation, certain buildings such as
+the Great Hall, for guard towers, and for some other game rules.
+
 You can get additional city points from accruing at least 4000 wealth, for
 achieving Prominence, and for having at least 10 technologies.
 
@@ -200,8 +191,9 @@ your city.
 - &ccity downgrade <name>&0: This downgrades the given city by 1 level, or
     removes its city status entirely if it was at the minimum.
 
-- &ccity claim <name>&0: This claims all unclaimed structures within the borders
-    of the city, up to your maximum territory. 
+- &ccity claim <name> [all]&0: This claims all unclaimed structures within
+    the borders of the city, up to your maximum territory -- or, all tiles with
+    the 'all' option.
 
 - &ccity abandon <name>&0: This abolishes the city, refunds your city points, and
     un-claims all territory within the city border.
@@ -252,7 +244,7 @@ Commerce also allows you to build the mint building, and mint your own coins:
 
 [MM] mint  12 lumber, 4 nails, 12 blocks, 4 coin mills
 
-See also: BUILD, MINT, WEALTH
+See also: BUILD, MINT, TERRITORY, WEALTH
 #
 CUSTOMIZE "CUSTOMIZE BUILDING"
 
@@ -268,6 +260,8 @@ from your empire.
 When editing a custom description, you can use /fi to add linebreaks and indent
 the first line. Generally descriptions look best in the 3-9 line range. You can
 use /h to get more information on editor commands, and /s to save and exit.
+
+See also: STRING EDITOR
 #
 DEDICATE
 
@@ -275,6 +269,8 @@ Usage:  dedicate <person>
 
 Some monuments can be dedicated to a particularly powerful person or god. Once
 dedicated, they can never be re-dedicated, so choose carefully.
+
+To find buildings that can be dedicated, try 'helpsearch dedicate'.
 #
 "DEEP MINES"
 
@@ -367,6 +363,14 @@ Dragonriding allows you to ride flying mounts, if you have the Ride ability.
 
 See also: RIDE
 #
+DISMANTLE-MINES "DISMANTLE MINES"
+
+The dismantle-mines workforce chore will cause mines to be dismantled auto-
+matically when they are empty. You can prevent this on individual mines using
+the nodismantle command.
+
+See also: NODISMANTLE, WORKFORCE
+#
 EEDIT "EMPIRE EDITOR" "EDIT EMPIRE"
 
 Usage:  eedit <option> <argument>
@@ -444,8 +448,7 @@ Usage:  empireinventory [item | all]
        
 The einventory command shows the contents of all storage buildings and rooms
 for the island you're currently on. It won't work out in the ocean. You can
-use the auto-balance workforce chore to automatically move resources between
-multiple islands.
+use the ship command to move resources between multiple islands.
 
 You can specify an item name to see only matching items. If you specify a name,
 it'll show them whether or not the item is stored on your current island. If
@@ -458,7 +461,7 @@ You can use "warehouse inventory" to see items in warehouse (unique) storage.
 their own empire. If the empire name has more than one word, you can use
 quotation marks.
 
-See also: AUTO-BALANCE, WORKFORCE
+See also: SHIPPING, WORKFORCE
 #
 "EMPIRE SCORE" ESCORE
 
@@ -491,7 +494,7 @@ See also: CITY, EXPEL, PROMOTE, PRIVILEGE, PLEDGE
 ESAY ETALK EHISTORY EMPIREHISTORY
 
 Usage:  etalk <text>
-        etalk #level <text>
+        etalk #<rank> <text>
         ehistory
 
 Allows you to talk to your empire on a private channel, even from the other
@@ -501,9 +504,17 @@ activities you might be participating in.
 The ehistory command shows you the last 20 messages you received on the empire
 channel.
 
+You can start your message with a # followed by an empire rank to send the
+message to only members of that rank or higher. If multiple ranks have similar
+names, the lowest will be used. Spaces must be replaced with underscores, and
+you can abbreviate - for example, #high_l will send to "High Lords".
+
+You can start chats with * (asterisk) to make them channel-emotes.
+
 Examples:
  > etalk Hi guys!
  > etalk #high_lord Hi, High Lords!
+ > etalk #lord *bows before the other lords.
 #
 EXCAVATE EXCAVATION TRENCH MOAT FILLIN
 
@@ -671,6 +682,7 @@ Inspire (Empire ability)
 
 Usage:  inspire <target | all> <type>
 Cost:  30 move points per person or 60 for 'all'
+Duration:  30 minutes (in same empire) or 5 minutes (if not)
 
 A powerful leader can inspire his friends and allies with a rousing speech.
 It will only be half as effective when used on himself. The 'all' option
@@ -688,6 +700,16 @@ Here are the ways you can inspire:
   Sorcery: intelligence and bonus magical damage
   Stamina: max moves and move regeneration
   Toughness: max health
+#
+ISLANDS
+
+Usage:  islands
+
+This command lists the islands your empire has territory or einventory on
+(including warehouse storage). You must have the Navigation ability. The
+coordinates for each island are the approximate center of the island.
+
+Note: Immortals with the 'empires' grant can list the islands of any empire.
 #
 LOCKSMITHING
 
@@ -753,7 +775,10 @@ start to automatically reduce itself. If the empire times out completely, it
 may lose all its territory. Finally, if no members log on for a very long time,
 the empire itself may crumble to dust.
 
-See also: ENROLL, PLEDGE, ROSTER
+Note: Players with extremely low average playtime may never count as active
+empire members.
+
+See also: ENROLL, PLEDGE, ROSTER, TERRITORY
 #
 MONUMENTS "MONUMENT BUILDINGS"
 
@@ -817,6 +842,10 @@ members must be at least the privilege's rank (or higher). For example, if
 Most privileges only apply to claimed land. All members can chop on unclaimed
 land, regardless of privilege.
 
+Members of allied empires can only use privileges available at rank 1 to your
+empire's members while on your territory, no matter what rank they have in
+their own empires.
+
 Privileges:
   claim: can claim new lands for the empire
   build: can build on claimed land
@@ -825,7 +854,7 @@ Privileges:
   chop: can chop trees on claimed land
   cede: can abandon/cede empire lands
   enroll: can add new members
-  withdraw: can take gold from the vault
+  withdraw: can take gold and items from the vault
   diplomacy: can set up diplomatic relations with other empires
   customize: can customize claimed buildings
   workforce: can turn workforce chores on and off
@@ -833,6 +862,10 @@ Privileges:
   cities: can found and abandon cities
   trade: can set up import and export rules
   logs: can view elogs
+  shipping: can use the ship command to move goods
+  homes: can set a home
+  storage: can retrieve from storage buildings
+  warehouse: can retrieve unique items from the warehouse
 
 See also: CLAIM, BUILD, HARVEST, PROMOTE, DEMOTE, CHOP, CEDE, EEDIT, ELOG
 #
@@ -895,8 +928,7 @@ You can gain Empire skill up to 15 by quarrying stone. This does not require
 an ability. If you have the "dig" workforce enabled, your citizens will only
 dig if you have a quarry.
 
-Quarries always count as in-city territory for your empire, no matter where
-you build them.
+Quarries count as in-city territory as far away as 3x a city's normal radius.
 
 See also: DEPLETION, DIG
 #
@@ -909,6 +941,8 @@ Usage:  radiance
 Particularly renowned leaders have a radiant aura about them that can be seen
 by all. Activate Radiance to gain +2 Greatness. Radiance remains active until
 you shut it off or die.
+
+See also: GREATNESS
 #
 "RAISE ARMIES" "RAISE ARMIES BUILDINGS"
 
@@ -978,7 +1012,10 @@ ROSTER
 Usage:  roster
 
 This command shows you the members of your empire and lets you know who's on-
-line and who's been gone a while.
+line and who's been gone a while. The color of the player's class name (if not
+white) indicates their role, if any: &aCaster&0, &jHealer&0, &yTank&0 or &rMelee&0.
+
+See also: CLASS, WHO
 #
 SEAFARING "SEAFARING BUILDINGS"
 
@@ -1015,6 +1052,7 @@ Summon Bodyguard (Empire ability)
 
 Usage:  summon bodyguard
 Cooldown:  5 minutes
+Cost:  25 move
 
 This powerful ability allows an emperor to summon a bodyguard. The bodyguard
 is strong enough to protect against many dangerous situations. He will take
@@ -1023,7 +1061,7 @@ simple orders and will rescue you in battle.
 The bodyguard counts as a familiar, and can be removed with the "dismiss"
 command.
 
-See also: DISMISS
+See also: DISMISS, ORDER
 #
 "SUMMON GUARDS"
 
@@ -1031,6 +1069,7 @@ Summon Guards (Empire ability)
 
 Usage:  summon guards
 Cooldown:  3 minutes
+Cost:  25 move
 
 This ability summons up to (Charisma / 2, rounded down) guards. They aren't
 very strong, but they count as city guards and will attack intruders and
@@ -1074,7 +1113,7 @@ Roads also do not count as outside.
 When an empire's members start to time out from lack of gameplay, the empire
 may start losing territory.
 
-See also: CITIES, EMPIRE TIMEOUT, TERRITORY COMMAND
+See also: CITIES, COMMERCE, EMPIRE TIMEOUT, TERRITORY COMMAND
 #
 "TERRITORY COMMAND"
 
@@ -1280,19 +1319,22 @@ Workforce types:
   &yquarrying:&0 NPCs will quarry huge stone blocks at the quarry.
   &ynailmaking:&0 NPCs will forge pouches of nails at the forge.
   &ybrickmaking:&0 NPCs will make bricks at the potter.
-  &yauto-abandon:&0 NPCS will abandon a tile when they finish chopping, dis-
-      mantling, or farming (without replanting).
+  &yabandon-dismantled:&0 NPCS will abandon a tile when they finish dismantling.
   &cherb gardening (skilled):&0 NPCS will gather herbs in gardens.
   &yfire brigade:&0 NPCs will put out fires.
   &ctrapping (skilled):&0 NPCs will gather skins at trapper's posts.
   &ytanning:&0 NPCs will tan skins into leather.
   &yshearing:&0 NPCs will shear animals in stables.
   &cminting (skilled):&0 NPCs will mint treasure into coins.
-  &cauto-balance (skilled):&0 einventory will be balanced between islands
-      which have docks.
+  &ydismantle-mines:&0 mines will be dismantled when empty.
+  &yabandon-chopped:&0 NPCs will abandon a tile when they finish chopping.
+  &yabandon-farmed:&0 NPCs will abandon a tile when they finish farming.
+  &cnexus-crystal (skilled):&0 Will make nexus crystals at the sorcery tower;
+     requires both Exarch Crafts and Skilled Labor.
+  &ymilling:&0 Will mill grains into flour.
   
 Items marked (skilled) require the Skilled Labor ability.
 
-See also: AUTO-BALANCE
+See also: EXARCH CRAFTS
 #
 $

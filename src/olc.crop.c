@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: olc.crop.c                                      EmpireMUD 2.0b2 *
+*   File: olc.crop.c                                      EmpireMUD 2.0b3 *
 *  Usage: OLC for crop prototypes                                         *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -71,6 +71,27 @@ crop_data* create_crop_table_entry(crop_vnum vnum) {
 	save_library_file_for_vnum(DB_BOOT_CROP, vnum);
 
 	return crop;
+}
+
+
+/**
+* For the .list command.
+*
+* @param crop_data *crop The thing to list.
+* @param bool detail If TRUE, provide additional details
+* @return char* The line to show (without a CRLF).
+*/
+char *list_one_crop(crop_data *crop, bool detail) {
+	static char output[MAX_STRING_LENGTH];
+	
+	if (detail) {
+		snprintf(output, sizeof(output), "[%5d] %s", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
+	}
+	else {
+		snprintf(output, sizeof(output), "[%5d] %s", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
+	}
+	
+	return output;
 }
 
 

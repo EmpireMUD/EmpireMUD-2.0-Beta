@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: dg_objcmd.c                                     EmpireMUD 2.0b2 *
+*   File: dg_objcmd.c                                     EmpireMUD 2.0b3 *
 *  Usage: contains the command_interpreter for objects, object commands.  *
 *                                                                         *
 *  DG Scripts code by galion, 1996/08/04 23:10:16, revision 3.8           *
@@ -23,6 +23,7 @@
 #include "handler.h"
 #include "db.h"
 #include "skills.h"
+#include "vnums.h"
 
 // external vars
 extern const char *damage_types[];
@@ -32,7 +33,7 @@ extern int dg_owner_purged;
 // external functions
 void obj_command_interpreter(obj_data *obj, char *argument);
 void send_char_pos(char_data *ch, int dam);
-extern struct instance_data *find_instance_by_room(room_data *room);
+extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 char_data *get_char_by_obj(obj_data *obj, char *name);
 obj_data *get_obj_by_obj(obj_data *obj, char *name);
 room_data *get_room(room_data *ref, char *name);
@@ -261,12 +262,44 @@ OCMD(do_oregionecho) {
 				}
 				
 				if (!indoor_only || IS_OUTDOORS(targ)) {
-					msg_to_desc(desc, "%s\r\n", msg);
+					msg_to_desc(desc, "%s\r\n", CAP(msg));
 				}
 			}
 		}
 	}
 }
+
+
+// prints the message to everyone except two targets
+OCMD(do_oechoneither) {
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+	char_data *vict1, *vict2, *iter;
+	char *p;
+
+	p = two_arguments(argument, arg1, arg2);
+	skip_spaces(&p);
+
+	if (!*arg1 || !*arg2 || !*p) {
+		obj_log(obj, "oechoneither called with missing arguments");
+		return;
+	}
+	
+	if (!(vict1 = get_char_by_obj(obj, arg1))) {
+		obj_log(obj, "oechoneither: vict 1 (%s) does not exist", arg1);
+		return;
+	}
+	if (!(vict2 = get_char_by_obj(obj, arg2))) {
+		obj_log(obj, "oechoneither: vict 2 (%s) does not exist", arg2);
+		return;
+	}
+	
+	for (iter = ROOM_PEOPLE(IN_ROOM(vict1)); iter; iter = iter->next_in_room) {
+		if (iter->desc && iter != vict1 && iter != vict2) {
+			sub_write(p, iter, TRUE, TO_CHAR);
+		}
+	}
+}
+
 
 OCMD(do_osend) {
 	char buf[MAX_INPUT_LENGTH], *msg;
@@ -332,7 +365,7 @@ OCMD(do_otransform) {
 	else if (!isdigit(*arg)) 
 		obj_log(obj, "otransform: bad argument");
 	else {
-		o = read_object(atoi(arg));
+		o = read_object(atoi(arg), TRUE);
 		if (o == NULL) {
 			obj_log(obj, "otransform: bad object vnum");
 			return;
@@ -465,7 +498,7 @@ OCMD(do_oteleport) {
 	}
 	else if (!str_cmp(arg1, "adventure")) {
 		// teleport all players in the adventure
-		if (!orm || !(inst = find_instance_by_room(orm))) {
+		if (!orm || !(inst = find_instance_by_room(orm, FALSE))) {
 			obj_log(obj, "oteleport: 'adventure' mode called outside any adventure");
 			return;
 		}
@@ -511,6 +544,109 @@ OCMD(do_oteleport) {
 }
 
 
+OCMD(do_oterracrop) {
+	void do_dg_terracrop(room_data *target, crop_data *crop);
+
+	char loc_arg[MAX_INPUT_LENGTH], crop_arg[MAX_INPUT_LENGTH];
+	crop_data *crop;
+	room_data *orm = obj_room(obj), *target;
+	crop_vnum vnum;
+
+	argument = any_one_word(argument, loc_arg);
+	any_one_word(argument, crop_arg);
+	
+	// usage: %terracrop% [location] <crop vnum>
+	if (!*loc_arg) {
+		obj_log(obj, "oterracrop: bad syntax");
+		return;
+	}
+	
+	// check number of args
+	if (!*crop_arg) {
+		// only arg is actually crop arg
+		strcpy(crop_arg, loc_arg);
+		target = orm;
+	}
+	else {
+		// two arguments
+		target = get_room(orm, loc_arg);
+	}
+	
+	if (!target) {
+		obj_log(obj, "oterracrop: target is an invalid room");
+		return;
+	}
+	
+	// places you just can't terracrop -- fail silently (currently)
+	if (IS_INSIDE(target) || IS_ADVENTURE_ROOM(target) || IS_CITY_CENTER(target)) {
+		return;
+	}
+	
+	if (!isdigit(*crop_arg) || (vnum = atoi(crop_arg)) < 0 || !(crop = crop_proto(vnum))) {
+		obj_log(obj, "oterracrop: invalid crop vnum");
+		return;
+	}
+	
+
+	// good to go
+	do_dg_terracrop(target, crop);
+}
+
+
+OCMD(do_oterraform) {
+	void do_dg_terraform(room_data *target, sector_data *sect);
+
+	char loc_arg[MAX_INPUT_LENGTH], sect_arg[MAX_INPUT_LENGTH];
+	sector_data *sect;
+	room_data *orm = obj_room(obj), *target;
+	sector_vnum vnum;
+
+	argument = any_one_word(argument, loc_arg);
+	any_one_word(argument, sect_arg);
+	
+	// usage: %terraform% [location] <sector vnum>
+	if (!*loc_arg) {
+		obj_log(obj, "oterraform: bad syntax");
+		return;
+	}
+	
+	// check number of args
+	if (!*sect_arg) {
+		// only arg is actually sect arg
+		strcpy(sect_arg, loc_arg);
+		target = orm;
+	}
+	else {
+		// two arguments
+		target = get_room(orm, loc_arg);
+	}
+	
+	if (!target) {
+		obj_log(obj, "oterraform: target is an invalid room");
+		return;
+	}
+	
+	// places you just can't terraform -- fail silently (currently)
+	if (IS_INSIDE(target) || IS_ADVENTURE_ROOM(target) || IS_CITY_CENTER(target)) {
+		return;
+	}
+	
+	if (!isdigit(*sect_arg) || (vnum = atoi(sect_arg)) < 0 || !(sect = sector_proto(vnum))) {
+		obj_log(obj, "oterraform: invalid sector vnum");
+		return;
+	}
+	
+	// validate sect
+	if (SECT_FLAGGED(sect, SECTF_MAP_BUILDING | SECTF_INSIDE | SECTF_ADVENTURE)) {
+		obj_log(obj, "oterraform: sector requires data that can't be set this way");
+		return;
+	}
+
+	// good to go
+	do_dg_terraform(target, sect);
+}
+
+
 OCMD(do_dgoload) {
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	
@@ -537,11 +673,11 @@ OCMD(do_dgoload) {
 	}
 	
 	if (obj_room(obj)) {
-		inst = find_instance_by_room(obj_room(obj));
+		inst = find_instance_by_room(obj_room(obj), FALSE);
 	}
 
 	if (is_abbrev(arg1, "mob")) {
-		if ((mob = read_mobile(number)) == NULL) {
+		if ((mob = read_mobile(number, TRUE)) == NULL) {
 			obj_log(obj, "oload: bad mob vnum");
 			return;
 		}
@@ -559,7 +695,7 @@ OCMD(do_dgoload) {
 		load_mtrigger(mob);
 	}
 	else if (is_abbrev(arg1, "obj")) {
-		if ((object = read_object(number)) == NULL) {
+		if ((object = read_object(number, TRUE)) == NULL) {
 			obj_log(obj, "oload: bad object vnum");
 			return;
 		}
@@ -573,9 +709,7 @@ OCMD(do_dgoload) {
 			obj_to_room(object, room);
 		
 			// must scale now if possible
-			if (OBJ_FLAGGED(object, OBJ_SCALABLE)) {
-				scale_item_to_level(object, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
-			}
+			scale_item_to_level(object, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 
 			load_otrigger(object);
 			return;
@@ -584,14 +718,12 @@ OCMD(do_dgoload) {
 		skip_spaces(&target);
 		
 		// if there is still a target, we scale on that number, otherwise default scale
-		if (OBJ_FLAGGED(object, OBJ_SCALABLE)) {
-			if (*target && isdigit(*target)) {
-				scale_item_to_level(object, atoi(target));
-			}
-			else {
-				// default
-				scale_item_to_level(object, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
-			}
+		if (*target && isdigit(*target)) {
+			scale_item_to_level(object, atoi(target));
+		}
+		else {
+			// default
+			scale_item_to_level(object, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 		}
 		
 		tch = get_char_near_obj(obj, arg1);
@@ -599,6 +731,7 @@ OCMD(do_dgoload) {
 			if (*arg2 && (pos = find_eq_pos_script(arg2)) >= 0 && !GET_EQ(tch, pos) && can_wear_on_pos(object, pos)) {
 				equip_char(tch, object, pos);
 				load_otrigger(object);
+				determine_gear_level(tch);
 				return;
 			}
 			obj_to_char(object, tch);
@@ -704,15 +837,16 @@ OCMD(do_oaoe) {
 
 
 OCMD(do_odot) {
-	char name[MAX_INPUT_LENGTH], modarg[MAX_INPUT_LENGTH], durarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH];
+	char name[MAX_INPUT_LENGTH], modarg[MAX_INPUT_LENGTH], durarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH], stackarg[MAX_INPUT_LENGTH];
 	double modifier = 1.0;
 	char_data *ch;
-	int type;
+	int type, max_stacks;
 
 	argument = one_argument(argument, name);
 	argument = one_argument(argument, modarg);
 	argument = one_argument(argument, durarg);
-	argument = one_argument(argument, typearg);	// optional
+	argument = one_argument(argument, typearg);	// optional, default: physical
+	argument = one_argument(argument, stackarg);	// optional, default: 1
 
 	/* who cares if it's a number ? if not it'll just be 0 */
 	if (!*name || !*modarg || !*durarg) {
@@ -742,7 +876,8 @@ OCMD(do_odot) {
 		type = DAM_PHYSICAL;
 	}
 	
-	script_damage_over_time(ch, get_obj_scale_level(obj, ch), modifier, type, atoi(durarg));
+	max_stacks = (*stackarg ? atoi(stackarg) : 1);
+	script_damage_over_time(ch, get_obj_scale_level(obj, ch), type, modifier, atoi(durarg), max_stacks, NULL);
 }
 
 
@@ -883,7 +1018,7 @@ OCMD(do_oat)  {
 		return;
 	}
 
-	object = read_object(GET_OBJ_VNUM(obj));
+	object = read_object(GET_OBJ_VNUM(obj), TRUE);
 	if (!object)
 		return;
 
@@ -932,7 +1067,7 @@ OCMD(do_oscale) {
 				scale_item_to_level(otarg, level);
 			}
 			else if ((proto = obj_proto(GET_OBJ_VNUM(otarg))) && OBJ_FLAGGED(proto, OBJ_SCALABLE)) {
-				fresh = read_object(GET_OBJ_VNUM(otarg));
+				fresh = read_object(GET_OBJ_VNUM(otarg), TRUE);
 				scale_item_to_level(fresh, level);
 				swap_obj_for_obj(otarg, fresh);
 				if (otarg == obj) {
@@ -941,7 +1076,8 @@ OCMD(do_oscale) {
 				extract_obj(otarg);
 			}
 			else {
-				obj_log(obj, "oscale: target is not scalable");
+				// attempt to scale anyway
+				scale_item_to_level(otarg, level);
 			}
 		}
 		else {
@@ -971,6 +1107,7 @@ const struct obj_command_info obj_cmd_info[] = {
 	{ "odot", do_odot,   NO_SCMD },
 	{ "oecho", do_oecho, NO_SCMD },
 	{ "oechoaround", do_osend, SCMD_OECHOAROUND },
+	{ "oechoneither", do_oechoneither, NO_SCMD },
 	{ "oforce", do_oforce, NO_SCMD },
 	{ "oload", do_dgoload, NO_SCMD },
 	{ "opurge", do_opurge, NO_SCMD },
@@ -978,6 +1115,8 @@ const struct obj_command_info obj_cmd_info[] = {
 	{ "osend", do_osend, SCMD_OSEND },
 	{ "osetval", do_osetval, NO_SCMD },
 	{ "oteleport", do_oteleport, NO_SCMD },
+	{ "oterracrop", do_oterracrop, NO_SCMD },
+	{ "oterraform", do_oterraform, NO_SCMD },
 	{ "otimer", do_otimer, NO_SCMD },
 	{ "otransform", do_otransform, NO_SCMD },
 	{ "obuildingecho", do_obuildingecho, NO_SCMD }, /* fix by Rumble */

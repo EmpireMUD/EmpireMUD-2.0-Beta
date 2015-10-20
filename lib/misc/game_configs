@@ -2,7 +2,20 @@
 * See init_config_system() in config.c for adding new configs
 *
 * Game configs
+allow_extended_color_codes 0
+hiring_builders 0
+hiring_coders 0
 huh_string Huh?!?
+mud_contact 
+mud_created 2015
+mud_hostname 
+mud_icon 
+mud_ip 
+mud_location 
+mud_minimum_age 
+mud_name EmpireMUD
+mud_status Live
+mud_website
 no_person No-one by that name here.
 ok_string Okay.
 public_logins 0
@@ -43,14 +56,17 @@ trench_initial_value -500
 * City configs
 bonus_city_point_techs 10
 bonus_city_point_wealth 4000
+cities_on_newbie_islands 0
 city_trait_radius 100
 disrepair_limit 10
 disrepair_limit_unfinished 2
 disrepair_major 6
 disrepair_minor 2
+max_out_of_city_portal 50
 min_distance_between_ally_cities 10
 min_distance_between_cities 30
 min_distance_from_city_to_starting_location 25
+minutes_to_full_city 60
 players_per_city_point 2
 *
 * Empire configs
@@ -66,6 +82,7 @@ member_timeout_newbie 7
 minutes_per_day_full 150
 minutes_per_day_newbie 15
 newbie_island_day_limit 7
+redesignate_time 60
 time_to_empire_delete 104
 time_to_empire_emptiness 2
 whole_empire_timeout 30
@@ -102,11 +119,13 @@ blood_starvation_level 20
 default_map_size 7
 idle_linkdead_rent_time 5
 idle_rent_time 20
-max_map_size 11
+max_capitals_in_name 2
+max_map_size 12
 max_player_attribute 15
 num_bonus_trait_daily_skills 5
 num_daily_skill_points 15
 obj_file_timeout 365
+offer_time 75
 pool_bonus_amount 15
 remove_lore_after_years 2
 *
@@ -131,7 +150,6 @@ siteok_everyone 0
 use_autowiz 1
 *
 * Trade configs
-auto_balance_per_cycle 400
 imports_per_day 100
 trading_post_days_to_timeout 60
 trading_post_fee 0.050000
@@ -163,6 +181,7 @@ interlink_distance 4
 interlink_mountain_limit 1
 interlink_river_limit 0
 nearby_sector_distance 2
+newbie_adventure_cap 25
 ocean_pool_size 1000
 tropics_percent 35.000000
 water_crop_distance 4

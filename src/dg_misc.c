@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: dg_misc.c                                       EmpireMUD 2.0b2 *
+*   File: dg_misc.c                                       EmpireMUD 2.0b3 *
 *  Usage: contains general functions for script usage.                    *
 *                                                                         *
 *  DG Scripts code had no header or author info in this file              *
@@ -125,7 +125,7 @@ void do_dg_cast(void *go, struct script_data *sc, trig_data *trig, int type, cha
 	}
 
 	if (!caster) {
-		caster = read_mobile(DG_CASTER_PROXY);
+		caster = read_mobile(DG_CASTER_PROXY, TRUE);
 		if (!caster) {
 			script_log("dg_cast: Cannot load the caster mob!");
 			return;
@@ -235,6 +235,77 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 }
 
 
+/**
+* Do the actual work for the %terracrop% commands, once everything has been
+* validated.
+*
+* @param room_data *target The room to change.
+* @param crop_data *cp The crop to change it to.
+*/
+void do_dg_terracrop(room_data *target, crop_data *cp) {
+	sector_data *sect;
+	empire_data *emp;
+	
+	if (!target || !cp) {
+		return;
+	}
+	
+	emp = ROOM_OWNER(target);
+	
+	if (!(sect = find_first_matching_sector(SECTF_CROP, NOBITS))) {
+		// no crop sects?
+		return;
+	}
+	else {
+		change_terrain(target, GET_SECT_VNUM(sect));
+		set_room_extra_data(target, ROOM_EXTRA_CROP_TYPE, GET_CROP_VNUM(cp));
+	}
+	
+	// clear these if set
+	REMOVE_BIT(ROOM_AFF_FLAGS(target), ROOM_AFF_PLAYER_MADE);
+	REMOVE_BIT(ROOM_BASE_FLAGS(target), ROOM_AFF_PLAYER_MADE);
+
+	if (emp) {
+		read_empire_territory(emp);
+	}
+}
+
+
+/**
+* Do the actual work for the %terraform% commands, once everything has been
+* validated.
+*
+* @param room_data *target The room to change.
+* @param sector_data *sect The sector to change it to.
+*/
+void do_dg_terraform(room_data *target, sector_data *sect) {
+	sector_data *old_sect;
+	empire_data *emp;
+	
+	if (!target || !sect) {
+		return;
+	}
+	
+	old_sect = ROOM_ORIGINAL_SECT(target);
+	emp = ROOM_OWNER(target);
+	
+	change_terrain(target, GET_SECT_VNUM(sect));
+
+	// clear these if set
+	REMOVE_BIT(ROOM_AFF_FLAGS(target), ROOM_AFF_PLAYER_MADE);
+	REMOVE_BIT(ROOM_BASE_FLAGS(target), ROOM_AFF_PLAYER_MADE);
+			
+	// preserve old original sect for roads -- TODO this is a special-case
+	if (IS_ROAD(target)) {
+		ROOM_ORIGINAL_SECT(target) = old_sect;
+	}
+
+	if (emp) {
+		read_empire_territory(emp);
+	}
+}
+
+
 void send_char_pos(char_data *ch, int dam) {
 	switch (GET_POS(ch)) {
 		case POS_MORTALLYW:
@@ -302,6 +373,11 @@ void script_damage(char_data *vict, char_data *killer, int level, int dam_type, 
 	
 	double dam;
 	
+	// no point damaging the dead
+	if (IS_DEAD(vict)) {
+		return;
+	}
+	
 	if (IS_IMMORTAL(vict) && (modifier > 0)) {
 		msg_to_char(vict, "Being the cool immortal you are, you sidestep a trap, obviously placed to kill you.\r\n");
 		return;
@@ -345,8 +421,10 @@ void script_damage(char_data *vict, char_data *killer, int level, int dam_type, 
 * @param int dam_type A DAM_x type.
 * @param double modifier An amount to modify the damage by (1.0 = full damage).
 * @param int dur_seconds The requested duration, in seconds.
+* @param int max_stacks Number of times this DoT can stack (minimum/default 1).
+* @param char_data *cast_by The caster, if any, for tracking on the effect (may be NULL).
 */
-void script_damage_over_time(char_data *vict, int level, int dam_type, double modifier, int dur_seconds) {
+void script_damage_over_time(char_data *vict, int level, int dam_type, double modifier, int dur_seconds, int max_stacks, char_data *cast_by) {
 	double dam;
 	
 	if (modifier <= 0 || dur_seconds <= 0) {
@@ -367,6 +445,5 @@ void script_damage_over_time(char_data *vict, int level, int dam_type, double mo
 	}
 
 	// add the affect
-	// TODO support max-stacks
-	apply_dot_effect(vict, ATYPE_DG_AFFECT, ceil((double)dur_seconds / SECS_PER_REAL_UPDATE), dam_type, (int) dam, 1);
+	apply_dot_effect(vict, ATYPE_DG_AFFECT, ceil((double)dur_seconds / SECS_PER_REAL_UPDATE), dam_type, (int) dam, MAX(1, max_stacks), cast_by);
 }

@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: dg_scripts.h                                    EmpireMUD 2.0b2 *
+*   File: dg_scripts.h                                    EmpireMUD 2.0b3 *
 *  Usage: header file for script structures and contstants, and           *
 *         function prototypes for dg_scripts.c                            *
 *                                                                         *
@@ -20,6 +20,7 @@
 #define OBJ_TRIGGER  1
 #define WLD_TRIGGER  2
 #define RMT_TRIGGER  3
+#define ADV_TRIGGER  4
 
 /* unless you change this, Puff casts all your dg spells */
 #define DG_CASTER_PROXY 1
@@ -51,7 +52,8 @@
 #define MTRIG_ABILITY          BIT(15)     /* mob targetted by ability     */
 #define MTRIG_LEAVE            BIT(16)     /* someone leaves room seen   */
 #define MTRIG_DOOR             BIT(17)     /* door manipulated in room   */
-#define MTRIG_LEAVE_ALL        BIT(18)		// leave even if they can't see
+#define MTRIG_LEAVE_ALL        BIT(18)	// leave even if they can't see
+#define MTRIG_FIGHT_CHARMED    BIT(19)	// fight trigger that fires even while charmed
 
 /* obj trigger types */
 #define OTRIG_GLOBAL           BIT(0)	     /* unused                     */
@@ -77,7 +79,7 @@
 #define WTRIG_RANDOM           BIT(1)	     /* checked randomly           */
 #define WTRIG_COMMAND          BIT(2)	     /* character types a command  */
 #define WTRIG_SPEECH           BIT(3)      /* a char says word/phrase    */
-
+#define WTRIG_ADVENTURE_CLEANUP  BIT(4)	// called on a map tile or room after an adventure cleans up
 #define WTRIG_RESET            BIT(5)      /* zone has been reset        */
 #define WTRIG_ENTER            BIT(6)	     /* character enters room      */
 #define WTRIG_DROP             BIT(7)      /* something dropped in room  */
@@ -101,6 +103,11 @@
 
 
 #define MAX_SCRIPT_DEPTH      10          /* maximum depth triggers can recurse into each other */
+
+
+// used for command triggers
+#define CMDTRG_EXACT  0
+#define CMDTRG_ABBREV  1
 
 
 /* one line of the trigger */
@@ -169,6 +176,7 @@ struct script_memory {
 
 
 /* function prototypes from triggers.c (and others) */
+void adventure_cleanup_wtrigger(room_data *room);
 void act_mtrigger(const char_data *ch, char *str, char_data *actor, char_data *victim, obj_data *object, obj_data *target, char *arg);  
 void speech_mtrigger(char_data *actor, char *str);
 void speech_wtrigger(char_data *actor, char *str);
@@ -185,9 +193,10 @@ int give_otrigger(obj_data *obj, char_data *actor, char_data *victim);
 int receive_mtrigger(char_data *ch, char_data *actor, obj_data *obj);
 int wear_otrigger(obj_data *obj, char_data *actor, int where);
 int remove_otrigger(obj_data *obj, char_data *actor);
-int command_mtrigger(char_data *actor, char *cmd, char *argument);
-int command_otrigger(char_data *actor, char *cmd, char *argument);
-int command_wtrigger(char_data *actor, char *cmd, char *argument);
+int command_mtrigger(char_data *actor, char *cmd, char *argument, int mode);
+int command_otrigger(char_data *actor, char *cmd, char *argument, int mode);
+int command_wtrigger(char_data *actor, char *cmd, char *argument, int mode);
+bool check_command_trigger(char_data *actor, char *cmd, char *argument, int mode);
 int death_mtrigger(char_data *ch, char_data *actor);
 void fight_mtrigger(char_data *ch);
 void hitprcnt_mtrigger(char_data *ch);
@@ -252,7 +261,7 @@ room_data *dg_room_of_obj(obj_data *obj);
 void do_dg_cast(void *go, struct script_data *sc, trig_data *trig, int type, char *cmd);
 void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int type, char *cmd);
 void script_damage(char_data *vict, char_data *killer, int level, int dam_type, double modifier);
-void script_damage_over_time(char_data *vict, int level, int dam_type, double modifier, int dur_seconds);
+void script_damage_over_time(char_data *vict, int level, int dam_type, double modifier, int dur_seconds, int max_stacks, char_data *cast_by);
 
 void extract_value(struct script_data *sc, trig_data *trig, char *cmd);
 

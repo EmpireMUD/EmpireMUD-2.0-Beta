@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: statistics.c                                    EmpireMUD 2.0b2 *
+*   File: statistics.c                                    EmpireMUD 2.0b3 *
 *  Usage: code related game stats                                         *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -76,12 +76,12 @@ void display_statistics_to_char(char_data *ch) {
 	extern int top_of_p_table;
 	extern time_t boot_time;
 
+	char populous_str[MAX_STRING_LENGTH], wealthiest_str[MAX_STRING_LENGTH], famous_str[MAX_STRING_LENGTH], greatest_str[MAX_STRING_LENGTH];
+	int populous_empire = NOTHING, wealthiest_empire = NOTHING, famous_empire = NOTHING, greatest_empire = NOTHING;
 	char_data *vict;
 	obj_data *obj;
 	empire_data *emp, *next_emp;
 	int citizens, territory, members, military, count;
-	int populous_empire = NOTHING, wealthiest_empire = NOTHING, famous_empire = NOTHING, greatest_empire = NOTHING;
-	bool found;
 
 	char *tmstr;
 	time_t mytime;
@@ -106,61 +106,61 @@ void display_statistics_to_char(char_data *ch) {
 
 	/* Find best scores.. */
 	HASH_ITER(hh, empire_table, emp, next_emp) {
-		if (!EMPIRE_IMM_ONLY(emp)) {
-			if (EMPIRE_MEMBERS(emp) > populous_empire) {
-				populous_empire = EMPIRE_MEMBERS(emp);
-			}
-			if (GET_TOTAL_WEALTH(emp) > wealthiest_empire) {
-				wealthiest_empire = GET_TOTAL_WEALTH(emp);
-			}
-			if (EMPIRE_FAME(emp) > famous_empire) {
-				famous_empire = EMPIRE_FAME(emp);
-			}
-			if (EMPIRE_GREATNESS(emp) > greatest_empire) {
-				greatest_empire = EMPIRE_GREATNESS(emp);
-			}
+		if (EMPIRE_IMM_ONLY(emp) || EMPIRE_IS_TIMED_OUT(emp)) {
+			continue;
+		}
+		
+		if (EMPIRE_MEMBERS(emp) > populous_empire) {
+			populous_empire = EMPIRE_MEMBERS(emp);
+		}
+		if (GET_TOTAL_WEALTH(emp) > wealthiest_empire) {
+			wealthiest_empire = GET_TOTAL_WEALTH(emp);
+		}
+		if (EMPIRE_FAME(emp) > famous_empire) {
+			famous_empire = EMPIRE_FAME(emp);
+		}
+		if (EMPIRE_GREATNESS(emp) > greatest_empire) {
+			greatest_empire = EMPIRE_GREATNESS(emp);
 		}
 	}
-
-	if (greatest_empire != NOTHING) {
-		found = FALSE;
-		HASH_ITER(hh, empire_table, emp, next_emp) {
-			if (EMPIRE_GREATNESS(emp) >= greatest_empire && !EMPIRE_IMM_ONLY(emp)) {
-				msg_to_char(ch, "%s %s%s&0", found ? "," : "Greatest empire:", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
-				found = TRUE;
-			}
+	
+	// init strings
+	*populous_str = '\0';
+	*wealthiest_str = '\0';
+	*famous_str = '\0';
+	*greatest_str = '\0';
+	
+	// build strings
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		if (EMPIRE_IMM_ONLY(emp) || EMPIRE_IS_TIMED_OUT(emp)) {
+			continue;
 		}
-		msg_to_char(ch, "\r\n");
+		
+		if (populous_empire != NOTHING && EMPIRE_MEMBERS(emp) >= populous_empire) {
+			snprintf(populous_str + strlen(populous_str), sizeof(populous_str) - strlen(populous_str), "%s%s%s&0", (*populous_str ? ", " : ""), EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+		}
+		if (wealthiest_empire != NOTHING && GET_TOTAL_WEALTH(emp) >= wealthiest_empire) {
+			snprintf(wealthiest_str + strlen(wealthiest_str), sizeof(wealthiest_str) - strlen(wealthiest_str), "%s%s%s&0", (*wealthiest_str ? ", " : ""), EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+		}
+		if (famous_empire != NOTHING && EMPIRE_FAME(emp) >= famous_empire) {
+			snprintf(famous_str + strlen(famous_str), sizeof(famous_str) - strlen(famous_str), "%s%s%s&0", (*famous_str ? ", " : ""), EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+		}
+		if (greatest_empire != NOTHING && EMPIRE_GREATNESS(emp) >= greatest_empire) {
+			snprintf(greatest_str + strlen(greatest_str), sizeof(greatest_str) - strlen(greatest_str), "%s%s%s&0", (*greatest_str ? ", " : ""), EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+		}
 	}
-	if (populous_empire != NOTHING) {
-		found = FALSE;
-		HASH_ITER(hh, empire_table, emp, next_emp) {
-			if (EMPIRE_MEMBERS(emp) >= populous_empire && !EMPIRE_IMM_ONLY(emp)) {
-				msg_to_char(ch, "%s %s%s&0", found ? "," : "Most populous empire:", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
-				found = TRUE;
-			}
-		}
-		msg_to_char(ch, "\r\n");
+	
+	if (*greatest_str) {
+		msg_to_char(ch, "Greatest empire: %s\r\n", greatest_str);
 	}
-	if (wealthiest_empire != NOTHING) {
-		found = FALSE;
-		HASH_ITER(hh, empire_table, emp, next_emp) {
-			if (GET_TOTAL_WEALTH(emp) >= wealthiest_empire && !EMPIRE_IMM_ONLY(emp)) {
-				msg_to_char(ch, "%s %s%s&0", found ? "," : "Most wealthy empire:", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
-				found = TRUE;
-			}
-		}
-		msg_to_char(ch, "\r\n");
+	if (*populous_str) {
+		msg_to_char(ch, "Most populous empire: %s\r\n", populous_str);
 	}
-	if (famous_empire != NOTHING) {
-		found = FALSE;
-		HASH_ITER(hh, empire_table, emp, next_emp) {
-			if (EMPIRE_FAME(emp) >= famous_empire && !EMPIRE_IMM_ONLY(emp)) {
-				msg_to_char(ch, "%s %s%s&0", found ? "," : "Most famous empire:", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
-				found = TRUE;
-			}
-		}
-		msg_to_char(ch, "\r\n");
+	if (*wealthiest_str) {
+		msg_to_char(ch, "Most wealthy empire: %s\r\n", wealthiest_str);
+	}
+	if (*famous_str) {
+		msg_to_char(ch, "Most famous empire: %s\r\n", famous_str);
 	}
 
 	// empire stats

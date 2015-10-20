@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: objsave.c                                       EmpireMUD 2.0b2 *
+*   File: objsave.c                                       EmpireMUD 2.0b3 *
 *  Usage: loading/saving player objects for rent and crash-save           *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -25,6 +25,7 @@
 #include "db.h"
 #include "interpreter.h"
 #include "utils.h"
+#include "dg_scripts.h"
 
 /**
 * Contents:
@@ -101,7 +102,7 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 	
 	// load based on vnum or, if NOTHING, create anonymous object
 	if (proto) {
-		obj = read_object(vnum);
+		obj = read_object(vnum, FALSE);
 	}
 	else {
 		// what we do here depends on input ... if the vnum was real, but no proto, it's a deleted obj
@@ -280,6 +281,14 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 				OBJ_BOUND_TO(obj) = bind;
 			}
 		}
+		else if (OBJ_FILE_TAG(line, "Trigger:", length)) {
+			if (sscanf(line + length + 1, "%d", &i_in[0]) && real_trigger(i_in[0])) {
+				if (!SCRIPT(obj)) {
+					CREATE(SCRIPT(obj), struct script_data, 1);
+				}
+				add_trigger(SCRIPT(obj), read_trigger(i_in[0]), -1);
+			}
+		}
 		
 		// ignore anything else
 		else {
@@ -287,60 +296,14 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 		}
 	}
 	
+	// we were not guaranteed an object
 	if (obj) {
 		ensure_safe_obj(obj);
 	}
 	
 	// check versioning: load a new version
 	if (obj && proto && OBJ_VERSION(obj) < OBJ_VERSION(proto) && config_get_bool("auto_update_items")) {
-		// TODO rewrite this as a generic rescale obj function AND make changes to live objects update players in-game (and trading post, einv, and rooms)
-		new = read_object(vnum);
-		GET_OBJ_EXTRA(new) |= GET_OBJ_EXTRA(obj) & (OBJ_SUPERIOR | OBJ_KEEP);
-		if (!OBJ_FLAGGED(new, OBJ_GENERIC_DROP)) {
-			GET_OBJ_EXTRA(new) |= GET_OBJ_EXTRA(obj) & (OBJ_HARD_DROP | OBJ_GROUP_DROP);
-		}
-		OBJ_BOUND_TO(new) = OBJ_BOUND_TO(obj);
-		OBJ_BOUND_TO(obj) = NULL;
-		GET_OBJ_TIMER(new) = GET_OBJ_TIMER(obj);
-		GET_AUTOSTORE_TIMER(new) = GET_AUTOSTORE_TIMER(obj);
-		new->stolen_timer = obj->stolen_timer;
-		new->last_owner_id = obj->last_owner_id;
-		new->last_empire_id = obj->last_empire_id;
-		
-		// certain things that must always copy over
-		switch (GET_OBJ_TYPE(new)) {
-			case ITEM_ARROW: {
-				GET_OBJ_VAL(new, VAL_ARROW_QUANTITY) = GET_OBJ_VAL(obj, VAL_ARROW_QUANTITY);
-				break;
-			}
-			case ITEM_BOOK: {
-				GET_OBJ_VAL(new, VAL_BOOK_ID) = GET_OBJ_VAL(obj, VAL_BOOK_ID);
-				break;
-			}
-			case ITEM_DRINKCON: {
-				GET_OBJ_VAL(new, VAL_DRINK_CONTAINER_CONTENTS) = GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS);
-				GET_OBJ_VAL(new, VAL_DRINK_CONTAINER_TYPE) = GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE);
-				break;
-			}
-			case ITEM_PORTAL: {
-				GET_OBJ_VAL(new, VAL_PORTAL_TARGET_VNUM) = GET_OBJ_VAL(obj, VAL_PORTAL_TARGET_VNUM);
-				break;
-			}
-			case ITEM_POISON: {
-				GET_OBJ_VAL(new, VAL_POISON_CHARGES) = GET_OBJ_VAL(obj, VAL_POISON_CHARGES);
-				break;
-			}
-			case ITEM_SHIP: {
-				GET_OBJ_VAL(new, VAL_SHIP_RESOURCES_REMAINING) = GET_OBJ_VAL(obj, VAL_SHIP_RESOURCES_REMAINING);
-				GET_OBJ_VAL(new, VAL_SHIP_MAIN_ROOM) = GET_OBJ_VAL(obj, VAL_SHIP_MAIN_ROOM);
-				break;
-			}
-		}
-		
-		if (OBJ_FLAGGED(new, OBJ_SCALABLE) && GET_OBJ_CURRENT_SCALE_LEVEL(obj) > 0) {
-			scale_item_to_level(new, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
-		}
-		
+		new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));		
 		extract_obj(obj);
 		obj = new;
 		
@@ -753,6 +716,17 @@ void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location) {
 	// who it's bound to
 	for (bind = OBJ_BOUND_TO(obj); bind; bind = bind->next) {
 		fprintf(fl, "Bound-to: %d\n", bind->idnum);
+	}
+	
+	// scripts
+	if (SCRIPT(obj)) {
+		trig_data *trig;
+		
+		for (trig = TRIGGERS(SCRIPT(obj)); trig; trig = trig->next) {
+			fprintf(fl, "Trigger: %d\n", GET_TRIG_VNUM(trig));
+		}
+		
+		// TODO could save SCRIPT(obj)->global_vars here too
 	}
 	
 	fprintf(fl, "End\n");

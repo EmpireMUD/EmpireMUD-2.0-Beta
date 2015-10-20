@@ -805,6 +805,36 @@ You go to gore $N, but merely bow your head in worship.
 $n goes to gore you, but merely bows $s head in worship.
 $n goes to gore $N, but merely bows $s head in worship.
 
+* Mana Blast
+M
+ 28
+You blast $N with mana until $S skin is peeling off and $E doubles over!
+$n blasts you with mana until your skin is searing and peeling off!
+$n blasts $N with mana until $S skin is peeling off and $E doubles over!
+You blast mana at $N, but miss $M!
+You duck out of the way as $n blasts mana at you!
+$N ducks out of the way as $n blasts mana at $M.
+#
+#
+#
+You blast mana at $N, who seems to absorb it.
+$n blasts mana at you, but it only seems to refresh you.
+$n blasts mana at $N, who laughs and absorbs it.
+M
+ 28
+You hit $N hard with a blast of mana, knocking $M to the ground!
+$n hits you hard with a blast of mana, and everything goes dark!
+$n hits $N hard with a blad of mana, knocking $M out!
+You fire a blast of mana at $N, who expertly avoids it!
+$n fires a blast of mana at you, but you expertly avoid it!
+$n fires a blast of mana at $N, but $E expertly avoids it.
+#
+#
+#
+$N makes playful animal shapes with the mana you blast at $M.
+$n blasts you with mana, which you form into playful animal shapes.
+$N maakes playful animal shapes with a blast of mana from $n.
+
 * Suffering
 M
  50

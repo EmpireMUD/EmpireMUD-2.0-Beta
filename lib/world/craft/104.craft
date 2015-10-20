@@ -1,0 +1,127 @@
+#10456
+violet leopard shawl~
+10456 1  # 1x a violet leopard shawl
+4 199 g 25 10473
+R
+1353 6  # 6x a big cat pelt
+R
+1307 3  # 3x deadly violet dye
+R
+10013 6  # 6x a rat skin
+R
+176 4  # 4x an ingot of nocturnium
+R
+103 4  # 4x a yellow lightning stone
+S
+#10457
+wildfire gloves~
+10457 1  # 1x wildfire gloves
+4 199 g 25 10474
+R
+10013 6  # 6x a rat skin
+R
+1307 2  # 2x deadly violet dye
+R
+10001 1  # 1x wild fire
+R
+176 4  # 4x an ingot of nocturnium
+R
+103 4  # 4x a yellow lightning stone
+S
+#10462
+rat-fur cloak~
+10462 1  # 1x a rat-fur cloak
+4 182 g 25 10475
+R
+1357 6  # 6x a large piece of leather
+R
+10013 6  # 6x a rat skin
+R
+177 4  # 4x an imperium ingot
+R
+104 4  # 4x a red bloodstone
+S
+#10463
+wooden gauntlets~
+10463 1  # 1x wooden gauntlets
+2 182 g 25 10476
+R
+125 2  # 2x a stack of lumber
+R
+10013 6  # 6x a rat skin
+R
+177 4  # 4x an imperium ingot
+R
+104 4  # 4x a red bloodstone
+S
+#10468
+mesh cloak~
+10468 1  # 1x a mesh cloak
+1 197 0 25 10477
+R
+175 8  # 8x an iron ingot
+R
+177 4  # 4x an imperium ingot
+R
+10013 6  # 6x a rat skin
+R
+104 4  # 4x a red bloodstone
+S
+#10469
+heavy goblin gauntlets~
+10469 1  # 1x heavy goblin gauntlets
+1 197 0 25 10478
+R
+175 8  # 8x an iron ingot
+R
+177 4  # 4x an imperium ingot
+R
+10013 6  # 6x a rat skin
+R
+104 4  # 4x a red bloodstone
+S
+#10479
+goblinwartent~
+-1 0  # 0x UNKNOWN
+8 -1 0 1 10479
+B
+10479 be bdeklmno
+R
+125 8  # 8x a stack of lumber
+R
+1306 2  # 2x a pouch of nails
+R
+175 8  # 8x an iron ingot
+S
+#10480
+goblinmessagepost~
+-1 0  # 0x UNKNOWN
+8 -1 0 1 10480
+B
+10480 bdel 0
+R
+3200 1  # 1x a cut of poultry
+S
+#10481
+goblinlabtent~
+-1 0  # 0x UNKNOWN
+8 -1 0 1 10481
+B
+10481 be bdeklmno
+R
+125 4  # 4x a stack of lumber
+R
+1306 1  # 1x a pouch of nails
+S
+#10482
+goblindolmen~
+-1 0  # 0x UNKNOWN
+8 -1 0 1 10482
+B
+10482 be bdeklmno
+R
+105 3  # 3x a huge stone block
+R
+100 10  # 10x a rock
+S
+$

@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: dg_mobcmd.c                                     EmpireMUD 2.0b2 *
+*   File: dg_mobcmd.c                                     EmpireMUD 2.0b3 *
 *  Usage: Script-related commands for mobs                                *
 *                                                                         *
 *  DG Scripts code came with the attributions in the next two blocks      *
@@ -51,6 +51,7 @@
 #include "interpreter.h"
 #include "comm.h"
 #include "skills.h"
+#include "vnums.h"
 
 // external vars
 extern int dg_owner_purged;
@@ -125,7 +126,7 @@ ACMD(do_madventurecomplete) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM)) {
+	if (AFF_FLAGGED(ch, AFF_ORDERED)) {
 		return;
 	}
 	
@@ -145,7 +146,7 @@ ACMD(do_masound) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM))
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
 
 	if (!*argument) {
@@ -179,7 +180,7 @@ ACMD(do_mkill) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM))
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
 
 	one_argument(argument, arg);
@@ -242,7 +243,7 @@ ACMD(do_mjunk) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM))
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
 
 	one_argument(argument, arg);
@@ -292,7 +293,7 @@ ACMD(do_mechoaround) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM))
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
 
 	p = one_argument(argument, arg);
@@ -318,6 +319,58 @@ ACMD(do_mechoaround) {
 }
 
 
+// prints the message to everyone except two targets
+ACMD(do_mechoneither) {
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+	char_data *vict1, *vict2, *iter;
+	char *p;
+
+	if (!MOB_OR_IMPL(ch)) {
+		send_config_msg(ch, "huh_string");
+		return;
+	}
+
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
+		return;
+
+	p = two_arguments(argument, arg1, arg2);
+	skip_spaces(&p);
+
+	if (!*arg1 || !*arg2 || !*p) {
+		mob_log(ch, "mechoneither called with missing arguments");
+		return;
+	}
+
+	if (*arg1 == UID_CHAR) {
+		if (!(vict1 = get_char(arg1))) {
+			mob_log(ch, "mechoneither: vict 1 (%s) does not exist", arg1);
+			return;
+		}
+	}
+	else if (!(vict1 = get_char_room_vis(ch, arg1))) {
+		mob_log(ch, "mechoneither: vict 1 (%s) does not exist", arg1);
+		return;
+	}
+
+	if (*arg2 == UID_CHAR) {
+		if (!(vict2 = get_char(arg2))) {
+			mob_log(ch, "mechoneither: vict 2 (%s) does not exist", arg2);
+			return;
+		}
+	}
+	else if (!(vict2 = get_char_room_vis(ch, arg2))) {
+		mob_log(ch, "mechoneither: vict 2 (%s) does not exist", arg2);
+		return;
+	}
+
+	for (iter = ROOM_PEOPLE(IN_ROOM(vict1)); iter; iter = iter->next_in_room) {
+		if (iter->desc && iter != vict1 && iter != vict2) {
+			sub_write(p, iter, TRUE, TO_CHAR);
+		}
+	}
+}
+
+
 /* sends the message to only the victim */
 ACMD(do_msend) {
 	char arg[MAX_INPUT_LENGTH];
@@ -329,7 +382,7 @@ ACMD(do_msend) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM))
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
 
 	p = one_argument(argument, arg);
@@ -364,7 +417,7 @@ ACMD(do_mecho) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM))
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
 
 	if (!*argument) {
@@ -387,7 +440,7 @@ ACMD(do_mbuildingecho) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM))
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
 
 	msg = any_one_word(argument, room_number);
@@ -427,7 +480,7 @@ ACMD(do_mregionecho) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM))
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
 
 	argument = any_one_word(argument, room_number);
@@ -461,7 +514,7 @@ ACMD(do_mregionecho) {
 				}
 				
 				if (!indoor_only || IS_OUTDOORS(targ)) {
-					msg_to_desc(desc, "%s\r\n", msg);
+					msg_to_desc(desc, "%s\r\n", CAP(msg));
 				}
 			}
 		}
@@ -491,7 +544,7 @@ ACMD(do_mload) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM))
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
 
 	if (ch->desc && GET_ACCESS_LEVEL(ch->desc->original) < LVL_CIMPL) {
@@ -507,7 +560,7 @@ ACMD(do_mload) {
 	}
 
 	if (is_abbrev(arg1, "mob")) {
-		if ((mob = read_mobile(number)) == NULL) {
+		if ((mob = read_mobile(number, TRUE)) == NULL) {
 			mob_log(ch, "mload: bad mob vnum");
 			return;
 		}
@@ -538,7 +591,7 @@ ACMD(do_mload) {
 		}
 	}
 	else if (is_abbrev(arg1, "obj")) {
-		if ((object = read_object(number)) == NULL) {
+		if ((object = read_object(number, TRUE)) == NULL) {
 			mob_log(ch, "mload: bad object vnum");
 			return;
 		}
@@ -557,9 +610,7 @@ ACMD(do_mload) {
 			}
 		
 			// must scale now
-			if (OBJ_FLAGGED(object, OBJ_SCALABLE)) {
-				scale_item_to_level(object, GET_CURRENT_SCALE_LEVEL(ch));
-			}
+			scale_item_to_level(object, GET_CURRENT_SCALE_LEVEL(ch));
 		
 			load_otrigger(object);
 			return;
@@ -568,13 +619,11 @@ ACMD(do_mload) {
 		target = two_arguments(target, arg1, arg2); /* recycling ... */
 		skip_spaces(&target);
 		
-		if (OBJ_FLAGGED(object, OBJ_SCALABLE)) {
-			if (*target && isdigit(*target)) {
-				scale_item_to_level(object, atoi(target));
-			}
-			else {
-				scale_item_to_level(object, GET_CURRENT_SCALE_LEVEL(ch));
-			}
+		if (*target && isdigit(*target)) {
+			scale_item_to_level(object, atoi(target));
+		}
+		else {
+			scale_item_to_level(object, GET_CURRENT_SCALE_LEVEL(ch));
 		}
 		
 		tch = (*arg1 == UID_CHAR) ? get_char(arg1) : get_char_room_vis(ch, arg1);
@@ -620,7 +669,7 @@ ACMD(do_mpurge) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM))
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
 
 	if (ch->desc && (GET_ACCESS_LEVEL(ch->desc->original) < LVL_CIMPL))
@@ -690,7 +739,7 @@ ACMD(do_mgoto) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM))
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
 
 	one_word(argument, arg);
@@ -725,7 +774,7 @@ ACMD(do_mat) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM))
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
 
 	argument = one_word(argument, arg);
@@ -770,7 +819,7 @@ ACMD(do_mat) {
 * everyone in the current room to the specified location
 */
 ACMD(do_mteleport) {
-	extern struct instance_data *find_instance_by_room(room_data *room);
+	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	room_data *target;
@@ -783,7 +832,7 @@ ACMD(do_mteleport) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM))
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
 
 	argument = one_argument(argument, arg1);
@@ -874,6 +923,118 @@ ACMD(do_mteleport) {
 }
 
 
+ACMD(do_mterracrop) {
+	void do_dg_terracrop(room_data *target, crop_data *cp);
+
+	char loc_arg[MAX_INPUT_LENGTH], crop_arg[MAX_INPUT_LENGTH];
+	crop_data *crop;
+	room_data *target;
+	crop_vnum vnum;
+
+	if (!MOB_OR_IMPL(ch) || AFF_FLAGGED(ch, AFF_ORDERED)) {
+		send_config_msg(ch, "huh_string");
+		return;
+	}
+
+	argument = any_one_word(argument, loc_arg);
+	any_one_word(argument, crop_arg);
+	
+	// usage: %terracrop% [location] <crop vnum>
+	if (!*loc_arg) {
+		mob_log(ch, "mterracrop: bad syntax");
+		return;
+	}
+	
+	// check number of args
+	if (!*crop_arg) {
+		// only arg is actually crop arg
+		strcpy(crop_arg, loc_arg);
+		target = IN_ROOM(ch);
+	}
+	else {
+		// two arguments
+		target = find_target_room(ch, loc_arg);
+	}
+	
+	if (!target) {
+		mob_log(ch, "mterracrop: target is an invalid room");
+		return;
+	}
+	
+	// places you just can't terracrop -- fail silently (currently)
+	if (IS_INSIDE(target) || IS_ADVENTURE_ROOM(target) || IS_CITY_CENTER(target)) {
+		return;
+	}
+	
+	if (!isdigit(*crop_arg) || (vnum = atoi(crop_arg)) < 0 || !(crop = crop_proto(vnum))) {
+		mob_log(ch, "mterracrop: invalid crop vnum");
+		return;
+	}
+
+	// good to go
+	do_dg_terracrop(target, crop);
+}
+
+
+ACMD(do_mterraform) {
+	void do_dg_terraform(room_data *target, sector_data *sect);
+
+	char loc_arg[MAX_INPUT_LENGTH], sect_arg[MAX_INPUT_LENGTH];
+	sector_data *sect;
+	room_data *target;
+	sector_vnum vnum;
+
+	if (!MOB_OR_IMPL(ch) || AFF_FLAGGED(ch, AFF_ORDERED)) {
+		send_config_msg(ch, "huh_string");
+		return;
+	}
+
+	argument = any_one_word(argument, loc_arg);
+	any_one_word(argument, sect_arg);
+	
+	// usage: %terraform% [location] <sector vnum>
+	if (!*loc_arg) {
+		mob_log(ch, "mterraform: bad syntax");
+		return;
+	}
+	
+	// check number of args
+	if (!*sect_arg) {
+		// only arg is actually sect arg
+		strcpy(sect_arg, loc_arg);
+		target = IN_ROOM(ch);
+	}
+	else {
+		// two arguments
+		target = find_target_room(ch, loc_arg);
+	}
+	
+	if (!target) {
+		mob_log(ch, "mterraform: target is an invalid room");
+		return;
+	}
+	
+	// places you just can't terraform -- fail silently (currently)
+	if (IS_INSIDE(target) || IS_ADVENTURE_ROOM(target) || IS_CITY_CENTER(target)) {
+		return;
+	}
+	
+	if (!isdigit(*sect_arg) || (vnum = atoi(sect_arg)) < 0 || !(sect = sector_proto(vnum))) {
+		mob_log(ch, "mterraform: invalid sector vnum");
+		return;
+	}
+	
+	// validate sect
+	if (SECT_FLAGGED(sect, SECTF_MAP_BUILDING | SECTF_INSIDE | SECTF_ADVENTURE)) {
+		mob_log(ch, "mterraform: sector requires data that can't be set this way");
+		return;
+	}
+
+	// good to go
+	do_dg_terraform(target, sect);
+}
+
+
 ACMD(do_mdamage) {
 	char name[MAX_INPUT_LENGTH], modarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH];
 	double modifier = 1.0;
@@ -885,7 +1046,7 @@ ACMD(do_mdamage) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM))
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
 
 	argument = two_arguments(argument, name, modarg);
@@ -900,7 +1061,7 @@ ACMD(do_mdamage) {
 	if (*modarg) {
 		modifier = atof(modarg) / 100.0;
 	}
-	modifier *= scale_modifier_by_mob(ch, modifier);
+	modifier = scale_modifier_by_mob(ch, modifier);
 
 	if (*name == UID_CHAR) {
 		if (!(vict = get_char(name))) {
@@ -941,7 +1102,7 @@ ACMD(do_maoe) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM))
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
 
 	two_arguments(argument, modarg, typearg);
@@ -961,7 +1122,7 @@ ACMD(do_maoe) {
 		type = DAM_PHYSICAL;
 	}
 	
-	modifier *= scale_modifier_by_mob(ch, modifier);
+	modifier = scale_modifier_by_mob(ch, modifier);
 	
 	level = get_approximate_level(ch);
 	for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict; vict = next_vict) {
@@ -975,23 +1136,24 @@ ACMD(do_maoe) {
 
 
 ACMD(do_mdot) {
-	char name[MAX_INPUT_LENGTH], modarg[MAX_INPUT_LENGTH], durarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH];
+	char name[MAX_INPUT_LENGTH], modarg[MAX_INPUT_LENGTH], durarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH], stackarg[MAX_INPUT_LENGTH];
 	double modifier = 1.0;
 	char_data *vict;
-	int type;
+	int type, max_stacks;
 
 	if (!MOB_OR_IMPL(ch)) {
 		send_config_msg(ch, "huh_string");
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM))
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
 
 	argument = one_argument(argument, name);
 	argument = one_argument(argument, modarg);
 	argument = one_argument(argument, durarg);
-	argument = one_argument(argument, typearg);
+	argument = one_argument(argument, typearg);	// optional, default physical
+	argument = one_argument(argument, stackarg);	// optional, default 1
 
 	if (!*name || !*modarg || !*durarg) {
 		mob_log(ch, "mdot: bad syntax");
@@ -1001,7 +1163,7 @@ ACMD(do_mdot) {
 	if (*modarg) {
 		modifier = atof(modarg) / 100.0;
 	}
-	modifier *= scale_modifier_by_mob(ch, modifier);
+	modifier = scale_modifier_by_mob(ch, modifier);
 
 	if (*name == UID_CHAR) {
 		if (!(vict = get_char(name))) {
@@ -1025,7 +1187,8 @@ ACMD(do_mdot) {
 		type = DAM_PHYSICAL;
 	}
 	
-	script_damage_over_time(vict, get_approximate_level(ch), type, modifier, atoi(durarg));
+	max_stacks = (*stackarg ? atoi(stackarg) : 1);
+	script_damage_over_time(vict, get_approximate_level(ch), type, modifier, atoi(durarg), max_stacks, ch);
 }
 
 
@@ -1041,7 +1204,7 @@ ACMD(do_mforce) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM))
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
 
 	if (ch->desc && (GET_ACCESS_LEVEL(ch->desc->original) < LVL_CIMPL))
@@ -1103,7 +1266,7 @@ ACMD(do_mhunt) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM))
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
 
 	if (!IS_NPC(ch)) {
@@ -1151,7 +1314,7 @@ ACMD(do_mremember) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM))
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
 
 	if (ch->desc && (GET_ACCESS_LEVEL(ch->desc->original) < LVL_CIMPL))
@@ -1205,7 +1368,7 @@ ACMD(do_mforget) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM))
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
 
 	if (ch->desc && (GET_ACCESS_LEVEL(ch->desc->original) < LVL_CIMPL))
@@ -1268,7 +1431,7 @@ ACMD(do_mtransform) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM))
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
 
 	if (ch->desc || !IS_NPC(ch)) {
@@ -1287,10 +1450,10 @@ ACMD(do_mtransform) {
 		mob_log(ch, "mtransform: bad argument");
 	else {
 		if (isdigit(*arg))
-			m = read_mobile(atoi(arg));
+			m = read_mobile(atoi(arg), TRUE);
 		else {
 			keep_attr = 0;
-			m = read_mobile(atoi(arg+1));
+			m = read_mobile(atoi(arg+1), TRUE);
 		}
 		if (m == NULL) {
 			mob_log(ch, "mtransform: bad mobile vnum");
@@ -1371,7 +1534,7 @@ ACMD(do_mdoor) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM))
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
 
 	argument = one_word(argument, target);
@@ -1463,7 +1626,7 @@ ACMD(do_mfollow) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM))
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
 
 	one_argument(argument, buf);
@@ -1539,7 +1702,7 @@ ACMD(do_mscale) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_CHARM))
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
 
 	if (ch->desc && (GET_ACCESS_LEVEL(ch->desc->original) < LVL_CIMPL))
@@ -1588,13 +1751,14 @@ ACMD(do_mscale) {
 				scale_item_to_level(obj, level);
 			}
 			else if ((proto = obj_proto(GET_OBJ_VNUM(obj))) && OBJ_FLAGGED(proto, OBJ_SCALABLE)) {
-				fresh = read_object(GET_OBJ_VNUM(obj));
+				fresh = read_object(GET_OBJ_VNUM(obj), TRUE);
 				scale_item_to_level(fresh, level);
 				swap_obj_for_obj(obj, fresh);
 				extract_obj(obj);
 			}
 			else {
-				mob_log(ch, "mscale: target is not scalable");
+				// attempt to scale anyway
+				scale_item_to_level(obj, level);
 			}
 		}
 		else {

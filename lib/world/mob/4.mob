@@ -5,8 +5,8 @@ A ferocious deinonychus is stalking around!
 ~
 40 50 dejo 0
 0 0 0 10
-I 0 3012 100.00 1  # BUTCHER: UNKNOWN
-I 0 3012 100.00 1  # BUTCHER: UNKNOWN
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 S
 #401
 liger swift gigantic~
@@ -15,10 +15,10 @@ A gigantic liger is prowling around!
 ~
 40 50 dejo 0
 0 0 0 10
-I 0 3012 100.00 1  # BUTCHER: UNKNOWN
-I 0 3012 100.00 1  # BUTCHER: UNKNOWN
-I 0 3012 75.00 1  # BUTCHER: UNKNOWN
-I 0 3012 75.00 1  # BUTCHER: UNKNOWN
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 0 3012 75.00 1  # BUTCHER: a fillet of raw meat
+I 0 3012 75.00 1  # BUTCHER: a fillet of raw meat
 S
 #402
 serpent giant swift~
@@ -26,9 +26,9 @@ a swift giant serpent~
 A swift, giant serpent is coiled and ready to strike!
 ~
 40 50 dejo 0
-0 0 0 10
-I 0 3012 100.00 1  # BUTCHER: UNKNOWN
-I 0 3012 100.00 1  # BUTCHER: UNKNOWN
+0 0 0 7
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 S
 #403
 stag swift majestic white~
@@ -36,9 +36,9 @@ a swift white stag~
 A majestic white stag is standing before you!
 ~
 40 50 dejo 0
-0 0 0 10
-I 0 3012 100.00 1  # BUTCHER: UNKNOWN
-I 0 3012 100.00 1  # BUTCHER: UNKNOWN
+0 0 0 27
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 S
 #404
 bear swift golden~
@@ -47,17 +47,17 @@ A swift golden bear stands up and towers over you!
 ~
 40 50 dejo 0
 0 0 0 10
-I 0 3012 100.00 1  # BUTCHER: UNKNOWN
-I 0 3012 100.00 1  # BUTCHER: UNKNOWN
-I 0 3012 75.00 1  # BUTCHER: UNKNOWN
-I 0 3012 75.00 1  # BUTCHER: UNKNOWN
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 0 3012 75.00 1  # BUTCHER: a fillet of raw meat
+I 0 3012 75.00 1  # BUTCHER: a fillet of raw meat
 S
 #450
 mirror image~
 a mirror image~
 A mirror image is standing here.
 ~
-0 0 bdhjorx 0
+0 0 bdhjorx cm
 0 0 0 7
 S
 $

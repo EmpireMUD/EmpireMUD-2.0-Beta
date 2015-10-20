@@ -45,6 +45,27 @@ L
 30 -1 -1
 -1 0 0
 S
+#102
+Magiterranean: Interdimensional Whirlwind~
+Paul Clarke and Owen Morris~
+   The magical whirlwind seems to be a portal between this plane and the
+Magiterranean, the secret realm of druids. You can't seem to penetrate the
+whirlwind, but it looks like the druids have been using it to spread their
+magi-netically modified crops into our world.
+(This adventure contains only the magical crops on the map.)
+~
+10500 10549 5-0
+1 60 d 0
+L
+1 0
+10500 -1 -1
+14 bd bd
+L
+5 0
+43920 -1 -1
+-1 0 0
+T 10507
+S
 #120
 Mountain Cave: Red Dragon~
 Paul Clarke~
@@ -106,13 +127,13 @@ S
 #123
 Ruins: Thieves~
 Paul Clarke~
-   This is a new adventure zone. You've stumbled onto somebody's campsite in
-the ruins. From the looks of things, it's not someone living the high life.
-Some of the items appear to be quite valuable, so it's safe to assume the
-person camping here is not the legal owner of any of these things.
+   You've stumbled onto somebody's campsite in the ruins. From the looks of
+things, it's not someone living the high life. Some of the items appear to be
+quite valuable, so it's safe to assume the person camping here is not the legal
+owner of any of these things.
 ~
-10110 10114 5-100
-20 0 cd 0
+10110 10129 25-75
+20 0 c 0
 L
 5 0
 2880 -1 -1
@@ -151,6 +172,50 @@ L
 50 -1 -1
 -1 0 0
 S
+#126
+Mountain Cave: Flame Dragon~
+Paul Clarke~
+   A flame dragon has made its nest in a mountain cave and is terrorizing the
+countryside! Can you hunt it down and kill it? Just follow the swath of
+scorched earth. The dragon is tough -- you might want to bring a partner.
+~
+10300 10329 100-150
+5 0 d 0
+L
+5 0
+43200 -1 -1
+-1 0 0
+L
+6 0
+75 -1 -1
+-1 0 0
+L
+1 0
+10300 -1 -1
+14 c bdegkln
+S
+#127
+Abandoned Dragon Nest~
+Paul Clarke~
+   The dragon nest appears abandoned, which means a dragon is on the loose
+nearby. Can you find and defeat it? Be careful, it might take a pair of stout
+adventurers -- but the rewards will be worth it.
+~
+10330 10359 125-175
+10 0 0 0
+L
+1 0
+10330 -1 -1
+9 c bcdel
+L
+5 0
+43200 -1 -1
+-1 0 0
+L
+6 0
+100 -1 -1
+-1 0 0
+S
 #140
 The Sewer: Ratskins~
 Paul Clarke~
@@ -176,6 +241,34 @@ L
 L
 6 0
 30 -1 -1
+-1 0 0
+S
+#141
+The Sewer: Goblin Outpost~
+Paul Clarke~
+   Strange sounds are coming from the sewer grate, and waste has been backing
+up into the streets. This can only mean one thing: Goblins! Will you buy the
+goblins' wares, or drive them from the city? This adventure sells 6 crafting
+patterns and 4 unique buildings. You can also fight the goblins solo or in
+pairs, to earn their prized gear.
+~
+10450 10499 50-100
+30 120 0 2
+L
+2 ab
+9 10450 10451
+-1 0 0
+L
+3 ab
+5009 10450 10451
+-1 0 0
+L
+6 0
+30 -1 -1
+-1 0 0
+L
+5 0
+1440 -1 -1
 -1 0 0
 S
 #160

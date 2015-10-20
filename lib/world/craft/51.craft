@@ -583,7 +583,7 @@ docks~
 -1 1  # 1x UNKNOWN
 8 45 0 1 -1
 B
-5152 be a
+5152 be ah
 R
 125 20  # 20x a stack of lumber
 R
@@ -1009,6 +1009,8 @@ R
 124 20  # 20x a heavy log
 R
 105 12  # 12x a huge stone block
+R
+1115 20  # 20x a nexus crystal
 S
 #5186
 househaven~
@@ -1061,5 +1063,20 @@ R
 1306 10  # 10x a pouch of nails
 R
 105 2  # 2x a huge stone block
+S
+#5190
+astralnexus~
+-1 0  # 0x UNKNOWN
+8 248 m 1 -1
+B
+5190 be 0
+R
+124 20  # 20x a heavy log
+R
+105 12  # 12x a huge stone block
+R
+176 12  # 12x an ingot of nocturnium
+R
+1115 20  # 20x a nexus crystal
 S
 $

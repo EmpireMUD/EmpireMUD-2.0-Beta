@@ -1,0 +1,11 @@
+#18100
+Inside the Camp~
+   This is the room where the goblins spawn, but you shouldn't actually be able
+to get in here. Please report a bug!  
+~
+g 0
+M 0 18100 100.00 3
+M 0 18100 50.00 3
+M 0 18100 25.00 3
+S
+$

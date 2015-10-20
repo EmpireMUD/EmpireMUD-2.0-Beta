@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.highsorcery.c                               EmpireMUD 2.0b2 *
+*   File: act.highsorcery.c                               EmpireMUD 2.0b3 *
 *  Usage: implementation for high sorcery abilities                       *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -365,19 +365,15 @@ INTERACTION_FUNC(devastate_crop) {
 	act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
 	
 	while (num-- > 0) {
-		obj_to_char_or_room((newobj = read_object(interaction->vnum)), ch);
-		if (OBJ_FLAGGED(newobj, OBJ_SCALABLE)) {
-			scale_item_to_level(newobj, 1);	// minimum level
-		}
+		obj_to_char_or_room((newobj = read_object(interaction->vnum, TRUE)), ch);
+		scale_item_to_level(newobj, 1);	// minimum level
 		load_otrigger(newobj);
 	}
 	
 	// additional tree if orchard
 	if (ROOM_CROP_FLAGGED(inter_room, CROPF_IS_ORCHARD)) {
-		obj_to_char_or_room((newobj = read_object(o_TREE)), ch);
-		if (OBJ_FLAGGED(newobj, OBJ_SCALABLE)) {
-			scale_item_to_level(newobj, 1);	// minimum level
-		}
+		obj_to_char_or_room((newobj = read_object(o_TREE, TRUE)), ch);
+		scale_item_to_level(newobj, 1);	// minimum level
 		load_otrigger(newobj);
 	}
 	
@@ -474,7 +470,7 @@ void start_ritual(char_data *ch, int ritual) {
 	// first message
 	send_ritual_messages(ch, ritual, 0);
 	
-	start_action(ch, ACT_RITUAL, 0, NOBITS);
+	start_action(ch, ACT_RITUAL, 0);
 	GET_ACTION_VNUM(ch, 0) = ritual;
 }
 
@@ -502,6 +498,10 @@ void summon_materials(char_data *ch, char *argument) {
 	
 	if (!(emp = GET_LOYALTY(ch))) {
 		msg_to_char(ch, "You can't summon empire materials if you're not in an empire.\r\n");
+		return;
+	}
+	if (GET_RANK(ch) < EMPIRE_PRIV(emp, PRIV_STORAGE)) {
+		msg_to_char(ch, "You aren't high enough rank to retrieve from the empire inventory.\r\n");
 		return;
 	}
 	
@@ -715,7 +715,7 @@ ACMD(do_colorburst) {
 		
 		amt = CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_COLORBURST) - GET_INTELLIGENCE(ch);
 	
-		af = create_mod_aff(ATYPE_COLORBURST, 6, APPLY_TO_HIT, amt);
+		af = create_mod_aff(ATYPE_COLORBURST, 6, APPLY_TO_HIT, amt, ch);
 		affect_join(vict, af, 0);
 
 		engage_combat(ch, vict, FALSE);
@@ -744,6 +744,9 @@ ACMD(do_disenchant) {
 	}
 	else if (ABILITY_TRIGGERS(ch, NULL, obj, ABIL_DISENCHANT)) {
 		return;
+	}
+	else if (!bind_ok(obj, ch)) {
+		msg_to_char(ch, "You can't disenchant something that is bound to someone else.\r\n");
 	}
 	else if (!OBJ_FLAGGED(obj, OBJ_ENCHANTED)) {
 		act("$p is not even enchanted.", FALSE, ch, obj, NULL, TO_CHAR);
@@ -782,7 +785,7 @@ ACMD(do_disenchant) {
 			}
 		
 			if (vnum != NOTHING) {
-				reward = read_object(vnum);
+				reward = read_object(vnum, TRUE);
 				obj_to_char_or_room(reward, ch);
 				act("You manage to weave the freed mana into $p!", FALSE, ch, reward, NULL, TO_CHAR);
 				act("$n weaves the freed mana into $p!", TRUE, ch, reward, NULL, TO_ROOM);
@@ -860,11 +863,12 @@ ACMD(do_dispel) {
 
 
 ACMD(do_enchant) {
+	extern int get_crafting_level(char_data *ch);
 	extern const double apply_values[];
 	
 	char arg2[MAX_INPUT_LENGTH];
 	obj_data *obj;
-	int iter, type, scale;
+	int iter, type, scale, charlevel;
 	bool found, line, first;		
 	double points_available, first_points = 0.0, second_points = 0.0;
 
@@ -925,8 +929,9 @@ ACMD(do_enchant) {
 	else {
 		extract_resources(ch, enchant_data[type].resources, FALSE);
 		
-		// enchant scale level is whichever is less: obj scale level, or player level
-		scale = MIN(GET_OBJ_CURRENT_SCALE_LEVEL(obj), GET_COMPUTED_LEVEL(ch));
+		// enchant scale level is whichever is less: obj scale level, or player crafting level
+		charlevel = MAX(get_crafting_level(ch), get_approximate_level(ch));
+		scale = MIN(GET_OBJ_CURRENT_SCALE_LEVEL(obj), charlevel);
 		points_available = MAX(1.0, scale / 100.0 * enchant_points_at_100);
 		
 		if (HAS_ABILITY(ch, ABIL_GREATER_ENCHANTMENTS)) {
@@ -1045,9 +1050,9 @@ ACMD(do_enervate) {
 		act("$n shouts somthing at you... The world takes on a reddish hue and you feel your stamina drain.", FALSE, ch, NULL, vict, TO_VICT);
 		act("$n shouts some kind of hex at $N, who starts to glow red and seems weakened!", FALSE, ch, NULL, vict, TO_NOTVICT);
 	
-		af = create_mod_aff(ATYPE_ENERVATE, 1 MUD_HOURS, APPLY_MOVE_REGEN, -1 * GET_INTELLIGENCE(ch) / 2);
+		af = create_mod_aff(ATYPE_ENERVATE, 1 MUD_HOURS, APPLY_MOVE_REGEN, -1 * GET_INTELLIGENCE(ch) / 2, ch);
 		affect_join(vict, af, 0);
-		af2 = create_mod_aff(ATYPE_ENERVATE_GAIN, 1 MUD_HOURS, APPLY_MOVE_REGEN, CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_ENERVATE));
+		af2 = create_mod_aff(ATYPE_ENERVATE_GAIN, 1 MUD_HOURS, APPLY_MOVE_REGEN, CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_ENERVATE), ch);
 		affect_join(ch, af2, 0);
 
 		engage_combat(ch, vict, FALSE);
@@ -1090,7 +1095,7 @@ ACMD(do_foresight) {
 		
 		amt = CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_FORESIGHT) + GET_INTELLIGENCE(ch);
 		
-		af = create_mod_aff(ATYPE_FORESIGHT, 12 MUD_HOURS, APPLY_DODGE, amt);
+		af = create_mod_aff(ATYPE_FORESIGHT, 12 MUD_HOURS, APPLY_DODGE, amt, ch);
 		affect_join(vict, af, 0);
 		
 		gain_ability_exp(ch, ABIL_FORESIGHT, 15);
@@ -1128,9 +1133,9 @@ ACMD(do_manashield) {
 		
 		amt = CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_MANASHIELD) + (GET_INTELLIGENCE(ch) / 3);
 		
-		af1 = create_mod_aff(ATYPE_MANASHIELD, 24 MUD_HOURS, APPLY_MANA, -25);
-		af2 = create_mod_aff(ATYPE_MANASHIELD, 24 MUD_HOURS, APPLY_RESIST_PHYSICAL, amt);
-		af3 = create_mod_aff(ATYPE_MANASHIELD, 24 MUD_HOURS, APPLY_RESIST_MAGICAL, amt);
+		af1 = create_mod_aff(ATYPE_MANASHIELD, 24 MUD_HOURS, APPLY_MANA, -25, ch);
+		af2 = create_mod_aff(ATYPE_MANASHIELD, 24 MUD_HOURS, APPLY_RESIST_PHYSICAL, amt, ch);
+		af3 = create_mod_aff(ATYPE_MANASHIELD, 24 MUD_HOURS, APPLY_RESIST_MAGICAL, amt, ch);
 		affect_join(ch, af1, 0);
 		affect_join(ch, af2, 0);
 		affect_join(ch, af3, 0);
@@ -1142,8 +1147,8 @@ ACMD(do_manashield) {
 
 
 ACMD(do_mirrorimage) {
-	bool check_scaling(char_data *mob, char_data *attacker);
 	extern char_data *has_familiar(char_data *ch);
+	void scale_mob_as_familiar(char_data *mob, char_data *master);
 	
 	char_data *mob, *other;
 	obj_data *wield;
@@ -1165,10 +1170,10 @@ ACMD(do_mirrorimage) {
 	}
 	
 	charge_ability_cost(ch, MANA, cost, COOLDOWN_MIRRORIMAGE, 5 * SECS_PER_REAL_MIN, WAIT_COMBAT_SPELL);
-	mob = read_mobile(vnum);
+	mob = read_mobile(vnum, TRUE);
 	
 	// scale mob to the summoner -- so it won't change its attributes later
-	check_scaling(mob, ch);
+	scale_mob_as_familiar(mob, ch);
 	
 	char_to_room(mob, IN_ROOM(ch));
 	
@@ -1380,10 +1385,10 @@ ACMD(do_siphon) {
 		act("$n shouts something at you... The world takes on a violet glow and you feel your mana siphoned away.", FALSE, ch, NULL, vict, TO_VICT);
 		act("$n shouts some kind of hex at $N, who starts to glow violet as mana flows away from $S skin!", FALSE, ch, NULL, vict, TO_NOTVICT);
 
-		af = create_mod_aff(ATYPE_SIPHON, 4, APPLY_MANA_REGEN, CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_SIPHON));
+		af = create_mod_aff(ATYPE_SIPHON, 4, APPLY_MANA_REGEN, CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_SIPHON), ch);
 		affect_join(ch, af, 0);
 		
-		af = create_mod_aff(ATYPE_SIPHON_DRAIN, 4, APPLY_MANA_REGEN, -1 * CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_SIPHON));
+		af = create_mod_aff(ATYPE_SIPHON_DRAIN, 4, APPLY_MANA_REGEN, -1 * CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_SIPHON), ch);
 		affect_join(vict, af, 0);
 
 		engage_combat(ch, vict, FALSE);
@@ -1448,7 +1453,7 @@ ACMD(do_slow) {
 		act("$n shouts something at you... The world takes on a gray tone and you more lethargic.", FALSE, ch, NULL, vict, TO_VICT);
 		act("$n shouts some kind of hex at $N, who starts to move sluggishly and starts to glow gray!", FALSE, ch, NULL, vict, TO_NOTVICT);
 	
-		af = create_flag_aff(ATYPE_SLOW, CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_SLOW), AFF_SLOW);
+		af = create_flag_aff(ATYPE_SLOW, CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_SLOW), AFF_SLOW, ch);
 		affect_join(vict, af, 0);
 
 		engage_combat(ch, vict, FALSE);
@@ -1526,7 +1531,8 @@ ACMD(do_vigor) {
 		
 		GET_MOVE(vict) = MIN(GET_MAX_MOVE(vict), GET_MOVE(vict) + gain);
 		
-		af = create_mod_aff(ATYPE_VIGOR, 1 MUD_HOURS, APPLY_MOVE_REGEN, -5);
+		// the cast_by on this is vict himself, because it is a penalty and this will block cleanse
+		af = create_mod_aff(ATYPE_VIGOR, 1 MUD_HOURS, APPLY_MOVE_REGEN, -5, vict);
 		affect_join(vict, af, 0);
 		
 		gain_ability_exp(ch, ABIL_VIGOR, 33.4);
@@ -1557,7 +1563,7 @@ RITUAL_FINISH_FUNC(perform_ritual_of_burdens) {
 	msg_to_char(ch, "You feel the weight of the world lift from your shoulders!\r\n");
 	act("$n seems uplifted!", FALSE, ch, NULL, NULL, TO_ROOM);
 	
-	af = create_mod_aff(ATYPE_UNBURDENED, 24 MUD_HOURS, APPLY_INVENTORY, CHOOSE_BY_ABILITY_LEVEL(burden_levels, ch, ABIL_RITUAL_OF_BURDENS));
+	af = create_mod_aff(ATYPE_UNBURDENED, 24 MUD_HOURS, APPLY_INVENTORY, CHOOSE_BY_ABILITY_LEVEL(burden_levels, ch, ABIL_RITUAL_OF_BURDENS), ch);
 	affect_join(ch, af, 0);	
 	
 	gain_ability_exp(ch, ABIL_RITUAL_OF_BURDENS, 25);
@@ -1568,6 +1574,7 @@ RITUAL_SETUP_FUNC(start_ritual_of_teleportation) {
 	room_data *room, *next_room, *to_room = NULL;
 	struct empire_city_data *city;
 	int subtype = NOWHERE;
+	bool wait;
 	
 	if (!can_teleport_to(ch, IN_ROOM(ch), TRUE) || RMT_FLAGGED(IN_ROOM(ch), RMT_NO_TELEPORT)) {
 		msg_to_char(ch, "You can't teleport out of here.\r\n");
@@ -1609,6 +1616,10 @@ RITUAL_SETUP_FUNC(start_ritual_of_teleportation) {
 			msg_to_char(ch, "Your city teleportation is still on cooldown.\r\n");
 			return FALSE;
 		}
+		if (!is_in_city_for_empire(city->location, GET_LOYALTY(ch), TRUE, &wait)) {
+			msg_to_char(ch, "That city was founded too recently to teleport to it.\r\n");
+			return FALSE;
+		}
 	}
 	else {
 		msg_to_char(ch, "That's not a valid place to teleport.\r\n");
@@ -1622,10 +1633,14 @@ RITUAL_SETUP_FUNC(start_ritual_of_teleportation) {
 
 
 RITUAL_FINISH_FUNC(perform_ritual_of_teleportation) {
+	void cancel_adventure_summon(char_data *ch);
+	
 	room_data *to_room, *rand_room;
 	int tries, rand_x, rand_y;
+	bool random;
 	
 	to_room = real_room(GET_ACTION_VNUM(ch, 1));
+	random = to_room ? FALSE : TRUE;
 	
 	// if there's no room, find a where
 	tries = 0;
@@ -1652,6 +1667,11 @@ RITUAL_FINISH_FUNC(perform_ritual_of_teleportation) {
 	
 		// reset this in case they teleport onto a wall.
 		GET_LAST_DIR(ch) = NO_DIR;
+		
+		// any existing adventure summon location is no longer valid after a voluntary teleport
+		if (!random) {	// except random teleport
+			cancel_adventure_summon(ch);
+		}
 
 		// trigger block	
 		enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
@@ -1678,7 +1698,7 @@ RITUAL_FINISH_FUNC(perform_phoenix_rite) {
 	msg_to_char(ch, "The flames on the remaining candles shoot toward you and form the crest of the Phoenix!\r\n");
 	act("The flames on the remaining candles shoot toward $n and form a huge fiery bird around $m!", FALSE, ch, NULL, NULL, TO_ROOM);
 
-	af = create_mod_aff(ATYPE_PHOENIX_RITE, UNLIMITED, APPLY_NONE, 0);
+	af = create_mod_aff(ATYPE_PHOENIX_RITE, UNLIMITED, APPLY_NONE, 0, ch);
 	affect_join(ch, af, 0);
 
 	gain_ability_exp(ch, ABIL_PHOENIX_RITE, 10);
@@ -1759,12 +1779,14 @@ RITUAL_FINISH_FUNC(perform_sense_life_ritual) {
 
 
 RITUAL_SETUP_FUNC(start_ritual_of_detection) {
+	bool wait;
+	
 	if (!GET_LOYALTY(ch)) {
 		msg_to_char(ch, "You must be a member of an empire to do this.\r\n");
 		return FALSE;
 	}
-	if (!find_city(GET_LOYALTY(ch), IN_ROOM(ch))) {
-		msg_to_char(ch, "You can only use the Ritual of Detection in one of your own cities.\r\n");
+	if (!is_in_city_for_empire(IN_ROOM(ch), GET_LOYALTY(ch), TRUE, &wait)) {
+		msg_to_char(ch, "You can only use the Ritual of Detection in one of your own cities%s.\r\n", wait ? " (this city was founded too recently)" : "");
 		return FALSE;
 	}
 
@@ -1779,13 +1801,13 @@ RITUAL_FINISH_FUNC(perform_ritual_of_detection) {
 	struct empire_city_data *city;
 	descriptor_data *d;
 	char_data *targ;
-	bool found;
+	bool found, wait;
 	
 	if (!GET_LOYALTY(ch)) {
 		msg_to_char(ch, "The ritual fails as you aren't in any empire.\r\n");
 	}
-	else if (!(city = find_city(GET_LOYALTY(ch), IN_ROOM(ch)))) {
-		msg_to_char(ch, "The ritual fails as you aren't in one of your cities.\r\n");
+	else if (!is_in_city_for_empire(IN_ROOM(ch), GET_LOYALTY(ch), TRUE, &wait) || !(city = find_city(GET_LOYALTY(ch), IN_ROOM(ch)))) {
+		msg_to_char(ch, "The ritual fails as you aren't in one of your cities%s.\r\n", wait ? " (this city was founded too recently)" : "");
 	}
 	else {
 		msg_to_char(ch, "You complete the Ritual of Detection...\r\n");
@@ -1965,19 +1987,34 @@ RITUAL_FINISH_FUNC(perform_devastation_ritual) {
 			act("$n's powerful ritual devastates the forest!", FALSE, ch, NULL, NULL, TO_ROOM);
 			
 			while (num-- > 0) {
-				obj_to_char_or_room((newobj = read_object(o_TREE)), ch);
+				obj_to_char_or_room((newobj = read_object(o_TREE, TRUE)), ch);
 				load_otrigger(newobj);
 			}
 		}
 		else if (ROOM_SECT_FLAGGED(to_room, SECTF_CROP) && (cp = crop_proto(ROOM_CROP_TYPE(to_room))) && has_interaction(GET_CROP_INTERACTIONS(cp), INTERACT_HARVEST)) {
 			run_room_interactions(ch, to_room, INTERACT_HARVEST, devastate_crop);
-			change_terrain(to_room, climate_default_sector[GET_CROP_CLIMATE(cp)]);
+			
+			// check for original sect, which may have been stored
+			if (ROOM_ORIGINAL_SECT(to_room) != SECT(to_room)) {
+				change_terrain(to_room, GET_SECT_VNUM(ROOM_ORIGINAL_SECT(to_room)));
+			}
+			else {
+				// fallback sect
+				change_terrain(to_room, climate_default_sector[GET_CROP_CLIMATE(cp)]);
+			}
 		}
 		else if (ROOM_SECT_FLAGGED(to_room, SECTF_HAS_CROP_DATA) && (cp = crop_proto(ROOM_CROP_TYPE(to_room)))) {
 			msg_to_char(ch, "You devastate the seeded field!\r\n");
 			act("$n's powerful ritual devastates the seeded field!", FALSE, ch, NULL, NULL, TO_ROOM);
 			
-			change_terrain(to_room, climate_default_sector[GET_CROP_CLIMATE(cp)]);
+			// check for original sect, which may have been stored
+			if (ROOM_ORIGINAL_SECT(to_room) != SECT(to_room)) {
+				change_terrain(to_room, GET_SECT_VNUM(ROOM_ORIGINAL_SECT(to_room)));
+			}
+			else {
+				// fallback sect
+				change_terrain(to_room, climate_default_sector[GET_CROP_CLIMATE(cp)]);
+			}
 		}
 		else {
 			msg_to_char(ch, "The Devastation Ritual has failed.\r\n");
@@ -2149,5 +2186,5 @@ ACMD(do_study) {
 	msg_to_char(ch, "You pick up a book to study.\r\n");
 	act("$n picks up a book to study.", FALSE, ch, NULL, NULL, TO_ROOM);
 	
-	start_action(ch, ACT_STUDYING, 0, 0);
+	start_action(ch, ACT_STUDYING, 0);
 }

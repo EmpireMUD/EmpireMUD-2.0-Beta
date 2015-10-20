@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.naturalmagic.c                              EmpireMUD 2.0b2 *
+*   File: act.naturalmagic.c                              EmpireMUD 2.0b3 *
 *  Usage: implementation for natural magic abilities                      *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -66,6 +66,43 @@ int ancestral_healing(char_data *ch) {
 	mod = get_approximate_level(ch) / 150.0;
 	amt = round(GET_GREATNESS(ch) * mod);
 	return MAX(0, amt);
+}
+
+
+/**
+* Finds a familiar belonging to ch that has the matching vnum and despawns it.
+* 
+* @param char_data *ch The player to find familiars for.
+* @param mob_vnum vnum Despawn only if matching this vnum (NOTHING for all familiars).
+* @return bool TRUE if it despawned a mob; FALSE if not.
+*/
+bool despawn_familiar(char_data *ch, mob_vnum vnum) {
+	char_data *iter, *next_iter;
+	bool any = FALSE;
+	
+	for (iter = character_list; iter; iter = next_iter) {
+		next_iter = iter->next;
+		
+		if (!IS_NPC(iter)) {
+			continue;
+		}
+		if (!MOB_FLAGGED(iter, MOB_FAMILIAR)) {
+			continue;
+		}
+		if (iter->master != ch) {
+			continue;
+		}
+		
+		if (vnum != NOTHING && GET_MOB_VNUM(iter) != vnum) {
+			continue;
+		}
+		
+		act("$n leaves.", TRUE, iter, NULL, NULL, TO_ROOM);
+		extract_char(iter);
+		any = TRUE;
+	}
+	
+	return any;
 }
 
 
@@ -212,7 +249,7 @@ void apply_potion(char_data *ch, int type, int scale) {
 			value = 0;
 		}
 		
-		af = create_aff(potion_data[type].atype, 24 MUD_HOURS, potion_data[type].apply, value, potion_data[type].aff);
+		af = create_aff(potion_data[type].atype, 24 MUD_HOURS, potion_data[type].apply, value, potion_data[type].aff, ch);
 		affect_join(ch, af, 0);
 	}
 	
@@ -245,20 +282,8 @@ ACMD(do_cleanse) {
 	struct affected_type *aff, *next_aff;
 	bitvector_t bitv;
 	char_data *vict = ch;
-	int pos, iter, cost = 30;
-	bool done_aff, uncleansable;
-	
-	// a list of affects cleanse should ignore
-	int exclude_blacklist[] = {
-		ATYPE_MANASHIELD,	// has a max-mana penalty
-		ATYPE_VIGOR,	// has a move regen penalty
-		ATYPE_MUMMIFY,	// has a strange set of affs
-		ATYPE_DEATHSHROUD,	// has a strange set of affs
-		ATYPE_DEATH_PENALTY,	// is a penalty
-		ATYPE_WAR_DELAY,	// is a penalty
-		ATYPE_CONFERRED,	// is a penalty
-		-1	// last
-	};
+	int pos, cost = 30;
+	bool done_aff;
 	
 	one_argument(argument, arg);
 	
@@ -288,15 +313,8 @@ ACMD(do_cleanse) {
 		for (aff = vict->affected; aff; aff = next_aff) {
 			next_aff = aff->next;
 			
-			// ensure not uncleansable
-			uncleansable = FALSE;
-			for (iter = 0; exclude_blacklist[iter] != -1; ++iter) {
-				if (aff->type == exclude_blacklist[iter]) {
-					uncleansable = TRUE;
-					break;
-				}
-			}
-			if (uncleansable) {
+			// can't cleanse penalties (things cast by self)
+			if (aff->cast_by == CAST_BY_ID(vict)) {
 				continue;
 			}
 			
@@ -308,7 +326,7 @@ ACMD(do_cleanse) {
 			if (!done_aff && (bitv = aff->bitvector) != NOBITS) {
 				// check each bit
 				for (pos = 0; bitv && !done_aff; ++pos, bitv >>= 1) {
-					if (IS_SET(bitv, BIT(1)) && aff_is_bad[pos]) {
+					if (IS_SET(bitv, BIT(0)) && aff_is_bad[pos]) {
 						affect_remove(vict, aff);
 						done_aff = TRUE;
 					}
@@ -320,15 +338,8 @@ ACMD(do_cleanse) {
 		for (dot = vict->over_time_effects; dot; dot = next_dot) {
 			next_dot = dot->next;
 			
-			// ensure not uncleansable
-			uncleansable = FALSE;
-			for (iter = 0; exclude_blacklist[iter] != -1; ++iter) {
-				if (dot->type == exclude_blacklist[iter]) {
-					uncleansable = TRUE;
-					break;
-				}
-			}
-			if (uncleansable) {
+			// can't cleanse penalties (things cast by self)
+			if (dot->cast_by == CAST_BY_ID(vict)) {
 				continue;
 			}
 
@@ -337,7 +348,7 @@ ACMD(do_cleanse) {
 			}
 		}
 
-		if (GET_COND(vict, DRUNK) > 0) {
+		if (!IS_NPC(vict) && GET_COND(vict, DRUNK) > 0) {
 			gain_condition(vict, DRUNK, -1 * GET_COND(vict, DRUNK));
 		}
 		
@@ -460,7 +471,7 @@ ACMD(do_confer) {
 		// attempt to find an existing confer effect that matches and just add to its amount
 		found_existing = found_ch = FALSE;
 		for (aff_iter = vict->affected; aff_iter; aff_iter = aff_iter->next) {
-			if (aff_iter->type == ATYPE_CONFER && aff_iter->location == confer_list[type].apply) {
+			if (aff_iter->type == ATYPE_CONFER && aff_iter->cast_by == CAST_BY_ID(ch) && aff_iter->location == confer_list[type].apply) {
 				found_existing = TRUE;
 				aff_iter->modifier += amt;
 				match_duration = aff_iter->duration;	// store this to match it later
@@ -492,7 +503,7 @@ ACMD(do_confer) {
 		}
 		else {
 			// did not find existing: add if needed
-			aff = create_mod_aff(ATYPE_CONFER, duration, confer_list[type].apply, amt);
+			aff = create_mod_aff(ATYPE_CONFER, duration, confer_list[type].apply, amt, ch);
 			
 			// use affect_to_char instead of affect_join because we will allow multiple copies of this with different durations
 			affect_to_char(vict, aff);
@@ -502,7 +513,7 @@ ACMD(do_confer) {
 		// separately ...
 		if (!found_ch) {
 			// need a new strength effect on ch
-			aff = create_mod_aff(ATYPE_CONFERRED, duration, APPLY_STRENGTH, -1);
+			aff = create_mod_aff(ATYPE_CONFERRED, duration, APPLY_STRENGTH, -1, ch);
 			
 			// use affect_to_char instead of affect_join because we will allow multiple copies of this with different durations
 			affect_to_char(ch, aff);
@@ -531,7 +542,7 @@ ACMD(do_counterspell) {
 		msg_to_char(ch, "You ready a counterspell.\r\n");
 		act("$n flickers momentarily with a blue-white aura.", TRUE, ch, NULL, NULL, TO_ROOM);
 		
-		af = create_flag_aff(ATYPE_COUNTERSPELL, 1 MUD_HOURS, 0);
+		af = create_flag_aff(ATYPE_COUNTERSPELL, 1 MUD_HOURS, 0, ch);
 		affect_join(ch, af, 0);
 	}
 }
@@ -571,7 +582,7 @@ ACMD(do_eartharmor) {
 	// 100/14 = 7 resistance at max level
 	amount = get_ability_level(ch, ABIL_EARTHARMOR) / 14.0;
 	amount += GET_INTELLIGENCE(ch) / 3.0;
-	af = create_mod_aff(ATYPE_EARTHARMOR, 30, APPLY_RESIST_PHYSICAL, (int)amount);
+	af = create_mod_aff(ATYPE_EARTHARMOR, 30, APPLY_RESIST_PHYSICAL, (int)amount, ch);
 	
 	if (ch == vict) {
 		msg_to_char(ch, "You form a thick layer of mana over your body, and it hardens to solid earth!\r\n");
@@ -625,7 +636,7 @@ ACMD(do_earthmeld) {
 		return;
 	}
 	
-	if (IS_ADVENTURE_ROOM(IN_ROOM(ch)) && (!RMT_FLAGGED(IN_ROOM(ch), RMT_OUTDOOR) || RMT_FLAGGED(IN_ROOM(ch), RMT_NEED_BOAT))) {
+	if (IS_ADVENTURE_ROOM(IN_ROOM(ch)) && (!RMT_FLAGGED(IN_ROOM(ch), RMT_OUTDOOR) || ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_NEED_BOAT) || RMT_FLAGGED(IN_ROOM(ch), RMT_NEED_BOAT))) {
 		msg_to_char(ch, "You can't earthmeld without natural ground below you!\r\n");
 		return;
 	}
@@ -650,7 +661,7 @@ ACMD(do_earthmeld) {
 	act("$n dissolves into pure mana and sinks right into the ground!", TRUE, ch, 0, 0, TO_ROOM);
 	GET_POS(ch) = POS_SLEEPING;
 
-	af = create_aff(ATYPE_EARTHMELD, -1, APPLY_NONE, 0, AFF_NO_TARGET_IN_ROOM | AFF_NO_SEE_IN_ROOM | AFF_EARTHMELD);
+	af = create_aff(ATYPE_EARTHMELD, -1, APPLY_NONE, 0, AFF_NO_TARGET_IN_ROOM | AFF_NO_SEE_IN_ROOM | AFF_EARTHMELD, ch);
 	affect_join(ch, af, 0);
 	
 	gain_ability_exp(ch, ABIL_EARTHMELD, 15);
@@ -710,7 +721,7 @@ ACMD(do_entangle) {
 		act("$n shoots vines of green mana at you, entangling you!", FALSE, ch, NULL, vict, TO_VICT);
 		act("$n shoots vines of green mana at $N, entangling $M!", FALSE, ch, NULL, vict, TO_NOTVICT);
 	
-		af = create_aff(ATYPE_ENTANGLE, 6, APPLY_DEXTERITY, -1, AFF_ENTANGLED);
+		af = create_aff(ATYPE_ENTANGLE, 6, APPLY_DEXTERITY, -1, AFF_ENTANGLED, ch);
 		affect_join(vict, af, 0);
 
 		engage_combat(ch, vict, FALSE);
@@ -724,9 +735,8 @@ ACMD(do_entangle) {
 
 
 ACMD(do_familiar) {
+	void scale_mob_as_familiar(char_data *mob, char_data *master);
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
-	
-	bool check_scaling(char_data *mob, char_data *attacker);
 	
 	char_data *mob;
 	int iter, type;
@@ -735,15 +745,30 @@ ACMD(do_familiar) {
 	struct {
 		char *name;
 		int ability;
-		int level;	// skill level required
+		int level;	// natural magic level required
 		mob_vnum vnum;
 		int cost;
 	} familiars[] = {
+		// base familiars
 		{ "cat", ABIL_FAMILIAR, 0, FAMILIAR_CAT, 40 },
-		{ "saber-tooth", ABIL_FAMILIAR, 51, FAMILIAR_SABERTOOTH, 40 },
+		{ "saber-toothed cat", ABIL_FAMILIAR, 51, FAMILIAR_SABERTOOTH, 40 },
 		{ "sphinx", ABIL_FAMILIAR, 76, FAMILIAR_SPHINX, 40 },
-		{ "griffin", ABIL_FAMILIAR, 100, FAMILIAR_GRIFFIN, 40 },
+		{ "giant tortoise", ABIL_FAMILIAR, 100, FAMILIAR_GIANT_TORTOISE, 40 },
 		
+		// class animals
+		{ "griffin", ABIL_GRIFFIN, 100, FAMILIAR_GRIFFIN, 40 },
+		{ "dire wolf", ABIL_DIRE_WOLF, 100, FAMILIAR_DIRE_WOLF, 40 },
+		{ "moon rabbit", ABIL_MOON_RABBIT, 100, FAMILIAR_MOON_RABBIT, 40 },
+		{ "spirit wolf", ABIL_SPIRIT_WOLF, 100, FAMILIAR_SPIRIT_WOLF, 40 },
+		{ "manticore", ABIL_MANTICORE, 100, FAMILIAR_MANTICORE, 40 },
+		{ "phoenix", ABIL_PHOENIX, 100, FAMILIAR_PHOENIX, 40 },
+		{ "scorpion shadow", ABIL_SCORPION_SHADOW, 100, FAMILIAR_SCORPION_SHADOW, 40 },
+		{ "owl shadow", ABIL_OWL_SHADOW, 100, FAMILIAR_OWL_SHADOW, 40 },
+		{ "basilisk", ABIL_BASILISK, 100, FAMILIAR_BASILISK, 40 },
+		{ "salamander", ABIL_SALAMANDER, 100, FAMILIAR_SALAMANDER, 40 },
+		{ "skeletal hulk", ABIL_SKELETAL_HULK, 100, FAMILIAR_SKELETAL_HULK, 40 },
+		{ "banshee", ABIL_BANSHEE, 100, FAMILIAR_BANSHEE, 40 },
+
 		{ "\n", NO_ABIL, 0, NOTHING, 0 }
 	};
 	
@@ -752,17 +777,20 @@ ACMD(do_familiar) {
 		return;
 	}
 	
-	one_argument(argument, arg);
+	skip_spaces(&argument);
 	
 	// no-arg: just list
-	if (!*arg) {
+	if (!*argument) {
 		msg_to_char(ch, "Summon which familiar:");
 		any = FALSE;
 		for (iter = 0; *familiars[iter].name != '\n'; ++iter) {
 			if (!IS_NPC(ch) && familiars[iter].ability != NO_ABIL && !HAS_ABILITY(ch, familiars[iter].ability)) {
 				continue;
 			}
-			if (GET_SKILL_LEVEL(ch) < familiars[iter].level) {
+			if (familiars[iter].ability != NO_ABIL && ability_data[familiars[iter].ability].parent_skill != NO_SKILL && GET_SKILL(ch, ability_data[familiars[iter].ability].parent_skill) < familiars[iter].level) {
+				continue;
+			}
+			if (familiars[iter].ability == NO_ABIL && GET_SKILL_LEVEL(ch) < familiars[iter].level) {
 				continue;
 			}
 			
@@ -784,10 +812,13 @@ ACMD(do_familiar) {
 		if (!IS_NPC(ch) && familiars[iter].ability != NO_ABIL && !HAS_ABILITY(ch, familiars[iter].ability)) {
 			continue;
 		}
-		if (GET_SKILL_LEVEL(ch) < familiars[iter].level) {
+		if (familiars[iter].ability != NO_ABIL && ability_data[familiars[iter].ability].parent_skill != NO_SKILL && GET_SKILL(ch, ability_data[familiars[iter].ability].parent_skill) < familiars[iter].level) {
 			continue;
 		}
-		if (is_abbrev(arg, familiars[iter].name)) {
+		if (familiars[iter].ability == NO_ABIL && GET_SKILL_LEVEL(ch) < familiars[iter].level) {
+			continue;
+		}
+		if (is_abbrev(argument, familiars[iter].name)) {
 			type = iter;
 			break;
 		}
@@ -807,14 +838,14 @@ ACMD(do_familiar) {
 	}
 	
 	charge_ability_cost(ch, MANA, familiars[type].cost, NOTHING, 0, WAIT_SPELL);
-	mob = read_mobile(familiars[type].vnum);
+	mob = read_mobile(familiars[type].vnum, TRUE);
 	if (IS_NPC(ch)) {
 		MOB_INSTANCE_ID(mob) = MOB_INSTANCE_ID(ch);
 	}
 	setup_generic_npc(mob, GET_LOYALTY(ch), NOTHING, NOTHING);
 	
 	// scale to summoner
-	check_scaling(mob, ch);
+	scale_mob_as_familiar(mob, ch);
 	
 	char_to_room(mob, IN_ROOM(ch));
 	
@@ -861,7 +892,7 @@ ACMD(do_fly) {
 	
 	charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
 	
-	af = create_flag_aff(ATYPE_FLY, CHOOSE_BY_ABILITY_LEVEL(fly_durations, ch, ABIL_FLY), AFF_FLY);
+	af = create_flag_aff(ATYPE_FLY, CHOOSE_BY_ABILITY_LEVEL(fly_durations, ch, ABIL_FLY), AFF_FLY, ch);
 	affect_join(ch, af, 0);
 	
 	msg_to_char(ch, "You concentrate for a moment...\r\nSparkling blue wings made of pure mana erupt from your back!\r\n");
@@ -901,7 +932,7 @@ ACMD(do_hasten) {
 			act("$n touches $N on the arm. Veins of red mana streak down $S skin and $E seems to move a little faster.", FALSE, ch, NULL, vict, TO_NOTVICT);
 		}
 		
-		af = create_flag_aff(ATYPE_HASTEN, CHOOSE_BY_ABILITY_LEVEL(durations, ch, ABIL_HASTEN), AFF_HASTE);
+		af = create_flag_aff(ATYPE_HASTEN, CHOOSE_BY_ABILITY_LEVEL(durations, ch, ABIL_HASTEN), AFF_HASTE, ch);
 		affect_join(vict, af, 0);
 		
 		gain_ability_exp(ch, ABIL_HASTEN, 15);
@@ -1093,7 +1124,8 @@ ACMD(do_moonrise) {
 			charge_ability_cost(ch, MANA, cost, COOLDOWN_MOONRISE, 20 * SECS_PER_REAL_MIN, WAIT_SPELL);
 			msg_to_char(ch, "You let out a bone-chilling howl...\r\n");
 			act("$n lets out a bone-chilling howl...", FALSE, ch, NULL, NULL, TO_ROOM);
-			perform_resurrection(vict, ch, IN_ROOM(ch), ABIL_MOONRISE);
+			act("$O is attempting to resurrect you (use 'accept/reject resurrection').", FALSE, vict, NULL, ch, TO_CHAR | TO_NODARK);
+			add_offer(vict, ch, OFFER_RESURRECTION, ABIL_MOONRISE);
 		}
 	}
 	else if ((corpse = get_obj_in_list_vis(ch, arg, ch->carrying)) || (corpse = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
@@ -1119,13 +1151,8 @@ ACMD(do_moonrise) {
 			charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
 			msg_to_char(ch, "You let out a bone-chilling howl...\r\n");
 			act("$n lets out a bone-chilling howl...", FALSE, ch, NULL, NULL, TO_ROOM);
-			
-			// set up rez data
-			GET_RESURRECT_LOCATION(vict) = GET_ROOM_VNUM(IN_ROOM(ch));
-			GET_RESURRECT_BY(vict) = IS_NPC(ch) ? NOBODY : GET_IDNUM(ch);
-			GET_RESURRECT_ABILITY(vict) = ABIL_MOONRISE;
-			GET_RESURRECT_TIME(vict) = time(0);
-			act("$N is attempting to resurrect you. Type 'respawn' to accept.", FALSE, vict, NULL, ch, TO_CHAR | TO_NODARK);
+			act("$O is attempting to resurrect you (use 'accept/reject resurrection').", FALSE, vict, NULL, ch, TO_CHAR | TO_NODARK);
+			add_offer(vict, ch, OFFER_RESURRECTION, ABIL_MOONRISE);
 		}
 	}
 	else {
@@ -1270,7 +1297,7 @@ ACMD(do_rejuvenate) {
 		act("$n surrounds $N with the bright white mana of rejuvenation.", FALSE, ch, NULL, vict, TO_NOTVICT);
 	}
 	
-	af = create_mod_aff(ATYPE_REJUVENATE, 6, APPLY_HEAL_OVER_TIME, amount);
+	af = create_mod_aff(ATYPE_REJUVENATE, 6, APPLY_HEAL_OVER_TIME, amount, ch);
 	affect_join(vict, af, 0);
 	
 	gain_ability_exp(ch, ABIL_REJUVENATE, 15);
@@ -1310,9 +1337,10 @@ ACMD(do_resurrect) {
 		else {
 			// success: resurrect in room
 			charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
-			msg_to_char(ch, "You begin channeling mana...\r\n");
-			act("$n glows with white light as $e begins to channel $s mana...", FALSE, ch, NULL, NULL, TO_ROOM);
-			perform_resurrection(vict, ch, IN_ROOM(ch), ABIL_RESURRECT);
+			act("You begin channeling mana to resurrect $O...", FALSE, ch, NULL, vict, TO_CHAR | TO_NODARK);
+			act("$n glows with white light as $e begins to channel $s mana to resurrect $O...", FALSE, ch, NULL, vict, TO_NOTVICT);
+			act("$O is attempting to resurrect you (use 'accept/reject resurrection').", FALSE, vict, NULL, ch, TO_CHAR | TO_NODARK);
+			add_offer(vict, ch, OFFER_RESURRECTION, ABIL_RESURRECT);
 		}
 	}
 	else if ((corpse = get_obj_in_list_vis(ch, arg, ch->carrying)) || (corpse = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
@@ -1331,20 +1359,15 @@ ACMD(do_resurrect) {
 		}
 		else if (IS_DEAD(vict) || corpse != find_obj(GET_LAST_CORPSE_ID(vict)) || !IS_CORPSE(corpse)) {
 			// victim has died AGAIN
-			act("You can only resurrect $N using $S most recent corpse.", FALSE, ch, NULL, vict, TO_CHAR | TO_NODARK);
+			act("You can't resurrect $N with that corpse.", FALSE, ch, NULL, vict, TO_CHAR | TO_NODARK);
 		}
 		else {
 			// seems legit...
 			charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
-			act("You begin channeling mana to resurrect $N...", FALSE, ch, NULL, vict, TO_CHAR | TO_NODARK);
-			act("$n glows with white light as $e begins to channel $s mana to resurrect $N...", FALSE, ch, NULL, vict, TO_NOTVICT);
-			
-			// set up rez data
-			GET_RESURRECT_LOCATION(vict) = GET_ROOM_VNUM(IN_ROOM(ch));
-			GET_RESURRECT_BY(vict) = IS_NPC(ch) ? NOBODY : GET_IDNUM(ch);
-			GET_RESURRECT_ABILITY(vict) = ABIL_RESURRECT;
-			GET_RESURRECT_TIME(vict) = time(0);
-			act("$N is attempting to resurrect you. Type 'respawn' to accept.", FALSE, vict, NULL, ch, TO_CHAR | TO_NODARK);
+			act("You begin channeling mana to resurrect $O...", FALSE, ch, NULL, vict, TO_CHAR | TO_NODARK);
+			act("$n glows with white light as $e begins to channel $s mana to resurrect $O...", FALSE, ch, NULL, vict, TO_NOTVICT);
+			act("$O is attempting to resurrect you (use 'accept/reject resurrection').", FALSE, vict, NULL, ch, TO_CHAR | TO_NODARK);
+			add_offer(vict, ch, OFFER_RESURRECTION, ABIL_RESURRECT);
 		}
 	}
 	else {
@@ -1404,7 +1427,7 @@ ACMD(do_skybrand) {
 		act("$n marks you with a glowing blue skybrand!", FALSE, ch, NULL, vict, TO_VICT);
 		act("$n marks $N with a glowing blue skybrand!", FALSE, ch, NULL, vict, TO_NOTVICT);
 	
-		apply_dot_effect(vict, ATYPE_SKYBRAND, 6, DAM_MAGICAL, get_ability_level(ch, ABIL_SKYBRAND) / 24, 3);
+		apply_dot_effect(vict, ATYPE_SKYBRAND, 6, DAM_MAGICAL, get_ability_level(ch, ABIL_SKYBRAND) / 24, 3, ch);
 		engage_combat(ch, vict, FALSE);
 	}
 
@@ -1433,7 +1456,7 @@ ACMD(do_soulsight) {
 		return;
 	}
 	else {
-		charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
+		charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_NONE);
 
 		act("$n's eyes flash briefly.", TRUE, ch, NULL, NULL, TO_ROOM);
 

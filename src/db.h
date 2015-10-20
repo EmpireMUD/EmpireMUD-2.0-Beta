@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: db.h                                            EmpireMUD 2.0b2 *
+*   File: db.h                                            EmpireMUD 2.0b3 *
 *  Usage: header file for database handling                               *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -24,7 +24,8 @@
 #define DB_BOOT_SECTOR  10
 #define DB_BOOT_ADV  11
 #define DB_BOOT_RMT  12
-#define NUM_DB_BOOT_TYPES  13	// total
+#define DB_BOOT_GLB  13
+#define NUM_DB_BOOT_TYPES  14	// total
 
 
 // library sub-dirs
@@ -67,6 +68,7 @@
 #define BLD_PREFIX  LIB_WORLD"bld/"	// building definitions
 #define CRAFT_PREFIX  LIB_WORLD"craft/"	// craft recipes
 #define CROP_PREFIX  LIB_WORLD"crop/"	// crop definitions
+#define GLB_PREFIX  LIB_WORLD"glb/"	// global templates
 #define WLD_PREFIX  LIB_WORLD"wld/"	// room definitions
 #define MOB_PREFIX  LIB_WORLD"mob/"	// monster prototypes
 #define NAMES_PREFIX  LIB_TEXT"names/"	// mob namelists
@@ -86,6 +88,7 @@
 #define CRAFT_SUFFIX  ".craft"	// craft file suffix
 #define CROP_SUFFIX  ".crop"	// crop file suffix
 #define EMPIRE_SUFFIX  ".empire"	// empire file suffix
+#define GLB_SUFFIX  ".glb"	// global suffix
 #define MOB_SUFFIX  ".mob"	// mob suffix for file saves
 #define OBJ_SUFFIX  ".obj"	// obj suffix for file saves
 #define RMT_SUFFIX  ".rmt"	// room template suffix
@@ -124,6 +127,7 @@
 #define INSTANCE_FILE  LIB_ETC"instances"	// instanced adventures
 #define ISLAND_FILE  LIB_ETC"islands"	// island info
 #define TRADING_POST_FILE  LIB_ETC"trading_post"	// for global trade
+#define VERSION_FILE  LIB_ETC"version"	// for version tracking
 
 // map output data
 #define DATA_DIR  "../data/"
@@ -176,6 +180,11 @@ extern struct instance_data *instance_list;
 void free_adventure(adv_data *adv);
 extern adv_data *adventure_proto(adv_vnum vnum);
 
+// books
+extern book_data *book_table;
+extern struct author_data *author_table;
+void free_book(book_data *book);
+
 // buildings
 extern bld_data *building_table;
 void free_building(bld_data *building);
@@ -211,6 +220,11 @@ void save_all_empires();
 // extra descs
 void free_extra_descs(struct extra_descr_data **list);
 
+// globals
+extern struct global_data *globals_table;
+void free_global(struct global_data *glb);
+extern struct global_data *global_proto(any_vnum vnum);
+
 // islands
 extern struct island_info *island_table;
 extern struct island_info *get_island(int island_id, bool create_if_missing);
@@ -225,7 +239,7 @@ extern char_data *mobile_table;
 extern int top_of_p_table;
 extern struct player_index_element *player_table;
 void init_player(char_data *ch);
-extern char_data *read_mobile(mob_vnum nr);
+extern char_data *read_mobile(mob_vnum nr, bool with_triggers);
 extern char_data *mob_proto(mob_vnum vnum);
 void clear_char(char_data *ch);
 void reset_char(char_data *ch);
@@ -248,7 +262,7 @@ obj_data *create_obj(void);
 void clear_object(obj_data *obj);
 void free_obj(obj_data *obj);
 obj_data *obj_proto(obj_vnum vnum);
-obj_data *read_object(obj_vnum nr);
+obj_data *read_object(obj_vnum nr, bool with_triggers);
 
 // players
 extern struct group_data *group_list;

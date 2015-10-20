@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: morph.c                                         EmpireMUD 2.0b2 *
+*   File: morph.c                                         EmpireMUD 2.0b3 *
 *  Usage: morph-related code                                              *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -456,7 +456,14 @@ void perform_morph(char_data *ch, ubyte form) {
 * @param int morph_to any MORPH_x const
 */
 void finish_morphing(char_data *ch, int morph_to) {
+	void undisguise(char_data *ch);
+
 	char lbuf[MAX_STRING_LENGTH];
+	
+	// can't be disguised while morphed
+	if (IS_DISGUISED(ch) && morph_to != MORPH_NONE) {
+		undisguise(ch);
+	}
 	
 	sprintf(lbuf, "%s has become $n!", PERS(ch, ch, FALSE));
 
@@ -569,7 +576,7 @@ ACMD(do_morph) {
 			command_lag(ch, WAIT_OTHER);
 		}
 		else {
-			start_action(ch, ACT_MORPHING, config_get_int("morph_timer"), ACT_ANYWHERE);
+			start_action(ch, ACT_MORPHING, config_get_int("morph_timer"));
 			GET_ACTION_VNUM(ch, 0) = morph_to;
 			msg_to_char(ch, "You begin to transform!\r\n");
 		}

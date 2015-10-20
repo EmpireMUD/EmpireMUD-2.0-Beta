@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: limits.c                                        EmpireMUD 2.0b2 *
+*   File: limits.c                                        EmpireMUD 2.0b3 *
 *  Usage: Periodic updates and limiters                                   *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -46,7 +46,7 @@ extern const struct wear_data_type wear_data[NUM_WEARS];
 // external funcs
 extern obj_data *die(char_data *ch, char_data *killer);
 void death_log(char_data *ch, char_data *killer, int type);
-extern struct instance_data *find_instance_by_room(room_data *room);
+extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 extern room_data *obj_room(obj_data *obj);
 void out_of_blood(char_data *ch);
 void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool full_abandon);
@@ -76,6 +76,11 @@ void check_attribute_gear(char_data *ch) {
 	bool found;
 	
 	if (!ch || IS_NPC(ch)) {
+		return;
+	}
+	
+	// don't bother if morphed -- let them keep using gear, but not equip any more
+	if (GET_MORPH(ch) != MORPH_NONE) {
 		return;
 	}
 	
@@ -176,8 +181,6 @@ void check_expired_cooldowns(void) {
 * Times out players who are sitting at the password or name prompt.
 */
 void check_idle_passwords(void) {
-	void echo_on(descriptor_data *d);
-
 	descriptor_data *d, *next_d;
 
 	for (d = descriptor_list; d; d = next_d) {
@@ -189,7 +192,9 @@ void check_idle_passwords(void) {
 			++d->idle_tics;
 		}
 		else {
-			echo_on(d);
+			if (STATE(d) == CON_PASSWORD) {
+				ProtocolNoEcho(d, false);
+			}
 			SEND_TO_Q("\r\nTimed out... goodbye.\r\n", d);
 			STATE(d) = CON_CLOSE;
 		}
@@ -367,6 +372,9 @@ void point_update_char(char_data *ch) {
 					GET_HEALTH(ch) = GET_MAX_HEALTH(ch);
 					GET_MOVE(ch) = GET_MAX_MOVE(ch);
 					GET_MANA(ch) = GET_MAX_MANA(ch);
+					if (GET_POS(ch) < POS_SLEEPING) {
+						GET_POS(ch) = POS_STANDING;
+					}
 				}
 			}
 		}
@@ -404,6 +412,7 @@ void point_update_char(char_data *ch) {
 * @param char_data *ch The character to update.
 */
 void real_update_char(char_data *ch) {
+	void adventure_unsummon(char_data *ch);
 	extern bool can_wear_item(char_data *ch, obj_data *item, bool send_messages);
 	extern int compute_bonus_exp_per_day(char_data *ch);
 	extern int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname);	
@@ -416,6 +425,11 @@ void real_update_char(char_data *ch) {
 	char_data *room_ch, *next_ch;
 	int result, iter, type;
 	int fol_count, gain;
+	
+	// first check location: this may move the player
+	if (!IS_NPC(ch) && PLR_FLAGGED(ch, PLR_ADVENTURE_SUMMONED) && !IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
+		adventure_unsummon(ch);
+	}
 	
 	// update affects (NPCs get this, too)
 	for (af = ch->affected; af; af = next_af) {
@@ -434,7 +448,7 @@ void real_update_char(char_data *ch) {
 			
 			// special case -- add immunity
 			if (IS_SET(af->bitvector, AFF_STUNNED) && config_get_int("stun_immunity_time") > 0) {
-				immune = create_flag_aff(ATYPE_STUN_IMMUNITY, config_get_int("stun_immunity_time") / SECS_PER_REAL_UPDATE, AFF_IMMUNE_STUN);
+				immune = create_flag_aff(ATYPE_STUN_IMMUNITY, config_get_int("stun_immunity_time") / SECS_PER_REAL_UPDATE, AFF_IMMUNE_STUN, ch);
 				affect_join(ch, immune, 0);
 			}
 			
@@ -487,7 +501,14 @@ void real_update_char(char_data *ch) {
 	if (IS_NPC(ch)) {
 		return;
 	}
-
+	
+	// update recent level data if level has gone up or it's been too long since we've seen a higher level
+	if (GET_COMPUTED_LEVEL(ch) > GET_HIGHEST_KNOWN_LEVEL(ch)) {
+		GET_HIGHEST_KNOWN_LEVEL(ch) = GET_COMPUTED_LEVEL(ch);
+	}
+	// update the last-known-level
+	GET_LAST_KNOWN_LEVEL(ch) = GET_COMPUTED_LEVEL(ch);
+	
 	// very drunk? more confused!
 	if (GET_COND(ch, DRUNK) > 350) {
 		GET_CONFUSED_DIR(ch) = number(0, NUM_SIMPLE_DIRS-1);
@@ -560,7 +581,7 @@ void real_update_char(char_data *ch) {
 	}
 
 	/* moving on.. */
-	if (GET_POS(ch) < POS_STUNNED) {
+	if (GET_POS(ch) < POS_STUNNED || (GET_POS(ch) == POS_STUNNED && health_gain(ch, TRUE) <= 0)) {
 		GET_HEALTH(ch) -= 1;
 		update_pos(ch);
 		if (GET_POS(ch) == POS_DEAD) {
@@ -676,7 +697,8 @@ static bool check_one_city_for_ruin(empire_data *emp, struct empire_city_data *c
 				
 				if (to_room && ROOM_OWNER(to_room) == emp) {
 					// is any building, and isn't ruins?
-					if (IS_ANY_BUILDING(to_room) && !ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_DISREPAIR) && BUILDING_VNUM(to_room) != BUILDING_RUINS_OPEN && BUILDING_VNUM(to_room) != BUILDING_RUINS_CLOSED) {
+					// TODO: maybe need a ruins flag, as we are up to 3 ruins
+					if (IS_ANY_BUILDING(to_room) && !ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_DISREPAIR) && BUILDING_VNUM(to_room) != BUILDING_RUINS_OPEN && BUILDING_VNUM(to_room) != BUILDING_RUINS_FLOODED && BUILDING_VNUM(to_room) != BUILDING_RUINS_CLOSED) {
 						found_building = TRUE;
 					}
 				}
@@ -839,6 +861,7 @@ static void reduce_outside_territory_one(empire_data *emp) {
 	struct empire_city_data *city;
 	room_data *iter, *next_iter, *loc, *farthest;
 	int dist, this_far, far_dist;
+	bool junk;
 	
 	// sanity
 	if (!emp || EMPIRE_IMM_ONLY(emp) || EMPIRE_OUTSIDE_TERRITORY(emp) <= land_can_claim(emp, TRUE)) {
@@ -857,16 +880,17 @@ static void reduce_outside_territory_one(empire_data *emp) {
 		loc = HOME_ROOM(iter);
 		
 		// if owner matches AND it's not in a city
-		if (ROOM_OWNER(loc) == emp && !COUNTS_AS_IN_CITY(loc) && !find_city(emp, loc)) {
-			// check its distance from each city
-			this_far = 0;
+		if (ROOM_OWNER(loc) == emp && !is_in_city_for_empire(loc, emp, FALSE, &junk)) {
+			// check its distance from each city, find the city it's closest to
+			this_far = MAP_SIZE;
 			for (city = EMPIRE_CITY_LIST(emp); city; city = city->next) {
 				dist = compute_distance(loc, city->location);
-				if (dist > this_far) {
+				if (dist < this_far) {
 					this_far = dist;
 				}
 			}
 			
+			// now compare its distance from the closest city, and find the one farthest from a city
 			if (this_far > far_dist) {
 				far_dist = this_far;
 				farthest = loc;
@@ -902,31 +926,62 @@ void reduce_outside_territory(void) {
 
 
 /**
-* Removes claimed land, one tile at a time, from very stale empires.
+* Removes claimed land, one tile at a time, from very stale empires. Since
+* these empires have been gone a long time, there's no need to do this in any
+* fancy order.
 *
 * @param empire_data *emp The empire to reduce.
 */
 static void reduce_stale_empires_one(empire_data *emp) {
 	bool outside_only = (EMPIRE_OUTSIDE_TERRITORY(emp) > 0);
 	room_data *iter, *next_iter, *found_room = NULL;
-	int num_found = 0;
+	bool junk;
 	
-	HASH_ITER(world_hh, world_table, iter, next_iter) {
-		// map only
-		if (GET_ROOM_VNUM(iter) >= MAP_SIZE) {
-			continue;
-		}
-		
-		// caution: do not abandon city centers this way
-		if (ROOM_OWNER(iter) == emp && !IS_CITY_CENTER(iter) && (!outside_only || !find_city(emp, iter))) {
-			if (!number(0, num_found++)) {
-				found_room = iter;
+	// try interior first -- we'll take the first secondary room we find
+	if (!outside_only) {
+		HASH_ITER(interior_hh, interior_world_table, iter, next_iter) {
+			// only want rooms owned by this empire and only if they are their own home room (like a ship)
+			if (ROOM_OWNER(iter) != emp || HOME_ROOM(iter) != iter) {
+				continue;
 			}
+			// only looking for secondary territory
+			if (!ROOM_BLD_FLAGGED(iter, BLD_SECONDARY_TERRITORY)) {
+				continue;
+			}
+		
+			// found one!
+			found_room = iter;
+			break;
 		}
 	}
 	
+	if (!found_room) {
+		// otherwise find a random room
+		HASH_ITER(world_hh, world_table, iter, next_iter) {
+			// map only
+			if (GET_ROOM_VNUM(iter) >= MAP_SIZE) {
+				continue;
+			}
+			if (ROOM_OWNER(iter) != emp) {
+				continue;
+			}
+			// caution: do not abandon city centers this way
+			if (IS_CITY_CENTER(iter)) {
+				continue;
+			}
+			if (outside_only && is_in_city_for_empire(iter, emp, FALSE, &junk)) {
+				continue;
+			}
+			
+			// first match
+			found_room = iter;
+			break;
+		}
+	}
+	
+	// did we find one?
 	if (found_room) {
-		// this is only called on VERY stale empires (no members), so there's no need to log this abandon
+		// this is only called on VERY stale empires (no members), so there's no real need to log this abandon
 		abandon_room(found_room);
 		read_empire_territory(emp);
 	}
@@ -982,6 +1037,7 @@ bool should_delete_empire(empire_data *emp) {
 * @return bool TRUE if the item is still in the world, FALSE if it was extracted
 */
 bool check_autostore(obj_data *obj, bool force) {
+	room_data *real_loc;
 	obj_data *top_obj;
 	empire_data *emp;
 	bool store, unique, full;
@@ -998,7 +1054,14 @@ bool check_autostore(obj_data *obj, bool force) {
 	
 	// ensure object is in a room, or in an object in a room
 	top_obj = get_top_object(obj);
-	if (!IN_ROOM(top_obj) || IS_ADVENTURE_ROOM(IN_ROOM(top_obj))) {
+	real_loc = IN_ROOM(top_obj);
+	if (!real_loc || IS_ADVENTURE_ROOM(real_loc)) {
+		return TRUE;
+	}
+	
+	// check boat room: items on ships in the Ship Holding Pen do not autostore
+	real_loc = BOAT_ROOM(real_loc);
+	if (!real_loc || BUILDING_VNUM(real_loc) == RTYPE_SHIP_HOLDING_PEN) {
 		return TRUE;
 	}
 	
@@ -1277,8 +1340,8 @@ void real_update_obj(obj_data *obj) {
 	if (OBJ_FLAGGED(obj, OBJ_LIGHT) && IN_ROOM(obj) && IS_ANY_BUILDING(IN_ROOM(obj))) {
 		home = HOME_ROOM(IN_ROOM(obj));
 		if (ROOM_BLD_FLAGGED(home, BLD_BURNABLE) && !BUILDING_BURNING(home)) {
-			// only items with an empire id are considered: you can't burn stuff down by accident
-			if (obj->last_empire_id != NOTHING) {
+			// only items with an empire id are considered: you can't burn stuff down by accident (unless the building is unowned)
+			if (obj->last_empire_id != NOTHING || !ROOM_OWNER(home)) {
 				// check that the empire is at war
 				emp = ROOM_OWNER(home);
 				enemy = real_empire(obj->last_empire_id);
@@ -1319,6 +1382,7 @@ void point_update_room(room_data *room) {
 	struct affected_type *af, *next_af;
 	empire_data *emp;
 	time_t now = time(0);
+	bool junk;
 	int count;
 	
 	int allowed_animals = config_get_int("num_duplicates_in_stable");
@@ -1381,7 +1445,8 @@ void point_update_room(room_data *room) {
 				disassociate_building(room);
 				
 				// auto-abandon if not in city
-				if (emp && !find_city(emp, room)) {
+				if (emp && !is_in_city_for_empire(room, emp, TRUE, &junk)) {
+					// does check the city time limit for abandon protection
 					abandon_room(room);
 					read_empire_territory(emp);
 				}
@@ -1511,9 +1576,9 @@ bool can_teleport_to(char_data *ch, room_data *loc, bool check_owner) {
 	}
 	
 	// player limit, maybe
-	if (IS_ADVENTURE_ROOM(loc) && (inst = find_instance_by_room(loc))) {
+	if (IS_ADVENTURE_ROOM(loc) && (inst = find_instance_by_room(loc, FALSE))) {
 		// only if not already in there
-		if (!IS_ADVENTURE_ROOM(IN_ROOM(ch)) || find_instance_by_room(IN_ROOM(ch)) != inst) {
+		if (!IS_ADVENTURE_ROOM(IN_ROOM(ch)) || find_instance_by_room(IN_ROOM(ch), FALSE) != inst) {
 			if (!can_enter_instance(ch, inst)) {
 				return FALSE;
 			}
@@ -1826,6 +1891,7 @@ int move_gain(char_data *ch, bool info_only) {
 * update for that tick, to avoid iterating a second time over the same data.
 */
 void point_update(bool run_real) {
+	void clean_offers(char_data *ch);
 	void save_daily_cycle();
 	void update_players_online_stats();
 	extern int max_players_today;
@@ -1836,7 +1902,11 @@ void point_update(bool run_real) {
 	
 	// check if the skill cycle must reset (daily)
 	if (time(0) > daily_cycle + SECS_PER_REAL_DAY) {
-		daily_cycle += SECS_PER_REAL_DAY;
+		// put this in a while so that it doesn't repeatedly update if the mud is down for more than a day
+		// but it only adds 1 day at a time so that the cycle time doesn't move
+		while (time(0) > daily_cycle + SECS_PER_REAL_DAY) {
+			daily_cycle += SECS_PER_REAL_DAY;
+		}
 		save_daily_cycle();
 		
 		// reset players seen today too
@@ -1847,6 +1917,11 @@ void point_update(bool run_real) {
 	// characters
 	for (ch = character_list; ch; ch = next_ch) {
 		next_ch = ch->next;
+		
+		// remove stale offers -- this needs to happen even if dead (resurrect)
+		if (!IS_NPC(ch)) {
+			clean_offers(ch);
+		}
 		
 		if (EXTRACTED(ch) || IS_DEAD(ch)) {
 			continue;
