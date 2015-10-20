@@ -1882,7 +1882,7 @@ void write_player_to_file(FILE *fl, char_data *ch) {
 		}
 	}
 	for (iter = 0; iter < MAX_REWARDS_PER_DAY; ++iter) {
-		if (GET_REWARDED_TODAY(ch, iter)) {
+		if (GET_REWARDED_TODAY(ch, iter) > 0) {
 			fprintf(fl, "Rewarded: %d\n", GET_REWARDED_TODAY(ch, iter));
 		}
 	}
