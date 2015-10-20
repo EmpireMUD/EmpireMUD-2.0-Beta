@@ -2207,7 +2207,7 @@ struct player_index_data {
 	char *last_host;	// last known host
 	
 	UT_hash_handle idnum_hh;	// player_table_by_idnum
-	UT_hash_handle hh;	// player_table_by_name
+	UT_hash_handle name_hh;	// player_table_by_name
 };
 
 

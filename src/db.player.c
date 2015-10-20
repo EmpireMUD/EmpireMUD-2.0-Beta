@@ -111,7 +111,7 @@ player_index_data *find_player_index_by_idnum(int idnum) {
 */
 player_index_data *find_player_index_by_name(char *name) {
 	player_index_data *plr;
-	HASH_FIND_STR(player_table_by_name, name, plr);
+	HASH_FIND(name_hh, player_table_by_name, name, strlen(name), plr);
 	return plr;
 }
 
@@ -544,10 +544,10 @@ void add_player_to_table(player_index_data *plr) {
 	// by name: ensure name is lowercase
 	find = NULL;
 	strtolower(plr->name);	// ensure always lower
-	HASH_FIND_STR(player_table_by_name, plr->name, find);
+	HASH_FIND(name_hh, player_table_by_name, plr->name, strlen(plr->name), find);
 	if (!find) {
-		HASH_ADD_STR(player_table_by_name, name, plr);
-		HASH_SORT(player_table_by_name, sort_players_by_name);
+		HASH_ADD(name_hh, player_table_by_name, name[0], strlen(plr->name), plr);
+		HASH_SRT(name_hh, player_table_by_name, sort_players_by_name);
 	}
 }
 
@@ -1428,7 +1428,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal) {
 */
 void remove_player_from_table(player_index_data *plr) {
 	HASH_DELETE(idnum_hh, player_table_by_idnum, plr);
-	HASH_DEL(player_table_by_name, plr);
+	HASH_DELETE(name_hh, player_table_by_name, plr);
 }
 
 
