@@ -503,7 +503,7 @@ OLC_MODULE(booked_author) {
 	}
 	else {
 		book->author = index->idnum;
-		msg_to_char(ch, "You set the book's author id to %s (%d).\r\n", (index->idnum <= 0 || !index->fullname) ? "nobody" : index->fullname, id);
+		msg_to_char(ch, "You set the book's author id to %s (%d).\r\n", (index->idnum <= 0 || !index->fullname) ? "nobody" : index->fullname, index->idnum);
 	}
 }
 

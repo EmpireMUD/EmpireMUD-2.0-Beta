@@ -3167,7 +3167,7 @@ void add_lore(char_data *ch, int type, const char *str, ...) {
 	char text[MAX_STRING_LENGTH];
 	va_list tArgList;
 
-	if (!ch || IS_NPC(ch) || !text)
+	if (!ch || IS_NPC(ch) || !str)
 		return;
 	
 	// find end
