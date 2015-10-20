@@ -5183,7 +5183,7 @@ void save_library_file_for_vnum(int type, any_vnum vnum) {
 		return;
 	}
 	
-	log("Saving library file %s", filename);
+	// log("Saving library file %s", filename);
 	
 	// DB_BOOT_x
 	switch (type) {
