@@ -546,7 +546,7 @@ void add_player_to_table(player_index_data *plr) {
 	strtolower(plr->name);	// ensure always lower
 	HASH_FIND(name_hh, player_table_by_name, plr->name, (unsigned)strlen(plr->name), find);
 	if (!find) {
-		HASH_ADD(name_hh, player_table_by_name, name, strlen(plr->name), plr);
+		HASH_ADD(name_hh, player_table_by_name, name, (unsigned)strlen(plr->name), plr);
 		HASH_SRT(name_hh, player_table_by_name, sort_players_by_name);
 	}
 }
@@ -1533,17 +1533,20 @@ void store_loaded_char(char_data *ch) {
 * @param char_data *ch The player character to update it with.
 */
 void update_player_index(player_index_data *index, char_data *ch) {
+	char temp[MAX_STRING_LENGTH];
+	
 	if (!index || !ch) {
 		return;
 	}
 	
 	index->idnum = GET_IDNUM(ch);
 	
-	if (index->name) {
-		free(index->name);
+	// we don't update the name once it's set
+	if (!index->name) {
+		strcpy(temp, GET_PC_NAME(ch));
+		strtolower(temp);
+		index->name = str_dup(temp);
 	}
-	index->name = str_dup(GET_PC_NAME(ch));
-	strtolower(index->name);
 	
 	if (index->fullname) {
 		free(index->fullname);
