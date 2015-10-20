@@ -110,8 +110,12 @@ player_index_data *find_player_index_by_idnum(int idnum) {
 * @return player_index_data* The player, if any (or NULL).
 */
 player_index_data *find_player_index_by_name(char *name) {
+	char dupe[MAX_INPUT_LENGTH];	// should be long enough
 	player_index_data *plr;
-	HASH_FIND(name_hh, player_table_by_name, name, strlen(name), plr);
+	
+	strcpy(dupe, name);
+	strtolower(dupe);
+	HASH_FIND(name_hh, player_table_by_name, dupe, strlen(dupe), plr);
 	return plr;
 }
 
