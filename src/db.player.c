@@ -1543,7 +1543,7 @@ void update_player_index(player_index_data *index, char_data *ch) {
 	}
 	index->fullname = PERS(ch, ch, TRUE);
 	
-	index->account_id = GET_ACCOUNT(ch)->id;
+	index->account_id = GET_ACCOUNT(ch) ? GET_ACCOUNT(ch)->id : 0;	// may not be set yet
 	index->last_logon = ch->prev_logon;
 	index->birth = ch->player.time.birth;
 	index->played = ch->player.time.played;
