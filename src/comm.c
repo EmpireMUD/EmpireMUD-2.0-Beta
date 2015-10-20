@@ -3577,7 +3577,7 @@ void reboot_recover(void) {
 		memset((char *) d, 0, sizeof (descriptor_data));
 		init_descriptor(d, desc);
 
-		strcpy(d->host, host);
+		d->host = str_dup(host);
 		d->next = descriptor_list;
 		descriptor_list = d;
 
