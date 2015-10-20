@@ -233,6 +233,7 @@ void add_player_to_account(char_data *ch, account_data *acct) {
 	}
 	
 	save_library_file_for_vnum(DB_BOOT_ACCT, acct->id);
+	GET_ACCOUNT(ch) = acct;
 }
 
 
