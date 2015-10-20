@@ -1236,8 +1236,10 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 			send_to_char("You cannot change that.\r\n", ch);
 			return (0);
 		}
-		strncpy(GET_PASSWD(vict), CRYPT(val_arg, PASSWORD_SALT), MAX_PWD_LENGTH);
-		*(GET_PASSWD(vict) + MAX_PWD_LENGTH) = '\0';
+		if (GET_PASSWD(vict)) {
+			free(GET_PASSWD(vict));
+		}
+		GET_PASSWD(vict) = str_dup(CRYPT(val_arg, PASSWORD_SALT));
 		sprintf(output, "Password for %s changed.", GET_NAME(vict));
 	}
 	else if SET_CASE("nodelete") {

@@ -2302,9 +2302,8 @@ void nanny(descriptor_data *d, char *arg) {
 				SEND_TO_Q("Password: ", d);
 				return;
 			}
-			strncpy(GET_PASSWD(d->character), CRYPT(arg, PASSWORD_SALT), MAX_PWD_LENGTH);
-			*(GET_PASSWD(d->character) + MAX_PWD_LENGTH) = '\0';
-
+			
+			GET_PASSWD(d->character) = str_dup(CRYPT(arg, PASSWORD_SALT));
 			next_creation_step(d);
 			break;
 		}
