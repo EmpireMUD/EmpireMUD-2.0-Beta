@@ -2052,7 +2052,7 @@ int enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	
 	extern bool global_mute_slash_channel_joins;
 
-	struct slash_channel *load_slash, *next_slash;
+	struct slash_channel *load_slash, *next_slash, *temp;
 	room_data *load_room = NULL, *map_loc;
 	char_data *ch = d->character;
 	char lbuf[MAX_STRING_LENGTH];
@@ -2164,6 +2164,8 @@ int enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 			sprintf(lbuf, "join %s", load_slash->name);
 			do_slash_channel(ch, lbuf, 0, 0);
 		}
+		
+		REMOVE_FROM_LIST(load_slash, LOAD_SLASH_CHANNELS(ch), next);
 		if (load_slash->name) {
 			free(load_slash->name);
 		}
