@@ -2206,8 +2206,8 @@ struct player_index_data {
 	empire_data *loyalty;	// empire, if any
 	char *last_host;	// last known host
 	
-	UT_hash_handle idnum_hh;
-	UT_hash_handle name_hh;
+	UT_hash_handle idnum_hh;	// player_table_by_idnum
+	UT_hash_handle hh;	// player_table_by_name
 };
 
 

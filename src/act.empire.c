@@ -4302,7 +4302,7 @@ ACMD(do_roster) {
 	*buf = '\0';
 	size = 0;
 	
-	HASH_ITER(name_hh, player_table_by_name, index, next_index) {
+	HASH_ITER(hh, player_table_by_name, index, next_index) {
 		if (index->loyalty != e) {
 			continue;
 		}

@@ -111,7 +111,7 @@ player_index_data *find_player_index_by_idnum(int idnum) {
 */
 player_index_data *find_player_index_by_name(char *name) {
 	player_index_data *plr;
-	HASH_FIND(name_hh, player_table_by_name, name, (unsigned)strlen(name), plr);
+	HASH_FIND_STR(player_table_by_name, name, plr);
 	return plr;
 }
 
@@ -544,10 +544,10 @@ void add_player_to_table(player_index_data *plr) {
 	// by name: ensure name is lowercase
 	find = NULL;
 	strtolower(plr->name);	// ensure always lower
-	HASH_FIND(name_hh, player_table_by_name, plr->name, (unsigned)strlen(plr->name), find);
+	HASH_FIND_STR(player_table_by_name, plr->name, find);
 	if (!find) {
-		HASH_ADD(name_hh, player_table_by_name, name, (unsigned)strlen(plr->name), plr);
-		HASH_SRT(name_hh, player_table_by_name, sort_players_by_name);
+		HASH_ADD_STR(player_table_by_name, name, plr);
+		HASH_SORT(player_table_by_name, sort_players_by_name);
 	}
 }
 
@@ -1428,7 +1428,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal) {
 */
 void remove_player_from_table(player_index_data *plr) {
 	HASH_DELETE(idnum_hh, player_table_by_idnum, plr);
-	HASH_DELETE(name_hh, player_table_by_name, plr);
+	HASH_DEL(player_table_by_name, plr);
 }
 
 
@@ -1533,20 +1533,17 @@ void store_loaded_char(char_data *ch) {
 * @param char_data *ch The player character to update it with.
 */
 void update_player_index(player_index_data *index, char_data *ch) {
-	char temp[MAX_STRING_LENGTH];
-	
 	if (!index || !ch) {
 		return;
 	}
 	
 	index->idnum = GET_IDNUM(ch);
 	
-	// we don't update the name once it's set
-	if (!index->name) {
-		strcpy(temp, GET_PC_NAME(ch));
-		strtolower(temp);
-		index->name = str_dup(temp);
+	if (index->name) {
+		free(index->name);
 	}
+	index->name = str_dup(GET_PC_NAME(ch));
+	strtolower(index->name);
 	
 	if (index->fullname) {
 		free(index->fullname);
