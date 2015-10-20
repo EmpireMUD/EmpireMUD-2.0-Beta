@@ -3582,15 +3582,11 @@ void reboot_recover(void) {
 		descriptor_list = d;
 
 		d->connected = CON_CLOSE;
-
-		CREATE(d->character, char_data, 1);
-		clear_char(d->character);
-		CREATE(d->character->player_specials, struct player_special_data, 1);
-		d->character->desc = d;
-		
+				
 		d->character = load_player(name);
 		if (d->character) {
 			REMOVE_BIT(PLR_FLAGS(d->character), PLR_WRITING | PLR_MAILING);
+			d->character->desc = d;
 		}
 		else {
 			fOld = FALSE;
