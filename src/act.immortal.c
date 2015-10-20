@@ -437,9 +437,8 @@ ADMIN_UTIL(util_islandsize) {
 
 
 ADMIN_UTIL(util_playerdump) {
-	struct char_file_u chdata;
+	player_index_data *index, *next_index;
 	char_data *plr;
-	int pos;
 	bool is_file;
 	FILE *fl;
 	
@@ -449,17 +448,13 @@ ADMIN_UTIL(util_playerdump) {
 	}
 	
 	fprintf(fl, "name\taccount\thours\thost\n");
-
-	for (pos = 0; pos <= top_of_p_table; ++pos) {
-		if (load_char(player_table[pos].name, &chdata) <= NOBODY || IS_SET(chdata.char_specials_saved.act, PLR_DELETED)) {
+	
+	HASH_ITER(idnum_hh, player_table_by_idnum, index, next_index) {		
+		if (!(plr = find_or_load_player(index->name, &is_file))) {
 			continue;
 		}
 		
-		if (!(plr = find_or_load_player(player_table[pos].name, &is_file))) {
-			continue;
-		}
-		
-		fprintf(fl, "%s\t%d\t%d\t%s\n", GET_NAME(plr), GET_ACCOUNT_ID(plr), (chdata.played / SECS_PER_REAL_HOUR), chdata.host);
+		fprintf(fl, "%s\t%d\t%d\t%s\n", GET_NAME(plr), GET_ACCOUNT(plr)->id, (plr->player.time.played / SECS_PER_REAL_HOUR), plr->prev_host);
 		
 		// done
 		if (is_file && plr) {
@@ -946,7 +941,6 @@ struct set_struct {
 		{ "thirst",		LVL_START_IMM, 	BOTH, 	MISC },
 		{ "level",		LVL_CIMPL, 	PC, 	NUMBER },
 		{ "siteok",		LVL_START_IMM, 	PC, 	BINARY },
-		{ "deleted", 	LVL_CIMPL, 	PC, 	BINARY },
 		{ "nowizlist", 	LVL_START_IMM, 	PC, 	BINARY },
 		{ "loadroom", 	LVL_START_IMM, 	PC, 	MISC },
 		{ "password",	LVL_CIMPL, 	PC, 	MISC },
@@ -986,9 +980,9 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 	extern int _parse_name(char *arg, char *name);
 	extern int Valid_Name(char *newname);
 	void make_vampire(char_data *ch, bool lore);
-	int new_account_id();
 
-	int i, iter, nr, on = 0, off = 0, value = 0;
+	player_index_data *index, *next_index, *found_index;
+	int i, iter, on = 0, off = 0, value = 0;
 	empire_data *emp;
 	room_vnum rvnum;
 	char output[MAX_STRING_LENGTH], oldname[MAX_INPUT_LENGTH], newname[MAX_INPUT_LENGTH];
@@ -1044,7 +1038,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 	}
 	else if SET_CASE("title") {
 		set_title(vict, val_arg);
-		sprintf(output, "%s's title is now: %s", GET_NAME(vict), GET_TITLE(vict));
+		sprintf(output, "%s's title is now: %s", GET_NAME(vict), NULLSAFE(GET_TITLE(vict)));
 	}
 
 	else if SET_CASE("health") {
@@ -1211,23 +1205,6 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 	}
 	else if SET_CASE("siteok") {
 		SET_OR_REMOVE(PLR_FLAGS(vict), PLR_SITEOK);
-	}
-	else if SET_CASE("deleted") {
-		void delete_player_character(char_data *ch);
-		
-		if (on || !PLR_FLAGGED(vict, PLR_DELETED)) {
-			if (PLR_FLAGGED(vict, PLR_NODELETE)) {
-				msg_to_char(ch, "You can't set that on a no-delete player.\r\n");
-				return 0;
-			}
-			
-			// DELETE THEM!
-			SET_BIT(PLR_FLAGS(vict), PLR_DELETED);
-			delete_player_character(vict);
-		}
-		else {
-			REMOVE_BIT(PLR_FLAGS(vict), PLR_DELETED);
-		}
 	}
 	else if SET_CASE("nowizlist") {
 		SET_OR_REMOVE(PLR_FLAGS(vict), PLR_NOWIZLIST);
@@ -1407,19 +1384,21 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 	}
 
 	else if SET_CASE("account") {		
-		if (!str_cmp(val_arg, "none")) {
-			sprintf(output, "%s is %s associated with an account", GET_NAME(vict), (GET_ACCOUNT_ID(vict) > 0) ? "no longer" : "not");
-			GET_ACCOUNT_ID(vict) = 0;
+		if (!str_cmp(val_arg, "new")) {
+			sprintf(output, "%s is now associated with a new account", GET_NAME(vict));
+			remove_player_from_account(vict);
+			create_account_for_player(vict);
 		}
 		else {
 			// load 2nd player
 			if ((alt = find_or_load_player(val_arg, &file))) {
 				sprintf(output, "%s is now associated with %s's account", GET_NAME(vict), GET_NAME(alt));
 				
+				remove_player_from_account(vict);
 				// does 2nd player have an account already? if not, make one
-				if (GET_ACCOUNT_ID(alt) == 0) {
-					GET_ACCOUNT_ID(alt) = new_account_id();
-					GET_ACCOUNT_ID(vict) = GET_ACCOUNT_ID(alt);
+				if (!GET_ACCOUNT(alt)) {
+					create_account_for_player(alt);
+					add_player_to_account(vict, GET_ACCOUNT(alt));
 
 					if (file) {
 						store_loaded_char(alt);
@@ -1432,7 +1411,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 				}
 				else {
 					// already has acct
-					GET_ACCOUNT_ID(vict) = GET_ACCOUNT_ID(alt);
+					add_player_to_account(vict, GET_ACCOUNT(alt));
 				}
 				
 				if (file && alt) {
@@ -1457,34 +1436,30 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 			msg_to_char(ch, "Invalid name.\r\n");
 			return 0;
 		}
-		nr = NOBODY;
-		for (i = 0; i <= top_of_p_table; i++) {
-			if (!str_cmp(player_table[i].name, newname)) {
+		found_index = NULL;
+		HASH_ITER(idnum_hh, player_table_by_idnum, index, next_index) {
+			if (!str_cmp(index->name, newname)) {
 				msg_to_char(ch, "That name is already taken.\r\n");
 				return 0;
 			}
-			if (!str_cmp(player_table[i].name, GET_NAME(vict))) {
-				if (nr >= 0) {
+			if (!str_cmp(index->name, GET_NAME(vict))) {
+				if (found_index) {
 					msg_to_char(ch, "WARNING: possible pfile corruption, more than one entry with that name.\r\n");
 				}
 				else {
-					nr = i;
+					found_index = index;
 				}
 			}
 		}
-		if (nr == NOBODY) {
+		if (!found_index) {
 			msg_to_char(ch, "WARNING: That character does not have a record in the pfile.\r\nName not changed.\r\n");
 			return 0;
 		}
-		strcpy(oldname, GET_NAME(vict));
-		if (player_table[nr].name)
-			free(player_table[nr].name);
-		CREATE(player_table[nr].name, char, strlen(newname) + 1);
-		for (i = 0; (*(player_table[nr].name + i) = *(newname + i)); i++);
-
+		strcpy(oldname, GET_PC_NAME(vict));
 		if (GET_PC_NAME(vict))
 			free(GET_PC_NAME(vict));
 		GET_PC_NAME(vict) = strdup(CAP(newname));
+		update_player_index(found_index, vict);
 		
 		// TODO file renames could be moved somewhere useful
 		// TODO also, this could be a lot cleaner and use remove() instead of system/rm
@@ -1495,11 +1470,6 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		rename(buf1, buf2);
 		get_filename(oldname, buf1, ALIAS_FILE);
 		get_filename(GET_NAME(vict), buf2, ALIAS_FILE);
-		sprintf(buf, "rm -f %s", buf2);
-		system(buf);
-		rename(buf1, buf2);
-		get_filename(oldname, buf1, LORE_FILE);
-		get_filename(GET_NAME(vict), buf2, LORE_FILE);
 		sprintf(buf, "rm -f %s", buf2);
 		system(buf);
 		rename(buf1, buf2);
@@ -1520,7 +1490,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		send_to_char("Can't set that!\r\n", ch);
 		return (0);
 	}
-
+	
 	if (*output) {
 		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s used set: %s", GET_REAL_NAME(ch), output);
 		strcat(output, "\r\n");
@@ -1633,35 +1603,40 @@ SHOW(show_islands) {
 
 
 SHOW(show_player) {
-	struct char_file_u vbuf;
 	char birth[80], lastlog[80];
 	double days_played, avg_min_per_day;
+	char_data *plr = NULL;
+	bool file = FALSE;
 	
 	if (!*argument) {
 		send_to_char("A name would help.\r\n", ch);
 		return;
 	}
-
-	if (load_char(argument, &vbuf) == NOTHING) {
+	
+	if (!(plr = find_or_load_player(argument, &file))) {
 		send_to_char("There is no such player.\r\n", ch);
 		return;
 	}
-	sprintf(buf, "Player: %-12s (%s) [%d]\r\n", vbuf.name, genders[(int) vbuf.sex], vbuf.access_level);
-	strcpy(birth, ctime(&vbuf.birth));
-	strcpy(lastlog, ctime(&vbuf.last_logon));
+	sprintf(buf, "Player: %-12s (%s) [%d]\r\n", GET_PC_NAME(plr), genders[(int) GET_REAL_SEX(plr)], GET_ACCESS_LEVEL(plr));
+	strcpy(birth, ctime(&plr->player.time.birth));
+	strcpy(lastlog, ctime(&plr->prev_logon));
 	// Www Mmm dd hh:mm:ss yyyy
 	sprintf(buf + strlen(buf), "Started: %-16.16s %4.4s   Last: %-16.16s %4.4s\r\n", birth, birth+20, lastlog, lastlog+20);
 	
-	if (vbuf.access_level <= GET_ACCESS_LEVEL(ch)) {
-		sprintf(buf + strlen(buf), "Creation host: %s\r\n", vbuf.player_specials_saved.creation_host);
+	if (GET_ACCESS_LEVEL(plr) <= GET_ACCESS_LEVEL(ch)) {
+		sprintf(buf + strlen(buf), "Creation host: %s\r\n", NULLSAFE(GET_CREATION_HOST(plr)));
 	}
 	
-	days_played = (double)(time(0) - vbuf.birth) / SECS_PER_REAL_DAY;
-	avg_min_per_day = (((double) vbuf.played / SECS_PER_REAL_HOUR) / days_played) * SECS_PER_REAL_MIN;
+	days_played = (double)(time(0) - plr->player.time.birth) / SECS_PER_REAL_DAY;
+	avg_min_per_day = (((double) plr->player.time.played / SECS_PER_REAL_HOUR) / days_played) * SECS_PER_REAL_MIN;
 	
-	sprintf(buf + strlen(buf), "Played: %3dh %2dm (%d minutes per day)\r\n", (int) (vbuf.played / SECS_PER_REAL_HOUR), (int) (vbuf.played % SECS_PER_REAL_HOUR) / SECS_PER_REAL_MIN, (int)avg_min_per_day);
+	sprintf(buf + strlen(buf), "Played: %3dh %2dm (%d minutes per day)\r\n", (int) (plr->player.time.played / SECS_PER_REAL_HOUR), (int) (plr->player.time.played % SECS_PER_REAL_HOUR) / SECS_PER_REAL_MIN, (int)avg_min_per_day);
 	
 	send_to_char(buf, ch);
+	
+	if (file) {
+		free_char(plr);
+	}
 }
 
 
@@ -1724,7 +1699,7 @@ SHOW(show_stats) {
 
 	msg_to_char(ch, "Current stats:\r\n");
 	msg_to_char(ch, "  %6d players in game  %6d connected\r\n", num_players, num_descs);
-	msg_to_char(ch, "  %6d registered       %6d at menus\r\n", top_of_p_table + 1, menu_count);
+	msg_to_char(ch, "  %6d registered       %6d at menus\r\n", HASH_CNT(idnum_hh, player_table_by_idnum), menu_count);
 	msg_to_char(ch, "  %6d player accounts  %6d active accounts\r\n", total_accounts, active_accounts);
 	msg_to_char(ch, "  %6d accounts logged in this week\r\n", active_accounts_week);
 	msg_to_char(ch, "  %6d empires          %6d active\r\n", HASH_COUNT(empire_table), num_active_empires);
@@ -1740,24 +1715,32 @@ SHOW(show_stats) {
 
 
 SHOW(show_site) {
-	struct char_file_u vbuf;
-	int j, k;
+	char buf[MAX_STRING_LENGTH], line[256];
+	player_index_data *index, *next_index;
+	size_t size;
+	int k;
 	
 	if (!*argument) {
 		msg_to_char(ch, "Locate players from what site?\r\n");
 		return;
 	}
+	
 	*buf = '\0';
+	size = 0;
 	k = 0;
-	for (j = 0; j <= top_of_p_table; j++) {
-		load_char((player_table + j)->name, &vbuf);
-		if (!IS_SET(vbuf.char_specials_saved.act, PLR_DELETED))
-			if (str_str(vbuf.host, argument))
-				sprintf(buf, "%s %-15.15s %s", buf, vbuf.name, ((++k % 3)) ? "|" : "\r\n");
+	HASH_ITER(idnum_hh, player_table_by_idnum, index, next_index) {
+		if (str_str(index->last_host, argument)) {
+			snprintf(line, sizeof(line), " %-15.15s %s", index->name, ((++k % 3)) ? "|" : "\r\n");
+			line[1] = UPPER(line[1]);	// cap name
+			
+			if (size + strlen(line) < sizeof(buf)) {
+				size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
+			}
+		}
 	}
 	msg_to_char(ch, "Players from site %s:\r\n", argument);
 	if (*buf) {
-		msg_to_char(ch, buf);
+		send_to_char(buf, ch);
 		
 		// trailing crlf
 		if (k % 3) {
@@ -1777,26 +1760,14 @@ SHOW(show_skills) {
 	char_data *vict;
 	int sk_iter, ab_iter;
 	bool found, is_file = FALSE;
-	struct char_file_u tmp_store;
 	
 	argument = one_argument(argument, arg);
-	vict = get_player_vis(ch, arg, FIND_CHAR_WORLD);
 	
-	if (!vict) {
-		CREATE(vict, char_data, 1);
-		clear_char(vict);
-		if (load_char(arg, &tmp_store) > NOBODY) {
-			store_to_char(&tmp_store, vict);
-			SET_BIT(PLR_FLAGS(vict), PLR_KEEP_LAST_LOGIN_INFO);
-		}
-		else {
-			// still no
-			send_config_msg(ch, "no_person");
-			free(vict);
-			return;
-		}
+	if (!(vict = find_or_load_player(arg, &is_file))) {
+		send_config_msg(ch, "no_person");
+		return;
 	}
-	
+		
 	if (REAL_NPC(vict)) {
 		msg_to_char(ch, "You can't show skills on an NPC.\r\n");
 		if (is_file) {
@@ -1917,55 +1888,81 @@ SHOW(show_terrain) {
 
 
 SHOW(show_account) {
-	struct char_file_u cbuf, vbuf;
-	int iter;
+	player_index_data *plr_index, *index, *next_index;
+	bool file = FALSE, loaded_file = FALSE;
+	char_data *plr = NULL, *loaded;
 	
 	if (!*argument) {
 		msg_to_char(ch, "Usage: show account <player>\r\n");
 	}
-	else if (load_char(argument, &cbuf) == NOTHING) {
+	else if (!(plr = find_or_load_player(argument, &file))) {
 		send_to_char("There is no such player.\r\n", ch);
 	}
 	else {
 		msg_to_char(ch, "Account characters:\r\n");
 		
-		for (iter = 0; iter <= top_of_p_table; iter++) {
-			load_char(player_table[iter].name, &vbuf);
-			if (vbuf.char_specials_saved.idnum == cbuf.char_specials_saved.idnum || (vbuf.player_specials_saved.account_id != 0 && vbuf.player_specials_saved.account_id == cbuf.player_specials_saved.account_id)) {
-				// same account
-				if (is_playing(vbuf.char_specials_saved.idnum) || is_at_menu(vbuf.char_specials_saved.idnum)) {
-					msg_to_char(ch, " &c[%d %s] %s (online)&0%s\r\n", vbuf.player_specials_saved.last_known_level, class_data[vbuf.player_specials_saved.character_class].name, vbuf.name, IS_SET(vbuf.char_specials_saved.act, PLR_DELETED) ? " (deleted)" : "");
+		if (!(plr_index = find_player_index_by_idnum(GET_IDNUM(plr)))) {
+			msg_to_char(ch, "Unknown error: player not in index.\r\n");
+			if (file) {
+				free_char(plr);
+			}
+		}
+		
+		HASH_ITER(name_hh, player_table_by_name, index, next_index) {
+			if (index->account_id != plr_index->account_id && strcmp(index->last_host, plr_index->last_host)) {
+				continue;
+			}
+			if (!(loaded = find_or_load_player(index->name, &loaded_file))) {
+				continue;
+			}
+			
+			if (GET_ACCOUNT(loaded) == GET_ACCOUNT(plr)) {
+				if (!loaded_file) {
+					msg_to_char(ch, " &c[%d %s] %s (online)&0\r\n", GET_COMPUTED_LEVEL(loaded), class_data[GET_CLASS(loaded)].name, GET_PC_NAME(loaded));
 				}
 				else {
 					// not playing but same account
-					msg_to_char(ch, " [%d %s] %s%s\r\n", vbuf.player_specials_saved.last_known_level, class_data[vbuf.player_specials_saved.character_class].name, vbuf.name, IS_SET(vbuf.char_specials_saved.act, PLR_DELETED) ? " (deleted)" : "");
+					msg_to_char(ch, " [%d %s] %s\r\n", GET_LAST_KNOWN_LEVEL(loaded), class_data[GET_CLASS(loaded)].name, GET_PC_NAME(loaded));
 				}
 			}
-			else if (!IS_SET(vbuf.char_specials_saved.act, PLR_DELETED) && !strcmp(vbuf.host, cbuf.host)) {
-				msg_to_char(ch, " &r[%d %s] %s (not on account)&0\r\n", vbuf.player_specials_saved.last_known_level, class_data[vbuf.player_specials_saved.character_class].name, vbuf.name);
+			else {
+				msg_to_char(ch, " &r[%d %s] %s (not on account)&0\r\n", loaded_file ? GET_LAST_KNOWN_LEVEL(loaded) : GET_COMPUTED_LEVEL(loaded), class_data[GET_CLASS(loaded)].name, GET_PC_NAME(loaded));
+			}
+			
+			if (loaded_file) {
+				free_char(loaded);
 			}
 		}
+	}
+	
+	if (plr && file) {
+		free_char(plr);
 	}
 }
 
 
 SHOW(show_notes) {
-	struct char_file_u cbuf;
+	char_data *plr = NULL;
+	bool file = FALSE;
 	
 	if (!*argument) {
 		msg_to_char(ch, "Usage: show notes <player>\r\n");
 	}
-	else if (load_char(argument, &cbuf) == NOTHING) {
+	else if (!(plr = find_or_load_player(argument, &file))) {
 		msg_to_char(ch, "There is no such player.\r\n");
 	}
-	else if (cbuf.access_level >= GET_REAL_LEVEL(ch)) {
+	else if (GET_ACCESS_LEVEL(plr) >= GET_REAL_LEVEL(ch)) {
 		msg_to_char(ch, "You can't show notes for players of that level.\r\n");
 	}
-	else if (!*cbuf.player_specials_saved.admin_notes) {
+	else if (!GET_ADMIN_NOTES(plr) || !*GET_ADMIN_NOTES(plr)) {
 		msg_to_char(ch, "There are no notes for that player.\r\n");
 	}
 	else {
-		msg_to_char(ch, "Admin notes for %s:\r\n%s", cbuf.name, cbuf.player_specials_saved.admin_notes);
+		msg_to_char(ch, "Admin notes for %s:\r\n%s", GET_PC_NAME(plr), GET_ADMIN_NOTES(plr));
+	}
+	
+	if (plr && file) {
+		free_char(plr);
 	}
 }
 
@@ -1998,6 +1995,7 @@ SHOW(show_arrowtypes) {
 
 SHOW(show_ignoring) {
 	char arg[MAX_INPUT_LENGTH];
+	player_index_data *index;
 	bool found, file = FALSE;
 	char_data *vict = NULL;
 	int iter;
@@ -2019,8 +2017,8 @@ SHOW(show_ignoring) {
 		
 		found = FALSE;
 		for (iter = 0; iter < MAX_IGNORES; ++iter) {
-			if (GET_IGNORE_LIST(vict, iter) != 0 && get_name_by_id(GET_IGNORE_LIST(vict, iter))) {
-				msg_to_char(ch, " %s\r\n", CAP(get_name_by_id(GET_IGNORE_LIST(vict, iter))));
+			if (GET_IGNORE_LIST(vict, iter) != 0 && (index = find_player_index_by_idnum(GET_IGNORE_LIST(vict, iter)))) {
+				msg_to_char(ch, " %s\r\n", index->fullname);
 				found = TRUE;
 			}
 		}
@@ -2288,11 +2286,12 @@ void do_stat_adventure(char_data *ch, adv_data *adv) {
 void do_stat_book(char_data *ch, book_data *book) {
 	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
 	struct paragraph_data *para;
+	player_index_data *index;
 	size_t size = 0;
 	int count, len, num;
 	char *ptr, *txt;
 	
-	size += snprintf(buf + size, sizeof(buf) - size, "Book VNum: [\tc%d\t0], Author: \ty%s\t0 (\tc%d\t0)\r\n", book->vnum, get_name_by_id(book->author) ? CAP(get_name_by_id(book->author)) : "nobody", book->author);
+	size += snprintf(buf + size, sizeof(buf) - size, "Book VNum: [\tc%d\t0], Author: \ty%s\t0 (\tc%d\t0)\r\n", book->vnum, (index = find_player_index_by_idnum(book->author)) ? index->fullname : "nobody", book->author);
 	size += snprintf(buf + size, sizeof(buf) - size, "Title: %s\r\n", book->title);
 	size += snprintf(buf + size, sizeof(buf) - size, "Byline: %s\r\n", book->byline);
 	size += snprintf(buf + size, sizeof(buf) - size, "Item: [%s]\r\n", book->item_name);
@@ -2474,7 +2473,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 	else {	// not NPC
 		msg_to_char(ch, "Title: %s&0\r\n", (GET_TITLE(k) ? GET_TITLE(k) : "<None>"));
 		
-		if (*GET_REFERRED_BY(k)) {
+		if (GET_REFERRED_BY(k) && *GET_REFERRED_BY(k)) {
 			msg_to_char(ch, "Referred by: %s\r\n", GET_REFERRED_BY(k));
 		}
 		if (GET_PROMO_ID(k) > 0) {
@@ -2493,7 +2492,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 
 		msg_to_char(ch, "Created: [%s, %s], Played [%dh %dm], Age [%d]\r\n", buf1, buf2, k->player.time.played / SECS_PER_REAL_HOUR, ((k->player.time.played % SECS_PER_REAL_HOUR) / SECS_PER_REAL_MIN), age(k)->year);
 		if (GET_ACCESS_LEVEL(k) <= GET_ACCESS_LEVEL(ch)) {
-			msg_to_char(ch, "Created from host: [%s]\r\n", GET_CREATION_HOST(k));
+			msg_to_char(ch, "Created from host: [%s]\r\n", NULLSAFE(GET_CREATION_HOST(k)));
 		}
 		
 		if (GET_ACCESS_LEVEL(k) >= LVL_BUILDER) {
@@ -2857,13 +2856,14 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	extern struct ship_data_struct ship_data[];
 	extern const char *armor_types[NUM_ARMOR_TYPES+1];
 	extern const struct poison_data_type poison_data[];
-
+	
 	int i, found;
 	room_data *room;
 	obj_vnum vnum = GET_OBJ_VNUM(j);
 	obj_data *j2;
 	struct obj_storage_type *store;
 	struct obj_custom_message *ocm;
+	player_index_data *index;
 
 	msg_to_char(ch, "Name: '&y%s&0', Aliases: %s\r\n", GET_OBJ_DESC(j, ch, OBJ_DESC_SHORT), GET_OBJ_KEYWORDS(j));
 
@@ -2932,7 +2932,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 		
 		msg_to_char(ch, "Bound to:");
 		for (bind = OBJ_BOUND_TO(j); bind; bind = bind->next) {
-			msg_to_char(ch, " %s", get_name_by_id(bind->idnum) ? CAP(get_name_by_id(bind->idnum)) : "<unknown>");
+			msg_to_char(ch, " %s", (index = find_player_index_by_idnum(bind->idnum)) ? index->fullname : "<unknown>");
 		}
 		msg_to_char(ch, "\r\n");
 	}
@@ -2981,7 +2981,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 				msg_to_char(ch, "%s\r\n", get_mob_name_by_proto(GET_CORPSE_NPC_VNUM(j)));
 			}
 			else if (IS_PC_CORPSE(j)) {
-				msg_to_char(ch, "%s\r\n", get_name_by_id(GET_CORPSE_PC_ID(j)) ? CAP(get_name_by_id(GET_CORPSE_PC_ID(j))) : "a player");
+				msg_to_char(ch, "%s\r\n", (index = find_player_index_by_idnum(GET_CORPSE_PC_ID(j))) ? index->fullname : "a player");
 			}
 			else {
 				msg_to_char(ch, "unknown\r\n");
@@ -3137,6 +3137,7 @@ void do_stat_room(char_data *ch) {
 	empire_data *emp;
 	struct affected_type *aff;
 	struct room_extra_data *red;
+	player_index_data *index;
 	room_data *home = HOME_ROOM(IN_ROOM(ch));
 
 
@@ -3165,7 +3166,7 @@ void do_stat_room(char_data *ch) {
 			msg_to_char(ch, ", City: %s", city->name);
 		}
 		if (ROOM_PRIVATE_OWNER(home) != NOBODY) {
-			msg_to_char(ch, ", Home: %s", get_name_by_id(ROOM_PRIVATE_OWNER(home)) ? CAP(get_name_by_id(ROOM_PRIVATE_OWNER(home))) : "someone");
+			msg_to_char(ch, ", Home: %s", (index = find_player_index_by_idnum(ROOM_PRIVATE_OWNER(home))) ? index->fullname : "someone");
 		}
 		
 		send_to_char("\r\n", ch);
@@ -3635,7 +3636,7 @@ int vnum_trigger(char *searchname, char_data *ch) {
 //// COMMANDS ////////////////////////////////////////////////////////////////
 
 ACMD(do_addnotes) {
-	char notes[MAX_ADMIN_NOTES_LENGTH];
+	char notes[MAX_ADMIN_NOTES_LENGTH + 1];
 	char_data *vict = NULL;
 	bool file = FALSE;
 	
@@ -3651,12 +3652,15 @@ ACMD(do_addnotes) {
 	else if (GET_ACCESS_LEVEL(vict) >= GET_ACCESS_LEVEL(ch)) {
 		msg_to_char(ch, "You cannot add notes for players of that level.\r\n");
 	}
-	else if (strlen(GET_ADMIN_NOTES(vict)) + strlen(argument) + 2 > MAX_ADMIN_NOTES_LENGTH) {
+	else if (strlen(NULLSAFE(GET_ADMIN_NOTES(vict))) + strlen(argument) + 2 > MAX_ADMIN_NOTES_LENGTH) {
 		msg_to_char(ch, "Notes too long, unable to add text. Use editnotes instead.\r\n");
 	}
 	else {
-		snprintf(notes, sizeof(notes), "%s%s\r\n", GET_ADMIN_NOTES(vict), argument);
-		strcpy(GET_ADMIN_NOTES(vict), notes);	// strcpy OK: same length
+		snprintf(notes, sizeof(notes), "%s%s\r\n", NULLSAFE(GET_ADMIN_NOTES(vict)), argument);
+		if (GET_ADMIN_NOTES(vict)) {
+			free(GET_ADMIN_NOTES(vict));
+		}
+		GET_ADMIN_NOTES(vict) = str_dup(notes);
 		
 		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has added notes for %s", GET_NAME(ch), GET_NAME(vict));
 		msg_to_char(ch, "Notes added to %s.\r\n", GET_NAME(vict));
@@ -3799,46 +3803,37 @@ ACMD(do_at) {
 
 
 ACMD(do_authorize) {
-	void save_char_file_u(struct char_file_u *st);
-	struct char_file_u chdata;
-	char_data *vict;
-	int id;
+	char_data *vict = NULL;
+	bool file = FALSE;
 
 	one_argument(argument, arg);
 
 	if (!*arg)
 		msg_to_char(ch, "Usage: authorize <character>\r\n");
-	else if (!(id = get_id_by_name(arg)))
+	else if (!(vict = find_or_load_player(arg, &file))) {
 		msg_to_char(ch, "Unable to find character '%s'?\r\n", arg);
+	}
 	else {
-		if ((vict = is_playing(id))) {
-			if (GET_ACCESS_LEVEL(vict) < LVL_APPROVED) {
-				GET_ACCESS_LEVEL(vict) = LVL_APPROVED;
-			}
-			SAVE_CHAR(vict);
+		if (GET_ACCESS_LEVEL(vict) < LVL_APPROVED) {
+			GET_ACCESS_LEVEL(vict) = LVL_APPROVED;
+		}
+		if (!file) {
 			msg_to_char(vict, "Your character has been authorized.\r\n");
-			mortlog("%s has been authorized!", PERS(vict, vict, 1));
 		}
-		else {
-			if ((load_char(arg, &chdata)) > NOBODY) {
-				if (chdata.char_specials_saved.idnum > 0) {
-					if (chdata.access_level < LVL_APPROVED) {
-						chdata.access_level = LVL_APPROVED;
-					}
-					save_char_file_u(&chdata);
-				}
-				else {
-					msg_to_char(ch, "You can't authorize someone with idnum 0.\r\n");
-					return;
-				}
-			}
-			else {
-				msg_to_char(ch, "No player by that name.\r\n");
-				return;
-			}
+		mortlog("%s has been authorized!", PERS(vict, vict, TRUE));
+		syslog(SYS_VALID, GET_INVIS_LEV(ch), TRUE, "VALID: %s has been authorized by %s", GET_PC_NAME(vict), GET_NAME(ch));
+		msg_to_char(ch, "%s authorized.\r\n", GET_PC_NAME(vict));
+
+		if (file) {
+			store_loaded_char(vict);
+			vict = NULL;
+			file = FALSE;
 		}
-		syslog(SYS_VALID, GET_INVIS_LEV(ch), TRUE, "VALID: %s has been authorized by %s", CAP(arg), GET_NAME(ch));
-		msg_to_char(ch, "%s authorized.\r\n", CAP(arg));
+		
+	}
+	
+	if (vict && file) {
+		free_char(vict);
 	}
 }
 
@@ -4284,7 +4279,7 @@ ACMD(do_editnotes) {
 	else {
 		// duplicate the str -- the victim will be un-loaded, so we can't edit it directly
 		CREATE(write, char*, 1);
-		*write = str_dup(GET_ADMIN_NOTES(vict));
+		*write = str_dup(NULLSAFE(GET_ADMIN_NOTES(vict)));
 		
 		sprintf(buf, "notes for %s", GET_NAME(vict));
 		start_string_editor(ch->desc, buf, write, MAX_ADMIN_NOTES_LENGTH-1);
@@ -4746,22 +4741,30 @@ ACMD(do_island) {
 
 ACMD(do_last) {
 	extern const char *level_names[][2];
-
-	struct char_file_u chdata;
+	
+	char_data *plr = NULL;
+	bool file = FALSE;
 	char status[10];
 
 	one_argument(argument, arg);
 
-	if (!*arg)
+	if (!*arg) {
 		send_to_char("For whom do you wish to search?\r\n", ch);
-	else if (load_char(arg, &chdata) == NOTHING)
+	}
+	else if (!(plr = find_or_load_player(arg, &file))) {
 		send_to_char("There is no such player.\r\n", ch);
-	else if ((chdata.access_level > GET_ACCESS_LEVEL(ch)) && (GET_ACCESS_LEVEL(ch) < LVL_IMPL))
+	}
+	else if ((GET_ACCESS_LEVEL(plr) > GET_ACCESS_LEVEL(ch)) && (GET_ACCESS_LEVEL(ch) < LVL_IMPL)) {
 		send_to_char("You are not sufficiently godly for that!\r\n", ch);
+	}
 	else {
-		strcpy(status, level_names[(int) chdata.access_level][0]);
+		strcpy(status, level_names[(int) GET_ACCESS_LEVEL(plr)][0]);
 		// crlf built into ctime
-		msg_to_char(ch, "[%5d] [%s] %-12s : %-18s : %-20s", chdata.char_specials_saved.idnum, status, chdata.name, chdata.host, ctime(&chdata.last_logon));
+		msg_to_char(ch, "[%5d] [%s] %-12s : %-18s : %-20s", GET_IDNUM(plr), status, GET_PC_NAME(plr), plr->desc ? plr->desc->host : plr->prev_host, file ? ctime(&plr->prev_logon) : ctime(&plr->player.time.logon));
+	}
+	
+	if (plr && file) {
+		free_char(plr);
 	}
 }
 
@@ -5000,8 +5003,7 @@ ACMD(do_poofset) {
 		}
 		return;
 	}
-
-	// char_file_u only holds MAX_POOFIN_LENGTH+1
+	
 	if (strlen(argument) > MAX_POOFIN_LENGTH) {
 		msg_to_char(ch, "You can't set that to anything longer than %d characters.\r\n", MAX_POOF_LENGTH);
 		return;
@@ -5437,11 +5439,11 @@ ACMD(do_send) {
 
 
 ACMD(do_set) {
-	char_data *vict = NULL, *cbuf = NULL;
-	struct char_file_u tmp_store;
 	char field[MAX_INPUT_LENGTH], name[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
-	int mode, len, player_i = 0, retval;
-	char is_file = 0, is_player = 0;
+	bool is_file = FALSE, load_from_file = FALSE;
+	int mode, len, retval;
+	char_data *vict = NULL;
+	char is_player = 0;
 
 	half_chop(argument, name, buf);
 
@@ -5484,22 +5486,15 @@ ACMD(do_set) {
 		}
 	}
 	else if (is_file) {
-		/* try to load the player off disk */
-		CREATE(cbuf, char_data, 1);
-		clear_char(cbuf);
-		if ((player_i = load_char(name, &tmp_store)) > NOBODY) {
-			store_to_char(&tmp_store, cbuf);
-			if (GET_ACCESS_LEVEL(cbuf) >= GET_ACCESS_LEVEL(ch)) {
-				free_char(cbuf);
-				send_to_char("Sorry, you can't do that.\r\n", ch);
-				return;
-			}
-			vict = cbuf;
-			SET_BIT(PLR_FLAGS(vict), PLR_KEEP_LAST_LOGIN_INFO);
-		}
-		else {
-			free(cbuf);
+		if (!(vict = find_or_load_player(name, &load_from_file))) {
 			send_to_char("There is no such player.\r\n", ch);
+			return;
+		}
+		if (GET_ACCESS_LEVEL(vict) >= GET_ACCESS_LEVEL(ch)) {
+			send_to_char("Sorry, you can't do that.\r\n", ch);
+			if (load_from_file) {
+				free_char(vict);
+			}
 			return;
 		}
 	}
@@ -5515,16 +5510,16 @@ ACMD(do_set) {
 
 	/* save the character if a change was made */
 	if (retval) {
-		if (!is_file && !IS_NPC(vict))
-			SAVE_CHAR(vict);
-		if (is_file) {
+		if (load_from_file) {
 			store_loaded_char(vict);
 			send_to_char("Saved in file.\r\n", ch);
 		}
+		else if (!IS_NPC(vict)) {
+			SAVE_CHAR(vict);
+		}
 	}
-	else if (is_file) {
-		/* free the memory if we allocated it earlier */
-		free_char(cbuf);
+	else if (load_from_file) {
+		free_char(vict);
 	}
 }
 
@@ -5695,10 +5690,10 @@ ACMD(do_snoop) {
 ACMD(do_stat) {
 	void read_saved_vars(char_data *ch);
 	
-	char_data *victim;
+	char_data *victim = NULL;
 	crop_data *cp;
 	obj_data *obj;
-	struct char_file_u tmp_store;
+	bool file = FALSE;
 	int tmp;
 
 	half_chop(argument, buf1, buf2);
@@ -5770,27 +5765,21 @@ ACMD(do_stat) {
 		if (!*buf2) {
 			send_to_char("Stats on which player?\r\n", ch);
 		}
+		else if (!(victim = find_or_load_player(buf2, &file))) {
+			send_to_char("There is no such player.\r\n", ch);
+		}
+		else if (GET_ACCESS_LEVEL(victim) > GET_ACCESS_LEVEL(ch)) {
+			send_to_char("Sorry, you can't do that.\r\n", ch);
+		}
 		else {
-			CREATE(victim, char_data, 1);
-			clear_char(victim);
-			if (load_char(buf2, &tmp_store) > NOBODY) {
-				store_to_char(&tmp_store, victim);
-				SET_BIT(PLR_FLAGS(victim), PLR_KEEP_LAST_LOGIN_INFO);
-				// put somewhere extractable
-				char_to_room(victim, world_table);
-				if (GET_ACCESS_LEVEL(victim) > GET_ACCESS_LEVEL(ch)) {
-					send_to_char("Sorry, you can't do that.\r\n", ch);
-				}
-				else {
-					read_saved_vars(victim);
-					do_stat_character(ch, victim);
-				}
-				extract_char_final(victim);
+			if (file) {
+				read_saved_vars(victim);
 			}
-			else {
-				send_to_char("There is no such player.\r\n", ch);
-				free(victim);
-			}
+			do_stat_character(ch, victim);
+		}
+		
+		if (victim && file) {
+			free_char(victim);
 		}
 	}
 	else if (is_abbrev(buf1, "object")) {

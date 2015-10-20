@@ -150,6 +150,7 @@ void string_add(descriptor_data *d, char *str) {
 	extern char *stripcr(char *dest, const char *src);
 	extern int improved_editor_execute(descriptor_data *d, char *str);
 	
+	player_index_data *index;
 	char_data *vict = NULL;
 	int action;
 	bool file = FALSE;
@@ -233,13 +234,15 @@ void string_add(descriptor_data *d, char *str) {
 		else if (d->notes_id > 0) {
 			if (action != STRINGADD_ABORT) {
 				// save if you can find the player
-				if (d->notes_id > 0 && (vict = find_or_load_player(get_name_by_id(d->notes_id), &file))) {
+				if (d->notes_id > 0 && (index = find_player_index_by_idnum(d->notes_id)) && (vict = find_or_load_player(index->name, &file))) {
+					if (GET_ADMIN_NOTES(vict)) {
+						free(GET_ADMIN_NOTES(vict));
+					}
 					if (*d->str != NULL) {
-						strncpy(GET_ADMIN_NOTES(vict), *d->str, MAX_ADMIN_NOTES_LENGTH-1);
-						GET_ADMIN_NOTES(vict)[MAX_ADMIN_NOTES_LENGTH-1] = '\0';
+						GET_ADMIN_NOTES(vict) = str_dup(*d->str);
 					}
 					else {
-						*GET_ADMIN_NOTES(vict) = '\0';
+						GET_ADMIN_NOTES(vict) = NULL;
 					}
 					
 					syslog(SYS_GC, GET_INVIS_LEV(d->character), TRUE, "GC: %s has edited notes for %s", GET_NAME(d->character), GET_NAME(vict));

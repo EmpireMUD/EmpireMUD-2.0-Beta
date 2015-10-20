@@ -1484,7 +1484,7 @@ void do_customize_room(char_data *ch, char *argument) {
 
 
 ACMD(do_dedicate) {
-	int idnum;
+	player_index_data *index;
 	
 	one_argument(argument, arg);
 	
@@ -1506,13 +1506,13 @@ ACMD(do_dedicate) {
 	else if (!*arg) {
 		msg_to_char(ch, "Dedicate this building to whom?\r\n");
 	}
-	else if ((idnum = get_id_by_name(arg)) <= 0) {
+	else if (!(index = find_player_index_by_name(arg))) {
 		msg_to_char(ch, "You must specify a valid player to dedicate the building to.\r\n");
 	}
 	else {
-		COMPLEX_DATA(IN_ROOM(ch))->patron = idnum;
-		msg_to_char(ch, "You dedicate the building to %s!\r\n", get_name_by_id(ROOM_PATRON(IN_ROOM(ch))) ? CAP(get_name_by_id(ROOM_PATRON(IN_ROOM(ch)))) : "a Former God");
-		sprintf(buf, "$n dedicates the building to %s!", get_name_by_id(ROOM_PATRON(IN_ROOM(ch))) ? CAP(get_name_by_id(ROOM_PATRON(IN_ROOM(ch)))) : "a Former God");
+		COMPLEX_DATA(IN_ROOM(ch))->patron = index->idnum;
+		msg_to_char(ch, "You dedicate the building to %s!\r\n", index->fullname);
+		sprintf(buf, "$n dedicates the building to %s!", index->fullname);
 		act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
 	}
 }

@@ -94,7 +94,6 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 	obj_data *obj, *new;
 	bool end = FALSE;
 	int length, i_in[3];
-	int l_in;
 	bool seek_end = FALSE;
 	
 	// up-front
@@ -134,165 +133,203 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 		
 		if (OBJ_FILE_TAG(line, "End", length)) {
 			end = TRUE;
+			continue;
 		}
 		else if (seek_end) {
 			// are we looking for the end of the object? ignore this line
 			// WARNING: don't put any ifs that require "obj" above seek_end; obj is not guaranteed
 			continue;
 		}
-		else if (OBJ_FILE_TAG(line, "Version:", length)) {
-			if (sscanf(line + length + 1, "%d", &i_in[0])) {
-				OBJ_VERSION(obj) = i_in[0];
-			}
-		}
-		else if (OBJ_FILE_TAG(line, "Location:", length)) {
-			if (sscanf(line + length + 1, "%d", &i_in[0]) == 1) {
-				*location = i_in[0];
-			}
-		}
-		else if (OBJ_FILE_TAG(line, "Keywords:", length)) {
-			if (GET_OBJ_KEYWORDS(obj) && (!proto || GET_OBJ_KEYWORDS(obj) != GET_OBJ_KEYWORDS(proto))) {
-				free(GET_OBJ_KEYWORDS(obj));
-			}
-			GET_OBJ_KEYWORDS(obj) = fread_string(fl, error);
-		}
-		else if (OBJ_FILE_TAG(line, "Short-desc:", length)) {
-			if (GET_OBJ_SHORT_DESC(obj) && (!proto || GET_OBJ_SHORT_DESC(obj) != GET_OBJ_SHORT_DESC(proto))) {
-				free(GET_OBJ_SHORT_DESC(obj));
-			}
-			GET_OBJ_SHORT_DESC(obj) = fread_string(fl, error);
-		}
-		else if (OBJ_FILE_TAG(line, "Long-desc:", length)) {
-			if (GET_OBJ_LONG_DESC(obj) && (!proto || GET_OBJ_LONG_DESC(obj) != GET_OBJ_LONG_DESC(proto))) {
-				free(GET_OBJ_LONG_DESC(obj));
-			}
-			GET_OBJ_LONG_DESC(obj) = fread_string(fl, error);
-		}
-		else if (OBJ_FILE_TAG(line, "Action-desc:", length)) {
-			if (GET_OBJ_ACTION_DESC(obj) && (!proto || GET_OBJ_ACTION_DESC(obj) != GET_OBJ_ACTION_DESC(proto))) {
-				free(GET_OBJ_ACTION_DESC(obj));
-			}
-			GET_OBJ_ACTION_DESC(obj) = fread_string(fl, error);
-		}
-		else if (OBJ_FILE_TAG(line, "Extra-desc:", length)) {
-			if (proto && obj->ex_description == proto->ex_description) {
-				obj->ex_description = NULL;
-			}
-			
-			CREATE(ex, struct extra_descr_data, 1);
-			ex->next = obj->ex_description;
-			obj->ex_description = ex;
-			
-			ex->keyword = fread_string(fl, error);
-			ex->description = fread_string(fl, error);
-		}
-		else if (OBJ_FILE_TAG(line, "Val-0:", length)) {
-			if (sscanf(line + length + 1, "%d", &i_in[0])) {
-				GET_OBJ_VAL(obj, 0) = i_in[0];
-			}
-		}
-		else if (OBJ_FILE_TAG(line, "Val-1:", length)) {
-			if (sscanf(line + length + 1, "%d", &i_in[0])) {
-				GET_OBJ_VAL(obj, 1) = i_in[0];
-			}
-		}
-		else if (OBJ_FILE_TAG(line, "Val-2:", length)) {
-			if (sscanf(line + length + 1, "%d", &i_in[0])) {
-				GET_OBJ_VAL(obj, 2) = i_in[0];
-			}
-		}
-		else if (OBJ_FILE_TAG(line, "Type:", length)) {
-			if (sscanf(line + length + 1, "%d", &i_in[0])) {
-				GET_OBJ_TYPE(obj) = i_in[0];
-			}
-		}
-		else if (OBJ_FILE_TAG(line, "Wear:", length)) {
-			if (sscanf(line + length + 1, "%s", s_in)) {
-				GET_OBJ_WEAR(obj) = asciiflag_conv(s_in);
-			}
-		}
-		else if (OBJ_FILE_TAG(line, "Flags:", length)) {
-			if (sscanf(line + length + 1, "%s", s_in)) {
-				GET_OBJ_EXTRA(obj) = asciiflag_conv(s_in);
-			}
-		}
-		else if (OBJ_FILE_TAG(line, "Affects:", length)) {
-			if (sscanf(line + length + 1, "%s", s_in)) {
-				obj->obj_flags.bitvector = asciiflag_conv(s_in);
-			}
-		}
-		else if (OBJ_FILE_TAG(line, "Timer:", length)) {
-			if (sscanf(line + length + 1, "%d", &i_in[0])) {
-				GET_OBJ_TIMER(obj) = i_in[0];
-			}
-		}
-		else if (OBJ_FILE_TAG(line, "Current-scale:", length)) {
-			if (sscanf(line + length + 1, "%d", &i_in[0])) {
-				GET_OBJ_CURRENT_SCALE_LEVEL(obj) = i_in[0];
-			}
-		}
-		else if (OBJ_FILE_TAG(line, "Min-scale:", length)) {
-			if (sscanf(line + length + 1, "%d", &i_in[0])) {
-				GET_OBJ_MIN_SCALE_LEVEL(obj) = i_in[0];
-			}
-		}
-		else if (OBJ_FILE_TAG(line, "Max-scale:", length)) {
-			if (sscanf(line + length + 1, "%d", &i_in[0])) {
-				GET_OBJ_MAX_SCALE_LEVEL(obj) = i_in[0];
-			}
-		}
-		else if (OBJ_FILE_TAG(line, "Material:", length)) {
-			if (sscanf(line + length + 1, "%d", &i_in[0])) {
-				GET_OBJ_MATERIAL(obj) = i_in[0];
-			}
-		}
-		else if (OBJ_FILE_TAG(line, "Last-empire:", length)) {
-			if (sscanf(line + length + 1, "%d", &i_in[0])) {
-				obj->last_empire_id = i_in[0];
-			}
-		}
-		else if (OBJ_FILE_TAG(line, "Last-owner:", length)) {
-			if (sscanf(line + length + 1, "%d", &l_in)) {
-				obj->last_owner_id = l_in;
-			}
-		}
-		else if (OBJ_FILE_TAG(line, "Stolen-timer:", length)) {
-			if (sscanf(line + length + 1, "%d", &i_in[0])) {
-				obj->stolen_timer = i_in[0];
-			}
-		}
-		else if (OBJ_FILE_TAG(line, "Autostore-timer:", length)) {
-			if (sscanf(line + length + 1, "%d", &i_in[0])) {
-				GET_AUTOSTORE_TIMER(obj) = i_in[0];
-			}
-		}
-		else if (OBJ_FILE_TAG(line, "Apply:", length)) {
-			if (sscanf(line + length + 1, "%d %d %d", &i_in[0], &i_in[1], &i_in[2])) {
-				obj->affected[i_in[0]].location = i_in[1];
-				obj->affected[i_in[0]].modifier = i_in[2];
-			}
-		}
-		else if (OBJ_FILE_TAG(line, "Bound-to:", length)) {
-			if (sscanf(line + length + 1, "%d", &i_in[0])) {
-				struct obj_binding *bind;
-				CREATE(bind, struct obj_binding, 1);
-				bind->idnum = i_in[0];
-				bind->next = OBJ_BOUND_TO(obj);
-				OBJ_BOUND_TO(obj) = bind;
-			}
-		}
-		else if (OBJ_FILE_TAG(line, "Trigger:", length)) {
-			if (sscanf(line + length + 1, "%d", &i_in[0]) && real_trigger(i_in[0])) {
-				if (!SCRIPT(obj)) {
-					CREATE(SCRIPT(obj), struct script_data, 1);
-				}
-				add_trigger(SCRIPT(obj), read_trigger(i_in[0]), -1);
-			}
-		}
 		
-		// ignore anything else
-		else {
-			// just discard line as junk
+		// normal tags by letter
+		switch (UPPER(*line)) {
+			case 'A': {
+				if (OBJ_FILE_TAG(line, "Action-desc:", length)) {
+					if (GET_OBJ_ACTION_DESC(obj) && (!proto || GET_OBJ_ACTION_DESC(obj) != GET_OBJ_ACTION_DESC(proto))) {
+						free(GET_OBJ_ACTION_DESC(obj));
+					}
+					GET_OBJ_ACTION_DESC(obj) = fread_string(fl, error);
+				}
+				else if (OBJ_FILE_TAG(line, "Affects:", length)) {
+					if (sscanf(line + length + 1, "%s", s_in)) {
+						obj->obj_flags.bitvector = asciiflag_conv(s_in);
+					}
+				}
+				else if (OBJ_FILE_TAG(line, "Apply:", length)) {
+					if (sscanf(line + length + 1, "%d %d %d", &i_in[0], &i_in[1], &i_in[2])) {
+						obj->affected[i_in[0]].location = i_in[1];
+						obj->affected[i_in[0]].modifier = i_in[2];
+					}
+				}
+				else if (OBJ_FILE_TAG(line, "Autostore-timer:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+						GET_AUTOSTORE_TIMER(obj) = i_in[0];
+					}
+				}
+				break;
+			}
+			case 'B': {
+				if (OBJ_FILE_TAG(line, "Bound-to:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+						struct obj_binding *bind;
+						CREATE(bind, struct obj_binding, 1);
+						bind->idnum = i_in[0];
+						bind->next = OBJ_BOUND_TO(obj);
+						OBJ_BOUND_TO(obj) = bind;
+					}
+				}
+				break;
+			}
+			case 'C': {
+				if (OBJ_FILE_TAG(line, "Current-scale:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+						GET_OBJ_CURRENT_SCALE_LEVEL(obj) = i_in[0];
+					}
+				}
+				break;
+			}
+			case 'E': {
+				if (OBJ_FILE_TAG(line, "Extra-desc:", length)) {
+					if (proto && obj->ex_description == proto->ex_description) {
+						obj->ex_description = NULL;
+					}
+			
+					CREATE(ex, struct extra_descr_data, 1);
+					ex->next = obj->ex_description;
+					obj->ex_description = ex;
+			
+					ex->keyword = fread_string(fl, error);
+					ex->description = fread_string(fl, error);
+				}
+				break;
+			}
+			case 'F': {
+				if (OBJ_FILE_TAG(line, "Flags:", length)) {
+					if (sscanf(line + length + 1, "%s", s_in)) {
+						GET_OBJ_EXTRA(obj) = asciiflag_conv(s_in);
+					}
+				}
+				break;
+			}
+			case 'K': {
+				if (OBJ_FILE_TAG(line, "Keywords:", length)) {
+					if (GET_OBJ_KEYWORDS(obj) && (!proto || GET_OBJ_KEYWORDS(obj) != GET_OBJ_KEYWORDS(proto))) {
+						free(GET_OBJ_KEYWORDS(obj));
+					}
+					GET_OBJ_KEYWORDS(obj) = fread_string(fl, error);
+				}
+				break;
+			}
+			case 'L': {
+				if (OBJ_FILE_TAG(line, "Last-empire:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+						obj->last_empire_id = i_in[0];
+					}
+				}
+				else if (OBJ_FILE_TAG(line, "Last-owner:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+						obj->last_owner_id = i_in[0];
+					}
+				}
+				else if (OBJ_FILE_TAG(line, "Location:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0]) == 1) {
+						*location = i_in[0];
+					}
+				}
+				else if (OBJ_FILE_TAG(line, "Long-desc:", length)) {
+					if (GET_OBJ_LONG_DESC(obj) && (!proto || GET_OBJ_LONG_DESC(obj) != GET_OBJ_LONG_DESC(proto))) {
+						free(GET_OBJ_LONG_DESC(obj));
+					}
+					GET_OBJ_LONG_DESC(obj) = fread_string(fl, error);
+				}
+				break;
+			}
+			case 'M': {
+				if (OBJ_FILE_TAG(line, "Max-scale:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+						GET_OBJ_MAX_SCALE_LEVEL(obj) = i_in[0];
+					}
+				}
+				else if (OBJ_FILE_TAG(line, "Material:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+						GET_OBJ_MATERIAL(obj) = i_in[0];
+					}
+				}
+				else if (OBJ_FILE_TAG(line, "Min-scale:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+						GET_OBJ_MIN_SCALE_LEVEL(obj) = i_in[0];
+					}
+				}
+				break;
+			}
+			case 'S': {
+				if (OBJ_FILE_TAG(line, "Short-desc:", length)) {
+					if (GET_OBJ_SHORT_DESC(obj) && (!proto || GET_OBJ_SHORT_DESC(obj) != GET_OBJ_SHORT_DESC(proto))) {
+						free(GET_OBJ_SHORT_DESC(obj));
+					}
+					GET_OBJ_SHORT_DESC(obj) = fread_string(fl, error);
+				}
+				else if (OBJ_FILE_TAG(line, "Stolen-timer:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+						obj->stolen_timer = i_in[0];
+					}
+				}
+				break;
+			}
+			case 'T': {
+				if (OBJ_FILE_TAG(line, "Timer:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+						GET_OBJ_TIMER(obj) = i_in[0];
+					}
+				}
+				else if (OBJ_FILE_TAG(line, "Trigger:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0]) && real_trigger(i_in[0])) {
+						if (!SCRIPT(obj)) {
+							CREATE(SCRIPT(obj), struct script_data, 1);
+						}
+						add_trigger(SCRIPT(obj), read_trigger(i_in[0]), -1);
+					}
+				}
+				else if (OBJ_FILE_TAG(line, "Type:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+						GET_OBJ_TYPE(obj) = i_in[0];
+					}
+				}
+				break;
+			}
+			case 'V': {
+				if (OBJ_FILE_TAG(line, "Val-0:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+						GET_OBJ_VAL(obj, 0) = i_in[0];
+					}
+				}
+				else if (OBJ_FILE_TAG(line, "Val-1:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+						GET_OBJ_VAL(obj, 1) = i_in[0];
+					}
+				}
+				else if (OBJ_FILE_TAG(line, "Val-2:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+						GET_OBJ_VAL(obj, 2) = i_in[0];
+					}
+				}
+				else if (OBJ_FILE_TAG(line, "Version:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+						OBJ_VERSION(obj) = i_in[0];
+					}
+				}
+				break;
+			}
+			case 'W': {
+				if (OBJ_FILE_TAG(line, "Wear:", length)) {
+					if (sscanf(line + length + 1, "%s", s_in)) {
+						GET_OBJ_WEAR(obj) = asciiflag_conv(s_in);
+					}
+				}
+				break;
+			}
+			
+			// ignore anything else and move on
 		}
 	}
 	
@@ -1194,11 +1231,9 @@ void Crash_listrent(char_data *ch, char *name) {
 * the obj-file cleaner on all players.
 */
 void update_obj_file(void) {
-	int iter;
-
-	for (iter = 0; iter <= top_of_p_table; ++iter) {
-		if (*player_table[iter].name) {
-			Crash_clean_file(player_table[iter].name);
-		}
+	player_index_data *index, *next_index;
+	
+	HASH_ITER(idnum_hh, player_table_by_idnum, index, next_index) {
+		Crash_clean_file(index->name);
 	}
 }

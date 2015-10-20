@@ -55,7 +55,6 @@ extern int num_intros;
 extern const char *version;
 extern int wizlock_level;
 extern int no_rent_check;
-extern FILE *player_fl;
 extern ush_int DFLT_PORT;
 extern const char *DFLT_DIR;
 extern char *LOGNAME;
@@ -707,7 +706,6 @@ void perform_reboot(void) {
 	}
 
 	// prepare for the end!
-	fclose(player_fl);
 	save_whole_world();
 
 	// If this is a reboot, restart the mud!
@@ -921,15 +919,13 @@ void heartbeat(int heart_pulse) {
 	if (HEARTBEAT(SECS_PER_MUD_HOUR)) {
 		weather_and_time(1);
 		if (debug_log && HEARTBEAT(15)) { log("debug 14a:\t%lld", microtime()); }
-		fflush(player_fl);
-		if (debug_log && HEARTBEAT(15)) { log("debug 14b:\t%lld", microtime()); }
 		chore_update();
-		if (debug_log && HEARTBEAT(15)) { log("debug 14c:\t%lld", microtime()); }
+		if (debug_log && HEARTBEAT(15)) { log("debug 14b:\t%lld", microtime()); }
 		
 		// save the world at dawn
 		if (time_info.hours == 7) {
 			save_whole_world();
-			if (debug_log && HEARTBEAT(15)) { log("debug 14d:\t%lld", microtime()); }
+			if (debug_log && HEARTBEAT(15)) { log("debug 14c:\t%lld", microtime()); }
 		}
 	}
 	
@@ -1881,12 +1877,10 @@ int new_descriptor(int s) {
 		}
 
 		/* find the numeric site address */
-		strncpy(newd->host, (char *)inet_ntoa(peer.sin_addr), MAX_HOST_LENGTH);
-		*(newd->host + MAX_HOST_LENGTH) = '\0';
+		newd->host = str_dup((char *)inet_ntoa(peer.sin_addr));
 	}
 	else {
-		strncpy(newd->host, from->h_name, MAX_HOST_LENGTH);
-		*(newd->host + MAX_HOST_LENGTH) = '\0';
+		newd->host = str_dup(from->h_name);
 	}
 
 	/* determine if the site is banned */
@@ -3357,7 +3351,6 @@ void init_game(ush_int port) {
 		close_socket(descriptor_list);
 
 	CLOSE_SOCKET(mother_desc);
-	fclose(player_fl);
 
 	log("Normal termination of game.");
 }
@@ -3547,8 +3540,7 @@ void reboot_recover(void) {
 	char_data *plr, *ldr;
 	FILE *fp;
 	char host[1024], protocol_info[1024], line[256];
-	struct char_file_u tmp_store;
-	int desc, player_i, plid, leid;
+	int desc, plid, leid;
 	bool fOld;
 	char name[MAX_INPUT_LENGTH];
 
@@ -3595,16 +3587,10 @@ void reboot_recover(void) {
 		clear_char(d->character);
 		CREATE(d->character->player_specials, struct player_special_data, 1);
 		d->character->desc = d;
-
-		if ((player_i = load_char(name, &tmp_store)) >= 0) {
-			store_to_char(&tmp_store, d->character);
-			GET_PFILEPOS(d->character) = player_i;
-			if (!PLR_FLAGGED(d->character, PLR_DELETED)) {
-				REMOVE_BIT(PLR_FLAGS(d->character), PLR_WRITING | PLR_MAILING);
-			}
-			else {
-				fOld = FALSE;
-			}
+		
+		d->character = load_player(name);
+		if (d->character) {
+			REMOVE_BIT(PLR_FLAGS(d->character), PLR_WRITING | PLR_MAILING);
 		}
 		else {
 			fOld = FALSE;

@@ -30,7 +30,6 @@ Various updates for EmpireMUD by Paul Clarke
 
 
 extern int no_mail;
-int find_name(char *name);
 
 mail_index_type *mail_index = NULL;	/* list of recs in the mail file  */
 position_list_type *free_list = NULL;	/* list of free positions in file */
@@ -360,8 +359,8 @@ char *read_delete(long recipient) {
 	mail_index_type *mail_pointer, *prev_mail;
 	position_list_type *position_pointer;
 	long mail_address, following_block;
+	player_index_data *from, *to;
 	char *message, *tmstr;
-	char *from, *to;
 	size_t string_size;
 
 	if (recipient < 0) {
@@ -413,14 +412,14 @@ char *read_delete(long recipient) {
 	tmstr = asctime(localtime(&header.header_data.mail_time));
 	*(tmstr + strlen(tmstr) - 1) = '\0';
 
-	from = get_name_by_id(header.header_data.from);
-	to = get_name_by_id(recipient);
+	from = find_player_index_by_idnum(header.header_data.from);
+	to = find_player_index_by_idnum(recipient);
 
 	sprintf(buf1, " * * * * Empire Mail System * * * *\r\n"
 		"Date: %s\r\n"
 		"  To: %s\r\n"
-		"From: %s\r\n\r\n", tmstr, to ? CAP(to) : "Unknown",
-			from ? CAP(from) : "Unknown");
+		"From: %s\r\n\r\n", tmstr, to ? to->fullname : "Unknown",
+			from ? from->fullname : "Unknown");
 
 	string_size = (sizeof(char) * (strlen(buf1) + strlen(header.txt) + 1));
 	CREATE(message, char, string_size);
@@ -453,9 +452,9 @@ char *read_delete(long recipient) {
 
 
 ACMD(do_mail) {
+	player_index_data *index;
 	obj_data *obj;
 	int amt = -1, count = 0;
-	long recipient;
 	char **write;
 	
 	/*
@@ -517,14 +516,14 @@ ACMD(do_mail) {
 		}
 		else if (!*buf)
 			msg_to_char(ch, "To whom will you be sending a letter?\r\n");
-		else if ((recipient = get_id_by_name(buf)) < 0)
+		else if (!(index = find_player_index_by_name(buf)))
 			msg_to_char(ch, "Nobody by that name is registered here!\r\n");
 		else {
 			act("$n starts to write some mail.", TRUE, ch, 0, 0, TO_ROOM);
 			SET_BIT(PLR_FLAGS(ch), PLR_MAILING);
 			CREATE(write, char *, 1);
 			start_string_editor(ch->desc, "your message", write, MAX_MAIL_SIZE);
-			ch->desc->mail_to = recipient;
+			ch->desc->mail_to = index->idnum;
 
 		}
 	}

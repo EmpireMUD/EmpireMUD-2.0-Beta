@@ -122,10 +122,9 @@ obj_data *object_list = NULL;	// global linked list of objs
 obj_data *object_table = NULL;	// hash table of objs
 
 // players
-struct player_index_element *player_table = NULL;	// index to plr file
-FILE *player_fl = NULL;	// file desc of player file
-int top_of_p_table = 0;	// ref to top of table
-int top_of_p_file = 0;	// ref of size of p file
+account_data *account_table = NULL;	// hash table of accounts
+player_index_data *player_table_by_idnum = NULL;	// hash table by idnum
+player_index_data *player_table_by_name = NULL;	// hash table by name
 int top_idnum = 0;	// highest idnum in use
 int top_account_id = 0;  // highest account number in use, determined during startup
 struct group_data *group_list = NULL;	// global LL of groups
@@ -185,6 +184,7 @@ struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES] = {
 	{ ADV_PREFIX, ADV_SUFFIX },	// DB_BOOT_ADV
 	{ RMT_PREFIX, RMT_SUFFIX },	// DB_BOOT_RMT
 	{ GLB_PREFIX, GLB_SUFFIX },	// DB_BOOT_GLB
+	{ ACCT_PREFIX, ACCT_SUFFIX },	// DB_BOOT_ACCT
 };
 
 
@@ -209,7 +209,6 @@ void boot_db(void) {
 	void load_daily_cycle();
 	void load_intro_screens();
 	void load_fight_messages();
-	void load_player_data_at_startup();
 	void load_tips_of_the_day();
 	void load_trading_post();
 	void reset_time();
@@ -248,6 +247,9 @@ void boot_db(void) {
 
 	log("Loading help entries.");
 	index_boot_help();
+	
+	log("Loading player accounts.");
+	index_boot(DB_BOOT_ACCT);
 
 	log("Generating player index.");
 	build_player_index();
@@ -301,9 +303,6 @@ void boot_db(void) {
 
 	load_daily_cycle();
 	log("Beginning skill reset cycle at %d.", daily_cycle);
-
-	log("Loading player data...");
-	load_player_data_at_startup();
 
 	boot_time = time(0);
 	
@@ -1377,7 +1376,6 @@ void number_and_count_islands(bool reset) {
 void clear_char(char_data *ch) {
 	memset((char *) ch, 0, sizeof(char_data));
 
-	GET_PFILEPOS(ch) = NOTHING;
 	ch->vnum = NOBODY;
 	GET_POS(ch) = POS_STANDING;
 	MOB_INSTANCE_ID(ch) = NOTHING;

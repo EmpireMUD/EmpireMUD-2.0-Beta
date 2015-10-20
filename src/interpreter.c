@@ -1708,14 +1708,14 @@ void next_creation_step(descriptor_data *d) {
 
 // Handler for CON_Q_ALT_NAME
 void process_alt_name(descriptor_data *d, char *arg) {
-	int id;
+	player_index_data *index;
 	
 	if (!*arg) {
 		// nothing -- send back to has-alt
 		set_creation_state(d, CON_Q_HAS_ALT);
 	}
-	else if ((id = get_id_by_name(arg)) != NOTHING) {
-		GET_CREATION_ALT_ID(d->character) = id;
+	else if ((index = find_player_index_by_name(arg))) {
+		GET_CREATION_ALT_ID(d->character) = index->idnum;
 		next_creation_step(d);
 	}
 	else {
@@ -1725,17 +1725,16 @@ void process_alt_name(descriptor_data *d, char *arg) {
 
 
 // Handler for CON_Q_ALT_PASSWORD
-void process_alt_password(descriptor_data *d, char *arg) {
-	extern int new_account_id(void);
-	
+void process_alt_password(descriptor_data *d, char *arg) {	
 	char_data *alt = NULL;
 	bool file = FALSE, save = FALSE;
+	player_index_data *index;
 
 	if (!*arg) {
 		// nothing -- send back to has-alt
 		set_creation_state(d, CON_Q_HAS_ALT);
 	}	
-	else if ((alt = find_or_load_player(get_name_by_id(GET_CREATION_ALT_ID(d->character)), &file))) {		
+	else if ((index = find_player_index_by_idnum(GET_CREATION_ALT_ID(d->character))) && (alt = find_or_load_player(index->name, &file))) {
 		// loaded char, now check password
 		if (strncmp(CRYPT(arg, PASSWORD_SALT), GET_PASSWD(alt), MAX_PWD_LENGTH)) {
 			syslog(SYS_LOGIN, 0, TRUE, "BAD PW: unable to register alt %s for %s [%s]", GET_NAME(d->character), GET_NAME(alt), d->host);
@@ -1755,15 +1754,11 @@ void process_alt_password(descriptor_data *d, char *arg) {
 			syslog(SYS_LOGIN, 0, TRUE, "NEW: associating new user %s with account for %s", GET_NAME(d->character), GET_NAME(alt));
 			
 			// does 2nd player have an account already? if not, make one
-			if (GET_ACCOUNT_ID(alt) == 0) {
-				GET_ACCOUNT_ID(alt) = new_account_id();
-				GET_ACCOUNT_ID(d->character) = GET_ACCOUNT_ID(alt);
+			if (!GET_ACCOUNT(alt)) {
+				create_account_for_player(alt);
 				save = TRUE;
 			}
-			else {
-				// already has acct
-				GET_ACCOUNT_ID(d->character) = GET_ACCOUNT_ID(alt);
-			}
+			GET_TEMPORARY_ACCOUNT_ID(d->character) = GET_ACCOUNT(alt)->id;
 			
 			next_creation_step(d);
 		}
@@ -1855,7 +1850,7 @@ bool check_multiplaying(descriptor_data *d) {
 	/* Check for connected players with identical hosts */
 	for (c = descriptor_list; c; c = c->next) {
 		if (c != d && STATE(c) == CON_PLAYING && !PLR_FLAGGED(c->character, PLR_MULTIOK) && GET_IDNUM(c->character) != GET_IDNUM(d->character)) {
-			if (!str_cmp(c->host, d->host) || (GET_ACCOUNT_ID(d->character) != 0 && GET_ACCOUNT_ID(d->character) == GET_ACCOUNT_ID(c->character))) {
+			if (!str_cmp(c->host, d->host) || GET_ACCOUNT(d->character) == GET_ACCOUNT(c->character)) {
 				ok = FALSE;
 			}
 		}
@@ -2093,6 +2088,7 @@ int _parse_name(char *arg, char *name) {
 * Master "socket nanny" for processing menu input.
 */
 void nanny(descriptor_data *d, char *arg) {
+	void clear_player(char_data *ch);
 	void display_tip_to_char(char_data *ch);
 	extern int enter_player_game(descriptor_data *d, int dolog, bool fresh);
 	extern int isbanned(char *hostname);
@@ -2107,8 +2103,7 @@ void nanny(descriptor_data *d, char *arg) {
 	extern char *wizlock_message;
 
 	char buf[MAX_STRING_LENGTH], tmp_name[MAX_INPUT_LENGTH];
-	int player_i, load_result, i, j, iter;
-	struct char_file_u tmp_store;
+	int load_result, i, j, iter;
 	bool help, show_start = FALSE;
 
 	skip_spaces(&arg);
@@ -2135,38 +2130,14 @@ void nanny(descriptor_data *d, char *arg) {
 					SEND_TO_Q("Invalid name, please try another.\r\nName: ", d);
 					return;
 				}
-				if ((player_i = load_char(tmp_name, &tmp_store)) != NOTHING) {
-					store_to_char(&tmp_store, d->character);
-					GET_PFILEPOS(d->character) = player_i;
+				if ((d->character = load_player(tmp_name))) {
+					/* undo it just in case they are set */
+					REMOVE_BIT(PLR_FLAGS(d->character), PLR_WRITING | PLR_MAILING);
 
-					if (PLR_FLAGGED(d->character, PLR_DELETED)) {
-						/* We get a false positive from the original deleted character. */
-						free_char(d->character);
-						/* Check for multiple creations... */
-						if (!Valid_Name(tmp_name)) {
-							SEND_TO_Q("Invalid name, please try another.\r\nName: ", d);
-							return;
-						}
-						CREATE(d->character, char_data, 1);
-						clear_char(d->character);
-						CREATE(d->character->player_specials, struct player_special_data, 1);
-						d->character->desc = d;
-						CREATE(GET_PC_NAME(d->character), char, strlen(tmp_name) + 1);
-						strcpy(GET_PC_NAME(d->character), CAP(tmp_name));
-						GET_PFILEPOS(d->character) = player_i;
-						sprintf(buf, "Did I get that right, %s (Y/N)? ", tmp_name);
-						SEND_TO_Q(buf, d);
-						STATE(d) = CON_NAME_CNFRM;
-					}
-					else {
-						/* undo it just in case they are set */
-						REMOVE_BIT(PLR_FLAGS(d->character), PLR_WRITING | PLR_MAILING);
-
-						SEND_TO_Q("Password: ", d);
-						ProtocolNoEcho(d, true);
-						d->idle_tics = 0;
-						STATE(d) = CON_PASSWORD;
-					}
+					SEND_TO_Q("Password: ", d);
+					ProtocolNoEcho(d, true);
+					d->idle_tics = 0;
+					STATE(d) = CON_PASSWORD;
 				}
 				else {
 					/* player unknown -- make new character */
@@ -2457,7 +2428,10 @@ void nanny(descriptor_data *d, char *arg) {
 			if (*arg) {
 				// store for later
 				arg[MAX_REFERRED_BY_LENGTH-1] = '\0';
-				strcpy(GET_REFERRED_BY(d->character), arg);
+				if (GET_REFERRED_BY(d->character)) {
+					free(GET_REFERRED_BY(d->character));
+				}
+				GET_REFERRED_BY(d->character) = str_dup(arg);
 			}
 			
 			next_creation_step(d);
@@ -2466,10 +2440,7 @@ void nanny(descriptor_data *d, char *arg) {
 
 		case CON_FINISH_CREATION: {
 			// some finalization
-
-			if (GET_PFILEPOS(d->character) < 0)
-				GET_PFILEPOS(d->character) = create_entry(GET_PC_NAME(d->character));
-			/* Now GET_NAME() will work properly. */
+			
 			if (GET_ACCESS_LEVEL(d->character) == 0) {
 				// set to base level now
 				GET_ACCESS_LEVEL(d->character) = 1;

@@ -1270,6 +1270,11 @@ int get_filename(char *orig_name, char *filename, int mode) {
 	}
 
 	switch (mode) {
+		case PLR_FILE: {
+			prefix = LIB_PLAYERS;
+			suffix = SUF_PLR;
+			break;
+		}
 		case CRASH_FILE:
 			prefix = LIB_PLROBJS;
 			suffix = SUF_OBJS;
@@ -1277,14 +1282,6 @@ int get_filename(char *orig_name, char *filename, int mode) {
 		case ALIAS_FILE:
 			prefix = LIB_PLRALIAS;
 			suffix = SUF_ALIAS;
-			break;
-		case ETEXT_FILE:
-			prefix = LIB_PLRTEXT;
-			suffix = SUF_TEXT;
-			break;
-		case LORE_FILE:
-			prefix = LIB_PLRLORE;
-			suffix = SUF_LORE;
 			break;
 		case SCRIPT_VARS_FILE:
 			prefix = LIB_PLRVARS;
@@ -3111,6 +3108,35 @@ char *str_str(char *cs, char *ct) {
 }
 
 
+/**
+* Removes spaces (' ') from the end of a string, and returns a pointer to the
+* first non-space character.
+*
+* @param char *string The string to trim (will lose spaces at the end).
+* @return char* A pointer to the first non-space character in the string.
+*/
+char *trim(char *string) {
+	char *ptr = string;
+	int len;
+	
+	if (!string) {
+		return NULL;
+	}
+	
+	// trim start
+	while (*ptr == ' ') {
+		++ptr;
+	}
+	
+	// trim end
+	while ((len = strlen(ptr)) > 0 && ptr[len-1] == ' ') {
+		ptr[len-1] = '\0';
+	}
+	
+	return ptr;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// TYPE UTILS //////////////////////////////////////////////////////////////
 
@@ -3934,10 +3960,9 @@ unsigned long long microtime(void) {
 * @param PLAYER_UPDATE_FUNC(*func)  A function pointer for the function to run on each player.
 */
 void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func)) {
-	struct char_file_u chdata;
+	player_index_data *index, *next_index;
 	descriptor_data *desc;
 	char_data *ch;
-	int pos;
 	bool is_file;
 	
 	// verify there are no characters at menus
@@ -3971,13 +3996,8 @@ void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func)) {
 	}
 
 	// ok, ready to roll
-	for (pos = 0; pos <= top_of_p_table; ++pos) {
-		// need chdata either way; check deleted here
-		if (load_char(player_table[pos].name, &chdata) <= NOBODY || IS_SET(chdata.char_specials_saved.act, PLR_DELETED)) {
-			continue;
-		}
-		
-		if (!(ch = find_or_load_player(player_table[pos].name, &is_file))) {
+	HASH_ITER(idnum_hh, player_table_by_idnum, index, next_index) {
+		if (!(ch = find_or_load_player(index->name, &is_file))) {
 			continue;
 		}
 		

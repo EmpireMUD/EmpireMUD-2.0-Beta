@@ -2750,7 +2750,7 @@ void out_of_blood(char_data *ch) {
 	msg_to_char(ch, "You die from lack of blood!\r\n");
 	act("$n falls down, dead.", FALSE, ch, 0, 0, TO_ROOM);
 	death_log(ch, ch, TYPE_SUFFERING);
-	add_lore(ch, LORE_DEATH, 0);
+	add_lore(ch, LORE_DEATH, "Died");
 	die(ch, ch);
 }
 
@@ -2866,13 +2866,13 @@ void perform_execute(char_data *ch, char_data *victim, int attacktype, int damty
 	if (!IS_NPC(victim) && !IS_NPC(ch)) {
 		if (ch == victim) {
 			if (attacktype == ATTACK_GUARD_TOWER)
-				add_lore(ch, LORE_TOWER_DEATH, 0);
+				add_lore(ch, LORE_TOWER_DEATH, "Killed by a guard tower");
 			else
-				add_lore(ch, LORE_DEATH, 0);
+				add_lore(ch, LORE_DEATH, "Died");
 		}
 		else {
-			add_lore(ch, LORE_PLAYER_KILL, GET_IDNUM(victim));
-			add_lore(victim, LORE_PLAYER_DEATH, GET_IDNUM(ch));
+			add_lore(ch, LORE_PLAYER_KILL, "Killed %s in battle", PERS(victim, victim, TRUE));
+			add_lore(victim, LORE_PLAYER_DEATH, "Slain by %s in battle", PERS(ch, ch, TRUE));
 		}
 	}
 	

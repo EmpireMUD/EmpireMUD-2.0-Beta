@@ -758,10 +758,6 @@ ACMD(do_disguise) {
 	else if (!MOB_FLAGGED(vict, MOB_HUMAN)) {
 		act("You can't disguise yourself as $N!", FALSE, ch, NULL, vict, TO_CHAR);
 	}
-	else if (strlen(PERS(vict, vict, FALSE)) >= MAX_DISGUISED_NAME_LENGTH) {
-		// this check is to make sure we can store the whole name
-		act("You can't disguise yourself as $N!", FALSE, ch, NULL, vict, TO_CHAR);
-	}
 	else if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_DISGUISE)) {
 		return;
 	}
@@ -779,9 +775,10 @@ ACMD(do_disguise) {
 		SET_BIT(PLR_FLAGS(ch), PLR_DISGUISED);
 		
 		// copy name and check limit
-		strcpy(buf, PERS(vict, vict, FALSE));
-		buf[MAX_DISGUISED_NAME_LENGTH-1] = '\0';
-		strcpy(GET_DISGUISED_NAME(ch), buf);
+		if (GET_DISGUISED_NAME(ch)) {
+			free(GET_DISGUISED_NAME(ch));
+		}
+		GET_DISGUISED_NAME(ch) = str_dup(PERS(vict, vict, FALSE));
 
 		// copy the sex
 		GET_DISGUISED_SEX(ch) = GET_SEX(vict);

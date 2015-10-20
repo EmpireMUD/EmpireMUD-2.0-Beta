@@ -246,6 +246,7 @@ char *get_room_description(room_data *room) {
 char *get_room_name(room_data *room, bool color) {
 	static char name[MAX_STRING_LENGTH];
 	empire_data *emp = ROOM_OWNER(room);
+	player_index_data *index;
 	crop_data *cp;
 
 	if (color && emp)
@@ -269,7 +270,7 @@ char *get_room_name(room_data *room, bool color) {
 	// patron monuments
 	else if (GET_BUILDING(room) && ROOM_PATRON(room) > 0) {
 		strcat(name, GET_BLD_TITLE(GET_BUILDING(room)));
-		sprintf(name + strlen(name), " of %s", get_name_by_id(ROOM_PATRON(room)) ? CAP(get_name_by_id(ROOM_PATRON(room))) : "a Former God");
+		sprintf(name + strlen(name), " of %s", (index = find_player_index_by_idnum(ROOM_PATRON(room))) ? index->fullname : "a Former God");
 	}
 
 	/* Building */
@@ -474,7 +475,6 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	extern int how_to_show_map[NUM_SIMPLE_DIRS][2];
 	extern int show_map_y_first[NUM_SIMPLE_DIRS];
 	extern byte distance_can_see(char_data *ch);
-	extern char *get_name_by_id(int id);
 	extern int find_mine_type(int type);
 	extern struct city_metadata_type city_type[];
 	extern const char *bld_flags[];
@@ -490,6 +490,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	int first_iter, second_iter, xx, yy, magnitude, north;
 	int first_start, first_end, second_start, second_end, temp;
 	bool y_first, invert_x, invert_y, found, comma;
+	player_index_data *index;
 	room_data *to_room;
 	empire_data *emp, *pcemp;
 	crop_data *cp;
@@ -782,7 +783,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		}
 		
 		if (ROOM_PRIVATE_OWNER(HOME_ROOM(room)) != NOBODY) {
-			msg_to_char(ch, " This is %s's private residence.", get_name_by_id(ROOM_PRIVATE_OWNER(HOME_ROOM(room))) ? CAP(get_name_by_id(ROOM_PRIVATE_OWNER(HOME_ROOM(room)))) : "someone");
+			msg_to_char(ch, " This is %s's private residence.", (index = find_player_index_by_idnum(ROOM_PRIVATE_OWNER(HOME_ROOM(room)))) ? index->fullname : "someone");
 		}
 		
 		if (ROOM_AFF_FLAGGED(HOME_ROOM(room), ROOM_AFF_PUBLIC)) {

@@ -65,7 +65,6 @@ extern const int confused_dirs[NUM_SIMPLE_DIRS][2][NUM_OF_DIRS];
 extern const char *drinks[];
 extern int get_north_for_char(char_data *ch);
 extern struct complex_room_data *init_complex_data();
-void write_lore(char_data *ch);
 const struct wear_data_type wear_data[NUM_WEARS];
 
 // external funcs
@@ -468,7 +467,7 @@ void affect_remove_room(room_data *room, struct affected_type *af) {
 * Insert an affect_type in a char_data structure
 *  Automatically sets apropriate bits and apply's
 *
-* Caution: this duplicates af (because of how it loads from the pfile)
+* Caution: this duplicates af (because of how it used to load from the pfile)
 *
 * @param char_data *ch The person to add the affect to
 * @param struct affected_type *af The affect to add.
@@ -3155,70 +3154,47 @@ bool run_room_interactions(char_data *ch, room_data *room, int type, INTERACTION
  //////////////////////////////////////////////////////////////////////////////
 //// LORE HANDLERS ///////////////////////////////////////////////////////////
 
-
 /**
 * Add lore to a character's list
 *
 * @param char_data *ch The person receiving the lore.
 * @param int type LORE_x const
-* @param int value Some lores require a value, e.g. empire id
+* @param const char *str String formatting.
+* @param ... printf-style args for str.
 */
-void add_lore(char_data *ch, int type, int value) {
+void add_lore(char_data *ch, int type, const char *str, ...) {
 	struct lore_data *new, *lore;
+	char text[MAX_STRING_LENGTH];
+	va_list tArgList;
 
-	if (IS_NPC(ch))
+	if (!ch || IS_NPC(ch) || !text)
 		return;
-
-	/* Clean old records automatically */
-	switch (type) {
-		case LORE_PURIFY: {
-			remove_lore(ch, LORE_PURIFY, -1);
-			break;
-		}
-		case LORE_START_VAMPIRE:
-		case LORE_SIRE_VAMPIRE: {
-			remove_lore(ch, LORE_START_VAMPIRE, -1);
-			remove_lore(ch, LORE_SIRE_VAMPIRE, -1);
-			break;
-		}
-		case LORE_JOIN_EMPIRE: {
-			remove_lore(ch, LORE_DEFECT_EMPIRE, -1);
-			remove_lore(ch, LORE_KICKED_EMPIRE, -1);
-			remove_lore(ch, LORE_FOUND_EMPIRE, -1);
-			break;
-		}
-		case LORE_DEFECT_EMPIRE:
-		case LORE_KICKED_EMPIRE: {
-			remove_lore(ch, LORE_JOIN_EMPIRE, -1);
-			remove_lore(ch, LORE_FOUND_EMPIRE, -1);
-			break;
-		}
-		case LORE_FOUND_EMPIRE: {
-			remove_lore(ch, LORE_FOUND_EMPIRE, -1);
-			remove_lore(ch, LORE_JOIN_EMPIRE, -1);
-			remove_lore(ch, LORE_KICKED_EMPIRE, -1);
-			remove_lore(ch, LORE_DEFECT_EMPIRE, -1);
-			break;
+	
+	// find end
+	if ((lore = GET_LORE(ch))) {
+		while (lore->next) {
+			lore = lore->next;
 		}
 	}
-
-	/* Find the last entry in ch's lore */
-	for (lore = GET_LORE(ch); lore && lore->next; lore = lore->next);
-
+	
+	va_start(tArgList, str);
+	vsprintf(text, str, tArgList);
+	
 	CREATE(new, struct lore_data, 1);
 	new->type = type;
-	new->value = value;
 	new->date = (long) time(0);
+	new->text = str_dup(text);
 	new->next = NULL;
 
-	/* If they have lore, append this to the end.  Elsewise it becomes their lore */
-	if (lore)
+	// append to end
+	if (lore) {
 		lore->next = new;
-	else
+	}
+	else {
 		GET_LORE(ch) = new;
-
-	/* And last but not least, save it */
-	write_lore(ch);
+	}
+	
+	va_end(tArgList);
 }
 
 
@@ -3259,19 +3235,16 @@ void clean_lore(char_data *ch) {
 			}
 		}
 	}
-
-	write_lore(ch);
 }
 
 
 /**
-* Remove all lore of a given type
+* Remove all lore of a given type.
 *
 * @param char_data *ch The person whose lore to remove
 * @param int type The LORE_x type to remove
-* @param int value -1 for all, otherwise it checks to only remove lore with matching value
 */
-void remove_lore(char_data *ch, int type, int value) {
+void remove_lore(char_data *ch, int type) {
 	struct lore_data *lore, *next_lore;
 
 	if (IS_NPC(ch))
@@ -3281,13 +3254,9 @@ void remove_lore(char_data *ch, int type, int value) {
 		next_lore = lore->next;
 
 		if (lore->type == type) {
-			if (value == -1 || value == lore->value) {
-				remove_lore_record(ch, lore);
-			}
+			remove_lore_record(ch, lore);
 		}
 	}
-
-	write_lore(ch);
 }
 
 
@@ -3299,6 +3268,9 @@ void remove_lore_record(char_data *ch, struct lore_data *lore) {
 		return;
 
 	REMOVE_FROM_LIST(lore, GET_LORE(ch), next);
+	if (lore->text) {
+		free(lore->text);
+	}
 	free(lore);
 }
 

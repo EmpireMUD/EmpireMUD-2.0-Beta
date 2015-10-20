@@ -844,9 +844,9 @@ ACMD(do_alternate) {
 	extern int isbanned(char *hostname);
 
 	char arg[MAX_INPUT_LENGTH];
-	struct char_file_u tmp_store;
+	struct account_player *plr;
+	player_index_data *index;
 	char_data *newch;
-	int player_i, idnum;
 	
 	any_one_arg(argument, arg);
 	
@@ -861,23 +861,19 @@ ACMD(do_alternate) {
 		msg_to_char(ch, "Usage: alternate <character name>\r\n");
 	}
 	else if (!str_cmp(arg, "list")) {
-		struct char_file_u vbuf;
-		int iter;
-	
 		msg_to_char(ch, "Account characters:\r\n");
 		
-		for (iter = 0; iter <= top_of_p_table; iter++) {
-			load_char(player_table[iter].name, &vbuf);
-			if (IS_SET(vbuf.char_specials_saved.act, PLR_DELETED)) {
+		for (plr = GET_ACCOUNT(ch)->players; plr; plr = plr->next) {
+			if (!plr->player) {
 				continue;
 			}
 			
-			if (vbuf.char_specials_saved.idnum == GET_IDNUM(ch)) {
+			if (plr->player->idnum == GET_IDNUM(ch)) {
 				// self
-				msg_to_char(ch, " &c%s&0\r\n", vbuf.name);
+				msg_to_char(ch, " &c%s&0\r\n", PERS(ch, ch, TRUE));
 			}
-			else if (vbuf.player_specials_saved.account_id != 0 && vbuf.player_specials_saved.account_id == GET_ACCOUNT_ID(ch)) {
-				msg_to_char(ch, " %s\r\n", vbuf.name);
+			else {
+				msg_to_char(ch, " %s\r\n", plr->player->fullname);
 			}
 		}
 		
@@ -905,13 +901,13 @@ ACMD(do_alternate) {
 	else if (GET_POS(ch) == POS_FIGHTING || FIGHTING(ch)) {
 		msg_to_char(ch, "You can't switch characters while fighting!\r\n");
 	}
-	else if ((idnum = get_id_by_name(arg)) == NOTHING) {
+	else if (!(index = find_player_index_by_name(arg))) {
 		msg_to_char(ch, "Unknown character.\r\n");
 	}
-	else if ((newch = is_playing(idnum)) || (newch = is_at_menu(idnum))) {
+	else if ((newch = is_playing(index->idnum)) || (newch = is_at_menu(index->idnum))) {
 		// in-game?
 		
-		if (GET_ACCOUNT_ID(newch) != GET_ACCOUNT_ID(ch) || GET_ACCOUNT_ID(newch) == 0) {
+		if (GET_ACCOUNT(newch) != GET_ACCOUNT(ch)) {
 			msg_to_char(ch, "That character isn't on your account.\r\n");
 			return;
 		}
@@ -925,33 +921,18 @@ ACMD(do_alternate) {
 	}
 	else {
 		// prepare
-		CREATE(newch, char_data, 1);
-		clear_char(newch);
-		CREATE(newch->player_specials, struct player_special_data, 1);
-
-		// load
-		if ((player_i = load_char(arg, &tmp_store)) >= 0) {
-			store_to_char(&tmp_store, newch);
-			GET_PFILEPOS(newch) = player_i;
-
-			if (PLR_FLAGGED(newch, PLR_DELETED)) {
-				msg_to_char(ch, "Unknown character.\r\n");
-				free_char(newch);
-				return;
-			}
-			else {
-				// undo it just in case they are set
-				REMOVE_BIT(PLR_FLAGS(newch), PLR_WRITING | PLR_MAILING);
-			}
-		}
-		else {
+		newch = load_player(index->name);
+		
+		if (!newch) {
 			msg_to_char(ch, "Unknown character.\r\n");
-			free_char(newch);
 			return;
 		}
 		
+		// in case
+		REMOVE_BIT(PLR_FLAGS(newch), PLR_WRITING | PLR_MAILING);
+				
 		// ensure legal switch
-		if (GET_ACCOUNT_ID(newch) != GET_ACCOUNT_ID(ch) || GET_ACCOUNT_ID(newch) == 0) {
+		if (GET_ACCOUNT(newch) != GET_ACCOUNT(ch)) {
 			msg_to_char(ch, "That character isn't on your account.\r\n");
 			free_char(newch);
 			return;
@@ -1681,8 +1662,7 @@ ACMD(do_prompt) {
 	}
 
 	delete_doubledollar(argument);
-
-	// char_file_u only holds MAX_PROMPT_SIZE+1
+	
 	if (strlen(argument) > MAX_PROMPT_SIZE) {
 		argument[MAX_PROMPT_SIZE] = '\0';
 	}
@@ -1827,9 +1807,6 @@ ACMD(do_selfdelete) {
 		msg_to_char(ch, "WARNING: This will delete your character.\r\n");
 	}
 	else {
-		// actual delete (rent out equipment first)
-		Objsave_char(ch, RENT_RENTED);
-		delete_player_character(ch);
 		
 		// logs and messaging
 		syslog(SYS_INFO, GET_INVIS_LEV(ch), TRUE, "DEL: %s (lev %d) has self-deleted.", GET_NAME(ch), GET_ACCESS_LEVEL(ch));
@@ -1846,7 +1823,9 @@ ACMD(do_selfdelete) {
 		}
 		msg_to_char(ch, "You have deleted your character. Goodbye...\r\n");
 		
-		// bye now
+		// actual delete (rent out equipment first)
+		Objsave_char(ch, RENT_RENTED);
+		delete_player_character(ch);
 		extract_char(ch);
 	}
 }
@@ -2230,7 +2209,7 @@ ACMD(do_title) {
 	}
 	else {
 		set_title(ch, argument);
-		msg_to_char(ch, "Okay, you're now %s%s.\r\n", PERS(ch, ch, 1), GET_TITLE(ch));
+		msg_to_char(ch, "Okay, you're now %s%s.\r\n", PERS(ch, ch, 1), NULLSAFE(GET_TITLE(ch)));
 	}
 }
 

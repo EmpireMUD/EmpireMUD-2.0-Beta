@@ -183,6 +183,7 @@ typedef any_vnum trig_vnum;	// for dg scripts
 
 
 // For simplicity...
+typedef struct account_data account_data;
 typedef struct adventure_data adv_data;
 typedef struct bld_data bld_data;
 typedef struct book_data book_data;
@@ -193,6 +194,7 @@ typedef struct descriptor_data descriptor_data;
 typedef struct empire_data empire_data;
 typedef struct index_data index_data;
 typedef struct obj_data obj_data;
+typedef struct player_index_data player_index_data;
 typedef struct room_data room_data;
 typedef struct room_template room_template;
 typedef struct sector_data sector_data;
@@ -470,17 +472,17 @@ typedef struct trig_data trig_data;
 #define MOVE  1
 #define MANA  2
 #define BLOOD  3
-#define NUM_POOLS  4	// used in char_file_u -- **DO NOT CHANGE**
+#define NUM_POOLS  4
 
 
-// core attributes for char_file_u and char_data
+// core attributes for char_data
 #define STRENGTH  0
 #define DEXTERITY  1
 #define CHARISMA  2
 #define GREATNESS  3
 #define INTELLIGENCE  4
 #define WITS  5
-#define NUM_ATTRIBUTES  6	// used in char_file_u -- **DO NOT CHANGE**
+#define NUM_ATTRIBUTES  6
 
 
 // extra attributes -- ATT_x
@@ -497,7 +499,6 @@ typedef struct trig_data trig_data;
 #define ATT_RESIST_MAGICAL  10	// damage reduction
 #define ATT_CRAFTING_BONUS  11	// levels added to crafting
 #define NUM_EXTRA_ATTRIBUTES  12
-#define TOTAL_EXTRA_ATTRIBUTES  20	// including spares, 10 spares remaining -- **DO NOT CHANGE**
 
 
 /* Affect bits */
@@ -998,7 +999,6 @@ typedef struct trig_data trig_data;
 #define MAT_BONE  14	// ...bone
 #define MAT_HAIR  15	// ...hair
 #define NUM_MATERIALS  16	// Total number of matierals
-#define MAX_MATERIALS  20	// extra space to add more later -- **DO NOT CHANGE**
 
 
 // Extra object flags -- OBJ_FLAGGED(obj, f)
@@ -1080,7 +1080,16 @@ typedef struct trig_data trig_data;
  //////////////////////////////////////////////////////////////////////////////
 //// PLAYER DEFINES //////////////////////////////////////////////////////////
 
-// Periodic actions -- WARNING: changing the order of these will have tragic consequences with the player file
+// ACCT_x: Account flags
+#define ACCT_FROZEN  BIT(0)	// a. unable to play
+#define ACCT_MUTED  BIT(1)	// b. unable to use public channels
+#define ACCT_SITEOK  BIT(2)	// c. site-cleared for partial bans
+#define ACCT_NOTITLE  BIT(3)	// d. cannot change own title
+#define ACCT_MULTI_IP  BIT(4)	// e. can log in at the same time as other accounts on the same IP
+#define ACCT_MULTI_CHAR  BIT(5)	// f. can log in more than one character on this account
+
+
+// Periodic actions -- WARNING: changing the order of these will have tragic consequences with saved players
 #define ACT_NONE			0
 #define ACT_DIGGING			1
 #define ACT_GATHERING		2
@@ -1196,14 +1205,14 @@ typedef struct trig_data trig_data;
 #define CUSTOM_COLOR_SLASH  5
 #define CUSTOM_COLOR_TELL  6
 #define CUSTOM_COLOR_STATUS  7
-// up to MAX_CUSTOM_COLORS (10) - 1
+#define NUM_CUSTOM_COLORS  8	// total
 
 
-// Player conditions
+// COND_x: Player conditions
 #define DRUNK  0
 #define FULL  1
 #define THIRST  2
-#define NUM_CONDS  3	// WARNING do not change: used in char_file_u
+#define NUM_CONDS  3
 
 
 // GRANT_X: Grant flags allow players to use abilities below the required access level
@@ -1308,7 +1317,7 @@ typedef struct trig_data trig_data;
 #define PLR_SITEOK		BIT(4)	/* Player has been site-cleared			*/
 #define PLR_MUTED		BIT(5)	/* Player not allowed to use pub_comm	*/
 #define PLR_NOTITLE		BIT(6)	/* Player not allowed to set title		*/
-#define PLR_DELETED		BIT(7)	/* Player deleted - space reusable		*/
+	#define PLR_UNUSED1		BIT(7)
 #define PLR_LOADROOM	BIT(8)	/* Player uses nonstandard loadroom		*/
 #define PLR_NOWIZLIST	BIT(9)	/* Player shouldn't be on wizlist		*/
 #define PLR_NODELETE	BIT(10)	/* Player shouldn't be deleted			*/
@@ -1596,12 +1605,19 @@ typedef struct trig_data trig_data;
 
 // misc game limits
 #define BANNED_SITE_LENGTH    50	// how long ban hosts can be
+#define COLREDUC_SIZE  80	// how many characters long a color_reducer string can be
+#define MAX_ABILITIES  300	// just a shy ton
+#define MAX_ADMIN_NOTES_LENGTH  2400
+#define MAX_AFFECT  32
 #define MAX_CLASS_ABILITIES  15	// maximum abilities per class
 #define MAX_CMD_LENGTH  16384	// 16k -- for trigger lengths
 #define MAX_COIN  2140000000	// 2.14b (< MAX_INT)
 #define MAX_COIN_TYPES  10	// don't store more than this many different coin types
 #define MAX_CONDITION  750	// FULL, etc
+#define MAX_COOLDOWNS  32
 #define MAX_EMPIRE_DESCRIPTION  2000
+#define MAX_GROUP_SIZE  4	// how many members a group allows
+#define MAX_IGNORES  15	// total number of players you can ignore
 #define MAX_INPUT_LENGTH  1024	// Max length per *line* of input
 #define MAX_INT  2147483647	// useful for bounds checking
 #define MAX_INVALID_NAMES  200	// ban.c
@@ -1609,43 +1625,29 @@ typedef struct trig_data trig_data;
 #define MAX_ITEM_DESCRIPTION  4000
 #define MAX_MESSAGES  60	// fight.c
 #define MAX_MOTD_LENGTH  4000	// eedit.c, configs
-#define MAX_OBJ_AFFECT  6
-#define NUM_OBJ_VAL_POSITIONS  3	// GET_OBJ_VAL(obj, X) -- caution: changing this will require you to change the .obj file format
-#define MAX_GROUP_SIZE  4	// how many members a group allows
-#define MAX_PLAYER_DESCRIPTION  4000
-#define MAX_POOF_LENGTH  80
-#define MAX_RANK_LENGTH  20	// length limit
-#define MAX_RANKS  20	// Max levels in an empire
-#define MAX_RAW_INPUT_LENGTH  1536  // Max size of *raw* input
-#define MAX_RESOURCES_REQUIRED  10	// how many resources a recipe can need
-#define MAX_ROOM_DESCRIPTION  4000
-#define MAX_SKILL_RESETS  10	// number of skill resets you can save up
-#define MAX_STORAGE  1000000	// empire storage cap, must be < MAX_INT
-#define MAX_STRING_LENGTH  8192
-#define COLREDUC_SIZE  80	// how many characters long a color_reducer string can be
-
-
-// limits used in char_file_u -- **DO NOT CHANGE** (without a pconvert)
-#define MAX_ABILITIES  400	// just a shy ton
-#define NUM_ACTION_VNUMS  3	// action vnums 0, 1, 2
-#define MAX_ADMIN_NOTES_LENGTH  240
-#define MAX_AFFECT  32
-#define MAX_COOLDOWNS  32
-#define MAX_CUSTOM_COLORS  10	// total storable custom colors
-#define MAX_DISGUISED_NAME_LENGTH  32
-#define MAX_HOST_LENGTH  45
-#define MAX_IGNORES  15	// total number of players you can ignore
 #define MAX_NAME_LENGTH  20
+#define MAX_OBJ_AFFECT  6
+#define MAX_PLAYER_DESCRIPTION  4000
 #define MAX_POOFIN_LENGTH  80
+#define MAX_POOF_LENGTH  80
 #define MAX_PROMPT_SIZE  120
 #define MAX_PWD_LENGTH  32
+#define MAX_RANKS  20	// Max levels in an empire
+#define MAX_RANK_LENGTH  20	// length limit
+#define MAX_RAW_INPUT_LENGTH  1536  // Max size of *raw* input
 #define MAX_REFERRED_BY_LENGTH  32
+#define MAX_RESOURCES_REQUIRED  10	// how many resources a recipe can need
 #define MAX_REWARDS_PER_DAY  5	//  number of times a player can be rewarded
-#define MAX_SKILLS  24
+#define MAX_ROOM_DESCRIPTION  4000
+#define MAX_SKILLS  10
+#define MAX_SKILL_RESETS  10	// number of skill resets you can save up
 #define MAX_SLASH_CHANNEL_NAME_LENGTH  16
-#define MAX_SLASH_CHANNELS  20
+#define MAX_STORAGE  1000000	// empire storage cap, must be < MAX_INT
+#define MAX_STRING_LENGTH  8192
 #define MAX_TITLE_LENGTH  100
 #define MAX_TITLE_LENGTH_NO_COLOR  80	// title limit without color codes (less than MAX_TITLE_LENGTH)
+#define NUM_ACTION_VNUMS  3	// action vnums 0, 1, 2
+#define NUM_OBJ_VAL_POSITIONS  3	// GET_OBJ_VAL(obj, X) -- caution: changing this will require you to change the .obj file format
 
 
 /*
@@ -1670,7 +1672,7 @@ typedef struct trig_data trig_data;
  //////////////////////////////////////////////////////////////////////////////
 //// MISCELLANEOUS STRUCTS ///////////////////////////////////////////////////
 
-// Simple affect structure -- Used in char_file_u **DO NOT CHANGE**
+// Simple affect structure
 struct affected_type {
 	sh_int type;	// The type of spell that caused this
 	int cast_by;	// player ID (positive) or mob vnum (negative)
@@ -1862,6 +1864,15 @@ struct shipping_data {
 	room_vnum ship_origin;	// where the ship is coming from (in case we have to send it back)
 	
 	struct shipping_data *next;
+};
+
+
+// for act.comm.c
+struct slash_channel {
+	int id;
+	char *name;
+	char color;
+	struct slash_channel *next;
 };
 
 
@@ -2141,6 +2152,27 @@ struct pursuit_data {
  //////////////////////////////////////////////////////////////////////////////
 //// PLAYER STRUCTS //////////////////////////////////////////////////////////
 
+// master player accounts
+struct account_data {
+	int id;	// corresponds to player_index_data account_id and player's saved account id
+	struct account_player *players;	// linked list of players
+	time_t last_logon;	// timestamp of the last login on the account
+	bitvector_t flags;	// ACCT_x
+	char *notes;	// account notes
+	
+	UT_hash_handle hh;	// account_table
+};
+
+
+// list of players in account_data
+struct account_player {
+	char *name;	// stored on load in order to build index
+	player_index_data *player;
+	
+	struct account_player *next;
+};
+
+
 // used in descriptor for personal channel histories -- act.comm.c
 struct channel_history_data {
 	char *message;
@@ -2155,6 +2187,27 @@ struct coin_data {
 	time_t last_acquired;	// helps cleanup
 	
 	struct coin_data *next;
+};
+
+
+// player table
+struct player_index_data {
+	// these stats are all copied from the player on startup (and save_char)
+	
+	int idnum;	// player id
+	char *name;	// character's login name
+	char *fullname;	// character's display name
+	int account_id;	// player's account id
+	time_t last_logon;	// timestamp of last play time
+	time_t birth;	// creation time
+	int played;	// time played
+	int access_level;	// player's access level
+	bitvector_t plr_flags;	// PLR_x: a copy of the last-saved player flags
+	empire_data *loyalty;	// empire, if any
+	char *last_host;	// last known host
+	
+	UT_hash_handle idnum_hh;
+	UT_hash_handle name_hh;
 };
 
 
@@ -2191,7 +2244,7 @@ struct color_reducer {
 struct descriptor_data {
 	socket_t descriptor;	// file descriptor for socket
 
-	char host[MAX_HOST_LENGTH+1];	// hostname
+	char *host;	// hostname
 	byte bad_pws;	// number of bad pw attemps this login
 	byte idle_tics;	// tics idle at password prompt
 	int connected;	// STATE()
@@ -2265,21 +2318,14 @@ struct paragraph_data {
 };
 
 
-// used in player_special_data_saved **DO NOT CHANGE** or you could corrupt the playerfile
+// used in player_special_data_saved
 struct player_ability_data {
 	bool purchased;	// whether or not the player bought it
 	byte levels_gained;	// tracks for the cap on how many times one ability grants skillups
 };
 
 
-// for the player index
-struct player_index_element {
-	char *name;
-	int id;
-};
-
-
-// used in player_special_data_saved **DO NOT CHANGE** or you could corrupt the playerfile
+// used in player_special_data_saved
 struct player_skill_data {
 	byte level;	// current skill level (0-100)
 	double exp;	// experience gained in skill (0-100)
@@ -2296,21 +2342,12 @@ struct player_slash_channel {
 };
 
 
-/*
- *  **DO NOT CHANGE**
- *  If you want to add new values to the playerfile, do it here.  DO NOT
- * ADD, DELETE OR MOVE ANY OF THE VARIABLES - doing so will change the
- * size of the structure and ruin the playerfile.  However, you can change
- * the names of the spares to something more meaningful, and then use them
- * in your new code.  They will automatically be transferred from the
- * playerfile into memory when players log in.
- */
+// various player-only data
 struct player_special_data_saved {
 	// account and player stuff
-	int account_id;	// all characters with the same account_id belong to the same player
-	char creation_host[MAX_HOST_LENGTH+1];	// host they created from
-	char referred_by[MAX_REFERRED_BY_LENGTH];	// as entered in character creation
-	char admin_notes[MAX_ADMIN_NOTES_LENGTH];	// for admin to leave notes about a player
+	char *creation_host;	// host they created from
+	char *referred_by;	// as entered in character creation
+	char *admin_notes;	// for admin to leave notes about a player
 	byte invis_level;	// level of invisibility
 	byte immortal_level;	// stored so that if level numbers are changed, imms stay at the correct level
 	bitvector_t grants;	// grant imm abilities
@@ -2332,10 +2369,9 @@ struct player_special_data_saved {
 	// misc player attributes
 	ubyte apparent_age;	// for vampires	
 	sh_int conditions[NUM_CONDS];	// Drunk, full, thirsty
-	int resources[MAX_MATERIALS];	// God resources
+	int resources[NUM_MATERIALS];	// God resources
 	int ignore_list[MAX_IGNORES];	// players who can't message you
-	char slash_channels[MAX_SLASH_CHANNELS][MAX_SLASH_CHANNEL_NAME_LENGTH];	// for storing /channels
-	char custom_colors[MAX_CUSTOM_COLORS];	// for custom channel coloring, storing the letter part of the & code ('r' for &r)
+	char custom_colors[NUM_CUSTOM_COLORS];	// for custom channel coloring, storing the letter part of the & code ('r' for &r)
 
 	// some daily stuff
 	int daily_cycle;	// Last update cycle registered
@@ -2381,70 +2417,25 @@ struct player_special_data_saved {
 	
 	// tracking for specific skills
 	byte confused_dir;  // people without Navigation think this dir is north
-	char disguised_name[MAX_DISGUISED_NAME_LENGTH];	// verbatim copy of name -- grabs custom mob names and empire names
+	char *disguised_name;	// verbatim copy of name -- grabs custom mob names and empire names
 	byte disguised_sex;	// sex of the mob you're disguised as
 	sh_int morph;	// MORPH_x form
 	bitvector_t mount_flags;	// flags for the stored mount
 	mob_vnum mount_vnum;	// stored mount
 	byte using_poison;	// poison preference for Stealth
-
-	/* spares below for future expansion.  You can change the names from
-	   'sparen' to something meaningful, but don't change the order.  */
-
-	byte spare0;
-	byte spare1;
-	byte spare2;
-	byte spare3;
-	byte spare4;
-	
-	ubyte spare5;
-	ubyte spare6;
-	ubyte spare7;
-	ubyte spare8;
-	ubyte spare9;
-	
-	sh_int spare10;
-	sh_int spare11;
-	sh_int spare12;
-	sh_int spare13;
-	sh_int spare14;
-	
-	int spare15;
-	int spare16;
-	int spare17;
-	int spare18;
-	int spare19;
-	
-	double spare20;
-	double spare21;
-	double spare22;
-	double spare23;
-	double spare24;
-	
-	bitvector_t spare25; 
-	bitvector_t spare26;
-	bitvector_t spare27;
-	bitvector_t spare28;
-	bitvector_t spare29;
-	
-	// these are initialized to NOTHING/-1 in init_player()
-	any_vnum spare30;
-	any_vnum spare31;
-	any_vnum spare32;
-	any_vnum spare33;
-	any_vnum spare34;
 };
 
 
 /*
  * Specials needed only by PCs, not NPCs.  Space for this structure is
  * not allocated in memory for NPCs, but it is for PCs and the portion
- * of it labelled 'saved' is saved in the playerfile.  This structure can
- * be changed freely; beware, though, that changing the contents of
- * player_special_data_saved will corrupt the playerfile.
+ * of it labelled 'saved' is saved in the playerfile.
  */
 struct player_special_data {
 	struct player_special_data_saved saved;
+	
+	account_data *account;	// pointer to account_table entry
+	int temporary_account_id;	// used during creation
 	
 	int gear_level;	// computed gear level -- determine_gear_level()
 	struct coin_data *coins;	// linked list of coin data
@@ -2460,6 +2451,7 @@ struct player_special_data {
 	int last_tell;	// idnum of last tell from
 
 	struct player_slash_channel *slash_channels;	// channels the player is on
+	struct slash_channel *load_slash_channels;	// temporary storage between load and join
 	byte reboot_conf;	// Reboot confirmation
 
 	byte create_points;	// Used in character creation
@@ -2488,7 +2480,7 @@ struct time_data {
 
 // general player-related info, usually PCs and NPCs
 struct char_player_data {
-	char passwd[MAX_PWD_LENGTH+1];	// character's password
+	char *passwd;	// character's password
 	char *name;	// PC name / NPC keyword (kill ... )
 	char *short_descr;	// for NPC string-building
 	char *long_descr;	// for 'look' on mobs or 'look at' on players
@@ -2500,7 +2492,7 @@ struct char_player_data {
 };
 
 
-// Char's points.  Used in char_file_u -- **DO NOT CHANGE**
+// Char's points.
 // everything in here has a default value that it's always reset to, and only
 // gear and affects can raise them above it; character can't gain them
 // permanently
@@ -2509,17 +2501,13 @@ struct char_point_data {
 	int max_pools[NUM_POOLS];	// HEALTH, MOVE, MANA, BLOOD
 	int deficit[NUM_POOLS];	// HEALTH, MOVE, MANA, BLOOD
 	
-	int extra_attributes[TOTAL_EXTRA_ATTRIBUTES];	// ATT_x (dodge, etc)
+	int extra_attributes[NUM_EXTRA_ATTRIBUTES];	// ATT_x (dodge, etc)
 };
 
 
 /* 
  * char_special_data_saved: specials which both a PC and an NPC have in
  * common, but which must be saved to the playerfile for PC's.
- *
- * ***WARNING***  Do not change this structure.  Doing so will ruin the
- * playerfile.  If you want to add to the playerfile, use the spares
- * in player_special_data.
  */
 struct char_special_data_saved {
 	int idnum;	// player's idnum; -1 for mobiles
@@ -2571,7 +2559,6 @@ struct char_special_data {
 
 // main character data for PC/NPC in-game
 struct char_data {
-	int pfilepos;	// playerfile pos
 	mob_vnum vnum;	// mob's vnum
 	room_data *in_room;	// location (real room number)
 	int wait;	// wait for how many loops
@@ -2607,14 +2594,14 @@ struct char_data {
 	char_data *master;	// Who is char following?
 	struct group_data *group;	// Character's Group
 
-	char prev_host[MAX_HOST_LENGTH+1];	// Previous host (they're Trills)
+	char *prev_host;	// Previous host (they're Trills)
 	time_t prev_logon;	// Time (in secs) of prev logon
 	
 	UT_hash_handle hh;	// mobile_table
 };
 
 
-// used in char_file_u **DO NOT CHANGE**
+// cooldown info
 struct cooldown_data {
 	sh_int type;	// any COOLDOWN_x const
 	time_t expire_time;	// time at which the cooldown has expired
@@ -2623,7 +2610,7 @@ struct cooldown_data {
 };
 
 
-// for damage-over-time (DoTs) Used in char_file_u **DO NOT CHANGE**
+// for damage-over-time (DoTs)
 struct over_time_effect_type {
 	sh_int type;	// ATYPE_x
 	int cast_by;	// player ID (positive) or mob vnum (negative)
@@ -2637,36 +2624,6 @@ struct over_time_effect_type {
 };
 
 
-// ***BEWARE*** Changing it will ruin the playerfile
-struct char_file_u {
-	char name[MAX_NAME_LENGTH+1];	// first name
-	char lastname[MAX_NAME_LENGTH+1];	// last name
-	char title[MAX_TITLE_LENGTH+1];	// character's title
-	char description[MAX_PLAYER_DESCRIPTION];	// player's manual description
-	char prompt[MAX_PROMPT_SIZE+1];	// character's prompt
-	char fight_prompt[MAX_PROMPT_SIZE+1];	// character's prompt for combat
-	char poofin[MAX_POOFIN_LENGTH+1];	// message when appearing
-	char poofout[MAX_POOFIN_LENGTH+1];	// message when disappearing
-	byte sex;	// sex (yes, please)
-	byte access_level;	// character's level
-	time_t birth;	// time of birth of character
-	int	played;	// number of secs played in total
-
-	char pwd[MAX_PWD_LENGTH+1];	// character's password
-
-	struct char_special_data_saved char_specials_saved;
-	struct player_special_data_saved player_specials_saved;
-	sh_int attributes[NUM_ATTRIBUTES];	// str, etc (natural)
-	struct char_point_data points;
-	struct affected_type affected[MAX_AFFECT];
-	struct over_time_effect_type over_time_effects[MAX_AFFECT];
-	struct cooldown_data cooldowns[MAX_COOLDOWNS];
-
-	time_t last_logon;	// time (in secs) of last logon
-	char host[MAX_HOST_LENGTH+1];	// host of last logon
-};
-
-
 // Structure used for chars following other chars
 struct follow_type {
 	char_data *follower;
@@ -2677,8 +2634,8 @@ struct follow_type {
 // For a person's lore
 struct lore_data {
 	int type;	// LORE_x
-	int value;	// empire id or other id type
 	long date;	// when it was acquired (timestamp)
+	char *text;
 
 	struct lore_data *next;
 };

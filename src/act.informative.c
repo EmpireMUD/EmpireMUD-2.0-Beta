@@ -602,13 +602,11 @@ void list_char_to_char(char_data *list, char_data *ch) {
 * @param char_data *to The person to show it to.
 */
 void list_lore_to_char(char_data *ch, char_data *to) {
-	extern char *get_name_by_id(int id);
 	extern long load_time();
 
 	struct lore_data *lore;
 	char daystring[MAX_INPUT_LENGTH];
 	struct time_info_data t;
-	empire_data *e;
 	long beginning_of_time = load_time();
 
 	msg_to_char(to, "%s's lore:\r\n", PERS(ch, ch, 1));
@@ -622,53 +620,8 @@ void list_lore_to_char(char_data *ch, char_data *to) {
 		else
 			strcpy(buf1, buf);
 
-		sprintf(daystring, "%d %s, Year %d", t.day + 1, buf1, t.year);
-
-		switch (lore->type) {
-			case LORE_FOUND_EMPIRE:
-				if ((e = real_empire(lore->value)))
-					msg_to_char(to, " Proudly founded %s%s&0 on %s.\r\n", EMPIRE_BANNER(e), EMPIRE_NAME(e), daystring);
-				break;
-			case LORE_JOIN_EMPIRE:
-				if ((e = real_empire(lore->value)))
-					msg_to_char(to, " Honorably accepted into %s%s&0 on %s.\r\n", EMPIRE_BANNER(e), EMPIRE_NAME(e), daystring);
-				break;
-			case LORE_DEFECT_EMPIRE:
-				if ((e = real_empire(lore->value)))
-					msg_to_char(to, " Defected from %s%s&0 on %s.\r\n", EMPIRE_BANNER(e), EMPIRE_NAME(e), daystring);
-				break;
-			case LORE_KICKED_EMPIRE:
-				if ((e = real_empire(lore->value)))
-					msg_to_char(to, " Dishonorably discharged from %s%s&0 on %s.\r\n", EMPIRE_BANNER(e), EMPIRE_NAME(e), daystring);
-				break;
-			case LORE_PLAYER_KILL:
-				msg_to_char(to, " Killed %s in battle on %s.\r\n", get_name_by_id(lore->value) ? CAP(get_name_by_id(lore->value)) : "an unknown foe", daystring);
-				break;
-			case LORE_PLAYER_DEATH:
-				msg_to_char(to, " Slain by %s in battle on %s.\r\n", get_name_by_id(lore->value) ? CAP(get_name_by_id(lore->value)) : "an unknown foe", daystring);
-				break;
-			case LORE_TOWER_DEATH:
-				msg_to_char(to, " Killed by a guard tower on %s.\r\n", daystring);
-				break;
-			case LORE_DEATH:
-				msg_to_char(to, " Died on %s.\r\n", daystring);
-				break;
-			case LORE_START_VAMPIRE:
-				if (IS_VAMPIRE(to))
-					msg_to_char(to, " Sired prior to %s.\r\n", daystring);
-				break;
-			case LORE_PURIFY:
-				msg_to_char(to, " Purified on %s.\r\n", daystring);
-				break;
-			case LORE_SIRE_VAMPIRE:
-				if (IS_VAMPIRE(to))
-					msg_to_char(to, " Sired by %s on %s.\r\n", get_name_by_id(lore->value) ? CAP(get_name_by_id(lore->value)) : "an unknown Cainite", daystring);
-				break;
-			case LORE_MAKE_VAMPIRE:
-				if (IS_VAMPIRE(to))
-					msg_to_char(to, " Sired %s on %s.\r\n", get_name_by_id(lore->value) ? CAP(get_name_by_id(lore->value)) : "an unknown Cainite", daystring);
-				break;
-		}
+		snprintf(daystring, sizeof(daystring), "%d %s, Year %d", t.day + 1, buf1, t.year);
+		msg_to_char(to, " %s on %s.\r\n", NULLSAFE(lore->text), daystring);
 	}
 }
 
@@ -1471,7 +1424,7 @@ char *one_who_line(char_data *ch, bool shortlist, bool screenreader) {
 	}
 	
 	// title
-	size += snprintf(out + size, sizeof(out) - size, "%s&0", GET_TITLE(ch));
+	size += snprintf(out + size, sizeof(out) - size, "%s&0", NULLSAFE(GET_TITLE(ch)));
 	
 	// tags
 	if (IS_AFK(ch)) {
@@ -1554,7 +1507,7 @@ char *partial_who(char_data *ch, char *name_search, int low, int high, empire_da
 		else if (!(tch = d->character))
 			continue;
 
-		if (*name_search && !is_abbrev(name_search, PERS(tch, tch, 1)) && !strstr(GET_TITLE(tch), name_search))
+		if (*name_search && !is_abbrev(name_search, PERS(tch, tch, 1)) && !strstr(NULLSAFE(GET_TITLE(tch)), name_search))
 			continue;
 		if (!CAN_SEE_GLOBAL(ch, tch)) {
 			continue;
@@ -2543,7 +2496,6 @@ ACMD(do_who) {
 
 
 ACMD(do_whois) {
-	void read_lore(char_data *ch);
 	extern const char *level_names[][2];
 	
 	char_data *victim = NULL;
@@ -2560,14 +2512,9 @@ ACMD(do_whois) {
 		send_to_char("There is no such player.\r\n", ch);
 		return;
 	}
-
-	// ready
-	if (file) {
-		read_lore(victim);
-	}
 	
 	// basic info
-	msg_to_char(ch, "%s%s&0\r\n", PERS(victim, victim, TRUE), GET_TITLE(victim));
+	msg_to_char(ch, "%s%s&0\r\n", PERS(victim, victim, TRUE), NULLSAFE(GET_TITLE(victim)));
 	msg_to_char(ch, "Status: %s\r\n", level_names[(int) GET_ACCESS_LEVEL(victim)][1]);
 
 	// show class (but don't bother for immortals, as they generally have all skills

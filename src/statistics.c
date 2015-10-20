@@ -73,7 +73,6 @@ void update_world_count();
 * @param char_data *ch The person to show stats to.
 */
 void display_statistics_to_char(char_data *ch) {
-	extern int top_of_p_table;
 	extern time_t boot_time;
 
 	char populous_str[MAX_STRING_LENGTH], wealthiest_str[MAX_STRING_LENGTH], famous_str[MAX_STRING_LENGTH], greatest_str[MAX_STRING_LENGTH];
@@ -173,7 +172,7 @@ void display_statistics_to_char(char_data *ch) {
 	}
 
 	msg_to_char(ch, "Total Empires:	    %3d     Claimed Area:       %d\r\n", HASH_COUNT(empire_table), territory);
-	msg_to_char(ch, "Total Players:    %5d     Players in Empires: %d\r\n", top_of_p_table + 1, members);
+	msg_to_char(ch, "Total Players:    %5d     Players in Empires: %d\r\n", HASH_CNT(idnum_hh, player_table_by_idnum), members);
 	msg_to_char(ch, "Total Citizens:   %5d     Total Military:     %d\r\n", citizens, military);
 
 	// creatures
@@ -296,7 +295,7 @@ int stats_get_sector_count(sector_data *sect) {
 *  active_accounts_week (at least one character this week)
 */
 void update_account_stats(void) {
-	extern bool member_is_timed_out_cfu(struct char_file_u *chdata);
+	extern bool member_is_timed_out_index(player_index_data *index);
 
 	// helper type
 	struct uniq_acct_t {
@@ -307,8 +306,8 @@ void update_account_stats(void) {
 	};
 
 	struct uniq_acct_t *acct, *next_acct, *acct_list = NULL;
-	struct char_file_u chdata;
-	int pos, id;
+	player_index_data *index, *next_index;
+	int id;
 	
 	// rate-limit this, as it scans the whole playerfile
 	if (last_account_count + rescan_world_after > time(0)) {
@@ -316,14 +315,8 @@ void update_account_stats(void) {
 	}
 	
 	// build list
-	for (pos = 0; pos <= top_of_p_table; ++pos) {
-		// need chdata either way; check deleted here
-		if (load_char(player_table[pos].name, &chdata) <= NOBODY || IS_SET(chdata.char_specials_saved.act, PLR_DELETED)) {
-			continue;
-		}
-		
-		// see if we have data
-		id = chdata.player_specials_saved.account_id > 0 ? chdata.player_specials_saved.account_id : (-1 * chdata.char_specials_saved.idnum);
+	HASH_ITER(idnum_hh, player_table_by_idnum, index, next_index) {
+		id = index->account_id;
 		HASH_FIND_INT(acct_list, &id, acct);
 		if (!acct) {
 			CREATE(acct, struct uniq_acct_t, 1);
@@ -333,9 +326,9 @@ void update_account_stats(void) {
 		}
 		
 		// update
-		acct->active_week |= ((time(0) - chdata.last_logon) < SECS_PER_REAL_WEEK);
+		acct->active_week |= ((time(0) - index->last_logon) < SECS_PER_REAL_WEEK);
 		if (!acct->active_timeout) {
-			acct->active_timeout = !member_is_timed_out_cfu(&chdata);
+			acct->active_timeout = !member_is_timed_out_index(index);
 		}
 	}
 

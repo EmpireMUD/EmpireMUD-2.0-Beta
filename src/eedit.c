@@ -513,8 +513,8 @@ EEDIT(eedit_rank) {
 EEDIT(eedit_num_ranks) {
 	extern const struct archetype_type archetype[];
 	
-	int pos, num, iter;
-	struct char_file_u chdata;
+	player_index_data *index, *next_index;
+	int num, iter;
 	char_data *mem;
 	bool is_file = FALSE;
 	
@@ -528,34 +528,33 @@ EEDIT(eedit_num_ranks) {
 		eliminate_linkdead_players();
 		
 		// update all players
-		for (pos = 0; pos <= top_of_p_table; ++pos) {
-			if (load_char(player_table[pos].name, &chdata) != NOBODY && !IS_SET(chdata.char_specials_saved.act, PLR_DELETED)) {
-				if (chdata.player_specials_saved.empire == EMPIRE_VNUM(emp)) {
-					if ((mem = find_or_load_player(player_table[pos].name, &is_file))) {
-						if (GET_RANK(mem) == EMPIRE_NUM_RANKS(emp)) {
-							// equal to old max
-							GET_RANK(mem) = num;
-						}
-						else if (GET_RANK(mem) >= num) {
-							// too high for new max
-							GET_RANK(mem) = num - 1;
-						}
-						
-						// save
-						if (is_file) {
-							store_loaded_char(mem);
-							is_file = FALSE;
-							mem = NULL;
-						}
-						else {
-							SAVE_CHAR(mem);
-						}
-					}
-		
-					if (mem && is_file) {
-						free_char(mem);
-					}
-				}
+		HASH_ITER(idnum_hh, player_table_by_idnum, index, next_index) {
+			if (index->loyalty != emp) {
+				continue;
+			}
+			if (!(mem = find_or_load_player(index->name, &is_file))) {
+				continue;
+			}
+			
+			if (GET_RANK(mem) == EMPIRE_NUM_RANKS(emp)) {
+				// equal to old max
+				GET_RANK(mem) = num;
+			}
+			else if (GET_RANK(mem) >= num) {
+				// too high for new max
+				GET_RANK(mem) = num - 1;
+			}
+			
+			update_player_index(index, mem);
+			
+			// save
+			if (is_file) {
+				store_loaded_char(mem);
+				is_file = FALSE;
+				mem = NULL;
+			}
+			else {
+				SAVE_CHAR(mem);
 			}
 		}
 		

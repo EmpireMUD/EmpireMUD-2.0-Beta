@@ -686,7 +686,7 @@ bool gain_skill(char_data *ch, int skill, int amount) {
 	bool any = FALSE, pos = (amount > 0);
 	int points;
 	
-	if (skill == NO_SKILL || skill >= MAX_SKILLS || !ch || IS_NPC(ch)) {
+	if (skill == NO_SKILL || skill >= NUM_SKILLS || !ch || IS_NPC(ch)) {
 		return FALSE;
 	}
 	
@@ -760,7 +760,7 @@ bool gain_skill_exp(char_data *ch, int skill, double amount) {
 	bool gained;
 	
 	// simply sanitation
-	if (amount <= 0 || skill == NOTHING || skill >= MAX_SKILLS || !ch || IS_NPC(ch)) {
+	if (amount <= 0 || skill == NOTHING || skill >= NUM_SKILLS || !ch || IS_NPC(ch)) {
 		return FALSE;
 	}
 	

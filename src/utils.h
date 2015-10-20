@@ -182,7 +182,6 @@
 // ch: char_data
 #define GET_AGE(ch)  ((!IS_NPC(ch) && IS_VAMPIRE(ch)) ? GET_APPARENT_AGE(ch) : age(ch)->year)
 #define GET_EQ(ch, i)  ((ch)->equipment[i])
-#define GET_PFILEPOS(ch)  ((ch)->pfilepos)
 #define GET_REAL_AGE(ch)  (age(ch)->year)
 #define IN_ROOM(ch)  ((ch)->in_room)
 #define GET_LOYALTY(ch)  ((ch)->loyalty)
@@ -724,6 +723,8 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define SYSLOG_FLAGS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.syslogs))
 
 // ch->player_specials: player_special_data
+#define GET_ACCOUNT(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->account))
+#define GET_TEMPORARY_ACCOUNT_ID(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->temporary_account_id))
 #define GET_ALIASES(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->aliases))
 #define GET_CREATION_ALT_ID(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->create_alt_id))
 #define GET_GEAR_LEVEL(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->gear_level))
@@ -737,6 +738,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_SLASH_CHANNELS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->slash_channels))
 #define GET_TITLE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->title))
 #define GET_OFFERS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->offers))
+#define LOAD_SLASH_CHANNELS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->load_slash_channels))
 #define POOFIN(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->poofin))
 #define POOFOUT(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->poofout))
 #define REBOOT_CONF(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->reboot_conf))
@@ -748,7 +750,6 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define CAN_GAIN_NEW_SKILLS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.can_gain_new_skills))
 #define CAN_GET_BONUS_SKILLS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.can_get_bonus_skills))
 #define CREATION_ARCHETYPE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.creation_archetype))
-#define GET_ACCOUNT_ID(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.account_id))
 #define GET_ACTION(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.action))
 #define GET_ACTION_ROOM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.action_room))
 #define GET_ACTION_CYCLE(ch) CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.action_cycle))
@@ -806,7 +807,6 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_SKILL_EXP(ch, sk)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.skills[sk].exp))
 #define GET_SKILL_LEVEL(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.skill_level))
 #define GET_DAILY_BONUS_EXPERIENCE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.daily_bonus_experience))
-#define GET_STORED_SLASH_CHANNEL(ch, pos)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.slash_channels[(pos)]))
 #define GET_TOMB_ROOM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.tomb_room))
 #define IS_DISGUISED(ch)  (!IS_NPC(ch) && PLR_FLAGGED((ch), PLR_DISGUISED))
 #define NOSKILL_BLOCKED(ch, skill)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.skills[(skill)].noskill))
@@ -814,6 +814,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define USING_POISON(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.using_poison))
 
 // helpers
+#define ACCOUNT_FLAGGED(ch, flag)  (!IS_NPC(ch) && GET_ACCOUNT(ch) && IS_SET(GET_ACCOUNT(ch)->flags, (flag)))
 #define GET_LEVELS_GAINED_FROM_ABILITY(ch, ab)  ((!IS_NPC(ch) && (ab) >= 0 && (ab) <= NUM_ABILITIES) ? CHECK_PLAYER_SPECIAL((ch), (ch)->player_specials->saved.abilities[(ab)].levels_gained) : 0)
 #define HAS_ABILITY(ch, ab)  ((!IS_NPC(ch) && (ab) >= 0 && (ab) <= NUM_ABILITIES) ? CHECK_PLAYER_SPECIAL((ch), (ch)->player_specials->saved.abilities[(ab)].purchased) : FALSE)
 #define HAS_BONUS_TRAIT(ch, flag)  (!IS_NPC(ch) && IS_SET(GET_BONUS_TRAITS(ch), (flag)))
@@ -826,6 +827,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define PLR_FLAGGED(ch, flag)  (!REAL_NPC(ch) && IS_SET(PLR_FLAGS(ch), (flag)))
 #define PRF_FLAGGED(ch, flag)  (!REAL_NPC(ch) && IS_SET(PRF_FLAGS(ch), (flag)))
 #define OLC_FLAGGED(ch, flag)  (!IS_NPC(ch) && IS_SET(GET_OLC_FLAGS(ch), (flag)))
+#define SAVE_ACCOUNT(acct)  save_library_file_for_vnum(DB_BOOT_ACCT, (acct)->id)
 
 // definitions
 #define IS_HOSTILE(ch)  (!IS_NPC(ch) && (get_cooldown_time((ch), COOLDOWN_HOSTILE_FLAG) > 0 || get_cooldown_time((ch), COOLDOWN_ROGUE_FLAG) > 0))
@@ -1131,6 +1133,7 @@ void prune_crlf(char *txt);
 extern const char *skip_filler(char *string);
 void sprintbit(bitvector_t vektor, const char *names[], char *result, bool space);
 void sprinttype(int type, const char *names[], char *result);
+extern char *trim(char *string);
 
 // world functions in utils.c
 extern bool check_sunny(room_data *room);
@@ -1247,7 +1250,6 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options);
 
 // get_filename()
 #define CRASH_FILE  0
-#define ETEXT_FILE  1
+#define PLR_FILE  1
 #define ALIAS_FILE  2
-#define LORE_FILE  4
-#define SCRIPT_VARS_FILE  5
+#define SCRIPT_VARS_FILE  3

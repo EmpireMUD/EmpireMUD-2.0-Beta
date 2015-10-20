@@ -199,6 +199,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	extern const char *wear_bits[];
 
 	struct obj_storage_type *store;
+	player_index_data *index;
 	char lbuf[MAX_STRING_LENGTH], location[MAX_STRING_LENGTH];
 	bld_data *bld;
 	int iter, found;
@@ -257,7 +258,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 		struct obj_binding *bind;		
 		msg_to_char(ch, "Bound to:");
 		for (bind = OBJ_BOUND_TO(obj); bind; bind = bind->next) {
-			msg_to_char(ch, " %s", get_name_by_id(bind->idnum) ? CAP(get_name_by_id(bind->idnum)) : "<unknown>");
+			msg_to_char(ch, " %s", (index = find_player_index_by_idnum(bind->idnum)) ? index->fullname : "<unknown>");
 		}
 		msg_to_char(ch, "\r\n");
 	}
@@ -327,7 +328,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 			else if (IS_NPC_CORPSE(obj))
 				msg_to_char(ch, "nothing.\r\n");
 			else
-				msg_to_char(ch, "%s.\r\n", get_name_by_id(GET_CORPSE_PC_ID(obj)) ? CAP(get_name_by_id(GET_CORPSE_PC_ID(obj))) : "a player");
+				msg_to_char(ch, "%s.\r\n", (index = find_player_index_by_idnum(GET_CORPSE_PC_ID(obj))) ? index->fullname : "a player");
 			break;
 		case ITEM_COINS: {
 			msg_to_char(ch, "Contains %s\r\n", money_amount(real_empire(GET_COINS_EMPIRE_ID(obj)), GET_COINS_AMOUNT(obj)));

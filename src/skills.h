@@ -79,7 +79,7 @@ extern bool skill_check(char_data *ch, int ability, int difficulty);
 #define SKILL_VAMPIRE  7
 
 #define NUM_SKILLS 8
-// must be <= MAX_SKILLS (structs.h)
+// must be <= MAX_SKILLS (10 -- structs.h)
 
 
 // for ability definitions
@@ -388,7 +388,7 @@ extern bool skill_check(char_data *ch, int ability, int difficulty);
 #define ABIL_SALAMANDER  259
 #define ABIL_SKELETAL_HULK  260
 #define ABIL_BANSHEE  261
-#define NUM_ABILITIES  262		// must be <= MAX_ABILITIES (400; structs.h)
+#define NUM_ABILITIES  262		// must be <= MAX_ABILITIES (300; structs.h)
 
 
 // cooldowns -- see COOLDOWN_x in constants.c

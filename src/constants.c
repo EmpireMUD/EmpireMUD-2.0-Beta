@@ -244,6 +244,18 @@ const struct archetype_type archetype[] = {
 };
 
 
+// ACCT_x: Account flags
+const char *account_flags[] = {
+	"FROZEN",
+	"MUTED",
+	"SITEOK",
+	"!TITLE",
+	"MULTI-IP",
+	"MULTI-CHAR",
+	"\n"
+};
+
+
 // BONUS_x
 const char *bonus_bits[] = {
 	"STRENGTH",
@@ -288,6 +300,15 @@ const char *bonus_bit_descriptions[] = {
 };
 
 
+// COND_x: player conditions
+const char *condition_types[] = {
+	"Drunk",
+	"Full",
+	"Thirst",
+	"\n"
+};
+
+
 // CUSTOM_COLOR_x
 const char *custom_color_types[] = {
 	"emote",
@@ -298,6 +319,24 @@ const char *custom_color_types[] = {
 	"slash-channels",
 	"tell",
 	"status",
+	"\n"
+};
+
+
+// ATT_x: extra attributes
+const char *extra_attribute_types[] = {
+	"Bonus-Inventory",
+	"Resist-Physical",
+	"Block",
+	"To-Hit",
+	"Dodge",
+	"Extra-Blood",	// 5
+	"Bonus-Physical",
+	"Bonus-Magical",
+	"Bonus-Healing",
+	"Heal-Over-Time",
+	"Resist-Magical",	// 10
+	"Crafting-Bonus",
 	"\n"
 };
 
@@ -354,7 +393,7 @@ const char *player_bits[] = {
 	"SITEOK",
 	"MUTED",
 	"NOTITLE",
-	"DELETED",
+		"UNUSED",
 	"LOADRM",
 	"!WIZL",
 	"!DEL",
