@@ -923,8 +923,8 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal) {
 				else if (PFILE_TAG(line, "Archetype:", length)) {
 					CREATION_ARCHETYPE(ch) = atoi(line + length + 1);
 				}
-				else if (PFILE_TAG(line, "Attribute-", length)) {
-					sscanf(line + length, "%s: %d", str_in, &i_in[0]);
+				else if (PFILE_TAG(line, "Attribute:", length)) {
+					sscanf(line + length + 1, "%s %d", str_in, &i_in[0]);
 					for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
 						if (!str_cmp(str_in, attributes[iter].name)) {
 							GET_REAL_ATT(ch, iter) = i_in[0];
@@ -968,8 +968,8 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal) {
 				else if (PFILE_TAG(line, "Class Role:", length)) {
 					GET_CLASS_ROLE(ch) = atoi(line + length + 1);
 				}
-				else if (PFILE_TAG(line, "Condition-", length)) {
-					sscanf(line + length, "%s: %d", str_in, &i_in[0]);
+				else if (PFILE_TAG(line, "Condition:", length)) {
+					sscanf(line + length + 1, "%s %d", str_in, &i_in[0]);
 					if ((num = search_block(str_in, condition_types, TRUE)) != NOTHING) {
 						GET_COND(ch, num) = i_in[0];
 					}
@@ -988,14 +988,14 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal) {
 					}
 					GET_CREATION_HOST(ch) = str_dup(trim(line + length + 1));
 				}
-				else if (PFILE_TAG(line, "Current-", length)) {
-					sscanf(line + length, "%s: %d", str_in, &i_in[0]);
+				else if (PFILE_TAG(line, "Current Pool:", length)) {
+					sscanf(line + length + 1, "%s %d", str_in, &i_in[0]);
 					if ((num = search_block(str_in, pool_types, TRUE)) != NOTHING) {
 						GET_CURRENT_POOL(ch, num) = i_in[0];
 					}
 				}
-				else if (PFILE_TAG(line, "Color-", length)) {
-					sscanf(line + length, "%s: %c", str_in, &c_in);
+				else if (PFILE_TAG(line, "Color:", length)) {
+					sscanf(line + length + 1, "%s %c", str_in, &c_in);
 					if ((num = search_block(str_in, custom_color_types, TRUE)) != NOTHING) {
 						GET_CUSTOM_COLOR(ch, num) = c_in;
 					}
@@ -1007,8 +1007,8 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal) {
 				if (PFILE_TAG(line, "Daily Cycle:", length)) {
 					GET_DAILY_CYCLE(ch) = atoi(line + length + 1);
 				}
-				else if (PFILE_TAG(line, "Deficit-", length)) {
-					sscanf(line + length, "%s: %d", str_in, &i_in[0]);
+				else if (PFILE_TAG(line, "Deficit:", length)) {
+					sscanf(line + length + 1, "%s %d", str_in, &i_in[0]);
 					if ((num = search_block(str_in, pool_types, TRUE)) != NOTHING) {
 						GET_DEFICIT(ch, num) = i_in[0];
 					}
@@ -1057,8 +1057,8 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal) {
 				if (PFILE_TAG(line, "Empire:", length)) {
 					GET_LOYALTY(ch) = real_empire(atoi(line + length + 1));
 				}
-				else if (PFILE_TAG(line, "Extra-", length)) {
-					sscanf(line + length, "%s: %d", str_in, &i_in[0]);
+				else if (PFILE_TAG(line, "Extra Attribute:", length)) {
+					sscanf(line + length + 1, "%s %d", str_in, &i_in[0]);
 					if ((num = search_block(str_in, extra_attribute_types, TRUE)) != NOTHING) {
 						GET_EXTRA_ATT(ch, num) = i_in[0];
 					}
@@ -1184,8 +1184,8 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal) {
 				else if (PFILE_TAG(line, "Mapsize:", length)) {
 					GET_MAPSIZE(ch) = atoi(line + length + 1);
 				}
-				else if (PFILE_TAG(line, "Max-", length)) {
-					sscanf(line + length, "%s: %d", str_in, &i_in[0]);
+				else if (PFILE_TAG(line, "Max Pool:", length)) {
+					sscanf(line + length + 1, "%s %d", str_in, &i_in[0]);
 					if ((num = search_block(str_in, pool_types, TRUE)) != NOTHING) {
 						GET_MAX_POOL(ch, num) = i_in[0];
 					}
@@ -1667,10 +1667,10 @@ void write_player_to_file(FILE *fl, char_data *ch) {
 	
 	// Pools
 	for (iter = 0; iter < NUM_POOLS; ++iter) {
-		fprintf(fl, "Current-%s: %d\n", pool_types[iter], GET_CURRENT_POOL(ch, iter));
-		fprintf(fl, "Max-%s: %d\n", pool_types[iter], GET_MAX_POOL(ch, iter));
+		fprintf(fl, "Current Pool: %s %d\n", pool_types[iter], GET_CURRENT_POOL(ch, iter));
+		fprintf(fl, "Max Pool: %s %d\n", pool_types[iter], GET_MAX_POOL(ch, iter));
 		if (GET_DEFICIT(ch, iter)) {
-			fprintf(fl, "Deficit-%s: %d\n", pool_types[iter], GET_DEFICIT(ch, iter));
+			fprintf(fl, "Deficit: %s %d\n", pool_types[iter], GET_DEFICIT(ch, iter));
 		}
 	}
 	
@@ -1702,7 +1702,7 @@ void write_player_to_file(FILE *fl, char_data *ch) {
 	}
 	fprintf(fl, "Archetype: %d\n", CREATION_ARCHETYPE(ch));
 	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
-		fprintf(fl, "Attribute-%s: %d\n", attributes[iter].name, GET_REAL_ATT(ch, iter));
+		fprintf(fl, "Attribute: %s %d\n", attributes[iter].name, GET_REAL_ATT(ch, iter));
 	}
 	
 	// 'B'
@@ -1725,12 +1725,12 @@ void write_player_to_file(FILE *fl, char_data *ch) {
 	fprintf(fl, "Class Role: %d\n", GET_CLASS_ROLE(ch));
 	for (iter = 0; iter < NUM_CUSTOM_COLORS; ++iter) {
 		if (GET_CUSTOM_COLOR(ch, iter) != 0) {
-			fprintf(fl, "Color-%s: %c\n", custom_color_types[iter], GET_CUSTOM_COLOR(ch, iter));
+			fprintf(fl, "Color: %s %c\n", custom_color_types[iter], GET_CUSTOM_COLOR(ch, iter));
 		}
 	}
 	for (iter = 0; iter < NUM_CONDS; ++iter) {
 		if (GET_COND(ch, iter) != 0) {
-			fprintf(fl, "Condition-%s: %d\n", condition_types[iter], GET_COND(ch, iter));
+			fprintf(fl, "Condition: %s %d\n", condition_types[iter], GET_COND(ch, iter));
 		}
 	}
 	if (GET_CONFUSED_DIR(ch)) {
@@ -1763,7 +1763,7 @@ void write_player_to_file(FILE *fl, char_data *ch) {
 	// 'E'
 	for (iter = 0; iter < NUM_EXTRA_ATTRIBUTES; ++iter) {
 		if (GET_EXTRA_ATT(ch, iter)) {
-			fprintf(fl, "Extra-%s: %d\n", extra_attribute_types[iter], GET_EXTRA_ATT(ch, iter));
+			fprintf(fl, "Extra Attribute: %s %d\n", extra_attribute_types[iter], GET_EXTRA_ATT(ch, iter));
 		}
 	}
 	
