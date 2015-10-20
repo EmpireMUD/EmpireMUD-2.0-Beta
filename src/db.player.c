@@ -111,7 +111,7 @@ player_index_data *find_player_index_by_idnum(int idnum) {
 */
 player_index_data *find_player_index_by_name(char *name) {
 	player_index_data *plr;
-	HASH_FIND(name_hh, player_table_by_name, name, strlen(name), plr);
+	HASH_FIND(name_hh, player_table_by_name, name, (unsigned)strlen(name), plr);
 	return plr;
 }
 
@@ -529,9 +529,9 @@ void write_account_to_file(FILE *fl, account_data *acct) {
 * @param player_index_data *plr The player to add.
 */
 void add_player_to_table(player_index_data *plr) {
+	char name[MAX_STRING_LENGTH];
 	player_index_data *find;
 	int idnum = plr->idnum;
-	int iter;
 	
 	// by idnum
 	find = NULL;
@@ -543,10 +543,9 @@ void add_player_to_table(player_index_data *plr) {
 	
 	// by name: ensure name is lowercase
 	find = NULL;
-	for (iter = 0; iter < strlen(plr->name); ++iter) {
-		plr->name[iter] = LOWER(plr->name[iter]);
-	}
-	HASH_FIND(name_hh, player_table_by_name, plr->name, strlen(plr->name), find);
+	strcpy(name, plr->name);
+	strtolower(name);
+	HASH_FIND(name_hh, player_table_by_name, name, (unsigned)strlen(name), find);
 	if (!find) {
 		HASH_ADD(name_hh, player_table_by_name, name, strlen(plr->name), plr);
 		HASH_SRT(name_hh, player_table_by_name, sort_players_by_name);
