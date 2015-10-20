@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.immortal.c                                  EmpireMUD 2.0b2 *
+*   File: act.immortal.c                                  EmpireMUD 2.0b3 *
 *  Usage: Player-level imm commands and other goodies                     *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -4699,6 +4699,9 @@ ACMD(do_island) {
 		}
 		else if (strlen(argument) > MAX_ISLAND_NAME) {
 			msg_to_char(ch, "Island names may not be longer than %d characters.\r\n", MAX_ISLAND_NAME);
+		}
+		else if (strchr(argument, '"')) {
+			msg_to_char(ch, "Island names may not contain quotation marks.\r\n");
 		}
 		else {
 			send_config_msg(ch, "ok_string");

@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: skills.c                                        EmpireMUD 2.0b2 *
+*   File: skills.c                                        EmpireMUD 2.0b3 *
 *  Usage: code related to the skill and ability system                    *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -1575,6 +1575,9 @@ bool has_cooking_fire(char_data *ch) {
 	}
 
 	if (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_COOKING_FIRE)) {	
+		return TRUE;
+	}
+	if (RMT_FLAGGED(IN_ROOM(ch), RMT_COOKING_FIRE)) {	
 		return TRUE;
 	}
 	

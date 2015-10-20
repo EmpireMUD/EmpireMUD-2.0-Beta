@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.social.c                                    EmpireMUD 2.0b2 *
+*   File: act.social.c                                    EmpireMUD 2.0b3 *
 *  Usage: Functions to handle socials                                     *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

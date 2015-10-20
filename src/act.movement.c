@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.movement.c                                  EmpireMUD 2.0b2 *
+*   File: act.movement.c                                  EmpireMUD 2.0b3 *
 *  Usage: movement commands, door handling, & sleep/rest/etc state        *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -541,6 +541,7 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 */
 bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_specials_check, byte mode) {
 	void cancel_action(char_data *ch);
+	extern const struct action_data_struct action_data[];
 	extern const char *mob_move_types[];
 	
 	char lbuf[MAX_STRING_LENGTH];
@@ -802,7 +803,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 	}
 
 	// cancel some actions on movement
-	if (!IS_NPC(ch) && GET_ACTION(ch) != ACT_NONE && GET_ACTION_ROOM(ch) != GET_ROOM_VNUM(IN_ROOM(ch)) && GET_ACTION_ROOM(ch) != NOWHERE) {
+	if (!IS_NPC(ch) && GET_ACTION(ch) != ACT_NONE && !IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_ANYWHERE) && GET_ACTION_ROOM(ch) != GET_ROOM_VNUM(IN_ROOM(ch)) && GET_ACTION_ROOM(ch) != NOWHERE) {
 		cancel_action(ch);
 	}
 	
@@ -1224,6 +1225,12 @@ ACMD(do_enter) {
 	
 	if (AFF_FLAGGED(ch, AFF_ENTANGLED)) {
 		msg_to_char(ch, "You are entangled and can't enter anything.\r\n");
+		return;
+	}
+	
+	if (AFF_FLAGGED(ch, AFF_CHARM) && ch->master && IN_ROOM(ch) == IN_ROOM(ch->master)) {
+		msg_to_char(ch, "The thought of leaving your master makes you weep.\r\n");
+		act("$n bursts into tears.", FALSE, ch, NULL, NULL, TO_ROOM);
 		return;
 	}
 	

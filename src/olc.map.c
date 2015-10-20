@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: olc.map.c                                       EmpireMUD 2.0b2 *
+*   File: olc.map.c                                       EmpireMUD 2.0b3 *
 *  Usage: OLC for the map and map-building rooms                          *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -33,6 +33,70 @@
 
  //////////////////////////////////////////////////////////////////////////////
 //// EDIT MODULES ////////////////////////////////////////////////////////////
+
+OLC_MODULE(mapedit_build) {
+	void herd_animals_out(room_data *location);
+	void special_building_setup(char_data *ch, room_data *room);
+	extern const int rev_dir[];
+	
+	char bld_arg[MAX_INPUT_LENGTH], dir_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	bld_data *bld;
+	int dir = NO_DIR;
+	
+	half_chop(argument, bld_arg, dir_arg);
+	
+	if (IS_INSIDE(IN_ROOM(ch)) || IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
+		msg_to_char(ch, "Leave the building or area first.\r\n");
+	}
+	else if (IS_CITY_CENTER(IN_ROOM(ch))) {
+		msg_to_char(ch, "You can't build over city centers this way.\r\n");
+	}
+	else if (!*bld_arg || !isdigit(*bld_arg)) {
+		msg_to_char(ch, "Build which building vnum?\r\n");
+	}
+	else if (!(bld = building_proto(atoi(bld_arg)))) {
+		msg_to_char(ch, "Unknown building vnum '%s'.\r\n", bld_arg);
+	}
+	else if (IS_SET(GET_BLD_FLAGS(bld), BLD_ROOM)) {
+		msg_to_char(ch, "You cannot build 'room' buildings this way.\r\n");
+	}
+	else if (!IS_SET(GET_BLD_FLAGS(bld), BLD_OPEN) && !*dir_arg) {
+		msg_to_char(ch, "Build it facing which direction?\r\n");
+	}
+	else if (!IS_SET(GET_BLD_FLAGS(bld), BLD_OPEN) && (dir = parse_direction(ch, dir_arg)) == NO_DIR) {
+		msg_to_char(ch, "Invalid direction.\r\n");
+	}
+	else if (dir != NO_DIR && dir >= NUM_2D_DIRS) {
+		msg_to_char(ch, "Invalid direction.\r\n");
+	}
+	else if (dir != NO_DIR && (!SHIFT_DIR(IN_ROOM(ch), dir) || (IS_SET(GET_BLD_FLAGS(bld), BLD_TWO_ENTRANCES) && !SHIFT_DIR(IN_ROOM(ch), rev_dir[dir])))) {
+		msg_to_char(ch, "You can't face it that direction.\r\n");
+	}
+	else {
+		disassociate_building(IN_ROOM(ch));
+		
+		construct_building(IN_ROOM(ch), GET_BLD_VNUM(bld));
+		special_building_setup(ch, IN_ROOM(ch));
+		
+		if (dir != NO_DIR) {
+			create_exit(IN_ROOM(ch), SHIFT_DIR(IN_ROOM(ch), dir), dir, FALSE);
+			if (IS_SET(GET_BLD_FLAGS(bld), BLD_TWO_ENTRANCES)) {
+				create_exit(IN_ROOM(ch), SHIFT_DIR(IN_ROOM(ch), rev_dir[dir]), rev_dir[dir], FALSE);
+			}
+			COMPLEX_DATA(IN_ROOM(ch))->entrance = rev_dir[dir];
+			herd_animals_out(IN_ROOM(ch));
+		}
+
+		msg_to_char(ch, "You creates %s %s!\r\n", AN(GET_BLD_NAME(bld)), GET_BLD_NAME(bld));
+		sprintf(buf, "$n creates %s %s!", AN(GET_BLD_NAME(bld)), GET_BLD_NAME(bld));
+		act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
+		
+		if (ROOM_OWNER(IN_ROOM(ch))) {
+			read_empire_territory(ROOM_OWNER(IN_ROOM(ch)));
+		}
+	}
+}
+
 
 OLC_MODULE(mapedit_terrain) {
 	extern crop_data *get_crop_by_name(char *name);

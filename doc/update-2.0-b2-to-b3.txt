@@ -1,5 +1,5 @@
 =======================================
-Updating EmpireMUD from 2.0b1 to 2.0b2:
+Updating EmpireMUD from 2.0b2 to 2.0b3:
 =======================================
 
 WARNING: You will need to convert your playerfile for this upgrade. If you used
@@ -13,13 +13,11 @@ Step by step instructions:
 
 2. Create a backup of your MUD.
 
-3. Update your code to 2.0b2 using git, or by creating a patch on the GitHub
-site. (Usually you should "git stash", "git pull", then "git stash apply").
+3. Update your code to 2.0b3 using git, or by creating a patch on the GitHub
+site. (Usually you should "git stash", "git pull", then "git stash pop").
 
-4. If you changed the password "salt" in structs.h, updating to 2.0b2 using
-git probably caused a conflict in this file. You will have to manually resolve
-the conflict by editing the file and looking for the conflicting section. It
-looks like this:
+4. If any of your own changes conflict, you must resolve conflicts in those
+files. Conflict sections look like this:
 
   <<<<<<< Updated upstream
     ...
@@ -37,17 +35,17 @@ patch):
 
   5a. In the "all:" block, add:
 
-    $(BINDIR)/plrconv-20b1-to-20b2
+    $(BINDIR)/plrconv-20b2-to-20b3
 
-  5b. Between the "plrconv:" line and the "purgeplay:" line, add a new section:
+  5b. After the "plrconv-20b1-to-20b2:" line, add a new section:
 
-    plrconv-20b1-to-20b2: $(BINDIR)/plrconv-20b1-to-20b2
+    plrconv-20b2-to-20b3: $(BINDIR)/plrconv-20b2-to-20b3
 
   5c. At the end, add this block:
 
-    $(BINDIR)/plrconv-20b1-to-20b2: plrconv-20b1-to-20b2.c $(INCDIR)/conf.h \
+    $(BINDIR)/plrconv-20b2-to-20b3: plrconv-20b2-to-20b3.c $(INCDIR)/conf.h \
        $(INCDIR)/sysdep.h $(INCDIR)/structs.h $(INCDIR)/utils.h
-       $(CC) $(CFLAGS) -o $(BINDIR)/plrconv-20b1-to-20b2 plrconv-20b1-to-20b2.c
+       $(CC) $(CFLAGS) -o $(BINDIR)/plrconv-20b2-to-20b3 plrconv-20b2-to-20b3.c
 
 6. Compile your MUD using "make all". This will also compile the playerfile
 converter.
@@ -64,7 +62,7 @@ converter.
 
   7c. Convert your playerfile:
 
-    ./../../bin/plrconv-20b1-to-20b2 players.old players
+    ./../../bin/plrconv-20b2-to-20b3 players.old players
 
 8. Start up your MUD. Warning: If your playerfile wasn't correctly converted
 and was corrupted, the player with ID #1 may still be able to log in, but all

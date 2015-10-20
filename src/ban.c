@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: ban.c                                           EmpireMUD 2.0b2 *
+*   File: ban.c                                           EmpireMUD 2.0b3 *
 *  Usage: banning/unbanning/checking sites and player names               *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

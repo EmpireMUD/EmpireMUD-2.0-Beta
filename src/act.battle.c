@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.battle.c                                    EmpireMUD 2.0b2 *
+*   File: act.battle.c                                    EmpireMUD 2.0b3 *
 *  Usage: commands and functions related to the Battle skill              *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -212,6 +212,7 @@ ACMD(do_firstaid) {
 	extern int total_bonus_healing(char_data *ch);
 
 	struct over_time_effect_type *dot, *next_dot;
+	bool has_dot = FALSE;
 	char_data *vict;
 	int cost = 20;
 	int levels[] = { 10, 20, 50 };
@@ -238,8 +239,18 @@ ACMD(do_firstaid) {
 		msg_to_char(ch, "You can't use firstaid on someone in combat.\r\n");
 		return;
 	}
+	
+	// check for DoTs
+	for (dot = vict->over_time_effects; dot; dot = next_dot) {
+		next_dot = dot->next;
 
-	if (GET_HEALTH(vict) >= GET_MAX_HEALTH(vict)) {
+		if (dot->damage_type == DAM_PHYSICAL || dot->damage_type == DAM_POISON || dot->damage_type == DAM_FIRE) {
+			has_dot = TRUE;
+			break;
+		}
+	}
+
+	if (GET_HEALTH(vict) >= GET_MAX_HEALTH(vict) && !has_dot) {
 		msg_to_char(ch, "You can't apply first aid to someone who isn't injured.\r\n");
 		return;
 	}

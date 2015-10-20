@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: olc.c                                           EmpireMUD 2.0b2 *
+*   File: olc.c                                           EmpireMUD 2.0b3 *
 *  Usage: On-Line Creation at player level                                *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -147,6 +147,7 @@ OLC_MODULE(medit_sex);
 OLC_MODULE(medit_short_description);
 
 // map modules
+OLC_MODULE(mapedit_build);
 OLC_MODULE(mapedit_complete_room);
 OLC_MODULE(mapedit_decustomize);
 OLC_MODULE(mapedit_delete_exit);
@@ -408,6 +409,7 @@ const struct olc_command_data olc_data[] = {
 	{ "shortdescription", medit_short_description, OLC_MOBILE, OLC_CF_EDITOR },
 	
 	// map commands
+	{ "build", mapedit_build, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "complete", mapedit_complete_room, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "decustomize", mapedit_decustomize, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "deleteexit", mapedit_delete_exit, OLC_MAP, OLC_CF_MAP_EDIT },
@@ -1984,6 +1986,7 @@ OLC_MODULE(olc_search) {
 OLC_MODULE(olc_set_flags) {
 	char_data *vict = NULL;
 	bool file = FALSE;
+	bitvector_t old;
 	
 	argument = one_argument(argument, arg);
 	skip_spaces(&argument);
@@ -2001,18 +2004,23 @@ OLC_MODULE(olc_set_flags) {
 		msg_to_char(ch, "You can't set that on a person of such level.\r\n");
 	}
 	else {
+		old = GET_OLC_FLAGS(vict);
 		GET_OLC_FLAGS(vict) = olc_process_flag(ch, argument, "olc", "setflags", olc_flag_bits, GET_OLC_FLAGS(vict));
-		sprintbit(GET_OLC_FLAGS(vict), olc_flag_bits, buf, TRUE);
-		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has set olc flags for %s to: %s", GET_NAME(ch), GET_NAME(vict), buf);
-		msg_to_char(ch, "%s saved.\r\n", GET_NAME(vict));
 		
-		if (file) {
-			store_loaded_char(vict);
-			file = FALSE;
-			vict = NULL;
-		}
-		else {
-			SAVE_CHAR(vict);
+		// they didn't necessarily make any changes
+		if (GET_OLC_FLAGS(vict) != old) {
+			sprintbit(GET_OLC_FLAGS(vict), olc_flag_bits, buf, TRUE);
+			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has set olc flags for %s to: %s", GET_NAME(ch), GET_NAME(vict), buf);
+			msg_to_char(ch, "%s saved.\r\n", GET_NAME(vict));
+		
+			if (file) {
+				store_loaded_char(vict);
+				file = FALSE;
+				vict = NULL;
+			}
+			else {
+				SAVE_CHAR(vict);
+			}
 		}
 	}
 	

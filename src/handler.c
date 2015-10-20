@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: handler.c                                       EmpireMUD 2.0b2 *
+*   File: handler.c                                       EmpireMUD 2.0b3 *
 *  Usage: internal funcs: moving and finding chars/objs                   *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -2492,7 +2492,7 @@ struct empire_city_data *find_city_entry(empire_data *emp, room_data *location) 
 * @return struct empire_city_data* A pointer to the city if match found, NULL otherwise
 */
 struct empire_city_data *find_city_by_name(empire_data *emp, char *name) {
-	struct empire_city_data *city, *found = NULL;
+	struct empire_city_data *city, *abbrev = NULL, *found = NULL;
 	int num = -1, count;
 	
 	if (!emp) {
@@ -2504,13 +2504,17 @@ struct empire_city_data *find_city_by_name(empire_data *emp, char *name) {
 	}
 	
 	count = 0;
-	for (city = EMPIRE_CITY_LIST(emp); city && !found; city = city->next) {
-		if (is_abbrev(name, city->name) || ++count == num) {
+	for (city = EMPIRE_CITY_LIST(emp); city; city = city->next) {
+		if (!str_cmp(name, city->name) || ++count == num) {
 			found = city;
+			break;
+		}
+		else if (is_abbrev(name, city->name)) {
+			abbrev = city;
 		}
 	}
 	
-	return found;
+	return found ? found : abbrev;
 }
 
 

@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: morph.c                                         EmpireMUD 2.0b2 *
+*   File: morph.c                                         EmpireMUD 2.0b3 *
 *  Usage: morph-related code                                              *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

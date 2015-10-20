@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: dg_misc.c                                       EmpireMUD 2.0b2 *
+*   File: dg_misc.c                                       EmpireMUD 2.0b3 *
 *  Usage: contains general functions for script usage.                    *
 *                                                                         *
 *  DG Scripts code had no header or author info in this file              *
@@ -372,6 +372,11 @@ void script_damage(char_data *vict, char_data *killer, int level, int dam_type, 
 	extern int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, int damtype);
 	
 	double dam;
+	
+	// no point damaging the dead
+	if (IS_DEAD(vict)) {
+		return;
+	}
 	
 	if (IS_IMMORTAL(vict) && (modifier > 0)) {
 		msg_to_char(vict, "Being the cool immortal you are, you sidestep a trap, obviously placed to kill you.\r\n");

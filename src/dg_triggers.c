@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: dg_triggers.c                                   EmpireMUD 2.0b2 *
+*   File: dg_triggers.c                                   EmpireMUD 2.0b3 *
 *  Usage: contains all the trigger functions for scripts.                 *
 *                                                                         *
 *  DG Scripts code by galion, 1996/08/05 23:32:08, revision 3.9           *

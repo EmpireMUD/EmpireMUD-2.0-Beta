@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: class.c                                         EmpireMUD 2.0b2 *
+*   File: class.c                                         EmpireMUD 2.0b3 *
 *  Usage: code related to classes                                         *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -524,14 +524,14 @@ ACMD(do_class) {
 			msg_to_char(ch, "You don't have a class. You can earn your class by raising two skills to 76 or higher.\r\n");
 		}
 		else {
-			msg_to_char(ch, "%s\r\nClass: %s (%s) %d/%d/%d\r\n", PERS(ch, ch, TRUE), class_data[GET_CLASS(ch)].name, class_role[(int) GET_CLASS_ROLE(ch)], GET_SKILL_LEVEL(ch), GET_GEAR_LEVEL(ch), GET_COMPUTED_LEVEL(ch));
+			msg_to_char(ch, "%s\r\nClass: %s%s (%s)\t0 %d/%d/%d\r\n", PERS(ch, ch, TRUE), class_role_color[GET_CLASS_ROLE(ch)], class_data[GET_CLASS(ch)].name, class_role[(int) GET_CLASS_ROLE(ch)], GET_SKILL_LEVEL(ch), GET_GEAR_LEVEL(ch), GET_COMPUTED_LEVEL(ch));
 			
 			// only show roles if there are any
 			if (class_data[GET_CLASS(ch)].role[0].role != ROLE_NONE) {
 				msg_to_char(ch, " Available class roles:\r\n");
 				
 				for (iter = 0; class_data[GET_CLASS(ch)].role[iter].role != ROLE_NONE; ++iter) {
-					msg_to_char(ch, "  %s: ", class_role[class_data[GET_CLASS(ch)].role[iter].role]);
+					msg_to_char(ch, "  %s%s\t0%s: ", class_role_color[class_data[GET_CLASS(ch)].role[iter].role], class_role[class_data[GET_CLASS(ch)].role[iter].role], (GET_CLASS_ROLE(ch) == class_data[GET_CLASS(ch)].role[iter].role) ? " (current)" : "");
 					
 					for (ab_iter = 0, comma = FALSE; class_data[GET_CLASS(ch)].role[iter].ability[ab_iter] != ROLE_ABIL_END; ++ab_iter, comma = TRUE) {
 						abil = class_data[GET_CLASS(ch)].role[iter].ability[ab_iter];

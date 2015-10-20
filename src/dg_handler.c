@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: dg_handler.c                                    EmpireMUD 2.0b2 *
+*   File: dg_handler.c                                    EmpireMUD 2.0b3 *
 *  Usage: handler.c-like functionality for DG Scripts                     *
 *                                                                         *
 *  DG Scripts code had no header or author info in this file              *

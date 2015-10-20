@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: mail.c                                          EmpireMUD 2.0b2 *
+*   File: mail.c                                          EmpireMUD 2.0b3 *
 *  Usage: Internal funcs and player spec-procs of mud-mail system         *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -506,7 +506,7 @@ ACMD(do_mail) {
 		}
 	}
 	else if (is_abbrev(arg, "send")) {
-		if (!IS_IMMORTAL(ch) && (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_PIGEON_POST) || !IS_COMPLETE(IN_ROOM(ch)))) {
+		if (!IS_IMMORTAL(ch) && ((!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_PIGEON_POST) && !RMT_FLAGGED(IN_ROOM(ch), RMT_PIGEON_POST)) || !IS_COMPLETE(IN_ROOM(ch)))) {
 			msg_to_char(ch, "You can only send mail from a pigeon post.\r\n");
 		}
 		else if (!ch->desc) {

@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: olc.object.c                                    EmpireMUD 2.0b2 *
+*   File: olc.object.c                                    EmpireMUD 2.0b3 *
 *  Usage: OLC for items                                                   *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: olc.sector.c                                    EmpireMUD 2.0b2 *
+*   File: olc.sector.c                                    EmpireMUD 2.0b3 *
 *  Usage: OLC for sector prototypes                                       *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: db.player.c                                     EmpireMUD 2.0b2 *
+*   File: db.player.c                                     EmpireMUD 2.0b3 *
 *  Usage: Database functions related to players and the player table      *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -739,6 +739,8 @@ void init_player(char_data *ch) {
 	ch->player_specials->saved.spare30 = NOTHING;
 	ch->player_specials->saved.spare31 = NOTHING;
 	ch->player_specials->saved.spare32 = NOTHING;
+	ch->player_specials->saved.spare33 = NOTHING;
+	ch->player_specials->saved.spare34 = NOTHING;
 }
 
 
@@ -1610,6 +1612,7 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 			EMPIRE_MEMBERS(emp) = 0;
 			EMPIRE_GREATNESS(emp) = 0;
 			EMPIRE_TOTAL_PLAYTIME(emp) = 0;
+			EMPIRE_LAST_LOGON(emp) = 0;
 		}
 	}
 

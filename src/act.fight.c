@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.fight.c                                     EmpireMUD 2.0b2 *
+*   File: act.fight.c                                     EmpireMUD 2.0b3 *
 *  Usage: non-skill commands and functions related to the fight system    *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

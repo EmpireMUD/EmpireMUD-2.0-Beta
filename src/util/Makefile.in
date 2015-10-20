@@ -31,7 +31,7 @@ default: all
 all: $(BINDIR)/autowiz $(BINDIR)/delobjs \
 	$(WLDDIR)/map $(BINDIR)/mudpasswd $(BINDIR)/purgeplay \
 	$(BINDIR)/showplay $(BINDIR)/sign $(BINDIR)/plrconv \
-	$(BINDIR)/plrconv-20b1-to-20b2
+	$(BINDIR)/plrconv-20b1-to-20b2 $(BINDIR)/plrconv-20b2-to-20b3
 
 autowiz: $(BINDIR)/autowiz
 
@@ -44,6 +44,8 @@ map: $(WLDDIR)/map
 plrconv: $(BINDIR)/plrconv
 
 plrconv-20b1-to-20b2: $(BINDIR)/plrconv-20b1-to-20b2
+
+plrconv-20b2-to-20b3: $(BINDIR)/plrconv-20b2-to-20b3
 
 purgeplay: $(BINDIR)/purgeplay
 
@@ -73,6 +75,10 @@ $(BINDIR)/plrconv: plrconv.c $(INCDIR)/conf.h $(INCDIR)/sysdep.h \
 $(BINDIR)/plrconv-20b1-to-20b2: plrconv-20b1-to-20b2.c $(INCDIR)/conf.h \
 	$(INCDIR)/sysdep.h $(INCDIR)/structs.h $(INCDIR)/utils.h
 	$(CC) $(CFLAGS) -o $(BINDIR)/plrconv-20b1-to-20b2 plrconv-20b1-to-20b2.c $(LIBS)
+
+$(BINDIR)/plrconv-20b2-to-20b3: plrconv-20b2-to-20b3.c $(INCDIR)/conf.h \
+	$(INCDIR)/sysdep.h $(INCDIR)/structs.h $(INCDIR)/utils.h
+	$(CC) $(CFLAGS) -o $(BINDIR)/plrconv-20b2-to-20b3 plrconv-20b2-to-20b3.c $(LIBS)
 
 $(BINDIR)/purgeplay: purgeplay.c $(INCDIR)/conf.h $(INCDIR)/sysdep.h \
 	$(INCDIR)/structs.h $(INCDIR)/utils.h

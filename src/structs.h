@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: structs.h                                       EmpireMUD 2.0b2 *
+*   File: structs.h                                       EmpireMUD 2.0b3 *
 *  Usage: header file for central structures and contstants               *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -338,7 +338,7 @@ typedef struct trig_data trig_data;
 #define INST_COMPLETED  BIT(0)	// instance is done and can be cleaned up
 
 
-// room template flags
+// RMT_X: room template flags
 #define RMT_OUTDOOR  BIT(0)	// a. sun during day
 #define RMT_DARK  BIT(1)	// b. requires a light at all times
 #define RMT_LIGHT  BIT(2)	// c. never requires a light
@@ -348,6 +348,8 @@ typedef struct trig_data trig_data;
 #define RMT_NO_TELEPORT  BIT(6)	// g. cannot teleport in/out
 #define RMT_LOOK_OUT  BIT(7)	// h. can see the map using "look out"
 #define RMT_NO_LOCATION  BIT(8)	// i. don't show a location, disables where
+#define RMT_PIGEON_POST  BIT(9)	// j. can use mail here
+#define RMT_COOKING_FIRE  BIT(10)	// k. can cook here
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2356,6 +2358,8 @@ struct player_special_data_saved {
 	int recent_death_count;	// for death penalty
 	long last_death_time;	// for death counts
 	int last_corpse_id;	// DG Scripts obj id of last corpse
+	room_vnum adventure_summon_return_location;	// where to send a player back to if they're outside an adventure
+	room_vnum adventure_summon_return_map;	// map check location for the return loc
 	
 	// olc data
 	any_vnum olc_min_vnum;	// low range of olc permissions
@@ -2370,6 +2374,7 @@ struct player_special_data_saved {
 	bool can_get_bonus_skills;	// can buy extra 75's
 	sh_int skill_level;  // levels computed based on class skills
 	sh_int highest_known_level;	// maximum level ever achieved (used for gear restrictions)
+	sh_int last_known_level;	// set on save/quit/alt
 	ubyte class_progression;	// % of the way from SPECIALTY_SKILL_CAP to CLASS_SKILL_CAP
 	ubyte class_role;	// ROLE_x chosen by the player
 	sh_int character_class;  // character's class as determined by top skills
@@ -2402,13 +2407,13 @@ struct player_special_data_saved {
 	sh_int spare11;
 	sh_int spare12;
 	sh_int spare13;
-	sh_int last_known_level;	// set on save/quit/alt -- TODO next pconvert, move this up with highest_known_level
+	sh_int spare14;
 	
 	int spare15;
 	int spare16;
 	int spare17;
 	int spare18;
-	int recent_level_time;	// no longer used, but may have data set if you ran b2.9 or earlier -- TODO should be removed in the b2->b3 pconvert
+	int spare19;
 	
 	double spare20;
 	double spare21;
@@ -2416,19 +2421,18 @@ struct player_special_data_saved {
 	double spare23;
 	double spare24;
 	
-	// WARNING: in 2.0b1-b2, these were erroneously initialized to -1 -- TODO next pconvert, fix any spares from 25-34 that are misinitialized
 	bitvector_t spare25; 
 	bitvector_t spare26;
 	bitvector_t spare27;
 	bitvector_t spare28;
 	bitvector_t spare29;
 	
-	// these are initialized to NOTHING/-1 in init_player() -- WARNING: in 2.0b1-b2, these were initialized to 0
+	// these are initialized to NOTHING/-1 in init_player()
 	any_vnum spare30;
 	any_vnum spare31;
 	any_vnum spare32;
-	any_vnum adventure_summon_return_location;	// where to send a player back to if they're outside an adventure
-	any_vnum adventure_summon_return_map;	// map check location for the return loc -- TODO next pconvert, move both of these up
+	any_vnum spare33;
+	any_vnum spare34;
 };
 
 

@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: interpreter.h                                   EmpireMUD 2.0b2 *
+*   File: interpreter.h                                   EmpireMUD 2.0b3 *
 *  Usage: header file: public procs, macro defs, subcommand defines       *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
