@@ -1,3 +1,5 @@
+players/*/*.plr
+players/accounts/*.acct
 plralias/*/*.alias
 plrlore/*/*.lore
 plrobjs/*/*.objs
