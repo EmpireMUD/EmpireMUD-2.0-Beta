@@ -638,6 +638,7 @@ void build_player_index(void) {
 void free_char(char_data *ch) {
 	void free_alias(struct alias_data *a);
 
+	struct slash_channel *loadslash, *next_loadslash;
 	struct channel_history_data *history;
 	struct player_slash_channel *slash;
 	struct interaction_item *interact;
@@ -680,6 +681,26 @@ void free_char(char_data *ch) {
 		if (POOFOUT(ch)) {
 			free(POOFOUT(ch));
 		}
+		if (GET_CREATION_HOST(ch)) {
+			free(GET_CREATION_HOST(ch));
+		}
+		if (GET_REFERRED_BY(ch)) {
+			free(GET_REFERRED_BY(ch));
+		}
+		if (GET_ADMIN_NOTES(ch)) {
+			free(GET_ADMIN_NOTES(ch));
+		}
+		if (GET_DISGUISED_NAME(ch)) {
+			free(GET_DISGUISED_NAME(ch));
+		}
+		
+		for (loadslash = LOAD_SLASH_CHANNELS(ch); loadslash; loadslash = next_loadslash) {
+			next_loadslash = loadslash->next;
+			if (loadslash->name) {
+				free(loadslash->name);
+			}
+			free(loadslash);
+		}
 	
 		while ((a = GET_ALIASES(ch)) != NULL) {
 			GET_ALIASES(ch) = (GET_ALIASES(ch))->next;
@@ -715,8 +736,14 @@ void free_char(char_data *ch) {
 		}
 	}
 
+	if (ch->prev_host && (!proto || ch->prev_host != proto->prev_host)) {
+		free(ch->prev_host);
+	}
 	if (ch->player.name && (!proto || ch->player.name != proto->player.name)) {
 		free(ch->player.name);
+	}
+	if (ch->player.passwd && (!proto || ch->player.passwd != proto->player.passwd)) {
+		free(ch->player.passwd);
 	}
 	if (ch->player.short_descr && (!proto || ch->player.short_descr != proto->player.short_descr)) {
 		free(ch->player.short_descr);
@@ -737,6 +764,9 @@ void free_char(char_data *ch) {
 	// remove all affects
 	while (ch->affected) {
 		affect_remove(ch, ch->affected);
+	}
+	while (ch->over_time_effects) {
+		dot_remove(ch, ch->over_time_effects);
 	}
 	
 	// remove cooldowns
