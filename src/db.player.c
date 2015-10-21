@@ -2033,7 +2033,6 @@ void clear_player(char_data *ch) {
 	// some nowheres/nothings
 	GET_LOADROOM(ch) = NOWHERE;
 	GET_MOUNT_VNUM(ch) = NOTHING;
-	GET_EMPIRE_VNUM(ch) = NOTHING;
 	GET_PLEDGE(ch) = NOTHING;
 	GET_TOMB_ROOM(ch) = NOWHERE;
 	GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch) = NOWHERE;
@@ -2066,7 +2065,6 @@ void delete_player_character(char_data *ch) {
 	// Check the empire
 	if ((emp = GET_LOYALTY(ch)) != NULL) {
 		GET_LOYALTY(ch) = NULL;
-		GET_EMPIRE_VNUM(ch) = NOTHING;
 		GET_RANK(ch) = 0;
 	}
 	

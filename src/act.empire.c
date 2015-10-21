@@ -2178,7 +2178,6 @@ ACMD(do_defect) {
 		msg_to_char(ch, "The leader can't defect!\r\n");
 	else {
 		GET_LOYALTY(ch) = NULL;
-		GET_EMPIRE_VNUM(ch) = NOTHING;
 		add_cooldown(ch, COOLDOWN_LEFT_EMPIRE, 2 * SECS_PER_REAL_HOUR);
 		SAVE_CHAR(ch);
 		
@@ -2989,7 +2988,6 @@ ACMD(do_enroll) {
 		send_config_msg(ch, "ok_string");
 		
 		GET_LOYALTY(targ) = e;
-		GET_EMPIRE_VNUM(targ) = EMPIRE_VNUM(e);
 		GET_RANK(targ) = 1;
 		GET_PLEDGE(targ) = NOTHING;
 		add_lore(targ, LORE_JOIN_EMPIRE, "Honorably accepted into %s%s&0", EMPIRE_BANNER(e), EMPIRE_NAME(e));
@@ -3013,7 +3011,6 @@ ACMD(do_enroll) {
 					}
 					add_lore(victim, LORE_JOIN_EMPIRE, "Empire merged into %s%s&0", EMPIRE_BANNER(e), EMPIRE_NAME(e));
 					GET_LOYALTY(victim) = e;
-					GET_EMPIRE_VNUM(victim) = EMPIRE_VNUM(e);
 					GET_RANK(victim) = 1;
 					update_player_index(index, victim);
 					SAVE_CHAR(victim);
@@ -3021,7 +3018,6 @@ ACMD(do_enroll) {
 				else if ((victim = find_or_load_player(index->name, &sub_file))) {
 					add_lore(victim, LORE_JOIN_EMPIRE, "Empire merged into %s%s&0", EMPIRE_BANNER(e), EMPIRE_NAME(e));
 					GET_LOYALTY(victim) = e;
-					GET_EMPIRE_VNUM(victim) = EMPIRE_VNUM(e);
 					GET_RANK(victim) = 1;
 					update_player_index(index, victim);
 					if (sub_file) {
@@ -3341,7 +3337,6 @@ ACMD(do_expel) {
 		msg_to_char(ch, "You can't expel the leader!\r\n");
 	else {
 		GET_LOYALTY(targ) = NULL;
-		GET_EMPIRE_VNUM(targ) = NOTHING;
 		add_cooldown(targ, COOLDOWN_LEFT_EMPIRE, 2 * SECS_PER_REAL_HOUR);
 		clear_private_owner(GET_IDNUM(targ));
 

@@ -1219,7 +1219,6 @@ empire_data *create_empire(char_data *ch) {
 	// set the player up
 	add_lore(ch, LORE_FOUND_EMPIRE, "Proudly founded %s%s&0", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 	GET_LOYALTY(ch) = emp;
-	GET_EMPIRE_VNUM(ch) = vnum;
 	GET_RANK(ch) = 2;
 	SAVE_CHAR(ch);
 
@@ -1300,13 +1299,11 @@ void delete_empire(empire_data *emp) {
 				msg_to_char(ch, "Your empire has been destroyed.  You are no longer a member.\r\n");
 			}
 			GET_LOYALTY(ch) = NULL;
-			GET_EMPIRE_VNUM(ch) = NOTHING;
 			GET_RANK(ch) = 0;
 			update_player_index(index, ch);
 		}
 		else if ((ch = find_or_load_player(index->name, &file))) {
 			GET_LOYALTY(ch) = NULL;
-			GET_EMPIRE_VNUM(ch) = NOTHING;
 			GET_RANK(ch) = 0;
 			update_player_index(index, ch);
 			if (file) {

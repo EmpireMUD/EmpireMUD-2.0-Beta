@@ -2363,7 +2363,6 @@ struct player_special_data_saved {
 
 	// empire
 	empire_vnum pledge;	// Empire he's applying to
-	empire_vnum empire;	// The empire this player follows (when stored to file; live players use ch->loyalty)
 	byte rank;	// Rank in the empire
 	
 	// misc player attributes
