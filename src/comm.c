@@ -1376,6 +1376,7 @@ void send_to_room(const char *messg, room_data *room) {
 void close_socket(descriptor_data *d) {
 	struct channel_history_data *hist;
 	descriptor_data *temp;
+	int iter;
 
 	REMOVE_FROM_LIST(d, descriptor_list, next);
 	CLOSE_SOCKET(d->descriptor);
