@@ -2434,6 +2434,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 	extern int move_gain(char_data *ch);
 	void display_attributes(char_data *ch, char_data *to);
 
+	extern const char *account_flags[];
 	extern const char *class_role[NUM_ROLES];
 	extern const char *cooldown_types[];
 	extern const char *damage_types[];
@@ -2446,7 +2447,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 	extern const int base_hit_chance;
 	extern struct promo_code_list promo_codes[];
 
-	char lbuf[MAX_STRING_LENGTH], lbuf2[MAX_STRING_LENGTH], lbuf3[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH], lbuf2[MAX_STRING_LENGTH], lbuf3[MAX_STRING_LENGTH];
 	char uname[MAX_INPUT_LENGTH];
 	struct script_memory *mem;
 	struct trig_var_data *tv;
@@ -2463,7 +2464,12 @@ void do_stat_character(char_data *ch, char_data *k) {
 	CAP(buf);
 	sprintf(buf2, " %s '&y%s&0'  IDNum: [%5d], In room [%5d]\r\n", (!IS_NPC(k) ? "PC" : (!IS_MOB(k) ? "NPC" : "MOB")), GET_NAME(k), GET_IDNUM(k), IN_ROOM(k) ? GET_ROOM_VNUM(IN_ROOM(k)) : NOWHERE);
 	send_to_char(strcat(buf, buf2), ch);
-
+	
+	if (!IS_NPC(k) && GET_ACCOUNT(k)) {
+		sprintbit(GET_ACCOUNT(k)->flags, account_flags, buf, TRUE);
+		msg_to_char(ch, "Account: [%d], Flags: &g%s&0\r\n", GET_ACCOUNT(k)->id, buf);
+	}
+	
 	if (IS_MOB(k)) {
 		msg_to_char(ch, "Alias: &y%s&0, VNum: [&c%5d&0]\r\n", GET_PC_NAME(k), GET_MOB_VNUM(k));
 		msg_to_char(ch, "L-Des: &y%s&0", (GET_LONG_DESC(k) ? GET_LONG_DESC(k) : "<None>\r\n"));
