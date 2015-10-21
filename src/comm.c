@@ -1374,6 +1374,7 @@ void send_to_room(const char *messg, room_data *room) {
 
 
 void close_socket(descriptor_data *d) {
+	struct channel_history_data *hist;
 	descriptor_data *temp;
 
 	REMOVE_FROM_LIST(d, descriptor_list, next);
@@ -1438,6 +1439,28 @@ void close_socket(descriptor_data *d) {
 		free(d->showstr_vector);
 	if (d->backstr) {
 		free(d->backstr);
+	}
+	
+	// other strings
+	if (d->host) {
+		free(d->host);
+	}
+	if (d->last_act_message) {
+		free(d->last_act_message);
+	}
+	if (d->file_storage) {
+		free(d->file_storage);
+	}
+	
+	// free channel histories
+	for (iter = 0; iter < NUM_CHANNEL_HISTORY_TYPES; ++iter) {
+		while ((hist = d->channel_history[iter])) {
+			d->channel_history[iter] = hist->next;
+			if (hist->message) {
+				free(hist->message);
+			}
+			free(hist);
+		}
 	}
 	
 	ProtocolDestroy(d->pProtocol);

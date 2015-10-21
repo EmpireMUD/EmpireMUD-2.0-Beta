@@ -243,6 +243,9 @@ void process_add_to_channel_history(struct channel_history_data **history, char 
 		// remove the first one
 		old = *history;
 		*history = old->next;
+		if (old->message) {
+			free(old->message);
+		}
 		free(old);
 	}
 }
