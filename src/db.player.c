@@ -208,7 +208,6 @@ void add_player_to_account(char_data *ch, account_data *acct) {
 	CREATE(plr, struct account_player, 1);
 	plr->name = str_dup(GET_PC_NAME(ch));
 	strtolower(plr->name);
-	plr->player = index;
 	
 	// see if the player's name is already in the account list (sometimes caused by disconnects during creation)
 	found = FALSE;
@@ -216,8 +215,11 @@ void add_player_to_account(char_data *ch, account_data *acct) {
 		if (!str_cmp(pos->name, plr->name)) {
 			found = TRUE;
 			pos->player = index;
+			
+			// free our temporary one
 			free(plr->name);
 			free(plr);
+			
 			plr = pos;
 			break;
 		}
@@ -235,6 +237,9 @@ void add_player_to_account(char_data *ch, account_data *acct) {
 			acct->players = plr;
 		}
 	}
+	
+	// update this at the end, after we're sure we've found it
+	plr->player = index;
 	
 	save_library_file_for_vnum(DB_BOOT_ACCT, acct->id);
 	GET_ACCOUNT(ch) = acct;
@@ -429,7 +434,7 @@ void remove_player_from_account(char_data *ch) {
 	for (plr = acct->players; plr && index; plr = next_plr) {
 		next_plr = plr->next;
 		
-		if (plr->player == index) {
+		if (plr->player == index || (plr->name && !str_cmp(plr->name, index->name))) {
 			// remove
 			if (plr->name) {
 				free(plr->name);
@@ -778,6 +783,26 @@ void free_char(char_data *ch) {
 	remove_from_lookup_table(GET_ID(ch));
 
 	free(ch);
+}
+
+
+/**
+* Frees the memory from a player index.
+*
+* @param player_index_data *index The index to free.
+*/
+void free_player_index_data(player_index_data *index) {
+	if (index->name) {
+		free(index->name);
+	}
+	if (index->fullname) {
+		free(index->fullname);
+	}
+	if (index->last_host) {
+		free(index->last_host);
+	}
+	
+	free(index);
 }
 
 
@@ -2021,6 +2046,7 @@ void delete_player_character(char_data *ch) {
 	}
 	if ((index = find_player_index_by_idnum(GET_IDNUM(ch)))) {
 		remove_player_from_table(index);
+		free_player_index_data(index);
 	}
 	
 	// various file deletes
@@ -2458,17 +2484,12 @@ void start_new_character(char_data *ch) {
 		SET_BIT(PLR_FLAGS(ch), PLR_SITEOK);
 	}
 	
-	// not sure how they could not have this...
-	if (ch->desc) {
-		if (GET_CREATION_HOST(ch)) {
-			free(GET_CREATION_HOST(ch));
-		}
-		GET_CREATION_HOST(ch) = str_dup(ch->desc->host);
+	// store host if possible
+	if (GET_CREATION_HOST(ch)) {
+		free(GET_CREATION_HOST(ch));
 	}
-	else {
-		GET_CREATION_HOST(ch) = NULL;
-	}
-
+	GET_CREATION_HOST(ch) = ch->desc ? str_dup(ch->desc->host) : NULL;
+	
 	// level
 	if (GET_ACCESS_LEVEL(ch) < LVL_APPROVED && !config_get_bool("require_auth")) {
 		GET_ACCESS_LEVEL(ch) = LVL_APPROVED;
