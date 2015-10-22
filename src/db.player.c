@@ -2033,13 +2033,13 @@ void write_player_to_file(FILE *fl, char_data *ch) {
 *  -- The Management
 */
 
-const char *IMM_LMARG = "   ";
-const int IMM_NSIZE = 16;
-const int LINE_LEN = 64;
-const int MIN_LEVEL = LVL_GOD;
+const char *AUTOWIZ_IMM_LMARG = "   ";
+const int AUTOWIZ_IMM_NSIZE = 16;
+const int AUTOWIZ_LINE_LEN = 64;
+const int AUTOWIZ_MIN_LEVEL = LVL_GOD;
 
 // max level that should be in columns instead of centered
-const int COL_LEVEL = LVL_GOD;
+const int AUTOWIZ_COL_LEVEL = LVL_GOD;
 
 const char *autowiz_header =
 "*************************************************************************\n"
@@ -2050,23 +2050,23 @@ const char *autowiz_header =
 "*************************************************************************\n";
 
 
-struct name_rec {
+struct autowiz_name_rec {
 	char *name;
-	struct name_rec *next;	// linked list
+	struct autowiz_name_rec *next;	// linked list
 };
 
-struct control_rec {
+struct autowiz_control_rec {
 	int level;
 	char *level_name;
 };
 
-struct level_rec {
-	struct control_rec *params;
-	struct name_rec *names;
-	struct level_rec *next;	// linked list
+struct autowiz_level_rec {
+	struct autowiz_control_rec *params;
+	struct autowiz_name_rec *names;
+	struct autowiz_level_rec *next;	// linked list
 };
 
-struct control_rec level_params[] = {
+struct autowiz_control_rec level_params[] = {
 	{ LVL_GOD,	"Gods" },
 #if (LVL_START_IMM < LVL_IMPL)
 	{ LVL_START_IMM, "Immortal" },
@@ -2081,18 +2081,18 @@ struct control_rec level_params[] = {
 	{0, ""}
 };
 
-struct level_rec *autowiz_data = NULL;
+struct autowiz_level_rec *autowiz_data = NULL;
 
 
 /**
 * Sets up the autowiz_data, which is shared by these functions.
 */
 void autowiz_initialize(void) {
-	struct level_rec *tmp;
+	struct autowiz_level_rec *tmp;
 	int i = 0;
 	
 	while (level_params[i].level > 0) {
-		CREATE(tmp, struct level_rec, 1);
+		CREATE(tmp, struct autowiz_level_rec, 1);
 		tmp->params = &(level_params[i++]);
 		tmp->next = autowiz_data;
 		autowiz_data = tmp;
@@ -2107,8 +2107,8 @@ void autowiz_initialize(void) {
 * @param char *name The player's name.
 */
 void autowiz_add_name(int level, char *name) {
-	struct name_rec *tmp, *end;
-	struct level_rec *curr_level;
+	struct autowiz_name_rec *tmp, *end;
+	struct autowiz_level_rec *curr_level;
 
 	if (!*name)
 		return;
@@ -2119,7 +2119,7 @@ void autowiz_add_name(int level, char *name) {
 			return;
 	*/
 	
-	CREATE(tmp, struct name_rec, 1);
+	CREATE(tmp, struct autowiz_name_rec, 1);
 	tmp->name = str_dup(name);
 	
 	curr_level = autowiz_data;
@@ -2143,8 +2143,8 @@ void autowiz_add_name(int level, char *name) {
 * Frees memory allocated by the autowiz system.
 */
 void autowiz_cleanup(void) {
-	struct level_rec *lev;
-	struct name_rec *name;
+	struct autowiz_level_rec *lev;
+	struct autowiz_name_rec *name;
 	
 	while ((lev = autowiz_data)) {
 		autowiz_data = lev->next;
@@ -2176,7 +2176,7 @@ void autowiz_read_players(void) {
 		if (IS_SET(index->plr_flags, PLR_NOWIZLIST | PLR_FROZEN)) {
 			continue;
 		}
-		if (index->access_level < MIN_LEVEL) {
+		if (index->access_level < AUTOWIZ_MIN_LEVEL) {
 			continue;
 		}
 		
@@ -2195,8 +2195,8 @@ void autowiz_read_players(void) {
 */
 void autowiz_write_wizlist(FILE *out, int minlev, int maxlev) {
 	char buf[MAX_STRING_LENGTH];
-	struct level_rec *curr_level;
-	struct name_rec *curr_name;
+	struct autowiz_level_rec *curr_level;
+	struct autowiz_name_rec *curr_name;
 	int i, j;
 	
 	fprintf(out, "%s\n", autowiz_header);
@@ -2220,9 +2220,9 @@ void autowiz_write_wizlist(FILE *out, int minlev, int maxlev) {
 		curr_name = curr_level->names;
 		while (curr_name) {
 			strcat(buf, curr_name->name);
-			if (strlen(buf) > LINE_LEN) {
-				if (curr_level->params->level <= COL_LEVEL)
-					fprintf(out, IMM_LMARG);
+			if (strlen(buf) > AUTOWIZ_LINE_LEN) {
+				if (curr_level->params->level <= AUTOWIZ_COL_LEVEL)
+					fprintf(out, AUTOWIZ_IMM_LMARG);
 				else {
 					i = 40 - (strlen(buf) / 2);
 					for (j = 1; j <= i; ++j)
@@ -2232,19 +2232,19 @@ void autowiz_write_wizlist(FILE *out, int minlev, int maxlev) {
 				strcpy(buf, "");
 			}
 			else {
-				if (curr_level->params->level <= COL_LEVEL) {
-					for (j = 1; j <= (IMM_NSIZE - strlen(curr_name->name));++ j)
+				if (curr_level->params->level <= AUTOWIZ_COL_LEVEL) {
+					for (j = 1; j <= (AUTOWIZ_IMM_NSIZE - strlen(curr_name->name));++ j)
 						strcat(buf, " ");
 				}
-				if (curr_level->params->level > COL_LEVEL)
+				if (curr_level->params->level > AUTOWIZ_COL_LEVEL)
 					strcat(buf, "   ");
 			}
 			curr_name = curr_name->next;
 		}
 
 		if (*buf) {
-			if (curr_level->params->level <= COL_LEVEL)
-				fprintf(out, "%s%s\n", IMM_LMARG, buf);
+			if (curr_level->params->level <= AUTOWIZ_COL_LEVEL)
+				fprintf(out, "%s%s\n", AUTOWIZ_IMM_LMARG, buf);
 			else {
 				i = 40 - (strlen(buf) / 2);
 				for (j = 1; j <= i; ++j)
