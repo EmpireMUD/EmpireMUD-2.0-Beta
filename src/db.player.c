@@ -2296,6 +2296,7 @@ void run_autowiz(void) {
 	fclose(fl);
 	rename(GODLIST_FILE TEMP_SUFFIX, GODLIST_FILE);
 	
+	autowiz_cleanup();
 	reload_wizlists();
 }
 
