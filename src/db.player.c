@@ -2161,6 +2161,7 @@ void autowiz_cleanup(void) {
 		
 		free(lev);
 	}
+	autowiz_data = NULL;
 }
 
 
