@@ -28,8 +28,10 @@ LIBS = -lm
 
 default: all
 
-all: $(WLDDIR)/map $(BINDIR)/sign \
+all: $(BINDIR)/cryptpasswd $(WLDDIR)/map $(BINDIR)/sign \
 	$(BINDIR)/plrconv-20b1-to-20b2 $(BINDIR)/plrconv-20b2-to-20b3
+
+cryptpasswd: $(BINDIR)/sign
 
 map: $(WLDDIR)/map
 
@@ -38,6 +40,10 @@ plrconv-20b1-to-20b2: $(BINDIR)/plrconv-20b1-to-20b2
 plrconv-20b2-to-20b3: $(BINDIR)/plrconv-20b2-to-20b3
 
 sign: $(BINDIR)/sign
+
+$(BINDIR)/cryptpasswd: cryptpasswd.c $(INCDIR)/conf.h $(INCDIR)/sysdep.h \
+	$(INCDIR)/structs.h $(INCDIR)/utils.h
+	$(CC) $(CFLAGS) -o $(BINDIR)/cryptpasswd cryptpasswd.c $(LIBS)
 
 $(WLDDIR)/map: map.c $(INCDIR)/conf.h $(INCDIR)/sysdep.h $(INCDIR)/structs.h
 	$(CC) $(CFLAGS) -o $(WLDDIR)/map map.c $(LIBS)
