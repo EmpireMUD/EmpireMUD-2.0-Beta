@@ -7,12 +7,6 @@ syslog.CRASH
 
 bin/plrconv-20b1-to-20b2.dSYM/Contents/Resources/DWARF/plrconv-20b1-to-20b2
 
-bin/plrconv-20b1-to-20b2
-
-bin/plrconv-20b2-to-20b3
-
 bin/plrconv-20b2-to-20b3.dSYM/Contents/Resources/DWARF/plrconv-20b2-to-20b3
 
 bin/cryptpasswd.dSYM/Contents/Resources/DWARF/cryptpasswd
-
-bin/cryptpasswd
