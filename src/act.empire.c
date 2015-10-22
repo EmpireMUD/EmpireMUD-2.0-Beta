@@ -2254,6 +2254,8 @@ ACMD(do_demote) {
 		act("You can't demote $M THAT low!", FALSE, ch, 0, victim, TO_CHAR);
 	else {
 		GET_RANK(victim) = to_rank;
+		remove_lore(victim, LORE_PROMOTED);	// only save most recent
+		add_lore(victim, LORE_PROMOTED, "Promoted to %s&0", EMPIRE_RANK(e, to_rank-1));
 
 		log_to_empire(e, ELOG_MEMBERS, "%s has been demoted to %s%s", PERS(victim, victim, 1), EMPIRE_RANK(e, to_rank-1), EMPIRE_BANNER(e));
 		send_config_msg(ch, "ok_string");
@@ -4000,6 +4002,8 @@ ACMD(do_promote) {
 		msg_to_char(ch, "You can't promote someone to that level.\r\n");
 	else {
 		GET_RANK(victim) = to_rank;
+		remove_lore(victim, LORE_PROMOTED);	// only save most recent
+		add_lore(victim, LORE_PROMOTED, "Promoted to %s&0", EMPIRE_RANK(e, to_rank-1));
 
 		log_to_empire(e, ELOG_MEMBERS, "%s has been promoted to %s%s!", PERS(victim, victim, 1), EMPIRE_RANK(e, to_rank-1), EMPIRE_BANNER(e));
 		send_config_msg(ch, "ok_string");

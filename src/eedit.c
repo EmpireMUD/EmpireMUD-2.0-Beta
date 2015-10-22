@@ -415,6 +415,10 @@ EEDIT(eedit_motd) {
 
 
 EEDIT(eedit_name) {
+	player_index_data *index, *next_index;
+	bool file = FALSE;
+	char_data *mem;
+	
 	if (!*argument) {
 		msg_to_char(ch, "Set the empire name to what?\r\n");
 	}
@@ -444,6 +448,21 @@ EEDIT(eedit_name) {
 		log_to_empire(emp, ELOG_ADMIN, "%s has changed the empire name to %s", PERS(ch, ch, TRUE), EMPIRE_NAME(emp));
 		msg_to_char(ch, "The empire's name is now: %s\r\n", EMPIRE_NAME(emp));
 		msg_to_char(ch, "The adjective form was also changed (use 'eedit adjective' to change it).\r\n");
+		
+		// update lore for members
+		HASH_ITER(idnum_hh, player_table_by_idnum, index, next_index) {
+			if (index->loyalty != emp) {
+				continue;
+			}
+			
+			if ((mem = find_or_load_player(index->name, &file))) {
+				add_lore(mem, LORE_JOIN_EMPIRE, "Empire became %s%s&0", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+				
+				if (file) {
+					store_loaded_char(mem);
+				}
+			}
+		}
 	}
 }
 

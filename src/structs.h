@@ -1268,6 +1268,7 @@ typedef struct trig_data trig_data;
 #define LORE_PURIFY				9
 #define LORE_DEATH				10
 #define LORE_MAKE_VAMPIRE		11
+#define LORE_PROMOTED			12
 
 
 // Morph forms
