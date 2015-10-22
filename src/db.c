@@ -1772,13 +1772,6 @@ void check_version(void) {
  //////////////////////////////////////////////////////////////////////////////
 //// MISCELLANEOUS HELPERS ///////////////////////////////////////////////////
 
-/* this is necessary for the autowiz system */
-void reload_wizlists(void) {
-	file_to_string_alloc(WIZLIST_FILE, &wizlist);
-	file_to_string_alloc(GODLIST_FILE, &godlist);
-}
-
-
 /* reset the time in the game from file */
 void reset_time(void) {
 	long load_time();	// db.c

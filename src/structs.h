@@ -750,7 +750,7 @@ typedef struct trig_data trig_data;
  *  - Make sure LVL_TOP is no less than 4!
  *  - If you want more levels than those listed in the chart, you'll have to
  *    make necessary adjustments yourself:
- *    = Add a clause in utils/autowiz.c: level_params[]
+ *    = Add a clause in db.player.c, Autowiz section: level_params[]
  *    = Add a clause in constants.c: level_names[][2]
  *    = Change interpreter.c command levels
  *

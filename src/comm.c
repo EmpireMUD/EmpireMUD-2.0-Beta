@@ -73,7 +73,6 @@ void save_whole_world();
 RETSIGTYPE checkpointing(int sig);
 RETSIGTYPE hupsig(int sig);
 RETSIGTYPE reap(int sig);
-RETSIGTYPE reread_wizlists(int sig);
 RETSIGTYPE unrestrict_game(int sig);
 char *make_prompt(descriptor_data *point);
 char *prompt_str(char_data *ch);
@@ -2985,14 +2984,6 @@ char *replace_prompt_codes(char_data *ch, char *str) {
  //////////////////////////////////////////////////////////////////////////////
 //// SIGNAL PROCESSING ///////////////////////////////////////////////////////
 
-
-RETSIGTYPE reread_wizlists(int sig) {
-	void reload_wizlists(void);
-	syslog(SYS_INFO, 0, TRUE, "Signal received - rereading wizlists.");
-	reload_wizlists();
-}
-
-
 RETSIGTYPE unrestrict_game(int sig) {
 	syslog(SYS_INFO, 0, TRUE, "Received SIGUSR2 - completely unrestricting game (emergent)");
 	ban_list = NULL;
@@ -3062,9 +3053,6 @@ sigfunc *my_signal(int signo, sigfunc * func) {
 void signal_setup(void) {
 	struct itimerval itime;
 	struct timeval interval;
-
-	/* user signal 1: reread wizlists.  Used by autowiz system. */
-	my_signal(SIGUSR1, reread_wizlists);
 
 	/*
 	 * user signal 2: unrestrict game.  Used for emergencies if you lock

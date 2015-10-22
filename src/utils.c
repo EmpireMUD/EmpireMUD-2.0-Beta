@@ -1233,26 +1233,6 @@ int land_can_claim(empire_data *emp, bool outside_only) {
 //// FILE UTILS //////////////////////////////////////////////////////////////
 
 /**
-* This initiates the autowiz program, which writes fresh wizlist files.
-*
-* TODO like many player-reading systems, this could be done internally
-* instead of with an external call.
-*
-* @param char_data *ch The player to check. Only runs autowiz if the player is a god.
-*/
-void check_autowiz(char_data *ch) {
-	if (GET_ACCESS_LEVEL(ch) >= LVL_GOD && config_get_bool("use_autowiz")) {
-		char buf[128];
-
-		sprintf(buf, "nice ../bin/autowiz %d %s %d %s %d &", LVL_START_IMM, WIZLIST_FILE, LVL_GOD, GODLIST_FILE, (int) getpid());
-
-		syslog(SYS_INFO, 0, TRUE, "Initiating autowiz.");
-		system(buf);
-	}
-}
-
-
-/**
 * Gets the filename/path for various name-divided file directories.
 *
 * @param char *orig_name The player name.

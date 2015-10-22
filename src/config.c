@@ -1690,7 +1690,7 @@ void init_config_system(void) {
 	init_config(CONFIG_SYSTEM, "nameserver_is_slow", CONFTYPE_BOOL, "if enabled, system will not resolve numeric IPs");
 	init_config(CONFIG_SYSTEM, "max_filesize", CONFTYPE_INT, "maximum size of bug, typo and idea files in bytes (to prevent bombing)");
 	init_config(CONFIG_SYSTEM, "max_bad_pws", CONFTYPE_INT, "maximum number of password attempts before disconnection");
-	init_config(CONFIG_SYSTEM, "use_autowiz", CONFTYPE_BOOL, "if on, automatically generates the wizlist (unix only)");
+	init_config(CONFIG_SYSTEM, "use_autowiz", CONFTYPE_BOOL, "if on, automatically generates the wizlist");
 	init_config(CONFIG_SYSTEM, "siteok_everyone", CONFTYPE_BOOL, "flags players siteok on creation, essentially inverting ban logic");
 	init_config(CONFIG_SYSTEM, "log_losing_descriptor_without_char", CONFTYPE_BOOL, "somewhat spammy disconnect logs");
 

@@ -3,8 +3,8 @@ ADVANCE
 Usage:  advance <victim> <access level>
 
 ADVANCE moves a player to a new access level. If used to promote a player to an
-immortal level, and if you have the autowiz program installed, the wizlist and
-godlist will automatically be recreated. This command is grantable.
+immortal or god level, the wizlist and godlist will automatically be recreated.
+This command is grantable.
 
 Don't confuse access levels with skill/gear levels.
 
@@ -50,7 +50,7 @@ AUTOWIZ
 
 Usage:  autowiz
 
-Regenerates the wizlist.
+Regenerates the wizlist and godlist.
 #d
 BAN UNBAN
 

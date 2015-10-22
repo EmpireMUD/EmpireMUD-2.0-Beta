@@ -28,6 +28,7 @@
 *   Getters
 *   Account DB
 *   Core Player DB
+*   Autowiz Wizlist Generator
 *   Helpers
 *   Empire Player Management
 *   Promo Codes
@@ -2009,6 +2010,306 @@ void write_player_to_file(FILE *fl, char_data *ch) {
 	}
 	
 	// affect_total(ch); // unnecessary, I think (?)
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// AUTOWIZ WIZLIST GENERATOR ///////////////////////////////////////////////
+
+/**
+* This is adapted from the autowiz.c utility written by Jeremy Elson (All
+* Right Reserved) and included with CircleMUD. In that code, written in the
+* '90s, tools that iterate over the playerfile were run separate from the MUD
+* itself because they were time-consuming and resource-intensive. This is no
+* longer the case and it's much simpler to generate this list from within the
+* mud itself. The following warning is included as-is:
+*
+*  WARNING:  THIS CODE IS A HACK.  WE CAN NOT AND WILL NOT BE RESPONSIBLE
+*  FOR ANY NASUEA, DIZZINESS, VOMITING, OR SHORTNESS OF BREATH RESULTING
+*  FROM READING THIS CODE.  PREGNANT WOMEN AND INDIVIDUALS WITH BACK
+*  INJURIES, HEART CONDITIONS, OR ARE UNDER THE CARE OF A PHYSICIAN SHOULD
+*  NOT READ THIS CODE.
+*
+*  -- The Management
+*/
+
+const char *IMM_LMARG = "   ";
+const int IMM_NSIZE = 16;
+const int LINE_LEN = 64;
+const int MIN_LEVEL = LVL_GOD;
+
+// max level that should be in columns instead of centered
+const int COL_LEVEL = LVL_GOD;
+
+const char *autowiz_header =
+"*************************************************************************\n"
+"* The following people have reached immortality on EmpireMUD.  They are *\n"
+"* to be treated with respect and awe.  Occasional prayers to them are   *\n"
+"* advisable.  Annoying them is not recommended.  Stealing from them is  *\n"
+"* punishable by immediate death.                                        *\n"
+"*************************************************************************\n";
+
+
+struct name_rec {
+	char *name;
+	struct name_rec *next;	// linked list
+};
+
+struct control_rec {
+	int level;
+	char *level_name;
+};
+
+struct level_rec {
+	struct control_rec *params;
+	struct name_rec *names;
+	struct level_rec *next;	// linked list
+};
+
+struct control_rec level_params[] = {
+	{ LVL_GOD,	"Gods" },
+#if (LVL_START_IMM < LVL_IMPL)
+	{ LVL_START_IMM, "Immortal" },
+#endif
+#if (LVL_ASST < LVL_IMPL && LVL_ASST != LVL_START_IMM)
+	{ LVL_ASST, "Assistant" },
+#endif
+#if (LVL_CIMPL < LVL_IMPL && LVL_CIMPL < LVL_CIMPL != LVL_ASST)
+	{ LVL_CIMPL, "Co-Implementor" },
+#endif
+	{ LVL_IMPL,	"Implementors" },
+	{0, ""}
+};
+
+struct level_rec *autowiz_data = NULL;
+
+
+/**
+* Sets up the autowiz_data, which is shared by these functions.
+*/
+void autowiz_initialize(void) {
+	struct level_rec *tmp;
+	int i = 0;
+	
+	while (level_params[i].level > 0) {
+		CREATE(tmp, struct level_rec, 1);
+		tmp->params = &(level_params[i++]);
+		tmp->next = autowiz_data;
+		autowiz_data = tmp;
+	}
+}
+
+
+/**
+* Adds a name to autowiz_data, in the correct level.
+*
+* @param int level The level of the player.
+* @param char *name The player's name.
+*/
+void autowiz_add_name(int level, char *name) {
+	struct name_rec *tmp, *end;
+	struct level_rec *curr_level;
+
+	if (!*name)
+		return;
+	
+	/* this used to require all-alpha names bu that shouldn't be necessary
+	for (ptr = name; *ptr; ptr++)
+		if (!isalpha(*ptr))
+			return;
+	*/
+	
+	CREATE(tmp, struct name_rec, 1);
+	tmp->name = str_dup(name);
+	
+	curr_level = autowiz_data;
+	while (curr_level->params->level > level)
+		curr_level = curr_level->next;
+	
+	// attempt to append at end
+	if ((end = curr_level->names)) {
+		while (end->next) {
+			end = end->next;
+		}
+		end->next = tmp;
+	}
+	else {
+		curr_level->names = tmp;
+	}
+}
+
+
+/**
+* Frees memory allocated by the autowiz system.
+*/
+void autowiz_cleanup(void) {
+	struct level_rec *lev;
+	struct name_rec *name;
+	
+	while ((lev = autowiz_data)) {
+		autowiz_data = lev->next;
+		
+		// do not free lev->params -- it's not allocated
+		while ((name = lev->names)) {
+			lev->names = name->next;
+			
+			if (name->name) {
+				free(name->name);
+			}
+			free(name);
+		}
+		
+		free(lev);
+	}
+}
+
+
+/**
+* Iterates over the player index and adds anyone of the correct level to
+* the autowiz_data.
+*/
+void autowiz_read_players(void) {
+	player_index_data *index, *next_index;
+	
+	HASH_ITER(name_hh, player_table_by_name, index, next_index) {
+		if (IS_SET(index->plr_flags, PLR_NOWIZLIST | PLR_FROZEN)) {
+			continue;
+		}
+		if (index->access_level < MIN_LEVEL) {
+			continue;
+		}
+		
+		// valid
+		autowiz_add_name(index->access_level, index->fullname);
+	}
+}
+
+
+/**
+* Writes a wizlist (or godlist) file.
+*
+* @param FILE *out The file open for writing.
+* @param int minlev Minimum level to write to this file.
+* @param int maxlev Maximum level to write to this file.
+*/
+void autowiz_write_wizlist(FILE *out, int minlev, int maxlev) {
+	char buf[MAX_STRING_LENGTH];
+	struct level_rec *curr_level;
+	struct name_rec *curr_name;
+	int i, j;
+	
+	fprintf(out, "%s\n", autowiz_header);
+	
+	for (curr_level = autowiz_data; curr_level; curr_level = curr_level->next) {
+		if (curr_level->params->level < minlev || curr_level->params->level > maxlev) {
+			continue;
+		}
+		
+		i = 39 - (strlen(curr_level->params->level_name) / 2);
+		for (j = 1; j <= i; ++j)
+			fputc(' ', out);
+		fprintf(out, "%s\n", curr_level->params->level_name);
+		for (j = 1; j <= i; ++j)
+			fputc(' ', out);
+		for (j = 1; j <= strlen(curr_level->params->level_name); ++j)
+			fputc('~', out);
+		fprintf(out, "\n");
+
+		strcpy(buf, "");
+		curr_name = curr_level->names;
+		while (curr_name) {
+			strcat(buf, curr_name->name);
+			if (strlen(buf) > LINE_LEN) {
+				if (curr_level->params->level <= COL_LEVEL)
+					fprintf(out, IMM_LMARG);
+				else {
+					i = 40 - (strlen(buf) / 2);
+					for (j = 1; j <= i; ++j)
+						fputc(' ', out);
+				}
+				fprintf(out, "%s\n", buf);
+				strcpy(buf, "");
+			}
+			else {
+				if (curr_level->params->level <= COL_LEVEL) {
+					for (j = 1; j <= (IMM_NSIZE - strlen(curr_name->name));++ j)
+						strcat(buf, " ");
+				}
+				if (curr_level->params->level > COL_LEVEL)
+					strcat(buf, "   ");
+			}
+			curr_name = curr_name->next;
+		}
+
+		if (*buf) {
+			if (curr_level->params->level <= COL_LEVEL)
+				fprintf(out, "%s%s\n", IMM_LMARG, buf);
+			else {
+				i = 40 - (strlen(buf) / 2);
+				for (j = 1; j <= i; ++j)
+					fputc(' ', out);
+				fprintf(out, "%s\n", buf);
+			}
+		}
+		fprintf(out, "\n");
+	}
+}
+
+
+/**
+* Reloads the wizlist and godlist files.
+*/
+void reload_wizlists(void) {
+	extern int file_to_string_alloc(const char *name, char **buf);
+	extern char *wizlist, *godlist;	// db.c
+
+	file_to_string_alloc(WIZLIST_FILE, &wizlist);
+	file_to_string_alloc(GODLIST_FILE, &godlist);
+}
+
+
+/**
+* Builds and generates the wizlist and godlist files, and reloads them.
+*/
+void run_autowiz(void) {	
+	FILE *fl;
+	
+	syslog(SYS_INFO, LVL_START_IMM, TRUE, "Rebuilding wizlists");
+	
+	autowiz_initialize();
+	autowiz_read_players();
+	
+	if (!(fl = fopen(WIZLIST_FILE TEMP_SUFFIX, "w"))) {
+		log("SYSERR: run_autowiz: Unable to open file %s for writing\r\n", WIZLIST_FILE TEMP_SUFFIX);
+		return;
+	}
+	autowiz_write_wizlist(fl, LVL_START_IMM, LVL_TOP);
+	fclose(fl);
+	rename(WIZLIST_FILE TEMP_SUFFIX, WIZLIST_FILE);
+	
+	if (!(fl = fopen(GODLIST_FILE TEMP_SUFFIX, "w"))) {
+		log("SYSERR: run_autowiz: Unable to open file %s for writing\r\n", GODLIST_FILE TEMP_SUFFIX);
+		return;
+	}
+	autowiz_write_wizlist(fl, LVL_GOD, LVL_START_IMM - 1);
+	fclose(fl);
+	rename(GODLIST_FILE TEMP_SUFFIX, GODLIST_FILE);
+	
+	reload_wizlists();
+}
+
+
+/**
+* This checks if a player is high enough level, and generates the wizlist. It
+* also checks the use_autowiz config. This will re-write the godlist and
+* wizlist files and commands.
+*
+* @param char_data *ch The player to check. Only runs autowiz if the player is of a certain level.
+*/
+void check_autowiz(char_data *ch) {
+	if (GET_ACCESS_LEVEL(ch) >= LVL_GOD && config_get_bool("use_autowiz")) {
+		run_autowiz();
+	}
 }
 
 
