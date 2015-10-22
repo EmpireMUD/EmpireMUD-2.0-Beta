@@ -24,7 +24,7 @@ INCDIR = ..
 
 CFLAGS = @CFLAGS@ $(MYFLAGS) $(PROFILE) -I$(INCDIR)
 
-LIBS = -lm
+LIBS = @CRYPTLIB@ -lm
 
 default: all
 
