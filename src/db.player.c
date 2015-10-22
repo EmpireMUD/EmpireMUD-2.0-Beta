@@ -53,6 +53,7 @@ void update_class(char_data *ch);
 
 // local protos
 void clear_player(char_data *ch);
+void delete_player_character(char_data *ch);
 static bool member_is_timed_out(time_t created, time_t last_login, double played_hours);
 char_data *read_player_from_file(FILE *fl, char *name, bool normal);
 int sort_players_by_idnum(player_index_data *a, player_index_data *b);
@@ -2342,6 +2343,55 @@ void clear_player(char_data *ch) {
 	GET_ADVENTURE_SUMMON_RETURN_MAP(ch) = NOWHERE;
 	GET_LAST_TELL(ch) = NOBODY;
 	GET_TEMPORARY_ACCOUNT_ID(ch) = NOTHING;
+}
+
+
+/**
+* This runs at startup (if you don't use -q) and deletes players who are
+* timed out according to the delete_invalid_players_after and 
+* delete_inactive_players_after configs. This can be prevented with the
+* NODELETE flag. Immortals are also never deleted this way.
+*/
+void delete_old_players(void) {
+	player_index_data *index, *next_index;
+	bool file, will_delete;
+	char_data *ch;
+	
+	int delete_inactive = config_get_int("delete_inactive_players_after");
+	int delete_invalid = config_get_int("delete_invalid_players_after");
+	
+	HASH_ITER(name_hh, player_table_by_name, index, next_index) {
+		// imms immune
+		if (index->access_level >= LVL_START_IMM && index->access_level <= LVL_TOP) {
+			continue;
+		}
+		// never!
+		if (IS_SET(index->plr_flags, PLR_NODELETE)) {
+			continue;
+		}
+		
+		will_delete = FALSE;
+		
+		// delete #1: invalid players
+		if (delete_invalid > 0 && (index->access_level <= 0 || index->access_level > LVL_TOP) && (index->last_logon + (delete_invalid * SECS_PER_REAL_DAY)) < time(0)) {
+			will_delete = TRUE;
+		}
+		// delete #2: inactive players
+		else if (delete_inactive > 0 && (index->last_logon + (delete_inactive * SECS_PER_REAL_DAY)) < time(0)) {
+			will_delete = TRUE;
+		}
+		
+		// attempt the delete
+		if (will_delete && (ch = find_or_load_player(index->name, &file))) {
+			if (!file) {
+				// EXTREMELY unlikely: they may be deletable but are actually in-game, so we skip them
+				continue;
+			}
+			
+			delete_player_character(ch);
+			free_char(ch);
+		}
+	}
 }
 
 

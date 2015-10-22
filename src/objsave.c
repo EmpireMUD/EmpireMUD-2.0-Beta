@@ -1233,7 +1233,16 @@ void Crash_listrent(char_data *ch, char *name) {
 void update_obj_file(void) {
 	player_index_data *index, *next_index;
 	
+	// don't bother
+	if (config_get_int("obj_file_timeout") <= 0) {
+		return;
+	}
+	
+	log("Deleting timed-out crash and rent files:");
+	
 	HASH_ITER(idnum_hh, player_table_by_idnum, index, next_index) {
 		Crash_clean_file(index->name);
 	}
+	
+	log("   Done.");
 }

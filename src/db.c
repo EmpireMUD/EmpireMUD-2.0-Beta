@@ -202,6 +202,7 @@ void boot_db(void) {
 	void build_player_index();
 	void check_ruined_cities();
 	void check_version();
+	void delete_old_players();
 	void delete_orphaned_rooms();
 	void init_config_system();
 	void init_skills();
@@ -286,9 +287,8 @@ void boot_db(void) {
 	Read_Invalid_List();
 
 	if (!no_rent_check) {
-		log("Deleting timed-out crash and rent files:");
+		delete_old_players();
 		update_obj_file();
-		log("   Done.");
 	}
 	
 	// this loads objs and mobs back into the world
