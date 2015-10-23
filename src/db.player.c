@@ -1008,10 +1008,6 @@ void read_player_delayed_data(FILE *fl, char_data *ch) {
 			}
 			case 'V': {
 				if (PFILE_TAG(line, "Variable:", length)) {
-					if (!SCRIPT(ch)) {
-						CREATE(SCRIPT(ch), struct script_data, 1);
-					}
-					
 					if (sscanf(line + length + 1, "%s %ld", str_in, &l_in[0]) != 2 || !get_line(fl, line)) {
 						log("SYSERR: Bad variable format in read_player_delayed_data: %s", GET_NAME(ch));
 						exit(1);
@@ -1075,6 +1071,9 @@ char_data *read_player_primary_data(FILE *fl, char *name, bool normal) {
 	clear_char(ch);
 	CREATE(ch->player_specials, struct player_special_data, 1);
 	clear_player(ch);
+	if (!SCRIPT(ch)) {
+		CREATE(SCRIPT(ch), struct script_data, 1);
+	}
 	
 	// this is now
 	ch->player.time.logon = time(0);
