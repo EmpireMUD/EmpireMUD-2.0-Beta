@@ -922,7 +922,7 @@ void read_player_delayed_data(FILE *fl, char_data *ch) {
 	struct lore_data *lore, *last_lore = NULL, *new_lore;
 	int length, i_in[3];
 	bool end = FALSE;
-	long l_in;
+	long l_in[2];
 	
 	if (!fl || !ch) {
 		log("SYSERR: read_player_delayed_data called without %s", fl ? "character" : "file");
@@ -957,15 +957,17 @@ void read_player_delayed_data(FILE *fl, char_data *ch) {
 		switch (UPPER(*line)) {
 			case 'A': {
 				if (PFILE_TAG(line, "Alias:", length)) {
-					sscanf(line + length + 1, "%d %d %d", &i_in[0], &i_in[1], &i_in[2]);
+					sscanf(line + length + 1, "%d %ld %ld", &i_in[0], &l_in[0], &l_in[1]);
 					CREATE(alias, struct alias_data, 1);
 					alias->type = i_in[0];
 					
-					fgets(line, i_in[1] + 1, fl);
+					fgets(line, l_in[0] + 2, fl);
+					line[l_in[0] + 1] = '\0';	// trailing \n
 					alias->alias = str_dup(line);
 					
 					*line = ' ';	// Doesn't need terminated, fgets() will
-					fgets(line + 1, i_in[2] + 1, fl);
+					fgets(line + 1, l_in[1] + 2, fl);
+					line[l_in[0] + 1] = '\0';	// trailing \n
 					alias->replacement = str_dup(line);
 					
 					// append to end
@@ -982,10 +984,10 @@ void read_player_delayed_data(FILE *fl, char_data *ch) {
 			}
 			case 'L': {
 				if (PFILE_TAG(line, "Lore:", length)) {
-					sscanf(line + length + 1, "%d %ld", &i_in[0], &l_in);
+					sscanf(line + length + 1, "%d %ld", &i_in[0], &l_in[0]);
 					CREATE(lore, struct lore_data, 1);
 					lore->type = i_in[0];
-					lore->date = l_in;
+					lore->date = l_in[0];
 					
 					// text on next line
 					if (get_line(fl, line)) {
