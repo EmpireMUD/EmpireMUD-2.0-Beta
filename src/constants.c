@@ -387,13 +387,13 @@ const char *grant_bits[] = {
 
 /* PLR_x */
 const char *player_bits[] = {
-	"FROZEN",
+		"UNUSED",
 	"WRITING",
 	"MAILING",
 	"DONTSET",
-	"SITEOK",
-	"MUTED",
-	"NOTITLE",
+		"UNUSED",
+		"UNUSED",
+		"UNUSED",
 		"UNUSED",
 	"LOADRM",
 	"!WIZL",
@@ -402,7 +402,7 @@ const char *player_bits[] = {
 	"IPMASK",
 	"DISGUISED",
 	"VAMPIRE",
-	"MULTI",
+		"UNUSED",
 	"NEEDS-NEWBIE-SETUP",
 	"!RESTICT",
 	"KEEP-LOGIN",
