@@ -937,8 +937,8 @@ ACMD(do_alternate) {
 			return;
 		}
 		// select ban?
-		if (isbanned(ch->desc->host) == BAN_SELECT && !PLR_FLAGGED(newch, PLR_SITEOK)) {
-			msg_to_char(ch, "Sorry, that character has not been cleared for login from your site!\r\n");
+		if (isbanned(ch->desc->host) == BAN_SELECT && !ACCOUNT_FLAGGED(newch, ACCT_SITEOK)) {
+			msg_to_char(ch, "Sorry, your account has not been cleared for login from your site!\r\n");
 			free_char(newch);
 			return;
 		}
@@ -2194,8 +2194,9 @@ ACMD(do_title) {
 
 	if (IS_NPC(ch))
 		send_to_char("Your title is fine... go away.\r\n", ch);
-	else if (PLR_FLAGGED(ch, PLR_NOTITLE))
+	else if (ACCOUNT_FLAGGED(ch, ACCT_NOTITLE)) {
 		send_to_char("You can't title yourself -- you shouldn't have abused it!\r\n", ch);
+	}
 	else if (strstr(argument, "(") || strstr(argument, ")") || strstr(argument, "%"))
 		send_to_char("Titles can't contain the (, ), or % characters.\r\n", ch);
 	else if (strlen(argument) > MAX_TITLE_LENGTH-1 || (strlen(argument) - (2 * count_color_codes(argument))) > MAX_TITLE_LENGTH_NO_COLOR) {

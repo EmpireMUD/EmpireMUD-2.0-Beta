@@ -3203,7 +3203,7 @@ ACMD(do_esay) {
 		return;
 		}
 
-	if (PLR_FLAGGED(ch, PLR_MUTED)) {
+	if (ACCOUNT_FLAGGED(ch, ACCT_MUTED)) {
 		msg_to_char(ch, "You can't use the empire channel while muted.\r\n");
 		return;
 		}

@@ -953,7 +953,8 @@ struct set_struct {
 		{ "name",		LVL_CIMPL,	PC,		MISC },
 		{ "incognito",	LVL_START_IMM,	PC,		BINARY },
 		{ "ipmask",		LVL_START_IMM,	PC,		BINARY },
-		{ "multiok",	LVL_START_IMM,	PC,		BINARY },
+		{ "multi-ip",	LVL_START_IMM,	PC,		BINARY },
+		{ "multi-char",	LVL_START_IMM,	PC,		BINARY },	// deliberately after multi-ip, which is more common
 		{ "vampire",	LVL_START_IMM,	PC, 	BINARY },
 		{ "wizhide",	LVL_START_IMM,	PC,		BINARY },
 		{ "account",	LVL_START_IMM,	PC,		MISC },
@@ -1104,13 +1105,16 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 			send_to_char("Better not -- could be a long winter!\r\n", ch);
 			return (0);
 		}
-		SET_OR_REMOVE(PLR_FLAGS(vict), PLR_FROZEN);
+		SET_OR_REMOVE(GET_ACCOUNT(vict)->flags, ACCT_FROZEN);
+		SAVE_ACCOUNT(GET_ACCOUNT(vict));
 	}
 	else if SET_CASE("muted") {
-		SET_OR_REMOVE(PLR_FLAGS(vict), PLR_MUTED);
+		SET_OR_REMOVE(GET_ACCOUNT(vict)->flags, ACCT_MUTED);
+		SAVE_ACCOUNT(GET_ACCOUNT(vict));
 	}
 	else if SET_CASE("notitle") {
-		SET_OR_REMOVE(PLR_FLAGS(vict), PLR_NOTITLE);
+		SET_OR_REMOVE(GET_ACCOUNT(vict)->flags, ACCT_NOTITLE);
+		SAVE_ACCOUNT(GET_ACCOUNT(vict));
 	}
 	else if SET_CASE("ipmask") {
 		SET_OR_REMOVE(PLR_FLAGS(vict), PLR_IPMASK);
@@ -1121,8 +1125,13 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 	else if SET_CASE("wizhide") {
 		SET_OR_REMOVE(PRF_FLAGS(vict), PRF_WIZHIDE);
 	}
-	else if SET_CASE("multiok") {
-		SET_OR_REMOVE(PLR_FLAGS(vict), PLR_MULTIOK);
+	else if SET_CASE("multi-ip") {
+		SET_OR_REMOVE(GET_ACCOUNT(vict)->flags, ACCT_MULTI_IP);
+		SAVE_ACCOUNT(GET_ACCOUNT(vict));
+	}
+	else if SET_CASE("multi-char") {
+		SET_OR_REMOVE(GET_ACCOUNT(vict)->flags, ACCT_MULTI_CHAR);
+		SAVE_ACCOUNT(GET_ACCOUNT(vict));
 	}
 	else if SET_CASE("vampire") {
 		if (IS_VAMPIRE(vict)) {
@@ -1204,7 +1213,8 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		check_autowiz(ch);
 	}
 	else if SET_CASE("siteok") {
-		SET_OR_REMOVE(PLR_FLAGS(vict), PLR_SITEOK);
+		SET_OR_REMOVE(GET_ACCOUNT(vict)->flags, ACCT_SITEOK);
+		SAVE_ACCOUNT(GET_ACCOUNT(vict));
 	}
 	else if SET_CASE("nowizlist") {
 		SET_OR_REMOVE(PLR_FLAGS(vict), PLR_NOWIZLIST);
@@ -4509,7 +4519,7 @@ ACMD(do_gecho) {
 	skip_spaces(&argument);
 	delete_doubledollar(argument);
 
-	if (!IS_NPC(ch) && PLR_FLAGGED(ch, PLR_MUTED))
+	if (!IS_NPC(ch) && ACCOUNT_FLAGGED(ch, ACCT_MUTED))
 		msg_to_char(ch, "You can't use gecho while muted.\r\n");
 	else if (!*argument)
 		send_to_char("That must be a mistake...\r\n", ch);
@@ -6440,12 +6450,12 @@ ACMD(do_wizutil) {
 	else {
 		switch (subcmd) {
 			case SCMD_NOTITLE:
-				result = PLR_TOG_CHK(vict, PLR_NOTITLE);
+				result = ((TOGGLE_BIT(GET_ACCOUNT(vict)->flags, ACCT_NOTITLE)) & ACCT_NOTITLE);
 				syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: Notitle %s for %s by %s.", ONOFF(result), GET_NAME(vict), GET_NAME(ch));
 				msg_to_char(ch, "Notitle %s for %s.\r\n", ONOFF(result), GET_NAME(vict));
 				break;
 			case SCMD_MUTE:
-				result = PLR_TOG_CHK(vict, PLR_MUTED);
+				result = ((TOGGLE_BIT(GET_ACCOUNT(vict)->flags, ACCT_MUTED)) & ACCT_MUTED);
 				syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: Mute %s for %s by %s.", ONOFF(result), GET_NAME(vict), GET_NAME(ch));
 				msg_to_char(ch, "Mute %s for %s.\r\n", ONOFF(result), GET_NAME(vict));
 				break;
@@ -6454,23 +6464,23 @@ ACMD(do_wizutil) {
 					send_to_char("Oh, yeah, THAT'S real smart...\r\n", ch);
 					return;
 				}
-				if (PLR_FLAGGED(vict, PLR_FROZEN)) {
+				if (ACCOUNT_FLAGGED(vict, ACCT_FROZEN)) {
 					send_to_char("Your victim is already pretty cold.\r\n", ch);
 					return;
 				}
-				SET_BIT(PLR_FLAGS(vict), PLR_FROZEN);
+				SET_BIT(GET_ACCOUNT(vict)->flags, ACCT_FROZEN);
 				send_to_char("A bitter wind suddenly rises and drains every erg of heat from your body!\r\nYou feel frozen!\r\n", vict);
 				send_to_char("Frozen.\r\n", ch);
 				act("A sudden cold wind conjured from nowhere freezes $n!", FALSE, vict, 0, 0, TO_ROOM);
 				syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s frozen by %s.", GET_NAME(vict), GET_NAME(ch));
 				break;
 			case SCMD_THAW:
-				if (!PLR_FLAGGED(vict, PLR_FROZEN)) {
+				if (!ACCOUNT_FLAGGED(vict, ACCT_FROZEN)) {
 					send_to_char("Sorry, your victim is not morbidly encased in ice at the moment.\r\n", ch);
 					return;
 				}
 				syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s un-frozen by %s.", GET_NAME(vict), GET_NAME(ch));
-				REMOVE_BIT(PLR_FLAGS(vict), PLR_FROZEN);
+				REMOVE_BIT(GET_ACCOUNT(vict)->flags, ACCT_FROZEN);
 				send_to_char("A fireball suddenly explodes in front of you, melting the ice!\r\nYou feel thawed.\r\n", vict);
 				send_to_char("Thawed.\r\n", ch);
 				act("A sudden fireball conjured from nowhere thaws $n!", FALSE, vict, 0, 0, TO_ROOM);
@@ -6479,6 +6489,7 @@ ACMD(do_wizutil) {
 				log("SYSERR: Unknown subcmd %d passed to do_wizutil (%s)", subcmd, __FILE__);
 				break;
 		}
+		SAVE_ACCOUNT(GET_ACCOUNT(vict));
 		SAVE_CHAR(vict);
 	}
 }

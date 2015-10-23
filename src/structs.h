@@ -1316,15 +1316,15 @@ typedef struct trig_data trig_data;
 #define OFFER_SUMMON  1
 
 
-/* Player flags: used by char_data.char_specials.act */
-#define PLR_FROZEN		BIT(0)	/* Player is frozen						*/
+// PLR_x: Player flags: used by char_data.char_specials.act
+	#define PLR_UNUSED1		BIT(0)
 #define PLR_WRITING		BIT(1)	/* Player writing (board/mail)			*/
 #define PLR_MAILING		BIT(2)	/* Player is writing mail				*/
 #define PLR_DONTSET		BIT(3)	/* Don't EVER set (ISNPC bit)			*/
-#define PLR_SITEOK		BIT(4)	/* Player has been site-cleared			*/
-#define PLR_MUTED		BIT(5)	/* Player not allowed to use pub_comm	*/
-#define PLR_NOTITLE		BIT(6)	/* Player not allowed to set title		*/
-	#define PLR_UNUSED1		BIT(7)
+	#define PLR_UNUSED2		BIT(4)
+	#define PLR_UNUSED3		BIT(5)	// these were flags that got moved to ACCT_x
+	#define PLR_UNUSED4		BIT(6)
+	#define PLR_UNUSED5		BIT(7)
 #define PLR_LOADROOM	BIT(8)	/* Player uses nonstandard loadroom		*/
 #define PLR_NOWIZLIST	BIT(9)	/* Player shouldn't be on wizlist		*/
 #define PLR_NODELETE	BIT(10)	/* Player shouldn't be deleted			*/
@@ -1332,7 +1332,7 @@ typedef struct trig_data trig_data;
 #define PLR_IPMASK		BIT(12)	/* Player is IP-masked					*/
 #define PLR_DISGUISED	BIT(13)	// Player is using a disguise
 #define PLR_VAMPIRE		BIT(14)	/* Player is a vampire					*/
-#define PLR_MULTIOK		BIT(15)	/* Player can multiplay					*/
+	#define PLR_UNUSED6		BIT(15)
 #define PLR_NEEDS_NEWBIE_SETUP  BIT(16)  // player is created but needs gear and setup
 #define PLR_UNRESTRICT	BIT(17)	/* !walls, !buildings					*/
 #define PLR_KEEP_LAST_LOGIN_INFO  BIT(18)	// in case of players loaded into the game, does not overwrite their playtime or last login info if stored

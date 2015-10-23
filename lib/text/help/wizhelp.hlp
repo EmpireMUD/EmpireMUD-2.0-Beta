@@ -750,7 +750,8 @@ thirst         BOTH    MISC         Thirst level
 frozen         PC      BINARY       Player is frozen
 incognito      PC      BINARY       Turns on/off incognito mode (imms only)
 ipmask         PC      BINARY       IP address is hidden
-multiok        PC      BINARY       Can multi-play
+multi-ip       PC      BINARY       Can log in more than 1 account per IP
+multi-char     PC      BINARY       Can log in more than 1 char per account
 muted          PC      BINARY       Player is muted
 nodelete       PC      BINARY       Can't be deleted
 noidleout      PC      BINARY       Won't idle out

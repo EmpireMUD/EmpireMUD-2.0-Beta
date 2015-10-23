@@ -2407,9 +2407,13 @@ void autowiz_cleanup(void) {
 */
 void autowiz_read_players(void) {
 	player_index_data *index, *next_index;
+	account_data *acct;
 	
 	HASH_ITER(name_hh, player_table_by_name, index, next_index) {
-		if (IS_SET(index->plr_flags, PLR_NOWIZLIST | PLR_FROZEN)) {
+		if (IS_SET(index->plr_flags, PLR_NOWIZLIST)) {
+			continue;
+		}
+		if ((acct = find_account(index->account_id)) && IS_SET(acct->flags, ACCT_FROZEN)) {
 			continue;
 		}
 		if (index->access_level < AUTOWIZ_MIN_LEVEL) {
@@ -3117,8 +3121,8 @@ void start_new_character(char_data *ch) {
 
 	/* Default Flags */
 	SET_BIT(PRF_FLAGS(ch), PRF_MORTLOG);
-	if (config_get_bool("siteok_everyone")) {
-		SET_BIT(PLR_FLAGS(ch), PLR_SITEOK);
+	if (GET_ACCOUNT(ch) && config_get_bool("siteok_everyone")) {
+		SET_BIT(GET_ACCOUNT(ch)->flags, ACCT_SITEOK);
 	}
 	
 	// store host if possible

@@ -291,7 +291,7 @@ ACMD(do_pub_comm) {
 	if (AFF_FLAGGED(ch, AFF_CHARM) && !ch->desc) {
 		msg_to_char(ch, "You can't %s.\r\n", pub_comm[subcmd].name);
 	}
-	else if (PLR_FLAGGED(ch, PLR_MUTED)) {
+	else if (ACCOUNT_FLAGGED(ch, ACCT_MUTED)) {
 		msg_to_char(ch, "You are muted and can't use the %s channel.\r\n", pub_comm[subcmd].name);
 	}
 	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_SILENT) && pub_comm[subcmd].type != PUB_COMM_OOC) {
@@ -606,7 +606,7 @@ void speak_on_slash_channel(char_data *ch, struct slash_channel *chan, char *arg
 	char color;
 	bool emote = FALSE;
 
-	if (PLR_FLAGGED(ch, PLR_MUTED)) {
+	if (ACCOUNT_FLAGGED(ch, ACCT_MUTED)) {
 		msg_to_char(ch, "You can't do that while muted.\r\n");
 		return;
 	}

@@ -1094,7 +1094,7 @@ void command_interpreter(char_data *ch, char *argument) {
 		// otherwise, no match
 		send_config_msg(ch, "huh_string");
 	}
-	else if (!IS_NPC(ch) && PLR_FLAGGED(ch, PLR_FROZEN))
+	else if (!IS_NPC(ch) && ACCOUNT_FLAGGED(ch, ACCT_FROZEN))
 		send_to_char("You try, but the mind-numbing cold prevents you...\r\n", ch);
 	else if (IS_SET(cmd_info[cmd].flags, CMD_NOT_RP) && !IS_NPC(ch) && !IS_GOD(ch) && !IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_RP)) {
 		msg_to_char(ch, "You can't do that while role-playing!\r\n");
@@ -1839,22 +1839,25 @@ void start_creation_process(descriptor_data *d) {
 bool check_multiplaying(descriptor_data *d) {
 	descriptor_data *c;
 	bool ok = TRUE;
-
-	if (IS_IMMORTAL(d->character))
+	
+	if (ACCOUNT_FLAGGED(d->character, ACCT_MULTI_CHAR)) {
 		return TRUE;
-
-	if (PLR_FLAGGED(d->character, PLR_MULTIOK | PLR_IPMASK))
-		return TRUE;
-
+	}
+	
 	/* Check for connected players with identical hosts */
-	for (c = descriptor_list; c; c = c->next) {
-		if (c != d && STATE(c) == CON_PLAYING && !PLR_FLAGGED(c->character, PLR_MULTIOK) && GET_IDNUM(c->character) != GET_IDNUM(d->character)) {
-			if (!str_cmp(c->host, d->host) || GET_ACCOUNT(d->character) == GET_ACCOUNT(c->character)) {
-				ok = FALSE;
-			}
+	for (c = descriptor_list; c && ok; c = c->next) {
+		if (c == d || STATE(c) != CON_PLAYING || GET_IDNUM(c->character) == GET_IDNUM(d->character)) {
+			continue;
+		}
+		
+		if (!ACCOUNT_FLAGGED(d->character, ACCT_MULTI_CHAR) && GET_ACCOUNT(d->character) == GET_ACCOUNT(c->character)) {
+			ok = FALSE;
+		}
+		else if (!ACCOUNT_FLAGGED(d->character, ACCT_MULTI_IP | ACCT_MULTI_CHAR) && !PLR_FLAGGED(d->character, PLR_IPMASK) && !strcmp(c->host, d->host)) {
+			ok = FALSE;
 		}
 	}
-
+	
 	return ok;
 }
 
@@ -2238,8 +2241,8 @@ void nanny(descriptor_data *d, char *arg) {
 				GET_BAD_PWS(d->character) = 0;
 				d->bad_pws = 0;
 
-				if (isbanned(d->host) == BAN_SELECT && !PLR_FLAGGED(d->character, PLR_SITEOK)) {
-					SEND_TO_Q("Sorry, this character has not been cleared for login from your site!\r\n", d);
+				if (isbanned(d->host) == BAN_SELECT && !ACCOUNT_FLAGGED(d->character, ACCT_SITEOK)) {
+					SEND_TO_Q("Sorry, this account has not been cleared for login from your site!\r\n", d);
 					STATE(d) = CON_CLOSE;
 					syslog(SYS_LOGIN, 0, TRUE, "Connection attempt for %s denied from %s", GET_NAME(d->character), d->host);
 					return;

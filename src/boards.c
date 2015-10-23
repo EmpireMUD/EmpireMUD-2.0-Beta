@@ -142,7 +142,7 @@ ACMD(do_write) {
 		log("SYSERR:  degenerate board!  (what the hell...)");
 		msg_to_char(ch, "There's no board here.\r\n");
 	}
-	else if (PLR_FLAGGED(ch, PLR_MUTED))
+	else if (ACCOUNT_FLAGGED(ch, ACCT_MUTED))
 		msg_to_char(ch, "You can't write on boards while muted.\r\n");
 	else if (!Board_write_message(board_type, ch, argument, board))
 		msg_to_char(ch, "There's no board here.\r\n");
@@ -216,7 +216,7 @@ ACMD(do_respond) {
 		log("SYSERR:  degenerate board!  (what the hell...)");
 		msg_to_char(ch, "There's no board here.\r\n");
 	}
-	else if (PLR_FLAGGED(ch, PLR_MUTED))
+	else if (ACCOUNT_FLAGGED(ch, ACCT_MUTED))
 		msg_to_char(ch, "You can't write on boards while muted.\r\n");
 	else if (!Board_respond_message(board_type, ch, argument, board))
 		msg_to_char(ch, "There's no board here.\r\n");
