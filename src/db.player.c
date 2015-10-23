@@ -2579,11 +2579,6 @@ void delete_player_character(char_data *ch) {
 	// various file deletes
 	Crash_delete_file(GET_NAME(ch));
 	delete_variables(GET_NAME(ch));
-	if (get_filename(GET_NAME(ch), filename, ALIAS_FILE)) {
-		if (remove(filename) < 0 && errno != ENOENT) {
-			log("SYSERR: deleting alias file %s: %s", filename, strerror(errno));
-		}
-	}
 	if (get_filename(GET_NAME(ch), filename, PLR_FILE)) {
 		if (remove(filename) < 0 && errno != ENOENT) {
 			log("SYSERR: deleting player file %s: %s", filename, strerror(errno));

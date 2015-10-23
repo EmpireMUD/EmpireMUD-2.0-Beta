@@ -821,14 +821,12 @@ void auto_equip(char_data *ch, obj_data *obj, int *location) {
 */
 void Crash_save_all(void) {
 	void Objsave_char(char_data *ch, int rent_code);
-	void write_aliases(char_data *ch);
 
 	descriptor_data *d;
 
 	for (d = descriptor_list; d; d = d->next) {
 		if ((STATE(d) == CON_PLAYING) && !IS_NPC(d->character)) {
 			Objsave_char(d->character, RENT_CRASH);
-			write_aliases(d->character);
 			SAVE_CHAR(d->character);
 		}
 	}

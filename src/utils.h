@@ -1251,5 +1251,4 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options);
 // get_filename()
 #define CRASH_FILE  0
 #define PLR_FILE  1
-#define ALIAS_FILE  2
-#define SCRIPT_VARS_FILE  3
+#define SCRIPT_VARS_FILE  2

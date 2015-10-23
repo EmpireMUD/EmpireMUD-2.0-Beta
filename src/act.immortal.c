@@ -1470,11 +1470,6 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		sprintf(buf, "rm -f %s", buf2);
 		system(buf);
 		rename(buf1, buf2);
-		get_filename(oldname, buf1, ALIAS_FILE);
-		get_filename(GET_NAME(vict), buf2, ALIAS_FILE);
-		sprintf(buf, "rm -f %s", buf2);
-		system(buf);
-		rename(buf1, buf2);
 		
 		SAVE_CHAR(vict);
 		sprintf(output, "%s's name changed to %s.", oldname, GET_NAME(vict));

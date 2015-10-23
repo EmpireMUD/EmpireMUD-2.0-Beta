@@ -1318,7 +1318,6 @@ int perform_alias(descriptor_data *d, char *orig) {
 /* The interface to the outside world: do_alias */
 ACMD(do_alias) {
 	extern char *show_color_codes(char *string);
-	void write_aliases(char_data *ch);
 	
 	char *repl;
 	struct alias_data *a, *temp;
@@ -1353,7 +1352,6 @@ ACMD(do_alias) {
 			}
 			else {
 				send_to_char("Alias deleted.\r\n", ch);
-				write_aliases(ch);
 			}
 		}
 		else {			/* otherwise, either add or redefine an alias */
@@ -1372,7 +1370,6 @@ ACMD(do_alias) {
 			a->next = GET_ALIASES(ch);
 			GET_ALIASES(ch) = a;
 			send_to_char("Alias added.\r\n", ch);
-			write_aliases(ch);
 		}
 	}
 }

@@ -40,14 +40,12 @@
 #define LIB_PLAYERS  "players/"
 #define LIB_PLROBJS  "plrobjs/"
 #define LIB_PLRVARS  "plrvars/"
-#define LIB_PLRALIAS  "plralias/"
 #define LIB_OBJPACK  "packs/"
 #define LIB_EMPIRE  "empires/"
 
 
 // file suffixes for common write files
 #define SUF_OBJS  "objs"
-#define SUF_ALIAS  "alias"
 #define SUF_MEM  "mem"
 #define SUF_PACK  "pack"
 #define SUF_PLR  "plr"

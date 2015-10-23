@@ -1762,14 +1762,11 @@ ACMD(do_quit) {
 
 
 ACMD(do_save) {
-	void write_aliases(char_data *ch);
-
 	if (!IS_NPC(ch) && ch->desc) {
 		if (cmd) {
 			msg_to_char(ch, "Saving %s.\r\n", GET_NAME(ch));
 		}
 		
-		write_aliases(ch);
 		GET_LAST_KNOWN_LEVEL(ch) = GET_COMPUTED_LEVEL(ch);
 		SAVE_CHAR(ch);
 		Objsave_char(ch, RENT_CRASH);

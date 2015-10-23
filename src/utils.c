@@ -1237,7 +1237,7 @@ int land_can_claim(empire_data *emp, bool outside_only) {
 *
 * @param char *orig_name The player name.
 * @param char *filename A variable to write the filename to.
-* @param int mode CRASH_FILE, ALIAS_FILE, etc.
+* @param int mode CRASH_FILE, etc.
 * @return int 1=success, 0=fail
 */
 int get_filename(char *orig_name, char *filename, int mode) {
@@ -1258,10 +1258,6 @@ int get_filename(char *orig_name, char *filename, int mode) {
 		case CRASH_FILE:
 			prefix = LIB_PLROBJS;
 			suffix = SUF_OBJS;
-			break;
-		case ALIAS_FILE:
-			prefix = LIB_PLRALIAS;
-			suffix = SUF_ALIAS;
 			break;
 		case SCRIPT_VARS_FILE:
 			prefix = LIB_PLRVARS;
