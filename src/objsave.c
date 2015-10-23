@@ -585,6 +585,10 @@ void loaded_obj_to_char(obj_data *obj, char_data *ch, int location) {
 		return;
 	}
 	
+	for (iter = 0; iter < MAX_BAG_ROWS; ++iter) {
+		cont_row[iter] = NULL;
+	}
+	
 	auto_equip(ch, obj, &location);
 	/*
 	 * What to do with a new loaded item:
