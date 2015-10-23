@@ -1259,10 +1259,6 @@ int get_filename(char *orig_name, char *filename, int mode) {
 			prefix = LIB_PLROBJS;
 			suffix = SUF_OBJS;
 			break;
-		case SCRIPT_VARS_FILE:
-			prefix = LIB_PLRVARS;
-			suffix = SUF_MEM;
-			break;
 		default:
 			return (0);
 	}

@@ -279,17 +279,6 @@ void copy_proto_script(void *source, void *dest, int type) {
 }
 
 
-void delete_variables(const char *charname) {
-	char filename[PATH_MAX];
-
-	if (!get_filename((char*)charname, filename, SCRIPT_VARS_FILE))
-		return;
-
-	if (remove(filename) < 0 && errno != ENOENT)
-		log("SYSERR: deleting variable file %s: %s", filename, strerror(errno));
-}
-
-
 // I don't believe this is used any more... it was required before the world was a hash table, when we had to copy the world
 void update_wait_events(room_data *to, room_data *from) {
 	trig_data *trig;

@@ -56,7 +56,7 @@ void clear_player(char_data *ch);
 void delete_player_character(char_data *ch);
 static bool member_is_timed_out(time_t created, time_t last_login, double played_hours);
 void read_player_delayed_data(FILE *fl, char_data *ch);
-char_data *read_player_from_file(FILE *fl, char *name, bool normal);
+char_data *read_player_primary_data(FILE *fl, char *name, bool normal);
 int sort_players_by_idnum(player_index_data *a, player_index_data *b);
 int sort_players_by_name(player_index_data *a, player_index_data *b);
 void write_player_to_file(FILE *fl, char_data *ch);
@@ -899,7 +899,7 @@ char_data *load_player(char *name, bool normal) {
 		return NULL;
 	}
 	
-	ch = read_player_from_file(fl, name, normal);
+	ch = read_player_primary_data(fl, name, normal);
 	GET_DELAYED_LOAD_FILE(ch) = fl;
 	
 	// do not close the file now
@@ -917,7 +917,7 @@ char_data *load_player(char *name, bool normal) {
 * @param char_data *ch The already-loaded character to finish loading into.
 */
 void read_player_delayed_data(FILE *fl, char_data *ch) {
-	char line[MAX_STRING_LENGTH];
+	char line[MAX_STRING_LENGTH], str_in[MAX_INPUT_LENGTH];
 	struct alias_data *alias, *last_alias = NULL;
 	struct lore_data *lore, *last_lore = NULL, *new_lore;
 	int length, i_in[3];
@@ -944,7 +944,7 @@ void read_player_delayed_data(FILE *fl, char_data *ch) {
 	
 	while (!end) {
 		if (!get_line(fl, line)) {
-			log("SYSERR: Unexpected end of player file in read_player_from_file");
+			log("SYSERR: Unexpected end of player file in read_player_delayed_data: %s", GET_NAME(ch));
 			exit(1);
 		}
 		
@@ -1006,6 +1006,21 @@ void read_player_delayed_data(FILE *fl, char_data *ch) {
 				BAD_TAG_WARNING(line);
 				break;
 			}
+			case 'V': {
+				if (PFILE_TAG(line, "Variable:", length)) {
+					if (!SCRIPT(ch)) {
+						CREATE(SCRIPT(ch), struct script_data, 1);
+					}
+					
+					if (sscanf(line + length + 1, "%s %ld", str_in, &l_in[0]) != 2 || !get_line(fl, line)) {
+						log("SYSERR: Bad variable format in read_player_delayed_data: %s", GET_NAME(ch));
+						exit(1);
+					}
+					add_var(&(SCRIPT(ch)->global_vars), str_in, line, l_in[0]);
+				}
+				BAD_TAG_WARNING(line);
+				break;
+			}
 			
 			// log maybe
 			default: {
@@ -1039,7 +1054,7 @@ void read_player_delayed_data(FILE *fl, char_data *ch) {
 * @param bool normal Always pass TRUE except during startup (won't link index/account if FALSE).
 * @return char_data* The loaded character.
 */
-char_data *read_player_from_file(FILE *fl, char *name, bool normal) {
+char_data *read_player_primary_data(FILE *fl, char *name, bool normal) {
 	char line[MAX_INPUT_LENGTH], error[MAX_STRING_LENGTH], str_in[MAX_INPUT_LENGTH];
 	struct slash_channel *slash, *last_slash = NULL;
 	int account_id = NOTHING, ignore_pos = 0, reward_pos = 0;
@@ -1065,14 +1080,14 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal) {
 	ch->player.time.logon = time(0);
 	
 	// for fread_string
-	sprintf(error, "read_player_from_file: %s", name);
+	sprintf(error, "read_player_primary_data: %s", name);
 	
 	// for more readable if/else chain
 	#define BAD_TAG_WARNING(src)  else if (LOG_BAD_TAG_WARNINGS) { log("SYSERR: Bad tag in player '%s': %s", NULLSAFE(GET_PC_NAME(ch)), (src)); }
 
 	while (!end) {
 		if (!get_line(fl, line)) {
-			log("SYSERR: Unexpected end of player file in read_player_from_file");
+			log("SYSERR: Unexpected end of player file in read_player_primary_data: %s", name);
 			exit(1);
 		}
 		
@@ -1638,8 +1653,6 @@ void remove_player_from_table(player_index_data *plr) {
  * @param room_data *load_room (Optional) The location that the player will reappear on reconnect.
  */
 void save_char(char_data *ch, room_data *load_room) {
-	void save_char_vars(char_data *ch);
-	
 	char filename[256], tempname[256];
 	player_index_data *index;
 	room_data *map;
@@ -1681,9 +1694,6 @@ void save_char(char_data *ch, room_data *load_room) {
 	
 	fclose(fl);
 	rename(tempname, filename);
-	
-	// additional data to save
-	save_char_vars(ch);
 	
 	// update the index in case any of this changed
 	index = find_player_index_by_idnum(GET_IDNUM(ch));
@@ -1784,6 +1794,7 @@ void write_player_to_file(FILE *fl, char_data *ch) {
 	struct slash_channel *channel;
 	obj_data *char_eq[NUM_WEARS];
 	char temp[MAX_STRING_LENGTH];
+	struct trig_var_data *vars;
 	struct cooldown_data *cool;
 	struct alias_data *alias;
 	struct offer_data *offer;
@@ -2128,6 +2139,16 @@ void write_player_to_file(FILE *fl, char_data *ch) {
 	for (lore = GET_LORE(ch); lore; lore = lore->next) {
 		if (lore->text && *lore->text) {
 			fprintf(fl, "Lore: %d %ld\n%s\n", lore->type, lore->date, lore->text);
+		}
+	}
+	
+	if (SCRIPT(ch) && SCRIPT(ch)->global_vars) {
+		for (vars = SCRIPT(ch)->global_vars; vars; vars = vars->next) {
+			if (*vars->name == '-') { // don't save if it begins with -
+				continue;
+			}
+			
+			fprintf(fl, "Variable: %s %ld\n%s\n", vars->name, vars->context, vars->value);
 		}
 	}
 	
@@ -2580,7 +2601,6 @@ void delete_player_character(char_data *ch) {
 	
 	// various file deletes
 	Crash_delete_file(GET_NAME(ch));
-	delete_variables(GET_NAME(ch));
 	if (get_filename(GET_NAME(ch), filename, PLR_FILE)) {
 		if (remove(filename) < 0 && errno != ENOENT) {
 			log("SYSERR: deleting player file %s: %s", filename, strerror(errno));
@@ -2610,7 +2630,6 @@ int enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	extern int Objload_char(char_data *ch, int dolog);
 	extern room_data *find_home(char_data *ch);
 	extern room_data *find_load_room(char_data *ch);
-	void read_saved_vars(char_data *ch);
 	
 	extern bool global_mute_slash_channel_joins;
 
@@ -2802,7 +2821,6 @@ int enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 
 	// script/trigger stuff
 	GET_ID(ch) = GET_IDNUM(ch);
-	read_saved_vars(ch);
 	greet_mtrigger(ch, NO_DIR);
 	greet_memory_mtrigger(ch);
 	add_to_lookup_table(GET_ID(ch), (void *)ch);

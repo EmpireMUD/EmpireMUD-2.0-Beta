@@ -5770,8 +5770,6 @@ ACMD(do_snoop) {
 
 
 ACMD(do_stat) {
-	void read_saved_vars(char_data *ch);
-	
 	char_data *victim = NULL;
 	crop_data *cp;
 	obj_data *obj;
@@ -5854,9 +5852,6 @@ ACMD(do_stat) {
 			send_to_char("Sorry, you can't do that.\r\n", ch);
 		}
 		else {
-			if (file) {
-				read_saved_vars(victim);
-			}
 			do_stat_character(ch, victim);
 		}
 		

@@ -253,7 +253,6 @@ void free_trigger(trig_data *trig);
 void copy_proto_script(void *source, void *dest, int type);
 void copy_script(void *source, void *dest, int type);
 void trig_data_copy(trig_data *this_data, const trig_data *trg);
-void delete_variables(const char *charname);
 
 trig_data *read_trigger(int nr);
 void add_var(struct trig_var_data **var_list, char *name, char *value, int id);
