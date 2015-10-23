@@ -380,6 +380,7 @@ const char *grant_bits[] = {
 	"slay",
 	"island",	// 35
 	"oset",
+	"playerdelete",
 	"\n"
 };
 

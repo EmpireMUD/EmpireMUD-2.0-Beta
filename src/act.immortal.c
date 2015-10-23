@@ -4987,6 +4987,81 @@ ACMD(do_oset) {
 }
 
 
+ACMD(do_playerdelete) {
+	void delete_player_character(char_data *ch);
+	void Objsave_char(char_data *ch, int rent_code);
+	
+	descriptor_data *desc, *next_desc;
+	char name[MAX_INPUT_LENGTH];
+	char_data *victim = NULL;
+	bool file = FALSE;
+	
+	argument = any_one_arg(argument, name);
+	skip_spaces(&argument);
+	
+	if (!*argument || !*name) {
+		msg_to_char(ch, "Usage: playerdelete <name> CONFIRM\r\n");
+	}
+	else if (!(victim = find_or_load_player(name, &file))) {
+		msg_to_char(ch, "Unknown player '%s'.\r\n", name);
+	}
+	else if (GET_ACCESS_LEVEL(victim) >= GET_ACCESS_LEVEL(ch)) {
+		msg_to_char(ch, "No, no, no, no, no, no, no.\r\n");
+	}
+	else if (PLR_FLAGGED(victim, PLR_NODELETE)) {
+		msg_to_char(ch, "You cannot delete that player because of a !DEL player flag.\r\n");
+	}
+	else if (strcmp(argument, "CONFIRM")) {
+		msg_to_char(ch, "You must type the word CONFIRM, in all caps, after the target name.\r\n");
+		msg_to_char(ch, "WARNING: This will permanently delete the character.\r\n");
+	}
+	else {
+		// logs and messaging
+		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has deleted player %s.", GET_NAME(ch), GET_NAME(victim));
+		if (!file) {
+			if (!GET_INVIS_LEV(victim)) {
+				act("$n has left the game.", TRUE, victim, FALSE, FALSE, TO_ROOM);
+			}
+			if (GET_INVIS_LEV(victim) == 0) {
+				if (config_get_bool("public_logins")) {
+					mortlog("%s has left the game", PERS(victim, victim, TRUE));
+				}
+				else if (GET_LOYALTY(victim)) {
+					log_to_empire(GET_LOYALTY(victim), ELOG_LOGINS, "%s has left the game", PERS(victim, victim, TRUE));
+				}
+			}
+			msg_to_char(victim, "Your character has been deleted. Goodbye...\r\n");
+		}
+		
+		// look for this character at a menu, in case
+		for (desc = descriptor_list; desc; desc = next_desc) {
+			next_desc = desc->next;
+			
+			if (desc->character && desc->character != victim && GET_IDNUM(desc->character) == GET_IDNUM(victim)) {
+				msg_to_desc(desc, "Your character has been deleted. Goodbye...\r\n");
+				if (STATE(desc) == CON_PLAYING) {
+					STATE(desc) = CON_DISCONNECT;
+				}
+				else {
+					STATE(desc) = CON_CLOSE;
+				}
+			}
+		}
+		
+		// actual delete (rent out equipment first)
+		Objsave_char(victim, RENT_RENTED);
+		delete_player_character(victim);
+		extract_char(victim);
+		victim = NULL;	// prevent cleanup
+	}
+	
+	// cleanup
+	if (victim && file) {
+		free_char(victim);
+	}
+}
+
+
 ACMD(do_poofset) {
 	char **msg;
 	

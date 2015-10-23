@@ -547,6 +547,19 @@ Do not abuse this command.
 
 See also: GRANT
 #d
+PLAYERDELETE "PLAYER DELETE" "DELETE PLAYER"
+
+Usage:  playerdelete <name> CONFIRM
+
+This command deletes a player completely. It cannot be used on players with
+the !DEL flag set. There is no way to undo this command (unless your EmpireMUD
+keeps backups of mud files). You must type the word 'CONFIRM' as the second
+argument, in all capital letters. This command also cannot be abbreviated.
+
+This command is grantable.
+
+See also: GRANT, SELFDELETE
+#d
 POOFIN POOFOUT
 
 Usage:  poofin <message | none>
