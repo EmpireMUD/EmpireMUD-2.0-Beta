@@ -274,6 +274,11 @@ typedef struct trig_data trig_data;
 #define NUM_INTERACTS  13
 
 
+// for object saving
+#define LOC_INVENTORY	0
+#define MAX_BAG_ROWS	5
+
+
 // for the shipping system
 #define SHIPPING_QUEUED  0	// waiting for a ship
 #define SHIPPING_EN_ROUTE  1	// waiting to deliver
@@ -1364,12 +1369,6 @@ typedef struct trig_data trig_data;
 #define PRF_SCREEN_READER  BIT(25)	// player is visually impaired and using a screen reader that can't read the map
 #define PRF_STEALTHABLE  BIT(26)	// player can steal (rather than be prevented from accidentally stealing)
 #define PRF_WIZHIDE  BIT(27)	// player can't be seen in the room
-
-
-// Rent codes
-#define RENT_UNDEF  0
-#define RENT_CRASH  1
-#define RENT_RENTED  2
 
 
 // group roles for classes

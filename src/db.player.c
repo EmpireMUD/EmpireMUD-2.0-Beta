@@ -684,6 +684,9 @@ void free_char(char_data *ch) {
 		leave_group(ch);
 	}
 	
+	// clean up gear/items, if any
+	extract_all_items(ch);
+	
 	proto = IS_NPC(ch) ? mob_proto(GET_MOB_VNUM(ch)) : NULL;
 
 	if (IS_NPC(ch)) {
@@ -911,17 +914,22 @@ char_data *load_player(char *name, bool normal) {
 /**
 * This function loads the secondary data for a character. This is data that
 * isn't needed for many simple loads. The open file is the player file after
-* the "End Primary Data" tag.
+* the "End Primary Data" tag, and it reads until "End Player File"
 *
 * @param FILE *fl The file to load.
 * @param char_data *ch The already-loaded character to finish loading into.
 */
 void read_player_delayed_data(FILE *fl, char_data *ch) {
+	void loaded_obj_to_char(obj_data *obj, char_data *ch, int location);
+	extern obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify);
+
 	char line[MAX_STRING_LENGTH], str_in[MAX_INPUT_LENGTH];
 	struct alias_data *alias, *last_alias = NULL;
+	struct coin_data *coin, *last_coin = NULL;
 	struct lore_data *lore, *last_lore = NULL, *new_lore;
 	int length, i_in[3];
 	bool end = FALSE;
+	obj_data *obj;
 	long l_in[2];
 	
 	if (!fl || !ch) {
@@ -948,13 +956,20 @@ void read_player_delayed_data(FILE *fl, char_data *ch) {
 			exit(1);
 		}
 		
-		if (PFILE_TAG(line, "End", length)) {
+		if (PFILE_TAG(line, "End Player File", length)) {
 			end = TRUE;
 			continue;
 		}
 		
 		// normal tags by letter
 		switch (UPPER(*line)) {
+			case '#': {	// an item
+				sscanf(line, "#%d", &i_in[0]);
+				if ((obj = Obj_load_from_file(fl, i_in[0], &i_in[1], ch->desc ? ch : NULL))) {
+					loaded_obj_to_char(obj, ch, i_in[1]);
+				}
+				break;
+			}
 			case 'A': {
 				if (PFILE_TAG(line, "Alias:", length)) {
 					sscanf(line + length + 1, "%d %ld %ld", &i_in[0], &l_in[0], &l_in[1]);
@@ -982,6 +997,27 @@ void read_player_delayed_data(FILE *fl, char_data *ch) {
 				BAD_TAG_WARNING(line);
 				break;
 			}
+			case 'C': {
+				if (PFILE_TAG(line, "Coin:", length)) {
+					sscanf(line + length + 1, "%d %d %ld", &i_in[0], &i_in[1], &l_in[0]);
+					
+					CREATE(coin, struct coin_data, 1);
+					coin->amount = i_in[0];
+					coin->empire_id = i_in[1];
+					coin->last_acquired = (time_t)l_in[0];
+					
+					// add to end
+					if (last_coin) {
+						last_coin->next = coin;
+					}
+					else {
+						GET_PLAYER_COINS(ch) = coin;
+					}
+					last_coin = coin;
+				}
+				BAD_TAG_WARNING(line);
+				break;
+			}
 			case 'L': {
 				if (PFILE_TAG(line, "Lore:", length)) {
 					sscanf(line + length + 1, "%d %ld", &i_in[0], &l_in[0]);
@@ -1002,6 +1038,16 @@ void read_player_delayed_data(FILE *fl, char_data *ch) {
 						GET_LORE(ch) = lore;
 					}
 					last_lore = lore;
+				}
+				BAD_TAG_WARNING(line);
+				break;
+			}
+			case 'R': {
+				if (PFILE_TAG(line, "Rent-code:", length)) {
+					// old data; ignore
+				}
+				else if (PFILE_TAG(line, "Rent-time:", length)) {
+					// old data; ignore
 				}
 				BAD_TAG_WARNING(line);
 				break;
@@ -1731,6 +1777,7 @@ int sort_players_by_name(player_index_data *a, player_index_data *b) {
 */
 void store_loaded_char(char_data *ch) {
 	save_char(ch, real_room(GET_LOADROOM(ch)));
+	extract_all_items(ch);
 	free_char(ch);
 }
 
@@ -1784,6 +1831,7 @@ void update_player_index(player_index_data *index, char_data *ch) {
 * @param char_data *ch The player to write.
 */
 void write_player_to_file(FILE *fl, char_data *ch) {
+	void Crash_save(obj_data *obj, FILE *fp, int location);
 	extern struct slash_channel *find_slash_channel_by_id(int id);
 	
 	struct affected_type *af, *new_af, *next_af, *af_list;
@@ -1797,6 +1845,7 @@ void write_player_to_file(FILE *fl, char_data *ch) {
 	struct cooldown_data *cool;
 	struct alias_data *alias;
 	struct offer_data *offer;
+	struct coin_data *coin;
 	struct lore_data *lore;
 	int iter;
 	
@@ -2131,16 +2180,24 @@ void write_player_to_file(FILE *fl, char_data *ch) {
 	// END MAIN TAGS: the rest of the data is delay-loaded
 	fprintf(fl, "End Primary Data\n");
 	
+	// delayed: alias
 	for (alias = GET_ALIASES(ch); alias; alias = alias->next) {
 		fprintf(fl, "Alias: %d %ld %ld\n%s\n%s\n", alias->type, strlen(alias->alias), strlen(alias->replacement)-1, alias->alias, alias->replacement + 1);
 	}
 	
+	// delayed: coin
+	for (coin = GET_PLAYER_COINS(ch); coin; coin = coin->next) {
+		fprintf(fl, "Coin: %d %d %ld\n", coin->amount, coin->empire_id, coin->last_acquired);
+	}
+	
+	// delayed: lore
 	for (lore = GET_LORE(ch); lore; lore = lore->next) {
 		if (lore->text && *lore->text) {
 			fprintf(fl, "Lore: %d %ld\n%s\n", lore->type, lore->date, lore->text);
 		}
 	}
 	
+	// delayed: script variables
 	if (SCRIPT(ch) && SCRIPT(ch)->global_vars) {
 		for (vars = SCRIPT(ch)->global_vars; vars; vars = vars->next) {
 			if (*vars->name == '-') { // don't save if it begins with -
@@ -2151,8 +2208,18 @@ void write_player_to_file(FILE *fl, char_data *ch) {
 		}
 	}
 	
+	// delayed: equipment
+	for (iter = 0; iter < NUM_WEARS; iter++) {
+		if (GET_EQ(ch, iter)) {
+			Crash_save(GET_EQ(ch, iter), fl, iter + 1);	// save at iter+1 because 0 == LOC_INVENTORY
+		}
+	}
+	
+	// delayed: inventory
+	Crash_save(ch->carrying, fl, LOC_INVENTORY);
+	
 	// END DELAY-LOADED SECTION
-	fprintf(fl, "End\n");
+	fprintf(fl, "End Player File\n");
 	
 	// re-apply: affects
 	for (af = af_list; af; af = next_af) {
@@ -2488,6 +2555,26 @@ void check_autowiz(char_data *ch) {
 //// HELPERS /////////////////////////////////////////////////////////////////
 
 /**
+* Logs the player's login and announces it to the room.
+*
+* @param char_data *ch The person logging in.
+*/
+void announce_login(char_data *ch) {
+	syslog(SYS_LOGIN, GET_INVIS_LEV(ch), TRUE, "%s has entered the game", GET_NAME(ch));
+	
+	// mortlog
+	if (GET_INVIS_LEV(ch) == 0) {
+		if (config_get_bool("public_logins")) {
+			mortlog("%s has entered the game", PERS(ch, ch, TRUE));
+		}
+		else if (GET_LOYALTY(ch)) {
+			log_to_empire(GET_LOYALTY(ch), ELOG_LOGINS, "%s has entered the game", PERS(ch, ch, TRUE));
+		}
+	}
+}
+
+
+/**
 * Clears certain player data, similar to clear_char() -- but not for NPCS.
 *
 * @param char_data *ch The player charater to clear.
@@ -2570,7 +2657,6 @@ void delete_old_players(void) {
 */
 void delete_player_character(char_data *ch) {
 	void clear_private_owner(int id);
-	void Crash_delete_file(char *name);
 	
 	player_index_data *index;
 	empire_data *emp = NULL;
@@ -2599,7 +2685,6 @@ void delete_player_character(char_data *ch) {
 	}
 	
 	// various file deletes
-	Crash_delete_file(GET_NAME(ch));
 	if (get_filename(GET_NAME(ch), filename, PLR_FILE)) {
 		if (remove(filename) < 0 && errno != ENOENT) {
 			log("SYSERR: deleting player file %s: %s", filename, strerror(errno));
@@ -2618,15 +2703,13 @@ void delete_player_character(char_data *ch) {
 * successful results.
 *
 * @param descriptor_data *d The descriptor for the player.
-* @param int dolog Whether or not to log the login (passed to Objload_char).
+* @param int dolog Whether or not to log the login.
 * @param bool fresh If FALSE, player was already in the game, not logging in fresh.
-* @return int 1 = rent-saved, 0 = crash-saved
 */
-int enter_player_game(descriptor_data *d, int dolog, bool fresh) {
+void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	void assign_class_abilities(char_data *ch, int class, int role);
 	void check_delayed_load(char_data *ch);
 	void clean_lore(char_data *ch);
-	extern int Objload_char(char_data *ch, int dolog);
 	extern room_data *find_home(char_data *ch);
 	extern room_data *find_load_room(char_data *ch);
 	
@@ -2639,7 +2722,6 @@ int enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	player_index_data *index;
 	bool try_home = FALSE;
 	empire_data *emp;
-	int load_result;
 	int iter;
 
 	reset_char(ch);
@@ -2724,8 +2806,10 @@ int enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	ch->next = character_list;
 	character_list = ch;
 	char_to_room(ch, load_room);
-	load_result = Objload_char(ch, dolog);
-
+	if (dolog) {
+		announce_login(ch);
+	}
+	
 	affect_total(ch);
 	SAVE_CHAR(ch);
 		
@@ -2831,8 +2915,6 @@ int enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	
 	// now is a good time to save and be sure we have a good save file
 	SAVE_CHAR(ch);
-	
-	return load_result;
 }
 
 
@@ -2957,6 +3039,20 @@ void reset_char(char_data *ch) {
 
 	if (GET_MOVE(ch) <= 0) {
 		GET_MOVE(ch) = 1;
+	}
+}
+
+
+/**
+* This saves all connected players.
+*/
+void save_all_players(void) {
+	descriptor_data *desc;
+
+	for (desc = descriptor_list; desc; desc = desc->next) {
+		if ((STATE(desc) == CON_PLAYING) && !IS_NPC(desc->character)) {
+			SAVE_CHAR(desc->character);
+		}
 	}
 }
 
@@ -3279,8 +3375,6 @@ bool member_is_timed_out_ch(char_data *ch) {
 * @param bool read_techs if TRUE, will add techs based on players (usually only during startup)
 */
 void read_empire_members(empire_data *only_empire, bool read_techs) {
-	void Objsave_char(char_data *ch, int rent_code);
-	extern int Objload_char(char_data *ch, int dolog);
 	void resort_empires();
 	bool should_delete_empire(empire_data *emp);
 	
@@ -3308,11 +3402,8 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 		
 		// new way of loading data
 		if ((ch = find_or_load_player(index->name, &is_file))) {
+			check_delayed_load(ch);
 			affect_total(ch);
-			
-			if (is_file) {
-				Objload_char(ch, FALSE);
-			}
 		}
 		
 		// check ch for empire traits

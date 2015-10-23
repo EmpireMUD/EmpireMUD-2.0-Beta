@@ -54,7 +54,7 @@ extern char **intros;
 extern int num_intros;
 extern const char *version;
 extern int wizlock_level;
-extern int no_rent_check;
+extern int no_auto_deletes;
 extern ush_int DFLT_PORT;
 extern const char *DFLT_DIR;
 extern char *LOGNAME;
@@ -62,7 +62,7 @@ extern int max_playing;
 extern char *help;
 
 // external functions
-void Crash_save_all();
+void save_all_players();
 extern char *flush_reduced_color_codes(descriptor_data *desc);
 void mobile_activity(void);
 void show_string(descriptor_data *d, char *input);
@@ -641,7 +641,6 @@ bool check_reboot_confirms(void) {
 * Perform a reboot/shutdown.
 */
 void perform_reboot(void) {
-	void Objsave_char(char_data *ch, int rent_code);
 	extern const char *reboot_strings[];
 	extern int num_of_reboot_strings;
 	
@@ -689,9 +688,9 @@ void perform_reboot(void) {
 		if (reboot_control.type == SCMD_REBOOT) {
 			write_to_descriptor(desc->descriptor, reboot_strings[number(0, num_of_reboot_strings - 1)]);
 		}
-
-		Objsave_char(och, RENT_RENTED);
+		
 		SAVE_CHAR(och);
+		extract_all_items(och);
 		
 		// extract is not actually necessary since we're rebooting, right?
 		// extract_char(och);
@@ -735,7 +734,7 @@ void perform_reboot(void) {
 		sprintf(buf2, "-C%d", mother_desc);
 		
 		// TODO: should support more of the extra options we might have started up with
-		if (no_rent_check) {
+		if (no_auto_deletes) {
 			execl("bin/empire", "empire", buf2, "-q", buf, (char *) NULL);
 		}
 		else {
@@ -950,7 +949,7 @@ void heartbeat(int heart_pulse) {
 		update_reboot();
 		if (++mins_since_crashsave >= 5) {
 			mins_since_crashsave = 0;
-			Crash_save_all();
+			save_all_players();
 			if (debug_log && HEARTBEAT(15)) { log("debug 19:\t%lld", microtime()); }
 		}
 	}
@@ -3356,7 +3355,7 @@ void init_game(ush_int port) {
 	log("Entering game loop.");
 	game_loop(mother_desc);
 
-	Crash_save_all();
+	save_all_players();
 
 	log("Closing all sockets.");
 	while (descriptor_list)
@@ -3414,8 +3413,8 @@ int main(int argc, char **argv) {
 				puts("Syntax check mode enabled.");
 				break;
 			case 'q':
-				no_rent_check = 1;
-				puts("Quick boot mode -- rent check suppressed.");
+				no_auto_deletes = 1;
+				puts("Quick boot mode -- auto-deletes suppressed.");
 				break;
 			case 'r':
 				wizlock_level = 1;
@@ -3432,7 +3431,7 @@ int main(int argc, char **argv) {
 					   "  -d <directory> Specify library directory (defaults to 'lib').\n"
 					   "  -h             Print this command line argument help.\n"
 					   "  -o <file>      Write log to <file> instead of stderr.\n"
-					   "  -q             Quick boot (doesn't scan rent for object limits)\n"
+					   "  -q             Quick boot (doesn't auto-delete players)\n"
 					   "  -r             Restrict MUD -- no new players allowed.\n",
 					argv[0]);
 				exit(0);
@@ -3545,7 +3544,7 @@ void setup_log(const char *filename, int fd) {
 
 
 void reboot_recover(void) {
-	extern int enter_player_game(descriptor_data *d, int dolog, bool fresh);
+	extern void enter_player_game(descriptor_data *d, int dolog, bool fresh);
 	extern bool global_mute_slash_channel_joins;
 
 	descriptor_data *d;

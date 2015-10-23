@@ -1091,7 +1091,6 @@ void perform_dismount(char_data *ch) {
 * @param char_data *ch The player to idle out.
 */
 void perform_idle_out(char_data *ch) {
-	void Objsave_char(char_data *ch, int rent_code);
 	extern obj_data *player_death(char_data *ch);
 	
 	empire_data *emp = NULL;
@@ -1123,11 +1122,11 @@ void perform_idle_out(char_data *ch) {
 	else {
 		act("$n is idle too long, and vanishes.", TRUE, ch, NULL, NULL, TO_ROOM);
 	}
-
-	Objsave_char(ch, RENT_RENTED);
+	
 	save_char(ch, died ? NULL : IN_ROOM(ch));
 	
 	syslog(SYS_LOGIN, GET_INVIS_LEV(ch), TRUE, "%s force-rented and extracted (idle).", GET_NAME(ch));
+	extract_all_items(ch);
 	extract_char(ch);
 	
 	if (emp) {

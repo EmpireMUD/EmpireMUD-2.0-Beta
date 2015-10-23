@@ -293,7 +293,6 @@ room_data *create_room(void) {
 void delete_room(room_data *room, bool check_exits) {
 	void extract_pending_chars();
 	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
-	void Objsave_char(char_data *ch, int rent_code);
 	void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool full_abandon);
 	void relocate_players(room_data *room, room_data *to_room);
 
@@ -351,9 +350,9 @@ void delete_room(room_data *room, bool check_exits) {
 	for (c = ROOM_PEOPLE(room); c; c = next_c) {
 		next_c = c->next_in_room;
 		if (!IS_NPC(c)) {
-			Objsave_char(c, RENT_RENTED);
 			save_char(c, NULL);
 		}
+		extract_all_items(c);
 		extract_char(c);
 	}
 	extract_pending_chars();

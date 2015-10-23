@@ -1463,12 +1463,9 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		GET_PC_NAME(vict) = strdup(CAP(newname));
 		update_player_index(found_index, vict);
 		
-		// TODO file renames could be moved somewhere useful
-		// TODO also, this could be a lot cleaner and use remove() instead of system/rm
-		get_filename(oldname, buf1, CRASH_FILE);
-		get_filename(GET_NAME(vict), buf2, CRASH_FILE);
-		sprintf(buf, "rm -f %s", buf2);
-		system(buf);
+		// rename the save file
+		get_filename(oldname, buf1, PLR_FILE);
+		get_filename(GET_NAME(vict), buf2, PLR_FILE);
 		rename(buf1, buf2);
 		
 		SAVE_CHAR(vict);
@@ -4988,7 +4985,6 @@ ACMD(do_oset) {
 
 ACMD(do_playerdelete) {
 	void delete_player_character(char_data *ch);
-	void Objsave_char(char_data *ch, int rent_code);
 	
 	descriptor_data *desc, *next_desc;
 	char name[MAX_INPUT_LENGTH];
@@ -5047,8 +5043,8 @@ ACMD(do_playerdelete) {
 			}
 		}
 		
-		// actual delete (rent out equipment first)
-		Objsave_char(victim, RENT_RENTED);
+		// actual delete (remove items first)
+		extract_all_items(victim);
 		delete_player_character(victim);
 		extract_char(victim);
 		victim = NULL;	// prevent cleanup

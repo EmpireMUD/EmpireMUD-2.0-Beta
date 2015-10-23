@@ -91,7 +91,7 @@ time_t boot_time = 0;	// time of mud boot
 int daily_cycle = 0;	// this is a timestamp for the last time skills/exp reset
 int Global_ignore_dark = 0;	// For use in public channels
 int no_mail = 0;	// mail disabled?
-int no_rent_check = 0;	// skip rent check on boot?
+int no_auto_deletes = 0;	// skip player deletes on boot?
 struct time_info_data time_info;	// the infomation about the time
 struct weather_data weather_info;	// the infomation about the weather
 int wizlock_level = 0;	// level of game restriction
@@ -215,7 +215,6 @@ void boot_db(void) {
 	void reset_time();
 	void sort_commands();
 	void startup_room_reset();
-	void update_obj_file();
 	void update_ships();
 
 	log("Boot db -- BEGIN.");
@@ -286,9 +285,8 @@ void boot_db(void) {
 	load_banned();
 	Read_Invalid_List();
 
-	if (!no_rent_check) {
+	if (!no_auto_deletes) {
 		delete_old_players();
-		update_obj_file();
 	}
 	
 	// this loads objs and mobs back into the world
@@ -1589,9 +1587,8 @@ PLAYER_UPDATE_FUNC(b2_8_update_players) {
 
 // 2.11 loads inventories and attaches triggers
 PLAYER_UPDATE_FUNC(b2_11_update_players) {
-	extern int Objload_char(char_data *ch, int dolog);
-	void Objsave_char(char_data *ch, int rent_code);
-	
+	void check_delayed_load(char_data *ch);
+
 	obj_data *obj, *proto;
 	int iter;
 	
@@ -1600,7 +1597,7 @@ PLAYER_UPDATE_FUNC(b2_11_update_players) {
 		return;
 	}
 	
-	Objload_char(ch, FALSE);
+	check_delayed_load(ch);
 	
 	// inventory
 	for (obj = ch->carrying; obj; obj = obj->next_content) {
@@ -1617,9 +1614,6 @@ PLAYER_UPDATE_FUNC(b2_11_update_players) {
 			assign_triggers(GET_EQ(ch, iter), OBJ_TRIGGER);
 		}
 	}
-	
-	// save gear
-	Objsave_char(ch, RENT_RENTED);
 }
 
 

@@ -845,7 +845,6 @@ obj_data *die(char_data *ch, char_data *killer) {
 	void cancel_blood_upkeeps(char_data *ch);
 	void despawn_charmies(char_data *ch);
 	void kill_empire_npc(char_data *ch);
-	void Objsave_char(char_data *ch, int rent_code);
 	
 	char_data *ch_iter;
 	obj_data *corpse = NULL;

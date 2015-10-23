@@ -2089,7 +2089,7 @@ int _parse_name(char *arg, char *name) {
 void nanny(descriptor_data *d, char *arg) {
 	void clear_player(char_data *ch);
 	void display_tip_to_char(char_data *ch);
-	extern int enter_player_game(descriptor_data *d, int dolog, bool fresh);
+	extern void enter_player_game(descriptor_data *d, int dolog, bool fresh);
 	extern int isbanned(char *hostname);
 	extern int num_earned_bonus_traits(char_data *ch);
 	void start_new_character(char_data *ch);
@@ -2572,7 +2572,7 @@ void nanny(descriptor_data *d, char *arg) {
 			// TODO most* of this block is repeated in do_alternate
 
 			// put them in-game
-			load_result = enter_player_game(d, TRUE, TRUE);
+			enter_player_game(d, TRUE, TRUE);
 			
 			msg_to_desc(d, "\r\n%s\r\n\r\n", config_get_string("welcome_message"));
 			act("$n has entered the game.", TRUE, d->character, 0, 0, TO_ROOM);

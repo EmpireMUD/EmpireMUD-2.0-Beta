@@ -40,7 +40,6 @@ extern bool can_enter_instance(char_data *ch, struct instance_data *inst);
 extern bool check_scaling(char_data *mob, char_data *attacker);
 extern char *get_room_name(room_data *room, bool color);
 extern char_data *has_familiar(char_data *ch);
-void Objsave_char(char_data *ch, int rent_code);
 void scale_item_to_level(obj_data *obj, int level);
 void scale_mob_as_familiar(char_data *mob, char_data *master);
 extern char *show_color_codes(char *string);
@@ -179,7 +178,7 @@ void cancel_adventure_summon(char_data *ch) {
 */
 void perform_alternate(char_data *old, char_data *new) {
 	void display_tip_to_char(char_data *ch);
-	extern int enter_player_game(descriptor_data *d, int dolog, bool fresh);
+	extern void enter_player_game(descriptor_data *d, int dolog, bool fresh);
 	extern int has_mail(long recipient);
 	void start_new_character(char_data *ch);
 	extern char *START_MESSG;
@@ -229,7 +228,6 @@ void perform_alternate(char_data *old, char_data *new) {
 	
 	// save old char...
 	GET_LAST_KNOWN_LEVEL(old) = GET_COMPUTED_LEVEL(old);
-	Objsave_char(old, RENT_RENTED);
 	SAVE_CHAR(old);
 	
 	// save this to switch over replies
@@ -241,6 +239,7 @@ void perform_alternate(char_data *old, char_data *new) {
 	old->desc = NULL;
 	
 	// remove old character
+	extract_all_items(old);
 	extract_char(old);
 	
 	syslog(SYS_LOGIN, invis_lev, TRUE, "%s", sys);
@@ -1750,12 +1749,12 @@ ACMD(do_quit) {
 		}
 		
 		GET_LAST_KNOWN_LEVEL(ch) = GET_COMPUTED_LEVEL(ch);
-		Objsave_char(ch, RENT_RENTED);
 		save_char(ch, died ? NULL : IN_ROOM(ch));
 		
 		display_statistics_to_char(ch);
 		
 		// this will disconnect the descriptor
+		extract_all_items(ch);
 		extract_char(ch);
 	}
 }
@@ -1769,7 +1768,6 @@ ACMD(do_save) {
 		
 		GET_LAST_KNOWN_LEVEL(ch) = GET_COMPUTED_LEVEL(ch);
 		SAVE_CHAR(ch);
-		Objsave_char(ch, RENT_CRASH);
 	}
 }
 
@@ -1820,8 +1818,8 @@ ACMD(do_selfdelete) {
 		}
 		msg_to_char(ch, "You have deleted your character. Goodbye...\r\n");
 		
-		// actual delete (rent out equipment first)
-		Objsave_char(ch, RENT_RENTED);
+		// actual delete (remove equipment first)
+		extract_all_items(ch);
 		delete_player_character(ch);
 		extract_char(ch);
 	}

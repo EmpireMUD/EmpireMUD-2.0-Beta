@@ -38,13 +38,11 @@
 #define LIB_ETC  "etc/"
 #define LIB_BOARD  "boards/"
 #define LIB_PLAYERS  "players/"
-#define LIB_PLROBJS  "plrobjs/"
 #define LIB_OBJPACK  "packs/"
 #define LIB_EMPIRE  "empires/"
 
 
 // file suffixes for common write files
-#define SUF_OBJS  "objs"
 #define SUF_PACK  "pack"
 #define SUF_PLR  "plr"
 
