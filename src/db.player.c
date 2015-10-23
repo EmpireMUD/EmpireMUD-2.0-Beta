@@ -919,7 +919,7 @@ char_data *load_player(char *name, bool normal) {
 void read_player_delayed_data(FILE *fl, char_data *ch) {
 	char line[MAX_STRING_LENGTH];
 	struct alias_data *alias, *last_alias = NULL;
-	struct lore_data *lore, *last_lore = NULL;
+	struct lore_data *lore, *last_lore = NULL, *new_lore;
 	int length, i_in[3];
 	bool end = FALSE;
 	long l_in;
@@ -928,7 +928,20 @@ void read_player_delayed_data(FILE *fl, char_data *ch) {
 		log("SYSERR: read_player_delayed_data called without %s", fl ? "character" : "file");
 		return;
 	}
-
+	
+	// some parts may already be added, so find the end of aliases:
+	if ((last_alias = GET_ALIASES(ch))) {
+		while (last_alias->next) {
+			last_alias = last_alias->next;
+		}
+	}
+	
+	// We want to read in any old lore ahead of any we've appended already.
+	// This happens if the player was loaded for an empire merge and new lore
+	// was added before delayed data.
+	new_lore = GET_LORE(ch);
+	GET_LORE(ch) = NULL;
+	
 	while (!end) {
 		if (!get_line(fl, line)) {
 			log("SYSERR: Unexpected end of player file in read_player_from_file");
@@ -999,6 +1012,16 @@ void read_player_delayed_data(FILE *fl, char_data *ch) {
 				BAD_TAG_WARNING(line);
 				break;
 			}
+		}
+	}
+	
+	// fix lore order
+	if (new_lore) {
+		if (last_lore) {
+			last_lore->next = new_lore;
+		}
+		else {
+			GET_LORE(ch) = new_lore;
 		}
 	}
 }
