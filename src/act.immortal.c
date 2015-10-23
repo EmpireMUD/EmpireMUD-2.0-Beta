@@ -2425,6 +2425,7 @@ void do_stat_building(char_data *ch, bld_data *bdg) {
 
 /* Sends ch information on the character or animal k */
 void do_stat_character(char_data *ch, char_data *k) {
+	void check_delayed_load(char_data *ch);
 	void find_uid_name(char *uid, char *name);
 	extern double get_combat_speed(char_data *ch, int pos);
 	extern int get_block_rating(char_data *ch, bool can_gain_skill);
@@ -2459,6 +2460,9 @@ void do_stat_character(char_data *ch, char_data *k) {
 	struct affected_type *aff;
 	
 	bool is_proto = (IS_NPC(k) && k == mob_proto(GET_MOB_VNUM(k)));
+	
+	// ensure fully loaded
+	check_delayed_load(ch);
 
 	sprinttype(GET_REAL_SEX(k), genders, buf);
 	CAP(buf);

@@ -2496,6 +2496,7 @@ ACMD(do_who) {
 
 
 ACMD(do_whois) {
+	void check_delayed_load(char_data *ch);
 	extern const char *level_names[][2];
 	
 	char_data *victim = NULL;
@@ -2512,6 +2513,9 @@ ACMD(do_whois) {
 		send_to_char("There is no such player.\r\n", ch);
 		return;
 	}
+	
+	// load remaining data
+	check_delayed_load(ch);
 	
 	// basic info
 	msg_to_char(ch, "%s%s&0\r\n", PERS(victim, victim, TRUE), NULLSAFE(GET_TITLE(victim)));

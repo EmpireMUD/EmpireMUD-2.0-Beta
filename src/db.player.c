@@ -55,6 +55,7 @@ void update_class(char_data *ch);
 void clear_player(char_data *ch);
 void delete_player_character(char_data *ch);
 static bool member_is_timed_out(time_t created, time_t last_login, double played_hours);
+void read_player_delayed_data(FILE *fl, char_data *ch);
 char_data *read_player_from_file(FILE *fl, char *name, bool normal);
 int sort_players_by_idnum(player_index_data *a, player_index_data *b);
 int sort_players_by_name(player_index_data *a, player_index_data *b);
@@ -535,6 +536,11 @@ void write_account_to_file(FILE *fl, account_data *acct) {
  //////////////////////////////////////////////////////////////////////////////
 //// CORE PLAYER DB //////////////////////////////////////////////////////////
 
+// for more readable if/else chain
+#define PFILE_TAG(src, tag, len)  (!strn_cmp((src), (tag), ((len) = strlen(tag))))
+#define BAD_TAG_WARNING(src)  else if (LOG_BAD_TAG_WARNINGS) { log("SYSERR: Bad tag in player '%s': %s", NULLSAFE(GET_PC_NAME(ch)), (src)); }
+
+
 /**
 * Adds a player to the player tables (by_name and by_idnum), and sorts both
 * tables.
@@ -636,6 +642,27 @@ void build_player_index(void) {
 }
 
 
+/**
+* Loads the rest of a player's data from the delayed-load file, if they have
+* an open file. If they don't have one, it just returns.
+*
+* @param char_data *ch The player to finish loading.
+*/
+void check_delayed_load(char_data *ch) {
+	FILE *fl;
+	
+	// no work
+	if (!ch || IS_NPC(ch) || !GET_DELAYED_LOAD_FILE(ch)) {
+		return;
+	}
+	
+	fl = GET_DELAYED_LOAD_FILE(ch);
+	read_player_delayed_data(fl, ch);
+	fclose(fl);
+	GET_DELAYED_LOAD_FILE(ch) = NULL;
+}
+
+
 /* release memory allocated for a char struct */
 void free_char(char_data *ch) {
 	void free_alias(struct alias_data *a);
@@ -731,7 +758,13 @@ void free_char(char_data *ch) {
 			GET_PLAYER_COINS(ch) = coin->next;
 			free(coin);
 		}
-				
+		
+		// close the delayed-load file (guess we didn't need it)
+		if (GET_DELAYED_LOAD_FILE(ch)) {
+			fclose(GET_DELAYED_LOAD_FILE(ch));
+			GET_DELAYED_LOAD_FILE(ch) = NULL;
+		}
+		
 		free(ch->player_specials);
 		if (IS_NPC(ch)) {
 			log("SYSERR: Mob %s (#%d) had player_specials allocated!", GET_NAME(ch), GET_MOB_VNUM(ch));
@@ -867,14 +900,114 @@ char_data *load_player(char *name, bool normal) {
 	}
 	
 	ch = read_player_from_file(fl, name, normal);
+	GET_DELAYED_LOAD_FILE(ch) = fl;
 	
-	fclose(fl);
+	// do not close the file now
+	
 	return ch;
 }
 
 
 /**
-* Parse a player file.
+* This function loads the secondary data for a character. This is data that
+* isn't needed for many simple loads. The open file is the player file after
+* the "End Primary Data" tag.
+*
+* @param FILE *fl The file to load.
+* @param char_data *ch The already-loaded character to finish loading into.
+*/
+void read_player_delayed_data(FILE *fl, char_data *ch) {
+	char line[MAX_STRING_LENGTH];
+	struct alias_data *alias, *last_alias = NULL;
+	struct lore_data *lore, *last_lore = NULL;
+	int length, i_in[3];
+	bool end = FALSE;
+	long l_in;
+	
+	if (!fl || !ch) {
+		log("SYSERR: read_player_delayed_data called without %s", fl ? "character" : "file");
+		return;
+	}
+
+	while (!end) {
+		if (!get_line(fl, line)) {
+			log("SYSERR: Unexpected end of player file in read_player_from_file");
+			exit(1);
+		}
+		
+		if (PFILE_TAG(line, "End", length)) {
+			end = TRUE;
+			continue;
+		}
+		
+		// normal tags by letter
+		switch (UPPER(*line)) {
+			case 'A': {
+				if (PFILE_TAG(line, "Alias:", length)) {
+					sscanf(line + length + 1, "%d %d %d", &i_in[0], &i_in[1], &i_in[2]);
+					CREATE(alias, struct alias_data, 1);
+					alias->type = i_in[0];
+					
+					fgets(line, i_in[1] + 1, fl);
+					alias->alias = str_dup(line);
+					
+					*line = ' ';	// Doesn't need terminated, fgets() will
+					fgets(line + 1, i_in[2] + 1, fl);
+					alias->replacement = str_dup(line);
+					
+					// append to end
+					if (last_alias) {
+						last_alias->next = alias;
+					}
+					else {
+						GET_ALIASES(ch) = alias;
+					}
+					last_alias = alias;
+				}
+				BAD_TAG_WARNING(line);
+				break;
+			}
+			case 'L': {
+				if (PFILE_TAG(line, "Lore:", length)) {
+					sscanf(line + length + 1, "%d %ld", &i_in[0], &l_in);
+					CREATE(lore, struct lore_data, 1);
+					lore->type = i_in[0];
+					lore->date = l_in;
+					
+					// text on next line
+					if (get_line(fl, line)) {
+						lore->text = str_dup(line);
+					}
+					
+					// append to end
+					if (last_lore) {
+						last_lore->next = lore;
+					}
+					else {
+						GET_LORE(ch) = lore;
+					}
+					last_lore = lore;
+				}
+				BAD_TAG_WARNING(line);
+				break;
+			}
+			
+			// log maybe
+			default: {
+				// ignore anything else and move on
+				if (FALSE) { /* for BAD_TAG_WARNING */ }
+				BAD_TAG_WARNING(line);
+				break;
+			}
+		}
+	}
+}
+
+
+/**
+* Parse the primary data from a player file. Reads until the "End Primary Data"
+* tag. After that tag, the file is stored until read_player_delayed_data() is
+* called.
 *
 * @param FILE *fl The open file, for reading.
 * @param char *name The name of the player we are trying to load.
@@ -887,7 +1020,6 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal) {
 	int account_id = NOTHING, ignore_pos = 0, reward_pos = 0;
 	struct over_time_effect_type *dot, *last_dot = NULL;
 	struct offer_data *offer, *last_offer = NULL;
-	struct lore_data *lore, *last_lore = NULL;
 	int length, i_in[7], iter, num;
 	struct cooldown_data *cool;
 	struct affected_type *af;
@@ -911,7 +1043,6 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal) {
 	sprintf(error, "read_player_from_file: %s", name);
 	
 	// for more readable if/else chain
-	#define PFILE_TAG(src, tag, len)  (!strn_cmp((src), (tag), ((len) = strlen(tag))))
 	#define BAD_TAG_WARNING(src)  else if (LOG_BAD_TAG_WARNINGS) { log("SYSERR: Bad tag in player '%s': %s", NULLSAFE(GET_PC_NAME(ch)), (src)); }
 
 	while (!end) {
@@ -920,7 +1051,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal) {
 			exit(1);
 		}
 		
-		if (PFILE_TAG(line, "End", length)) {
+		if (PFILE_TAG(line, "End Primary Data", length)) {
 			end = TRUE;
 			continue;
 		}
@@ -1214,26 +1345,6 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal) {
 				}
 				else if (PFILE_TAG(line, "Load Room Check:", length)) {
 					GET_LOAD_ROOM_CHECK(ch) = atoi(line + length + 1);
-				}
-				else if (PFILE_TAG(line, "Lore:", length)) {
-					sscanf(line + length + 1, "%d %ld", &i_in[0], &l_in);
-					CREATE(lore, struct lore_data, 1);
-					lore->type = i_in[0];
-					lore->date = l_in;
-					
-					// text on next line
-					if (get_line(fl, line)) {
-						lore->text = str_dup(line);
-					}
-					
-					// append to end
-					if (last_lore) {
-						last_lore->next = lore;
-					}
-					else {
-						GET_LORE(ch) = lore;
-					}
-					last_lore = lore;
 				}
 				BAD_TAG_WARNING(line);
 				break;
@@ -1530,6 +1641,9 @@ void save_char(char_data *ch, room_data *load_room) {
 		return;
 	}
 	
+	// must finish-loading before we can save
+	check_delayed_load(ch);
+	
 	// store to a temp name in order to avoid problems from crashes during save
 	snprintf(tempname, sizeof(tempname), "%s%s", filename, TEMP_SUFFIX);
 	if (!(fl = fopen(tempname, "w"))) {
@@ -1646,6 +1760,7 @@ void write_player_to_file(FILE *fl, char_data *ch) {
 	obj_data *char_eq[NUM_WEARS];
 	char temp[MAX_STRING_LENGTH];
 	struct cooldown_data *cool;
+	struct alias_data *alias;
 	struct offer_data *offer;
 	struct lore_data *lore;
 	int iter;
@@ -1874,11 +1989,6 @@ void write_player_to_file(FILE *fl, char_data *ch) {
 	}
 	fprintf(fl, "Load Room: %d\n", GET_LOADROOM(ch));
 	fprintf(fl, "Load Room Check: %d\n", GET_LOAD_ROOM_CHECK(ch));
-	for (lore = GET_LORE(ch); lore; lore = lore->next) {
-		if (lore->text && *lore->text) {
-			fprintf(fl, "Lore: %d %ld\n%s\n", lore->type, lore->date, lore->text);
-		}
-	}
 	
 	// 'M'
 	if (GET_MARK_LOCATION(ch) != NOWHERE) {
@@ -1983,7 +2093,20 @@ void write_player_to_file(FILE *fl, char_data *ch) {
 		fprintf(fl, "Using Poison: %d\n", USING_POISON(ch));
 	}
 	
-	// END TAGS
+	// END MAIN TAGS: the rest of the data is delay-loaded
+	fprintf(fl, "End Primary Data\n");
+	
+	for (alias = GET_ALIASES(ch); alias; alias = alias->next) {
+		fprintf(fl, "Alias: %d %ld %ld\n%s\n%s\n", alias->type, strlen(alias->alias), strlen(alias->replacement)-1, alias->alias, alias->replacement + 1);
+	}
+	
+	for (lore = GET_LORE(ch); lore; lore = lore->next) {
+		if (lore->text && *lore->text) {
+			fprintf(fl, "Lore: %d %ld\n%s\n", lore->type, lore->date, lore->text);
+		}
+	}
+	
+	// END DELAY-LOADED SECTION
 	fprintf(fl, "End\n");
 	
 	// re-apply: affects
@@ -2462,9 +2585,9 @@ void delete_player_character(char_data *ch) {
 */
 int enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	void assign_class_abilities(char_data *ch, int class, int role);
+	void check_delayed_load(char_data *ch);
 	void clean_lore(char_data *ch);
 	extern int Objload_char(char_data *ch, int dolog);
-	void read_aliases(char_data *ch);
 	extern room_data *find_home(char_data *ch);
 	extern room_data *find_load_room(char_data *ch);
 	void read_saved_vars(char_data *ch);
@@ -2482,7 +2605,7 @@ int enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	int iter;
 
 	reset_char(ch);
-	read_aliases(ch);
+	check_delayed_load(ch);	// ensure everything is loaded
 	
 	// remove this now
 	REMOVE_BIT(PLR_FLAGS(ch), PLR_KEEP_LAST_LOGIN_INFO);

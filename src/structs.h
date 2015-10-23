@@ -2437,6 +2437,7 @@ struct player_special_data {
 	
 	account_data *account;	// pointer to account_table entry
 	int temporary_account_id;	// used during creation
+	FILE *delayed_load_file;	// open player file that was partially-loaded
 	
 	int gear_level;	// computed gear level -- determine_gear_level()
 	struct coin_data *coins;	// linked list of coin data
