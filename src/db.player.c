@@ -2210,7 +2210,9 @@ void write_player_to_file(FILE *fl, char_data *ch) {
 	
 	// delayed: equipment
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
-		Crash_save(GET_EQ(ch, iter), fl, iter + 1);	// save at iter+1 because 0 == LOC_INVENTORY
+		if (char_eq[iter]) {
+			Crash_save(char_eq[iter], fl, iter + 1);	// save at iter+1 because 0 == LOC_INVENTORY
+		}
 	}
 	
 	// delayed: inventory
