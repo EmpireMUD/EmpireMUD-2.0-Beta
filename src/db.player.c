@@ -962,12 +962,12 @@ void read_player_delayed_data(FILE *fl, char_data *ch) {
 					alias->type = i_in[0];
 					
 					fgets(line, l_in[0] + 2, fl);
-					line[l_in[0] + 1] = '\0';	// trailing \n
+					line[l_in[0]] = '\0';	// trailing \n
 					alias->alias = str_dup(line);
 					
 					*line = ' ';	// Doesn't need terminated, fgets() will
 					fgets(line + 1, l_in[1] + 2, fl);
-					line[l_in[0] + 1] = '\0';	// trailing \n
+					line[l_in[0]] = '\0';	// trailing \n
 					alias->replacement = str_dup(line);
 					
 					// append to end
