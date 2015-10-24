@@ -3366,7 +3366,7 @@ bool member_is_timed_out_index(player_index_data *index) {
 * @return bool TRUE if the member has timed out and should not be counted; FALSE if they're ok.
 */
 bool member_is_timed_out_ch(char_data *ch) {
-	return member_is_timed_out(ch->player.time.birth, ch->player.time.logon, ((double)ch->player.time.played) / SECS_PER_REAL_HOUR);
+	return member_is_timed_out(ch->player.time.birth, ch->prev_logon, ((double)ch->player.time.played) / SECS_PER_REAL_HOUR);
 }
 
 
