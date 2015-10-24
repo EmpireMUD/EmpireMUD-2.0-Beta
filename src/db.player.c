@@ -600,7 +600,6 @@ void build_player_index(void) {
 				ch = NULL;
 				if (plr->name && *plr->name) {
 					ch = load_player(plr->name, FALSE);
-					GET_ACCOUNT(ch) = acct;	// not set by load_player
 				}
 				
 				// could not load character for this entry
@@ -615,6 +614,8 @@ void build_player_index(void) {
 				}
 				
 				has_players = TRUE;
+				
+				GET_ACCOUNT(ch) = acct;	// not set by load_player
 				
 				CREATE(index, player_index_data, 1);
 				update_player_index(index, ch);
