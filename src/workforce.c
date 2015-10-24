@@ -564,7 +564,7 @@ char_data *find_chore_worker_in_room(room_data *room, mob_vnum vnum) {
 	
 	for (mob = ROOM_PEOPLE(room); mob; mob = mob->next_in_room) {
 		// not our mob
-		if (!IS_NPC(mob) && GET_MOB_VNUM(mob) != vnum) {
+		if (!IS_NPC(mob) || GET_MOB_VNUM(mob) != vnum) {
 			continue;
 		}
 		
