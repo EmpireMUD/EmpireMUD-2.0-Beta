@@ -201,7 +201,7 @@ const int primary_attributes[] = { STRENGTH, CHARISMA, INTELLIGENCE, NOTHING };
 const int universal_wait = 1.25 RL_SEC;
 
 // lore cleanup -- terminate the list with a -1
-const int remove_lore_types[] = { LORE_PLAYER_KILL, LORE_PLAYER_DEATH, LORE_TOWER_DEATH, LORE_DEATH, -1 };
+const int remove_lore_types[] = { LORE_PLAYER_KILL, LORE_PLAYER_DEATH, LORE_TOWER_DEATH, -1 };
 
 // used in several places to represent the lowest to-hit a player could have
 const int base_hit_chance = 50;

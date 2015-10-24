@@ -108,6 +108,26 @@ const char *genders[] = {
 	"\n"
 };
 
+const char *material_types[] = {
+	"WOOD",
+	"ROCK",
+	"IRON",
+	"SILVER"
+	"GOLD",
+	"FLINT",
+	"CLAY",
+	"FLESH",
+	"GLASS",
+	"WAX",
+	"MAGIC",
+	"CLOTH",
+	"GEM",
+	"COPPER",
+	"BONE",
+	"HAIR",
+	"\n"
+};
+
 const char *pool_types[] = {
 	"health",
 	"move",
@@ -119,6 +139,20 @@ const char *pool_types[] = {
 
  //////////////////////////////////////////////////////////////////////////////
 //// VERSION 2.0b3 STRUCTS ///////////////////////////////////////////////////
+
+#define b3_LORE_JOIN_EMPIRE  0
+#define b3_LORE_DEFECT_EMPIRE  1
+#define b3_LORE_KICKED_EMPIRE  2
+#define b3_LORE_PLAYER_KILL  3
+#define b3_LORE_PLAYER_DEATH  4
+#define b3_LORE_TOWER_DEATH  5
+#define b3_LORE_FOUND_EMPIRE  6
+#define b3_LORE_START_VAMPIRE  7
+#define b3_LORE_SIRE_VAMPIRE  8
+#define b3_LORE_PURIFY  9
+#define b3_LORE_DEATH  10
+#define b3_LORE_MAKE_VAMPIRE  11
+#define b3_LORE_PROMOTED  12
 
 #define b3_PLR_FROZEN  BIT(0)
 #define b3_PLR_SITEOK  BIT(4)
@@ -152,6 +186,14 @@ const char *pool_types[] = {
 #define b3_MAX_SKILLS  24
 #define b3_MAX_ABILITIES  400
 #define b3_MAX_DISGUISED_NAME_LENGTH  32
+
+struct b3_lore_data {
+	int type;	// LORE_x
+	int value;	// empire id or other id type
+	long date;	// when it was acquired (timestamp)
+
+	struct lore_data *next;
+};
 
 struct b3_char_special_data_saved {
 	int idnum;	// player's idnum; -1 for mobiles
@@ -611,7 +653,9 @@ void write_account_to_file(FILE *fl, account_data *acct) {
 * @param struct b3_char_file_u *cfu The char file. 
 */
 void convert_char(struct b3_char_file_u *cfu) {
-	char charname_lower[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH], temp[MAX_STRING_LENGTH];
+	char charname_lower[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH];
+	char temp[MAX_STRING_LENGTH], str_in1[MAX_STRING_LENGTH], 
+	char str_in2[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
 	struct affected_type *af, *new_af, *next_af, *af_list;
 	struct account_player *acct_player, *last_acct_player;
 	struct player_slash_channel *slash;
@@ -622,10 +666,8 @@ void convert_char(struct b3_char_file_u *cfu) {
 	char temp[MAX_STRING_LENGTH];
 	struct trig_var_data *vars;
 	struct cooldown_data *cool;
-	struct alias_data *alias;
-	struct offer_data *offer;
-	struct coin_data *coin;
-	struct lore_data *lore;
+	struct b3_lore_data lore;
+	struct alias_data alias;
 	FILE *pfile, *loadfile;
 	account_data *acct;
 	int iter;
@@ -641,7 +683,7 @@ void convert_char(struct b3_char_file_u *cfu) {
 		return;
 	}
 	
-	if (!get_filename(charname_lower buf, "lib/players/", ".plr")) {
+	if (!get_filename(charname_lower, buf, "lib/players/", ".plr")) {
 		printf("convert_char: Unable to get filename for player: %s", charname_lower);
 		exit(1);
 	}
@@ -700,9 +742,10 @@ void convert_char(struct b3_char_file_u *cfu) {
 		SET_BIT(acct->flags, ACCT_MULTI_IP);
 	}
 	REMOVE_BIT(cfu->char_specials_saved.act, b3_PLR_MULTIOK | b3_PLR_DELETED | b3_PLR_NOTITLE | b3_PLR_MUTED | b3_PLR_SITEOK | b3_PLR_FROZEN);
-	// account: notes -- only importing from the first player we find notes on, not each player.
-	if (*cfu->player_specials_saved.admin_notes && !acct->notes) {
-		acct->notes = str_dup(cfu->player_specials_saved.admin_notes);
+	// account: notes -- merge from each character
+	if (*cfu->player_specials_saved.admin_notes) {
+		snprintf(temp, sizeof(temp), "%s%s%s", acct->notes ? acct->notes : "", acct->notes ? "\r\n" : "", cfu->player_specials_saved.admin_notes);
+		acct->notes = str_dup(temp);
 	}
 	
 	// BEGIN TAGS
@@ -854,116 +897,184 @@ void convert_char(struct b3_char_file_u *cfu) {
 	if (cfu->player_specials_saved.morph != MORPH_NONE) {
 		fprintf(fl, "Morph: %d\n", cfu->player_specials_saved.morph);
 	}
-	if (GET_MOUNT_FLAGS(ch) != NOBITS) {
-		fprintf(fl, "Mount Flags: %s\n", bitv_to_alpha(GET_MOUNT_FLAGS(ch)));
+	if (cfu->player_specials_saved.mount_flags) {
+		fprintf(fl, "Mount Flags: %s\n", bitv_to_alpha(cfu->player_specials_saved.mount_flags));
 	}
-	if (GET_MOUNT_VNUM(ch) != NOTHING) {
-		fprintf(fl, "Mount Vnum: %d\n", GET_MOUNT_VNUM(ch));
+	if (cfu->player_specials_saved.mount_vnum != NOTHING) {
+		fprintf(fl, "Mount Vnum: %d\n", cfu->player_specials_saved.mount_vnum);
 	}
-	
-	// 'N'
-	if (GET_ADMIN_NOTES(ch)) {
-		strcpy(temp, NULLSAFE(GET_ADMIN_NOTES(ch)));
-		strip_crlf(temp);
-		fprintf(fl, "Notes:\n%s~\n", temp);
+	if (cfu->player_specials_saved.olc_min_vnum > 0 || cfu->player_specials_saved.olc_max_vnum > 0 || cfu->player_specials_saved.olc_flags) {
+		fprintf(fl, "OLC: %d %d %s\n", cfu->player_specials_saved.olc_min_vnum, cfu->player_specials_saved.olc_max_vnum, bitv_to_alpha(cfu->player_specials_saved.olc_flags));
 	}
-	
-	// 'O'
-	for (offer = GET_OFFERS(ch); offer; offer = offer->next) {
-		fprintf(fl, "Offer: %d %d %d %ld %d\n", offer->from, offer->type, offer->location, offer->time, offer->data);
+	fprintf(fl, "Played: %d\n", cfu->played);
+	fprintf(fl, "Player Flags: %s\n", bitv_to_alpha(cfu->char_specials_saved.act));
+	if (*cfu->poofin) {
+		fprintf(fl, "Poofin: %s\n", cfu->poofin);
 	}
-	if (GET_OLC_MAX_VNUM(ch) > 0 || GET_OLC_MIN_VNUM(ch) > 0 || GET_OLC_FLAGS(ch) != NOBITS) {
-		fprintf(fl, "OLC: %d %d %s\n", GET_OLC_MIN_VNUM(ch), GET_OLC_MAX_VNUM(ch), bitv_to_alpha(GET_OLC_FLAGS(ch)));
+	if (*cfu->poofout) {
+		fprintf(fl, "Poofout: %s\n", cfu->poofout);
 	}
-	
-	// 'P'
-	fprintf(fl, "Played: %d\n", ch->player.time.played);
-	fprintf(fl, "Player Flags: %s\n", bitv_to_alpha(PLR_FLAGS(ch)));
-	if (POOFIN(ch)) {
-		fprintf(fl, "Poofin: %s\n", POOFIN(ch));
+	if (cfu->player_specials_saved.pref) {
+		fprintf(fl, "Preferences: %s\n", bitv_to_alpha(cfu->player_specials_saved.pref));
 	}
-	if (POOFOUT(ch)) {
-		fprintf(fl, "Poofout: %s\n", POOFOUT(ch));
+	if (cfu->player_specials_saved.promo_id) {
+		fprintf(fl, "Promo ID: %d\n", cfu->player_specials_saved.promo_id);
 	}
-	if (PRF_FLAGS(ch)) {
-		fprintf(fl, "Preferences: %s\n", bitv_to_alpha(PRF_FLAGS(ch)));
+	if (*cfu->prompt) {
+		fprintf(fl, "Prompt: %s\n", cfu->prompt);
 	}
-	if (GET_PROMO_ID(ch)) {
-		fprintf(fl, "Promo ID: %d\n", GET_PROMO_ID(ch));
+	if (cfu->player_specials_saved.recent_death_count) {
+		fprintf(fl, "Recent Deaths: %d\n", cfu->player_specials_saved.recent_death_count);
 	}
-	if (GET_PROMPT(ch)) {
-		fprintf(fl, "Prompt: %s\n", GET_PROMPT(ch));
+	if (*cfu->player_specials_saved.referred_by) {
+		fprintf(fl, "Referred by: %s\n", cfu->player_specials_saved.referred_by);
 	}
-	
-	// 'R'
-	if (GET_RECENT_DEATH_COUNT(ch)) {
-		fprintf(fl, "Recent Deaths: %d\n", GET_RECENT_DEATH_COUNT(ch));
-	}
-	if (GET_REFERRED_BY(ch)) {
-		fprintf(fl, "Referred by: %s\n", GET_REFERRED_BY(ch));
-	}
-	for (iter = 0; iter < NUM_MATERIALS; ++iter) {
-		if (GET_RESOURCE(ch, iter) != 0) {
-			fprintf(fl, "Resource: %d %s\n", GET_RESOURCE(ch, iter), materials[iter].name);
+	for (iter = 0; iter < b3_NUM_MATERIALS; ++iter) {
+		if (cfu->player_specials_saved.resources[iter] != 0) {
+			fprintf(fl, "Resource: %d %s\n", cfu->player_specials_saved.resources[iter], material_types[iter]);
 		}
 	}
-	for (iter = 0; iter < MAX_REWARDS_PER_DAY; ++iter) {
-		if (GET_REWARDED_TODAY(ch, iter) > 0) {
-			fprintf(fl, "Rewarded: %d\n", GET_REWARDED_TODAY(ch, iter));
+	for (iter = 0; iter < b3_MAX_REWARDS_PER_DAY; ++iter) {
+		if (cfu->player_specials_saved.rewarded_today[iter] > 0) {
+			fprintf(fl, "Rewarded: %d\n", cfu->player_specials_saved.rewarded_today[iter]);
 		}
 	}
-	
-	// 'S'
-	fprintf(fl, "Sex: %s\n", genders[(int) GET_REAL_SEX(ch)]);
-	for (iter = 0; iter < NUM_SKILLS; ++iter) {
-		fprintf(fl, "Skill: %d %d %.2f %d %d\n", iter, GET_SKILL(ch, iter), GET_SKILL_EXP(ch, iter), GET_FREE_SKILL_RESETS(ch, iter), NOSKILL_BLOCKED(ch, iter) ? 1 : 0);
+	fprintf(fl, "Sex: %s\n", genders[(int) cfu->sex]);
+	for (iter = 0; iter < MIN(NUM_SKILLS, b3_MAX_SKILLS); ++iter) {
+		fprintf(fl, "Skill: %d %d %.2f %d %d\n", iter, cfu->player_specials_saved.skills[iter].level, cfu->player_specials_saved.skills[iter].exp, cfu->player_specials_saved.skills[iter].resets, cfu->player_specials_saved.skills[iter].noskill ? 1 : 0);
 	}
-	fprintf(fl, "Skill Level: %d\n", GET_SKILL_LEVEL(ch));
-	for (slash = GET_SLASH_CHANNELS(ch); slash; slash = slash->next) {
-		if ((channel = find_slash_channel_by_id(slash->id))) {
-			fprintf(fl, "Slash-channel: %s\n", channel->name);
+	fprintf(fl, "Skill Level: %d\n", cfu->player_specials_saved.skill_level);
+	for (iter = 0; iter < b3_MAX_SLASH_CHANNELS; ++iter) {
+		if (*cfu->player_specials_saved.slash_channels[iter]) {
+			fprintf(fl, "Slash-channel: %s\n", cfu->player_specials_saved.slash_channels[iter]);
 		}
 	}
-	for (loadslash = LOAD_SLASH_CHANNELS(ch); loadslash; loadslash = loadslash->next) {
-		if (loadslash->name) {
-			// these are half-loaded slash channels and save in the same way
-			fprintf(fl, "Slash-channel: %s\n", loadslash->name);
-		}
+	if (cfu->player_specials_saved.syslogs) {
+		fprintf(fl, "Syslog Flags: %s\n", bitv_to_alpha(cfu->player_specials_saved.syslogs));
 	}
-	if (SYSLOG_FLAGS(ch)) {
-		fprintf(fl, "Syslog Flags: %s\n", bitv_to_alpha(SYSLOG_FLAGS(ch)));
+	if (*cfu->title) {
+		fprintf(fl, "Title: %s\n", cfu->title);
 	}
-	
-	// 'T'
-	if (GET_TITLE(ch)) {
-		fprintf(fl, "Title: %s\n", GET_TITLE(ch));
+	if (cfu->player_specials_saved.tomb_room != NOWHERE) {
+		fprintf(fl, "Tomb Room: %d\n", cfu->player_specials_saved.tomb_room);
 	}
-	if (GET_TOMB_ROOM(ch) != NOWHERE) {
-		fprintf(fl, "Tomb Room: %d\n", GET_TOMB_ROOM(ch));
-	}
-	
-	// 'U'
-	if (USING_POISON(ch)) {
-		fprintf(fl, "Using Poison: %d\n", USING_POISON(ch));
+	if (cfu->player_specials_saved.using_poison) {
+		fprintf(fl, "Using Poison: %d\n", cfu->player_specials_saved.using_poison);
 	}
 	
 	// END MAIN TAGS: the rest of the data is delay-loaded
 	fprintf(fl, "End Primary Data\n");
 	
-	// delayed: alias
-	for (alias = GET_ALIASES(ch); alias; alias = alias->next) {
-		fprintf(fl, "Alias: %d %ld %ld\n%s\n%s\n", alias->type, strlen(alias->alias), strlen(alias->replacement)-1, alias->alias, alias->replacement + 1);
+	// Aliases: only if we can read a file (ignore missing aliases)
+	get_filename(charname_lower, buf, "lib/plralias/", ".alias");
+	if ((loadfile = fopen(buf, "r"))) {
+		for (;;) {
+			/* Read the aliased command. */
+			fscanf(loadfile, "%d\n", &i_in[0]);
+			fgets(str_in1, i_in[0] + 1, loadfile);
+			alias.alias = str_in1;
+			/* Build the replacement. */
+			fscanf(file, "%d\n", &i_in[1]);
+			*str_in2 = ' ';		/* Doesn't need terminated, fgets() will. */
+			fgets(str_in2 + 1, i_in[1] + 1, loadfile);
+			alias.replacement = str_in2;
+
+			/* Figure out the alias type. */
+			fscanf(loadfile, "%d\n", &i_in[2]);
+			alias.type = length;
+			
+			fprintf(fl, "Alias: %d %ld %ld\n%s\n%s\n", alias.type, strlen(alias.alias), strlen(alias.replacement)-1, alias.alias, alias.replacement + 1);
+			
+			if (feof(loadfile)) {
+				break;
+			}
+		}
+		fclose(loadfile);
 	}
-	
-	// delayed: coin
-	for (coin = GET_PLAYER_COINS(ch); coin; coin = coin->next) {
-		fprintf(fl, "Coin: %d %d %ld\n", coin->amount, coin->empire_id, coin->last_acquired);
+		
+	// delayed: lore: only if we can read a file (ignore missing lore)
+	get_filename(charname_lower, buf, "lib/plrlore/", ".lore");
+	if ((loadfile = fopen(buf, "r"))) {
+		for (;;) {
+			get_line(loadfile, line);
+			if (!*line) {
+				// ignore
+				break;
+			}
+			if (*line == '$') {
+				// done
+				break;
+			}
+
+			if (sscanf(line, "%d %d %ld", &lore.type, &lore.value, &lore.date) != 3) {
+				// bad data: break
+				break;
+			}
+			
+			// must build strings now
+			switch (lore.type) {
+				case b3_LORE_FOUND_EMPIRE: {
+					strcpy(buf, "Founded the empire");
+					break;
+				}
+				case b3_LORE_JOIN_EMPIRE: {
+					strcpy(buf, "Honorably accepted into the empire");
+					break;
+				}
+				case b3_LORE_DEFECT_EMPIRE: {
+					strcpy(buf, "Defected from an empire");
+					break;
+				}
+				case b3_LORE_KICKED_EMPIRE: {
+					strcpy(buf, "Dishonorably discharged from an empire");
+					break;
+				}
+				case b3_LORE_PLAYER_KILL: {
+					strcpy(buf, "Killed a player in battle");
+					break;
+				}
+				case b3_LORE_PLAYER_DEATH: {
+					strcpy(buf, "Slain in battle");
+					break;
+				}
+				case b3_LORE_TOWER_DEATH: {
+					strcpy(buf, "Killed by a guard tower");
+					break;
+				}
+				case b3_LORE_START_VAMPIRE: {
+					strcpy(buf, "Sired");
+					break;
+				}
+				case b3_LORE_PURIFY: {
+					strcpy(buf, "Purified");
+					break;
+				}
+				case b3_LORE_SIRE_VAMPIRE: {
+					strcpy(buf, "Sired");
+					break;
+				}
+				case b3_LORE_MAKE_VAMPIRE: {
+					strcpy(buf, "Sired another vampire");
+					break;
+				}
+				
+				default: {
+					*buf = '\0';
+					break;
+				}
+			}
+			
+			if (*buf) {
+				fprintf(fl, "Lore: %d %ld\n%s\n", lore.type, lore.date, buf);
+			}
+		}
+		fclose(loadfile);
 	}
+
 	
-	// delayed: lore
 	for (lore = GET_LORE(ch); lore; lore = lore->next) {
 		if (lore->text && *lore->text) {
-			fprintf(fl, "Lore: %d %ld\n%s\n", lore->type, lore->date, lore->text);
+			
 		}
 	}
 	
