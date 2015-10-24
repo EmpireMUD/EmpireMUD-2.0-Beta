@@ -186,6 +186,16 @@ const char *pool_types[] = {
 #define b3_MAX_SKILLS  24
 #define b3_MAX_ABILITIES  400
 #define b3_MAX_DISGUISED_NAME_LENGTH  32
+#define b3_NUM_ABILITIES  262
+#define b3_NUM_MATERIALS  16
+#define b3_NUM_SKILLS 8
+
+struct b3_alias_data {
+	char *alias;
+	char *replacement;
+	int type;
+	struct b3_alias_data *next;
+};
 
 struct b3_lore_data {
 	int type;	// LORE_x
@@ -416,6 +426,33 @@ struct b3_char_file_u {
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
 
+// most of these helpers are copied out of the regular game code, but some have
+// been modified specifically for this converter.
+
+/*
+ * get_line reads the next non-blank line off of the input stream.
+ * The newline character is removed from the input.  Lines which begin
+ * with '*' are considered to be comments.
+ *
+ * Returns the number of lines advanced in the file.
+ */
+int get_line(FILE *fl, char *buf) {
+	char temp[256];
+	int lines = 0;
+
+	do {
+		fgets(temp, 256, fl);
+		if (feof(fl)) {
+			return (0);
+		}
+		lines++;
+	} while (*temp == '*' || *temp == '\n');
+
+	temp[strlen(temp) - 1] = '\0';
+	strcpy(buf, temp);
+	return (lines);
+}
+
 /**
 * Gets the filename/path for various name-divided file directories.
 *
@@ -425,7 +462,7 @@ struct b3_char_file_u {
 * @param char *suffix THe portion after the name.
 * @return int 1=success, 0=fail
 */
-int get_filename(char *orig_name, char *filename, char *prefix, char *suffix) {
+int old_filename(char *orig_name, char *filename, char *prefix, char *suffix) {
 	const char *middle;
 	char name[64], *ptr;
 	
@@ -445,7 +482,7 @@ int get_filename(char *orig_name, char *filename, char *prefix, char *suffix) {
 	else if (LOWER(*name) <= 'j') {
 		middle = "F-J";
 	}
-	else if (LOWER(*name) <= 'o')
+	else if (LOWER(*name) <= 'o') {
 		middle = "K-O";
 	}
 	else if (LOWER(*name) <= 't') {
@@ -553,9 +590,6 @@ int sort_accounts(account_data *a, account_data *b) {
 }
 
 
-// most of these helpers are copied out of the regular game code, but some have
-// been modified specifically for this converter.
-
 /**
 * Add an account to the hash table.
 *
@@ -654,23 +688,17 @@ void write_account_to_file(FILE *fl, account_data *acct) {
 */
 void convert_char(struct b3_char_file_u *cfu) {
 	char charname_lower[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH];
-	char temp[MAX_STRING_LENGTH], str_in1[MAX_STRING_LENGTH], 
+	char temp[MAX_STRING_LENGTH], str_in1[MAX_STRING_LENGTH];
 	char str_in2[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
-	struct affected_type *af, *new_af, *next_af, *af_list;
 	struct account_player *acct_player, *last_acct_player;
-	struct player_slash_channel *slash;
-	struct over_time_effect_type *dot;
-	struct slash_channel *loadslash;
-	struct slash_channel *channel;
-	obj_data *char_eq[NUM_WEARS];
-	char temp[MAX_STRING_LENGTH];
-	struct trig_var_data *vars;
-	struct cooldown_data *cool;
 	struct b3_lore_data lore;
-	struct alias_data alias;
+	struct b3_alias_data alias;
 	FILE *fl, *loadfile;
 	account_data *acct;
-	int iter;
+	int iter, spaces;
+	long l_in[2];
+	int i_in[3];
+	char *ptr;
 	
 	// get lowercase char name
 	strcpy(charname_lower, cfu->name);
@@ -683,7 +711,7 @@ void convert_char(struct b3_char_file_u *cfu) {
 		return;
 	}
 	
-	if (!get_filename(charname_lower, buf, "lib/players/", ".plr")) {
+	if (!old_filename(charname_lower, buf, "lib/players/", ".plr")) {
 		printf("convert_char: Unable to get filename for player: %s", charname_lower);
 		exit(1);
 	}
@@ -715,7 +743,7 @@ void convert_char(struct b3_char_file_u *cfu) {
 		}
 	}
 	CREATE(acct_player, struct account_player, 1);
-	acct_player->name = str_dup(charname_lower);
+	acct_player->name = strdup(charname_lower);
 	if ((last_acct_player = acct->players)) {
 		while (last_acct_player->next) {
 			last_acct_player = last_acct_player->next;
@@ -745,7 +773,7 @@ void convert_char(struct b3_char_file_u *cfu) {
 	// account: notes -- merge from each character
 	if (*cfu->player_specials_saved.admin_notes) {
 		snprintf(temp, sizeof(temp), "%s%s%s", acct->notes ? acct->notes : "", acct->notes ? "\r\n" : "", cfu->player_specials_saved.admin_notes);
-		acct->notes = str_dup(temp);
+		acct->notes = strdup(temp);
 	}
 	
 	// BEGIN TAGS
@@ -814,7 +842,7 @@ void convert_char(struct b3_char_file_u *cfu) {
 	fprintf(fl, "Class: %d\n", cfu->player_specials_saved.character_class);
 	fprintf(fl, "Class Progression: %d\n", cfu->player_specials_saved.class_progression);
 	fprintf(fl, "Class Role: %d\n", cfu->player_specials_saved.class_role);
-	for (iter = 0; iter < b3_NUM_CUSTOM_COLORS; ++iter) {
+	for (iter = 0; iter < b3_MAX_CUSTOM_COLORS; ++iter) {
 		if (cfu->player_specials_saved.custom_colors[iter] > 0) {
 			fprintf(fl, "Color: %s %c\n", custom_color_types[iter], cfu->player_specials_saved.custom_colors[iter]);
 		}
@@ -940,7 +968,7 @@ void convert_char(struct b3_char_file_u *cfu) {
 		}
 	}
 	fprintf(fl, "Sex: %s\n", genders[(int) cfu->sex]);
-	for (iter = 0; iter < MIN(NUM_SKILLS, b3_MAX_SKILLS); ++iter) {
+	for (iter = 0; iter < MIN(b3_NUM_SKILLS, b3_MAX_SKILLS); ++iter) {
 		fprintf(fl, "Skill: %d %d %.2f %d %d\n", iter, cfu->player_specials_saved.skills[iter].level, cfu->player_specials_saved.skills[iter].exp, cfu->player_specials_saved.skills[iter].resets, cfu->player_specials_saved.skills[iter].noskill ? 1 : 0);
 	}
 	fprintf(fl, "Skill Level: %d\n", cfu->player_specials_saved.skill_level);
@@ -966,7 +994,7 @@ void convert_char(struct b3_char_file_u *cfu) {
 	fprintf(fl, "End Primary Data\n");
 	
 	// Aliases: only if we can read a file (ignore missing aliases)
-	get_filename(charname_lower, buf, "lib/plralias/", ".alias");
+	old_filename(charname_lower, buf, "lib/plralias/", ".alias");
 	if ((loadfile = fopen(buf, "r"))) {
 		for (;;) {
 			/* Read the aliased command. */
@@ -974,14 +1002,14 @@ void convert_char(struct b3_char_file_u *cfu) {
 			fgets(str_in1, i_in[0] + 1, loadfile);
 			alias.alias = str_in1;
 			/* Build the replacement. */
-			fscanf(file, "%d\n", &i_in[1]);
+			fscanf(loadfile, "%d\n", &i_in[1]);
 			*str_in2 = ' ';		/* Doesn't need terminated, fgets() will. */
 			fgets(str_in2 + 1, i_in[1] + 1, loadfile);
 			alias.replacement = str_in2;
 
 			/* Figure out the alias type. */
 			fscanf(loadfile, "%d\n", &i_in[2]);
-			alias.type = length;
+			alias.type = i_in[2];
 			
 			fprintf(fl, "Alias: %d %ld %ld\n%s\n%s\n", alias.type, strlen(alias.alias), strlen(alias.replacement)-1, alias.alias, alias.replacement + 1);
 			
@@ -991,9 +1019,9 @@ void convert_char(struct b3_char_file_u *cfu) {
 		}
 		fclose(loadfile);
 	}
-		
+	
 	// delayed: lore: only if we can read a file (ignore missing lore)
-	get_filename(charname_lower, buf, "lib/plrlore/", ".lore");
+	old_filename(charname_lower, buf, "lib/plrlore/", ".lore");
 	if ((loadfile = fopen(buf, "r"))) {
 		for (;;) {
 			get_line(loadfile, line);
@@ -1071,63 +1099,57 @@ void convert_char(struct b3_char_file_u *cfu) {
 		fclose(loadfile);
 	}
 	
-	// delayed: script variables
-	if (SCRIPT(ch) && SCRIPT(ch)->global_vars) {
-		for (vars = SCRIPT(ch)->global_vars; vars; vars = vars->next) {
-			if (*vars->name == '-') { // don't save if it begins with -
+	// delayed: Variables: only if we can read a file (ignore missing vars)
+	old_filename(charname_lower, buf, "lib/plrvars/", ".mem");
+	if ((loadfile = fopen(buf, "r"))) {
+		do {
+			if (get_line(loadfile, line) <= 0) {
+				continue;
+			}
+			if (sscanf(line, "%s %ld ", str_in1, &l_in[0]) != 2) {
 				continue;
 			}
 			
-			fprintf(fl, "Variable: %s %ld\n%s\n", vars->name, vars->context, vars->value);
-		}
+			ptr = line;
+			spaces = 0;
+			while ((spaces < 2 || *ptr == ' ') && *ptr) {
+				if (*ptr == ' ') {
+					++spaces;
+				}
+				++ptr;
+			}
+			
+			if (*ptr) {
+				fprintf(fl, "Variable: %s %ld\n%s\n", str_in1, l_in[0], ptr);
+			}
+		} while(!feof(loadfile));
+
+		fclose(loadfile);
 	}
 	
-	// delayed: equipment
-	for (iter = 0; iter < NUM_WEARS; ++iter) {
-		if (char_eq[iter]) {
-			Crash_save(char_eq[iter], fl, iter + 1);	// save at iter+1 because 0 == LOC_INVENTORY
-		}
+	// delayed: Equipment: attempt to just grab the whole obj file
+	old_filename(charname_lower, buf, "lib/plrobjs/", ".objs");
+	if ((loadfile = fopen(buf, "r"))) {
+		do {
+			if (get_line(loadfile, line) < 0) {
+				continue;
+			}
+			if (*line == '$') {
+				break;
+			}
+			if (!strncmp(line, "Rent-time:", 10) || !strncmp(line, "Rent-code:", 10)) {
+				continue;
+			}
+			
+			// otherwise write the line as-is
+			fprintf(fl, "%s\n", line);
+		} while (!feof(loadfile));
+		
+		fclose(loadfile);
 	}
-	
-	// delayed: inventory
-	Crash_save(ch->carrying, fl, LOC_INVENTORY);
 	
 	// END DELAY-LOADED SECTION
 	fprintf(fl, "End Player File\n");
-	
-	// re-apply: affects
-	for (af = af_list; af; af = next_af) {
-		next_af = af->next;
-		affect_to_char(ch, af);
-		free(af);
-	}
-	
-	// re-apply: equipment
-	for (iter = 0; iter < NUM_WEARS; ++iter) {
-		if (char_eq[iter]) {
-			#ifndef NO_EXTRANEOUS_TRIGGERS
-				if (wear_otrigger(char_eq[iter], ch, iter)) {
-			#endif
-					// this line may depend on the above if
-					equip_char(ch, char_eq[iter], iter);
-			#ifndef NO_EXTRANEOUS_TRIGGERS
-				}
-				else {
-					obj_to_char(char_eq[iter], ch);
-				}
-			#endif
-		}
-	}
-	
-	// affect_total(ch); // unnecessary, I think (?)
-
-
-	// - move admin notes to acct
-	// - move plr flags
-	// - import lore
-	// - import vars
-	// - import objs
-	// - import aliases
 }
 
 
