@@ -812,7 +812,7 @@ void free_char(char_data *ch) {
 		remove_cooldown(ch, ch->cooldowns);
 	}
 
-	/* free any assigned scripts */
+	// free any assigned scripts and vars
 	if (SCRIPT(ch)) {
 		extract_script(ch, MOB_TRIGGER);
 	}
@@ -2462,7 +2462,7 @@ void autowiz_write_wizlist(FILE *out, int minlev, int maxlev) {
 			strcat(buf, curr_name->name);
 			if (strlen(buf) > AUTOWIZ_LINE_LEN) {
 				if (curr_level->params->level <= AUTOWIZ_COL_LEVEL)
-					fprintf(out, AUTOWIZ_IMM_LMARG);
+					fprintf(out, "%s", AUTOWIZ_IMM_LMARG);
 				else {
 					i = 40 - (strlen(buf) / 2);
 					for (j = 1; j <= i; ++j)

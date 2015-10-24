@@ -29,7 +29,8 @@ LIBS = @CRYPTLIB@ -lm
 default: all
 
 all: $(BINDIR)/cryptpasswd $(WLDDIR)/map $(BINDIR)/sign \
-	$(BINDIR)/plrconv-20b1-to-20b2 $(BINDIR)/plrconv-20b2-to-20b3
+	$(BINDIR)/plrconv-20b1-to-20b2 $(BINDIR)/plrconv-20b2-to-20b3 \
+	$(BINDIR)/plrconv-20b3-to-ascii
 
 cryptpasswd: $(BINDIR)/cryptpasswd
 
@@ -38,6 +39,8 @@ map: $(WLDDIR)/map
 plrconv-20b1-to-20b2: $(BINDIR)/plrconv-20b1-to-20b2
 
 plrconv-20b2-to-20b3: $(BINDIR)/plrconv-20b2-to-20b3
+
+plrconv-20b3-to-ascii: $(BINDIR)/plrconv-20b3-to-ascii
 
 sign: $(BINDIR)/sign
 
@@ -55,6 +58,10 @@ $(BINDIR)/plrconv-20b1-to-20b2: plrconv-20b1-to-20b2.c $(INCDIR)/conf.h \
 $(BINDIR)/plrconv-20b2-to-20b3: plrconv-20b2-to-20b3.c $(INCDIR)/conf.h \
 	$(INCDIR)/sysdep.h $(INCDIR)/structs.h $(INCDIR)/utils.h
 	$(CC) $(CFLAGS) -o $(BINDIR)/plrconv-20b2-to-20b3 plrconv-20b2-to-20b3.c $(LIBS)
+
+$(BINDIR)/plrconv-20b3-to-ascii: plrconv-20b3-to-ascii.c $(INCDIR)/conf.h \
+	$(INCDIR)/sysdep.h $(INCDIR)/structs.h $(INCDIR)/utils.h
+	$(CC) $(CFLAGS) -o $(BINDIR)/plrconv-20b3-to-ascii plrconv-20b3-to-ascii.c $(LIBS)
 
 $(BINDIR)/sign: sign.c $(INCDIR)/conf.h $(INCDIR)/sysdep.h
 	$(CC) $(CFLAGS) -o $(BINDIR)/sign sign.c $(LIBS)
