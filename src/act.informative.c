@@ -2515,7 +2515,7 @@ ACMD(do_whois) {
 	}
 	
 	// load remaining data
-	check_delayed_load(ch);
+	check_delayed_load(victim);
 	
 	// basic info
 	msg_to_char(ch, "%s%s&0\r\n", PERS(victim, victim, TRUE), NULLSAFE(GET_TITLE(victim)));
