@@ -668,7 +668,7 @@ void convert_char(struct b3_char_file_u *cfu) {
 	struct cooldown_data *cool;
 	struct b3_lore_data lore;
 	struct alias_data alias;
-	FILE *pfile, *loadfile;
+	FILE *fl, *loadfile;
 	account_data *acct;
 	int iter;
 	
@@ -1069,13 +1069,6 @@ void convert_char(struct b3_char_file_u *cfu) {
 			}
 		}
 		fclose(loadfile);
-	}
-
-	
-	for (lore = GET_LORE(ch); lore; lore = lore->next) {
-		if (lore->text && *lore->text) {
-			
-		}
 	}
 	
 	// delayed: script variables
