@@ -1234,11 +1234,9 @@ int main(int argc, char *argv[]) {
 	}
 	
 	// remove old-style files
-	remove("lib/etc/players");
-	remove("lib/plralias");
-	remove("lib/plrlore");
-	remove("lib/plrobjs");
-	remove("lib/plrvars");
+	printf("Done.\n");
+	printf("You may now delete the lib/etc/players file.\n");
+	printf("You may also delete the lib/plralias, lib/plrlore, lib/plrobjs, and lib/plrvars directories.\n");
 	
 	return 0;
 }
