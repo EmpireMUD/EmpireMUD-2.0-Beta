@@ -2048,7 +2048,7 @@ void write_player_to_file(FILE *fl, char_data *ch) {
 			fprintf(fl, "Ignore: %d\n", GET_IGNORE_LIST(ch, iter));
 		}
 	}
-	if (GET_IMMORTAL_LEVEL(ch)) {
+	if (GET_IMMORTAL_LEVEL(ch) != -1) {
 		fprintf(fl, "Immortal Level: %d\n", GET_IMMORTAL_LEVEL(ch));
 	}
 	fprintf(fl, "Injuries: %s\n", bitv_to_alpha(INJURY_FLAGS(ch)));
@@ -2604,6 +2604,7 @@ void clear_player(char_data *ch) {
 	GET_ADVENTURE_SUMMON_RETURN_MAP(ch) = NOWHERE;
 	GET_LAST_TELL(ch) = NOBODY;
 	GET_TEMPORARY_ACCOUNT_ID(ch) = NOTHING;
+	GET_IMMORTAL_LEVEL(ch) = -1;	// Not an immortal
 }
 
 
@@ -2756,6 +2757,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	
 	if (GET_IMMORTAL_LEVEL(ch) > -1) {
 		GET_ACCESS_LEVEL(ch) = LVL_TOP - GET_IMMORTAL_LEVEL(ch);
+		GET_ACCESS_LEVEL(ch) = MAX(GET_ACCESS_LEVEL(ch), LVL_START_IMM);
 	}
 	
 	if (PLR_FLAGGED(ch, PLR_INVSTART))
@@ -2954,8 +2956,6 @@ void init_player(char_data *ch) {
 	
 	// some basic player inits
 	clear_player(ch);
-
-	GET_IMMORTAL_LEVEL(ch) = -1;				/* Not an immortal */
 
 	/* *** if this is our first player --- he be God *** */
 	if (HASH_CNT(idnum_hh, player_table_by_idnum) == 0) {

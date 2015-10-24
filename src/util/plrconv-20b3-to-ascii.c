@@ -899,7 +899,7 @@ void convert_char(struct b3_char_file_u *cfu) {
 			fprintf(fl, "Ignore: %d\n", cfu->player_specials_saved.ignore_list[iter]);
 		}
 	}
-	if (cfu->player_specials_saved.immortal_level) {
+	if (cfu->player_specials_saved.immortal_level != -1) {
 		fprintf(fl, "Immortal Level: %d\n", cfu->player_specials_saved.immortal_level);
 	}
 	fprintf(fl, "Injuries: %s\n", bitv_to_alpha(cfu->char_specials_saved.injuries));
