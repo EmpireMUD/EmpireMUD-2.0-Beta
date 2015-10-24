@@ -1910,10 +1910,11 @@ SHOW(show_account) {
 			if (file) {
 				free_char(plr);
 			}
+			return;
 		}
 		
 		HASH_ITER(name_hh, player_table_by_name, index, next_index) {
-			if (index->account_id != plr_index->account_id && strcmp(index->last_host, plr_index->last_host)) {
+			if (index->account_id != plr_index->account_id || strcmp(index->last_host, plr_index->last_host)) {
 				continue;
 			}
 			if (!(loaded = find_or_load_player(index->name, &loaded_file))) {
