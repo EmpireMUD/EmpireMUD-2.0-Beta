@@ -600,6 +600,7 @@ void build_player_index(void) {
 				ch = NULL;
 				if (plr->name && *plr->name) {
 					ch = load_player(plr->name, FALSE);
+					GET_ACCOUNT(ch) = acct;	// not set by load_player
 				}
 				
 				// could not load character for this entry
@@ -2743,8 +2744,10 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	}
 	
 	// ensure the player has an idnum and is in the index
-	if (GET_IDNUM(ch) <= 0 || !(index = find_player_index_by_idnum(GET_IDNUM(ch)))) {
+	if (GET_IDNUM(ch) <= 0) {
 		GET_IDNUM(ch) = ++top_idnum;
+	}
+	if (!(index = find_player_index_by_idnum(GET_IDNUM(ch)))) {
 		CREATE(index, player_index_data, 1);
 		update_player_index(index, ch);
 		add_player_to_table(index);
@@ -2996,8 +2999,11 @@ void init_player(char_data *ch) {
 	ch->points.current_pools[BLOOD] = GET_MAX_BLOOD(ch);	// this is a function
 	
 	// assign idnum
-	if (GET_IDNUM(ch) <= 0 || !(index = find_player_index_by_idnum(GET_IDNUM(ch)))) {
+	if (GET_IDNUM(ch) <= 0) {
 		GET_IDNUM(ch) = ++top_idnum;
+	}
+	// ensure in index
+	if (!(index = find_player_index_by_idnum(GET_IDNUM(ch)))) {
 		CREATE(index, player_index_data, 1);
 		update_player_index(index, ch);
 		add_player_to_table(index);
