@@ -2485,7 +2485,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 	bool is_proto = (IS_NPC(k) && k == mob_proto(GET_MOB_VNUM(k)));
 	
 	// ensure fully loaded
-	check_delayed_load(ch);
+	check_delayed_load(k);
 
 	sprinttype(GET_REAL_SEX(k), genders, buf);
 	CAP(buf);
