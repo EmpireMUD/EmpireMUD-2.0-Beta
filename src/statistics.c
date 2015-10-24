@@ -171,7 +171,7 @@ void display_statistics_to_char(char_data *ch) {
 		military += EMPIRE_MILITARY(emp);
 	}
 
-	msg_to_char(ch, "Total Empires:	   %5d     Claimed Area:       %d\r\n", HASH_COUNT(empire_table), territory);
+	msg_to_char(ch, "Total Empires:    %5d     Claimed Area:       %d\r\n", HASH_COUNT(empire_table), territory);
 	msg_to_char(ch, "Total Players:    %5d     Players in Empires: %d\r\n", HASH_CNT(idnum_hh, player_table_by_idnum), members);
 	msg_to_char(ch, "Total Citizens:   %5d     Total Military:     %d\r\n", citizens, military);
 

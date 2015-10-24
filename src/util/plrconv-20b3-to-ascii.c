@@ -85,6 +85,22 @@ const char *custom_color_types[] = {
 	"\n"
 };
 
+const char *extra_attribute_types[] = {
+	"Bonus-Inventory",
+	"Resist-Physical",
+	"Block",
+	"To-Hit",
+	"Dodge",
+	"Extra-Blood",	// 5
+	"Bonus-Physical",
+	"Bonus-Magical",
+	"Bonus-Healing",
+	"Heal-Over-Time",
+	"Resist-Magical",	// 10
+	"Crafting-Bonus",
+	"\n"
+};
+
 const char *genders[] = {
 	"neutral",
 	"male",
@@ -793,70 +809,50 @@ void convert_char(struct b3_char_file_u *cfu) {
 			fprintf(fl, "DoT Effect: %d %d %d %d %d %d %d\n", cfu->over_time_effects[iter].type, cfu->over_time_effects[iter].cast_by, cfu->over_time_effects[iter].duration, cfu->over_time_effects[iter].damage_type, cfu->over_time_effects[iter].damage, cfu->over_time_effects[iter].stack, cfu->over_time_effects[iter].max_stack);
 		}
 	}
-	
-	// 'E'
 	for (iter = 0; iter < NUM_EXTRA_ATTRIBUTES; ++iter) {
-		if (GET_EXTRA_ATT(ch, iter)) {
-			fprintf(fl, "Extra Attribute: %s %d\n", extra_attribute_types[iter], GET_EXTRA_ATT(ch, iter));
+		if (cfu->points.extra_attributes[iter] > 0) {
+			fprintf(fl, "Extra Attribute: %s %d\n", extra_attribute_types[iter], cfu->points.extra_attributes[iter]);
 		}
 	}
-	
-	// 'F'
-	if (GET_FIGHT_PROMPT(ch)) {
-		fprintf(fl, "Fight Prompt: %s\n", GET_FIGHT_PROMPT(ch));
+	if (*cfu->fight_prompt) {
+		fprintf(fl, "Fight Prompt: %s\n", cfu->fight_prompt);
 	}
-	
-	// 'G'
-	if (GET_GRANT_FLAGS(ch)) {
-		fprintf(fl, "Grants: %s\n", bitv_to_alpha(GET_GRANT_FLAGS(ch)));
+	if (cfu->player_specials_saved.grants) {
+		fprintf(fl, "Grants: %s\n", bitv_to_alpha(cfu->player_specials_saved.grants));
 	}
-	
-	// 'H'
-	fprintf(fl, "Highest Known Level: %d\n", GET_HIGHEST_KNOWN_LEVEL(ch));
-	
-	// 'I'
-	for (iter = 0; iter < MAX_IGNORES; ++iter) {
-		if (GET_IGNORE_LIST(ch, iter) > 0) {
-			fprintf(fl, "Ignore: %d\n", GET_IGNORE_LIST(ch, iter));
+	fprintf(fl, "Highest Known Level: %d\n", cfu->player_specials_saved.highest_known_level);
+	for (iter = 0; iter < b3_MAX_IGNORES; ++iter) {
+		if (cfu->player_specials_saved.ignore_list[iter] > 0) {
+			fprintf(fl, "Ignore: %d\n", cfu->player_specials_saved.ignore_list[iter]);
 		}
 	}
-	if (GET_IMMORTAL_LEVEL(ch)) {
-		fprintf(fl, "Immortal Level: %d\n", GET_IMMORTAL_LEVEL(ch));
+	if (cfu->player_specials_saved.immortal_level) {
+		fprintf(fl, "Immortal Level: %d\n", cfu->player_specials_saved.immortal_level);
 	}
-	fprintf(fl, "Injuries: %s\n", bitv_to_alpha(INJURY_FLAGS(ch)));
-	if (GET_INVIS_LEV(ch)) {
-		fprintf(fl, "Invis Level: %d\n", GET_INVIS_LEV(ch));
+	fprintf(fl, "Injuries: %s\n", bitv_to_alpha(cfu->char_specials_saved.injuries));
+	if (cfu->player_specials_saved.invis_level) {
+		fprintf(fl, "Invis Level: %d\n", cfu->player_specials_saved.invis_level);
 	}
-	
-	// 'L'
-	if (GET_LAST_CORPSE_ID(ch) > 0) {
-		fprintf(fl, "Last Corpse Id: %d\n", GET_LAST_CORPSE_ID(ch));
+	if (cfu->player_specials_saved.last_corpse_id > 0) {
+		fprintf(fl, "Last Corpse Id: %d\n", cfu->player_specials_saved.last_corpse_id);
 	}
-	fprintf(fl, "Last Death: %ld\n", GET_LAST_DEATH_TIME(ch));
-	fprintf(fl, "Last Direction: %d\n", GET_LAST_DIR(ch));
-	fprintf(fl, "Last Known Level: %d\n", GET_LAST_KNOWN_LEVEL(ch));
-	fprintf(fl, "Last Room: %d\n", GET_LAST_ROOM(ch));
-	if (GET_LAST_TELL(ch) != NOBODY) {
-		fprintf(fl, "Last Tell: %d\n", GET_LAST_TELL(ch));
+	fprintf(fl, "Last Death: %ld\n", cfu->player_specials_saved.last_death_time);
+	fprintf(fl, "Last Direction: %d\n", cfu->player_specials_saved.last_direction);
+	fprintf(fl, "Last Known Level: %d\n", cfu->player_specials_saved.last_known_level);
+	fprintf(fl, "Last Room: %d\n", cfu->player_specials_saved.last_room);
+	if (cfu->player_specials_saved.last_tip) {
+		fprintf(fl, "Last Tip: %d\n", cfu->player_specials_saved.last_tip);
 	}
-	if (GET_LAST_TIP(ch)) {
-		fprintf(fl, "Last Tip: %d\n", GET_LAST_TIP(ch));
+	if (*cfu->lastname) {
+		fprintf(fl, "Lastname: %s\n", cfu->lastname);
 	}
-	if (GET_LASTNAME(ch)) {
-		fprintf(fl, "Lastname: %s\n", GET_LASTNAME(ch));
+	fprintf(fl, "Load Room: %d\n", cfu->player_specials_saved.load_room);
+	fprintf(fl, "Load Room Check: %d\n", cfu->player_specials_saved.load_room_check);
+	if (cfu->player_specials_saved.mapsize) {
+		fprintf(fl, "Mapsize: %d\n", cfu->player_specials_saved.mapsize);
 	}
-	fprintf(fl, "Load Room: %d\n", GET_LOADROOM(ch));
-	fprintf(fl, "Load Room Check: %d\n", GET_LOAD_ROOM_CHECK(ch));
-	
-	// 'M'
-	if (GET_MARK_LOCATION(ch) != NOWHERE) {
-		fprintf(fl, "Map Mark: %d\n", GET_MARK_LOCATION(ch));
-	}
-	if (GET_MAPSIZE(ch)) {
-		fprintf(fl, "Mapsize: %d\n", GET_MAPSIZE(ch));
-	}
-	if (GET_MORPH(ch) != MORPH_NONE) {
-		fprintf(fl, "Morph: %d\n", GET_MORPH(ch));
+	if (cfu->player_specials_saved.morph != MORPH_NONE) {
+		fprintf(fl, "Morph: %d\n", cfu->player_specials_saved.morph);
 	}
 	if (GET_MOUNT_FLAGS(ch) != NOBITS) {
 		fprintf(fl, "Mount Flags: %s\n", bitv_to_alpha(GET_MOUNT_FLAGS(ch)));
