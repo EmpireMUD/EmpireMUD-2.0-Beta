@@ -1442,6 +1442,9 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 	}
 
 	else if SET_CASE("name") {
+		void add_player_to_table(player_index_data *plr);
+		void remove_player_from_table(player_index_data *plr);
+
 		SAVE_CHAR(vict);
 		one_argument(val_arg, buf);
 		if (_parse_name(buf, newname) || fill_word(newname) || strlen(newname) > MAX_NAME_LENGTH || strlen(newname) < 2 || !Valid_Name(newname)) {
@@ -1468,10 +1471,27 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 			return 0;
 		}
 		strcpy(oldname, GET_PC_NAME(vict));
-		if (GET_PC_NAME(vict))
+		if (GET_PC_NAME(vict)) {
 			free(GET_PC_NAME(vict));
+		}
 		GET_PC_NAME(vict) = strdup(CAP(newname));
-		update_player_index(found_index, vict);
+		
+		// ensure we really have the right index
+		if ((found_index = find_player_index_by_idnum(GET_IDNUM(vict)))) {
+			remove_player_from_table(found_index);	// temporary remove
+			
+			if (found_index->name) {
+				free(found_index->name);
+			}
+			found_index->name = str_dup(GET_PC_NAME(vict));
+			strtolower(found_index->name);
+			
+			// now update the rest of the data
+			update_player_index(found_index, vict);
+			
+			// now re-add to index
+			add_player_to_table(found_index);
+		}
 		
 		// rename the save file
 		get_filename(oldname, buf1, PLR_FILE);

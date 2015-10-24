@@ -1797,11 +1797,11 @@ void update_player_index(player_index_data *index, char_data *ch) {
 	
 	index->idnum = GET_IDNUM(ch);
 	
-	if (index->name) {
-		free(index->name);
+	// only copy the name once (it's used as a key)
+	if (!index->name) {
+		index->name = str_dup(GET_PC_NAME(ch));
+		strtolower(index->name);
 	}
-	index->name = str_dup(GET_PC_NAME(ch));
-	strtolower(index->name);
 	
 	if (index->fullname) {
 		free(index->fullname);
