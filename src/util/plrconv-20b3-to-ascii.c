@@ -111,7 +111,7 @@ const char *material_types[] = {
 	"WOOD",
 	"ROCK",
 	"IRON",
-	"SILVER"
+	"SILVER",
 	"GOLD",
 	"FLINT",
 	"CLAY",
@@ -1223,6 +1223,7 @@ int main(int argc, char *argv[]) {
 				printf("Unable to write file: %s\n", fname);
 				exit(1);
 			}
+			last_zone = this_zone;
 		}
 		
 		write_account_to_file(fl, acct);
