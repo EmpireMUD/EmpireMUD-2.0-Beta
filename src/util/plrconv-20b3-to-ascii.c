@@ -713,7 +713,7 @@ void convert_char(struct b3_char_file_u *cfu) {
 		return;
 	}
 	
-	if (!old_filename(charname_lower, buf, "lib/players/", ".plr")) {
+	if (!old_filename(charname_lower, buf, "lib/players/", "plr")) {
 		printf("convert_char: Unable to get filename for player: %s", charname_lower);
 		exit(1);
 	}
@@ -996,7 +996,7 @@ void convert_char(struct b3_char_file_u *cfu) {
 	fprintf(fl, "End Primary Data\n");
 	
 	// Aliases: only if we can read a file (ignore missing aliases)
-	old_filename(charname_lower, buf, "lib/plralias/", ".alias");
+	old_filename(charname_lower, buf, "lib/plralias/", "alias");
 	if ((loadfile = fopen(buf, "r"))) {
 		for (;;) {
 			/* Read the aliased command. */
@@ -1023,7 +1023,7 @@ void convert_char(struct b3_char_file_u *cfu) {
 	}
 	
 	// delayed: lore: only if we can read a file (ignore missing lore)
-	old_filename(charname_lower, buf, "lib/plrlore/", ".lore");
+	old_filename(charname_lower, buf, "lib/plrlore/", "lore");
 	if ((loadfile = fopen(buf, "r"))) {
 		for (;;) {
 			get_line(loadfile, line);
@@ -1102,7 +1102,7 @@ void convert_char(struct b3_char_file_u *cfu) {
 	}
 	
 	// delayed: Variables: only if we can read a file (ignore missing vars)
-	old_filename(charname_lower, buf, "lib/plrvars/", ".mem");
+	old_filename(charname_lower, buf, "lib/plrvars/", "mem");
 	if ((loadfile = fopen(buf, "r"))) {
 		do {
 			if (get_line(loadfile, line) <= 0) {
@@ -1130,7 +1130,7 @@ void convert_char(struct b3_char_file_u *cfu) {
 	}
 	
 	// delayed: Equipment: attempt to just grab the whole obj file
-	old_filename(charname_lower, buf, "lib/plrobjs/", ".objs");
+	old_filename(charname_lower, buf, "lib/plrobjs/", "objs");
 	if ((loadfile = fopen(buf, "r"))) {
 		do {
 			if (get_line(loadfile, line) < 0) {
@@ -1152,6 +1152,11 @@ void convert_char(struct b3_char_file_u *cfu) {
 	
 	// END DELAY-LOADED SECTION
 	fprintf(fl, "End Player File\n");
+	fclose(fl);
+	
+	old_filename(charname_lower, buf, "lib/players/", "plr");
+	sprintf(temp, "%s.temp", buf);
+	rename(temp, buf);
 }
 
 
