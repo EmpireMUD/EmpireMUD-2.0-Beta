@@ -4007,7 +4007,7 @@ void obj_from_char(obj_data *object) {
 		REMOVE_FROM_LIST(object, object->carried_by->carrying, next_content);
 		object->next_content = NULL;
 
-		IS_CARRYING_N(object->carried_by) -= GET_OBJ_INVENTORY_SIZE(object);
+		IS_CARRYING_N(object->carried_by) -= obj_carry_size(object);
 
 		// check lights
 		if (IN_ROOM(object->carried_by) && OBJ_FLAGGED(object, OBJ_LIGHT)) {
@@ -4034,7 +4034,7 @@ void obj_from_obj(obj_data *obj) {
 		obj_from = obj->in_obj;
 		REMOVE_FROM_LIST(obj, obj_from->contains, next_content);
 
-		GET_OBJ_CARRYING_N(obj_from) -= GET_OBJ_INVENTORY_SIZE(obj);
+		GET_OBJ_CARRYING_N(obj_from) -= obj_carry_size(obj);
 
 		obj->in_obj = NULL;
 		obj->next_content = NULL;
@@ -4097,7 +4097,7 @@ void obj_to_char(obj_data *object, char_data *ch) {
 		object->next_content = ch->carrying;
 		ch->carrying = object;
 		object->carried_by = ch;
-		IS_CARRYING_N(ch) += GET_OBJ_INVENTORY_SIZE(object);
+		IS_CARRYING_N(ch) += obj_carry_size(object);
 		
 		// binding
 		if (OBJ_FLAGGED(object, OBJ_BIND_ON_PICKUP)) {
@@ -4143,7 +4143,7 @@ void obj_to_char(obj_data *object, char_data *ch) {
 * @param char_data *ch The person to try to give it to.
 */
 void obj_to_char_or_room(obj_data *obj, char_data *ch) {
-	if (!IS_NPC(ch) && IS_CARRYING_N(ch) + GET_OBJ_INVENTORY_SIZE(obj) > CAN_CARRY_N(ch) && IN_ROOM(ch)) {
+	if (!IS_NPC(ch) && IS_CARRYING_N(ch) + obj_carry_size(obj) > CAN_CARRY_N(ch) && IN_ROOM(ch)) {
 		// bind it to the player anyway, as if they received it, if it's BoP
 		if (OBJ_FLAGGED(obj, OBJ_BIND_ON_PICKUP)) {
 			bind_obj_to_player(obj, ch);
@@ -4187,7 +4187,7 @@ void obj_to_obj(obj_data *obj, obj_data *obj_to) {
 	else {
 		check_obj_in_void(obj);
 	
-		GET_OBJ_CARRYING_N(obj_to) += GET_OBJ_INVENTORY_SIZE(obj);
+		GET_OBJ_CARRYING_N(obj_to) += obj_carry_size(obj);
 
 		// set the timer here; actual rules for it are in limits.c
 		GET_AUTOSTORE_TIMER(obj) = time(0);
@@ -5511,7 +5511,7 @@ bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_da
 		return FALSE;
 	}
 
-	if (IS_CARRYING_N(ch) + GET_OBJ_INVENTORY_SIZE(proto) > CAN_CARRY_N(ch)) {
+	if (IS_CARRYING_N(ch) + obj_carry_size(proto) > CAN_CARRY_N(ch)) {
 		msg_to_char(ch, "Your arms are full.\r\n");
 		return FALSE;
 	}

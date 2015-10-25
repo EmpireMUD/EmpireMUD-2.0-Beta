@@ -261,7 +261,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 // definitions
 #define AWAKE(ch)  (GET_POS(ch) > POS_SLEEPING || GET_POS(ch) == POS_DEAD)
 #define CAN_CARRY_N(ch)  (25 + GET_BONUS_INVENTORY(ch) + (HAS_BONUS_TRAIT(ch, BONUS_INVENTORY) ? 5 : 0) + (GET_EQ((ch), WEAR_PACK) ? GET_PACK_CAPACITY(GET_EQ(ch, WEAR_PACK)) : 0))
-#define CAN_CARRY_OBJ(ch,obj)  ((IS_CARRYING_N(ch) + GET_OBJ_INVENTORY_SIZE(obj)) <= CAN_CARRY_N(ch))
+#define CAN_CARRY_OBJ(ch,obj)  ((IS_CARRYING_N(ch) + obj_carry_size(obj)) <= CAN_CARRY_N(ch))
 #define CAN_GET_OBJ(ch, obj)  (CAN_WEAR((obj), ITEM_WEAR_TAKE) && CAN_CARRY_OBJ((ch),(obj)) && CAN_SEE_OBJ((ch),(obj)))
 #define CAN_RECOGNIZE(ch, vict)  (IS_IMMORTAL(ch) || (!AFF_FLAGGED(vict, AFF_NO_SEE_IN_ROOM | AFF_HIDE) && !MORPH_FLAGGED(vict, MORPH_FLAG_ANIMAL) && !IS_DISGUISED(vict)))
 #define CAN_RIDE_FLYING_MOUNT(ch)  (HAS_ABILITY((ch), ABIL_ALL_TERRAIN_RIDING) || HAS_ABILITY((ch), ABIL_FLY) || HAS_ABILITY((ch), ABIL_DRAGONRIDING))
@@ -549,7 +549,6 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_OBJ_VNUM(obj)  ((obj)->vnum)
 
 // definitions
-#define GET_OBJ_INVENTORY_SIZE(obj)  (OBJ_FLAGGED((obj), OBJ_LARGE) ? 2 : 1)
 #define IS_STOLEN(obj)  (GET_STOLEN_TIMER(obj) > 0 && (config_get_int("stolen_object_timer") * SECS_PER_REAL_MIN) + GET_STOLEN_TIMER(obj) > time(0))
 
 // helpers
@@ -1158,6 +1157,9 @@ extern bool is_in_city_for_empire(room_data *loc, empire_data *emp, bool check_w
 
 // utils from act.informative.c
 extern char *get_obj_desc(obj_data *obj, char_data *ch, int mode);
+
+// utils from act.item.c
+extern int obj_carry_size(obj_data *obj);
 
 // utils from limits.c
 extern bool can_teleport_to(char_data *ch, room_data *loc, bool check_owner);
