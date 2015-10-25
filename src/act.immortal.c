@@ -1967,27 +1967,52 @@ SHOW(show_account) {
 
 
 SHOW(show_notes) {
-	char_data *plr = NULL;
-	bool file = FALSE;
+	char buf[MAX_STRING_LENGTH];
+	player_index_data *index = NULL;
+	account_data *acct = NULL;
 	
 	if (!*argument) {
 		msg_to_char(ch, "Usage: show notes <player>\r\n");
-	}
-	else if (!(plr = find_or_load_player(argument, &file))) {
-		msg_to_char(ch, "There is no such player.\r\n");
-	}
-	else if (GET_ACCESS_LEVEL(plr) >= GET_REAL_LEVEL(ch)) {
-		msg_to_char(ch, "You can't show notes for players of that level.\r\n");
-	}
-	else if (!GET_ADMIN_NOTES(plr) || !*GET_ADMIN_NOTES(plr)) {
-		msg_to_char(ch, "There are no notes for that player.\r\n");
-	}
-	else {
-		msg_to_char(ch, "Admin notes for %s:\r\n%s", GET_PC_NAME(plr), GET_ADMIN_NOTES(plr));
+		return;
 	}
 	
-	if (plr && file) {
-		free_char(plr);
+	// argument parsing
+	if (isdigit(*argument)) {
+		if (!(acct = find_account(atoi(argument)))) {
+			msg_to_char(ch, "Unknown account '%s'.\r\n", argument);
+			return;
+		}
+	}
+	else {
+		if (!(index = find_player_index_by_name(argument))) {
+			msg_to_char(ch, "There is no such player.\r\n");
+			return;
+		}
+		if (index->access_level >= GET_ACCESS_LEVEL(ch)) {
+			msg_to_char(ch, "You can't show notes for players of that level.\r\n");
+			return;
+		}
+		if (!(acct = find_account(index->account_id))) {
+			msg_to_char(ch, "There are no notes for that player.\r\n");
+			return;
+		}
+	}
+	
+	// final checks
+	if (!acct) {	// in case somehow
+		msg_to_char(ch, "Unknown account.\r\n");
+	}
+	else if (!acct->notes || !*acct->notes) {
+		msg_to_char(ch, "There are no notes for that account.\r\n");
+	}
+	else {
+		if (index) {
+			strcpy(buf, index->fullname);
+		}
+		else {
+			sprintf(buf, "account %d", acct->id);
+		}
+		msg_to_char(ch, "Admin notes for %s:\r\n%s", buf, acct->notes);
 	}
 }
 
@@ -3671,47 +3696,62 @@ int vnum_trigger(char *searchname, char_data *ch) {
 //// COMMANDS ////////////////////////////////////////////////////////////////
 
 ACMD(do_addnotes) {
-	char notes[MAX_ADMIN_NOTES_LENGTH + 1];
-	char_data *vict = NULL;
-	bool file = FALSE;
+	char notes[MAX_ADMIN_NOTES_LENGTH + 1], buf[MAX_STRING_LENGTH];
+	player_index_data *index = NULL;
+	account_data *acct = NULL;
 	
 	argument = one_argument(argument, arg);	// target
 	skip_spaces(&argument);	// text to add
 	
 	if (!*arg || !*argument) {
 		msg_to_char(ch, "Usage: addnotes <name> <text>\r\n");
+		return;
 	}
-	else if (!(vict = find_or_load_player(arg, &file))) {
-		send_to_char("There is no such player.\r\n", ch);
-	}
-	else if (GET_ACCESS_LEVEL(vict) >= GET_ACCESS_LEVEL(ch)) {
-		msg_to_char(ch, "You cannot add notes for players of that level.\r\n");
-	}
-	else if (strlen(NULLSAFE(GET_ADMIN_NOTES(vict))) + strlen(argument) + 2 > MAX_ADMIN_NOTES_LENGTH) {
-		msg_to_char(ch, "Notes too long, unable to add text. Use editnotes instead.\r\n");
+	
+	// argument processing
+	if (isdigit(*arg)) {
+		if (!(acct = find_account(atoi(arg)))) {
+			msg_to_char(ch, "Unknown account '%s'.\r\n", arg);
+			return;
+		}
 	}
 	else {
-		snprintf(notes, sizeof(notes), "%s%s\r\n", NULLSAFE(GET_ADMIN_NOTES(vict)), argument);
-		if (GET_ADMIN_NOTES(vict)) {
-			free(GET_ADMIN_NOTES(vict));
+		if (!(index = find_player_index_by_name(arg))) {
+			send_to_char("There is no such player.\r\n", ch);
+			return;
 		}
-		GET_ADMIN_NOTES(vict) = str_dup(notes);
-		
-		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has added notes for %s", GET_NAME(ch), GET_NAME(vict));
-		msg_to_char(ch, "Notes added to %s.\r\n", GET_NAME(vict));
-		
-		if (file) {
-			store_loaded_char(vict);
-			file = FALSE;
+		if (index->access_level >= GET_ACCESS_LEVEL(ch)) {
+			msg_to_char(ch, "You cannot add notes for players of that level.\r\n");
+			return;
 		}
-		else {
-			SAVE_CHAR(vict);
+		if (!(acct = find_account(index->account_id))) {
+			msg_to_char(ch, "Unable to find the account for that player.\r\n");
+			return;
 		}
 	}
 	
-	// in case
-	if (vict && file) {
-		free_char(vict);
+	// final checks
+	if (!acct) {
+		msg_to_char(ch, "Unknown account.\r\n");
+	}
+	if (strlen(NULLSAFE(acct->notes)) + strlen(argument) + 2 > MAX_ADMIN_NOTES_LENGTH) {
+		msg_to_char(ch, "Notes too long, unable to add text. Use editnotes instead.\r\n");
+	}
+	else {
+		snprintf(notes, sizeof(notes), "%s%s\r\n", NULLSAFE(acct->notes), argument);
+		if (acct->notes) {
+			free(acct->notes);
+		}
+		acct->notes = str_dup(notes);
+		
+		if (index) {
+			strcpy(buf, index->fullname);
+		}
+		else {
+			sprintf(buf, "account %d", acct->id);
+		}
+		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has added notes for %s", GET_NAME(ch), buf);
+		msg_to_char(ch, "Notes added to %s.\r\n", buf);
 	}
 }
 
@@ -4290,42 +4330,73 @@ ACMD(do_edelete) {
 
 
 ACMD(do_editnotes) {
-	char_data *vict = NULL;
-	bool file = FALSE;
-	char **write;
+	player_index_data *index = NULL;
+	char buf[MAX_STRING_LENGTH];
+	account_data *acct = NULL;
+	descriptor_data *desc;
 	
 	one_argument(argument, arg);
 	
+	// preliminaries
 	if (!ch->desc) {
 		msg_to_char(ch, "You can't do that.\r\n");
+		return;
 	}
-	else if (ch->desc->str) {
+	if (ch->desc->str) {
 		msg_to_char(ch, "You're already editing something else.\r\n");
+		return;
 	}
-	else if (!*arg) {
+	if (!*arg) {
 		msg_to_char(ch, "Edit notes for whom?\r\n");
+		return;
 	}
-	else if (!(vict = find_or_load_player(arg, &file))) {
-		send_to_char("There is no such player.\r\n", ch);
-	}
-	else if (GET_ACCESS_LEVEL(vict) >= GET_ACCESS_LEVEL(ch)) {
-		msg_to_char(ch, "You cannot edit notes for players of that level.\r\n");
+	
+	// argument processing
+	if (isdigit(*arg)) {
+		if (!(acct = find_account(atoi(arg)))) {
+			msg_to_char(ch, "Unknown account '%s'.\r\n", arg);
+			return;
+		}
 	}
 	else {
-		// duplicate the str -- the victim will be un-loaded, so we can't edit it directly
-		CREATE(write, char*, 1);
-		*write = str_dup(NULLSAFE(GET_ADMIN_NOTES(vict)));
-		
-		sprintf(buf, "notes for %s", GET_NAME(vict));
-		start_string_editor(ch->desc, buf, write, MAX_ADMIN_NOTES_LENGTH-1);
-		ch->desc->notes_id = GET_IDNUM(vict);
-	
-		act("$n begins editing some notes.", TRUE, ch, 0, 0, TO_ROOM);
+		if (!(index = find_player_index_by_name(arg))) {
+			send_to_char("There is no such player.\r\n", ch);
+			return;
+		}
+		if (index->access_level >= GET_ACCESS_LEVEL(ch)) {
+			msg_to_char(ch, "You cannot edit notes for players of that level.\r\n");
+			return;
+		}
+		if (!(acct = find_account(index->account_id))) {
+			msg_to_char(ch, "Unable to find account for that player.\r\n");
+			return;
+		}
 	}
 	
-	if (vict && file) {
-		free_char(vict);
+	if (!acct) {
+		msg_to_char(ch, "Unable to find account.\r\n");
+		return;
 	}
+	
+	// ensure nobody else is writing notes for the same person
+	for (desc = descriptor_list; desc; desc = desc->next) {
+		if (desc != ch->desc && desc->str == &(acct->notes)) {
+			msg_to_char(ch, "Someone is already editing notes for that account.\r\n");
+			return;
+		}
+	}
+	
+	// good to go
+	if (index) {
+		sprintf(buf, "notes for %s", index->fullname);
+	}
+	else {
+		sprintf(buf, "notes for account %d", acct->id);
+	}
+	start_string_editor(ch->desc, buf, &(acct->notes), MAX_ADMIN_NOTES_LENGTH-1);
+	ch->desc->notes_id = acct->id;
+
+	act("$n begins editing some notes.", TRUE, ch, FALSE, FALSE, TO_ROOM);
 }
 
 

@@ -150,10 +150,8 @@ void string_add(descriptor_data *d, char *str) {
 	extern char *stripcr(char *dest, const char *src);
 	extern int improved_editor_execute(descriptor_data *d, char *str);
 	
-	player_index_data *index;
-	char_data *vict = NULL;
+	account_data *acct;
 	int action;
-	bool file = FALSE;
 	FILE *fl;
 
 	delete_doubledollar(str);
@@ -233,53 +231,19 @@ void string_add(descriptor_data *d, char *str) {
 		}
 		else if (d->notes_id > 0) {
 			if (action != STRINGADD_ABORT) {
-				// save if you can find the player
-				if (d->notes_id > 0 && (index = find_player_index_by_idnum(d->notes_id)) && (vict = find_or_load_player(index->name, &file))) {
-					if (GET_ADMIN_NOTES(vict)) {
-						free(GET_ADMIN_NOTES(vict));
-					}
-					if (*d->str != NULL) {
-						GET_ADMIN_NOTES(vict) = str_dup(*d->str);
-					}
-					else {
-						GET_ADMIN_NOTES(vict) = NULL;
-					}
-					
-					syslog(SYS_GC, GET_INVIS_LEV(d->character), TRUE, "GC: %s has edited notes for %s", GET_NAME(d->character), GET_NAME(vict));
-										
-					// save now
-					if (file) {
-						store_loaded_char(vict);
-						file = FALSE;
-					}
-					else {
-						SAVE_CHAR(vict);
-					}
-				}
-				
-				// cleanup if needed
-				if (file && vict) {
-					free_char(vict);
-					vict = NULL;
-				}
-				
+				syslog(SYS_GC, GET_INVIS_LEV(d->character), TRUE, "GC: %s has edited notes for account %d", GET_NAME(d->character), d->notes_id);
 				SEND_TO_Q("Notes saved.\r\n", d);
 			}
 			else {
 				SEND_TO_Q("Edit aborted.\r\n", d);
 			}
 			
-			// d->str is always a copy; may have been freed already
-			if (d->str && *d->str) {
-				free(*d->str);
+			// save if possible -- even if aborted (if it was saved while we were editing, we need to overwrite with thet right thing)
+			if ((acct = find_account(d->notes_id))) {
+				SAVE_ACCOUNT(acct);
 			}
-			if (d->str) {
-				free(d->str);
-			}
-			d->str = NULL;
 			
-			act("$n stops editing notes.", TRUE, d->character, 0, 0, TO_ROOM);
-			STATE(d) = CON_PLAYING;
+			act("$n stops editing notes.", TRUE, d->character, FALSE, FALSE, TO_ROOM);
 		}
 		else if (d->file_storage) {
 			if (action != STRINGADD_ABORT) {

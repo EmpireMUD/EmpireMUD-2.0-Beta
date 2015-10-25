@@ -1394,9 +1394,10 @@ void close_socket(descriptor_data *d) {
 		 * Plug memory leak, from Eric Green.
 		 * Note: only free if it's a type that isn't editing a live string -pc
 		 */
-		if (!IS_NPC(d->character) && (PLR_FLAGGED(d->character, PLR_MAILING) || d->notes_id > 0) && d->str) {
-			if (*(d->str))
+		if (!IS_NPC(d->character) && PLR_FLAGGED(d->character, PLR_MAILING) && d->str) {
+			if (*(d->str)) {
 				free(*(d->str));
+			}
 			free(d->str);
 			d->str = NULL;
 		}

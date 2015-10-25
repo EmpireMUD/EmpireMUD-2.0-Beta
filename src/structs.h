@@ -2348,7 +2348,6 @@ struct player_special_data_saved {
 	// account and player stuff
 	char *creation_host;	// host they created from
 	char *referred_by;	// as entered in character creation
-	char *admin_notes;	// for admin to leave notes about a player
 	byte invis_level;	// level of invisibility
 	byte immortal_level;	// stored so that if level numbers are changed, imms stay at the correct level
 	bitvector_t grants;	// grant imm abilities

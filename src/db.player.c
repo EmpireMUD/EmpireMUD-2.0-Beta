@@ -300,9 +300,19 @@ account_data *find_account(int id) {
 */
 void free_account(account_data *acct) {
 	struct account_player *plr;
+	descriptor_data *desc;
 	
 	if (!acct) {
 		return;
+	}
+	
+	// ensure no players editing the notes
+	for (desc = descriptor_list; desc; desc = desc->next) {
+		if (desc->str == &(acct->notes)) {
+			desc->str = NULL;
+			desc->notes_id = 0;
+			msg_to_desc(desc, "The account you were editing notes for has been deleted.\r\n");
+		}
 	}
 	
 	if (acct->notes) {
@@ -720,9 +730,6 @@ void free_char(char_data *ch) {
 		}
 		if (GET_REFERRED_BY(ch)) {
 			free(GET_REFERRED_BY(ch));
-		}
-		if (GET_ADMIN_NOTES(ch)) {
-			free(GET_ADMIN_NOTES(ch));
 		}
 		if (GET_DISGUISED_NAME(ch)) {
 			free(GET_DISGUISED_NAME(ch));
@@ -1468,12 +1475,6 @@ char_data *read_player_primary_data(FILE *fl, char *name, bool normal) {
 					}
 					GET_PC_NAME(ch) = str_dup(trim(line + length + 1));
 				}
-				else if (PFILE_TAG(line, "Notes:", length)) {
-					if (GET_ADMIN_NOTES(ch)) {
-						free(GET_ADMIN_NOTES(ch));
-					}
-					GET_ADMIN_NOTES(ch) = fread_string(fl, error);
-				}
 				BAD_TAG_WARNING(line);
 				break;
 			}
@@ -2091,13 +2092,6 @@ void write_player_to_file(FILE *fl, char_data *ch) {
 	}
 	if (GET_MOUNT_VNUM(ch) != NOTHING) {
 		fprintf(fl, "Mount Vnum: %d\n", GET_MOUNT_VNUM(ch));
-	}
-	
-	// 'N'
-	if (GET_ADMIN_NOTES(ch)) {
-		strcpy(temp, NULLSAFE(GET_ADMIN_NOTES(ch)));
-		strip_crlf(temp);
-		fprintf(fl, "Notes:\n%s~\n", temp);
 	}
 	
 	// 'O'
