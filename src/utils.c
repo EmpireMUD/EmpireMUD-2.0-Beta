@@ -2305,26 +2305,40 @@ sector_data *find_first_matching_sector(bitvector_t with_flags, bitvector_t with
 * This converts data file entries into bitvectors, where they may be written
 * as "abdo" in the file, or as a number.
 *
+* - a-z are bits 1-26
+* - A-Z are bits 27-52
+* - !"#$%&'()*=, are bits 53-64
+*
 * @param char *flag The input string.
 * @return bitvector_t The bitvector.
 */
 bitvector_t asciiflag_conv(char *flag) {
 	bitvector_t flags = 0;
-	int is_number = 1;
-	register char *p;
+	bool is_number = TRUE;
+	char *p;
 
-	for (p = flag; *p; p++) {
-		if (islower(*p))
+	for (p = flag; *p; ++p) {
+		// skip numbers
+		if (isdigit(*p)) {
+			continue;
+		}
+		
+		is_number = FALSE;
+		
+		if (islower(*p)) {
 			flags |= BIT(*p - 'a');
-		else if (isupper(*p))
+		}
+		else if (isupper(*p)) {
 			flags |= BIT(26 + (*p - 'A'));
-
-		if (!isdigit(*p))
-			is_number = 0;
+		}
+		else {
+			flags |= BIT(52 + (*p - '!'));
+		}
 	}
 
-	if (is_number)
-		flags = strtoull(flag, NULL, 10); //atol(flag);
+	if (is_number) {
+		flags = strtoull(flag, NULL, 10);
+	}
 
 	return (flags);
 }
@@ -2367,6 +2381,10 @@ char *delete_doubledollar(char *string) {
 * files, e.g. "adoO", where each letter represents a bit starting with a=1.
 * If there are no bits, it returns the string "0".
 *
+* - bits 1-26 are lowercase a-z
+* - bits 27-52 are uppercase A-Z
+* - bits 53-64 are !"#$%&'()*=,
+*
 * @param bitvector_t flags The bitmask to convert to alpha.
 * @return char* The resulting string.
 */
@@ -2375,9 +2393,17 @@ char *bitv_to_alpha(bitvector_t flags) {
 	int iter, pos;
 	
 	pos = 0;
-	for (iter = 0; flags && iter <= 64; ++iter) {
+	for (iter = 0; flags && iter < 64; ++iter) {
 		if (IS_SET(flags, BIT(iter))) {
-			output[pos++] = (iter < 26) ? ('a' + iter) : ('A' + iter - 26);
+			if (iter < 26) {
+				output[pos++] = ('a' + iter);
+			}
+			else if (iter < 52) {
+				output[pos++] = ('A' + (iter - 26));
+			}
+			else if (iter < 64) {
+				output[pos++] = ('!' + (iter - 52));
+			}
 		}
 		
 		// remove so we exhaust flags
