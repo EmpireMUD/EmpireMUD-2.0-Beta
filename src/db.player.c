@@ -1156,8 +1156,8 @@ char_data *read_player_primary_data(FILE *fl, char *name, bool normal) {
 				if (PFILE_TAG(line, "Ability:", length)) {
 					sscanf(line + length + 1, "%d %d %d", &i_in[0], &i_in[1], &i_in[2]);
 					if (i_in[0] >= 0 && i_in[0] < NUM_ABILITIES) {
-						ch->player_specials->saved.abilities[i_in[0]].purchased = i_in[1] ? TRUE : FALSE;
-						ch->player_specials->saved.abilities[i_in[0]].levels_gained = i_in[2];
+						ch->player_specials->abilities[i_in[0]].purchased = i_in[1] ? TRUE : FALSE;
+						ch->player_specials->abilities[i_in[0]].levels_gained = i_in[2];
 					}
 				}
 				else if (PFILE_TAG(line, "Access Level:", length)) {
@@ -1588,7 +1588,7 @@ char_data *read_player_primary_data(FILE *fl, char *name, bool normal) {
 				else if (PFILE_TAG(line, "Skill:", length)) {
 					sscanf(line + length + 1, "%d %d %lf %d %d", &i_in[0], &i_in[1], &dbl_in, &i_in[2], &i_in[3]);
 					if (i_in[0] >= 0 && i_in[0] < NUM_SKILLS) {
-						ch->player_specials->saved.skills[i_in[0]].level = i_in[1];
+						ch->player_specials->skills[i_in[0]].level = i_in[1];
 						GET_SKILL_EXP(ch, i_in[0]) = dbl_in;
 						GET_FREE_SKILL_RESETS(ch, i_in[0]) = i_in[2];
 						NOSKILL_BLOCKED(ch, i_in[0]) = i_in[3] ? TRUE : FALSE;
@@ -3016,7 +3016,7 @@ void init_player(char_data *ch) {
 		}
 	}
 	
-	ch->char_specials.saved.affected_by = 0;
+	ch->char_specials.affected_by = 0;
 
 	for (i = 0; i < NUM_CONDS; i++)
 		GET_COND(ch, i) = (GET_ACCESS_LEVEL(ch) == LVL_IMPL ? UNLIMITED : 0);

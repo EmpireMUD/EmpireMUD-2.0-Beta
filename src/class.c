@@ -307,13 +307,13 @@ void assign_class_abilities(char_data *ch, int class, int role) {
 		}
 		
 		// remove any they shouldn't have
-		if (ch->player_specials->saved.abilities[abil].purchased && !has) {
-			ch->player_specials->saved.abilities[abil].purchased = FALSE;
+		if (ch->player_specials->abilities[abil].purchased && !has) {
+			ch->player_specials->abilities[abil].purchased = FALSE;
 			check_skill_sell(ch, abil);
 		}
 		// add if needed
 		if (has) {
-			ch->player_specials->saved.abilities[abil].purchased = TRUE;
+			ch->player_specials->abilities[abil].purchased = TRUE;
 		}
 	}
 }

@@ -344,7 +344,7 @@ PLAYER_UPDATE_FUNC(update_clear_roles) {
 	
 	for (iter = 0; iter < NUM_ABILITIES; ++iter) {
 		if (ability_data[iter].parent_skill == NO_SKILL && HAS_ABILITY(ch, iter)) {
-			ch->player_specials->saved.abilities[iter].purchased = FALSE;
+			ch->player_specials->abilities[iter].purchased = FALSE;
 			if (!is_file) {
 				check_skill_sell(ch, iter);
 			}
@@ -5542,8 +5542,8 @@ ACMD(do_restore) {
 			}
 			
 			for (i = 0; i < NUM_ABILITIES; ++i) {
-				vict->player_specials->saved.abilities[i].purchased = TRUE;
-				vict->player_specials->saved.abilities[i].levels_gained = 0;
+				vict->player_specials->abilities[i].purchased = TRUE;
+				vict->player_specials->abilities[i].levels_gained = 0;
 			}
 
 			affect_total(vict);

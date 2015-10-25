@@ -546,7 +546,7 @@ void clear_char_abilities(char_data *ch, int skill) {
 				if (HAS_ABILITY(REAL_CHAR(ch), iter)) {
 					check_skill_sell(REAL_CHAR(ch), iter);
 				}
-				REAL_CHAR(ch)->player_specials->saved.abilities[iter].purchased = 0;
+				REAL_CHAR(ch)->player_specials->abilities[iter].purchased = 0;
 			}
 		}
 		SAVE_CHAR(ch);
@@ -668,7 +668,7 @@ void gain_ability_exp(char_data *ch, int ability, double amount) {
 	// try gain
 	if (skill != NO_SKILL && gain_skill_exp(ch, skill, amount)) {
 		// increment gains from this
-		ch->player_specials->saved.abilities[ability].levels_gained += 1;
+		ch->player_specials->abilities[ability].levels_gained += 1;
 	}
 }
 
@@ -1069,7 +1069,7 @@ void reset_skill_gain_tracker_on_abilities_above_level(char_data *ch, int skill)
 	if (!IS_NPC(ch)) {
 		for (iter = 0; iter < NUM_ABILITIES; ++iter) {
 			if (ability_data[iter].parent_skill == skill && ability_data[iter].parent_skill_required >= GET_SKILL(ch, skill)) {
-				ch->player_specials->saved.abilities[iter].levels_gained = 0;
+				ch->player_specials->abilities[iter].levels_gained = 0;
 			}
 		}
 	}
@@ -1083,8 +1083,8 @@ void set_skill(char_data *ch, int skill, int level) {
 	if (!IS_NPC(ch)) {
 		gain = (level > GET_SKILL(ch, skill));
 		
-		ch->player_specials->saved.skills[skill].level = level;
-		ch->player_specials->saved.skills[skill].exp = 0;
+		ch->player_specials->skills[skill].level = level;
+		ch->player_specials->skills[skill].exp = 0;
 		
 		if (!gain) {
 			reset_skill_gain_tracker_on_abilities_above_level(ch, skill);
@@ -1238,7 +1238,7 @@ ACMD(do_skills) {
 			adjust_abilities_to_empire(ch, emp, FALSE);
 		}
 		
-		ch->player_specials->saved.abilities[ab].purchased = TRUE;
+		ch->player_specials->abilities[ab].purchased = TRUE;
 		msg_to_char(ch, "You purchase %s.\r\n", ability_data[ab].name);
 		SAVE_CHAR(ch);
 		
@@ -1343,7 +1343,7 @@ ACMD(do_skills) {
 		}
 		
 		// good to go
-		ch->player_specials->saved.abilities[ab].purchased = FALSE;
+		ch->player_specials->abilities[ab].purchased = FALSE;
 		msg_to_char(ch, "You no longer know %s.\r\n", ability_data[ab].name);
 		SAVE_CHAR(ch);
 

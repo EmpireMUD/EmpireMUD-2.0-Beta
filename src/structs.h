@@ -2319,14 +2319,14 @@ struct paragraph_data {
 };
 
 
-// used in player_special_data_saved
+// used in player_special_data
 struct player_ability_data {
 	bool purchased;	// whether or not the player bought it
 	byte levels_gained;	// tracks for the cap on how many times one ability grants skillups
 };
 
 
-// used in player_special_data_saved
+// used in player_special_data
 struct player_skill_data {
 	byte level;	// current skill level (0-100)
 	double exp;	// experience gained in skill (0-100)
@@ -2343,9 +2343,17 @@ struct player_slash_channel {
 };
 
 
-// various player-only data
-struct player_special_data_saved {
+/*
+ * Specials needed only by PCs, not NPCs.  Space for this structure is
+ * not allocated in memory for NPCs, but it is for PCs.
+ */
+struct player_special_data {
+	// SAVED PORTION //
+	// add new items to write_player_to_file() and read_player_primary_data()
+	
 	// account and player stuff
+	account_data *account;	// pointer to account_table entry
+	int temporary_account_id;	// used during creation
 	char *creation_host;	// host they created from
 	char *referred_by;	// as entered in character creation
 	byte invis_level;	// level of invisibility
@@ -2354,13 +2362,25 @@ struct player_special_data_saved {
 	bitvector_t syslogs;	// which syslogs people want to see
 	bitvector_t bonus_traits;	// BONUS_x
 	ubyte bad_pws;	// number of bad password attemps
+	int create_alt_id;	// used in CON_Q_ALT_NAME and CON_Q_ALT_PASSWORD
 	int promo_id;	// entry in the promo_codes table
-
+	int ignore_list[MAX_IGNORES];	// players who can't message you
+	int last_tell;	// idnum of last tell from
+	
+	// character strings
+	char *lastname;	// Last name
+	char *title;	// shown on 'who'/'whois'
+	char *prompt;	// custom prompt
+	char *fight_prompt;	// fight prompt
+	char *poofin;	// shown when immortal appears
+	char *poofout;	// shown when immortal disappears
+	
 	// preferences
 	bitvector_t pref;	// preference flags for PCs.
 	int last_tip;	// for display_tip_to_character
 	byte mapsize;	// how big the player likes the map
-
+	char custom_colors[NUM_CUSTOM_COLORS];	// for custom channel coloring, storing the letter part of the & code ('r' for &r)
+	
 	// empire
 	empire_vnum pledge;	// Empire he's applying to
 	byte rank;	// Rank in the empire
@@ -2369,8 +2389,13 @@ struct player_special_data_saved {
 	ubyte apparent_age;	// for vampires	
 	sh_int conditions[NUM_CONDS];	// Drunk, full, thirsty
 	int resources[NUM_MATERIALS];	// God resources
-	int ignore_list[MAX_IGNORES];	// players who can't message you
-	char custom_colors[NUM_CUSTOM_COLORS];	// for custom channel coloring, storing the letter part of the & code ('r' for &r)
+	
+	// various lists
+	struct coin_data *coins;	// linked list of coin data
+	struct alias_data *aliases;	// Character's aliases
+	struct offer_data *offers;	// various offers for do_accept/reject
+	struct player_slash_channel *slash_channels;	// channels the player is on
+	struct slash_channel *load_slash_channels;	// temporary storage between load and join
 
 	// some daily stuff
 	int daily_cycle;	// Last update cycle registered
@@ -2395,6 +2420,7 @@ struct player_special_data_saved {
 	int last_corpse_id;	// DG Scripts obj id of last corpse
 	room_vnum adventure_summon_return_location;	// where to send a player back to if they're outside an adventure
 	room_vnum adventure_summon_return_map;	// map check location for the return loc
+	room_vnum marked_location;	// for map marking
 	
 	// olc data
 	any_vnum olc_min_vnum;	// low range of olc permissions
@@ -2422,48 +2448,18 @@ struct player_special_data_saved {
 	bitvector_t mount_flags;	// flags for the stored mount
 	mob_vnum mount_vnum;	// stored mount
 	byte using_poison;	// poison preference for Stealth
-};
-
-
-/*
- * Specials needed only by PCs, not NPCs.  Space for this structure is
- * not allocated in memory for NPCs, but it is for PCs and the portion
- * of it labelled 'saved' is saved in the playerfile.
- */
-struct player_special_data {
-	struct player_special_data_saved saved;
 	
-	account_data *account;	// pointer to account_table entry
-	int temporary_account_id;	// used during creation
+	// UNSAVED PORTION //
+	
 	FILE *delayed_load_file;	// open player file that was partially-loaded
 	
 	int gear_level;	// computed gear level -- determine_gear_level()
-	struct coin_data *coins;	// linked list of coin data
-	
-	char *lastname;	// Last name
-	char *title;	// shown on 'who'/'whois'
-	char *prompt;	// custom prompt
-	char *fight_prompt;	// fight prompt
-	char *poofin;	// shown when immortal appears
-	char *poofout;	// shown when immortal disappears
-
-	struct alias_data *aliases;	// Character's aliases
-	int last_tell;	// idnum of last tell from
-
-	struct player_slash_channel *slash_channels;	// channels the player is on
-	struct slash_channel *load_slash_channels;	// temporary storage between load and join
 	byte reboot_conf;	// Reboot confirmation
-
 	byte create_points;	// Used in character creation
-	int create_alt_id;	// used in CON_Q_ALT_NAME and CON_Q_ALT_PASSWORD
+	int group_invite_by;	// idnum of the last player to invite this one
 	
 	bool restore_on_login;	// mark the player to trigger a free reset when they enter the game
 	bool reread_empire_tech_on_login;	// mark the player to trigger empire tech re-read on entering the game
-	
-	room_vnum marked_location;	// for map marking
-	
-	struct offer_data *offers;	// various offers for do_accept/reject
-	int group_invite_by;	// idnum of the last player to invite this one
 };
 
 
@@ -2505,20 +2501,6 @@ struct char_point_data {
 };
 
 
-/* 
- * char_special_data_saved: specials which both a PC and an NPC have in
- * common, but which must be saved to the playerfile for PC's.
- */
-struct char_special_data_saved {
-	int idnum;	// player's idnum; -1 for mobiles
-	bitvector_t act;	// mob flag for NPCs; player flag for PCs
-
-	bitvector_t injuries;	// Bitvectors including damage to the player
-
-	bitvector_t affected_by;	// Bitvector for spells/skills affected by
-};
-
-
 // for fighting
 struct fight_data {
 	char_data *victim;	// Actual victim
@@ -2527,8 +2509,18 @@ struct fight_data {
 };
 
 
-// Special playing constants shared by PCs and NPCs which aren't in pfile
+// Special playing constants shared by PCs and NPCs
 struct char_special_data {
+	// SAVED SECTION //
+	// add new items to write_player_to_file() and read_player_primary_data()
+	
+	int idnum;	// player's idnum; -1 for mobiles
+	bitvector_t act;	// mob flag for NPCs; player flag for PCs
+	bitvector_t injuries;	// Bitvectors including damage to the player
+	bitvector_t affected_by;	// Bitvector for spells/skills affected by
+
+	// UNSAVED SECTION //
+	
 	obj_data *chair;	// Object that this char's sitting in
 
 	struct fight_data fighting;	// Opponent
@@ -2543,17 +2535,15 @@ struct char_special_data {
 	obj_data *pulling;	// The mob may be pulling something
 	
 	struct empire_npc_data *empire_npc;	// if this is an empire spawn
-
+	
 	byte position;	// Standing, fighting, sleeping, etc.
 	
 	int health_regen;	// Hit regeneration add
 	int move_regen;	// Move regeneration add
 	int mana_regen;	// mana regen add
-
+	
 	int carry_items;	// Number of items carried
 	int	timer;	// Timer for update
-
-	struct char_special_data_saved saved;	// constants saved in plrfile
 };
 
 
