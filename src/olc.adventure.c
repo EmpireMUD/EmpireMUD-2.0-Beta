@@ -261,6 +261,80 @@ bool delete_link_rule_by_type_value(struct adventure_link_rule **list, int type,
 
 
 /**
+* This function determines which parameters are needed for a bunch of the
+* "linking" options. It is used by ".linking add" and ".linking change"
+*
+* @param int type ADV_LINK_x type.
+* @param ... All other parameters are pointers to variables to set up based on type.
+*/
+void get_advedit_linking_params(int type, int *vnum_type, bool *need_vnum, bool *need_dir, bool *need_buildon, bool *need_buildfacing, bool *need_portalin, bool *need_portalout, bool *need_num, bool *no_rooms, bool *restrict_sect) {
+	// init
+	*vnum_type = OLC_SECTOR;
+	*need_vnum = FALSE;
+	*need_dir = FALSE;
+	*need_buildon = FALSE;
+	*need_buildfacing = FALSE;
+	*need_portalin = FALSE;
+	*need_portalout = FALSE;
+	*need_num = FALSE;
+	*no_rooms = FALSE;
+	*restrict_sect = FALSE;
+	
+	// ADV_LINK_x: needed params depend on type
+	switch (type) {
+		case ADV_LINK_BUILDING_EXISTING: {
+			*need_vnum = TRUE;
+			*need_dir = TRUE;
+			*vnum_type = OLC_BUILDING;
+			break;
+		}
+		case ADV_LINK_BUILDING_NEW: {
+			*need_vnum = TRUE;
+			*need_dir = TRUE;
+			*need_buildon = TRUE;
+			*need_buildfacing = TRUE;
+			*vnum_type = OLC_BUILDING;
+			*no_rooms = TRUE;
+			break;
+		}
+		case ADV_LINK_PORTAL_WORLD: {
+			*need_vnum = TRUE;
+			*need_portalin = TRUE;
+			*need_portalout = TRUE;
+			*vnum_type = OLC_SECTOR;
+			*restrict_sect = TRUE;
+			break;
+		}
+		case ADV_LINK_PORTAL_BUILDING_EXISTING: {
+			*need_vnum = TRUE;
+			*need_portalin = TRUE;
+			*need_portalout = TRUE;
+			*vnum_type = OLC_BUILDING;
+			break;
+		}
+		case ADV_LINK_PORTAL_BUILDING_NEW: {
+			*need_vnum = TRUE;
+			*need_portalin = TRUE;
+			*need_portalout = TRUE;
+			*need_buildon = TRUE;
+			*need_buildfacing = TRUE;
+			*vnum_type = OLC_BUILDING;
+			*no_rooms = TRUE;
+			break;
+		}
+		case ADV_LINK_TIME_LIMIT: {
+			*need_num = TRUE;
+			break;
+		}
+		case ADV_LINK_NOT_NEAR_SELF: {
+			*need_num = TRUE;
+			break;
+		}
+	}
+}
+
+
+/**
 * For the .list command.
 *
 * @param adv_data *adv The thing to list.
@@ -694,9 +768,15 @@ OLC_MODULE(advedit_limit) {
 
 // warning: linking rules require highly-customized input
 OLC_MODULE(advedit_linking) {
-	adv_data *adv = GET_OLC_ADVENTURE(ch->desc);
+	bool need_vnum, need_dir, need_buildon, need_buildfacing, need_portalin, need_portalout, need_num, no_rooms, restrict_sect;
+	char type_arg[MAX_INPUT_LENGTH], vnum_arg[MAX_INPUT_LENGTH], dir_arg[MAX_INPUT_LENGTH], buildon_arg[MAX_INPUT_LENGTH], buildfacing_arg[MAX_INPUT_LENGTH], portalin_arg[MAX_INPUT_LENGTH], portalout_arg[MAX_INPUT_LENGTH], num_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
+	bitvector_t buildon = NOBITS, buildfacing = NOBITS;
 	char arg1[MAX_INPUT_LENGTH], lbuf[MAX_STRING_LENGTH];
-	struct adventure_link_rule *link, *temp;
+	struct adventure_link_rule *link, *change, *temp;
+	obj_data *portalin = NULL, *portalout = NULL;
+	adv_data *adv = GET_OLC_ADVENTURE(ch->desc);
+	int linktype = 0, dir = NO_DIR, vnum_type;
+	any_vnum value = NOTHING;
 	int iter, num;
 	bool found;
 	
@@ -735,32 +815,25 @@ OLC_MODULE(advedit_linking) {
 			}
 		}
 	}
-	else if (is_abbrev(arg1, "add")) {		
-		char type_arg[MAX_INPUT_LENGTH], vnum_arg[MAX_INPUT_LENGTH], dir_arg[MAX_INPUT_LENGTH], buildon_arg[MAX_INPUT_LENGTH], buildfacing_arg[MAX_INPUT_LENGTH], portalin_arg[MAX_INPUT_LENGTH], portalout_arg[MAX_INPUT_LENGTH], num_arg[MAX_INPUT_LENGTH];
-		bool need_vnum = FALSE, need_dir = FALSE, need_buildon = FALSE, need_buildfacing = FALSE, need_portalin = FALSE, need_portalout = FALSE, need_num = FALSE;
-		bitvector_t buildon = NOBITS, buildfacing = NOBITS;
-		any_vnum value = NOTHING;
-		obj_data *portalin = NULL, *portalout = NULL;
-		int type = 0, dir = NO_DIR, vnum_type = OLC_SECTOR;
-		bool no_rooms = FALSE, restrict_sect = FALSE;
-		
+	else if (is_abbrev(arg1, "add")) {
 		// defaults
 		*type_arg = *vnum_arg = *dir_arg = *buildon_arg = *buildfacing_arg = *portalin_arg = *portalout_arg = *num_arg = '\0';
 		
 		// pull out type arg
 		argument = any_one_word(argument, type_arg);
-		if (!*type_arg || (type = search_block(type_arg, adventure_link_types, FALSE)) == NOTHING) {
+		if (!*type_arg || (linktype = search_block(type_arg, adventure_link_types, FALSE)) == NOTHING) {
 			msg_to_char(ch, "Invalid type '%s'.\r\n", type_arg);
 			return;
 		}
 		
-		// ADV_LINK_x: rest of args depend on type
-		switch (type) {
+		// determine params
+		get_advedit_linking_params(linktype, &vnum_type, &need_vnum, &need_dir, &need_buildon, &need_buildfacing, &need_portalin, &need_portalout, &need_num, &no_rooms, &restrict_sect);
+		
+		// ADV_LINK_x: argument order depends on type
+		switch (linktype) {
 			case ADV_LINK_BUILDING_EXISTING: {
 				argument = any_one_word(argument, vnum_arg);
 				argument = any_one_word(argument, dir_arg);
-				need_vnum = need_dir = TRUE;
-				vnum_type = OLC_BUILDING;
 				break;
 			}
 			case ADV_LINK_BUILDING_NEW: {
@@ -768,26 +841,18 @@ OLC_MODULE(advedit_linking) {
 				argument = any_one_word(argument, dir_arg);
 				argument = any_one_word(argument, buildon_arg);
 				argument = any_one_word(argument, buildfacing_arg);
-				need_vnum = need_dir = need_buildon = need_buildfacing = TRUE;
-				vnum_type = OLC_BUILDING;
-				no_rooms = TRUE;
 				break;
 			}
 			case ADV_LINK_PORTAL_WORLD: {
 				argument = any_one_word(argument, vnum_arg);
 				argument = any_one_word(argument, portalin_arg);
 				argument = any_one_word(argument, portalout_arg);
-				need_vnum = need_portalin = need_portalout = TRUE;
-				vnum_type = OLC_SECTOR;
-				restrict_sect = TRUE;
 				break;
 			}
 			case ADV_LINK_PORTAL_BUILDING_EXISTING: {
 				argument = any_one_word(argument, vnum_arg);
 				argument = any_one_word(argument, portalin_arg);
 				argument = any_one_word(argument, portalout_arg);
-				need_vnum = need_portalin = need_portalout = TRUE;
-				vnum_type = OLC_BUILDING;
 				break;
 			}
 			case ADV_LINK_PORTAL_BUILDING_NEW: {
@@ -796,19 +861,14 @@ OLC_MODULE(advedit_linking) {
 				argument = any_one_word(argument, portalout_arg);
 				argument = any_one_word(argument, buildon_arg);
 				argument = any_one_word(argument, buildfacing_arg);
-				need_vnum = need_portalin = need_portalout = need_buildon = need_buildfacing = TRUE;
-				vnum_type = OLC_BUILDING;
-				no_rooms = TRUE;
 				break;
 			}
 			case ADV_LINK_TIME_LIMIT: {
 				argument = any_one_word(argument, num_arg);
-				need_num = TRUE;
 				break;
 			}
 			case ADV_LINK_NOT_NEAR_SELF: {
 				argument = any_one_word(argument, num_arg);
-				need_num = TRUE;
 				break;
 			}
 		}
@@ -878,7 +938,7 @@ OLC_MODULE(advedit_linking) {
 			
 			// setup done...
 			CREATE(link, struct adventure_link_rule, 1);
-			link->type = type;
+			link->type = linktype;
 			link->flags = *argument ? olc_process_flag(ch, argument, "linking", NULL, adventure_link_flags, NOBITS) : NOBITS;
 			link->value = value;
 			link->portal_in = portalin ? GET_OBJ_VNUM(portalin) : NOTHING;
@@ -898,7 +958,7 @@ OLC_MODULE(advedit_linking) {
 				GET_ADV_LINKING(adv) = link;
 			}
 
-			msg_to_char(ch, "You add a linking rule of type: %s\r\n", adventure_link_types[type]);
+			msg_to_char(ch, "You add a linking rule of type: %s\r\n", adventure_link_types[linktype]);
 			if (need_vnum) {
 				msg_to_char(ch, " - vnum: %d\r\n", value);
 			}
@@ -928,8 +988,146 @@ OLC_MODULE(advedit_linking) {
 			}
 		}
 	}
+	else if (is_abbrev(arg1, "change")) {		
+		half_chop(argument, num_arg, arg1);
+		half_chop(arg1, type_arg, val_arg);
+		
+		if (!*num_arg || !isdigit(*num_arg) || !*type_arg) {
+			msg_to_char(ch, "Usage: linking change <number> <field> <value>\r\n");
+			msg_to_char(ch, "Valid fields: vnum, dir, flags, buildon, buildfacing, portalin, portalout, number\r\n");
+			return;
+		}
+		
+		// find which one to change
+		num = atoi(num_arg);
+		change = NULL;
+		for (link = GET_ADV_LINKING(adv); link && !change; link = link->next) {
+			if (--num == 0) {
+				change = link;
+				break;
+			}
+		}
+		
+		if (!change) {
+			msg_to_char(ch, "Invalid linking rule number.\r\n");
+			return;
+		}
+		
+		// determine params
+		get_advedit_linking_params(change->type, &vnum_type, &need_vnum, &need_dir, &need_buildon, &need_buildfacing, &need_portalin, &need_portalout, &need_num, &no_rooms, &restrict_sect);
+		
+		if (is_abbrev(type_arg, "vnum")) {
+			if (!need_vnum) {
+				msg_to_char(ch, "That link has no vnum.\r\n");
+			}
+			else if (!*val_arg) {
+				msg_to_char(ch, "Set the vnum to what?\r\n");
+			}
+			else if (!isdigit(*val_arg) || (value = atoi(val_arg)) < 0) {
+				msg_to_char(ch, "Invalid vnum '%s'.\r\n", val_arg);
+			}
+			else if (vnum_type == OLC_BUILDING && !building_proto(value)) {
+				msg_to_char(ch, "Invalid building vnum '%s'.\r\n", val_arg);
+			}
+			else if (no_rooms && IS_SET(GET_BLD_FLAGS(building_proto(value)), BLD_ROOM)) {
+				msg_to_char(ch, "You may not use ROOM-type buildings for this.\r\n");
+			}
+			else if (vnum_type == OLC_SECTOR && !sector_proto(value)) {
+				msg_to_char(ch, "Invalid sector vnum '%s'.\r\n", val_arg);
+			}
+			else if (restrict_sect && SECT_FLAGGED(sector_proto(value), SECTF_ADVENTURE)) {
+				msg_to_char(ch, "You may not use ADVENTURE-type sectors for this.\r\n");
+			}
+			else {
+				change->value = value;
+				msg_to_char(ch, "Linking rule %d changed to vnum %d.\r\n", atoi(num_arg), value);
+			}
+		}
+		else if (is_abbrev(type_arg, "direction")) {
+			if (!need_dir) {
+				msg_to_char(ch, "That link has no direction.\r\n");
+			}
+			else if (!*val_arg) {
+				msg_to_char(ch, "Set the direction to what?\r\n");
+			}
+			else if ((dir = parse_direction(ch, val_arg)) == NO_DIR) {
+				msg_to_char(ch, "Invalid direction '%s'.\r\n", val_arg);
+			}
+			else {
+				change->dir = dir;
+				msg_to_char(ch, "Linking rule %d changed to direction %s.\r\n", atoi(num_arg), dirs[dir]);
+			}
+		}
+		else if (is_abbrev(type_arg, "flags")) {
+			change->flags = olc_process_flag(ch, val_arg, "linking", "linking change flags", adventure_link_flags, change->flags);
+		}
+		else if (is_abbrev(type_arg, "buildon")) {
+			if (!need_buildon) {
+				msg_to_char(ch, "That link has no buildon.\r\n");
+			}
+			else {
+				change->bld_on = olc_process_flag(ch, val_arg, "buildon", "linking change buildon", bld_on_flags, change->bld_on);
+			}
+		}
+		else if (is_abbrev(type_arg, "buildfacing")) {
+			if (!need_buildfacing) {
+				msg_to_char(ch, "That link has no buildfacing.\r\n");
+			}
+			else {
+				change->bld_facing = olc_process_flag(ch, val_arg, "buildfacing", "linking change buildfacing", bld_on_flags, change->bld_facing);
+			}
+		}
+		else if (is_abbrev(type_arg, "portalin")) {
+			if (!need_portalin) {
+				msg_to_char(ch, "That link has no portalin.\r\n");
+			}
+			else if (!*val_arg) {
+				msg_to_char(ch, "Set the portalin vnum to what?\r\n");
+			}
+			else if (!(portalin = obj_proto(atoi(val_arg))) || !IS_PORTAL(portalin)) {
+				msg_to_char(ch, "Invalid entrance portal vnum '%s'.\r\n", val_arg);
+			}
+			else {
+				change->portal_in = GET_OBJ_VNUM(portalin);
+				msg_to_char(ch, "Linking rule %d entrance portal changed to %d (%s).\r\n", atoi(num_arg), GET_OBJ_VNUM(portalin), GET_OBJ_SHORT_DESC(portalin));
+			}
+		}
+		else if (is_abbrev(type_arg, "portalout")) {
+			if (!need_portalout) {
+				msg_to_char(ch, "That link has no portalout.\r\n");
+			}
+			else if (!*val_arg) {
+				msg_to_char(ch, "Set the portalout vnum to what?\r\n");
+			}
+			else if (!(portalout = obj_proto(atoi(val_arg))) || !IS_PORTAL(portalout)) {
+				msg_to_char(ch, "Invalid exit portal vnum '%s'.\r\n", val_arg);
+			}
+			else {
+				change->portal_out = GET_OBJ_VNUM(portalout);
+				msg_to_char(ch, "Linking rule %d exit portal changed to %d (%s).\r\n", atoi(num_arg), GET_OBJ_VNUM(portalout), GET_OBJ_SHORT_DESC(portalout));
+			}
+		}
+		else if (is_abbrev(type_arg, "number")) {
+			value = atoi(val_arg);
+			
+			if (!need_num) {
+				msg_to_char(ch, "That link has no number.\r\n");
+			}
+			else if (!*val_arg || (!isdigit(*val_arg) && *val_arg != '-')) {
+				msg_to_char(ch, "Set the number to what?\r\n");
+			}
+			else {
+				change->value = value;
+				msg_to_char(ch, "Linking rule %d numeric value changed to %d.\r\n", atoi(num_arg), value);
+			}
+		}
+		else {
+			msg_to_char(ch, "You can only change the vnum, dir, flags, buildon, buildfacing, portalin, portalout, or number.\r\n");
+		}
+	}
 	else {
 		msg_to_char(ch, "Usage: linking add <type> <data> [flags] (see HELP ADVEDIT LINKING)\r\n");
+		msg_to_char(ch, "Usage: linking change <number> <field> <value>\r\n");
 		msg_to_char(ch, "Usage: linking remove <number | all>\r\n");
 		msg_to_char(ch, "Available types:\r\n");
 		

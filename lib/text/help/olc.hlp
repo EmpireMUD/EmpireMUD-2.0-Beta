@@ -445,6 +445,10 @@ See also: ADVEDIT LINKING, %ADVENTURECOMPLETE%
 #d
 "ADVEDIT LINKING" "ADVEDIT LINK RULE" "LINKING RULES" "LINK RULES"
 
+Usage: linking add <type> <data> [flags]
+       linking change <number> <field> <value>
+       linking remove <number | all>
+
 Linking rules help the game engine determine where to link instances of an
 adventure. You can add as many linking rules as you like; it will spawn
 instances in any place that matches any rule.
