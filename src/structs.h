@@ -2205,6 +2205,7 @@ struct player_index_data {
 	int access_level;	// player's access level
 	bitvector_t plr_flags;	// PLR_x: a copy of the last-saved player flags
 	empire_data *loyalty;	// empire, if any
+	int rank;	// empire rank
 	char *last_host;	// last known host
 	
 	UT_hash_handle idnum_hh;	// player_table_by_idnum

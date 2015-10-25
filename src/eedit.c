@@ -329,6 +329,9 @@ EEDIT(eedit_change_leader) {
 
 		log_to_empire(emp, ELOG_MEMBERS, "%s is now the leader of the empire!", PERS(victim, victim, TRUE));
 		msg_to_char(ch, "You make %s leader of the empire.\r\n", PERS(victim, victim, TRUE));
+		
+		remove_lore(victim, LORE_PROMOTED);
+		add_lore(victim, LORE_PROMOTED, "Became leader of %s%s&0", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 
 		// save now
 		if (file) {
@@ -498,7 +501,10 @@ EEDIT(eedit_privilege) {
 
 
 EEDIT(eedit_rank) {
+	player_index_data *index, *next_index;
+	char_data *mem;
 	int rnk, iter;
+	bool file;
 
 	argument = any_one_word(argument, arg);
 	skip_spaces(&argument);
@@ -525,6 +531,23 @@ EEDIT(eedit_rank) {
 		
 		log_to_empire(emp, ELOG_ADMIN, "%s has changed rank %d to %s%s", PERS(ch, ch, TRUE), rnk+1, EMPIRE_RANK(emp, rnk), EMPIRE_BANNER(emp));
 		msg_to_char(ch, "You have changed rank %d to %s&0.\r\n", rnk+1, EMPIRE_RANK(emp, rnk));
+		
+		
+		// update lore for members
+		HASH_ITER(idnum_hh, player_table_by_idnum, index, next_index) {
+			if (index->loyalty != emp || rnk != (index->rank - 1)) {
+				continue;
+			}
+			
+			if ((mem = find_or_load_player(index->name, &file))) {
+				remove_lore(mem, LORE_PROMOTED);	// only save most recent
+				add_lore(mem, LORE_PROMOTED, "Became %s&0", EMPIRE_RANK(emp, rnk));
+				
+				if (file) {
+					store_loaded_char(mem);
+				}
+			}
+		}
 	}
 }
 

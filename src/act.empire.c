@@ -2183,6 +2183,8 @@ ACMD(do_defect) {
 		
 		log_to_empire(e, ELOG_MEMBERS, "%s has defected from the empire", PERS(ch, ch, 1));
 		msg_to_char(ch, "You defect from the empire!\r\n");
+		
+		remove_lore(ch, LORE_PROMOTED);
 		add_lore(ch, LORE_DEFECT_EMPIRE, "Defected from %s%s&0", EMPIRE_BANNER(e), EMPIRE_NAME(e));
 		
 		clear_private_owner(GET_IDNUM(ch));
@@ -2255,7 +2257,7 @@ ACMD(do_demote) {
 	else {
 		GET_RANK(victim) = to_rank;
 		remove_lore(victim, LORE_PROMOTED);	// only save most recent
-		add_lore(victim, LORE_PROMOTED, "Promoted to %s&0", EMPIRE_RANK(e, to_rank-1));
+		add_lore(victim, LORE_PROMOTED, "Became %s&0", EMPIRE_RANK(e, to_rank-1));
 
 		log_to_empire(e, ELOG_MEMBERS, "%s has been demoted to %s%s", PERS(victim, victim, 1), EMPIRE_RANK(e, to_rank-1), EMPIRE_BANNER(e));
 		send_config_msg(ch, "ok_string");
@@ -2992,6 +2994,8 @@ ACMD(do_enroll) {
 		GET_LOYALTY(targ) = e;
 		GET_RANK(targ) = 1;
 		GET_PLEDGE(targ) = NOTHING;
+		
+		remove_lore(targ, LORE_PROMOTED);
 		add_lore(targ, LORE_JOIN_EMPIRE, "Honorably accepted into %s%s&0", EMPIRE_BANNER(e), EMPIRE_NAME(e));
 		
 		// TODO split this out into a "merge empires" func
@@ -3345,6 +3349,8 @@ ACMD(do_expel) {
 		log_to_empire(e, ELOG_MEMBERS, "%s has been expelled from the empire", PERS(targ, targ, 1));
 		send_config_msg(ch, "ok_string");
 		msg_to_char(targ, "You have been expelled from the empire.\r\n");
+		
+		remove_lore(targ, LORE_PROMOTED);
 		add_lore(targ, LORE_KICKED_EMPIRE, "Dishonorably discharged from %s%s&0", EMPIRE_BANNER(e), EMPIRE_NAME(e));
 
 		// save now

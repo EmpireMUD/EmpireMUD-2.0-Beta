@@ -1217,6 +1217,7 @@ empire_data *create_empire(char_data *ch) {
 	emp->storage_loaded = TRUE;
 
 	// set the player up
+	remove_lore(ch, LORE_PROMOTED);
 	add_lore(ch, LORE_FOUND_EMPIRE, "Proudly founded %s%s&0", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 	GET_LOYALTY(ch) = emp;
 	GET_RANK(ch) = 2;
