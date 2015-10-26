@@ -1736,7 +1736,7 @@ struct global_data {
 	int type;	// GLOBAL_x
 	bitvector_t flags;	// GLB_FLAG_x flags
 	int value[NUM_GLB_VAL_POSITIONS];	// misc vals
-
+	
 	// constraints
 	int ability;	// must have this to trigger, unless NO_ABIL
 	double percent;	// chance to trigger
@@ -1744,7 +1744,7 @@ struct global_data {
 	bitvector_t type_exclude;	// type-dependent flags
 	int min_level;
 	int max_level;
-
+	
 	// data
 	struct interaction_item *interactions;
 	

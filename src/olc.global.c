@@ -503,8 +503,10 @@ OLC_MODULE(gedit_type) {
 	
 	GET_GLOBAL_TYPE(glb) = olc_process_type(ch, argument, "type", "type", global_types, GET_GLOBAL_TYPE(glb));
 	
-	// reset vals if type changes
+	// reset excludes/vals if type changes
 	if (GET_GLOBAL_TYPE(glb) != old) {
+		GET_GLOBAL_TYPE_FLAGS(glb) = NOBITS;
+		GET_GLOBAL_TYPE_EXCLUDE(glb) = NOBITS;
 		for (iter = 0; iter < NUM_GLB_VAL_POSITIONS; ++iter) {
 			GET_GLOBAL_VAL(glb, iter) = 0;
 		}
