@@ -1800,7 +1800,7 @@ void check_version(void) {
 				}
 			}
 		}
-		if (MATCH_VERSION("b3.0")) {
+		if (MATCH_VERSION("b3.1")) {
 			log("Applying b3.1 update to mines...");
 			b3_1_mine_update();
 		}
