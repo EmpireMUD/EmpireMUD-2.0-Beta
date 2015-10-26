@@ -2196,6 +2196,7 @@ const char *room_extra_types[] = {
 	"found time",
 	"redesignate time",
 	"ceded",
+	"mine global vnum",
 	"\n"
 };
 
@@ -2783,6 +2784,7 @@ const char *fill_words[] = {
 // GLOBAL_x types
 const char *global_types[] = {
 	"Mob Interactions",
+	"Mine Data",
 	"\n"
 };
 

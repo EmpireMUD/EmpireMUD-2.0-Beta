@@ -246,6 +246,7 @@ typedef struct trig_data trig_data;
 
 // GLOBAL_x types for global_data
 #define GLOBAL_MOB_INTERACTIONS  0
+#define GLOBAL_MINE_DATA  1
 
 
 // GLB_FLAG_x flags for global_data
@@ -1595,6 +1596,7 @@ typedef struct trig_data trig_data;
 #define ROOM_EXTRA_FOUND_TIME  14
 #define ROOM_EXTRA_REDESIGNATE_TIME  15
 #define ROOM_EXTRA_CEDED  16	// used to mark that a room was ceded to someone and never used by the empire, to prevent cede+steal
+#define ROOM_EXTRA_MINE_GLB_VNUM  17
 
 
 // number of different appearances
@@ -1650,6 +1652,7 @@ typedef struct trig_data trig_data;
 #define MAX_TITLE_LENGTH_NO_COLOR  80	// title limit without color codes (less than MAX_TITLE_LENGTH)
 #define NUM_ACTION_VNUMS  3	// action vnums 0, 1, 2
 #define NUM_OBJ_VAL_POSITIONS  3	// GET_OBJ_VAL(obj, X) -- caution: changing this will require you to change the .obj file format
+#define NUM_GLB_VAL_POSITIONS  3	// GET_GLOBAL_VAL(glb, X) -- caution: changing this will require you to change the .glb file format
 
 
 /*
@@ -1732,6 +1735,7 @@ struct global_data {
 	char *name;	// descriptive text
 	int type;	// GLOBAL_x
 	bitvector_t flags;	// GLB_FLAG_x flags
+	int value[NUM_GLB_VAL_POSITIONS];	// misc vals
 
 	// constraints
 	int ability;	// must have this to trigger, unless NO_ABIL

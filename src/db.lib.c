@@ -2662,12 +2662,22 @@ void parse_global(FILE *fl, any_vnum vnum) {
 		}
 		switch (*line) {
 			case 'E': {	// extra data
+				// line 1: abil perc
 				if (!get_line(fl, line) || sscanf(line, "%d %lf", &int_in[0], &dbl_in) != 2) {
-					log("SYSERR: Format error E line of %s", buf2);
+					log("SYSERR: Format error E line 1 of %s", buf2);
 					exit(1);
 				}
 				GET_GLOBAL_ABILITY(glb) = int_in[0];
 				GET_GLOBAL_PERCENT(glb) = dbl_in;
+				
+				// line 2: val0 val1 val25
+				if (!get_line(fl, line) || sscanf(line, "%d %d %d", &int_in[0], &int_in[1], &int_in[2]) != 3) {
+					log("SYSERR: Format error E line 2 of %s", buf2);
+					exit(1);
+				}
+				GET_GLOBAL_VAL(glb, 0) = int_in[0];
+				GET_GLOBAL_VAL(glb, 1) = int_in[1];
+				GET_GLOBAL_VAL(glb, 2) = int_in[2];
 				break;
 			}
 			case 'I': {	// interaction item
@@ -2714,10 +2724,9 @@ void write_global_to_file(FILE *fl, struct global_data *glb) {
 	fprintf(fl, "%d %s %s %s %d-%d\n", GET_GLOBAL_TYPE(glb), temp, temp2, temp3, GET_GLOBAL_MIN_LEVEL(glb), GET_GLOBAL_MAX_LEVEL(glb));
 	
 	// E: extra data
-	if (GET_GLOBAL_ABILITY(glb) != NO_ABIL || GET_GLOBAL_PERCENT(glb) != 100.00) {
-		fprintf(fl, "E\n");
-		fprintf(fl, "%d %.2f\n", GET_GLOBAL_ABILITY(glb), GET_GLOBAL_PERCENT(glb));
-	}
+	fprintf(fl, "E\n");
+	fprintf(fl, "%d %.2f\n", GET_GLOBAL_ABILITY(glb), GET_GLOBAL_PERCENT(glb));
+	fprintf(fl, "%d %d %d\n", GET_GLOBAL_VAL(glb, 0), GET_GLOBAL_VAL(glb, 1), GET_GLOBAL_VAL(glb, 2));
 	
 	// I: interactions
 	write_interactions_to_file(fl, GET_GLOBAL_INTERACTIONS(glb));

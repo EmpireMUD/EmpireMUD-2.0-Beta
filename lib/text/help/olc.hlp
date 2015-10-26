@@ -1252,6 +1252,16 @@ covered by the crops.
 
 See also: OLC CROPS
 #d
+"GEDIT ABILITY"
+
+Usage:  .ability <name | none>
+
+This allows you to require the player to have a certain ability in order to
+trigger this global (of any type). Setting it to 'none' removes this
+requirement.
+
+See also: OLC GLOBALS
+#d
 "GEDIT FLAGS"
 
 Usage:  .flags [add | remove] <flags>
@@ -1261,8 +1271,9 @@ This set of flags applies to the global table itself.
 Available flags:
  IN-DEVELOPMENT - Will not be used live.
  ADVENTURE-ONLY - This global table will only apply to the adventure it's in.
+ CUMULATIVE-PRC - Percent check will be cumulative.
 
-See also: OLC GLOBALS
+See also: GEDIT PERCENT, OLC GLOBALS
 #d
 "GEDIT MAXLEVEL"
 
@@ -1321,6 +1332,21 @@ Usage:  .name <name>
 This lets you set the 'name' property of a global table. Names are only shown
 to the immortal staff, never to players. The name should indicate what this
 table is for.
+
+See also: OLC GLOBALS
+#d
+"GEDIT PERCENT" CUMULATIVE-PRC
+
+Usage:  .percent <amount>
+
+This allows you to add a chance of choosing this global, between 0.01 and
+100 (default is 100). When a global would be selected, its percent is checked.
+
+You can make the percent check cumulative, in order to link several different
+globals together. If multiple globals have the CUMULATIVE-PRC flag, only one
+of them will be chosen (if any), based on a cumulative percentage.
+
+More than one global may be selected if the CUMULATIVE-PRC flag is not set.
 
 See also: OLC GLOBALS
 #d

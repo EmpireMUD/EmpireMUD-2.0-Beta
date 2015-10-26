@@ -67,10 +67,14 @@ bool audit_global(struct global_data *glb, char_data *ch) {
 	}
 	
 	for (interact = GET_GLOBAL_INTERACTIONS(glb); interact; interact = interact->next) {
-		if (GET_GLOBAL_TYPE(glb) == GLOBAL_MOB_INTERACTIONS) {
-			if (interact->type != INTERACT_SHEAR && interact->type != INTERACT_LOOT && interact->type != INTERACT_PICKPOCKET) {
-				olc_audit_msg(ch, GET_GLOBAL_VNUM(glb), "Unsupported interaction type");
-				problem = TRUE;
+		// GLOBAL_x
+		switch (GET_GLOBAL_TYPE(glb)) {
+			case GLOBAL_MOB_INTERACTIONS: {
+				if (interact->type != INTERACT_SHEAR && interact->type != INTERACT_LOOT && interact->type != INTERACT_PICKPOCKET) {
+					olc_audit_msg(ch, GET_GLOBAL_VNUM(glb), "Unsupported interaction type");
+					problem = TRUE;
+				}
+				break;
 			}
 		}
 	}
@@ -120,7 +124,8 @@ char *list_one_global(struct global_data *glb, bool detail) {
 	
 	static char output[MAX_STRING_LENGTH];
 	char flags[MAX_STRING_LENGTH];
-
+	
+	// GLOBAL_x
 	switch (GET_GLOBAL_TYPE(glb)) {
 		case GLOBAL_MOB_INTERACTIONS: {
 			if (detail) {
@@ -351,13 +356,17 @@ void olc_show_global(char_data *ch) {
 	
 	sprintf(buf + strlen(buf), "<&ypercent&0> %.2f%%\r\n", GET_GLOBAL_PERCENT(glb));
 	
-	// type-based data
+	// GLOBAL_x: type-based data
 	switch (GET_GLOBAL_TYPE(glb)) {
 		case GLOBAL_MOB_INTERACTIONS: {
 			sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), action_bits, lbuf, TRUE);
 			sprintf(buf + strlen(buf), "<&ymobflags&0> %s\r\n", lbuf);
 			sprintbit(GET_GLOBAL_TYPE_EXCLUDE(glb), action_bits, lbuf, TRUE);
 			sprintf(buf + strlen(buf), "<&ymobexclude&0> %s\r\n", lbuf);
+			break;
+		}
+		case GLOBAL_MINE_DATA: {
+			sprintf(buf + strlen(buf), "<&ycapacity&0> %d maximum ore\r\n", GET_GLOBAL_VAL(glb, GLOBAL_MOB_INTERACTIONS));
 			break;
 		}
 	}
@@ -404,6 +413,18 @@ OLC_MODULE(gedit_ability) {
 		else {
 			msg_to_char(ch, "It now requires the %s ability.\r\n", ability_data[abil].name);
 		}
+	}
+}
+
+
+OLC_MODULE(gedit_capacity) {
+	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
+	
+	if (GET_GLOBAL_TYPE(glb) != GLOBAL_MINE_DATA) {
+		msg_to_char(ch, "You can't set mine capacity on this type.\r\n");
+	}
+	else {
+		GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE) = olc_process_number(ch, argument, "mine capacity", "capacity", 1, 1000, GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE));
 	}
 }
 
@@ -478,5 +499,14 @@ OLC_MODULE(gedit_percent) {
 
 OLC_MODULE(gedit_type) {
 	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
+	int iter, old = GET_GLOBAL_TYPE(glb);
+	
 	GET_GLOBAL_TYPE(glb) = olc_process_type(ch, argument, "type", "type", global_types, GET_GLOBAL_TYPE(glb));
+	
+	// reset vals if type changes
+	if (GET_GLOBAL_TYPE(glb) != old) {
+		for (iter = 0; iter < NUM_GLB_VAL_POSITIONS; ++iter) {
+			GET_GLOBAL_VAL(glb, iter) = 0;
+		}
+	}
 }
