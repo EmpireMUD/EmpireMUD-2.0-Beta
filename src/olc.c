@@ -132,6 +132,8 @@ OLC_MODULE(gedit_mobexclude);
 OLC_MODULE(gedit_mobflags);
 OLC_MODULE(gedit_name);
 OLC_MODULE(gedit_percent);
+OLC_MODULE(gedit_sectorexclude);
+OLC_MODULE(gedit_sectorflags);
 OLC_MODULE(gedit_type);
 
 // mob edit modules
@@ -397,6 +399,8 @@ const struct olc_command_data olc_data[] = {
 	{ "mobflags", gedit_mobflags, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "name", gedit_name, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "percent", gedit_percent, OLC_GLOBAL, OLC_CF_EDITOR },
+	{ "sectorexclude", gedit_sectorexclude, OLC_GLOBAL, OLC_CF_EDITOR },
+	{ "sectorflags", gedit_sectorflags, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "type", gedit_type, OLC_GLOBAL, OLC_CF_EDITOR },
 	
 	// mob commands

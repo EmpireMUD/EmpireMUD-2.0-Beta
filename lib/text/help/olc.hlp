@@ -1350,6 +1350,30 @@ More than one global may be selected if the CUMULATIVE-PRC flag is not set.
 
 See also: OLC GLOBALS
 #d
+"GEDIT SECTOREXCLUDE"
+
+Usage:  .sectorexclude [add | remove] <flags>
+
+A 'Mine Data' global table may have sector flags set to exclude. If so, the
+global table is only used if a tile DOES NOT have all the flags in this set.
+For example, you can use it to create a set that does not apply to ROUGH sects.
+
+These are the same set of flags from HELP SECTEDIT FLAGS.
+
+See also: OLC GLOBALS
+#d
+"GEDIT SECTORFLAGS"
+
+Usage:  .sectorflags [add | remove] <flags>
+
+A 'Mine Data' global table may have sector flags set. If so, the global table
+is only used if a tile has ALL of the flags set here. For example, you might
+set a global table to only apply to ROUGH sectors.
+
+These are the same set of flags from HELP SECTEDIT FLAGS.
+
+See also: OLC GLOBALS
+#d
 "GEDIT TYPE"
 
 Usage:  .type <type>

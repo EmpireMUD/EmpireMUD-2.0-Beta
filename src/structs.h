@@ -148,6 +148,7 @@
 #define TYPE_OBJ  0
 #define TYPE_MOB  1
 #define TYPE_ROOM  2
+#define TYPE_MINE_DATA  3
 
 
 // basic types
@@ -259,7 +260,7 @@ typedef struct trig_data trig_data;
 #define GROUP_ANON  BIT(0)	// Group is hidden/anonymous
 
 
-// mob/room interactions
+// INTERACT_x: standard interactions
 #define INTERACT_BUTCHER  0
 #define INTERACT_SKIN  1
 #define INTERACT_SHEAR  2
@@ -273,7 +274,8 @@ typedef struct trig_data trig_data;
 #define INTERACT_ENCOUNTER  10
 #define INTERACT_LIGHT  11
 #define INTERACT_PICKPOCKET  12
-#define NUM_INTERACTS  13
+#define INTERACT_MINE  13
+#define NUM_INTERACTS  14
 
 
 // for object saving
