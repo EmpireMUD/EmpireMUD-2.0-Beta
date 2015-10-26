@@ -207,18 +207,20 @@ int get_map_radius(char_data *ch) {
 
 
 /**
-* Returns the mineral name for a room with mine data.
+* Returns the mine (global) name for a room with mine data.
 *
 * @param room_data *room The room
 * @return char* The mineral name
 */
 char *get_mine_type_name(room_data *room) {
-	extern int find_mine_type(int type);
-	extern const struct mine_data_type mine_data[];
+	struct global_data *glb = global_proto(get_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM));
 	
-	int t = find_mine_type(get_room_extra_data(room, ROOM_EXTRA_MINE_TYPE));
-	
-	return (t == NOTHING ? "unknown" : mine_data[t].name);
+	if (glb) {
+		return GET_GLOBAL_NAME(glb);
+	}
+	else {
+		return "unknown";
+	}
 }
 
 
@@ -475,7 +477,6 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	extern int how_to_show_map[NUM_SIMPLE_DIRS][2];
 	extern int show_map_y_first[NUM_SIMPLE_DIRS];
 	extern byte distance_can_see(char_data *ch);
-	extern int find_mine_type(int type);
 	extern struct city_metadata_type city_type[];
 	extern const char *bld_flags[];
 	extern const char *room_aff_bits[];
@@ -486,7 +487,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	struct building_resource_type *res;
 	struct empire_city_data *city;
 	char output[MAX_STRING_LENGTH], shipbuf[256], flagbuf[MAX_STRING_LENGTH], locbuf[128], partialbuf[MAX_STRING_LENGTH];
-	int s, t, mapsize, iter, type, check_x, check_y;
+	int s, t, mapsize, iter, check_x, check_y;
 	int first_iter, second_iter, xx, yy, magnitude, north;
 	int first_start, first_end, second_start, second_end, temp;
 	bool y_first, invert_x, invert_y, found, comma;
@@ -839,12 +840,12 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	}
 
 	if (ROOM_BLD_FLAGGED(room, BLD_MINE) && IS_COMPLETE(room)) {
-		type = find_mine_type(get_room_extra_data(room, ROOM_EXTRA_MINE_TYPE));
-		if (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) <= 0 || type == NOTHING) {
+		if (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) <= 0) {
 			msg_to_char(ch, "This mine is depleted.\r\n");
 		}
 		else {
-			msg_to_char(ch, "The mine is gleaming with %s.\r\n", get_mine_type_name(room));
+			strcpy(locbuf, get_mine_type_name(room));
+			msg_to_char(ch, "This appears to be %s %s.\r\n", AN(locbuf), locbuf);
 		}
 	}
 	

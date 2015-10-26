@@ -1311,44 +1311,73 @@ void do_chore_maintenance(empire_data *emp, room_data *room) {
 }
 
 
-void do_chore_mining(empire_data *emp, room_data *room) {
-	extern obj_vnum find_mine_vnum_by_type(int type);
+INTERACTION_FUNC(one_mining_chore) {
+	empire_data *emp = ROOM_OWNER(inter_room);
+	struct global_data *mine;
+	bool any = FALSE;
+	obj_data *proto;
+	int iter;
 	
-	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_MINING].mob);
-	obj_vnum vnum = find_mine_vnum_by_type(get_room_extra_data(room, ROOM_EXTRA_MINE_TYPE));
-	bool can_do = can_gain_chore_resource(emp, room, vnum);
+	// no mine
+	if (get_room_extra_data(inter_room, ROOM_EXTRA_MINE_AMOUNT) < 0 || !(mine = global_proto(get_room_extra_data(inter_room, ROOM_EXTRA_MINE_GLB_VNUM)))) {
+		return FALSE;
+	}
 	
-	if (worker && can_do) {
-		ewt_mark_resource_worker(emp, room, vnum);
-		
-		if (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) > 0) {
-			// mine ~ every sixth time
-			if (!number(0, 5)) {
-				// random gold instead of iron
-				if (vnum == o_IRON_ORE && !number(0, 100)) {
-					vnum = o_GOLD;
-				}
-				
-				add_to_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT, -1);
-				add_to_empire_storage(emp, GET_ISLAND_ID(room), vnum, 1);
-				empire_skillup(emp, ABIL_WORKFORCE, config_get_double("exp_from_workforce"));
+	// find object
+	proto = obj_proto(interaction->vnum);
+	
+	// check vars and limits
+	if (!emp || !proto || proto->storage || can_gain_chore_resource(emp, inter_room, interaction->vnum)) {
+		return FALSE;
+	}
+	
+	// good to go
+	ewt_mark_resource_worker(emp, inter_room, interaction->vnum);
+	
+	// mine ~ every sixth time
+	if (!number(0, 5)) {
+		for (iter = 0; iter < interaction->quantity && get_room_extra_data(inter_room, ROOM_EXTRA_MINE_AMOUNT) > 0; ++iter) {
+			add_to_room_extra_data(inter_room, ROOM_EXTRA_MINE_AMOUNT, -1);
+			add_to_empire_storage(emp, GET_ISLAND_ID(inter_room), interaction->vnum, 1);
+			empire_skillup(emp, ABIL_WORKFORCE, config_get_double("exp_from_workforce"));
+			any = TRUE;
 
-				sprintf(buf, "$n strikes the wall and %s falls loose!", get_obj_name_by_proto(vnum));
-				act(buf, FALSE, worker, NULL, NULL, TO_ROOM);
-			}
 		}
-		
-		// check for depletion
-		if (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) <= 0) {
-			// mark for despawn
-			SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
-			stop_room_action(room, ACT_MINING, CHORE_MINING);
+		if (any) {
+			sprintf(buf, "$n strikes the wall and %s falls loose!", get_obj_name_by_proto(interaction->vnum));
+			act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
+			return TRUE;
+		}
+		else {
+			return FALSE;
 		}
 	}
-	else if (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) > 0 && can_do) {
-		// place worker
-		if ((worker = place_chore_worker(emp, CHORE_MINING, room))) {
-			ewt_mark_resource_worker(emp, room, vnum);
+	// didn't mine this time, still return TRUE
+	return TRUE;
+}
+
+
+void do_chore_mining(empire_data *emp, room_data *room) {
+	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_MINING].mob);
+	struct global_data *mine = global_proto(get_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM));
+	bool can_do = (mine && GET_GLOBAL_TYPE(mine) == GLOBAL_MINE_DATA && GET_GLOBAL_INTERACTIONS(mine) && get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) > 0);
+	
+	if (can_do) {
+		// not able to ewt_mark_resource_worker() until we're inside the interact
+		if (worker) {
+			if (!run_interactions(worker, GET_GLOBAL_INTERACTIONS(mine), INTERACT_MINE, room, worker, NULL, one_mining_chore)) {
+				SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
+			}
+			
+			// check for depletion
+			if (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) <= 0) {
+				// mark for despawn
+				SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
+				stop_room_action(room, ACT_MINING, CHORE_MINING);
+			}
+		}
+		else {
+			worker = place_chore_worker(emp, CHORE_MINING, room);
 		}
 	}
 	else if (worker) {

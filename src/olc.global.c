@@ -150,7 +150,7 @@ char *list_one_global(struct global_data *glb, bool detail) {
 		case GLOBAL_MOB_INTERACTIONS: {
 			if (detail) {
 				sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), action_bits, flags, TRUE);
-				snprintf(output, sizeof(output), "[%5d] %s (%s)%s %s", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb), level_range_string(GET_GLOBAL_MIN_LEVEL(glb), GET_GLOBAL_MAX_LEVEL(glb), 0), abil, flags);
+				snprintf(output, sizeof(output), "[%5d] %s (%s)%s %.2f%%%s %s", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb), level_range_string(GET_GLOBAL_MIN_LEVEL(glb), GET_GLOBAL_MAX_LEVEL(glb), 0), abil, GET_GLOBAL_PERCENT(glb), IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_CUMULATIVE_PERCENT) ? "C" : "", flags);
 			}
 			else {
 				snprintf(output, sizeof(output), "[%5d] %s", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
@@ -160,7 +160,7 @@ char *list_one_global(struct global_data *glb, bool detail) {
 		case GLOBAL_MINE_DATA: {
 			if (detail) {
 				sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), sector_flags, flags, TRUE);
-				snprintf(output, sizeof(output), "[%5d] %s%s %s", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb), abil, flags);
+				snprintf(output, sizeof(output), "[%5d] %s%s %.2f%%%s %s", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb), abil, GET_GLOBAL_PERCENT(glb), IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_CUMULATIVE_PERCENT) ? "C" : "", flags);
 			}
 			else {
 				snprintf(output, sizeof(output), "[%5d] %s", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
@@ -169,7 +169,7 @@ char *list_one_global(struct global_data *glb, bool detail) {
 		}
 		default: {
 			if (detail) {
-				snprintf(output, sizeof(output), "[%5d] %s%s", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb), abil);
+				snprintf(output, sizeof(output), "[%5d] %s%s %.2f%%%s", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb), abil, GET_GLOBAL_PERCENT(glb), IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_CUMULATIVE_PERCENT) ? "C" : "");
 			}
 			else {
 				snprintf(output, sizeof(output), "[%5d] %s", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));

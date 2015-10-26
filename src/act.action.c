@@ -675,6 +675,27 @@ INTERACTION_FUNC(finish_harvesting) {
 }
 
 
+INTERACTION_FUNC(finish_mining) {
+	bool any = FALSE;
+	obj_data *obj;
+	int iter;
+	
+	for (iter = 0; iter < interaction->quantity; ++iter) {
+		obj = read_object(interaction->vnum, TRUE);
+		obj_to_char_or_room(obj, ch);
+
+		act("With that last stroke, $p falls from the wall!", FALSE, ch, obj, 0, TO_CHAR);
+		act("With $s last stroke, $p falls from the wall where $n was picking!", FALSE, ch, obj, 0, TO_ROOM);
+
+		GET_ACTION(ch) = ACT_NONE;
+		load_otrigger(obj);
+		any = TRUE;
+	}
+	
+	return any;
+}
+
+
 INTERACTION_FUNC(finish_picking_herb) {
 	obj_data *obj = NULL;
 	room_data *in_room = IN_ROOM(ch);
@@ -1358,13 +1379,11 @@ void process_harvesting(char_data *ch) {
 *
 * @param char_data *ch The miner.
 */
-void process_mining(char_data *ch) {
-	extern obj_vnum find_mine_vnum_by_type(int type);
-	
-	obj_data *obj;
+void process_mining(char_data *ch) {	
+	struct global_data *glb;
 	int count, total;
 	room_data *in_room;
-	obj_vnum vnum;
+	bool success;
 
 	total = 1;	// pick swings at once (add things that speed up mining)
 	for (count = 0; count < total && GET_ACTION(ch) == ACT_MINING; ++count) {
@@ -1390,29 +1409,30 @@ void process_mining(char_data *ch) {
 			
 			// amount of ore remaining
 			add_to_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_AMOUNT, -1);
-
-
-			vnum = find_mine_vnum_by_type(get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_TYPE));
-			// random gold instead of iron
-			if (vnum == o_IRON_ORE && !number(0, 100)) {
-				vnum = o_GOLD;
+			
+			glb = global_proto(get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_GLB_VNUM));
+			if (!glb || GET_GLOBAL_TYPE(glb) != GLOBAL_MINE_DATA) {
+				msg_to_char(ch, "You can't seem to mine here.\r\n");
+				cancel_action(ch);
+				break;
 			}
-
-			obj = read_object(vnum, TRUE);
-			obj_to_char_or_room(obj, ch);
-	
-			act("With that last stroke, $p falls from the wall!", FALSE, ch, obj, 0, TO_CHAR);
-			act("With $s last stroke, $p falls from the wall where $n was picking!", FALSE, ch, obj, 0, TO_ROOM);
-
-			GET_ACTION(ch) = ACT_NONE;
-			if (GET_SKILL(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
-				gain_skill_exp(ch, SKILL_EMPIRE, 10);
-			}
-			load_otrigger(obj);
-	
-			// go again! (if ch is still there)
-			if (in_room == IN_ROOM(ch)) {
-				start_mining(ch);
+			
+			// attempt to mine it
+			success = run_interactions(ch, GET_GLOBAL_INTERACTIONS(glb), INTERACT_MINE, IN_ROOM(ch), NULL, NULL, finish_mining);
+			
+			if (success && in_room == IN_ROOM(ch)) {
+				// skillups
+				if (GET_GLOBAL_ABILITY(glb) != NO_ABIL) {
+					gain_ability_exp(ch, GET_GLOBAL_ABILITY(glb), 5);
+				}
+				else if (GET_SKILL(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
+					gain_skill_exp(ch, SKILL_EMPIRE, 10);
+				}
+				
+				// go again! (if ch is still there)
+				if (in_room == IN_ROOM(ch)) {
+					start_mining(ch);
+				}
 			}
 		}
 	}
@@ -1668,13 +1688,10 @@ void process_planting(char_data *ch) {
 * @param char_data *ch The prospector.
 */
 void process_prospecting(char_data *ch) {
-	extern int find_mine_type(int type);
 	extern char *get_mine_type_name(room_data *room);
 	extern bool is_deep_mine(room_data *room);
 	void init_mine(room_data *room, char_data *ch);
-	
-	int type;
-	
+		
 	// simple decrement
 	GET_ACTION_TIMER(ch) -= 1;
 	
@@ -1700,13 +1717,12 @@ void process_prospecting(char_data *ch) {
 		case 0: {
 			GET_ACTION(ch) = ACT_NONE;
 			init_mine(IN_ROOM(ch), ch);
-			type = find_mine_type(get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_TYPE));
 			
-			if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_AMOUNT) <= 0 || type == NOTHING) {
+			if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_AMOUNT) <= 0 || !global_proto(get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_GLB_VNUM))) {
 				msg_to_char(ch, "This area has already been mined for all it's worth.\r\n");
 			}
 			else {
-				msg_to_char(ch, "You discover that this area %s %s.\r\n", (is_deep_mine(IN_ROOM(ch)) ? "has a deep vein of" : "is rich in"), get_mine_type_name(IN_ROOM(ch)));
+				msg_to_char(ch, "You discover that this area %s %s.\r\n", (is_deep_mine(IN_ROOM(ch)) ? "is a deep" : "is a"), get_mine_type_name(IN_ROOM(ch)));
 				act("$n finishes prospecting.", TRUE, ch, NULL, NULL, TO_ROOM);
 			}
 			

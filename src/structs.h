@@ -1546,16 +1546,6 @@ typedef struct trig_data trig_data;
 #define ISLE_NO_AGGRO  BIT(1)	// b. Island will not fire aggro mobs or guard towers
 
 
-// mine types
-#define MINE_NOT_SET  0	// do not change this -- 0 can't be used, as it represents an uninitialized mine. The rest are arbitrary
-#define MINE_IRON  10
-#define MINE_SILVER  11
-#define MINE_GOLD  12
-#define MINE_NOCTURNIUM  13
-#define MINE_IMPERIUM  14
-#define MINE_COPPER  15
-
-
 // Room affects -- these are similar to room flags, but if you want to set them
 // in a "permanent" way, set the room's base_affects as well as its current
 // affects.
@@ -1581,7 +1571,7 @@ typedef struct trig_data trig_data;
 // For various misc numbers attached to rooms
 // WARNING: Make sure you have a place these are set, a place they are read,
 // and *especially* a place they are removed. -pc
-#define ROOM_EXTRA_MINE_TYPE  0
+	#define ROOM_EXTRA_UNUSED  0	// was MINE_TYPE prior to b3.1
 #define ROOM_EXTRA_MINE_AMOUNT  1
 #define ROOM_EXTRA_CROP_TYPE  2
 #define ROOM_EXTRA_SEED_TIME  3
@@ -2794,18 +2784,6 @@ struct fishing_data_type {
 struct material_data {
 	char *name;
 	bool floats;
-};
-
-
-// mining data
-struct mine_data_type {
-	int type;
-	char *name;
-	obj_vnum vnum;
-	int min_amount;	// initial mine value
-	int max_amount;	//		min-max
-	double chance;	// chance a mine is this, out of 100.00; -1 is special chance
-	int ability;	// if != NO_ABIL, requires this ability to find
 };
 
 

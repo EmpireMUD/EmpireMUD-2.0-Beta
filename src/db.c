@@ -1532,6 +1532,7 @@ const char *versions_list[] = {
 	"b2.9",
 	"b2.11",
 	"b3.0",
+	"b3.1",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -1613,6 +1614,48 @@ PLAYER_UPDATE_FUNC(b2_11_update_players) {
 			copy_proto_script(proto, GET_EQ(ch, iter), OBJ_TRIGGER);
 			assign_triggers(GET_EQ(ch, iter), OBJ_TRIGGER);
 		}
+	}
+}
+
+
+// updater for existing mines
+void b3_1_mine_update(void) {
+	room_data *room, *next_room;
+	int type;
+	
+	HASH_ITER(world_hh, world_table, room, next_room) {
+		if ((type = get_room_extra_data(room, 0)) <= 0) {	// 0 was ROOM_EXTRA_MINE_TYPE
+			continue;
+		}
+
+		switch (type) {
+			case 10: {	// iron
+				set_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM, 199);
+				break;
+			}
+			case 11: {	// silver
+				set_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM, 161);
+				break;
+			}
+			case 12: {	// gold
+				set_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM, 162);
+				break;
+			}
+			case 13: {	// nocturnium
+				set_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM, 163);
+				break;
+			}
+			case 14: {	// imperium
+				set_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM, 164);
+				break;
+			}
+			case 15: {	// copper
+				set_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM, 160);
+				break;
+			}
+		}
+
+		remove_room_extra_data(room, 0);	// ROOM_EXTRA_MINE_TYPE prior to b3.1
 	}
 }
 
@@ -1756,6 +1799,10 @@ void check_version(void) {
 					}
 				}
 			}
+		}
+		if (MATCH_VERSION("b3.0")) {
+			log("Applying b3.1 update to mines...");
+			b3_1_mine_update();
 		}
 	}
 	

@@ -48,7 +48,6 @@
 */
 
 // external vars
-extern const struct mine_data_type mine_data[];
 
 // external funcs
 void scale_item_to_level(obj_data *obj, int level);
@@ -3447,34 +3446,6 @@ room_data *find_load_room(char_data *ch) {
 
 
 /**
-* @param int type MINE_x
-* @return int position in mine_data[] or NOTHING
-*/
-int find_mine_type(int type) {
-	int iter, found = NOTHING;
-	
-	for (iter = 0; mine_data[iter].type != NOTHING && found == NOTHING; ++iter) {
-		if (mine_data[iter].type == type) {
-			found = iter;
-		}
-	}
-	
-	return found;
-}
-
-
-/**
-* @param int type a mine type
-* @return obj_vnum mine production vnum
-*/
-obj_vnum find_mine_vnum_by_type(int type) {
-	int t = find_mine_type(type);
-	obj_vnum vnum = (t != NOTHING ? mine_data[t].vnum : o_IRON_ORE);
-	return vnum;
-}
-
-
-/**
 * This determines if ch is close enough to a sect with certain flags.
 *
 * @param char_data *ch
@@ -3680,7 +3651,8 @@ int GET_ISLAND_ID(room_data *room) {
 * @return TRUE if the room has a deep mine set up
 */
 bool is_deep_mine(room_data *room) {
-	return (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) > mine_data[find_mine_type(get_room_extra_data(room, ROOM_EXTRA_MINE_TYPE))].max_amount);
+	struct global_data *glb = global_proto(get_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM));	
+	return glb ? (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) > GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE)) : FALSE;
 }
 
 

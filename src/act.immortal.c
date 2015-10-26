@@ -53,6 +53,7 @@ extern const char *grant_bits[];
 extern const char *island_bits[];
 extern const char *mapout_color_names[];
 extern const char *room_aff_bits[];
+extern const char *sector_flags[];
 extern const char *spawn_flags[];
 extern const char *spawn_flags_short[];
 extern const char *syslog_types[];
@@ -2901,7 +2902,9 @@ void do_stat_global(char_data *ch, struct global_data *glb) {
 			break;
 		}
 		case GLOBAL_MINE_DATA: {
-			msg_to_char(ch, "Maximum capacity: [&g%d&0]\r\n", GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE));
+			sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), sector_flags, buf, TRUE);
+			sprintbit(GET_GLOBAL_TYPE_EXCLUDE(glb), sector_flags, buf2, TRUE);
+			msg_to_char(ch, "Maximum capacity: [&g%d&0], Sector Flags: &c%s&0, Exclude: &c%s&0\r\n", GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE), buf, buf2);
 			break;
 		}
 	}
@@ -3193,7 +3196,6 @@ void do_stat_object(char_data *ch, obj_data *j) {
 
 /* Displays the vital statistics of IN_ROOM(ch) to ch */
 void do_stat_room(char_data *ch) {
-	extern char *get_mine_type_name(room_data *room);
 	extern const char *exit_bits[];
 	extern const char *depletion_type[NUM_DEPLETION_TYPES];
 	extern const char *room_extra_types[];
@@ -3209,6 +3211,7 @@ void do_stat_room(char_data *ch) {
 	struct affected_type *aff;
 	struct room_extra_data *red;
 	player_index_data *index;
+	struct global_data *glb;
 	room_data *home = HOME_ROOM(IN_ROOM(ch));
 
 
@@ -3256,11 +3259,11 @@ void do_stat_room(char_data *ch) {
 	}
 
 	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_CAN_MINE) || ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_MINE)) {
-		if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_TYPE) == MINE_NOT_SET) {
+		if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_GLB_VNUM) <= 0 || !(glb = global_proto(get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_GLB_VNUM))) || GET_GLOBAL_TYPE(glb) != GLOBAL_MINE_DATA) {
 			msg_to_char(ch, "This area is unmined.\r\n");
 		}
 		else {
-			msg_to_char(ch, "Mineral: %s, Amount remaining: %d\r\n", get_mine_type_name(IN_ROOM(ch)), get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_AMOUNT));
+			msg_to_char(ch, "Mine type: %s, Amount remaining: %d\r\n", GET_GLOBAL_NAME(glb), get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_AMOUNT));
 		}
 	}
 
@@ -3430,8 +3433,6 @@ void do_stat_room_template(char_data *ch, room_template *rmt) {
 */
 void do_stat_sector(char_data *ch, sector_data *st) {
 	void get_evolution_display(struct evolution_data *list, char *save_buffer);
-
-	extern const char *sector_flags[];
 	
 	msg_to_char(ch, "Sector VNum: [&c%d&0], Name: '&c%s&0'\r\n", st->vnum, st->name);
 	msg_to_char(ch, "Room Title: %s\r\n", st->title);
@@ -3602,7 +3603,11 @@ int vnum_global(char *searchname, char_data *ch) {
 					msg_to_char(ch, "%3d. [%5d] %s (%s) %s\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), level_range_string(GET_GLOBAL_MIN_LEVEL(iter), GET_GLOBAL_MAX_LEVEL(iter), 0), flags);
 					break;
 				}
-				case GLOBAL_MINE_DATA:
+				case GLOBAL_MINE_DATA: {
+					sprintbit(GET_GLOBAL_TYPE_FLAGS(iter), sector_flags, flags, TRUE);
+					msg_to_char(ch, "%3d. [%5d] %s - %s\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), flags);
+					break;
+				}
 				default: {
 					msg_to_char(ch, "%3d. [%5d] %s\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter));
 					break;

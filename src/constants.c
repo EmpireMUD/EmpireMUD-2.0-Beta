@@ -2531,22 +2531,6 @@ const struct fishing_data_type fishing_data[] = {
 };
 
 
-// master mines data
-const struct mine_data_type mine_data[] = {
-	// type, name, vnum, min amt, max amt, chance, ability
-	{ MINE_COPPER, "copper", o_COPPER, 20, 40, 20.0, NO_ABIL },
-	{ MINE_SILVER, "silver", o_SILVER, 15, 25, 3.5, NO_ABIL },
-	{ MINE_GOLD, "gold", o_GOLD, 10, 20, 0.5, ABIL_RARE_METALS },
-	{ MINE_NOCTURNIUM, "nocturnium", o_NOCTURNIUM_ORE, 10, 20, 1.5, ABIL_RARE_METALS },
-	{ MINE_IMPERIUM, "imperium", o_IMPERIUM_ORE, 10, 20, 1.5, ABIL_RARE_METALS },
-	
-	// put this as last real entry, since it's "default" if the others miss (-1 chance means "always")
-	{ MINE_IRON, "iron", o_IRON_ORE, 30, 50, -1, NO_ABIL },
-	
-	{ NOTHING, "\n", NOTHING, 0, 0, 0, NO_ABIL }
-};
-
-
 // for do_smelt
 const struct smelt_data_type smelt_data[] = {
 	// from, amt			to, amt					workforce?
