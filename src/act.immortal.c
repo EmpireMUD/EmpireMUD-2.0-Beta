@@ -2882,6 +2882,12 @@ void do_stat_global(char_data *ch, struct global_data *glb) {
 	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
 	
 	msg_to_char(ch, "Global VNum: [&c%d&0], Type: [&c%s&0], Name: '&c%s&0'\r\n", GET_GLOBAL_VNUM(glb), global_types[GET_GLOBAL_TYPE(glb)], GET_GLOBAL_NAME(glb));
+
+	sprintf(buf, "%s", (GET_GLOBAL_ABILITY(glb) == NO_ABIL ? "none" : ability_data[GET_GLOBAL_ABILITY(glb)].name));
+	if (GET_GLOBAL_ABILITY(glb) != NO_ABIL && ability_data[GET_GLOBAL_ABILITY(glb)].parent_skill != NO_SKILL) {
+		sprintf(buf + strlen(buf), " (%s %d)", skill_data[ability_data[GET_GLOBAL_ABILITY(glb)].parent_skill].name, ability_data[GET_GLOBAL_ABILITY(glb)].parent_skill_required);
+	}
+	msg_to_char(ch, "Requires ability: [&y%s&0], Percent: [&g%.2f&0]\r\n", buf, GET_GLOBAL_PERCENT(glb));
 	
 	sprintbit(GET_GLOBAL_FLAGS(glb), global_flags, buf, TRUE);
 	msg_to_char(ch, "Flags: &g%s&0\r\n", buf);
