@@ -2572,6 +2572,21 @@ void remove_global_from_table(struct global_data *glb) {
 
 
 /**
+* Initializes a new global. This clears all memory for it, so set the vnum
+* AFTER.
+*
+* @param struct global_data *glb The global to initialize.
+*/
+void clear_global(struct global_data *glb) {
+	memset((char *) glb, 0, sizeof(struct global_data));
+	
+	GET_GLOBAL_VNUM(glb) = NOTHING;
+	GET_GLOBAL_ABILITY(glb) = NO_ABIL;
+	GET_GLOBAL_PERCENT(glb) = 100.0;
+}
+
+
+/**
 * frees up memory for a global data item.
 *
 * See also: olc_delete_global
@@ -2607,8 +2622,10 @@ void parse_global(FILE *fl, any_vnum vnum) {
 	struct global_data *glb, *find;
 	char line[256], str_in[256], str_in2[256], str_in3[256];
 	int int_in[4];
+	double dbl_in;
 
 	CREATE(glb, struct global_data, 1);
+	clear_global(glb);
 	GET_GLOBAL_VNUM(glb) = vnum;
 
 	HASH_FIND_INT(globals_table, &vnum, find);
@@ -2644,6 +2661,15 @@ void parse_global(FILE *fl, any_vnum vnum) {
 			exit(1);
 		}
 		switch (*line) {
+			case 'E': {	// extra data
+				if (!get_line(fl, line) || sscanf(line, "%d %lf", &int_in[0], &dbl_in) != 2) {
+					log("SYSERR: Format error E line of %s", buf2);
+					exit(1);
+				}
+				GET_GLOBAL_ABILITY(glb) = int_in[0];
+				GET_GLOBAL_PERCENT(glb) = dbl_in;
+				break;
+			}
 			case 'I': {	// interaction item
 				parse_interaction(line, &GET_GLOBAL_INTERACTIONS(glb), buf2);
 				break;
@@ -2686,7 +2712,13 @@ void write_global_to_file(FILE *fl, struct global_data *glb) {
 	strcpy(temp2, bitv_to_alpha(GET_GLOBAL_TYPE_FLAGS(glb)));
 	strcpy(temp3, bitv_to_alpha(GET_GLOBAL_TYPE_EXCLUDE(glb)));
 	fprintf(fl, "%d %s %s %s %d-%d\n", GET_GLOBAL_TYPE(glb), temp, temp2, temp3, GET_GLOBAL_MIN_LEVEL(glb), GET_GLOBAL_MAX_LEVEL(glb));
-
+	
+	// E: extra data
+	if (GET_GLOBAL_ABILITY(glb) != NO_ABIL || GET_GLOBAL_PERCENT(glb) != 100.00) {
+		fprintf(fl, "E\n");
+		fprintf(fl, "%d %.2f\n", GET_GLOBAL_ABILITY(glb), GET_GLOBAL_PERCENT(glb));
+	}
+	
 	// I: interactions
 	write_interactions_to_file(fl, GET_GLOBAL_INTERACTIONS(glb));
 	

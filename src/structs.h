@@ -251,6 +251,7 @@ typedef struct trig_data trig_data;
 // GLB_FLAG_x flags for global_data
 #define GLB_FLAG_IN_DEVELOPMENT  BIT(0)	// not live
 #define GLB_FLAG_ADVENTURE_ONLY  BIT(1)	// does not apply outside same-adventure
+#define GLB_FLAG_CUMULATIVE_PERCENT  BIT(2)	// accumulates percent with other valid globals instead of its own percent
 
 
 // Group Defines
@@ -1733,6 +1734,8 @@ struct global_data {
 	bitvector_t flags;	// GLB_FLAG_x flags
 
 	// constraints
+	int ability;	// must have this to trigger, unless NO_ABIL
+	double percent;	// chance to trigger
 	bitvector_t type_flags;	// type-dependent flags
 	bitvector_t type_exclude;	// type-dependent flags
 	int min_level;

@@ -265,9 +265,12 @@ void save_olc_global(descriptor_data *desc) {
 * @return struct global_data* The copied global.
 */
 struct global_data *setup_olc_global(struct global_data *input) {
+	void clear_global(struct global_data *glb);
+
 	struct global_data *new;
 	
 	CREATE(new, struct global_data, 1);
+	clear_global(new);
 	
 	if (input) {
 		// copy normal data
@@ -333,7 +336,21 @@ void olc_show_global(char_data *ch) {
 	else {
 		sprintf(buf + strlen(buf), "<&ymaxlevel&0> %d\r\n", GET_GLOBAL_MAX_LEVEL(glb));
 	}
-
+	
+	// ability required
+	if (GET_GLOBAL_ABILITY(glb) == NO_ABIL) {
+		strcpy(buf1, "none");
+	}
+	else {
+		sprintf(buf1, "%s", ability_data[GET_GLOBAL_ABILITY(glb)].name);
+		if (ability_data[GET_GLOBAL_ABILITY(glb)].parent_skill != NO_SKILL) {
+			sprintf(buf1 + strlen(buf1), " (%s %d)", skill_data[ability_data[GET_GLOBAL_ABILITY(glb)].parent_skill].name, ability_data[GET_GLOBAL_ABILITY(glb)].parent_skill_required);
+		}
+	}
+	sprintf(buf + strlen(buf), "<&yability&0> %s\r\n", buf1);
+	
+	sprintf(buf + strlen(buf), "<&ypercent&0> %.2f%%\r\n", GET_GLOBAL_PERCENT(glb));
+	
 	// type-based data
 	switch (GET_GLOBAL_TYPE(glb)) {
 		case GLOBAL_MOB_INTERACTIONS: {
@@ -355,6 +372,40 @@ void olc_show_global(char_data *ch) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// EDIT MODULES ////////////////////////////////////////////////////////////
+
+OLC_MODULE(gedit_ability) {
+	extern int find_ability_by_name(char *name, bool allow_abbrev);
+	
+	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
+	int abil;
+	
+	if (!*argument) {
+		msg_to_char(ch, "Require what ability (or 'none')?\r\n");
+	}
+	else if (!str_cmp(argument, "none")) {
+		GET_GLOBAL_ABILITY(glb) = NO_ABIL;
+		
+		if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+			send_config_msg(ch, "ok_string");
+		}
+		else {
+			msg_to_char(ch, "It will require no ability.\r\n");
+		}
+	}
+	else if ((abil = find_ability_by_name(argument, TRUE)) == NOTHING) {
+		msg_to_char(ch, "Invalid ability '%s'.\r\n", argument);
+	}
+	else {
+		GET_GLOBAL_ABILITY(glb) = abil;
+		
+		if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+			send_config_msg(ch, "ok_string");
+		}
+		else {
+			msg_to_char(ch, "It now requires the %s ability.\r\n", ability_data[abil].name);
+		}
+	}
+}
 
 
 OLC_MODULE(gedit_flags) {
@@ -416,6 +467,12 @@ OLC_MODULE(gedit_mobflags) {
 OLC_MODULE(gedit_name) {
 	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
 	olc_process_string(ch, argument, "name", &GET_GLOBAL_NAME(glb));
+}
+
+
+OLC_MODULE(gedit_percent) {
+	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
+	GET_GLOBAL_PERCENT(glb) = olc_process_double(ch, argument, "percent", "percent", 0.01, 100.00, GET_GLOBAL_PERCENT(glb));
 }
 
 

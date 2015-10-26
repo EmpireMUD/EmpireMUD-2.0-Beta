@@ -2791,6 +2791,7 @@ const char *global_types[] = {
 const char *global_flags[] = {
 	"IN-DEVELOPMENT",
 	"ADVENTURE-ONLY",
+	"CUMULATIVE-PRC",
 	"\n"
 };
 
