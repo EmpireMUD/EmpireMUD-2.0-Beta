@@ -3029,8 +3029,9 @@ bool has_interaction(struct interaction_item *list, int type) {
 bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERACTION_FUNC(*func)) {
 	extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
 	
+	bool any = FALSE, done_cumulative = FALSE;
 	struct global_data *glb, *next_glb;
-	bool any = FALSE;
+	int cumulative_prc;
 	adv_data *adv;
 	
 	// no work
@@ -3039,12 +3040,16 @@ bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERA
 	}
 	
 	adv = get_adventure_for_vnum(GET_MOB_VNUM(mob));
+	cumulative_prc = number(1, 10000);
 
 	HASH_ITER(hh, globals_table, glb, next_glb) {
 		if (GET_GLOBAL_TYPE(glb) != GLOBAL_MOB_INTERACTIONS) {
 			continue;
 		}
 		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_IN_DEVELOPMENT)) {
+			continue;
+		}
+		if (GET_GLOBAL_ABILITY(glb) != NO_ABIL && !HAS_ABILITY(ch, GET_GLOBAL_ABILITY(glb))) {
 			continue;
 		}
 		
@@ -3067,6 +3072,24 @@ bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERA
 		
 		// check adventure-only -- late-matching because it does more work than other conditions
 		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_ADVENTURE_ONLY) && get_adventure_for_vnum(GET_GLOBAL_VNUM(glb)) != adv) {
+			continue;
+		}
+		
+		// percent checks last
+		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_CUMULATIVE_PERCENT)) {
+			if (done_cumulative) {
+				continue;
+			}
+			cumulative_prc -= (int)(GET_GLOBAL_PERCENT(glb) * 100);
+			if (cumulative_prc <= 0) {
+				done_cumulative = TRUE;
+			}
+			else {
+				continue;	// not this time
+			}
+		}
+		else if (number(1, 10000) <= (int)(GET_GLOBAL_PERCENT(glb) * 100)) {
+			// normal not-cumulative percent
 			continue;
 		}
 		
