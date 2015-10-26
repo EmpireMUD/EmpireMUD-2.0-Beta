@@ -353,7 +353,7 @@ ACMD(do_hit) {
 		}
 	}
 	else if (can_fight(ch, vict)) {
-		if (AFF_FLAGGED(ch, AFF_CHARM) && !IS_NPC(ch->master) && !IS_NPC(vict))
+		if (AFF_FLAGGED(ch, AFF_CHARM) && ch->master && !IS_NPC(ch->master) && !IS_NPC(vict))
 			return;
 
 		if (FIGHTING(ch) == vict) {
@@ -430,7 +430,7 @@ ACMD(do_shoot) {
 	else if (FIGHTING(ch))
 		msg_to_char(ch, "You're already fighting for your life!\r\n");
 	else if (can_fight(ch, vict)) {
-		if (AFF_FLAGGED(ch, AFF_CHARM) && !IS_NPC(ch->master) && !IS_NPC(vict))
+		if (AFF_FLAGGED(ch, AFF_CHARM) && ch->master && !IS_NPC(ch->master) && !IS_NPC(vict))
 			return;
 
 		msg_to_char(ch, "You take aim.\r\n");
