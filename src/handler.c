@@ -3088,7 +3088,7 @@ bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERA
 				continue;	// not this time
 			}
 		}
-		else if (number(1, 10000) <= (int)(GET_GLOBAL_PERCENT(glb) * 100)) {
+		else if (number(1, 10000) > (int)(GET_GLOBAL_PERCENT(glb) * 100)) {
 			// normal not-cumulative percent
 			continue;
 		}
