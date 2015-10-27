@@ -1619,6 +1619,7 @@ typedef struct trig_data trig_data;
 #define MAX_INVALID_NAMES  200	// ban.c
 #define MAX_ISLAND_NAME  40	// island name length -- seems more than reasonable
 #define MAX_ITEM_DESCRIPTION  4000
+#define MAX_MAIL_SIZE  4096	// arbitrary
 #define MAX_MESSAGES  60	// fight.c
 #define MAX_MOTD_LENGTH  4000	// eedit.c, configs
 #define MAX_NAME_LENGTH  20
@@ -2319,6 +2320,16 @@ struct paragraph_data {
 };
 
 
+// player mail
+struct mail_data {
+	int from;	// player idnum
+	time_t timestamp;	// when the mail was sent
+	char *body;	// mail body
+	
+	struct mail_data *next;	// linked list
+};
+
+
 // used in player_special_data
 struct player_ability_data {
 	bool purchased;	// whether or not the player bought it
@@ -2362,6 +2373,7 @@ struct player_special_data {
 	bitvector_t syslogs;	// which syslogs people want to see
 	bitvector_t bonus_traits;	// BONUS_x
 	ubyte bad_pws;	// number of bad password attemps
+	struct mail_data *mail_pending;	// uncollected letters
 	int create_alt_id;	// used in CON_Q_ALT_NAME and CON_Q_ALT_PASSWORD
 	int promo_id;	// entry in the promo_codes table
 	int ignore_list[MAX_IGNORES];	// players who can't message you

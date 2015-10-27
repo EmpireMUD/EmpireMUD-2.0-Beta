@@ -19,7 +19,6 @@
 #include "handler.h"
 #include "db.h"
 #include "comm.h"
-#include "mail.h"
 #include "boards.h"
 #include "olc.h"
 
@@ -150,7 +149,11 @@ void string_add(descriptor_data *d, char *str) {
 	extern char *stripcr(char *dest, const char *src);
 	extern int improved_editor_execute(descriptor_data *d, char *str);
 	
+	player_index_data *index;
+	struct mail_data *mail;
 	account_data *acct;
+	char_data *recip;
+	bool is_file;
 	int action;
 	FILE *fl;
 
@@ -213,7 +216,22 @@ void string_add(descriptor_data *d, char *str) {
 	if (action) {
 		if (STATE(d) == CON_PLAYING && PLR_FLAGGED(d->character, PLR_MAILING)) {
 			if (action == STRINGADD_SAVE && *d->str) {
-				store_mail(d->mail_to, GET_IDNUM(d->character), *d->str);
+				if ((index = find_player_index_by_idnum(d->mail_to)) && (recip = find_or_load_player(index->name, &is_file))) {
+					// create letter
+					CREATE(mail, struct mail_data, 1);
+					mail->from = GET_IDNUM(d->character);
+					mail->timestamp = time(0);
+					mail->body = str_dup(*d->str);
+					
+					// put it on the pile
+					mail->next = GET_MAIL_PENDING(recip);
+					GET_MAIL_PENDING(recip) = mail;
+					
+					if (is_file) {
+						store_loaded_char(recip);
+					}
+				}
+				
 				SEND_TO_Q("You tie your message to a pigeon and it flies away!\r\n", d);
 			}
 			else {

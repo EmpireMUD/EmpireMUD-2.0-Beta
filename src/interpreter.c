@@ -19,7 +19,6 @@
 #include "db.h"
 #include "utils.h"
 #include "handler.h"
-#include "mail.h"
 #include "utils.h"
 #include "olc.h"
 #include "skills.h"
@@ -2603,7 +2602,7 @@ void nanny(descriptor_data *d, char *arg) {
 			
 			display_tip_to_char(d->character);
 			
-			if (has_mail(GET_IDNUM(d->character))) {
+			if (GET_MAIL_PENDING(d->character)) {
 				send_to_char("&rYou have mail waiting.&0\r\n", d->character);
 			}
 			

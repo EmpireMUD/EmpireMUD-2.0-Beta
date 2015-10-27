@@ -39,7 +39,6 @@
 **   DON'T TOUCH DEFINES BELOW  */
 
 int	scan_file(void);
-int	has_mail(long recipient);
 void store_mail(long to, long from, char *message_pointer);
 char *read_delete(long recipient);
 

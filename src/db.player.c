@@ -678,6 +678,7 @@ void check_delayed_load(char_data *ch) {
 /* release memory allocated for a char struct */
 void free_char(char_data *ch) {
 	void free_alias(struct alias_data *a);
+	void free_mail(struct mail_data *mail);
 
 	struct slash_channel *loadslash, *next_loadslash;
 	struct channel_history_data *history;
@@ -686,6 +687,7 @@ void free_char(char_data *ch) {
 	struct offer_data *offer;
 	struct lore_data *lore;
 	struct coin_data *coin;
+	struct mail_data *mail;
 	struct alias_data *a;
 	char_data *proto;
 	obj_data *obj;
@@ -769,6 +771,11 @@ void free_char(char_data *ch) {
 		while ((coin = GET_PLAYER_COINS(ch))) {
 			GET_PLAYER_COINS(ch) = coin->next;
 			free(coin);
+		}
+		
+		while ((mail = GET_MAIL_PENDING(ch))) {
+			GET_MAIL_PENDING(ch) = mail->next;
+			free_mail(mail);
 		}
 		
 		// close the delayed-load file (guess we didn't need it)
@@ -931,11 +938,13 @@ char_data *load_player(char *name, bool normal) {
 void read_player_delayed_data(FILE *fl, char_data *ch) {
 	void loaded_obj_to_char(obj_data *obj, char_data *ch, int location);
 	extern obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify);
+	extern struct mail_data *parse_mail(FILE *fl, char *first_line);
 
 	char line[MAX_STRING_LENGTH], str_in[MAX_INPUT_LENGTH];
 	struct alias_data *alias, *last_alias = NULL;
 	struct coin_data *coin, *last_coin = NULL;
 	struct lore_data *lore, *last_lore = NULL, *new_lore;
+	struct mail_data *mail, *last_mail = NULL;
 	int length, i_in[3];
 	bool end = FALSE;
 	obj_data *obj;
@@ -950,6 +959,13 @@ void read_player_delayed_data(FILE *fl, char_data *ch) {
 	if ((last_alias = GET_ALIASES(ch))) {
 		while (last_alias->next) {
 			last_alias = last_alias->next;
+		}
+	}
+	
+	// find end of mailing list
+	if ((last_mail = GET_MAIL_PENDING(ch))) {
+		while (last_mail->next) {
+			last_mail = last_mail->next;
 		}
 	}
 	
@@ -1047,6 +1063,21 @@ void read_player_delayed_data(FILE *fl, char_data *ch) {
 						GET_LORE(ch) = lore;
 					}
 					last_lore = lore;
+				}
+				BAD_TAG_WARNING(line);
+				break;
+			}
+			case 'M': {
+				if (PFILE_TAG(line, "Mail", length)) {
+					if ((mail = parse_mail(fl, line))) {
+						if (last_mail) {
+							last_mail->next = mail;
+						}
+						else {
+							GET_MAIL_PENDING(ch) = mail;
+						}
+						last_mail = mail;
+					}
 				}
 				BAD_TAG_WARNING(line);
 				break;
@@ -1837,6 +1868,7 @@ void update_player_index(player_index_data *index, char_data *ch) {
 void write_player_to_file(FILE *fl, char_data *ch) {
 	void Crash_save(obj_data *obj, FILE *fp, int location);
 	extern struct slash_channel *find_slash_channel_by_id(int id);
+	void write_mail_to_file(FILE *fl, char_data *ch);
 	
 	struct affected_type *af, *new_af, *next_af, *af_list;
 	struct player_slash_channel *slash;
@@ -2214,6 +2246,9 @@ void write_player_to_file(FILE *fl, char_data *ch) {
 	
 	// delayed: inventory
 	Crash_save(ch->carrying, fl, LOC_INVENTORY);
+	
+	// delayted: mail
+	write_mail_to_file(fl, ch);
 	
 	// END DELAY-LOADED SECTION
 	fprintf(fl, "End Player File\n");

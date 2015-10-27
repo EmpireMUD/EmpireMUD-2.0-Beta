@@ -20,7 +20,6 @@
 #include "db.h"
 #include "comm.h"
 #include "handler.h"
-#include "mail.h"
 #include "interpreter.h"
 #include "skills.h"
 #include "olc.h"
@@ -90,7 +89,6 @@ struct message_list fight_messages[MAX_MESSAGES];	// fighting messages
 time_t boot_time = 0;	// time of mud boot
 int daily_cycle = 0;	// this is a timestamp for the last time skills/exp reset
 int Global_ignore_dark = 0;	// For use in public channels
-int no_mail = 0;	// mail disabled?
 int no_auto_deletes = 0;	// skip player deletes on boot?
 struct time_info_data time_info;	// the infomation about the time
 struct weather_data weather_info;	// the infomation about the weather
@@ -271,12 +269,6 @@ void boot_db(void) {
 
 	log("Sorting command list.");
 	sort_commands();
-
-	log("Booting mail system.");
-	if (!scan_file()) {
-		log("    Mail boot failed -- Mail system disabled");
-		no_mail = 1;
-	}
 	
 	// sends own log
 	load_tips_of_the_day();

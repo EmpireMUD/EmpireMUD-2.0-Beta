@@ -179,7 +179,6 @@ void cancel_adventure_summon(char_data *ch) {
 void perform_alternate(char_data *old, char_data *new) {
 	void display_tip_to_char(char_data *ch);
 	extern void enter_player_game(descriptor_data *d, int dolog, bool fresh);
-	extern int has_mail(long recipient);
 	void start_new_character(char_data *ch);
 	extern char *START_MESSG;
 	extern bool global_mute_slash_channel_joins;
@@ -294,7 +293,7 @@ void perform_alternate(char_data *old, char_data *new) {
 	msg_to_char(new, "\r\n");	// leading \r\n between the look and the tip
 	display_tip_to_char(new);
 	
-	if (has_mail(GET_IDNUM(new))) {
+	if (GET_MAIL_PENDING(new)) {
 		send_to_char("&rYou have mail waiting.&0\r\n", new);
 	}
 	
