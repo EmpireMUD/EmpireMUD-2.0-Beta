@@ -122,7 +122,7 @@ void special_building_setup(char_data *ch, room_data *room) {
 	void init_mine(room_data *room, char_data *ch);
 		
 	// mine data
-	if (ROOM_BLD_FLAGGED(room, BLD_MINE) && get_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM) <= 0) {
+	if (ROOM_BLD_FLAGGED(room, BLD_MINE)) {
 		init_mine(room, ch);
 	}
 }

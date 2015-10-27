@@ -545,11 +545,11 @@ void init_mine(room_data *room, char_data *ch) {
 		}
 		
 		// match ALL type-flags
-		if ((GET_SECT_FLAGS(SECT(room)) & GET_GLOBAL_TYPE_FLAGS(glb)) != GET_GLOBAL_TYPE_FLAGS(glb)) {
+		if ((GET_SECT_FLAGS(ROOM_ORIGINAL_SECT(room)) & GET_GLOBAL_TYPE_FLAGS(glb)) != GET_GLOBAL_TYPE_FLAGS(glb)) {
 			continue;
 		}
 		// match ZERO type-excludes
-		if ((GET_SECT_FLAGS(SECT(room)) & GET_GLOBAL_TYPE_EXCLUDE(glb)) != 0) {
+		if ((GET_SECT_FLAGS(ROOM_ORIGINAL_SECT(room)) & GET_GLOBAL_TYPE_EXCLUDE(glb)) != 0) {
 			continue;
 		}
 		
