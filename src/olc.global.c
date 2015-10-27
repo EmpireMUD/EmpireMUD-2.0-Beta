@@ -400,7 +400,7 @@ void olc_show_global(char_data *ch) {
 			sprintf(buf + strlen(buf), "<&ysectorflags&0> %s\r\n", lbuf);
 			sprintbit(GET_GLOBAL_TYPE_EXCLUDE(glb), sector_flags, lbuf, TRUE);
 			sprintf(buf + strlen(buf), "<&ysectorexclude&0> %s\r\n", lbuf);
-			sprintf(buf + strlen(buf), "<&ycapacity&0> %d ore (%d-%d normal, %d-%d deep)\r\n", GET_GLOBAL_VAL(glb, GLOBAL_MOB_INTERACTIONS), GET_GLOBAL_VAL(glb, GLOBAL_MOB_INTERACTIONS), GET_GLOBAL_VAL(glb, GLOBAL_MOB_INTERACTIONS)/2, (int)(GET_GLOBAL_VAL(glb, GLOBAL_MOB_INTERACTIONS) / 2.0 * 1.5), (int)(GET_GLOBAL_VAL(glb, GLOBAL_MOB_INTERACTIONS) * 1.5));
+			sprintf(buf + strlen(buf), "<&ycapacity&0> %d ore (%d-%d normal, %d-%d deep)\r\n", GET_GLOBAL_VAL(glb, GLOBAL_MOB_INTERACTIONS), GET_GLOBAL_VAL(glb, GLOBAL_MOB_INTERACTIONS)/2, GET_GLOBAL_VAL(glb, GLOBAL_MOB_INTERACTIONS), (int)(GET_GLOBAL_VAL(glb, GLOBAL_MOB_INTERACTIONS) / 2.0 * 1.5), (int)(GET_GLOBAL_VAL(glb, GLOBAL_MOB_INTERACTIONS) * 1.5));
 			break;
 		}
 	}
