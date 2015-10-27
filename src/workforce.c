@@ -415,6 +415,43 @@ static bool can_gain_chore_resource(empire_data *emp, room_data *loc, obj_vnum v
 
 
 /**
+* Checks to see if the empire can gain any chore that's in an interaction list.
+* If you pass TRUE for highest_only, it will only care about the thing with the
+* highest percentage. This patches a bug where workforce might spawn for some-
+* thing that only has a 1% chance of coming up, then despawn without finding
+* any again.
+*
+* @param empire_data *emp The empire whose inventory we'll check.
+* @param room_data *location The place we'll check for resource overages.
+* @param struct interaction_item *list The list of interactions to check.
+* @param int interaction_type Any INTERACT_x types.
+* @param bool highest_only If TRUE, only checks if the empire can gain the thing with the highest percent.
+* @return bool TRUE if the empire could gain the resource(s) from the interaction list.
+*/
+bool can_gain_chore_resource_from_interaction_list(empire_data *emp, room_data *location, struct interaction_item *list, int interaction_type, bool highest_only) {
+	struct interaction_item *interact, *found = NULL;
+	double best_percent = 0.0;
+	
+	for (interact = list; interact; interact = interact->next) {
+		if (interact->type == interaction_type) {
+			if (highest_only) {
+				if (!found || interact->percent > best_percent) {
+					best_percent = interact->percent;
+					found = interact;
+				}
+			}
+			else {
+				found = interact;
+				break;
+			}
+		}
+	}
+	
+	return (found && can_gain_chore_resource(emp, location, found->vnum));
+}
+
+
+/**
 * Checks to see if the empire can gain any chore that's on an interaction for this room.
 *
 * @param empire_data *emp The empire whose inventory we'll check.
@@ -423,28 +460,15 @@ static bool can_gain_chore_resource(empire_data *emp, room_data *loc, obj_vnum v
 * @return bool TRUE if the empire could gain at least one resource from the interactions on this room.
 */
 bool can_gain_chore_resource_from_interaction(empire_data *emp, room_data *room, int interaction_type) {
-	struct interaction_item *interact;
 	bool found_any = FALSE;
 	crop_data *cp;
 	
-	for (interact = GET_SECT_INTERACTIONS(SECT(room)); interact && !found_any; interact = interact->next) {
-		if (interact->type == interaction_type && can_gain_chore_resource(emp, room, interact->vnum)) {
-			found_any = TRUE;
-		}
-	}
+	found_any |= can_gain_chore_resource_from_interaction_list(emp, room, GET_SECT_INTERACTIONS(SECT(room)), interaction_type, FALSE);
 	if (!found_any && ROOM_CROP_TYPE(room) != NOTHING && (cp = crop_proto(ROOM_CROP_TYPE(room)))) {
-		for (interact = GET_CROP_INTERACTIONS(cp); interact && !found_any; interact = interact->next) {
-			if (interact->type == interaction_type && can_gain_chore_resource(emp, room, interact->vnum)) {
-				found_any = TRUE;
-			}
-		}
+		found_any |= can_gain_chore_resource_from_interaction_list(emp, room, GET_CROP_INTERACTIONS(cp), interaction_type, FALSE);
 	}
 	if (!found_any && GET_BUILDING(room)) {
-		for (interact = GET_BLD_INTERACTIONS(GET_BUILDING(room)); interact && !found_any; interact = interact->next) {
-			if (interact->type == interaction_type && can_gain_chore_resource(emp, room, interact->vnum)) {
-				found_any = TRUE;
-			}
-		}
+		found_any |= can_gain_chore_resource_from_interaction_list(emp, room, GET_BLD_INTERACTIONS(GET_BUILDING(room)), interaction_type, FALSE);
 	}
 	
 	return found_any;
@@ -1355,7 +1379,7 @@ INTERACTION_FUNC(one_mining_chore) {
 void do_chore_mining(empire_data *emp, room_data *room) {
 	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_MINING].mob);
 	struct global_data *mine = global_proto(get_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM));
-	bool can_do = (mine && GET_GLOBAL_TYPE(mine) == GLOBAL_MINE_DATA && GET_GLOBAL_INTERACTIONS(mine) && get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) > 0);
+	bool can_do = (mine && GET_GLOBAL_TYPE(mine) == GLOBAL_MINE_DATA && get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) > 0 && can_gain_chore_resource_from_interaction_list(emp, room, GET_GLOBAL_INTERACTIONS(mine), INTERACT_MINE, TRUE));
 	
 	if (can_do) {
 		// not able to ewt_mark_resource_worker() until we're inside the interact
