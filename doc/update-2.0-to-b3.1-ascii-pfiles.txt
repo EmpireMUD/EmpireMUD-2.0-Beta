@@ -8,8 +8,8 @@ Upgrade Intro, or, What are ASCII playerfiles?
   a binary playerfile that contained all the players as fixed-length data. This
   meant that adding new features to the playerfile required writing and running
   a converter program on it. Additionally, players had extra files to store
-  variable-length data like aliases, equipment, inventory, lore, and script
-  variables.
+  variable-length data like aliases, equipment, inventory, lore, mail, and
+  script variables.
   
   ASCII (or "tagged") playerfiles instead use a human-readable text file for
   each player. This file stores all of the information for the character, and
@@ -105,7 +105,7 @@ converter.
   8c. After the converter finishes, you can delete the following files and
   directories:
 
-    rm lib/etc/players
+    rm lib/etc/players lib/etc/plrmail
     rm -rf lib/plralias/ lib/plrlore/ lib/plrobjs/ lib/plrvars/
 
 9. Start up your MUD like normal.

@@ -34,6 +34,7 @@
 *   GLOBAL DATA AND CONSTANTS
 *   VERSION 2.0b3 STRUCTS
 *   HELPERS
+*   MAIL CONVERTER
 *   CONVERTER CODE
 */
 
@@ -678,6 +679,382 @@ void write_account_to_file(FILE *fl, account_data *acct) {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// MAIL CONVERTER //////////////////////////////////////////////////////////
+
+#define MAIL_FILE  "lib/etc/plrmail"
+
+#define b3_BLOCK_SIZE 200
+#define b3_HEADER_BLOCK  -1
+#define b3_LAST_BLOCK    -2
+#define b3_DELETED_BLOCK -3
+
+struct b3_header_data_type {
+	long next_block;		/* if header block, link to next block	*/
+	long from;				/* idnum of the mail's sender			*/
+	long to;				/* idnum of mail's recipient			*/
+	time_t mail_time;		/* when was the letter mailed?			*/
+};
+
+#define b3_HEADER_BLOCK_DATASIZE  (b3_BLOCK_SIZE - sizeof(long) - sizeof(struct b3_header_data_type) - sizeof(char))
+#define b3_DATA_BLOCK_DATASIZE  (b3_BLOCK_SIZE - sizeof(long) - sizeof(char))
+
+struct b3_header_block_type_d {
+	long block_type;				/* is this a header or data block?	*/
+	struct b3_header_data_type header_data;	/* other header data		*/
+	char txt[b3_HEADER_BLOCK_DATASIZE+1]; /* actual text plus 1 for null	*/
+};
+
+struct b3_data_block_type_d {
+	long block_type;		/* -1 if header block, -2 if last data block
+							   in mail, otherwise a link to the next	*/
+	char txt[b3_DATA_BLOCK_DATASIZE+1]; /* actual text plus 1 for null		*/
+};
+
+typedef struct b3_header_block_type_d b3_header_block_type;
+typedef struct b3_data_block_type_d b3_data_block_type;
+
+struct b3_position_list_type_d {
+	long position;
+	struct b3_position_list_type_d *next;
+};
+
+typedef struct b3_position_list_type_d b3_position_list_type;
+
+struct b3_mail_index_type_d {
+	long recipient;					/* who is this mail for?	*/
+	b3_position_list_type *list_start;	/* list of mail positions	*/
+	struct b3_mail_index_type_d *next;	/* link to next one			*/
+};
+
+typedef struct b3_mail_index_type_d b3_mail_index_type;
+
+
+int no_mail = 0;
+b3_mail_index_type *mail_index = NULL;	/* list of recs in the mail file  */
+b3_position_list_type *free_list = NULL;	/* list of free positions in file */
+long file_end_pos = 0;			/* length of file */
+
+/* -------------------------------------------------------------------------- */
+
+/*
+ * void push_free_list(long #1)
+ * #1 - What byte offset into the file the block resides.
+ *
+ * Net effect is to store a list of free blocks in the mail file in a linked
+ * list.  This is called when people receive their messages and at startup
+ * when the list is created.
+ */
+void push_free_list(long pos) {
+	b3_position_list_type *new_pos;
+
+	CREATE(new_pos, b3_position_list_type, 1);
+	new_pos->position = pos;
+	new_pos->next = free_list;
+	free_list = new_pos;
+}
+
+
+/*
+ * long pop_free_list(none)
+ * Returns the offset of a free block in the mail file.
+ *
+ * Typically used whenever a person mails a message.  The blocks are not
+ * guaranteed to be sequential or in any order at all.
+ */
+long pop_free_list(void) {
+	b3_position_list_type *old_pos;
+	long return_value;
+
+	/*
+	 * If we don't have any free blocks, we append to the file.
+	 */
+	if ((old_pos = free_list) == NULL)
+		return (file_end_pos);
+
+	/* Save the offset of the free block. */
+	return_value = free_list->position;
+
+	/* Remove this block from the free list. */
+	free_list = old_pos->next;
+
+	/* Get rid of the memory the node took. */
+	free(old_pos);
+
+	/* Give back the free offset. */
+	return (return_value);
+}
+
+
+/*
+ * main_index_type *find_char_in_index(long #1)
+ * #1 - The idnum of the person to look for.
+ * Returns a pointer to the mail block found.
+ *
+ * Finds the first mail block for a specific person based on id number.
+ */
+b3_mail_index_type *find_char_in_index(long searchee) {
+	b3_mail_index_type *tmp;
+
+	if (searchee < 0) {
+		printf("SYSERR: Mail system -- non fatal error #1 (searchee == %ld)\r\n.", searchee);
+		return (NULL);
+	}
+	for (tmp = mail_index; (tmp && tmp->recipient != searchee); tmp = tmp->next);
+
+	return (tmp);
+}
+
+
+/*
+ * void write_to_file(void * #1, int #2, long #3)
+ * #1 - A pointer to the data to write, usually the 'block' record.
+ * #2 - How much to write (because we'll write NUL terminated strings.)
+ * #3 - What offset (block position) in the file to write to.
+ *
+ * Writes a mail block back into the database at the given location.
+ */
+void write_to_file(void *buf, int size, long filepos) {
+	FILE *mail_file;
+
+	if (filepos % b3_BLOCK_SIZE) {
+		printf("SYSERR: Mail system -- fatal error #2!!! (invalid file position %ld)\r\n", filepos);
+		no_mail = TRUE;
+		return;
+	}
+	if (!(mail_file = fopen(MAIL_FILE, "r+b"))) {
+		printf("SYSERR: Unable to open mail file '%s'.\r\n", MAIL_FILE);
+		no_mail = TRUE;
+		return;
+	}
+	fseek(mail_file, filepos, SEEK_SET);
+	fwrite(buf, size, 1, mail_file);
+
+	/* find end of file */
+	fseek(mail_file, 0L, SEEK_END);
+	file_end_pos = ftell(mail_file);
+	fclose(mail_file);
+	return;
+}
+
+
+/*
+ * void read_from_file(void * #1, int #2, long #3)
+ * #1 - A pointer to where we should store the data read.
+ * #2 - How large the block we're reading is.
+ * #3 - What position in the file to read.
+ *
+ * This reads a block from the mail database file.
+ */
+void read_from_file(void *buffer, int size, long filepos) {
+	FILE *mail_file;
+
+	if (filepos % b3_BLOCK_SIZE) {
+		printf("SYSERR: Mail system -- fatal error #3!!! (invalid filepos read %ld)\r\n", filepos);
+		no_mail = TRUE;
+		return;
+	}
+	if (!(mail_file = fopen(MAIL_FILE, "r+b"))) {
+		printf("SYSERR: Unable to open mail file '%s'.\r\n", MAIL_FILE);
+		no_mail = TRUE;
+		return;
+	}
+
+	fseek(mail_file, filepos, SEEK_SET);
+	fread(buffer, size, 1, mail_file);
+	fclose(mail_file);
+	return;
+}
+
+
+void index_mail(long id_to_index, long pos) {
+	b3_mail_index_type *new_index;
+	b3_position_list_type *new_position;
+
+	if (id_to_index < 0) {
+		printf("SYSERR: Mail system -- non-fatal error #4. (id_to_index == %ld)\r\n", id_to_index);
+		return;
+	}
+	if (!(new_index = find_char_in_index(id_to_index))) {
+		/* name not already in index.. add it */
+		CREATE(new_index, b3_mail_index_type, 1);
+		new_index->recipient = id_to_index;
+		new_index->list_start = NULL;
+
+		/* add to front of list */
+		new_index->next = mail_index;
+		mail_index = new_index;
+	}
+	/* now, add this position to front of position list */
+	CREATE(new_position, b3_position_list_type, 1);
+	new_position->position = pos;
+	new_position->next = new_index->list_start;
+	new_index->list_start = new_position;
+}
+
+
+/*
+ * int scan_mail_file(none)
+ * Returns false if mail file is corrupted or true if everything correct.
+ *
+ * This is called once during boot-up.  It scans through the mail file
+ * and indexes all entries currently in the mail file.
+ */
+int scan_mail_file(void) {
+	FILE *mail_file;
+	b3_header_block_type next_block;
+	int total_messages = 0, block_num = 0;
+
+	if (!(mail_file = fopen(MAIL_FILE, "r"))) {
+		return (0);
+	}
+	while (fread(&next_block, sizeof(b3_header_block_type), 1, mail_file)) {
+		if (next_block.block_type == b3_HEADER_BLOCK) {
+			index_mail(next_block.header_data.to, block_num * b3_BLOCK_SIZE);
+			total_messages++;
+		}
+		else if (next_block.block_type == b3_DELETED_BLOCK)
+			push_free_list(block_num * b3_BLOCK_SIZE);
+		block_num++;
+	}
+
+	file_end_pos = ftell(mail_file);
+	fclose(mail_file);
+	printf("   %ld bytes read.", file_end_pos);
+	if (file_end_pos % b3_BLOCK_SIZE) {
+		printf("SYSERR: Error booting mail system -- Mail file corrupt!\r\n");
+		return (0);
+	}
+	printf("   Mail file read -- %d messages.\r\n", total_messages);
+	return (1);
+}				/* end of scan_file */
+
+
+/*
+ * Retrieves one messsage for a player. The mail is then discarded from
+ * the file and the mail index.
+ */
+char *read_delete(long recipient, int *from, time_t *timestamp) {
+	b3_header_block_type header;
+	b3_data_block_type data;
+	b3_mail_index_type *mail_pointer, *prev_mail;
+	b3_position_list_type *position_pointer;
+	long mail_address, following_block;
+	char *message;
+	size_t string_size;
+	
+	*from = 0;
+	*timestamp = 0;
+
+	if (recipient < 0) {
+		printf("SYSERR: Mail system -- non-fatal error #6. (recipient: %ld)\r\n", recipient);
+		return (NULL);
+	}
+	if (!(mail_pointer = find_char_in_index(recipient))) {
+		printf("SYSERR: Mail system --  Error #7. (invalid character in index)\r\n");
+		return (NULL);
+	}
+	if (!(position_pointer = mail_pointer->list_start)) {
+		printf("SYSERR: Mail system -- non-fatal error #8. (invalid position pointer %p)\r\n", position_pointer);
+		return (NULL);
+	}
+	if (!(position_pointer->next)) {	/* just 1 entry in list. */
+		mail_address = position_pointer->position;
+		free(position_pointer);
+
+		/* now free up the actual name entry */
+		if (mail_index == mail_pointer) {	/* name is 1st in list */
+			mail_index = mail_pointer->next;
+			free(mail_pointer);
+		}
+		else {
+			/* find entry before the one we're going to del */
+			for (prev_mail = mail_index; prev_mail->next != mail_pointer; prev_mail = prev_mail->next);
+			prev_mail->next = mail_pointer->next;
+			free(mail_pointer);
+		}
+	}
+	else {
+		/* move to next-to-last record */
+		while (position_pointer->next->next)
+			position_pointer = position_pointer->next;
+		mail_address = position_pointer->next->position;
+		free(position_pointer->next);
+		position_pointer->next = NULL;
+	}
+
+	/* ok, now lets do some readin'! */
+	read_from_file(&header, b3_BLOCK_SIZE, mail_address);
+
+	if (header.block_type != b3_HEADER_BLOCK) {
+		printf("SYSERR: Oh dear. (Header block %ld != %d)\r\n", header.block_type, b3_HEADER_BLOCK);
+		no_mail = TRUE;
+		printf("SYSERR: Mail system disabled!  -- Error #9. (Invalid header block.)\r\n");
+		return (NULL);
+	}
+	*from = (int) header.header_data.from;
+	*timestamp = header.header_data.mail_time;
+	
+	string_size = (sizeof(char) * (strlen(header.txt) + 1));
+	CREATE(message, char, string_size);
+	strcpy(message, header.txt);
+	message[string_size - 1] = '\0';
+	following_block = header.header_data.next_block;
+
+	/* mark the block as deleted */
+	header.block_type = b3_DELETED_BLOCK;
+	write_to_file(&header, b3_BLOCK_SIZE, mail_address);
+	push_free_list(mail_address);
+
+	while (following_block != b3_LAST_BLOCK) {
+		read_from_file(&data, b3_BLOCK_SIZE, following_block);
+
+		string_size = (sizeof(char) * (strlen(message) + strlen(data.txt) + 1));
+		RECREATE(message, char, string_size);
+		strcat(message, data.txt);
+		message[string_size - 1] = '\0';
+		mail_address = following_block;
+		following_block = data.block_type;
+		data.block_type = b3_DELETED_BLOCK;
+		write_to_file(&data, b3_BLOCK_SIZE, mail_address);
+		push_free_list(mail_address);
+	}
+
+	return (message);
+}
+
+
+/**
+* Reads and removes the mail for one player, returning a list of new mail
+* data.
+*
+* @param long recipient The player idnum.
+* @return struct mail_data* The linked list of mail, or NULL.
+*/
+struct mail_data *get_converted_mail(long recipient) {
+	struct mail_data *mail, *last_mail = NULL, *list = NULL;
+	time_t timestamp;
+	int from;
+	
+	if (!no_mail && find_char_in_index(recipient)) {
+		CREATE(mail, struct mail_data, 1);
+		mail->body = read_delete(recipient, &from, &timestamp);
+		mail->from = from;
+		mail->timestamp = timestamp;
+		
+		if (last_mail) {
+			last_mail->next = mail;
+		}
+		else {
+			list = mail;
+		}
+		last_mail = mail;
+	}
+	
+	return list;
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// CONVERTER CODE //////////////////////////////////////////////////////////
 
 
@@ -693,6 +1070,7 @@ void convert_char(struct b3_char_file_u *cfu) {
 	char temp[MAX_STRING_LENGTH], str_in1[MAX_STRING_LENGTH];
 	char str_in2[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
 	struct account_player *acct_player, *last_acct_player;
+	struct mail_data *mail, *mail_list;
 	struct b3_lore_data lore;
 	struct b3_alias_data alias;
 	FILE *fl, *loadfile;
@@ -1150,6 +1528,25 @@ void convert_char(struct b3_char_file_u *cfu) {
 		fclose(loadfile);
 	}
 	
+	// delayed: mail
+	if ((mail_list = get_converted_mail(cfu->char_specials_saved.idnum))) {
+		while ((mail = mail_list)) {
+			mail_list = mail->next;
+			
+			fprintf(fl, "Mail: %d %ld\n", mail->from, mail->timestamp);
+		
+			strcpy(temp, mail->body);
+			strip_crlf(temp);
+			fprintf(fl, "%s~\n", temp);		
+			fprintf(fl, "End Mail\n");
+			
+			if (mail->body) {
+				free(mail->body);
+			}
+			free(mail);
+		}
+	}
+	
 	// END DELAY-LOADED SECTION
 	fprintf(fl, "End Player File\n");
 	fclose(fl);
@@ -1171,6 +1568,10 @@ int main(int argc, char *argv[]) {
 	if (!(ptOldHndl = fopen("lib/etc/players", "rb"))) {
 		printf("Unable to read file: lib/etc/players\n");
 		exit(1);
+	}
+	
+	if (!scan_mail_file()) {
+		no_mail = TRUE;
 	}
 	
 	// first determine top account
@@ -1235,7 +1636,7 @@ int main(int argc, char *argv[]) {
 	
 	// remove old-style files
 	printf("Done.\n");
-	printf("You may now delete the lib/etc/players file.\n");
+	printf("You may now delete the lib/etc/players and lib/etc/plrmail files.\n");
 	printf("You may also delete the lib/plralias, lib/plrlore, lib/plrobjs, and lib/plrvars directories.\n");
 	
 	return 0;

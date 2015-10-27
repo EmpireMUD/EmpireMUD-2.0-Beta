@@ -115,7 +115,6 @@
 #define XNAME_FILE  LIB_MISC"xnames"	// invalid name substrings
 
 // etc files (non-user-modifiable libs)
-#define MAIL_FILE  LIB_ETC"plrmail"	// for the mudmail system
 #define BAN_FILE  LIB_ETC"badsites"	// for the siteban system
 #define TIME_FILE  LIB_ETC"time"	// for recording the big bang
 #define EXP_FILE  LIB_ETC"exp_cycle"	// for experience cycling
