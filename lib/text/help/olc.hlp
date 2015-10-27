@@ -2847,6 +2847,9 @@ All commands in the editor are highlighted in yellow and placed inside <angle
 braces>. You can get help on any of these commands by typing &yHELP GEDIT
 <COMMAND>&0.
 
+Each type of global provides a different function, and has its own help file.
+See: GLOBAL MINE DATA, GLOBAL MOB INTERACTIONS
+
 You can close an open editor with .abort or .save.
 
 Example:
