@@ -65,7 +65,6 @@ extern const int confused_dirs[NUM_SIMPLE_DIRS][2][NUM_OF_DIRS];
 extern const char *drinks[];
 extern int get_north_for_char(char_data *ch);
 extern struct complex_room_data *init_complex_data();
-void write_lore(char_data *ch);
 const struct wear_data_type wear_data[NUM_WEARS];
 
 // external funcs
@@ -468,7 +467,7 @@ void affect_remove_room(room_data *room, struct affected_type *af) {
 * Insert an affect_type in a char_data structure
 *  Automatically sets apropriate bits and apply's
 *
-* Caution: this duplicates af (because of how it loads from the pfile)
+* Caution: this duplicates af (because of how it used to load from the pfile)
 *
 * @param char_data *ch The person to add the affect to
 * @param struct affected_type *af The affect to add.
@@ -1092,7 +1091,6 @@ void perform_dismount(char_data *ch) {
 * @param char_data *ch The player to idle out.
 */
 void perform_idle_out(char_data *ch) {
-	void Objsave_char(char_data *ch, int rent_code);
 	extern obj_data *player_death(char_data *ch);
 	
 	empire_data *emp = NULL;
@@ -1124,11 +1122,11 @@ void perform_idle_out(char_data *ch) {
 	else {
 		act("$n is idle too long, and vanishes.", TRUE, ch, NULL, NULL, TO_ROOM);
 	}
-
-	Objsave_char(ch, RENT_RENTED);
+	
 	save_char(ch, died ? NULL : IN_ROOM(ch));
 	
 	syslog(SYS_LOGIN, GET_INVIS_LEV(ch), TRUE, "%s force-rented and extracted (idle).", GET_NAME(ch));
+	extract_all_items(ch);
 	extract_char(ch);
 	
 	if (emp) {
@@ -3031,8 +3029,9 @@ bool has_interaction(struct interaction_item *list, int type) {
 bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERACTION_FUNC(*func)) {
 	extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
 	
+	bool any = FALSE, done_cumulative = FALSE;
 	struct global_data *glb, *next_glb;
-	bool any = FALSE;
+	int cumulative_prc;
 	adv_data *adv;
 	
 	// no work
@@ -3041,12 +3040,16 @@ bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERA
 	}
 	
 	adv = get_adventure_for_vnum(GET_MOB_VNUM(mob));
+	cumulative_prc = number(1, 10000);
 
 	HASH_ITER(hh, globals_table, glb, next_glb) {
 		if (GET_GLOBAL_TYPE(glb) != GLOBAL_MOB_INTERACTIONS) {
 			continue;
 		}
 		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_IN_DEVELOPMENT)) {
+			continue;
+		}
+		if (GET_GLOBAL_ABILITY(glb) != NO_ABIL && !HAS_ABILITY(ch, GET_GLOBAL_ABILITY(glb))) {
 			continue;
 		}
 		
@@ -3069,6 +3072,24 @@ bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERA
 		
 		// check adventure-only -- late-matching because it does more work than other conditions
 		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_ADVENTURE_ONLY) && get_adventure_for_vnum(GET_GLOBAL_VNUM(glb)) != adv) {
+			continue;
+		}
+		
+		// percent checks last
+		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_CUMULATIVE_PERCENT)) {
+			if (done_cumulative) {
+				continue;
+			}
+			cumulative_prc -= (int)(GET_GLOBAL_PERCENT(glb) * 100);
+			if (cumulative_prc <= 0) {
+				done_cumulative = TRUE;
+			}
+			else {
+				continue;	// not this time
+			}
+		}
+		else if (number(1, 10000) > (int)(GET_GLOBAL_PERCENT(glb) * 100)) {
+			// normal not-cumulative percent
 			continue;
 		}
 		
@@ -3155,70 +3176,47 @@ bool run_room_interactions(char_data *ch, room_data *room, int type, INTERACTION
  //////////////////////////////////////////////////////////////////////////////
 //// LORE HANDLERS ///////////////////////////////////////////////////////////
 
-
 /**
 * Add lore to a character's list
 *
 * @param char_data *ch The person receiving the lore.
 * @param int type LORE_x const
-* @param int value Some lores require a value, e.g. empire id
+* @param const char *str String formatting.
+* @param ... printf-style args for str.
 */
-void add_lore(char_data *ch, int type, int value) {
+void add_lore(char_data *ch, int type, const char *str, ...) {
 	struct lore_data *new, *lore;
+	char text[MAX_STRING_LENGTH];
+	va_list tArgList;
 
-	if (IS_NPC(ch))
+	if (!ch || IS_NPC(ch) || !str)
 		return;
-
-	/* Clean old records automatically */
-	switch (type) {
-		case LORE_PURIFY: {
-			remove_lore(ch, LORE_PURIFY, -1);
-			break;
-		}
-		case LORE_START_VAMPIRE:
-		case LORE_SIRE_VAMPIRE: {
-			remove_lore(ch, LORE_START_VAMPIRE, -1);
-			remove_lore(ch, LORE_SIRE_VAMPIRE, -1);
-			break;
-		}
-		case LORE_JOIN_EMPIRE: {
-			remove_lore(ch, LORE_DEFECT_EMPIRE, -1);
-			remove_lore(ch, LORE_KICKED_EMPIRE, -1);
-			remove_lore(ch, LORE_FOUND_EMPIRE, -1);
-			break;
-		}
-		case LORE_DEFECT_EMPIRE:
-		case LORE_KICKED_EMPIRE: {
-			remove_lore(ch, LORE_JOIN_EMPIRE, -1);
-			remove_lore(ch, LORE_FOUND_EMPIRE, -1);
-			break;
-		}
-		case LORE_FOUND_EMPIRE: {
-			remove_lore(ch, LORE_FOUND_EMPIRE, -1);
-			remove_lore(ch, LORE_JOIN_EMPIRE, -1);
-			remove_lore(ch, LORE_KICKED_EMPIRE, -1);
-			remove_lore(ch, LORE_DEFECT_EMPIRE, -1);
-			break;
+	
+	// find end
+	if ((lore = GET_LORE(ch))) {
+		while (lore->next) {
+			lore = lore->next;
 		}
 	}
-
-	/* Find the last entry in ch's lore */
-	for (lore = GET_LORE(ch); lore && lore->next; lore = lore->next);
-
+	
+	va_start(tArgList, str);
+	vsprintf(text, str, tArgList);
+	
 	CREATE(new, struct lore_data, 1);
 	new->type = type;
-	new->value = value;
 	new->date = (long) time(0);
+	new->text = str_dup(text);
 	new->next = NULL;
 
-	/* If they have lore, append this to the end.  Elsewise it becomes their lore */
-	if (lore)
+	// append to end
+	if (lore) {
 		lore->next = new;
-	else
+	}
+	else {
 		GET_LORE(ch) = new;
-
-	/* And last but not least, save it */
-	write_lore(ch);
+	}
+	
+	va_end(tArgList);
 }
 
 
@@ -3259,19 +3257,16 @@ void clean_lore(char_data *ch) {
 			}
 		}
 	}
-
-	write_lore(ch);
 }
 
 
 /**
-* Remove all lore of a given type
+* Remove all lore of a given type.
 *
 * @param char_data *ch The person whose lore to remove
 * @param int type The LORE_x type to remove
-* @param int value -1 for all, otherwise it checks to only remove lore with matching value
 */
-void remove_lore(char_data *ch, int type, int value) {
+void remove_lore(char_data *ch, int type) {
 	struct lore_data *lore, *next_lore;
 
 	if (IS_NPC(ch))
@@ -3281,13 +3276,9 @@ void remove_lore(char_data *ch, int type, int value) {
 		next_lore = lore->next;
 
 		if (lore->type == type) {
-			if (value == -1 || value == lore->value) {
-				remove_lore_record(ch, lore);
-			}
+			remove_lore_record(ch, lore);
 		}
 	}
-
-	write_lore(ch);
 }
 
 
@@ -3299,6 +3290,9 @@ void remove_lore_record(char_data *ch, struct lore_data *lore) {
 		return;
 
 	REMOVE_FROM_LIST(lore, GET_LORE(ch), next);
+	if (lore->text) {
+		free(lore->text);
+	}
 	free(lore);
 }
 
@@ -4036,7 +4030,7 @@ void obj_from_char(obj_data *object) {
 		REMOVE_FROM_LIST(object, object->carried_by->carrying, next_content);
 		object->next_content = NULL;
 
-		IS_CARRYING_N(object->carried_by) -= GET_OBJ_INVENTORY_SIZE(object);
+		IS_CARRYING_N(object->carried_by) -= obj_carry_size(object);
 
 		// check lights
 		if (IN_ROOM(object->carried_by) && OBJ_FLAGGED(object, OBJ_LIGHT)) {
@@ -4063,7 +4057,7 @@ void obj_from_obj(obj_data *obj) {
 		obj_from = obj->in_obj;
 		REMOVE_FROM_LIST(obj, obj_from->contains, next_content);
 
-		GET_OBJ_CARRYING_N(obj_from) -= GET_OBJ_INVENTORY_SIZE(obj);
+		GET_OBJ_CARRYING_N(obj_from) -= obj_carry_size(obj);
 
 		obj->in_obj = NULL;
 		obj->next_content = NULL;
@@ -4126,7 +4120,7 @@ void obj_to_char(obj_data *object, char_data *ch) {
 		object->next_content = ch->carrying;
 		ch->carrying = object;
 		object->carried_by = ch;
-		IS_CARRYING_N(ch) += GET_OBJ_INVENTORY_SIZE(object);
+		IS_CARRYING_N(ch) += obj_carry_size(object);
 		
 		// binding
 		if (OBJ_FLAGGED(object, OBJ_BIND_ON_PICKUP)) {
@@ -4172,7 +4166,7 @@ void obj_to_char(obj_data *object, char_data *ch) {
 * @param char_data *ch The person to try to give it to.
 */
 void obj_to_char_or_room(obj_data *obj, char_data *ch) {
-	if (!IS_NPC(ch) && IS_CARRYING_N(ch) + GET_OBJ_INVENTORY_SIZE(obj) > CAN_CARRY_N(ch) && IN_ROOM(ch)) {
+	if (!IS_NPC(ch) && IS_CARRYING_N(ch) + obj_carry_size(obj) > CAN_CARRY_N(ch) && IN_ROOM(ch)) {
 		// bind it to the player anyway, as if they received it, if it's BoP
 		if (OBJ_FLAGGED(obj, OBJ_BIND_ON_PICKUP)) {
 			bind_obj_to_player(obj, ch);
@@ -4216,7 +4210,7 @@ void obj_to_obj(obj_data *obj, obj_data *obj_to) {
 	else {
 		check_obj_in_void(obj);
 	
-		GET_OBJ_CARRYING_N(obj_to) += GET_OBJ_INVENTORY_SIZE(obj);
+		GET_OBJ_CARRYING_N(obj_to) += obj_carry_size(obj);
 
 		// set the timer here; actual rules for it are in limits.c
 		GET_AUTOSTORE_TIMER(obj) = time(0);
@@ -5540,7 +5534,7 @@ bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_da
 		return FALSE;
 	}
 
-	if (IS_CARRYING_N(ch) + GET_OBJ_INVENTORY_SIZE(proto) > CAN_CARRY_N(ch)) {
+	if (IS_CARRYING_N(ch) + obj_carry_size(proto) > CAN_CARRY_N(ch)) {
 		msg_to_char(ch, "Your arms are full.\r\n");
 		return FALSE;
 	}

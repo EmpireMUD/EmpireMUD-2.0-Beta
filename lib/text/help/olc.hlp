@@ -134,7 +134,21 @@ Crops (CROPEDIT):
 Globals (GEDIT):
 - All global tables must be approved by the head builder, because they apply
   to the entire game rather than just one adventure.
-- Only SHEAR, LOOT, and PICKPOCKET mob interactions are supported.
+- If a global is set ADVENTURE-ONLY, it will only apply to mobs (etc.) in the
+  adventure which its vnum falls into.
+- In most cases (but not Mine Data), more than one global can trigger at the
+  same time. This means two global loot tables might apply to one mob kill.
+  You can lower the chance of an entire global set being checked by setting the
+  percent on the global itself. If its percent fails, the interactions won't
+  even be checked.
+- If you use the CUMULATIVE-PRC flag, the game rolls a 0.01 - 100% chance once,
+  and tracks the total percentages of each matching global until the first one
+  that passes. No additional cumulative globals will pass at all, but globals
+  that are not cumulative may still also trigger.
+- The cumulative percent is always checked in ascending order of vnum. We
+  acknowledge that this is not necessarily the best approach, and are open to
+  suggestions on how to improve it.
+- See also: MINE DATA GLOBAL, MOB INTERACTIONS GLOBAL
 
 Map (MAPEDIT):
 - Immortals are not generally permitted to make edits to the map. However,
@@ -444,6 +458,10 @@ de-spawns.
 See also: ADVEDIT LINKING, %ADVENTURECOMPLETE%
 #d
 "ADVEDIT LINKING" "ADVEDIT LINK RULE" "LINKING RULES" "LINK RULES"
+
+Usage: linking add <type> <data> [flags]
+       linking change <number> <field> <value>
+       linking remove <number | all>
 
 Linking rules help the game engine determine where to link instances of an
 adventure. You can add as many linking rules as you like; it will spawn
@@ -1248,6 +1266,16 @@ covered by the crops.
 
 See also: OLC CROPS
 #d
+"GEDIT ABILITY"
+
+Usage:  .ability <name | none>
+
+This allows you to require the player to have a certain ability in order to
+trigger this global (of any type). Setting it to 'none' removes this
+requirement.
+
+See also: OLC GLOBALS
+#d
 "GEDIT FLAGS"
 
 Usage:  .flags [add | remove] <flags>
@@ -1257,8 +1285,9 @@ This set of flags applies to the global table itself.
 Available flags:
  IN-DEVELOPMENT - Will not be used live.
  ADVENTURE-ONLY - This global table will only apply to the adventure it's in.
+ CUMULATIVE-PRC - Percent check will be cumulative.
 
-See also: OLC GLOBALS
+See also: GEDIT PERCENT, OLC GLOBALS
 #d
 "GEDIT MAXLEVEL"
 
@@ -1320,6 +1349,45 @@ table is for.
 
 See also: OLC GLOBALS
 #d
+"GEDIT PERCENT" CUMULATIVE-PRC
+
+Usage:  .percent <amount>
+
+This allows you to add a chance of choosing this global, between 0.01 and
+100 (default is 100). When a global would be selected, its percent is checked.
+
+You can make the percent check cumulative, in order to link several different
+globals together. If multiple globals have the CUMULATIVE-PRC flag, only one
+of them will be chosen (if any), based on a cumulative percentage.
+
+More than one global may be selected if the CUMULATIVE-PRC flag is not set.
+
+See also: OLC GLOBALS
+#d
+"GEDIT SECTOREXCLUDE"
+
+Usage:  .sectorexclude [add | remove] <flags>
+
+A 'Mine Data' global table may have sector flags set to exclude. If so, the
+global table is only used if a tile DOES NOT have all the flags in this set.
+For example, you can use it to create a set that does not apply to ROUGH sects.
+
+These are the same set of flags from HELP SECTEDIT FLAGS.
+
+See also: OLC GLOBALS
+#d
+"GEDIT SECTORFLAGS"
+
+Usage:  .sectorflags [add | remove] <flags>
+
+A 'Mine Data' global table may have sector flags set. If so, the global table
+is only used if a tile has ALL of the flags set here. For example, you might
+set a global table to only apply to ROUGH sectors.
+
+These are the same set of flags from HELP SECTEDIT FLAGS.
+
+See also: OLC GLOBALS
+#d
 "GEDIT TYPE"
 
 Usage:  .type <type>
@@ -1331,6 +1399,58 @@ Types:
  Mob Interactions - Used for global SHEAR, LOOT, and PICKPOCKET tables.
 
 See also: OLC GLOBALS
+#d
+"GLOBAL MINE DATA" "MINE DATA GLOBAL"
+
+The 'Mine Data' global type is used for determining what type of mine a given
+mountain (or any sector) tile will have. The basic elements required are:
+
+1. A sector with the CAN-MINE flag (e.g. #8 Mountain).
+2. A building with the MINE flag which can be built upon that sector (like 
+   #5107 Mine).
+3. At least one global with the 'Mine Data' type, with matching sector flags
+   for your sector (e.g. #199).
+
+If there is more than one matching Mine Data global, the percentages on those
+globals will be used. Only the first match will be selected, as each map tile
+can only have 1 global vnum. Once the tile has been prospected or a mine has
+been built upon it, "stat room" will show "mine global vnum:" under extra data,
+indicating which global was chosen.
+
+When a player or Workforce NPC mines on that tile, it will run the interactions
+ONLY from that one chosen Mine Data global, not from other matching globals.
+This means that once a mine is established, it stays the same type of mine.
+However, if the interaction list in that global has more than one possible
+result, any of those results might appear from any successful swing of the
+pick.
+
+Notes on Mine Data globals:
+- You should name the global something like "iron mine", as it is used to build
+  certain strings, such as "This appears to be an iron mine."
+- The sector flags and excludes match the base map terrain the mine was built
+  upon, not the Building sector type of the mine itself. Setting ROUGH on the
+  global's sector flags will match the ROUGH mountain.
+- The capacity is a maximum. Mines normally have between 50% and 100% of this
+  maximum, at random. Deep mines have 75% to 150% of this range.
+- The level requirements, if you set any, will apply to the total level of the
+  player who is prospecting or who builds the mine.
+
+See also: BUILDING GUIDE, OLC GLOBALS
+#d
+"GLOBAL MOB INTERACTIONS" "MOB INTERACTIONS GLOBAL" "MOB INTERACTION GLOBAL"
+
+The 'Mob Interactions' Global allows SHEAR, LOOT, and PICKPOCKET globals to
+be applied to all mobs in a matching range. This can be used for loot tables
+that are adventure-wide, or truly global.
+
+Notes on Mob Interactions globals:
+- Only SHEAR, LOOT, and PICKPOCKET mob interactions are supported.
+- The min/max levels, if any, apply to the mobs (not the player attacking the
+  mob). If the mob normally has a range of 150-250, and is scaled to 175, it
+  will not trigger a global loot interaction that requires 200-250. But the
+  same mob scaled to 225 would.
+
+See also: BUILDING GUIDE, OLC GLOBALS
 #d
 "ITEM SCALING" "OBJ SCALING" "OBJECT SCALING" SCALABLE "SCALABLE FLAG" "SCALING ITEM"
 
@@ -2726,6 +2846,9 @@ live game system.
 All commands in the editor are highlighted in yellow and placed inside <angle
 braces>. You can get help on any of these commands by typing &yHELP GEDIT
 <COMMAND>&0.
+
+Each type of global provides a different function, and has its own help file.
+See: GLOBAL MINE DATA, GLOBAL MOB INTERACTIONS
 
 You can close an open editor with .abort or .save.
 

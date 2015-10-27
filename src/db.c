@@ -20,7 +20,6 @@
 #include "db.h"
 #include "comm.h"
 #include "handler.h"
-#include "mail.h"
 #include "interpreter.h"
 #include "skills.h"
 #include "olc.h"
@@ -90,8 +89,7 @@ struct message_list fight_messages[MAX_MESSAGES];	// fighting messages
 time_t boot_time = 0;	// time of mud boot
 int daily_cycle = 0;	// this is a timestamp for the last time skills/exp reset
 int Global_ignore_dark = 0;	// For use in public channels
-int no_mail = 0;	// mail disabled?
-int no_rent_check = 0;	// skip rent check on boot?
+int no_auto_deletes = 0;	// skip player deletes on boot?
 struct time_info_data time_info;	// the infomation about the time
 struct weather_data weather_info;	// the infomation about the weather
 int wizlock_level = 0;	// level of game restriction
@@ -122,10 +120,9 @@ obj_data *object_list = NULL;	// global linked list of objs
 obj_data *object_table = NULL;	// hash table of objs
 
 // players
-struct player_index_element *player_table = NULL;	// index to plr file
-FILE *player_fl = NULL;	// file desc of player file
-int top_of_p_table = 0;	// ref to top of table
-int top_of_p_file = 0;	// ref of size of p file
+account_data *account_table = NULL;	// hash table of accounts
+player_index_data *player_table_by_idnum = NULL;	// hash table by idnum
+player_index_data *player_table_by_name = NULL;	// hash table by name
 int top_idnum = 0;	// highest idnum in use
 int top_account_id = 0;  // highest account number in use, determined during startup
 struct group_data *group_list = NULL;	// global LL of groups
@@ -185,6 +182,7 @@ struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES] = {
 	{ ADV_PREFIX, ADV_SUFFIX },	// DB_BOOT_ADV
 	{ RMT_PREFIX, RMT_SUFFIX },	// DB_BOOT_RMT
 	{ GLB_PREFIX, GLB_SUFFIX },	// DB_BOOT_GLB
+	{ ACCT_PREFIX, ACCT_SUFFIX },	// DB_BOOT_ACCT
 };
 
 
@@ -202,6 +200,7 @@ void boot_db(void) {
 	void build_player_index();
 	void check_ruined_cities();
 	void check_version();
+	void delete_old_players();
 	void delete_orphaned_rooms();
 	void init_config_system();
 	void init_skills();
@@ -209,13 +208,11 @@ void boot_db(void) {
 	void load_daily_cycle();
 	void load_intro_screens();
 	void load_fight_messages();
-	void load_player_data_at_startup();
 	void load_tips_of_the_day();
 	void load_trading_post();
 	void reset_time();
 	void sort_commands();
 	void startup_room_reset();
-	void update_obj_file();
 	void update_ships();
 
 	log("Boot db -- BEGIN.");
@@ -248,6 +245,9 @@ void boot_db(void) {
 
 	log("Loading help entries.");
 	index_boot_help();
+	
+	log("Loading player accounts.");
+	index_boot(DB_BOOT_ACCT);
 
 	log("Generating player index.");
 	build_player_index();
@@ -269,12 +269,6 @@ void boot_db(void) {
 
 	log("Sorting command list.");
 	sort_commands();
-
-	log("Booting mail system.");
-	if (!scan_file()) {
-		log("    Mail boot failed -- Mail system disabled");
-		no_mail = 1;
-	}
 	
 	// sends own log
 	load_tips_of_the_day();
@@ -283,10 +277,8 @@ void boot_db(void) {
 	load_banned();
 	Read_Invalid_List();
 
-	if (!no_rent_check) {
-		log("Deleting timed-out crash and rent files:");
-		update_obj_file();
-		log("   Done.");
+	if (!no_auto_deletes) {
+		delete_old_players();
 	}
 	
 	// this loads objs and mobs back into the world
@@ -301,9 +293,6 @@ void boot_db(void) {
 
 	load_daily_cycle();
 	log("Beginning skill reset cycle at %d.", daily_cycle);
-
-	log("Loading player data...");
-	load_player_data_at_startup();
 
 	boot_time = time(0);
 	
@@ -1377,7 +1366,6 @@ void number_and_count_islands(bool reset) {
 void clear_char(char_data *ch) {
 	memset((char *) ch, 0, sizeof(char_data));
 
-	GET_PFILEPOS(ch) = NOTHING;
 	ch->vnum = NOBODY;
 	GET_POS(ch) = POS_STANDING;
 	MOB_INSTANCE_ID(ch) = NOTHING;
@@ -1536,6 +1524,7 @@ const char *versions_list[] = {
 	"b2.9",
 	"b2.11",
 	"b3.0",
+	"b3.1",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -1591,9 +1580,8 @@ PLAYER_UPDATE_FUNC(b2_8_update_players) {
 
 // 2.11 loads inventories and attaches triggers
 PLAYER_UPDATE_FUNC(b2_11_update_players) {
-	extern int Objload_char(char_data *ch, int dolog);
-	void Objsave_char(char_data *ch, int rent_code);
-	
+	void check_delayed_load(char_data *ch);
+
 	obj_data *obj, *proto;
 	int iter;
 	
@@ -1602,7 +1590,7 @@ PLAYER_UPDATE_FUNC(b2_11_update_players) {
 		return;
 	}
 	
-	Objload_char(ch, FALSE);
+	check_delayed_load(ch);
 	
 	// inventory
 	for (obj = ch->carrying; obj; obj = obj->next_content) {
@@ -1619,9 +1607,48 @@ PLAYER_UPDATE_FUNC(b2_11_update_players) {
 			assign_triggers(GET_EQ(ch, iter), OBJ_TRIGGER);
 		}
 	}
+}
+
+
+// updater for existing mines
+void b3_1_mine_update(void) {
+	room_data *room, *next_room;
+	int type;
 	
-	// save gear
-	Objsave_char(ch, RENT_RENTED);
+	HASH_ITER(world_hh, world_table, room, next_room) {
+		if ((type = get_room_extra_data(room, 0)) <= 0) {	// 0 was ROOM_EXTRA_MINE_TYPE
+			continue;
+		}
+
+		switch (type) {
+			case 10: {	// iron
+				set_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM, 199);
+				break;
+			}
+			case 11: {	// silver
+				set_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM, 161);
+				break;
+			}
+			case 12: {	// gold
+				set_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM, 162);
+				break;
+			}
+			case 13: {	// nocturnium
+				set_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM, 163);
+				break;
+			}
+			case 14: {	// imperium
+				set_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM, 164);
+				break;
+			}
+			case 15: {	// copper
+				set_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM, 160);
+				break;
+			}
+		}
+
+		remove_room_extra_data(room, 0);	// ROOM_EXTRA_MINE_TYPE prior to b3.1
+	}
 }
 
 
@@ -1765,6 +1792,10 @@ void check_version(void) {
 				}
 			}
 		}
+		if (MATCH_VERSION("b3.1")) {
+			log("Applying b3.1 update to mines...");
+			b3_1_mine_update();
+		}
 	}
 	
 	write_last_boot_version(current);
@@ -1773,13 +1804,6 @@ void check_version(void) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// MISCELLANEOUS HELPERS ///////////////////////////////////////////////////
-
-/* this is necessary for the autowiz system */
-void reload_wizlists(void) {
-	file_to_string_alloc(WIZLIST_FILE, &wizlist);
-	file_to_string_alloc(GODLIST_FILE, &godlist);
-}
-
 
 /* reset the time in the game from file */
 void reset_time(void) {

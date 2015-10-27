@@ -10,7 +10,7 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 
-// arbitrary constants used by index_boot() (must be unique) -- these correspond to an array in discrete_load() too
+// DB_BOOT_x: arbitrary constants used by index_boot() (must be unique) -- these correspond to an array in discrete_load() too
 #define DB_BOOT_WLD  0
 #define DB_BOOT_MOB  1
 #define DB_BOOT_OBJ  2
@@ -25,32 +25,26 @@
 #define DB_BOOT_ADV  11
 #define DB_BOOT_RMT  12
 #define DB_BOOT_GLB  13
-#define NUM_DB_BOOT_TYPES  14	// total
+#define DB_BOOT_ACCT  14
+#define NUM_DB_BOOT_TYPES  15	// total
 
 
 // library sub-dirs
+#define LIB_ACCTS  LIB_PLAYERS"accounts/"
 #define LIB_WORLD  "world/"
 #define LIB_TEXT  "text/"
 #define LIB_TEXT_HELP  "text/help/"
 #define LIB_MISC  "misc/"
 #define LIB_ETC  "etc/"
 #define LIB_BOARD  "boards/"
-#define LIB_PLRTEXT  "plrtext/"
-#define LIB_PLROBJS  "plrobjs/"
-#define LIB_PLRVARS  "plrvars/"
-#define LIB_PLRALIAS  "plralias/"
+#define LIB_PLAYERS  "players/"
 #define LIB_OBJPACK  "packs/"
 #define LIB_EMPIRE  "empires/"
-#define LIB_PLRLORE  "plrlore/"
 
 
 // file suffixes for common write files
-#define SUF_OBJS  "objs"
-#define SUF_TEXT  "text"
-#define SUF_ALIAS  "alias"
-#define SUF_MEM  "mem"
 #define SUF_PACK  "pack"
-#define SUF_LORE  "lore"
+#define SUF_PLR  "plr"
 
 
 // files used to block startup
@@ -64,6 +58,7 @@
 
 // names of various files and directories
 #define INDEX_FILE  "index"	// index of world files
+#define ACCT_PREFIX  LIB_ACCTS	// account files
 #define ADV_PREFIX  LIB_WORLD"adv/"	// adventure zones
 #define BLD_PREFIX  LIB_WORLD"bld/"	// building definitions
 #define CRAFT_PREFIX  LIB_WORLD"craft/"	// craft recipes
@@ -82,6 +77,7 @@
 #define STORAGE_PREFIX  LIB_EMPIRE"storage/"	// for empire storage
 
 // library file suffixes
+#define ACCT_SUFFIX  ".acct"	// account file suffix
 #define ADV_SUFFIX  ".adv"	// adventure file suffix
 #define BLD_SUFFIX  ".bld"	// building file suffix
 #define BOOK_SUFFIX  ".book"	// book file suffix
@@ -119,8 +115,6 @@
 #define XNAME_FILE  LIB_MISC"xnames"	// invalid name substrings
 
 // etc files (non-user-modifiable libs)
-#define PLAYER_FILE  LIB_ETC"players"	// the player database
-#define MAIL_FILE  LIB_ETC"plrmail"	// for the mudmail system
 #define BAN_FILE  LIB_ETC"badsites"	// for the siteban system
 #define TIME_FILE  LIB_ETC"time"	// for recording the big bang
 #define EXP_FILE  LIB_ETC"exp_cycle"	// for experience cycling
@@ -154,9 +148,6 @@ struct db_boot_info_type {
 
 // public procedures in db.c
 char *fread_string(FILE *fl, char *error);
-char *get_name_by_id(int id);
-int create_entry(char *name);
-int get_id_by_name(char *name);
 void boot_db(void);
 
 // global saves
@@ -173,6 +164,12 @@ void disassociate_building(room_data *room);
 extern int Global_ignore_dark;
 extern struct time_info_data time_info;
 
+
+// accounts
+void add_player_to_account(char_data *ch, account_data *acct);
+extern account_data *create_account_for_player(char_data *ch);
+extern account_data *find_account(int id);
+void remove_player_from_account(char_data *ch);
 
 // adventures
 extern adv_data *adventure_table;
@@ -232,12 +229,15 @@ extern struct island_info *get_island_by_coords(char *coords);
 extern struct island_info *get_island_by_name(char *name);
 
 // mobiles/chars
+extern account_data *account_table;
 extern char_data *character_list;
 extern char_data *combat_list;
 extern char_data *next_combat_list;
 extern char_data *mobile_table;
-extern int top_of_p_table;
-extern struct player_index_element *player_table;
+extern player_index_data *player_table_by_idnum;
+extern player_index_data *player_table_by_name;
+extern player_index_data *find_player_index_by_idnum(int idnum);
+extern player_index_data *find_player_index_by_name(char *name);
 void init_player(char_data *ch);
 extern char_data *read_mobile(mob_vnum nr, bool with_triggers);
 extern char_data *mob_proto(mob_vnum vnum);
@@ -249,11 +249,10 @@ void set_title(char_data *ch, char *title);
 void save_char(char_data *ch, room_data *load_room);
 #define SAVE_CHAR(ch)  save_char((ch), (IN_ROOM(ch) ? IN_ROOM(ch) : (GET_LOADROOM(ch) != NOWHERE ? real_room(GET_LOADROOM(ch)) : NULL)))
 
+void update_player_index(player_index_data *index, char_data *ch);
 extern char_data *find_or_load_player(char *name, bool *is_file);
-void char_to_store(char_data *ch, struct char_file_u *st);
 void store_loaded_char(char_data *ch);
-void store_to_char(struct char_file_u *st, char_data *ch);
-int load_char(char *name, struct char_file_u *char_element);
+char_data *load_player(char *name, bool normal);
 
 // objects
 extern obj_data *object_list;

@@ -1217,9 +1217,9 @@ empire_data *create_empire(char_data *ch) {
 	emp->storage_loaded = TRUE;
 
 	// set the player up
-	add_lore(ch, LORE_FOUND_EMPIRE, vnum);
+	remove_lore(ch, LORE_PROMOTED);
+	add_lore(ch, LORE_FOUND_EMPIRE, "Proudly founded %s%s&0", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 	GET_LOYALTY(ch) = emp;
-	GET_EMPIRE_VNUM(ch) = vnum;
 	GET_RANK(ch) = 2;
 	SAVE_CHAR(ch);
 
@@ -1245,18 +1245,16 @@ empire_data *create_empire(char_data *ch) {
 void delete_empire(empire_data *emp) {
 	void eliminate_linkdead_players();
 	void remove_empire_from_table(empire_data *emp);
-	void save_char_file_u(struct char_file_u *st);
 
 	struct empire_political_data *emp_pol, *next_pol, *temp;
+	player_index_data *index, *next_index;
 	empire_data *emp_iter, *next_emp;
 	room_data *room, *next_room;
 	char buf[MAX_STRING_LENGTH];
-	struct char_file_u chdata;
 	obj_data *obj, *next_obj;
 	char_data *ch, *next_ch;
+	bool file = FALSE, save;
 	empire_vnum vnum;
-	bool save;
-	int iter;
 
 	if (!emp) {
 		return;
@@ -1293,38 +1291,24 @@ void delete_empire(empire_data *emp) {
 	}
 	
 	// clean up players
-	for (iter = 0; iter <= top_of_p_table; ++iter) {
-		if ((ch = is_playing(player_table[iter].id))) {
-			if (GET_LOYALTY(ch) == emp) {
+	HASH_ITER(idnum_hh, player_table_by_idnum, index, next_index) {
+		if (index->loyalty != emp) {
+			continue;
+		}
+		if ((ch = is_playing(index->idnum)) || (ch = is_at_menu(index->idnum))) {
+			if (IN_ROOM(ch)) {
 				msg_to_char(ch, "Your empire has been destroyed.  You are no longer a member.\r\n");
-				GET_LOYALTY(ch) = NULL;
-				GET_EMPIRE_VNUM(ch) = NOTHING;
-				GET_RANK(ch) = 0;
-				SAVE_CHAR(ch);
 			}
+			GET_LOYALTY(ch) = NULL;
+			GET_RANK(ch) = 0;
+			update_player_index(index, ch);
 		}
-		else if ((ch = is_at_menu(player_table[iter].id))) {
-			// hybrid solution
-			if (GET_LOYALTY(ch) == emp) {
-				GET_LOYALTY(ch) = NULL;
-				GET_EMPIRE_VNUM(ch) = NOTHING;
-				GET_RANK(ch) = 0;
-				SAVE_CHAR(ch);
-
-				load_char(player_table[iter].name, &chdata);
-				if (chdata.player_specials_saved.empire == vnum) {
-					chdata.player_specials_saved.empire = NOTHING;
-					chdata.player_specials_saved.rank = 0;
-					save_char_file_u(&chdata);
-				}
-			}
-		}
-		else {
-			load_char(player_table[iter].name, &chdata);
-			if (chdata.player_specials_saved.empire == vnum) {
-				chdata.player_specials_saved.empire = NOTHING;
-				chdata.player_specials_saved.rank = 0;
-				save_char_file_u(&chdata);
+		else if ((ch = find_or_load_player(index->name, &file))) {
+			GET_LOYALTY(ch) = NULL;
+			GET_RANK(ch) = 0;
+			update_player_index(index, ch);
+			if (file) {
+				store_loaded_char(ch);
 			}
 		}
 	}
@@ -2588,6 +2572,21 @@ void remove_global_from_table(struct global_data *glb) {
 
 
 /**
+* Initializes a new global. This clears all memory for it, so set the vnum
+* AFTER.
+*
+* @param struct global_data *glb The global to initialize.
+*/
+void clear_global(struct global_data *glb) {
+	memset((char *) glb, 0, sizeof(struct global_data));
+	
+	GET_GLOBAL_VNUM(glb) = NOTHING;
+	GET_GLOBAL_ABILITY(glb) = NO_ABIL;
+	GET_GLOBAL_PERCENT(glb) = 100.0;
+}
+
+
+/**
 * frees up memory for a global data item.
 *
 * See also: olc_delete_global
@@ -2623,8 +2622,10 @@ void parse_global(FILE *fl, any_vnum vnum) {
 	struct global_data *glb, *find;
 	char line[256], str_in[256], str_in2[256], str_in3[256];
 	int int_in[4];
+	double dbl_in;
 
 	CREATE(glb, struct global_data, 1);
+	clear_global(glb);
 	GET_GLOBAL_VNUM(glb) = vnum;
 
 	HASH_FIND_INT(globals_table, &vnum, find);
@@ -2660,6 +2661,25 @@ void parse_global(FILE *fl, any_vnum vnum) {
 			exit(1);
 		}
 		switch (*line) {
+			case 'E': {	// extra data
+				// line 1: abil perc
+				if (!get_line(fl, line) || sscanf(line, "%d %lf", &int_in[0], &dbl_in) != 2) {
+					log("SYSERR: Format error E line 1 of %s", buf2);
+					exit(1);
+				}
+				GET_GLOBAL_ABILITY(glb) = int_in[0];
+				GET_GLOBAL_PERCENT(glb) = dbl_in;
+				
+				// line 2: val0 val1 val25
+				if (!get_line(fl, line) || sscanf(line, "%d %d %d", &int_in[0], &int_in[1], &int_in[2]) != 3) {
+					log("SYSERR: Format error E line 2 of %s", buf2);
+					exit(1);
+				}
+				GET_GLOBAL_VAL(glb, 0) = int_in[0];
+				GET_GLOBAL_VAL(glb, 1) = int_in[1];
+				GET_GLOBAL_VAL(glb, 2) = int_in[2];
+				break;
+			}
 			case 'I': {	// interaction item
 				parse_interaction(line, &GET_GLOBAL_INTERACTIONS(glb), buf2);
 				break;
@@ -2702,7 +2722,12 @@ void write_global_to_file(FILE *fl, struct global_data *glb) {
 	strcpy(temp2, bitv_to_alpha(GET_GLOBAL_TYPE_FLAGS(glb)));
 	strcpy(temp3, bitv_to_alpha(GET_GLOBAL_TYPE_EXCLUDE(glb)));
 	fprintf(fl, "%d %s %s %s %d-%d\n", GET_GLOBAL_TYPE(glb), temp, temp2, temp3, GET_GLOBAL_MIN_LEVEL(glb), GET_GLOBAL_MAX_LEVEL(glb));
-
+	
+	// E: extra data
+	fprintf(fl, "E\n");
+	fprintf(fl, "%d %.2f\n", GET_GLOBAL_ABILITY(glb), GET_GLOBAL_PERCENT(glb));
+	fprintf(fl, "%d %d %d\n", GET_GLOBAL_VAL(glb, 0), GET_GLOBAL_VAL(glb, 1), GET_GLOBAL_VAL(glb, 2));
+	
 	// I: interactions
 	write_interactions_to_file(fl, GET_GLOBAL_INTERACTIONS(glb));
 	
@@ -4890,12 +4915,14 @@ void write_trigger_to_file(FILE *fl, trig_data *trig) {
 * @param char *filename The name of the file, for error reporting.
 */
 void discrete_load(FILE *fl, int mode, char *filename) {
+	void parse_account(FILE *fl, int nr);
 	void parse_book(FILE *fl, int book_id);
+	
 	any_vnum nr = -1, last;
 	char line[256];
 
-	/* modes positions correspond to DB_BOOT_xxx in db.h */
-	const char *modes[] = {"world", "mob", "obj", "zone", "empire", "book", "craft", "trg", "crop", "sector", "adventure", "room template" };
+	/* modes positions correspond to DB_BOOT_x in db.h */
+	const char *modes[] = {"world", "mob", "obj", "zone", "empire", "book", "craft", "trg", "crop", "sector", "adventure", "room template", "global", "account" };
 
 	for (;;) {
 		if (!get_line(fl, line)) {
@@ -4916,7 +4943,12 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 				log("SYSERR: Format error after %s #%d", modes[mode], last);
 				exit(1);
 			}
+			// DB_BOOT_x
 			switch (mode) {
+				case DB_BOOT_ACCT: {
+					parse_account(fl, nr);
+					break;
+				}
 				case DB_BOOT_ADV: {
 					parse_adventure(fl, nr);
 					break;
@@ -5027,8 +5059,8 @@ void index_boot(int mode) {
 	}
 
 	if (!rec_count) {
-		// some types don't matter TODO could move this into a config
-		if (mode == DB_BOOT_EMP || mode == DB_BOOT_BOOKS || mode == DB_BOOT_CRAFT || mode == DB_BOOT_BLD || mode == DB_BOOT_ADV || mode == DB_BOOT_RMT || mode == DB_BOOT_WLD || mode == DB_BOOT_GLB) {
+		// DB_BOOT_x: some types don't matter TODO could move this into a config
+		if (mode == DB_BOOT_EMP || mode == DB_BOOT_BOOKS || mode == DB_BOOT_CRAFT || mode == DB_BOOT_BLD || mode == DB_BOOT_ADV || mode == DB_BOOT_RMT || mode == DB_BOOT_WLD || mode == DB_BOOT_GLB || mode == DB_BOOT_ACCT) {
 			// types that don't require any entries and exit early if none
 			return;
 		}
@@ -5046,6 +5078,7 @@ void index_boot(int mode) {
 	rec_count++;
 
 	/*
+	 * DB_BOOT_x:
 	 * NOTE: "bytes" does _not_ include strings or other later malloc'd things.
 	 */
 	switch (mode) {
@@ -5057,6 +5090,11 @@ void index_boot(int mode) {
    			size[0] = sizeof(char_data) * rec_count;
 			log("   %d mobs, %d bytes in prototypes.", rec_count, size[0]);
 			break;
+		case DB_BOOT_ACCT: {
+			size[0] = sizeof(account_data) * rec_count;
+			log("   %d accounts, %d bytes in index.", rec_count, size[0]);
+			break;
+		}
 		case DB_BOOT_ADV: {
 			size[0] = sizeof(adv_data) * rec_count;
 			log("   %d adventure zones, %d bytes in adventure table.", rec_count, size[0]);
@@ -5119,7 +5157,9 @@ void index_boot(int mode) {
 			log("SYSERR: %s: %s", buf2, strerror(errno));
 			exit(1);
 		}
+		// DB_BOOT_x
 		switch (mode) {
+			case DB_BOOT_ACCT:
 			case DB_BOOT_ADV:
 			case DB_BOOT_BLD:
 			case DB_BOOT_CRAFT:
@@ -5182,9 +5222,20 @@ void save_library_file_for_vnum(int type, any_vnum vnum) {
 		return;
 	}
 	
-	log("Saving library file %s", filename);
-
+	// log("Saving library file %s", filename);
+	
+	// DB_BOOT_x
 	switch (type) {
+		case DB_BOOT_ACCT: {
+			void write_account_to_file(FILE *fl, account_data *acct);
+			account_data *acct, *next_acct;
+			HASH_ITER(hh, account_table, acct, next_acct) {
+				if (acct->id >= (zone * 100) && acct->id <= (zone * 100 + 99)) {
+					write_account_to_file(fl, acct);
+				}
+			}
+			break;
+		}
 		case DB_BOOT_ADV: {
 			adv_data *adv, *next_adv;
 			HASH_ITER(hh, adventure_table, adv, next_adv) {
@@ -5503,7 +5554,13 @@ void save_index(int type) {
 		return;
 	}
 	
+	// DB_BOOT_x
 	switch (type) {
+		case DB_BOOT_ACCT: {
+			void write_account_index(FILE *fl);
+			write_account_index(fl);
+			break;
+		}
 		case DB_BOOT_ADV: {
 			write_adventure_index(fl);
 			break;

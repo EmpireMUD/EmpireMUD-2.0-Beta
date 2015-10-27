@@ -19,7 +19,6 @@
 #include "db.h"
 #include "utils.h"
 #include "handler.h"
-#include "mail.h"
 #include "utils.h"
 #include "olc.h"
 #include "skills.h"
@@ -274,6 +273,7 @@ ACMD(do_pick);
 ACMD(do_pickpocket);
 ACMD(do_plant);
 ACMD(do_play);
+ACMD(do_playerdelete);
 ACMD(do_pledge);
 ACMD(do_point);
 ACMD(do_poofset);
@@ -785,6 +785,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "pick", POS_STANDING, do_pick, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	STANDARD_CMD( "pickpocket", POS_STANDING, do_pickpocket, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_COMBAT, CMD_STAY_HIDDEN, ABIL_PICKPOCKET ),
 	STANDARD_CMD( "play", POS_STANDING, do_play, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
+	STANDARD_CMD( "playerdelete", POS_SLEEPING, do_playerdelete, LVL_CIMPL, GRANT_PLAYERDELETE, NO_SCMD, CTYPE_IMMORTAL, CMD_NO_ABBREV, NO_ABIL ),
 	STANDARD_CMD( "plant", POS_STANDING, do_plant, LVL_APPROVED, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "pledge", POS_SLEEPING, do_pledge, LVL_APPROVED, CTYPE_EMPIRE ),
 	SIMPLE_CMD( "point", POS_RESTING, do_point, NO_MIN, CTYPE_UTIL ),
@@ -1092,7 +1093,7 @@ void command_interpreter(char_data *ch, char *argument) {
 		// otherwise, no match
 		send_config_msg(ch, "huh_string");
 	}
-	else if (!IS_NPC(ch) && PLR_FLAGGED(ch, PLR_FROZEN))
+	else if (!IS_NPC(ch) && ACCOUNT_FLAGGED(ch, ACCT_FROZEN))
 		send_to_char("You try, but the mind-numbing cold prevents you...\r\n", ch);
 	else if (IS_SET(cmd_info[cmd].flags, CMD_NOT_RP) && !IS_NPC(ch) && !IS_GOD(ch) && !IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_RP)) {
 		msg_to_char(ch, "You can't do that while role-playing!\r\n");
@@ -1316,7 +1317,6 @@ int perform_alias(descriptor_data *d, char *orig) {
 /* The interface to the outside world: do_alias */
 ACMD(do_alias) {
 	extern char *show_color_codes(char *string);
-	void write_aliases(char_data *ch);
 	
 	char *repl;
 	struct alias_data *a, *temp;
@@ -1351,7 +1351,6 @@ ACMD(do_alias) {
 			}
 			else {
 				send_to_char("Alias deleted.\r\n", ch);
-				write_aliases(ch);
 			}
 		}
 		else {			/* otherwise, either add or redefine an alias */
@@ -1370,7 +1369,6 @@ ACMD(do_alias) {
 			a->next = GET_ALIASES(ch);
 			GET_ALIASES(ch) = a;
 			send_to_char("Alias added.\r\n", ch);
-			write_aliases(ch);
 		}
 	}
 }
@@ -1708,14 +1706,14 @@ void next_creation_step(descriptor_data *d) {
 
 // Handler for CON_Q_ALT_NAME
 void process_alt_name(descriptor_data *d, char *arg) {
-	int id;
+	player_index_data *index;
 	
 	if (!*arg) {
 		// nothing -- send back to has-alt
 		set_creation_state(d, CON_Q_HAS_ALT);
 	}
-	else if ((id = get_id_by_name(arg)) != NOTHING) {
-		GET_CREATION_ALT_ID(d->character) = id;
+	else if ((index = find_player_index_by_name(arg))) {
+		GET_CREATION_ALT_ID(d->character) = index->idnum;
 		next_creation_step(d);
 	}
 	else {
@@ -1725,17 +1723,16 @@ void process_alt_name(descriptor_data *d, char *arg) {
 
 
 // Handler for CON_Q_ALT_PASSWORD
-void process_alt_password(descriptor_data *d, char *arg) {
-	extern int new_account_id(void);
-	
+void process_alt_password(descriptor_data *d, char *arg) {	
 	char_data *alt = NULL;
 	bool file = FALSE, save = FALSE;
+	player_index_data *index;
 
 	if (!*arg) {
 		// nothing -- send back to has-alt
 		set_creation_state(d, CON_Q_HAS_ALT);
 	}	
-	else if ((alt = find_or_load_player(get_name_by_id(GET_CREATION_ALT_ID(d->character)), &file))) {		
+	else if ((index = find_player_index_by_idnum(GET_CREATION_ALT_ID(d->character))) && (alt = find_or_load_player(index->name, &file))) {
 		// loaded char, now check password
 		if (strncmp(CRYPT(arg, PASSWORD_SALT), GET_PASSWD(alt), MAX_PWD_LENGTH)) {
 			syslog(SYS_LOGIN, 0, TRUE, "BAD PW: unable to register alt %s for %s [%s]", GET_NAME(d->character), GET_NAME(alt), d->host);
@@ -1755,15 +1752,11 @@ void process_alt_password(descriptor_data *d, char *arg) {
 			syslog(SYS_LOGIN, 0, TRUE, "NEW: associating new user %s with account for %s", GET_NAME(d->character), GET_NAME(alt));
 			
 			// does 2nd player have an account already? if not, make one
-			if (GET_ACCOUNT_ID(alt) == 0) {
-				GET_ACCOUNT_ID(alt) = new_account_id();
-				GET_ACCOUNT_ID(d->character) = GET_ACCOUNT_ID(alt);
+			if (!GET_ACCOUNT(alt)) {
+				create_account_for_player(alt);
 				save = TRUE;
 			}
-			else {
-				// already has acct
-				GET_ACCOUNT_ID(d->character) = GET_ACCOUNT_ID(alt);
-			}
+			GET_TEMPORARY_ACCOUNT_ID(d->character) = GET_ACCOUNT(alt)->id;
 			
 			next_creation_step(d);
 		}
@@ -1845,22 +1838,25 @@ void start_creation_process(descriptor_data *d) {
 bool check_multiplaying(descriptor_data *d) {
 	descriptor_data *c;
 	bool ok = TRUE;
-
-	if (IS_IMMORTAL(d->character))
+	
+	if (ACCOUNT_FLAGGED(d->character, ACCT_MULTI_CHAR)) {
 		return TRUE;
-
-	if (PLR_FLAGGED(d->character, PLR_MULTIOK | PLR_IPMASK))
-		return TRUE;
-
+	}
+	
 	/* Check for connected players with identical hosts */
-	for (c = descriptor_list; c; c = c->next) {
-		if (c != d && STATE(c) == CON_PLAYING && !PLR_FLAGGED(c->character, PLR_MULTIOK) && GET_IDNUM(c->character) != GET_IDNUM(d->character)) {
-			if (!str_cmp(c->host, d->host) || (GET_ACCOUNT_ID(d->character) != 0 && GET_ACCOUNT_ID(d->character) == GET_ACCOUNT_ID(c->character))) {
-				ok = FALSE;
-			}
+	for (c = descriptor_list; c && ok; c = c->next) {
+		if (c == d || STATE(c) != CON_PLAYING || GET_IDNUM(c->character) == GET_IDNUM(d->character)) {
+			continue;
+		}
+		
+		if (!ACCOUNT_FLAGGED(d->character, ACCT_MULTI_CHAR) && GET_ACCOUNT(d->character) == GET_ACCOUNT(c->character)) {
+			ok = FALSE;
+		}
+		else if (!ACCOUNT_FLAGGED(d->character, ACCT_MULTI_IP | ACCT_MULTI_CHAR) && !ACCOUNT_FLAGGED(c->character, ACCT_MULTI_IP | ACCT_MULTI_CHAR) && !PLR_FLAGGED(d->character, PLR_IPMASK) && !strcmp(c->host, d->host)) {
+			ok = FALSE;
 		}
 	}
-
+	
 	return ok;
 }
 
@@ -2093,8 +2089,9 @@ int _parse_name(char *arg, char *name) {
 * Master "socket nanny" for processing menu input.
 */
 void nanny(descriptor_data *d, char *arg) {
+	void clear_player(char_data *ch);
 	void display_tip_to_char(char_data *ch);
-	extern int enter_player_game(descriptor_data *d, int dolog, bool fresh);
+	extern void enter_player_game(descriptor_data *d, int dolog, bool fresh);
 	extern int isbanned(char *hostname);
 	extern int num_earned_bonus_traits(char_data *ch);
 	void start_new_character(char_data *ch);
@@ -2107,9 +2104,9 @@ void nanny(descriptor_data *d, char *arg) {
 	extern char *wizlock_message;
 
 	char buf[MAX_STRING_LENGTH], tmp_name[MAX_INPUT_LENGTH];
-	int player_i, load_result, i, j, iter;
-	struct char_file_u tmp_store;
+	int load_result, i, j, iter;
 	bool help, show_start = FALSE;
+	char_data *temp_char;
 
 	skip_spaces(&arg);
 
@@ -2121,6 +2118,7 @@ void nanny(descriptor_data *d, char *arg) {
 				CREATE(d->character->player_specials, struct player_special_data, 1);
 				d->character->desc = d;
 			}
+			
 			if (!*arg) {
 				SET_BIT(PLR_FLAGS(d->character), PLR_KEEP_LAST_LOGIN_INFO);	// prevent login storing
 				STATE(d) = CON_CLOSE;
@@ -2135,38 +2133,18 @@ void nanny(descriptor_data *d, char *arg) {
 					SEND_TO_Q("Invalid name, please try another.\r\nName: ", d);
 					return;
 				}
-				if ((player_i = load_char(tmp_name, &tmp_store)) != NOTHING) {
-					store_to_char(&tmp_store, d->character);
-					GET_PFILEPOS(d->character) = player_i;
+				if ((temp_char = load_player(tmp_name, TRUE))) {
+					free_char(d->character);
+					d->character = temp_char;	// can't load directly; overwrites the existing char
+					d->character->desc = d;
+					
+					/* undo it just in case they are set */
+					REMOVE_BIT(PLR_FLAGS(d->character), PLR_WRITING | PLR_MAILING);
 
-					if (PLR_FLAGGED(d->character, PLR_DELETED)) {
-						/* We get a false positive from the original deleted character. */
-						free_char(d->character);
-						/* Check for multiple creations... */
-						if (!Valid_Name(tmp_name)) {
-							SEND_TO_Q("Invalid name, please try another.\r\nName: ", d);
-							return;
-						}
-						CREATE(d->character, char_data, 1);
-						clear_char(d->character);
-						CREATE(d->character->player_specials, struct player_special_data, 1);
-						d->character->desc = d;
-						CREATE(GET_PC_NAME(d->character), char, strlen(tmp_name) + 1);
-						strcpy(GET_PC_NAME(d->character), CAP(tmp_name));
-						GET_PFILEPOS(d->character) = player_i;
-						sprintf(buf, "Did I get that right, %s (Y/N)? ", tmp_name);
-						SEND_TO_Q(buf, d);
-						STATE(d) = CON_NAME_CNFRM;
-					}
-					else {
-						/* undo it just in case they are set */
-						REMOVE_BIT(PLR_FLAGS(d->character), PLR_WRITING | PLR_MAILING);
-
-						SEND_TO_Q("Password: ", d);
-						ProtocolNoEcho(d, true);
-						d->idle_tics = 0;
-						STATE(d) = CON_PASSWORD;
-					}
+					SEND_TO_Q("Password: ", d);
+					ProtocolNoEcho(d, true);
+					d->idle_tics = 0;
+					STATE(d) = CON_PASSWORD;
 				}
 				else {
 					/* player unknown -- make new character */
@@ -2176,8 +2154,7 @@ void nanny(descriptor_data *d, char *arg) {
 						SEND_TO_Q("Invalid name, please try another.\r\nName: ", d);
 						return;
 					}
-					CREATE(GET_PC_NAME(d->character), char, strlen(tmp_name) + 1);
-					strcpy(GET_PC_NAME(d->character), CAP(tmp_name));
+					GET_PC_NAME(d->character) = str_dup(CAP(tmp_name));
 
 					sprintf(buf, "Did I get that right, %s (Y/N)? ", tmp_name);
 					SEND_TO_Q(buf, d);
@@ -2263,8 +2240,8 @@ void nanny(descriptor_data *d, char *arg) {
 				GET_BAD_PWS(d->character) = 0;
 				d->bad_pws = 0;
 
-				if (isbanned(d->host) == BAN_SELECT && !PLR_FLAGGED(d->character, PLR_SITEOK)) {
-					SEND_TO_Q("Sorry, this character has not been cleared for login from your site!\r\n", d);
+				if (isbanned(d->host) == BAN_SELECT && !ACCOUNT_FLAGGED(d->character, ACCT_SITEOK)) {
+					SEND_TO_Q("Sorry, this account has not been cleared for login from your site!\r\n", d);
 					STATE(d) = CON_CLOSE;
 					syslog(SYS_LOGIN, 0, TRUE, "Connection attempt for %s denied from %s", GET_NAME(d->character), d->host);
 					return;
@@ -2326,9 +2303,8 @@ void nanny(descriptor_data *d, char *arg) {
 				SEND_TO_Q("Password: ", d);
 				return;
 			}
-			strncpy(GET_PASSWD(d->character), CRYPT(arg, PASSWORD_SALT), MAX_PWD_LENGTH);
-			*(GET_PASSWD(d->character) + MAX_PWD_LENGTH) = '\0';
-
+			
+			GET_PASSWD(d->character) = str_dup(CRYPT(arg, PASSWORD_SALT));
 			next_creation_step(d);
 			break;
 		}
@@ -2457,7 +2433,10 @@ void nanny(descriptor_data *d, char *arg) {
 			if (*arg) {
 				// store for later
 				arg[MAX_REFERRED_BY_LENGTH-1] = '\0';
-				strcpy(GET_REFERRED_BY(d->character), arg);
+				if (GET_REFERRED_BY(d->character)) {
+					free(GET_REFERRED_BY(d->character));
+				}
+				GET_REFERRED_BY(d->character) = str_dup(arg);
 			}
 			
 			next_creation_step(d);
@@ -2466,10 +2445,7 @@ void nanny(descriptor_data *d, char *arg) {
 
 		case CON_FINISH_CREATION: {
 			// some finalization
-
-			if (GET_PFILEPOS(d->character) < 0)
-				GET_PFILEPOS(d->character) = create_entry(GET_PC_NAME(d->character));
-			/* Now GET_NAME() will work properly. */
+			
 			if (GET_ACCESS_LEVEL(d->character) == 0) {
 				// set to base level now
 				GET_ACCESS_LEVEL(d->character) = 1;
@@ -2598,7 +2574,7 @@ void nanny(descriptor_data *d, char *arg) {
 			// TODO most* of this block is repeated in do_alternate
 
 			// put them in-game
-			load_result = enter_player_game(d, TRUE, TRUE);
+			enter_player_game(d, TRUE, TRUE);
 			
 			msg_to_desc(d, "\r\n%s\r\n\r\n", config_get_string("welcome_message"));
 			act("$n has entered the game.", TRUE, d->character, 0, 0, TO_ROOM);
@@ -2626,7 +2602,7 @@ void nanny(descriptor_data *d, char *arg) {
 			
 			display_tip_to_char(d->character);
 			
-			if (has_mail(GET_IDNUM(d->character))) {
+			if (GET_MAIL_PENDING(d->character)) {
 				send_to_char("&rYou have mail waiting.&0\r\n", d->character);
 			}
 			

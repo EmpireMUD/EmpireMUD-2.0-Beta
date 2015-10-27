@@ -34,6 +34,7 @@ extern const char *global_flags[];
 extern const char *global_types[];
 extern const char *interact_types[];
 extern const byte interact_vnum_types[NUM_INTERACTS];
+extern const char *sector_flags[];
 
 // external funcs
 void sort_interactions(struct interaction_item **list);
@@ -67,10 +68,21 @@ bool audit_global(struct global_data *glb, char_data *ch) {
 	}
 	
 	for (interact = GET_GLOBAL_INTERACTIONS(glb); interact; interact = interact->next) {
-		if (GET_GLOBAL_TYPE(glb) == GLOBAL_MOB_INTERACTIONS) {
-			if (interact->type != INTERACT_SHEAR && interact->type != INTERACT_LOOT && interact->type != INTERACT_PICKPOCKET) {
-				olc_audit_msg(ch, GET_GLOBAL_VNUM(glb), "Unsupported interaction type");
-				problem = TRUE;
+		// GLOBAL_x
+		switch (GET_GLOBAL_TYPE(glb)) {
+			case GLOBAL_MOB_INTERACTIONS: {
+				if (interact->type != INTERACT_SHEAR && interact->type != INTERACT_LOOT && interact->type != INTERACT_PICKPOCKET) {
+					olc_audit_msg(ch, GET_GLOBAL_VNUM(glb), "Unsupported interaction type");
+					problem = TRUE;
+				}
+				break;
+			}
+			case GLOBAL_MINE_DATA: {
+				if (interact->type != INTERACT_MINE) {
+					olc_audit_msg(ch, GET_GLOBAL_VNUM(glb), "Unsupported interaction type");
+					problem = TRUE;
+				}
+				break;
 			}
 		}
 	}
@@ -119,13 +131,36 @@ char *list_one_global(struct global_data *glb, bool detail) {
 	extern const char *action_bits[];
 	
 	static char output[MAX_STRING_LENGTH];
-	char flags[MAX_STRING_LENGTH];
-
+	char abil[MAX_STRING_LENGTH], flags[MAX_STRING_LENGTH];
+	
+	// ability required
+	if (GET_GLOBAL_ABILITY(glb) == NO_ABIL) {
+		*abil = '\0';
+	}
+	else {
+		sprintf(abil, " (%s", ability_data[GET_GLOBAL_ABILITY(glb)].name);
+		if (ability_data[GET_GLOBAL_ABILITY(glb)].parent_skill != NO_SKILL) {
+			sprintf(abil + strlen(abil), " - %s %d", skill_data[ability_data[GET_GLOBAL_ABILITY(glb)].parent_skill].name, ability_data[GET_GLOBAL_ABILITY(glb)].parent_skill_required);
+		}
+		strcat(abil, ")");
+	}
+	
+	// GLOBAL_x
 	switch (GET_GLOBAL_TYPE(glb)) {
 		case GLOBAL_MOB_INTERACTIONS: {
 			if (detail) {
 				sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), action_bits, flags, TRUE);
-				snprintf(output, sizeof(output), "[%5d] %s (%s) %s", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb), level_range_string(GET_GLOBAL_MIN_LEVEL(glb), GET_GLOBAL_MAX_LEVEL(glb), 0), flags);
+				snprintf(output, sizeof(output), "[%5d] %s (%s)%s %.2f%%%s %s", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb), level_range_string(GET_GLOBAL_MIN_LEVEL(glb), GET_GLOBAL_MAX_LEVEL(glb), 0), abil, GET_GLOBAL_PERCENT(glb), IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_CUMULATIVE_PERCENT) ? "C" : "", flags);
+			}
+			else {
+				snprintf(output, sizeof(output), "[%5d] %s", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
+			}
+			break;
+		}
+		case GLOBAL_MINE_DATA: {
+			if (detail) {
+				sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), sector_flags, flags, TRUE);
+				snprintf(output, sizeof(output), "[%5d] %s%s %.2f%%%s %s", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb), abil, GET_GLOBAL_PERCENT(glb), IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_CUMULATIVE_PERCENT) ? "C" : "", flags);
 			}
 			else {
 				snprintf(output, sizeof(output), "[%5d] %s", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
@@ -134,7 +169,7 @@ char *list_one_global(struct global_data *glb, bool detail) {
 		}
 		default: {
 			if (detail) {
-				snprintf(output, sizeof(output), "[%5d] %s", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
+				snprintf(output, sizeof(output), "[%5d] %s%s %.2f%%%s", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb), abil, GET_GLOBAL_PERCENT(glb), IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_CUMULATIVE_PERCENT) ? "C" : "");
 			}
 			else {
 				snprintf(output, sizeof(output), "[%5d] %s", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
@@ -265,9 +300,12 @@ void save_olc_global(descriptor_data *desc) {
 * @return struct global_data* The copied global.
 */
 struct global_data *setup_olc_global(struct global_data *input) {
+	void clear_global(struct global_data *glb);
+
 	struct global_data *new;
 	
 	CREATE(new, struct global_data, 1);
+	clear_global(new);
 	
 	if (input) {
 		// copy normal data
@@ -333,14 +371,36 @@ void olc_show_global(char_data *ch) {
 	else {
 		sprintf(buf + strlen(buf), "<&ymaxlevel&0> %d\r\n", GET_GLOBAL_MAX_LEVEL(glb));
 	}
-
-	// type-based data
+	
+	// ability required
+	if (GET_GLOBAL_ABILITY(glb) == NO_ABIL) {
+		strcpy(buf1, "none");
+	}
+	else {
+		sprintf(buf1, "%s", ability_data[GET_GLOBAL_ABILITY(glb)].name);
+		if (ability_data[GET_GLOBAL_ABILITY(glb)].parent_skill != NO_SKILL) {
+			sprintf(buf1 + strlen(buf1), " (%s %d)", skill_data[ability_data[GET_GLOBAL_ABILITY(glb)].parent_skill].name, ability_data[GET_GLOBAL_ABILITY(glb)].parent_skill_required);
+		}
+	}
+	sprintf(buf + strlen(buf), "<&yability&0> %s\r\n", buf1);
+	
+	sprintf(buf + strlen(buf), "<&ypercent&0> %.2f%%\r\n", GET_GLOBAL_PERCENT(glb));
+	
+	// GLOBAL_x: type-based data
 	switch (GET_GLOBAL_TYPE(glb)) {
 		case GLOBAL_MOB_INTERACTIONS: {
 			sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), action_bits, lbuf, TRUE);
 			sprintf(buf + strlen(buf), "<&ymobflags&0> %s\r\n", lbuf);
 			sprintbit(GET_GLOBAL_TYPE_EXCLUDE(glb), action_bits, lbuf, TRUE);
 			sprintf(buf + strlen(buf), "<&ymobexclude&0> %s\r\n", lbuf);
+			break;
+		}
+		case GLOBAL_MINE_DATA: {
+			sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), sector_flags, lbuf, TRUE);
+			sprintf(buf + strlen(buf), "<&ysectorflags&0> %s\r\n", lbuf);
+			sprintbit(GET_GLOBAL_TYPE_EXCLUDE(glb), sector_flags, lbuf, TRUE);
+			sprintf(buf + strlen(buf), "<&ysectorexclude&0> %s\r\n", lbuf);
+			sprintf(buf + strlen(buf), "<&ycapacity&0> %d ore (%d-%d normal, %d-%d deep)\r\n", GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE), GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE)/2, GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE), (int)(GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE) / 2.0 * 1.5), (int)(GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE) * 1.5));
 			break;
 		}
 	}
@@ -355,6 +415,52 @@ void olc_show_global(char_data *ch) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// EDIT MODULES ////////////////////////////////////////////////////////////
+
+OLC_MODULE(gedit_ability) {
+	extern int find_ability_by_name(char *name, bool allow_abbrev);
+	
+	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
+	int abil;
+	
+	if (!*argument) {
+		msg_to_char(ch, "Require what ability (or 'none')?\r\n");
+	}
+	else if (!str_cmp(argument, "none")) {
+		GET_GLOBAL_ABILITY(glb) = NO_ABIL;
+		
+		if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+			send_config_msg(ch, "ok_string");
+		}
+		else {
+			msg_to_char(ch, "It will require no ability.\r\n");
+		}
+	}
+	else if ((abil = find_ability_by_name(argument, TRUE)) == NOTHING) {
+		msg_to_char(ch, "Invalid ability '%s'.\r\n", argument);
+	}
+	else {
+		GET_GLOBAL_ABILITY(glb) = abil;
+		
+		if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+			send_config_msg(ch, "ok_string");
+		}
+		else {
+			msg_to_char(ch, "It now requires the %s ability.\r\n", ability_data[abil].name);
+		}
+	}
+}
+
+
+OLC_MODULE(gedit_capacity) {
+	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
+	
+	if (GET_GLOBAL_TYPE(glb) != GLOBAL_MINE_DATA) {
+		msg_to_char(ch, "You can't set mine capacity on this type.\r\n");
+	}
+	else {
+		GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE) = olc_process_number(ch, argument, "mine capacity", "capacity", 1, 1000, GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE));
+	}
+}
 
 
 OLC_MODULE(gedit_flags) {
@@ -373,7 +479,24 @@ OLC_MODULE(gedit_flags) {
 
 OLC_MODULE(gedit_interaction) {
 	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
-	olc_process_interactions(ch, argument, &GET_GLOBAL_INTERACTIONS(glb), TYPE_MOB);
+	int itype = TYPE_MOB;
+	
+	switch (GET_GLOBAL_TYPE(glb)) {
+		case GLOBAL_MOB_INTERACTIONS: {
+			itype = TYPE_MOB;
+			break;
+		}
+		case GLOBAL_MINE_DATA: {
+			itype = TYPE_MINE_DATA;
+			break;
+		}
+		default: {
+			msg_to_char(ch, "You can't set interactions on this type.\r\n");
+			return;
+		}
+	}
+	
+	olc_process_interactions(ch, argument, &GET_GLOBAL_INTERACTIONS(glb), itype);
 }
 
 
@@ -419,7 +542,48 @@ OLC_MODULE(gedit_name) {
 }
 
 
+OLC_MODULE(gedit_percent) {
+	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
+	GET_GLOBAL_PERCENT(glb) = olc_process_double(ch, argument, "percent", "percent", 0.01, 100.00, GET_GLOBAL_PERCENT(glb));
+}
+
+
+OLC_MODULE(gedit_sectorexclude) {
+	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
+	
+	if (GET_GLOBAL_TYPE(glb) != GLOBAL_MINE_DATA) {
+		msg_to_char(ch, "You can't set sectorexclude on this type.\r\n");
+	}
+	else {
+		GET_GLOBAL_TYPE_EXCLUDE(glb) = olc_process_flag(ch, argument, "sector", "sectorexclude", sector_flags, GET_GLOBAL_TYPE_EXCLUDE(glb));
+	}
+}
+
+
+OLC_MODULE(gedit_sectorflags) {
+	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
+	
+	if (GET_GLOBAL_TYPE(glb) != GLOBAL_MINE_DATA) {
+		msg_to_char(ch, "You can't set sectorflags on this type.\r\n");
+	}
+	else {
+		GET_GLOBAL_TYPE_FLAGS(glb) = olc_process_flag(ch, argument, "sector", "sectorflags", sector_flags, GET_GLOBAL_TYPE_FLAGS(glb));
+	}
+}
+
+
 OLC_MODULE(gedit_type) {
 	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
+	int iter, old = GET_GLOBAL_TYPE(glb);
+	
 	GET_GLOBAL_TYPE(glb) = olc_process_type(ch, argument, "type", "type", global_types, GET_GLOBAL_TYPE(glb));
+	
+	// reset excludes/vals if type changes
+	if (GET_GLOBAL_TYPE(glb) != old) {
+		GET_GLOBAL_TYPE_FLAGS(glb) = NOBITS;
+		GET_GLOBAL_TYPE_EXCLUDE(glb) = NOBITS;
+		for (iter = 0; iter < NUM_GLB_VAL_POSITIONS; ++iter) {
+			GET_GLOBAL_VAL(glb, iter) = 0;
+		}
+	}
 }

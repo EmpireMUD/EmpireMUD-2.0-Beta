@@ -329,6 +329,9 @@ EEDIT(eedit_change_leader) {
 
 		log_to_empire(emp, ELOG_MEMBERS, "%s is now the leader of the empire!", PERS(victim, victim, TRUE));
 		msg_to_char(ch, "You make %s leader of the empire.\r\n", PERS(victim, victim, TRUE));
+		
+		remove_lore(victim, LORE_PROMOTED);
+		add_lore(victim, LORE_PROMOTED, "Became leader of %s%s&0", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 
 		// save now
 		if (file) {
@@ -415,6 +418,10 @@ EEDIT(eedit_motd) {
 
 
 EEDIT(eedit_name) {
+	player_index_data *index, *next_index;
+	bool file = FALSE;
+	char_data *mem;
+	
 	if (!*argument) {
 		msg_to_char(ch, "Set the empire name to what?\r\n");
 	}
@@ -444,6 +451,21 @@ EEDIT(eedit_name) {
 		log_to_empire(emp, ELOG_ADMIN, "%s has changed the empire name to %s", PERS(ch, ch, TRUE), EMPIRE_NAME(emp));
 		msg_to_char(ch, "The empire's name is now: %s\r\n", EMPIRE_NAME(emp));
 		msg_to_char(ch, "The adjective form was also changed (use 'eedit adjective' to change it).\r\n");
+		
+		// update lore for members
+		HASH_ITER(idnum_hh, player_table_by_idnum, index, next_index) {
+			if (index->loyalty != emp) {
+				continue;
+			}
+			
+			if ((mem = find_or_load_player(index->name, &file))) {
+				add_lore(mem, LORE_JOIN_EMPIRE, "Empire became %s%s&0", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+				
+				if (file) {
+					store_loaded_char(mem);
+				}
+			}
+		}
 	}
 }
 
@@ -479,7 +501,10 @@ EEDIT(eedit_privilege) {
 
 
 EEDIT(eedit_rank) {
+	player_index_data *index, *next_index;
+	char_data *mem;
 	int rnk, iter;
+	bool file;
 
 	argument = any_one_word(argument, arg);
 	skip_spaces(&argument);
@@ -506,6 +531,23 @@ EEDIT(eedit_rank) {
 		
 		log_to_empire(emp, ELOG_ADMIN, "%s has changed rank %d to %s%s", PERS(ch, ch, TRUE), rnk+1, EMPIRE_RANK(emp, rnk), EMPIRE_BANNER(emp));
 		msg_to_char(ch, "You have changed rank %d to %s&0.\r\n", rnk+1, EMPIRE_RANK(emp, rnk));
+		
+		
+		// update lore for members
+		HASH_ITER(idnum_hh, player_table_by_idnum, index, next_index) {
+			if (index->loyalty != emp || rnk != (index->rank - 1)) {
+				continue;
+			}
+			
+			if ((mem = find_or_load_player(index->name, &file))) {
+				remove_lore(mem, LORE_PROMOTED);	// only save most recent
+				add_lore(mem, LORE_PROMOTED, "Became %s&0", EMPIRE_RANK(emp, rnk));
+				
+				if (file) {
+					store_loaded_char(mem);
+				}
+			}
+		}
 	}
 }
 
@@ -513,8 +555,8 @@ EEDIT(eedit_rank) {
 EEDIT(eedit_num_ranks) {
 	extern const struct archetype_type archetype[];
 	
-	int pos, num, iter;
-	struct char_file_u chdata;
+	player_index_data *index, *next_index;
+	int num, iter;
 	char_data *mem;
 	bool is_file = FALSE;
 	
@@ -528,34 +570,33 @@ EEDIT(eedit_num_ranks) {
 		eliminate_linkdead_players();
 		
 		// update all players
-		for (pos = 0; pos <= top_of_p_table; ++pos) {
-			if (load_char(player_table[pos].name, &chdata) != NOBODY && !IS_SET(chdata.char_specials_saved.act, PLR_DELETED)) {
-				if (chdata.player_specials_saved.empire == EMPIRE_VNUM(emp)) {
-					if ((mem = find_or_load_player(player_table[pos].name, &is_file))) {
-						if (GET_RANK(mem) == EMPIRE_NUM_RANKS(emp)) {
-							// equal to old max
-							GET_RANK(mem) = num;
-						}
-						else if (GET_RANK(mem) >= num) {
-							// too high for new max
-							GET_RANK(mem) = num - 1;
-						}
-						
-						// save
-						if (is_file) {
-							store_loaded_char(mem);
-							is_file = FALSE;
-							mem = NULL;
-						}
-						else {
-							SAVE_CHAR(mem);
-						}
-					}
-		
-					if (mem && is_file) {
-						free_char(mem);
-					}
-				}
+		HASH_ITER(idnum_hh, player_table_by_idnum, index, next_index) {
+			if (index->loyalty != emp) {
+				continue;
+			}
+			if (!(mem = find_or_load_player(index->name, &is_file))) {
+				continue;
+			}
+			
+			if (GET_RANK(mem) == EMPIRE_NUM_RANKS(emp)) {
+				// equal to old max
+				GET_RANK(mem) = num;
+			}
+			else if (GET_RANK(mem) >= num) {
+				// too high for new max
+				GET_RANK(mem) = num - 1;
+			}
+			
+			update_player_index(index, mem);
+			
+			// save
+			if (is_file) {
+				store_loaded_char(mem);
+				is_file = FALSE;
+				mem = NULL;
+			}
+			else {
+				SAVE_CHAR(mem);
 			}
 		}
 		

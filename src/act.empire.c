@@ -108,6 +108,7 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 	int iter, sub, found_rank;
 	empire_data *other, *emp_iter, *next_emp;
 	bool found, is_own_empire, comma;
+	player_index_data *index;
 	char line[256];
 	
 	// for displaying diplomacy below
@@ -140,7 +141,7 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 		*line = '\0';
 	}
 	
-	msg_to_char(ch, "%s%s&0%s, led by %s\r\n", EMPIRE_BANNER(e), EMPIRE_NAME(e), line, (get_name_by_id(EMPIRE_LEADER(e)) ? CAP(get_name_by_id(EMPIRE_LEADER(e))) : "(Unknown)"));
+	msg_to_char(ch, "%s%s&0%s, led by %s\r\n", EMPIRE_BANNER(e), EMPIRE_NAME(e), line, (index = find_player_index_by_idnum(EMPIRE_LEADER(e))) ? index->fullname : "(Unknown)");
 	
 	if (IS_IMMORTAL(ch)) {
 		msg_to_char(ch, "Created: %-24.24s\r\n", ctime(&EMPIRE_CREATE_TIME(e)));
@@ -2177,13 +2178,14 @@ ACMD(do_defect) {
 		msg_to_char(ch, "The leader can't defect!\r\n");
 	else {
 		GET_LOYALTY(ch) = NULL;
-		GET_EMPIRE_VNUM(ch) = NOTHING;
 		add_cooldown(ch, COOLDOWN_LEFT_EMPIRE, 2 * SECS_PER_REAL_HOUR);
 		SAVE_CHAR(ch);
 		
 		log_to_empire(e, ELOG_MEMBERS, "%s has defected from the empire", PERS(ch, ch, 1));
 		msg_to_char(ch, "You defect from the empire!\r\n");
-		add_lore(ch, LORE_DEFECT_EMPIRE, EMPIRE_VNUM(e));
+		
+		remove_lore(ch, LORE_PROMOTED);
+		add_lore(ch, LORE_DEFECT_EMPIRE, "Defected from %s%s&0", EMPIRE_BANNER(e), EMPIRE_NAME(e));
 		
 		clear_private_owner(GET_IDNUM(ch));
 		
@@ -2254,6 +2256,8 @@ ACMD(do_demote) {
 		act("You can't demote $M THAT low!", FALSE, ch, 0, victim, TO_CHAR);
 	else {
 		GET_RANK(victim) = to_rank;
+		remove_lore(victim, LORE_PROMOTED);	// only save most recent
+		add_lore(victim, LORE_PROMOTED, "Became %s&0", EMPIRE_RANK(e, to_rank-1));
 
 		log_to_empire(e, ELOG_MEMBERS, "%s has been demoted to %s%s", PERS(victim, victim, 1), EMPIRE_RANK(e, to_rank-1), EMPIRE_BANNER(e));
 		send_config_msg(ch, "ok_string");
@@ -2938,19 +2942,18 @@ ACMD(do_empire_inventory) {
 
 
 ACMD(do_enroll) {
-	void save_char_file_u(struct char_file_u *st);
-	struct char_file_u chdata;
 	struct empire_territory_data *ter, *next_ter;
 	struct empire_npc_data *npc;
 	struct empire_storage_data *store, *store2;
 	struct empire_city_data *city, *next_city, *temp;
+	player_index_data *index, *next_index;
 	struct empire_unique_storage *eus;
 	struct shipping_data *shipd;
 	empire_data *e, *old;
 	room_data *room, *next_room;
-	int j, old_store;
+	int old_store;
 	char_data *targ = NULL, *victim, *mob;
-	bool file = FALSE;
+	bool file = FALSE, sub_file = FALSE;
 	obj_data *obj;
 
 	if (IS_NPC(ch))
@@ -2989,10 +2992,11 @@ ACMD(do_enroll) {
 		send_config_msg(ch, "ok_string");
 		
 		GET_LOYALTY(targ) = e;
-		GET_EMPIRE_VNUM(targ) = EMPIRE_VNUM(e);
 		GET_RANK(targ) = 1;
 		GET_PLEDGE(targ) = NOTHING;
-		add_lore(targ, LORE_JOIN_EMPIRE, EMPIRE_VNUM(e));
+		
+		remove_lore(targ, LORE_PROMOTED);
+		add_lore(targ, LORE_JOIN_EMPIRE, "Honorably accepted into %s%s&0", EMPIRE_BANNER(e), EMPIRE_NAME(e));
 		
 		// TODO split this out into a "merge empires" func
 
@@ -3001,43 +3005,29 @@ ACMD(do_enroll) {
 			eliminate_linkdead_players();
 			
 			// move members
-			for (j = 0; j <= top_of_p_table; j++) {
-				// only even bother checking people other than targ
-				if (player_table[j].id != GET_IDNUM(targ)) {
-					if ((victim = is_playing(player_table[j].id))) {
-						if (GET_LOYALTY(victim) == old) {
-							msg_to_char(victim, "Your empire has merged with %s.\r\n", EMPIRE_NAME(e));
-							add_lore(victim, LORE_JOIN_EMPIRE, EMPIRE_VNUM(e));
-							GET_LOYALTY(victim) = e;
-							GET_EMPIRE_VNUM(victim) = EMPIRE_VNUM(e);
-							GET_RANK(victim) = 1;
-							SAVE_CHAR(victim);
-						}
+			HASH_ITER(idnum_hh, player_table_by_idnum, index, next_index) {
+				// find only members of the old empire (other than targ)
+				if (index->idnum == GET_IDNUM(targ) || index->loyalty != old) {
+					continue;
+				}
+				
+				if ((victim = is_playing(index->idnum)) || (victim = is_at_menu(index->idnum))) {
+					if (IN_ROOM(victim)) {
+						msg_to_char(victim, "Your empire has merged with %s.\r\n", EMPIRE_NAME(e));
 					}
-					else if ((victim = is_at_menu(player_table[j].id))) {
-						// hybrid
-						if (GET_LOYALTY(victim) == old) {
-							add_lore(victim, LORE_JOIN_EMPIRE, EMPIRE_VNUM(e));
-							GET_LOYALTY(victim) = e;
-							GET_EMPIRE_VNUM(victim) = EMPIRE_VNUM(e);
-							GET_RANK(victim) = 1;
-							SAVE_CHAR(victim);
-							
-							load_char(player_table[j].name, &chdata);
-							if (chdata.player_specials_saved.empire == EMPIRE_VNUM(old)) {
-								chdata.player_specials_saved.empire = EMPIRE_VNUM(e);
-								chdata.player_specials_saved.rank = 1;
-								save_char_file_u(&chdata);
-							}
-						}
-					}
-					else {
-						load_char(player_table[j].name, &chdata);
-						if (chdata.player_specials_saved.empire == EMPIRE_VNUM(old)) {
-							chdata.player_specials_saved.empire = EMPIRE_VNUM(e);
-							chdata.player_specials_saved.rank = 1;
-							save_char_file_u(&chdata);
-						}
+					add_lore(victim, LORE_JOIN_EMPIRE, "Empire merged into %s%s&0", EMPIRE_BANNER(e), EMPIRE_NAME(e));
+					GET_LOYALTY(victim) = e;
+					GET_RANK(victim) = 1;
+					update_player_index(index, victim);
+					SAVE_CHAR(victim);
+				}
+				else if ((victim = find_or_load_player(index->name, &sub_file))) {
+					add_lore(victim, LORE_JOIN_EMPIRE, "Empire merged into %s%s&0", EMPIRE_BANNER(e), EMPIRE_NAME(e));
+					GET_LOYALTY(victim) = e;
+					GET_RANK(victim) = 1;
+					update_player_index(index, victim);
+					if (sub_file) {
+						store_loaded_char(victim);
 					}
 				}
 			}
@@ -3217,7 +3207,7 @@ ACMD(do_esay) {
 		return;
 		}
 
-	if (PLR_FLAGGED(ch, PLR_MUTED)) {
+	if (ACCOUNT_FLAGGED(ch, ACCT_MUTED)) {
 		msg_to_char(ch, "You can't use the empire channel while muted.\r\n");
 		return;
 		}
@@ -3353,14 +3343,15 @@ ACMD(do_expel) {
 		msg_to_char(ch, "You can't expel the leader!\r\n");
 	else {
 		GET_LOYALTY(targ) = NULL;
-		GET_EMPIRE_VNUM(targ) = NOTHING;
 		add_cooldown(targ, COOLDOWN_LEFT_EMPIRE, 2 * SECS_PER_REAL_HOUR);
 		clear_private_owner(GET_IDNUM(targ));
 
 		log_to_empire(e, ELOG_MEMBERS, "%s has been expelled from the empire", PERS(targ, targ, 1));
 		send_config_msg(ch, "ok_string");
 		msg_to_char(targ, "You have been expelled from the empire.\r\n");
-		add_lore(targ, LORE_KICKED_EMPIRE, EMPIRE_VNUM(e));
+		
+		remove_lore(targ, LORE_PROMOTED);
+		add_lore(targ, LORE_KICKED_EMPIRE, "Dishonorably discharged from %s%s&0", EMPIRE_BANNER(e), EMPIRE_NAME(e));
 
 		// save now
 		if (file) {
@@ -4017,6 +4008,8 @@ ACMD(do_promote) {
 		msg_to_char(ch, "You can't promote someone to that level.\r\n");
 	else {
 		GET_RANK(victim) = to_rank;
+		remove_lore(victim, LORE_PROMOTED);	// only save most recent
+		add_lore(victim, LORE_PROMOTED, "Promoted to %s&0", EMPIRE_RANK(e, to_rank-1));
 
 		log_to_empire(e, ELOG_MEMBERS, "%s has been promoted to %s%s!", PERS(victim, victim, 1), EMPIRE_RANK(e, to_rank-1), EMPIRE_BANNER(e));
 		send_config_msg(ch, "ok_string");
@@ -4287,16 +4280,16 @@ ACMD(do_reward) {
 
 
 ACMD(do_roster) {
-	extern bool member_is_timed_out_cfu(struct char_file_u *chdata);
+	extern bool member_is_timed_out_ch(char_data *ch);
 	extern const char *class_role[NUM_ROLES];
 	extern const char *class_role_color[NUM_ROLES];
 
 	char buf[MAX_STRING_LENGTH * 2], buf1[MAX_STRING_LENGTH * 2], arg[MAX_STRING_LENGTH];
-	struct char_file_u chdata;
-	int j, days, hours, size;
+	player_index_data *index, *next_index;
+	bool timed_out, is_file = FALSE;
+	int days, hours, size;
+	char_data *member;
 	empire_data *e;
-	char_data *tmp;
-	bool timed_out;
 
 	one_word(argument, arg);
 
@@ -4313,41 +4306,49 @@ ACMD(do_roster) {
 
 	*buf = '\0';
 	size = 0;
-
-	for (j = 0; j <= top_of_p_table; j++) {
-		load_char((player_table + j)->name, &chdata);
-		if (!IS_SET(chdata.char_specials_saved.act, PLR_DELETED)) {
-			if (chdata.player_specials_saved.empire == EMPIRE_VNUM(e)) {
-				tmp = is_playing(chdata.char_specials_saved.idnum);
-			
-				timed_out = member_is_timed_out_cfu(&chdata);
-				if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
-					size += snprintf(buf + size, sizeof(buf) - size, "[%d %s %s] <%s&0> %s%s&0", tmp ? GET_COMPUTED_LEVEL(tmp) : chdata.player_specials_saved.last_known_level, class_data[tmp ? GET_CLASS(tmp) : chdata.player_specials_saved.character_class].name, class_role[tmp ? GET_CLASS_ROLE(tmp) : chdata.player_specials_saved.class_role], EMPIRE_RANK(e, (tmp ? GET_RANK(tmp) : chdata.player_specials_saved.rank) - 1), (timed_out ? "&r" : ""), chdata.name);
-				}
-				else {	// not screenreader
-					size += snprintf(buf + size, sizeof(buf) - size, "[%d %s%s\t0] <%s&0> %s%s&0", tmp ? GET_COMPUTED_LEVEL(tmp) : chdata.player_specials_saved.last_known_level, class_role_color[tmp ? GET_CLASS_ROLE(tmp) : chdata.player_specials_saved.class_role], class_data[tmp ? GET_CLASS(tmp) : chdata.player_specials_saved.character_class].name, EMPIRE_RANK(e, (tmp ? GET_RANK(tmp) : chdata.player_specials_saved.rank) - 1), (timed_out ? "&r" : ""), chdata.name);
-				}
-								
-				// online/not
-				if (tmp) {
-					size += snprintf(buf + size, sizeof(buf) - size, "  - &conline&0%s", IS_AFK(tmp) ? " - &rafk&0" : "");
-				}
-				else if ((time(0) - chdata.last_logon) < SECS_PER_REAL_DAY) {
-					hours = (time(0) - chdata.last_logon) / SECS_PER_REAL_HOUR;
-					size += snprintf(buf + size, sizeof(buf) - size, "  - %d hour%s ago%s", hours, PLURAL(hours), (timed_out ? ", &rtimed-out&0" : ""));
-				}
-				else {	// more than a day
-					days = (time(0) - chdata.last_logon) / SECS_PER_REAL_DAY;
-					size += snprintf(buf + size, sizeof(buf) - size, "  - %d day%s ago%s", days, PLURAL(days), (timed_out ? ", &rtimed-out&0" : ""));
-				}
-				
-				size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
-			}
+	
+	HASH_ITER(name_hh, player_table_by_name, index, next_index) {
+		if (index->loyalty != e) {
+			continue;
+		}
+		
+		// load member
+		member = find_or_load_player(index->name, &is_file);
+		if (!member) {
+			continue;
+		}
+		
+		// display:
+		timed_out = member_is_timed_out_ch(member);
+		if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+			size += snprintf(buf + size, sizeof(buf) - size, "[%d %s %s] <%s&0> %s%s&0", !is_file ? GET_COMPUTED_LEVEL(member) : GET_LAST_KNOWN_LEVEL(member), class_data[GET_CLASS(member)].name, class_role[GET_CLASS_ROLE(member)], EMPIRE_RANK(e, GET_RANK(member) - 1), (timed_out ? "&r" : ""), PERS(member, member, TRUE));
+		}
+		else {	// not screenreader
+			size += snprintf(buf + size, sizeof(buf) - size, "[%d %s%s\t0] <%s&0> %s%s&0", !is_file ? GET_COMPUTED_LEVEL(member) : GET_LAST_KNOWN_LEVEL(member), class_role_color[GET_CLASS_ROLE(member)], class_data[GET_CLASS(member)].name, EMPIRE_RANK(e, GET_RANK(member) - 1), (timed_out ? "&r" : ""), PERS(member, member, TRUE));
+		}
+						
+		// online/not
+		if (!is_file) {
+			size += snprintf(buf + size, sizeof(buf) - size, "  - &conline&0%s", IS_AFK(member) ? " - &rafk&0" : "");
+		}
+		else if ((time(0) - member->prev_logon) < SECS_PER_REAL_DAY) {
+			hours = (time(0) - member->prev_logon) / SECS_PER_REAL_HOUR;
+			size += snprintf(buf + size, sizeof(buf) - size, "  - %d hour%s ago%s", hours, PLURAL(hours), (timed_out ? ", &rtimed-out&0" : ""));
+		}
+		else {	// more than a day
+			days = (time(0) - member->prev_logon) / SECS_PER_REAL_DAY;
+			size += snprintf(buf + size, sizeof(buf) - size, "  - %d day%s ago%s", days, PLURAL(days), (timed_out ? ", &rtimed-out&0" : ""));
+		}
+		
+		size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
+		
+		if (member && is_file) {
+			free_char(member);
 		}
 	}
 
 	snprintf(buf1, sizeof(buf1), "Roster of %s%s&0:\r\n%s", EMPIRE_BANNER(e), EMPIRE_NAME(e), buf);
-	page_string(ch->desc, buf1, 1);
+	page_string(ch->desc, buf1, TRUE);
 }
 
 

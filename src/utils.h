@@ -182,7 +182,6 @@
 // ch: char_data
 #define GET_AGE(ch)  ((!IS_NPC(ch) && IS_VAMPIRE(ch)) ? GET_APPARENT_AGE(ch) : age(ch)->year)
 #define GET_EQ(ch, i)  ((ch)->equipment[i])
-#define GET_PFILEPOS(ch)  ((ch)->pfilepos)
 #define GET_REAL_AGE(ch)  (age(ch)->year)
 #define IN_ROOM(ch)  ((ch)->in_room)
 #define GET_LOYALTY(ch)  ((ch)->loyalty)
@@ -247,7 +246,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_FEEDING_FROM(ch)  ((ch)->char_specials.feeding_from)
 #define GET_HEALTH_REGEN(ch)  ((ch)->char_specials.health_regen)
 #define GET_ID(x)  ((x)->id)
-#define GET_IDNUM(ch)  (REAL_CHAR(ch)->char_specials.saved.idnum)
+#define GET_IDNUM(ch)  (REAL_CHAR(ch)->char_specials.idnum)
 #define GET_LEADING(ch)  ((ch)->char_specials.leading)
 #define GET_LED_BY(ch)  ((ch)->char_specials.led_by)
 #define GET_MANA_REGEN(ch)  ((ch)->char_specials.mana_regen)
@@ -262,7 +261,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 // definitions
 #define AWAKE(ch)  (GET_POS(ch) > POS_SLEEPING || GET_POS(ch) == POS_DEAD)
 #define CAN_CARRY_N(ch)  (25 + GET_BONUS_INVENTORY(ch) + (HAS_BONUS_TRAIT(ch, BONUS_INVENTORY) ? 5 : 0) + (GET_EQ((ch), WEAR_PACK) ? GET_PACK_CAPACITY(GET_EQ(ch, WEAR_PACK)) : 0))
-#define CAN_CARRY_OBJ(ch,obj)  ((IS_CARRYING_N(ch) + GET_OBJ_INVENTORY_SIZE(obj)) <= CAN_CARRY_N(ch))
+#define CAN_CARRY_OBJ(ch,obj)  ((IS_CARRYING_N(ch) + obj_carry_size(obj)) <= CAN_CARRY_N(ch))
 #define CAN_GET_OBJ(ch, obj)  (CAN_WEAR((obj), ITEM_WEAR_TAKE) && CAN_CARRY_OBJ((ch),(obj)) && CAN_SEE_OBJ((ch),(obj)))
 #define CAN_RECOGNIZE(ch, vict)  (IS_IMMORTAL(ch) || (!AFF_FLAGGED(vict, AFF_NO_SEE_IN_ROOM | AFF_HIDE) && !MORPH_FLAGGED(vict, MORPH_FLAG_ANIMAL) && !IS_DISGUISED(vict)))
 #define CAN_RIDE_FLYING_MOUNT(ch)  (HAS_ABILITY((ch), ABIL_ALL_TERRAIN_RIDING) || HAS_ABILITY((ch), ABIL_FLY) || HAS_ABILITY((ch), ABIL_DRAGONRIDING))
@@ -429,11 +428,17 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_GLOBAL_NAME(glb)  ((glb)->name)
 #define GET_GLOBAL_TYPE(glb)  ((glb)->type)
 #define GET_GLOBAL_FLAGS(glb)  ((glb)->flags)
+#define GET_GLOBAL_PERCENT(glb)  ((glb)->percent)
+#define GET_GLOBAL_ABILITY(glb)  ((glb)->ability)
 #define GET_GLOBAL_TYPE_EXCLUDE(glb)  ((glb)->type_exclude)
 #define GET_GLOBAL_TYPE_FLAGS(glb)  ((glb)->type_flags)
 #define GET_GLOBAL_MIN_LEVEL(glb)  ((glb)->min_level)
 #define GET_GLOBAL_MAX_LEVEL(glb)  ((glb)->max_level)
+#define GET_GLOBAL_VAL(glb, pos)  ((glb)->value[(pos)])
 #define GET_GLOBAL_INTERACTIONS(glb)  ((glb)->interactions)
+
+// global value types
+#define GLB_VAL_MAX_MINE_SIZE  0	// which global value is used for max mine size
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -490,8 +495,8 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
  //////////////////////////////////////////////////////////////////////////////
 //// MOBILE UTILS ////////////////////////////////////////////////////////////
 
-// ch->char_specials.saved: char_specials_saved
-#define MOB_FLAGS(ch)  ((ch)->char_specials.saved.act)
+// ch->char_specials: char_special_data
+#define MOB_FLAGS(ch)  ((ch)->char_specials.act)
 
 // ch->mob_specials: mob_special_data
 #define GET_CURRENT_SCALE_LEVEL(ch)  ((ch)->mob_specials.current_scale_level)
@@ -550,7 +555,6 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_OBJ_VNUM(obj)  ((obj)->vnum)
 
 // definitions
-#define GET_OBJ_INVENTORY_SIZE(obj)  (OBJ_FLAGGED((obj), OBJ_LARGE) ? 2 : 1)
 #define IS_STOLEN(obj)  (GET_STOLEN_TIMER(obj) > 0 && (config_get_int("stolen_object_timer") * SECS_PER_REAL_MIN) + GET_STOLEN_TIMER(obj) > time(0))
 
 // helpers
@@ -717,105 +721,104 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
  //////////////////////////////////////////////////////////////////////////////
 //// PLAYER UTILS ////////////////////////////////////////////////////////////
 
-// ch->char_specials.saved: char_special_data_saved
-#define AFF_FLAGS(ch)  ((ch)->char_specials.saved.affected_by)
-#define INJURY_FLAGS(ch)  ((ch)->char_specials.saved.injuries)
-#define PLR_FLAGS(ch)  (REAL_CHAR(ch)->char_specials.saved.act)
-#define SYSLOG_FLAGS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.syslogs))
+// ch->char_specials: char_special_data
+#define AFF_FLAGS(ch)  ((ch)->char_specials.affected_by)
+#define INJURY_FLAGS(ch)  ((ch)->char_specials.injuries)
+#define PLR_FLAGS(ch)  (REAL_CHAR(ch)->char_specials.act)
+#define SYSLOG_FLAGS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->syslogs))
 
 // ch->player_specials: player_special_data
+#define CAN_GAIN_NEW_SKILLS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->can_gain_new_skills))
+#define CAN_GET_BONUS_SKILLS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->can_get_bonus_skills))
+#define CREATION_ARCHETYPE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->creation_archetype))
+#define GET_ACCOUNT(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->account))
+#define GET_ACTION(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->action))
+#define GET_ACTION_CYCLE(ch) CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->action_cycle))
+#define GET_ACTION_ROOM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->action_room))
+#define GET_ACTION_TIMER(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->action_timer))
+#define GET_ACTION_VNUM(ch, n)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->action_vnum[(n)]))
+#define GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->adventure_summon_return_location))
+#define GET_ADVENTURE_SUMMON_RETURN_MAP(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->adventure_summon_return_map))
 #define GET_ALIASES(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->aliases))
+#define GET_APPARENT_AGE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->apparent_age))
+#define GET_BAD_PWS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->bad_pws))
+#define GET_BONUS_TRAITS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->bonus_traits))
+#define GET_CLASS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->character_class))
+#define GET_CLASS_PROGRESSION(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->class_progression))
+#define GET_CLASS_ROLE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->class_role))
+#define GET_COMPUTED_LEVEL(ch)  (GET_SKILL_LEVEL(ch) + GET_GEAR_LEVEL(ch))
+#define GET_COND(ch, i)  CHECK_PLAYER_SPECIAL(REAL_CHAR(ch), (REAL_CHAR(ch)->player_specials->conditions[(i)]))
+#define GET_CONFUSED_DIR(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->confused_dir))
 #define GET_CREATION_ALT_ID(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->create_alt_id))
-#define GET_GEAR_LEVEL(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->gear_level))
-#define GET_LASTNAME(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->lastname))
-#define GET_LAST_TELL(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_tell))
-#define GET_MARK_LOCATION(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->marked_location))
-#define GET_GROUP_INVITE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->group_invite_by))
-#define GET_PLAYER_COINS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->coins))
-#define GET_PROMPT(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->prompt))
+#define GET_CREATION_HOST(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->creation_host))
+#define GET_CUSTOM_COLOR(ch, pos)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->custom_colors[(pos)]))
+#define GET_DAILY_BONUS_EXPERIENCE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->daily_bonus_experience))
+#define GET_DAILY_CYCLE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->daily_cycle))
+#define GET_DELAYED_LOAD_FILE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->delayed_load_file))
+#define GET_DISGUISED_NAME(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->disguised_name))
+#define GET_DISGUISED_SEX(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->disguised_sex))
+#define GET_EXP_TODAY(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->exp_today))
 #define GET_FIGHT_PROMPT(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->fight_prompt))
-#define GET_SLASH_CHANNELS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->slash_channels))
-#define GET_TITLE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->title))
+#define GET_FREE_SKILL_RESETS(ch, skill)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->skills[(skill)].resets))
+#define GET_GEAR_LEVEL(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->gear_level))
+#define GET_GRANT_FLAGS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->grants))
+#define GET_GROUP_INVITE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->group_invite_by))
+#define GET_HIGHEST_KNOWN_LEVEL(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->highest_known_level))
+#define GET_IGNORE_LIST(ch, pos)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->ignore_list[(pos)]))
+#define GET_IMMORTAL_LEVEL(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->immortal_level))
+#define GET_INVIS_LEV(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->invis_level))
+#define GET_LASTNAME(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->lastname))
+#define GET_LAST_CORPSE_ID(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_corpse_id))
+#define GET_LAST_DEATH_TIME(ch)  CHECK_PLAYER_SPECIAL(REAL_CHAR(ch), (REAL_CHAR(ch)->player_specials->last_death_time))
+#define GET_LAST_DIR(ch)  CHECK_PLAYER_SPECIAL(REAL_CHAR(ch), (REAL_CHAR(ch)->player_specials->last_direction))
+#define GET_LAST_KNOWN_LEVEL(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_known_level))
+#define GET_LAST_ROOM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_room))
+#define GET_LAST_TELL(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_tell))
+#define GET_LAST_TIP(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_tip))
+#define GET_LOADROOM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->load_room))
+#define GET_LOAD_ROOM_CHECK(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->load_room_check))
+#define GET_MAIL_PENDING(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->mail_pending))
+#define GET_MAPSIZE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->mapsize))
+#define GET_MARK_LOCATION(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->marked_location))
+#define GET_MORPH(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->morph))
+#define GET_MOUNT_FLAGS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->mount_flags))
+#define GET_MOUNT_VNUM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->mount_vnum))
 #define GET_OFFERS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->offers))
+#define GET_OLC_FLAGS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->olc_flags))
+#define GET_OLC_MAX_VNUM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->olc_max_vnum))
+#define GET_OLC_MIN_VNUM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->olc_min_vnum))
+#define GET_PC_CLASS(ch)  (IS_NPC(ch) ? 0 : GET_CLASS(ch))
+#define GET_PLAYER_COINS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->coins))
+#define GET_PLEDGE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->pledge))
+#define GET_PROMO_ID(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->promo_id))
+#define GET_PROMPT(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->prompt))
+#define GET_RANK(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->rank))
+#define GET_RECENT_DEATH_COUNT(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->recent_death_count))
+#define GET_REFERRED_BY(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->referred_by))
+#define GET_RESOURCE(ch, i)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->resources[i]))
+#define GET_REWARDED_TODAY(ch, pos)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->rewarded_today[(pos)]))
+#define GET_SKILL(ch, sk)  (IS_NPC(ch) ? 0 : CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->skills[sk].level)))
+#define GET_SKILL_EXP(ch, sk)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->skills[sk].exp))
+#define GET_SKILL_LEVEL(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->skill_level))
+#define GET_SLASH_CHANNELS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->slash_channels))
+#define GET_TEMPORARY_ACCOUNT_ID(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->temporary_account_id))
+#define GET_TITLE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->title))
+#define GET_TOMB_ROOM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->tomb_room))
+#define IS_DISGUISED(ch)  (!IS_NPC(ch) && PLR_FLAGGED((ch), PLR_DISGUISED))
+#define LOAD_SLASH_CHANNELS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->load_slash_channels))
+#define NOSKILL_BLOCKED(ch, skill)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->skills[(skill)].noskill))
 #define POOFIN(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->poofin))
 #define POOFOUT(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->poofout))
+#define PRF_FLAGS(ch)  CHECK_PLAYER_SPECIAL(REAL_CHAR(ch), (REAL_CHAR(ch)->player_specials->pref))
 #define REBOOT_CONF(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->reboot_conf))
 #define REREAD_EMPIRE_TECH_ON_LOGIN(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->reread_empire_tech_on_login))
 #define RESTORE_ON_LOGIN(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->restore_on_login))
-
-
-// ch->player_specials.saved: player_special_data_saved
-#define CAN_GAIN_NEW_SKILLS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.can_gain_new_skills))
-#define CAN_GET_BONUS_SKILLS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.can_get_bonus_skills))
-#define CREATION_ARCHETYPE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.creation_archetype))
-#define GET_ACCOUNT_ID(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.account_id))
-#define GET_ACTION(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.action))
-#define GET_ACTION_ROOM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.action_room))
-#define GET_ACTION_CYCLE(ch) CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.action_cycle))
-#define GET_ACTION_TIMER(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.action_timer))
-#define GET_ACTION_VNUM(ch, n)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.action_vnum[(n)]))
-#define GET_ADMIN_NOTES(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.admin_notes))
-#define GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.adventure_summon_return_location))
-#define GET_ADVENTURE_SUMMON_RETURN_MAP(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.adventure_summon_return_map))
-#define GET_APPARENT_AGE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.apparent_age))
-#define GET_BAD_PWS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.bad_pws))
-#define GET_BONUS_TRAITS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.bonus_traits))
-#define GET_CLASS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.character_class))
-#define GET_CLASS_PROGRESSION(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.class_progression))
-#define GET_CLASS_ROLE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.class_role))
-#define GET_COMPUTED_LEVEL(ch)  (GET_SKILL_LEVEL(ch) + GET_GEAR_LEVEL(ch))
-#define GET_COND(ch, i)  CHECK_PLAYER_SPECIAL(REAL_CHAR(ch), (REAL_CHAR(ch)->player_specials->saved.conditions[(i)]))
-#define GET_CONFUSED_DIR(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.confused_dir))
-#define GET_CREATION_HOST(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.creation_host))
-#define GET_CUSTOM_COLOR(ch, pos)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.custom_colors[(pos)]))
-#define GET_DAILY_CYCLE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.daily_cycle))
-#define GET_DISGUISED_NAME(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.disguised_name))
-#define GET_DISGUISED_SEX(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.disguised_sex))
-#define GET_EXP_TODAY(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.exp_today))
-#define GET_FREE_SKILL_RESETS(ch, skill)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.skills[(skill)].resets))
-#define GET_GRANT_FLAGS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.grants))
-#define GET_IGNORE_LIST(ch, pos)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.ignore_list[(pos)]))
-#define GET_IMMORTAL_LEVEL(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.immortal_level))
-#define GET_INVIS_LEV(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.invis_level))
-#define GET_LAST_CORPSE_ID(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.last_corpse_id))
-#define GET_LAST_DEATH_TIME(ch)  CHECK_PLAYER_SPECIAL(REAL_CHAR(ch), (REAL_CHAR(ch)->player_specials->saved.last_death_time))
-#define GET_LAST_DIR(ch)  CHECK_PLAYER_SPECIAL(REAL_CHAR(ch), (REAL_CHAR(ch)->player_specials->saved.last_direction))
-#define GET_LAST_KNOWN_LEVEL(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.last_known_level))
-#define GET_HIGHEST_KNOWN_LEVEL(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.highest_known_level))
-#define GET_LAST_ROOM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.last_room))
-#define GET_LAST_TIP(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.last_tip))
-#define GET_LOADROOM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.load_room))
-#define GET_LOAD_ROOM_CHECK(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.load_room_check))
-#define GET_EMPIRE_VNUM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.empire))
-#define GET_MAPSIZE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.mapsize))
-#define GET_MORPH(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.morph))
-#define GET_MOUNT_FLAGS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.mount_flags))
-#define GET_MOUNT_VNUM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.mount_vnum))
-#define GET_OLC_FLAGS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.olc_flags))
-#define GET_OLC_MAX_VNUM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.olc_max_vnum))
-#define GET_OLC_MIN_VNUM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.olc_min_vnum))
-#define GET_PC_CLASS(ch)  (IS_NPC(ch) ? 0 : GET_CLASS(ch))
-#define GET_PLEDGE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.pledge))
-#define GET_PROMO_ID(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.promo_id))
-#define GET_RANK(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.rank))
-#define GET_RECENT_DEATH_COUNT(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.recent_death_count))
-#define GET_REFERRED_BY(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.referred_by))
-#define GET_RESOURCE(ch, i)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.resources[i]))
-#define GET_REWARDED_TODAY(ch, pos)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.rewarded_today[(pos)]))
-#define GET_SKILL(ch, sk)  (IS_NPC(ch) ? 0 : CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.skills[sk].level)))
-#define GET_SKILL_EXP(ch, sk)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.skills[sk].exp))
-#define GET_SKILL_LEVEL(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.skill_level))
-#define GET_DAILY_BONUS_EXPERIENCE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.daily_bonus_experience))
-#define GET_STORED_SLASH_CHANNEL(ch, pos)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.slash_channels[(pos)]))
-#define GET_TOMB_ROOM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.tomb_room))
-#define IS_DISGUISED(ch)  (!IS_NPC(ch) && PLR_FLAGGED((ch), PLR_DISGUISED))
-#define NOSKILL_BLOCKED(ch, skill)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.skills[(skill)].noskill))
-#define PRF_FLAGS(ch)  CHECK_PLAYER_SPECIAL(REAL_CHAR(ch), (REAL_CHAR(ch)->player_specials->saved.pref))
-#define USING_POISON(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.using_poison))
+#define USING_POISON(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->using_poison))
 
 // helpers
-#define GET_LEVELS_GAINED_FROM_ABILITY(ch, ab)  ((!IS_NPC(ch) && (ab) >= 0 && (ab) <= NUM_ABILITIES) ? CHECK_PLAYER_SPECIAL((ch), (ch)->player_specials->saved.abilities[(ab)].levels_gained) : 0)
-#define HAS_ABILITY(ch, ab)  ((!IS_NPC(ch) && (ab) >= 0 && (ab) <= NUM_ABILITIES) ? CHECK_PLAYER_SPECIAL((ch), (ch)->player_specials->saved.abilities[(ab)].purchased) : FALSE)
+#define ACCOUNT_FLAGGED(ch, flag)  (!IS_NPC(ch) && GET_ACCOUNT(ch) && IS_SET(GET_ACCOUNT(ch)->flags, (flag)))
+#define GET_LEVELS_GAINED_FROM_ABILITY(ch, ab)  ((!IS_NPC(ch) && (ab) >= 0 && (ab) <= NUM_ABILITIES) ? CHECK_PLAYER_SPECIAL((ch), (ch)->player_specials->abilities[(ab)].levels_gained) : 0)
+#define HAS_ABILITY(ch, ab)  ((!IS_NPC(ch) && (ab) >= 0 && (ab) <= NUM_ABILITIES) ? CHECK_PLAYER_SPECIAL((ch), (ch)->player_specials->abilities[(ab)].purchased) : FALSE)
 #define HAS_BONUS_TRAIT(ch, flag)  (!IS_NPC(ch) && IS_SET(GET_BONUS_TRAITS(ch), (flag)))
 #define IS_AFK(ch)  (!IS_NPC(ch) && (PRF_FLAGGED((ch), PRF_AFK) || ((ch)->char_specials.timer * SECS_PER_MUD_HOUR / SECS_PER_REAL_MIN) >= 10))
 #define IS_GRANTED(ch, flag)  (!IS_NPC(ch) && IS_SET(GET_GRANT_FLAGS(ch), (flag)))
@@ -826,6 +829,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define PLR_FLAGGED(ch, flag)  (!REAL_NPC(ch) && IS_SET(PLR_FLAGS(ch), (flag)))
 #define PRF_FLAGGED(ch, flag)  (!REAL_NPC(ch) && IS_SET(PRF_FLAGS(ch), (flag)))
 #define OLC_FLAGGED(ch, flag)  (!IS_NPC(ch) && IS_SET(GET_OLC_FLAGS(ch), (flag)))
+#define SAVE_ACCOUNT(acct)  save_library_file_for_vnum(DB_BOOT_ACCT, (acct)->id)
 
 // definitions
 #define IS_HOSTILE(ch)  (!IS_NPC(ch) && (get_cooldown_time((ch), COOLDOWN_HOSTILE_FLAG) > 0 || get_cooldown_time((ch), COOLDOWN_ROGUE_FLAG) > 0))
@@ -1131,6 +1135,7 @@ void prune_crlf(char *txt);
 extern const char *skip_filler(char *string);
 void sprintbit(bitvector_t vektor, const char *names[], char *result, bool space);
 void sprinttype(int type, const char *names[], char *result);
+extern char *trim(char *string);
 
 // world functions in utils.c
 extern bool check_sunny(room_data *room);
@@ -1159,6 +1164,9 @@ extern bool is_in_city_for_empire(room_data *loc, empire_data *emp, bool check_w
 
 // utils from act.informative.c
 extern char *get_obj_desc(obj_data *obj, char_data *ch, int mode);
+
+// utils from act.item.c
+extern int obj_carry_size(obj_data *obj);
 
 // utils from limits.c
 extern bool can_teleport_to(char_data *ch, room_data *loc, bool check_owner);
@@ -1246,8 +1254,4 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options);
 //// CONSTS FOR UTILS.C //////////////////////////////////////////////////////
 
 // get_filename()
-#define CRASH_FILE  0
-#define ETEXT_FILE  1
-#define ALIAS_FILE  2
-#define LORE_FILE  4
-#define SCRIPT_VARS_FILE  5
+#define PLR_FILE  0

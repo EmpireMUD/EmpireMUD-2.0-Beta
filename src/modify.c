@@ -19,7 +19,6 @@
 #include "handler.h"
 #include "db.h"
 #include "comm.h"
-#include "mail.h"
 #include "boards.h"
 #include "olc.h"
 
@@ -150,9 +149,12 @@ void string_add(descriptor_data *d, char *str) {
 	extern char *stripcr(char *dest, const char *src);
 	extern int improved_editor_execute(descriptor_data *d, char *str);
 	
-	char_data *vict = NULL;
+	player_index_data *index;
+	struct mail_data *mail;
+	account_data *acct;
+	char_data *recip;
+	bool is_file;
 	int action;
-	bool file = FALSE;
 	FILE *fl;
 
 	delete_doubledollar(str);
@@ -214,7 +216,22 @@ void string_add(descriptor_data *d, char *str) {
 	if (action) {
 		if (STATE(d) == CON_PLAYING && PLR_FLAGGED(d->character, PLR_MAILING)) {
 			if (action == STRINGADD_SAVE && *d->str) {
-				store_mail(d->mail_to, GET_IDNUM(d->character), *d->str);
+				if ((index = find_player_index_by_idnum(d->mail_to)) && (recip = find_or_load_player(index->name, &is_file))) {
+					// create letter
+					CREATE(mail, struct mail_data, 1);
+					mail->from = GET_IDNUM(d->character);
+					mail->timestamp = time(0);
+					mail->body = str_dup(*d->str);
+					
+					// put it on the pile
+					mail->next = GET_MAIL_PENDING(recip);
+					GET_MAIL_PENDING(recip) = mail;
+					
+					if (is_file) {
+						store_loaded_char(recip);
+					}
+				}
+				
 				SEND_TO_Q("You tie your message to a pigeon and it flies away!\r\n", d);
 			}
 			else {
@@ -232,51 +249,19 @@ void string_add(descriptor_data *d, char *str) {
 		}
 		else if (d->notes_id > 0) {
 			if (action != STRINGADD_ABORT) {
-				// save if you can find the player
-				if (d->notes_id > 0 && (vict = find_or_load_player(get_name_by_id(d->notes_id), &file))) {
-					if (*d->str != NULL) {
-						strncpy(GET_ADMIN_NOTES(vict), *d->str, MAX_ADMIN_NOTES_LENGTH-1);
-						GET_ADMIN_NOTES(vict)[MAX_ADMIN_NOTES_LENGTH-1] = '\0';
-					}
-					else {
-						*GET_ADMIN_NOTES(vict) = '\0';
-					}
-					
-					syslog(SYS_GC, GET_INVIS_LEV(d->character), TRUE, "GC: %s has edited notes for %s", GET_NAME(d->character), GET_NAME(vict));
-										
-					// save now
-					if (file) {
-						store_loaded_char(vict);
-						file = FALSE;
-					}
-					else {
-						SAVE_CHAR(vict);
-					}
-				}
-				
-				// cleanup if needed
-				if (file && vict) {
-					free_char(vict);
-					vict = NULL;
-				}
-				
+				syslog(SYS_GC, GET_INVIS_LEV(d->character), TRUE, "GC: %s has edited notes for account %d", GET_NAME(d->character), d->notes_id);
 				SEND_TO_Q("Notes saved.\r\n", d);
 			}
 			else {
 				SEND_TO_Q("Edit aborted.\r\n", d);
 			}
 			
-			// d->str is always a copy; may have been freed already
-			if (d->str && *d->str) {
-				free(*d->str);
+			// save if possible -- even if aborted (if it was saved while we were editing, we need to overwrite with thet right thing)
+			if ((acct = find_account(d->notes_id))) {
+				SAVE_ACCOUNT(acct);
 			}
-			if (d->str) {
-				free(d->str);
-			}
-			d->str = NULL;
 			
-			act("$n stops editing notes.", TRUE, d->character, 0, 0, TO_ROOM);
-			STATE(d) = CON_PLAYING;
+			act("$n stops editing notes.", TRUE, d->character, FALSE, FALSE, TO_ROOM);
 		}
 		else if (d->file_storage) {
 			if (action != STRINGADD_ABORT) {

@@ -201,7 +201,7 @@ const int primary_attributes[] = { STRENGTH, CHARISMA, INTELLIGENCE, NOTHING };
 const int universal_wait = 1.25 RL_SEC;
 
 // lore cleanup -- terminate the list with a -1
-const int remove_lore_types[] = { LORE_PLAYER_KILL, LORE_PLAYER_DEATH, LORE_TOWER_DEATH, LORE_DEATH, -1 };
+const int remove_lore_types[] = { LORE_PLAYER_KILL, LORE_PLAYER_DEATH, LORE_TOWER_DEATH, -1 };
 
 // used in several places to represent the lowest to-hit a player could have
 const int base_hit_chance = 50;
@@ -1660,6 +1660,8 @@ void init_config_system(void) {
 	init_config(CONFIG_OTHER, "test_config", CONFTYPE_INT, "this is a test config");
 	
 	// players
+	init_config(CONFIG_PLAYERS, "delete_inactive_players_after", CONFTYPE_INT, "days to a player can be inactive before auto-delete (0 = never)");
+	init_config(CONFIG_PLAYERS, "delete_invalid_players_after", CONFTYPE_INT, "days to wait before deleting players with bad level data (0 = never)");
 	init_config(CONFIG_PLAYERS, "pool_bonus_amount", CONFTYPE_INT, "bonus trait amount for health/move/mana");
 	init_config(CONFIG_PLAYERS, "num_daily_skill_points", CONFTYPE_INT, "easy skillups per day");
 	init_config(CONFIG_PLAYERS, "num_bonus_trait_daily_skills", CONFTYPE_INT, "bonus trait for skillups");
@@ -1667,7 +1669,6 @@ void init_config_system(void) {
 	init_config(CONFIG_PLAYERS, "idle_linkdead_rent_time", CONFTYPE_INT, "how many ticks before a linkdead player is idle-rented");
 	init_config(CONFIG_PLAYERS, "max_capitals_in_name", CONFTYPE_INT, "how many uppercase letters can be in a player name (0 for unlimited)");
 	init_config(CONFIG_PLAYERS, "max_player_attribute", CONFTYPE_INT, "how high primary player attributes go");
-	init_config(CONFIG_PLAYERS, "obj_file_timeout", CONFTYPE_INT, "lifetime of normal player inventory files, in days");
 	init_config(CONFIG_PLAYERS, "remove_lore_after_years", CONFTYPE_INT, "game years to clean some lore types");
 	init_config(CONFIG_PLAYERS, "default_map_size", CONFTYPE_INT, "distance from the player that can be seen");
 	init_config(CONFIG_PLAYERS, "max_map_size", CONFTYPE_INT, "highest view radius a player may set");
@@ -1690,7 +1691,7 @@ void init_config_system(void) {
 	init_config(CONFIG_SYSTEM, "nameserver_is_slow", CONFTYPE_BOOL, "if enabled, system will not resolve numeric IPs");
 	init_config(CONFIG_SYSTEM, "max_filesize", CONFTYPE_INT, "maximum size of bug, typo and idea files in bytes (to prevent bombing)");
 	init_config(CONFIG_SYSTEM, "max_bad_pws", CONFTYPE_INT, "maximum number of password attempts before disconnection");
-	init_config(CONFIG_SYSTEM, "use_autowiz", CONFTYPE_BOOL, "if on, automatically generates the wizlist (unix only)");
+	init_config(CONFIG_SYSTEM, "use_autowiz", CONFTYPE_BOOL, "if on, automatically generates the wizlist");
 	init_config(CONFIG_SYSTEM, "siteok_everyone", CONFTYPE_BOOL, "flags players siteok on creation, essentially inverting ban logic");
 	init_config(CONFIG_SYSTEM, "log_losing_descriptor_without_char", CONFTYPE_BOOL, "somewhat spammy disconnect logs");
 

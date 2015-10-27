@@ -48,7 +48,6 @@
 */
 
 // external vars
-extern const struct mine_data_type mine_data[];
 
 // external funcs
 void scale_item_to_level(obj_data *obj, int level);
@@ -1233,31 +1232,10 @@ int land_can_claim(empire_data *emp, bool outside_only) {
 //// FILE UTILS //////////////////////////////////////////////////////////////
 
 /**
-* This initiates the autowiz program, which writes fresh wizlist files.
-*
-* TODO like many player-reading systems, this could be done internally
-* instead of with an external call.
-*
-* @param char_data *ch The player to check. Only runs autowiz if the player is a god.
-*/
-void check_autowiz(char_data *ch) {
-	if (GET_ACCESS_LEVEL(ch) >= LVL_GOD && config_get_bool("use_autowiz")) {
-		char buf[128];
-
-		sprintf(buf, "nice ../bin/autowiz %d %s %d %s %d &", LVL_START_IMM, WIZLIST_FILE, LVL_GOD, GODLIST_FILE, (int) getpid());
-
-		syslog(SYS_INFO, 0, TRUE, "Initiating autowiz.");
-		system(buf);
-	}
-}
-
-
-/**
 * Gets the filename/path for various name-divided file directories.
 *
 * @param char *orig_name The player name.
 * @param char *filename A variable to write the filename to.
-* @param int mode CRASH_FILE, ALIAS_FILE, etc.
 * @return int 1=success, 0=fail
 */
 int get_filename(char *orig_name, char *filename, int mode) {
@@ -1270,28 +1248,14 @@ int get_filename(char *orig_name, char *filename, int mode) {
 	}
 
 	switch (mode) {
-		case CRASH_FILE:
-			prefix = LIB_PLROBJS;
-			suffix = SUF_OBJS;
+		case PLR_FILE: {
+			prefix = LIB_PLAYERS;
+			suffix = SUF_PLR;
 			break;
-		case ALIAS_FILE:
-			prefix = LIB_PLRALIAS;
-			suffix = SUF_ALIAS;
-			break;
-		case ETEXT_FILE:
-			prefix = LIB_PLRTEXT;
-			suffix = SUF_TEXT;
-			break;
-		case LORE_FILE:
-			prefix = LIB_PLRLORE;
-			suffix = SUF_LORE;
-			break;
-		case SCRIPT_VARS_FILE:
-			prefix = LIB_PLRVARS;
-			suffix = SUF_MEM;
-			break;
-		default:
+		}
+		default: {
 			return (0);
+		}
 	}
 
 	strcpy(name, orig_name);
@@ -2340,26 +2304,40 @@ sector_data *find_first_matching_sector(bitvector_t with_flags, bitvector_t with
 * This converts data file entries into bitvectors, where they may be written
 * as "abdo" in the file, or as a number.
 *
+* - a-z are bits 1-26
+* - A-Z are bits 27-52
+* - !"#$%&'()*=, are bits 53-64
+*
 * @param char *flag The input string.
 * @return bitvector_t The bitvector.
 */
 bitvector_t asciiflag_conv(char *flag) {
 	bitvector_t flags = 0;
-	int is_number = 1;
-	register char *p;
+	bool is_number = TRUE;
+	char *p;
 
-	for (p = flag; *p; p++) {
-		if (islower(*p))
+	for (p = flag; *p; ++p) {
+		// skip numbers
+		if (isdigit(*p)) {
+			continue;
+		}
+		
+		is_number = FALSE;
+		
+		if (islower(*p)) {
 			flags |= BIT(*p - 'a');
-		else if (isupper(*p))
+		}
+		else if (isupper(*p)) {
 			flags |= BIT(26 + (*p - 'A'));
-
-		if (!isdigit(*p))
-			is_number = 0;
+		}
+		else {
+			flags |= BIT(52 + (*p - '!'));
+		}
 	}
 
-	if (is_number)
-		flags = strtoull(flag, NULL, 10); //atol(flag);
+	if (is_number) {
+		flags = strtoull(flag, NULL, 10);
+	}
 
 	return (flags);
 }
@@ -2402,6 +2380,10 @@ char *delete_doubledollar(char *string) {
 * files, e.g. "adoO", where each letter represents a bit starting with a=1.
 * If there are no bits, it returns the string "0".
 *
+* - bits 1-26 are lowercase a-z
+* - bits 27-52 are uppercase A-Z
+* - bits 53-64 are !"#$%&'()*=,
+*
 * @param bitvector_t flags The bitmask to convert to alpha.
 * @return char* The resulting string.
 */
@@ -2410,9 +2392,17 @@ char *bitv_to_alpha(bitvector_t flags) {
 	int iter, pos;
 	
 	pos = 0;
-	for (iter = 0; flags && iter <= 64; ++iter) {
+	for (iter = 0; flags && iter < 64; ++iter) {
 		if (IS_SET(flags, BIT(iter))) {
-			output[pos++] = (iter < 26) ? ('a' + iter) : ('A' + iter - 26);
+			if (iter < 26) {
+				output[pos++] = ('a' + iter);
+			}
+			else if (iter < 52) {
+				output[pos++] = ('A' + (iter - 26));
+			}
+			else if (iter < 64) {
+				output[pos++] = ('!' + (iter - 52));
+			}
 		}
 		
 		// remove so we exhaust flags
@@ -3111,6 +3101,35 @@ char *str_str(char *cs, char *ct) {
 }
 
 
+/**
+* Removes spaces (' ') from the end of a string, and returns a pointer to the
+* first non-space character.
+*
+* @param char *string The string to trim (will lose spaces at the end).
+* @return char* A pointer to the first non-space character in the string.
+*/
+char *trim(char *string) {
+	char *ptr = string;
+	int len;
+	
+	if (!string) {
+		return NULL;
+	}
+	
+	// trim start
+	while (*ptr == ' ') {
+		++ptr;
+	}
+	
+	// trim end
+	while ((len = strlen(ptr)) > 0 && ptr[len-1] == ' ') {
+		ptr[len-1] = '\0';
+	}
+	
+	return ptr;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// TYPE UTILS //////////////////////////////////////////////////////////////
 
@@ -3427,34 +3446,6 @@ room_data *find_load_room(char_data *ch) {
 
 
 /**
-* @param int type MINE_x
-* @return int position in mine_data[] or NOTHING
-*/
-int find_mine_type(int type) {
-	int iter, found = NOTHING;
-	
-	for (iter = 0; mine_data[iter].type != NOTHING && found == NOTHING; ++iter) {
-		if (mine_data[iter].type == type) {
-			found = iter;
-		}
-	}
-	
-	return found;
-}
-
-
-/**
-* @param int type a mine type
-* @return obj_vnum mine production vnum
-*/
-obj_vnum find_mine_vnum_by_type(int type) {
-	int t = find_mine_type(type);
-	obj_vnum vnum = (t != NOTHING ? mine_data[t].vnum : o_IRON_ORE);
-	return vnum;
-}
-
-
-/**
 * This determines if ch is close enough to a sect with certain flags.
 *
 * @param char_data *ch
@@ -3660,7 +3651,8 @@ int GET_ISLAND_ID(room_data *room) {
 * @return TRUE if the room has a deep mine set up
 */
 bool is_deep_mine(room_data *room) {
-	return (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) > mine_data[find_mine_type(get_room_extra_data(room, ROOM_EXTRA_MINE_TYPE))].max_amount);
+	struct global_data *glb = global_proto(get_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM));	
+	return glb ? (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) > GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE)) : FALSE;
 }
 
 
@@ -3934,10 +3926,9 @@ unsigned long long microtime(void) {
 * @param PLAYER_UPDATE_FUNC(*func)  A function pointer for the function to run on each player.
 */
 void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func)) {
-	struct char_file_u chdata;
+	player_index_data *index, *next_index;
 	descriptor_data *desc;
 	char_data *ch;
-	int pos;
 	bool is_file;
 	
 	// verify there are no characters at menus
@@ -3971,13 +3962,8 @@ void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func)) {
 	}
 
 	// ok, ready to roll
-	for (pos = 0; pos <= top_of_p_table; ++pos) {
-		// need chdata either way; check deleted here
-		if (load_char(player_table[pos].name, &chdata) <= NOBODY || IS_SET(chdata.char_specials_saved.act, PLR_DELETED)) {
-			continue;
-		}
-		
-		if (!(ch = find_or_load_player(player_table[pos].name, &is_file))) {
+	HASH_ITER(idnum_hh, player_table_by_idnum, index, next_index) {
+		if (!(ch = find_or_load_player(index->name, &is_file))) {
 			continue;
 		}
 		

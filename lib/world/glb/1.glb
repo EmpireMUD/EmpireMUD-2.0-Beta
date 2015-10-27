@@ -1,0 +1,50 @@
+#160
+copper mine~
+1 c v 0 0-0
+E
+-1 20.00
+40 0 0
+I 13 165 100.00 1  # MINE: some copper ore
+S
+#161
+silver mine~
+1 c v 0 0-0
+E
+-1 3.50
+25 0 0
+I 13 161 100.00 1  # MINE: a silver nugget
+S
+#162
+gold mine~
+1 c v 0 0-0
+E
+133 0.50
+20 0 0
+I 13 162 100.00 1  # MINE: a pile of gold dust
+S
+#163
+nocturinum mine~
+1 c v 0 0-0
+E
+133 1.50
+20 0 0
+I 13 163 100.00 1  # MINE: some nocturnium ore
+S
+#164
+imperium mine~
+1 c v 0 0-0
+E
+133 1.50
+20 0 0
+I 13 164 100.00 1  # MINE: some imperium ore
+S
+#199
+iron mine~
+1 c v 0 0-0
+E
+-1 100.00
+50 0 0
+I 13 162 1.00 1 c  # MINE: a pile of gold dust
+I 13 160 99.00 1 c  # MINE: some iron ore
+S
+$

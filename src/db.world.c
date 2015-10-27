@@ -293,7 +293,6 @@ room_data *create_room(void) {
 void delete_room(room_data *room, bool check_exits) {
 	void extract_pending_chars();
 	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
-	void Objsave_char(char_data *ch, int rent_code);
 	void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool full_abandon);
 	void relocate_players(room_data *room, room_data *to_room);
 
@@ -351,9 +350,9 @@ void delete_room(room_data *room, bool check_exits) {
 	for (c = ROOM_PEOPLE(room); c; c = next_c) {
 		next_c = c->next_in_room;
 		if (!IS_NPC(c)) {
-			Objsave_char(c, RENT_RENTED);
 			save_char(c, NULL);
 		}
+		extract_all_items(c);
 		extract_char(c);
 	}
 	extract_pending_chars();
@@ -504,44 +503,94 @@ void fill_trench(room_data *room) {
 
 
 /**
-* sets up mine data only if not set yet
+* Choose a mine type for a room. The 'ch' is optional, for ability
+* requirements.
 *
-* @param room_data *room The mountain/mine room to set up
-* @param char_data *ch Optional: for ability-checking (rare metals)
+* @param room_data *room The room to choose a mine type for.
+* @param char_data *ch The character setting up mine data (for abilities).
 */
 void init_mine(room_data *room, char_data *ch) {
-	extern const struct mine_data_type mine_data[];
-
-	int prc, roll, iter, found = NOTHING;
+	extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
 	
-	if (ROOM_CAN_MINE(room) && get_room_extra_data(room, ROOM_EXTRA_MINE_TYPE) == MINE_NOT_SET) {
-		roll = number(1, 10000);
-		prc = 0;
-		
-		for (iter = 0; mine_data[iter].type != NOTHING && found == NOTHING; ++iter) {
-			if (mine_data[iter].ability == NO_ABIL || (ch && HAS_ABILITY(ch, mine_data[iter].ability))) {
-				// add to old prc to see if we're in the "next X percent"
-				prc += (int)(mine_data[iter].chance * 100);
-
-				if (mine_data[iter].chance == -1 || roll <= prc) {
-					found = iter;
-				}
-			}
-		}
+	struct global_data *glb, *next_glb;
+	bool done_cumulative = FALSE;
+	int cumulative_prc;
+	adv_data *adv;
+	
+	// no work
+	if (!room || !ROOM_CAN_MINE(room) || get_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM) > 0) {
+		return;
 	}
 	
-	if (found != NOTHING) {
-		set_room_extra_data(room, ROOM_EXTRA_MINE_TYPE, mine_data[found].type);
-		set_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT, number(mine_data[found].min_amount, mine_data[found].max_amount));
+	adv = (GET_ROOM_TEMPLATE(room) ? get_adventure_for_vnum(GET_RMT_VNUM(GET_ROOM_TEMPLATE(room))) : NULL);
+	cumulative_prc = number(1, 10000);
+
+	HASH_ITER(hh, globals_table, glb, next_glb) {
+		if (GET_GLOBAL_TYPE(glb) != GLOBAL_MINE_DATA) {
+			continue;
+		}
+		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_IN_DEVELOPMENT)) {
+			continue;
+		}
+		if (GET_GLOBAL_ABILITY(glb) != NO_ABIL && (!ch || !HAS_ABILITY(ch, GET_GLOBAL_ABILITY(glb)))) {
+			continue;
+		}
+		
+		// level limits
+		if (GET_GLOBAL_MIN_LEVEL(glb) > 0 && (!ch || GET_COMPUTED_LEVEL(ch) < GET_GLOBAL_MIN_LEVEL(glb))) {
+			continue;
+		}
+		if (GET_GLOBAL_MAX_LEVEL(glb) > 0 && ch && GET_COMPUTED_LEVEL(ch) > GET_GLOBAL_MAX_LEVEL(glb)) {
+			continue;
+		}
+		
+		// match ALL type-flags
+		if ((GET_SECT_FLAGS(ROOM_ORIGINAL_SECT(room)) & GET_GLOBAL_TYPE_FLAGS(glb)) != GET_GLOBAL_TYPE_FLAGS(glb)) {
+			continue;
+		}
+		// match ZERO type-excludes
+		if ((GET_SECT_FLAGS(ROOM_ORIGINAL_SECT(room)) & GET_GLOBAL_TYPE_EXCLUDE(glb)) != 0) {
+			continue;
+		}
+		
+		// check adventure-only -- late-matching because it does more work than other conditions
+		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_ADVENTURE_ONLY) && get_adventure_for_vnum(GET_GLOBAL_VNUM(glb)) != adv) {
+			continue;
+		}
+		
+		// percent checks last
+		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_CUMULATIVE_PERCENT)) {
+			if (done_cumulative) {
+				continue;
+			}
+			cumulative_prc -= (int)(GET_GLOBAL_PERCENT(glb) * 100);
+			if (cumulative_prc <= 0) {
+				done_cumulative = TRUE;
+			}
+			else {
+				continue;	// not this time
+			}
+		}
+		else if (number(1, 10000) > (int)(GET_GLOBAL_PERCENT(glb) * 100)) {
+			// normal not-cumulative percent
+			continue;
+		}
+		
+		// we have a match!
+		set_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM, GET_GLOBAL_VNUM(glb));
+		set_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT, number(GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE) / 2, GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE)));
 		
 		if (ch && HAS_ABILITY(ch, ABIL_DEEP_MINES)) {
 			multiply_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT, 1.5);
 			gain_ability_exp(ch, ABIL_DEEP_MINES, 15);
 		}
 		
-		if (ch && mine_data[found].ability != NO_ABIL) {
-			gain_ability_exp(ch, mine_data[found].ability, 75);
+		if (ch && GET_GLOBAL_ABILITY(glb) != NO_ABIL) {
+			gain_ability_exp(ch, GET_GLOBAL_ABILITY(glb), 75);
 		}
+		
+		// can only use first match
+		break;
 	}
 }
 
@@ -776,7 +825,7 @@ static void annual_update_map_tile(room_data *room) {
 
 	// clean mine data from anything that's not currently a mine
 	if (!ROOM_BLD_FLAGGED(room, BLD_MINE)) {
-		remove_room_extra_data(room, ROOM_EXTRA_MINE_TYPE);
+		remove_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM);
 		remove_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT);
 	}
 }

@@ -353,7 +353,7 @@ ACMD(do_hit) {
 		}
 	}
 	else if (can_fight(ch, vict)) {
-		if (AFF_FLAGGED(ch, AFF_CHARM) && !IS_NPC(ch->master) && !IS_NPC(vict))
+		if (AFF_FLAGGED(ch, AFF_CHARM) && ch->master && !IS_NPC(ch->master) && !IS_NPC(vict))
 			return;
 
 		if (FIGHTING(ch) == vict) {
@@ -430,7 +430,7 @@ ACMD(do_shoot) {
 	else if (FIGHTING(ch))
 		msg_to_char(ch, "You're already fighting for your life!\r\n");
 	else if (can_fight(ch, vict)) {
-		if (AFF_FLAGGED(ch, AFF_CHARM) && !IS_NPC(ch->master) && !IS_NPC(vict))
+		if (AFF_FLAGGED(ch, AFF_CHARM) && ch->master && !IS_NPC(ch->master) && !IS_NPC(vict))
 			return;
 
 		msg_to_char(ch, "You take aim.\r\n");
@@ -506,8 +506,8 @@ ACMD(do_stake) {
 		if (!IS_VAMPIRE(victim)) {
 			if (!IS_NPC(victim)) {
 				death_log(victim, ch, ATTACK_EXECUTE);
-				add_lore(ch, LORE_PLAYER_KILL, GET_IDNUM(victim));
-				add_lore(victim, LORE_PLAYER_DEATH, GET_IDNUM(ch));
+				add_lore(ch, LORE_PLAYER_KILL, "Killed %s in battle", PERS(victim, victim, TRUE));
+				add_lore(victim, LORE_PLAYER_DEATH, "Slain by %s in battle", PERS(ch, ch, TRUE));
 			}
 			die(victim, ch);	// returns a corpse but we don't need it
 		}

@@ -117,6 +117,8 @@ test_config 0
 * Players configs
 blood_starvation_level 20
 default_map_size 7
+delete_inactive_players_after 0
+delete_invalid_players_after 30
 idle_linkdead_rent_time 5
 idle_rent_time 20
 max_capitals_in_name 2
@@ -124,7 +126,6 @@ max_map_size 12
 max_player_attribute 15
 num_bonus_trait_daily_skills 5
 num_daily_skill_points 15
-obj_file_timeout 365
 offer_time 75
 pool_bonus_amount 15
 remove_lore_after_years 2

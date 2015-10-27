@@ -306,7 +306,7 @@ void make_vampire(char_data *ch, bool lore) {
 		GET_BLOOD(ch) = 30;
 	
 		if (lore) {
-			add_lore(ch, LORE_START_VAMPIRE, -1);
+			add_lore(ch, LORE_START_VAMPIRE, "Sired");
 		}
 	
 		SAVE_CHAR(ch);
@@ -347,8 +347,8 @@ void sire_char(char_data *ch, char_data *victim) {
 		msg_to_char(victim, "You sit up quickly, nearly knocking over your sire!\r\n");
 		act("$n sits up quickly!", FALSE, victim, 0, 0, TO_ROOM);
 
-		add_lore(victim, LORE_SIRE_VAMPIRE, GET_IDNUM(ch));
-		add_lore(ch, LORE_MAKE_VAMPIRE, GET_IDNUM(victim));
+		add_lore(victim, LORE_SIRE_VAMPIRE, "Sired by %s", PERS(ch, ch, TRUE));
+		add_lore(ch, LORE_MAKE_VAMPIRE, "Sired %s", PERS(victim, victim, TRUE));
 
 		/* Turn off that SIRING action */
 		GET_ACTION(ch) = ACT_NONE;
@@ -454,7 +454,7 @@ void un_vampire(char_data *ch) {
 	void clear_char_abilities(char_data *ch, int skill);
 
 	if (!IS_NPC(ch)) {
-		add_lore(ch, LORE_PURIFY, -1);
+		add_lore(ch, LORE_PURIFY, "Purified");
 		REMOVE_BIT(PLR_FLAGS(ch), PLR_VAMPIRE);
 		GET_BLOOD(ch) = GET_MAX_BLOOD(ch);
 		clear_char_abilities(ch, SKILL_VAMPIRE);
@@ -515,8 +515,8 @@ void update_biting_char(char_data *ch) {
 		msg_to_char(victim, "You are dead! Sorry...\r\n");
 		if (!IS_NPC(victim)) {
 			death_log(victim, ch, ATTACK_EXECUTE);
-			add_lore(ch, LORE_PLAYER_KILL, GET_IDNUM(victim));
-			add_lore(victim, LORE_PLAYER_DEATH, GET_IDNUM(ch));
+			add_lore(ch, LORE_PLAYER_KILL, "Killed %s", PERS(victim, victim, TRUE));
+			add_lore(victim, LORE_PLAYER_DEATH, "Slain by %s", PERS(ch, ch, TRUE));
 		}
 
 		GET_FED_ON_BY(victim) = NULL;

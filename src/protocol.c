@@ -2567,7 +2567,7 @@ static const char *GetMSSP_DB_Size() {
 	int size = 0;
 
 	// we're not 100% sure what counts toward DB Size, but here is a rough guess
-	size += top_of_p_table + 1;
+	size += HASH_CNT(idnum_hh, player_table_by_idnum);
 	size += HASH_COUNT(empire_table);
 	size += HASH_COUNT(mobile_table);
 	size += HASH_COUNT(object_table);

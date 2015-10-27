@@ -87,6 +87,7 @@ extern struct interaction_item *copy_interaction_list(struct interaction_item *i
 extern struct spawn_info *copy_spawn_list(struct spawn_info *input_list);
 extern int find_olc_type(char *name);
 extern bool player_can_olc_edit(char_data *ch, int type, any_vnum vnum);
+extern double olc_process_double(char_data *ch, char *argument, char *name, char *command, double min, double max, double old_value);
 extern bitvector_t olc_process_flag(char_data *ch, char *argument, char *name, char *command, const char **flag_names, bitvector_t existing_bits);
 extern int olc_process_number(char_data *ch, char *argument, char *name, char *command, int min, int max, int old_value);
 void olc_process_string(char_data *ch, char *argument, char *name, char **save_point);

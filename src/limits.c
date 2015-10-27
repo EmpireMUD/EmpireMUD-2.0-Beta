@@ -588,7 +588,6 @@ void real_update_char(char_data *ch) {
 			msg_to_char(ch, "You die from your wounds!\r\n");
 			act("$n falls down, dead.", FALSE, ch, 0, 0, TO_ROOM);
 			death_log(ch, ch, TYPE_SUFFERING);
-			add_lore(ch, LORE_DEATH, 0);
 			die(ch, ch);
 			return;
 		}

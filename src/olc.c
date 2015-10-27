@@ -122,6 +122,8 @@ OLC_MODULE(cropedit_ymax);
 OLC_MODULE(cropedit_ymin);
 
 // global modules
+OLC_MODULE(gedit_ability);
+OLC_MODULE(gedit_capacity);
 OLC_MODULE(gedit_flags);
 OLC_MODULE(gedit_interaction);
 OLC_MODULE(gedit_maxlevel);
@@ -129,6 +131,9 @@ OLC_MODULE(gedit_minlevel);
 OLC_MODULE(gedit_mobexclude);
 OLC_MODULE(gedit_mobflags);
 OLC_MODULE(gedit_name);
+OLC_MODULE(gedit_percent);
+OLC_MODULE(gedit_sectorexclude);
+OLC_MODULE(gedit_sectorflags);
 OLC_MODULE(gedit_type);
 
 // mob edit modules
@@ -384,6 +389,8 @@ const struct olc_command_data olc_data[] = {
 	{ "ymin", cropedit_ymin, OLC_CROP, OLC_CF_EDITOR },
 	
 	// globals commands
+	{ "ability", gedit_ability, OLC_GLOBAL, OLC_CF_EDITOR },
+	{ "capacity", gedit_capacity, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "flags", gedit_flags, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "interaction", gedit_interaction, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "maxlevel", gedit_maxlevel, OLC_GLOBAL, OLC_CF_EDITOR },
@@ -391,6 +398,9 @@ const struct olc_command_data olc_data[] = {
 	{ "mobexclude", gedit_mobexclude, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "mobflags", gedit_mobflags, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "name", gedit_name, OLC_GLOBAL, OLC_CF_EDITOR },
+	{ "percent", gedit_percent, OLC_GLOBAL, OLC_CF_EDITOR },
+	{ "sectorexclude", gedit_sectorexclude, OLC_GLOBAL, OLC_CF_EDITOR },
+	{ "sectorflags", gedit_sectorflags, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "type", gedit_type, OLC_GLOBAL, OLC_CF_EDITOR },
 	
 	// mob commands
@@ -2648,6 +2658,45 @@ char *prompt_olc_info(char_data *ch) {
 	
 	snprintf(output, sizeof(output), "%c%d", LOWER(typename[0]), GET_OLC_VNUM(ch->desc));
 	return output;
+}
+
+
+/**
+* Generic processor for doubles/floats/percents in olc:
+* 
+* @param char_data *ch The player using OLC.
+* @param char *argument The argument the player entered.
+* @param char *name The display name of the item, e.g. "decay timer".
+* @param char *command The command typed to set this, e.g. "timer". (optional)
+* @param double min The minimum legal value.
+* @param double max The maximum legal value.
+* @param double old_value The previous value of the item (in case of no change).
+* @return double The new value to set the item to.
+*/
+double olc_process_double(char_data *ch, char *argument, char *name, char *command, double min, double max, double old_value) {
+	double val = atof(argument);
+	
+	if (!*argument) {
+		msg_to_char(ch, "Set the %s to what?\r\n", name);
+	}
+	else if (!isdigit(*argument) && ((*argument != '-' && *argument != '.') || !isdigit(argument[1]))) {
+		msg_to_char(ch, "Invalid setting. Please choose a decimal number.\r\n");
+	}
+	else if (val < min || val > max) {
+		msg_to_char(ch, "You must choose a value between %.2f and %.2f.\r\n", min, max);
+	}
+	else {
+		if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+			send_config_msg(ch, "ok_string");
+		}
+		else {
+			msg_to_char(ch, "You set the %s to %.2f.\r\n", name, val);
+		}
+		return val;
+	}
+	
+	// fall-through
+	return old_value;
 }
 
 

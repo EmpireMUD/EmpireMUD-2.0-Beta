@@ -74,7 +74,7 @@ bool add_ignore(char_data *ch, int idnum) {
 	bool found = FALSE;
 	
 	for (iter = 0; iter < MAX_IGNORES && !found; ++iter) {
-		if (GET_IGNORE_LIST(ch, iter) == 0 || !get_name_by_id(GET_IGNORE_LIST(ch, iter))) {
+		if (GET_IGNORE_LIST(ch, iter) == 0 || !find_player_index_by_idnum(GET_IGNORE_LIST(ch, iter))) {
 			GET_IGNORE_LIST(ch, iter) = idnum;
 			found = TRUE;
 		}
@@ -243,6 +243,9 @@ void process_add_to_channel_history(struct channel_history_data **history, char 
 		// remove the first one
 		old = *history;
 		*history = old->next;
+		if (old->message) {
+			free(old->message);
+		}
 		free(old);
 	}
 }
@@ -288,7 +291,7 @@ ACMD(do_pub_comm) {
 	if (AFF_FLAGGED(ch, AFF_CHARM) && !ch->desc) {
 		msg_to_char(ch, "You can't %s.\r\n", pub_comm[subcmd].name);
 	}
-	else if (PLR_FLAGGED(ch, PLR_MUTED)) {
+	else if (ACCOUNT_FLAGGED(ch, ACCT_MUTED)) {
 		msg_to_char(ch, "You are muted and can't use the %s channel.\r\n", pub_comm[subcmd].name);
 	}
 	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_SILENT) && pub_comm[subcmd].type != PUB_COMM_OOC) {
@@ -457,14 +460,6 @@ ACMD(do_pub_comm) {
 // this can be turned on to prevent spammy channel joins on reboot
 bool global_mute_slash_channel_joins = FALSE;
 
-// data type
-struct slash_channel {
-	int id;
-	char *name;
-	char color;
-	struct slash_channel *next;
-};
-
 // local vars
 struct slash_channel *slash_channel_list = NULL;	// master list
 int top_slash_channel_id = 0;
@@ -603,24 +598,6 @@ struct player_slash_channel *find_on_slash_channel(char_data *ch, int id) {
 }
 
 
-/**
-* This removes a stored slash-channel, when a character leaves it.
-*
-* @param char_data *ch Player to remove the slash channel from.
-* @param char *name Name of the slash-channel.
-*/
-void remove_stored_slash_channel(char_data *ch, char *name) {
-	int iter;
-	
-	for (iter = 0; iter < MAX_SLASH_CHANNELS; ++iter) {
-		if (!str_cmp(name, GET_STORED_SLASH_CHANNEL(ch, iter))) {
-			// remove name from list of stored slash channels
-			*GET_STORED_SLASH_CHANNEL(ch, iter) = '\0';
-		}
-	}
-}
-
-
 void speak_on_slash_channel(char_data *ch, struct slash_channel *chan, char *argument) {
 	struct player_slash_channel *slash;
 	char lbuf[MAX_STRING_LENGTH], invis_string[10];
@@ -629,7 +606,7 @@ void speak_on_slash_channel(char_data *ch, struct slash_channel *chan, char *arg
 	char color;
 	bool emote = FALSE;
 
-	if (PLR_FLAGGED(ch, PLR_MUTED)) {
+	if (ACCOUNT_FLAGGED(ch, ACCT_MUTED)) {
 		msg_to_char(ch, "You can't do that while muted.\r\n");
 		return;
 	}
@@ -700,39 +677,6 @@ void speak_on_slash_channel(char_data *ch, struct slash_channel *chan, char *arg
 				process_add_to_channel_history(&(slash->history), desc->last_act_message);
 			}
 		}
-	}
-}
-
-
-/**
-* Stores a slash-channel to the character, if there is a free slot. This will
-* also prevent duplicates by making sure the player is does not already have
-* the channel stored.
-*
-* This fails if there are no free slots to store a slash channel, meaning the
-* character would not auto-join it next time they log in.
-*
-* @param char_data *ch Player to store to.
-* @param char *name Name of the slash-channel.
-*/
-void store_slash_channel(char_data *ch, char *name) {
-	int iter, free_pos = NOTHING;
-	bool found = FALSE;
-	
-	// already on it?
-	for (iter = 0; iter < MAX_SLASH_CHANNELS; ++iter) {
-		if (free_pos == NOTHING && !*GET_STORED_SLASH_CHANNEL(ch, iter)) {
-			free_pos = iter;
-		}
-		else if (!str_cmp(name, GET_STORED_SLASH_CHANNEL(ch, iter))) {
-			found = TRUE;
-		}
-	}
-	
-	// add channel?
-	if (!found && free_pos != NOTHING) {
-		strncpy(GET_STORED_SLASH_CHANNEL(ch, free_pos), name, MAX_SLASH_CHANNEL_NAME_LENGTH-1);
-		GET_STORED_SLASH_CHANNEL(ch, free_pos)[MAX_SLASH_CHANNEL_NAME_LENGTH-1] = '\0';
 	}
 }
 
@@ -849,8 +793,6 @@ ACMD(do_slash_channel) {
 			GET_SLASH_CHANNELS(ch) = slash;
 			slash->id = chan->id;
 			
-			store_slash_channel(ch, chan->name);
-			
 			// announce it (this also messages the player)
 			if (!global_mute_slash_channel_joins) {
 				msg_to_char(ch, "You join \t%c/%s\tn.\r\n", chan->color, chan->name);
@@ -874,8 +816,6 @@ ACMD(do_slash_channel) {
 			if (GET_INVIS_LEV(ch) <= LVL_APPROVED) {
 				announce_to_slash_channel(chan, "%s has left the channel", PERS(ch, ch, TRUE));
 			}
-			
-			remove_stored_slash_channel(ch, chan->name);
 			
 			while ((slash = find_on_slash_channel(ch, chan->id))) {
 				REMOVE_FROM_LIST(slash, GET_SLASH_CHANNELS(ch), next);
@@ -1043,6 +983,7 @@ ACMD(do_history) {
 
 ACMD(do_ignore) {
 	int iter, found_pos, total_ignores;
+	player_index_data *index;
 	char_data *victim;
 	bool found;
 	
@@ -1052,11 +993,11 @@ ACMD(do_ignore) {
 	found_pos = NOTHING;
 	total_ignores = 0;
 	for (iter = 0; iter < MAX_IGNORES && found_pos == NOTHING; ++iter) {
-		if (GET_IGNORE_LIST(ch, iter) != 0 && get_name_by_id(GET_IGNORE_LIST(ch, iter))) {
+		if (GET_IGNORE_LIST(ch, iter) != 0 && find_player_index_by_idnum(GET_IGNORE_LIST(ch, iter))) {
 			++total_ignores;
 			
 			// is this the one they typed?
-			if (*arg && !str_cmp(arg, get_name_by_id(GET_IGNORE_LIST(ch, iter)))) {
+			if (*arg && (index = find_player_index_by_idnum(GET_IGNORE_LIST(ch, iter))) && !str_cmp(arg, index->name)) {
 				found_pos = iter;
 			}
 		}
@@ -1071,8 +1012,8 @@ ACMD(do_ignore) {
 		
 		found = FALSE;
 		for (iter = 0; iter < MAX_IGNORES; ++iter) {
-			if (GET_IGNORE_LIST(ch, iter) != 0 && get_name_by_id(GET_IGNORE_LIST(ch, iter))) {
-				msg_to_char(ch, " %s\r\n", CAP(get_name_by_id(GET_IGNORE_LIST(ch, iter))));
+			if (GET_IGNORE_LIST(ch, iter) != 0 && (index = find_player_index_by_idnum(GET_IGNORE_LIST(ch, iter)))) {
+				msg_to_char(ch, " %s\r\n", index->fullname);
 				found = TRUE;
 			}
 		}
@@ -1083,7 +1024,7 @@ ACMD(do_ignore) {
 	}
 	else if (found_pos != NOTHING) {
 		// remove it
-		msg_to_char(ch, "You are no longer ignoring %s.\r\n", (get_name_by_id(GET_IGNORE_LIST(ch, found_pos)) ? get_name_by_id(GET_IGNORE_LIST(ch, found_pos)) : "Someone"));
+		msg_to_char(ch, "You are no longer ignoring %s.\r\n", (index = find_player_index_by_idnum(GET_IGNORE_LIST(ch, found_pos))) ? index->fullname : "Someone");
 		remove_ignore(ch, GET_IGNORE_LIST(ch, found_pos));
 	}
 	else if (!(victim = get_player_vis(ch, arg, FIND_CHAR_WORLD | FIND_NO_DARK))) {
@@ -1170,7 +1111,7 @@ ACMD(do_recolor) {
 	else if (!*arg) {
 		msg_to_char(ch, "Usage: recolor <type> <color code>\r\n");
 		msg_to_char(ch, "Your custom colors are set to:\r\n");
-		for (iter = 0; *custom_color_types[iter] != '\n' && iter < MAX_CUSTOM_COLORS; ++iter) {
+		for (iter = 0; *custom_color_types[iter] != '\n' && iter < NUM_CUSTOM_COLORS; ++iter) {
 			if (GET_CUSTOM_COLOR(ch, iter)) {
 				msg_to_char(ch, " %s: \t&%c\r\n", custom_color_types[iter], GET_CUSTOM_COLOR(ch, iter));
 			}

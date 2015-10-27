@@ -244,6 +244,18 @@ const struct archetype_type archetype[] = {
 };
 
 
+// ACCT_x: Account flags
+const char *account_flags[] = {
+	"FROZEN",
+	"MUTED",
+	"SITEOK",
+	"!TITLE",
+	"MULTI-IP",
+	"MULTI-CHAR",
+	"\n"
+};
+
+
 // BONUS_x
 const char *bonus_bits[] = {
 	"STRENGTH",
@@ -288,6 +300,15 @@ const char *bonus_bit_descriptions[] = {
 };
 
 
+// COND_x: player conditions
+const char *condition_types[] = {
+	"Drunk",
+	"Full",
+	"Thirst",
+	"\n"
+};
+
+
 // CUSTOM_COLOR_x
 const char *custom_color_types[] = {
 	"emote",
@@ -298,6 +319,24 @@ const char *custom_color_types[] = {
 	"slash-channels",
 	"tell",
 	"status",
+	"\n"
+};
+
+
+// ATT_x: extra attributes
+const char *extra_attribute_types[] = {
+	"Bonus-Inventory",
+	"Resist-Physical",
+	"Block",
+	"To-Hit",
+	"Dodge",
+	"Extra-Blood",	// 5
+	"Bonus-Physical",
+	"Bonus-Magical",
+	"Bonus-Healing",
+	"Heal-Over-Time",
+	"Resist-Magical",	// 10
+	"Crafting-Bonus",
 	"\n"
 };
 
@@ -341,20 +380,21 @@ const char *grant_bits[] = {
 	"slay",
 	"island",	// 35
 	"oset",
+	"playerdelete",
 	"\n"
 };
 
 
 /* PLR_x */
 const char *player_bits[] = {
-	"FROZEN",
+		"UNUSED",
 	"WRITING",
 	"MAILING",
 	"DONTSET",
-	"SITEOK",
-	"MUTED",
-	"NOTITLE",
-	"DELETED",
+		"UNUSED",
+		"UNUSED",
+		"UNUSED",
+		"UNUSED",
 	"LOADRM",
 	"!WIZL",
 	"!DEL",
@@ -362,7 +402,7 @@ const char *player_bits[] = {
 	"IPMASK",
 	"DISGUISED",
 	"VAMPIRE",
-	"MULTI",
+		"UNUSED",
 	"NEEDS-NEWBIE-SETUP",
 	"!RESTICT",
 	"KEEP-LOGIN",
@@ -2156,6 +2196,7 @@ const char *room_extra_types[] = {
 	"found time",
 	"redesignate time",
 	"ceded",
+	"mine global vnum",
 	"\n"
 };
 
@@ -2490,22 +2531,6 @@ const struct fishing_data_type fishing_data[] = {
 };
 
 
-// master mines data
-const struct mine_data_type mine_data[] = {
-	// type, name, vnum, min amt, max amt, chance, ability
-	{ MINE_COPPER, "copper", o_COPPER, 20, 40, 20.0, NO_ABIL },
-	{ MINE_SILVER, "silver", o_SILVER, 15, 25, 3.5, NO_ABIL },
-	{ MINE_GOLD, "gold", o_GOLD, 10, 20, 0.5, ABIL_RARE_METALS },
-	{ MINE_NOCTURNIUM, "nocturnium", o_NOCTURNIUM_ORE, 10, 20, 1.5, ABIL_RARE_METALS },
-	{ MINE_IMPERIUM, "imperium", o_IMPERIUM_ORE, 10, 20, 1.5, ABIL_RARE_METALS },
-	
-	// put this as last real entry, since it's "default" if the others miss (-1 chance means "always")
-	{ MINE_IRON, "iron", o_IRON_ORE, 30, 50, -1, NO_ABIL },
-	
-	{ NOTHING, "\n", NOTHING, 0, 0, 0, NO_ABIL }
-};
-
-
 // for do_smelt
 const struct smelt_data_type smelt_data[] = {
 	// from, amt			to, amt					workforce?
@@ -2743,6 +2768,7 @@ const char *fill_words[] = {
 // GLOBAL_x types
 const char *global_types[] = {
 	"Mob Interactions",
+	"Mine Data",
 	"\n"
 };
 
@@ -2751,6 +2777,7 @@ const char *global_types[] = {
 const char *global_flags[] = {
 	"IN-DEVELOPMENT",
 	"ADVENTURE-ONLY",
+	"CUMULATIVE-PRC",
 	"\n"
 };
 
@@ -2770,6 +2797,7 @@ const char *interact_types[] = {
 	"ENCOUNTER",
 	"LIGHT",
 	"PICKPOCKET",
+	"MINE",
 	"\n"
 };
 
@@ -2788,7 +2816,8 @@ const int interact_attach_types[NUM_INTERACTS] = {
 	TYPE_ROOM,
 	TYPE_ROOM,
 	TYPE_OBJ,	// light
-	TYPE_MOB	// pickpocket
+	TYPE_MOB,	// pickpocket
+	TYPE_MINE_DATA	// mine
 };
 
 
@@ -2806,7 +2835,8 @@ const byte interact_vnum_types[NUM_INTERACTS] = {
 	TYPE_OBJ,
 	TYPE_MOB,	// encounter
 	TYPE_OBJ,
-	TYPE_OBJ	// pickpocket
+	TYPE_OBJ,
+	TYPE_OBJ	// mine
 };
 
 
