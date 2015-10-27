@@ -1314,12 +1314,10 @@ void do_chore_maintenance(empire_data *emp, room_data *room) {
 INTERACTION_FUNC(one_mining_chore) {
 	empire_data *emp = ROOM_OWNER(inter_room);
 	struct global_data *mine;
-	bool any = FALSE;
 	obj_data *proto;
-	int iter;
 	
 	// no mine
-	if (get_room_extra_data(inter_room, ROOM_EXTRA_MINE_AMOUNT) < 0 || !(mine = global_proto(get_room_extra_data(inter_room, ROOM_EXTRA_MINE_GLB_VNUM)))) {
+	if (!(mine = global_proto(get_room_extra_data(inter_room, ROOM_EXTRA_MINE_GLB_VNUM)))) {
 		return FALSE;
 	}
 	
@@ -1327,7 +1325,7 @@ INTERACTION_FUNC(one_mining_chore) {
 	proto = obj_proto(interaction->vnum);
 	
 	// check vars and limits
-	if (!emp || !proto || proto->storage || can_gain_chore_resource(emp, inter_room, interaction->vnum)) {
+	if (!emp || !proto || !proto->storage || !can_gain_chore_resource(emp, inter_room, interaction->vnum)) {
 		return FALSE;
 	}
 	
@@ -1336,14 +1334,11 @@ INTERACTION_FUNC(one_mining_chore) {
 	
 	// mine ~ every sixth time
 	if (!number(0, 5)) {
-		for (iter = 0; iter < interaction->quantity && get_room_extra_data(inter_room, ROOM_EXTRA_MINE_AMOUNT) > 0; ++iter) {
-			add_to_room_extra_data(inter_room, ROOM_EXTRA_MINE_AMOUNT, -1);
-			add_to_empire_storage(emp, GET_ISLAND_ID(inter_room), interaction->vnum, 1);
+		if (interaction->quantity > 0) {
+			add_to_room_extra_data(inter_room, ROOM_EXTRA_MINE_AMOUNT, interaction->quantity);
+			add_to_empire_storage(emp, GET_ISLAND_ID(inter_room), interaction->vnum, interaction->quantity);
 			empire_skillup(emp, ABIL_WORKFORCE, config_get_double("exp_from_workforce"));
-			any = TRUE;
-
-		}
-		if (any) {
+			
 			sprintf(buf, "$n strikes the wall and %s falls loose!", get_obj_name_by_proto(interaction->vnum));
 			act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
 			return TRUE;
