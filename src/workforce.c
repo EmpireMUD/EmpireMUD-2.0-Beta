@@ -1359,7 +1359,7 @@ INTERACTION_FUNC(one_mining_chore) {
 	// mine ~ every sixth time
 	if (!number(0, 5)) {
 		if (interaction->quantity > 0) {
-			add_to_room_extra_data(inter_room, ROOM_EXTRA_MINE_AMOUNT, interaction->quantity);
+			add_to_room_extra_data(inter_room, ROOM_EXTRA_MINE_AMOUNT, -1 * interaction->quantity);
 			add_to_empire_storage(emp, GET_ISLAND_ID(inter_room), interaction->vnum, interaction->quantity);
 			empire_skillup(emp, ABIL_WORKFORCE, config_get_double("exp_from_workforce"));
 			
