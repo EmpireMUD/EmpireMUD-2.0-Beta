@@ -3192,6 +3192,9 @@ void add_lore(char_data *ch, int type, const char *str, ...) {
 	if (!ch || IS_NPC(ch) || !str)
 		return;
 	
+	// need the old lore, in case the player is offline
+	check_delayed_load(ch);
+	
 	// find end
 	if ((lore = GET_LORE(ch))) {
 		while (lore->next) {

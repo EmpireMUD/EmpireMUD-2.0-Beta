@@ -2463,13 +2463,12 @@ struct player_special_data {
 	
 	// UNSAVED PORTION //
 	
-	FILE *delayed_load_file;	// open player file that was partially-loaded
-	
 	int gear_level;	// computed gear level -- determine_gear_level()
 	byte reboot_conf;	// Reboot confirmation
 	byte create_points;	// Used in character creation
 	int group_invite_by;	// idnum of the last player to invite this one
 	
+	bool needs_delayed_load;	// whether or not the player still needs delayed data
 	bool restore_on_login;	// mark the player to trigger a free reset when they enter the game
 	bool reread_empire_tech_on_login;	// mark the player to trigger empire tech re-read on entering the game
 };

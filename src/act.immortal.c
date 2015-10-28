@@ -1498,6 +1498,9 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		get_filename(oldname, buf1, PLR_FILE);
 		get_filename(GET_NAME(vict), buf2, PLR_FILE);
 		rename(buf1, buf2);
+		get_filename(oldname, buf1, DELAYED_FILE);
+		get_filename(GET_NAME(vict), buf2, DELAYED_FILE);
+		rename(buf1, buf2);
 		
 		SAVE_CHAR(vict);
 		sprintf(output, "%s's name changed to %s.", oldname, GET_NAME(vict));

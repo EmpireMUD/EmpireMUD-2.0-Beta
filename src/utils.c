@@ -1253,6 +1253,11 @@ int get_filename(char *orig_name, char *filename, int mode) {
 			suffix = SUF_PLR;
 			break;
 		}
+		case DELAYED_FILE: {
+			prefix = LIB_PLAYERS;
+			suffix = SUF_DELAY;
+			break;
+		}
 		default: {
 			return (0);
 		}
