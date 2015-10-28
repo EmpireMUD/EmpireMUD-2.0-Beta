@@ -3185,6 +3185,8 @@ bool run_room_interactions(char_data *ch, room_data *room, int type, INTERACTION
 * @param ... printf-style args for str.
 */
 void add_lore(char_data *ch, int type, const char *str, ...) {
+	void check_delayed_load(char_data *ch);
+	
 	struct lore_data *new, *lore;
 	char text[MAX_STRING_LENGTH];
 	va_list tArgList;
