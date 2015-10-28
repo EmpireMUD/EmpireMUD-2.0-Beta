@@ -3051,25 +3051,24 @@ void init_player(char_data *ch) {
 }
 
 
-/* clear some of the the working variables of a char */
-void reset_char(char_data *ch) {
-	int i;
-
-	for (i = 0; i < NUM_WEARS; i++)
-		GET_EQ(ch, i) = NULL;
-
+/**
+* clear some of the the working variables of a char.
+*
+* I'm not sure if most of this is really necessary anymore -pc
+*
+* @param char_data *ch The character to reset.
+*/
+void reset_char(char_data *ch) {	
 	ch->followers = NULL;
 	ch->master = NULL;
 	IN_ROOM(ch) = NULL;
-	ch->carrying = NULL;
 	ch->next = NULL;
 	ch->next_fighting = NULL;
 	ch->next_in_room = NULL;
 	ON_CHAIR(ch) = NULL;
 	FIGHTING(ch) = NULL;
 	ch->char_specials.position = POS_STANDING;
-	ch->char_specials.carry_items = 0;
-
+	
 	if (GET_MOVE(ch) <= 0) {
 		GET_MOVE(ch) = 1;
 	}
