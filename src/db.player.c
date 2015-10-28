@@ -683,7 +683,6 @@ void check_delayed_load(char_data *ch) {
 	
 	ch = read_player_from_file(fl, GET_PC_NAME(ch), FALSE, ch);
 	fclose(fl);	
-	NEEDS_DELAYED_LOAD(ch) = FALSE;
 }
 
 
@@ -926,6 +925,9 @@ char_data *load_player(char *name, bool normal) {
 	
 	ch = read_player_from_file(fl, name, normal, NULL);
 	fclose(fl);
+	
+	// mark that they are partially-loaded
+	NEEDS_DELAYED_LOAD(ch) = TRUE;
 	
 	return ch;
 }
