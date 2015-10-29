@@ -992,14 +992,16 @@ void extract_char_final(char_data *ch) {
 void extract_char(char_data *ch) {
 	void despawn_charmies(char_data *ch);
 	
-	if (IS_NPC(ch)) {
-		SET_BIT(MOB_FLAGS(ch), MOB_EXTRACTED);
-	}
-	else {
-		SET_BIT(PLR_FLAGS(ch), PLR_EXTRACTED);
+	if (!EXTRACTED(ch)) {
+		if (IS_NPC(ch)) {
+			SET_BIT(MOB_FLAGS(ch), MOB_EXTRACTED);
+		}
+		else {
+			SET_BIT(PLR_FLAGS(ch), PLR_EXTRACTED);
+		}
+		++extractions_pending;
 	}
 
-	extractions_pending++;
 	
 	// get rid of friends now (extracts them as well)
 	despawn_charmies(ch);
