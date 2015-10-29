@@ -1186,7 +1186,7 @@ void startup_room_reset(void) {
 void check_building_tech(empire_data *emp, room_data *room) {
 	int island = GET_ISLAND_ID(room);
 	
-	if (!IS_COMPLETE(room)) {
+	if (!IS_COMPLETE(room) || IS_DISMANTLING(room)) {
 		return;
 	}
 	

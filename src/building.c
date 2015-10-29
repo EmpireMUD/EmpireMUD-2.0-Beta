@@ -1385,14 +1385,16 @@ ACMD(do_dismantle) {
 	}
 	
 	start_dismantle_building(IN_ROOM(ch));
-	if (ROOM_OWNER(IN_ROOM(ch))) {
-		reread_empire_tech(ROOM_OWNER(IN_ROOM(ch)));
-	}
 	start_action(ch, ACT_DISMANTLING, 0);
 	msg_to_char(ch, "You begin to dismantle the building.\r\n");
 	act("$n begins to dismantle the building.\r\n", FALSE, ch, 0, 0, TO_ROOM);
 	process_dismantling(ch, IN_ROOM(ch));
 	command_lag(ch, WAIT_OTHER);
+	
+	// read this AFTER the process_dismantle, in case the building completes
+	if (ROOM_OWNER(IN_ROOM(ch))) {
+		reread_empire_tech(ROOM_OWNER(IN_ROOM(ch)));
+	}
 }
 
 
