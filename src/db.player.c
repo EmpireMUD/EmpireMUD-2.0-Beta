@@ -153,7 +153,7 @@ char_data *is_playing(int id) {
 	char_data *ch;
 
 	for (ch = character_list; ch; ch = ch->next) {
-		if (!IS_NPC(ch) && GET_IDNUM(ch) == id) {
+		if (!IS_NPC(ch) && GET_IDNUM(ch) == id && !EXTRACTED(ch)) {
 			return ch;
 		}
 	}
