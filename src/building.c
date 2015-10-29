@@ -1386,7 +1386,7 @@ ACMD(do_dismantle) {
 	
 	start_dismantle_building(IN_ROOM(ch));
 	if (ROOM_OWNER(IN_ROOM(ch))) {
-		read_empire_territory(ROOM_OWNER(IN_ROOM(ch)));
+		reread_empire_tech(ROOM_OWNER(IN_ROOM(ch)));
 	}
 	start_action(ch, ACT_DISMANTLING, 0);
 	msg_to_char(ch, "You begin to dismantle the building.\r\n");
