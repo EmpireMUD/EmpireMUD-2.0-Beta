@@ -55,11 +55,11 @@ void update_class(char_data *ch);
 void clear_player(char_data *ch);
 void delete_player_character(char_data *ch);
 static bool member_is_timed_out(time_t created, time_t last_login, double played_hours);
-void read_player_delayed_data(FILE *fl, char_data *ch);
-char_data *read_player_primary_data(FILE *fl, char *name, bool normal);
+char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *ch);
 int sort_players_by_idnum(player_index_data *a, player_index_data *b);
 int sort_players_by_name(player_index_data *a, player_index_data *b);
-void write_player_to_file(FILE *fl, char_data *ch);
+void write_player_delayed_data_to_file(FILE *fl, char_data *ch);
+void write_player_primary_data_to_file(FILE *fl, char_data *ch);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -661,17 +661,28 @@ void build_player_index(void) {
 * @param char_data *ch The player to finish loading.
 */
 void check_delayed_load(char_data *ch) {
+	char filename[256];
 	FILE *fl;
 	
 	// no work
-	if (!ch || IS_NPC(ch) || !GET_DELAYED_LOAD_FILE(ch)) {
+	if (!ch || IS_NPC(ch) || !NEEDS_DELAYED_LOAD(ch)) {
 		return;
 	}
 	
-	fl = GET_DELAYED_LOAD_FILE(ch);
-	read_player_delayed_data(fl, ch);
-	fclose(fl);
-	GET_DELAYED_LOAD_FILE(ch) = NULL;
+	// reset this no matter what
+	NEEDS_DELAYED_LOAD(ch) = FALSE;
+	
+	if (!get_filename(GET_PC_NAME(ch), filename, DELAYED_FILE)) {
+		log("SYSERR: check_delayed_load: Unable to get delayed filename for '%s'", GET_PC_NAME(ch));
+		return;
+	}
+	if (!(fl = fopen(filename, "r"))) {
+		// non-fatal: delay file does not exist
+		return;
+	}
+	
+	ch = read_player_from_file(fl, GET_PC_NAME(ch), FALSE, ch);
+	fclose(fl);	
 }
 
 
@@ -776,12 +787,6 @@ void free_char(char_data *ch) {
 		while ((mail = GET_MAIL_PENDING(ch))) {
 			GET_MAIL_PENDING(ch) = mail->next;
 			free_mail(mail);
-		}
-		
-		// close the delayed-load file (guess we didn't need it)
-		if (GET_DELAYED_LOAD_FILE(ch)) {
-			fclose(GET_DELAYED_LOAD_FILE(ch));
-			GET_DELAYED_LOAD_FILE(ch) = NULL;
 		}
 		
 		free(ch->player_specials);
@@ -918,41 +923,64 @@ char_data *load_player(char *name, bool normal) {
 		return NULL;
 	}
 	
-	ch = read_player_primary_data(fl, name, normal);
-	GET_DELAYED_LOAD_FILE(ch) = fl;
+	ch = read_player_from_file(fl, name, normal, NULL);
+	fclose(fl);
 	
-	// do not close the file now
+	// mark that they are partially-loaded
+	NEEDS_DELAYED_LOAD(ch) = TRUE;
 	
 	return ch;
 }
 
 
 /**
-* This function loads the secondary data for a character. This is data that
-* isn't needed for many simple loads. The open file is the player file after
-* the "End Primary Data" tag, and it reads until "End Player File"
+* Parse the data from a player file -- this is used on both the normal player
+* file and the delayed player file, as the same data could appear in either.
 *
-* @param FILE *fl The file to load.
-* @param char_data *ch The already-loaded character to finish loading into.
+* @param FILE *fl The open file, for reading.
+* @param char *name The name of the player we are trying to load (for error messages).
+* @param bool normal Always pass TRUE except during startup and delayed data loads (won't link index/account if FALSE).
+* @param char_data *ch Optional: If loading delayed data, pass in the existing character. Otherwise, NULL.
+* @return char_data* The loaded character.
 */
-void read_player_delayed_data(FILE *fl, char_data *ch) {
+char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *ch) {
 	void loaded_obj_to_char(obj_data *obj, char_data *ch, int location);
 	extern obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify);
 	extern struct mail_data *parse_mail(FILE *fl, char *first_line);
-
-	char line[MAX_STRING_LENGTH], str_in[MAX_INPUT_LENGTH];
+	
+	char line[MAX_INPUT_LENGTH], error[MAX_STRING_LENGTH], str_in[MAX_INPUT_LENGTH];
+	struct slash_channel *slash, *last_slash = NULL;
+	int account_id = NOTHING, ignore_pos = 0, reward_pos = 0;
+	struct lore_data *lore, *last_lore = NULL, *new_lore;
+	struct over_time_effect_type *dot, *last_dot = NULL;
+	struct offer_data *offer, *last_offer = NULL;
 	struct alias_data *alias, *last_alias = NULL;
 	struct coin_data *coin, *last_coin = NULL;
-	struct lore_data *lore, *last_lore = NULL, *new_lore;
 	struct mail_data *mail, *last_mail = NULL;
-	int length, i_in[3];
+	int length, i_in[7], iter, num;
+	struct cooldown_data *cool;
+	struct affected_type *af;
+	account_data *acct;
 	bool end = FALSE;
 	obj_data *obj;
+	double dbl_in;
 	long l_in[2];
+	char c_in;
 	
-	if (!fl || !ch) {
-		log("SYSERR: read_player_delayed_data called without %s", fl ? "character" : "file");
-		return;
+	// allocate player if we didn't receive one
+	if (!ch) {
+		CREATE(ch, char_data, 1);
+		clear_char(ch);
+		CREATE(ch->player_specials, struct player_special_data, 1);
+		clear_player(ch);
+	
+		// this is now
+		ch->player.time.logon = time(0);
+	}
+	
+	// ensure script allocation
+	if (!SCRIPT(ch)) {
+		CREATE(SCRIPT(ch), struct script_data, 1);
 	}
 	
 	// some parts may already be added, so find the end of aliases:
@@ -975,15 +1003,16 @@ void read_player_delayed_data(FILE *fl, char_data *ch) {
 	new_lore = GET_LORE(ch);
 	GET_LORE(ch) = NULL;
 	
+	// for fread_string
+	sprintf(error, "read_player_from_file: %s", name);
+	
+	// for more readable if/else chain
+	#define BAD_TAG_WARNING(src)  else if (LOG_BAD_TAG_WARNINGS) { log("SYSERR: Bad tag in player '%s': %s", NULLSAFE(GET_PC_NAME(ch)), (src)); }
+
 	while (!end) {
 		if (!get_line(fl, line)) {
-			log("SYSERR: Unexpected end of player file in read_player_delayed_data: %s", GET_NAME(ch));
+			log("SYSERR: Unexpected end of player file in read_player_from_file: %s", name);
 			exit(1);
-		}
-		
-		if (PFILE_TAG(line, "End Player File", length)) {
-			end = TRUE;
-			continue;
 		}
 		
 		// normal tags by letter
@@ -995,194 +1024,6 @@ void read_player_delayed_data(FILE *fl, char_data *ch) {
 				}
 				break;
 			}
-			case 'A': {
-				if (PFILE_TAG(line, "Alias:", length)) {
-					sscanf(line + length + 1, "%d %ld %ld", &i_in[0], &l_in[0], &l_in[1]);
-					CREATE(alias, struct alias_data, 1);
-					alias->type = i_in[0];
-					
-					fgets(line, l_in[0] + 2, fl);
-					line[l_in[0]] = '\0';	// trailing \n
-					alias->alias = str_dup(line);
-					
-					*line = ' ';	// Doesn't need terminated, fgets() will
-					fgets(line + 1, l_in[1] + 2, fl);
-					line[l_in[1] + 1] = '\0';	// trailing \n
-					alias->replacement = str_dup(line);
-					
-					// append to end
-					if (last_alias) {
-						last_alias->next = alias;
-					}
-					else {
-						GET_ALIASES(ch) = alias;
-					}
-					last_alias = alias;
-				}
-				BAD_TAG_WARNING(line);
-				break;
-			}
-			case 'C': {
-				if (PFILE_TAG(line, "Coin:", length)) {
-					sscanf(line + length + 1, "%d %d %ld", &i_in[0], &i_in[1], &l_in[0]);
-					
-					CREATE(coin, struct coin_data, 1);
-					coin->amount = i_in[0];
-					coin->empire_id = i_in[1];
-					coin->last_acquired = (time_t)l_in[0];
-					
-					// add to end
-					if (last_coin) {
-						last_coin->next = coin;
-					}
-					else {
-						GET_PLAYER_COINS(ch) = coin;
-					}
-					last_coin = coin;
-				}
-				BAD_TAG_WARNING(line);
-				break;
-			}
-			case 'L': {
-				if (PFILE_TAG(line, "Lore:", length)) {
-					sscanf(line + length + 1, "%d %ld", &i_in[0], &l_in[0]);
-					CREATE(lore, struct lore_data, 1);
-					lore->type = i_in[0];
-					lore->date = l_in[0];
-					
-					// text on next line
-					if (get_line(fl, line)) {
-						lore->text = str_dup(line);
-					}
-					
-					// append to end
-					if (last_lore) {
-						last_lore->next = lore;
-					}
-					else {
-						GET_LORE(ch) = lore;
-					}
-					last_lore = lore;
-				}
-				BAD_TAG_WARNING(line);
-				break;
-			}
-			case 'M': {
-				if (PFILE_TAG(line, "Mail", length)) {
-					if ((mail = parse_mail(fl, line))) {
-						if (last_mail) {
-							last_mail->next = mail;
-						}
-						else {
-							GET_MAIL_PENDING(ch) = mail;
-						}
-						last_mail = mail;
-					}
-				}
-				BAD_TAG_WARNING(line);
-				break;
-			}
-			case 'R': {
-				if (PFILE_TAG(line, "Rent-code:", length)) {
-					// old data; ignore
-				}
-				else if (PFILE_TAG(line, "Rent-time:", length)) {
-					// old data; ignore
-				}
-				BAD_TAG_WARNING(line);
-				break;
-			}
-			case 'V': {
-				if (PFILE_TAG(line, "Variable:", length)) {
-					if (sscanf(line + length + 1, "%s %ld", str_in, &l_in[0]) != 2 || !get_line(fl, line)) {
-						log("SYSERR: Bad variable format in read_player_delayed_data: %s", GET_NAME(ch));
-						exit(1);
-					}
-					add_var(&(SCRIPT(ch)->global_vars), str_in, line, l_in[0]);
-				}
-				BAD_TAG_WARNING(line);
-				break;
-			}
-			
-			// log maybe
-			default: {
-				// ignore anything else and move on
-				if (FALSE) { /* for BAD_TAG_WARNING */ }
-				BAD_TAG_WARNING(line);
-				break;
-			}
-		}
-	}
-	
-	// fix lore order
-	if (new_lore) {
-		if (last_lore) {
-			last_lore->next = new_lore;
-		}
-		else {
-			GET_LORE(ch) = new_lore;
-		}
-	}
-}
-
-
-/**
-* Parse the primary data from a player file. Reads until the "End Primary Data"
-* tag. After that tag, the file is stored until read_player_delayed_data() is
-* called.
-*
-* @param FILE *fl The open file, for reading.
-* @param char *name The name of the player we are trying to load.
-* @param bool normal Always pass TRUE except during startup (won't link index/account if FALSE).
-* @return char_data* The loaded character.
-*/
-char_data *read_player_primary_data(FILE *fl, char *name, bool normal) {
-	char line[MAX_INPUT_LENGTH], error[MAX_STRING_LENGTH], str_in[MAX_INPUT_LENGTH];
-	struct slash_channel *slash, *last_slash = NULL;
-	int account_id = NOTHING, ignore_pos = 0, reward_pos = 0;
-	struct over_time_effect_type *dot, *last_dot = NULL;
-	struct offer_data *offer, *last_offer = NULL;
-	int length, i_in[7], iter, num;
-	struct cooldown_data *cool;
-	struct affected_type *af;
-	account_data *acct;
-	bool end = FALSE;
-	char_data *ch;
-	double dbl_in;
-	long l_in;
-	char c_in;
-	
-	// allocate player
-	CREATE(ch, char_data, 1);
-	clear_char(ch);
-	CREATE(ch->player_specials, struct player_special_data, 1);
-	clear_player(ch);
-	if (!SCRIPT(ch)) {
-		CREATE(SCRIPT(ch), struct script_data, 1);
-	}
-	
-	// this is now
-	ch->player.time.logon = time(0);
-	
-	// for fread_string
-	sprintf(error, "read_player_primary_data: %s", name);
-	
-	// for more readable if/else chain
-	#define BAD_TAG_WARNING(src)  else if (LOG_BAD_TAG_WARNINGS) { log("SYSERR: Bad tag in player '%s': %s", NULLSAFE(GET_PC_NAME(ch)), (src)); }
-
-	while (!end) {
-		if (!get_line(fl, line)) {
-			log("SYSERR: Unexpected end of player file in read_player_primary_data: %s", name);
-			exit(1);
-		}
-		
-		if (PFILE_TAG(line, "End Primary Data", length)) {
-			end = TRUE;
-			continue;
-		}
-		
-		// normal tags by letter
-		switch (UPPER(*line)) {
 			case 'A': {
 				if (PFILE_TAG(line, "Ability:", length)) {
 					sscanf(line + length + 1, "%d %d %d", &i_in[0], &i_in[1], &i_in[2]);
@@ -1233,6 +1074,29 @@ char_data *read_player_primary_data(FILE *fl, char *name, bool normal) {
 				}
 				else if (PFILE_TAG(line, "Affect Flags:", length)) {
 					AFF_FLAGS(ch) = asciiflag_conv(line + length + 1);
+				}
+				else if (PFILE_TAG(line, "Alias:", length)) {
+					sscanf(line + length + 1, "%d %ld %ld", &i_in[0], &l_in[0], &l_in[1]);
+					CREATE(alias, struct alias_data, 1);
+					alias->type = i_in[0];
+					
+					fgets(line, l_in[0] + 2, fl);
+					line[l_in[0]] = '\0';	// trailing \n
+					alias->alias = str_dup(line);
+					
+					*line = ' ';	// Doesn't need terminated, fgets() will
+					fgets(line + 1, l_in[1] + 2, fl);
+					line[l_in[1] + 1] = '\0';	// trailing \n
+					alias->replacement = str_dup(line);
+					
+					// append to end
+					if (last_alias) {
+						last_alias->next = alias;
+					}
+					else {
+						GET_ALIASES(ch) = alias;
+					}
+					last_alias = alias;
 				}
 				else if (PFILE_TAG(line, "Apparent Age:", length)) {
 					GET_APPARENT_AGE(ch) = atoi(line + length + 1);
@@ -1291,13 +1155,30 @@ char_data *read_player_primary_data(FILE *fl, char *name, bool normal) {
 						GET_COND(ch, num) = i_in[0];
 					}
 				}
+				else if (PFILE_TAG(line, "Coin:", length)) {
+					sscanf(line + length + 1, "%d %d %ld", &i_in[0], &i_in[1], &l_in[0]);
+					
+					CREATE(coin, struct coin_data, 1);
+					coin->amount = i_in[0];
+					coin->empire_id = i_in[1];
+					coin->last_acquired = (time_t)l_in[0];
+					
+					// add to end
+					if (last_coin) {
+						last_coin->next = coin;
+					}
+					else {
+						GET_PLAYER_COINS(ch) = coin;
+					}
+					last_coin = coin;
+				}
 				else if (PFILE_TAG(line, "Confused Direction:", length)) {
 					GET_CONFUSED_DIR(ch) = atoi(line + length + 1);
 				}
 				else if (PFILE_TAG(line, "Cooldown:", length)) {
-					sscanf(line + length + 1, "%d %ld", &i_in[0], &l_in);
+					sscanf(line + length + 1, "%d %ld", &i_in[0], &l_in[0]);
 					CREATE(cool, struct cooldown_data, 1);
-					add_cooldown(ch, i_in[0], l_in - time(0));
+					add_cooldown(ch, i_in[0], l_in[0] - time(0));
 				}
 				else if (PFILE_TAG(line, "Creation Host:", length)) {
 					if (GET_CREATION_HOST(ch)) {
@@ -1373,6 +1254,13 @@ char_data *read_player_primary_data(FILE *fl, char *name, bool normal) {
 			case 'E': {
 				if (PFILE_TAG(line, "Empire:", length)) {
 					GET_LOYALTY(ch) = real_empire(atoi(line + length + 1));
+				}
+				else if (PFILE_TAG(line, "End Player File", length)) {
+					// actual end
+					end = TRUE;
+				}
+				else if (PFILE_TAG(line, "End Primary Data", length)) {
+					// this tag is no longer used; ignore it
 				}
 				else if (PFILE_TAG(line, "Extra Attribute:", length)) {
 					sscanf(line + length + 1, "%s %d", str_in, &i_in[0]);
@@ -1471,11 +1359,42 @@ char_data *read_player_primary_data(FILE *fl, char *name, bool normal) {
 				else if (PFILE_TAG(line, "Load Room Check:", length)) {
 					GET_LOAD_ROOM_CHECK(ch) = atoi(line + length + 1);
 				}
+				else if (PFILE_TAG(line, "Lore:", length)) {
+					sscanf(line + length + 1, "%d %ld", &i_in[0], &l_in[0]);
+					CREATE(lore, struct lore_data, 1);
+					lore->type = i_in[0];
+					lore->date = l_in[0];
+					
+					// text on next line
+					if (get_line(fl, line)) {
+						lore->text = str_dup(line);
+					}
+					
+					// append to end
+					if (last_lore) {
+						last_lore->next = lore;
+					}
+					else {
+						GET_LORE(ch) = lore;
+					}
+					last_lore = lore;
+				}
 				BAD_TAG_WARNING(line);
 				break;
 			}
 			case 'M': {
-				if (PFILE_TAG(line, "Map Mark:", length)) {
+				if (PFILE_TAG(line, "Mail", length)) {
+					if ((mail = parse_mail(fl, line))) {
+						if (last_mail) {
+							last_mail->next = mail;
+						}
+						else {
+							GET_MAIL_PENDING(ch) = mail;
+						}
+						last_mail = mail;
+					}
+				}
+				else if (PFILE_TAG(line, "Map Mark:", length)) {
 					GET_MARK_LOCATION(ch) = atoi(line + length + 1);
 				}
 				else if (PFILE_TAG(line, "Mapsize:", length)) {
@@ -1511,12 +1430,12 @@ char_data *read_player_primary_data(FILE *fl, char *name, bool normal) {
 			}
 			case 'O': {
 				if (PFILE_TAG(line, "Offer:", length)) {
-					sscanf(line + length + 1, "%d %d %d %ld %d", &i_in[0], &i_in[1], &i_in[2], &l_in, &i_in[3]);
+					sscanf(line + length + 1, "%d %d %d %ld %d", &i_in[0], &i_in[1], &i_in[2], &l_in[0], &i_in[3]);
 					CREATE(offer, struct offer_data, 1);
 					offer->from = i_in[0];
 					offer->type = i_in[1];
 					offer->location = i_in[2];
-					offer->time = l_in;
+					offer->time = l_in[0];
 					offer->data = i_in[3];
 					
 					// append to end
@@ -1592,6 +1511,12 @@ char_data *read_player_primary_data(FILE *fl, char *name, bool normal) {
 						free(GET_REFERRED_BY(ch));
 					}
 					GET_REFERRED_BY(ch) = str_dup(trim(line + length + 1));
+				}
+				else if (PFILE_TAG(line, "Rent-code:", length)) {
+					// old data; ignore
+				}
+				else if (PFILE_TAG(line, "Rent-time:", length)) {
+					// old data; ignore
 				}
 				else if (PFILE_TAG(line, "Resource:", length)) {
 					sscanf(line + length + 1, "%d %s", &i_in[0], str_in);
@@ -1670,6 +1595,17 @@ char_data *read_player_primary_data(FILE *fl, char *name, bool normal) {
 				BAD_TAG_WARNING(line);
 				break;
 			}
+			case 'V': {
+				if (PFILE_TAG(line, "Variable:", length)) {
+					if (sscanf(line + length + 1, "%s %ld", str_in, &l_in[0]) != 2 || !get_line(fl, line)) {
+						log("SYSERR: Bad variable format in read_player_delayed_data: %s", GET_NAME(ch));
+						exit(1);
+					}
+					add_var(&(SCRIPT(ch)->global_vars), str_in, line, l_in[0]);
+				}
+				BAD_TAG_WARNING(line);
+				break;
+			}
 			
 			default: {
 				// ignore anything else and move on
@@ -1680,6 +1616,7 @@ char_data *read_player_primary_data(FILE *fl, char *name, bool normal) {
 		}
 	}
 	
+	// quick safety checks
 	if (!GET_PC_NAME(ch) || !*GET_PC_NAME(ch)) {
 		log("SYSERR: Finished loading playerfile '%s' but did not find name", name);
 		// hopefully we came in with a good name
@@ -1695,11 +1632,21 @@ char_data *read_player_primary_data(FILE *fl, char *name, bool normal) {
 	}
 	
 	// have account?
-	if (normal) {
+	if (normal && !GET_ACCOUNT(ch)) {
 		if (!(acct = find_account(account_id))) {
 			acct = create_account_for_player(ch);
 		}
 		GET_ACCOUNT(ch) = acct;
+	}
+	
+	// fix lore order
+	if (new_lore) {
+		if (last_lore) {
+			last_lore->next = new_lore;
+		}
+		else {
+			GET_LORE(ch) = new_lore;
+		}
 	}
 	
 	// safety
@@ -1753,13 +1700,11 @@ void save_char(char_data *ch, room_data *load_room) {
 		}
 	}
 	
+	// PRIMARY data
 	if (!get_filename(GET_PC_NAME(ch), filename, PLR_FILE)) {
 		log("SYSERR: save_char: Unable to get player filename for '%s'", GET_PC_NAME(ch));
 		return;
 	}
-	
-	// must finish-loading before we can save
-	check_delayed_load(ch);
 	
 	// store to a temp name in order to avoid problems from crashes during save
 	snprintf(tempname, sizeof(tempname), "%s%s", filename, TEMP_SUFFIX);
@@ -1769,10 +1714,31 @@ void save_char(char_data *ch, room_data *load_room) {
 	}
 	
 	// write it
-	write_player_to_file(fl, ch);
+	write_player_primary_data_to_file(fl, ch);
 	
 	fclose(fl);
 	rename(tempname, filename);
+	
+	// delayed data?
+	if (!NEEDS_DELAYED_LOAD(ch)) {
+		if (!get_filename(GET_PC_NAME(ch), filename, DELAYED_FILE)) {
+			log("SYSERR: save_char: Unable to get delayed filename for '%s'", GET_PC_NAME(ch));
+			return;
+		}
+	
+		// store to a temp name in order to avoid problems from crashes during save
+		snprintf(tempname, sizeof(tempname), "%s%s", filename, TEMP_SUFFIX);
+		if (!(fl = fopen(tempname, "w"))) {
+			log("SYSERR: save_char: Unable to open '%s' for writing", tempname);
+			return;
+		}
+	
+		// write it
+		write_player_delayed_data_to_file(fl, ch);
+	
+		fclose(fl);
+		rename(tempname, filename);
+	}
 	
 	// update the index in case any of this changed
 	index = find_player_index_by_idnum(GET_IDNUM(ch));
@@ -1860,12 +1826,13 @@ void update_player_index(player_index_data *index, char_data *ch) {
 
 
 /**
-* Writes all the tagged data for one player to file.
+* Writes all the tagged data for one player to file. This is only the primary
+* data -- data saved in the main file. See write_player_delayed_data_to_file().
 *
 * @param FILE *fl The open file to write to.
 * @param char_data *ch The player to write.
 */
-void write_player_to_file(FILE *fl, char_data *ch) {
+void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	void Crash_save(obj_data *obj, FILE *fp, int location);
 	extern struct slash_channel *find_slash_channel_by_id(int id);
 	void write_mail_to_file(FILE *fl, char_data *ch);
@@ -1877,20 +1844,15 @@ void write_player_to_file(FILE *fl, char_data *ch) {
 	struct slash_channel *channel;
 	obj_data *char_eq[NUM_WEARS];
 	char temp[MAX_STRING_LENGTH];
-	struct trig_var_data *vars;
 	struct cooldown_data *cool;
-	struct alias_data *alias;
-	struct offer_data *offer;
-	struct coin_data *coin;
-	struct lore_data *lore;
 	int iter;
 	
 	if (!fl || !ch) {
-		log("SYSERR: write_player_to_file called without %s", fl ? "character" : "file");
+		log("SYSERR: write_player_primary_data_to_file called without %s", fl ? "character" : "file");
 		return;
 	}
 	if (IS_NPC(ch)) {
-		log("SYSERR: write_player_to_file called with NPC");
+		log("SYSERR: write_player_primary_data_to_file called with NPC");
 		return;
 	}
 	
@@ -2128,9 +2090,6 @@ void write_player_to_file(FILE *fl, char_data *ch) {
 	}
 	
 	// 'O'
-	for (offer = GET_OFFERS(ch); offer; offer = offer->next) {
-		fprintf(fl, "Offer: %d %d %d %ld %d\n", offer->from, offer->type, offer->location, offer->time, offer->data);
-	}
 	if (GET_OLC_MAX_VNUM(ch) > 0 || GET_OLC_MIN_VNUM(ch) > 0 || GET_OLC_FLAGS(ch) != NOBITS) {
 		fprintf(fl, "OLC: %d %d %s\n", GET_OLC_MIN_VNUM(ch), GET_OLC_MAX_VNUM(ch), bitv_to_alpha(GET_OLC_FLAGS(ch)));
 	}
@@ -2206,51 +2165,7 @@ void write_player_to_file(FILE *fl, char_data *ch) {
 		fprintf(fl, "Using Poison: %d\n", USING_POISON(ch));
 	}
 	
-	// END MAIN TAGS: the rest of the data is delay-loaded
-	fprintf(fl, "End Primary Data\n");
-	
-	// delayed: alias
-	for (alias = GET_ALIASES(ch); alias; alias = alias->next) {
-		fprintf(fl, "Alias: %d %ld %ld\n%s\n%s\n", alias->type, strlen(alias->alias), strlen(alias->replacement)-1, alias->alias, alias->replacement + 1);
-	}
-	
-	// delayed: coin
-	for (coin = GET_PLAYER_COINS(ch); coin; coin = coin->next) {
-		fprintf(fl, "Coin: %d %d %ld\n", coin->amount, coin->empire_id, coin->last_acquired);
-	}
-	
-	// delayed: lore
-	for (lore = GET_LORE(ch); lore; lore = lore->next) {
-		if (lore->text && *lore->text) {
-			fprintf(fl, "Lore: %d %ld\n%s\n", lore->type, lore->date, lore->text);
-		}
-	}
-	
-	// delayed: script variables
-	if (SCRIPT(ch) && SCRIPT(ch)->global_vars) {
-		for (vars = SCRIPT(ch)->global_vars; vars; vars = vars->next) {
-			if (*vars->name == '-') { // don't save if it begins with -
-				continue;
-			}
-			
-			fprintf(fl, "Variable: %s %ld\n%s\n", vars->name, vars->context, vars->value);
-		}
-	}
-	
-	// delayed: equipment
-	for (iter = 0; iter < NUM_WEARS; ++iter) {
-		if (char_eq[iter]) {
-			Crash_save(char_eq[iter], fl, iter + 1);	// save at iter+1 because 0 == LOC_INVENTORY
-		}
-	}
-	
-	// delayed: inventory
-	Crash_save(ch->carrying, fl, LOC_INVENTORY);
-	
-	// delayted: mail
-	write_mail_to_file(fl, ch);
-	
-	// END DELAY-LOADED SECTION
+	// END PLAYER FILE
 	fprintf(fl, "End Player File\n");
 	
 	// re-apply: affects
@@ -2278,6 +2193,85 @@ void write_player_to_file(FILE *fl, char_data *ch) {
 	}
 	
 	// affect_total(ch); // unnecessary, I think (?)
+}
+
+
+/**
+* Writes all the DELAYED data for one player to file. This is saved separately
+* in order to reduce loading in many cases.
+*
+* @param FILE *fl The open file to write to.
+* @param char_data *ch The player to write.
+*/
+void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
+	void Crash_save(obj_data *obj, FILE *fp, int location);
+	extern struct slash_channel *find_slash_channel_by_id(int id);
+	void write_mail_to_file(FILE *fl, char_data *ch);
+	
+	struct trig_var_data *vars;
+	struct alias_data *alias;
+	struct offer_data *offer;
+	struct coin_data *coin;
+	struct lore_data *lore;
+	int iter;
+	
+	if (!fl || !ch) {
+		log("SYSERR: write_player_delayed_data_to_file called without %s", fl ? "character" : "file");
+		return;
+	}
+	if (IS_NPC(ch)) {
+		log("SYSERR: write_player_delayed_data_to_file called with NPC");
+		return;
+	}
+	
+	// BEGIN TAGS
+	
+	// 'A'
+	for (alias = GET_ALIASES(ch); alias; alias = alias->next) {
+		fprintf(fl, "Alias: %d %ld %ld\n%s\n%s\n", alias->type, strlen(alias->alias), strlen(alias->replacement)-1, alias->alias, alias->replacement + 1);
+	}
+	
+	// 'C'
+	for (coin = GET_PLAYER_COINS(ch); coin; coin = coin->next) {
+		fprintf(fl, "Coin: %d %d %ld\n", coin->amount, coin->empire_id, coin->last_acquired);
+	}
+	
+	// 'L'
+	for (lore = GET_LORE(ch); lore; lore = lore->next) {
+		if (lore->text && *lore->text) {
+			fprintf(fl, "Lore: %d %ld\n%s\n", lore->type, lore->date, lore->text);
+		}
+	}
+	
+	// 'M'
+	write_mail_to_file(fl, ch);
+	
+	// 'O'
+	for (offer = GET_OFFERS(ch); offer; offer = offer->next) {
+		fprintf(fl, "Offer: %d %d %d %ld %d\n", offer->from, offer->type, offer->location, offer->time, offer->data);
+	}
+	
+	// 'S'
+	if (SCRIPT(ch) && SCRIPT(ch)->global_vars) {
+		for (vars = SCRIPT(ch)->global_vars; vars; vars = vars->next) {
+			if (*vars->name == '-') { // don't save if it begins with -
+				continue;
+			}
+			
+			fprintf(fl, "Variable: %s %ld\n%s\n", vars->name, vars->context, vars->value);
+		}
+	}
+	
+	// '#'
+	for (iter = 0; iter < NUM_WEARS; ++iter) {
+		if (GET_EQ(ch, iter)) {
+			Crash_save(GET_EQ(ch, iter), fl, iter + 1);	// save at iter+1 because 0 == LOC_INVENTORY
+		}
+	}
+	Crash_save(ch->carrying, fl, LOC_INVENTORY);
+	
+	// END DELAY-LOADED SECTION
+	fprintf(fl, "End Player File\n");
 }
 
 
@@ -3059,25 +3053,24 @@ void init_player(char_data *ch) {
 }
 
 
-/* clear some of the the working variables of a char */
-void reset_char(char_data *ch) {
-	int i;
-
-	for (i = 0; i < NUM_WEARS; i++)
-		GET_EQ(ch, i) = NULL;
-
+/**
+* clear some of the the working variables of a char.
+*
+* I'm not sure if most of this is really necessary anymore -pc
+*
+* @param char_data *ch The character to reset.
+*/
+void reset_char(char_data *ch) {	
 	ch->followers = NULL;
 	ch->master = NULL;
 	IN_ROOM(ch) = NULL;
-	ch->carrying = NULL;
 	ch->next = NULL;
 	ch->next_fighting = NULL;
 	ch->next_in_room = NULL;
 	ON_CHAIR(ch) = NULL;
 	FIGHTING(ch) = NULL;
 	ch->char_specials.position = POS_STANDING;
-	ch->char_specials.carry_items = 0;
-
+	
 	if (GET_MOVE(ch) <= 0) {
 		GET_MOVE(ch) = 1;
 	}

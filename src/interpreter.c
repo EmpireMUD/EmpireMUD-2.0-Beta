@@ -2089,6 +2089,7 @@ int _parse_name(char *arg, char *name) {
 * Master "socket nanny" for processing menu input.
 */
 void nanny(descriptor_data *d, char *arg) {
+	void check_delayed_load(char_data *ch);
 	void clear_player(char_data *ch);
 	void display_tip_to_char(char_data *ch);
 	extern void enter_player_game(descriptor_data *d, int dolog, bool fresh);
@@ -2137,6 +2138,7 @@ void nanny(descriptor_data *d, char *arg) {
 					free_char(d->character);
 					d->character = temp_char;	// can't load directly; overwrites the existing char
 					d->character->desc = d;
+					check_delayed_load(d->character);
 					
 					/* undo it just in case they are set */
 					REMOVE_BIT(PLR_FLAGS(d->character), PLR_WRITING | PLR_MAILING);

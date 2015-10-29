@@ -45,6 +45,7 @@
 // file suffixes for common write files
 #define SUF_PACK  "pack"
 #define SUF_PLR  "plr"
+#define SUF_DELAY  "delay"
 
 
 // files used to block startup

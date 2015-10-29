@@ -1403,7 +1403,7 @@ void close_socket(descriptor_data *d) {
 		}
 		if (STATE(d) == CON_PLAYING || STATE(d) == CON_DISCONNECT) {
 			act("$n has lost $s link.", TRUE, d->character, 0, 0, TO_ROOM);
-			if (!IS_NPC(d->character)) {			
+			if (!IS_NPC(d->character)) {
 				SAVE_CHAR(d->character);
 				syslog(SYS_LOGIN, GET_INVIS_LEV(d->character), TRUE, "Closing link to: %s.", GET_NAME(d->character));
 			}

@@ -1370,9 +1370,6 @@ void convert_char(struct b3_char_file_u *cfu) {
 		fprintf(fl, "Using Poison: %d\n", cfu->player_specials_saved.using_poison);
 	}
 	
-	// END MAIN TAGS: the rest of the data is delay-loaded
-	fprintf(fl, "End Primary Data\n");
-	
 	// Aliases: only if we can read a file (ignore missing aliases)
 	old_filename(charname_lower, buf, "lib/plralias/", "alias");
 	if ((loadfile = fopen(buf, "r"))) {
