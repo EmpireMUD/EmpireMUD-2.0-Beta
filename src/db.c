@@ -1354,6 +1354,9 @@ void number_and_count_islands(bool reset) {
 				free(item);
 			}
 		}
+		else {
+			use_id = map->island;
+		}
 		
 		HASH_FIND_INT(list, &use_id, data);
 		if (!data) {	// or create one
