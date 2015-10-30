@@ -2115,8 +2115,14 @@ void build_world_map(void) {
 	int x, y;
 	
 	HASH_ITER(world_hh, world_table, room, next_room) {
+		if (GET_ROOM_VNUM(room) >= MAP_SIZE) {
+			continue;
+		}
+		
 		x = FLAT_X_COORD(room);
 		y = FLAT_Y_COORD(room);
+		
+		world_map[x][y].island = GET_ISLAND_ID(room);
 		
 		if (SECT(room)) {
 			world_map[x][y].sector_type = SECT(room);

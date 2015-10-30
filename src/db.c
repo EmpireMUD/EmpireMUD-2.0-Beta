@@ -1298,7 +1298,7 @@ void number_and_count_islands(bool reset) {
 	// helper type
 	struct island_read_data {
 		int id;
-			int size;
+		int size;
 		int sum_x, sum_y;	// for averaging center
 		room_vnum edge[NUM_SIMPLE_DIRS];	// detected edges
 		int edge_val[NUM_SIMPLE_DIRS];	// for detecting edges
