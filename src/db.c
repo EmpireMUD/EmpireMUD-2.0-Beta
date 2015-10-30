@@ -1311,7 +1311,7 @@ void number_and_count_islands(bool reset) {
 	struct island_info *isle;
 	struct map_data *map;
 	room_data *room;
-	int id, iter, use_id;
+	int iter, use_id;
 	
 	// find top island id (and reset if requested)
 	top_island_num = -1;
@@ -1355,10 +1355,10 @@ void number_and_count_islands(bool reset) {
 			}
 		}
 		
-		HASH_FIND_INT(list, &id, data);
+		HASH_FIND_INT(list, &use_id, data);
 		if (!data) {	// or create one
 			CREATE(data, struct island_read_data, 1);
-			data->id = id;
+			data->id = use_id;
 			for (iter = 0; iter < NUM_SIMPLE_DIRS; ++iter) {
 				data->edge[iter] = NOWHERE;
 				data->edge_val[iter] = NOWHERE;
