@@ -2091,7 +2091,7 @@ void build_land_map(void) {
 			
 			// update land_map
 			map->next = NULL;
-			if (map->sector_type != ocean) {
+			if (map->sector_type != ocean && !SECT_FLAGGED(map->sector_type, SECTF_NON_ISLAND)) {
 				if (last) {
 					last->next = map;
 				}
