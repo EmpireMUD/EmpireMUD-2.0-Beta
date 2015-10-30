@@ -1144,6 +1144,38 @@ void index_boot_help(void) {
  //////////////////////////////////////////////////////////////////////////////
 //// ISLAND SETUP ////////////////////////////////////////////////////////////
 
+// this helps find places to number
+struct island_num_data_t {
+	struct map_data *loc;
+	struct island_num_data_t *next;	// LL
+};
+
+struct island_num_data_t *island_stack = NULL;	// global stack
+
+
+// pops an item from the stack and returns it, or NULL if empty
+struct island_num_data_t *pop_island(void) {
+	struct island_num_data_t *temp = NULL;
+	
+	if (island_stack) {
+		temp = island_stack;
+		island_stack = temp->next;
+	}
+	
+	return temp;
+}
+
+
+// push a location onto the stack
+void push_island(struct map_data *loc) {
+	struct island_num_data_t *island;
+	CREATE(island, struct island_num_data_t, 1);
+	island->loc = loc;
+	island->next = island_stack;
+	island_stack = island;
+}
+
+
 /**
 * Checks the newbie islands and applies their rules (abandons land).
 */
@@ -1215,17 +1247,16 @@ void check_newbie_islands(void) {
 
 
 /**
-* adds a map location to an island, then scans all adjacent locations.
+* Numbers an island and pushes its neighbors onto the stack if they need island
+* ids.
 *
-* @param map_data *map The map location (in world_map or land_map) to set.
-* @param int island The island id to assign it.
+* @param struct map_data *map A map location.
+* @param int island The island id.
 */
-static void recursive_island_scan(struct map_data *map, int island) {
+void number_island(struct map_data *map, int island) {
 	int x, y, new_x, new_y;
 	struct map_data *tile;
 	room_data *room;
-	
-	island = MAX(0, island);	// ensure it's never < 0, as that would go poorly
 	
 	map->island = island;
 	
@@ -1246,7 +1277,8 @@ static void recursive_island_scan(struct map_data *map, int island) {
 				tile = &(world_map[new_x][new_y]);
 				
 				if (!SECT_FLAGGED(tile->sector_type, SECTF_NON_ISLAND) && tile->island <= 0) {
-					recursive_island_scan(tile, island);
+					// add to stack
+					push_island(tile);
 				}
 			}
 		}
@@ -1275,10 +1307,11 @@ void number_and_count_islands(bool reset) {
 	
 	struct island_read_data *data, *next_data, *list = NULL;
 	bool re_empire = (top_island_num != -1);
+	struct island_num_data_t *item;
 	struct island_info *isle;
 	struct map_data *map;
 	room_data *room;
-	int id, iter;
+	int id, iter, use_id;
 	
 	// find top island id (and reset if requested)
 	top_island_num = -1;
@@ -1296,8 +1329,16 @@ void number_and_count_islands(bool reset) {
 	// 1. expand EXISTING islands
 	if (!reset) {
 		for (map = land_map; map; map = map->next) {
-			if (map->island != NO_ISLAND) {
-				recursive_island_scan(map, map->island);
+			if (map->island == NO_ISLAND) {
+				continue;
+			}
+			
+			use_id = map->island;
+			push_island(map);
+			
+			while ((item = pop_island())) {
+				number_island(item->loc, use_id);
+				free(item);
 			}
 		}
 	}
@@ -1305,14 +1346,13 @@ void number_and_count_islands(bool reset) {
 	// 2. look for places that have no island id but need one -- and also measure islands while we're here
 	for (map = land_map; map; map = map->next) {
 		if (map->island == NO_ISLAND && !SECT_FLAGGED(map->sector_type, SECTF_NON_ISLAND)) {
-			recursive_island_scan(map, ++top_island_num);
-		}
-		
-		// find helper entry
-		id = map->island;
-		if (id == NO_ISLAND) {
-			// just an ocean
-			continue;
+			use_id = ++top_island_num;
+			push_island(map);
+			
+			while ((item = pop_island())) {
+				number_island(item->loc, use_id);
+				free(item);
+			}
 		}
 		
 		HASH_FIND_INT(list, &id, data);
