@@ -3284,7 +3284,7 @@ struct room_data {
 	empire_data *owner;  // who owns this territory
 	
 	sector_data *sector_type;  // terrain type -- saved in file as vnum
-	sector_data *original_sector;  // for when built-over -- ^
+	sector_data *base_sector;  // for when built-over -- ^
 	int island;	// island numbers
 	
 	struct complex_room_data *complex; // for rooms that are buildings, inside, adventures, etc

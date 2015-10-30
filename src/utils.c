@@ -3269,7 +3269,7 @@ int compute_distance(room_data *from, room_data *to) {
 *
 * @param room_data *room The location to check.
 * @param sector_vnum The sector vnum to find.
-* @param bool count_original_sect If TRUE, also checks ROOM_ORIGINAL_SECT
+* @param bool count_original_sect If TRUE, also checks BASE_SECT
 * @return int The number of matching adjacent tiles.
 */
 int count_adjacent_sectors(room_data *room, sector_vnum sect, bool count_original_sect) {
@@ -3283,7 +3283,7 @@ int count_adjacent_sectors(room_data *room, sector_vnum sect, bool count_origina
 	for (iter = 0; iter < NUM_2D_DIRS; ++iter) {
 		to_room = real_shift(room, shift_dir[iter][0], shift_dir[iter][1]);
 		
-		if (to_room && (SECT(to_room) == rl_sect || (count_original_sect && ROOM_ORIGINAL_SECT(to_room) == rl_sect))) {
+		if (to_room && (SECT(to_room) == rl_sect || (count_original_sect && BASE_SECT(to_room) == rl_sect))) {
 			++count;
 		}
 	}
@@ -3314,7 +3314,7 @@ int count_flagged_sect_between(bitvector_t sectf_bits, room_data *start, room_da
 	dist = compute_distance(start, end);	// for safety-checking
 	
 	for (iter = 1, room = straight_line(start, end, iter); iter <= dist && room && room != end; ++iter, room = straight_line(start, end, iter)) {
-		if (SECT_FLAGGED(SECT(room), sectf_bits) || (check_base_sect && SECT_FLAGGED(ROOM_ORIGINAL_SECT(room), sectf_bits))) {
+		if (SECT_FLAGGED(SECT(room), sectf_bits) || (check_base_sect && SECT_FLAGGED(BASE_SECT(room), sectf_bits))) {
 			++count;
 		}
 	}

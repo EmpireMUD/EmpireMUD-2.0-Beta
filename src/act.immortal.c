@@ -3225,7 +3225,7 @@ void do_stat_room(char_data *ch) {
 	else {
 		strcpy(buf2, GET_SECT_NAME(SECT(IN_ROOM(ch))));
 	}
-	msg_to_char(ch, "(%d, %d) %s (&c%s&0/&c%s&0)\r\n", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), get_room_name(IN_ROOM(ch), FALSE), buf2, GET_SECT_NAME(ROOM_ORIGINAL_SECT(IN_ROOM(ch))));
+	msg_to_char(ch, "(%d, %d) %s (&c%s&0/&c%s&0)\r\n", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), get_room_name(IN_ROOM(ch), FALSE), buf2, GET_SECT_NAME(BASE_SECT(IN_ROOM(ch))));
 	msg_to_char(ch, "VNum: [&g%d&0], Island: [%d] %s\r\n", GET_ROOM_VNUM(IN_ROOM(ch)), GET_ISLAND_ID(home), get_island(GET_ISLAND_ID(home), TRUE)->name);
 	
 	if (home != IN_ROOM(ch)) {

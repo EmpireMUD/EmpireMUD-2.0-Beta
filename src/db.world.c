@@ -41,6 +41,7 @@ extern struct city_metadata_type city_type[];
 extern const sector_vnum climate_default_sector[NUM_CLIMATES];
 extern bool need_world_index;
 extern const int rev_dir[];
+extern bool world_map_needs_save;
 
 // external funcs
 void add_room_to_world_tables(room_data *room);
@@ -68,6 +69,29 @@ void save_world_map_to_file();
  //////////////////////////////////////////////////////////////////////////////
 //// WORLD-CHANGERS //////////////////////////////////////////////////////////
 
+/**
+* Update the "base sector" of a room. This is the sector that underlies its
+* current sector (e.g. Plains under Building).
+*
+* @param room_data *room The room to update.
+* @param sector_data *sect The sector to change the base to.
+*/
+void change_base_sector(room_data *room, sector_data *sect) {
+	// safety
+	if (GET_ROOM_VNUM(room) >= MAP_SIZE) {
+		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: Attempting to change_base_sector outside the map (%d)", GET_ROOM_VNUM(room));
+		return;
+	}
+	if (!sect) {
+		log("SYSERR: change_terrain called with invalid sector");
+		return;
+	}
+	
+	BASE_SECT(room) = sect;
+	world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)].base_sector = sect;
+	world_map_needs_save = TRUE;
+}
+
 
 /**
 * This changes the territory when a chop finishes, and returns the number of
@@ -85,8 +109,8 @@ int change_chop_territory(room_data *room) {
 		trees = 1;
 		
 		// check if original sect was stored to the crop
-		if (ROOM_ORIGINAL_SECT(room) != SECT(room)) {
-			change_terrain(room, GET_SECT_VNUM(ROOM_ORIGINAL_SECT(room)));
+		if (BASE_SECT(room) != SECT(room)) {
+			change_terrain(room, GET_SECT_VNUM(BASE_SECT(room)));
 		}
 		else {
 			// default
@@ -120,6 +144,7 @@ void change_terrain(room_data *room, sector_vnum sect) {
 	bool belongs = BELONGS_IN_TERRITORY_LIST(room);
 	sector_data *old_sect = SECT(room), *st = sector_proto(sect);
 	crop_data *new_crop = NULL;
+	struct map_data *map;
 	empire_data *emp;
 	
 	if (GET_ROOM_VNUM(room) >= MAP_SIZE) {
@@ -142,7 +167,13 @@ void change_terrain(room_data *room, sector_vnum sect) {
 	
 	// change sect
 	SECT(room) = st;
-	ROOM_ORIGINAL_SECT(room) = st;
+	BASE_SECT(room) = st;
+	
+	// update the world map
+	map = &(world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)]);
+	map->sector_type = st;
+	map->base_sector = st;
+	world_map_needs_save = TRUE;
 		
 	// need room data?
 	if ((IS_ANY_BUILDING(room) || IS_ADVENTURE_ROOM(room)) && !COMPLEX_DATA(room)) {
@@ -555,11 +586,11 @@ void init_mine(room_data *room, char_data *ch) {
 		}
 		
 		// match ALL type-flags
-		if ((GET_SECT_FLAGS(ROOM_ORIGINAL_SECT(room)) & GET_GLOBAL_TYPE_FLAGS(glb)) != GET_GLOBAL_TYPE_FLAGS(glb)) {
+		if ((GET_SECT_FLAGS(BASE_SECT(room)) & GET_GLOBAL_TYPE_FLAGS(glb)) != GET_GLOBAL_TYPE_FLAGS(glb)) {
 			continue;
 		}
 		// match ZERO type-excludes
-		if ((GET_SECT_FLAGS(ROOM_ORIGINAL_SECT(room)) & GET_GLOBAL_TYPE_EXCLUDE(glb)) != 0) {
+		if ((GET_SECT_FLAGS(BASE_SECT(room)) & GET_GLOBAL_TYPE_EXCLUDE(glb)) != 0) {
 			continue;
 		}
 		
@@ -1552,7 +1583,7 @@ room_data *load_map_room(room_vnum vnum) {
 	add_room_to_world_tables(room);
 	
 	SECT(room) = map->sector_type;
-	ROOM_ORIGINAL_SECT(room) = map->base_sector;
+	BASE_SECT(room) = map->base_sector;
 	SET_ISLAND_ID(room, map->island);
 	
 	// only if saveable
@@ -1692,7 +1723,7 @@ static void evolve_one_map_tile(room_data *room) {
 	// Growing Seeds: NOTE: this one does not check is_entrance
 	if (!changed && ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && (evo = get_evolution_by_type(SECT(room), EVO_CROP_GROWS))) {
 		// only going to use the original sect if it was different -- this preserves the stored sect
-		sector_data *stored = (ROOM_ORIGINAL_SECT(room) != SECT(room)) ? ROOM_ORIGINAL_SECT(room) : NULL;
+		sector_data *stored = (BASE_SECT(room) != SECT(room)) ? BASE_SECT(room) : NULL;
 		
 		if (sector_proto(evo->becomes)) {
 			add_to_room_extra_data(room, ROOM_EXTRA_SEED_TIME, -1);
@@ -1700,7 +1731,7 @@ static void evolve_one_map_tile(room_data *room) {
 				type = get_room_extra_data(room, ROOM_EXTRA_CROP_TYPE);	// must preserve this
 				change_terrain(room, evo->becomes);
 				if (stored) {
-					ROOM_ORIGINAL_SECT(room) = stored;
+					change_base_sector(room, stored);
 				}
 				set_room_extra_data(room, ROOM_EXTRA_CROP_TYPE, type);
 				remove_depletion(room, DPLTN_PICK);
@@ -1712,8 +1743,8 @@ static void evolve_one_map_tile(room_data *room) {
 	// DONE
 
 	// If the new sector has crop data, we should store the original (e.g. a desert that randomly grows into a crop)
-	if (changed && ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && ROOM_ORIGINAL_SECT(room) == SECT(room)) {
-		ROOM_ORIGINAL_SECT(room) = original;
+	if (changed && ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && BASE_SECT(room) == SECT(room)) {
+		change_base_sector(room, original);
 	}
 }
 
@@ -1857,7 +1888,7 @@ void init_room(room_data *room, room_vnum vnum) {
 	room->owner = NULL;
 	
 	room->sector_type = inside;
-	room->original_sector = inside;
+	room->base_sector = inside;
 	
 	COMPLEX_DATA(room) = init_complex_data();	// no type at this point
 	room->light = 0;
@@ -1900,7 +1931,7 @@ void ruin_one_building(room_data *room) {
 	}
 
 	// basic setup
-	if (SECT_FLAGGED(ROOM_ORIGINAL_SECT(room), SECTF_FRESH_WATER | SECTF_OCEAN)) {
+	if (SECT_FLAGGED(BASE_SECT(room), SECTF_FRESH_WATER | SECTF_OCEAN)) {
 		type = BUILDING_RUINS_FLOODED;
 	}
 	else if (closed) {
@@ -2127,14 +2158,14 @@ void build_world_map(void) {
 		if (SECT(room)) {
 			world_map[x][y].sector_type = SECT(room);
 		}
-		if (ROOM_ORIGINAL_SECT(room)) {
-			world_map[x][y].base_sector = ROOM_ORIGINAL_SECT(room);
+		if (BASE_SECT(room)) {
+			world_map[x][y].base_sector = BASE_SECT(room);
 		}
 		
 		// we only update the natural sector if it doesn't have one
 		if (!world_map[x][y].natural_sector) {
 			// it's PROBABLY the room's original sect
-			world_map[x][y].natural_sector = ROOM_ORIGINAL_SECT(room);
+			world_map[x][y].natural_sector = BASE_SECT(room);
 		}
 	}
 }
@@ -2202,9 +2233,14 @@ void load_world_map_from_file(void) {
 /**
 * Outputs the land portion of the world map to the map file.
 */
-void save_world_map_to_file(void) {
+void save_world_map_to_file(void) {	
 	struct map_data *iter;
 	FILE *fl;
+	
+	// shortcut
+	if (!world_map_needs_save) {
+		return;
+	}
 	
 	if (!(fl = fopen(WORLD_MAP_FILE TEMP_SUFFIX, "w"))) {
 		log("Unable to open %s for writing", WORLD_MAP_FILE TEMP_SUFFIX);
@@ -2219,4 +2255,5 @@ void save_world_map_to_file(void) {
 	
 	fclose(fl);
 	rename(WORLD_MAP_FILE TEMP_SUFFIX, WORLD_MAP_FILE);
+	world_map_needs_save = FALSE;
 }

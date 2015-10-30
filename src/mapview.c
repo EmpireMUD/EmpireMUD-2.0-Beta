@@ -265,7 +265,7 @@ char *get_room_name(room_data *room, bool color) {
 		strcat(name, GET_CROP_TITLE(cp));
 
 	/* Custom names by type */
-	else if (IS_ROAD(room) && SECT_FLAGGED(ROOM_ORIGINAL_SECT(room), SECTF_ROUGH)) {
+	else if (IS_ROAD(room) && SECT_FLAGGED(BASE_SECT(room), SECTF_ROUGH)) {
 		strcat(name, "A Winding Path");
 	}
 
@@ -1113,7 +1113,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	struct icon_data *base_icon, *icon, *crop_icon = NULL;
 	bool junk, hidden = FALSE;
 	crop_data *cp = crop_proto(ROOM_CROP_TYPE(to_room));
-	sector_data *st, *base_sect = ROOM_ORIGINAL_SECT(to_room);
+	sector_data *st, *base_sect = BASE_SECT(to_room);
 	char *base_color, *str;
 	room_data *map_loc = get_map_location_for(IN_ROOM(ch)), *map_to_room = get_map_location_for(to_room);
 	obj_data *on_ship;
@@ -1312,7 +1312,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 		}
 		// east (@e) tile attachment
 		if (strstr(buf, "@e")) {
-			st = r_east ? ROOM_ORIGINAL_SECT(r_east) : ROOM_ORIGINAL_SECT(to_room);
+			st = r_east ? BASE_SECT(r_east) : BASE_SECT(to_room);
 			icon = get_icon_from_set(GET_SECT_ICONS(st), tileset);
 			sprintf(buf1, "%s%c", icon->color, GET_SECT_ROADSIDE_ICON(st));
 			str = str_replace("@e", buf1, buf);
@@ -1321,7 +1321,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 		}
 		// west (@w) tile attachment
 		if (strstr(buf, "@w")) {
-			st = r_west ? ROOM_ORIGINAL_SECT(r_west) : ROOM_ORIGINAL_SECT(to_room);
+			st = r_west ? BASE_SECT(r_west) : BASE_SECT(to_room);
 			icon = get_icon_from_set(GET_SECT_ICONS(st), tileset);
 			sprintf(buf1, "%s%c", icon->color, GET_SECT_ROADSIDE_ICON(st));
 			str = str_replace("@w", buf1, buf);
@@ -1515,7 +1515,7 @@ char *get_screenreader_room_name(room_data *from_room, room_data *to_room) {
 		strcpy(lbuf, GET_CROP_NAME(cp));
 		CAP(lbuf);
 	}
-	else if (IS_ROAD(to_room) && SECT_FLAGGED(ROOM_ORIGINAL_SECT(to_room), SECTF_ROUGH)) {
+	else if (IS_ROAD(to_room) && SECT_FLAGGED(BASE_SECT(to_room), SECTF_ROUGH)) {
 		strcpy(lbuf, "Winding Path");
 	}
 	else {

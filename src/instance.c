@@ -406,7 +406,7 @@ static room_data *instantiate_one_room(struct instance_data *inst, room_template
 	
 	room = create_room();
 	attach_template_to_room(rmt, room);
-	ROOM_ORIGINAL_SECT(room) = SECT(room) = sector_proto(config_get_int("default_adventure_sect"));
+	BASE_SECT(room) = SECT(room) = sector_proto(config_get_int("default_adventure_sect"));
 	SET_BIT(ROOM_BASE_FLAGS(room), GET_RMT_BASE_AFFECTS(rmt) | default_affs);
 	SET_BIT(ROOM_AFF_FLAGS(room), GET_RMT_BASE_AFFECTS(rmt) | default_affs);
 	

@@ -662,7 +662,7 @@ void claim_city(char_data *ch, char *argument) {
 			}
 			
 			// ok...
-			if (all || (SECT(to_room) != ROOM_ORIGINAL_SECT(to_room))) {
+			if (all || (SECT(to_room) != BASE_SECT(to_room))) {
 				found = TRUE;
 				claim_room(to_room, emp);
 				

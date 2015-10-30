@@ -286,7 +286,7 @@ void do_dg_terraform(room_data *target, sector_data *sect) {
 		return;
 	}
 	
-	old_sect = ROOM_ORIGINAL_SECT(target);
+	old_sect = BASE_SECT(target);
 	emp = ROOM_OWNER(target);
 	
 	change_terrain(target, GET_SECT_VNUM(sect));
@@ -297,7 +297,7 @@ void do_dg_terraform(room_data *target, sector_data *sect) {
 			
 	// preserve old original sect for roads -- TODO this is a special-case
 	if (IS_ROAD(target)) {
-		ROOM_ORIGINAL_SECT(target) = old_sect;
+		change_base_sector(target, old_sect);
 	}
 
 	if (emp) {

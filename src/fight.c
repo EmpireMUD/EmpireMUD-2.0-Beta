@@ -1356,7 +1356,7 @@ static bool tower_would_shoot(room_data *from_room, char_data *vict) {
 	}
 	
 	// can't see into buildings/mountains
-	if (ROOM_IS_CLOSED(to_room) || ROOM_SECT_FLAGGED(to_room, SECTF_OBSCURE_VISION) || SECT_FLAGGED(ROOM_ORIGINAL_SECT(to_room), SECTF_OBSCURE_VISION)) {
+	if (ROOM_IS_CLOSED(to_room) || ROOM_SECT_FLAGGED(to_room, SECTF_OBSCURE_VISION) || SECT_FLAGGED(BASE_SECT(to_room), SECTF_OBSCURE_VISION)) {
 		return FALSE;
 	}
 

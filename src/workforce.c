@@ -1127,6 +1127,7 @@ void do_chore_dismantle_mines(empire_data *emp, room_data *room) {
 
 INTERACTION_FUNC(one_farming_chore) {
 	extern const sector_vnum climate_default_sector[NUM_CLIMATES];
+	extern bool world_map_needs_save;
 	
 	empire_data *emp = ROOM_OWNER(inter_room);
 	sector_data *old_sect;
@@ -1165,15 +1166,20 @@ INTERACTION_FUNC(one_farming_chore) {
 			// only change to seeded if it's not an orchard OR if it's over-picked			
 			if (!ROOM_CROP_FLAGGED(inter_room, CROPF_IS_ORCHARD) || get_depletion(inter_room, DPLTN_PICK) >= short_depletion) {
 				if (EMPIRE_CHORE(emp, CHORE_REPLANTING) && (old_sect = reverse_lookup_evolution_for_sector(SECT(inter_room), EVO_CROP_GROWS))) {
-					// sly-convert back to what it was grown from
+					// sly-convert back to what it was grown from ... this is a hack
 					SECT(inter_room) = old_sect;
+					if (GET_ROOM_VNUM(inter_room) < MAP_SIZE) {
+						world_map[FLAT_X_COORD(inter_room)][FLAT_Y_COORD(inter_room)].sector_type = old_sect;
+						world_map_needs_save = TRUE;
+					}
+					
 					// we are keeping the original sect the same as it was
 					set_room_extra_data(inter_room, ROOM_EXTRA_SEED_TIME, 60);
 				}
 				else {
 					// do we have a stored original sect?
-					if (ROOM_ORIGINAL_SECT(inter_room) != SECT(inter_room)) {
-						change_terrain(inter_room, GET_SECT_VNUM(ROOM_ORIGINAL_SECT(inter_room)));
+					if (BASE_SECT(inter_room) != SECT(inter_room)) {
+						change_terrain(inter_room, GET_SECT_VNUM(BASE_SECT(inter_room)));
 					}
 					else {
 						// fallback

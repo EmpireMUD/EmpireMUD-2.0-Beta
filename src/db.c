@@ -166,6 +166,7 @@ bool need_world_index = TRUE;	// used to trigger world index saving (always save
 struct island_info *island_table = NULL; // hash table for all the islands
 struct map_data world_map[MAP_WIDTH][MAP_HEIGHT];	// master world map
 struct map_data *land_map = NULL;	// linked list of non-ocean
+bool world_map_needs_save = TRUE;	// always do at least 1 save
 
 
 // DB_BOOT_x
@@ -718,10 +719,15 @@ void verify_sectors(void) {
 	// check whole world
 	HASH_ITER(world_hh, world_table, room, next_room) {
 		if (!SECT(room)) {
+			// can't use change_terrain() here
 			SECT(room) = use_sect;
+			if (GET_ROOM_VNUM(room) < MAP_SIZE) {
+				world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)].sector_type = use_sect;
+				world_map_needs_save = TRUE;
+			}
 		}
-		if (!ROOM_ORIGINAL_SECT(room)) {
-			ROOM_ORIGINAL_SECT(room) = use_sect;
+		if (!BASE_SECT(room)) {
+			change_base_sector(room, use_sect);
 		}
 		
 		// also check for missing crop data
@@ -1756,21 +1762,21 @@ void check_version(void) {
 			// b2.8 reboot would have gotten bad original-sect data
 			room_data *room, *next_room;
 			HASH_ITER(world_hh, world_table, room, next_room) {
-				if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && SECT_FLAGGED(ROOM_ORIGINAL_SECT(room), SECTF_HAS_CROP_DATA) && !SECT_FLAGGED(ROOM_ORIGINAL_SECT(room), SECTF_CROP)) {
+				if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && SECT_FLAGGED(BASE_SECT(room), SECTF_HAS_CROP_DATA) && !SECT_FLAGGED(BASE_SECT(room), SECTF_CROP)) {
 					// normal case: crop with a 'Seeded' original sect
 					// the fix is just to set the original sect to the current
 					// sect so it will detect a new sect on-harvest instead of
 					// setting it back to seeded
-					ROOM_ORIGINAL_SECT(room) = SECT(room);
+					change_base_sector(room, SECT(room));
 				}
-				else if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && !ROOM_SECT_FLAGGED(room, SECTF_CROP) && SECT(room) == ROOM_ORIGINAL_SECT(room)) {
+				else if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && !ROOM_SECT_FLAGGED(room, SECTF_CROP) && SECT(room) == BASE_SECT(room)) {
 					// second error case: a Seeded crop with itself as its
 					// original sect: detect a new original sect
 					extern const sector_vnum climate_default_sector[NUM_CLIMATES];
 					sector_data *sect;
 					crop_data *cp;
 					if ((cp = crop_proto(ROOM_CROP_TYPE(room))) && (sect = sector_proto(climate_default_sector[GET_CROP_CLIMATE(cp)]))) {
-						ROOM_ORIGINAL_SECT(room) = sect;
+						change_base_sector(room, sect);
 					}
 				}
 			}
@@ -1834,21 +1840,21 @@ void check_version(void) {
 			// rooms
 			room_data *room, *next_room;
 			HASH_ITER(world_hh, world_table, room, next_room) {
-				if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && SECT_FLAGGED(ROOM_ORIGINAL_SECT(room), SECTF_HAS_CROP_DATA) && !SECT_FLAGGED(ROOM_ORIGINAL_SECT(room), SECTF_CROP)) {
+				if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && SECT_FLAGGED(BASE_SECT(room), SECTF_HAS_CROP_DATA) && !SECT_FLAGGED(BASE_SECT(room), SECTF_CROP)) {
 					// normal case: crop with a 'Seeded' original sect
 					// the fix is just to set the original sect to the current
 					// sect so it will detect a new sect on-harvest instead of
 					// setting it back to seeded
-					ROOM_ORIGINAL_SECT(room) = SECT(room);
+					change_base_sector(room, SECT(room));
 				}
-				else if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && !ROOM_SECT_FLAGGED(room, SECTF_CROP) && SECT_FLAGGED(ROOM_ORIGINAL_SECT(room), SECTF_HAS_CROP_DATA) && !SECT_FLAGGED(ROOM_ORIGINAL_SECT(room), SECTF_CROP)) {
+				else if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && !ROOM_SECT_FLAGGED(room, SECTF_CROP) && SECT_FLAGGED(BASE_SECT(room), SECTF_HAS_CROP_DATA) && !SECT_FLAGGED(BASE_SECT(room), SECTF_CROP)) {
 					// second error case: a Seeded crop with a Seeded crop as
 					// its original sect: detect a new original sect
 					extern const sector_vnum climate_default_sector[NUM_CLIMATES];
 					sector_data *sect;
 					crop_data *cp;
 					if ((cp = crop_proto(ROOM_CROP_TYPE(room))) && (sect = sector_proto(climate_default_sector[GET_CROP_CLIMATE(cp)]))) {
-						ROOM_ORIGINAL_SECT(room) = sect;
+						change_base_sector(room, sect);
 					}
 				}
 			}

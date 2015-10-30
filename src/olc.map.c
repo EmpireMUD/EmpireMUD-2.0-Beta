@@ -131,7 +131,7 @@ OLC_MODULE(mapedit_terrain) {
 		msg_to_char(ch, "That sector requires extra data and can't be set this way.\r\n");
 	}
 	else {
-		old_sect = ROOM_ORIGINAL_SECT(IN_ROOM(ch));
+		old_sect = BASE_SECT(IN_ROOM(ch));
 		emp = ROOM_OWNER(IN_ROOM(ch));
 
 		// delete city center?
@@ -166,7 +166,7 @@ OLC_MODULE(mapedit_terrain) {
 				
 		// preserve old original sect for roads -- TODO this is a special-case
 		if (IS_ROAD(IN_ROOM(ch))) {
-			ROOM_ORIGINAL_SECT(IN_ROOM(ch)) = old_sect;
+			change_base_sector(IN_ROOM(ch), old_sect);
 		}
 
 		if (emp) {

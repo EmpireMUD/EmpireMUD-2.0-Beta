@@ -1995,8 +1995,8 @@ RITUAL_FINISH_FUNC(perform_devastation_ritual) {
 			run_room_interactions(ch, to_room, INTERACT_HARVEST, devastate_crop);
 			
 			// check for original sect, which may have been stored
-			if (ROOM_ORIGINAL_SECT(to_room) != SECT(to_room)) {
-				change_terrain(to_room, GET_SECT_VNUM(ROOM_ORIGINAL_SECT(to_room)));
+			if (BASE_SECT(to_room) != SECT(to_room)) {
+				change_terrain(to_room, GET_SECT_VNUM(BASE_SECT(to_room)));
 			}
 			else {
 				// fallback sect
@@ -2008,8 +2008,8 @@ RITUAL_FINISH_FUNC(perform_devastation_ritual) {
 			act("$n's powerful ritual devastates the seeded field!", FALSE, ch, NULL, NULL, TO_ROOM);
 			
 			// check for original sect, which may have been stored
-			if (ROOM_ORIGINAL_SECT(to_room) != SECT(to_room)) {
-				change_terrain(to_room, GET_SECT_VNUM(ROOM_ORIGINAL_SECT(to_room)));
+			if (BASE_SECT(to_room) != SECT(to_room)) {
+				change_terrain(to_room, GET_SECT_VNUM(BASE_SECT(to_room)));
 			}
 			else {
 				// fallback sect

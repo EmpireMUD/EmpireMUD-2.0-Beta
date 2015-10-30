@@ -158,6 +158,7 @@ void save_index(int type);
 void save_library_file_for_vnum(int type, any_vnum vnum);
 
 // world processors
+void change_base_sector(room_data *room, sector_data *sect);
 void change_terrain(room_data *room, sector_vnum sect);
 void construct_building(room_data *room, bld_vnum type);
 void disassociate_building(room_data *room);
