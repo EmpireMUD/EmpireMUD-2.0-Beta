@@ -164,6 +164,8 @@ room_data *interior_world_table = NULL;	// hash table of the interior world
 bool world_is_sorted = FALSE;	// to prevent unnecessary re-sorts
 bool need_world_index = TRUE;	// used to trigger world index saving (always save at least once)
 struct island_info *island_table = NULL; // hash table for all the islands
+struct map_data world_map[MAP_WIDTH][MAP_HEIGHT];	// master world map
+struct map_data *land_map = NULL;	// linked list of non-ocean
 
 
 // DB_BOOT_x
@@ -309,6 +311,8 @@ void boot_db(void) {
 * rooms (because rooms have sectors).
 */
 void boot_world(void) {
+	void build_land_map();
+	void build_world_map();
 	void check_for_bad_buildings();
 	void check_for_bad_sectors();
 	void check_newbie_islands();
@@ -317,6 +321,7 @@ void boot_world(void) {
 	void load_empire_storage();
 	void load_instances();
 	void load_islands();
+	void load_world_map_from_file();
 	void number_and_count_islands(bool reset);
 	void renum_world();
 	void setup_start_locations();
@@ -340,9 +345,12 @@ void boot_world(void) {
 	log("Loading crops.");
 	index_boot(DB_BOOT_CROP);
 	
-	// requires sectors, buildings, and room templates
-	log("Loading rooms.");
-	index_boot(DB_BOOT_WLD);
+	// requires sectors, buildings, and room templates -- order matters here
+	log("Loading the world.");
+	load_world_map_from_file();	// get base data
+	index_boot(DB_BOOT_WLD);	// override with live rooms
+	build_world_map();	// ensure full world map
+	build_land_map();	// determine which parts are land
 	
 	// requires rooms
 	log("Loading empires.");
@@ -772,7 +780,10 @@ void renum_world(void) {
 				
 				// validify exit
 				ex->room_ptr = real_room(ex->to_room);
-				if (!ex->room_ptr) {
+				if (ex->room_ptr) {
+					++GET_EXITS_HERE(ex->room_ptr);
+				}
+				else {
 					if (ex->keyword) {
 						free(ex->keyword);
 					}
@@ -1203,20 +1214,41 @@ void check_newbie_islands(void) {
 }
 
 
-// adds a room to an island, then scans all adjacent rooms
-static void recursive_island_scan(room_data *room, int island) {
-	int dir;
-	room_data *to_room;
+/**
+* adds a map location to an island, then scans all adjacent locations.
+*
+* @param map_data *map The map location (in world_map or land_map) to set.
+* @param int island The island id to assign it.
+*/
+static void recursive_island_scan(struct map_data *map, int island) {
+	int x, y, new_x, new_y;
+	struct map_data *tile;
+	room_data *room;
 	
-	SET_ISLAND_ID(room, MAX(0, island));	// ensure it's never < 0, as that would go poorly
+	island = MAX(0, island);	// ensure it's never < 0, as that would go poorly
 	
-	for (dir = 0; dir < NUM_2D_DIRS; ++dir) {
-		// TODO disabling ocean lookups on this real_shift would save RAM at startup
-		to_room = real_shift(room, shift_dir[dir][0], shift_dir[dir][1]);
-		
-		// TODO <= 0 here -- isn't 0 a valid island num?
-		if (to_room && !ROOM_SECT_FLAGGED(to_room, SECTF_NON_ISLAND) && GET_ISLAND_ID(to_room) <= 0) {
-			recursive_island_scan(to_room, island);
+	map->island = island;
+	
+	// if there's a real room
+	if ((room = real_real_room(map->vnum))) {
+		SET_ISLAND_ID(room, island);
+	}
+	
+	// check neighboring tiles
+	for (x = -1; x <= 1; ++x) {
+		for (y = -1; y <= 1; ++y) {
+			// same tile
+			if (x == 0 && y == 0) {
+				continue;
+			}
+			
+			if (get_coord_shift(MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum), x, y, &new_x, &new_y)) {
+				tile = &(world_map[new_x][new_y]);
+				
+				if (!SECT_FLAGGED(tile->sector_type, SECTF_NON_ISLAND) && tile->island <= 0) {
+					recursive_island_scan(tile, island);
+				}
+			}
 		}
 	}
 }
@@ -1243,23 +1275,19 @@ void number_and_count_islands(bool reset) {
 	
 	struct island_read_data *data, *next_data, *list = NULL;
 	bool re_empire = (top_island_num != -1);
-	room_data *room, *next_room;
 	struct island_info *isle;
+	struct map_data *map;
+	room_data *room;
 	int id, iter;
 	
 	// find top island id (and reset if requested)
 	top_island_num = -1;
-	HASH_ITER(world_hh, world_table, room, next_room) {
-		// map only
-		if (GET_ROOM_VNUM(room) >= MAP_SIZE) {
-			continue;
-		}
-		
-		if (reset || ROOM_SECT_FLAGGED(room, SECTF_NON_ISLAND)) {
-			SET_ISLAND_ID(room, NO_ISLAND);
+	for (map = land_map; map; map = map->next) {
+		if (reset || SECT_FLAGGED(map->sector_type, SECTF_NON_ISLAND)) {
+			map->island = NO_ISLAND;
 		}
 		else {
-			top_island_num = MAX(top_island_num, GET_ISLAND_ID(room));
+			top_island_num = MAX(top_island_num, map->island);
 		}
 	}
 	
@@ -1267,31 +1295,21 @@ void number_and_count_islands(bool reset) {
 	
 	// 1. expand EXISTING islands
 	if (!reset) {
-		HASH_ITER(world_hh, world_table, room, next_room) {
-			// map only
-			if (GET_ROOM_VNUM(room) >= MAP_SIZE) {
-				continue;
-			}
-			
-			if (GET_ISLAND_ID(room) != NO_ISLAND) {
-				recursive_island_scan(room, GET_ISLAND_ID(room));
+		for (map = land_map; map; map = map->next) {
+			if (map->island != NO_ISLAND) {
+				recursive_island_scan(map, map->island);
 			}
 		}
 	}
 	
 	// 2. look for places that have no island id but need one -- and also measure islands while we're here
-	HASH_ITER(world_hh, world_table, room, next_room) {
-		// map only!
-		if (GET_ROOM_VNUM(room) >= MAP_SIZE) {
-			continue;
-		}
-		
-		if (GET_ISLAND_ID(room) == NO_ISLAND && !ROOM_SECT_FLAGGED(room, SECTF_NON_ISLAND)) {
-			recursive_island_scan(room, ++top_island_num);
+	for (map = land_map; map; map = map->next) {
+		if (map->island == NO_ISLAND && !SECT_FLAGGED(map->sector_type, SECTF_NON_ISLAND)) {
+			recursive_island_scan(map, ++top_island_num);
 		}
 		
 		// find helper entry
-		id = GET_ISLAND_ID(room);
+		id = map->island;
 		if (id == NO_ISLAND) {
 			// just an ocean
 			continue;
@@ -1310,25 +1328,25 @@ void number_and_count_islands(bool reset) {
 
 		// update helper data
 		data->size += 1;
-		data->sum_x += FLAT_X_COORD(room);
-		data->sum_y += FLAT_Y_COORD(room);
+		data->sum_x += MAP_X_COORD(map->vnum);
+		data->sum_y += MAP_Y_COORD(map->vnum);
 	
 		// detect edges
-		if (data->edge[NORTH] == NOWHERE || FLAT_Y_COORD(room) > data->edge_val[NORTH]) {
-			data->edge[NORTH] = GET_ROOM_VNUM(room);
-			data->edge_val[NORTH] = FLAT_Y_COORD(room);
+		if (data->edge[NORTH] == NOWHERE || MAP_Y_COORD(map->vnum) > data->edge_val[NORTH]) {
+			data->edge[NORTH] = map->vnum;
+			data->edge_val[NORTH] = MAP_Y_COORD(map->vnum);
 		}
-		if (data->edge[SOUTH] == NOWHERE || FLAT_Y_COORD(room) < data->edge_val[SOUTH]) {
-			data->edge[SOUTH] = GET_ROOM_VNUM(room);
-			data->edge_val[SOUTH] = FLAT_Y_COORD(room);
+		if (data->edge[SOUTH] == NOWHERE || MAP_Y_COORD(map->vnum) < data->edge_val[SOUTH]) {
+			data->edge[SOUTH] = map->vnum;
+			data->edge_val[SOUTH] = MAP_Y_COORD(map->vnum);
 		}
-		if (data->edge[EAST] == NOWHERE || FLAT_X_COORD(room) > data->edge_val[EAST]) {
-			data->edge[EAST] = GET_ROOM_VNUM(room);
-			data->edge_val[EAST] = FLAT_X_COORD(room);
+		if (data->edge[EAST] == NOWHERE || MAP_X_COORD(map->vnum) > data->edge_val[EAST]) {
+			data->edge[EAST] = map->vnum;
+			data->edge_val[EAST] = MAP_X_COORD(map->vnum);
 		}
-		if (data->edge[WEST] == NOWHERE || FLAT_X_COORD(room) < data->edge_val[WEST]) {
-			data->edge[WEST] = GET_ROOM_VNUM(room);
-			data->edge_val[WEST] = FLAT_X_COORD(room);
+		if (data->edge[WEST] == NOWHERE || MAP_X_COORD(map->vnum) < data->edge_val[WEST]) {
+			data->edge[WEST] = map->vnum;
+			data->edge_val[WEST] = MAP_X_COORD(map->vnum);
 		}
 	}
 	

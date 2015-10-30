@@ -56,9 +56,9 @@ extern struct player_special_data dummy_mob;
 extern bool world_is_sorted;
 
 // external funcs
-extern room_data *create_ocean_room(room_vnum vnum);
 extern struct complex_room_data *init_complex_data();
 void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location);
+extern room_data *load_map_room(room_vnum vnum);
 extern obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify);
 void sort_exits(struct room_direction_data **list);
 void sort_world_table();
@@ -5807,9 +5807,9 @@ room_data *real_room(room_vnum vnum) {
 	
 	// we guarantee map rooms exist
 	if (!room && vnum < MAP_SIZE) {
-		room = create_ocean_room(vnum);
+		room = load_map_room(vnum);
 	}
-
+	
 	return room;
 }
 
@@ -6520,6 +6520,9 @@ void free_complex_data(struct complex_room_data *data) {
 	
 	while ((ex = data->exits)) {
 		data->exits = ex->next;
+		if (ex->room_ptr) {
+			--GET_EXITS_HERE(ex->room_ptr);
+		}
 		if (ex->keyword) {
 			free(ex->keyword);
 		}

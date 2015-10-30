@@ -94,11 +94,14 @@
 // See http://linux.die.net/man/3/crypt for more info.
 #define PASSWORD_SALT  "salt"
 
-// this determines if a room is "empty ocean" and doesn't need to stay in RAM
-#define BASIC_OCEAN  6	// sector to un-load and recreate as-needed
+#define BASIC_OCEAN  6	// sector vnum used as the base for blank rooms
+
+// this determines if a room is "empty"/"blank" and doesn't need to stay in RAM
 #define CAN_UNLOAD_MAP_ROOM(room)  ( \
-	GET_SECT_VNUM(SECT(room)) == BASIC_OCEAN && !COMPLEX_DATA(room) && \
+	!COMPLEX_DATA(room) && \
 	GET_ROOM_VNUM(room) < MAP_SIZE && \
+	GET_EXITS_HERE(room) == 0 && \
+	SECT(room) == world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)].sector_type && \
 	!ROOM_OWNER(room) && !ROOM_CONTENTS(room) && !ROOM_PEOPLE(room) && \
 	!ROOM_DEPLETION(room) && !ROOM_CUSTOM_NAME(room) && \
 	!ROOM_CUSTOM_ICON(room) && !ROOM_CUSTOM_DESCRIPTION(room) && \
@@ -3286,6 +3289,7 @@ struct room_data {
 	
 	struct complex_room_data *complex; // for rooms that are buildings, inside, adventures, etc
 	byte light;  // number of light sources
+	int exits_here;	// number of rooms that have complex->exits to this one
 	
 	struct depletion_data *depletion;	// resource depletion
 
@@ -3423,4 +3427,18 @@ struct track_data {
 	byte dir;	// which way
 	
 	struct track_data *next;
+};
+
+
+// data for the world map (world_map, land_map)
+struct map_data {
+	room_vnum vnum;	// corresponding room vnum (coordinates can be derived from here)
+	int island;	// the island id
+	
+	// three basic sector types
+	sector_data *sector_type;	// current sector
+	sector_data *base_sector;	// underlying current sector (e.g. plains under building)
+	sector_data *natural_sector;	// sector at time of map generation
+	
+	struct map_data *next;	// linked list of non-ocean tiles, for iterating
 };

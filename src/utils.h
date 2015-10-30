@@ -447,9 +447,13 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 // returns TRUE only if both x and y are in the bounds of the map
 #define CHECK_MAP_BOUNDS(x, y)  ((x) >= 0 && (x) < MAP_WIDTH && (y) >= 0 && (y) < MAP_HEIGHT)
 
-// flat coords ASSUME room is on the map -- otherwise use the X_COORD/Y_COORD macros
-#define FLAT_X_COORD(room)  (GET_ROOM_VNUM(room) % MAP_WIDTH)
-#define FLAT_Y_COORD(room)  (GET_ROOM_VNUM(room) / MAP_WIDTH)
+// for getting coordinates by vnum
+#define MAP_X_COORD(vnum)  ((vnum) % MAP_WIDTH)
+#define MAP_Y_COORD(vnum)  (int)((vnum) / MAP_WIDTH)
+
+// flat coords ASSUME room is on the map -- otherwise use the X_COORD/Y_COORD
+#define FLAT_X_COORD(room)  MAP_X_COORD(GET_ROOM_VNUM(room))
+#define FLAT_Y_COORD(room)  MAP_Y_COORD(GET_ROOM_VNUM(room))
 
 extern int X_COORD(room_data *room);	// formerly #define X_COORD(room)  FLAT_X_COORD(get_map_location_for(room))
 extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(get_map_location_for(room))
@@ -862,6 +866,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define ROOM_PEOPLE(room)  ((room)->people)
 #define ROOM_TRACKS(room)  ((room)->tracks)
 #define SECT(room)  ((room)->sector_type)
+#define GET_EXITS_HERE(room)  ((room)->exits_here)
 
 
 // room->complex data
@@ -1146,6 +1151,7 @@ extern bool find_sect_within_distance_from_room(room_data *room, sector_vnum sec
 extern int compute_distance(room_data *from, room_data *to);
 extern int count_adjacent_sectors(room_data *room, sector_vnum sect, bool count_original_sect);
 extern int distance_to_nearest_player(room_data *room);
+extern bool get_coord_shift(int start_x, int start_y, int x_shift, int y_shift, int *new_x, int *new_y);
 extern int get_direction_to(room_data *from, room_data *to);
 extern room_data *get_map_location_for(room_data *room);
 extern room_data *real_shift(room_data *origin, int x_shift, int y_shift);

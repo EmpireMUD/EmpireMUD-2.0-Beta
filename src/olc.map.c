@@ -432,6 +432,9 @@ OLC_MODULE(mapedit_delete_exit) {
 	}
 	else {
 		if ((ex = find_exit(IN_ROOM(ch), dir))) {
+			if (ex->room_ptr) {
+				--GET_EXITS_HERE(ex->room_ptr);
+			}
 			if (ex->keyword)
 				free(ex->keyword);
 			REMOVE_FROM_LIST(ex, COMPLEX_DATA(IN_ROOM(ch))->exits, next);

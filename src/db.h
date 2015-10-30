@@ -135,6 +135,8 @@
 #define NUM_WORLD_BLOCK_UPDATES  15	// world is divided into this many updates, and one fires per 30 seconds
 #define GET_WORLD_BLOCK(roomvnum)  (roomvnum == NOWHERE ? NOWHERE : (int)(roomvnum / WORLD_BLOCK_SIZE))
 
+// additional files
+#define WORLD_MAP_FILE  LIB_WORLD"base_map"	// storage for the game's base map
 
 // used for many file reads:
 #define READ_SIZE 256
@@ -289,6 +291,8 @@ extern struct room_direction_data *create_exit(room_data *from, room_data *to, i
 void delete_room(room_data *room, bool check_exits);
 extern room_data *world_table;
 extern room_data *interior_world_table;
+extern struct map_data world_map[MAP_WIDTH][MAP_HEIGHT];
+extern struct map_data *land_map;
 room_data *real_real_room(room_vnum vnum);
 room_data *real_room(room_vnum vnum);
 

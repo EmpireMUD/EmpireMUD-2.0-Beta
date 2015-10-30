@@ -1573,6 +1573,9 @@ ACMD(do_mdoor) {
 	if (fd == 0) {
 		if (newexit) {
 			REMOVE_FROM_LIST(newexit, COMPLEX_DATA(rm)->exits, next);
+			if (newexit->room_ptr) {
+				--GET_EXITS_HERE(newexit->room_ptr);
+			}
 			if (newexit->keyword)
 				free(newexit->keyword);
 			free(newexit);
@@ -1602,8 +1605,13 @@ ACMD(do_mdoor) {
 						newexit = create_exit(rm, to_room, dir, FALSE);
 					}
 					else {
+						if (newexit->room_ptr) {
+							// lower old one
+							--GET_EXITS_HERE(newexit->room_ptr);
+						}
 						newexit->to_room = GET_ROOM_VNUM(to_room);
 						newexit->room_ptr = to_room;
+						++GET_EXITS_HERE(to_room);
 					}
 				}
 				else

@@ -33,6 +33,7 @@
 *   Territory
 *   Helpers
 *   Map Output
+*   World Map System
 */
 
 // external vars
@@ -56,12 +57,12 @@ void write_room_to_file(FILE *fl, room_data *room);
 
 // locals
 int count_city_points_used(empire_data *emp);
-room_data *create_ocean_room(room_vnum vnum);
 void decustomize_room(room_data *room);
 static void evolve_one_map_tile(room_data *room);
 room_vnum find_free_vnum();
 void init_room(room_data *room, room_vnum vnum);
 void ruin_one_building(room_data *room);
+void save_world_map_to_file();
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -219,6 +220,9 @@ struct room_direction_data *create_exit(room_data *from, room_data *to, int dir,
 	if (ex) {
 		ex->to_room = to ? GET_ROOM_VNUM(to) : NOWHERE;
 		ex->room_ptr = to;
+		if (to) {
+			++GET_EXITS_HERE(to);
+		}
 	}
 	
 	if (back && to && COMPLEX_DATA(to) && !(other = find_exit(to, rev_dir[dir]))) {
@@ -237,6 +241,7 @@ struct room_direction_data *create_exit(room_data *from, room_data *to, int dir,
 	if (other) {
 		other->to_room = GET_ROOM_VNUM(from);
 		other->room_ptr = from;
+		++GET_EXITS_HERE(from);
 	}
 	
 	// re-find just in case
@@ -398,6 +403,10 @@ void delete_room(room_data *room, bool check_exits) {
 	if (check_exits) {
 		// update all home rooms and exits
 		HASH_ITER(world_hh, world_table, rm_iter, next_rm) {
+			// found them all?
+			if (GET_EXITS_HERE(room) <= 0) {
+				break;
+			}
 			if (rm_iter != room && COMPLEX_DATA(rm_iter)) {
 				// unset homeroom -> this is just interior table
 				if (COMPLEX_DATA(rm_iter)->home_room == room) {
@@ -416,6 +425,7 @@ void delete_room(room_data *room, bool check_exits) {
 							free(ex->keyword);
 						}
 						free(ex);
+						--GET_EXITS_HERE(room);
 					}
 				}
 			}
@@ -715,6 +725,7 @@ void save_whole_world(void) {
 	// ensure this
 	save_world_index();
 	save_instances();
+	save_world_map_to_file();
 }
 
 
@@ -1485,6 +1496,8 @@ void check_all_exits(void) {
 					}
 					REMOVE_FROM_LIST(ex, COMPLEX_DATA(room)->exits, next);
 					free(ex);
+					
+					// no need to update GET_EXITS_HERE() as the target room is gone
 				}
 			}	
 		}
@@ -1515,21 +1528,32 @@ void clear_private_owner(int id) {
 
 
 /**
-* Creates a blank ocean room using BASIC_OCEAN.
+* Creates a blank map room from the world_map data. This allows parts of the
+* map to be unloaded using CAN_UNLOAD_MAP_ROOM(); this function builds new
+* rooms as-needed.
 *
-* @param room_vnum vnum The vnum of the new ocean room.
-* @return room_data* A new ocean room.
+* @param room_vnum vnum The vnum of the map room to load.
+* @return room_data* A fresh map room.
 */
-room_data *create_ocean_room(room_vnum vnum) {
+room_data *load_map_room(room_vnum vnum) {
+	struct map_data *map;
 	room_data *room;
-
+	
+	if (vnum < 0 || vnum >= MAP_SIZE) {
+		log("SYSERR: load_map_room: request for out-of-bounds vnum %d", vnum);
+		return NULL;
+	}
+	
+	// find map data
+	map = &(world_map[MAP_X_COORD(vnum)][MAP_Y_COORD(vnum)]);
+	
 	CREATE(room, room_data, 1);
 	room->vnum = vnum;
 	add_room_to_world_tables(room);
 	
-	SECT(room) = sector_proto(BASIC_OCEAN);
-	ROOM_ORIGINAL_SECT(room) = SECT(room);
-	SET_ISLAND_ID(room, NO_ISLAND);
+	SECT(room) = map->sector_type;
+	ROOM_ORIGINAL_SECT(room) = map->base_sector;
+	SET_ISLAND_ID(room, map->island);
 	
 	// only if saveable
 	if (!CAN_UNLOAD_MAP_ROOM(room)) {
@@ -2035,3 +2059,158 @@ void output_map_to_file(void) {
 	rename(CITY_DATA_FILE TEMP_SUFFIX, CITY_DATA_FILE);
 }
 
+
+ //////////////////////////////////////////////////////////////////////////////
+//// WORLD MAP SYSTEM ////////////////////////////////////////////////////////
+
+/**
+* Validates sectors and sets up the land_map linked list. This should be done
+* at the end of world startup. Run this AFTER build_world_map().
+*/
+void build_land_map(void) {
+	struct map_data *map, *last = NULL;
+	sector_data *ocean = sector_proto(BASIC_OCEAN);
+	int x, y;
+	
+	land_map = NULL;
+	
+	for (x = 0; x < MAP_WIDTH; ++x) {
+		for (y = 0; y < MAP_HEIGHT; ++y) {
+			map = &(world_map[x][y]);
+						
+			// ensure data
+			if (!map->sector_type) {
+				map->sector_type = ocean;
+			}
+			if (!map->base_sector) {
+				map->base_sector = ocean;
+			}
+			if (!map->natural_sector) {
+				map->natural_sector = ocean;
+			}
+			
+			// update land_map
+			map->next = NULL;
+			if (map->sector_type != ocean) {
+				if (last) {
+					last->next = map;
+				}
+				else {
+					land_map = map;
+				}
+				last = map;
+			}
+		}
+	}
+}
+
+
+/**
+* Fills in any gaps in the world_map data from the current live map. This
+* should be run after the data is loaded from file. Run this BEFORE running
+* build_land_map().
+*/
+void build_world_map(void) {
+	room_data *room, *next_room;
+	int x, y;
+	
+	HASH_ITER(world_hh, world_table, room, next_room) {
+		x = FLAT_X_COORD(room);
+		y = FLAT_Y_COORD(room);
+		
+		if (SECT(room)) {
+			world_map[x][y].sector_type = SECT(room);
+		}
+		if (ROOM_ORIGINAL_SECT(room)) {
+			world_map[x][y].base_sector = ROOM_ORIGINAL_SECT(room);
+		}
+		
+		// we only update the natural sector if it doesn't have one
+		if (!world_map[x][y].natural_sector) {
+			// it's PROBABLY the room's original sect
+			world_map[x][y].natural_sector = ROOM_ORIGINAL_SECT(room);
+		}
+	}
+}
+
+
+/**
+* This loads the world_map array from file. This is optional, and this data
+* can be overwritten by the actual rooms from the .wld files. This should be
+* run after sectors are loaded, and before the .wld files are read in.
+*/
+void load_world_map_from_file(void) {
+	struct map_data *map;
+	int var[6], x, y;
+	char line[256];
+	FILE *fl;
+	
+	// init
+	land_map = NULL;
+	for (x = 0; x < MAP_WIDTH; ++x) {
+		for (y = 0; y < MAP_HEIGHT; ++y) {
+			world_map[x][y].vnum = (y * MAP_WIDTH) + x;
+			world_map[x][y].island = NO_ISLAND;
+			world_map[x][y].sector_type = NULL;
+			world_map[x][y].base_sector = NULL;
+			world_map[x][y].natural_sector = NULL;
+			world_map[x][y].next = NULL;
+		}
+	}
+	
+	if (!(fl = fopen(WORLD_MAP_FILE, "r"))) {
+		log(" - no %s file, booting without one", WORLD_MAP_FILE);
+		return;
+	}
+	
+	// optionals
+	while (get_line(fl, line)) {
+		if (*line == '$') {
+			break;
+		}
+		
+		// x y island sect base natural
+		if (sscanf(line, "%d %d %d %d %d %d", &var[0], &var[1], &var[2], &var[3], &var[4], &var[5]) != 6) {
+			log("Encountered bad line in world map file: %s", line);
+			continue;
+		}
+		if (var[0] < 0 || var[0] >= MAP_WIDTH || var[1] < 0 || var[1] >= MAP_HEIGHT) {
+			log("Encountered bad location in world map file: (%d, %d)", var[0], var[1]);
+			continue;
+		}
+		
+		map = &(world_map[var[0]][var[1]]);
+		
+		map->island = var[2];
+		
+		// these will be validated later
+		map->sector_type = sector_proto(var[3]);
+		map->base_sector = sector_proto(var[4]);
+		map->natural_sector = sector_proto(var[5]);
+	}
+	
+	fclose(fl);
+}
+
+
+/**
+* Outputs the land portion of the world map to the map file.
+*/
+void save_world_map_to_file(void) {
+	struct map_data *iter;
+	FILE *fl;
+	
+	if (!(fl = fopen(WORLD_MAP_FILE TEMP_SUFFIX, "w"))) {
+		log("Unable to open %s for writing", WORLD_MAP_FILE TEMP_SUFFIX);
+		return;
+	}
+	
+	// only bother with ones that aren't base ocean
+	for (iter = land_map; iter; iter = iter->next) {
+		// x y island sect base natural
+		fprintf(fl, "%d %d %d %d %d %d\n", MAP_X_COORD(iter->vnum), MAP_Y_COORD(iter->vnum), iter->island, (iter->sector_type ? GET_SECT_VNUM(iter->sector_type) : -1), (iter->base_sector ? GET_SECT_VNUM(iter->base_sector) : -1), (iter->natural_sector ? GET_SECT_VNUM(iter->natural_sector) : -1));
+	}
+	
+	fclose(fl);
+	rename(WORLD_MAP_FILE TEMP_SUFFIX, WORLD_MAP_FILE);
+}

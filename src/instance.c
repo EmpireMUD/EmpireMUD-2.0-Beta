@@ -376,6 +376,7 @@ static void instantiate_one_exit(struct instance_data *inst, room_data *room, st
 	new->dir = dir;
 	new->to_room = GET_ROOM_VNUM(to_room);
 	new->room_ptr = to_room;
+	++GET_EXITS_HERE(to_room);
 	new->exit_info = exit->exit_info;
 	if (new->keyword) {
 		free(new->keyword);

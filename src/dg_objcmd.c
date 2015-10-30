@@ -933,6 +933,9 @@ OCMD(do_odoor) {
 	if (fd == 0) {
 		if (newexit) {
 			REMOVE_FROM_LIST(newexit, COMPLEX_DATA(rm)->exits, next);
+			if (newexit->room_ptr) {
+				--GET_EXITS_HERE(newexit->room_ptr);
+			}
 			if (newexit->keyword)
 				free(newexit->keyword);
 			free(newexit);
@@ -963,8 +966,13 @@ OCMD(do_odoor) {
 					newexit = create_exit(rm, troom, dir, FALSE);
 				}
 				else {
+					if (newexit->room_ptr) {
+						// lower old one
+						--GET_EXITS_HERE(newexit->room_ptr);
+					}
 					newexit->to_room = GET_ROOM_VNUM(troom);
 					newexit->room_ptr = troom;
+					++GET_EXITS_HERE(troom);
 				}
 			}
 			else
