@@ -391,8 +391,9 @@ void update_players_online_stats(void) {
 */
 void update_world_count(void) {
 	struct stats_data_struct *sect_inf = NULL, *crop_inf = NULL, *bld_inf = NULL, *data, *next_data;
-	room_data *iter, *next_iter;
 	any_vnum vnum, last_bld_vnum = NOTHING, last_crop_vnum = NOTHING, last_sect_vnum = NOTHING;
+	struct map_data *map;
+	room_data *room;
 	
 	// free and recreate counts
 	HASH_ITER(hh, global_sector_count, data, next_data) {
@@ -409,9 +410,9 @@ void update_world_count(void) {
 	}
 	
 	// scan world
-	HASH_ITER(world_hh, world_table, iter, next_iter) {
+	for (map = land_map; map; map = map->next) {
 		// sector
-		vnum = GET_SECT_VNUM(SECT(iter));
+		vnum = GET_SECT_VNUM(map->sector_type);
 		if (vnum != last_sect_vnum) {
 			HASH_FIND_INT(global_sector_count, &vnum, sect_inf);
 			if (!sect_inf) {
@@ -423,8 +424,13 @@ void update_world_count(void) {
 		}
 		++sect_inf->count;
 		
+		// any further data?
+		if (!(room = real_real_room(map->vnum))) {
+			continue;
+		}
+		
 		// crop?
-		vnum = ROOM_CROP_TYPE(iter);
+		vnum = ROOM_CROP_TYPE(room);
 		if (vnum != NOTHING) {
 			if (vnum != last_crop_vnum) {
 				HASH_FIND_INT(global_crop_count, &vnum, crop_inf);
@@ -440,7 +446,7 @@ void update_world_count(void) {
 		}
 		
 		// building?
-		vnum = BUILDING_VNUM(iter);
+		vnum = BUILDING_VNUM(room);
 		if (vnum != NOTHING) {
 			if (vnum != last_bld_vnum) {
 				HASH_FIND_INT(global_building_count, &vnum, bld_inf);
