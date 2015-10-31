@@ -1675,30 +1675,35 @@ static void evolve_one_map_tile(struct map_data *tile) {
 	}
 	
 	if (become == NOTHING && (evo = get_evolution_by_type(tile->sector_type, EVO_ADJACENT_ONE))) {
+		room = room ? room : real_room(tile->vnum);
 		if (count_adjacent_sectors(room, evo->value, TRUE) >= 1) {
 			become = evo->becomes;
 		}
 	}
 	
 	if (become == NOTHING && (evo = get_evolution_by_type(tile->sector_type, EVO_NOT_ADJACENT))) {
+		room = room ? room : real_room(tile->vnum);
 		if (count_adjacent_sectors(room, evo->value, TRUE) < 1) {
 			become = evo->becomes;
 		}
 	}
 	
 	if (become == NOTHING && (evo = get_evolution_by_type(tile->sector_type, EVO_ADJACENT_MANY))) {
+		room = room ? room : real_room(tile->vnum);
 		if (count_adjacent_sectors(room, evo->value, TRUE) >= 6) {
 			become = evo->becomes;
 		}
 	}
 	
 	if (become == NOTHING && (evo = get_evolution_by_type(tile->sector_type, EVO_NEAR_SECTOR))) {
+		room = room ? room : real_room(tile->vnum);
 		if (find_sect_within_distance_from_room(room, evo->value, config_get_int("nearby_sector_distance"))) {
 			become = evo->becomes;
 		}
 	}
 	
 	if (become == NOTHING && (evo = get_evolution_by_type(tile->sector_type, EVO_NOT_NEAR_SECTOR))) {
+		room = room ? room : real_room(tile->vnum);
 		if (!find_sect_within_distance_from_room(room, evo->value, config_get_int("nearby_sector_distance"))) {
 			become = evo->becomes;
 		}
