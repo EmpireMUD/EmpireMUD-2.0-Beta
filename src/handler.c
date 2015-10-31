@@ -3157,7 +3157,7 @@ bool run_room_interactions(char_data *ch, room_data *room, int type, INTERACTION
 	}
 	
 	// crop second
-	if (!success && ROOM_CROP_TYPE(room) != NOTHING && (crop = crop_proto(ROOM_CROP_TYPE(room)))) {
+	if (!success && (crop = ROOM_CROP(room))) {
 		success |= run_interactions(ch, GET_CROP_INTERACTIONS(crop), type, room, NULL, NULL, func);
 	}
 	

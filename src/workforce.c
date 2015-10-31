@@ -464,7 +464,7 @@ bool can_gain_chore_resource_from_interaction(empire_data *emp, room_data *room,
 	crop_data *cp;
 	
 	found_any |= can_gain_chore_resource_from_interaction_list(emp, room, GET_SECT_INTERACTIONS(SECT(room)), interaction_type, FALSE);
-	if (!found_any && ROOM_CROP_TYPE(room) != NOTHING && (cp = crop_proto(ROOM_CROP_TYPE(room)))) {
+	if (!found_any && (cp = ROOM_CROP(room))) {
 		found_any |= can_gain_chore_resource_from_interaction_list(emp, room, GET_CROP_INTERACTIONS(cp), interaction_type, FALSE);
 	}
 	if (!found_any && GET_BUILDING(room)) {
@@ -1160,7 +1160,7 @@ INTERACTION_FUNC(one_farming_chore) {
 				}
 			}
 	
-			sprintf(buf, "$n finishes harvesting the %s.", GET_CROP_NAME(crop_proto(ROOM_CROP_TYPE(inter_room))));
+			sprintf(buf, "$n finishes harvesting the %s.", GET_CROP_NAME(ROOM_CROP(inter_room)));
 			act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
 
 			// only change to seeded if it's not an orchard OR if it's over-picked			
@@ -1183,7 +1183,7 @@ INTERACTION_FUNC(one_farming_chore) {
 					}
 					else {
 						// fallback
-						change_terrain(inter_room, climate_default_sector[GET_CROP_CLIMATE(crop_proto(ROOM_CROP_TYPE(inter_room)))]);
+						change_terrain(inter_room, climate_default_sector[GET_CROP_CLIMATE(ROOM_CROP(inter_room))]);
 					}
 					
 					// stop the chop just in case

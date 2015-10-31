@@ -633,7 +633,7 @@ INTERACTION_FUNC(finish_harvesting) {
 	int count, num;
 	obj_data *obj = NULL;
 		
-	if ((cp = crop_proto(ROOM_CROP_TYPE(inter_room))) && (sect = sector_proto(climate_default_sector[GET_CROP_CLIMATE(cp)]))) {
+	if ((cp = ROOM_CROP(inter_room)) && (sect = sector_proto(climate_default_sector[GET_CROP_CLIMATE(cp)]))) {
 		// victory
 		act("You finish harvesting the crop!", FALSE, ch, 0, 0, TO_CHAR);
 		act("$n finished harvesting the crop!", FALSE, ch, 0, 0, TO_ROOM);
@@ -1334,17 +1334,17 @@ void process_harvesting(char_data *ch) {
 	switch (number(0, 2)) {
 		case 0: {
 			if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
-				msg_to_char(ch, "You walk through the field, harvesting the %s.\r\n", GET_CROP_NAME(crop_proto(ROOM_CROP_TYPE(IN_ROOM(ch)))));
+				msg_to_char(ch, "You walk through the field, harvesting the %s.\r\n", GET_CROP_NAME(ROOM_CROP(IN_ROOM(ch))));
 			}
-			sprintf(buf, "$n walks through the field, harvesting the %s.", GET_CROP_NAME(crop_proto(ROOM_CROP_TYPE(IN_ROOM(ch)))));
+			sprintf(buf, "$n walks through the field, harvesting the %s.", GET_CROP_NAME(ROOM_CROP(IN_ROOM(ch))));
 			act(buf, FALSE, ch, 0, 0, TO_ROOM | TO_SPAMMY);
 			break;
 		}
 		case 1: {
 			if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
-				msg_to_char(ch, "You carefully harvest the %s.\r\n", GET_CROP_NAME(crop_proto(ROOM_CROP_TYPE(IN_ROOM(ch)))));
+				msg_to_char(ch, "You carefully harvest the %s.\r\n", GET_CROP_NAME(ROOM_CROP(IN_ROOM(ch))));
 			}
-			sprintf(buf, "$n carefully harvests the %s.", GET_CROP_NAME(crop_proto(ROOM_CROP_TYPE(IN_ROOM(ch)))));
+			sprintf(buf, "$n carefully harvests the %s.", GET_CROP_NAME(ROOM_CROP(IN_ROOM(ch))));
 			act(buf, FALSE, ch, 0, 0, TO_ROOM | TO_SPAMMY);
 			break;
 		}
@@ -2316,7 +2316,7 @@ ACMD(do_harvest) {
 		msg_to_char(ch, "You can't do that.\r\n");
 	}
 	else if (GET_ACTION(ch) == ACT_HARVESTING) {
-		msg_to_char(ch, "You stop harvesting the %s.\r\n", GET_CROP_NAME(crop_proto(ROOM_CROP_TYPE(IN_ROOM(ch)))));
+		msg_to_char(ch, "You stop harvesting the %s.\r\n", GET_CROP_NAME(ROOM_CROP(IN_ROOM(ch))));
 		act("$n stops harvesting.\r\n", FALSE, ch, 0, 0, TO_ROOM);
 		cancel_action(ch);
 	}
@@ -2349,7 +2349,7 @@ ACMD(do_harvest) {
 			set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_HARVEST_PROGRESS, harvest_timer);
 		}
 		
-		msg_to_char(ch, "You begin harvesting the %s.\r\n", GET_CROP_NAME(crop_proto(ROOM_CROP_TYPE(IN_ROOM(ch)))));
+		msg_to_char(ch, "You begin harvesting the %s.\r\n", GET_CROP_NAME(ROOM_CROP(IN_ROOM(ch))));
 		act("$n begins to harvest the crop.", FALSE, ch, 0, 0, TO_ROOM);
 	}
 }
@@ -2547,7 +2547,7 @@ ACMD(do_plant) {
 		change_base_sector(IN_ROOM(ch), original);
 		
 		// don't use GET_FOOD_CROP_TYPE because not all plantables are food
-		set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CROP_TYPE, GET_OBJ_VAL(obj, VAL_FOOD_CROP_TYPE));
+		set_crop_type(IN_ROOM(ch), cp);
 		set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_SEED_TIME, planting_base_timer);
 		
 		extract_obj(obj);

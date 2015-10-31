@@ -236,7 +236,7 @@ bool morph_affinity_ok(room_data *location, int morph) {
 	crop_data *cp;
 	bool ok = TRUE;
 	
-	if (ROOM_SECT_FLAGGED(location, SECTF_HAS_CROP_DATA) && (cp = crop_proto(ROOM_CROP_TYPE(location)))) {
+	if (ROOM_SECT_FLAGGED(location, SECTF_HAS_CROP_DATA) && (cp = ROOM_CROP(location))) {
 		climate = GET_CROP_CLIMATE(cp);
 	}
 	else {

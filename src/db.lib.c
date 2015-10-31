@@ -3951,6 +3951,10 @@ void parse_room(FILE *fl, room_vnum vnum) {
 				add_trd_owner(vnum, atoi(line+1));
 				break;
 			}
+			case 'P': { // crop (plants)
+				set_crop_type(room, crop_proto(atoi(line+1)));
+				break;
+			}
 			case 'R': {	/* resources */
 				if (!get_line(fl, line2)) {
 					log("SYSERR: Unable to read resource line of room #%d", vnum);
@@ -4150,6 +4154,11 @@ void write_room_to_file(FILE *fl, room_data *room) {
 	// O owner
 	if (ROOM_OWNER(room)) {
 		fprintf(fl, "O%d\n", EMPIRE_VNUM(ROOM_OWNER(room)));
+	}
+	
+	// P crop (plant)
+	if (ROOM_CROP(room)) {
+		fprintf(fl, "P%d\n", GET_CROP_VNUM(ROOM_CROP(room)));
 	}
 	
 	// R resource

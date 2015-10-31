@@ -433,7 +433,7 @@ void update_world_count(void) {
 		}
 		
 		// crop?
-		vnum = ROOM_CROP_TYPE(room);
+		vnum = ROOM_CROP(room) ? GET_CROP_VNUM(ROOM_CROP(room)) : NOTHING;
 		if (vnum != NOTHING) {
 			if (vnum != last_crop_vnum) {
 				HASH_FIND_INT(global_crop_count, &vnum, crop_inf);

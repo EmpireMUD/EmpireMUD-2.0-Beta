@@ -2942,8 +2942,8 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 						else if (GET_BUILDING(IN_ROOM(ch))) {
 							sprintf(i, "b%d", GET_BLD_VNUM(GET_BUILDING(IN_ROOM(ch))));
 						}
-						else if (crop_proto(ROOM_CROP_TYPE(IN_ROOM(ch)))) {
-							sprintf(i, "c%d/s%d", GET_CROP_VNUM(crop_proto(ROOM_CROP_TYPE(IN_ROOM(ch)))), GET_SECT_VNUM(SECT(IN_ROOM(ch))));
+						else if (ROOM_CROP(IN_ROOM(ch))) {
+							sprintf(i, "c%d/s%d", GET_CROP_VNUM(ROOM_CROP(IN_ROOM(ch))), GET_SECT_VNUM(SECT(IN_ROOM(ch))));
 						}
 						else {
 							sprintf(i, "s%d", GET_SECT_VNUM(SECT(IN_ROOM(ch))));

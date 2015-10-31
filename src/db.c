@@ -53,6 +53,7 @@ void discrete_load(FILE *fl, int mode, char *filename);
 void free_complex_data(struct complex_room_data *data);
 void index_boot(int mode);
 extern obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify);
+void save_whole_world();
 
 // local functions
 int file_to_string_alloc(const char *name, char **buf);
@@ -217,6 +218,7 @@ void boot_db(void) {
 	void sort_commands();
 	void startup_room_reset();
 	void update_ships();
+	void verify_sectors();
 
 	log("Boot db -- BEGIN.");
 	
@@ -301,6 +303,9 @@ void boot_db(void) {
 	
 	log("Checking game version...");
 	check_version();
+		
+	log("Verifying world sectors.");
+	verify_sectors();
 
 	log("Boot db -- DONE.");
 }
@@ -326,7 +331,6 @@ void boot_world(void) {
 	void number_and_count_islands(bool reset);
 	void renum_world();
 	void setup_start_locations();
-	void verify_sectors();
 
 	log("Loading name lists.");
 	index_boot(DB_BOOT_NAMES);
@@ -357,9 +361,6 @@ void boot_world(void) {
 	log("Loading empires.");
 	index_boot(DB_BOOT_EMP);
 	clean_empire_logs();
-		
-	log("  Verifying world sectors.");
-	verify_sectors();
 	
 	// requires empires
 	log("  Renumbering rooms.");
@@ -731,10 +732,10 @@ void verify_sectors(void) {
 		}
 		
 		// also check for missing crop data
-		if (SECT_FLAGGED(SECT(room), SECTF_HAS_CROP_DATA | SECTF_CROP) && !find_room_extra_data(room, ROOM_EXTRA_CROP_TYPE)) {
+		if (SECT_FLAGGED(SECT(room), SECTF_HAS_CROP_DATA | SECTF_CROP) && !ROOM_CROP(room)) {
 			crop_data *new_crop = get_potential_crop_for_location(room);
 			if (new_crop) {
-				set_room_extra_data(room, ROOM_EXTRA_CROP_TYPE, GET_CROP_VNUM(new_crop));
+				set_crop_type(room, new_crop);
 			}
 		}
 	}
@@ -1725,24 +1726,34 @@ void b3_2_map_update(void) {
 	extern const sector_vnum climate_default_sector[NUM_CLIMATES];
 
 	room_data *room, *next_room;
+	
+	int ROOM_EXTRA_CROP_TYPE = 2;	// removed extra type
 	bitvector_t ROOM_AFF_PLAYER_MADE = BIT(11);	// removed flag
-	sector_vnum OASIS = 21, SANDY_TRENCH = 22;
+	sector_vnum OASIS = 21, SANDY_TRENCH = 22; 
 	
 	HASH_ITER(world_hh, world_table, room, next_room) {
-		if (!IS_SET(ROOM_AFF_FLAGS(room) | ROOM_BASE_FLAGS(room), ROOM_AFF_PLAYER_MADE)) {
-			continue;
+		// player-made
+		if (IS_SET(ROOM_AFF_FLAGS(room) | ROOM_BASE_FLAGS(room), ROOM_AFF_PLAYER_MADE)) {
+			// remove the bits
+			REMOVE_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_PLAYER_MADE);
+			REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_PLAYER_MADE);
+		
+			// update the natural sector
+			if (GET_ROOM_VNUM(room) < MAP_SIZE) {
+				world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)].natural_sector = sector_proto((GET_SECT_VNUM(SECT(room)) == OASIS || GET_SECT_VNUM(SECT(room)) == SANDY_TRENCH) ? climate_default_sector[CLIMATE_ARID] : climate_default_sector[CLIMATE_TEMPERATE]);
+				world_map_needs_save = TRUE;
+			}
 		}
 		
-		// remove the bits
-		REMOVE_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_PLAYER_MADE);
-		REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_PLAYER_MADE);
-		
-		// update the natural sector
-		if (GET_ROOM_VNUM(room) < MAP_SIZE) {
-			world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)].natural_sector = sector_proto((GET_SECT_VNUM(SECT(room)) == OASIS || GET_SECT_VNUM(SECT(room)) == SANDY_TRENCH) ? climate_default_sector[CLIMATE_ARID] : climate_default_sector[CLIMATE_TEMPERATE]);
-			world_map_needs_save = TRUE;
+		// crops
+		if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && !ROOM_CROP(room)) {
+			set_crop_type(room, crop_proto(get_room_extra_data(room, ROOM_EXTRA_CROP_TYPE)));
+			remove_room_extra_data(room, ROOM_EXTRA_CROP_TYPE);
 		}
 	}
+	
+	// ensure this gets saved
+	save_whole_world();
 }
 
 
@@ -1802,7 +1813,7 @@ void check_version(void) {
 					extern const sector_vnum climate_default_sector[NUM_CLIMATES];
 					sector_data *sect;
 					crop_data *cp;
-					if ((cp = crop_proto(ROOM_CROP_TYPE(room))) && (sect = sector_proto(climate_default_sector[GET_CROP_CLIMATE(cp)]))) {
+					if ((cp = ROOM_CROP(room)) && (sect = sector_proto(climate_default_sector[GET_CROP_CLIMATE(cp)]))) {
 						change_base_sector(room, sect);
 					}
 				}
@@ -1810,7 +1821,6 @@ void check_version(void) {
 		}
 		if (MATCH_VERSION("b2.11")) {
 			void save_trading_post();
-			void save_whole_world();
 			
 			struct empire_unique_storage *eus;
 			struct trading_post_data *tpd;
@@ -1880,7 +1890,7 @@ void check_version(void) {
 					extern const sector_vnum climate_default_sector[NUM_CLIMATES];
 					sector_data *sect;
 					crop_data *cp;
-					if ((cp = crop_proto(ROOM_CROP_TYPE(room))) && (sect = sector_proto(climate_default_sector[GET_CROP_CLIMATE(cp)]))) {
+					if ((cp = ROOM_CROP(room)) && (sect = sector_proto(climate_default_sector[GET_CROP_CLIMATE(cp)]))) {
 						change_base_sector(room, sect);
 					}
 				}

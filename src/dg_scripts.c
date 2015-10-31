@@ -2876,7 +2876,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "crop")) {
 						crop_data *cp;
-						if ((cp = crop_proto(ROOM_CROP_TYPE(r)))) {
+						if ((cp = ROOM_CROP(r))) {
 							snprintf(str, slen, "%s", GET_CROP_NAME(cp));
 						}
 						else {

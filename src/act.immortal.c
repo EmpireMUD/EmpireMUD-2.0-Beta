@@ -3218,7 +3218,7 @@ void do_stat_room(char_data *ch) {
 	room_data *home = HOME_ROOM(IN_ROOM(ch));
 
 
-	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_HAS_CROP_DATA) && (cp = crop_proto(get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CROP_TYPE)))) {
+	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_HAS_CROP_DATA) && (cp = ROOM_CROP(IN_ROOM(ch)))) {
 		strcpy(buf2, GET_CROP_NAME(cp));
 		CAP(buf2);
 	}
@@ -5929,7 +5929,7 @@ ACMD(do_stat) {
 		}
 	}
 	else if (!str_cmp(buf1, "crop")) {
-		if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_HAS_CROP_DATA) && (cp = crop_proto(ROOM_CROP_TYPE(IN_ROOM(ch))))) {
+		if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_HAS_CROP_DATA) && (cp = ROOM_CROP(IN_ROOM(ch)))) {
 			do_stat_crop(ch, cp);
 		}
 		else {

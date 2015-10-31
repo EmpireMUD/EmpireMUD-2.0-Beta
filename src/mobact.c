@@ -857,7 +857,7 @@ static void spawn_one_room(room_data *room) {
 			list = GET_BLD_SPAWNS(GET_BUILDING(room));
 		}
 	}
-	else if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && (cp = crop_proto(ROOM_CROP_TYPE(room)))) {
+	else if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && (cp = ROOM_CROP(room))) {
 		list = GET_CROP_SPAWNS(cp);
 	}
 	else {

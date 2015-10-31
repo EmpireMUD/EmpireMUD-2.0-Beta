@@ -105,7 +105,7 @@ int change_chop_territory(room_data *room) {
 	int trees = 1;
 	crop_data *cp;
 	
-	if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && ROOM_CROP_FLAGGED(room, CROPF_IS_ORCHARD) && (cp = crop_proto(ROOM_CROP_TYPE(room)))) {
+	if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && ROOM_CROP_FLAGGED(room, CROPF_IS_ORCHARD) && (cp = ROOM_CROP(room))) {
 		trees = 1;
 		
 		// check if original sect was stored to the crop
@@ -161,7 +161,7 @@ void change_terrain(room_data *room, sector_vnum sect) {
 	disassociate_building(room);
 	
 	// need to determine a crop before we change it?
-	if (SECT_FLAGGED(st, SECTF_HAS_CROP_DATA)) {
+	if (SECT_FLAGGED(st, SECTF_HAS_CROP_DATA) && !ROOM_CROP(room)) {
 		new_crop = get_potential_crop_for_location(room);
 	}
 	
@@ -184,12 +184,14 @@ void change_terrain(room_data *room, sector_vnum sect) {
 	remove_room_extra_data(room, ROOM_EXTRA_CHOP_PROGRESS);
 	remove_room_extra_data(room, ROOM_EXTRA_HARVEST_PROGRESS);
 	remove_room_extra_data(room, ROOM_EXTRA_TRENCH_PROGRESS);
-	remove_room_extra_data(room, ROOM_EXTRA_CROP_TYPE);
 	remove_room_extra_data(room, ROOM_EXTRA_SEED_TIME);
 	
 	// if we picked a crop type, 
 	if (new_crop) {
-		set_room_extra_data(room, ROOM_EXTRA_CROP_TYPE, GET_CROP_VNUM(new_crop));
+		set_crop_type(room, new_crop);
+	}
+	else if (!SECT_FLAGGED(st, SECTF_HAS_CROP_DATA)) {
+		set_crop_type(room, NULL);
 	}
 	
 	// do we need to lock the icon?
@@ -681,6 +683,25 @@ void untrench_room(room_data *room) {
 	
 	if (to_sect) {
 		change_terrain(room, GET_SECT_VNUM(to_sect));
+	}
+}
+
+
+/**
+* Set the crop on a room, and mark it on the base map.
+*
+* @param room_data *room The room to set crop for.
+* @param crop_data *cp The crop to set.
+*/
+void set_crop_type(room_data *room, crop_data *cp) {
+	if (!room) {
+		return;
+	}
+	
+	ROOM_CROP(room) = cp;
+	if (GET_ROOM_VNUM(room) < MAP_SIZE) {
+		world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)].crop_type = cp;
+		world_map_needs_save = TRUE;
 	}
 }
 
@@ -1612,6 +1633,8 @@ room_data *load_map_room(room_vnum vnum) {
 	BASE_SECT(room) = map->base_sector;
 	SET_ISLAND_ID(room, map->island);
 	
+	ROOM_CROP(room) = map->crop_type;
+	
 	// only if saveable
 	if (!CAN_UNLOAD_MAP_ROOM(room)) {
 		need_world_index = TRUE;
@@ -1860,7 +1883,6 @@ room_vnum find_free_vnum(void) {
 void grow_crop(room_data *room) {
 	struct evolution_data *evo;
 	sector_data *stored;
-	int type;
 	
 	// nothing to grow
 	if (!ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) || !(evo = get_evolution_by_type(SECT(room), EVO_CROP_GROWS)) || !sector_proto(evo->becomes)) {
@@ -1875,12 +1897,10 @@ void grow_crop(room_data *room) {
 	
 	// done?
 	if (get_room_extra_data(room, ROOM_EXTRA_SEED_TIME) <= 0) {
-		type = get_room_extra_data(room, ROOM_EXTRA_CROP_TYPE);	// must preserve this
 		change_terrain(room, evo->becomes);
 		if (stored) {
 			change_base_sector(room, stored);
 		}
-		set_room_extra_data(room, ROOM_EXTRA_CROP_TYPE, type);
 		remove_depletion(room, DPLTN_PICK);
 	}
 }
@@ -2073,7 +2093,7 @@ void output_map_to_file(void) {
 		}
 		
 		// normal map output
-		if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && (cp = crop_proto(ROOM_CROP_TYPE(room)))) {
+		if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && (cp = ROOM_CROP(room))) {
 			fprintf(out, "%c", mapout_color_tokens[GET_CROP_MAPOUT(cp)]);
 		}
 		else {
@@ -2223,7 +2243,7 @@ void build_world_map(void) {
 */
 void load_world_map_from_file(void) {
 	struct map_data *map;
-	int var[6], x, y;
+	int var[7], x, y;
 	char line[256];
 	FILE *fl;
 	
@@ -2236,6 +2256,7 @@ void load_world_map_from_file(void) {
 			world_map[x][y].sector_type = NULL;
 			world_map[x][y].base_sector = NULL;
 			world_map[x][y].natural_sector = NULL;
+			world_map[x][y].crop_type = NULL;
 			world_map[x][y].next = NULL;
 		}
 	}
@@ -2251,8 +2272,8 @@ void load_world_map_from_file(void) {
 			break;
 		}
 		
-		// x y island sect base natural
-		if (sscanf(line, "%d %d %d %d %d %d", &var[0], &var[1], &var[2], &var[3], &var[4], &var[5]) != 6) {
+		// x y island sect base natural crop
+		if (sscanf(line, "%d %d %d %d %d %d %d", &var[0], &var[1], &var[2], &var[3], &var[4], &var[5], &var[6]) != 7) {
 			log("Encountered bad line in world map file: %s", line);
 			continue;
 		}
@@ -2269,6 +2290,7 @@ void load_world_map_from_file(void) {
 		map->sector_type = sector_proto(var[3]);
 		map->base_sector = sector_proto(var[4]);
 		map->natural_sector = sector_proto(var[5]);
+		map->crop_type = crop_proto(var[6]);
 	}
 	
 	fclose(fl);
@@ -2306,8 +2328,8 @@ void save_world_map_to_file(void) {
 	
 	// only bother with ones that aren't base ocean
 	for (iter = land_map; iter; iter = iter->next) {
-		// x y island sect base natural
-		fprintf(fl, "%d %d %d %d %d %d\n", MAP_X_COORD(iter->vnum), MAP_Y_COORD(iter->vnum), iter->island, (iter->sector_type ? GET_SECT_VNUM(iter->sector_type) : -1), (iter->base_sector ? GET_SECT_VNUM(iter->base_sector) : -1), (iter->natural_sector ? GET_SECT_VNUM(iter->natural_sector) : -1));
+		// x y island sect base natural crop
+		fprintf(fl, "%d %d %d %d %d %d %d\n", MAP_X_COORD(iter->vnum), MAP_Y_COORD(iter->vnum), iter->island, (iter->sector_type ? GET_SECT_VNUM(iter->sector_type) : -1), (iter->base_sector ? GET_SECT_VNUM(iter->base_sector) : -1), (iter->natural_sector ? GET_SECT_VNUM(iter->natural_sector) : -1), (iter->crop_type ? GET_CROP_VNUM(iter->crop_type) : -1));
 	}
 	
 	fclose(fl);

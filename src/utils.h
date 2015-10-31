@@ -858,6 +858,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define ROOM_AFFECTS(room)  ((room)->af)
 #define ROOM_BASE_FLAGS(room)  ((room)->base_affects)
 #define ROOM_CONTENTS(room)  ((room)->contents)
+#define ROOM_CROP(room)  ((room)->crop_type)
 #define ROOM_DEPLETION(room)  ((room)->depletion)
 #define ROOM_LAST_SPAWN_TIME(room)  ((room)->last_spawn_time)
 #define ROOM_LIGHTS(room)  ((room)->light)
@@ -917,12 +918,9 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define SHOW_PEOPLE_IN_ROOM(room)  (!ROOM_IS_CLOSED(room) && !ROOM_SECT_FLAGGED(room, SECTF_OBSCURE_VISION))
 #define WOULD_BE_LIGHT_WITHOUT_MAGIC_DARKNESS(room)  (!IS_DARK(room) || RMT_FLAGGED((room), RMT_LIGHT) || adjacent_room_is_light(room) || IS_ANY_BUILDING(room))
 
-// extra data
-#define ROOM_CROP_TYPE(room)  (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) ? get_room_extra_data((room), ROOM_EXTRA_CROP_TYPE) : NOTHING)
-
 // interaction checks (leading up to CAN_INTERACT_ROOM)
 #define BLD_CAN_INTERACT_ROOM(room, type)  (GET_BUILDING(room) && has_interaction(GET_BLD_INTERACTIONS(GET_BUILDING(room)), (type)))
-#define CROP_CAN_INTERACT_ROOM(room, type)  (ROOM_CROP_TYPE(room) != NOTHING && has_interaction(GET_CROP_INTERACTIONS(crop_proto(ROOM_CROP_TYPE(room))), (type)))
+#define CROP_CAN_INTERACT_ROOM(room, type)  (ROOM_CROP(room) && has_interaction(GET_CROP_INTERACTIONS(ROOM_CROP(room)), (type)))
 #define RMT_CAN_INTERACT_ROOM(room, type)  (GET_ROOM_TEMPLATE(room) && has_interaction(GET_RMT_INTERACTIONS(GET_ROOM_TEMPLATE(room)), (type)))
 #define SECT_CAN_INTERACT_ROOM(room, type)  has_interaction(GET_SECT_INTERACTIONS(SECT(room)), (type))
 #define CAN_INTERACT_ROOM(room, type)  (SECT_CAN_INTERACT_ROOM((room), (type)) || BLD_CAN_INTERACT_ROOM((room), (type)) || RMT_CAN_INTERACT_ROOM((room), (type)) || CROP_CAN_INTERACT_ROOM((room), (type)))
@@ -936,7 +934,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define RMT_FLAGGED(room, flag)  (GET_ROOM_TEMPLATE(room) && IS_SET(GET_RMT_FLAGS(GET_ROOM_TEMPLATE(room)), (flag)))
 #define ROOM_AFF_FLAGGED(r, flag)  (IS_SET(ROOM_AFF_FLAGS(r), (flag)))
 #define ROOM_BLD_FLAGGED(room, flag)  (GET_BUILDING(room) && IS_SET(GET_BLD_FLAGS(GET_BUILDING(room)), (flag)))
-#define ROOM_CROP_FLAGGED(room, flg)  (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && CROP_FLAGGED(crop_proto(ROOM_CROP_TYPE(room)), (flg)))
+#define ROOM_CROP_FLAGGED(room, flg)  (ROOM_SECT_FLAGGED((room), SECTF_HAS_CROP_DATA) && ROOM_CROP(room) && CROP_FLAGGED(ROOM_CROP(room), (flg)))
 #define ROOM_SECT_FLAGGED(room, flg)  SECT_FLAGGED(SECT(room), (flg))
 #define SHIFT_CHAR_DIR(ch, room, dir)  SHIFT_DIR((room), confused_dirs[get_north_for_char(ch)][0][(dir)])
 #define SHIFT_DIR(room, dir)  real_shift((room), shift_dir[(dir)][0], shift_dir[(dir)][1])

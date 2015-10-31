@@ -1769,7 +1769,7 @@ void scan_for_tile(char_data *ch, char *argument) {
 			else if (GET_BUILDING(room) && multi_isname(argument, GET_BLD_NAME(GET_BUILDING(room)))) {
 				ok = TRUE;
 			}
-			else if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && (crop = crop_proto(ROOM_CROP_TYPE(room))) && multi_isname(argument, GET_CROP_NAME(crop))) {
+			else if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && (crop = CROP_TYPE(room)) && multi_isname(argument, GET_CROP_NAME(crop))) {
 				ok = TRUE;
 			}
 			else if (multi_isname(argument, get_room_name(room, FALSE))) {
@@ -4406,7 +4406,7 @@ ACMD(do_territory) {
 				else if (GET_BUILDING(iter) && multi_isname(argument, GET_BLD_NAME(GET_BUILDING(iter)))) {
 					ok = TRUE;
 				}
-				else if (ROOM_SECT_FLAGGED(iter, SECTF_HAS_CROP_DATA) && (crop = crop_proto(ROOM_CROP_TYPE(iter))) && multi_isname(argument, GET_CROP_NAME(crop))) {
+				else if (ROOM_SECT_FLAGGED(iter, SECTF_HAS_CROP_DATA) && (crop = ROOM_CROP(iter)) && multi_isname(argument, GET_CROP_NAME(crop))) {
 					ok = TRUE;
 				}
 				else if (multi_isname(argument, get_room_name(iter, FALSE))) {

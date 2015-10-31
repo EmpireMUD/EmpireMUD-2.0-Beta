@@ -240,7 +240,6 @@ void perform_chant(char_data *ch) {
 	struct evolution_data *evo;
 	int chant = GET_ACTION_VNUM(ch, 0);
 	sector_data *new_sect, *preserve;
-	crop_vnum cropv;
 	
 	// some chants could be timed...
 	if (GET_ACTION_TIMER(ch) > 0) {
@@ -293,7 +292,6 @@ void perform_chant(char_data *ch) {
 			// percentage is checked in the evolution data
 			if ((evo = get_evolution_by_type(SECT(IN_ROOM(ch)), EVO_MAGIC_GROWTH))) {
 				new_sect = sector_proto(evo->becomes);
-				cropv = ROOM_CROP_TYPE(IN_ROOM(ch));
 				preserve = (BASE_SECT(IN_ROOM(ch)) != SECT(IN_ROOM(ch))) ? BASE_SECT(IN_ROOM(ch)) : NULL;
 				
 				// messaging based on whether or not it's choppable
@@ -307,9 +305,6 @@ void perform_chant(char_data *ch) {
 				}
 				
 				change_terrain(IN_ROOM(ch), evo->becomes);
-				if (cropv != NOTHING) {
-					set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CROP_TYPE, cropv);
-				}
 				if (preserve) {
 					change_base_sector(IN_ROOM(ch), preserve);
 				}

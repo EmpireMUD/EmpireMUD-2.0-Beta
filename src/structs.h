@@ -1576,7 +1576,7 @@ typedef struct trig_data trig_data;
 // and *especially* a place they are removed. -pc
 	#define ROOM_EXTRA_UNUSED  0	// was MINE_TYPE prior to b3.1
 #define ROOM_EXTRA_MINE_AMOUNT  1
-#define ROOM_EXTRA_CROP_TYPE  2
+	#define ROOM_EXTRA_UNUSED2  2
 #define ROOM_EXTRA_SEED_TIME  3
 #define ROOM_EXTRA_TAVERN_TYPE  4
 #define ROOM_EXTRA_TAVERN_BREWING_TIME  5
@@ -3285,6 +3285,7 @@ struct room_data {
 	
 	sector_data *sector_type;  // terrain type -- saved in file as vnum
 	sector_data *base_sector;  // for when built-over -- ^
+	crop_data *crop_type;	// if this room has a crop, this is it
 	int island;	// island numbers
 	
 	struct complex_room_data *complex; // for rooms that are buildings, inside, adventures, etc
@@ -3439,6 +3440,8 @@ struct map_data {
 	sector_data *sector_type;	// current sector
 	sector_data *base_sector;	// underlying current sector (e.g. plains under building)
 	sector_data *natural_sector;	// sector at time of map generation
+	
+	crop_data *crop_type;	// possible crop type
 	
 	struct map_data *next;	// linked list of non-ocean tiles, for iterating
 };

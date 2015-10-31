@@ -258,7 +258,7 @@ void do_dg_terracrop(room_data *target, crop_data *cp) {
 	}
 	else {
 		change_terrain(target, GET_SECT_VNUM(sect));
-		set_room_extra_data(target, ROOM_EXTRA_CROP_TYPE, GET_CROP_VNUM(cp));
+		set_crop_type(target, cp);
 	}
 	
 	if (emp) {

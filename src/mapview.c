@@ -261,7 +261,7 @@ char *get_room_name(room_data *room, bool color) {
 		strcat(name, ROOM_CUSTOM_NAME(room));
 
 	/* Names by type */
-	else if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && (cp = crop_proto(ROOM_CROP_TYPE(room))))
+	else if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && (cp = ROOM_CROP(room)))
 		strcat(name, GET_CROP_TITLE(cp));
 
 	/* Custom names by type */
@@ -850,7 +850,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	}
 	
 	// has a crop but doesn't show as crop probably == seeded field
-	if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && !ROOM_SECT_FLAGGED(room, SECTF_CROP) && (cp = crop_proto(ROOM_CROP_TYPE(room)))) {
+	if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && !ROOM_SECT_FLAGGED(room, SECTF_CROP) && (cp = ROOM_CROP(room))) {
 		msg_to_char(ch, "The field is seeded with %s.\r\n", GET_CROP_NAME(cp));
 	}
 
@@ -1112,7 +1112,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	int tileset = pick_season(to_room);
 	struct icon_data *base_icon, *icon, *crop_icon = NULL;
 	bool junk, hidden = FALSE;
-	crop_data *cp = crop_proto(ROOM_CROP_TYPE(to_room));
+	crop_data *cp = ROOM_CROP(to_room);
 	sector_data *st, *base_sect = BASE_SECT(to_room);
 	char *base_color, *str;
 	room_data *map_loc = get_map_location_for(IN_ROOM(ch)), *map_to_room = get_map_location_for(to_room);
@@ -1511,7 +1511,7 @@ char *get_screenreader_room_name(room_data *from_room, room_data *to_room) {
 	else if (GET_ROOM_TEMPLATE(to_room)) {
 		strcpy(lbuf, GET_RMT_TITLE(GET_ROOM_TEMPLATE(to_room)));
 	}
-	else if (ROOM_SECT_FLAGGED(to_room, SECTF_CROP) && (cp = crop_proto(ROOM_CROP_TYPE(to_room)))) {
+	else if (ROOM_SECT_FLAGGED(to_room, SECTF_CROP) && (cp = ROOM_CROP(to_room))) {
 		strcpy(lbuf, GET_CROP_NAME(cp));
 		CAP(lbuf);
 	}

@@ -354,7 +354,7 @@ bool can_use_ritual(char_data *ch, int ritual) {
 INTERACTION_FUNC(devastate_crop) {
 	void scale_item_to_level(obj_data *obj, int level);
 	
-	crop_data *cp = crop_proto(ROOM_CROP_TYPE(inter_room));
+	crop_data *cp = ROOM_CROP(inter_room);
 	obj_data *newobj;
 	int num;
 
@@ -1991,7 +1991,7 @@ RITUAL_FINISH_FUNC(perform_devastation_ritual) {
 				load_otrigger(newobj);
 			}
 		}
-		else if (ROOM_SECT_FLAGGED(to_room, SECTF_CROP) && (cp = crop_proto(ROOM_CROP_TYPE(to_room))) && has_interaction(GET_CROP_INTERACTIONS(cp), INTERACT_HARVEST)) {
+		else if (ROOM_SECT_FLAGGED(to_room, SECTF_CROP) && (cp = ROOM_CROP(to_room)) && has_interaction(GET_CROP_INTERACTIONS(cp), INTERACT_HARVEST)) {
 			run_room_interactions(ch, to_room, INTERACT_HARVEST, devastate_crop);
 			
 			// check for original sect, which may have been stored
@@ -2003,7 +2003,7 @@ RITUAL_FINISH_FUNC(perform_devastation_ritual) {
 				change_terrain(to_room, climate_default_sector[GET_CROP_CLIMATE(cp)]);
 			}
 		}
-		else if (ROOM_SECT_FLAGGED(to_room, SECTF_HAS_CROP_DATA) && (cp = crop_proto(ROOM_CROP_TYPE(to_room)))) {
+		else if (ROOM_SECT_FLAGGED(to_room, SECTF_HAS_CROP_DATA) && (cp = ROOM_CROP(to_room))) {
 			msg_to_char(ch, "You devastate the seeded field!\r\n");
 			act("$n's powerful ritual devastates the seeded field!", FALSE, ch, NULL, NULL, TO_ROOM);
 			
