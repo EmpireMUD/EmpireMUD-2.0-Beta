@@ -203,13 +203,13 @@ void change_terrain(room_data *room, sector_vnum sect) {
 	}
 	
 	// need land-map update?
-	if (SECT_FLAGGED(old_sect, SECTF_NON_ISLAND) != SECT_FLAGGED(st, SECTF_NON_ISLAND)) {
-		if (SECT_FLAGGED(old_sect, SECTF_NON_ISLAND)) {
+	if (st != old_sect) {
+		if (GET_SECT_VNUM(old_sect) == BASIC_OCEAN) {
 			// add to land_map (at the start is fine)
 			map->next = land_map;
 			land_map = map;
 		}
-		else {
+		else if (GET_SECT_VNUM(st) == BASIC_OCEAN) {
 			// remove from land_map
 			REMOVE_FROM_LIST(map, land_map, next);
 			// do NOT free map -- it's a pointer to something in world_map
@@ -2167,7 +2167,7 @@ void build_land_map(void) {
 			
 			// update land_map
 			map->next = NULL;
-			if (map->sector_type != ocean && !SECT_FLAGGED(map->sector_type, SECTF_NON_ISLAND)) {
+			if (map->sector_type != ocean) {
 				if (last) {
 					last->next = map;
 				}
@@ -2276,8 +2276,7 @@ void load_world_map_from_file(void) {
 
 
 /**
-* Runs evolutions on all the land mass in the world. This skips the oceans
-* and anywhere else flagged NON-ISLAND.
+* Runs evolutions on all the land mass in the world. This skips the oceans.
 */
 void run_map_evolutions(void) {
 	struct map_data *map;
