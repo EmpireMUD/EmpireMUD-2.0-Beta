@@ -58,8 +58,8 @@ void write_room_to_file(FILE *fl, room_data *room);
 // locals
 int count_city_points_used(empire_data *emp);
 void decustomize_room(room_data *room);
-static void evolve_one_map_tile(struct map_data *tile);
 room_vnum find_free_vnum();
+void grow_crop(room_data *room);
 void init_room(room_data *room, room_vnum vnum);
 void ruin_one_building(room_data *room);
 void save_world_map_to_file();
@@ -818,8 +818,12 @@ void update_world(void) {
 				reset_wtrigger(iter);
 			}
 			
+			// type-specific updates
 			if (ROOM_BLD_FLAGGED(iter, BLD_TAVERN) && IS_COMPLETE(iter)) {
 				update_tavern(iter);
+			}
+			if (ROOM_SECT_FLAGGED(iter, SECTF_HAS_CROP_DATA) && get_room_extra_data(iter, ROOM_EXTRA_SEED_TIME)) {
+				grow_crop(iter);
 			}
 		}
 	}
@@ -1651,7 +1655,6 @@ static void evolve_one_map_tile(struct map_data *tile) {
 	sector_vnum become;
 	room_data *room;
 	bool changed;
-	int type;
 	
 	// this may return NULL -- we don't need it if so
 	room = real_real_room(tile->vnum);
@@ -1698,26 +1701,6 @@ static void evolve_one_map_tile(struct map_data *tile) {
 	if (become == NOTHING && (evo = get_evolution_by_type(tile->sector_type, EVO_NOT_NEAR_SECTOR))) {
 		if (!find_sect_within_distance_from_room(room, evo->value, config_get_int("nearby_sector_distance"))) {
 			become = evo->becomes;
-		}
-	}
-
-	// Growing Seeds: NOTE: this one does not check is_entrance
-	if (become == NOTHING && ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && (evo = get_evolution_by_type(tile->sector_type, EVO_CROP_GROWS))) {
-		// only going to use the original sect if it was different -- this preserves the stored sect
-		sector_data *stored = (BASE_SECT(room) != SECT(room)) ? BASE_SECT(room) : NULL;
-		
-		if (sector_proto(evo->becomes)) {
-			add_to_room_extra_data(room, ROOM_EXTRA_SEED_TIME, -1);
-			if (get_room_extra_data(room, ROOM_EXTRA_SEED_TIME) <= 0) {
-				type = get_room_extra_data(room, ROOM_EXTRA_CROP_TYPE);	// must preserve this
-				change_terrain(room, evo->becomes);
-				if (stored) {
-					change_base_sector(room, stored);
-				}
-				set_room_extra_data(room, ROOM_EXTRA_CROP_TYPE, type);
-				remove_depletion(room, DPLTN_PICK);
-				changed = TRUE;
-			}
 		}
 	}
 	
@@ -1863,6 +1846,40 @@ room_vnum find_free_vnum(void) {
 			last_try = TRUE;
 		}
 	} while (TRUE);
+}
+
+
+/**
+* Processes crop growth on a tile.
+*
+* @aram room_data *room The location to grow.
+*/
+void grow_crop(room_data *room) {
+	struct evolution_data *evo;
+	sector_data *stored;
+	int type;
+	
+	// nothing to grow
+	if (!ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) || !(evo = get_evolution_by_type(SECT(room), EVO_CROP_GROWS)) || !sector_proto(evo->becomes)) {
+		return;
+	}
+	
+	// only going to use the original sect if it was different -- this preserves the stored sect
+	stored = (BASE_SECT(room) != SECT(room)) ? BASE_SECT(room) : NULL;
+	
+	// update seed growth time
+	add_to_room_extra_data(room, ROOM_EXTRA_SEED_TIME, -1);
+	
+	// done?
+	if (get_room_extra_data(room, ROOM_EXTRA_SEED_TIME) <= 0) {
+		type = get_room_extra_data(room, ROOM_EXTRA_CROP_TYPE);	// must preserve this
+		change_terrain(room, evo->becomes);
+		if (stored) {
+			change_base_sector(room, stored);
+		}
+		set_room_extra_data(room, ROOM_EXTRA_CROP_TYPE, type);
+		remove_depletion(room, DPLTN_PICK);
+	}
 }
 
 
