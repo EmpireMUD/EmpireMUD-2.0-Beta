@@ -173,7 +173,7 @@ void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 	
 	// update world
 	count = 0;
-	HASH_ITER(world_hh, world_table, room, next_room) {
+	HASH_ITER(hh, world_table, room, next_room) {
 		if (SECT(room) == sect) {
 			// can't use change_terrain() here
 			SECT(room) = replace_sect;

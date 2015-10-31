@@ -449,7 +449,7 @@ void delete_room(room_data *room, bool check_exits) {
 
 	if (check_exits) {
 		// update all home rooms and exits
-		HASH_ITER(world_hh, world_table, rm_iter, next_rm) {
+		HASH_ITER(hh, world_table, rm_iter, next_rm) {
 			// found them all?
 			if (GET_EXITS_HERE(room) <= 0) {
 				break;
@@ -738,7 +738,7 @@ void save_world_index(void) {
 	}
 	
 	last = -1;
-	HASH_ITER(world_hh, world_table, iter, next_iter) {
+	HASH_ITER(hh, world_table, iter, next_iter) {
 		vnum = GET_ROOM_VNUM(iter);
 		this = GET_WORLD_BLOCK(vnum);
 		
@@ -773,7 +773,7 @@ void save_whole_world(void) {
 	// must sort first
 	sort_world_table();
 	
-	HASH_ITER(world_hh, world_table, iter, next_iter) {
+	HASH_ITER(hh, world_table, iter, next_iter) {
 		vnum = GET_ROOM_VNUM(iter);
 		block = GET_WORLD_BLOCK(vnum);
 		
@@ -821,7 +821,7 @@ void update_world(void) {
 		last_save_group = 0;
 	}
 	
-	HASH_ITER(world_hh, world_table, iter, next_iter) {
+	HASH_ITER(hh, world_table, iter, next_iter) {
 		// only do certain blocks
 		if ((GET_WORLD_BLOCK(GET_ROOM_VNUM(iter)) % NUM_WORLD_BLOCK_UPDATES) != last_save_group) {
 			continue;
@@ -964,7 +964,7 @@ void annual_world_update(void) {
 		}
 	}
 
-	HASH_ITER(world_hh, world_table, room, next_room) {
+	HASH_ITER(hh, world_table, room, next_room) {
 		if (GET_ROOM_VNUM(room) < MAP_SIZE) {
 			annual_update_map_tile(room);
 		}
@@ -1257,7 +1257,7 @@ void reset_one_room(room_data *room) {
 void startup_room_reset(void) {
 	room_data *room, *next_room;
 
-	HASH_ITER(world_hh, world_table, room, next_room) {
+	HASH_ITER(hh, world_table, room, next_room) {
 		if (room->reset_commands) {
 			reset_one_room(room);
 		}
@@ -1406,7 +1406,7 @@ void read_empire_territory(empire_data *emp) {
 	}
 
 	// scan the whole world
-	HASH_ITER(world_hh, world_table, iter, next_iter) {
+	HASH_ITER(hh, world_table, iter, next_iter) {
 		// skip dependent multi- rooms
 		if (ROOM_OWNER(iter) && (!emp || ROOM_OWNER(iter) == emp) && (HOME_ROOM(iter) == iter || IS_INSIDE(iter))) {
 			if ((e = ROOM_OWNER(iter))) {
@@ -1564,7 +1564,7 @@ void check_all_exits(void) {
 	}
 	
 	// exits
-	HASH_ITER(world_hh, world_table, room, next_room) {
+	HASH_ITER(hh, world_table, room, next_room) {
 		if (COMPLEX_DATA(room)) {
 			for (ex = COMPLEX_DATA(room)->exits; ex; ex = next_ex) {
 				next_ex = ex->next;
@@ -1594,7 +1594,7 @@ void clear_private_owner(int id) {
 	void remove_designate_objects(room_data *room);
 	room_data *iter, *next_iter;
 	
-	HASH_ITER(world_hh, world_table, iter, next_iter) {
+	HASH_ITER(hh, world_table, iter, next_iter) {
 		if (COMPLEX_DATA(iter) && ROOM_PRIVATE_OWNER(iter) == id) {
 			COMPLEX_DATA(iter)->private_owner = NOBODY;
 		}
@@ -1772,7 +1772,7 @@ int get_main_island(empire_data *emp) {
 	}
 	
 	// no? just find their first territory
-	HASH_ITER(world_hh, world_table, iter, next_iter) {
+	HASH_ITER(hh, world_table, iter, next_iter) {
 		if (ROOM_OWNER(iter) == emp && GET_ISLAND_ID(iter) != NO_ISLAND) {
 			return GET_ISLAND_ID(iter);
 		}
@@ -2066,7 +2066,7 @@ void output_map_to_file(void) {
 	fprintf(pol, "%dx%d\n", MAP_WIDTH, MAP_HEIGHT);
 	
 	expecting = 0;	// next expected vnum
-	HASH_ITER(world_hh, world_table, room, next_room) {
+	HASH_ITER(hh, world_table, room, next_room) {
 		// in case of partially-loaded world:
 		while (expecting < GET_ROOM_VNUM(room) && expecting < MAP_SIZE) {
 			// normal
@@ -2212,7 +2212,7 @@ void build_world_map(void) {
 	room_data *room, *next_room;
 	int x, y;
 	
-	HASH_ITER(world_hh, world_table, room, next_room) {
+	HASH_ITER(hh, world_table, room, next_room) {
 		if (GET_ROOM_VNUM(room) >= MAP_SIZE) {
 			continue;
 		}

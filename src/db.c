@@ -490,7 +490,7 @@ void check_for_bad_buildings(void) {
 	bool deleted = FALSE;
 	
 	// check buildings and adventures
-	HASH_ITER(world_hh, world_table, room, next_room) {
+	HASH_ITER(hh, world_table, room, next_room) {
 		if (ROOM_SECT_FLAGGED(room, SECTF_MAP_BUILDING) && !GET_BUILDING(room)) {
 			// map building
 			log(" removing building at %d for bad building type", GET_ROOM_VNUM(room));
@@ -675,7 +675,7 @@ void update_ships(void) {
 		}
 	}
 
-	HASH_ITER(world_hh, world_table, room, next_room) {
+	HASH_ITER(hh, world_table, room, next_room) {
 		if (BUILDING_VNUM(room) == RTYPE_B_ONDECK && HOME_ROOM(room) == room && !GET_BOAT(room)) {
 			delete_room(room, FALSE);	// must check_all_exits
 			found = TRUE;
@@ -720,7 +720,7 @@ void verify_sectors(void) {
 	}
 	
 	// check whole world
-	HASH_ITER(world_hh, world_table, room, next_room) {
+	HASH_ITER(hh, world_table, room, next_room) {
 		if (!SECT(room)) {
 			// can't use change_terrain() here
 			SECT(room) = use_sect;
@@ -780,7 +780,7 @@ void renum_world(void) {
 	process_temporary_room_data();
 
 	// exits
-	HASH_ITER(world_hh, world_table, room, next_room) {
+	HASH_ITER(hh, world_table, room, next_room) {
 		// exits
 		if (COMPLEX_DATA(room)) {
 			// exit targets
@@ -1211,7 +1211,7 @@ void check_newbie_islands(void) {
 		}
 	}
 	
-	HASH_ITER(world_hh, world_table, room, next_room) {
+	HASH_ITER(hh, world_table, room, next_room) {
 		if (GET_ROOM_VNUM(room) >= MAP_SIZE || GET_ISLAND_ID(room) == NO_ISLAND) {
 			continue;
 		}
@@ -1686,7 +1686,7 @@ void b3_1_mine_update(void) {
 	room_data *room, *next_room;
 	int type;
 	
-	HASH_ITER(world_hh, world_table, room, next_room) {
+	HASH_ITER(hh, world_table, room, next_room) {
 		if ((type = get_room_extra_data(room, 0)) <= 0) {	// 0 was ROOM_EXTRA_MINE_TYPE
 			continue;
 		}
@@ -1733,7 +1733,7 @@ void b3_2_map_update(void) {
 	bitvector_t ROOM_AFF_PLAYER_MADE = BIT(11);	// removed flag
 	sector_vnum OASIS = 21, SANDY_TRENCH = 22; 
 	
-	HASH_ITER(world_hh, world_table, room, next_room) {
+	HASH_ITER(hh, world_table, room, next_room) {
 		// player-made
 		if (IS_SET(ROOM_AFF_FLAGS(room) | ROOM_BASE_FLAGS(room), ROOM_AFF_PLAYER_MADE)) {
 			// remove the bits
@@ -1801,7 +1801,7 @@ void check_version(void) {
 			// error state -- crops that were in the 'seeded' state during the
 			// b2.8 reboot would have gotten bad original-sect data
 			room_data *room, *next_room;
-			HASH_ITER(world_hh, world_table, room, next_room) {
+			HASH_ITER(hh, world_table, room, next_room) {
 				if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && SECT_FLAGGED(BASE_SECT(room), SECTF_HAS_CROP_DATA) && !SECT_FLAGGED(BASE_SECT(room), SECTF_CROP)) {
 					// normal case: crop with a 'Seeded' original sect
 					// the fix is just to set the original sect to the current
@@ -1878,7 +1878,7 @@ void check_version(void) {
 			// this is a repeat of the b2.9 update, but should fix additional
 			// rooms
 			room_data *room, *next_room;
-			HASH_ITER(world_hh, world_table, room, next_room) {
+			HASH_ITER(hh, world_table, room, next_room) {
 				if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && SECT_FLAGGED(BASE_SECT(room), SECTF_HAS_CROP_DATA) && !SECT_FLAGGED(BASE_SECT(room), SECTF_CROP)) {
 					// normal case: crop with a 'Seeded' original sect
 					// the fix is just to set the original sect to the current
@@ -1964,7 +1964,7 @@ void setup_start_locations(void) {
 	room_vnum *new_start_locs = NULL;
 	int count = -1;
 
-	HASH_ITER(world_hh, world_table, room, next_room) {
+	HASH_ITER(hh, world_table, room, next_room) {
 		if (ROOM_SECT_FLAGGED(room, SECTF_START_LOCATION)) {
 			++count;
 			

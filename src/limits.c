@@ -871,7 +871,7 @@ static void reduce_outside_territory_one(empire_data *emp) {
 	far_dist = -1;	// always less
 	
 	// check the whole map to determine the farthest outside claim
-	HASH_ITER(world_hh, world_table, iter, next_iter) {
+	HASH_ITER(hh, world_table, iter, next_iter) {
 		// map only
 		if (GET_ROOM_VNUM(iter) >= MAP_SIZE) {
 			continue;
@@ -958,7 +958,7 @@ static void reduce_stale_empires_one(empire_data *emp) {
 	
 	if (!found_room) {
 		// otherwise find a random room
-		HASH_ITER(world_hh, world_table, iter, next_iter) {
+		HASH_ITER(hh, world_table, iter, next_iter) {
 			// map only
 			if (GET_ROOM_VNUM(iter) >= MAP_SIZE) {
 				continue;
@@ -1941,7 +1941,7 @@ void point_update(bool run_real) {
 	}
 	
 	// rooms
-	HASH_ITER(world_hh, world_table, room, next_room) {
+	HASH_ITER(hh, world_table, room, next_room) {
 		point_update_room(room);
 	}
 	

@@ -134,7 +134,7 @@ void olc_delete_crop(char_data *ch, crop_vnum vnum) {
 	
 	// update world
 	count = 0;
-	HASH_ITER(world_hh, world_table, room, next_room) {
+	HASH_ITER(hh, world_table, room, next_room) {
 		if (ROOM_CROP(room) == crop) {
 			set_crop_type(room, NULL);	// remove it explicitly
 			change_terrain(room, GET_SECT_VNUM(base));

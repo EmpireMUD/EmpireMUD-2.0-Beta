@@ -1337,7 +1337,7 @@ void delete_empire(empire_data *emp) {
 	}
 	
 	// remove all world ownership
-	HASH_ITER(world_hh, world_table, room, next_room) {
+	HASH_ITER(hh, world_table, room, next_room) {
 		if (ROOM_OWNER(room) == emp) {
 			perform_abandon_room(room);
 		}
@@ -3722,7 +3722,7 @@ void write_obj_to_file(FILE *fl, obj_data *obj) {
 * @param room_data *room The room to add.
 */
 void add_room_to_world_tables(room_data *room) {	
-	HASH_ADD(world_hh, world_table, vnum, sizeof(int), room);
+	HASH_ADD_INT(world_table, vnum, room);
 	
 	// interior linked list
 	if (GET_ROOM_VNUM(room) >= MAP_SIZE) {
@@ -3742,7 +3742,7 @@ void add_room_to_world_tables(room_data *room) {
 void remove_room_from_world_tables(room_data *room) {
 	room_data *temp;
 	
-	HASH_DELETE(world_hh, world_table, room);
+	HASH_DEL(world_table, room);
 	
 	if (room->vnum >= MAP_SIZE) {
 		REMOVE_FROM_LIST(room, interior_room_list, next_interior);
@@ -3777,7 +3777,7 @@ void parse_room(FILE *fl, room_vnum vnum) {
 	room->vnum = vnum;
 	room->owner = NULL;
 	
-	HASH_FIND(world_hh, world_table, &vnum, sizeof(int), find);
+	HASH_FIND_INT(world_table, &vnum, find);
 	if (find) {
 		log("WARNING: Duplicate room vnum #%d", vnum);
 		// but have to load it anyway to advance the file
@@ -5791,7 +5791,7 @@ room_data *real_real_room(room_vnum vnum) {
 	}
 	
 	// whole world
-	HASH_FIND(world_hh, world_table, &vnum, sizeof(int), room);
+	HASH_FIND_INT(world_table, &vnum, room);
 	
 	return room;
 }
@@ -6483,7 +6483,7 @@ int sort_world_table_func(void *a, void *b) {
 */
 void sort_world_table(void) {
 	if (!world_is_sorted) {
-		HASH_SRT(world_hh, world_table, sort_world_table_func);
+		HASH_SORT(world_table, sort_world_table_func);
 	}
 	world_is_sorted = TRUE;
 }

@@ -2593,7 +2593,7 @@ ACMD(do_efind) {
 		total = 0;
 		
 		// first, gotta find them all
-		HASH_ITER(world_hh, world_table, iter, next_iter) {
+		HASH_ITER(hh, world_table, iter, next_iter) {
 			if (ROOM_OWNER(iter) == emp) {			
 				for (obj = ROOM_CONTENTS(iter); obj; obj = obj->next_content) {
 					if ((all && CAN_WEAR(obj, ITEM_WEAR_TAKE)) || (!all && isname(arg, obj->name))) {
@@ -3142,7 +3142,7 @@ ACMD(do_enroll) {
 			EMPIRE_TERRITORY_LIST(old) = NULL;
 			
 			// move territory over
-			HASH_ITER(world_hh, world_table, room, next_room) {
+			HASH_ITER(hh, world_table, room, next_room) {
 				if (ROOM_OWNER(room) == old) {
 					ROOM_OWNER(room) = e;
 				}
@@ -3399,7 +3399,7 @@ ACMD(do_findmaintenance) {
 		msg_to_char(ch, "You can't use findmaintenance if you are not in an empire.\r\n");
 	}
 	else {
-		HASH_ITER(world_hh, world_table, iter, next_iter) {
+		HASH_ITER(hh, world_table, iter, next_iter) {
 			// skip non-map
 			if (GET_ROOM_VNUM(iter) >= MAP_SIZE) {
 				continue;
@@ -3452,7 +3452,7 @@ room_data *find_home(char_data *ch) {
 		return NULL;
 	}
 	
-	HASH_ITER(world_hh, world_table, iter, next_iter) {
+	HASH_ITER(hh, world_table, iter, next_iter) {
 		if (ROOM_PRIVATE_OWNER(iter) == GET_IDNUM(ch)) {
 			return iter;
 		}
@@ -4394,7 +4394,7 @@ ACMD(do_territory) {
 	outside_only = *argument ? FALSE : TRUE;
 	
 	// ready?
-	HASH_ITER(world_hh, world_table, iter, next_iter) {
+	HASH_ITER(hh, world_table, iter, next_iter) {
 		if (outside_only && GET_ROOM_VNUM(iter) >= MAP_SIZE) {
 			continue;
 		}
@@ -4482,7 +4482,7 @@ ACMD(do_unpublicize) {
 	else if (GET_RANK(ch) < EMPIRE_NUM_RANKS(e))
 		msg_to_char(ch, "You're of insufficient rank to remove all public status for the empire.\r\n");
 	else {
-		HASH_ITER(world_hh, world_table, iter, next_iter) {
+		HASH_ITER(hh, world_table, iter, next_iter) {
 			if (ROOM_AFF_FLAGGED(iter, ROOM_AFF_PUBLIC) && ROOM_OWNER(iter) == e) {
 				REMOVE_BIT(ROOM_AFF_FLAGS(iter), ROOM_AFF_PUBLIC);
 				REMOVE_BIT(ROOM_BASE_FLAGS(iter), ROOM_AFF_PUBLIC);

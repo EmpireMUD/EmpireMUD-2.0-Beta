@@ -1586,7 +1586,7 @@ RITUAL_SETUP_FUNC(start_ritual_of_teleportation) {
 		subtype = NOWHERE;
 	}
 	else if (!str_cmp(argument, "home")) {
-		HASH_ITER(world_hh, world_table, room, next_room) {
+		HASH_ITER(hh, world_table, room, next_room) {
 			if (ROOM_PRIVATE_OWNER(room) == GET_IDNUM(ch)) {
 				to_room = room;
 				break;

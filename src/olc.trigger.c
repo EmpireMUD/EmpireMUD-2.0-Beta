@@ -231,7 +231,7 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 	}
 	
 	// look for live rooms with this trigger
-	HASH_ITER(world_hh, world_table, room, next_room) {
+	HASH_ITER(hh, world_table, room, next_room) {
 		if (SCRIPT(room)) {
 			remove_live_script_by_vnum(SCRIPT(room), vnum);
 		}
