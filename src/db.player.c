@@ -949,7 +949,6 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	extern struct mail_data *parse_mail(FILE *fl, char *first_line);
 	
 	char line[MAX_INPUT_LENGTH], error[MAX_STRING_LENGTH], str_in[MAX_INPUT_LENGTH];
-	struct slash_channel *slash, *last_slash = NULL;
 	int account_id = NOTHING, ignore_pos = 0, reward_pos = 0;
 	struct lore_data *lore, *last_lore = NULL, *new_lore;
 	struct over_time_effect_type *dot, *last_dot = NULL;
@@ -958,6 +957,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	struct coin_data *coin, *last_coin = NULL;
 	struct mail_data *mail, *last_mail = NULL;
 	int length, i_in[7], iter, num;
+	struct slash_channel *slash;
 	struct cooldown_data *cool;
 	struct affected_type *af;
 	account_data *acct;
@@ -1557,14 +1557,9 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					CREATE(slash, struct slash_channel, 1);
 					slash->name = str_dup(trim(line + length + 1));
 					
-					// append to end
-					if (last_slash) {
-						last_slash->next = slash;
-					}
-					else {
-						LOAD_SLASH_CHANNELS(ch) = slash;
-					}
-					last_slash = slash;
+					// append to start (it reverses them on-join anyway)
+					slash->next = LOAD_SLASH_CHANNELS(ch);
+					LOAD_SLASH_CHANNELS(ch) = slash;
 				}
 				else if (PFILE_TAG(line, "Syslog Flags:", length)) {
 					SYSLOG_FLAGS(ch) = asciiflag_conv(line + length + 1);
