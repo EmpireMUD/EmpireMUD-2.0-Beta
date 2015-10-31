@@ -2169,7 +2169,7 @@ const char *room_aff_bits[] = {
 	"*DISMANTLING",
 	"!FLY",
 	"*SHIP-PRESENT",
-	"*PLAYER-MADE",
+	"*",
 	"*!WORK",
 	"!DISREPAIR",
 	"*!DISMANTLE",

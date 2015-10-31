@@ -138,8 +138,9 @@ void special_building_setup(char_data *ch, room_data *room) {
 */
 bool can_build_on(room_data *room, bitvector_t flags) {
 	#define CLEAR_OPEN_BUILDING(r)	(IS_MAP_BUILDING(r) && ROOM_BLD_FLAGGED((r), BLD_OPEN) && !ROOM_BLD_FLAGGED((r), BLD_BARRIER) && (IS_COMPLETE(r) || !SECT_FLAGGED(BASE_SECT(r), SECTF_FRESH_WATER | SECTF_OCEAN)))
+	#define IS_PLAYER_MADE(r)  (GET_ROOM_VNUM(r) < MAP_SIZE && SECT(r) != world_map[FLAT_X_COORD(r)][FLAT_Y_COORD(r)].natural_sector)
 
-	return (!IS_SET(flags, BLD_ON_NOT_PLAYER_MADE) || !ROOM_AFF_FLAGGED(room, ROOM_AFF_PLAYER_MADE)) && (
+	return (!IS_SET(flags, BLD_ON_NOT_PLAYER_MADE) || !IS_PLAYER_MADE(room)) && (
 		IS_SET(GET_SECT_BUILD_FLAGS(SECT(room)), flags) || 
 		(IS_SET(flags, BLD_FACING_OPEN_BUILDING) && CLEAR_OPEN_BUILDING(room))
 	);

@@ -2227,8 +2227,6 @@ ACMD(do_excavate) {
 		// Set up the trench
 		change_terrain(IN_ROOM(ch), evo->becomes);
 		set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_PROGRESS, config_get_int("trench_initial_value"));
-		SET_BIT(ROOM_AFF_FLAGS(IN_ROOM(ch)), ROOM_AFF_PLAYER_MADE);
-		SET_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_PLAYER_MADE);
 	}
 }
 
@@ -2264,11 +2262,11 @@ ACMD(do_fillin) {
 			set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_PROGRESS, -1);
 		}
 	}
-	else if (!(old_sect = reverse_lookup_evolution_for_sector(SECT(IN_ROOM(ch)), EVO_TRENCH_FULL))) {
+	else if (GET_ROOM_VNUM(IN_ROOM(ch)) >= MAP_SIZE || !(old_sect = reverse_lookup_evolution_for_sector(SECT(IN_ROOM(ch)), EVO_TRENCH_FULL))) {
 		// anything to reverse it to?
 		msg_to_char(ch, "You can't fill anything in here.\r\n");
 	}
-	else if (!ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_PLAYER_MADE)) {
+	else if (SECT(IN_ROOM(ch)) == world_map[FLAT_X_COORD(IN_ROOM(ch))][FLAT_Y_COORD(IN_ROOM(ch))].natural_sector) {
 		msg_to_char(ch, "You can only fill in a tile that was made by excavation, not a natural one.\r\n");
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {

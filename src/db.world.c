@@ -28,7 +28,6 @@
 *   Management
 *   Annual Map Update
 *   City Lib
-*   Ocean Pool
 *   Room Resets
 *   Territory
 *   Helpers
@@ -59,11 +58,12 @@ void write_room_to_file(FILE *fl, room_data *room);
 // locals
 int count_city_points_used(empire_data *emp);
 void decustomize_room(room_data *room);
-static void evolve_one_map_tile(room_data *room);
+static void evolve_one_map_tile(struct map_data *tile);
 room_vnum find_free_vnum();
 void init_room(room_data *room, room_vnum vnum);
 void ruin_one_building(room_data *room);
 void save_world_map_to_file();
+void update_tavern(room_data *room);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -143,8 +143,8 @@ void change_terrain(room_data *room, sector_vnum sect) {
 	
 	bool belongs = BELONGS_IN_TERRITORY_LIST(room);
 	sector_data *old_sect = SECT(room), *st = sector_proto(sect);
+	struct map_data *map, *temp;
 	crop_data *new_crop = NULL;
-	struct map_data *map;
 	empire_data *emp;
 	
 	if (GET_ROOM_VNUM(room) >= MAP_SIZE) {
@@ -200,6 +200,20 @@ void change_terrain(room_data *room, sector_vnum sect) {
 	// need start locations update?
 	if (SECT_FLAGGED(old_sect, SECTF_START_LOCATION) != SECT_FLAGGED(st, SECTF_START_LOCATION)) {
 		setup_start_locations();
+	}
+	
+	// need land-map update?
+	if (SECT_FLAGGED(old_sect, SECTF_NON_ISLAND) != SECT_FLAGGED(st, SECTF_NON_ISLAND)) {
+		if (SECT_FLAGGED(old_sect, SECTF_NON_ISLAND)) {
+			// add to land_map (at the start is fine)
+			map->next = land_map;
+			land_map = map;
+		}
+		else {
+			// remove from land_map
+			REMOVE_FROM_LIST(map, land_map, next);
+			// do NOT free map -- it's a pointer to something in world_map
+		}
 	}
 	
 	// for later
@@ -643,23 +657,30 @@ void init_mine(room_data *room, char_data *ch) {
 */
 void untrench_room(room_data *room) {
 	void stop_room_action(room_data *room, int action, int chore);
-
-	sector_data *to_sect;
 	
-	if (!ROOM_SECT_FLAGGED(room, SECTF_IS_TRENCH)) {
+	sector_data *to_sect = NULL;
+	struct map_data *map;
+	
+	if (!ROOM_SECT_FLAGGED(room, SECTF_IS_TRENCH) || GET_ROOM_VNUM(room) >= MAP_SIZE) {
 		return;
 	}
 					
 	// stop BOTH actions -- it's not a trench!
 	stop_room_action(room, ACT_FILLING_IN, NOTHING);
 	stop_room_action(room, ACT_EXCAVATING, NOTHING);
-
-	// de-evolve sect
-	to_sect = reverse_lookup_evolution_for_sector(SECT(room), EVO_TRENCH_START);
+	
+	map = &(world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)]);
+	if (SECT(room) !=  map->natural_sector) {
+		// return to nature
+		to_sect = map->natural_sector;
+	}
+	else {
+		// de-evolve sect
+		to_sect = reverse_lookup_evolution_for_sector(SECT(room), EVO_TRENCH_START);
+	}
+	
 	if (to_sect) {
 		change_terrain(room, GET_SECT_VNUM(to_sect));
-		REMOVE_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_PLAYER_MADE);
-		REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_PLAYER_MADE);
 	}
 }
 
@@ -796,9 +817,10 @@ void update_world(void) {
 			if (!IS_ADVENTURE_ROOM(iter)) {
 				reset_wtrigger(iter);
 			}
-		
-			// evolve it
-			evolve_one_map_tile(iter);	// world is unsorted after this
+			
+			if (ROOM_BLD_FLAGGED(iter, BLD_TAVERN) && IS_COMPLETE(iter)) {
+				update_tavern(iter);
+			}
 		}
 	}
 	
@@ -1616,112 +1638,71 @@ void decustomize_room(room_data *room) {
 }
 
 
-// evolutions for 1 tile
-static void evolve_one_map_tile(room_data *room) {
-	extern bool extract_tavern_resources(room_data *room);
+/**
+* Checks and runs evolutions for a single map tile.
+*
+* @param struct map_data *tile The map location to evolve.
+*/
+static void evolve_one_map_tile(struct map_data *tile) {
 	extern bool is_entrance(room_data *room);
 	
 	struct evolution_data *evo;
 	sector_data *original;
+	sector_vnum become;
+	room_data *room;
 	bool changed;
 	int type;
 	
-	// Tavern: charge periodic resources
-	// TODO should this move to the room updates like trench?
-	if (ROOM_BLD_FLAGGED(room, BLD_TAVERN) && IS_COMPLETE(room)) {
-		if (get_room_extra_data(room, ROOM_EXTRA_TAVERN_BREWING_TIME) > 0) {
-			add_to_room_extra_data(room, ROOM_EXTRA_TAVERN_BREWING_TIME, -1);
-			if (get_room_extra_data(room, ROOM_EXTRA_TAVERN_BREWING_TIME) == 0) {
-				// brew's ready!
-				set_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME, config_get_int("tavern_timer"));
-			}
-		}
-		else if (get_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME) >= 0) {
-			// count down to re-brew
-			add_to_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME, -1);
-			
-			if (get_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME) <= 0) {
-				// enough to go again?
-				if (extract_tavern_resources(room)) {
-					set_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME, config_get_int("tavern_timer"));
-				}
-				else {
-					// can't afford to keep brewing
-					set_room_extra_data(room, ROOM_EXTRA_TAVERN_TYPE, BREW_NONE);
-					set_room_extra_data(room, ROOM_EXTRA_TAVERN_BREWING_TIME, config_get_int("tavern_brew_time"));
-				}
-			}
-		}
-	}
+	// this may return NULL -- we don't need it if so
+	room = real_real_room(tile->vnum);
 	
 	// no further action if !evolve or if no evos
-	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_EVOLVE) || !GET_SECT_EVOS(SECT(room))) {
+	if ((room && ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_EVOLVE)) || !GET_SECT_EVOS(tile->sector_type)) {
 		return;
 	}
-		
+	
 	// to avoid running more than one:
 	changed = FALSE;
-	original = SECT(room);
-	
-	// NOTE: the is_entrance() check is after the get_evolution_by_type to
-	// avoid checking entrance on every tile -- only check the ones that passed
-	// the random
+	original = tile->sector_type;
+	become = NOTHING;
 	
 	// run some evolutions!
-	if (!changed && (evo = get_evolution_by_type(SECT(room), EVO_RANDOM)) && !is_entrance(room)) {
-		if (sector_proto(evo->becomes)) {
-			change_terrain(room, evo->becomes);
-			changed = TRUE;
+	if (become == NOTHING && (evo = get_evolution_by_type(tile->sector_type, EVO_RANDOM))) {
+		become = evo->becomes;
+	}
+	
+	if (become == NOTHING && (evo = get_evolution_by_type(tile->sector_type, EVO_ADJACENT_ONE))) {
+		if (count_adjacent_sectors(room, evo->value, TRUE) >= 1) {
+			become = evo->becomes;
 		}
 	}
 	
-	if (!changed && (evo = get_evolution_by_type(SECT(room), EVO_ADJACENT_ONE)) && !is_entrance(room)) {
-		if (sector_proto(evo->becomes)) {
-			if (count_adjacent_sectors(room, evo->value, TRUE) >= 1) {
-				change_terrain(room, evo->becomes);
-				changed = TRUE;
-			}
+	if (become == NOTHING && (evo = get_evolution_by_type(tile->sector_type, EVO_NOT_ADJACENT))) {
+		if (count_adjacent_sectors(room, evo->value, TRUE) < 1) {
+			become = evo->becomes;
 		}
 	}
 	
-	if (!changed && (evo = get_evolution_by_type(SECT(room), EVO_NOT_ADJACENT)) && !is_entrance(room)) {
-		if (sector_proto(evo->becomes)) {
-			if (count_adjacent_sectors(room, evo->value, TRUE) < 1) {
-				change_terrain(room, evo->becomes);
-				changed = TRUE;
-			}
+	if (become == NOTHING && (evo = get_evolution_by_type(tile->sector_type, EVO_ADJACENT_MANY))) {
+		if (count_adjacent_sectors(room, evo->value, TRUE) >= 6) {
+			become = evo->becomes;
 		}
 	}
 	
-	if (!changed && (evo = get_evolution_by_type(SECT(room), EVO_ADJACENT_MANY)) && !is_entrance(room)) {
-		if (sector_proto(evo->becomes)) {
-			if (count_adjacent_sectors(room, evo->value, TRUE) >= 6) {
-				change_terrain(room, evo->becomes);
-				changed = TRUE;
-			}
+	if (become == NOTHING && (evo = get_evolution_by_type(tile->sector_type, EVO_NEAR_SECTOR))) {
+		if (find_sect_within_distance_from_room(room, evo->value, config_get_int("nearby_sector_distance"))) {
+			become = evo->becomes;
 		}
 	}
 	
-	if (!changed && (evo = get_evolution_by_type(SECT(room), EVO_NEAR_SECTOR)) && !is_entrance(room)) {
-		if (sector_proto(evo->becomes)) {
-			if (find_sect_within_distance_from_room(room, evo->value, config_get_int("nearby_sector_distance"))) {
-				change_terrain(room, evo->becomes);
-				changed = TRUE;
-			}
-		}
-	}
-	
-	if (!changed && (evo = get_evolution_by_type(SECT(room), EVO_NOT_NEAR_SECTOR)) && !is_entrance(room)) {
-		if (sector_proto(evo->becomes)) {
-			if (!find_sect_within_distance_from_room(room, evo->value, config_get_int("nearby_sector_distance"))) {
-				change_terrain(room, evo->becomes);
-				changed = TRUE;
-			}
+	if (become == NOTHING && (evo = get_evolution_by_type(tile->sector_type, EVO_NOT_NEAR_SECTOR))) {
+		if (!find_sect_within_distance_from_room(room, evo->value, config_get_int("nearby_sector_distance"))) {
+			become = evo->becomes;
 		}
 	}
 
 	// Growing Seeds: NOTE: this one does not check is_entrance
-	if (!changed && ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && (evo = get_evolution_by_type(SECT(room), EVO_CROP_GROWS))) {
+	if (become == NOTHING && ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && (evo = get_evolution_by_type(tile->sector_type, EVO_CROP_GROWS))) {
 		// only going to use the original sect if it was different -- this preserves the stored sect
 		sector_data *stored = (BASE_SECT(room) != SECT(room)) ? BASE_SECT(room) : NULL;
 		
@@ -1740,11 +1721,21 @@ static void evolve_one_map_tile(room_data *room) {
 		}
 	}
 	
-	// DONE
-
-	// If the new sector has crop data, we should store the original (e.g. a desert that randomly grows into a crop)
-	if (changed && ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && BASE_SECT(room) == SECT(room)) {
-		change_base_sector(room, original);
+	// DONE: now change it
+	if (become != NOTHING && sector_proto(become)) {
+		// in case we didn't get it earlier
+		if (!room) {
+			room = real_room(tile->vnum);
+		}
+		
+	 	if (room && !is_entrance(room)) {
+			change_terrain(room, become);
+			
+			// If the new sector has crop data, we should store the original (e.g. a desert that randomly grows into a crop)
+			if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && BASE_SECT(room) == SECT(room)) {
+				change_base_sector(room, original);
+			}
+		}
 	}
 }
 
@@ -1952,6 +1943,40 @@ void ruin_one_building(room_data *room) {
 
 	if (ROOM_PEOPLE(room)) {
 		act("The building around you crumbles to ruin!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
+	}
+}
+
+
+/**
+* Runs the tavern resources on a location.
+*
+* @param room_data *room The tavern's room.
+*/
+void update_tavern(room_data *room) {
+	extern bool extract_tavern_resources(room_data *room);
+	
+	if (get_room_extra_data(room, ROOM_EXTRA_TAVERN_BREWING_TIME) > 0) {
+		add_to_room_extra_data(room, ROOM_EXTRA_TAVERN_BREWING_TIME, -1);
+		if (get_room_extra_data(room, ROOM_EXTRA_TAVERN_BREWING_TIME) == 0) {
+			// brew's ready!
+			set_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME, config_get_int("tavern_timer"));
+		}
+	}
+	else if (get_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME) >= 0) {
+		// count down to re-brew
+		add_to_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME, -1);
+		
+		if (get_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME) <= 0) {
+			// enough to go again?
+			if (extract_tavern_resources(room)) {
+				set_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME, config_get_int("tavern_timer"));
+			}
+			else {
+				// can't afford to keep brewing
+				set_room_extra_data(room, ROOM_EXTRA_TAVERN_TYPE, BREW_NONE);
+				set_room_extra_data(room, ROOM_EXTRA_TAVERN_BREWING_TIME, config_get_int("tavern_brew_time"));
+			}
+		}
 	}
 }
 
@@ -2227,6 +2252,19 @@ void load_world_map_from_file(void) {
 	}
 	
 	fclose(fl);
+}
+
+
+/**
+* Runs evolutions on all the land mass in the world. This skips the oceans
+* and anywhere else flagged NON-ISLAND.
+*/
+void run_map_evolutions(void) {
+	struct map_data *map;
+	
+	for (map = land_map; map; map = map->next) {
+		evolve_one_map_tile(map);
+	}
 }
 
 

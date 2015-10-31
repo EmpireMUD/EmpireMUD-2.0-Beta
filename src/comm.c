@@ -832,6 +832,7 @@ void heartbeat(int heart_pulse) {
 	void reduce_outside_territory();
 	void reduce_stale_empires();
 	void reset_instances();
+	void run_map_evolutions();
 	void sanity_check();
 	void update_actions();
 	void update_empire_npc_data();
@@ -988,6 +989,12 @@ void heartbeat(int heart_pulse) {
 			process_imports();
 			if (debug_log && HEARTBEAT(15)) { log("debug 25:\t%lld", microtime()); }
 		}
+	}
+	
+	// just over 7.5 minutes -- to avoid putting it right on the same cycle as hours
+	if (HEARTBEAT(455)) {
+		run_map_evolutions();
+		if (debug_log && HEARTBEAT(15)) { log("debug 26:\t%lld", microtime()); }
 	}
 	
 	// this goes roughly last -- update MSDP users

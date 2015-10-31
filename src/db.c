@@ -1592,6 +1592,7 @@ const char *versions_list[] = {
 	"b2.11",
 	"b3.0",
 	"b3.1",
+	"b3.2",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -1715,6 +1716,32 @@ void b3_1_mine_update(void) {
 		}
 
 		remove_room_extra_data(room, 0);	// ROOM_EXTRA_MINE_TYPE prior to b3.1
+	}
+}
+
+
+// removes the PLAYER-MADE flag from rooms and sets their "natural sect" instead
+void b3_2_map_update(void) {
+	extern const sector_vnum climate_default_sector[NUM_CLIMATES];
+
+	room_data *room, *next_room;
+	bitvector_t ROOM_AFF_PLAYER_MADE = BIT(11);	// removed flag
+	sector_vnum OASIS = 21, SANDY_TRENCH = 22;
+	
+	HASH_ITER(world_hh, world_table, room, next_room) {
+		if (!IS_SET(ROOM_AFF_FLAGS(room) | ROOM_BASE_FLAGS(room), ROOM_AFF_PLAYER_MADE)) {
+			continue;
+		}
+		
+		// remove the bits
+		REMOVE_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_PLAYER_MADE);
+		REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_PLAYER_MADE);
+		
+		// update the natural sector
+		if (GET_ROOM_VNUM(room) < MAP_SIZE) {
+			world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)].natural_sector = sector_proto((GET_SECT_VNUM(SECT(room)) == OASIS || GET_SECT_VNUM(SECT(room)) == SANDY_TRENCH) ? climate_default_sector[CLIMATE_ARID] : climate_default_sector[CLIMATE_TEMPERATE]);
+			world_map_needs_save = TRUE;
+		}
 	}
 }
 
@@ -1862,6 +1889,10 @@ void check_version(void) {
 		if (MATCH_VERSION("b3.1")) {
 			log("Applying b3.1 update to mines...");
 			b3_1_mine_update();
+		}
+		if (MATCH_VERSION("b3.2")) {
+			log("Applying b3.2 update to the map...");
+			b3_2_map_update();
 		}
 	}
 	

@@ -1565,7 +1565,7 @@ typedef struct trig_data trig_data;
 #define ROOM_AFF_DISMANTLING  BIT(8)	// i. Being dismantled
 #define ROOM_AFF_NO_FLY  BIT(9)	// j. Can't fly there
 #define ROOM_AFF_SHIP_PRESENT  BIT(10)	// k. A ship is present
-#define ROOM_AFF_PLAYER_MADE  BIT(11)	// l. A river (or whatever) that a player created
+	#define ROOM_AFF_UNUSED  BIT(11)
 #define ROOM_AFF_NO_WORK  BIT(12)	// m. workforce ignores this room
 #define ROOM_AFF_NO_DISREPAIR  BIT(13)	// n. will not fall into disrepair
 #define ROOM_AFF_NO_DISMANTLE  BIT(14)

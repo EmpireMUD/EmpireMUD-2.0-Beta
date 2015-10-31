@@ -159,10 +159,6 @@ OLC_MODULE(mapedit_terrain) {
 				msg_to_char(ch, "This room is now %s.\r\n", GET_CROP_NAME(cp));
 			}
 		}
-
-		// clear these
-		REMOVE_BIT(ROOM_AFF_FLAGS(IN_ROOM(ch)), ROOM_AFF_PLAYER_MADE);
-		REMOVE_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_PLAYER_MADE);
 				
 		// preserve old original sect for roads -- TODO this is a special-case
 		if (IS_ROAD(IN_ROOM(ch))) {
