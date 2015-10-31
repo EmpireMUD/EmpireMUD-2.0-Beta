@@ -3306,7 +3306,7 @@ struct room_data {
 	
 	time_t last_spawn_time;  // used to spawn npcs
 	
-	struct room_extra_data *extra_data;	// misc storage
+	struct room_extra_data *extra_data;	// hash of misc storage
 
 	struct trig_proto_list *proto_script;	/* list of default triggers  */
 	struct script_data *script;	/* script info for the room           */
@@ -3414,7 +3414,7 @@ struct room_extra_data {
 	int type;	// ROOM_EXTRA_x
 	int value;
 	
-	struct room_extra_data *next;
+	UT_hash_handle hh;	// room->extra_data hash
 };
 
 

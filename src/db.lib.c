@@ -4048,7 +4048,7 @@ void write_room_to_file(FILE *fl, room_data *room) {
 	
 	struct building_resource_type *res;
 	char temp[MAX_STRING_LENGTH];
-	struct room_extra_data *red;
+	struct room_extra_data *red, *next_red;
 	struct depletion_data *dep;
 	struct cooldown_data *cool;
 	trig_data *trig;
@@ -4184,7 +4184,7 @@ void write_room_to_file(FILE *fl, room_data *room) {
 	// no longer used: script_save_to_disk(fl, room, WLD_TRIGGER);
 	
 	// Z: extra data
-	for (red = room->extra_data; red; red = red->next) {
+	HASH_ITER(hh, room->extra_data, red, next_red) {
 		fprintf(fl, "Z\n%d %d\n", red->type, red->value);
 	}
 	

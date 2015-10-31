@@ -3212,7 +3212,7 @@ void do_stat_room(char_data *ch) {
 	crop_data *cp;
 	empire_data *emp;
 	struct affected_type *aff;
-	struct room_extra_data *red;
+	struct room_extra_data *red, *next_red;
 	player_index_data *index;
 	struct global_data *glb;
 	room_data *home = HOME_ROOM(IN_ROOM(ch));
@@ -3361,7 +3361,7 @@ void do_stat_room(char_data *ch) {
 	if (IN_ROOM(ch)->extra_data) {
 		msg_to_char(ch, "Extra data:\r\n");
 		
-		for (red = IN_ROOM(ch)->extra_data; red; red = red->next) {
+		HASH_ITER(hh, IN_ROOM(ch)->extra_data, red, next_red) {
 			sprinttype(red->type, room_extra_types, buf);
 			msg_to_char(ch, " %s: %d\r\n", buf, red->value);
 		}

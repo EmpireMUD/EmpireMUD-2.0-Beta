@@ -4883,7 +4883,7 @@ void add_to_room_extra_data(room_data *room, int type, int add_value) {
 	struct room_extra_data *red;
 	
 	if ((red = find_room_extra_data(room, type))) {
-		red->value += add_value;
+		SAFE_ADD(red->value, add_value, INT_MIN, INT_MAX, TRUE);
 		
 		// delete zeroes for cleanliness
 		if (red->value == 0) {
@@ -4904,16 +4904,11 @@ void add_to_room_extra_data(room_data *room, int type, int add_value) {
 * @return struct room_extra_data* The matching entry, or NULL.
 */
 struct room_extra_data *find_room_extra_data(room_data *room, int type) {
-	struct room_extra_data *iter, *found = NULL;
-	
-	for (iter = room->extra_data; iter && !found; iter = iter->next) {
-		if (iter->type == type) {
-			found = iter;
-		}
-	}
-	
-	return found;
+	struct room_extra_data *red;
+	HASH_FIND_INT(room->extra_data, &type, red);
+	return red;
 }
+
 
 /**
 * Gets the value of an extra data type for a room; defaults to 0 if none is set.
@@ -4926,6 +4921,7 @@ int get_room_extra_data(room_data *room, int type) {
 	struct room_extra_data *red = find_room_extra_data(room, type);
 	return (red ? red->value : 0);
 }
+
 
 /**
 * Multiplies an existing room extra data value by a number.
@@ -4956,10 +4952,9 @@ void multiply_room_extra_data(room_data *room, int type, double multiplier) {
 * @param int type The ROOM_EXTRA_x type to remove.
 */
 void remove_room_extra_data(room_data *room, int type) {
-	struct room_extra_data *red, *temp;
-	
-	while ((red = find_room_extra_data(room, type))) {
-		REMOVE_FROM_LIST(red, room->extra_data, next);
+	struct room_extra_data *red = find_room_extra_data(room, type);
+	if (red) {
+		HASH_DEL(room->extra_data, red);
 		free(red);
 	}
 }
@@ -4973,21 +4968,16 @@ void remove_room_extra_data(room_data *room, int type) {
 * @param int value The value to set it to.
 */
 void set_room_extra_data(room_data *room, int type, int value) {
-	struct room_extra_data *red;
+	struct room_extra_data *red = find_room_extra_data(room, type);
 	
-	// remove any old one first
-	remove_room_extra_data(room, type);
-	
-	// only bother if non-zero -- no need to store a zero
-	if (value != 0) {
+	// create if needed
+	if (!red) {
 		CREATE(red, struct room_extra_data, 1);
 		red->type = type;
-		red->value = value;
-	
-		// add
-		red->next = room->extra_data;
-		room->extra_data = red;
+		HASH_ADD_INT(room->extra_data, type, red);
 	}
+	
+	red->value = value;
 }
 
 
