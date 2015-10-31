@@ -1654,7 +1654,6 @@ static void evolve_one_map_tile(struct map_data *tile) {
 	sector_data *original;
 	sector_vnum become;
 	room_data *room;
-	bool changed;
 	
 	// this may return NULL -- we don't need it if so
 	room = real_real_room(tile->vnum);
@@ -1665,7 +1664,6 @@ static void evolve_one_map_tile(struct map_data *tile) {
 	}
 	
 	// to avoid running more than one:
-	changed = FALSE;
 	original = tile->sector_type;
 	become = NOTHING;
 	
