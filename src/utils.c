@@ -3216,21 +3216,21 @@ bool check_sunny(room_data *room) {
 
 
 /**
-* Gets linear distance between two rooms.
+* Gets linear distance between two map locations (accounting for wrapping).
 *
-* @param room_data *from Origin room
-* @param room_data *to Target room
+* @param int x1 first
+* @param int y1  coordinate
+* @param int x2 second
+* @param int y2  coordinate
 * @return int distance
 */
-int compute_distance(room_data *from, room_data *to) {
-	int x1 = X_COORD(from), y1 = Y_COORD(from);
-	int x2 = X_COORD(to), y2 = Y_COORD(to);
+int compute_map_distance(int x1, int y1, int x2, int y2) {
 	int dx = x1 - x2;
 	int dy = y1 - y2;
 	int dist;
 	
 	// short circuit on same-room
-	if (from == to || HOME_ROOM(from) == HOME_ROOM(to)) {
+	if (x1 == x2 && y1 == y2) {
 		return 0;
 	}
 	

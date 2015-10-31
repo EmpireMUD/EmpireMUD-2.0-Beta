@@ -3246,6 +3246,9 @@ own, they'll eventually succeed. Percentages may be set from 0.01 to 100.00.
 Evolutions are automatically sorted by type and by percentage. Only one will
 be called at a time -- the first one whose percentage check passes.
 
+Sectors with the NON-ISLAND flag can't evolve, as they aren't included in the
+list of land rooms that evolutions run on.
+
 Available types ([value] isn't used unless specified):
  CHOPPED-DOWN - Sector to become when chopped by a player; value is the number
     of trees you receive.
@@ -3281,7 +3284,7 @@ Available sector flags:
  LOCK-ICON - a random icon is chosen when the terrain changes to this, and kept
  IS-ADVENTURE - used only for adventure rooms
  NON-ISLAND - won't be detected as part of an island by the island detection
-    system, and generally can't be used for instancing adventures
+    system; can't be used for instancing adventures and won't run evolutions
  CHORE - This sector may have a chore (required, or the chore will never trigger)
  !CLAIM - Cannot be claimed.
  START-LOCATION - A starting location for players; prevents combat here

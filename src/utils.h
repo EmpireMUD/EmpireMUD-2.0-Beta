@@ -1148,7 +1148,8 @@ extern bool find_flagged_sect_within_distance_from_char(char_data *ch, bitvector
 extern bool find_flagged_sect_within_distance_from_room(room_data *room, bitvector_t with_flags, bitvector_t without_flags, int distance);
 extern bool find_sect_within_distance_from_char(char_data *ch, sector_vnum sect, int distance);
 extern bool find_sect_within_distance_from_room(room_data *room, sector_vnum sect, int distance);
-extern int compute_distance(room_data *from, room_data *to);
+extern int compute_map_distance(int x1, int y1, int x2, int y2);
+#define compute_distance(from, to)  compute_map_distance(X_COORD(from), Y_COORD(from), X_COORD(to), Y_COORD(to))
 extern int count_adjacent_sectors(room_data *room, sector_vnum sect, bool count_original_sect);
 extern int distance_to_nearest_player(room_data *room);
 extern bool get_coord_shift(int start_x, int start_y, int x_shift, int y_shift, int *new_x, int *new_y);
