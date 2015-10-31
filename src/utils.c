@@ -3710,11 +3710,27 @@ int get_direction_to(room_data *from, room_data *to) {
 int GET_ISLAND_ID(room_data *room) {
 	room_data *map = get_map_location_for(room);
 	
-	if (map) {
-		return map->island;
+	if (map && GET_ROOM_VNUM(map) < MAP_SIZE) {
+		return world_map[FLAT_X_COORD(map)][FLAT_Y_COORD(map)].island;
 	}
 	else {
 		return NO_ISLAND;
+	}
+}
+
+
+/**
+* Changes the island id of a room.
+*
+* @param room_data *room The room to change the island on.
+* @param int island The island ID to set it to.
+*/
+void SET_ISLAND_ID(room_data *room, int island) {
+	extern bool world_map_needs_save;
+	
+	if (GET_ROOM_VNUM(room) < MAP_SIZE) {
+		world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)].island = island;
+		world_map_needs_save = TRUE;
 	}
 }
 

@@ -941,7 +941,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 
 // island info
 extern int GET_ISLAND_ID(room_data *room);	// formerly #define GET_ISLAND_ID(room)  (get_map_location_for(room)->island)
-#define SET_ISLAND_ID(room, id)  ((room)->island = id)
+void SET_ISLAND_ID(room_data *room, int island);	// formerly a #define and a room_data property
 
 // room types
 #define IS_ADVENTURE_ROOM(room)  ROOM_SECT_FLAGGED((room), SECTF_ADVENTURE)

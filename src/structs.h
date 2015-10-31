@@ -3286,7 +3286,6 @@ struct room_data {
 	sector_data *sector_type;  // terrain type -- saved in file as vnum
 	sector_data *base_sector;  // for when built-over -- ^
 	crop_data *crop_type;	// if this room has a crop, this is it
-	int island;	// island numbers
 	
 	struct complex_room_data *complex; // for rooms that are buildings, inside, adventures, etc
 	byte light;  // number of light sources
