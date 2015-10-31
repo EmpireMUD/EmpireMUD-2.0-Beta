@@ -343,7 +343,7 @@ void cancel_minting(char_data *ch) {
 * @param char_data *ch The sailer.
 */
 void cancel_sailing(char_data *ch) {
-	room_data *room, *next_room;
+	room_data *room;
 	obj_data *ship;
 	
 	// no ship? no work
@@ -351,7 +351,7 @@ void cancel_sailing(char_data *ch) {
 		return;
 	}
 	
-	HASH_ITER(interior_hh, interior_world_table, room, next_room) {
+	for (room = interior_room_list; room; room = room->next_interior) {
 		if (HOME_ROOM(room) == HOME_ROOM(IN_ROOM(ch)) && ROOM_PEOPLE(room)) {
 			act("The ship stops moving.", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
 		}

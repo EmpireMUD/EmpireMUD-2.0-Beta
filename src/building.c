@@ -383,7 +383,9 @@ void disassociate_building(room_data *room) {
 	remove_room_extra_data(room, ROOM_EXTRA_REDESIGNATE_TIME);
 
 	// disassociate inside rooms
-	HASH_ITER(interior_hh, interior_world_table, iter, next_iter) {
+	for (iter = interior_room_list; iter; iter = next_iter) {
+		next_iter = iter->next_interior;
+		
 		if (HOME_ROOM(iter) == room && iter != room) {
 			remove_designate_objects(iter);
 			
@@ -949,7 +951,9 @@ void start_dismantle_building(room_data *loc) {
 	}
 
 	// interior only
-	HASH_ITER(interior_hh, interior_world_table, room, next_room) {
+	for (room = interior_room_list; room; room = next_room) {
+		next_room = room->next_interior;
+		
 		if (HOME_ROOM(room) == loc) {
 			remove_designate_objects(room);
 			delete_room_npcs(room, NULL);

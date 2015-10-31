@@ -292,7 +292,7 @@ void check_all_exits();
 extern struct room_direction_data *create_exit(room_data *from, room_data *to, int dir, bool back);
 void delete_room(room_data *room, bool check_exits);
 extern room_data *world_table;
-extern room_data *interior_world_table;
+extern room_data *interior_room_list;
 extern struct map_data world_map[MAP_WIDTH][MAP_HEIGHT];
 extern struct map_data *land_map;
 room_data *real_real_room(room_vnum vnum);

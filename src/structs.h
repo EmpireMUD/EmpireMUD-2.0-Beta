@@ -3318,7 +3318,7 @@ struct room_data {
 	struct reset_com *reset_commands;	// used only during startup
 	
 	UT_hash_handle world_hh;	// hash handle for world_table
-	UT_hash_handle interior_hh;	// hash handle for interior_world_table
+	room_data *next_interior;	// linked list: interior_room_list
 };
 
 

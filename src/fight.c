@@ -1976,7 +1976,7 @@ void besiege_room(room_data *to_room, int damage) {
 	empire_data *emp = ROOM_OWNER(to_room);
 	int max_dam;
 	bool junk;
-	room_data *rm, *next_rm;
+	room_data *rm;
 	
 	// make sure we only hit the home-room
 	to_room = HOME_ROOM(to_room);
@@ -2022,7 +2022,7 @@ void besiege_room(room_data *to_room, int damage) {
 			if (ROOM_PEOPLE(to_room)) {
 				act("The building is hit by something and shakes violently!", FALSE, ROOM_PEOPLE(to_room), 0, 0, TO_CHAR | TO_ROOM);
 			}
-			HASH_ITER(interior_hh, interior_world_table, rm, next_rm) {
+			for (rm = interior_room_list; rm; rm = rm->next_interior) {
 				if (HOME_ROOM(rm) == to_room && ROOM_PEOPLE(rm)) {
 					act("The building is hit by something and shakes violently!", FALSE, ROOM_PEOPLE(rm), 0, 0, TO_CHAR | TO_ROOM);
 				}

@@ -1796,9 +1796,9 @@ obj_data *find_free_ship(empire_data *emp, struct shipping_data *shipd) {
 room_data *get_ship_pen(void) {
 	extern room_data *create_room();
 
-	room_data *room, *iter, *next_iter;
+	room_data *room, *iter;
 	
-	HASH_ITER(interior_hh, interior_world_table, iter, next_iter) {
+	for (iter = interior_room_list; iter; iter = iter->next_interior) {
 		if (GET_BUILDING(iter) && GET_BLD_VNUM(GET_BUILDING(iter)) == RTYPE_SHIP_HOLDING_PEN) {
 			return iter;
 		}
@@ -2045,7 +2045,7 @@ void sail_shipment(empire_data *emp, obj_data *boat) {
 * @return bool TRUE if the ship is empty, FALSE if it has players inside.
 */
 bool ship_is_empty(obj_data *ship) {
-	room_data *ship_room, *iter, *next_iter;
+	room_data *ship_room, *iter;
 	char_data *ch;
 	
 	if (!ship || !IS_SHIP(ship) || !(ship_room = real_room(GET_SHIP_MAIN_ROOM(ship)))) {
@@ -2053,7 +2053,7 @@ bool ship_is_empty(obj_data *ship) {
 	}
 	
 	// check all interior rooms
-	HASH_ITER(interior_hh, interior_world_table, iter, next_iter) {
+	for (iter = interior_room_list; iter; iter = iter->next_interior) {
 		if (HOME_ROOM(iter) != ship_room) {
 			continue;
 		}

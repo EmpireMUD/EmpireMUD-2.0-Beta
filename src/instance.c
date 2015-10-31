@@ -1141,7 +1141,9 @@ void prune_instances(void) {
 	// shut off saves briefly
 	instance_save_wait = TRUE;
 	
-	HASH_ITER(interior_hh, interior_world_table, room, next_room) {
+	for (room = interior_room_list; room; room = next_room) {
+		next_room = room->next_interior;
+		
 		// scan only non-map rooms for orphaned instance rooms
 		if (IS_ADVENTURE_ROOM(room) && (!COMPLEX_DATA(room) || !COMPLEX_DATA(room)->instance)) {
 			log("Deleting room %d due to missing instance.", GET_ROOM_VNUM(room));

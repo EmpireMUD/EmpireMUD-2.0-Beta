@@ -938,7 +938,9 @@ static void reduce_stale_empires_one(empire_data *emp) {
 	
 	// try interior first -- we'll take the first secondary room we find
 	if (!outside_only) {
-		HASH_ITER(interior_hh, interior_world_table, iter, next_iter) {
+		for (iter = interior_room_list; iter; iter = next_iter) {
+			next_iter = iter->next_interior;
+			
 			// only want rooms owned by this empire and only if they are their own home room (like a ship)
 			if (ROOM_OWNER(iter) != emp || HOME_ROOM(iter) != iter) {
 				continue;

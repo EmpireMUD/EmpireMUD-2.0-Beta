@@ -636,8 +636,9 @@ void script_trigger_check(void) {
 		}
 	}
 	else {
-		// partial		
-		HASH_ITER(interior_hh, interior_world_table, room, next_room) {
+		// partial
+		for (room = interior_room_list; room; room = next_room) {
+			next_room = room->next_interior;
 			if ((sc = SCRIPT(room)) && IS_SET(SCRIPT_TYPES(sc), WTRIG_RANDOM) && (players_nearby_script(room) || IS_SET(SCRIPT_TYPES(sc), WTRIG_GLOBAL))) {
 				random_wtrigger(room);
 			}

@@ -2234,7 +2234,9 @@ void abandon_room(room_data *room) {
 	perform_abandon_room(room);
 
 	// inside
-	HASH_ITER(interior_hh, interior_world_table, iter, next_iter) {
+	for (iter = interior_room_list; iter; iter = next_iter) {
+		next_iter = iter->next_interior;
+		
 		if (HOME_ROOM(iter) == home) {
 			perform_abandon_room(iter);
 		}
@@ -2257,8 +2259,10 @@ void claim_room(room_data *room, empire_data *emp) {
 	
 	ROOM_OWNER(room) = emp;
 	remove_room_extra_data(room, ROOM_EXTRA_CEDED);	// not ceded if just claimed
-
-	HASH_ITER(interior_hh, interior_world_table, iter, next_iter) {
+	
+	for (iter = interior_room_list; iter; iter = next_iter) {
+		next_iter = iter->next_interior;
+		
 		if (HOME_ROOM(iter) == home) {
 			ROOM_OWNER(iter) = emp;
 			remove_room_extra_data(iter, ROOM_EXTRA_CEDED);	// not ceded if just claimed

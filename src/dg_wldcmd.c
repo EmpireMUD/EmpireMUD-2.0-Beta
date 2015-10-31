@@ -236,7 +236,7 @@ WCMD(do_wsend) {
 }
 
 WCMD(do_wbuildingecho) {
-	room_data *froom, *iter, *next_iter, *home;
+	room_data *froom, *iter, *home;
 	char room_num[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH], *msg;
 
 	msg = any_one_word(argument, room_num);
@@ -252,7 +252,7 @@ WCMD(do_wbuildingecho) {
 		sprintf(buf, "%s\r\n", msg);
 		
 		send_to_room(buf, home);
-		HASH_ITER(interior_hh, interior_world_table, iter, next_iter) {
+		for (iter = interior_room_list; iter; iter = iter->next_interior) {
 			if (HOME_ROOM(iter) == home && iter != home && ROOM_PEOPLE(iter)) {
 				send_to_room(buf, iter);
 			}

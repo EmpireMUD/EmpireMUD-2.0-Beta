@@ -674,7 +674,9 @@ void claim_city(char_data *ch, char *argument) {
 	
 	if (found) {
 		// update the inside (interior rooms only)
-		HASH_ITER(interior_hh, interior_world_table, iter, next_iter) {
+		for (iter = interior_room_list; iter; iter = next_iter) {
+			next_iter = iter->next_interior;
+			
 			home = HOME_ROOM(iter);
 			if (home != iter && ROOM_OWNER(home) == emp) {
 				ROOM_OWNER(iter) = emp;
@@ -2072,7 +2074,9 @@ ACMD(do_cede) {
 		
 		// mark as ceded
 		set_room_extra_data(room, ROOM_EXTRA_CEDED, 1);
-		HASH_ITER(interior_hh, interior_world_table, iter, next_iter) {
+		for (iter = interior_room_list; iter; iter = next_iter) {
+			next_iter = iter->next_interior;
+			
 			if (HOME_ROOM(iter) == room) {
 				set_room_extra_data(iter, ROOM_EXTRA_CEDED, 1);
 			}
@@ -3539,8 +3543,10 @@ ACMD(do_home) {
 			
 			COMPLEX_DATA(real)->private_owner = GET_IDNUM(ch);
 
-			// interior only			
-			HASH_ITER(interior_hh, interior_world_table, iter, next_iter) {
+			// interior only
+			for (iter = interior_room_list; iter; iter = next_iter) {
+				next_iter = iter->next_interior;
+				
 				// TODO consider a trigger like RoomUpdate that passes a var like %update% == homeset
 				if (HOME_ROOM(iter) == real && BUILDING_VNUM(iter) == RTYPE_BEDROOM) {
 					obj_to_room((obj = read_object(o_HOME_CHEST, TRUE)), iter);

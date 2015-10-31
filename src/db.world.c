@@ -480,7 +480,9 @@ void delete_room(room_data *room, bool check_exits) {
 	}
 	else {
 		// just check home rooms of interiors
-		HASH_ITER(interior_hh, interior_world_table, rm_iter, next_rm) {
+		for (rm_iter = interior_room_list; rm_iter; rm_iter = next_rm) {
+			next_rm = rm_iter->next_interior;
+			
 			if (rm_iter != room && COMPLEX_DATA(rm_iter)) {
 				// unset homeroom -> this is just interior table
 				if (COMPLEX_DATA(rm_iter)->home_room == room) {

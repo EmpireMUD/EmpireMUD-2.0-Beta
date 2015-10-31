@@ -161,7 +161,7 @@ int dg_owner_purged;	// For control of scripts
 
 // world / rooms
 room_data *world_table = NULL;	// hash table of the whole world
-room_data *interior_world_table = NULL;	// hash table of the interior world
+room_data *interior_room_list = NULL;	// linked list of interior rooms: room->next_interior
 bool world_is_sorted = FALSE;	// to prevent unnecessary re-sorts
 bool need_world_index = TRUE;	// used to trigger world index saving (always save at least once)
 struct island_info *island_table = NULL; // hash table for all the islands
@@ -622,7 +622,9 @@ void delete_orphaned_rooms(void) {
 	bool deleted = FALSE;
 	
 	// start at the end of the map!
-	HASH_ITER(interior_hh, interior_world_table, room, next_room) {
+	for (room = interior_room_list; room; room = next_room) {
+		next_room = room->next_interior;
+		
 		// boats are checked separately
 		if (BUILDING_VNUM(room) == RTYPE_B_ONDECK && HOME_ROOM(room) == room) {
 			continue;

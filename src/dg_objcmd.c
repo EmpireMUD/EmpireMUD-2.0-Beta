@@ -195,7 +195,7 @@ OCMD(do_oforce) {
 
 
 OCMD(do_obuildingecho) {
-	room_data *froom, *home_room, *iter, *next_iter;
+	room_data *froom, *home_room, *iter;
 	room_data *orm = obj_room(obj);
 	char room_number[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH], *msg;
 
@@ -214,7 +214,7 @@ OCMD(do_obuildingecho) {
 		sprintf(buf, "%s\r\n", msg);
 		
 		send_to_room(buf, home_room);
-		HASH_ITER(interior_hh, interior_world_table, iter, next_iter) {
+		for (iter = interior_room_list; iter; iter = iter->next_interior) {
 			if (HOME_ROOM(iter) == home_room && iter != home_room && ROOM_PEOPLE(iter)) {
 				send_to_room(buf, iter);
 			}

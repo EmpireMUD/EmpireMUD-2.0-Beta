@@ -394,7 +394,9 @@ bool move_ship(char_data *ch, obj_data *ship, int dir) {
 	}
 	
 	// alert whole ship
-	HASH_ITER(interior_hh, interior_world_table, room, next_room) {
+	for (room = interior_room_list; room; room = next_room) {
+		next_room = room->next_interior;
+		
 		if (HOME_ROOM(room) != deck) {
 			continue;
 		}
@@ -429,7 +431,9 @@ bool only_one_sailing(char_data *ch, obj_data *ship) {
 		return FALSE;
 	}
 	
-	HASH_ITER(interior_hh, interior_world_table, room, next_room) {
+	for (room = interior_room_list; room; room = next_room) {
+		next_room = room->next_interior;
+		
 		if (HOME_ROOM(room) != HOME_ROOM(IN_ROOM(ch))) {
 			continue;
 		}
@@ -737,7 +741,9 @@ ACMD(do_load_boat) {
 		msg_to_char(ch, "You can't seem to load this ship.\r\n");
 	}
 	else {
-		HASH_ITER(interior_hh, interior_world_table, room, next_room) {
+		for (room = interior_room_list; room; room = next_room) {
+			next_room = room->next_interior;
+			
 			if (done) {
 				break;
 			}
@@ -886,7 +892,9 @@ ACMD(do_sail) {
 		
 		// alert whole ship
 		if (!same_dir) {
-			HASH_ITER(interior_hh, interior_world_table, room, next_room) {
+			for (room = interior_room_list; room; room = next_room) {
+				next_room = room->next_interior;
+				
 				if (HOME_ROOM(room) != HOME_ROOM(IN_ROOM(ch))) {
 					continue;
 				}
@@ -925,7 +933,9 @@ ACMD(do_unload_boat) {
 		msg_to_char(ch, "You can't seem to unload the ship.\r\n");
 	}
 	else {
-		HASH_ITER(interior_hh, interior_world_table, room, next_room) {
+		for (room = interior_room_list; room; room = next_room) {
+			next_room = room->next_interior;
+			
 			if (HOME_ROOM(room) != ship_room)
 				continue;
 			if (BUILDING_VNUM(room) != RTYPE_B_STORAGE && BUILDING_VNUM(room) != RTYPE_B_ONDECK)
