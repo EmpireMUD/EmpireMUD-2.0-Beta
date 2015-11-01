@@ -726,7 +726,8 @@ ACMD(do_colorburst) {
 
 
 ACMD(do_disenchant) {
-	obj_data *obj, *reward, *proto;
+	struct obj_apply *apply, *next_apply, *temp;
+	obj_data *obj, *reward;
 	int iter, prc, rnd;
 	obj_vnum vnum = NOTHING;
 	int cost = 5;
@@ -754,10 +755,14 @@ ACMD(do_disenchant) {
 	else {
 		charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
 		REMOVE_BIT(GET_OBJ_EXTRA(obj), OBJ_ENCHANTED | OBJ_SUPERIOR);
-		proto = obj_proto(GET_OBJ_VNUM(obj));
 		
-		free_apply_list(GET_OBJ_APPLIES(obj));
-		GET_OBJ_APPLIES(obj) = NULL;
+		for (apply = GET_OBJ_APPLIES(obj); apply; apply = next_apply) {
+			next_apply = apply->next;
+			if (apply->apply_type == APPLY_TYPE_ENCHANTMENT) {
+				REMOVE_FROM_LIST(apply, GET_OBJ_APPLIES(obj), next);
+				free(apply);
+			}
+		}
 		
 		act("You hold $p over your head and shout 'KA!' as you release the mana bound to it!\r\nThere is a burst of red light from $p and then it fizzles and is disenchanted.", FALSE, ch, obj, NULL, TO_CHAR);
 		act("$n shouts 'KA!' and cracks $p, which blasts out red light, and then fizzles.", FALSE, ch, obj, NULL, TO_ROOM);
@@ -960,7 +965,7 @@ ACMD(do_enchant) {
 		
 		// set enchanted bit
 		SET_BIT(GET_OBJ_EXTRA(obj), OBJ_ENCHANTED);
-
+		
 		sprintf(buf, "You infuse $p with the %s enchantment.", enchant_data[type].name);
 		act(buf, FALSE, ch, obj, NULL, TO_CHAR);
 		

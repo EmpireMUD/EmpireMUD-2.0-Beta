@@ -3420,7 +3420,7 @@ void free_obj(obj_data *obj) {
 */
 void parse_object(FILE *obj_f, int nr) {
 	static char line[256];
-	int t[10], j = 0, retval;
+	int t[10], retval;
 	char *tmpptr;
 	char f1[256], f2[256];
 	struct obj_custom_message *ocm, *last_ocm = NULL;
@@ -3504,7 +3504,6 @@ void parse_object(FILE *obj_f, int nr) {
 
 	/* *** extra descriptions and affect fields *** */
 	strcat(buf2, ", after numeric constants\n...expecting alphabetic flags");
-	j = 0;
 
 	for (;;) {
 		if (!get_line(obj_f, line)) {
