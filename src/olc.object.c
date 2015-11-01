@@ -1404,7 +1404,7 @@ OLC_MODULE(oedit_apply) {
 				GET_OBJ_APPLIES(obj) = apply;
 			}
 			
-			msg_to_char(ch, "You add %+d to %s.\r\n", num, apply_types[loc]);
+			msg_to_char(ch, "You add %+d to %s (%s).\r\n", num, apply_types[loc], apply_type_names[apply_type]);
 		}
 	}
 	else if (is_abbrev(arg1, "change")) {
