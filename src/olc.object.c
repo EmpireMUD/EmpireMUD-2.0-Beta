@@ -1256,10 +1256,7 @@ void olc_show_object(char_data *ch) {
 	if (count == 0) {
 		strcat(buf, " none\r\n");
 	}
-	else if ((count % 2) != 0) {
-		strcat(buf, "\r\n");
-	}
-
+	
 	// exdesc
 	sprintf(buf + strlen(buf), "Extra descriptions: <&yextra&0>\r\n");
 	get_extra_desc_display(obj->ex_description, buf1);
