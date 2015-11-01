@@ -2035,13 +2035,11 @@ void output_map_to_file(void) {
 	extern const char mapout_color_tokens[];
 	
 	FILE *out, *pol, *cit;
-	int num, color = 0;
+	int num, color = 0, x, y;
 	struct empire_city_data *city;
-	room_data *room, *next_room;
+	room_data *room;
 	empire_data *emp, *next_emp;
 	sector_data *ocean = sector_proto(BASIC_OCEAN);
-	crop_data *cp;
-	room_vnum expecting;
 	
 	// basic ocean sector is required
 	if (!ocean) {
@@ -2066,70 +2064,43 @@ void output_map_to_file(void) {
 	fprintf(out, "%dx%d\n", MAP_WIDTH, MAP_HEIGHT);
 	fprintf(pol, "%dx%d\n", MAP_WIDTH, MAP_HEIGHT);
 	
-	expecting = 0;	// next expected vnum
-	HASH_ITER(hh, world_table, room, next_room) {
-		// in case of partially-loaded world:
-		while (expecting < GET_ROOM_VNUM(room) && expecting < MAP_SIZE) {
-			// normal
-			fprintf(out, "%c", mapout_color_tokens[GET_SECT_MAPOUT(ocean)]);
-			
-			// political
-			if (SECT_FLAGGED(ocean, SECTF_SHOW_ON_POLITICAL_MAPOUT)) {
-				fprintf(pol, "%c", mapout_color_tokens[GET_SECT_MAPOUT(ocean)]);
+	for (y = 0; y < MAP_HEIGHT; ++y) {
+		for (x = 0; x < MAP_WIDTH; ++x) {
+			// normal map output
+			if (world_map[x][y].crop_type) {
+				fprintf(out, "%c", mapout_color_tokens[GET_CROP_MAPOUT(world_map[x][y].crop_type)]);
 			}
 			else {
-				fprintf(pol, "\n");
+				fprintf(out, "%c", mapout_color_tokens[GET_SECT_MAPOUT(world_map[x][y].sector_type)]);
 			}
+		
+			// political output
+			if ((room = real_real_room(world_map[x][y].vnum)) && (emp = ROOM_OWNER(room))) {
+				// find the first color in banner_to_mapout_token that is in the banner
+				color = -1;
+				for (num = 0; banner_to_mapout_token[0][0] != '\n'; ++num) {
+					if (strchr(EMPIRE_BANNER(emp), banner_to_mapout_token[num][0])) {
+						color = num;
+						break;
+					}
+				}
 			
-			++expecting;
-			
-			if (!(expecting % MAP_WIDTH)) {
-				fprintf(out, "\n");
-				fprintf(pol, "\n");
+				fprintf(pol, "%c", color != -1 ? banner_to_mapout_token[color][1] : '?');
 			}
-		}
-		expecting = GET_ROOM_VNUM(room)+1;	// for next iteration
-		
-		// check for done
-		if (GET_ROOM_VNUM(room) >= MAP_SIZE) {
-			break;
-		}
-		
-		// normal map output
-		if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && (cp = ROOM_CROP(room))) {
-			fprintf(out, "%c", mapout_color_tokens[GET_CROP_MAPOUT(cp)]);
-		}
-		else {
-			fprintf(out, "%c", mapout_color_tokens[GET_SECT_MAPOUT(SECT(room))]);
-		}
-		
-		// political output
-		if ((emp = ROOM_OWNER(room))) {
-			// find the first color in banner_to_mapout_token that is in the banner
-			color = -1;
-			for (num = 0; banner_to_mapout_token[0][0] != '\n'; ++num) {
-				if (strchr(EMPIRE_BANNER(emp), banner_to_mapout_token[num][0])) {
-					color = num;
-					break;
+			else {
+				// no owner -- only some sects get printed
+				if (SECT_FLAGGED(world_map[x][y].sector_type, SECTF_SHOW_ON_POLITICAL_MAPOUT)) {
+					fprintf(pol, "%c", mapout_color_tokens[GET_SECT_MAPOUT(world_map[x][y].sector_type)]);
+				}
+				else {
+					fprintf(pol, "?");
 				}
 			}
-			
-			fprintf(pol, "%c", color != -1 ? banner_to_mapout_token[color][1] : '?');
-		}
-		else {
-			// no owner -- only some sects get printed
-			if (ROOM_SECT_FLAGGED(room, SECTF_SHOW_ON_POLITICAL_MAPOUT)) {
-				fprintf(pol, "%c", mapout_color_tokens[GET_SECT_MAPOUT(SECT(room))]);
-			}
-			else {
-				fprintf(pol, "?");
-			}
 		}
 		
-		if (!((GET_ROOM_VNUM(room)+1) % MAP_WIDTH)) {
-			fprintf(out, "\n");
-			fprintf(pol, "\n");
-		}
+		// end of row
+		fprintf(out, "\n");
+		fprintf(pol, "\n");	
 	}
 
 	fclose(out);
