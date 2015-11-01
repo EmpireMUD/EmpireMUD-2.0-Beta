@@ -1565,7 +1565,10 @@ obj_data *read_object(obj_vnum nr, bool with_triggers) {
 
 	*obj = *proto;
 	add_to_object_list(obj);
-
+	
+	// applies are ALWAYS a copy
+	GET_OBJ_APPLIES(obj) = copy_apply_list(GET_OBJ_APPLIES(proto));
+	
 	if (obj->obj_flags.timer == 0)
 		obj->obj_flags.timer = UNLIMITED;
 	

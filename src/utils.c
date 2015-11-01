@@ -1961,12 +1961,12 @@ double rate_item(obj_data *obj) {
 	extern double get_base_dps(obj_data *weapon);
 	extern const double apply_values[];
 	
+	struct obj_apply *apply;
 	double score = 0;
-	int iter;
 	
 	// basic apply score
-	for (iter = 0; iter < MAX_OBJ_AFFECT; ++iter) {
-		score += obj->affected[iter].modifier * apply_values[(int) obj->affected[iter].location];
+	for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
+		score += apply->modifier * apply_values[(int) apply->location];
 	}
 	
 	// score based on type

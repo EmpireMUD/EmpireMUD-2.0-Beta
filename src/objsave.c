@@ -86,6 +86,7 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 	char line[MAX_INPUT_LENGTH], error[MAX_STRING_LENGTH], s_in[MAX_INPUT_LENGTH];
 	obj_data *proto = obj_proto(vnum);
 	struct extra_descr_data *ex;
+	struct obj_apply *apply, *last_apply = NULL;
 	obj_data *obj, *new;
 	bool end = FALSE;
 	int length, i_in[3];
@@ -113,6 +114,10 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 	if (obj) {
 		OBJ_VERSION(obj) = 0;
 	}
+	
+	// we always use the applies from the file, not from the proto
+	free_apply_list(GET_OBJ_APPLIES(obj));
+	GET_OBJ_APPLIES(obj) = NULL;
 	
 	// for fread_string
 	sprintf(error, "Obj_load_from_file %d", vnum);
@@ -150,10 +155,40 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 						obj->obj_flags.bitvector = asciiflag_conv(s_in);
 					}
 				}
-				else if (OBJ_FILE_TAG(line, "Apply:", length)) {
+				else if (OBJ_FILE_TAG(line, "Applies:", length)) {
+					// this is the CURRENT version of the "Apply" tag
 					if (sscanf(line + length + 1, "%d %d %d", &i_in[0], &i_in[1], &i_in[2])) {
-						obj->affected[i_in[0]].location = i_in[1];
-						obj->affected[i_in[0]].modifier = i_in[2];
+						CREATE(apply, struct obj_apply, 1);
+						apply->location = i_in[0];
+						apply->modifier = i_in[1];
+						apply->apply_type = i_in[2];
+						
+						// append to end
+						if (last_apply) {
+							last_apply->next = apply;
+						}
+						else {
+							GET_OBJ_APPLIES(obj) = apply;
+						}
+						last_apply = apply;
+					}
+				}
+				else if (OBJ_FILE_TAG(line, "Apply:", length)) {
+					// this is an OLD version of the tag that has a different set of params
+					if (sscanf(line + length + 1, "%d %d %d", &i_in[0], &i_in[1], &i_in[2])) {
+						CREATE(apply, struct obj_apply, 1);
+						apply->location = i_in[1];
+						apply->modifier = i_in[2];
+						apply->apply_type = APPLY_TYPE_NATURAL;
+						
+						// append to end
+						if (last_apply) {
+							last_apply->next = apply;
+						}
+						else {
+							GET_OBJ_APPLIES(obj) = apply;
+						}
+						last_apply = apply;
 					}
 				}
 				else if (OBJ_FILE_TAG(line, "Autostore-timer:", length)) {
@@ -396,6 +431,7 @@ void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location) {
 	char temp[MAX_STRING_LENGTH];
 	struct extra_descr_data *ex;
 	struct obj_binding *bind;
+	struct obj_apply *apply;
 	obj_data *proto;
 	int iter;
 	
@@ -484,8 +520,8 @@ void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location) {
 	}
 	
 	// always save applies
-	for (iter = 0; iter < MAX_OBJ_AFFECT; ++iter) {
-		fprintf(fl, "Apply: %d %d %d\n", iter, obj->affected[iter].location, obj->affected[iter].modifier);
+	for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
+		fprintf(fl, "Applies: %d %d %d\n", apply->location, apply->modifier, apply->apply_type);
 	}
 	
 	// who it's bound to

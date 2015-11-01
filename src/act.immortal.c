@@ -2922,6 +2922,7 @@ void do_stat_global(char_data *ch, struct global_data *glb) {
 
 /* Gives detailed information on an object (j) to ch */
 void do_stat_object(char_data *ch, obj_data *j) {
+	extern const char *apply_type_names[];
 	extern const struct material_data materials[NUM_MATERIALS];
 	extern const char *wear_bits[];
 	extern const char *item_types[];
@@ -2934,7 +2935,9 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	extern const char *armor_types[NUM_ARMOR_TYPES+1];
 	extern const struct poison_data_type poison_data[];
 	
-	int i, found;
+	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
+	int found;
+	struct obj_apply *apply;
 	room_data *room;
 	obj_vnum vnum = GET_OBJ_VNUM(j);
 	obj_data *j2;
@@ -3154,9 +3157,15 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	}
 	found = 0;
 	send_to_char("Applies:", ch);
-	for (i = 0; i < MAX_OBJ_AFFECT; i++)
-		if (j->affected[i].modifier)
-			msg_to_char(ch, "%s %+d to %s", found++ ? "," : "", j->affected[i].modifier, apply_types[(int) j->affected[i].location]);
+	for (apply = GET_OBJ_APPLIES(j); apply; apply = apply->next) {
+		if (apply->apply_type != APPLY_TYPE_NATURAL) {
+			sprintf(part, " (%s)", apply_type_names[(int)apply->apply_type]);
+		}
+		else {
+			*part = '\0';
+		}
+		msg_to_char(ch, "%s %+d to %s%s", found++ ? "," : "", apply->modifier, apply_types[(int) apply->location], part);
+	}
 	if (!found)
 		send_to_char(" None", ch);
 

@@ -531,6 +531,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 //// OBJECT UTILS ////////////////////////////////////////////////////////////
 
 // primary attributes
+#define GET_OBJ_APPLIES(obj)  ((obj)->applies)
 #define GET_AUTOSTORE_TIMER(obj)  ((obj)->autostore_timer)
 #define GET_OBJ_ACTION_DESC(obj)  ((obj)->action_description)
 #define GET_OBJ_AFF_FLAGS(obj)  ((obj)->obj_flags.bitvector)

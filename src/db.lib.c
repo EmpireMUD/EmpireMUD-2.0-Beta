@@ -3396,7 +3396,10 @@ void free_obj(obj_data *obj) {
 	}
 	
 	free_obj_binding(&OBJ_BOUND_TO(obj));
-
+	
+	// applies are ALWAYS a copy
+	free_apply_list(GET_OBJ_APPLIES(obj));
+	
 	/* free any assigned scripts */
 	if (SCRIPT(obj)) {
 		extract_script(obj, OBJ_TRIGGER);
@@ -3422,6 +3425,7 @@ void parse_object(FILE *obj_f, int nr) {
 	char f1[256], f2[256];
 	struct obj_custom_message *ocm, *last_ocm = NULL;
 	struct obj_storage_type *store, *last_store = NULL;
+	struct obj_apply *apply, *last_apply = NULL;
 	obj_data *obj, *find;
 	
 	// create
@@ -3499,11 +3503,6 @@ void parse_object(FILE *obj_f, int nr) {
 	obj->obj_flags.timer = t[1];
 
 	/* *** extra descriptions and affect fields *** */
-	for (j = 0; j < MAX_OBJ_AFFECT; j++) {
-		obj->affected[j].location = APPLY_NONE;
-		obj->affected[j].modifier = 0;
-	}
-
 	strcat(buf2, ", after numeric constants\n...expecting alphabetic flags");
 	j = 0;
 
@@ -3514,22 +3513,32 @@ void parse_object(FILE *obj_f, int nr) {
 		}
 		switch (*line) {
 			case 'A':
-				if (j >= MAX_OBJ_AFFECT) {
-					log("SYSERR: Too many A fields (%d max), %s", MAX_OBJ_AFFECT, buf2);
-					exit(1);
-				}
 				if (!get_line(obj_f, line)) {
 					log("SYSERR: Format error in 'A' field, %s\n...expecting 2 numeric constants but file ended!", buf2);
 					exit(1);
 				}
-
-				if ((retval = sscanf(line, " %d %d ", t, t + 1)) != 2) {
-					log("SYSERR: Format error in 'A' field, %s\n...expecting 2 numeric arguments, got %d\n...offending line: '%s'", buf2, retval, line);
-					exit(1);
+				
+				if (sscanf(line, " %d %d %d ", &t[0], &t[1], &t[2]) != 3) {
+					// backwards-compatible
+					t[2] = APPLY_TYPE_NATURAL;
+					if ((retval = sscanf(line, " %d %d ", &t[0], &t[1])) != 2) {
+						log("SYSERR: Format error in 'A' field, %s\n...expecting 3 numeric arguments, got %d\n...offending line: '%s'", buf2, retval, line);
+						exit(1);
+					}
 				}
-				obj->affected[j].location = t[0];
-				obj->affected[j].modifier = t[1];
-				j++;
+				CREATE(apply, struct obj_apply, 1);
+				apply->location = t[0];
+				apply->modifier = t[1];
+				apply->apply_type = t[2];
+				
+				// append to end
+				if (last_apply) {
+					last_apply->next = apply;
+				}
+				else {
+					GET_OBJ_APPLIES(obj) = apply;
+				}
+				last_apply = apply;
 				break;
 
 			case 'B':
@@ -3637,7 +3646,7 @@ void write_obj_to_file(FILE *fl, obj_data *obj) {
 	char temp[MAX_STRING_LENGTH], temp2[MAX_STRING_LENGTH];
 	struct obj_storage_type *store;
 	struct obj_custom_message *ocm;
-	int iter;
+	struct obj_apply *apply;
 	
 	if (!fl || !obj) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: write_obj_to_file called without %s", !fl ? "file" : "object");
@@ -3666,11 +3675,9 @@ void write_obj_to_file(FILE *fl, obj_data *obj) {
 	// now optional parts:
 	
 	// A: applies
-	for (iter = 0; iter < MAX_OBJ_AFFECT; ++iter) {
-		if (obj->affected[iter].location != APPLY_NONE && obj->affected[iter].modifier != 0) {
-			fprintf(fl, "A\n");
-			fprintf(fl, "%d %d\n", obj->affected[iter].location, obj->affected[iter].modifier);
-		}
+	for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
+		fprintf(fl, "A\n");
+		fprintf(fl, "%d %d %d\n", apply->location, apply->modifier, apply->apply_type);
 	}
 	
 	// B: sets affect bitvector
@@ -6493,6 +6500,49 @@ void sort_world_table(void) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// MISCELLANEOUS LIB ///////////////////////////////////////////////////////
+
+/**
+* Creates a copy of a list of applies.
+*
+* @param struct obj_apply *list The list to copy.
+* @return struct obj_apply* A pointer to the copy list.
+*/
+struct obj_apply *copy_apply_list(struct obj_apply *list) {
+	struct obj_apply *new_list, *last, *iter, *new;
+	
+	new_list = last = NULL;
+	for (iter = list; iter; iter = iter->next) {
+		CREATE(new, struct obj_apply, 1);
+		*new = *iter;
+		new->next = NULL;
+		
+		if (last) {
+			last->next = new;
+		}
+		else {
+			new_list = new;
+		}
+		last = new;
+	}
+	
+	return new_list;
+}
+
+
+/**
+* Frees the memory for a list of object applies.
+*
+* @param struct obj_apply *list The start of the list to free.
+*/
+void free_apply_list(struct obj_apply *list) {
+	struct obj_apply *app;
+	
+	while ((app = list)) {
+		list = app->next;
+		free(app);
+	}
+}
+
 
 /**
 * Creates and initialies a complex room data pointer.

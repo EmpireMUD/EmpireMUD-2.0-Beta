@@ -71,7 +71,8 @@ void check_attribute_gear(char_data *ch) {
 	extern const int apply_attribute[];
 	extern const int primary_attributes[];
 	
-	int iter, app, pos;
+	struct obj_apply *apply;
+	int iter, pos;
 	obj_data *obj;
 	bool found;
 	
@@ -105,14 +106,14 @@ void check_attribute_gear(char_data *ch) {
 		
 		// check all applies on item
 		found = FALSE;
-		for (app = 0; app < MAX_OBJ_AFFECT && !found; ++app) {
-			if (obj->affected[app].location == APPLY_NONE || obj->affected[app].modifier >= 0) {
+		for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
+			if (apply->modifier >= 0) {
 				continue;
 			}
 			
 			// check each primary attribute
 			for (iter = 0; primary_attributes[iter] != NOTHING && !found; ++iter) {
-				if (GET_ATT(ch, primary_attributes[iter]) < 1 && primary_attributes[iter] == apply_attribute[(int) obj->affected[app].location]) {
+				if (GET_ATT(ch, primary_attributes[iter]) < 1 && primary_attributes[iter] == apply_attribute[(int) apply->location]) {
 					act("You are too weak to keep using $p.", FALSE, ch, obj, NULL, TO_CHAR);
 					act("$n stops using $p.", TRUE, ch, obj, NULL, TO_ROOM);
 					// this may extract it

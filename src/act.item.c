@@ -191,6 +191,7 @@ int get_wear_by_item_wear(bitvector_t item_wear) {
 void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	extern double get_base_dps(obj_data *weapon);
 	extern double get_weapon_speed(obj_data *weapon);
+	extern const char *apply_type_names[];
 	extern const char *extra_bits[];
 	extern const char *drinks[];
 	extern const char *affected_bits[];
@@ -200,9 +201,10 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 
 	struct obj_storage_type *store;
 	player_index_data *index;
-	char lbuf[MAX_STRING_LENGTH], location[MAX_STRING_LENGTH];
+	struct obj_apply *apply;
+	char lbuf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], location[MAX_STRING_LENGTH];
 	bld_data *bld;
-	int iter, found;
+	int found;
 	double rating;
 	
 	// ONLY flags to show
@@ -367,10 +369,14 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	
 	
 	*lbuf = '\0';
-	for (iter = 0; iter < MAX_OBJ_AFFECT; ++iter) {
-		if (obj->affected[iter].modifier) {
-			sprintf(lbuf + strlen(lbuf), "%s%+d to %s", (*lbuf != '\0') ? ", " : "", obj->affected[iter].modifier, apply_types[(int) obj->affected[iter].location]);
+	for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
+		if (apply->apply_type != APPLY_TYPE_NATURAL) {
+			sprintf(part, " (%s)", apply_type_names[(int)apply->apply_type]);
 		}
+		else {
+			*part = '\0';
+		}
+		sprintf(lbuf + strlen(lbuf), "%s%+d to %s%s", (*lbuf != '\0') ? ", " : "", apply->modifier, apply_types[(int) apply->location], part);
 	}
 	if (*lbuf) {
 		msg_to_char(ch, "Modifiers: %s\r\n", lbuf);
@@ -541,7 +547,8 @@ void perform_remove(char_data *ch, int pos) {
 static void perform_wear(char_data *ch, obj_data *obj, int where) {
 	extern const int apply_attribute[];
 	extern const int primary_attributes[];
-	int iter, app, type, val;
+	struct obj_apply *apply;
+	int iter, type, val;
 
 	/* first, make sure that the wear position is valid. */
 	if (!CAN_WEAR(obj, wear_data[where].item_wear)) {
@@ -558,9 +565,9 @@ static void perform_wear(char_data *ch, obj_data *obj, int where) {
 	for (iter = 0; primary_attributes[iter] != NOTHING; ++iter) {
 		type = primary_attributes[iter];
 		val = GET_ATT(ch, type);
-		for (app = 0; app < MAX_OBJ_AFFECT; app++) {
-			if (apply_attribute[(int) obj->affected[app].location] == type) {
-				val += obj->affected[app].modifier;
+		for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
+			if (apply_attribute[(int) apply->location] == type) {
+				val += apply->modifier;
 			}
 		}
 		
@@ -1247,6 +1254,7 @@ void scale_item_to_level(obj_data *obj, int level) {
 	double share, this_share, points_to_give, per_point;
 	room_data *room = NULL;
 	obj_data *top_obj, *proto;
+	struct obj_apply *apply;
 	bitvector_t bits;
 	
 	// configure this here
@@ -1327,10 +1335,10 @@ void scale_item_to_level(obj_data *obj, int level) {
 	// end helper
 	
 	// first check applies, count share/bonus
-	for (iter = 0; iter < MAX_OBJ_AFFECT; ++iter) {
+	for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
 		// TODO non-scalable traits should be an array
-		if (obj->affected[iter].location != APPLY_NONE && obj->affected[iter].location != APPLY_GREATNESS && obj->affected[iter].location != APPLY_CRAFTING) {
-			SHARE_OR_BONUS(obj->affected[iter].modifier);
+		if (apply->location != APPLY_GREATNESS && apply->location != APPLY_CRAFTING) {
+			SHARE_OR_BONUS(apply->modifier);
 		}
 	}
 	
@@ -1492,22 +1500,22 @@ void scale_item_to_level(obj_data *obj, int level) {
 	}
 	
 	// distribute points: applies
-	for (iter = 0; iter < MAX_OBJ_AFFECT; ++iter) {
+	for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
 		// TODO non-scalable traits should be an array
-		if (obj->affected[iter].location != APPLY_NONE && obj->affected[iter].location != APPLY_GREATNESS && obj->affected[iter].location != APPLY_CRAFTING) {
+		if (apply->location != APPLY_GREATNESS && apply->location != APPLY_CRAFTING) {
 			this_share = MAX(0, MIN(share, points_to_give));
 			// raw amount
-			per_point = (1.0 / apply_values[(int)obj->affected[iter].location]);
+			per_point = (1.0 / apply_values[(int)apply->location]);
 			
-			if (obj->affected[iter].modifier > 0) {
+			if (apply->modifier > 0) {
 				// positive benefit
-				amt = round(this_share * obj->affected[iter].modifier * per_point);
-				points_to_give -= round(this_share * obj->affected[iter].modifier);
-				obj->affected[iter].modifier = amt;
+				amt = round(this_share * apply->modifier * per_point);
+				points_to_give -= round(this_share * apply->modifier);
+				apply->modifier = amt;
 			}
-			else if (obj->affected[iter].modifier < 0) {
+			else if (apply->modifier < 0) {
 				// penalty: does not cost from points_to_give
-				obj->affected[iter].modifier = round(obj->affected[iter].modifier * per_point);
+				apply->modifier = round(apply->modifier * per_point);
 			}
 		}
 	}

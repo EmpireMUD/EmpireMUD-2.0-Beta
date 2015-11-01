@@ -964,6 +964,14 @@ const char *injury_bits[] = {
 };
 
 
+// APPLY_TYPE_x: source of obj apply
+const char *apply_type_names[] = {
+	"natural",
+	"enchantment",
+	"\n"
+};
+
+
 /* APPLY_x (1/3) */
 const char *apply_types[] = {
 	"NONE",

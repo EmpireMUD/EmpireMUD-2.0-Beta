@@ -911,6 +911,11 @@ typedef struct trig_data trig_data;
  //////////////////////////////////////////////////////////////////////////////
 //// OBJECT DEFINES //////////////////////////////////////////////////////////
 
+// APPLY_TYPE_x: What type of obj apply it is
+#define APPLY_TYPE_NATURAL  0	// built-in trait
+#define APPLY_TYPE_ENCHANTMENT  1	// caused by enchant
+
+
 // Container flags -- limited to 31 because of int type in obj value
 #define CONT_CLOSEABLE  BIT(0)	// Container can be closed
 #define CONT_CLOSED  BIT(1)	// Container is closed
@@ -1816,10 +1821,13 @@ struct interaction_item {
 };
 
 
-// obj applies
-struct obj_affected_type {
+// for items -- this replaces CircleMUD's obj_affected_type
+struct obj_apply {
+	byte apply_type;	// APPLY_TYPE_x
 	byte location;	// Which ability to change (APPLY_XXX)
 	sh_int modifier;	// How much it changes by
+	
+	struct obj_apply *next;	// linked list
 };
 
 
@@ -3149,7 +3157,7 @@ struct obj_data {
 	room_data *in_room;	// In what room -- NULL when container/carried
 
 	struct obj_flag_data obj_flags;	// Object information
-	struct obj_affected_type affected[MAX_OBJ_AFFECT];	// affects
+	struct obj_apply *applies;	// APPLY_x list
 
 	char *name;	// Title of object: get, etc.
 	char *description;	// When in room (long desc)

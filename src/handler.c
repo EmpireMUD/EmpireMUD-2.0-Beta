@@ -519,8 +519,9 @@ void affect_total(char_data *ch) {
 	void update_morph_stats(char_data *ch, bool add);
 
 	struct affected_type *af;
-	int i, j, iter;
+	int i, iter;
 	empire_data *emp = GET_LOYALTY(ch);
+	struct obj_apply *apply;
 	int health, move, mana;
 	
 	int pool_bonus_amount = config_get_int("pool_bonus_amount");
@@ -537,8 +538,8 @@ void affect_total(char_data *ch) {
 
 	for (i = 0; i < NUM_WEARS; i++) {
 		if (GET_EQ(ch, i) && wear_data[i].count_stats) {
-			for (j = 0; j < MAX_OBJ_AFFECT; j++) {
-				affect_modify(ch, GET_EQ(ch, i)->affected[j].location, GET_EQ(ch, i)->affected[j].modifier, GET_OBJ_AFF_FLAGS(GET_EQ(ch, i)), FALSE);
+			for (apply = GET_OBJ_APPLIES(GET_EQ(ch, i)); apply; apply = apply->next) {
+				affect_modify(ch, apply->location, apply->modifier, GET_OBJ_AFF_FLAGS(GET_EQ(ch, i)), FALSE);
 			}
 		}
 	}
@@ -573,8 +574,8 @@ void affect_total(char_data *ch) {
 
 	for (i = 0; i < NUM_WEARS; i++) {
 		if (GET_EQ(ch, i) && wear_data[i].count_stats) {
-			for (j = 0; j < MAX_OBJ_AFFECT; j++) {
-				affect_modify(ch, GET_EQ(ch, i)->affected[j].location, GET_EQ(ch, i)->affected[j].modifier, GET_OBJ_AFF_FLAGS(GET_EQ(ch, i)), TRUE);
+			for (apply = GET_OBJ_APPLIES(GET_EQ(ch, i)); apply; apply = apply->next) {
+				affect_modify(ch, apply->location, apply->modifier, GET_OBJ_AFF_FLAGS(GET_EQ(ch, i)), TRUE);
 			}
 		}
 	}
@@ -3544,10 +3545,7 @@ obj_data *copy_warehouse_obj(obj_data *input) {
 	for (iter = 0; iter < NUM_OBJ_VAL_POSITIONS; ++iter) {
 		GET_OBJ_VAL(obj, iter) = GET_OBJ_VAL(input, iter);
 	}
-	for (iter = 0; iter < MAX_OBJ_AFFECT; ++iter) {
-		obj->affected[iter].location = input->affected[iter].location;
-		obj->affected[iter].modifier = input->affected[iter].modifier;
-	}
+	GET_OBJ_APPLIES(obj) = copy_apply_list(GET_OBJ_APPLIES(input));
 	
 	return obj;
 }
@@ -3727,6 +3725,8 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 * @return bool TRUE if the two items are functionally identical.
 */
 bool objs_are_identical(obj_data *obj_a, obj_data *obj_b) {
+	struct obj_apply *a_apply, *b_list, *b_apply, *temp;
+	bool found;
 	int iter;
 	
 	if (GET_OBJ_VNUM(obj_a) != GET_OBJ_VNUM(obj_b)) {
@@ -3758,11 +3758,6 @@ bool objs_are_identical(obj_data *obj_a, obj_data *obj_b) {
 			return FALSE;
 		}
 	}
-	for (iter = 0; iter < MAX_OBJ_AFFECT; ++iter) {
-		if (obj_a->affected[iter].location != obj_b->affected[iter].location || obj_a->affected[iter].modifier != obj_b->affected[iter].modifier) {
-			return FALSE;
-		}
-	}
 	if (GET_OBJ_KEYWORDS(obj_a) != GET_OBJ_KEYWORDS(obj_b) && !str_cmp(GET_OBJ_KEYWORDS(obj_a), GET_OBJ_KEYWORDS(obj_b))) {
 		return FALSE;
 	}
@@ -3776,6 +3771,29 @@ bool objs_are_identical(obj_data *obj_a, obj_data *obj_b) {
 		return FALSE;
 	}
 	if (obj_a->ex_description != obj_b->ex_description) {
+		return FALSE;
+	}
+	
+	// to compare applies, we're going to copy and delete as we find them
+	b_list = copy_apply_list(GET_OBJ_APPLIES(obj_b));
+	for (a_apply = GET_OBJ_APPLIES(obj_a); a_apply; a_apply = a_apply->next) {
+		found = FALSE;
+		for (b_apply = b_list; b_apply; b_apply = b_apply->next) {
+			if (a_apply->location == b_apply->location && a_apply->modifier == b_apply->modifier && a_apply->apply_type == b_apply->apply_type) {
+				found = TRUE;
+				REMOVE_FROM_LIST(b_apply, b_list, next);
+				free(b_apply);
+				break;	// only need one, plus we freed it
+			}
+		}
+		
+		if (!found) {
+			free_apply_list(b_list);
+			return FALSE;
+		}
+	}
+	if (b_list) {	// more things in b_list than a
+		free_apply_list(b_list);
 		return FALSE;
 	}
 	
@@ -3984,7 +4002,7 @@ void check_obj_in_void(obj_data *obj) {
 * @param int pos the WEAR_x spot to it
 */
 void equip_char(char_data *ch, obj_data *obj, int pos) {
-	int j;
+	struct obj_apply *apply;
 
 	if (pos < 0 || pos >= NUM_WEARS) {
 		log("SYSERR: Trying to equip gear to invalid position: %d", pos);
@@ -4016,8 +4034,8 @@ void equip_char(char_data *ch, obj_data *obj, int pos) {
 		}
 
 		if (wear_data[pos].count_stats) {
-			for (j = 0; j < MAX_OBJ_AFFECT; j++) {
-				affect_modify(ch, obj->affected[j].location, obj->affected[j].modifier, GET_OBJ_AFF_FLAGS(obj), TRUE);
+			for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
+				affect_modify(ch, apply->location, apply->modifier, GET_OBJ_AFF_FLAGS(obj), TRUE);
 			}
 		}
 
@@ -4317,7 +4335,7 @@ void swap_obj_for_obj(obj_data *old, obj_data *new) {
 * @return obj_data *The removed item, or NULL if there was none.
 */
 obj_data *unequip_char(char_data *ch, int pos) {	
-	int j;
+	struct obj_apply *apply;
 	obj_data *obj = NULL;
 
 	if ((pos >= 0 && pos < NUM_WEARS) && GET_EQ(ch, pos) != NULL) {
@@ -4335,8 +4353,8 @@ obj_data *unequip_char(char_data *ch, int pos) {
 
 		// un-apply affects
 		if (wear_data[pos].count_stats) {
-			for (j = 0; j < MAX_OBJ_AFFECT; j++) {
-				affect_modify(ch, obj->affected[j].location, obj->affected[j].modifier, GET_OBJ_AFF_FLAGS(obj), FALSE);
+			for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
+				affect_modify(ch, apply->location, apply->modifier, GET_OBJ_AFF_FLAGS(obj), FALSE);
 			}
 		}
 

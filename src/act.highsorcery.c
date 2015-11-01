@@ -756,18 +756,8 @@ ACMD(do_disenchant) {
 		REMOVE_BIT(GET_OBJ_EXTRA(obj), OBJ_ENCHANTED | OBJ_SUPERIOR);
 		proto = obj_proto(GET_OBJ_VNUM(obj));
 		
-		for (iter = 0; iter < MAX_OBJ_AFFECT; ++iter) {
-			if (!proto || OBJ_FLAGGED(proto, OBJ_ENCHANTED)) {
-				// if the protype is enchanted, remove them all
-				obj->affected[iter].location = 0;
-				obj->affected[iter].modifier = 0;
-			}
-			else {
-				// otherwise just match the proto
-				obj->affected[iter].location = proto->affected[iter].location;
-				obj->affected[iter].modifier = proto->affected[iter].modifier;
-			}
-		}
+		free_apply_list(GET_OBJ_APPLIES(obj));
+		GET_OBJ_APPLIES(obj) = NULL;
 		
 		act("You hold $p over your head and shout 'KA!' as you release the mana bound to it!\r\nThere is a burst of red light from $p and then it fizzles and is disenchanted.", FALSE, ch, obj, NULL, TO_CHAR);
 		act("$n shouts 'KA!' and cracks $p, which blasts out red light, and then fizzles.", FALSE, ch, obj, NULL, TO_ROOM);
@@ -867,9 +857,10 @@ ACMD(do_enchant) {
 	extern const double apply_values[];
 	
 	char arg2[MAX_INPUT_LENGTH];
+	struct obj_apply *apply;
 	obj_data *obj;
-	int iter, type, scale, charlevel;
-	bool found, line, first;		
+	int iter, type, scale, charlevel, value;
+	bool found, line;
 	double points_available, first_points = 0.0, second_points = 0.0;
 
 	double enchant_points_at_100 = config_get_double("enchant_points_at_100");
@@ -948,32 +939,23 @@ ACMD(do_enchant) {
 			first_points = points_available;
 			second_points = 0.0;
 		}
-
-		first = TRUE;
 		
-		// find free applies to use
-		for (iter = 0; iter < MAX_OBJ_AFFECT; ++iter) {
-			if (obj->affected[iter].location == APPLY_NONE) {
-				if (first) {
-					// always get at least 1 from first bonus
-					int value = MAX(1, round(first_points * (1.0 / apply_values[enchant_data[type].first_bonus])));
-					
-					obj->affected[iter].location = enchant_data[type].first_bonus;
-					obj->affected[iter].modifier = value;
-					first = FALSE;
-				}
-				else if (enchant_data[type].second_bonus != APPLY_NONE) {
-					int value = round(second_points * (1.0 / apply_values[enchant_data[type].second_bonus]));
-					
-					// only bother if any points to give
-					if (value > 0) {
-						obj->affected[iter].location = enchant_data[type].second_bonus;
-						obj->affected[iter].modifier = value;
-					}
-					// second apply done
-					break;
-				}
-			}
+		// first apply
+		CREATE(apply, struct obj_apply, 1);
+		apply->apply_type = APPLY_TYPE_ENCHANTMENT;
+		apply->location = enchant_data[type].first_bonus;
+		apply->modifier = MAX(1, round(first_points * (1.0 / apply_values[enchant_data[type].first_bonus])));
+		apply->next = GET_OBJ_APPLIES(obj);
+		GET_OBJ_APPLIES(obj) = apply;
+		
+		// secondy apply
+		if (enchant_data[type].second_bonus != APPLY_NONE && (value = round(second_points * (1.0 / apply_values[enchant_data[type].second_bonus]))) > 0) {
+			CREATE(apply, struct obj_apply, 1);
+			apply->apply_type = APPLY_TYPE_ENCHANTMENT;
+			apply->location = enchant_data[type].second_bonus;
+			apply->modifier = value;
+			apply->next = GET_OBJ_APPLIES(obj);
+			GET_OBJ_APPLIES(obj) = apply;
 		}
 		
 		// set enchanted bit

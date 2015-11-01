@@ -298,8 +298,11 @@ extern struct map_data *land_map;
 room_data *real_real_room(room_vnum vnum);
 room_data *real_room(room_vnum vnum);
 
+// misc
+extern struct obj_apply *copy_apply_list(struct obj_apply *list);
 
 // more frees
+void free_apply_list(struct obj_apply *list);
 void free_icon_set(struct icon_data **set);
 void free_exit_template(struct exit_template *ex);
 
