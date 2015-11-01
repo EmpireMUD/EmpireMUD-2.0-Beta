@@ -176,19 +176,21 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 				else if (OBJ_FILE_TAG(line, "Apply:", length)) {
 					// this is an OLD version of the tag that has a different set of params
 					if (sscanf(line + length + 1, "%d %d %d", &i_in[0], &i_in[1], &i_in[2])) {
-						CREATE(apply, struct obj_apply, 1);
-						apply->location = i_in[1];
-						apply->modifier = i_in[2];
-						apply->apply_type = APPLY_TYPE_NATURAL;
+						if (i_in[1] != APPLY_NONE && i_in[2] != 0) {
+							CREATE(apply, struct obj_apply, 1);
+							apply->location = i_in[1];
+							apply->modifier = i_in[2];
+							apply->apply_type = APPLY_TYPE_NATURAL;
 						
-						// append to end
-						if (last_apply) {
-							last_apply->next = apply;
+							// append to end
+							if (last_apply) {
+								last_apply->next = apply;
+							}
+							else {
+								GET_OBJ_APPLIES(obj) = apply;
+							}
+							last_apply = apply;
 						}
-						else {
-							GET_OBJ_APPLIES(obj) = apply;
-						}
-						last_apply = apply;
 					}
 				}
 				else if (OBJ_FILE_TAG(line, "Autostore-timer:", length)) {
