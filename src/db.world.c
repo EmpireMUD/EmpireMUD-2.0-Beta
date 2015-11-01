@@ -1904,6 +1904,7 @@ void grow_crop(room_data *room) {
 			change_base_sector(room, stored);
 		}
 		remove_depletion(room, DPLTN_PICK);
+		remove_depletion(room, DPLTN_FORAGE);
 	}
 }
 

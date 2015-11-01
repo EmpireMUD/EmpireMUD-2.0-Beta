@@ -259,6 +259,9 @@ void do_dg_terracrop(room_data *target, crop_data *cp) {
 	else {
 		change_terrain(target, GET_SECT_VNUM(sect));
 		set_crop_type(target, cp);
+		
+		remove_depletion(target, DPLTN_PICK);
+		remove_depletion(target, DPLTN_FORAGE);
 	}
 	
 	if (emp) {
