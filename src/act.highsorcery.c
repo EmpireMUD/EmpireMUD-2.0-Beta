@@ -900,7 +900,7 @@ ACMD(do_enchant) {
 		}
 		// end !*arg
 	}
-	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying)) && !get_obj_by_char_share(ch, arg)) {
+	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying)) && !(obj = get_obj_by_char_share(ch, arg))) {
 		msg_to_char(ch, "You don't seem to have any %s.\r\n", arg);
 	}
 	else if ((type = find_enchant_by_name(ch, arg2)) == NOTHING) {
