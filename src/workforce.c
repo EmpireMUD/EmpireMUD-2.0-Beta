@@ -440,9 +440,9 @@ bool can_gain_chore_resource_from_interaction_list(empire_data *emp, room_data *
 					found = interact;
 				}
 			}
-			else {
-				found = interact;
-				break;
+			else if (can_gain_chore_resource(emp, location, interact->vnum)) {
+				// any 1 is fine
+				return TRUE;
 			}
 		}
 	}
