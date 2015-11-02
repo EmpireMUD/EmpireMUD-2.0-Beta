@@ -3812,7 +3812,7 @@ ACMD(do_grab) {
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs may not hold items.\r\n");
 	}
-	if (!*arg)
+	else if (!*arg)
 		send_to_char("Hold what?\r\n", ch);
 	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
 		sprintf(buf, "You don't seem to have %s %s.\r\n", AN(arg), arg);
@@ -4532,6 +4532,30 @@ ACMD(do_roadsign) {
 }
 
 
+// does not call can_wear_item() since the item doesn't count stats
+ACMD(do_share) {
+	obj_data *obj;
+	
+	one_argument(argument, arg);
+	
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "NPCs may not share items.\r\n");
+	}
+	else if (GET_EQ(ch, WEAR_SHARE)) {
+		act("You are already sharing $p.", FALSE, ch, GET_EQ(ch, WEAR_SHARE), NULL, TO_CHAR);
+	}
+	else if (!*arg) {
+		msg_to_char(ch, "Share what?\r\n");
+	}
+	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
+	}
+	else {
+		perform_wear(ch, obj, WEAR_SHARE);
+	}
+}
+
+
 ACMD(do_sheathe) {
 	obj_data *obj;
 	int loc = 0;
@@ -4943,6 +4967,16 @@ ACMD(do_trade) {
 	}
 	else {
 		msg_to_char(ch, "Usage: trade <check | list | buy | cancel | collect | identify | post>\r\n");
+	}
+}
+
+
+ACMD(do_unshare) {
+	if (!GET_EQ(ch, WEAR_SHARE)) {
+		msg_to_char(ch, "You are not sharing anything.\r\n");
+	}
+	else {
+		perform_remove(ch, WEAR_SHARE);
 	}
 }
 

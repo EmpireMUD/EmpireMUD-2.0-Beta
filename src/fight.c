@@ -2176,6 +2176,8 @@ bool check_combat_position(char_data *ch, double speed) {
  *	> 0	How much damage done.
  */
 int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damtype) {
+	extern const struct wear_data_type wear_data[NUM_WEARS];
+	
 	struct instance_data *inst;
 	int iter;
 	bool full_miss = (dam <= 0);
@@ -2313,7 +2315,7 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 
 		// armor skills
 		for (iter = 0; iter < NUM_WEARS; ++iter) {
-			if (GET_EQ(victim, iter) && GET_ARMOR_TYPE(GET_EQ(victim, iter)) != NOTHING) {
+			if (wear_data[iter].count_stats && GET_EQ(victim, iter) && GET_ARMOR_TYPE(GET_EQ(victim, iter)) != NOTHING) {
 				switch (GET_ARMOR_TYPE(GET_EQ(victim, iter))) {
 					case ARMOR_MAGE: {
 						gain_ability_exp(victim, ABIL_MAGE_ARMOR, 2);

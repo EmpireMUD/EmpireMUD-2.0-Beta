@@ -1061,7 +1061,7 @@ typedef struct trig_data trig_data;
 #define STORAGE_WITHDRAW  BIT(0)	// requires withdraw privilege
 
 
-// Character equipment positions
+// WEAR_x: Character equipment positions
 /* NOTE: Don't confuse these constants with the ITEM_ bitvectors
    which control the valid places you can wear a piece of equipment */
 #define WEAR_HEAD  0
@@ -1086,7 +1086,8 @@ typedef struct trig_data trig_data;
 #define WEAR_WIELD  19
 #define WEAR_RANGED  20
 #define WEAR_HOLD  21
-#define NUM_WEARS  22	/* This must be the # of eq positions!! */
+#define WEAR_SHARE  22
+#define NUM_WEARS  23	/* This must be the # of eq positions!! */
 
 
 // for item scaling based on wear flags

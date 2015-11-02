@@ -1378,6 +1378,7 @@ const char *wear_keywords[] = {
 	"\r!",	// wield
 	"\r!",	// ranged
 	"\r!",	// hold
+	"\r!",	// share
 	"\n"
 };
 
@@ -1406,7 +1407,8 @@ const struct wear_data_type wear_data[NUM_WEARS] = {
 	{ "          (sheath) ", ITEM_WEAR_WIELD, FALSE, 0, NO_WEAR, "You've already got something sheathed.", "$n sheathes $p.", "You sheathe $p." },
 	{ "         <wielded> ", ITEM_WEAR_WIELD, 	TRUE, 2.0, NO_WEAR, "You're already wielding $p.", "$n wields $p.", "You wield $p." },
 	{ "          <ranged> ", ITEM_WEAR_RANGED, TRUE, 0, NO_WEAR, "You're already using $p.", "$n uses $p.", "You use $p." },
-	{ "            <held> ", ITEM_WEAR_HOLD, TRUE, 1.0, NO_WEAR, "You're already holding $p.", "$n grabs $p.", "You grab $p." }
+	{ "            <held> ", ITEM_WEAR_HOLD, TRUE, 1.0, NO_WEAR, "You're already holding $p.", "$n grabs $p.", "You grab $p." },
+	{ "          (shared) ", ITEM_WEAR_TAKE, FALSE, 0, NO_WEAR, "You're already sharing $p.", "$n shares $p.", "You share $p." }
 };
 
 

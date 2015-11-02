@@ -163,6 +163,7 @@ int find_eq_pos_script(char *arg) {
 		const char *pos;
 		int where;
 	} eq_pos[] = {
+		// WEAR_x:
 		{ "head", WEAR_HEAD },
 		{ "ears", WEAR_EARS },
 		{ "neck1", WEAR_NECK_1 },
@@ -186,6 +187,7 @@ int find_eq_pos_script(char *arg) {
 		{ "ranged", WEAR_RANGED },
 		{ "hold", WEAR_HOLD },
 		{ "held", WEAR_HOLD },
+		{ "shared", WEAR_SHARE },
 		{ "none", NO_WEAR }
 	};
 
