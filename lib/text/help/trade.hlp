@@ -254,6 +254,11 @@ Characters with the Trade skill can learn to hone their own items, making them
 more powerful. Honing an item will bind it to the character, so it can only be
 used on the user's own gear.
 
+Just like Enchant, the power gained from Hone is based on either your crafting
+level or your composite level (whichever is higher). It's also limited by the
+level of the item you hone (more powerful items get bigger bonuses). Players
+with Trade skill below 100 will also be limited by their Trade skill.
+
 You can hone the following items:
  Weapon: Gains bonus physical or magical damage.
  Off-Hand: Gains bonus healing.
