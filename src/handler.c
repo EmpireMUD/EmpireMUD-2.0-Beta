@@ -4456,6 +4456,24 @@ bool has_custom_message(obj_data *obj, int type) {
 //// OBJECT TARGETING HANDLERS ///////////////////////////////////////////////
 
 /**
+* Find an object in another person's share slot, by character name.
+*
+* @param char_data *ch The person looking for a shared obj.
+* @param char *arg The potential name of a PLAYER.
+*/
+obj_data *get_obj_by_char_share(char_data *ch, char *arg) {
+	char_data *targ;
+	
+	// find person by name
+	if (!(targ = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
+		return NULL;
+	}
+	
+	return GET_EQ(targ, WEAR_SHARE);
+}
+
+
+/**
 * Finds a matching object in a character's equipment.
 *
 * @param char_data *ch The person who is looking...
