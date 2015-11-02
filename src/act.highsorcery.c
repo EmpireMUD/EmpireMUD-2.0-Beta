@@ -382,6 +382,27 @@ INTERACTION_FUNC(devastate_crop) {
 
 
 /**
+* @param char_data *ch The enchanter.
+* @param int max_scale Optional: The highest scale level it will use (0 = no max)
+* @return double The number of scale points available for an enchantment at that level.
+*/
+double get_enchant_scale_for_char(char_data *ch, int max_scale) {
+	extern int get_crafting_level(char_data *ch);
+	
+	double points_available;
+	int level;
+
+	// enchant scale level is whichever is less: obj scale level, or player crafting level
+	level = MAX(get_crafting_level(ch), get_approximate_level(ch));
+	if (max_scale > 0) {
+		level = MIN(max_scale, level);
+	}
+	points_available = level / 100.0 * config_get_double("enchant_points_at_100");
+	return MAX(points_available, 1.0);
+}
+
+
+/**
 * Name matching for enchantments, preferring exact matches first.
 *
 * @param char_data *ch the player, to check abilities
@@ -858,7 +879,6 @@ ACMD(do_dispel) {
 
 
 ACMD(do_enchant) {
-	extern int get_crafting_level(char_data *ch);
 	extern const double apply_values[];
 	
 	char arg2[MAX_INPUT_LENGTH];
@@ -925,11 +945,7 @@ ACMD(do_enchant) {
 	else {
 		extract_resources(ch, enchant_data[type].resources, FALSE);
 		
-		// enchant scale level is whichever is less: obj scale level, or player crafting level
-		charlevel = MAX(get_crafting_level(ch), get_approximate_level(ch));
-		scale = MIN(GET_OBJ_CURRENT_SCALE_LEVEL(obj), charlevel);
-		points_available = MAX(1.0, scale / 100.0 * enchant_points_at_100);
-		
+		points_available = get_enchant_scale_for_char(ch, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 		if (HAS_ABILITY(ch, ABIL_GREATER_ENCHANTMENTS)) {
 			points_available *= config_get_double("greater_enchantments_bonus");
 		}

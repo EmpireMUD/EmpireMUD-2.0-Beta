@@ -256,6 +256,7 @@ void init_skills() {
 					setup_ability(ABIL_SIEGEWORKS, SKILL_TRADE, 55, ABIL_ADVANCED_WOODWORKING, "Siegeworks");
 				setup_ability(ABIL_SHIPBUILDING, SKILL_TRADE, 65, ABIL_WOODWORKING, "Shipbuilding");
 					setup_ability(ABIL_ADVANCED_SHIPS, SKILL_TRADE, 80, ABIL_SHIPBUILDING, "Advanced Ships");
+		setup_ability(ABIL_HONE, SKILL_TRADE, 75, NO_PREREQ, "Hone");
 		setup_ability(ABIL_MASTER_FARMER, SKILL_TRADE, 75, NO_PREREQ, "Master Farmer");
 	// end Trade
 	

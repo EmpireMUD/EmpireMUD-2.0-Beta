@@ -968,6 +968,7 @@ const char *injury_bits[] = {
 const char *apply_type_names[] = {
 	"natural",
 	"enchantment",
+	"honed",
 	"\n"
 };
 

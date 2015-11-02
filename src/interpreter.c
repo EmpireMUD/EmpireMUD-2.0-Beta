@@ -203,6 +203,7 @@ ACMD(do_hide);
 ACMD(do_history);
 ACMD(do_hit);
 ACMD(do_home);
+ACMD(do_hone);
 ACMD(do_hostile);
 ACMD(do_howl);
 
@@ -702,6 +703,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "hit", POS_FIGHTING, do_hit, NO_MIN, CTYPE_COMBAT, SCMD_HIT ),
 	SIMPLE_CMD( "hold", POS_RESTING, do_grab, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "home", POS_SLEEPING, do_home, LVL_APPROVED, CTYPE_UTIL ),
+	ABILITY_CMD( "hone", POS_STANDING, do_hone, NO_MIN, CTYPE_SKILL, ABIL_HONE ),
 	GRANT_CMD( "hostile", POS_DEAD, do_hostile, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_HOSTILE ),
 	ABILITY_CMD( "howl", POS_FIGHTING, do_howl, NO_MIN, CTYPE_SKILL, ABIL_HOWL ),
 

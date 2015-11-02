@@ -10,6 +10,8 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 
+#include <math.h>
+
 #include "conf.h"
 #include "sysdep.h"
 
@@ -781,6 +783,116 @@ ACMD(do_gen_craft) {
 		sprintf(buf, "$n starts %s.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 		act(buf, FALSE, ch, 0, 0, TO_ROOM);
 	}
+}
+
+
+ACMD(do_hone) {
+	extern double get_enchant_scale_for_char(char_data *ch, int max_scale);
+	extern const double apply_values[];
+
+	Resource hone_res[2] = { { o_NOCTURNIUM_INGOT, 2 }, END_RESOURCE_LIST };
+	struct obj_apply *apply;
+	obj_data *obj;
+	double points;
+	int maxlev;
+	bool has;
+	
+	one_argument(argument, arg);
+	
+	if (!can_use_ability(ch, ABIL_HONE, NOTHING, 0, NOTHING)) {
+		return;
+	}
+	if (!*arg) {
+		msg_to_char(ch, "Hone which item?\r\n");
+		return;
+	}
+	if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
+		return;
+	}
+	
+	// check for honed
+	has = FALSE;
+	for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
+		if (apply->apply_type == APPLY_TYPE_HONED) {
+			has = TRUE;
+		}
+	}
+	if (has) {
+		act("$p is already honed.", FALSE, ch, obj, NULL, TO_CHAR);
+		return;
+	}
+	
+	if (!has_resources(ch, hone_res, FALSE, TRUE)) {
+		// message sent by has_resources
+		return;
+	}
+	
+	if (ABILITY_TRIGGERS(ch, NULL, obj, ABIL_HONE)) {
+		return;
+	}
+	
+	// determine points to spend
+	maxlev = GET_OBJ_CURRENT_SCALE_LEVEL(obj);
+	if (GET_SKILL(ch, SKILL_TRADE) < CLASS_SKILL_CAP) {
+		maxlev = MIN(maxlev, GET_SKILL(ch, SKILL_TRADE));
+	}
+	points = get_enchant_scale_for_char(ch, maxlev);
+	
+	// how it hones depends upon type
+	if (IS_WEAPON(obj)) {
+		CREATE(apply, struct obj_apply, 1);
+		apply->apply_type = APPLY_TYPE_HONED;
+		apply->location = (attack_hit_info[GET_WEAPON_TYPE(obj)].damage_type == DAM_MAGICAL) ? APPLY_BONUS_MAGICAL : APPLY_BONUS_PHYSICAL;
+		apply->modifier = MAX(1, round(points * (1.0 / apply_values[(int) apply->location])));
+		apply->next = GET_OBJ_APPLIES(obj);
+		GET_OBJ_APPLIES(obj) = apply;
+	}
+	else if (CAN_WEAR(obj, ITEM_WEAR_HOLD)) {
+		CREATE(apply, struct obj_apply, 1);
+		apply->apply_type = APPLY_TYPE_HONED;
+		apply->location = APPLY_BONUS_HEALING;
+		apply->modifier = MAX(1, round(points * (1.0 / apply_values[(int) apply->location])));
+		apply->next = GET_OBJ_APPLIES(obj);
+		GET_OBJ_APPLIES(obj) = apply;
+	}
+	else if (IS_SHIELD(obj)) {
+		// resist-physical
+		CREATE(apply, struct obj_apply, 1);
+		apply->apply_type = APPLY_TYPE_HONED;
+		apply->location = APPLY_RESIST_PHYSICAL;
+		apply->modifier = MAX(1, round(points / 2.0 * (1.0 / apply_values[(int) apply->location])));
+		apply->next = GET_OBJ_APPLIES(obj);
+		GET_OBJ_APPLIES(obj) = apply;
+		
+		// resist-magical
+		CREATE(apply, struct obj_apply, 1);
+		apply->apply_type = APPLY_TYPE_HONED;
+		apply->location = APPLY_RESIST_MAGICAL;
+		apply->modifier = MAX(1, round(points / 2.0 * (1.0 / apply_values[(int) apply->location])));
+		apply->next = GET_OBJ_APPLIES(obj);
+		GET_OBJ_APPLIES(obj) = apply;
+	}
+	else {
+		act("You can't hone $p.", FALSE, ch, obj, NULL, TO_CHAR);
+		return;
+	}
+	
+	extract_resources(ch, hone_res, FALSE);
+	
+	// messaging
+	act("You carefully hone $p.", FALSE, ch, obj, NULL, TO_CHAR);
+	act("$n carefully hones $p.", FALSE, ch, obj, NULL, TO_ROOM);
+	
+	// ensure binding
+	if (!OBJ_FLAGGED(obj, OBJ_BIND_FLAGS)) {
+		SET_BIT(GET_OBJ_EXTRA(obj), OBJ_BIND_ON_PICKUP);
+	}
+	bind_obj_to_player(obj, ch);
+	reduce_obj_binding(obj, ch);
+	
+	// exp
+	gain_ability_exp(ch, ABIL_HONE, 100);
 }
 
 

@@ -914,6 +914,7 @@ typedef struct trig_data trig_data;
 // APPLY_TYPE_x: What type of obj apply it is
 #define APPLY_TYPE_NATURAL  0	// built-in trait
 #define APPLY_TYPE_ENCHANTMENT  1	// caused by enchant
+#define APPLY_TYPE_HONED  2	// Trade ability
 
 
 // Container flags -- limited to 31 because of int type in obj value

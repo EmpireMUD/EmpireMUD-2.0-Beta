@@ -243,6 +243,19 @@ tool or weapon.
 
 See also: CRAFT, FORGE
 #
+HONE HONED
+
+Hone (Trade ability)
+
+Characters with the Trade skill can learn to hone their own items, making them
+more powerful. Honing an item will bind it to the character, so it can only be
+used on the user's own gear.
+
+You can hone the following items:
+ Weapon: Gains bonus physical or magical damage.
+ Off-Hand: Gains bonus healing.
+ Shield: Gains resist physical and resist magical.
+#
 IRON "IRON ORE"
 
 Used for: forge, build, manufacture
