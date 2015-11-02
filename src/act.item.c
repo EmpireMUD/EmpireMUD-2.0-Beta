@@ -55,6 +55,7 @@ void save_trading_post();
 void trigger_distrust_from_stealth(char_data *ch, empire_data *emp);
 
 // local protos
+ACMD(do_unshare);
 room_data *find_docks(empire_data *emp, int island_id);
 int get_wear_by_item_wear(bitvector_t item_wear);
 void move_ship_to_destination(empire_data *emp, struct shipping_data *shipd, room_data *to_room);
@@ -561,22 +562,6 @@ static void perform_wear(char_data *ch, obj_data *obj, int where) {
 		where = wear_data[where].cascade_pos;
 	}
 	
-	// check weakness (check all applies first, in case they contradict like -1str +2str)
-	for (iter = 0; primary_attributes[iter] != NOTHING; ++iter) {
-		type = primary_attributes[iter];
-		val = GET_ATT(ch, type);
-		for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
-			if (apply_attribute[(int) apply->location] == type) {
-				val += apply->modifier;
-			}
-		}
-		
-		if (val < 1) {
-			act("You are too weak to use $p!", FALSE, ch, obj, 0, TO_CHAR);
-			return;
-		}
-	}
-	
 	if (where == WEAR_SADDLE && !IS_RIDING(ch)) {
 		msg_to_char(ch, "You can't wear a saddle while you're not riding anything.\r\n");
 		return;
@@ -586,10 +571,29 @@ static void perform_wear(char_data *ch, obj_data *obj, int where) {
 		act(wear_data[where].already_wearing, FALSE, ch, GET_EQ(ch, where), NULL, TO_CHAR);
 		return;
 	}
+	
+	// some checks are only needed when the slot counts for stats
+	if (wear_data[where].count_stats) {
+		// check weakness (check all applies first, in case they contradict like -1str +2str)
+		for (iter = 0; primary_attributes[iter] != NOTHING; ++iter) {
+			type = primary_attributes[iter];
+			val = GET_ATT(ch, type);
+			for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
+				if (apply_attribute[(int) apply->location] == type) {
+					val += apply->modifier;
+				}
+			}
+		
+			if (val < 1) {
+				act("You are too weak to use $p!", FALSE, ch, obj, 0, TO_CHAR);
+				return;
+			}
+		}
 
-	/* See if a trigger disallows it */
-	if (!wear_otrigger(obj, ch, where) || (obj->carried_by != ch)) {
-		return;
+		/* See if a trigger disallows it */
+		if (!wear_otrigger(obj, ch, where) || (obj->carried_by != ch)) {
+			return;
+		}
 	}
 
 	wear_message(ch, obj, where);
@@ -4541,9 +4545,6 @@ ACMD(do_share) {
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs may not share items.\r\n");
 	}
-	else if (GET_EQ(ch, WEAR_SHARE)) {
-		act("You are already sharing $p.", FALSE, ch, GET_EQ(ch, WEAR_SHARE), NULL, TO_CHAR);
-	}
 	else if (!*arg) {
 		msg_to_char(ch, "Share what?\r\n");
 	}
@@ -4551,6 +4552,9 @@ ACMD(do_share) {
 		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
 	}
 	else {
+		if (GET_EQ(ch, WEAR_SHARE)) {
+			do_unshare(ch, "", 0, 0);
+		}
 		perform_wear(ch, obj, WEAR_SHARE);
 	}
 }
@@ -4976,7 +4980,14 @@ ACMD(do_unshare) {
 		msg_to_char(ch, "You are not sharing anything.\r\n");
 	}
 	else {
-		perform_remove(ch, WEAR_SHARE);
+		// we don't perform_remove() because it checks things we don't need to check, and we want a custom message
+		
+		act("You stop sharing $p.", FALSE, ch, GET_EQ(ch, WEAR_SHARE), 0, TO_CHAR);
+		act("$n stops sharing $p.", TRUE, ch, GET_EQ(ch, WEAR_SHARE), 0, TO_ROOM);
+		
+		// this may extract it, or drop it
+		unequip_char_to_inventory(ch, WEAR_SHARE);
+		determine_gear_level(ch);
 	}
 }
 
