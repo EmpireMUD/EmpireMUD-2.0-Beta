@@ -963,6 +963,7 @@ ACMD(do_recipes) {
 
 // this handles both 'reforge' and 'refashion'
 ACMD(do_reforge) {
+	extern char *shared_by(obj_data *obj, char_data *ch);
 	extern const char *item_types[];
 	
 	Resource res[2] = { { NOTHING, 0 }, END_RESOURCE_LIST };	// this cost is set later
@@ -994,7 +995,7 @@ ACMD(do_reforge) {
 	else if (reforge_data[subcmd].validate_func && !(reforge_data[subcmd].validate_func)(ch)) {
 		// failed validate func -- sends own messages
 	}
-	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying)) && !(obj = get_obj_by_char_share(ch, arg))) {
 		msg_to_char(ch, "You don't seem to have a %s.\r\n", arg);
 	}
 	else if (!match_reforge_type(obj, subcmd)) {
@@ -1032,8 +1033,8 @@ ACMD(do_reforge) {
 			extract_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED));
 			
 			// prepare
-			sprintf(buf1, "You name %s $p!", GET_OBJ_SHORT_DESC(obj));
-			sprintf(buf2, "$n names %s $p!", GET_OBJ_SHORT_DESC(obj));
+			sprintf(buf1, "You name %s%s $p!", GET_OBJ_SHORT_DESC(obj), shared_by(obj, ch));
+			sprintf(buf2, "$n names %s%s $p!", GET_OBJ_SHORT_DESC(obj), shared_by(obj, ch));
 			
 			proto = obj_proto(GET_OBJ_VNUM(obj));
 			
@@ -1058,8 +1059,8 @@ ACMD(do_reforge) {
 			GET_OBJ_LONG_DESC(obj) = str_dup(temp);
 			
 			// message
-			act(buf1, FALSE, ch, obj, NULL, TO_CHAR);
-			act(buf2, TRUE, ch, obj, NULL, TO_ROOM);
+			act(buf1, FALSE, ch, obj, obj->worn_by, TO_CHAR);
+			act(buf2, TRUE, ch, obj, obj->worn_by, TO_ROOM);
 			
 			if (reforge_data[subcmd].ability != NOTHING) {
 				gain_ability_exp(ch, reforge_data[subcmd].ability, 50);
@@ -1094,9 +1095,6 @@ ACMD(do_reforge) {
 			OBJ_BOUND_TO(new) = OBJ_BOUND_TO(obj);
 			OBJ_BOUND_TO(obj) = NULL;
 			
-			// give to char
-			obj_to_char(new, ch);
-			
 			// re-apply
 			new->stolen_timer = old_stolen_time;
 			GET_OBJ_TIMER(new) = old_timer;
@@ -1105,20 +1103,22 @@ ACMD(do_reforge) {
 			}
 			
 			// junk the old one
+			swap_obj_for_obj(obj, new);
 			extract_obj(obj);
+			obj = new;
 			
 			// message
-			sprintf(buf, "You %s $p!", reforge_data[subcmd].command);
-			act(buf, FALSE, ch, new, NULL, TO_CHAR);
+			sprintf(buf, "You %s $p%s!", reforge_data[subcmd].command, shared_by(obj, ch));
+			act(buf, FALSE, ch, obj, obj->worn_by, TO_CHAR);
 			
-			sprintf(buf, "$n %s $p!", reforge_data[subcmd].command);
-			act(buf, TRUE, ch, new, NULL, TO_ROOM);
+			sprintf(buf, "$n %s $p%s!", reforge_data[subcmd].command, shared_by(obj, ch));
+			act(buf, TRUE, ch, obj, obj->worn_by, TO_ROOM);
 			
 			if (reforge_data[subcmd].ability != NO_ABIL) {
 				gain_ability_exp(ch, reforge_data[subcmd].ability, 50);
 			}
 
-			load_otrigger(new);
+			load_otrigger(obj);
 		}
 	}
 	else if (is_abbrev(arg2, "superior")) {
@@ -1154,9 +1154,6 @@ ACMD(do_reforge) {
 			OBJ_BOUND_TO(new) = OBJ_BOUND_TO(obj);
 			OBJ_BOUND_TO(obj) = NULL;
 			
-			// give to char
-			obj_to_char(new, ch);
-			
 			// set superior
 			SET_BIT(GET_OBJ_EXTRA(new), OBJ_SUPERIOR);
 			
@@ -1182,13 +1179,15 @@ ACMD(do_reforge) {
 			}
 			
 			// junk the old one
+			swap_obj_for_obj(obj, new);
 			extract_obj(obj);
+			obj = new;
 			
-			sprintf(buf, "You %s $p into a masterwork!", reforge_data[subcmd].command);
-			act(buf, FALSE, ch, new, NULL, TO_CHAR);
+			sprintf(buf, "You %s $p%s into a masterwork!", reforge_data[subcmd].command, shared_by(obj, ch));
+			act(buf, FALSE, ch, obj, obj->worn_by, TO_CHAR);
 			
-			sprintf(buf, "$n %s $p into a masterwork!", reforge_data[subcmd].command);
-			act(buf, TRUE, ch, new, NULL, TO_ROOM);
+			sprintf(buf, "$n %s $p%s into a masterwork!", reforge_data[subcmd].command, shared_by(obj, ch));
+			act(buf, TRUE, ch, obj, obj->worn_by, TO_ROOM);
 
 			if (reforge_data[subcmd].ability != NOTHING) {
 				gain_ability_exp(ch, reforge_data[subcmd].ability, 50);

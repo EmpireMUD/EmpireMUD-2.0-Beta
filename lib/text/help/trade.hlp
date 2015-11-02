@@ -521,11 +521,11 @@ REFORGE REFASHION
 Refashion (Trade ability)
 Reforge (Trade ability)
 
-Usage:  reforge <item> name <new name>
-        reforge <item> <renew | superior>
+Usage:  reforge <item | person> name <new name>
+        reforge <item | person> <renew | superior>
 
 A great blacksmith (weapons) or tailor (armors and shields) can use this
-ability in two ways:
+ability in three ways:
 
 Name: You can take a generic item and give it a name. The name must contain
 the original name (except a leading a/an/the). Requires 1 blue iris per 3 gear
@@ -541,7 +541,11 @@ the normal version of an item that can be made superior, and only if you have
 the correct Master ability. Requires 1 green seashell per 3 gear rating on the
 item.
 
-See also: MASTER BLACKSMITH, MASTER TAILOR
+An item must be in your inventory to reforge it. However, if another player
+"shares" an item, you can reforge that item by targeting that player by name
+(e.g. "reforge Lyra superior").
+
+See also: MASTER BLACKSMITH, MASTER TAILOR, SHARE
 #
 "SCALABLE CRAFTS" "SCALABLE CRAFTING" "CRAFTING SCALABLES"
 

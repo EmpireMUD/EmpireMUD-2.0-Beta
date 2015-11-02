@@ -879,6 +879,7 @@ ACMD(do_dispel) {
 
 
 ACMD(do_enchant) {
+	extern char *shared_by(obj_data *obj, char_data *ch);
 	extern const double apply_values[];
 	
 	char arg2[MAX_INPUT_LENGTH];
@@ -980,23 +981,12 @@ ACMD(do_enchant) {
 		// set enchanted bit
 		SET_BIT(GET_OBJ_EXTRA(obj), OBJ_ENCHANTED);
 		
-		if (obj->worn_on == WEAR_SHARE && obj->worn_by && obj->worn_by != ch) {
-			// share'd target
-			sprintf(buf, "You infuse $p (shared by $N) with the %s enchantment.", enchant_data[type].name);
-			act(buf, FALSE, ch, obj, obj->worn_by, TO_CHAR);
+		sprintf(buf, "You infuse $p%s with the %s enchantment.", shared_by(obj, ch), enchant_data[type].name);
+		act(buf, FALSE, ch, obj, obj->worn_by, TO_CHAR);
 		
-			sprintf(buf, "$n infuses $p (shared by $N) with the %s enchantment.", enchant_data[type].name);
-			act(buf, FALSE, ch, obj, obj->worn_by, TO_ROOM);
-		}
-		else {
-			// normal message
-			sprintf(buf, "You infuse $p with the %s enchantment.", enchant_data[type].name);
-			act(buf, FALSE, ch, obj, NULL, TO_CHAR);
+		sprintf(buf, "$n infuses $p%s with the %s enchantment.", shared_by(obj, ch), enchant_data[type].name);
+		act(buf, FALSE, ch, obj, obj->worn_by, TO_ROOM);
 		
-			sprintf(buf, "$n infuses $p with the %s enchantment.", enchant_data[type].name);
-			act(buf, FALSE, ch, obj, NULL, TO_ROOM);
-		}
-				
 		if (enchant_data[type].ability != NO_ABIL) {
 			gain_ability_exp(ch, enchant_data[type].ability, 50);
 		}

@@ -3941,6 +3941,26 @@ int Y_COORD(room_data *room) {
 //// MISC UTILS //////////////////////////////////////////////////////////////
 
 /**
+* Gets a string fragment if an obj is shared (by someone other than ch). This
+* is used by enchanting and some other commands, in their success strings. It
+* has an $N in the string, so pass obj->worn_by as the 2nd char in your act()
+* message.
+*
+* @param obj_data *obj The obj that might be shared.
+* @param char_data *ch The person using the ablitiy, who will be ignored for this message.
+* @return char* Either an empty string, or " (shared by $N)".
+*/
+char *shared_by(obj_data *obj, char_data *ch) {
+	if (obj->worn_on == WEAR_SHARE && obj->worn_by && (!ch || obj->worn_by != ch)) {
+		return " (shared by $N)";
+	}
+	else {
+		return "";
+	}
+}
+
+
+/**
 * @return unsigned long long The current timestamp as microtime (1 million per second)
 */
 unsigned long long microtime(void) {
