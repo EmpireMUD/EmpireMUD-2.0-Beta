@@ -54,6 +54,7 @@ void free_complex_data(struct complex_room_data *data);
 void index_boot(int mode);
 extern obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify);
 void save_whole_world();
+void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func));
 
 // local functions
 int file_to_string_alloc(const char *name, char **buf);
@@ -1726,16 +1727,49 @@ void b3_1_mine_update(void) {
 }
 
 
-// removes the PLAYER-MADE flag from rooms and sets their "natural sect" instead
-void b3_2_map_update(void) {
-	extern const sector_vnum climate_default_sector[NUM_CLIMATES];
+PLAYER_UPDATE_FUNC(b3_2_player_gear_disenchant) {
+	void check_delayed_load(char_data *ch);
+	obj_data *obj, *next_obj, *new;
+	int iter;
+	
+	check_delayed_load(ch);
+	
+	for (iter = 0; iter < NUM_WEARS; ++iter) {
+		if ((obj = GET_EQ(ch, iter)) && OBJ_FLAGGED(obj, OBJ_ENCHANTED) && obj_proto(GET_OBJ_VNUM(obj))) {
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			swap_obj_for_obj(obj, new);
+			extract_obj(obj);
+		}
+	}
+	for (obj = ch->carrying; obj; obj = next_obj) {
+		next_obj = obj->next_content;
+		if (OBJ_FLAGGED(obj, OBJ_ENCHANTED) && obj_proto(GET_OBJ_VNUM(obj))) {
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			swap_obj_for_obj(obj, new);
+			extract_obj(obj);
+		}
+	}
+}
 
+
+// removes the PLAYER-MADE flag from rooms and sets their "natural sect" instead
+void b3_2_map_and_gear(void) {
+	extern const sector_vnum climate_default_sector[NUM_CLIMATES];
+	void save_trading_post();
+
+	obj_data *obj, *next_obj, *new, *proto;
+	struct empire_unique_storage *eus;
+	struct trading_post_data *tpd;
 	room_data *room, *next_room;
+	empire_data *emp, *next_emp;
 	
 	int ROOM_EXTRA_CROP_TYPE = 2;	// removed extra type
 	bitvector_t ROOM_AFF_PLAYER_MADE = BIT(11);	// removed flag
-	sector_vnum OASIS = 21, SANDY_TRENCH = 22; 
+	sector_vnum OASIS = 21, SANDY_TRENCH = 22;
 	
+	log("Applying b3.2 update...");
+	
+	log(" - updating the map...");
 	HASH_ITER(hh, world_table, room, next_room) {
 		// player-made
 		if (IS_SET(ROOM_AFF_FLAGS(room) | ROOM_BASE_FLAGS(room), ROOM_AFF_PLAYER_MADE)) {
@@ -1757,7 +1791,42 @@ void b3_2_map_update(void) {
 		}
 	}
 	
-	// ensure this gets saved
+	log(" - disenchanting the object list...");
+	for (obj = object_list; obj; obj = next_obj) {
+		next_obj = obj->next;
+		if (OBJ_FLAGGED(obj, OBJ_ENCHANTED) && (proto = obj_proto(GET_OBJ_VNUM(obj))) && !OBJ_FLAGGED(proto, OBJ_ENCHANTED)) {
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			swap_obj_for_obj(obj, new);
+			extract_obj(obj);
+		}
+	}
+	
+	log(" - disenchanting warehouse objects...");
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		for (eus = EMPIRE_UNIQUE_STORAGE(emp); eus; eus = eus->next) {
+			if ((obj = eus->obj) && OBJ_FLAGGED(obj, OBJ_ENCHANTED) && (proto = obj_proto(GET_OBJ_VNUM(obj))) && !OBJ_FLAGGED(proto, OBJ_ENCHANTED)) {
+				new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+				eus->obj = new;
+				extract_obj(obj);
+			}
+		}
+	}
+	
+	log(" - disenchanting trading post objects...");
+	for (tpd = trading_list; tpd; tpd = tpd->next) {
+		if ((obj = tpd->obj) && OBJ_FLAGGED(obj, OBJ_ENCHANTED) && (proto = obj_proto(GET_OBJ_VNUM(obj))) && !OBJ_FLAGGED(proto, OBJ_ENCHANTED)) {
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			tpd->obj = new;
+			extract_obj(obj);
+		}
+	}
+	
+	log(" - disenchanting player inventories...");
+	update_all_players(NULL, b3_2_player_gear_disenchant);
+	
+	// ensure everything gets saved this way since we won't do this again
+	save_all_empires();
+	save_trading_post();
 	save_whole_world();
 }
 
@@ -1765,9 +1834,7 @@ void b3_2_map_update(void) {
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
-void check_version(void) {
-	void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func));
-	
+void check_version(void) {	
 	int last, iter, current = NOTHING;
 	
 	#define MATCH_VERSION(name)  (!str_cmp(versions_list[iter], name))
@@ -1906,8 +1973,7 @@ void check_version(void) {
 			b3_1_mine_update();
 		}
 		if (MATCH_VERSION("b3.2")) {
-			log("Applying b3.2 update to the map...");
-			b3_2_map_update();
+			b3_2_map_and_gear();
 		}
 	}
 	
