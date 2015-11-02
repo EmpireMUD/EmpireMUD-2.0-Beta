@@ -884,11 +884,9 @@ ACMD(do_enchant) {
 	char arg2[MAX_INPUT_LENGTH];
 	struct obj_apply *apply;
 	obj_data *obj;
-	int iter, type, scale, charlevel, value;
+	int iter, type, value;
 	bool found, line;
 	double points_available, first_points = 0.0, second_points = 0.0;
-
-	double enchant_points_at_100 = config_get_double("enchant_points_at_100");
 	
 	two_arguments(argument, arg, arg2);
 	
