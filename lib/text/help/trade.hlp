@@ -247,6 +247,8 @@ HONE HONED
 
 Hone (Trade ability)
 
+Usage:  hone <item>
+
 Characters with the Trade skill can learn to hone their own items, making them
 more powerful. Honing an item will bind it to the character, so it can only be
 used on the user's own gear.
