@@ -337,6 +337,7 @@ ACMD(do_selfdelete);
 ACMD(do_set);
 ACMD(do_shadowcage);
 ACMD(do_shadowstep);
+ACMD(do_share);
 ACMD(do_shear);
 ACMD(do_sheathe);
 ACMD(do_ship);
@@ -400,6 +401,7 @@ ACMD(do_unban);
 ACMD(do_unbind);
 ACMD(do_unload_boat);
 ACMD(do_unpublicize);
+ACMD(do_unshare);
 ACMD(do_upgrade);
 ACMD(do_use);
 ACMD(do_users);
@@ -858,6 +860,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	GRANT_CMD( "send", POS_SLEEPING, do_send, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_SEND ),
 	GRANT_CMD( "set", POS_DEAD, do_set, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_SET ),
 	STANDARD_CMD( "sew", POS_STANDING, do_gen_craft, LVL_APPROVED, NO_GRANTS, CRAFT_TYPE_SEW, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
+	SIMPLE_CMD( "share", POS_RESTING, do_share, NO_MIN, CTYPE_UTIL ),
 	ABILITY_CMD( "shadowcage", POS_FIGHTING, do_shadowcage, NO_MIN, CTYPE_SKILL, ABIL_SHADOWCAGE ),
 	ABILITY_CMD( "shadowstep", POS_STANDING, do_shadowstep, NO_MIN, CTYPE_MOVE, ABIL_SHADOWSTEP ),
 	STANDARD_CMD( "shear", POS_STANDING, do_shear, LVL_APPROVED, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
@@ -934,6 +937,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "untie", POS_STANDING, do_tie, NO_MIN, NO_GRANTS, TRUE, CTYPE_COMBAT, CMD_NO_ANIMALS, NO_ABIL ),
 	GRANT_CMD( "unban", POS_DEAD, do_unban, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_BAN ),
 	SIMPLE_CMD( "unpublicize", POS_DEAD, do_unpublicize, LVL_APPROVED, CTYPE_EMPIRE ),
+	SIMPLE_CMD( "unshare", POS_RESTING, do_unshare, NO_MIN, CTYPE_UTIL ),
 	SCMD_CMD( "uptime", POS_DEAD, do_date, LVL_START_IMM, CTYPE_IMMORTAL, SCMD_UPTIME ),
 	SIMPLE_CMD( "upgrade", POS_STANDING, do_upgrade, LVL_APPROVED, CTYPE_BUILD ),
 	SIMPLE_CMD( "use", POS_RESTING, do_use, NO_MIN, CTYPE_MOVE ),
