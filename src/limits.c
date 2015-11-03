@@ -573,7 +573,7 @@ void real_update_char(char_data *ch) {
 	
 	// ensure character isn't using any gear they shouldn't be
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
-		if (GET_EQ(ch, iter) && !can_wear_item(ch, GET_EQ(ch, iter), TRUE)) {
+		if (wear_data[iter].count_stats && GET_EQ(ch, iter) && !can_wear_item(ch, GET_EQ(ch, iter), TRUE)) {
 			// can_wear_item sends own message to ch
 			act("$n stops using $p.", TRUE, ch, GET_EQ(ch, iter), NULL, TO_ROOM);
 			// this may extract it
