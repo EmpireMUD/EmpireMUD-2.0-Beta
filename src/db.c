@@ -69,6 +69,9 @@ void save_daily_cycle();
 // adventures
 adv_data *adventure_table = NULL;	// adventure hash table
 
+// augments
+augment_data *augment_table = NULL;	// master augment hash table
+
 // buildings
 bld_data *building_table = NULL;	// building hash table
 
@@ -188,6 +191,7 @@ struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES] = {
 	{ RMT_PREFIX, RMT_SUFFIX },	// DB_BOOT_RMT
 	{ GLB_PREFIX, GLB_SUFFIX },	// DB_BOOT_GLB
 	{ ACCT_PREFIX, ACCT_SUFFIX },	// DB_BOOT_ACCT
+	{ AUG_PREFIX, AUG_SUFFIX },	// DB_BOOT_AUG
 };
 
 

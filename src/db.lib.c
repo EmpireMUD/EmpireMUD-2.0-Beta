@@ -38,6 +38,7 @@
 *   Interaction Lib
 *   Mobile Lib
 *   Object Lib
+*   Resource Lib
 *   Room Lib
 *   Room Template Lib
 *   Sector Lib
@@ -3719,6 +3720,106 @@ void write_obj_to_file(FILE *fl, obj_data *obj) {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// RESOURCE LIB ////////////////////////////////////////////////////////////
+
+/**
+* Copies a resource list.
+*
+* @param struct resource_data *input The list to copy.
+* @return struct resource_data* The copied list.
+*/
+struct resource_data *copy_resource_list(struct resource_data *input) {
+	struct resource_data *new, *last, *list, *iter;
+	
+	last = list = NULL;
+	for (iter = input; iter; iter = iter->next) {
+		CREATE(new, struct resource_data, 1);
+		*new = *iter;
+		new->next = NULL;
+		
+		if (last) {
+			last->next = new;
+		}
+		else {
+			list = new;
+		}
+		last = new;
+	}
+	
+	return list;
+}
+
+
+/**
+* Frees a list of resource_data items.
+*
+* @param struct resource_data *list The start of the list to free.
+*/
+void free_resource_list(struct resource_data *list) {
+	struct resource_data *res;
+	
+	while ((res = list)) {
+		list = res->next;
+		free(res);
+	}
+}
+
+
+/**
+* Parses an 'R' resource tag, written by write_resources_to_file(). This file
+* should have just read the 'R' line, and the next line to read is its data.
+*
+* @param FILE *fl The file to read from.
+* @param struct resource_data **list The resource list to append to.
+* @param char *error_str An identifier to log if there is a problem.
+*/
+void parse_resource(FILE *fl, struct resource_data **list, char *error_str) {
+	struct resource_data *new, *end;
+	char line[256];
+	int int_in[2];
+	
+	if (!fl || !list || !get_line(fl, line) || sscanf(line, "%d %d", &int_in[0], &int_in[1]) != 2) {
+		log("SYSERR: format error in R line of %s", error_str ? error_str : "resource");
+		exit(1);
+	}
+	
+	CREATE(new, struct resource_data, 1);
+	new->vnum = int_in[0];
+	new->amount = int_in[1];
+	
+	// append at the end
+	if ((end = *list)) {
+		while (end->next) {
+			end = end->next;
+		}
+		end->next = new;
+	}
+	else {
+		*list = new;
+	}
+}
+
+
+/**
+* Writes new-style resource_data to file as an 'R' tag.
+*
+* @param FILE *fl The file, open for writing.
+* @param struct resource_data *list The list of resources to write.
+*/
+void write_resources_to_file(FILE *fl, struct resource_data *list) {
+	struct resource_data *res;
+	
+	if (!fl || !list) {
+		return;
+	}
+	
+	for (res = list; res; res = res->next) {
+		fprintf(fl, "R\n%d %d  # %dx %s\n", res->vnum, res->amount, res->amount, get_obj_name_by_proto(res->vnum));
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// ROOM LIB ////////////////////////////////////////////////////////////////
 
 
@@ -4940,13 +5041,14 @@ void write_trigger_to_file(FILE *fl, trig_data *trig) {
 */
 void discrete_load(FILE *fl, int mode, char *filename) {
 	void parse_account(FILE *fl, int nr);
+	void parse_augment(FILE *fl, any_vnum vnum);
 	void parse_book(FILE *fl, int book_id);
 	
 	any_vnum nr = -1, last;
 	char line[256];
 
 	/* modes positions correspond to DB_BOOT_x in db.h */
-	const char *modes[] = {"world", "mob", "obj", "zone", "empire", "book", "craft", "trg", "crop", "sector", "adventure", "room template", "global", "account" };
+	const char *modes[] = {"world", "mob", "obj", "zone", "empire", "book", "craft", "trg", "crop", "sector", "adventure", "room template", "global", "account", "augment" };
 
 	for (;;) {
 		if (!get_line(fl, line)) {
@@ -4975,6 +5077,10 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 				}
 				case DB_BOOT_ADV: {
 					parse_adventure(fl, nr);
+					break;
+				}
+				case DB_BOOT_AUG: {
+					parse_augment(fl, nr);
 					break;
 				}
 				case DB_BOOT_BLD: {
@@ -5084,7 +5190,7 @@ void index_boot(int mode) {
 
 	if (!rec_count) {
 		// DB_BOOT_x: some types don't matter TODO could move this into a config
-		if (mode == DB_BOOT_EMP || mode == DB_BOOT_BOOKS || mode == DB_BOOT_CRAFT || mode == DB_BOOT_BLD || mode == DB_BOOT_ADV || mode == DB_BOOT_RMT || mode == DB_BOOT_WLD || mode == DB_BOOT_GLB || mode == DB_BOOT_ACCT) {
+		if (mode == DB_BOOT_EMP || mode == DB_BOOT_BOOKS || mode == DB_BOOT_CRAFT || mode == DB_BOOT_BLD || mode == DB_BOOT_ADV || mode == DB_BOOT_RMT || mode == DB_BOOT_WLD || mode == DB_BOOT_GLB || mode == DB_BOOT_ACCT || mode == DB_BOOT_AUG) {
 			// types that don't require any entries and exit early if none
 			return;
 		}
@@ -5106,6 +5212,11 @@ void index_boot(int mode) {
 	 * NOTE: "bytes" does _not_ include strings or other later malloc'd things.
 	 */
 	switch (mode) {
+		case DB_BOOT_AUG: {
+			size[0] = sizeof(augment_data) * rec_count;
+			log("  %d augments, %d bytes in db", rec_count, size[0]);
+			break;
+		}
 		case DB_BOOT_BOOKS: {
 			log("  %d books", rec_count);
 			break;
@@ -5185,6 +5296,7 @@ void index_boot(int mode) {
 		switch (mode) {
 			case DB_BOOT_ACCT:
 			case DB_BOOT_ADV:
+			case DB_BOOT_AUG:
 			case DB_BOOT_BLD:
 			case DB_BOOT_CRAFT:
 			case DB_BOOT_CROP:
@@ -5265,6 +5377,16 @@ void save_library_file_for_vnum(int type, any_vnum vnum) {
 			HASH_ITER(hh, adventure_table, adv, next_adv) {
 				if (GET_ADV_VNUM(adv) >= (zone * 100) && GET_ADV_VNUM(adv) <= (zone * 100 + 99)) {
 					write_adventure_to_file(fl, adv);
+				}
+			}
+			break;
+		}
+		case DB_BOOT_AUG: {
+			void write_augment_to_file(FILE *fl, augment_data *aug);
+			augment_data *aug, *next_aug;
+			HASH_ITER(hh, augment_table, aug, next_aug) {
+				if (GET_AUG_VNUM(aug) >= (zone * 100) && GET_AUG_VNUM(aug) <= (zone * 100 + 99)) {
+					write_augment_to_file(fl, aug);
 				}
 			}
 			break;
@@ -5441,7 +5563,7 @@ void write_crop_index(FILE *fl) {
 }
 
 
-// writes entries in the room template index
+// writes entries in the globals index
 void write_globals_index(FILE *fl) {
 	struct global_data *glb, *next_glb;
 	int this, last;
@@ -5587,6 +5709,11 @@ void save_index(int type) {
 		}
 		case DB_BOOT_ADV: {
 			write_adventure_index(fl);
+			break;
+		}
+		case DB_BOOT_AUG: {
+			void write_augments_index(FILE *fl);
+			write_augments_index(fl);
 			break;
 		}
 		case DB_BOOT_BLD: {

@@ -17,6 +17,7 @@
 *   #define Section
 *     Miscellaneous Defines
 *     Adventure Defines
+*     Augment Defines
 *     Book Defines
 *     Building Defines
 *     Character Defines
@@ -33,6 +34,7 @@
 *   Structs Section
 *     Miscellaneous Structs
 *     Adventure Structs
+*     Augment Structs
 *     Book Structs
 *     Building Structs
 *     Mobile Structs
@@ -189,6 +191,7 @@ typedef any_vnum trig_vnum;	// for dg scripts
 // For simplicity...
 typedef struct account_data account_data;
 typedef struct adventure_data adv_data;
+typedef struct augment_data augment_data;
 typedef struct bld_data bld_data;
 typedef struct book_data book_data;
 typedef struct char_data char_data;
@@ -364,6 +367,19 @@ typedef struct trig_data trig_data;
 #define RMT_NO_LOCATION  BIT(8)	// i. don't show a location, disables where
 #define RMT_PIGEON_POST  BIT(9)	// j. can use mail here
 #define RMT_COOKING_FIRE  BIT(10)	// k. can cook here
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// AUGMENT DEFINES /////////////////////////////////////////////////////////
+
+// AUGMENT_x: Augment types
+#define AUGMENT_NONE  0
+#define AUGMENT_ENCHANTMENT  1
+#define AUGMENT_HONE  2
+
+
+// AUG_x: Augment flags
+#define AUG_IN_DEVELOPMENT  BIT(0)	// a. can't be used by players
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2046,6 +2062,39 @@ struct room_template {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// AUGMENT STRUCTS /////////////////////////////////////////////////////////
+
+struct augment_data {
+	any_vnum vnum;
+	char *name;	// descriptive text
+	int type;	// AUGMENT_x
+	bitvector_t flags;	// AUG_x flags
+	
+	int ability;	// required ability or NO_ABIL
+	struct augment_apply *applies;	// how it modifies items
+	struct resource_data *resources;	// resources required
+	
+	UT_hash_handle hh;	// augment_table hash
+};
+
+
+// apply types for augment_data
+struct augment_apply {
+	int location;	// APPLY_x
+	int weight;	// what percent of points go to this
+	struct augment_apply *next;	// linked list
+};
+
+
+// new resource-required data (for augments)
+struct resource_data {
+	obj_vnum vnum;	// which item
+	int amount;	// how mant
+	struct resource_data *next;	// linked list
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// BOOK STRUCTS ////////////////////////////////////////////////////////////
 
 // Just helps keep a unique list of authors
@@ -2310,6 +2359,7 @@ struct descriptor_data {
 	any_vnum olc_vnum;	// vnum being edited
 	
 	adv_data *olc_adventure;	// adv being edited
+	augment_data *olc_augment;	// aug being edited
 	book_data *olc_book;	// book being edited
 	obj_data *olc_object;	// item being edited
 	char_data *olc_mobile;	// mobile being edited

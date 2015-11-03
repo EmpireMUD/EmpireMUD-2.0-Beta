@@ -1,6 +1,7 @@
 This directory contains data files for various in-game prototypes:
 
 adv - Adventure zones
+aug - Augments (item enchantments)
 bld - Buildings and designated rooms
 craft - Craft (forge, sew, etc) and build recipes
 crop - Crops

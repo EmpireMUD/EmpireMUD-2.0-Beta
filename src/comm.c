@@ -1479,6 +1479,9 @@ void close_socket(descriptor_data *d) {
 	if (d->olc_adventure) {
 		free_adventure(d->olc_adventure);
 	}
+	if (d->olc_augment) {
+		free_augment(d->olc_augment);
+	}
 	if (d->olc_book) {
 		free_book(d->olc_book);
 	}
@@ -1669,8 +1672,6 @@ void init_descriptor(descriptor_data *newd, int desc) {
 	
 	newd->olc_type = 0;
 	newd->olc_vnum = NOTHING;
-	newd->olc_object = NULL;
-	newd->olc_mobile = NULL;
 	
 	// ensure clean data
 	*newd->color.last_fg = '\0';

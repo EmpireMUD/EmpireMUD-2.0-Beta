@@ -14,6 +14,7 @@
 * Contents:
 *   Core Utils
 *   Adventure Utils
+*   Augment Utils
 *   Bitvector Utils
 *   Building Utils
 *   Can See Utils
@@ -101,6 +102,20 @@
 #define ADVENTURE_FLAGGED(adv, flg)  (IS_SET(GET_ADV_FLAGS(adv), (flg)) ? TRUE : FALSE)
 #define INSTANCE_FLAGGED(i, flg)  (IS_SET((i)->flags, (flg)))
 #define LINK_FLAGGED(lnkptr, flg)  (IS_SET((lnkptr)->flags, (flg)) ? TRUE : FALSE)
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// AUGMENT UTILS ///////////////////////////////////////////////////////////
+
+#define GET_AUG_VNUM(aug)  ((aug)->vnum)
+#define GET_AUG_NAME(aug)  ((aug)->name)
+#define GET_AUG_TYPE(aug)  ((aug)->type)
+#define GET_AUG_FLAGS(aug)  ((aug)->flags)
+#define GET_AUG_ABILITY(aug)  ((aug)->ability)
+#define GET_AUG_APPLIES(aug)  ((aug)->applies)
+#define GET_AUG_RESOURCES(aug)  ((aug)->resources)
+
+#define AUGMENT_FLAGGED(aug, flag)  IS_SET(GET_AUG_FLAGS(aug), (flag))
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -347,6 +362,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_OLC_VNUM(desc)  ((desc)->olc_vnum)
 #define GET_OLC_STORAGE(desc)  ((desc)->olc_storage)
 #define GET_OLC_ADVENTURE(desc)  ((desc)->olc_adventure)
+#define GET_OLC_AUGMENT(desc)  ((desc)->olc_augment)
 #define GET_OLC_BOOK(desc)  ((desc)->olc_book)
 #define GET_OLC_BUILDING(desc)  ((desc)->olc_building)
 #define GET_OLC_CRAFT(desc)  ((desc)->olc_craft)

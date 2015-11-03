@@ -24,6 +24,7 @@
 * Contents:
 *   EmpireMUD Constants
 *   Adventure Constants
+*   Augment Constants
 *   Player Constants
 *   Direction And Room Constants
 *   Character Constants
@@ -164,6 +165,25 @@ const char *room_template_flags[] = {
 	"!LOCATION",
 	"PIGEON-POST",
 	"COOKING-FIRE",
+	"\n"
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// AUGMENT CONSTANTS ///////////////////////////////////////////////////////
+
+// AUGMENT_x: augment types
+const char *augment_types[] = {
+	"None",
+	"Enchantment",
+	"Hone",
+	"\n"
+};
+
+
+// AUG_x: augment flags
+const char *augment_flags[] = {
+	"IN-DEV",
 	"\n"
 };
 
@@ -1830,6 +1850,7 @@ const char *olc_flag_bits[] = {
 	"!ADVENTURE",
 	"!ROOMTEMPLATE",
 	"!GLOBAL",
+	"!AUGMENT",
 	"\n"
 };
 
@@ -1848,6 +1869,7 @@ const char *olc_type_bits[NUM_OLC_TYPES+1] = {
 	"roomtemplate",
 	"global",
 	"book",
+	"augment",
 	"\n"
 };
 
