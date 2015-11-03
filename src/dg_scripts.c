@@ -163,6 +163,7 @@ int find_eq_pos_script(char *arg) {
 		const char *pos;
 		int where;
 	} eq_pos[] = {
+		// WEAR_x:
 		{ "head", WEAR_HEAD },
 		{ "ears", WEAR_EARS },
 		{ "neck1", WEAR_NECK_1 },
@@ -186,6 +187,7 @@ int find_eq_pos_script(char *arg) {
 		{ "ranged", WEAR_RANGED },
 		{ "hold", WEAR_HOLD },
 		{ "held", WEAR_HOLD },
+		{ "shared", WEAR_SHARE },
 		{ "none", NO_WEAR }
 	};
 
@@ -629,15 +631,16 @@ void script_trigger_check(void) {
 	// Except every 5th cycle, this only does "interior" rooms -- to prevent over-frequent map iteration
 	if (++my_cycle >= 5) {
 		my_cycle = 0;
-		HASH_ITER(world_hh, world_table, room, next_room) {
+		HASH_ITER(hh, world_table, room, next_room) {
 			if ((sc = SCRIPT(room)) && IS_SET(SCRIPT_TYPES(sc), WTRIG_RANDOM) && (players_nearby_script(room) || IS_SET(SCRIPT_TYPES(sc), WTRIG_GLOBAL))) {
 				random_wtrigger(room);
 			}
 		}
 	}
 	else {
-		// partial		
-		HASH_ITER(interior_hh, interior_world_table, room, next_room) {
+		// partial
+		for (room = interior_room_list; room; room = next_room) {
+			next_room = room->next_interior;
 			if ((sc = SCRIPT(room)) && IS_SET(SCRIPT_TYPES(sc), WTRIG_RANDOM) && (players_nearby_script(room) || IS_SET(SCRIPT_TYPES(sc), WTRIG_GLOBAL))) {
 				random_wtrigger(room);
 			}
@@ -678,7 +681,7 @@ EVENTFUNC(trig_wait_event) {
 		}
 		else {
 			room_data *i, *next_i;
-			HASH_ITER(world_hh, world_table, i, next_i) {
+			HASH_ITER(hh, world_table, i, next_i) {
 				if (i == (room_data*)go) {
 					found = TRUE;
 					break;
@@ -2876,7 +2879,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "crop")) {
 						crop_data *cp;
-						if ((cp = crop_proto(ROOM_CROP_TYPE(r)))) {
+						if ((cp = ROOM_CROP(r))) {
 							snprintf(str, slen, "%s", GET_CROP_NAME(cp));
 						}
 						else {

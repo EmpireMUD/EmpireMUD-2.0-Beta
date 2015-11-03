@@ -447,9 +447,13 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 // returns TRUE only if both x and y are in the bounds of the map
 #define CHECK_MAP_BOUNDS(x, y)  ((x) >= 0 && (x) < MAP_WIDTH && (y) >= 0 && (y) < MAP_HEIGHT)
 
-// flat coords ASSUME room is on the map -- otherwise use the X_COORD/Y_COORD macros
-#define FLAT_X_COORD(room)  (GET_ROOM_VNUM(room) % MAP_WIDTH)
-#define FLAT_Y_COORD(room)  (GET_ROOM_VNUM(room) / MAP_WIDTH)
+// for getting coordinates by vnum
+#define MAP_X_COORD(vnum)  ((vnum) % MAP_WIDTH)
+#define MAP_Y_COORD(vnum)  (int)((vnum) / MAP_WIDTH)
+
+// flat coords ASSUME room is on the map -- otherwise use the X_COORD/Y_COORD
+#define FLAT_X_COORD(room)  MAP_X_COORD(GET_ROOM_VNUM(room))
+#define FLAT_Y_COORD(room)  MAP_Y_COORD(GET_ROOM_VNUM(room))
 
 extern int X_COORD(room_data *room);	// formerly #define X_COORD(room)  FLAT_X_COORD(get_map_location_for(room))
 extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(get_map_location_for(room))
@@ -527,6 +531,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 //// OBJECT UTILS ////////////////////////////////////////////////////////////
 
 // primary attributes
+#define GET_OBJ_APPLIES(obj)  ((obj)->applies)
 #define GET_AUTOSTORE_TIMER(obj)  ((obj)->autostore_timer)
 #define GET_OBJ_ACTION_DESC(obj)  ((obj)->action_description)
 #define GET_OBJ_AFF_FLAGS(obj)  ((obj)->obj_flags.bitvector)
@@ -854,14 +859,16 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define ROOM_AFFECTS(room)  ((room)->af)
 #define ROOM_BASE_FLAGS(room)  ((room)->base_affects)
 #define ROOM_CONTENTS(room)  ((room)->contents)
+#define ROOM_CROP(room)  ((room)->crop_type)
 #define ROOM_DEPLETION(room)  ((room)->depletion)
 #define ROOM_LAST_SPAWN_TIME(room)  ((room)->last_spawn_time)
 #define ROOM_LIGHTS(room)  ((room)->light)
-#define ROOM_ORIGINAL_SECT(room)  ((room)->original_sector)
+#define BASE_SECT(room)  ((room)->base_sector)
 #define ROOM_OWNER(room)  ((room)->owner)
 #define ROOM_PEOPLE(room)  ((room)->people)
 #define ROOM_TRACKS(room)  ((room)->tracks)
 #define SECT(room)  ((room)->sector_type)
+#define GET_EXITS_HERE(room)  ((room)->exits_here)
 
 
 // room->complex data
@@ -907,17 +914,14 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define IS_REAL_LIGHT(room)  (!MAGIC_DARKNESS(room) && (!IS_DARK(room) || RMT_FLAGGED((room), RMT_LIGHT) || IS_INSIDE(room) || (ROOM_OWNER(room) && IS_ANY_BUILDING(room))))
 #define ISLAND_FLAGGED(room, flag)  ((GET_ISLAND_ID(room) != NO_ISLAND) ? IS_SET(get_island(GET_ISLAND_ID(room), TRUE)->flags, (flag)) : FALSE)
 #define MAGIC_DARKNESS(room)  (ROOM_AFF_FLAGGED((room), ROOM_AFF_DARK))
-#define ROOM_CAN_MINE(room)  (ROOM_SECT_FLAGGED((room), SECTF_CAN_MINE) || ROOM_BLD_FLAGGED((room), BLD_MINE) || (IS_ROAD(room) && SECT_FLAGGED(ROOM_ORIGINAL_SECT(room), SECTF_CAN_MINE)))
+#define ROOM_CAN_MINE(room)  (ROOM_SECT_FLAGGED((room), SECTF_CAN_MINE) || ROOM_BLD_FLAGGED((room), BLD_MINE) || (IS_ROAD(room) && SECT_FLAGGED(BASE_SECT(room), SECTF_CAN_MINE)))
 #define ROOM_IS_CLOSED(room)  (IS_INSIDE(room) || IS_ADVENTURE_ROOM(room) || (IS_ANY_BUILDING(room) && !ROOM_BLD_FLAGGED(room, BLD_OPEN) && (IS_COMPLETE(room) || ROOM_BLD_FLAGGED(room, BLD_CLOSED))))
 #define SHOW_PEOPLE_IN_ROOM(room)  (!ROOM_IS_CLOSED(room) && !ROOM_SECT_FLAGGED(room, SECTF_OBSCURE_VISION))
 #define WOULD_BE_LIGHT_WITHOUT_MAGIC_DARKNESS(room)  (!IS_DARK(room) || RMT_FLAGGED((room), RMT_LIGHT) || adjacent_room_is_light(room) || IS_ANY_BUILDING(room))
 
-// extra data
-#define ROOM_CROP_TYPE(room)  (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) ? get_room_extra_data((room), ROOM_EXTRA_CROP_TYPE) : NOTHING)
-
 // interaction checks (leading up to CAN_INTERACT_ROOM)
 #define BLD_CAN_INTERACT_ROOM(room, type)  (GET_BUILDING(room) && has_interaction(GET_BLD_INTERACTIONS(GET_BUILDING(room)), (type)))
-#define CROP_CAN_INTERACT_ROOM(room, type)  (ROOM_CROP_TYPE(room) != NOTHING && has_interaction(GET_CROP_INTERACTIONS(crop_proto(ROOM_CROP_TYPE(room))), (type)))
+#define CROP_CAN_INTERACT_ROOM(room, type)  (ROOM_CROP(room) && has_interaction(GET_CROP_INTERACTIONS(ROOM_CROP(room)), (type)))
 #define RMT_CAN_INTERACT_ROOM(room, type)  (GET_ROOM_TEMPLATE(room) && has_interaction(GET_RMT_INTERACTIONS(GET_ROOM_TEMPLATE(room)), (type)))
 #define SECT_CAN_INTERACT_ROOM(room, type)  has_interaction(GET_SECT_INTERACTIONS(SECT(room)), (type))
 #define CAN_INTERACT_ROOM(room, type)  (SECT_CAN_INTERACT_ROOM((room), (type)) || BLD_CAN_INTERACT_ROOM((room), (type)) || RMT_CAN_INTERACT_ROOM((room), (type)) || CROP_CAN_INTERACT_ROOM((room), (type)))
@@ -931,14 +935,14 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define RMT_FLAGGED(room, flag)  (GET_ROOM_TEMPLATE(room) && IS_SET(GET_RMT_FLAGS(GET_ROOM_TEMPLATE(room)), (flag)))
 #define ROOM_AFF_FLAGGED(r, flag)  (IS_SET(ROOM_AFF_FLAGS(r), (flag)))
 #define ROOM_BLD_FLAGGED(room, flag)  (GET_BUILDING(room) && IS_SET(GET_BLD_FLAGS(GET_BUILDING(room)), (flag)))
-#define ROOM_CROP_FLAGGED(room, flg)  (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && CROP_FLAGGED(crop_proto(ROOM_CROP_TYPE(room)), (flg)))
+#define ROOM_CROP_FLAGGED(room, flg)  (ROOM_SECT_FLAGGED((room), SECTF_HAS_CROP_DATA) && ROOM_CROP(room) && CROP_FLAGGED(ROOM_CROP(room), (flg)))
 #define ROOM_SECT_FLAGGED(room, flg)  SECT_FLAGGED(SECT(room), (flg))
 #define SHIFT_CHAR_DIR(ch, room, dir)  SHIFT_DIR((room), confused_dirs[get_north_for_char(ch)][0][(dir)])
 #define SHIFT_DIR(room, dir)  real_shift((room), shift_dir[(dir)][0], shift_dir[(dir)][1])
 
 // island info
 extern int GET_ISLAND_ID(room_data *room);	// formerly #define GET_ISLAND_ID(room)  (get_map_location_for(room)->island)
-#define SET_ISLAND_ID(room, id)  ((room)->island = id)
+void SET_ISLAND_ID(room_data *room, int island);	// formerly a #define and a room_data property
 
 // room types
 #define IS_ADVENTURE_ROOM(room)  ROOM_SECT_FLAGGED((room), SECTF_ADVENTURE)
@@ -1143,9 +1147,11 @@ extern bool find_flagged_sect_within_distance_from_char(char_data *ch, bitvector
 extern bool find_flagged_sect_within_distance_from_room(room_data *room, bitvector_t with_flags, bitvector_t without_flags, int distance);
 extern bool find_sect_within_distance_from_char(char_data *ch, sector_vnum sect, int distance);
 extern bool find_sect_within_distance_from_room(room_data *room, sector_vnum sect, int distance);
-extern int compute_distance(room_data *from, room_data *to);
+extern int compute_map_distance(int x1, int y1, int x2, int y2);
+#define compute_distance(from, to)  compute_map_distance(X_COORD(from), Y_COORD(from), X_COORD(to), Y_COORD(to))
 extern int count_adjacent_sectors(room_data *room, sector_vnum sect, bool count_original_sect);
 extern int distance_to_nearest_player(room_data *room);
+extern bool get_coord_shift(int start_x, int start_y, int x_shift, int y_shift, int *new_x, int *new_y);
 extern int get_direction_to(room_data *from, room_data *to);
 extern room_data *get_map_location_for(room_data *room);
 extern room_data *real_shift(room_data *origin, int x_shift, int y_shift);

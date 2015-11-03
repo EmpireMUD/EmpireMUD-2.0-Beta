@@ -354,7 +354,7 @@ bool can_use_ritual(char_data *ch, int ritual) {
 INTERACTION_FUNC(devastate_crop) {
 	void scale_item_to_level(obj_data *obj, int level);
 	
-	crop_data *cp = crop_proto(ROOM_CROP_TYPE(inter_room));
+	crop_data *cp = ROOM_CROP(inter_room);
 	obj_data *newobj;
 	int num;
 
@@ -378,6 +378,27 @@ INTERACTION_FUNC(devastate_crop) {
 	}
 	
 	return TRUE;
+}
+
+
+/**
+* @param char_data *ch The enchanter.
+* @param int max_scale Optional: The highest scale level it will use (0 = no max)
+* @return double The number of scale points available for an enchantment at that level.
+*/
+double get_enchant_scale_for_char(char_data *ch, int max_scale) {
+	extern int get_crafting_level(char_data *ch);
+	
+	double points_available;
+	int level;
+
+	// enchant scale level is whichever is less: obj scale level, or player crafting level
+	level = MAX(get_crafting_level(ch), get_approximate_level(ch));
+	if (max_scale > 0) {
+		level = MIN(max_scale, level);
+	}
+	points_available = level / 100.0 * config_get_double("enchant_points_at_100");
+	return MAX(points_available, 1.0);
 }
 
 
@@ -726,7 +747,8 @@ ACMD(do_colorburst) {
 
 
 ACMD(do_disenchant) {
-	obj_data *obj, *reward, *proto;
+	struct obj_apply *apply, *next_apply, *temp;
+	obj_data *obj, *reward;
 	int iter, prc, rnd;
 	obj_vnum vnum = NOTHING;
 	int cost = 5;
@@ -754,18 +776,12 @@ ACMD(do_disenchant) {
 	else {
 		charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
 		REMOVE_BIT(GET_OBJ_EXTRA(obj), OBJ_ENCHANTED | OBJ_SUPERIOR);
-		proto = obj_proto(GET_OBJ_VNUM(obj));
 		
-		for (iter = 0; iter < MAX_OBJ_AFFECT; ++iter) {
-			if (!proto || OBJ_FLAGGED(proto, OBJ_ENCHANTED)) {
-				// if the protype is enchanted, remove them all
-				obj->affected[iter].location = 0;
-				obj->affected[iter].modifier = 0;
-			}
-			else {
-				// otherwise just match the proto
-				obj->affected[iter].location = proto->affected[iter].location;
-				obj->affected[iter].modifier = proto->affected[iter].modifier;
+		for (apply = GET_OBJ_APPLIES(obj); apply; apply = next_apply) {
+			next_apply = apply->next;
+			if (apply->apply_type == APPLY_TYPE_ENCHANTMENT) {
+				REMOVE_FROM_LIST(apply, GET_OBJ_APPLIES(obj), next);
+				free(apply);
 			}
 		}
 		
@@ -863,16 +879,15 @@ ACMD(do_dispel) {
 
 
 ACMD(do_enchant) {
-	extern int get_crafting_level(char_data *ch);
+	extern char *shared_by(obj_data *obj, char_data *ch);
 	extern const double apply_values[];
 	
 	char arg2[MAX_INPUT_LENGTH];
+	struct obj_apply *apply;
 	obj_data *obj;
-	int iter, type, scale, charlevel;
-	bool found, line, first;		
+	int iter, type, value;
+	bool found, line;
 	double points_available, first_points = 0.0, second_points = 0.0;
-
-	double enchant_points_at_100 = config_get_double("enchant_points_at_100");
 	
 	two_arguments(argument, arg, arg2);
 	
@@ -904,7 +919,7 @@ ACMD(do_enchant) {
 		}
 		// end !*arg
 	}
-	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying)) && !(obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
+	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying)) && !(obj = get_obj_by_char_share(ch, arg))) {
 		msg_to_char(ch, "You don't seem to have any %s.\r\n", arg);
 	}
 	else if ((type = find_enchant_by_name(ch, arg2)) == NOTHING) {
@@ -929,11 +944,7 @@ ACMD(do_enchant) {
 	else {
 		extract_resources(ch, enchant_data[type].resources, FALSE);
 		
-		// enchant scale level is whichever is less: obj scale level, or player crafting level
-		charlevel = MAX(get_crafting_level(ch), get_approximate_level(ch));
-		scale = MIN(GET_OBJ_CURRENT_SCALE_LEVEL(obj), charlevel);
-		points_available = MAX(1.0, scale / 100.0 * enchant_points_at_100);
-		
+		points_available = get_enchant_scale_for_char(ch, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 		if (HAS_ABILITY(ch, ABIL_GREATER_ENCHANTMENTS)) {
 			points_available *= config_get_double("greater_enchantments_bonus");
 		}
@@ -948,43 +959,34 @@ ACMD(do_enchant) {
 			first_points = points_available;
 			second_points = 0.0;
 		}
-
-		first = TRUE;
 		
-		// find free applies to use
-		for (iter = 0; iter < MAX_OBJ_AFFECT; ++iter) {
-			if (obj->affected[iter].location == APPLY_NONE) {
-				if (first) {
-					// always get at least 1 from first bonus
-					int value = MAX(1, round(first_points * (1.0 / apply_values[enchant_data[type].first_bonus])));
-					
-					obj->affected[iter].location = enchant_data[type].first_bonus;
-					obj->affected[iter].modifier = value;
-					first = FALSE;
-				}
-				else if (enchant_data[type].second_bonus != APPLY_NONE) {
-					int value = round(second_points * (1.0 / apply_values[enchant_data[type].second_bonus]));
-					
-					// only bother if any points to give
-					if (value > 0) {
-						obj->affected[iter].location = enchant_data[type].second_bonus;
-						obj->affected[iter].modifier = value;
-					}
-					// second apply done
-					break;
-				}
-			}
+		// first apply
+		CREATE(apply, struct obj_apply, 1);
+		apply->apply_type = APPLY_TYPE_ENCHANTMENT;
+		apply->location = enchant_data[type].first_bonus;
+		apply->modifier = MAX(1, round(first_points * (1.0 / apply_values[enchant_data[type].first_bonus])));
+		apply->next = GET_OBJ_APPLIES(obj);
+		GET_OBJ_APPLIES(obj) = apply;
+		
+		// secondy apply
+		if (enchant_data[type].second_bonus != APPLY_NONE && (value = round(second_points * (1.0 / apply_values[enchant_data[type].second_bonus]))) > 0) {
+			CREATE(apply, struct obj_apply, 1);
+			apply->apply_type = APPLY_TYPE_ENCHANTMENT;
+			apply->location = enchant_data[type].second_bonus;
+			apply->modifier = value;
+			apply->next = GET_OBJ_APPLIES(obj);
+			GET_OBJ_APPLIES(obj) = apply;
 		}
 		
 		// set enchanted bit
 		SET_BIT(GET_OBJ_EXTRA(obj), OBJ_ENCHANTED);
-
-		sprintf(buf, "You infuse $p with the %s enchantment.", enchant_data[type].name);
-		act(buf, FALSE, ch, obj, NULL, TO_CHAR);
 		
-		sprintf(buf, "$n infuses $p with the %s enchantment.", enchant_data[type].name);
-		act(buf, FALSE, ch, obj, NULL, TO_ROOM);
-				
+		sprintf(buf, "You infuse $p%s with the %s enchantment.", shared_by(obj, ch), enchant_data[type].name);
+		act(buf, FALSE, ch, obj, obj->worn_by, TO_CHAR);
+		
+		sprintf(buf, "$n infuses $p%s with the %s enchantment.", shared_by(obj, ch), enchant_data[type].name);
+		act(buf, FALSE, ch, obj, obj->worn_by, TO_ROOM);
+		
 		if (enchant_data[type].ability != NO_ABIL) {
 			gain_ability_exp(ch, enchant_data[type].ability, 50);
 		}
@@ -1586,7 +1588,7 @@ RITUAL_SETUP_FUNC(start_ritual_of_teleportation) {
 		subtype = NOWHERE;
 	}
 	else if (!str_cmp(argument, "home")) {
-		HASH_ITER(world_hh, world_table, room, next_room) {
+		HASH_ITER(hh, world_table, room, next_room) {
 			if (ROOM_PRIVATE_OWNER(room) == GET_IDNUM(ch)) {
 				to_room = room;
 				break;
@@ -1991,25 +1993,25 @@ RITUAL_FINISH_FUNC(perform_devastation_ritual) {
 				load_otrigger(newobj);
 			}
 		}
-		else if (ROOM_SECT_FLAGGED(to_room, SECTF_CROP) && (cp = crop_proto(ROOM_CROP_TYPE(to_room))) && has_interaction(GET_CROP_INTERACTIONS(cp), INTERACT_HARVEST)) {
+		else if (ROOM_SECT_FLAGGED(to_room, SECTF_CROP) && (cp = ROOM_CROP(to_room)) && has_interaction(GET_CROP_INTERACTIONS(cp), INTERACT_HARVEST)) {
 			run_room_interactions(ch, to_room, INTERACT_HARVEST, devastate_crop);
 			
 			// check for original sect, which may have been stored
-			if (ROOM_ORIGINAL_SECT(to_room) != SECT(to_room)) {
-				change_terrain(to_room, GET_SECT_VNUM(ROOM_ORIGINAL_SECT(to_room)));
+			if (BASE_SECT(to_room) != SECT(to_room)) {
+				change_terrain(to_room, GET_SECT_VNUM(BASE_SECT(to_room)));
 			}
 			else {
 				// fallback sect
 				change_terrain(to_room, climate_default_sector[GET_CROP_CLIMATE(cp)]);
 			}
 		}
-		else if (ROOM_SECT_FLAGGED(to_room, SECTF_HAS_CROP_DATA) && (cp = crop_proto(ROOM_CROP_TYPE(to_room)))) {
+		else if (ROOM_SECT_FLAGGED(to_room, SECTF_HAS_CROP_DATA) && (cp = ROOM_CROP(to_room))) {
 			msg_to_char(ch, "You devastate the seeded field!\r\n");
 			act("$n's powerful ritual devastates the seeded field!", FALSE, ch, NULL, NULL, TO_ROOM);
 			
 			// check for original sect, which may have been stored
-			if (ROOM_ORIGINAL_SECT(to_room) != SECT(to_room)) {
-				change_terrain(to_room, GET_SECT_VNUM(ROOM_ORIGINAL_SECT(to_room)));
+			if (BASE_SECT(to_room) != SECT(to_room)) {
+				change_terrain(to_room, GET_SECT_VNUM(BASE_SECT(to_room)));
 			}
 			else {
 				// fallback sect

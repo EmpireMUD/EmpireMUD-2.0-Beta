@@ -41,8 +41,11 @@ struct stats_data_struct {
 
 // stats globals
 struct stats_data_struct *global_sector_count = NULL;	// hash table of sector counts
+int global_sector_size = 0;
 struct stats_data_struct *global_crop_count = NULL;	// hash table count of crops
+int global_crop_size = 0;
 struct stats_data_struct *global_building_count = NULL;	// hash table of building counts
+int global_building_size = 0;
 
 time_t last_world_count = 0;	// timestamp of last sector/crop/building tally
 time_t last_account_count = 0;	// timestamp of last time accounts were read
@@ -229,7 +232,7 @@ int stats_get_building_count(bld_data *bdg) {
 		return 0;
 	}
 	
-	if (HASH_COUNT(global_building_count) != HASH_COUNT(building_table) || last_world_count + rescan_world_after < time(0)) {
+	if (HASH_COUNT(global_building_count) != global_building_size || last_world_count + rescan_world_after < time(0)) {
 		update_world_count();
 	}
 	
@@ -251,7 +254,7 @@ int stats_get_crop_count(crop_data *cp) {
 		return 0;
 	}
 	
-	if (HASH_COUNT(global_crop_count) != HASH_COUNT(crop_table) || last_world_count + rescan_world_after < time(0)) {
+	if (HASH_COUNT(global_crop_count) != global_crop_size || last_world_count + rescan_world_after < time(0)) {
 		update_world_count();
 	}
 	
@@ -274,7 +277,7 @@ int stats_get_sector_count(sector_data *sect) {
 		return 0;
 	}
 	
-	if (HASH_COUNT(global_sector_count) != HASH_COUNT(sector_table) || last_world_count + rescan_world_after < time(0)) {
+	if (HASH_COUNT(global_sector_count) != global_sector_size || last_world_count + rescan_world_after < time(0)) {
 		update_world_count();
 	}
 	
@@ -391,8 +394,9 @@ void update_players_online_stats(void) {
 */
 void update_world_count(void) {
 	struct stats_data_struct *sect_inf = NULL, *crop_inf = NULL, *bld_inf = NULL, *data, *next_data;
-	room_data *iter, *next_iter;
 	any_vnum vnum, last_bld_vnum = NOTHING, last_crop_vnum = NOTHING, last_sect_vnum = NOTHING;
+	struct map_data *map;
+	room_data *room;
 	
 	// free and recreate counts
 	HASH_ITER(hh, global_sector_count, data, next_data) {
@@ -409,9 +413,9 @@ void update_world_count(void) {
 	}
 	
 	// scan world
-	HASH_ITER(world_hh, world_table, iter, next_iter) {
+	for (map = land_map; map; map = map->next) {
 		// sector
-		vnum = GET_SECT_VNUM(SECT(iter));
+		vnum = GET_SECT_VNUM(map->sector_type);
 		if (vnum != last_sect_vnum) {
 			HASH_FIND_INT(global_sector_count, &vnum, sect_inf);
 			if (!sect_inf) {
@@ -423,8 +427,13 @@ void update_world_count(void) {
 		}
 		++sect_inf->count;
 		
+		// any further data?
+		if (!(room = real_real_room(map->vnum))) {
+			continue;
+		}
+		
 		// crop?
-		vnum = ROOM_CROP_TYPE(iter);
+		vnum = ROOM_CROP(room) ? GET_CROP_VNUM(ROOM_CROP(room)) : NOTHING;
 		if (vnum != NOTHING) {
 			if (vnum != last_crop_vnum) {
 				HASH_FIND_INT(global_crop_count, &vnum, crop_inf);
@@ -440,7 +449,7 @@ void update_world_count(void) {
 		}
 		
 		// building?
-		vnum = BUILDING_VNUM(iter);
+		vnum = BUILDING_VNUM(room);
 		if (vnum != NOTHING) {
 			if (vnum != last_bld_vnum) {
 				HASH_FIND_INT(global_building_count, &vnum, bld_inf);
@@ -457,4 +466,7 @@ void update_world_count(void) {
 	}
 	
 	last_world_count = time(0);
+	global_sector_size = HASH_COUNT(global_sector_count);
+	global_crop_size = HASH_COUNT(global_crop_count);
+	global_building_size = HASH_COUNT(global_building_count);
 }

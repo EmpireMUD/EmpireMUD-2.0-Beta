@@ -56,9 +56,9 @@ extern struct player_special_data dummy_mob;
 extern bool world_is_sorted;
 
 // external funcs
-extern room_data *create_ocean_room(room_vnum vnum);
 extern struct complex_room_data *init_complex_data();
 void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location);
+extern room_data *load_map_room(room_vnum vnum);
 extern obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify);
 void sort_exits(struct room_direction_data **list);
 void sort_world_table();
@@ -1337,7 +1337,7 @@ void delete_empire(empire_data *emp) {
 	}
 	
 	// remove all world ownership
-	HASH_ITER(world_hh, world_table, room, next_room) {
+	HASH_ITER(hh, world_table, room, next_room) {
 		if (ROOM_OWNER(room) == emp) {
 			perform_abandon_room(room);
 		}
@@ -3396,7 +3396,10 @@ void free_obj(obj_data *obj) {
 	}
 	
 	free_obj_binding(&OBJ_BOUND_TO(obj));
-
+	
+	// applies are ALWAYS a copy
+	free_apply_list(GET_OBJ_APPLIES(obj));
+	
 	/* free any assigned scripts */
 	if (SCRIPT(obj)) {
 		extract_script(obj, OBJ_TRIGGER);
@@ -3417,11 +3420,12 @@ void free_obj(obj_data *obj) {
 */
 void parse_object(FILE *obj_f, int nr) {
 	static char line[256];
-	int t[10], j = 0, retval;
+	int t[10], retval;
 	char *tmpptr;
 	char f1[256], f2[256];
 	struct obj_custom_message *ocm, *last_ocm = NULL;
 	struct obj_storage_type *store, *last_store = NULL;
+	struct obj_apply *apply, *last_apply = NULL;
 	obj_data *obj, *find;
 	
 	// create
@@ -3499,13 +3503,7 @@ void parse_object(FILE *obj_f, int nr) {
 	obj->obj_flags.timer = t[1];
 
 	/* *** extra descriptions and affect fields *** */
-	for (j = 0; j < MAX_OBJ_AFFECT; j++) {
-		obj->affected[j].location = APPLY_NONE;
-		obj->affected[j].modifier = 0;
-	}
-
 	strcat(buf2, ", after numeric constants\n...expecting alphabetic flags");
-	j = 0;
 
 	for (;;) {
 		if (!get_line(obj_f, line)) {
@@ -3514,22 +3512,32 @@ void parse_object(FILE *obj_f, int nr) {
 		}
 		switch (*line) {
 			case 'A':
-				if (j >= MAX_OBJ_AFFECT) {
-					log("SYSERR: Too many A fields (%d max), %s", MAX_OBJ_AFFECT, buf2);
-					exit(1);
-				}
 				if (!get_line(obj_f, line)) {
 					log("SYSERR: Format error in 'A' field, %s\n...expecting 2 numeric constants but file ended!", buf2);
 					exit(1);
 				}
-
-				if ((retval = sscanf(line, " %d %d ", t, t + 1)) != 2) {
-					log("SYSERR: Format error in 'A' field, %s\n...expecting 2 numeric arguments, got %d\n...offending line: '%s'", buf2, retval, line);
-					exit(1);
+				
+				if (sscanf(line, " %d %d %d ", &t[0], &t[1], &t[2]) != 3) {
+					// backwards-compatible
+					t[2] = APPLY_TYPE_NATURAL;
+					if ((retval = sscanf(line, " %d %d ", &t[0], &t[1])) != 2) {
+						log("SYSERR: Format error in 'A' field, %s\n...expecting 3 numeric arguments, got %d\n...offending line: '%s'", buf2, retval, line);
+						exit(1);
+					}
 				}
-				obj->affected[j].location = t[0];
-				obj->affected[j].modifier = t[1];
-				j++;
+				CREATE(apply, struct obj_apply, 1);
+				apply->location = t[0];
+				apply->modifier = t[1];
+				apply->apply_type = t[2];
+				
+				// append to end
+				if (last_apply) {
+					last_apply->next = apply;
+				}
+				else {
+					GET_OBJ_APPLIES(obj) = apply;
+				}
+				last_apply = apply;
 				break;
 
 			case 'B':
@@ -3637,7 +3645,7 @@ void write_obj_to_file(FILE *fl, obj_data *obj) {
 	char temp[MAX_STRING_LENGTH], temp2[MAX_STRING_LENGTH];
 	struct obj_storage_type *store;
 	struct obj_custom_message *ocm;
-	int iter;
+	struct obj_apply *apply;
 	
 	if (!fl || !obj) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: write_obj_to_file called without %s", !fl ? "file" : "object");
@@ -3666,11 +3674,9 @@ void write_obj_to_file(FILE *fl, obj_data *obj) {
 	// now optional parts:
 	
 	// A: applies
-	for (iter = 0; iter < MAX_OBJ_AFFECT; ++iter) {
-		if (obj->affected[iter].location != APPLY_NONE && obj->affected[iter].modifier != 0) {
-			fprintf(fl, "A\n");
-			fprintf(fl, "%d %d\n", obj->affected[iter].location, obj->affected[iter].modifier);
-		}
+	for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
+		fprintf(fl, "A\n");
+		fprintf(fl, "%d %d %d\n", apply->location, apply->modifier, apply->apply_type);
 	}
 	
 	// B: sets affect bitvector
@@ -3722,10 +3728,14 @@ void write_obj_to_file(FILE *fl, obj_data *obj) {
 * @param room_data *room The room to add.
 */
 void add_room_to_world_tables(room_data *room) {	
-	HASH_ADD(world_hh, world_table, vnum, sizeof(int), room);
+	HASH_ADD_INT(world_table, vnum, room);
+	
+	// interior linked list
 	if (GET_ROOM_VNUM(room) >= MAP_SIZE) {
-		HASH_ADD(interior_hh, interior_world_table, vnum, sizeof(int), room);
+		room->next_interior = interior_room_list;
+		interior_room_list = room;
 	}
+	
 	world_is_sorted = FALSE;
 }
 
@@ -3736,9 +3746,12 @@ void add_room_to_world_tables(room_data *room) {
 * @param room_data *room The room to remove.
 */
 void remove_room_from_world_tables(room_data *room) {
-	HASH_DELETE(world_hh, world_table, room);
+	room_data *temp;
+	
+	HASH_DEL(world_table, room);
+	
 	if (room->vnum >= MAP_SIZE) {
-		HASH_DELETE(interior_hh, interior_world_table, room);
+		REMOVE_FROM_LIST(room, interior_room_list, next_interior);
 	}
 }
 
@@ -3770,7 +3783,7 @@ void parse_room(FILE *fl, room_vnum vnum) {
 	room->vnum = vnum;
 	room->owner = NULL;
 	
-	HASH_FIND(world_hh, world_table, &vnum, sizeof(int), find);
+	HASH_FIND_INT(world_table, &vnum, find);
 	if (find) {
 		log("WARNING: Duplicate room vnum #%d", vnum);
 		// but have to load it anyway to advance the file
@@ -3790,9 +3803,11 @@ void parse_room(FILE *fl, room_vnum vnum) {
 		exit(1);
 	}
 	
-	room->island = t[0];
+	if (t[0] != NOTHING) {
+		SET_ISLAND_ID(room, t[0]);
+	}
 	room->sector_type = sector_proto(t[1]);
-	room->original_sector = sector_proto(t[2]);
+	room->base_sector = sector_proto(t[2]);
 
 	// set up building data?
 	if (IS_ANY_BUILDING(room) || IS_ADVENTURE_ROOM(room)) {
@@ -3951,6 +3966,10 @@ void parse_room(FILE *fl, room_vnum vnum) {
 				add_trd_owner(vnum, atoi(line+1));
 				break;
 			}
+			case 'P': { // crop (plants)
+				set_crop_type(room, crop_proto(atoi(line+1)));
+				break;
+			}
 			case 'R': {	/* resources */
 				if (!get_line(fl, line2)) {
 					log("SYSERR: Unable to read resource line of room #%d", vnum);
@@ -4048,7 +4067,7 @@ void write_room_to_file(FILE *fl, room_data *room) {
 	
 	struct building_resource_type *res;
 	char temp[MAX_STRING_LENGTH];
-	struct room_extra_data *red;
+	struct room_extra_data *red, *next_red;
 	struct depletion_data *dep;
 	struct cooldown_data *cool;
 	trig_data *trig;
@@ -4064,7 +4083,7 @@ void write_room_to_file(FILE *fl, room_data *room) {
 	
 	// both sector and original-sector must save vnums
 	// NOTE: does not need an island id if it's not on the map
-	fprintf(fl, "%d %d %d\n", (GET_ROOM_VNUM(HOME_ROOM(room)) < MAP_SIZE) ? GET_ISLAND_ID(room) : -1, GET_SECT_VNUM(SECT(room)), GET_SECT_VNUM(ROOM_ORIGINAL_SECT(room)));
+	fprintf(fl, "%d %d %d\n", (GET_ROOM_VNUM(room) < MAP_SIZE) ? GET_ISLAND_ID(room) : -1, GET_SECT_VNUM(SECT(room)), GET_SECT_VNUM(BASE_SECT(room)));
 	
 	// B building data
 	if (COMPLEX_DATA(room)) {
@@ -4152,6 +4171,11 @@ void write_room_to_file(FILE *fl, room_data *room) {
 		fprintf(fl, "O%d\n", EMPIRE_VNUM(ROOM_OWNER(room)));
 	}
 	
+	// P crop (plant)
+	if (ROOM_CROP(room)) {
+		fprintf(fl, "P%d\n", GET_CROP_VNUM(ROOM_CROP(room)));
+	}
+	
 	// R resource
 	if (COMPLEX_DATA(room) && BUILDING_RESOURCES(room)) {
 		for (res = BUILDING_RESOURCES(room); res; res = res->next) {
@@ -4184,7 +4208,7 @@ void write_room_to_file(FILE *fl, room_data *room) {
 	// no longer used: script_save_to_disk(fl, room, WLD_TRIGGER);
 	
 	// Z: extra data
-	for (red = room->extra_data; red; red = red->next) {
+	HASH_ITER(hh, room->extra_data, red, next_red) {
 		fprintf(fl, "Z\n%d %d\n", red->type, red->value);
 	}
 	
@@ -5774,15 +5798,9 @@ room_data *real_real_room(room_vnum vnum) {
 		return NULL;
 	}
 	
-	if (vnum >= MAP_SIZE) {
-		// smaller lookup table
-		HASH_FIND(interior_hh, interior_world_table, &vnum, sizeof(int), room);
-	}
-	else {
-		// whole world
-		HASH_FIND(world_hh, world_table, &vnum, sizeof(int), room);
-	}
-
+	// whole world
+	HASH_FIND_INT(world_table, &vnum, room);
+	
 	return room;
 }
 
@@ -5807,9 +5825,9 @@ room_data *real_room(room_vnum vnum) {
 	
 	// we guarantee map rooms exist
 	if (!room && vnum < MAP_SIZE) {
-		room = create_ocean_room(vnum);
+		room = load_map_room(vnum);
 	}
-
+	
 	return room;
 }
 
@@ -6473,8 +6491,7 @@ int sort_world_table_func(void *a, void *b) {
 */
 void sort_world_table(void) {
 	if (!world_is_sorted) {
-		HASH_SRT(world_hh, world_table, sort_world_table_func);
-		HASH_SRT(interior_hh, interior_world_table, sort_world_table_func);
+		HASH_SORT(world_table, sort_world_table_func);
 	}
 	world_is_sorted = TRUE;
 }
@@ -6482,6 +6499,49 @@ void sort_world_table(void) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// MISCELLANEOUS LIB ///////////////////////////////////////////////////////
+
+/**
+* Creates a copy of a list of applies.
+*
+* @param struct obj_apply *list The list to copy.
+* @return struct obj_apply* A pointer to the copy list.
+*/
+struct obj_apply *copy_apply_list(struct obj_apply *list) {
+	struct obj_apply *new_list, *last, *iter, *new;
+	
+	new_list = last = NULL;
+	for (iter = list; iter; iter = iter->next) {
+		CREATE(new, struct obj_apply, 1);
+		*new = *iter;
+		new->next = NULL;
+		
+		if (last) {
+			last->next = new;
+		}
+		else {
+			new_list = new;
+		}
+		last = new;
+	}
+	
+	return new_list;
+}
+
+
+/**
+* Frees the memory for a list of object applies.
+*
+* @param struct obj_apply *list The start of the list to free.
+*/
+void free_apply_list(struct obj_apply *list) {
+	struct obj_apply *app;
+	
+	while ((app = list)) {
+		list = app->next;
+		free(app);
+	}
+}
+
 
 /**
 * Creates and initialies a complex room data pointer.
@@ -6520,6 +6580,9 @@ void free_complex_data(struct complex_room_data *data) {
 	
 	while ((ex = data->exits)) {
 		data->exits = ex->next;
+		if (ex->room_ptr) {
+			--GET_EXITS_HERE(ex->room_ptr);
+		}
 		if (ex->keyword) {
 			free(ex->keyword);
 		}

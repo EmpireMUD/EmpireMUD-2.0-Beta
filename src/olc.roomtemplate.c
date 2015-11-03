@@ -307,7 +307,9 @@ void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
 	
 	// update world
 	count = 0;
-	HASH_ITER(interior_hh, interior_world_table, room, next_room) {
+	for (room = interior_room_list; room; room = next_room) {
+		next_room = room->next_interior;
+		
 		if (ROOM_TEMPLATE_VNUM(room) == vnum) {
 			delete_room(room, FALSE);	// must call check_all_exits
 			++count;

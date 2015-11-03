@@ -31,6 +31,7 @@
 
 // externs
 extern const char *affected_bits[];
+extern const char *apply_type_names[];
 extern const char *apply_types[];
 extern const char *armor_types[NUM_ARMOR_TYPES+1];
 extern const char *container_bits[];
@@ -886,6 +887,10 @@ void save_olc_object(descriptor_data *desc) {
 		free(ocm);
 	}
 	
+	// old applies
+	free_apply_list(GET_OBJ_APPLIES(proto));
+	GET_OBJ_APPLIES(proto) = NULL;
+	
 	// free old script?
 	if (proto->proto_script) {
 		free_proto_script(proto, OBJ_TRIGGER);
@@ -902,6 +907,9 @@ void save_olc_object(descriptor_data *desc) {
 	*proto = *obj;
 	proto->vnum = vnum;	// ensure correct vnum
 	proto->hh = hh;	// restore hash handle
+	
+	// remove the reference to this so it won't be free'd
+	GET_OBJ_APPLIES(obj) = NULL;
 	
 	// and save to file
 	save_library_file_for_vnum(DB_BOOT_OBJ, vnum);
@@ -1021,7 +1029,10 @@ obj_data *setup_olc_object(obj_data *input) {
 			}
 			last_ocm = new_ocm;
 		}
-
+		
+		// copy applies
+		GET_OBJ_APPLIES(new) = copy_apply_list(GET_OBJ_APPLIES(input));
+		
 		// copy scripts
 		SCRIPT(new) = NULL;
 		new->proto_script = NULL;
@@ -1188,7 +1199,8 @@ void olc_show_object(char_data *ch) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	struct obj_storage_type *store;
 	struct obj_custom_message *ocm;
-	int iter, count, minutes;
+	struct obj_apply *apply;
+	int count, minutes;
 	
 	if (!obj) {
 		return;
@@ -1238,20 +1250,13 @@ void olc_show_object(char_data *ch) {
 	// applies / affected[]
 	count = 0;
 	sprintf(buf + strlen(buf), "Attribute Applies: <&yapply&0>\r\n");
-	for (iter = 0; iter < MAX_OBJ_AFFECT; ++iter) {
-		if (obj->affected[iter].location != APPLY_NONE) {
-			sprintf(buf1, "%+d to %s", obj->affected[iter].modifier, apply_types[(int) obj->affected[iter].location]);
-			sprintf(buf + strlen(buf), " &y%2d&0. %-25.25s%s", count + 1, buf1, ((count % 2) ? "\r\n" : ""));
-			++count;
-		}
+	for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
+		sprintf(buf + strlen(buf), " &y%2d&0. %+d to %s (%s)\r\n", ++count, apply->modifier, apply_types[(int) apply->location], apply_type_names[(int)apply->apply_type]);
 	}
 	if (count == 0) {
 		strcat(buf, " none\r\n");
 	}
-	else if ((count % 2) != 0) {
-		strcat(buf, "\r\n");
-	}
-
+	
 	// exdesc
 	sprintf(buf + strlen(buf), "Extra descriptions: <&yextra&0>\r\n");
 	get_extra_desc_display(obj->ex_description, buf1);
@@ -1325,13 +1330,12 @@ OLC_MODULE(oedit_animalsrequired) {
 }
 
 
-// usage: apply add <value> <type>
-// usage: apply remove <number | all>
 OLC_MODULE(oedit_apply) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
-	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], arg4[MAX_INPUT_LENGTH];
 	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
-	int loc, num, iter, change;
+	int loc, num, iter, apply_type;
+	struct obj_apply *apply, *change, *temp;
 	bool found;
 	
 	// arg1 arg2 arg3
@@ -1343,9 +1347,8 @@ OLC_MODULE(oedit_apply) {
 			msg_to_char(ch, "Remove which apply (number)?\r\n");
 		}
 		else if (!str_cmp(arg2, "all")) {
-			for (iter = 0; iter < MAX_OBJ_AFFECT; ++iter) {
-				obj->affected[iter].location = APPLY_NONE;
-			}
+			free_apply_list(GET_OBJ_APPLIES(obj));
+			GET_OBJ_APPLIES(obj) = NULL;
 			msg_to_char(ch, "You remove all the applies.\r\n");
 		}
 		else if (!isdigit(*arg2) || (num = atoi(arg2)) < 1) {
@@ -1353,13 +1356,13 @@ OLC_MODULE(oedit_apply) {
 		}
 		else {
 			found = FALSE;
-			for (iter = 0; iter < MAX_OBJ_AFFECT && !found; ++iter) {
-				if (obj->affected[iter].location != APPLY_NONE && --num == 0) {
+			for (apply = GET_OBJ_APPLIES(obj); apply && !found; apply = apply->next) {
+				if (--num == 0) {
 					found = TRUE;
 					
-					msg_to_char(ch, "You remove the %+d to %s.\r\n", obj->affected[iter].modifier, apply_types[(int) obj->affected[iter].location]);
-					obj->affected[iter].location = APPLY_NONE;
-					obj->affected[iter].modifier = 0;
+					msg_to_char(ch, "You remove the %+d to %s (%s).\r\n", apply->modifier, apply_types[(int)apply->location], apply_type_names[(int)apply->apply_type]);
+					REMOVE_FROM_LIST(apply, GET_OBJ_APPLIES(obj), next);
+					free(apply);
 				}
 			}
 			
@@ -1369,31 +1372,39 @@ OLC_MODULE(oedit_apply) {
 		}
 	}
 	else if (is_abbrev(arg1, "add")) {
+		strcpy(arg1, arg3);
+		half_chop(arg1, arg3, arg4);
+		
 		num = atoi(arg2);
+		apply_type = APPLY_TYPE_NATURAL;	// default
 		
 		if (!*arg2 || !*arg3 || (!isdigit(*arg2) && *arg2 != '-')) {
-			msg_to_char(ch, "Usage: apply add <value> <type>\r\n");
+			msg_to_char(ch, "Usage: apply add <value> <apply> [type]\r\n");
 		}
 		else if ((loc = search_block(arg3, apply_types, FALSE)) == NOTHING) {
-			msg_to_char(ch, "Invalid type.\r\n");
+			msg_to_char(ch, "Invalid apply.\r\n");
+		}
+		else if (*arg4 && (apply_type = search_block(arg4, apply_type_names, FALSE)) == NOTHING) {
+			msg_to_char(ch, "Invalid apply type.\r\n");
 		}
 		else {
-			found = FALSE;
-			for (iter = 0; iter < MAX_OBJ_AFFECT && !found; ++iter) {
-				if (obj->affected[iter].location == APPLY_NONE) {
-					found = TRUE;
-					
-					obj->affected[iter].location = loc;
-					obj->affected[iter].modifier = num;
-				}
-			}
+			CREATE(apply, struct obj_apply, 1);
+			apply->location = loc;
+			apply->modifier = num;
+			apply->apply_type = apply_type;
 			
-			if (found) {
-				msg_to_char(ch, "You add %+d to %s.\r\n", num, apply_types[loc]);
+			// append to end
+			if ((temp = GET_OBJ_APPLIES(obj))) {
+				while (temp->next) {
+					temp = temp->next;
+				}
+				temp->next = apply;
 			}
 			else {
-				msg_to_char(ch, "There is no room for more applies.\r\n");
+				GET_OBJ_APPLIES(obj) = apply;
 			}
+			
+			msg_to_char(ch, "You add %+d to %s (%s).\r\n", num, apply_types[loc], apply_type_names[apply_type]);
 		}
 	}
 	else if (is_abbrev(arg1, "change")) {
@@ -1401,21 +1412,23 @@ OLC_MODULE(oedit_apply) {
 		half_chop(arg3, type_arg, val_arg);
 		
 		if (!*num_arg || !isdigit(*num_arg) || !*type_arg || !*val_arg) {
-			msg_to_char(ch, "Usage: apply change <number> <value | type> <new value>\r\n");
+			msg_to_char(ch, "Usage: apply change <number> <value | apply | type> <new value>\r\n");
 			return;
 		}
 		
 		// find which one to change
-		num = atoi(num_arg);
-		change = -1;
-		for (iter = 0; iter < MAX_OBJ_AFFECT && change == -1; ++iter) {
-			if (obj->affected[iter].location != APPLY_NONE && --num == 0) {
-				change = iter;
+		if (!isdigit(*num_arg) || (num = atoi(num_arg)) < 1) {
+			msg_to_char(ch, "Invalid apply number.\r\n");
+			return;
+		}
+		change = NULL;
+		for (apply = GET_OBJ_APPLIES(obj); apply && !change; apply = apply->next) {
+			if (--num == 0) {
+				change = apply;
 				break;
 			}
 		}
-		
-		if (change == -1) {
+		if (!change) {
 			msg_to_char(ch, "Invalid apply number.\r\n");
 		}
 		else if (is_abbrev(type_arg, "value")) {
@@ -1424,31 +1437,48 @@ OLC_MODULE(oedit_apply) {
 				msg_to_char(ch, "Invalid value '%s'.\r\n", val_arg);
 			}
 			else {
-				obj->affected[change].modifier = num;
+				change->modifier = num;
 				msg_to_char(ch, "Apply %d changed to value %+d.\r\n", atoi(num_arg), num);
 			}
 		}
-		else if (is_abbrev(type_arg, "type")) {
+		else if (is_abbrev(type_arg, "apply")) {
 			if ((loc = search_block(val_arg, apply_types, FALSE)) == NOTHING) {
-				msg_to_char(ch, "Invalid type.\r\n");
+				msg_to_char(ch, "Invalid apply.\r\n");
 			}
 			else {
-				obj->affected[change].location = loc;
-				msg_to_char(ch, "Apply %d changed to type %s.\r\n", atoi(num_arg), apply_types[loc]);
+				change->location = loc;
+				msg_to_char(ch, "Apply %d changed to %s.\r\n", atoi(num_arg), apply_types[loc]);
+			}
+		}
+		else if (is_abbrev(type_arg, "type")) {
+			if ((loc = search_block(val_arg, apply_type_names, FALSE)) == NOTHING) {
+				msg_to_char(ch, "Invalid apply type.\r\n");
+			}
+			else {
+				change->apply_type = loc;
+				msg_to_char(ch, "Apply %d changed to %s.\r\n", atoi(num_arg), apply_type_names[loc]);
 			}
 		}
 		else {
-			msg_to_char(ch, "You can only change the value or type.\r\n");
+			msg_to_char(ch, "You can only change the value, apply, or type.\r\n");
 		}
 	}
 	else {
-		msg_to_char(ch, "Usage: apply add <value> <type>\r\n");
-		msg_to_char(ch, "Usage: apply change <number> <value | type> <new value>\r\n");
+		msg_to_char(ch, "Usage: apply add <value> <apply> [type]\r\n");
+		msg_to_char(ch, "Usage: apply change <number> <value | apply | type> <new value>\r\n");
 		msg_to_char(ch, "Usage: apply remove <number | all>\r\n");
-		msg_to_char(ch, "Available types:\r\n");
 		
+		msg_to_char(ch, "Available applies:\r\n");
 		for (iter = 0; *apply_types[iter] != '\n'; ++iter) {
 			msg_to_char(ch, " %-24.24s%s", apply_types[iter], ((iter % 2) ? "\r\n" : ""));
+		}
+		if ((iter % 2) != 0) {
+			msg_to_char(ch, "\r\n");
+		}
+		
+		msg_to_char(ch, "Available types:\r\n");
+		for (iter = 0; *apply_type_names[iter] != '\n'; ++iter) {
+			msg_to_char(ch, " %-24.24s%s", apply_type_names[iter], ((iter % 2) ? "\r\n" : ""));
 		}
 		if ((iter % 2) != 0) {
 			msg_to_char(ch, "\r\n");

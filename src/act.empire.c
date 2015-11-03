@@ -662,7 +662,7 @@ void claim_city(char_data *ch, char *argument) {
 			}
 			
 			// ok...
-			if (all || (SECT(to_room) != ROOM_ORIGINAL_SECT(to_room))) {
+			if (all || (SECT(to_room) != BASE_SECT(to_room))) {
 				found = TRUE;
 				claim_room(to_room, emp);
 				
@@ -674,7 +674,9 @@ void claim_city(char_data *ch, char *argument) {
 	
 	if (found) {
 		// update the inside (interior rooms only)
-		HASH_ITER(interior_hh, interior_world_table, iter, next_iter) {
+		for (iter = interior_room_list; iter; iter = next_iter) {
+			next_iter = iter->next_interior;
+			
 			home = HOME_ROOM(iter);
 			if (home != iter && ROOM_OWNER(home) == emp) {
 				ROOM_OWNER(iter) = emp;
@@ -1769,7 +1771,7 @@ void scan_for_tile(char_data *ch, char *argument) {
 			else if (GET_BUILDING(room) && multi_isname(argument, GET_BLD_NAME(GET_BUILDING(room)))) {
 				ok = TRUE;
 			}
-			else if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && (crop = crop_proto(ROOM_CROP_TYPE(room))) && multi_isname(argument, GET_CROP_NAME(crop))) {
+			else if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && (crop = ROOM_CROP(room)) && multi_isname(argument, GET_CROP_NAME(crop))) {
 				ok = TRUE;
 			}
 			else if (multi_isname(argument, get_room_name(room, FALSE))) {
@@ -2072,7 +2074,9 @@ ACMD(do_cede) {
 		
 		// mark as ceded
 		set_room_extra_data(room, ROOM_EXTRA_CEDED, 1);
-		HASH_ITER(interior_hh, interior_world_table, iter, next_iter) {
+		for (iter = interior_room_list; iter; iter = next_iter) {
+			next_iter = iter->next_interior;
+			
 			if (HOME_ROOM(iter) == room) {
 				set_room_extra_data(iter, ROOM_EXTRA_CEDED, 1);
 			}
@@ -2589,7 +2593,7 @@ ACMD(do_efind) {
 		total = 0;
 		
 		// first, gotta find them all
-		HASH_ITER(world_hh, world_table, iter, next_iter) {
+		HASH_ITER(hh, world_table, iter, next_iter) {
 			if (ROOM_OWNER(iter) == emp) {			
 				for (obj = ROOM_CONTENTS(iter); obj; obj = obj->next_content) {
 					if ((all && CAN_WEAR(obj, ITEM_WEAR_TAKE)) || (!all && isname(arg, obj->name))) {
@@ -3138,7 +3142,7 @@ ACMD(do_enroll) {
 			EMPIRE_TERRITORY_LIST(old) = NULL;
 			
 			// move territory over
-			HASH_ITER(world_hh, world_table, room, next_room) {
+			HASH_ITER(hh, world_table, room, next_room) {
 				if (ROOM_OWNER(room) == old) {
 					ROOM_OWNER(room) = e;
 				}
@@ -3395,7 +3399,7 @@ ACMD(do_findmaintenance) {
 		msg_to_char(ch, "You can't use findmaintenance if you are not in an empire.\r\n");
 	}
 	else {
-		HASH_ITER(world_hh, world_table, iter, next_iter) {
+		HASH_ITER(hh, world_table, iter, next_iter) {
 			// skip non-map
 			if (GET_ROOM_VNUM(iter) >= MAP_SIZE) {
 				continue;
@@ -3448,7 +3452,7 @@ room_data *find_home(char_data *ch) {
 		return NULL;
 	}
 	
-	HASH_ITER(world_hh, world_table, iter, next_iter) {
+	HASH_ITER(hh, world_table, iter, next_iter) {
 		if (ROOM_PRIVATE_OWNER(iter) == GET_IDNUM(ch)) {
 			return iter;
 		}
@@ -3539,8 +3543,10 @@ ACMD(do_home) {
 			
 			COMPLEX_DATA(real)->private_owner = GET_IDNUM(ch);
 
-			// interior only			
-			HASH_ITER(interior_hh, interior_world_table, iter, next_iter) {
+			// interior only
+			for (iter = interior_room_list; iter; iter = next_iter) {
+				next_iter = iter->next_interior;
+				
 				// TODO consider a trigger like RoomUpdate that passes a var like %update% == homeset
 				if (HOME_ROOM(iter) == real && BUILDING_VNUM(iter) == RTYPE_BEDROOM) {
 					obj_to_room((obj = read_object(o_HOME_CHEST, TRUE)), iter);
@@ -4388,7 +4394,7 @@ ACMD(do_territory) {
 	outside_only = *argument ? FALSE : TRUE;
 	
 	// ready?
-	HASH_ITER(world_hh, world_table, iter, next_iter) {
+	HASH_ITER(hh, world_table, iter, next_iter) {
 		if (outside_only && GET_ROOM_VNUM(iter) >= MAP_SIZE) {
 			continue;
 		}
@@ -4406,7 +4412,7 @@ ACMD(do_territory) {
 				else if (GET_BUILDING(iter) && multi_isname(argument, GET_BLD_NAME(GET_BUILDING(iter)))) {
 					ok = TRUE;
 				}
-				else if (ROOM_SECT_FLAGGED(iter, SECTF_HAS_CROP_DATA) && (crop = crop_proto(ROOM_CROP_TYPE(iter))) && multi_isname(argument, GET_CROP_NAME(crop))) {
+				else if (ROOM_SECT_FLAGGED(iter, SECTF_HAS_CROP_DATA) && (crop = ROOM_CROP(iter)) && multi_isname(argument, GET_CROP_NAME(crop))) {
 					ok = TRUE;
 				}
 				else if (multi_isname(argument, get_room_name(iter, FALSE))) {
@@ -4476,7 +4482,7 @@ ACMD(do_unpublicize) {
 	else if (GET_RANK(ch) < EMPIRE_NUM_RANKS(e))
 		msg_to_char(ch, "You're of insufficient rank to remove all public status for the empire.\r\n");
 	else {
-		HASH_ITER(world_hh, world_table, iter, next_iter) {
+		HASH_ITER(hh, world_table, iter, next_iter) {
 			if (ROOM_AFF_FLAGGED(iter, ROOM_AFF_PUBLIC) && ROOM_OWNER(iter) == e) {
 				REMOVE_BIT(ROOM_AFF_FLAGS(iter), ROOM_AFF_PUBLIC);
 				REMOVE_BIT(ROOM_BASE_FLAGS(iter), ROOM_AFF_PUBLIC);

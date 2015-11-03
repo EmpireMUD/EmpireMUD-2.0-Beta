@@ -137,9 +137,10 @@ void special_building_setup(char_data *ch, room_data *room) {
 * @return TRUE if valid, FALSE if not
 */
 bool can_build_on(room_data *room, bitvector_t flags) {
-	#define CLEAR_OPEN_BUILDING(r)	(IS_MAP_BUILDING(r) && ROOM_BLD_FLAGGED((r), BLD_OPEN) && !ROOM_BLD_FLAGGED((r), BLD_BARRIER) && (IS_COMPLETE(r) || !SECT_FLAGGED(ROOM_ORIGINAL_SECT(r), SECTF_FRESH_WATER | SECTF_OCEAN)))
+	#define CLEAR_OPEN_BUILDING(r)	(IS_MAP_BUILDING(r) && ROOM_BLD_FLAGGED((r), BLD_OPEN) && !ROOM_BLD_FLAGGED((r), BLD_BARRIER) && (IS_COMPLETE(r) || !SECT_FLAGGED(BASE_SECT(r), SECTF_FRESH_WATER | SECTF_OCEAN)))
+	#define IS_PLAYER_MADE(r)  (GET_ROOM_VNUM(r) < MAP_SIZE && SECT(r) != world_map[FLAT_X_COORD(r)][FLAT_Y_COORD(r)].natural_sector)
 
-	return (!IS_SET(flags, BLD_ON_NOT_PLAYER_MADE) || !ROOM_AFF_FLAGGED(room, ROOM_AFF_PLAYER_MADE)) && (
+	return (!IS_SET(flags, BLD_ON_NOT_PLAYER_MADE) || !IS_PLAYER_MADE(room)) && (
 		IS_SET(GET_SECT_BUILD_FLAGS(SECT(room)), flags) || 
 		(IS_SET(flags, BLD_FACING_OPEN_BUILDING) && CLEAR_OPEN_BUILDING(room))
 	);
@@ -263,7 +264,7 @@ void construct_building(room_data *room, bld_vnum type) {
 	
 	sect = SECT(room);
 	change_terrain(room, config_get_int("default_building_sect"));
-	ROOM_ORIGINAL_SECT(room) = sect;
+	change_base_sector(room, sect);
 	
 	// set actual data
 	attach_building_to_room(building_proto(type), room);
@@ -337,6 +338,7 @@ void disassociate_building(room_data *room) {
 	void decustomize_room(room_data *room);
 	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 	void remove_designate_objects(room_data *room);
+	extern bool world_map_needs_save;
 	
 	room_data *iter, *next_iter;
 	struct instance_data *inst;
@@ -358,8 +360,12 @@ void disassociate_building(room_data *room) {
 	// free up the customs
 	decustomize_room(room);
 
-	// restore sect
-	SECT(room) = ROOM_ORIGINAL_SECT(room);
+	// restore sect: this does not use change_terrain()
+	SECT(room) = BASE_SECT(room);
+	if (GET_ROOM_VNUM(room) < MAP_SIZE) {
+		world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)].sector_type = SECT(room);
+		world_map_needs_save = TRUE;
+	}
 	
 	if (COMPLEX_DATA(room)) {
 		COMPLEX_DATA(room)->home_room = NULL;
@@ -377,7 +383,9 @@ void disassociate_building(room_data *room) {
 	remove_room_extra_data(room, ROOM_EXTRA_REDESIGNATE_TIME);
 
 	// disassociate inside rooms
-	HASH_ITER(interior_hh, interior_world_table, iter, next_iter) {
+	for (iter = interior_room_list; iter; iter = next_iter) {
+		next_iter = iter->next_interior;
+		
 		if (HOME_ROOM(iter) == room && iter != room) {
 			remove_designate_objects(iter);
 			
@@ -943,7 +951,9 @@ void start_dismantle_building(room_data *loc) {
 	}
 
 	// interior only
-	HASH_ITER(interior_hh, interior_world_table, room, next_room) {
+	for (room = interior_room_list; room; room = next_room) {
+		next_room = room->next_interior;
+		
 		if (HOME_ROOM(room) == loc) {
 			remove_designate_objects(room);
 			delete_room_npcs(room, NULL);
@@ -1374,7 +1384,7 @@ ACMD(do_dismantle) {
 		return;
 	}
 	
-	if (SECT_FLAGGED(ROOM_ORIGINAL_SECT(IN_ROOM(ch)), SECTF_FRESH_WATER | SECTF_OCEAN) && is_entrance(IN_ROOM(ch))) {
+	if (SECT_FLAGGED(BASE_SECT(IN_ROOM(ch)), SECTF_FRESH_WATER | SECTF_OCEAN) && is_entrance(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't dismantle here because it's the entrance for another building.\r\n");
 		return;
 	}
@@ -1385,14 +1395,16 @@ ACMD(do_dismantle) {
 	}
 	
 	start_dismantle_building(IN_ROOM(ch));
-	if (ROOM_OWNER(IN_ROOM(ch))) {
-		read_empire_territory(ROOM_OWNER(IN_ROOM(ch)));
-	}
 	start_action(ch, ACT_DISMANTLING, 0);
 	msg_to_char(ch, "You begin to dismantle the building.\r\n");
 	act("$n begins to dismantle the building.\r\n", FALSE, ch, 0, 0, TO_ROOM);
 	process_dismantling(ch, IN_ROOM(ch));
 	command_lag(ch, WAIT_OTHER);
+	
+	// read this AFTER the process_dismantle, in case the building completes
+	if (ROOM_OWNER(IN_ROOM(ch))) {
+		reread_empire_tech(ROOM_OWNER(IN_ROOM(ch)));
+	}
 }
 
 
@@ -1751,7 +1763,7 @@ ACMD(do_interlink) {
 ACMD(do_lay) {
 	Resource cost[3] = { { o_ROCK, 20 }, END_RESOURCE_LIST };
 	sector_data *original_sect = SECT(IN_ROOM(ch));
-	sector_data *check_sect = (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_IS_ROAD) ? ROOM_ORIGINAL_SECT(IN_ROOM(ch)) : SECT(IN_ROOM(ch)));
+	sector_data *check_sect = (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_IS_ROAD) ? BASE_SECT(IN_ROOM(ch)) : SECT(IN_ROOM(ch)));
 	sector_data *road_sect = find_first_matching_sector(SECTF_IS_ROAD, NOBITS);
 
 	if (IS_NPC(ch)) {
@@ -1813,7 +1825,7 @@ ACMD(do_lay) {
 		change_terrain(IN_ROOM(ch), GET_SECT_VNUM(road_sect));
 		
 		// preserve this for un-laying the road (disassociate_building)
-		ROOM_ORIGINAL_SECT(IN_ROOM(ch)) = original_sect;
+		change_base_sector(IN_ROOM(ch), original_sect);
 
 		command_lag(ch, WAIT_OTHER);
 		check_lay_territory(ch, IN_ROOM(ch));
@@ -1913,7 +1925,7 @@ ACMD(do_tunnel) {
 			}
 
 			// found a non-rough
-			if (!SECT_FLAGGED(ROOM_ORIGINAL_SECT(to_room), SECTF_ROUGH)) {
+			if (!SECT_FLAGGED(BASE_SECT(to_room), SECTF_ROUGH)) {
 				// did we at least have a last room?
 				if (last_room) {
 					exit = last_room;

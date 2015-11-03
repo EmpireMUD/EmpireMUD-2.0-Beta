@@ -2572,7 +2572,7 @@ static const char *GetMSSP_DB_Size() {
 	size += HASH_COUNT(mobile_table);
 	size += HASH_COUNT(object_table);
 	size += HASH_COUNT(adventure_table);
-	size += HASH_CNT(world_hh, world_table);
+	size += HASH_COUNT(world_table);
 	size += HASH_COUNT(building_table);
 	size += HASH_COUNT(room_template_table);
 	size += HASH_COUNT(sector_table);
@@ -2701,7 +2701,7 @@ static const char *GetMSSP_Port() {
 
 static const char *GetMSSP_Rooms() {
 	static char buf[256];
-	snprintf(buf, sizeof(buf), "%d", HASH_CNT(world_hh, world_table));
+	snprintf(buf, sizeof(buf), "%d", HASH_COUNT(world_table));
 	return buf;
 }
 

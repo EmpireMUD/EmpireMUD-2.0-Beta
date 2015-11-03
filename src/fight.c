@@ -1356,7 +1356,7 @@ static bool tower_would_shoot(room_data *from_room, char_data *vict) {
 	}
 	
 	// can't see into buildings/mountains
-	if (ROOM_IS_CLOSED(to_room) || ROOM_SECT_FLAGGED(to_room, SECTF_OBSCURE_VISION) || SECT_FLAGGED(ROOM_ORIGINAL_SECT(to_room), SECTF_OBSCURE_VISION)) {
+	if (ROOM_IS_CLOSED(to_room) || ROOM_SECT_FLAGGED(to_room, SECTF_OBSCURE_VISION) || SECT_FLAGGED(BASE_SECT(to_room), SECTF_OBSCURE_VISION)) {
 		return FALSE;
 	}
 
@@ -1976,7 +1976,7 @@ void besiege_room(room_data *to_room, int damage) {
 	empire_data *emp = ROOM_OWNER(to_room);
 	int max_dam;
 	bool junk;
-	room_data *rm, *next_rm;
+	room_data *rm;
 	
 	// make sure we only hit the home-room
 	to_room = HOME_ROOM(to_room);
@@ -2022,7 +2022,7 @@ void besiege_room(room_data *to_room, int damage) {
 			if (ROOM_PEOPLE(to_room)) {
 				act("The building is hit by something and shakes violently!", FALSE, ROOM_PEOPLE(to_room), 0, 0, TO_CHAR | TO_ROOM);
 			}
-			HASH_ITER(interior_hh, interior_world_table, rm, next_rm) {
+			for (rm = interior_room_list; rm; rm = rm->next_interior) {
 				if (HOME_ROOM(rm) == to_room && ROOM_PEOPLE(rm)) {
 					act("The building is hit by something and shakes violently!", FALSE, ROOM_PEOPLE(rm), 0, 0, TO_CHAR | TO_ROOM);
 				}
@@ -2176,6 +2176,8 @@ bool check_combat_position(char_data *ch, double speed) {
  *	> 0	How much damage done.
  */
 int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damtype) {
+	extern const struct wear_data_type wear_data[NUM_WEARS];
+	
 	struct instance_data *inst;
 	int iter;
 	bool full_miss = (dam <= 0);
@@ -2313,7 +2315,7 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 
 		// armor skills
 		for (iter = 0; iter < NUM_WEARS; ++iter) {
-			if (GET_EQ(victim, iter) && GET_ARMOR_TYPE(GET_EQ(victim, iter)) != NOTHING) {
+			if (wear_data[iter].count_stats && GET_EQ(victim, iter) && GET_ARMOR_TYPE(GET_EQ(victim, iter)) != NOTHING) {
 				switch (GET_ARMOR_TYPE(GET_EQ(victim, iter))) {
 					case ARMOR_MAGE: {
 						gain_ability_exp(victim, ABIL_MAGE_ARMOR, 2);

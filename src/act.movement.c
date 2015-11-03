@@ -46,7 +46,7 @@ extern const char *from_dir[];
 #define MOVE_EARTHMELD	4
 #define MOVE_SWIM		5	// swim skill
 
-#define WATER_SECT(room)		(ROOM_SECT_FLAGGED((room), SECTF_FRESH_WATER | SECTF_OCEAN) || ROOM_BLD_FLAGGED((room), BLD_NEED_BOAT) || RMT_FLAGGED((room), RMT_NEED_BOAT) || (IS_WATER_BUILDING(room) && !IS_COMPLETE(room) && SECT_FLAGGED(ROOM_ORIGINAL_SECT(room), SECTF_FRESH_WATER | SECTF_OCEAN)))
+#define WATER_SECT(room)		(ROOM_SECT_FLAGGED((room), SECTF_FRESH_WATER | SECTF_OCEAN) || ROOM_BLD_FLAGGED((room), BLD_NEED_BOAT) || RMT_FLAGGED((room), RMT_NEED_BOAT) || (IS_WATER_BUILDING(room) && !IS_COMPLETE(room) && SECT_FLAGGED(BASE_SECT(room), SECTF_FRESH_WATER | SECTF_OCEAN)))
 #define DEEP_WATER_SECT(room)	(ROOM_SECT_FLAGGED((room), SECTF_OCEAN))
 
 
@@ -365,7 +365,7 @@ int move_cost(char_data *ch, room_data *from, room_data *to, int dir, int mode) 
 	
 	// open buildings and incomplete non-closed buildings use average of current & original sect's move cost
 	if (!ROOM_IS_CLOSED(from)) {
-		cost_from = (GET_SECT_MOVE_LOSS(SECT(from)) + GET_SECT_MOVE_LOSS(ROOM_ORIGINAL_SECT(from))) / 2.0;
+		cost_from = (GET_SECT_MOVE_LOSS(SECT(from)) + GET_SECT_MOVE_LOSS(BASE_SECT(from))) / 2.0;
 	}
 	else {
 		cost_from = GET_SECT_MOVE_LOSS(SECT(from));
@@ -373,7 +373,7 @@ int move_cost(char_data *ch, room_data *from, room_data *to, int dir, int mode) 
 	
 	// cost for the space moving to
 	if (!ROOM_IS_CLOSED(to)) {
-		cost_to = (GET_SECT_MOVE_LOSS(SECT(to)) + GET_SECT_MOVE_LOSS(ROOM_ORIGINAL_SECT(to))) / 2.0;
+		cost_to = (GET_SECT_MOVE_LOSS(SECT(to)) + GET_SECT_MOVE_LOSS(BASE_SECT(to))) / 2.0;
 	}
 	else {
 		cost_to = GET_SECT_MOVE_LOSS(SECT(to));
@@ -1482,7 +1482,7 @@ ACMD(do_portal) {
 		
 		count = 0;
 		ch_in_city = (is_in_city_for_empire(IN_ROOM(ch), ROOM_OWNER(IN_ROOM(ch)), TRUE, &wait_here) || (!ROOM_OWNER(IN_ROOM(ch)) && is_in_city_for_empire(IN_ROOM(ch), GET_LOYALTY(ch), TRUE, &wait_here)));
-		HASH_ITER(world_hh, world_table, room, next_room) {
+		HASH_ITER(hh, world_table, room, next_room) {
 			// early exit
 			if (bsize >= sizeof(buf) - 1) {
 				break;
@@ -1525,7 +1525,7 @@ ACMD(do_portal) {
 	
 	// targeting: by list number (only targets member/ally portals
 	if (is_number(arg) && (num = atoi(arg)) >= 1 && GET_LOYALTY(ch)) {
-		HASH_ITER(world_hh, world_table, room, next_room) {
+		HASH_ITER(hh, world_table, room, next_room) {
 			if (ROOM_OWNER(room) && ROOM_BLD_FLAGGED(room, BLD_PORTAL) && IS_COMPLETE(room) && can_use_room(ch, room, MEMBERS_AND_ALLIES)) {
 				if (--num <= 0) {
 					target = room;
@@ -1869,7 +1869,7 @@ ACMD(do_worm) {
 	}
 	else if (!(to_room = real_shift(IN_ROOM(ch), shift_dir[dir][0], shift_dir[dir][1])))
 		msg_to_char(ch, "You can't go that way!\r\n");
-	else if (ROOM_SECT_FLAGGED(to_room, SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_SHALLOW_WATER) || SECT_FLAGGED(ROOM_ORIGINAL_SECT(to_room), SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_SHALLOW_WATER))
+	else if (ROOM_SECT_FLAGGED(to_room, SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_SHALLOW_WATER) || SECT_FLAGGED(BASE_SECT(to_room), SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_SHALLOW_WATER))
 		msg_to_char(ch, "You can't pass through the water!\r\n");
 	else if (GET_MOVE(ch) < 1)
 		msg_to_char(ch, "You don't have enough energy left to do that.\r\n");

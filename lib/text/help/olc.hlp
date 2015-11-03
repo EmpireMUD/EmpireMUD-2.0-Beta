@@ -1995,14 +1995,19 @@ with 0 animals, it can never be pulled.
 
 See also: HARNESS, OLC OBJECTS
 #d
-"OEDIT APPLY" APPLIES
+"OEDIT APPLY" "OEDIT APPLIES" APPLIES
 
-Usage:  .apply add <value> <type>
-        .apply change <number> <value | type> <new value>
+Usage:  .apply add <value> <apply> [type]
+        .apply change <number> <value | apply | type> <new value>
         .apply remove <number | all>
 
 Applies are bonuses (or penalties) that an item gives to the player who is
-using it. The following applies are available. Most are self-explanatory:
+using it. The following applies are available.
+
+Apply types (optional) let you specify which applies come from enchantments or
+other sources (the default is "natural").
+
+Most applies are self-explanatory:
  STRENGTH - characters can't use an item that would reduce them below 1 strength
  DEXTERITY - chance to hit/dodge
  HEALTH-REGEN - rate of health regen (per 5 second tick)
@@ -3280,7 +3285,8 @@ Usage:  .flags [add | remove] <flags>
 Available sector flags:
  LOCK-ICON - a random icon is chosen when the terrain changes to this, and kept
  IS-ADVENTURE - used only for adventure rooms
- NON-ISLAND - won't be detected as part of an island by the island detection system
+ NON-ISLAND - won't be detected as part of an island by the island detection
+    system.
  CHORE - This sector may have a chore (required, or the chore will never trigger)
  !CLAIM - Cannot be claimed.
  START-LOCATION - A starting location for players; prevents combat here

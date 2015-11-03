@@ -135,6 +135,8 @@
 #define NUM_WORLD_BLOCK_UPDATES  15	// world is divided into this many updates, and one fires per 30 seconds
 #define GET_WORLD_BLOCK(roomvnum)  (roomvnum == NOWHERE ? NOWHERE : (int)(roomvnum / WORLD_BLOCK_SIZE))
 
+// additional files
+#define WORLD_MAP_FILE  LIB_WORLD"base_map"	// storage for the game's base map
 
 // used for many file reads:
 #define READ_SIZE 256
@@ -156,9 +158,11 @@ void save_index(int type);
 void save_library_file_for_vnum(int type, any_vnum vnum);
 
 // world processors
+void change_base_sector(room_data *room, sector_data *sect);
 void change_terrain(room_data *room, sector_vnum sect);
 void construct_building(room_data *room, bld_vnum type);
 void disassociate_building(room_data *room);
+void set_crop_type(room_data *room, crop_data *cp);
 
 
 // various externs
@@ -288,12 +292,17 @@ void check_all_exits();
 extern struct room_direction_data *create_exit(room_data *from, room_data *to, int dir, bool back);
 void delete_room(room_data *room, bool check_exits);
 extern room_data *world_table;
-extern room_data *interior_world_table;
+extern room_data *interior_room_list;
+extern struct map_data world_map[MAP_WIDTH][MAP_HEIGHT];
+extern struct map_data *land_map;
 room_data *real_real_room(room_vnum vnum);
 room_data *real_room(room_vnum vnum);
 
+// misc
+extern struct obj_apply *copy_apply_list(struct obj_apply *list);
 
 // more frees
+void free_apply_list(struct obj_apply *list);
 void free_icon_set(struct icon_data **set);
 void free_exit_template(struct exit_template *ex);
 

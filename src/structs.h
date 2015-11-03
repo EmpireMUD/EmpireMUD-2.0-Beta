@@ -94,11 +94,14 @@
 // See http://linux.die.net/man/3/crypt for more info.
 #define PASSWORD_SALT  "salt"
 
-// this determines if a room is "empty ocean" and doesn't need to stay in RAM
-#define BASIC_OCEAN  6	// sector to un-load and recreate as-needed
+#define BASIC_OCEAN  6	// sector vnum used as the base for blank rooms
+
+// this determines if a room is "empty"/"blank" and doesn't need to stay in RAM
 #define CAN_UNLOAD_MAP_ROOM(room)  ( \
-	GET_SECT_VNUM(SECT(room)) == BASIC_OCEAN && !COMPLEX_DATA(room) && \
+	!COMPLEX_DATA(room) && \
 	GET_ROOM_VNUM(room) < MAP_SIZE && \
+	GET_EXITS_HERE(room) == 0 && \
+	SECT(room) == world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)].sector_type && \
 	!ROOM_OWNER(room) && !ROOM_CONTENTS(room) && !ROOM_PEOPLE(room) && \
 	!ROOM_DEPLETION(room) && !ROOM_CUSTOM_NAME(room) && \
 	!ROOM_CUSTOM_ICON(room) && !ROOM_CUSTOM_DESCRIPTION(room) && \
@@ -908,6 +911,12 @@ typedef struct trig_data trig_data;
  //////////////////////////////////////////////////////////////////////////////
 //// OBJECT DEFINES //////////////////////////////////////////////////////////
 
+// APPLY_TYPE_x: What type of obj apply it is
+#define APPLY_TYPE_NATURAL  0	// built-in trait
+#define APPLY_TYPE_ENCHANTMENT  1	// caused by enchant
+#define APPLY_TYPE_HONED  2	// Trade ability
+
+
 // Container flags -- limited to 31 because of int type in obj value
 #define CONT_CLOSEABLE  BIT(0)	// Container can be closed
 #define CONT_CLOSED  BIT(1)	// Container is closed
@@ -1053,7 +1062,7 @@ typedef struct trig_data trig_data;
 #define STORAGE_WITHDRAW  BIT(0)	// requires withdraw privilege
 
 
-// Character equipment positions
+// WEAR_x: Character equipment positions
 /* NOTE: Don't confuse these constants with the ITEM_ bitvectors
    which control the valid places you can wear a piece of equipment */
 #define WEAR_HEAD  0
@@ -1078,7 +1087,8 @@ typedef struct trig_data trig_data;
 #define WEAR_WIELD  19
 #define WEAR_RANGED  20
 #define WEAR_HOLD  21
-#define NUM_WEARS  22	/* This must be the # of eq positions!! */
+#define WEAR_SHARE  22
+#define NUM_WEARS  23	/* This must be the # of eq positions!! */
 
 
 // for item scaling based on wear flags
@@ -1562,7 +1572,7 @@ typedef struct trig_data trig_data;
 #define ROOM_AFF_DISMANTLING  BIT(8)	// i. Being dismantled
 #define ROOM_AFF_NO_FLY  BIT(9)	// j. Can't fly there
 #define ROOM_AFF_SHIP_PRESENT  BIT(10)	// k. A ship is present
-#define ROOM_AFF_PLAYER_MADE  BIT(11)	// l. A river (or whatever) that a player created
+	#define ROOM_AFF_UNUSED  BIT(11)
 #define ROOM_AFF_NO_WORK  BIT(12)	// m. workforce ignores this room
 #define ROOM_AFF_NO_DISREPAIR  BIT(13)	// n. will not fall into disrepair
 #define ROOM_AFF_NO_DISMANTLE  BIT(14)
@@ -1573,7 +1583,7 @@ typedef struct trig_data trig_data;
 // and *especially* a place they are removed. -pc
 	#define ROOM_EXTRA_UNUSED  0	// was MINE_TYPE prior to b3.1
 #define ROOM_EXTRA_MINE_AMOUNT  1
-#define ROOM_EXTRA_CROP_TYPE  2
+	#define ROOM_EXTRA_UNUSED2  2
 #define ROOM_EXTRA_SEED_TIME  3
 #define ROOM_EXTRA_TAVERN_TYPE  4
 #define ROOM_EXTRA_TAVERN_BREWING_TIME  5
@@ -1813,10 +1823,13 @@ struct interaction_item {
 };
 
 
-// obj applies
-struct obj_affected_type {
+// for items -- this replaces CircleMUD's obj_affected_type
+struct obj_apply {
+	byte apply_type;	// APPLY_TYPE_x
 	byte location;	// Which ability to change (APPLY_XXX)
 	sh_int modifier;	// How much it changes by
+	
+	struct obj_apply *next;	// linked list
 };
 
 
@@ -3146,7 +3159,7 @@ struct obj_data {
 	room_data *in_room;	// In what room -- NULL when container/carried
 
 	struct obj_flag_data obj_flags;	// Object information
-	struct obj_affected_type affected[MAX_OBJ_AFFECT];	// affects
+	struct obj_apply *applies;	// APPLY_x list
 
 	char *name;	// Title of object: get, etc.
 	char *description;	// When in room (long desc)
@@ -3281,11 +3294,12 @@ struct room_data {
 	empire_data *owner;  // who owns this territory
 	
 	sector_data *sector_type;  // terrain type -- saved in file as vnum
-	sector_data *original_sector;  // for when built-over -- ^
-	int island;	// island numbers
+	sector_data *base_sector;  // for when built-over -- ^
+	crop_data *crop_type;	// if this room has a crop, this is it
 	
 	struct complex_room_data *complex; // for rooms that are buildings, inside, adventures, etc
 	byte light;  // number of light sources
+	int exits_here;	// number of rooms that have complex->exits to this one
 	
 	struct depletion_data *depletion;	// resource depletion
 
@@ -3302,7 +3316,7 @@ struct room_data {
 	
 	time_t last_spawn_time;  // used to spawn npcs
 	
-	struct room_extra_data *extra_data;	// misc storage
+	struct room_extra_data *extra_data;	// hash of misc storage
 
 	struct trig_proto_list *proto_script;	/* list of default triggers  */
 	struct script_data *script;	/* script info for the room           */
@@ -3312,8 +3326,8 @@ struct room_data {
 	
 	struct reset_com *reset_commands;	// used only during startup
 	
-	UT_hash_handle world_hh;	// hash handle for world_table
-	UT_hash_handle interior_hh;	// hash handle for interior_world_table
+	UT_hash_handle hh;	// hash handle for world_table
+	room_data *next_interior;	// linked list: interior_room_list
 };
 
 
@@ -3410,7 +3424,7 @@ struct room_extra_data {
 	int type;	// ROOM_EXTRA_x
 	int value;
 	
-	struct room_extra_data *next;
+	UT_hash_handle hh;	// room->extra_data hash
 };
 
 
@@ -3423,4 +3437,20 @@ struct track_data {
 	byte dir;	// which way
 	
 	struct track_data *next;
+};
+
+
+// data for the world map (world_map, land_map)
+struct map_data {
+	room_vnum vnum;	// corresponding room vnum (coordinates can be derived from here)
+	int island;	// the island id
+	
+	// three basic sector types
+	sector_data *sector_type;	// current sector
+	sector_data *base_sector;	// underlying current sector (e.g. plains under building)
+	sector_data *natural_sector;	// sector at time of map generation
+	
+	crop_data *crop_type;	// possible crop type
+	
+	struct map_data *next;	// linked list of non-ocean tiles, for iterating
 };

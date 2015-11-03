@@ -519,8 +519,9 @@ void affect_total(char_data *ch) {
 	void update_morph_stats(char_data *ch, bool add);
 
 	struct affected_type *af;
-	int i, j, iter;
+	int i, iter;
 	empire_data *emp = GET_LOYALTY(ch);
+	struct obj_apply *apply;
 	int health, move, mana;
 	
 	int pool_bonus_amount = config_get_int("pool_bonus_amount");
@@ -537,8 +538,8 @@ void affect_total(char_data *ch) {
 
 	for (i = 0; i < NUM_WEARS; i++) {
 		if (GET_EQ(ch, i) && wear_data[i].count_stats) {
-			for (j = 0; j < MAX_OBJ_AFFECT; j++) {
-				affect_modify(ch, GET_EQ(ch, i)->affected[j].location, GET_EQ(ch, i)->affected[j].modifier, GET_OBJ_AFF_FLAGS(GET_EQ(ch, i)), FALSE);
+			for (apply = GET_OBJ_APPLIES(GET_EQ(ch, i)); apply; apply = apply->next) {
+				affect_modify(ch, apply->location, apply->modifier, GET_OBJ_AFF_FLAGS(GET_EQ(ch, i)), FALSE);
 			}
 		}
 	}
@@ -573,8 +574,8 @@ void affect_total(char_data *ch) {
 
 	for (i = 0; i < NUM_WEARS; i++) {
 		if (GET_EQ(ch, i) && wear_data[i].count_stats) {
-			for (j = 0; j < MAX_OBJ_AFFECT; j++) {
-				affect_modify(ch, GET_EQ(ch, i)->affected[j].location, GET_EQ(ch, i)->affected[j].modifier, GET_OBJ_AFF_FLAGS(GET_EQ(ch, i)), TRUE);
+			for (apply = GET_OBJ_APPLIES(GET_EQ(ch, i)); apply; apply = apply->next) {
+				affect_modify(ch, apply->location, apply->modifier, GET_OBJ_AFF_FLAGS(GET_EQ(ch, i)), TRUE);
 			}
 		}
 	}
@@ -992,14 +993,16 @@ void extract_char_final(char_data *ch) {
 void extract_char(char_data *ch) {
 	void despawn_charmies(char_data *ch);
 	
-	if (IS_NPC(ch)) {
-		SET_BIT(MOB_FLAGS(ch), MOB_EXTRACTED);
-	}
-	else {
-		SET_BIT(PLR_FLAGS(ch), PLR_EXTRACTED);
+	if (!EXTRACTED(ch)) {
+		if (IS_NPC(ch)) {
+			SET_BIT(MOB_FLAGS(ch), MOB_EXTRACTED);
+		}
+		else {
+			SET_BIT(PLR_FLAGS(ch), PLR_EXTRACTED);
+		}
+		++extractions_pending;
 	}
 
-	extractions_pending++;
 	
 	// get rid of friends now (extracts them as well)
 	despawn_charmies(ch);
@@ -2232,7 +2235,9 @@ void abandon_room(room_data *room) {
 	perform_abandon_room(room);
 
 	// inside
-	HASH_ITER(interior_hh, interior_world_table, iter, next_iter) {
+	for (iter = interior_room_list; iter; iter = next_iter) {
+		next_iter = iter->next_interior;
+		
 		if (HOME_ROOM(iter) == home) {
 			perform_abandon_room(iter);
 		}
@@ -2255,8 +2260,10 @@ void claim_room(room_data *room, empire_data *emp) {
 	
 	ROOM_OWNER(room) = emp;
 	remove_room_extra_data(room, ROOM_EXTRA_CEDED);	// not ceded if just claimed
-
-	HASH_ITER(interior_hh, interior_world_table, iter, next_iter) {
+	
+	for (iter = interior_room_list; iter; iter = next_iter) {
+		next_iter = iter->next_interior;
+		
 		if (HOME_ROOM(iter) == home) {
 			ROOM_OWNER(iter) = emp;
 			remove_room_extra_data(iter, ROOM_EXTRA_CEDED);	// not ceded if just claimed
@@ -3155,7 +3162,7 @@ bool run_room_interactions(char_data *ch, room_data *room, int type, INTERACTION
 	}
 	
 	// crop second
-	if (!success && ROOM_CROP_TYPE(room) != NOTHING && (crop = crop_proto(ROOM_CROP_TYPE(room)))) {
+	if (!success && (crop = ROOM_CROP(room))) {
 		success |= run_interactions(ch, GET_CROP_INTERACTIONS(crop), type, room, NULL, NULL, func);
 	}
 	
@@ -3538,10 +3545,7 @@ obj_data *copy_warehouse_obj(obj_data *input) {
 	for (iter = 0; iter < NUM_OBJ_VAL_POSITIONS; ++iter) {
 		GET_OBJ_VAL(obj, iter) = GET_OBJ_VAL(input, iter);
 	}
-	for (iter = 0; iter < MAX_OBJ_AFFECT; ++iter) {
-		obj->affected[iter].location = input->affected[iter].location;
-		obj->affected[iter].modifier = input->affected[iter].modifier;
-	}
+	GET_OBJ_APPLIES(obj) = copy_apply_list(GET_OBJ_APPLIES(input));
 	
 	return obj;
 }
@@ -3721,6 +3725,8 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 * @return bool TRUE if the two items are functionally identical.
 */
 bool objs_are_identical(obj_data *obj_a, obj_data *obj_b) {
+	struct obj_apply *a_apply, *b_list, *b_apply, *temp;
+	bool found;
 	int iter;
 	
 	if (GET_OBJ_VNUM(obj_a) != GET_OBJ_VNUM(obj_b)) {
@@ -3752,11 +3758,6 @@ bool objs_are_identical(obj_data *obj_a, obj_data *obj_b) {
 			return FALSE;
 		}
 	}
-	for (iter = 0; iter < MAX_OBJ_AFFECT; ++iter) {
-		if (obj_a->affected[iter].location != obj_b->affected[iter].location || obj_a->affected[iter].modifier != obj_b->affected[iter].modifier) {
-			return FALSE;
-		}
-	}
 	if (GET_OBJ_KEYWORDS(obj_a) != GET_OBJ_KEYWORDS(obj_b) && !str_cmp(GET_OBJ_KEYWORDS(obj_a), GET_OBJ_KEYWORDS(obj_b))) {
 		return FALSE;
 	}
@@ -3770,6 +3771,29 @@ bool objs_are_identical(obj_data *obj_a, obj_data *obj_b) {
 		return FALSE;
 	}
 	if (obj_a->ex_description != obj_b->ex_description) {
+		return FALSE;
+	}
+	
+	// to compare applies, we're going to copy and delete as we find them
+	b_list = copy_apply_list(GET_OBJ_APPLIES(obj_b));
+	for (a_apply = GET_OBJ_APPLIES(obj_a); a_apply; a_apply = a_apply->next) {
+		found = FALSE;
+		for (b_apply = b_list; b_apply; b_apply = b_apply->next) {
+			if (a_apply->location == b_apply->location && a_apply->modifier == b_apply->modifier && a_apply->apply_type == b_apply->apply_type) {
+				found = TRUE;
+				REMOVE_FROM_LIST(b_apply, b_list, next);
+				free(b_apply);
+				break;	// only need one, plus we freed it
+			}
+		}
+		
+		if (!found) {
+			free_apply_list(b_list);
+			return FALSE;
+		}
+	}
+	if (b_list) {	// more things in b_list than a
+		free_apply_list(b_list);
 		return FALSE;
 	}
 	
@@ -3978,7 +4002,7 @@ void check_obj_in_void(obj_data *obj) {
 * @param int pos the WEAR_x spot to it
 */
 void equip_char(char_data *ch, obj_data *obj, int pos) {
-	int j;
+	struct obj_apply *apply;
 
 	if (pos < 0 || pos >= NUM_WEARS) {
 		log("SYSERR: Trying to equip gear to invalid position: %d", pos);
@@ -4010,8 +4034,8 @@ void equip_char(char_data *ch, obj_data *obj, int pos) {
 		}
 
 		if (wear_data[pos].count_stats) {
-			for (j = 0; j < MAX_OBJ_AFFECT; j++) {
-				affect_modify(ch, obj->affected[j].location, obj->affected[j].modifier, GET_OBJ_AFF_FLAGS(obj), TRUE);
+			for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
+				affect_modify(ch, apply->location, apply->modifier, GET_OBJ_AFF_FLAGS(obj), TRUE);
 			}
 		}
 
@@ -4311,7 +4335,7 @@ void swap_obj_for_obj(obj_data *old, obj_data *new) {
 * @return obj_data *The removed item, or NULL if there was none.
 */
 obj_data *unequip_char(char_data *ch, int pos) {	
-	int j;
+	struct obj_apply *apply;
 	obj_data *obj = NULL;
 
 	if ((pos >= 0 && pos < NUM_WEARS) && GET_EQ(ch, pos) != NULL) {
@@ -4329,8 +4353,8 @@ obj_data *unequip_char(char_data *ch, int pos) {
 
 		// un-apply affects
 		if (wear_data[pos].count_stats) {
-			for (j = 0; j < MAX_OBJ_AFFECT; j++) {
-				affect_modify(ch, obj->affected[j].location, obj->affected[j].modifier, GET_OBJ_AFF_FLAGS(obj), FALSE);
+			for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
+				affect_modify(ch, apply->location, apply->modifier, GET_OBJ_AFF_FLAGS(obj), FALSE);
 			}
 		}
 
@@ -4430,6 +4454,24 @@ bool has_custom_message(obj_data *obj, int type) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// OBJECT TARGETING HANDLERS ///////////////////////////////////////////////
+
+/**
+* Find an object in another person's share slot, by character name.
+*
+* @param char_data *ch The person looking for a shared obj.
+* @param char *arg The potential name of a PLAYER.
+*/
+obj_data *get_obj_by_char_share(char_data *ch, char *arg) {
+	char_data *targ;
+	
+	// find person by name
+	if (!(targ = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
+		return NULL;
+	}
+	
+	return GET_EQ(targ, WEAR_SHARE);
+}
+
 
 /**
 * Finds a matching object in a character's equipment.
@@ -4881,7 +4923,7 @@ void add_to_room_extra_data(room_data *room, int type, int add_value) {
 	struct room_extra_data *red;
 	
 	if ((red = find_room_extra_data(room, type))) {
-		red->value += add_value;
+		SAFE_ADD(red->value, add_value, INT_MIN, INT_MAX, TRUE);
 		
 		// delete zeroes for cleanliness
 		if (red->value == 0) {
@@ -4902,16 +4944,11 @@ void add_to_room_extra_data(room_data *room, int type, int add_value) {
 * @return struct room_extra_data* The matching entry, or NULL.
 */
 struct room_extra_data *find_room_extra_data(room_data *room, int type) {
-	struct room_extra_data *iter, *found = NULL;
-	
-	for (iter = room->extra_data; iter && !found; iter = iter->next) {
-		if (iter->type == type) {
-			found = iter;
-		}
-	}
-	
-	return found;
+	struct room_extra_data *red;
+	HASH_FIND_INT(room->extra_data, &type, red);
+	return red;
 }
+
 
 /**
 * Gets the value of an extra data type for a room; defaults to 0 if none is set.
@@ -4924,6 +4961,7 @@ int get_room_extra_data(room_data *room, int type) {
 	struct room_extra_data *red = find_room_extra_data(room, type);
 	return (red ? red->value : 0);
 }
+
 
 /**
 * Multiplies an existing room extra data value by a number.
@@ -4954,10 +4992,9 @@ void multiply_room_extra_data(room_data *room, int type, double multiplier) {
 * @param int type The ROOM_EXTRA_x type to remove.
 */
 void remove_room_extra_data(room_data *room, int type) {
-	struct room_extra_data *red, *temp;
-	
-	while ((red = find_room_extra_data(room, type))) {
-		REMOVE_FROM_LIST(red, room->extra_data, next);
+	struct room_extra_data *red = find_room_extra_data(room, type);
+	if (red) {
+		HASH_DEL(room->extra_data, red);
 		free(red);
 	}
 }
@@ -4971,21 +5008,16 @@ void remove_room_extra_data(room_data *room, int type) {
 * @param int value The value to set it to.
 */
 void set_room_extra_data(room_data *room, int type, int value) {
-	struct room_extra_data *red;
+	struct room_extra_data *red = find_room_extra_data(room, type);
 	
-	// remove any old one first
-	remove_room_extra_data(room, type);
-	
-	// only bother if non-zero -- no need to store a zero
-	if (value != 0) {
+	// create if needed
+	if (!red) {
 		CREATE(red, struct room_extra_data, 1);
 		red->type = type;
-		red->value = value;
-	
-		// add
-		red->next = room->extra_data;
-		room->extra_data = red;
+		HASH_ADD_INT(room->extra_data, type, red);
 	}
+	
+	red->value = value;
 }
 
 

@@ -208,6 +208,7 @@ extern char *get_custom_message(obj_data *obj, int type);
 extern bool has_custom_message(obj_data *obj, int type);
 
 // object targeting handlers
+extern obj_data *get_obj_by_char_share(char_data *ch, char *arg);
 extern obj_data *get_obj_in_equip_vis(char_data *ch, char *arg, obj_data *equipment[]);
 extern obj_data *get_obj_in_list_num(int num, obj_data *list);
 extern obj_data *get_obj_in_list_vnum(obj_vnum vnum, obj_data *list);

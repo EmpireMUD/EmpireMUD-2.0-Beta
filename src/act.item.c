@@ -55,6 +55,7 @@ void save_trading_post();
 void trigger_distrust_from_stealth(char_data *ch, empire_data *emp);
 
 // local protos
+ACMD(do_unshare);
 room_data *find_docks(empire_data *emp, int island_id);
 int get_wear_by_item_wear(bitvector_t item_wear);
 void move_ship_to_destination(empire_data *emp, struct shipping_data *shipd, room_data *to_room);
@@ -191,6 +192,7 @@ int get_wear_by_item_wear(bitvector_t item_wear) {
 void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	extern double get_base_dps(obj_data *weapon);
 	extern double get_weapon_speed(obj_data *weapon);
+	extern const char *apply_type_names[];
 	extern const char *extra_bits[];
 	extern const char *drinks[];
 	extern const char *affected_bits[];
@@ -200,9 +202,10 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 
 	struct obj_storage_type *store;
 	player_index_data *index;
-	char lbuf[MAX_STRING_LENGTH], location[MAX_STRING_LENGTH];
+	struct obj_apply *apply;
+	char lbuf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], location[MAX_STRING_LENGTH];
 	bld_data *bld;
-	int iter, found;
+	int found;
 	double rating;
 	
 	// ONLY flags to show
@@ -367,10 +370,14 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	
 	
 	*lbuf = '\0';
-	for (iter = 0; iter < MAX_OBJ_AFFECT; ++iter) {
-		if (obj->affected[iter].modifier) {
-			sprintf(lbuf + strlen(lbuf), "%s%+d to %s", (*lbuf != '\0') ? ", " : "", obj->affected[iter].modifier, apply_types[(int) obj->affected[iter].location]);
+	for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
+		if (apply->apply_type != APPLY_TYPE_NATURAL) {
+			sprintf(part, " (%s)", apply_type_names[(int)apply->apply_type]);
 		}
+		else {
+			*part = '\0';
+		}
+		sprintf(lbuf + strlen(lbuf), "%s%+d to %s%s", (*lbuf != '\0') ? ", " : "", apply->modifier, apply_types[(int) apply->location], part);
 	}
 	if (*lbuf) {
 		msg_to_char(ch, "Modifiers: %s\r\n", lbuf);
@@ -541,7 +548,8 @@ void perform_remove(char_data *ch, int pos) {
 static void perform_wear(char_data *ch, obj_data *obj, int where) {
 	extern const int apply_attribute[];
 	extern const int primary_attributes[];
-	int iter, app, type, val;
+	struct obj_apply *apply;
+	int iter, type, val;
 
 	/* first, make sure that the wear position is valid. */
 	if (!CAN_WEAR(obj, wear_data[where].item_wear)) {
@@ -554,22 +562,6 @@ static void perform_wear(char_data *ch, obj_data *obj, int where) {
 		where = wear_data[where].cascade_pos;
 	}
 	
-	// check weakness (check all applies first, in case they contradict like -1str +2str)
-	for (iter = 0; primary_attributes[iter] != NOTHING; ++iter) {
-		type = primary_attributes[iter];
-		val = GET_ATT(ch, type);
-		for (app = 0; app < MAX_OBJ_AFFECT; app++) {
-			if (apply_attribute[(int) obj->affected[app].location] == type) {
-				val += obj->affected[app].modifier;
-			}
-		}
-		
-		if (val < 1) {
-			act("You are too weak to use $p!", FALSE, ch, obj, 0, TO_CHAR);
-			return;
-		}
-	}
-	
 	if (where == WEAR_SADDLE && !IS_RIDING(ch)) {
 		msg_to_char(ch, "You can't wear a saddle while you're not riding anything.\r\n");
 		return;
@@ -579,10 +571,29 @@ static void perform_wear(char_data *ch, obj_data *obj, int where) {
 		act(wear_data[where].already_wearing, FALSE, ch, GET_EQ(ch, where), NULL, TO_CHAR);
 		return;
 	}
+	
+	// some checks are only needed when the slot counts for stats
+	if (wear_data[where].count_stats) {
+		// check weakness (check all applies first, in case they contradict like -1str +2str)
+		for (iter = 0; primary_attributes[iter] != NOTHING; ++iter) {
+			type = primary_attributes[iter];
+			val = GET_ATT(ch, type);
+			for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
+				if (apply_attribute[(int) apply->location] == type) {
+					val += apply->modifier;
+				}
+			}
+		
+			if (val < 1) {
+				act("You are too weak to use $p!", FALSE, ch, obj, 0, TO_CHAR);
+				return;
+			}
+		}
 
-	/* See if a trigger disallows it */
-	if (!wear_otrigger(obj, ch, where) || (obj->carried_by != ch)) {
-		return;
+		/* See if a trigger disallows it */
+		if (!wear_otrigger(obj, ch, where) || (obj->carried_by != ch)) {
+			return;
+		}
 	}
 
 	wear_message(ch, obj, where);
@@ -1247,6 +1258,7 @@ void scale_item_to_level(obj_data *obj, int level) {
 	double share, this_share, points_to_give, per_point;
 	room_data *room = NULL;
 	obj_data *top_obj, *proto;
+	struct obj_apply *apply;
 	bitvector_t bits;
 	
 	// configure this here
@@ -1327,10 +1339,10 @@ void scale_item_to_level(obj_data *obj, int level) {
 	// end helper
 	
 	// first check applies, count share/bonus
-	for (iter = 0; iter < MAX_OBJ_AFFECT; ++iter) {
+	for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
 		// TODO non-scalable traits should be an array
-		if (obj->affected[iter].location != APPLY_NONE && obj->affected[iter].location != APPLY_GREATNESS && obj->affected[iter].location != APPLY_CRAFTING) {
-			SHARE_OR_BONUS(obj->affected[iter].modifier);
+		if (apply->location != APPLY_GREATNESS && apply->location != APPLY_CRAFTING) {
+			SHARE_OR_BONUS(apply->modifier);
 		}
 	}
 	
@@ -1492,22 +1504,22 @@ void scale_item_to_level(obj_data *obj, int level) {
 	}
 	
 	// distribute points: applies
-	for (iter = 0; iter < MAX_OBJ_AFFECT; ++iter) {
+	for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
 		// TODO non-scalable traits should be an array
-		if (obj->affected[iter].location != APPLY_NONE && obj->affected[iter].location != APPLY_GREATNESS && obj->affected[iter].location != APPLY_CRAFTING) {
+		if (apply->location != APPLY_GREATNESS && apply->location != APPLY_CRAFTING) {
 			this_share = MAX(0, MIN(share, points_to_give));
 			// raw amount
-			per_point = (1.0 / apply_values[(int)obj->affected[iter].location]);
+			per_point = (1.0 / apply_values[(int)apply->location]);
 			
-			if (obj->affected[iter].modifier > 0) {
+			if (apply->modifier > 0) {
 				// positive benefit
-				amt = round(this_share * obj->affected[iter].modifier * per_point);
-				points_to_give -= round(this_share * obj->affected[iter].modifier);
-				obj->affected[iter].modifier = amt;
+				amt = round(this_share * apply->modifier * per_point);
+				points_to_give -= round(this_share * apply->modifier);
+				apply->modifier = amt;
 			}
-			else if (obj->affected[iter].modifier < 0) {
+			else if (apply->modifier < 0) {
 				// penalty: does not cost from points_to_give
-				obj->affected[iter].modifier = round(obj->affected[iter].modifier * per_point);
+				apply->modifier = round(apply->modifier * per_point);
 			}
 		}
 	}
@@ -1796,9 +1808,9 @@ obj_data *find_free_ship(empire_data *emp, struct shipping_data *shipd) {
 room_data *get_ship_pen(void) {
 	extern room_data *create_room();
 
-	room_data *room, *iter, *next_iter;
+	room_data *room, *iter;
 	
-	HASH_ITER(interior_hh, interior_world_table, iter, next_iter) {
+	for (iter = interior_room_list; iter; iter = iter->next_interior) {
 		if (GET_BUILDING(iter) && GET_BLD_VNUM(GET_BUILDING(iter)) == RTYPE_SHIP_HOLDING_PEN) {
 			return iter;
 		}
@@ -2045,7 +2057,7 @@ void sail_shipment(empire_data *emp, obj_data *boat) {
 * @return bool TRUE if the ship is empty, FALSE if it has players inside.
 */
 bool ship_is_empty(obj_data *ship) {
-	room_data *ship_room, *iter, *next_iter;
+	room_data *ship_room, *iter;
 	char_data *ch;
 	
 	if (!ship || !IS_SHIP(ship) || !(ship_room = real_room(GET_SHIP_MAIN_ROOM(ship)))) {
@@ -2053,7 +2065,7 @@ bool ship_is_empty(obj_data *ship) {
 	}
 	
 	// check all interior rooms
-	HASH_ITER(interior_hh, interior_world_table, iter, next_iter) {
+	for (iter = interior_room_list; iter; iter = iter->next_interior) {
 		if (HOME_ROOM(iter) != ship_room) {
 			continue;
 		}
@@ -3804,7 +3816,7 @@ ACMD(do_grab) {
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs may not hold items.\r\n");
 	}
-	if (!*arg)
+	else if (!*arg)
 		send_to_char("Hold what?\r\n", ch);
 	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
 		sprintf(buf, "You don't seem to have %s %s.\r\n", AN(arg), arg);
@@ -4524,6 +4536,30 @@ ACMD(do_roadsign) {
 }
 
 
+// does not call can_wear_item() since the item doesn't count stats
+ACMD(do_share) {
+	obj_data *obj;
+	
+	one_argument(argument, arg);
+	
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "NPCs may not share items.\r\n");
+	}
+	else if (!*arg) {
+		msg_to_char(ch, "Share what?\r\n");
+	}
+	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
+	}
+	else {
+		if (GET_EQ(ch, WEAR_SHARE)) {
+			do_unshare(ch, "", 0, 0);
+		}
+		perform_wear(ch, obj, WEAR_SHARE);
+	}
+}
+
+
 ACMD(do_sheathe) {
 	obj_data *obj;
 	int loc = 0;
@@ -4935,6 +4971,23 @@ ACMD(do_trade) {
 	}
 	else {
 		msg_to_char(ch, "Usage: trade <check | list | buy | cancel | collect | identify | post>\r\n");
+	}
+}
+
+
+ACMD(do_unshare) {
+	if (!GET_EQ(ch, WEAR_SHARE)) {
+		msg_to_char(ch, "You are not sharing anything.\r\n");
+	}
+	else {
+		// we don't perform_remove() because it checks things we don't need to check, and we want a custom message
+		
+		act("You stop sharing $p.", FALSE, ch, GET_EQ(ch, WEAR_SHARE), 0, TO_CHAR);
+		act("$n stops sharing $p.", TRUE, ch, GET_EQ(ch, WEAR_SHARE), 0, TO_ROOM);
+		
+		// this may extract it, or drop it
+		unequip_char_to_inventory(ch, WEAR_SHARE);
+		determine_gear_level(ch);
 	}
 }
 

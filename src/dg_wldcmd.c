@@ -236,7 +236,7 @@ WCMD(do_wsend) {
 }
 
 WCMD(do_wbuildingecho) {
-	room_data *froom, *iter, *next_iter, *home;
+	room_data *froom, *iter, *home;
 	char room_num[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH], *msg;
 
 	msg = any_one_word(argument, room_num);
@@ -252,7 +252,7 @@ WCMD(do_wbuildingecho) {
 		sprintf(buf, "%s\r\n", msg);
 		
 		send_to_room(buf, home);
-		HASH_ITER(interior_hh, interior_world_table, iter, next_iter) {
+		for (iter = interior_room_list; iter; iter = iter->next_interior) {
 			if (HOME_ROOM(iter) == home && iter != home && ROOM_PEOPLE(iter)) {
 				send_to_room(buf, iter);
 			}
@@ -360,6 +360,9 @@ WCMD(do_wdoor) {
 	if (fd == 0) {
 		if (newexit) {
 			REMOVE_FROM_LIST(newexit, COMPLEX_DATA(rm)->exits, next);
+			if (newexit->room_ptr) {
+				--GET_EXITS_HERE(newexit->room_ptr);
+			}
 			if (newexit->keyword)
 				free(newexit->keyword);
 			free(newexit);
@@ -390,8 +393,13 @@ WCMD(do_wdoor) {
 						newexit = create_exit(rm, to_room, dir, FALSE);
 					}
 					else {
+						if (newexit->room_ptr) {
+							// lower old room
+							--GET_EXITS_HERE(newexit->room_ptr);
+						}
 						newexit->to_room = GET_ROOM_VNUM(to_room);
 						newexit->room_ptr = to_room;
+						++GET_EXITS_HERE(to_room);
 					}
 				}
 				else

@@ -964,6 +964,15 @@ const char *injury_bits[] = {
 };
 
 
+// APPLY_TYPE_x: source of obj apply
+const char *apply_type_names[] = {
+	"natural",
+	"enchantment",
+	"honed",
+	"\n"
+};
+
+
 /* APPLY_x (1/3) */
 const char *apply_types[] = {
 	"NONE",
@@ -1370,6 +1379,7 @@ const char *wear_keywords[] = {
 	"\r!",	// wield
 	"\r!",	// ranged
 	"\r!",	// hold
+	"\r!",	// share
 	"\n"
 };
 
@@ -1398,7 +1408,8 @@ const struct wear_data_type wear_data[NUM_WEARS] = {
 	{ "          (sheath) ", ITEM_WEAR_WIELD, FALSE, 0, NO_WEAR, "You've already got something sheathed.", "$n sheathes $p.", "You sheathe $p." },
 	{ "         <wielded> ", ITEM_WEAR_WIELD, 	TRUE, 2.0, NO_WEAR, "You're already wielding $p.", "$n wields $p.", "You wield $p." },
 	{ "          <ranged> ", ITEM_WEAR_RANGED, TRUE, 0, NO_WEAR, "You're already using $p.", "$n uses $p.", "You use $p." },
-	{ "            <held> ", ITEM_WEAR_HOLD, TRUE, 1.0, NO_WEAR, "You're already holding $p.", "$n grabs $p.", "You grab $p." }
+	{ "            <held> ", ITEM_WEAR_HOLD, TRUE, 1.0, NO_WEAR, "You're already holding $p.", "$n grabs $p.", "You grab $p." },
+	{ "          (shared) ", ITEM_WEAR_TAKE, FALSE, 0, NO_WEAR, "You're already sharing $p.", "$n shares $p.", "You share $p." }
 };
 
 
@@ -2169,7 +2180,7 @@ const char *room_aff_bits[] = {
 	"*DISMANTLING",
 	"!FLY",
 	"*SHIP-PRESENT",
-	"*PLAYER-MADE",
+	"*",
 	"*!WORK",
 	"!DISREPAIR",
 	"*!DISMANTLE",
@@ -2179,9 +2190,9 @@ const char *room_aff_bits[] = {
 
 // ROOM_EXTRA_x
 const char *room_extra_types[] = {
-	"mine type",
+		"unused",
 	"mine amount",
-	"crop type",
+		"unused",
 	"seed time",
 	"tavern type",
 	"tavern brewing time",

@@ -192,7 +192,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 	
 	// update world
 	count = 0;
-	HASH_ITER(world_hh, world_table, room, next_room) {
+	HASH_ITER(hh, world_table, room, next_room) {
 		if (IS_ANY_BUILDING(room) && BUILDING_VNUM(room) == vnum) {
 			if (GET_ROOM_VNUM(room) >= MAP_SIZE) {
 				delete_room(room, FALSE);	// must call check_all_exits

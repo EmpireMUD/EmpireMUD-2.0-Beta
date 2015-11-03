@@ -1961,12 +1961,12 @@ double rate_item(obj_data *obj) {
 	extern double get_base_dps(obj_data *weapon);
 	extern const double apply_values[];
 	
+	struct obj_apply *apply;
 	double score = 0;
-	int iter;
 	
 	// basic apply score
-	for (iter = 0; iter < MAX_OBJ_AFFECT; ++iter) {
-		score += obj->affected[iter].modifier * apply_values[(int) obj->affected[iter].location];
+	for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
+		score += apply->modifier * apply_values[(int) apply->location];
 	}
 	
 	// score based on type
@@ -3216,21 +3216,21 @@ bool check_sunny(room_data *room) {
 
 
 /**
-* Gets linear distance between two rooms.
+* Gets linear distance between two map locations (accounting for wrapping).
 *
-* @param room_data *from Origin room
-* @param room_data *to Target room
+* @param int x1 first
+* @param int y1  coordinate
+* @param int x2 second
+* @param int y2  coordinate
 * @return int distance
 */
-int compute_distance(room_data *from, room_data *to) {
-	int x1 = X_COORD(from), y1 = Y_COORD(from);
-	int x2 = X_COORD(to), y2 = Y_COORD(to);
+int compute_map_distance(int x1, int y1, int x2, int y2) {
 	int dx = x1 - x2;
 	int dy = y1 - y2;
 	int dist;
 	
 	// short circuit on same-room
-	if (from == to || HOME_ROOM(from) == HOME_ROOM(to)) {
+	if (x1 == x2 && y1 == y2) {
 		return 0;
 	}
 	
@@ -3269,7 +3269,7 @@ int compute_distance(room_data *from, room_data *to) {
 *
 * @param room_data *room The location to check.
 * @param sector_vnum The sector vnum to find.
-* @param bool count_original_sect If TRUE, also checks ROOM_ORIGINAL_SECT
+* @param bool count_original_sect If TRUE, also checks BASE_SECT
 * @return int The number of matching adjacent tiles.
 */
 int count_adjacent_sectors(room_data *room, sector_vnum sect, bool count_original_sect) {
@@ -3283,7 +3283,7 @@ int count_adjacent_sectors(room_data *room, sector_vnum sect, bool count_origina
 	for (iter = 0; iter < NUM_2D_DIRS; ++iter) {
 		to_room = real_shift(room, shift_dir[iter][0], shift_dir[iter][1]);
 		
-		if (to_room && (SECT(to_room) == rl_sect || (count_original_sect && ROOM_ORIGINAL_SECT(to_room) == rl_sect))) {
+		if (to_room && (SECT(to_room) == rl_sect || (count_original_sect && BASE_SECT(to_room) == rl_sect))) {
 			++count;
 		}
 	}
@@ -3314,7 +3314,7 @@ int count_flagged_sect_between(bitvector_t sectf_bits, room_data *start, room_da
 	dist = compute_distance(start, end);	// for safety-checking
 	
 	for (iter = 1, room = straight_line(start, end, iter); iter <= dist && room && room != end; ++iter, room = straight_line(start, end, iter)) {
-		if (SECT_FLAGGED(SECT(room), sectf_bits) || (check_base_sect && SECT_FLAGGED(ROOM_ORIGINAL_SECT(room), sectf_bits))) {
+		if (SECT_FLAGGED(SECT(room), sectf_bits) || (check_base_sect && SECT_FLAGGED(BASE_SECT(room), sectf_bits))) {
 			++count;
 		}
 	}
@@ -3572,6 +3572,74 @@ room_data *find_starting_location() {
 
 
 /**
+* This function takes a set of coordinates and finds another location in
+* relation to them. It checks the wrapping boundaries of the map in the
+* process.
+*
+* @param int start_x The initial X coordinate.
+* @param int start_y The initial Y coordinate.
+* @param int x_shift How much to shift X by (+/-).
+* @param int y_shift How much to shift Y by (+/-).
+* @param int *new_x A variable to bind the new X coord to.
+* @param int *new_y A variable to bind the new Y coord to.
+* @return bool TRUE if a valid location was found; FALSE if it's off the map.
+*/
+bool get_coord_shift(int start_x, int start_y, int x_shift, int y_shift, int *new_x, int *new_y) {
+	// clear these
+	*new_x = -1;
+	*new_y = -1;
+	
+	if (start_x < 0 || start_x >= MAP_WIDTH || start_y < 0 || start_y >= MAP_HEIGHT) {
+		// bad location
+		return FALSE;
+	}
+	
+	// process x
+	start_x += x_shift;
+	if (start_x < 0) {
+		if (WRAP_X) {
+			start_x += MAP_WIDTH;
+		}
+		else {
+			return FALSE;	// off the map
+		}
+	}
+	else if (start_x >= MAP_WIDTH) {
+		if (WRAP_X) {
+			start_x -= MAP_WIDTH;
+		}
+		else {
+			return FALSE;	// off the map
+		}
+	}
+	
+	// process y
+	start_y += y_shift;
+	if (start_y < 0) {
+		if (WRAP_Y) {
+			start_y += MAP_HEIGHT;
+		}
+		else {
+			return FALSE;	// off the map
+		}
+	}
+	else if (start_y >= MAP_HEIGHT) {
+		if (WRAP_Y) {
+			start_y -= MAP_HEIGHT;
+		}
+		else {
+			return FALSE;	// off the map
+		}
+	}
+	
+	// found a valid location
+	*new_x = start_x;
+	*new_y = start_y;
+	return TRUE;
+}
+
+
+/**
 * This function determines the approximate direction between two points on the
 * map.
 *
@@ -3642,11 +3710,27 @@ int get_direction_to(room_data *from, room_data *to) {
 int GET_ISLAND_ID(room_data *room) {
 	room_data *map = get_map_location_for(room);
 	
-	if (map) {
-		return map->island;
+	if (map && GET_ROOM_VNUM(map) < MAP_SIZE) {
+		return world_map[FLAT_X_COORD(map)][FLAT_Y_COORD(map)].island;
 	}
 	else {
 		return NO_ISLAND;
+	}
+}
+
+
+/**
+* Changes the island id of a room.
+*
+* @param room_data *room The room to change the island on.
+* @param int island The island ID to set it to.
+*/
+void SET_ISLAND_ID(room_data *room, int island) {
+	extern bool world_map_needs_save;
+	
+	if (GET_ROOM_VNUM(room) < MAP_SIZE) {
+		world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)].island = island;
+		world_map_needs_save = TRUE;
 	}
 }
 
@@ -3699,9 +3783,8 @@ void lock_icon(room_data *room, struct icon_data *use_icon) {
 * @return room_data* The new location on the map, or NULL if the location would be off the map
 */
 room_data *real_shift(room_data *origin, int x_shift, int y_shift) {
-	room_data *map;
 	int x_coord, y_coord;
-	room_vnum loc;
+	room_data *map;
 	
 	// sanity?
 	if (!origin) {
@@ -3711,65 +3794,14 @@ room_data *real_shift(room_data *origin, int x_shift, int y_shift) {
 	map = get_map_location_for(origin);
 	
 	// are we somehow not on the map? if not, don't shift
-	if (!map || (loc = GET_ROOM_VNUM(map)) >= MAP_SIZE) {
+	if (!map || GET_ROOM_VNUM(map) >= MAP_SIZE) {
 		return NULL;
 	}
 	
-	x_coord = FLAT_X_COORD(map);
-	y_coord = FLAT_Y_COORD(map);
-	
-	// check map bounds on x coordinate, and shift positions
-	if (x_coord + x_shift < 0) {
-		if (WRAP_X) {
-			loc += x_shift + MAP_WIDTH;
-		}
-		else {
-			// off the left side
-			return NULL;
-		}
+	if (get_coord_shift(FLAT_X_COORD(map), FLAT_Y_COORD(map), x_shift, y_shift, &x_coord, &y_coord)) {
+		return real_room((y_coord * MAP_WIDTH) + x_coord);
 	}
-	else if (x_coord + x_shift >= MAP_WIDTH) {
-		if (WRAP_X) {
-			loc += x_shift - MAP_WIDTH;
-		}
-		else {
-			// off the right side
-			return NULL;
-		}
-	}
-	else {
-		loc += x_shift;
-	}
-	
-	if (y_coord + y_shift < 0) {
-		if (WRAP_Y) {
-			loc += (y_shift * MAP_WIDTH) + MAP_SIZE;
-		}
-		else {
-			// off the bottom
-			return NULL;
-		}
-	}
-	else if (y_coord + y_shift >= MAP_HEIGHT) {
-		if (WRAP_Y) {
-			loc += (y_shift * MAP_WIDTH) - MAP_SIZE;
-		}
-		else {
-			// off the top
-			return NULL;
-		}
-	}
-	else {
-		loc += (y_shift * MAP_WIDTH);
-	}
-	
-	// again, we can ONLY return map locations
-	if (loc >= 0 && loc < MAP_SIZE) {
-		return real_room(loc);
-	}
-	else {
-		return NULL;
-	}
+	return NULL;
 }
 
 
@@ -3907,6 +3939,26 @@ int Y_COORD(room_data *room) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// MISC UTILS //////////////////////////////////////////////////////////////
+
+/**
+* Gets a string fragment if an obj is shared (by someone other than ch). This
+* is used by enchanting and some other commands, in their success strings. It
+* has an $N in the string, so pass obj->worn_by as the 2nd char in your act()
+* message.
+*
+* @param obj_data *obj The obj that might be shared.
+* @param char_data *ch The person using the ablitiy, who will be ignored for this message.
+* @return char* Either an empty string, or " (shared by $N)".
+*/
+char *shared_by(obj_data *obj, char_data *ch) {
+	if (obj->worn_on == WEAR_SHARE && obj->worn_by && (!ch || obj->worn_by != ch)) {
+		return " (shared by $N)";
+	}
+	else {
+		return "";
+	}
+}
+
 
 /**
 * @return unsigned long long The current timestamp as microtime (1 million per second)

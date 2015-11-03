@@ -71,7 +71,8 @@ void check_attribute_gear(char_data *ch) {
 	extern const int apply_attribute[];
 	extern const int primary_attributes[];
 	
-	int iter, app, pos;
+	struct obj_apply *apply;
+	int iter, pos;
 	obj_data *obj;
 	bool found;
 	
@@ -105,14 +106,14 @@ void check_attribute_gear(char_data *ch) {
 		
 		// check all applies on item
 		found = FALSE;
-		for (app = 0; app < MAX_OBJ_AFFECT && !found; ++app) {
-			if (obj->affected[app].location == APPLY_NONE || obj->affected[app].modifier >= 0) {
+		for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
+			if (apply->modifier >= 0) {
 				continue;
 			}
 			
 			// check each primary attribute
 			for (iter = 0; primary_attributes[iter] != NOTHING && !found; ++iter) {
-				if (GET_ATT(ch, primary_attributes[iter]) < 1 && primary_attributes[iter] == apply_attribute[(int) obj->affected[app].location]) {
+				if (GET_ATT(ch, primary_attributes[iter]) < 1 && primary_attributes[iter] == apply_attribute[(int) apply->location]) {
 					act("You are too weak to keep using $p.", FALSE, ch, obj, NULL, TO_CHAR);
 					act("$n stops using $p.", TRUE, ch, obj, NULL, TO_ROOM);
 					// this may extract it
@@ -572,7 +573,7 @@ void real_update_char(char_data *ch) {
 	
 	// ensure character isn't using any gear they shouldn't be
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
-		if (GET_EQ(ch, iter) && !can_wear_item(ch, GET_EQ(ch, iter), TRUE)) {
+		if (wear_data[iter].count_stats && GET_EQ(ch, iter) && !can_wear_item(ch, GET_EQ(ch, iter), TRUE)) {
 			// can_wear_item sends own message to ch
 			act("$n stops using $p.", TRUE, ch, GET_EQ(ch, iter), NULL, TO_ROOM);
 			// this may extract it
@@ -871,7 +872,7 @@ static void reduce_outside_territory_one(empire_data *emp) {
 	far_dist = -1;	// always less
 	
 	// check the whole map to determine the farthest outside claim
-	HASH_ITER(world_hh, world_table, iter, next_iter) {
+	HASH_ITER(hh, world_table, iter, next_iter) {
 		// map only
 		if (GET_ROOM_VNUM(iter) >= MAP_SIZE) {
 			continue;
@@ -938,7 +939,9 @@ static void reduce_stale_empires_one(empire_data *emp) {
 	
 	// try interior first -- we'll take the first secondary room we find
 	if (!outside_only) {
-		HASH_ITER(interior_hh, interior_world_table, iter, next_iter) {
+		for (iter = interior_room_list; iter; iter = next_iter) {
+			next_iter = iter->next_interior;
+			
 			// only want rooms owned by this empire and only if they are their own home room (like a ship)
 			if (ROOM_OWNER(iter) != emp || HOME_ROOM(iter) != iter) {
 				continue;
@@ -956,7 +959,7 @@ static void reduce_stale_empires_one(empire_data *emp) {
 	
 	if (!found_room) {
 		// otherwise find a random room
-		HASH_ITER(world_hh, world_table, iter, next_iter) {
+		HASH_ITER(hh, world_table, iter, next_iter) {
 			// map only
 			if (GET_ROOM_VNUM(iter) >= MAP_SIZE) {
 				continue;
@@ -1939,7 +1942,7 @@ void point_update(bool run_real) {
 	}
 	
 	// rooms
-	HASH_ITER(world_hh, world_table, room, next_room) {
+	HASH_ITER(hh, world_table, room, next_room) {
 		point_update_room(room);
 	}
 	

@@ -343,7 +343,7 @@ void cancel_minting(char_data *ch) {
 * @param char_data *ch The sailer.
 */
 void cancel_sailing(char_data *ch) {
-	room_data *room, *next_room;
+	room_data *room;
 	obj_data *ship;
 	
 	// no ship? no work
@@ -351,7 +351,7 @@ void cancel_sailing(char_data *ch) {
 		return;
 	}
 	
-	HASH_ITER(interior_hh, interior_world_table, room, next_room) {
+	for (room = interior_room_list; room; room = room->next_interior) {
 		if (HOME_ROOM(room) == HOME_ROOM(IN_ROOM(ch)) && ROOM_PEOPLE(room)) {
 			act("The ship stops moving.", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
 		}
@@ -633,7 +633,7 @@ INTERACTION_FUNC(finish_harvesting) {
 	int count, num;
 	obj_data *obj = NULL;
 		
-	if ((cp = crop_proto(ROOM_CROP_TYPE(inter_room))) && (sect = sector_proto(climate_default_sector[GET_CROP_CLIMATE(cp)]))) {
+	if ((cp = ROOM_CROP(inter_room)) && (sect = sector_proto(climate_default_sector[GET_CROP_CLIMATE(cp)]))) {
 		// victory
 		act("You finish harvesting the crop!", FALSE, ch, 0, 0, TO_CHAR);
 		act("$n finished harvesting the crop!", FALSE, ch, 0, 0, TO_ROOM);
@@ -663,9 +663,9 @@ INTERACTION_FUNC(finish_harvesting) {
 	}
 
 	// finally, change the terrain
-	if (ROOM_ORIGINAL_SECT(inter_room) != SECT(inter_room)) {
+	if (BASE_SECT(inter_room) != SECT(inter_room)) {
 		// use original terrain (appears to have been stored)
-		change_terrain(inter_room, GET_SECT_VNUM(ROOM_ORIGINAL_SECT(inter_room)));
+		change_terrain(inter_room, GET_SECT_VNUM(BASE_SECT(inter_room)));
 	}
 	else if (sect) {
 		// use fallback sect
@@ -1334,17 +1334,17 @@ void process_harvesting(char_data *ch) {
 	switch (number(0, 2)) {
 		case 0: {
 			if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
-				msg_to_char(ch, "You walk through the field, harvesting the %s.\r\n", GET_CROP_NAME(crop_proto(ROOM_CROP_TYPE(IN_ROOM(ch)))));
+				msg_to_char(ch, "You walk through the field, harvesting the %s.\r\n", GET_CROP_NAME(ROOM_CROP(IN_ROOM(ch))));
 			}
-			sprintf(buf, "$n walks through the field, harvesting the %s.", GET_CROP_NAME(crop_proto(ROOM_CROP_TYPE(IN_ROOM(ch)))));
+			sprintf(buf, "$n walks through the field, harvesting the %s.", GET_CROP_NAME(ROOM_CROP(IN_ROOM(ch))));
 			act(buf, FALSE, ch, 0, 0, TO_ROOM | TO_SPAMMY);
 			break;
 		}
 		case 1: {
 			if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
-				msg_to_char(ch, "You carefully harvest the %s.\r\n", GET_CROP_NAME(crop_proto(ROOM_CROP_TYPE(IN_ROOM(ch)))));
+				msg_to_char(ch, "You carefully harvest the %s.\r\n", GET_CROP_NAME(ROOM_CROP(IN_ROOM(ch))));
 			}
-			sprintf(buf, "$n carefully harvests the %s.", GET_CROP_NAME(crop_proto(ROOM_CROP_TYPE(IN_ROOM(ch)))));
+			sprintf(buf, "$n carefully harvests the %s.", GET_CROP_NAME(ROOM_CROP(IN_ROOM(ch))));
 			act(buf, FALSE, ch, 0, 0, TO_ROOM | TO_SPAMMY);
 			break;
 		}
@@ -2227,8 +2227,6 @@ ACMD(do_excavate) {
 		// Set up the trench
 		change_terrain(IN_ROOM(ch), evo->becomes);
 		set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_PROGRESS, config_get_int("trench_initial_value"));
-		SET_BIT(ROOM_AFF_FLAGS(IN_ROOM(ch)), ROOM_AFF_PLAYER_MADE);
-		SET_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_PLAYER_MADE);
 	}
 }
 
@@ -2264,11 +2262,11 @@ ACMD(do_fillin) {
 			set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_PROGRESS, -1);
 		}
 	}
-	else if (!(old_sect = reverse_lookup_evolution_for_sector(SECT(IN_ROOM(ch)), EVO_TRENCH_FULL))) {
+	else if (GET_ROOM_VNUM(IN_ROOM(ch)) >= MAP_SIZE || !(old_sect = reverse_lookup_evolution_for_sector(SECT(IN_ROOM(ch)), EVO_TRENCH_FULL))) {
 		// anything to reverse it to?
 		msg_to_char(ch, "You can't fill anything in here.\r\n");
 	}
-	else if (!ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_PLAYER_MADE)) {
+	else if (SECT(IN_ROOM(ch)) == world_map[FLAT_X_COORD(IN_ROOM(ch))][FLAT_Y_COORD(IN_ROOM(ch))].natural_sector) {
 		msg_to_char(ch, "You can only fill in a tile that was made by excavation, not a natural one.\r\n");
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
@@ -2318,7 +2316,7 @@ ACMD(do_harvest) {
 		msg_to_char(ch, "You can't do that.\r\n");
 	}
 	else if (GET_ACTION(ch) == ACT_HARVESTING) {
-		msg_to_char(ch, "You stop harvesting the %s.\r\n", GET_CROP_NAME(crop_proto(ROOM_CROP_TYPE(IN_ROOM(ch)))));
+		msg_to_char(ch, "You stop harvesting the %s.\r\n", GET_CROP_NAME(ROOM_CROP(IN_ROOM(ch))));
 		act("$n stops harvesting.\r\n", FALSE, ch, 0, 0, TO_ROOM);
 		cancel_action(ch);
 	}
@@ -2351,7 +2349,7 @@ ACMD(do_harvest) {
 			set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_HARVEST_PROGRESS, harvest_timer);
 		}
 		
-		msg_to_char(ch, "You begin harvesting the %s.\r\n", GET_CROP_NAME(crop_proto(ROOM_CROP_TYPE(IN_ROOM(ch)))));
+		msg_to_char(ch, "You begin harvesting the %s.\r\n", GET_CROP_NAME(ROOM_CROP(IN_ROOM(ch))));
 		act("$n begins to harvest the crop.", FALSE, ch, 0, 0, TO_ROOM);
 	}
 }
@@ -2546,10 +2544,10 @@ ACMD(do_plant) {
 	else {
 		original = SECT(IN_ROOM(ch));
 		change_terrain(IN_ROOM(ch), evo->becomes);
-		ROOM_ORIGINAL_SECT(IN_ROOM(ch)) = original;
+		change_base_sector(IN_ROOM(ch), original);
 		
 		// don't use GET_FOOD_CROP_TYPE because not all plantables are food
-		set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CROP_TYPE, GET_OBJ_VAL(obj, VAL_FOOD_CROP_TYPE));
+		set_crop_type(IN_ROOM(ch), cp);
 		set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_SEED_TIME, planting_base_timer);
 		
 		extract_obj(obj);

@@ -1329,6 +1329,21 @@ password contains a space, you should put it in "quotes" or (parentheses).
 
 This command cannot be abbreviated.
 #
+SHARE UNSHARE "SHARED ITEM"
+
+Usage:  share <item>
+        unshare
+
+You can "share" any item from your inventory. This allows it to be targeted
+by other players' enchantments (and other abilities). This way, another player
+can enchant an item that is bound to you. Items in the shared slot don't count
+toward your stats your gear level.
+
+To use an ability like "enchant" on another player's shared slot, type the
+player's name as the target of the enchantment.
+
+See also: ENCHANT
+#
 SHEATH SHEATHE
 
 Usage:  sheathe

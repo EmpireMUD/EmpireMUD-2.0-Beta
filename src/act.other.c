@@ -1174,7 +1174,7 @@ ACMD(do_gen_write) {
 	else if (GET_BUILDING(IN_ROOM(ch))) {
 		snprintf(locpart, sizeof(locpart), " [BLD%d]", GET_BLD_VNUM(GET_BUILDING(IN_ROOM(ch))));
 	}
-	else if (ROOM_CROP_TYPE(IN_ROOM(ch)) && (cp = crop_proto(ROOM_CROP_TYPE(IN_ROOM(ch))))) {
+	else if ((cp = ROOM_CROP(IN_ROOM(ch)))) {
 		snprintf(locpart, sizeof(locpart), " [CRP%d]", GET_CROP_VNUM(cp));
 	}
 	else {

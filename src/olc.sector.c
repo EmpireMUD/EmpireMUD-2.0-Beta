@@ -135,6 +135,7 @@ void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 	extern bool delete_link_rule_by_type_value(struct adventure_link_rule **list, int type, any_vnum value);
 	void remove_sector_from_table(sector_data *sect);
 	extern const sector_vnum climate_default_sector[NUM_CLIMATES];
+	extern bool world_map_needs_save;
 	
 	sector_data *sect, *sect_iter, *next_sect, *replace_sect;
 	room_data *room, *next_room;
@@ -172,13 +173,19 @@ void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 	
 	// update world
 	count = 0;
-	HASH_ITER(world_hh, world_table, room, next_room) {
+	HASH_ITER(hh, world_table, room, next_room) {
 		if (SECT(room) == sect) {
+			// can't use change_terrain() here
 			SECT(room) = replace_sect;
 			++count;
+			
+			if (GET_ROOM_VNUM(room) < MAP_SIZE) {
+				world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)].sector_type = replace_sect;
+				world_map_needs_save = TRUE;
+			}
 		}
-		if (ROOM_ORIGINAL_SECT(room) == sect) {
-			ROOM_ORIGINAL_SECT(room) = replace_sect;
+		if (BASE_SECT(room) == sect) {
+			change_base_sector(room, replace_sect);
 		}
 	}
 	

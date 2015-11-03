@@ -403,7 +403,7 @@ ADMIN_UTIL(util_islandsize) {
 	size_t size;
 	int isle;
 	
-	HASH_ITER(world_hh, world_table, room, next_room) {
+	HASH_ITER(hh, world_table, room, next_room) {
 		if (GET_ROOM_VNUM(room) < MAP_SIZE) {
 			isle = GET_ISLAND_ID(room);
 			HASH_FIND_INT(list, &isle, isf);
@@ -1733,7 +1733,7 @@ SHOW(show_stats) {
 	msg_to_char(ch, "  %6d empires          %6d active\r\n", HASH_COUNT(empire_table), num_active_empires);
 	msg_to_char(ch, "  %6d mobiles          %6d prototypes\r\n", num_mobs, HASH_COUNT(mobile_table));
 	msg_to_char(ch, "  %6d objects          %6d prototypes\r\n", num_objs, HASH_COUNT(object_table));
-	msg_to_char(ch, "  %6d adventures       %6d total rooms\r\n", HASH_COUNT(adventure_table), HASH_CNT(world_hh, world_table));
+	msg_to_char(ch, "  %6d adventures       %6d total rooms\r\n", HASH_COUNT(adventure_table), HASH_COUNT(world_table));
 	msg_to_char(ch, "  %6d buildings        %6d room templates\r\n", HASH_COUNT(building_table), HASH_COUNT(room_template_table));
 	msg_to_char(ch, "  %6d sectors          %6d crops\r\n", HASH_COUNT(sector_table), HASH_COUNT(crop_table));
 	msg_to_char(ch, "  %6d triggers         %6d craft recipes\r\n", HASH_COUNT(trigger_table), HASH_COUNT(craft_table));
@@ -2159,7 +2159,7 @@ SHOW(show_startlocs) {
 	
 	strcpy(buf, "Starting locations:\r\n");
 	
-	HASH_ITER(world_hh, world_table, iter, next_iter) {
+	HASH_ITER(hh, world_table, iter, next_iter) {
 		if (ROOM_SECT_FLAGGED(iter, SECTF_START_LOCATION)) {
 			sprintf(buf + strlen(buf), "%s (%d, %d)&0\r\n", get_room_name(iter, TRUE), X_COORD(iter), Y_COORD(iter));
 		}
@@ -2922,6 +2922,7 @@ void do_stat_global(char_data *ch, struct global_data *glb) {
 
 /* Gives detailed information on an object (j) to ch */
 void do_stat_object(char_data *ch, obj_data *j) {
+	extern const char *apply_type_names[];
 	extern const struct material_data materials[NUM_MATERIALS];
 	extern const char *wear_bits[];
 	extern const char *item_types[];
@@ -2934,7 +2935,9 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	extern const char *armor_types[NUM_ARMOR_TYPES+1];
 	extern const struct poison_data_type poison_data[];
 	
-	int i, found;
+	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
+	int found;
+	struct obj_apply *apply;
 	room_data *room;
 	obj_vnum vnum = GET_OBJ_VNUM(j);
 	obj_data *j2;
@@ -3154,9 +3157,15 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	}
 	found = 0;
 	send_to_char("Applies:", ch);
-	for (i = 0; i < MAX_OBJ_AFFECT; i++)
-		if (j->affected[i].modifier)
-			msg_to_char(ch, "%s %+d to %s", found++ ? "," : "", j->affected[i].modifier, apply_types[(int) j->affected[i].location]);
+	for (apply = GET_OBJ_APPLIES(j); apply; apply = apply->next) {
+		if (apply->apply_type != APPLY_TYPE_NATURAL) {
+			sprintf(part, " (%s)", apply_type_names[(int)apply->apply_type]);
+		}
+		else {
+			*part = '\0';
+		}
+		msg_to_char(ch, "%s %+d to %s%s", found++ ? "," : "", apply->modifier, apply_types[(int) apply->location], part);
+	}
 	if (!found)
 		send_to_char(" None", ch);
 
@@ -3212,20 +3221,20 @@ void do_stat_room(char_data *ch) {
 	crop_data *cp;
 	empire_data *emp;
 	struct affected_type *aff;
-	struct room_extra_data *red;
+	struct room_extra_data *red, *next_red;
 	player_index_data *index;
 	struct global_data *glb;
 	room_data *home = HOME_ROOM(IN_ROOM(ch));
 
 
-	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_HAS_CROP_DATA) && (cp = crop_proto(get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CROP_TYPE)))) {
+	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_HAS_CROP_DATA) && (cp = ROOM_CROP(IN_ROOM(ch)))) {
 		strcpy(buf2, GET_CROP_NAME(cp));
 		CAP(buf2);
 	}
 	else {
 		strcpy(buf2, GET_SECT_NAME(SECT(IN_ROOM(ch))));
 	}
-	msg_to_char(ch, "(%d, %d) %s (&c%s&0/&c%s&0)\r\n", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), get_room_name(IN_ROOM(ch), FALSE), buf2, GET_SECT_NAME(ROOM_ORIGINAL_SECT(IN_ROOM(ch))));
+	msg_to_char(ch, "(%d, %d) %s (&c%s&0/&c%s&0)\r\n", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), get_room_name(IN_ROOM(ch), FALSE), buf2, GET_SECT_NAME(BASE_SECT(IN_ROOM(ch))));
 	msg_to_char(ch, "VNum: [&g%d&0], Island: [%d] %s\r\n", GET_ROOM_VNUM(IN_ROOM(ch)), GET_ISLAND_ID(home), get_island(GET_ISLAND_ID(home), TRUE)->name);
 	
 	if (home != IN_ROOM(ch)) {
@@ -3361,7 +3370,7 @@ void do_stat_room(char_data *ch) {
 	if (IN_ROOM(ch)->extra_data) {
 		msg_to_char(ch, "Extra data:\r\n");
 		
-		for (red = IN_ROOM(ch)->extra_data; red; red = red->next) {
+		HASH_ITER(hh, IN_ROOM(ch)->extra_data, red, next_red) {
 			sprinttype(red->type, room_extra_types, buf);
 			msg_to_char(ch, " %s: %d\r\n", buf, red->value);
 		}
@@ -5929,7 +5938,7 @@ ACMD(do_stat) {
 		}
 	}
 	else if (!str_cmp(buf1, "crop")) {
-		if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_HAS_CROP_DATA) && (cp = crop_proto(ROOM_CROP_TYPE(IN_ROOM(ch))))) {
+		if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_HAS_CROP_DATA) && (cp = ROOM_CROP(IN_ROOM(ch)))) {
 			do_stat_crop(ch, cp);
 		}
 		else {

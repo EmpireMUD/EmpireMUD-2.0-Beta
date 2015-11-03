@@ -27,7 +27,7 @@ else
   %actor.set_skill(Stealth, 1)%
   %send% %actor% %self.name% whispers, 'I suppose I could let you into the Guild, provisionally.'
 end
-%junk% %object%
+%purge% %object%
 ~
 #256
 Hestian Trinket~

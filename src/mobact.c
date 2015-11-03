@@ -857,7 +857,7 @@ static void spawn_one_room(room_data *room) {
 			list = GET_BLD_SPAWNS(GET_BUILDING(room));
 		}
 	}
-	else if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && (cp = crop_proto(ROOM_CROP_TYPE(room)))) {
+	else if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && (cp = ROOM_CROP(room))) {
 		list = GET_CROP_SPAWNS(cp);
 	}
 	else {
@@ -922,7 +922,9 @@ static void spawn_one_room(room_data *room) {
 
 	// spawn interior rooms: recursively
 	if (GET_INSIDE_ROOMS(room) > 0) {
-		HASH_ITER(interior_hh, interior_world_table, iter, next_iter) {
+		for (iter = interior_room_list; iter; iter = next_iter) {
+			next_iter = iter->next_interior;
+			
 			if (HOME_ROOM(iter) == room && iter != room) {
 				spawn_one_room(iter);
 			}

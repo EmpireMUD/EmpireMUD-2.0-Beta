@@ -10,6 +10,8 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 
+#include <math.h>
+
 #include "conf.h"
 #include "sysdep.h"
 
@@ -784,6 +786,116 @@ ACMD(do_gen_craft) {
 }
 
 
+ACMD(do_hone) {
+	extern double get_enchant_scale_for_char(char_data *ch, int max_scale);
+	extern const double apply_values[];
+
+	Resource hone_res[2] = { { o_NOCTURNIUM_INGOT, 2 }, END_RESOURCE_LIST };
+	struct obj_apply *apply;
+	obj_data *obj;
+	double points;
+	int maxlev;
+	bool has;
+	
+	one_argument(argument, arg);
+	
+	if (!can_use_ability(ch, ABIL_HONE, NOTHING, 0, NOTHING)) {
+		return;
+	}
+	if (!*arg) {
+		msg_to_char(ch, "Hone which item?\r\n");
+		return;
+	}
+	if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
+		return;
+	}
+	
+	// check for honed
+	has = FALSE;
+	for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
+		if (apply->apply_type == APPLY_TYPE_HONED) {
+			has = TRUE;
+		}
+	}
+	if (has) {
+		act("$p is already honed.", FALSE, ch, obj, NULL, TO_CHAR);
+		return;
+	}
+	
+	if (!has_resources(ch, hone_res, FALSE, TRUE)) {
+		// message sent by has_resources
+		return;
+	}
+	
+	if (ABILITY_TRIGGERS(ch, NULL, obj, ABIL_HONE)) {
+		return;
+	}
+	
+	// determine points to spend
+	maxlev = GET_OBJ_CURRENT_SCALE_LEVEL(obj);
+	if (GET_SKILL(ch, SKILL_TRADE) < CLASS_SKILL_CAP) {
+		maxlev = MIN(maxlev, GET_SKILL(ch, SKILL_TRADE));
+	}
+	points = get_enchant_scale_for_char(ch, maxlev);
+	
+	// how it hones depends upon type
+	if (IS_WEAPON(obj)) {
+		CREATE(apply, struct obj_apply, 1);
+		apply->apply_type = APPLY_TYPE_HONED;
+		apply->location = (attack_hit_info[GET_WEAPON_TYPE(obj)].damage_type == DAM_MAGICAL) ? APPLY_BONUS_MAGICAL : APPLY_BONUS_PHYSICAL;
+		apply->modifier = MAX(1, round(points * (1.0 / apply_values[(int) apply->location])));
+		apply->next = GET_OBJ_APPLIES(obj);
+		GET_OBJ_APPLIES(obj) = apply;
+	}
+	else if (CAN_WEAR(obj, ITEM_WEAR_HOLD)) {
+		CREATE(apply, struct obj_apply, 1);
+		apply->apply_type = APPLY_TYPE_HONED;
+		apply->location = APPLY_BONUS_HEALING;
+		apply->modifier = MAX(1, round(points * (1.0 / apply_values[(int) apply->location])));
+		apply->next = GET_OBJ_APPLIES(obj);
+		GET_OBJ_APPLIES(obj) = apply;
+	}
+	else if (IS_SHIELD(obj)) {
+		// resist-physical
+		CREATE(apply, struct obj_apply, 1);
+		apply->apply_type = APPLY_TYPE_HONED;
+		apply->location = APPLY_RESIST_PHYSICAL;
+		apply->modifier = MAX(1, round(points / 2.0 * (1.0 / apply_values[(int) apply->location])));
+		apply->next = GET_OBJ_APPLIES(obj);
+		GET_OBJ_APPLIES(obj) = apply;
+		
+		// resist-magical
+		CREATE(apply, struct obj_apply, 1);
+		apply->apply_type = APPLY_TYPE_HONED;
+		apply->location = APPLY_RESIST_MAGICAL;
+		apply->modifier = MAX(1, round(points / 2.0 * (1.0 / apply_values[(int) apply->location])));
+		apply->next = GET_OBJ_APPLIES(obj);
+		GET_OBJ_APPLIES(obj) = apply;
+	}
+	else {
+		act("You can't hone $p.", FALSE, ch, obj, NULL, TO_CHAR);
+		return;
+	}
+	
+	extract_resources(ch, hone_res, FALSE);
+	
+	// messaging
+	act("You carefully hone $p.", FALSE, ch, obj, NULL, TO_CHAR);
+	act("$n carefully hones $p.", FALSE, ch, obj, NULL, TO_ROOM);
+	
+	// ensure binding
+	if (!OBJ_FLAGGED(obj, OBJ_BIND_FLAGS)) {
+		SET_BIT(GET_OBJ_EXTRA(obj), OBJ_BIND_ON_PICKUP);
+	}
+	bind_obj_to_player(obj, ch);
+	reduce_obj_binding(obj, ch);
+	
+	// exp
+	gain_ability_exp(ch, ABIL_HONE, 100);
+}
+
+
 ACMD(do_recipes) {
 	int sub, last_type = NOTHING;
 	craft_data *craft, *next_craft;
@@ -851,6 +963,7 @@ ACMD(do_recipes) {
 
 // this handles both 'reforge' and 'refashion'
 ACMD(do_reforge) {
+	extern char *shared_by(obj_data *obj, char_data *ch);
 	extern const char *item_types[];
 	
 	Resource res[2] = { { NOTHING, 0 }, END_RESOURCE_LIST };	// this cost is set later
@@ -882,7 +995,7 @@ ACMD(do_reforge) {
 	else if (reforge_data[subcmd].validate_func && !(reforge_data[subcmd].validate_func)(ch)) {
 		// failed validate func -- sends own messages
 	}
-	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying)) && !(obj = get_obj_by_char_share(ch, arg))) {
 		msg_to_char(ch, "You don't seem to have a %s.\r\n", arg);
 	}
 	else if (!match_reforge_type(obj, subcmd)) {
@@ -920,8 +1033,8 @@ ACMD(do_reforge) {
 			extract_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED));
 			
 			// prepare
-			sprintf(buf1, "You name %s $p!", GET_OBJ_SHORT_DESC(obj));
-			sprintf(buf2, "$n names %s $p!", GET_OBJ_SHORT_DESC(obj));
+			sprintf(buf1, "You name %s%s $p!", GET_OBJ_SHORT_DESC(obj), shared_by(obj, ch));
+			sprintf(buf2, "$n names %s%s $p!", GET_OBJ_SHORT_DESC(obj), shared_by(obj, ch));
 			
 			proto = obj_proto(GET_OBJ_VNUM(obj));
 			
@@ -946,8 +1059,8 @@ ACMD(do_reforge) {
 			GET_OBJ_LONG_DESC(obj) = str_dup(temp);
 			
 			// message
-			act(buf1, FALSE, ch, obj, NULL, TO_CHAR);
-			act(buf2, TRUE, ch, obj, NULL, TO_ROOM);
+			act(buf1, FALSE, ch, obj, obj->worn_by, TO_CHAR);
+			act(buf2, TRUE, ch, obj, obj->worn_by, TO_ROOM);
 			
 			if (reforge_data[subcmd].ability != NOTHING) {
 				gain_ability_exp(ch, reforge_data[subcmd].ability, 50);
@@ -982,9 +1095,6 @@ ACMD(do_reforge) {
 			OBJ_BOUND_TO(new) = OBJ_BOUND_TO(obj);
 			OBJ_BOUND_TO(obj) = NULL;
 			
-			// give to char
-			obj_to_char(new, ch);
-			
 			// re-apply
 			new->stolen_timer = old_stolen_time;
 			GET_OBJ_TIMER(new) = old_timer;
@@ -993,20 +1103,22 @@ ACMD(do_reforge) {
 			}
 			
 			// junk the old one
+			swap_obj_for_obj(obj, new);
 			extract_obj(obj);
+			obj = new;
 			
 			// message
-			sprintf(buf, "You %s $p!", reforge_data[subcmd].command);
-			act(buf, FALSE, ch, new, NULL, TO_CHAR);
+			sprintf(buf, "You %s $p%s!", reforge_data[subcmd].command, shared_by(obj, ch));
+			act(buf, FALSE, ch, obj, obj->worn_by, TO_CHAR);
 			
-			sprintf(buf, "$n %s $p!", reforge_data[subcmd].command);
-			act(buf, TRUE, ch, new, NULL, TO_ROOM);
+			sprintf(buf, "$n %s $p%s!", reforge_data[subcmd].command, shared_by(obj, ch));
+			act(buf, TRUE, ch, obj, obj->worn_by, TO_ROOM);
 			
 			if (reforge_data[subcmd].ability != NO_ABIL) {
 				gain_ability_exp(ch, reforge_data[subcmd].ability, 50);
 			}
 
-			load_otrigger(new);
+			load_otrigger(obj);
 		}
 	}
 	else if (is_abbrev(arg2, "superior")) {
@@ -1042,9 +1154,6 @@ ACMD(do_reforge) {
 			OBJ_BOUND_TO(new) = OBJ_BOUND_TO(obj);
 			OBJ_BOUND_TO(obj) = NULL;
 			
-			// give to char
-			obj_to_char(new, ch);
-			
 			// set superior
 			SET_BIT(GET_OBJ_EXTRA(new), OBJ_SUPERIOR);
 			
@@ -1070,13 +1179,15 @@ ACMD(do_reforge) {
 			}
 			
 			// junk the old one
+			swap_obj_for_obj(obj, new);
 			extract_obj(obj);
+			obj = new;
 			
-			sprintf(buf, "You %s $p into a masterwork!", reforge_data[subcmd].command);
-			act(buf, FALSE, ch, new, NULL, TO_CHAR);
+			sprintf(buf, "You %s $p%s into a masterwork!", reforge_data[subcmd].command, shared_by(obj, ch));
+			act(buf, FALSE, ch, obj, obj->worn_by, TO_CHAR);
 			
-			sprintf(buf, "$n %s $p into a masterwork!", reforge_data[subcmd].command);
-			act(buf, TRUE, ch, new, NULL, TO_ROOM);
+			sprintf(buf, "$n %s $p%s into a masterwork!", reforge_data[subcmd].command, shared_by(obj, ch));
+			act(buf, TRUE, ch, obj, obj->worn_by, TO_ROOM);
 
 			if (reforge_data[subcmd].ability != NOTHING) {
 				gain_ability_exp(ch, reforge_data[subcmd].ability, 50);

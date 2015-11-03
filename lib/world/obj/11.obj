@@ -18,7 +18,7 @@ The sword drips with blood.
 0 3 1
 10 0
 A
-17 1
+17 1 0
 S
 #1105
 fireball~
@@ -57,13 +57,13 @@ a wanderer's staff~
 A wanderer's staff has fallen on the ground.~
 The staff is the signature weapon of High Sorcery.
 ~
-1 ehjlmo an 1
+1 ehlmo an 2
 0 3 17
 0 0
 A
-6 1
+6 1 0
 A
-11 3
+11 3 0
 S
 #1109
 staff sorcerer's sorcerers~
@@ -71,11 +71,11 @@ a sorcerer's staff~
 A sorcerer's staff has been dropped here.~
 The staff is the signature weapon of High Sorcery.
 ~
-1 ehjlmo an 1
+1 ehlmo an 2
 0 4 17
 0 0
 A
-7 1
+7 1 0
 S
 #1110
 staff wisdom~
@@ -83,11 +83,11 @@ a staff of wisdom~
 A staff of wisdom has fallen to the ground.~
 The staff is the signature weapon of High Sorcery.
 ~
-1 ehjlmo an 1
+1 ehlmo an 2
 0 4 17
 0 0
 A
-8 1
+8 1 0
 S
 #1111
 staff lightning~
@@ -95,13 +95,13 @@ a staff of lightning~
 A staff of lightning is crackling with energy on the ground.~
 The staff is the signature weapon of High Sorcery.
 ~
-1 ejmo an 1
+1 emo an 2
 0 4 17
 0 0
 A
-9 2
+9 2 0
 A
-8 1
+8 1 0
 S
 #1112
 staff burning~
@@ -109,13 +109,13 @@ a burning staff~
 A burning staff is planted in the ground.~
 The staff is the signature weapon of High Sorcery.
 ~
-1 ejmo an 1
+1 emo an 2
 0 6 18
 0 0
 A
-16 1
+16 1 0
 A
-7 1
+7 1 0
 S
 #1113
 staff agony~
@@ -123,11 +123,11 @@ a staff of agony~
 A staff of agony is wailing dreadfully.~
 The staff is the signature weapon of High Sorcery.
 ~
-1 ejmo an 1
+1 emo an 2
 0 3 19
 0 0
 A
-17 1
+17 1 0
 S
 #1114
 spike imperium~
@@ -148,7 +148,7 @@ crystal nexus~
 a nexus crystal~
 A nexus crystal is lying here.~
    The nexus crystal is a small, fiery gem that is used to build certain
-magical buildings.  
+magical buildings.
 ~
 3 0 a 2
 0 0 0
