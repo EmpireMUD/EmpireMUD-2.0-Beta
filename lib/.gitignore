@@ -1,4 +1,5 @@
 players/*/*.plr
+players/*/*.delay
 players/accounts/*.acct
 plralias/*/*.alias
 plrlore/*/*.lore
