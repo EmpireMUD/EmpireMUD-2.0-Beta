@@ -309,6 +309,9 @@ void perform_chant(char_data *ch) {
 					change_base_sector(IN_ROOM(ch), preserve);
 				}
 				
+				remove_depletion(IN_ROOM(ch), DPLTN_PICK);
+				remove_depletion(IN_ROOM(ch), DPLTN_FORAGE);
+				
 				gain_ability_exp(ch, ABIL_CHANT_OF_NATURE, 20);
 			}
 			else {
