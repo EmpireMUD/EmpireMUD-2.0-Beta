@@ -81,8 +81,6 @@ bool audit_augment(augment_data *aug, char_data *ch) {
 * @return char* The line to show (without a CRLF).
 */
 char *list_one_augment(augment_data *aug, bool detail) {
-	extern const char *action_bits[];
-	
 	static char output[MAX_STRING_LENGTH];
 	char abil[MAX_STRING_LENGTH];
 	
