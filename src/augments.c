@@ -151,6 +151,27 @@ int sort_augments(augment_data *a, augment_data *b) {
 }
 
 
+/**
+* Searches the augment db for a match, and prints it to the character.
+*
+* @param char *searchname The search string.
+* @param char_data *ch The player who is searching.
+* @return int The number of matches shown.
+*/
+int vnum_augment(char *searchname, char_data *ch) {
+	augment_data *iter, *next_iter;
+	int found = 0;
+	
+	HASH_ITER(hh, augment_table, iter, next_iter) {
+		if (multi_isname(searchname, GET_AUG_NAME(iter))) {
+			msg_to_char(ch, "%3d. [%5d] %s (%s)\r\n", ++found, GET_AUG_VNUM(iter), GET_AUG_NAME(iter), augment_types[GET_AUG_TYPE(iter)]);
+		}
+	}
+	
+	return found;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// DATABASE ////////////////////////////////////////////////////////////////
 
@@ -716,7 +737,7 @@ OLC_MODULE(augedit_apply) {
 		num = atoi(arg2);
 		
 		if (!*arg2 || !*arg3 || !isdigit(*arg2) || num <= 0) {
-			msg_to_char(ch, "Usage: apply add <value> <apply> [type]\r\n");
+			msg_to_char(ch, "Usage: apply add <value> <apply>\r\n");
 		}
 		else if ((loc = search_block(arg3, apply_types, FALSE)) == NOTHING) {
 			msg_to_char(ch, "Invalid apply.\r\n");

@@ -6320,6 +6320,8 @@ ACMD(do_users) {
 
 
 ACMD(do_vnum) {
+	extern int vnum_augment(char *searchname, char_data *ch);
+
 	char buf[MAX_INPUT_LENGTH], buf2[MAX_INPUT_LENGTH];
 	
 	half_chop(argument, buf, buf2);
@@ -6345,6 +6347,11 @@ ACMD(do_vnum) {
 	else if (is_abbrev(buf, "adventure")) {
 		if (!vnum_adventure(buf2, ch)) {
 			msg_to_char(ch, "No adventures by that name.\r\n");
+		}
+	}
+	else if (is_abbrev(buf, "augment")) {
+		if (!vnum_augment(buf2, ch)) {
+			msg_to_char(ch, "No augments by that name.\r\n");
 		}
 	}
 	else if (is_abbrev(buf, "building")) {
