@@ -559,7 +559,7 @@ augment_data *setup_olc_augment(augment_data *input) {
 	}
 	else {
 		// brand new: some defaults
-		GET_AUG_NAME(new) = str_dup("Unnamed Augment");
+		GET_AUG_NAME(new) = str_dup("unnamed augment");
 		GET_AUG_FLAGS(new) = AUG_IN_DEVELOPMENT;
 	}
 	
