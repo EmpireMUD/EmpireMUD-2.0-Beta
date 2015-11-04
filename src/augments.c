@@ -439,7 +439,7 @@ void write_augment_to_file(FILE *fl, augment_data *aug) {
 	// 2. type flags wear-flags ability
 	strcpy(temp, bitv_to_alpha(GET_AUG_FLAGS(aug)));
 	strcpy(temp2, bitv_to_alpha(GET_AUG_WEAR_FLAGS(aug)));
-	fprintf(fl, "%d %s %s %d\n", GET_AUG_TYPE(aug), temp, temp, GET_AUG_ABILITY(aug));
+	fprintf(fl, "%d %s %s %d\n", GET_AUG_TYPE(aug), temp, temp2, GET_AUG_ABILITY(aug));
 	
 	// 'A': applies
 	for (app = GET_AUG_APPLIES(aug); app; app = app->next) {
