@@ -191,7 +191,7 @@ void stat_augment(char_data *ch, augment_data *aug) {
 	
 	// resources
 	get_resource_display(GET_AUG_RESOURCES(aug), part);
-	size += snprintf(buf + size, sizeof(buf) - size, "%s", part);
+	size += snprintf(buf + size, sizeof(buf) - size, "Resource cost:\r\n%s", part);
 	
 	page_string(ch->desc, buf, TRUE);
 }
