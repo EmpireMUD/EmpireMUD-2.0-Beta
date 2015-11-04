@@ -35,6 +35,7 @@
 // external consts
 extern const char *augment_types[];
 extern const char *augment_flags[];
+extern const char *wear_bits[];
 
 
 // external funcs
@@ -294,8 +295,8 @@ void free_augment(augment_data *aug) {
 void parse_augment(FILE *fl, any_vnum vnum) {
 	void parse_resource(FILE *fl, struct resource_data **list, char *error_str);
 
+	char line[256], error[256], str_in[256], str_in2[256];
 	struct augment_apply *app, *last_app = NULL;
-	char line[256], error[256], str_in[256];
 	augment_data *aug, *find;
 	int int_in[4];
 	
@@ -316,14 +317,15 @@ void parse_augment(FILE *fl, any_vnum vnum) {
 	// line 1
 	GET_AUG_NAME(aug) = fread_string(fl, error);
 	
-	// line 2: type flags ability
-	if (!get_line(fl, line) || sscanf(line, "%d %s %d", &int_in[0], str_in, &int_in[1]) != 3) {
+	// line 2: type flags wear-flags ability
+	if (!get_line(fl, line) || sscanf(line, "%d %s %s %d", &int_in[0], str_in, str_in2, &int_in[1]) != 3) {
 		log("SYSERR: Format error in line 2 of %s", error);
 		exit(1);
 	}
 	
 	GET_AUG_TYPE(aug) = int_in[0];
 	GET_AUG_FLAGS(aug) = asciiflag_conv(str_in);
+	GET_AUG_WEAR_FLAGS(aug) = asciiflag_conv(str_in2);
 	GET_AUG_ABILITY(aug) = int_in[1];
 		
 	// optionals
@@ -401,6 +403,7 @@ void write_augments_index(FILE *fl) {
 void write_augment_to_file(FILE *fl, augment_data *aug) {
 	void write_resources_to_file(FILE *fl, struct resource_data *list);
 	
+	char temp[256], temp2[256];
 	struct augment_apply *app;
 	
 	if (!fl || !aug) {
@@ -413,8 +416,10 @@ void write_augment_to_file(FILE *fl, augment_data *aug) {
 	// 1. name
 	fprintf(fl, "%s~\n", NULLSAFE(GET_AUG_NAME(aug)));
 	
-	// 2. type flags ability
-	fprintf(fl, "%d %s %d\n", GET_AUG_TYPE(aug), bitv_to_alpha(GET_AUG_FLAGS(aug)), GET_AUG_ABILITY(aug));
+	// 2. type flags wear-flags ability
+	strcpy(temp, bitv_to_alpha(GET_AUG_FLAGS(aug)));
+	strcpy(temp2, bitv_to_alpha(GET_AUG_WEAR_FLAGS(aug)));
+	fprintf(fl, "%d %s %s %d\n", GET_AUG_TYPE(aug), temp, temp, GET_AUG_ABILITY(aug));
 	
 	// 'A': applies
 	for (app = GET_AUG_APPLIES(aug); app; app = app->next) {
@@ -590,6 +595,9 @@ void olc_show_augment(char_data *ch) {
 
 	sprintbit(GET_AUG_FLAGS(aug), augment_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<&yflags&0> %s\r\n", lbuf);
+	
+	sprintbit(GET_AUG_WEAR_FLAGS(aug), wear_bits, lbuf, TRUE);
+	sprintf(buf + strlen(buf), "<&ywear&0> %s\r\n", lbuf);
 	
 	// ability required
 	if (GET_AUG_ABILITY(aug) == NO_ABIL) {

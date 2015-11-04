@@ -2069,6 +2069,7 @@ struct augment_data {
 	char *name;	// descriptive text
 	int type;	// AUGMENT_x
 	bitvector_t flags;	// AUG_x flags
+	bitvector_t wear_flags;	// ITEM_WEAR_x where this augment applies
 	
 	int ability;	// required ability or NO_ABIL
 	struct augment_apply *applies;	// how it modifies items
