@@ -337,6 +337,8 @@ void boot_world(void) {
 	void renum_world();
 	void setup_start_locations();
 
+	// DB_BOOT_x search: boot new types in this function
+
 	log("Loading name lists.");
 	index_boot(DB_BOOT_NAMES);
 
@@ -395,6 +397,9 @@ void boot_world(void) {
 	
 	log("Loading adventures.");
 	index_boot(DB_BOOT_ADV);
+	
+	log("Loading augments.");
+	index_boot(DB_BOOT_AUG);
 	
 	log("Loading instances.");
 	load_instances();
