@@ -338,7 +338,7 @@ void parse_augment(FILE *fl, any_vnum vnum) {
 	GET_AUG_NAME(aug) = fread_string(fl, error);
 	
 	// line 2: type flags wear-flags ability
-	if (!get_line(fl, line) || sscanf(line, "%d %s %s %d", &int_in[0], str_in, str_in2, &int_in[1]) != 3) {
+	if (!get_line(fl, line) || sscanf(line, "%d %s %s %d", &int_in[0], str_in, str_in2, &int_in[1]) != 4) {
 		log("SYSERR: Format error in line 2 of %s", error);
 		exit(1);
 	}
