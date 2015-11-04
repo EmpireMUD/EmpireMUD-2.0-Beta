@@ -171,13 +171,13 @@ void stat_augment(char_data *ch, augment_data *aug) {
 	if (GET_AUG_ABILITY(aug) != NO_ABIL && ability_data[GET_AUG_ABILITY(aug)].parent_skill != NO_SKILL) {
 		snprintf(part + strlen(part), sizeof(part) - strlen(part), " (%s %d)", skill_data[ability_data[GET_AUG_ABILITY(aug)].parent_skill].name, ability_data[GET_AUG_ABILITY(aug)].parent_skill_required);
 	}
-	size += snprintf(buf + size, sizeof(buf) - size, "Type: [\tc%s\t0], Requires Ability: [\tc%s\t0]\r\n", augment_types[GET_AUG_TYPE(aug)], part);
-	
-	sprintbit(GET_AUG_WEAR_FLAGS(aug), wear_bits, part, TRUE);
-	size += snprintf(buf + size, sizeof(buf) - size, "Targets wear location: \ty%s\t0\r\n", part);
+	size += snprintf(buf + size, sizeof(buf) - size, "Type: [\ty%s\t0], Requires Ability: [\ty%s\t0]\r\n", augment_types[GET_AUG_TYPE(aug)], part);
 	
 	sprintbit(GET_AUG_FLAGS(aug), augment_flags, part, TRUE);
 	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
+	
+	sprintbit(GET_AUG_WEAR_FLAGS(aug), wear_bits, part, TRUE);
+	size += snprintf(buf + size, sizeof(buf) - size, "Targets wear location: \ty%s\t0\r\n", part);
 	
 	// applies
 	size += snprintf(buf + size, sizeof(buf) - size, "Applies: ");
