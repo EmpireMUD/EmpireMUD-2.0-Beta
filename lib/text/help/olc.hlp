@@ -96,6 +96,11 @@ Adventures (ADVEDIT):
   evidence of them nearby, like a thieves' den.
 - Adventure scripts will ONLY run if they are 'Adventure Cleanup' scripts.
 
+Augments (AUGEDIT):
+- Augment names should be all lowercase.
+- If you don't set an ability on an augment, anyone will be able to use that
+  augment. They should virtually always have an ability set.
+
 Buildings (BEDIT):
 - Designated rooms are also built in the building editor, using the ROOM flag.
 - If a building has at least 1 Citizen, players can also set it as their home.
@@ -579,6 +584,123 @@ The following affect flags are available:
  !STEALTH - Immune to the Stealth debuffs.
  !VAMPIRE - Immune to Vampire debuffs.
  !STUN - Immune to stun effects.
+#d
+AUGEDIT "OLC AUGMENTS" "AUGMENT OLC" "AUGMENT EDITOR"
+
+Usage:  .aug <command>
+        .<command>
+
+The .olc augment editor is a powerful tool for creating and editing auments
+(which are like item enchantments). It provides a simple in-game menu with
+contextual choices to design multiple types of augments.
+
+All commands in the editor are highlighted in yellow and placed inside <angle
+braces>. You can get help on these by typing &yHELP AUGEDIT <COMMMAND>&0.
+
+You can close an open editor with .abort or .save.
+
+Example:
+ > .aug edit 11000
+ > .name moar power
+ > .type enchantment
+ > .save
+
+For notes on the mud's building rules, see HELP BUILDING GUIDE.
+
+See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
+"AUGEDIT ABILITY"
+
+Usage:  .ability <name | none>
+
+This allows you to require the player to have a certain ability in order to
+apply this augment. Setting it to 'none' removes this requirement.
+
+See also: OLC AUGMENTS
+#d
+"AUGEDIT APPLY" "AUGEDIT APPLIES"
+
+Usage:  .apply add <value> <apply>
+        .apply change <number> <value | apply> <new value>
+        .apply remove <number | all>
+
+Applies are the specific bonuses that will be added to an item when it is
+enhanced with this augment. The values you provide for the applies are actually
+"weights", as the final value is determined by the level of the augmented item
+and the level of the person who augmented it.
+
+If you set applies like "2 to STRENGTH, 1 to DEXTERITY", it means 2/3 of the
+points go to the STRENGTH apply and 1/3 to the DEXTERITY apply. If this is used
+on an item that receives 6 points from the augment, the final values would come
+out to +4 Strength and +2 Dexterity.
+
+You can see a list of applies on HELP APPLIES.
+
+See also: APPLIES, OLC AUGMENTS
+#d
+"AUGEDIT FLAGS"
+
+Usage:  .flags [add | remove] <flags>
+
+Augment flags are properties that affect how the augment behaves.
+
+Available flags:
+ IN-DEV - Cannot be used by mortals.
+
+See also: OLC AUGMENTS
+#d
+"AUGEDIT NAME"
+
+Usage:  .name <name>
+
+The augment name is the text used by the player when enchanting (or otherwise
+modifying) an item. The name should be all lowercase, and should be fairly
+simple.
+
+For example, if an enchantment augment is named "striking", the player will
+use it by typing "enchant sword striking".
+
+See also: OLC AUGMENTS
+#d
+"AUGEDIT RESOURCES"
+
+Usage:  .resource add <amount> <vnum>
+        .resource change <number> <quantity | vnum> <value>
+        .resource remove <number | all>
+        .resource move <number> <up | down>
+
+This command sets the resources required to apply the augment to an item.
+
+Don't use SCALABLE items as a resource, because it won't be scaled back to
+the same level if it's refunded.
+
+See also: OLC AUGMENTS, VNUM
+#d
+"AUGEDIT TYPE" "AUGMENT TYPES"
+
+Usage:  .type <type>
+
+The augment type determines which command is used to apply the augment to an
+item. It also determines what type of "apply" is added to the item, and what
+rules those applies will follow. For example, "enchantment" applies can be
+removed with the Disenchant ability, but "hone" applies cannot.
+
+See also: OLC AUGMENTS
+#d
+"AUGEDIT WEAR" "AUGMENT WEAR FLAGS"
+
+Usage:  .wear [add | remove] <wear flags>
+
+The "wear" flags on an augment help determine what kind of item can be a valid
+target for the augment. For example, an augment with the WIELD setting can only
+be used on items that can be wielded (i.e. weapons).
+
+An augment with no "wear" setting can generally not be used. An augment with
+the TAKE wear flag could be used on virtually any item.
+
+Usually an augment should be locked down to just one wear flag.
+
+See also: OEDIT WEAR, OLC AUGMENTS
 #d
 "BEDIT AFFECTS" "REDIT AFFECTS"
 

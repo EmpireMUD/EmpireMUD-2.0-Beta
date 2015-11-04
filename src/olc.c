@@ -347,6 +347,7 @@ const struct olc_command_data olc_data[] = {
 	{ "resource", augedit_resource, OLC_AUGMENT, OLC_CF_EDITOR },
 	{ "type", augedit_type, OLC_AUGMENT, OLC_CF_EDITOR },
 	{ "wear", augedit_wear, OLC_AUGMENT, OLC_CF_EDITOR },
+	{ "where", augedit_wear, OLC_AUGMENT, OLC_CF_EDITOR },	// where to wear it
 	
 	// books
 	{ "author", booked_author, OLC_BOOK, OLC_CF_EDITOR },
