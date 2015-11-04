@@ -38,13 +38,10 @@ extern const char *augment_types[];
 extern const char *augment_flags[];
 extern const char *wear_bits[];
 
-
 // external funcs
 extern struct resource_data *copy_resource_list(struct resource_data *input);
+void get_resource_display(struct resource_data *list, char *save_buffer);
 void free_resource_list(struct resource_data *list);
-
-
-// local protos
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -148,6 +145,55 @@ void olc_search_augment(char_data *ch, any_vnum vnum) {
 */
 int sort_augments(augment_data *a, augment_data *b) {
 	return GET_AUG_VNUM(a) - GET_AUG_VNUM(b);
+}
+
+
+/**
+* For vstat.
+*
+* @param char_data *ch The player requesting stats.
+* @param augment_data *aug The augment to display.
+*/
+void stat_augment(char_data *ch, augment_data *aug) {
+	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
+	struct augment_apply *app;
+	size_t size;
+	int num;
+	
+	if (!aug) {
+		return;
+	}
+	
+	// first line
+	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Name: \tc%s\t0\r\n", GET_AUG_VNUM(aug), GET_AUG_NAME(aug));
+	
+	snprintf(part, sizeof(part), "%s", (GET_AUG_ABILITY(aug) == NO_ABIL ? "none" : ability_data[GET_AUG_ABILITY(aug)].name));
+	if (GET_AUG_ABILITY(aug) != NO_ABIL && ability_data[GET_AUG_ABILITY(aug)].parent_skill != NO_SKILL) {
+		snprintf(part + strlen(part), sizeof(part) - strlen(part), " (%s %d)", skill_data[ability_data[GET_AUG_ABILITY(aug)].parent_skill].name, ability_data[GET_AUG_ABILITY(aug)].parent_skill_required);
+	}
+	size += snprintf(buf + size, sizeof(buf) - size, "Type: [\tc%s\t0], Requires Ability: [\tc%s\t0]\r\n", augment_types[GET_AUG_TYPE(aug)], part);
+	
+	sprintbit(GET_AUG_WEAR_FLAGS(aug), wear_bits, part, TRUE);
+	size += snprintf(buf + size, sizeof(buf) - size, "Targets wear location: \ty%s\t0\r\n", part);
+	
+	sprintbit(GET_AUG_FLAGS(aug), augment_flags, part, TRUE);
+	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
+	
+	// applies
+	size += snprintf(buf + size, sizeof(buf) - size, "Applies: ");
+	for (app = GET_AUG_APPLIES(aug), num = 0; app; app = app->next, ++num) {
+		size += snprintf(buf + size, sizeof(buf) - size, "%s%d to %s", num ? ", " : "", app->weight, apply_types[app->location]);
+	}
+	if (!GET_AUG_APPLIES(aug)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "none");
+	}
+	size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
+	
+	// resources
+	get_resource_display(GET_AUG_RESOURCES(aug), part);
+	size += snprintf(buf + size, sizeof(buf) - size, "%s", part);
+	
+	page_string(ch->desc, buf, TRUE);
 }
 
 
@@ -599,8 +645,6 @@ augment_data *setup_olc_augment(augment_data *input) {
 * @param char_data *ch The person who is editing an augment and will see its display.
 */
 void olc_show_augment(char_data *ch) {
-	void get_resource_display(struct resource_data *list, char *save_buffer);
-	
 	augment_data *aug = GET_OLC_AUGMENT(ch->desc);
 	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
 	struct augment_apply *app;
