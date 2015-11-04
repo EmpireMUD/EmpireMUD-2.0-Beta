@@ -33,6 +33,7 @@
 */
 
 // external consts
+extern const char *apply_types[];
 extern const char *augment_types[];
 extern const char *augment_flags[];
 extern const char *wear_bits[];
@@ -579,8 +580,12 @@ augment_data *setup_olc_augment(augment_data *input) {
 * @param char_data *ch The person who is editing an augment and will see its display.
 */
 void olc_show_augment(char_data *ch) {
+	void get_resource_display(struct resource_data *list, char *save_buffer);
+	
 	augment_data *aug = GET_OLC_AUGMENT(ch->desc);
 	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
+	struct augment_apply *app;
+	int num;
 	
 	if (!aug) {
 		return;
@@ -611,9 +616,229 @@ void olc_show_augment(char_data *ch) {
 	}
 	sprintf(buf + strlen(buf), "<&yability&0> %s\r\n", buf1);
 	
+	// applies
+	sprintf(buf + strlen(buf), "Attribute applies: <&yapply&0>\r\n");
+	for (app = GET_AUG_APPLIES(aug), num = 1; app; app = app->next, ++num) {
+		sprintf(buf + strlen(buf), " %2d. %d to %s\r\n", num, app->weight, apply_types[app->location]);
+	}
+	if (!GET_AUG_APPLIES(aug)) {
+		strcat(buf, "  none\r\n");
+	}
+	
+	// resources
+	sprintf(buf + strlen(buf), "Resources required: <&yresource&0>\r\n");
+	get_resource_display(GET_AUG_RESOURCES(aug), lbuf);
+	strcat(buf, lbuf);
+	
 	page_string(ch->desc, buf, TRUE);
 }
 
 
  //////////////////////////////////////////////////////////////////////////////
 //// OLC MODULES /////////////////////////////////////////////////////////////
+
+OLC_MODULE(augedit_ability) {
+	extern int find_ability_by_name(char *name, bool allow_abbrev);
+	
+	augment_data *aug = GET_OLC_AUGMENT(ch->desc);
+	int abil;
+	
+	if (!*argument) {
+		msg_to_char(ch, "Require what ability (or 'none')?\r\n");
+	}
+	else if (!str_cmp(argument, "none")) {
+		GET_AUG_ABILITY(aug) = NO_ABIL;
+		
+		if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+			send_config_msg(ch, "ok_string");
+		}
+		else {
+			msg_to_char(ch, "It will require no ability.\r\n");
+		}
+	}
+	else if ((abil = find_ability_by_name(argument, TRUE)) == NOTHING) {
+		msg_to_char(ch, "Invalid ability '%s'.\r\n", argument);
+	}
+	else {
+		GET_AUG_ABILITY(aug) = abil;
+		
+		if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+			send_config_msg(ch, "ok_string");
+		}
+		else {
+			msg_to_char(ch, "It now requires the %s ability.\r\n", ability_data[abil].name);
+		}
+	}
+}
+
+
+OLC_MODULE(augedit_apply) {
+	augment_data *aug = GET_OLC_AUGMENT(ch->desc);
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
+	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
+	struct augment_apply *apply, *next_apply, *change, *temp;
+	int loc, num, iter;
+	bool found;
+	
+	// arg1 arg2 arg3
+	half_chop(argument, arg1, buf);
+	half_chop(buf, arg2, arg3);
+	
+	if (is_abbrev(arg1, "remove")) {
+		if (!*arg2) {
+			msg_to_char(ch, "Remove which apply (number)?\r\n");
+		}
+		else if (!str_cmp(arg2, "all")) {
+			free_augment_applies(GET_AUG_APPLIES(aug));
+			GET_AUG_APPLIES(aug) = NULL;
+			msg_to_char(ch, "You remove all the applies.\r\n");
+		}
+		else if (!isdigit(*arg2) || (num = atoi(arg2)) < 1) {
+			msg_to_char(ch, "Invalid apply number.\r\n");
+		}
+		else {
+			found = FALSE;
+			for (apply = GET_AUG_APPLIES(aug); apply && !found; apply = next_apply) {
+				next_apply = apply->next;
+				if (--num == 0) {
+					found = TRUE;
+					
+					msg_to_char(ch, "You remove the %d to %s.\r\n", apply->weight, apply_types[apply->location]);
+					REMOVE_FROM_LIST(apply, GET_AUG_APPLIES(aug), next);
+					free(apply);
+				}
+			}
+			
+			if (!found) {
+				msg_to_char(ch, "Invalid apply number.\r\n");
+			}
+		}
+	}
+	else if (is_abbrev(arg1, "add")) {
+		num = atoi(arg2);
+		
+		if (!*arg2 || !*arg3 || !isdigit(*arg2) || num <= 0) {
+			msg_to_char(ch, "Usage: apply add <value> <apply> [type]\r\n");
+		}
+		else if ((loc = search_block(arg3, apply_types, FALSE)) == NOTHING) {
+			msg_to_char(ch, "Invalid apply.\r\n");
+		}
+		else {
+			CREATE(apply, struct augment_apply, 1);
+			apply->location = loc;
+			apply->weight = num;
+			
+			// append to end
+			if ((temp = GET_AUG_APPLIES(aug))) {
+				while (temp->next) {
+					temp = temp->next;
+				}
+				temp->next = apply;
+			}
+			else {
+				GET_AUG_APPLIES(aug) = apply;
+			}
+			
+			msg_to_char(ch, "You add %d to %s.\r\n", num, apply_types[loc]);
+		}
+	}
+	else if (is_abbrev(arg1, "change")) {
+		strcpy(num_arg, arg2);
+		half_chop(arg3, type_arg, val_arg);
+		
+		if (!*num_arg || !isdigit(*num_arg) || !*type_arg || !*val_arg) {
+			msg_to_char(ch, "Usage: apply change <number> <value | apply> <new value>\r\n");
+			return;
+		}
+		
+		// find which one to change
+		if (!isdigit(*num_arg) || (num = atoi(num_arg)) < 1) {
+			msg_to_char(ch, "Invalid apply number.\r\n");
+			return;
+		}
+		change = NULL;
+		for (apply = GET_AUG_APPLIES(aug); apply && !change; apply = apply->next) {
+			if (--num == 0) {
+				change = apply;
+				break;
+			}
+		}
+		if (!change) {
+			msg_to_char(ch, "Invalid apply number.\r\n");
+		}
+		else if (is_abbrev(type_arg, "value")) {
+			num = atoi(val_arg);
+			if ((!isdigit(*val_arg) && *val_arg != '-') || num == 0) {
+				msg_to_char(ch, "Invalid value '%s'.\r\n", val_arg);
+			}
+			else {
+				change->weight = num;
+				msg_to_char(ch, "Apply %d changed to value %d.\r\n", atoi(num_arg), num);
+			}
+		}
+		else if (is_abbrev(type_arg, "apply")) {
+			if ((loc = search_block(val_arg, apply_types, FALSE)) == NOTHING) {
+				msg_to_char(ch, "Invalid apply.\r\n");
+			}
+			else {
+				change->location = loc;
+				msg_to_char(ch, "Apply %d changed to %s.\r\n", atoi(num_arg), apply_types[loc]);
+			}
+		}
+		else {
+			msg_to_char(ch, "You can only change the value or apply.\r\n");
+		}
+	}
+	else {
+		msg_to_char(ch, "Usage: apply add <value> <apply>\r\n");
+		msg_to_char(ch, "Usage: apply change <number> <value | apply> <new value>\r\n");
+		msg_to_char(ch, "Usage: apply remove <number | all>\r\n");
+		
+		msg_to_char(ch, "Available applies:\r\n");
+		for (iter = 0; *apply_types[iter] != '\n'; ++iter) {
+			msg_to_char(ch, " %-24.24s%s", apply_types[iter], ((iter % 2) ? "\r\n" : ""));
+		}
+		if ((iter % 2) != 0) {
+			msg_to_char(ch, "\r\n");
+		}
+	}
+}
+
+
+OLC_MODULE(augedit_flags) {
+	augment_data *aug = GET_OLC_AUGMENT(ch->desc);
+	bool had_indev = IS_SET(GET_AUG_FLAGS(aug), AUG_IN_DEVELOPMENT) ? TRUE : FALSE;
+	
+	GET_AUG_FLAGS(aug) = olc_process_flag(ch, argument, "augment", "flags", augment_flags, GET_AUG_FLAGS(aug));
+	
+	// validate removal of IN-DEVELOPMENT
+	if (had_indev && !IS_SET(GET_AUG_FLAGS(aug), AUG_IN_DEVELOPMENT) && GET_ACCESS_LEVEL(ch) < LVL_UNRESTRICTED_BUILDER && !OLC_FLAGGED(ch, OLC_FLAG_CLEAR_IN_DEV)) {
+		msg_to_char(ch, "You don't have permission to remove the IN-DEVELOPMENT flag.\r\n");
+		SET_BIT(GET_AUG_FLAGS(aug), AUG_IN_DEVELOPMENT);
+	}
+}
+
+
+OLC_MODULE(augedit_name) {
+	augment_data *aug = GET_OLC_AUGMENT(ch->desc);
+	olc_process_string(ch, argument, "name", &GET_AUG_NAME(aug));
+}
+
+
+OLC_MODULE(augedit_resource) {
+	void olc_process_resources(char_data *ch, char *argument, struct resource_data **list);
+	augment_data *aug = GET_OLC_AUGMENT(ch->desc);
+	olc_process_resources(ch, argument, &GET_AUG_RESOURCES(aug));
+}
+
+
+OLC_MODULE(augedit_type) {
+	augment_data *aug = GET_OLC_AUGMENT(ch->desc);
+	GET_AUG_TYPE(aug) = olc_process_type(ch, argument, "type", "type", augment_types, GET_AUG_TYPE(aug));
+}
+
+
+OLC_MODULE(augedit_wear) {
+	augment_data *aug = GET_OLC_AUGMENT(ch->desc);	
+	GET_AUG_WEAR_FLAGS(aug) = olc_process_flag(ch, argument, "wear", "wear", wear_bits, GET_AUG_WEAR_FLAGS(aug));
+}

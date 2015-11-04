@@ -61,6 +61,15 @@ OLC_MODULE(advedit_reset);
 OLC_MODULE(advedit_script);
 OLC_MODULE(advedit_startvnum);
 
+// augment modules
+OLC_MODULE(augedit_ability);
+OLC_MODULE(augedit_apply);
+OLC_MODULE(augedit_flags);
+OLC_MODULE(augedit_name);
+OLC_MODULE(augedit_resource);
+OLC_MODULE(augedit_type);
+OLC_MODULE(augedit_wear);
+
 // book modules
 OLC_MODULE(booked_author);
 OLC_MODULE(booked_byline);
@@ -329,6 +338,15 @@ const struct olc_command_data olc_data[] = {
 	{ "reset", advedit_reset, OLC_ADVENTURE, OLC_CF_EDITOR },
 	{ "script", advedit_script, OLC_ADVENTURE, OLC_CF_EDITOR },
 	{ "startvnum", advedit_startvnum, OLC_ADVENTURE, OLC_CF_EDITOR },
+	
+	// adventure zones
+	{ "ability", augedit_ability, OLC_AUGMENT, OLC_CF_EDITOR },
+	{ "apply", augedit_apply, OLC_AUGMENT, OLC_CF_EDITOR },
+	{ "flags", augedit_flags, OLC_AUGMENT, OLC_CF_EDITOR },
+	{ "name", augedit_name, OLC_AUGMENT, OLC_CF_EDITOR },
+	{ "resource", augedit_resource, OLC_AUGMENT, OLC_CF_EDITOR },
+	{ "type", augedit_type, OLC_AUGMENT, OLC_CF_EDITOR },
+	{ "wear", augedit_wear, OLC_AUGMENT, OLC_CF_EDITOR },
 	
 	// books
 	{ "author", booked_author, OLC_BOOK, OLC_CF_EDITOR },
@@ -2349,6 +2367,33 @@ void get_interaction_display(struct interaction_item *list, char *save_buffer) {
 
 
 /**
+* Gets the resource list for use in an editor or display.
+*
+* @param struct resource_data *list The list to show.
+* @param char *save_buffer A string to write the output to.
+*/
+void get_resource_display(struct resource_data *list, char *save_buffer) {
+	char line[MAX_STRING_LENGTH];
+	struct resource_data *res;
+	obj_data *obj;
+	int num;
+	
+	*save_buffer = '\0';
+	for (res = list, num = 1; res; res = res->next, ++num) {
+		obj = obj_proto(res->vnum);
+		sprintf(line, "%dx %s", res->amount, !obj ? "UNKNOWN" : skip_filler(GET_OBJ_SHORT_DESC(obj)));
+		sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. [%5d] %-26.26s%s", num, res->vnum, line, (!(num % 2) ? "\r\n" : ""));
+	}
+	if (!*save_buffer) {
+		strcpy(save_buffer, "  none\r\n");
+	}
+	else if (!(num % 2)) {
+		strcat(save_buffer, "\r\n");
+	}
+}
+
+
+/**
 * Displays the scripts from a given list.
 *
 * @param struct trig_proto_list *list The list (start) to show.
@@ -3390,7 +3435,7 @@ void olc_process_icons(char_data *ch, char *argument, struct icon_data **list) {
 * @param struct interaction_item **list A pointer to an interaction list to modify.
 * @param int attach_type TYPE_MOB or TYPE_ROOM for interactions that attach to different types of things.
 */
-void olc_process_interactions(char_data *ch, char *argument, struct interaction_item **list, int attach_type) {	
+void olc_process_interactions(char_data *ch, char *argument, struct interaction_item **list, int attach_type) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], arg4[MAX_INPUT_LENGTH], arg5[MAX_INPUT_LENGTH], arg6[MAX_INPUT_LENGTH];
 	struct interaction_item *interact, *prev, *to_move, *temp, *a, *b, *a_next, *b_next, *copyfrom = NULL, *change;
 	struct interaction_item iitem;
@@ -3759,6 +3804,213 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 		if ((count % 2) != 0) {
 			msg_to_char(ch, "\r\n");
 		}
+	}
+}
+
+
+/**
+* OLC processor for resource data, which is used on augments and crafts.
+*
+* @param char_data *ch The player using OLC.
+* @param char *argument The arguments the player entered.
+* @param struct resource_data **list A pointer to a resource list to modify.
+*/
+void olc_process_resources(char_data *ch, char *argument, struct resource_data **list) {
+	void free_resource_list(struct resource_data *list);
+
+	augment_data *aug = GET_OLC_AUGMENT(ch->desc);
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], arg4[MAX_INPUT_LENGTH];
+	struct resource_data *res, *next_res, *prev_res, *prev_prev, *change, *temp;
+	obj_vnum vnum;
+	bool found;
+	int num;
+	
+	// arg1 arg2 arg3
+	half_chop(argument, arg1, buf);
+	half_chop(buf, arg2, buf1);
+	half_chop(buf1, arg3, arg4);
+	
+	if (is_abbrev(arg1, "remove")) {
+		if (!*arg2) {
+			msg_to_char(ch, "Remove which resource (number)?\r\n");
+		}
+		else if (!str_cmp(arg2, "all")) {
+			free_resource_list(GET_AUG_RESOURCES(aug));
+			GET_AUG_RESOURCES(aug) = NULL;
+			msg_to_char(ch, "All resources removed.\r\n");
+		}
+		else if (!isdigit(*arg2) || (num = atoi(arg2)) < 1) {
+			msg_to_char(ch, "Invalid resource number.\r\n");
+		}
+		else {
+			found = FALSE;
+			for (res = *list; res && !found; res = next_res) {
+				next_res = res->next;
+				if (--num == 0) {
+					found = TRUE;
+					
+					msg_to_char(ch, "You remove the %dx %s.\r\n", res->amount, skip_filler(get_obj_name_by_proto(res->vnum)));
+					REMOVE_FROM_LIST(res, *list, next);
+					free(res);
+				}
+			}
+			
+			if (!found) {
+				msg_to_char(ch, "Invalid resource number.\r\n");
+			}
+		}
+	}
+	else if (is_abbrev(arg1, "add")) {
+		num = atoi(arg2);
+		vnum = atoi(arg3);
+		
+		if (!*arg2 || !*arg3 || !isdigit(*arg2)) {
+			msg_to_char(ch, "Usage: resource add <quantity> <vnum>\r\n");
+		}
+		else if (!obj_proto(vnum)) {
+			msg_to_char(ch, "There is no such object vnum %d.\r\n", vnum);
+		}
+		else if (num < 1 || num > 1000) {
+			msg_to_char(ch, "You must specify a quantity between 1 and 1000.\r\n");
+		}
+		else {
+			found = FALSE;
+			
+			CREATE(res, struct resource_data, 1);
+			res->vnum = vnum;
+			res->amount = num;
+			
+			// append to end
+			if ((temp = *list)) {
+				while (temp->next) {
+					temp = temp->next;
+				}
+				temp->next = res;
+			}
+			else {
+				*list = res;
+			}
+			
+			msg_to_char(ch, "You add the %dx %s resource requirement.\r\n", num, skip_filler(get_obj_name_by_proto(vnum)));
+		}
+	}
+	else if (is_abbrev(arg1, "move")) {
+		bool up;
+		
+		num = atoi(arg2);
+		up = is_abbrev(arg3, "up");
+		
+		if (!*arg2 || !*arg3) {
+			msg_to_char(ch, "Usage: resource move <number> <up | down>\r\n");
+		}
+		else if (!isdigit(*arg2) || num < 1) {
+			msg_to_char(ch, "Invalid resource number.\r\n");
+		}
+		else if (!is_abbrev(arg3, "up") && !is_abbrev(arg3, "down")) {
+			msg_to_char(ch, "You must specify whether you're moving it up or down in the list.\r\n");
+		}
+		else if (up && num == 1) {
+			msg_to_char(ch, "You can't move it up; it's already at the top of the list.\r\n");
+		}
+		else {
+			prev_res = prev_prev = NULL;
+			found = FALSE;
+			for (res = *list; res && !found && num > 0; res = res->next) {
+				if (--num == 0) {
+					if (up) {
+						found = TRUE;
+						if (prev_prev) {
+							prev_prev->next = res;
+							prev_res->next = res->next;
+							res->next = prev_res;
+						}
+						else {
+							// must be head of list
+							prev_res->next = res->next;
+							res->next = prev_res;
+							*list = res;
+						}
+					}
+					else {	// down
+						if (res->next) {
+							found = TRUE;
+							temp = res->next;
+							if (prev_res) {
+								prev_res->next = temp;
+								res->next = temp->next;
+								temp->next = res;
+							}
+							else {
+								// was at start
+								res->next = temp->next;
+								temp->next = res;
+								*list = temp;
+							}
+						}
+					}
+					
+					if (found) {
+						msg_to_char(ch, "You move %dx %s %s.\r\n", res->amount, skip_filler(get_obj_name_by_proto(res->vnum)), (up ? "up" : "down"));
+					}
+				}
+				
+				// rotate back
+				prev_prev = prev_res;
+				prev_res = res;
+			}
+			
+			if (!found) {
+				msg_to_char(ch, "Invalid resource number to move.\r\n");
+			}
+		}
+	}
+	else if (is_abbrev(arg1, "change")) {
+		if (!*arg2 || !*arg3 || !*arg4 || !isdigit(*arg2) || !isdigit(*arg4)) {
+			msg_to_char(ch, "Usage: resource change <number> <quantity | vnum> <value>\r\n");
+			return;
+		}
+		
+		vnum = atoi(arg4);	// may be used as quantity instead
+		
+		// verify valid pos
+		num = atoi(arg2);
+		change = NULL;
+		for (res = *list; res && !change; res = res->next) {
+			if (--num == 0) {
+				change = res;
+			}
+		}
+		
+		if (!change) {
+			msg_to_char(ch, "Invalid resource number.\r\n");
+		}
+		else if (is_abbrev(arg3, "quantity")) {
+			if (vnum < 1 || vnum > 1000) {
+				msg_to_char(ch, "You must specify a quantity between 1 and 1000.\r\n");
+			}
+			else {
+				change->amount = vnum;
+				msg_to_char(ch, "You change resource %d (%s)'s quantity to %d.\r\n", atoi(arg2), get_obj_name_by_proto(change->vnum), vnum);
+			}
+		}
+		else if (is_abbrev(arg3, "vnum")) {
+			if (!obj_proto(vnum)) {
+				msg_to_char(ch, "There is no such object vnum %d.\r\n", vnum);
+			}
+			else {
+				change->vnum = vnum;
+				msg_to_char(ch, "You change resource %d's vnum to [%d] %s.\r\n", atoi(arg2), vnum, get_obj_name_by_proto(vnum));
+			}
+		}
+		else {
+			msg_to_char(ch, "Usage: resource change <number> <quantity | vnum> <value>\r\n");
+		}
+	}
+	else {
+		msg_to_char(ch, "Usage: resource add <quantity> <vnum>\r\n");
+		msg_to_char(ch, "Usage: resource change <number> <quantity | vnum> <value>\r\n");
+		msg_to_char(ch, "Usage: resource remove <number | all>\r\n");
+		msg_to_char(ch, "Usage: resource move <number> <up | down>\r\n");
 	}
 }
 
