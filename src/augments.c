@@ -555,6 +555,7 @@ augment_data *create_augment_table_entry(any_vnum vnum) {
 	CREATE(aug, augment_data, 1);
 	clear_augment(aug);
 	GET_AUG_VNUM(aug) = vnum;
+	GET_AUG_NAME(aug) = str_dup("unnamed augment");
 	add_augment_to_table(aug);
 
 	// save index and augment file now
