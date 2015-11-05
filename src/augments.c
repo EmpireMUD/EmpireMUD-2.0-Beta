@@ -107,7 +107,7 @@ bool validate_augment_target(char_data *ch, obj_data *obj, augment_data *aug) {
 	partial_wear = GET_AUG_WEAR_FLAGS(aug) & ~ITEM_WEAR_TAKE;
 	if (partial_wear != NOBITS && !CAN_WEAR(obj, partial_wear)) {
 		prettier_sprintbit(partial_wear, wear_bits, part);
-		snprintf(buf, sizeof(buf), "You can only use that %s on items that are worn on: %s\r\n", augment_info[GET_AUG_TYPE(aug)].noun, part);
+		snprintf(buf, sizeof(buf), "You can only use that %s on items that are worn on: %s.\r\n", augment_info[GET_AUG_TYPE(aug)].noun, part);
 		for (iter = 1; iter < strlen(buf); ++iter) {
 			buf[iter] = LOWER(buf[iter]);	// lowercase both parts of the string
 		}
