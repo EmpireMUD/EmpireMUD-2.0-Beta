@@ -2077,6 +2077,7 @@ struct augment_data {
 	struct resource_data *resources;	// resources required
 	
 	UT_hash_handle hh;	// augment_table hash
+	UT_hash_handle sorted_hh;	// sorted_augments hash
 };
 
 

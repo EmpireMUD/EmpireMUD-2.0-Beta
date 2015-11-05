@@ -71,6 +71,7 @@ adv_data *adventure_table = NULL;	// adventure hash table
 
 // augments
 augment_data *augment_table = NULL;	// master augment hash table
+augment_data *sorted_augments = NULL;	// alphabetic version // sorted_hh
 
 // buildings
 bld_data *building_table = NULL;	// building hash table

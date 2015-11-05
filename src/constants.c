@@ -172,11 +172,20 @@ const char *room_template_flags[] = {
  //////////////////////////////////////////////////////////////////////////////
 //// AUGMENT CONSTANTS ///////////////////////////////////////////////////////
 
-// AUGMENT_x: augment types
+// AUGMENT_x (1/2): augment types
 const char *augment_types[] = {
 	"None",
 	"Enchantment",
 	"Hone",
+	"\n"
+};
+
+
+// AUGMENT_x (1/2): verb/command form
+const char *augment_verbs[] = {
+	"augment",	// none / should not be used
+	"enchant",
+	"hone",
 	"\n"
 };
 

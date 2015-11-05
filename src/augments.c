@@ -136,15 +136,29 @@ void olc_search_augment(char_data *ch, any_vnum vnum) {
 }
 
 
-/**
-* Simple sorter for the augment hash
-*
-* @param augment_data *a One element
-* @param augment_data *b Another element
-* @return int Sort instruction of -1, 0, or 1
-*/
+// Simple vnum sorter for the augment hash
 int sort_augments(augment_data *a, augment_data *b) {
 	return GET_AUG_VNUM(a) - GET_AUG_VNUM(b);
+}
+
+
+// typealphabetic sorter for sorted_augments
+int sort_augments_by_data(augment_data *a, augment_data *b) {
+	int a_level, b_level;
+	
+	if (GET_AUG_TYPE(a) != GET_AUG_TYPE(b)) {
+		return GET_AUG_TYPE(a) - GET_AUG_TYPE(b);
+	}
+	
+	a_level = (GET_AUG_ABILITY(a) == NO_ABIL) ? 0 : ability_data[GET_AUG_ABILITY(a)].parent_skill_required;
+	b_level = (GET_AUG_ABILITY(b) == NO_ABIL) ? 0 : ability_data[GET_AUG_ABILITY(b)].parent_skill_required;
+	
+	// reverse level sort
+	if (a_level != b_level) {
+		return b_level - a_level;
+	}
+	
+	return strcmp(GET_AUG_NAME(a), GET_AUG_NAME(b));
 }
 
 
@@ -168,6 +182,13 @@ void add_augment_to_table(augment_data *aug) {
 		if (!find) {
 			HASH_ADD_INT(augment_table, vnum, aug);
 			HASH_SORT(augment_table, sort_augments);
+		}
+		
+		// sorted table
+		HASH_FIND(sorted_hh, sorted_augments, &vnum, sizeof(int), find);
+		if (!find) {
+			HASH_ADD(sorted_hh, sorted_augments, vnum, sizeof(int), aug);
+			HASH_SRT(sorted_hh, sorted_augments, sort_augments_by_data);
 		}
 	}
 }
@@ -196,6 +217,7 @@ augment_data *augment_proto(any_vnum vnum) {
 */
 void remove_augment_from_table(augment_data *aug) {
 	HASH_DEL(augment_table, aug);
+	HASH_DELETE(sorted_hh, sorted_augments, aug);
 }
 
 

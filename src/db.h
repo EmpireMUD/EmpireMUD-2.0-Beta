@@ -187,6 +187,7 @@ extern adv_data *adventure_proto(adv_vnum vnum);
 
 // augments
 extern augment_data *augment_table;
+extern augment_data *sorted_augments;
 extern augment_data *augment_proto(any_vnum vnum);
 void free_augment(augment_data *aug);
 
