@@ -551,6 +551,9 @@ void save_olc_augment(descriptor_data *desc) {
 		
 	// and save to file
 	save_library_file_for_vnum(DB_BOOT_AUG, vnum);
+
+	// ... and re-sort
+	HASH_SRT(sorted_hh, sorted_augments, sort_augments_by_data);
 }
 
 
