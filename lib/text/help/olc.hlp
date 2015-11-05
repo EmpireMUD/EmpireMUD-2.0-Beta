@@ -98,8 +98,13 @@ Adventures (ADVEDIT):
 
 Augments (AUGEDIT):
 - Augment names should be all lowercase.
-- If you don't set an ability on an augment, anyone will be able to use that
-  augment. They should virtually always have an ability set.
+- You should always require either an ability, or a certain object (or both) on
+  each augment. No augments should be available without at least one of those.
+- If you use the "requiresobject" option, that object will only be consumed on
+  use if it is also in the resource list. Otherwise, having the object means
+  a re-usable augment.
+- Unlike crafts, it is safe to use SCALABLE items as resources and requires-
+  objects, because augments are instant and non-refundable.
 
 Buildings (BEDIT):
 - Designated rooms are also built in the building editor, using the ROOM flag.
@@ -661,6 +666,23 @@ For example, if an enchantment augment is named "striking", the player will
 use it by typing "enchant sword striking".
 
 See also: OLC AUGMENTS
+#d
+"AUGEDIT REQUIRESOBJECT" "AUGEDIT REQUIRES OBJECT"
+
+Usage:  .requiresobject <vnum>
+
+Instead of (or in addition to) requiring an ability to use an augment, you
+can make it dependent upon having a certain item in the player's inventory.
+The player will not see the augment in his list (for example, when he types
+enchant) if he doesn't have the item.
+
+The required object will not be consumed unless it is also in the resource
+list. An example non-consumable augment might require a spellbook object, so
+the effect is that having the spellbook allows the player to enchant weapons
+with extra mana.  An example consumable augment might be a grindstone that
+lets a player "hone" a sword with additional to-hit.
+
+See also: OLC AUGMENTS, VNUM
 #d
 "AUGEDIT RESOURCES"
 

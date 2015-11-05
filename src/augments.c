@@ -384,7 +384,7 @@ void parse_augment(FILE *fl, any_vnum vnum) {
 	GET_AUG_NAME(aug) = fread_string(fl, error);
 	
 	// line 2: type flags wear-flags ability
-	if (!get_line(fl, line) || sscanf(line, "%d %s %s %d", &int_in[0], str_in, str_in2, &int_in[1]) != 4) {
+	if (!get_line(fl, line) || sscanf(line, "%d %s %s %d %d", &int_in[0], str_in, str_in2, &int_in[1], &int_in[2]) != 5) {
 		log("SYSERR: Format error in line 2 of %s", error);
 		exit(1);
 	}
@@ -393,6 +393,7 @@ void parse_augment(FILE *fl, any_vnum vnum) {
 	GET_AUG_FLAGS(aug) = asciiflag_conv(str_in);
 	GET_AUG_WEAR_FLAGS(aug) = asciiflag_conv(str_in2);
 	GET_AUG_ABILITY(aug) = int_in[1];
+	GET_AUG_REQUIRES_OBJ(aug) = int_in[2];
 		
 	// optionals
 	for (;;) {
@@ -482,10 +483,10 @@ void write_augment_to_file(FILE *fl, augment_data *aug) {
 	// 1. name
 	fprintf(fl, "%s~\n", NULLSAFE(GET_AUG_NAME(aug)));
 	
-	// 2. type flags wear-flags ability
+	// 2. type flags wear-flags ability requires-obj
 	strcpy(temp, bitv_to_alpha(GET_AUG_FLAGS(aug)));
 	strcpy(temp2, bitv_to_alpha(GET_AUG_WEAR_FLAGS(aug)));
-	fprintf(fl, "%d %s %s %d\n", GET_AUG_TYPE(aug), temp, temp2, GET_AUG_ABILITY(aug));
+	fprintf(fl, "%d %s %s %d %d\n", GET_AUG_TYPE(aug), temp, temp2, GET_AUG_ABILITY(aug), GET_AUG_REQUIRES_OBJ(aug));
 	
 	// 'A': applies
 	for (app = GET_AUG_APPLIES(aug); app; app = app->next) {
@@ -678,6 +679,8 @@ void olc_show_augment(char_data *ch) {
 		}
 	}
 	sprintf(buf + strlen(buf), "<&yability&0> %s\r\n", buf1);
+
+	sprintf(buf + strlen(buf), "<&yrequiresobject&0> %d - %s\r\n", GET_AUG_REQUIRES_OBJ(aug), GET_AUG_REQUIRES_OBJ(aug) == NOTHING ? "none" : get_obj_name_by_proto(GET_AUG_REQUIRES_OBJ(aug)));
 	
 	// applies
 	sprintf(buf + strlen(buf), "Attribute applies: <&yapply&0>\r\n");
@@ -885,6 +888,32 @@ OLC_MODULE(augedit_flags) {
 OLC_MODULE(augedit_name) {
 	augment_data *aug = GET_OLC_AUGMENT(ch->desc);
 	olc_process_string(ch, argument, "name", &GET_AUG_NAME(aug));
+}
+
+
+OLC_MODULE(augedit_requiresobject) {
+	augment_data *aug = GET_OLC_AUGMENT(ch->desc);
+	obj_vnum old = GET_AUG_REQUIRES_OBJ(aug);
+	
+	if (!str_cmp(argument, "none") || atoi(argument) == NOTHING) {
+		GET_AUG_REQUIRES_OBJ(aug) = NOTHING;
+		if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+			send_config_msg(ch, "ok_string");
+		}
+		else {
+			msg_to_char(ch, "It no longer requires an object to see it in the %s list.\r\n", augment_types[GET_AUG_TYPE(aug)]);
+		}
+	}
+	else {
+		GET_AUG_REQUIRES_OBJ(aug) = olc_process_number(ch, argument, "object vnum", "requiresobject", 0, MAX_VNUM, GET_AUG_REQUIRES_OBJ(aug));
+		if (!obj_proto(GET_AUG_REQUIRES_OBJ(aug))) {
+			GET_AUG_REQUIRES_OBJ(aug) = old;
+			msg_to_char(ch, "There is no object with that vnum. Old value restored.\r\n");
+		}
+		else if (!PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+			msg_to_char(ch, "It now requires %s.\r\n", get_obj_name_by_proto(GET_AUG_REQUIRES_OBJ(aug)));
+		}
+	}
 }
 
 

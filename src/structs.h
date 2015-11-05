@@ -2072,6 +2072,7 @@ struct augment_data {
 	bitvector_t wear_flags;	// ITEM_WEAR_x where this augment applies
 	
 	int ability;	// required ability or NO_ABIL
+	obj_vnum requires_obj;	// required item or NOTHING
 	struct augment_apply *applies;	// how it modifies items
 	struct resource_data *resources;	// resources required
 	

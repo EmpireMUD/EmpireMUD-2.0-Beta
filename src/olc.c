@@ -66,6 +66,7 @@ OLC_MODULE(augedit_ability);
 OLC_MODULE(augedit_apply);
 OLC_MODULE(augedit_flags);
 OLC_MODULE(augedit_name);
+OLC_MODULE(augedit_requiresobject);
 OLC_MODULE(augedit_resource);
 OLC_MODULE(augedit_type);
 OLC_MODULE(augedit_wear);
@@ -344,6 +345,7 @@ const struct olc_command_data olc_data[] = {
 	{ "apply", augedit_apply, OLC_AUGMENT, OLC_CF_EDITOR },
 	{ "flags", augedit_flags, OLC_AUGMENT, OLC_CF_EDITOR },
 	{ "name", augedit_name, OLC_AUGMENT, OLC_CF_EDITOR },
+	{ "requiresobject", augedit_requiresobject, OLC_AUGMENT, OLC_CF_EDITOR },
 	{ "resource", augedit_resource, OLC_AUGMENT, OLC_CF_EDITOR },
 	{ "type", augedit_type, OLC_AUGMENT, OLC_CF_EDITOR },
 	{ "wear", augedit_wear, OLC_AUGMENT, OLC_CF_EDITOR },

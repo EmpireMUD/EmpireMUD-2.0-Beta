@@ -112,6 +112,7 @@
 #define GET_AUG_FLAGS(aug)  ((aug)->flags)
 #define GET_AUG_NAME(aug)  ((aug)->name)
 #define GET_AUG_RESOURCES(aug)  ((aug)->resources)
+#define GET_AUG_REQUIRES_OBJ(aug)  ((aug)->requires_obj)
 #define GET_AUG_TYPE(aug)  ((aug)->type)
 #define GET_AUG_VNUM(aug)  ((aug)->vnum)
 #define GET_AUG_WEAR_FLAGS(aug)  ((aug)->wear_flags)
