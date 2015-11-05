@@ -111,6 +111,7 @@ bool validate_augment_target(char_data *ch, obj_data *obj, augment_data *aug) {
 		for (iter = 1; iter < strlen(buf); ++iter) {
 			buf[iter] = LOWER(buf[iter]);	// lowercase both parts of the string
 		}
+		send_to_char(buf, ch);
 		return FALSE;
 	}
 	
