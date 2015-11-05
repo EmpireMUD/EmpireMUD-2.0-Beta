@@ -602,7 +602,7 @@ void olc_delete_augment(char_data *ch, any_vnum vnum) {
 void save_olc_augment(descriptor_data *desc) {	
 	augment_data *proto, *aug = GET_OLC_AUGMENT(desc);
 	any_vnum vnum = GET_OLC_VNUM(desc);
-	UT_hash_handle hh;
+	UT_hash_handle hh, sorted;
 
 	// have a place to save it?
 	if (!(proto = augment_proto(vnum))) {
@@ -626,9 +626,11 @@ void save_olc_augment(descriptor_data *desc) {
 
 	// save data back over the proto-type
 	hh = proto->hh;	// save old hash handle
+	sorted = proto->sorted_hh;
 	*proto = *aug;	// copy over all data
 	proto->vnum = vnum;	// ensure correct vnum
 	proto->hh = hh;	// restore old hash handle
+	proto->sorted_hh = sorted;
 		
 	// and save to file
 	save_library_file_for_vnum(DB_BOOT_AUG, vnum);
