@@ -88,13 +88,17 @@ ACMD(do_assist) {
 
 
 ACMD(do_catapult) {
+	static struct resource_data *rocks = NULL;
 	struct empire_political_data *emp_pol = NULL;
 	obj_data *catapult;
 	char_data *vict;
 	int dir;
 	empire_data *e;
-	Resource rocks[2] = { {o_ROCK, 12}, END_RESOURCE_LIST };
 	room_data *to_room;
+	
+	if (!rocks) {
+		rocks = create_resource_list(o_ROCK, 12, NOTHING);
+	}
 
 	/* Find a 'pult */
 	for (catapult = ROOM_CONTENTS(IN_ROOM(ch)); catapult; catapult = catapult->next_content)

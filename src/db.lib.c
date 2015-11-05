@@ -72,12 +72,14 @@ void parse_extra_desc(FILE *fl, struct extra_descr_data **list, char *error_part
 void parse_generic_name_file(FILE *fl, char *err_str);
 void parse_icon(char *line, FILE *fl, struct icon_data **list, char *error_part);
 void parse_interaction(char *line, struct interaction_item **list, char *error_part);
+void parse_resource(FILE *fl, struct resource_data **list, char *error_str);
 void script_save_to_disk(FILE *fp, void *item, int type);
 int sort_empires(empire_data *a, empire_data *b);
 int sort_room_templates(room_template *a, room_template *b);
 void write_extra_descs_to_file(FILE *fl, struct extra_descr_data *list);
 void write_icons_to_file(FILE *fl, char file_tag, struct icon_data *list);
 void write_interactions_to_file(FILE *fl, struct interaction_item *list);
+void write_resources_to_file(FILE *fl, struct resource_data *list);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -694,7 +696,7 @@ void free_craft(craft_data *craft) {
 	}
 	
 	if (GET_CRAFT_RESOURCES(craft) && (!proto || GET_CRAFT_RESOURCES(craft) != GET_CRAFT_RESOURCES(proto))) {
-		free(GET_CRAFT_RESOURCES(craft));
+		free_resource_list(GET_CRAFT_RESOURCES(craft));
 	}
 	
 	free(craft);
@@ -707,8 +709,6 @@ void free_craft(craft_data *craft) {
 * @param craft_data *craft The craft recipe to clear.
 */
 void init_craft(craft_data *craft) {
-	int iter;
-	
 	memset((char *)craft, 0, sizeof(craft_data));
 	
 	// clear/default some stuff
@@ -716,12 +716,6 @@ void init_craft(craft_data *craft) {
 	GET_CRAFT_REQUIRES_OBJ(craft) = NOTHING;
 	GET_CRAFT_QUANTITY(craft) = 1;
 	GET_CRAFT_TIME(craft) = 1;
-		
-	CREATE(GET_CRAFT_RESOURCES(craft), Resource, MAX_RESOURCES_REQUIRED);
-	for (iter = 0; iter < MAX_RESOURCES_REQUIRED; ++iter) {
-		GET_CRAFT_RESOURCES(craft)[iter].vnum = NOTHING;
-		GET_CRAFT_RESOURCES(craft)[iter].amount = 0;
-	}
 }
 
 
@@ -733,7 +727,6 @@ void init_craft(craft_data *craft) {
 */
 void parse_craft(FILE *fl, craft_vnum vnum) {
 	char line[256], str_in[256], str_in2[256];
-	int resource_pos = 0;
 	craft_data *craft, *find;
 	int int_in[4];
 	
@@ -809,21 +802,10 @@ void parse_craft(FILE *fl, craft_vnum vnum) {
 				GET_CRAFT_MIN_LEVEL(craft) = int_in[0];
 				break;
 			}
-
-			// resources: vnum amount
-			case 'R': {
-				if (!get_line(fl, line) || sscanf(line, "%d %d", int_in, int_in + 1) != 2) {
-					log("SYSERR: Format error in R section of craft recipe #%d", vnum);
-					exit(1);
-				}
-				
-				GET_CRAFT_RESOURCES(craft)[resource_pos].vnum = int_in[0];
-				GET_CRAFT_RESOURCES(craft)[resource_pos].amount = int_in[1];
-				
-				++resource_pos;
-				
-				break;
 			
+			case 'R': {	// resources
+				parse_resource(fl, &GET_CRAFT_RESOURCES(craft), buf2);
+				break;
 			}
 
 			// end
@@ -851,7 +833,6 @@ void write_craft_to_file(FILE *fl, craft_data *craft) {
 	extern const char *drinks[];
 
 	char temp1[256], temp2[256];
-	int iter;
 	
 	if (!fl || !craft) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: write_craft_to_file called without %s", !fl ? "file" : "craft");
@@ -877,10 +858,8 @@ void write_craft_to_file(FILE *fl, craft_data *craft) {
 		fprintf(fl, "%d\n", GET_CRAFT_MIN_LEVEL(craft));
 	}
 	
-	for (iter = 0; iter < MAX_RESOURCES_REQUIRED && GET_CRAFT_RESOURCES(craft)[iter].vnum != NOTHING; ++iter) {
-		fprintf(fl, "R\n");
-		fprintf(fl, "%d %d  # %dx %s\n", GET_CRAFT_RESOURCES(craft)[iter].vnum, GET_CRAFT_RESOURCES(craft)[iter].amount, GET_CRAFT_RESOURCES(craft)[iter].amount, get_obj_name_by_proto(GET_CRAFT_RESOURCES(craft)[iter].vnum));
-	}
+	// 'R': resources
+	write_resources_to_file(fl, GET_CRAFT_RESOURCES(craft));
 	
 	// end
 	fprintf(fl, "S\n");
@@ -6652,6 +6631,53 @@ struct obj_apply *copy_apply_list(struct obj_apply *list) {
 	}
 	
 	return new_list;
+}
+
+
+/**
+* Generates a resource list from alternating (vnum, amount, vnum, amount,
+* vnum, amount, NOTHING) -- you MUST pass NOTHING as the last vnum
+*
+* @param ... You must pass alternating (vnum, amount, vnum, amount, NOTHING)
+* @return struct resource_data* The allocated list.
+*/
+struct resource_data *create_resource_list(int first_vnum, int first_amount, ...) {
+	struct resource_data *list, *res, *last;
+	va_list ap;
+	int last_vnum = NOTHING, val;
+	bool have_vnum;
+	
+	// shortcut
+	if (first_vnum == NOTHING || first_amount <= 0) {
+		return NULL;
+	}
+	
+	CREATE(res, struct resource_data, 1);
+	res->vnum = first_vnum;
+	res->amount = first_amount;
+	list = last = res;
+	
+	// alternating vnum, amt
+	va_start(ap, first_amount);
+	have_vnum = FALSE;
+	
+	do {
+		val = va_arg(ap, int);
+		if (!have_vnum) {
+			last_vnum = val;
+			have_vnum = TRUE;
+		}
+		else {
+			CREATE(res, struct resource_data, 1);
+			res->vnum = last_vnum;
+			res->amount = val;
+			last->next = res;
+			last = res;
+		}
+	} while (last_vnum != NOTHING);
+
+	va_end(ap);
+	return list;
 }
 
 

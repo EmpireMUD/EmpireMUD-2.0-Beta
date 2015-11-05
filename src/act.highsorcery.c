@@ -66,81 +66,6 @@ const struct {
 };
 
 
-// for enchantments:
-#define ENCHANT_LINE_BREAK  { "\t", 0, NO_ABIL,  APPLY_NONE, APPLY_NONE,  { END_RESOURCE_LIST } }
-
-// enchantment flags
-#define ENCH_WEAPON  BIT(0)
-#define ENCH_ARMOR  BIT(1)
-#define ENCH_SHIELD  BIT(2)
-#define ENCH_PACK  BIT(3)
-#define ENCH_OFFHAND  BIT(4)
-
-
-// master enchantment data
-// TODO this could be moved to live data; will need a whole enchantment editor suite -pc
-struct {
-	char *name;
-	bitvector_t flags;
-	int ability;
-	
-	int first_bonus;	// APPLY_x
-	int second_bonus;	// APPLY_x
-		
-	Resource resources[5];
-} enchant_data[] = {
-
-	// weapons
-	{ "striking", ENCH_WEAPON, ABIL_ENCHANT_WEAPONS, APPLY_STRENGTH, APPLY_TO_HIT, { { o_BLOODSTONE, 5 }, END_RESOURCE_LIST } },
-	{ "parry", ENCH_WEAPON, ABIL_ENCHANT_WEAPONS, APPLY_DEXTERITY, APPLY_NONE, { { o_LIGHTNING_STONE, 5 }, END_RESOURCE_LIST } },
-	{ "wisdom", ENCH_WEAPON, ABIL_ENCHANT_WEAPONS, APPLY_INTELLIGENCE, APPLY_MANA_REGEN, { { o_GLOWING_SEASHELL, 5 }, END_RESOURCE_LIST } },
-	{ "accuracy", ENCH_WEAPON, ABIL_ENCHANT_WEAPONS, APPLY_TO_HIT, APPLY_NONE, { { o_BLOODSTONE, 5 }, END_RESOURCE_LIST } },
-	{ "awareness", ENCH_WEAPON, ABIL_ENCHANT_WEAPONS, APPLY_WITS, APPLY_TO_HIT, { { o_IRIDESCENT_IRIS, 5 }, END_RESOURCE_LIST } },
-	{ "deflection", ENCH_WEAPON, ABIL_ENCHANT_WEAPONS, APPLY_DODGE, APPLY_BLOCK, { { o_LIGHTNING_STONE, 5 }, END_RESOURCE_LIST } },
-
-	
-	ENCHANT_LINE_BREAK,
-	
-	// offhand
-	{ "manaspring", ENCH_OFFHAND, ABIL_ENCHANT_WEAPONS, APPLY_MANA_REGEN, APPLY_MANA, { { o_IRIDESCENT_IRIS, 5 }, END_RESOURCE_LIST } },
-	{ "healing", ENCH_OFFHAND, ABIL_ENCHANT_WEAPONS, APPLY_BONUS_HEALING, APPLY_MANA_REGEN, { { o_GLOWING_SEASHELL, 5 }, END_RESOURCE_LIST } },
-	{ "fury", ENCH_OFFHAND, ABIL_ENCHANT_WEAPONS, APPLY_BONUS_MAGICAL, APPLY_MANA_REGEN, { { o_LIGHTNING_STONE, 5 }, END_RESOURCE_LIST } },
-	{ "venom", ENCH_OFFHAND, ABIL_ENCHANT_WEAPONS, APPLY_BONUS_PHYSICAL, APPLY_MOVE_REGEN, { { o_BLOODSTONE, 5 }, END_RESOURCE_LIST } },
-	
-	ENCHANT_LINE_BREAK,
-	
-	// armor
-	{ "health", ENCH_ARMOR, ABIL_ENCHANT_ARMOR, APPLY_HEALTH, APPLY_NONE, { { o_BLOODSTONE, 5 }, END_RESOURCE_LIST } },
-	{ "mana", ENCH_ARMOR, ABIL_ENCHANT_ARMOR, APPLY_MANA, APPLY_NONE, { { o_IRIDESCENT_IRIS, 5 }, END_RESOURCE_LIST } },
-	{ "stamina", ENCH_ARMOR, ABIL_ENCHANT_ARMOR, APPLY_MOVE, APPLY_NONE, { { o_LIGHTNING_STONE, 5 }, END_RESOURCE_LIST } },
-	{ "regeneration", ENCH_ARMOR, ABIL_ENCHANT_ARMOR, APPLY_HEALTH_REGEN, APPLY_NONE, { { o_IRIDESCENT_IRIS, 5 }, END_RESOURCE_LIST } },
-	{ "longrunning", ENCH_ARMOR, ABIL_ENCHANT_ARMOR, APPLY_MOVE_REGEN, APPLY_NONE, { { o_LIGHTNING_STONE, 5 }, END_RESOURCE_LIST } },
-	{ "energy", ENCH_ARMOR, ABIL_ENCHANT_ARMOR, APPLY_MANA_REGEN, APPLY_NONE, { { o_IRIDESCENT_IRIS, 5 }, END_RESOURCE_LIST } },
-	{ "protection", ENCH_ARMOR, ABIL_ENCHANT_ARMOR, APPLY_RESIST_PHYSICAL, APPLY_NONE, { { o_GLOWING_SEASHELL, 5 }, END_RESOURCE_LIST } },
-	{ "evasion", ENCH_ARMOR, ABIL_ENCHANT_ARMOR, APPLY_DODGE, APPLY_NONE, { { o_LIGHTNING_STONE, 5 }, END_RESOURCE_LIST } },
-	
-	ENCHANT_LINE_BREAK,
-	
-	{ "rage", ENCH_ARMOR, ABIL_ENCHANT_ARMOR, APPLY_STRENGTH, APPLY_NONE, { { o_BLOODSTONE, 5 }, END_RESOURCE_LIST } },
-	{ "power", ENCH_ARMOR, ABIL_ENCHANT_ARMOR, APPLY_INTELLIGENCE, APPLY_NONE, { { o_GLOWING_SEASHELL, 5 }, END_RESOURCE_LIST } },
-	{ "spellwarding", ENCH_ARMOR, ABIL_ENCHANT_ARMOR, APPLY_RESIST_MAGICAL, APPLY_NONE, { { o_IRIDESCENT_IRIS, 5 }, END_RESOURCE_LIST } },
-	{ "focus", ENCH_ARMOR, ABIL_ENCHANT_ARMOR, APPLY_TO_HIT, APPLY_NONE, { { o_BLOODSTONE, 5 }, END_RESOURCE_LIST } },
-	{ "acrobatics", ENCH_ARMOR, ABIL_ENCHANT_ARMOR, APPLY_DEXTERITY, APPLY_NONE, { { o_LIGHTNING_STONE, 5 }, END_RESOURCE_LIST } },
-	
-	ENCHANT_LINE_BREAK,
-	
-	// shields
-	{ "blocking", ENCH_SHIELD, ABIL_ENCHANT_ARMOR, APPLY_BLOCK, APPLY_NONE, { { o_LIGHTNING_STONE, 5 }, END_RESOURCE_LIST } },
-	
-	ENCHANT_LINE_BREAK,
-	
-	{ "embiggening", ENCH_PACK, ABIL_ENCHANT_TOOLS, APPLY_INVENTORY, APPLY_NONE, { { o_IRIDESCENT_IRIS, 1 }, { o_GLOWING_SEASHELL, 1 }, { o_BLOODSTONE, 1 }, { o_LIGHTNING_STONE, 1 }, END_RESOURCE_LIST } },
-	
-	// END
-	{ "\n", 0, NO_ABIL,  APPLY_NONE, APPLY_NONE,  { END_RESOURCE_LIST } }
-};
-
-
 /**
 * Ritual setup function: for rituals that take arguments or must pre-validate
 * anything. If your ritual doesn't require this, use start_simple_ritual as
@@ -300,37 +225,6 @@ struct ritual_data_type {
 //// HELPERS /////////////////////////////////////////////////////////////////
 
 /**
-* @param obj_data *obj
-* @param int type enchant_data pos
-* @return TRUE if the enchantment could apply to the object
-*/
-bool can_be_enchanted(obj_data *obj, int type) {
-	if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) <= 0) {
-		// unscaled items cannot be enchanted
-		return FALSE;
-	}
-	if (IS_SET(enchant_data[type].flags, ENCH_WEAPON) && IS_WEAPON(obj)) {
-		return TRUE;
-	}
-	if (IS_SET(enchant_data[type].flags, ENCH_ARMOR) && IS_ARMOR(obj) && CAN_WEAR(obj, ITEM_WEAR_ARMOR)) {
-		return TRUE;
-	}
-	if (IS_SET(enchant_data[type].flags, ENCH_SHIELD) && IS_SHIELD(obj)) {
-		return TRUE;
-	}
-	if (IS_SET(enchant_data[type].flags, ENCH_PACK) && IS_PACK(obj)) {
-		return TRUE;
-	}
-	if (IS_SET(enchant_data[type].flags, ENCH_OFFHAND) && CAN_WEAR(obj, ITEM_WEAR_HOLD)) {
-		return TRUE;
-	}
-	
-	// Nope.
-	return FALSE;
-}
-
-
-/**
 * @param char_data *ch The player trying to perform a ritual.
 * @param int ritual The position in the ritual_data[] table.
 */
@@ -399,35 +293,6 @@ double get_enchant_scale_for_char(char_data *ch, int max_scale) {
 	}
 	points_available = level / 100.0 * config_get_double("enchant_points_at_100");
 	return MAX(points_available, 1.0);
-}
-
-
-/**
-* Name matching for enchantments, preferring exact matches first.
-*
-* @param char_data *ch the player, to check abilities
-* @param char *name enchantment name to find
-* @return int enchant_data position, or NOTHING for not found
-*/
-int find_enchant_by_name(char_data *ch, char *name) {
-	int iter, exact = NOTHING, partial = NOTHING;
-	
-	for (iter = 0; *enchant_data[iter].name != '\n' && exact == NOTHING; ++iter) {
-		if ((enchant_data[iter].ability == NO_ABIL || HAS_ABILITY(ch, enchant_data[iter].ability))) {
-			if (!str_cmp(name, enchant_data[iter].name)) {
-				exact = iter;
-			}
-			else if (is_abbrev(name, enchant_data[iter].name)) {
-				partial = iter;
-			}
-		}
-	}
-	
-	if (exact == NOTHING) {
-		exact = partial;
-	}
-	
-	return exact;
 }
 
 
@@ -874,125 +739,6 @@ ACMD(do_dispel) {
 		if (FIGHTING(vict) && !FIGHTING(ch)) {
 			engage_combat(ch, FIGHTING(vict), FALSE);
 		}
-	}
-}
-
-
-ACMD(do_enchant) {
-	extern char *shared_by(obj_data *obj, char_data *ch);
-	extern const double apply_values[];
-	
-	char arg2[MAX_INPUT_LENGTH];
-	struct obj_apply *apply;
-	obj_data *obj;
-	int iter, type, value;
-	bool found, line;
-	double points_available, first_points = 0.0, second_points = 0.0;
-	
-	two_arguments(argument, arg, arg2);
-	
-	if (IS_NPC(ch)) {
-		msg_to_char(ch, "NPCs can't enchant.\r\n");
-	}
-	else if (!*arg || !*arg2) {
-		msg_to_char(ch, "Usage: enchant <item> <type>\r\nYou know how to enchant:\r\n");
-		
-		line = FALSE;
-		for (iter = 0; *enchant_data[iter].name != '\n'; ++iter) {			
-			if (*enchant_data[iter].name == '\t') {
-				if (line) {
-					msg_to_char(ch, "\r\n");
-					line = FALSE;
-				}
-			}
-			else if (enchant_data[iter].ability == NO_ABIL || HAS_ABILITY(ch, enchant_data[iter].ability)) {
-				msg_to_char(ch, "%s%s", line ? ", " : "  ", enchant_data[iter].name);
-				found = line = TRUE;
-			}
-		}
-		
-		if (line) {
-			msg_to_char(ch, "\r\n");
-		}
-		if (!found) {
-			msg_to_char(ch, "  nothing\r\n");
-		}
-		// end !*arg
-	}
-	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying)) && !(obj = get_obj_by_char_share(ch, arg))) {
-		msg_to_char(ch, "You don't seem to have any %s.\r\n", arg);
-	}
-	else if ((type = find_enchant_by_name(ch, arg2)) == NOTHING) {
-		msg_to_char(ch, "You don't know that enchantment.\r\n");
-	}
-	else if (enchant_data[type].ability != NO_ABIL && ABILITY_TRIGGERS(ch, NULL, obj, enchant_data[type].ability)) {
-		return;
-	}
-	else if (OBJ_FLAGGED(obj, OBJ_ENCHANTED)) {
-		msg_to_char(ch, "You cannot enchant an item that has already been enchanted.\r\n");
-	}
-	else if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) <= 0) {
-		// always forbidden
-		msg_to_char(ch, "That item cannot be enchanted.\r\n");
-	}
-	else if (!can_be_enchanted(obj, type)) {
-		msg_to_char(ch, "You can't place that enchantment on that object.\r\n");
-	}
-	else if (!has_resources(ch, enchant_data[type].resources, FALSE, TRUE)) {
-		// sends its own messages
-	}
-	else {
-		extract_resources(ch, enchant_data[type].resources, FALSE);
-		
-		points_available = get_enchant_scale_for_char(ch, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
-		if (HAS_ABILITY(ch, ABIL_GREATER_ENCHANTMENTS)) {
-			points_available *= config_get_double("greater_enchantments_bonus");
-		}
-		
-		// split the points
-		if (enchant_data[type].second_bonus != APPLY_NONE) {
-			first_points = points_available * 0.6666;
-			second_points = points_available * 0.3333;
-		}
-		else {
-			// only one apply
-			first_points = points_available;
-			second_points = 0.0;
-		}
-		
-		// first apply
-		CREATE(apply, struct obj_apply, 1);
-		apply->apply_type = APPLY_TYPE_ENCHANTMENT;
-		apply->location = enchant_data[type].first_bonus;
-		apply->modifier = MAX(1, round(first_points * (1.0 / apply_values[enchant_data[type].first_bonus])));
-		apply->next = GET_OBJ_APPLIES(obj);
-		GET_OBJ_APPLIES(obj) = apply;
-		
-		// secondy apply
-		if (enchant_data[type].second_bonus != APPLY_NONE && (value = round(second_points * (1.0 / apply_values[enchant_data[type].second_bonus]))) > 0) {
-			CREATE(apply, struct obj_apply, 1);
-			apply->apply_type = APPLY_TYPE_ENCHANTMENT;
-			apply->location = enchant_data[type].second_bonus;
-			apply->modifier = value;
-			apply->next = GET_OBJ_APPLIES(obj);
-			GET_OBJ_APPLIES(obj) = apply;
-		}
-		
-		// set enchanted bit
-		SET_BIT(GET_OBJ_EXTRA(obj), OBJ_ENCHANTED);
-		
-		sprintf(buf, "You infuse $p%s with the %s enchantment.", shared_by(obj, ch), enchant_data[type].name);
-		act(buf, FALSE, ch, obj, obj->worn_by, TO_CHAR);
-		
-		sprintf(buf, "$n infuses $p%s with the %s enchantment.", shared_by(obj, ch), enchant_data[type].name);
-		act(buf, FALSE, ch, obj, obj->worn_by, TO_ROOM);
-		
-		if (enchant_data[type].ability != NO_ABIL) {
-			gain_ability_exp(ch, enchant_data[type].ability, 50);
-		}
-		gain_ability_exp(ch, ABIL_GREATER_ENCHANTMENTS, 50);
-		
-		command_lag(ch, WAIT_ABILITY);
 	}
 }
 
@@ -1708,8 +1454,12 @@ RITUAL_FINISH_FUNC(perform_phoenix_rite) {
 
 
 RITUAL_SETUP_FUNC(start_ritual_of_defense) {
-	Resource defense_res[3] = { { o_IMPERIUM_SPIKE, 1 }, { o_BLOODSTONE, 1 }, END_RESOURCE_LIST };
+	static struct resource_data *defense_res = NULL;
 	bool found = FALSE;
+	
+	if (!defense_res) {
+		defense_res = create_resource_list(o_IMPERIUM_SPIKE, 1, o_BLOODSTONE, 1, NOTHING);
+	}
 	
 	// valid sects
 	if (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_BARRIER)) {

@@ -1931,14 +1931,13 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (subfield && *subfield && !IS_NPC(c)) {
 							// nop %actor.add_resources(vnum, number)%
 							char arg1[256], arg2[256];
-							Resource res[2] = { END_RESOURCE_LIST, END_RESOURCE_LIST };
+							struct resource_data *res = NULL;
 							obj_vnum vnum;
 							int amt;
 						
 							comma_args(subfield, arg1, arg2);
 							if (*arg1 && *arg2 && (vnum = atoi(arg1)) > 0 && (amt = atoi(arg2)) != 0 && obj_proto(vnum)) {
-								res[0].vnum = vnum;
-								res[0].amount = ABSOLUTE(amt);
+								res = create_resource_list(vnum, ABSOLUTE(amt), NOTHING);
 								
 								// this sends an error message to c on failure
 								if (amt > 0) {
@@ -1947,6 +1946,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 								else {
 									extract_resources(c, res, can_use_room(c, IN_ROOM(c), GUESTS_ALLOWED));
 								}
+								
+								free_resource_list(res);
 							}
 							*str = '\0';
 						}
@@ -2222,18 +2223,19 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (subfield && *subfield && !IS_NPC(c)) {
 							// %actor.has_resources(vnum, number)%
 							char arg1[256], arg2[256];
-							Resource res[2] = { END_RESOURCE_LIST, END_RESOURCE_LIST };
+							struct resource_data *res;
 							obj_vnum vnum;
 							int amt;
 						
 							comma_args(subfield, arg1, arg2);
 							if (*arg1 && *arg2 && (vnum = atoi(arg1)) > 0 && (amt = atoi(arg2)) > 0) {
-								res[0].vnum = vnum;
-								res[0].amount = amt;
+								res = create_resource_list(vnum, amt, NOTHING);
 								
 								if (has_resources(c, res, can_use_room(c, IN_ROOM(c), GUESTS_ALLOWED), FALSE)) {
 									snprintf(str, slen, "1");
 								}
+								
+								free_resource_list(res);
 							}
 						}
 						// all other cases...

@@ -2164,20 +2164,21 @@ bool wake_and_stand(char_data *ch) {
 * This function always takes from inventory first, and ground second.
 *
 * @param char_data *ch The person whose resources to take.
-* @param Resource list[] Any resource list.
+* @param struct resource_data *list Any resource list.
 * @param bool ground If TRUE, will also take resources off the ground.
 */
-void extract_resources(char_data *ch, Resource list[], bool ground) {
+void extract_resources(char_data *ch, struct resource_data *list, bool ground) {
+	struct resource_data *res;
 	obj_data *obj, *next_obj;
-	int i, remaining;
-
-	for (i = 0; list[i].vnum != NOTHING; i++) {
-		remaining = list[i].amount;
+	int remaining;
+	
+	for (res = list; res; res = res->next) {
+		remaining = res->amount;
 
 		for (obj = ch->carrying; obj && remaining > 0; obj = next_obj) {
 			next_obj = obj->next_content;
 
-			if (GET_OBJ_VNUM(obj) == list[i].vnum) {
+			if (GET_OBJ_VNUM(obj) == res->vnum) {
 				--remaining;
 				extract_obj(obj);
 			}
@@ -2186,7 +2187,7 @@ void extract_resources(char_data *ch, Resource list[], bool ground) {
 			for (obj = ROOM_CONTENTS(IN_ROOM(ch)); obj && remaining > 0; obj = next_obj) {
 				next_obj = obj->next_content;
 
-				if (GET_OBJ_VNUM(obj) == list[i].vnum) {
+				if (GET_OBJ_VNUM(obj) == res->vnum) {
 					--remaining;
 					extract_obj(obj);
 				}
@@ -2200,23 +2201,24 @@ void extract_resources(char_data *ch, Resource list[], bool ground) {
 * Give resources from a resource list to a player.
 *
 * @param char_data *ch The target player.
-* @param Resource list[] Any resource list.
+* @param struct resource_data *list Any resource list.
 * @param bool split If TRUE, gives back only half.
 */
-void give_resources(char_data *ch, Resource list[], bool split) {
+void give_resources(char_data *ch, struct resource_data *list, bool split) {
+	struct resource_data *res;
 	obj_data *obj;
-	int i, j, remaining;
-
-	for (i = 0; list[i].vnum != NOTHING; i++) {
-		remaining = list[i].amount;
+	int j, remaining;
+	
+	for (res = list; res; res = res->next) {
+		remaining = res->amount;
 
 		if (split) {
 			remaining /= 2;
 		}
 
-		for (j = 0; j < remaining; j++) {
-			if (obj_proto(list[i].vnum)) {
-				obj = read_object(list[i].vnum, TRUE);
+		if (obj_proto(res->vnum)) {
+			for (j = 0; j < remaining; ++j) {
+				obj = read_object(res->vnum, TRUE);
 				
 				// scale item to minimum level
 				scale_item_to_level(obj, 0);
@@ -2233,18 +2235,19 @@ void give_resources(char_data *ch, Resource list[], bool split) {
 * Find out if a person has resources available.
 *
 * @param char_data *ch The person whose resources to check.
-* @param Resource list[] Any resource list.
+* @param struct resource_data *list Any resource list.
 * @param bool ground If TRUE, will also count resources on the ground.
 * @param bool send_msgs If TRUE, will alert the character as to what they need. FALSE runs silently.
 */
-bool has_resources(char_data *ch, Resource list[], bool ground, bool send_msgs) {
+bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool send_msgs) {
+	struct resource_data *res;
 	obj_data *obj, *proto;
-	int i, total = 0;
 	bool ok = TRUE;
-
-	for (i = 0; list[i].vnum != NOTHING; i++, total = 0) {
-		for (obj = ch->carrying; obj; obj = obj->next_content) {
-			if (GET_OBJ_VNUM(obj) == list[i].vnum) {
+	int total;
+	
+	for (res = list, total = 0; res; res = res->next, total = 0) {
+		for (obj = ch->carrying; obj && total < res->amount; obj = obj->next_content) {
+			if (GET_OBJ_VNUM(obj) == res->vnum) {
 				// check full of water for drink containers
 				if (!IS_DRINK_CONTAINER(obj) || (GET_DRINK_CONTAINER_CONTENTS(obj) >= GET_DRINK_CONTAINER_CAPACITY(obj) && GET_DRINK_CONTAINER_TYPE(obj) == LIQ_WATER)) {
 					++total;
@@ -2252,8 +2255,8 @@ bool has_resources(char_data *ch, Resource list[], bool ground, bool send_msgs) 
 			}
 		}
 		if (ground) {
-			for (obj = ROOM_CONTENTS(IN_ROOM(ch)); obj; obj = obj->next_content) {
-				if (GET_OBJ_VNUM(obj) == list[i].vnum) {
+			for (obj = ROOM_CONTENTS(IN_ROOM(ch)); obj && total < res->amount; obj = obj->next_content) {
+				if (GET_OBJ_VNUM(obj) == res->vnum) {
 					// check full of water for drink containers
 					if (!IS_DRINK_CONTAINER(obj) || (GET_DRINK_CONTAINER_CONTENTS(obj) >= GET_DRINK_CONTAINER_CAPACITY(obj) && GET_DRINK_CONTAINER_TYPE(obj) == LIQ_WATER)) {
 						++total;
@@ -2262,9 +2265,9 @@ bool has_resources(char_data *ch, Resource list[], bool ground, bool send_msgs) 
 			}
 		}
 
-		if (total < list[i].amount) {
-			if (send_msgs && (proto = obj_proto(list[i].vnum))) {
-				msg_to_char(ch, "%s %d more of %s%s", (ok ? "You need" : ","), list[i].amount - total, skip_filler(GET_OBJ_SHORT_DESC(proto)), IS_DRINK_CONTAINER(proto) ? " (full of water)" : "");
+		if (total < res->amount) {
+			if (send_msgs && (proto = obj_proto(res->vnum))) {
+				msg_to_char(ch, "%s %d more of %s%s", (ok ? "You need" : ","), res->amount - total, skip_filler(GET_OBJ_SHORT_DESC(proto)), IS_DRINK_CONTAINER(proto) ? " (full of water)" : "");
 			}
 			ok = FALSE;
 		}

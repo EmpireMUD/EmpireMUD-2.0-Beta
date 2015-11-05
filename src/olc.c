@@ -3819,8 +3819,6 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 * @param struct resource_data **list A pointer to a resource list to modify.
 */
 void olc_process_resources(char_data *ch, char *argument, struct resource_data **list) {
-	void free_resource_list(struct resource_data *list);
-
 	augment_data *aug = GET_OLC_AUGMENT(ch->desc);
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], arg4[MAX_INPUT_LENGTH];
 	struct resource_data *res, *next_res, *prev_res, *prev_prev, *change, *temp;

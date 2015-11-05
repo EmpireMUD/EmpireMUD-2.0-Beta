@@ -2782,11 +2782,13 @@ void do_stat_character(char_data *ch, char_data *k) {
 
 
 void do_stat_craft(char_data *ch, craft_data *craft) {
+	void get_resource_display(struct resource_data *list, char *save_buffer);
+
 	extern const char *craft_flags[];
 	extern const char *craft_types[];
 
 	bld_data *bld;
-	int count, iter, seconds;
+	int seconds;
 	
 	msg_to_char(ch, "Name: '&y%s&0', Vnum: [&g%d&0], Type: &c%s&0\r\n", GET_CRAFT_NAME(craft), GET_CRAFT_VNUM(craft), craft_types[GET_CRAFT_TYPE(craft)]);
 	
@@ -2823,18 +2825,9 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 	}
 
 	// resources
-	count = 0;
 	msg_to_char(ch, "Resources required: ");
-	for (iter = 0; iter < MAX_RESOURCES_REQUIRED && GET_CRAFT_RESOURCES(craft)[iter].vnum != NOTHING; ++iter) {
-		msg_to_char(ch, "%s&y[%d] %s (x%d)&0", (count > 0 ? ", ": ""), GET_CRAFT_RESOURCES(craft)[iter].vnum, skip_filler(get_obj_name_by_proto(GET_CRAFT_RESOURCES(craft)[iter].vnum)), GET_CRAFT_RESOURCES(craft)[iter].amount);
-		++count;
-	}
-	if (count == 0) {
-		msg_to_char(ch, "none\r\n");
-	}
-	else {
-		msg_to_char(ch, "\r\n");
-	}
+	get_resource_display(GET_CRAFT_RESOURCES(craft), buf);
+	send_to_char(buf, ch);
 }
 
 

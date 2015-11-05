@@ -380,8 +380,9 @@ typedef struct trig_data trig_data;
 
 // AUG_x: Augment flags
 #define AUG_IN_DEVELOPMENT  BIT(0)	// a. can't be used by players
-#define AUG_ARMOR  BIT(1)	// b. targets ARMOR item type
-#define AUG_SHIELD  BIT(2)	// c. only targets shields
+#define AUG_SELF_ONLY  BIT(1)	// b. can only be used on own items / force-bind
+#define AUG_ARMOR  BIT(2)	// c. targets ARMOR item type
+#define AUG_SHIELD  BIT(3)	// d. only targets shields
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1870,13 +1871,6 @@ struct promo_code_list {
 };
 
 
-/* resource data */
-typedef struct resource_data_struct {
-	int vnum;
-	int amount;
-} Resource;
-
-
 // for act.highsorcery.c ritual strings
 struct ritual_strings {
 	char *to_char;
@@ -2096,6 +2090,7 @@ struct augment_type_data {
 	char *noun;
 	char *verb;
 	int apply_type;	// APPLY_TYPE_x
+	bitvector_t default_flags;	// AUG_x always applied
 	int greater_abil;	// ABIL_x that boosts the scale points, or NO_ABIL
 	bitvector_t use_obj_flag;	// OBJ_x: optional; used by enchants
 };
@@ -2744,7 +2739,7 @@ struct craft_data {
 	bitvector_t build_facing;	// BLD_ON_x flags for the tile it's facing
 	
 	obj_vnum requires_obj;	// only shows up if you have the item, e.g. o_TENT
-	Resource *resources;
+	struct resource_data *resources;	// linked list
 	
 	UT_hash_handle hh;	// craft_table hash
 	UT_hash_handle sorted_hh;	// sorted_crafts hash

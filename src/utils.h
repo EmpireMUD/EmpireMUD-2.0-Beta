@@ -1125,9 +1125,9 @@ void determine_gear_level(char_data *ch);
 extern bool wake_and_stand(char_data *ch);
 
 // resource functions from utils.c
-void extract_resources(char_data *ch, Resource list[], bool ground);
-void give_resources(char_data *ch, Resource list[], bool split);
-extern bool has_resources(char_data *ch, Resource list[], bool ground, bool send_msgs);
+void extract_resources(char_data *ch, struct resource_data *list, bool ground);
+void give_resources(char_data *ch, struct resource_data *list, bool split);
+extern bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool send_msgs);
 
 // string functions from utils.c
 extern bitvector_t asciiflag_conv(char *flag);

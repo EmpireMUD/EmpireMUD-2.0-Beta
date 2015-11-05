@@ -651,6 +651,9 @@ Augment flags are properties that affect how the augment behaves.
 
 Available flags:
  IN-DEV - Cannot be used by mortals.
+ SELF-ONLY - Can only be used on own items; will bind items to self.
+ ARMOR - Works on any ARMOR-type item only.
+ SHIELD - Works on any SHIELD-type item only.
 
 See also: OLC AUGMENTS
 #d
@@ -706,6 +709,10 @@ The augment type determines which command is used to apply the augment to an
 item. It also determines what type of "apply" is added to the item, and what
 rules those applies will follow. For example, "enchantment" applies can be
 removed with the Disenchant ability, but "hone" applies cannot.
+
+Type notes:
+ Enchantment - Also sets the ENCHANTED bit on items.
+ Hone - Always acts as if it has the SELF-ONLY flag.
 
 See also: OLC AUGMENTS
 #d

@@ -1922,14 +1922,18 @@ ACMD(do_abandon) {
 ACMD(do_barde) {
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	
-	Resource res[2] = { { o_IRON_INGOT, 10 }, END_RESOURCE_LIST };
+	static struct resource_data *res = NULL;
 	struct interact_exclusion_data *excl = NULL;
 	struct interaction_item *interact;
 	char_data *mob, *newmob = NULL;
 	bool found;
 	double prc;
 	int num;
-
+	
+	if (!res) {
+		res = create_resource_list(o_IRON_INGOT, 10, NOTHING);
+	}
+	
 	one_argument(argument, arg);
 
 	if (!can_use_ability(ch, ABIL_BARDE, NOTHING, 0, NOTHING)) {

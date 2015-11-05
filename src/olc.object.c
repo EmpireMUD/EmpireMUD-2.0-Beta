@@ -359,7 +359,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	extern bool delete_from_spawn_template_list(struct adventure_spawn **list, int spawn_type, mob_vnum vnum);
 	extern bool delete_link_rule_by_portal(struct adventure_link_rule **list, obj_vnum portal_vnum);
 	void expire_trading_post_item(struct trading_post_data *tpd);
-	extern bool remove_obj_from_resource_list(struct resource_data_struct **list, obj_vnum vnum);
+	extern bool remove_obj_from_resource_list(struct resource_data **list, obj_vnum vnum);
 	void remove_object_from_table(obj_data *obj);
 	void save_trading_post();
 
@@ -370,6 +370,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	room_template *rmt, *next_rmt;
 	sector_data *sect, *next_sect;
 	craft_data *craft, *next_craft;
+	augment_data *aug, *next_aug;
 	crop_data *crop, *next_crop;
 	empire_data *emp, *next_emp;
 	char_data *mob, *next_mob;
@@ -467,6 +468,23 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		}
 	}
 	
+	// update augments
+	HASH_ITER(hh, augment_table, aug, next_aug) {
+		found = FALSE;
+		
+		if (GET_AUG_REQUIRES_OBJ(aug) == vnum) {
+			GET_AUG_REQUIRES_OBJ(aug) = NOTHING;
+			found = TRUE;
+		}
+		
+		found |= remove_obj_from_resource_list(&GET_AUG_RESOURCES(aug), vnum);
+		
+		if (found) {
+			SET_BIT(GET_AUG_FLAGS(aug), AUG_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_AUG, GET_AUG_VNUM(aug));
+		}
+	}
+	
 	// update buildings
 	HASH_ITER(hh, building_table, bld, next_bld) {
 		found = delete_from_interaction_list(&GET_BLD_INTERACTIONS(bld), TYPE_OBJ, vnum);
@@ -480,6 +498,11 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		found = FALSE;
 		if (GET_CRAFT_TYPE(craft) != CRAFT_TYPE_BUILD && !IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_SOUP) && GET_CRAFT_OBJECT(craft) == vnum) {
 			GET_CRAFT_OBJECT(craft) = NOTHING;
+			found = TRUE;
+		}
+		
+		if (GET_CRAFT_REQUIRES_OBJ(craft) == vnum) {
+			GET_CRAFT_REQUIRES_OBJ(craft) = NOTHING;
 			found = TRUE;
 		}
 		
@@ -610,12 +633,14 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	craft_data *craft, *next_craft;
 	room_template *rmt, *next_rmt;
 	sector_data *sect, *next_sect;
+	augment_data *aug, *next_aug;
 	crop_data *crop, *next_crop;
 	char_data *mob, *next_mob;
 	adv_data *adv, *next_adv;
 	bld_data *bld, *next_bld;
 	obj_data *proto, *obj, *next_obj;
-	int size, sub, found;
+	struct resource_data *res;
+	int size, found;
 	bool any;
 	
 	if (!(proto = obj_proto(vnum))) {
@@ -625,14 +650,31 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	
 	found = 0;
 	size = snprintf(buf, sizeof(buf), "Occurrences of object %d (%s):\r\n", vnum, GET_OBJ_SHORT_DESC(proto));
-
-	// update adventure zones
+	
+	// adventure zones
 	HASH_ITER(hh, adventure_table, adv, next_adv) {
 		for (link = GET_ADV_LINKING(adv); link; link = link->next) {
 			if (link->portal_in == vnum || link->portal_out == vnum) {
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "ADV [%5d] %s\r\n", GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
 				break;	// only need 1
+			}
+		}
+	}
+	
+	// augments
+	HASH_ITER(hh, augment_table, aug, next_aug) {
+		any = FALSE;
+		if (!any && GET_AUG_REQUIRES_OBJ(aug) == vnum) {
+			any = TRUE;
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "AUG [%5d] %s\r\n", GET_AUG_VNUM(aug), GET_AUG_NAME(aug));
+		}
+		for (res = GET_AUG_RESOURCES(aug); res && !any; res = res->next) {
+			if (res->vnum == vnum) {
+				any = TRUE;
+				++found;
+				size += snprintf(buf + size, sizeof(buf) - size, "AUG [%5d] %s\r\n", GET_AUG_VNUM(aug), GET_AUG_NAME(aug));
 			}
 		}
 	}
@@ -662,8 +704,8 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
 		}
-		for (sub = 0; !any && sub < MAX_RESOURCES_REQUIRED && GET_CRAFT_RESOURCES(craft)[sub].vnum != NOTHING; ++sub) {
-			if (GET_CRAFT_RESOURCES(craft)[sub].vnum == vnum) {
+		for (res = GET_CRAFT_RESOURCES(craft); res && !any; res = res->next) {
+			if (res->vnum == vnum) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));

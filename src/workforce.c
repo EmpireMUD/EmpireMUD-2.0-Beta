@@ -815,7 +815,8 @@ void do_chore_gen_craft(empire_data *emp, room_data *room, int chore, CHORE_GEN_
 	struct empire_storage_data *store = NULL;
 	char_data *worker = find_chore_worker_in_room(room, chore_data[chore].mob);
 	craft_data *craft, *next_craft, *do_craft = NULL;
-	int iter, crafts_found;
+	struct resource_data *res;
+	int crafts_found;
 	char buf[256];
 	bool has_res;
 	
@@ -838,8 +839,8 @@ void do_chore_gen_craft(empire_data *emp, room_data *room, int chore, CHORE_GEN_
 		
 		// check resources...
 		has_res = TRUE;
-		for (iter = 0; iter < MAX_RESOURCES_REQUIRED && GET_CRAFT_RESOURCES(craft)[iter].vnum != NOTHING && has_res; ++iter) {
-			if (!(store = find_stored_resource(emp, GET_ISLAND_ID(room), GET_CRAFT_RESOURCES(craft)[iter].vnum)) || store->amount < GET_CRAFT_RESOURCES(craft)[iter].amount) {
+		for (res = GET_CRAFT_RESOURCES(craft); res && has_res; res = res->next) {
+			if (!(store = find_stored_resource(emp, GET_ISLAND_ID(room), res->vnum)) || store->amount < res->amount) {
 				has_res = FALSE;
 			}
 		}
@@ -858,8 +859,8 @@ void do_chore_gen_craft(empire_data *emp, room_data *room, int chore, CHORE_GEN_
 		ewt_mark_resource_worker(emp, room, GET_CRAFT_OBJECT(do_craft));
 	
 		// charge resources (we pre-validated)
-		for (iter = 0; iter < MAX_RESOURCES_REQUIRED && GET_CRAFT_RESOURCES(do_craft)[iter].vnum != NOTHING; ++iter) {
-			charge_stored_resource(emp, GET_ISLAND_ID(room), GET_CRAFT_RESOURCES(do_craft)[iter].vnum, GET_CRAFT_RESOURCES(do_craft)[iter].amount);
+		for (res = GET_CRAFT_RESOURCES(do_craft); res; res = res->next) {
+			charge_stored_resource(emp, GET_ISLAND_ID(room), res->vnum, res->amount);
 		}
 
 		add_to_empire_storage(emp, GET_ISLAND_ID(room), GET_CRAFT_OBJECT(do_craft), GET_CRAFT_QUANTITY(do_craft));

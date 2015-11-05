@@ -42,7 +42,6 @@ extern const char *wear_bits[];
 // external funcs
 extern struct resource_data *copy_resource_list(struct resource_data *input);
 void get_resource_display(struct resource_data *list, char *save_buffer);
-void free_resource_list(struct resource_data *list);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -98,26 +97,28 @@ augment_data *find_augment_by_name(char_data *ch, char *name, int type) {
 * @return bool TRUE if successful, FALSE if an error was sent.
 */
 bool validate_augment_target(char_data *ch, obj_data *obj, augment_data *aug) {
-	char buf[MAX_STRING_LENGTH], flags[MAX_STRING_LENGTH];
-	bitvector_t partial_wear;
+	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
+	bitvector_t partial_wear, flags;
 	int iter;
+	
+	flags = GET_AUG_FLAGS(aug) | augment_info[GET_AUG_TYPE(aug)].default_flags;
 	
 	// wear-based targeting
 	partial_wear = GET_AUG_WEAR_FLAGS(aug) & ~ITEM_WEAR_TAKE;
 	if (partial_wear != NOBITS && !CAN_WEAR(obj, partial_wear)) {
-		prettier_sprintbit(partial_wear, wear_bits, flags);
-		snprintf(buf, sizeof(buf), "You can only use that %s on items that are worn on: %s\r\n", augment_info[GET_AUG_TYPE(aug)].noun, flags);
+		prettier_sprintbit(partial_wear, wear_bits, part);
+		snprintf(buf, sizeof(buf), "You can only use that %s on items that are worn on: %s\r\n", augment_info[GET_AUG_TYPE(aug)].noun, part);
 		for (iter = 1; iter < strlen(buf); ++iter) {
 			buf[iter] = LOWER(buf[iter]);	// lowercase both parts of the string
 		}
 		return FALSE;
 	}
 	
-	if (AUGMENT_FLAGGED(aug, AUG_ARMOR) && !IS_ARMOR(obj)) {
+	if (IS_SET(flags, AUG_ARMOR) && !IS_ARMOR(obj)) {
 		msg_to_char(ch, "You can only put that %s on armor.\r\n", augment_info[GET_AUG_TYPE(aug)].noun);
 		return FALSE;
 	}
-	if (AUGMENT_FLAGGED(aug, AUG_SHIELD) && !IS_SHIELD(obj)) {
+	if (IS_SET(flags, AUG_SHIELD) && !IS_SHIELD(obj)) {
 		msg_to_char(ch, "You can only put that %s on a shield.\r\n", augment_info[GET_AUG_TYPE(aug)].noun);
 		return FALSE;
 	}
