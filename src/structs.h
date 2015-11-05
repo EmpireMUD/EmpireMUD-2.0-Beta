@@ -380,6 +380,8 @@ typedef struct trig_data trig_data;
 
 // AUG_x: Augment flags
 #define AUG_IN_DEVELOPMENT  BIT(0)	// a. can't be used by players
+#define AUG_ARMOR  BIT(1)	// b. targets ARMOR item type
+#define AUG_SHIELD  BIT(2)	// c. only targets shields
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2086,6 +2088,16 @@ struct augment_apply {
 	int location;	// APPLY_x
 	int weight;	// what percent of points go to this
 	struct augment_apply *next;	// linked list
+};
+
+
+// used by do_gen_augment
+struct augment_type_data {
+	char *noun;
+	char *verb;
+	int apply_type;	// APPLY_TYPE_x
+	int greater_abil;	// ABIL_x that boosts the scale points, or NO_ABIL
+	bitvector_t use_obj_flag;	// OBJ_x: optional; used by enchants
 };
 
 

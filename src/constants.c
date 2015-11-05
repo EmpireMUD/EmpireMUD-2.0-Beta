@@ -181,18 +181,22 @@ const char *augment_types[] = {
 };
 
 
-// AUGMENT_x (1/2): verb/command form
-const char *augment_verbs[] = {
-	"augment",	// none / should not be used
-	"enchant",
-	"hone",
-	"\n"
+// AUGMENT_x (1/2): augment type data
+const struct augment_type_data augment_info[] = {
+	// noun, verb, apply-type, greater-ability
+	{ "augment", "augment", APPLY_TYPE_NATURAL, NO_ABIL, NOBITS },
+	{ "enchantment", "enchant", APPLY_TYPE_ENCHANTMENT, ABIL_GREATER_ENCHANTMENTS, OBJ_ENCHANTED },
+	{ "hone", "hone", APPLY_TYPE_HONED, NO_ABIL, NOBITS },
+	
+	{ "\n", "\n", 0, 0, 0 }	// last
 };
 
 
 // AUG_x: augment flags
 const char *augment_flags[] = {
 	"IN-DEV",
+	"ARMOR",
+	"SHIELD",
 	"\n"
 };
 

@@ -35,6 +35,7 @@
 // external consts
 extern const char *apply_types[];
 extern const char *augment_types[];
+extern const struct augment_type_data augment_info[];
 extern const char *augment_flags[];
 extern const char *wear_bits[];
 
@@ -46,6 +47,83 @@ void free_resource_list(struct resource_data *list);
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
+
+/**
+* Used for choosing an augment that's valid for the player.
+*
+* @param char_data *ch The person trying to augment.
+* @param char *name The argument.
+* @param int type AUGMENT_x type.
+* @return augment_data* The matching augment, or NULL if none.
+*/
+augment_data *find_augment_by_name(char_data *ch, char *name, int type) {
+	augment_data *aug, *next_aug, *partial = NULL;
+	
+	HASH_ITER(sorted_hh, sorted_augments, aug, next_aug) {
+		if (GET_AUG_TYPE(aug) != type) {
+			continue;
+		}
+		if (AUGMENT_FLAGGED(aug, AUG_IN_DEVELOPMENT) && !IS_IMMORTAL(ch)) {
+			continue;
+		}
+		if (GET_AUG_ABILITY(aug) != NO_ABIL && !HAS_ABILITY(ch, GET_AUG_ABILITY(aug))) {
+			continue;
+		}
+		if (GET_AUG_REQUIRES_OBJ(aug) != NOTHING && !get_obj_in_list_vnum(GET_AUG_REQUIRES_OBJ(aug), ch->carrying)) {
+			continue;
+		}
+		
+		// matches:
+		if (!str_cmp(name, GET_AUG_NAME(aug))) {
+			// perfect match
+			return aug;
+		}
+		if (is_multiword_abbrev(name, GET_AUG_NAME(aug))) {
+			// probable match
+			partial = aug;
+		}
+	}
+	
+	// no exact match...
+	return partial;
+}
+
+
+/**
+* Checks targeting flags on augments.
+*
+* @param char_data *ch The person to send the error messages to.
+* @param obj_data *obj The item to validate.
+* @param augment_data *aug The augment we're trying to apply.
+* @return bool TRUE if successful, FALSE if an error was sent.
+*/
+bool validate_augment_target(char_data *ch, obj_data *obj, augment_data *aug) {
+	char buf[MAX_STRING_LENGTH], flags[MAX_STRING_LENGTH];
+	bitvector_t partial_wear;
+	int iter;
+	
+	// wear-based targeting
+	partial_wear = GET_AUG_WEAR_FLAGS(aug) & ~ITEM_WEAR_TAKE;
+	if (partial_wear != NOBITS && !CAN_WEAR(obj, partial_wear)) {
+		prettier_sprintbit(partial_wear, wear_bits, flags);
+		snprintf(buf, sizeof(buf), "You can only use that %s on items that are worn on: %s\r\n", augment_info[GET_AUG_TYPE(aug)].noun, flags);
+		for (iter = 1; iter < strlen(buf); ++iter) {
+			buf[iter] = LOWER(buf[iter]);	// lowercase both parts of the string
+		}
+		return FALSE;
+	}
+	
+	if (AUGMENT_FLAGGED(aug, AUG_ARMOR) && !IS_ARMOR(obj)) {
+		msg_to_char(ch, "You can only put that %s on armor.\r\n", augment_info[GET_AUG_TYPE(aug)].noun);
+		return FALSE;
+	}
+	if (AUGMENT_FLAGGED(aug, AUG_SHIELD) && !IS_SHIELD(obj)) {
+		msg_to_char(ch, "You can only put that %s on a shield.\r\n", augment_info[GET_AUG_TYPE(aug)].noun);
+		return FALSE;
+	}
+	
+	return TRUE;
+}
 
 
  //////////////////////////////////////////////////////////////////////////////

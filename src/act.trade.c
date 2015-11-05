@@ -37,6 +37,7 @@
 
 // external functions
 ACMD(do_gen_craft);
+extern double get_enchant_scale_for_char(char_data *ch, int max_scale);
 extern bool has_cooking_fire(char_data *ch);
 extern obj_data *has_sharp_tool(char_data *ch);
 void scale_item_to_level(obj_data *obj, int level);
@@ -606,6 +607,164 @@ bool validate_item_rename(char_data *ch, obj_data *obj, char *name) {
  //////////////////////////////////////////////////////////////////////////////
 //// COMMANDS ////////////////////////////////////////////////////////////////
 
+// subcmd is AUGMENT_x
+ACMD(do_gen_augment) {
+	extern augment_data *find_augment_by_name(char_data *ch, char *name, int type);
+	extern bool validate_augment_target(char_data *ch, obj_data *obj, augment_data *aug);
+	extern char *shared_by(obj_data *obj, char_data *ch);
+	extern const struct augment_type_data augment_info[];
+	extern const double apply_values[];
+	
+	char buf[MAX_STRING_LENGTH], target_arg[MAX_INPUT_LENGTH], *augment_arg;
+	double points_available, remaining, share;
+	struct obj_apply *apply, *last_apply;
+	int iter, scale, total_weight, value;
+	augment_data *aug, *next_aug;
+	struct augment_apply *app;
+	obj_data *obj;
+	bool found, line;
+	
+	augment_arg = one_argument(argument, target_arg);
+	
+	if (IS_NPC(ch)) {
+		// TODO should we allow this for scripting?
+		msg_to_char(ch, "NPCs can't augment items.\r\n");
+	}
+	else if (!*target_arg || !*augment_arg) {
+		msg_to_char(ch, "Usage: %s <item> <type>\r\nYou know how to %s:\r\n", augment_info[subcmd].verb, augment_info[subcmd].verb);
+		
+		*buf = '\0';
+		line = found = FALSE;
+		HASH_ITER(sorted_hh, sorted_augments, aug, next_aug) {
+			if (GET_AUG_TYPE(aug) != subcmd || AUGMENT_FLAGGED(aug, AUG_IN_DEVELOPMENT)) {
+				continue;
+			}
+			if (GET_AUG_ABILITY(aug) != NO_ABIL && !HAS_ABILITY(ch, GET_AUG_ABILITY(aug))) {
+				continue;
+			}
+			if (GET_AUG_REQUIRES_OBJ(aug) != NOTHING && !get_obj_in_list_vnum(GET_AUG_REQUIRES_OBJ(aug), ch->carrying)) {
+				continue;
+			}
+			
+			// send last line?
+			if ((strlen(buf) + strlen(GET_AUG_NAME(aug)) + 2) >= 80) {
+				msg_to_char(ch, "%s\r\n", buf);
+				line = FALSE;
+				*buf = '\0';
+			}
+			
+			// add this entry to line
+			sprintf(buf + strlen(buf), "%s%s", (line ? ", " : " "), GET_AUG_NAME(aug));
+			line = found = TRUE;
+		}
+		
+		if (line) {
+			msg_to_char(ch, "%s\r\n", buf);
+		}
+		if (!found) {
+			msg_to_char(ch, "  nothing\r\n");
+		}
+		// end no-args
+	}
+	else if (!(obj = get_obj_in_list_vis(ch, target_arg, ch->carrying)) && !(obj = get_obj_by_char_share(ch, target_arg))) {
+		msg_to_char(ch, "You don't seem to have any %s.\r\n", target_arg);
+	}
+	else if (!(aug = find_augment_by_name(ch, augment_arg, subcmd))) {
+		msg_to_char(ch, "You don't know that %s.\r\n", augment_info[subcmd].noun);
+	}
+	else if (GET_AUG_ABILITY(aug) != NO_ABIL && ABILITY_TRIGGERS(ch, NULL, obj, GET_AUG_ABILITY(aug))) {
+		return;
+	}
+	else if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) <= 0) {
+		// always forbidden
+		msg_to_char(ch, "You cannot %s that item.\r\n", augment_info[subcmd].verb);
+	}
+	else if (augment_info[subcmd].use_obj_flag && OBJ_FLAGGED(obj, augment_info[subcmd].use_obj_flag)) {
+		msg_to_char(ch, "You cannot %s an item that already has %s %s.\r\n", augment_info[subcmd].verb, AN(augment_info[subcmd].noun), augment_info[subcmd].noun);
+	}
+	else if (!validate_augment_target(ch, obj, aug)) {
+		// sends own message
+	}
+	else if (!has_resources(ch, GET_AUG_RESOURCES(aug), FALSE, TRUE)) {
+		// sends its own messages
+	}
+	else {
+		extract_resources(ch, GET_AUG_RESOURCES(aug), FALSE);
+		
+		// determine scale cap
+		scale = GET_OBJ_CURRENT_SCALE_LEVEL(obj);
+		if (GET_AUG_ABILITY(aug) != NO_ABIL && ability_data[GET_AUG_ABILITY(aug)].parent_skill != NO_SKILL && GET_SKILL(ch, ability_data[GET_AUG_ABILITY(aug)].parent_skill) < CLASS_SKILL_CAP) {
+			scale = MIN(scale, GET_SKILL(ch, ability_data[GET_AUG_ABILITY(aug)].parent_skill));
+		}
+		
+		// determine points
+		points_available = get_enchant_scale_for_char(ch, scale);
+		if (augment_info[subcmd].greater_abil && HAS_ABILITY(ch, augment_info[subcmd].greater_abil)) {
+			points_available *= config_get_double("greater_enchantments_bonus");
+		}
+		
+		// figure out how many total weight points are used
+		total_weight = 0;
+		for (app = GET_AUG_APPLIES(aug); app; app = app->next) {
+			total_weight += app->weight;
+		}
+		
+		// find end of current applies on obj
+		if ((last_apply = GET_OBJ_APPLIES(obj))) {
+			while (last_apply->next) {
+				last_apply = last_apply->next;
+			}
+		}
+		
+		// start adding applies
+		remaining = points_available;
+		for (app = GET_AUG_APPLIES(aug); app && remaining > 0; app = app->next) {
+			share = (((double)app->weight) / total_weight) * points_available;	// % of total
+			share = MIN(share, remaining);	// check limit
+			value = round(share * (1.0 / apply_values[app->location]));
+			if (value > 0 || (app == GET_AUG_APPLIES(aug))) {	// always give at least 1 point on the first one
+				value = MAX(1, value);
+				remaining -= (value * apply_values[app->location]);	// subtract actual amount used
+				
+				// create the actual apply
+				CREATE(apply, struct obj_apply, 1);
+				apply->apply_type = augment_info[subcmd].apply_type;
+				apply->location = app->location;
+				apply->modifier = value;
+				
+				if (last_apply) {
+					last_apply->next = apply;
+				}
+				else {
+					GET_OBJ_APPLIES(obj) = apply;
+				}
+				last_apply = apply;
+			}
+		}
+		
+		// enchanted bit*
+		if (augment_info[subcmd].use_obj_flag) {
+			SET_BIT(GET_OBJ_EXTRA(obj), augment_info[subcmd].use_obj_flag);
+		}
+		
+		sprintf(buf, "You %s $p%s with %s.", augment_info[subcmd].verb, shared_by(obj, ch), GET_AUG_NAME(aug));
+		act(buf, FALSE, ch, obj, obj->worn_by, TO_CHAR);
+		
+		sprintf(buf, "$n %ss $p%s with %s.", augment_info[subcmd].verb, shared_by(obj, ch), GET_AUG_NAME(aug));
+		act(buf, FALSE, ch, obj, obj->worn_by, TO_ROOM);
+		
+		if (GET_AUG_ABILITY(aug) != NO_ABIL) {
+			gain_ability_exp(ch, GET_AUG_ABILITY(aug), 50);
+		}
+		if (augment_info[subcmd].greater_abil != NO_ABIL) {
+			gain_ability_exp(ch, augment_info[subcmd].greater_abil, 50);
+		}
+		
+		command_lag(ch, WAIT_ABILITY);
+	}
+}
+
+
 // subcmd must be CRAFT_TYPE_x
 ACMD(do_gen_craft) {	
 	int timer, master_ability, num = 1;
@@ -787,7 +946,6 @@ ACMD(do_gen_craft) {
 
 
 ACMD(do_hone) {
-	extern double get_enchant_scale_for_char(char_data *ch, int max_scale);
 	extern const double apply_values[];
 
 	Resource hone_res[2] = { { o_NOCTURNIUM_INGOT, 2 }, END_RESOURCE_LIST };

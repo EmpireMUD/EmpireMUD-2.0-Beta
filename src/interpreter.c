@@ -146,7 +146,6 @@ ACMD(do_elog);
 ACMD(do_emotd);
 ACMD(do_empire_inventory);
 ACMD(do_empires);
-ACMD(do_enchant);
 ACMD(do_enervate);
 ACMD(do_enroll);
 ACMD(do_entangle);
@@ -180,6 +179,7 @@ ACMD(do_fullsave);
 
 ACMD(do_gather);
 ACMD(do_gecho);
+ACMD(do_gen_augment);
 ACMD(do_gen_craft);
 ACMD(do_gen_door);
 ACMD(do_gen_ps);
@@ -203,7 +203,6 @@ ACMD(do_hide);
 ACMD(do_history);
 ACMD(do_hit);
 ACMD(do_home);
-ACMD(do_hone);
 ACMD(do_hostile);
 ACMD(do_howl);
 
@@ -636,7 +635,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( ":", POS_RESTING, do_echo, NO_MIN, CTYPE_COMM, SCMD_EMOTE ),
 	SCMD_CMD( "empirehistory", POS_DEAD, do_history, NO_MIN, CTYPE_COMM, CHANNEL_HISTORY_EMPIRE ),
 	SCMD_CMD( "ehistory", POS_DEAD, do_history, NO_MIN, CTYPE_COMM, CHANNEL_HISTORY_EMPIRE ),
-	STANDARD_CMD( "enchant", POS_STANDING, do_enchant, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_SKILL, CMD_NO_ANIMALS, NO_ABIL ),
+	STANDARD_CMD( "enchant", POS_STANDING, do_gen_augment, NO_MIN, NO_GRANTS, AUGMENT_ENCHANTMENT, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	ABILITY_CMD( "enervate", POS_FIGHTING, do_enervate, NO_MIN, CTYPE_COMBAT, ABIL_ENERVATE ),
 	SIMPLE_CMD( "enter", POS_STANDING, do_enter, NO_MIN, CTYPE_MOVE ),
 	ABILITY_CMD( "entangle", POS_FIGHTING, do_entangle, NO_MIN, CTYPE_COMBAT, ABIL_ENTANGLE ),
@@ -703,7 +702,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "hit", POS_FIGHTING, do_hit, NO_MIN, CTYPE_COMBAT, SCMD_HIT ),
 	SIMPLE_CMD( "hold", POS_RESTING, do_grab, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "home", POS_SLEEPING, do_home, LVL_APPROVED, CTYPE_UTIL ),
-	ABILITY_CMD( "hone", POS_STANDING, do_hone, NO_MIN, CTYPE_SKILL, ABIL_HONE ),
+	STANDARD_CMD( "hone", POS_STANDING, do_gen_augment, NO_MIN, NO_GRANTS, AUGMENT_HONE, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	GRANT_CMD( "hostile", POS_DEAD, do_hostile, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_HOSTILE ),
 	ABILITY_CMD( "howl", POS_FIGHTING, do_howl, NO_MIN, CTYPE_SKILL, ABIL_HOWL ),
 
