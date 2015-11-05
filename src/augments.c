@@ -311,6 +311,7 @@ void clear_augment(augment_data *aug) {
 	
 	GET_AUG_VNUM(aug) = NOTHING;
 	GET_AUG_ABILITY(aug) = NO_ABIL;
+	GET_AUG_REQUIRES_OBJ(aug) = NOTHING;
 }
 
 
