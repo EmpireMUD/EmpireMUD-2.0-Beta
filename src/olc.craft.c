@@ -371,9 +371,9 @@ void olc_show_craft(char_data *ch) {
 	void get_resource_display(struct resource_data *list, char *save_buffer);
 
 	craft_data *craft = GET_OLC_CRAFT(ch->desc);
-	char lbuf[MAX_STRING_LENGTH];
-	int count, seconds;
 	obj_data *proto = obj_proto(GET_CRAFT_OBJECT(craft));
+	char lbuf[MAX_STRING_LENGTH];
+	int seconds;
 	
 	if (!craft) {
 		return;
@@ -434,7 +434,6 @@ void olc_show_craft(char_data *ch) {
 	sprintf(buf + strlen(buf), "<&yrequiresobject&0> %d - %s\r\n", GET_CRAFT_REQUIRES_OBJ(craft), GET_CRAFT_REQUIRES_OBJ(craft) == NOTHING ? "none" : get_obj_name_by_proto(GET_CRAFT_REQUIRES_OBJ(craft)));
 
 	// resources
-	count = 0;
 	sprintf(buf + strlen(buf), "Resources required: <&yresource&0>\r\n");
 	get_resource_display(GET_CRAFT_RESOURCES(craft), lbuf);
 	strcat(buf, lbuf);
