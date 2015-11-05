@@ -148,76 +148,6 @@ int sort_augments(augment_data *a, augment_data *b) {
 }
 
 
-/**
-* For vstat.
-*
-* @param char_data *ch The player requesting stats.
-* @param augment_data *aug The augment to display.
-*/
-void stat_augment(char_data *ch, augment_data *aug) {
-	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
-	struct augment_apply *app;
-	size_t size;
-	int num;
-	
-	if (!aug) {
-		return;
-	}
-	
-	// first line
-	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Name: \tc%s\t0\r\n", GET_AUG_VNUM(aug), GET_AUG_NAME(aug));
-	
-	snprintf(part, sizeof(part), "%s", (GET_AUG_ABILITY(aug) == NO_ABIL ? "none" : ability_data[GET_AUG_ABILITY(aug)].name));
-	if (GET_AUG_ABILITY(aug) != NO_ABIL && ability_data[GET_AUG_ABILITY(aug)].parent_skill != NO_SKILL) {
-		snprintf(part + strlen(part), sizeof(part) - strlen(part), " (%s %d)", skill_data[ability_data[GET_AUG_ABILITY(aug)].parent_skill].name, ability_data[GET_AUG_ABILITY(aug)].parent_skill_required);
-	}
-	size += snprintf(buf + size, sizeof(buf) - size, "Type: [\ty%s\t0], Requires Ability: [\ty%s\t0]\r\n", augment_types[GET_AUG_TYPE(aug)], part);
-	
-	sprintbit(GET_AUG_FLAGS(aug), augment_flags, part, TRUE);
-	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
-	
-	sprintbit(GET_AUG_WEAR_FLAGS(aug), wear_bits, part, TRUE);
-	size += snprintf(buf + size, sizeof(buf) - size, "Targets wear location: \ty%s\t0\r\n", part);
-	
-	// applies
-	size += snprintf(buf + size, sizeof(buf) - size, "Applies: ");
-	for (app = GET_AUG_APPLIES(aug), num = 0; app; app = app->next, ++num) {
-		size += snprintf(buf + size, sizeof(buf) - size, "%s%d to %s", num ? ", " : "", app->weight, apply_types[app->location]);
-	}
-	if (!GET_AUG_APPLIES(aug)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "none");
-	}
-	size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
-	
-	// resources
-	get_resource_display(GET_AUG_RESOURCES(aug), part);
-	size += snprintf(buf + size, sizeof(buf) - size, "Resource cost:\r\n%s", part);
-	
-	page_string(ch->desc, buf, TRUE);
-}
-
-
-/**
-* Searches the augment db for a match, and prints it to the character.
-*
-* @param char *searchname The search string.
-* @param char_data *ch The player who is searching.
-* @return int The number of matches shown.
-*/
-int vnum_augment(char *searchname, char_data *ch) {
-	augment_data *iter, *next_iter;
-	int found = 0;
-	
-	HASH_ITER(hh, augment_table, iter, next_iter) {
-		if (multi_isname(searchname, GET_AUG_NAME(iter))) {
-			msg_to_char(ch, "%3d. [%5d] %s (%s)\r\n", ++found, GET_AUG_VNUM(iter), GET_AUG_NAME(iter), augment_types[GET_AUG_TYPE(iter)]);
-		}
-	}
-	
-	return found;
-}
-
-
  //////////////////////////////////////////////////////////////////////////////
 //// DATABASE ////////////////////////////////////////////////////////////////
 
@@ -640,6 +570,59 @@ augment_data *setup_olc_augment(augment_data *input) {
 //// DISPLAYS ////////////////////////////////////////////////////////////////
 
 /**
+* For vstat.
+*
+* @param char_data *ch The player requesting stats.
+* @param augment_data *aug The augment to display.
+*/
+void do_stat_augment(char_data *ch, augment_data *aug) {
+	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
+	struct augment_apply *app;
+	size_t size;
+	int num;
+	
+	if (!aug) {
+		return;
+	}
+	
+	// first line
+	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Name: \tc%s\t0\r\n", GET_AUG_VNUM(aug), GET_AUG_NAME(aug));
+	
+	snprintf(part, sizeof(part), "%s", (GET_AUG_ABILITY(aug) == NO_ABIL ? "none" : ability_data[GET_AUG_ABILITY(aug)].name));
+	if (GET_AUG_ABILITY(aug) != NO_ABIL && ability_data[GET_AUG_ABILITY(aug)].parent_skill != NO_SKILL) {
+		snprintf(part + strlen(part), sizeof(part) - strlen(part), " (%s %d)", skill_data[ability_data[GET_AUG_ABILITY(aug)].parent_skill].name, ability_data[GET_AUG_ABILITY(aug)].parent_skill_required);
+	}
+	size += snprintf(buf + size, sizeof(buf) - size, "Type: [\ty%s\t0], Requires Ability: [\ty%s\t0]\r\n", augment_types[GET_AUG_TYPE(aug)], part);
+	
+	if (GET_AUG_REQUIRES_OBJ(aug) != NOTHING) {
+		msg_to_char(ch, "Requires item: [%d] &g%s&0\r\n", GET_AUG_REQUIRES_OBJ(aug), skip_filler(get_obj_name_by_proto(GET_AUG_REQUIRES_OBJ(aug))));
+	}
+	
+	sprintbit(GET_AUG_WEAR_FLAGS(aug), wear_bits, part, TRUE);
+	size += snprintf(buf + size, sizeof(buf) - size, "Targets wear location: \ty%s\t0\r\n", part);
+	
+	sprintbit(GET_AUG_FLAGS(aug), augment_flags, part, TRUE);
+	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
+	
+	// applies
+	size += snprintf(buf + size, sizeof(buf) - size, "Applies: ");
+	for (app = GET_AUG_APPLIES(aug), num = 0; app; app = app->next, ++num) {
+		size += snprintf(buf + size, sizeof(buf) - size, "%s%d to %s", num ? ", " : "", app->weight, apply_types[app->location]);
+	}
+	if (!GET_AUG_APPLIES(aug)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "none");
+	}
+	size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
+	
+	// resources
+	get_resource_display(GET_AUG_RESOURCES(aug), part);
+	size += snprintf(buf + size, sizeof(buf) - size, "Resource cost:\r\n%s", part);
+	
+	page_string(ch->desc, buf, TRUE);
+}
+
+
+/**
 * This is the main recipe display for augment OLC. It displays the user's
 * currently-edited augment.
 *
@@ -697,6 +680,27 @@ void olc_show_augment(char_data *ch) {
 	strcat(buf, lbuf);
 	
 	page_string(ch->desc, buf, TRUE);
+}
+
+
+/**
+* Searches the augment db for a match, and prints it to the character.
+*
+* @param char *searchname The search string.
+* @param char_data *ch The player who is searching.
+* @return int The number of matches shown.
+*/
+int vnum_augment(char *searchname, char_data *ch) {
+	augment_data *iter, *next_iter;
+	int found = 0;
+	
+	HASH_ITER(hh, augment_table, iter, next_iter) {
+		if (multi_isname(searchname, GET_AUG_NAME(iter))) {
+			msg_to_char(ch, "%3d. [%5d] %s (%s)\r\n", ++found, GET_AUG_VNUM(iter), GET_AUG_NAME(iter), augment_types[GET_AUG_TYPE(iter)]);
+		}
+	}
+	
+	return found;
 }
 
 

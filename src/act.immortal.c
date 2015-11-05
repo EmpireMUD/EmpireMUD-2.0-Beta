@@ -6420,13 +6420,13 @@ ACMD(do_vstat) {
 		do_stat_adventure(ch, adv);
 	}
 	else if (is_abbrev(buf, "augment")) {
-		void stat_augment(char_data *ch, augment_data *aug);
+		void do_stat_augment(char_data *ch, augment_data *aug);
 		augment_data *aug = augment_proto(number);
 		if (!aug) {
 			msg_to_char(ch, "There is no augment with that number.\r\n");
 			return;
 		}
-		stat_augment(ch, aug);
+		do_stat_augment(ch, aug);
 	}
 	else if (is_abbrev(buf, "building")) {
 		bld_data *bld = building_proto(number);
