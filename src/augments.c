@@ -595,7 +595,7 @@ void do_stat_augment(char_data *ch, augment_data *aug) {
 	size += snprintf(buf + size, sizeof(buf) - size, "Type: [\ty%s\t0], Requires Ability: [\ty%s\t0]\r\n", augment_types[GET_AUG_TYPE(aug)], part);
 	
 	if (GET_AUG_REQUIRES_OBJ(aug) != NOTHING) {
-		msg_to_char(ch, "Requires item: [%d] &g%s&0\r\n", GET_AUG_REQUIRES_OBJ(aug), skip_filler(get_obj_name_by_proto(GET_AUG_REQUIRES_OBJ(aug))));
+		size += snprintf(buf + size, sizeof(buf) - size, "Requires item: [%d] &g%s&0\r\n", GET_AUG_REQUIRES_OBJ(aug), skip_filler(get_obj_name_by_proto(GET_AUG_REQUIRES_OBJ(aug))));
 	}
 	
 	sprintbit(GET_AUG_WEAR_FLAGS(aug), wear_bits, part, TRUE);
