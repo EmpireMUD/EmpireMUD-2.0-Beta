@@ -999,8 +999,6 @@ ACMD(do_gen_craft) {
 
 
 ACMD(do_recipes) {
-	extern const char *augment_types[];
-
 	int last_type = NOTHING;
 	craft_data *craft, *next_craft;
 	augment_data *aug, *next_aug;
