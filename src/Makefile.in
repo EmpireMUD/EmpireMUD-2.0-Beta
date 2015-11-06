@@ -27,7 +27,7 @@ LIBS = @LIBS@ @CRYPTLIB@ @NETLIB@ -lm
 OBJFILES = act.action.o act.battle.o act.comm.o act.empire.o act.fight.o \
 	act.god.o act.highsorcery.o act.immortal.o act.informative.o act.item.o \
 	act.movement.o act.naturalmagic.o act.other.o act.social.o act.stealth.o \
-	act.survival.o act.trade.o act.vampire.o archetype.o augments.o ban.o \
+	act.survival.o act.trade.o act.vampire.o archetypes.o augments.o ban.o \
 	boards.o bookedit.o books.o building.o class.o comm.o config.o \
 	constants.o db.o db.lib.o db.player.o db.world.o dg_comm.o \
 	dg_db_scripts.o dg_event.o dg_handler.o dg_misc.o dg_mobcmd.o dg_objcmd.o \
