@@ -39,6 +39,7 @@ const char *default_archetype_rank = "Adventurer";
 
 // external consts
 extern const char *archetype_flags[];
+extern int attribute_display_order[NUM_ATTRIBUTES];
 extern struct attribute_data_type attributes[NUM_ATTRIBUTES];
 extern const struct wear_data_type wear_data[NUM_WEARS];
 
@@ -717,7 +718,7 @@ void do_stat_archetype(char_data *ch, archetype_data *arch) {
 	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
 	struct archetype_gear *gear;
 	struct archetype_skill *sk;
-	int iter, num, total;
+	int iter, num, pos, total;
 	size_t size;
 	
 	if (!arch) {
@@ -728,7 +729,7 @@ void do_stat_archetype(char_data *ch, archetype_data *arch) {
 	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Name: \tc%s\t0\r\n", GET_ARCH_VNUM(arch), GET_ARCH_NAME(arch));
 	
 	size += snprintf(buf + size, sizeof(buf) - size, "Description: %s\r\n", GET_ARCH_DESC(arch));
-	size += snprintf(buf + size, sizeof(buf) - size, "Ranks: [\to%s\t0/\tp%s\t0]\r\n", GET_ARCH_MALE_RANK(arch), GET_ARCH_FEMALE_RANK(arch));
+	size += snprintf(buf + size, sizeof(buf) - size, "Ranks: [\ta%s\t0/\tp%s\t0]\r\n", GET_ARCH_MALE_RANK(arch), GET_ARCH_FEMALE_RANK(arch));
 	
 	sprintbit(GET_ARCH_FLAGS(arch), archetype_flags, part, TRUE);
 	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
@@ -740,7 +741,8 @@ void do_stat_archetype(char_data *ch, archetype_data *arch) {
 	}
 	size += snprintf(buf + size, sizeof(buf) - size, "Attributes: [\tc%d total attributes\t0]\r\n", total);
 	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
-		snprintf(part, sizeof(part), "%s  [\tg%2d\t0]", attributes[iter].name, GET_ARCH_ATTRIBUTE(arch, iter));
+		pos = attribute_display_order[iter];
+		snprintf(part, sizeof(part), "%s  [\tg%2d\t0]", attributes[pos].name, GET_ARCH_ATTRIBUTE(arch, pos));
 		size += snprintf(buf + size, sizeof(buf) - size, "  %-27.27s%s", part, !((iter + 1) % 3) ? "\r\n" : "");
 	}
 	if (iter % 3) {
@@ -778,7 +780,7 @@ void olc_show_archetype(char_data *ch) {
 	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
 	struct archetype_gear *gear;
 	struct archetype_skill *sk;
-	int num, iter, total;
+	int num, iter, pos, total;
 	
 	if (!arch) {
 		return;
@@ -803,7 +805,8 @@ void olc_show_archetype(char_data *ch) {
 	}
 	sprintf(buf + strlen(buf), "Attributes: <&yattribute&0> (%d total attributes)\r\n", total);
 	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
-		sprintf(lbuf, "%s  [%2d]", attributes[iter].name, GET_ARCH_ATTRIBUTE(arch, iter));
+		pos = attribute_display_order[iter];
+		sprintf(lbuf, "%s  [%2d]", attributes[pos].name, GET_ARCH_ATTRIBUTE(arch, pos));
 		sprintf(buf + strlen(buf), "  %-23.23s%s", lbuf, !((iter + 1) % 3) ? "\r\n" : "");
 	}
 	if (iter % 3) {
@@ -843,6 +846,7 @@ int vnum_archetype(char *searchname, char_data *ch) {
 	
 	HASH_ITER(hh, archetype_table, iter, next_iter) {
 		if (multi_isname(searchname, GET_ARCH_NAME(iter)) || multi_isname(searchname, GET_ARCH_MALE_RANK(iter)) || multi_isname(searchname, GET_ARCH_FEMALE_RANK(iter)) || multi_isname(searchname, GET_ARCH_DESC(iter))) {
+			// TODO show skills/attrs?
 			msg_to_char(ch, "%3d. [%5d] %s\r\n", ++found, GET_ARCH_VNUM(iter), GET_ARCH_NAME(iter));
 		}
 	}
@@ -853,6 +857,21 @@ int vnum_archetype(char *searchname, char_data *ch) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// OLC MODULES /////////////////////////////////////////////////////////////
+
+/*
+You begin editing archetype 1:
+[1] new archetype
+<name> unnamed archetype
+<description> no description
+<flags> IN-DEVELOPMENT 
+<malerank> Adventurer
+<femalerank> Adventurer
+Attributes: <attribute> (6 total attributes)
+  Strength  [ 1]           Dexterity  [ 1]          Charisma  [ 1]         
+  Greatness  [ 1]          Intelligence  [ 1]       Wits  [ 1]             
+Skills: <skills> (0 total skill points)
+Gear: <gear>
+*/
 
 OLC_MODULE(archedit_apply) {
 	archetype_data *arch = GET_OLC_ARCHETYPE(ch->desc);

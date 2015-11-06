@@ -1113,7 +1113,7 @@ const int apply_attribute[] = {
 };
 
 
-// STRENGTH, etc
+// STRENGTH, etc (part 1)
 struct attribute_data_type attributes[NUM_ATTRIBUTES] = {
 	{ "Strength", "Strength improves your melee damage and lets you chop trees faster" },
 	{ "Dexterity", "Dexterity helps you hit opponents and dodge hits" },
@@ -1121,6 +1121,12 @@ struct attribute_data_type attributes[NUM_ATTRIBUTES] = {
 	{ "Greatness", "Greatness determines how much territory your empire can claim" },
 	{ "Intelligence", "Intelligence improves your magical damage and healing" },
 	{ "Wits", "Wits improves your speed and effectiveness in combat" }
+};
+
+// STRENGTH, etc (part 2)
+int attribute_display_order[NUM_ATTRIBUTES] = {
+	STRENGTH, CHARISMA, INTELLIGENCE,
+	DEXTERITY, GREATNESS, WITS
 };
 
 
