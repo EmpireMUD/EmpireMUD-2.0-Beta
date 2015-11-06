@@ -621,6 +621,7 @@ extern bool skill_check(char_data *ch, int ability, int difficulty);
 struct skill_data_type {
 	int number;	// SKILL_x
 	char *name;
+	char *abbrev;
 	char *description;
 	char *creation_description;	// shown to players who ask for help during creation
 	int flags;

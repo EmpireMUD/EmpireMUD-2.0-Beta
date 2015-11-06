@@ -2805,7 +2805,7 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 	
 	sprintf(buf, "%s", (GET_CRAFT_ABILITY(craft) == NO_ABIL ? "none" : ability_data[GET_CRAFT_ABILITY(craft)].name));
 	if (GET_CRAFT_ABILITY(craft) != NO_ABIL && ability_data[GET_CRAFT_ABILITY(craft)].parent_skill != NO_SKILL) {
-		sprintf(buf + strlen(buf), " (%s %d)", skill_data[ability_data[GET_CRAFT_ABILITY(craft)].parent_skill].name, ability_data[GET_CRAFT_ABILITY(craft)].parent_skill_required);
+		sprintf(buf + strlen(buf), " (%s %d)", skill_data[ability_data[GET_CRAFT_ABILITY(craft)].parent_skill].abbrev, ability_data[GET_CRAFT_ABILITY(craft)].parent_skill_required);
 	}
 	seconds = GET_CRAFT_TIME(craft) * ACTION_CYCLE_TIME;
 	msg_to_char(ch, "Ability: &y%s&0, Level: &g%d&0, Time: [&g%d action tick%s&0 | &g%d:%02d&0]\r\n", buf, GET_CRAFT_MIN_LEVEL(craft), GET_CRAFT_TIME(craft), PLURAL(GET_CRAFT_TIME(craft)), seconds / SECS_PER_REAL_MIN, seconds % SECS_PER_REAL_MIN);
@@ -2882,7 +2882,7 @@ void do_stat_global(char_data *ch, struct global_data *glb) {
 
 	sprintf(buf, "%s", (GET_GLOBAL_ABILITY(glb) == NO_ABIL ? "none" : ability_data[GET_GLOBAL_ABILITY(glb)].name));
 	if (GET_GLOBAL_ABILITY(glb) != NO_ABIL && ability_data[GET_GLOBAL_ABILITY(glb)].parent_skill != NO_SKILL) {
-		sprintf(buf + strlen(buf), " (%s %d)", skill_data[ability_data[GET_GLOBAL_ABILITY(glb)].parent_skill].name, ability_data[GET_GLOBAL_ABILITY(glb)].parent_skill_required);
+		sprintf(buf + strlen(buf), " (%s %d)", skill_data[ability_data[GET_GLOBAL_ABILITY(glb)].parent_skill].abbrev, ability_data[GET_GLOBAL_ABILITY(glb)].parent_skill_required);
 	}
 	msg_to_char(ch, "Requires ability: [&y%s&0], Percent: [&g%.2f&0]\r\n", buf, GET_GLOBAL_PERCENT(glb));
 	

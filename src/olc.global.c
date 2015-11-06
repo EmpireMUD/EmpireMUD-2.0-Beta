@@ -140,7 +140,7 @@ char *list_one_global(struct global_data *glb, bool detail) {
 	else {
 		sprintf(abil, " (%s", ability_data[GET_GLOBAL_ABILITY(glb)].name);
 		if (ability_data[GET_GLOBAL_ABILITY(glb)].parent_skill != NO_SKILL) {
-			sprintf(abil + strlen(abil), " - %s %d", skill_data[ability_data[GET_GLOBAL_ABILITY(glb)].parent_skill].name, ability_data[GET_GLOBAL_ABILITY(glb)].parent_skill_required);
+			sprintf(abil + strlen(abil), " - %s %d", skill_data[ability_data[GET_GLOBAL_ABILITY(glb)].parent_skill].abbrev, ability_data[GET_GLOBAL_ABILITY(glb)].parent_skill_required);
 		}
 		strcat(abil, ")");
 	}

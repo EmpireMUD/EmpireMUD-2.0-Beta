@@ -203,22 +203,29 @@ bool audit_augment(augment_data *aug, char_data *ch) {
 */
 char *list_one_augment(augment_data *aug, bool detail) {
 	static char output[MAX_STRING_LENGTH];
-	char abil[MAX_STRING_LENGTH];
-	
-	// ability required
-	if (GET_AUG_ABILITY(aug) == NO_ABIL) {
-		*abil = '\0';
-	}
-	else {
-		sprintf(abil, " (%s", ability_data[GET_AUG_ABILITY(aug)].name);
-		if (ability_data[GET_AUG_ABILITY(aug)].parent_skill != NO_SKILL) {
-			sprintf(abil + strlen(abil), " - %s %d", skill_data[ability_data[GET_AUG_ABILITY(aug)].parent_skill].name, ability_data[GET_AUG_ABILITY(aug)].parent_skill_required);
-		}
-		strcat(abil, ")");
-	}
+	char abil[MAX_STRING_LENGTH], applies[MAX_STRING_LENGTH];
+	struct augment_apply *app;
 	
 	if (detail) {
-		snprintf(output, sizeof(output), "[%5d] %s%s", GET_AUG_VNUM(aug), GET_AUG_NAME(aug), abil);
+		// ability required
+		if (GET_AUG_ABILITY(aug) == NO_ABIL) {
+			*abil = '\0';
+		}
+		else {
+			sprintf(abil, " (%s", ability_data[GET_AUG_ABILITY(aug)].name);
+			if (ability_data[GET_AUG_ABILITY(aug)].parent_skill != NO_SKILL) {
+				sprintf(abil + strlen(abil), " - %s %d", skill_data[ability_data[GET_AUG_ABILITY(aug)].parent_skill].abbrev, ability_data[GET_AUG_ABILITY(aug)].parent_skill_required);
+			}
+			strcat(abil, ")");
+		}
+		
+		// applies
+		*applies = '\0';
+		for (app = GET_AUG_APPLIES(aug); app; app = app->next) {
+			sprintf(applies + strlen(applies), "%s%d to %s", (app == GET_AUG_APPLIES(aug)) ? " " : ", ", app->weight, apply_types[app->location]);
+		}
+		
+		snprintf(output, sizeof(output), "[%5d] %s%s%s", GET_AUG_VNUM(aug), GET_AUG_NAME(aug), abil, applies);
 	}
 	else {
 		snprintf(output, sizeof(output), "[%5d] %s", GET_AUG_VNUM(aug), GET_AUG_NAME(aug));
@@ -743,7 +750,7 @@ void do_stat_augment(char_data *ch, augment_data *aug) {
 	
 	snprintf(part, sizeof(part), "%s", (GET_AUG_ABILITY(aug) == NO_ABIL ? "none" : ability_data[GET_AUG_ABILITY(aug)].name));
 	if (GET_AUG_ABILITY(aug) != NO_ABIL && ability_data[GET_AUG_ABILITY(aug)].parent_skill != NO_SKILL) {
-		snprintf(part + strlen(part), sizeof(part) - strlen(part), " (%s %d)", skill_data[ability_data[GET_AUG_ABILITY(aug)].parent_skill].name, ability_data[GET_AUG_ABILITY(aug)].parent_skill_required);
+		snprintf(part + strlen(part), sizeof(part) - strlen(part), " (%s %d)", skill_data[ability_data[GET_AUG_ABILITY(aug)].parent_skill].abbrev, ability_data[GET_AUG_ABILITY(aug)].parent_skill_required);
 	}
 	size += snprintf(buf + size, sizeof(buf) - size, "Type: [\ty%s\t0], Requires Ability: [\ty%s\t0]\r\n", augment_types[GET_AUG_TYPE(aug)], part);
 	

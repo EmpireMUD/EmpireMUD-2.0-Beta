@@ -1603,6 +1603,17 @@ Notes on Mob Interactions globals:
 
 See also: BUILDING GUIDE, OLC GLOBALS
 #d
+IN-DEVELOPMENT "IN DEVELOPMENT" IN-DEV
+
+The IN-DEVELOPMENT flag prevents an augment, craft, or global from being
+available to players. Generally immortals can still use them (although they
+won't appear in craft lists).
+
+You can quickly remove the IN-DEV flag using the .removeindev command. The OLC
+auditors will warn about items that still have IN-DEV flags.
+
+See also: OLC AUDIT, REMOVEINDEV
+#d
 "ITEM SCALING" "OBJ SCALING" "OBJECT SCALING" SCALABLE "SCALABLE FLAG" "SCALING ITEM"
 
 Items can be set to scale to different levels. You can set various traits on
