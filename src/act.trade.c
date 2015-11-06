@@ -978,11 +978,14 @@ ACMD(do_gen_craft) {
 
 
 ACMD(do_recipes) {
+	extern const char *augment_types[];
+
 	int last_type = NOTHING;
 	craft_data *craft, *next_craft;
+	augment_data *aug, *next_aug;
 	struct resource_data *res;
 	obj_data *obj;
-	bool found_any = FALSE, found_type = FALSE, found_one = FALSE;
+	bool found_any, found_type, uses_item;
 	
 	one_argument(argument, arg);
 	
@@ -994,7 +997,9 @@ ACMD(do_recipes) {
 	}
 	else {
 		act("With $p, you can make:", FALSE, ch, obj, NULL, TO_CHAR);
-
+		found_any = FALSE;
+		
+		found_type = FALSE;
 		HASH_ITER(sorted_hh, sorted_crafts, craft, next_craft) {
 			// is it a live recipe?
 			if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT) && !IS_IMMORTAL(ch)) {
@@ -1002,22 +1007,27 @@ ACMD(do_recipes) {
 			}
 		
 			// has right abil?
-			if (*GET_CRAFT_NAME(craft) == '\t' || (GET_CRAFT_ABILITY(craft) != NO_ABIL && !HAS_ABILITY(ch, GET_CRAFT_ABILITY(craft)))) {
+			if (GET_CRAFT_ABILITY(craft) != NO_ABIL && !HAS_ABILITY(ch, GET_CRAFT_ABILITY(craft))) {
+				continue;
+			}
+			
+			if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING && !get_obj_in_list_vnum(GET_CRAFT_REQUIRES_OBJ(craft), ch->carrying)) {
 				continue;
 			}
 			
 			// is the item used to make it?
-			for (res = GET_CRAFT_RESOURCES(craft), found_one = FALSE; !found_one && res; res = res->next) {
-				if (res->vnum != GET_OBJ_VNUM(obj)) {
-					continue;
+			uses_item = FALSE;
+			if (GET_CRAFT_REQUIRES_OBJ(craft) == GET_OBJ_VNUM(obj)) {
+				uses_item = TRUE;
+			}
+			for (res = GET_CRAFT_RESOURCES(craft); !uses_item && res; res = res->next) {
+				if (res->vnum == GET_OBJ_VNUM(obj)) {
+					uses_item = TRUE;
 				}
+			}
 				
-				if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING && !get_obj_in_list_vnum(GET_CRAFT_REQUIRES_OBJ(craft), ch->carrying)) {
-					continue;
-				}
-				
-				// MATCH!
-			
+			// MATCH!
+			if (uses_item) {
 				// need header?
 				if (GET_CRAFT_TYPE(craft) != last_type) {
 					msg_to_char(ch, "%s %s: ", found_type ? "\r\n" : "", gen_craft_data[GET_CRAFT_TYPE(craft)].command);
@@ -1027,7 +1037,50 @@ ACMD(do_recipes) {
 				}
 		
 				msg_to_char(ch, "%s%s", (found_type ? ", " : ""), GET_CRAFT_NAME(craft));
-				found_any = found_one = found_type = TRUE;
+				found_any = found_type = TRUE;
+			}
+		}
+		// trailing crlf
+		if (found_type) {
+			msg_to_char(ch, "\r\n");
+		}
+		
+		found_type = FALSE;
+		HASH_ITER(sorted_hh, sorted_augments, aug, next_aug) {
+			if (AUGMENT_FLAGGED(aug, AUG_IN_DEVELOPMENT) && !IS_IMMORTAL(ch)) {
+				continue;
+			}
+			if (GET_AUG_ABILITY(aug) != NO_ABIL && !HAS_ABILITY(ch, GET_AUG_ABILITY(aug))) {
+				continue;
+			}
+			
+			if (GET_AUG_REQUIRES_OBJ(aug) != NOTHING && !get_obj_in_list_vnum(GET_AUG_REQUIRES_OBJ(aug), ch->carrying)) {
+				continue;
+			}
+			
+			// is the item used to make it?
+			uses_item = FALSE;
+			if (GET_AUG_REQUIRES_OBJ(aug) == GET_OBJ_VNUM(obj)) {
+				uses_item = TRUE;
+			}
+			for (res = GET_AUG_RESOURCES(aug); !uses_item && res; res = res->next) {
+				if (res->vnum == GET_OBJ_VNUM(obj)) {
+					uses_item = TRUE;
+				}
+			}
+				
+			// MATCH!
+			if (uses_item) {
+				// need header?
+				if (GET_AUG_TYPE(aug) != last_type) {
+					msg_to_char(ch, "%s %s: ", found_type ? "\r\n" : "", augment_types[GET_AUG_TYPE(aug)]);
+	
+					found_type = FALSE;
+					last_type = GET_AUG_TYPE(aug);
+				}
+		
+				msg_to_char(ch, "%s%s", (found_type ? ", " : ""), GET_AUG_NAME(aug));
+				found_any = found_type = TRUE;
 			}
 		}
 		
