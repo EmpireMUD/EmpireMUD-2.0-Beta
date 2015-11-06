@@ -96,6 +96,14 @@ Adventures (ADVEDIT):
   evidence of them nearby, like a thieves' den.
 - Adventure scripts will ONLY run if they are 'Adventure Cleanup' scripts.
 
+Archetypes (ARCHEDIT):
+- Archetypes should have a total of 11 attribute points (3 2 2 2 1 1).
+- Archetypes should have a total of 30 skill points.
+- Archetypes should provide gear for: head, clothes, legs, feet, wield, hold.
+- The hold slot is always a long-lasting light, like the newbie torch (2104).
+- You should only set the BASIC flag on very simple archetypes. Most archetypes
+  should only appear in the extended list.
+
 Augments (AUGEDIT):
 - Augment names should be all lowercase.
 - You should always require either an ability, or a certain object (or both) on
@@ -590,12 +598,128 @@ The following affect flags are available:
  !VAMPIRE - Immune to Vampire debuffs.
  !STUN - Immune to stun effects.
 #d
+ARCHEDIT "OLC ARCHETYPES" "ARCHETYPE OLC" "ARCHETYPE EDITOR"
+
+Usage:  .arch <command>
+        .<command>
+
+The .olc archetype editor is a powerful tool for creating and editing player
+archetypes (character creation options). It provides a simple in-game menu with
+contextual choices to design any archetype.
+
+All commands in the editor are highlighted in yellow and placed inside <angle
+braces>. You can get help on these by typing &yHELP ARCHEDIT <COMMMAND>&0.
+
+You can close an open editor with .abort or .save.
+
+Example:
+ > .arch edit 99
+ > .name Silent Assassin
+ > .skill add Stealth 30
+ > .save
+
+For notes on the mud's building rules, see HELP BUILDING GUIDE.
+
+See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
+"ARCHEDIT ATTRIBUTES"
+
+Usage:  .attribute <type> <number>
+
+This allows you to set the starting level of each attribute. By design, the
+starting attributes should be low. Players will earn higher attributes using
+gear and abilities.
+
+All of the stock archetypes have starting attributes totalling 11 (one at 3,
+two at 1, and the rest at 2).
+
+See also: OLC ARCHETYPES
+#d
+"ARCHEDIT DESCRIPTION"
+
+Usage:  .description <text>
+
+The archetype description should be a short phrase that indicates what type
+of character it is meant for. Descriptions should not be longer than about
+half a line of text.
+
+See also: OLC ARCHETYPES
+#d
+"ARCHEDIT FEMALERANK" "ARCHEDIT FEMALE RANK" "ARCHEDIT MALERANK" "ARCHEDIT MALE RANK"
+
+Usage:  .femalerank <name>
+        .malerank <name>
+
+These set the default rank when a player of this archetype founds an empire.
+Two rank names are available in case the name is gender-specific (Lord, Lady).
+However, it's also ok to set the same name for both.
+
+See also: OLC ARCHETYPES
+#d
+"ARCHEDIT FLAGS"
+
+Usage:  .flags [add | remove] <flags>
+
+Archetype flags are properties that affect how the archetype behaves.
+
+Available flags:
+ IN-DEV - Cannot be chosen or displayed.
+ BASIC - Shows up in the basic set of archetypes (others must be searched).
+
+See also: OLC ARCHETYPES
+#d
+"ARCHEDIT GEAR"
+
+Usage:  .gear add <slot | inventory> <vnum>
+        .gear change <number> <slot | vnum> <new value>
+        .gear remove <number>
+
+This option sets the starting gear for players who choose this archetype. You
+should provide some low-level gear (it will be scaled to level 1, or to the
+item's minimum scale level).
+
+Additional items can be added via 'Archetype Gear' globals. If more than one
+starting item would be put in a gear slot, only the first one is used (except
+slots like neck, which allow two).
+
+Usually, the following slots have newbie gear: head, clothes, legs, feet,
+wield, hold.
+
+The hold slot is generally a light, e.g. the newbie torch (2104).
+
+See also: OLC ARCHETYPES, OLC GLOBALS, GEDIT TYPE
+#d
+"ARCHEDIT NAME"
+
+Usage:  .name <name>
+
+The archetype name is the text displayed to the player, and used to choose an
+archetype. The name should be reasonably short, and title-cased (Each Word
+Capitalized).
+
+See also: OLC ARCHETYPES
+#d
+"ARCHEDIT SKILLS"
+
+Usage:  .skill <add | change> <name> <level>
+        .skill remove <name>
+
+Archetypes determine a player's starting skill levels. Players should begin
+the game with a small number of skill points split between one or two skills.
+However, the system is flexible and you may choose to give a small number of
+points to all skills.
+
+All of the stock archetypes have a total of 30 skill points, usually split
+between two skills as 20/10.
+
+See also: OLC ARCHETYPES
+#d
 AUGEDIT "OLC AUGMENTS" "AUGMENT OLC" "AUGMENT EDITOR"
 
 Usage:  .aug <command>
         .<command>
 
-The .olc augment editor is a powerful tool for creating and editing auments
+The .olc augment editor is a powerful tool for creating and editing augments
 (which are like item enchantments). It provides a simple in-game menu with
 contextual choices to design multiple types of augments.
 
