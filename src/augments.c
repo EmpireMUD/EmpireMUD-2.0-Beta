@@ -139,13 +139,57 @@ bool validate_augment_target(char_data *ch, obj_data *obj, augment_data *aug) {
 * @return bool TRUE if any problems were reported; FALSE if all good.
 */
 bool audit_augment(augment_data *aug, char_data *ch) {
+	char temp[MAX_STRING_LENGTH];
+	struct augment_apply *app;
 	bool problem = FALSE;
-
+	
 	if (AUGMENT_FLAGGED(aug, AUG_IN_DEVELOPMENT)) {
 		olc_audit_msg(ch, GET_AUG_VNUM(aug), "IN-DEVELOPMENT");
 		problem = TRUE;
 	}
-		
+	if (GET_AUG_TYPE(aug) == AUGMENT_NONE) {
+		olc_audit_msg(ch, GET_AUG_VNUM(aug), "Type not set");
+		problem = TRUE;
+	}
+	if (!GET_AUG_NAME(aug) || !*GET_AUG_NAME(aug) || !str_cmp(GET_AUG_NAME(aug), "unnamed augment")) {
+		olc_audit_msg(ch, GET_AUG_VNUM(aug), "No name set");
+		problem = TRUE;
+	}
+	
+	strcpy(temp, GET_AUG_NAME(aug));
+	strtolower(temp);
+	if (strcmp(GET_AUG_NAME(aug), temp)) {
+		olc_audit_msg(ch, GET_AUG_VNUM(aug), "Non-lowercase name");
+		problem = TRUE;
+	}
+	
+	for (app = GET_AUG_APPLIES(aug); app; app = app->next) {
+		if (app->location == APPLY_NONE || app->weight == 0) {
+			olc_audit_msg(ch, GET_AUG_VNUM(aug), "Invalid apply: %d to %s", app->weight, apply_types[app->location]);
+			problem = TRUE;
+		}
+	}
+	
+	if (GET_AUG_ABILITY(aug) == NO_ABIL && GET_AUG_REQUIRES_OBJ(aug) == NOTHING) {
+		olc_audit_msg(ch, GET_AUG_VNUM(aug), "Requires no ability or object");
+		problem = TRUE;
+	}
+	if (GET_AUG_REQUIRES_OBJ(aug) != NOTHING && !obj_proto(GET_AUG_REQUIRES_OBJ(aug))) {
+		olc_audit_msg(ch, GET_AUG_VNUM(aug), "Requires-object does not exist");
+		problem = TRUE;
+	}
+	
+	if (!GET_AUG_RESOURCES(aug)) {
+		olc_audit_msg(ch, GET_AUG_VNUM(aug), "No resources required");
+		problem = TRUE;
+	}
+	
+	// AUG_x: any new targeting flags must be added here
+	if (GET_AUG_WEAR_FLAGS(aug) == NOBITS && !AUGMENT_FLAGGED(aug, AUG_ARMOR | AUG_SHIELD)) {
+		olc_audit_msg(ch, GET_AUG_VNUM(aug), "No targeting flags");
+		problem = TRUE;
+	}
+	
 	return problem;
 }
 
