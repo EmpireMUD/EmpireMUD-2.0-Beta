@@ -61,6 +61,16 @@ OLC_MODULE(advedit_reset);
 OLC_MODULE(advedit_script);
 OLC_MODULE(advedit_startvnum);
 
+// archetype modules
+OLC_MODULE(archedit_attribute);
+OLC_MODULE(archedit_description);
+OLC_MODULE(archedit_femalerank);
+OLC_MODULE(archedit_flags);
+OLC_MODULE(archedit_gear);
+OLC_MODULE(archedit_malerank);
+OLC_MODULE(archedit_name);
+OLC_MODULE(archedit_skill);
+
 // augment modules
 OLC_MODULE(augedit_ability);
 OLC_MODULE(augedit_apply);
@@ -342,7 +352,17 @@ const struct olc_command_data olc_data[] = {
 	{ "script", advedit_script, OLC_ADVENTURE, OLC_CF_EDITOR },
 	{ "startvnum", advedit_startvnum, OLC_ADVENTURE, OLC_CF_EDITOR },
 	
-	// adventure zones
+	// archetypes
+	{ "attribute", archedit_attribute, OLC_ARCHETYPE, OLC_CF_EDITOR },
+	{ "description", archedit_description, OLC_ARCHETYPE, OLC_CF_EDITOR },
+	{ "femalerank", archedit_femalerank, OLC_ARCHETYPE, OLC_CF_EDITOR },
+	{ "flags", archedit_flags, OLC_ARCHETYPE, OLC_CF_EDITOR },
+	{ "gear", archedit_gear, OLC_ARCHETYPE, OLC_CF_EDITOR },
+	{ "malerank", archedit_malerank, OLC_ARCHETYPE, OLC_CF_EDITOR },
+	{ "name", archedit_name, OLC_ARCHETYPE, OLC_CF_EDITOR },
+	{ "skill", archedit_skill, OLC_ARCHETYPE, OLC_CF_EDITOR },
+	
+	// augments
 	{ "ability", augedit_ability, OLC_AUGMENT, OLC_CF_EDITOR },
 	{ "apply", augedit_apply, OLC_AUGMENT, OLC_CF_EDITOR },
 	{ "flags", augedit_flags, OLC_AUGMENT, OLC_CF_EDITOR },

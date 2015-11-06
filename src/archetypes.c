@@ -32,7 +32,8 @@
 *   Edit Modules
 */
 
-// local defaults
+// local data
+#define GEAR_ERROR  -123	// arbitrary number that's not -1 thru NUM_WEARS
 const char *default_archetype_name = "unnamed archetype";
 const char *default_archetype_desc = "no description";
 const char *default_archetype_rank = "Adventurer";
@@ -48,6 +49,67 @@ extern const struct wear_data_type wear_data[NUM_WEARS];
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
+
+/**
+* Find a matching gear slot, preferring exact matches.
+*
+* @param char *name The name to look up.
+* @return int The slot found (-1 for inventory, GEAR_ERROR if no match).
+*/
+int find_gear_slot_by_name(char *name) {
+	int iter, partial = GEAR_ERROR;
+	
+	// special case for giving to inventory
+	if (!str_cmp(name, "inventory")) {
+		return -1;
+	}
+	else if (is_abbrev(name, "inventory")) {
+		partial = -1;
+	}
+	
+	for (iter = 0; iter < NUM_WEARS; ++iter) {
+		if (!str_cmp(name, wear_data[iter].name)) {
+			return iter;	// exact match
+		}
+		else if (partial == GEAR_ERROR && is_abbrev(name, wear_data[iter].name)) {
+			// only want first partial match
+			partial = iter;
+		}
+	}
+		
+	// no exact match
+	return partial;
+}
+
+
+/**
+* Validates the male/female rank names.
+*
+* @param char_data *ch The player to send errors to.
+* @param char *argument The proposed rank name.
+* @return TRUE if it's ok, or FALSE if not.
+*/
+bool valid_default_rank(char_data *ch, char *argument) {
+	extern bool valid_rank_name(char_data *ch, char *newname);
+
+	if (count_color_codes(argument) > 0 || strchr(argument, '&') != NULL) {
+		msg_to_char(ch, "Default ranks may not contain color codes.\r\n");
+	}
+	else if (strchr(argument, '%')) {
+		msg_to_char(ch, "Default ranks may not contain a percent sign (%%).\r\n");
+	}
+	else if (strchr(argument, '"')) {
+		msg_to_char(ch, "Default rank names may not contain a quotation mark (\").\r\n");
+	}
+	else if (!valid_rank_name(ch, argument)) {
+		// sends own message
+	}
+	else {
+		return TRUE;
+	}
+	
+	return FALSE;
+}
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -858,153 +920,51 @@ int vnum_archetype(char *searchname, char_data *ch) {
  //////////////////////////////////////////////////////////////////////////////
 //// OLC MODULES /////////////////////////////////////////////////////////////
 
-/*
-You begin editing archetype 1:
-[1] new archetype
-<name> unnamed archetype
-<description> no description
-<flags> IN-DEVELOPMENT 
-<malerank> Adventurer
-<femalerank> Adventurer
-Attributes: <attribute> (6 total attributes)
-  Strength  [ 1]           Dexterity  [ 1]          Charisma  [ 1]         
-  Greatness  [ 1]          Intelligence  [ 1]       Wits  [ 1]             
-Skills: <skills> (0 total skill points)
-Gear: <gear>
-*/
+OLC_MODULE(archedit_attribute) {
+	extern int get_attribute_by_name(char *name);
 
-OLC_MODULE(archedit_apply) {
 	archetype_data *arch = GET_OLC_ARCHETYPE(ch->desc);
-	/*
-	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
-	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
-	struct augment_apply *apply, *next_apply, *change, *temp;
-	int loc, num, iter;
-	bool found;
+	char att_arg[MAX_INPUT_LENGTH], num_arg[MAX_INPUT_LENGTH];
+	int att, num;
 	
-	// arg1 arg2 arg3
-	half_chop(argument, arg1, buf);
-	half_chop(buf, arg2, arg3);
+	argument = any_one_arg(argument, att_arg);
+	argument = any_one_arg(argument, num_arg);
 	
-	if (is_abbrev(arg1, "remove")) {
-		if (!*arg2) {
-			msg_to_char(ch, "Remove which apply (number)?\r\n");
-		}
-		else if (!str_cmp(arg2, "all")) {
-			free_augment_applies(GET_AUG_APPLIES(aug));
-			GET_AUG_APPLIES(aug) = NULL;
-			msg_to_char(ch, "You remove all the applies.\r\n");
-		}
-		else if (!isdigit(*arg2) || (num = atoi(arg2)) < 1) {
-			msg_to_char(ch, "Invalid apply number.\r\n");
-		}
-		else {
-			found = FALSE;
-			for (apply = GET_AUG_APPLIES(aug); apply && !found; apply = next_apply) {
-				next_apply = apply->next;
-				if (--num == 0) {
-					found = TRUE;
-					
-					msg_to_char(ch, "You remove the %d to %s.\r\n", apply->weight, apply_types[apply->location]);
-					REMOVE_FROM_LIST(apply, GET_AUG_APPLIES(aug), next);
-					free(apply);
-				}
-			}
-			
-			if (!found) {
-				msg_to_char(ch, "Invalid apply number.\r\n");
-			}
-		}
+	if (!*att_arg || !*num_arg || !isdigit(*num_arg)) {
+		msg_to_char(ch, "Usage: attribute <type> <number>\r\n");
 	}
-	else if (is_abbrev(arg1, "add")) {
-		num = atoi(arg2);
-		
-		if (!*arg2 || !*arg3 || !isdigit(*arg2) || num <= 0) {
-			msg_to_char(ch, "Usage: apply add <value> <apply>\r\n");
-		}
-		else if ((loc = search_block(arg3, apply_types, FALSE)) == NOTHING) {
-			msg_to_char(ch, "Invalid apply.\r\n");
-		}
-		else {
-			CREATE(apply, struct augment_apply, 1);
-			apply->location = loc;
-			apply->weight = num;
-			
-			// append to end
-			if ((temp = GET_AUG_APPLIES(aug))) {
-				while (temp->next) {
-					temp = temp->next;
-				}
-				temp->next = apply;
-			}
-			else {
-				GET_AUG_APPLIES(aug) = apply;
-			}
-			
-			msg_to_char(ch, "You add %d to %s.\r\n", num, apply_types[loc]);
-		}
+	else if ((att = get_attribute_by_name(att_arg)) == -1) {
+		msg_to_char(ch, "Unknown attribute '%s'.\r\n", att_arg);
 	}
-	else if (is_abbrev(arg1, "change")) {
-		strcpy(num_arg, arg2);
-		half_chop(arg3, type_arg, val_arg);
-		
-		if (!*num_arg || !isdigit(*num_arg) || !*type_arg || !*val_arg) {
-			msg_to_char(ch, "Usage: apply change <number> <value | apply> <new value>\r\n");
-			return;
-		}
-		
-		// find which one to change
-		if (!isdigit(*num_arg) || (num = atoi(num_arg)) < 1) {
-			msg_to_char(ch, "Invalid apply number.\r\n");
-			return;
-		}
-		change = NULL;
-		for (apply = GET_AUG_APPLIES(aug); apply && !change; apply = apply->next) {
-			if (--num == 0) {
-				change = apply;
-				break;
-			}
-		}
-		if (!change) {
-			msg_to_char(ch, "Invalid apply number.\r\n");
-		}
-		else if (is_abbrev(type_arg, "value")) {
-			num = atoi(val_arg);
-			if ((!isdigit(*val_arg) && *val_arg != '-') || num == 0) {
-				msg_to_char(ch, "Invalid value '%s'.\r\n", val_arg);
-			}
-			else {
-				change->weight = num;
-				msg_to_char(ch, "Apply %d changed to value %d.\r\n", atoi(num_arg), num);
-			}
-		}
-		else if (is_abbrev(type_arg, "apply")) {
-			if ((loc = search_block(val_arg, apply_types, FALSE)) == NOTHING) {
-				msg_to_char(ch, "Invalid apply.\r\n");
-			}
-			else {
-				change->location = loc;
-				msg_to_char(ch, "Apply %d changed to %s.\r\n", atoi(num_arg), apply_types[loc]);
-			}
-		}
-		else {
-			msg_to_char(ch, "You can only change the value or apply.\r\n");
-		}
+	else if ((num = atoi(num_arg)) < 0 || num > config_get_int("max_player_attribute")) {
+		msg_to_char(ch, "You must choose a number between 0 and %d.\r\n", config_get_int("max_player_attribute"));
 	}
 	else {
-		msg_to_char(ch, "Usage: apply add <value> <apply>\r\n");
-		msg_to_char(ch, "Usage: apply change <number> <value | apply> <new value>\r\n");
-		msg_to_char(ch, "Usage: apply remove <number | all>\r\n");
+		GET_ARCH_ATTRIBUTE(arch, att) = num;
 		
-		msg_to_char(ch, "Available applies:\r\n");
-		for (iter = 0; *apply_types[iter] != '\n'; ++iter) {
-			msg_to_char(ch, " %-24.24s%s", apply_types[iter], ((iter % 2) ? "\r\n" : ""));
+		if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+			send_config_msg(ch, "ok_string");
 		}
-		if ((iter % 2) != 0) {
-			msg_to_char(ch, "\r\n");
+		else {
+			msg_to_char(ch, "You set the %s to %d.\r\n", attributes[att].name, num);
 		}
 	}
-	*/
+}
+
+
+OLC_MODULE(archedit_description) {
+	archetype_data *arch = GET_OLC_ARCHETYPE(ch->desc);
+	olc_process_string(ch, argument, "description", &GET_ARCH_DESC(arch));
+}
+
+
+OLC_MODULE(archedit_femalerank) {
+	archetype_data *arch = GET_OLC_ARCHETYPE(ch->desc);
+	
+	// valid_default_rank sends its own errors
+	if (valid_default_rank(ch, argument)) {
+		olc_process_string(ch, argument, "female rank", &GET_ARCH_FEMALE_RANK(arch));
+	}
 }
 
 
@@ -1022,7 +982,244 @@ OLC_MODULE(archedit_flags) {
 }
 
 
+OLC_MODULE(archedit_gear) {
+	archetype_data *arch = GET_OLC_ARCHETYPE(ch->desc);
+	char cmd_arg[MAX_INPUT_LENGTH], slot_arg[MAX_INPUT_LENGTH], num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
+	struct archetype_gear *gear, *next_gear, *change, *temp;
+	int loc, num;
+	bool found;
+	
+	argument = any_one_arg(argument, cmd_arg);
+	skip_spaces(&argument);
+	
+	if (is_abbrev(cmd_arg, "remove")) {
+		if (!*argument) {
+			msg_to_char(ch, "Remove which gear (number)?\r\n");
+		}
+		else if (!str_cmp(argument, "all")) {
+			free_archetype_gear(GET_ARCH_GEAR(arch));
+			GET_ARCH_GEAR(arch) = NULL;
+			msg_to_char(ch, "You remove all the gear.\r\n");
+		}
+		else if (!isdigit(*argument) || (num = atoi(argument)) < 1) {
+			msg_to_char(ch, "Invalid gear number.\r\n");
+		}
+		else {
+			found = FALSE;
+			for (gear = GET_ARCH_GEAR(arch); gear && !found; gear = next_gear) {
+				next_gear = gear->next;
+				if (--num == 0) {
+					found = TRUE;
+					
+					msg_to_char(ch, "You remove %s.\r\n", get_obj_name_by_proto(gear->vnum));
+					REMOVE_FROM_LIST(gear, GET_ARCH_GEAR(arch), next);
+					free(gear);
+				}
+			}
+			
+			if (!found) {
+				msg_to_char(ch, "Invalid gear number.\r\n");
+			}
+		}
+	}
+	else if (is_abbrev(cmd_arg, "add")) {
+		argument = any_one_arg(argument, slot_arg);
+		argument = any_one_arg(argument, num_arg);
+		num = atoi(num_arg);
+		loc = -1;	// this indicates inventory
+		
+		if (!*slot_arg || !*num_arg || !isdigit(*num_arg) || num <= 0) {
+			msg_to_char(ch, "Usage: gear add <gear slot> <vnum>\r\n");
+		}
+		else if ((loc = find_gear_slot_by_name(slot_arg)) == GEAR_ERROR) {
+			msg_to_char(ch, "Invalid gear slot '%s'.\r\n", slot_arg);
+		}
+		else if (!obj_proto(num)) {
+			msg_to_char(ch, "Invalid object vnum %d.\r\n", num);
+		}
+		else {
+			CREATE(gear, struct archetype_gear, 1);
+			gear->wear = loc;
+			gear->vnum = num;
+			
+			// append to end
+			if ((temp = GET_ARCH_GEAR(arch))) {
+				while (temp->next) {
+					temp = temp->next;
+				}
+				temp->next = gear;
+			}
+			else {
+				GET_ARCH_GEAR(arch) = gear;
+			}
+			
+			msg_to_char(ch, "You add %s (%s).\r\n", get_obj_name_by_proto(num), loc == -1 ? "inventory" : wear_data[loc].name);
+		}
+	}
+	else if (is_abbrev(cmd_arg, "change")) {
+		argument = any_one_arg(argument, num_arg);
+		argument = any_one_arg(argument, type_arg);
+		argument = any_one_arg(argument, val_arg);
+		
+		if (!*num_arg || !isdigit(*num_arg) || !*type_arg || !*val_arg) {
+			msg_to_char(ch, "Usage: gear change <number> <slot | vnum> <new value>\r\n");
+			return;
+		}
+		
+		// find which one to change
+		if (!isdigit(*num_arg) || (num = atoi(num_arg)) < 1) {
+			msg_to_char(ch, "Invalid gear number.\r\n");
+			return;
+		}
+		change = NULL;
+		for (gear = GET_ARCH_GEAR(arch); gear && !change; gear = gear->next) {
+			if (--num == 0) {
+				change = gear;
+				break;
+			}
+		}
+		if (!change) {
+			msg_to_char(ch, "Invalid gear number.\r\n");
+		}
+		else if (is_abbrev(type_arg, "vnum")) {
+			num = atoi(val_arg);
+			if (!obj_proto(num)) {
+				msg_to_char(ch, "Invalid object vnum '%s'.\r\n", val_arg);
+			}
+			else {
+				change->vnum = num;
+				msg_to_char(ch, "Gear %d changed to vnum %d (%s).\r\n", atoi(num_arg), num, get_obj_name_by_proto(num));
+			}
+		}
+		else if (is_abbrev(type_arg, "slot")) {
+			if ((loc = find_gear_slot_by_name(val_arg)) == GEAR_ERROR) {
+				msg_to_char(ch, "Invalid gear slot '%s'.\r\n", val_arg);
+			}
+			else {
+				change->wear = loc;
+				msg_to_char(ch, "Apply %d changed to %s.\r\n", atoi(num_arg), loc == -1 ? "inventory" : wear_data[loc].name);
+			}
+		}
+		else {
+			msg_to_char(ch, "You can only change the slot or vnum.\r\n");
+		}
+	}
+	else {
+		msg_to_char(ch, "Usage: gear add <gear slot> <obj vnum>\r\n");
+		msg_to_char(ch, "Usage: gear change <number> <slot | vnum> <new value>\r\n");
+		msg_to_char(ch, "Usage: gear remove <number | all>\r\n");
+	}
+}
+
+
+OLC_MODULE(archedit_malerank) {
+	archetype_data *arch = GET_OLC_ARCHETYPE(ch->desc);
+	
+	// valid_default_rank sends its own errors
+	if (valid_default_rank(ch, argument)) {
+		olc_process_string(ch, argument, "male rank", &GET_ARCH_MALE_RANK(arch));
+	}
+}
+
+
 OLC_MODULE(archedit_name) {
 	archetype_data *arch = GET_OLC_ARCHETYPE(ch->desc);
 	olc_process_string(ch, argument, "name", &GET_ARCH_NAME(arch));
+}
+
+
+OLC_MODULE(archedit_skill) {
+	extern int find_skill_by_name(char *name);
+	
+	archetype_data *arch = GET_OLC_ARCHETYPE(ch->desc);
+	char cmd_arg[MAX_INPUT_LENGTH], skill_arg[MAX_INPUT_LENGTH], num_arg[MAX_INPUT_LENGTH];
+	struct archetype_skill *sk, *next_sk, *temp;
+	int skid, num;
+	bool found;
+	
+	argument = any_one_arg(argument, cmd_arg);
+	argument = any_one_arg(argument, skill_arg);
+	argument = any_one_arg(argument, num_arg);
+	
+	if (!*cmd_arg || !*skill_arg) {
+		msg_to_char(ch, "Usage: skill add <skill> <level>\r\n");
+		msg_to_char(ch, "       skill change <skill> <level>\r\n");
+		msg_to_char(ch, "       skill remove <skill>\r\n");
+	}
+	else if ((skid = find_skill_by_name(skill_arg)) == NO_SKILL) {
+		msg_to_char(ch, "Unknown skill '%s'.\r\n", skill_arg);
+	}
+	else if (is_abbrev(cmd_arg, "add") || is_abbrev(cmd_arg, "change")) {
+		// add and change are actually the same
+		if (!*num_arg || !isdigit(*num_arg) || (num = atoi(num_arg)) < 0 || num > CLASS_SKILL_CAP) {
+			msg_to_char(ch, "Invalid skill level '%s'.\r\n", num_arg);
+			return;
+		}
+		
+		// attempt to find an existing entry
+		found = FALSE;
+		for (sk = GET_ARCH_SKILLS(arch); sk; sk = next_sk) {
+			next_sk = sk->next;
+			if (sk->skill != skid) {
+				continue;
+			}
+			
+			// found it!
+			found = TRUE;
+			sk->level = num;
+			
+			if (num == 0) {
+				REMOVE_FROM_LIST(sk, GET_ARCH_SKILLS(arch), next);
+				free(sk);
+			}
+		}
+		
+		if (!found && num > 0) {
+			CREATE(sk, struct archetype_skill, 1);
+			sk->skill = skid;
+			sk->level = num;
+			
+			// append
+			if ((temp = GET_ARCH_SKILLS(arch))) {
+				while (temp->next) {
+					temp = temp->next;
+				}
+				temp->next = sk;
+			}
+			else {
+				GET_ARCH_SKILLS(arch) = sk;
+			}
+		}
+		
+		if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+			send_config_msg(ch, "ok_string");
+		}
+		else {
+			msg_to_char(ch, "You set the starting %s level to %d.\r\n", skill_data[skid].name, num);
+		}
+	}
+	else if (is_abbrev(cmd_arg, "remove")) {
+		// attempt to find an entries
+		found = FALSE;
+		for (sk = GET_ARCH_SKILLS(arch); sk; sk = next_sk) {
+			next_sk = sk->next;
+			if (sk->skill != skid) {
+				continue;
+			}
+			
+			// found it!
+			REMOVE_FROM_LIST(sk, GET_ARCH_SKILLS(arch), next);
+			free(sk);
+		}
+		
+		if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+			send_config_msg(ch, "ok_string");
+		}
+		else {
+			msg_to_char(ch, "The archetype will grant no starting %s level.\r\n", skill_data[skid].name);
+		}
+	}
+	else {
+		msg_to_char(ch, "Valid commands are: add, change, remove.\r\n");
+	}
 }

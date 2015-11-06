@@ -2116,6 +2116,30 @@ void determine_gear_level(char_data *ch) {
 
 
 /**
+* Finds an attribute by name, preferring exact matches to partial matches.
+*
+* @param char *name The name to look up.
+* @return int An attribute constant (STRENGTH) or -1 for no-match.
+*/
+int get_attribute_by_name(char *name) {
+	extern struct attribute_data_type attributes[NUM_ATTRIBUTES];
+	int iter, partial = -1;
+	
+	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
+		if (!str_cmp(name, attributes[iter].name)) {
+			return iter;	// exact matcg;
+		}
+		else if (is_abbrev(name, attributes[iter].name)) {
+			partial = iter;
+		}
+	}
+	
+	// didn't find exact...
+	return partial;
+}
+
+
+/**
 * Raises a person from sleeping+ to standing (or fighting) if possible.
 * 
 * @param char_data *ch The person to try to wake/stand.
