@@ -167,6 +167,8 @@ bool audit_adventure(adv_data *adv, char_data *ch, bool only_one) {
 		olc_audit(ch, OLC_SECTOR, buf);
 		msg_to_char(ch, "Room Templates:\r\n");
 		olc_audit(ch, OLC_ROOM_TEMPLATE, buf);
+		msg_to_char(ch, "Archetypes:\r\n");
+		olc_audit(ch, OLC_ARCHETYPE, buf);
 		msg_to_char(ch, "Augments:\r\n");
 		olc_audit(ch, OLC_AUGMENT, buf);
 		msg_to_char(ch, "Globals:\r\n");

@@ -309,8 +309,6 @@ int sort_augments_by_data(augment_data *a, augment_data *b) {
 * @param augment_data *aug The augment data to add to the table.
 */
 void add_augment_to_table(augment_data *aug) {
-	extern int sort_augments(augment_data *a, augment_data *b);
-	
 	augment_data *find;
 	any_vnum vnum;
 	

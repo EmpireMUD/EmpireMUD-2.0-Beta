@@ -40,7 +40,8 @@
 #define OLC_GLOBAL  BIT(10)
 #define OLC_BOOK  BIT(11)
 #define OLC_AUGMENT  BIT(12)
-#define NUM_OLC_TYPES  13
+#define OLC_ARCHETYPE  BIT(13)
+#define NUM_OLC_TYPES  14
 
 
 // olc command flags
@@ -64,6 +65,7 @@
 #define OLC_FLAG_NO_ROOM_TEMPLATE  BIT(11)	// cannot edit room templates
 #define OLC_FLAG_NO_GLOBAL  BIT(12)	// cannot edit globals
 #define OLC_FLAG_NO_AUGMENT  BIT(13)	// cannot edit augs
+#define OLC_FLAG_NO_ARCHETYPE  BIT(14)	// cannot edit archetypes
 
 
 // for trigger editing

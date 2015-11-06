@@ -1479,6 +1479,9 @@ void close_socket(descriptor_data *d) {
 	if (d->olc_adventure) {
 		free_adventure(d->olc_adventure);
 	}
+	if (d->olc_archetype) {
+		free_archetype(d->olc_archetype);
+	}
 	if (d->olc_augment) {
 		free_augment(d->olc_augment);
 	}

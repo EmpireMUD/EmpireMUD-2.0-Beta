@@ -611,7 +611,7 @@ EEDIT(eedit_num_ranks) {
 		// ensure all new ranks have names
 		for (iter = 0; iter < num; ++iter) {
 			if (!EMPIRE_RANK(emp, iter)) {
-				EMPIRE_RANK(emp, iter) = str_dup((iter < (num-1)) ? "Follower" : archetype[(int) CREATION_ARCHETYPE(ch)].starting_rank[(int) GET_REAL_SEX(ch)]);
+				EMPIRE_RANK(emp, iter) = str_dup((iter < (num-1)) ? "Follower" : archetype[CREATION_ARCHETYPE(ch)].starting_rank[(int) GET_REAL_SEX(ch)]);
 			}
 		}
 		

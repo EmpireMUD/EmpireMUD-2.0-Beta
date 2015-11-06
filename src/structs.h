@@ -17,6 +17,7 @@
 *   #define Section
 *     Miscellaneous Defines
 *     Adventure Defines
+*     Archetype Defines
 *     Augment Defines
 *     Book Defines
 *     Building Defines
@@ -34,6 +35,7 @@
 *   Structs Section
 *     Miscellaneous Structs
 *     Adventure Structs
+*     Archetype Structs
 *     Augment Structs
 *     Book Structs
 *     Building Structs
@@ -191,6 +193,7 @@ typedef any_vnum trig_vnum;	// for dg scripts
 // For simplicity...
 typedef struct account_data account_data;
 typedef struct adventure_data adv_data;
+typedef struct archetype_data archetype_data;
 typedef struct augment_data augment_data;
 typedef struct bld_data bld_data;
 typedef struct book_data book_data;
@@ -367,6 +370,14 @@ typedef struct trig_data trig_data;
 #define RMT_NO_LOCATION  BIT(8)	// i. don't show a location, disables where
 #define RMT_PIGEON_POST  BIT(9)	// j. can use mail here
 #define RMT_COOKING_FIRE  BIT(10)	// k. can cook here
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// ARCHETYPE DEFINES ///////////////////////////////////////////////////////
+
+// ARCH_x: archetype flags
+#define ARCH_IN_DEVELOPMENT  BIT(0)	// a. not available to players
+#define ARCH_BASIC  BIT(1)	// b. will show on the basic list
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2058,6 +2069,44 @@ struct room_template {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// ARCHETYPE STRUCTS ///////////////////////////////////////////////////////
+
+struct archetype_data {
+	// basic data
+	any_vnum vnum;
+	char *name;
+	char *description;
+	bitvector_t flags;	// ARCH_x
+	
+	// default starting ranks
+	char *male_rank;
+	char *female_rank;
+	
+	struct archetype_skill *skills;	// linked list
+	struct archetype_gear *gear;	// linked list
+	int attributes[NUM_ATTRIBUTES];	// starting attributes (default 1)
+	
+	UT_hash_handle hh;	// archetype_table hash handle
+	UT_hash_handle sorted_hh;	// sorted_archetypes hash handle
+};
+
+
+struct archetype_skill {
+	int skill;	// SKILL_x
+	int level;	// starting level
+	
+	struct archetype_skill *next;
+};
+
+
+struct archetype_gear {
+	int wear;	// WEAR_x, -1 == inventory
+	obj_vnum vnum;
+	struct archetype_gear *next;
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// AUGMENT STRUCTS /////////////////////////////////////////////////////////
 
 struct augment_data {
@@ -2369,6 +2418,7 @@ struct descriptor_data {
 	any_vnum olc_vnum;	// vnum being edited
 	
 	adv_data *olc_adventure;	// adv being edited
+	archetype_data *olc_archetype;	// arch being edited
 	augment_data *olc_augment;	// aug being edited
 	book_data *olc_book;	// book being edited
 	obj_data *olc_object;	// item being edited
@@ -2513,7 +2563,7 @@ struct player_special_data {
 	bitvector_t olc_flags;	// olc permissions
 	
 	// skill/ability data
-	byte creation_archetype;	// this is now stored permanently so later decisions can be made based on it
+	any_vnum creation_archetype;	// this is now stored permanently so later decisions can be made based on it
 	struct player_skill_data skills[MAX_SKILLS];
 	struct player_ability_data abilities[MAX_ABILITIES];
 	bool can_gain_new_skills;	// not required to keep skills at zero
@@ -2955,6 +3005,7 @@ struct toggle_data_type {
 // WEAR_x data for each equipment slot
 struct wear_data_type {
 	char *eq_prompt;	// shown on 'eq' list
+	char *name;	// display name
 	bitvector_t item_wear;	// matching ITEM_WEAR_x
 	bool count_stats;	// FALSE means it's a slot like in-sheath, and adds nothing to the character
 	double gear_level_mod;	// modifier (slot significance) when counting gear level

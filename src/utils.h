@@ -14,6 +14,7 @@
 * Contents:
 *   Core Utils
 *   Adventure Utils
+*   Archetype Utils
 *   Augment Utils
 *   Bitvector Utils
 *   Building Utils
@@ -102,6 +103,22 @@
 #define ADVENTURE_FLAGGED(adv, flg)  (IS_SET(GET_ADV_FLAGS(adv), (flg)) ? TRUE : FALSE)
 #define INSTANCE_FLAGGED(i, flg)  (IS_SET((i)->flags, (flg)))
 #define LINK_FLAGGED(lnkptr, flg)  (IS_SET((lnkptr)->flags, (flg)) ? TRUE : FALSE)
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// ARCHETYPE UTILS /////////////////////////////////////////////////////////
+
+#define GET_ARCH_ATTRIBUTE(arch, pos)  ((arch)->attributes[(pos)])
+#define GET_ARCH_DESC(arch)  ((arch)->description)
+#define GET_ARCH_FEMALE_RANK(arch)  ((arch)->female_rank)
+#define GET_ARCH_FLAGS(arch)  ((arch)->flags)
+#define GET_ARCH_GEAR(arch)  ((arch)->gear)
+#define GET_ARCH_MALE_RANK(arch)  ((arch)->male_rank)
+#define GET_ARCH_NAME(arch)  ((arch)->name)
+#define GET_ARCH_SKILLS(arch)  ((arch)->skills)
+#define GET_ARCH_VNUM(arch)  ((arch)->vnum)
+
+#define ARCHETYPE_FLAGGED(arch, flag)  IS_SET(GET_ARCH_FLAGS(arch), (flag))
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -364,6 +381,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_OLC_VNUM(desc)  ((desc)->olc_vnum)
 #define GET_OLC_STORAGE(desc)  ((desc)->olc_storage)
 #define GET_OLC_ADVENTURE(desc)  ((desc)->olc_adventure)
+#define GET_OLC_ARCHETYPE(desc)  ((desc)->olc_archetype)
 #define GET_OLC_AUGMENT(desc)  ((desc)->olc_augment)
 #define GET_OLC_BOOK(desc)  ((desc)->olc_book)
 #define GET_OLC_BUILDING(desc)  ((desc)->olc_building)

@@ -1188,7 +1188,7 @@ empire_data *create_empire(char_data *ch) {
 	// rank setup
 	EMPIRE_NUM_RANKS(emp) = 2;
 	EMPIRE_RANK(emp, 0) = str_dup("Follower");
-	EMPIRE_RANK(emp, 1) = str_dup(archetype[(int) CREATION_ARCHETYPE(ch)].starting_rank[(int) GET_REAL_SEX(ch)]);
+	EMPIRE_RANK(emp, 1) = str_dup(archetype[CREATION_ARCHETYPE(ch)].starting_rank[(int) GET_REAL_SEX(ch)]);
 	for (iter = 0; iter < NUM_PRIVILEGES; ++iter) {
 		EMPIRE_PRIV(emp, iter) = 2;
 	}
@@ -5020,6 +5020,7 @@ void write_trigger_to_file(FILE *fl, trig_data *trig) {
 */
 void discrete_load(FILE *fl, int mode, char *filename) {
 	void parse_account(FILE *fl, int nr);
+	void parse_archetype(FILE *fl, any_vnum vnum);
 	void parse_augment(FILE *fl, any_vnum vnum);
 	void parse_book(FILE *fl, int book_id);
 	
@@ -5027,7 +5028,7 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 	char line[256];
 
 	/* modes positions correspond to DB_BOOT_x in db.h */
-	const char *modes[] = {"world", "mob", "obj", "zone", "empire", "book", "craft", "trg", "crop", "sector", "adventure", "room template", "global", "account", "augment" };
+	const char *modes[] = {"world", "mob", "obj", "zone", "empire", "book", "craft", "trg", "crop", "sector", "adventure", "room template", "global", "account", "augment", "archetype" };
 
 	for (;;) {
 		if (!get_line(fl, line)) {
@@ -5056,6 +5057,10 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 				}
 				case DB_BOOT_ADV: {
 					parse_adventure(fl, nr);
+					break;
+				}
+				case DB_BOOT_ARCH: {
+					parse_archetype(fl, nr);
 					break;
 				}
 				case DB_BOOT_AUG: {
@@ -5169,7 +5174,7 @@ void index_boot(int mode) {
 
 	if (!rec_count) {
 		// DB_BOOT_x: some types don't matter TODO could move this into a config
-		if (mode == DB_BOOT_EMP || mode == DB_BOOT_BOOKS || mode == DB_BOOT_CRAFT || mode == DB_BOOT_BLD || mode == DB_BOOT_ADV || mode == DB_BOOT_RMT || mode == DB_BOOT_WLD || mode == DB_BOOT_GLB || mode == DB_BOOT_ACCT || mode == DB_BOOT_AUG) {
+		if (mode == DB_BOOT_EMP || mode == DB_BOOT_BOOKS || mode == DB_BOOT_CRAFT || mode == DB_BOOT_BLD || mode == DB_BOOT_ADV || mode == DB_BOOT_RMT || mode == DB_BOOT_WLD || mode == DB_BOOT_GLB || mode == DB_BOOT_ACCT || mode == DB_BOOT_AUG || mode == DB_BOOT_ARCH) {
 			// types that don't require any entries and exit early if none
 			return;
 		}
@@ -5191,6 +5196,11 @@ void index_boot(int mode) {
 	 * NOTE: "bytes" does _not_ include strings or other later malloc'd things.
 	 */
 	switch (mode) {
+		case DB_BOOT_ARCH: {
+			size[0] = sizeof(archetype_data) * rec_count;
+			log("  %d archetypes, %d bytes in db", rec_count, size[0]);
+			break;
+		}
 		case DB_BOOT_AUG: {
 			size[0] = sizeof(augment_data) * rec_count;
 			log("  %d augments, %d bytes in db", rec_count, size[0]);
@@ -5275,6 +5285,7 @@ void index_boot(int mode) {
 		switch (mode) {
 			case DB_BOOT_ACCT:
 			case DB_BOOT_ADV:
+			case DB_BOOT_ARCH:
 			case DB_BOOT_AUG:
 			case DB_BOOT_BLD:
 			case DB_BOOT_CRAFT:
@@ -5356,6 +5367,16 @@ void save_library_file_for_vnum(int type, any_vnum vnum) {
 			HASH_ITER(hh, adventure_table, adv, next_adv) {
 				if (GET_ADV_VNUM(adv) >= (zone * 100) && GET_ADV_VNUM(adv) <= (zone * 100 + 99)) {
 					write_adventure_to_file(fl, adv);
+				}
+			}
+			break;
+		}
+		case DB_BOOT_ARCH: {
+			void write_archetype_to_file(FILE *fl, archetype_data *arch);
+			archetype_data *arch, *next_arch;
+			HASH_ITER(hh, archetype_table, arch, next_arch) {
+				if (GET_ARCH_VNUM(arch) >= (zone * 100) && GET_ARCH_VNUM(arch) <= (zone * 100 + 99)) {
+					write_archetype_to_file(fl, arch);
 				}
 			}
 			break;
@@ -5688,6 +5709,11 @@ void save_index(int type) {
 		}
 		case DB_BOOT_ADV: {
 			write_adventure_index(fl);
+			break;
+		}
+		case DB_BOOT_ARCH: {
+			void write_archetype_index(FILE *fl);
+			write_archetype_index(fl);
 			break;
 		}
 		case DB_BOOT_AUG: {

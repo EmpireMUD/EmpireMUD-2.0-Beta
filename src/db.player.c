@@ -2605,6 +2605,8 @@ void announce_login(char_data *ch) {
 * @param char_data *ch The player charater to clear.
 */
 void clear_player(char_data *ch) {
+	int iter;
+	
 	if (!ch) {
 		return;
 	}
@@ -2624,6 +2626,10 @@ void clear_player(char_data *ch) {
 	GET_LAST_TELL(ch) = NOBODY;
 	GET_TEMPORARY_ACCOUNT_ID(ch) = NOTHING;
 	GET_IMMORTAL_LEVEL(ch) = -1;	// Not an immortal
+	
+	for (iter = 0; iter < MAX_REWARDS_PER_DAY; ++iter) {
+		GET_REWARDED_TODAY(ch, iter) = -1;
+	}
 }
 
 

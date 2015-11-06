@@ -279,6 +279,7 @@ extern bool valid_room_template_vnum(rmt_vnum vnum);
 
 // prototypes
 void olc_show_adventure(char_data *ch);
+void olc_show_archetype(char_data *ch);
 void olc_show_augment(char_data *ch);
 void olc_show_book(char_data *ch);
 void olc_show_building(char_data *ch);
@@ -291,6 +292,7 @@ void olc_show_room_template(char_data *ch);
 void olc_show_sector(char_data *ch);
 void olc_show_trigger(char_data *ch);
 extern adv_data *setup_olc_adventure(adv_data *input);
+extern archetype_data *setup_olc_archetype(archetype_data *input);
 extern augment_data *setup_olc_augment(augment_data *input);
 extern book_data *setup_olc_book(book_data *input);
 extern bld_data *setup_olc_building(bld_data *input);
@@ -307,17 +309,17 @@ extern bool validate_icon(char *icon);
 
 // master olc command structure
 const struct olc_command_data olc_data[] = {
-	// main commands
-	{ "abort", olc_abort, OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
-	{ "audit", olc_audit, OLC_ADVENTURE | OLC_AUGMENT | OLC_BUILDING | OLC_CRAFT | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_ROOM_TEMPLATE, NOBITS },
-	{ "copy", olc_copy, OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, NOBITS },
-	{ "delete", olc_delete, OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, OLC_CF_NO_ABBREV },
+	// OLC_x: main commands
+	{ "abort", olc_abort, OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
+	{ "audit", olc_audit, OLC_ADVENTURE | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BUILDING | OLC_CRAFT | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_ROOM_TEMPLATE, NOBITS },
+	{ "copy", olc_copy, OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, NOBITS },
+	{ "delete", olc_delete, OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, OLC_CF_NO_ABBREV },
 	// "display" command uses the shortcut "." or "olc" with no args, and is in the do_olc function
-	{ "edit", olc_edit, OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, NOBITS },
-	{ "free", olc_free, OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, NOBITS },
-	{ "list", olc_list, OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, NOBITS },
-	{ "save", olc_save, OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
-	{ "search", olc_search, OLC_AUGMENT | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ROOM_TEMPLATE, NOBITS },
+	{ "edit", olc_edit, OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, NOBITS },
+	{ "free", olc_free, OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, NOBITS },
+	{ "list", olc_list, OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, NOBITS },
+	{ "save", olc_save, OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
+	{ "search", olc_search, OLC_ARCHETYPE | OLC_AUGMENT | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ROOM_TEMPLATE, NOBITS },
 	
 	// admin
 	{ "removeindev", olc_removeindev, NOBITS, NOBITS },
@@ -658,6 +660,11 @@ OLC_MODULE(olc_abort) {
 				GET_OLC_ADVENTURE(ch->desc) = NULL;
 				break;
 			}
+			case OLC_ARCHETYPE: {
+				free_archetype(GET_OLC_ARCHETYPE(ch->desc));
+				GET_OLC_ARCHETYPE(ch->desc) = NULL;
+				break;
+			}
 			case OLC_AUGMENT: {
 				free_augment(GET_OLC_AUGMENT(ch->desc));
 				GET_OLC_AUGMENT(ch->desc) = NULL;
@@ -764,6 +771,16 @@ OLC_MODULE(olc_audit) {
 				HASH_ITER(hh, adventure_table, adv, next_adv) {
 					if (GET_ADV_VNUM(adv) >= from_vnum && GET_ADV_VNUM(adv) <= to_vnum) {
 						found |= audit_adventure(adv, ch, (from_vnum == to_vnum));
+					}
+				}
+				break;
+			}
+			case OLC_ARCHETYPE: {
+				extern bool audit_archetype(archetype_data *arch, char_data *ch);
+				archetype_data *arch, *next_arch;
+				HASH_ITER(hh, archetype_table, arch, next_arch) {
+					if (GET_ARCH_VNUM(arch) >= from_vnum && GET_ARCH_VNUM(arch) <= to_vnum) {
+						found |= audit_archetype(arch, ch);
 					}
 				}
 				break;
@@ -933,6 +950,11 @@ OLC_MODULE(olc_copy) {
 			exists = (adventure_proto(from_vnum) != NULL);
 			break;
 		}
+		case OLC_ARCHETYPE: {
+			found = (archetype_proto(vnum) != NULL);
+			exists = (archetype_proto(from_vnum) != NULL);
+			break;
+		}
 		case OLC_AUGMENT: {
 			found = (augment_proto(vnum) != NULL);
 			exists = (augment_proto(from_vnum) != NULL);
@@ -1039,6 +1061,13 @@ OLC_MODULE(olc_copy) {
 			olc_show_adventure(ch);
 			break;
 		}
+		case OLC_ARCHETYPE: {
+			GET_OLC_ARCHETYPE(ch->desc) = setup_olc_archetype(archetype_proto(from_vnum));
+			GET_OLC_ARCHETYPE(ch->desc)->vnum = vnum;
+			SET_BIT(GET_ARCH_FLAGS(GET_OLC_ARCHETYPE(ch->desc)), ARCH_IN_DEVELOPMENT);	// ensure flag
+			olc_show_archetype(ch);
+			break;
+		}
 		case OLC_AUGMENT: {
 			GET_OLC_AUGMENT(ch->desc) = setup_olc_augment(augment_proto(from_vnum));
 			GET_OLC_AUGMENT(ch->desc)->vnum = vnum;
@@ -1127,6 +1156,7 @@ OLC_MODULE(olc_copy) {
 
 OLC_MODULE(olc_delete) {
 	void olc_delete_adventure(char_data *ch, adv_vnum vnum);
+	void olc_delete_archetype(char_data *ch, any_vnum vnum);
 	void olc_delete_augment(char_data *ch, any_vnum vnum);
 	void olc_delete_book(char_data *ch, book_vnum vnum);
 	void olc_delete_building(char_data *ch, bld_vnum vnum);
@@ -1177,6 +1207,10 @@ OLC_MODULE(olc_delete) {
 	switch (type) {
 		case OLC_ADVENTURE: {
 			olc_delete_adventure(ch, vnum);
+			break;
+		}
+		case OLC_ARCHETYPE: {
+			olc_delete_archetype(ch, vnum);
 			break;
 		}
 		case OLC_AUGMENT: {
@@ -1236,6 +1270,10 @@ OLC_MODULE(olc_display) {
 	switch (GET_OLC_TYPE(ch->desc)) {
 		case OLC_ADVENTURE: {
 			olc_show_adventure(ch);
+			break;
+		}
+		case OLC_ARCHETYPE: {
+			olc_show_archetype(ch);
 			break;
 		}
 		case OLC_AUGMENT: {
@@ -1353,6 +1391,13 @@ OLC_MODULE(olc_edit) {
 			GET_OLC_ADVENTURE(ch->desc) = setup_olc_adventure(adventure_proto(vnum));
 			GET_OLC_ADVENTURE(ch->desc)->vnum = vnum;
 			olc_show_adventure(ch);
+			break;
+		}
+		case OLC_ARCHETYPE: {
+			// this will set up from existing OR new automatically
+			GET_OLC_ARCHETYPE(ch->desc) = setup_olc_archetype(archetype_proto(vnum));
+			GET_OLC_ARCHETYPE(ch->desc)->vnum = vnum;			
+			olc_show_archetype(ch);
 			break;
 		}
 		case OLC_AUGMENT: {
@@ -1478,6 +1523,10 @@ OLC_MODULE(olc_free) {
 			switch (type) {
 				case OLC_ADVENTURE: {
 					free = (adventure_proto(iter) == NULL);
+					break;
+				}
+				case OLC_ARCHETYPE: {
+					free = (archetype_proto(iter) == NULL);
 					break;
 				}
 				case OLC_AUGMENT: {
@@ -1624,6 +1673,20 @@ OLC_MODULE(olc_list) {
 					if (GET_ADV_VNUM(adv) >= from_vnum && GET_ADV_VNUM(adv) <= to_vnum) {
 						++count;
 						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_adventure(adv, show_details));
+					}
+				}
+				break;
+			}
+			case OLC_ARCHETYPE: {
+				extern char *list_one_archetype(archetype_data *arch, bool detail);
+				struct archetype_data *arch, *next_arch;
+				HASH_ITER(hh, archetype_table, arch, next_arch) {
+					if (len >= sizeof(buf)) {
+						break;
+					}
+					if (GET_ARCH_VNUM(arch) >= from_vnum && GET_ARCH_VNUM(arch) <= to_vnum) {
+						++count;
+						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_archetype(arch, show_details));
 					}
 				}
 				break;
@@ -1801,6 +1864,7 @@ OLC_MODULE(olc_removeindev) {
 	any_vnum from = NOTHING, to = NOTHING;
 	bool use_adv = FALSE, any = FALSE;
 	struct global_data *glb, *next_glb;
+	archetype_data *arch, *next_arch;
 	craft_data *craft, *next_craft;
 	augment_data *aug, *next_aug;
 	adv_data *adv = NULL;
@@ -1888,6 +1952,23 @@ OLC_MODULE(olc_removeindev) {
 			any = TRUE;
 		}
 		
+		HASH_ITER(hh, archetype_table, arch, next_arch) {
+			if (GET_ARCH_VNUM(arch) < from || GET_ARCH_VNUM(arch) > to) {
+				continue;
+			}
+			if (!ARCHETYPE_FLAGGED(arch, ARCH_IN_DEVELOPMENT)) {
+				continue;
+			}
+			if (!player_can_olc_edit(ch, OLC_ARCHETYPE, GET_ARCH_VNUM(arch))) {
+				continue;
+			}
+			
+			REMOVE_BIT(GET_ARCH_FLAGS(arch), ARCH_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_ARCH, GET_ARCH_VNUM(arch));
+			msg_to_char(ch, "Removed IN-DEV flag from archetype [%d] %s.\r\n", GET_ARCH_VNUM(arch), GET_ARCH_NAME(arch));
+			any = TRUE;
+		}
+		
 		HASH_ITER(hh, augment_table, aug, next_aug) {
 			if (GET_AUG_VNUM(aug) < from || GET_AUG_VNUM(aug) > to) {
 				continue;
@@ -1920,6 +2001,7 @@ OLC_MODULE(olc_removeindev) {
 
 OLC_MODULE(olc_save) {
 	void save_olc_adventure(descriptor_data *desc);
+	void save_olc_archetype(descriptor_data *desc);
 	void save_olc_augment(descriptor_data *desc);
 	void save_olc_book(descriptor_data *desc);
 	void save_olc_building(descriptor_data *desc);
@@ -1952,6 +2034,12 @@ OLC_MODULE(olc_save) {
 				save_olc_adventure(ch->desc);
 				free_adventure(GET_OLC_ADVENTURE(ch->desc));
 				GET_OLC_ADVENTURE(ch->desc) = NULL;
+				break;
+			}
+			case OLC_ARCHETYPE: {
+				save_olc_archetype(ch->desc);
+				free_archetype(GET_OLC_ARCHETYPE(ch->desc));
+				GET_OLC_ARCHETYPE(ch->desc) = NULL;
 				break;
 			}
 			case OLC_AUGMENT: {
@@ -2040,6 +2128,7 @@ OLC_MODULE(olc_save) {
 
 
 OLC_MODULE(olc_search) {
+	void olc_search_archetype(char_data *ch, any_vnum vnum);
 	void olc_search_augment(char_data *ch, any_vnum vnum);
 	void olc_search_building(char_data *ch, bld_vnum vnum);
 	void olc_search_craft(char_data *ch, craft_vnum vnum);
@@ -2064,6 +2153,10 @@ OLC_MODULE(olc_search) {
 	else {
 		// OLC_x:
 		switch (type) {
+			case OLC_ARCHETYPE: {
+				olc_search_archetype(ch, vnum);
+				break;
+			}
 			case OLC_AUGMENT: {
 				olc_search_augment(ch, vnum);
 				break;
@@ -2748,7 +2841,10 @@ bool player_can_olc_edit(char_data *ch, int type, any_vnum vnum) {
 	}
 	else if (OLC_FLAGGED(ch, OLC_FLAG_ALL_VNUMS) || (GET_OLC_MIN_VNUM(ch) <= vnum && GET_OLC_MAX_VNUM(ch) >= vnum)) {
 		// OLC_x: olc allows/disallows
-		if (IS_SET(type, OLC_AUGMENT) && !OLC_FLAGGED(ch, OLC_FLAG_NO_AUGMENT)) {
+		if (IS_SET(type, OLC_ARCHETYPE) && !OLC_FLAGGED(ch, OLC_FLAG_NO_ARCHETYPE)) {
+			return TRUE;
+		}
+		else if (IS_SET(type, OLC_AUGMENT) && !OLC_FLAGGED(ch, OLC_FLAG_NO_AUGMENT)) {
 			return TRUE;
 		}
 		else if (IS_SET(type, OLC_BUILDING) && !OLC_FLAGGED(ch, OLC_FLAG_NO_BUILDING)) {
@@ -3819,7 +3915,6 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 * @param struct resource_data **list A pointer to a resource list to modify.
 */
 void olc_process_resources(char_data *ch, char *argument, struct resource_data **list) {
-	augment_data *aug = GET_OLC_AUGMENT(ch->desc);
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], arg4[MAX_INPUT_LENGTH];
 	struct resource_data *res, *next_res, *prev_res, *prev_prev, *change, *temp;
 	obj_vnum vnum;
@@ -3836,8 +3931,8 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 			msg_to_char(ch, "Remove which resource (number)?\r\n");
 		}
 		else if (!str_cmp(arg2, "all")) {
-			free_resource_list(GET_AUG_RESOURCES(aug));
-			GET_AUG_RESOURCES(aug) = NULL;
+			free_resource_list(*list);
+			*list = NULL;
 			msg_to_char(ch, "All resources removed.\r\n");
 		}
 		else if (!isdigit(*arg2) || (num = atoi(arg2)) < 1) {

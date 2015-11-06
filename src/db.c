@@ -69,6 +69,10 @@ void save_daily_cycle();
 // adventures
 adv_data *adventure_table = NULL;	// adventure hash table
 
+// archetype
+archetype_data *archetype_table = NULL;	// master hash (hh)
+archetype_data *sorted_archetypes = NULL;	// sorted hash (sorted_hh)
+
 // augments
 augment_data *augment_table = NULL;	// master augment hash table
 augment_data *sorted_augments = NULL;	// alphabetic version // sorted_hh
@@ -193,6 +197,7 @@ struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES] = {
 	{ GLB_PREFIX, GLB_SUFFIX },	// DB_BOOT_GLB
 	{ ACCT_PREFIX, ACCT_SUFFIX },	// DB_BOOT_ACCT
 	{ AUG_PREFIX, AUG_SUFFIX },	// DB_BOOT_AUG
+	{ ARCH_PREFIX, ARCH_SUFFIX },	// DB_BOOT_ARCH
 };
 
 
@@ -398,6 +403,9 @@ void boot_world(void) {
 	
 	log("Loading adventures.");
 	index_boot(DB_BOOT_ADV);
+	
+	log("Loading archetypes.");
+	index_boot(DB_BOOT_ARCH);
 	
 	log("Loading augments.");
 	index_boot(DB_BOOT_AUG);
