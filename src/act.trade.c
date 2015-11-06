@@ -34,6 +34,7 @@
 */
 
 // external vars
+extern const struct augment_type_data augment_info[];
 
 // external functions
 ACMD(do_gen_craft);
@@ -678,7 +679,6 @@ bool validate_item_rename(char_data *ch, obj_data *obj, char *name) {
 ACMD(do_gen_augment) {
 	extern augment_data *find_augment_by_name(char_data *ch, char *name, int type);
 	extern char *shared_by(obj_data *obj, char_data *ch);
-	extern const struct augment_type_data augment_info[];
 	extern const double apply_values[];
 	
 	char buf[MAX_STRING_LENGTH], target_arg[MAX_INPUT_LENGTH], *augment_arg;
@@ -1094,7 +1094,7 @@ ACMD(do_recipes) {
 			if (uses_item) {
 				// need header?
 				if (GET_AUG_TYPE(aug) != last_type) {
-					msg_to_char(ch, "%s %s: ", found_type ? "\r\n" : "", augment_types[GET_AUG_TYPE(aug)]);
+					msg_to_char(ch, "%s %s: ", found_type ? "\r\n" : "", augment_info[GET_AUG_TYPE(aug)].verb);
 	
 					found_type = FALSE;
 					last_type = GET_AUG_TYPE(aug);
