@@ -850,22 +850,22 @@ void olc_show_archetype(char_data *ch) {
 	
 	*buf = '\0';
 	
-	sprintf(buf + strlen(buf), "[&c%d&0] &c%s&0\r\n", GET_OLC_VNUM(ch->desc), !archetype_proto(GET_ARCH_VNUM(arch)) ? "new archetype" : GET_ARCH_NAME(archetype_proto(GET_ARCH_VNUM(arch))));
-	sprintf(buf + strlen(buf), "<&yname&0> %s\r\n", NULLSAFE(GET_ARCH_NAME(arch)));
-	sprintf(buf + strlen(buf), "<&ydescription&0> %s\r\n", NULLSAFE(GET_ARCH_DESC(arch)));
+	sprintf(buf + strlen(buf), "[\tc%d\t0] \tc%s\t0\r\n", GET_OLC_VNUM(ch->desc), !archetype_proto(GET_ARCH_VNUM(arch)) ? "new archetype" : GET_ARCH_NAME(archetype_proto(GET_ARCH_VNUM(arch))));
+	sprintf(buf + strlen(buf), "<\tyname\t0> %s\r\n", NULLSAFE(GET_ARCH_NAME(arch)));
+	sprintf(buf + strlen(buf), "<\tydescription\t0> %s\r\n", NULLSAFE(GET_ARCH_DESC(arch)));
 	
 	sprintbit(GET_ARCH_FLAGS(arch), archetype_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<&yflags&0> %s\r\n", lbuf);
+	sprintf(buf + strlen(buf), "<\tyflags\t0> %s\r\n", lbuf);
 	
-	sprintf(buf + strlen(buf), "<&ymalerank&0> %s\r\n", NULLSAFE(GET_ARCH_MALE_RANK(arch)));
-	sprintf(buf + strlen(buf), "<&yfemalerank&0> %s\r\n", NULLSAFE(GET_ARCH_FEMALE_RANK(arch)));
+	sprintf(buf + strlen(buf), "<\tymalerank\t0> %s\r\n", NULLSAFE(GET_ARCH_MALE_RANK(arch)));
+	sprintf(buf + strlen(buf), "<\tyfemalerank\t0> %s\r\n", NULLSAFE(GET_ARCH_FEMALE_RANK(arch)));
 	
 	// attributes
 	total = 0;
 	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
 		total += GET_ARCH_ATTRIBUTE(arch, iter);
 	}
-	sprintf(buf + strlen(buf), "Attributes: <&yattribute&0> (%d total attributes)\r\n", total);
+	sprintf(buf + strlen(buf), "Attributes: <\tyattribute\t0> (%d total attributes)\r\n", total);
 	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
 		pos = attribute_display_order[iter];
 		sprintf(lbuf, "%s  [%2d]", attributes[pos].name, GET_ARCH_ATTRIBUTE(arch, pos));
@@ -880,13 +880,13 @@ void olc_show_archetype(char_data *ch) {
 	for (sk = GET_ARCH_SKILLS(arch); sk; sk = sk->next) {
 		total += sk->level;
 	}
-	sprintf(buf + strlen(buf), "Skills: <&yskills&0> (%d total skill points)\r\n", total);
+	sprintf(buf + strlen(buf), "Skills: <\tyskills\t0> (%d total skill points)\r\n", total);
 	for (sk = GET_ARCH_SKILLS(arch); sk; sk = sk->next) {
 		sprintf(buf + strlen(buf), "  %s: %d\r\n", skill_data[sk->skill].name, sk->level);
 	}
 	
 	// gear
-	sprintf(buf + strlen(buf), "Gear: <&ygear&0>\r\n");
+	sprintf(buf + strlen(buf), "Gear: <\tygear\t0>\r\n");
 	for (gear = GET_ARCH_GEAR(arch), num = 1; gear; gear = gear->next, ++num) {
 		sprintf(buf + strlen(buf), " %2d. %s: [%d] %s\r\n", num, gear->wear == -1 ? "inventory" : wear_data[gear->wear].name, gear->vnum, get_obj_name_by_proto(gear->vnum));
 	}

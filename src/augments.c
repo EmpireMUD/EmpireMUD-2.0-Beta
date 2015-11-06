@@ -760,7 +760,7 @@ void do_stat_augment(char_data *ch, augment_data *aug) {
 	size += snprintf(buf + size, sizeof(buf) - size, "Type: [\ty%s\t0], Requires Ability: [\ty%s\t0]\r\n", augment_types[GET_AUG_TYPE(aug)], part);
 	
 	if (GET_AUG_REQUIRES_OBJ(aug) != NOTHING) {
-		size += snprintf(buf + size, sizeof(buf) - size, "Requires item: [%d] &g%s&0\r\n", GET_AUG_REQUIRES_OBJ(aug), skip_filler(get_obj_name_by_proto(GET_AUG_REQUIRES_OBJ(aug))));
+		size += snprintf(buf + size, sizeof(buf) - size, "Requires item: [%d] \tg%s\t0\r\n", GET_AUG_REQUIRES_OBJ(aug), skip_filler(get_obj_name_by_proto(GET_AUG_REQUIRES_OBJ(aug))));
 	}
 	
 	sprintbit(GET_AUG_FLAGS(aug), augment_flags, part, TRUE);
@@ -805,16 +805,16 @@ void olc_show_augment(char_data *ch) {
 	
 	*buf = '\0';
 	
-	sprintf(buf + strlen(buf), "[&c%d&0] &c%s&0\r\n", GET_OLC_VNUM(ch->desc), !augment_proto(GET_AUG_VNUM(aug)) ? "new augment" : GET_AUG_NAME(augment_proto(GET_AUG_VNUM(aug))));
-	sprintf(buf + strlen(buf), "<&yname&0> %s\r\n", NULLSAFE(GET_AUG_NAME(aug)));
+	sprintf(buf + strlen(buf), "[\tc%d\t0] \tc%s\t0\r\n", GET_OLC_VNUM(ch->desc), !augment_proto(GET_AUG_VNUM(aug)) ? "new augment" : GET_AUG_NAME(augment_proto(GET_AUG_VNUM(aug))));
+	sprintf(buf + strlen(buf), "<\tyname\t0> %s\r\n", NULLSAFE(GET_AUG_NAME(aug)));
 	
-	sprintf(buf + strlen(buf), "<&ytype&0> %s\r\n", augment_types[GET_AUG_TYPE(aug)]);
+	sprintf(buf + strlen(buf), "<\tytype\t0> %s\r\n", augment_types[GET_AUG_TYPE(aug)]);
 
 	sprintbit(GET_AUG_FLAGS(aug), augment_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<&yflags&0> %s\r\n", lbuf);
+	sprintf(buf + strlen(buf), "<\tyflags\t0> %s\r\n", lbuf);
 	
 	sprintbit(GET_AUG_WEAR_FLAGS(aug), wear_bits, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<&ywear&0> %s\r\n", lbuf);
+	sprintf(buf + strlen(buf), "<\tywear\t0> %s\r\n", lbuf);
 	
 	// ability required
 	if (GET_AUG_ABILITY(aug) == NO_ABIL) {
@@ -826,12 +826,12 @@ void olc_show_augment(char_data *ch) {
 			sprintf(buf1 + strlen(buf1), " (%s %d)", skill_data[ability_data[GET_AUG_ABILITY(aug)].parent_skill].name, ability_data[GET_AUG_ABILITY(aug)].parent_skill_required);
 		}
 	}
-	sprintf(buf + strlen(buf), "<&yability&0> %s\r\n", buf1);
+	sprintf(buf + strlen(buf), "<\tyability\t0> %s\r\n", buf1);
 
-	sprintf(buf + strlen(buf), "<&yrequiresobject&0> %d - %s\r\n", GET_AUG_REQUIRES_OBJ(aug), GET_AUG_REQUIRES_OBJ(aug) == NOTHING ? "none" : get_obj_name_by_proto(GET_AUG_REQUIRES_OBJ(aug)));
+	sprintf(buf + strlen(buf), "<\tyrequiresobject\t0> %d - %s\r\n", GET_AUG_REQUIRES_OBJ(aug), GET_AUG_REQUIRES_OBJ(aug) == NOTHING ? "none" : get_obj_name_by_proto(GET_AUG_REQUIRES_OBJ(aug)));
 	
 	// applies
-	sprintf(buf + strlen(buf), "Attribute applies: <&yapply&0>\r\n");
+	sprintf(buf + strlen(buf), "Attribute applies: <\tyapply\t0>\r\n");
 	for (app = GET_AUG_APPLIES(aug), num = 1; app; app = app->next, ++num) {
 		sprintf(buf + strlen(buf), " %2d. %d to %s\r\n", num, app->weight, apply_types[app->location]);
 	}
@@ -840,7 +840,7 @@ void olc_show_augment(char_data *ch) {
 	}
 	
 	// resources
-	sprintf(buf + strlen(buf), "Resources required: <&yresource&0>\r\n");
+	sprintf(buf + strlen(buf), "Resources required: <\tyresource\t0>\r\n");
 	get_resource_display(GET_AUG_RESOURCES(aug), lbuf);
 	strcat(buf, lbuf);
 	
