@@ -699,7 +699,7 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 	extern bool can_build_on(room_data *room, bitvector_t flags);
 	
 	room_template *start_room = room_template_proto(GET_ADV_START_VNUM(adv));
-	room_data *room, *loc, *shift, *found = NULL;
+	room_data *room, *next_room, *loc, *shift, *found = NULL;
 	int dir, iter, sub, num_found, pos;
 	sector_data *findsect = NULL;
 	bool match_buildon = FALSE;
@@ -744,46 +744,45 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 	}
 	
 	// two ways of doing this:
-	if (!match_buildon) {
-		// scan the whole world world
-		if (findsect || findbdg) {
-			num_found = 0;
-			for (map = land_map; map; map = map->next) {
-				room = NULL;
-				
-				// looking for sect: fail
-				if (findsect && map->sector_type != findsect) {
-					continue;
-				}
-				// looking for bdg: fail
-				if (findbdg) {
-					if (!(room = real_real_room(map->vnum))) {
-						continue;
-					}
-					if (BUILDING_VNUM(room) != GET_BLD_VNUM(findbdg) || !IS_COMPLETE(room)) {
-						continue;
-					}
-				}
-				
-				// primary attributes check
-				if (!validate_one_loc(adv, rule, NULL, map)) {
-					continue;
-				}
+	if (findsect) {	// scan the whole map
+		num_found = 0;
+		for (map = land_map; map; map = map->next) {
+			// looking for sect: fail
+			if (findsect && map->sector_type != findsect) {
+				continue;
+			}
 			
-				// check secondary limits
-				if (!validate_linking_limits(adv, NULL, map)) {
-					continue;
-				}
-				
-				// SUCCESS: mark it ok
-				if (!number(0, num_found++) || !found) {
-					// may already have looked up room
-					found = room ? room : real_room(map->vnum);
-				}
+			// attributes/limits checks
+			if (!validate_one_loc(adv, rule, NULL, map) || !validate_linking_limits(adv, NULL, map)) {
+				continue;
+			}
+			
+			// SUCCESS: mark it ok
+			if (!number(0, num_found++) || !found) {
+				// may already have looked up room
+				found = real_room(map->vnum);
 			}
 		}
 	}
-	else {
+	else if (findbdg) {	// check live rooms for matching building
+		num_found = 0;
+		HASH_ITER(hh, world_table, room, next_room) {
+			if (BUILDING_VNUM(room) != GET_BLD_VNUM(findbdg) || !IS_COMPLETE(room)) {
+				continue;
+			}
+			
+			// attributes/limits checks
+			if (!validate_one_loc(adv, rule, room, NULL) || !validate_linking_limits(adv, room, NULL)) {
+				continue;
+			}
+			
+			// SUCCESS: mark it ok
+			if (!number(0, num_found++) || !found) {
+				found = room;
+			}
+		}
+	}
+	else if (match_buildon) {
 		// try to match a build rule
 		for (iter = 0; iter < max_tries && !found; ++iter) {
 			// random location:
