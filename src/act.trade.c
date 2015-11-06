@@ -41,6 +41,7 @@ extern double get_enchant_scale_for_char(char_data *ch, int max_scale);
 extern bool has_cooking_fire(char_data *ch);
 extern obj_data *has_sharp_tool(char_data *ch);
 void scale_item_to_level(obj_data *obj, int level);
+extern bool validate_augment_target(char_data *ch, obj_data *obj, augment_data *aug, bool send_messages);
 
 // locals
 bool can_refashion(char_data *ch);
@@ -134,6 +135,56 @@ obj_data *has_hammer(char_data *ch) {
 	// nope
 	msg_to_char(ch, "You need to use a hammer to do that.\r\n");
 	return NULL;
+}
+
+
+/**
+* Shows a character which augments are available. If a matching_obj is given,
+* only lists augments that can be applied to that item.
+*
+* @param char_data *ch The person to list to (whose abilities will be checked).
+* @param int type AUGMENT_x type.
+* @param obj_data *matching_obj Optional: Only show augments that work on this item (or NULL).
+*/
+void list_available_augments(char_data *ch, int type, obj_data *matching_obj) {
+	char buf[MAX_STRING_LENGTH];
+	augment_data *aug, *next_aug;
+	bool found, line;
+	
+	*buf = '\0';
+	line = found = FALSE;
+	HASH_ITER(sorted_hh, sorted_augments, aug, next_aug) {
+		if (GET_AUG_TYPE(aug) != type || AUGMENT_FLAGGED(aug, AUG_IN_DEVELOPMENT)) {
+			continue;
+		}
+		if (GET_AUG_ABILITY(aug) != NO_ABIL && !HAS_ABILITY(ch, GET_AUG_ABILITY(aug))) {
+			continue;
+		}
+		if (GET_AUG_REQUIRES_OBJ(aug) != NOTHING && !get_obj_in_list_vnum(GET_AUG_REQUIRES_OBJ(aug), ch->carrying)) {
+			continue;
+		}
+		if (matching_obj && !validate_augment_target(ch, matching_obj, aug, FALSE)) {
+			continue;
+		}
+		
+		// send last line?
+		if ((strlen(buf) + strlen(GET_AUG_NAME(aug)) + 2) >= 80) {
+			msg_to_char(ch, "%s\r\n", buf);
+			line = FALSE;
+			*buf = '\0';
+		}
+		
+		// add this entry to line
+		sprintf(buf + strlen(buf), "%s%s", (line ? ", " : " "), GET_AUG_NAME(aug));
+		line = found = TRUE;
+	}
+	
+	if (line) {
+		msg_to_char(ch, "%s\r\n", buf);
+	}
+	if (!found) {
+		msg_to_char(ch, "  nothing\r\n");
+	}
 }
 
 
@@ -626,7 +677,6 @@ bool validate_item_rename(char_data *ch, obj_data *obj, char *name) {
 // subcmd is AUGMENT_x
 ACMD(do_gen_augment) {
 	extern augment_data *find_augment_by_name(char_data *ch, char *name, int type);
-	extern bool validate_augment_target(char_data *ch, obj_data *obj, augment_data *aug);
 	extern char *shared_by(obj_data *obj, char_data *ch);
 	extern const struct augment_type_data augment_info[];
 	extern const double apply_values[];
@@ -635,10 +685,9 @@ ACMD(do_gen_augment) {
 	double points_available, remaining, share;
 	struct obj_apply *apply, *last_apply;
 	int scale, total_weight, value;
-	augment_data *aug, *next_aug;
 	struct augment_apply *app;
+	augment_data *aug;
 	obj_data *obj;
-	bool found, line;
 	
 	augment_arg = one_argument(argument, target_arg);
 	
@@ -646,44 +695,16 @@ ACMD(do_gen_augment) {
 		// TODO should we allow this for scripting?
 		msg_to_char(ch, "NPCs can't augment items.\r\n");
 	}
-	else if (!*target_arg || !*augment_arg) {
+	else if (!*target_arg) {
 		msg_to_char(ch, "Usage: %s <item> <type>\r\nYou know how to %s:\r\n", augment_info[subcmd].verb, augment_info[subcmd].verb);
-		
-		*buf = '\0';
-		line = found = FALSE;
-		HASH_ITER(sorted_hh, sorted_augments, aug, next_aug) {
-			if (GET_AUG_TYPE(aug) != subcmd || AUGMENT_FLAGGED(aug, AUG_IN_DEVELOPMENT)) {
-				continue;
-			}
-			if (GET_AUG_ABILITY(aug) != NO_ABIL && !HAS_ABILITY(ch, GET_AUG_ABILITY(aug))) {
-				continue;
-			}
-			if (GET_AUG_REQUIRES_OBJ(aug) != NOTHING && !get_obj_in_list_vnum(GET_AUG_REQUIRES_OBJ(aug), ch->carrying)) {
-				continue;
-			}
-			
-			// send last line?
-			if ((strlen(buf) + strlen(GET_AUG_NAME(aug)) + 2) >= 80) {
-				msg_to_char(ch, "%s\r\n", buf);
-				line = FALSE;
-				*buf = '\0';
-			}
-			
-			// add this entry to line
-			sprintf(buf + strlen(buf), "%s%s", (line ? ", " : " "), GET_AUG_NAME(aug));
-			line = found = TRUE;
-		}
-		
-		if (line) {
-			msg_to_char(ch, "%s\r\n", buf);
-		}
-		if (!found) {
-			msg_to_char(ch, "  nothing\r\n");
-		}
-		// end no-args
+		list_available_augments(ch, subcmd, NULL);
 	}
 	else if (!(obj = get_obj_in_list_vis(ch, target_arg, ch->carrying)) && !(obj = get_obj_by_char_share(ch, target_arg))) {
 		msg_to_char(ch, "You don't seem to have any %s.\r\n", target_arg);
+	}
+	else if (!*augment_arg) {
+		msg_to_char(ch, "You can %s %s with:\r\n", augment_info[subcmd].verb, GET_OBJ_SHORT_DESC(obj));
+		list_available_augments(ch, subcmd, obj);
 	}
 	else if (!(aug = find_augment_by_name(ch, augment_arg, subcmd))) {
 		msg_to_char(ch, "You don't know that %s.\r\n", augment_info[subcmd].noun);
@@ -702,7 +723,7 @@ ACMD(do_gen_augment) {
 	else if (obj_has_apply_type(obj, augment_info[subcmd].apply_type)) {
 		msg_to_char(ch, "That item already has a %s effect.\r\n", augment_info[subcmd].noun);
 	}
-	else if (!validate_augment_target(ch, obj, aug)) {
+	else if (!validate_augment_target(ch, obj, aug, TRUE)) {
 		// sends own message
 	}
 	else if (!has_resources(ch, GET_AUG_RESOURCES(aug), FALSE, TRUE)) {
