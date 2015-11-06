@@ -756,8 +756,13 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 					continue;
 				}
 				// looking for bdg: fail
-				if (findbdg && (room = real_real_room(map->vnum)) && (BUILDING_VNUM(room) != GET_BLD_VNUM(findbdg) || !IS_COMPLETE(room))) {
-					continue;
+				if (findbdg) {
+					if (!(room = real_real_room(map->vnum))) {
+						continue;
+					}
+					if (BUILDING_VNUM(room) != GET_BLD_VNUM(findbdg) || !IS_COMPLETE(room)) {
+						continue;
+					}
 				}
 				
 				// primary attributes check
