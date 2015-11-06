@@ -6313,8 +6313,6 @@ ACMD(do_users) {
 
 
 ACMD(do_vnum) {
-	extern int vnum_augment(char *searchname, char_data *ch);
-
 	char buf[MAX_INPUT_LENGTH], buf2[MAX_INPUT_LENGTH];
 	
 	half_chop(argument, buf, buf2);
@@ -6342,7 +6340,14 @@ ACMD(do_vnum) {
 			msg_to_char(ch, "No adventures by that name.\r\n");
 		}
 	}
+	else if (is_abbrev(buf, "archetype")) {
+		extern int vnum_archetype(char *searchname, char_data *ch);
+		if (!vnum_archetype(buf2, ch)) {
+			msg_to_char(ch, "No archetypes by that name.\r\n");
+		}
+	}
 	else if (is_abbrev(buf, "augment")) {
+		extern int vnum_augment(char *searchname, char_data *ch);
 		if (!vnum_augment(buf2, ch)) {
 			msg_to_char(ch, "No augments by that name.\r\n");
 		}
@@ -6411,6 +6416,15 @@ ACMD(do_vstat) {
 			return;
 		}
 		do_stat_adventure(ch, adv);
+	}
+	else if (is_abbrev(buf, "archetype")) {
+		void do_stat_archetype(char_data *ch, archetype_data *arcg);
+		archetype_data *arch = archetype_proto(number);
+		if (!arch) {
+			msg_to_char(ch, "There is no archetype with that number.\r\n");
+			return;
+		}
+		do_stat_archetype(ch, arch);
 	}
 	else if (is_abbrev(buf, "augment")) {
 		void do_stat_augment(char_data *ch, augment_data *aug);
