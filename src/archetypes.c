@@ -839,7 +839,7 @@ void parse_archetype_menu(descriptor_data *desc, char *argument) {
 	
 	// still here? add a prompt
 	if (STATE(desc) == CON_Q_ARCHETYPE) {
-		msg_to_desc(desc, "Type an info, list, or an archetype name > ");
+		msg_to_desc(desc, "\r\nType a \tcinfo\t0, \tclist\t0, or an archetype name > ");
 	}
 }
 
