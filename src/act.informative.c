@@ -344,13 +344,26 @@ void diag_char_to_char(char_data *i, char_data *ch) {
 * @param char_data *to The person to show them to.
 */
 void display_attributes(char_data *ch, char_data *to) {
+	extern struct attribute_data_type attributes[NUM_ATTRIBUTES];
+	extern int attribute_display_order[NUM_ATTRIBUTES];
+	
+	char buf[MAX_STRING_LENGTH];
+	int iter, pos;
+
 	if (!ch || !to || !to->desc) {
 		return;
 	}
 	
 	msg_to_char(to, "        Physical                   Social                      Mental\r\n");
-	msg_to_char(to, "  Strength  [%s%2d&0]           Charisma  [%s%2d&0]           Intelligence  [%s%2d&0]\r\n", HAPPY_COLOR(GET_STRENGTH(ch), ch->real_attributes[STRENGTH]), GET_STRENGTH(ch), HAPPY_COLOR(GET_CHARISMA(ch), ch->real_attributes[CHARISMA]), GET_CHARISMA(ch), HAPPY_COLOR(GET_INTELLIGENCE(ch), ch->real_attributes[INTELLIGENCE]), GET_INTELLIGENCE(ch));
-	msg_to_char(to, "  Dexterity  [%s%2d&0]          Greatness  [%s%2d&0]          Wits  [%s%2d&0]\r\n", HAPPY_COLOR(GET_DEXTERITY(ch), ch->real_attributes[DEXTERITY]), GET_DEXTERITY(ch), HAPPY_COLOR(GET_GREATNESS(ch), ch->real_attributes[GREATNESS]), GET_GREATNESS(ch), HAPPY_COLOR(GET_WITS(ch), ch->real_attributes[WITS]), GET_WITS(ch));
+	
+	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
+		pos = attribute_display_order[iter];
+		snprintf(buf, sizeof(buf), "%s  [%s%2d\t0]", attributes[pos].name, HAPPY_COLOR(GET_ATT(ch, pos), GET_REAL_ATT(ch, pos)), GET_ATT(ch, pos));
+		msg_to_char(ch, "  %-*.*s%s", 27 + color_code_length(buf), 27 + color_code_length(buf), buf, !((iter + 1) % 3) ? "\r\n" : "");
+	}
+	if (iter % 3) {
+		msg_to_char(ch, "\r\n");
+	}
 }
 
 

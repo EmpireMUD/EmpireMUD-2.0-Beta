@@ -2460,6 +2460,61 @@ char *CAP(char *txt) {
 
 
 /**
+* Counts the number of chars in a string that are color codes and will be
+* invisible to the player.
+*
+* @param const char *str The string to count.
+* @return int The length of color codes.
+*/
+int color_code_length(const char *str) {
+	const char *ptr;
+	int len = 0;
+	
+	for (ptr = str; *ptr; ++ptr) {
+		if (*ptr == '\t') {
+			if (*(ptr+1) == '\t' || *(ptr+1) == COLOUR_CHAR) {	// && = &
+				++ptr;
+				++len;	// only 1 char counts as a color code
+			}
+			else if (*(ptr+1) == '[') {
+				if (*(ptr+2) != 'U') {
+					++len;	// we skip 1 len if there is a U because 1 char will be visible
+				}
+				for (++ptr; *ptr != ']'; ++ptr) {	// count chars in *[..]
+					++len;
+				}
+			}
+			else {	// assume 2-wide color char
+				++ptr;
+				len += 2;
+			}
+		}
+		else if (*ptr == COLOUR_CHAR) {
+			if (*(ptr+1) == COLOUR_CHAR) {	// && = &
+				++ptr;
+				++len;	// only 1 char counts as a color code, the other is removed
+			}
+			else if (*(ptr+1) == '[' && config_get_bool("allow_extended_color_codes")) {
+				if (*(ptr+2) != 'U') {
+					++len;	// we skip 1 len if there is a U because 1 char will be visible
+				}
+				for (++ptr; *ptr != ']'; ++ptr) {	// count chars in &[..]
+					++len;
+				}
+			}
+			else {	// assume 2-wide color char
+				++ptr;
+				len += 2;
+			}
+		}
+		// else not a color code
+	}
+	
+	return len;
+}
+
+
+/**
 * @param char *string String to count color codes in
 * @return int the number of &0-style color codes in the string
 */

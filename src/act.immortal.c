@@ -301,6 +301,7 @@ ADMIN_UTIL(util_islandsize);
 ADMIN_UTIL(util_playerdump);
 ADMIN_UTIL(util_randtest);
 ADMIN_UTIL(util_redo_islands);
+ADMIN_UTIL(util_strlen);
 ADMIN_UTIL(util_tool);
 
 
@@ -315,6 +316,7 @@ struct {
 	{ "playerdump", LVL_IMPL, util_playerdump },
 	{ "randtest", LVL_CIMPL, util_randtest },
 	{ "redoislands", LVL_CIMPL, util_redo_islands },
+	{ "strlen", LVL_START_IMM, util_strlen },
 	{ "tool", LVL_IMPL, util_tool },
 
 	// last
@@ -553,6 +555,16 @@ ADMIN_UTIL(util_redo_islands) {
 		number_and_count_islands(TRUE);
 		msg_to_char(ch, "Islands renumbered. Caution: empire inventories may now be in the wrong place.\r\n");
 	}
+}
+
+
+ADMIN_UTIL(util_strlen) {
+	msg_to_char(ch, "String: %s\r\n", argument);
+	msg_to_char(ch, "Raw: %s\r\n", show_color_codes(argument));
+	msg_to_char(ch, "strlen: %d\r\n", (int)strlen(argument));
+	msg_to_char(ch, "color_strlen: %d\r\n", (int)color_strlen(argument));
+	msg_to_char(ch, "color_code_length: %d\r\n", color_code_length(argument));
+	msg_to_char(ch, "count_color_codes: %d\r\n", count_color_codes(argument));
 }
 
 

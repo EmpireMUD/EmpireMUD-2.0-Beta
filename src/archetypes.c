@@ -701,14 +701,14 @@ void display_archetype_info(descriptor_data *desc, archetype_data *arch) {
 	int iter;
 	
 	msg_to_desc(desc, "\r\n");
-	msg_to_desc(desc, "\tc%s\t0 - %s\r\n", GET_ARCH_NAME(arch), GET_ARCH_DESC(arch));
+	msg_to_desc(desc, "[\tc%s\t0] - %s\r\n", GET_ARCH_NAME(arch), GET_ARCH_DESC(arch));
 	
-	msg_to_desc(desc, "Attributes:\r\n");
+	msg_to_desc(desc, "\tyAttributes\ty:\r\n");
 	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
 		msg_to_desc(desc, " %s: \tg%d\t0 (%s)\r\n", attributes[iter].name, GET_ARCH_ATTRIBUTE(arch, iter), attributes[iter].creation_description);
 	}
 	
-	msg_to_desc(desc, "Skills:\r\n");
+	msg_to_desc(desc, "\tySkills\ty:\r\n");
 	for (sk = GET_ARCH_SKILLS(arch); sk; sk = sk->next) {
 		msg_to_desc(desc, " %s: \tg%d\t0 (%s)\r\n", skill_data[sk->skill].name, sk->level, skill_data[sk->skill].description);
 	}
@@ -784,7 +784,7 @@ void display_archetype_list(descriptor_data *desc, char *argument) {
 void display_archetype_menu(descriptor_data *desc) {
 	msg_to_desc(desc, "Choose your background (type its name), 'info <name>' for more information,\r\n");
 	msg_to_desc(desc, "or type 'list' for more options\r\n");
-	msg_to_desc(desc, "\ty[ HINT: These are only your starting traits; you can still learn any skill ]\t0");	// no crlf
+	msg_to_desc(desc, "\ty[ HINT: These are only your starting traits; you can still learn any skill ]\t0\r\n");
 	
 	display_archetype_list(desc, "basic");
 }
