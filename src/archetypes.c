@@ -701,16 +701,16 @@ void display_archetype_info(descriptor_data *desc, archetype_data *arch) {
 	int iter;
 	
 	msg_to_desc(desc, "\r\n");
-	msg_to_desc(desc, "%s - %s\r\n", GET_ARCH_NAME(arch), GET_ARCH_DESC(arch));
+	msg_to_desc(desc, "\tc%s\t0 - %s\r\n", GET_ARCH_NAME(arch), GET_ARCH_DESC(arch));
 	
 	msg_to_desc(desc, "Attributes:\r\n");
 	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
-		msg_to_desc(desc, " %s: %d (%s)\r\n", attributes[iter].name, GET_ARCH_ATTRIBUTE(arch, iter), attributes[iter].creation_description);
+		msg_to_desc(desc, " %s: \tg%d\t0 (%s)\r\n", attributes[iter].name, GET_ARCH_ATTRIBUTE(arch, iter), attributes[iter].creation_description);
 	}
 	
 	msg_to_desc(desc, "Skills:\r\n");
 	for (sk = GET_ARCH_SKILLS(arch); sk; sk = sk->next) {
-		msg_to_desc(desc, " %s: %d (%s)\r\n", skill_data[sk->skill].name, sk->level, skill_data[sk->skill].description);
+		msg_to_desc(desc, " %s: \tg%d\t0 (%s)\r\n", skill_data[sk->skill].name, sk->level, skill_data[sk->skill].description);
 	}
 }
 
@@ -730,7 +730,7 @@ void display_archetype_list(descriptor_data *desc, char *argument) {
 	size_t size;
 	
 	if (!*argument) {
-		msg_to_desc(desc, "\r\nUsage: list <all | basic | keywords>\r\n");
+		msg_to_desc(desc, "Usage: list <all | basic | keywords>\r\n");
 		return;
 	}
 	else if (!str_cmp(argument, "basic")) {
@@ -740,7 +740,8 @@ void display_archetype_list(descriptor_data *desc, char *argument) {
 		all = TRUE;
 	}
 	
-	size = snprintf(buf, sizeof(buf), "\r\n");
+	size = 0;
+	*buf = '\0';
 	
 	HASH_ITER(sorted_hh, sorted_archetypes, arch, next_arch) {
 		if (basic && !ARCHETYPE_FLAGGED(arch, ARCH_BASIC)) {
@@ -783,7 +784,7 @@ void display_archetype_list(descriptor_data *desc, char *argument) {
 void display_archetype_menu(descriptor_data *desc) {
 	msg_to_desc(desc, "Choose your background (type its name), 'info <name>' for more information,\r\n");
 	msg_to_desc(desc, "or type 'list' for more options\r\n");
-	msg_to_desc(desc, "\tc[ HINT: These are only your starting traits; you can still learn any skill ]\t0");	// no crlf
+	msg_to_desc(desc, "\ty[ HINT: These are only your starting traits; you can still learn any skill ]\t0");	// no crlf
 	
 	display_archetype_list(desc, "basic");
 }
