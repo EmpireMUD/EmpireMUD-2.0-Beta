@@ -705,7 +705,7 @@ void display_archetype_info(descriptor_data *desc, archetype_data *arch) {
 	
 	msg_to_desc(desc, "\tyAttributes\t0:\r\n");
 	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
-		msg_to_desc(desc, " %s: \tg%d\t0 (%s)\r\n", attributes[iter].name, GET_ARCH_ATTRIBUTE(arch, iter), attributes[iter].creation_description);
+		msg_to_desc(desc, " %s: %s%d\t0 (%s)\r\n", attributes[iter].name, HAPPY_COLOR(GET_ARCH_ATTRIBUTE(arch, iter), 2), GET_ARCH_ATTRIBUTE(arch, iter), attributes[iter].creation_description);
 	}
 	
 	msg_to_desc(desc, "\tySkills\t0:\r\n");
