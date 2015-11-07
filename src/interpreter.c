@@ -37,6 +37,7 @@
 */
 
 // external funcs
+void parse_archetype_menu(descriptor_data *desc, char *argument);
 
 // locals
 void set_creation_state(descriptor_data *d, int state);
@@ -1547,10 +1548,6 @@ struct {
 * @param descriptor_data *d the user
 */
 void prompt_creation(descriptor_data *d) {
-	extern const struct archetype_type archetype[];
-	
-	int iter;
-	
 	switch (STATE(d)) {
 		case CON_Q_SCREEN_READER: {
 			SEND_TO_Q("\r\nEmpireMUD makes heavy use of an ascii map, but also supports screen\r\n", d);
@@ -1608,14 +1605,7 @@ void prompt_creation(descriptor_data *d) {
 			break;
 		}
 		case CON_Q_ARCHETYPE: {
-			SEND_TO_Q("\r\nChoose your character background:\r\n", d);
-			for (iter = 1; str_cmp(archetype[iter].name, "\n"); iter++) {
-				sprintf(buf, " %2d. %s - %s\r\n", iter, archetype[iter].name, archetype[iter].description);
-				SEND_TO_Q(buf, d);
-			}
-			SEND_TO_Q("\r\n", d);
-			SEND_TO_Q("&c[ HINT: These are only your starting traits; you can still learn any skill ]&0\r\n", d);
-			SEND_TO_Q("Choose a number or type 'help <number>' for info > ", d);
+			parse_archetype_menu(d, "");
 			break;
 		}
 		case CON_PROMO_CODE: {
@@ -1640,48 +1630,6 @@ void prompt_creation(descriptor_data *d) {
 			break;
 		}
 	}
-}
-
-
-/**
-* Shows archetype detail to the player. This leaves them with an "ENTER to
-* list choices again".
-*
-* @param descriptor_data *d the player who is at character creation
-* @param int type Any archetype number
-*/
-void display_archetype_help(descriptor_data *d, int type) {
-	extern const struct archetype_type archetype[];
-	extern const struct attribute_data_type attributes[NUM_ATTRIBUTES];
-	
-	char lbuf[MAX_STRING_LENGTH];
-	int iter;
-	
-	SEND_TO_Q("\r\n", d);
-	msg_to_desc(d, "\r\nMore information on &c%s&0:\r\n", archetype[type].name);
-
-	if (archetype[type].primary_skill != NO_SKILL) {
-		msg_to_desc(d, "* %s\r\n", skill_data[archetype[type].primary_skill].creation_description);
-	}
-	if (archetype[type].secondary_skill != NO_SKILL) {
-		msg_to_desc(d, "* %s\r\n", skill_data[archetype[type].secondary_skill].creation_description);
-	}
-	
-	*lbuf = '\0';
-	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
-		// save all attributes for later
-		sprintf(lbuf + strlen(lbuf), "%s%s %d", (*lbuf ? ", " : ""), attributes[iter].name, archetype[type].attributes[iter]);
-		
-		// highlight high attributes
-		if (archetype[type].attributes[iter] >= 3) {
-			msg_to_desc(d, "* %s\r\n", attributes[iter].creation_description);
-		}
-	}
-	
-	msg_to_desc(d, "Attributes: %s\r\n", lbuf);
-	
-	msg_to_desc(d, "\r\n(Remember these are just starting traits and you can learn any skill later)\r\n");
-	msg_to_desc(d, "Press ENTER to list the choices again: ");
 }
 
 
@@ -2103,15 +2051,14 @@ void nanny(descriptor_data *d, char *arg) {
 	void start_new_character(char_data *ch);
 	extern int Valid_Name(char *newname);
 	
-	extern const struct archetype_type archetype[];
 	extern struct promo_code_list promo_codes[];
 	extern char *START_MESSG;
 	extern int wizlock_level;
 	extern char *wizlock_message;
 
 	char buf[MAX_STRING_LENGTH], tmp_name[MAX_INPUT_LENGTH];
-	int load_result, i, j, iter;
-	bool help, show_start = FALSE;
+	int load_result, i, iter;
+	bool show_start = FALSE;
 	char_data *temp_char;
 
 	skip_spaces(&arg);
@@ -2470,37 +2417,7 @@ void nanny(descriptor_data *d, char *arg) {
 		}
 
 		case CON_Q_ARCHETYPE: {
-			if (!*arg) {
-				// just re-show
-				prompt_creation(d);
-				return;
-			}
-			else if (!strn_cmp(arg, "help ", 5)) {
-				help = TRUE;
-				arg += 5;
-			}
-			else {
-				help = FALSE;
-			}
-			
-			i = atoi(arg);
-
-			/* Determine top choice # */
-			for (j = 1; str_cmp(archetype[j].name, "\n"); j++);
-
-			if (i < 1 || i >= j) {
-				SEND_TO_Q("\r\nInvalid choice.\r\n> ", d);
-				return;
-			}
-			
-			if (help) {
-				display_archetype_help(d, i);
-			}
-			else {
-				CREATION_ARCHETYPE(d->character) = i;
-				SET_BIT(PLR_FLAGS(d->character), PLR_NEEDS_NEWBIE_SETUP);
-				next_creation_step(d);
-			}
+			parse_archetype_menu(d, arg);
 			break;
 		}
 		

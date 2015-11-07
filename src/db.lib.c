@@ -1146,8 +1146,8 @@ void remove_empire_from_table(empire_data *emp) {
 empire_data *create_empire(char_data *ch) {
 	void add_empire_to_table(empire_data *emp);
 	void resort_empires();
-	extern const struct archetype_type archetype[];
 
+	archetype_data *arch;
 	char colorcode[10];
 	empire_vnum vnum;
 	empire_data *emp;
@@ -1186,9 +1186,13 @@ empire_data *create_empire(char_data *ch) {
 	}
 	
 	// rank setup
+	arch = archetype_proto(CREATION_ARCHETYPE(ch));
+	if (!arch) {
+		arch = archetype_proto(0);	// default to 0
+	}
 	EMPIRE_NUM_RANKS(emp) = 2;
 	EMPIRE_RANK(emp, 0) = str_dup("Follower");
-	EMPIRE_RANK(emp, 1) = str_dup(archetype[CREATION_ARCHETYPE(ch)].starting_rank[(int) GET_REAL_SEX(ch)]);
+	EMPIRE_RANK(emp, 1) = str_dup(arch ? (GET_REAL_SEX(ch) == SEX_FEMALE ? GET_ARCH_FEMALE_RANK(arch) : GET_ARCH_MALE_RANK(arch)) : "Leader");
 	for (iter = 0; iter < NUM_PRIVILEGES; ++iter) {
 		EMPIRE_PRIV(emp, iter) = 2;
 	}

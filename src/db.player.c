@@ -3132,7 +3132,6 @@ void set_title(char_data *ch, char *title) {
 */
 void start_new_character(char_data *ch) {
 	void apply_bonus_trait(char_data *ch, bitvector_t trait, bool add);
-	extern const struct archetype_type archetype[];
 	void make_vampire(char_data *ch, bool lore);
 	void scale_item_to_level(obj_data *obj, int level);
 	void set_skill(char_data *ch, int skill, int level);
@@ -3140,10 +3139,14 @@ void start_new_character(char_data *ch) {
 	extern bool global_mute_slash_channel_joins;
 	extern struct promo_code_list promo_codes[];
 	extern int tips_of_the_day_size;
+	extern const struct wear_data_type wear_data[NUM_WEARS];
 	
 	char lbuf[MAX_INPUT_LENGTH];
-	int type, iter;
+	struct archetype_gear *gear;
+	struct archetype_skill *sk;
+	archetype_data *arch;
 	obj_data *obj;
+	int iter, pos;
 	
 	// announce to existing players that we have a newbie
 	mortlog("%s has joined the game", PERS(ch, ch, TRUE));
@@ -3207,47 +3210,46 @@ void start_new_character(char_data *ch) {
 	}
 	global_mute_slash_channel_joins = FALSE;
 
-	/* Give EQ, if applicable */
-	if (CREATION_ARCHETYPE(ch) != 0) {
-		type = CREATION_ARCHETYPE(ch);
-		
+	// archetype setup
+	if ((arch = archetype_proto(CREATION_ARCHETYPE(ch))) || (arch = archetype_proto(0))) {
 		// attributes
 		for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
-			ch->real_attributes[iter] = archetype[type].attributes[iter];
+			ch->real_attributes[iter] = GET_ARCH_ATTRIBUTE(arch, iter);
 		}
 	
 		// skills
-		if (archetype[type].primary_skill != NO_SKILL && GET_SKILL(ch, archetype[type].primary_skill) < archetype[type].primary_skill_level) {
-			set_skill(ch, archetype[type].primary_skill, archetype[type].primary_skill_level);
-		}
-		if (archetype[type].secondary_skill != NO_SKILL && GET_SKILL(ch, archetype[type].secondary_skill) < archetype[type].secondary_skill_level) {
-			set_skill(ch, archetype[type].secondary_skill, archetype[type].secondary_skill_level);
-		}
-		
-		// vampire?
-		if (!IS_VAMPIRE(ch) && (archetype[type].primary_skill == SKILL_VAMPIRE || archetype[type].secondary_skill == SKILL_VAMPIRE)) {
-			make_vampire(ch, TRUE);
-			GET_BLOOD(ch) = GET_MAX_BLOOD(ch);
+		for (sk = GET_ARCH_SKILLS(arch); sk; sk = sk->next) {
+			if (GET_SKILL(ch, sk->skill) < sk->level) {
+				set_skill(ch, sk->skill, sk->level);
+			}
+			
+			// special case for vampire
+			if (sk->skill == SKILL_VAMPIRE && !IS_VAMPIRE(ch)) {
+				make_vampire(ch, TRUE);
+				GET_BLOOD(ch) = GET_MAX_BLOOD(ch);
+			}
 		}
 		
 		// newbie eq -- don't run load triggers on this set, as ch is possibly not in a room
-		for (iter = 0; archetype[type].gear[iter].vnum != NOTHING; ++iter) {
-			// skip slots that are somehow full
-			if (archetype[type].gear[iter].wear != NOWHERE && GET_EQ(ch, archetype[type].gear[iter].wear) != NULL) {
-				continue;
+		for (gear = GET_ARCH_GEAR(arch); gear; gear = gear->next) {
+			pos = gear->wear;
+			if (pos != NO_WEAR && GET_EQ(ch, pos) && wear_data[pos].cascade_pos != NO_WEAR) {
+				pos = wear_data[pos].cascade_pos;
 			}
 			
-			obj = read_object(archetype[type].gear[iter].vnum, TRUE);
-			scale_item_to_level(obj, 1);	// lowest possible scale
-			
-			if (archetype[type].gear[iter].wear == NOWHERE) {
-				obj_to_char(obj, ch);
-			}
-			else {
-				equip_char(ch, obj, archetype[type].gear[iter].wear);
+			if (pos == NO_WEAR || !GET_EQ(ch, pos)) {
+				obj = read_object(gear->vnum, TRUE);
+				scale_item_to_level(obj, 1);	// lowest possible scale
+				
+				if (pos == NO_WEAR) {
+					obj_to_char(obj, ch);
+				}
+				else {
+					equip_char(ch, obj, pos);
+				}
 			}
 		}
-
+		
 		// misc items
 		obj = read_object(o_GRAVE_MARKER, TRUE);
 		scale_item_to_level(obj, 1);	// lowest possible scale

@@ -553,9 +553,8 @@ EEDIT(eedit_rank) {
 
 
 EEDIT(eedit_num_ranks) {
-	extern const struct archetype_type archetype[];
-	
 	player_index_data *index, *next_index;
+	archetype_data *arch;
 	int num, iter;
 	char_data *mem;
 	bool is_file = FALSE;
@@ -608,10 +607,15 @@ EEDIT(eedit_num_ranks) {
 			EMPIRE_RANK(emp, iter) = NULL;
 		}
 		
+		arch = archetype_proto(CREATION_ARCHETYPE(ch));
+		if (!arch) {
+			arch = archetype_proto(0);	// default
+		}
+		
 		// ensure all new ranks have names
 		for (iter = 0; iter < num; ++iter) {
 			if (!EMPIRE_RANK(emp, iter)) {
-				EMPIRE_RANK(emp, iter) = str_dup((iter < (num-1)) ? "Follower" : archetype[CREATION_ARCHETYPE(ch)].starting_rank[(int) GET_REAL_SEX(ch)]);
+				EMPIRE_RANK(emp, iter) = str_dup((iter < (num-1)) ? "Follower" : (arch ? (GET_REAL_SEX(ch) == SEX_FEMALE ? GET_ARCH_FEMALE_RANK(arch) : GET_ARCH_MALE_RANK(arch)) : "Leader"));
 			}
 		}
 		

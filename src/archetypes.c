@@ -27,6 +27,7 @@
 *   Helpers
 *   Utilities
 *   Database
+*   Character Creation
 *   OLC Handlers
 *   Displays
 *   Edit Modules
@@ -50,6 +51,35 @@ extern const struct wear_data_type wear_data[NUM_WEARS];
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
+
+/**
+* Look up an active archetype by name, preferring exact matches.
+*
+* @param char *name The archetype name to look up.
+*/
+archetype_data *find_archetype_by_name(char *name) {
+	archetype_data *arch, *next_arch, *partial = NULL;
+	
+	HASH_ITER(sorted_hh, sorted_archetypes, arch, next_arch) {
+		if (ARCHETYPE_FLAGGED(arch, ARCH_IN_DEVELOPMENT)) {
+			continue;
+		}
+		
+		// matches:
+		if (!str_cmp(name, GET_ARCH_NAME(arch))) {
+			// perfect match
+			return arch;
+		}
+		if (is_multiword_abbrev(name, GET_ARCH_NAME(arch))) {
+			// probable match
+			partial = arch;
+		}
+	}
+	
+	// no exact match...
+	return partial;
+}
+
 
 /**
 * Find a matching gear slot, preferring exact matches.
@@ -654,6 +684,161 @@ void write_archetype_to_file(FILE *fl, archetype_data *arch) {
 	
 	// end
 	fprintf(fl, "S\n");
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// CHARACTER CREATION //////////////////////////////////////////////////////
+
+/**
+* Detailed info on an archetype.
+*
+* @param descriptor_data *desc The user to send it to.
+* @param archetype_data *arch The archetype to show.
+*/
+void display_archetype_info(descriptor_data *desc, archetype_data *arch) {
+	struct archetype_skill *sk;
+	int iter;
+	
+	msg_to_desc(desc, "\r\n");
+	msg_to_desc(desc, "%s - %s\r\n", GET_ARCH_NAME(arch), GET_ARCH_DESC(arch));
+	
+	msg_to_desc(desc, "Attributes:\r\n");
+	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
+		msg_to_desc(desc, " %s: %d (%s)\r\n", attributes[iter].name, GET_ARCH_ATTRIBUTE(arch, iter), attributes[iter].creation_description);
+	}
+	
+	msg_to_desc(desc, "Skills:\r\n");
+	for (sk = GET_ARCH_SKILLS(arch); sk; sk = sk->next) {
+		msg_to_desc(desc, " %s: %d (%s)\r\n", skill_data[sk->skill].name, sk->level, skill_data[sk->skill].description);
+	}
+}
+
+
+/**
+* List archetypes, or search.
+*
+* @param descriptor_data *desc The user to send it to.
+* @param char *argument All, basic, or search string.
+*/
+void display_archetype_list(descriptor_data *desc, char *argument) {
+	char buf[MAX_STRING_LENGTH], line[256];
+	archetype_data *arch, *next_arch;
+	bool basic = FALSE, all = FALSE;
+	struct archetype_skill *sk;
+	bool skill_match;
+	size_t size;
+	
+	if (!*argument) {
+		msg_to_desc(desc, "Usage: list <all | basic | keywords>\r\n");
+		return;
+	}
+	else if (!str_cmp(argument, "basic")) {
+		basic = TRUE;
+	}
+	else if (!str_cmp(argument, "all")) {
+		all = TRUE;
+	}
+	
+	size = snprintf(buf, sizeof(buf), "\r\n");
+	
+	HASH_ITER(sorted_hh, sorted_archetypes, arch, next_arch) {
+		if (basic && !ARCHETYPE_FLAGGED(arch, ARCH_BASIC)) {
+			continue;
+		}
+		
+		// check skill match
+		skill_match = FALSE;
+		for (sk = GET_ARCH_SKILLS(arch); sk && !skill_match; sk = sk->next) {
+			if (multi_isname(argument, skill_data[sk->skill].name)) {
+				skill_match = TRUE;
+			}
+		}
+		
+		// match strings
+		if (all || skill_match || multi_isname(argument, GET_ARCH_NAME(arch)) || multi_isname(argument, GET_ARCH_DESC(arch))) {
+			snprintf(line, sizeof(line), " \tc%s\t0 - %s", GET_ARCH_NAME(arch), GET_ARCH_DESC(arch));
+			
+			if (size + strlen(line) + 40 < sizeof(buf)) {
+				size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", line);
+			}
+			else {
+				size += snprintf(buf + size, sizeof(buf) - size, " ... and more\r\n");
+				break;
+			}
+		}
+	}
+	
+	if (*buf) {
+		page_string(desc, buf, TRUE);
+	}
+}
+
+
+/**
+* Prompt character for an archetype.
+*
+* @param descriptor_data *desc The user to send it to.
+*/
+void display_archetype_menu(descriptor_data *desc) {
+	msg_to_desc(desc, "\r\n");
+	msg_to_desc(desc, "Choose your background (type its name), 'info <name>' for more information,\r\n");
+	msg_to_desc(desc, "or type 'list' for more options\r\n");
+	msg_to_desc(desc, "\tc[ HINT: These are only your starting traits; you can still learn any skill ]\t0");	// no crlf
+	
+	display_archetype_list(desc, "basic");
+}
+
+
+/**
+* Process input at the archetype menu.
+*
+* @param descriptor_data *desc The user.
+* @param char *argument What they typed.
+*/
+void parse_archetype_menu(descriptor_data *desc, char *argument) {
+	void next_creation_step(descriptor_data *d);
+
+	char arg1[MAX_INPUT_LENGTH], *arg2;
+	archetype_data *arch;
+	
+	skip_spaces(&argument);
+	arg2 = any_one_arg(argument, arg1);
+	skip_spaces(&arg2);
+	
+	if (!*arg1) {
+		display_archetype_menu(desc);
+	}
+	else if (is_abbrev(arg1, "info")) {
+		if (!*arg2) {
+			msg_to_desc(desc, "Usage: info <archetype name>\r\n");
+		}
+		else if (!(arch = find_archetype_by_name(argument))) {
+			msg_to_desc(desc, "Unknown archetype '%s'.\r\n", argument);
+		}
+		else {
+			display_archetype_info(desc, arch);
+		}
+	}
+	else if (is_abbrev(arg1, "list")) {
+		display_archetype_list(desc, arg2);
+	}
+	else {	// picking one
+		if (!(arch = find_archetype_by_name(argument))) {
+			msg_to_desc(desc, "Unknown archetype '%s'. Try 'list' for more options.\r\n", argument);
+		}
+		else {
+			// success!
+			CREATION_ARCHETYPE(desc->character) = GET_ARCH_VNUM(arch);
+			SET_BIT(PLR_FLAGS(desc->character), PLR_NEEDS_NEWBIE_SETUP);
+			next_creation_step(desc);
+		}
+	}
+	
+	// still here? add a prompt
+	if (STATE(desc) == CON_Q_ARCHETYPE) {
+		msg_to_desc(desc, "Type an help, info, list, or an archetype name > ");
+	}
 }
 
 

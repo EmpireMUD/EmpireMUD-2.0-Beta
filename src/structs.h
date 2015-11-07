@@ -2845,28 +2845,6 @@ struct action_data_struct {
 };
 
 
-// For new players -- starting selections
-struct archetype_type {
-	char *name;
-	char *description;
-	
-	char *starting_rank[NUM_GENDERS];	// rank names for default empires
-	
-	int primary_skill;	// SKILL_x or NO_SKILL
-	int primary_skill_level;	// 0-100
-	
-	int secondary_skill;	// SKILL_x or NO_SKILL
-	int secondary_skill_level;	// 0-100
-
-	int attributes[NUM_ATTRIBUTES];	// starting attributes
-	
-	struct {
-		int wear;	// WEAR_x location for newbie gear
-		obj_vnum vnum;	// vnum of object
-	} gear[10];	// newbie gear -- MUST terminate with a vnum=NOTHING
-};
-
-
 // STRENGTH, NUM_ATTRIBUTES, etc
 struct attribute_data_type {
 	char *name;
