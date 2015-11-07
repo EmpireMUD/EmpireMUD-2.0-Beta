@@ -730,7 +730,7 @@ void display_archetype_list(descriptor_data *desc, char *argument) {
 	size_t size;
 	
 	if (!*argument) {
-		msg_to_desc(desc, "Usage: list <all | basic | keywords>\r\n");
+		msg_to_desc(desc, "\r\nUsage: list <all | basic | keywords>\r\n");
 		return;
 	}
 	else if (!str_cmp(argument, "basic")) {
@@ -781,7 +781,6 @@ void display_archetype_list(descriptor_data *desc, char *argument) {
 * @param descriptor_data *desc The user to send it to.
 */
 void display_archetype_menu(descriptor_data *desc) {
-	msg_to_desc(desc, "\r\n");
 	msg_to_desc(desc, "Choose your background (type its name), 'info <name>' for more information,\r\n");
 	msg_to_desc(desc, "or type 'list' for more options\r\n");
 	msg_to_desc(desc, "\tc[ HINT: These are only your starting traits; you can still learn any skill ]\t0");	// no crlf
@@ -806,6 +805,8 @@ void parse_archetype_menu(descriptor_data *desc, char *argument) {
 	arg2 = any_one_arg(argument, arg1);
 	skip_spaces(&arg2);
 	
+	msg_to_desc(desc, "\r\n");
+	
 	if (!*arg1) {
 		display_archetype_menu(desc);
 	}
@@ -813,7 +814,7 @@ void parse_archetype_menu(descriptor_data *desc, char *argument) {
 		if (!*arg2) {
 			msg_to_desc(desc, "Usage: info <archetype name>\r\n");
 		}
-		else if (!(arch = find_archetype_by_name(argument))) {
+		else if (!(arch = find_archetype_by_name(arg2))) {
 			msg_to_desc(desc, "Unknown archetype '%s'.\r\n", argument);
 		}
 		else {
