@@ -359,7 +359,7 @@ void display_attributes(char_data *ch, char_data *to) {
 	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
 		pos = attribute_display_order[iter];
 		snprintf(buf, sizeof(buf), "%s  [%s%2d\t0]", attributes[pos].name, HAPPY_COLOR(GET_ATT(ch, pos), GET_REAL_ATT(ch, pos)), GET_ATT(ch, pos));
-		msg_to_char(ch, "  %-*.*s%s", 27 + color_code_length(buf), 27 + color_code_length(buf), buf, !((iter + 1) % 3) ? "\r\n" : "");
+		msg_to_char(ch, "  %-*.*s%s", 23 + color_code_length(buf), 23 + color_code_length(buf), buf, !((iter + 1) % 3) ? "\r\n" : "");
 	}
 	if (iter % 3) {
 		msg_to_char(ch, "\r\n");
