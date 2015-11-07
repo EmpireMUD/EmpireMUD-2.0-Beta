@@ -816,7 +816,7 @@ void found_city(char_data *ch, char *argument) {
 		msg_to_char(ch, "Usage: city found <name>\r\n");
 		return;
 	}
-	if (count_color_codes(argument) > 0) {
+	if (color_code_length(argument) > 0) {
 		msg_to_char(ch, "City names may not contain color codes.\r\n");
 		return;
 	}
@@ -1031,7 +1031,7 @@ void rename_city(char_data *ch, char *argument) {
 		msg_to_char(ch, "Your empire has no city by that name.\r\n");
 		return;
 	}
-	if (count_color_codes(newname) > 0) {
+	if (color_code_length(newname) > 0) {
 		msg_to_char(ch, "City names may not contain color codes.\r\n");
 		return;
 	}

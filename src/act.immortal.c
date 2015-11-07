@@ -564,7 +564,6 @@ ADMIN_UTIL(util_strlen) {
 	msg_to_char(ch, "strlen: %d\r\n", (int)strlen(argument));
 	msg_to_char(ch, "color_strlen: %d\r\n", (int)color_strlen(argument));
 	msg_to_char(ch, "color_code_length: %d\r\n", color_code_length(argument));
-	msg_to_char(ch, "count_color_codes: %d\r\n", count_color_codes(argument));
 }
 
 

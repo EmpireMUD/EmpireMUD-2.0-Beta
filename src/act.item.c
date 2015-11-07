@@ -4521,7 +4521,7 @@ ACMD(do_roadsign) {
 	else if (!*argument) {
 		msg_to_char(ch, "Usage: roadsign <message>\r\n");
 	}
-	else if ((strlen(argument) - (2 * count_color_codes(argument))) > max_length) {
+	else if (color_strlen(argument) > max_length) {
 		msg_to_char(ch, "Road signs can't be more than %d characters long.\r\n", max_length);
 	}
 	else {

@@ -1449,7 +1449,7 @@ void do_customize_room(char_data *ch, char *argument) {
 			
 			msg_to_char(ch, "This room no longer has a custom name.\r\n");
 		}
-		else if (count_color_codes(arg2) > 0) {
+		else if (color_code_length(arg2) > 0) {
 			msg_to_char(ch, "You cannot use color codes in custom room names.\r\n");
 		}
 		else if (strlen(arg2) > 60) {

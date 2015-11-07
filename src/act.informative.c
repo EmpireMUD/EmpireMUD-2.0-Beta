@@ -460,9 +460,8 @@ void display_score_to_char(char_data *ch, char_data *to) {
 		strcpy(lbuf, "&gnone&0");
 	}
 	// gotta count the color codes to determine width
-	count = 37 + (2 * count_color_codes(lbuf));
-	sprintf(lbuf2, "  Conditions: %%-%d.%ds", count, count);
-	msg_to_char(to, lbuf2, lbuf);
+	count = 37 + color_code_length(lbuf);
+	msg_to_char(ch, "  Conditions: %-*.*s", count, count, lbuf);
 	
 	if (IS_VAMPIRE(ch)) {
 		msg_to_char(to, " Blood: &r%d&0/&r%d&0-&r%d&0/hr\r\n", GET_BLOOD(ch), GET_MAX_BLOOD(ch), get_blood_upkeep_cost(ch));
@@ -513,9 +512,8 @@ void display_score_to_char(char_data *ch, char_data *to) {
 				sprintf(lbuf + strlen(lbuf), " &g(%d)", pts);
 			}
 			
-			cols = 25 + (2 * count_color_codes(lbuf));
-			sprintf(lbuf2, "%%-%d.%ds&0", cols, cols);
-			msg_to_char(to, lbuf2, lbuf);
+			cols = 25 + color_code_length(lbuf);
+			msg_to_char(ch, "%-*.*s&0", cols, cols, lbuf);
 			
 			if (++count == 3) {
 				msg_to_char(to, "&0\r\n ");
@@ -1422,8 +1420,8 @@ char *one_who_line(char_data *ch, bool shortlist, bool screenreader) {
 	
 	// shortlist ends here
 	if (shortlist) {
-		num = count_color_codes(out);
-		sprintf(buf, "%%-%d.%ds", 35 + 2 * num, 35 + 2 * num);
+		num = color_code_length(out);
+		sprintf(buf, "%%-%d.%ds", 35 + num, 35 + num);
 		strcpy(buf1, out);
 		
 		size = snprintf(out, sizeof(out), buf, buf1);

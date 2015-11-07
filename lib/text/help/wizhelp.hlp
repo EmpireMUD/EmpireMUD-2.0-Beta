@@ -961,6 +961,7 @@ Available utilities:
     reports the results.
  redoislands - Renumbers all the islands (requires confirmation; may rearrange
     empire inventories).
+ strlen - Give various measures of string length.
 #d
 VNUM
 

@@ -280,7 +280,6 @@ extern const char *olc_flag_bits[];
 extern const char *olc_type_bits[NUM_OLC_TYPES+1];
 
 // external functions
-extern int count_double_ampersands(char *string);
 void replace_question_color(char *input, char *color, char *output);
 extern char *show_color_codes(char *string);
 void sort_icon_set(struct icon_data **list);
@@ -2435,7 +2434,7 @@ void get_icons_display(struct icon_data *list, char *save_buffer) {
 		sprintf(line, " %2d. %s: %s%s&0  %s%s&0 %s", ++count, icon_types[icon->type], icon->color, ibuf, icon->color, show_color_codes(icon->color), lbuf);
 		
 		// format column despite variable width of color codes
-		size = 30 + (2 * count_color_codes(line)) - count_double_ampersands(line);
+		size = 30 + color_code_length(line);
 		sprintf(lbuf, "%%-%d.%ds%%s", size, size);
 		sprintf(save_buffer + strlen(save_buffer), lbuf, line, !(count % 2) ? "\r\n" : "");
 	}
@@ -4779,12 +4778,10 @@ void smart_copy_template_spawns(struct adventure_spawn **addto, struct adventure
 * @return bool TRUE if the icon is ok; FALSE if not.
 */
 bool validate_icon(char *icon) {
-	extern int count_double_ampersands(char *string);
-	
 	if (!*icon) {
 		return FALSE;
 	}
-	else if ((strlen(icon) - count_icon_codes(icon) - (2 * count_color_codes(icon)) - count_double_ampersands(icon)) != 4) {
+	else if ((strlen(icon) - count_icon_codes(icon) - color_code_length(icon)) != 4) {
 		return FALSE;
 	}
 	else {

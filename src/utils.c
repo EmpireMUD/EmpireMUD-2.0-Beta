@@ -2517,57 +2517,6 @@ int color_code_length(const char *str) {
 
 
 /**
-* @param char *string String to count color codes in
-* @return int the number of &0-style color codes in the string
-*/
-int count_color_codes(char *string) {
-	int iter, count = 0, len = strlen(string);
-	for (iter = 0; iter < len - 1; ++iter) {
-		if (string[iter] == '\t' && string[iter+1] == '\t') {
-			++iter;	// advance past the \t\t (not a color code)
-		}
-		else if (string[iter] == '\t' && string[iter+1] == '&') {
-			++iter;	// advance past the \t& (not a color code)
-		}
-		else if (string[iter] == '&' && string[iter+1] == '&') {
-			++iter;	// advance past the && (not a color code)
-		}
-		else if (string[iter] == '&' || string[iter] == '\t') {
-			++count;
-			++iter;	// advance past the color code
-		}
-	}
-	
-	return count;
-}
-
-
-/**
-* @param char *string The string to count && in.
-* @return int The number of occurrances of && in the string.
-*/
-int count_double_ampersands(char *string) {
-	int iter, count = 0, len = strlen(string);
-	for (iter = 0; iter < len - 1; ++iter) {
-		if (string[iter] == '&' && string[iter+1] == '&') {
-			++count;
-			++iter;	// advance past the second &
-		}
-		else if (string[iter] == '\t' && string[iter+1] == '&') {
-			++count;
-			++iter;	// advance past the & in \t&
-		}
-		else if (string[iter] == '\t' && string[iter+1] == '\t') {
-			++count;
-			++iter;	// advance past the second \t in \t\t (similar to an &&)
-		}
-	}
-	
-	return count;
-}
-
-
-/**
 * Counts the number of icon codes (@) in a string.
 *
 * @param char *string The input string.

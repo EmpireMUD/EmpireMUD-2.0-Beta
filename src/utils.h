@@ -1167,7 +1167,6 @@ extern char *strtolower(char *str);
 extern char *strtoupper(char *str);
 extern int color_code_length(const char *str);
 #define color_strlen(str)  (strlen(str) - color_code_length(str))
-extern int count_color_codes(char *string);
 extern int count_icon_codes(char *string);
 extern bool strchrstr(const char *haystack, const char *needles);
 extern int str_cmp(const char *arg1, const char *arg2);

@@ -2198,7 +2198,7 @@ ACMD(do_title) {
 	}
 	else if (strstr(argument, "(") || strstr(argument, ")") || strstr(argument, "%"))
 		send_to_char("Titles can't contain the (, ), or % characters.\r\n", ch);
-	else if (strlen(argument) > MAX_TITLE_LENGTH-1 || (strlen(argument) - (2 * count_color_codes(argument))) > MAX_TITLE_LENGTH_NO_COLOR) {
+	else if (strlen(argument) > MAX_TITLE_LENGTH-1 || color_strlen(argument) > MAX_TITLE_LENGTH_NO_COLOR) {
 		// the -1 reserves an extra spot for an extra space
 		msg_to_char(ch, "Sorry, titles can't be longer than %d characters.\r\n", MAX_TITLE_LENGTH_NO_COLOR);
 	}
