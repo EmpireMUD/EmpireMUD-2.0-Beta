@@ -3233,7 +3233,7 @@ void start_new_character(char_data *ch) {
 		// newbie eq -- don't run load triggers on this set, as ch is possibly not in a room
 		for (gear = GET_ARCH_GEAR(arch); gear; gear = gear->next) {
 			pos = gear->wear;
-			if (pos != NO_WEAR && GET_EQ(ch, pos) && wear_data[pos].cascade_pos != NO_WEAR) {
+			while (pos != NO_WEAR && GET_EQ(ch, pos) && wear_data[pos].cascade_pos != NO_WEAR) {
 				pos = wear_data[pos].cascade_pos;
 			}
 			
