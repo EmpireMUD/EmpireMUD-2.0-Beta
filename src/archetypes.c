@@ -42,6 +42,7 @@ const char *default_archetype_rank = "Adventurer";
 extern const char *archetype_flags[];
 extern int attribute_display_order[NUM_ATTRIBUTES];
 extern struct attribute_data_type attributes[NUM_ATTRIBUTES];
+extern const char *olc_type_bits[NUM_OLC_TYPES+1];
 extern const struct wear_data_type wear_data[NUM_WEARS];
 
 // external funcs
@@ -79,6 +80,72 @@ int find_gear_slot_by_name(char *name) {
 		
 	// no exact match
 	return partial;
+}
+
+
+/**
+* Copies gear locations that are not already full.
+*
+* @param struct archetype_gear **list The list to merge copies into.
+* @param struct archetype_gear *from The list to copy from.
+*/
+void smart_copy_gear(struct archetype_gear **list, struct archetype_gear *from) {
+	struct archetype_gear *old, *find, *gear, *last;
+	int part_count[NUM_WEARS], iter;
+	bool found;
+	
+	// for multi-slot wears
+	for (iter = 0; iter < NUM_WEARS; ++iter) {
+		part_count[iter] = 0;
+	}
+	
+	// find end
+	if ((last = *list)) {
+		while (last->next) {
+			last = last->next;
+		}
+	}
+	
+	for (old = from; old; old = old->next) {
+		// only check on non-inventory
+		if (old->wear != -1) {
+			// ensure the slot is not already filled
+			found = FALSE;
+			for (find = *list; find && !found; find = find->next) {
+				if (find->wear != old->wear) {
+					continue;
+				}
+				
+				// check if it's cascadable
+				if (wear_data[find->wear].cascade_pos != NO_WEAR) {
+					if (++part_count[find->wear] > 1) {
+						found = TRUE;
+					}
+				}
+				else {
+					found = TRUE;
+				}
+			}
+			
+			// does the list already have this gear slot? if so, skip
+			if (found) {
+				continue;
+			}
+		}
+		
+		// ok copy it
+		CREATE(gear, struct archetype_gear, 1);
+		*gear = *old;
+		gear->next = NULL;
+		
+		if (last) {
+			last->next = gear;
+		}
+		else {
+			*list = gear;
+		}
+		last = gear;
+	}
 }
 
 
@@ -880,7 +947,7 @@ void olc_show_archetype(char_data *ch) {
 	for (sk = GET_ARCH_SKILLS(arch); sk; sk = sk->next) {
 		total += sk->level;
 	}
-	sprintf(buf + strlen(buf), "Skills: <\tyskills\t0> (%d total skill points)\r\n", total);
+	sprintf(buf + strlen(buf), "Skills: <\tyskill\t0> (%d total skill points)\r\n", total);
 	for (sk = GET_ARCH_SKILLS(arch); sk; sk = sk->next) {
 		sprintf(buf + strlen(buf), "  %s: %d\r\n", skill_data[sk->skill].name, sk->level);
 	}
@@ -983,9 +1050,11 @@ OLC_MODULE(archedit_flags) {
 
 
 OLC_MODULE(archedit_gear) {
-	archetype_data *arch = GET_OLC_ARCHETYPE(ch->desc);
+	archetype_data *arch = GET_OLC_ARCHETYPE(ch->desc), *copyarch;
 	char cmd_arg[MAX_INPUT_LENGTH], slot_arg[MAX_INPUT_LENGTH], num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
-	struct archetype_gear *gear, *next_gear, *change, *temp;
+	struct archetype_gear *gear, *next_gear, *change, *temp, *copyfrom;
+	char buf[MAX_STRING_LENGTH];
+	bitvector_t findtype;
 	int loc, num;
 	bool found;
 	
@@ -1104,10 +1173,54 @@ OLC_MODULE(archedit_gear) {
 			msg_to_char(ch, "You can only change the slot or vnum.\r\n");
 		}
 	}
+	else if (is_abbrev(cmd_arg, "copy")) {
+		argument = any_one_arg(argument, type_arg);
+		argument = any_one_arg(argument, num_arg);
+		copyfrom = NULL;
+		
+		if (!*type_arg || !*num_arg) {
+			msg_to_char(ch, "Usage: gear copy <from type> <from vnum>\r\n");
+		}
+		else if ((findtype = find_olc_type(type_arg)) == 0) {
+			msg_to_char(ch, "Unknown olc type '%s'.\r\n", type_arg);
+		}
+		else if (!isdigit(*num_arg)) {
+			sprintbit(findtype, olc_type_bits, buf, FALSE);
+			msg_to_char(ch, "Copy spawns from which %s?\r\n", buf);
+		}
+		else if ((num = atoi(num_arg)) < 0) {
+			msg_to_char(ch, "Invalid vnum.\r\n");
+		}
+		else {
+			sprintbit(findtype, olc_type_bits, buf, FALSE);
+			
+			switch (findtype) {
+				case OLC_ARCHETYPE: {
+					if ((copyarch = archetype_proto(num))) {
+						copyfrom = GET_ARCH_GEAR(copyarch);
+					}
+					break;
+				}
+				default: {
+					msg_to_char(ch, "You can't copy gear from %ss.\r\n", buf);
+					return;
+				}
+			}
+			
+			if (!copyfrom) {
+				msg_to_char(ch, "Invalid %s vnum '%s'.\r\n", buf, num_arg);
+			}
+			else {
+				smart_copy_gear(&GET_ARCH_GEAR(arch), copyfrom);
+				msg_to_char(ch, "Gear copied from %s %d.\r\n", buf, num);
+			}
+		}
+	}
 	else {
 		msg_to_char(ch, "Usage: gear add <gear slot> <obj vnum>\r\n");
-		msg_to_char(ch, "Usage: gear change <number> <slot | vnum> <new value>\r\n");
-		msg_to_char(ch, "Usage: gear remove <number | all>\r\n");
+		msg_to_char(ch, "       gear copy <from type> <from vnum>\r\n");
+		msg_to_char(ch, "       gear change <number> <slot | vnum> <new value>\r\n");
+		msg_to_char(ch, "       gear remove <number | all>\r\n");
 	}
 }
 
@@ -1138,7 +1251,7 @@ OLC_MODULE(archedit_skill) {
 	bool found;
 	
 	argument = any_one_arg(argument, cmd_arg);
-	argument = any_one_arg(argument, skill_arg);
+	argument = any_one_word(argument, skill_arg);
 	argument = any_one_arg(argument, num_arg);
 	
 	if (!*cmd_arg || !*skill_arg) {

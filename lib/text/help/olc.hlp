@@ -671,6 +671,7 @@ See also: OLC ARCHETYPES
 "ARCHEDIT GEAR"
 
 Usage:  .gear add <slot | inventory> <vnum>
+        .gear copy <from type> <from vnum>
         .gear change <number> <slot | vnum> <new value>
         .gear remove <number>
 
