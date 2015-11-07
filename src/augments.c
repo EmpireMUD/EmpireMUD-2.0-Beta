@@ -296,7 +296,7 @@ int sort_augments_by_data(augment_data *a, augment_data *b) {
 		return b_level - a_level;
 	}
 	
-	return strcmp(GET_AUG_NAME(a), GET_AUG_NAME(b));
+	return strcmp(NULLSAFE(GET_AUG_NAME(a)), NULLSAFE(GET_AUG_NAME(b)));
 }
 
 

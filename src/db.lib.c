@@ -6213,7 +6213,7 @@ int sort_crafts_by_data(craft_data *a, craft_data *b) {
 		return b_level - a_level;
 	}
 	
-	return strcmp(GET_CRAFT_NAME(a), GET_CRAFT_NAME(b));
+	return strcmp(NULLSAFE(GET_CRAFT_NAME(a)), NULLSAFE(GET_CRAFT_NAME(b)));
 }
 
 
