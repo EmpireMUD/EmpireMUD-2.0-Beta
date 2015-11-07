@@ -33,7 +33,7 @@
 */
 
 // local data
-#define GEAR_ERROR  -123	// arbitrary number that's not -1 thru NUM_WEARS
+#define GEAR_ERROR  -123	// arbitrary number that's not -1/NO_WEAR thru NUM_WEARS
 const char *default_archetype_name = "unnamed archetype";
 const char *default_archetype_desc = "no description";
 const char *default_archetype_rank = "Adventurer";
@@ -55,17 +55,17 @@ extern const struct wear_data_type wear_data[NUM_WEARS];
 * Find a matching gear slot, preferring exact matches.
 *
 * @param char *name The name to look up.
-* @return int The slot found (-1 for inventory, GEAR_ERROR if no match).
+* @return int The slot found (NO_WEAR for inventory, GEAR_ERROR if no match).
 */
 int find_gear_slot_by_name(char *name) {
 	int iter, partial = GEAR_ERROR;
 	
 	// special case for giving to inventory
 	if (!str_cmp(name, "inventory")) {
-		return -1;
+		return NO_WEAR;
 	}
 	else if (is_abbrev(name, "inventory")) {
-		partial = -1;
+		partial = NO_WEAR;
 	}
 	
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
@@ -108,7 +108,7 @@ void smart_copy_gear(struct archetype_gear **list, struct archetype_gear *from) 
 	
 	for (old = from; old; old = old->next) {
 		// only check on non-inventory
-		if (old->wear != -1) {
+		if (old->wear != NO_WEAR) {
 			// ensure the slot is not already filled
 			found = FALSE;
 			for (find = *list; find && !found; find = find->next) {
@@ -535,7 +535,7 @@ void parse_archetype(FILE *fl, any_vnum vnum) {
 				}
 				
 				// only accept valid positions
-				if (int_in[0] >= -1 && int_in[0] < NUM_WEARS) {
+				if (int_in[0] >= NO_WEAR && int_in[0] < NUM_WEARS) {
 					CREATE(gear, struct archetype_gear, 1);
 					gear->wear = int_in[0];
 					gear->vnum = int_in[1];
@@ -594,7 +594,7 @@ void write_archetype_index(FILE *fl) {
 	archetype_data *arch, *next_arch;
 	int this, last;
 	
-	last = -1;
+	last = NO_WEAR;
 	HASH_ITER(hh, archetype_table, arch, next_arch) {
 		// determine "zone number" by vnum
 		this = (int)(GET_ARCH_VNUM(arch) / 100);
@@ -891,7 +891,7 @@ void do_stat_archetype(char_data *ch, archetype_data *arch) {
 	// gear
 	size += snprintf(buf + size, sizeof(buf) - size, "Gear:\r\n");
 	for (gear = GET_ARCH_GEAR(arch), num = 1; gear; gear = gear->next, ++num) {
-		size += snprintf(buf + size, sizeof(buf) - size, " %2d. %s: [\ty%d\t0] \ty%s\t0\r\n", num, gear->wear == -1 ? "inventory" : wear_data[gear->wear].name, gear->vnum, get_obj_name_by_proto(gear->vnum));
+		size += snprintf(buf + size, sizeof(buf) - size, " %2d. %s: [\ty%d\t0] \ty%s\t0\r\n", num, gear->wear == NO_WEAR ? "inventory" : wear_data[gear->wear].name, gear->vnum, get_obj_name_by_proto(gear->vnum));
 	}
 	
 	page_string(ch->desc, buf, TRUE);
@@ -955,7 +955,7 @@ void olc_show_archetype(char_data *ch) {
 	// gear
 	sprintf(buf + strlen(buf), "Gear: <\tygear\t0>\r\n");
 	for (gear = GET_ARCH_GEAR(arch), num = 1; gear; gear = gear->next, ++num) {
-		sprintf(buf + strlen(buf), " %2d. %s: [%d] %s\r\n", num, gear->wear == -1 ? "inventory" : wear_data[gear->wear].name, gear->vnum, get_obj_name_by_proto(gear->vnum));
+		sprintf(buf + strlen(buf), " %2d. %s: [%d] %s\r\n", num, gear->wear == NO_WEAR ? "inventory" : wear_data[gear->wear].name, gear->vnum, get_obj_name_by_proto(gear->vnum));
 	}
 	
 	page_string(ch->desc, buf, TRUE);
@@ -1095,7 +1095,7 @@ OLC_MODULE(archedit_gear) {
 		argument = any_one_arg(argument, slot_arg);
 		argument = any_one_arg(argument, num_arg);
 		num = atoi(num_arg);
-		loc = -1;	// this indicates inventory
+		loc = NO_WEAR;	// this indicates inventory
 		
 		if (!*slot_arg || !*num_arg || !isdigit(*num_arg) || num <= 0) {
 			msg_to_char(ch, "Usage: gear add <gear slot> <vnum>\r\n");
@@ -1122,7 +1122,7 @@ OLC_MODULE(archedit_gear) {
 				GET_ARCH_GEAR(arch) = gear;
 			}
 			
-			msg_to_char(ch, "You add %s (%s).\r\n", get_obj_name_by_proto(num), loc == -1 ? "inventory" : wear_data[loc].name);
+			msg_to_char(ch, "You add %s (%s).\r\n", get_obj_name_by_proto(num), loc == NO_WEAR ? "inventory" : wear_data[loc].name);
 		}
 	}
 	else if (is_abbrev(cmd_arg, "change")) {
@@ -1166,7 +1166,7 @@ OLC_MODULE(archedit_gear) {
 			}
 			else {
 				change->wear = loc;
-				msg_to_char(ch, "Apply %d changed to %s.\r\n", atoi(num_arg), loc == -1 ? "inventory" : wear_data[loc].name);
+				msg_to_char(ch, "Gear %d changed to %s.\r\n", atoi(num_arg), loc == NO_WEAR ? "inventory" : wear_data[loc].name);
 			}
 		}
 		else {
