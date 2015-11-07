@@ -758,7 +758,7 @@ void display_archetype_list(descriptor_data *desc, char *argument) {
 		
 		// match strings
 		if (all || basic || skill_match || multi_isname(argument, GET_ARCH_NAME(arch)) || multi_isname(argument, GET_ARCH_DESC(arch))) {
-			snprintf(line, sizeof(line), " \tc%s\t0 - %s", GET_ARCH_NAME(arch), GET_ARCH_DESC(arch));
+			snprintf(line, sizeof(line), " %s%s\t0 - %s", ARCHETYPE_FLAGGED(arch, ARCH_BASIC) ? "\tc" : "\ty", GET_ARCH_NAME(arch), GET_ARCH_DESC(arch));
 			
 			if (size + strlen(line) + 40 < sizeof(buf)) {
 				size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", line);
