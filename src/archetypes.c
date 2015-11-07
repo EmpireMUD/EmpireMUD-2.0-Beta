@@ -990,7 +990,7 @@ int vnum_archetype(char *searchname, char_data *ch) {
 OLC_MODULE(archedit_attribute) {
 	extern int get_attribute_by_name(char *name);
 
-	archetype_data *arch = GET_OLC_ARCHETYPE(ch->desc);
+	archetype_data *arch = GET_OLC_ARCHETYPE(ch->desc), *copyfrom;
 	char att_arg[MAX_INPUT_LENGTH], num_arg[MAX_INPUT_LENGTH];
 	int att, num;
 	
@@ -999,7 +999,21 @@ OLC_MODULE(archedit_attribute) {
 	
 	if (!*att_arg || !*num_arg || !isdigit(*num_arg)) {
 		msg_to_char(ch, "Usage: attribute <type> <number>\r\n");
+		msg_to_char(ch, "       attribute <copy> <archetype vnum>\r\n");
 	}
+	else if (!str_cmp(att_arg, "copy")) {
+		if (!(copyfrom = archetype_proto(atoi(num_arg)))) {
+			msg_to_char(ch, "Invalid archetype vnum '%s'.\r\n", num_arg);
+			return;
+		}
+		
+		for (att = 0; att < NUM_ATTRIBUTES; ++att) {
+			GET_ARCH_ATTRIBUTE(arch, att) = GET_ARCH_ATTRIBUTE(copyfrom, att);
+		}
+		
+		msg_to_char(ch, "Attributes copied from archetype [%d] %s.\r\n", GET_ARCH_VNUM(copyfrom), GET_ARCH_NAME(copyfrom));
+	}
+	// not copying -- add a new one
 	else if ((att = get_attribute_by_name(att_arg)) == -1) {
 		msg_to_char(ch, "Unknown attribute '%s'.\r\n", att_arg);
 	}

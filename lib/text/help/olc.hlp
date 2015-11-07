@@ -625,6 +625,7 @@ See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
 "ARCHEDIT ATTRIBUTES"
 
 Usage:  .attribute <type> <number>
+        .attribute <copy> <archetype vnum>
 
 This allows you to set the starting level of each attribute. By design, the
 starting attributes should be low. Players will earn higher attributes using
