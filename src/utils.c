@@ -2478,7 +2478,7 @@ int color_code_length(const char *str) {
 			}
 			else if (*(ptr+1) == '[') {
 				++len;	// 1 for the &
-				if (*(ptr+2) != 'U') {
+				if (UPPER(*(ptr+2)) != 'U') {
 					++len;	// we skip 1 len if there is a U because 1 char will be visible
 				}
 				for (++ptr; *ptr != ']'; ++ptr) {	// count chars in *[..]
@@ -2497,7 +2497,7 @@ int color_code_length(const char *str) {
 			}
 			else if (*(ptr+1) == '[' && config_get_bool("allow_extended_color_codes")) {
 				++len;	// 1 for the &
-				if (*(ptr+2) != 'U') {
+				if (UPPER(*(ptr+2)) != 'U') {
 					++len;	// we skip 1 len if there is a U because 1 char will be visible
 				}
 				for (++ptr; *ptr != ']'; ++ptr) {	// count chars in &[..]
