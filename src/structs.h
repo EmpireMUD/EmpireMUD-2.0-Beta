@@ -2076,6 +2076,7 @@ struct archetype_data {
 	any_vnum vnum;
 	char *name;
 	char *description;
+	char *lore;	// optional lore entry
 	bitvector_t flags;	// ARCH_x
 	
 	// default starting ranks
