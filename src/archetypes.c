@@ -1484,6 +1484,7 @@ OLC_MODULE(archedit_lore) {
 		msg_to_char(ch, "It now adds no lore.\r\n");
 	}
 	else {
+		delete_doubledollar(argument);
 		olc_process_string(ch, argument, "lore", &GET_ARCH_LORE(arch));
 	}
 }
