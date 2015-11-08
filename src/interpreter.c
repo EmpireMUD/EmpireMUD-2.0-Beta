@@ -1529,6 +1529,7 @@ struct {
 	{ CON_Q_ALT_PASSWORD },
 	
 	{ CON_Q_ARCHETYPE },
+	{ CON_ARCHETYPE_CNFRM },
 	{ CON_BONUS_CREATION },
 	
 	{ CON_PROMO_CODE },
@@ -1607,6 +1608,10 @@ void prompt_creation(descriptor_data *d) {
 		case CON_Q_ARCHETYPE: {
 			parse_archetype_menu(d, "");
 			break;
+		}
+		case CON_ARCHETYPE_CNFRM: {
+			archetype_data *arch = archetype_proto(CREATION_ARCHETYPE(d->character));
+			msg_to_desc(d, "\r\nYou picked \tc%s\t0. Is that corrent (y/n)? ", GET_ARCH_NAME(arch));
 		}
 		case CON_PROMO_CODE: {
 			SEND_TO_Q("\r\nIf you have a promo code, enter it now. Otherwise, just leave it blank > ", d);
@@ -2418,6 +2423,19 @@ void nanny(descriptor_data *d, char *arg) {
 
 		case CON_Q_ARCHETYPE: {
 			parse_archetype_menu(d, arg);
+			break;
+		}
+		
+		case CON_ARCHETYPE_CNFRM: {
+			if (is_abbrev(arg, "yes")) {
+				next_creation_step(d);
+			}
+			else if (is_abbrev(arg, "no")) {
+				set_creation_state(d, CON_Q_ARCHETYPE);
+			}
+			else {
+				msg_to_desc(d, "\r\nPlease type YES or NO: ");
+			}
 			break;
 		}
 		

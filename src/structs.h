@@ -1232,7 +1232,7 @@ typedef struct trig_data trig_data;
 #define CON_QLAST_NAME  13	// Do you have a last..
 #define CON_SLAST_NAME  14  // And what is it?
 #define CON_CLAST_NAME  15	// Did I get that right?
-	#define CON_UNUSED2  16
+#define CON_ARCHETYPE_CNFRM  16	// Correct archetype?
 #define CON_Q_HAS_ALT  17	// Do you have an alt?
 #define CON_Q_ALT_NAME  18	// Type alt's name
 #define CON_Q_ALT_PASSWORD  19	// Type alt's password

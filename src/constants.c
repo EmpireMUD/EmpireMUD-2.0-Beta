@@ -484,7 +484,7 @@ const char *connected_types[] = {
 	"Last name?",
 	"Get last name",
 	"Cnf last name",	// 15
-		"UNUSED 2",
+	"Cnf archetype",
 	"Have alt?",
 	"Alt name",
 	"Alt password",
