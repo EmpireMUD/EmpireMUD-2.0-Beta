@@ -67,19 +67,19 @@ void add_archetype_lore(char_data *ch) {
 		
 		// he/she
 		if (strstr(temp, "$e")) {
-			str = str_replace(temp, "$e", HSSH(ch));
+			str = str_replace("$e", HSSH(ch), temp);
 			strcpy(temp, str);
 			free(str);
 		}
 		// his/her
 		if (strstr(temp, "$s")) {
-			str = str_replace(temp, "$s", HSHR(ch));
+			str = str_replace("$s", HSHR(ch), temp);
 			strcpy(temp, str);
 			free(str);
 		}
 		// him/her
 		if (strstr(temp, "$m")) {
-			str = str_replace(temp, "$m", HMHR(ch));
+			str = str_replace("$m", HMHR(ch), temp);
 			strcpy(temp, str);
 			free(str);
 		}
