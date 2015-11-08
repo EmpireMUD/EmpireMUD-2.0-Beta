@@ -1087,7 +1087,7 @@ void do_stat_archetype(char_data *ch, archetype_data *arch) {
 	size += snprintf(buf + size, sizeof(buf) - size, "Description: %s\r\n", GET_ARCH_DESC(arch));
 
 	if (GET_ARCH_LORE(arch) && *GET_ARCH_LORE(arch)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "Lore: \tc%s\t0 [on Month Day, Year]\r\n", GET_ARCH_LORE(arch));
+		size += snprintf(buf + size, sizeof(buf) - size, "Lore: \tc%s\t0 [on Month Day, Year.]\r\n", GET_ARCH_LORE(arch));
 	}
 	else {
 		size += snprintf(buf + size, sizeof(buf) - size, "Lore: \tcnone\t0\r\n");
@@ -1153,7 +1153,7 @@ void olc_show_archetype(char_data *ch) {
 	sprintf(buf + strlen(buf), "[\tc%d\t0] \tc%s\t0\r\n", GET_OLC_VNUM(ch->desc), !archetype_proto(GET_ARCH_VNUM(arch)) ? "new archetype" : GET_ARCH_NAME(archetype_proto(GET_ARCH_VNUM(arch))));
 	sprintf(buf + strlen(buf), "<\tyname\t0> %s\r\n", NULLSAFE(GET_ARCH_NAME(arch)));
 	sprintf(buf + strlen(buf), "<\tydescription\t0> %s\r\n", NULLSAFE(GET_ARCH_DESC(arch)));
-	sprintf(buf + strlen(buf), "<\tylore\t0> %s [on Month Day, Year]\r\n", (GET_ARCH_LORE(arch) && *GET_ARCH_LORE(arch)) ? GET_ARCH_LORE(arch) : "none");
+	sprintf(buf + strlen(buf), "<\tylore\t0> %s [on Month Day, Year.]\r\n", (GET_ARCH_LORE(arch) && *GET_ARCH_LORE(arch)) ? GET_ARCH_LORE(arch) : "none");
 	
 	sprintbit(GET_ARCH_FLAGS(arch), archetype_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<\tyflags\t0> %s\r\n", lbuf);
