@@ -37,6 +37,8 @@ extern const byte interact_vnum_types[NUM_INTERACTS];
 extern const char *sector_flags[];
 
 // external funcs
+extern struct archetype_gear *copy_archetype_gear(struct archetype_gear *input);
+void free_archetype_gear(struct archetype_gear *list);
 void sort_interactions(struct interaction_item **list);
 
 
@@ -273,6 +275,7 @@ void save_olc_global(descriptor_data *desc) {
 		GET_GLOBAL_INTERACTIONS(proto) = interact->next;
 		free(interact);
 	}
+	free_archetype_gear(GET_GLOBAL_GEAR(proto));
 	
 	// sanity
 	if (!GET_GLOBAL_NAME(glb) || !*GET_GLOBAL_NAME(glb)) {
@@ -314,8 +317,9 @@ struct global_data *setup_olc_global(struct global_data *input) {
 		// copy things that are pointers
 		GET_GLOBAL_NAME(new) = GET_GLOBAL_NAME(input) ? str_dup(GET_GLOBAL_NAME(input)) : NULL;
 		
-		// copy interactions
+		// copy pointers
 		GET_GLOBAL_INTERACTIONS(new) = copy_interaction_list(GET_GLOBAL_INTERACTIONS(input));
+		GET_GLOBAL_GEAR(new) = copy_archetype_gear(GET_GLOBAL_GEAR(input));
 	}
 	else {
 		// brand new: some defaults

@@ -311,7 +311,7 @@ void archedit_process_gear(char_data *ch, char *argument, struct archetype_gear 
 		loc = NO_WEAR;	// this indicates inventory
 		
 		if (!*slot_arg || !*num_arg || !isdigit(*num_arg) || num <= 0) {
-			msg_to_char(ch, "Usage: gear add <gear slot> <vnum>\r\n");
+			msg_to_char(ch, "Usage: gear add <inventory | slot> <vnum>\r\n");
 		}
 		else if ((loc = find_gear_slot_by_name(slot_arg)) == GEAR_ERROR) {
 			msg_to_char(ch, "Invalid gear slot '%s'.\r\n", slot_arg);
@@ -437,7 +437,7 @@ void archedit_process_gear(char_data *ch, char *argument, struct archetype_gear 
 		}
 	}
 	else {
-		msg_to_char(ch, "Usage: gear add <gear slot> <obj vnum>\r\n");
+		msg_to_char(ch, "Usage: gear add <inventory | slot> <obj vnum>\r\n");
 		msg_to_char(ch, "       gear copy <from type> <from vnum>\r\n");
 		msg_to_char(ch, "       gear change <number> <slot | vnum> <new value>\r\n");
 		msg_to_char(ch, "       gear remove <number | all>\r\n");

@@ -59,6 +59,7 @@ extern bool world_is_sorted;
 // external funcs
 extern struct complex_room_data *init_complex_data();
 void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location);
+void free_archetype_gear(struct archetype_gear *list);
 extern room_data *load_map_room(room_vnum vnum);
 extern obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify);
 void sort_exits(struct room_direction_data **list);
@@ -2590,6 +2591,10 @@ void free_global(struct global_data *glb) {
 			GET_GLOBAL_INTERACTIONS(glb) = interact->next;
 			free(interact);
 		}
+	}
+	
+	if (GET_GLOBAL_GEAR(glb) && (!proto || GET_GLOBAL_GEAR(glb) != GET_GLOBAL_GEAR(proto))) {
+		free_archetype_gear(GET_GLOBAL_GEAR(glb));
 	}
 	
 	free(glb);
