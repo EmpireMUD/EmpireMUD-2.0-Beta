@@ -259,7 +259,11 @@ bool valid_default_rank(char_data *ch, char *argument) {
 * @return bool TRUE if any problems were reported; FALSE if all good.
 */
 bool audit_archetype(archetype_data *arch, char_data *ch) {
+	int gear_count[NUM_WEARS], iter, pos, total;
+	struct archetype_gear *gear;
+	struct archetype_skill *sk;
 	bool problem = FALSE;
+	obj_data *proto;
 	
 	if (ARCHETYPE_FLAGGED(arch, ARCH_IN_DEVELOPMENT)) {
 		olc_audit_msg(ch, GET_ARCH_VNUM(arch), "IN-DEVELOPMENT");
@@ -267,6 +271,82 @@ bool audit_archetype(archetype_data *arch, char_data *ch) {
 	}
 	if (!GET_ARCH_NAME(arch) || !*GET_ARCH_NAME(arch) || !str_cmp(GET_ARCH_NAME(arch), default_archetype_name)) {
 		olc_audit_msg(ch, GET_ARCH_VNUM(arch), "No name set");
+		problem = TRUE;
+	}
+	
+	if (strlen(NULLSAFE(GET_ARCH_DESC(arch))) > 40) {	// arbitrary number
+		olc_audit_msg(ch, GET_ARCH_VNUM(arch), "Description is long");
+		problem = TRUE;
+	}
+	
+	if (GET_ARCH_LORE(arch) && *GET_ARCH_LORE(arch)) {
+		for (iter = 0; iter < strlen(GET_ARCH_LORE(arch)); ++iter) {
+			if (*(GET_ARCH_LORE(arch) + iter) == '$' && !strchr("esm", *(GET_ARCH_LORE(arch) + iter + 1))) {
+				olc_audit_msg(ch, GET_ARCH_VNUM(arch), "Lore contains bad $ code");
+				problem = TRUE;
+				break;	// report only 1
+			}
+		}
+		
+		if (ispunct(*(GET_ARCH_LORE(arch) + strlen(GET_ARCH_LORE(arch)) - 1))) {
+			olc_audit_msg(ch, GET_ARCH_VNUM(arch), "Lore ends with punctuation");
+			problem = TRUE;
+		}
+	}
+	
+	// check for overloaded gear slots
+	for (iter = 0; iter < NUM_WEARS; ++iter) {
+		gear_count[iter] = 0;
+	}
+	for (gear = GET_ARCH_GEAR(arch); gear; gear = gear->next) {
+		// only check on non-inventory
+		if (gear->wear != NO_WEAR) {
+			pos = gear->wear;
+			
+			// check item matches pos
+			if (!(proto = obj_proto(gear->vnum))) {
+				olc_audit_msg(ch, GET_ARCH_VNUM(arch), "Missing gear vnum %d", gear->vnum);
+				problem = TRUE;
+			}
+			else if (!CAN_WEAR(proto, wear_data[pos].item_wear)) {
+				olc_audit_msg(ch, GET_ARCH_VNUM(arch), "Item %s can't be worn on %s", GET_OBJ_SHORT_DESC(proto), wear_data[pos].name);
+				problem = TRUE;
+			}
+			
+			while (gear_count[pos] > 0 && wear_data[pos].cascade_pos != NO_WEAR) {
+				pos = wear_data[pos].cascade_pos;
+			}
+			++gear_count[pos];
+		}
+	}
+	for (iter = 0; iter < NUM_WEARS; ++iter) {
+		if (gear_count[iter] > 1) {
+			olc_audit_msg(ch, GET_ARCH_VNUM(arch), "Duplicate gear for %s slot", wear_data[iter].name);
+			problem = TRUE;
+		}
+	}
+	
+	// attributes
+	total = 0;
+	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
+		total += GET_ARCH_ATTRIBUTE(arch, iter);
+		if (GET_ARCH_ATTRIBUTE(arch, iter) == 0) {
+			olc_audit_msg(ch, GET_ARCH_VNUM(arch), "%s is 0", attributes[iter].name);
+			problem = TRUE;
+		}
+	}
+	if (total != 11) {	// this number is arbitrary
+		olc_audit_msg(ch, GET_ARCH_VNUM(arch), "Attributes total %d", total);
+		problem = TRUE;
+	}
+	
+	// skills
+	total = 0;
+	for (sk = GET_ARCH_SKILLS(arch); sk; sk = sk->next) {
+		total += sk->level;
+	}
+	if (total != 30) {	// this number is arbitrary
+		olc_audit_msg(ch, GET_ARCH_VNUM(arch), "Skill points total %d", total);
 		problem = TRUE;
 	}
 	
