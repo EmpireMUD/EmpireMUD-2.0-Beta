@@ -59,9 +59,34 @@ extern const struct wear_data_type wear_data[NUM_WEARS];
 */
 void add_archetype_lore(char_data *ch) {
 	archetype_data *arch = archetype_proto(CREATION_ARCHETYPE(ch));
+	char temp[MAX_STRING_LENGTH];
+	char *str;
 	
 	if (arch && GET_ARCH_LORE(arch) && *GET_ARCH_LORE(arch)) {
-		add_lore(ch, LORE_CREATED, GET_ARCH_LORE(arch));
+		strcpy(temp, GET_ARCH_LORE(arch));
+		
+		// he/she
+		if (strstr(temp, "$e")) {
+			str = str_replace(temp, "$e", HSSH(ch));
+			strcpy(temp, str);
+			free(str);
+		}
+		// his/her
+		if (strstr(temp, "$s")) {
+			str = str_replace(temp, "$s", HSHR(ch));
+			strcpy(temp, str);
+			free(str);
+		}
+		// him/her
+		if (strstr(temp, "$m")) {
+			str = str_replace(temp, "$m", HMHR(ch));
+			strcpy(temp, str);
+			free(str);
+		}
+		
+		CAP(temp);
+		
+		add_lore(ch, LORE_CREATED, temp);
 	}
 }
 
@@ -716,7 +741,6 @@ void display_archetype_info(descriptor_data *desc, archetype_data *arch) {
 	struct archetype_skill *sk;
 	int iter;
 	
-	msg_to_desc(desc, "\r\n");
 	msg_to_desc(desc, "[\tc%s\t0] - %s\r\n", GET_ARCH_NAME(arch), GET_ARCH_DESC(arch));
 	
 	msg_to_desc(desc, "\tyAttributes\t0:\r\n");
@@ -1058,17 +1082,16 @@ void do_stat_archetype(char_data *ch, archetype_data *arch) {
 	}
 	
 	// first line
-	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Name: \tc%s\t0\r\n", GET_ARCH_VNUM(arch), GET_ARCH_NAME(arch));
+	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Name: \tc%s\t0, Ranks: [\ta%s\t0/\tp%s\t0]\r\n", GET_ARCH_VNUM(arch), GET_ARCH_NAME(arch), GET_ARCH_MALE_RANK(arch), GET_ARCH_FEMALE_RANK(arch));
 	
 	size += snprintf(buf + size, sizeof(buf) - size, "Description: %s\r\n", GET_ARCH_DESC(arch));
 
 	if (GET_ARCH_LORE(arch) && *GET_ARCH_LORE(arch)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "Lore: \tc%s\t0 [on Month Day, Year], ", GET_ARCH_DESC(arch));
+		size += snprintf(buf + size, sizeof(buf) - size, "Lore: \tc%s\t0 [on Month Day, Year]\r\n", GET_ARCH_LORE(arch));
 	}
 	else {
-		size += snprintf(buf + size, sizeof(buf) - size, "Lore: \tcnone\t0, ");
+		size += snprintf(buf + size, sizeof(buf) - size, "Lore: \tcnone\t0\r\n");
 	}
-	size += snprintf(buf + size, sizeof(buf) - size, "Ranks: [\ta%s\t0/\tp%s\t0]\r\n", GET_ARCH_MALE_RANK(arch), GET_ARCH_FEMALE_RANK(arch));
 	
 	sprintbit(GET_ARCH_FLAGS(arch), archetype_flags, part, TRUE);
 	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);

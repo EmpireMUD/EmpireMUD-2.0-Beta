@@ -703,6 +703,11 @@ at all from it.
 Lore is always the first part of a sentence that will end with "on Month Day,
 Year." It should end with no punctuation.
 
+You can use the following tokens in lore:
+ $e - he/she
+ $s - his/her
+ $m - him/her
+
 See also: OLC ARCHETYPES
 #d
 "ARCHEDIT NAME"

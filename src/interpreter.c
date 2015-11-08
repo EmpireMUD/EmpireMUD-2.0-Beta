@@ -1614,7 +1614,7 @@ void prompt_creation(descriptor_data *d) {
 			archetype_data *arch = archetype_proto(CREATION_ARCHETYPE(d->character));
 			
 			display_archetype_info(d, arch);
-			msg_to_desc(d, "Is this correct (y/n)? ");
+			msg_to_desc(d, "\r\nIs this correct (y/n)? ");
 			break;
 		}
 		case CON_PROMO_CODE: {
