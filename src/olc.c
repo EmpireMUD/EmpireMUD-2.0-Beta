@@ -146,6 +146,7 @@ OLC_MODULE(cropedit_ymin);
 OLC_MODULE(gedit_ability);
 OLC_MODULE(gedit_capacity);
 OLC_MODULE(gedit_flags);
+OLC_MODULE(gedit_gear);
 OLC_MODULE(gedit_interaction);
 OLC_MODULE(gedit_maxlevel);
 OLC_MODULE(gedit_minlevel);
@@ -438,6 +439,7 @@ const struct olc_command_data olc_data[] = {
 	{ "ability", gedit_ability, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "capacity", gedit_capacity, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "flags", gedit_flags, OLC_GLOBAL, OLC_CF_EDITOR },
+	{ "gear", gedit_gear, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "interaction", gedit_interaction, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "maxlevel", gedit_maxlevel, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "minlevel", gedit_minlevel, OLC_GLOBAL, OLC_CF_EDITOR },

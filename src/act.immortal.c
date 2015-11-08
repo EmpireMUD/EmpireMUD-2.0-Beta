@@ -2914,6 +2914,12 @@ void do_stat_global(char_data *ch, struct global_data *glb) {
 			msg_to_char(ch, "Capacity: [&g%d-%d normal, %d-%d deep&0], Sector Flags: &c%s&0, Exclude: &c%s&0\r\n", GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE)/2, GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE), (int)(GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE) / 2.0 * 1.5), (int)(GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE) * 1.5), buf, buf2);
 			break;
 		}
+		case GLOBAL_NEWBIE_GEAR: {
+			void get_archetype_gear_display(struct archetype_gear *list, char *save_buffer);
+			get_archetype_gear_display(GET_GLOBAL_GEAR(glb), buf2);
+			msg_to_char(ch, "Gear:\r\n%s", buf2);
+			break;
+		}
 	}
 	
 	if (GET_GLOBAL_INTERACTIONS(glb)) {

@@ -358,31 +358,33 @@ void olc_show_global(char_data *ch) {
 	sprintbit(GET_GLOBAL_FLAGS(glb), global_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<&yflags&0> %s\r\n", lbuf);
 	
+	if (GET_GLOBAL_TYPE(glb) != GLOBAL_NEWBIE_GEAR) {
 	if (GET_GLOBAL_MIN_LEVEL(glb) == 0) {
-		sprintf(buf + strlen(buf), "<&yminlevel&0> none\r\n");
-	}
-	else {
-		sprintf(buf + strlen(buf), "<&yminlevel&0> %d\r\n", GET_GLOBAL_MIN_LEVEL(glb));
-	}
-	
-	if (GET_GLOBAL_MAX_LEVEL(glb) == 0) {
-		sprintf(buf + strlen(buf), "<&ymaxlevel&0> none\r\n");
-	}
-	else {
-		sprintf(buf + strlen(buf), "<&ymaxlevel&0> %d\r\n", GET_GLOBAL_MAX_LEVEL(glb));
-	}
-	
-	// ability required
-	if (GET_GLOBAL_ABILITY(glb) == NO_ABIL) {
-		strcpy(buf1, "none");
-	}
-	else {
-		sprintf(buf1, "%s", ability_data[GET_GLOBAL_ABILITY(glb)].name);
-		if (ability_data[GET_GLOBAL_ABILITY(glb)].parent_skill != NO_SKILL) {
-			sprintf(buf1 + strlen(buf1), " (%s %d)", skill_data[ability_data[GET_GLOBAL_ABILITY(glb)].parent_skill].name, ability_data[GET_GLOBAL_ABILITY(glb)].parent_skill_required);
+			sprintf(buf + strlen(buf), "<&yminlevel&0> none\r\n");
 		}
+		else {
+			sprintf(buf + strlen(buf), "<&yminlevel&0> %d\r\n", GET_GLOBAL_MIN_LEVEL(glb));
+		}
+	
+		if (GET_GLOBAL_MAX_LEVEL(glb) == 0) {
+			sprintf(buf + strlen(buf), "<&ymaxlevel&0> none\r\n");
+		}
+		else {
+			sprintf(buf + strlen(buf), "<&ymaxlevel&0> %d\r\n", GET_GLOBAL_MAX_LEVEL(glb));
+		}
+	
+		// ability required
+		if (GET_GLOBAL_ABILITY(glb) == NO_ABIL) {
+			strcpy(buf1, "none");
+		}
+		else {
+			sprintf(buf1, "%s", ability_data[GET_GLOBAL_ABILITY(glb)].name);
+			if (ability_data[GET_GLOBAL_ABILITY(glb)].parent_skill != NO_SKILL) {
+				sprintf(buf1 + strlen(buf1), " (%s %d)", skill_data[ability_data[GET_GLOBAL_ABILITY(glb)].parent_skill].name, ability_data[GET_GLOBAL_ABILITY(glb)].parent_skill_required);
+			}
+		}
+		sprintf(buf + strlen(buf), "<&yability&0> %s\r\n", buf1);
 	}
-	sprintf(buf + strlen(buf), "<&yability&0> %s\r\n", buf1);
 	
 	sprintf(buf + strlen(buf), "<&ypercent&0> %.2f%%\r\n", GET_GLOBAL_PERCENT(glb));
 	
@@ -393,6 +395,10 @@ void olc_show_global(char_data *ch) {
 			sprintf(buf + strlen(buf), "<&ymobflags&0> %s\r\n", lbuf);
 			sprintbit(GET_GLOBAL_TYPE_EXCLUDE(glb), action_bits, lbuf, TRUE);
 			sprintf(buf + strlen(buf), "<&ymobexclude&0> %s\r\n", lbuf);
+
+			sprintf(buf + strlen(buf), "Interactions: <&yinteraction&0>\r\n");
+			get_interaction_display(GET_GLOBAL_INTERACTIONS(glb), buf1);
+			strcat(buf, buf1);
 			break;
 		}
 		case GLOBAL_MINE_DATA: {
@@ -401,13 +407,19 @@ void olc_show_global(char_data *ch) {
 			sprintbit(GET_GLOBAL_TYPE_EXCLUDE(glb), sector_flags, lbuf, TRUE);
 			sprintf(buf + strlen(buf), "<&ysectorexclude&0> %s\r\n", lbuf);
 			sprintf(buf + strlen(buf), "<&ycapacity&0> %d ore (%d-%d normal, %d-%d deep)\r\n", GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE), GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE)/2, GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE), (int)(GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE) / 2.0 * 1.5), (int)(GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE) * 1.5));
+	
+			sprintf(buf + strlen(buf), "Interactions: <&yinteraction&0>\r\n");
+			get_interaction_display(GET_GLOBAL_INTERACTIONS(glb), buf1);
+			strcat(buf, buf1);
+			break;
+		}
+		case GLOBAL_NEWBIE_GEAR: {			
+			void get_archetype_gear_display(struct archetype_gear *list, char *save_buffer);
+			get_archetype_gear_display(GET_GLOBAL_GEAR(glb), lbuf);
+			sprintf(buf + strlen(buf), "Gear: <\tygear\t0>\r\n%s", lbuf);
 			break;
 		}
 	}
-	
-	sprintf(buf + strlen(buf), "Interactions: <&yinteraction&0>\r\n");
-	get_interaction_display(GET_GLOBAL_INTERACTIONS(glb), buf1);
-	strcat(buf, buf1);
 		
 	page_string(ch->desc, buf, TRUE);
 }
@@ -473,6 +485,20 @@ OLC_MODULE(gedit_flags) {
 	if (had_indev && !IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_IN_DEVELOPMENT) && GET_ACCESS_LEVEL(ch) < LVL_UNRESTRICTED_BUILDER && !OLC_FLAGGED(ch, OLC_FLAG_CLEAR_IN_DEV)) {
 		msg_to_char(ch, "You don't have permission to remove the IN-DEVELOPMENT flag.\r\n");
 		SET_BIT(GET_GLOBAL_FLAGS(glb), GLB_FLAG_IN_DEVELOPMENT);
+	}
+}
+
+
+OLC_MODULE(gedit_gear) {
+	void archedit_process_gear(char_data *ch, char *argument, struct archetype_gear **list);
+	
+	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
+	
+	if (GET_GLOBAL_TYPE(glb) != GLOBAL_NEWBIE_GEAR) {
+		msg_to_char(ch, "You can't set gear on this type.\r\n");
+	}
+	else {
+		archedit_process_gear(ch, argument, &GET_GLOBAL_GEAR(glb));
 	}
 }
 

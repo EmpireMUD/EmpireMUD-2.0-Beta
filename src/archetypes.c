@@ -39,6 +39,10 @@ const char *default_archetype_name = "unnamed archetype";
 const char *default_archetype_desc = "no description";
 const char *default_archetype_rank = "Adventurer";
 
+// local protos
+void free_archetype_gear(struct archetype_gear *list);
+void get_archetype_gear_display(struct archetype_gear *list, char *save_buffer);
+
 // external consts
 extern const char *archetype_flags[];
 extern int attribute_display_order[NUM_ATTRIBUTES];
@@ -252,6 +256,196 @@ bool valid_default_rank(char_data *ch, char *argument) {
 //// UTILITIES ///////////////////////////////////////////////////////////////
 
 /**
+* OLC processor for archetype gear, which is also used by globals.
+*
+* @param char_data *ch The player using OLC.
+* @param char *argument The arguments the player entered.
+* @param struct archetype_gear **list A pointer to a gear list to modify.
+*/
+void archedit_process_gear(char_data *ch, char *argument, struct archetype_gear **list) {
+	char cmd_arg[MAX_INPUT_LENGTH], slot_arg[MAX_INPUT_LENGTH], num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
+	struct archetype_gear *gear, *next_gear, *change, *temp, *copyfrom;
+	char buf[MAX_STRING_LENGTH];
+	archetype_data *copyarch;
+	bitvector_t findtype;
+	int loc, num;
+	bool found;
+	
+	argument = any_one_arg(argument, cmd_arg);
+	skip_spaces(&argument);
+	
+	if (is_abbrev(cmd_arg, "remove")) {
+		if (!*argument) {
+			msg_to_char(ch, "Remove which gear (number)?\r\n");
+		}
+		else if (!str_cmp(argument, "all")) {
+			free_archetype_gear(*list);
+			*list = NULL;
+			msg_to_char(ch, "You remove all the gear.\r\n");
+		}
+		else if (!isdigit(*argument) || (num = atoi(argument)) < 1) {
+			msg_to_char(ch, "Invalid gear number.\r\n");
+		}
+		else {
+			found = FALSE;
+			for (gear = *list; gear && !found; gear = next_gear) {
+				next_gear = gear->next;
+				if (--num == 0) {
+					found = TRUE;
+					
+					msg_to_char(ch, "You remove %s.\r\n", get_obj_name_by_proto(gear->vnum));
+					REMOVE_FROM_LIST(gear, *list, next);
+					free(gear);
+				}
+			}
+			
+			if (!found) {
+				msg_to_char(ch, "Invalid gear number.\r\n");
+			}
+		}
+	}
+	else if (is_abbrev(cmd_arg, "add")) {
+		argument = any_one_arg(argument, slot_arg);
+		argument = any_one_arg(argument, num_arg);
+		num = atoi(num_arg);
+		loc = NO_WEAR;	// this indicates inventory
+		
+		if (!*slot_arg || !*num_arg || !isdigit(*num_arg) || num <= 0) {
+			msg_to_char(ch, "Usage: gear add <gear slot> <vnum>\r\n");
+		}
+		else if ((loc = find_gear_slot_by_name(slot_arg)) == GEAR_ERROR) {
+			msg_to_char(ch, "Invalid gear slot '%s'.\r\n", slot_arg);
+		}
+		else if (!obj_proto(num)) {
+			msg_to_char(ch, "Invalid object vnum %d.\r\n", num);
+		}
+		else {
+			CREATE(gear, struct archetype_gear, 1);
+			gear->wear = loc;
+			gear->vnum = num;
+			
+			// append to end
+			if ((temp = *list)) {
+				while (temp->next) {
+					temp = temp->next;
+				}
+				temp->next = gear;
+			}
+			else {
+				*list = gear;
+			}
+			
+			msg_to_char(ch, "You add %s (%s).\r\n", get_obj_name_by_proto(num), loc == NO_WEAR ? "inventory" : wear_data[loc].name);
+		}
+	}
+	else if (is_abbrev(cmd_arg, "change")) {
+		argument = any_one_arg(argument, num_arg);
+		argument = any_one_arg(argument, type_arg);
+		argument = any_one_arg(argument, val_arg);
+		
+		if (!*num_arg || !isdigit(*num_arg) || !*type_arg || !*val_arg) {
+			msg_to_char(ch, "Usage: gear change <number> <slot | vnum> <new value>\r\n");
+			return;
+		}
+		
+		// find which one to change
+		if (!isdigit(*num_arg) || (num = atoi(num_arg)) < 1) {
+			msg_to_char(ch, "Invalid gear number.\r\n");
+			return;
+		}
+		change = NULL;
+		for (gear = *list; gear && !change; gear = gear->next) {
+			if (--num == 0) {
+				change = gear;
+				break;
+			}
+		}
+		if (!change) {
+			msg_to_char(ch, "Invalid gear number.\r\n");
+		}
+		else if (is_abbrev(type_arg, "vnum")) {
+			num = atoi(val_arg);
+			if (!obj_proto(num)) {
+				msg_to_char(ch, "Invalid object vnum '%s'.\r\n", val_arg);
+			}
+			else {
+				change->vnum = num;
+				msg_to_char(ch, "Gear %d changed to vnum %d (%s).\r\n", atoi(num_arg), num, get_obj_name_by_proto(num));
+			}
+		}
+		else if (is_abbrev(type_arg, "slot")) {
+			if ((loc = find_gear_slot_by_name(val_arg)) == GEAR_ERROR) {
+				msg_to_char(ch, "Invalid gear slot '%s'.\r\n", val_arg);
+			}
+			else {
+				change->wear = loc;
+				msg_to_char(ch, "Gear %d changed to %s.\r\n", atoi(num_arg), loc == NO_WEAR ? "inventory" : wear_data[loc].name);
+			}
+		}
+		else {
+			msg_to_char(ch, "You can only change the slot or vnum.\r\n");
+		}
+	}
+	else if (is_abbrev(cmd_arg, "copy")) {
+		argument = any_one_arg(argument, type_arg);
+		argument = any_one_arg(argument, num_arg);
+		copyfrom = NULL;
+		
+		if (!*type_arg || !*num_arg) {
+			msg_to_char(ch, "Usage: gear copy <from type> <from vnum>\r\n");
+		}
+		else if ((findtype = find_olc_type(type_arg)) == 0) {
+			msg_to_char(ch, "Unknown olc type '%s'.\r\n", type_arg);
+		}
+		else if (!isdigit(*num_arg)) {
+			sprintbit(findtype, olc_type_bits, buf, FALSE);
+			msg_to_char(ch, "Copy spawns from which %s?\r\n", buf);
+		}
+		else if ((num = atoi(num_arg)) < 0) {
+			msg_to_char(ch, "Invalid vnum.\r\n");
+		}
+		else {
+			sprintbit(findtype, olc_type_bits, buf, FALSE);
+			
+			switch (findtype) {
+				case OLC_ARCHETYPE: {
+					if ((copyarch = archetype_proto(num))) {
+						copyfrom = GET_ARCH_GEAR(copyarch);
+					}
+					break;
+				}
+				case OLC_GLOBAL: {
+					struct global_data *glb;
+					if ((glb = global_proto(num))) {
+						copyfrom = GET_GLOBAL_GEAR(glb);
+					}
+					break;
+				}
+				default: {
+					msg_to_char(ch, "You can't copy gear from %ss.\r\n", buf);
+					return;
+				}
+			}
+			
+			if (!copyfrom) {
+				msg_to_char(ch, "Invalid %s vnum '%s'.\r\n", buf, num_arg);
+			}
+			else {
+				smart_copy_gear(list, copyfrom);
+				msg_to_char(ch, "Gear copied from %s %d.\r\n", buf, num);
+			}
+		}
+	}
+	else {
+		msg_to_char(ch, "Usage: gear add <gear slot> <obj vnum>\r\n");
+		msg_to_char(ch, "       gear copy <from type> <from vnum>\r\n");
+		msg_to_char(ch, "       gear change <number> <slot | vnum> <new value>\r\n");
+		msg_to_char(ch, "       gear remove <number | all>\r\n");
+	}
+}
+
+
+/**
 * Checks for common archetype problems and reports them to ch.
 *
 * @param archetype_data *arch The item to audit.
@@ -274,7 +468,7 @@ bool audit_archetype(archetype_data *arch, char_data *ch) {
 		problem = TRUE;
 	}
 	
-	if (strlen(NULLSAFE(GET_ARCH_DESC(arch))) > 40) {	// arbitrary number
+	if (strlen(NULLSAFE(GET_ARCH_DESC(arch))) > 60) {	// arbitrary number
 		olc_audit_msg(ch, GET_ARCH_VNUM(arch), "Description is long");
 		problem = TRUE;
 	}
@@ -634,6 +828,43 @@ void free_archetype(archetype_data *arch) {
 
 
 /**
+* Parse a 'G' gear tag.
+*
+* @param FILE *fl A file open for reading, having just read the 'G' line.
+* @param struct archetype_gear **list The list to save the result to.
+* @param char *error The string describing the item being read, in case something goes wrong.
+*/
+void parse_archetype_gear(FILE *fl, struct archetype_gear **list, char *error) {
+	struct archetype_gear *gear, *last;
+	char line[256];
+	int int_in[2];
+
+	if (!get_line(fl, line) || sscanf(line, "%d %d", &int_in[0], &int_in[1]) != 2) {
+		log("SYSERR: format error in G line of %s", error);
+		exit(1);
+	}
+	
+	// only accept valid positions
+	if (int_in[0] >= NO_WEAR && int_in[0] < NUM_WEARS) {
+		CREATE(gear, struct archetype_gear, 1);
+		gear->wear = int_in[0];
+		gear->vnum = int_in[1];
+	
+		// append
+		if ((last = *list)) {
+			while (last->next) {
+				last = last->next;
+			}
+			last->next = gear;
+		}
+		else {
+			*list = gear;
+		}
+	}
+}
+
+
+/**
 * Read one archetype from file.
 *
 * @param FILE *fl The open .arch file
@@ -641,7 +872,6 @@ void free_archetype(archetype_data *arch) {
 */
 void parse_archetype(FILE *fl, any_vnum vnum) {
 	char line[256], error[256], str_in[256];
-	struct archetype_gear *gear, *last_gear = NULL;
 	struct archetype_skill *sk, *last_sk = NULL;
 	archetype_data *arch, *find;
 	int int_in[4];
@@ -695,26 +925,7 @@ void parse_archetype(FILE *fl, any_vnum vnum) {
 				break;
 			}
 			case 'G': {	// gear: loc vnum
-				if (!get_line(fl, line) || sscanf(line, "%d %d", &int_in[0], &int_in[1]) != 2) {
-					log("SYSERR: format error in G line of %s", error);
-					exit(1);
-				}
-				
-				// only accept valid positions
-				if (int_in[0] >= NO_WEAR && int_in[0] < NUM_WEARS) {
-					CREATE(gear, struct archetype_gear, 1);
-					gear->wear = int_in[0];
-					gear->vnum = int_in[1];
-				
-					// append
-					if (last_gear) {
-						last_gear->next = gear;
-					}
-					else {
-						GET_ARCH_GEAR(arch) = gear;
-					}
-					last_gear = gear;
-				}
+				parse_archetype_gear(fl, &GET_ARCH_GEAR(arch), error);
 				break;
 			}
 			case 'K': {	// skill: number level
@@ -774,6 +985,22 @@ void write_archetype_index(FILE *fl) {
 
 
 /**
+* Writes the 'G' tag with archetype gear to an open file.
+*
+* @param FILE *fl The open file to write to.
+* @param struct archetype_gear *list The list to save.
+*/
+void write_archetype_gear_to_file(FILE *fl, struct archetype_gear *list) {
+	struct archetype_gear *gear;
+	
+	// G: gear
+	for (gear = list; gear; gear = gear->next) {
+		fprintf(fl, "G\n%d %d  # %s\n", gear->wear, gear->vnum, get_obj_name_by_proto(gear->vnum));
+	}
+}
+
+
+/**
 * Outputs one archetype in the db file format, starting with a #VNUM and
 * ending with an S.
 *
@@ -781,7 +1008,6 @@ void write_archetype_index(FILE *fl) {
 * @param archetype_data *arch The thing to save.
 */
 void write_archetype_to_file(FILE *fl, archetype_data *arch) {
-	struct archetype_gear *gear;
 	struct archetype_skill *sk;
 	int iter;
 	
@@ -809,10 +1035,8 @@ void write_archetype_to_file(FILE *fl, archetype_data *arch) {
 		}
 	}
 	
-	// G: gear
-	for (gear = GET_ARCH_GEAR(arch); gear; gear = gear->next) {
-		fprintf(fl, "G\n%d %d\n", gear->wear, gear->vnum);
-	}
+	// 'G': gear
+	write_archetype_gear_to_file(fl, GET_ARCH_GEAR(arch));
 	
 	// K: skills
 	for (sk = GET_ARCH_SKILLS(arch); sk; sk = sk->next) {
@@ -1168,9 +1392,8 @@ archetype_data *setup_olc_archetype(archetype_data *input) {
 */
 void do_stat_archetype(char_data *ch, archetype_data *arch) {
 	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
-	struct archetype_gear *gear;
 	struct archetype_skill *sk;
-	int iter, num, pos, total;
+	int iter, pos, total;
 	size_t size;
 	
 	if (!arch) {
@@ -1219,11 +1442,29 @@ void do_stat_archetype(char_data *ch, archetype_data *arch) {
 	
 	// gear
 	size += snprintf(buf + size, sizeof(buf) - size, "Gear:\r\n");
-	for (gear = GET_ARCH_GEAR(arch), num = 1; gear; gear = gear->next, ++num) {
-		size += snprintf(buf + size, sizeof(buf) - size, " %2d. %s: [\ty%d\t0] \ty%s\t0\r\n", num, gear->wear == NO_WEAR ? "inventory" : wear_data[gear->wear].name, gear->vnum, get_obj_name_by_proto(gear->vnum));
-	}
+	get_archetype_gear_display(GET_ARCH_GEAR(arch), part);
+	size += snprintf(buf + size, sizeof(buf) - size, "%s", part);
 	
 	page_string(ch->desc, buf, TRUE);
+}
+
+
+/**
+* Displays the archetype-gear data from a given list.
+*
+* @param struct archetype_gear *list Pointer to the start of a list of gear.
+* @param char *save_buffer A buffer to store the result to.
+*/
+void get_archetype_gear_display(struct archetype_gear *list, char *save_buffer) {
+	struct archetype_gear *gear;
+	int num;
+	*save_buffer = '\0';
+	for (gear = list, num = 1; gear; gear = gear->next, ++num) {
+		sprintf(save_buffer + strlen(save_buffer), " %2d. %s: [%d] %s\r\n", num, gear->wear == NO_WEAR ? "inventory" : wear_data[gear->wear].name, gear->vnum, get_obj_name_by_proto(gear->vnum));
+	}
+	if (!list) {
+		sprintf(save_buffer + strlen(save_buffer), "  none\r\n");
+	}
 }
 
 
@@ -1236,9 +1477,8 @@ void do_stat_archetype(char_data *ch, archetype_data *arch) {
 void olc_show_archetype(char_data *ch) {
 	archetype_data *arch = GET_OLC_ARCHETYPE(ch->desc);
 	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
-	struct archetype_gear *gear;
 	struct archetype_skill *sk;
-	int num, iter, pos, total;
+	int iter, pos, total;
 	
 	if (!arch) {
 		return;
@@ -1284,9 +1524,8 @@ void olc_show_archetype(char_data *ch) {
 	
 	// gear
 	sprintf(buf + strlen(buf), "Gear: <\tygear\t0>\r\n");
-	for (gear = GET_ARCH_GEAR(arch), num = 1; gear; gear = gear->next, ++num) {
-		sprintf(buf + strlen(buf), " %2d. %s: [%d] %s\r\n", num, gear->wear == NO_WEAR ? "inventory" : wear_data[gear->wear].name, gear->vnum, get_obj_name_by_proto(gear->vnum));
-	}
+	get_archetype_gear_display(GET_ARCH_GEAR(arch), lbuf);
+	strcat(buf, lbuf);
 	
 	page_string(ch->desc, buf, TRUE);
 }
@@ -1394,178 +1633,8 @@ OLC_MODULE(archedit_flags) {
 
 
 OLC_MODULE(archedit_gear) {
-	archetype_data *arch = GET_OLC_ARCHETYPE(ch->desc), *copyarch;
-	char cmd_arg[MAX_INPUT_LENGTH], slot_arg[MAX_INPUT_LENGTH], num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
-	struct archetype_gear *gear, *next_gear, *change, *temp, *copyfrom;
-	char buf[MAX_STRING_LENGTH];
-	bitvector_t findtype;
-	int loc, num;
-	bool found;
-	
-	argument = any_one_arg(argument, cmd_arg);
-	skip_spaces(&argument);
-	
-	if (is_abbrev(cmd_arg, "remove")) {
-		if (!*argument) {
-			msg_to_char(ch, "Remove which gear (number)?\r\n");
-		}
-		else if (!str_cmp(argument, "all")) {
-			free_archetype_gear(GET_ARCH_GEAR(arch));
-			GET_ARCH_GEAR(arch) = NULL;
-			msg_to_char(ch, "You remove all the gear.\r\n");
-		}
-		else if (!isdigit(*argument) || (num = atoi(argument)) < 1) {
-			msg_to_char(ch, "Invalid gear number.\r\n");
-		}
-		else {
-			found = FALSE;
-			for (gear = GET_ARCH_GEAR(arch); gear && !found; gear = next_gear) {
-				next_gear = gear->next;
-				if (--num == 0) {
-					found = TRUE;
-					
-					msg_to_char(ch, "You remove %s.\r\n", get_obj_name_by_proto(gear->vnum));
-					REMOVE_FROM_LIST(gear, GET_ARCH_GEAR(arch), next);
-					free(gear);
-				}
-			}
-			
-			if (!found) {
-				msg_to_char(ch, "Invalid gear number.\r\n");
-			}
-		}
-	}
-	else if (is_abbrev(cmd_arg, "add")) {
-		argument = any_one_arg(argument, slot_arg);
-		argument = any_one_arg(argument, num_arg);
-		num = atoi(num_arg);
-		loc = NO_WEAR;	// this indicates inventory
-		
-		if (!*slot_arg || !*num_arg || !isdigit(*num_arg) || num <= 0) {
-			msg_to_char(ch, "Usage: gear add <gear slot> <vnum>\r\n");
-		}
-		else if ((loc = find_gear_slot_by_name(slot_arg)) == GEAR_ERROR) {
-			msg_to_char(ch, "Invalid gear slot '%s'.\r\n", slot_arg);
-		}
-		else if (!obj_proto(num)) {
-			msg_to_char(ch, "Invalid object vnum %d.\r\n", num);
-		}
-		else {
-			CREATE(gear, struct archetype_gear, 1);
-			gear->wear = loc;
-			gear->vnum = num;
-			
-			// append to end
-			if ((temp = GET_ARCH_GEAR(arch))) {
-				while (temp->next) {
-					temp = temp->next;
-				}
-				temp->next = gear;
-			}
-			else {
-				GET_ARCH_GEAR(arch) = gear;
-			}
-			
-			msg_to_char(ch, "You add %s (%s).\r\n", get_obj_name_by_proto(num), loc == NO_WEAR ? "inventory" : wear_data[loc].name);
-		}
-	}
-	else if (is_abbrev(cmd_arg, "change")) {
-		argument = any_one_arg(argument, num_arg);
-		argument = any_one_arg(argument, type_arg);
-		argument = any_one_arg(argument, val_arg);
-		
-		if (!*num_arg || !isdigit(*num_arg) || !*type_arg || !*val_arg) {
-			msg_to_char(ch, "Usage: gear change <number> <slot | vnum> <new value>\r\n");
-			return;
-		}
-		
-		// find which one to change
-		if (!isdigit(*num_arg) || (num = atoi(num_arg)) < 1) {
-			msg_to_char(ch, "Invalid gear number.\r\n");
-			return;
-		}
-		change = NULL;
-		for (gear = GET_ARCH_GEAR(arch); gear && !change; gear = gear->next) {
-			if (--num == 0) {
-				change = gear;
-				break;
-			}
-		}
-		if (!change) {
-			msg_to_char(ch, "Invalid gear number.\r\n");
-		}
-		else if (is_abbrev(type_arg, "vnum")) {
-			num = atoi(val_arg);
-			if (!obj_proto(num)) {
-				msg_to_char(ch, "Invalid object vnum '%s'.\r\n", val_arg);
-			}
-			else {
-				change->vnum = num;
-				msg_to_char(ch, "Gear %d changed to vnum %d (%s).\r\n", atoi(num_arg), num, get_obj_name_by_proto(num));
-			}
-		}
-		else if (is_abbrev(type_arg, "slot")) {
-			if ((loc = find_gear_slot_by_name(val_arg)) == GEAR_ERROR) {
-				msg_to_char(ch, "Invalid gear slot '%s'.\r\n", val_arg);
-			}
-			else {
-				change->wear = loc;
-				msg_to_char(ch, "Gear %d changed to %s.\r\n", atoi(num_arg), loc == NO_WEAR ? "inventory" : wear_data[loc].name);
-			}
-		}
-		else {
-			msg_to_char(ch, "You can only change the slot or vnum.\r\n");
-		}
-	}
-	else if (is_abbrev(cmd_arg, "copy")) {
-		argument = any_one_arg(argument, type_arg);
-		argument = any_one_arg(argument, num_arg);
-		copyfrom = NULL;
-		
-		if (!*type_arg || !*num_arg) {
-			msg_to_char(ch, "Usage: gear copy <from type> <from vnum>\r\n");
-		}
-		else if ((findtype = find_olc_type(type_arg)) == 0) {
-			msg_to_char(ch, "Unknown olc type '%s'.\r\n", type_arg);
-		}
-		else if (!isdigit(*num_arg)) {
-			sprintbit(findtype, olc_type_bits, buf, FALSE);
-			msg_to_char(ch, "Copy spawns from which %s?\r\n", buf);
-		}
-		else if ((num = atoi(num_arg)) < 0) {
-			msg_to_char(ch, "Invalid vnum.\r\n");
-		}
-		else {
-			sprintbit(findtype, olc_type_bits, buf, FALSE);
-			
-			switch (findtype) {
-				case OLC_ARCHETYPE: {
-					if ((copyarch = archetype_proto(num))) {
-						copyfrom = GET_ARCH_GEAR(copyarch);
-					}
-					break;
-				}
-				default: {
-					msg_to_char(ch, "You can't copy gear from %ss.\r\n", buf);
-					return;
-				}
-			}
-			
-			if (!copyfrom) {
-				msg_to_char(ch, "Invalid %s vnum '%s'.\r\n", buf, num_arg);
-			}
-			else {
-				smart_copy_gear(&GET_ARCH_GEAR(arch), copyfrom);
-				msg_to_char(ch, "Gear copied from %s %d.\r\n", buf, num);
-			}
-		}
-	}
-	else {
-		msg_to_char(ch, "Usage: gear add <gear slot> <obj vnum>\r\n");
-		msg_to_char(ch, "       gear copy <from type> <from vnum>\r\n");
-		msg_to_char(ch, "       gear change <number> <slot | vnum> <new value>\r\n");
-		msg_to_char(ch, "       gear remove <number | all>\r\n");
-	}
+	archetype_data *arch = GET_OLC_ARCHETYPE(ch->desc);
+	archedit_process_gear(ch, argument, &GET_ARCH_GEAR(arch));
 }
 
 

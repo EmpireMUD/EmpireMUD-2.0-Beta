@@ -257,6 +257,7 @@ typedef struct trig_data trig_data;
 // GLOBAL_x types for global_data
 #define GLOBAL_MOB_INTERACTIONS  0
 #define GLOBAL_MINE_DATA  1
+#define GLOBAL_NEWBIE_GEAR  2
 
 
 // GLB_FLAG_x flags for global_data
@@ -1780,6 +1781,7 @@ struct global_data {
 	
 	// data
 	struct interaction_item *interactions;
+	struct archetype_gear *gear;
 	
 	UT_hash_handle hh;
 };

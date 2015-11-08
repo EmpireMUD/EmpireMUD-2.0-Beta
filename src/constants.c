@@ -2763,6 +2763,7 @@ const char *fill_words[] = {
 const char *global_types[] = {
 	"Mob Interactions",
 	"Mine Data",
+	"Newbie Gear",
 	"\n"
 };
 

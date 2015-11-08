@@ -2954,6 +2954,45 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 
 
 /**
+* Gives a character a piece of newbie gear, if the slot isn't filled. Auto-
+* mathematically cascades to the 2nd neck/finger/etc slot.
+*
+* @param char_data *ch The person to give the item to.
+* @param obj_vnum vnum Which item to give.
+* @param int pos Where to equip it, or NO_WEAR for inventory.
+*/
+void give_newbie_gear(char_data *ch, obj_vnum vnum, int pos) {
+	void scale_item_to_level(obj_data *obj, int level);
+	extern const struct wear_data_type wear_data[NUM_WEARS];
+	
+	obj_data *obj;
+	
+	if (!obj_proto(vnum)) {
+		return;
+	}
+	
+	// detect cascade
+	while (pos != NO_WEAR && GET_EQ(ch, pos) && wear_data[pos].cascade_pos != NO_WEAR) {
+		pos = wear_data[pos].cascade_pos;
+	}
+	
+	if (pos != NO_WEAR && GET_EQ(ch, pos)) {
+		return;
+	}
+	
+	obj = read_object(vnum, TRUE);
+	scale_item_to_level(obj, 1);	// lowest possible scale
+	
+	if (pos == NO_WEAR) {
+		obj_to_char(obj, ch);
+	}
+	else {
+		equip_char(ch, obj, pos);
+	}
+}
+
+
+/**
 * This runs one-time setup on the player character, during their initial
 * creation.
 *
@@ -3134,20 +3173,19 @@ void start_new_character(char_data *ch) {
 	void add_archetype_lore(char_data *ch);
 	void apply_bonus_trait(char_data *ch, bitvector_t trait, bool add);
 	void make_vampire(char_data *ch, bool lore);
-	void scale_item_to_level(obj_data *obj, int level);
 	void set_skill(char_data *ch, int skill, int level);
 	extern const char *default_channels[];
 	extern bool global_mute_slash_channel_joins;
 	extern struct promo_code_list promo_codes[];
 	extern int tips_of_the_day_size;
-	extern const struct wear_data_type wear_data[NUM_WEARS];
 	
 	char lbuf[MAX_INPUT_LENGTH];
+	struct global_data *glb, *next_glb;
+	int cumulative_prc, iter;
+	bool done_cumulative = FALSE;
 	struct archetype_gear *gear;
 	struct archetype_skill *sk;
 	archetype_data *arch;
-	obj_data *obj;
-	int iter, pos;
 	
 	// announce to existing players that we have a newbie
 	mortlog("%s has joined the game", PERS(ch, ch, TRUE));
@@ -3233,48 +3271,44 @@ void start_new_character(char_data *ch) {
 		
 		// newbie eq -- don't run load triggers on this set, as ch is possibly not in a room
 		for (gear = GET_ARCH_GEAR(arch); gear; gear = gear->next) {
-			pos = gear->wear;
-			while (pos != NO_WEAR && GET_EQ(ch, pos) && wear_data[pos].cascade_pos != NO_WEAR) {
-				pos = wear_data[pos].cascade_pos;
+			give_newbie_gear(ch, gear->vnum, gear->wear);
+		}
+		
+		// global newbie gear
+		cumulative_prc = number(1, 10000);
+		HASH_ITER(hh, globals_table, glb, next_glb) {
+			if (GET_GLOBAL_TYPE(glb) != GLOBAL_NEWBIE_GEAR || IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_IN_DEVELOPMENT)) {
+				continue;
+			}
+			if (GET_GLOBAL_ABILITY(glb) != NO_ABIL && !HAS_ABILITY(ch, GET_GLOBAL_ABILITY(glb))) {
+				continue;
 			}
 			
-			if (pos == NO_WEAR || !GET_EQ(ch, pos)) {
-				obj = read_object(gear->vnum, TRUE);
-				scale_item_to_level(obj, 1);	// lowest possible scale
-				
-				if (pos == NO_WEAR) {
-					obj_to_char(obj, ch);
+			// percent checks last
+			if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_CUMULATIVE_PERCENT)) {
+				if (done_cumulative) {
+					continue;
+				}
+				cumulative_prc -= (int)(GET_GLOBAL_PERCENT(glb) * 100);
+				if (cumulative_prc <= 0) {
+					done_cumulative = TRUE;
 				}
 				else {
-					equip_char(ch, obj, pos);
+					continue;	// not this time
 				}
+			}
+			else if (number(1, 10000) > (int)(GET_GLOBAL_PERCENT(glb) * 100)) {
+				// normal not-cumulative percent
+				continue;
+			}
+		
+			// success!
+			for (gear = GET_GLOBAL_GEAR(glb); gear; gear = gear->next) {
+				give_newbie_gear(ch, gear->vnum, gear->wear);
 			}
 		}
 		
-		// misc items
-		obj = read_object(o_GRAVE_MARKER, TRUE);
-		scale_item_to_level(obj, 1);	// lowest possible scale
-		obj_to_char(obj, ch);
-		
-		for (iter = 0; iter < 2; ++iter) {
-			// 2 bread
-			obj = read_object(o_BREAD, TRUE);
-			scale_item_to_level(obj, 1);	// lowest possible scale
-			obj_to_char(obj, ch);
-			
-			// 2 trinket of conveyance
-			obj = read_object(o_TRINKET_OF_CONVEYANCE, TRUE);
-			scale_item_to_level(obj, 1);	// lowest possible scale
-			obj_to_char(obj, ch);
-		}
-		
-		obj = read_object(o_BOWL, TRUE);
-		scale_item_to_level(obj, 1);	// lowest possible scale
-		GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) = GET_DRINK_CONTAINER_CAPACITY(obj);
-		GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = LIQ_WATER;
-		obj_to_char(obj, ch);
 		determine_gear_level(ch);
-		
 		add_archetype_lore(ch);
 	}
 	

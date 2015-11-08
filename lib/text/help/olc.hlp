@@ -670,20 +670,19 @@ Available flags:
 
 See also: OLC ARCHETYPES
 #d
-"ARCHEDIT GEAR"
+"ARCHEDIT GEAR" "GEDIT GEAR"
 
 Usage:  .gear add <slot | inventory> <vnum>
         .gear copy <from type> <from vnum>
         .gear change <number> <slot | vnum> <new value>
         .gear remove <number>
 
-This option sets the starting gear for players who choose this archetype. You
+Archetypes: Sets the starting gear for players who choose this archetype. You
 should provide some low-level gear (it will be scaled to level 1, or to the
 item's minimum scale level).
 
-Additional items can be added via 'Archetype Gear' globals. If more than one
-starting item would be put in a gear slot, only the first one is used (except
-slots like neck, which allow two).
+Global Newbie Gear: Gear given to all new players, if their archetype didn't
+fill the slot.
 
 Usually, the following slots have newbie gear: head, clothes, legs, feet,
 wield, hold.
@@ -1732,6 +1731,21 @@ Notes on Mine Data globals:
   player who is prospecting or who builds the mine.
 
 See also: BUILDING GUIDE, OLC GLOBALS
+#d
+"GLOBAL NEWBIE GEAR" "NEWBIE GEAR GLOBAL"
+
+The 'Newbie Gear' Global allows the same gear list options as Archetypes,
+but this is given to all newbie characters.
+
+Notes on Newbie Gear globals:
+- Only the percent field (and cumulative flag) really affect this type of
+  global. The other usual global controls like exclude flags and level
+  restrictions don't apply.
+- Gear from archetypes is given first, so players only receive gear from
+  globals in equipment slots not already filled. (This doesn't apply to
+  inventory.)
+
+See also: GEDIT GEAR
 #d
 "GLOBAL MOB INTERACTIONS" "MOB INTERACTIONS GLOBAL" "MOB INTERACTION GLOBAL"
 

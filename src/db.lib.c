@@ -2603,6 +2603,8 @@ void free_global(struct global_data *glb) {
 * @param any_vnum vnum The global vnum
 */
 void parse_global(FILE *fl, any_vnum vnum) {
+	void parse_archetype_gear(FILE *fl, struct archetype_gear **list, char *error);
+
 	struct global_data *glb, *find;
 	char line[256], str_in[256], str_in2[256], str_in3[256];
 	int int_in[4];
@@ -2664,6 +2666,10 @@ void parse_global(FILE *fl, any_vnum vnum) {
 				GET_GLOBAL_VAL(glb, 2) = int_in[2];
 				break;
 			}
+			case 'G': {	// gear: loc vnum
+				parse_archetype_gear(fl, &GET_GLOBAL_GEAR(glb), buf2);
+				break;
+			}
 			case 'I': {	// interaction item
 				parse_interaction(line, &GET_GLOBAL_INTERACTIONS(glb), buf2);
 				break;
@@ -2691,6 +2697,8 @@ void parse_global(FILE *fl, any_vnum vnum) {
 * @param struct global_data *glb The thing to save.
 */
 void write_global_to_file(FILE *fl, struct global_data *glb) {
+	void write_archetype_gear_to_file(FILE *fl, struct archetype_gear *list);
+	
 	char temp[MAX_STRING_LENGTH], temp2[MAX_STRING_LENGTH], temp3[MAX_STRING_LENGTH];
 	
 	if (!fl || !glb) {
@@ -2711,6 +2719,9 @@ void write_global_to_file(FILE *fl, struct global_data *glb) {
 	fprintf(fl, "E\n");
 	fprintf(fl, "%d %.2f\n", GET_GLOBAL_ABILITY(glb), GET_GLOBAL_PERCENT(glb));
 	fprintf(fl, "%d %d %d\n", GET_GLOBAL_VAL(glb, 0), GET_GLOBAL_VAL(glb, 1), GET_GLOBAL_VAL(glb, 2));
+	
+	// G: gear
+	write_archetype_gear_to_file(fl, GET_GLOBAL_GEAR(glb));
 	
 	// I: interactions
 	write_interactions_to_file(fl, GET_GLOBAL_INTERACTIONS(glb));
