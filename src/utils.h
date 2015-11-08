@@ -113,6 +113,7 @@
 #define GET_ARCH_FEMALE_RANK(arch)  ((arch)->female_rank)
 #define GET_ARCH_FLAGS(arch)  ((arch)->flags)
 #define GET_ARCH_GEAR(arch)  ((arch)->gear)
+#define GET_ARCH_LORE(arch)  ((arch)->lore)
 #define GET_ARCH_MALE_RANK(arch)  ((arch)->male_rank)
 #define GET_ARCH_NAME(arch)  ((arch)->name)
 #define GET_ARCH_SKILLS(arch)  ((arch)->skills)

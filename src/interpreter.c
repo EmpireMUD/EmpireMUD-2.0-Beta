@@ -1610,8 +1610,12 @@ void prompt_creation(descriptor_data *d) {
 			break;
 		}
 		case CON_ARCHETYPE_CNFRM: {
+			void display_archetype_info(descriptor_data *desc, archetype_data *arch);
 			archetype_data *arch = archetype_proto(CREATION_ARCHETYPE(d->character));
-			msg_to_desc(d, "\r\nYou picked \tc%s\t0. Is that corrent (y/n)? ", GET_ARCH_NAME(arch));
+			
+			display_archetype_info(d, arch);
+			msg_to_desc(d, "Is this correct (y/n)? ");
+			break;
 		}
 		case CON_PROMO_CODE: {
 			SEND_TO_Q("\r\nIf you have a promo code, enter it now. Otherwise, just leave it blank > ", d);

@@ -3131,6 +3131,7 @@ void set_title(char_data *ch, char *title) {
 * @param char_data *ch A new player
 */
 void start_new_character(char_data *ch) {
+	void add_archetype_lore(char_data *ch);
 	void apply_bonus_trait(char_data *ch, bitvector_t trait, bool add);
 	void make_vampire(char_data *ch, bool lore);
 	void scale_item_to_level(obj_data *obj, int level);
@@ -3273,6 +3274,8 @@ void start_new_character(char_data *ch) {
 		GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = LIQ_WATER;
 		obj_to_char(obj, ch);
 		determine_gear_level(ch);
+		
+		add_archetype_lore(ch);
 	}
 	
 	// apply any bonus traits that needed it

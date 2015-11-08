@@ -103,6 +103,7 @@ Archetypes (ARCHEDIT):
 - The hold slot is always a long-lasting light, like the newbie torch (2104).
 - You should only set the BASIC flag on very simple archetypes. Most archetypes
   should only appear in the extended list.
+- Lore is optional. If you have it, make sure it ends with no punctuation.
 
 Augments (AUGEDIT):
 - Augment names should be all lowercase.
@@ -690,6 +691,19 @@ wield, hold.
 The hold slot is generally a light, e.g. the newbie torch (2104).
 
 See also: OLC ARCHETYPES, OLC GLOBALS, GEDIT TYPE
+#d
+"ARCHEDIT LORE"
+
+Usage:  .lore <text | none>
+
+Archetype lore is the lore given to a player who starts the game with this
+archetype. It's optional -- if it's set to none, the player will get no lore
+at all from it.
+
+Lore is always the first part of a sentence that will end with "on Month Day,
+Year." It should end with no punctuation.
+
+See also: OLC ARCHETYPES
 #d
 "ARCHEDIT NAME"
 

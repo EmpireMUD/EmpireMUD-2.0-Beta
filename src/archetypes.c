@@ -53,6 +53,20 @@ extern const struct wear_data_type wear_data[NUM_WEARS];
 //// HELPERS /////////////////////////////////////////////////////////////////
 
 /**
+* Gives a player creation lore if they have an archetype that includes it.
+*
+* @param char_data *ch The person to give lore to.
+*/
+void add_archetype_lore(char_data *ch) {
+	archetype_data *arch = archetype_proto(CREATION_ARCHETYPE(ch));
+	
+	if (arch && GET_ARCH_LORE(arch) && *GET_ARCH_LORE(arch)) {
+		add_lore(ch, LORE_CREATED, GET_ARCH_LORE(arch));
+	}
+}
+
+
+/**
 * Look up an active archetype by name, preferring exact matches.
 *
 * @param char *name The archetype name to look up.
@@ -525,13 +539,14 @@ void parse_archetype(FILE *fl, any_vnum vnum) {
 	// for error messages
 	sprintf(error, "archetype vnum %d", vnum);
 	
-	// lines 1-4: name, desc, male rank, female rank
+	// lines 1-5: name, desc, lore, male rank, female rank
 	GET_ARCH_NAME(arch) = fread_string(fl, error);
 	GET_ARCH_DESC(arch) = fread_string(fl, error);
+	GET_ARCH_LORE(arch) = fread_string(fl, error);
 	GET_ARCH_MALE_RANK(arch) = fread_string(fl, error);
 	GET_ARCH_FEMALE_RANK(arch) = fread_string(fl, error);
 	
-	// line 5: flags
+	// line 6: flags
 	if (!get_line(fl, line) || sscanf(line, "%s", str_in) != 1) {
 		log("SYSERR: Format error in line 5 of %s", error);
 		exit(1);
@@ -656,13 +671,14 @@ void write_archetype_to_file(FILE *fl, archetype_data *arch) {
 	
 	fprintf(fl, "#%d\n", GET_ARCH_VNUM(arch));
 	
-	// 1-4. strings
+	// 1-5. strings
 	fprintf(fl, "%s~\n", NULLSAFE(GET_ARCH_NAME(arch)));
 	fprintf(fl, "%s~\n", NULLSAFE(GET_ARCH_DESC(arch)));
+	fprintf(fl, "%s~\n", NULLSAFE(GET_ARCH_LORE(arch)));
 	fprintf(fl, "%s~\n", NULLSAFE(GET_ARCH_MALE_RANK(arch)));
 	fprintf(fl, "%s~\n", NULLSAFE(GET_ARCH_FEMALE_RANK(arch)));
 	
-	// 5. flags
+	// 6. flags
 	fprintf(fl, "%s\n", bitv_to_alpha(GET_ARCH_FLAGS(arch)));
 	
 	// 'A': attributes
@@ -1045,6 +1061,13 @@ void do_stat_archetype(char_data *ch, archetype_data *arch) {
 	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Name: \tc%s\t0\r\n", GET_ARCH_VNUM(arch), GET_ARCH_NAME(arch));
 	
 	size += snprintf(buf + size, sizeof(buf) - size, "Description: %s\r\n", GET_ARCH_DESC(arch));
+
+	if (GET_ARCH_LORE(arch) && *GET_ARCH_LORE(arch)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "Lore: \tc%s\t0 [on Month Day, Year], ", GET_ARCH_DESC(arch));
+	}
+	else {
+		size += snprintf(buf + size, sizeof(buf) - size, "Lore: \tcnone\t0, ");
+	}
 	size += snprintf(buf + size, sizeof(buf) - size, "Ranks: [\ta%s\t0/\tp%s\t0]\r\n", GET_ARCH_MALE_RANK(arch), GET_ARCH_FEMALE_RANK(arch));
 	
 	sprintbit(GET_ARCH_FLAGS(arch), archetype_flags, part, TRUE);
@@ -1107,6 +1130,7 @@ void olc_show_archetype(char_data *ch) {
 	sprintf(buf + strlen(buf), "[\tc%d\t0] \tc%s\t0\r\n", GET_OLC_VNUM(ch->desc), !archetype_proto(GET_ARCH_VNUM(arch)) ? "new archetype" : GET_ARCH_NAME(archetype_proto(GET_ARCH_VNUM(arch))));
 	sprintf(buf + strlen(buf), "<\tyname\t0> %s\r\n", NULLSAFE(GET_ARCH_NAME(arch)));
 	sprintf(buf + strlen(buf), "<\tydescription\t0> %s\r\n", NULLSAFE(GET_ARCH_DESC(arch)));
+	sprintf(buf + strlen(buf), "<\tylore\t0> %s [on Month Day, Year]\r\n", (GET_ARCH_LORE(arch) && *GET_ARCH_LORE(arch)) ? GET_ARCH_LORE(arch) : "none");
 	
 	sprintbit(GET_ARCH_FLAGS(arch), archetype_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<\tyflags\t0> %s\r\n", lbuf);
@@ -1422,6 +1446,22 @@ OLC_MODULE(archedit_gear) {
 		msg_to_char(ch, "       gear copy <from type> <from vnum>\r\n");
 		msg_to_char(ch, "       gear change <number> <slot | vnum> <new value>\r\n");
 		msg_to_char(ch, "       gear remove <number | all>\r\n");
+	}
+}
+
+
+OLC_MODULE(archedit_lore) {
+	archetype_data *arch = GET_OLC_ARCHETYPE(ch->desc);
+	
+	if (!str_cmp(argument, "none")) {
+		if (GET_ARCH_LORE(arch)) {
+			free(GET_ARCH_LORE(arch));
+			GET_ARCH_LORE(arch) = NULL;
+		}
+		msg_to_char(ch, "It now adds no lore.\r\n");
+	}
+	else {
+		olc_process_string(ch, argument, "lore", &GET_ARCH_LORE(arch));
 	}
 }
 

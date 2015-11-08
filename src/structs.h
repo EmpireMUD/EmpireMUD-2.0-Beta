@@ -1316,7 +1316,7 @@ typedef struct trig_data trig_data;
 #define LORE_START_VAMPIRE		7
 #define LORE_SIRE_VAMPIRE		8
 #define LORE_PURIFY				9
-	#define LORE_UNUSED1  10	// unused
+#define LORE_CREATED			10
 #define LORE_MAKE_VAMPIRE		11
 #define LORE_PROMOTED			12
 

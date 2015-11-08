@@ -67,6 +67,7 @@ OLC_MODULE(archedit_description);
 OLC_MODULE(archedit_femalerank);
 OLC_MODULE(archedit_flags);
 OLC_MODULE(archedit_gear);
+OLC_MODULE(archedit_lore);
 OLC_MODULE(archedit_malerank);
 OLC_MODULE(archedit_name);
 OLC_MODULE(archedit_skill);
@@ -357,6 +358,7 @@ const struct olc_command_data olc_data[] = {
 	{ "femalerank", archedit_femalerank, OLC_ARCHETYPE, OLC_CF_EDITOR },
 	{ "flags", archedit_flags, OLC_ARCHETYPE, OLC_CF_EDITOR },
 	{ "gear", archedit_gear, OLC_ARCHETYPE, OLC_CF_EDITOR },
+	{ "lore", archedit_lore, OLC_ARCHETYPE, OLC_CF_EDITOR },
 	{ "malerank", archedit_malerank, OLC_ARCHETYPE, OLC_CF_EDITOR },
 	{ "name", archedit_name, OLC_ARCHETYPE, OLC_CF_EDITOR },
 	{ "skill", archedit_skill, OLC_ARCHETYPE, OLC_CF_EDITOR },
