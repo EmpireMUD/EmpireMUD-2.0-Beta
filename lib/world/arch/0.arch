@@ -1,6 +1,7 @@
 #0
 Adventurer~
 Ready to take on the world~
+Left home in search of adventure~
 Adventurer~
 Adventurer~
 0
@@ -36,6 +37,7 @@ S
 #1
 Noble Birth~
 Raised to rule (Empire, Battle)~
+Left the manor in search of greatness~
 Lord~
 Lady~
 b
@@ -67,6 +69,7 @@ S
 #2
 Skilled Apprentice~
 Trained by a master artisan (Trade)~
+Graduated from an apprenticeship~
 Tradesman~
 Tradesman~
 b
@@ -96,6 +99,7 @@ S
 #3
 Promising Squire~
 Built for battle (Battle, Survival)~
+Left to seek $s own fame~
 Sir~
 Lady~
 b
@@ -127,6 +131,7 @@ S
 #4
 Rugged Woodsman~
 Cleaved from stone (Survival, Trade)~
+Left the logging camp to seek fortune~
 Adventurer~
 Adventurer~
 b
@@ -158,6 +163,7 @@ S
 #5
 Tribal Leader~
 Rise from nothing (Empire, Survival)~
+Left the tribe to seek greatness~
 Elder~
 Elder~
 b
@@ -189,6 +195,7 @@ S
 #6
 Street Urchin~
 The shadows of society (Stealth, Battle)~
+Stepped out of the shadows~
 Adventurer~
 Adventurer~
 b
@@ -220,6 +227,7 @@ S
 #7
 Druidic Commune~
 Wield ancient magic (Natural Magic, Survival)~
+Left the commune~
 Elder~
 Elder~
 b
@@ -249,6 +257,7 @@ S
 #8
 Novice Sorcerer~
 Master the rituals (High Sorcery, Battle)~
+Graduated from the Academy~
 Master~
 Mistress~
 b
@@ -278,6 +287,7 @@ S
 #9
 Lone Vampire~
 Empowered by blood (Vampire, Battle)~
+~
 Hunter~
 Hunter~
 b
@@ -307,6 +317,7 @@ S
 #10
 Heretic~
 Practice both magics (High Sorcery, Natural Magic, Intelligence)~
+Branded a heretic~
 Heretic~
 Heretic~
 0
@@ -336,6 +347,7 @@ S
 #11
 Reclusive Baron~
 A vampire noble from an old family (Vampire, Empire)~
+Became a recluse~
 Baron~
 Baroness~
 0
@@ -366,7 +378,8 @@ K
 S
 #12
 Herbalist~
-DESCRIPTION HERE (Natural Magic, Trade, Intelligence)~
+An apprentice alchemist (Natural Magic, Trade, Intelligence)~
+Finished an herbalist apprenticeship~
 Herbalist~
 Herbalist~
 0
@@ -396,6 +409,7 @@ S
 #13
 Petty Thug~
 A streetwise bruiser up to no good (Battle, Stealth)~
+Moved on to bigger and better things~
 Hood~
 Hood~
 0
@@ -427,6 +441,7 @@ S
 #14
 Boorish Warrior~
 A skilled fighter looking to move up (Battle)~
+Left prizefighting for greater fame~
 Warlord~
 Warlord~
 0
@@ -456,6 +471,7 @@ S
 #15
 Alley Predator~
 Lurking in the shadows of society (Vampire, Stealth, Battle)~
+Moved into the shadows~
 Hunter~
 Hunter~
 0
