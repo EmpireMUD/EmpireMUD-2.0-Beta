@@ -98,7 +98,9 @@
 // See http://linux.die.net/man/3/crypt for more info.
 #define PASSWORD_SALT  "salt"
 
-#define BASIC_OCEAN  6	// sector vnum used as the base for blank rooms
+// features for determining whether or not a map tile needs to be in RAM as a room_data*
+#define BASIC_OCEAN  6	// sector vnum used as the base for fully ignorable and blank rooms
+#define TILE_KEEP_FLAGS  (SECTF_START_LOCATION)	// flags for rooms that MUST stay in RAM
 
 // this determines if a room is "empty"/"blank" and doesn't need to stay in RAM
 #define CAN_UNLOAD_MAP_ROOM(room)  ( \
@@ -106,6 +108,7 @@
 	GET_ROOM_VNUM(room) < MAP_SIZE && \
 	GET_EXITS_HERE(room) == 0 && \
 	SECT(room) == world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)].sector_type && \
+	!ROOM_SECT_FLAGGED(room, TILE_KEEP_FLAGS) && \
 	!ROOM_OWNER(room) && !ROOM_CONTENTS(room) && !ROOM_PEOPLE(room) && \
 	!ROOM_DEPLETION(room) && !ROOM_CUSTOM_NAME(room) && \
 	!ROOM_CUSTOM_ICON(room) && !ROOM_CUSTOM_DESCRIPTION(room) && \
