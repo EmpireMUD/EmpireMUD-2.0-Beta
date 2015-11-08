@@ -285,8 +285,24 @@ char *list_one_archetype(archetype_data *arch, bool detail) {
 	static char output[MAX_STRING_LENGTH];
 	
 	if (detail) {
-		// TODO list skills?
-		snprintf(output, sizeof(output), "[%5d] %s", GET_ARCH_VNUM(arch), GET_ARCH_NAME(arch));
+		int iter, atts = 0, skills = 0;
+		char buf[MAX_STRING_LENGTH];
+		struct archetype_skill *sk;
+		
+		// count attribute points
+		for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
+			atts += GET_ARCH_ATTRIBUTE(arch, iter);
+		}
+		
+		// build skill string and count
+		strcpy(buf, " (");
+		for (sk = GET_ARCH_SKILLS(arch); sk; sk = sk->next) {
+			skills += sk->level;
+			sprintf(buf + strlen(buf), "%s%s", (sk == GET_ARCH_SKILLS(arch)) ? "" : ", ", skill_data[sk->skill].abbrev);
+		}
+		strcat(buf, ")");
+		
+		snprintf(output, sizeof(output), "[%5d] %s%s [%d/%d]", GET_ARCH_VNUM(arch), GET_ARCH_NAME(arch), GET_ARCH_SKILLS(arch) ? buf : "", atts, skills);
 	}
 	else {
 		snprintf(output, sizeof(output), "[%5d] %s", GET_ARCH_VNUM(arch), GET_ARCH_NAME(arch));
