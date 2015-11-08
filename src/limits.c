@@ -1144,8 +1144,15 @@ bool check_autostore(obj_data *obj, bool force) {
 */
 void point_update_obj(obj_data *obj) {
 	room_data *to_room, *obj_r;
+	obj_data *top;
 	char_data *c;
 	time_t timer;
+	
+	// ensure this obj is actually in-game
+	top = get_top_object(obj);
+	if ((top->carried_by && !IN_ROOM(top->carried_by)) || (top->worn_by && !IN_ROOM(top->worn_by))) {
+		return;
+	}
 	
 	// this is the firing cooldown on carts
 	if (GET_OBJ_TYPE(obj) == ITEM_CART && GET_OBJ_VAL(obj, VAL_CART_FIRING_DATA) > 1) {
