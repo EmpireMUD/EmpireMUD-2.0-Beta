@@ -2147,6 +2147,7 @@ ACMD(do_summon) {
 				MOB_INSTANCE_ID(mob) = MOB_INSTANCE_ID(ch);
 			}
 			
+			SET_BIT(MOB_FLAGS(mob), MOB_NO_EXPERIENCE);	// never gain exp
 			if (emp) {
 				// guarantee empire flag
 				SET_BIT(MOB_FLAGS(mob), MOB_EMPIRE);
