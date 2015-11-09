@@ -4240,7 +4240,7 @@ ACMD(do_reward) {
 	else if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
 	}
-	else if (ch == vict) {
+	else if (ch == vict || GET_ACCOUNT(ch) == GET_ACCOUNT(vict)) {
 		msg_to_char(ch, "You can't reward yourself.\r\n");
 	}
 	else if (IS_NPC(vict)) {
