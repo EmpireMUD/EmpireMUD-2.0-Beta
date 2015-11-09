@@ -1127,6 +1127,9 @@ ACMD(do_moonrise) {
 		else if (IS_NPC(vict)) {
 			msg_to_char(ch, "You can only resurrect players, not NPCs.\r\n");
 		}
+		else if (GET_ACCOUNT(ch) == GET_ACCOUNT(vict)) {
+			msg_to_char(ch, "You can't resurrect your own alts.\r\n");
+		}
 		else if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_MOONRISE)) {
 			return;
 		}
@@ -1152,6 +1155,9 @@ ACMD(do_moonrise) {
 		}
 		else if (vict == ch) {
 			msg_to_char(ch, "You can't resurrect your own corpse, that's just silly.\r\n");
+		}
+		else if (GET_ACCOUNT(ch) == GET_ACCOUNT(vict)) {
+			msg_to_char(ch, "You can't resurrect your own alts.\r\n");
 		}
 		else if (IS_DEAD(vict) || corpse != find_obj(GET_LAST_CORPSE_ID(vict)) || !IS_CORPSE(corpse)) {
 			// victim has died AGAIN
@@ -1346,6 +1352,9 @@ ACMD(do_resurrect) {
 		else if (IS_NPC(vict)) {
 			msg_to_char(ch, "You can only resurrect players, not NPCs.\r\n");
 		}
+		else if (GET_ACCOUNT(ch) == GET_ACCOUNT(vict)) {
+			msg_to_char(ch, "You can't resurrect your own alts.\r\n");
+		}
 		else if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_RESURRECT)) {
 			return;
 		}
@@ -1371,6 +1380,9 @@ ACMD(do_resurrect) {
 		}
 		else if (vict == ch) {
 			msg_to_char(ch, "You can't resurrect your own corpse, that's just silly.\r\n");
+		}
+		else if (GET_ACCOUNT(ch) == GET_ACCOUNT(vict)) {
+			msg_to_char(ch, "You can't resurrect your own alts.\r\n");
 		}
 		else if (IS_DEAD(vict) || corpse != find_obj(GET_LAST_CORPSE_ID(vict)) || !IS_CORPSE(corpse)) {
 			// victim has died AGAIN
