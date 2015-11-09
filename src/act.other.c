@@ -91,7 +91,7 @@ void adventure_summon(char_data *ch, char *argument) {
 		msg_to_char(ch, "You cannot summon someone who is already in an adventure.\r\n");
 	}
 	else if (!vict->desc) {
-		msg_to_char(ch, "You can't summon someone who is linkdead.\r\n")/
+		msg_to_char(ch, "You can't summon someone who is linkdead.\r\n");
 	}
 	else if (GET_ACCOUNT(ch) == GET_ACCOUNT(vict)) {
 		msg_to_char(ch, "You can't summon your own alts.\r\n");
