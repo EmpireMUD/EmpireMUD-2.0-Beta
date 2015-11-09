@@ -606,8 +606,10 @@ ACMD(do_colorburst) {
 
 		engage_combat(ch, vict, FALSE);
 	}
-
-	gain_ability_exp(ch, ABIL_COLORBURST, 15);
+	
+	if (can_gain_exp_from(ch, vict)) {
+		gain_ability_exp(ch, ABIL_COLORBURST, 15);
+	}
 }
 
 
@@ -734,7 +736,9 @@ ACMD(do_dispel) {
 			}
 		}
 		
-		gain_ability_exp(ch, ABIL_DISPEL, 33.4);
+		if (can_gain_exp_from(ch, vict)) {
+			gain_ability_exp(ch, ABIL_DISPEL, 33.4);
+		}
 
 		if (FIGHTING(vict) && !FIGHTING(ch)) {
 			engage_combat(ch, FIGHTING(vict), FALSE);
@@ -805,8 +809,10 @@ ACMD(do_enervate) {
 
 		engage_combat(ch, vict, FALSE);
 	}
-
-	gain_ability_exp(ch, ABIL_ENERVATE, 15);
+	
+	if (can_gain_exp_from(ch, vict)) {
+		gain_ability_exp(ch, ABIL_ENERVATE, 15);
+	}
 }
 
 
@@ -1141,8 +1147,10 @@ ACMD(do_siphon) {
 
 		engage_combat(ch, vict, FALSE);
 	}
-
-	gain_ability_exp(ch, ABIL_SIPHON, 15);
+	
+	if (can_gain_exp_from(ch, vict)) {
+		gain_ability_exp(ch, ABIL_SIPHON, 15);
+	}
 }
 
 
@@ -1206,8 +1214,10 @@ ACMD(do_slow) {
 
 		engage_combat(ch, vict, FALSE);
 	}
-
-	gain_ability_exp(ch, ABIL_SLOW, 15);
+	
+	if (can_gain_exp_from(ch, vict)) {
+		gain_ability_exp(ch, ABIL_SLOW, 15);
+	}
 }
 
 

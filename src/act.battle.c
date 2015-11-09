@@ -145,8 +145,10 @@ ACMD(do_bash) {
 			}			
 		}		
 	}
-
-	gain_ability_exp(ch, ABIL_BASH, 15);
+	
+	if (can_gain_exp_from(ch, vict)) {
+		gain_ability_exp(ch, ABIL_BASH, 15);
+	}
 }
 
 
@@ -203,7 +205,9 @@ ACMD(do_disarm) {
 		}
 		
 		engage_combat(ch, victim, TRUE);
-		gain_ability_exp(ch, ABIL_DISARM, 15);
+		if (can_gain_exp_from(ch, victim)) {
+			gain_ability_exp(ch, ABIL_DISARM, 15);
+		}
 	}
 }
 
@@ -281,7 +285,9 @@ ACMD(do_firstaid) {
 	}
 	
 	heal(ch, vict, CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_FIRSTAID) + total_bonus_healing(ch));
-	gain_ability_exp(ch, ABIL_FIRSTAID, 15);
+	if (can_gain_exp_from(ch, vict)) {
+		gain_ability_exp(ch, ABIL_FIRSTAID, 15);
+	}
 	GET_WAIT_STATE(ch) += 2 RL_SEC;	// plus normal command_lag
 }
 
@@ -329,7 +335,9 @@ ACMD(do_heartstop) {
 			return;
 		}
 		
-		gain_ability_exp(ch, ABIL_HEARTSTOP, 15);
+		if (can_gain_exp_from(ch, victim)) {
+			gain_ability_exp(ch, ABIL_HEARTSTOP, 15);
+		}
 
 		af = create_flag_aff(ATYPE_HEARTSTOP, 4, AFF_CANT_SPEND_BLOOD, ch);
 		affect_join(victim, af, ADD_DURATION);
@@ -400,8 +408,10 @@ ACMD(do_kick) {
 	else {
 		damage(ch, vict, 0, ATTACK_KICK, DAM_PHYSICAL);
 	}
-
-	gain_ability_exp(ch, ABIL_KICK, 15);
+	
+	if (can_gain_exp_from(ch, vict)) {
+		gain_ability_exp(ch, ABIL_KICK, 15);
+	}
 }
 
 
@@ -436,12 +446,14 @@ ACMD(do_outrage) {
 				}
 				
 				hit(ch, victim, GET_EQ(ch, WEAR_WIELD), FALSE);
-				found = TRUE;
+				found |= can_gain_exp_from(ch, victim);
 				
 				// rescue check
 				if (HAS_ABILITY(ch, ABIL_RESCUE) && FIGHTING(victim) && !IS_NPC(FIGHTING(victim)) && FIGHTING(victim) != ch && skill_check(ch, ABIL_RESCUE, DIFF_MEDIUM)) {
 					perform_rescue(ch, FIGHTING(victim), victim);
-					gain_ability_exp(ch, ABIL_RESCUE, 15);
+					if (can_gain_exp_from(ch, victim)) {
+						gain_ability_exp(ch, ABIL_RESCUE, 15);
+					}
 				}
 			}
 		}
@@ -483,7 +495,9 @@ ACMD(do_rescue) {
 
 			charge_ability_cost(ch, MOVE, cost, COOLDOWN_RESCUE, 6, WAIT_COMBAT_ABILITY);
 			perform_rescue(ch, FIGHTING(vict), vict);
-			gain_ability_exp(ch, ABIL_RESCUE, 15);
+			if (can_gain_exp_from(ch, vict)) {
+				gain_ability_exp(ch, ABIL_RESCUE, 15);
+			}
 			break;
 		}
 		
@@ -533,5 +547,7 @@ ACMD(do_rescue) {
 
 	charge_ability_cost(ch, MOVE, cost, COOLDOWN_RESCUE, 6, WAIT_COMBAT_ABILITY);
 	perform_rescue(ch, vict, tmp_ch);
-	gain_ability_exp(ch, ABIL_RESCUE, 15);
+	if (can_gain_exp_from(ch, tmp_ch)) {
+		gain_ability_exp(ch, ABIL_RESCUE, 15);
+	}
 }

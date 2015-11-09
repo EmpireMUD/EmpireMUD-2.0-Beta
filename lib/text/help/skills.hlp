@@ -440,7 +440,8 @@ chance is checked any time you use an ability. You don't need to get the
 experience all the way to 100%.
 
 When your skills hit level 50 or 75, you will not be able to gain additional
-levels in the skill unless you specialize into it.
+levels in the skill unless you specialize into it. You won't gain skill from
+using abilities on mobs and players who are more than 50 levels below you.
 
 See also: SKILL CAPS, SPECIALIZE, SKILLS
 #

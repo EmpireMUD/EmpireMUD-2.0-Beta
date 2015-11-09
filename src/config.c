@@ -1662,6 +1662,7 @@ void init_config_system(void) {
 	// players
 	init_config(CONFIG_PLAYERS, "delete_inactive_players_after", CONFTYPE_INT, "days to a player can be inactive before auto-delete (0 = never)");
 	init_config(CONFIG_PLAYERS, "delete_invalid_players_after", CONFTYPE_INT, "days to wait before deleting players with bad level data (0 = never)");
+	init_config(CONFIG_PLAYERS, "exp_level_difference", CONFTYPE_INT, "levels a player can have above a mob and still gain exp from it");
 	init_config(CONFIG_PLAYERS, "pool_bonus_amount", CONFTYPE_INT, "bonus trait amount for health/move/mana");
 	init_config(CONFIG_PLAYERS, "num_daily_skill_points", CONFTYPE_INT, "easy skillups per day");
 	init_config(CONFIG_PLAYERS, "num_bonus_trait_daily_skills", CONFTYPE_INT, "bonus trait for skillups");

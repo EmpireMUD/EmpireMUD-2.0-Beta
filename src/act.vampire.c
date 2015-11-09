@@ -410,7 +410,9 @@ void taste_blood(char_data *ch, char_data *vict) {
 		act(buf, FALSE, ch, 0, vict, TO_CHAR);
 		
 		command_lag(ch, WAIT_ABILITY);
-		gain_ability_exp(ch, ABIL_TASTE_BLOOD, 20);
+		if (can_gain_exp_from(ch, vict)) {
+			gain_ability_exp(ch, ABIL_TASTE_BLOOD, 20);
+		}
 	}
 }
 
@@ -509,7 +511,9 @@ void update_biting_char(char_data *ch) {
 		act("$N falls limply from $n's arms!", FALSE, ch, 0, victim, TO_NOTVICT);
 		act("You feel faint as the last of your blood is pulled from your body!", FALSE, ch, 0, victim, TO_VICT);
 		
-		gain_ability_exp(ch, ABIL_ANCIENT_BLOOD, 15);
+		if (can_gain_exp_from(ch, victim)) {
+			gain_ability_exp(ch, ABIL_ANCIENT_BLOOD, 15);
+		}
 
 		act("$n is dead! R.I.P.", FALSE, victim, 0, 0, TO_ROOM);
 		msg_to_char(victim, "You are dead! Sorry...\r\n");
@@ -539,7 +543,7 @@ void update_biting_char(char_data *ch) {
 			act("...$e sways from lack of blood.", FALSE, victim, NULL, NULL, TO_ROOM);
 		}
 		
-		if (HAS_ABILITY(ch, ABIL_ANCIENT_BLOOD)) {
+		if (HAS_ABILITY(ch, ABIL_ANCIENT_BLOOD) && can_gain_exp_from(ch, victim)) {
 			gain_ability_exp(ch, ABIL_ANCIENT_BLOOD, 1);
 		}
 	}
@@ -1017,7 +1021,9 @@ ACMD(do_command) {
 			strcpy(argument, buf);
 		do_say(ch, argument, 0, 0);
 		
-		gain_ability_exp(ch, ABIL_COMMAND, 33.4);
+		if (can_gain_exp_from(ch, victim)) {
+			gain_ability_exp(ch, ABIL_COMMAND, 33.4);
+		}
 
 		if (skill_check(ch, ABIL_COMMAND, DIFF_MEDIUM) && !AFF_FLAGGED(victim, AFF_IMMUNE_VAMPIRE)) {
 			un_charm = AFF_FLAGGED(victim, AFF_CHARM) ? FALSE : TRUE;
@@ -1498,7 +1504,9 @@ ACMD(do_weaken) {
 		}
 		
 		engage_combat(ch, victim, TRUE);
-
-		gain_ability_exp(ch, ABIL_WEAKEN, 15);
+		
+		if (can_gain_exp_from(ch, victim)) {
+			gain_ability_exp(ch, ABIL_WEAKEN, 15);
+		}
 	}
 }

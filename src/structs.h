@@ -879,7 +879,7 @@ typedef struct trig_data trig_data;
  //////////////////////////////////////////////////////////////////////////////
 //// MOBILE DEFINES //////////////////////////////////////////////////////////
 
-// Mobile flags 
+// MOB_x: Mobile flags 
 #define MOB_BRING_A_FRIEND  BIT(0)	// a. Mob auto-assists any other (!charmed) mob
 #define MOB_SENTINEL  BIT(1)	// b. Mob should not move
 #define MOB_AGGRESSIVE  BIT(2)	// c. Mob hits players in the room
@@ -911,6 +911,7 @@ typedef struct trig_data trig_data;
 #define MOB_EXTRACTED  BIT(28)	// C. for late-extraction
 #define MOB_NO_LOOT  BIT(29)	// D. do not drop loot
 #define MOB_NO_TELEPORT  BIT(30)  // E. cannot teleport to this mob
+#define MOB_NO_EXPERIENCE  BIT(31)	// F. players get no exp against this mob
 
 
 // mob movement types

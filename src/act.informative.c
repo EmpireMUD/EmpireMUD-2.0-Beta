@@ -929,7 +929,9 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 		list_obj_to_char(i->carrying, ch, OBJ_DESC_INVENTORY, TRUE);
 
 		if (ch != i && i->carrying) {
-			gain_ability_exp(ch, ABIL_APPRAISAL, 5);
+			if (can_gain_exp_from(ch, i)) {
+				gain_ability_exp(ch, ABIL_APPRAISAL, 5);
+			}
 			GET_WAIT_STATE(ch) = MAX(GET_WAIT_STATE(ch), 0.5 RL_SEC);
 		}
 	}

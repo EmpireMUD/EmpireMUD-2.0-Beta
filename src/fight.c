@@ -383,7 +383,7 @@ int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill) 
 		
 		base += refl;
 		
-		if (can_gain_skill) {
+		if (can_gain_skill && can_gain_exp_from(ch, attacker)) {
 			gain_ability_exp(ch, ABIL_REFLEXES, 2);
 		}
 	}
@@ -437,7 +437,7 @@ int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_sk
 		
 		base_chance += spar;
 		
-		if (can_gain_skill) {
+		if (can_gain_skill && can_gain_exp_from(ch, victim)) {
 			gain_ability_exp(ch, ABIL_SPARRING, 2);
 		}
 	}
@@ -690,7 +690,9 @@ int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, i
 			if (absorb > 0) {
 				dam -= absorb;
 				GET_MANA(victim) -= absorb;
-				gain_ability_exp(victim, ABIL_NULL_MANA, 5);
+				if (can_gain_exp_from(victim, attacker)) {
+					gain_ability_exp(victim, ABIL_NULL_MANA, 5);
+				}
 			}
 		}
 	}
@@ -699,8 +701,10 @@ int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, i
 		if (HAS_ABILITY(victim, ABIL_POISON_IMMUNITY)) {
 			dam = 0;
 		}
-		gain_ability_exp(victim, ABIL_POISON_IMMUNITY, 2);
-		gain_ability_exp(victim, ABIL_RESIST_POISON, 5);
+		if (can_gain_exp_from(victim, attacker)) {
+			gain_ability_exp(victim, ABIL_POISON_IMMUNITY, 2);
+			gain_ability_exp(victim, ABIL_RESIST_POISON, 5);
+		}
 	}
 	
 	return dam;
@@ -1851,7 +1855,9 @@ bool can_fight(char_data *ch, char_data *victim) {
 		return FALSE;
 
 	// try to hit people through majesty?
-	gain_ability_exp(victim, ABIL_MAJESTY, 33.4);
+	if (can_gain_exp_from(victim, ch)) {
+		gain_ability_exp(victim, ABIL_MAJESTY, 33.4);
+	}
 	if (CHECK_MAJESTY(victim) && !AFF_FLAGGED(ch, AFF_IMMUNE_VAMPIRE)) {
 		return FALSE;
 	}
@@ -2311,11 +2317,13 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 	// skill gains when you take damage
 	if (!full_miss && !IS_NPC(victim) && ch != victim && !EXTRACTED(victim)) {
 		// endurance (extra HP)
-		gain_ability_exp(victim, ABIL_ENDURANCE, 2);
+		if (can_gain_exp_from(victim, ch)) {
+			gain_ability_exp(victim, ABIL_ENDURANCE, 2);
+		}
 
 		// armor skills
 		for (iter = 0; iter < NUM_WEARS; ++iter) {
-			if (wear_data[iter].count_stats && GET_EQ(victim, iter) && GET_ARMOR_TYPE(GET_EQ(victim, iter)) != NOTHING) {
+			if (wear_data[iter].count_stats && GET_EQ(victim, iter) && GET_ARMOR_TYPE(GET_EQ(victim, iter)) != NOTHING && can_gain_exp_from(victim, ch)) {
 				switch (GET_ARMOR_TYPE(GET_EQ(victim, iter))) {
 					case ARMOR_MAGE: {
 						gain_ability_exp(victim, ABIL_MAGE_ARMOR, 2);
@@ -2337,7 +2345,7 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 			}
 		}
 	
-		if (affected_by_spell(victim, ATYPE_MANASHIELD)) {
+		if (affected_by_spell(victim, ATYPE_MANASHIELD) && can_gain_exp_from(victim, ch)) {
 			gain_ability_exp(victim, ABIL_MANASHIELD, 2);
 		}
 	}
@@ -2635,19 +2643,25 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		if (can_gain_skill) {
 			if (!IS_NPC(ch) && HAS_ABILITY(ch, ABIL_DAGGER_MASTERY) && weapon && GET_WEAPON_TYPE(weapon) == TYPE_STAB) {
 				dam *= 1.5;
-				gain_ability_exp(ch, ABIL_DAGGER_MASTERY, 2);
+				if (can_gain_exp_from(ch, victim)) {
+					gain_ability_exp(ch, ABIL_DAGGER_MASTERY, 2);
+				}
 			}
 			if (!IS_NPC(ch) && HAS_ABILITY(ch, ABIL_STAFF_MASTERY) && weapon && IS_STAFF(weapon)) {
 				dam *= 1.5;
-				gain_ability_exp(ch, ABIL_STAFF_MASTERY, 2);
+				if (can_gain_exp_from(ch, victim)) {
+					gain_ability_exp(ch, ABIL_STAFF_MASTERY, 2);
+				}
 			}	
-			if (!IS_NPC(ch) && HAS_ABILITY(ch, ABIL_CLAWS) && w_type == TYPE_VAMPIRE_CLAWS) {
+			if (!IS_NPC(ch) && HAS_ABILITY(ch, ABIL_CLAWS) && w_type == TYPE_VAMPIRE_CLAWS && can_gain_exp_from(ch, victim)) {
 				gain_ability_exp(ch, ABIL_CLAWS, 2);
 			}
 
 			// raw damage modified by hunt
 			if (IS_NPC(victim) && MOB_FLAGGED(victim, MOB_ANIMAL) && HAS_ABILITY(ch, ABIL_HUNT)) {
-				gain_ability_exp(ch, ABIL_HUNT, 2);
+				if (can_gain_exp_from(ch, victim)) {
+					gain_ability_exp(ch, ABIL_HUNT, 2);
+				}
 			
 				if (skill_check(ch, ABIL_HUNT, DIFF_EASY)) {
 					dam *= 2;
@@ -2656,8 +2670,10 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		
 			// raw damage modified by big game hunter
 			if (!IS_NPC(ch) && HAS_ABILITY(ch, ABIL_BIG_GAME_HUNTER) && (IS_VAMPIRE(victim) || IS_MAGE(victim))) {
-				gain_ability_exp(ch, ABIL_BIG_GAME_HUNTER, 1);
-			
+				if (can_gain_exp_from(ch, victim)) {
+					gain_ability_exp(ch, ABIL_BIG_GAME_HUNTER, 1);
+				}
+		
 				if (skill_check(ch, ABIL_BIG_GAME_HUNTER, DIFF_MEDIUM)) {
 					dam = (int) (CHOOSE_BY_ABILITY_LEVEL(big_game_hunter, ch, ABIL_BIG_GAME_HUNTER) * dam);
 				}
@@ -2669,7 +2685,8 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		// anything after this must NOT rely on victim being alive
 		result = damage(ch, victim, dam, w_type, attack_hit_info[w_type].damage_type);
 		
-		if (combat_round && can_gain_skill) {
+		// exp gain
+		if (combat_round && can_gain_skill && can_gain_exp_from(ch, victim)) {
 			if (!IS_NPC(ch)) {
 				gain_ability_exp(ch, ABIL_FINESSE, 2);
 				if (GET_SKILL(ch, SKILL_BATTLE) < EMPIRE_CHORE_SKILL_CAP) {
@@ -2706,7 +2723,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 				act("$n's last attack cuts deep -- you are bleeding!", FALSE, ch, NULL, victim, TO_VICT);
 				act("$n's last attack cuts deep -- $N is bleeding!", FALSE, ch, NULL, victim, TO_NOTVICT);
 
-				if (can_gain_skill) {
+				if (can_gain_skill && can_gain_exp_from(ch, victim)) {
 					gain_ability_exp(ch, ABIL_CUT_DEEP, 10);
 				}
 			}
@@ -2720,7 +2737,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 				act("$n's last blow hit you hard! You're knocked to the floor, stunned.", FALSE, ch, NULL, victim, TO_VICT);
 				act("$n's last blow seems to stun $N!", FALSE, ch, NULL, victim, TO_NOTVICT);
 
-				if (can_gain_skill) {
+				if (can_gain_skill && can_gain_exp_from(ch, victim)) {
 					gain_ability_exp(ch, ABIL_STUNNING_BLOW, 10);
 				}
 			}
@@ -3073,7 +3090,9 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 	
 	if (success && AWAKE(FIGHTING(ch)) && HAS_ABILITY(FIGHTING(ch), ABIL_BLOCK_ARROWS)) {
 		block = check_block(FIGHTING(ch), ch, TRUE);
-		gain_ability_exp(FIGHTING(ch), ABIL_BLOCK_ARROWS, 2);
+		if (can_gain_exp_from(FIGHTING(ch), ch)) {
+			gain_ability_exp(FIGHTING(ch), ABIL_BLOCK_ARROWS, 2);
+		}
 	}
 	
 	if (block) {
@@ -3090,10 +3109,12 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 		damage(ch, FIGHTING(ch), dam, ATTACK_ARROW, DAM_PHYSICAL);
 		
 		// McSkillups
-		gain_ability_exp(ch, ABIL_ARCHERY, 2);
-		gain_ability_exp(ch, ABIL_QUICK_DRAW, 2);
-		if (affected_by_spell(ch, ATYPE_ALACRITY)) {
-			gain_ability_exp(ch, ABIL_ALACRITY, 2);
+		if (can_gain_exp_from(ch, FIGHTING(ch))) {
+			gain_ability_exp(ch, ABIL_ARCHERY, 2);
+			gain_ability_exp(ch, ABIL_QUICK_DRAW, 2);
+			if (affected_by_spell(ch, ATYPE_ALACRITY)) {
+				gain_ability_exp(ch, ABIL_ALACRITY, 2);
+			}
 		}
 	}
 	

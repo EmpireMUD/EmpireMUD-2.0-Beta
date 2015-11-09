@@ -2115,6 +2115,7 @@ Available mob flags:
  *EXTRACTED - Do not set.
  !LOOT - Will not drop any loot.
  !TELEPORT - Cannot teleport to this mob.
+ !EXP - Players get no experience from using abilities against this mob.
 
 See also: OLC MOBILES
 #d

@@ -312,7 +312,7 @@ ACMD(do_flee) {
 			was_fighting = FIGHTING(ch);
 			if (perform_move(ch, attempt, TRUE, 0)) {
 				send_to_char("You flee head over heels.\r\n", ch);
-				if (was_fighting) {
+				if (was_fighting && can_gain_exp_from(ch, was_fighting)) {
 					gain_ability_exp(ch, ABIL_FLEET, 5);
 				}
 				GET_WAIT_STATE(ch) = 2 RL_SEC;
