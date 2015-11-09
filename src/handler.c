@@ -3892,6 +3892,7 @@ void bind_obj_to_player(obj_data *obj, char_data *ch) {
 * @param struct mob_tag *list The list of mob tags.
 */
 void bind_obj_to_tag_list(obj_data *obj, struct mob_tag *list) {
+	bool at_least_one = FALSE;
 	struct mob_tag *tag;
 	char_data *plr;
 	
@@ -3913,6 +3914,15 @@ void bind_obj_to_tag_list(obj_data *obj, struct mob_tag *list) {
 			continue;	// don't bind to linkdead players
 		}
 		add_obj_binding(tag->idnum, &OBJ_BOUND_TO(obj));
+		at_least_one = TRUE;
+	}
+	
+	// guarantee we bound to at least 1 -- if not, we'll have to bind to at least one anyway
+	if (list && !at_least_one) {
+		for (tag = list; tag; tag = tag->next) {
+			add_obj_binding(tag->idnum, &OBJ_BOUND_TO(obj));
+			break;
+		}
 	}
 }
 
