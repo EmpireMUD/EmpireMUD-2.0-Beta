@@ -89,7 +89,7 @@ bool check_block(char_data *ch, char_data *attacker, bool can_gain_skill) {
 		return FALSE;
 	}
 	
-	rating = get_block_rating(ch, can_gain_skill);
+	rating = get_block_rating(ch, can_gain_skill && can_gain_exp_from(ch, attacker));
 	
 	// penalty for blind/dark
 	if (attacker && !CAN_SEE(ch, attacker)) {
@@ -648,7 +648,7 @@ static void recursive_loot_set(obj_data *obj, int idnum, empire_data *emp) {
 * @param int damtype The DAM_x type of damage.
 */
 int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, int damtype) {
-	extern bool check_blood_fortitude(char_data *ch);
+	extern bool check_blood_fortitude(char_data *ch, bool can_gain_skill);
 	
 	bool self = (!attacker || attacker == victim);
 	int max_resist, use_resist;
@@ -679,7 +679,7 @@ int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, i
 			}
 		}
 	
-		if (check_blood_fortitude(victim)) {
+		if (check_blood_fortitude(victim, can_gain_exp_from(victim, attacker))) {
 			dam = (int) round(0.9 * dam);
 		}
 	

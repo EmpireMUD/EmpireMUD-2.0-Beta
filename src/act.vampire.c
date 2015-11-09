@@ -133,9 +133,11 @@ void cancel_siring(char_data *ch) {
 
 
 // checks for Blood Fortitude and does skill gain
-bool check_blood_fortitude(char_data *ch) {
+bool check_blood_fortitude(char_data *ch, bool can_gain_skill) {
 	if (!IS_NPC(ch) && IS_VAMPIRE(ch) && check_vampire_sun(ch, FALSE) && HAS_ABILITY(ch, ABIL_BLOOD_FORTITUDE)) {
-		gain_ability_exp(ch, ABIL_BLOOD_FORTITUDE, 1);
+		if (can_gain_skill) {
+			gain_ability_exp(ch, ABIL_BLOOD_FORTITUDE, 1);
+		}
 		return TRUE;
 	}
 	return FALSE;
