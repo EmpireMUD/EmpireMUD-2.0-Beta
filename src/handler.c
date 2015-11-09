@@ -3447,10 +3447,15 @@ void tag_mob(char_data *mob, char_data *player) {
 				continue;
 			}
 			
+			// never tag for someone with no descriptor
+			if (!mem->member->desc) {
+				continue;
+			}
+			
 			add_mob_tag(GET_IDNUM(mem->member), &MOB_TAGGED_BY(mob));
 		}
 	}
-	else {
+	else if (player->desc) { // never tag for someone with no descriptor
 		// just tag for player
 		add_mob_tag(GET_IDNUM(player), &MOB_TAGGED_BY(mob));
 	}
@@ -3888,6 +3893,7 @@ void bind_obj_to_player(obj_data *obj, char_data *ch) {
 */
 void bind_obj_to_tag_list(obj_data *obj, struct mob_tag *list) {
 	struct mob_tag *tag;
+	char_data *plr;
 	
 	// sanity
 	if (!obj || !list || !OBJ_FLAGGED(obj, OBJ_BIND_FLAGS)) {
@@ -3900,6 +3906,12 @@ void bind_obj_to_tag_list(obj_data *obj, struct mob_tag *list) {
 	}
 	
 	for (tag = list; tag; tag = tag->next) {
+		if (!(plr = is_playing(tag->idnum))) {
+			continue;	// don't bind to missing players
+		}
+		if (!plr->desc) {
+			continue;	// don't bind to linkdead players
+		}
 		add_obj_binding(tag->idnum, &OBJ_BOUND_TO(obj));
 	}
 }
