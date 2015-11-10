@@ -6707,8 +6707,12 @@ struct resource_data *create_resource_list(int first_vnum, int first_amount, ...
 	va_start(ap, first_amount);
 	have_vnum = FALSE;
 	
-	do {
-		val = va_arg(ap, int);
+	while (TRUE) {
+		// get another int and break if it's a list terminator
+		if ((val = va_arg(ap, int)) == NOTHING) {
+			break;
+		}
+		
 		if (!have_vnum) {
 			last_vnum = val;
 			have_vnum = TRUE;
@@ -6720,7 +6724,7 @@ struct resource_data *create_resource_list(int first_vnum, int first_amount, ...
 			last->next = res;
 			last = res;
 		}
-	} while (last_vnum != NOTHING);
+	}
 
 	va_end(ap);
 	return list;
