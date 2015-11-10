@@ -51,6 +51,7 @@ extern const sector_vnum climate_default_sector[NUM_CLIMATES];
 void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location);
 void discrete_load(FILE *fl, int mode, char *filename);
 void free_complex_data(struct complex_room_data *data);
+extern crop_data *get_potential_crop_for_location(room_data *location);
 void index_boot(int mode);
 extern obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify);
 void save_whole_world();
@@ -716,9 +717,7 @@ void update_ships(void) {
 /**
 * This ensures that every room has a valid sector.
 */
-void verify_sectors(void) {
-	extern crop_data *get_potential_crop_for_location(room_data *location);
-	
+void verify_sectors(void) {	
 	sector_data *use_sect, *sect, *next_sect;
 	room_data *room, *next_room;
 	
@@ -1780,6 +1779,7 @@ void b3_2_map_and_gear(void) {
 	struct trading_post_data *tpd;
 	room_data *room, *next_room;
 	empire_data *emp, *next_emp;
+	crop_vnum type;
 	
 	int ROOM_EXTRA_CROP_TYPE = 2;	// removed extra type
 	bitvector_t ROOM_AFF_PLAYER_MADE = BIT(11);	// removed flag
@@ -1804,7 +1804,8 @@ void b3_2_map_and_gear(void) {
 		
 		// crops
 		if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && !ROOM_CROP(room)) {
-			set_crop_type(room, crop_proto(get_room_extra_data(room, ROOM_EXTRA_CROP_TYPE)));
+			type = get_room_extra_data(room, ROOM_EXTRA_CROP_TYPE);
+			set_crop_type(room, type > 0 ? crop_proto(type) : get_potential_crop_for_location(room));
 			remove_room_extra_data(room, ROOM_EXTRA_CROP_TYPE);
 		}
 	}
