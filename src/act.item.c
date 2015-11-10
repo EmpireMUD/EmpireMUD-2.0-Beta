@@ -1258,7 +1258,7 @@ void scale_item_to_level(obj_data *obj, int level) {
 	double share, this_share, points_to_give, per_point;
 	room_data *room = NULL;
 	obj_data *top_obj, *proto;
-	struct obj_apply *apply;
+	struct obj_apply *apply, *next_apply, *temp;
 	bitvector_t bits;
 	
 	// configure this here
@@ -1504,7 +1504,9 @@ void scale_item_to_level(obj_data *obj, int level) {
 	}
 	
 	// distribute points: applies
-	for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
+	for (apply = GET_OBJ_APPLIES(obj); apply; apply = next_apply) {
+		next_apply = apply->next;
+		
 		// TODO non-scalable traits should be an array
 		if (apply->location != APPLY_GREATNESS && apply->location != APPLY_CRAFTING) {
 			this_share = MAX(0, MIN(share, points_to_give));
@@ -1521,6 +1523,12 @@ void scale_item_to_level(obj_data *obj, int level) {
 				// penalty: does not cost from points_to_give
 				apply->modifier = round(apply->modifier * per_point);
 			}
+		}
+		
+		// remove zero-applies
+		if (apply->modifier == 0) {
+			REMOVE_FROM_LIST(apply, GET_OBJ_APPLIES(obj), next);
+			free(apply);
 		}
 	}
 	
@@ -4513,7 +4521,7 @@ ACMD(do_roadsign) {
 	else if (!*argument) {
 		msg_to_char(ch, "Usage: roadsign <message>\r\n");
 	}
-	else if ((strlen(argument) - (2 * count_color_codes(argument))) > max_length) {
+	else if (color_strlen(argument) > max_length) {
 		msg_to_char(ch, "Road signs can't be more than %d characters long.\r\n", max_length);
 	}
 	else {

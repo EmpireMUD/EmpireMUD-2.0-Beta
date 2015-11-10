@@ -650,7 +650,7 @@ void mobile_activity(void) {
 				}
 				
 				// ok good to go
-				if (affected_by_spell(vict, ATYPE_MAJESTY) && !AFF_FLAGGED(ch, AFF_IMMUNE_VAMPIRE)) {
+				if (affected_by_spell(vict, ATYPE_MAJESTY) && !AFF_FLAGGED(ch, AFF_IMMUNE_VAMPIRE) && can_gain_exp_from(vict, ch)) {
 					gain_ability_exp(vict, ABIL_MAJESTY, 10);
 				}
 				if (!CHECK_MAJESTY(vict) || AFF_FLAGGED(ch, AFF_IMMUNE_VAMPIRE)) {
@@ -708,7 +708,7 @@ void mobile_activity(void) {
 								// check friendly first -- so we don't attack someone who's friendly
 								if (!empire_is_friendly(chemp, victemp) && can_fight(ch, vict)) {
 									if (IS_HOSTILE(vict) || (!IS_DISGUISED(vict) && empire_is_hostile(chemp, victemp, IN_ROOM(ch)))) {
-										if (affected_by_spell(vict, ATYPE_MAJESTY) && !AFF_FLAGGED(ch, AFF_IMMUNE_VAMPIRE)) {
+										if (affected_by_spell(vict, ATYPE_MAJESTY) && !AFF_FLAGGED(ch, AFF_IMMUNE_VAMPIRE) && can_gain_exp_from(vict, ch)) {
 											gain_ability_exp(vict, ABIL_MAJESTY, 10);
 										}
 									

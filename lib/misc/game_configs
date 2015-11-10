@@ -119,6 +119,7 @@ blood_starvation_level 20
 default_map_size 7
 delete_inactive_players_after 0
 delete_invalid_players_after 30
+exp_level_difference 50
 idle_linkdead_rent_time 5
 idle_rent_time 20
 max_capitals_in_name 2

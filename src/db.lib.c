@@ -38,6 +38,7 @@
 *   Interaction Lib
 *   Mobile Lib
 *   Object Lib
+*   Resource Lib
 *   Room Lib
 *   Room Template Lib
 *   Sector Lib
@@ -58,6 +59,7 @@ extern bool world_is_sorted;
 // external funcs
 extern struct complex_room_data *init_complex_data();
 void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location);
+void free_archetype_gear(struct archetype_gear *list);
 extern room_data *load_map_room(room_vnum vnum);
 extern obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify);
 void sort_exits(struct room_direction_data **list);
@@ -71,12 +73,14 @@ void parse_extra_desc(FILE *fl, struct extra_descr_data **list, char *error_part
 void parse_generic_name_file(FILE *fl, char *err_str);
 void parse_icon(char *line, FILE *fl, struct icon_data **list, char *error_part);
 void parse_interaction(char *line, struct interaction_item **list, char *error_part);
+void parse_resource(FILE *fl, struct resource_data **list, char *error_str);
 void script_save_to_disk(FILE *fp, void *item, int type);
 int sort_empires(empire_data *a, empire_data *b);
 int sort_room_templates(room_template *a, room_template *b);
 void write_extra_descs_to_file(FILE *fl, struct extra_descr_data *list);
 void write_icons_to_file(FILE *fl, char file_tag, struct icon_data *list);
 void write_interactions_to_file(FILE *fl, struct interaction_item *list);
+void write_resources_to_file(FILE *fl, struct resource_data *list);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -693,7 +697,7 @@ void free_craft(craft_data *craft) {
 	}
 	
 	if (GET_CRAFT_RESOURCES(craft) && (!proto || GET_CRAFT_RESOURCES(craft) != GET_CRAFT_RESOURCES(proto))) {
-		free(GET_CRAFT_RESOURCES(craft));
+		free_resource_list(GET_CRAFT_RESOURCES(craft));
 	}
 	
 	free(craft);
@@ -706,8 +710,6 @@ void free_craft(craft_data *craft) {
 * @param craft_data *craft The craft recipe to clear.
 */
 void init_craft(craft_data *craft) {
-	int iter;
-	
 	memset((char *)craft, 0, sizeof(craft_data));
 	
 	// clear/default some stuff
@@ -715,12 +717,6 @@ void init_craft(craft_data *craft) {
 	GET_CRAFT_REQUIRES_OBJ(craft) = NOTHING;
 	GET_CRAFT_QUANTITY(craft) = 1;
 	GET_CRAFT_TIME(craft) = 1;
-		
-	CREATE(GET_CRAFT_RESOURCES(craft), Resource, MAX_RESOURCES_REQUIRED);
-	for (iter = 0; iter < MAX_RESOURCES_REQUIRED; ++iter) {
-		GET_CRAFT_RESOURCES(craft)[iter].vnum = NOTHING;
-		GET_CRAFT_RESOURCES(craft)[iter].amount = 0;
-	}
 }
 
 
@@ -732,7 +728,6 @@ void init_craft(craft_data *craft) {
 */
 void parse_craft(FILE *fl, craft_vnum vnum) {
 	char line[256], str_in[256], str_in2[256];
-	int resource_pos = 0;
 	craft_data *craft, *find;
 	int int_in[4];
 	
@@ -808,21 +803,10 @@ void parse_craft(FILE *fl, craft_vnum vnum) {
 				GET_CRAFT_MIN_LEVEL(craft) = int_in[0];
 				break;
 			}
-
-			// resources: vnum amount
-			case 'R': {
-				if (!get_line(fl, line) || sscanf(line, "%d %d", int_in, int_in + 1) != 2) {
-					log("SYSERR: Format error in R section of craft recipe #%d", vnum);
-					exit(1);
-				}
-				
-				GET_CRAFT_RESOURCES(craft)[resource_pos].vnum = int_in[0];
-				GET_CRAFT_RESOURCES(craft)[resource_pos].amount = int_in[1];
-				
-				++resource_pos;
-				
-				break;
 			
+			case 'R': {	// resources
+				parse_resource(fl, &GET_CRAFT_RESOURCES(craft), buf2);
+				break;
 			}
 
 			// end
@@ -850,7 +834,6 @@ void write_craft_to_file(FILE *fl, craft_data *craft) {
 	extern const char *drinks[];
 
 	char temp1[256], temp2[256];
-	int iter;
 	
 	if (!fl || !craft) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: write_craft_to_file called without %s", !fl ? "file" : "craft");
@@ -876,10 +859,8 @@ void write_craft_to_file(FILE *fl, craft_data *craft) {
 		fprintf(fl, "%d\n", GET_CRAFT_MIN_LEVEL(craft));
 	}
 	
-	for (iter = 0; iter < MAX_RESOURCES_REQUIRED && GET_CRAFT_RESOURCES(craft)[iter].vnum != NOTHING; ++iter) {
-		fprintf(fl, "R\n");
-		fprintf(fl, "%d %d  # %dx %s\n", GET_CRAFT_RESOURCES(craft)[iter].vnum, GET_CRAFT_RESOURCES(craft)[iter].amount, GET_CRAFT_RESOURCES(craft)[iter].amount, get_obj_name_by_proto(GET_CRAFT_RESOURCES(craft)[iter].vnum));
-	}
+	// 'R': resources
+	write_resources_to_file(fl, GET_CRAFT_RESOURCES(craft));
 	
 	// end
 	fprintf(fl, "S\n");
@@ -1166,8 +1147,8 @@ void remove_empire_from_table(empire_data *emp) {
 empire_data *create_empire(char_data *ch) {
 	void add_empire_to_table(empire_data *emp);
 	void resort_empires();
-	extern const struct archetype_type archetype[];
 
+	archetype_data *arch;
 	char colorcode[10];
 	empire_vnum vnum;
 	empire_data *emp;
@@ -1206,9 +1187,13 @@ empire_data *create_empire(char_data *ch) {
 	}
 	
 	// rank setup
+	arch = archetype_proto(CREATION_ARCHETYPE(ch));
+	if (!arch) {
+		arch = archetype_proto(0);	// default to 0
+	}
 	EMPIRE_NUM_RANKS(emp) = 2;
 	EMPIRE_RANK(emp, 0) = str_dup("Follower");
-	EMPIRE_RANK(emp, 1) = str_dup(archetype[(int) CREATION_ARCHETYPE(ch)].starting_rank[(int) GET_REAL_SEX(ch)]);
+	EMPIRE_RANK(emp, 1) = str_dup(arch ? (GET_REAL_SEX(ch) == SEX_FEMALE ? GET_ARCH_FEMALE_RANK(arch) : GET_ARCH_MALE_RANK(arch)) : "Leader");
 	for (iter = 0; iter < NUM_PRIVILEGES; ++iter) {
 		EMPIRE_PRIV(emp, iter) = 2;
 	}
@@ -2608,6 +2593,10 @@ void free_global(struct global_data *glb) {
 		}
 	}
 	
+	if (GET_GLOBAL_GEAR(glb) && (!proto || GET_GLOBAL_GEAR(glb) != GET_GLOBAL_GEAR(proto))) {
+		free_archetype_gear(GET_GLOBAL_GEAR(glb));
+	}
+	
 	free(glb);
 }
 
@@ -2619,6 +2608,8 @@ void free_global(struct global_data *glb) {
 * @param any_vnum vnum The global vnum
 */
 void parse_global(FILE *fl, any_vnum vnum) {
+	void parse_archetype_gear(FILE *fl, struct archetype_gear **list, char *error);
+
 	struct global_data *glb, *find;
 	char line[256], str_in[256], str_in2[256], str_in3[256];
 	int int_in[4];
@@ -2680,6 +2671,10 @@ void parse_global(FILE *fl, any_vnum vnum) {
 				GET_GLOBAL_VAL(glb, 2) = int_in[2];
 				break;
 			}
+			case 'G': {	// gear: loc vnum
+				parse_archetype_gear(fl, &GET_GLOBAL_GEAR(glb), buf2);
+				break;
+			}
 			case 'I': {	// interaction item
 				parse_interaction(line, &GET_GLOBAL_INTERACTIONS(glb), buf2);
 				break;
@@ -2707,6 +2702,8 @@ void parse_global(FILE *fl, any_vnum vnum) {
 * @param struct global_data *glb The thing to save.
 */
 void write_global_to_file(FILE *fl, struct global_data *glb) {
+	void write_archetype_gear_to_file(FILE *fl, struct archetype_gear *list);
+	
 	char temp[MAX_STRING_LENGTH], temp2[MAX_STRING_LENGTH], temp3[MAX_STRING_LENGTH];
 	
 	if (!fl || !glb) {
@@ -2727,6 +2724,9 @@ void write_global_to_file(FILE *fl, struct global_data *glb) {
 	fprintf(fl, "E\n");
 	fprintf(fl, "%d %.2f\n", GET_GLOBAL_ABILITY(glb), GET_GLOBAL_PERCENT(glb));
 	fprintf(fl, "%d %d %d\n", GET_GLOBAL_VAL(glb, 0), GET_GLOBAL_VAL(glb, 1), GET_GLOBAL_VAL(glb, 2));
+	
+	// G: gear
+	write_archetype_gear_to_file(fl, GET_GLOBAL_GEAR(glb));
 	
 	// I: interactions
 	write_interactions_to_file(fl, GET_GLOBAL_INTERACTIONS(glb));
@@ -3715,6 +3715,106 @@ void write_obj_to_file(FILE *fl, obj_data *obj) {
 
 	// END
 	fprintf(fl, "S\n");
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// RESOURCE LIB ////////////////////////////////////////////////////////////
+
+/**
+* Copies a resource list.
+*
+* @param struct resource_data *input The list to copy.
+* @return struct resource_data* The copied list.
+*/
+struct resource_data *copy_resource_list(struct resource_data *input) {
+	struct resource_data *new, *last, *list, *iter;
+	
+	last = list = NULL;
+	for (iter = input; iter; iter = iter->next) {
+		CREATE(new, struct resource_data, 1);
+		*new = *iter;
+		new->next = NULL;
+		
+		if (last) {
+			last->next = new;
+		}
+		else {
+			list = new;
+		}
+		last = new;
+	}
+	
+	return list;
+}
+
+
+/**
+* Frees a list of resource_data items.
+*
+* @param struct resource_data *list The start of the list to free.
+*/
+void free_resource_list(struct resource_data *list) {
+	struct resource_data *res;
+	
+	while ((res = list)) {
+		list = res->next;
+		free(res);
+	}
+}
+
+
+/**
+* Parses an 'R' resource tag, written by write_resources_to_file(). This file
+* should have just read the 'R' line, and the next line to read is its data.
+*
+* @param FILE *fl The file to read from.
+* @param struct resource_data **list The resource list to append to.
+* @param char *error_str An identifier to log if there is a problem.
+*/
+void parse_resource(FILE *fl, struct resource_data **list, char *error_str) {
+	struct resource_data *new, *end;
+	char line[256];
+	int int_in[2];
+	
+	if (!fl || !list || !get_line(fl, line) || sscanf(line, "%d %d", &int_in[0], &int_in[1]) != 2) {
+		log("SYSERR: format error in R line of %s", error_str ? error_str : "resource");
+		exit(1);
+	}
+	
+	CREATE(new, struct resource_data, 1);
+	new->vnum = int_in[0];
+	new->amount = int_in[1];
+	
+	// append at the end
+	if ((end = *list)) {
+		while (end->next) {
+			end = end->next;
+		}
+		end->next = new;
+	}
+	else {
+		*list = new;
+	}
+}
+
+
+/**
+* Writes new-style resource_data to file as an 'R' tag.
+*
+* @param FILE *fl The file, open for writing.
+* @param struct resource_data *list The list of resources to write.
+*/
+void write_resources_to_file(FILE *fl, struct resource_data *list) {
+	struct resource_data *res;
+	
+	if (!fl || !list) {
+		return;
+	}
+	
+	for (res = list; res; res = res->next) {
+		fprintf(fl, "R\n%d %d  # %dx %s\n", res->vnum, res->amount, res->amount, get_obj_name_by_proto(res->vnum));
+	}
 }
 
 
@@ -4940,13 +5040,15 @@ void write_trigger_to_file(FILE *fl, trig_data *trig) {
 */
 void discrete_load(FILE *fl, int mode, char *filename) {
 	void parse_account(FILE *fl, int nr);
+	void parse_archetype(FILE *fl, any_vnum vnum);
+	void parse_augment(FILE *fl, any_vnum vnum);
 	void parse_book(FILE *fl, int book_id);
 	
 	any_vnum nr = -1, last;
 	char line[256];
 
 	/* modes positions correspond to DB_BOOT_x in db.h */
-	const char *modes[] = {"world", "mob", "obj", "zone", "empire", "book", "craft", "trg", "crop", "sector", "adventure", "room template", "global", "account" };
+	const char *modes[] = {"world", "mob", "obj", "zone", "empire", "book", "craft", "trg", "crop", "sector", "adventure", "room template", "global", "account", "augment", "archetype" };
 
 	for (;;) {
 		if (!get_line(fl, line)) {
@@ -4975,6 +5077,14 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 				}
 				case DB_BOOT_ADV: {
 					parse_adventure(fl, nr);
+					break;
+				}
+				case DB_BOOT_ARCH: {
+					parse_archetype(fl, nr);
+					break;
+				}
+				case DB_BOOT_AUG: {
+					parse_augment(fl, nr);
 					break;
 				}
 				case DB_BOOT_BLD: {
@@ -5084,7 +5194,7 @@ void index_boot(int mode) {
 
 	if (!rec_count) {
 		// DB_BOOT_x: some types don't matter TODO could move this into a config
-		if (mode == DB_BOOT_EMP || mode == DB_BOOT_BOOKS || mode == DB_BOOT_CRAFT || mode == DB_BOOT_BLD || mode == DB_BOOT_ADV || mode == DB_BOOT_RMT || mode == DB_BOOT_WLD || mode == DB_BOOT_GLB || mode == DB_BOOT_ACCT) {
+		if (mode == DB_BOOT_EMP || mode == DB_BOOT_BOOKS || mode == DB_BOOT_CRAFT || mode == DB_BOOT_BLD || mode == DB_BOOT_ADV || mode == DB_BOOT_RMT || mode == DB_BOOT_WLD || mode == DB_BOOT_GLB || mode == DB_BOOT_ACCT || mode == DB_BOOT_AUG || mode == DB_BOOT_ARCH) {
 			// types that don't require any entries and exit early if none
 			return;
 		}
@@ -5106,6 +5216,16 @@ void index_boot(int mode) {
 	 * NOTE: "bytes" does _not_ include strings or other later malloc'd things.
 	 */
 	switch (mode) {
+		case DB_BOOT_ARCH: {
+			size[0] = sizeof(archetype_data) * rec_count;
+			log("  %d archetypes, %d bytes in db", rec_count, size[0]);
+			break;
+		}
+		case DB_BOOT_AUG: {
+			size[0] = sizeof(augment_data) * rec_count;
+			log("  %d augments, %d bytes in db", rec_count, size[0]);
+			break;
+		}
 		case DB_BOOT_BOOKS: {
 			log("  %d books", rec_count);
 			break;
@@ -5185,6 +5305,8 @@ void index_boot(int mode) {
 		switch (mode) {
 			case DB_BOOT_ACCT:
 			case DB_BOOT_ADV:
+			case DB_BOOT_ARCH:
+			case DB_BOOT_AUG:
 			case DB_BOOT_BLD:
 			case DB_BOOT_CRAFT:
 			case DB_BOOT_CROP:
@@ -5265,6 +5387,26 @@ void save_library_file_for_vnum(int type, any_vnum vnum) {
 			HASH_ITER(hh, adventure_table, adv, next_adv) {
 				if (GET_ADV_VNUM(adv) >= (zone * 100) && GET_ADV_VNUM(adv) <= (zone * 100 + 99)) {
 					write_adventure_to_file(fl, adv);
+				}
+			}
+			break;
+		}
+		case DB_BOOT_ARCH: {
+			void write_archetype_to_file(FILE *fl, archetype_data *arch);
+			archetype_data *arch, *next_arch;
+			HASH_ITER(hh, archetype_table, arch, next_arch) {
+				if (GET_ARCH_VNUM(arch) >= (zone * 100) && GET_ARCH_VNUM(arch) <= (zone * 100 + 99)) {
+					write_archetype_to_file(fl, arch);
+				}
+			}
+			break;
+		}
+		case DB_BOOT_AUG: {
+			void write_augment_to_file(FILE *fl, augment_data *aug);
+			augment_data *aug, *next_aug;
+			HASH_ITER(hh, augment_table, aug, next_aug) {
+				if (GET_AUG_VNUM(aug) >= (zone * 100) && GET_AUG_VNUM(aug) <= (zone * 100 + 99)) {
+					write_augment_to_file(fl, aug);
 				}
 			}
 			break;
@@ -5441,7 +5583,7 @@ void write_crop_index(FILE *fl) {
 }
 
 
-// writes entries in the room template index
+// writes entries in the globals index
 void write_globals_index(FILE *fl) {
 	struct global_data *glb, *next_glb;
 	int this, last;
@@ -5587,6 +5729,16 @@ void save_index(int type) {
 		}
 		case DB_BOOT_ADV: {
 			write_adventure_index(fl);
+			break;
+		}
+		case DB_BOOT_ARCH: {
+			void write_archetype_index(FILE *fl);
+			write_archetype_index(fl);
+			break;
+		}
+		case DB_BOOT_AUG: {
+			void write_augments_index(FILE *fl);
+			write_augments_index(fl);
 			break;
 		}
 		case DB_BOOT_BLD: {
@@ -6081,7 +6233,7 @@ int sort_crafts_by_data(craft_data *a, craft_data *b) {
 		return b_level - a_level;
 	}
 	
-	return strcmp(GET_CRAFT_NAME(a), GET_CRAFT_NAME(b));
+	return strcmp(NULLSAFE(GET_CRAFT_NAME(a)), NULLSAFE(GET_CRAFT_NAME(b)));
 }
 
 
@@ -6525,6 +6677,53 @@ struct obj_apply *copy_apply_list(struct obj_apply *list) {
 	}
 	
 	return new_list;
+}
+
+
+/**
+* Generates a resource list from alternating (vnum, amount, vnum, amount,
+* vnum, amount, NOTHING) -- you MUST pass NOTHING as the last vnum
+*
+* @param ... You must pass alternating (vnum, amount, vnum, amount, NOTHING)
+* @return struct resource_data* The allocated list.
+*/
+struct resource_data *create_resource_list(int first_vnum, int first_amount, ...) {
+	struct resource_data *list, *res, *last;
+	va_list ap;
+	int last_vnum = NOTHING, val;
+	bool have_vnum;
+	
+	// shortcut
+	if (first_vnum == NOTHING || first_amount <= 0) {
+		return NULL;
+	}
+	
+	CREATE(res, struct resource_data, 1);
+	res->vnum = first_vnum;
+	res->amount = first_amount;
+	list = last = res;
+	
+	// alternating vnum, amt
+	va_start(ap, first_amount);
+	have_vnum = FALSE;
+	
+	do {
+		val = va_arg(ap, int);
+		if (!have_vnum) {
+			last_vnum = val;
+			have_vnum = TRUE;
+		}
+		else {
+			CREATE(res, struct resource_data, 1);
+			res->vnum = last_vnum;
+			res->amount = val;
+			last->next = res;
+			last = res;
+		}
+	} while (last_vnum != NOTHING);
+
+	va_end(ap);
+	return list;
 }
 
 

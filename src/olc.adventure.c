@@ -150,6 +150,7 @@ bool audit_adventure(adv_data *adv, char_data *ch, bool only_one) {
 	// sub-audits
 	if (only_one && GET_ADV_START_VNUM(adv) <= GET_ADV_END_VNUM(adv)) {
 		snprintf(buf, sizeof(buf), "%d %d", GET_ADV_START_VNUM(adv), GET_ADV_END_VNUM(adv));
+		// OLC_x: auto-auditors
 		msg_to_char(ch, "Crafts:\r\n");
 		olc_audit(ch, OLC_CRAFT, buf);
 		msg_to_char(ch, "Mobs:\r\n");
@@ -166,6 +167,10 @@ bool audit_adventure(adv_data *adv, char_data *ch, bool only_one) {
 		olc_audit(ch, OLC_SECTOR, buf);
 		msg_to_char(ch, "Room Templates:\r\n");
 		olc_audit(ch, OLC_ROOM_TEMPLATE, buf);
+		msg_to_char(ch, "Archetypes:\r\n");
+		olc_audit(ch, OLC_ARCHETYPE, buf);
+		msg_to_char(ch, "Augments:\r\n");
+		olc_audit(ch, OLC_AUGMENT, buf);
 		msg_to_char(ch, "Globals:\r\n");
 		olc_audit(ch, OLC_GLOBAL, buf);
 	}

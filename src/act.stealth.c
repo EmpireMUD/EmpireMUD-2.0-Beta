@@ -463,8 +463,10 @@ int apply_poison(char_data *ch, char_data *vict, int type) {
 	}
 	
 	// GAIN SKILL NOW -- it at least attempts an application
-	gain_ability_exp(ch, ABIL_POISONS, 2);
-	gain_ability_exp(ch, ABIL_DEADLY_POISONS, 2);
+	if (can_gain_exp_from(ch, vict)) {
+		gain_ability_exp(ch, ABIL_POISONS, 2);
+		gain_ability_exp(ch, ABIL_DEADLY_POISONS, 2);
+	}
 	
 	// skill check!
 	if (!skill_check(ch, ABIL_POISONS, DIFF_HARD)) {
@@ -480,11 +482,15 @@ int apply_poison(char_data *ch, char_data *vict, int type) {
 	
 	// attempt immunity/resist
 	if (HAS_ABILITY(vict, ABIL_POISON_IMMUNITY)) {
-		gain_ability_exp(vict, ABIL_POISON_IMMUNITY, 10);
+		if (can_gain_exp_from(vict, ch)) {
+			gain_ability_exp(vict, ABIL_POISON_IMMUNITY, 10);
+		}
 		return 0;
 	}
 	if (HAS_ABILITY(vict, ABIL_RESIST_POISON)) {
-		gain_ability_exp(vict, ABIL_RESIST_POISON, 10);
+		if (can_gain_exp_from(vict, ch)) {
+			gain_ability_exp(vict, ABIL_RESIST_POISON, 10);
+		}
 		if (!number(0, 2)) {
 			return 0;
 		}
@@ -632,8 +638,10 @@ ACMD(do_backstab) {
 				}
 			}		
 		}
-
-		gain_ability_exp(ch, ABIL_BACKSTAB, 15);
+		
+		if (can_gain_exp_from(ch, vict)) {
+			gain_ability_exp(ch, ABIL_BACKSTAB, 15);
+		}
 	}
 }
 
@@ -684,7 +692,9 @@ ACMD(do_blind) {
 			engage_combat(ch, vict, TRUE);
 		}
 		
-		gain_ability_exp(ch, ABIL_BLIND, 15);
+		if (can_gain_exp_from(ch, vict)) {
+			gain_ability_exp(ch, ABIL_BLIND, 15);
+		}
 	}
 }
 
@@ -1120,7 +1130,9 @@ ACMD(do_jab) {
 				affect_join(vict, af, ADD_MODIFIER);
 			}
 		}
-		gain_ability_exp(ch, ABIL_JAB, 15);
+		if (can_gain_exp_from(ch, vict)) {
+			gain_ability_exp(ch, ABIL_JAB, 15);
+		}
 	}
 }
 
@@ -1219,7 +1231,9 @@ ACMD(do_pickpocket) {
 		}
 		
 		// gain either way
-		gain_ability_exp(ch, ABIL_PICKPOCKET, 25);
+		if (can_gain_exp_from(ch, vict)) {
+			gain_ability_exp(ch, ABIL_PICKPOCKET, 25);
+		}
 		command_lag(ch, WAIT_ABILITY);
 	}
 }
@@ -1279,8 +1293,10 @@ ACMD(do_prick) {
 		if (!EXTRACTED(vict) && !IS_DEAD(vict) && CAN_SEE(vict, ch)) {
 			engage_combat(ch, vict, TRUE);
 		}
-
-		gain_ability_exp(ch, ABIL_PRICK, 15);
+		
+		if (can_gain_exp_from(ch, vict)) {
+			gain_ability_exp(ch, ABIL_PRICK, 15);
+		}
 	}
 }
 
@@ -1339,8 +1355,10 @@ ACMD(do_sap) {
 		else {
 			engage_combat(ch, vict, TRUE);
 		}
-
-		gain_ability_exp(ch, ABIL_SAP, 20);
+		
+		if (can_gain_exp_from(ch, vict)) {
+			gain_ability_exp(ch, ABIL_SAP, 20);
+		}
 		
 		// release other saps here
 		limit_crowd_control(vict, ATYPE_SAP);
@@ -1742,6 +1760,8 @@ ACMD(do_terrify) {
 		}
 		
 		engage_combat(victim, ch, TRUE);
-		gain_ability_exp(ch, ABIL_TERRIFY, 15);
+		if (can_gain_exp_from(ch, victim)) {
+			gain_ability_exp(ch, ABIL_TERRIFY, 15);
+		}
 	}
 }

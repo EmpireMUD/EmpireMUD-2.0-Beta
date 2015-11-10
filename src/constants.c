@@ -24,6 +24,8 @@
 * Contents:
 *   EmpireMUD Constants
 *   Adventure Constants
+*   Archetype Constants
+*   Augment Constants
 *   Player Constants
 *   Direction And Room Constants
 *   Character Constants
@@ -169,80 +171,51 @@ const char *room_template_flags[] = {
 
 
  //////////////////////////////////////////////////////////////////////////////
-//// PLAYER CONSTANTS ////////////////////////////////////////////////////////
+//// ARCHETYPE CONSTANTS /////////////////////////////////////////////////////
 
-// gear lists MUST be terminated with this
-#define GEAR_END  { NOWHERE, NOTHING }
-
-// starting player equipment and skills -- just don't change the order or insert new ones anywhere but the end (these are stored in the playerfile)
-const struct archetype_type archetype[] = {
-	// dummy row so options numbered 1+ match up
-	{ "\r", "\r", { "Adventurer", "Adventurer", "Adventurer" }, 0, 0, 0, 0, { 0, 0, 0, 0, 0, 0 }, { GEAR_END } },
-	
-	/*
-	* name, description, { Neuter rank, Male rank, Female rank },
-	* skill, level,  skill (or NO_SKILL), level
-	* strength, dexterity,  charisma, greatness,  intelligence, wits
-	*/
-
-	{ "Noble Birth", "raised to rule (Empire, Battle, Greatness)", { "Lord", "Lord", "Lady" },
-		SKILL_EMPIRE, 20,  SKILL_BATTLE, 10,
-		{ 2, 1,  2, 3,  1, 2 },
-		{ { WEAR_HEAD, o_BRIMMED_CAP }, { WEAR_CLOTHES, o_WAISTCOAT }, { WEAR_LEGS, o_BREECHES }, { WEAR_FEET, o_SANDALS }, { WEAR_WIELD, o_SHORT_SWORD }, { WEAR_HOLD, o_NEWBIE_TORCH }, GEAR_END }
-	},
-	
-	{ "Skilled Apprentice", "trained by a master artisan (Trade, Dexterity)", { "Tradesman", "Tradesman", "Tradesman" },
-		SKILL_TRADE, 30,  NO_SKILL, 0,
-		{ 2, 3,  2, 1,  2, 1 },
-		{ { WEAR_HEAD, o_COIF }, { WEAR_CLOTHES, o_SHIRT }, { WEAR_LEGS, o_BREECHES }, { WEAR_FEET, o_SANDALS }, { WEAR_WIELD, o_SHORT_SWORD }, { WEAR_HOLD, o_NEWBIE_TORCH }, GEAR_END }
-	},
-	
-	{ "Promising Squire", "built for battle (Battle, Survival, Strength)", { "Sir", "Sir", "Lady" },
-		SKILL_BATTLE, 20,  SKILL_SURVIVAL, 10,
-		{ 3, 2,  1, 2,  1, 2 },
-		{ { WEAR_HEAD, o_COIF }, { WEAR_CLOTHES, o_SHIRT }, { WEAR_LEGS, o_BREECHES }, { WEAR_FEET, o_SANDALS }, { WEAR_WIELD, o_SHORT_SWORD }, { WEAR_HOLD, o_NEWBIE_TORCH }, GEAR_END }
-	},
-	
-	{ "Rugged Woodsman", "cleaved from stone (Survival, Trade, Dexterity)", { "Adventurer", "Adventurer", "Adventurer" },
-		SKILL_SURVIVAL, 20,  SKILL_TRADE, 10,
-		{ 2, 3,  1, 1,  2, 2 },
-		{ { WEAR_HEAD, o_LEATHER_HOOD }, { WEAR_CLOTHES, o_LEATHER_JACKET }, { WEAR_LEGS, o_PANTS }, { WEAR_FEET, o_MOCCASINS }, { WEAR_WIELD, o_WOODSMANS_AXE }, { WEAR_HOLD, o_NEWBIE_TORCH }, GEAR_END }
-	},
-	
-	{ "Tribal Leader", "rise from nothing (Empire, Survival, Wits)", { "Elder", "Elder", "Elder" },
-		SKILL_EMPIRE, 15, SKILL_SURVIVAL, 15,
-		{ 2, 1,  1, 2,  2, 3 },
-		{ { WEAR_HEAD, o_LEATHER_HOOD }, { WEAR_CLOTHES, o_SPOTTED_ROBE }, { WEAR_LEGS, o_PANTS }, { WEAR_FEET, o_MOCCASINS }, { WEAR_WIELD, o_STONE_AXE }, { WEAR_HOLD, o_NEWBIE_TORCH }, GEAR_END }
-	},
-	
-	{ "Street Urchin", "the shadows of society (Stealth, Battle, Charisma)", { "Adventurer", "Adventurer", "Adventurer" },
-		SKILL_STEALTH, 20,  SKILL_BATTLE, 10,
-		{ 2, 2,  3, 1,  1, 2 },
-		{ { WEAR_HEAD, o_CLOTH_HOOD }, { WEAR_CLOTHES, o_SHIRT }, { WEAR_LEGS, o_BREECHES }, { WEAR_FEET, o_SANDALS }, { WEAR_WIELD, o_SHIV }, { WEAR_HOLD, o_NEWBIE_TORCH }, GEAR_END }
-	},
-		
-	{ "Druidic Commune", "wield ancient magic (Natural Magic, Survival, Intelligence)", { "Elder", "Elder", "Elder" },
-		SKILL_NATURAL_MAGIC, 20, SKILL_SURVIVAL, 10,
-		{ 1, 2,  2, 1,  3, 2 },
-		{ { WEAR_HEAD, o_LEATHER_HOOD }, { WEAR_CLOTHES, o_ROBE }, { WEAR_FEET, o_SANDALS }, { WEAR_WIELD, o_STONE_AXE }, { WEAR_HOLD, o_NEWBIE_TORCH }, GEAR_END }
-	},
-		
-	{ "Novice Sorcerer", "master the rituals (High Sorcery, Battle, Intelligence)", { "Master", "Master", "Mistress" },
-		SKILL_HIGH_SORCERY, 20, SKILL_BATTLE, 10,
-		{ 1, 2,  1, 2,  3, 2 },
-		{ { WEAR_HEAD, o_CLOTH_HOOD }, { WEAR_CLOTHES, o_ROBE }, { WEAR_FEET, o_SANDALS }, { WEAR_WIELD, o_STAFF }, { WEAR_HOLD, o_NEWBIE_TORCH }, GEAR_END }
-	},
-
-	{ "Lone Vampire", "empowered by blood (Vampire, Battle, Wits)", { "Hunter", "Hunter", "Hunter" },
-		SKILL_VAMPIRE, 20,  SKILL_BATTLE, 10,
-		{ 2, 1,  2, 1,  2, 3 },
-		{ { WEAR_CLOTHES, o_SHIRT }, { WEAR_LEGS, o_BREECHES }, { WEAR_FEET, o_SANDALS }, { WEAR_WIELD, o_SHORT_SWORD }, { WEAR_HOLD, o_NEWBIE_TORCH }, GEAR_END }
-	},
-
-	// end
-	{ "\n", "\n", { "\n", "\n", "\n" }, 0, 0, 0, 0, { 0, 0, 0, 0, 0, 0 }, { GEAR_END } }
+// ARCH_x: archetype flags
+const char *archetype_flags[] = {
+	"IN-DEVELOPMENT",
+	"BASIC",
+	"\n"
 };
 
+
+ //////////////////////////////////////////////////////////////////////////////
+//// AUGMENT CONSTANTS ///////////////////////////////////////////////////////
+
+// AUGMENT_x (1/2): augment types
+const char *augment_types[] = {
+	"None",
+	"Enchantment",
+	"Hone",
+	"\n"
+};
+
+
+// AUGMENT_x (1/2): augment type data
+const struct augment_type_data augment_info[] = {
+	// noun, verb, apply-type, default-flags, greater-ability, use-obj-flag
+	{ "augment", "augment", APPLY_TYPE_NATURAL, NOBITS, NO_ABIL, NOBITS },
+	{ "enchantment", "enchant", APPLY_TYPE_ENCHANTMENT, NOBITS, ABIL_GREATER_ENCHANTMENTS, OBJ_ENCHANTED },
+	{ "hone", "hone", APPLY_TYPE_HONED, AUG_SELF_ONLY, NO_ABIL, NOBITS },
+	
+	{ "\n", "\n", 0, 0, 0 }	// last
+};
+
+
+// AUG_x: augment flags
+const char *augment_flags[] = {
+	"IN-DEV",
+	"SELF-ONLY",
+	"ARMOR",
+	"SHIELD",
+	"\n"
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// PLAYER CONSTANTS ////////////////////////////////////////////////////////
 
 // ACCT_x: Account flags
 const char *account_flags[] = {
@@ -511,7 +484,7 @@ const char *connected_types[] = {
 	"Last name?",
 	"Get last name",
 	"Cnf last name",	// 15
-		"UNUSED 2",
+	"Cnf archetype",
 	"Have alt?",
 	"Alt name",
 	"Alt password",
@@ -1067,7 +1040,7 @@ const int apply_attribute[] = {
 };
 
 
-// STRENGTH, etc
+// STRENGTH, etc (part 1)
 struct attribute_data_type attributes[NUM_ATTRIBUTES] = {
 	{ "Strength", "Strength improves your melee damage and lets you chop trees faster" },
 	{ "Dexterity", "Dexterity helps you hit opponents and dodge hits" },
@@ -1075,6 +1048,12 @@ struct attribute_data_type attributes[NUM_ATTRIBUTES] = {
 	{ "Greatness", "Greatness determines how much territory your empire can claim" },
 	{ "Intelligence", "Intelligence improves your magical damage and healing" },
 	{ "Wits", "Wits improves your speed and effectiveness in combat" }
+};
+
+// STRENGTH, etc (part 2)
+int attribute_display_order[NUM_ATTRIBUTES] = {
+	STRENGTH, CHARISMA, INTELLIGENCE,
+	DEXTERITY, GREATNESS, WITS
 };
 
 
@@ -1313,6 +1292,7 @@ const char *action_bits[] = {
 	"*EXTRACTED",
 	"!LOOT",
 	"!TELEPORT",
+	"!EXP",
 	"\n"
 };
 
@@ -1386,30 +1366,30 @@ const char *wear_keywords[] = {
 
 // WEAR_x -- data for each wear slot
 const struct wear_data_type wear_data[NUM_WEARS] = {
-	// eq tag,				 wear bit,		count-stats, gear-level-mod, cascade-pos, already-wearing, wear-message-to-room, wear-message-to-char
-	{ "    <worn on head> ", ITEM_WEAR_HEAD, TRUE, 1.0, NO_WEAR, "You're already wearing $p on your head.", "$n wears $p on $s head.", "You wear $p on your head." },
-	{ "    <worn on ears> ", ITEM_WEAR_EARS, TRUE, 1.0, NO_WEAR, "You're already wearing $p on your ears.", "$n pins $p onto $s ears.", "You pin $p onto your ears." },
-	{ "<worn around neck> ", ITEM_WEAR_NECK, TRUE, 1.0, WEAR_NECK_2, "YOU SHOULD NEVER SEE THIS MESSAGE. PLEASE REPORT.", "$n wears $p around $s neck.", "You wear $p around your neck." },
-	{ "<worn around neck> ", ITEM_WEAR_NECK, TRUE, 1.0, NO_WEAR, "You're already wearing enough around your neck.", "$n wears $p around $s neck.", "You wear $p around your neck." },
-	{ " <worn as clothes> ", ITEM_WEAR_CLOTHES, TRUE, 0, NO_WEAR, "You're already wearing $p as clothes.", "$n wears $p as clothing.", "You wear $p as clothing." },
-	{ "   <worn as armor> ", ITEM_WEAR_ARMOR, TRUE, 2.0, NO_WEAR, "You're already wearing $p as armor.", "$n wears $p as armor.", "You wear $p as armor." },
-	{ " <worn about body> ", ITEM_WEAR_ABOUT, TRUE, 1.0, NO_WEAR, "You're already wearing $p about your body.", "$n wears $p about $s body.", "You wear $p around your body." },
-	{ "    <worn on arms> ", ITEM_WEAR_ARMS, TRUE, 1.0, NO_WEAR, "You're already wearing $p on your arms.", "$n wears $p on $s arms.", "You wear $p on your arms." },
-	{ "  <worn on wrists> ", ITEM_WEAR_WRISTS, TRUE, 1.0, NO_WEAR, "You're already wearing $p on your wrists.", "$n wears $p on $s wrists.", "You wear $p on your wrists." },
-	{ "   <worn on hands> ", ITEM_WEAR_HANDS, TRUE, 1.0, NO_WEAR, "You're already wearing $p on your hands.", "$n puts $p on $s hands.", "You put $p on your hands." },
-	{ "  <worn on finger> ", ITEM_WEAR_FINGER, TRUE, 1.0, WEAR_FINGER_L, "YOU SHOULD NEVER SEE THIS MESSAGE. PLEASE REPORT.", "$n slides $p on to $s right ring finger.", "You slide $p on to your right ring finger." },
-	{ "  <worn on finger> ", ITEM_WEAR_FINGER, TRUE, 1.0, NO_WEAR, "You're already wearing something on both of your ring fingers.", "$n slides $p on to $s left ring finger.", "You slide $p on to your left ring finger." },
-	{ "<worn about waist> ", ITEM_WEAR_WAIST, TRUE, 1.0, NO_WEAR, "You already have $p around your waist.", "$n wears $p around $s waist.", "You wear $p around your waist." },
-	{ "    <worn on legs> ", ITEM_WEAR_LEGS, TRUE, 1.0, NO_WEAR, "You're already wearing $p on your legs.", "$n puts $p on $s legs.", "You put $p on your legs." },
-	{ "    <worn on feet> ", ITEM_WEAR_FEET, TRUE, 1.0, NO_WEAR, "You're already wearing $p on your feet.", "$n wears $p on $s feet.", "You wear $p on your feet." },
-	{ " <carried as pack> ", ITEM_WEAR_PACK, TRUE, 0.5, NO_WEAR, "You're already using $p.", "$n starts using $p.", "You start using $p." },
-	{ "  <used as saddle> ", ITEM_WEAR_SADDLE, TRUE, 0, NO_WEAR, "You're already using $p.", "$n start using $p.", "You start using $p." },
-	{ "          (sheath) ", ITEM_WEAR_WIELD, FALSE, 0, WEAR_SHEATH_2, "You've already got something sheathed.", "$n sheathes $p.", "You sheathe $p." },
-	{ "          (sheath) ", ITEM_WEAR_WIELD, FALSE, 0, NO_WEAR, "You've already got something sheathed.", "$n sheathes $p.", "You sheathe $p." },
-	{ "         <wielded> ", ITEM_WEAR_WIELD, 	TRUE, 2.0, NO_WEAR, "You're already wielding $p.", "$n wields $p.", "You wield $p." },
-	{ "          <ranged> ", ITEM_WEAR_RANGED, TRUE, 0, NO_WEAR, "You're already using $p.", "$n uses $p.", "You use $p." },
-	{ "            <held> ", ITEM_WEAR_HOLD, TRUE, 1.0, NO_WEAR, "You're already holding $p.", "$n grabs $p.", "You grab $p." },
-	{ "          (shared) ", ITEM_WEAR_TAKE, FALSE, 0, NO_WEAR, "You're already sharing $p.", "$n shares $p.", "You share $p." }
+	// eq tag,				 name, wear bit,       count-stats, gear-level-mod, cascade-pos, already-wearing, wear-message-to-room, wear-message-to-char
+	{ "    <worn on head> ", "head", ITEM_WEAR_HEAD, TRUE, 1.0, NO_WEAR, "You're already wearing $p on your head.", "$n wears $p on $s head.", "You wear $p on your head." },
+	{ "    <worn on ears> ", "ears", ITEM_WEAR_EARS, TRUE, 1.0, NO_WEAR, "You're already wearing $p on your ears.", "$n pins $p onto $s ears.", "You pin $p onto your ears." },
+	{ "<worn around neck> ", "neck", ITEM_WEAR_NECK, TRUE, 1.0, WEAR_NECK_2, "YOU SHOULD NEVER SEE THIS MESSAGE. PLEASE REPORT.", "$n wears $p around $s neck.", "You wear $p around your neck." },
+	{ "<worn around neck> ", "neck", ITEM_WEAR_NECK, TRUE, 1.0, NO_WEAR, "You're already wearing enough around your neck.", "$n wears $p around $s neck.", "You wear $p around your neck." },
+	{ " <worn as clothes> ", "clothes", ITEM_WEAR_CLOTHES, TRUE, 0, NO_WEAR, "You're already wearing $p as clothes.", "$n wears $p as clothing.", "You wear $p as clothing." },
+	{ "   <worn as armor> ", "armor", ITEM_WEAR_ARMOR, TRUE, 2.0, NO_WEAR, "You're already wearing $p as armor.", "$n wears $p as armor.", "You wear $p as armor." },
+	{ " <worn about body> ", "body", ITEM_WEAR_ABOUT, TRUE, 1.0, NO_WEAR, "You're already wearing $p about your body.", "$n wears $p about $s body.", "You wear $p around your body." },
+	{ "    <worn on arms> ", "arms", ITEM_WEAR_ARMS, TRUE, 1.0, NO_WEAR, "You're already wearing $p on your arms.", "$n wears $p on $s arms.", "You wear $p on your arms." },
+	{ "  <worn on wrists> ", "wrists", ITEM_WEAR_WRISTS, TRUE, 1.0, NO_WEAR, "You're already wearing $p on your wrists.", "$n wears $p on $s wrists.", "You wear $p on your wrists." },
+	{ "   <worn on hands> ", "hands", ITEM_WEAR_HANDS, TRUE, 1.0, NO_WEAR, "You're already wearing $p on your hands.", "$n puts $p on $s hands.", "You put $p on your hands." },
+	{ "  <worn on finger> ", "finger", ITEM_WEAR_FINGER, TRUE, 1.0, WEAR_FINGER_L, "YOU SHOULD NEVER SEE THIS MESSAGE. PLEASE REPORT.", "$n slides $p on to $s right ring finger.", "You slide $p on to your right ring finger." },
+	{ "  <worn on finger> ", "finger", ITEM_WEAR_FINGER, TRUE, 1.0, NO_WEAR, "You're already wearing something on both of your ring fingers.", "$n slides $p on to $s left ring finger.", "You slide $p on to your left ring finger." },
+	{ "<worn about waist> ", "waist", ITEM_WEAR_WAIST, TRUE, 1.0, NO_WEAR, "You already have $p around your waist.", "$n wears $p around $s waist.", "You wear $p around your waist." },
+	{ "    <worn on legs> ", "legs", ITEM_WEAR_LEGS, TRUE, 1.0, NO_WEAR, "You're already wearing $p on your legs.", "$n puts $p on $s legs.", "You put $p on your legs." },
+	{ "    <worn on feet> ", "feet", ITEM_WEAR_FEET, TRUE, 1.0, NO_WEAR, "You're already wearing $p on your feet.", "$n wears $p on $s feet.", "You wear $p on your feet." },
+	{ " <carried as pack> ", "pack", ITEM_WEAR_PACK, TRUE, 0.5, NO_WEAR, "You're already using $p.", "$n starts using $p.", "You start using $p." },
+	{ "  <used as saddle> ", "saddle", ITEM_WEAR_SADDLE, TRUE, 0, NO_WEAR, "You're already using $p.", "$n start using $p.", "You start using $p." },
+	{ "          (sheath) ", "sheath", ITEM_WEAR_WIELD, FALSE, 0, WEAR_SHEATH_2, "You've already got something sheathed.", "$n sheathes $p.", "You sheathe $p." },
+	{ "          (sheath) ", "sheath", ITEM_WEAR_WIELD, FALSE, 0, NO_WEAR, "You've already got something sheathed.", "$n sheathes $p.", "You sheathe $p." },
+	{ "         <wielded> ", "wield", ITEM_WEAR_WIELD, 	TRUE, 2.0, NO_WEAR, "You're already wielding $p.", "$n wields $p.", "You wield $p." },
+	{ "          <ranged> ", "ranged", ITEM_WEAR_RANGED, TRUE, 0, NO_WEAR, "You're already using $p.", "$n uses $p.", "You use $p." },
+	{ "            <held> ", "hold", ITEM_WEAR_HOLD, TRUE, 1.0, NO_WEAR, "You're already holding $p.", "$n grabs $p.", "You grab $p." },
+	{ "          (shared) ", "shared", ITEM_WEAR_TAKE, FALSE, 0, NO_WEAR, "You're already sharing $p.", "$n shares $p.", "You share $p." }
 };
 
 
@@ -1830,6 +1810,8 @@ const char *olc_flag_bits[] = {
 	"!ADVENTURE",
 	"!ROOMTEMPLATE",
 	"!GLOBAL",
+	"!AUGMENT",
+	"!ARCHETYPE",
 	"\n"
 };
 
@@ -1848,6 +1830,8 @@ const char *olc_type_bits[NUM_OLC_TYPES+1] = {
 	"roomtemplate",
 	"global",
 	"book",
+	"augment",
+	"archetype",
 	"\n"
 };
 
@@ -2780,6 +2764,7 @@ const char *fill_words[] = {
 const char *global_types[] = {
 	"Mob Interactions",
 	"Mine Data",
+	"Newbie Gear",
 	"\n"
 };
 

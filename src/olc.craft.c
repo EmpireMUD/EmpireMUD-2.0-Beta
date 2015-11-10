@@ -63,7 +63,7 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "IN-DEVELOPMENT");
 		problem = TRUE;
 	}
-	if (!IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_APIARIES | CRAFT_GLASS) && GET_CRAFT_RESOURCES(craft)[0].vnum == NOTHING) {
+	if (!IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_APIARIES | CRAFT_GLASS) && !GET_CRAFT_RESOURCES(craft)) {
 		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft requires no resources");
 		problem = TRUE;
 	}
@@ -251,25 +251,22 @@ void olc_search_craft(char_data *ch, craft_vnum vnum) {
 /**
 * Removes any entries of an obj vnum from a resource list.
 *
-* @param struct resource_data_struct **list A pointer to a resource list.
+* @param struct resource_data **list A pointer to a resource list.
 * @param obj_vnum vnum The vnum to remove.
 * @return bool TRUE if any were removed.
 */
-bool remove_obj_from_resource_list(struct resource_data_struct **list, obj_vnum vnum) {
-	int iter, removed = 0;
-
-	for (iter = 0; (*list)[iter].vnum != NOTHING; ++iter) {
-		if ((*list)[iter].vnum == vnum) {
+bool remove_obj_from_resource_list(struct resource_data **list, obj_vnum vnum) {
+	struct resource_data *res, *next_res, *temp;
+	int removed = 0;
+	
+	for (res = *list; res; res = next_res) {
+		next_res = res->next;
+		
+		if (res->vnum == vnum) {
+			REMOVE_FROM_LIST(res, *list, next);
+			free(res);
 			++removed;
 		}
-		else {
-			(*list)[iter-removed] = (*list)[iter];
-		}
-	}
-	
-	// copy the final -1 to the correct position
-	if (removed > 0) {
-		(*list)[iter-removed] = (*list)[iter];
 	}
 	
 	return removed > 0;
@@ -297,9 +294,7 @@ void save_olc_craft(descriptor_data *desc) {
 	if (GET_CRAFT_NAME(proto)) {
 		free(GET_CRAFT_NAME(proto));
 	}
-	if (GET_CRAFT_RESOURCES(proto)) {
-		free(GET_CRAFT_RESOURCES(proto));
-	}
+	free_resource_list(GET_CRAFT_RESOURCES(proto));
 	
 	// sanity
 	if (!GET_CRAFT_NAME(craft) || !*GET_CRAFT_NAME(craft)) {
@@ -332,28 +327,20 @@ void save_olc_craft(descriptor_data *desc) {
 * @return craft_data * The copied recipe.
 */
 craft_data *setup_olc_craft(craft_data *input) {
+	extern struct resource_data *copy_resource_list(struct resource_data *input);
+
 	craft_data *new;
-	int iter;
 	
 	CREATE(new, craft_data, 1);
 	init_craft(new);
 	
 	if (input) {
-		// oops
-		if (GET_CRAFT_RESOURCES(new)) {
-			free(GET_CRAFT_RESOURCES(new));
-		}
 		// copy normal data
 		*new = *input;
 
 		// copy things that are pointers
 		GET_CRAFT_NAME(new) = GET_CRAFT_NAME(input) ? str_dup(GET_CRAFT_NAME(input)) : NULL;
-		
-		// copy resources
-		CREATE(GET_CRAFT_RESOURCES(new), Resource, MAX_RESOURCES_REQUIRED);
-		for (iter = 0; iter < MAX_RESOURCES_REQUIRED; ++iter) {
-			GET_CRAFT_RESOURCES(new)[iter] = GET_CRAFT_RESOURCES(input)[iter];
-		}
+		GET_CRAFT_RESOURCES(new) = copy_resource_list(GET_CRAFT_RESOURCES(input));
 	}
 	else {
 		// brand new: some defaults
@@ -381,10 +368,12 @@ craft_data *setup_olc_craft(craft_data *input) {
 * @param char_data *ch The person who is editing a craft and will see its display.
 */
 void olc_show_craft(char_data *ch) {
+	void get_resource_display(struct resource_data *list, char *save_buffer);
+
 	craft_data *craft = GET_OLC_CRAFT(ch->desc);
+	obj_data *proto = obj_proto(GET_CRAFT_OBJECT(craft));
 	char lbuf[MAX_STRING_LENGTH];
-	int iter, count, seconds;
-	obj_data *proto = obj_proto(GET_CRAFT_OBJECT(craft)), *reso;
+	int seconds;
 	
 	if (!craft) {
 		return;
@@ -445,20 +434,9 @@ void olc_show_craft(char_data *ch) {
 	sprintf(buf + strlen(buf), "<&yrequiresobject&0> %d - %s\r\n", GET_CRAFT_REQUIRES_OBJ(craft), GET_CRAFT_REQUIRES_OBJ(craft) == NOTHING ? "none" : get_obj_name_by_proto(GET_CRAFT_REQUIRES_OBJ(craft)));
 
 	// resources
-	count = 0;
 	sprintf(buf + strlen(buf), "Resources required: <&yresource&0>\r\n");
-	for (iter = 0; iter < MAX_RESOURCES_REQUIRED && GET_CRAFT_RESOURCES(craft)[iter].vnum != NOTHING; ++iter) {
-		reso = obj_proto(GET_CRAFT_RESOURCES(craft)[iter].vnum);
-		sprintf(buf1, "%dx %s", GET_CRAFT_RESOURCES(craft)[iter].amount, !reso ? "UNKNOWN" : skip_filler(GET_OBJ_SHORT_DESC(reso)));
-		sprintf(buf + strlen(buf), " &y%2d&0. [%5d] %-26.26s%s", count + 1, GET_CRAFT_RESOURCES(craft)[iter].vnum, buf1, ((count % 2) ? "\r\n" : ""));
-		++count;
-	}
-	if (count == 0) {
-		strcat(buf, " none\r\n");
-	}
-	else if ((count % 2) != 0) {
-		strcat(buf, "\r\n");
-	}
+	get_resource_display(GET_CRAFT_RESOURCES(craft), lbuf);
+	strcat(buf, lbuf);
 		
 	page_string(ch->desc, buf, TRUE);
 }
@@ -664,201 +642,9 @@ OLC_MODULE(cedit_requiresobject) {
 
 
 OLC_MODULE(cedit_resource) {
+	void olc_process_resources(char_data *ch, char *argument, struct resource_data **list);
 	craft_data *craft = GET_OLC_CRAFT(ch->desc);
-	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], arg4[MAX_INPUT_LENGTH];
-	int num, iter, pos;
-	obj_vnum vnum;
-	bool found;
-	
-	// arg1 arg2 arg3
-	half_chop(argument, arg1, buf);
-	half_chop(buf, arg2, buf1);
-	half_chop(buf1, arg3, arg4);
-	
-	if (is_abbrev(arg1, "remove")) {
-		if (!*arg2) {
-			msg_to_char(ch, "Remove which resource (number)?\r\n");
-		}
-		else if (!str_cmp(arg2, "all")) {
-			for (iter = 0; iter < MAX_RESOURCES_REQUIRED; ++iter) {
-				GET_CRAFT_RESOURCES(craft)[iter].vnum = NOTHING;
-				GET_CRAFT_RESOURCES(craft)[iter].amount = 0;
-			}
-			msg_to_char(ch, "All resources removed.\r\n");
-		}
-		else if (!isdigit(*arg2) || (num = atoi(arg2)) < 1) {
-			msg_to_char(ch, "Invalid resource number.\r\n");
-		}
-		else {
-			found = FALSE;
-			for (iter = 0; GET_CRAFT_RESOURCES(craft)[iter].vnum != NOTHING; ++iter) {
-				if (found) {
-					// copy down one
-					GET_CRAFT_RESOURCES(craft)[iter].vnum = GET_CRAFT_RESOURCES(craft)[iter+1].vnum;
-					GET_CRAFT_RESOURCES(craft)[iter].amount = GET_CRAFT_RESOURCES(craft)[iter+1].amount;
-				}
-				else if (--num == 0) {
-					found = TRUE;
-					
-					msg_to_char(ch, "You remove the %dx %s.\r\n", GET_CRAFT_RESOURCES(craft)[iter].amount, skip_filler(get_obj_name_by_proto(GET_CRAFT_RESOURCES(craft)[iter].vnum)));
-					
-					// copy down the next one
-					GET_CRAFT_RESOURCES(craft)[iter].vnum = GET_CRAFT_RESOURCES(craft)[iter+1].vnum;
-					GET_CRAFT_RESOURCES(craft)[iter].amount = GET_CRAFT_RESOURCES(craft)[iter+1].amount;
-				}
-			}
-			
-			if (!found) {
-				msg_to_char(ch, "Invalid resource number.\r\n");
-			}
-		}
-	}
-	else if (is_abbrev(arg1, "add")) {
-		num = atoi(arg2);
-		vnum = atoi(arg3);
-		
-		if (!*arg2 || !*arg3 || !isdigit(*arg2)) {
-			msg_to_char(ch, "Usage: resource add <quantity> <vnum>\r\n");
-		}
-		else if (!obj_proto(vnum)) {
-			msg_to_char(ch, "There is no such object vnum %d.\r\n", vnum);
-		}
-		else if (num < 1 || num > 1000) {
-			msg_to_char(ch, "You must specify a quantity between 1 and 1000.\r\n");
-		}
-		else {
-			found = FALSE;
-			for (iter = 0; iter < MAX_RESOURCES_REQUIRED - 1 && !found; ++iter) {
-				if (GET_CRAFT_RESOURCES(craft)[iter].vnum == NOTHING) {
-					found = TRUE;
-					
-					GET_CRAFT_RESOURCES(craft)[iter].vnum = vnum;
-					GET_CRAFT_RESOURCES(craft)[iter].amount = num;
-					
-					// ensure the next one has a NOTHING list terminator
-					GET_CRAFT_RESOURCES(craft)[iter+1].vnum = NOTHING;
-				}
-			}
-			
-			if (found) {
-				msg_to_char(ch, "You add the %dx %s resource requirement.\r\n", num, skip_filler(get_obj_name_by_proto(vnum)));
-			}
-			else {
-				msg_to_char(ch, "There is no room for more resources.\r\n");
-			}
-		}
-	}
-	else if (is_abbrev(arg1, "move")) {
-		bool up;
-		
-		num = atoi(arg2);
-		up = is_abbrev(arg3, "up");
-		
-		if (!*arg2 || !*arg3) {
-			msg_to_char(ch, "Usage: resource move <number> <up | down>\r\n");
-		}
-		else if (!isdigit(*arg2) || num < 1) {
-			msg_to_char(ch, "Invalid resource number.\r\n");
-		}
-		else if (!is_abbrev(arg3, "up") && !is_abbrev(arg3, "down")) {
-			msg_to_char(ch, "You must specify whether you're moving it up or down in the list.\r\n");
-		}
-		else if (up && num == 1) {
-			msg_to_char(ch, "You can't move it up; it's already at the top of the list.\r\n");
-		}
-		else {
-			obj_vnum temp_vnum = NOTHING;
-			int temp_amt = 0;
-			
-			// find the one to move
-			found = FALSE;
-			for (iter = 0; iter < MAX_RESOURCES_REQUIRED && !found; ++iter) {
-				if (iter == (num - 1)) {
-					found = TRUE;
-					
-					if (!up && GET_CRAFT_RESOURCES(craft)[iter+1].vnum == NOTHING) {
-						msg_to_char(ch, "You can't move it down; it's already at the end.\r\n");
-						return;
-					}
-					
-					temp_vnum = GET_CRAFT_RESOURCES(craft)[iter].vnum;
-					temp_amt = GET_CRAFT_RESOURCES(craft)[iter].amount;
-					
-					if (up) {
-						GET_CRAFT_RESOURCES(craft)[iter].vnum = GET_CRAFT_RESOURCES(craft)[iter-1].vnum;
-						GET_CRAFT_RESOURCES(craft)[iter].amount = GET_CRAFT_RESOURCES(craft)[iter-1].amount;
-						
-						GET_CRAFT_RESOURCES(craft)[iter-1].vnum = temp_vnum;
-						GET_CRAFT_RESOURCES(craft)[iter-1].amount = temp_amt;
-					}
-					else {
-						GET_CRAFT_RESOURCES(craft)[iter].vnum = GET_CRAFT_RESOURCES(craft)[iter+1].vnum;
-						GET_CRAFT_RESOURCES(craft)[iter].amount = GET_CRAFT_RESOURCES(craft)[iter+1].amount;
-						
-						GET_CRAFT_RESOURCES(craft)[iter+1].vnum = temp_vnum;
-						GET_CRAFT_RESOURCES(craft)[iter+1].amount = temp_amt;
-					}
-					
-					msg_to_char(ch, "You move %dx %s %s.\r\n", temp_amt, skip_filler(get_obj_name_by_proto(temp_vnum)), (up ? "up" : "down"));
-				}
-			}
-			
-			if (!found) {
-				msg_to_char(ch, "Invalid resource number to move.\r\n");
-			}
-		}
-	}
-	else if (is_abbrev(arg1, "change")) {
-		if (!*arg2 || !*arg3 || !*arg4 || !isdigit(*arg2) || !isdigit(*arg4)) {
-			msg_to_char(ch, "Usage: resource change <number> <quantity | vnum> <value>\r\n");
-			return;
-		}
-		
-		vnum = atoi(arg4);	// may be used as quantity instead
-		
-		// verify valid pos
-		num = atoi(arg2);
-		pos = -1;
-		for (iter = 0; iter < MAX_RESOURCES_REQUIRED && GET_CRAFT_RESOURCES(craft)[iter].vnum != NOTHING; ++iter) {
-			// num-1 because it shows as 1-based
-			if (iter == (num - 1)) {
-				pos = iter;
-				break;
-			}
-		}
-		
-		if (pos == -1) {
-			msg_to_char(ch, "Invalid resource number.\r\n");
-		}
-		else if (is_abbrev(arg3, "quantity")) {
-			if (vnum < 1 || vnum > 1000) {
-				msg_to_char(ch, "You must specify a quantity between 1 and 1000.\r\n");
-			}
-			else {
-				GET_CRAFT_RESOURCES(craft)[pos].amount = vnum;
-				// TODO
-				msg_to_char(ch, "You change resource %d (%s)'s quantity to %d.\r\n", num, get_obj_name_by_proto(GET_CRAFT_RESOURCES(craft)[pos].vnum), vnum);
-			}
-		}
-		else if (is_abbrev(arg3, "vnum")) {
-			if (!obj_proto(vnum)) {
-				msg_to_char(ch, "There is no such object vnum %d.\r\n", vnum);
-			}
-			else {
-				GET_CRAFT_RESOURCES(craft)[pos].vnum = vnum;
-				msg_to_char(ch, "You change resource %d's vnum to [%d] %s.\r\n", num, vnum, get_obj_name_by_proto(vnum));
-			}
-		}
-		else {
-			msg_to_char(ch, "Usage: resource change <number> <quantity|vnum> <value>\r\n");
-		}
-	}
-	else {
-		msg_to_char(ch, "Usage: resource add <quantity> <vnum>\r\n");
-		msg_to_char(ch, "Usage: resource change <number> <quantity | vnum> <value>\r\n");
-		msg_to_char(ch, "Usage: resource remove <number | all>\r\n");
-		msg_to_char(ch, "Usage: resource move <number> <up | down>\r\n");
-	}
+	olc_process_resources(ch, argument, &GET_CRAFT_RESOURCES(craft));
 }
 
 

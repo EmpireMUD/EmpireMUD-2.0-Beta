@@ -259,10 +259,12 @@ level or your composite level (whichever is higher). It's also limited by the
 level of the item you hone (more powerful items get bigger bonuses). Players
 with Trade skill below 100 will also be limited by their Trade skill.
 
-You can hone the following items:
- Weapon: Gains bonus physical or magical damage.
- Off-Hand: Gains bonus healing.
- Shield: Gains resist physical and resist magical.
+You can hone the following item slots:
+ Weapon: harden weapon (Bonus-Physical), brighten weapon (Bonus-Magical)
+ Off-Hand: polish relic (Bonus-Healing)
+ Shield: reinforce shield (Resist-Physical/Magical)
+
+See also: RECIPES
 #
 IRON "IRON ORE"
 
@@ -514,7 +516,8 @@ RECIPE RECIPES
 Usage:  recipes <item>
 
 This command allows you to see which recipes (forge, craft, cook, etc) you
-know that require a given item.
+know that require a given item. It also shows which augments (enchant, hone)
+you know that us the item.
 #
 REFORGE REFASHION
 

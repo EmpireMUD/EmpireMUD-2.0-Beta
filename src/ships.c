@@ -484,11 +484,15 @@ int perform_unload_boat(char_data *ch, room_data *from, room_data *to, obj_data 
 
 
 void process_manufacturing(char_data *ch) {
+	static struct resource_data *iron = NULL, *logs = NULL;
 	obj_data *ship;
 	char_data *c;
-	Resource iron[] = { {o_NAILS, 2}, END_RESOURCE_LIST };
-	Resource logs[] = { {o_LUMBER, 1}, END_RESOURCE_LIST };
 	int type = NOTHING, iter, total, count;
+	
+	if (!iron || !logs) {
+		iron = create_resource_list(o_NAILS, 2, NOTHING);
+		logs = create_resource_list(o_LUMBER, 1, NOTHING);
+	}
 	
 	// this finds the ship being worked on
 	for (ship = ROOM_CONTENTS(IN_ROOM(ch)); ship; ship = ship->next_content) {

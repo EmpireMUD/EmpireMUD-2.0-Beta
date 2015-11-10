@@ -17,6 +17,8 @@
 *   #define Section
 *     Miscellaneous Defines
 *     Adventure Defines
+*     Archetype Defines
+*     Augment Defines
 *     Book Defines
 *     Building Defines
 *     Character Defines
@@ -33,6 +35,8 @@
 *   Structs Section
 *     Miscellaneous Structs
 *     Adventure Structs
+*     Archetype Structs
+*     Augment Structs
 *     Book Structs
 *     Building Structs
 *     Mobile Structs
@@ -94,7 +98,9 @@
 // See http://linux.die.net/man/3/crypt for more info.
 #define PASSWORD_SALT  "salt"
 
-#define BASIC_OCEAN  6	// sector vnum used as the base for blank rooms
+// features for determining whether or not a map tile needs to be in RAM as a room_data*
+#define BASIC_OCEAN  6	// sector vnum used as the base for fully ignorable and blank rooms
+#define TILE_KEEP_FLAGS  (SECTF_START_LOCATION)	// flags for rooms that MUST stay in RAM
 
 // this determines if a room is "empty"/"blank" and doesn't need to stay in RAM
 #define CAN_UNLOAD_MAP_ROOM(room)  ( \
@@ -102,6 +108,7 @@
 	GET_ROOM_VNUM(room) < MAP_SIZE && \
 	GET_EXITS_HERE(room) == 0 && \
 	SECT(room) == world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)].sector_type && \
+	!ROOM_SECT_FLAGGED(room, TILE_KEEP_FLAGS) && \
 	!ROOM_OWNER(room) && !ROOM_CONTENTS(room) && !ROOM_PEOPLE(room) && \
 	!ROOM_DEPLETION(room) && !ROOM_CUSTOM_NAME(room) && \
 	!ROOM_CUSTOM_ICON(room) && !ROOM_CUSTOM_DESCRIPTION(room) && \
@@ -189,6 +196,8 @@ typedef any_vnum trig_vnum;	// for dg scripts
 // For simplicity...
 typedef struct account_data account_data;
 typedef struct adventure_data adv_data;
+typedef struct archetype_data archetype_data;
+typedef struct augment_data augment_data;
 typedef struct bld_data bld_data;
 typedef struct book_data book_data;
 typedef struct char_data char_data;
@@ -251,6 +260,7 @@ typedef struct trig_data trig_data;
 // GLOBAL_x types for global_data
 #define GLOBAL_MOB_INTERACTIONS  0
 #define GLOBAL_MINE_DATA  1
+#define GLOBAL_NEWBIE_GEAR  2
 
 
 // GLB_FLAG_x flags for global_data
@@ -364,6 +374,30 @@ typedef struct trig_data trig_data;
 #define RMT_NO_LOCATION  BIT(8)	// i. don't show a location, disables where
 #define RMT_PIGEON_POST  BIT(9)	// j. can use mail here
 #define RMT_COOKING_FIRE  BIT(10)	// k. can cook here
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// ARCHETYPE DEFINES ///////////////////////////////////////////////////////
+
+// ARCH_x: archetype flags
+#define ARCH_IN_DEVELOPMENT  BIT(0)	// a. not available to players
+#define ARCH_BASIC  BIT(1)	// b. will show on the basic list
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// AUGMENT DEFINES /////////////////////////////////////////////////////////
+
+// AUGMENT_x: Augment types
+#define AUGMENT_NONE  0
+#define AUGMENT_ENCHANTMENT  1
+#define AUGMENT_HONE  2
+
+
+// AUG_x: Augment flags
+#define AUG_IN_DEVELOPMENT  BIT(0)	// a. can't be used by players
+#define AUG_SELF_ONLY  BIT(1)	// b. can only be used on own items / force-bind
+#define AUG_ARMOR  BIT(2)	// c. targets ARMOR item type
+#define AUG_SHIELD  BIT(3)	// d. only targets shields
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -845,7 +879,7 @@ typedef struct trig_data trig_data;
  //////////////////////////////////////////////////////////////////////////////
 //// MOBILE DEFINES //////////////////////////////////////////////////////////
 
-// Mobile flags 
+// MOB_x: Mobile flags 
 #define MOB_BRING_A_FRIEND  BIT(0)	// a. Mob auto-assists any other (!charmed) mob
 #define MOB_SENTINEL  BIT(1)	// b. Mob should not move
 #define MOB_AGGRESSIVE  BIT(2)	// c. Mob hits players in the room
@@ -877,6 +911,7 @@ typedef struct trig_data trig_data;
 #define MOB_EXTRACTED  BIT(28)	// C. for late-extraction
 #define MOB_NO_LOOT  BIT(29)	// D. do not drop loot
 #define MOB_NO_TELEPORT  BIT(30)  // E. cannot teleport to this mob
+#define MOB_NO_EXPERIENCE  BIT(31)	// F. players get no exp against this mob
 
 
 // mob movement types
@@ -1202,7 +1237,7 @@ typedef struct trig_data trig_data;
 #define CON_QLAST_NAME  13	// Do you have a last..
 #define CON_SLAST_NAME  14  // And what is it?
 #define CON_CLAST_NAME  15	// Did I get that right?
-	#define CON_UNUSED2  16
+#define CON_ARCHETYPE_CNFRM  16	// Correct archetype?
 #define CON_Q_HAS_ALT  17	// Do you have an alt?
 #define CON_Q_ALT_NAME  18	// Type alt's name
 #define CON_Q_ALT_PASSWORD  19	// Type alt's password
@@ -1286,7 +1321,7 @@ typedef struct trig_data trig_data;
 #define LORE_START_VAMPIRE		7
 #define LORE_SIRE_VAMPIRE		8
 #define LORE_PURIFY				9
-	#define LORE_UNUSED1  10	// unused
+#define LORE_CREATED			10
 #define LORE_MAKE_VAMPIRE		11
 #define LORE_PROMOTED			12
 
@@ -1750,6 +1785,7 @@ struct global_data {
 	
 	// data
 	struct interaction_item *interactions;
+	struct archetype_gear *gear;
 	
 	UT_hash_handle hh;
 };
@@ -1850,13 +1886,6 @@ struct promo_code_list {
 	bool expired;
 	PROMO_APPLY(*apply_func);
 };
-
-
-/* resource data */
-typedef struct resource_data_struct {
-	int vnum;
-	int amount;
-} Resource;
 
 
 // for act.highsorcery.c ritual strings
@@ -2042,6 +2071,92 @@ struct room_template {
 	struct trig_proto_list *proto_script;	// list of default triggers
 	
 	UT_hash_handle hh;	// room_template_table hash
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// ARCHETYPE STRUCTS ///////////////////////////////////////////////////////
+
+struct archetype_data {
+	// basic data
+	any_vnum vnum;
+	char *name;
+	char *description;
+	char *lore;	// optional lore entry
+	bitvector_t flags;	// ARCH_x
+	
+	// default starting ranks
+	char *male_rank;
+	char *female_rank;
+	
+	struct archetype_skill *skills;	// linked list
+	struct archetype_gear *gear;	// linked list
+	int attributes[NUM_ATTRIBUTES];	// starting attributes (default 1)
+	
+	UT_hash_handle hh;	// archetype_table hash handle
+	UT_hash_handle sorted_hh;	// sorted_archetypes hash handle
+};
+
+
+struct archetype_skill {
+	int skill;	// SKILL_x
+	int level;	// starting level
+	
+	struct archetype_skill *next;
+};
+
+
+struct archetype_gear {
+	int wear;	// WEAR_x, -1 == inventory
+	obj_vnum vnum;
+	struct archetype_gear *next;
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// AUGMENT STRUCTS /////////////////////////////////////////////////////////
+
+struct augment_data {
+	any_vnum vnum;
+	char *name;	// descriptive text
+	int type;	// AUGMENT_x
+	bitvector_t flags;	// AUG_x flags
+	bitvector_t wear_flags;	// ITEM_WEAR_x where this augment applies
+	
+	int ability;	// required ability or NO_ABIL
+	obj_vnum requires_obj;	// required item or NOTHING
+	struct augment_apply *applies;	// how it modifies items
+	struct resource_data *resources;	// resources required
+	
+	UT_hash_handle hh;	// augment_table hash
+	UT_hash_handle sorted_hh;	// sorted_augments hash
+};
+
+
+// apply types for augment_data
+struct augment_apply {
+	int location;	// APPLY_x
+	int weight;	// what percent of points go to this
+	struct augment_apply *next;	// linked list
+};
+
+
+// used by do_gen_augment
+struct augment_type_data {
+	char *noun;
+	char *verb;
+	int apply_type;	// APPLY_TYPE_x
+	bitvector_t default_flags;	// AUG_x always applied
+	int greater_abil;	// ABIL_x that boosts the scale points, or NO_ABIL
+	bitvector_t use_obj_flag;	// OBJ_x: optional; used by enchants
+};
+
+
+// new resource-required data (for augments)
+struct resource_data {
+	obj_vnum vnum;	// which item
+	int amount;	// how mant
+	struct resource_data *next;	// linked list
 };
 
 
@@ -2310,6 +2425,8 @@ struct descriptor_data {
 	any_vnum olc_vnum;	// vnum being edited
 	
 	adv_data *olc_adventure;	// adv being edited
+	archetype_data *olc_archetype;	// arch being edited
+	augment_data *olc_augment;	// aug being edited
 	book_data *olc_book;	// book being edited
 	obj_data *olc_object;	// item being edited
 	char_data *olc_mobile;	// mobile being edited
@@ -2453,7 +2570,7 @@ struct player_special_data {
 	bitvector_t olc_flags;	// olc permissions
 	
 	// skill/ability data
-	byte creation_archetype;	// this is now stored permanently so later decisions can be made based on it
+	any_vnum creation_archetype;	// this is now stored permanently so later decisions can be made based on it
 	struct player_skill_data skills[MAX_SKILLS];
 	struct player_ability_data abilities[MAX_ABILITIES];
 	bool can_gain_new_skills;	// not required to keep skills at zero
@@ -2679,7 +2796,7 @@ struct craft_data {
 	bitvector_t build_facing;	// BLD_ON_x flags for the tile it's facing
 	
 	obj_vnum requires_obj;	// only shows up if you have the item, e.g. o_TENT
-	Resource *resources;
+	struct resource_data *resources;	// linked list
 	
 	UT_hash_handle hh;	// craft_table hash
 	UT_hash_handle sorted_hh;	// sorted_crafts hash
@@ -2732,28 +2849,6 @@ struct action_data_struct {
 	bitvector_t flags;	// ACTF_x flags
 	void (*process_function)(char_data *ch);	// called on ticks (may be NULL)
 	void (*cancel_function)(char_data *ch);	// called when the action is cancelled early (may be NULL)
-};
-
-
-// For new players -- starting selections
-struct archetype_type {
-	char *name;
-	char *description;
-	
-	char *starting_rank[NUM_GENDERS];	// rank names for default empires
-	
-	int primary_skill;	// SKILL_x or NO_SKILL
-	int primary_skill_level;	// 0-100
-	
-	int secondary_skill;	// SKILL_x or NO_SKILL
-	int secondary_skill_level;	// 0-100
-
-	int attributes[NUM_ATTRIBUTES];	// starting attributes
-	
-	struct {
-		int wear;	// WEAR_x location for newbie gear
-		obj_vnum vnum;	// vnum of object
-	} gear[10];	// newbie gear -- MUST terminate with a vnum=NOTHING
 };
 
 
@@ -2895,6 +2990,7 @@ struct toggle_data_type {
 // WEAR_x data for each equipment slot
 struct wear_data_type {
 	char *eq_prompt;	// shown on 'eq' list
+	char *name;	// display name
 	bitvector_t item_wear;	// matching ITEM_WEAR_x
 	bool count_stats;	// FALSE means it's a slot like in-sheath, and adds nothing to the character
 	double gear_level_mod;	// modifier (slot significance) when counting gear level

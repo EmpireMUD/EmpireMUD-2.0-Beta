@@ -90,6 +90,12 @@ void adventure_summon(char_data *ch, char *argument) {
 	else if (IS_ADVENTURE_ROOM(IN_ROOM(vict))) {
 		msg_to_char(ch, "You cannot summon someone who is already in an adventure.\r\n");
 	}
+	else if (!vict->desc) {
+		msg_to_char(ch, "You can't summon someone who is linkdead.\r\n");
+	}
+	else if (GET_ACCOUNT(ch) == GET_ACCOUNT(vict)) {
+		msg_to_char(ch, "You can't summon your own alts.\r\n");
+	}
 	else if (IS_DEAD(vict)) {
 		msg_to_char(ch, "You cannot summon the dead like that.\r\n");
 	}
@@ -2147,6 +2153,7 @@ ACMD(do_summon) {
 				MOB_INSTANCE_ID(mob) = MOB_INSTANCE_ID(ch);
 			}
 			
+			SET_BIT(MOB_FLAGS(mob), MOB_NO_EXPERIENCE);	// never gain exp
 			if (emp) {
 				// guarantee empire flag
 				SET_BIT(MOB_FLAGS(mob), MOB_EMPIRE);
@@ -2198,7 +2205,7 @@ ACMD(do_title) {
 	}
 	else if (strstr(argument, "(") || strstr(argument, ")") || strstr(argument, "%"))
 		send_to_char("Titles can't contain the (, ), or % characters.\r\n", ch);
-	else if (strlen(argument) > MAX_TITLE_LENGTH-1 || (strlen(argument) - (2 * count_color_codes(argument))) > MAX_TITLE_LENGTH_NO_COLOR) {
+	else if (strlen(argument) > MAX_TITLE_LENGTH-1 || color_strlen(argument) > MAX_TITLE_LENGTH_NO_COLOR) {
 		// the -1 reserves an extra spot for an extra space
 		msg_to_char(ch, "Sorry, titles can't be longer than %d characters.\r\n", MAX_TITLE_LENGTH_NO_COLOR);
 	}

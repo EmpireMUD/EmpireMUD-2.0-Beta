@@ -352,7 +352,9 @@ ACMD(do_cleanse) {
 			gain_condition(vict, DRUNK, -1 * GET_COND(vict, DRUNK));
 		}
 		
-		gain_ability_exp(ch, ABIL_CLEANSE, 33.4);
+		if (can_gain_exp_from(ch, vict)) {
+			gain_ability_exp(ch, ABIL_CLEANSE, 33.4);
+		}
 
 		if (FIGHTING(vict) && !FIGHTING(ch)) {
 			engage_combat(ch, FIGHTING(vict), FALSE);
@@ -729,8 +731,10 @@ ACMD(do_entangle) {
 		// release other entangleds here
 		limit_crowd_control(vict, ATYPE_ENTANGLE);
 	}
-
-	gain_ability_exp(ch, ABIL_ENTANGLE, 15);
+	
+	if (can_gain_exp_from(ch, vict)) {
+		gain_ability_exp(ch, ABIL_ENTANGLE, 15);
+	}
 }
 
 
@@ -839,6 +843,7 @@ ACMD(do_familiar) {
 	
 	charge_ability_cost(ch, MANA, familiars[type].cost, NOTHING, 0, WAIT_SPELL);
 	mob = read_mobile(familiars[type].vnum, TRUE);
+	SET_BIT(MOB_FLAGS(mob), MOB_NO_EXPERIENCE);
 	if (IS_NPC(ch)) {
 		MOB_INSTANCE_ID(mob) = MOB_INSTANCE_ID(ch);
 	}
@@ -935,7 +940,9 @@ ACMD(do_hasten) {
 		af = create_flag_aff(ATYPE_HASTEN, CHOOSE_BY_ABILITY_LEVEL(durations, ch, ABIL_HASTEN), AFF_HASTE, ch);
 		affect_join(vict, af, 0);
 		
-		gain_ability_exp(ch, ABIL_HASTEN, 15);
+		if (can_gain_exp_from(ch, vict)) {
+			gain_ability_exp(ch, ABIL_HASTEN, 15);
+		}
 
 		if (FIGHTING(vict) && !FIGHTING(ch)) {
 			engage_combat(ch, FIGHTING(vict), FALSE);
@@ -951,7 +958,7 @@ ACMD(do_hasten) {
 */
 ACMD(do_heal) {
 	char_data *vict = ch, *ch_iter, *next_ch;
-	bool party = FALSE;
+	bool party = FALSE, will_gain = FALSE;
 	int cost, abil = NO_ABIL, gain = 15, amount, bonus;
 	
 	int heal_levels[] = { 15, 25, 35 };
@@ -1064,6 +1071,8 @@ ACMD(do_heal) {
 				}
 				
 				report_healing(ch_iter, amount * 0.75, ch);
+				
+				will_gain |= can_gain_exp_from(ch, ch_iter);
 			}
 		}
 	}
@@ -1086,9 +1095,11 @@ ACMD(do_heal) {
 		}
 		
 		report_healing(vict, amount, ch);
+		
+		will_gain = can_gain_exp_from(ch, vict);
 	}
 	
-	if (abil != NO_ABIL) {
+	if (abil != NO_ABIL && will_gain) {
 		gain_ability_exp(ch, abil, gain);
 	}
 }
@@ -1116,6 +1127,9 @@ ACMD(do_moonrise) {
 		else if (IS_NPC(vict)) {
 			msg_to_char(ch, "You can only resurrect players, not NPCs.\r\n");
 		}
+		else if (GET_ACCOUNT(ch) == GET_ACCOUNT(vict)) {
+			msg_to_char(ch, "You can't resurrect your own alts.\r\n");
+		}
 		else if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_MOONRISE)) {
 			return;
 		}
@@ -1141,6 +1155,9 @@ ACMD(do_moonrise) {
 		}
 		else if (vict == ch) {
 			msg_to_char(ch, "You can't resurrect your own corpse, that's just silly.\r\n");
+		}
+		else if (GET_ACCOUNT(ch) == GET_ACCOUNT(vict)) {
+			msg_to_char(ch, "You can't resurrect your own alts.\r\n");
 		}
 		else if (IS_DEAD(vict) || corpse != find_obj(GET_LAST_CORPSE_ID(vict)) || !IS_CORPSE(corpse)) {
 			// victim has died AGAIN
@@ -1205,7 +1222,9 @@ ACMD(do_purify) {
 			msg_to_char(vict, "You feel the power of your blood fade and your vampiric powers vanish.\r\n");
 		}
 		
-		gain_ability_exp(ch, ABIL_PURIFY, 50);
+		if (can_gain_exp_from(ch, vict)) {
+			gain_ability_exp(ch, ABIL_PURIFY, 50);
+		}
 
 		if (FIGHTING(vict) && !FIGHTING(ch)) {
 			engage_combat(ch, FIGHTING(vict), FALSE);
@@ -1300,7 +1319,9 @@ ACMD(do_rejuvenate) {
 	af = create_mod_aff(ATYPE_REJUVENATE, 6, APPLY_HEAL_OVER_TIME, amount, ch);
 	affect_join(vict, af, 0);
 	
-	gain_ability_exp(ch, ABIL_REJUVENATE, 15);
+	if (can_gain_exp_from(ch, vict)) {
+		gain_ability_exp(ch, ABIL_REJUVENATE, 15);
+	}
 
 	if (FIGHTING(vict) && !FIGHTING(ch)) {
 		engage_combat(ch, FIGHTING(vict), FALSE);
@@ -1331,6 +1352,9 @@ ACMD(do_resurrect) {
 		else if (IS_NPC(vict)) {
 			msg_to_char(ch, "You can only resurrect players, not NPCs.\r\n");
 		}
+		else if (GET_ACCOUNT(ch) == GET_ACCOUNT(vict)) {
+			msg_to_char(ch, "You can't resurrect your own alts.\r\n");
+		}
 		else if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_RESURRECT)) {
 			return;
 		}
@@ -1356,6 +1380,9 @@ ACMD(do_resurrect) {
 		}
 		else if (vict == ch) {
 			msg_to_char(ch, "You can't resurrect your own corpse, that's just silly.\r\n");
+		}
+		else if (GET_ACCOUNT(ch) == GET_ACCOUNT(vict)) {
+			msg_to_char(ch, "You can't resurrect your own alts.\r\n");
 		}
 		else if (IS_DEAD(vict) || corpse != find_obj(GET_LAST_CORPSE_ID(vict)) || !IS_CORPSE(corpse)) {
 			// victim has died AGAIN
@@ -1430,8 +1457,10 @@ ACMD(do_skybrand) {
 		apply_dot_effect(vict, ATYPE_SKYBRAND, 6, DAM_MAGICAL, get_ability_level(ch, ABIL_SKYBRAND) / 24, 3, ch);
 		engage_combat(ch, vict, FALSE);
 	}
-
-	gain_ability_exp(ch, ABIL_SKYBRAND, 15);
+	
+	if (can_gain_exp_from(ch, vict)) {
+		gain_ability_exp(ch, ABIL_SKYBRAND, 15);
+	}
 }
 
 
@@ -1471,7 +1500,9 @@ ACMD(do_soulsight) {
 			
 			show_character_affects(vict, ch);
 		}
-
-		gain_ability_exp(ch, ABIL_SOULSIGHT, 33.4);
+		
+		if (can_gain_exp_from(ch, vict)) {
+			gain_ability_exp(ch, ABIL_SOULSIGHT, 33.4);
+		}
 	}
 }

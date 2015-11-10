@@ -816,7 +816,7 @@ void found_city(char_data *ch, char *argument) {
 		msg_to_char(ch, "Usage: city found <name>\r\n");
 		return;
 	}
-	if (count_color_codes(argument) > 0) {
+	if (color_code_length(argument) > 0) {
 		msg_to_char(ch, "City names may not contain color codes.\r\n");
 		return;
 	}
@@ -1031,7 +1031,7 @@ void rename_city(char_data *ch, char *argument) {
 		msg_to_char(ch, "Your empire has no city by that name.\r\n");
 		return;
 	}
-	if (count_color_codes(newname) > 0) {
+	if (color_code_length(newname) > 0) {
 		msg_to_char(ch, "City names may not contain color codes.\r\n");
 		return;
 	}
@@ -1922,14 +1922,18 @@ ACMD(do_abandon) {
 ACMD(do_barde) {
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	
-	Resource res[2] = { { o_IRON_INGOT, 10 }, END_RESOURCE_LIST };
+	static struct resource_data *res = NULL;
 	struct interact_exclusion_data *excl = NULL;
 	struct interaction_item *interact;
 	char_data *mob, *newmob = NULL;
 	bool found;
 	double prc;
 	int num;
-
+	
+	if (!res) {
+		res = create_resource_list(o_IRON_INGOT, 10, NOTHING);
+	}
+	
 	one_argument(argument, arg);
 
 	if (!can_use_ability(ch, ABIL_BARDE, NOTHING, 0, NOTHING)) {
@@ -4236,7 +4240,7 @@ ACMD(do_reward) {
 	else if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
 	}
-	else if (ch == vict) {
+	else if (ch == vict || GET_ACCOUNT(ch) == GET_ACCOUNT(vict)) {
 		msg_to_char(ch, "You can't reward yourself.\r\n");
 	}
 	else if (IS_NPC(vict)) {

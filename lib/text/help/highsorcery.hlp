@@ -104,7 +104,8 @@ Powerful sorcerers learn to enchant ordinary items to increase their useful-
 ness and power. You may only enchant items that are not already enchanted. The
 level and strength of the enchantment are based on both the level of the item
 and the crafting level of the enchanter. If the enchanter's gear level is
-better than his/her crafting level, that is used instead.
+better than his/her crafting level, that is used instead. If High Sorcery is
+below level 100, the enchanter's High Sorcery skill also limits the effect.
 
 An item must be in your inventory to enchant it. However, if another player
 "shares" an item, you can enchant that item by targeting that player by name
@@ -141,7 +142,7 @@ Enchant Armor:
 Enchant Tools:
   embiggening (pack) - capacity  (1 of each of the 4 gems)
 
-See also: CRAFTING LEVEL, GREATER ENCHANTMENTS, SHARE
+See also: CRAFTING LEVEL, GREATER ENCHANTMENTS, RECIPES, SHARE
 #
 ENERVATE
 

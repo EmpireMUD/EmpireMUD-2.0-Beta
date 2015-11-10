@@ -2116,6 +2116,30 @@ void determine_gear_level(char_data *ch) {
 
 
 /**
+* Finds an attribute by name, preferring exact matches to partial matches.
+*
+* @param char *name The name to look up.
+* @return int An attribute constant (STRENGTH) or -1 for no-match.
+*/
+int get_attribute_by_name(char *name) {
+	extern struct attribute_data_type attributes[NUM_ATTRIBUTES];
+	int iter, partial = -1;
+	
+	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
+		if (!str_cmp(name, attributes[iter].name)) {
+			return iter;	// exact matcg;
+		}
+		else if (is_abbrev(name, attributes[iter].name)) {
+			partial = iter;
+		}
+	}
+	
+	// didn't find exact...
+	return partial;
+}
+
+
+/**
 * Raises a person from sleeping+ to standing (or fighting) if possible.
 * 
 * @param char_data *ch The person to try to wake/stand.
@@ -2164,20 +2188,21 @@ bool wake_and_stand(char_data *ch) {
 * This function always takes from inventory first, and ground second.
 *
 * @param char_data *ch The person whose resources to take.
-* @param Resource list[] Any resource list.
+* @param struct resource_data *list Any resource list.
 * @param bool ground If TRUE, will also take resources off the ground.
 */
-void extract_resources(char_data *ch, Resource list[], bool ground) {
+void extract_resources(char_data *ch, struct resource_data *list, bool ground) {
+	struct resource_data *res;
 	obj_data *obj, *next_obj;
-	int i, remaining;
-
-	for (i = 0; list[i].vnum != NOTHING; i++) {
-		remaining = list[i].amount;
+	int remaining;
+	
+	for (res = list; res; res = res->next) {
+		remaining = res->amount;
 
 		for (obj = ch->carrying; obj && remaining > 0; obj = next_obj) {
 			next_obj = obj->next_content;
 
-			if (GET_OBJ_VNUM(obj) == list[i].vnum) {
+			if (GET_OBJ_VNUM(obj) == res->vnum) {
 				--remaining;
 				extract_obj(obj);
 			}
@@ -2186,7 +2211,7 @@ void extract_resources(char_data *ch, Resource list[], bool ground) {
 			for (obj = ROOM_CONTENTS(IN_ROOM(ch)); obj && remaining > 0; obj = next_obj) {
 				next_obj = obj->next_content;
 
-				if (GET_OBJ_VNUM(obj) == list[i].vnum) {
+				if (GET_OBJ_VNUM(obj) == res->vnum) {
 					--remaining;
 					extract_obj(obj);
 				}
@@ -2200,23 +2225,24 @@ void extract_resources(char_data *ch, Resource list[], bool ground) {
 * Give resources from a resource list to a player.
 *
 * @param char_data *ch The target player.
-* @param Resource list[] Any resource list.
+* @param struct resource_data *list Any resource list.
 * @param bool split If TRUE, gives back only half.
 */
-void give_resources(char_data *ch, Resource list[], bool split) {
+void give_resources(char_data *ch, struct resource_data *list, bool split) {
+	struct resource_data *res;
 	obj_data *obj;
-	int i, j, remaining;
-
-	for (i = 0; list[i].vnum != NOTHING; i++) {
-		remaining = list[i].amount;
+	int j, remaining;
+	
+	for (res = list; res; res = res->next) {
+		remaining = res->amount;
 
 		if (split) {
 			remaining /= 2;
 		}
 
-		for (j = 0; j < remaining; j++) {
-			if (obj_proto(list[i].vnum)) {
-				obj = read_object(list[i].vnum, TRUE);
+		if (obj_proto(res->vnum)) {
+			for (j = 0; j < remaining; ++j) {
+				obj = read_object(res->vnum, TRUE);
 				
 				// scale item to minimum level
 				scale_item_to_level(obj, 0);
@@ -2233,18 +2259,19 @@ void give_resources(char_data *ch, Resource list[], bool split) {
 * Find out if a person has resources available.
 *
 * @param char_data *ch The person whose resources to check.
-* @param Resource list[] Any resource list.
+* @param struct resource_data *list Any resource list.
 * @param bool ground If TRUE, will also count resources on the ground.
 * @param bool send_msgs If TRUE, will alert the character as to what they need. FALSE runs silently.
 */
-bool has_resources(char_data *ch, Resource list[], bool ground, bool send_msgs) {
+bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool send_msgs) {
+	struct resource_data *res;
 	obj_data *obj, *proto;
-	int i, total = 0;
 	bool ok = TRUE;
-
-	for (i = 0; list[i].vnum != NOTHING; i++, total = 0) {
-		for (obj = ch->carrying; obj; obj = obj->next_content) {
-			if (GET_OBJ_VNUM(obj) == list[i].vnum) {
+	int total;
+	
+	for (res = list, total = 0; res; res = res->next, total = 0) {
+		for (obj = ch->carrying; obj && total < res->amount; obj = obj->next_content) {
+			if (GET_OBJ_VNUM(obj) == res->vnum) {
 				// check full of water for drink containers
 				if (!IS_DRINK_CONTAINER(obj) || (GET_DRINK_CONTAINER_CONTENTS(obj) >= GET_DRINK_CONTAINER_CAPACITY(obj) && GET_DRINK_CONTAINER_TYPE(obj) == LIQ_WATER)) {
 					++total;
@@ -2252,8 +2279,8 @@ bool has_resources(char_data *ch, Resource list[], bool ground, bool send_msgs) 
 			}
 		}
 		if (ground) {
-			for (obj = ROOM_CONTENTS(IN_ROOM(ch)); obj; obj = obj->next_content) {
-				if (GET_OBJ_VNUM(obj) == list[i].vnum) {
+			for (obj = ROOM_CONTENTS(IN_ROOM(ch)); obj && total < res->amount; obj = obj->next_content) {
+				if (GET_OBJ_VNUM(obj) == res->vnum) {
 					// check full of water for drink containers
 					if (!IS_DRINK_CONTAINER(obj) || (GET_DRINK_CONTAINER_CONTENTS(obj) >= GET_DRINK_CONTAINER_CAPACITY(obj) && GET_DRINK_CONTAINER_TYPE(obj) == LIQ_WATER)) {
 						++total;
@@ -2262,9 +2289,9 @@ bool has_resources(char_data *ch, Resource list[], bool ground, bool send_msgs) 
 			}
 		}
 
-		if (total < list[i].amount) {
-			if (send_msgs && (proto = obj_proto(list[i].vnum))) {
-				msg_to_char(ch, "%s %d more of %s%s", (ok ? "You need" : ","), list[i].amount - total, skip_filler(GET_OBJ_SHORT_DESC(proto)), IS_DRINK_CONTAINER(proto) ? " (full of water)" : "");
+		if (total < res->amount) {
+			if (send_msgs && (proto = obj_proto(res->vnum))) {
+				msg_to_char(ch, "%s %d more of %s%s", (ok ? "You need" : ","), res->amount - total, skip_filler(GET_OBJ_SHORT_DESC(proto)), IS_DRINK_CONTAINER(proto) ? " (full of water)" : "");
 			}
 			ok = FALSE;
 		}
@@ -2433,53 +2460,59 @@ char *CAP(char *txt) {
 
 
 /**
-* @param char *string String to count color codes in
-* @return int the number of &0-style color codes in the string
+* Counts the number of chars in a string that are color codes and will be
+* invisible to the player.
+*
+* @param const char *str The string to count.
+* @return int The length of color codes.
 */
-int count_color_codes(char *string) {
-	int iter, count = 0, len = strlen(string);
-	for (iter = 0; iter < len - 1; ++iter) {
-		if (string[iter] == '\t' && string[iter+1] == '\t') {
-			++iter;	// advance past the \t\t (not a color code)
+int color_code_length(const char *str) {
+	const char *ptr;
+	int len = 0;
+	
+	for (ptr = str; *ptr; ++ptr) {
+		if (*ptr == '\t') {
+			if (*(ptr+1) == '\t' || *(ptr+1) == COLOUR_CHAR) {	// && = &
+				++ptr;
+				++len;	// only 1 char counts as a color code
+			}
+			else if (*(ptr+1) == '[') {
+				++len;	// 1 for the &
+				if (UPPER(*(ptr+2)) != 'U') {
+					++len;	// we skip 1 len if there is a U because 1 char will be visible
+				}
+				for (++ptr; *ptr != ']'; ++ptr) {	// count chars in *[..]
+					++len;
+				}
+			}
+			else {	// assume 2-wide color char
+				++ptr;
+				len += 2;
+			}
 		}
-		else if (string[iter] == '\t' && string[iter+1] == '&') {
-			++iter;	// advance past the \t& (not a color code)
+		else if (*ptr == COLOUR_CHAR) {
+			if (*(ptr+1) == COLOUR_CHAR) {	// && = &
+				++ptr;
+				++len;	// only 1 char counts as a color code, the other is removed
+			}
+			else if (*(ptr+1) == '[' && config_get_bool("allow_extended_color_codes")) {
+				++len;	// 1 for the &
+				if (UPPER(*(ptr+2)) != 'U') {
+					++len;	// we skip 1 len if there is a U because 1 char will be visible
+				}
+				for (++ptr; *ptr != ']'; ++ptr) {	// count chars in &[..]
+					++len;
+				}
+			}
+			else {	// assume 2-wide color char
+				++ptr;
+				len += 2;
+			}
 		}
-		else if (string[iter] == '&' && string[iter+1] == '&') {
-			++iter;	// advance past the && (not a color code)
-		}
-		else if (string[iter] == '&' || string[iter] == '\t') {
-			++count;
-			++iter;	// advance past the color code
-		}
+		// else not a color code
 	}
 	
-	return count;
-}
-
-
-/**
-* @param char *string The string to count && in.
-* @return int The number of occurrances of && in the string.
-*/
-int count_double_ampersands(char *string) {
-	int iter, count = 0, len = strlen(string);
-	for (iter = 0; iter < len - 1; ++iter) {
-		if (string[iter] == '&' && string[iter+1] == '&') {
-			++count;
-			++iter;	// advance past the second &
-		}
-		else if (string[iter] == '\t' && string[iter+1] == '&') {
-			++count;
-			++iter;	// advance past the & in \t&
-		}
-		else if (string[iter] == '\t' && string[iter+1] == '\t') {
-			++count;
-			++iter;	// advance past the second \t in \t\t (similar to an &&)
-		}
-	}
-	
-	return count;
+	return len;
 }
 
 

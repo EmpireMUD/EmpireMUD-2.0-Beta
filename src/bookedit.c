@@ -511,7 +511,7 @@ OLC_MODULE(booked_author) {
 OLC_MODULE(booked_byline) {
 	book_data *book = GET_OLC_BOOK(ch->desc);
 
-	if (strlen(argument) - (2 * count_color_codes(argument)) > MAX_BOOK_BYLINE) {
+	if (color_strlen(argument) > MAX_BOOK_BYLINE) {
 		msg_to_char(ch, "Book bylines may not be more than %d characters long.\r\n", MAX_BOOK_TITLE);
 	}
 	else {
@@ -535,7 +535,7 @@ OLC_MODULE(booked_item_description) {
 OLC_MODULE(booked_item_name) {
 	book_data *book = GET_OLC_BOOK(ch->desc);
 
-	if (count_color_codes(argument) > 0) {
+	if (color_code_length(argument) > 0) {
 		msg_to_char(ch, "Book item names may not contain color codes.\r\n");
 	}
 	else if (strchrstr(argument, "%()[]\\")) {
@@ -715,7 +715,7 @@ OLC_MODULE(booked_paragraphs) {
 OLC_MODULE(booked_title) {
 	book_data *book = GET_OLC_BOOK(ch->desc);
 	
-	if (strlen(argument) - (2 * count_color_codes(argument)) > MAX_BOOK_TITLE) {
+	if (color_strlen(argument) > MAX_BOOK_TITLE) {
 		msg_to_char(ch, "Book titles may not be more than %d characters long.\r\n", MAX_BOOK_TITLE);
 	}
 	else {

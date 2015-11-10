@@ -1112,7 +1112,7 @@ void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int m
 			temp = *flow;
 			*flow = '\0';
 
-			startlen = strlen(start) - (2 * count_color_codes(start));
+			startlen = color_strlen(start);
 			if (line_chars + startlen + 1 > 79) {
 				strcat(formatted, "\r\n");
 				line_chars = 0;

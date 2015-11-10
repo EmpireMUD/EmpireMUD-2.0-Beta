@@ -14,6 +14,8 @@
 * Contents:
 *   Core Utils
 *   Adventure Utils
+*   Archetype Utils
+*   Augment Utils
 *   Bitvector Utils
 *   Building Utils
 *   Can See Utils
@@ -101,6 +103,39 @@
 #define ADVENTURE_FLAGGED(adv, flg)  (IS_SET(GET_ADV_FLAGS(adv), (flg)) ? TRUE : FALSE)
 #define INSTANCE_FLAGGED(i, flg)  (IS_SET((i)->flags, (flg)))
 #define LINK_FLAGGED(lnkptr, flg)  (IS_SET((lnkptr)->flags, (flg)) ? TRUE : FALSE)
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// ARCHETYPE UTILS /////////////////////////////////////////////////////////
+
+#define GET_ARCH_ATTRIBUTE(arch, pos)  ((arch)->attributes[(pos)])
+#define GET_ARCH_DESC(arch)  ((arch)->description)
+#define GET_ARCH_FEMALE_RANK(arch)  ((arch)->female_rank)
+#define GET_ARCH_FLAGS(arch)  ((arch)->flags)
+#define GET_ARCH_GEAR(arch)  ((arch)->gear)
+#define GET_ARCH_LORE(arch)  ((arch)->lore)
+#define GET_ARCH_MALE_RANK(arch)  ((arch)->male_rank)
+#define GET_ARCH_NAME(arch)  ((arch)->name)
+#define GET_ARCH_SKILLS(arch)  ((arch)->skills)
+#define GET_ARCH_VNUM(arch)  ((arch)->vnum)
+
+#define ARCHETYPE_FLAGGED(arch, flag)  IS_SET(GET_ARCH_FLAGS(arch), (flag))
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// AUGMENT UTILS ///////////////////////////////////////////////////////////
+
+#define GET_AUG_ABILITY(aug)  ((aug)->ability)
+#define GET_AUG_APPLIES(aug)  ((aug)->applies)
+#define GET_AUG_FLAGS(aug)  ((aug)->flags)
+#define GET_AUG_NAME(aug)  ((aug)->name)
+#define GET_AUG_RESOURCES(aug)  ((aug)->resources)
+#define GET_AUG_REQUIRES_OBJ(aug)  ((aug)->requires_obj)
+#define GET_AUG_TYPE(aug)  ((aug)->type)
+#define GET_AUG_VNUM(aug)  ((aug)->vnum)
+#define GET_AUG_WEAR_FLAGS(aug)  ((aug)->wear_flags)
+
+#define AUGMENT_FLAGGED(aug, flag)  IS_SET(GET_AUG_FLAGS(aug), (flag))
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -347,6 +382,8 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_OLC_VNUM(desc)  ((desc)->olc_vnum)
 #define GET_OLC_STORAGE(desc)  ((desc)->olc_storage)
 #define GET_OLC_ADVENTURE(desc)  ((desc)->olc_adventure)
+#define GET_OLC_ARCHETYPE(desc)  ((desc)->olc_archetype)
+#define GET_OLC_AUGMENT(desc)  ((desc)->olc_augment)
 #define GET_OLC_BOOK(desc)  ((desc)->olc_book)
 #define GET_OLC_BUILDING(desc)  ((desc)->olc_building)
 #define GET_OLC_CRAFT(desc)  ((desc)->olc_craft)
@@ -428,6 +465,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_GLOBAL_NAME(glb)  ((glb)->name)
 #define GET_GLOBAL_TYPE(glb)  ((glb)->type)
 #define GET_GLOBAL_FLAGS(glb)  ((glb)->flags)
+#define GET_GLOBAL_GEAR(glb)  ((glb)->gear)
 #define GET_GLOBAL_PERCENT(glb)  ((glb)->percent)
 #define GET_GLOBAL_ABILITY(glb)  ((glb)->ability)
 #define GET_GLOBAL_TYPE_EXCLUDE(glb)  ((glb)->type_exclude)
@@ -1107,9 +1145,9 @@ void determine_gear_level(char_data *ch);
 extern bool wake_and_stand(char_data *ch);
 
 // resource functions from utils.c
-void extract_resources(char_data *ch, Resource list[], bool ground);
-void give_resources(char_data *ch, Resource list[], bool split);
-extern bool has_resources(char_data *ch, Resource list[], bool ground, bool send_msgs);
+void extract_resources(char_data *ch, struct resource_data *list, bool ground);
+void give_resources(char_data *ch, struct resource_data *list, bool split);
+extern bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool send_msgs);
 
 // string functions from utils.c
 extern bitvector_t asciiflag_conv(char *flag);
@@ -1129,7 +1167,8 @@ extern char *strip_color(char *input);
 void strip_crlf(char *buffer);
 extern char *strtolower(char *str);
 extern char *strtoupper(char *str);
-extern int count_color_codes(char *string);
+extern int color_code_length(const char *str);
+#define color_strlen(str)  (strlen(str) - color_code_length(str))
 extern int count_icon_codes(char *string);
 extern bool strchrstr(const char *haystack, const char *needles);
 extern int str_cmp(const char *arg1, const char *arg2);

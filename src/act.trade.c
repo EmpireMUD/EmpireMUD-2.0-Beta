@@ -34,12 +34,15 @@
 */
 
 // external vars
+extern const struct augment_type_data augment_info[];
 
 // external functions
 ACMD(do_gen_craft);
+extern double get_enchant_scale_for_char(char_data *ch, int max_scale);
 extern bool has_cooking_fire(char_data *ch);
 extern obj_data *has_sharp_tool(char_data *ch);
 void scale_item_to_level(obj_data *obj, int level);
+extern bool validate_augment_target(char_data *ch, obj_data *obj, augment_data *aug, bool send_messages);
 
 // locals
 bool can_refashion(char_data *ch);
@@ -133,6 +136,72 @@ obj_data *has_hammer(char_data *ch) {
 	// nope
 	msg_to_char(ch, "You need to use a hammer to do that.\r\n");
 	return NULL;
+}
+
+
+/**
+* Shows a character which augments are available. If a matching_obj is given,
+* only lists augments that can be applied to that item.
+*
+* @param char_data *ch The person to list to (whose abilities will be checked).
+* @param int type AUGMENT_x type.
+* @param obj_data *matching_obj Optional: Only show augments that work on this item (or NULL).
+*/
+void list_available_augments(char_data *ch, int type, obj_data *matching_obj) {
+	char buf[MAX_STRING_LENGTH];
+	augment_data *aug, *next_aug;
+	bool found, line;
+	
+	*buf = '\0';
+	line = found = FALSE;
+	HASH_ITER(sorted_hh, sorted_augments, aug, next_aug) {
+		if (GET_AUG_TYPE(aug) != type || AUGMENT_FLAGGED(aug, AUG_IN_DEVELOPMENT)) {
+			continue;
+		}
+		if (GET_AUG_ABILITY(aug) != NO_ABIL && !HAS_ABILITY(ch, GET_AUG_ABILITY(aug))) {
+			continue;
+		}
+		if (GET_AUG_REQUIRES_OBJ(aug) != NOTHING && !get_obj_in_list_vnum(GET_AUG_REQUIRES_OBJ(aug), ch->carrying)) {
+			continue;
+		}
+		if (matching_obj && !validate_augment_target(ch, matching_obj, aug, FALSE)) {
+			continue;
+		}
+		
+		// send last line?
+		if ((strlen(buf) + strlen(GET_AUG_NAME(aug)) + 2) >= 80) {
+			msg_to_char(ch, "%s\r\n", buf);
+			line = FALSE;
+			*buf = '\0';
+		}
+		
+		// add this entry to line
+		sprintf(buf + strlen(buf), "%s%s", (line ? ", " : " "), GET_AUG_NAME(aug));
+		line = found = TRUE;
+	}
+	
+	if (line) {
+		msg_to_char(ch, "%s\r\n", buf);
+	}
+	if (!found) {
+		msg_to_char(ch, "  nothing\r\n");
+	}
+}
+
+
+/**
+* @param obj_data *obj Any item.
+* @param int apply_type APPLY_TYPE_x
+* @return bool TRUE if obj has at least 1 apply of that type.
+*/
+bool obj_has_apply_type(obj_data *obj, int apply_type) {
+	struct obj_apply *app;
+	for (app = GET_OBJ_APPLIES(obj); app; app = app->next) {
+		if (app->apply_type == apply_type) {
+			return TRUE;
+		}
+	}
+	return FALSE;
 }
 
 
@@ -606,6 +675,149 @@ bool validate_item_rename(char_data *ch, obj_data *obj, char *name) {
  //////////////////////////////////////////////////////////////////////////////
 //// COMMANDS ////////////////////////////////////////////////////////////////
 
+// subcmd is AUGMENT_x
+ACMD(do_gen_augment) {
+	extern augment_data *find_augment_by_name(char_data *ch, char *name, int type);
+	extern char *shared_by(obj_data *obj, char_data *ch);
+	extern const double apply_values[];
+	
+	char buf[MAX_STRING_LENGTH], target_arg[MAX_INPUT_LENGTH], *augment_arg;
+	double points_available, remaining, share;
+	struct obj_apply *apply, *last_apply;
+	int scale, total_weight, value;
+	struct augment_apply *app;
+	augment_data *aug;
+	obj_data *obj;
+	
+	augment_arg = one_argument(argument, target_arg);
+	
+	if (IS_NPC(ch)) {
+		// TODO should we allow this for scripting?
+		msg_to_char(ch, "NPCs can't augment items.\r\n");
+	}
+	else if (!*target_arg) {
+		msg_to_char(ch, "Usage: %s <item> <type>\r\nYou know how to %s:\r\n", augment_info[subcmd].verb, augment_info[subcmd].verb);
+		list_available_augments(ch, subcmd, NULL);
+	}
+	else if (!(obj = get_obj_in_list_vis(ch, target_arg, ch->carrying)) && !(obj = get_obj_by_char_share(ch, target_arg))) {
+		msg_to_char(ch, "You don't seem to have any %s.\r\n", target_arg);
+	}
+	else if (!*augment_arg) {
+		msg_to_char(ch, "You can %s %s with:\r\n", augment_info[subcmd].verb, GET_OBJ_SHORT_DESC(obj));
+		list_available_augments(ch, subcmd, obj);
+	}
+	else if (!(aug = find_augment_by_name(ch, augment_arg, subcmd))) {
+		msg_to_char(ch, "You don't know that %s.\r\n", augment_info[subcmd].noun);
+	}
+	else if (IS_SET(GET_AUG_FLAGS(aug) | augment_info[subcmd].default_flags, AUG_SELF_ONLY) && ((obj->worn_by && obj->worn_by != ch) || !bind_ok(obj, ch))) {
+		// targeting a shared item with a self-only enchant
+		msg_to_char(ch, "You can only %s your own items like that.\r\n", augment_info[subcmd].verb);
+	}
+	else if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) <= 0) {
+		// always forbidden
+		msg_to_char(ch, "You cannot %s that item.\r\n", augment_info[subcmd].verb);
+	}
+	else if (augment_info[subcmd].use_obj_flag && OBJ_FLAGGED(obj, augment_info[subcmd].use_obj_flag)) {
+		msg_to_char(ch, "You cannot %s an item that already has %s %s.\r\n", augment_info[subcmd].verb, AN(augment_info[subcmd].noun), augment_info[subcmd].noun);
+	}
+	else if (obj_has_apply_type(obj, augment_info[subcmd].apply_type)) {
+		msg_to_char(ch, "That item already has a %s effect.\r\n", augment_info[subcmd].noun);
+	}
+	else if (!validate_augment_target(ch, obj, aug, TRUE)) {
+		// sends own message
+	}
+	else if (!has_resources(ch, GET_AUG_RESOURCES(aug), FALSE, TRUE)) {
+		// sends its own messages
+	}
+	else if (GET_AUG_ABILITY(aug) != NO_ABIL && ABILITY_TRIGGERS(ch, NULL, obj, GET_AUG_ABILITY(aug))) {
+		return;
+	}
+	else {
+		extract_resources(ch, GET_AUG_RESOURCES(aug), FALSE);
+		
+		// determine scale cap
+		scale = GET_OBJ_CURRENT_SCALE_LEVEL(obj);
+		if (GET_AUG_ABILITY(aug) != NO_ABIL && ability_data[GET_AUG_ABILITY(aug)].parent_skill != NO_SKILL && GET_SKILL(ch, ability_data[GET_AUG_ABILITY(aug)].parent_skill) < CLASS_SKILL_CAP) {
+			scale = MIN(scale, GET_SKILL(ch, ability_data[GET_AUG_ABILITY(aug)].parent_skill));
+		}
+		
+		// determine points
+		points_available = get_enchant_scale_for_char(ch, scale);
+		if (augment_info[subcmd].greater_abil && HAS_ABILITY(ch, augment_info[subcmd].greater_abil)) {
+			points_available *= config_get_double("greater_enchantments_bonus");
+		}
+		
+		// figure out how many total weight points are used
+		total_weight = 0;
+		for (app = GET_AUG_APPLIES(aug); app; app = app->next) {
+			total_weight += app->weight;
+		}
+		
+		// find end of current applies on obj
+		if ((last_apply = GET_OBJ_APPLIES(obj))) {
+			while (last_apply->next) {
+				last_apply = last_apply->next;
+			}
+		}
+		
+		// start adding applies
+		remaining = points_available;
+		for (app = GET_AUG_APPLIES(aug); app && remaining > 0; app = app->next) {
+			share = (((double)app->weight) / total_weight) * points_available;	// % of total
+			share = MIN(share, remaining);	// check limit
+			value = round(share * (1.0 / apply_values[app->location]));
+			if (value > 0 || (app == GET_AUG_APPLIES(aug))) {	// always give at least 1 point on the first one
+				value = MAX(1, value);
+				remaining -= (value * apply_values[app->location]);	// subtract actual amount used
+				
+				// create the actual apply
+				CREATE(apply, struct obj_apply, 1);
+				apply->apply_type = augment_info[subcmd].apply_type;
+				apply->location = app->location;
+				apply->modifier = value;
+				
+				if (last_apply) {
+					last_apply->next = apply;
+				}
+				else {
+					GET_OBJ_APPLIES(obj) = apply;
+				}
+				last_apply = apply;
+			}
+		}
+		
+		// enchanted bit*
+		if (augment_info[subcmd].use_obj_flag) {
+			SET_BIT(GET_OBJ_EXTRA(obj), augment_info[subcmd].use_obj_flag);
+		}
+		
+		// self-only: force binding
+		if (IS_SET(GET_AUG_FLAGS(aug) | augment_info[subcmd].default_flags, AUG_SELF_ONLY)) {
+			if (!OBJ_FLAGGED(obj, OBJ_BIND_FLAGS)) {
+				SET_BIT(GET_OBJ_EXTRA(obj), OBJ_BIND_ON_PICKUP);
+			}
+			bind_obj_to_player(obj, ch);
+			reduce_obj_binding(obj, ch);
+		}
+		
+		sprintf(buf, "You %s $p%s with %s.", augment_info[subcmd].verb, shared_by(obj, ch), GET_AUG_NAME(aug));
+		act(buf, FALSE, ch, obj, obj->worn_by, TO_CHAR);
+		
+		sprintf(buf, "$n %ss $p%s with %s.", augment_info[subcmd].verb, shared_by(obj, ch), GET_AUG_NAME(aug));
+		act(buf, FALSE, ch, obj, obj->worn_by, TO_ROOM);
+		
+		if (GET_AUG_ABILITY(aug) != NO_ABIL) {
+			gain_ability_exp(ch, GET_AUG_ABILITY(aug), 50);
+		}
+		if (augment_info[subcmd].greater_abil != NO_ABIL) {
+			gain_ability_exp(ch, augment_info[subcmd].greater_abil, 50);
+		}
+		
+		command_lag(ch, WAIT_ABILITY);
+	}
+}
+
+
 // subcmd must be CRAFT_TYPE_x
 ACMD(do_gen_craft) {	
 	int timer, master_ability, num = 1;
@@ -786,121 +998,13 @@ ACMD(do_gen_craft) {
 }
 
 
-ACMD(do_hone) {
-	extern double get_enchant_scale_for_char(char_data *ch, int max_scale);
-	extern const double apply_values[];
-
-	Resource hone_res[2] = { { o_NOCTURNIUM_INGOT, 2 }, END_RESOURCE_LIST };
-	struct obj_apply *apply;
-	obj_data *obj;
-	double points;
-	int maxlev;
-	bool has;
-	
-	one_argument(argument, arg);
-	
-	if (!can_use_ability(ch, ABIL_HONE, NOTHING, 0, NOTHING)) {
-		return;
-	}
-	if (!*arg) {
-		msg_to_char(ch, "Hone which item?\r\n");
-		return;
-	}
-	if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
-		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
-		return;
-	}
-	
-	// check for honed
-	has = FALSE;
-	for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
-		if (apply->apply_type == APPLY_TYPE_HONED) {
-			has = TRUE;
-		}
-	}
-	if (has) {
-		act("$p is already honed.", FALSE, ch, obj, NULL, TO_CHAR);
-		return;
-	}
-	
-	if (!has_resources(ch, hone_res, FALSE, TRUE)) {
-		// message sent by has_resources
-		return;
-	}
-	
-	if (ABILITY_TRIGGERS(ch, NULL, obj, ABIL_HONE)) {
-		return;
-	}
-	
-	// determine points to spend
-	maxlev = GET_OBJ_CURRENT_SCALE_LEVEL(obj);
-	if (GET_SKILL(ch, SKILL_TRADE) < CLASS_SKILL_CAP) {
-		maxlev = MIN(maxlev, GET_SKILL(ch, SKILL_TRADE));
-	}
-	points = get_enchant_scale_for_char(ch, maxlev);
-	
-	// how it hones depends upon type
-	if (IS_WEAPON(obj)) {
-		CREATE(apply, struct obj_apply, 1);
-		apply->apply_type = APPLY_TYPE_HONED;
-		apply->location = (attack_hit_info[GET_WEAPON_TYPE(obj)].damage_type == DAM_MAGICAL) ? APPLY_BONUS_MAGICAL : APPLY_BONUS_PHYSICAL;
-		apply->modifier = MAX(1, round(points * (1.0 / apply_values[(int) apply->location])));
-		apply->next = GET_OBJ_APPLIES(obj);
-		GET_OBJ_APPLIES(obj) = apply;
-	}
-	else if (CAN_WEAR(obj, ITEM_WEAR_HOLD)) {
-		CREATE(apply, struct obj_apply, 1);
-		apply->apply_type = APPLY_TYPE_HONED;
-		apply->location = APPLY_BONUS_HEALING;
-		apply->modifier = MAX(1, round(points * (1.0 / apply_values[(int) apply->location])));
-		apply->next = GET_OBJ_APPLIES(obj);
-		GET_OBJ_APPLIES(obj) = apply;
-	}
-	else if (IS_SHIELD(obj)) {
-		// resist-physical
-		CREATE(apply, struct obj_apply, 1);
-		apply->apply_type = APPLY_TYPE_HONED;
-		apply->location = APPLY_RESIST_PHYSICAL;
-		apply->modifier = MAX(1, round(points / 2.0 * (1.0 / apply_values[(int) apply->location])));
-		apply->next = GET_OBJ_APPLIES(obj);
-		GET_OBJ_APPLIES(obj) = apply;
-		
-		// resist-magical
-		CREATE(apply, struct obj_apply, 1);
-		apply->apply_type = APPLY_TYPE_HONED;
-		apply->location = APPLY_RESIST_MAGICAL;
-		apply->modifier = MAX(1, round(points / 2.0 * (1.0 / apply_values[(int) apply->location])));
-		apply->next = GET_OBJ_APPLIES(obj);
-		GET_OBJ_APPLIES(obj) = apply;
-	}
-	else {
-		act("You can't hone $p.", FALSE, ch, obj, NULL, TO_CHAR);
-		return;
-	}
-	
-	extract_resources(ch, hone_res, FALSE);
-	
-	// messaging
-	act("You carefully hone $p.", FALSE, ch, obj, NULL, TO_CHAR);
-	act("$n carefully hones $p.", FALSE, ch, obj, NULL, TO_ROOM);
-	
-	// ensure binding
-	if (!OBJ_FLAGGED(obj, OBJ_BIND_FLAGS)) {
-		SET_BIT(GET_OBJ_EXTRA(obj), OBJ_BIND_ON_PICKUP);
-	}
-	bind_obj_to_player(obj, ch);
-	reduce_obj_binding(obj, ch);
-	
-	// exp
-	gain_ability_exp(ch, ABIL_HONE, 100);
-}
-
-
 ACMD(do_recipes) {
-	int sub, last_type = NOTHING;
+	int last_type = NOTHING;
 	craft_data *craft, *next_craft;
+	augment_data *aug, *next_aug;
+	struct resource_data *res;
 	obj_data *obj;
-	bool found_any = FALSE, found_type = FALSE, found_one = FALSE;
+	bool found_any, found_type, uses_item;
 	
 	one_argument(argument, arg);
 	
@@ -912,7 +1016,9 @@ ACMD(do_recipes) {
 	}
 	else {
 		act("With $p, you can make:", FALSE, ch, obj, NULL, TO_CHAR);
-
+		found_any = FALSE;
+		
+		found_type = FALSE;
 		HASH_ITER(sorted_hh, sorted_crafts, craft, next_craft) {
 			// is it a live recipe?
 			if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT) && !IS_IMMORTAL(ch)) {
@@ -920,22 +1026,27 @@ ACMD(do_recipes) {
 			}
 		
 			// has right abil?
-			if (*GET_CRAFT_NAME(craft) == '\t' || (GET_CRAFT_ABILITY(craft) != NO_ABIL && !HAS_ABILITY(ch, GET_CRAFT_ABILITY(craft)))) {
+			if (GET_CRAFT_ABILITY(craft) != NO_ABIL && !HAS_ABILITY(ch, GET_CRAFT_ABILITY(craft))) {
+				continue;
+			}
+			
+			if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING && !get_obj_in_list_vnum(GET_CRAFT_REQUIRES_OBJ(craft), ch->carrying)) {
 				continue;
 			}
 			
 			// is the item used to make it?
-			for (sub = 0, found_one = FALSE; !found_one && GET_CRAFT_RESOURCES(craft)[sub].vnum != NOTHING; ++sub) {
-				if (GET_CRAFT_RESOURCES(craft)[sub].vnum != GET_OBJ_VNUM(obj)) {
-					continue;
+			uses_item = FALSE;
+			if (GET_CRAFT_REQUIRES_OBJ(craft) == GET_OBJ_VNUM(obj)) {
+				uses_item = TRUE;
+			}
+			for (res = GET_CRAFT_RESOURCES(craft); !uses_item && res; res = res->next) {
+				if (res->vnum == GET_OBJ_VNUM(obj)) {
+					uses_item = TRUE;
 				}
+			}
 				
-				if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING && !get_obj_in_list_vnum(GET_CRAFT_REQUIRES_OBJ(craft), ch->carrying)) {
-					continue;
-				}
-				
-				// MATCH!
-			
+			// MATCH!
+			if (uses_item) {
 				// need header?
 				if (GET_CRAFT_TYPE(craft) != last_type) {
 					msg_to_char(ch, "%s %s: ", found_type ? "\r\n" : "", gen_craft_data[GET_CRAFT_TYPE(craft)].command);
@@ -945,7 +1056,50 @@ ACMD(do_recipes) {
 				}
 		
 				msg_to_char(ch, "%s%s", (found_type ? ", " : ""), GET_CRAFT_NAME(craft));
-				found_any = found_one = found_type = TRUE;
+				found_any = found_type = TRUE;
+			}
+		}
+		// trailing crlf
+		if (found_type) {
+			msg_to_char(ch, "\r\n");
+		}
+		
+		found_type = FALSE;
+		HASH_ITER(sorted_hh, sorted_augments, aug, next_aug) {
+			if (AUGMENT_FLAGGED(aug, AUG_IN_DEVELOPMENT) && !IS_IMMORTAL(ch)) {
+				continue;
+			}
+			if (GET_AUG_ABILITY(aug) != NO_ABIL && !HAS_ABILITY(ch, GET_AUG_ABILITY(aug))) {
+				continue;
+			}
+			
+			if (GET_AUG_REQUIRES_OBJ(aug) != NOTHING && !get_obj_in_list_vnum(GET_AUG_REQUIRES_OBJ(aug), ch->carrying)) {
+				continue;
+			}
+			
+			// is the item used to make it?
+			uses_item = FALSE;
+			if (GET_AUG_REQUIRES_OBJ(aug) == GET_OBJ_VNUM(obj)) {
+				uses_item = TRUE;
+			}
+			for (res = GET_AUG_RESOURCES(aug); !uses_item && res; res = res->next) {
+				if (res->vnum == GET_OBJ_VNUM(obj)) {
+					uses_item = TRUE;
+				}
+			}
+				
+			// MATCH!
+			if (uses_item) {
+				// need header?
+				if (GET_AUG_TYPE(aug) != last_type) {
+					msg_to_char(ch, "%s %s: ", found_type ? "\r\n" : "", augment_info[GET_AUG_TYPE(aug)].verb);
+	
+					found_type = FALSE;
+					last_type = GET_AUG_TYPE(aug);
+				}
+		
+				msg_to_char(ch, "%s%s", (found_type ? ", " : ""), GET_AUG_NAME(aug));
+				found_any = found_type = TRUE;
 			}
 		}
 		
@@ -966,8 +1120,8 @@ ACMD(do_reforge) {
 	extern char *shared_by(obj_data *obj, char_data *ch);
 	extern const char *item_types[];
 	
-	Resource res[2] = { { NOTHING, 0 }, END_RESOURCE_LIST };	// this cost is set later
 	char arg2[MAX_INPUT_LENGTH], temp[MAX_INPUT_LENGTH];
+	struct resource_data *res = NULL;
 	time_t old_stolen_time;
 	craft_data *ctype;
 	int old_timer, iter, level;
@@ -1020,8 +1174,7 @@ ACMD(do_reforge) {
 	}
 	else if (is_abbrev(arg2, "name")) {
 		// calculate gem cost based on the gear rating of the item
-		res[0].vnum = o_IRIDESCENT_IRIS;
-		res[0].amount = MAX(1, rate_item(obj) / 3);
+		res = create_resource_list(o_IRIDESCENT_IRIS, MAX(1, rate_item(obj) / 3), NOTHING);
 		
 		if (!validate_item_rename(ch, obj, argument)) {
 			// sends own message
@@ -1071,8 +1224,7 @@ ACMD(do_reforge) {
 		proto = obj_proto(GET_OBJ_VNUM(obj));
 		
 		// calculate gem cost based on the gear rating of the original item
-		res[0].vnum = o_BLOODSTONE;
-		res[0].amount = MAX(1, (proto ? rate_item(proto) : rate_item(obj)) / 3);
+		res = create_resource_list(o_BLOODSTONE, MAX(1, (proto ? rate_item(proto) : rate_item(obj)) / 3), NOTHING);
 		
 		if (!proto) {
 			msg_to_char(ch, "You can't renew that.\r\n");
@@ -1123,8 +1275,7 @@ ACMD(do_reforge) {
 	}
 	else if (is_abbrev(arg2, "superior")) {
 		// calculate gem cost based on the gear rating of the item
-		res[0].vnum = o_GLOWING_SEASHELL;
-		res[0].amount = MAX(1, rate_item(obj) / 3);
+		res = create_resource_list(o_GLOWING_SEASHELL, MAX(1, rate_item(obj) / 3), NOTHING);
 		proto = obj_proto(GET_OBJ_VNUM(obj));
 		
 		if (OBJ_FLAGGED(obj, OBJ_SUPERIOR)) {
@@ -1196,5 +1347,10 @@ ACMD(do_reforge) {
 	}
 	else {
 		msg_to_char(ch, "That's not a valid %s option.\r\n", reforge_data[subcmd].command);
+	}
+	
+	// no leaks
+	if (res) {
+		free_resource_list(res);
 	}
 }

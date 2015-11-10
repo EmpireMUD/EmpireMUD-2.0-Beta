@@ -196,7 +196,9 @@ ACMD(do_damage_spell) {
 		damage(ch, vict, 0, damage_spell[type].attack_type, DAM_MAGICAL);
 	}
 	
-	gain_ability_exp(ch, subcmd, 15);
+	if (can_gain_exp_from(ch, vict)) {
+		gain_ability_exp(ch, subcmd, 15);
+	}
 }
 
 

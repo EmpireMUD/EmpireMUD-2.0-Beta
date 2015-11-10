@@ -301,6 +301,7 @@ ADMIN_UTIL(util_islandsize);
 ADMIN_UTIL(util_playerdump);
 ADMIN_UTIL(util_randtest);
 ADMIN_UTIL(util_redo_islands);
+ADMIN_UTIL(util_strlen);
 ADMIN_UTIL(util_tool);
 
 
@@ -315,6 +316,7 @@ struct {
 	{ "playerdump", LVL_IMPL, util_playerdump },
 	{ "randtest", LVL_CIMPL, util_randtest },
 	{ "redoislands", LVL_CIMPL, util_redo_islands },
+	{ "strlen", LVL_START_IMM, util_strlen },
 	{ "tool", LVL_IMPL, util_tool },
 
 	// last
@@ -553,6 +555,15 @@ ADMIN_UTIL(util_redo_islands) {
 		number_and_count_islands(TRUE);
 		msg_to_char(ch, "Islands renumbered. Caution: empire inventories may now be in the wrong place.\r\n");
 	}
+}
+
+
+ADMIN_UTIL(util_strlen) {
+	msg_to_char(ch, "String: %s\r\n", argument);
+	msg_to_char(ch, "Raw: %s\r\n", show_color_codes(argument));
+	msg_to_char(ch, "strlen: %d\r\n", (int)strlen(argument));
+	msg_to_char(ch, "color_strlen: %d\r\n", (int)color_strlen(argument));
+	msg_to_char(ch, "color_code_length: %d\r\n", color_code_length(argument));
 }
 
 
@@ -2782,11 +2793,13 @@ void do_stat_character(char_data *ch, char_data *k) {
 
 
 void do_stat_craft(char_data *ch, craft_data *craft) {
+	void get_resource_display(struct resource_data *list, char *save_buffer);
+
 	extern const char *craft_flags[];
 	extern const char *craft_types[];
 
 	bld_data *bld;
-	int count, iter, seconds;
+	int seconds;
 	
 	msg_to_char(ch, "Name: '&y%s&0', Vnum: [&g%d&0], Type: &c%s&0\r\n", GET_CRAFT_NAME(craft), GET_CRAFT_VNUM(craft), craft_types[GET_CRAFT_TYPE(craft)]);
 	
@@ -2803,7 +2816,7 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 	
 	sprintf(buf, "%s", (GET_CRAFT_ABILITY(craft) == NO_ABIL ? "none" : ability_data[GET_CRAFT_ABILITY(craft)].name));
 	if (GET_CRAFT_ABILITY(craft) != NO_ABIL && ability_data[GET_CRAFT_ABILITY(craft)].parent_skill != NO_SKILL) {
-		sprintf(buf + strlen(buf), " (%s %d)", skill_data[ability_data[GET_CRAFT_ABILITY(craft)].parent_skill].name, ability_data[GET_CRAFT_ABILITY(craft)].parent_skill_required);
+		sprintf(buf + strlen(buf), " (%s %d)", skill_data[ability_data[GET_CRAFT_ABILITY(craft)].parent_skill].abbrev, ability_data[GET_CRAFT_ABILITY(craft)].parent_skill_required);
 	}
 	seconds = GET_CRAFT_TIME(craft) * ACTION_CYCLE_TIME;
 	msg_to_char(ch, "Ability: &y%s&0, Level: &g%d&0, Time: [&g%d action tick%s&0 | &g%d:%02d&0]\r\n", buf, GET_CRAFT_MIN_LEVEL(craft), GET_CRAFT_TIME(craft), PLURAL(GET_CRAFT_TIME(craft)), seconds / SECS_PER_REAL_MIN, seconds % SECS_PER_REAL_MIN);
@@ -2823,18 +2836,9 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 	}
 
 	// resources
-	count = 0;
 	msg_to_char(ch, "Resources required: ");
-	for (iter = 0; iter < MAX_RESOURCES_REQUIRED && GET_CRAFT_RESOURCES(craft)[iter].vnum != NOTHING; ++iter) {
-		msg_to_char(ch, "%s&y[%d] %s (x%d)&0", (count > 0 ? ", ": ""), GET_CRAFT_RESOURCES(craft)[iter].vnum, skip_filler(get_obj_name_by_proto(GET_CRAFT_RESOURCES(craft)[iter].vnum)), GET_CRAFT_RESOURCES(craft)[iter].amount);
-		++count;
-	}
-	if (count == 0) {
-		msg_to_char(ch, "none\r\n");
-	}
-	else {
-		msg_to_char(ch, "\r\n");
-	}
+	get_resource_display(GET_CRAFT_RESOURCES(craft), buf);
+	send_to_char(buf, ch);
 }
 
 
@@ -2889,7 +2893,7 @@ void do_stat_global(char_data *ch, struct global_data *glb) {
 
 	sprintf(buf, "%s", (GET_GLOBAL_ABILITY(glb) == NO_ABIL ? "none" : ability_data[GET_GLOBAL_ABILITY(glb)].name));
 	if (GET_GLOBAL_ABILITY(glb) != NO_ABIL && ability_data[GET_GLOBAL_ABILITY(glb)].parent_skill != NO_SKILL) {
-		sprintf(buf + strlen(buf), " (%s %d)", skill_data[ability_data[GET_GLOBAL_ABILITY(glb)].parent_skill].name, ability_data[GET_GLOBAL_ABILITY(glb)].parent_skill_required);
+		sprintf(buf + strlen(buf), " (%s %d)", skill_data[ability_data[GET_GLOBAL_ABILITY(glb)].parent_skill].abbrev, ability_data[GET_GLOBAL_ABILITY(glb)].parent_skill_required);
 	}
 	msg_to_char(ch, "Requires ability: [&y%s&0], Percent: [&g%.2f&0]\r\n", buf, GET_GLOBAL_PERCENT(glb));
 	
@@ -2908,6 +2912,12 @@ void do_stat_global(char_data *ch, struct global_data *glb) {
 			sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), sector_flags, buf, TRUE);
 			sprintbit(GET_GLOBAL_TYPE_EXCLUDE(glb), sector_flags, buf2, TRUE);
 			msg_to_char(ch, "Capacity: [&g%d-%d normal, %d-%d deep&0], Sector Flags: &c%s&0, Exclude: &c%s&0\r\n", GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE)/2, GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE), (int)(GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE) / 2.0 * 1.5), (int)(GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE) * 1.5), buf, buf2);
+			break;
+		}
+		case GLOBAL_NEWBIE_GEAR: {
+			void get_archetype_gear_display(struct archetype_gear *list, char *save_buffer);
+			get_archetype_gear_display(GET_GLOBAL_GEAR(glb), buf2);
+			msg_to_char(ch, "Gear:\r\n%s", buf2);
 			break;
 		}
 	}
@@ -6347,6 +6357,18 @@ ACMD(do_vnum) {
 			msg_to_char(ch, "No adventures by that name.\r\n");
 		}
 	}
+	else if (is_abbrev(buf, "archetype")) {
+		extern int vnum_archetype(char *searchname, char_data *ch);
+		if (!vnum_archetype(buf2, ch)) {
+			msg_to_char(ch, "No archetypes by that name.\r\n");
+		}
+	}
+	else if (is_abbrev(buf, "augment")) {
+		extern int vnum_augment(char *searchname, char_data *ch);
+		if (!vnum_augment(buf2, ch)) {
+			msg_to_char(ch, "No augments by that name.\r\n");
+		}
+	}
 	else if (is_abbrev(buf, "building")) {
 		if (!vnum_building(buf2, ch)) {
 			msg_to_char(ch, "No buildings by that name.\r\n");
@@ -6411,6 +6433,24 @@ ACMD(do_vstat) {
 			return;
 		}
 		do_stat_adventure(ch, adv);
+	}
+	else if (is_abbrev(buf, "archetype")) {
+		void do_stat_archetype(char_data *ch, archetype_data *arcg);
+		archetype_data *arch = archetype_proto(number);
+		if (!arch) {
+			msg_to_char(ch, "There is no archetype with that number.\r\n");
+			return;
+		}
+		do_stat_archetype(ch, arch);
+	}
+	else if (is_abbrev(buf, "augment")) {
+		void do_stat_augment(char_data *ch, augment_data *aug);
+		augment_data *aug = augment_proto(number);
+		if (!aug) {
+			msg_to_char(ch, "There is no augment with that number.\r\n");
+			return;
+		}
+		do_stat_augment(ch, aug);
 	}
 	else if (is_abbrev(buf, "building")) {
 		bld_data *bld = building_proto(number);

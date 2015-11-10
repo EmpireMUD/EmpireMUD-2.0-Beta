@@ -96,6 +96,25 @@ Adventures (ADVEDIT):
   evidence of them nearby, like a thieves' den.
 - Adventure scripts will ONLY run if they are 'Adventure Cleanup' scripts.
 
+Archetypes (ARCHEDIT):
+- Archetypes should have a total of 11 attribute points (3 2 2 2 1 1).
+- Archetypes should have a total of 30 skill points.
+- Archetypes should provide gear for: head, clothes, legs, feet, wield, hold.
+- The hold slot is always a long-lasting light, like the newbie torch (2104).
+- You should only set the BASIC flag on very simple archetypes. Most archetypes
+  should only appear in the extended list.
+- Lore is optional. If you have it, make sure it ends with no punctuation.
+
+Augments (AUGEDIT):
+- Augment names should be all lowercase.
+- You should always require either an ability, or a certain object (or both) on
+  each augment. No augments should be available without at least one of those.
+- If you use the "requiresobject" option, that object will only be consumed on
+  use if it is also in the resource list. Otherwise, having the object means
+  a re-usable augment.
+- Unlike crafts, it is safe to use SCALABLE items as resources and requires-
+  objects, because augments are instant and non-refundable.
+
 Buildings (BEDIT):
 - Designated rooms are also built in the building editor, using the ROOM flag.
 - If a building has at least 1 Citizen, players can also set it as their home.
@@ -579,6 +598,282 @@ The following affect flags are available:
  !STEALTH - Immune to the Stealth debuffs.
  !VAMPIRE - Immune to Vampire debuffs.
  !STUN - Immune to stun effects.
+#d
+ARCHEDIT "OLC ARCHETYPES" "ARCHETYPE OLC" "ARCHETYPE EDITOR"
+
+Usage:  .arch <command>
+        .<command>
+
+The .olc archetype editor is a powerful tool for creating and editing player
+archetypes (character creation options). It provides a simple in-game menu with
+contextual choices to design any archetype.
+
+All commands in the editor are highlighted in yellow and placed inside <angle
+braces>. You can get help on these by typing &yHELP ARCHEDIT <COMMMAND>&0.
+
+You can close an open editor with .abort or .save.
+
+Example:
+ > .arch edit 99
+ > .name Silent Assassin
+ > .skill add Stealth 30
+ > .save
+
+For notes on the mud's building rules, see HELP BUILDING GUIDE.
+
+See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
+"ARCHEDIT ATTRIBUTES"
+
+Usage:  .attribute <type> <number>
+        .attribute <copy> <archetype vnum>
+
+This allows you to set the starting level of each attribute. By design, the
+starting attributes should be low. Players will earn higher attributes using
+gear and abilities.
+
+All of the stock archetypes have starting attributes totalling 11 (one at 3,
+two at 1, and the rest at 2).
+
+See also: OLC ARCHETYPES
+#d
+"ARCHEDIT DESCRIPTION"
+
+Usage:  .description <text>
+
+The archetype description should be a short phrase that indicates what type
+of character it is meant for. Descriptions should not be longer than about
+half a line of text.
+
+See also: OLC ARCHETYPES
+#d
+"ARCHEDIT FEMALERANK" "ARCHEDIT FEMALE RANK" "ARCHEDIT MALERANK" "ARCHEDIT MALE RANK"
+
+Usage:  .femalerank <name>
+        .malerank <name>
+
+These set the default rank when a player of this archetype founds an empire.
+Two rank names are available in case the name is gender-specific (Lord, Lady).
+However, it's also ok to set the same name for both.
+
+See also: OLC ARCHETYPES
+#d
+"ARCHEDIT FLAGS"
+
+Usage:  .flags [add | remove] <flags>
+
+Archetype flags are properties that affect how the archetype behaves.
+
+Available flags:
+ IN-DEV - Cannot be chosen or displayed.
+ BASIC - Shows up in the basic set of archetypes (others must be searched).
+
+See also: OLC ARCHETYPES
+#d
+"ARCHEDIT GEAR" "GEDIT GEAR"
+
+Usage:  .gear add <slot | inventory> <vnum>
+        .gear copy <from type> <from vnum>
+        .gear change <number> <slot | vnum> <new value>
+        .gear remove <number>
+
+Archetypes: Sets the starting gear for players who choose this archetype. You
+should provide some low-level gear (it will be scaled to level 1, or to the
+item's minimum scale level).
+
+Global Newbie Gear: Gear given to all new players, if their archetype didn't
+fill the slot.
+
+Usually, the following slots have newbie gear: head, clothes, legs, feet,
+wield, hold.
+
+The hold slot is generally a light, e.g. the newbie torch (2104).
+
+See also: OLC ARCHETYPES, OLC GLOBALS, GEDIT TYPE
+#d
+"ARCHEDIT LORE"
+
+Usage:  .lore <text | none>
+
+Archetype lore is the lore given to a player who starts the game with this
+archetype. It's optional -- if it's set to none, the player will get no lore
+at all from it.
+
+Lore is always the first part of a sentence that will end with "on Month Day,
+Year." It should end with no punctuation.
+
+You can use the following tokens in lore:
+ $e - he/she
+ $s - his/her
+ $m - him/her
+
+See also: OLC ARCHETYPES
+#d
+"ARCHEDIT NAME"
+
+Usage:  .name <name>
+
+The archetype name is the text displayed to the player, and used to choose an
+archetype. The name should be reasonably short, and title-cased (Each Word
+Capitalized).
+
+See also: OLC ARCHETYPES
+#d
+"ARCHEDIT SKILLS"
+
+Usage:  .skill <add | change> <name> <level>
+        .skill remove <name>
+
+Archetypes determine a player's starting skill levels. Players should begin
+the game with a small number of skill points split between one or two skills.
+However, the system is flexible and you may choose to give a small number of
+points to all skills.
+
+All of the stock archetypes have a total of 30 skill points, usually split
+between two skills as 20/10.
+
+See also: OLC ARCHETYPES
+#d
+AUGEDIT "OLC AUGMENTS" "AUGMENT OLC" "AUGMENT EDITOR"
+
+Usage:  .aug <command>
+        .<command>
+
+The .olc augment editor is a powerful tool for creating and editing augments
+(which are like item enchantments). It provides a simple in-game menu with
+contextual choices to design multiple types of augments.
+
+All commands in the editor are highlighted in yellow and placed inside <angle
+braces>. You can get help on these by typing &yHELP AUGEDIT <COMMMAND>&0.
+
+You can close an open editor with .abort or .save.
+
+Example:
+ > .aug edit 11000
+ > .name moar power
+ > .type enchantment
+ > .save
+
+For notes on the mud's building rules, see HELP BUILDING GUIDE.
+
+See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
+"AUGEDIT ABILITY"
+
+Usage:  .ability <name | none>
+
+This allows you to require the player to have a certain ability in order to
+apply this augment. Setting it to 'none' removes this requirement.
+
+See also: OLC AUGMENTS
+#d
+"AUGEDIT APPLY" "AUGEDIT APPLIES"
+
+Usage:  .apply add <value> <apply>
+        .apply change <number> <value | apply> <new value>
+        .apply remove <number | all>
+
+Applies are the specific bonuses that will be added to an item when it is
+enhanced with this augment. The values you provide for the applies are actually
+"weights", as the final value is determined by the level of the augmented item
+and the level of the person who augmented it.
+
+If you set applies like "2 to STRENGTH, 1 to DEXTERITY", it means 2/3 of the
+points go to the STRENGTH apply and 1/3 to the DEXTERITY apply. If this is used
+on an item that receives 6 points from the augment, the final values would come
+out to +4 Strength and +2 Dexterity.
+
+You can see a list of applies on HELP APPLIES.
+
+See also: APPLIES, OLC AUGMENTS
+#d
+"AUGEDIT FLAGS"
+
+Usage:  .flags [add | remove] <flags>
+
+Augment flags are properties that affect how the augment behaves.
+
+Available flags:
+ IN-DEV - Cannot be used by mortals.
+ SELF-ONLY - Can only be used on own items; will bind items to self.
+ ARMOR - Works on any ARMOR-type item only.
+ SHIELD - Works on any SHIELD-type item only.
+
+See also: OLC AUGMENTS
+#d
+"AUGEDIT NAME"
+
+Usage:  .name <name>
+
+The augment name is the text used by the player when enchanting (or otherwise
+modifying) an item. The name should be all lowercase, and should be fairly
+simple.
+
+For example, if an enchantment augment is named "striking", the player will
+use it by typing "enchant sword striking".
+
+See also: OLC AUGMENTS
+#d
+"AUGEDIT REQUIRESOBJECT" "AUGEDIT REQUIRES OBJECT"
+
+Usage:  .requiresobject <vnum>
+
+Instead of (or in addition to) requiring an ability to use an augment, you
+can make it dependent upon having a certain item in the player's inventory.
+The player will not see the augment in his list (for example, when he types
+enchant) if he doesn't have the item.
+
+The required object will not be consumed unless it is also in the resource
+list. An example non-consumable augment might require a spellbook object, so
+the effect is that having the spellbook allows the player to enchant weapons
+with extra mana.  An example consumable augment might be a grindstone that
+lets a player "hone" a sword with additional to-hit.
+
+See also: OLC AUGMENTS, VNUM
+#d
+"AUGEDIT RESOURCES"
+
+Usage:  .resource add <amount> <vnum>
+        .resource change <number> <quantity | vnum> <value>
+        .resource remove <number | all>
+        .resource move <number> <up | down>
+
+This command sets the resources required to apply the augment to an item.
+
+Don't use SCALABLE items as a resource, because it won't be scaled back to
+the same level if it's refunded.
+
+See also: OLC AUGMENTS, VNUM
+#d
+"AUGEDIT TYPE" "AUGMENT TYPES"
+
+Usage:  .type <type>
+
+The augment type determines which command is used to apply the augment to an
+item. It also determines what type of "apply" is added to the item, and what
+rules those applies will follow. For example, "enchantment" applies can be
+removed with the Disenchant ability, but "hone" applies cannot.
+
+Type notes:
+ Enchantment - Also sets the ENCHANTED bit on items.
+ Hone - Always acts as if it has the SELF-ONLY flag.
+
+See also: OLC AUGMENTS
+#d
+"AUGEDIT WEAR" "AUGMENT WEAR FLAGS"
+
+Usage:  .wear [add | remove] <wear flags>
+
+The "wear" flags on an augment help determine what kind of item can be a valid
+target for the augment. For example, an augment with the WIELD setting can only
+be used on items that can be wielded (i.e. weapons).
+
+An augment with no "wear" setting can generally not be used. An augment with
+the TAKE wear flag could be used on virtually any item.
+
+Usually an augment should be locked down to just one wear flag.
+
+See also: OEDIT WEAR, OLC AUGMENTS
 #d
 "BEDIT AFFECTS" "REDIT AFFECTS"
 
@@ -1437,6 +1732,21 @@ Notes on Mine Data globals:
 
 See also: BUILDING GUIDE, OLC GLOBALS
 #d
+"GLOBAL NEWBIE GEAR" "NEWBIE GEAR GLOBAL"
+
+The 'Newbie Gear' Global allows the same gear list options as Archetypes,
+but this is given to all newbie characters.
+
+Notes on Newbie Gear globals:
+- Only the percent field (and cumulative flag) really affect this type of
+  global. The other usual global controls like exclude flags and level
+  restrictions don't apply.
+- Gear from archetypes is given first, so players only receive gear from
+  globals in equipment slots not already filled. (This doesn't apply to
+  inventory.)
+
+See also: GEDIT GEAR
+#d
 "GLOBAL MOB INTERACTIONS" "MOB INTERACTIONS GLOBAL" "MOB INTERACTION GLOBAL"
 
 The 'Mob Interactions' Global allows SHEAR, LOOT, and PICKPOCKET globals to
@@ -1451,6 +1761,17 @@ Notes on Mob Interactions globals:
   same mob scaled to 225 would.
 
 See also: BUILDING GUIDE, OLC GLOBALS
+#d
+IN-DEVELOPMENT "IN DEVELOPMENT" IN-DEV
+
+The IN-DEVELOPMENT flag prevents an augment, craft, or global from being
+available to players. Generally immortals can still use them (although they
+won't appear in craft lists).
+
+You can quickly remove the IN-DEV flag using the .removeindev command. The OLC
+auditors will warn about items that still have IN-DEV flags.
+
+See also: OLC AUDIT, REMOVEINDEV
 #d
 "ITEM SCALING" "OBJ SCALING" "OBJECT SCALING" SCALABLE "SCALABLE FLAG" "SCALING ITEM"
 
@@ -1794,6 +2115,7 @@ Available mob flags:
  *EXTRACTED - Do not set.
  !LOOT - Will not drop any loot.
  !TELEPORT - Cannot teleport to this mob.
+ !EXP - Players get no experience from using abilities against this mob.
 
 See also: OLC MOBILES
 #d

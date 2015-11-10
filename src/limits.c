@@ -331,7 +331,7 @@ void point_update_char(char_data *ch) {
 	}
 	
 	// check spawned
-	if (REAL_NPC(ch) && !ch->desc && MOB_FLAGGED(ch, MOB_SPAWNED) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_STABLE) && MOB_SPAWN_TIME(ch) < (time(0) - config_get_int("mob_spawn_interval") * SECS_PER_REAL_MIN) && !GET_BOAT(IN_ROOM(ch))) {
+	if (REAL_NPC(ch) && !ch->desc && MOB_FLAGGED(ch, MOB_SPAWNED) && (!MOB_FLAGGED(ch, MOB_ANIMAL) || !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_STABLE)) && MOB_SPAWN_TIME(ch) < (time(0) - config_get_int("mob_spawn_interval") * SECS_PER_REAL_MIN) && !GET_BOAT(IN_ROOM(ch))) {
 		if (!GET_LED_BY(ch) && !GET_LEADING(ch) && !GET_PULLING(ch) && !MOB_FLAGGED(ch, MOB_TIED)) {
 			if (distance_to_nearest_player(IN_ROOM(ch)) > config_get_int("mob_despawn_radius")) {
 				despawn_mob(ch);

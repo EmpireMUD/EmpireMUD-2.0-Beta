@@ -26,7 +26,9 @@
 #define DB_BOOT_RMT  12
 #define DB_BOOT_GLB  13
 #define DB_BOOT_ACCT  14
-#define NUM_DB_BOOT_TYPES  15	// total
+#define DB_BOOT_AUG  15
+#define DB_BOOT_ARCH  16
+#define NUM_DB_BOOT_TYPES  17	// total
 
 
 // library sub-dirs
@@ -61,6 +63,8 @@
 #define INDEX_FILE  "index"	// index of world files
 #define ACCT_PREFIX  LIB_ACCTS	// account files
 #define ADV_PREFIX  LIB_WORLD"adv/"	// adventure zones
+#define ARCH_PREFIX  LIB_WORLD"arch/"	// archetypes
+#define AUG_PREFIX  LIB_WORLD"aug/"	// augments
 #define BLD_PREFIX  LIB_WORLD"bld/"	// building definitions
 #define CRAFT_PREFIX  LIB_WORLD"craft/"	// craft recipes
 #define CROP_PREFIX  LIB_WORLD"crop/"	// crop definitions
@@ -80,6 +84,8 @@
 // library file suffixes
 #define ACCT_SUFFIX  ".acct"	// account file suffix
 #define ADV_SUFFIX  ".adv"	// adventure file suffix
+#define ARCH_SUFFIX  ".arch"	// archetype file suffix
+#define AUG_SUFFIX  ".aug"	// augment file suffix
 #define BLD_SUFFIX  ".bld"	// building file suffix
 #define BOOK_SUFFIX  ".book"	// book file suffix
 #define CRAFT_SUFFIX  ".craft"	// craft file suffix
@@ -181,6 +187,18 @@ extern adv_data *adventure_table;
 extern struct instance_data *instance_list;
 void free_adventure(adv_data *adv);
 extern adv_data *adventure_proto(adv_vnum vnum);
+
+// archetypes
+extern archetype_data *archetype_table;
+extern archetype_data *sorted_archetypes;
+extern archetype_data *archetype_proto(any_vnum vnum);
+void free_archetype(archetype_data *arch);
+
+// augments
+extern augment_data *augment_table;
+extern augment_data *sorted_augments;
+extern augment_data *augment_proto(any_vnum vnum);
+void free_augment(augment_data *aug);
 
 // books
 extern book_data *book_table;
@@ -300,6 +318,8 @@ room_data *real_room(room_vnum vnum);
 
 // misc
 extern struct obj_apply *copy_apply_list(struct obj_apply *list);
+extern struct resource_data *create_resource_list(int first_vnum, int first_amount, ...);
+void free_resource_list(struct resource_data *list);
 
 // more frees
 void free_apply_list(struct obj_apply *list);

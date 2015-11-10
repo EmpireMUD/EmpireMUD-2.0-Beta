@@ -48,6 +48,7 @@
 
 // protos
 void adjust_abilities_to_empire(char_data *ch, empire_data *emp, bool add);
+extern bool can_gain_exp_from(char_data *ch, char_data *vict);
 extern bool can_use_ability(char_data *ch, int ability, int cost_pool, int cost_amount, int cooldown_type);
 void charge_ability_cost(char_data *ch, int cost_pool, int cost_amount, int cooldown_type, int cooldown_time, int wait_type);
 void gain_ability_exp(char_data *ch, int ability, double amount);
@@ -621,6 +622,7 @@ extern bool skill_check(char_data *ch, int ability, int difficulty);
 struct skill_data_type {
 	int number;	// SKILL_x
 	char *name;
+	char *abbrev;
 	char *description;
 	char *creation_description;	// shown to players who ask for help during creation
 	int flags;

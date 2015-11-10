@@ -34,11 +34,12 @@
 
 // locals
 void process_build(char_data *ch, room_data *room);
-void setup_building_resources(room_data *room, const Resource list[], bool half);
+void setup_building_resources(room_data *room, struct resource_data *list, bool half);
 void setup_tunnel_entrance(char_data *ch, room_data *room, int dir);
 
 // externs
 extern bool can_claim(char_data *ch);
+extern struct resource_data *copy_resource_list(struct resource_data *input);
 void delete_room_npcs(room_data *room, struct empire_territory_data *ter);
 void free_complex_data(struct complex_room_data *data);
 extern room_data *create_room();
@@ -164,35 +165,30 @@ void check_lay_territory(char_data *ch, room_data *room) {
 
 
 /**
-* This merges a Resource list into another Resource list.
+* This creates a resource list that is a merged copy of two lists. You will
+* need to free_resource_list() on the result when done with it.
 *
-* @param Resource *combine_to The list to merge into.
-* @param const Resource *combine_from The list to copy/merge.
+* @param struct resource_data *combine_a One list of resources.
+* @param struct resource_data *combine_from Another list of resources.
+* @return struct resource_data* The copied/merged list.
 */
-void combine_resources(Resource *combine_to, const Resource *combine_from) {
-	int iter, pos;
-	bool found;
+struct resource_data *combine_resources(struct resource_data *combine_a, struct resource_data *combine_b) {
+	struct resource_data *list, *two, *end;
 	
-	for (iter = 0; combine_from[iter].vnum != NOTHING; ++iter) {
-		found = FALSE;
-		
-		for (pos = 0; combine_to[pos].vnum != NOTHING && !found; ++pos) {
-			if (combine_to[pos].vnum == combine_from[iter].vnum) {
-				found = TRUE;
-				
-				combine_to[pos].amount += combine_from[iter].amount;
-			}
+	list = copy_resource_list(combine_a);
+	two = copy_resource_list(combine_b);
+	
+	if ((end = list)) {
+		while (end->next) {
+			end = end->next;
 		}
-		
-		// did it find one to add to? if not, add to end
-		if (!found) {
-			combine_to[pos].vnum = combine_from[iter].vnum;
-			combine_to[pos].amount = combine_from[iter].amount;
-			
-			// move up the end of the list
-			combine_to[pos+1].vnum = NOTHING;
-		}
+		end->next = two;
 	}
+	else {
+		list = two;
+	}
+	
+	return list;
 }
 
 
@@ -285,10 +281,14 @@ void construct_building(room_data *room, bld_vnum type) {
 * @param int length The number of intervening rooms to add
 */
 void construct_tunnel(char_data *ch, int dir, room_data *entrance, room_data *exit, int length) {
-	Resource resources[4] = { { o_LOG, 12 }, { o_LUMBER, 8 }, { o_NAILS, 4 }, END_RESOURCE_LIST };
+	static struct resource_data *resources = NULL;
 	
 	room_data *new_room, *last_room = entrance, *to_room;
 	int iter;
+	
+	if (!resources) {
+		resources = create_resource_list(o_LOG, 12, o_LUMBER, 8, o_NAILS, 4, NOTHING);
+	}
 
 	// entrance
 	setup_tunnel_entrance(ch, entrance, dir);
@@ -859,24 +859,24 @@ void remove_designate_objects(room_data *room) {
 * state.
 *
 * @param room_data *room The location.
-* @param Resource list[] list of standard resources
+* @param struct resource_data *list of standard resources
 * @param bool half if TRUE cuts amount in half (e.g. dismantle)
 */
-void setup_building_resources(room_data *room, const Resource list[], bool half) {
+void setup_building_resources(room_data *room, struct resource_data *list, bool half) {
 	struct building_resource_type *res, *end;
+	struct resource_data *iter;
 	int div = (half ? 2 : 1);
-	int iter;
 	
 	end = GET_BUILDING_RESOURCES(room);
 	while (end && end->next) {
 		end = end->next;
 	}
 	
-	for (iter = 0; list[iter].vnum != NOTHING; ++iter) {
-		if (list[iter].amount/div > 0) {
+	for (iter = list; iter; iter = iter->next) {
+		if (iter->amount/div > 0) {
 			CREATE(res, struct building_resource_type, 1);
-			res->vnum = list[iter].vnum;
-			res->amount = list[iter].amount/div;
+			res->vnum = iter->vnum;
+			res->amount = iter->amount/div;
 			
 			// apply to end
 			if (end) {
@@ -925,7 +925,7 @@ void setup_tunnel_entrance(char_data *ch, room_data *room, int dir) {
 * @param room_data *loc The location to dismantle.
 */
 void start_dismantle_building(room_data *loc) {
-	Resource composite_resources[MAX_RESOURCES_REQUIRED*2] = { END_RESOURCE_LIST };
+	struct resource_data *composite_resources = NULL, *crcp, *iter;
 	struct building_resource_type *res, *next_res, *findres, *temp;
 	bool deleted = FALSE, found, upgraded = FALSE;
 	room_data *room, *next_room;
@@ -933,7 +933,6 @@ void start_dismantle_building(room_data *loc) {
 	craft_data *type, *up_type;
 	obj_data *obj, *next_obj;
 	bld_data *up_bldg;
-	int iter;
 	
 	if (!IS_MAP_BUILDING(loc)) {
 		log("SYSERR: Attempting to dismantle non-building room #%d", GET_ROOM_VNUM(loc));
@@ -986,13 +985,15 @@ void start_dismantle_building(room_data *loc) {
 	}
 	
 	// prepare resources:
-	combine_resources(composite_resources, GET_CRAFT_RESOURCES(type));
+	composite_resources = copy_resource_list(GET_CRAFT_RESOURCES(type));
 	if (upgraded) {
 		up_bldg = find_upgraded_from(building_proto(GET_CRAFT_BUILD_TYPE(type)));
 		up_type = find_build_craft(GET_BLD_VNUM(up_bldg));
 		
 		while (up_bldg && up_type) {
-			combine_resources(composite_resources, GET_CRAFT_RESOURCES(up_type));
+			crcp = composite_resources;
+			composite_resources = combine_resources(crcp, GET_CRAFT_RESOURCES(up_type));
+			free_resource_list(crcp);
 			
 			up_bldg = find_upgraded_from(up_bldg);
 			up_type = find_build_craft(GET_BLD_VNUM(up_bldg));
@@ -1003,23 +1004,22 @@ void start_dismantle_building(room_data *loc) {
 		// room was already started, so dismantle is more complicated
 	
 		// iterate over all building resources
-		for (iter = 0; composite_resources[iter].vnum != NOTHING; ++iter) {
-		
+		for (iter = composite_resources; iter; iter = iter->next) {		
 			// find out if there's already an entry for this resource
 			found = FALSE;
 			for (findres = BUILDING_RESOURCES(loc); findres; findres = findres->next) {
-				if (findres->vnum == composite_resources[iter].vnum) {
+				if (findres->vnum == iter->vnum) {
 					found = TRUE;
 					// new amount is the difference between the original and the remaining, divided by 2
-					findres->amount = MAX(0, (composite_resources[iter].amount - findres->amount) / 2);
+					findres->amount = MAX(0, (iter->amount - findres->amount) / 2);
 				}
 			}
 			
 			// didn't find, so they already built that entire resource -- add it at half
-			if (!found && composite_resources[iter].amount/2 > 0) {
+			if (!found && iter->amount/2 > 0) {
 				CREATE(res, struct building_resource_type, 1);
-				res->vnum = composite_resources[iter].vnum;
-				res->amount = composite_resources[iter].amount / 2;
+				res->vnum = iter->vnum;
+				res->amount = iter->amount / 2;
 				
 				res->next = GET_BUILDING_RESOURCES(loc);
 				GET_BUILDING_RESOURCES(loc) = res;
@@ -1044,6 +1044,10 @@ void start_dismantle_building(room_data *loc) {
 	SET_BIT(ROOM_AFF_FLAGS(loc), ROOM_AFF_DISMANTLING);
 	SET_BIT(ROOM_BASE_FLAGS(loc), ROOM_AFF_DISMANTLING);
 	delete_room_npcs(loc, NULL);
+	
+	if (composite_resources) {
+		free_resource_list(composite_resources);
+	}
 }
 
 
@@ -1445,7 +1449,7 @@ void do_customize_room(char_data *ch, char *argument) {
 			
 			msg_to_char(ch, "This room no longer has a custom name.\r\n");
 		}
-		else if (count_color_codes(arg2) > 0) {
+		else if (color_code_length(arg2) > 0) {
 			msg_to_char(ch, "You cannot use color codes in custom room names.\r\n");
 		}
 		else if (strlen(arg2) > 60) {
@@ -1761,10 +1765,14 @@ ACMD(do_interlink) {
 
 
 ACMD(do_lay) {
-	Resource cost[3] = { { o_ROCK, 20 }, END_RESOURCE_LIST };
+	static struct resource_data *cost = NULL;
 	sector_data *original_sect = SECT(IN_ROOM(ch));
 	sector_data *check_sect = (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_IS_ROAD) ? BASE_SECT(IN_ROOM(ch)) : SECT(IN_ROOM(ch)));
 	sector_data *road_sect = find_first_matching_sector(SECTF_IS_ROAD, NOBITS);
+	
+	if (!cost) {
+		cost = create_resource_list(o_ROCK, 20, NOTHING);
+	}
 
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs can't lay roads.\r\n");
@@ -1834,7 +1842,7 @@ ACMD(do_lay) {
 
 
 ACMD(do_maintain) {
-	Resource res[3] = { { o_LUMBER, BUILDING_DISREPAIR(IN_ROOM(ch)) }, { o_NAILS, BUILDING_DISREPAIR(IN_ROOM(ch)) }, END_RESOURCE_LIST };
+	struct resource_data *res = create_resource_list(o_LUMBER, BUILDING_DISREPAIR(IN_ROOM(ch)), o_NAILS, BUILDING_DISREPAIR(IN_ROOM(ch)), NOTHING);
 	
 	if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		msg_to_char(ch, "You can't perform maintenance here.\r\n");
@@ -1852,6 +1860,8 @@ ACMD(do_maintain) {
 		act("$n performs some quick maintenance on the building.", TRUE, ch, NULL, NULL, TO_ROOM);
 		command_lag(ch, WAIT_OTHER);
 	}
+	
+	free_resource_list(res);
 }
 
 

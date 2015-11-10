@@ -34,7 +34,7 @@ void init_skills() {
 	void sort_skills_and_abilities();
 	void init_skill_data();
 	void init_ability_data();
-	void setup_skill(int number, char *name, int flags, char *description, char *creation_description);
+	void setup_skill(int number, char *name, char *abbrev, int flags, char *description, char *creation_description);
 	void setup_ability(int number, int parent_skill, int parent_skill_required, int parent_ability, char *name);
 	
 	#define setup_class_ability(abil, name)	setup_ability((abil), NO_SKILL, 100, NO_PREREQ, name)
@@ -43,7 +43,7 @@ void init_skills() {
 	init_ability_data();
 
 	// Battle
-	setup_skill(SKILL_BATTLE, "Battle", 0, "Charge confidently into combat", "Battle is important for combat, especially tanks and melee damage characters");
+	setup_skill(SKILL_BATTLE, "Battle", "Btl", 0, "Charge confidently into combat", "Battle is important for combat, especially tanks and melee damage characters");
 		setup_ability(ABIL_ENDURANCE, SKILL_BATTLE, 75, NO_PREREQ, "Endurance");
 		setup_ability(ABIL_REFLEXES, SKILL_BATTLE, 15, NO_PREREQ, "Reflexes");
 			setup_ability(ABIL_SHIELD_BLOCK, SKILL_BATTLE, 30, ABIL_REFLEXES, "Shield Block");
@@ -73,7 +73,7 @@ void init_skills() {
 	
 
 	// Empire: gains up to 15 just from simple empire tasks
-	setup_skill(SKILL_EMPIRE, "Empire", 0, "Lead your empire to greatness", "Empire allows you to construct buildings and cities");
+	setup_skill(SKILL_EMPIRE, "Empire", "Emp", 0, "Lead your empire to greatness", "Empire allows you to construct buildings and cities");
 		setup_ability(ABIL_BARDE, SKILL_EMPIRE, 20, NO_PREREQ, "Barde");
 		setup_ability(ABIL_LOCKS, SKILL_EMPIRE, 30, NO_PREREQ, "Locksmithing");
 			setup_ability(ABIL_RAISE_ARMIES, SKILL_EMPIRE, 50, ABIL_LOCKS, "Raise Armies");
@@ -105,7 +105,7 @@ void init_skills() {
 			setup_ability(ABIL_RARE_METALS, SKILL_EMPIRE, 70, ABIL_PROSPECT, "Rare Metals");
 	// end Empire
 	
-	setup_skill(SKILL_HIGH_SORCERY, "High Sorcery", 0, "Learn the secrets of the imperial sorcerers", "High Sorcery lets you cast powerful spells, rituals, and enchantments");
+	setup_skill(SKILL_HIGH_SORCERY, "High Sorcery", "HiS", 0, "Learn the secrets of the imperial sorcerers", "High Sorcery lets you cast powerful spells, rituals, and enchantments");
 		setup_ability(ABIL_RITUAL_OF_BURDENS, SKILL_HIGH_SORCERY, 1, NO_PREREQ, "Ritual of Burdens");
 			setup_ability(ABIL_VIGOR, SKILL_HIGH_SORCERY, 40, ABIL_RITUAL_OF_BURDENS, "Vigor");
 			setup_ability(ABIL_DEVASTATION_RITUAL, SKILL_HIGH_SORCERY, 55, ABIL_RITUAL_OF_BURDENS, "Devastation Ritual");
@@ -140,7 +140,7 @@ void init_skills() {
 		setup_ability(ABIL_ARCANE_POWER, SKILL_HIGH_SORCERY, 75, NO_PREREQ, "Arcane Power");
 	// end High Sorcery
 	
-	setup_skill(SKILL_NATURAL_MAGIC, "Natural Magic", 0, "Attain mastery over the natural world", "Natural Magic lets you use mana to heal, fight, and make potions");
+	setup_skill(SKILL_NATURAL_MAGIC, "Natural Magic", "NtM", 0, "Attain mastery over the natural world", "Natural Magic lets you use mana to heal, fight, and make potions");
 		setup_ability(ABIL_HEAL, SKILL_NATURAL_MAGIC, 1, NO_PREREQ, "Heal");
 			setup_ability(ABIL_HEAL_FRIEND, SKILL_NATURAL_MAGIC, 10, ABIL_HEAL, "Heal Friend");
 				setup_ability(ABIL_REJUVENATE, SKILL_NATURAL_MAGIC, 50, ABIL_HEAL_FRIEND, "Rejuvenate");
@@ -171,7 +171,7 @@ void init_skills() {
 					setup_ability(ABIL_WRATH_OF_NATURE_POTIONS, SKILL_NATURAL_MAGIC, 95, ABIL_HEALING_ELIXIRS, "Wrath of Nature Potions");
 	// end Natural Magic
 	
-	setup_skill(SKILL_STEALTH, "Stealth", 0, "Become one with the shadows and learn their secrets", "Stealth lets you hide, sneak, infiltrate, steal, and create poisons");
+	setup_skill(SKILL_STEALTH, "Stealth", "Stl", 0, "Become one with the shadows and learn their secrets", "Stealth lets you hide, sneak, infiltrate, steal, and create poisons");
 		setup_ability(ABIL_SNEAK, SKILL_STEALTH, 1, NO_PREREQ, "Sneak");
 			setup_ability(ABIL_PICKPOCKET, SKILL_STEALTH, 10, ABIL_SNEAK, "Pickpocket");
 				setup_ability(ABIL_STEAL, SKILL_STEALTH, 50, ABIL_PICKPOCKET, "Steal");
@@ -202,7 +202,7 @@ void init_skills() {
 				setup_ability(ABIL_PRICK, SKILL_STEALTH, 75, ABIL_POISONS, "Prick");
 	// end Stealth
 	
-	setup_skill(SKILL_SURVIVAL, "Survival", 0, "Make your way in the harsh wilderness", "Survival helps you navigate, find food, drink less, and ride animals");
+	setup_skill(SKILL_SURVIVAL, "Survival", "Srv", 0, "Make your way in the harsh wilderness", "Survival helps you navigate, find food, drink less, and ride animals");
 		setup_ability(ABIL_SWIMMING, SKILL_SURVIVAL, 15, NO_PREREQ, "Swimming");
 		setup_ability(ABIL_FORAGE, SKILL_SURVIVAL, 15, NO_PREREQ, "Forage");
 			setup_ability(ABIL_SATED_THIRST, SKILL_SURVIVAL, 75, ABIL_FORAGE, "Sated Thirst");
@@ -228,7 +228,7 @@ void init_skills() {
 			setup_ability(ABIL_HUNT, SKILL_SURVIVAL, 10, ABIL_BUTCHER, "Hunt");
 		setup_ability(ABIL_MASTER_SURVIVALIST, SKILL_SURVIVAL, 95, NO_PREREQ, "Master Survivalist");
 	
-	setup_skill(SKILL_TRADE, "Trade", 0, "Earn your fortune on the roads and seas", "Trade allows you to craft tools, weapons, ships, and trinkets");
+	setup_skill(SKILL_TRADE, "Trade", "Trd", 0, "Earn your fortune on the roads and seas", "Trade allows you to craft tools, weapons, ships, and trinkets");
 		setup_ability(ABIL_FORGE, SKILL_TRADE, 15, NO_PREREQ, "Forge");
 			setup_ability(ABIL_WEAPONCRAFTING, SKILL_TRADE, 30, ABIL_FORGE, "Weaponcrafting");
 				setup_ability(ABIL_IRON_BLADES, SKILL_TRADE, 55, ABIL_WEAPONCRAFTING, "Iron Blades");
@@ -260,7 +260,7 @@ void init_skills() {
 		setup_ability(ABIL_MASTER_FARMER, SKILL_TRADE, 75, NO_PREREQ, "Master Farmer");
 	// end Trade
 	
-	setup_skill(SKILL_VAMPIRE, "Vampire", SKLF_VAMPIRE, "Feed the hunger, control the blood", "Vampire allows you to drink only blood, to shapeshift, and see in the dark");
+	setup_skill(SKILL_VAMPIRE, "Vampire", "Vmp", SKLF_VAMPIRE, "Feed the hunger, control the blood", "Vampire allows you to drink only blood, to shapeshift, and see in the dark");
 		setup_ability(ABIL_REGENERATE, SKILL_VAMPIRE, 15, NO_PREREQ, "Regenerate");
 			setup_ability(ABIL_ALACRITY, SKILL_VAMPIRE, 60, ABIL_REGENERATE, "Alacrity");
 		setup_ability(ABIL_TASTE_BLOOD, SKILL_VAMPIRE, 15, NO_PREREQ, "Taste Blood");
@@ -366,12 +366,15 @@ void init_skill_data() {
 /**
 * int number The skill's SKILL_x define
 * char *name The skill's display name
+* char *abbrev A short name (4 letters)
 * int flags Any skills flags to set
 * char *description The skill's one-line description.
+* char *creation_description The help text for character creation.
 */
-void setup_skill(int number, char *name, int flags, char *description, char *creation_description) {
+void setup_skill(int number, char *name, char *abbrev, int flags, char *description, char *creation_description) {
 	skill_data[number].number = number;	// yo dawg, I heard you liked numbers
 	skill_data[number].name = strdup(name);
+	skill_data[number].abbrev = strdup(abbrev);
 	skill_data[number].flags = flags;
 	skill_data[number].description = strdup(description);
 	skill_data[number].creation_description = strdup(creation_description);

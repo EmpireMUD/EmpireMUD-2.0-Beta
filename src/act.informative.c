@@ -344,13 +344,26 @@ void diag_char_to_char(char_data *i, char_data *ch) {
 * @param char_data *to The person to show them to.
 */
 void display_attributes(char_data *ch, char_data *to) {
+	extern struct attribute_data_type attributes[NUM_ATTRIBUTES];
+	extern int attribute_display_order[NUM_ATTRIBUTES];
+	
+	char buf[MAX_STRING_LENGTH];
+	int iter, pos;
+
 	if (!ch || !to || !to->desc) {
 		return;
 	}
 	
 	msg_to_char(to, "        Physical                   Social                      Mental\r\n");
-	msg_to_char(to, "  Strength  [%s%2d&0]           Charisma  [%s%2d&0]           Intelligence  [%s%2d&0]\r\n", HAPPY_COLOR(GET_STRENGTH(ch), ch->real_attributes[STRENGTH]), GET_STRENGTH(ch), HAPPY_COLOR(GET_CHARISMA(ch), ch->real_attributes[CHARISMA]), GET_CHARISMA(ch), HAPPY_COLOR(GET_INTELLIGENCE(ch), ch->real_attributes[INTELLIGENCE]), GET_INTELLIGENCE(ch));
-	msg_to_char(to, "  Dexterity  [%s%2d&0]          Greatness  [%s%2d&0]          Wits  [%s%2d&0]\r\n", HAPPY_COLOR(GET_DEXTERITY(ch), ch->real_attributes[DEXTERITY]), GET_DEXTERITY(ch), HAPPY_COLOR(GET_GREATNESS(ch), ch->real_attributes[GREATNESS]), GET_GREATNESS(ch), HAPPY_COLOR(GET_WITS(ch), ch->real_attributes[WITS]), GET_WITS(ch));
+	
+	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
+		pos = attribute_display_order[iter];
+		snprintf(buf, sizeof(buf), "%s  [%s%2d\t0]", attributes[pos].name, HAPPY_COLOR(GET_ATT(ch, pos), GET_REAL_ATT(ch, pos)), GET_ATT(ch, pos));
+		msg_to_char(ch, "  %-*.*s%s", 23 + color_code_length(buf), 23 + color_code_length(buf), buf, !((iter + 1) % 3) ? "\r\n" : "");
+	}
+	if (iter % 3) {
+		msg_to_char(ch, "\r\n");
+	}
 }
 
 
@@ -447,9 +460,8 @@ void display_score_to_char(char_data *ch, char_data *to) {
 		strcpy(lbuf, "&gnone&0");
 	}
 	// gotta count the color codes to determine width
-	count = 37 + (2 * count_color_codes(lbuf));
-	sprintf(lbuf2, "  Conditions: %%-%d.%ds", count, count);
-	msg_to_char(to, lbuf2, lbuf);
+	count = 37 + color_code_length(lbuf);
+	msg_to_char(ch, "  Conditions: %-*.*s", count, count, lbuf);
 	
 	if (IS_VAMPIRE(ch)) {
 		msg_to_char(to, " Blood: &r%d&0/&r%d&0-&r%d&0/hr\r\n", GET_BLOOD(ch), GET_MAX_BLOOD(ch), get_blood_upkeep_cost(ch));
@@ -500,9 +512,8 @@ void display_score_to_char(char_data *ch, char_data *to) {
 				sprintf(lbuf + strlen(lbuf), " &g(%d)", pts);
 			}
 			
-			cols = 25 + (2 * count_color_codes(lbuf));
-			sprintf(lbuf2, "%%-%d.%ds&0", cols, cols);
-			msg_to_char(to, lbuf2, lbuf);
+			cols = 25 + color_code_length(lbuf);
+			msg_to_char(ch, "%-*.*s&0", cols, cols, lbuf);
 			
 			if (++count == 3) {
 				msg_to_char(to, "&0\r\n ");
@@ -918,7 +929,9 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 		list_obj_to_char(i->carrying, ch, OBJ_DESC_INVENTORY, TRUE);
 
 		if (ch != i && i->carrying) {
-			gain_ability_exp(ch, ABIL_APPRAISAL, 5);
+			if (can_gain_exp_from(ch, i)) {
+				gain_ability_exp(ch, ABIL_APPRAISAL, 5);
+			}
 			GET_WAIT_STATE(ch) = MAX(GET_WAIT_STATE(ch), 0.5 RL_SEC);
 		}
 	}
@@ -1409,8 +1422,8 @@ char *one_who_line(char_data *ch, bool shortlist, bool screenreader) {
 	
 	// shortlist ends here
 	if (shortlist) {
-		num = count_color_codes(out);
-		sprintf(buf, "%%-%d.%ds", 35 + 2 * num, 35 + 2 * num);
+		num = color_code_length(out);
+		sprintf(buf, "%%-%d.%ds", 35 + num, 35 + num);
 		strcpy(buf1, out);
 		
 		size = snprintf(out, sizeof(out), buf, buf1);
