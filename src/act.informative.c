@@ -359,10 +359,10 @@ void display_attributes(char_data *ch, char_data *to) {
 	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
 		pos = attribute_display_order[iter];
 		snprintf(buf, sizeof(buf), "%s  [%s%2d\t0]", attributes[pos].name, HAPPY_COLOR(GET_ATT(ch, pos), GET_REAL_ATT(ch, pos)), GET_ATT(ch, pos));
-		msg_to_char(ch, "  %-*.*s%s", 23 + color_code_length(buf), 23 + color_code_length(buf), buf, !((iter + 1) % 3) ? "\r\n" : "");
+		msg_to_char(to, "  %-*.*s%s", 23 + color_code_length(buf), 23 + color_code_length(buf), buf, !((iter + 1) % 3) ? "\r\n" : "");
 	}
 	if (iter % 3) {
-		msg_to_char(ch, "\r\n");
+		msg_to_char(to, "\r\n");
 	}
 }
 
@@ -461,7 +461,7 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	}
 	// gotta count the color codes to determine width
 	count = 37 + color_code_length(lbuf);
-	msg_to_char(ch, "  Conditions: %-*.*s", count, count, lbuf);
+	msg_to_char(to, "  Conditions: %-*.*s", count, count, lbuf);
 	
 	if (IS_VAMPIRE(ch)) {
 		msg_to_char(to, " Blood: &r%d&0/&r%d&0-&r%d&0/hr\r\n", GET_BLOOD(ch), GET_MAX_BLOOD(ch), get_blood_upkeep_cost(ch));
@@ -513,7 +513,7 @@ void display_score_to_char(char_data *ch, char_data *to) {
 			}
 			
 			cols = 25 + color_code_length(lbuf);
-			msg_to_char(ch, "%-*.*s&0", cols, cols, lbuf);
+			msg_to_char(to, "%-*.*s&0", cols, cols, lbuf);
 			
 			if (++count == 3) {
 				msg_to_char(to, "&0\r\n ");

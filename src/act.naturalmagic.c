@@ -963,10 +963,13 @@ ACMD(do_heal) {
 	
 	int heal_levels[] = { 15, 25, 35 };
 	double intel_bonus[] = { 0.5, 1.5, 2.0 };
-	double level_bonus[] = { 0.5, 1.0, 1.5 };
-	double cost_ratio[] = { 0.75, 0.5, 0.25 };	// multiplied by amount healed
+	double base_cost_ratio = 0.75;	// multiplied by amount healed
 	double party_cost = 1.25;
 	double self_cost = 0.75;
+	
+	// Healer ability features
+	double healer_cost_ratio = 0.25;
+	double healer_level_bonus = 1.5;	// times levels over 100
 	
 	one_argument(argument, arg);
 	
@@ -1002,6 +1005,10 @@ ACMD(do_heal) {
 		msg_to_char(ch, "Unfortunately you can't heal on someone who is already dead.\r\n");
 		return;
 	}
+	if (!party && is_fight_enemy(ch, vict)) {
+		msg_to_char(ch, "You can't heal an enemy like that.\r\n");
+		return;
+	}
 	
 	// determine cost
 	if (party) {
@@ -1017,7 +1024,10 @@ ACMD(do_heal) {
 	}
 
 	// amount to heal will determine the cost
-	amount = CHOOSE_BY_ABILITY_LEVEL(heal_levels, ch, abil) + (GET_INTELLIGENCE(ch) * CHOOSE_BY_ABILITY_LEVEL(intel_bonus, ch, abil)) + (MAX(0, get_approximate_level(ch) - 100) * CHOOSE_BY_ABILITY_LEVEL(level_bonus, ch, abil));
+	amount = CHOOSE_BY_ABILITY_LEVEL(heal_levels, ch, abil) + (GET_INTELLIGENCE(ch) * CHOOSE_BY_ABILITY_LEVEL(intel_bonus, ch, abil));
+	if (HAS_ABILITY(ch, ABIL_HEALER)) {
+		amount += (MAX(0, get_approximate_level(ch) - 100) * healer_level_bonus);
+	}
 	bonus = total_bonus_healing(ch);
 	
 	if (vict && !party) {
@@ -1026,7 +1036,12 @@ ACMD(do_heal) {
 		amount = MAX(1, amount);
 	}
 	
-	cost = amount * CHOOSE_BY_ABILITY_LEVEL(cost_ratio, ch, abil);
+	if (HAS_ABILITY(ch, ABIL_HEALER)) {
+		cost = amount * base_cost_ratio;
+	}
+	else {
+		cost = amount * healer_cost_ratio;
+	}
 	
 	// bonus healing does not add to cost
 	amount += bonus;
@@ -1268,9 +1283,12 @@ ACMD(do_rejuvenate) {
 	
 	int heal_levels[] = { 4, 6, 8 };	// x6 ticks (24, 36, 42)
 	double int_mod = 0.3333;
-	double over_level_mod = 1.0/4.0;
 	double bonus_heal_mod = 1.0/4.0;
-	double cost_mod[] = { 2.0, 1.5, 1.1 };
+	double base_cost_mod = 2.0;
+	
+	// healer ability mods
+	double over_level_mod = 1.0/4.0;
+	double healer_cost_mod = 1.1;
 	
 	one_argument(argument, arg);
 	
@@ -1284,10 +1302,15 @@ ACMD(do_rejuvenate) {
 	
 	// amount determines cost
 	amount = CHOOSE_BY_ABILITY_LEVEL(heal_levels, ch, ABIL_REJUVENATE);
-	amount += round(MAX(0, get_approximate_level(ch) - 100) * over_level_mod);
 	amount += round(GET_INTELLIGENCE(ch) * int_mod);
+	if (HAS_ABILITY(ch, ABIL_HEALER)) {
+		amount += round(MAX(0, get_approximate_level(ch) - 100) * over_level_mod);
+		cost = round(amount * healer_cost_mod);
+	}
+	else {
+		cost = round(amount * base_cost_mod);
+	}
 	
-	cost = round(amount * CHOOSE_BY_ABILITY_LEVEL(cost_mod, ch, ABIL_REJUVENATE));
 	cost = MAX(1, cost);
 	
 	// does not affect the cost

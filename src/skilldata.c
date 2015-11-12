@@ -41,6 +41,8 @@ void init_skills() {
 	
 	init_skill_data();
 	init_ability_data();
+	
+	// ABIL_x (search tag): ability definitions and assignments are here
 
 	// Battle
 	setup_skill(SKILL_BATTLE, "Battle", "Btl", 0, "Charge confidently into combat", "Battle is important for combat, especially tanks and melee damage characters");
@@ -308,6 +310,7 @@ void init_skills() {
 	setup_class_ability(ABIL_FASTCASTING, "Fastcasting");
 	setup_class_ability(ABIL_GRIFFIN, "Griffin");
 	setup_class_ability(ABIL_GUILDSMAN_CRAFTS, "Guildsman Crafts");
+	setup_class_ability(ABIL_HEALER, "Healer");
 	setup_class_ability(ABIL_HORRID_FORM, "Horrid Form");
 	setup_class_ability(ABIL_HOWL, "Howl");
 	setup_class_ability(ABIL_MANTICORE, "Manticore");
