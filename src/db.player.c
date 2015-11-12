@@ -2841,6 +2841,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	ch->next = character_list;
 	character_list = ch;
 	char_to_room(ch, load_room);
+	ch->prev_logon = ch->player.time.logon;	// and update prev_logon now
 	if (dolog) {
 		announce_login(ch);
 	}
@@ -2944,7 +2945,6 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	add_to_lookup_table(GET_ID(ch), (void *)ch);
 	
 	// update the index in case any of this changed
-	ch->prev_logon = ch->player.time.logon;	// and update prev_logon here
 	index = find_player_index_by_idnum(GET_IDNUM(ch));
 	update_player_index(index, ch);
 	
