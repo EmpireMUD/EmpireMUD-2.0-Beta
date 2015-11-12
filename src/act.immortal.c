@@ -301,6 +301,7 @@ ADMIN_UTIL(util_islandsize);
 ADMIN_UTIL(util_playerdump);
 ADMIN_UTIL(util_randtest);
 ADMIN_UTIL(util_redo_islands);
+ADMIN_UTIL(util_rescan);
 ADMIN_UTIL(util_strlen);
 ADMIN_UTIL(util_tool);
 
@@ -316,6 +317,7 @@ struct {
 	{ "playerdump", LVL_IMPL, util_playerdump },
 	{ "randtest", LVL_CIMPL, util_randtest },
 	{ "redoislands", LVL_CIMPL, util_redo_islands },
+	{ "rescan", LVL_START_IMM, util_rescan },
 	{ "strlen", LVL_START_IMM, util_strlen },
 	{ "tool", LVL_IMPL, util_tool },
 
@@ -554,6 +556,31 @@ ADMIN_UTIL(util_redo_islands) {
 		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has renumbered islands", GET_NAME(ch));
 		number_and_count_islands(TRUE);
 		msg_to_char(ch, "Islands renumbered. Caution: empire inventories may now be in the wrong place.\r\n");
+	}
+}
+
+
+ADMIN_UTIL(util_rescan) {
+	empire_data *emp;
+	
+	if (GET_ACCESS_LEVEL(ch) < LVL_CIMPL && !IS_GRANTED(ch, GRANT_EMPIRES)) {
+		msg_to_char(ch, "You don't have permission to rescan empires.\r\n");
+	}
+	else if (!*argument) {
+		msg_to_char(ch, "Usage: rescan <empire | all>\r\n");
+	}
+	else if (!str_cmp(argument, "all")) {
+		syslog(SYS_INFO, GET_INVIS_LEV(ch), TRUE, "Rescanning all empires");
+		reread_empire_tech(NULL);
+		send_config_msg(ch, "ok_string");
+	}
+	else if (!(emp = get_empire_by_name(argument))) {
+		msg_to_char(ch, "Unknown empire.\r\n");
+	}
+	else {
+		syslog(SYS_INFO, GET_INVIS_LEV(ch), TRUE, "Rescanning empire: %s", EMPIRE_NAME(emp));
+		reread_empire_tech(emp);
+		send_config_msg(ch, "ok_string");
 	}
 }
 
