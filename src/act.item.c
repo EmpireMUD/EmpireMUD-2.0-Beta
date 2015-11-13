@@ -438,7 +438,15 @@ int obj_carry_size(obj_data *obj) {
 	int size = 0;
 	
 	// my size
-	size = OBJ_FLAGGED(obj, OBJ_LARGE) ? 2 : 1;
+	if (IS_COINS(obj)) {
+		size = 0;
+	}
+	else if (OBJ_FLAGGED(obj, OBJ_LARGE)) {
+		size = 2;
+	}
+	else {
+		size = 1;
+	}
 	
 	// size of contents
 	for (iter = obj->contains; iter; iter = iter->next_content) {
