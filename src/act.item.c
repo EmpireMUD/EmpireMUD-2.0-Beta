@@ -78,7 +78,7 @@ static void wear_message(char_data *ch, obj_data *obj, int where);
 * @return bool TRUE if ch can take obj.
 */
 static bool can_take_obj(char_data *ch, obj_data *obj) {
-	if (!IS_NPC(ch) && IS_CARRYING_N(ch) + obj_carry_size(obj) > CAN_CARRY_N(ch)) {
+	if (!IS_NPC(ch) && !CAN_CARRY_OBJ(ch, obj)) {
 		act("$p: you can't carry that many items.", FALSE, ch, obj, 0, TO_CHAR);
 		return FALSE;
 	}
@@ -797,7 +797,7 @@ static bool perform_get_from_container(char_data *ch, obj_data *obj, obj_data *c
 			return FALSE;
 		}
 	}
-	if (!IS_NPC(ch) && IS_CARRYING_N(ch) + obj_carry_size(obj) > CAN_CARRY_N(ch)) {
+	if (!IS_NPC(ch) && !CAN_CARRY_OBJ(ch, obj)) {
 		act("$p: you can't hold any more items.", FALSE, ch, obj, 0, TO_CHAR);
 		return FALSE;
 	}
@@ -920,7 +920,7 @@ static bool perform_get_from_room(char_data *ch, obj_data *obj) {
 			return FALSE;
 		}
 	}
-	if (!IS_NPC(ch) && IS_CARRYING_N(ch) + obj_carry_size(obj) > CAN_CARRY_N(ch)) {
+	if (!IS_NPC(ch) && !CAN_CARRY_OBJ(ch, obj)) {
 		act("$p: you can't hold any more items.", FALSE, ch, obj, 0, TO_CHAR);
 		return FALSE;
 	}
@@ -1045,7 +1045,7 @@ static void perform_give(char_data *ch, char_data *vict, obj_data *obj) {
 	}
 	
 	// NPCs usually have no carry limit, but 'give' is an exception because otherwise crazy ensues
-	if (IS_CARRYING_N(vict) + obj_carry_size(obj) > CAN_CARRY_N(vict)) {
+	if (!CAN_CARRY_OBJ(vict, obj)) {
 		act("$N seems to have $S hands full.", FALSE, ch, 0, vict, TO_CHAR);
 		return;
 	}
@@ -2313,7 +2313,7 @@ void trade_buy(char_data *ch, char *argument) {
 			msg_to_char(ch, "You can't afford the cost of %s.\r\n", money_amount(coin_emp, tpd->buy_cost));
 			return;
 		}
-		if (IS_CARRYING_N(ch) + obj_carry_size(tpd->obj) > CAN_CARRY_N(ch)) {
+		if (!CAN_CARRY_OBJ(ch, tpd->obj)) {
 			msg_to_char(ch, "Your inventory is too full to buy that.\r\n");
 			return;
 		}
@@ -2449,7 +2449,7 @@ void trade_collect(char_data *ch, char *argument) {
 		}
 		if (IS_SET(tpd->state, TPD_EXPIRED) && IS_SET(tpd->state, TPD_OBJ_PENDING)) {
 			if (tpd->obj) {
-				if (IS_CARRYING_N(ch) + obj_carry_size(tpd->obj) > CAN_CARRY_N(ch)) {
+				if (!CAN_CARRY_OBJ(ch, tpd->obj)) {
 					full = TRUE;
 					continue;	// EARLY CONTINUE IN THE LOOP
 				}
@@ -2896,7 +2896,7 @@ void warehouse_retrieve(char_data *ch, char *argument) {
 		
 		// load the actual objs
 		while (!done && iter->amount > 0 && (all || amt-- > 0)) {
-			if (iter->obj && IS_CARRYING_N(ch) + obj_carry_size(iter->obj) > CAN_CARRY_N(ch)) {
+			if (iter->obj && !CAN_CARRY_OBJ(ch, iter->obj)) {
 				msg_to_char(ch, "Your arms are full.\r\n");
 				done = TRUE;
 				break;
