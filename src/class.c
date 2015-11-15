@@ -332,6 +332,7 @@ void update_class(char_data *ch) {
 	
 	int iter, skl, class = CLASS_NONE, at_zero = 0, over_basic = 0, over_specialty = 0;
 	int best[NUM_BEST], best_level[NUM_BEST], best_iter, best_sub, best_total;
+	struct player_skill_data *skdata, *next_skill;
 	int total_class_skill, total_skill;
 	int old_class, old_level;
 	bool ok;
@@ -343,24 +344,26 @@ void update_class(char_data *ch) {
 			best_level[best_iter] = 0;
 		}
 		
+		at_zero = NUM_SKILLS;
+		
 		// find skill counts
-		for (iter = 0; iter < NUM_SKILLS; ++iter) {
-			total_skill += GET_SKILL(ch, iter);
+		HASH_ITER(hh, GET_SKILL_HASH(ch), skdata, next_skill) {
+			total_skill += skdata->level;
 			
-			if (GET_SKILL(ch, iter) == 0) {
-				++at_zero;
+			if (skdata->level > 0) {
+				--at_zero;
 			}
-			if (GET_SKILL(ch, iter) > BASIC_SKILL_CAP) {
+			if (skdata->level > BASIC_SKILL_CAP) {
 				++over_basic;
 			}
-			if (GET_SKILL(ch, iter) > SPECIALTY_SKILL_CAP) {
+			if (skdata->level > SPECIALTY_SKILL_CAP) {
 				++over_specialty;
 			}
 			
 			// update best
 			for (best_iter = 0; best_iter < NUM_BEST; ++best_iter) {
 				// new best
-				if (GET_SKILL(ch, iter) > best_level[best_iter]) {
+				if (skdata->level > best_level[best_iter]) {
 					// move down the other best first
 					for (best_sub = NUM_BEST - 1; best_sub > best_iter; --best_sub) {
 						best[best_sub] = best[best_sub-1];
@@ -368,8 +371,8 @@ void update_class(char_data *ch) {
 					}
 					
 					// store this one
-					best[best_iter] = iter;
-					best_level[best_iter] = GET_SKILL(ch, iter);
+					best[best_iter] = skdata->skill_id;
+					best_level[best_iter] = skdata->level;
 					
 					// ONLY update the first matching best
 					break;
@@ -394,8 +397,8 @@ void update_class(char_data *ch) {
 			ok = TRUE;
 			total_class_skill = 0;
 			for (skl = 0; skl < SKILLS_PER_CLASS && ok; ++skl) {
-				if (class_data[iter].skills[skl] != NO_SKILL && GET_SKILL(ch, class_data[iter].skills[skl]) > SPECIALTY_SKILL_CAP) {
-					total_class_skill += GET_SKILL(ch, class_data[iter].skills[skl]);
+				if (class_data[iter].skills[skl] != NO_SKILL && get_skill_level(ch, class_data[iter].skills[skl]) > SPECIALTY_SKILL_CAP) {
+					total_class_skill += get_skill_level(ch, class_data[iter].skills[skl]);
 				}
 				else {
 					ok = FALSE;

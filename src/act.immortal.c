@@ -1425,7 +1425,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		}
 
 		// victory
-		old_level = GET_SKILL(vict, skill);
+		old_level = get_skill_level(vict, skill);
 		set_skill(vict, skill, level);
 		if (old_level > level) {
 			clear_char_abilities(vict, skill);
@@ -1846,7 +1846,7 @@ SHOW(show_skills) {
 	msg_to_char(ch, "Skills for %s:\r\n", PERS(vict, ch, TRUE));
 	
 	for (sk_iter = 0; sk_iter < NUM_SKILLS; ++sk_iter) {
-		msg_to_char(ch, "&y%s&0 [%d, %.1f%%, %d]: ", skill_data[sk_iter].name, GET_SKILL(vict, sk_iter), GET_SKILL_EXP(vict, sk_iter), get_ability_points_available_for_char(vict, sk_iter));
+		msg_to_char(ch, "&y%s&0 [%d, %.1f%%, %d]: ", skill_data[sk_iter].name, get_skill_level(vict, sk_iter), get_skill_exp(vict, sk_iter), get_ability_points_available_for_char(vict, sk_iter));
 		
 		found = FALSE;
 		for (ab_iter = 0; ab_iter < NUM_ABILITIES; ++ab_iter) {

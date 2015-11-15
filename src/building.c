@@ -518,7 +518,7 @@ void finish_building(char_data *ch, room_data *room) {
 				if (type && GET_CRAFT_ABILITY(type) != NO_ABIL) {
 					gain_ability_exp(c, GET_CRAFT_ABILITY(type), 3);
 				}
-				else if (GET_SKILL(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
+				else if (get_skill_level(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
 					gain_skill_exp(c, SKILL_EMPIRE, 3);
 				}
 			}
@@ -755,7 +755,7 @@ void process_build(char_data *ch, room_data *room) {
 		if (type && GET_CRAFT_ABILITY(type) != NO_ABIL) {
 			gain_ability_exp(ch, GET_CRAFT_ABILITY(type), 3);
 		}
-		else if (GET_SKILL(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
+		else if (get_skill_level(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
 			gain_skill_exp(ch, SKILL_EMPIRE, 3);
 		}			
 	}

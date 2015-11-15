@@ -432,7 +432,7 @@ void finish_gen_craft(char_data *ch) {
 		gain_ability_exp(ch, GET_CRAFT_ABILITY(type), 33.4);
 	}
 	else {
-		if (GET_SKILL(ch, SKILL_TRADE) < EMPIRE_CHORE_SKILL_CAP) {
+		if (get_skill_level(ch, SKILL_TRADE) < EMPIRE_CHORE_SKILL_CAP) {
 			gain_skill_exp(ch, SKILL_TRADE, 33.4);
 		}
 	}
@@ -550,13 +550,13 @@ void scale_craftable(obj_data *obj, char_data *ch, craft_data *craft) {
 			}
 			else if ((psr = GET_PARENT_SKILL_REQUIRED(GET_CRAFT_ABILITY(craft))) != NOTHING) {
 				if (psr < BASIC_SKILL_CAP) {
-					level = MIN(BASIC_SKILL_CAP, GET_SKILL(ch, ability_data[GET_CRAFT_ABILITY(craft)].parent_skill));
+					level = MIN(BASIC_SKILL_CAP, get_skill_level(ch, ability_data[GET_CRAFT_ABILITY(craft)].parent_skill));
 				}
 				else if (psr < SPECIALTY_SKILL_CAP) {
-					level = MIN(SPECIALTY_SKILL_CAP, GET_SKILL(ch, ability_data[GET_CRAFT_ABILITY(craft)].parent_skill));
+					level = MIN(SPECIALTY_SKILL_CAP, get_skill_level(ch, ability_data[GET_CRAFT_ABILITY(craft)].parent_skill));
 				}
 				else {
-					level = MIN(CLASS_SKILL_CAP, GET_SKILL(ch, ability_data[GET_CRAFT_ABILITY(craft)].parent_skill));
+					level = MIN(CLASS_SKILL_CAP, get_skill_level(ch, ability_data[GET_CRAFT_ABILITY(craft)].parent_skill));
 				}
 			}
 			else {
@@ -737,8 +737,8 @@ ACMD(do_gen_augment) {
 		
 		// determine scale cap
 		scale = GET_OBJ_CURRENT_SCALE_LEVEL(obj);
-		if (GET_AUG_ABILITY(aug) != NO_ABIL && ability_data[GET_AUG_ABILITY(aug)].parent_skill != NO_SKILL && GET_SKILL(ch, ability_data[GET_AUG_ABILITY(aug)].parent_skill) < CLASS_SKILL_CAP) {
-			scale = MIN(scale, GET_SKILL(ch, ability_data[GET_AUG_ABILITY(aug)].parent_skill));
+		if (GET_AUG_ABILITY(aug) != NO_ABIL && ability_data[GET_AUG_ABILITY(aug)].parent_skill != NO_SKILL && get_skill_level(ch, ability_data[GET_AUG_ABILITY(aug)].parent_skill) < CLASS_SKILL_CAP) {
+			scale = MIN(scale, get_skill_level(ch, ability_data[GET_AUG_ABILITY(aug)].parent_skill));
 		}
 		
 		// determine points

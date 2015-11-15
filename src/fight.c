@@ -2689,7 +2689,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		if (combat_round && can_gain_skill && can_gain_exp_from(ch, victim)) {
 			if (!IS_NPC(ch)) {
 				gain_ability_exp(ch, ABIL_FINESSE, 2);
-				if (GET_SKILL(ch, SKILL_BATTLE) < EMPIRE_CHORE_SKILL_CAP) {
+				if (get_skill_level(ch, SKILL_BATTLE) < EMPIRE_CHORE_SKILL_CAP) {
 					gain_skill_exp(ch, SKILL_BATTLE, 4);
 				}
 				if (affected_by_spell(ch, ATYPE_ALACRITY)) {

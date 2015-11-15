@@ -956,6 +956,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	struct alias_data *alias, *last_alias = NULL;
 	struct coin_data *coin, *last_coin = NULL;
 	struct mail_data *mail, *last_mail = NULL;
+	struct player_skill_data *skdata;
 	int length, i_in[7], iter, num;
 	struct slash_channel *slash;
 	struct cooldown_data *cool;
@@ -1543,11 +1544,12 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				}
 				else if (PFILE_TAG(line, "Skill:", length)) {
 					sscanf(line + length + 1, "%d %d %lf %d %d", &i_in[0], &i_in[1], &dbl_in, &i_in[2], &i_in[3]);
-					if (i_in[0] >= 0 && i_in[0] < NUM_SKILLS) {
-						ch->player_specials->skills[i_in[0]].level = i_in[1];
-						GET_SKILL_EXP(ch, i_in[0]) = dbl_in;
-						GET_FREE_SKILL_RESETS(ch, i_in[0]) = i_in[2];
-						NOSKILL_BLOCKED(ch, i_in[0]) = i_in[3] ? TRUE : FALSE;
+					
+					if ((skdata = get_skill_data(ch, i_in[0], TRUE))) {
+						skdata->level = i_in[1];
+						skdata->exp = dbl_in;
+						skdata->resets = i_in[2];
+						skdata->noskill = i_in[3];
 					}
 				}
 				else if (PFILE_TAG(line, "Skill Level:", length)) {
@@ -1833,6 +1835,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	void write_mail_to_file(FILE *fl, char_data *ch);
 	
 	struct affected_type *af, *new_af, *next_af, *af_list;
+	struct player_skill_data *skill, *next_skill;
 	struct player_slash_channel *slash;
 	struct over_time_effect_type *dot;
 	struct slash_channel *loadslash;
@@ -2128,8 +2131,11 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	
 	// 'S'
 	fprintf(fl, "Sex: %s\n", genders[(int) GET_REAL_SEX(ch)]);
-	for (iter = 0; iter < NUM_SKILLS; ++iter) {
-		fprintf(fl, "Skill: %d %d %.2f %d %d\n", iter, GET_SKILL(ch, iter), GET_SKILL_EXP(ch, iter), GET_FREE_SKILL_RESETS(ch, iter), NOSKILL_BLOCKED(ch, iter) ? 1 : 0);
+	HASH_ITER(hh, GET_SKILL_HASH(ch), skill, next_skill) {
+		// don't bother writing ones with no data
+		if (skill->level > 0 || skill->exp > 0 || skill->resets > 0 || skill->noskill > 0) {
+			fprintf(fl, "Skill: %d %d %.2f %d %d\n", skill->skill_id, skill->level, skill->exp, skill->resets, skill->noskill ? 1 : 0);
+		}
 	}
 	fprintf(fl, "Skill Level: %d\n", GET_SKILL_LEVEL(ch));
 	for (slash = GET_SLASH_CHANNELS(ch); slash; slash = slash->next) {
@@ -3258,7 +3264,7 @@ void start_new_character(char_data *ch) {
 	
 		// skills
 		for (sk = GET_ARCH_SKILLS(arch); sk; sk = sk->next) {
-			if (GET_SKILL(ch, sk->skill) < sk->level) {
+			if (get_skill_level(ch, sk->skill) < sk->level) {
 				set_skill(ch, sk->skill, sk->level);
 			}
 			
@@ -3562,11 +3568,11 @@ PROMO_APPLY(promo_facebook) {
 
 // 1.5x skills
 PROMO_APPLY(promo_skillups) {
-	int iter;
+	struct player_skill_data *skill, *next_skill;
 	
-	for (iter = 0; iter < NUM_SKILLS; ++iter) {
-		if (GET_SKILL(ch, iter) > 0) {
-			set_skill(ch, iter, MIN(BASIC_SKILL_CAP, GET_SKILL(ch, iter) * 1.5));
+	HASH_ITER(hh, GET_SKILL_HASH(ch), skill, next_skill) {
+		if (skill->level > 0) {
+			set_skill(ch, skill->skill_id, MIN(BASIC_SKILL_CAP, skill->level * 1.5));
 		}
 	}
 }

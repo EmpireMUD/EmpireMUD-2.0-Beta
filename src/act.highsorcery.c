@@ -1907,7 +1907,7 @@ void perform_study(char_data *ch) {
 	
 	if (*study_strings[pos] == '\n') {
 		// DONE!
-		if (CAN_GAIN_NEW_SKILLS(ch) && GET_SKILL(ch, SKILL_HIGH_SORCERY) == 0 && !NOSKILL_BLOCKED(ch, SKILL_HIGH_SORCERY)) {
+		if (CAN_GAIN_NEW_SKILLS(ch) && get_skill_level(ch, SKILL_HIGH_SORCERY) == 0 && noskill_ok(ch, SKILL_HIGH_SORCERY)) {
 			msg_to_char(ch, "&mYour mind begins to open to the ways of High Sorcery, and you are now an apprentice to this school.&0\r\n");
 			set_skill(ch, SKILL_HIGH_SORCERY, 1);
 			SAVE_CHAR(ch);

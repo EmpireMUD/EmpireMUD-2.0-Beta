@@ -4511,7 +4511,7 @@ ACMD(do_roadsign) {
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs can't use roadsign.\r\n");
 	}
-	else if (GET_SKILL(ch, SKILL_EMPIRE) <= BASIC_SKILL_CAP) {
+	else if (get_skill_level(ch, SKILL_EMPIRE) <= BASIC_SKILL_CAP) {
 		msg_to_char(ch, "You need the Roads ability and an Empire skill of at least %d to set up road signs.\r\n", BASIC_SKILL_CAP+1);
 	}
 	else if (!HAS_ABILITY(ch, ABIL_ROADS)) {

@@ -791,7 +791,7 @@ ACMD(do_familiar) {
 			if (!IS_NPC(ch) && familiars[iter].ability != NO_ABIL && !HAS_ABILITY(ch, familiars[iter].ability)) {
 				continue;
 			}
-			if (familiars[iter].ability != NO_ABIL && ability_data[familiars[iter].ability].parent_skill != NO_SKILL && GET_SKILL(ch, ability_data[familiars[iter].ability].parent_skill) < familiars[iter].level) {
+			if (familiars[iter].ability != NO_ABIL && ability_data[familiars[iter].ability].parent_skill != NO_SKILL && get_skill_level(ch, ability_data[familiars[iter].ability].parent_skill) < familiars[iter].level) {
 				continue;
 			}
 			if (familiars[iter].ability == NO_ABIL && GET_SKILL_LEVEL(ch) < familiars[iter].level) {
@@ -816,7 +816,7 @@ ACMD(do_familiar) {
 		if (!IS_NPC(ch) && familiars[iter].ability != NO_ABIL && !HAS_ABILITY(ch, familiars[iter].ability)) {
 			continue;
 		}
-		if (familiars[iter].ability != NO_ABIL && ability_data[familiars[iter].ability].parent_skill != NO_SKILL && GET_SKILL(ch, ability_data[familiars[iter].ability].parent_skill) < familiars[iter].level) {
+		if (familiars[iter].ability != NO_ABIL && ability_data[familiars[iter].ability].parent_skill != NO_SKILL && get_skill_level(ch, ability_data[familiars[iter].ability].parent_skill) < familiars[iter].level) {
 			continue;
 		}
 		if (familiars[iter].ability == NO_ABIL && GET_SKILL_LEVEL(ch) < familiars[iter].level) {

@@ -388,12 +388,12 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	extern int mana_gain(char_data *ch, bool info_only);
 	extern int get_ability_points_available_for_char(char_data *ch, int skill);
 	extern const struct material_data materials[NUM_MATERIALS];
-	extern int skill_sort[NUM_SKILLS];
 	extern const int base_hit_chance;
 	extern const double hit_per_dex;
 
 	char lbuf[MAX_STRING_LENGTH], lbuf2[MAX_STRING_LENGTH], lbuf3[MAX_STRING_LENGTH];
-	int i, j, count, iter, sk, pts, cols, val;
+	struct player_skill_data *skdata, *next_skill;
+	int i, j, count, pts, cols, val;
 	empire_data *emp;
 	struct time_info_data playing_time;
 
@@ -503,11 +503,10 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	msg_to_char(to, " +--------------------------------- Skills ----------------------------------+\r\n ");
 
 	count = 0;
-	for (iter = 0; iter < NUM_SKILLS; ++iter) {
-		sk = skill_sort[iter];
-		if (GET_SKILL(ch, sk) > 0) {
-			sprintf(lbuf, " %s: %s%d", skill_data[sk].name, IS_ANY_SKILL_CAP(ch, sk) ? "&g" : "&y", GET_SKILL(ch, sk));
-			pts = get_ability_points_available_for_char(ch, sk);
+	HASH_ITER(hh, GET_SKILL_HASH(ch), skdata, next_skill) {
+		if (skdata->level > 0) {
+			sprintf(lbuf, " %s: %s%d", skill_data[skdata->skill_id].name, IS_ANY_SKILL_CAP(ch, skdata->skill_id) ? "&g" : "&y", skdata->level);
+			pts = get_ability_points_available_for_char(ch, skdata->skill_id);
 			if (pts > 0) {
 				sprintf(lbuf + strlen(lbuf), " &g(%d)", pts);
 			}

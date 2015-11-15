@@ -229,7 +229,7 @@ int get_blood_upkeep_cost(char_data *ch) {
 	
 	if (!IS_NPC(ch) && IS_VAMPIRE(ch) && !IS_IMMORTAL(ch)) {
 		// low skill vamp upkeep
-		if (GET_SKILL(ch, SKILL_VAMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
+		if (get_skill_level(ch, SKILL_VAMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
 			cost += 1;
 		}
 	
@@ -301,7 +301,7 @@ void make_vampire(char_data *ch, bool lore) {
 
 		SET_BIT(PLR_FLAGS(ch), PLR_VAMPIRE);
 	
-		if (GET_SKILL(ch, SKILL_VAMPIRE) < 1) {
+		if (get_skill_level(ch, SKILL_VAMPIRE) < 1) {
 			set_skill(ch, SKILL_VAMPIRE, 1);
 		}
 
@@ -552,7 +552,7 @@ void update_biting_char(char_data *ch) {
 	
 	gain_ability_exp(ch, ABIL_SANGUINE_RESTORATION, 2);
 	gain_ability_exp(ch, ABIL_UNNATURAL_THIRST, 2);
-	if (GET_SKILL(ch, SKILL_VAMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
+	if (get_skill_level(ch, SKILL_VAMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
 		gain_skill_exp(ch, SKILL_VAMPIRE, 5);
 	}
 }
@@ -832,7 +832,7 @@ ACMD(do_bloodsword) {
 		scale_level = get_approximate_level(ch);
 	}
 	else {
-		scale_level = MIN(get_approximate_level(ch), GET_SKILL(ch, SKILL_VAMPIRE));
+		scale_level = MIN(get_approximate_level(ch), get_skill_level(ch, SKILL_VAMPIRE));
 	}
 	
 	scale_item_to_level(obj, scale_level);
@@ -1000,7 +1000,7 @@ ACMD(do_command) {
 	else if (MOB_FLAGGED(victim, MOB_HARD | MOB_GROUP)) {
 		act("You can't command $N.", FALSE, ch, NULL, victim, TO_CHAR);
 	}
-	else if (IS_VAMPIRE(victim) && (IS_NPC(victim) || GET_SKILL(victim, SKILL_VAMPIRE) > GET_SKILL(ch, SKILL_VAMPIRE)))
+	else if (IS_VAMPIRE(victim) && (IS_NPC(victim) || get_skill_level(victim, SKILL_VAMPIRE) > get_skill_level(ch, SKILL_VAMPIRE)))
 		msg_to_char(ch, "You cannot force your will upon those of more powerful blood.\r\n");
 	else if (get_approximate_level(ch) - get_approximate_level(victim) < level_threshold) {
 		msg_to_char(ch, "Your victim is too powerful.\r\n");
