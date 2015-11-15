@@ -956,6 +956,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	struct alias_data *alias, *last_alias = NULL;
 	struct coin_data *coin, *last_coin = NULL;
 	struct mail_data *mail, *last_mail = NULL;
+	struct player_ability_data *abildata;
 	struct player_skill_data *skdata;
 	int length, i_in[7], iter, num;
 	struct slash_channel *slash;
@@ -1028,9 +1029,9 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 			case 'A': {
 				if (PFILE_TAG(line, "Ability:", length)) {
 					sscanf(line + length + 1, "%d %d %d", &i_in[0], &i_in[1], &i_in[2]);
-					if (i_in[0] >= 0 && i_in[0] < NUM_ABILITIES) {
-						ch->player_specials->abilities[i_in[0]].purchased = i_in[1] ? TRUE : FALSE;
-						ch->player_specials->abilities[i_in[0]].levels_gained = i_in[2];
+					if ((abildata = get_ability_data(ch, i_in[0], TRUE))) {
+						abildata->purchased = i_in[1] ? TRUE : FALSE;
+						abildata->levels_gained = i_in[2];
 					}
 				}
 				else if (PFILE_TAG(line, "Access Level:", length)) {
@@ -1835,6 +1836,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	void write_mail_to_file(FILE *fl, char_data *ch);
 	
 	struct affected_type *af, *new_af, *next_af, *af_list;
+	struct player_ability_data *abil, *next_abil;
 	struct player_skill_data *skill, *next_skill;
 	struct player_slash_channel *slash;
 	struct over_time_effect_type *dot;
@@ -1933,9 +1935,9 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	// The rest is alphabetical:
 	
 	// 'A'
-	for (iter = 0; iter < NUM_ABILITIES; ++iter) {
-		if (HAS_ABILITY(ch, iter) || GET_LEVELS_GAINED_FROM_ABILITY(ch, iter) > 0) {
-			fprintf(fl, "Ability: %d %d %d\n", iter, HAS_ABILITY(ch, iter) ? 1 : 0, GET_LEVELS_GAINED_FROM_ABILITY(ch, iter));
+	HASH_ITER(hh, GET_ABILITY_HASH(ch), abil, next_abil) {
+		if (abil->purchased || abil->levels_gained > 0) {
+			fprintf(fl, "Ability: %d %d %d\n", abil->ability_id, abil->purchased ? 1 : 0, abil->levels_gained);
 		}
 	}
 	fprintf(fl, "Access Level: %d\n", GET_ACCESS_LEVEL(ch));
@@ -3286,7 +3288,7 @@ void start_new_character(char_data *ch) {
 			if (GET_GLOBAL_TYPE(glb) != GLOBAL_NEWBIE_GEAR || IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_IN_DEVELOPMENT)) {
 				continue;
 			}
-			if (GET_GLOBAL_ABILITY(glb) != NO_ABIL && !HAS_ABILITY(ch, GET_GLOBAL_ABILITY(glb))) {
+			if (GET_GLOBAL_ABILITY(glb) != NO_ABIL && !has_ability(ch, GET_GLOBAL_ABILITY(glb))) {
 				continue;
 			}
 			

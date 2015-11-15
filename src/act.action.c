@@ -257,7 +257,7 @@ void update_actions(void) {
 		if (IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_FAST_CHORES) && HAS_BONUS_TRAIT(ch, BONUS_FAST_CHORES)) {
 			speed += 1;
 		}
-		if (IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_FINDER) && HAS_ABILITY(ch, ABIL_FINDER)) {
+		if (IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_FINDER) && has_ability(ch, ABIL_FINDER)) {
 			speed += 1;
 			gain_ability_exp(ch, ABIL_FINDER, 0.1);
 		}
@@ -639,7 +639,7 @@ INTERACTION_FUNC(finish_harvesting) {
 		act("$n finished harvesting the crop!", FALSE, ch, 0, 0, TO_ROOM);
 
 		// how many to get
-		num = number(2, 6) + (HAS_ABILITY(ch, ABIL_MASTER_FARMER) ? number(2, 6) : 0);
+		num = number(2, 6) + (has_ability(ch, ABIL_MASTER_FARMER) ? number(2, 6) : 0);
 		num *= interaction->quantity;
 	
 		// give them over
@@ -702,7 +702,7 @@ INTERACTION_FUNC(finish_picking_herb) {
 	obj_vnum vnum = interaction->vnum;
 	int iter, num = interaction->quantity;
 	
-	if (HAS_ABILITY(ch, ABIL_FIND_HERBS)) {
+	if (has_ability(ch, ABIL_FIND_HERBS)) {
 		gain_ability_exp(ch, ABIL_FIND_HERBS, 10);
 	
 		if (!number(0, 11)) {
@@ -2593,7 +2593,7 @@ ACMD(do_prospect) {
 		act("$n stops prospecting.", FALSE, ch, 0, 0, TO_ROOM);
 		cancel_action(ch);
 	}
-	else if (IS_NPC(ch) || !HAS_ABILITY(ch, ABIL_PROSPECT)) {
+	else if (IS_NPC(ch) || !has_ability(ch, ABIL_PROSPECT)) {
 		msg_to_char(ch, "You need to buy the Prospect ability before you can use it.\r\n");
 	}
 	else if (GET_ACTION(ch) != ACT_NONE) {

@@ -598,13 +598,13 @@ void affect_total(char_data *ch) {
 
 	// ability-based modifiers
 	if (!IS_NPC(ch)) {
-		if (HAS_ABILITY(ch, ABIL_ENDURANCE)) {
+		if (has_ability(ch, ABIL_ENDURANCE)) {
 			GET_MAX_HEALTH(ch) = MIN(GET_MAX_HEALTH(ch), 1000) * 2.0 + MAX(GET_MAX_HEALTH(ch) - 1000, 0) * 1.25;
 		}
-		if (HAS_ABILITY(ch, ABIL_GIFT_OF_NATURE)) {
+		if (has_ability(ch, ABIL_GIFT_OF_NATURE)) {
 			GET_MAX_MANA(ch) *= 1.35;
 		}
-		if (HAS_ABILITY(ch, ABIL_ARCANE_POWER)) {
+		if (has_ability(ch, ABIL_ARCANE_POWER)) {
 			GET_MAX_MANA(ch) *= 1.35;
 		}
 	}
@@ -3056,7 +3056,7 @@ bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERA
 		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_IN_DEVELOPMENT)) {
 			continue;
 		}
-		if (GET_GLOBAL_ABILITY(glb) != NO_ABIL && !HAS_ABILITY(ch, GET_GLOBAL_ABILITY(glb))) {
+		if (GET_GLOBAL_ABILITY(glb) != NO_ABIL && !has_ability(ch, GET_GLOBAL_ABILITY(glb))) {
 			continue;
 		}
 		

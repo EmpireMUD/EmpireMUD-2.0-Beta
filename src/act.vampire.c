@@ -134,7 +134,7 @@ void cancel_siring(char_data *ch) {
 
 // checks for Blood Fortitude and does skill gain
 bool check_blood_fortitude(char_data *ch, bool can_gain_skill) {
-	if (!IS_NPC(ch) && IS_VAMPIRE(ch) && check_vampire_sun(ch, FALSE) && HAS_ABILITY(ch, ABIL_BLOOD_FORTITUDE)) {
+	if (!IS_NPC(ch) && IS_VAMPIRE(ch) && check_vampire_sun(ch, FALSE) && has_ability(ch, ABIL_BLOOD_FORTITUDE)) {
 		if (can_gain_skill) {
 			gain_ability_exp(ch, ABIL_BLOOD_FORTITUDE, 1);
 		}
@@ -164,7 +164,7 @@ bool check_vampire_ability(char_data *ch, int ability, int cost_pool, int cost_a
 * @return bool TRUE if the ability can proceed, FALSE if sunny
 */
 bool check_vampire_sun(char_data *ch, bool message) {
-	if (IS_NPC(ch) || HAS_ABILITY(ch, ABIL_DAYWALKING) || IS_GOD(ch) || IS_IMMORTAL(ch) || AFF_FLAGGED(ch, AFF_EARTHMELD) || !check_sunny(IN_ROOM(ch))) {
+	if (IS_NPC(ch) || has_ability(ch, ABIL_DAYWALKING) || IS_GOD(ch) || IS_IMMORTAL(ch) || AFF_FLAGGED(ch, AFF_EARTHMELD) || !check_sunny(IN_ROOM(ch))) {
 		// ok -- not sunny
 		return TRUE;
 	}
@@ -278,7 +278,7 @@ int GET_MAX_BLOOD(char_data *ch) {
 				base += 50;
 			}
 
-			if (HAS_ABILITY(ch, ABIL_ANCIENT_BLOOD)) {
+			if (has_ability(ch, ABIL_ANCIENT_BLOOD)) {
 				base *= 2;
 			}
 		}
@@ -496,7 +496,7 @@ void update_biting_char(char_data *ch) {
 	GET_BLOOD(victim) -= amount;
 	
 	// can gain more
-	if (HAS_ABILITY(ch, ABIL_ANCIENT_BLOOD)) {
+	if (has_ability(ch, ABIL_ANCIENT_BLOOD)) {
 		amount *= 2;
 	}
 	GET_BLOOD(ch) = MIN(GET_MAX_BLOOD(ch), GET_BLOOD(ch) + amount);
@@ -545,7 +545,7 @@ void update_biting_char(char_data *ch) {
 			act("...$e sways from lack of blood.", FALSE, victim, NULL, NULL, TO_ROOM);
 		}
 		
-		if (HAS_ABILITY(ch, ABIL_ANCIENT_BLOOD) && can_gain_exp_from(ch, victim)) {
+		if (has_ability(ch, ABIL_ANCIENT_BLOOD) && can_gain_exp_from(ch, victim)) {
 			gain_ability_exp(ch, ABIL_ANCIENT_BLOOD, 1);
 		}
 	}

@@ -281,9 +281,9 @@ ACMD(do_flee) {
 	}
 
 	// try more times if FLEET
-	for (i = 0; i < NUM_2D_DIRS * ((!IS_NPC(ch) && HAS_ABILITY(ch, ABIL_FLEET)) ? 2 : 1); i++) {
+	for (i = 0; i < NUM_2D_DIRS * ((!IS_NPC(ch) && has_ability(ch, ABIL_FLEET)) ? 2 : 1); i++) {
 		// chance to fail if not FLEET
-		if ((IS_NPC(ch) || !HAS_ABILITY(ch, ABIL_FLEET)) && number(0, 2) == 0) {
+		if ((IS_NPC(ch) || !has_ability(ch, ABIL_FLEET)) && number(0, 2) == 0) {
 			continue;
 		}
 

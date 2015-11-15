@@ -224,7 +224,7 @@ struct chant_data_type {
 bool can_use_chant(char_data *ch, int chant) {
 	bool ok = TRUE;
 	
-	if (chant_data[chant].ability != NO_ABIL && !HAS_ABILITY(ch, chant_data[chant].ability)) {
+	if (chant_data[chant].ability != NO_ABIL && !has_ability(ch, chant_data[chant].ability)) {
 		ok = FALSE;
 	}
 	
@@ -445,7 +445,7 @@ ACMD(do_ready) {
 		
 		found = FALSE;
 		for (iter = 0; *ready_magic_weapon[iter].name != '\n'; ++iter) {
-			if (ready_magic_weapon[iter].ability == NO_ABIL || HAS_ABILITY(ch, ready_magic_weapon[iter].ability)) {
+			if (ready_magic_weapon[iter].ability == NO_ABIL || has_ability(ch, ready_magic_weapon[iter].ability)) {
 				msg_to_char(ch, "%s%s", (found ? ", " : ""), ready_magic_weapon[iter].name);
 				found = TRUE;
 			}
@@ -457,7 +457,7 @@ ACMD(do_ready) {
 
 	found = FALSE;
 	for (iter = 0; *ready_magic_weapon[iter].name != '\n' && !found; ++iter) {
-		if (is_abbrev(arg, ready_magic_weapon[iter].name) && (ready_magic_weapon[iter].ability == NO_ABIL || HAS_ABILITY(ch, ready_magic_weapon[iter].ability))) {
+		if (is_abbrev(arg, ready_magic_weapon[iter].name) && (ready_magic_weapon[iter].ability == NO_ABIL || has_ability(ch, ready_magic_weapon[iter].ability))) {
 			type = iter;
 			found = TRUE;
 		}

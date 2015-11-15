@@ -1072,7 +1072,7 @@ void command_interpreter(char_data *ch, char *argument) {
 			continue;
 		}
 		// NPCs can use ability commands IF they aren't charmed; players require the ability
-		if (cmd_info[cmd].ability != NO_ABIL && (IS_NPC(ch) ? AFF_FLAGGED(ch, AFF_CHARM) : !HAS_ABILITY(ch, cmd_info[cmd].ability))) {
+		if (cmd_info[cmd].ability != NO_ABIL && (IS_NPC(ch) ? AFF_FLAGGED(ch, AFF_CHARM) : !has_ability(ch, cmd_info[cmd].ability))) {
 			continue;
 		}
 		
@@ -1455,7 +1455,7 @@ ACMD(do_commands) {
 	/* cmd_num starts at 1, not 0, to remove 'RESERVED' */
 	for (no = 1, cmd_num = 1; cmd_num < num_of_cmds; cmd_num++) {
 		i = cmd_sort_info[cmd_num].sort_pos;
-		if (cmd_info[i].minimum_level >= 0 && (cmd_info[i].ability == NO_ABIL || HAS_ABILITY(vict, cmd_info[i].ability)) && (GET_ACCESS_LEVEL(vict) >= cmd_info[i].minimum_level || (cmd_info[i].grants != NO_GRANTS && IS_GRANTED(ch, cmd_info[i].grants))) && (cmd_info[i].minimum_level >= LVL_GOD) == wizhelp) {
+		if (cmd_info[i].minimum_level >= 0 && (cmd_info[i].ability == NO_ABIL || has_ability(vict, cmd_info[i].ability)) && (GET_ACCESS_LEVEL(vict) >= cmd_info[i].minimum_level || (cmd_info[i].grants != NO_GRANTS && IS_GRANTED(ch, cmd_info[i].grants))) && (cmd_info[i].minimum_level >= LVL_GOD) == wizhelp) {
 			if (!IS_SET(cmd_info[i].flags, CMD_IMM_OR_MOB_ONLY) || GET_ACCESS_LEVEL(vict) >= LVL_START_IMM || IS_NPC(vict)) {
 				sprintf(buf + strlen(buf), "%-15s", cmd_info[i].command);
 				if (!(no % 5))

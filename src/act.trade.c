@@ -158,7 +158,7 @@ void list_available_augments(char_data *ch, int type, obj_data *matching_obj) {
 		if (GET_AUG_TYPE(aug) != type || AUGMENT_FLAGGED(aug, AUG_IN_DEVELOPMENT)) {
 			continue;
 		}
-		if (GET_AUG_ABILITY(aug) != NO_ABIL && !HAS_ABILITY(ch, GET_AUG_ABILITY(aug))) {
+		if (GET_AUG_ABILITY(aug) != NO_ABIL && !has_ability(ch, GET_AUG_ABILITY(aug))) {
 			continue;
 		}
 		if (GET_AUG_REQUIRES_OBJ(aug) != NOTHING && !get_obj_in_list_vnum(GET_AUG_REQUIRES_OBJ(aug), ch->carrying)) {
@@ -387,7 +387,7 @@ void finish_gen_craft(char_data *ch) {
 	
 		amt = GET_CRAFT_QUANTITY(type);
 	
-		if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_MILL && HAS_ABILITY(ch, ABIL_MASTER_FARMER)) {
+		if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_MILL && has_ability(ch, ABIL_MASTER_FARMER)) {
 			gain_ability_exp(ch, ABIL_MASTER_FARMER, 10);
 			amt *= 2;
 		}
@@ -396,7 +396,7 @@ void finish_gen_craft(char_data *ch) {
 			for (iter = 0; iter < amt; ++iter) {
 				// load and master it
 				obj = read_object(GET_CRAFT_OBJECT(type), TRUE);
-				if (OBJ_FLAGGED(obj, OBJ_SCALABLE) && master_ability != NO_ABIL && HAS_ABILITY(ch, master_ability)) {
+				if (OBJ_FLAGGED(obj, OBJ_SCALABLE) && master_ability != NO_ABIL && has_ability(ch, master_ability)) {
 					applied_master = TRUE;
 					SET_BIT(GET_OBJ_EXTRA(obj), OBJ_SUPERIOR);
 				}
@@ -743,7 +743,7 @@ ACMD(do_gen_augment) {
 		
 		// determine points
 		points_available = get_enchant_scale_for_char(ch, scale);
-		if (augment_info[subcmd].greater_abil && HAS_ABILITY(ch, augment_info[subcmd].greater_abil)) {
+		if (augment_info[subcmd].greater_abil && has_ability(ch, augment_info[subcmd].greater_abil)) {
 			points_available *= config_get_double("greater_enchantments_bonus");
 		}
 		
@@ -848,7 +848,7 @@ ACMD(do_gen_craft) {
 		HASH_ITER(sorted_hh, sorted_crafts, craft, next_craft) {
 			if (GET_CRAFT_TYPE(craft) == subcmd) {
 				if (!IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT) || IS_IMMORTAL(ch)) {
-					if (GET_CRAFT_ABILITY(craft) == NO_ABIL || HAS_ABILITY(ch, GET_CRAFT_ABILITY(craft))) {
+					if (GET_CRAFT_ABILITY(craft) == NO_ABIL || has_ability(ch, GET_CRAFT_ABILITY(craft))) {
 						if (GET_CRAFT_REQUIRES_OBJ(craft) == NOTHING || get_obj_in_list_vnum(GET_CRAFT_REQUIRES_OBJ(craft), ch->carrying)) {
 							// match so far...
 							
@@ -884,7 +884,7 @@ ACMD(do_gen_craft) {
 		*buf = '\0';
 		
 		HASH_ITER(sorted_hh, sorted_crafts, craft, next_craft) {
-			if (GET_CRAFT_TYPE(craft) == subcmd && (!IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT) || IS_IMMORTAL(ch)) && (GET_CRAFT_ABILITY(craft) == NO_ABIL || HAS_ABILITY(ch, GET_CRAFT_ABILITY(craft)))) {
+			if (GET_CRAFT_TYPE(craft) == subcmd && (!IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT) || IS_IMMORTAL(ch)) && (GET_CRAFT_ABILITY(craft) == NO_ABIL || has_ability(ch, GET_CRAFT_ABILITY(craft)))) {
 				if (GET_CRAFT_REQUIRES_OBJ(craft) == NOTHING || get_obj_in_list_vnum(GET_CRAFT_REQUIRES_OBJ(craft), ch->carrying)) {
 					if (strlen(buf) + strlen(GET_CRAFT_NAME(craft)) + 2 >= 80) {
 						this_line = FALSE;
@@ -907,7 +907,7 @@ ACMD(do_gen_craft) {
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're busy right now.\r\n");
 	}
-	else if (GET_CRAFT_ABILITY(type) != NO_ABIL && !HAS_ABILITY(ch, GET_CRAFT_ABILITY(type))) {
+	else if (GET_CRAFT_ABILITY(type) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(type))) {
 		msg_to_char(ch, "You need to buy the %s ability to %s that.\r\n", ability_data[GET_CRAFT_ABILITY(type)].name, gen_craft_data[GET_CRAFT_TYPE(type)].command);
 	}
 	else if (GET_CRAFT_MIN_LEVEL(type) > get_crafting_level(ch)) {
@@ -974,7 +974,7 @@ ACMD(do_gen_craft) {
 		}
 		
 		// mastery
-		if (master_ability != NO_ABIL && HAS_ABILITY(ch, master_ability)) {
+		if (master_ability != NO_ABIL && has_ability(ch, master_ability)) {
 			timer /= 2;
 		}
 	
@@ -1026,7 +1026,7 @@ ACMD(do_recipes) {
 			}
 		
 			// has right abil?
-			if (GET_CRAFT_ABILITY(craft) != NO_ABIL && !HAS_ABILITY(ch, GET_CRAFT_ABILITY(craft))) {
+			if (GET_CRAFT_ABILITY(craft) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(craft))) {
 				continue;
 			}
 			
@@ -1069,7 +1069,7 @@ ACMD(do_recipes) {
 			if (AUGMENT_FLAGGED(aug, AUG_IN_DEVELOPMENT) && !IS_IMMORTAL(ch)) {
 				continue;
 			}
-			if (GET_AUG_ABILITY(aug) != NO_ABIL && !HAS_ABILITY(ch, GET_AUG_ABILITY(aug))) {
+			if (GET_AUG_ABILITY(aug) != NO_ABIL && !has_ability(ch, GET_AUG_ABILITY(aug))) {
 				continue;
 			}
 			
@@ -1139,7 +1139,7 @@ ACMD(do_reforge) {
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs cannot reforge.\r\n");
 	}
-	else if (reforge_data[subcmd].ability != NOTHING && !HAS_ABILITY(ch, reforge_data[subcmd].ability)) {
+	else if (reforge_data[subcmd].ability != NOTHING && !has_ability(ch, reforge_data[subcmd].ability)) {
 		msg_to_char(ch, "You must buy the %s ability to do that.\r\n", reforge_data[subcmd].command);
 	}
 	else if (!*arg || !*arg2) {
@@ -1284,7 +1284,7 @@ ACMD(do_reforge) {
 		else if (!proto || !OBJ_FLAGGED(proto, OBJ_SCALABLE) || !(ctype = find_craft_for_obj_vnum(GET_OBJ_VNUM(obj)))) {
 			msg_to_char(ch, "It can't be made superior.\r\n");
 		}
-		else if (GET_CRAFT_ABILITY(ctype) == NO_ABIL || get_mastery_ability(GET_CRAFT_ABILITY(ctype)) == NO_ABIL || !HAS_ABILITY(ch, get_mastery_ability(GET_CRAFT_ABILITY(ctype)))) {
+		else if (GET_CRAFT_ABILITY(ctype) == NO_ABIL || get_mastery_ability(GET_CRAFT_ABILITY(ctype)) == NO_ABIL || !has_ability(ch, get_mastery_ability(GET_CRAFT_ABILITY(ctype)))) {
 			msg_to_char(ch, "You don't have the mastery to make that item superior.\r\n");
 		}
 		else if (!has_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), TRUE)) {

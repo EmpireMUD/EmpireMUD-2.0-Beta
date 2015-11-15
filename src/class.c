@@ -307,13 +307,13 @@ void assign_class_abilities(char_data *ch, int class, int role) {
 		}
 		
 		// remove any they shouldn't have
-		if (ch->player_specials->abilities[abil].purchased && !has) {
-			ch->player_specials->abilities[abil].purchased = FALSE;
+		if (has_ability(ch, abil) && !has) {
+			remove_ability(ch, abil, FALSE);
 			check_skill_sell(ch, abil);
 		}
 		// add if needed
 		if (has) {
-			ch->player_specials->abilities[abil].purchased = TRUE;
+			add_ability(ch, abil, FALSE);
 		}
 	}
 }
@@ -538,7 +538,7 @@ ACMD(do_class) {
 					
 					for (ab_iter = 0, comma = FALSE; class_data[GET_CLASS(ch)].role[iter].ability[ab_iter] != ROLE_ABIL_END; ++ab_iter, comma = TRUE) {
 						abil = class_data[GET_CLASS(ch)].role[iter].ability[ab_iter];
-						msg_to_char(ch, "%s%s%s&0", (comma ? ", " : ""), (HAS_ABILITY(ch, abil) ? "&g" : ""), ability_data[abil].name);
+						msg_to_char(ch, "%s%s%s&0", (comma ? ", " : ""), (has_ability(ch, abil) ? "&g" : ""), ability_data[abil].name);
 					}
 					msg_to_char(ch, "\r\n");
 				}

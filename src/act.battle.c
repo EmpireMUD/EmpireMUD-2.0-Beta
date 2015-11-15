@@ -392,7 +392,7 @@ ACMD(do_kick) {
 	success = IS_SPECIALTY_ABILITY(ch, ABIL_KICK) || check_hit_vs_dodge(ch, vict, FALSE);
 
 	if (success) {
-		if (HAS_ABILITY(ch, ABIL_SHADOW_KICK) && !AFF_FLAGGED(vict, AFF_IMMUNE_BATTLE)) {
+		if (has_ability(ch, ABIL_SHADOW_KICK) && !AFF_FLAGGED(vict, AFF_IMMUNE_BATTLE)) {
 			struct affected_type *af;
 			int value = round(GET_COMPUTED_LEVEL(ch) / 50);
 			af = create_mod_aff(ATYPE_SHADOW_KICK, 2, APPLY_BONUS_PHYSICAL, -value, ch);
@@ -449,7 +449,7 @@ ACMD(do_outrage) {
 				found |= can_gain_exp_from(ch, victim);
 				
 				// rescue check
-				if (HAS_ABILITY(ch, ABIL_RESCUE) && FIGHTING(victim) && !IS_NPC(FIGHTING(victim)) && FIGHTING(victim) != ch && skill_check(ch, ABIL_RESCUE, DIFF_MEDIUM)) {
+				if (has_ability(ch, ABIL_RESCUE) && FIGHTING(victim) && !IS_NPC(FIGHTING(victim)) && FIGHTING(victim) != ch && skill_check(ch, ABIL_RESCUE, DIFF_MEDIUM)) {
 					perform_rescue(ch, FIGHTING(victim), victim);
 					if (can_gain_exp_from(ch, victim)) {
 						gain_ability_exp(ch, ABIL_RESCUE, 15);

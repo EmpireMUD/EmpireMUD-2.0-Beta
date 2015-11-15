@@ -1903,7 +1903,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (subfield && *subfield) {
 							int ab = find_ability_by_name(subfield, TRUE);
 							if (ab != NO_ABIL) {
-								snprintf(str, slen, (IS_NPC(c) || HAS_ABILITY(c, ab)) ? "1" : "0");
+								snprintf(str, slen, (IS_NPC(c) || has_ability(c, ab)) ? "1" : "0");
 							}
 							else {
 								snprintf(str, slen, "0");
@@ -2464,7 +2464,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "poison_immunity")) {
-						if (HAS_ABILITY(c, ABIL_POISON_IMMUNITY)) {
+						if (has_ability(c, ABIL_POISON_IMMUNITY)) {
 							snprintf(str, slen, "1");
 						}
 						else {
@@ -2498,7 +2498,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%d", GET_RESIST_PHYSICAL(c));
 					}
 					else if (!str_cmp(field, "resist_poison")) {
-						if (HAS_ABILITY(c, ABIL_RESIST_POISON)) {
+						if (has_ability(c, ABIL_RESIST_POISON)) {
 							snprintf(str, slen, "1");
 						}
 						else {

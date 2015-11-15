@@ -591,7 +591,7 @@ void init_mine(room_data *room, char_data *ch) {
 		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_IN_DEVELOPMENT)) {
 			continue;
 		}
-		if (GET_GLOBAL_ABILITY(glb) != NO_ABIL && (!ch || !HAS_ABILITY(ch, GET_GLOBAL_ABILITY(glb)))) {
+		if (GET_GLOBAL_ABILITY(glb) != NO_ABIL && (!ch || !has_ability(ch, GET_GLOBAL_ABILITY(glb)))) {
 			continue;
 		}
 		
@@ -639,7 +639,7 @@ void init_mine(room_data *room, char_data *ch) {
 		set_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM, GET_GLOBAL_VNUM(glb));
 		set_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT, number(GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE) / 2, GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE)));
 		
-		if (ch && HAS_ABILITY(ch, ABIL_DEEP_MINES)) {
+		if (ch && has_ability(ch, ABIL_DEEP_MINES)) {
 			multiply_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT, 1.5);
 			gain_ability_exp(ch, ABIL_DEEP_MINES, 15);
 		}

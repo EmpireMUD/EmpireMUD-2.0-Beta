@@ -403,7 +403,7 @@ bool move_ship(char_data *ch, obj_data *ship, int dir) {
 		
 		for (ch_iter = ROOM_PEOPLE(room); ch_iter; ch_iter = ch_iter->next_in_room) {
 			if (ch_iter->desc) {
-				if (HAS_ABILITY(ch_iter, ABIL_NAVIGATION)) {
+				if (has_ability(ch_iter, ABIL_NAVIGATION)) {
 					snprintf(buf, sizeof(buf), "The ship sails %s (%d, %d).", dirs[get_direction_for_char(ch_iter, dir)], X_COORD(IN_ROOM(ship)), Y_COORD(IN_ROOM(ship)));
 				}
 				else {
@@ -796,7 +796,7 @@ ACMD(do_manufacture) {
 	skip_spaces(&argument);
 
 	if (*argument)
-		for (i = 0; str_cmp(ship_data[i].name, "\n") && (!is_abbrev(argument, ship_data[i].name) || (ship_data[i].ability != NO_ABIL && !HAS_ABILITY(ch, ship_data[i].ability))); i++);
+		for (i = 0; str_cmp(ship_data[i].name, "\n") && (!is_abbrev(argument, ship_data[i].name) || (ship_data[i].ability != NO_ABIL && !has_ability(ch, ship_data[i].ability))); i++);
 
 	if ((BUILDING_VNUM(IN_ROOM(ch)) != BUILDING_SHIPYARD && BUILDING_VNUM(IN_ROOM(ch)) != BUILDING_SHIPYARD2) || !IS_COMPLETE(IN_ROOM(ch)))
 		msg_to_char(ch, "You can't do that here.\r\n");
@@ -811,7 +811,7 @@ ACMD(do_manufacture) {
 	else if (!ship && (!*argument || !str_cmp(ship_data[i].name, "\n"))) {
 		msg_to_char(ch, "What type of ship would you like to build:");
 		for (i = 0; str_cmp(ship_data[i].name, "\n"); i++)
-			if (ship_data[i].ability == NO_ABIL || HAS_ABILITY(ch, ship_data[i].ability)) {
+			if (ship_data[i].ability == NO_ABIL || has_ability(ch, ship_data[i].ability)) {
 				msg_to_char(ch, "%s%s", (comma ? ", " : " "), ship_data[i].name);
 				comma = TRUE;
 			}

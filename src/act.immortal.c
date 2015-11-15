@@ -348,8 +348,8 @@ PLAYER_UPDATE_FUNC(update_clear_roles) {
 	}
 	
 	for (iter = 0; iter < NUM_ABILITIES; ++iter) {
-		if (ability_data[iter].parent_skill == NO_SKILL && HAS_ABILITY(ch, iter)) {
-			ch->player_specials->abilities[iter].purchased = FALSE;
+		if (ability_data[iter].parent_skill == NO_SKILL && has_ability(ch, iter)) {
+			remove_ability(ch, iter, FALSE);
 			if (!is_file) {
 				check_skill_sell(ch, iter);
 			}
@@ -1850,7 +1850,7 @@ SHOW(show_skills) {
 		
 		found = FALSE;
 		for (ab_iter = 0; ab_iter < NUM_ABILITIES; ++ab_iter) {
-			if (ability_data[ab_iter].parent_skill == sk_iter && HAS_ABILITY(vict, ab_iter)) {
+			if (ability_data[ab_iter].parent_skill == sk_iter && has_ability(vict, ab_iter)) {
 				msg_to_char(ch, "%s%s%s&0", (found ? ", " : ""), ability_color(vict, ab_iter), ability_data[ab_iter].name);
 				found = TRUE;
 			}
@@ -1862,7 +1862,7 @@ SHOW(show_skills) {
 	msg_to_char(ch, "&yClass&0: &g");
 	found = FALSE;
 	for (ab_iter = 0; ab_iter < NUM_ABILITIES; ++ab_iter) {
-		if (ability_data[ab_iter].parent_skill == NOTHING && HAS_ABILITY(vict, ab_iter)) {
+		if (ability_data[ab_iter].parent_skill == NOTHING && has_ability(vict, ab_iter)) {
 			msg_to_char(ch, "%s%s", (found ? ", " : ""), ability_data[ab_iter].name);
 			found = TRUE;
 		}
@@ -5609,8 +5609,7 @@ ACMD(do_restore) {
 			}
 			
 			for (i = 0; i < NUM_ABILITIES; ++i) {
-				vict->player_specials->abilities[i].purchased = TRUE;
-				vict->player_specials->abilities[i].levels_gained = 0;
+				add_ability(vict, i, TRUE);
 			}
 
 			affect_total(vict);

@@ -540,7 +540,7 @@ void real_update_char(char_data *ch) {
 	}
 
 	/* Update conditions */
-	if (IS_VAMPIRE(ch) && HAS_ABILITY(ch, ABIL_UNNATURAL_THIRST)) {			
+	if (IS_VAMPIRE(ch) && has_ability(ch, ABIL_UNNATURAL_THIRST)) {			
 		gain_condition(ch, FULL, -1);
 	}
 	else {
@@ -558,7 +558,7 @@ void real_update_char(char_data *ch) {
 	}
 	
 	// more thirsty?
-	if (HAS_ABILITY(ch, ABIL_SATED_THIRST) || (IS_VAMPIRE(ch) && HAS_ABILITY(ch, ABIL_UNNATURAL_THIRST))) {
+	if (has_ability(ch, ABIL_SATED_THIRST) || (IS_VAMPIRE(ch) && has_ability(ch, ABIL_UNNATURAL_THIRST))) {
 		gain_condition(ch, THIRST, -1);
 	}
 	else {
@@ -1707,12 +1707,12 @@ void gain_condition(char_data *ch, int condition, int value) {
 	}
 	
 	// things that prevent thirst
-	if (value > 0 && condition == THIRST && (HAS_ABILITY(ch, ABIL_SATED_THIRST) || HAS_ABILITY(ch, ABIL_UNNATURAL_THIRST))) {
+	if (value > 0 && condition == THIRST && (has_ability(ch, ABIL_SATED_THIRST) || has_ability(ch, ABIL_UNNATURAL_THIRST))) {
 		return;
 	}
 	
 	// things that prevent hunger
-	if (value > 0 && condition == FULL && HAS_ABILITY(ch, ABIL_UNNATURAL_THIRST)) {
+	if (value > 0 && condition == FULL && has_ability(ch, ABIL_UNNATURAL_THIRST)) {
 		return;
 	}
 
@@ -1781,7 +1781,7 @@ int health_gain(char_data *ch, bool info_only) {
 			gain += 1;
 		}
 		
-		if (GET_FEEDING_FROM(ch) && HAS_ABILITY(ch, ABIL_SANGUINE_RESTORATION)) {
+		if (GET_FEEDING_FROM(ch) && has_ability(ch, ABIL_SANGUINE_RESTORATION)) {
 			gain *= 4;
 		}
 		
@@ -1824,7 +1824,7 @@ int mana_gain(char_data *ch, bool info_only) {
 		gain = regen_by_pos[(int) GET_POS(ch)];
 		gain += GET_MANA_REGEN(ch);
 		
-		if (HAS_ABILITY(ch, ABIL_SOLAR_POWER)) {
+		if (has_ability(ch, ABIL_SOLAR_POWER)) {
 			if (IS_CLASS_ABILITY(ch, ABIL_SOLAR_POWER) || check_sunny(IN_ROOM(ch))) {
 				gain *= CHOOSE_BY_ABILITY_LEVEL(solar_power_levels, ch, ABIL_SOLAR_POWER);
 			
@@ -1840,7 +1840,7 @@ int mana_gain(char_data *ch, bool info_only) {
 		if (HAS_BONUS_TRAIT(ch, BONUS_MANA_REGEN)) {
 			gain += 1;
 		}
-		if (GET_FEEDING_FROM(ch) && HAS_ABILITY(ch, ABIL_SANGUINE_RESTORATION)) {
+		if (GET_FEEDING_FROM(ch) && has_ability(ch, ABIL_SANGUINE_RESTORATION)) {
 			gain *= 4;
 		}
 		
@@ -1881,7 +1881,7 @@ int move_gain(char_data *ch, bool info_only) {
 		gain = regen_by_pos[(int) GET_POS(ch)];
 		gain += GET_MOVE_REGEN(ch);
 		
-		if (HAS_ABILITY(ch, ABIL_STAMINA)) {
+		if (has_ability(ch, ABIL_STAMINA)) {
 			gain *= 2;
 			
 			if (GET_MOVE(ch) < GET_MAX_MOVE(ch) && !info_only) {
@@ -1895,7 +1895,7 @@ int move_gain(char_data *ch, bool info_only) {
 		if (HAS_BONUS_TRAIT(ch, BONUS_MOVE_REGEN)) {
 			gain += 1;
 		}
-		if (GET_FEEDING_FROM(ch) && HAS_ABILITY(ch, ABIL_SANGUINE_RESTORATION)) {
+		if (GET_FEEDING_FROM(ch) && has_ability(ch, ABIL_SANGUINE_RESTORATION)) {
 			gain *= 4;
 		}
 		

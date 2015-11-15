@@ -47,6 +47,7 @@
 
 
 // protos
+void add_ability(char_data *ch, int abil_id, bool reset_levels);
 void adjust_abilities_to_empire(char_data *ch, empire_data *emp, bool add);
 extern bool can_gain_exp_from(char_data *ch, char_data *vict);
 extern bool can_use_ability(char_data *ch, int ability, int cost_pool, int cost_amount, int cooldown_type);
@@ -54,10 +55,13 @@ void charge_ability_cost(char_data *ch, int cost_pool, int cost_amount, int cool
 void gain_ability_exp(char_data *ch, int ability, double amount);
 extern bool gain_skill(char_data *ch, int skill, int amount);
 extern bool gain_skill_exp(char_data *ch, int skill, double amount);
+extern struct player_ability_data *get_ability_data(char_data *ch, int abil_id, bool add_if_missing);
 extern int get_ability_level(char_data *ch, int ability);
 extern int get_ability_points_available_for_char(char_data *ch, int skill);
 extern int get_approximate_level(char_data *ch);
 extern struct player_skill_data *get_skill_data(char_data *ch, int skill_id, bool add_if_missing);
+void mark_level_gained_from_ability(char_data *ch, int abil_id);
+void remove_ability(char_data *ch, int abil_id, bool reset_levels);
 void set_skill(char_data *ch, int skill, int level);
 extern bool skill_check(char_data *ch, int ability, int difficulty);
 
@@ -693,6 +697,28 @@ static inline int get_skill_level(char_data *ch, int skill_id) {
 static inline int get_skill_resets(char_data *ch, int skill_id) {
 	struct player_skill_data *sk = get_skill_data(ch, skill_id, 0);
 	return sk ? sk->resets : 0;
+}
+
+
+/**
+* @param char_data *ch The player to check.
+* @param int abil_id Any valid ability.
+* @return bool TRUE if the player has the ability; FALSE if not.
+*/
+static inline bool has_ability(char_data *ch, int abil_id) {
+	struct player_ability_data *data = get_ability_data(ch, abil_id, 0);
+	return data && data->purchased;
+}
+
+
+/**
+* @param char_data *ch The player to check.
+* @param int abil_id Any valid ability.
+* @return int The number of levels gained from that ability.
+*/
+static inline int levels_gained_from_ability(char_data *ch, int abil_id) {
+	struct player_ability_data *data = get_ability_data(ch, abil_id, 0);
+	return data ? data->levels_gained : 0;
 }
 
 

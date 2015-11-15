@@ -3440,7 +3440,7 @@ ACMD(do_eat) {
 	if (!(food = get_obj_in_list_vis(ch, arg, ch->carrying))) {
 		if (!(food = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
 			// special case: Taste Blood
-			if (subcmd == SCMD_TASTE && IS_VAMPIRE(ch) && HAS_ABILITY(ch, ABIL_TASTE_BLOOD) && (vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
+			if (subcmd == SCMD_TASTE && IS_VAMPIRE(ch) && has_ability(ch, ABIL_TASTE_BLOOD) && (vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
 				if (check_vampire_sun(ch, TRUE) && !ABILITY_TRIGGERS(ch, vict, NULL, ABIL_TASTE_BLOOD)) {
 					taste_blood(ch, vict);
 				}
@@ -3975,7 +3975,7 @@ ACMD(do_keep) {
 
 ACMD(do_light) {
 	obj_data *obj, *flint = NULL;
-	bool magic = !IS_NPC(ch) && HAS_ABILITY(ch, ABIL_TOUCH_OF_FLAME);
+	bool magic = !IS_NPC(ch) && has_ability(ch, ABIL_TOUCH_OF_FLAME);
 
 	one_argument(argument, arg);
 
@@ -4514,7 +4514,7 @@ ACMD(do_roadsign) {
 	else if (get_skill_level(ch, SKILL_EMPIRE) <= BASIC_SKILL_CAP) {
 		msg_to_char(ch, "You need the Roads ability and an Empire skill of at least %d to set up road signs.\r\n", BASIC_SKILL_CAP+1);
 	}
-	else if (!HAS_ABILITY(ch, ABIL_ROADS)) {
+	else if (!has_ability(ch, ABIL_ROADS)) {
 		msg_to_char(ch, "You must purchase the Roads ability to set up road signs.\r\n");
 	}
 	else if (!IS_ROAD(IN_ROOM(ch)) || !IS_COMPLETE(IN_ROOM(ch))) {

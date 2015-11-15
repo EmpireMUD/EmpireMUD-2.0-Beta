@@ -59,7 +59,7 @@ void un_earthmeld(char_data *ch);
 int ancestral_healing(char_data *ch) {
 	double mod, amt;
 	
-	if (!HAS_ABILITY(ch, ABIL_ANCESTRAL_HEALING)) {
+	if (!has_ability(ch, ABIL_ANCESTRAL_HEALING)) {
 		return 0;
 	}
 	
@@ -617,7 +617,7 @@ ACMD(do_earthmeld) {
 
 	if (AFF_FLAGGED(ch, AFF_EARTHMELD)) {
 		// only check sector on rise if the person has earth mastery, otherwise they are trapped
-		if (HAS_ABILITY(ch, ABIL_WORM) && IS_ANY_BUILDING(IN_ROOM(ch))) {
+		if (has_ability(ch, ABIL_WORM) && IS_ANY_BUILDING(IN_ROOM(ch))) {
 			msg_to_char(ch, "You can't rise from the earth here!\r\n");
 		}
 		else {
@@ -788,7 +788,7 @@ ACMD(do_familiar) {
 		msg_to_char(ch, "Summon which familiar:");
 		any = FALSE;
 		for (iter = 0; *familiars[iter].name != '\n'; ++iter) {
-			if (!IS_NPC(ch) && familiars[iter].ability != NO_ABIL && !HAS_ABILITY(ch, familiars[iter].ability)) {
+			if (!IS_NPC(ch) && familiars[iter].ability != NO_ABIL && !has_ability(ch, familiars[iter].ability)) {
 				continue;
 			}
 			if (familiars[iter].ability != NO_ABIL && ability_data[familiars[iter].ability].parent_skill != NO_SKILL && get_skill_level(ch, ability_data[familiars[iter].ability].parent_skill) < familiars[iter].level) {
@@ -813,7 +813,7 @@ ACMD(do_familiar) {
 	// find which one they wanted
 	type = -1;
 	for (iter = 0; *familiars[iter].name != '\n'; ++iter) {
-		if (!IS_NPC(ch) && familiars[iter].ability != NO_ABIL && !HAS_ABILITY(ch, familiars[iter].ability)) {
+		if (!IS_NPC(ch) && familiars[iter].ability != NO_ABIL && !has_ability(ch, familiars[iter].ability)) {
 			continue;
 		}
 		if (familiars[iter].ability != NO_ABIL && ability_data[familiars[iter].ability].parent_skill != NO_SKILL && get_skill_level(ch, ability_data[familiars[iter].ability].parent_skill) < familiars[iter].level) {
@@ -1025,7 +1025,7 @@ ACMD(do_heal) {
 
 	// amount to heal will determine the cost
 	amount = CHOOSE_BY_ABILITY_LEVEL(heal_levels, ch, abil) + (GET_INTELLIGENCE(ch) * CHOOSE_BY_ABILITY_LEVEL(intel_bonus, ch, abil));
-	if (HAS_ABILITY(ch, ABIL_HEALER)) {
+	if (has_ability(ch, ABIL_HEALER)) {
 		amount += (MAX(0, get_approximate_level(ch) - 100) * healer_level_bonus);
 	}
 	bonus = total_bonus_healing(ch);
@@ -1036,7 +1036,7 @@ ACMD(do_heal) {
 		amount = MAX(1, amount);
 	}
 	
-	if (HAS_ABILITY(ch, ABIL_HEALER)) {
+	if (has_ability(ch, ABIL_HEALER)) {
 		cost = amount * base_cost_ratio;
 	}
 	else {
@@ -1210,7 +1210,7 @@ ACMD(do_purify) {
 	else if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
 	}
-	else if (!IS_NPC(vict) && HAS_ABILITY(vict, ABIL_DAYWALKING)) {
+	else if (!IS_NPC(vict) && has_ability(vict, ABIL_DAYWALKING)) {
 		msg_to_char(ch, "The light of your purify spell has no effect on daywalkers.\r\n");
 	}
 	else if (vict != ch && !IS_NPC(vict) && !PRF_FLAGGED(vict, PRF_BOTHERABLE)) {
@@ -1303,7 +1303,7 @@ ACMD(do_rejuvenate) {
 	// amount determines cost
 	amount = CHOOSE_BY_ABILITY_LEVEL(heal_levels, ch, ABIL_REJUVENATE);
 	amount += round(GET_INTELLIGENCE(ch) * int_mod);
-	if (HAS_ABILITY(ch, ABIL_HEALER)) {
+	if (has_ability(ch, ABIL_HEALER)) {
 		amount += round(MAX(0, get_approximate_level(ch) - 100) * over_level_mod);
 		cost = round(amount * healer_cost_mod);
 	}

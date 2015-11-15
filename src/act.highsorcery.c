@@ -232,7 +232,7 @@ bool can_use_ritual(char_data *ch, int ritual) {
 	if (IS_NPC(ch)) {
 		return FALSE;
 	}
-	if (ritual_data[ritual].ability != NO_ABIL && !HAS_ABILITY(ch, ritual_data[ritual].ability)) {
+	if (ritual_data[ritual].ability != NO_ABIL && !has_ability(ch, ritual_data[ritual].ability)) {
 		return FALSE;
 	}
 	
@@ -1367,7 +1367,7 @@ RITUAL_SETUP_FUNC(start_ritual_of_teleportation) {
 			subtype = GET_ROOM_VNUM(to_room);
 		}
 	}
-	else if (HAS_ABILITY(ch, ABIL_CITY_TELEPORTATION) && (city = find_city_by_name(GET_LOYALTY(ch), argument))) {
+	else if (has_ability(ch, ABIL_CITY_TELEPORTATION) && (city = find_city_by_name(GET_LOYALTY(ch), argument))) {
 		subtype = GET_ROOM_VNUM(city->location);
 		
 		if (get_cooldown_time(ch, COOLDOWN_TELEPORT_CITY) > 0) {
