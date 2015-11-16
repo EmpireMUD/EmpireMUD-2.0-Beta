@@ -1105,7 +1105,6 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 
 	bool need_color_terminator = FALSE;
 	char buf[30], buf1[30], lbuf[MAX_STRING_LENGTH];
-	char wallcolor[10];
 	struct empire_city_data *city;
 	int iter;
 	empire_data *emp, *chemp = GET_LOYALTY(ch);
@@ -1132,15 +1131,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	room_data *r_northeast = SHIFT_CHAR_DIR(ch, to_room, NORTHEAST);
 	room_data *r_southwest = SHIFT_CHAR_DIR(ch, to_room, SOUTHWEST);
 	room_data *r_southeast = SHIFT_CHAR_DIR(ch, to_room, SOUTHEAST);
-
-	// wall color setup
-	if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_FLY)) {
-		strcpy(wallcolor, "&m");
-	}
-	else {
-		strcpy(wallcolor, "&0");
-	}
-
+	
 	#define distance(x, y, a, b)		((x - a) * (x - a) + (y - b) * (y - b))
 
 	// detect base icon
@@ -1333,11 +1324,11 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 		if (strstr(buf, "@u") || strstr(buf, "@U")) {
 			if (!r_west || IS_BARRIER(r_west) || ROOM_IS_CLOSED(r_west)) {
 				// west is a barrier
-				sprintf(buf1, "%sv", wallcolor);
+				sprintf(buf1, "%sv", ROOM_AFF_FLAGGED(r_west, ROOM_AFF_NO_FLY) ? "&m" : "&0");
 				str = str_replace("@u", buf1, buf);
 				strcpy(buf, str);
 				free(str);
-				sprintf(buf1, "%sV", wallcolor);
+				sprintf(buf1, "%sV", ROOM_AFF_FLAGGED(r_west, ROOM_AFF_NO_FLY) ? "&m" : "&0");
 				str = str_replace("@U", buf1, buf);
 				strcpy(buf, str);
 				free(str);
@@ -1358,11 +1349,11 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 		if (strstr(buf, "@v") || strstr(buf, "@V")) {
 			if (!r_east || IS_BARRIER(r_east) || ROOM_IS_CLOSED(r_east)) {
 				// east is a barrier
-				sprintf(buf1, "%sv", wallcolor);
+				sprintf(buf1, "%sv", ROOM_AFF_FLAGGED(r_east, ROOM_AFF_NO_FLY) ? "&m" : "&0");
 				str = str_replace("@v", buf1, buf);
 				strcpy(buf, str);
 				free(str);
-				sprintf(buf1, "%sV", wallcolor);
+				sprintf(buf1, "%sV", ROOM_AFF_FLAGGED(r_east, ROOM_AFF_NO_FLY) ? "&m" : "&0");
 				str = str_replace("@V", buf1, buf);
 				strcpy(buf, str);
 				free(str);
@@ -1453,7 +1444,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 			strcpy(buf, lbuf);
 		}
 		if (strstr(buf, "&V")) {
-			str = str_replace("&V", wallcolor, buf);
+			str = str_replace("&V", ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_FLY) ? "&m" : "&0", buf);
 			strcpy(buf, str);
 			free(str);
 		}
@@ -1462,7 +1453,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 		if (AFF_FLAGGED(ch, AFF_STONED)) {
 			// check all but the final char
 			for (iter = 0; buf[iter] != 0 && buf[iter+1] != 0; ++iter) {
-				if (buf[iter] == '&') {
+				if (buf[iter] == '&' || buf[iter] == '\t') {
 					switch(buf[iter+1]) {
 						case 'r':	buf[iter+1] = 'b';	break;
 						case 'g':	buf[iter+1] = 'c';	break;
@@ -1470,12 +1461,26 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 						case 'b':	buf[iter+1] = 'g';	break;
 						case 'm':	buf[iter+1] = 'r';	break;
 						case 'c':	buf[iter+1] = 'y';	break;
+						case 'p':	buf[iter+1] = 'l';	break;
+						case 'v':	buf[iter+1] = 'o';	break;
+						case 'a':	buf[iter+1] = 't';	break;
+						case 'l':	buf[iter+1] = 'w';	break;
+						case 'j':	buf[iter+1] = 'v';	break;
+						case 'o':	buf[iter+1] = 'p';	break;
+						case 't':	buf[iter+1] = 'j';	break;
 						case 'R':	buf[iter+1] = 'B';	break;
 						case 'G':	buf[iter+1] = 'C';	break;
 						case 'Y':	buf[iter+1] = 'M';	break;
 						case 'B':	buf[iter+1] = 'G';	break;
 						case 'M':	buf[iter+1] = 'R';	break;
 						case 'C':	buf[iter+1] = 'Y';	break;
+						case 'P':	buf[iter+1] = 'L';	break;
+						case 'V':	buf[iter+1] = 'O';	break;
+						case 'A':	buf[iter+1] = 'T';	break;
+						case 'L':	buf[iter+1] = 'W';	break;
+						case 'J':	buf[iter+1] = 'V';	break;
+						case 'O':	buf[iter+1] = 'P';	break;
+						case 'T':	buf[iter+1] = 'J';	break;
 					}
 				}
 			}
