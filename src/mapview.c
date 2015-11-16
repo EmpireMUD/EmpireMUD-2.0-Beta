@@ -1110,7 +1110,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	empire_data *emp, *chemp = GET_LOYALTY(ch);
 	int tileset = pick_season(to_room);
 	struct icon_data *base_icon, *icon, *crop_icon = NULL;
-	bool junk, hidden = FALSE;
+	bool junk, enchanted, hidden = FALSE;
 	crop_data *cp = ROOM_CROP(to_room);
 	sector_data *st, *base_sect = BASE_SECT(to_room);
 	char *base_color, *str;
@@ -1323,12 +1323,13 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 		// west (@u) barrier attachment
 		if (strstr(buf, "@u") || strstr(buf, "@U")) {
 			if (!r_west || IS_BARRIER(r_west) || ROOM_IS_CLOSED(r_west)) {
+				enchanted = ROOM_AFF_FLAGGED(r_west, ROOM_AFF_NO_FLY) || ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_FLY);
 				// west is a barrier
-				sprintf(buf1, "%sv", ROOM_AFF_FLAGGED(r_west, ROOM_AFF_NO_FLY) ? "&m" : "&0");
+				sprintf(buf1, "%sv", enchanted ? "&m" : "&0");
 				str = str_replace("@u", buf1, buf);
 				strcpy(buf, str);
 				free(str);
-				sprintf(buf1, "%sV", ROOM_AFF_FLAGGED(r_west, ROOM_AFF_NO_FLY) ? "&m" : "&0");
+				sprintf(buf1, "%sV", enchanted ? "&m" : "&0");
 				str = str_replace("@U", buf1, buf);
 				strcpy(buf, str);
 				free(str);
@@ -1348,12 +1349,13 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 		//  east (@v) barrier attachment
 		if (strstr(buf, "@v") || strstr(buf, "@V")) {
 			if (!r_east || IS_BARRIER(r_east) || ROOM_IS_CLOSED(r_east)) {
+				enchanted = ROOM_AFF_FLAGGED(r_east, ROOM_AFF_NO_FLY) || ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_FLY);
 				// east is a barrier
-				sprintf(buf1, "%sv", ROOM_AFF_FLAGGED(r_east, ROOM_AFF_NO_FLY) ? "&m" : "&0");
+				sprintf(buf1, "%sv", enchanted ? "&m" : "&0");
 				str = str_replace("@v", buf1, buf);
 				strcpy(buf, str);
 				free(str);
-				sprintf(buf1, "%sV", ROOM_AFF_FLAGGED(r_east, ROOM_AFF_NO_FLY) ? "&m" : "&0");
+				sprintf(buf1, "%sV", enchanted ? "&m" : "&0");
 				str = str_replace("@V", buf1, buf);
 				strcpy(buf, str);
 				free(str);
