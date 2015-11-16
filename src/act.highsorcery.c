@@ -1486,6 +1486,11 @@ RITUAL_SETUP_FUNC(start_ritual_of_defense) {
 		return FALSE;
 	}
 	
+	if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_FLY)) {
+		msg_to_char(ch, "The ritual has already been performed here.\r\n");
+		return FALSE;
+	}
+	
 	if (!has_resources(ch, defense_res, TRUE, TRUE)) {
 		// message sent by has_resources
 		return FALSE;
