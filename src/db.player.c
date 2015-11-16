@@ -692,6 +692,8 @@ void free_char(char_data *ch) {
 	void free_mail(struct mail_data *mail);
 
 	struct slash_channel *loadslash, *next_loadslash;
+	struct player_ability_data *abil, *next_abil;
+	struct player_skill_data *skill, *next_skill;
 	struct channel_history_data *history;
 	struct player_slash_channel *slash;
 	struct interaction_item *interact;
@@ -787,6 +789,13 @@ void free_char(char_data *ch) {
 		while ((mail = GET_MAIL_PENDING(ch))) {
 			GET_MAIL_PENDING(ch) = mail->next;
 			free_mail(mail);
+		}
+		
+		HASH_ITER(hh, GET_SKILL_HASH(ch), skill, next_skill) {
+			free(skill);
+		}
+		HASH_ITER(hh, GET_ABILITY_HASH(ch), abil, next_abil) {
+			free(abil);
 		}
 		
 		free(ch->player_specials);
