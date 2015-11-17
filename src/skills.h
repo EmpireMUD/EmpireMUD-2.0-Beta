@@ -21,15 +21,15 @@
 #define CLASS_SKILL_CAP  100  // class skills
 #define SPECIALTY_SKILL_CAP  75  // accessory skill
 #define BASIC_SKILL_CAP  50  // common skills
-#define IS_ANY_SKILL_CAP(ch, skill)  (GET_SKILL((ch), (skill)) == CLASS_SKILL_CAP || GET_SKILL((ch), (skill)) == SPECIALTY_SKILL_CAP || GET_SKILL((ch), (skill)) == BASIC_SKILL_CAP || (GET_SKILL((ch), (skill)) == 0 && !CAN_GAIN_NEW_SKILLS(ch)))
-#define NEXT_CAP_LEVEL(ch, skill)  (GET_SKILL((ch), (skill)) <= BASIC_SKILL_CAP ? BASIC_SKILL_CAP : (GET_SKILL((ch), (skill)) <= SPECIALTY_SKILL_CAP ? SPECIALTY_SKILL_CAP : (CLASS_SKILL_CAP)))
+#define IS_ANY_SKILL_CAP(ch, skill)  (get_skill_level((ch), (skill)) == CLASS_SKILL_CAP || get_skill_level((ch), (skill)) == SPECIALTY_SKILL_CAP || get_skill_level((ch), (skill)) == BASIC_SKILL_CAP || (get_skill_level((ch), (skill)) == 0 && !CAN_GAIN_NEW_SKILLS(ch)))
+#define NEXT_CAP_LEVEL(ch, skill)  (get_skill_level((ch), (skill)) <= BASIC_SKILL_CAP ? BASIC_SKILL_CAP : (get_skill_level((ch), (skill)) <= SPECIALTY_SKILL_CAP ? SPECIALTY_SKILL_CAP : (CLASS_SKILL_CAP)))
 
 // skill > basic level
-#define IS_SPECIALTY_SKILL(ch, skill)	((IS_NPC(ch) ? get_approximate_level(ch) : GET_SKILL((ch), (skill))) > BASIC_SKILL_CAP)
+#define IS_SPECIALTY_SKILL(ch, skill)	((IS_NPC(ch) ? get_approximate_level(ch) : get_skill_level((ch), (skill))) > BASIC_SKILL_CAP)
 #define IS_SPECIALTY_ABILITY(ch, abil)	(get_ability_level((ch), (abil)) > BASIC_SKILL_CAP)
 
 // skill > specialty level
-#define IS_CLASS_SKILL(ch, skill)	((IS_NPC(ch) ? get_approximate_level(ch) : GET_SKILL((ch), (skill))) > SPECIALTY_SKILL_CAP)
+#define IS_CLASS_SKILL(ch, skill)	((IS_NPC(ch) ? get_approximate_level(ch) : get_skill_level((ch), (skill))) > SPECIALTY_SKILL_CAP)
 #define IS_CLASS_ABILITY(ch, abil)	(get_ability_level((ch), (abil)) > SPECIALTY_SKILL_CAP)
 
 #define CHOOSE_BY_SKILL_LEVEL(arr, ch, skill)	(IS_CLASS_SKILL((ch), (skill)) ? (arr)[2] : (IS_SPECIALTY_SKILL((ch), (skill)) ? (arr)[1] : (arr)[0]))
@@ -47,6 +47,7 @@
 
 
 // protos
+void add_ability(char_data *ch, int abil_id, bool reset_levels);
 void adjust_abilities_to_empire(char_data *ch, empire_data *emp, bool add);
 extern bool can_gain_exp_from(char_data *ch, char_data *vict);
 extern bool can_use_ability(char_data *ch, int ability, int cost_pool, int cost_amount, int cooldown_type);
@@ -54,9 +55,13 @@ void charge_ability_cost(char_data *ch, int cost_pool, int cost_amount, int cool
 void gain_ability_exp(char_data *ch, int ability, double amount);
 extern bool gain_skill(char_data *ch, int skill, int amount);
 extern bool gain_skill_exp(char_data *ch, int skill, double amount);
+extern struct player_ability_data *get_ability_data(char_data *ch, int abil_id, bool add_if_missing);
 extern int get_ability_level(char_data *ch, int ability);
 extern int get_ability_points_available_for_char(char_data *ch, int skill);
 extern int get_approximate_level(char_data *ch);
+extern struct player_skill_data *get_skill_data(char_data *ch, int skill_id, bool add_if_missing);
+void mark_level_gained_from_ability(char_data *ch, int abil_id);
+void remove_ability(char_data *ch, int abil_id, bool reset_levels);
 void set_skill(char_data *ch, int skill, int level);
 extern bool skill_check(char_data *ch, int ability, int difficulty);
 
@@ -390,7 +395,8 @@ extern bool skill_check(char_data *ch, int ability, int difficulty);
 #define ABIL_SKELETAL_HULK  260
 #define ABIL_BANSHEE  261
 #define ABIL_HONE  262
-#define NUM_ABILITIES  263		// must be <= MAX_ABILITIES (300; structs.h)
+#define ABIL_HEALER  263
+#define NUM_ABILITIES  264		// must be <= MAX_ABILITIES (300; structs.h)
 
 
 // cooldowns -- see COOLDOWN_x in constants.c
@@ -656,3 +662,72 @@ extern struct attack_hit_type attack_hit_info[NUM_ATTACK_TYPES];
 extern const struct class_data_type class_data[NUM_CLASSES];
 extern const double missile_weapon_speed[];
 extern struct skill_data_type skill_data[NUM_SKILLS];
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// INLINE SKILL FUNCTIONS //////////////////////////////////////////////////
+
+/**
+* @param char_data *ch A player.
+* @param int skill_id Any valid skill number.
+* @return double The player's experience in that skill.
+*/
+static inline double get_skill_exp(char_data *ch, int skill_id) {
+	struct player_skill_data *sk = get_skill_data(ch, skill_id, 0);
+	return sk ? sk->exp : 0.0;
+}
+
+
+/**
+* @param char_data *ch A player.
+* @param int skill_id Any valid skill number.
+* @return int The player's level in that skill.
+*/
+static inline int get_skill_level(char_data *ch, int skill_id) {
+	struct player_skill_data *sk = get_skill_data(ch, skill_id, 0);
+	return sk ? sk->level : 0;
+}
+
+
+/**
+* @param char_data *ch A player.
+* @param int skill_id Any valid skill number.
+* @return int The number of skill resets available.
+*/
+static inline int get_skill_resets(char_data *ch, int skill_id) {
+	struct player_skill_data *sk = get_skill_data(ch, skill_id, 0);
+	return sk ? sk->resets : 0;
+}
+
+
+/**
+* @param char_data *ch The player to check.
+* @param int abil_id Any valid ability.
+* @return bool TRUE if the player has the ability; FALSE if not.
+*/
+static inline bool has_ability(char_data *ch, int abil_id) {
+	struct player_ability_data *data = get_ability_data(ch, abil_id, 0);
+	return data && data->purchased;
+}
+
+
+/**
+* @param char_data *ch The player to check.
+* @param int abil_id Any valid ability.
+* @return int The number of levels gained from that ability.
+*/
+static inline int levels_gained_from_ability(char_data *ch, int abil_id) {
+	struct player_ability_data *data = get_ability_data(ch, abil_id, 0);
+	return data ? data->levels_gained : 0;
+}
+
+
+/**
+* @param char_data *ch A player.
+* @param int skill_id Any valid skill number.
+* @return bool TRUE if a player can gain skills, FALSE if not.
+*/
+static inline bool noskill_ok(char_data *ch, int skill_id) {
+	struct player_skill_data *sk = get_skill_data(ch, skill_id, 0);
+	return sk ? !sk->noskill : 1;
+}

@@ -839,7 +839,7 @@ void found_city(char_data *ch, char *argument) {
 		return;
 	}
 	
-	if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
+	if (has_ability(ch, ABIL_NAVIGATION)) {
 		log_to_empire(emp, ELOG_TERRITORY, "%s has founded %s at (%d, %d)", PERS(ch, ch, 1), city->name, X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
 	}
 	else {
@@ -1621,7 +1621,7 @@ void show_tavern_status(char_data *ch) {
 		if (ROOM_BLD_FLAGGED(ter->room, BLD_TAVERN)) {
 			found = TRUE;
 			
-			if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
+			if (has_ability(ch, ABIL_NAVIGATION)) {
 				msg_to_char(ch, "(%*d, %*d) %s : %s\r\n", X_PRECISION, X_COORD(ter->room), Y_PRECISION, Y_COORD(ter->room), get_room_name(ter->room, FALSE), tavern_data[get_room_extra_data(ter->room, ROOM_EXTRA_TAVERN_TYPE)].name);
 			}
 			else {
@@ -1810,7 +1810,7 @@ void scan_for_tile(char_data *ch, char *argument) {
 			dist = compute_distance(IN_ROOM(ch), node->loc);
 			dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), node->loc));
 			
-			if (CHECK_MAP_BOUNDS(check_x, check_y) && HAS_ABILITY(ch, ABIL_NAVIGATION)) {
+			if (CHECK_MAP_BOUNDS(check_x, check_y) && has_ability(ch, ABIL_NAVIGATION)) {
 				lsize = snprintf(line, sizeof(line), "%2d tile%s %s (%d, %d) - %s", dist, PLURAL(dist), (dir == NO_DIR ? "away" : dirs[dir]), check_x, check_y, get_room_name(node->loc, FALSE));
 			}
 			else {
@@ -2623,7 +2623,7 @@ ACMD(do_efind) {
 				
 				// first item at this location?
 				if (eg->location != last_rm) {
-					if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
+					if (has_ability(ch, ABIL_NAVIGATION)) {
 						// count have no coordinates
 						check_x = X_COORD(eg->location);
 						check_y = Y_COORD(eg->location);
@@ -3484,7 +3484,7 @@ ACMD(do_home) {
 		if (!home) {
 			msg_to_char(ch, "You have no home set.\r\n");
 		}
-		else if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
+		else if (has_ability(ch, ABIL_NAVIGATION)) {
 			msg_to_char(ch, "Your home is at: %s (%d, %d)\r\n", get_room_name(home, FALSE), X_COORD(home), Y_COORD(home));
 		}
 		else {
@@ -3620,7 +3620,7 @@ ACMD(do_islands) {
 		msg_to_char(ch, "You can't do that.\r\n");
 		return;
 	}
-	if (!HAS_ABILITY(ch, ABIL_NAVIGATION)) {
+	if (!has_ability(ch, ABIL_NAVIGATION)) {
 		msg_to_char(ch, "You need to purchase the Navigation ability to do that.\r\n");
 		return;
 	}
@@ -3760,7 +3760,7 @@ ACMD(do_tomb) {
 		if (!tomb) {
 			msg_to_char(ch, "You have no tomb set.\r\n");
 		}
-		else if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
+		else if (has_ability(ch, ABIL_NAVIGATION)) {
 			msg_to_char(ch, "Your tomb is at: %s (%d, %d)\r\n", get_room_name(tomb, FALSE), X_COORD(tomb), Y_COORD(tomb));
 		}
 		else {
@@ -4389,7 +4389,7 @@ ACMD(do_territory) {
 		msg_to_char(ch, "You are not in an empire.\r\n");
 		return;
 	}
-	if (!ch->desc || IS_NPC(ch) || !HAS_ABILITY(ch, ABIL_NAVIGATION)) {
+	if (!ch->desc || IS_NPC(ch) || !has_ability(ch, ABIL_NAVIGATION)) {
 		msg_to_char(ch, "You need the Navigation ability to list the coordinates of your territory.\r\n");
 		return;
 	}

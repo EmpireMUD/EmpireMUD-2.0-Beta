@@ -301,6 +301,7 @@ ADMIN_UTIL(util_islandsize);
 ADMIN_UTIL(util_playerdump);
 ADMIN_UTIL(util_randtest);
 ADMIN_UTIL(util_redo_islands);
+ADMIN_UTIL(util_rescan);
 ADMIN_UTIL(util_strlen);
 ADMIN_UTIL(util_tool);
 
@@ -316,6 +317,7 @@ struct {
 	{ "playerdump", LVL_IMPL, util_playerdump },
 	{ "randtest", LVL_CIMPL, util_randtest },
 	{ "redoislands", LVL_CIMPL, util_redo_islands },
+	{ "rescan", LVL_START_IMM, util_rescan },
 	{ "strlen", LVL_START_IMM, util_strlen },
 	{ "tool", LVL_IMPL, util_tool },
 
@@ -346,8 +348,8 @@ PLAYER_UPDATE_FUNC(update_clear_roles) {
 	}
 	
 	for (iter = 0; iter < NUM_ABILITIES; ++iter) {
-		if (ability_data[iter].parent_skill == NO_SKILL && HAS_ABILITY(ch, iter)) {
-			ch->player_specials->abilities[iter].purchased = FALSE;
+		if (ability_data[iter].parent_skill == NO_SKILL && has_ability(ch, iter)) {
+			remove_ability(ch, iter, FALSE);
 			if (!is_file) {
 				check_skill_sell(ch, iter);
 			}
@@ -554,6 +556,31 @@ ADMIN_UTIL(util_redo_islands) {
 		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has renumbered islands", GET_NAME(ch));
 		number_and_count_islands(TRUE);
 		msg_to_char(ch, "Islands renumbered. Caution: empire inventories may now be in the wrong place.\r\n");
+	}
+}
+
+
+ADMIN_UTIL(util_rescan) {
+	empire_data *emp;
+	
+	if (GET_ACCESS_LEVEL(ch) < LVL_CIMPL && !IS_GRANTED(ch, GRANT_EMPIRES)) {
+		msg_to_char(ch, "You don't have permission to rescan empires.\r\n");
+	}
+	else if (!*argument) {
+		msg_to_char(ch, "Usage: rescan <empire | all>\r\n");
+	}
+	else if (!str_cmp(argument, "all")) {
+		syslog(SYS_INFO, GET_INVIS_LEV(ch), TRUE, "Rescanning all empires");
+		reread_empire_tech(NULL);
+		send_config_msg(ch, "ok_string");
+	}
+	else if (!(emp = get_empire_by_name(argument))) {
+		msg_to_char(ch, "Unknown empire.\r\n");
+	}
+	else {
+		syslog(SYS_INFO, GET_INVIS_LEV(ch), TRUE, "Rescanning empire: %s", EMPIRE_NAME(emp));
+		reread_empire_tech(emp);
+		send_config_msg(ch, "ok_string");
 	}
 }
 
@@ -1398,7 +1425,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		}
 
 		// victory
-		old_level = GET_SKILL(vict, skill);
+		old_level = get_skill_level(vict, skill);
 		set_skill(vict, skill, level);
 		if (old_level > level) {
 			clear_char_abilities(vict, skill);
@@ -1819,11 +1846,11 @@ SHOW(show_skills) {
 	msg_to_char(ch, "Skills for %s:\r\n", PERS(vict, ch, TRUE));
 	
 	for (sk_iter = 0; sk_iter < NUM_SKILLS; ++sk_iter) {
-		msg_to_char(ch, "&y%s&0 [%d, %.1f%%, %d]: ", skill_data[sk_iter].name, GET_SKILL(vict, sk_iter), GET_SKILL_EXP(vict, sk_iter), get_ability_points_available_for_char(vict, sk_iter));
+		msg_to_char(ch, "&y%s&0 [%d, %.1f%%, %d]: ", skill_data[sk_iter].name, get_skill_level(vict, sk_iter), get_skill_exp(vict, sk_iter), get_ability_points_available_for_char(vict, sk_iter));
 		
 		found = FALSE;
 		for (ab_iter = 0; ab_iter < NUM_ABILITIES; ++ab_iter) {
-			if (ability_data[ab_iter].parent_skill == sk_iter && HAS_ABILITY(vict, ab_iter)) {
+			if (ability_data[ab_iter].parent_skill == sk_iter && has_ability(vict, ab_iter)) {
 				msg_to_char(ch, "%s%s%s&0", (found ? ", " : ""), ability_color(vict, ab_iter), ability_data[ab_iter].name);
 				found = TRUE;
 			}
@@ -1835,7 +1862,7 @@ SHOW(show_skills) {
 	msg_to_char(ch, "&yClass&0: &g");
 	found = FALSE;
 	for (ab_iter = 0; ab_iter < NUM_ABILITIES; ++ab_iter) {
-		if (ability_data[ab_iter].parent_skill == NOTHING && HAS_ABILITY(vict, ab_iter)) {
+		if (ability_data[ab_iter].parent_skill == NOTHING && has_ability(vict, ab_iter)) {
 			msg_to_char(ch, "%s%s", (found ? ", " : ""), ability_data[ab_iter].name);
 			found = TRUE;
 		}
@@ -5582,8 +5609,7 @@ ACMD(do_restore) {
 			}
 			
 			for (i = 0; i < NUM_ABILITIES; ++i) {
-				vict->player_specials->abilities[i].purchased = TRUE;
-				vict->player_specials->abilities[i].levels_gained = 0;
+				add_ability(vict, i, TRUE);
 			}
 
 			affect_total(vict);

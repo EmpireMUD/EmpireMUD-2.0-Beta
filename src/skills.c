@@ -358,9 +358,9 @@ void check_skill_sell(char_data *ch, int abil) {
 char *ability_color(char_data *ch, int abil) {
 	bool can_buy, has_bought, has_maxed;
 		
-	has_bought = HAS_ABILITY(ch, abil);
-	can_buy = (GET_SKILL(ch, ability_data[abil].parent_skill) >= ability_data[abil].parent_skill_required) && (ability_data[abil].parent_ability == NO_PREREQ || HAS_ABILITY(ch, ability_data[abil].parent_ability));
-	has_maxed = has_bought && (GET_LEVELS_GAINED_FROM_ABILITY(ch, abil) >= GAINS_PER_ABILITY || IS_ANY_SKILL_CAP(ch, ability_data[abil].parent_skill) || !can_gain_skill_from(ch, abil));
+	has_bought = has_ability(ch, abil);
+	can_buy = (get_skill_level(ch, ability_data[abil].parent_skill) >= ability_data[abil].parent_skill_required) && (ability_data[abil].parent_ability == NO_PREREQ || has_ability(ch, ability_data[abil].parent_ability));
+	has_maxed = has_bought && (levels_gained_from_ability(ch, abil) >= GAINS_PER_ABILITY || IS_ANY_SKILL_CAP(ch, ability_data[abil].parent_skill) || !can_gain_skill_from(ch, abil));
 	
 	if (has_bought && has_maxed) {
 		return "&g";
@@ -376,6 +376,24 @@ char *ability_color(char_data *ch, int abil) {
 
 
 /**
+* Gives an ability to a player.
+*
+* @param char_data *ch The player to check.
+* @param int abil_id Any valid ability.
+* @param bool reset_levels If TRUE, wipes out the number of levels gained from the ability.
+*/
+void add_ability(char_data *ch, int abil_id, bool reset_levels) {
+	struct player_ability_data *data = get_ability_data(ch, abil_id, TRUE);
+	if (data) {
+		data->purchased = TRUE;
+		if (reset_levels) {
+			data->levels_gained = 0;
+		}
+	}
+}
+
+
+/**
 * This function reads abilities out of a player and modifies the empire technology.
 *
 * @param char_data *ch
@@ -385,34 +403,34 @@ char *ability_color(char_data *ch, int abil) {
 void adjust_abilities_to_empire(char_data *ch, empire_data *emp, bool add) {
 	int mod = (add ? 1 : -1);
 	
-	if (HAS_ABILITY(ch, ABIL_EXARCH_CRAFTS)) {
+	if (has_ability(ch, ABIL_EXARCH_CRAFTS)) {
 		EMPIRE_TECH(emp, TECH_EXARCH_CRAFTS) += mod;
 	}
-	if (HAS_ABILITY(ch, ABIL_WORKFORCE)) {
+	if (has_ability(ch, ABIL_WORKFORCE)) {
 		EMPIRE_TECH(emp, TECH_WORKFORCE) += mod;
 	}
-	if (HAS_ABILITY(ch, ABIL_SKILLED_LABOR)) {
+	if (has_ability(ch, ABIL_SKILLED_LABOR)) {
 		EMPIRE_TECH(emp, TECH_SKILLED_LABOR) += mod;
 	}
-	if (HAS_ABILITY(ch, ABIL_TRADE_ROUTES)) {
+	if (has_ability(ch, ABIL_TRADE_ROUTES)) {
 		EMPIRE_TECH(emp, TECH_TRADE_ROUTES) += mod;
 	}
-	if (HAS_ABILITY(ch, ABIL_LOCKS)) {
+	if (has_ability(ch, ABIL_LOCKS)) {
 		EMPIRE_TECH(emp, TECH_LOCKS) += mod;
 	}
-	if (HAS_ABILITY(ch, ABIL_PROMINENCE)) {
+	if (has_ability(ch, ABIL_PROMINENCE)) {
 		EMPIRE_TECH(emp, TECH_PROMINENCE) += mod;
 	}
-	if (HAS_ABILITY(ch, ABIL_COMMERCE)) {
+	if (has_ability(ch, ABIL_COMMERCE)) {
 		EMPIRE_TECH(emp, TECH_COMMERCE) += mod;
 	}
-	if (HAS_ABILITY(ch, ABIL_CITY_LIGHTS)) {
+	if (has_ability(ch, ABIL_CITY_LIGHTS)) {
 		EMPIRE_TECH(emp, TECH_CITY_LIGHTS) += mod;
 	}
-	if (HAS_ABILITY(ch, ABIL_PORTAL_MAGIC)) {
+	if (has_ability(ch, ABIL_PORTAL_MAGIC)) {
 		EMPIRE_TECH(emp, TECH_PORTALS) += mod;
 	}
-	if (HAS_ABILITY(ch, ABIL_PORTAL_MASTER)) {
+	if (has_ability(ch, ABIL_PORTAL_MASTER)) {
 		EMPIRE_TECH(emp, TECH_MASTER_PORTALS) += mod;
 	}
 }
@@ -425,12 +443,12 @@ void adjust_abilities_to_empire(char_data *ch, empire_data *emp, bool add) {
 */
 bool can_gain_skill_from(char_data *ch, int ability) {
 	// must have the ability and not gained too many from it
-	if (GET_SKILL(ch, ability_data[ability].parent_skill) < CLASS_SKILL_CAP && HAS_ABILITY(ch, ability) && GET_LEVELS_GAINED_FROM_ABILITY(ch, ability) < GAINS_PER_ABILITY) {
+	if (get_skill_level(ch, ability_data[ability].parent_skill) < CLASS_SKILL_CAP && has_ability(ch, ability) && levels_gained_from_ability(ch, ability) < GAINS_PER_ABILITY) {
 	
 		// these limit abilities purchased under each cap to players who are still under that cap
-		if (ability_data[ability].parent_skill_required >= BASIC_SKILL_CAP || GET_SKILL(ch, ability_data[ability].parent_skill) < BASIC_SKILL_CAP) {
-			if (ability_data[ability].parent_skill_required >= SPECIALTY_SKILL_CAP || GET_SKILL(ch, ability_data[ability].parent_skill) < SPECIALTY_SKILL_CAP) {
-				if (ability_data[ability].parent_skill_required >= CLASS_SKILL_CAP || GET_SKILL(ch, ability_data[ability].parent_skill) < CLASS_SKILL_CAP) {
+		if (ability_data[ability].parent_skill_required >= BASIC_SKILL_CAP || get_skill_level(ch, ability_data[ability].parent_skill) < BASIC_SKILL_CAP) {
+			if (ability_data[ability].parent_skill_required >= SPECIALTY_SKILL_CAP || get_skill_level(ch, ability_data[ability].parent_skill) < SPECIALTY_SKILL_CAP) {
+				if (ability_data[ability].parent_skill_required >= CLASS_SKILL_CAP || get_skill_level(ch, ability_data[ability].parent_skill) < CLASS_SKILL_CAP) {
 					return TRUE;
 				}
 			}
@@ -460,7 +478,7 @@ bool can_use_ability(char_data *ch, int ability, int cost_pool, int cost_amount,
 	int time, needs_cost;
 	
 	// purchase check first, or the rest don't make sense.
-	if (!IS_NPC(ch) && ability != NO_ABIL && !HAS_ABILITY(ch, ability)) {
+	if (!IS_NPC(ch) && ability != NO_ABIL && !has_ability(ch, ability)) {
 		msg_to_char(ch, "You have not purchased the %s ability.\r\n", ability_data[ability].name);
 		return FALSE;
 	}
@@ -531,7 +549,7 @@ void clear_char_abilities(char_data *ch, int skill) {
 	void check_skill_sell(char_data *ch, int abil);
 	void resort_empires();
 	
-	int iter;
+	struct player_ability_data *abil, *next_abil;
 	empire_data *emp = GET_LOYALTY(ch);
 	bool all = (skill == NO_SKILL);
 	
@@ -540,13 +558,13 @@ void clear_char_abilities(char_data *ch, int skill) {
 		if (emp && ch->desc && STATE(ch->desc) == CON_PLAYING) {
 			adjust_abilities_to_empire(ch, emp, FALSE);
 		}
-	
-		for (iter = 0; iter < NUM_ABILITIES; ++iter) {
-			if (all || ability_data[iter].parent_skill == skill) {
-				if (HAS_ABILITY(REAL_CHAR(ch), iter)) {
-					check_skill_sell(REAL_CHAR(ch), iter);
+		
+		HASH_ITER(hh, GET_ABILITY_HASH(ch), abil, next_abil) {
+			if (all || ability_data[abil->ability_id].parent_skill == skill) {
+				if (abil->purchased) {
+					check_skill_sell(REAL_CHAR(ch), abil->ability_id);
+					remove_ability(ch, abil->ability_id, FALSE);
 				}
-				REAL_CHAR(ch)->player_specials->abilities[iter].purchased = 0;
 			}
 		}
 		SAVE_CHAR(ch);
@@ -668,7 +686,7 @@ void gain_ability_exp(char_data *ch, int ability, double amount) {
 	// try gain
 	if (skill != NO_SKILL && gain_skill_exp(ch, skill, amount)) {
 		// increment gains from this
-		ch->player_specials->abilities[ability].levels_gained += 1;
+		mark_level_gained_from_ability(ch, ability);
 	}
 }
 
@@ -684,6 +702,7 @@ void gain_ability_exp(char_data *ch, int ability, double amount) {
 */
 bool gain_skill(char_data *ch, int skill, int amount) {
 	bool any = FALSE, pos = (amount > 0);
+	struct player_skill_data *skdata;
 	int points;
 	
 	if (skill == NO_SKILL || skill >= NUM_SKILLS || !ch || IS_NPC(ch)) {
@@ -691,51 +710,55 @@ bool gain_skill(char_data *ch, int skill, int amount) {
 	}
 	
 	// inability to gain from 0?
-	if (GET_SKILL(ch, skill) == 0 && !CAN_GAIN_NEW_SKILLS(ch)) {
+	if (get_skill_level(ch, skill) == 0 && !CAN_GAIN_NEW_SKILLS(ch)) {
 		return FALSE;
 	}
 	
 	// reasons a character would not gain no matter what
-	if (amount > 0 && NOSKILL_BLOCKED(ch, skill)) {
+	if (amount > 0 && !noskill_ok(ch, skill)) {
 		return FALSE;
 	}
-
-	while (amount != 0 && (amount > 0 || GET_SKILL(ch, skill) > 0) && (amount < 0 || !IS_ANY_SKILL_CAP(ch, skill))) {
+	
+	// load skill data now (this is the final check)
+	if (!(skdata = get_skill_data(ch, skill, TRUE))) {
+		return FALSE;
+	}
+	
+	while (amount != 0 && (amount > 0 || skdata->level > 0) && (amount < 0 || !IS_ANY_SKILL_CAP(ch, skill))) {
 		any = TRUE;
 		if (pos) {
-			set_skill(ch, skill, GET_SKILL(ch, skill) + 1);
+			set_skill(ch, skill, skdata->level + 1);
 			--amount;
 		}
 		else {
-			set_skill(ch, skill, GET_SKILL(ch, skill) - 1);
+			set_skill(ch, skill, skdata->level - 1);
 			++amount;
 		}
 	}
 	
 	if (any) {
-		SAVE_CHAR(ch);
-		
 		// messaging
 		if (pos) {
-			msg_to_char(ch, "&yYou improve your %s skill to %d.&0\r\n", skill_data[skill].name, GET_SKILL(ch, skill));
-	
+			msg_to_char(ch, "&yYou improve your %s skill to %d.&0\r\n", skill_data[skill].name, skdata->level);
+			
 			points = get_ability_points_available_for_char(ch, skill);
 			if (points > 0) {
 				msg_to_char(ch, "&yYou have %d ability point%s to spend. Type 'skill %s' to see %s.&0\r\n", points, (points != 1 ? "s" : ""), skill_data[skill].name, (points != 1 ? "them" : "it"));
 			}
-	
+			
 			// did we hit a cap? free reset!
 			if (IS_ANY_SKILL_CAP(ch, skill)) {
-				GET_FREE_SKILL_RESETS(ch, skill) = MIN(GET_FREE_SKILL_RESETS(ch, skill) + 1, MAX_SKILL_RESETS);
+				skdata->resets = MIN(skdata->resets + 1, MAX_SKILL_RESETS);
 				msg_to_char(ch, "&yYou have earned a free skill reset in %s. Type 'skill reset %s' to use it.&0\r\n", skill_data[skill].name, skill_data[skill].name);
 			}
 		}
 		else {
-			msg_to_char(ch, "&yYour %s skill drops to %d.&0\r\n", skill_data[skill].name, GET_SKILL(ch, skill));
+			msg_to_char(ch, "&yYour %s skill drops to %d.&0\r\n", skill_data[skill].name, skdata->level);
 		}
 		
 		// update class and progression
 		update_class(ch);
+		SAVE_CHAR(ch);
 	}
 	
 	return any;
@@ -757,15 +780,16 @@ bool gain_skill(char_data *ch, int skill, int amount) {
 * @return bool TRUE if the character gained a skill point from the exp.
 */
 bool gain_skill_exp(char_data *ch, int skill, double amount) {
+	struct player_skill_data *skdata;
 	bool gained;
 	
 	// simply sanitation
-	if (amount <= 0 || skill == NOTHING || skill >= NUM_SKILLS || !ch || IS_NPC(ch)) {
+	if (amount <= 0 || !ch || !(skdata = get_skill_data(ch, skill, TRUE))) {
 		return FALSE;
 	}
 	
 	// reasons a character would not gain no matter what
-	if (NOSKILL_BLOCKED(ch, skill) || IS_ANY_SKILL_CAP(ch, skill)) {
+	if (skdata->noskill || IS_ANY_SKILL_CAP(ch, skill)) {
 		return FALSE;
 	}
 
@@ -775,15 +799,15 @@ bool gain_skill_exp(char_data *ch, int skill, double amount) {
 	}
 	
 	// gain the exp
-	GET_SKILL_EXP(ch, skill) = MIN(100.0, GET_SKILL_EXP(ch, skill) + amount);
+	skdata->exp += amount;
 	
 	// can gain at all?
-	if (GET_SKILL_EXP(ch, skill) < config_get_int("min_exp_to_roll_skillup")) {
+	if (skdata->exp < config_get_int("min_exp_to_roll_skillup")) {
 		return FALSE;
 	}
 	
 	// check for skill gain
-	gained = (number(1, 100) <= GET_SKILL_EXP(ch, skill));
+	gained = (number(1, 100) <= skdata->exp);
 	
 	if (gained) {
 		GET_DAILY_BONUS_EXPERIENCE(ch) = MAX(0, GET_DAILY_BONUS_EXPERIENCE(ch) - 1);
@@ -791,6 +815,35 @@ bool gain_skill_exp(char_data *ch, int skill, double amount) {
 	}
 	
 	return gained;
+}
+
+
+/**
+* Get one ability from a player's hash (or add it if missing). Note that the
+* add_if_missing param does not guarantee a non-NULL return if the other
+* arguments are bad.
+*
+* @param char_data *ch The player to get the ability for (NPCs always return NULL).
+* @param int abil_id A valid ability number.
+* @param bool add_if_missing If TRUE, will add a ability entry if they player has none.
+* @return struct player_ability_data* The ability entry if possible, or NULL.
+*/
+struct player_ability_data *get_ability_data(char_data *ch, int abil_id, bool add_if_missing) {
+	struct player_ability_data *data;
+	
+	// check bounds
+	if (!ch || IS_NPC(ch) || abil_id < 0 || abil_id >= NUM_ABILITIES) {
+		return NULL;
+	}
+	
+	HASH_FIND_INT(GET_ABILITY_HASH(ch), &abil_id, data);
+	if (!data && add_if_missing) {
+		CREATE(data, struct player_ability_data, 1);
+		data->ability_id = abil_id;
+		HASH_ADD_INT(GET_ABILITY_HASH(ch), ability_id, data);
+	}
+	
+	return data;	// may be NULL
 }
 
 
@@ -809,11 +862,11 @@ int get_ability_level(char_data *ch, int ability) {
 	}
 	else {
 		// players
-		if (ability != NO_ABIL && !HAS_ABILITY(ch, ability)) {
+		if (ability != NO_ABIL && !has_ability(ch, ability)) {
 			return 0;
 		}
 		else if (ability != NO_ABIL && ability_data[ability].parent_skill != NO_SKILL) {
-			return GET_SKILL(ch, ability_data[ability].parent_skill);
+			return get_skill_level(ch, ability_data[ability].parent_skill);
 		}
 		else {
 			return MIN(CLASS_SKILL_CAP, GET_COMPUTED_LEVEL(ch));
@@ -883,10 +936,10 @@ int get_ability_points_available(int skill, int level) {
 int get_ability_points_available_for_char(char_data *ch, int skill) {
 	int max = get_ability_points_available(skill, NEXT_CAP_LEVEL(ch, skill));
 	int spent = get_ability_points_spent(ch, skill);
-	int avail = MAX(0, get_ability_points_available(skill, GET_SKILL(ch, skill)) - spent);
+	int avail = MAX(0, get_ability_points_available(skill, get_skill_level(ch, skill)) - spent);
 	
 	// allow early if they're at a deadend
-	if (avail == 0 && spent < max && GET_SKILL(ch, skill) >= EMPIRE_CHORE_SKILL_CAP && green_skill_deadend(ch, skill)) {
+	if (avail == 0 && spent < max && get_skill_level(ch, skill) >= EMPIRE_CHORE_SKILL_CAP && green_skill_deadend(ch, skill)) {
 		return 1;
 	}
 	else {
@@ -904,7 +957,7 @@ int get_ability_points_spent(char_data *ch, int skill) {
 	int count = 0, iter;
 	
 	for (iter = 0; iter < NUM_ABILITIES; ++iter) {
-		if (ability_data[iter].parent_skill == skill && HAS_ABILITY(ch, iter)) {
+		if (ability_data[iter].parent_skill == skill && has_ability(ch, iter)) {
 			++count;
 		}
 	}
@@ -955,12 +1008,12 @@ char *get_skill_abilities_display(char_data *ch, int skill, int ability, int ind
 			// get the proper color for this ability
 			strcpy(colorize, ability_color(ch, abil));
 			
-			sprintf(out + strlen(out), "%s(%s) %s%s&0 [%d-%d]", lbuf, (HAS_ABILITY(ch, abil) ? "x" : " "), colorize, ability_data[abil].name, ability_data[abil].parent_skill_required, max_skill);
+			sprintf(out + strlen(out), "%s(%s) %s%s&0 [%d-%d]", lbuf, (has_ability(ch, abil) ? "x" : " "), colorize, ability_data[abil].name, ability_data[abil].parent_skill_required, max_skill);
 			
-			if (HAS_ABILITY(ch, abil)) {
+			if (has_ability(ch, abil)) {
 				// this is kind of a hack to quickly make sure you can still use the ability
-				if (GET_LEVELS_GAINED_FROM_ABILITY(ch, abil) < GAINS_PER_ABILITY && !strcmp(colorize, "&y")) {
-					sprintf(out + strlen(out), " %d/%d skill points gained", GET_LEVELS_GAINED_FROM_ABILITY(ch, abil), GAINS_PER_ABILITY);
+				if (levels_gained_from_ability(ch, abil) < GAINS_PER_ABILITY && !strcmp(colorize, "&y")) {
+					sprintf(out + strlen(out), " %d/%d skill points gained", levels_gained_from_ability(ch, abil), GAINS_PER_ABILITY);
 				}
 				else {
 					strcat(out, " (max)");
@@ -970,10 +1023,10 @@ char *get_skill_abilities_display(char_data *ch, int skill, int ability, int ind
 				// does not have the ability at all
 				// we check that the parent skill exists first, since this reports it
 				
-				if (ability_data[abil].parent_ability != NO_ABIL && !HAS_ABILITY(ch, ability_data[abil].parent_ability)) {
+				if (ability_data[abil].parent_ability != NO_ABIL && !has_ability(ch, ability_data[abil].parent_ability)) {
 					sprintf(out + strlen(out), " requires %s", ability_data[ability_data[abil].parent_ability].name);
 				}
-				else if (GET_SKILL(ch, ability_data[abil].parent_skill) < ability_data[abil].parent_skill_required) {
+				else if (get_skill_level(ch, ability_data[abil].parent_skill) < ability_data[abil].parent_skill_required) {
 					sprintf(out + strlen(out), " requires %s %d", skill_data[ability_data[abil].parent_skill].name, ability_data[abil].parent_skill_required);
 				}
 				else {
@@ -991,6 +1044,35 @@ char *get_skill_abilities_display(char_data *ch, int skill, int ability, int ind
 	strcpy(retval, out);
 	
 	return retval;
+}
+
+
+/**
+* Get one skill from a player's hash (or add it if missing). Note that the
+* add_if_missing param does not guarantee a non-NULL return if the other
+* arguments are bad.
+*
+* @param char_data *ch The player to get skills for (NPCs always return NULL).
+* @param int skill_id A valid skill number.
+* @param bool add_if_missing If TRUE, will add a skill entry if they player has none.
+* @return struct player_skill_data* The skill entry if possible, or NULL.
+*/
+struct player_skill_data *get_skill_data(char_data *ch, int skill_id, bool add_if_missing) {
+	struct player_skill_data *sk;
+	
+	// check bounds
+	if (!ch || IS_NPC(ch) || skill_id < 0 || skill_id >= NUM_SKILLS) {
+		return NULL;
+	}
+	
+	HASH_FIND_INT(GET_SKILL_HASH(ch), &skill_id, sk);
+	if (!sk && add_if_missing) {
+		CREATE(sk, struct player_skill_data, 1);
+		sk->skill_id = skill_id;
+		HASH_ADD_INT(GET_SKILL_HASH(ch), skill_id, sk);
+	}
+	
+	return sk;	// may be NULL
 }
 
 
@@ -1014,17 +1096,20 @@ char *get_skill_gain_display(char_data *ch) {
 
 char *get_skill_row_display(char_data *ch, int skill) {
 	static char out[MAX_STRING_LENGTH];
+	struct player_skill_data *skdata;
 	char exp[256];
 	int points = get_ability_points_available_for_char(ch, skill);
 	
-	if (!NOSKILL_BLOCKED(ch, skill) && !IS_ANY_SKILL_CAP(ch, skill)) {
-		sprintf(exp, ", %.1f%% exp", GET_SKILL_EXP(ch, skill));
+	skdata = get_skill_data(ch, skill, FALSE);
+	
+	if (skdata && !skdata->noskill && !IS_ANY_SKILL_CAP(ch, skill)) {
+		sprintf(exp, ", %.1f%% exp", skdata->exp);
 	}
 	else {
 		*exp = '\0';
 	}
 	
-	sprintf(out, "[%3d] %s%s&0%s (%s%s) - %s\r\n", GET_SKILL(ch, skill), IS_ANY_SKILL_CAP(ch, skill) ? "&g" : "&y", skill_data[skill].name, (points > 0 ? "*" : ""), IS_ANY_SKILL_CAP(ch, skill) ? "&ymax&0" : (NOSKILL_BLOCKED(ch, skill) ? "&rnoskill&0" : "&cgaining&0"), exp, skill_data[skill].description);
+	sprintf(out, "[%3d] %s%s&0%s (%s%s) - %s\r\n", (skdata ? skdata->level : 0), IS_ANY_SKILL_CAP(ch, skill) ? "&g" : "&y", skill_data[skill].name, (points > 0 ? "*" : ""), IS_ANY_SKILL_CAP(ch, skill) ? "&ymax&0" : ((skdata && skdata->noskill) ? "\trnoskill\t0" : "\tcgaining\t0"), exp, skill_data[skill].description);
 	return out;
 }
 
@@ -1038,7 +1123,7 @@ char *get_skill_row_display(char_data *ch, int skill) {
 * @return bool TRUE if the player has found no levelable abilities
 */
 bool green_skill_deadend(char_data *ch, int skill) {
-	int avail = get_ability_points_available(skill, GET_SKILL(ch, skill)) - get_ability_points_spent(ch, skill);
+	int avail = get_ability_points_available(skill, get_skill_level(ch, skill)) - get_ability_points_spent(ch, skill);
 	int iter;
 	bool yellow = FALSE;
 		
@@ -1056,6 +1141,41 @@ bool green_skill_deadend(char_data *ch, int skill) {
 
 
 /**
+* Adds one to the number of levels ch gained from an ability.
+*
+* @param char_data *ch The player to check.
+* @param int abil_id Any valid ability.
+*/
+void mark_level_gained_from_ability(char_data *ch, int abil_id) {
+	struct player_ability_data *data = get_ability_data(ch, abil_id, TRUE);
+	if (data) {
+		data->levels_gained += 1;
+	}
+}
+
+
+/**
+* Takes an ability away from a player.
+*
+* @param char_data *ch The player to check.
+* @param int abil_id Any valid ability.
+* @param bool reset_levels If TRUE, wipes out the number of levels gained from the ability.
+*/
+void remove_ability(char_data *ch, int abil_id, bool reset_levels) {
+	struct player_ability_data *data = get_ability_data(ch, abil_id, FALSE);
+	if (data) {
+		data->purchased = FALSE;
+		
+		// if we're also resetting the levels, just wipe out the whole entry
+		if (reset_levels) {
+			HASH_DEL(GET_ABILITY_HASH(ch), data);
+			free(data);
+		}
+	}
+}
+
+
+/**
 * When a character loses skill levels, we clear the "levels_gained" tracker
 * for abilities that are >= their new level, so they can successfully regain
 * those levels later.
@@ -1064,12 +1184,12 @@ bool green_skill_deadend(char_data *ch, int skill) {
 * @param int skill Which SKILL_x.
 */
 void reset_skill_gain_tracker_on_abilities_above_level(char_data *ch, int skill) {
-	int iter;
+	struct player_ability_data *abil, *next_abil;
 	
 	if (!IS_NPC(ch)) {
-		for (iter = 0; iter < NUM_ABILITIES; ++iter) {
-			if (ability_data[iter].parent_skill == skill && ability_data[iter].parent_skill_required >= GET_SKILL(ch, skill)) {
-				ch->player_specials->abilities[iter].levels_gained = 0;
+		HASH_ITER(hh, GET_ABILITY_HASH(ch), abil, next_abil) {
+			if (ability_data[abil->ability_id].parent_skill == skill && ability_data[abil->ability_id].parent_skill_required >= get_skill_level(ch, skill)) {
+				abil->levels_gained = 0;
 			}
 		}
 	}
@@ -1078,13 +1198,14 @@ void reset_skill_gain_tracker_on_abilities_above_level(char_data *ch, int skill)
 
 // set a skill directly to a level
 void set_skill(char_data *ch, int skill, int level) {
+	struct player_skill_data *skdata;
 	bool gain = FALSE;
 	
-	if (!IS_NPC(ch)) {
-		gain = (level > GET_SKILL(ch, skill));
+	if ((skdata = get_skill_data(ch, skill, TRUE))) {
+		gain = (level > skdata->level);
 		
-		ch->player_specials->skills[skill].level = level;
-		ch->player_specials->skills[skill].exp = 0;
+		skdata->level = level;
+		skdata->exp = 0.0;
 		
 		if (!gain) {
 			reset_skill_gain_tracker_on_abilities_above_level(ch, skill);
@@ -1105,7 +1226,7 @@ bool skill_check(char_data *ch, int ability, int difficulty) {
 	int chance = get_ability_level(ch, ability);
 
 	// players without the ability have no chance	
-	if (!IS_NPC(ch) && !HAS_ABILITY(ch, ability)) {
+	if (!IS_NPC(ch) && !has_ability(ch, ability)) {
 		chance = 0;
 	}
 	
@@ -1121,6 +1242,7 @@ bool skill_check(char_data *ch, int ability, int difficulty) {
 //// CORE SKILL COMMANDS /////////////////////////////////////////////////////
 
 ACMD(do_noskill) {
+	struct player_skill_data *skdata;
 	int skill;
 
 	skip_spaces(&argument);
@@ -1132,16 +1254,16 @@ ACMD(do_noskill) {
 		msg_to_char(ch, "Usage: noskill <skill>\r\n");
 		msg_to_char(ch, "Type 'skills' to see which skills are gaining and which are not.\r\n");
 	}
-	else if ((skill = find_skill_by_name(argument)) == NO_SKILL) {
+	else if ((skill = find_skill_by_name(argument)) == NO_SKILL || !(skdata = get_skill_data(ch, skill, TRUE))) {
 		msg_to_char(ch, "Unknown skill.\r\n");
 	}
 	else {
-		if (NOSKILL_BLOCKED(ch, skill)) {
-			NOSKILL_BLOCKED(ch, skill) = FALSE;
+		if (skdata->noskill) {
+			skdata->noskill = FALSE;
 			msg_to_char(ch, "You will now &cbe able to gain&0 %s skill.\r\n", skill_data[skill].name);
 		}
 		else {
-			NOSKILL_BLOCKED(ch, skill) = TRUE;
+			skdata->noskill = TRUE;
 			msg_to_char(ch, "You will &rno longer&0 gain %s skill.\r\n", skill_data[skill].name);
 		}
 	}
@@ -1151,10 +1273,10 @@ ACMD(do_noskill) {
 ACMD(do_skills) {
 	void check_skill_sell(char_data *ch, int abil);
 	void clear_char_abilities(char_data *ch, int skill);
-	extern int skill_sort[NUM_SKILLS];
 	void resort_empires();
 	
 	char arg2[MAX_INPUT_LENGTH], lbuf[MAX_INPUT_LENGTH], outbuf[MAX_STRING_LENGTH];
+	struct player_skill_data *skdata;
 	int iter, points, sk, ab, level;
 	empire_data *emp;
 	bool found;
@@ -1173,8 +1295,8 @@ ACMD(do_skills) {
 		sprintf(outbuf + strlen(outbuf), "You know the following skills (skill level %d):\r\n", GET_SKILL_LEVEL(ch));
 		found = FALSE;
 		for (iter = 0; iter < NUM_SKILLS; ++iter) {
-			strcat(outbuf, get_skill_row_display(ch, skill_sort[iter]));
-			if (!found && get_ability_points_available_for_char(ch, skill_sort[iter]) > 0) {
+			strcat(outbuf, get_skill_row_display(ch, iter));
+			if (!found && get_ability_points_available_for_char(ch, iter) > 0) {
 				found = TRUE;
 			}
 		}
@@ -1202,7 +1324,7 @@ ACMD(do_skills) {
 			return;
 		}
 		
-		if (HAS_ABILITY(ch, ab)) {
+		if (has_ability(ch, ab)) {
 			msg_to_char(ch, "You already know the %s ability.\r\n", ability_data[ab].name);
 			return;
 		}
@@ -1218,13 +1340,13 @@ ACMD(do_skills) {
 		}
 		
 		// check level
-		if (GET_SKILL(ch, ability_data[ab].parent_skill) < ability_data[ab].parent_skill_required) {
+		if (get_skill_level(ch, ability_data[ab].parent_skill) < ability_data[ab].parent_skill_required) {
 			msg_to_char(ch, "You need at least %d in %s to buy %s.\r\n", ability_data[ab].parent_skill_required, skill_data[ability_data[ab].parent_skill].name, ability_data[ab].name);
 			return;
 		}
 		
 		// check pre-req
-		if (ability_data[ab].parent_ability != NO_PREREQ && !HAS_ABILITY(ch, ability_data[ab].parent_ability)) {
+		if (ability_data[ab].parent_ability != NO_PREREQ && !has_ability(ch, ability_data[ab].parent_ability)) {
 			msg_to_char(ch, "You need to buy %s before you can buy %s.\r\n", ability_data[ability_data[ab].parent_ability].name, ability_data[ab].name);
 			return;
 		}
@@ -1238,7 +1360,7 @@ ACMD(do_skills) {
 			adjust_abilities_to_empire(ch, emp, FALSE);
 		}
 		
-		ch->player_specials->abilities[ab].purchased = TRUE;
+		add_ability(ch, ab, FALSE);
 		msg_to_char(ch, "You purchase %s.\r\n", ability_data[ab].name);
 		SAVE_CHAR(ch);
 		
@@ -1258,10 +1380,10 @@ ACMD(do_skills) {
 			
 			found = FALSE;
 			for (iter = 0; iter < NUM_SKILLS; ++iter) {
-				if (IS_IMMORTAL(ch) || GET_FREE_SKILL_RESETS(ch, iter) > 0) {
+				if (IS_IMMORTAL(ch) || get_skill_resets(ch, iter) > 0) {
 					msg_to_char(ch, "%s%s", (found ? ", " : ""), skill_data[iter].name);
-					if (GET_FREE_SKILL_RESETS(ch, iter) > 1) {
-						msg_to_char(ch, " (%d)", GET_FREE_SKILL_RESETS(ch, iter));
+					if (get_skill_resets(ch, iter) > 1) {
+						msg_to_char(ch, " (%d)", get_skill_resets(ch, iter));
 					}
 					found = TRUE;
 				}
@@ -1277,11 +1399,13 @@ ACMD(do_skills) {
 		else if ((sk = find_skill_by_name(lbuf)) == NO_SKILL) {
 			msg_to_char(ch, "No such skill %s.\r\n", lbuf);
 		}
-		else if (!IS_IMMORTAL(ch) && GET_FREE_SKILL_RESETS(ch, sk) == 0) {
+		else if (!IS_IMMORTAL(ch) && get_skill_resets(ch, sk) == 0) {
 			msg_to_char(ch, "You do not have a free reset available for %s.\r\n", skill_data[sk].name);
 		}
 		else {
-			GET_FREE_SKILL_RESETS(ch, sk) -= 1;
+			if (!IS_IMMORTAL(ch) && (skdata = get_skill_data(ch, sk, TRUE))) {
+				skdata->resets = MAX(skdata->resets - 1, 0);
+			}
 			clear_char_abilities(ch, sk);
 			
 			msg_to_char(ch, "You have reset your %s abilities.\r\n", skill_data[sk].name);
@@ -1305,7 +1429,7 @@ ACMD(do_skills) {
 		else if (!is_number(arg2)) {
 			msg_to_char(ch, "Invalid level.\r\n");
 		}
-		else if ((level = atoi(arg2)) >= GET_SKILL(ch, sk)) {
+		else if ((level = atoi(arg2)) >= get_skill_level(ch, sk)) {
 			msg_to_char(ch, "You can only drop skills to lower levels.\r\n");
 		}
 		else if (level != 0 && level != BASIC_SKILL_CAP && level != SPECIALTY_SKILL_CAP) {
@@ -1337,13 +1461,13 @@ ACMD(do_skills) {
 			return;
 		}
 		
-		if (!HAS_ABILITY(ch, ab)) {
+		if (!has_ability(ch, ab)) {
 			msg_to_char(ch, "You do not know the %s ability.\r\n", ability_data[ab].name);
 			return;
 		}
 		
 		// good to go
-		ch->player_specials->abilities[ab].purchased = FALSE;
+		remove_ability(ch, ab, FALSE);
 		msg_to_char(ch, "You no longer know %s.\r\n", ability_data[ab].name);
 		SAVE_CHAR(ch);
 
@@ -1399,14 +1523,14 @@ ACMD(do_specialize) {
 	else if ((sk = find_skill_by_name(argument)) == NO_SKILL) {
 		msg_to_char(ch, "No such skill.\r\n");
 	}
-	else if (GET_SKILL(ch, sk) != BASIC_SKILL_CAP && GET_SKILL(ch, sk) != SPECIALTY_SKILL_CAP) {
+	else if (get_skill_level(ch, sk) != BASIC_SKILL_CAP && get_skill_level(ch, sk) != SPECIALTY_SKILL_CAP) {
 		msg_to_char(ch, "You can only specialize skills which are at %d or %d.\r\n", BASIC_SKILL_CAP, SPECIALTY_SKILL_CAP);
 	}
 	else {
 		// check > basic
-		if (GET_SKILL(ch, sk) == BASIC_SKILL_CAP) {
+		if (get_skill_level(ch, sk) == BASIC_SKILL_CAP) {
 			for (iter = count = 0; iter < NUM_SKILLS; ++iter) {
-				if (GET_SKILL(ch, iter) > BASIC_SKILL_CAP) {
+				if (get_skill_level(ch, iter) > BASIC_SKILL_CAP) {
 					++count;
 				}
 			}
@@ -1417,9 +1541,9 @@ ACMD(do_specialize) {
 		}
 		
 		// check > specialty
-		if (GET_SKILL(ch, sk) == SPECIALTY_SKILL_CAP) {
+		if (get_skill_level(ch, sk) == SPECIALTY_SKILL_CAP) {
 			for (iter = count = 0; iter < NUM_SKILLS; ++iter) {
-				if (GET_SKILL(ch, iter) > SPECIALTY_SKILL_CAP) {
+				if (get_skill_level(ch, iter) > SPECIALTY_SKILL_CAP) {
 					++count;
 				}
 			}
@@ -1430,7 +1554,7 @@ ACMD(do_specialize) {
 		}
 
 		// le done
-		set_skill(ch, sk, GET_SKILL(ch, sk) + 1);
+		set_skill(ch, sk, get_skill_level(ch, sk) + 1);
 		msg_to_char(ch, "You have specialized in %s.\r\n", skill_data[sk].name);
 
 		// check class and skill levels
@@ -1519,7 +1643,7 @@ bool can_wear_item(char_data *ch, obj_data *item, bool send_messages) {
 		abil = ABIL_SHIELD_BLOCK;
 	}
 	
-	if (abil != NO_ABIL && !HAS_ABILITY(ch, abil)) {
+	if (abil != NO_ABIL && !has_ability(ch, abil)) {
 		if (send_messages) {
 			snprintf(buf, sizeof(buf), "You must purchase the %s ability to use $p.", ability_data[abil].name);
 			act(buf, FALSE, ch, item, NULL, TO_CHAR);
@@ -1596,7 +1720,7 @@ obj_data *find_chip_weapon(char_data *ch) {
 bool has_cooking_fire(char_data *ch) {
 	obj_data *obj;
 	
-	if (!IS_NPC(ch) && HAS_ABILITY(ch, ABIL_TOUCH_OF_FLAME)) {
+	if (!IS_NPC(ch) && has_ability(ch, ABIL_TOUCH_OF_FLAME)) {
 		return TRUE;
 	}
 

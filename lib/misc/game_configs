@@ -125,6 +125,7 @@ idle_rent_time 20
 max_capitals_in_name 2
 max_map_size 12
 max_player_attribute 15
+max_sleeping_regen_time 60
 num_bonus_trait_daily_skills 5
 num_daily_skill_points 15
 offer_time 75

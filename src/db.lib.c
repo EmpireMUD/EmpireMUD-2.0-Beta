@@ -6723,6 +6723,8 @@ struct resource_data *create_resource_list(int first_vnum, int first_amount, ...
 			res->amount = val;
 			last->next = res;
 			last = res;
+			
+			have_vnum = FALSE;	// and get another vnum
 		}
 	}
 

@@ -57,7 +57,7 @@ const struct class_data_type class_data[NUM_CLASSES] = {
 		{
 			{ ROLE_TANK, { ABIL_RESURRECT, ABIL_SPIRIT_WOLF, ABIL_TOWERING_WEREWOLF_FORM, ROLE_ABIL_END } },
 			{ ROLE_MELEE, { ABIL_DIRE_WOLF, ABIL_RESURRECT, ABIL_SAVAGE_WEREWOLF_FORM, ROLE_ABIL_END } },
-			{ ROLE_HEALER, { ABIL_CONFER, ABIL_FASTCASTING, ABIL_MOON_RABBIT, ABIL_RESURRECT, ABIL_SAGE_WEREWOLF_FORM, ROLE_ABIL_END } },
+			{ ROLE_HEALER, { ABIL_CONFER, ABIL_FASTCASTING, ABIL_HEALER, ABIL_MOON_RABBIT, ABIL_RESURRECT, ABIL_SAGE_WEREWOLF_FORM, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
@@ -98,7 +98,7 @@ const struct class_data_type class_data[NUM_CLASSES] = {
 	{ "Luminary", "Lmny", { SKILL_EMPIRE, SKILL_NATURAL_MAGIC },  { 150, 150, 300, 0 },
 		{
 			{ ROLE_CASTER, { ABIL_DRAGONRIDING, ABIL_GRIFFIN, ABIL_MANTICORE, ABIL_RESURRECT, ROLE_ABIL_END } },
-			{ ROLE_HEALER, { ABIL_ANCESTRAL_HEALING, ABIL_DRAGONRIDING, ABIL_FASTCASTING, ABIL_GRIFFIN, ABIL_MANTICORE, ABIL_RESURRECT, ROLE_ABIL_END } },
+			{ ROLE_HEALER, { ABIL_ANCESTRAL_HEALING, ABIL_DRAGONRIDING, ABIL_FASTCASTING, ABIL_GRIFFIN, ABIL_HEALER, ABIL_MANTICORE, ABIL_RESURRECT, ROLE_ABIL_END } },
 			{ ROLE_UTILITY, { ABIL_DRAGONRIDING, ABIL_GRIFFIN, ABIL_MANTICORE, ABIL_RESURRECT, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
@@ -133,7 +133,7 @@ const struct class_data_type class_data[NUM_CLASSES] = {
 	{ "Archmage", "Achm", { SKILL_HIGH_SORCERY, SKILL_NATURAL_MAGIC },  { 150, 150, 300, 0 },
 		{
 			{ ROLE_CASTER, { ABIL_RESURRECT, ROLE_ABIL_END } },
-			{ ROLE_HEALER, { ABIL_FASTCASTING, ABIL_PHOENIX, ABIL_RESURRECT, ROLE_ABIL_END } },
+			{ ROLE_HEALER, { ABIL_FASTCASTING, ABIL_HEALER, ABIL_PHOENIX, ABIL_RESURRECT, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
@@ -165,20 +165,20 @@ const struct class_data_type class_data[NUM_CLASSES] = {
 	{ "Shadow Wolf", "ShWf", { SKILL_NATURAL_MAGIC, SKILL_STEALTH },  { 100, 200, 300, 0 },
 		{
 			{ ROLE_MELEE, { ABIL_HOWL, ABIL_MOONRISE, ABIL_SAVAGE_WEREWOLF_FORM, ABIL_SCORPION_SHADOW, ROLE_ABIL_END } },
-			{ ROLE_HEALER, { ABIL_FASTCASTING, ABIL_MOONRISE, ABIL_OWL_SHADOW, ABIL_SAGE_WEREWOLF_FORM, ROLE_ABIL_END } },
+			{ ROLE_HEALER, { ABIL_FASTCASTING, ABIL_HEALER, ABIL_MOONRISE, ABIL_OWL_SHADOW, ABIL_SAGE_WEREWOLF_FORM, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
 	{ "Feral", "Ferl", { SKILL_NATURAL_MAGIC, SKILL_SURVIVAL },  { 150, 150, 300, 0 },
 		{
 			{ ROLE_TANK, { ABIL_BASILISK, ABIL_RESURRECT, ABIL_TOWERING_WEREWOLF_FORM, ROLE_ABIL_END } },
-			{ ROLE_HEALER, { ABIL_BASILISK, ABIL_FASTCASTING, ABIL_RESURRECT, ABIL_SAGE_WEREWOLF_FORM, ROLE_ABIL_END } },
+			{ ROLE_HEALER, { ABIL_BASILISK, ABIL_FASTCASTING, ABIL_HEALER, ABIL_RESURRECT, ABIL_SAGE_WEREWOLF_FORM, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
 	{ "Alchemist", "Alch", { SKILL_NATURAL_MAGIC, SKILL_TRADE },  { 150, 150, 300, 0 },
 		{
-			{ ROLE_HEALER, { ABIL_ALCHEMIST_CRAFTS, ABIL_FASTCASTING, ABIL_RESURRECT, ABIL_SALAMANDER, ROLE_ABIL_END } },
+			{ ROLE_HEALER, { ABIL_ALCHEMIST_CRAFTS, ABIL_FASTCASTING, ABIL_HEALER, ABIL_RESURRECT, ABIL_SALAMANDER, ROLE_ABIL_END } },
 			{ ROLE_UTILITY, { ABIL_ALCHEMIST_CRAFTS, ABIL_RESURRECT, ABIL_SALAMANDER, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
@@ -186,7 +186,7 @@ const struct class_data_type class_data[NUM_CLASSES] = {
 	{ "Necromancer", "Necr", { SKILL_NATURAL_MAGIC, SKILL_VAMPIRE },  { 150, 150, 300, 0 },
 		{
 			{ ROLE_CASTER, { ABIL_DREAD_BLOOD_FORM, ABIL_RESURRECT, ABIL_SKELETAL_HULK, ROLE_ABIL_END } },
-			{ ROLE_HEALER, { ABIL_BANSHEE, ABIL_FASTCASTING, ABIL_RESURRECT, ROLE_ABIL_END } },
+			{ ROLE_HEALER, { ABIL_BANSHEE, ABIL_FASTCASTING, ABIL_HEALER, ABIL_RESURRECT, ROLE_ABIL_END } },
 			ROLE_LIST_END
 		}
 	},
@@ -307,13 +307,13 @@ void assign_class_abilities(char_data *ch, int class, int role) {
 		}
 		
 		// remove any they shouldn't have
-		if (ch->player_specials->abilities[abil].purchased && !has) {
-			ch->player_specials->abilities[abil].purchased = FALSE;
+		if (has_ability(ch, abil) && !has) {
+			remove_ability(ch, abil, FALSE);
 			check_skill_sell(ch, abil);
 		}
 		// add if needed
 		if (has) {
-			ch->player_specials->abilities[abil].purchased = TRUE;
+			add_ability(ch, abil, FALSE);
 		}
 	}
 }
@@ -332,6 +332,7 @@ void update_class(char_data *ch) {
 	
 	int iter, skl, class = CLASS_NONE, at_zero = 0, over_basic = 0, over_specialty = 0;
 	int best[NUM_BEST], best_level[NUM_BEST], best_iter, best_sub, best_total;
+	struct player_skill_data *skdata, *next_skill;
 	int total_class_skill, total_skill;
 	int old_class, old_level;
 	bool ok;
@@ -343,24 +344,26 @@ void update_class(char_data *ch) {
 			best_level[best_iter] = 0;
 		}
 		
+		at_zero = NUM_SKILLS;
+		
 		// find skill counts
-		for (iter = 0; iter < NUM_SKILLS; ++iter) {
-			total_skill += GET_SKILL(ch, iter);
+		HASH_ITER(hh, GET_SKILL_HASH(ch), skdata, next_skill) {
+			total_skill += skdata->level;
 			
-			if (GET_SKILL(ch, iter) == 0) {
-				++at_zero;
+			if (skdata->level > 0) {
+				--at_zero;
 			}
-			if (GET_SKILL(ch, iter) > BASIC_SKILL_CAP) {
+			if (skdata->level > BASIC_SKILL_CAP) {
 				++over_basic;
 			}
-			if (GET_SKILL(ch, iter) > SPECIALTY_SKILL_CAP) {
+			if (skdata->level > SPECIALTY_SKILL_CAP) {
 				++over_specialty;
 			}
 			
 			// update best
 			for (best_iter = 0; best_iter < NUM_BEST; ++best_iter) {
 				// new best
-				if (GET_SKILL(ch, iter) > best_level[best_iter]) {
+				if (skdata->level > best_level[best_iter]) {
 					// move down the other best first
 					for (best_sub = NUM_BEST - 1; best_sub > best_iter; --best_sub) {
 						best[best_sub] = best[best_sub-1];
@@ -368,8 +371,8 @@ void update_class(char_data *ch) {
 					}
 					
 					// store this one
-					best[best_iter] = iter;
-					best_level[best_iter] = GET_SKILL(ch, iter);
+					best[best_iter] = skdata->skill_id;
+					best_level[best_iter] = skdata->level;
 					
 					// ONLY update the first matching best
 					break;
@@ -394,8 +397,8 @@ void update_class(char_data *ch) {
 			ok = TRUE;
 			total_class_skill = 0;
 			for (skl = 0; skl < SKILLS_PER_CLASS && ok; ++skl) {
-				if (class_data[iter].skills[skl] != NO_SKILL && GET_SKILL(ch, class_data[iter].skills[skl]) > SPECIALTY_SKILL_CAP) {
-					total_class_skill += GET_SKILL(ch, class_data[iter].skills[skl]);
+				if (class_data[iter].skills[skl] != NO_SKILL && get_skill_level(ch, class_data[iter].skills[skl]) > SPECIALTY_SKILL_CAP) {
+					total_class_skill += get_skill_level(ch, class_data[iter].skills[skl]);
 				}
 				else {
 					ok = FALSE;
@@ -535,7 +538,7 @@ ACMD(do_class) {
 					
 					for (ab_iter = 0, comma = FALSE; class_data[GET_CLASS(ch)].role[iter].ability[ab_iter] != ROLE_ABIL_END; ++ab_iter, comma = TRUE) {
 						abil = class_data[GET_CLASS(ch)].role[iter].ability[ab_iter];
-						msg_to_char(ch, "%s%s%s&0", (comma ? ", " : ""), (HAS_ABILITY(ch, abil) ? "&g" : ""), ability_data[abil].name);
+						msg_to_char(ch, "%s%s%s&0", (comma ? ", " : ""), (has_ability(ch, abil) ? "&g" : ""), ability_data[abil].name);
 					}
 					msg_to_char(ch, "\r\n");
 				}

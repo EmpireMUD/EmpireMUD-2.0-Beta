@@ -359,10 +359,10 @@ void display_attributes(char_data *ch, char_data *to) {
 	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
 		pos = attribute_display_order[iter];
 		snprintf(buf, sizeof(buf), "%s  [%s%2d\t0]", attributes[pos].name, HAPPY_COLOR(GET_ATT(ch, pos), GET_REAL_ATT(ch, pos)), GET_ATT(ch, pos));
-		msg_to_char(ch, "  %-*.*s%s", 23 + color_code_length(buf), 23 + color_code_length(buf), buf, !((iter + 1) % 3) ? "\r\n" : "");
+		msg_to_char(to, "  %-*.*s%s", 23 + color_code_length(buf), 23 + color_code_length(buf), buf, !((iter + 1) % 3) ? "\r\n" : "");
 	}
 	if (iter % 3) {
-		msg_to_char(ch, "\r\n");
+		msg_to_char(to, "\r\n");
 	}
 }
 
@@ -388,12 +388,12 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	extern int mana_gain(char_data *ch, bool info_only);
 	extern int get_ability_points_available_for_char(char_data *ch, int skill);
 	extern const struct material_data materials[NUM_MATERIALS];
-	extern int skill_sort[NUM_SKILLS];
 	extern const int base_hit_chance;
 	extern const double hit_per_dex;
 
 	char lbuf[MAX_STRING_LENGTH], lbuf2[MAX_STRING_LENGTH], lbuf3[MAX_STRING_LENGTH];
-	int i, j, count, iter, sk, pts, cols, val;
+	struct player_skill_data *skdata, *next_skill;
+	int i, j, count, pts, cols, val;
 	empire_data *emp;
 	struct time_info_data playing_time;
 
@@ -461,7 +461,7 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	}
 	// gotta count the color codes to determine width
 	count = 37 + color_code_length(lbuf);
-	msg_to_char(ch, "  Conditions: %-*.*s", count, count, lbuf);
+	msg_to_char(to, "  Conditions: %-*.*s", count, count, lbuf);
 	
 	if (IS_VAMPIRE(ch)) {
 		msg_to_char(to, " Blood: &r%d&0/&r%d&0-&r%d&0/hr\r\n", GET_BLOOD(ch), GET_MAX_BLOOD(ch), get_blood_upkeep_cost(ch));
@@ -503,17 +503,16 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	msg_to_char(to, " +--------------------------------- Skills ----------------------------------+\r\n ");
 
 	count = 0;
-	for (iter = 0; iter < NUM_SKILLS; ++iter) {
-		sk = skill_sort[iter];
-		if (GET_SKILL(ch, sk) > 0) {
-			sprintf(lbuf, " %s: %s%d", skill_data[sk].name, IS_ANY_SKILL_CAP(ch, sk) ? "&g" : "&y", GET_SKILL(ch, sk));
-			pts = get_ability_points_available_for_char(ch, sk);
+	HASH_ITER(hh, GET_SKILL_HASH(ch), skdata, next_skill) {
+		if (skdata->level > 0) {
+			sprintf(lbuf, " %s: %s%d", skill_data[skdata->skill_id].name, IS_ANY_SKILL_CAP(ch, skdata->skill_id) ? "&g" : "&y", skdata->level);
+			pts = get_ability_points_available_for_char(ch, skdata->skill_id);
 			if (pts > 0) {
 				sprintf(lbuf + strlen(lbuf), " &g(%d)", pts);
 			}
 			
 			cols = 25 + color_code_length(lbuf);
-			msg_to_char(ch, "%-*.*s&0", cols, cols, lbuf);
+			msg_to_char(to, "%-*.*s&0", cols, cols, lbuf);
 			
 			if (++count == 3) {
 				msg_to_char(to, "&0\r\n ");
@@ -851,7 +850,7 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 	if (!i || !ch || !ch->desc)
 		return;
 	
-	if (show_eq && ch != i && !IS_IMMORTAL(ch) && !IS_NPC(i) && HAS_ABILITY(i, ABIL_CONCEALMENT)) {
+	if (show_eq && ch != i && !IS_IMMORTAL(ch) && !IS_NPC(i) && has_ability(i, ABIL_CONCEALMENT)) {
 		show_eq = FALSE;
 		gain_ability_exp(i, ABIL_CONCEALMENT, 5);
 	}
@@ -924,7 +923,7 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 		return;
 	}
 
-	if (ch != i && (IS_IMMORTAL(ch) || IS_NPC(i) || GET_MORPH(i) == MORPH_NONE || !MORPH_FLAGGED(i, MORPH_FLAG_ANIMAL)) && HAS_ABILITY(ch, ABIL_APPRAISAL)) {
+	if (ch != i && (IS_IMMORTAL(ch) || IS_NPC(i) || GET_MORPH(i) == MORPH_NONE || !MORPH_FLAGGED(i, MORPH_FLAG_ANIMAL)) && has_ability(ch, ABIL_APPRAISAL)) {
 		act("\r\nYou appraise $s inventory:", FALSE, i, 0, ch, TO_VICT);
 		list_obj_to_char(i->carrying, ch, OBJ_DESC_INVENTORY, TRUE);
 
@@ -1683,7 +1682,7 @@ ACMD(do_affects) {
 	if (IS_RIDING(ch)) {
 		msg_to_char(ch, "   You are riding %s.\r\n", get_mob_name_by_proto(GET_MOUNT_VNUM(ch)));
 	}
-	else if (HAS_ABILITY(ch, ABIL_RIDE) && GET_MOUNT_VNUM(ch) != NOTHING && mob_proto(GET_MOUNT_VNUM(ch))) {
+	else if (has_ability(ch, ABIL_RIDE) && GET_MOUNT_VNUM(ch) != NOTHING && mob_proto(GET_MOUNT_VNUM(ch))) {
 		msg_to_char(ch, "   You have %s. Type 'mount' to ride it.\r\n", get_mob_name_by_proto(GET_MOUNT_VNUM(ch)));
 	}
 
@@ -2106,7 +2105,7 @@ ACMD(do_mark) {
 				dist = compute_distance(mark, IN_ROOM(ch));
 				dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), mark));
 				
-				if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
+				if (has_ability(ch, ABIL_NAVIGATION)) {
 					msg_to_char(ch, "Your mark at (%d, %d) is %d map tile%s %s.\r\n", X_COORD(mark), Y_COORD(mark), dist, (dist == 1 ? "" : "s"), (dir == NO_DIR ? "away" : dirs[dir]));
 				}
 				else {
@@ -2198,7 +2197,7 @@ ACMD(do_nearby) {
 
 			dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
 			
-			if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
+			if (has_ability(ch, ABIL_NAVIGATION)) {
 				snprintf(line, sizeof(line), " %d tile%s %s: %s (%d, %d)\r\n", dist, (dist != 1 ? "s" : ""), (dir == NO_DIR ? "away" : dirs[dir]), get_room_name(loc, FALSE), X_COORD(loc), Y_COORD(loc));
 			}
 			else {
@@ -2220,7 +2219,7 @@ ACMD(do_nearby) {
 				
 				dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
 
-				if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
+				if (has_ability(ch, ABIL_NAVIGATION)) {
 					snprintf(line, sizeof(line), " %d tile%s %s: the %s of %s (%d, %d) / %s%s&0\r\n", dist, (dist != 1 ? "s" : ""), (dir == NO_DIR ? "away" : dirs[dir]), city_type[city->type].name, city->name, X_COORD(loc), Y_COORD(loc), EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 				}
 				else {
@@ -2250,7 +2249,7 @@ ACMD(do_nearby) {
 		// show instance
 		found = TRUE;
 		dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), inst->location));
-		if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
+		if (has_ability(ch, ABIL_NAVIGATION)) {
 			snprintf(line, sizeof(line), " %d tile%s %s: %s (%d, %d) / %s\r\n", dist, PLURAL(dist), (dir == NO_DIR ? "away" : dirs[dir]), GET_ADV_NAME(inst->adventure), X_COORD(loc), Y_COORD(loc), instance_level_string(inst));
 		}
 		else {
@@ -2399,7 +2398,7 @@ ACMD(do_weather) {
 
 
 ACMD(do_whereami) {	
-	if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
+	if (has_ability(ch, ABIL_NAVIGATION)) {
 		msg_to_char(ch, "You are at: %s (%d, %d)\r\n", get_room_name(IN_ROOM(ch), FALSE), X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
 	}
 	else {

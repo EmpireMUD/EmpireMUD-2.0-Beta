@@ -146,6 +146,7 @@ void start_string_editor(descriptor_data *d, char *prompt, char **writeto, size_
 
 /* Add user input to the 'current' string (as defined by d->str) */
 void string_add(descriptor_data *d, char *str) {
+	void check_delayed_load(char_data *ch);
 	extern char *stripcr(char *dest, const char *src);
 	extern int improved_editor_execute(descriptor_data *d, char *str);
 	
@@ -217,6 +218,8 @@ void string_add(descriptor_data *d, char *str) {
 		if (STATE(d) == CON_PLAYING && PLR_FLAGGED(d->character, PLR_MAILING)) {
 			if (action == STRINGADD_SAVE && *d->str) {
 				if ((index = find_player_index_by_idnum(d->mail_to)) && (recip = find_or_load_player(index->name, &is_file))) {
+					check_delayed_load(recip);	// need to delay-load them to save mail
+					
 					// create letter
 					CREATE(mail, struct mail_data, 1);
 					mail->from = GET_IDNUM(d->character);

@@ -351,7 +351,7 @@ bool can_see_player_in_other_room(char_data *ch, char_data *vict) {
 	
 	if (!IS_NPC(vict) && CAN_SEE(ch, vict) && CAN_RECOGNIZE(ch, vict)) {
 		if (compute_distance(IN_ROOM(ch), IN_ROOM(vict)) <= distance_can_see_players) {
-			if (HAS_ABILITY(vict, ABIL_CLOAK_OF_DARKNESS)) {
+			if (has_ability(vict, ABIL_CLOAK_OF_DARKNESS)) {
 				gain_ability_exp(vict, ABIL_CLOAK_OF_DARKNESS, 10);
 				return FALSE;
 			}
@@ -561,7 +561,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		
 		sprintf(output, "[%d] %s%s %s&0 %s[ %s]\r\n", GET_ROOM_VNUM(room), get_room_name(room, TRUE), shipbuf, locbuf, (SCRIPT(room) ? "[TRIG] " : ""), flagbuf);
 	}
-	else if (HAS_ABILITY(ch, ABIL_NAVIGATION) && !RMT_FLAGGED(IN_ROOM(ch), RMT_NO_LOCATION)) {
+	else if (has_ability(ch, ABIL_NAVIGATION) && !RMT_FLAGGED(IN_ROOM(ch), RMT_NO_LOCATION)) {
 		// need navigation to see coords
 		sprintf(output, "%s%s %s&0\r\n", get_room_name(room, TRUE), shipbuf, locbuf);
 	}
@@ -1105,13 +1105,12 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 
 	bool need_color_terminator = FALSE;
 	char buf[30], buf1[30], lbuf[MAX_STRING_LENGTH];
-	char wallcolor[10];
 	struct empire_city_data *city;
 	int iter;
 	empire_data *emp, *chemp = GET_LOYALTY(ch);
 	int tileset = pick_season(to_room);
 	struct icon_data *base_icon, *icon, *crop_icon = NULL;
-	bool junk, hidden = FALSE;
+	bool junk, enchanted, hidden = FALSE;
 	crop_data *cp = ROOM_CROP(to_room);
 	sector_data *st, *base_sect = BASE_SECT(to_room);
 	char *base_color, *str;
@@ -1132,15 +1131,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	room_data *r_northeast = SHIFT_CHAR_DIR(ch, to_room, NORTHEAST);
 	room_data *r_southwest = SHIFT_CHAR_DIR(ch, to_room, SOUTHWEST);
 	room_data *r_southeast = SHIFT_CHAR_DIR(ch, to_room, SOUTHEAST);
-
-	// wall color setup
-	if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_FLY)) {
-		strcpy(wallcolor, "&m");
-	}
-	else {
-		strcpy(wallcolor, "&0");
-	}
-
+	
 	#define distance(x, y, a, b)		((x - a) * (x - a) + (y - b) * (y - b))
 
 	// detect base icon
@@ -1332,12 +1323,13 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 		// west (@u) barrier attachment
 		if (strstr(buf, "@u") || strstr(buf, "@U")) {
 			if (!r_west || IS_BARRIER(r_west) || ROOM_IS_CLOSED(r_west)) {
+				enchanted = ROOM_AFF_FLAGGED(r_west, ROOM_AFF_NO_FLY) || ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_FLY);
 				// west is a barrier
-				sprintf(buf1, "%sv", wallcolor);
+				sprintf(buf1, "%sv", enchanted ? "&m" : "&0");
 				str = str_replace("@u", buf1, buf);
 				strcpy(buf, str);
 				free(str);
-				sprintf(buf1, "%sV", wallcolor);
+				sprintf(buf1, "%sV", enchanted ? "&m" : "&0");
 				str = str_replace("@U", buf1, buf);
 				strcpy(buf, str);
 				free(str);
@@ -1357,12 +1349,13 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 		//  east (@v) barrier attachment
 		if (strstr(buf, "@v") || strstr(buf, "@V")) {
 			if (!r_east || IS_BARRIER(r_east) || ROOM_IS_CLOSED(r_east)) {
+				enchanted = ROOM_AFF_FLAGGED(r_east, ROOM_AFF_NO_FLY) || ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_FLY);
 				// east is a barrier
-				sprintf(buf1, "%sv", wallcolor);
+				sprintf(buf1, "%sv", enchanted ? "&m" : "&0");
 				str = str_replace("@v", buf1, buf);
 				strcpy(buf, str);
 				free(str);
-				sprintf(buf1, "%sV", wallcolor);
+				sprintf(buf1, "%sV", enchanted ? "&m" : "&0");
 				str = str_replace("@V", buf1, buf);
 				strcpy(buf, str);
 				free(str);
@@ -1453,7 +1446,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 			strcpy(buf, lbuf);
 		}
 		if (strstr(buf, "&V")) {
-			str = str_replace("&V", wallcolor, buf);
+			str = str_replace("&V", ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_FLY) ? "&m" : "&0", buf);
 			strcpy(buf, str);
 			free(str);
 		}
@@ -1462,7 +1455,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 		if (AFF_FLAGGED(ch, AFF_STONED)) {
 			// check all but the final char
 			for (iter = 0; buf[iter] != 0 && buf[iter+1] != 0; ++iter) {
-				if (buf[iter] == '&') {
+				if (buf[iter] == '&' || buf[iter] == '\t') {
 					switch(buf[iter+1]) {
 						case 'r':	buf[iter+1] = 'b';	break;
 						case 'g':	buf[iter+1] = 'c';	break;
@@ -1470,12 +1463,26 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 						case 'b':	buf[iter+1] = 'g';	break;
 						case 'm':	buf[iter+1] = 'r';	break;
 						case 'c':	buf[iter+1] = 'y';	break;
+						case 'p':	buf[iter+1] = 'l';	break;
+						case 'v':	buf[iter+1] = 'o';	break;
+						case 'a':	buf[iter+1] = 't';	break;
+						case 'l':	buf[iter+1] = 'w';	break;
+						case 'j':	buf[iter+1] = 'v';	break;
+						case 'o':	buf[iter+1] = 'p';	break;
+						case 't':	buf[iter+1] = 'j';	break;
 						case 'R':	buf[iter+1] = 'B';	break;
 						case 'G':	buf[iter+1] = 'C';	break;
 						case 'Y':	buf[iter+1] = 'M';	break;
 						case 'B':	buf[iter+1] = 'G';	break;
 						case 'M':	buf[iter+1] = 'R';	break;
 						case 'C':	buf[iter+1] = 'Y';	break;
+						case 'P':	buf[iter+1] = 'L';	break;
+						case 'V':	buf[iter+1] = 'O';	break;
+						case 'A':	buf[iter+1] = 'T';	break;
+						case 'L':	buf[iter+1] = 'W';	break;
+						case 'J':	buf[iter+1] = 'V';	break;
+						case 'O':	buf[iter+1] = 'P';	break;
+						case 'T':	buf[iter+1] = 'J';	break;
 					}
 				}
 			}
@@ -1703,7 +1710,7 @@ void perform_mortal_where(char_data *ch, char *arg) {
 	descriptor_data *d;
 	char_data *i, *found = NULL;
 	
-	if (HAS_ABILITY(ch, ABIL_MASTER_TRACKER)) {
+	if (has_ability(ch, ABIL_MASTER_TRACKER)) {
 		max_distance = 75;
 	}
 	else {
@@ -1735,11 +1742,11 @@ void perform_mortal_where(char_data *ch, char *arg) {
 					continue;
 				}
 			}
-			if (HAS_ABILITY(i, ABIL_NO_TRACE) && IS_OUTDOORS(i)) {
+			if (has_ability(i, ABIL_NO_TRACE) && IS_OUTDOORS(i)) {
 				gain_ability_exp(i, ABIL_NO_TRACE, 10);
 				continue;
 			}
-			if (HAS_ABILITY(i, ABIL_UNSEEN_PASSING) && !IS_OUTDOORS(i)) {
+			if (has_ability(i, ABIL_UNSEEN_PASSING) && !IS_OUTDOORS(i)) {
 				gain_ability_exp(i, ABIL_UNSEEN_PASSING, 10);
 				continue;
 			}
@@ -1747,7 +1754,7 @@ void perform_mortal_where(char_data *ch, char *arg) {
 			dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), IN_ROOM(i)));
 			// dist already set for us
 		
-			if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
+			if (has_ability(ch, ABIL_NAVIGATION)) {
 				check_x = X_COORD(IN_ROOM(i));	// not all locations are on the map
 				check_y = Y_COORD(IN_ROOM(i));
 				
@@ -1788,11 +1795,11 @@ void perform_mortal_where(char_data *ch, char *arg) {
 					continue;
 				}
 			}
-			if (HAS_ABILITY(i, ABIL_NO_TRACE) && IS_OUTDOORS(i)) {
+			if (has_ability(i, ABIL_NO_TRACE) && IS_OUTDOORS(i)) {
 				gain_ability_exp(i, ABIL_NO_TRACE, 10);
 				continue;
 			}
-			if (HAS_ABILITY(i, ABIL_UNSEEN_PASSING) && !IS_OUTDOORS(i)) {
+			if (has_ability(i, ABIL_UNSEEN_PASSING) && !IS_OUTDOORS(i)) {
 				gain_ability_exp(i, ABIL_UNSEEN_PASSING, 10);
 				continue;
 			}
@@ -1808,7 +1815,7 @@ void perform_mortal_where(char_data *ch, char *arg) {
 			dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), IN_ROOM(found)));
 			// distance is already set for us as 'closest'
 			
-			if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
+			if (has_ability(ch, ABIL_NAVIGATION)) {
 				check_x = X_COORD(IN_ROOM(found));	// not all locations are on the map
 				check_y = Y_COORD(IN_ROOM(found));
 				if (CHECK_MAP_BOUNDS(check_x, check_y) && !RMT_FLAGGED(IN_ROOM(found), RMT_NO_LOCATION)) {
@@ -1845,7 +1852,7 @@ void print_object_location(int num, obj_data *obj, char_data *ch, int recur) {
 	}
 
 	if (IN_ROOM(obj)) {
-		if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
+		if (has_ability(ch, ABIL_NAVIGATION)) {
 			check_x = X_COORD(IN_ROOM(obj));	// not all locations are on the map
 			check_y = Y_COORD(IN_ROOM(obj));
 			if (CHECK_MAP_BOUNDS(check_x, check_y)) {
@@ -1989,7 +1996,7 @@ ACMD(do_exits) {
 					if (IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
 						sprintf(buf2 + strlen(buf2), "[%d] %s %s\r\n", GET_ROOM_VNUM(to_room), get_room_name(to_room, FALSE), coords);
 					}
-					else if (HAS_ABILITY(ch, ABIL_NAVIGATION) && !RMT_FLAGGED(to_room, RMT_NO_LOCATION) && (HOME_ROOM(to_room) == to_room || !ROOM_IS_CLOSED(to_room)) && X_COORD(to_room) >= 0) {
+					else if (has_ability(ch, ABIL_NAVIGATION) && !RMT_FLAGGED(to_room, RMT_NO_LOCATION) && (HOME_ROOM(to_room) == to_room || !ROOM_IS_CLOSED(to_room)) && X_COORD(to_room) >= 0) {
 						sprintf(buf2 + strlen(buf2), "%s %s\r\n", get_room_name(to_room, FALSE), coords);
 					}
 					else {

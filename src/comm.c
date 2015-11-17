@@ -239,7 +239,7 @@ void msdp_update_room(char_data *ch) {
 	buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cAREA%c%s", (char)MSDP_VAR, (char)MSDP_VAL, area_name);
 	
 	buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cCOORDS%c%c", (char)MSDP_VAR, (char)MSDP_VAL, (char)MSDP_TABLE_OPEN);
-	if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
+	if (has_ability(ch, ABIL_NAVIGATION)) {
 		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cX%c%d", (char)MSDP_VAR, (char)MSDP_VAL, X_COORD(IN_ROOM(ch)));
 		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cY%c%d", (char)MSDP_VAR, (char)MSDP_VAL, Y_COORD(IN_ROOM(ch)));
 	}
@@ -293,13 +293,14 @@ static void msdp_update(void) {
 	extern const double hit_per_dex;
 	extern const char *seasons[];
 	
+	struct player_skill_data *skill, *next_skill;
 	struct over_time_effect_type *dot;
 	char buf[MAX_STRING_LENGTH];
 	struct cooldown_data *cool;
 	char_data *ch, *pOpponent;
 	struct affected_type *aff;
 	descriptor_data *d;
-	int hit_points, iter, PlayerCount = 0;
+	int hit_points, PlayerCount = 0;
 	size_t buf_size;
 
 	for (d = descriptor_list; d; d = d->next) {
@@ -371,18 +372,16 @@ static void msdp_update(void) {
 			// skills
 			*buf = '\0';
 			buf_size = 0;
-			for (iter = 0; iter < NUM_SKILLS; ++iter) {
-				if (GET_SKILL(ch, iter) > 0) {
-					buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%c", (char)MSDP_VAR, skill_data[iter].name, (char)MSDP_VAL, (char)MSDP_TABLE_OPEN);
-					
-					buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cLEVEL%c%d", (char)MSDP_VAR, (char)MSDP_VAL, GET_SKILL(ch, iter));
-					buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cEXP%c%.2f", (char)MSDP_VAR, (char)MSDP_VAL, GET_SKILL_EXP(ch, iter));
-					buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cRESETS%c%d", (char)MSDP_VAR, (char)MSDP_VAL, GET_FREE_SKILL_RESETS(ch, iter));
-					buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cNOSKILL%c%d", (char)MSDP_VAR, (char)MSDP_VAL, NOSKILL_BLOCKED(ch, iter));
-					
-					// end table
-					buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c", (char)MSDP_TABLE_CLOSE);
-				}
+			HASH_ITER(hh, GET_SKILL_HASH(ch), skill, next_skill) {
+				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%c", (char)MSDP_VAR, skill_data[skill->skill_id].name, (char)MSDP_VAL, (char)MSDP_TABLE_OPEN);
+				
+				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cLEVEL%c%d", (char)MSDP_VAR, (char)MSDP_VAL, skill->level);
+				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cEXP%c%.2f", (char)MSDP_VAR, (char)MSDP_VAL, skill->exp);
+				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cRESETS%c%d", (char)MSDP_VAR, (char)MSDP_VAL, skill->resets);
+				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cNOSKILL%c%d", (char)MSDP_VAR, (char)MSDP_VAL, skill->noskill ? 1 : 0);
+				
+				// end table
+				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c", (char)MSDP_TABLE_CLOSE);
 			}
 			MSDPSetTable(d, eMSDP_SKILLS, buf);
 

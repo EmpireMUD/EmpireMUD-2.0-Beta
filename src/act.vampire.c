@@ -134,7 +134,7 @@ void cancel_siring(char_data *ch) {
 
 // checks for Blood Fortitude and does skill gain
 bool check_blood_fortitude(char_data *ch, bool can_gain_skill) {
-	if (!IS_NPC(ch) && IS_VAMPIRE(ch) && check_vampire_sun(ch, FALSE) && HAS_ABILITY(ch, ABIL_BLOOD_FORTITUDE)) {
+	if (!IS_NPC(ch) && IS_VAMPIRE(ch) && check_vampire_sun(ch, FALSE) && has_ability(ch, ABIL_BLOOD_FORTITUDE)) {
 		if (can_gain_skill) {
 			gain_ability_exp(ch, ABIL_BLOOD_FORTITUDE, 1);
 		}
@@ -164,7 +164,7 @@ bool check_vampire_ability(char_data *ch, int ability, int cost_pool, int cost_a
 * @return bool TRUE if the ability can proceed, FALSE if sunny
 */
 bool check_vampire_sun(char_data *ch, bool message) {
-	if (IS_NPC(ch) || HAS_ABILITY(ch, ABIL_DAYWALKING) || IS_GOD(ch) || IS_IMMORTAL(ch) || AFF_FLAGGED(ch, AFF_EARTHMELD) || !check_sunny(IN_ROOM(ch))) {
+	if (IS_NPC(ch) || has_ability(ch, ABIL_DAYWALKING) || IS_GOD(ch) || IS_IMMORTAL(ch) || AFF_FLAGGED(ch, AFF_EARTHMELD) || !check_sunny(IN_ROOM(ch))) {
 		// ok -- not sunny
 		return TRUE;
 	}
@@ -229,7 +229,7 @@ int get_blood_upkeep_cost(char_data *ch) {
 	
 	if (!IS_NPC(ch) && IS_VAMPIRE(ch) && !IS_IMMORTAL(ch)) {
 		// low skill vamp upkeep
-		if (GET_SKILL(ch, SKILL_VAMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
+		if (get_skill_level(ch, SKILL_VAMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
 			cost += 1;
 		}
 	
@@ -278,7 +278,7 @@ int GET_MAX_BLOOD(char_data *ch) {
 				base += 50;
 			}
 
-			if (HAS_ABILITY(ch, ABIL_ANCIENT_BLOOD)) {
+			if (has_ability(ch, ABIL_ANCIENT_BLOOD)) {
 				base *= 2;
 			}
 		}
@@ -301,7 +301,7 @@ void make_vampire(char_data *ch, bool lore) {
 
 		SET_BIT(PLR_FLAGS(ch), PLR_VAMPIRE);
 	
-		if (GET_SKILL(ch, SKILL_VAMPIRE) < 1) {
+		if (get_skill_level(ch, SKILL_VAMPIRE) < 1) {
 			set_skill(ch, SKILL_VAMPIRE, 1);
 		}
 
@@ -496,7 +496,7 @@ void update_biting_char(char_data *ch) {
 	GET_BLOOD(victim) -= amount;
 	
 	// can gain more
-	if (HAS_ABILITY(ch, ABIL_ANCIENT_BLOOD)) {
+	if (has_ability(ch, ABIL_ANCIENT_BLOOD)) {
 		amount *= 2;
 	}
 	GET_BLOOD(ch) = MIN(GET_MAX_BLOOD(ch), GET_BLOOD(ch) + amount);
@@ -545,14 +545,14 @@ void update_biting_char(char_data *ch) {
 			act("...$e sways from lack of blood.", FALSE, victim, NULL, NULL, TO_ROOM);
 		}
 		
-		if (HAS_ABILITY(ch, ABIL_ANCIENT_BLOOD) && can_gain_exp_from(ch, victim)) {
+		if (has_ability(ch, ABIL_ANCIENT_BLOOD) && can_gain_exp_from(ch, victim)) {
 			gain_ability_exp(ch, ABIL_ANCIENT_BLOOD, 1);
 		}
 	}
 	
 	gain_ability_exp(ch, ABIL_SANGUINE_RESTORATION, 2);
 	gain_ability_exp(ch, ABIL_UNNATURAL_THIRST, 2);
-	if (GET_SKILL(ch, SKILL_VAMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
+	if (get_skill_level(ch, SKILL_VAMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
 		gain_skill_exp(ch, SKILL_VAMPIRE, 5);
 	}
 }
@@ -832,7 +832,7 @@ ACMD(do_bloodsword) {
 		scale_level = get_approximate_level(ch);
 	}
 	else {
-		scale_level = MIN(get_approximate_level(ch), GET_SKILL(ch, SKILL_VAMPIRE));
+		scale_level = MIN(get_approximate_level(ch), get_skill_level(ch, SKILL_VAMPIRE));
 	}
 	
 	scale_item_to_level(obj, scale_level);
@@ -1000,7 +1000,7 @@ ACMD(do_command) {
 	else if (MOB_FLAGGED(victim, MOB_HARD | MOB_GROUP)) {
 		act("You can't command $N.", FALSE, ch, NULL, victim, TO_CHAR);
 	}
-	else if (IS_VAMPIRE(victim) && (IS_NPC(victim) || GET_SKILL(victim, SKILL_VAMPIRE) > GET_SKILL(ch, SKILL_VAMPIRE)))
+	else if (IS_VAMPIRE(victim) && (IS_NPC(victim) || get_skill_level(victim, SKILL_VAMPIRE) > get_skill_level(ch, SKILL_VAMPIRE)))
 		msg_to_char(ch, "You cannot force your will upon those of more powerful blood.\r\n");
 	else if (get_approximate_level(ch) - get_approximate_level(victim) < level_threshold) {
 		msg_to_char(ch, "Your victim is too powerful.\r\n");

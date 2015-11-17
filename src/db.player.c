@@ -692,6 +692,8 @@ void free_char(char_data *ch) {
 	void free_mail(struct mail_data *mail);
 
 	struct slash_channel *loadslash, *next_loadslash;
+	struct player_ability_data *abil, *next_abil;
+	struct player_skill_data *skill, *next_skill;
 	struct channel_history_data *history;
 	struct player_slash_channel *slash;
 	struct interaction_item *interact;
@@ -787,6 +789,13 @@ void free_char(char_data *ch) {
 		while ((mail = GET_MAIL_PENDING(ch))) {
 			GET_MAIL_PENDING(ch) = mail->next;
 			free_mail(mail);
+		}
+		
+		HASH_ITER(hh, GET_SKILL_HASH(ch), skill, next_skill) {
+			free(skill);
+		}
+		HASH_ITER(hh, GET_ABILITY_HASH(ch), abil, next_abil) {
+			free(abil);
 		}
 		
 		free(ch->player_specials);
@@ -956,6 +965,8 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	struct alias_data *alias, *last_alias = NULL;
 	struct coin_data *coin, *last_coin = NULL;
 	struct mail_data *mail, *last_mail = NULL;
+	struct player_ability_data *abildata;
+	struct player_skill_data *skdata;
 	int length, i_in[7], iter, num;
 	struct slash_channel *slash;
 	struct cooldown_data *cool;
@@ -1027,9 +1038,9 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 			case 'A': {
 				if (PFILE_TAG(line, "Ability:", length)) {
 					sscanf(line + length + 1, "%d %d %d", &i_in[0], &i_in[1], &i_in[2]);
-					if (i_in[0] >= 0 && i_in[0] < NUM_ABILITIES) {
-						ch->player_specials->abilities[i_in[0]].purchased = i_in[1] ? TRUE : FALSE;
-						ch->player_specials->abilities[i_in[0]].levels_gained = i_in[2];
+					if ((abildata = get_ability_data(ch, i_in[0], TRUE))) {
+						abildata->purchased = i_in[1] ? TRUE : FALSE;
+						abildata->levels_gained = i_in[2];
 					}
 				}
 				else if (PFILE_TAG(line, "Access Level:", length)) {
@@ -1543,11 +1554,12 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				}
 				else if (PFILE_TAG(line, "Skill:", length)) {
 					sscanf(line + length + 1, "%d %d %lf %d %d", &i_in[0], &i_in[1], &dbl_in, &i_in[2], &i_in[3]);
-					if (i_in[0] >= 0 && i_in[0] < NUM_SKILLS) {
-						ch->player_specials->skills[i_in[0]].level = i_in[1];
-						GET_SKILL_EXP(ch, i_in[0]) = dbl_in;
-						GET_FREE_SKILL_RESETS(ch, i_in[0]) = i_in[2];
-						NOSKILL_BLOCKED(ch, i_in[0]) = i_in[3] ? TRUE : FALSE;
+					
+					if ((skdata = get_skill_data(ch, i_in[0], TRUE))) {
+						skdata->level = i_in[1];
+						skdata->exp = dbl_in;
+						skdata->resets = i_in[2];
+						skdata->noskill = i_in[3];
 					}
 				}
 				else if (PFILE_TAG(line, "Skill Level:", length)) {
@@ -1833,6 +1845,8 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	void write_mail_to_file(FILE *fl, char_data *ch);
 	
 	struct affected_type *af, *new_af, *next_af, *af_list;
+	struct player_ability_data *abil, *next_abil;
+	struct player_skill_data *skill, *next_skill;
 	struct player_slash_channel *slash;
 	struct over_time_effect_type *dot;
 	struct slash_channel *loadslash;
@@ -1930,9 +1944,9 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	// The rest is alphabetical:
 	
 	// 'A'
-	for (iter = 0; iter < NUM_ABILITIES; ++iter) {
-		if (HAS_ABILITY(ch, iter) || GET_LEVELS_GAINED_FROM_ABILITY(ch, iter) > 0) {
-			fprintf(fl, "Ability: %d %d %d\n", iter, HAS_ABILITY(ch, iter) ? 1 : 0, GET_LEVELS_GAINED_FROM_ABILITY(ch, iter));
+	HASH_ITER(hh, GET_ABILITY_HASH(ch), abil, next_abil) {
+		if (abil->purchased || abil->levels_gained > 0) {
+			fprintf(fl, "Ability: %d %d %d\n", abil->ability_id, abil->purchased ? 1 : 0, abil->levels_gained);
 		}
 	}
 	fprintf(fl, "Access Level: %d\n", GET_ACCESS_LEVEL(ch));
@@ -2128,8 +2142,11 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	
 	// 'S'
 	fprintf(fl, "Sex: %s\n", genders[(int) GET_REAL_SEX(ch)]);
-	for (iter = 0; iter < NUM_SKILLS; ++iter) {
-		fprintf(fl, "Skill: %d %d %.2f %d %d\n", iter, GET_SKILL(ch, iter), GET_SKILL_EXP(ch, iter), GET_FREE_SKILL_RESETS(ch, iter), NOSKILL_BLOCKED(ch, iter) ? 1 : 0);
+	HASH_ITER(hh, GET_SKILL_HASH(ch), skill, next_skill) {
+		// don't bother writing ones with no data
+		if (skill->level > 0 || skill->exp > 0 || skill->resets > 0 || skill->noskill > 0) {
+			fprintf(fl, "Skill: %d %d %.2f %d %d\n", skill->skill_id, skill->level, skill->exp, skill->resets, skill->noskill ? 1 : 0);
+		}
 	}
 	fprintf(fl, "Skill Level: %d\n", GET_SKILL_LEVEL(ch));
 	for (slash = GET_SLASH_CHANNELS(ch); slash; slash = slash->next) {
@@ -2841,6 +2858,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	ch->next = character_list;
 	character_list = ch;
 	char_to_room(ch, load_room);
+	ch->prev_logon = ch->player.time.logon;	// and update prev_logon now
 	if (dolog) {
 		announce_login(ch);
 	}
@@ -2944,7 +2962,6 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	add_to_lookup_table(GET_ID(ch), (void *)ch);
 	
 	// update the index in case any of this changed
-	ch->prev_logon = ch->player.time.logon;	// and update prev_logon here
 	index = find_player_index_by_idnum(GET_IDNUM(ch));
 	update_player_index(index, ch);
 	
@@ -3258,7 +3275,7 @@ void start_new_character(char_data *ch) {
 	
 		// skills
 		for (sk = GET_ARCH_SKILLS(arch); sk; sk = sk->next) {
-			if (GET_SKILL(ch, sk->skill) < sk->level) {
+			if (get_skill_level(ch, sk->skill) < sk->level) {
 				set_skill(ch, sk->skill, sk->level);
 			}
 			
@@ -3280,7 +3297,7 @@ void start_new_character(char_data *ch) {
 			if (GET_GLOBAL_TYPE(glb) != GLOBAL_NEWBIE_GEAR || IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_IN_DEVELOPMENT)) {
 				continue;
 			}
-			if (GET_GLOBAL_ABILITY(glb) != NO_ABIL && !HAS_ABILITY(ch, GET_GLOBAL_ABILITY(glb))) {
+			if (GET_GLOBAL_ABILITY(glb) != NO_ABIL && !has_ability(ch, GET_GLOBAL_ABILITY(glb))) {
 				continue;
 			}
 			
@@ -3562,11 +3579,11 @@ PROMO_APPLY(promo_facebook) {
 
 // 1.5x skills
 PROMO_APPLY(promo_skillups) {
-	int iter;
+	struct player_skill_data *skill, *next_skill;
 	
-	for (iter = 0; iter < NUM_SKILLS; ++iter) {
-		if (GET_SKILL(ch, iter) > 0) {
-			set_skill(ch, iter, MIN(BASIC_SKILL_CAP, GET_SKILL(ch, iter) * 1.5));
+	HASH_ITER(hh, GET_SKILL_HASH(ch), skill, next_skill) {
+		if (skill->level > 0) {
+			set_skill(ch, skill->skill_id, MIN(BASIC_SKILL_CAP, skill->level * 1.5));
 		}
 	}
 }

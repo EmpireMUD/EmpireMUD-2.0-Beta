@@ -598,13 +598,13 @@ void affect_total(char_data *ch) {
 
 	// ability-based modifiers
 	if (!IS_NPC(ch)) {
-		if (HAS_ABILITY(ch, ABIL_ENDURANCE)) {
+		if (has_ability(ch, ABIL_ENDURANCE)) {
 			GET_MAX_HEALTH(ch) = MIN(GET_MAX_HEALTH(ch), 1000) * 2.0 + MAX(GET_MAX_HEALTH(ch) - 1000, 0) * 1.25;
 		}
-		if (HAS_ABILITY(ch, ABIL_GIFT_OF_NATURE)) {
+		if (has_ability(ch, ABIL_GIFT_OF_NATURE)) {
 			GET_MAX_MANA(ch) *= 1.35;
 		}
-		if (HAS_ABILITY(ch, ABIL_ARCANE_POWER)) {
+		if (has_ability(ch, ABIL_ARCANE_POWER)) {
 			GET_MAX_MANA(ch) *= 1.35;
 		}
 	}
@@ -3056,7 +3056,7 @@ bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERA
 		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_IN_DEVELOPMENT)) {
 			continue;
 		}
-		if (GET_GLOBAL_ABILITY(glb) != NO_ABIL && !HAS_ABILITY(ch, GET_GLOBAL_ABILITY(glb))) {
+		if (GET_GLOBAL_ABILITY(glb) != NO_ABIL && !has_ability(ch, GET_GLOBAL_ABILITY(glb))) {
 			continue;
 		}
 		
@@ -4217,7 +4217,7 @@ void obj_to_char(obj_data *object, char_data *ch) {
 * @param char_data *ch The person to try to give it to.
 */
 void obj_to_char_or_room(obj_data *obj, char_data *ch) {
-	if (!IS_NPC(ch) && IS_CARRYING_N(ch) + obj_carry_size(obj) > CAN_CARRY_N(ch) && IN_ROOM(ch)) {
+	if (!IS_NPC(ch) && !CAN_CARRY_OBJ(ch, obj) && IN_ROOM(ch)) {
 		// bind it to the player anyway, as if they received it, if it's BoP
 		if (OBJ_FLAGGED(obj, OBJ_BIND_ON_PICKUP)) {
 			bind_obj_to_player(obj, ch);
@@ -5593,7 +5593,7 @@ bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_da
 		return FALSE;
 	}
 
-	if (IS_CARRYING_N(ch) + obj_carry_size(proto) > CAN_CARRY_N(ch)) {
+	if (!CAN_CARRY_OBJ(ch, proto)) {
 		msg_to_char(ch, "Your arms are full.\r\n");
 		return FALSE;
 	}

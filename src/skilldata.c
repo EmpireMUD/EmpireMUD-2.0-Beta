@@ -21,7 +21,6 @@
 // global skills data
 struct skill_data_type skill_data[NUM_SKILLS];
 struct ability_data_type ability_data[NUM_ABILITIES];
-int skill_sort[NUM_SKILLS];
 int ability_sort[NUM_ABILITIES];
 
 
@@ -41,6 +40,8 @@ void init_skills() {
 	
 	init_skill_data();
 	init_ability_data();
+	
+	// ABIL_x (search tag): ability definitions and assignments are here
 
 	// Battle
 	setup_skill(SKILL_BATTLE, "Battle", "Btl", 0, "Charge confidently into combat", "Battle is important for combat, especially tanks and melee damage characters");
@@ -308,6 +309,7 @@ void init_skills() {
 	setup_class_ability(ABIL_FASTCASTING, "Fastcasting");
 	setup_class_ability(ABIL_GRIFFIN, "Griffin");
 	setup_class_ability(ABIL_GUILDSMAN_CRAFTS, "Guildsman Crafts");
+	setup_class_ability(ABIL_HEALER, "Healer");
 	setup_class_ability(ABIL_HORRID_FORM, "Horrid Form");
 	setup_class_ability(ABIL_HOWL, "Howl");
 	setup_class_ability(ABIL_MANTICORE, "Manticore");
@@ -414,27 +416,11 @@ void setup_ability(int number, int parent_skill, int parent_skill_required, int 
 void sort_skills_and_abilities() {
 	int iter, a, b, temp;
 	
-	// init skills
-	for (iter = 0; iter < NUM_SKILLS; ++iter) {
-		skill_sort[iter] = iter;
-	}
-	
 	// init abils
 	for (iter = 0; iter < NUM_ABILITIES; ++iter) {
 		ability_sort[iter] = iter;
 	}
-	
-	// sort skills
-	for (a = 0; a < NUM_SKILLS - 1; ++a) {
-		for (b = a + 1; b < NUM_SKILLS; ++b) {
-			if (str_cmp(skill_data[skill_sort[a]].name, skill_data[skill_sort[b]].name) > 0) {
-				temp = skill_sort[a];
-				skill_sort[a] = skill_sort[b];
-				skill_sort[b] = temp;
-			}
-		}
-	}
-	
+		
 	// sort abilities
 	for (a = 0; a < NUM_ABILITIES - 1; ++a) {
 		for (b = a + 1; b < NUM_ABILITIES; ++b) {

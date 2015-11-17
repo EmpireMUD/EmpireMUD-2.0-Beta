@@ -119,7 +119,7 @@ bool can_steal(char_data *ch, empire_data *emp) {
 		return TRUE;
 	}
 	
-	if (!HAS_ABILITY(ch, ABIL_STEAL)) {
+	if (!has_ability(ch, ABIL_STEAL)) {
 		msg_to_char(ch, "You don't have the Steal ability.\r\n");
 		return FALSE;
 	}
@@ -445,7 +445,7 @@ int apply_poison(char_data *ch, char_data *vict, int type) {
 	}
 	
 	// ability check
-	if (poison_data[type].ability != NO_ABIL && !HAS_ABILITY(ch, poison_data[type].ability)) {
+	if (poison_data[type].ability != NO_ABIL && !has_ability(ch, poison_data[type].ability)) {
 		return 0;
 	}
 
@@ -481,13 +481,13 @@ int apply_poison(char_data *ch, char_data *vict, int type) {
 	}
 	
 	// attempt immunity/resist
-	if (HAS_ABILITY(vict, ABIL_POISON_IMMUNITY)) {
+	if (has_ability(vict, ABIL_POISON_IMMUNITY)) {
 		if (can_gain_exp_from(vict, ch)) {
 			gain_ability_exp(vict, ABIL_POISON_IMMUNITY, 10);
 		}
 		return 0;
 	}
-	if (HAS_ABILITY(vict, ABIL_RESIST_POISON)) {
+	if (has_ability(vict, ABIL_RESIST_POISON)) {
 		if (can_gain_exp_from(vict, ch)) {
 			gain_ability_exp(vict, ABIL_RESIST_POISON, 10);
 		}
@@ -499,7 +499,7 @@ int apply_poison(char_data *ch, char_data *vict, int type) {
 	// atype
 	if (poison_data[type].atype > 0) {
 		
-		af = create_aff(poison_data[type].atype, 2 MUD_HOURS, poison_data[type].apply, poison_data[type].mod * (HAS_ABILITY(ch, ABIL_DEADLY_POISONS) ? 2 : 1), poison_data[type].aff, ch);
+		af = create_aff(poison_data[type].atype, 2 MUD_HOURS, poison_data[type].apply, poison_data[type].mod * (has_ability(ch, ABIL_DEADLY_POISONS) ? 2 : 1), poison_data[type].aff, ch);
 		affect_join(vict, af, poison_data[type].allow_stack ? (AVG_DURATION|ADD_MODIFIER) : 0);
 		
 		if (!messaged) {
@@ -513,7 +513,7 @@ int apply_poison(char_data *ch, char_data *vict, int type) {
 	
 	// dot
 	if (poison_data[type].dot_type > 0) {
-		apply_dot_effect(vict, poison_data[type].dot_type, poison_data[type].dot_duration, poison_data[type].dot_damage_type, poison_data[type].dot_damage * (HAS_ABILITY(ch, ABIL_DEADLY_POISONS) ? 2 : 1), poison_data[type].dot_max_stacks, ch);
+		apply_dot_effect(vict, poison_data[type].dot_type, poison_data[type].dot_duration, poison_data[type].dot_damage_type, poison_data[type].dot_damage * (has_ability(ch, ABIL_DEADLY_POISONS) ? 2 : 1), poison_data[type].dot_max_stacks, ch);
 		
 		if (!messaged) {
 			act("You feel ill as you are poisoned!", FALSE, vict, NULL, NULL, TO_CHAR);
@@ -527,7 +527,7 @@ int apply_poison(char_data *ch, char_data *vict, int type) {
 	// special cases
 	switch (poison_data[type].special) {
 		case SPEC_SEARING: {
-			result = damage(ch, vict, 5 * (HAS_ABILITY(ch, ABIL_DEADLY_POISONS) ? 2 : 1), ATTACK_POISON, DAM_POISON);
+			result = damage(ch, vict, 5 * (has_ability(ch, ABIL_DEADLY_POISONS) ? 2 : 1), ATTACK_POISON, DAM_POISON);
 			break;
 		}
 	}
@@ -555,7 +555,7 @@ void use_poison(char_data *ch, obj_data *obj) {
 		return;
 	}
 	
-	if (poison_data[type].ability != NO_ABIL && !HAS_ABILITY(ch, poison_data[type].ability)) {
+	if (poison_data[type].ability != NO_ABIL && !has_ability(ch, poison_data[type].ability)) {
 		msg_to_char(ch, "You don't have the correct ability to use that poison.\r\n");
 		return;
 	}
@@ -631,7 +631,7 @@ ACMD(do_backstab) {
 			}
 
 			if (damage(ch, vict, dam, ATTACK_BACKSTAB, DAM_PHYSICAL) > 0) {
-				if (HAS_ABILITY(ch, ABIL_POISONS)) {
+				if (has_ability(ch, ABIL_POISONS)) {
 					if (!number(0, 1) && apply_poison(ch, vict, USING_POISON(ch)) < 0) {
 						// dedz
 					}
@@ -931,7 +931,7 @@ ACMD(do_hide) {
 	gain_ability_exp(ch, ABIL_HIDE, 33.4);
 	gain_ability_exp(ch, ABIL_CLING_TO_SHADOW, 10);
 
-	if (HAS_ABILITY(ch, ABIL_CLING_TO_SHADOW) || skill_check(ch, ABIL_HIDE, DIFF_MEDIUM)) {
+	if (has_ability(ch, ABIL_CLING_TO_SHADOW) || skill_check(ch, ABIL_HIDE, DIFF_MEDIUM)) {
 		SET_BIT(AFF_FLAGS(ch), AFF_HIDE);
 	}
 }
@@ -1025,7 +1025,7 @@ ACMD(do_infiltrate) {
 		gain_ability_exp(ch, ABIL_INFILTRATE, 50);
 		gain_ability_exp(ch, ABIL_IMPROVED_INFILTRATE, 50);
 		
-		if (!HAS_ABILITY(ch, ABIL_IMPROVED_INFILTRATE) && !skill_check(ch, ABIL_INFILTRATE, (emp && EMPIRE_HAS_TECH(emp, TECH_LOCKS)) ? DIFF_RARELY : DIFF_HARD)) {
+		if (!has_ability(ch, ABIL_IMPROVED_INFILTRATE) && !skill_check(ch, ABIL_INFILTRATE, (emp && EMPIRE_HAS_TECH(emp, TECH_LOCKS)) ? DIFF_RARELY : DIFF_HARD)) {
 			if (emp && EMPIRE_HAS_TECH(emp, TECH_LOCKS)) {
 				empire_skillup(emp, ABIL_LOCKS, 10);
 			}
@@ -1047,7 +1047,7 @@ ACMD(do_infiltrate) {
 
 		// chance to log
 		if (emp && !skill_check(ch, ABIL_IMPROVED_INFILTRATE, DIFF_HARD)) {
-			if (HAS_ABILITY(ch, ABIL_IMPROVED_INFILTRATE)) {
+			if (has_ability(ch, ABIL_IMPROVED_INFILTRATE)) {
 				log_to_empire(emp, ELOG_HOSTILITY, "An infiltrator has been spotted at (%d, %d)!", X_COORD(to_room), Y_COORD(to_room));
 			}
 			else {
@@ -1109,21 +1109,21 @@ ACMD(do_jab) {
 		if (hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FALSE) > 0) {
 			apply_dot_effect(vict, ATYPE_JABBED, 3, DAM_PHYSICAL, get_ability_level(ch, ABIL_JAB) / 24, 2, ch);
 			
-			if (!HAS_ABILITY(ch, ABIL_STAGGER_JAB) && !AFF_FLAGGED(vict, AFF_IMMUNE_STEALTH)) {
+			if (!has_ability(ch, ABIL_STAGGER_JAB) && !AFF_FLAGGED(vict, AFF_IMMUNE_STEALTH)) {
 				struct affected_type *af;
 				int value = ceil(GET_CHARISMA(ch) / 5);
 				af = create_mod_aff(ATYPE_STAGGER_JAB, 3, APPLY_TO_HIT, -value, ch);
 				affect_join(vict, af, ADD_MODIFIER);
 			}
 			
-			if (HAS_ABILITY(ch, ABIL_CRUCIAL_JAB) && !AFF_FLAGGED(vict, AFF_IMMUNE_STEALTH)) {
+			if (has_ability(ch, ABIL_CRUCIAL_JAB) && !AFF_FLAGGED(vict, AFF_IMMUNE_STEALTH)) {
 				struct affected_type *af;
 				int value = round(GET_COMPUTED_LEVEL(ch) / 80);
 				af = create_mod_aff(ATYPE_CRUCIAL_JAB, 2, APPLY_DEXTERITY, -value, ch);
 				affect_join(vict, af, NOBITS);
 			}
 			
-			if (HAS_ABILITY(ch, ABIL_SHADOW_JAB) && !AFF_FLAGGED(vict, AFF_IMMUNE_STEALTH)) {
+			if (has_ability(ch, ABIL_SHADOW_JAB) && !AFF_FLAGGED(vict, AFF_IMMUNE_STEALTH)) {
 				struct affected_type *af;
 				int value = ceil(GET_CHARISMA(ch) / 5);
 				af = create_mod_aff(ATYPE_SHADOW_JAB, 3, APPLY_DEXTERITY, -value, ch);
@@ -1393,7 +1393,7 @@ ACMD(do_search) {
 
 			SET_BIT(AFF_FLAGS(ch), AFF_SENSE_HIDE);
 			
-			if (HAS_ABILITY(targ, ABIL_CLING_TO_SHADOW)) {
+			if (has_ability(targ, ABIL_CLING_TO_SHADOW)) {
 				gain_ability_exp(targ, ABIL_CLING_TO_SHADOW, 20);
 				continue;
 			}
@@ -1522,7 +1522,7 @@ ACMD(do_shadowstep) {
 		charge_ability_cost(ch, MOVE, cost, COOLDOWN_SHADOWSTEP, SECS_PER_REAL_MIN, WAIT_ABILITY);
 		gain_ability_exp(ch, ABIL_SHADOWSTEP, 20);
 		
-		if (infil && !HAS_ABILITY(ch, ABIL_IMPROVED_INFILTRATE) && !skill_check(ch, ABIL_INFILTRATE, DIFF_HARD)) {
+		if (infil && !has_ability(ch, ABIL_IMPROVED_INFILTRATE) && !skill_check(ch, ABIL_INFILTRATE, DIFF_HARD)) {
 			msg_to_char(ch, "You fail to shadowstep to that location.\r\n");
 		}
 		else {
@@ -1542,7 +1542,7 @@ ACMD(do_shadowstep) {
 
 		// chance to log
 		if (infil && emp && !skill_check(ch, ABIL_IMPROVED_INFILTRATE, DIFF_HARD)) {
-			if (HAS_ABILITY(ch, ABIL_IMPROVED_INFILTRATE)) {
+			if (has_ability(ch, ABIL_IMPROVED_INFILTRATE)) {
 				log_to_empire(emp, ELOG_HOSTILITY, "An infiltrator has been spotted shadowstepping into (%d, %d)!", X_COORD(IN_ROOM(vict)), Y_COORD(IN_ROOM(vict)));
 			}
 			else {
@@ -1672,7 +1672,7 @@ ACMD(do_steal) {
 			if (proto && obj_can_be_stored(proto, IN_ROOM(ch)) && isname(arg, GET_OBJ_KEYWORDS(proto))) {
 				found = TRUE;
 				
-				if (stored_item_requires_withdraw(proto) && !HAS_ABILITY(ch, ABIL_VAULTCRACKING)) {
+				if (stored_item_requires_withdraw(proto) && !has_ability(ch, ABIL_VAULTCRACKING)) {
 					msg_to_char(ch, "You can't steal that without Vaultcracking!\r\n");
 					return;
 				}

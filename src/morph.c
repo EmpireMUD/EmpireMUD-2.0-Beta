@@ -35,7 +35,7 @@
 
 // validates morphs
 #define MORPH_OK(ch, morph)  ( \
-	(morph_data[(morph)].ability == NO_ABIL || HAS_ABILITY((ch), morph_data[(morph)].ability)) && \
+	(morph_data[(morph)].ability == NO_ABIL || has_ability((ch), morph_data[(morph)].ability)) && \
 	(!IS_SET(morph_data[(morph)].morph_flags, MORPH_FLAG_VAMPIRE_ONLY) || IS_VAMPIRE(ch)) \
 )
 

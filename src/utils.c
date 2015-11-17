@@ -2030,7 +2030,7 @@ void command_lag(char_data *ch, int wait_type) {
 	
 	switch (wait_type) {
 		case WAIT_SPELL: {	// spells (but not combat spells)
-			if (HAS_ABILITY(ch, ABIL_FASTCASTING)) {
+			if (has_ability(ch, ABIL_FASTCASTING)) {
 				val = 0.3333 * GET_WITS(ch);
 				wait -= MAX(0, val) RL_SEC;
 				

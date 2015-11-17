@@ -1903,7 +1903,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (subfield && *subfield) {
 							int ab = find_ability_by_name(subfield, TRUE);
 							if (ab != NO_ABIL) {
-								snprintf(str, slen, (IS_NPC(c) || HAS_ABILITY(c, ab)) ? "1" : "0");
+								snprintf(str, slen, (IS_NPC(c) || has_ability(c, ab)) ? "1" : "0");
 							}
 							else {
 								snprintf(str, slen, "0");
@@ -2186,7 +2186,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							int sk = NO_SKILL, amount = 0;
 							
 							comma_args(subfield, arg1, arg2);
-							if (*arg1 && *arg2 && (sk = find_skill_by_name(arg1)) != NO_SKILL && (amount = atoi(arg2)) != 0 && !NOSKILL_BLOCKED(c, sk)) {
+							if (*arg1 && *arg2 && (sk = find_skill_by_name(arg1)) != NO_SKILL && (amount = atoi(arg2)) != 0 && noskill_ok(c, sk)) {
 								gain_skill(c, sk, amount);
 								snprintf(str, slen, "1");
 							}
@@ -2204,8 +2204,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "give_skill_reset")) {
 						int sk = find_skill_by_name(subfield);
-						if (sk != NO_SKILL && !IS_NPC(c)) {
-							GET_FREE_SKILL_RESETS(c, sk) = MIN(GET_FREE_SKILL_RESETS(c, sk) + 1, MAX_SKILL_RESETS);
+						struct player_skill_data *skdata;
+						
+						if (sk != NO_SKILL && (skdata = get_skill_data(c, sk, TRUE))) {
+							skdata->resets = MIN(skdata->resets + 1, MAX_SKILL_RESETS);
 						}
 						*str = '\0';
 					}
@@ -2462,7 +2464,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "poison_immunity")) {
-						if (HAS_ABILITY(c, ABIL_POISON_IMMUNITY)) {
+						if (has_ability(c, ABIL_POISON_IMMUNITY)) {
 							snprintf(str, slen, "1");
 						}
 						else {
@@ -2496,7 +2498,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%d", GET_RESIST_PHYSICAL(c));
 					}
 					else if (!str_cmp(field, "resist_poison")) {
-						if (HAS_ABILITY(c, ABIL_RESIST_POISON)) {
+						if (has_ability(c, ABIL_RESIST_POISON)) {
 							snprintf(str, slen, "1");
 						}
 						else {
@@ -2525,7 +2527,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "skill")) {
 						int sk = find_skill_by_name(subfield);
 						if (sk != NO_SKILL && !IS_NPC(c)) {
-							snprintf(str, slen, "%d", GET_SKILL(c, sk));
+							snprintf(str, slen, "%d", get_skill_level(c, sk));
 						}
 						else {
 							snprintf(str, slen, "0");
@@ -2540,7 +2542,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							int sk = NO_SKILL, sk_lev = 0;
 							
 							comma_args(subfield, arg1, arg2);
-							if (*arg1 && *arg2 && (sk = find_skill_by_name(arg1)) != NO_SKILL && (sk_lev = atoi(arg2)) >= 0 && sk_lev <= CLASS_SKILL_CAP && (sk_lev < GET_SKILL(c, sk) || !NOSKILL_BLOCKED(c, sk))) {
+							if (*arg1 && *arg2 && (sk = find_skill_by_name(arg1)) != NO_SKILL && (sk_lev = atoi(arg2)) >= 0 && sk_lev <= CLASS_SKILL_CAP && (sk_lev < get_skill_level(c, sk) || noskill_ok(c, sk))) {
 								// TODO skill cap checking! need a f() like can_set_skill_to(ch, sk, lev)
 								set_skill(c, sk, sk_lev);
 								snprintf(str, slen, "1");

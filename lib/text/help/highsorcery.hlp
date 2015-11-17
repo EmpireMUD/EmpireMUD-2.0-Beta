@@ -290,12 +290,11 @@ Ritual of Defense (High Sorcery ability)
 Usage:  ritual defense
 Cost:  15 mana; 1 imperium spike and 1 bloodstone per wall
 
-This ritual enchants a wall to be able to repel anyone flying. It also works
-on gatehouses and river gates. It will go away if you dismantle the building
-or wall.
+This ritual enchants a wall to be able to repel anyone flying. It will go away
+if you dismantle the wall. You will not get your resources back if you cancel
+the ritual; they are spent immediately.
 
-Cast it on more walls to raise your skill. You will not get your resources back
-if you cancel the ritual; they are spent immediately.
+Cast it on more walls to raise your skill.
 
 See also: RITUAL
 #

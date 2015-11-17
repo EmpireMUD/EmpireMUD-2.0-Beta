@@ -257,7 +257,7 @@ void update_actions(void) {
 		if (IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_FAST_CHORES) && HAS_BONUS_TRAIT(ch, BONUS_FAST_CHORES)) {
 			speed += 1;
 		}
-		if (IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_FINDER) && HAS_ABILITY(ch, ABIL_FINDER)) {
+		if (IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_FINDER) && has_ability(ch, ABIL_FINDER)) {
 			speed += 1;
 			gain_ability_exp(ch, ABIL_FINDER, 0.1);
 		}
@@ -613,7 +613,7 @@ INTERACTION_FUNC(finish_gathering) {
 		act(buf, FALSE, ch, obj, 0, TO_CHAR);
 		act("$n finds $p!", TRUE, ch, obj, 0, TO_ROOM);
 		
-		if (GET_SKILL(ch, SKILL_SURVIVAL) < EMPIRE_CHORE_SKILL_CAP) {
+		if (get_skill_level(ch, SKILL_SURVIVAL) < EMPIRE_CHORE_SKILL_CAP) {
 			gain_skill_exp(ch, SKILL_SURVIVAL, 10);
 		}
 		// action does not end normally
@@ -639,7 +639,7 @@ INTERACTION_FUNC(finish_harvesting) {
 		act("$n finished harvesting the crop!", FALSE, ch, 0, 0, TO_ROOM);
 
 		// how many to get
-		num = number(2, 6) + (HAS_ABILITY(ch, ABIL_MASTER_FARMER) ? number(2, 6) : 0);
+		num = number(2, 6) + (has_ability(ch, ABIL_MASTER_FARMER) ? number(2, 6) : 0);
 		num *= interaction->quantity;
 	
 		// give them over
@@ -702,7 +702,7 @@ INTERACTION_FUNC(finish_picking_herb) {
 	obj_vnum vnum = interaction->vnum;
 	int iter, num = interaction->quantity;
 	
-	if (HAS_ABILITY(ch, ABIL_FIND_HERBS)) {
+	if (has_ability(ch, ABIL_FIND_HERBS)) {
 		gain_ability_exp(ch, ABIL_FIND_HERBS, 10);
 	
 		if (!number(0, 11)) {
@@ -828,7 +828,7 @@ void perform_saw(char_data *ch) {
 		act("You finish sawing $p (x2).", FALSE, ch, obj, NULL, TO_CHAR);
 		act("$n finishes sawing $p.", TRUE, ch, obj, 0, TO_ROOM);
 		
-		if (GET_SKILL(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
+		if (get_skill_level(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
 			gain_skill_exp(ch, SKILL_EMPIRE, 10);
 		}
 		if ((proto = obj_proto(GET_ACTION_VNUM(ch, 0)))) {
@@ -927,7 +927,7 @@ void process_chipping(char_data *ch) {
 					obj = read_object(o_CHIPPED, TRUE);
 					obj_to_char_or_room(obj, ch);
 					msg_to_char(ch, "It splits open!\r\n");
-					if (GET_SKILL(ch, SKILL_TRADE) < EMPIRE_CHORE_SKILL_CAP) {
+					if (get_skill_level(ch, SKILL_TRADE) < EMPIRE_CHORE_SKILL_CAP) {
 						gain_skill_exp(ch, SKILL_TRADE, 25);
 					}
 					load_otrigger(obj);
@@ -937,7 +937,7 @@ void process_chipping(char_data *ch) {
 					obj = read_object(o_HANDAXE, TRUE);
 					obj_to_char_or_room(obj, ch);
 					act("You have crafted $p!", FALSE, ch, obj, 0, TO_CHAR);
-					if (GET_SKILL(ch, SKILL_TRADE) < EMPIRE_CHORE_SKILL_CAP) {
+					if (get_skill_level(ch, SKILL_TRADE) < EMPIRE_CHORE_SKILL_CAP) {
 						gain_skill_exp(ch, SKILL_TRADE, 25);
 					}
 					load_otrigger(obj);
@@ -947,7 +947,7 @@ void process_chipping(char_data *ch) {
 					obj = read_object(o_SPEARHEAD, TRUE);
 					obj_to_char_or_room(obj, ch);
 					act("You have crafted $p!", FALSE, ch, obj, 0, TO_CHAR);
-					if (GET_SKILL(ch, SKILL_TRADE) < EMPIRE_CHORE_SKILL_CAP) {
+					if (get_skill_level(ch, SKILL_TRADE) < EMPIRE_CHORE_SKILL_CAP) {
 						gain_skill_exp(ch, SKILL_TRADE, 25);
 					}
 					load_otrigger(obj);
@@ -1004,7 +1004,7 @@ void process_chop(char_data *ch) {
 				load_otrigger(obj);
 			}
 		
-			if (GET_SKILL(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
+			if (get_skill_level(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
 				gain_skill_exp(ch, SKILL_EMPIRE, 15);
 			}
 			
@@ -1043,7 +1043,7 @@ void process_digging(char_data *ch) {
 		
 		if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_DIG, finish_digging)) {
 			// success
-			if (GET_SKILL(ch, SKILL_SURVIVAL) < EMPIRE_CHORE_SKILL_CAP) {
+			if (get_skill_level(ch, SKILL_SURVIVAL) < EMPIRE_CHORE_SKILL_CAP) {
 				gain_skill_exp(ch, SKILL_SURVIVAL, 10);
 			}
 		
@@ -1362,7 +1362,7 @@ void process_harvesting(char_data *ch) {
 		
 		if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_HARVEST, finish_harvesting)) {
 			// skillups
-			if (GET_SKILL(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
+			if (get_skill_level(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
 				gain_skill_exp(ch, SKILL_EMPIRE, 30);
 			}
 			gain_ability_exp(ch, ABIL_MASTER_FARMER, 5);
@@ -1425,7 +1425,7 @@ void process_mining(char_data *ch) {
 				if (GET_GLOBAL_ABILITY(glb) != NO_ABIL) {
 					gain_ability_exp(ch, GET_GLOBAL_ABILITY(glb), 5);
 				}
-				else if (GET_SKILL(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
+				else if (get_skill_level(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
 					gain_skill_exp(ch, SKILL_EMPIRE, 10);
 				}
 				
@@ -1473,7 +1473,7 @@ void process_minting(char_data *ch) {
 		increase_coins(ch, emp, num);
 		
 		GET_ACTION(ch) = ACT_NONE;
-		if (GET_SKILL(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
+		if (get_skill_level(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
 			gain_skill_exp(ch, SKILL_EMPIRE, 10);
 		}
 		
@@ -1610,7 +1610,7 @@ void process_picking(char_data *ch) {
 		}
 		else {
 			if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_FIND_HERB, finish_picking_herb)) {
-				if (GET_SKILL(ch, SKILL_SURVIVAL) < EMPIRE_CHORE_SKILL_CAP) {
+				if (get_skill_level(ch, SKILL_SURVIVAL) < EMPIRE_CHORE_SKILL_CAP) {
 					gain_skill_exp(ch, SKILL_SURVIVAL, 10);
 				}
 				found = TRUE;
@@ -1618,7 +1618,7 @@ void process_picking(char_data *ch) {
 			else if (CAN_INTERACT_ROOM(IN_ROOM(ch), INTERACT_HARVEST) && (IS_ADVENTURE_ROOM(IN_ROOM(ch)) || ROOM_CROP_FLAGGED(IN_ROOM(ch), CROPF_IS_ORCHARD))) {
 				// only orchards allow pick -- and only run this if we hit no herbs at all
 				if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_HARVEST, finish_picking_crop)) {
-					if (GET_SKILL(ch, SKILL_SURVIVAL) < EMPIRE_CHORE_SKILL_CAP) {
+					if (get_skill_level(ch, SKILL_SURVIVAL) < EMPIRE_CHORE_SKILL_CAP) {
 						gain_skill_exp(ch, SKILL_SURVIVAL, 10);
 					}
 					found = TRUE;
@@ -1674,7 +1674,7 @@ void process_planting(char_data *ch) {
 		msg_to_char(ch, "You have finished planting!\r\n");
 		act("$n finishes planting!", FALSE, ch, 0, 0, TO_ROOM);
 		
-		if (GET_SKILL(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
+		if (get_skill_level(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
 			gain_skill_exp(ch, SKILL_EMPIRE, 30);
 		}
 		GET_ACTION(ch) = ACT_NONE;
@@ -1791,7 +1791,7 @@ void process_quarrying(char_data *ch) {
 		act("You give the plug drill one final swing and pry loose $p!", FALSE, ch, obj, 0, TO_CHAR);
 		act("$n hits the plug drill hard with a hammer and pries loose $p!", FALSE, ch, obj, 0, TO_ROOM);
 	
-		if (GET_SKILL(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
+		if (get_skill_level(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
 			gain_skill_exp(ch, SKILL_EMPIRE, 25);
 		}
 		load_otrigger(obj);
@@ -1893,7 +1893,7 @@ void process_scraping(char_data *ch) {
 			act(buf, FALSE, ch, obj, stick, TO_CHAR);
 			act("$n finishes scraping off $p!", TRUE, ch, obj, 0, TO_ROOM);
 	
-			if (GET_SKILL(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
+			if (get_skill_level(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
 				gain_skill_exp(ch, SKILL_EMPIRE, 10);
 			}
 			load_otrigger(obj);
@@ -2014,7 +2014,7 @@ void process_tanning(char_data *ch) {
 
 		GET_ACTION(ch) = ACT_NONE;
 	
-		if (GET_SKILL(ch, SKILL_TRADE) < EMPIRE_CHORE_SKILL_CAP) {
+		if (get_skill_level(ch, SKILL_TRADE) < EMPIRE_CHORE_SKILL_CAP) {
 			gain_skill_exp(ch, SKILL_TRADE, 20);
 		}
 		load_otrigger(obj);
@@ -2593,7 +2593,7 @@ ACMD(do_prospect) {
 		act("$n stops prospecting.", FALSE, ch, 0, 0, TO_ROOM);
 		cancel_action(ch);
 	}
-	else if (IS_NPC(ch) || !HAS_ABILITY(ch, ABIL_PROSPECT)) {
+	else if (IS_NPC(ch) || !has_ability(ch, ABIL_PROSPECT)) {
 		msg_to_char(ch, "You need to buy the Prospect ability before you can use it.\r\n");
 	}
 	else if (GET_ACTION(ch) != ACT_NONE) {

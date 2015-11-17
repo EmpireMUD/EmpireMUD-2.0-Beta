@@ -232,7 +232,7 @@ bool can_use_ritual(char_data *ch, int ritual) {
 	if (IS_NPC(ch)) {
 		return FALSE;
 	}
-	if (ritual_data[ritual].ability != NO_ABIL && !HAS_ABILITY(ch, ritual_data[ritual].ability)) {
+	if (ritual_data[ritual].ability != NO_ABIL && !has_ability(ch, ritual_data[ritual].ability)) {
 		return FALSE;
 	}
 	
@@ -1367,7 +1367,7 @@ RITUAL_SETUP_FUNC(start_ritual_of_teleportation) {
 			subtype = GET_ROOM_VNUM(to_room);
 		}
 	}
-	else if (HAS_ABILITY(ch, ABIL_CITY_TELEPORTATION) && (city = find_city_by_name(GET_LOYALTY(ch), argument))) {
+	else if (has_ability(ch, ABIL_CITY_TELEPORTATION) && (city = find_city_by_name(GET_LOYALTY(ch), argument))) {
 		subtype = GET_ROOM_VNUM(city->location);
 		
 		if (get_cooldown_time(ch, COOLDOWN_TELEPORT_CITY) > 0) {
@@ -1483,6 +1483,11 @@ RITUAL_SETUP_FUNC(start_ritual_of_defense) {
 	
 	if (!IS_COMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You need to finish it before you can cast Ritual of Defense.\r\n");
+		return FALSE;
+	}
+	
+	if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_FLY)) {
+		msg_to_char(ch, "The ritual has already been performed here.\r\n");
 		return FALSE;
 	}
 	
@@ -1907,7 +1912,7 @@ void perform_study(char_data *ch) {
 	
 	if (*study_strings[pos] == '\n') {
 		// DONE!
-		if (CAN_GAIN_NEW_SKILLS(ch) && GET_SKILL(ch, SKILL_HIGH_SORCERY) == 0 && !NOSKILL_BLOCKED(ch, SKILL_HIGH_SORCERY)) {
+		if (CAN_GAIN_NEW_SKILLS(ch) && get_skill_level(ch, SKILL_HIGH_SORCERY) == 0 && noskill_ok(ch, SKILL_HIGH_SORCERY)) {
 			msg_to_char(ch, "&mYour mind begins to open to the ways of High Sorcery, and you are now an apprentice to this school.&0\r\n");
 			set_skill(ch, SKILL_HIGH_SORCERY, 1);
 			SAVE_CHAR(ch);

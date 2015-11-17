@@ -10,6 +10,8 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 
+#include <math.h>
+
 #include "conf.h"
 #include "sysdep.h"
 
@@ -538,7 +540,7 @@ void real_update_char(char_data *ch) {
 	}
 
 	/* Update conditions */
-	if (IS_VAMPIRE(ch) && HAS_ABILITY(ch, ABIL_UNNATURAL_THIRST)) {			
+	if (IS_VAMPIRE(ch) && has_ability(ch, ABIL_UNNATURAL_THIRST)) {			
 		gain_condition(ch, FULL, -1);
 	}
 	else {
@@ -556,7 +558,7 @@ void real_update_char(char_data *ch) {
 	}
 	
 	// more thirsty?
-	if (HAS_ABILITY(ch, ABIL_SATED_THIRST) || (IS_VAMPIRE(ch) && HAS_ABILITY(ch, ABIL_UNNATURAL_THIRST))) {
+	if (has_ability(ch, ABIL_SATED_THIRST) || (IS_VAMPIRE(ch) && has_ability(ch, ABIL_UNNATURAL_THIRST))) {
 		gain_condition(ch, THIRST, -1);
 	}
 	else {
@@ -1705,12 +1707,12 @@ void gain_condition(char_data *ch, int condition, int value) {
 	}
 	
 	// things that prevent thirst
-	if (value > 0 && condition == THIRST && (HAS_ABILITY(ch, ABIL_SATED_THIRST) || HAS_ABILITY(ch, ABIL_UNNATURAL_THIRST))) {
+	if (value > 0 && condition == THIRST && (has_ability(ch, ABIL_SATED_THIRST) || has_ability(ch, ABIL_UNNATURAL_THIRST))) {
 		return;
 	}
 	
 	// things that prevent hunger
-	if (value > 0 && condition == FULL && HAS_ABILITY(ch, ABIL_UNNATURAL_THIRST)) {
+	if (value > 0 && condition == FULL && has_ability(ch, ABIL_UNNATURAL_THIRST)) {
 		return;
 	}
 
@@ -1756,7 +1758,7 @@ void gain_condition(char_data *ch, int condition, int value) {
 * @return int How much health to gain per 5 seconds.
 */
 int health_gain(char_data *ch, bool info_only) {
-	double gain;
+	double gain, min;
 	
 	// no health gain in combat
 	if (GET_POS(ch) == POS_FIGHTING || FIGHTING(ch) || IS_INJURED(ch, INJ_STAKED | INJ_TIED)) {
@@ -1778,12 +1780,19 @@ int health_gain(char_data *ch, bool info_only) {
 		if (HAS_BONUS_TRAIT(ch, BONUS_HEALTH_REGEN)) {
 			gain += 1;
 		}
-
+		
+		if (GET_FEEDING_FROM(ch) && has_ability(ch, ABIL_SANGUINE_RESTORATION)) {
+			gain *= 4;
+		}
+		
+		if (GET_POS(ch) == POS_SLEEPING) {
+			min = round((double) GET_MAX_HEALTH(ch) / ((double) config_get_int("max_sleeping_regen_time") / (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
+			gain = MAX(gain, min);
+		}
+		
+		// put this last
 		if (IS_HUNGRY(ch) || IS_THIRSTY(ch) || IS_BLOOD_STARVED(ch)) {
 			gain /= 4;
-		}
-		if (GET_FEEDING_FROM(ch) && HAS_ABILITY(ch, ABIL_SANGUINE_RESTORATION)) {
-			gain *= 4;
 		}
 	}
 	
@@ -1799,7 +1808,7 @@ int health_gain(char_data *ch, bool info_only) {
 * @return int How much mana to gain per 5 seconds.
 */
 int mana_gain(char_data *ch, bool info_only) {
-	double gain;
+	double gain, min;
 	
 	double solar_power_levels[] = { 2, 2.5, 2.5 };
 	
@@ -1815,7 +1824,7 @@ int mana_gain(char_data *ch, bool info_only) {
 		gain = regen_by_pos[(int) GET_POS(ch)];
 		gain += GET_MANA_REGEN(ch);
 		
-		if (HAS_ABILITY(ch, ABIL_SOLAR_POWER)) {
+		if (has_ability(ch, ABIL_SOLAR_POWER)) {
 			if (IS_CLASS_ABILITY(ch, ABIL_SOLAR_POWER) || check_sunny(IN_ROOM(ch))) {
 				gain *= CHOOSE_BY_ABILITY_LEVEL(solar_power_levels, ch, ABIL_SOLAR_POWER);
 			
@@ -1831,12 +1840,18 @@ int mana_gain(char_data *ch, bool info_only) {
 		if (HAS_BONUS_TRAIT(ch, BONUS_MANA_REGEN)) {
 			gain += 1;
 		}
-
+		if (GET_FEEDING_FROM(ch) && has_ability(ch, ABIL_SANGUINE_RESTORATION)) {
+			gain *= 4;
+		}
+		
+		if (GET_POS(ch) == POS_SLEEPING) {
+			min = round((double) GET_MAX_MANA(ch) / ((double) config_get_int("max_sleeping_regen_time") / (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
+			gain = MAX(gain, min);
+		}
+		
+		// this goes last
 		if (IS_HUNGRY(ch) || IS_THIRSTY(ch) || IS_BLOOD_STARVED(ch)) {
 			gain /= 4;
-		}
-		if (GET_FEEDING_FROM(ch) && HAS_ABILITY(ch, ABIL_SANGUINE_RESTORATION)) {
-			gain *= 4;
 		}
 	}
 	
@@ -1852,7 +1867,7 @@ int mana_gain(char_data *ch, bool info_only) {
 * @return int How much move to gain per 5 seconds.
 */
 int move_gain(char_data *ch, bool info_only) {
-	double gain;
+	double gain, min;
 	
 	if (IS_INJURED(ch, INJ_STAKED | INJ_TIED)) {
 		return 0;
@@ -1866,7 +1881,7 @@ int move_gain(char_data *ch, bool info_only) {
 		gain = regen_by_pos[(int) GET_POS(ch)];
 		gain += GET_MOVE_REGEN(ch);
 		
-		if (HAS_ABILITY(ch, ABIL_STAMINA)) {
+		if (has_ability(ch, ABIL_STAMINA)) {
 			gain *= 2;
 			
 			if (GET_MOVE(ch) < GET_MAX_MOVE(ch) && !info_only) {
@@ -1880,12 +1895,17 @@ int move_gain(char_data *ch, bool info_only) {
 		if (HAS_BONUS_TRAIT(ch, BONUS_MOVE_REGEN)) {
 			gain += 1;
 		}
+		if (GET_FEEDING_FROM(ch) && has_ability(ch, ABIL_SANGUINE_RESTORATION)) {
+			gain *= 4;
+		}
+		
+		if (GET_POS(ch) == POS_SLEEPING) {
+			min = round((double) GET_MAX_MOVE(ch) / ((double) config_get_int("max_sleeping_regen_time") / (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
+			gain = MAX(gain, min);
+		}
 
 		if (IS_HUNGRY(ch) || IS_THIRSTY(ch) || IS_BLOOD_STARVED(ch)) {
 			gain /= 4;
-		}
-		if (GET_FEEDING_FROM(ch) && HAS_ABILITY(ch, ABIL_SANGUINE_RESTORATION)) {
-			gain *= 4;
 		}
 	}
 

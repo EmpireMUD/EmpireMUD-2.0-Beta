@@ -85,7 +85,7 @@ bool check_block(char_data *ch, char_data *attacker, bool can_gain_skill) {
 	int max_block = 50;	// never pass this value
 	
 	// must have a shield and Shield Block
-	if (!shield || !IS_SHIELD(shield) || (!IS_NPC(ch) && !HAS_ABILITY(ch, ABIL_SHIELD_BLOCK))) {
+	if (!shield || !IS_SHIELD(shield) || (!IS_NPC(ch) && !has_ability(ch, ABIL_SHIELD_BLOCK))) {
 		return FALSE;
 	}
 	
@@ -272,7 +272,7 @@ int get_block_rating(char_data *ch, bool can_gain_skill) {
 	rating = GET_BLOCK(ch);
 	
 	// quick block procs to add 10%
-	if (HAS_ABILITY(ch, ABIL_QUICK_BLOCK)) {
+	if (has_ability(ch, ABIL_QUICK_BLOCK)) {
 		if (IS_CLASS_ABILITY(ch, ABIL_QUICK_BLOCK)) {
 			rating += MAX(quick_block_base, get_approximate_level(ch) * quick_block_scale);
 		}
@@ -321,10 +321,10 @@ double get_combat_speed(char_data *ch, int pos) {
 
 	// ability mods: player only
 	if (!IS_NPC(ch) && weapon) {
-		if (HAS_ABILITY(ch, ABIL_FINESSE) && !IS_MISSILE_WEAPON(weapon)) {
+		if (has_ability(ch, ABIL_FINESSE) && !IS_MISSILE_WEAPON(weapon)) {
 			base *= CHOOSE_BY_ABILITY_LEVEL(finesse, ch, ABIL_FINESSE);
 		}
-		if (HAS_ABILITY(ch, ABIL_QUICK_DRAW) && IS_MISSILE_WEAPON(weapon)) {
+		if (has_ability(ch, ABIL_QUICK_DRAW) && IS_MISSILE_WEAPON(weapon)) {
 			base *= CHOOSE_BY_ABILITY_LEVEL(quick_draw, ch, ABIL_QUICK_DRAW);
 		}
 	}
@@ -338,7 +338,7 @@ double get_combat_speed(char_data *ch, int pos) {
 	}
 	
 	// wits: it gets .1 second faster for every 4 wits
-	if (!HAS_ABILITY(ch, ABIL_FASTCASTING)) {
+	if (!has_ability(ch, ABIL_FASTCASTING)) {
 		base *= (1.0 - (0.025 * GET_WITS(ch)));
 	}
 	
@@ -370,7 +370,7 @@ int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill) 
 	base += GET_DEXTERITY(ch) * hit_per_dex;
 	
 	// skills
-	if (HAS_ABILITY(ch, ABIL_REFLEXES)) {
+	if (has_ability(ch, ABIL_REFLEXES)) {
 		if (IS_CLASS_ABILITY(ch, ABIL_REFLEXES)) {
 			refl = MAX(10.0, GET_COMPUTED_LEVEL(ch) * 0.1);
 		}
@@ -424,7 +424,7 @@ int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_sk
 	base_chance += GET_DEXTERITY(ch) * hit_per_dex;
 	
 	// skills: sparring
-	if (HAS_ABILITY(ch, ABIL_SPARRING)) {
+	if (has_ability(ch, ABIL_SPARRING)) {
 		if (IS_CLASS_ABILITY(ch, ABIL_SPARRING)) {
 			spar = MAX(10.0, GET_COMPUTED_LEVEL(ch) * 0.1);
 		}
@@ -655,7 +655,7 @@ int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, i
 	double resist_prc;
 	
 	if (!self) {
-		if (HAS_ABILITY(victim, ABIL_NOBLE_BEARING)) {
+		if (has_ability(victim, ABIL_NOBLE_BEARING)) {
 			dam -= GET_GREATNESS(victim);
 		}
 		
@@ -664,7 +664,7 @@ int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, i
 			max_resist = get_approximate_level(attacker) / 2;
 			use_resist = 0;
 			
-			if (damtype == DAM_PHYSICAL || damtype == DAM_FIRE || (damtype == DAM_POISON && HAS_ABILITY(victim, ABIL_RESIST_POISON))) {
+			if (damtype == DAM_PHYSICAL || damtype == DAM_FIRE || (damtype == DAM_POISON && has_ability(victim, ABIL_RESIST_POISON))) {
 				use_resist = GET_RESIST_PHYSICAL(victim);
 			}
 			else if (damtype == DAM_MAGICAL) {
@@ -684,7 +684,7 @@ int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, i
 		}
 	
 		// redirect some damage to mana: player only
-		if (damtype == DAM_MAGICAL && !IS_NPC(victim) && HAS_ABILITY(victim, ABIL_NULL_MANA) && GET_MANA(victim) > 0) {
+		if (damtype == DAM_MAGICAL && !IS_NPC(victim) && has_ability(victim, ABIL_NULL_MANA) && GET_MANA(victim) > 0) {
 			int absorb = MIN(dam / 2, GET_MANA(victim));
 		
 			if (absorb > 0) {
@@ -698,7 +698,7 @@ int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, i
 	}
 	
 	if (damtype == DAM_POISON) {
-		if (HAS_ABILITY(victim, ABIL_POISON_IMMUNITY)) {
+		if (has_ability(victim, ABIL_POISON_IMMUNITY)) {
 			dam = 0;
 		}
 		if (can_gain_exp_from(victim, attacker)) {
@@ -1453,7 +1453,7 @@ static bool tower_would_shoot(room_data *from_room, char_data *vict) {
 	}
 	
 	// cloak of darkness
-	if (!IS_NPC(vict) && HAS_ABILITY(vict, ABIL_CLOAK_OF_DARKNESS)) {
+	if (!IS_NPC(vict) && has_ability(vict, ABIL_CLOAK_OF_DARKNESS)) {
 		gain_ability_exp(vict, ABIL_CLOAK_OF_DARKNESS, 15);
 		if (!number(0, 1) && skill_check(vict, ABIL_CLOAK_OF_DARKNESS, DIFF_HARD)) {
 			return FALSE;
@@ -2240,7 +2240,7 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 	dam = reduce_damage_from_skills(dam, victim, ch, damtype);
 	
 	// lethal damage?? check Master Survivalist
-	if ((ch != victim) && dam >= GET_HEALTH(victim) && !IS_NPC(victim) && AWAKE(victim) && HAS_ABILITY(victim, ABIL_MASTER_SURVIVALIST)) {
+	if ((ch != victim) && dam >= GET_HEALTH(victim) && !IS_NPC(victim) && AWAKE(victim) && has_ability(victim, ABIL_MASTER_SURVIVALIST)) {
 		if (!number(0, 2)) {
 			msg_to_char(victim, "You dive out of the way at the last second!\r\n");
 			act("$n dives out of the way at the last second!", FALSE, victim, NULL, NULL, TO_ROOM);
@@ -2591,7 +2591,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		if (attack_hit_info[w_type].damage_type == DAM_PHYSICAL) {
 			block = check_block(victim, ch, TRUE);
 		}
-		else if (HAS_ABILITY(victim, ABIL_WARD_AGAINST_MAGIC) && attack_hit_info[w_type].damage_type == DAM_MAGICAL) {
+		else if (has_ability(victim, ABIL_WARD_AGAINST_MAGIC) && attack_hit_info[w_type].damage_type == DAM_MAGICAL) {
 			// half-chance
 			block = check_block(victim, ch, TRUE) && !number(0, 1);
 		}
@@ -2641,24 +2641,24 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 				
 		// All these abilities add damage: no skill gain on an already-beated foe
 		if (can_gain_skill) {
-			if (!IS_NPC(ch) && HAS_ABILITY(ch, ABIL_DAGGER_MASTERY) && weapon && GET_WEAPON_TYPE(weapon) == TYPE_STAB) {
+			if (!IS_NPC(ch) && has_ability(ch, ABIL_DAGGER_MASTERY) && weapon && GET_WEAPON_TYPE(weapon) == TYPE_STAB) {
 				dam *= 1.5;
 				if (can_gain_exp_from(ch, victim)) {
 					gain_ability_exp(ch, ABIL_DAGGER_MASTERY, 2);
 				}
 			}
-			if (!IS_NPC(ch) && HAS_ABILITY(ch, ABIL_STAFF_MASTERY) && weapon && IS_STAFF(weapon)) {
+			if (!IS_NPC(ch) && has_ability(ch, ABIL_STAFF_MASTERY) && weapon && IS_STAFF(weapon)) {
 				dam *= 1.5;
 				if (can_gain_exp_from(ch, victim)) {
 					gain_ability_exp(ch, ABIL_STAFF_MASTERY, 2);
 				}
 			}	
-			if (!IS_NPC(ch) && HAS_ABILITY(ch, ABIL_CLAWS) && w_type == TYPE_VAMPIRE_CLAWS && can_gain_exp_from(ch, victim)) {
+			if (!IS_NPC(ch) && has_ability(ch, ABIL_CLAWS) && w_type == TYPE_VAMPIRE_CLAWS && can_gain_exp_from(ch, victim)) {
 				gain_ability_exp(ch, ABIL_CLAWS, 2);
 			}
 
 			// raw damage modified by hunt
-			if (IS_NPC(victim) && MOB_FLAGGED(victim, MOB_ANIMAL) && HAS_ABILITY(ch, ABIL_HUNT)) {
+			if (IS_NPC(victim) && MOB_FLAGGED(victim, MOB_ANIMAL) && has_ability(ch, ABIL_HUNT)) {
 				if (can_gain_exp_from(ch, victim)) {
 					gain_ability_exp(ch, ABIL_HUNT, 2);
 				}
@@ -2669,7 +2669,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 			}
 		
 			// raw damage modified by big game hunter
-			if (!IS_NPC(ch) && HAS_ABILITY(ch, ABIL_BIG_GAME_HUNTER) && (IS_VAMPIRE(victim) || IS_MAGE(victim))) {
+			if (!IS_NPC(ch) && has_ability(ch, ABIL_BIG_GAME_HUNTER) && (IS_VAMPIRE(victim) || IS_MAGE(victim))) {
 				if (can_gain_exp_from(ch, victim)) {
 					gain_ability_exp(ch, ABIL_BIG_GAME_HUNTER, 1);
 				}
@@ -2689,7 +2689,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		if (combat_round && can_gain_skill && can_gain_exp_from(ch, victim)) {
 			if (!IS_NPC(ch)) {
 				gain_ability_exp(ch, ABIL_FINESSE, 2);
-				if (GET_SKILL(ch, SKILL_BATTLE) < EMPIRE_CHORE_SKILL_CAP) {
+				if (get_skill_level(ch, SKILL_BATTLE) < EMPIRE_CHORE_SKILL_CAP) {
 					gain_skill_exp(ch, SKILL_BATTLE, 4);
 				}
 				if (affected_by_spell(ch, ATYPE_ALACRITY)) {
@@ -2743,7 +2743,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 			}
 			
 			// poison could kill too
-			if (!IS_NPC(ch) && HAS_ABILITY(ch, ABIL_POISONS) && weapon && attack_hit_info[w_type].weapon_type == WEAPON_SHARP) {
+			if (!IS_NPC(ch) && has_ability(ch, ABIL_POISONS) && weapon && attack_hit_info[w_type].weapon_type == WEAPON_SHARP) {
 				if (!number(0, 1) && apply_poison(ch, victim, USING_POISON(ch)) < 0) {
 					// dedz
 					result = -1;
@@ -3088,7 +3088,7 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 	// compute
 	success = check_hit_vs_dodge(ch, FIGHTING(ch), FALSE);
 	
-	if (success && AWAKE(FIGHTING(ch)) && HAS_ABILITY(FIGHTING(ch), ABIL_BLOCK_ARROWS)) {
+	if (success && AWAKE(FIGHTING(ch)) && has_ability(FIGHTING(ch), ABIL_BLOCK_ARROWS)) {
 		block = check_block(FIGHTING(ch), ch, TRUE);
 		if (can_gain_exp_from(FIGHTING(ch), ch)) {
 			gain_ability_exp(FIGHTING(ch), ABIL_BLOCK_ARROWS, 2);
@@ -3297,7 +3297,7 @@ void frequent_combat(int pulse) {
 				}
 				
 				// still fighting and can dual-wield?
-				if (!IS_NPC(ch) && FIGHTING(ch) && !IS_DEAD(ch) && !EXTRACTED(ch) && !EXTRACTED(FIGHTING(ch)) && HAS_ABILITY(ch, ABIL_DUAL_WIELD) && GET_EQ(ch, WEAR_HOLD) && IS_WEAPON(GET_EQ(ch, WEAR_HOLD))) {
+				if (!IS_NPC(ch) && FIGHTING(ch) && !IS_DEAD(ch) && !EXTRACTED(ch) && !EXTRACTED(FIGHTING(ch)) && has_ability(ch, ABIL_DUAL_WIELD) && GET_EQ(ch, WEAR_HOLD) && IS_WEAPON(GET_EQ(ch, WEAR_HOLD))) {
 					speed = get_combat_speed(ch, WEAR_HOLD);
 					if ((pulse % ((int)(speed RL_SEC))) == 0) {
 						one_combat_round(ch, speed, GET_EQ(ch, WEAR_HOLD));

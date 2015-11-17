@@ -416,7 +416,7 @@ void update_world_count(void) {
 	for (map = land_map; map; map = map->next) {
 		// sector
 		vnum = GET_SECT_VNUM(map->sector_type);
-		if (vnum != last_sect_vnum) {
+		if (vnum != last_sect_vnum || !sect_inf) {
 			HASH_FIND_INT(global_sector_count, &vnum, sect_inf);
 			if (!sect_inf) {
 				CREATE(sect_inf, struct stats_data_struct, 1);
@@ -427,15 +427,11 @@ void update_world_count(void) {
 		}
 		++sect_inf->count;
 		
-		// any further data?
-		if (!(room = real_real_room(map->vnum))) {
-			continue;
-		}
-		
-		// crop?
-		vnum = ROOM_CROP(room) ? GET_CROP_VNUM(ROOM_CROP(room)) : NOTHING;
-		if (vnum != NOTHING) {
-			if (vnum != last_crop_vnum) {
+		// crop
+		if (map->crop_type) {
+			vnum = GET_CROP_VNUM(map->crop_type);
+			
+			if (vnum != last_crop_vnum || !crop_inf) {
 				HASH_FIND_INT(global_crop_count, &vnum, crop_inf);
 				if (!crop_inf) {
 					CREATE(crop_inf, struct stats_data_struct, 1);
@@ -446,6 +442,11 @@ void update_world_count(void) {
 			}
 			
 			++crop_inf->count;
+		}
+		
+		// any further data?
+		if (!(room = real_real_room(map->vnum))) {
+			continue;
 		}
 		
 		// building?

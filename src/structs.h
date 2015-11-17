@@ -2462,17 +2462,23 @@ struct mail_data {
 
 // used in player_special_data
 struct player_ability_data {
+	int ability_id;	// ABIL_x identifier
 	bool purchased;	// whether or not the player bought it
 	byte levels_gained;	// tracks for the cap on how many times one ability grants skillups
+
+	UT_hash_handle hh;	// player's ability hash
 };
 
 
-// used in player_special_data
+// used for a hash of skills per player in player_special_data
 struct player_skill_data {
-	byte level;	// current skill level (0-100)
-	double exp;	// experience gained in skill (0-100)
-	byte resets;	// resets available
+	int skill_id;	// SKILL_x identifier
+	int level;	// current skill level (0-100)
+	double exp;	// experience gained in skill (0-100%)
+	int resets;	// resets available
 	bool noskill;	// if TRUE, do not gain
+	
+	UT_hash_handle hh;	// player's skill hash
 };
 
 
@@ -2571,8 +2577,8 @@ struct player_special_data {
 	
 	// skill/ability data
 	any_vnum creation_archetype;	// this is now stored permanently so later decisions can be made based on it
-	struct player_skill_data skills[MAX_SKILLS];
-	struct player_ability_data abilities[MAX_ABILITIES];
+	struct player_skill_data *skill_hash;
+	struct player_ability_data *ability_hash;
 	bool can_gain_new_skills;	// not required to keep skills at zero
 	bool can_get_bonus_skills;	// can buy extra 75's
 	sh_int skill_level;  // levels computed based on class skills
