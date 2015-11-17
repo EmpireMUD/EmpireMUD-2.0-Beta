@@ -391,13 +391,17 @@ void point_update_char(char_data *ch) {
 		}
 	}
 
-	// check all cooldowns
-	for (cool = ch->cooldowns; cool; cool = next_cool) {
-		next_cool = cool->next;
+	// check all cooldowns -- ignore chars with descriptors, as they'll want
+	// the OTHER function to remove this (it sends messages; this one includes
+	// NPCs and doesn't)
+	if (!ch->desc) {
+		for (cool = ch->cooldowns; cool; cool = next_cool) {
+			next_cool = cool->next;
 		
-		// is expired?
-		if (time(0) >= cool->expire_time) {
-			remove_cooldown(ch, cool);
+			// is expired?
+			if (time(0) >= cool->expire_time) {
+				remove_cooldown(ch, cool);
+			}
 		}
 	}
 
