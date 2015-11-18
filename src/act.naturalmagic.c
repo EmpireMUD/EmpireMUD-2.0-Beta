@@ -1037,10 +1037,10 @@ ACMD(do_heal) {
 	}
 	
 	if (has_ability(ch, ABIL_HEALER)) {
-		cost = amount * base_cost_ratio;
+		cost = amount * healer_cost_ratio;
 	}
 	else {
-		cost = amount * healer_cost_ratio;
+		cost = amount * base_cost_ratio;
 	}
 	
 	// bonus healing does not add to cost
