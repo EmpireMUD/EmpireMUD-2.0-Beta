@@ -713,11 +713,54 @@ void free_char(char_data *ch) {
 	
 	// clean up gear/items, if any
 	extract_all_items(ch);
-	
-	proto = IS_NPC(ch) ? mob_proto(GET_MOB_VNUM(ch)) : NULL;
 
 	if (IS_NPC(ch)) {
 		free_mob_tags(&MOB_TAGGED_BY(ch));
+	}
+	
+	// remove all affects
+	while (ch->affected) {
+		affect_remove(ch, ch->affected);
+	}
+	while (ch->over_time_effects) {
+		dot_remove(ch, ch->over_time_effects);
+	}
+	
+	// remove cooldowns
+	while (ch->cooldowns) {
+		remove_cooldown(ch, ch->cooldowns);
+	}
+
+	// free any assigned scripts and vars
+	if (SCRIPT(ch)) {
+		extract_script(ch, MOB_TRIGGER);
+	}
+	
+	// TODO what about script memory (freed in extract_char_final for NPCs, but what about PCs?)
+	
+	// free lore
+	while ((lore = GET_LORE(ch))) {
+		GET_LORE(ch) = lore->next;
+		if (lore->text) {
+			free(lore->text);
+		}
+		free(lore);
+	}
+	
+	// alert empire data the mob is despawned
+	if (GET_EMPIRE_NPC_DATA(ch)) {
+		GET_EMPIRE_NPC_DATA(ch)->mob = NULL;
+		GET_EMPIRE_NPC_DATA(ch) = NULL;
+	}
+	
+	// extract objs
+	while ((obj = ch->carrying)) {
+		extract_obj(obj);
+	}
+	for (iter = 0; iter < NUM_WEARS; ++iter) {
+		if (GET_EQ(ch, iter)) {
+			extract_obj(GET_EQ(ch, iter));
+		}
 	}
 
 	// This is really just players, but I suppose a mob COULD have it ...
@@ -803,7 +846,10 @@ void free_char(char_data *ch) {
 			log("SYSERR: Mob %s (#%d) had player_specials allocated!", GET_NAME(ch), GET_MOB_VNUM(ch));
 		}
 	}
-
+	
+	// mob prototype checks
+	proto = IS_NPC(ch) ? mob_proto(GET_MOB_VNUM(ch)) : NULL;
+	
 	if (ch->prev_host && (!proto || ch->prev_host != proto->prev_host)) {
 		free(ch->prev_host);
 	}
@@ -828,54 +874,10 @@ void free_char(char_data *ch) {
 			free(interact);
 		}
 	}
-	
-	// remove all affects
-	while (ch->affected) {
-		affect_remove(ch, ch->affected);
-	}
-	while (ch->over_time_effects) {
-		dot_remove(ch, ch->over_time_effects);
-	}
-	
-	// remove cooldowns
-	while (ch->cooldowns) {
-		remove_cooldown(ch, ch->cooldowns);
-	}
 
-	// free any assigned scripts and vars
-	if (SCRIPT(ch)) {
-		extract_script(ch, MOB_TRIGGER);
-	}
-	
-	// TODO what about script memory (freed in extract_char_final for NPCs, but what about PCs?)
-	
-	// free lore
-	while ((lore = GET_LORE(ch))) {
-		GET_LORE(ch) = lore->next;
-		if (lore->text) {
-			free(lore->text);
-		}
-		free(lore);
-	}
-	
-	// alert empire data the mob is despawned
-	if (GET_EMPIRE_NPC_DATA(ch)) {
-		GET_EMPIRE_NPC_DATA(ch)->mob = NULL;
-		GET_EMPIRE_NPC_DATA(ch) = NULL;
-	}
-	
-	// extract objs
-	while ((obj = ch->carrying)) {
-		extract_obj(obj);
-	}
-	for (iter = 0; iter < NUM_WEARS; ++iter) {
-		if (GET_EQ(ch, iter)) {
-			extract_obj(GET_EQ(ch, iter));
-		}
-	}
-
-	if (ch->desc)
+	if (ch->desc) {
 		ch->desc->character = NULL;
+	}
 
 	/* find_char helper */
 	remove_from_lookup_table(GET_ID(ch));
