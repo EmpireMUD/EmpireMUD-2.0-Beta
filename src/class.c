@@ -1027,7 +1027,7 @@ void do_stat_class(char_data *ch, class_data *cls) {
 	size += snprintf(buf + size, sizeof(buf) - size, "Skills required:\r\n%s", part);
 	
 	get_class_ability_display(CLASS_ABILITIES(cls), part, NULL);
-	size += snprintf(buf + size, sizeof(buf) - size, "Roles and abilities:\r\n%s", part);
+	size += snprintf(buf + size, sizeof(buf) - size, "Roles and abilities:\r\n%s%s", part, *part ? "\r\n" : " none\r\n");
 
 	page_string(ch->desc, buf, TRUE);
 }
