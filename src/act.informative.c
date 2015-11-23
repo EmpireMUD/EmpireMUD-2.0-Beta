@@ -1404,7 +1404,7 @@ char *one_who_line(char_data *ch, bool shortlist, bool screenreader) {
 			size += snprintf(out + size, sizeof(out) - size, "[%s%3d%s] ", screenreader ? "" : class_role_color[GET_CLASS_ROLE(ch)], GET_COMPUTED_LEVEL(ch), screenreader ? "" : "\t0");
 		}
 		else {
-			size += snprintf(out + size, sizeof(out) - size, "[%3d %s%s%s] ", GET_COMPUTED_LEVEL(ch), screenreader ? "" : class_role_color[GET_CLASS_ROLE(ch)], screenreader ? SHOW_CLASS_NAME(ch) : SHOW_CLASS_ABBREV(ch), screenreader ? show_role : "\t0");
+			size += snprintf(out + size, sizeof(out) - size, "[%3d %s%s%s] ", GET_COMPUTED_LEVEL(ch), screenreader ? "" : class_role_color[GET_CLASS_ROLE(ch)], screenreader ? SHOW_CLASS_ABBREV(ch) : SHOW_CLASS_NAME(ch), screenreader ? show_role : "\t0");
 		}
 	}
 	

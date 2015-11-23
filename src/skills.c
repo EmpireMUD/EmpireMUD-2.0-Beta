@@ -2630,6 +2630,7 @@ void get_skill_ability_display(struct skill_ability *list, struct skill_ability 
 		// crlf only on parent abilities
 		if (!parent && size > 0) {
 			size += snprintf(save_buffer + size, buflen - size, "\r\n");
+			any = FALSE;
 		}
 	}
 }
