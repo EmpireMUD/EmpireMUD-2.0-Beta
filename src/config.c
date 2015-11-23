@@ -197,6 +197,9 @@ const int base_player_pools[NUM_POOLS] = { 50, 100, 50, 100 };
 // attributes that can't go below 1 (terminate list with NOTHING)
 const int primary_attributes[] = { STRENGTH, CHARISMA, INTELLIGENCE, NOTHING };
 
+// skill levels at which you gain an ability
+int master_ability_levels[] = { 1, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 75, 80, 90, 100, -1 };
+
 // universal wait (command lag) after abilities with cooldowns
 const int universal_wait = 1.25 RL_SEC;
 
@@ -1660,6 +1663,8 @@ void init_config_system(void) {
 	init_config(CONFIG_OTHER, "test_config", CONFTYPE_INT, "this is a test config");
 	
 	// players
+	init_config(CONFIG_PLAYERS, "default_class_abbrev", CONFTYPE_SHORT_STRING, "abbreviation to show for unclassed players");
+	init_config(CONFIG_PLAYERS, "default_class_name", CONFTYPE_SHORT_STRING, "name to show for unclassed players");
 	init_config(CONFIG_PLAYERS, "delete_inactive_players_after", CONFTYPE_INT, "days to a player can be inactive before auto-delete (0 = never)");
 	init_config(CONFIG_PLAYERS, "delete_invalid_players_after", CONFTYPE_INT, "days to wait before deleting players with bad level data (0 = never)");
 	init_config(CONFIG_PLAYERS, "exp_level_difference", CONFTYPE_INT, "levels a player can have above a mob and still gain exp from it");

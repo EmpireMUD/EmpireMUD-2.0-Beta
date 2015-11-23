@@ -51,8 +51,6 @@ extern const char *wtrig_types[];
 extern const struct wear_data_type wear_data[NUM_WEARS];
 
 /* external functions */
-extern int find_ability_by_name(char *name, bool allow_abbrev);
-extern int find_skill_by_name(char *name);
 void free_varlist(struct trig_var_data *vd);
 extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
 extern bool is_fight_enemy(char_data *ch, char_data *frenemy);	// fight.c
@@ -1866,8 +1864,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 			else if (!str_cmp(var, "skill")) {
 				if (!str_cmp(field, "name")) {
 					if (subfield && *subfield) {
-						int sk = find_skill_by_name(subfield);
-						snprintf(str, slen, "%s", sk != NO_SKILL ? skill_data[sk].name : "");
+						skill_data *sk = find_skill(subfield);
+						snprintf(str, slen, "%s", sk ? SKILL_NAME(sk) : "");
 					}
 					else {
 						*str = '\0';
@@ -1875,8 +1873,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				else if (!str_cmp(field, "validate")) {
 					if (subfield && *subfield) {
-						int sk = find_skill_by_name(subfield);
-						snprintf(str, slen, "%d", sk != NO_SKILL ? 1 : 0);
+						skill_data *sk = find_skill(subfield);
+						snprintf(str, slen, "%d", sk ? 1 : 0);
 					}
 					else {
 						snprintf(str, slen, "0");
@@ -1901,9 +1899,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				case 'a': {	// char.a*
 					if (!str_cmp(field, "ability")) {
 						if (subfield && *subfield) {
-							int ab = find_ability_by_name(subfield, TRUE);
-							if (ab != NO_ABIL) {
-								snprintf(str, slen, (IS_NPC(c) || has_ability(c, ab)) ? "1" : "0");
+							ability_data *ab = find_ability(subfield);
+							if (ab) {
+								snprintf(str, slen, (IS_NPC(c) || has_ability(c, ABIL_VNUM(ab))) ? "1" : "0");
 							}
 							else {
 								snprintf(str, slen, "0");
@@ -2090,11 +2088,11 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%d", (troom && can_teleport_to(c, troom, TRUE)) ? 1 : 0);
 					}
 					else if (!str_cmp(field, "class")) {
-						if (IS_NPC(c) || GET_CLASS(c) == CLASS_NONE) {
+						if (IS_NPC(c) || !GET_CLASS(c)) {
 							*str = '\0';
 						}
 						else {
-							snprintf(str, slen, "%s", class_data[GET_CLASS(c)].name);
+							snprintf(str, slen, "%s", SHOW_CLASS_NAME(ch));
 						}
 					}
 					else if (!str_cmp(field, "cha") || !str_cmp(field, "charisma")) {
@@ -2181,12 +2179,13 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "gain_skill")) {
 						if (subfield && *subfield && !IS_NPC(c)) {
 							// %actor.gain_skill(skill, amount)%
-							void set_skill(char_data *ch, int skill, int level);
+							void set_skill(char_data *ch, any_vnum skill, int level);
 							char arg1[256], arg2[256];
-							int sk = NO_SKILL, amount = 0;
+							skill_data *sk;
+							int amount = 0;
 							
 							comma_args(subfield, arg1, arg2);
-							if (*arg1 && *arg2 && (sk = find_skill_by_name(arg1)) != NO_SKILL && (amount = atoi(arg2)) != 0 && noskill_ok(c, sk)) {
+							if (*arg1 && *arg2 && (sk = find_skill(arg1)) && (amount = atoi(arg2)) != 0 && noskill_ok(c, SKILL_VNUM(sk))) {
 								gain_skill(c, sk, amount);
 								snprintf(str, slen, "1");
 							}
@@ -2203,10 +2202,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "give_skill_reset")) {
-						int sk = find_skill_by_name(subfield);
+						skill_data *sk = find_skill(subfield);
 						struct player_skill_data *skdata;
 						
-						if (sk != NO_SKILL && (skdata = get_skill_data(c, sk, TRUE))) {
+						if (sk && (skdata = get_skill_data(c, SKILL_VNUM(sk), TRUE))) {
 							skdata->resets = MIN(skdata->resets + 1, MAX_SKILL_RESETS);
 						}
 						*str = '\0';
@@ -2525,9 +2524,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%d", GET_STRENGTH(c));
 
 					else if (!str_cmp(field, "skill")) {
-						int sk = find_skill_by_name(subfield);
-						if (sk != NO_SKILL && !IS_NPC(c)) {
-							snprintf(str, slen, "%d", get_skill_level(c, sk));
+						skill_data *sk = find_skill(subfield);
+						if (sk && !IS_NPC(c)) {
+							snprintf(str, slen, "%d", get_skill_level(c, SKILL_VNUM(sk)));
 						}
 						else {
 							snprintf(str, slen, "0");
@@ -2537,14 +2536,15 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "set_skill")) {
 						if (subfield && *subfield && !IS_NPC(c)) {
 							// %actor.set_skill(skill, number)%
-							void set_skill(char_data *ch, int skill, int level);
+							void set_skill(char_data *ch, any_vnum skill, int level);
 							char arg1[256], arg2[256];
-							int sk = NO_SKILL, sk_lev = 0;
+							skill_data *sk;
+							int sk_lev = 0;
 							
 							comma_args(subfield, arg1, arg2);
-							if (*arg1 && *arg2 && (sk = find_skill_by_name(arg1)) != NO_SKILL && (sk_lev = atoi(arg2)) >= 0 && sk_lev <= CLASS_SKILL_CAP && (sk_lev < get_skill_level(c, sk) || noskill_ok(c, sk))) {
+							if (*arg1 && *arg2 && (sk = find_skill(arg1)) && (sk_lev = atoi(arg2)) >= 0 && sk_lev <= CLASS_SKILL_CAP && (sk_lev < get_skill_level(c, SKILL_VNUM(sk)) || noskill_ok(c, SKILL_VNUM(sk)))) {
 								// TODO skill cap checking! need a f() like can_set_skill_to(ch, sk, lev)
-								set_skill(c, sk, sk_lev);
+								set_skill(c, SKILL_VNUM(sk), sk_lev);
 								snprintf(str, slen, "1");
 							}
 						}

@@ -123,7 +123,7 @@ RITUAL_SETUP_FUNC(start_simple_ritual);
 struct ritual_data_type {
 	char *name;
 	int cost;
-	int ability;
+	any_vnum ability;
 	bitvector_t flags;
 	RITUAL_SETUP_FUNC(*begin);	// function pointer
 	RITUAL_FINISH_FUNC(*perform);	// function pointer
@@ -1898,7 +1898,7 @@ const char *study_strings[] = {
 
 // **** for do_study ****
 void perform_study(char_data *ch) {
-	void set_skill(char_data *ch, int skill, int level);
+	void set_skill(char_data *ch, any_vnum skill, int level);
 	int pos;
 	
 	GET_ACTION_TIMER(ch) += 1;

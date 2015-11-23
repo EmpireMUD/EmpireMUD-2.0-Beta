@@ -58,7 +58,7 @@ void do_chore_trapping(empire_data *emp, room_data *room);
 void do_chore_tanning(empire_data *emp, room_data *room);
 
 // external functions
-void empire_skillup(empire_data *emp, int ability, double amount);	// skills.c
+void empire_skillup(empire_data *emp, any_vnum ability, double amount);	// skills.c
 void stop_room_action(room_data *room, int action, int chore);	// act.action.c
 
 // gen_craft protos:
@@ -789,11 +789,13 @@ CHORE_GEN_CRAFT_VALIDATOR(chore_sawing) {
 * @return bool TRUE if this workforce chore can work this craft, FALSE if not
 */
 CHORE_GEN_CRAFT_VALIDATOR(chore_weaving) {
+	ability_data *abil;
+	
 	if (GET_CRAFT_TYPE(craft) != CRAFT_TYPE_WEAVE) {
 		return FALSE;
 	}
 	// won't weave things higher level than BASIC_SKILL_CAP
-	if (GET_CRAFT_ABILITY(craft) != NO_ABIL && ability_data[GET_CRAFT_ABILITY(craft)].parent_skill_required > BASIC_SKILL_CAP) {
+	if ((abil = find_ability_by_vnum(GET_CRAFT_ABILITY(craft))) && ABIL_SKILL_LEVEL(abil) > BASIC_SKILL_CAP) {
 		return FALSE;
 	}
 	// success
@@ -1175,6 +1177,7 @@ INTERACTION_FUNC(one_farming_chore) {
 					}
 					
 					// we are keeping the original sect the same as it was
+					// TODO un-magic-number this
 					set_room_extra_data(inter_room, ROOM_EXTRA_SEED_TIME, 60);
 				}
 				else {
@@ -1187,10 +1190,10 @@ INTERACTION_FUNC(one_farming_chore) {
 						change_terrain(inter_room, climate_default_sector[GET_CROP_CLIMATE(ROOM_CROP(inter_room))]);
 					}
 					
-					// stop the chop just in case
+					// stop the farming just in case
 					stop_room_action(inter_room, ACT_CHOPPING, CHORE_CHOPPING);
 					
-					if (EMPIRE_CHORE(emp, CHORE_ABANDON_CHOPPED)) {
+					if (EMPIRE_CHORE(emp, CHORE_ABANDON_FARMED)) {
 						abandon_room(inter_room);
 						add_chore_tracker(emp);
 					}

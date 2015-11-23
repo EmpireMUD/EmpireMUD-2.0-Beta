@@ -1144,9 +1144,9 @@ obj_data *make_corpse(char_data *ch) {
 * @param char_data *ch The player resurrecting.
 * @param char_data *rez_by Optional (or NULL): The player who resurrected them.
 * @param room_data *loc The location to resurrect to.
-* @param int ability Optional (or NO_ABIL): The ability to skillup for rez_by.
+* @param any_vnum ability Optional (or NO_ABIL): The ability to skillup for rez_by.
 */
-void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, int ability) {
+void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, any_vnum ability) {
 	extern obj_data *find_obj(int n);
 
 	obj_data *corpse;

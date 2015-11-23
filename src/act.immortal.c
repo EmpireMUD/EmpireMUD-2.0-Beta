@@ -61,7 +61,7 @@ extern const char *syslog_types[];
 // external functions
 extern struct instance_data *build_instance_loc(adv_data *adv, struct adventure_link_rule *rule, room_data *loc, int dir);	// instance.c
 void check_autowiz(char_data *ch);
-void clear_char_abilities(char_data *ch, int skill);
+void clear_char_abilities(char_data *ch, any_vnum skill);
 void delete_instance(struct instance_data *inst);	// instance.c
 void get_icons_display(struct icon_data *list, char *save_buffer);
 void get_interaction_display(struct interaction_item *list, char *save_buffer);
@@ -334,26 +334,17 @@ ADMIN_UTIL(util_tool) {
 
 // for util_clear_roles
 PLAYER_UPDATE_FUNC(update_clear_roles) {
-	void check_skill_sell(char_data *ch, int abil);
-	int iter;
+	void assign_class_abilities(char_data *ch, class_data *cls, int role);
 	
 	if (IS_IMMORTAL(ch)) {
 		return;
 	}
 	
 	GET_CLASS_ROLE(ch) = ROLE_NONE;
+	assign_class_abilities(ch, NULL, NOTHING);
 	
 	if (!is_file) {
 		msg_to_char(ch, "Your class role has been reset.\r\n");
-	}
-	
-	for (iter = 0; iter < NUM_ABILITIES; ++iter) {
-		if (ability_data[iter].parent_skill == NO_SKILL && has_ability(ch, iter)) {
-			remove_ability(ch, iter, FALSE);
-			if (!is_file) {
-				check_skill_sell(ch, iter);
-			}
-		}
 	}
 }
 
@@ -1402,10 +1393,9 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		}
 	}
 	else if SET_CASE("skill") {
-		extern int find_skill_by_name(char *name);
-	
 		char skillname[MAX_INPUT_LENGTH], *skillval;
-		int level = -1, old_level, skill;
+		int level = -1, old_level;
+		skill_data *skill;
 		
 		// set <name> skill "<name>" <level>
 		skillval = any_one_word(val_arg, skillname);
@@ -1419,19 +1409,19 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 			msg_to_char(ch, "You must choose a level between 0 and %d.\r\n", CLASS_SKILL_CAP);
 			return 0;
 		}
-		else if ((skill = find_skill_by_name(skillname)) == NO_SKILL) {
+		else if (!(skill = find_skill(skillname))) {
 			msg_to_char(ch, "Unknown skill '%s'.\r\n", skillname);
 			return 0;
 		}
 
 		// victory
-		old_level = get_skill_level(vict, skill);
-		set_skill(vict, skill, level);
+		old_level = get_skill_level(vict, SKILL_VNUM(skill));
+		set_skill(vict, SKILL_VNUM(skill), level);
 		if (old_level > level) {
-			clear_char_abilities(vict, skill);
+			clear_char_abilities(vict, SKILL_VNUM(skill));
 		}
 		update_class(vict);
-		sprintf(output, "%s's %s set to %d", GET_NAME(vict), skill_data[skill].name, level);
+		sprintf(output, "%s's %s set to %d", GET_NAME(vict), SKILL_NAME(skill), level);
 	}
 
 	else if SET_CASE("account") {		
@@ -1820,11 +1810,14 @@ SHOW(show_site) {
 
 
 SHOW(show_skills) {
-	extern char *ability_color(char_data *ch, int abil);
-	extern int get_ability_points_available_for_char(char_data *ch, int skill);
+	extern char *ability_color(char_data *ch, ability_data *abil);
+	extern int get_ability_points_available_for_char(char_data *ch, any_vnum skill);
 	
+	struct player_ability_data *plab, *next_plab;
+	struct player_skill_data *plsk, *next_plsk;
+	ability_data *abil;
+	skill_data *skill;
 	char_data *vict;
-	int sk_iter, ab_iter;
 	bool found, is_file = FALSE;
 	
 	argument = one_argument(argument, arg);
@@ -1845,15 +1838,27 @@ SHOW(show_skills) {
 	
 	msg_to_char(ch, "Skills for %s:\r\n", PERS(vict, ch, TRUE));
 	
-	for (sk_iter = 0; sk_iter < NUM_SKILLS; ++sk_iter) {
-		msg_to_char(ch, "&y%s&0 [%d, %.1f%%, %d]: ", skill_data[sk_iter].name, get_skill_level(vict, sk_iter), get_skill_exp(vict, sk_iter), get_ability_points_available_for_char(vict, sk_iter));
+	HASH_ITER(hh, GET_SKILL_HASH(vict), plsk, next_plsk) {
+		if (!(skill = find_skill_by_vnum(plsk->vnum))) {
+			continue;
+		}
+		
+		msg_to_char(ch, "&y%s&0 [%d, %.1f%%, %d]: ", SKILL_NAME(skill), get_skill_level(vict, SKILL_VNUM(skill)), get_skill_exp(vict, SKILL_VNUM(skill)), get_ability_points_available_for_char(vict, SKILL_VNUM(skill)));
 		
 		found = FALSE;
-		for (ab_iter = 0; ab_iter < NUM_ABILITIES; ++ab_iter) {
-			if (ability_data[ab_iter].parent_skill == sk_iter && has_ability(vict, ab_iter)) {
-				msg_to_char(ch, "%s%s%s&0", (found ? ", " : ""), ability_color(vict, ab_iter), ability_data[ab_iter].name);
-				found = TRUE;
+		HASH_ITER(hh, GET_ABILITY_HASH(vict), plab, next_plab) {
+			if (!plab->purchased) {
+				continue;
 			}
+			if (!(abil = find_ability_by_vnum(plab->vnum))) {
+				continue;
+			}
+			if (ABIL_ASSIGNED_SKILL(abil) != skill) {
+				continue;
+			}
+
+			msg_to_char(ch, "%s%s%s&0", (found ? ", " : ""), ability_color(vict, abil), ABIL_NAME(abil));
+			found = TRUE;
 		}
 		
 		msg_to_char(ch, "%s\r\n", (found ? "" : "none"));
@@ -1861,11 +1866,19 @@ SHOW(show_skills) {
 	
 	msg_to_char(ch, "&yClass&0: &g");
 	found = FALSE;
-	for (ab_iter = 0; ab_iter < NUM_ABILITIES; ++ab_iter) {
-		if (ability_data[ab_iter].parent_skill == NOTHING && has_ability(vict, ab_iter)) {
-			msg_to_char(ch, "%s%s", (found ? ", " : ""), ability_data[ab_iter].name);
-			found = TRUE;
+	HASH_ITER(hh, GET_ABILITY_HASH(vict), plab, next_plab) {
+		if (!plab->purchased) {
+			continue;
 		}
+		if (!(abil = find_ability_by_vnum(plab->vnum))) {
+			continue;
+		}
+		if (ABIL_ASSIGNED_SKILL(abil) != NULL) {
+			continue;	// only looking for non-skill abilities
+		}
+
+		msg_to_char(ch, "%s%s", (found ? ", " : ""), ABIL_NAME(abil));
+		found = TRUE;
 	}
 	msg_to_char(ch, "&0%s\r\n", (found ? "" : "none"));
 	
@@ -1985,15 +1998,15 @@ SHOW(show_account) {
 			
 			if (GET_ACCOUNT(loaded) == GET_ACCOUNT(plr)) {
 				if (!loaded_file) {
-					msg_to_char(ch, " &c[%d %s] %s (online)&0\r\n", GET_COMPUTED_LEVEL(loaded), class_data[GET_CLASS(loaded)].name, GET_PC_NAME(loaded));
+					msg_to_char(ch, " &c[%d %s] %s (online)&0\r\n", GET_COMPUTED_LEVEL(loaded), SHOW_CLASS_NAME(loaded), GET_PC_NAME(loaded));
 				}
 				else {
 					// not playing but same account
-					msg_to_char(ch, " [%d %s] %s\r\n", GET_LAST_KNOWN_LEVEL(loaded), class_data[GET_CLASS(loaded)].name, GET_PC_NAME(loaded));
+					msg_to_char(ch, " [%d %s] %s\r\n", GET_LAST_KNOWN_LEVEL(loaded), SHOW_CLASS_NAME(loaded), GET_PC_NAME(loaded));
 				}
 			}
 			else {
-				msg_to_char(ch, " &r[%d %s] %s (not on account)&0\r\n", loaded_file ? GET_LAST_KNOWN_LEVEL(loaded) : GET_COMPUTED_LEVEL(loaded), class_data[GET_CLASS(loaded)].name, GET_PC_NAME(loaded));
+				msg_to_char(ch, " &r[%d %s] %s (not on account)&0\r\n", loaded_file ? GET_LAST_KNOWN_LEVEL(loaded) : GET_COMPUTED_LEVEL(loaded), SHOW_CLASS_NAME(loaded), GET_PC_NAME(loaded));
 			}
 			
 			if (loaded_file) {
@@ -2582,7 +2595,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 			msg_to_char(ch, "Promo code: %s\r\n", promo_codes[GET_PROMO_ID(k)].code);
 		}
 
-		msg_to_char(ch, "Access Level: [&c%d&0], Class: [&c%s&0/&c%s&0], Skill Level: [&c%d&0], Gear Level: [&c%d&0], Total: [&c%d&0]\r\n", GET_ACCESS_LEVEL(k), class_data[GET_CLASS(k)].name, class_role[(int) GET_CLASS_ROLE(k)], GET_SKILL_LEVEL(k), GET_GEAR_LEVEL(k), IN_ROOM(k) ? GET_COMPUTED_LEVEL(k) : GET_LAST_KNOWN_LEVEL(k));
+		msg_to_char(ch, "Access Level: [&c%d&0], Class: [&c%s&0/&c%s&0], Skill Level: [&c%d&0], Gear Level: [&c%d&0], Total: [&c%d&0]\r\n", GET_ACCESS_LEVEL(k), SHOW_CLASS_NAME(k), class_role[(int) GET_CLASS_ROLE(k)], GET_SKILL_LEVEL(k), GET_GEAR_LEVEL(k), IN_ROOM(k) ? GET_COMPUTED_LEVEL(k) : GET_LAST_KNOWN_LEVEL(k));
 		
 		coin_string(GET_PLAYER_COINS(k), buf);
 		msg_to_char(ch, "Coins: %s\r\n", buf);
@@ -2824,7 +2837,8 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 
 	extern const char *craft_flags[];
 	extern const char *craft_types[];
-
+	
+	ability_data *abil;
 	bld_data *bld;
 	int seconds;
 	
@@ -2841,9 +2855,9 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 		msg_to_char(ch, "Creates Quantity: [&g%d&0], Item: [&c%d&0] %s\r\n", GET_CRAFT_QUANTITY(craft), GET_CRAFT_OBJECT(craft), get_obj_name_by_proto(GET_CRAFT_OBJECT(craft)));
 	}
 	
-	sprintf(buf, "%s", (GET_CRAFT_ABILITY(craft) == NO_ABIL ? "none" : ability_data[GET_CRAFT_ABILITY(craft)].name));
-	if (GET_CRAFT_ABILITY(craft) != NO_ABIL && ability_data[GET_CRAFT_ABILITY(craft)].parent_skill != NO_SKILL) {
-		sprintf(buf + strlen(buf), " (%s %d)", skill_data[ability_data[GET_CRAFT_ABILITY(craft)].parent_skill].abbrev, ability_data[GET_CRAFT_ABILITY(craft)].parent_skill_required);
+	sprintf(buf, "%s", (GET_CRAFT_ABILITY(craft) == NO_ABIL ? "none" : get_ability_name_by_vnum(GET_CRAFT_ABILITY(craft))));
+	if ((abil = find_ability_by_vnum(GET_CRAFT_ABILITY(craft))) && ABIL_ASSIGNED_SKILL(abil) != NULL) {
+		sprintf(buf + strlen(buf), " (%s %d)", SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
 	}
 	seconds = GET_CRAFT_TIME(craft) * ACTION_CYCLE_TIME;
 	msg_to_char(ch, "Ability: &y%s&0, Level: &g%d&0, Time: [&g%d action tick%s&0 | &g%d:%02d&0]\r\n", buf, GET_CRAFT_MIN_LEVEL(craft), GET_CRAFT_TIME(craft), PLURAL(GET_CRAFT_TIME(craft)), seconds / SECS_PER_REAL_MIN, seconds % SECS_PER_REAL_MIN);
@@ -2915,12 +2929,13 @@ void do_stat_global(char_data *ch, struct global_data *glb) {
 	extern const char *global_types[];
 	
 	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
+	ability_data *abil;
 	
 	msg_to_char(ch, "Global VNum: [&c%d&0], Type: [&c%s&0], Name: '&c%s&0'\r\n", GET_GLOBAL_VNUM(glb), global_types[GET_GLOBAL_TYPE(glb)], GET_GLOBAL_NAME(glb));
 
-	sprintf(buf, "%s", (GET_GLOBAL_ABILITY(glb) == NO_ABIL ? "none" : ability_data[GET_GLOBAL_ABILITY(glb)].name));
-	if (GET_GLOBAL_ABILITY(glb) != NO_ABIL && ability_data[GET_GLOBAL_ABILITY(glb)].parent_skill != NO_SKILL) {
-		sprintf(buf + strlen(buf), " (%s %d)", skill_data[ability_data[GET_GLOBAL_ABILITY(glb)].parent_skill].abbrev, ability_data[GET_GLOBAL_ABILITY(glb)].parent_skill_required);
+	sprintf(buf, "%s", (GET_GLOBAL_ABILITY(glb) == NO_ABIL ? "none" : get_ability_name_by_vnum(GET_GLOBAL_ABILITY(glb))));
+	if ((abil = find_ability_by_vnum(GET_GLOBAL_ABILITY(glb))) && ABIL_ASSIGNED_SKILL(abil) != NULL) {
+		sprintf(buf + strlen(buf), " (%s %d)", SKILL_ABBREV(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
 	}
 	msg_to_char(ch, "Requires ability: [&y%s&0], Percent: [&g%.2f&0]\r\n", buf, GET_GLOBAL_PERCENT(glb));
 	
@@ -4022,11 +4037,9 @@ ACMD(do_autowiz) {
 
 
 ACMD(do_clearabilities) {
-	extern int find_skill_by_name(char *name);
-	
 	char_data *vict;
 	char typestr[MAX_STRING_LENGTH];
-	int skill = NO_SKILL;
+	skill_data *skill = NULL;
 	bool all;
 
 	argument = one_argument(argument, arg);
@@ -4042,19 +4055,19 @@ ACMD(do_clearabilities) {
 	}
 	else {
 		all = FALSE;
-		if ((skill = find_skill_by_name(argument)) == NO_SKILL) {
+		if (!(skill = find_skill(argument))) {
 			msg_to_char(ch, "Invalid skill '%s'.\r\n", argument);
 			return;
 		}
 	}
 	
-	clear_char_abilities(vict, all ? NO_SKILL : skill);
+	clear_char_abilities(vict, all ? NO_SKILL : SKILL_VNUM(skill));
 	
 	if (all) {
 		*typestr = '\0';
 	}
 	else {
-		sprintf(typestr, "%s ", skill_data[skill].name);
+		sprintf(typestr, "%s ", SKILL_NAME(skill));
 	}
 	
 	syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has cleared %s's %sabilities", GET_REAL_NAME(ch), GET_REAL_NAME(vict), typestr);
@@ -5558,6 +5571,8 @@ ACMD(do_rescale) {
 
 
 ACMD(do_restore) {
+	ability_data *abil, *next_abil;
+	skill_data *skill, *next_skill;
 	struct cooldown_data *cool;
 	empire_data *emp;
 	char_data *vict;
@@ -5597,8 +5612,8 @@ ACMD(do_restore) {
 				vict->real_attributes[iter] = att_max(vict);
 			}
 			
-			for (i = 0; i < NUM_SKILLS; ++i) {
-				set_skill(vict, i, 100);
+			HASH_ITER(hh, skill_table, skill, next_skill) {
+				set_skill(vict, SKILL_VNUM(skill), 100);
 			}
 			update_class(vict);
 			
@@ -5608,8 +5623,8 @@ ACMD(do_restore) {
 				adjust_abilities_to_empire(vict, emp, FALSE);
 			}
 			
-			for (i = 0; i < NUM_ABILITIES; ++i) {
-				add_ability(vict, i, TRUE);
+			HASH_ITER(hh, ability_table, abil, next_abil) {
+				add_ability(vict, abil, TRUE);
 			}
 
 			affect_total(vict);
@@ -6378,9 +6393,15 @@ ACMD(do_vnum) {
 			msg_to_char(ch, "No crafts by that name.\r\n");
 		}
 	}
-	else if (is_abbrev(buf, "adventure")) {
+	else if (is_abbrev(buf, "adventure")) {	// name precedence for "vnum a"
 		if (!vnum_adventure(buf2, ch)) {
 			msg_to_char(ch, "No adventures by that name.\r\n");
+		}
+	}
+	else if (is_abbrev(buf, "archetype")) {
+		extern int vnum_ability(char *searchname, char_data *ch);
+		if (!vnum_ability(buf2, ch)) {
+			msg_to_char(ch, "No abilities by that name.\r\n");
 		}
 	}
 	else if (is_abbrev(buf, "archetype")) {
@@ -6405,6 +6426,12 @@ ACMD(do_vnum) {
 			send_to_char("No books by that name.\r\n", ch);
 		}
 	}
+	else if (is_abbrev(buf, "class")) {
+		extern int vnum_class(char *searchname, char_data *ch);
+		if (!vnum_class(buf2, ch)) {
+			msg_to_char(ch, "No classes by that name.\r\n");
+		}
+	}
 	else if (is_abbrev(buf, "crop")) {
 		if (!vnum_crop(buf2, ch)) {
 			msg_to_char(ch, "No crops by that name.\r\n");
@@ -6423,6 +6450,12 @@ ACMD(do_vnum) {
 	else if (is_abbrev(buf, "sector")) {
 		if (!vnum_sector(buf2, ch)) {
 			msg_to_char(ch, "No sectors by that name.\r\n");
+		}
+	}
+	else if (is_abbrev(buf, "skill")) {
+		extern int vnum_skill(char *searchname, char_data *ch);
+		if (!vnum_skill(buf2, ch)) {
+			msg_to_char(ch, "No skills by that name.\r\n");
 		}
 	}
 	else if (is_abbrev(buf, "trigger")) {
@@ -6452,7 +6485,7 @@ ACMD(do_vstat) {
 		return;
 	}
 	
-	if (is_abbrev(buf, "adventure")) {
+	if (is_abbrev(buf, "adventure")) {	// alphabetic precedence for "vstat a"
 		adv_data *adv = adventure_proto(number);
 		if (!adv) {
 			msg_to_char(ch, "There is no adventure zone with that number.\r\n");
@@ -6460,8 +6493,17 @@ ACMD(do_vstat) {
 		}
 		do_stat_adventure(ch, adv);
 	}
+	else if (is_abbrev(buf, "ability")) {
+		void do_stat_ability(char_data *ch, ability_data *abil);
+		ability_data *abil = find_ability_by_vnum(number);
+		if (!abil) {
+			msg_to_char(ch, "There is no ability with that number.\r\n");
+			return;
+		}
+		do_stat_ability(ch, abil);
+	}
 	else if (is_abbrev(buf, "archetype")) {
-		void do_stat_archetype(char_data *ch, archetype_data *arcg);
+		void do_stat_archetype(char_data *ch, archetype_data *arch);
 		archetype_data *arch = archetype_proto(number);
 		if (!arch) {
 			msg_to_char(ch, "There is no archetype with that number.\r\n");
@@ -6478,7 +6520,7 @@ ACMD(do_vstat) {
 		}
 		do_stat_augment(ch, aug);
 	}
-	else if (is_abbrev(buf, "building")) {
+	else if (is_abbrev(buf, "building")) {	// alphabetic precedence for "vstat b"
 		bld_data *bld = building_proto(number);
 		if (!bld) {
 			msg_to_char(ch, "There is no building with that number.\r\n");
@@ -6486,7 +6528,7 @@ ACMD(do_vstat) {
 		}
 		do_stat_building(ch, bld);
 	}
-	else if (is_abbrev(buf, "book")) {	// deliberately after 'building'
+	else if (is_abbrev(buf, "book")) {
 		book_data *book = book_proto(number);
 		if (!book) {
 			msg_to_char(ch, "There is no book with that number.\r\n");
@@ -6494,13 +6536,22 @@ ACMD(do_vstat) {
 		}
 		do_stat_book(ch, book);
 	}
-	else if (is_abbrev(buf, "craft")) {
+	else if (is_abbrev(buf, "craft")) {	// alphabetic precedence for "vstat c"
 		craft_data *craft = craft_proto(number);
 		if (!craft) {
 			msg_to_char(ch, "There is no craft with that number.\r\n");
 			return;
 		}
 		do_stat_craft(ch, craft);
+	}
+	else if (is_abbrev(buf, "class")) {
+		void do_stat_class(char_data *ch, class_data *cls);
+		class_data *cls = find_class_by_vnum(number);
+		if (!cls) {
+			msg_to_char(ch, "There is no class with that number.\r\n");
+			return;
+		}
+		do_stat_class(ch, cls);
 	}
 	else if (is_abbrev(buf, "crop")) {
 		crop_data *crop = crop_proto(number);
@@ -6553,6 +6604,15 @@ ACMD(do_vstat) {
 			return;
 		}
 		do_stat_sector(ch, sect);
+	}
+	else if (is_abbrev(buf, "skill")) {
+		void do_stat_skill(char_data *ch, skill_data *skill);
+		skill_data *skill = find_skill_by_vnum(number);
+		if (!skill) {
+			msg_to_char(ch, "There is no skill with that number.\r\n");
+			return;
+		}
+		do_stat_skill(ch, skill);
 	}
 	else if (is_abbrev(buf, "trigger")) {
 		trig_data *trig = real_trigger(number);

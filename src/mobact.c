@@ -450,7 +450,7 @@ bool mob_can_move_to_sect(char_data *mob, room_data *to_room) {
 * @return TRUE if the move is valid, FALSE otherwise
 */
 bool validate_mobile_move(char_data *ch, int dir, room_data *to_room) {
-	void empire_skillup(empire_data *emp, int ability, double amount);
+	void empire_skillup(empire_data *emp, any_vnum ability, double amount);
 	
 	empire_data *ch_emp = GET_LOYALTY(ch);
 	empire_data *room_emp = ROOM_OWNER(to_room);

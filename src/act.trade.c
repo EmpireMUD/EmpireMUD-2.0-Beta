@@ -521,6 +521,7 @@ void process_gen_craft(char_data *ch) {
 */
 void scale_craftable(obj_data *obj, char_data *ch, craft_data *craft) {
 	int level = 1, psr;
+	ability_data *abil;
 	obj_data *req;
 	
 	if (IS_NPC(ch)) {
@@ -541,22 +542,22 @@ void scale_craftable(obj_data *obj, char_data *ch, craft_data *craft) {
 			}
 		}
 		else {
-			if (GET_CRAFT_ABILITY(craft) == NO_ABIL) {
+			if (!(abil = find_ability_by_vnum(GET_CRAFT_ABILITY(craft)))) {
 				level = EMPIRE_CHORE_SKILL_CAP;	// considered the "default" level for unskilled things
 			}
-			else if (ability_data[GET_CRAFT_ABILITY(craft)].parent_skill == NO_SKILL) {
+			else if (!ABIL_ASSIGNED_SKILL(abil)) {
 				// probably a class skill
 				level = get_crafting_level(ch);
 			}
-			else if ((psr = GET_PARENT_SKILL_REQUIRED(GET_CRAFT_ABILITY(craft))) != NOTHING) {
+			else if ((psr = ABIL_SKILL_LEVEL(abil)) != NOTHING) {
 				if (psr < BASIC_SKILL_CAP) {
-					level = MIN(BASIC_SKILL_CAP, get_skill_level(ch, ability_data[GET_CRAFT_ABILITY(craft)].parent_skill));
+					level = MIN(BASIC_SKILL_CAP, get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))));
 				}
 				else if (psr < SPECIALTY_SKILL_CAP) {
-					level = MIN(SPECIALTY_SKILL_CAP, get_skill_level(ch, ability_data[GET_CRAFT_ABILITY(craft)].parent_skill));
+					level = MIN(SPECIALTY_SKILL_CAP, get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))));
 				}
 				else {
-					level = MIN(CLASS_SKILL_CAP, get_skill_level(ch, ability_data[GET_CRAFT_ABILITY(craft)].parent_skill));
+					level = MIN(CLASS_SKILL_CAP, get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))));
 				}
 			}
 			else {
@@ -583,7 +584,7 @@ void scale_craftable(obj_data *obj, char_data *ch, craft_data *craft) {
 
 const struct {
 	char *command;
-	int ability;	// required ability
+	any_vnum ability;	// required ability
 	bool (*validate_func)(char_data *ch);	// e.g. can_forge, func that returns TRUE if ok -- must send own errors if FALSE
 	int types[3];	// NOTHING-terminated list of valid obj types
 } reforge_data[] = {
@@ -686,6 +687,7 @@ ACMD(do_gen_augment) {
 	struct obj_apply *apply, *last_apply;
 	int scale, total_weight, value;
 	struct augment_apply *app;
+	ability_data *abil;
 	augment_data *aug;
 	obj_data *obj;
 	
@@ -737,8 +739,8 @@ ACMD(do_gen_augment) {
 		
 		// determine scale cap
 		scale = GET_OBJ_CURRENT_SCALE_LEVEL(obj);
-		if (GET_AUG_ABILITY(aug) != NO_ABIL && ability_data[GET_AUG_ABILITY(aug)].parent_skill != NO_SKILL && get_skill_level(ch, ability_data[GET_AUG_ABILITY(aug)].parent_skill) < CLASS_SKILL_CAP) {
-			scale = MIN(scale, get_skill_level(ch, ability_data[GET_AUG_ABILITY(aug)].parent_skill));
+		if ((abil = find_ability_by_vnum(GET_AUG_ABILITY(aug))) && ABIL_ASSIGNED_SKILL(abil) != NULL && get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) < CLASS_SKILL_CAP) {
+			scale = MIN(scale, get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))));
 		}
 		
 		// determine points
@@ -908,7 +910,7 @@ ACMD(do_gen_craft) {
 		msg_to_char(ch, "You're busy right now.\r\n");
 	}
 	else if (GET_CRAFT_ABILITY(type) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(type))) {
-		msg_to_char(ch, "You need to buy the %s ability to %s that.\r\n", ability_data[GET_CRAFT_ABILITY(type)].name, gen_craft_data[GET_CRAFT_TYPE(type)].command);
+		msg_to_char(ch, "You need to buy the %s ability to %s that.\r\n", get_ability_name_by_vnum(GET_CRAFT_ABILITY(type)), gen_craft_data[GET_CRAFT_TYPE(type)].command);
 	}
 	else if (GET_CRAFT_MIN_LEVEL(type) > get_crafting_level(ch)) {
 		msg_to_char(ch, "You need to have a crafting level of %d to %s that.\r\n", GET_CRAFT_MIN_LEVEL(type), gen_craft_data[GET_CRAFT_TYPE(type)].command);

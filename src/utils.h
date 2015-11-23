@@ -13,6 +13,7 @@
 /**
 * Contents:
 *   Core Utils
+*   Ability Utils
 *   Adventure Utils
 *   Archetype Utils
 *   Augment Utils
@@ -21,6 +22,7 @@
 *   Can See Utils
 *   Can See Obj Utils
 *   Character Utils
+*   Class Utils
 *   Craft Utils
 *   Crop Utils
 *   Descriptor Utils
@@ -36,6 +38,7 @@
 *   Room Utils
 *   Room Template Utils
 *   Sector Utils
+*   Skill Utils
 *   String Utils
 *   Const Externs
 *   Util Function Protos
@@ -79,6 +82,20 @@
 #else
 	#define CRYPT(a, b) ((char *) crypt((a),(b)))
 #endif
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// ABILITY UTILS ///////////////////////////////////////////////////////////
+
+#define ABIL_ASSIGNED_SKILL(abil)  ((abil)->assigned_skill)
+#define ABIL_FLAGS(abil)  ((abil)->flags)
+#define ABIL_MASTERY_ABIL(abil)  ((abil)->mastery_abil)
+#define ABIL_NAME(abil)  ((abil)->name)
+#define ABIL_SKILL_LEVEL(abil)  ((abil)->skill_level)
+#define ABIL_VNUM(abil)  ((abil)->vnum)
+
+// utils
+#define ABILITY_FLAGGED(abil, flag)  IS_SET(ABIL_FLAGS(abil), (flag))
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -329,6 +346,20 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// CLASS UTILS /////////////////////////////////////////////////////////////
+
+#define CLASS_VNUM(cls)  ((cls)->vnum)
+#define CLASS_NAME(cls)  ((cls)->name)
+#define CLASS_ABBREV(cls)  ((cls)->abbrev)
+#define CLASS_FLAGS(cls)  ((cls)->flags)
+#define CLASS_POOL(cls, type)  ((cls)->pools[type])
+#define CLASS_SKILL_REQUIREMENTS(cls)  ((cls)->skill_requirements)
+#define CLASS_ABILITIES(cls)  ((cls)->abilities)
+
+#define CLASS_FLAGGED(cls, flag)  IS_SET(CLASS_FLAGS(cls), (flag))
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// CRAFT UTILS /////////////////////////////////////////////////////////////
 
 #define GET_CRAFT_ABILITY(craft)  ((craft)->ability)
@@ -381,11 +412,13 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_OLC_TYPE(desc)  ((desc)->olc_type)
 #define GET_OLC_VNUM(desc)  ((desc)->olc_vnum)
 #define GET_OLC_STORAGE(desc)  ((desc)->olc_storage)
+#define GET_OLC_ABILITY(desc)  ((desc)->olc_ability)
 #define GET_OLC_ADVENTURE(desc)  ((desc)->olc_adventure)
 #define GET_OLC_ARCHETYPE(desc)  ((desc)->olc_archetype)
 #define GET_OLC_AUGMENT(desc)  ((desc)->olc_augment)
 #define GET_OLC_BOOK(desc)  ((desc)->olc_book)
 #define GET_OLC_BUILDING(desc)  ((desc)->olc_building)
+#define GET_OLC_CLASS(desc)  ((desc)->olc_class)
 #define GET_OLC_CRAFT(desc)  ((desc)->olc_craft)
 #define GET_OLC_CROP(desc)  ((desc)->olc_crop)
 #define GET_OLC_GLOBAL(desc)  ((desc)->olc_global)
@@ -393,6 +426,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_OLC_OBJECT(desc)  ((desc)->olc_object)
 #define GET_OLC_ROOM_TEMPLATE(desc)  ((desc)->olc_room_template)
 #define GET_OLC_SECTOR(desc)  ((desc)->olc_sector)
+#define GET_OLC_SKILL(desc)  ((desc)->olc_skill)
 #define GET_OLC_TRIGGER(desc)  ((desc)->olc_trigger)
 
 
@@ -829,7 +863,6 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_OLC_FLAGS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->olc_flags))
 #define GET_OLC_MAX_VNUM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->olc_max_vnum))
 #define GET_OLC_MIN_VNUM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->olc_min_vnum))
-#define GET_PC_CLASS(ch)  (IS_NPC(ch) ? 0 : GET_CLASS(ch))
 #define GET_PLAYER_COINS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->coins))
 #define GET_PLEDGE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->pledge))
 #define GET_PROMO_ID(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->promo_id))
@@ -869,6 +902,8 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define PRF_FLAGGED(ch, flag)  (!REAL_NPC(ch) && IS_SET(PRF_FLAGS(ch), (flag)))
 #define OLC_FLAGGED(ch, flag)  (!IS_NPC(ch) && IS_SET(GET_OLC_FLAGS(ch), (flag)))
 #define SAVE_ACCOUNT(acct)  save_library_file_for_vnum(DB_BOOT_ACCT, (acct)->id)
+#define SHOW_CLASS_ABBREV(ch)  ((!IS_NPC(ch) && GET_CLASS(ch)) ? CLASS_NAME(GET_CLASS(ch)) : config_get_string("default_class_abbrev"))
+#define SHOW_CLASS_NAME(ch)  ((!IS_NPC(ch) && GET_CLASS(ch)) ? CLASS_NAME(GET_CLASS(ch)) : config_get_string("default_class_name"))
 
 // definitions
 #define IS_HOSTILE(ch)  (!IS_NPC(ch) && (get_cooldown_time((ch), COOLDOWN_HOSTILE_FLAG) > 0 || get_cooldown_time((ch), COOLDOWN_ROGUE_FLAG) > 0))
@@ -1027,6 +1062,20 @@ void SET_ISLAND_ID(room_data *room, int island);	// formerly a #define and a roo
 // utils
 #define IS_WATER_SECT(sct)  SECT_FLAGGED((sct), SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_SHALLOW_WATER)
 #define SECT_FLAGGED(sct, flg)  (IS_SET(GET_SECT_FLAGS(sct), (flg)))
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// SKILL UTILS /////////////////////////////////////////////////////////////
+
+#define SKILL_ABBREV(skill)  ((skill)->abbrev)
+#define SKILL_ABILITIES(skill)  ((skill)->abilities)
+#define SKILL_DESC(skill)  ((skill)->desc)
+#define SKILL_FLAGS(skill)  ((skill)->flags)
+#define SKILL_NAME(skill)  ((skill)->name)
+#define SKILL_VNUM(skill)  ((skill)->vnum)
+
+// utils
+#define SKILL_FLAGGED(skill, flag)  IS_SET(SKILL_FLAGS(skill), (flag))
 
 
  //////////////////////////////////////////////////////////////////////////////

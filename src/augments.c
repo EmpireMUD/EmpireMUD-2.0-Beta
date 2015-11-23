@@ -210,20 +210,21 @@ bool audit_augment(augment_data *aug, char_data *ch) {
 */
 char *list_one_augment(augment_data *aug, bool detail) {
 	static char output[MAX_STRING_LENGTH];
-	char abil[MAX_STRING_LENGTH], applies[MAX_STRING_LENGTH];
+	char part[MAX_STRING_LENGTH], applies[MAX_STRING_LENGTH];
 	struct augment_apply *app;
+	ability_data *abil;
 	
 	if (detail) {
 		// ability required
 		if (GET_AUG_ABILITY(aug) == NO_ABIL) {
-			*abil = '\0';
+			*part = '\0';
 		}
 		else {
-			sprintf(abil, " (%s", ability_data[GET_AUG_ABILITY(aug)].name);
-			if (ability_data[GET_AUG_ABILITY(aug)].parent_skill != NO_SKILL) {
-				sprintf(abil + strlen(abil), " - %s %d", skill_data[ability_data[GET_AUG_ABILITY(aug)].parent_skill].abbrev, ability_data[GET_AUG_ABILITY(aug)].parent_skill_required);
+			sprintf(part, " (%s", get_ability_name_by_vnum(GET_AUG_ABILITY(aug)));
+			if ((abil = find_ability_by_vnum(GET_AUG_ABILITY(aug))) && ABIL_ASSIGNED_SKILL(abil) != NULL) {
+				sprintf(part + strlen(part), " - %s %d", SKILL_ABBREV(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
 			}
-			strcat(abil, ")");
+			strcat(part, ")");
 		}
 		
 		// applies
@@ -232,7 +233,7 @@ char *list_one_augment(augment_data *aug, bool detail) {
 			sprintf(applies + strlen(applies), "%s%d to %s", (app == GET_AUG_APPLIES(aug)) ? " " : ", ", app->weight, apply_types[app->location]);
 		}
 		
-		snprintf(output, sizeof(output), "[%5d] %s%s%s", GET_AUG_VNUM(aug), GET_AUG_NAME(aug), abil, applies);
+		snprintf(output, sizeof(output), "[%5d] %s%s%s", GET_AUG_VNUM(aug), GET_AUG_NAME(aug), part, applies);
 	}
 	else {
 		snprintf(output, sizeof(output), "[%5d] %s", GET_AUG_VNUM(aug), GET_AUG_NAME(aug));
@@ -282,14 +283,17 @@ int sort_augments(augment_data *a, augment_data *b) {
 
 // typealphabetic sorter for sorted_augments
 int sort_augments_by_data(augment_data *a, augment_data *b) {
+	ability_data *a_abil, *b_abil;
 	int a_level, b_level;
 	
 	if (GET_AUG_TYPE(a) != GET_AUG_TYPE(b)) {
 		return GET_AUG_TYPE(a) - GET_AUG_TYPE(b);
 	}
 	
-	a_level = (GET_AUG_ABILITY(a) == NO_ABIL) ? 0 : ability_data[GET_AUG_ABILITY(a)].parent_skill_required;
-	b_level = (GET_AUG_ABILITY(b) == NO_ABIL) ? 0 : ability_data[GET_AUG_ABILITY(b)].parent_skill_required;
+	a_abil = find_ability_by_vnum(GET_AUG_ABILITY(a));
+	b_abil = find_ability_by_vnum(GET_AUG_ABILITY(b));
+	a_level = a_abil ? ABIL_SKILL_LEVEL(a_abil) : 0;
+	b_level = b_abil ? ABIL_SKILL_LEVEL(b_abil) : 0;
 	
 	// reverse level sort
 	if (a_level != b_level) {
@@ -743,6 +747,7 @@ augment_data *setup_olc_augment(augment_data *input) {
 void do_stat_augment(char_data *ch, augment_data *aug) {
 	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
 	struct augment_apply *app;
+	ability_data *abil;
 	size_t size;
 	int num;
 	
@@ -753,9 +758,9 @@ void do_stat_augment(char_data *ch, augment_data *aug) {
 	// first line
 	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Name: \tc%s\t0\r\n", GET_AUG_VNUM(aug), GET_AUG_NAME(aug));
 	
-	snprintf(part, sizeof(part), "%s", (GET_AUG_ABILITY(aug) == NO_ABIL ? "none" : ability_data[GET_AUG_ABILITY(aug)].name));
-	if (GET_AUG_ABILITY(aug) != NO_ABIL && ability_data[GET_AUG_ABILITY(aug)].parent_skill != NO_SKILL) {
-		snprintf(part + strlen(part), sizeof(part) - strlen(part), " (%s %d)", skill_data[ability_data[GET_AUG_ABILITY(aug)].parent_skill].abbrev, ability_data[GET_AUG_ABILITY(aug)].parent_skill_required);
+	snprintf(part, sizeof(part), "%s", (GET_AUG_ABILITY(aug) == NO_ABIL ? "none" : get_ability_name_by_vnum(GET_AUG_ABILITY(aug))));
+	if ((abil = find_ability_by_vnum(GET_AUG_ABILITY(aug))) && ABIL_ASSIGNED_SKILL(abil) != NULL) {
+		snprintf(part + strlen(part), sizeof(part) - strlen(part), " (%s %d)", SKILL_ABBREV(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
 	}
 	size += snprintf(buf + size, sizeof(buf) - size, "Type: [\ty%s\t0], Requires Ability: [\ty%s\t0]\r\n", augment_types[GET_AUG_TYPE(aug)], part);
 	
@@ -797,6 +802,7 @@ void olc_show_augment(char_data *ch) {
 	augment_data *aug = GET_OLC_AUGMENT(ch->desc);
 	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
 	struct augment_apply *app;
+	ability_data *abil;
 	int num;
 	
 	if (!aug) {
@@ -817,13 +823,13 @@ void olc_show_augment(char_data *ch) {
 	sprintf(buf + strlen(buf), "<\tywear\t0> %s\r\n", lbuf);
 	
 	// ability required
-	if (GET_AUG_ABILITY(aug) == NO_ABIL) {
+	if (GET_AUG_ABILITY(aug) == NO_ABIL || !(abil = find_ability_by_vnum(GET_AUG_ABILITY(aug)))) {
 		strcpy(buf1, "none");
 	}
 	else {
-		sprintf(buf1, "%s", ability_data[GET_AUG_ABILITY(aug)].name);
-		if (ability_data[GET_AUG_ABILITY(aug)].parent_skill != NO_SKILL) {
-			sprintf(buf1 + strlen(buf1), " (%s %d)", skill_data[ability_data[GET_AUG_ABILITY(aug)].parent_skill].name, ability_data[GET_AUG_ABILITY(aug)].parent_skill_required);
+		sprintf(buf1, "%s", ABIL_NAME(abil));
+		if (ABIL_ASSIGNED_SKILL(abil)) {
+			sprintf(buf1 + strlen(buf1), " (%s %d)", SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
 		}
 	}
 	sprintf(buf + strlen(buf), "<\tyability\t0> %s\r\n", buf1);
@@ -873,10 +879,8 @@ int vnum_augment(char *searchname, char_data *ch) {
 //// OLC MODULES /////////////////////////////////////////////////////////////
 
 OLC_MODULE(augedit_ability) {
-	extern int find_ability_by_name(char *name, bool allow_abbrev);
-	
 	augment_data *aug = GET_OLC_AUGMENT(ch->desc);
-	int abil;
+	ability_data *abil;
 	
 	if (!*argument) {
 		msg_to_char(ch, "Require what ability (or 'none')?\r\n");
@@ -891,17 +895,17 @@ OLC_MODULE(augedit_ability) {
 			msg_to_char(ch, "It will require no ability.\r\n");
 		}
 	}
-	else if ((abil = find_ability_by_name(argument, TRUE)) == NOTHING) {
+	else if (!(abil = find_ability(argument))) {
 		msg_to_char(ch, "Invalid ability '%s'.\r\n", argument);
 	}
 	else {
-		GET_AUG_ABILITY(aug) = abil;
+		GET_AUG_ABILITY(aug) = ABIL_VNUM(abil);
 		
 		if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
 			send_config_msg(ch, "ok_string");
 		}
 		else {
-			msg_to_char(ch, "It now requires the %s ability.\r\n", ability_data[abil].name);
+			msg_to_char(ch, "It now requires the %s ability.\r\n", ABIL_NAME(abil));
 		}
 	}
 }

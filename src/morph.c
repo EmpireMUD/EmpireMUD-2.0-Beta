@@ -43,7 +43,7 @@
 /* The main data structure */
 struct morph_data_structure {
 	char *name;	// for "morph <form>" -- "\n" to not be able to manually morph to this form
-	int ability;	// required ability, or NO_ABIL for none
+	any_vnum ability;	// required ability, or NO_ABIL for none
 	int normal_cost[NUM_POOLS];	// cost when out of combat (slow morph)
 	int combat_cost[NUM_POOLS];	// cost when in combat
 	

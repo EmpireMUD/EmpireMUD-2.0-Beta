@@ -3099,11 +3099,17 @@ Available flags:
  - !MOBILE -- Cannot edit mobiles
  - !OBJECT -- Cannot edit objects
  - !BUILDING -- Cannot edit buildings
- - SECTORS -- Can edit map sectors
+ - SECTORS -- CAN edit map sectors
  - !CROP -- Cannot edit crops
  - !TRIGGER -- Cannot edit triggers
  - !ADVENTURE -- Cannot edit adventures
  - !ROOMTEMPLATE -- Cannot edit room templates
+ - !GLOBAL -- Cannot edit globals
+ - !AUGMENT -- Cannot edit augments
+ - !ARCHETYPE -- Cannot edit archetypes
+ - ABILITIES -- CAN edit abilities
+ - CLASSES -- CAN edit classes
+ -- SKILLS -- CAN edit skills
 
 For notes on the mud's building rules, see HELP BUILDING GUIDE.
 #d
@@ -3302,7 +3308,14 @@ This command removes the IN-DEVELOPMENT flag from an adventure and any craft
 recipes in it, or from craft recipes over a given vnum range. It can be used
 to quickly activate a zone.
 
-This also applies to global tables in the range.
+The following types will have IN-DEVELOPMENT flags removed in the vnum range:
+- the adventure (when targeting an adventure vnum)
+- archetypes
+- augments
+- classes
+- crafts
+- globals
+- skills
 
 See also: OLC CONTROLS, OLC ADVENTURES, ADVEDIT FLAGS, CEDIT FLAGS
 #d

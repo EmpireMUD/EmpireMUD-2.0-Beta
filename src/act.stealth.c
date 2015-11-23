@@ -982,7 +982,7 @@ ACMD(do_howl) {
 
 
 ACMD(do_infiltrate) {
-	void empire_skillup(empire_data *emp, int ability, double amount);
+	void empire_skillup(empire_data *emp, any_vnum ability, double amount);
 
 	room_data *to_room;
 	int dir;

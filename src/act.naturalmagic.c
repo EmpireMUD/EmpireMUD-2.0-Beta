@@ -38,7 +38,7 @@
 extern obj_data *find_obj(int n);
 extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
 extern bool is_fight_enemy(char_data *ch, char_data *frenemy);	// fight.c
-void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, int ability);
+void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, any_vnum ability);
 extern bool trigger_counterspell(char_data *ch);	// spells.c
 
 // locals
@@ -742,13 +742,14 @@ ACMD(do_familiar) {
 	void scale_mob_as_familiar(char_data *mob, char_data *master);
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	
+	ability_data *abil = NULL;
 	char_data *mob;
 	int iter, type;
 	bool any;
 	
 	struct {
 		char *name;
-		int ability;
+		any_vnum ability;
 		int level;	// natural magic level required
 		mob_vnum vnum;
 		int cost;
@@ -791,10 +792,11 @@ ACMD(do_familiar) {
 			if (!IS_NPC(ch) && familiars[iter].ability != NO_ABIL && !has_ability(ch, familiars[iter].ability)) {
 				continue;
 			}
-			if (familiars[iter].ability != NO_ABIL && ability_data[familiars[iter].ability].parent_skill != NO_SKILL && get_skill_level(ch, ability_data[familiars[iter].ability].parent_skill) < familiars[iter].level) {
+			abil = find_ability_by_vnum(familiars[iter].ability);
+			if (abil && ABIL_ASSIGNED_SKILL(abil) != NULL && get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) < familiars[iter].level) {
 				continue;
 			}
-			if (familiars[iter].ability == NO_ABIL && GET_SKILL_LEVEL(ch) < familiars[iter].level) {
+			if (!abil && GET_SKILL_LEVEL(ch) < familiars[iter].level) {
 				continue;
 			}
 			
@@ -816,10 +818,11 @@ ACMD(do_familiar) {
 		if (!IS_NPC(ch) && familiars[iter].ability != NO_ABIL && !has_ability(ch, familiars[iter].ability)) {
 			continue;
 		}
-		if (familiars[iter].ability != NO_ABIL && ability_data[familiars[iter].ability].parent_skill != NO_SKILL && get_skill_level(ch, ability_data[familiars[iter].ability].parent_skill) < familiars[iter].level) {
+		abil = find_ability_by_vnum(familiars[iter].ability);
+		if (abil && ABIL_ASSIGNED_SKILL(abil) != NULL && get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) < familiars[iter].level) {
 			continue;
 		}
-		if (familiars[iter].ability == NO_ABIL && GET_SKILL_LEVEL(ch) < familiars[iter].level) {
+		if (!abil && GET_SKILL_LEVEL(ch) < familiars[iter].level) {
 			continue;
 		}
 		if (is_abbrev(argument, familiars[iter].name)) {

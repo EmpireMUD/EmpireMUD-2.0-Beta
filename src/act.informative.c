@@ -386,7 +386,7 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	extern int health_gain(char_data *ch, bool info_only);
 	extern int move_gain(char_data *ch, bool info_only);
 	extern int mana_gain(char_data *ch, bool info_only);
-	extern int get_ability_points_available_for_char(char_data *ch, int skill);
+	extern int get_ability_points_available_for_char(char_data *ch, any_vnum skill);
 	extern const struct material_data materials[NUM_MATERIALS];
 	extern const int base_hit_chance;
 	extern const double hit_per_dex;
@@ -404,7 +404,7 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	msg_to_char(to, "  Name: %-18.18s", PERS(ch, ch, 1));
 
 	// row 1 col 2: class
-	msg_to_char(to, " Class: %-17.17s", IS_IMMORTAL(ch) ? "Immortal" : class_data[GET_CLASS(ch)].name);
+	msg_to_char(to, " Class: %-17.17s", SHOW_CLASS_NAME(ch));
 	msg_to_char(to, " Level: %d (%d)\r\n", GET_COMPUTED_LEVEL(ch), GET_SKILL_LEVEL(ch));
 
 	// row 1 col 3: levels
@@ -505,8 +505,8 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	count = 0;
 	HASH_ITER(hh, GET_SKILL_HASH(ch), skdata, next_skill) {
 		if (skdata->level > 0) {
-			sprintf(lbuf, " %s: %s%d", skill_data[skdata->skill_id].name, IS_ANY_SKILL_CAP(ch, skdata->skill_id) ? "&g" : "&y", skdata->level);
-			pts = get_ability_points_available_for_char(ch, skdata->skill_id);
+			sprintf(lbuf, " %s: %s%d", get_skill_name_by_vnum(skdata->vnum), IS_ANY_SKILL_CAP(ch, skdata->vnum) ? "&g" : "&y", skdata->level);
+			pts = get_ability_points_available_for_char(ch, skdata->vnum);
 			if (pts > 0) {
 				sprintf(lbuf + strlen(lbuf), " &g(%d)", pts);
 			}
@@ -1403,11 +1403,8 @@ char *one_who_line(char_data *ch, bool shortlist, bool screenreader) {
 		if (shortlist) {
 			size += snprintf(out + size, sizeof(out) - size, "[%s%3d%s] ", screenreader ? "" : class_role_color[GET_CLASS_ROLE(ch)], GET_COMPUTED_LEVEL(ch), screenreader ? "" : "\t0");
 		}
-		else if (GET_CLASS(ch) != CLASS_NONE) {
-			size += snprintf(out + size, sizeof(out) - size, "[%3d %s%s%s] ", GET_COMPUTED_LEVEL(ch), screenreader ? "" : class_role_color[GET_CLASS_ROLE(ch)], screenreader ? class_data[GET_CLASS(ch)].name : class_data[GET_CLASS(ch)].abbrev, screenreader ? show_role : "\t0");
-		}
-		else {	// classless
-			size += snprintf(out + size, sizeof(out) - size, "[%3d %sAdvn%s] ", GET_COMPUTED_LEVEL(ch), screenreader ? "" : class_role_color[GET_CLASS_ROLE(ch)], screenreader ? show_role : "\t0");
+		else {
+			size += snprintf(out + size, sizeof(out) - size, "[%3d %s%s%s] ", GET_COMPUTED_LEVEL(ch), screenreader ? "" : class_role_color[GET_CLASS_ROLE(ch)], screenreader ? SHOW_CLASS_NAME(ch) : SHOW_CLASS_ABBREV(ch), screenreader ? show_role : "\t0");
 		}
 	}
 	
@@ -2537,12 +2534,7 @@ ACMD(do_whois) {
 	if (!IS_GOD(victim) && !IS_IMMORTAL(victim)) {
 		level = file ? GET_LAST_KNOWN_LEVEL(victim) : GET_COMPUTED_LEVEL(victim);
 		
-		if (GET_CLASS(victim) != CLASS_NONE) {
-			msg_to_char(ch, "Class: %d %s (%s%s\t0)\r\n", level, class_data[GET_PC_CLASS(victim)].name, class_role_color[GET_CLASS_ROLE(victim)], class_role[GET_CLASS_ROLE(victim)]);
-		}
-		else {
-			msg_to_char(ch, "Level: %d\r\n", level);
-		}
+		msg_to_char(ch, "Class: %d %s (%s%s\t0)\r\n", level, SHOW_CLASS_NAME(victim), class_role_color[GET_CLASS_ROLE(victim)], class_role[GET_CLASS_ROLE(victim)]);
 	}
 
 	if (GET_LOYALTY(victim)) {

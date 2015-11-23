@@ -28,7 +28,10 @@
 #define DB_BOOT_ACCT  14
 #define DB_BOOT_AUG  15
 #define DB_BOOT_ARCH  16
-#define NUM_DB_BOOT_TYPES  17	// total
+#define DB_BOOT_ABIL  17
+#define DB_BOOT_CLASS  18
+#define DB_BOOT_SKILL  19
+#define NUM_DB_BOOT_TYPES  20	// total
 
 
 // library sub-dirs
@@ -61,11 +64,13 @@
 
 // names of various files and directories
 #define INDEX_FILE  "index"	// index of world files
+#define ABIL_PREFIX  LIB_WORLD"abil/"	// player abilities
 #define ACCT_PREFIX  LIB_ACCTS	// account files
 #define ADV_PREFIX  LIB_WORLD"adv/"	// adventure zones
 #define ARCH_PREFIX  LIB_WORLD"arch/"	// archetypes
 #define AUG_PREFIX  LIB_WORLD"aug/"	// augments
 #define BLD_PREFIX  LIB_WORLD"bld/"	// building definitions
+#define CLASS_PREFIX  LIB_WORLD"class/"	// player classes
 #define CRAFT_PREFIX  LIB_WORLD"craft/"	// craft recipes
 #define CROP_PREFIX  LIB_WORLD"crop/"	// crop definitions
 #define GLB_PREFIX  LIB_WORLD"glb/"	// global templates
@@ -75,6 +80,7 @@
 #define OBJ_PREFIX  LIB_WORLD"obj/"	// object prototypes
 #define RMT_PREFIX  LIB_WORLD"rmt/"	// room templates
 #define SECTOR_PREFIX  LIB_WORLD"sect/"	// sect definitions
+#define SKILL_PREFIX  LIB_WORLD"skill/"	// player skills
 #define TRG_PREFIX  LIB_WORLD"trg/"	// trigger files
 #define HLP_PREFIX  LIB_TEXT"help/"	// for HELP <keyword>
 #define INTROS_PREFIX  LIB_TEXT"intros/"	// for intro screens
@@ -82,12 +88,14 @@
 #define STORAGE_PREFIX  LIB_EMPIRE"storage/"	// for empire storage
 
 // library file suffixes
+#define ABIL_SUFFIX  ".abil"	// player abilities
 #define ACCT_SUFFIX  ".acct"	// account file suffix
 #define ADV_SUFFIX  ".adv"	// adventure file suffix
 #define ARCH_SUFFIX  ".arch"	// archetype file suffix
 #define AUG_SUFFIX  ".aug"	// augment file suffix
 #define BLD_SUFFIX  ".bld"	// building file suffix
 #define BOOK_SUFFIX  ".book"	// book file suffix
+#define CLASS_SUFFIX  ".class"	// player classes
 #define CRAFT_SUFFIX  ".craft"	// craft file suffix
 #define CROP_SUFFIX  ".crop"	// crop file suffix
 #define EMPIRE_SUFFIX  ".empire"	// empire file suffix
@@ -96,6 +104,7 @@
 #define OBJ_SUFFIX  ".obj"	// obj suffix for file saves
 #define RMT_SUFFIX  ".rmt"	// room template suffix
 #define SECTOR_SUFFIX  ".sect"	// sector file suffix
+#define SKILL_SUFFIX  ".skill"	// player skills
 #define TRG_SUFFIX  ".trg"	// trigger file suffix
 #define WLD_SUFFIX  ".wld"	// suffix for rooms
 
@@ -148,7 +157,7 @@
 #define READ_SIZE 256
 
 
-// for DB_BOOT_x configs
+// for DB_BOOT_ configs
 struct db_boot_info_type {
 	char *prefix;
 	char *suffix;
@@ -175,6 +184,15 @@ void set_crop_type(room_data *room, crop_data *cp);
 extern int Global_ignore_dark;
 extern struct time_info_data time_info;
 
+
+// abilities
+extern ability_data *ability_table;
+extern ability_data *sorted_abilities;
+extern ability_data *find_ability(char *argument);
+extern ability_data *find_ability_by_name(char *name);
+extern ability_data *find_ability_by_vnum(any_vnum vnum);
+void free_ability(ability_data *abil);
+extern char *get_ability_name_by_vnum(any_vnum vnum);
 
 // accounts
 void add_player_to_account(char_data *ch, account_data *acct);
@@ -209,6 +227,14 @@ void free_book(book_data *book);
 extern bld_data *building_table;
 void free_building(bld_data *building);
 extern bld_data *building_proto(bld_vnum vnum);
+
+// classes
+extern class_data *class_table;
+extern class_data *sorted_classes;
+extern class_data *find_class(char *argument);
+extern class_data *find_class_by_name(char *name);
+extern class_data *find_class_by_vnum(any_vnum vnum);
+void free_class(class_data *cls);
 
 // crafts
 extern craft_data *craft_table;
@@ -300,6 +326,16 @@ extern room_template *room_template_proto(rmt_vnum vnum);
 extern sector_data *sector_table;
 void free_sector(struct sector_data *st);
 extern sector_data *sector_proto(sector_vnum vnum);
+
+// skills
+extern skill_data *skill_table;
+extern skill_data *sorted_skills;
+extern skill_data *find_skill(char *argument);
+extern skill_data *find_skill_by_name(char *name);
+extern skill_data *find_skill_by_vnum(any_vnum vnum);
+void free_skill(skill_data *skill);
+extern char *get_skill_abbrev_by_vnum(any_vnum vnum);
+extern char *get_skill_name_by_vnum(any_vnum vnum);
 
 // triggers
 extern trig_data *trigger_table;

@@ -366,14 +366,14 @@ static void msdp_update(void) {
 			MSDPSetNumber(d, eMSDP_GEAR_LEVEL, IS_NPC(ch) ? 0 : GET_GEAR_LEVEL(ch));
 			MSDPSetNumber(d, eMSDP_CRAFTING_LEVEL, get_crafting_level(ch));
 
-			snprintf(buf, sizeof(buf), "%s", IS_IMMORTAL(ch) ? "Immortal" : class_data[GET_CLASS(ch)].name);
+			snprintf(buf, sizeof(buf), "%s", SHOW_CLASS_NAME(ch));
 			MSDPSetString(d, eMSDP_CLASS, buf);
 			
 			// skills
 			*buf = '\0';
 			buf_size = 0;
 			HASH_ITER(hh, GET_SKILL_HASH(ch), skill, next_skill) {
-				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%c", (char)MSDP_VAR, skill_data[skill->skill_id].name, (char)MSDP_VAL, (char)MSDP_TABLE_OPEN);
+				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%c", (char)MSDP_VAR, get_skill_name_by_vnum(skill->vnum), (char)MSDP_VAL, (char)MSDP_TABLE_OPEN);
 				
 				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cLEVEL%c%d", (char)MSDP_VAR, (char)MSDP_VAL, skill->level);
 				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cEXP%c%.2f", (char)MSDP_VAR, (char)MSDP_VAL, skill->exp);
@@ -1474,6 +1474,9 @@ void close_socket(descriptor_data *d) {
 	// olc data
 	if (d->olc_storage) {
 		free(d->olc_storage);
+	}
+	if (d->olc_ability) {
+		free_ability(d->olc_ability);
 	}
 	if (d->olc_adventure) {
 		free_adventure(d->olc_adventure);

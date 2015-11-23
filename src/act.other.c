@@ -343,8 +343,8 @@ static void print_group(char_data *ch) {
 			}
 			
 			// show class section if they have one
-			if (!IS_NPC(k) && GET_CLASS(k) != CLASS_NONE) {
-				snprintf(class, sizeof(class), "/%s/%s", class_data[GET_CLASS(k)].name, class_role[(int) GET_CLASS_ROLE(k)]);
+			if (!IS_NPC(k) && GET_CLASS(k)) {
+				snprintf(class, sizeof(class), "/%s/%s", SHOW_CLASS_NAME(k), class_role[(int) GET_CLASS_ROLE(k)]);
 			}
 			else {
 				*class = '\0';

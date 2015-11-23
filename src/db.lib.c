@@ -5035,20 +5035,23 @@ void write_trigger_to_file(FILE *fl, trig_data *trig) {
 * them off to various parse functions.
 *
 * @param FILE *fl The file to read.
-* @param int mode Any DB_BOOT_x const.
+* @param int mode Any DB_BOOT_ const.
 * @param char *filename The name of the file, for error reporting.
 */
 void discrete_load(FILE *fl, int mode, char *filename) {
+	void parse_ability(FILE *fl, any_vnum vnum);
 	void parse_account(FILE *fl, int nr);
 	void parse_archetype(FILE *fl, any_vnum vnum);
 	void parse_augment(FILE *fl, any_vnum vnum);
 	void parse_book(FILE *fl, int book_id);
+	void parse_class(FILE *fl, any_vnum vnum);
+	void parse_skill(FILE *fl, any_vnum vnum);
 	
 	any_vnum nr = -1, last;
 	char line[256];
 
 	/* modes positions correspond to DB_BOOT_x in db.h */
-	const char *modes[] = {"world", "mob", "obj", "zone", "empire", "book", "craft", "trg", "crop", "sector", "adventure", "room template", "global", "account", "augment", "archetype" };
+	const char *modes[] = {"world", "mob", "obj", "zone", "empire", "book", "craft", "trg", "crop", "sector", "adventure", "room template", "global", "account", "augment", "archetype", "ability", "class", "skill" };
 
 	for (;;) {
 		if (!get_line(fl, line)) {
@@ -5071,6 +5074,10 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 			}
 			// DB_BOOT_x
 			switch (mode) {
+				case DB_BOOT_ABIL: {
+					parse_ability(fl, nr);
+					break;
+				}
 				case DB_BOOT_ACCT: {
 					parse_account(fl, nr);
 					break;
@@ -5089,6 +5096,10 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 				}
 				case DB_BOOT_BLD: {
 					parse_building(fl, nr);
+					break;
+				}
+				case DB_BOOT_CLASS: {
+					parse_class(fl, nr);
 					break;
 				}
 				case DB_BOOT_CRAFT: {
@@ -5127,6 +5138,10 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 					parse_sector(fl, nr);
 					break;
 				}
+				case DB_BOOT_SKILL: {
+					parse_skill(fl, nr);
+					break;
+				}
 				case DB_BOOT_TRG: {
 					parse_trigger(fl, nr);
 					break;
@@ -5150,7 +5165,7 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 * index_boot: Loads an index file for a given type, and loads each entry from
 * the index using discrete_load.
 *
-* @param int mode Any DB_BOOT_x const.
+* @param int mode Any DB_BOOT_ const.
 */
 void index_boot(int mode) {
 	char buf1[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
@@ -5194,7 +5209,7 @@ void index_boot(int mode) {
 
 	if (!rec_count) {
 		// DB_BOOT_x: some types don't matter TODO could move this into a config
-		if (mode == DB_BOOT_EMP || mode == DB_BOOT_BOOKS || mode == DB_BOOT_CRAFT || mode == DB_BOOT_BLD || mode == DB_BOOT_ADV || mode == DB_BOOT_RMT || mode == DB_BOOT_WLD || mode == DB_BOOT_GLB || mode == DB_BOOT_ACCT || mode == DB_BOOT_AUG || mode == DB_BOOT_ARCH) {
+		if (mode == DB_BOOT_EMP || mode == DB_BOOT_BOOKS || mode == DB_BOOT_CRAFT || mode == DB_BOOT_BLD || mode == DB_BOOT_ADV || mode == DB_BOOT_RMT || mode == DB_BOOT_WLD || mode == DB_BOOT_GLB || mode == DB_BOOT_ACCT || mode == DB_BOOT_AUG || mode == DB_BOOT_ARCH || mode == DB_BOOT_ABIL || mode == DB_BOOT_CLASS || mode == DB_BOOT_SKILL) {
 			// types that don't require any entries and exit early if none
 			return;
 		}
@@ -5216,6 +5231,11 @@ void index_boot(int mode) {
 	 * NOTE: "bytes" does _not_ include strings or other later malloc'd things.
 	 */
 	switch (mode) {
+		case DB_BOOT_ABIL: {
+			size[0] = sizeof(ability_data) * rec_count;
+			log("  %d abilities, %d bytes in db", rec_count, size[0]);
+			break;
+		}
 		case DB_BOOT_ARCH: {
 			size[0] = sizeof(archetype_data) * rec_count;
 			log("  %d archetypes, %d bytes in db", rec_count, size[0]);
@@ -5247,6 +5267,11 @@ void index_boot(int mode) {
 		case DB_BOOT_BLD: {
 			size[0] = sizeof(bld_data) * rec_count;
 			log("   %d buildings, %d bytes in building table.", rec_count, size[0]);
+			break;
+		}
+		case DB_BOOT_CLASS: {
+			size[0] = sizeof(class_data) * rec_count;
+			log("  %d classes, %d bytes in db", rec_count, size[0]);
 			break;
 		}
 		case DB_BOOT_CRAFT: {
@@ -5287,6 +5312,11 @@ void index_boot(int mode) {
 			log("   %d sectors, %d bytes in sector.", rec_count, size[0]);
 			break;
 		}
+		case DB_BOOT_SKILL: {
+			size[0] = sizeof(skill_data) * rec_count;
+			log("  %d skills, %d bytes in db", rec_count, size[0]);
+			break;
+		}
 		case DB_BOOT_TRG: {
 			size[0] = sizeof(trig_data) * rec_count;
 			log("   %d triggers, %d bytes in triggers.", rec_count, size[0]);
@@ -5303,11 +5333,13 @@ void index_boot(int mode) {
 		}
 		// DB_BOOT_x
 		switch (mode) {
+			case DB_BOOT_ABIL:
 			case DB_BOOT_ACCT:
 			case DB_BOOT_ADV:
 			case DB_BOOT_ARCH:
 			case DB_BOOT_AUG:
 			case DB_BOOT_BLD:
+			case DB_BOOT_CLASS:
 			case DB_BOOT_CRAFT:
 			case DB_BOOT_CROP:
 			case DB_BOOT_GLB:
@@ -5317,6 +5349,7 @@ void index_boot(int mode) {
 			case DB_BOOT_BOOKS:
 			case DB_BOOT_RMT:
 			case DB_BOOT_SECTOR:
+			case DB_BOOT_SKILL:
 			case DB_BOOT_TRG:
 			case DB_BOOT_WLD: {
 				discrete_load(db_file, mode, buf2);
@@ -5340,7 +5373,7 @@ void index_boot(int mode) {
 * You don't have to call it with a real vnum; it just uses the vnum to
 * determine which "zone" (block of 100) items to save to file.
 *
-* @param int type Any DB_BOOT_x const.
+* @param int type Any DB_BOOT_ const.
 * @param any_vnum vnum A vnum in the set to save (it saved the whole 100-block).
 */
 void save_library_file_for_vnum(int type, any_vnum vnum) {
@@ -5372,6 +5405,16 @@ void save_library_file_for_vnum(int type, any_vnum vnum) {
 	
 	// DB_BOOT_x
 	switch (type) {
+		case DB_BOOT_ABIL: {
+			void write_ability_to_file(FILE *fl, ability_data *abil);
+			ability_data *abil, *next_abil;
+			HASH_ITER(hh, ability_table, abil, next_abil) {
+				if (ABIL_VNUM(abil) >= (zone * 100) && ABIL_VNUM(abil) <= (zone * 100 + 99)) {
+					write_ability_to_file(fl, abil);
+				}
+			}
+			break;
+		}
 		case DB_BOOT_ACCT: {
 			void write_account_to_file(FILE *fl, account_data *acct);
 			account_data *acct, *next_acct;
@@ -5416,6 +5459,16 @@ void save_library_file_for_vnum(int type, any_vnum vnum) {
 			HASH_ITER(hh, building_table, bld, next_bld) {
 				if (GET_BLD_VNUM(bld) >= (zone * 100) && GET_BLD_VNUM(bld) <= (zone * 100 + 99)) {
 					write_building_to_file(fl, bld);
+				}
+			}
+			break;
+		}
+		case DB_BOOT_CLASS: {
+			void write_class_to_file(FILE *fl, class_data *cls);
+			class_data *cls, *next_cls;
+			HASH_ITER(hh, class_table, cls, next_cls) {
+				if (CLASS_VNUM(cls) >= (zone * 100) && CLASS_VNUM(cls) <= (zone * 100 + 99)) {
+					write_class_to_file(fl, cls);
 				}
 			}
 			break;
@@ -5479,6 +5532,16 @@ void save_library_file_for_vnum(int type, any_vnum vnum) {
 			HASH_ITER(hh, sector_table, sect, next_sect) {
 				if (GET_SECT_VNUM(sect) >= (zone * 100) && GET_SECT_VNUM(sect) <= (zone * 100 + 99)) {
 					write_sector_to_file(fl, sect);
+				}
+			}
+			break;
+		}
+		case DB_BOOT_SKILL: {
+			void write_skill_to_file(FILE *fl, skill_data *skill);
+			skill_data *skill, *next_skill;
+			HASH_ITER(hh, skill_table, skill, next_skill) {
+				if (SKILL_VNUM(skill) >= (zone * 100) && SKILL_VNUM(skill) <= (zone * 100 + 99)) {
+					write_skill_to_file(fl, skill);
 				}
 			}
 			break;
@@ -5694,7 +5757,7 @@ void write_trigger_index(FILE *fl) {
 /**
 * Writes the index file for any database type.
 *
-* @param int type Any DB_BOOT_x type.
+* @param int type Any DB_BOOT_ type.
 */
 void save_index(int type) {
 	char filename[64], tempfile[64], *prefix = NULL, *suffix = NULL;
@@ -5722,6 +5785,11 @@ void save_index(int type) {
 	
 	// DB_BOOT_x
 	switch (type) {
+		case DB_BOOT_ABIL: {
+			void write_ability_index(FILE *fl);
+			write_ability_index(fl);
+			break;
+		}
 		case DB_BOOT_ACCT: {
 			void write_account_index(FILE *fl);
 			write_account_index(fl);
@@ -5743,6 +5811,11 @@ void save_index(int type) {
 		}
 		case DB_BOOT_BLD: {
 			write_building_index(fl);
+			break;
+		}
+		case DB_BOOT_CLASS: {
+			void write_class_index(FILE *fl);
+			write_class_index(fl);
 			break;
 		}
 		case DB_BOOT_CRAFT: {
@@ -5771,6 +5844,11 @@ void save_index(int type) {
 		}
 		case DB_BOOT_SECTOR: {
 			write_sector_index(fl);
+			break;
+		}
+		case DB_BOOT_SKILL: {
+			void write_skill_index(FILE *fl);
+			write_skill_index(fl);
 			break;
 		}
 		case DB_BOOT_TRG: {
@@ -6219,14 +6297,17 @@ int sort_buildings(bld_data *a, bld_data *b) {
 * @return int Sort instruction of -1, 0, or 1
 */
 int sort_crafts_by_data(craft_data *a, craft_data *b) {
+	ability_data *a_abil, *b_abil;
 	int a_level, b_level;
 	
 	if (GET_CRAFT_TYPE(a) != GET_CRAFT_TYPE(b)) {
 		return GET_CRAFT_TYPE(a) - GET_CRAFT_TYPE(b);
 	}
 	
-	a_level = (GET_CRAFT_ABILITY(a) == NO_ABIL) ? 0 : ability_data[GET_CRAFT_ABILITY(a)].parent_skill_required;
-	b_level = (GET_CRAFT_ABILITY(b) == NO_ABIL) ? 0 : ability_data[GET_CRAFT_ABILITY(b)].parent_skill_required;
+	a_abil = find_ability_by_vnum(GET_CRAFT_ABILITY(a));
+	b_abil = find_ability_by_vnum(GET_CRAFT_ABILITY(b));
+	a_level = a_abil ? ABIL_SKILL_LEVEL(a_abil) : 0;
+	b_level = b_abil ? ABIL_SKILL_LEVEL(b_abil) : 0;
 	
 	// reverse level sort
 	if (a_level != b_level) {

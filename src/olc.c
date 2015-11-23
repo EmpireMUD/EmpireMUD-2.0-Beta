@@ -289,11 +289,13 @@ void sort_interactions(struct interaction_item **list);
 extern bool valid_room_template_vnum(rmt_vnum vnum);
 
 // prototypes
+void olc_show_ability(char_data *ch);
 void olc_show_adventure(char_data *ch);
 void olc_show_archetype(char_data *ch);
 void olc_show_augment(char_data *ch);
 void olc_show_book(char_data *ch);
 void olc_show_building(char_data *ch);
+void olc_show_class(char_data *ch);
 void olc_show_craft(char_data *ch);
 void olc_show_crop(char_data *ch);
 void olc_show_global(char_data *ch);
@@ -301,12 +303,15 @@ void olc_show_mobile(char_data *ch);
 void olc_show_object(char_data *ch);
 void olc_show_room_template(char_data *ch);
 void olc_show_sector(char_data *ch);
+void olc_show_skill(char_data *ch);
 void olc_show_trigger(char_data *ch);
+extern ability_data *setup_olc_ability(ability_data *input);
 extern adv_data *setup_olc_adventure(adv_data *input);
 extern archetype_data *setup_olc_archetype(archetype_data *input);
 extern augment_data *setup_olc_augment(augment_data *input);
 extern book_data *setup_olc_book(book_data *input);
 extern bld_data *setup_olc_building(bld_data *input);
+extern class_data *setup_olc_class(class_data *input);
 extern craft_data *setup_olc_craft(craft_data *input);
 extern crop_data *setup_olc_crop(crop_data *input);
 extern struct global_data *setup_olc_global(struct global_data *input);
@@ -314,6 +319,7 @@ extern char_data *setup_olc_mobile(char_data *input);
 extern obj_data *setup_olc_object(obj_data *input);
 extern room_template *setup_olc_room_template(room_template *input);
 extern sector_data *setup_olc_sector(sector_data *input);
+extern skill_data *setup_olc_skill(skill_data *input);
 extern struct trig_data *setup_olc_trigger(struct trig_data *input, char **cmdlist_storage);
 extern bool validate_icon(char *icon);
 
@@ -321,22 +327,24 @@ extern bool validate_icon(char *icon);
 // master olc command structure
 const struct olc_command_data olc_data[] = {
 	// OLC_x: main commands
-	{ "abort", olc_abort, OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
-	{ "audit", olc_audit, OLC_ADVENTURE | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BUILDING | OLC_CRAFT | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_ROOM_TEMPLATE, NOBITS },
-	{ "copy", olc_copy, OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, NOBITS },
-	{ "delete", olc_delete, OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, OLC_CF_NO_ABBREV },
+	{ "abort", olc_abort, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
+	{ "audit", olc_audit, OLC_ABILITY | OLC_ADVENTURE | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_ROOM_TEMPLATE | OLC_SKILL, NOBITS },
+	{ "copy", olc_copy, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, NOBITS },
+	{ "delete", olc_delete, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, OLC_CF_NO_ABBREV },
 	// "display" command uses the shortcut "." or "olc" with no args, and is in the do_olc function
-	{ "edit", olc_edit, OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, NOBITS },
-	{ "free", olc_free, OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, NOBITS },
-	{ "list", olc_list, OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, NOBITS },
-	{ "save", olc_save, OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
-	{ "search", olc_search, OLC_ARCHETYPE | OLC_AUGMENT | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_TRIGGER | OLC_ROOM_TEMPLATE, NOBITS },
+	{ "edit", olc_edit, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, NOBITS },
+	{ "free", olc_free, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, NOBITS },
+	{ "list", olc_list, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, NOBITS },
+	{ "save", olc_save, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
+	{ "search", olc_search, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ROOM_TEMPLATE, NOBITS },
 	
 	// admin
 	{ "removeindev", olc_removeindev, NOBITS, NOBITS },
 	{ "setflags", olc_set_flags, NOBITS, NOBITS },
 	{ "setminvnum", olc_set_min_vnum, NOBITS, NOBITS },
 	{ "setmaxvnum", olc_set_max_vnum, NOBITS, NOBITS },
+	
+	// ability commands
 	
 	// adventure zones
 	{ "author", advedit_author, OLC_ADVENTURE, OLC_CF_EDITOR },
@@ -403,6 +411,8 @@ const struct olc_command_data olc_data[] = {
 	{ "spawns", bedit_spawns, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "title", bedit_title, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "upgradesto", bedit_upgradesto, OLC_BUILDING, OLC_CF_EDITOR },
+	
+	// class commands
 	
 	// craft commands
 	{ "ability", cedit_ability, OLC_CRAFT, OLC_CF_EDITOR },
@@ -555,6 +565,8 @@ const struct olc_command_data olc_data[] = {
 	{ "roadsideicon", sectedit_roadsideicon, OLC_SECTOR, OLC_CF_EDITOR },
 	{ "spawns", sectedit_spawns, OLC_SECTOR, OLC_CF_EDITOR },
 	{ "title", sectedit_title, OLC_SECTOR, OLC_CF_EDITOR },
+	
+	// skill commands
 
 	// trigger commands
 	{ "argtype", tedit_argtype, OLC_TRIGGER, OLC_CF_EDITOR },
@@ -678,6 +690,11 @@ OLC_MODULE(olc_abort) {
 	else {
 		// OLC_x:
 		switch (GET_OLC_TYPE(ch->desc)) {
+			case OLC_ABILITY: {
+				free_ability(GET_OLC_ABILITY(ch->desc));
+				GET_OLC_ABILITY(ch->desc) = NULL;
+				break;
+			}
 			case OLC_ADVENTURE: {
 				free_adventure(GET_OLC_ADVENTURE(ch->desc));
 				GET_OLC_ADVENTURE(ch->desc) = NULL;
@@ -701,6 +718,11 @@ OLC_MODULE(olc_abort) {
 			case OLC_BUILDING: {
 				free_building(GET_OLC_BUILDING(ch->desc));
 				GET_OLC_BUILDING(ch->desc) = NULL;
+				break;
+			}
+			case OLC_CLASS: {
+				free_class(GET_OLC_CLASS(ch->desc));
+				GET_OLC_CLASS(ch->desc) = NULL;
 				break;
 			}
 			case OLC_CRAFT: {
@@ -736,6 +758,11 @@ OLC_MODULE(olc_abort) {
 			case OLC_SECTOR: {
 				free_sector(GET_OLC_SECTOR(ch->desc));
 				GET_OLC_SECTOR(ch->desc) = NULL;
+				break;
+			}
+			case OLC_SKILL: {
+				free_skill(GET_OLC_SKILL(ch->desc));
+				GET_OLC_SKILL(ch->desc) = NULL;
 				break;
 			}
 			case OLC_TRIGGER: {
@@ -788,6 +815,16 @@ OLC_MODULE(olc_audit) {
 		
 		// OLC_x: auditors
 		switch (type) {
+			case OLC_ABILITY: {
+				extern bool audit_ability(ability_data *abil, char_data *ch);
+				ability_data *abil, *next_abil;
+				HASH_ITER(hh, ability_table, abil, next_abil) {
+					if (ABIL_VNUM(abil) >= from_vnum && ABIL_VNUM(abil) <= to_vnum) {
+						found |= audit_ability(abil, ch);
+					}
+				}
+				break;
+			}
 			case OLC_ADVENTURE: {
 				extern bool audit_adventure(adv_data *adv, char_data *ch, bool only_one);
 				adv_data *adv, *next_adv;
@@ -824,6 +861,16 @@ OLC_MODULE(olc_audit) {
 				HASH_ITER(hh, building_table, bld, next_bld) {
 					if (GET_BLD_VNUM(bld) >= from_vnum && GET_BLD_VNUM(bld) <= to_vnum) {
 						found |= audit_building(bld, ch);
+					}
+				}
+				break;
+			}
+			case OLC_CLASS: {
+				extern bool audit_class(class_data *cls, char_data *ch);
+				class_data *cls, *next_cls;
+				HASH_ITER(hh, class_table, cls, next_cls) {
+					if (CLASS_VNUM(cls) >= from_vnum && CLASS_VNUM(cls) <= to_vnum) {
+						found |= audit_class(cls, ch);
 					}
 				}
 				break;
@@ -907,6 +954,18 @@ OLC_MODULE(olc_audit) {
 				}
 				break;
 			}
+			*/
+			case OLC_SKILL: {
+				extern bool audit_skill(skill_data *skill, char_data *ch);
+				skill_data *skill, *next_skill;
+				HASH_ITER(hh, skill_table, skill, next_skill) {
+					if (SKILL_VNUM(skill) >= from_vnum && SKILL_VNUM(skill) <= to_vnum) {
+						found |= audit_skill(skill, ch);
+					}
+				}
+				break;
+			}
+			/*
 			case OLC_TRIGGER: {
 				trig_data *trig, *next_trig;
 				HASH_ITER(hh, trigger_table, trig, next_trig) {
@@ -968,6 +1027,11 @@ OLC_MODULE(olc_copy) {
 	exists = FALSE;
 	// OLC_x:
 	switch (type) {
+		case OLC_ABILITY: {
+			found = (find_ability_by_vnum(vnum) != NULL);
+			exists = (find_ability_by_vnum(from_vnum) != NULL);
+			break;
+		}
 		case OLC_ADVENTURE: {
 			found = (adventure_proto(vnum) != NULL);
 			exists = (adventure_proto(from_vnum) != NULL);
@@ -991,6 +1055,11 @@ OLC_MODULE(olc_copy) {
 		case OLC_BUILDING: {
 			found = (building_proto(vnum) != NULL);
 			exists = (building_proto(from_vnum) != NULL);
+			break;
+		}
+		case OLC_CLASS: {
+			found = (find_class_by_vnum(vnum) != NULL);
+			exists = (find_class_by_vnum(from_vnum) != NULL);
 			break;
 		}
 		case OLC_CRAFT: {
@@ -1026,6 +1095,11 @@ OLC_MODULE(olc_copy) {
 		case OLC_SECTOR: {
 			found = (sector_proto(vnum) != NULL);
 			exists = (sector_proto(from_vnum) != NULL);
+			break;
+		}
+		case OLC_SKILL: {
+			found = (find_skill_by_vnum(vnum) != NULL);
+			exists = (find_skill_by_vnum(from_vnum) != NULL);
 			break;
 		}
 		case OLC_TRIGGER: {
@@ -1077,6 +1151,12 @@ OLC_MODULE(olc_copy) {
 	
 	// OLC_x: setup
 	switch (type) {
+		case OLC_ABILITY: {
+			GET_OLC_ABILITY(ch->desc) = setup_olc_ability(find_ability_by_vnum(from_vnum));
+			GET_OLC_ABILITY(ch->desc)->vnum = vnum;
+			olc_show_ability(ch);
+			break;
+		}
 		case OLC_ADVENTURE: {
 			GET_OLC_ADVENTURE(ch->desc) = setup_olc_adventure(adventure_proto(from_vnum));
 			GET_OLC_ADVENTURE(ch->desc)->vnum = vnum;
@@ -1108,6 +1188,13 @@ OLC_MODULE(olc_copy) {
 			GET_OLC_BUILDING(ch->desc) = setup_olc_building(building_proto(from_vnum));
 			GET_OLC_BUILDING(ch->desc)->vnum = vnum;
 			olc_show_building(ch);
+			break;
+		}
+		case OLC_CLASS: {
+			GET_OLC_CLASS(ch->desc) = setup_olc_class(find_class_by_vnum(from_vnum));
+			GET_OLC_CLASS(ch->desc)->vnum = vnum;
+			SET_BIT(GET_OLC_CLASS(ch->desc)->flags, CLASSF_IN_DEVELOPMENT);	// ensure flag
+			olc_show_class(ch);
 			break;
 		}
 		case OLC_CRAFT: {
@@ -1157,6 +1244,13 @@ OLC_MODULE(olc_copy) {
 			olc_show_sector(ch);
 			break;
 		}
+		case OLC_SKILL: {
+			GET_OLC_SKILL(ch->desc) = setup_olc_skill(find_skill_by_vnum(from_vnum));
+			GET_OLC_SKILL(ch->desc)->vnum = vnum;
+			SET_BIT(GET_OLC_SKILL(ch->desc)->flags, SKILLF_IN_DEVELOPMENT);	// ensure flag
+			olc_show_skill(ch);
+			break;
+		}
 		case OLC_TRIGGER: {
 			GET_OLC_TRIGGER(ch->desc) = setup_olc_trigger(real_trigger(from_vnum), &GET_OLC_STORAGE(ch->desc));
 			GET_OLC_TRIGGER(ch->desc)->vnum = vnum;
@@ -1178,11 +1272,13 @@ OLC_MODULE(olc_copy) {
 
 
 OLC_MODULE(olc_delete) {
+	void olc_delete_ability(char_data *ch, any_vnum vnum);
 	void olc_delete_adventure(char_data *ch, adv_vnum vnum);
 	void olc_delete_archetype(char_data *ch, any_vnum vnum);
 	void olc_delete_augment(char_data *ch, any_vnum vnum);
 	void olc_delete_book(char_data *ch, book_vnum vnum);
 	void olc_delete_building(char_data *ch, bld_vnum vnum);
+	void olc_delete_class(char_data *ch, any_vnum vnum);
 	void olc_delete_craft(char_data *ch, craft_vnum vnum);
 	void olc_delete_crop(char_data *ch, crop_vnum vnum);
 	void olc_delete_global(char_data *ch, any_vnum vnum);
@@ -1190,6 +1286,7 @@ OLC_MODULE(olc_delete) {
 	void olc_delete_object(char_data *ch, obj_vnum vnum);
 	void olc_delete_room_template(char_data *ch, rmt_vnum vnum);
 	void olc_delete_sector(char_data *ch, sector_vnum vnum);
+	void olc_delete_skill(char_data *ch, any_vnum vnum);
 	void olc_delete_trigger(char_data *ch, trig_vnum vnum);
 	
 	descriptor_data *desc;
@@ -1228,6 +1325,10 @@ OLC_MODULE(olc_delete) {
 	
 	// OLC_x: success by type
 	switch (type) {
+		case OLC_ABILITY: {
+			olc_delete_ability(ch, vnum);
+			break;
+		}
 		case OLC_ADVENTURE: {
 			olc_delete_adventure(ch, vnum);
 			break;
@@ -1246,6 +1347,10 @@ OLC_MODULE(olc_delete) {
 		}
 		case OLC_BUILDING: {
 			olc_delete_building(ch, vnum);
+			break;
+		}
+		case OLC_CLASS: {
+			olc_delete_class(ch, vnum);
 			break;
 		}
 		case OLC_CRAFT: {
@@ -1276,6 +1381,10 @@ OLC_MODULE(olc_delete) {
 			olc_delete_sector(ch, vnum);
 			break;
 		}
+		case OLC_SKILL: {
+			olc_delete_skill(ch, vnum);
+			break;
+		}
 		case OLC_TRIGGER: {
 			olc_delete_trigger(ch, vnum);
 			break;
@@ -1291,6 +1400,10 @@ OLC_MODULE(olc_delete) {
 OLC_MODULE(olc_display) {
 	// OLC_x:
 	switch (GET_OLC_TYPE(ch->desc)) {
+		case OLC_ABILITY: {
+			olc_show_ability(ch);
+			break;
+		}
 		case OLC_ADVENTURE: {
 			olc_show_adventure(ch);
 			break;
@@ -1309,6 +1422,10 @@ OLC_MODULE(olc_display) {
 		}
 		case OLC_BUILDING: {
 			olc_show_building(ch);
+			break;
+		}
+		case OLC_CLASS: {
+			olc_show_class(ch);
 			break;
 		}
 		case OLC_CRAFT: {
@@ -1337,6 +1454,10 @@ OLC_MODULE(olc_display) {
 		}
 		case OLC_SECTOR: {
 			olc_show_sector(ch);
+			break;
+		}
+		case OLC_SKILL: {
+			olc_show_skill(ch);
 			break;
 		}
 		case OLC_TRIGGER: {
@@ -1409,6 +1530,13 @@ OLC_MODULE(olc_edit) {
 	
 	// OLC_x: setup
 	switch (type) {
+		case OLC_ABILITY: {
+			// this sets up either new or existing automatically
+			GET_OLC_ABILITY(ch->desc) = setup_olc_ability(find_ability_by_vnum(vnum));
+			GET_OLC_ABILITY(ch->desc)->vnum = vnum;
+			olc_show_ability(ch);
+			break;
+		}
 		case OLC_ADVENTURE: {
 			// this sets up either new or existing automatically
 			GET_OLC_ADVENTURE(ch->desc) = setup_olc_adventure(adventure_proto(vnum));
@@ -1442,6 +1570,13 @@ OLC_MODULE(olc_edit) {
 			GET_OLC_BUILDING(ch->desc) = setup_olc_building(building_proto(vnum));
 			GET_OLC_BUILDING(ch->desc)->vnum = vnum;			
 			olc_show_building(ch);
+			break;
+		}
+		case OLC_CLASS: {
+			// this sets up either new or existing automatically
+			GET_OLC_CLASS(ch->desc) = setup_olc_class(find_class_by_vnum(vnum));
+			GET_OLC_CLASS(ch->desc)->vnum = vnum;
+			olc_show_class(ch);
 			break;
 		}
 		case OLC_CRAFT: {
@@ -1491,6 +1626,13 @@ OLC_MODULE(olc_edit) {
 			GET_OLC_SECTOR(ch->desc) = setup_olc_sector(sector_proto(vnum));
 			GET_OLC_SECTOR(ch->desc)->vnum = vnum;
 			olc_show_sector(ch);
+			break;
+		}
+		case OLC_SKILL: {
+			// this sets up either new or existing automatically
+			GET_OLC_SKILL(ch->desc) = setup_olc_skill(find_skill_by_vnum(vnum));
+			GET_OLC_SKILL(ch->desc)->vnum = vnum;
+			olc_show_skill(ch);
 			break;
 		}
 		case OLC_TRIGGER: {
@@ -1544,6 +1686,10 @@ OLC_MODULE(olc_free) {
 		for (iter = from_vnum; iter <= to_vnum && !free; ++iter) {
 			// OLC_x:
 			switch (type) {
+				case OLC_ABILITY: {
+					free = (find_ability_by_vnum(iter) == NULL);
+					break;
+				}
 				case OLC_ADVENTURE: {
 					free = (adventure_proto(iter) == NULL);
 					break;
@@ -1562,6 +1708,10 @@ OLC_MODULE(olc_free) {
 				}
 				case OLC_BUILDING: {
 					free = (building_proto(iter) == NULL);
+					break;
+				}
+				case OLC_CLASS: {
+					free = (find_class_by_vnum(iter) == NULL);
 					break;
 				}
 				case OLC_CRAFT: {
@@ -1590,6 +1740,10 @@ OLC_MODULE(olc_free) {
 				}
 				case OLC_SECTOR: {
 					free = (sector_proto(iter) == NULL);
+					break;
+				}
+				case OLC_SKILL: {
+					free = (find_skill_by_vnum(iter) == NULL);
 					break;
 				}
 				case OLC_TRIGGER: {
@@ -1686,6 +1840,20 @@ OLC_MODULE(olc_list) {
 		
 		// OLC_x:
 		switch (type) {
+			case OLC_ABILITY: {
+				extern char *list_one_ability(ability_data *abil, bool detail);
+				ability_data *abil, *next_abil;
+				HASH_ITER(hh, ability_table, abil, next_abil) {
+					if (len >= sizeof(buf)) {
+						break;
+					}
+					if (ABIL_VNUM(abil) >= from_vnum && ABIL_VNUM(abil) <= to_vnum) {
+						++count;
+						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_ability(abil, show_details));
+					}
+				}
+				break;
+			}
 			case OLC_ADVENTURE: {
 				extern char *list_one_adventure(adv_data *adv, bool detail);
 				adv_data *adv, *next_adv;
@@ -1752,6 +1920,20 @@ OLC_MODULE(olc_list) {
 					if (GET_BLD_VNUM(bld) >= from_vnum && GET_BLD_VNUM(bld) <= to_vnum) {
 						++count;
 						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_building(bld, show_details));
+					}
+				}
+				break;
+			}
+			case OLC_CLASS: {
+				extern char *list_one_class(class_data *cls, bool detail);
+				class_data *cls, *next_cls;
+				HASH_ITER(hh, class_table, cls, next_cls) {
+					if (len >= sizeof(buf)) {
+						break;
+					}
+					if (CLASS_VNUM(cls) >= from_vnum && CLASS_VNUM(cls) <= to_vnum) {
+						++count;
+						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_class(cls, show_details));
 					}
 				}
 				break;
@@ -1854,6 +2036,20 @@ OLC_MODULE(olc_list) {
 				}
 				break;
 			}
+			case OLC_SKILL: {
+				extern char *list_one_skill(skill_data *skill, bool detail);
+				skill_data *skill, *next_skill;
+				HASH_ITER(hh, skill_table, skill, next_skill) {
+					if (len >= sizeof(buf)) {
+						break;
+					}
+					if (SKILL_VNUM(skill) >= from_vnum && SKILL_VNUM(skill) <= to_vnum) {
+						++count;
+						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_skill(skill, show_details));
+					}
+				}
+				break;
+			}
 			case OLC_TRIGGER: {
 				extern char *list_one_trigger(trig_data *trig, bool detail);
 				trig_data *trig, *next_trig;
@@ -1889,7 +2085,9 @@ OLC_MODULE(olc_removeindev) {
 	struct global_data *glb, *next_glb;
 	archetype_data *arch, *next_arch;
 	craft_data *craft, *next_craft;
+	skill_data *skill, *next_skill;
 	augment_data *aug, *next_aug;
+	class_data *cls, *next_cls;
 	adv_data *adv = NULL;
 	int iter;
 	
@@ -1939,6 +2137,23 @@ OLC_MODULE(olc_removeindev) {
 		if (use_adv && adv) {
 			from = GET_ADV_START_VNUM(adv);
 			to = GET_ADV_END_VNUM(adv);
+		}
+		
+		HASH_ITER(hh, class_table, cls, next_cls) {
+			if (CLASS_VNUM(cls) < from || CLASS_VNUM(cls) > to) {
+				continue;
+			}
+			if (!CLASS_FLAGGED(cls, CLASSF_IN_DEVELOPMENT)) {
+				continue;
+			}
+			if (!player_can_olc_edit(ch, OLC_CLASS, CLASS_VNUM(cls))) {
+				continue;
+			}
+			
+			REMOVE_BIT(CLASS_FLAGS(cls), CLASSF_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_CLASS, CLASS_VNUM(cls));
+			msg_to_char(ch, "Removed IN-DEV flag from class [%d] %s.\r\n", CLASS_VNUM(cls), CLASS_NAME(cls));
+			any = TRUE;
 		}
 		
 		HASH_ITER(hh, craft_table, craft, next_craft) {
@@ -2009,6 +2224,23 @@ OLC_MODULE(olc_removeindev) {
 			any = TRUE;
 		}
 		
+		HASH_ITER(hh, skill_table, skill, next_skill) {
+			if (SKILL_VNUM(skill) < from || SKILL_VNUM(skill) > to) {
+				continue;
+			}
+			if (!SKILL_FLAGGED(skill, SKILLF_IN_DEVELOPMENT)) {
+				continue;
+			}
+			if (!player_can_olc_edit(ch, OLC_SKILL, SKILL_VNUM(skill))) {
+				continue;
+			}
+			
+			REMOVE_BIT(SKILL_FLAGS(skill), SKILLF_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_SKILL, SKILL_VNUM(skill));
+			msg_to_char(ch, "Removed IN-DEV flag from skill [%d] %s.\r\n", SKILL_VNUM(skill), SKILL_NAME(skill));
+			any = TRUE;
+		}
+		
 		if (!any) {
 			msg_to_char(ch, "No in-development flags to remove.\r\n");
 		}
@@ -2023,11 +2255,13 @@ OLC_MODULE(olc_removeindev) {
 
 
 OLC_MODULE(olc_save) {
+	void save_olc_ability(descriptor_data *desc);
 	void save_olc_adventure(descriptor_data *desc);
 	void save_olc_archetype(descriptor_data *desc);
 	void save_olc_augment(descriptor_data *desc);
 	void save_olc_book(descriptor_data *desc);
 	void save_olc_building(descriptor_data *desc);
+	void save_olc_class(descriptor_data *desc);
 	void save_olc_craft(descriptor_data *desc);
 	void save_olc_crop(descriptor_data *desc);
 	void save_olc_global(descriptor_data *desc);
@@ -2035,6 +2269,7 @@ OLC_MODULE(olc_save) {
 	void save_olc_object(descriptor_data *desc);
 	void save_olc_room_template(descriptor_data *desc);
 	void save_olc_sector(descriptor_data *desc);	
+	void save_olc_skill(descriptor_data *desc);
 	void save_olc_trigger(descriptor_data *desc, char *script_text);
 	
 	char typename[42];
@@ -2053,6 +2288,12 @@ OLC_MODULE(olc_save) {
 	else {
 		// OLC_x:
 		switch (GET_OLC_TYPE(ch->desc)) {
+			case OLC_ABILITY: {
+				save_olc_ability(ch->desc);
+				free_ability(GET_OLC_ABILITY(ch->desc));
+				GET_OLC_ABILITY(ch->desc) = NULL;
+				break;
+			}
 			case OLC_ADVENTURE: {
 				save_olc_adventure(ch->desc);
 				free_adventure(GET_OLC_ADVENTURE(ch->desc));
@@ -2081,6 +2322,12 @@ OLC_MODULE(olc_save) {
 				save_olc_building(ch->desc);
 				free_building(GET_OLC_BUILDING(ch->desc));
 				GET_OLC_BUILDING(ch->desc) = NULL;
+				break;
+			}
+			case OLC_CLASS: {
+				save_olc_class(ch->desc);
+				free_class(GET_OLC_CLASS(ch->desc));
+				GET_OLC_CLASS(ch->desc) = NULL;
 				break;
 			}
 			case OLC_CRAFT: {
@@ -2125,6 +2372,12 @@ OLC_MODULE(olc_save) {
 				GET_OLC_SECTOR(ch->desc) = NULL;
 				break;
 			}
+			case OLC_SKILL: {
+				save_olc_skill(ch->desc);
+				free_skill(GET_OLC_SKILL(ch->desc));
+				GET_OLC_SKILL(ch->desc) = NULL;
+				break;
+			}
 			case OLC_TRIGGER: {
 				save_olc_trigger(ch->desc, GET_OLC_STORAGE(ch->desc));
 				free_trigger(GET_OLC_TRIGGER(ch->desc));
@@ -2151,9 +2404,11 @@ OLC_MODULE(olc_save) {
 
 
 OLC_MODULE(olc_search) {
+	void olc_search_ability(char_data *ch, any_vnum vnum);
 	void olc_search_archetype(char_data *ch, any_vnum vnum);
 	void olc_search_augment(char_data *ch, any_vnum vnum);
 	void olc_search_building(char_data *ch, bld_vnum vnum);
+	void olc_search_class(char_data *ch, any_vnum vnum);
 	void olc_search_craft(char_data *ch, craft_vnum vnum);
 	void olc_search_crop(char_data *ch, crop_vnum vnum);
 	void olc_search_global(char_data *ch, any_vnum vnum);
@@ -2161,6 +2416,7 @@ OLC_MODULE(olc_search) {
 	void olc_search_obj(char_data *ch, obj_vnum vnum);
 	void olc_search_room_template(char_data *ch, rmt_vnum vnum);
 	void olc_search_sector(char_data *ch, sector_vnum vnum);
+	void olc_search_skill(char_data *ch, any_vnum vnum);
 	void olc_search_trigger(char_data *ch, trig_vnum vnum);
 
 	any_vnum vnum = NOTHING;
@@ -2176,6 +2432,10 @@ OLC_MODULE(olc_search) {
 	else {
 		// OLC_x:
 		switch (type) {
+			case OLC_ABILITY: {
+				olc_search_ability(ch, vnum);
+				break;
+			}
 			case OLC_ARCHETYPE: {
 				olc_search_archetype(ch, vnum);
 				break;
@@ -2186,6 +2446,10 @@ OLC_MODULE(olc_search) {
 			}
 			case OLC_BUILDING: {
 				olc_search_building(ch, vnum);
+				break;
+			}
+			case OLC_CLASS: {
+				olc_search_class(ch, vnum);
 				break;
 			}
 			case OLC_CRAFT: {
@@ -2214,6 +2478,10 @@ OLC_MODULE(olc_search) {
 			}
 			case OLC_SECTOR: {
 				olc_search_sector(ch, vnum);
+				break;
+			}
+			case OLC_SKILL: {
+				olc_search_skill(ch, vnum);
 				break;
 			}
 			case OLC_TRIGGER: {
@@ -2806,7 +3074,7 @@ struct extra_descr_data *find_extra_desc_by_num(struct extra_descr_data *list, i
 
 /**
 * @param char *name An olc type name input.
-* @return int the OLC_x type (flag) or 
+* @return int the OLC_ type (flag) or 
 */
 int find_olc_type(char *name) {
 	int iter, type = NOBITS;
@@ -2821,7 +3089,7 @@ int find_olc_type(char *name) {
 
 /**
 * @param char_data *ch The person trying to olc-edit.
-* @param int type Any OLC_x mode.
+* @param int type Any OLC_ mode.
 * @param any_vnum vnum The vnum they are trying to edit.
 */
 bool player_can_olc_edit(char_data *ch, int type, any_vnum vnum) {
@@ -2895,6 +3163,15 @@ bool player_can_olc_edit(char_data *ch, int type, any_vnum vnum) {
 			return TRUE;
 		}
 		else if (IS_SET(type, OLC_SECTOR) && OLC_FLAGGED(ch, OLC_FLAG_SECTORS)) {
+			return TRUE;
+		}
+		else if (IS_SET(type, OLC_ABILITY) && OLC_FLAGGED(ch, OLC_FLAG_ABILITIES)) {
+			return TRUE;
+		}
+		else if (IS_SET(type, OLC_CLASS) && OLC_FLAGGED(ch, OLC_FLAG_CLASSES)) {
+			return TRUE;
+		}
+		else if (IS_SET(type, OLC_SKILL) && OLC_FLAGGED(ch, OLC_FLAG_SKILLS)) {
 			return TRUE;
 		}
 		else if (IS_SET(type, OLC_BOOK)) {

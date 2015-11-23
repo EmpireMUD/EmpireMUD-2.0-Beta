@@ -41,7 +41,10 @@
 #define OLC_BOOK  BIT(11)
 #define OLC_AUGMENT  BIT(12)
 #define OLC_ARCHETYPE  BIT(13)
-#define NUM_OLC_TYPES  14
+#define OLC_ABILITY  BIT(14)
+#define OLC_CLASS  BIT(15)
+#define OLC_SKILL  BIT(16)
+#define NUM_OLC_TYPES  17
 
 
 // olc command flags
@@ -66,6 +69,9 @@
 #define OLC_FLAG_NO_GLOBAL  BIT(12)	// cannot edit globals
 #define OLC_FLAG_NO_AUGMENT  BIT(13)	// cannot edit augs
 #define OLC_FLAG_NO_ARCHETYPE  BIT(14)	// cannot edit archetypes
+#define OLC_FLAG_ABILITIES  BIT(15)	// CAN edit abilities
+#define OLC_FLAG_CLASSES  BIT(16)	// CAN edit classes
+#define OLC_FLAG_SKILLS  BIT(17)	// CAN edit skills
 
 
 // for trigger editing
@@ -80,8 +86,8 @@
 struct olc_command_data {
 	char *command;
 	void (*func)(char_data *ch, int type, char *argument);
-	int valid_types;	// OLC_x type const
-	int flags;	// OLC_CF_x
+	int valid_types;	// OLC_ type const
+	int flags;	// OLC_CF_
 };
 
 

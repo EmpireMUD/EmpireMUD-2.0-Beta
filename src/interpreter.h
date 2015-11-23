@@ -31,7 +31,7 @@ struct command_info {
 	int	subcmd;
 	byte ctype;
 	sh_int flags;
-	sh_int ability;
+	any_vnum ability;
 };
 
 

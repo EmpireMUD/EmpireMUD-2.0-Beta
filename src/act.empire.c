@@ -4331,10 +4331,10 @@ ACMD(do_roster) {
 		// display:
 		timed_out = member_is_timed_out_ch(member);
 		if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
-			size += snprintf(buf + size, sizeof(buf) - size, "[%d %s %s] <%s&0> %s%s&0", !is_file ? GET_COMPUTED_LEVEL(member) : GET_LAST_KNOWN_LEVEL(member), class_data[GET_CLASS(member)].name, class_role[GET_CLASS_ROLE(member)], EMPIRE_RANK(e, GET_RANK(member) - 1), (timed_out ? "&r" : ""), PERS(member, member, TRUE));
+			size += snprintf(buf + size, sizeof(buf) - size, "[%d %s %s] <%s&0> %s%s&0", !is_file ? GET_COMPUTED_LEVEL(member) : GET_LAST_KNOWN_LEVEL(member), SHOW_CLASS_NAME(member), class_role[GET_CLASS_ROLE(member)], EMPIRE_RANK(e, GET_RANK(member) - 1), (timed_out ? "&r" : ""), PERS(member, member, TRUE));
 		}
 		else {	// not screenreader
-			size += snprintf(buf + size, sizeof(buf) - size, "[%d %s%s\t0] <%s&0> %s%s&0", !is_file ? GET_COMPUTED_LEVEL(member) : GET_LAST_KNOWN_LEVEL(member), class_role_color[GET_CLASS_ROLE(member)], class_data[GET_CLASS(member)].name, EMPIRE_RANK(e, GET_RANK(member) - 1), (timed_out ? "&r" : ""), PERS(member, member, TRUE));
+			size += snprintf(buf + size, sizeof(buf) - size, "[%d %s%s\t0] <%s&0> %s%s&0", !is_file ? GET_COMPUTED_LEVEL(member) : GET_LAST_KNOWN_LEVEL(member), class_role_color[GET_CLASS_ROLE(member)], SHOW_CLASS_NAME(member), EMPIRE_RANK(e, GET_RANK(member) - 1), (timed_out ? "&r" : ""), PERS(member, member, TRUE));
 		}
 						
 		// online/not

@@ -972,8 +972,8 @@ Gives a list of the virtual numbers of objects or mobiles which have the
 specified name. If you specify more than one keyword, it will find things
 that match ALL of those keywords.
 
-Valid types are: adventure, archetype, augment, book, building, craft, crop,
-                 global, obj, mob, roomtemplate, sector
+Valid types are: adventure, ability, archetype, augment, book, building, craft,
+                 class, crop, global, obj, mob, roomtemplate, sector, skill
 
 Examples:
 
@@ -993,8 +993,8 @@ Usage:  vstat <type> <vnum>
 
 Used to stat a prototypical object by virtual number.
 
-Valid types are: adventure, archetype, augment, building, book, craft, crop,
-                 global, obj, mob, roomtemplate, sector
+Valid types are: adventure, ability, archetype, augment, building, book, craft,
+                 class, crop, global, obj, mob, roomtemplate, sector, skill
 
 Examples:
 
