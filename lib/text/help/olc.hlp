@@ -719,10 +719,10 @@ Capitalized).
 
 See also: OLC ARCHETYPES
 #d
-"ARCHEDIT SKILLS"
+"ARCHEDIT STARTINGSKILLS" "ARCHEDIT STARTING SKILLS"
 
-Usage:  .skill <add | change> <name> <level>
-        .skill remove <name>
+Usage:  .startingskill <add | change> <name> <level>
+        .startingskill remove <name>
 
 Archetypes determine a player's starting skill levels. Players should begin
 the game with a small number of skill points split between one or two skills.

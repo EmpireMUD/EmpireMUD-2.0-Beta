@@ -1517,7 +1517,7 @@ void olc_show_archetype(char_data *ch) {
 	for (sk = GET_ARCH_SKILLS(arch); sk; sk = sk->next) {
 		total += sk->level;
 	}
-	sprintf(buf + strlen(buf), "Skills: <\tyskill\t0> (%d total skill points)\r\n", total);
+	sprintf(buf + strlen(buf), "Starting skills: <\tystartingskill\t0> (%d total skill points)\r\n", total);
 	for (sk = GET_ARCH_SKILLS(arch); sk; sk = sk->next) {
 		sprintf(buf + strlen(buf), "  %s: %d\r\n", get_skill_name_by_vnum(sk->skill), sk->level);
 	}
