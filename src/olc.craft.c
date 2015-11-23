@@ -420,7 +420,7 @@ void olc_show_craft(char_data *ch) {
 			sprintf(buf1 + strlen(buf1), " (%s %d)", SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
 		}
 	}
-	sprintf(buf + strlen(buf), "<&yability&0> %s\r\n", buf1);
+	sprintf(buf + strlen(buf), "<&yrequiresability&0> %s\r\n", buf1);
 	
 	sprintf(buf + strlen(buf), "<&ylevelrequired&0> %d\r\n", GET_CRAFT_MIN_LEVEL(craft));
 

@@ -373,10 +373,10 @@ const struct olc_command_data olc_data[] = {
 	{ "skill", archedit_skill, OLC_ARCHETYPE, OLC_CF_EDITOR },
 	
 	// augments
-	{ "ability", augedit_ability, OLC_AUGMENT, OLC_CF_EDITOR },
 	{ "apply", augedit_apply, OLC_AUGMENT, OLC_CF_EDITOR },
 	{ "flags", augedit_flags, OLC_AUGMENT, OLC_CF_EDITOR },
 	{ "name", augedit_name, OLC_AUGMENT, OLC_CF_EDITOR },
+	{ "requiresability", augedit_ability, OLC_AUGMENT, OLC_CF_EDITOR },
 	{ "requiresobject", augedit_requiresobject, OLC_AUGMENT, OLC_CF_EDITOR },
 	{ "resource", augedit_resource, OLC_AUGMENT, OLC_CF_EDITOR },
 	{ "type", augedit_type, OLC_AUGMENT, OLC_CF_EDITOR },
@@ -415,7 +415,6 @@ const struct olc_command_data olc_data[] = {
 	// class commands
 	
 	// craft commands
-	{ "ability", cedit_ability, OLC_CRAFT, OLC_CF_EDITOR },
 	{ "builds", cedit_builds, OLC_CRAFT, OLC_CF_EDITOR },
 	{ "buildfacing", cedit_buildfacing, OLC_CRAFT, OLC_CF_EDITOR },
 	{ "buildon", cedit_buildon, OLC_CRAFT, OLC_CF_EDITOR },
@@ -425,6 +424,7 @@ const struct olc_command_data olc_data[] = {
 	{ "liquid", cedit_liquid, OLC_CRAFT, OLC_CF_EDITOR },
 	{ "name", cedit_name, OLC_CRAFT, OLC_CF_EDITOR },
 	{ "quantity", cedit_quantity, OLC_CRAFT, OLC_CF_EDITOR },
+	{ "requiresability", cedit_ability, OLC_CRAFT, OLC_CF_EDITOR },
 	{ "requiresobject", cedit_requiresobject, OLC_CRAFT, OLC_CF_EDITOR },
 	{ "resource", cedit_resource, OLC_CRAFT, OLC_CF_EDITOR },
 	{ "time", cedit_time, OLC_CRAFT, OLC_CF_EDITOR },
@@ -446,7 +446,6 @@ const struct olc_command_data olc_data[] = {
 	{ "ymin", cropedit_ymin, OLC_CROP, OLC_CF_EDITOR },
 	
 	// globals commands
-	{ "ability", gedit_ability, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "capacity", gedit_capacity, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "flags", gedit_flags, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "gear", gedit_gear, OLC_GLOBAL, OLC_CF_EDITOR },
@@ -457,6 +456,7 @@ const struct olc_command_data olc_data[] = {
 	{ "mobflags", gedit_mobflags, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "name", gedit_name, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "percent", gedit_percent, OLC_GLOBAL, OLC_CF_EDITOR },
+	{ "requiresability", gedit_ability, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "sectorexclude", gedit_sectorexclude, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "sectorflags", gedit_sectorflags, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "type", gedit_type, OLC_GLOBAL, OLC_CF_EDITOR },

@@ -758,15 +758,6 @@ For notes on the mud's building rules, see HELP BUILDING GUIDE.
 
 See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
 #d
-"AUGEDIT ABILITY"
-
-Usage:  .ability <name | none>
-
-This allows you to require the player to have a certain ability in order to
-apply this augment. Setting it to 'none' removes this requirement.
-
-See also: OLC AUGMENTS
-#d
 "AUGEDIT APPLY" "AUGEDIT APPLIES"
 
 Usage:  .apply add <value> <apply>
@@ -811,6 +802,15 @@ simple.
 
 For example, if an enchantment augment is named "striking", the player will
 use it by typing "enchant sword striking".
+
+See also: OLC AUGMENTS
+#d
+"AUGEDIT REQUIRESABILITY" "AUGEDIT REQUIRES ABILITY"
+
+Usage:  .requiresability <name | none>
+
+This allows you to require the player to have a certain ability in order to
+apply this augment. Setting it to 'none' removes this requirement.
 
 See also: OLC AUGMENTS
 #d
@@ -1218,15 +1218,6 @@ and only if it's buildable.
 
 See also: OLC BUILDINGS, UPGRADE, VNUM
 #d
-"CEDIT ABILITY"
-
-Usage:  .ability <ability name | none>
-
-You can use this command to set which ability is required to use a particular
-craft recipe. If you don't want it to require an ability any more, use 'none'.
-
-See also: OLC CRAFTS
-#d
 "CEDIT BUILDFACING" "CEDIT BUILD FACING"
 
 Usage:  .buildfacing [add | remove] <flags>
@@ -1389,6 +1380,15 @@ quantity.
 
 See also: CEDIT CREATES, OLC CRAFTS
 #d
+"CEDIT REQUIRESABILITY" "CEDIT REQUIRES ABILITY"
+
+Usage:  .requiresability <ability name | none>
+
+You can use this command to set which ability is required to use a particular
+craft recipe. If you don't want it to require an ability any more, use 'none'.
+
+See also: OLC CRAFTS
+#d
 "CEDIT REQUIRESOBJECT" "CEDIT REQUIRES OBJECT"
 
 Usage:  .requiresobject <vnum>
@@ -1461,7 +1461,7 @@ Available types are:
  BREW - potions
  MIX - poisons
 
-See also: CEDIT ABILITY, OLC CRAFTS
+See also: CEDIT REQUIRESABILITY, OLC CRAFTS
 #d
 "CEDIT VOLUME"
 
@@ -1561,16 +1561,6 @@ covered by the crops.
 
 See also: OLC CROPS
 #d
-"GEDIT ABILITY"
-
-Usage:  .ability <name | none>
-
-This allows you to require the player to have a certain ability in order to
-trigger this global (of any type). Setting it to 'none' removes this
-requirement.
-
-See also: OLC GLOBALS
-#d
 "GEDIT FLAGS"
 
 Usage:  .flags [add | remove] <flags>
@@ -1656,6 +1646,16 @@ globals together. If multiple globals have the CUMULATIVE-PRC flag, only one
 of them will be chosen (if any), based on a cumulative percentage.
 
 More than one global may be selected if the CUMULATIVE-PRC flag is not set.
+
+See also: OLC GLOBALS
+#d
+"GEDIT REQUIRESABILITY" "GEDIT REQUIRES ABILITY"
+
+Usage:  .requiresability <name | none>
+
+This allows you to require the player to have a certain ability in order to
+trigger this global (of any type). Setting it to 'none' removes this
+requirement.
 
 See also: OLC GLOBALS
 #d

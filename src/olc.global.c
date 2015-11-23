@@ -389,7 +389,7 @@ void olc_show_global(char_data *ch) {
 				sprintf(buf1 + strlen(buf1), " (%s %d)", SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
 			}
 		}
-		sprintf(buf + strlen(buf), "<&yability&0> %s\r\n", buf1);
+		sprintf(buf + strlen(buf), "<&yrequiresability&0> %s\r\n", buf1);
 	}
 	
 	sprintf(buf + strlen(buf), "<&ypercent&0> %.2f%%\r\n", GET_GLOBAL_PERCENT(glb));

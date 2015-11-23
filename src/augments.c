@@ -832,7 +832,7 @@ void olc_show_augment(char_data *ch) {
 			sprintf(buf1 + strlen(buf1), " (%s %d)", SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
 		}
 	}
-	sprintf(buf + strlen(buf), "<\tyability\t0> %s\r\n", buf1);
+	sprintf(buf + strlen(buf), "<\tyrequiresability\t0> %s\r\n", buf1);
 
 	sprintf(buf + strlen(buf), "<\tyrequiresobject\t0> %d - %s\r\n", GET_AUG_REQUIRES_OBJ(aug), GET_AUG_REQUIRES_OBJ(aug) == NOTHING ? "none" : get_obj_name_by_proto(GET_AUG_REQUIRES_OBJ(aug)));
 	
