@@ -2618,7 +2618,7 @@ void get_skill_ability_display(struct skill_ability *list, struct skill_ability 
 			continue;	// wrong sub-tree
 		}
 		
-		size += snprintf(save_buffer + size, buflen - size, "%s%s%s @ %d%s", (any ? ", " : ""), colorize ? "\tc" : "", get_ability_name_by_vnum(abil->vnum), abil->level, colorize ? "\t0" : "");
+		size += snprintf(save_buffer + size, buflen - size, "%s%s%s @ %d%s", (any ? ", " : (parent ? "- " : "")), colorize ? "\tc" : "", get_ability_name_by_vnum(abil->vnum), abil->level, colorize ? "\t0" : "");
 		any = TRUE;
 		
 		// find any dependent abilities
