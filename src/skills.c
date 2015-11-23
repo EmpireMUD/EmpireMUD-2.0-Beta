@@ -2604,7 +2604,9 @@ void get_skill_ability_display(struct skill_ability *list, struct skill_ability 
 	char sub[MAX_STRING_LENGTH];
 	struct skill_ability *abil;
 	size_t size;
+	bool any;
 	
+	any = FALSE;
 	*save_buffer = '\0';
 	size = 0;
 	
@@ -2616,18 +2618,18 @@ void get_skill_ability_display(struct skill_ability *list, struct skill_ability 
 			continue;	// wrong sub-tree
 		}
 		
-		size += snprintf(save_buffer + size, buflen - size, "%s%s @ %d%s", colorize ? "\tc" : "", get_ability_name_by_vnum(abil->vnum), abil->level, colorize ? "\t0" : "");
+		size += snprintf(save_buffer + size, buflen - size, "%s%s%s @ %d%s", (parent && any ? ", " : ""), colorize ? "\tc" : "", get_ability_name_by_vnum(abil->vnum), abil->level, colorize ? "\t0" : "");
 		
 		// find any dependent abilities
 		get_skill_ability_display(list, abil, colorize, sub, sizeof(sub));
 		if (*sub) {
 			size += snprintf(save_buffer + size, buflen - size, " (%s)", sub);
 		}
-	}
 	
-	// crlf only on parent abilities
-	if (!parent && size > 0) {
-		size += snprintf(save_buffer + size, buflen - size, "\r\n");
+		// crlf only on parent abilities
+		if (!parent && size > 0) {
+			size += snprintf(save_buffer + size, buflen - size, "\r\n");
+		}
 	}
 }
 
