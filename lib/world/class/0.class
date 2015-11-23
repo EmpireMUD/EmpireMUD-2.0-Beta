@@ -3,8 +3,8 @@ Duke~
 Duke~
 0
 300 200 100 0
-R Battle 100
-R Empire 100
+R 0 100
+R 1 100
 A 1 230
 A 1 228
 A 2 230
@@ -16,16 +16,16 @@ Battlemage~
 BtMg~
 0
 200 200 200 0
-R Battle 100
-R High Sorcery 100
+R 0 100
+R 2 100
 S
 #3
 Werewolf~
 Wwlf~
 0
 200 200 200 0
-R Battle 100
-R Natural Magic 100
+R 0 100
+R 3 100
 A 1 219
 A 1 253
 A 1 213
@@ -44,8 +44,8 @@ Assassin~
 Assn~
 0
 200 300 100 0
-R Battle 100
-R Stealth 100
+R 0 100
+R 4 100
 A 2 218
 A 2 231
 S
@@ -54,8 +54,8 @@ Barbarian~
 Brbn~
 0
 300 200 100 0
-R Battle 100
-R Survival 100
+R 0 100
+R 5 100
 A 1 227
 A 2 26
 S
@@ -64,8 +64,8 @@ Steelsmith~
 Smth~
 0
 300 200 100 0
-R Battle 100
-R Trade 100
+R 0 100
+R 6 100
 A 2 241
 A 2 26
 A 5 241
@@ -75,8 +75,8 @@ Reaper~
 Reap~
 0
 300 200 100 0
-R Battle 100
-R Vampire 100
+R 0 100
+R 7 100
 A 1 38
 A 1 229
 A 1 227
@@ -87,8 +87,8 @@ Exarch~
 Exrc~
 0
 150 150 300 0
-R Empire 100
-R High Sorcery 100
+R 1 100
+R 2 100
 A 3 230
 A 3 248
 A 5 230
@@ -99,8 +99,8 @@ Luminary~
 Lmny~
 0
 150 150 300 0
-R Empire 100
-R Natural Magic 100
+R 1 100
+R 3 100
 A 3 230
 A 3 250
 A 3 254
@@ -122,8 +122,8 @@ Powerbroker~
 Pwbk~
 0
 200 300 100 0
-R Empire 100
-R Stealth 100
+R 1 100
+R 4 100
 A 2 230
 A 2 232
 A 5 230
@@ -133,8 +133,8 @@ Elder~
 Eldr~
 0
 200 200 200 0
-R Empire 100
-R Survival 100
+R 1 100
+R 5 100
 A 2 230
 A 5 230
 S
@@ -143,8 +143,8 @@ Guildsman~
 Gdsm~
 0
 200 200 200 0
-R Empire 100
-R Trade 100
+R 1 100
+R 6 100
 A 5 230
 A 5 242
 S
@@ -153,8 +153,8 @@ Ancient~
 Anct~
 0
 200 200 200 0
-R Empire 100
-R Vampire 100
+R 1 100
+R 7 100
 A 2 230
 A 5 230
 S
@@ -163,8 +163,8 @@ Archmage~
 Achm~
 0
 150 150 300 0
-R High Sorcery 100
-R Natural Magic 100
+R 2 100
+R 3 100
 A 3 219
 A 4 238
 A 4 263
@@ -176,8 +176,8 @@ Occultist~
 Oclt~
 0
 100 250 250 0
-R High Sorcery 100
-R Stealth 100
+R 2 100
+R 4 100
 A 2 233
 S
 #16
@@ -185,16 +185,16 @@ Theurge~
 Thrg~
 0
 200 100 300 0
-R High Sorcery 100
-R Survival 100
+R 2 100
+R 5 100
 S
 #17
 Artificer~
 Artf~
 0
 150 150 300 0
-R High Sorcery 100
-R Trade 100
+R 2 100
+R 6 100
 A 3 243
 A 5 243
 S
@@ -203,8 +203,8 @@ Lich~
 Lich~
 0
 150 150 300 0
-R High Sorcery 100
-R Vampire 100
+R 2 100
+R 7 100
 A 3 211
 S
 #19
@@ -212,8 +212,8 @@ Shadow Wolf~
 ShWf~
 0
 100 200 300 0
-R Natural Magic 100
-R Stealth 100
+R 3 100
+R 4 100
 A 2 234
 A 2 220
 A 2 212
@@ -229,8 +229,8 @@ Feral~
 Ferl~
 0
 150 150 300 0
-R Natural Magic 100
-R Survival 100
+R 3 100
+R 5 100
 A 1 258
 A 1 219
 A 1 213
@@ -245,8 +245,8 @@ Alchemist~
 Alch~
 0
 150 150 300 0
-R Natural Magic 100
-R Trade 100
+R 3 100
+R 6 100
 A 4 244
 A 4 238
 A 4 263
@@ -261,8 +261,8 @@ Necromancer~
 Necr~
 0
 150 150 300 0
-R Natural Magic 100
-R Vampire 100
+R 3 100
+R 7 100
 A 3 211
 A 3 219
 A 3 260
@@ -276,8 +276,8 @@ Bandit~
 Bndt~
 0
 250 250 100 0
-R Stealth 100
-R Survival 100
+R 4 100
+R 5 100
 A 2 235
 A 2 218
 S
@@ -286,8 +286,8 @@ Smuggler~
 Smgl~
 0
 200 300 100 0
-R Stealth 100
-R Trade 100
+R 4 100
+R 6 100
 A 2 236
 A 2 218
 A 2 245
@@ -298,8 +298,8 @@ Shade~
 Shde~
 0
 200 300 100 0
-R Stealth 100
-R Vampire 100
+R 4 100
+R 7 100
 A 2 21
 A 2 237
 S
@@ -308,8 +308,8 @@ Tinker~
 Tnkr~
 0
 250 250 100 0
-R Survival 100
-R Trade 100
+R 5 100
+R 6 100
 A 2 246
 A 5 246
 S
@@ -318,8 +318,8 @@ Wight~
 Wght~
 0
 300 200 100 0
-R Survival 100
-R Vampire 100
+R 5 100
+R 7 100
 A 2 21
 S
 #28
@@ -327,8 +327,8 @@ Antiquarian~
 Antq~
 0
 200 200 200 0
-R Trade 100
-R Vampire 100
+R 6 100
+R 7 100
 A 2 247
 A 5 247
 S
