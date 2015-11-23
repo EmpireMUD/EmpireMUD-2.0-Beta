@@ -298,6 +298,64 @@ is in.
 
 See also: BUILDING GUIDE
 #d
+ABILEDIT "OLC ABILITIES" "ABILITY EDITOR"
+
+Usage:  .abil <command>
+        .command
+
+The .olc ability editor allows you to configure the data for various abilities.
+The main properties set up here are names and mastery abilities.
+
+All commands in the editor arg highlighted in yellow and placed inside <angle
+braces>. You can get help on these commands by typing &yHELP ABILEDIT <COMMAND>&0.
+
+You can close an open editor with .abort or .save.
+
+Example:
+> .abil edit 123
+> .name Test Ability
+> .save
+
+For notes on the mud's building rules, see HELP BUILDING GUIDE.
+
+See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
+"ABILEDIT FLAGS" "ABILITY FLAGS"
+
+Usage:  .flags [add | remove] <flags>
+
+The following adventure flags are available:
+ * - There are noflags for abilities yet
+#d
+"ABILEDIT MASTERYABILITY" "ABILEDIT MASTERY ABILITY"
+
+Usage:  .masterability <ability>
+
+The mastery ability is a separate ability which boosts the performance of this
+ability if a player has both. For example, many crafting abilities have linked
+mastery abilities that result in the (superior) flag on crafts.
+
+Most abilities have no mastery ability.
+
+See also: OLC ABILITIES
+#d
+"ABILEDIT NAME"
+
+Usage:  .name <name>
+
+This lets you set an ability's name. Names should have each word capitalized
+and should be relatively short.
+
+By convention, active abilities (ones with their own commands) almost always
+have the same name one-word name as the command they will use.
+
+When a player types an ability name (e.g. to buy the ability), the game looks
+for exact matches first and then tries a multi-abbreviation approach, where
+each word typed by the user is matched sequentially. For example, "hor fo"
+matches "Horrid Form".
+
+See also: OLC ABILITIES
+#d
 "ADVEDIT AUTHOR"
 
 Usage:  .author <name>

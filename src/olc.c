@@ -46,6 +46,11 @@ OLC_MODULE(olc_set_flags);
 OLC_MODULE(olc_set_max_vnum);
 OLC_MODULE(olc_set_min_vnum);
 
+// ability modules
+OLC_MODULE(abiledit_flags);
+OLC_MODULE(abiledit_masteryability);
+OLC_MODULE(abiledit_name);
+
 // adventure zone modules
 OLC_MODULE(advedit_author);
 OLC_MODULE(advedit_description);
@@ -345,6 +350,9 @@ const struct olc_command_data olc_data[] = {
 	{ "setmaxvnum", olc_set_max_vnum, NOBITS, NOBITS },
 	
 	// ability commands
+	{ "flags", abiledit_flags, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "masteryability", abiledit_masteryability, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "name", abiledit_name, OLC_ABILITY, OLC_CF_EDITOR },
 	
 	// adventure zones
 	{ "author", advedit_author, OLC_ADVENTURE, OLC_CF_EDITOR },
