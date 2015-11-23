@@ -226,7 +226,7 @@ void update_class(char_data *ch) {
 	#define NUM_BEST  3
 	#define IGNORE_BOTTOM_SKILL_POINTS  30	// amount newbies should start with
 	#define BEST_SUM_REQUIRED_FOR_100  (2 * CLASS_SKILL_CAP + SPECIALTY_SKILL_CAP)
-	#define CLASS_LEVEL_BUFFER  25	// allows the class when still this much under the final level requirement
+	#define CLASS_LEVEL_BUFFER  24	// allows the class when still this much under the final level requirement
 	
 	int at_zero, over_basic, over_specialty, old_level, best_class_count, class_count;
 	int best[NUM_BEST], best_level[NUM_BEST], best_iter, best_sub, best_total;
