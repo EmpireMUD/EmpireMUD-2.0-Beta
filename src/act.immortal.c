@@ -6398,7 +6398,7 @@ ACMD(do_vnum) {
 			msg_to_char(ch, "No adventures by that name.\r\n");
 		}
 	}
-	else if (is_abbrev(buf, "archetype")) {
+	else if (is_abbrev(buf, "ability")) {
 		extern int vnum_ability(char *searchname, char_data *ch);
 		if (!vnum_ability(buf2, ch)) {
 			msg_to_char(ch, "No abilities by that name.\r\n");
