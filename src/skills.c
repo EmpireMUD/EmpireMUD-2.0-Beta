@@ -2225,7 +2225,7 @@ void parse_skill(FILE *fl, any_vnum vnum) {
 		}
 		switch (*line) {
 			case 'A': {	// ability assignment
-				if (!get_line(fl, line) || sscanf(line, "%d %d %d", &int_in[0], &int_in[1], &int_in[2]) != 3) {
+				if (sscanf(line, "A %d %d %d", &int_in[0], &int_in[1], &int_in[2]) != 3) {
 					log("SYSERR: Format error in A line of %s", error);
 					exit(1);
 				}
@@ -2298,7 +2298,7 @@ void write_skill_to_file(FILE *fl, skill_data *skill) {
 	
 	// A: abilities
 	LL_FOREACH(SKILL_ABILITIES(skill), iter) {
-		fprintf(fl, "A\n%d %d %d\n", iter->vnum, iter->prerequisite, iter->level);
+		fprintf(fl, "A %d %d %d\n", iter->vnum, iter->prerequisite, iter->level);
 	}
 	
 	// end
