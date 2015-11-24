@@ -33,7 +33,8 @@
 *   Utilities
 *   Database
 *   OLC Handlers
-*   Displays
+*   Skill Ability Display
+*   Main Displays
 *   Edit Modules
 */
 
@@ -52,7 +53,6 @@ void update_class(char_data *ch);
 bool can_gain_skill_from(char_data *ch, ability_data *abil);
 struct skill_ability *find_skill_ability(skill_data *skill, ability_data *abil);
 int get_ability_points_spent(char_data *ch, any_vnum skill);
-void get_skill_ability_display(struct skill_ability *list, struct skill_ability *parent, bool colorize, char *save_buffer, size_t buflen);
 bool green_skill_deadend(char_data *ch, any_vnum skill);
 
 
@@ -2583,7 +2583,155 @@ skill_data *setup_olc_skill(skill_data *input) {
 
 
  //////////////////////////////////////////////////////////////////////////////
-//// DISPLAYS ////////////////////////////////////////////////////////////////
+//// SKILL ABILITY DISPLAY ///////////////////////////////////////////////////
+
+struct skad_element {
+	char **text;
+	int lines;
+	struct skad_element *next;	// linked list
+};
+
+
+/**
+* Builds one block of text for a hierarchical ability list.
+*
+* @param struct skill_ability *list The whole list we're showing part of.
+* @param struct skill_ability *parent Which parent ability we are showing.
+* @param int indent Number of times to indent this row.
+* @param struct skad_element **skad A pointer to a list of skad elements, for storing the display.
+*/
+void get_skad_partial(struct skill_ability *list, struct skill_ability *parent, int indent, struct skad_element **skad) {
+	char buf[MAX_STRING_LENGTH];
+	struct skill_ability *abil;
+	
+	LL_FOREACH(list, abil) {
+		if (!parent && abil->prerequisite != NO_ABIL) {
+			continue;	// only showing freestanding abilities here
+		}
+		if (parent && abil->prerequisite != parent->vnum) {
+			continue;	// wrong sub-tree
+		}
+		
+		// have one to display
+		if (!*skad) {
+			CREATE(*skad, struct skad_element, 1);
+			(*skad)->lines = 0;
+			(*skad)->text = NULL;
+		}
+		
+		snprintf(buf, sizeof(buf), "%*s- [%5d] %s @ %d", (2 * indent), " ", abil->vnum, get_ability_name_by_vnum(abil->vnum), abil->level);
+		
+		// append line
+		if ((*skad)->lines > 0) {
+			RECREATE((*skad)->text, char*, (*skad)->lines + 1);
+		}
+		else {
+			CREATE((*skad)->text, char*, 1);
+		}
+		(*skad)->text[(*skad)->lines] = str_dup(buf);
+		++(*skad)->lines;
+		
+		// find any dependent abilities
+		get_skad_partial(list, abil, indent + 1, skad);
+	}
+}
+
+
+/**
+* Builds the two-column display of abilities for a skill.
+*
+* @param struct skill_ability *list The list to show.
+* @param char *save_buffer Text to write the result to.
+* @param size_t buflen The max length of save_buffer.
+*/
+void get_skill_ability_display(struct skill_ability *list, char *save_buffer, size_t buflen) {
+	struct skad_element *skad, *mid, **display = NULL;
+	char **left_text = NULL, **right_text = NULL;
+	int left_lines = 0, right_lines = 0;
+	int count, iter, total_lines;
+	size_t size;
+	
+	// prepare...
+	*save_buffer = '\0';
+	size = 0;
+	
+	// fetch set of columns
+	get_skad_partial(list, NULL, 0, display);
+	
+	if (!display || !*display) {
+		return;	// no work
+	}
+	
+	// determine number of blocks per column
+	total_lines = 0;
+	LL_FOREACH(*display, skad) {
+		total_lines += skad->lines;
+	}
+	
+	// determine approximate middle
+	mid = NULL;
+	count = 0;
+	LL_FOREACH(*display, skad) {
+		if (count + skad->lines > (total_lines / 2)) {
+			mid = skad;
+			break;
+		}
+	}
+	
+	// build left column: move string pointers over to new list
+	for (skad = *display; skad && skad != mid; skad = skad->next) {
+		if (left_lines > 0) {
+			RECREATE(left_text, char*, left_lines + skad->lines);
+		}
+		else {
+			CREATE(left_text, char*, skad->lines);
+		}
+		for (iter = 0; iter < skad->lines; ++iter) {
+			left_text[left_lines++] = skad->text[iter];
+		}
+	}
+	
+	// build right column: move string pointers over to new list
+	for (skad = mid; skad; skad = skad->next) {
+		if (right_lines > 0) {
+			RECREATE(right_text, char*, right_lines + skad->lines);
+		}
+		else {
+			CREATE(right_text, char*, skad->lines);
+		}
+		for (iter = 0; iter < skad->lines; ++iter) {
+			right_text[right_lines++] = skad->text[iter];
+		}
+	}
+	
+	iter = 0;
+	while (iter < left_lines && iter < right_lines) {
+		size += snprintf(save_buffer + size, buflen - size, " %38.38s", (iter < left_lines ? left_text[iter] : ""));
+		if (iter < right_lines) {
+			size += snprintf(save_buffer + size, buflen - size, " %38.38s\r\n", right_text[iter]);
+		}
+		else {
+			size += snprintf(save_buffer + size, buflen - size, "\r\n");
+		}
+	}
+	
+	// free all the things
+	LL_FOREACH_SAFE(*display, skad, mid) {
+		free(skad);
+	}
+	for (iter = 0; iter < left_lines; ++iter) {
+		free(left_text[iter]);
+	}
+	for (iter = 0; iter < right_lines; ++iter) {
+		free(right_text[iter]);
+	}
+	free(left_text);
+	free(right_text);
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// MAIN DISPLAYS ///////////////////////////////////////////////////////////
 
 /**
 * For vstat.
@@ -2611,57 +2759,12 @@ void do_stat_skill(char_data *ch, skill_data *skill) {
 	
 	LL_COUNT(SKILL_ABILITIES(skill), skab, total);
 	size += snprintf(buf + size, sizeof(buf) - size, "Simplified skill tree: (%d total)\r\n", total);
-	get_skill_ability_display(SKILL_ABILITIES(skill), NULL, TRUE, part, sizeof(part));
+	get_skill_ability_display(SKILL_ABILITIES(skill), part, sizeof(part));
 	if (*part) {
 		size += snprintf(buf + size, sizeof(buf) - size, "%s", part);
 	}
 	
 	page_string(ch->desc, buf, TRUE);
-}
-
-
-/**
-* Simplified display of the abilities in a skill.
-*
-* @param struct skill_ability *list The list to show.
-* @param struct skill_ability *parent If set, only shows abilities that depend on this one; if NULL, only show branch starts.
-* @param bool colorize If true, colors each entry cyan.
-* @param char *save_buffer The string to write the output to.
-* @param size_t buflen Max size of save_buffer.
-*/
-void get_skill_ability_display(struct skill_ability *list, struct skill_ability *parent, bool colorize, char *save_buffer, size_t buflen) {
-	char sub[MAX_STRING_LENGTH];
-	struct skill_ability *abil;
-	size_t size;
-	bool any;
-	
-	any = FALSE;
-	*save_buffer = '\0';
-	size = 0;
-	
-	LL_FOREACH(list, abil) {
-		if (!parent && abil->prerequisite != NO_ABIL) {
-			continue;	// only showing freestanding abilities here
-		}
-		if (parent && abil->prerequisite != parent->vnum) {
-			continue;	// wrong sub-tree
-		}
-		
-		size += snprintf(save_buffer + size, buflen - size, "%s%s%s @ %d%s", (any ? ", " : (parent ? "" : "- ")), colorize ? "\tc" : "", get_ability_name_by_vnum(abil->vnum), abil->level, colorize ? "\t0" : "");
-		any = TRUE;
-		
-		// find any dependent abilities
-		get_skill_ability_display(list, abil, colorize, sub, sizeof(sub));
-		if (*sub) {
-			size += snprintf(save_buffer + size, buflen - size, " (%s)", sub);
-		}
-	
-		// crlf only on parent abilities
-		if (!parent && size > 0) {
-			size += snprintf(save_buffer + size, buflen - size, "\r\n");
-			any = FALSE;
-		}
-	}
 }
 
 
@@ -2693,7 +2796,7 @@ void olc_show_skill(char_data *ch) {
 	
 	LL_COUNT(SKILL_ABILITIES(skill), skab, total);
 	sprintf(buf + strlen(buf), "<\tytree\t0> %d %s\r\n", total, total == 1 ? "ability" : "abilities");
-	get_skill_ability_display(SKILL_ABILITIES(skill), NULL, TRUE, lbuf, sizeof(lbuf));
+	get_skill_ability_display(SKILL_ABILITIES(skill), lbuf, sizeof(lbuf));
 	if (*lbuf) {
 		sprintf(buf + strlen(buf), "%s", lbuf);
 	}
@@ -2769,6 +2872,7 @@ OLC_MODULE(skilledit_name) {
 
 OLC_MODULE(skilledit_tree) {
 	extern ability_data *find_ability_on_skill(char *name, skill_data *skill);
+	extern bool is_class_ability(ability_data *abil);
 
 	skill_data *skill = GET_OLC_SKILL(ch->desc);
 	char cmd_arg[MAX_INPUT_LENGTH], abil_arg[MAX_INPUT_LENGTH], sub_arg[MAX_INPUT_LENGTH];
@@ -2793,6 +2897,9 @@ OLC_MODULE(skilledit_tree) {
 		}
 		else if (!(abil = find_ability(abil_arg))) {
 			msg_to_char(ch, "Unknown ability '%s'.\r\n", abil_arg);
+		}
+		else if (is_class_ability(abil)) {
+			msg_to_char(ch, "You can't assign %s to this skill because it's already assigned to a class.\r\n", ABIL_NAME(abil));
 		}
 		else if (!*sub_arg || !isdigit(*sub_arg) || (level = atoi(sub_arg)) < 0) {
 			msg_to_char(ch, "Add the ability at what level?\r\n");
