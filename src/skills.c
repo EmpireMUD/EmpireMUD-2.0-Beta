@@ -1785,6 +1785,10 @@ skill_data *find_skill(char *argument) {
 skill_data *find_skill_by_name(char *name) {
 	skill_data *skill, *next_skill, *partial = NULL;
 	
+	if (!*name) {
+		return NULL;	// shortcut
+	}
+	
 	HASH_ITER(sorted_hh, sorted_skills, skill, next_skill) {
 		if (SKILL_FLAGGED(skill, SKILLF_IN_DEVELOPMENT)) {
 			continue;

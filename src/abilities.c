@@ -90,6 +90,10 @@ ability_data *find_ability(char *argument) {
 ability_data *find_ability_by_name(char *name) {
 	ability_data *abil, *next_abil, *partial = NULL;
 	
+	if (!*name) {
+		return NULL;	// shortcut
+	}
+	
 	HASH_ITER(sorted_hh, sorted_abilities, abil, next_abil) {
 		// matches:
 		if (!str_cmp(name, ABIL_NAME(abil))) {
