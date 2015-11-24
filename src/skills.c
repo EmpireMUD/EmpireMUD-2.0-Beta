@@ -2680,6 +2680,7 @@ void get_skill_ability_display(struct skill_ability *list, char *save_buffer, si
 			mid = skad;
 			break;
 		}
+		count += skad->lines;
 	}
 	
 	// build left column: move string pointers over to new list
