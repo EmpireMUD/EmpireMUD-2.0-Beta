@@ -1286,9 +1286,14 @@ OLC_MODULE(classedit_role) {
 	argument = any_one_arg(argument, cmd_arg);
 	skip_spaces(&argument);
 	
-	// detect role
+	// first args
 	if (*role_arg && (role = search_block(role_arg, class_role, FALSE)) == NOTHING) {
 		msg_to_char(ch, "Invalid role '%s'.\r\n", role_arg);
+		return;
+	}
+	else if (!*cmd_arg) {
+		msg_to_char(ch, "Usage: role <role> add <ability>\r\n");
+		msg_to_char(ch, "       role <role> remove <ability | all>\r\n");
 		return;
 	}
 	

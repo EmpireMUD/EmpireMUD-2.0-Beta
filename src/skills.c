@@ -2057,6 +2057,31 @@ bool remove_vnum_from_skill_abilities(struct skill_ability **list, any_vnum vnum
 }
 
 
+/**
+* Sorts skill abilities alphabetically.
+*
+* @param struct skill_ability *a First element.
+* @param struct skill_ability *b Second element.
+* @return int sort code
+*/
+int sort_skill_abilities(struct skill_ability *a, struct skill_ability *b) {
+	ability_data *a_abil, *b_abil;
+	
+	a_abil = find_ability_by_vnum(a->vnum);
+	b_abil = find_ability_by_vnum(b->vnum);
+	
+	if (a_abil && b_abil) {
+		return strcmp(ABIL_NAME(a_abil), ABIL_NAME(b_abil));
+	}
+	else if (a_abil) {
+		return -1;
+	}
+	else {
+		return 1;
+	}
+}
+
+
 // Simple vnum sorter for the skill hash
 int sort_skills(skill_data *a, skill_data *b) {
 	return SKILL_VNUM(a) - SKILL_VNUM(b);
@@ -2806,6 +2831,7 @@ OLC_MODULE(skilledit_tree) {
 				skab->vnum = ABIL_VNUM(abil);
 				skab->level = level;
 				skab->prerequisite = requires ? ABIL_VNUM(requires) : NOTHING;
+				LL_APPEND(SKILL_ABILITIES(skill), skab);
 			}
 			
 			msg_to_char(ch, "You assign %s at level %d", ABIL_NAME(abil), level);
@@ -2815,6 +2841,9 @@ OLC_MODULE(skilledit_tree) {
 			else {
 				msg_to_char(ch, ".\r\n");
 			}
+			
+			// in case
+			LL_SORT(SKILL_ABILITIES(skill), sort_skill_abilities);
 		}
 	}
 	else if (is_abbrev(cmd_arg, "remove")) {
@@ -2920,6 +2949,9 @@ OLC_MODULE(skilledit_tree) {
 		else {
 			msg_to_char(ch, "You can change the level or requirement.\r\n");
 		}
+		
+		// in case
+		LL_SORT(SKILL_ABILITIES(skill), sort_skill_abilities);
 	}
 	else {
 		msg_to_char(ch, "Usage: tree add <ability> <level> [requires ability]\r\n");
