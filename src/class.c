@@ -41,6 +41,7 @@ const char *default_class_abbrev = "???";
 // local protos
 void get_class_ability_display(struct class_ability *list, char *save_buffer, char_data *info_ch);
 void get_class_skill_display(struct class_skill_req *list, char *save_buffer, bool one_line);
+int sort_class_abilities(struct class_ability *a, struct class_ability *b);
 
 // external consts
 extern const char *class_flags[];
@@ -150,6 +151,9 @@ void check_classes(void) {
 		if (error) {
 			SET_BIT(CLASS_FLAGS(cls), CLASSF_IN_DEVELOPMENT);
 		}
+		
+		// ensure sorting now
+		LL_SORT(CLASS_ABILITIES(cls), sort_class_abilities);
 	}
 }
 

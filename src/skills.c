@@ -54,6 +54,7 @@ bool can_gain_skill_from(char_data *ch, ability_data *abil);
 struct skill_ability *find_skill_ability(skill_data *skill, ability_data *abil);
 int get_ability_points_spent(char_data *ch, any_vnum skill);
 bool green_skill_deadend(char_data *ch, any_vnum skill);
+int sort_skill_abilities(struct skill_ability *a, struct skill_ability *b);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1712,6 +1713,9 @@ void check_skills(void) {
 		if (error) {
 			SET_BIT(SKILL_FLAGS(skill), SKILLF_IN_DEVELOPMENT);
 		}
+		
+		// ensure sort
+		LL_SORT(SKILL_ABILITIES(skill), sort_skill_abilities);
 	}
 }
 
