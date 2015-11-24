@@ -1046,9 +1046,6 @@ void get_class_ability_display(struct class_ability *list, char *save_buffer, ch
 	ability_data *abil;
 	
 	*save_buffer = '\0';
-	
-	// ensure sorting first, as this arranges the roles
-	LL_SORT(list, sort_class_abilities);
 
 	LL_FOREACH(list, iter) {
 		if (iter->role != last_role) {
@@ -1328,6 +1325,9 @@ OLC_MODULE(classedit_role) {
 			LL_APPEND(CLASS_ABILITIES(cls), clab);
 			msg_to_char(ch, "You add %s to the %s role.\r\n", ABIL_NAME(abil), class_role[role]);
 		}
+		
+		// ensure sorting now
+		LL_SORT(CLASS_ABILITIES(cls), sort_class_abilities);
 	}
 	else if (is_abbrev(cmd_arg, "remove")) {
 		any = FALSE;
