@@ -116,6 +116,13 @@ OLC_MODULE(bedit_spawns);
 OLC_MODULE(bedit_title);
 OLC_MODULE(bedit_upgradesto);
 
+// class modules
+OLC_MODULE(classedit_abbrev);
+OLC_MODULE(classedit_flags);
+OLC_MODULE(classedit_name);
+OLC_MODULE(classedit_requires);
+OLC_MODULE(classedit_role);
+
 // craft modules
 OLC_MODULE(cedit_ability);
 OLC_MODULE(cedit_buildfacing);
@@ -266,6 +273,13 @@ OLC_MODULE(sectedit_name);
 OLC_MODULE(sectedit_roadsideicon);
 OLC_MODULE(sectedit_spawns);
 OLC_MODULE(sectedit_title);
+
+// skill modules
+OLC_MODULE(skilledit_abbrev);
+OLC_MODULE(skilledit_description);
+OLC_MODULE(skilledit_flags);
+OLC_MODULE(skilledit_name);
+OLC_MODULE(skilledit_tree);
 
 // trigger modules
 OLC_MODULE(tedit_argtype);
@@ -421,6 +435,11 @@ const struct olc_command_data olc_data[] = {
 	{ "upgradesto", bedit_upgradesto, OLC_BUILDING, OLC_CF_EDITOR },
 	
 	// class commands
+	{ "abbrev", classedit_abbrev, OLC_CLASS, OLC_CF_EDITOR },
+	{ "flags", classedit_flags, OLC_CLASS, OLC_CF_EDITOR },
+	{ "name", classedit_name, OLC_CLASS, OLC_CF_EDITOR },
+	{ "requires", classedit_requires, OLC_CLASS, OLC_CF_EDITOR },
+	{ "role", classedit_role, OLC_CLASS, OLC_CF_EDITOR },
 	
 	// craft commands
 	{ "builds", cedit_builds, OLC_CRAFT, OLC_CF_EDITOR },
@@ -575,7 +594,12 @@ const struct olc_command_data olc_data[] = {
 	{ "title", sectedit_title, OLC_SECTOR, OLC_CF_EDITOR },
 	
 	// skill commands
-
+	{ "abbrev", skilledit_abbrev, OLC_SKILL, OLC_CF_EDITOR },
+	{ "description", skilledit_description, OLC_SKILL, OLC_CF_EDITOR },
+	{ "flags", skilledit_flags, OLC_SKILL, OLC_CF_EDITOR },
+	{ "name", skilledit_name, OLC_SKILL, OLC_CF_EDITOR },
+	{ "tree", skilledit_tree, OLC_SKILL, OLC_CF_EDITOR },
+	
 	// trigger commands
 	{ "argtype", tedit_argtype, OLC_TRIGGER, OLC_CF_EDITOR },
 	{ "attaches", tedit_attaches, OLC_TRIGGER, OLC_CF_EDITOR },

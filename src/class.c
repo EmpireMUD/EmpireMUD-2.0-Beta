@@ -44,8 +44,8 @@ void get_class_skill_display(struct class_skill_req *list, char *save_buffer, bo
 
 // external consts
 extern const char *class_flags[];
-extern const char *class_role[NUM_ROLES];
-extern const char *class_role_color[NUM_ROLES];
+extern const char *class_role[];
+extern const char *class_role_color[];
 extern const char *pool_types[];
 
 // external funcs
@@ -1190,10 +1190,173 @@ OLC_MODULE(classedit_name) {
 
 
 OLC_MODULE(classedit_requires) {
+	class_data *cls = GET_OLC_CLASS(ch->desc);
+	struct class_skill_req *clsk, *next_clsk;
+	char skill_arg[MAX_INPUT_LENGTH];
+	bool found, remove = FALSE;
+	skill_data *skill;
+	int iter, level = 0;
+	
+	int valid_levels[] = { 0, BASIC_SKILL_CAP, SPECIALTY_SKILL_CAP, CLASS_SKILL_CAP, -1 };
+	
+	if (!*argument) {
+		msg_to_char(ch, "Usage: requires <skill> <level>\r\n");
+		msg_to_char(ch, "       requires remove <skill>\r\n");
+		return;
+	}
+	
+	argument = any_one_word(argument, skill_arg);
+		
+	// optional first word is type
+	if (is_abbrev(skill_arg, "add")) {
+		argument = any_one_word(argument, skill_arg);	// fetch next arg
+	}
+	else if (is_abbrev(skill_arg, "remove")) {
+		remove = TRUE;
+		argument = any_one_word(argument, skill_arg);	// fetch next arg
+	}
+	
+	// look up skill
+	if (!(skill = find_skill(skill_arg))) {
+		msg_to_char(ch, "Invalid skill '%s'.\r\n", skill_arg);
+		return;
+	}
+	
+	// check for level arg
+	if (!remove) {
+		skip_spaces(&argument);
+		if (!*argument || !isdigit(*argument) || (level = atoi(argument) < 0)) {
+			msg_to_char(ch, "Require what level of %s?\r\n", SKILL_NAME(skill));
+			return;
+		}
+		found = FALSE;
+		for (iter = 0; valid_levels[iter] != -1; ++iter) {
+			if (level == valid_levels[iter]) {
+				found = TRUE;
+			}
+		}
+		if (!found) {
+			msg_to_char(ch, "Invalid skill requirement. Please set it to one of the progression caps.\r\n");
+			return;
+		}
+	}
+	
+	// ok, ready to add or remove
+	if (remove || level == 0) {
+		LL_FOREACH_SAFE(CLASS_SKILL_REQUIREMENTS(cls), clsk, next_clsk) {
+			if (clsk->vnum == SKILL_VNUM(skill)) {
+				LL_DELETE(CLASS_SKILL_REQUIREMENTS(cls), clsk);
+				free(clsk);
+			}
+		}
+		msg_to_char(ch, "It will require no %s.\r\n", SKILL_NAME(skill));
+	}
+	else {
+		found = FALSE;
+		LL_FOREACH(CLASS_SKILL_REQUIREMENTS(cls), clsk) {
+			if (clsk->vnum == SKILL_VNUM(skill)) {
+				clsk->level = level;
+				found = TRUE;
+			}
+		}
+		
+		// need to add?
+		if (!found) {
+			CREATE(clsk, struct class_skill_req, 1);
+			clsk->vnum = SKILL_VNUM(skill);
+			clsk->level = level;
+			LL_APPEND(CLASS_SKILL_REQUIREMENTS(cls), clsk);
+		}
+		
+		msg_to_char(ch, "It now requires %s %d.\r\n", SKILL_NAME(skill), level);
+	}
 }
 
 
 OLC_MODULE(classedit_role) {
+	class_data *cls = GET_OLC_CLASS(ch->desc);
+	char cmd_arg[MAX_INPUT_LENGTH], role_arg[MAX_INPUT_LENGTH];
+	struct class_ability *clab, *next_clab;
+	int role = ROLE_NONE;
+	ability_data *abil;
+	bool all, any;
+	
+	argument = any_one_word(argument, role_arg);
+	argument = any_one_arg(argument, cmd_arg);
+	skip_spaces(&argument);
+	
+	// detect role
+	if (*role_arg && (role = search_block(role_arg, class_role, FALSE)) == NOTHING) {
+		msg_to_char(ch, "Invalid role '%s'.\r\n", role_arg);
+		return;
+	}
+	
+	// argument pre-processing
+	abil = find_ability(argument);
+	all = !str_cmp(argument, "all");
+	if (!all && !abil) {
+		msg_to_char(ch, "Invalid ability '%s'.\r\n", argument);
+		return;
+	}
+	
+	// actual commands
+	if (is_abbrev(cmd_arg, "add")) {
+		if (!abil) {
+			msg_to_char(ch, "Add which ability?\r\n");
+			return;
+		}
+		if (ABIL_ASSIGNED_SKILL(abil)) {
+			msg_to_char(ch, "You can't assign an ability that is already assigned to a skill (%s).\r\n", SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)));
+			return;
+		}
+		
+		any = FALSE;
+		LL_FOREACH(CLASS_ABILITIES(cls), clab) {
+			if (clab->role == role && clab->vnum == ABIL_VNUM(abil)) {
+				any = TRUE;
+				break;
+			}
+		}
+		
+		if (any) {
+			msg_to_char(ch, "It already has %s on the %s role.\r\n", ABIL_NAME(abil), class_role[role]);
+		}
+		else {
+			CREATE(clab, struct class_ability, 1);
+			clab->role = role;
+			clab->vnum = ABIL_VNUM(abil);
+			LL_APPEND(CLASS_ABILITIES(cls), clab);
+			msg_to_char(ch, "You add %s to the %s role.\r\n", ABIL_NAME(abil), class_role[role]);
+		}
+	}
+	else if (is_abbrev(cmd_arg, "remove")) {
+		any = FALSE;
+		LL_FOREACH_SAFE(CLASS_ABILITIES(cls), clab, next_clab) {
+			if (clab->role != role) {
+				continue;
+			}
+			
+			if (all || (abil && clab->vnum == ABIL_VNUM(abil))) {
+				LL_DELETE(CLASS_ABILITIES(cls), clab);
+				free(clab);
+				any = TRUE;
+			}
+		}
+		
+		if (!any) {
+			msg_to_char(ch, "The %s role didn't have %s.\r\n", class_role[role], all ? "any abilities" : "that ability");
+		}
+		else if (all) {
+			msg_to_char(ch, "You remove all abilities from the %s role.\r\n", class_role[role]);
+		}
+		else {
+			msg_to_char(ch, "You remove %s from the %s role.\r\n", ABIL_NAME(abil), class_role[role]);
+		}
+	}
+	else {
+		msg_to_char(ch, "Usage: role <role> add <ability>\r\n");
+		msg_to_char(ch, "       role <role> remove <ability | all>\r\n");
+	}
 }
 
 
@@ -1205,7 +1368,7 @@ ACMD(do_class) {
 	
 	char arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	empire_data *emp = GET_LOYALTY(ch);
-	int iter, found;
+	int found;
 	
 	two_arguments(argument, arg, arg2);
 
@@ -1224,35 +1387,26 @@ ACMD(do_class) {
 		else if (GET_POS(ch) < POS_STANDING) {
 			msg_to_char(ch, "You can't change your class role right now!\r\n");
 		}
+		else if ((found = search_block(arg2, class_role, FALSE)) == NOTHING) {
+			msg_to_char(ch, "Unknown role '%s'.\r\n", arg2);
+		}
 		else {
-			found = NOTHING;
-			for (iter = 0; iter < NUM_ROLES && found == NOTHING; ++iter) {
-				if (is_abbrev(arg2, class_role[iter])) {
-					found = iter;
-				}
+			// remove old abilities
+			if (emp) {
+				adjust_abilities_to_empire(ch, emp, FALSE);
 			}
 			
-			if (found == NOTHING) {
-				msg_to_char(ch, "Unknown role '%s'.\r\n", arg2);
+			// change role
+			GET_CLASS_ROLE(ch) = found;
+			
+			// add new abilities
+			assign_class_abilities(ch, NULL, NOTHING);
+			if (emp) {
+				adjust_abilities_to_empire(ch, emp, TRUE);
+				resort_empires();
 			}
-			else {
-				// remove old abilities
-				if (emp) {
-					adjust_abilities_to_empire(ch, emp, FALSE);
-				}
-				
-				// change role
-				GET_CLASS_ROLE(ch) = found;
-				
-				// add new abilities
-				assign_class_abilities(ch, NULL, NOTHING);
-				if (emp) {
-					adjust_abilities_to_empire(ch, emp, TRUE);
-					resort_empires();
-				}
-				
-				msg_to_char(ch, "Your class role is now: %s.\r\n", class_role[(int) GET_CLASS_ROLE(ch)]);
-			}
+			
+			msg_to_char(ch, "Your class role is now: %s.\r\n", class_role[(int) GET_CLASS_ROLE(ch)]);
 		}
 	}
 	else if (*arg) {

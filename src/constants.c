@@ -218,7 +218,7 @@ const char *augment_flags[] = {
  //////////////////////////////////////////////////////////////////////////////
 //// CLASS CONSTANTS /////////////////////////////////////////////////////////
 
-// CLASS_x: class flags
+// CLASSF_x: class flags
 const char *class_flags[] = {
 	"IN-DEVELOPMENT",
 	"\n"
@@ -431,24 +431,26 @@ const char *preference_bits[] = {
 
 
 // ROLE_x (1/2): role names
-const char *class_role[NUM_ROLES] = {
+const char *class_role[] = {
 	"none",
 	"Tank",
 	"Melee",
 	"Caster",
 	"Healer",
-	"Utility"
+	"Utility",
+	"\n"
 };
 
 
 // ROLE_x (2/2): role colors for who list
-const char *class_role_color[NUM_ROLES] = {
+const char *class_role_color[] = {
 	"\t0",
 	"\ty",	// tank
 	"\tr",	// melee
 	"\ta",	// caster
 	"\tj",	// healer
-	"\tm"	// utility
+	"\tm",	// utility
+	"\n"
 };
 
 

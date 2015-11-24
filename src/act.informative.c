@@ -35,8 +35,8 @@
 
 // extern variables
 extern struct city_metadata_type city_type[];
-extern const char *class_role[NUM_ROLES];
-extern const char *class_role_color[NUM_ROLES];
+extern const char *class_role[];
+extern const char *class_role_color[];
 extern const char *dirs[];
 extern struct help_index_element *help_table;
 extern int top_of_helpt;

@@ -2539,7 +2539,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 	void display_attributes(char_data *ch, char_data *to);
 
 	extern const char *account_flags[];
-	extern const char *class_role[NUM_ROLES];
+	extern const char *class_role[];
 	extern const char *cooldown_types[];
 	extern const char *damage_types[];
 	extern const double hit_per_dex;

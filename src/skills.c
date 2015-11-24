@@ -2740,5 +2740,173 @@ OLC_MODULE(skilledit_name) {
 
 OLC_MODULE(skilledit_tree) {
 	skill_data *skill = GET_OLC_SKILL(ch->desc);
-	msg_to_char(ch, "TODO: .tree\r\n");
+	char cmd_arg[MAX_INPUT_LENGTH], abil_arg[MAX_INPUT_LENGTH], sub_arg[MAX_INPUT_LENGTH];
+	struct skill_ability *skab, *next_skab, *change;
+	ability_data *abil = NULL, *requires = NULL;
+	bool all = FALSE, found, found_prq;
+	int level;
+	
+	argument = any_one_arg(argument, cmd_arg);
+	argument = any_one_arg(argument, abil_arg);
+	argument = any_one_arg(argument, sub_arg);	// may be level or type
+	skip_spaces(&argument);	// may be requires ability or "new value"
+	
+	// validate ability arg
+	if (!str_cmp(abil_arg, "all")) {
+		all = TRUE;
+	}
+	else if (!(abil = find_ability(abil_arg))) {
+		msg_to_char(ch, "Invalid ability '%s'.\r\n", abil_arg);
+		return;
+	}
+	
+	if (is_abbrev(cmd_arg, "add")) {
+		if (!abil) {
+			msg_to_char(ch, "Add what ability?\r\n");
+		}
+		else if (!*sub_arg || !isdigit(*sub_arg) || (level = atoi(sub_arg)) < 0) {
+			msg_to_char(ch, "Add the ability at what level?\r\n");
+		}
+		else if (*argument && str_cmp(argument, "none") && !(requires = find_ability(argument))) {
+			msg_to_char(ch, "Invalid pre-requisite ability '%s'.\r\n", argument);
+		}
+		else if (abil == requires) {
+			msg_to_char(ch, "It cannot require itself.\r\n");
+		}
+		else {
+			// this does some validation
+			found = found_prq = FALSE;
+			change = NULL;
+			LL_FOREACH(SKILL_ABILITIES(skill), skab) {
+				if (skab->vnum == ABIL_VNUM(abil)) {
+					change = skab;
+					found = TRUE;
+				}
+				if (requires && skab->vnum == ABIL_VNUM(requires)) {
+					found_prq = TRUE;
+				}
+			}
+			
+			if (requires && !found_prq) {
+				msg_to_char(ch, "You can't add a prerequisite that isn't assigned to this skill.\r\n");
+				return;
+			}
+			
+			if (found && change) {
+				change->level = level;
+				change->prerequisite = requires ? ABIL_VNUM(requires) : NOTHING;
+			}
+			else {
+				CREATE(skab, struct skill_ability, 1);
+				skab->vnum = ABIL_VNUM(abil);
+				skab->level = level;
+				skab->prerequisite = requires ? ABIL_VNUM(requires) : NOTHING;
+			}
+			
+			msg_to_char(ch, "You assign %s at level %d", ABIL_NAME(abil), level);
+			if (requires) {
+				msg_to_char(ch, " (branching from %s).\r\n", ABIL_NAME(requires));
+			}
+			else {
+				msg_to_char(ch, ".\r\n");
+			}
+		}
+	}
+	else if (is_abbrev(cmd_arg, "remove")) {
+		found = found_prq = FALSE;
+		LL_FOREACH_SAFE(SKILL_ABILITIES(skill), skab, next_skab) {
+			if (all || (abil && skab->vnum == ABIL_VNUM(abil))) {
+				LL_DELETE(SKILL_ABILITIES(skill), skab);
+				free(skab);
+				found = TRUE;
+			}
+			else if (abil && skab->prerequisite == ABIL_VNUM(abil)) {
+				LL_DELETE(SKILL_ABILITIES(skill), skab);
+				free(skab);
+				found = found_prq = TRUE;
+			}
+		}
+		
+		if (!found) {
+			msg_to_char(ch, "Couldn't find anything to remove.\r\n");
+		}
+		else if (all) {
+			msg_to_char(ch, "You remove all abilities.\r\n");
+		}
+		else {
+			msg_to_char(ch, "You remove the %s ability%s.\r\n", ABIL_NAME(abil), found_prq ? " (and things that required it)" : "");
+		}
+	}
+	else if (is_abbrev(cmd_arg, "change")) {
+		if (!abil) {
+			msg_to_char(ch, "Change which ability?\r\n");
+		}
+		else if (is_abbrev(sub_arg, "level")) {
+			if (!*argument || !isdigit(*argument) || (level = atoi(argument)) < 0) {
+				msg_to_char(ch, "Set it to what level?\r\n");
+				return;
+			}
+			
+			found = FALSE;
+			LL_FOREACH(SKILL_ABILITIES(skill), skab) {
+				if (skab->vnum == ABIL_VNUM(abil)) {
+					skab->level = level;
+					found = TRUE;
+				}
+			}
+			
+			if (found) {
+				msg_to_char(ch, "You change %s to level %d.\r\n", ABIL_NAME(abil), level);
+			}
+			else {
+				msg_to_char(ch, "%s is not assigned to this skill.\r\n", ABIL_NAME(abil));
+			}
+		}
+		else if (is_abbrev(sub_arg, "requires") || is_abbrev(sub_arg, "requirement") || is_abbrev(sub_arg, "prerequisite")) {
+			if (!*argument) {
+				msg_to_char(ch, "Require which ability (or none)?\r\n");
+			}
+			else if (str_cmp(argument, "none") && !(requires = find_ability(argument))) {
+				msg_to_char(ch, "Invalid pre-requisite ability '%s'.\r\n", argument);
+			}
+			else {
+				found = FALSE;
+				found_prq = (requires == NULL);
+				change = NULL;
+				LL_FOREACH(SKILL_ABILITIES(skill), skab) {
+					if (skab->vnum == ABIL_VNUM(abil)) {
+						change = skab;
+						found = TRUE;
+					}
+					else if (requires && skab->vnum == ABIL_VNUM(requires)) {
+						found_prq = TRUE;
+					}
+				}
+				
+				if (!found || !change) {
+					msg_to_char(ch, "%s is not assigned to this skill.\r\n", ABIL_NAME(abil));
+				}
+				else if (!found_prq) {
+					msg_to_char(ch, "You can't require an ability that isn't assigned to this skill.\r\n");
+				}
+				else {
+					change->prerequisite = requires ? ABIL_VNUM(requires) : -1;
+					if (requires) {
+						msg_to_char(ch, "%s now requires the %s ability.\r\n", ABIL_NAME(abil), ABIL_NAME(requires));
+					}
+					else {
+						msg_to_char(ch, "%s no longer requires a prerequisite.\r\n", ABIL_NAME(abil));
+					}
+				}
+			}
+		}
+		else {
+			msg_to_char(ch, "You can change the level or requirement.\r\n");
+		}
+	}
+	else {
+		msg_to_char(ch, "Usage: tree add <ability> <level> [requires ability]\r\n");
+		msg_to_char(ch, "       tree remove <ability | all>\r\n");
+		msg_to_char(ch, "       tree change <ability> <level | requires> <new value>\r\n");
+	}
 }

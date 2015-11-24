@@ -4291,8 +4291,8 @@ ACMD(do_reward) {
 
 ACMD(do_roster) {
 	extern bool member_is_timed_out_ch(char_data *ch);
-	extern const char *class_role[NUM_ROLES];
-	extern const char *class_role_color[NUM_ROLES];
+	extern const char *class_role[];
+	extern const char *class_role_color[];
 
 	char buf[MAX_STRING_LENGTH * 2], buf1[MAX_STRING_LENGTH * 2], arg[MAX_STRING_LENGTH];
 	player_index_data *index, *next_index;

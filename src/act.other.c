@@ -320,7 +320,7 @@ void perform_alternate(char_data *old, char_data *new) {
 * @param char_data *ch The person to display to.
 */
 static void print_group(char_data *ch) {
-	extern const char *class_role[NUM_ROLES];
+	extern const char *class_role[];
 	extern const char *pool_abbrevs[];
 
 	char status[256], class[256], loc[256], alerts[256];

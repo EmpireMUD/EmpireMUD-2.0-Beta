@@ -50,15 +50,19 @@ See also: OLC ABORT, OLC AUDIT, OLC COPY, OLC DELETE, OLC EDIT, OLC FREE,
 Sometimes abbreviations are used for core "thing" types, like mobs. Here are
 some common ones:
 
+abl - ability
 adv - adventure
 bld (or bdg) - building (these include designated rooms)
 cft - craft
+cls - class
 crp - crop
+glb - global
 mob - mobile/npc
 npc - non-player character (mob)
 obj - object
 rmt - room template
 sct - sector/terrain
+skl - skill
 trg - trigger
 #d
 "OLC LICENSE" "OLC RIGHTS"
@@ -298,7 +302,7 @@ is in.
 
 See also: BUILDING GUIDE
 #d
-ABILEDIT "OLC ABILITIES" "ABILITY EDITOR"
+ABILEDIT "OLC ABILITIES" "OLC ABILITY" "ABILITY EDITOR"
 
 Usage:  .abil <command>
         .command
@@ -1530,6 +1534,103 @@ It will always be limited by the size of the drink container the player uses
 to cook the soup in.
 
 See also: CEDIT FLAGS, OLC CRAFTS
+#d
+CLASSEDIT "OLC CLASSES" "OLC CLASS"
+
+Usage:  .class <command>
+        .command
+
+The .olc class editor allows you to set up player classes. On EmpireMUD, the
+players don't begin with classes -- they unlock them by leveling up certain
+skills. Classes can have broadly overlapping requirements (but can't be
+identical to each other), allowing players with similar sets of skills to end
+up in different classes/
+
+All commands in the editor arg highlighted in yellow and placed inside <angle
+braces>. You can get help on these commands by typing &yHELP CLASSEDIT <COMMAND>&0.
+
+You can close an open editor with .abort or .save.
+
+Example:
+> .class edit 123
+> .abbrev Test
+> .save
+
+For notes on the mud's building rules, see HELP BUILDING GUIDE.
+
+See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
+"CLASSEDIT ABBREVIATION"
+
+Usage:  .abbrev <string>
+
+The class abbreviation is shown on the who list and in other places where a
+short name is desired. It must be exactly 4 characters and contain no color
+codes.
+
+See also: OLC CLASSES
+#d
+"CLASSEDIT FLAGS" "CLASS FLAGS"
+
+Usage:  .flags [add | remove] <flags>
+
+Class flags set various properties on classes.
+
+Available flags:
+ IN-DEVELOPMENT - Will not be assigned to players.
+
+See also: OLC CLASSES, OLC REMOVEINDEV
+#d
+"CLASSEDIT NAME"
+
+Usage:  .name <name>
+
+This sets the name of the class. Names should have their first letters
+capitalized and should be reasonably short and concise. You should avoid names
+that conflict with other classes.
+
+See also: OLC CLASSES
+#d
+"CLASSEDIT REQUIRES"
+
+Usage:  .requires <skill> <level>
+        .requires remove <skill>
+
+This allows you to set the skill requirements for a class. Players are auto-
+matically assigned a class when their skills enter a certain range. You can
+set as few or as many skill requirements on a class as you like; the player
+will be matched to the class that has the best fit.
+
+You can specify the skill by vnum or name (use "quotation marks" for multi-word
+names).
+
+The actual requirement is 24 levels below the value you set -- if you set a
+skill requirement to 100, a player will qualify when it hits 76.
+
+All stock EmpireMUD classes specify two skills at level 100, but you have more
+flexibility if you want to do something different. For example, you could do
+more specialized classes that require two skills at 100 and a third at 75.
+If you intend to change the number of skills that a player can raise to 50/75/
+100, though, you should consult a programmer.
+
+See also: OLC CLASSES, VNUM
+#d
+"CLASSEDIT ROLE"
+
+Usage:  .role <role> add <ability>
+        .role <role> remove <ability | all>
+
+This command assigns abilities to the class, under each role. If more than one
+role will have an ability, you must assign it to each of them. There is no
+limit on the number of abilities that can be assigned to each role.
+
+Abilities can be specified by name or vnum.
+
+You should not assign an ability that is also assigned to a skill, because a
+player who has the ability from his/her class will also count as having spent
+an abilitiy point in the skill tree.
+
+See also: OLC CLASSES, VNUM
 #d
 "CROPEDIT CLIMATE" "SECTEDIT CLIMATE"
 
