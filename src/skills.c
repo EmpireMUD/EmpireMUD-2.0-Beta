@@ -2613,9 +2613,6 @@ void get_skad_partial(struct skill_ability *list, struct skill_ability *parent, 
 		}
 		
 		// have one to display
-		if (!display) {
-			CREATE(display, struct skad_element*, 1);
-		}
 		if (!skad) {
 			CREATE(skad, struct skad_element, 1);
 			skad->lines = 0;
@@ -2649,7 +2646,7 @@ void get_skad_partial(struct skill_ability *list, struct skill_ability *parent, 
 * @param size_t buflen The max length of save_buffer.
 */
 void get_skill_ability_display(struct skill_ability *list, char *save_buffer, size_t buflen) {
-	struct skad_element *skad, *mid, **display = NULL;
+	struct skad_element *skad, *mid, *display = NULL;
 	char **left_text = NULL, **right_text = NULL;
 	int left_lines = 0, right_lines = 0;
 	int count, iter, total_lines;
@@ -2662,7 +2659,7 @@ void get_skill_ability_display(struct skill_ability *list, char *save_buffer, si
 	log("Debug: 1");
 	
 	// fetch set of columns
-	get_skad_partial(list, NULL, 0, display, NULL);
+	get_skad_partial(list, NULL, 0, &display, NULL);
 	
 	log("Debug: 2");
 	
@@ -2674,7 +2671,7 @@ void get_skill_ability_display(struct skill_ability *list, char *save_buffer, si
 	
 	// determine number of blocks per column
 	total_lines = 0;
-	LL_FOREACH(*display, skad) {
+	LL_FOREACH(display, skad) {
 		total_lines += skad->lines;
 	}
 	
@@ -2683,7 +2680,7 @@ void get_skill_ability_display(struct skill_ability *list, char *save_buffer, si
 	// determine approximate middle
 	mid = NULL;
 	count = 0;
-	LL_FOREACH(*display, skad) {
+	LL_FOREACH(display, skad) {
 		if (count + skad->lines > (total_lines / 2)) {
 			mid = skad;
 			break;
@@ -2694,7 +2691,7 @@ void get_skill_ability_display(struct skill_ability *list, char *save_buffer, si
 	log("Debug: 5: %d", count);
 	
 	// build left column: move string pointers over to new list
-	for (skad = *display; skad && skad != mid; skad = skad->next) {
+	for (skad = display; skad && skad != mid; skad = skad->next) {
 		if (left_lines > 0) {
 			RECREATE(left_text, char*, left_lines + skad->lines);
 		}
@@ -2739,7 +2736,7 @@ void get_skill_ability_display(struct skill_ability *list, char *save_buffer, si
 	log("Debug: 8: %d", iter);
 	
 	// free all the things
-	LL_FOREACH_SAFE(*display, skad, mid) {
+	LL_FOREACH_SAFE(display, skad, mid) {
 		free(skad);
 	}
 	for (iter = 0; iter < left_lines; ++iter) {
@@ -2750,7 +2747,6 @@ void get_skill_ability_display(struct skill_ability *list, char *save_buffer, si
 	}
 	free(left_text);
 	free(right_text);
-	free(display);
 }
 
 
