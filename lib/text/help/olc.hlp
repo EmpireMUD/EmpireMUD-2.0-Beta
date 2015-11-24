@@ -3887,6 +3887,71 @@ sector.
 
 See also: OLC SECTORS
 #d
+SKILLEDIT "OLC SKILLS" "SKILL OLC"
+
+TODO
+#d
+"SKILLEDIT ABBREVIATION"
+
+Usage:  .abbrev <string>
+
+The skill abbreviation is a short name used for some strings where there isn't
+enough space for the full name. It must always be 3 letters and contain no
+color codes.
+
+See also: OLC SKILLS
+#d
+"SKILLEDIT DESCRIPTION"
+
+Usage:  .description <text>
+
+Skill descriptions are short phrases that appear when a player types "skills",
+or when they get more info on a skill during character creation. These should
+always be short -- 40 characters or so. Generally they are written as whole
+sentences, but with no punctuation.
+
+See also: OLC SKILLS
+#d
+"SKILLEDIT FLAGS" "SKILL FLAGS"
+
+Usage:  .flags [add | remove] <flags>
+
+Skill flags set various properties on skills.
+
+Available flags:
+ IN-DEVELOPMENT - Players can't see or gain the skill.
+
+See also: OLC SKILLS, OLC REMOVEINDEV
+#d
+"SKILLEDIT NAME"
+
+Usage:  .name <name>
+
+A skill's name is what players see on their skill list, and what is shown in
+many messages related to the skill. Skill names should be reasonably short and
+very unique. Players will want to abbreviate them easily.
+
+See also: OLC SKILLS
+#d
+"SKILLEDIT TREE"
+
+Usage:  .tree add <ability> <level> [requires ability]
+        .tree remove <ability | all>
+        .tree change <ability> <level | requires> <new value>
+
+This command allows you to set up the skill tree -- the abilities players can
+purchase. Each ability requires a level. You can also set a requirement that
+they buy another ability first -- that's what makes it a tree.
+
+Each ability may only be assigned to only one skill, and cannot be assigned to
+both a skill and a class.
+
+Players always get a fixed number of ability points in a skill, and you can
+use the level and prerequisite abilities to help control how many of the
+abilities a player can access.
+
+See also: ABILITY POINTS, OLC SKILLS, VNUM
+#d
 "SPECIAL ICONS" "ICON CODES"
 
 The following special codes may be used in icons:
