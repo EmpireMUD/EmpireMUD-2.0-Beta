@@ -2656,12 +2656,8 @@ void get_skill_ability_display(struct skill_ability *list, char *save_buffer, si
 	*save_buffer = '\0';
 	size = 0;
 	
-	log("Debug: 1");
-	
 	// fetch set of columns
 	get_skad_partial(list, NULL, 0, &display, NULL);
-	
-	log("Debug: 2");
 	
 	if (!display) {
 		return;	// no work
@@ -2681,8 +2677,12 @@ void get_skill_ability_display(struct skill_ability *list, char *save_buffer, si
 	mid = NULL;
 	count = 0;
 	LL_FOREACH(display, skad) {
-		if (count + skad->lines > (total_lines / 2)) {
+		if (count + skad->lines == (total_lines / 2)) {
 			mid = skad;
+			break;
+		}
+		else if (count + skad->lines > (total_lines / 2)) {
+			mid = skad->next;
 			break;
 		}
 		count += skad->lines;
@@ -2722,9 +2722,9 @@ void get_skill_ability_display(struct skill_ability *list, char *save_buffer, si
 	
 	iter = 0;
 	while (iter < left_lines || iter < right_lines) {
-		size += snprintf(save_buffer + size, buflen - size, " %38.38s", (iter < left_lines ? left_text[iter] : ""));
+		size += snprintf(save_buffer + size, buflen - size, " %-38.38s", (iter < left_lines ? left_text[iter] : ""));
 		if (iter < right_lines) {
-			size += snprintf(save_buffer + size, buflen - size, " %38.38s\r\n", right_text[iter]);
+			size += snprintf(save_buffer + size, buflen - size, " %-38.38s\r\n", right_text[iter]);
 		}
 		else {
 			size += snprintf(save_buffer + size, buflen - size, "\r\n");
