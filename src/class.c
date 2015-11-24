@@ -165,7 +165,7 @@ class_data *find_class(char *argument) {
 	class_data *cls;
 	any_vnum vnum;
 	
-	if (isdigit(*argument) && (vnum = atoi(argument)) && (cls = find_class_by_vnum(vnum))) {
+	if (isdigit(*argument) && (vnum = atoi(argument)) >= 0 && (cls = find_class_by_vnum(vnum))) {
 		return cls;
 	}
 	else {
@@ -185,11 +185,11 @@ class_data *find_class_by_name(char *name) {
 	
 	HASH_ITER(sorted_hh, sorted_classes, cls, next_cls) {
 		// matches:
-		if (!str_cmp(name, CLASS_NAME(cls))) {
+		if (!str_cmp(name, CLASS_NAME(cls)) || !str_cmp(name, CLASS_ABBREV(cls))) {
 			// perfect match
 			return cls;
 		}
-		if (is_multiword_abbrev(name, CLASS_NAME(cls))) {
+		if (!partial && is_multiword_abbrev(name, CLASS_NAME(cls))) {
 			// probable match
 			partial = cls;
 		}
@@ -1124,7 +1124,7 @@ void olc_show_class(char_data *ch) {
 	sprintf(buf + strlen(buf), "Skills required: <\tyrequires\t0>\r\n%s", lbuf);
 	
 	get_class_ability_display(CLASS_ABILITIES(cls), lbuf, NULL);
-	sprintf(buf + strlen(buf), "Class roles and abilities: <\tyrole\t0>\r\n%s", lbuf);
+	sprintf(buf + strlen(buf), "Class roles and abilities: <\tyrole\t0>\r\n%s%s", lbuf, *lbuf ? "\r\n" : "  none\r\n");
 	
 	page_string(ch->desc, buf, TRUE);
 }
@@ -1217,7 +1217,7 @@ OLC_MODULE(classedit_requires) {
 	}
 	
 	// look up skill
-	if (!(skill = find_skill(skill_arg))) {
+	if (!*skill_arg || !(skill = find_skill(skill_arg))) {
 		msg_to_char(ch, "Invalid skill '%s'.\r\n", skill_arg);
 		return;
 	}
@@ -1225,7 +1225,7 @@ OLC_MODULE(classedit_requires) {
 	// check for level arg
 	if (!remove) {
 		skip_spaces(&argument);
-		if (!*argument || !isdigit(*argument) || (level = atoi(argument) < 0)) {
+		if (!*argument || !isdigit(*argument) || (level = atoi(argument)) < 0) {
 			msg_to_char(ch, "Require what level of %s?\r\n", SKILL_NAME(skill));
 			return;
 		}

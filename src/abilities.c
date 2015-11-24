@@ -72,7 +72,7 @@ ability_data *find_ability(char *argument) {
 	ability_data *abil;
 	any_vnum vnum;
 	
-	if (isdigit(*argument) && (vnum = atoi(argument)) && (abil = find_ability_by_vnum(vnum))) {
+	if (isdigit(*argument) && (vnum = atoi(argument)) >= 0 && (abil = find_ability_by_vnum(vnum))) {
 		return abil;
 	}
 	else {
@@ -96,7 +96,7 @@ ability_data *find_ability_by_name(char *name) {
 			// perfect match
 			return abil;
 		}
-		if (is_multiword_abbrev(name, ABIL_NAME(abil))) {
+		if (!partial && is_multiword_abbrev(name, ABIL_NAME(abil))) {
 			// probable match
 			partial = abil;
 		}
@@ -120,6 +120,45 @@ ability_data *find_ability_by_vnum(any_vnum vnum) {
 	
 	HASH_FIND_INT(ability_table, &vnum, abil);
 	return abil;
+}
+
+
+/**
+* Finds an ability that is attached to a skill -- this works similar to the
+* find_ability() function except that it ignores partial matches that aren't
+* attached to the skill.
+*
+* @param char *name The name to look up.
+* @param skill_data *skill The skill to search on.
+* @return ability_data* The found ability, if any.
+*/
+ability_data *find_ability_on_skill(char *name, skill_data *skill) {
+	ability_data *abil, *partial = NULL;
+	struct skill_ability *skab;
+	any_vnum vnum = NOTHING;
+	
+	if (!skill || !*name) {
+		return NULL;	// shortcut
+	}
+	
+	if (isdigit(*name)) {
+		vnum = atoi(name);
+	}
+	
+	LL_FOREACH(SKILL_ABILITIES(skill), skab) {
+		if (!(abil = find_ability_by_vnum(skab->vnum))) {
+			continue;
+		}
+		
+		if (vnum == ABIL_VNUM(abil) || !str_cmp(name, ABIL_NAME(abil))) {
+			return abil;	// exact
+		}
+		else if (!partial && is_multiword_abbrev(name, ABIL_NAME(abil))) {
+			partial = abil;
+		}
+	}
+	
+	return partial;	// if any
 }
 
 

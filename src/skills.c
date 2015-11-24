@@ -1766,7 +1766,7 @@ skill_data *find_skill(char *argument) {
 	skill_data *skill;
 	any_vnum vnum;
 	
-	if (isdigit(*argument) && (vnum = atoi(argument)) && (skill = find_skill_by_vnum(vnum))) {
+	if (isdigit(*argument) && (vnum = atoi(argument)) >= 0 && (skill = find_skill_by_vnum(vnum))) {
 		return skill;
 	}
 	else {
@@ -1791,11 +1791,11 @@ skill_data *find_skill_by_name(char *name) {
 		}
 		
 		// matches:
-		if (!str_cmp(name, SKILL_NAME(skill))) {
+		if (!str_cmp(name, SKILL_NAME(skill)) || !str_cmp(name, SKILL_ABBREV(skill))) {
 			// perfect match
 			return skill;
 		}
-		if (is_multiword_abbrev(name, SKILL_NAME(skill))) {
+		if (!partial && is_multiword_abbrev(name, SKILL_NAME(skill))) {
 			// probable match
 			partial = skill;
 		}
@@ -2739,6 +2739,8 @@ OLC_MODULE(skilledit_name) {
 
 
 OLC_MODULE(skilledit_tree) {
+	extern ability_data *find_ability_on_skill(char *name, skill_data *skill);
+
 	skill_data *skill = GET_OLC_SKILL(ch->desc);
 	char cmd_arg[MAX_INPUT_LENGTH], abil_arg[MAX_INPUT_LENGTH], sub_arg[MAX_INPUT_LENGTH];
 	struct skill_ability *skab, *next_skab, *change;
@@ -2751,18 +2753,17 @@ OLC_MODULE(skilledit_tree) {
 	argument = any_one_arg(argument, sub_arg);	// may be level or type
 	skip_spaces(&argument);	// may be requires ability or "new value"
 	
-	// validate ability arg
+	// check for "all" arg
 	if (!str_cmp(abil_arg, "all")) {
 		all = TRUE;
 	}
-	else if (!(abil = find_ability(abil_arg))) {
-		msg_to_char(ch, "Invalid ability '%s'.\r\n", abil_arg);
-		return;
-	}
 	
 	if (is_abbrev(cmd_arg, "add")) {
-		if (!abil) {
+		if (!*abil_arg) {
 			msg_to_char(ch, "Add what ability?\r\n");
+		}
+		else if (!(abil = find_ability(abil_arg))) {
+			msg_to_char(ch, "Unknown ability '%s'.\r\n", abil_arg);
 		}
 		else if (!*sub_arg || !isdigit(*sub_arg) || (level = atoi(sub_arg)) < 0) {
 			msg_to_char(ch, "Add the ability at what level?\r\n");
@@ -2813,6 +2814,15 @@ OLC_MODULE(skilledit_tree) {
 		}
 	}
 	else if (is_abbrev(cmd_arg, "remove")) {
+		if (!all && !*abil_arg) {
+			msg_to_char(ch, "Remove which ability?\r\n");
+			return;
+		}
+		if (!all && !(abil = find_ability_on_skill(abil_arg, skill))) {
+			msg_to_char(ch, "There is no such ability on this skill.\r\n");
+			return;
+		}
+		
 		found = found_prq = FALSE;
 		LL_FOREACH_SAFE(SKILL_ABILITIES(skill), skab, next_skab) {
 			if (all || (abil && skab->vnum == ABIL_VNUM(abil))) {
@@ -2838,8 +2848,11 @@ OLC_MODULE(skilledit_tree) {
 		}
 	}
 	else if (is_abbrev(cmd_arg, "change")) {
-		if (!abil) {
+		if (!*abil_arg) {
 			msg_to_char(ch, "Change which ability?\r\n");
+		}
+		else if (!(abil = find_ability_on_skill(abil_arg, skill))) {
+			msg_to_char(ch, "There is no such ability on this skill.\r\n");
 		}
 		else if (is_abbrev(sub_arg, "level")) {
 			if (!*argument || !isdigit(*argument) || (level = atoi(argument)) < 0) {
