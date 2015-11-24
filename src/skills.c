@@ -2657,6 +2657,7 @@ void get_skill_ability_display(struct skill_ability *list, char *save_buffer, si
 	char **left_text = NULL, **right_text = NULL;
 	int left_lines = 0, right_lines = 0;
 	int count, iter, total_lines;
+	double half;
 	size_t size;
 	
 	// prepare...
@@ -2676,25 +2677,22 @@ void get_skill_ability_display(struct skill_ability *list, char *save_buffer, si
 		total_lines += skad->lines;
 	}
 	
-	log("Debug: 4: %d", total_lines);
-	
 	// determine approximate middle
 	mid = NULL;
 	count = 0;
+	half = total_lines / 2.0;
 	LL_FOREACH(display, skad) {
 		count += skad->lines;
 		
-		if (count == (total_lines / 2)) {
+		if ((double)count == half) {
 			mid = skad;
 			break;
 		}
-		else if (count > (total_lines / 2)) {
+		else if (count > half) {
 			mid = skad->next;
 			break;
 		}
 	}
-	
-	log("Debug: 5: %d", count);
 	
 	// build left column: move string pointers over to new list
 	for (skad = display; skad && skad != mid; skad = skad->next) {
@@ -2709,8 +2707,6 @@ void get_skill_ability_display(struct skill_ability *list, char *save_buffer, si
 		}
 	}
 	
-	log("Debug: 6: %d", left_lines);
-	
 	// build right column: move string pointers over to new list
 	for (skad = mid; skad; skad = skad->next) {
 		if (right_lines > 0) {
@@ -2724,8 +2720,6 @@ void get_skill_ability_display(struct skill_ability *list, char *save_buffer, si
 		}
 	}
 	
-	log("Debug: 7: %d", right_lines);
-	
 	iter = 0;
 	while (iter < left_lines || iter < right_lines) {
 		size += snprintf(save_buffer + size, buflen - size, " %-38.38s", (iter < left_lines ? left_text[iter] : ""));
@@ -2738,8 +2732,6 @@ void get_skill_ability_display(struct skill_ability *list, char *save_buffer, si
 		
 		++iter;
 	}
-	
-	log("Debug: 8: %d", iter);
 	
 	// free all the things
 	LL_FOREACH_SAFE(display, skad, mid) {
