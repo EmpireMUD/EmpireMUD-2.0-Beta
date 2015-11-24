@@ -2709,7 +2709,7 @@ void get_skill_ability_display(struct skill_ability *list, char *save_buffer, si
 	}
 	
 	iter = 0;
-	while (iter < left_lines && iter < right_lines) {
+	while (iter < left_lines || iter < right_lines) {
 		size += snprintf(save_buffer + size, buflen - size, " %38.38s", (iter < left_lines ? left_text[iter] : ""));
 		if (iter < right_lines) {
 			size += snprintf(save_buffer + size, buflen - size, " %38.38s\r\n", right_text[iter]);
