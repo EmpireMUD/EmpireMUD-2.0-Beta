@@ -2634,6 +2634,9 @@ void get_skad_partial(struct skill_ability *list, struct skill_ability *parent, 
 		
 		// find any dependent abilities
 		get_skad_partial(list, abil, indent + 1, display, skad);
+		if (parent) {
+			skad = NULL;	// create new block
+		}
 	}
 }
 
