@@ -2620,7 +2620,7 @@ void get_skad_partial(struct skill_ability *list, struct skill_ability *parent, 
 			LL_APPEND(*display, skad);
 		}
 		
-		snprintf(buf, sizeof(buf), "%*s- [%5d] %s @ %d", (2 * indent), " ", abil->vnum, get_ability_name_by_vnum(abil->vnum), abil->level);
+		snprintf(buf, sizeof(buf), "%*s- [%d] %s @ %d", (2 * indent), " ", abil->vnum, get_ability_name_by_vnum(abil->vnum), abil->level);
 		
 		// append line
 		if (skad->lines > 0) {
@@ -2634,7 +2634,7 @@ void get_skad_partial(struct skill_ability *list, struct skill_ability *parent, 
 		
 		// find any dependent abilities
 		get_skad_partial(list, abil, indent + 1, display, skad);
-		if (parent) {
+		if (!parent) {
 			skad = NULL;	// create new block
 		}
 	}
