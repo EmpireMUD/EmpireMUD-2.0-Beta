@@ -2598,9 +2598,10 @@ struct skad_element {
 * @param struct skill_ability *list The whole list we're showing part of.
 * @param struct skill_ability *parent Which parent ability we are showing.
 * @param int indent Number of times to indent this row.
-* @param struct skad_element **skad A pointer to a list of skad elements, for storing the display.
+* @param struct skad_element **display A pointer to a list of skad elements, for storing the display.
 */
-void get_skad_partial(struct skill_ability *list, struct skill_ability *parent, int indent, struct skad_element **skad) {
+void get_skad_partial(struct skill_ability *list, struct skill_ability *parent, int indent, struct skad_element **display) {
+	struct skad_element *skad = NULL;
 	char buf[MAX_STRING_LENGTH];
 	struct skill_ability *abil;
 	
@@ -2613,26 +2614,30 @@ void get_skad_partial(struct skill_ability *list, struct skill_ability *parent, 
 		}
 		
 		// have one to display
-		if (!*skad) {
-			CREATE(*skad, struct skad_element, 1);
-			(*skad)->lines = 0;
-			(*skad)->text = NULL;
+		if (!display) {
+			CREATE(display, struct skad_element*, 1);
+		}
+		if (!skad) {
+			CREATE(skad, struct skad_element, 1);
+			skad->lines = 0;
+			skad->text = NULL;
+			LL_APPEND(*display, skad);
 		}
 		
 		snprintf(buf, sizeof(buf), "%*s- [%5d] %s @ %d", (2 * indent), " ", abil->vnum, get_ability_name_by_vnum(abil->vnum), abil->level);
 		
 		// append line
-		if ((*skad)->lines > 0) {
-			RECREATE((*skad)->text, char*, (*skad)->lines + 1);
+		if (skad->lines > 0) {
+			RECREATE(skad->text, char*, skad->lines + 1);
 		}
 		else {
-			CREATE((*skad)->text, char*, 1);
+			CREATE(skad->text, char*, 1);
 		}
-		(*skad)->text[(*skad)->lines] = str_dup(buf);
-		++(*skad)->lines;
+		skad->text[skad->lines] = str_dup(buf);
+		++(skad->lines);
 		
 		// find any dependent abilities
-		get_skad_partial(list, abil, indent + 1, skad);
+		get_skad_partial(list, abil, indent + 1, display);
 	}
 }
 
