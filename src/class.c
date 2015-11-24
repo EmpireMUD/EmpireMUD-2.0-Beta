@@ -1278,9 +1278,15 @@ OLC_MODULE(classedit_role) {
 	ability_data *abil;
 	bool all, any;
 	
+	msg_to_char(ch, "Debug: '%s'\r\n", argument);
+	
 	argument = any_one_word(argument, role_arg);
 	argument = any_one_arg(argument, cmd_arg);
 	skip_spaces(&argument);
+	
+	msg_to_char(ch, "Debug: '%s'\r\n", role_arg);
+	msg_to_char(ch, "Debug: '%s'\r\n", cmd_arg);
+	msg_to_char(ch, "Debug: '%s'\r\n", argument);
 	
 	// detect role
 	if (*role_arg && (role = search_block(role_arg, class_role, FALSE)) == NOTHING) {
