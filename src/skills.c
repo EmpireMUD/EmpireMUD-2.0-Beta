@@ -2663,8 +2663,6 @@ void get_skill_ability_display(struct skill_ability *list, char *save_buffer, si
 		return;	// no work
 	}
 	
-	log("Debug: 3");
-	
 	// determine number of blocks per column
 	total_lines = 0;
 	LL_FOREACH(display, skad) {
@@ -2677,15 +2675,16 @@ void get_skill_ability_display(struct skill_ability *list, char *save_buffer, si
 	mid = NULL;
 	count = 0;
 	LL_FOREACH(display, skad) {
-		if (count + skad->lines == (total_lines / 2)) {
+		count += skad->lines;
+		
+		if (count == (total_lines / 2)) {
 			mid = skad;
 			break;
 		}
-		else if (count + skad->lines > (total_lines / 2)) {
+		else if (count > (total_lines / 2)) {
 			mid = skad->next;
 			break;
 		}
-		count += skad->lines;
 	}
 	
 	log("Debug: 5: %d", count);
