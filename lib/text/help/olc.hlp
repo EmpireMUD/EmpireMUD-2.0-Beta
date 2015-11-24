@@ -90,6 +90,10 @@ on the editors instead, see HELP OLC.
 
 ** Editor Notes **
 
+Abilities (ABILEDIT):
+- The mastery ability is mainly used to determine when a craft should be marked
+  (superior). Do not apply mastery abilities to abilities that don't need this.
+
 Adventures (ADVEDIT):
 - When you set a min/max level for the adventure, mobs and items that don't
   have their own level limits will inherit the limits from the adventure.
@@ -122,6 +126,16 @@ Augments (AUGEDIT):
 Buildings (BEDIT):
 - Designated rooms are also built in the building editor, using the ROOM flag.
 - If a building has at least 1 Citizen, players can also set it as their home.
+
+Classes (CLASSEDIT):
+- By convention, stock EmpireMUD has one class for every pair of level 100
+  skills. This leaves no room for adding more classes unless you are re-
+  designing that entire notion.
+- A player will get assigned the class with the most matching skills, so adding
+  a 100/100/75 class would give them a more specific version of the 100/100.
+- Abilities can be on more than one class and more than one role within a class
+  but you CANNOT assign an ability to both a class and a skill -- it would
+  count toward purchased abilities in that skill tree.
 
 Crafts (CEDIT):
 - Soups are made using the COOK type and the SOUP flag. Instead of choosing an
@@ -260,6 +274,23 @@ Sectors (SECTEDIT):
   do anything.
 - Please provide a useful list of commands for any new sector. For example, if
   you add any DIG interaction, put "dig" on the commands list.
+
+Skills (SKILLEDIT):
+- See HELP ABILITY POINTS for a breakdown of how many points a player gets in
+  each skill tree. Use this to "gate" abilities and prevent players from having
+  too many powerful abilities at once.
+- Remember that players can only level up an ability from the level you assign
+  it to, to the cap for that level range (50, 75, 100). You need to provide
+  several abilities at the 50 and 75 marks so that players can level past these
+  points.
+- An ability assigned at level 50 can be purchased by someone who does not
+  specialize past 50. If they choose to specialize, that ability can be used to
+  level the skill from there.
+- The skill description should be short (40-50 characters), written like a
+  sentence, and with no punctuation. It is displayed on the "skills" command.
+- Abilities can be on more than one class and more than one role within a class
+  but you CANNOT assign an ability to both a class and a skill -- it would
+  count toward purchased abilities in that skill tree.
 
 Triggers and Scripts (TRIGEDIT):
 - Scripts must be formatted with /f -- this will also ensure your if/end and
@@ -1544,7 +1575,7 @@ The .olc class editor allows you to set up player classes. On EmpireMUD, the
 players don't begin with classes -- they unlock them by leveling up certain
 skills. Classes can have broadly overlapping requirements (but can't be
 identical to each other), allowing players with similar sets of skills to end
-up in different classes/
+up in different classes.
 
 All commands in the editor arg highlighted in yellow and placed inside <angle
 braces>. You can get help on these commands by typing &yHELP CLASSEDIT <COMMAND>&0.
@@ -3889,7 +3920,27 @@ See also: OLC SECTORS
 #d
 SKILLEDIT "OLC SKILLS" "SKILL OLC"
 
-TODO
+Usage:  .skill <command>
+        .command
+
+The .olc skill editor allows you to set up player skills. The main purpose of
+this is to choose which abilities that skill unlocks, and at what level. This
+does not control what class a player becomes (see HELP CLASSEDIT), only which
+powers they have access to and in which order.
+
+All commands in the editor arg highlighted in yellow and placed inside <angle
+braces>. You can get help on these commands by typing &yHELP SKILLEDIT <COMMAND>&0.
+
+You can close an open editor with .abort or .save.
+
+Example:
+> .skill edit 123
+> .name Test Skill
+> .save
+
+For notes on the mud's building rules, see HELP BUILDING GUIDE.
+
+See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
 #d
 "SKILLEDIT ABBREVIATION"
 
