@@ -2600,8 +2600,7 @@ struct skad_element {
 * @param int indent Number of times to indent this row.
 * @param struct skad_element **display A pointer to a list of skad elements, for storing the display.
 */
-void get_skad_partial(struct skill_ability *list, struct skill_ability *parent, int indent, struct skad_element **display) {
-	struct skad_element *skad = NULL;
+void get_skad_partial(struct skill_ability *list, struct skill_ability *parent, int indent, struct skad_element **display, struct skad_element *skad) {
 	char buf[MAX_STRING_LENGTH];
 	struct skill_ability *abil;
 	
@@ -2637,7 +2636,7 @@ void get_skad_partial(struct skill_ability *list, struct skill_ability *parent, 
 		++(skad->lines);
 		
 		// find any dependent abilities
-		get_skad_partial(list, abil, indent + 1, display);
+		get_skad_partial(list, abil, indent + 1, display, skad);
 	}
 }
 
@@ -2661,9 +2660,9 @@ void get_skill_ability_display(struct skill_ability *list, char *save_buffer, si
 	size = 0;
 	
 	// fetch set of columns
-	get_skad_partial(list, NULL, 0, display);
+	get_skad_partial(list, NULL, 0, display, NULL);
 	
-	if (!display || !*display) {
+	if (!display) {
 		return;	// no work
 	}
 	
@@ -2718,6 +2717,8 @@ void get_skill_ability_display(struct skill_ability *list, char *save_buffer, si
 		else {
 			size += snprintf(save_buffer + size, buflen - size, "\r\n");
 		}
+		
+		++iter;
 	}
 	
 	// free all the things
@@ -2732,6 +2733,7 @@ void get_skill_ability_display(struct skill_ability *list, char *save_buffer, si
 	}
 	free(left_text);
 	free(right_text);
+	free(display);
 }
 
 
