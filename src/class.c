@@ -1261,6 +1261,24 @@ OLC_MODULE(classedit_flags) {
 }
 
 
+OLC_MODULE(classedit_maxhealth) {
+	class_data *cls = GET_OLC_CLASS(ch->desc);
+	CLASS_POOL(cls, HEALTH) = olc_process_number(ch, argument, "max health", "maxhealth", 1, MAX_INT, CLASS_POOL(cls, HEALTH));
+}
+
+
+OLC_MODULE(classedit_maxmana) {
+	class_data *cls = GET_OLC_CLASS(ch->desc);
+	CLASS_POOL(cls, MANA) = olc_process_number(ch, argument, "max mana", "maxmana", 1, MAX_INT, CLASS_POOL(cls, MANA));
+}
+
+
+OLC_MODULE(classedit_maxmoves) {
+	class_data *cls = GET_OLC_CLASS(ch->desc);
+	CLASS_POOL(cls, MOVE) = olc_process_number(ch, argument, "max moves", "maxmoves", 1, MAX_INT, CLASS_POOL(cls, MOVE));
+}
+
+
 OLC_MODULE(classedit_name) {
 	class_data *cls = GET_OLC_CLASS(ch->desc);
 	olc_process_string(ch, argument, "name", &CLASS_NAME(cls));

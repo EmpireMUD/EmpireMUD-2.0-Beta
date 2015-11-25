@@ -119,6 +119,9 @@ OLC_MODULE(bedit_upgradesto);
 // class modules
 OLC_MODULE(classedit_abbrev);
 OLC_MODULE(classedit_flags);
+OLC_MODULE(classedit_maxhealth);
+OLC_MODULE(classedit_maxmana);
+OLC_MODULE(classedit_maxmoves);
 OLC_MODULE(classedit_name);
 OLC_MODULE(classedit_requires);
 OLC_MODULE(classedit_role);
@@ -438,6 +441,9 @@ const struct olc_command_data olc_data[] = {
 	{ "abbrev", classedit_abbrev, OLC_CLASS, OLC_CF_EDITOR },
 	{ "flags", classedit_flags, OLC_CLASS, OLC_CF_EDITOR },
 	{ "name", classedit_name, OLC_CLASS, OLC_CF_EDITOR },
+	{ "maxhealth", classedit_maxhealth, OLC_CLASS, OLC_CF_EDITOR },
+	{ "maxmana", classedit_maxmana, OLC_CLASS, OLC_CF_EDITOR },
+	{ "maxmoves", classedit_maxmoves, OLC_CLASS, OLC_CF_EDITOR },
 	{ "requires", classedit_requires, OLC_CLASS, OLC_CF_EDITOR },
 	{ "role", classedit_role, OLC_CLASS, OLC_CF_EDITOR },
 	
