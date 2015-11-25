@@ -1298,6 +1298,10 @@ ACMD(do_skills) {
 		sprintf(outbuf + strlen(outbuf), "You know the following skills (skill level %d):\r\n", GET_SKILL_LEVEL(ch));
 		found = FALSE;
 		HASH_ITER(sorted_hh, sorted_skills, skill, next_skill) {
+			if (SKILL_FLAGGED(skill, SKILLF_IN_DEVELOPMENT)) {
+				continue;
+			}
+			
 			strcat(outbuf, get_skill_row_display(ch, skill));
 			if (!found && get_ability_points_available_for_char(ch, SKILL_VNUM(skill)) > 0) {
 				found = TRUE;
@@ -1382,6 +1386,10 @@ ACMD(do_skills) {
 			
 			found = FALSE;
 			HASH_ITER(sorted_hh, sorted_skills, skill, next_skill) {
+				if (SKILL_FLAGGED(skill, SKILLF_IN_DEVELOPMENT)) {
+					continue;
+				}
+				
 				if (IS_IMMORTAL(ch) || get_skill_resets(ch, SKILL_VNUM(skill)) > 0) {
 					msg_to_char(ch, "%s%s", (found ? ", " : ""), SKILL_NAME(skill));
 					if (get_skill_resets(ch, SKILL_VNUM(skill)) > 1) {
