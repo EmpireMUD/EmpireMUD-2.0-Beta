@@ -47,6 +47,7 @@ const char *default_skill_desc = "New skill";
 extern const char *skill_flags[];
 
 // eternal functions
+extern bool is_class_ability(ability_data *abil);
 void update_class(char_data *ch);
 
 // local protos
@@ -1952,7 +1953,10 @@ void perform_npc_tie(char_data *ch, char_data *victim, int subcmd) {
 * @return bool TRUE if any problems were reported; FALSE if all good.
 */
 bool audit_skill(skill_data *skill, char_data *ch) {
+	struct skill_ability *skab, *find;
+	skill_data *iter, *next_iter;
 	bool problem = FALSE;
+	ability_data *abil;
 	
 	if (SKILL_FLAGGED(skill, SKILLF_IN_DEVELOPMENT)) {
 		olc_audit_msg(ch, SKILL_VNUM(skill), "IN-DEVELOPMENT");
@@ -1961,6 +1965,59 @@ bool audit_skill(skill_data *skill, char_data *ch) {
 	if (!SKILL_NAME(skill) || !*SKILL_NAME(skill) || !str_cmp(SKILL_NAME(skill), default_skill_name)) {
 		olc_audit_msg(ch, SKILL_VNUM(skill), "No name set");
 		problem = TRUE;
+	}
+	
+	// ability assignments
+	LL_FOREACH(SKILL_ABILITIES(skill), skab) {
+		if (!(abil = find_ability_by_vnum(skab->vnum))) {
+			olc_audit_msg(ch, SKILL_VNUM(skill), "Invalid ability %d", skab->vnum);
+			problem = TRUE;
+			continue;
+		}
+		
+		if (is_class_ability(abil)) {
+			olc_audit_msg(ch, SKILL_VNUM(skill), "Ability %d %s is a class ability", ABIL_VNUM(abil), ABIL_NAME(abil));
+			problem = TRUE;
+		}
+		
+		// verify tree
+		if (skab->prerequisite) {
+			if (skab->vnum == skab->prerequisite) {
+				olc_audit_msg(ch, SKILL_VNUM(skill), "Ability %d %s is its own prerequisite", ABIL_VNUM(abil), ABIL_NAME(abil));
+				problem = TRUE;
+			}
+			
+			LL_SEARCH_SCALAR(SKILL_ABILITIES(skill), find, vnum, skab->prerequisite);
+			if (!find) {
+				olc_audit_msg(ch, SKILL_VNUM(skill), "Ability %d %s has missing prerequisite", ABIL_VNUM(abil), ABIL_NAME(abil));
+				problem = TRUE;
+			}
+			else if (skab->level < find->level) {
+				olc_audit_msg(ch, SKILL_VNUM(skill), "Ability %d %s is lower level than its prerequisite", ABIL_VNUM(abil), ABIL_NAME(abil));
+				problem = TRUE;
+			}
+		}
+	}
+	
+	// other skills
+	HASH_ITER(hh, skill_table, iter, next_iter) {
+		if (iter == skill) {
+			continue;
+		}
+		
+		if (!str_cmp(SKILL_NAME(iter), SKILL_NAME(skill))) {
+			olc_audit_msg(ch, SKILL_VNUM(skill), "Same name as skill %d", SKILL_VNUM(iter));
+			problem = TRUE;
+		}
+		
+		// ensure no abilities are assigned to both
+		LL_FOREACH(SKILL_ABILITIES(skill), skab) {
+			LL_SEARCH_SCALAR(SKILL_ABILITIES(iter), find, vnum, skab->vnum);
+			if (find && (abil = find_ability_by_vnum(skab->vnum))) {
+				olc_audit_msg(ch, SKILL_VNUM(skill), "Ability %d %s is also assigned to skill %d %s", ABIL_VNUM(abil), ABIL_NAME(abil), SKILL_VNUM(iter), SKILL_NAME(iter));
+				problem = TRUE;
+			}
+		}
 	}
 	
 	return problem;
@@ -2898,7 +2955,6 @@ OLC_MODULE(skilledit_name) {
 
 OLC_MODULE(skilledit_tree) {
 	extern ability_data *find_ability_on_skill(char *name, skill_data *skill);
-	extern bool is_class_ability(ability_data *abil);
 
 	skill_data *skill = GET_OLC_SKILL(ch->desc);
 	char cmd_arg[MAX_INPUT_LENGTH], abil_arg[MAX_INPUT_LENGTH], sub_arg[MAX_INPUT_LENGTH];
