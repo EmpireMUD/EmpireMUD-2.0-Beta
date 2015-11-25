@@ -230,9 +230,18 @@ bool audit_ability(ability_data *abil, char_data *ch) {
 */
 char *list_one_ability(ability_data *abil, bool detail) {
 	static char output[MAX_STRING_LENGTH];
+	char part[MAX_STRING_LENGTH];
+	ability_data *mastery;
 	
 	if (detail) {
-		snprintf(output, sizeof(output), "[%5d] %s", ABIL_VNUM(abil), ABIL_NAME(abil));
+		if ((mastery = find_ability_by_vnum(ABIL_MASTERY_ABIL(abil)))) {
+			snprintf(part, sizeof(part), " (%s)", ABIL_NAME(mastery));
+		}
+		else {
+			*part = '\0';
+		}
+		
+		snprintf(output, sizeof(output), "[%5d] %s%s", ABIL_VNUM(abil), ABIL_NAME(abil), part);
 	}
 	else {
 		snprintf(output, sizeof(output), "[%5d] %s", ABIL_VNUM(abil), ABIL_NAME(abil));
