@@ -210,6 +210,7 @@ bool is_class_ability(ability_data *abil) {
 * @return bool TRUE if any problems were reported; FALSE if all good.
 */
 bool audit_ability(ability_data *abil, char_data *ch) {
+	ability_data *iter, *next_iter;
 	bool problem = FALSE;
 	
 	if (!ABIL_NAME(abil) || !*ABIL_NAME(abil) || !str_cmp(ABIL_NAME(abil), default_ability_name)) {
@@ -223,6 +224,14 @@ bool audit_ability(ability_data *abil, char_data *ch) {
 		}
 		if (!find_ability_by_vnum(ABIL_MASTERY_ABIL(abil))) {
 			olc_audit_msg(ch, ABIL_VNUM(abil), "Mastery ability is invalid");
+			problem = TRUE;
+		}
+	}
+	
+	// other abils
+	HASH_ITER(hh, ability_table, iter, next_iter) {
+		if (iter != abil && !str_cmp(ABIL_NAME(iter), ABIL_NAME(abil))) {
+			olc_audit_msg(ch, ABIL_VNUM(abil), "Same name as ability %d", ABIL_VNUM(iter));
 			problem = TRUE;
 		}
 	}
