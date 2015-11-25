@@ -2927,6 +2927,9 @@ OLC_MODULE(skilledit_tree) {
 		else if (is_class_ability(abil)) {
 			msg_to_char(ch, "You can't assign %s to this skill because it's already assigned to a class.\r\n", ABIL_NAME(abil));
 		}
+		else if (ABIL_ASSIGNED_SKILL(abil) && SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil)) != SKILL_VNUM(skill)) {
+			msg_to_char(ch, "You can't assign %s to this skill because it's already assigned to [%d] %s.\r\n", ABIL_NAME(abil), SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil)), SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)));
+		}
 		else if (!*sub_arg || !isdigit(*sub_arg) || (level = atoi(sub_arg)) < 0) {
 			msg_to_char(ch, "Add the ability at what level?\r\n");
 		}
