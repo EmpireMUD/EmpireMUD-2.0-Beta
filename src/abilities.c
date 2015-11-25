@@ -251,8 +251,11 @@ char *list_one_ability(ability_data *abil, bool detail) {
 void olc_search_ability(char_data *ch, any_vnum vnum) {
 	char buf[MAX_STRING_LENGTH];
 	ability_data *abil = find_ability_by_vnum(vnum);
+	struct global_data *glb, *next_glb;
 	ability_data *abiter, *next_abiter;
+	craft_data *craft, *next_craft;
 	skill_data *skill, *next_skill;
+	augment_data *aug, *next_aug;
 	class_data *cls, *next_cls;
 	struct class_ability *clab;
 	struct skill_ability *skab;
@@ -271,7 +274,14 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 		if (ABIL_MASTERY_ABIL(abiter) == vnum) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "ABIL [%5d] %s\r\n", ABIL_VNUM(abiter), ABIL_NAME(abiter));
-			break;	// only need 1
+		}
+	}
+	
+	// augments
+	HASH_ITER(hh, augment_table, aug, next_aug) {
+		if (GET_AUG_ABILITY(aug) == vnum) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "AUG [%5d] %s\r\n", GET_AUG_VNUM(aug), GET_AUG_NAME(aug));
 		}
 	}
 	
@@ -283,6 +293,22 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 				size += snprintf(buf + size, sizeof(buf) - size, "CLS [%5d] %s\r\n", CLASS_VNUM(cls), CLASS_NAME(cls));
 				break;	// only need 1
 			}
+		}
+	}
+	
+	// update crafts
+	HASH_ITER(hh, craft_table, craft, next_craft) {
+		if (GET_CRAFT_ABILITY(craft) == vnum) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
+		}
+	}
+	
+	// globals
+	HASH_ITER(hh, globals_table, glb, next_glb) {
+		if (GET_GLOBAL_ABILITY(glb) == vnum) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "GLB [%5d] %s\r\n", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
 		}
 	}
 	
@@ -571,7 +597,10 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 	
 	struct player_ability_data *plab, *next_plab;
 	ability_data *abil, *abiter, *next_abiter;
+	struct global_data *glb, *next_glb;
+	craft_data *craft, *next_craft;
 	skill_data *skill, *next_skill;
+	augment_data *aug, *next_aug;
 	class_data *cls, *next_cls;
 	descriptor_data *desc;
 	char_data *chiter;
@@ -593,11 +622,38 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
+	// update augments
+	HASH_ITER(hh, augment_table, aug, next_aug) {
+		if (GET_AUG_ABILITY(aug) == vnum) {
+			GET_AUG_ABILITY(aug) = NOTHING;
+			SET_BIT(GET_AUG_FLAGS(aug), AUG_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_AUG, GET_AUG_VNUM(aug));
+		}
+	}
+	
 	// update classes
 	HASH_ITER(hh, class_table, cls, next_cls) {
 		found = remove_vnum_from_class_abilities(&CLASS_ABILITIES(cls), vnum);
 		if (found) {
 			save_library_file_for_vnum(DB_BOOT_CLASS, CLASS_VNUM(cls));
+		}
+	}
+	
+	// update crafts
+	HASH_ITER(hh, craft_table, craft, next_craft) {
+		if (GET_CRAFT_ABILITY(craft) == vnum) {
+			GET_CRAFT_ABILITY(craft) = NOTHING;
+			SET_BIT(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_CRAFT, GET_CRAFT_VNUM(craft));
+		}
+	}
+	
+	// update globals
+	HASH_ITER(hh, globals_table, glb, next_glb) {
+		if (GET_GLOBAL_ABILITY(glb) == vnum) {
+			GET_GLOBAL_ABILITY(glb) = NOTHING;
+			SET_BIT(GET_GLOBAL_FLAGS(glb), GLB_FLAG_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_GLB, GET_GLOBAL_VNUM(glb));
 		}
 	}
 	
@@ -633,10 +689,28 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 				msg_to_desc(desc, "The mastery ability has been deleted from the ability you're editing.\r\n");
 			}
 		}
+		if (GET_OLC_AUGMENT(desc)) {
+			if (GET_AUG_ABILITY(GET_OLC_AUGMENT(desc)) == vnum) {
+				GET_AUG_ABILITY(GET_OLC_AUGMENT(desc)) = NOTHING;
+				msg_to_desc(desc, "The required ability has been deleted from the augment you're editing.\r\n");
+			}
+		}
 		if (GET_OLC_CLASS(desc)) {
 			found = remove_vnum_from_class_abilities(&CLASS_ABILITIES(GET_OLC_CLASS(desc)), vnum);
 			if (found) {
 				msg_to_desc(desc, "An ability has been deleted from the class you're editing.\r\n");
+			}
+		}
+		if (GET_OLC_CRAFT(desc)) {
+			if (GET_CRAFT_ABILITY(GET_OLC_CRAFT(desc)) == vnum) {
+				GET_CRAFT_ABILITY(GET_OLC_CRAFT(desc)) = NOTHING;
+				msg_to_desc(desc, "The required ability has been deleted from the craft you're editing.\r\n");
+			}
+		}
+		if (GET_OLC_GLOBAL(desc)) {
+			if (GET_GLOBAL_ABILITY(GET_OLC_GLOBAL(desc)) == vnum) {
+				GET_GLOBAL_ABILITY(GET_OLC_GLOBAL(desc)) = NOTHING;
+				msg_to_desc(desc, "The required ability has been deleted from the global you're editing.\r\n");
 			}
 		}
 		if (GET_OLC_SKILL(desc)) {

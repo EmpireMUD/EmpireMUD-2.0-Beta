@@ -2422,6 +2422,7 @@ void olc_delete_skill(char_data *ch, any_vnum vnum) {
 		}
 		
 		if (found) {
+			SET_BIT(GET_ARCH_FLAGS(arch), ARCH_IN_DEVELOPMENT);
 			save_library_file_for_vnum(DB_BOOT_ARCH, GET_ARCH_VNUM(arch));
 		}
 	}
@@ -2430,6 +2431,7 @@ void olc_delete_skill(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, class_table, cls, next_cls) {
 		found = remove_vnum_from_class_skill_reqs(&CLASS_SKILL_REQUIREMENTS(cls), vnum);
 		if (found) {
+			SET_BIT(CLASS_FLAGS(cls), CLASSF_IN_DEVELOPMENT);
 			save_library_file_for_vnum(DB_BOOT_CLASS, CLASS_VNUM(cls));
 		}
 	}
