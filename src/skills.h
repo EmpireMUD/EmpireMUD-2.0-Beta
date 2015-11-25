@@ -71,7 +71,7 @@ extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 #define NUM_DIFF_TYPES  4
 
 
-// new skills SKILL_x
+// SKILL_x: skill vnums
 #define SKILL_BATTLE  0
 #define SKILL_EMPIRE  1
 #define SKILL_HIGH_SORCERY  2
@@ -80,9 +80,6 @@ extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 #define SKILL_SURVIVAL  5
 #define SKILL_TRADE  6
 #define SKILL_VAMPIRE  7
-
-#define NUM_SKILLS 8
-// must be <= MAX_SKILLS (10 -- structs.h)
 
 
 // for ability definitions
@@ -123,7 +120,7 @@ extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 #define NUM_CLASSES  29	// total
 
 
-// abilities ABIL_x
+// ABIL_x: ability vnums
 #define ABIL_GIFT_OF_NATURE  0
 #define ABIL_FLY  1
 #define ABIL_ANCIENT_BLOOD  2
@@ -388,7 +385,6 @@ extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 #define ABIL_BANSHEE  261
 #define ABIL_HONE  262
 #define ABIL_HEALER  263
-#define NUM_ABILITIES  264		// must be <= MAX_ABILITIES (300; structs.h)
 
 
 // cooldowns -- see COOLDOWN_x in constants.c

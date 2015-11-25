@@ -2707,8 +2707,9 @@ static const char *GetMSSP_Rooms() {
 
 static const char *GetMSSP_Skills() {
 	static char buf[256];
+	
 	// we think this refers more to our concept of "abilities" than "skills"
-	snprintf(buf, sizeof(buf), "%d", NUM_ABILITIES);
+	snprintf(buf, sizeof(buf), "%d", HASH_COUNT(ability_table));
 	return buf;
 }
 

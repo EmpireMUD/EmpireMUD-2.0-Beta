@@ -1667,7 +1667,6 @@ typedef struct trig_data trig_data;
 // misc game limits
 #define BANNED_SITE_LENGTH    50	// how long ban hosts can be
 #define COLREDUC_SIZE  80	// how many characters long a color_reducer string can be
-#define MAX_ABILITIES  300	// just a shy ton
 #define MAX_ADMIN_NOTES_LENGTH  2400
 #define MAX_AFFECT  32
 #define MAX_CMD_LENGTH  16384	// 16k -- for trigger lengths
@@ -1700,7 +1699,6 @@ typedef struct trig_data trig_data;
 #define MAX_RESOURCES_REQUIRED  10	// how many resources a recipe can need
 #define MAX_REWARDS_PER_DAY  5	//  number of times a player can be rewarded
 #define MAX_ROOM_DESCRIPTION  4000
-#define MAX_SKILLS  10
 #define MAX_SKILL_RESETS  10	// number of skill resets you can save up
 #define MAX_SLASH_CHANNEL_NAME_LENGTH  16
 #define MAX_STORAGE  1000000	// empire storage cap, must be < MAX_INT
