@@ -1097,6 +1097,8 @@ void do_stat_class(char_data *ch, class_data *cls) {
 	// first line
 	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Name: \tc%s\t0, Abbrev: [\tc%s\t0]\r\n", CLASS_VNUM(cls), CLASS_NAME(cls), CLASS_ABBREV(cls));
 	
+	size += snprintf(buf + size, sizeof(buf) - size, "Health: [\tg%d\t0], Moves: [\tg%d\t0], Mana: [\tg%d\t0]\r\n", CLASS_POOL(cls, HEALTH), CLASS_POOL(cls, MOVE), CLASS_POOL(cls, MANA));
+	
 	sprintbit(CLASS_FLAGS(cls), class_flags, part, TRUE);
 	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
 	
