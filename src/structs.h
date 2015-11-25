@@ -2564,6 +2564,7 @@ struct player_ability_data {
 	any_vnum vnum;	// ABIL_ or ability vnum
 	bool purchased;	// whether or not the player bought it
 	byte levels_gained;	// tracks for the cap on how many times one ability grants skillups
+	ability_data *ptr;	// live abil pointer
 
 	UT_hash_handle hh;	// player's ability hash
 };
@@ -2576,6 +2577,7 @@ struct player_skill_data {
 	double exp;	// experience gained in skill (0-100%)
 	int resets;	// resets available
 	bool noskill;	// if TRUE, do not gain
+	skill_data *ptr;	// live skill pointer
 	
 	UT_hash_handle hh;	// player's skill hash
 };

@@ -1839,18 +1839,15 @@ SHOW(show_skills) {
 	msg_to_char(ch, "Skills for %s:\r\n", PERS(vict, ch, TRUE));
 	
 	HASH_ITER(hh, GET_SKILL_HASH(vict), plsk, next_plsk) {
-		if (!(skill = find_skill_by_vnum(plsk->vnum))) {
-			continue;
-		}
+		skill = plsk->ptr;
 		
 		msg_to_char(ch, "&y%s&0 [%d, %.1f%%, %d]: ", SKILL_NAME(skill), get_skill_level(vict, SKILL_VNUM(skill)), get_skill_exp(vict, SKILL_VNUM(skill)), get_ability_points_available_for_char(vict, SKILL_VNUM(skill)));
 		
 		found = FALSE;
 		HASH_ITER(hh, GET_ABILITY_HASH(vict), plab, next_plab) {
+			abil = plab->ptr;
+			
 			if (!plab->purchased) {
-				continue;
-			}
-			if (!(abil = find_ability_by_vnum(plab->vnum))) {
 				continue;
 			}
 			if (ABIL_ASSIGNED_SKILL(abil) != skill) {
@@ -1867,10 +1864,9 @@ SHOW(show_skills) {
 	msg_to_char(ch, "&yClass&0: &g");
 	found = FALSE;
 	HASH_ITER(hh, GET_ABILITY_HASH(vict), plab, next_plab) {
+		abil = plab->ptr;
+		
 		if (!plab->purchased) {
-			continue;
-		}
-		if (!(abil = find_ability_by_vnum(plab->vnum))) {
 			continue;
 		}
 		if (ABIL_ASSIGNED_SKILL(abil) != NULL) {

@@ -373,7 +373,7 @@ static void msdp_update(void) {
 			*buf = '\0';
 			buf_size = 0;
 			HASH_ITER(hh, GET_SKILL_HASH(ch), skill, next_skill) {
-				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%c", (char)MSDP_VAR, get_skill_name_by_vnum(skill->vnum), (char)MSDP_VAL, (char)MSDP_TABLE_OPEN);
+				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%c", (char)MSDP_VAR, SKILL_NAME(skill->ptr), (char)MSDP_VAL, (char)MSDP_TABLE_OPEN);
 				
 				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cLEVEL%c%d", (char)MSDP_VAR, (char)MSDP_VAL, skill->level);
 				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cEXP%c%.2f", (char)MSDP_VAR, (char)MSDP_VAL, skill->exp);

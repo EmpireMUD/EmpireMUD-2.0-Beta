@@ -578,7 +578,8 @@ void clear_char_abilities(char_data *ch, any_vnum skill) {
 		}
 		
 		HASH_ITER(hh, GET_ABILITY_HASH(ch), abil, next_abil) {
-			if (all || ((abd = find_ability_by_vnum(abil->vnum)) && ABIL_ASSIGNED_SKILL(abd) && SKILL_VNUM(ABIL_ASSIGNED_SKILL(abd)) == skill)) {
+			abd = abil->ptr;
+			if (all || (ABIL_ASSIGNED_SKILL(abd) && SKILL_VNUM(ABIL_ASSIGNED_SKILL(abd)) == skill)) {
 				if (abil->purchased) {
 					check_skill_sell(REAL_CHAR(ch), abil->vnum);
 					remove_ability(ch, abil->vnum, FALSE);
@@ -760,7 +761,7 @@ bool gain_skill_exp(char_data *ch, any_vnum skill_vnum, double amount) {
 	bool gained;
 	
 	// simply sanitation
-	if (amount <= 0 || !ch || !(skill = find_skill_by_vnum(skill_vnum)) || !(skdata = get_skill_data(ch, skill_vnum, TRUE))) {
+	if (amount <= 0 || !ch || !(skdata = get_skill_data(ch, skill_vnum, TRUE)) || !(skill = skdata->ptr)) {
 		return FALSE;
 	}
 	
@@ -806,16 +807,18 @@ bool gain_skill_exp(char_data *ch, any_vnum skill_vnum, double amount) {
 */
 struct player_ability_data *get_ability_data(char_data *ch, any_vnum abil_id, bool add_if_missing) {
 	struct player_ability_data *data;
+	ability_data *ptr;
 	
 	// check bounds
-	if (!ch || IS_NPC(ch) || abil_id < 0 || abil_id >= NUM_ABILITIES) {
+	if (!ch || IS_NPC(ch)) {
 		return NULL;
 	}
 	
 	HASH_FIND_INT(GET_ABILITY_HASH(ch), &abil_id, data);
-	if (!data && add_if_missing) {
+	if (!data && add_if_missing && (ptr = find_ability_by_vnum(abil_id))) {
 		CREATE(data, struct player_ability_data, 1);
 		data->vnum = abil_id;
+		data->ptr = ptr;
 		HASH_ADD_INT(GET_ABILITY_HASH(ch), vnum, data);
 	}
 	
@@ -1046,6 +1049,7 @@ char *get_skill_abilities_display(char_data *ch, skill_data *skill, any_vnum pre
 */
 struct player_skill_data *get_skill_data(char_data *ch, any_vnum vnum, bool add_if_missing) {
 	struct player_skill_data *sk = NULL;
+	skill_data *ptr;
 	
 	// check bounds
 	if (!ch || IS_NPC(ch)) {
@@ -1053,9 +1057,10 @@ struct player_skill_data *get_skill_data(char_data *ch, any_vnum vnum, bool add_
 	}
 	
 	HASH_FIND_INT(GET_SKILL_HASH(ch), &vnum, sk);
-	if (!sk && add_if_missing && find_skill_by_vnum(vnum)) {
+	if (!sk && add_if_missing && (ptr = find_skill_by_vnum(vnum))) {
 		CREATE(sk, struct player_skill_data, 1);
 		sk->vnum = vnum;
+		sk->ptr = ptr;
 		HASH_ADD_INT(GET_SKILL_HASH(ch), vnum, sk);
 	}
 	
@@ -1182,7 +1187,8 @@ void reset_skill_gain_tracker_on_abilities_above_level(char_data *ch, any_vnum s
 	
 	if (!IS_NPC(ch)) {
 		HASH_ITER(hh, GET_ABILITY_HASH(ch), abil, next_abil) {
-			if ((ability = find_ability_by_vnum(abil->vnum)) && SKILL_VNUM(ABIL_ASSIGNED_SKILL(ability)) == skill && ABIL_SKILL_LEVEL(ability) >= get_skill_level(ch, skill)) {
+			ability = abil->ptr;
+			if (ABIL_ASSIGNED_SKILL(ability) && SKILL_VNUM(ABIL_ASSIGNED_SKILL(ability)) == skill && ABIL_SKILL_LEVEL(ability) >= get_skill_level(ch, skill)) {
 				abil->levels_gained = 0;
 			}
 		}

@@ -2631,13 +2631,13 @@ void check_skills_and_abilities(char_data *ch) {
 	}
 	
 	HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
-		if (!find_ability_by_vnum(plab->vnum)) {
+		if (!plab->ptr) {
 			HASH_DEL(GET_ABILITY_HASH(ch), plab);
 			free(plab);
 		}
 	}
 	HASH_ITER(hh, GET_SKILL_HASH(ch), plsk, next_plsk) {
-		if (!find_skill_by_vnum(plsk->vnum)) {
+		if (!plsk->ptr) {
 			HASH_DEL(GET_SKILL_HASH(ch), plsk);
 			free(plsk);
 		}
