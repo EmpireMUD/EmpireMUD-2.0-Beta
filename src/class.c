@@ -376,11 +376,80 @@ void update_class(char_data *ch) {
 * @return bool TRUE if any problems were reported; FALSE if all good.
 */
 bool audit_class(class_data *cls, char_data *ch) {
-	bool problem = FALSE;
+	bool found_different, found_identical, problem = FALSE;
+	struct class_skill_req *clsk, *sec;
+	int pl, my_count, their_count;
+	class_data *iter, *next_iter;
+	struct class_ability *clab;
+	ability_data *abil;
 	
 	if (CLASS_FLAGGED(cls, CLASSF_IN_DEVELOPMENT)) {
 		olc_audit_msg(ch, CLASS_VNUM(cls), "IN-DEVELOPMENT");
 		problem = TRUE;
+	}
+	if (!CLASS_NAME(cls) || !*CLASS_NAME(cls) || !str_cmp(CLASS_NAME(cls), default_class_name)) {
+		olc_audit_msg(ch, CLASS_VNUM(cls), "No name set");
+		problem = TRUE;
+	}
+	if (!CLASS_ABBREV(cls) || !*CLASS_ABBREV(cls) || !str_cmp(CLASS_ABBREV(cls), default_class_abbrev)) {
+		olc_audit_msg(ch, CLASS_VNUM(cls), "No abbrev set");
+		problem = TRUE;
+	}
+	
+	// check pools
+	for (pl = 0; pl < NUM_POOLS; ++pl) {
+		if (pl != BLOOD && CLASS_POOL(cls, pl) < 1) {
+			olc_audit_msg(ch, CLASS_VNUM(cls), "%s pool is %d", pool_types[pl], CLASS_POOL(cls, pl));
+			problem = TRUE;
+		}
+	}
+	
+	// check skill requirements
+	if (CLASS_SKILL_REQUIREMENTS(cls)) {
+		LL_COUNT(CLASS_SKILL_REQUIREMENTS(cls), clsk, my_count);
+		
+		// check for identical requirements with other classes
+		HASH_ITER(hh, class_table, iter, next_iter) {
+			LL_COUNT(CLASS_SKILL_REQUIREMENTS(iter), sec, their_count);
+			
+			if (my_count == their_count) {	// same # of skill reqs
+				found_different = FALSE;
+				LL_FOREACH(CLASS_SKILL_REQUIREMENTS(cls), clsk) {
+					found_identical = FALSE;
+					LL_FOREACH(CLASS_SKILL_REQUIREMENTS(iter), sec) {
+						if (clsk->vnum == sec->vnum && clsk->level == sec->level) {
+							found_identical = TRUE;
+							break;	// only need 1
+						}
+					}
+					if (!found_identical) {
+						found_different = TRUE;
+						break;	// only need 1
+					}
+				}
+			
+				if (!found_different) {
+					olc_audit_msg(ch, CLASS_VNUM(cls), "Class %d %s has same skill requirements", CLASS_VNUM(iter), CLASS_NAME(iter));
+					problem = TRUE;
+				}
+			}
+		}
+	}
+	else {
+		olc_audit_msg(ch, CLASS_VNUM(cls), "No skill requirements");
+		problem = TRUE;
+	}
+	
+	// check abilities
+	LL_FOREACH(CLASS_ABILITIES(cls), clab) {
+		if (!(abil = find_ability_by_vnum(clab->vnum))) {
+			olc_audit_msg(ch, CLASS_VNUM(cls), "Invalid ability %d", clab->vnum);
+			problem = TRUE;
+		}
+		else if (ABIL_ASSIGNED_SKILL(abil)) {
+			olc_audit_msg(ch, CLASS_VNUM(cls), "Ability %d %s is assigned to skill %d %s", ABIL_VNUM(abil), ABIL_NAME(abil), SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil)), SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)));
+			problem = TRUE;
+		}
 	}
 	
 	return problem;

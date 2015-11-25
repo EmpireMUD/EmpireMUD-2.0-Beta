@@ -1966,6 +1966,14 @@ bool audit_skill(skill_data *skill, char_data *ch) {
 		olc_audit_msg(ch, SKILL_VNUM(skill), "No name set");
 		problem = TRUE;
 	}
+	if (!SKILL_ABBREV(skill) || !*SKILL_ABBREV(skill) || !str_cmp(SKILL_ABBREV(skill), default_skill_abbrev)) {
+		olc_audit_msg(ch, SKILL_VNUM(skill), "No abbrev set");
+		problem = TRUE;
+	}
+	if (!SKILL_DESC(skill) || !*SKILL_DESC(skill) || !str_cmp(SKILL_DESC(skill), default_skill_desc)) {
+		olc_audit_msg(ch, SKILL_VNUM(skill), "No description set");
+		problem = TRUE;
+	}
 	
 	// ability assignments
 	LL_FOREACH(SKILL_ABILITIES(skill), skab) {
