@@ -1612,6 +1612,34 @@ Available flags:
 
 See also: OLC CLASSES, OLC REMOVEINDEV
 #d
+"CLASSEDIT MAXHEALTH" "CLASSEDIT MAX HEALTH"
+
+Usage:  .maxhealth <amount>
+
+This determines the amount of health a player gets at skill level 100. Remember
+that certain abilities will raise this amount, and gear will also add to it.
+
+See also: OLC CLASSES
+#d
+"CLASSEDIT MAXMANA" "CLASSEDIT MAX MANA"
+
+Usage:  .maxmana <amount>
+
+This determines the amount of mana a player gets at skill level 100. Remember
+that certain abilities will raise this amount, and gear will also add to it.
+
+See also: OLC CLASSES
+#d
+"CLASSEDIT MAXMOVES" "CLASSEDIT MAX MOVES"
+
+Usage:  .maxmoves <amount>
+
+This determines the number of movement points a player gets at skill level 100.
+Remember that certain abilities will raise this amount, and gear will also add
+to it.
+
+See also: OLC CLASSES
+#d
 "CLASSEDIT NAME"
 
 Usage:  .name <name>
