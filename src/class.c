@@ -89,9 +89,9 @@ void assign_class_abilities(char_data *ch, class_data *cls, int role) {
 			continue;	// class abils only
 		}
 		
-		// determine if the player's class/role has this abil
+		// determine if the player's class/role has this abil -- only if they are at the class skill cap (100)
 		has = FALSE;
-		if (cls) {
+		if (cls && GET_SKILL_LEVEL(ch) >= CLASS_SKILL_CAP) {
 			LL_FOREACH(CLASS_ABILITIES(cls), clab) {
 				if (clab->role != NOTHING && clab->role != role) {
 					continue;	// wrong role
