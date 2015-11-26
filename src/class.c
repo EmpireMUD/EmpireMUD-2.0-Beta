@@ -1120,7 +1120,7 @@ void do_stat_class(char_data *ch, class_data *cls) {
 * @param char_data *info_ch Optional: highlights abilities this player has (or NULL).
 */
 void get_class_ability_display(struct class_ability *list, char *save_buffer, char_data *info_ch) {
-	int count = 0, last_role = -1;
+	int count = 0, last_role = -2;
 	struct class_ability *iter;
 	ability_data *abil;
 	
@@ -1128,7 +1128,7 @@ void get_class_ability_display(struct class_ability *list, char *save_buffer, ch
 
 	LL_FOREACH(list, iter) {
 		if (iter->role != last_role) {
-			sprintf(save_buffer + strlen(save_buffer), "%s %s%s\t0: ", last_role != -1 ? "\r\n" : "", iter->role == NOTHING ? "\t0" : class_role_color[iter->role], iter->role == NOTHING ? "All" : class_role[iter->role]);
+			sprintf(save_buffer + strlen(save_buffer), "%s %s%s\t0: ", last_role != -2 ? "\r\n" : "", iter->role == NOTHING ? "\t0" : class_role_color[iter->role], iter->role == NOTHING ? "All" : class_role[iter->role]);
 			last_role = iter->role;
 			count = 0;
 		}
