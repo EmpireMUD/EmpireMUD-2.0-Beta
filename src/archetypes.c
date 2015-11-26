@@ -96,6 +96,33 @@ void add_archetype_lore(char_data *ch) {
 
 
 /**
+* Audits archetypes on startup. Erroring entries are set IN-DEVELOPMENT.
+*/
+void check_archetypes(void) {
+	struct archetype_skill *arsk, *next_arsk;
+	archetype_data *arch, *next_arch;
+	bool error;
+	
+	HASH_ITER(hh, archetype_table, arch, next_arch) {
+		error = FALSE;
+		
+		LL_FOREACH_SAFE(GET_ARCH_SKILLS(arch), arsk, next_arsk) {
+			if (!find_skill_by_vnum(arsk->skill)) {
+				log("- Archetype [%d] %s has invalid skill %d", GET_ARCH_VNUM(arch), GET_ARCH_NAME(arch), arsk->skill);
+				error = TRUE;
+				LL_DELETE(GET_ARCH_SKILLS(arch), arsk);
+				free(arsk);
+			}
+		}
+		
+		if (error) {
+			SET_BIT(GET_ARCH_FLAGS(arch), ARCH_IN_DEVELOPMENT);
+		}
+	}
+}
+
+
+/**
 * Look up an active archetype by name, preferring exact matches.
 *
 * @param char *name The archetype name to look up.

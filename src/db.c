@@ -342,6 +342,7 @@ void boot_world(void) {
 	void build_land_map();
 	void build_world_map();
 	void check_abilities();
+	void check_archetypes();
 	void check_classes();
 	void check_skills();
 	void check_for_bad_buildings();
@@ -449,6 +450,7 @@ void boot_world(void) {
 	// check for bad data
 	log("Verifying data.");
 	check_abilities();
+	check_archetypes();
 	check_classes();
 	check_skills();
 	check_for_bad_buildings();
