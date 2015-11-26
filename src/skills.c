@@ -65,9 +65,9 @@ int sort_skill_abilities(struct skill_ability *a, struct skill_ability *b);
 * Code that must run when skills are sold.
 *
 * @param char_data *ch
-* @param any_vnum abil The ability to sell
+* @param ability_data *abil The ability to sell
 */
-void check_skill_sell(char_data *ch, any_vnum abil) {
+void check_skill_sell(char_data *ch, ability_data *abil) {
 	bool despawn_familiar(char_data *ch, mob_vnum vnum);
 	void end_majesty(char_data *ch);
 	void remove_armor_by_type(char_data *ch, int armor_type);
@@ -79,7 +79,7 @@ void check_skill_sell(char_data *ch, any_vnum abil) {
 	
 	// empire_data *emp = GET_LOYALTY(ch);
 	
-	switch (abil) {
+	switch (ABIL_VNUM(abil)) {
 		case ABIL_ALACRITY: {
 			void end_alacrity(char_data *ch);
 			end_alacrity(ch);
@@ -582,8 +582,8 @@ void clear_char_abilities(char_data *ch, any_vnum skill) {
 			abd = abil->ptr;
 			if (all || (ABIL_ASSIGNED_SKILL(abd) && SKILL_VNUM(ABIL_ASSIGNED_SKILL(abd)) == skill)) {
 				if (abil->purchased) {
-					check_skill_sell(REAL_CHAR(ch), abil->vnum);
-					remove_ability(ch, abil->vnum, FALSE);
+					check_skill_sell(REAL_CHAR(ch), abil->ptr);
+					remove_ability(ch, abil->ptr, FALSE);
 				}
 			}
 		}
@@ -1157,11 +1157,11 @@ void mark_level_gained_from_ability(char_data *ch, ability_data *abil) {
 * Takes an ability away from a player.
 *
 * @param char_data *ch The player to check.
-* @param any_vnum abil_id Any valid ability.
+* @param ability_data *abil Any ability.
 * @param bool reset_levels If TRUE, wipes out the number of levels gained from the ability.
 */
-void remove_ability(char_data *ch, any_vnum abil_id, bool reset_levels) {
-	struct player_ability_data *data = get_ability_data(ch, abil_id, FALSE);
+void remove_ability(char_data *ch, ability_data *abil, bool reset_levels) {
+	struct player_ability_data *data = get_ability_data(ch, ABIL_VNUM(abil), FALSE);
 	if (data) {
 		data->purchased = FALSE;
 		
@@ -1476,7 +1476,7 @@ ACMD(do_skills) {
 		}
 		
 		// good to go
-		remove_ability(ch, ABIL_VNUM(abil), FALSE);
+		remove_ability(ch, abil, FALSE);
 		msg_to_char(ch, "You no longer know %s.\r\n", ABIL_NAME(abil));
 		SAVE_CHAR(ch);
 
@@ -1484,7 +1484,7 @@ ACMD(do_skills) {
 			adjust_abilities_to_empire(ch, GET_LOYALTY(ch), FALSE);
 		}
 
-		check_skill_sell(ch, ABIL_VNUM(abil));
+		check_skill_sell(ch, abil);
 		
 		if (GET_LOYALTY(ch)) {
 			adjust_abilities_to_empire(ch, GET_LOYALTY(ch), TRUE);

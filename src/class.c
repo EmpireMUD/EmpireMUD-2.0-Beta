@@ -64,7 +64,7 @@ extern const char *pool_types[];
 * @param int roole Any ROLE_X const, or NOTHING to detect from the player.
 */
 void assign_class_abilities(char_data *ch, class_data *cls, int role) {
-	void check_skill_sell(char_data *ch, any_vnum abil);
+	void check_skill_sell(char_data *ch, ability_data *abil);
 	
 	ability_data *abil, *next_abil;
 	struct class_ability *clab;
@@ -108,8 +108,8 @@ void assign_class_abilities(char_data *ch, class_data *cls, int role) {
 		
 		// remove any they shouldn't have
 		if (has_ability(ch, ABIL_VNUM(abil)) && !has) {
-			remove_ability(ch, ABIL_VNUM(abil), FALSE);
-			check_skill_sell(ch, ABIL_VNUM(abil));
+			remove_ability(ch, abil, FALSE);
+			check_skill_sell(ch, abil);
 		}
 		// add if needed
 		if (has) {
