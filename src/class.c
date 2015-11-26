@@ -1440,7 +1440,7 @@ OLC_MODULE(classedit_role) {
 	else if (is_abbrev(cmd_arg, "remove")) {
 		any = FALSE;
 		LL_FOREACH_SAFE(CLASS_ABILITIES(cls), clab, next_clab) {
-			if (clab->role != role) {
+			if (role != NOTHING && clab->role != role) {
 				continue;
 			}
 			
