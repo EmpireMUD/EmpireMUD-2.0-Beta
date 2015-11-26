@@ -93,7 +93,7 @@ void assign_class_abilities(char_data *ch, class_data *cls, int role) {
 		has = FALSE;
 		if (cls) {
 			LL_FOREACH(CLASS_ABILITIES(cls), clab) {
-				if (clab->role != role) {
+				if (clab->role != NOTHING && clab->role != role) {
 					continue;	// wrong role
 				}
 				if (clab->vnum != ABIL_VNUM(abil)) {
@@ -1128,7 +1128,7 @@ void get_class_ability_display(struct class_ability *list, char *save_buffer, ch
 
 	LL_FOREACH(list, iter) {
 		if (iter->role != last_role) {
-			sprintf(save_buffer + strlen(save_buffer), "%s %s%s\t0: ", last_role != -1 ? "\r\n" : "", class_role_color[iter->role], class_role[iter->role]);
+			sprintf(save_buffer + strlen(save_buffer), "%s %s%s\t0: ", last_role != -1 ? "\r\n" : "", iter->role == NOTHING ? "\t0" : class_role_color[iter->role], iter->role == NOTHING ? "All" : class_role[iter->role]);
 			last_role = iter->role;
 			count = 0;
 		}
@@ -1377,20 +1377,22 @@ OLC_MODULE(classedit_role) {
 	struct class_ability *clab, *next_clab;
 	int role = ROLE_NONE;
 	ability_data *abil;
-	bool all, any;
+	bool all, any, all_roles;
 	
 	argument = any_one_word(argument, role_arg);
 	argument = any_one_arg(argument, cmd_arg);
 	skip_spaces(&argument);
 	
 	// first args
-	if (*role_arg && (role = search_block(role_arg, class_role, FALSE)) == NOTHING) {
+	all_roles = !str_cmp(role_arg, "all");
+	role = all_roles ? NOTHING : search_block(role_arg, class_role, FALSE);
+	if (!all_roles && *role_arg && role == NOTHING) {
 		msg_to_char(ch, "Invalid role '%s'.\r\n", role_arg);
 		return;
 	}
 	else if (!*cmd_arg || !*argument) {
-		msg_to_char(ch, "Usage: role <role> add <ability>\r\n");
-		msg_to_char(ch, "       role <role> remove <ability | all>\r\n");
+		msg_to_char(ch, "Usage: role <role | all> add <ability>\r\n");
+		msg_to_char(ch, "       role <role | all> remove <ability | all>\r\n");
 		return;
 	}
 	
@@ -1422,14 +1424,14 @@ OLC_MODULE(classedit_role) {
 		}
 		
 		if (any) {
-			msg_to_char(ch, "It already has %s on the %s role.\r\n", ABIL_NAME(abil), class_role[role]);
+			msg_to_char(ch, "It already has %s on the %s role.\r\n", ABIL_NAME(abil), all_roles ? "ALL" : class_role[role]);
 		}
 		else {
 			CREATE(clab, struct class_ability, 1);
 			clab->role = role;
 			clab->vnum = ABIL_VNUM(abil);
 			LL_APPEND(CLASS_ABILITIES(cls), clab);
-			msg_to_char(ch, "You add %s to the %s role.\r\n", ABIL_NAME(abil), class_role[role]);
+			msg_to_char(ch, "You add %s to the %s role.\r\n", ABIL_NAME(abil), all_roles ? "ALL" : class_role[role]);
 		}
 		
 		// ensure sorting now
@@ -1450,18 +1452,18 @@ OLC_MODULE(classedit_role) {
 		}
 		
 		if (!any) {
-			msg_to_char(ch, "The %s role didn't have %s.\r\n", class_role[role], all ? "any abilities" : "that ability");
+			msg_to_char(ch, "The %s role didn't have %s.\r\n", all_roles ? "ALL" : class_role[role], all ? "any abilities" : "that ability");
 		}
 		else if (all) {
-			msg_to_char(ch, "You remove all abilities from the %s role.\r\n", class_role[role]);
+			msg_to_char(ch, "You remove all abilities from the %s role.\r\n", all_roles ? "ALL" : class_role[role]);
 		}
 		else {
-			msg_to_char(ch, "You remove %s from the %s role.\r\n", ABIL_NAME(abil), class_role[role]);
+			msg_to_char(ch, "You remove %s from the %s role.\r\n", ABIL_NAME(abil), all_roles ? "ALL" : class_role[role]);
 		}
 	}
 	else {
-		msg_to_char(ch, "Usage: role <role> add <ability>\r\n");
-		msg_to_char(ch, "       role <role> remove <ability | all>\r\n");
+		msg_to_char(ch, "Usage: role <role | all> add <ability>\r\n");
+		msg_to_char(ch, "       role <role | all> remove <ability | all>\r\n");
 	}
 }
 
