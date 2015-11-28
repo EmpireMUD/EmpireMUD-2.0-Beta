@@ -171,6 +171,8 @@ void check_classes(void) {
 * @return bool TRUE if the player counts as "solo" (for the soloist role).
 */
 bool check_solo_role(char_data *ch) {
+	extern bool is_fight_enemy(char_data *ch, char_data *frenemy);	// fight.c
+
 	char_data *iter;
 	
 	if (IS_NPC(ch) || GET_CLASS_ROLE(ch) != ROLE_SOLO) {
