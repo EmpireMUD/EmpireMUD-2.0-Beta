@@ -1040,10 +1040,10 @@ ACMD(do_heal) {
 	}
 	
 	if (has_ability(ch, ABIL_HEALING_BOOST) && check_solo_role(ch)) {
-		cost = amount * base_cost_ratio;
+		cost = amount * CHOOSE_BY_ABILITY_LEVEL(healer_cost_ratio, ch, abil);
 	}
 	else {
-		cost = amount * CHOOSE_BY_ABILITY_LEVEL(healer_cost_ratio, ch, abil);
+		cost = amount * base_cost_ratio;
 	}
 	
 	// bonus healing does not add to cost
