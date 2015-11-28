@@ -377,6 +377,17 @@ If your target is in combat, you will join the combat upon using this ability.
 
 See also: HEALER
 #
+"HEALING BOOST"
+
+Healing Boost
+Class ability: various
+
+This ability increases the amount healed by abilities such as Heal and
+Rejuvenate, making the user more effective at healing. This ability is auto-
+matic.
+
+See also: HEAL, HEALER, REJUVENATE
+#
 "HEALING POTIONS" "HEALING ELIXIRS"
 
 Usage:  brew <potion>
