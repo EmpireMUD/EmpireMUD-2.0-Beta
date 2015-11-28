@@ -891,11 +891,18 @@ void parse_action(int command, char *string, descriptor_data *d) {
 				return;
 			}
 			if (line_low > 0) {
-				while (s && i < line_low)
+				while (s && i < line_low) {
 					if ((s = strchr(s, '\n')) != NULL) {
 						i++;
 						s++;
 					}
+				}
+				
+				if (!s) {
+					msg_to_desc(d, "Invalid insert position.\r\n");
+					return;
+				}
+				
 				temp = *s;
 				*s = '\0';
 				if ((strlen(*d->str) + strlen(buf2) + strlen(s + 1) + 3) > d->max_str) {
