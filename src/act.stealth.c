@@ -808,6 +808,9 @@ ACMD(do_diversion) {
 	if (!can_use_ability(ch, ABIL_DIVERSION, MOVE, cost, COOLDOWN_DIVERSION)) {
 		return;
 	}
+	else if (!check_solo_role(ch)) {
+		msg_to_char(ch, "You must be alone to use that ability in the solo role.\r\n");
+	}
 	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_DIVERSION)) {
 		return;
 	}
@@ -945,6 +948,9 @@ ACMD(do_howl) {
 	
 	if (!can_use_ability(ch, ABIL_HOWL, MOVE, cost, COOLDOWN_HOWL)) {
 		return;
+	}
+	else if (!check_solo_role(ch)) {
+		msg_to_char(ch, "You must be alone to use that ability in the solo role.\r\n");
 	}
 	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_HOWL)) {
 		return;
@@ -1109,21 +1115,21 @@ ACMD(do_jab) {
 		if (hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FALSE) > 0) {
 			apply_dot_effect(vict, ATYPE_JABBED, 3, DAM_PHYSICAL, get_ability_level(ch, ABIL_JAB) / 24, 2, ch);
 			
-			if (!has_ability(ch, ABIL_STAGGER_JAB) && !AFF_FLAGGED(vict, AFF_IMMUNE_STEALTH)) {
+			if (has_ability(ch, ABIL_STAGGER_JAB) && !AFF_FLAGGED(vict, AFF_IMMUNE_STEALTH) && check_solo_role(ch)) {
 				struct affected_type *af;
 				int value = ceil(GET_CHARISMA(ch) / 5);
 				af = create_mod_aff(ATYPE_STAGGER_JAB, 3, APPLY_TO_HIT, -value, ch);
 				affect_join(vict, af, ADD_MODIFIER);
 			}
 			
-			if (has_ability(ch, ABIL_CRUCIAL_JAB) && !AFF_FLAGGED(vict, AFF_IMMUNE_STEALTH)) {
+			if (has_ability(ch, ABIL_CRUCIAL_JAB) && !AFF_FLAGGED(vict, AFF_IMMUNE_STEALTH) && check_solo_role(ch)) {
 				struct affected_type *af;
 				int value = round(GET_COMPUTED_LEVEL(ch) / 80);
 				af = create_mod_aff(ATYPE_CRUCIAL_JAB, 2, APPLY_DEXTERITY, -value, ch);
 				affect_join(vict, af, NOBITS);
 			}
 			
-			if (has_ability(ch, ABIL_SHADOW_JAB) && !AFF_FLAGGED(vict, AFF_IMMUNE_STEALTH)) {
+			if (has_ability(ch, ABIL_SHADOW_JAB) && !AFF_FLAGGED(vict, AFF_IMMUNE_STEALTH) && check_solo_role(ch)) {
 				struct affected_type *af;
 				int value = ceil(GET_CHARISMA(ch) / 5);
 				af = create_mod_aff(ATYPE_SHADOW_JAB, 3, APPLY_DEXTERITY, -value, ch);
@@ -1425,6 +1431,9 @@ ACMD(do_shadowcage) {
 	
 	if (!can_use_ability(ch, ABIL_SHADOWCAGE, MOVE, cost, COOLDOWN_SHADOWCAGE)) {
 		return;
+	}
+	else if (!check_solo_role(ch)) {
+		msg_to_char(ch, "You must be alone to use that ability in the solo role.\r\n");
 	}
 	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_SHADOWCAGE)) {
 		return;

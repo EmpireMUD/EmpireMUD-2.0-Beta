@@ -59,7 +59,7 @@ void un_earthmeld(char_data *ch);
 int ancestral_healing(char_data *ch) {
 	double mod, amt;
 	
-	if (!has_ability(ch, ABIL_ANCESTRAL_HEALING)) {
+	if (!has_ability(ch, ABIL_ANCESTRAL_HEALING) || !check_solo_role(ch)) {
 		return 0;
 	}
 	

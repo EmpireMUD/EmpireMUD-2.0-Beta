@@ -1379,6 +1379,7 @@ typedef struct trig_data trig_data;
 #define MORPH_FLAG_TEMPERATE_AFFINITY  BIT(3)	// requires temperate
 #define MORPH_FLAG_ARID_AFFINITY  BIT(4)	// requires arid
 #define MORPH_FLAG_TROPICAL_AFFINITY  BIT(5)	// requires tropical
+#define MORPH_FLAG_CHECK_SOLO  BIT(6)	// check for the solo role
 
 // for morph data
 #define MORPH_STRING_NAME  0
