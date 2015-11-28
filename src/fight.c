@@ -3028,6 +3028,11 @@ void perform_violence_melee(char_data *ch, obj_data *weapon) {
 		weapon = NULL;
 	}
 	
+	if (weapon && OBJ_FLAGGED(weapon, OBJ_TWO_HANDED) && (!has_ability(ch, ABIL_TWO_HANDED_WEAPONS) || !check_solo_role(ch))) {
+		msg_to_char(ch, "You must be alone to use two-handed weapons in the solo role.\r\n");
+		return;
+	}
+	
 	if (hit(ch, FIGHTING(ch), weapon, TRUE) < 0) {
 		return;
 	}
