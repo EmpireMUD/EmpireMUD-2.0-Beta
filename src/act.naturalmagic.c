@@ -971,8 +971,8 @@ ACMD(do_heal) {
 	double self_cost = 0.75;
 	
 	// Healer ability features
-	double healer_cost_ratio = 0.25;
-	double healer_level_bonus = 1.5;	// times levels over 100
+	double healer_cost_ratio[] = { 0.75, 0.5, 0.25 };	// multiplied by amount healed
+	double healer_level_bonus[] = { 0.5, 1.0, 1.5 };	// times levels over 100
 	
 	one_argument(argument, arg);
 	
@@ -1028,8 +1028,8 @@ ACMD(do_heal) {
 
 	// amount to heal will determine the cost
 	amount = CHOOSE_BY_ABILITY_LEVEL(heal_levels, ch, abil) + (GET_INTELLIGENCE(ch) * CHOOSE_BY_ABILITY_LEVEL(intel_bonus, ch, abil));
-	if (has_ability(ch, ABIL_HEALER)) {
-		amount += (MAX(0, get_approximate_level(ch) - 100) * healer_level_bonus);
+	if (has_ability(ch, ABIL_HEALING_BOOST) && check_solo_role(ch)) {
+		amount += (MAX(0, get_approximate_level(ch) - 100) * CHOOSE_BY_ABILITY_LEVEL(healer_level_bonus, ch, abil));
 	}
 	bonus = total_bonus_healing(ch);
 	
@@ -1039,11 +1039,11 @@ ACMD(do_heal) {
 		amount = MAX(1, amount);
 	}
 	
-	if (has_ability(ch, ABIL_HEALER)) {
+	if (has_ability(ch, ABIL_HEALING_BOOST) && check_solo_role(ch)) {
 		cost = amount * base_cost_ratio;
 	}
 	else {
-		cost = amount * healer_cost_ratio;
+		cost = amount * CHOOSE_BY_ABILITY_LEVEL(healer_cost_ratio, ch, abil);
 	}
 	
 	// bonus healing does not add to cost
@@ -1291,7 +1291,7 @@ ACMD(do_rejuvenate) {
 	
 	// healer ability mods
 	double over_level_mod = 1.0/4.0;
-	double healer_cost_mod = 1.1;
+	double healer_cost_mod[] = { 2.0, 1.5, 1.1 };
 	
 	one_argument(argument, arg);
 	
@@ -1306,9 +1306,9 @@ ACMD(do_rejuvenate) {
 	// amount determines cost
 	amount = CHOOSE_BY_ABILITY_LEVEL(heal_levels, ch, ABIL_REJUVENATE);
 	amount += round(GET_INTELLIGENCE(ch) * int_mod);
-	if (has_ability(ch, ABIL_HEALER)) {
+	if (has_ability(ch, ABIL_HEALING_BOOST) && check_solo_role(ch)) {
 		amount += round(MAX(0, get_approximate_level(ch) - 100) * over_level_mod);
-		cost = round(amount * healer_cost_mod);
+		cost = round(amount * CHOOSE_BY_ABILITY_LEVEL(healer_cost_mod, ch, ABIL_REJUVENATE));
 	}
 	else {
 		cost = round(amount * base_cost_mod);

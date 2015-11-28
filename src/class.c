@@ -61,7 +61,7 @@ extern const char *pool_types[];
 *
 * @param char_data *ch The player to check.
 * @param class_data *cls Any player class, or NULL to detect fomr the player.
-* @param int roole Any ROLE_X const, or NOTHING to detect from the player.
+* @param int roole Any ROLE_ const, or NOTHING to detect from the player.
 */
 void assign_class_abilities(char_data *ch, class_data *cls, int role) {
 	void check_skill_sell(char_data *ch, ability_data *abil);
@@ -155,6 +155,35 @@ void check_classes(void) {
 		// ensure sorting now
 		LL_SORT(CLASS_ABILITIES(cls), sort_class_abilities);
 	}
+}
+
+
+/**
+* This checks if a person is in the solo role but not solo, and returns FALSE
+* if that's the case. In all other cases, it returns TRUE (as in: okay to
+* proceed).
+*
+* You should put this check in abilities which are assigned to the "Solo" role.
+* If they are also assigned to another role and the player is in that role,
+* this function will return TRUE anyway.
+* 
+* @param char_data *ch A player.
+* @return bool TRUE if the player counts as "solo" (for the soloist role).
+*/
+bool check_solo_role(char_data *ch) {
+	char_data *iter;
+	
+	if (IS_NPC(ch) || GET_CLASS_ROLE(ch) != ROLE_SOLO) {
+		return TRUE;
+	}
+	
+	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_in_room) {
+		if (iter != ch && !IS_NPC(iter) && !IS_IMMORTAL(iter) && !is_fight_enemy(ch, iter)) {
+			return FALSE;
+		}
+	}
+	
+	return TRUE;
 }
 
 

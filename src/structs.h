@@ -635,7 +635,8 @@ typedef struct trig_data trig_data;
 #define ROLE_CASTER  3
 #define ROLE_HEALER  4
 #define ROLE_UTILITY  5
-#define NUM_ROLES  6
+#define ROLE_SOLO  6
+#define NUM_ROLES  7
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2684,7 +2685,7 @@ struct player_special_data {
 	sh_int highest_known_level;	// maximum level ever achieved (used for gear restrictions)
 	sh_int last_known_level;	// set on save/quit/alt
 	ubyte class_progression;	// % of the way from SPECIALTY_SKILL_CAP to CLASS_SKILL_CAP
-	ubyte class_role;	// ROLE_x chosen by the player
+	ubyte class_role;	// ROLE_ chosen by the player
 	class_data *character_class;  // character's class as determined by top skills
 	
 	// tracking for specific skills

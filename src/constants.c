@@ -438,6 +438,7 @@ const char *class_role[] = {
 	"Caster",
 	"Healer",
 	"Utility",
+	"Solo",
 	"\n"
 };
 
@@ -450,6 +451,7 @@ const char *class_role_color[] = {
 	"\ta",	// caster
 	"\tj",	// healer
 	"\tm",	// utility
+	"\tw",	// solo
 	"\n"
 };
 
