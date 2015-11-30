@@ -395,6 +395,13 @@ A highwayman is lurking in the shadows.
 ~
 50 75 cdqv c
 1 0 0 4
+I 4 2300 10.00 1  # LOOT: a leather breastplate
+I 4 2301 10.00 1  # LOOT: a leather helm
+I 4 2302 10.00 1  # LOOT: leather vambraces
+I 4 2306 10.00 1  # LOOT: leather shoes
+I 4 2120 1.00 1  # LOOT: a small silver ring
+I 4 2122 0.25 1  # LOOT: a sparkling gold ring
+I 4 2208 10.00 1 W  # LOOT: a dagger
 S
 #247
 boy lost~
@@ -411,10 +418,11 @@ A traveling knight is standing here.
 ~
 75 95 dquvz c
 2 0 0 1
-I 4 2202 10.00 1  # LOOT: an arming sword
-I 4 2210 10.00 1  # LOOT: a mace
 I 4 2310 10.00 1  # LOOT: splint vambraces
 I 4 2315 10.00 1  # LOOT: a kite shield
+I 4 2309 10.00 1  # LOOT: a mail coif
+I 4 2210 10.00 1 W  # LOOT: a mace
+I 4 2202 10.00 1 W  # LOOT: an arming sword
 S
 #249
 sailor lost~

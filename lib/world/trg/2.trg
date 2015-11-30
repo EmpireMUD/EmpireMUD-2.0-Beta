@@ -53,7 +53,13 @@ end
 * once per 60 minutes
 if %actor.varexists(last_hestian_time)%
   if (%timestamp% - %actor.last_hestian_time%) < 3600
-    %send% %actor% You have used a hestian trinket too recently.
+    eval diff (%actor.last_hestian_time% - %timestamp%) + 3600
+    eval diff2 %diff%/60
+    eval diff %diff%//60
+    if %diff%<10
+      set diff 0%diff%
+    end
+    %send% %actor% You must wait %diff2%:%diff% to use %self.shortdesc% again.
     halt
   end
 end
@@ -129,7 +135,13 @@ end
 * once per 30 minutes
 if %actor.varexists(last_conveyance_time)%
   if (%timestamp% - %actor.last_conveyance_time%) < 1800
-    %send% %actor% You have used a trinket of conveyance too recently.
+    eval diff (%actor.last_conveyance_time% - %timestamp%) + 1800
+    eval diff2 %diff%/60
+    eval diff %diff%//60
+    if %diff%<10
+      set diff 0%diff%
+    end
+    %send% %actor% You must wait %diff2%:%diff% to use %self.shortdesc%.
     halt
   end
 end
