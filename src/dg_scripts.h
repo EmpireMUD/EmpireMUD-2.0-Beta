@@ -210,9 +210,9 @@ void reset_wtrigger(room_data *ch);
 void load_mtrigger(char_data *ch);
 void load_otrigger(obj_data *obj);
 
-int ability_mtrigger(char_data *actor, char_data *ch, int abil);
-int ability_otrigger(char_data *actor, obj_data *obj, int abil);
-int ability_wtrigger(char_data *actor, char_data *vict, obj_data *obj, int abil);
+int ability_mtrigger(char_data *actor, char_data *ch, any_vnum abil);
+int ability_otrigger(char_data *actor, obj_data *obj, any_vnum abil);
+int ability_wtrigger(char_data *actor, char_data *vict, obj_data *obj, any_vnum abil);
 
 int leave_mtrigger(char_data *actor, int dir);
 int leave_wtrigger(room_data *room, char_data *actor, int dir);

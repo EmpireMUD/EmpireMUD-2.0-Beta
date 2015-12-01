@@ -373,6 +373,7 @@ void olc_show_craft(char_data *ch) {
 	craft_data *craft = GET_OLC_CRAFT(ch->desc);
 	obj_data *proto = obj_proto(GET_CRAFT_OBJECT(craft));
 	char lbuf[MAX_STRING_LENGTH];
+	ability_data *abil;
 	int seconds;
 	
 	if (!craft) {
@@ -410,16 +411,16 @@ void olc_show_craft(char_data *ch) {
 	}
 	
 	// ability required
-	if (GET_CRAFT_ABILITY(craft) == NO_ABIL) {
+	if (!(abil = find_ability_by_vnum(GET_CRAFT_ABILITY(craft)))) {
 		strcpy(buf1, "none");
 	}
 	else {
-		sprintf(buf1, "%s", ability_data[GET_CRAFT_ABILITY(craft)].name);
-		if (ability_data[GET_CRAFT_ABILITY(craft)].parent_skill != NO_SKILL) {
-			sprintf(buf1 + strlen(buf1), " (%s %d)", skill_data[ability_data[GET_CRAFT_ABILITY(craft)].parent_skill].name, ability_data[GET_CRAFT_ABILITY(craft)].parent_skill_required);
+		sprintf(buf1, "%s", ABIL_NAME(abil));
+		if (ABIL_ASSIGNED_SKILL(abil)) {
+			sprintf(buf1 + strlen(buf1), " (%s %d)", SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
 		}
 	}
-	sprintf(buf + strlen(buf), "<&yability&0> %s\r\n", buf1);
+	sprintf(buf + strlen(buf), "<&yrequiresability&0> %s\r\n", buf1);
 	
 	sprintf(buf + strlen(buf), "<&ylevelrequired&0> %d\r\n", GET_CRAFT_MIN_LEVEL(craft));
 
@@ -446,10 +447,8 @@ void olc_show_craft(char_data *ch) {
 //// EDIT MODULES ////////////////////////////////////////////////////////////
 
 OLC_MODULE(cedit_ability) {
-	extern int find_ability_by_name(char *name, bool allow_abbrev);
-	
 	craft_data *craft = GET_OLC_CRAFT(ch->desc);
-	int abil;
+	ability_data *abil;
 	
 	if (!*argument) {
 		msg_to_char(ch, "Require what ability (or 'none')?\r\n");
@@ -464,17 +463,17 @@ OLC_MODULE(cedit_ability) {
 			msg_to_char(ch, "It will require no ability.\r\n");
 		}
 	}
-	else if ((abil = find_ability_by_name(argument, TRUE)) == NOTHING) {
+	else if (!(abil = find_ability(argument))) {
 		msg_to_char(ch, "Invalid ability '%s'.\r\n", argument);
 	}
 	else {
-		GET_CRAFT_ABILITY(craft) = abil;
+		GET_CRAFT_ABILITY(craft) = ABIL_VNUM(abil);
 		
 		if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
 			send_config_msg(ch, "ok_string");
 		}
 		else {
-			msg_to_char(ch, "It now requires the %s ability.\r\n", ability_data[abil].name);
+			msg_to_char(ch, "It now requires the %s ability.\r\n", ABIL_NAME(abil));
 		}
 	}
 }

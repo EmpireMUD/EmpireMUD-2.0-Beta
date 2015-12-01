@@ -67,6 +67,10 @@ void save_daily_cycle();
  //////////////////////////////////////////////////////////////////////////////
 //// GLOBAL DATA /////////////////////////////////////////////////////////////
 
+// abilities
+ability_data *ability_table = NULL;	// main hash (hh)
+ability_data *sorted_abilities = NULL;	// alpha hash (sorted_hh)
+
 // adventures
 adv_data *adventure_table = NULL;	// adventure hash table
 
@@ -80,6 +84,10 @@ augment_data *sorted_augments = NULL;	// alphabetic version // sorted_hh
 
 // buildings
 bld_data *building_table = NULL;	// building hash table
+
+// classes
+class_data *class_table = NULL;	// main hash (hh)
+class_data *sorted_classes = NULL;	// alpha hash (sorted_hh)
 
 // crafts
 craft_data *craft_table = NULL;	// master crafting table
@@ -144,6 +152,10 @@ room_template *room_template_table = NULL;	// hash table of room templates
 // sectors
 sector_data *sector_table = NULL;	// sector hash table
 
+// skills
+skill_data *skill_table = NULL;	// main skills hash (hh)
+skill_data *sorted_skills = NULL;	// alpha hash (sorted_hh)
+
 // strings
 char *credits = NULL;	// game credits
 char *motd = NULL;	// message of the day - mortals
@@ -199,6 +211,9 @@ struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES] = {
 	{ ACCT_PREFIX, ACCT_SUFFIX },	// DB_BOOT_ACCT
 	{ AUG_PREFIX, AUG_SUFFIX },	// DB_BOOT_AUG
 	{ ARCH_PREFIX, ARCH_SUFFIX },	// DB_BOOT_ARCH
+	{ ABIL_PREFIX, ABIL_SUFFIX },	// DB_BOOT_ABIL
+	{ CLASS_PREFIX, CLASS_SUFFIX },	// DB_BOOT_CLASS
+	{ SKILL_PREFIX, SKILL_SUFFIX },	// DB_BOOT_SKILL
 };
 
 
@@ -219,7 +234,6 @@ void boot_db(void) {
 	void delete_old_players();
 	void delete_orphaned_rooms();
 	void init_config_system();
-	void init_skills();
 	void load_banned();
 	void load_daily_cycle();
 	void load_intro_screens();
@@ -252,10 +266,6 @@ void boot_db(void) {
 	file_to_string_alloc(HANDBOOK_FILE, &handbook);
 	file_to_string_alloc(SCREDITS_FILE, &CREDIT_MESSG);
 	load_intro_screens();
-	
-	// skills are needed for some world files (crafts?)
-	log("Initializing skills.");
-	init_skills();
 
 	// Load the world!
 	boot_world();
@@ -331,6 +341,10 @@ void boot_db(void) {
 void boot_world(void) {
 	void build_land_map();
 	void build_world_map();
+	void check_abilities();
+	void check_archetypes();
+	void check_classes();
+	void check_skills();
 	void check_for_bad_buildings();
 	void check_for_bad_sectors();
 	void check_newbie_islands();
@@ -341,11 +355,27 @@ void boot_world(void) {
 	void load_islands();
 	void load_world_map_from_file();
 	void number_and_count_islands(bool reset);
+	void read_ability_requirements();
 	void renum_world();
 	void setup_start_locations();
+	extern int sort_abilities_by_data(ability_data *a, ability_data *b);
+	extern int sort_archetypes_by_data(archetype_data *a, archetype_data *b);
+	extern int sort_augments_by_data(augment_data *a, augment_data *b);
+	extern int sort_classes_by_data(class_data *a, class_data *b);
+	extern int sort_crafts_by_data(craft_data *a, craft_data *b);
+	extern int sort_skills_by_data(skill_data *a, skill_data *b);
 
 	// DB_BOOT_x search: boot new types in this function
-
+	
+	log("Loading abilities.");
+	index_boot(DB_BOOT_ABIL);
+	
+	log("Loading classes.");
+	index_boot(DB_BOOT_CLASS);
+	
+	log("Loading skills.");
+	index_boot(DB_BOOT_SKILL);
+	
 	log("Loading name lists.");
 	index_boot(DB_BOOT_NAMES);
 
@@ -419,8 +449,21 @@ void boot_world(void) {
 	
 	// check for bad data
 	log("Verifying data.");
+	check_abilities();
+	check_archetypes();
+	check_classes();
+	check_skills();
 	check_for_bad_buildings();
 	check_for_bad_sectors();
+	read_ability_requirements();
+	
+	log("Sorting data.");
+	HASH_SRT(sorted_hh, sorted_abilities, sort_abilities_by_data);
+	HASH_SRT(sorted_hh, sorted_archetypes, sort_archetypes_by_data);
+	HASH_SRT(sorted_hh, sorted_augments, sort_augments_by_data);
+	HASH_SRT(sorted_hh, sorted_classes, sort_classes_by_data);
+	HASH_SRT(sorted_hh, sorted_crafts, sort_crafts_by_data);
+	HASH_SRT(sorted_hh, sorted_skills, sort_skills_by_data);
 	
 	log("Checking newbie islands.");
 	check_newbie_islands();

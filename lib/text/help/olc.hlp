@@ -50,15 +50,19 @@ See also: OLC ABORT, OLC AUDIT, OLC COPY, OLC DELETE, OLC EDIT, OLC FREE,
 Sometimes abbreviations are used for core "thing" types, like mobs. Here are
 some common ones:
 
+abl - ability
 adv - adventure
 bld (or bdg) - building (these include designated rooms)
 cft - craft
+cls - class
 crp - crop
+glb - global
 mob - mobile/npc
 npc - non-player character (mob)
 obj - object
 rmt - room template
 sct - sector/terrain
+skl - skill
 trg - trigger
 #d
 "OLC LICENSE" "OLC RIGHTS"
@@ -85,6 +89,10 @@ describes the game's current guidelines for building that content. For help
 on the editors instead, see HELP OLC.
 
 ** Editor Notes **
+
+Abilities (ABILEDIT):
+- The mastery ability is mainly used to determine when a craft should be marked
+  (superior). Do not apply mastery abilities to abilities that don't need this.
 
 Adventures (ADVEDIT):
 - When you set a min/max level for the adventure, mobs and items that don't
@@ -118,6 +126,16 @@ Augments (AUGEDIT):
 Buildings (BEDIT):
 - Designated rooms are also built in the building editor, using the ROOM flag.
 - If a building has at least 1 Citizen, players can also set it as their home.
+
+Classes (CLASSEDIT):
+- By convention, stock EmpireMUD has one class for every pair of level 100
+  skills. This leaves no room for adding more classes unless you are re-
+  designing that entire notion.
+- A player will get assigned the class with the most matching skills, so adding
+  a 100/100/75 class would give them a more specific version of the 100/100.
+- Abilities can be on more than one class and more than one role within a class
+  but you CANNOT assign an ability to both a class and a skill -- it would
+  count toward purchased abilities in that skill tree.
 
 Crafts (CEDIT):
 - Soups are made using the COOK type and the SOUP flag. Instead of choosing an
@@ -257,6 +275,23 @@ Sectors (SECTEDIT):
 - Please provide a useful list of commands for any new sector. For example, if
   you add any DIG interaction, put "dig" on the commands list.
 
+Skills (SKILLEDIT):
+- See HELP ABILITY POINTS for a breakdown of how many points a player gets in
+  each skill tree. Use this to "gate" abilities and prevent players from having
+  too many powerful abilities at once.
+- Remember that players can only level up an ability from the level you assign
+  it to, to the cap for that level range (50, 75, 100). You need to provide
+  several abilities at the 50 and 75 marks so that players can level past these
+  points.
+- An ability assigned at level 50 can be purchased by someone who does not
+  specialize past 50. If they choose to specialize, that ability can be used to
+  level the skill from there.
+- The skill description should be short (40-50 characters), written like a
+  sentence, and with no punctuation. It is displayed on the "skills" command.
+- Abilities can be on more than one class and more than one role within a class
+  but you CANNOT assign an ability to both a class and a skill -- it would
+  count toward purchased abilities in that skill tree.
+
 Triggers and Scripts (TRIGEDIT):
 - Scripts must be formatted with /f -- this will also ensure your if/end and
   while/done tags all match.
@@ -297,6 +332,64 @@ it doesn't have its own min or max, it will inherit one from the adventure it
 is in.
 
 See also: BUILDING GUIDE
+#d
+ABILEDIT "OLC ABILITIES" "OLC ABILITY" "ABILITY EDITOR"
+
+Usage:  .abil <command>
+        .command
+
+The .olc ability editor allows you to configure the data for various abilities.
+The main properties set up here are names and mastery abilities.
+
+All commands in the editor arg highlighted in yellow and placed inside <angle
+braces>. You can get help on these commands by typing &yHELP ABILEDIT <COMMAND>&0.
+
+You can close an open editor with .abort or .save.
+
+Example:
+> .abil edit 123
+> .name Test Ability
+> .save
+
+For notes on the mud's building rules, see HELP BUILDING GUIDE.
+
+See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
+"ABILEDIT FLAGS" "ABILITY FLAGS"
+
+Usage:  .flags [add | remove] <flags>
+
+The following adventure flags are available:
+ * - There are noflags for abilities yet
+#d
+"ABILEDIT MASTERYABILITY" "ABILEDIT MASTERY ABILITY"
+
+Usage:  .masterability <ability>
+
+The mastery ability is a separate ability which boosts the performance of this
+ability if a player has both. For example, many crafting abilities have linked
+mastery abilities that result in the (superior) flag on crafts.
+
+Most abilities have no mastery ability.
+
+See also: OLC ABILITIES
+#d
+"ABILEDIT NAME"
+
+Usage:  .name <name>
+
+This lets you set an ability's name. Names should have each word capitalized
+and should be relatively short.
+
+By convention, active abilities (ones with their own commands) almost always
+have the same name one-word name as the command they will use.
+
+When a player types an ability name (e.g. to buy the ability), the game looks
+for exact matches first and then tries a multi-abbreviation approach, where
+each word typed by the user is matched sequentially. For example, "hor fo"
+matches "Horrid Form".
+
+See also: OLC ABILITIES
 #d
 "ADVEDIT AUTHOR"
 
@@ -719,10 +812,10 @@ Capitalized).
 
 See also: OLC ARCHETYPES
 #d
-"ARCHEDIT SKILLS"
+"ARCHEDIT STARTINGSKILLS" "ARCHEDIT STARTING SKILLS"
 
-Usage:  .skill <add | change> <name> <level>
-        .skill remove <name>
+Usage:  .startingskill <add | change> <name> <level>
+        .startingskill remove <name>
 
 Archetypes determine a player's starting skill levels. Players should begin
 the game with a small number of skill points split between one or two skills.
@@ -757,15 +850,6 @@ Example:
 For notes on the mud's building rules, see HELP BUILDING GUIDE.
 
 See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
-#d
-"AUGEDIT ABILITY"
-
-Usage:  .ability <name | none>
-
-This allows you to require the player to have a certain ability in order to
-apply this augment. Setting it to 'none' removes this requirement.
-
-See also: OLC AUGMENTS
 #d
 "AUGEDIT APPLY" "AUGEDIT APPLIES"
 
@@ -811,6 +895,15 @@ simple.
 
 For example, if an enchantment augment is named "striking", the player will
 use it by typing "enchant sword striking".
+
+See also: OLC AUGMENTS
+#d
+"AUGEDIT REQUIRESABILITY" "AUGEDIT REQUIRES ABILITY"
+
+Usage:  .requiresability <name | none>
+
+This allows you to require the player to have a certain ability in order to
+apply this augment. Setting it to 'none' removes this requirement.
 
 See also: OLC AUGMENTS
 #d
@@ -1218,15 +1311,6 @@ and only if it's buildable.
 
 See also: OLC BUILDINGS, UPGRADE, VNUM
 #d
-"CEDIT ABILITY"
-
-Usage:  .ability <ability name | none>
-
-You can use this command to set which ability is required to use a particular
-craft recipe. If you don't want it to require an ability any more, use 'none'.
-
-See also: OLC CRAFTS
-#d
 "CEDIT BUILDFACING" "CEDIT BUILD FACING"
 
 Usage:  .buildfacing [add | remove] <flags>
@@ -1389,6 +1473,15 @@ quantity.
 
 See also: CEDIT CREATES, OLC CRAFTS
 #d
+"CEDIT REQUIRESABILITY" "CEDIT REQUIRES ABILITY"
+
+Usage:  .requiresability <ability name | none>
+
+You can use this command to set which ability is required to use a particular
+craft recipe. If you don't want it to require an ability any more, use 'none'.
+
+See also: OLC CRAFTS
+#d
 "CEDIT REQUIRESOBJECT" "CEDIT REQUIRES OBJECT"
 
 Usage:  .requiresobject <vnum>
@@ -1461,7 +1554,7 @@ Available types are:
  BREW - potions
  MIX - poisons
 
-See also: CEDIT ABILITY, OLC CRAFTS
+See also: CEDIT REQUIRESABILITY, OLC CRAFTS
 #d
 "CEDIT VOLUME"
 
@@ -1472,6 +1565,131 @@ It will always be limited by the size of the drink container the player uses
 to cook the soup in.
 
 See also: CEDIT FLAGS, OLC CRAFTS
+#d
+CLASSEDIT "OLC CLASSES" "OLC CLASS"
+
+Usage:  .class <command>
+        .command
+
+The .olc class editor allows you to set up player classes. On EmpireMUD, the
+players don't begin with classes -- they unlock them by leveling up certain
+skills. Classes can have broadly overlapping requirements (but can't be
+identical to each other), allowing players with similar sets of skills to end
+up in different classes.
+
+All commands in the editor arg highlighted in yellow and placed inside <angle
+braces>. You can get help on these commands by typing &yHELP CLASSEDIT <COMMAND>&0.
+
+You can close an open editor with .abort or .save.
+
+Example:
+> .class edit 123
+> .abbrev Test
+> .save
+
+For notes on the mud's building rules, see HELP BUILDING GUIDE.
+
+See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
+"CLASSEDIT ABBREVIATION"
+
+Usage:  .abbrev <string>
+
+The class abbreviation is shown on the who list and in other places where a
+short name is desired. It must be exactly 4 characters and contain no color
+codes.
+
+See also: OLC CLASSES
+#d
+"CLASSEDIT FLAGS" "CLASS FLAGS"
+
+Usage:  .flags [add | remove] <flags>
+
+Class flags set various properties on classes.
+
+Available flags:
+ IN-DEVELOPMENT - Will not be assigned to players.
+
+See also: OLC CLASSES, OLC REMOVEINDEV
+#d
+"CLASSEDIT MAXHEALTH" "CLASSEDIT MAX HEALTH"
+
+Usage:  .maxhealth <amount>
+
+This determines the amount of health a player gets at skill level 100. Remember
+that certain abilities will raise this amount, and gear will also add to it.
+
+See also: OLC CLASSES
+#d
+"CLASSEDIT MAXMANA" "CLASSEDIT MAX MANA"
+
+Usage:  .maxmana <amount>
+
+This determines the amount of mana a player gets at skill level 100. Remember
+that certain abilities will raise this amount, and gear will also add to it.
+
+See also: OLC CLASSES
+#d
+"CLASSEDIT MAXMOVES" "CLASSEDIT MAX MOVES"
+
+Usage:  .maxmoves <amount>
+
+This determines the number of movement points a player gets at skill level 100.
+Remember that certain abilities will raise this amount, and gear will also add
+to it.
+
+See also: OLC CLASSES
+#d
+"CLASSEDIT NAME"
+
+Usage:  .name <name>
+
+This sets the name of the class. Names should have their first letters
+capitalized and should be reasonably short and concise. You should avoid names
+that conflict with other classes.
+
+See also: OLC CLASSES
+#d
+"CLASSEDIT REQUIRES"
+
+Usage:  .requires <skill> <level>
+        .requires remove <skill>
+
+This allows you to set the skill requirements for a class. Players are auto-
+matically assigned a class when their skills enter a certain range. You can
+set as few or as many skill requirements on a class as you like; the player
+will be matched to the class that has the best fit.
+
+You can specify the skill by vnum or name (use "quotation marks" for multi-word
+names).
+
+The actual requirement is 24 levels below the value you set -- if you set a
+skill requirement to 100, a player will qualify when it hits 76.
+
+All stock EmpireMUD classes specify two skills at level 100, but you have more
+flexibility if you want to do something different. For example, you could do
+more specialized classes that require two skills at 100 and a third at 75.
+If you intend to change the number of skills that a player can raise to 50/75/
+100, though, you should consult a programmer.
+
+See also: OLC CLASSES, VNUM
+#d
+"CLASSEDIT ROLE"
+
+Usage:  .role <role> add <ability>
+        .role <role> remove <ability | all>
+
+This command assigns abilities to the class, under each role. If more than one
+role will have an ability, you must assign it to each of them. There is no
+limit on the number of abilities that can be assigned to each role.
+
+Abilities can be specified by name or vnum.
+
+You should not assign an ability that is also assigned to a skill, because a
+player who has the ability from his/her class will also count as having spent
+an abilitiy point in the skill tree.
+
+See also: OLC CLASSES, VNUM
 #d
 "CROPEDIT CLIMATE" "SECTEDIT CLIMATE"
 
@@ -1561,16 +1779,6 @@ covered by the crops.
 
 See also: OLC CROPS
 #d
-"GEDIT ABILITY"
-
-Usage:  .ability <name | none>
-
-This allows you to require the player to have a certain ability in order to
-trigger this global (of any type). Setting it to 'none' removes this
-requirement.
-
-See also: OLC GLOBALS
-#d
 "GEDIT FLAGS"
 
 Usage:  .flags [add | remove] <flags>
@@ -1656,6 +1864,16 @@ globals together. If multiple globals have the CUMULATIVE-PRC flag, only one
 of them will be chosen (if any), based on a cumulative percentage.
 
 More than one global may be selected if the CUMULATIVE-PRC flag is not set.
+
+See also: OLC GLOBALS
+#d
+"GEDIT REQUIRESABILITY" "GEDIT REQUIRES ABILITY"
+
+Usage:  .requiresability <name | none>
+
+This allows you to require the player to have a certain ability in order to
+trigger this global (of any type). Setting it to 'none' removes this
+requirement.
 
 See also: OLC GLOBALS
 #d
@@ -3099,11 +3317,17 @@ Available flags:
  - !MOBILE -- Cannot edit mobiles
  - !OBJECT -- Cannot edit objects
  - !BUILDING -- Cannot edit buildings
- - SECTORS -- Can edit map sectors
+ - SECTORS -- CAN edit map sectors
  - !CROP -- Cannot edit crops
  - !TRIGGER -- Cannot edit triggers
  - !ADVENTURE -- Cannot edit adventures
  - !ROOMTEMPLATE -- Cannot edit room templates
+ - !GLOBAL -- Cannot edit globals
+ - !AUGMENT -- Cannot edit augments
+ - !ARCHETYPE -- Cannot edit archetypes
+ - ABILITIES -- CAN edit abilities
+ - CLASSES -- CAN edit classes
+ -- SKILLS -- CAN edit skills
 
 For notes on the mud's building rules, see HELP BUILDING GUIDE.
 #d
@@ -3302,7 +3526,14 @@ This command removes the IN-DEVELOPMENT flag from an adventure and any craft
 recipes in it, or from craft recipes over a given vnum range. It can be used
 to quickly activate a zone.
 
-This also applies to global tables in the range.
+The following types will have IN-DEVELOPMENT flags removed in the vnum range:
+- the adventure (when targeting an adventure vnum)
+- archetypes
+- augments
+- classes
+- crafts
+- globals
+- skills
 
 See also: OLC CONTROLS, OLC ADVENTURES, ADVEDIT FLAGS, CEDIT FLAGS
 #d
@@ -3714,6 +3945,91 @@ punctuation at the end, and should be a reasonably short description of the
 sector.
 
 See also: OLC SECTORS
+#d
+SKILLEDIT "OLC SKILLS" "SKILL OLC"
+
+Usage:  .skill <command>
+        .command
+
+The .olc skill editor allows you to set up player skills. The main purpose of
+this is to choose which abilities that skill unlocks, and at what level. This
+does not control what class a player becomes (see HELP CLASSEDIT), only which
+powers they have access to and in which order.
+
+All commands in the editor arg highlighted in yellow and placed inside <angle
+braces>. You can get help on these commands by typing &yHELP SKILLEDIT <COMMAND>&0.
+
+You can close an open editor with .abort or .save.
+
+Example:
+> .skill edit 123
+> .name Test Skill
+> .save
+
+For notes on the mud's building rules, see HELP BUILDING GUIDE.
+
+See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
+"SKILLEDIT ABBREVIATION"
+
+Usage:  .abbrev <string>
+
+The skill abbreviation is a short name used for some strings where there isn't
+enough space for the full name. It must always be 3 letters and contain no
+color codes.
+
+See also: OLC SKILLS
+#d
+"SKILLEDIT DESCRIPTION"
+
+Usage:  .description <text>
+
+Skill descriptions are short phrases that appear when a player types "skills",
+or when they get more info on a skill during character creation. These should
+always be short -- 40 characters or so. Generally they are written as whole
+sentences, but with no punctuation.
+
+See also: OLC SKILLS
+#d
+"SKILLEDIT FLAGS" "SKILL FLAGS"
+
+Usage:  .flags [add | remove] <flags>
+
+Skill flags set various properties on skills.
+
+Available flags:
+ IN-DEVELOPMENT - Players can't see or gain the skill.
+
+See also: OLC SKILLS, OLC REMOVEINDEV
+#d
+"SKILLEDIT NAME"
+
+Usage:  .name <name>
+
+A skill's name is what players see on their skill list, and what is shown in
+many messages related to the skill. Skill names should be reasonably short and
+very unique. Players will want to abbreviate them easily.
+
+See also: OLC SKILLS
+#d
+"SKILLEDIT TREE"
+
+Usage:  .tree add <ability> <level> [requires ability]
+        .tree remove <ability | all>
+        .tree change <ability> <level | requires> <new value>
+
+This command allows you to set up the skill tree -- the abilities players can
+purchase. Each ability requires a level. You can also set a requirement that
+they buy another ability first -- that's what makes it a tree.
+
+Each ability may only be assigned to only one skill, and cannot be assigned to
+both a skill and a class.
+
+Players always get a fixed number of ability points in a skill, and you can
+use the level and prerequisite abilities to help control how many of the
+abilities a player can access.
+
+See also: ABILITY POINTS, OLC SKILLS, VNUM
 #d
 "SPECIAL ICONS" "ICON CODES"
 

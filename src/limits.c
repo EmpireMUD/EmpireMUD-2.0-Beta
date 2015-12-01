@@ -391,13 +391,17 @@ void point_update_char(char_data *ch) {
 		}
 	}
 
-	// check all cooldowns
-	for (cool = ch->cooldowns; cool; cool = next_cool) {
-		next_cool = cool->next;
+	// check all cooldowns -- ignore chars with descriptors, as they'll want
+	// the OTHER function to remove this (it sends messages; this one includes
+	// NPCs and doesn't)
+	if (!ch->desc) {
+		for (cool = ch->cooldowns; cool; cool = next_cool) {
+			next_cool = cool->next;
 		
-		// is expired?
-		if (time(0) >= cool->expire_time) {
-			remove_cooldown(ch, cool);
+			// is expired?
+			if (time(0) >= cool->expire_time) {
+				remove_cooldown(ch, cool);
+			}
 		}
 	}
 
@@ -417,6 +421,7 @@ void point_update_char(char_data *ch) {
 void real_update_char(char_data *ch) {
 	void adventure_unsummon(char_data *ch);
 	extern bool can_wear_item(char_data *ch, obj_data *item, bool send_messages);
+	void check_morph_ability(char_data *ch);
 	extern int compute_bonus_exp_per_day(char_data *ch);
 	extern int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname);	
 	void random_encounter(char_data *ch);
@@ -432,6 +437,18 @@ void real_update_char(char_data *ch) {
 	// first check location: this may move the player
 	if (!IS_NPC(ch) && PLR_FLAGGED(ch, PLR_ADVENTURE_SUMMONED) && !IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
 		adventure_unsummon(ch);
+	}
+	
+	if (!IS_NPC(ch) && GET_MORPH(ch) != MORPH_NONE) {
+		check_morph_ability(ch);
+	}
+	
+	// check master's solo role
+	if (IS_NPC(ch) && MOB_FLAGGED(ch, MOB_FAMILIAR) && ch->master && !check_solo_role(ch->master)) {
+		act("$N vanishes because you're in the solo role but not alone.", FALSE, ch->master, NULL, ch, TO_CHAR);
+		act("$N vanishes.", FALSE, ch->master, NULL, ch, TO_NOTVICT);
+		extract_char(ch);
+		return;
 	}
 	
 	// update affects (NPCs get this, too)

@@ -62,7 +62,7 @@ bool trigger_counterspell(char_data *ch) {
 //// DAMAGE SPELLS ///////////////////////////////////////////////////////////
 
 struct damage_spell_type {
-	int ability;	// ABIL_x
+	any_vnum ability;	// ABIL_ type
 	int cost;	// mana
 	int attack_type;	// ATTACK_x
 	double damage_mod;	// 1.0 = normal damage, balance based on affects
@@ -211,7 +211,7 @@ ACMD(do_damage_spell) {
 
 struct chant_data_type {
 	char *name;
-	int ability;
+	any_vnum ability;
 	bitvector_t flags;
 } chant_data[] = {
 	{ "druids", NO_ABIL, CHANT_HENGE },	// 0
@@ -237,7 +237,7 @@ bool can_use_chant(char_data *ch, int chant) {
 
 
 void perform_chant(char_data *ch) {
-	void set_skill(char_data *ch, int skill, int level);
+	void set_skill(char_data *ch, any_vnum skill, int level);
 	char lbuf[MAX_STRING_LENGTH];
 	struct evolution_data *evo;
 	int chant = GET_ACTION_VNUM(ch, 0);
@@ -417,7 +417,7 @@ ACMD(do_chant) {
 struct ready_magic_weapon_type {
 	char *name;
 	int mana;
-	int ability;
+	any_vnum ability;
 	obj_vnum vnum;
 	double min_dps;	// the lowest the DPS should ever go (or close to it)
 	double target_dps;	// DPS at level 100 -- will get as close to this as possible without going over

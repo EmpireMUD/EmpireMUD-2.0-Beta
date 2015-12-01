@@ -22,6 +22,7 @@
 *     Book Defines
 *     Building Defines
 *     Character Defines
+*     Class Defines
 *     Craft Defines
 *     Crop Defines
 *     Empire Defines
@@ -39,6 +40,7 @@
 *     Augment Structs
 *     Book Structs
 *     Building Structs
+*     Class Structs
 *     Mobile Structs
 *     Player Structs
 *     Character Structs
@@ -61,6 +63,7 @@
 
 #include "protocol.h" // needed by everything
 #include "uthash.h"	// needed by everything
+#include "utlist.h"	// needed by everything
 
  //////////////////////////////////////////////////////////////////////////////
 //// MASTER CONFIGURATION ////////////////////////////////////////////////////
@@ -194,6 +197,7 @@ typedef any_vnum trig_vnum;	// for dg scripts
 
 
 // For simplicity...
+typedef struct ability_data ability_data;
 typedef struct account_data account_data;
 typedef struct adventure_data adv_data;
 typedef struct archetype_data archetype_data;
@@ -201,6 +205,7 @@ typedef struct augment_data augment_data;
 typedef struct bld_data bld_data;
 typedef struct book_data book_data;
 typedef struct char_data char_data;
+typedef struct class_data class_data;
 typedef struct craft_data craft_data;
 typedef struct crop_data crop_data;
 typedef struct descriptor_data descriptor_data;
@@ -211,6 +216,7 @@ typedef struct player_index_data player_index_data;
 typedef struct room_data room_data;
 typedef struct room_template room_template;
 typedef struct sector_data sector_data;
+typedef struct skill_data skill_data;
 typedef struct trig_data trig_data;
 
 
@@ -220,6 +226,10 @@ typedef struct trig_data trig_data;
 
  //////////////////////////////////////////////////////////////////////////////
 //// MISCELLANEOUS DEFINES ///////////////////////////////////////////////////
+
+// ABILF_x: ability flags
+#define ABILF_UNUSED  BIT(0)	// a. ??? placeholder
+
 
 // Modifier constants used with obj affects ('A' fields), player affect types, etc
 #define APPLY_NONE  0	// No effect
@@ -300,6 +310,10 @@ typedef struct trig_data trig_data;
 #define SHIPPING_QUEUED  0	// waiting for a ship
 #define SHIPPING_EN_ROUTE  1	// waiting to deliver
 #define SHIPPING_DELIVERED  2	// indicates the ship has been delivered and these can be offloaded to the destination
+
+
+// SKILLF_x: skill flags
+#define SKILLF_IN_DEVELOPMENT  BIT(0)	// a. not live, won't show up on skill lists
 
 
 // mob spawn flags
@@ -608,6 +622,24 @@ typedef struct trig_data trig_data;
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// CLASS DEFINES ///////////////////////////////////////////////////////////
+
+// CLASSF_x: class flags
+#define CLASSF_IN_DEVELOPMENT  BIT(0)	// a. not available to players
+
+
+// ROLE_x: group roles for classes
+#define ROLE_NONE  0	// placeholder
+#define ROLE_TANK  1
+#define ROLE_MELEE  2
+#define ROLE_CASTER  3
+#define ROLE_HEALER  4
+#define ROLE_UTILITY  5
+#define ROLE_SOLO  6
+#define NUM_ROLES  7
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// CRAFT DEFINES ///////////////////////////////////////////////////////////
 
 // do_gen_craft (trade.c)
@@ -851,7 +883,6 @@ typedef struct trig_data trig_data;
 
 // misc game configs
 #define ACTION_CYCLE_TIME  5	// seconds per action tick (before haste) -- TODO should this be a config?
-#define SKILLS_PER_CLASS  2	// number of skills that makes up a combo class
 #define HISTORY_SIZE  5	// Keep last 5 commands.
 
 
@@ -1348,6 +1379,7 @@ typedef struct trig_data trig_data;
 #define MORPH_FLAG_TEMPERATE_AFFINITY  BIT(3)	// requires temperate
 #define MORPH_FLAG_ARID_AFFINITY  BIT(4)	// requires arid
 #define MORPH_FLAG_TROPICAL_AFFINITY  BIT(5)	// requires tropical
+#define MORPH_FLAG_CHECK_SOLO  BIT(6)	// check for the solo role
 
 // for morph data
 #define MORPH_STRING_NAME  0
@@ -1418,16 +1450,6 @@ typedef struct trig_data trig_data;
 #define PRF_SCREEN_READER  BIT(25)	// player is visually impaired and using a screen reader that can't read the map
 #define PRF_STEALTHABLE  BIT(26)	// player can steal (rather than be prevented from accidentally stealing)
 #define PRF_WIZHIDE  BIT(27)	// player can't be seen in the room
-
-
-// group roles for classes
-#define ROLE_NONE  0	// placeholder
-#define ROLE_TANK  1
-#define ROLE_MELEE  2
-#define ROLE_CASTER  3
-#define ROLE_HEALER  4
-#define ROLE_UTILITY  5
-#define NUM_ROLES  6
 
 
 // summon types for oval_summon, ofin_summon, and add_offer
@@ -1647,10 +1669,8 @@ typedef struct trig_data trig_data;
 // misc game limits
 #define BANNED_SITE_LENGTH    50	// how long ban hosts can be
 #define COLREDUC_SIZE  80	// how many characters long a color_reducer string can be
-#define MAX_ABILITIES  300	// just a shy ton
 #define MAX_ADMIN_NOTES_LENGTH  2400
 #define MAX_AFFECT  32
-#define MAX_CLASS_ABILITIES  15	// maximum abilities per class
 #define MAX_CMD_LENGTH  16384	// 16k -- for trigger lengths
 #define MAX_COIN  2140000000	// 2.14b (< MAX_INT)
 #define MAX_COIN_TYPES  10	// don't store more than this many different coin types
@@ -1681,7 +1701,6 @@ typedef struct trig_data trig_data;
 #define MAX_RESOURCES_REQUIRED  10	// how many resources a recipe can need
 #define MAX_REWARDS_PER_DAY  5	//  number of times a player can be rewarded
 #define MAX_ROOM_DESCRIPTION  4000
-#define MAX_SKILLS  10
 #define MAX_SKILL_RESETS  10	// number of skill resets you can save up
 #define MAX_SLASH_CHANNEL_NAME_LENGTH  16
 #define MAX_STORAGE  1000000	// empire storage cap, must be < MAX_INT
@@ -1714,6 +1733,23 @@ typedef struct trig_data trig_data;
 
  //////////////////////////////////////////////////////////////////////////////
 //// MISCELLANEOUS STRUCTS ///////////////////////////////////////////////////
+
+// abilities.c
+struct ability_data {
+	any_vnum vnum;
+	char *name;
+	
+	bitvector_t flags;	// ABILF_ flags
+	any_vnum mastery_abil;	// used for crafting abilities
+	
+	// live cached (not saved) data:
+	skill_data *assigned_skill;	// skill for reverse-lookup
+	int skill_level;	// level of that skill required
+	
+	UT_hash_handle hh;	// ability_table hash handle
+	UT_hash_handle sorted_hh;	// sorted_abilities hash handle
+};
+
 
 // Simple affect structure
 struct affected_type {
@@ -1776,7 +1812,7 @@ struct global_data {
 	int value[NUM_GLB_VAL_POSITIONS];	// misc vals
 	
 	// constraints
-	int ability;	// must have this to trigger, unless NO_ABIL
+	any_vnum ability;	// must have this to trigger, unless NO_ABIL
 	double percent;	// chance to trigger
 	bitvector_t type_flags;	// type-dependent flags
 	bitvector_t type_exclude;	// type-dependent flags
@@ -1907,6 +1943,31 @@ struct shipping_data {
 	room_vnum ship_origin;	// where the ship is coming from (in case we have to send it back)
 	
 	struct shipping_data *next;
+};
+
+
+// skills.c
+struct skill_data {
+	any_vnum vnum;
+	char *name;
+	char *abbrev;
+	char *desc;
+	
+	bitvector_t flags;	// SKILLF_ flags
+	struct skill_ability *abilities;	// assigned abilities
+	
+	UT_hash_handle hh;	// skill_table hash handle
+	UT_hash_handle sorted_hh;	// sorted_skills hash handle
+};
+
+
+// for attaching abilities to skills
+struct skill_ability {
+	any_vnum vnum;	// ability vnum
+	any_vnum prerequisite;	// required ability vnum
+	int level;	// skill level to get this ability
+	
+	struct skill_ability *next;	// linked list
 };
 
 
@@ -2099,7 +2160,7 @@ struct archetype_data {
 
 
 struct archetype_skill {
-	int skill;	// SKILL_x
+	any_vnum skill;	// SKILL_ type
 	int level;	// starting level
 	
 	struct archetype_skill *next;
@@ -2123,7 +2184,7 @@ struct augment_data {
 	bitvector_t flags;	// AUG_x flags
 	bitvector_t wear_flags;	// ITEM_WEAR_x where this augment applies
 	
-	int ability;	// required ability or NO_ABIL
+	any_vnum ability;	// required ability or NO_ABIL
 	obj_vnum requires_obj;	// required item or NOTHING
 	struct augment_apply *applies;	// how it modifies items
 	struct resource_data *resources;	// resources required
@@ -2226,6 +2287,41 @@ struct bld_data {
 	struct interaction_item *interactions;	// interaction items
 	
 	UT_hash_handle hh;	// building_table hash handle
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// CLASS STRUCTS ///////////////////////////////////////////////////////////
+
+// class.c
+struct class_data {
+	any_vnum vnum;
+	char *name;
+	char *abbrev;	// short form (4 letters)
+	
+	bitvector_t flags;	// CLASSF_ flags
+	int pools[NUM_POOLS];	// health/etc values at 100
+	struct class_skill_req *skill_requirements;	// linked list
+	struct class_ability *abilities;	// linked list
+	
+	UT_hash_handle hh;	// ability_table hash handle
+	UT_hash_handle sorted_hh;	// sorted_abilities hash handle
+};
+
+
+// for skill requirements on a class
+struct class_skill_req {
+	any_vnum vnum;	// skill vnum
+	int level;	// required skill level (needs to match exactly: 0, 50, 75, 100)
+	struct class_skill_req *next;	// linked list
+};
+
+
+// for abilities assigned to a class
+struct class_ability {
+	any_vnum vnum;	// ability vnum
+	int role;	// ROLE_ type
+	struct class_ability *next;	// linked list
 };
 
 
@@ -2424,10 +2520,12 @@ struct descriptor_data {
 	char *olc_storage;	// a character buffer created and used by some olc modes
 	any_vnum olc_vnum;	// vnum being edited
 	
+	ability_data *olc_ability;	// abil being edited
 	adv_data *olc_adventure;	// adv being edited
 	archetype_data *olc_archetype;	// arch being edited
 	augment_data *olc_augment;	// aug being edited
 	book_data *olc_book;	// book being edited
+	class_data *olc_class;	// class being edited
 	obj_data *olc_object;	// item being edited
 	char_data *olc_mobile;	// mobile being edited
 	craft_data *olc_craft;	// craft recipe being edited
@@ -2436,6 +2534,7 @@ struct descriptor_data {
 	struct global_data *olc_global;	// global being edited
 	room_template *olc_room_template;	// rmt being edited
 	struct sector_data *olc_sector;	// sector being edited
+	skill_data *olc_skill;	// skill being edited
 	struct trig_data *olc_trigger;	// trigger being edited
 	
 	// linked list
@@ -2462,9 +2561,10 @@ struct mail_data {
 
 // used in player_special_data
 struct player_ability_data {
-	int ability_id;	// ABIL_x identifier
+	any_vnum vnum;	// ABIL_ or ability vnum
 	bool purchased;	// whether or not the player bought it
 	byte levels_gained;	// tracks for the cap on how many times one ability grants skillups
+	ability_data *ptr;	// live abil pointer
 
 	UT_hash_handle hh;	// player's ability hash
 };
@@ -2472,11 +2572,12 @@ struct player_ability_data {
 
 // used for a hash of skills per player in player_special_data
 struct player_skill_data {
-	int skill_id;	// SKILL_x identifier
+	any_vnum vnum;	// SKILL_ or skill vnum
 	int level;	// current skill level (0-100)
 	double exp;	// experience gained in skill (0-100%)
 	int resets;	// resets available
 	bool noskill;	// if TRUE, do not gain
+	skill_data *ptr;	// live skill pointer
 	
 	UT_hash_handle hh;	// player's skill hash
 };
@@ -2585,8 +2686,8 @@ struct player_special_data {
 	sh_int highest_known_level;	// maximum level ever achieved (used for gear restrictions)
 	sh_int last_known_level;	// set on save/quit/alt
 	ubyte class_progression;	// % of the way from SPECIALTY_SKILL_CAP to CLASS_SKILL_CAP
-	ubyte class_role;	// ROLE_x chosen by the player
-	sh_int character_class;  // character's class as determined by top skills
+	ubyte class_role;	// ROLE_ chosen by the player
+	class_data *character_class;  // character's class as determined by top skills
 	
 	// tracking for specific skills
 	byte confused_dir;  // people without Navigation think this dir is north
@@ -2786,7 +2887,7 @@ struct craft_data {
 	craft_vnum vnum;	// vnum of this recipe
 	
 	int type;	// CRAFT_TYPE_x
-	int ability;	// NO_ABIL for none, otherwise ABIL_x
+	any_vnum ability;	// NO_ABIL for none, otherwise ABIL_ type
 	
 	char *name;
 	obj_vnum object;	// vnum of the object it makes, or liquid id if CRAFT_SOUP
@@ -2874,23 +2975,6 @@ struct city_metadata_type {
 };
 
 
-// ROLE_x
-struct class_role_data_type {
-	int role;	// ROLE_x const
-	int ability[MAX_CLASS_ABILITIES];	// list of abilities for this role
-};
-
-
-// CLASS_x
-struct class_data_type {
-	char *name;
-	char *abbrev;	// 4-letter
-	int skills[SKILLS_PER_CLASS];	// skills which make up this class
-	int max_pools[NUM_POOLS];	// health, move, mana, blood (blood is not used here)
-	struct class_role_data_type role[NUM_ROLES];	// various class roles
-};
-
-
 // chore type data -- CHORE_x
 struct empire_chore_type {
 	char *name;
@@ -2915,7 +2999,7 @@ struct material_data {
 // see act.stealth.c
 struct poison_data_type {
 	char *name;
-	int ability;
+	any_vnum ability;
 	
 	int atype;	// ATYPE_x
 	int apply;	// APPLY_x
@@ -2949,7 +3033,7 @@ struct ship_data_struct {
 	char *name;
 	int vnum;
 	int type;
-	int ability;	// NO_ABIL or ABIL_x
+	any_vnum ability;	// NO_ABIL or ABIL_x
 	int resources;
 	int advanced;
 	int cargo_size;

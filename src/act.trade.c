@@ -237,48 +237,6 @@ struct gen_craft_data_t gen_craft_data[] = {
 };
 
 
-// related mastery skills
-struct {
-	int base_ability;
-	int mastery_ability;
-} related_mastery_data[] = {
-	// smith block
-	{ ABIL_FORGE, ABIL_MASTER_BLACKSMITH },
-	{ ABIL_WEAPONCRAFTING, ABIL_MASTER_BLACKSMITH },
-	{ ABIL_IRON_BLADES, ABIL_MASTER_BLACKSMITH },
-	{ ABIL_DEADLY_WEAPONS, ABIL_MASTER_BLACKSMITH },
-	{ ABIL_ARMORSMITHING, ABIL_MASTER_BLACKSMITH },
-	{ ABIL_STURDY_ARMORS, ABIL_MASTER_BLACKSMITH },
-	{ ABIL_IMPERIAL_ARMORS, ABIL_MASTER_BLACKSMITH },
-	{ ABIL_JEWELRY, ABIL_MASTER_BLACKSMITH },
-	
-	// brew block
-	{ ABIL_HEALING_ELIXIRS, ABIL_WRATH_OF_NATURE_POTIONS },
-	{ ABIL_WRATH_OF_NATURE_POTIONS, ABIL_HEALING_ELIXIRS },
-	
-	// craft block
-	{ ABIL_BASIC_CRAFTS, ABIL_MASTER_CRAFTSMAN },
-	{ ABIL_WOODWORKING, ABIL_MASTER_CRAFTSMAN },
-	{ ABIL_ADVANCED_WOODWORKING, ABIL_MASTER_CRAFTSMAN },
-	
-	// pottery block
-	{ ABIL_POTTERY, ABIL_MASTER_CRAFTSMAN },
-	{ ABIL_FINE_POTTERY, ABIL_MASTER_CRAFTSMAN },
-	{ ABIL_MASTER_CRAFTSMAN, ABIL_MASTER_CRAFTSMAN },	// its own
-	
-	// sew block
-	{ ABIL_SEWING, ABIL_MASTER_TAILOR },
-	{ ABIL_RAWHIDE_STITCHING, ABIL_MASTER_TAILOR },
-	{ ABIL_LEATHERWORKING, ABIL_MASTER_TAILOR },
-	{ ABIL_DANGEROUS_LEATHERS, ABIL_MASTER_TAILOR },
-	{ ABIL_MAGIC_ATTIRE, ABIL_MASTER_TAILOR },
-	{ ABIL_MAGICAL_VESTMENTS, ABIL_MASTER_TAILOR },
-	
-	// this goes last
-	{ NO_ABIL, NO_ABIL }
-};
-
-
 void cancel_gen_craft(char_data *ch) {
 	craft_data *type = craft_proto(GET_ACTION_VNUM(ch, 0));
 	obj_data *obj;
@@ -326,34 +284,17 @@ craft_data *find_craft_for_obj_vnum(obj_vnum vnum) {
 }
 
 
-/**
-* find the mastery ability for any crafting ability using the
-* related_mastery_data table
-*
-* @param int base_ability The ability being used.
-* @return int The mastery ability, or NO_ABIL if it has none.
-*/
-int get_mastery_ability(int base_ability) {
-	int iter, found = NO_ABIL;
-	
-	for (iter = 0; found == NO_ABIL && related_mastery_data[iter].base_ability != NO_ABIL; ++iter) {
-		if (related_mastery_data[iter].base_ability == base_ability) {
-			found = related_mastery_data[iter].mastery_ability;
-		}
-	}
-	
-	return found;
-}
-
-
 void finish_gen_craft(char_data *ch) {
 	craft_data *type = craft_proto(GET_ACTION_VNUM(ch, 0));
+	bool applied_master = FALSE, is_master = FALSE;
 	int num = GET_ACTION_VNUM(ch, 2);
-	int master_ability = get_mastery_ability(GET_CRAFT_ABILITY(type));
 	char lbuf[MAX_INPUT_LENGTH];
-	bool applied_master = FALSE;
+	ability_data *cft_abil;
 	obj_data *obj = NULL;
 	int iter, amt = 1;
+	
+	cft_abil = find_ability_by_vnum(GET_CRAFT_ABILITY(type));
+	is_master = (cft_abil && ABIL_MASTERY_ABIL(cft_abil) != NOTHING && has_ability(ch, ABIL_MASTERY_ABIL(cft_abil)));
 	
 	GET_ACTION(ch) = ACT_NONE;
 
@@ -396,7 +337,7 @@ void finish_gen_craft(char_data *ch) {
 			for (iter = 0; iter < amt; ++iter) {
 				// load and master it
 				obj = read_object(GET_CRAFT_OBJECT(type), TRUE);
-				if (OBJ_FLAGGED(obj, OBJ_SCALABLE) && master_ability != NO_ABIL && has_ability(ch, master_ability)) {
+				if (OBJ_FLAGGED(obj, OBJ_SCALABLE) && is_master) {
 					applied_master = TRUE;
 					SET_BIT(GET_OBJ_EXTRA(obj), OBJ_SUPERIOR);
 				}
@@ -438,8 +379,8 @@ void finish_gen_craft(char_data *ch) {
 	}
 
 	// master?
-	if (master_ability != NO_ABIL && applied_master) {
-		gain_ability_exp(ch, master_ability, 33.4);
+	if (is_master && applied_master) {
+		gain_ability_exp(ch, ABIL_MASTERY_ABIL(cft_abil), 33.4);
 	}
 
 	// repeat as desired
@@ -521,6 +462,7 @@ void process_gen_craft(char_data *ch) {
 */
 void scale_craftable(obj_data *obj, char_data *ch, craft_data *craft) {
 	int level = 1, psr;
+	ability_data *abil;
 	obj_data *req;
 	
 	if (IS_NPC(ch)) {
@@ -541,22 +483,22 @@ void scale_craftable(obj_data *obj, char_data *ch, craft_data *craft) {
 			}
 		}
 		else {
-			if (GET_CRAFT_ABILITY(craft) == NO_ABIL) {
+			if (!(abil = find_ability_by_vnum(GET_CRAFT_ABILITY(craft)))) {
 				level = EMPIRE_CHORE_SKILL_CAP;	// considered the "default" level for unskilled things
 			}
-			else if (ability_data[GET_CRAFT_ABILITY(craft)].parent_skill == NO_SKILL) {
+			else if (!ABIL_ASSIGNED_SKILL(abil)) {
 				// probably a class skill
 				level = get_crafting_level(ch);
 			}
-			else if ((psr = GET_PARENT_SKILL_REQUIRED(GET_CRAFT_ABILITY(craft))) != NOTHING) {
+			else if ((psr = ABIL_SKILL_LEVEL(abil)) != NOTHING) {
 				if (psr < BASIC_SKILL_CAP) {
-					level = MIN(BASIC_SKILL_CAP, get_skill_level(ch, ability_data[GET_CRAFT_ABILITY(craft)].parent_skill));
+					level = MIN(BASIC_SKILL_CAP, get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))));
 				}
 				else if (psr < SPECIALTY_SKILL_CAP) {
-					level = MIN(SPECIALTY_SKILL_CAP, get_skill_level(ch, ability_data[GET_CRAFT_ABILITY(craft)].parent_skill));
+					level = MIN(SPECIALTY_SKILL_CAP, get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))));
 				}
 				else {
-					level = MIN(CLASS_SKILL_CAP, get_skill_level(ch, ability_data[GET_CRAFT_ABILITY(craft)].parent_skill));
+					level = MIN(CLASS_SKILL_CAP, get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))));
 				}
 			}
 			else {
@@ -583,7 +525,7 @@ void scale_craftable(obj_data *obj, char_data *ch, craft_data *craft) {
 
 const struct {
 	char *command;
-	int ability;	// required ability
+	any_vnum ability;	// required ability
 	bool (*validate_func)(char_data *ch);	// e.g. can_forge, func that returns TRUE if ok -- must send own errors if FALSE
 	int types[3];	// NOTHING-terminated list of valid obj types
 } reforge_data[] = {
@@ -686,6 +628,7 @@ ACMD(do_gen_augment) {
 	struct obj_apply *apply, *last_apply;
 	int scale, total_weight, value;
 	struct augment_apply *app;
+	ability_data *abil;
 	augment_data *aug;
 	obj_data *obj;
 	
@@ -737,8 +680,8 @@ ACMD(do_gen_augment) {
 		
 		// determine scale cap
 		scale = GET_OBJ_CURRENT_SCALE_LEVEL(obj);
-		if (GET_AUG_ABILITY(aug) != NO_ABIL && ability_data[GET_AUG_ABILITY(aug)].parent_skill != NO_SKILL && get_skill_level(ch, ability_data[GET_AUG_ABILITY(aug)].parent_skill) < CLASS_SKILL_CAP) {
-			scale = MIN(scale, get_skill_level(ch, ability_data[GET_AUG_ABILITY(aug)].parent_skill));
+		if ((abil = find_ability_by_vnum(GET_AUG_ABILITY(aug))) && ABIL_ASSIGNED_SKILL(abil) != NULL && get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) < CLASS_SKILL_CAP) {
+			scale = MIN(scale, get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))));
 		}
 		
 		// determine points
@@ -820,11 +763,12 @@ ACMD(do_gen_augment) {
 
 // subcmd must be CRAFT_TYPE_x
 ACMD(do_gen_craft) {	
-	int timer, master_ability, num = 1;
+	int timer, num = 1;
 	bool this_line, found;
 	craft_data *craft, *next_craft, *type = NULL, *abbrev_match = NULL;
+	bool is_master, wait, room_wait;
 	obj_data *drinkcon = NULL;
-	bool wait, room_wait;
+	ability_data *cft_abil;
 
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs can't craft.\r\n");
@@ -908,7 +852,7 @@ ACMD(do_gen_craft) {
 		msg_to_char(ch, "You're busy right now.\r\n");
 	}
 	else if (GET_CRAFT_ABILITY(type) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(type))) {
-		msg_to_char(ch, "You need to buy the %s ability to %s that.\r\n", ability_data[GET_CRAFT_ABILITY(type)].name, gen_craft_data[GET_CRAFT_TYPE(type)].command);
+		msg_to_char(ch, "You need to buy the %s ability to %s that.\r\n", get_ability_name_by_vnum(GET_CRAFT_ABILITY(type)), gen_craft_data[GET_CRAFT_TYPE(type)].command);
 	}
 	else if (GET_CRAFT_MIN_LEVEL(type) > get_crafting_level(ch)) {
 		msg_to_char(ch, "You need to have a crafting level of %d to %s that.\r\n", GET_CRAFT_MIN_LEVEL(type), gen_craft_data[GET_CRAFT_TYPE(type)].command);
@@ -964,8 +908,10 @@ ACMD(do_gen_craft) {
 		//msg_to_char(ch, "You don't have the resources to %s that.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
 	}
 	else {
+		cft_abil = find_ability_by_vnum(GET_CRAFT_ABILITY(type));
+		is_master = (cft_abil && ABIL_MASTERY_ABIL(cft_abil) != NOTHING && has_ability(ch, ABIL_MASTERY_ABIL(cft_abil)));
+		
 		// base timer
-		master_ability = get_mastery_ability(GET_CRAFT_ABILITY(type));
 		timer = GET_CRAFT_TIME(type);
 
 		// potter building bonus	
@@ -974,7 +920,7 @@ ACMD(do_gen_craft) {
 		}
 		
 		// mastery
-		if (master_ability != NO_ABIL && has_ability(ch, master_ability)) {
+		if (is_master) {
 			timer /= 2;
 		}
 	
@@ -1123,6 +1069,7 @@ ACMD(do_reforge) {
 	char arg2[MAX_INPUT_LENGTH], temp[MAX_INPUT_LENGTH];
 	struct resource_data *res = NULL;
 	time_t old_stolen_time;
+	ability_data *cft_abil;
 	craft_data *ctype;
 	int old_timer, iter, level;
 	bool found;
@@ -1284,7 +1231,7 @@ ACMD(do_reforge) {
 		else if (!proto || !OBJ_FLAGGED(proto, OBJ_SCALABLE) || !(ctype = find_craft_for_obj_vnum(GET_OBJ_VNUM(obj)))) {
 			msg_to_char(ch, "It can't be made superior.\r\n");
 		}
-		else if (GET_CRAFT_ABILITY(ctype) == NO_ABIL || get_mastery_ability(GET_CRAFT_ABILITY(ctype)) == NO_ABIL || !has_ability(ch, get_mastery_ability(GET_CRAFT_ABILITY(ctype)))) {
+		else if (!(cft_abil = find_ability_by_vnum(GET_CRAFT_ABILITY(ctype))) || ABIL_MASTERY_ABIL(cft_abil) == NOTHING || !has_ability(ch, ABIL_MASTERY_ABIL(cft_abil))) {
 			msg_to_char(ch, "You don't have the mastery to make that item superior.\r\n");
 		}
 		else if (!has_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), TRUE)) {

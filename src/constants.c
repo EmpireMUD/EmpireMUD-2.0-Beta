@@ -26,6 +26,7 @@
 *   Adventure Constants
 *   Archetype Constants
 *   Augment Constants
+*   Class Constants
 *   Player Constants
 *   Direction And Room Constants
 *   Character Constants
@@ -210,6 +211,16 @@ const char *augment_flags[] = {
 	"SELF-ONLY",
 	"ARMOR",
 	"SHIELD",
+	"\n"
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// CLASS CONSTANTS /////////////////////////////////////////////////////////
+
+// CLASSF_x: class flags
+const char *class_flags[] = {
+	"IN-DEVELOPMENT",
 	"\n"
 };
 
@@ -415,6 +426,32 @@ const char *preference_bits[] = {
 	"SCREENREADER",
 	"STEALTHABLE",
 	"WIZHIDE",
+	"\n"
+};
+
+
+// ROLE_x (1/2): role names
+const char *class_role[] = {
+	"none",
+	"Tank",
+	"Melee",
+	"Caster",
+	"Healer",
+	"Utility",
+	"Solo",
+	"\n"
+};
+
+
+// ROLE_x (2/2): role colors for who list
+const char *class_role_color[] = {
+	"\t0",
+	"\ty",	// tank
+	"\tr",	// melee
+	"\ta",	// caster
+	"\tj",	// healer
+	"\tm",	// utility
+	"\tw",	// solo
 	"\n"
 };
 
@@ -1812,6 +1849,9 @@ const char *olc_flag_bits[] = {
 	"!GLOBAL",
 	"!AUGMENT",
 	"!ARCHETYPE",
+	"ABILITIES",
+	"CLASSES",
+	"SKILLS",
 	"\n"
 };
 
@@ -1832,6 +1872,9 @@ const char *olc_type_bits[NUM_OLC_TYPES+1] = {
 	"book",
 	"augment",
 	"archetype",
+	"ability",
+	"class",
+	"skill",
 	"\n"
 };
 
@@ -2304,6 +2347,13 @@ const char *weather_types[] = {
  //////////////////////////////////////////////////////////////////////////////
 //// SKILL CONSTANTS /////////////////////////////////////////////////////////
 
+// ABILF_x: ability flags
+const char *ability_flags[] = {
+	"*",
+	"\n"
+};
+
+
 /* ATYPE_x */
 const char *affect_types[] = {
 	"!RESERVED!",	// 0
@@ -2507,6 +2557,22 @@ const char *damage_types[] = {
 	"fire",
 	"poison",
 	"direct",
+	"\n"
+};
+
+
+// DIFF_x: modifiers to your skill level before a skill check
+double skill_check_difficulty_modifier[NUM_DIFF_TYPES] = {
+	1.5,  // easy
+	1,  // medium
+	0.66,  // hard
+	0.1  // rarely
+};
+
+
+// SKILLF_x: skill flags
+const char *skill_flags[] = {
+	"IN-DEVELOPMENT",
 	"\n"
 };
 

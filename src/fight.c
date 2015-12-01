@@ -655,7 +655,7 @@ int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, i
 	double resist_prc;
 	
 	if (!self) {
-		if (has_ability(victim, ABIL_NOBLE_BEARING)) {
+		if (has_ability(victim, ABIL_NOBLE_BEARING) && check_solo_role(victim)) {
 			dam -= GET_GREATNESS(victim);
 		}
 		
@@ -1144,9 +1144,9 @@ obj_data *make_corpse(char_data *ch) {
 * @param char_data *ch The player resurrecting.
 * @param char_data *rez_by Optional (or NULL): The player who resurrected them.
 * @param room_data *loc The location to resurrect to.
-* @param int ability Optional (or NO_ABIL): The ability to skillup for rez_by.
+* @param any_vnum ability Optional (or NO_ABIL): The ability to skillup for rez_by.
 */
-void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, int ability) {
+void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, any_vnum ability) {
 	extern obj_data *find_obj(int n);
 
 	obj_data *corpse;
@@ -2591,7 +2591,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		if (attack_hit_info[w_type].damage_type == DAM_PHYSICAL) {
 			block = check_block(victim, ch, TRUE);
 		}
-		else if (has_ability(victim, ABIL_WARD_AGAINST_MAGIC) && attack_hit_info[w_type].damage_type == DAM_MAGICAL) {
+		else if (has_ability(victim, ABIL_WARD_AGAINST_MAGIC) && check_solo_role(victim) && attack_hit_info[w_type].damage_type == DAM_MAGICAL) {
 			// half-chance
 			block = check_block(victim, ch, TRUE) && !number(0, 1);
 		}
@@ -3028,6 +3028,11 @@ void perform_violence_melee(char_data *ch, obj_data *weapon) {
 		weapon = NULL;
 	}
 	
+	if (weapon && OBJ_FLAGGED(weapon, OBJ_TWO_HANDED) && (!has_ability(ch, ABIL_TWO_HANDED_WEAPONS) || !check_solo_role(ch))) {
+		msg_to_char(ch, "You must be alone to use two-handed weapons in the solo role.\r\n");
+		return;
+	}
+	
 	if (hit(ch, FIGHTING(ch), weapon, TRUE) < 0) {
 		return;
 	}
@@ -3297,7 +3302,7 @@ void frequent_combat(int pulse) {
 				}
 				
 				// still fighting and can dual-wield?
-				if (!IS_NPC(ch) && FIGHTING(ch) && !IS_DEAD(ch) && !EXTRACTED(ch) && !EXTRACTED(FIGHTING(ch)) && has_ability(ch, ABIL_DUAL_WIELD) && GET_EQ(ch, WEAR_HOLD) && IS_WEAPON(GET_EQ(ch, WEAR_HOLD))) {
+				if (!IS_NPC(ch) && FIGHTING(ch) && !IS_DEAD(ch) && !EXTRACTED(ch) && !EXTRACTED(FIGHTING(ch)) && has_ability(ch, ABIL_DUAL_WIELD) && check_solo_role(ch) && GET_EQ(ch, WEAR_HOLD) && IS_WEAPON(GET_EQ(ch, WEAR_HOLD))) {
 					speed = get_combat_speed(ch, WEAR_HOLD);
 					if ((pulse % ((int)(speed RL_SEC))) == 0) {
 						one_combat_round(ch, speed, GET_EQ(ch, WEAR_HOLD));

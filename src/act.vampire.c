@@ -134,7 +134,7 @@ void cancel_siring(char_data *ch) {
 
 // checks for Blood Fortitude and does skill gain
 bool check_blood_fortitude(char_data *ch, bool can_gain_skill) {
-	if (!IS_NPC(ch) && IS_VAMPIRE(ch) && check_vampire_sun(ch, FALSE) && has_ability(ch, ABIL_BLOOD_FORTITUDE)) {
+	if (!IS_NPC(ch) && IS_VAMPIRE(ch) && check_vampire_sun(ch, FALSE) && has_ability(ch, ABIL_BLOOD_FORTITUDE) && check_solo_role(ch)) {
 		if (can_gain_skill) {
 			gain_ability_exp(ch, ABIL_BLOOD_FORTITUDE, 1);
 		}
@@ -145,7 +145,7 @@ bool check_blood_fortitude(char_data *ch, bool can_gain_skill) {
 
 
 // returns TRUE if the character is a vampire and has the ability; sends its own error
-bool check_vampire_ability(char_data *ch, int ability, int cost_pool, int cost_amount, int cooldown_type) {
+bool check_vampire_ability(char_data *ch, any_vnum ability, int cost_pool, int cost_amount, int cooldown_type) {
 	if (!IS_VAMPIRE(ch)) {
 		send_config_msg(ch, "must_be_vampire");
 		return FALSE;
@@ -293,7 +293,7 @@ int GET_MAX_BLOOD(char_data *ch) {
 * bool lore if TRUE, also adds lore
 */
 void make_vampire(char_data *ch, bool lore) {
-	void set_skill(char_data *ch, int skill, int level);
+	void set_skill(char_data *ch, any_vnum skill, int level);
 	
 	if (!IS_NPC(ch)) {	
 		/* set BEFORE set as a vampire! */
@@ -455,7 +455,7 @@ void un_deathshroud(char_data *ch) {
 
 // undo vampirism
 void un_vampire(char_data *ch) {
-	void clear_char_abilities(char_data *ch, int skill);
+	void clear_char_abilities(char_data *ch, any_vnum skill);
 
 	if (!IS_NPC(ch)) {
 		add_lore(ch, LORE_PURIFY, "Purified");
@@ -763,6 +763,9 @@ ACMD(do_bloodsweat) {
 	
 	if (!can_use_ability(ch, ABIL_BLOODSWEAT, BLOOD, cost, COOLDOWN_BLOODSWEAT)) {
 		return;
+	}
+	else if (!check_solo_role(ch)) {
+		msg_to_char(ch, "You must be alone to use that ability in the solo role.\r\n");
 	}
 	else {
 		// remove first (to ensure there are some

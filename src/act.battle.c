@@ -392,7 +392,7 @@ ACMD(do_kick) {
 	success = IS_SPECIALTY_ABILITY(ch, ABIL_KICK) || check_hit_vs_dodge(ch, vict, FALSE);
 
 	if (success) {
-		if (has_ability(ch, ABIL_SHADOW_KICK) && !AFF_FLAGGED(vict, AFF_IMMUNE_BATTLE)) {
+		if (has_ability(ch, ABIL_SHADOW_KICK) && check_solo_role(ch) && !AFF_FLAGGED(vict, AFF_IMMUNE_BATTLE)) {
 			struct affected_type *af;
 			int value = round(GET_COMPUTED_LEVEL(ch) / 50);
 			af = create_mod_aff(ATYPE_SHADOW_KICK, 2, APPLY_BONUS_PHYSICAL, -value, ch);

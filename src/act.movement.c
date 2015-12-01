@@ -1448,7 +1448,7 @@ ACMD(do_move) {
 
 // mortals have to portal from a certain building, immortals can do it anywhere
 ACMD(do_portal) {
-	void empire_skillup(empire_data *emp, int ability, double amount);
+	void empire_skillup(empire_data *emp, any_vnum ability, double amount);
 	extern char *get_room_name(room_data *room, bool color);
 	
 	bool all_access = (IS_IMMORTAL(ch) || (IS_NPC(ch) && !AFF_FLAGGED(ch, AFF_CHARM)));

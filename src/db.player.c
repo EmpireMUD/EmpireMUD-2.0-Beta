@@ -713,11 +713,54 @@ void free_char(char_data *ch) {
 	
 	// clean up gear/items, if any
 	extract_all_items(ch);
-	
-	proto = IS_NPC(ch) ? mob_proto(GET_MOB_VNUM(ch)) : NULL;
 
 	if (IS_NPC(ch)) {
 		free_mob_tags(&MOB_TAGGED_BY(ch));
+	}
+	
+	// remove all affects
+	while (ch->affected) {
+		affect_remove(ch, ch->affected);
+	}
+	while (ch->over_time_effects) {
+		dot_remove(ch, ch->over_time_effects);
+	}
+	
+	// remove cooldowns
+	while (ch->cooldowns) {
+		remove_cooldown(ch, ch->cooldowns);
+	}
+
+	// free any assigned scripts and vars
+	if (SCRIPT(ch)) {
+		extract_script(ch, MOB_TRIGGER);
+	}
+	
+	// TODO what about script memory (freed in extract_char_final for NPCs, but what about PCs?)
+	
+	// free lore
+	while ((lore = GET_LORE(ch))) {
+		GET_LORE(ch) = lore->next;
+		if (lore->text) {
+			free(lore->text);
+		}
+		free(lore);
+	}
+	
+	// alert empire data the mob is despawned
+	if (GET_EMPIRE_NPC_DATA(ch)) {
+		GET_EMPIRE_NPC_DATA(ch)->mob = NULL;
+		GET_EMPIRE_NPC_DATA(ch) = NULL;
+	}
+	
+	// extract objs
+	while ((obj = ch->carrying)) {
+		extract_obj(obj);
+	}
+	for (iter = 0; iter < NUM_WEARS; ++iter) {
+		if (GET_EQ(ch, iter)) {
+			extract_obj(GET_EQ(ch, iter));
+		}
 	}
 
 	// This is really just players, but I suppose a mob COULD have it ...
@@ -803,7 +846,10 @@ void free_char(char_data *ch) {
 			log("SYSERR: Mob %s (#%d) had player_specials allocated!", GET_NAME(ch), GET_MOB_VNUM(ch));
 		}
 	}
-
+	
+	// mob prototype checks
+	proto = IS_NPC(ch) ? mob_proto(GET_MOB_VNUM(ch)) : NULL;
+	
 	if (ch->prev_host && (!proto || ch->prev_host != proto->prev_host)) {
 		free(ch->prev_host);
 	}
@@ -828,54 +874,10 @@ void free_char(char_data *ch) {
 			free(interact);
 		}
 	}
-	
-	// remove all affects
-	while (ch->affected) {
-		affect_remove(ch, ch->affected);
-	}
-	while (ch->over_time_effects) {
-		dot_remove(ch, ch->over_time_effects);
-	}
-	
-	// remove cooldowns
-	while (ch->cooldowns) {
-		remove_cooldown(ch, ch->cooldowns);
-	}
 
-	// free any assigned scripts and vars
-	if (SCRIPT(ch)) {
-		extract_script(ch, MOB_TRIGGER);
-	}
-	
-	// TODO what about script memory (freed in extract_char_final for NPCs, but what about PCs?)
-	
-	// free lore
-	while ((lore = GET_LORE(ch))) {
-		GET_LORE(ch) = lore->next;
-		if (lore->text) {
-			free(lore->text);
-		}
-		free(lore);
-	}
-	
-	// alert empire data the mob is despawned
-	if (GET_EMPIRE_NPC_DATA(ch)) {
-		GET_EMPIRE_NPC_DATA(ch)->mob = NULL;
-		GET_EMPIRE_NPC_DATA(ch) = NULL;
-	}
-	
-	// extract objs
-	while ((obj = ch->carrying)) {
-		extract_obj(obj);
-	}
-	for (iter = 0; iter < NUM_WEARS; ++iter) {
-		if (GET_EQ(ch, iter)) {
-			extract_obj(GET_EQ(ch, iter));
-		}
-	}
-
-	if (ch->desc)
+	if (ch->desc) {
 		ch->desc->character = NULL;
+	}
 
 	/* find_char helper */
 	remove_from_lookup_table(GET_ID(ch));
@@ -1152,7 +1154,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					CAN_GET_BONUS_SKILLS(ch) = atoi(line + length + 1) ? TRUE : FALSE;
 				}
 				else if (PFILE_TAG(line, "Class:", length)) {
-					GET_CLASS(ch) = atoi(line + length + 1);
+					GET_CLASS(ch) = find_class_by_vnum(atoi(line + length + 1));
 				}
 				else if (PFILE_TAG(line, "Class Progression:", length)) {
 					GET_CLASS_PROGRESSION(ch) = atoi(line + length + 1);
@@ -1946,7 +1948,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	// 'A'
 	HASH_ITER(hh, GET_ABILITY_HASH(ch), abil, next_abil) {
 		if (abil->purchased || abil->levels_gained > 0) {
-			fprintf(fl, "Ability: %d %d %d\n", abil->ability_id, abil->purchased ? 1 : 0, abil->levels_gained);
+			fprintf(fl, "Ability: %d %d %d\n", abil->vnum, abil->purchased ? 1 : 0, abil->levels_gained);
 		}
 	}
 	fprintf(fl, "Access Level: %d\n", GET_ACCESS_LEVEL(ch));
@@ -1987,7 +1989,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	if (CAN_GET_BONUS_SKILLS(ch)) {
 		fprintf(fl, "Can Get Bonus Skills: 1\n");
 	}
-	fprintf(fl, "Class: %d\n", GET_CLASS(ch));
+	fprintf(fl, "Class: %d\n", GET_CLASS(ch) ? CLASS_VNUM(GET_CLASS(ch)) : NOTHING);
 	fprintf(fl, "Class Progression: %d\n", GET_CLASS_PROGRESSION(ch));
 	fprintf(fl, "Class Role: %d\n", GET_CLASS_ROLE(ch));
 	for (iter = 0; iter < NUM_CUSTOM_COLORS; ++iter) {
@@ -2145,7 +2147,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	HASH_ITER(hh, GET_SKILL_HASH(ch), skill, next_skill) {
 		// don't bother writing ones with no data
 		if (skill->level > 0 || skill->exp > 0 || skill->resets > 0 || skill->noskill > 0) {
-			fprintf(fl, "Skill: %d %d %.2f %d %d\n", skill->skill_id, skill->level, skill->exp, skill->resets, skill->noskill ? 1 : 0);
+			fprintf(fl, "Skill: %d %d %.2f %d %d\n", skill->vnum, skill->level, skill->exp, skill->resets, skill->noskill ? 1 : 0);
 		}
 	}
 	fprintf(fl, "Skill Level: %d\n", GET_SKILL_LEVEL(ch));
@@ -2617,6 +2619,34 @@ void announce_login(char_data *ch) {
 
 
 /**
+* Ensures that all of a player's skills and abilities exist, and updates their
+* class. This should be called on login.
+*/
+void check_skills_and_abilities(char_data *ch) {
+	struct player_ability_data *plab, *next_plab;
+	struct player_skill_data *plsk, *next_plsk;
+	
+	if (!ch || IS_NPC(ch)) {
+		return;
+	}
+	
+	HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
+		if (!plab->ptr) {
+			HASH_DEL(GET_ABILITY_HASH(ch), plab);
+			free(plab);
+		}
+	}
+	HASH_ITER(hh, GET_SKILL_HASH(ch), plsk, next_plsk) {
+		if (!plsk->ptr) {
+			HASH_DEL(GET_SKILL_HASH(ch), plsk);
+			free(plsk);
+		}
+	}
+	update_class(ch);
+}
+
+
+/**
 * Clears certain player data, similar to clear_char() -- but not for NPCS.
 *
 * @param char_data *ch The player charater to clear.
@@ -2756,7 +2786,7 @@ void delete_player_character(char_data *ch) {
 * @param bool fresh If FALSE, player was already in the game, not logging in fresh.
 */
 void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
-	void assign_class_abilities(char_data *ch, int class, int role);
+	void assign_class_abilities(char_data *ch, class_data *cls, int role);
 	void check_delayed_load(char_data *ch);
 	void clean_lore(char_data *ch);
 	extern room_data *find_home(char_data *ch);
@@ -2864,11 +2894,12 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	}
 	
 	affect_total(ch);
-	SAVE_CHAR(ch);
 		
-	// verify class and skill/gear levels are up-to-date
-	update_class(ch);
+	// verify skills, abilities, and class and skill/gear levels are up-to-date
+	check_skills_and_abilities(ch);
 	determine_gear_level(ch);
+	
+	SAVE_CHAR(ch);
 	
 	// clear some player special data
 	GET_MARK_LOCATION(ch) = NOWHERE;
@@ -2946,7 +2977,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	cleanup_coins(ch);
 	
 	// verify abils -- TODO should this remove/re-add abilities for the empire? do class abilities affect that?
-	assign_class_abilities(ch, NOTHING, NOTHING);
+	assign_class_abilities(ch, NULL, NOTHING);
 	
 	// ensure player has penalty if at war
 	if (fresh && GET_LOYALTY(ch) && is_at_war(GET_LOYALTY(ch))) {
@@ -3190,7 +3221,7 @@ void start_new_character(char_data *ch) {
 	void add_archetype_lore(char_data *ch);
 	void apply_bonus_trait(char_data *ch, bitvector_t trait, bool add);
 	void make_vampire(char_data *ch, bool lore);
-	void set_skill(char_data *ch, int skill, int level);
+	void set_skill(char_data *ch, any_vnum skill, int level);
 	extern const char *default_channels[];
 	extern bool global_mute_slash_channel_joins;
 	extern struct promo_code_list promo_codes[];
@@ -3583,7 +3614,7 @@ PROMO_APPLY(promo_skillups) {
 	
 	HASH_ITER(hh, GET_SKILL_HASH(ch), skill, next_skill) {
 		if (skill->level > 0) {
-			set_skill(ch, skill->skill_id, MIN(BASIC_SKILL_CAP, skill->level * 1.5));
+			set_skill(ch, skill->vnum, MIN(BASIC_SKILL_CAP, skill->level * 1.5));
 		}
 	}
 }

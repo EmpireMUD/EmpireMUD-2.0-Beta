@@ -320,7 +320,7 @@ void perform_alternate(char_data *old, char_data *new) {
 * @param char_data *ch The person to display to.
 */
 static void print_group(char_data *ch) {
-	extern const char *class_role[NUM_ROLES];
+	extern const char *class_role[];
 	extern const char *pool_abbrevs[];
 
 	char status[256], class[256], loc[256], alerts[256];
@@ -343,8 +343,8 @@ static void print_group(char_data *ch) {
 			}
 			
 			// show class section if they have one
-			if (!IS_NPC(k) && GET_CLASS(k) != CLASS_NONE) {
-				snprintf(class, sizeof(class), "/%s/%s", class_data[GET_CLASS(k)].name, class_role[(int) GET_CLASS_ROLE(k)]);
+			if (!IS_NPC(k) && GET_CLASS(k)) {
+				snprintf(class, sizeof(class), "/%s/%s", SHOW_CLASS_NAME(k), class_role[(int) GET_CLASS_ROLE(k)]);
 			}
 			else {
 				*class = '\0';

@@ -96,6 +96,33 @@ void add_archetype_lore(char_data *ch) {
 
 
 /**
+* Audits archetypes on startup. Erroring entries are set IN-DEVELOPMENT.
+*/
+void check_archetypes(void) {
+	struct archetype_skill *arsk, *next_arsk;
+	archetype_data *arch, *next_arch;
+	bool error;
+	
+	HASH_ITER(hh, archetype_table, arch, next_arch) {
+		error = FALSE;
+		
+		LL_FOREACH_SAFE(GET_ARCH_SKILLS(arch), arsk, next_arsk) {
+			if (!find_skill_by_vnum(arsk->skill)) {
+				log("- Archetype [%d] %s has invalid skill %d", GET_ARCH_VNUM(arch), GET_ARCH_NAME(arch), arsk->skill);
+				error = TRUE;
+				LL_DELETE(GET_ARCH_SKILLS(arch), arsk);
+				free(arsk);
+			}
+		}
+		
+		if (error) {
+			SET_BIT(GET_ARCH_FLAGS(arch), ARCH_IN_DEVELOPMENT);
+		}
+	}
+}
+
+
+/**
 * Look up an active archetype by name, preferring exact matches.
 *
 * @param char *name The archetype name to look up.
@@ -572,7 +599,7 @@ char *list_one_archetype(archetype_data *arch, bool detail) {
 		strcpy(buf, " (");
 		for (sk = GET_ARCH_SKILLS(arch); sk; sk = sk->next) {
 			skills += sk->level;
-			sprintf(buf + strlen(buf), "%s%s", (sk == GET_ARCH_SKILLS(arch)) ? "" : ", ", skill_data[sk->skill].abbrev);
+			sprintf(buf + strlen(buf), "%s%s", (sk == GET_ARCH_SKILLS(arch)) ? "" : ", ", get_skill_abbrev_by_vnum(sk->skill));
 		}
 		strcat(buf, ")");
 		
@@ -934,21 +961,18 @@ void parse_archetype(FILE *fl, any_vnum vnum) {
 					exit(1);
 				}
 				
-				// only accept valid skills
-				if (int_in[0] >= 0 && int_in[0] < NUM_SKILLS) {
-					CREATE(sk, struct archetype_skill, 1);
-					sk->skill = int_in[0];
-					sk->level = int_in[1];
-				
-					// append
-					if (last_sk) {
-						last_sk->next = sk;
-					}
-					else {
-						GET_ARCH_SKILLS(arch) = sk;
-					}
-					last_sk = sk;
+				CREATE(sk, struct archetype_skill, 1);
+				sk->skill = int_in[0];
+				sk->level = int_in[1];
+			
+				// append
+				if (last_sk) {
+					last_sk->next = sk;
 				}
+				else {
+					GET_ARCH_SKILLS(arch) = sk;
+				}
+				last_sk = sk;
 				break;
 			}
 			
@@ -1059,6 +1083,7 @@ void write_archetype_to_file(FILE *fl, archetype_data *arch) {
 */
 void display_archetype_info(descriptor_data *desc, archetype_data *arch) {
 	struct archetype_skill *sk;
+	skill_data *skill;
 	int iter;
 	
 	msg_to_desc(desc, "[\tc%s\t0] - %s\r\n", GET_ARCH_NAME(arch), GET_ARCH_DESC(arch));
@@ -1070,7 +1095,9 @@ void display_archetype_info(descriptor_data *desc, archetype_data *arch) {
 	
 	msg_to_desc(desc, "\tySkills\t0:\r\n");
 	for (sk = GET_ARCH_SKILLS(arch); sk; sk = sk->next) {
-		msg_to_desc(desc, " %s: \tg%d\t0 (%s)\r\n", skill_data[sk->skill].name, sk->level, skill_data[sk->skill].description);
+		if ((skill = find_skill_by_vnum(sk->skill))) {
+			msg_to_desc(desc, " %s: \tg%d\t0 (%s)\r\n", SKILL_NAME(skill), sk->level, SKILL_DESC(skill));
+		}
 	}
 }
 
@@ -1111,7 +1138,7 @@ void display_archetype_list(descriptor_data *desc, char *argument) {
 		// check skill match
 		skill_match = FALSE;
 		for (sk = GET_ARCH_SKILLS(arch); sk && !skill_match; sk = sk->next) {
-			if (multi_isname(argument, skill_data[sk->skill].name)) {
+			if (multi_isname(argument, get_skill_name_by_vnum(sk->skill))) {
 				skill_match = TRUE;
 			}
 		}
@@ -1437,7 +1464,7 @@ void do_stat_archetype(char_data *ch, archetype_data *arch) {
 	}
 	size += snprintf(buf + size, sizeof(buf) - size, "Skills: [\tc%d total skill points\t0]\r\n", total);
 	for (sk = GET_ARCH_SKILLS(arch); sk; sk = sk->next) {
-		size += snprintf(buf + size, sizeof(buf) - size, "  %s: \tg%d\t0\r\n", skill_data[sk->skill].name, sk->level);
+		size += snprintf(buf + size, sizeof(buf) - size, "  %s: \tg%d\t0\r\n", get_skill_name_by_vnum(sk->skill), sk->level);
 	}
 	
 	// gear
@@ -1517,9 +1544,9 @@ void olc_show_archetype(char_data *ch) {
 	for (sk = GET_ARCH_SKILLS(arch); sk; sk = sk->next) {
 		total += sk->level;
 	}
-	sprintf(buf + strlen(buf), "Skills: <\tyskill\t0> (%d total skill points)\r\n", total);
+	sprintf(buf + strlen(buf), "Starting skills: <\tystartingskill\t0> (%d total skill points)\r\n", total);
 	for (sk = GET_ARCH_SKILLS(arch); sk; sk = sk->next) {
-		sprintf(buf + strlen(buf), "  %s: %d\r\n", skill_data[sk->skill].name, sk->level);
+		sprintf(buf + strlen(buf), "  %s: %d\r\n", get_skill_name_by_vnum(sk->skill), sk->level);
 	}
 	
 	// gear
@@ -1671,14 +1698,13 @@ OLC_MODULE(archedit_name) {
 }
 
 
-OLC_MODULE(archedit_skill) {
-	extern int find_skill_by_name(char *name);
-	
+OLC_MODULE(archedit_skill) {	
 	archetype_data *arch = GET_OLC_ARCHETYPE(ch->desc);
 	char cmd_arg[MAX_INPUT_LENGTH], skill_arg[MAX_INPUT_LENGTH], num_arg[MAX_INPUT_LENGTH];
 	struct archetype_skill *sk, *next_sk, *temp;
-	int skid, num;
+	skill_data *skill;
 	bool found;
+	int num;
 	
 	argument = any_one_arg(argument, cmd_arg);
 	argument = any_one_word(argument, skill_arg);
@@ -1689,7 +1715,7 @@ OLC_MODULE(archedit_skill) {
 		msg_to_char(ch, "       skill change <skill> <level>\r\n");
 		msg_to_char(ch, "       skill remove <skill>\r\n");
 	}
-	else if ((skid = find_skill_by_name(skill_arg)) == NO_SKILL) {
+	else if (!(skill = find_skill(skill_arg))) {
 		msg_to_char(ch, "Unknown skill '%s'.\r\n", skill_arg);
 	}
 	else if (is_abbrev(cmd_arg, "add") || is_abbrev(cmd_arg, "change")) {
@@ -1703,7 +1729,7 @@ OLC_MODULE(archedit_skill) {
 		found = FALSE;
 		for (sk = GET_ARCH_SKILLS(arch); sk; sk = next_sk) {
 			next_sk = sk->next;
-			if (sk->skill != skid) {
+			if (sk->skill != SKILL_VNUM(skill)) {
 				continue;
 			}
 			
@@ -1719,7 +1745,7 @@ OLC_MODULE(archedit_skill) {
 		
 		if (!found && num > 0) {
 			CREATE(sk, struct archetype_skill, 1);
-			sk->skill = skid;
+			sk->skill = SKILL_VNUM(skill);
 			sk->level = num;
 			
 			// append
@@ -1738,7 +1764,7 @@ OLC_MODULE(archedit_skill) {
 			send_config_msg(ch, "ok_string");
 		}
 		else {
-			msg_to_char(ch, "You set the starting %s level to %d.\r\n", skill_data[skid].name, num);
+			msg_to_char(ch, "You set the starting %s level to %d.\r\n", SKILL_NAME(skill), num);
 		}
 	}
 	else if (is_abbrev(cmd_arg, "remove")) {
@@ -1746,7 +1772,7 @@ OLC_MODULE(archedit_skill) {
 		found = FALSE;
 		for (sk = GET_ARCH_SKILLS(arch); sk; sk = next_sk) {
 			next_sk = sk->next;
-			if (sk->skill != skid) {
+			if (sk->skill != SKILL_VNUM(skill)) {
 				continue;
 			}
 			
@@ -1759,7 +1785,7 @@ OLC_MODULE(archedit_skill) {
 			send_config_msg(ch, "ok_string");
 		}
 		else {
-			msg_to_char(ch, "The archetype will grant no starting %s level.\r\n", skill_data[skid].name);
+			msg_to_char(ch, "The archetype will grant no starting %s level.\r\n", SKILL_NAME(skill));
 		}
 	}
 	else {

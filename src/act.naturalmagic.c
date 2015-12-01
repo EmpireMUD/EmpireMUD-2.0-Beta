@@ -38,7 +38,7 @@
 extern obj_data *find_obj(int n);
 extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
 extern bool is_fight_enemy(char_data *ch, char_data *frenemy);	// fight.c
-void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, int ability);
+void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, any_vnum ability);
 extern bool trigger_counterspell(char_data *ch);	// spells.c
 
 // locals
@@ -59,7 +59,7 @@ void un_earthmeld(char_data *ch);
 int ancestral_healing(char_data *ch) {
 	double mod, amt;
 	
-	if (!has_ability(ch, ABIL_ANCESTRAL_HEALING)) {
+	if (!has_ability(ch, ABIL_ANCESTRAL_HEALING) || !check_solo_role(ch)) {
 		return 0;
 	}
 	
@@ -742,13 +742,14 @@ ACMD(do_familiar) {
 	void scale_mob_as_familiar(char_data *mob, char_data *master);
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	
+	ability_data *abil = NULL;
 	char_data *mob;
 	int iter, type;
 	bool any;
 	
 	struct {
 		char *name;
-		int ability;
+		any_vnum ability;
 		int level;	// natural magic level required
 		mob_vnum vnum;
 		int cost;
@@ -791,10 +792,11 @@ ACMD(do_familiar) {
 			if (!IS_NPC(ch) && familiars[iter].ability != NO_ABIL && !has_ability(ch, familiars[iter].ability)) {
 				continue;
 			}
-			if (familiars[iter].ability != NO_ABIL && ability_data[familiars[iter].ability].parent_skill != NO_SKILL && get_skill_level(ch, ability_data[familiars[iter].ability].parent_skill) < familiars[iter].level) {
+			abil = find_ability_by_vnum(familiars[iter].ability);
+			if (abil && ABIL_ASSIGNED_SKILL(abil) != NULL && get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) < familiars[iter].level) {
 				continue;
 			}
-			if (familiars[iter].ability == NO_ABIL && GET_SKILL_LEVEL(ch) < familiars[iter].level) {
+			if (!abil && GET_SKILL_LEVEL(ch) < familiars[iter].level) {
 				continue;
 			}
 			
@@ -816,10 +818,11 @@ ACMD(do_familiar) {
 		if (!IS_NPC(ch) && familiars[iter].ability != NO_ABIL && !has_ability(ch, familiars[iter].ability)) {
 			continue;
 		}
-		if (familiars[iter].ability != NO_ABIL && ability_data[familiars[iter].ability].parent_skill != NO_SKILL && get_skill_level(ch, ability_data[familiars[iter].ability].parent_skill) < familiars[iter].level) {
+		abil = find_ability_by_vnum(familiars[iter].ability);
+		if (abil && ABIL_ASSIGNED_SKILL(abil) != NULL && get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) < familiars[iter].level) {
 			continue;
 		}
-		if (familiars[iter].ability == NO_ABIL && GET_SKILL_LEVEL(ch) < familiars[iter].level) {
+		if (!abil && GET_SKILL_LEVEL(ch) < familiars[iter].level) {
 			continue;
 		}
 		if (is_abbrev(argument, familiars[iter].name)) {
@@ -968,8 +971,8 @@ ACMD(do_heal) {
 	double self_cost = 0.75;
 	
 	// Healer ability features
-	double healer_cost_ratio = 0.25;
-	double healer_level_bonus = 1.5;	// times levels over 100
+	double healer_cost_ratio[] = { 0.75, 0.5, 0.25 };	// multiplied by amount healed
+	double healer_level_bonus[] = { 0.5, 1.0, 1.5 };	// times levels over 100
 	
 	one_argument(argument, arg);
 	
@@ -1025,8 +1028,8 @@ ACMD(do_heal) {
 
 	// amount to heal will determine the cost
 	amount = CHOOSE_BY_ABILITY_LEVEL(heal_levels, ch, abil) + (GET_INTELLIGENCE(ch) * CHOOSE_BY_ABILITY_LEVEL(intel_bonus, ch, abil));
-	if (has_ability(ch, ABIL_HEALER)) {
-		amount += (MAX(0, get_approximate_level(ch) - 100) * healer_level_bonus);
+	if (has_ability(ch, ABIL_HEALING_BOOST) && check_solo_role(ch)) {
+		amount += (MAX(0, get_approximate_level(ch) - 100) * CHOOSE_BY_ABILITY_LEVEL(healer_level_bonus, ch, abil));
 	}
 	bonus = total_bonus_healing(ch);
 	
@@ -1036,8 +1039,8 @@ ACMD(do_heal) {
 		amount = MAX(1, amount);
 	}
 	
-	if (has_ability(ch, ABIL_HEALER)) {
-		cost = amount * healer_cost_ratio;
+	if (has_ability(ch, ABIL_HEALING_BOOST) && check_solo_role(ch)) {
+		cost = amount * CHOOSE_BY_ABILITY_LEVEL(healer_cost_ratio, ch, abil);
 	}
 	else {
 		cost = amount * base_cost_ratio;
@@ -1288,7 +1291,7 @@ ACMD(do_rejuvenate) {
 	
 	// healer ability mods
 	double over_level_mod = 1.0/4.0;
-	double healer_cost_mod = 1.1;
+	double healer_cost_mod[] = { 2.0, 1.5, 1.1 };
 	
 	one_argument(argument, arg);
 	
@@ -1303,9 +1306,9 @@ ACMD(do_rejuvenate) {
 	// amount determines cost
 	amount = CHOOSE_BY_ABILITY_LEVEL(heal_levels, ch, ABIL_REJUVENATE);
 	amount += round(GET_INTELLIGENCE(ch) * int_mod);
-	if (has_ability(ch, ABIL_HEALER)) {
+	if (has_ability(ch, ABIL_HEALING_BOOST) && check_solo_role(ch)) {
 		amount += round(MAX(0, get_approximate_level(ch) - 100) * over_level_mod);
-		cost = round(amount * healer_cost_mod);
+		cost = round(amount * CHOOSE_BY_ABILITY_LEVEL(healer_cost_mod, ch, ABIL_REJUVENATE));
 	}
 	else {
 		cost = round(amount * base_cost_mod);
