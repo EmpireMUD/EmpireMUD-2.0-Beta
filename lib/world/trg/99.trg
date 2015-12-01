@@ -20,6 +20,9 @@ if %test%
     eval diff (%tt% - %timestamp%) + 1800
     eval diff2 %diff%/60
     eval diff %diff%//60
+    if %diff%<10
+      set diff 0%diff%
+    end
     %send% %actor% You must wait %diff2%:%diff% to use %self.shortdesc% again.
     halt
   end

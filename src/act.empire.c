@@ -108,6 +108,7 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 	int iter, sub, found_rank;
 	empire_data *other, *emp_iter, *next_emp;
 	bool found, is_own_empire, comma;
+	player_index_data *index;
 	char line[256];
 	
 	// for displaying diplomacy below
@@ -140,7 +141,7 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 		*line = '\0';
 	}
 	
-	msg_to_char(ch, "%s%s&0%s, led by %s\r\n", EMPIRE_BANNER(e), EMPIRE_NAME(e), line, (get_name_by_id(EMPIRE_LEADER(e)) ? CAP(get_name_by_id(EMPIRE_LEADER(e))) : "(Unknown)"));
+	msg_to_char(ch, "%s%s&0%s, led by %s\r\n", EMPIRE_BANNER(e), EMPIRE_NAME(e), line, (index = find_player_index_by_idnum(EMPIRE_LEADER(e))) ? index->fullname : "(Unknown)");
 	
 	if (IS_IMMORTAL(ch)) {
 		msg_to_char(ch, "Created: %-24.24s\r\n", ctime(&EMPIRE_CREATE_TIME(e)));
@@ -661,7 +662,7 @@ void claim_city(char_data *ch, char *argument) {
 			}
 			
 			// ok...
-			if (all || (SECT(to_room) != ROOM_ORIGINAL_SECT(to_room))) {
+			if (all || (SECT(to_room) != BASE_SECT(to_room))) {
 				found = TRUE;
 				claim_room(to_room, emp);
 				
@@ -673,7 +674,9 @@ void claim_city(char_data *ch, char *argument) {
 	
 	if (found) {
 		// update the inside (interior rooms only)
-		HASH_ITER(interior_hh, interior_world_table, iter, next_iter) {
+		for (iter = interior_room_list; iter; iter = next_iter) {
+			next_iter = iter->next_interior;
+			
 			home = HOME_ROOM(iter);
 			if (home != iter && ROOM_OWNER(home) == emp) {
 				ROOM_OWNER(iter) = emp;
@@ -813,7 +816,7 @@ void found_city(char_data *ch, char *argument) {
 		msg_to_char(ch, "Usage: city found <name>\r\n");
 		return;
 	}
-	if (count_color_codes(argument) > 0) {
+	if (color_code_length(argument) > 0) {
 		msg_to_char(ch, "City names may not contain color codes.\r\n");
 		return;
 	}
@@ -836,7 +839,7 @@ void found_city(char_data *ch, char *argument) {
 		return;
 	}
 	
-	if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
+	if (has_ability(ch, ABIL_NAVIGATION)) {
 		log_to_empire(emp, ELOG_TERRITORY, "%s has founded %s at (%d, %d)", PERS(ch, ch, 1), city->name, X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
 	}
 	else {
@@ -1028,7 +1031,7 @@ void rename_city(char_data *ch, char *argument) {
 		msg_to_char(ch, "Your empire has no city by that name.\r\n");
 		return;
 	}
-	if (count_color_codes(newname) > 0) {
+	if (color_code_length(newname) > 0) {
 		msg_to_char(ch, "City names may not contain color codes.\r\n");
 		return;
 	}
@@ -1618,7 +1621,7 @@ void show_tavern_status(char_data *ch) {
 		if (ROOM_BLD_FLAGGED(ter->room, BLD_TAVERN)) {
 			found = TRUE;
 			
-			if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
+			if (has_ability(ch, ABIL_NAVIGATION)) {
 				msg_to_char(ch, "(%*d, %*d) %s : %s\r\n", X_PRECISION, X_COORD(ter->room), Y_PRECISION, Y_COORD(ter->room), get_room_name(ter->room, FALSE), tavern_data[get_room_extra_data(ter->room, ROOM_EXTRA_TAVERN_TYPE)].name);
 			}
 			else {
@@ -1768,7 +1771,7 @@ void scan_for_tile(char_data *ch, char *argument) {
 			else if (GET_BUILDING(room) && multi_isname(argument, GET_BLD_NAME(GET_BUILDING(room)))) {
 				ok = TRUE;
 			}
-			else if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && (crop = crop_proto(ROOM_CROP_TYPE(room))) && multi_isname(argument, GET_CROP_NAME(crop))) {
+			else if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && (crop = ROOM_CROP(room)) && multi_isname(argument, GET_CROP_NAME(crop))) {
 				ok = TRUE;
 			}
 			else if (multi_isname(argument, get_room_name(room, FALSE))) {
@@ -1807,7 +1810,7 @@ void scan_for_tile(char_data *ch, char *argument) {
 			dist = compute_distance(IN_ROOM(ch), node->loc);
 			dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), node->loc));
 			
-			if (CHECK_MAP_BOUNDS(check_x, check_y) && HAS_ABILITY(ch, ABIL_NAVIGATION)) {
+			if (CHECK_MAP_BOUNDS(check_x, check_y) && has_ability(ch, ABIL_NAVIGATION)) {
 				lsize = snprintf(line, sizeof(line), "%2d tile%s %s (%d, %d) - %s", dist, PLURAL(dist), (dir == NO_DIR ? "away" : dirs[dir]), check_x, check_y, get_room_name(node->loc, FALSE));
 			}
 			else {
@@ -1919,14 +1922,18 @@ ACMD(do_abandon) {
 ACMD(do_barde) {
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	
-	Resource res[2] = { { o_IRON_INGOT, 10 }, END_RESOURCE_LIST };
+	static struct resource_data *res = NULL;
 	struct interact_exclusion_data *excl = NULL;
 	struct interaction_item *interact;
 	char_data *mob, *newmob = NULL;
 	bool found;
 	double prc;
 	int num;
-
+	
+	if (!res) {
+		res = create_resource_list(o_IRON_INGOT, 10, NOTHING);
+	}
+	
 	one_argument(argument, arg);
 
 	if (!can_use_ability(ch, ABIL_BARDE, NOTHING, 0, NOTHING)) {
@@ -2071,7 +2078,9 @@ ACMD(do_cede) {
 		
 		// mark as ceded
 		set_room_extra_data(room, ROOM_EXTRA_CEDED, 1);
-		HASH_ITER(interior_hh, interior_world_table, iter, next_iter) {
+		for (iter = interior_room_list; iter; iter = next_iter) {
+			next_iter = iter->next_interior;
+			
 			if (HOME_ROOM(iter) == room) {
 				set_room_extra_data(iter, ROOM_EXTRA_CEDED, 1);
 			}
@@ -2177,13 +2186,14 @@ ACMD(do_defect) {
 		msg_to_char(ch, "The leader can't defect!\r\n");
 	else {
 		GET_LOYALTY(ch) = NULL;
-		GET_EMPIRE_VNUM(ch) = NOTHING;
 		add_cooldown(ch, COOLDOWN_LEFT_EMPIRE, 2 * SECS_PER_REAL_HOUR);
 		SAVE_CHAR(ch);
 		
 		log_to_empire(e, ELOG_MEMBERS, "%s has defected from the empire", PERS(ch, ch, 1));
 		msg_to_char(ch, "You defect from the empire!\r\n");
-		add_lore(ch, LORE_DEFECT_EMPIRE, EMPIRE_VNUM(e));
+		
+		remove_lore(ch, LORE_PROMOTED);
+		add_lore(ch, LORE_DEFECT_EMPIRE, "Defected from %s%s&0", EMPIRE_BANNER(e), EMPIRE_NAME(e));
 		
 		clear_private_owner(GET_IDNUM(ch));
 		
@@ -2254,6 +2264,8 @@ ACMD(do_demote) {
 		act("You can't demote $M THAT low!", FALSE, ch, 0, victim, TO_CHAR);
 	else {
 		GET_RANK(victim) = to_rank;
+		remove_lore(victim, LORE_PROMOTED);	// only save most recent
+		add_lore(victim, LORE_PROMOTED, "Became %s&0", EMPIRE_RANK(e, to_rank-1));
 
 		log_to_empire(e, ELOG_MEMBERS, "%s has been demoted to %s%s", PERS(victim, victim, 1), EMPIRE_RANK(e, to_rank-1), EMPIRE_BANNER(e));
 		send_config_msg(ch, "ok_string");
@@ -2585,7 +2597,7 @@ ACMD(do_efind) {
 		total = 0;
 		
 		// first, gotta find them all
-		HASH_ITER(world_hh, world_table, iter, next_iter) {
+		HASH_ITER(hh, world_table, iter, next_iter) {
 			if (ROOM_OWNER(iter) == emp) {			
 				for (obj = ROOM_CONTENTS(iter); obj; obj = obj->next_content) {
 					if ((all && CAN_WEAR(obj, ITEM_WEAR_TAKE)) || (!all && isname(arg, obj->name))) {
@@ -2611,7 +2623,7 @@ ACMD(do_efind) {
 				
 				// first item at this location?
 				if (eg->location != last_rm) {
-					if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
+					if (has_ability(ch, ABIL_NAVIGATION)) {
 						// count have no coordinates
 						check_x = X_COORD(eg->location);
 						check_y = Y_COORD(eg->location);
@@ -2938,19 +2950,18 @@ ACMD(do_empire_inventory) {
 
 
 ACMD(do_enroll) {
-	void save_char_file_u(struct char_file_u *st);
-	struct char_file_u chdata;
 	struct empire_territory_data *ter, *next_ter;
 	struct empire_npc_data *npc;
 	struct empire_storage_data *store, *store2;
 	struct empire_city_data *city, *next_city, *temp;
+	player_index_data *index, *next_index;
 	struct empire_unique_storage *eus;
 	struct shipping_data *shipd;
 	empire_data *e, *old;
 	room_data *room, *next_room;
-	int j, old_store;
+	int old_store;
 	char_data *targ = NULL, *victim, *mob;
-	bool file = FALSE;
+	bool file = FALSE, sub_file = FALSE;
 	obj_data *obj;
 
 	if (IS_NPC(ch))
@@ -2989,10 +3000,11 @@ ACMD(do_enroll) {
 		send_config_msg(ch, "ok_string");
 		
 		GET_LOYALTY(targ) = e;
-		GET_EMPIRE_VNUM(targ) = EMPIRE_VNUM(e);
 		GET_RANK(targ) = 1;
 		GET_PLEDGE(targ) = NOTHING;
-		add_lore(targ, LORE_JOIN_EMPIRE, EMPIRE_VNUM(e));
+		
+		remove_lore(targ, LORE_PROMOTED);
+		add_lore(targ, LORE_JOIN_EMPIRE, "Honorably accepted into %s%s&0", EMPIRE_BANNER(e), EMPIRE_NAME(e));
 		
 		// TODO split this out into a "merge empires" func
 
@@ -3001,43 +3013,29 @@ ACMD(do_enroll) {
 			eliminate_linkdead_players();
 			
 			// move members
-			for (j = 0; j <= top_of_p_table; j++) {
-				// only even bother checking people other than targ
-				if (player_table[j].id != GET_IDNUM(targ)) {
-					if ((victim = is_playing(player_table[j].id))) {
-						if (GET_LOYALTY(victim) == old) {
-							msg_to_char(victim, "Your empire has merged with %s.\r\n", EMPIRE_NAME(e));
-							add_lore(victim, LORE_JOIN_EMPIRE, EMPIRE_VNUM(e));
-							GET_LOYALTY(victim) = e;
-							GET_EMPIRE_VNUM(victim) = EMPIRE_VNUM(e);
-							GET_RANK(victim) = 1;
-							SAVE_CHAR(victim);
-						}
+			HASH_ITER(idnum_hh, player_table_by_idnum, index, next_index) {
+				// find only members of the old empire (other than targ)
+				if (index->idnum == GET_IDNUM(targ) || index->loyalty != old) {
+					continue;
+				}
+				
+				if ((victim = is_playing(index->idnum)) || (victim = is_at_menu(index->idnum))) {
+					if (IN_ROOM(victim)) {
+						msg_to_char(victim, "Your empire has merged with %s.\r\n", EMPIRE_NAME(e));
 					}
-					else if ((victim = is_at_menu(player_table[j].id))) {
-						// hybrid
-						if (GET_LOYALTY(victim) == old) {
-							add_lore(victim, LORE_JOIN_EMPIRE, EMPIRE_VNUM(e));
-							GET_LOYALTY(victim) = e;
-							GET_EMPIRE_VNUM(victim) = EMPIRE_VNUM(e);
-							GET_RANK(victim) = 1;
-							SAVE_CHAR(victim);
-							
-							load_char(player_table[j].name, &chdata);
-							if (chdata.player_specials_saved.empire == EMPIRE_VNUM(old)) {
-								chdata.player_specials_saved.empire = EMPIRE_VNUM(e);
-								chdata.player_specials_saved.rank = 1;
-								save_char_file_u(&chdata);
-							}
-						}
-					}
-					else {
-						load_char(player_table[j].name, &chdata);
-						if (chdata.player_specials_saved.empire == EMPIRE_VNUM(old)) {
-							chdata.player_specials_saved.empire = EMPIRE_VNUM(e);
-							chdata.player_specials_saved.rank = 1;
-							save_char_file_u(&chdata);
-						}
+					add_lore(victim, LORE_JOIN_EMPIRE, "Empire merged into %s%s&0", EMPIRE_BANNER(e), EMPIRE_NAME(e));
+					GET_LOYALTY(victim) = e;
+					GET_RANK(victim) = 1;
+					update_player_index(index, victim);
+					SAVE_CHAR(victim);
+				}
+				else if ((victim = find_or_load_player(index->name, &sub_file))) {
+					add_lore(victim, LORE_JOIN_EMPIRE, "Empire merged into %s%s&0", EMPIRE_BANNER(e), EMPIRE_NAME(e));
+					GET_LOYALTY(victim) = e;
+					GET_RANK(victim) = 1;
+					update_player_index(index, victim);
+					if (sub_file) {
+						store_loaded_char(victim);
 					}
 				}
 			}
@@ -3148,7 +3146,7 @@ ACMD(do_enroll) {
 			EMPIRE_TERRITORY_LIST(old) = NULL;
 			
 			// move territory over
-			HASH_ITER(world_hh, world_table, room, next_room) {
+			HASH_ITER(hh, world_table, room, next_room) {
 				if (ROOM_OWNER(room) == old) {
 					ROOM_OWNER(room) = e;
 				}
@@ -3217,7 +3215,7 @@ ACMD(do_esay) {
 		return;
 		}
 
-	if (PLR_FLAGGED(ch, PLR_MUTED)) {
+	if (ACCOUNT_FLAGGED(ch, ACCT_MUTED)) {
 		msg_to_char(ch, "You can't use the empire channel while muted.\r\n");
 		return;
 		}
@@ -3353,14 +3351,15 @@ ACMD(do_expel) {
 		msg_to_char(ch, "You can't expel the leader!\r\n");
 	else {
 		GET_LOYALTY(targ) = NULL;
-		GET_EMPIRE_VNUM(targ) = NOTHING;
 		add_cooldown(targ, COOLDOWN_LEFT_EMPIRE, 2 * SECS_PER_REAL_HOUR);
 		clear_private_owner(GET_IDNUM(targ));
 
 		log_to_empire(e, ELOG_MEMBERS, "%s has been expelled from the empire", PERS(targ, targ, 1));
 		send_config_msg(ch, "ok_string");
 		msg_to_char(targ, "You have been expelled from the empire.\r\n");
-		add_lore(targ, LORE_KICKED_EMPIRE, EMPIRE_VNUM(e));
+		
+		remove_lore(targ, LORE_PROMOTED);
+		add_lore(targ, LORE_KICKED_EMPIRE, "Dishonorably discharged from %s%s&0", EMPIRE_BANNER(e), EMPIRE_NAME(e));
 
 		// save now
 		if (file) {
@@ -3404,7 +3403,7 @@ ACMD(do_findmaintenance) {
 		msg_to_char(ch, "You can't use findmaintenance if you are not in an empire.\r\n");
 	}
 	else {
-		HASH_ITER(world_hh, world_table, iter, next_iter) {
+		HASH_ITER(hh, world_table, iter, next_iter) {
 			// skip non-map
 			if (GET_ROOM_VNUM(iter) >= MAP_SIZE) {
 				continue;
@@ -3457,7 +3456,7 @@ room_data *find_home(char_data *ch) {
 		return NULL;
 	}
 	
-	HASH_ITER(world_hh, world_table, iter, next_iter) {
+	HASH_ITER(hh, world_table, iter, next_iter) {
 		if (ROOM_PRIVATE_OWNER(iter) == GET_IDNUM(ch)) {
 			return iter;
 		}
@@ -3485,7 +3484,7 @@ ACMD(do_home) {
 		if (!home) {
 			msg_to_char(ch, "You have no home set.\r\n");
 		}
-		else if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
+		else if (has_ability(ch, ABIL_NAVIGATION)) {
 			msg_to_char(ch, "Your home is at: %s (%d, %d)\r\n", get_room_name(home, FALSE), X_COORD(home), Y_COORD(home));
 		}
 		else {
@@ -3548,8 +3547,10 @@ ACMD(do_home) {
 			
 			COMPLEX_DATA(real)->private_owner = GET_IDNUM(ch);
 
-			// interior only			
-			HASH_ITER(interior_hh, interior_world_table, iter, next_iter) {
+			// interior only
+			for (iter = interior_room_list; iter; iter = next_iter) {
+				next_iter = iter->next_interior;
+				
 				// TODO consider a trigger like RoomUpdate that passes a var like %update% == homeset
 				if (HOME_ROOM(iter) == real && BUILDING_VNUM(iter) == RTYPE_BEDROOM) {
 					obj_to_room((obj = read_object(o_HOME_CHEST, TRUE)), iter);
@@ -3619,7 +3620,7 @@ ACMD(do_islands) {
 		msg_to_char(ch, "You can't do that.\r\n");
 		return;
 	}
-	if (!HAS_ABILITY(ch, ABIL_NAVIGATION)) {
+	if (!has_ability(ch, ABIL_NAVIGATION)) {
 		msg_to_char(ch, "You need to purchase the Navigation ability to do that.\r\n");
 		return;
 	}
@@ -3759,7 +3760,7 @@ ACMD(do_tomb) {
 		if (!tomb) {
 			msg_to_char(ch, "You have no tomb set.\r\n");
 		}
-		else if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
+		else if (has_ability(ch, ABIL_NAVIGATION)) {
 			msg_to_char(ch, "Your tomb is at: %s (%d, %d)\r\n", get_room_name(tomb, FALSE), X_COORD(tomb), Y_COORD(tomb));
 		}
 		else {
@@ -4017,6 +4018,8 @@ ACMD(do_promote) {
 		msg_to_char(ch, "You can't promote someone to that level.\r\n");
 	else {
 		GET_RANK(victim) = to_rank;
+		remove_lore(victim, LORE_PROMOTED);	// only save most recent
+		add_lore(victim, LORE_PROMOTED, "Promoted to %s&0", EMPIRE_RANK(e, to_rank-1));
 
 		log_to_empire(e, ELOG_MEMBERS, "%s has been promoted to %s%s!", PERS(victim, victim, 1), EMPIRE_RANK(e, to_rank-1), EMPIRE_BANNER(e));
 		send_config_msg(ch, "ok_string");
@@ -4237,7 +4240,7 @@ ACMD(do_reward) {
 	else if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
 	}
-	else if (ch == vict) {
+	else if (ch == vict || GET_ACCOUNT(ch) == GET_ACCOUNT(vict)) {
 		msg_to_char(ch, "You can't reward yourself.\r\n");
 	}
 	else if (IS_NPC(vict)) {
@@ -4287,16 +4290,16 @@ ACMD(do_reward) {
 
 
 ACMD(do_roster) {
-	extern bool member_is_timed_out_cfu(struct char_file_u *chdata);
-	extern const char *class_role[NUM_ROLES];
-	extern const char *class_role_color[NUM_ROLES];
+	extern bool member_is_timed_out_ch(char_data *ch);
+	extern const char *class_role[];
+	extern const char *class_role_color[];
 
 	char buf[MAX_STRING_LENGTH * 2], buf1[MAX_STRING_LENGTH * 2], arg[MAX_STRING_LENGTH];
-	struct char_file_u chdata;
-	int j, days, hours, size;
+	player_index_data *index, *next_index;
+	bool timed_out, is_file = FALSE;
+	int days, hours, size;
+	char_data *member;
 	empire_data *e;
-	char_data *tmp;
-	bool timed_out;
 
 	one_word(argument, arg);
 
@@ -4313,41 +4316,49 @@ ACMD(do_roster) {
 
 	*buf = '\0';
 	size = 0;
-
-	for (j = 0; j <= top_of_p_table; j++) {
-		load_char((player_table + j)->name, &chdata);
-		if (!IS_SET(chdata.char_specials_saved.act, PLR_DELETED)) {
-			if (chdata.player_specials_saved.empire == EMPIRE_VNUM(e)) {
-				tmp = is_playing(chdata.char_specials_saved.idnum);
-			
-				timed_out = member_is_timed_out_cfu(&chdata);
-				if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
-					size += snprintf(buf + size, sizeof(buf) - size, "[%d %s %s] <%s&0> %s%s&0", tmp ? GET_COMPUTED_LEVEL(tmp) : chdata.player_specials_saved.last_known_level, class_data[tmp ? GET_CLASS(tmp) : chdata.player_specials_saved.character_class].name, class_role[tmp ? GET_CLASS_ROLE(tmp) : chdata.player_specials_saved.class_role], EMPIRE_RANK(e, (tmp ? GET_RANK(tmp) : chdata.player_specials_saved.rank) - 1), (timed_out ? "&r" : ""), chdata.name);
-				}
-				else {	// not screenreader
-					size += snprintf(buf + size, sizeof(buf) - size, "[%d %s%s\t0] <%s&0> %s%s&0", tmp ? GET_COMPUTED_LEVEL(tmp) : chdata.player_specials_saved.last_known_level, class_role_color[tmp ? GET_CLASS_ROLE(tmp) : chdata.player_specials_saved.class_role], class_data[tmp ? GET_CLASS(tmp) : chdata.player_specials_saved.character_class].name, EMPIRE_RANK(e, (tmp ? GET_RANK(tmp) : chdata.player_specials_saved.rank) - 1), (timed_out ? "&r" : ""), chdata.name);
-				}
-								
-				// online/not
-				if (tmp) {
-					size += snprintf(buf + size, sizeof(buf) - size, "  - &conline&0%s", IS_AFK(tmp) ? " - &rafk&0" : "");
-				}
-				else if ((time(0) - chdata.last_logon) < SECS_PER_REAL_DAY) {
-					hours = (time(0) - chdata.last_logon) / SECS_PER_REAL_HOUR;
-					size += snprintf(buf + size, sizeof(buf) - size, "  - %d hour%s ago%s", hours, PLURAL(hours), (timed_out ? ", &rtimed-out&0" : ""));
-				}
-				else {	// more than a day
-					days = (time(0) - chdata.last_logon) / SECS_PER_REAL_DAY;
-					size += snprintf(buf + size, sizeof(buf) - size, "  - %d day%s ago%s", days, PLURAL(days), (timed_out ? ", &rtimed-out&0" : ""));
-				}
-				
-				size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
-			}
+	
+	HASH_ITER(name_hh, player_table_by_name, index, next_index) {
+		if (index->loyalty != e) {
+			continue;
+		}
+		
+		// load member
+		member = find_or_load_player(index->name, &is_file);
+		if (!member) {
+			continue;
+		}
+		
+		// display:
+		timed_out = member_is_timed_out_ch(member);
+		if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+			size += snprintf(buf + size, sizeof(buf) - size, "[%d %s %s] <%s&0> %s%s&0", !is_file ? GET_COMPUTED_LEVEL(member) : GET_LAST_KNOWN_LEVEL(member), SHOW_CLASS_NAME(member), class_role[GET_CLASS_ROLE(member)], EMPIRE_RANK(e, GET_RANK(member) - 1), (timed_out ? "&r" : ""), PERS(member, member, TRUE));
+		}
+		else {	// not screenreader
+			size += snprintf(buf + size, sizeof(buf) - size, "[%d %s%s\t0] <%s&0> %s%s&0", !is_file ? GET_COMPUTED_LEVEL(member) : GET_LAST_KNOWN_LEVEL(member), class_role_color[GET_CLASS_ROLE(member)], SHOW_CLASS_NAME(member), EMPIRE_RANK(e, GET_RANK(member) - 1), (timed_out ? "&r" : ""), PERS(member, member, TRUE));
+		}
+						
+		// online/not
+		if (!is_file) {
+			size += snprintf(buf + size, sizeof(buf) - size, "  - &conline&0%s", IS_AFK(member) ? " - &rafk&0" : "");
+		}
+		else if ((time(0) - member->prev_logon) < SECS_PER_REAL_DAY) {
+			hours = (time(0) - member->prev_logon) / SECS_PER_REAL_HOUR;
+			size += snprintf(buf + size, sizeof(buf) - size, "  - %d hour%s ago%s", hours, PLURAL(hours), (timed_out ? ", &rtimed-out&0" : ""));
+		}
+		else {	// more than a day
+			days = (time(0) - member->prev_logon) / SECS_PER_REAL_DAY;
+			size += snprintf(buf + size, sizeof(buf) - size, "  - %d day%s ago%s", days, PLURAL(days), (timed_out ? ", &rtimed-out&0" : ""));
+		}
+		
+		size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
+		
+		if (member && is_file) {
+			free_char(member);
 		}
 	}
 
 	snprintf(buf1, sizeof(buf1), "Roster of %s%s&0:\r\n%s", EMPIRE_BANNER(e), EMPIRE_NAME(e), buf);
-	page_string(ch->desc, buf1, 1);
+	page_string(ch->desc, buf1, TRUE);
 }
 
 
@@ -4378,7 +4389,7 @@ ACMD(do_territory) {
 		msg_to_char(ch, "You are not in an empire.\r\n");
 		return;
 	}
-	if (!ch->desc || IS_NPC(ch) || !HAS_ABILITY(ch, ABIL_NAVIGATION)) {
+	if (!ch->desc || IS_NPC(ch) || !has_ability(ch, ABIL_NAVIGATION)) {
 		msg_to_char(ch, "You need the Navigation ability to list the coordinates of your territory.\r\n");
 		return;
 	}
@@ -4387,7 +4398,7 @@ ACMD(do_territory) {
 	outside_only = *argument ? FALSE : TRUE;
 	
 	// ready?
-	HASH_ITER(world_hh, world_table, iter, next_iter) {
+	HASH_ITER(hh, world_table, iter, next_iter) {
 		if (outside_only && GET_ROOM_VNUM(iter) >= MAP_SIZE) {
 			continue;
 		}
@@ -4405,7 +4416,7 @@ ACMD(do_territory) {
 				else if (GET_BUILDING(iter) && multi_isname(argument, GET_BLD_NAME(GET_BUILDING(iter)))) {
 					ok = TRUE;
 				}
-				else if (ROOM_SECT_FLAGGED(iter, SECTF_HAS_CROP_DATA) && (crop = crop_proto(ROOM_CROP_TYPE(iter))) && multi_isname(argument, GET_CROP_NAME(crop))) {
+				else if (ROOM_SECT_FLAGGED(iter, SECTF_HAS_CROP_DATA) && (crop = ROOM_CROP(iter)) && multi_isname(argument, GET_CROP_NAME(crop))) {
 					ok = TRUE;
 				}
 				else if (multi_isname(argument, get_room_name(iter, FALSE))) {
@@ -4475,7 +4486,7 @@ ACMD(do_unpublicize) {
 	else if (GET_RANK(ch) < EMPIRE_NUM_RANKS(e))
 		msg_to_char(ch, "You're of insufficient rank to remove all public status for the empire.\r\n");
 	else {
-		HASH_ITER(world_hh, world_table, iter, next_iter) {
+		HASH_ITER(hh, world_table, iter, next_iter) {
 			if (ROOM_AFF_FLAGGED(iter, ROOM_AFF_PUBLIC) && ROOM_OWNER(iter) == e) {
 				REMOVE_BIT(ROOM_AFF_FLAGS(iter), ROOM_AFF_PUBLIC);
 				REMOVE_BIT(ROOM_BASE_FLAGS(iter), ROOM_AFF_PUBLIC);

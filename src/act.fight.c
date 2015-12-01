@@ -88,13 +88,17 @@ ACMD(do_assist) {
 
 
 ACMD(do_catapult) {
+	static struct resource_data *rocks = NULL;
 	struct empire_political_data *emp_pol = NULL;
 	obj_data *catapult;
 	char_data *vict;
 	int dir;
 	empire_data *e;
-	Resource rocks[2] = { {o_ROCK, 12}, END_RESOURCE_LIST };
 	room_data *to_room;
+	
+	if (!rocks) {
+		rocks = create_resource_list(o_ROCK, 12, NOTHING);
+	}
 
 	/* Find a 'pult */
 	for (catapult = ROOM_CONTENTS(IN_ROOM(ch)); catapult; catapult = catapult->next_content)
@@ -277,9 +281,9 @@ ACMD(do_flee) {
 	}
 
 	// try more times if FLEET
-	for (i = 0; i < NUM_2D_DIRS * ((!IS_NPC(ch) && HAS_ABILITY(ch, ABIL_FLEET)) ? 2 : 1); i++) {
+	for (i = 0; i < NUM_2D_DIRS * ((!IS_NPC(ch) && has_ability(ch, ABIL_FLEET)) ? 2 : 1); i++) {
 		// chance to fail if not FLEET
-		if ((IS_NPC(ch) || !HAS_ABILITY(ch, ABIL_FLEET)) && number(0, 2) == 0) {
+		if ((IS_NPC(ch) || !has_ability(ch, ABIL_FLEET)) && number(0, 2) == 0) {
 			continue;
 		}
 
@@ -308,7 +312,7 @@ ACMD(do_flee) {
 			was_fighting = FIGHTING(ch);
 			if (perform_move(ch, attempt, TRUE, 0)) {
 				send_to_char("You flee head over heels.\r\n", ch);
-				if (was_fighting) {
+				if (was_fighting && can_gain_exp_from(ch, was_fighting)) {
 					gain_ability_exp(ch, ABIL_FLEET, 5);
 				}
 				GET_WAIT_STATE(ch) = 2 RL_SEC;
@@ -353,7 +357,7 @@ ACMD(do_hit) {
 		}
 	}
 	else if (can_fight(ch, vict)) {
-		if (AFF_FLAGGED(ch, AFF_CHARM) && !IS_NPC(ch->master) && !IS_NPC(vict))
+		if (AFF_FLAGGED(ch, AFF_CHARM) && ch->master && !IS_NPC(ch->master) && !IS_NPC(vict))
 			return;
 
 		if (FIGHTING(ch) == vict) {
@@ -430,7 +434,7 @@ ACMD(do_shoot) {
 	else if (FIGHTING(ch))
 		msg_to_char(ch, "You're already fighting for your life!\r\n");
 	else if (can_fight(ch, vict)) {
-		if (AFF_FLAGGED(ch, AFF_CHARM) && !IS_NPC(ch->master) && !IS_NPC(vict))
+		if (AFF_FLAGGED(ch, AFF_CHARM) && ch->master && !IS_NPC(ch->master) && !IS_NPC(vict))
 			return;
 
 		msg_to_char(ch, "You take aim.\r\n");
@@ -506,8 +510,8 @@ ACMD(do_stake) {
 		if (!IS_VAMPIRE(victim)) {
 			if (!IS_NPC(victim)) {
 				death_log(victim, ch, ATTACK_EXECUTE);
-				add_lore(ch, LORE_PLAYER_KILL, GET_IDNUM(victim));
-				add_lore(victim, LORE_PLAYER_DEATH, GET_IDNUM(ch));
+				add_lore(ch, LORE_PLAYER_KILL, "Killed %s in battle", PERS(victim, victim, TRUE));
+				add_lore(victim, LORE_PLAYER_DEATH, "Slain by %s in battle", PERS(ch, ch, TRUE));
 			}
 			die(victim, ch);	// returns a corpse but we don't need it
 		}

@@ -35,8 +35,8 @@
 
 // extern variables
 extern struct city_metadata_type city_type[];
-extern const char *class_role[NUM_ROLES];
-extern const char *class_role_color[NUM_ROLES];
+extern const char *class_role[];
+extern const char *class_role_color[];
 extern const char *dirs[];
 extern struct help_index_element *help_table;
 extern int top_of_helpt;
@@ -344,13 +344,26 @@ void diag_char_to_char(char_data *i, char_data *ch) {
 * @param char_data *to The person to show them to.
 */
 void display_attributes(char_data *ch, char_data *to) {
+	extern struct attribute_data_type attributes[NUM_ATTRIBUTES];
+	extern int attribute_display_order[NUM_ATTRIBUTES];
+	
+	char buf[MAX_STRING_LENGTH];
+	int iter, pos;
+
 	if (!ch || !to || !to->desc) {
 		return;
 	}
 	
 	msg_to_char(to, "        Physical                   Social                      Mental\r\n");
-	msg_to_char(to, "  Strength  [%s%2d&0]           Charisma  [%s%2d&0]           Intelligence  [%s%2d&0]\r\n", HAPPY_COLOR(GET_STRENGTH(ch), ch->real_attributes[STRENGTH]), GET_STRENGTH(ch), HAPPY_COLOR(GET_CHARISMA(ch), ch->real_attributes[CHARISMA]), GET_CHARISMA(ch), HAPPY_COLOR(GET_INTELLIGENCE(ch), ch->real_attributes[INTELLIGENCE]), GET_INTELLIGENCE(ch));
-	msg_to_char(to, "  Dexterity  [%s%2d&0]          Greatness  [%s%2d&0]          Wits  [%s%2d&0]\r\n", HAPPY_COLOR(GET_DEXTERITY(ch), ch->real_attributes[DEXTERITY]), GET_DEXTERITY(ch), HAPPY_COLOR(GET_GREATNESS(ch), ch->real_attributes[GREATNESS]), GET_GREATNESS(ch), HAPPY_COLOR(GET_WITS(ch), ch->real_attributes[WITS]), GET_WITS(ch));
+	
+	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
+		pos = attribute_display_order[iter];
+		snprintf(buf, sizeof(buf), "%s  [%s%2d\t0]", attributes[pos].name, HAPPY_COLOR(GET_ATT(ch, pos), GET_REAL_ATT(ch, pos)), GET_ATT(ch, pos));
+		msg_to_char(to, "  %-*.*s%s", 23 + color_code_length(buf), 23 + color_code_length(buf), buf, !((iter + 1) % 3) ? "\r\n" : "");
+	}
+	if (iter % 3) {
+		msg_to_char(to, "\r\n");
+	}
 }
 
 
@@ -373,14 +386,14 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	extern int health_gain(char_data *ch, bool info_only);
 	extern int move_gain(char_data *ch, bool info_only);
 	extern int mana_gain(char_data *ch, bool info_only);
-	extern int get_ability_points_available_for_char(char_data *ch, int skill);
+	extern int get_ability_points_available_for_char(char_data *ch, any_vnum skill);
 	extern const struct material_data materials[NUM_MATERIALS];
-	extern int skill_sort[NUM_SKILLS];
 	extern const int base_hit_chance;
 	extern const double hit_per_dex;
 
 	char lbuf[MAX_STRING_LENGTH], lbuf2[MAX_STRING_LENGTH], lbuf3[MAX_STRING_LENGTH];
-	int i, j, count, iter, sk, pts, cols, val;
+	struct player_skill_data *skdata, *next_skill;
+	int i, j, count, pts, cols, val;
 	empire_data *emp;
 	struct time_info_data playing_time;
 
@@ -391,7 +404,7 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	msg_to_char(to, "  Name: %-18.18s", PERS(ch, ch, 1));
 
 	// row 1 col 2: class
-	msg_to_char(to, " Class: %-17.17s", IS_IMMORTAL(ch) ? "Immortal" : class_data[GET_CLASS(ch)].name);
+	msg_to_char(to, " Class: %-17.17s", SHOW_CLASS_NAME(ch));
 	msg_to_char(to, " Level: %d (%d)\r\n", GET_COMPUTED_LEVEL(ch), GET_SKILL_LEVEL(ch));
 
 	// row 1 col 3: levels
@@ -447,9 +460,8 @@ void display_score_to_char(char_data *ch, char_data *to) {
 		strcpy(lbuf, "&gnone&0");
 	}
 	// gotta count the color codes to determine width
-	count = 37 + (2 * count_color_codes(lbuf));
-	sprintf(lbuf2, "  Conditions: %%-%d.%ds", count, count);
-	msg_to_char(to, lbuf2, lbuf);
+	count = 37 + color_code_length(lbuf);
+	msg_to_char(to, "  Conditions: %-*.*s", count, count, lbuf);
 	
 	if (IS_VAMPIRE(ch)) {
 		msg_to_char(to, " Blood: &r%d&0/&r%d&0-&r%d&0/hr\r\n", GET_BLOOD(ch), GET_MAX_BLOOD(ch), get_blood_upkeep_cost(ch));
@@ -491,18 +503,16 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	msg_to_char(to, " +--------------------------------- Skills ----------------------------------+\r\n ");
 
 	count = 0;
-	for (iter = 0; iter < NUM_SKILLS; ++iter) {
-		sk = skill_sort[iter];
-		if (GET_SKILL(ch, sk) > 0) {
-			sprintf(lbuf, " %s: %s%d", skill_data[sk].name, IS_ANY_SKILL_CAP(ch, sk) ? "&g" : "&y", GET_SKILL(ch, sk));
-			pts = get_ability_points_available_for_char(ch, sk);
+	HASH_ITER(hh, GET_SKILL_HASH(ch), skdata, next_skill) {
+		if (skdata->level > 0) {
+			sprintf(lbuf, " %s: %s%d", SKILL_NAME(skdata->ptr), IS_ANY_SKILL_CAP(ch, skdata->vnum) ? "&g" : "&y", skdata->level);
+			pts = get_ability_points_available_for_char(ch, skdata->vnum);
 			if (pts > 0) {
 				sprintf(lbuf + strlen(lbuf), " &g(%d)", pts);
 			}
 			
-			cols = 25 + (2 * count_color_codes(lbuf));
-			sprintf(lbuf2, "%%-%d.%ds&0", cols, cols);
-			msg_to_char(to, lbuf2, lbuf);
+			cols = 25 + color_code_length(lbuf);
+			msg_to_char(to, "%-*.*s&0", cols, cols, lbuf);
 			
 			if (++count == 3) {
 				msg_to_char(to, "&0\r\n ");
@@ -602,13 +612,11 @@ void list_char_to_char(char_data *list, char_data *ch) {
 * @param char_data *to The person to show it to.
 */
 void list_lore_to_char(char_data *ch, char_data *to) {
-	extern char *get_name_by_id(int id);
 	extern long load_time();
 
 	struct lore_data *lore;
 	char daystring[MAX_INPUT_LENGTH];
 	struct time_info_data t;
-	empire_data *e;
 	long beginning_of_time = load_time();
 
 	msg_to_char(to, "%s's lore:\r\n", PERS(ch, ch, 1));
@@ -622,53 +630,8 @@ void list_lore_to_char(char_data *ch, char_data *to) {
 		else
 			strcpy(buf1, buf);
 
-		sprintf(daystring, "%d %s, Year %d", t.day + 1, buf1, t.year);
-
-		switch (lore->type) {
-			case LORE_FOUND_EMPIRE:
-				if ((e = real_empire(lore->value)))
-					msg_to_char(to, " Proudly founded %s%s&0 on %s.\r\n", EMPIRE_BANNER(e), EMPIRE_NAME(e), daystring);
-				break;
-			case LORE_JOIN_EMPIRE:
-				if ((e = real_empire(lore->value)))
-					msg_to_char(to, " Honorably accepted into %s%s&0 on %s.\r\n", EMPIRE_BANNER(e), EMPIRE_NAME(e), daystring);
-				break;
-			case LORE_DEFECT_EMPIRE:
-				if ((e = real_empire(lore->value)))
-					msg_to_char(to, " Defected from %s%s&0 on %s.\r\n", EMPIRE_BANNER(e), EMPIRE_NAME(e), daystring);
-				break;
-			case LORE_KICKED_EMPIRE:
-				if ((e = real_empire(lore->value)))
-					msg_to_char(to, " Dishonorably discharged from %s%s&0 on %s.\r\n", EMPIRE_BANNER(e), EMPIRE_NAME(e), daystring);
-				break;
-			case LORE_PLAYER_KILL:
-				msg_to_char(to, " Killed %s in battle on %s.\r\n", get_name_by_id(lore->value) ? CAP(get_name_by_id(lore->value)) : "an unknown foe", daystring);
-				break;
-			case LORE_PLAYER_DEATH:
-				msg_to_char(to, " Slain by %s in battle on %s.\r\n", get_name_by_id(lore->value) ? CAP(get_name_by_id(lore->value)) : "an unknown foe", daystring);
-				break;
-			case LORE_TOWER_DEATH:
-				msg_to_char(to, " Killed by a guard tower on %s.\r\n", daystring);
-				break;
-			case LORE_DEATH:
-				msg_to_char(to, " Died on %s.\r\n", daystring);
-				break;
-			case LORE_START_VAMPIRE:
-				if (IS_VAMPIRE(to))
-					msg_to_char(to, " Sired prior to %s.\r\n", daystring);
-				break;
-			case LORE_PURIFY:
-				msg_to_char(to, " Purified on %s.\r\n", daystring);
-				break;
-			case LORE_SIRE_VAMPIRE:
-				if (IS_VAMPIRE(to))
-					msg_to_char(to, " Sired by %s on %s.\r\n", get_name_by_id(lore->value) ? CAP(get_name_by_id(lore->value)) : "an unknown Cainite", daystring);
-				break;
-			case LORE_MAKE_VAMPIRE:
-				if (IS_VAMPIRE(to))
-					msg_to_char(to, " Sired %s on %s.\r\n", get_name_by_id(lore->value) ? CAP(get_name_by_id(lore->value)) : "an unknown Cainite", daystring);
-				break;
-		}
+		snprintf(daystring, sizeof(daystring), "%d %s, Year %d", t.day + 1, buf1, t.year);
+		msg_to_char(to, " %s on %s.\r\n", NULLSAFE(lore->text), daystring);
 	}
 }
 
@@ -887,7 +850,7 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 	if (!i || !ch || !ch->desc)
 		return;
 	
-	if (show_eq && ch != i && !IS_IMMORTAL(ch) && !IS_NPC(i) && HAS_ABILITY(i, ABIL_CONCEALMENT)) {
+	if (show_eq && ch != i && !IS_IMMORTAL(ch) && !IS_NPC(i) && has_ability(i, ABIL_CONCEALMENT)) {
 		show_eq = FALSE;
 		gain_ability_exp(i, ABIL_CONCEALMENT, 5);
 	}
@@ -960,12 +923,14 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 		return;
 	}
 
-	if (ch != i && (IS_IMMORTAL(ch) || IS_NPC(i) || GET_MORPH(i) == MORPH_NONE || !MORPH_FLAGGED(i, MORPH_FLAG_ANIMAL)) && HAS_ABILITY(ch, ABIL_APPRAISAL)) {
+	if (ch != i && (IS_IMMORTAL(ch) || IS_NPC(i) || GET_MORPH(i) == MORPH_NONE || !MORPH_FLAGGED(i, MORPH_FLAG_ANIMAL)) && has_ability(ch, ABIL_APPRAISAL)) {
 		act("\r\nYou appraise $s inventory:", FALSE, i, 0, ch, TO_VICT);
 		list_obj_to_char(i->carrying, ch, OBJ_DESC_INVENTORY, TRUE);
 
 		if (ch != i && i->carrying) {
-			gain_ability_exp(ch, ABIL_APPRAISAL, 5);
+			if (can_gain_exp_from(ch, i)) {
+				gain_ability_exp(ch, ABIL_APPRAISAL, 5);
+			}
 			GET_WAIT_STATE(ch) = MAX(GET_WAIT_STATE(ch), 0.5 RL_SEC);
 		}
 	}
@@ -1438,11 +1403,8 @@ char *one_who_line(char_data *ch, bool shortlist, bool screenreader) {
 		if (shortlist) {
 			size += snprintf(out + size, sizeof(out) - size, "[%s%3d%s] ", screenreader ? "" : class_role_color[GET_CLASS_ROLE(ch)], GET_COMPUTED_LEVEL(ch), screenreader ? "" : "\t0");
 		}
-		else if (GET_CLASS(ch) != CLASS_NONE) {
-			size += snprintf(out + size, sizeof(out) - size, "[%3d %s%s%s] ", GET_COMPUTED_LEVEL(ch), screenreader ? "" : class_role_color[GET_CLASS_ROLE(ch)], screenreader ? class_data[GET_CLASS(ch)].name : class_data[GET_CLASS(ch)].abbrev, screenreader ? show_role : "\t0");
-		}
-		else {	// classless
-			size += snprintf(out + size, sizeof(out) - size, "[%3d %sAdvn%s] ", GET_COMPUTED_LEVEL(ch), screenreader ? "" : class_role_color[GET_CLASS_ROLE(ch)], screenreader ? show_role : "\t0");
+		else {
+			size += snprintf(out + size, sizeof(out) - size, "[%3d %s%s%s] ", GET_COMPUTED_LEVEL(ch), screenreader ? "" : class_role_color[GET_CLASS_ROLE(ch)], screenreader ? SHOW_CLASS_NAME(ch) : SHOW_CLASS_ABBREV(ch), screenreader ? show_role : "\t0");
 		}
 	}
 	
@@ -1456,8 +1418,8 @@ char *one_who_line(char_data *ch, bool shortlist, bool screenreader) {
 	
 	// shortlist ends here
 	if (shortlist) {
-		num = count_color_codes(out);
-		sprintf(buf, "%%-%d.%ds", 35 + 2 * num, 35 + 2 * num);
+		num = color_code_length(out);
+		sprintf(buf, "%%-%d.%ds", 35 + num, 35 + num);
 		strcpy(buf1, out);
 		
 		size = snprintf(out, sizeof(out), buf, buf1);
@@ -1471,7 +1433,7 @@ char *one_who_line(char_data *ch, bool shortlist, bool screenreader) {
 	}
 	
 	// title
-	size += snprintf(out + size, sizeof(out) - size, "%s&0", GET_TITLE(ch));
+	size += snprintf(out + size, sizeof(out) - size, "%s&0", NULLSAFE(GET_TITLE(ch)));
 	
 	// tags
 	if (IS_AFK(ch)) {
@@ -1554,7 +1516,7 @@ char *partial_who(char_data *ch, char *name_search, int low, int high, empire_da
 		else if (!(tch = d->character))
 			continue;
 
-		if (*name_search && !is_abbrev(name_search, PERS(tch, tch, 1)) && !strstr(GET_TITLE(tch), name_search))
+		if (*name_search && !is_abbrev(name_search, PERS(tch, tch, 1)) && !strstr(NULLSAFE(GET_TITLE(tch)), name_search))
 			continue;
 		if (!CAN_SEE_GLOBAL(ch, tch)) {
 			continue;
@@ -1717,7 +1679,7 @@ ACMD(do_affects) {
 	if (IS_RIDING(ch)) {
 		msg_to_char(ch, "   You are riding %s.\r\n", get_mob_name_by_proto(GET_MOUNT_VNUM(ch)));
 	}
-	else if (HAS_ABILITY(ch, ABIL_RIDE) && GET_MOUNT_VNUM(ch) != NOTHING && mob_proto(GET_MOUNT_VNUM(ch))) {
+	else if (has_ability(ch, ABIL_RIDE) && GET_MOUNT_VNUM(ch) != NOTHING && mob_proto(GET_MOUNT_VNUM(ch))) {
 		msg_to_char(ch, "   You have %s. Type 'mount' to ride it.\r\n", get_mob_name_by_proto(GET_MOUNT_VNUM(ch)));
 	}
 
@@ -2140,7 +2102,7 @@ ACMD(do_mark) {
 				dist = compute_distance(mark, IN_ROOM(ch));
 				dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), mark));
 				
-				if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
+				if (has_ability(ch, ABIL_NAVIGATION)) {
 					msg_to_char(ch, "Your mark at (%d, %d) is %d map tile%s %s.\r\n", X_COORD(mark), Y_COORD(mark), dist, (dist == 1 ? "" : "s"), (dir == NO_DIR ? "away" : dirs[dir]));
 				}
 				else {
@@ -2232,7 +2194,7 @@ ACMD(do_nearby) {
 
 			dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
 			
-			if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
+			if (has_ability(ch, ABIL_NAVIGATION)) {
 				snprintf(line, sizeof(line), " %d tile%s %s: %s (%d, %d)\r\n", dist, (dist != 1 ? "s" : ""), (dir == NO_DIR ? "away" : dirs[dir]), get_room_name(loc, FALSE), X_COORD(loc), Y_COORD(loc));
 			}
 			else {
@@ -2254,7 +2216,7 @@ ACMD(do_nearby) {
 				
 				dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
 
-				if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
+				if (has_ability(ch, ABIL_NAVIGATION)) {
 					snprintf(line, sizeof(line), " %d tile%s %s: the %s of %s (%d, %d) / %s%s&0\r\n", dist, (dist != 1 ? "s" : ""), (dir == NO_DIR ? "away" : dirs[dir]), city_type[city->type].name, city->name, X_COORD(loc), Y_COORD(loc), EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 				}
 				else {
@@ -2284,7 +2246,7 @@ ACMD(do_nearby) {
 		// show instance
 		found = TRUE;
 		dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), inst->location));
-		if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
+		if (has_ability(ch, ABIL_NAVIGATION)) {
 			snprintf(line, sizeof(line), " %d tile%s %s: %s (%d, %d) / %s\r\n", dist, PLURAL(dist), (dir == NO_DIR ? "away" : dirs[dir]), GET_ADV_NAME(inst->adventure), X_COORD(loc), Y_COORD(loc), instance_level_string(inst));
 		}
 		else {
@@ -2433,7 +2395,7 @@ ACMD(do_weather) {
 
 
 ACMD(do_whereami) {	
-	if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
+	if (has_ability(ch, ABIL_NAVIGATION)) {
 		msg_to_char(ch, "You are at: %s (%d, %d)\r\n", get_room_name(IN_ROOM(ch), FALSE), X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
 	}
 	else {
@@ -2543,7 +2505,7 @@ ACMD(do_who) {
 
 
 ACMD(do_whois) {
-	void read_lore(char_data *ch);
+	void check_delayed_load(char_data *ch);
 	extern const char *level_names[][2];
 	
 	char_data *victim = NULL;
@@ -2560,26 +2522,19 @@ ACMD(do_whois) {
 		send_to_char("There is no such player.\r\n", ch);
 		return;
 	}
-
-	// ready
-	if (file) {
-		read_lore(victim);
-	}
+	
+	// load remaining data
+	check_delayed_load(victim);
 	
 	// basic info
-	msg_to_char(ch, "%s%s&0\r\n", PERS(victim, victim, TRUE), GET_TITLE(victim));
+	msg_to_char(ch, "%s%s&0\r\n", PERS(victim, victim, TRUE), NULLSAFE(GET_TITLE(victim)));
 	msg_to_char(ch, "Status: %s\r\n", level_names[(int) GET_ACCESS_LEVEL(victim)][1]);
 
 	// show class (but don't bother for immortals, as they generally have all skills
 	if (!IS_GOD(victim) && !IS_IMMORTAL(victim)) {
 		level = file ? GET_LAST_KNOWN_LEVEL(victim) : GET_COMPUTED_LEVEL(victim);
 		
-		if (GET_CLASS(victim) != CLASS_NONE) {
-			msg_to_char(ch, "Class: %d %s (%s%s\t0)\r\n", level, class_data[GET_PC_CLASS(victim)].name, class_role_color[GET_CLASS_ROLE(victim)], class_role[GET_CLASS_ROLE(victim)]);
-		}
-		else {
-			msg_to_char(ch, "Level: %d\r\n", level);
-		}
+		msg_to_char(ch, "Class: %d %s (%s%s\t0)\r\n", level, SHOW_CLASS_NAME(victim), class_role_color[GET_CLASS_ROLE(victim)], class_role[GET_CLASS_ROLE(victim)]);
 	}
 
 	if (GET_LOYALTY(victim)) {

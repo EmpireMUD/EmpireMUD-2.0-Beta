@@ -210,9 +210,9 @@ void reset_wtrigger(room_data *ch);
 void load_mtrigger(char_data *ch);
 void load_otrigger(obj_data *obj);
 
-int ability_mtrigger(char_data *actor, char_data *ch, int abil);
-int ability_otrigger(char_data *actor, obj_data *obj, int abil);
-int ability_wtrigger(char_data *actor, char_data *vict, obj_data *obj, int abil);
+int ability_mtrigger(char_data *actor, char_data *ch, any_vnum abil);
+int ability_otrigger(char_data *actor, obj_data *obj, any_vnum abil);
+int ability_wtrigger(char_data *actor, char_data *vict, obj_data *obj, any_vnum abil);
 
 int leave_mtrigger(char_data *actor, int dir);
 int leave_wtrigger(room_data *room, char_data *actor, int dir);
@@ -253,7 +253,6 @@ void free_trigger(trig_data *trig);
 void copy_proto_script(void *source, void *dest, int type);
 void copy_script(void *source, void *dest, int type);
 void trig_data_copy(trig_data *this_data, const trig_data *trg);
-void delete_variables(const char *charname);
 
 trig_data *read_trigger(int nr);
 void add_var(struct trig_var_data **var_list, char *name, char *value, int id);

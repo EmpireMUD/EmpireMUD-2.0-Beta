@@ -79,9 +79,7 @@ Usage:  disenchant <item>
 This technique allows you to break open enchanted objects and strip them of
 their power. This allows them to be enchanted with something different.
 
-This will also remove the superior qualities of masterwork items.
-
-Sometimes you can create magical items from the released energy.
+Sometimes you can create magical gems from the released energy.
 #
 DISPEL
 
@@ -100,13 +98,18 @@ ENCHANT "ENCHANT WEAPONS" "ENCHANT ARMOR" "ENCHANT TOOLS"
 
 Enchant Weapons, Enchant Armor, Enchant Tools (High Sorcery abilities)
 
-Usage:  enchant <item> <type>
+Usage:  enchant <item | person> <type>
 
 Powerful sorcerers learn to enchant ordinary items to increase their useful-
 ness and power. You may only enchant items that are not already enchanted. The
 level and strength of the enchantment are based on both the level of the item
 and the crafting level of the enchanter. If the enchanter's gear level is
-better than his/her crafting level, that is used instead.
+better than his/her crafting level, that is used instead. If High Sorcery is
+below level 100, the enchanter's High Sorcery skill also limits the effect.
+
+An item must be in your inventory to enchant it. However, if another player
+"shares" an item, you can enchant that item by targeting that player by name
+(e.g. "enchant Lyra striking").
 
 Enchant Weapons:
   striking - strength, to-hit  (5 bloodstones)
@@ -139,7 +142,7 @@ Enchant Armor:
 Enchant Tools:
   embiggening (pack) - capacity  (1 of each of the 4 gems)
 
-See also: CRAFTING LEVEL, GREATER ENCHANTMENTS
+See also: CRAFTING LEVEL, GREATER ENCHANTMENTS, RECIPES, SHARE
 #
 ENERVATE
 
@@ -287,12 +290,11 @@ Ritual of Defense (High Sorcery ability)
 Usage:  ritual defense
 Cost:  15 mana; 1 imperium spike and 1 bloodstone per wall
 
-This ritual enchants a wall to be able to repel anyone flying. It also works
-on gatehouses and river gates. It will go away if you dismantle the building
-or wall.
+This ritual enchants a wall to be able to repel anyone flying. It will go away
+if you dismantle the wall. You will not get your resources back if you cancel
+the ritual; they are spent immediately.
 
-Cast it on more walls to raise your skill. You will not get your resources back
-if you cancel the ritual; they are spent immediately.
+Cast it on more walls to raise your skill.
 
 See also: RITUAL
 #

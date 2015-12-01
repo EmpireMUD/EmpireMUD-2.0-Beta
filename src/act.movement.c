@@ -46,7 +46,7 @@ extern const char *from_dir[];
 #define MOVE_EARTHMELD	4
 #define MOVE_SWIM		5	// swim skill
 
-#define WATER_SECT(room)		(ROOM_SECT_FLAGGED((room), SECTF_FRESH_WATER | SECTF_OCEAN) || ROOM_BLD_FLAGGED((room), BLD_NEED_BOAT) || RMT_FLAGGED((room), RMT_NEED_BOAT) || (IS_WATER_BUILDING(room) && !IS_COMPLETE(room) && SECT_FLAGGED(ROOM_ORIGINAL_SECT(room), SECTF_FRESH_WATER | SECTF_OCEAN)))
+#define WATER_SECT(room)		(ROOM_SECT_FLAGGED((room), SECTF_FRESH_WATER | SECTF_OCEAN) || ROOM_BLD_FLAGGED((room), BLD_NEED_BOAT) || RMT_FLAGGED((room), RMT_NEED_BOAT) || (IS_WATER_BUILDING(room) && !IS_COMPLETE(room) && SECT_FLAGGED(BASE_SECT(room), SECTF_FRESH_WATER | SECTF_OCEAN)))
 #define DEEP_WATER_SECT(room)	(ROOM_SECT_FLAGGED((room), SECTF_OCEAN))
 
 
@@ -77,10 +77,10 @@ void add_tracks(char_data *ch, room_data *room, byte dir) {
 	struct track_data *track;
 	
 	if (!IS_IMMORTAL(ch) && !ROOM_SECT_FLAGGED(room, SECTF_FRESH_WATER | SECTF_FRESH_WATER)) {
-		if (!IS_NPC(ch) && HAS_ABILITY(ch, ABIL_NO_TRACE) && !COMPLEX_DATA(room) && !IS_ROAD(room)) {
+		if (!IS_NPC(ch) && has_ability(ch, ABIL_NO_TRACE) && !COMPLEX_DATA(room) && !IS_ROAD(room)) {
 			gain_ability_exp(ch, ABIL_NO_TRACE, 5);
 		}
-		else if (!IS_NPC(ch) && HAS_ABILITY(ch, ABIL_UNSEEN_PASSING) && (COMPLEX_DATA(room) || IS_ROAD(room))) {
+		else if (!IS_NPC(ch) && has_ability(ch, ABIL_UNSEEN_PASSING) && (COMPLEX_DATA(room) || IS_ROAD(room))) {
 			gain_ability_exp(ch, ABIL_UNSEEN_PASSING, 5);
 		}
 		else {
@@ -258,7 +258,7 @@ int find_door(char_data *ch, const char *type, char *dir, const char *cmdname) {
 
 // processes the character's north
 int get_north_for_char(char_data *ch) {
-	if (IS_NPC(ch) || (HAS_ABILITY(ch, ABIL_NAVIGATION) && GET_COND(ch, DRUNK) < 250)) {
+	if (IS_NPC(ch) || (has_ability(ch, ABIL_NAVIGATION) && GET_COND(ch, DRUNK) < 250)) {
 		return NORTH;
 	}
 	else {
@@ -292,7 +292,7 @@ int can_move(char_data *ch, int dir, room_data *to_room, int need_specials_check
 		msg_to_char(ch, "You can't enter a building without permission.\r\n");
 		return 0;
 	}
-	if (IS_RIDING(ch) && ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && !HAS_ABILITY(ch, ABIL_ALL_TERRAIN_RIDING) && !EFFECTIVELY_FLYING(ch)) {
+	if (IS_RIDING(ch) && ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && !has_ability(ch, ABIL_ALL_TERRAIN_RIDING) && !EFFECTIVELY_FLYING(ch)) {
 		msg_to_char(ch, "You can't ride on such rough terrain.\r\n");
 		return 0;
 	}
@@ -301,7 +301,7 @@ int can_move(char_data *ch, int dir, room_data *to_room, int need_specials_check
 		msg_to_char(ch, "Your mount won't ride into the ocean.\r\n");
 		return 0;
 	}
-	if (IS_RIDING(ch) && !HAS_ABILITY(ch, ABIL_ALL_TERRAIN_RIDING) && WATER_SECT(to_room) && !MOUNT_FLAGGED(ch, MOUNT_AQUATIC) && !EFFECTIVELY_FLYING(ch)) {
+	if (IS_RIDING(ch) && !has_ability(ch, ABIL_ALL_TERRAIN_RIDING) && WATER_SECT(to_room) && !MOUNT_FLAGGED(ch, MOUNT_AQUATIC) && !EFFECTIVELY_FLYING(ch)) {
 		msg_to_char(ch, "Your mount won't ride into the water.\r\n");
 		return 0;
 	}
@@ -321,7 +321,7 @@ int can_move(char_data *ch, int dir, room_data *to_room, int need_specials_check
 		return 0;
 	}
 	
-	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH) && ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && (!IS_NPC(ch) || !MOB_FLAGGED(ch, MOB_MOUNTAINWALK)) && !HAS_ABILITY(ch, ABIL_MOUNTAIN_CLIMBING) && !EFFECTIVELY_FLYING(ch)) {
+	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH) && ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && (!IS_NPC(ch) || !MOB_FLAGGED(ch, MOB_MOUNTAINWALK)) && !has_ability(ch, ABIL_MOUNTAIN_CLIMBING) && !EFFECTIVELY_FLYING(ch)) {
 		msg_to_char(ch, "You must buy the Mountain Climbing ability to cross such rough terrain.\r\n");
 		return 0;
 	}
@@ -365,7 +365,7 @@ int move_cost(char_data *ch, room_data *from, room_data *to, int dir, int mode) 
 	
 	// open buildings and incomplete non-closed buildings use average of current & original sect's move cost
 	if (!ROOM_IS_CLOSED(from)) {
-		cost_from = (GET_SECT_MOVE_LOSS(SECT(from)) + GET_SECT_MOVE_LOSS(ROOM_ORIGINAL_SECT(from))) / 2.0;
+		cost_from = (GET_SECT_MOVE_LOSS(SECT(from)) + GET_SECT_MOVE_LOSS(BASE_SECT(from))) / 2.0;
 	}
 	else {
 		cost_from = GET_SECT_MOVE_LOSS(SECT(from));
@@ -373,7 +373,7 @@ int move_cost(char_data *ch, room_data *from, room_data *to, int dir, int mode) 
 	
 	// cost for the space moving to
 	if (!ROOM_IS_CLOSED(to)) {
-		cost_to = (GET_SECT_MOVE_LOSS(SECT(to)) + GET_SECT_MOVE_LOSS(ROOM_ORIGINAL_SECT(to))) / 2.0;
+		cost_to = (GET_SECT_MOVE_LOSS(SECT(to)) + GET_SECT_MOVE_LOSS(BASE_SECT(to))) / 2.0;
 	}
 	else {
 		cost_to = GET_SECT_MOVE_LOSS(SECT(to));
@@ -495,7 +495,7 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 			if (is_in_city_for_empire(was_in, ROOM_OWNER(was_in), TRUE, &junk) && is_in_city_for_empire(to_room, ROOM_OWNER(to_room), TRUE, &junk)) {
 				add_cooldown(ch, COOLDOWN_PORTAL_SICKNESS, 2 * SECS_PER_REAL_MIN);
 			}
-			else if (HAS_ABILITY(ch, ABIL_PORTAL_MAGIC)) {
+			else if (has_ability(ch, ABIL_PORTAL_MAGIC)) {
 				add_cooldown(ch, COOLDOWN_PORTAL_SICKNESS, 4 * SECS_PER_REAL_MIN);
 			}
 			else {
@@ -629,7 +629,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 	/* if the room we're going to needs a boat, check for one.  You can wade if you're already in one */
 	if (WATER_SECT(to_room)) {
 		if (!has_boat(ch) && !IS_RIDING(ch)) {
-			if (HAS_ABILITY(ch, ABIL_SWIMMING) && (mode == MOVE_NORMAL || mode == MOVE_FOLLOW)) {
+			if (has_ability(ch, ABIL_SWIMMING) && (mode == MOVE_NORMAL || mode == MOVE_FOLLOW)) {
 				mode = MOVE_SWIM;
 			}
 			else if (IS_NPC(ch) && MOB_FLAGGED(ch, MOB_AQUATIC)) {
@@ -1272,7 +1272,7 @@ ACMD(do_enter) {
 	
 	// permissions
 	if (ROOM_OWNER(IN_ROOM(ch)) && !IS_IMMORTAL(ch) && !IS_NPC(ch) && (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) || !can_use_room(ch, room, GUESTS_ALLOWED))) {
-		if (!HAS_ABILITY(ch, ABIL_INFILTRATE)) {
+		if (!has_ability(ch, ABIL_INFILTRATE)) {
 			msg_to_char(ch, "You don't have permission to enter that.\r\n");
 			return;
 		}
@@ -1448,7 +1448,7 @@ ACMD(do_move) {
 
 // mortals have to portal from a certain building, immortals can do it anywhere
 ACMD(do_portal) {
-	void empire_skillup(empire_data *emp, int ability, double amount);
+	void empire_skillup(empire_data *emp, any_vnum ability, double amount);
 	extern char *get_room_name(room_data *room, bool color);
 	
 	bool all_access = (IS_IMMORTAL(ch) || (IS_NPC(ch) && !AFF_FLAGGED(ch, AFF_CHARM)));
@@ -1482,7 +1482,7 @@ ACMD(do_portal) {
 		
 		count = 0;
 		ch_in_city = (is_in_city_for_empire(IN_ROOM(ch), ROOM_OWNER(IN_ROOM(ch)), TRUE, &wait_here) || (!ROOM_OWNER(IN_ROOM(ch)) && is_in_city_for_empire(IN_ROOM(ch), GET_LOYALTY(ch), TRUE, &wait_here)));
-		HASH_ITER(world_hh, world_table, room, next_room) {
+		HASH_ITER(hh, world_table, room, next_room) {
 			// early exit
 			if (bsize >= sizeof(buf) - 1) {
 				break;
@@ -1503,13 +1503,13 @@ ACMD(do_portal) {
 				}
 				
 				// coords: navigation only
-				if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
+				if (has_ability(ch, ABIL_NAVIGATION)) {
 					lsize += snprintf(line + lsize, sizeof(line) - lsize, "(%*d, %*d) ", X_PRECISION, X_COORD(room), Y_PRECISION, Y_COORD(room));
 				}
 				
 				lsize += snprintf(line + lsize, sizeof(line) - lsize, "%s (%s%s&0)", get_room_name(room, FALSE), EMPIRE_BANNER(ROOM_OWNER(room)), EMPIRE_ADJECTIVE(ROOM_OWNER(room)));
 				
-				if ((dist > max_out_of_city_portal && (!ch_in_city || !there_in_city)) || (!HAS_ABILITY(ch, ABIL_PORTAL_MASTER) && (!GET_LOYALTY(ch) || !EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_MASTER_PORTALS)) && GET_ISLAND_ID(IN_ROOM(ch)) != GET_ISLAND_ID(target))) {
+				if ((dist > max_out_of_city_portal && (!ch_in_city || !there_in_city)) || (!has_ability(ch, ABIL_PORTAL_MASTER) && (!GET_LOYALTY(ch) || !EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_MASTER_PORTALS)) && GET_ISLAND_ID(IN_ROOM(ch)) != GET_ISLAND_ID(target))) {
 					lsize += snprintf(line + lsize, sizeof(line) - lsize, " &r(too far)&0");
 				}
 				
@@ -1525,7 +1525,7 @@ ACMD(do_portal) {
 	
 	// targeting: by list number (only targets member/ally portals
 	if (is_number(arg) && (num = atoi(arg)) >= 1 && GET_LOYALTY(ch)) {
-		HASH_ITER(world_hh, world_table, room, next_room) {
+		HASH_ITER(hh, world_table, room, next_room) {
 			if (ROOM_OWNER(room) && ROOM_BLD_FLAGGED(room, BLD_PORTAL) && IS_COMPLETE(room) && can_use_room(ch, room, MEMBERS_AND_ALLIES)) {
 				if (--num <= 0) {
 					target = room;
@@ -1542,7 +1542,7 @@ ACMD(do_portal) {
 	}
 
 	// ok, we have a target...
-	if (!all_access && !HAS_ABILITY(ch, ABIL_PORTAL_MAGIC)  && (!GET_LOYALTY(ch) || !EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_PORTALS))) {
+	if (!all_access && !has_ability(ch, ABIL_PORTAL_MAGIC)  && (!GET_LOYALTY(ch) || !EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_PORTALS))) {
 		msg_to_char(ch, "You can only open portals if there is a portal mage in your empire.\r\n");
 		return;
 	}
@@ -1562,7 +1562,7 @@ ACMD(do_portal) {
 		msg_to_char(ch, "You don't have permission to open a portal to that location.\r\n");
 		return;
 	}
-	if (!HAS_ABILITY(ch, ABIL_PORTAL_MASTER) && (!GET_LOYALTY(ch) || !EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_MASTER_PORTALS)) && GET_ISLAND_ID(IN_ROOM(ch)) != GET_ISLAND_ID(target)) {
+	if (!has_ability(ch, ABIL_PORTAL_MASTER) && (!GET_LOYALTY(ch) || !EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_MASTER_PORTALS)) && GET_ISLAND_ID(IN_ROOM(ch)) != GET_ISLAND_ID(target)) {
 		msg_to_char(ch, "You can't open a portal to another land without a portal master in your empire.\r\n");
 		return;
 	}
@@ -1869,7 +1869,7 @@ ACMD(do_worm) {
 	}
 	else if (!(to_room = real_shift(IN_ROOM(ch), shift_dir[dir][0], shift_dir[dir][1])))
 		msg_to_char(ch, "You can't go that way!\r\n");
-	else if (ROOM_SECT_FLAGGED(to_room, SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_SHALLOW_WATER) || SECT_FLAGGED(ROOM_ORIGINAL_SECT(to_room), SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_SHALLOW_WATER))
+	else if (ROOM_SECT_FLAGGED(to_room, SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_SHALLOW_WATER) || SECT_FLAGGED(BASE_SECT(to_room), SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_SHALLOW_WATER))
 		msg_to_char(ch, "You can't pass through the water!\r\n");
 	else if (GET_MOVE(ch) < 1)
 		msg_to_char(ch, "You don't have enough energy left to do that.\r\n");

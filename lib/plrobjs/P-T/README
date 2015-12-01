@@ -1,2 +1,4 @@
-This directory contains player inventories.
-
+This directory formerly contained player inventories. They are now part of
+the main player file. If your EmpireMUD never ran a version prior to 2.0b3.1,
+or you have already run the converter for that version, you can delete the
+plrobjs directory.

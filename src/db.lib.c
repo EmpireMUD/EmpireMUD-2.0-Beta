@@ -38,6 +38,7 @@
 *   Interaction Lib
 *   Mobile Lib
 *   Object Lib
+*   Resource Lib
 *   Room Lib
 *   Room Template Lib
 *   Sector Lib
@@ -56,9 +57,10 @@ extern struct player_special_data dummy_mob;
 extern bool world_is_sorted;
 
 // external funcs
-extern room_data *create_ocean_room(room_vnum vnum);
 extern struct complex_room_data *init_complex_data();
 void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location);
+void free_archetype_gear(struct archetype_gear *list);
+extern room_data *load_map_room(room_vnum vnum);
 extern obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify);
 void sort_exits(struct room_direction_data **list);
 void sort_world_table();
@@ -71,12 +73,14 @@ void parse_extra_desc(FILE *fl, struct extra_descr_data **list, char *error_part
 void parse_generic_name_file(FILE *fl, char *err_str);
 void parse_icon(char *line, FILE *fl, struct icon_data **list, char *error_part);
 void parse_interaction(char *line, struct interaction_item **list, char *error_part);
+void parse_resource(FILE *fl, struct resource_data **list, char *error_str);
 void script_save_to_disk(FILE *fp, void *item, int type);
 int sort_empires(empire_data *a, empire_data *b);
 int sort_room_templates(room_template *a, room_template *b);
 void write_extra_descs_to_file(FILE *fl, struct extra_descr_data *list);
 void write_icons_to_file(FILE *fl, char file_tag, struct icon_data *list);
 void write_interactions_to_file(FILE *fl, struct interaction_item *list);
+void write_resources_to_file(FILE *fl, struct resource_data *list);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -693,7 +697,7 @@ void free_craft(craft_data *craft) {
 	}
 	
 	if (GET_CRAFT_RESOURCES(craft) && (!proto || GET_CRAFT_RESOURCES(craft) != GET_CRAFT_RESOURCES(proto))) {
-		free(GET_CRAFT_RESOURCES(craft));
+		free_resource_list(GET_CRAFT_RESOURCES(craft));
 	}
 	
 	free(craft);
@@ -706,8 +710,6 @@ void free_craft(craft_data *craft) {
 * @param craft_data *craft The craft recipe to clear.
 */
 void init_craft(craft_data *craft) {
-	int iter;
-	
 	memset((char *)craft, 0, sizeof(craft_data));
 	
 	// clear/default some stuff
@@ -715,12 +717,6 @@ void init_craft(craft_data *craft) {
 	GET_CRAFT_REQUIRES_OBJ(craft) = NOTHING;
 	GET_CRAFT_QUANTITY(craft) = 1;
 	GET_CRAFT_TIME(craft) = 1;
-		
-	CREATE(GET_CRAFT_RESOURCES(craft), Resource, MAX_RESOURCES_REQUIRED);
-	for (iter = 0; iter < MAX_RESOURCES_REQUIRED; ++iter) {
-		GET_CRAFT_RESOURCES(craft)[iter].vnum = NOTHING;
-		GET_CRAFT_RESOURCES(craft)[iter].amount = 0;
-	}
 }
 
 
@@ -732,7 +728,6 @@ void init_craft(craft_data *craft) {
 */
 void parse_craft(FILE *fl, craft_vnum vnum) {
 	char line[256], str_in[256], str_in2[256];
-	int resource_pos = 0;
 	craft_data *craft, *find;
 	int int_in[4];
 	
@@ -808,21 +803,10 @@ void parse_craft(FILE *fl, craft_vnum vnum) {
 				GET_CRAFT_MIN_LEVEL(craft) = int_in[0];
 				break;
 			}
-
-			// resources: vnum amount
-			case 'R': {
-				if (!get_line(fl, line) || sscanf(line, "%d %d", int_in, int_in + 1) != 2) {
-					log("SYSERR: Format error in R section of craft recipe #%d", vnum);
-					exit(1);
-				}
-				
-				GET_CRAFT_RESOURCES(craft)[resource_pos].vnum = int_in[0];
-				GET_CRAFT_RESOURCES(craft)[resource_pos].amount = int_in[1];
-				
-				++resource_pos;
-				
-				break;
 			
+			case 'R': {	// resources
+				parse_resource(fl, &GET_CRAFT_RESOURCES(craft), buf2);
+				break;
 			}
 
 			// end
@@ -850,7 +834,6 @@ void write_craft_to_file(FILE *fl, craft_data *craft) {
 	extern const char *drinks[];
 
 	char temp1[256], temp2[256];
-	int iter;
 	
 	if (!fl || !craft) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: write_craft_to_file called without %s", !fl ? "file" : "craft");
@@ -876,10 +859,8 @@ void write_craft_to_file(FILE *fl, craft_data *craft) {
 		fprintf(fl, "%d\n", GET_CRAFT_MIN_LEVEL(craft));
 	}
 	
-	for (iter = 0; iter < MAX_RESOURCES_REQUIRED && GET_CRAFT_RESOURCES(craft)[iter].vnum != NOTHING; ++iter) {
-		fprintf(fl, "R\n");
-		fprintf(fl, "%d %d  # %dx %s\n", GET_CRAFT_RESOURCES(craft)[iter].vnum, GET_CRAFT_RESOURCES(craft)[iter].amount, GET_CRAFT_RESOURCES(craft)[iter].amount, get_obj_name_by_proto(GET_CRAFT_RESOURCES(craft)[iter].vnum));
-	}
+	// 'R': resources
+	write_resources_to_file(fl, GET_CRAFT_RESOURCES(craft));
 	
 	// end
 	fprintf(fl, "S\n");
@@ -1166,8 +1147,8 @@ void remove_empire_from_table(empire_data *emp) {
 empire_data *create_empire(char_data *ch) {
 	void add_empire_to_table(empire_data *emp);
 	void resort_empires();
-	extern const struct archetype_type archetype[];
 
+	archetype_data *arch;
 	char colorcode[10];
 	empire_vnum vnum;
 	empire_data *emp;
@@ -1206,9 +1187,13 @@ empire_data *create_empire(char_data *ch) {
 	}
 	
 	// rank setup
+	arch = archetype_proto(CREATION_ARCHETYPE(ch));
+	if (!arch) {
+		arch = archetype_proto(0);	// default to 0
+	}
 	EMPIRE_NUM_RANKS(emp) = 2;
 	EMPIRE_RANK(emp, 0) = str_dup("Follower");
-	EMPIRE_RANK(emp, 1) = str_dup(archetype[(int) CREATION_ARCHETYPE(ch)].starting_rank[(int) GET_REAL_SEX(ch)]);
+	EMPIRE_RANK(emp, 1) = str_dup(arch ? (GET_REAL_SEX(ch) == SEX_FEMALE ? GET_ARCH_FEMALE_RANK(arch) : GET_ARCH_MALE_RANK(arch)) : "Leader");
 	for (iter = 0; iter < NUM_PRIVILEGES; ++iter) {
 		EMPIRE_PRIV(emp, iter) = 2;
 	}
@@ -1217,9 +1202,9 @@ empire_data *create_empire(char_data *ch) {
 	emp->storage_loaded = TRUE;
 
 	// set the player up
-	add_lore(ch, LORE_FOUND_EMPIRE, vnum);
+	remove_lore(ch, LORE_PROMOTED);
+	add_lore(ch, LORE_FOUND_EMPIRE, "Proudly founded %s%s&0", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 	GET_LOYALTY(ch) = emp;
-	GET_EMPIRE_VNUM(ch) = vnum;
 	GET_RANK(ch) = 2;
 	SAVE_CHAR(ch);
 
@@ -1245,18 +1230,16 @@ empire_data *create_empire(char_data *ch) {
 void delete_empire(empire_data *emp) {
 	void eliminate_linkdead_players();
 	void remove_empire_from_table(empire_data *emp);
-	void save_char_file_u(struct char_file_u *st);
 
 	struct empire_political_data *emp_pol, *next_pol, *temp;
+	player_index_data *index, *next_index;
 	empire_data *emp_iter, *next_emp;
 	room_data *room, *next_room;
 	char buf[MAX_STRING_LENGTH];
-	struct char_file_u chdata;
 	obj_data *obj, *next_obj;
 	char_data *ch, *next_ch;
+	bool file = FALSE, save;
 	empire_vnum vnum;
-	bool save;
-	int iter;
 
 	if (!emp) {
 		return;
@@ -1293,38 +1276,24 @@ void delete_empire(empire_data *emp) {
 	}
 	
 	// clean up players
-	for (iter = 0; iter <= top_of_p_table; ++iter) {
-		if ((ch = is_playing(player_table[iter].id))) {
-			if (GET_LOYALTY(ch) == emp) {
+	HASH_ITER(idnum_hh, player_table_by_idnum, index, next_index) {
+		if (index->loyalty != emp) {
+			continue;
+		}
+		if ((ch = is_playing(index->idnum)) || (ch = is_at_menu(index->idnum))) {
+			if (IN_ROOM(ch)) {
 				msg_to_char(ch, "Your empire has been destroyed.  You are no longer a member.\r\n");
-				GET_LOYALTY(ch) = NULL;
-				GET_EMPIRE_VNUM(ch) = NOTHING;
-				GET_RANK(ch) = 0;
-				SAVE_CHAR(ch);
 			}
+			GET_LOYALTY(ch) = NULL;
+			GET_RANK(ch) = 0;
+			update_player_index(index, ch);
 		}
-		else if ((ch = is_at_menu(player_table[iter].id))) {
-			// hybrid solution
-			if (GET_LOYALTY(ch) == emp) {
-				GET_LOYALTY(ch) = NULL;
-				GET_EMPIRE_VNUM(ch) = NOTHING;
-				GET_RANK(ch) = 0;
-				SAVE_CHAR(ch);
-
-				load_char(player_table[iter].name, &chdata);
-				if (chdata.player_specials_saved.empire == vnum) {
-					chdata.player_specials_saved.empire = NOTHING;
-					chdata.player_specials_saved.rank = 0;
-					save_char_file_u(&chdata);
-				}
-			}
-		}
-		else {
-			load_char(player_table[iter].name, &chdata);
-			if (chdata.player_specials_saved.empire == vnum) {
-				chdata.player_specials_saved.empire = NOTHING;
-				chdata.player_specials_saved.rank = 0;
-				save_char_file_u(&chdata);
+		else if ((ch = find_or_load_player(index->name, &file))) {
+			GET_LOYALTY(ch) = NULL;
+			GET_RANK(ch) = 0;
+			update_player_index(index, ch);
+			if (file) {
+				store_loaded_char(ch);
 			}
 		}
 	}
@@ -1353,7 +1322,7 @@ void delete_empire(empire_data *emp) {
 	}
 	
 	// remove all world ownership
-	HASH_ITER(world_hh, world_table, room, next_room) {
+	HASH_ITER(hh, world_table, room, next_room) {
 		if (ROOM_OWNER(room) == emp) {
 			perform_abandon_room(room);
 		}
@@ -2588,6 +2557,21 @@ void remove_global_from_table(struct global_data *glb) {
 
 
 /**
+* Initializes a new global. This clears all memory for it, so set the vnum
+* AFTER.
+*
+* @param struct global_data *glb The global to initialize.
+*/
+void clear_global(struct global_data *glb) {
+	memset((char *) glb, 0, sizeof(struct global_data));
+	
+	GET_GLOBAL_VNUM(glb) = NOTHING;
+	GET_GLOBAL_ABILITY(glb) = NO_ABIL;
+	GET_GLOBAL_PERCENT(glb) = 100.0;
+}
+
+
+/**
 * frees up memory for a global data item.
 *
 * See also: olc_delete_global
@@ -2609,6 +2593,10 @@ void free_global(struct global_data *glb) {
 		}
 	}
 	
+	if (GET_GLOBAL_GEAR(glb) && (!proto || GET_GLOBAL_GEAR(glb) != GET_GLOBAL_GEAR(proto))) {
+		free_archetype_gear(GET_GLOBAL_GEAR(glb));
+	}
+	
 	free(glb);
 }
 
@@ -2620,11 +2608,15 @@ void free_global(struct global_data *glb) {
 * @param any_vnum vnum The global vnum
 */
 void parse_global(FILE *fl, any_vnum vnum) {
+	void parse_archetype_gear(FILE *fl, struct archetype_gear **list, char *error);
+
 	struct global_data *glb, *find;
 	char line[256], str_in[256], str_in2[256], str_in3[256];
 	int int_in[4];
+	double dbl_in;
 
 	CREATE(glb, struct global_data, 1);
+	clear_global(glb);
 	GET_GLOBAL_VNUM(glb) = vnum;
 
 	HASH_FIND_INT(globals_table, &vnum, find);
@@ -2660,6 +2652,29 @@ void parse_global(FILE *fl, any_vnum vnum) {
 			exit(1);
 		}
 		switch (*line) {
+			case 'E': {	// extra data
+				// line 1: abil perc
+				if (!get_line(fl, line) || sscanf(line, "%d %lf", &int_in[0], &dbl_in) != 2) {
+					log("SYSERR: Format error E line 1 of %s", buf2);
+					exit(1);
+				}
+				GET_GLOBAL_ABILITY(glb) = int_in[0];
+				GET_GLOBAL_PERCENT(glb) = dbl_in;
+				
+				// line 2: val0 val1 val25
+				if (!get_line(fl, line) || sscanf(line, "%d %d %d", &int_in[0], &int_in[1], &int_in[2]) != 3) {
+					log("SYSERR: Format error E line 2 of %s", buf2);
+					exit(1);
+				}
+				GET_GLOBAL_VAL(glb, 0) = int_in[0];
+				GET_GLOBAL_VAL(glb, 1) = int_in[1];
+				GET_GLOBAL_VAL(glb, 2) = int_in[2];
+				break;
+			}
+			case 'G': {	// gear: loc vnum
+				parse_archetype_gear(fl, &GET_GLOBAL_GEAR(glb), buf2);
+				break;
+			}
 			case 'I': {	// interaction item
 				parse_interaction(line, &GET_GLOBAL_INTERACTIONS(glb), buf2);
 				break;
@@ -2687,6 +2702,8 @@ void parse_global(FILE *fl, any_vnum vnum) {
 * @param struct global_data *glb The thing to save.
 */
 void write_global_to_file(FILE *fl, struct global_data *glb) {
+	void write_archetype_gear_to_file(FILE *fl, struct archetype_gear *list);
+	
 	char temp[MAX_STRING_LENGTH], temp2[MAX_STRING_LENGTH], temp3[MAX_STRING_LENGTH];
 	
 	if (!fl || !glb) {
@@ -2702,7 +2719,15 @@ void write_global_to_file(FILE *fl, struct global_data *glb) {
 	strcpy(temp2, bitv_to_alpha(GET_GLOBAL_TYPE_FLAGS(glb)));
 	strcpy(temp3, bitv_to_alpha(GET_GLOBAL_TYPE_EXCLUDE(glb)));
 	fprintf(fl, "%d %s %s %s %d-%d\n", GET_GLOBAL_TYPE(glb), temp, temp2, temp3, GET_GLOBAL_MIN_LEVEL(glb), GET_GLOBAL_MAX_LEVEL(glb));
-
+	
+	// E: extra data
+	fprintf(fl, "E\n");
+	fprintf(fl, "%d %.2f\n", GET_GLOBAL_ABILITY(glb), GET_GLOBAL_PERCENT(glb));
+	fprintf(fl, "%d %d %d\n", GET_GLOBAL_VAL(glb, 0), GET_GLOBAL_VAL(glb, 1), GET_GLOBAL_VAL(glb, 2));
+	
+	// G: gear
+	write_archetype_gear_to_file(fl, GET_GLOBAL_GEAR(glb));
+	
 	// I: interactions
 	write_interactions_to_file(fl, GET_GLOBAL_INTERACTIONS(glb));
 	
@@ -3371,7 +3396,10 @@ void free_obj(obj_data *obj) {
 	}
 	
 	free_obj_binding(&OBJ_BOUND_TO(obj));
-
+	
+	// applies are ALWAYS a copy
+	free_apply_list(GET_OBJ_APPLIES(obj));
+	
 	/* free any assigned scripts */
 	if (SCRIPT(obj)) {
 		extract_script(obj, OBJ_TRIGGER);
@@ -3392,11 +3420,12 @@ void free_obj(obj_data *obj) {
 */
 void parse_object(FILE *obj_f, int nr) {
 	static char line[256];
-	int t[10], j = 0, retval;
+	int t[10], retval;
 	char *tmpptr;
 	char f1[256], f2[256];
 	struct obj_custom_message *ocm, *last_ocm = NULL;
 	struct obj_storage_type *store, *last_store = NULL;
+	struct obj_apply *apply, *last_apply = NULL;
 	obj_data *obj, *find;
 	
 	// create
@@ -3474,13 +3503,7 @@ void parse_object(FILE *obj_f, int nr) {
 	obj->obj_flags.timer = t[1];
 
 	/* *** extra descriptions and affect fields *** */
-	for (j = 0; j < MAX_OBJ_AFFECT; j++) {
-		obj->affected[j].location = APPLY_NONE;
-		obj->affected[j].modifier = 0;
-	}
-
 	strcat(buf2, ", after numeric constants\n...expecting alphabetic flags");
-	j = 0;
 
 	for (;;) {
 		if (!get_line(obj_f, line)) {
@@ -3489,22 +3512,32 @@ void parse_object(FILE *obj_f, int nr) {
 		}
 		switch (*line) {
 			case 'A':
-				if (j >= MAX_OBJ_AFFECT) {
-					log("SYSERR: Too many A fields (%d max), %s", MAX_OBJ_AFFECT, buf2);
-					exit(1);
-				}
 				if (!get_line(obj_f, line)) {
 					log("SYSERR: Format error in 'A' field, %s\n...expecting 2 numeric constants but file ended!", buf2);
 					exit(1);
 				}
-
-				if ((retval = sscanf(line, " %d %d ", t, t + 1)) != 2) {
-					log("SYSERR: Format error in 'A' field, %s\n...expecting 2 numeric arguments, got %d\n...offending line: '%s'", buf2, retval, line);
-					exit(1);
+				
+				if (sscanf(line, " %d %d %d ", &t[0], &t[1], &t[2]) != 3) {
+					// backwards-compatible
+					t[2] = APPLY_TYPE_NATURAL;
+					if ((retval = sscanf(line, " %d %d ", &t[0], &t[1])) != 2) {
+						log("SYSERR: Format error in 'A' field, %s\n...expecting 3 numeric arguments, got %d\n...offending line: '%s'", buf2, retval, line);
+						exit(1);
+					}
 				}
-				obj->affected[j].location = t[0];
-				obj->affected[j].modifier = t[1];
-				j++;
+				CREATE(apply, struct obj_apply, 1);
+				apply->location = t[0];
+				apply->modifier = t[1];
+				apply->apply_type = t[2];
+				
+				// append to end
+				if (last_apply) {
+					last_apply->next = apply;
+				}
+				else {
+					GET_OBJ_APPLIES(obj) = apply;
+				}
+				last_apply = apply;
 				break;
 
 			case 'B':
@@ -3612,7 +3645,7 @@ void write_obj_to_file(FILE *fl, obj_data *obj) {
 	char temp[MAX_STRING_LENGTH], temp2[MAX_STRING_LENGTH];
 	struct obj_storage_type *store;
 	struct obj_custom_message *ocm;
-	int iter;
+	struct obj_apply *apply;
 	
 	if (!fl || !obj) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: write_obj_to_file called without %s", !fl ? "file" : "object");
@@ -3641,11 +3674,9 @@ void write_obj_to_file(FILE *fl, obj_data *obj) {
 	// now optional parts:
 	
 	// A: applies
-	for (iter = 0; iter < MAX_OBJ_AFFECT; ++iter) {
-		if (obj->affected[iter].location != APPLY_NONE && obj->affected[iter].modifier != 0) {
-			fprintf(fl, "A\n");
-			fprintf(fl, "%d %d\n", obj->affected[iter].location, obj->affected[iter].modifier);
-		}
+	for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
+		fprintf(fl, "A\n");
+		fprintf(fl, "%d %d %d\n", apply->location, apply->modifier, apply->apply_type);
 	}
 	
 	// B: sets affect bitvector
@@ -3688,6 +3719,106 @@ void write_obj_to_file(FILE *fl, obj_data *obj) {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// RESOURCE LIB ////////////////////////////////////////////////////////////
+
+/**
+* Copies a resource list.
+*
+* @param struct resource_data *input The list to copy.
+* @return struct resource_data* The copied list.
+*/
+struct resource_data *copy_resource_list(struct resource_data *input) {
+	struct resource_data *new, *last, *list, *iter;
+	
+	last = list = NULL;
+	for (iter = input; iter; iter = iter->next) {
+		CREATE(new, struct resource_data, 1);
+		*new = *iter;
+		new->next = NULL;
+		
+		if (last) {
+			last->next = new;
+		}
+		else {
+			list = new;
+		}
+		last = new;
+	}
+	
+	return list;
+}
+
+
+/**
+* Frees a list of resource_data items.
+*
+* @param struct resource_data *list The start of the list to free.
+*/
+void free_resource_list(struct resource_data *list) {
+	struct resource_data *res;
+	
+	while ((res = list)) {
+		list = res->next;
+		free(res);
+	}
+}
+
+
+/**
+* Parses an 'R' resource tag, written by write_resources_to_file(). This file
+* should have just read the 'R' line, and the next line to read is its data.
+*
+* @param FILE *fl The file to read from.
+* @param struct resource_data **list The resource list to append to.
+* @param char *error_str An identifier to log if there is a problem.
+*/
+void parse_resource(FILE *fl, struct resource_data **list, char *error_str) {
+	struct resource_data *new, *end;
+	char line[256];
+	int int_in[2];
+	
+	if (!fl || !list || !get_line(fl, line) || sscanf(line, "%d %d", &int_in[0], &int_in[1]) != 2) {
+		log("SYSERR: format error in R line of %s", error_str ? error_str : "resource");
+		exit(1);
+	}
+	
+	CREATE(new, struct resource_data, 1);
+	new->vnum = int_in[0];
+	new->amount = int_in[1];
+	
+	// append at the end
+	if ((end = *list)) {
+		while (end->next) {
+			end = end->next;
+		}
+		end->next = new;
+	}
+	else {
+		*list = new;
+	}
+}
+
+
+/**
+* Writes new-style resource_data to file as an 'R' tag.
+*
+* @param FILE *fl The file, open for writing.
+* @param struct resource_data *list The list of resources to write.
+*/
+void write_resources_to_file(FILE *fl, struct resource_data *list) {
+	struct resource_data *res;
+	
+	if (!fl || !list) {
+		return;
+	}
+	
+	for (res = list; res; res = res->next) {
+		fprintf(fl, "R\n%d %d  # %dx %s\n", res->vnum, res->amount, res->amount, get_obj_name_by_proto(res->vnum));
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// ROOM LIB ////////////////////////////////////////////////////////////////
 
 
@@ -3697,10 +3828,14 @@ void write_obj_to_file(FILE *fl, obj_data *obj) {
 * @param room_data *room The room to add.
 */
 void add_room_to_world_tables(room_data *room) {	
-	HASH_ADD(world_hh, world_table, vnum, sizeof(int), room);
+	HASH_ADD_INT(world_table, vnum, room);
+	
+	// interior linked list
 	if (GET_ROOM_VNUM(room) >= MAP_SIZE) {
-		HASH_ADD(interior_hh, interior_world_table, vnum, sizeof(int), room);
+		room->next_interior = interior_room_list;
+		interior_room_list = room;
 	}
+	
 	world_is_sorted = FALSE;
 }
 
@@ -3711,9 +3846,12 @@ void add_room_to_world_tables(room_data *room) {
 * @param room_data *room The room to remove.
 */
 void remove_room_from_world_tables(room_data *room) {
-	HASH_DELETE(world_hh, world_table, room);
+	room_data *temp;
+	
+	HASH_DEL(world_table, room);
+	
 	if (room->vnum >= MAP_SIZE) {
-		HASH_DELETE(interior_hh, interior_world_table, room);
+		REMOVE_FROM_LIST(room, interior_room_list, next_interior);
 	}
 }
 
@@ -3745,7 +3883,7 @@ void parse_room(FILE *fl, room_vnum vnum) {
 	room->vnum = vnum;
 	room->owner = NULL;
 	
-	HASH_FIND(world_hh, world_table, &vnum, sizeof(int), find);
+	HASH_FIND_INT(world_table, &vnum, find);
 	if (find) {
 		log("WARNING: Duplicate room vnum #%d", vnum);
 		// but have to load it anyway to advance the file
@@ -3765,9 +3903,11 @@ void parse_room(FILE *fl, room_vnum vnum) {
 		exit(1);
 	}
 	
-	room->island = t[0];
+	if (t[0] != NOTHING) {
+		SET_ISLAND_ID(room, t[0]);
+	}
 	room->sector_type = sector_proto(t[1]);
-	room->original_sector = sector_proto(t[2]);
+	room->base_sector = sector_proto(t[2]);
 
 	// set up building data?
 	if (IS_ANY_BUILDING(room) || IS_ADVENTURE_ROOM(room)) {
@@ -3926,6 +4066,10 @@ void parse_room(FILE *fl, room_vnum vnum) {
 				add_trd_owner(vnum, atoi(line+1));
 				break;
 			}
+			case 'P': { // crop (plants)
+				set_crop_type(room, crop_proto(atoi(line+1)));
+				break;
+			}
 			case 'R': {	/* resources */
 				if (!get_line(fl, line2)) {
 					log("SYSERR: Unable to read resource line of room #%d", vnum);
@@ -4023,7 +4167,7 @@ void write_room_to_file(FILE *fl, room_data *room) {
 	
 	struct building_resource_type *res;
 	char temp[MAX_STRING_LENGTH];
-	struct room_extra_data *red;
+	struct room_extra_data *red, *next_red;
 	struct depletion_data *dep;
 	struct cooldown_data *cool;
 	trig_data *trig;
@@ -4039,7 +4183,7 @@ void write_room_to_file(FILE *fl, room_data *room) {
 	
 	// both sector and original-sector must save vnums
 	// NOTE: does not need an island id if it's not on the map
-	fprintf(fl, "%d %d %d\n", (GET_ROOM_VNUM(HOME_ROOM(room)) < MAP_SIZE) ? GET_ISLAND_ID(room) : -1, GET_SECT_VNUM(SECT(room)), GET_SECT_VNUM(ROOM_ORIGINAL_SECT(room)));
+	fprintf(fl, "%d %d %d\n", (GET_ROOM_VNUM(room) < MAP_SIZE) ? GET_ISLAND_ID(room) : -1, GET_SECT_VNUM(SECT(room)), GET_SECT_VNUM(BASE_SECT(room)));
 	
 	// B building data
 	if (COMPLEX_DATA(room)) {
@@ -4127,6 +4271,11 @@ void write_room_to_file(FILE *fl, room_data *room) {
 		fprintf(fl, "O%d\n", EMPIRE_VNUM(ROOM_OWNER(room)));
 	}
 	
+	// P crop (plant)
+	if (ROOM_CROP(room)) {
+		fprintf(fl, "P%d\n", GET_CROP_VNUM(ROOM_CROP(room)));
+	}
+	
 	// R resource
 	if (COMPLEX_DATA(room) && BUILDING_RESOURCES(room)) {
 		for (res = BUILDING_RESOURCES(room); res; res = res->next) {
@@ -4159,7 +4308,7 @@ void write_room_to_file(FILE *fl, room_data *room) {
 	// no longer used: script_save_to_disk(fl, room, WLD_TRIGGER);
 	
 	// Z: extra data
-	for (red = room->extra_data; red; red = red->next) {
+	HASH_ITER(hh, room->extra_data, red, next_red) {
 		fprintf(fl, "Z\n%d %d\n", red->type, red->value);
 	}
 	
@@ -4886,16 +5035,23 @@ void write_trigger_to_file(FILE *fl, trig_data *trig) {
 * them off to various parse functions.
 *
 * @param FILE *fl The file to read.
-* @param int mode Any DB_BOOT_x const.
+* @param int mode Any DB_BOOT_ const.
 * @param char *filename The name of the file, for error reporting.
 */
 void discrete_load(FILE *fl, int mode, char *filename) {
+	void parse_ability(FILE *fl, any_vnum vnum);
+	void parse_account(FILE *fl, int nr);
+	void parse_archetype(FILE *fl, any_vnum vnum);
+	void parse_augment(FILE *fl, any_vnum vnum);
 	void parse_book(FILE *fl, int book_id);
+	void parse_class(FILE *fl, any_vnum vnum);
+	void parse_skill(FILE *fl, any_vnum vnum);
+	
 	any_vnum nr = -1, last;
 	char line[256];
 
-	/* modes positions correspond to DB_BOOT_xxx in db.h */
-	const char *modes[] = {"world", "mob", "obj", "zone", "empire", "book", "craft", "trg", "crop", "sector", "adventure", "room template" };
+	/* modes positions correspond to DB_BOOT_x in db.h */
+	const char *modes[] = {"world", "mob", "obj", "zone", "empire", "book", "craft", "trg", "crop", "sector", "adventure", "room template", "global", "account", "augment", "archetype", "ability", "class", "skill" };
 
 	for (;;) {
 		if (!get_line(fl, line)) {
@@ -4916,13 +5072,34 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 				log("SYSERR: Format error after %s #%d", modes[mode], last);
 				exit(1);
 			}
+			// DB_BOOT_x
 			switch (mode) {
+				case DB_BOOT_ABIL: {
+					parse_ability(fl, nr);
+					break;
+				}
+				case DB_BOOT_ACCT: {
+					parse_account(fl, nr);
+					break;
+				}
 				case DB_BOOT_ADV: {
 					parse_adventure(fl, nr);
 					break;
 				}
+				case DB_BOOT_ARCH: {
+					parse_archetype(fl, nr);
+					break;
+				}
+				case DB_BOOT_AUG: {
+					parse_augment(fl, nr);
+					break;
+				}
 				case DB_BOOT_BLD: {
 					parse_building(fl, nr);
+					break;
+				}
+				case DB_BOOT_CLASS: {
+					parse_class(fl, nr);
 					break;
 				}
 				case DB_BOOT_CRAFT: {
@@ -4961,6 +5138,10 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 					parse_sector(fl, nr);
 					break;
 				}
+				case DB_BOOT_SKILL: {
+					parse_skill(fl, nr);
+					break;
+				}
 				case DB_BOOT_TRG: {
 					parse_trigger(fl, nr);
 					break;
@@ -4984,7 +5165,7 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 * index_boot: Loads an index file for a given type, and loads each entry from
 * the index using discrete_load.
 *
-* @param int mode Any DB_BOOT_x const.
+* @param int mode Any DB_BOOT_ const.
 */
 void index_boot(int mode) {
 	char buf1[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
@@ -5027,8 +5208,8 @@ void index_boot(int mode) {
 	}
 
 	if (!rec_count) {
-		// some types don't matter TODO could move this into a config
-		if (mode == DB_BOOT_EMP || mode == DB_BOOT_BOOKS || mode == DB_BOOT_CRAFT || mode == DB_BOOT_BLD || mode == DB_BOOT_ADV || mode == DB_BOOT_RMT || mode == DB_BOOT_WLD || mode == DB_BOOT_GLB) {
+		// DB_BOOT_x: some types don't matter TODO could move this into a config
+		if (mode == DB_BOOT_EMP || mode == DB_BOOT_BOOKS || mode == DB_BOOT_CRAFT || mode == DB_BOOT_BLD || mode == DB_BOOT_ADV || mode == DB_BOOT_RMT || mode == DB_BOOT_WLD || mode == DB_BOOT_GLB || mode == DB_BOOT_ACCT || mode == DB_BOOT_AUG || mode == DB_BOOT_ARCH || mode == DB_BOOT_ABIL || mode == DB_BOOT_CLASS || mode == DB_BOOT_SKILL) {
 			// types that don't require any entries and exit early if none
 			return;
 		}
@@ -5046,9 +5227,25 @@ void index_boot(int mode) {
 	rec_count++;
 
 	/*
+	 * DB_BOOT_x:
 	 * NOTE: "bytes" does _not_ include strings or other later malloc'd things.
 	 */
 	switch (mode) {
+		case DB_BOOT_ABIL: {
+			size[0] = sizeof(ability_data) * rec_count;
+			log("  %d abilities, %d bytes in db", rec_count, size[0]);
+			break;
+		}
+		case DB_BOOT_ARCH: {
+			size[0] = sizeof(archetype_data) * rec_count;
+			log("  %d archetypes, %d bytes in db", rec_count, size[0]);
+			break;
+		}
+		case DB_BOOT_AUG: {
+			size[0] = sizeof(augment_data) * rec_count;
+			log("  %d augments, %d bytes in db", rec_count, size[0]);
+			break;
+		}
 		case DB_BOOT_BOOKS: {
 			log("  %d books", rec_count);
 			break;
@@ -5057,6 +5254,11 @@ void index_boot(int mode) {
    			size[0] = sizeof(char_data) * rec_count;
 			log("   %d mobs, %d bytes in prototypes.", rec_count, size[0]);
 			break;
+		case DB_BOOT_ACCT: {
+			size[0] = sizeof(account_data) * rec_count;
+			log("   %d accounts, %d bytes in index.", rec_count, size[0]);
+			break;
+		}
 		case DB_BOOT_ADV: {
 			size[0] = sizeof(adv_data) * rec_count;
 			log("   %d adventure zones, %d bytes in adventure table.", rec_count, size[0]);
@@ -5065,6 +5267,11 @@ void index_boot(int mode) {
 		case DB_BOOT_BLD: {
 			size[0] = sizeof(bld_data) * rec_count;
 			log("   %d buildings, %d bytes in building table.", rec_count, size[0]);
+			break;
+		}
+		case DB_BOOT_CLASS: {
+			size[0] = sizeof(class_data) * rec_count;
+			log("  %d classes, %d bytes in db", rec_count, size[0]);
 			break;
 		}
 		case DB_BOOT_CRAFT: {
@@ -5105,6 +5312,11 @@ void index_boot(int mode) {
 			log("   %d sectors, %d bytes in sector.", rec_count, size[0]);
 			break;
 		}
+		case DB_BOOT_SKILL: {
+			size[0] = sizeof(skill_data) * rec_count;
+			log("  %d skills, %d bytes in db", rec_count, size[0]);
+			break;
+		}
 		case DB_BOOT_TRG: {
 			size[0] = sizeof(trig_data) * rec_count;
 			log("   %d triggers, %d bytes in triggers.", rec_count, size[0]);
@@ -5119,9 +5331,15 @@ void index_boot(int mode) {
 			log("SYSERR: %s: %s", buf2, strerror(errno));
 			exit(1);
 		}
+		// DB_BOOT_x
 		switch (mode) {
+			case DB_BOOT_ABIL:
+			case DB_BOOT_ACCT:
 			case DB_BOOT_ADV:
+			case DB_BOOT_ARCH:
+			case DB_BOOT_AUG:
 			case DB_BOOT_BLD:
+			case DB_BOOT_CLASS:
 			case DB_BOOT_CRAFT:
 			case DB_BOOT_CROP:
 			case DB_BOOT_GLB:
@@ -5131,6 +5349,7 @@ void index_boot(int mode) {
 			case DB_BOOT_BOOKS:
 			case DB_BOOT_RMT:
 			case DB_BOOT_SECTOR:
+			case DB_BOOT_SKILL:
 			case DB_BOOT_TRG:
 			case DB_BOOT_WLD: {
 				discrete_load(db_file, mode, buf2);
@@ -5154,7 +5373,7 @@ void index_boot(int mode) {
 * You don't have to call it with a real vnum; it just uses the vnum to
 * determine which "zone" (block of 100) items to save to file.
 *
-* @param int type Any DB_BOOT_x const.
+* @param int type Any DB_BOOT_ const.
 * @param any_vnum vnum A vnum in the set to save (it saved the whole 100-block).
 */
 void save_library_file_for_vnum(int type, any_vnum vnum) {
@@ -5182,9 +5401,30 @@ void save_library_file_for_vnum(int type, any_vnum vnum) {
 		return;
 	}
 	
-	log("Saving library file %s", filename);
-
+	// log("Saving library file %s", filename);
+	
+	// DB_BOOT_x
 	switch (type) {
+		case DB_BOOT_ABIL: {
+			void write_ability_to_file(FILE *fl, ability_data *abil);
+			ability_data *abil, *next_abil;
+			HASH_ITER(hh, ability_table, abil, next_abil) {
+				if (ABIL_VNUM(abil) >= (zone * 100) && ABIL_VNUM(abil) <= (zone * 100 + 99)) {
+					write_ability_to_file(fl, abil);
+				}
+			}
+			break;
+		}
+		case DB_BOOT_ACCT: {
+			void write_account_to_file(FILE *fl, account_data *acct);
+			account_data *acct, *next_acct;
+			HASH_ITER(hh, account_table, acct, next_acct) {
+				if (acct->id >= (zone * 100) && acct->id <= (zone * 100 + 99)) {
+					write_account_to_file(fl, acct);
+				}
+			}
+			break;
+		}
 		case DB_BOOT_ADV: {
 			adv_data *adv, *next_adv;
 			HASH_ITER(hh, adventure_table, adv, next_adv) {
@@ -5194,11 +5434,41 @@ void save_library_file_for_vnum(int type, any_vnum vnum) {
 			}
 			break;
 		}
+		case DB_BOOT_ARCH: {
+			void write_archetype_to_file(FILE *fl, archetype_data *arch);
+			archetype_data *arch, *next_arch;
+			HASH_ITER(hh, archetype_table, arch, next_arch) {
+				if (GET_ARCH_VNUM(arch) >= (zone * 100) && GET_ARCH_VNUM(arch) <= (zone * 100 + 99)) {
+					write_archetype_to_file(fl, arch);
+				}
+			}
+			break;
+		}
+		case DB_BOOT_AUG: {
+			void write_augment_to_file(FILE *fl, augment_data *aug);
+			augment_data *aug, *next_aug;
+			HASH_ITER(hh, augment_table, aug, next_aug) {
+				if (GET_AUG_VNUM(aug) >= (zone * 100) && GET_AUG_VNUM(aug) <= (zone * 100 + 99)) {
+					write_augment_to_file(fl, aug);
+				}
+			}
+			break;
+		}
 		case DB_BOOT_BLD: {
 			bld_data *bld, *next_bld;
 			HASH_ITER(hh, building_table, bld, next_bld) {
 				if (GET_BLD_VNUM(bld) >= (zone * 100) && GET_BLD_VNUM(bld) <= (zone * 100 + 99)) {
 					write_building_to_file(fl, bld);
+				}
+			}
+			break;
+		}
+		case DB_BOOT_CLASS: {
+			void write_class_to_file(FILE *fl, class_data *cls);
+			class_data *cls, *next_cls;
+			HASH_ITER(hh, class_table, cls, next_cls) {
+				if (CLASS_VNUM(cls) >= (zone * 100) && CLASS_VNUM(cls) <= (zone * 100 + 99)) {
+					write_class_to_file(fl, cls);
 				}
 			}
 			break;
@@ -5262,6 +5532,16 @@ void save_library_file_for_vnum(int type, any_vnum vnum) {
 			HASH_ITER(hh, sector_table, sect, next_sect) {
 				if (GET_SECT_VNUM(sect) >= (zone * 100) && GET_SECT_VNUM(sect) <= (zone * 100 + 99)) {
 					write_sector_to_file(fl, sect);
+				}
+			}
+			break;
+		}
+		case DB_BOOT_SKILL: {
+			void write_skill_to_file(FILE *fl, skill_data *skill);
+			skill_data *skill, *next_skill;
+			HASH_ITER(hh, skill_table, skill, next_skill) {
+				if (SKILL_VNUM(skill) >= (zone * 100) && SKILL_VNUM(skill) <= (zone * 100 + 99)) {
+					write_skill_to_file(fl, skill);
 				}
 			}
 			break;
@@ -5366,7 +5646,7 @@ void write_crop_index(FILE *fl) {
 }
 
 
-// writes entries in the room template index
+// writes entries in the globals index
 void write_globals_index(FILE *fl) {
 	struct global_data *glb, *next_glb;
 	int this, last;
@@ -5477,7 +5757,7 @@ void write_trigger_index(FILE *fl) {
 /**
 * Writes the index file for any database type.
 *
-* @param int type Any DB_BOOT_x type.
+* @param int type Any DB_BOOT_ type.
 */
 void save_index(int type) {
 	char filename[64], tempfile[64], *prefix = NULL, *suffix = NULL;
@@ -5503,13 +5783,39 @@ void save_index(int type) {
 		return;
 	}
 	
+	// DB_BOOT_x
 	switch (type) {
+		case DB_BOOT_ABIL: {
+			void write_ability_index(FILE *fl);
+			write_ability_index(fl);
+			break;
+		}
+		case DB_BOOT_ACCT: {
+			void write_account_index(FILE *fl);
+			write_account_index(fl);
+			break;
+		}
 		case DB_BOOT_ADV: {
 			write_adventure_index(fl);
 			break;
 		}
+		case DB_BOOT_ARCH: {
+			void write_archetype_index(FILE *fl);
+			write_archetype_index(fl);
+			break;
+		}
+		case DB_BOOT_AUG: {
+			void write_augments_index(FILE *fl);
+			write_augments_index(fl);
+			break;
+		}
 		case DB_BOOT_BLD: {
 			write_building_index(fl);
+			break;
+		}
+		case DB_BOOT_CLASS: {
+			void write_class_index(FILE *fl);
+			write_class_index(fl);
 			break;
 		}
 		case DB_BOOT_CRAFT: {
@@ -5538,6 +5844,11 @@ void save_index(int type) {
 		}
 		case DB_BOOT_SECTOR: {
 			write_sector_index(fl);
+			break;
+		}
+		case DB_BOOT_SKILL: {
+			void write_skill_index(FILE *fl);
+			write_skill_index(fl);
 			break;
 		}
 		case DB_BOOT_TRG: {
@@ -5717,15 +6028,9 @@ room_data *real_real_room(room_vnum vnum) {
 		return NULL;
 	}
 	
-	if (vnum >= MAP_SIZE) {
-		// smaller lookup table
-		HASH_FIND(interior_hh, interior_world_table, &vnum, sizeof(int), room);
-	}
-	else {
-		// whole world
-		HASH_FIND(world_hh, world_table, &vnum, sizeof(int), room);
-	}
-
+	// whole world
+	HASH_FIND_INT(world_table, &vnum, room);
+	
 	return room;
 }
 
@@ -5750,9 +6055,9 @@ room_data *real_room(room_vnum vnum) {
 	
 	// we guarantee map rooms exist
 	if (!room && vnum < MAP_SIZE) {
-		room = create_ocean_room(vnum);
+		room = load_map_room(vnum);
 	}
-
+	
 	return room;
 }
 
@@ -5992,21 +6297,24 @@ int sort_buildings(bld_data *a, bld_data *b) {
 * @return int Sort instruction of -1, 0, or 1
 */
 int sort_crafts_by_data(craft_data *a, craft_data *b) {
+	ability_data *a_abil, *b_abil;
 	int a_level, b_level;
 	
 	if (GET_CRAFT_TYPE(a) != GET_CRAFT_TYPE(b)) {
 		return GET_CRAFT_TYPE(a) - GET_CRAFT_TYPE(b);
 	}
 	
-	a_level = (GET_CRAFT_ABILITY(a) == NO_ABIL) ? 0 : ability_data[GET_CRAFT_ABILITY(a)].parent_skill_required;
-	b_level = (GET_CRAFT_ABILITY(b) == NO_ABIL) ? 0 : ability_data[GET_CRAFT_ABILITY(b)].parent_skill_required;
+	a_abil = find_ability_by_vnum(GET_CRAFT_ABILITY(a));
+	b_abil = find_ability_by_vnum(GET_CRAFT_ABILITY(b));
+	a_level = a_abil ? ABIL_SKILL_LEVEL(a_abil) : 0;
+	b_level = b_abil ? ABIL_SKILL_LEVEL(b_abil) : 0;
 	
 	// reverse level sort
 	if (a_level != b_level) {
 		return b_level - a_level;
 	}
 	
-	return strcmp(GET_CRAFT_NAME(a), GET_CRAFT_NAME(b));
+	return strcmp(NULLSAFE(GET_CRAFT_NAME(a)), NULLSAFE(GET_CRAFT_NAME(b)));
 }
 
 
@@ -6416,8 +6724,7 @@ int sort_world_table_func(void *a, void *b) {
 */
 void sort_world_table(void) {
 	if (!world_is_sorted) {
-		HASH_SRT(world_hh, world_table, sort_world_table_func);
-		HASH_SRT(interior_hh, interior_world_table, sort_world_table_func);
+		HASH_SORT(world_table, sort_world_table_func);
 	}
 	world_is_sorted = TRUE;
 }
@@ -6425,6 +6732,102 @@ void sort_world_table(void) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// MISCELLANEOUS LIB ///////////////////////////////////////////////////////
+
+/**
+* Creates a copy of a list of applies.
+*
+* @param struct obj_apply *list The list to copy.
+* @return struct obj_apply* A pointer to the copy list.
+*/
+struct obj_apply *copy_apply_list(struct obj_apply *list) {
+	struct obj_apply *new_list, *last, *iter, *new;
+	
+	new_list = last = NULL;
+	for (iter = list; iter; iter = iter->next) {
+		CREATE(new, struct obj_apply, 1);
+		*new = *iter;
+		new->next = NULL;
+		
+		if (last) {
+			last->next = new;
+		}
+		else {
+			new_list = new;
+		}
+		last = new;
+	}
+	
+	return new_list;
+}
+
+
+/**
+* Generates a resource list from alternating (vnum, amount, vnum, amount,
+* vnum, amount, NOTHING) -- you MUST pass NOTHING as the last vnum
+*
+* @param ... You must pass alternating (vnum, amount, vnum, amount, NOTHING)
+* @return struct resource_data* The allocated list.
+*/
+struct resource_data *create_resource_list(int first_vnum, int first_amount, ...) {
+	struct resource_data *list, *res, *last;
+	va_list ap;
+	int last_vnum = NOTHING, val;
+	bool have_vnum;
+	
+	// shortcut
+	if (first_vnum == NOTHING || first_amount <= 0) {
+		return NULL;
+	}
+	
+	CREATE(res, struct resource_data, 1);
+	res->vnum = first_vnum;
+	res->amount = first_amount;
+	list = last = res;
+	
+	// alternating vnum, amt
+	va_start(ap, first_amount);
+	have_vnum = FALSE;
+	
+	while (TRUE) {
+		// get another int and break if it's a list terminator
+		if ((val = va_arg(ap, int)) == NOTHING) {
+			break;
+		}
+		
+		if (!have_vnum) {
+			last_vnum = val;
+			have_vnum = TRUE;
+		}
+		else {
+			CREATE(res, struct resource_data, 1);
+			res->vnum = last_vnum;
+			res->amount = val;
+			last->next = res;
+			last = res;
+			
+			have_vnum = FALSE;	// and get another vnum
+		}
+	}
+
+	va_end(ap);
+	return list;
+}
+
+
+/**
+* Frees the memory for a list of object applies.
+*
+* @param struct obj_apply *list The start of the list to free.
+*/
+void free_apply_list(struct obj_apply *list) {
+	struct obj_apply *app;
+	
+	while ((app = list)) {
+		list = app->next;
+		free(app);
+	}
+}
+
 
 /**
 * Creates and initialies a complex room data pointer.
@@ -6463,6 +6866,9 @@ void free_complex_data(struct complex_room_data *data) {
 	
 	while ((ex = data->exits)) {
 		data->exits = ex->next;
+		if (ex->room_ptr) {
+			--GET_EXITS_HERE(ex->room_ptr);
+		}
 		if (ex->keyword) {
 			free(ex->keyword);
 		}

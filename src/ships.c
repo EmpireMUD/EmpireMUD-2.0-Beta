@@ -394,14 +394,16 @@ bool move_ship(char_data *ch, obj_data *ship, int dir) {
 	}
 	
 	// alert whole ship
-	HASH_ITER(interior_hh, interior_world_table, room, next_room) {
+	for (room = interior_room_list; room; room = next_room) {
+		next_room = room->next_interior;
+		
 		if (HOME_ROOM(room) != deck) {
 			continue;
 		}
 		
 		for (ch_iter = ROOM_PEOPLE(room); ch_iter; ch_iter = ch_iter->next_in_room) {
 			if (ch_iter->desc) {
-				if (HAS_ABILITY(ch_iter, ABIL_NAVIGATION)) {
+				if (has_ability(ch_iter, ABIL_NAVIGATION)) {
 					snprintf(buf, sizeof(buf), "The ship sails %s (%d, %d).", dirs[get_direction_for_char(ch_iter, dir)], X_COORD(IN_ROOM(ship)), Y_COORD(IN_ROOM(ship)));
 				}
 				else {
@@ -429,7 +431,9 @@ bool only_one_sailing(char_data *ch, obj_data *ship) {
 		return FALSE;
 	}
 	
-	HASH_ITER(interior_hh, interior_world_table, room, next_room) {
+	for (room = interior_room_list; room; room = next_room) {
+		next_room = room->next_interior;
+		
 		if (HOME_ROOM(room) != HOME_ROOM(IN_ROOM(ch))) {
 			continue;
 		}
@@ -480,11 +484,15 @@ int perform_unload_boat(char_data *ch, room_data *from, room_data *to, obj_data 
 
 
 void process_manufacturing(char_data *ch) {
+	static struct resource_data *iron = NULL, *logs = NULL;
 	obj_data *ship;
 	char_data *c;
-	Resource iron[] = { {o_NAILS, 2}, END_RESOURCE_LIST };
-	Resource logs[] = { {o_LUMBER, 1}, END_RESOURCE_LIST };
 	int type = NOTHING, iter, total, count;
+	
+	if (!iron || !logs) {
+		iron = create_resource_list(o_NAILS, 2, NOTHING);
+		logs = create_resource_list(o_LUMBER, 1, NOTHING);
+	}
 	
 	// this finds the ship being worked on
 	for (ship = ROOM_CONTENTS(IN_ROOM(ch)); ship; ship = ship->next_content) {
@@ -737,7 +745,9 @@ ACMD(do_load_boat) {
 		msg_to_char(ch, "You can't seem to load this ship.\r\n");
 	}
 	else {
-		HASH_ITER(interior_hh, interior_world_table, room, next_room) {
+		for (room = interior_room_list; room; room = next_room) {
+			next_room = room->next_interior;
+			
 			if (done) {
 				break;
 			}
@@ -786,7 +796,7 @@ ACMD(do_manufacture) {
 	skip_spaces(&argument);
 
 	if (*argument)
-		for (i = 0; str_cmp(ship_data[i].name, "\n") && (!is_abbrev(argument, ship_data[i].name) || (ship_data[i].ability != NO_ABIL && !HAS_ABILITY(ch, ship_data[i].ability))); i++);
+		for (i = 0; str_cmp(ship_data[i].name, "\n") && (!is_abbrev(argument, ship_data[i].name) || (ship_data[i].ability != NO_ABIL && !has_ability(ch, ship_data[i].ability))); i++);
 
 	if ((BUILDING_VNUM(IN_ROOM(ch)) != BUILDING_SHIPYARD && BUILDING_VNUM(IN_ROOM(ch)) != BUILDING_SHIPYARD2) || !IS_COMPLETE(IN_ROOM(ch)))
 		msg_to_char(ch, "You can't do that here.\r\n");
@@ -801,7 +811,7 @@ ACMD(do_manufacture) {
 	else if (!ship && (!*argument || !str_cmp(ship_data[i].name, "\n"))) {
 		msg_to_char(ch, "What type of ship would you like to build:");
 		for (i = 0; str_cmp(ship_data[i].name, "\n"); i++)
-			if (ship_data[i].ability == NO_ABIL || HAS_ABILITY(ch, ship_data[i].ability)) {
+			if (ship_data[i].ability == NO_ABIL || has_ability(ch, ship_data[i].ability)) {
 				msg_to_char(ch, "%s%s", (comma ? ", " : " "), ship_data[i].name);
 				comma = TRUE;
 			}
@@ -886,7 +896,9 @@ ACMD(do_sail) {
 		
 		// alert whole ship
 		if (!same_dir) {
-			HASH_ITER(interior_hh, interior_world_table, room, next_room) {
+			for (room = interior_room_list; room; room = next_room) {
+				next_room = room->next_interior;
+				
 				if (HOME_ROOM(room) != HOME_ROOM(IN_ROOM(ch))) {
 					continue;
 				}
@@ -925,7 +937,9 @@ ACMD(do_unload_boat) {
 		msg_to_char(ch, "You can't seem to unload the ship.\r\n");
 	}
 	else {
-		HASH_ITER(interior_hh, interior_world_table, room, next_room) {
+		for (room = interior_room_list; room; room = next_room) {
+			next_room = room->next_interior;
+			
 			if (HOME_ROOM(room) != ship_room)
 				continue;
 			if (BUILDING_VNUM(room) != RTYPE_B_STORAGE && BUILDING_VNUM(room) != RTYPE_B_ONDECK)

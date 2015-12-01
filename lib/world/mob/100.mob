@@ -277,10 +277,10 @@ a bustling page~
 A page is bustling past you.
 ~
 30 50 advxA 0
-1 0 0 0
+1 0 0 15
+I 4 10036 100.00 1  # LOOT: a skystone
 I 4 10043 10.00 1 X  # LOOT: page robes
 I 4 10042 10.00 1 X  # LOOT: bustling shoes
-I 4 10036 100.00 1  # LOOT: a skystone
 T 10031
 T 10046
 S
@@ -516,7 +516,7 @@ T 10064
 T 10065
 S
 #10052
-celiya high sorcereress~
+celiya high sorceress~
 High Sorceress Celiya~
 High Sorceress Celiya is here.
 ~

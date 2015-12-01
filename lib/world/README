@@ -1,7 +1,11 @@
 This directory contains data files for various in-game prototypes:
 
+abil - Player abilities
 adv - Adventure zones
+arch - Archetypes (character creation options)
+aug - Augments (item enchantments)
 bld - Buildings and designated rooms
+class - Player classes
 craft - Craft (forge, sew, etc) and build recipes
 crop - Crops
 glb - Global data
@@ -9,6 +13,7 @@ mob - Mobiles/NPCs
 obj - Objects
 rmt - Room templates (for adventures)
 sect - Sectors (map terrain types)
+skill - Player skills
 trg - DG Scripts triggers
 
 The final one is different.

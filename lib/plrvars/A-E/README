@@ -1,3 +1,4 @@
-This directory contains player variables for DG Scripts.
-This directory contains player variables for DG Scripts.
-
+This directory formerly contained player variables for DG Scripts. As of
+2.0b3.1, those variables are stored in the player file. If you have converted
+your player files for b3.1 or never ran an older version, the plrvars dir can
+be deleted.

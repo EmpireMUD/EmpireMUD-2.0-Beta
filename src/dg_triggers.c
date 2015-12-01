@@ -555,12 +555,14 @@ void load_mtrigger(char_data *ch) {
 	}
 }
 
-int ability_mtrigger(char_data *actor, char_data *ch, int abil) {
+int ability_mtrigger(char_data *actor, char_data *ch, any_vnum abil) {
 	trig_data *t;
 	char buf[MAX_INPUT_LENGTH];
+	ability_data *ab;
 
-	if (ch == NULL || abil == NO_ABIL)
+	if (ch == NULL || !(ab = find_ability_by_vnum(abil))) {
 		return 1;
+	}
 
 	if (!SCRIPT_CHECK(ch, MTRIG_ABILITY) || AFF_FLAGGED(ch, AFF_CHARM))
 		return 1;
@@ -572,7 +574,7 @@ int ability_mtrigger(char_data *actor, char_data *ch, int abil) {
 			ADD_UID_VAR(buf, t, actor, "actor", 0);
 			sprintf(buf, "%d", abil);
 			add_var(&GET_TRIG_VARS(t), "ability", buf, 0);
-			add_var(&GET_TRIG_VARS(t), "abilityname", ability_data[abil].name, 0);
+			add_var(&GET_TRIG_VARS(t), "abilityname", ABIL_NAME(ab), 0);
 			sdd.c = ch;
 			return script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
 		}
@@ -935,11 +937,12 @@ void load_otrigger(obj_data *obj) {
 	}
 }
 
-int ability_otrigger(char_data *actor, obj_data *obj, int abil) {
+int ability_otrigger(char_data *actor, obj_data *obj, any_vnum abil) {
 	trig_data *t;
 	char buf[MAX_INPUT_LENGTH];
+	ability_data *ab;
 
-	if (obj == NULL || abil == NO_ABIL)
+	if (obj == NULL || !(ab = find_ability_by_vnum(abil)))
 		return 1;
 
 	if (!SCRIPT_CHECK(obj, OTRIG_ABILITY))
@@ -952,7 +955,7 @@ int ability_otrigger(char_data *actor, obj_data *obj, int abil) {
 			ADD_UID_VAR(buf, t, actor, "actor", 0);
 			sprintf(buf, "%d", abil);
 			add_var(&GET_TRIG_VARS(t), "ability", buf, 0);
-			add_var(&GET_TRIG_VARS(t), "abilityname", ability_data[abil].name, 0);
+			add_var(&GET_TRIG_VARS(t), "abilityname", ABIL_NAME(ab), 0);
 			sdd.o = obj;
 			return script_driver(&sdd, t, OBJ_TRIGGER, TRIG_NEW);
 		}
@@ -1225,12 +1228,13 @@ int drop_wtrigger(obj_data *obj, char_data *actor) {
 	return 1;
 }
 
-int ability_wtrigger(char_data *actor, char_data *vict, obj_data *obj, int abil) {
+int ability_wtrigger(char_data *actor, char_data *vict, obj_data *obj, any_vnum abil) {
 	room_data *room;
 	trig_data *t;
 	char buf[MAX_INPUT_LENGTH];
+	ability_data *ab;
 
-	if (!actor || abil == NO_ABIL || !SCRIPT_CHECK(IN_ROOM(actor), WTRIG_ABILITY))
+	if (!actor || !(ab = find_ability_by_vnum(abil)) || !SCRIPT_CHECK(IN_ROOM(actor), WTRIG_ABILITY))
 		return 1;
 
 	room = IN_ROOM(actor);
@@ -1246,7 +1250,7 @@ int ability_wtrigger(char_data *actor, char_data *vict, obj_data *obj, int abil)
 				ADD_UID_VAR(buf, t, obj, "object", 0);
 			sprintf(buf, "%d", abil);
 			add_var(&GET_TRIG_VARS(t), "ability", buf, 0);
-			add_var(&GET_TRIG_VARS(t), "abilityname", ability_data[abil].name, 0);
+			add_var(&GET_TRIG_VARS(t), "abilityname", ABIL_NAME(ab), 0);
 			sdd.r = room;
 			return script_driver(&sdd, t, WLD_TRIGGER, TRIG_NEW);
 		}

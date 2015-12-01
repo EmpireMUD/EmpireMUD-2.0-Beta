@@ -127,7 +127,7 @@ void extract_script(void *thing, int type) {
 			for ( ; j ; j = j->next)
 				assert(sc != SCRIPT(j));
 			
-			HASH_ITER(world_hh, world_table, k, next_k) {
+			HASH_ITER(hh, world_table, k, next_k) {
 				assert(sc != SCRIPT(k));
 			}
 		}
@@ -209,7 +209,7 @@ void free_proto_script(void *thing, int type) {
 			for ( ; j ; j = j->next)
 				assert(proto != j->proto_script);
 
-			HASH_ITER(world_hh, world_table, k, next_k) {
+			HASH_ITER(hh, world_table, k, next_k) {
 				assert(proto != k->proto_script);
 			}
 		}
@@ -276,17 +276,6 @@ void copy_proto_script(void *source, void *dest, int type) {
 			tp_dst = tp_dst->next;
 		}
 	}
-}
-
-
-void delete_variables(const char *charname) {
-	char filename[PATH_MAX];
-
-	if (!get_filename((char*)charname, filename, SCRIPT_VARS_FILE))
-		return;
-
-	if (remove(filename) < 0 && errno != ENOENT)
-		log("SYSERR: deleting variable file %s: %s", filename, strerror(errno));
 }
 
 

@@ -258,13 +258,12 @@ void do_dg_terracrop(room_data *target, crop_data *cp) {
 	}
 	else {
 		change_terrain(target, GET_SECT_VNUM(sect));
-		set_room_extra_data(target, ROOM_EXTRA_CROP_TYPE, GET_CROP_VNUM(cp));
+		set_crop_type(target, cp);
+		
+		remove_depletion(target, DPLTN_PICK);
+		remove_depletion(target, DPLTN_FORAGE);
 	}
 	
-	// clear these if set
-	REMOVE_BIT(ROOM_AFF_FLAGS(target), ROOM_AFF_PLAYER_MADE);
-	REMOVE_BIT(ROOM_BASE_FLAGS(target), ROOM_AFF_PLAYER_MADE);
-
 	if (emp) {
 		read_empire_territory(emp);
 	}
@@ -286,18 +285,14 @@ void do_dg_terraform(room_data *target, sector_data *sect) {
 		return;
 	}
 	
-	old_sect = ROOM_ORIGINAL_SECT(target);
+	old_sect = BASE_SECT(target);
 	emp = ROOM_OWNER(target);
 	
 	change_terrain(target, GET_SECT_VNUM(sect));
-
-	// clear these if set
-	REMOVE_BIT(ROOM_AFF_FLAGS(target), ROOM_AFF_PLAYER_MADE);
-	REMOVE_BIT(ROOM_BASE_FLAGS(target), ROOM_AFF_PLAYER_MADE);
-			
+	
 	// preserve old original sect for roads -- TODO this is a special-case
 	if (IS_ROAD(target)) {
-		ROOM_ORIGINAL_SECT(target) = old_sect;
+		change_base_sector(target, old_sect);
 	}
 
 	if (emp) {

@@ -195,7 +195,7 @@ OCMD(do_oforce) {
 
 
 OCMD(do_obuildingecho) {
-	room_data *froom, *home_room, *iter, *next_iter;
+	room_data *froom, *home_room, *iter;
 	room_data *orm = obj_room(obj);
 	char room_number[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH], *msg;
 
@@ -214,7 +214,7 @@ OCMD(do_obuildingecho) {
 		sprintf(buf, "%s\r\n", msg);
 		
 		send_to_room(buf, home_room);
-		HASH_ITER(interior_hh, interior_world_table, iter, next_iter) {
+		for (iter = interior_room_list; iter; iter = iter->next_interior) {
 			if (HOME_ROOM(iter) == home_room && iter != home_room && ROOM_PEOPLE(iter)) {
 				send_to_room(buf, iter);
 			}
@@ -933,6 +933,9 @@ OCMD(do_odoor) {
 	if (fd == 0) {
 		if (newexit) {
 			REMOVE_FROM_LIST(newexit, COMPLEX_DATA(rm)->exits, next);
+			if (newexit->room_ptr) {
+				--GET_EXITS_HERE(newexit->room_ptr);
+			}
 			if (newexit->keyword)
 				free(newexit->keyword);
 			free(newexit);
@@ -963,8 +966,13 @@ OCMD(do_odoor) {
 					newexit = create_exit(rm, troom, dir, FALSE);
 				}
 				else {
+					if (newexit->room_ptr) {
+						// lower old one
+						--GET_EXITS_HERE(newexit->room_ptr);
+					}
 					newexit->to_room = GET_ROOM_VNUM(troom);
 					newexit->room_ptr = troom;
+					++GET_EXITS_HERE(troom);
 				}
 			}
 			else

@@ -432,7 +432,7 @@ ACMD(do_mecho) {
 
 
 ACMD(do_mbuildingecho) {
-	room_data *home_room, *iter, *next_iter;
+	room_data *home_room, *iter;
 	char room_number[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH], *msg;
 
 	if (!MOB_OR_IMPL(ch)) {
@@ -458,7 +458,7 @@ ACMD(do_mbuildingecho) {
 		sprintf(buf, "%s\r\n", msg);
 		
 		send_to_room(buf, home_room);
-		HASH_ITER(interior_hh, interior_world_table, iter, next_iter) {
+		for (iter = interior_room_list; iter; iter = iter->next_interior) {
 			if (HOME_ROOM(iter) == home_room && iter != home_room && ROOM_PEOPLE(iter)) {
 				send_to_room(buf, iter);
 			}
@@ -1573,6 +1573,9 @@ ACMD(do_mdoor) {
 	if (fd == 0) {
 		if (newexit) {
 			REMOVE_FROM_LIST(newexit, COMPLEX_DATA(rm)->exits, next);
+			if (newexit->room_ptr) {
+				--GET_EXITS_HERE(newexit->room_ptr);
+			}
 			if (newexit->keyword)
 				free(newexit->keyword);
 			free(newexit);
@@ -1602,8 +1605,13 @@ ACMD(do_mdoor) {
 						newexit = create_exit(rm, to_room, dir, FALSE);
 					}
 					else {
+						if (newexit->room_ptr) {
+							// lower old one
+							--GET_EXITS_HERE(newexit->room_ptr);
+						}
 						newexit->to_room = GET_ROOM_VNUM(to_room);
 						newexit->room_ptr = to_room;
+						++GET_EXITS_HERE(to_room);
 					}
 				}
 				else

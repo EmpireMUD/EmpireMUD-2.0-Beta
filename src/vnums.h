@@ -186,29 +186,6 @@
 #define o_SMALL_LEATHER  1356
 #define o_LARGE_LEATHER  1357
 
-// newbie gear
-#define o_STAFF  1107
-#define o_LEATHER_HOOD  2001
-#define o_CLOTH_HOOD  2002
-#define o_BRIMMED_CAP  2004
-#define o_COIF  2006
-#define o_SHIRT  2009
-#define o_ROBE  2012
-#define o_WAISTCOAT  2014
-#define o_LEATHER_JACKET  2016
-#define o_SPOTTED_ROBE  2017
-#define o_PANTS  2027
-#define o_BREECHES  2028
-#define o_MOCCASINS  2031
-#define o_SANDALS  2032
-#define o_STONE_AXE  2100
-#define o_WOODSMANS_AXE  2101
-#define o_SHORT_SWORD  2102
-#define o_SHIV  2103
-#define o_NEWBIE_TORCH  2104
-#define o_GRAVE_MARKER  2117
-#define o_BREAD  3313
-
 
  //////////////////////////////////////////////////////////////////////////////
 //// MOBS ////////////////////////////////////////////////////////////////////

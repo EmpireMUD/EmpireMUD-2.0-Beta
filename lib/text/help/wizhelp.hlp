@@ -3,8 +3,8 @@ ADVANCE
 Usage:  advance <victim> <access level>
 
 ADVANCE moves a player to a new access level. If used to promote a player to an
-immortal level, and if you have the autowiz program installed, the wizlist and
-godlist will automatically be recreated. This command is grantable.
+immortal or god level, the wizlist and godlist will automatically be recreated.
+This command is grantable.
 
 Don't confuse access levels with skill/gear levels.
 
@@ -50,7 +50,7 @@ AUTOWIZ
 
 Usage:  autowiz
 
-Regenerates the wizlist.
+Regenerates the wizlist and godlist.
 #d
 BAN UNBAN
 
@@ -547,6 +547,19 @@ Do not abuse this command.
 
 See also: GRANT
 #d
+PLAYERDELETE "PLAYER DELETE" "DELETE PLAYER"
+
+Usage:  playerdelete <name> CONFIRM
+
+This command deletes a player completely. It cannot be used on players with
+the !DEL flag set. There is no way to undo this command (unless your EmpireMUD
+keeps backups of mud files). You must type the word 'CONFIRM' as the second
+argument, in all capital letters. This command also cannot be abbreviated.
+
+This command is grantable.
+
+See also: GRANT, SELFDELETE
+#d
 POOFIN POOFOUT
 
 Usage:  poofin <message | none>
@@ -734,11 +747,11 @@ drunk          BOTH    MISC         Drunkenness
 hunger         BOTH    MISC         Hunger level
 thirst         BOTH    MISC         Thirst level
 
-deleted        PC      BINARY       Player deleted
 frozen         PC      BINARY       Player is frozen
 incognito      PC      BINARY       Turns on/off incognito mode (imms only)
 ipmask         PC      BINARY       IP address is hidden
-multiok        PC      BINARY       Can multi-play
+multi-ip       PC      BINARY       Can log in more than 1 account per IP
+multi-char     PC      BINARY       Can log in more than 1 char per account
 muted          PC      BINARY       Player is muted
 nodelete       PC      BINARY       Can't be deleted
 noidleout      PC      BINARY       Won't idle out
@@ -948,6 +961,8 @@ Available utilities:
     reports the results.
  redoislands - Renumbers all the islands (requires confirmation; may rearrange
     empire inventories).
+ rescan <empire | all> - Rereads territory and members, which can fix issues.
+ strlen - Give various measures of string length.
 #d
 VNUM
 
@@ -957,8 +972,8 @@ Gives a list of the virtual numbers of objects or mobiles which have the
 specified name. If you specify more than one keyword, it will find things
 that match ALL of those keywords.
 
-Valid types are: adventure, book, building, craft, crop, global, obj, mob, 
-                 roomtemplate, sector
+Valid types are: adventure, ability, archetype, augment, book, building, craft,
+                 class, crop, global, obj, mob, roomtemplate, sector, skill
 
 Examples:
 
@@ -978,8 +993,8 @@ Usage:  vstat <type> <vnum>
 
 Used to stat a prototypical object by virtual number.
 
-Valid types are: adventure, building, book, craft, crop, global, obj, mob,
-                 roomtemplate, sector
+Valid types are: adventure, ability, archetype, augment, building, book, craft,
+                 class, crop, global, obj, mob, roomtemplate, sector, skill
 
 Examples:
 

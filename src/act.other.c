@@ -40,7 +40,6 @@ extern bool can_enter_instance(char_data *ch, struct instance_data *inst);
 extern bool check_scaling(char_data *mob, char_data *attacker);
 extern char *get_room_name(room_data *room, bool color);
 extern char_data *has_familiar(char_data *ch);
-void Objsave_char(char_data *ch, int rent_code);
 void scale_item_to_level(obj_data *obj, int level);
 void scale_mob_as_familiar(char_data *mob, char_data *master);
 extern char *show_color_codes(char *string);
@@ -90,6 +89,12 @@ void adventure_summon(char_data *ch, char *argument) {
 	}
 	else if (IS_ADVENTURE_ROOM(IN_ROOM(vict))) {
 		msg_to_char(ch, "You cannot summon someone who is already in an adventure.\r\n");
+	}
+	else if (!vict->desc) {
+		msg_to_char(ch, "You can't summon someone who is linkdead.\r\n");
+	}
+	else if (GET_ACCOUNT(ch) == GET_ACCOUNT(vict)) {
+		msg_to_char(ch, "You can't summon your own alts.\r\n");
 	}
 	else if (IS_DEAD(vict)) {
 		msg_to_char(ch, "You cannot summon the dead like that.\r\n");
@@ -179,8 +184,7 @@ void cancel_adventure_summon(char_data *ch) {
 */
 void perform_alternate(char_data *old, char_data *new) {
 	void display_tip_to_char(char_data *ch);
-	extern int enter_player_game(descriptor_data *d, int dolog, bool fresh);
-	extern int has_mail(long recipient);
+	extern void enter_player_game(descriptor_data *d, int dolog, bool fresh);
 	void start_new_character(char_data *ch);
 	extern char *START_MESSG;
 	extern bool global_mute_slash_channel_joins;
@@ -229,7 +233,6 @@ void perform_alternate(char_data *old, char_data *new) {
 	
 	// save old char...
 	GET_LAST_KNOWN_LEVEL(old) = GET_COMPUTED_LEVEL(old);
-	Objsave_char(old, RENT_RENTED);
 	SAVE_CHAR(old);
 	
 	// save this to switch over replies
@@ -241,6 +244,7 @@ void perform_alternate(char_data *old, char_data *new) {
 	old->desc = NULL;
 	
 	// remove old character
+	extract_all_items(old);
 	extract_char(old);
 	
 	syslog(SYS_LOGIN, invis_lev, TRUE, "%s", sys);
@@ -295,7 +299,7 @@ void perform_alternate(char_data *old, char_data *new) {
 	msg_to_char(new, "\r\n");	// leading \r\n between the look and the tip
 	display_tip_to_char(new);
 	
-	if (has_mail(GET_IDNUM(new))) {
+	if (GET_MAIL_PENDING(new)) {
 		send_to_char("&rYou have mail waiting.&0\r\n", new);
 	}
 	
@@ -316,7 +320,7 @@ void perform_alternate(char_data *old, char_data *new) {
 * @param char_data *ch The person to display to.
 */
 static void print_group(char_data *ch) {
-	extern const char *class_role[NUM_ROLES];
+	extern const char *class_role[];
 	extern const char *pool_abbrevs[];
 
 	char status[256], class[256], loc[256], alerts[256];
@@ -339,8 +343,8 @@ static void print_group(char_data *ch) {
 			}
 			
 			// show class section if they have one
-			if (!IS_NPC(k) && GET_CLASS(k) != CLASS_NONE) {
-				snprintf(class, sizeof(class), "/%s/%s", class_data[GET_CLASS(k)].name, class_role[(int) GET_CLASS_ROLE(k)]);
+			if (!IS_NPC(k) && GET_CLASS(k)) {
+				snprintf(class, sizeof(class), "/%s/%s", SHOW_CLASS_NAME(k), class_role[(int) GET_CLASS_ROLE(k)]);
 			}
 			else {
 				*class = '\0';
@@ -354,7 +358,7 @@ static void print_group(char_data *ch) {
 			
 			// show location if different
 			if (IN_ROOM(k) != IN_ROOM(ch)) {
-				if (HAS_ABILITY(ch, ABIL_NAVIGATION) && !RMT_FLAGGED(IN_ROOM(k), RMT_NO_LOCATION) && (IS_NPC(k) || HAS_ABILITY(k, ABIL_NAVIGATION)) && X_COORD(IN_ROOM(k)) >= 0) {
+				if (has_ability(ch, ABIL_NAVIGATION) && !RMT_FLAGGED(IN_ROOM(k), RMT_NO_LOCATION) && (IS_NPC(k) || has_ability(k, ABIL_NAVIGATION)) && X_COORD(IN_ROOM(k)) >= 0) {
 					snprintf(loc, sizeof(loc), " - %s (%d, %d)", get_room_name(IN_ROOM(k), FALSE), X_COORD(IN_ROOM(k)), Y_COORD(IN_ROOM(k)));
 				}
 				else {
@@ -384,7 +388,7 @@ INTERACTION_FUNC(shear_interact) {
 	command_lag(ch, WAIT_OTHER);
 			
 	amt = interaction->quantity;
-	if (HAS_ABILITY(ch, ABIL_MASTER_FARMER)) {
+	if (has_ability(ch, ABIL_MASTER_FARMER)) {
 		amt *= 2;
 	}
 	
@@ -509,7 +513,7 @@ void summon_player(char_data *ch, char *argument) {
 		}
 		
 		act("You start summoning $N...", FALSE, ch, NULL, vict, TO_CHAR);
-		if (HAS_ABILITY(vict, ABIL_NAVIGATION)) {
+		if (has_ability(vict, ABIL_NAVIGATION)) {
 			snprintf(buf, sizeof(buf), "$o is trying to summon you to %s (%d, %d) -- use 'accept/reject summon'.", get_room_name(IN_ROOM(ch), FALSE), X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
 		}
 		else {
@@ -844,9 +848,9 @@ ACMD(do_alternate) {
 	extern int isbanned(char *hostname);
 
 	char arg[MAX_INPUT_LENGTH];
-	struct char_file_u tmp_store;
+	struct account_player *plr;
+	player_index_data *index;
 	char_data *newch;
-	int player_i, idnum;
 	
 	any_one_arg(argument, arg);
 	
@@ -861,23 +865,19 @@ ACMD(do_alternate) {
 		msg_to_char(ch, "Usage: alternate <character name>\r\n");
 	}
 	else if (!str_cmp(arg, "list")) {
-		struct char_file_u vbuf;
-		int iter;
-	
 		msg_to_char(ch, "Account characters:\r\n");
 		
-		for (iter = 0; iter <= top_of_p_table; iter++) {
-			load_char(player_table[iter].name, &vbuf);
-			if (IS_SET(vbuf.char_specials_saved.act, PLR_DELETED)) {
+		for (plr = GET_ACCOUNT(ch)->players; plr; plr = plr->next) {
+			if (!plr->player) {
 				continue;
 			}
 			
-			if (vbuf.char_specials_saved.idnum == GET_IDNUM(ch)) {
+			if (plr->player->idnum == GET_IDNUM(ch)) {
 				// self
-				msg_to_char(ch, " &c%s&0\r\n", vbuf.name);
+				msg_to_char(ch, " &c%s&0\r\n", PERS(ch, ch, TRUE));
 			}
-			else if (vbuf.player_specials_saved.account_id != 0 && vbuf.player_specials_saved.account_id == GET_ACCOUNT_ID(ch)) {
-				msg_to_char(ch, " %s\r\n", vbuf.name);
+			else {
+				msg_to_char(ch, " %s\r\n", plr->player->fullname);
 			}
 		}
 		
@@ -905,13 +905,13 @@ ACMD(do_alternate) {
 	else if (GET_POS(ch) == POS_FIGHTING || FIGHTING(ch)) {
 		msg_to_char(ch, "You can't switch characters while fighting!\r\n");
 	}
-	else if ((idnum = get_id_by_name(arg)) == NOTHING) {
+	else if (!(index = find_player_index_by_name(arg))) {
 		msg_to_char(ch, "Unknown character.\r\n");
 	}
-	else if ((newch = is_playing(idnum)) || (newch = is_at_menu(idnum))) {
+	else if ((newch = is_playing(index->idnum)) || (newch = is_at_menu(index->idnum))) {
 		// in-game?
 		
-		if (GET_ACCOUNT_ID(newch) != GET_ACCOUNT_ID(ch) || GET_ACCOUNT_ID(newch) == 0) {
+		if (GET_ACCOUNT(newch) != GET_ACCOUNT(ch)) {
 			msg_to_char(ch, "That character isn't on your account.\r\n");
 			return;
 		}
@@ -925,40 +925,25 @@ ACMD(do_alternate) {
 	}
 	else {
 		// prepare
-		CREATE(newch, char_data, 1);
-		clear_char(newch);
-		CREATE(newch->player_specials, struct player_special_data, 1);
-
-		// load
-		if ((player_i = load_char(arg, &tmp_store)) >= 0) {
-			store_to_char(&tmp_store, newch);
-			GET_PFILEPOS(newch) = player_i;
-
-			if (PLR_FLAGGED(newch, PLR_DELETED)) {
-				msg_to_char(ch, "Unknown character.\r\n");
-				free_char(newch);
-				return;
-			}
-			else {
-				// undo it just in case they are set
-				REMOVE_BIT(PLR_FLAGS(newch), PLR_WRITING | PLR_MAILING);
-			}
-		}
-		else {
+		newch = load_player(index->name, TRUE);
+		
+		if (!newch) {
 			msg_to_char(ch, "Unknown character.\r\n");
-			free_char(newch);
 			return;
 		}
 		
+		// in case
+		REMOVE_BIT(PLR_FLAGS(newch), PLR_WRITING | PLR_MAILING);
+				
 		// ensure legal switch
-		if (GET_ACCOUNT_ID(newch) != GET_ACCOUNT_ID(ch) || GET_ACCOUNT_ID(newch) == 0) {
+		if (GET_ACCOUNT(newch) != GET_ACCOUNT(ch)) {
 			msg_to_char(ch, "That character isn't on your account.\r\n");
 			free_char(newch);
 			return;
 		}
 		// select ban?
-		if (isbanned(ch->desc->host) == BAN_SELECT && !PLR_FLAGGED(newch, PLR_SITEOK)) {
-			msg_to_char(ch, "Sorry, that character has not been cleared for login from your site!\r\n");
+		if (isbanned(ch->desc->host) == BAN_SELECT && !ACCOUNT_FLAGGED(newch, ACCT_SITEOK)) {
+			msg_to_char(ch, "Sorry, your account has not been cleared for login from your site!\r\n");
 			free_char(newch);
 			return;
 		}
@@ -1195,7 +1180,7 @@ ACMD(do_gen_write) {
 	else if (GET_BUILDING(IN_ROOM(ch))) {
 		snprintf(locpart, sizeof(locpart), " [BLD%d]", GET_BLD_VNUM(GET_BUILDING(IN_ROOM(ch))));
 	}
-	else if (ROOM_CROP_TYPE(IN_ROOM(ch)) && (cp = crop_proto(ROOM_CROP_TYPE(IN_ROOM(ch))))) {
+	else if ((cp = ROOM_CROP(IN_ROOM(ch)))) {
 		snprintf(locpart, sizeof(locpart), " [CRP%d]", GET_CROP_VNUM(cp));
 	}
 	else {
@@ -1681,8 +1666,7 @@ ACMD(do_prompt) {
 	}
 
 	delete_doubledollar(argument);
-
-	// char_file_u only holds MAX_PROMPT_SIZE+1
+	
 	if (strlen(argument) > MAX_PROMPT_SIZE) {
 		argument[MAX_PROMPT_SIZE] = '\0';
 	}
@@ -1770,29 +1754,25 @@ ACMD(do_quit) {
 		}
 		
 		GET_LAST_KNOWN_LEVEL(ch) = GET_COMPUTED_LEVEL(ch);
-		Objsave_char(ch, RENT_RENTED);
 		save_char(ch, died ? NULL : IN_ROOM(ch));
 		
 		display_statistics_to_char(ch);
 		
 		// this will disconnect the descriptor
+		extract_all_items(ch);
 		extract_char(ch);
 	}
 }
 
 
 ACMD(do_save) {
-	void write_aliases(char_data *ch);
-
 	if (!IS_NPC(ch) && ch->desc) {
 		if (cmd) {
 			msg_to_char(ch, "Saving %s.\r\n", GET_NAME(ch));
 		}
 		
-		write_aliases(ch);
 		GET_LAST_KNOWN_LEVEL(ch) = GET_COMPUTED_LEVEL(ch);
 		SAVE_CHAR(ch);
-		Objsave_char(ch, RENT_CRASH);
 	}
 }
 
@@ -1827,9 +1807,6 @@ ACMD(do_selfdelete) {
 		msg_to_char(ch, "WARNING: This will delete your character.\r\n");
 	}
 	else {
-		// actual delete (rent out equipment first)
-		Objsave_char(ch, RENT_RENTED);
-		delete_player_character(ch);
 		
 		// logs and messaging
 		syslog(SYS_INFO, GET_INVIS_LEV(ch), TRUE, "DEL: %s (lev %d) has self-deleted.", GET_NAME(ch), GET_ACCESS_LEVEL(ch));
@@ -1846,7 +1823,9 @@ ACMD(do_selfdelete) {
 		}
 		msg_to_char(ch, "You have deleted your character. Goodbye...\r\n");
 		
-		// bye now
+		// actual delete (remove equipment first)
+		extract_all_items(ch);
+		delete_player_character(ch);
 		extract_char(ch);
 	}
 }
@@ -2174,6 +2153,7 @@ ACMD(do_summon) {
 				MOB_INSTANCE_ID(mob) = MOB_INSTANCE_ID(ch);
 			}
 			
+			SET_BIT(MOB_FLAGS(mob), MOB_NO_EXPERIENCE);	// never gain exp
 			if (emp) {
 				// guarantee empire flag
 				SET_BIT(MOB_FLAGS(mob), MOB_EMPIRE);
@@ -2220,17 +2200,18 @@ ACMD(do_title) {
 
 	if (IS_NPC(ch))
 		send_to_char("Your title is fine... go away.\r\n", ch);
-	else if (PLR_FLAGGED(ch, PLR_NOTITLE))
+	else if (ACCOUNT_FLAGGED(ch, ACCT_NOTITLE)) {
 		send_to_char("You can't title yourself -- you shouldn't have abused it!\r\n", ch);
+	}
 	else if (strstr(argument, "(") || strstr(argument, ")") || strstr(argument, "%"))
 		send_to_char("Titles can't contain the (, ), or % characters.\r\n", ch);
-	else if (strlen(argument) > MAX_TITLE_LENGTH-1 || (strlen(argument) - (2 * count_color_codes(argument))) > MAX_TITLE_LENGTH_NO_COLOR) {
+	else if (strlen(argument) > MAX_TITLE_LENGTH-1 || color_strlen(argument) > MAX_TITLE_LENGTH_NO_COLOR) {
 		// the -1 reserves an extra spot for an extra space
 		msg_to_char(ch, "Sorry, titles can't be longer than %d characters.\r\n", MAX_TITLE_LENGTH_NO_COLOR);
 	}
 	else {
 		set_title(ch, argument);
-		msg_to_char(ch, "Okay, you're now %s%s.\r\n", PERS(ch, ch, 1), GET_TITLE(ch));
+		msg_to_char(ch, "Okay, you're now %s%s.\r\n", PERS(ch, ch, 1), NULLSAFE(GET_TITLE(ch)));
 	}
 }
 

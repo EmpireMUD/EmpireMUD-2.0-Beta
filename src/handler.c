@@ -65,7 +65,6 @@ extern const int confused_dirs[NUM_SIMPLE_DIRS][2][NUM_OF_DIRS];
 extern const char *drinks[];
 extern int get_north_for_char(char_data *ch);
 extern struct complex_room_data *init_complex_data();
-void write_lore(char_data *ch);
 const struct wear_data_type wear_data[NUM_WEARS];
 
 // external funcs
@@ -468,7 +467,7 @@ void affect_remove_room(room_data *room, struct affected_type *af) {
 * Insert an affect_type in a char_data structure
 *  Automatically sets apropriate bits and apply's
 *
-* Caution: this duplicates af (because of how it loads from the pfile)
+* Caution: this duplicates af (because of how it used to load from the pfile)
 *
 * @param char_data *ch The person to add the affect to
 * @param struct affected_type *af The affect to add.
@@ -520,8 +519,9 @@ void affect_total(char_data *ch) {
 	void update_morph_stats(char_data *ch, bool add);
 
 	struct affected_type *af;
-	int i, j, iter;
+	int i, iter;
 	empire_data *emp = GET_LOYALTY(ch);
+	struct obj_apply *apply;
 	int health, move, mana;
 	
 	int pool_bonus_amount = config_get_int("pool_bonus_amount");
@@ -538,8 +538,8 @@ void affect_total(char_data *ch) {
 
 	for (i = 0; i < NUM_WEARS; i++) {
 		if (GET_EQ(ch, i) && wear_data[i].count_stats) {
-			for (j = 0; j < MAX_OBJ_AFFECT; j++) {
-				affect_modify(ch, GET_EQ(ch, i)->affected[j].location, GET_EQ(ch, i)->affected[j].modifier, GET_OBJ_AFF_FLAGS(GET_EQ(ch, i)), FALSE);
+			for (apply = GET_OBJ_APPLIES(GET_EQ(ch, i)); apply; apply = apply->next) {
+				affect_modify(ch, apply->location, apply->modifier, GET_OBJ_AFF_FLAGS(GET_EQ(ch, i)), FALSE);
 			}
 		}
 	}
@@ -565,17 +565,17 @@ void affect_total(char_data *ch) {
 		GET_MAX_MOVE(ch) = base_player_pools[MOVE];
 		GET_MAX_MANA(ch) = base_player_pools[MANA];
 		
-		if (GET_CLASS(ch) != CLASS_NONE) {
-			GET_MAX_HEALTH(ch) += MAX(0, GET_CLASS_PROGRESSION(ch) * (class_data[GET_CLASS(ch)].max_pools[HEALTH] - base_player_pools[HEALTH]) / 100);
-			GET_MAX_MOVE(ch) += MAX(0, GET_CLASS_PROGRESSION(ch) * (class_data[GET_CLASS(ch)].max_pools[MOVE] - base_player_pools[MOVE]) / 100);
-			GET_MAX_MANA(ch) += MAX(0, GET_CLASS_PROGRESSION(ch) * (class_data[GET_CLASS(ch)].max_pools[MANA] - base_player_pools[MANA]) / 100);
+		if (GET_CLASS(ch)) {
+			GET_MAX_HEALTH(ch) += MAX(0, GET_CLASS_PROGRESSION(ch) * (CLASS_POOL(GET_CLASS(ch), HEALTH) - base_player_pools[HEALTH]) / 100);
+			GET_MAX_MOVE(ch) += MAX(0, GET_CLASS_PROGRESSION(ch) * (CLASS_POOL(GET_CLASS(ch), MOVE) - base_player_pools[MOVE]) / 100);
+			GET_MAX_MANA(ch) += MAX(0, GET_CLASS_PROGRESSION(ch) * (CLASS_POOL(GET_CLASS(ch), MANA) - base_player_pools[MANA]) / 100);
 		}
 	}
 
 	for (i = 0; i < NUM_WEARS; i++) {
 		if (GET_EQ(ch, i) && wear_data[i].count_stats) {
-			for (j = 0; j < MAX_OBJ_AFFECT; j++) {
-				affect_modify(ch, GET_EQ(ch, i)->affected[j].location, GET_EQ(ch, i)->affected[j].modifier, GET_OBJ_AFF_FLAGS(GET_EQ(ch, i)), TRUE);
+			for (apply = GET_OBJ_APPLIES(GET_EQ(ch, i)); apply; apply = apply->next) {
+				affect_modify(ch, apply->location, apply->modifier, GET_OBJ_AFF_FLAGS(GET_EQ(ch, i)), TRUE);
 			}
 		}
 	}
@@ -598,13 +598,13 @@ void affect_total(char_data *ch) {
 
 	// ability-based modifiers
 	if (!IS_NPC(ch)) {
-		if (HAS_ABILITY(ch, ABIL_ENDURANCE)) {
+		if (has_ability(ch, ABIL_ENDURANCE)) {
 			GET_MAX_HEALTH(ch) = MIN(GET_MAX_HEALTH(ch), 1000) * 2.0 + MAX(GET_MAX_HEALTH(ch) - 1000, 0) * 1.25;
 		}
-		if (HAS_ABILITY(ch, ABIL_GIFT_OF_NATURE)) {
+		if (has_ability(ch, ABIL_GIFT_OF_NATURE)) {
 			GET_MAX_MANA(ch) *= 1.35;
 		}
-		if (HAS_ABILITY(ch, ABIL_ARCANE_POWER)) {
+		if (has_ability(ch, ABIL_ARCANE_POWER)) {
 			GET_MAX_MANA(ch) *= 1.35;
 		}
 	}
@@ -993,14 +993,16 @@ void extract_char_final(char_data *ch) {
 void extract_char(char_data *ch) {
 	void despawn_charmies(char_data *ch);
 	
-	if (IS_NPC(ch)) {
-		SET_BIT(MOB_FLAGS(ch), MOB_EXTRACTED);
-	}
-	else {
-		SET_BIT(PLR_FLAGS(ch), PLR_EXTRACTED);
+	if (!EXTRACTED(ch)) {
+		if (IS_NPC(ch)) {
+			SET_BIT(MOB_FLAGS(ch), MOB_EXTRACTED);
+		}
+		else {
+			SET_BIT(PLR_FLAGS(ch), PLR_EXTRACTED);
+		}
+		++extractions_pending;
 	}
 
-	extractions_pending++;
 	
 	// get rid of friends now (extracts them as well)
 	despawn_charmies(ch);
@@ -1092,7 +1094,6 @@ void perform_dismount(char_data *ch) {
 * @param char_data *ch The player to idle out.
 */
 void perform_idle_out(char_data *ch) {
-	void Objsave_char(char_data *ch, int rent_code);
 	extern obj_data *player_death(char_data *ch);
 	
 	empire_data *emp = NULL;
@@ -1124,11 +1125,11 @@ void perform_idle_out(char_data *ch) {
 	else {
 		act("$n is idle too long, and vanishes.", TRUE, ch, NULL, NULL, TO_ROOM);
 	}
-
-	Objsave_char(ch, RENT_RENTED);
+	
 	save_char(ch, died ? NULL : IN_ROOM(ch));
 	
 	syslog(SYS_LOGIN, GET_INVIS_LEV(ch), TRUE, "%s force-rented and extracted (idle).", GET_NAME(ch));
+	extract_all_items(ch);
 	extract_char(ch);
 	
 	if (emp) {
@@ -2234,7 +2235,9 @@ void abandon_room(room_data *room) {
 	perform_abandon_room(room);
 
 	// inside
-	HASH_ITER(interior_hh, interior_world_table, iter, next_iter) {
+	for (iter = interior_room_list; iter; iter = next_iter) {
+		next_iter = iter->next_interior;
+		
 		if (HOME_ROOM(iter) == home) {
 			perform_abandon_room(iter);
 		}
@@ -2257,8 +2260,10 @@ void claim_room(room_data *room, empire_data *emp) {
 	
 	ROOM_OWNER(room) = emp;
 	remove_room_extra_data(room, ROOM_EXTRA_CEDED);	// not ceded if just claimed
-
-	HASH_ITER(interior_hh, interior_world_table, iter, next_iter) {
+	
+	for (iter = interior_room_list; iter; iter = next_iter) {
+		next_iter = iter->next_interior;
+		
 		if (HOME_ROOM(iter) == home) {
 			ROOM_OWNER(iter) = emp;
 			remove_room_extra_data(iter, ROOM_EXTRA_CEDED);	// not ceded if just claimed
@@ -3031,8 +3036,9 @@ bool has_interaction(struct interaction_item *list, int type) {
 bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERACTION_FUNC(*func)) {
 	extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
 	
+	bool any = FALSE, done_cumulative = FALSE;
 	struct global_data *glb, *next_glb;
-	bool any = FALSE;
+	int cumulative_prc;
 	adv_data *adv;
 	
 	// no work
@@ -3041,12 +3047,16 @@ bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERA
 	}
 	
 	adv = get_adventure_for_vnum(GET_MOB_VNUM(mob));
+	cumulative_prc = number(1, 10000);
 
 	HASH_ITER(hh, globals_table, glb, next_glb) {
 		if (GET_GLOBAL_TYPE(glb) != GLOBAL_MOB_INTERACTIONS) {
 			continue;
 		}
 		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_IN_DEVELOPMENT)) {
+			continue;
+		}
+		if (GET_GLOBAL_ABILITY(glb) != NO_ABIL && !has_ability(ch, GET_GLOBAL_ABILITY(glb))) {
 			continue;
 		}
 		
@@ -3069,6 +3079,24 @@ bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERA
 		
 		// check adventure-only -- late-matching because it does more work than other conditions
 		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_ADVENTURE_ONLY) && get_adventure_for_vnum(GET_GLOBAL_VNUM(glb)) != adv) {
+			continue;
+		}
+		
+		// percent checks last
+		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_CUMULATIVE_PERCENT)) {
+			if (done_cumulative) {
+				continue;
+			}
+			cumulative_prc -= (int)(GET_GLOBAL_PERCENT(glb) * 100);
+			if (cumulative_prc <= 0) {
+				done_cumulative = TRUE;
+			}
+			else {
+				continue;	// not this time
+			}
+		}
+		else if (number(1, 10000) > (int)(GET_GLOBAL_PERCENT(glb) * 100)) {
+			// normal not-cumulative percent
 			continue;
 		}
 		
@@ -3134,7 +3162,7 @@ bool run_room_interactions(char_data *ch, room_data *room, int type, INTERACTION
 	}
 	
 	// crop second
-	if (!success && ROOM_CROP_TYPE(room) != NOTHING && (crop = crop_proto(ROOM_CROP_TYPE(room)))) {
+	if (!success && (crop = ROOM_CROP(room))) {
 		success |= run_interactions(ch, GET_CROP_INTERACTIONS(crop), type, room, NULL, NULL, func);
 	}
 	
@@ -3155,70 +3183,52 @@ bool run_room_interactions(char_data *ch, room_data *room, int type, INTERACTION
  //////////////////////////////////////////////////////////////////////////////
 //// LORE HANDLERS ///////////////////////////////////////////////////////////
 
-
 /**
 * Add lore to a character's list
 *
 * @param char_data *ch The person receiving the lore.
 * @param int type LORE_x const
-* @param int value Some lores require a value, e.g. empire id
+* @param const char *str String formatting.
+* @param ... printf-style args for str.
 */
-void add_lore(char_data *ch, int type, int value) {
+void add_lore(char_data *ch, int type, const char *str, ...) {
+	void check_delayed_load(char_data *ch);
+	
 	struct lore_data *new, *lore;
+	char text[MAX_STRING_LENGTH];
+	va_list tArgList;
 
-	if (IS_NPC(ch))
+	if (!ch || IS_NPC(ch) || !str)
 		return;
-
-	/* Clean old records automatically */
-	switch (type) {
-		case LORE_PURIFY: {
-			remove_lore(ch, LORE_PURIFY, -1);
-			break;
-		}
-		case LORE_START_VAMPIRE:
-		case LORE_SIRE_VAMPIRE: {
-			remove_lore(ch, LORE_START_VAMPIRE, -1);
-			remove_lore(ch, LORE_SIRE_VAMPIRE, -1);
-			break;
-		}
-		case LORE_JOIN_EMPIRE: {
-			remove_lore(ch, LORE_DEFECT_EMPIRE, -1);
-			remove_lore(ch, LORE_KICKED_EMPIRE, -1);
-			remove_lore(ch, LORE_FOUND_EMPIRE, -1);
-			break;
-		}
-		case LORE_DEFECT_EMPIRE:
-		case LORE_KICKED_EMPIRE: {
-			remove_lore(ch, LORE_JOIN_EMPIRE, -1);
-			remove_lore(ch, LORE_FOUND_EMPIRE, -1);
-			break;
-		}
-		case LORE_FOUND_EMPIRE: {
-			remove_lore(ch, LORE_FOUND_EMPIRE, -1);
-			remove_lore(ch, LORE_JOIN_EMPIRE, -1);
-			remove_lore(ch, LORE_KICKED_EMPIRE, -1);
-			remove_lore(ch, LORE_DEFECT_EMPIRE, -1);
-			break;
+	
+	// need the old lore, in case the player is offline
+	check_delayed_load(ch);
+	
+	// find end
+	if ((lore = GET_LORE(ch))) {
+		while (lore->next) {
+			lore = lore->next;
 		}
 	}
-
-	/* Find the last entry in ch's lore */
-	for (lore = GET_LORE(ch); lore && lore->next; lore = lore->next);
-
+	
+	va_start(tArgList, str);
+	vsprintf(text, str, tArgList);
+	
 	CREATE(new, struct lore_data, 1);
 	new->type = type;
-	new->value = value;
 	new->date = (long) time(0);
+	new->text = str_dup(text);
 	new->next = NULL;
 
-	/* If they have lore, append this to the end.  Elsewise it becomes their lore */
-	if (lore)
+	// append to end
+	if (lore) {
 		lore->next = new;
-	else
+	}
+	else {
 		GET_LORE(ch) = new;
-
-	/* And last but not least, save it */
-	write_lore(ch);
+	}
+	
+	va_end(tArgList);
 }
 
 
@@ -3259,19 +3269,16 @@ void clean_lore(char_data *ch) {
 			}
 		}
 	}
-
-	write_lore(ch);
 }
 
 
 /**
-* Remove all lore of a given type
+* Remove all lore of a given type.
 *
 * @param char_data *ch The person whose lore to remove
 * @param int type The LORE_x type to remove
-* @param int value -1 for all, otherwise it checks to only remove lore with matching value
 */
-void remove_lore(char_data *ch, int type, int value) {
+void remove_lore(char_data *ch, int type) {
 	struct lore_data *lore, *next_lore;
 
 	if (IS_NPC(ch))
@@ -3281,13 +3288,9 @@ void remove_lore(char_data *ch, int type, int value) {
 		next_lore = lore->next;
 
 		if (lore->type == type) {
-			if (value == -1 || value == lore->value) {
-				remove_lore_record(ch, lore);
-			}
+			remove_lore_record(ch, lore);
 		}
 	}
-
-	write_lore(ch);
 }
 
 
@@ -3299,6 +3302,9 @@ void remove_lore_record(char_data *ch, struct lore_data *lore) {
 		return;
 
 	REMOVE_FROM_LIST(lore, GET_LORE(ch), next);
+	if (lore->text) {
+		free(lore->text);
+	}
 	free(lore);
 }
 
@@ -3441,10 +3447,15 @@ void tag_mob(char_data *mob, char_data *player) {
 				continue;
 			}
 			
+			// never tag for someone with no descriptor
+			if (!mem->member->desc) {
+				continue;
+			}
+			
 			add_mob_tag(GET_IDNUM(mem->member), &MOB_TAGGED_BY(mob));
 		}
 	}
-	else {
+	else if (player->desc) { // never tag for someone with no descriptor
 		// just tag for player
 		add_mob_tag(GET_IDNUM(player), &MOB_TAGGED_BY(mob));
 	}
@@ -3539,10 +3550,7 @@ obj_data *copy_warehouse_obj(obj_data *input) {
 	for (iter = 0; iter < NUM_OBJ_VAL_POSITIONS; ++iter) {
 		GET_OBJ_VAL(obj, iter) = GET_OBJ_VAL(input, iter);
 	}
-	for (iter = 0; iter < MAX_OBJ_AFFECT; ++iter) {
-		obj->affected[iter].location = input->affected[iter].location;
-		obj->affected[iter].modifier = input->affected[iter].modifier;
-	}
+	GET_OBJ_APPLIES(obj) = copy_apply_list(GET_OBJ_APPLIES(input));
 	
 	return obj;
 }
@@ -3722,6 +3730,8 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 * @return bool TRUE if the two items are functionally identical.
 */
 bool objs_are_identical(obj_data *obj_a, obj_data *obj_b) {
+	struct obj_apply *a_apply, *b_list, *b_apply, *temp;
+	bool found;
 	int iter;
 	
 	if (GET_OBJ_VNUM(obj_a) != GET_OBJ_VNUM(obj_b)) {
@@ -3753,11 +3763,6 @@ bool objs_are_identical(obj_data *obj_a, obj_data *obj_b) {
 			return FALSE;
 		}
 	}
-	for (iter = 0; iter < MAX_OBJ_AFFECT; ++iter) {
-		if (obj_a->affected[iter].location != obj_b->affected[iter].location || obj_a->affected[iter].modifier != obj_b->affected[iter].modifier) {
-			return FALSE;
-		}
-	}
 	if (GET_OBJ_KEYWORDS(obj_a) != GET_OBJ_KEYWORDS(obj_b) && !str_cmp(GET_OBJ_KEYWORDS(obj_a), GET_OBJ_KEYWORDS(obj_b))) {
 		return FALSE;
 	}
@@ -3771,6 +3776,29 @@ bool objs_are_identical(obj_data *obj_a, obj_data *obj_b) {
 		return FALSE;
 	}
 	if (obj_a->ex_description != obj_b->ex_description) {
+		return FALSE;
+	}
+	
+	// to compare applies, we're going to copy and delete as we find them
+	b_list = copy_apply_list(GET_OBJ_APPLIES(obj_b));
+	for (a_apply = GET_OBJ_APPLIES(obj_a); a_apply; a_apply = a_apply->next) {
+		found = FALSE;
+		for (b_apply = b_list; b_apply; b_apply = b_apply->next) {
+			if (a_apply->location == b_apply->location && a_apply->modifier == b_apply->modifier && a_apply->apply_type == b_apply->apply_type) {
+				found = TRUE;
+				REMOVE_FROM_LIST(b_apply, b_list, next);
+				free(b_apply);
+				break;	// only need one, plus we freed it
+			}
+		}
+		
+		if (!found) {
+			free_apply_list(b_list);
+			return FALSE;
+		}
+	}
+	if (b_list) {	// more things in b_list than a
+		free_apply_list(b_list);
 		return FALSE;
 	}
 	
@@ -3864,7 +3892,9 @@ void bind_obj_to_player(obj_data *obj, char_data *ch) {
 * @param struct mob_tag *list The list of mob tags.
 */
 void bind_obj_to_tag_list(obj_data *obj, struct mob_tag *list) {
+	bool at_least_one = FALSE;
 	struct mob_tag *tag;
+	char_data *plr;
 	
 	// sanity
 	if (!obj || !list || !OBJ_FLAGGED(obj, OBJ_BIND_FLAGS)) {
@@ -3877,7 +3907,22 @@ void bind_obj_to_tag_list(obj_data *obj, struct mob_tag *list) {
 	}
 	
 	for (tag = list; tag; tag = tag->next) {
+		if (!(plr = is_playing(tag->idnum))) {
+			continue;	// don't bind to missing players
+		}
+		if (!plr->desc) {
+			continue;	// don't bind to linkdead players
+		}
 		add_obj_binding(tag->idnum, &OBJ_BOUND_TO(obj));
+		at_least_one = TRUE;
+	}
+	
+	// guarantee we bound to at least 1 -- if not, we'll have to bind to at least one anyway
+	if (list && !at_least_one) {
+		for (tag = list; tag; tag = tag->next) {
+			add_obj_binding(tag->idnum, &OBJ_BOUND_TO(obj));
+			break;
+		}
 	}
 }
 
@@ -3979,7 +4024,7 @@ void check_obj_in_void(obj_data *obj) {
 * @param int pos the WEAR_x spot to it
 */
 void equip_char(char_data *ch, obj_data *obj, int pos) {
-	int j;
+	struct obj_apply *apply;
 
 	if (pos < 0 || pos >= NUM_WEARS) {
 		log("SYSERR: Trying to equip gear to invalid position: %d", pos);
@@ -4011,8 +4056,8 @@ void equip_char(char_data *ch, obj_data *obj, int pos) {
 		}
 
 		if (wear_data[pos].count_stats) {
-			for (j = 0; j < MAX_OBJ_AFFECT; j++) {
-				affect_modify(ch, obj->affected[j].location, obj->affected[j].modifier, GET_OBJ_AFF_FLAGS(obj), TRUE);
+			for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
+				affect_modify(ch, apply->location, apply->modifier, GET_OBJ_AFF_FLAGS(obj), TRUE);
 			}
 		}
 
@@ -4036,7 +4081,7 @@ void obj_from_char(obj_data *object) {
 		REMOVE_FROM_LIST(object, object->carried_by->carrying, next_content);
 		object->next_content = NULL;
 
-		IS_CARRYING_N(object->carried_by) -= GET_OBJ_INVENTORY_SIZE(object);
+		IS_CARRYING_N(object->carried_by) -= obj_carry_size(object);
 
 		// check lights
 		if (IN_ROOM(object->carried_by) && OBJ_FLAGGED(object, OBJ_LIGHT)) {
@@ -4063,7 +4108,7 @@ void obj_from_obj(obj_data *obj) {
 		obj_from = obj->in_obj;
 		REMOVE_FROM_LIST(obj, obj_from->contains, next_content);
 
-		GET_OBJ_CARRYING_N(obj_from) -= GET_OBJ_INVENTORY_SIZE(obj);
+		GET_OBJ_CARRYING_N(obj_from) -= obj_carry_size(obj);
 
 		obj->in_obj = NULL;
 		obj->next_content = NULL;
@@ -4126,7 +4171,7 @@ void obj_to_char(obj_data *object, char_data *ch) {
 		object->next_content = ch->carrying;
 		ch->carrying = object;
 		object->carried_by = ch;
-		IS_CARRYING_N(ch) += GET_OBJ_INVENTORY_SIZE(object);
+		IS_CARRYING_N(ch) += obj_carry_size(object);
 		
 		// binding
 		if (OBJ_FLAGGED(object, OBJ_BIND_ON_PICKUP)) {
@@ -4172,7 +4217,7 @@ void obj_to_char(obj_data *object, char_data *ch) {
 * @param char_data *ch The person to try to give it to.
 */
 void obj_to_char_or_room(obj_data *obj, char_data *ch) {
-	if (!IS_NPC(ch) && IS_CARRYING_N(ch) + GET_OBJ_INVENTORY_SIZE(obj) > CAN_CARRY_N(ch) && IN_ROOM(ch)) {
+	if (!IS_NPC(ch) && !CAN_CARRY_OBJ(ch, obj) && IN_ROOM(ch)) {
 		// bind it to the player anyway, as if they received it, if it's BoP
 		if (OBJ_FLAGGED(obj, OBJ_BIND_ON_PICKUP)) {
 			bind_obj_to_player(obj, ch);
@@ -4216,7 +4261,7 @@ void obj_to_obj(obj_data *obj, obj_data *obj_to) {
 	else {
 		check_obj_in_void(obj);
 	
-		GET_OBJ_CARRYING_N(obj_to) += GET_OBJ_INVENTORY_SIZE(obj);
+		GET_OBJ_CARRYING_N(obj_to) += obj_carry_size(obj);
 
 		// set the timer here; actual rules for it are in limits.c
 		GET_AUTOSTORE_TIMER(obj) = time(0);
@@ -4312,7 +4357,7 @@ void swap_obj_for_obj(obj_data *old, obj_data *new) {
 * @return obj_data *The removed item, or NULL if there was none.
 */
 obj_data *unequip_char(char_data *ch, int pos) {	
-	int j;
+	struct obj_apply *apply;
 	obj_data *obj = NULL;
 
 	if ((pos >= 0 && pos < NUM_WEARS) && GET_EQ(ch, pos) != NULL) {
@@ -4330,8 +4375,8 @@ obj_data *unequip_char(char_data *ch, int pos) {
 
 		// un-apply affects
 		if (wear_data[pos].count_stats) {
-			for (j = 0; j < MAX_OBJ_AFFECT; j++) {
-				affect_modify(ch, obj->affected[j].location, obj->affected[j].modifier, GET_OBJ_AFF_FLAGS(obj), FALSE);
+			for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
+				affect_modify(ch, apply->location, apply->modifier, GET_OBJ_AFF_FLAGS(obj), FALSE);
 			}
 		}
 
@@ -4431,6 +4476,24 @@ bool has_custom_message(obj_data *obj, int type) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// OBJECT TARGETING HANDLERS ///////////////////////////////////////////////
+
+/**
+* Find an object in another person's share slot, by character name.
+*
+* @param char_data *ch The person looking for a shared obj.
+* @param char *arg The potential name of a PLAYER.
+*/
+obj_data *get_obj_by_char_share(char_data *ch, char *arg) {
+	char_data *targ;
+	
+	// find person by name
+	if (!(targ = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
+		return NULL;
+	}
+	
+	return GET_EQ(targ, WEAR_SHARE);
+}
+
 
 /**
 * Finds a matching object in a character's equipment.
@@ -4882,7 +4945,7 @@ void add_to_room_extra_data(room_data *room, int type, int add_value) {
 	struct room_extra_data *red;
 	
 	if ((red = find_room_extra_data(room, type))) {
-		red->value += add_value;
+		SAFE_ADD(red->value, add_value, INT_MIN, INT_MAX, TRUE);
 		
 		// delete zeroes for cleanliness
 		if (red->value == 0) {
@@ -4903,16 +4966,11 @@ void add_to_room_extra_data(room_data *room, int type, int add_value) {
 * @return struct room_extra_data* The matching entry, or NULL.
 */
 struct room_extra_data *find_room_extra_data(room_data *room, int type) {
-	struct room_extra_data *iter, *found = NULL;
-	
-	for (iter = room->extra_data; iter && !found; iter = iter->next) {
-		if (iter->type == type) {
-			found = iter;
-		}
-	}
-	
-	return found;
+	struct room_extra_data *red;
+	HASH_FIND_INT(room->extra_data, &type, red);
+	return red;
 }
+
 
 /**
 * Gets the value of an extra data type for a room; defaults to 0 if none is set.
@@ -4925,6 +4983,7 @@ int get_room_extra_data(room_data *room, int type) {
 	struct room_extra_data *red = find_room_extra_data(room, type);
 	return (red ? red->value : 0);
 }
+
 
 /**
 * Multiplies an existing room extra data value by a number.
@@ -4955,10 +5014,9 @@ void multiply_room_extra_data(room_data *room, int type, double multiplier) {
 * @param int type The ROOM_EXTRA_x type to remove.
 */
 void remove_room_extra_data(room_data *room, int type) {
-	struct room_extra_data *red, *temp;
-	
-	while ((red = find_room_extra_data(room, type))) {
-		REMOVE_FROM_LIST(red, room->extra_data, next);
+	struct room_extra_data *red = find_room_extra_data(room, type);
+	if (red) {
+		HASH_DEL(room->extra_data, red);
 		free(red);
 	}
 }
@@ -4972,21 +5030,16 @@ void remove_room_extra_data(room_data *room, int type) {
 * @param int value The value to set it to.
 */
 void set_room_extra_data(room_data *room, int type, int value) {
-	struct room_extra_data *red;
+	struct room_extra_data *red = find_room_extra_data(room, type);
 	
-	// remove any old one first
-	remove_room_extra_data(room, type);
-	
-	// only bother if non-zero -- no need to store a zero
-	if (value != 0) {
+	// create if needed
+	if (!red) {
 		CREATE(red, struct room_extra_data, 1);
 		red->type = type;
-		red->value = value;
-	
-		// add
-		red->next = room->extra_data;
-		room->extra_data = red;
+		HASH_ADD_INT(room->extra_data, type, red);
 	}
+	
+	red->value = value;
 }
 
 
@@ -5540,7 +5593,7 @@ bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_da
 		return FALSE;
 	}
 
-	if (IS_CARRYING_N(ch) + GET_OBJ_INVENTORY_SIZE(proto) > CAN_CARRY_N(ch)) {
+	if (!CAN_CARRY_OBJ(ch, proto)) {
 		msg_to_char(ch, "Your arms are full.\r\n");
 		return FALSE;
 	}

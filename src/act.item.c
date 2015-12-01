@@ -55,6 +55,7 @@ void save_trading_post();
 void trigger_distrust_from_stealth(char_data *ch, empire_data *emp);
 
 // local protos
+ACMD(do_unshare);
 room_data *find_docks(empire_data *emp, int island_id);
 int get_wear_by_item_wear(bitvector_t item_wear);
 void move_ship_to_destination(empire_data *emp, struct shipping_data *shipd, room_data *to_room);
@@ -77,7 +78,7 @@ static void wear_message(char_data *ch, obj_data *obj, int where);
 * @return bool TRUE if ch can take obj.
 */
 static bool can_take_obj(char_data *ch, obj_data *obj) {
-	if (!IS_NPC(ch) && IS_CARRYING_N(ch) + GET_OBJ_INVENTORY_SIZE(obj) > CAN_CARRY_N(ch)) {
+	if (!IS_NPC(ch) && !CAN_CARRY_OBJ(ch, obj)) {
 		act("$p: you can't carry that many items.", FALSE, ch, obj, 0, TO_CHAR);
 		return FALSE;
 	}
@@ -191,6 +192,7 @@ int get_wear_by_item_wear(bitvector_t item_wear) {
 void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	extern double get_base_dps(obj_data *weapon);
 	extern double get_weapon_speed(obj_data *weapon);
+	extern const char *apply_type_names[];
 	extern const char *extra_bits[];
 	extern const char *drinks[];
 	extern const char *affected_bits[];
@@ -199,9 +201,11 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	extern const char *wear_bits[];
 
 	struct obj_storage_type *store;
-	char lbuf[MAX_STRING_LENGTH], location[MAX_STRING_LENGTH];
+	player_index_data *index;
+	struct obj_apply *apply;
+	char lbuf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], location[MAX_STRING_LENGTH];
 	bld_data *bld;
-	int iter, found;
+	int found;
 	double rating;
 	
 	// ONLY flags to show
@@ -257,7 +261,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 		struct obj_binding *bind;		
 		msg_to_char(ch, "Bound to:");
 		for (bind = OBJ_BOUND_TO(obj); bind; bind = bind->next) {
-			msg_to_char(ch, " %s", get_name_by_id(bind->idnum) ? CAP(get_name_by_id(bind->idnum)) : "<unknown>");
+			msg_to_char(ch, " %s", (index = find_player_index_by_idnum(bind->idnum)) ? index->fullname : "<unknown>");
 		}
 		msg_to_char(ch, "\r\n");
 	}
@@ -327,7 +331,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 			else if (IS_NPC_CORPSE(obj))
 				msg_to_char(ch, "nothing.\r\n");
 			else
-				msg_to_char(ch, "%s.\r\n", get_name_by_id(GET_CORPSE_PC_ID(obj)) ? CAP(get_name_by_id(GET_CORPSE_PC_ID(obj))) : "a player");
+				msg_to_char(ch, "%s.\r\n", (index = find_player_index_by_idnum(GET_CORPSE_PC_ID(obj))) ? index->fullname : "a player");
 			break;
 		case ITEM_COINS: {
 			msg_to_char(ch, "Contains %s\r\n", money_amount(real_empire(GET_COINS_EMPIRE_ID(obj)), GET_COINS_AMOUNT(obj)));
@@ -366,10 +370,14 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	
 	
 	*lbuf = '\0';
-	for (iter = 0; iter < MAX_OBJ_AFFECT; ++iter) {
-		if (obj->affected[iter].modifier) {
-			sprintf(lbuf + strlen(lbuf), "%s%+d to %s", (*lbuf != '\0') ? ", " : "", obj->affected[iter].modifier, apply_types[(int) obj->affected[iter].location]);
+	for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
+		if (apply->apply_type != APPLY_TYPE_NATURAL) {
+			sprintf(part, " (%s)", apply_type_names[(int)apply->apply_type]);
 		}
+		else {
+			*part = '\0';
+		}
+		sprintf(lbuf + strlen(lbuf), "%s%+d to %s%s", (*lbuf != '\0') ? ", " : "", apply->modifier, apply_types[(int) apply->location], part);
 	}
 	if (*lbuf) {
 		msg_to_char(ch, "Modifiers: %s\r\n", lbuf);
@@ -417,6 +425,35 @@ INTERACTION_FUNC(light_obj_interact) {
 	}
 	
 	return TRUE;
+}
+
+
+/**
+* Gets the functional size of an object, where each object inside it adds to
+* its size. This prevents corpses and containers from being used to hold more
+* items than the normal limit.
+*/
+int obj_carry_size(obj_data *obj) {
+	obj_data *iter;
+	int size = 0;
+	
+	// my size
+	if (IS_COINS(obj)) {
+		size = 0;
+	}
+	else if (OBJ_FLAGGED(obj, OBJ_LARGE)) {
+		size = 2;
+	}
+	else {
+		size = 1;
+	}
+	
+	// size of contents
+	for (iter = obj->contains; iter; iter = iter->next_content) {
+		size += obj_carry_size(iter);
+	}
+	
+	return size;
 }
 
 
@@ -474,7 +511,7 @@ static int perform_put(char_data *ch, obj_data *obj, obj_data *cont) {
 		return 0;
 	}
 	
-	if (GET_OBJ_CARRYING_N(cont) + GET_OBJ_INVENTORY_SIZE(obj) > GET_MAX_CONTAINER_CONTENTS(cont)) {
+	if (GET_OBJ_CARRYING_N(cont) + obj_carry_size(obj) > GET_MAX_CONTAINER_CONTENTS(cont)) {
 		act("$p won't fit in $P.", FALSE, ch, obj, cont, TO_CHAR);
 		return 0;
 	}
@@ -519,7 +556,8 @@ void perform_remove(char_data *ch, int pos) {
 static void perform_wear(char_data *ch, obj_data *obj, int where) {
 	extern const int apply_attribute[];
 	extern const int primary_attributes[];
-	int iter, app, type, val;
+	struct obj_apply *apply;
+	int iter, type, val;
 
 	/* first, make sure that the wear position is valid. */
 	if (!CAN_WEAR(obj, wear_data[where].item_wear)) {
@@ -532,22 +570,6 @@ static void perform_wear(char_data *ch, obj_data *obj, int where) {
 		where = wear_data[where].cascade_pos;
 	}
 	
-	// check weakness (check all applies first, in case they contradict like -1str +2str)
-	for (iter = 0; primary_attributes[iter] != NOTHING; ++iter) {
-		type = primary_attributes[iter];
-		val = GET_ATT(ch, type);
-		for (app = 0; app < MAX_OBJ_AFFECT; app++) {
-			if (apply_attribute[(int) obj->affected[app].location] == type) {
-				val += obj->affected[app].modifier;
-			}
-		}
-		
-		if (val < 1) {
-			act("You are too weak to use $p!", FALSE, ch, obj, 0, TO_CHAR);
-			return;
-		}
-	}
-	
 	if (where == WEAR_SADDLE && !IS_RIDING(ch)) {
 		msg_to_char(ch, "You can't wear a saddle while you're not riding anything.\r\n");
 		return;
@@ -557,10 +579,29 @@ static void perform_wear(char_data *ch, obj_data *obj, int where) {
 		act(wear_data[where].already_wearing, FALSE, ch, GET_EQ(ch, where), NULL, TO_CHAR);
 		return;
 	}
+	
+	// some checks are only needed when the slot counts for stats
+	if (wear_data[where].count_stats) {
+		// check weakness (check all applies first, in case they contradict like -1str +2str)
+		for (iter = 0; primary_attributes[iter] != NOTHING; ++iter) {
+			type = primary_attributes[iter];
+			val = GET_ATT(ch, type);
+			for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
+				if (apply_attribute[(int) apply->location] == type) {
+					val += apply->modifier;
+				}
+			}
+		
+			if (val < 1) {
+				act("You are too weak to use $p!", FALSE, ch, obj, 0, TO_CHAR);
+				return;
+			}
+		}
 
-	/* See if a trigger disallows it */
-	if (!wear_otrigger(obj, ch, where) || (obj->carried_by != ch)) {
-		return;
+		/* See if a trigger disallows it */
+		if (!wear_otrigger(obj, ch, where) || (obj->carried_by != ch)) {
+			return;
+		}
 	}
 
 	wear_message(ch, obj, where);
@@ -756,7 +797,7 @@ static bool perform_get_from_container(char_data *ch, obj_data *obj, obj_data *c
 			return FALSE;
 		}
 	}
-	if (!IS_NPC(ch) && IS_CARRYING_N(ch) + GET_OBJ_INVENTORY_SIZE(obj) > CAN_CARRY_N(ch)) {
+	if (!IS_NPC(ch) && !CAN_CARRY_OBJ(ch, obj)) {
 		act("$p: you can't hold any more items.", FALSE, ch, obj, 0, TO_CHAR);
 		return FALSE;
 	}
@@ -879,7 +920,7 @@ static bool perform_get_from_room(char_data *ch, obj_data *obj) {
 			return FALSE;
 		}
 	}
-	if (!IS_NPC(ch) && IS_CARRYING_N(ch) + GET_OBJ_INVENTORY_SIZE(obj) > CAN_CARRY_N(ch)) {
+	if (!IS_NPC(ch) && !CAN_CARRY_OBJ(ch, obj)) {
 		act("$p: you can't hold any more items.", FALSE, ch, obj, 0, TO_CHAR);
 		return FALSE;
 	}
@@ -1004,7 +1045,7 @@ static void perform_give(char_data *ch, char_data *vict, obj_data *obj) {
 	}
 	
 	// NPCs usually have no carry limit, but 'give' is an exception because otherwise crazy ensues
-	if (IS_CARRYING_N(vict) + GET_OBJ_INVENTORY_SIZE(obj) > CAN_CARRY_N(vict)) {
+	if (!CAN_CARRY_OBJ(vict, obj)) {
 		act("$N seems to have $S hands full.", FALSE, ch, 0, vict, TO_CHAR);
 		return;
 	}
@@ -1225,6 +1266,7 @@ void scale_item_to_level(obj_data *obj, int level) {
 	double share, this_share, points_to_give, per_point;
 	room_data *room = NULL;
 	obj_data *top_obj, *proto;
+	struct obj_apply *apply, *next_apply, *temp;
 	bitvector_t bits;
 	
 	// configure this here
@@ -1305,10 +1347,10 @@ void scale_item_to_level(obj_data *obj, int level) {
 	// end helper
 	
 	// first check applies, count share/bonus
-	for (iter = 0; iter < MAX_OBJ_AFFECT; ++iter) {
+	for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
 		// TODO non-scalable traits should be an array
-		if (obj->affected[iter].location != APPLY_NONE && obj->affected[iter].location != APPLY_GREATNESS && obj->affected[iter].location != APPLY_CRAFTING) {
-			SHARE_OR_BONUS(obj->affected[iter].modifier);
+		if (apply->location != APPLY_GREATNESS && apply->location != APPLY_CRAFTING) {
+			SHARE_OR_BONUS(apply->modifier);
 		}
 	}
 	
@@ -1470,23 +1512,31 @@ void scale_item_to_level(obj_data *obj, int level) {
 	}
 	
 	// distribute points: applies
-	for (iter = 0; iter < MAX_OBJ_AFFECT; ++iter) {
+	for (apply = GET_OBJ_APPLIES(obj); apply; apply = next_apply) {
+		next_apply = apply->next;
+		
 		// TODO non-scalable traits should be an array
-		if (obj->affected[iter].location != APPLY_NONE && obj->affected[iter].location != APPLY_GREATNESS && obj->affected[iter].location != APPLY_CRAFTING) {
+		if (apply->location != APPLY_GREATNESS && apply->location != APPLY_CRAFTING) {
 			this_share = MAX(0, MIN(share, points_to_give));
 			// raw amount
-			per_point = (1.0 / apply_values[(int)obj->affected[iter].location]);
+			per_point = (1.0 / apply_values[(int)apply->location]);
 			
-			if (obj->affected[iter].modifier > 0) {
+			if (apply->modifier > 0) {
 				// positive benefit
-				amt = round(this_share * obj->affected[iter].modifier * per_point);
-				points_to_give -= round(this_share * obj->affected[iter].modifier);
-				obj->affected[iter].modifier = amt;
+				amt = round(this_share * apply->modifier * per_point);
+				points_to_give -= round(this_share * apply->modifier);
+				apply->modifier = amt;
 			}
-			else if (obj->affected[iter].modifier < 0) {
+			else if (apply->modifier < 0) {
 				// penalty: does not cost from points_to_give
-				obj->affected[iter].modifier = round(obj->affected[iter].modifier * per_point);
+				apply->modifier = round(apply->modifier * per_point);
 			}
+		}
+		
+		// remove zero-applies
+		if (apply->modifier == 0) {
+			REMOVE_FROM_LIST(apply, GET_OBJ_APPLIES(obj), next);
+			free(apply);
 		}
 	}
 	
@@ -1774,9 +1824,9 @@ obj_data *find_free_ship(empire_data *emp, struct shipping_data *shipd) {
 room_data *get_ship_pen(void) {
 	extern room_data *create_room();
 
-	room_data *room, *iter, *next_iter;
+	room_data *room, *iter;
 	
-	HASH_ITER(interior_hh, interior_world_table, iter, next_iter) {
+	for (iter = interior_room_list; iter; iter = iter->next_interior) {
 		if (GET_BUILDING(iter) && GET_BLD_VNUM(GET_BUILDING(iter)) == RTYPE_SHIP_HOLDING_PEN) {
 			return iter;
 		}
@@ -2023,7 +2073,7 @@ void sail_shipment(empire_data *emp, obj_data *boat) {
 * @return bool TRUE if the ship is empty, FALSE if it has players inside.
 */
 bool ship_is_empty(obj_data *ship) {
-	room_data *ship_room, *iter, *next_iter;
+	room_data *ship_room, *iter;
 	char_data *ch;
 	
 	if (!ship || !IS_SHIP(ship) || !(ship_room = real_room(GET_SHIP_MAIN_ROOM(ship)))) {
@@ -2031,7 +2081,7 @@ bool ship_is_empty(obj_data *ship) {
 	}
 	
 	// check all interior rooms
-	HASH_ITER(interior_hh, interior_world_table, iter, next_iter) {
+	for (iter = interior_room_list; iter; iter = iter->next_interior) {
 		if (HOME_ROOM(iter) != ship_room) {
 			continue;
 		}
@@ -2263,7 +2313,7 @@ void trade_buy(char_data *ch, char *argument) {
 			msg_to_char(ch, "You can't afford the cost of %s.\r\n", money_amount(coin_emp, tpd->buy_cost));
 			return;
 		}
-		if (IS_CARRYING_N(ch) + GET_OBJ_INVENTORY_SIZE(tpd->obj) > CAN_CARRY_N(ch)) {
+		if (!CAN_CARRY_OBJ(ch, tpd->obj)) {
 			msg_to_char(ch, "Your inventory is too full to buy that.\r\n");
 			return;
 		}
@@ -2399,7 +2449,7 @@ void trade_collect(char_data *ch, char *argument) {
 		}
 		if (IS_SET(tpd->state, TPD_EXPIRED) && IS_SET(tpd->state, TPD_OBJ_PENDING)) {
 			if (tpd->obj) {
-				if (IS_CARRYING_N(ch) + GET_OBJ_INVENTORY_SIZE(tpd->obj) > CAN_CARRY_N(ch)) {
+				if (!CAN_CARRY_OBJ(ch, tpd->obj)) {
 					full = TRUE;
 					continue;	// EARLY CONTINUE IN THE LOOP
 				}
@@ -2846,7 +2896,7 @@ void warehouse_retrieve(char_data *ch, char *argument) {
 		
 		// load the actual objs
 		while (!done && iter->amount > 0 && (all || amt-- > 0)) {
-			if (iter->obj && IS_CARRYING_N(ch) + GET_OBJ_INVENTORY_SIZE(iter->obj) > CAN_CARRY_N(ch)) {
+			if (iter->obj && !CAN_CARRY_OBJ(ch, iter->obj)) {
 				msg_to_char(ch, "Your arms are full.\r\n");
 				done = TRUE;
 				break;
@@ -3390,7 +3440,7 @@ ACMD(do_eat) {
 	if (!(food = get_obj_in_list_vis(ch, arg, ch->carrying))) {
 		if (!(food = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
 			// special case: Taste Blood
-			if (subcmd == SCMD_TASTE && IS_VAMPIRE(ch) && HAS_ABILITY(ch, ABIL_TASTE_BLOOD) && (vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
+			if (subcmd == SCMD_TASTE && IS_VAMPIRE(ch) && has_ability(ch, ABIL_TASTE_BLOOD) && (vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
 				if (check_vampire_sun(ch, TRUE) && !ABILITY_TRIGGERS(ch, vict, NULL, ABIL_TASTE_BLOOD)) {
 					taste_blood(ch, vict);
 				}
@@ -3782,7 +3832,7 @@ ACMD(do_grab) {
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs may not hold items.\r\n");
 	}
-	if (!*arg)
+	else if (!*arg)
 		send_to_char("Hold what?\r\n", ch);
 	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
 		sprintf(buf, "You don't seem to have %s %s.\r\n", AN(arg), arg);
@@ -3925,7 +3975,7 @@ ACMD(do_keep) {
 
 ACMD(do_light) {
 	obj_data *obj, *flint = NULL;
-	bool magic = !IS_NPC(ch) && HAS_ABILITY(ch, ABIL_TOUCH_OF_FLAME);
+	bool magic = !IS_NPC(ch) && has_ability(ch, ABIL_TOUCH_OF_FLAME);
 
 	one_argument(argument, arg);
 
@@ -4461,10 +4511,10 @@ ACMD(do_roadsign) {
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs can't use roadsign.\r\n");
 	}
-	else if (GET_SKILL(ch, SKILL_EMPIRE) <= BASIC_SKILL_CAP) {
+	else if (get_skill_level(ch, SKILL_EMPIRE) <= BASIC_SKILL_CAP) {
 		msg_to_char(ch, "You need the Roads ability and an Empire skill of at least %d to set up road signs.\r\n", BASIC_SKILL_CAP+1);
 	}
-	else if (!HAS_ABILITY(ch, ABIL_ROADS)) {
+	else if (!has_ability(ch, ABIL_ROADS)) {
 		msg_to_char(ch, "You must purchase the Roads ability to set up road signs.\r\n");
 	}
 	else if (!IS_ROAD(IN_ROOM(ch)) || !IS_COMPLETE(IN_ROOM(ch))) {
@@ -4479,7 +4529,7 @@ ACMD(do_roadsign) {
 	else if (!*argument) {
 		msg_to_char(ch, "Usage: roadsign <message>\r\n");
 	}
-	else if ((strlen(argument) - (2 * count_color_codes(argument))) > max_length) {
+	else if (color_strlen(argument) > max_length) {
 		msg_to_char(ch, "Road signs can't be more than %d characters long.\r\n", max_length);
 	}
 	else {
@@ -4498,6 +4548,30 @@ ACMD(do_roadsign) {
 
 		gain_ability_exp(ch, ABIL_ROADS, 33.4);
 		extract_obj(sign);
+	}
+}
+
+
+// does not call can_wear_item() since the item doesn't count stats
+ACMD(do_share) {
+	obj_data *obj;
+	
+	one_argument(argument, arg);
+	
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "NPCs may not share items.\r\n");
+	}
+	else if (!*arg) {
+		msg_to_char(ch, "Share what?\r\n");
+	}
+	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
+	}
+	else {
+		if (GET_EQ(ch, WEAR_SHARE)) {
+			do_unshare(ch, "", 0, 0);
+		}
+		perform_wear(ch, obj, WEAR_SHARE);
 	}
 }
 
@@ -4913,6 +4987,23 @@ ACMD(do_trade) {
 	}
 	else {
 		msg_to_char(ch, "Usage: trade <check | list | buy | cancel | collect | identify | post>\r\n");
+	}
+}
+
+
+ACMD(do_unshare) {
+	if (!GET_EQ(ch, WEAR_SHARE)) {
+		msg_to_char(ch, "You are not sharing anything.\r\n");
+	}
+	else {
+		// we don't perform_remove() because it checks things we don't need to check, and we want a custom message
+		
+		act("You stop sharing $p.", FALSE, ch, GET_EQ(ch, WEAR_SHARE), 0, TO_CHAR);
+		act("$n stops sharing $p.", TRUE, ch, GET_EQ(ch, WEAR_SHARE), 0, TO_ROOM);
+		
+		// this may extract it, or drop it
+		unequip_char_to_inventory(ch, WEAR_SHARE);
+		determine_gear_level(ch);
 	}
 }
 

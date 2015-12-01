@@ -450,7 +450,7 @@ bool mob_can_move_to_sect(char_data *mob, room_data *to_room) {
 * @return TRUE if the move is valid, FALSE otherwise
 */
 bool validate_mobile_move(char_data *ch, int dir, room_data *to_room) {
-	void empire_skillup(empire_data *emp, int ability, double amount);
+	void empire_skillup(empire_data *emp, any_vnum ability, double amount);
 	
 	empire_data *ch_emp = GET_LOYALTY(ch);
 	empire_data *room_emp = ROOM_OWNER(to_room);
@@ -650,7 +650,7 @@ void mobile_activity(void) {
 				}
 				
 				// ok good to go
-				if (affected_by_spell(vict, ATYPE_MAJESTY) && !AFF_FLAGGED(ch, AFF_IMMUNE_VAMPIRE)) {
+				if (affected_by_spell(vict, ATYPE_MAJESTY) && !AFF_FLAGGED(ch, AFF_IMMUNE_VAMPIRE) && can_gain_exp_from(vict, ch)) {
 					gain_ability_exp(vict, ABIL_MAJESTY, 10);
 				}
 				if (!CHECK_MAJESTY(vict) || AFF_FLAGGED(ch, AFF_IMMUNE_VAMPIRE)) {
@@ -708,7 +708,7 @@ void mobile_activity(void) {
 								// check friendly first -- so we don't attack someone who's friendly
 								if (!empire_is_friendly(chemp, victemp) && can_fight(ch, vict)) {
 									if (IS_HOSTILE(vict) || (!IS_DISGUISED(vict) && empire_is_hostile(chemp, victemp, IN_ROOM(ch)))) {
-										if (affected_by_spell(vict, ATYPE_MAJESTY) && !AFF_FLAGGED(ch, AFF_IMMUNE_VAMPIRE)) {
+										if (affected_by_spell(vict, ATYPE_MAJESTY) && !AFF_FLAGGED(ch, AFF_IMMUNE_VAMPIRE) && can_gain_exp_from(vict, ch)) {
 											gain_ability_exp(vict, ABIL_MAJESTY, 10);
 										}
 									
@@ -857,7 +857,7 @@ static void spawn_one_room(room_data *room) {
 			list = GET_BLD_SPAWNS(GET_BUILDING(room));
 		}
 	}
-	else if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && (cp = crop_proto(ROOM_CROP_TYPE(room)))) {
+	else if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && (cp = ROOM_CROP(room))) {
 		list = GET_CROP_SPAWNS(cp);
 	}
 	else {
@@ -922,7 +922,9 @@ static void spawn_one_room(room_data *room) {
 
 	// spawn interior rooms: recursively
 	if (GET_INSIDE_ROOMS(room) > 0) {
-		HASH_ITER(interior_hh, interior_world_table, iter, next_iter) {
+		for (iter = interior_room_list; iter; iter = next_iter) {
+			next_iter = iter->next_interior;
+			
 			if (HOME_ROOM(iter) == room && iter != room) {
 				spawn_one_room(iter);
 			}

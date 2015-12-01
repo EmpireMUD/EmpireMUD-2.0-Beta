@@ -19,7 +19,6 @@
 #include "db.h"
 #include "utils.h"
 #include "handler.h"
-#include "mail.h"
 #include "utils.h"
 #include "olc.h"
 #include "skills.h"
@@ -38,6 +37,7 @@
 */
 
 // external funcs
+void parse_archetype_menu(descriptor_data *desc, char *argument);
 
 // locals
 void set_creation_state(descriptor_data *d, int state);
@@ -147,7 +147,6 @@ ACMD(do_elog);
 ACMD(do_emotd);
 ACMD(do_empire_inventory);
 ACMD(do_empires);
-ACMD(do_enchant);
 ACMD(do_enervate);
 ACMD(do_enroll);
 ACMD(do_entangle);
@@ -181,6 +180,7 @@ ACMD(do_fullsave);
 
 ACMD(do_gather);
 ACMD(do_gecho);
+ACMD(do_gen_augment);
 ACMD(do_gen_craft);
 ACMD(do_gen_door);
 ACMD(do_gen_ps);
@@ -274,6 +274,7 @@ ACMD(do_pick);
 ACMD(do_pickpocket);
 ACMD(do_plant);
 ACMD(do_play);
+ACMD(do_playerdelete);
 ACMD(do_pledge);
 ACMD(do_point);
 ACMD(do_poofset);
@@ -337,6 +338,7 @@ ACMD(do_selfdelete);
 ACMD(do_set);
 ACMD(do_shadowcage);
 ACMD(do_shadowstep);
+ACMD(do_share);
 ACMD(do_shear);
 ACMD(do_sheathe);
 ACMD(do_ship);
@@ -400,6 +402,7 @@ ACMD(do_unban);
 ACMD(do_unbind);
 ACMD(do_unload_boat);
 ACMD(do_unpublicize);
+ACMD(do_unshare);
 ACMD(do_upgrade);
 ACMD(do_use);
 ACMD(do_users);
@@ -633,7 +636,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( ":", POS_RESTING, do_echo, NO_MIN, CTYPE_COMM, SCMD_EMOTE ),
 	SCMD_CMD( "empirehistory", POS_DEAD, do_history, NO_MIN, CTYPE_COMM, CHANNEL_HISTORY_EMPIRE ),
 	SCMD_CMD( "ehistory", POS_DEAD, do_history, NO_MIN, CTYPE_COMM, CHANNEL_HISTORY_EMPIRE ),
-	STANDARD_CMD( "enchant", POS_STANDING, do_enchant, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_SKILL, CMD_NO_ANIMALS, NO_ABIL ),
+	STANDARD_CMD( "enchant", POS_STANDING, do_gen_augment, NO_MIN, NO_GRANTS, AUGMENT_ENCHANTMENT, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	ABILITY_CMD( "enervate", POS_FIGHTING, do_enervate, NO_MIN, CTYPE_COMBAT, ABIL_ENERVATE ),
 	SIMPLE_CMD( "enter", POS_STANDING, do_enter, NO_MIN, CTYPE_MOVE ),
 	ABILITY_CMD( "entangle", POS_FIGHTING, do_entangle, NO_MIN, CTYPE_COMBAT, ABIL_ENTANGLE ),
@@ -700,6 +703,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "hit", POS_FIGHTING, do_hit, NO_MIN, CTYPE_COMBAT, SCMD_HIT ),
 	SIMPLE_CMD( "hold", POS_RESTING, do_grab, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "home", POS_SLEEPING, do_home, LVL_APPROVED, CTYPE_UTIL ),
+	STANDARD_CMD( "hone", POS_STANDING, do_gen_augment, NO_MIN, NO_GRANTS, AUGMENT_HONE, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	GRANT_CMD( "hostile", POS_DEAD, do_hostile, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_HOSTILE ),
 	ABILITY_CMD( "howl", POS_FIGHTING, do_howl, NO_MIN, CTYPE_SKILL, ABIL_HOWL ),
 
@@ -785,6 +789,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "pick", POS_STANDING, do_pick, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	STANDARD_CMD( "pickpocket", POS_STANDING, do_pickpocket, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_COMBAT, CMD_STAY_HIDDEN, ABIL_PICKPOCKET ),
 	STANDARD_CMD( "play", POS_STANDING, do_play, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
+	STANDARD_CMD( "playerdelete", POS_SLEEPING, do_playerdelete, LVL_CIMPL, GRANT_PLAYERDELETE, NO_SCMD, CTYPE_IMMORTAL, CMD_NO_ABBREV, NO_ABIL ),
 	STANDARD_CMD( "plant", POS_STANDING, do_plant, LVL_APPROVED, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "pledge", POS_SLEEPING, do_pledge, LVL_APPROVED, CTYPE_EMPIRE ),
 	SIMPLE_CMD( "point", POS_RESTING, do_point, NO_MIN, CTYPE_UTIL ),
@@ -857,6 +862,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	GRANT_CMD( "send", POS_SLEEPING, do_send, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_SEND ),
 	GRANT_CMD( "set", POS_DEAD, do_set, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_SET ),
 	STANDARD_CMD( "sew", POS_STANDING, do_gen_craft, LVL_APPROVED, NO_GRANTS, CRAFT_TYPE_SEW, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
+	SIMPLE_CMD( "share", POS_RESTING, do_share, NO_MIN, CTYPE_UTIL ),
 	ABILITY_CMD( "shadowcage", POS_FIGHTING, do_shadowcage, NO_MIN, CTYPE_SKILL, ABIL_SHADOWCAGE ),
 	ABILITY_CMD( "shadowstep", POS_STANDING, do_shadowstep, NO_MIN, CTYPE_MOVE, ABIL_SHADOWSTEP ),
 	STANDARD_CMD( "shear", POS_STANDING, do_shear, LVL_APPROVED, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
@@ -933,6 +939,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "untie", POS_STANDING, do_tie, NO_MIN, NO_GRANTS, TRUE, CTYPE_COMBAT, CMD_NO_ANIMALS, NO_ABIL ),
 	GRANT_CMD( "unban", POS_DEAD, do_unban, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_BAN ),
 	SIMPLE_CMD( "unpublicize", POS_DEAD, do_unpublicize, LVL_APPROVED, CTYPE_EMPIRE ),
+	SIMPLE_CMD( "unshare", POS_RESTING, do_unshare, NO_MIN, CTYPE_UTIL ),
 	SCMD_CMD( "uptime", POS_DEAD, do_date, LVL_START_IMM, CTYPE_IMMORTAL, SCMD_UPTIME ),
 	SIMPLE_CMD( "upgrade", POS_STANDING, do_upgrade, LVL_APPROVED, CTYPE_BUILD ),
 	SIMPLE_CMD( "use", POS_RESTING, do_use, NO_MIN, CTYPE_MOVE ),
@@ -1065,7 +1072,7 @@ void command_interpreter(char_data *ch, char *argument) {
 			continue;
 		}
 		// NPCs can use ability commands IF they aren't charmed; players require the ability
-		if (cmd_info[cmd].ability != NO_ABIL && (IS_NPC(ch) ? AFF_FLAGGED(ch, AFF_CHARM) : !HAS_ABILITY(ch, cmd_info[cmd].ability))) {
+		if (cmd_info[cmd].ability != NO_ABIL && (IS_NPC(ch) ? AFF_FLAGGED(ch, AFF_CHARM) : !has_ability(ch, cmd_info[cmd].ability))) {
 			continue;
 		}
 		
@@ -1092,7 +1099,7 @@ void command_interpreter(char_data *ch, char *argument) {
 		// otherwise, no match
 		send_config_msg(ch, "huh_string");
 	}
-	else if (!IS_NPC(ch) && PLR_FLAGGED(ch, PLR_FROZEN))
+	else if (!IS_NPC(ch) && ACCOUNT_FLAGGED(ch, ACCT_FROZEN))
 		send_to_char("You try, but the mind-numbing cold prevents you...\r\n", ch);
 	else if (IS_SET(cmd_info[cmd].flags, CMD_NOT_RP) && !IS_NPC(ch) && !IS_GOD(ch) && !IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_RP)) {
 		msg_to_char(ch, "You can't do that while role-playing!\r\n");
@@ -1316,7 +1323,6 @@ int perform_alias(descriptor_data *d, char *orig) {
 /* The interface to the outside world: do_alias */
 ACMD(do_alias) {
 	extern char *show_color_codes(char *string);
-	void write_aliases(char_data *ch);
 	
 	char *repl;
 	struct alias_data *a, *temp;
@@ -1351,7 +1357,6 @@ ACMD(do_alias) {
 			}
 			else {
 				send_to_char("Alias deleted.\r\n", ch);
-				write_aliases(ch);
 			}
 		}
 		else {			/* otherwise, either add or redefine an alias */
@@ -1370,7 +1375,6 @@ ACMD(do_alias) {
 			a->next = GET_ALIASES(ch);
 			GET_ALIASES(ch) = a;
 			send_to_char("Alias added.\r\n", ch);
-			write_aliases(ch);
 		}
 	}
 }
@@ -1451,7 +1455,7 @@ ACMD(do_commands) {
 	/* cmd_num starts at 1, not 0, to remove 'RESERVED' */
 	for (no = 1, cmd_num = 1; cmd_num < num_of_cmds; cmd_num++) {
 		i = cmd_sort_info[cmd_num].sort_pos;
-		if (cmd_info[i].minimum_level >= 0 && (cmd_info[i].ability == NO_ABIL || HAS_ABILITY(vict, cmd_info[i].ability)) && (GET_ACCESS_LEVEL(vict) >= cmd_info[i].minimum_level || (cmd_info[i].grants != NO_GRANTS && IS_GRANTED(ch, cmd_info[i].grants))) && (cmd_info[i].minimum_level >= LVL_GOD) == wizhelp) {
+		if (cmd_info[i].minimum_level >= 0 && (cmd_info[i].ability == NO_ABIL || has_ability(vict, cmd_info[i].ability)) && (GET_ACCESS_LEVEL(vict) >= cmd_info[i].minimum_level || (cmd_info[i].grants != NO_GRANTS && IS_GRANTED(ch, cmd_info[i].grants))) && (cmd_info[i].minimum_level >= LVL_GOD) == wizhelp) {
 			if (!IS_SET(cmd_info[i].flags, CMD_IMM_OR_MOB_ONLY) || GET_ACCESS_LEVEL(vict) >= LVL_START_IMM || IS_NPC(vict)) {
 				sprintf(buf + strlen(buf), "%-15s", cmd_info[i].command);
 				if (!(no % 5))
@@ -1525,6 +1529,7 @@ struct {
 	{ CON_Q_ALT_PASSWORD },
 	
 	{ CON_Q_ARCHETYPE },
+	{ CON_ARCHETYPE_CNFRM },
 	{ CON_BONUS_CREATION },
 	
 	{ CON_PROMO_CODE },
@@ -1544,10 +1549,6 @@ struct {
 * @param descriptor_data *d the user
 */
 void prompt_creation(descriptor_data *d) {
-	extern const struct archetype_type archetype[];
-	
-	int iter;
-	
 	switch (STATE(d)) {
 		case CON_Q_SCREEN_READER: {
 			SEND_TO_Q("\r\nEmpireMUD makes heavy use of an ascii map, but also supports screen\r\n", d);
@@ -1605,14 +1606,15 @@ void prompt_creation(descriptor_data *d) {
 			break;
 		}
 		case CON_Q_ARCHETYPE: {
-			SEND_TO_Q("\r\nChoose your character background:\r\n", d);
-			for (iter = 1; str_cmp(archetype[iter].name, "\n"); iter++) {
-				sprintf(buf, " %2d. %s - %s\r\n", iter, archetype[iter].name, archetype[iter].description);
-				SEND_TO_Q(buf, d);
-			}
-			SEND_TO_Q("\r\n", d);
-			SEND_TO_Q("&c[ HINT: These are only your starting traits; you can still learn any skill ]&0\r\n", d);
-			SEND_TO_Q("Choose a number or type 'help <number>' for info > ", d);
+			parse_archetype_menu(d, "");
+			break;
+		}
+		case CON_ARCHETYPE_CNFRM: {
+			void display_archetype_info(descriptor_data *desc, archetype_data *arch);
+			archetype_data *arch = archetype_proto(CREATION_ARCHETYPE(d->character));
+			
+			display_archetype_info(d, arch);
+			msg_to_desc(d, "\r\nIs this correct (y/n)? ");
 			break;
 		}
 		case CON_PROMO_CODE: {
@@ -1637,48 +1639,6 @@ void prompt_creation(descriptor_data *d) {
 			break;
 		}
 	}
-}
-
-
-/**
-* Shows archetype detail to the player. This leaves them with an "ENTER to
-* list choices again".
-*
-* @param descriptor_data *d the player who is at character creation
-* @param int type Any archetype number
-*/
-void display_archetype_help(descriptor_data *d, int type) {
-	extern const struct archetype_type archetype[];
-	extern const struct attribute_data_type attributes[NUM_ATTRIBUTES];
-	
-	char lbuf[MAX_STRING_LENGTH];
-	int iter;
-	
-	SEND_TO_Q("\r\n", d);
-	msg_to_desc(d, "\r\nMore information on &c%s&0:\r\n", archetype[type].name);
-
-	if (archetype[type].primary_skill != NO_SKILL) {
-		msg_to_desc(d, "* %s\r\n", skill_data[archetype[type].primary_skill].creation_description);
-	}
-	if (archetype[type].secondary_skill != NO_SKILL) {
-		msg_to_desc(d, "* %s\r\n", skill_data[archetype[type].secondary_skill].creation_description);
-	}
-	
-	*lbuf = '\0';
-	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
-		// save all attributes for later
-		sprintf(lbuf + strlen(lbuf), "%s%s %d", (*lbuf ? ", " : ""), attributes[iter].name, archetype[type].attributes[iter]);
-		
-		// highlight high attributes
-		if (archetype[type].attributes[iter] >= 3) {
-			msg_to_desc(d, "* %s\r\n", attributes[iter].creation_description);
-		}
-	}
-	
-	msg_to_desc(d, "Attributes: %s\r\n", lbuf);
-	
-	msg_to_desc(d, "\r\n(Remember these are just starting traits and you can learn any skill later)\r\n");
-	msg_to_desc(d, "Press ENTER to list the choices again: ");
 }
 
 
@@ -1708,14 +1668,14 @@ void next_creation_step(descriptor_data *d) {
 
 // Handler for CON_Q_ALT_NAME
 void process_alt_name(descriptor_data *d, char *arg) {
-	int id;
+	player_index_data *index;
 	
 	if (!*arg) {
 		// nothing -- send back to has-alt
 		set_creation_state(d, CON_Q_HAS_ALT);
 	}
-	else if ((id = get_id_by_name(arg)) != NOTHING) {
-		GET_CREATION_ALT_ID(d->character) = id;
+	else if ((index = find_player_index_by_name(arg))) {
+		GET_CREATION_ALT_ID(d->character) = index->idnum;
 		next_creation_step(d);
 	}
 	else {
@@ -1725,17 +1685,16 @@ void process_alt_name(descriptor_data *d, char *arg) {
 
 
 // Handler for CON_Q_ALT_PASSWORD
-void process_alt_password(descriptor_data *d, char *arg) {
-	extern int new_account_id(void);
-	
+void process_alt_password(descriptor_data *d, char *arg) {	
 	char_data *alt = NULL;
 	bool file = FALSE, save = FALSE;
+	player_index_data *index;
 
 	if (!*arg) {
 		// nothing -- send back to has-alt
 		set_creation_state(d, CON_Q_HAS_ALT);
 	}	
-	else if ((alt = find_or_load_player(get_name_by_id(GET_CREATION_ALT_ID(d->character)), &file))) {		
+	else if ((index = find_player_index_by_idnum(GET_CREATION_ALT_ID(d->character))) && (alt = find_or_load_player(index->name, &file))) {
 		// loaded char, now check password
 		if (strncmp(CRYPT(arg, PASSWORD_SALT), GET_PASSWD(alt), MAX_PWD_LENGTH)) {
 			syslog(SYS_LOGIN, 0, TRUE, "BAD PW: unable to register alt %s for %s [%s]", GET_NAME(d->character), GET_NAME(alt), d->host);
@@ -1755,15 +1714,11 @@ void process_alt_password(descriptor_data *d, char *arg) {
 			syslog(SYS_LOGIN, 0, TRUE, "NEW: associating new user %s with account for %s", GET_NAME(d->character), GET_NAME(alt));
 			
 			// does 2nd player have an account already? if not, make one
-			if (GET_ACCOUNT_ID(alt) == 0) {
-				GET_ACCOUNT_ID(alt) = new_account_id();
-				GET_ACCOUNT_ID(d->character) = GET_ACCOUNT_ID(alt);
+			if (!GET_ACCOUNT(alt)) {
+				create_account_for_player(alt);
 				save = TRUE;
 			}
-			else {
-				// already has acct
-				GET_ACCOUNT_ID(d->character) = GET_ACCOUNT_ID(alt);
-			}
+			GET_TEMPORARY_ACCOUNT_ID(d->character) = GET_ACCOUNT(alt)->id;
 			
 			next_creation_step(d);
 		}
@@ -1845,22 +1800,25 @@ void start_creation_process(descriptor_data *d) {
 bool check_multiplaying(descriptor_data *d) {
 	descriptor_data *c;
 	bool ok = TRUE;
-
-	if (IS_IMMORTAL(d->character))
+	
+	if (ACCOUNT_FLAGGED(d->character, ACCT_MULTI_CHAR)) {
 		return TRUE;
-
-	if (PLR_FLAGGED(d->character, PLR_MULTIOK | PLR_IPMASK))
-		return TRUE;
-
+	}
+	
 	/* Check for connected players with identical hosts */
-	for (c = descriptor_list; c; c = c->next) {
-		if (c != d && STATE(c) == CON_PLAYING && !PLR_FLAGGED(c->character, PLR_MULTIOK) && GET_IDNUM(c->character) != GET_IDNUM(d->character)) {
-			if (!str_cmp(c->host, d->host) || (GET_ACCOUNT_ID(d->character) != 0 && GET_ACCOUNT_ID(d->character) == GET_ACCOUNT_ID(c->character))) {
-				ok = FALSE;
-			}
+	for (c = descriptor_list; c && ok; c = c->next) {
+		if (c == d || STATE(c) != CON_PLAYING || GET_IDNUM(c->character) == GET_IDNUM(d->character)) {
+			continue;
+		}
+		
+		if (!ACCOUNT_FLAGGED(d->character, ACCT_MULTI_CHAR) && GET_ACCOUNT(d->character) == GET_ACCOUNT(c->character)) {
+			ok = FALSE;
+		}
+		else if (!ACCOUNT_FLAGGED(d->character, ACCT_MULTI_IP | ACCT_MULTI_CHAR) && !ACCOUNT_FLAGGED(c->character, ACCT_MULTI_IP | ACCT_MULTI_CHAR) && !PLR_FLAGGED(d->character, PLR_IPMASK) && !strcmp(c->host, d->host)) {
+			ok = FALSE;
 		}
 	}
-
+	
 	return ok;
 }
 
@@ -2093,23 +2051,24 @@ int _parse_name(char *arg, char *name) {
 * Master "socket nanny" for processing menu input.
 */
 void nanny(descriptor_data *d, char *arg) {
+	void check_delayed_load(char_data *ch);
+	void clear_player(char_data *ch);
 	void display_tip_to_char(char_data *ch);
-	extern int enter_player_game(descriptor_data *d, int dolog, bool fresh);
+	extern void enter_player_game(descriptor_data *d, int dolog, bool fresh);
 	extern int isbanned(char *hostname);
 	extern int num_earned_bonus_traits(char_data *ch);
 	void start_new_character(char_data *ch);
 	extern int Valid_Name(char *newname);
 	
-	extern const struct archetype_type archetype[];
 	extern struct promo_code_list promo_codes[];
 	extern char *START_MESSG;
 	extern int wizlock_level;
 	extern char *wizlock_message;
 
 	char buf[MAX_STRING_LENGTH], tmp_name[MAX_INPUT_LENGTH];
-	int player_i, load_result, i, j, iter;
-	struct char_file_u tmp_store;
-	bool help, show_start = FALSE;
+	int load_result, i, iter;
+	bool show_start = FALSE;
+	char_data *temp_char;
 
 	skip_spaces(&arg);
 
@@ -2121,6 +2080,7 @@ void nanny(descriptor_data *d, char *arg) {
 				CREATE(d->character->player_specials, struct player_special_data, 1);
 				d->character->desc = d;
 			}
+			
 			if (!*arg) {
 				SET_BIT(PLR_FLAGS(d->character), PLR_KEEP_LAST_LOGIN_INFO);	// prevent login storing
 				STATE(d) = CON_CLOSE;
@@ -2135,38 +2095,19 @@ void nanny(descriptor_data *d, char *arg) {
 					SEND_TO_Q("Invalid name, please try another.\r\nName: ", d);
 					return;
 				}
-				if ((player_i = load_char(tmp_name, &tmp_store)) != NOTHING) {
-					store_to_char(&tmp_store, d->character);
-					GET_PFILEPOS(d->character) = player_i;
+				if ((temp_char = load_player(tmp_name, TRUE))) {
+					free_char(d->character);
+					d->character = temp_char;	// can't load directly; overwrites the existing char
+					d->character->desc = d;
+					check_delayed_load(d->character);
+					
+					/* undo it just in case they are set */
+					REMOVE_BIT(PLR_FLAGS(d->character), PLR_WRITING | PLR_MAILING);
 
-					if (PLR_FLAGGED(d->character, PLR_DELETED)) {
-						/* We get a false positive from the original deleted character. */
-						free_char(d->character);
-						/* Check for multiple creations... */
-						if (!Valid_Name(tmp_name)) {
-							SEND_TO_Q("Invalid name, please try another.\r\nName: ", d);
-							return;
-						}
-						CREATE(d->character, char_data, 1);
-						clear_char(d->character);
-						CREATE(d->character->player_specials, struct player_special_data, 1);
-						d->character->desc = d;
-						CREATE(GET_PC_NAME(d->character), char, strlen(tmp_name) + 1);
-						strcpy(GET_PC_NAME(d->character), CAP(tmp_name));
-						GET_PFILEPOS(d->character) = player_i;
-						sprintf(buf, "Did I get that right, %s (Y/N)? ", tmp_name);
-						SEND_TO_Q(buf, d);
-						STATE(d) = CON_NAME_CNFRM;
-					}
-					else {
-						/* undo it just in case they are set */
-						REMOVE_BIT(PLR_FLAGS(d->character), PLR_WRITING | PLR_MAILING);
-
-						SEND_TO_Q("Password: ", d);
-						ProtocolNoEcho(d, true);
-						d->idle_tics = 0;
-						STATE(d) = CON_PASSWORD;
-					}
+					SEND_TO_Q("Password: ", d);
+					ProtocolNoEcho(d, true);
+					d->idle_tics = 0;
+					STATE(d) = CON_PASSWORD;
 				}
 				else {
 					/* player unknown -- make new character */
@@ -2176,8 +2117,7 @@ void nanny(descriptor_data *d, char *arg) {
 						SEND_TO_Q("Invalid name, please try another.\r\nName: ", d);
 						return;
 					}
-					CREATE(GET_PC_NAME(d->character), char, strlen(tmp_name) + 1);
-					strcpy(GET_PC_NAME(d->character), CAP(tmp_name));
+					GET_PC_NAME(d->character) = str_dup(CAP(tmp_name));
 
 					sprintf(buf, "Did I get that right, %s (Y/N)? ", tmp_name);
 					SEND_TO_Q(buf, d);
@@ -2263,8 +2203,8 @@ void nanny(descriptor_data *d, char *arg) {
 				GET_BAD_PWS(d->character) = 0;
 				d->bad_pws = 0;
 
-				if (isbanned(d->host) == BAN_SELECT && !PLR_FLAGGED(d->character, PLR_SITEOK)) {
-					SEND_TO_Q("Sorry, this character has not been cleared for login from your site!\r\n", d);
+				if (isbanned(d->host) == BAN_SELECT && !ACCOUNT_FLAGGED(d->character, ACCT_SITEOK)) {
+					SEND_TO_Q("Sorry, this account has not been cleared for login from your site!\r\n", d);
 					STATE(d) = CON_CLOSE;
 					syslog(SYS_LOGIN, 0, TRUE, "Connection attempt for %s denied from %s", GET_NAME(d->character), d->host);
 					return;
@@ -2326,9 +2266,8 @@ void nanny(descriptor_data *d, char *arg) {
 				SEND_TO_Q("Password: ", d);
 				return;
 			}
-			strncpy(GET_PASSWD(d->character), CRYPT(arg, PASSWORD_SALT), MAX_PWD_LENGTH);
-			*(GET_PASSWD(d->character) + MAX_PWD_LENGTH) = '\0';
-
+			
+			GET_PASSWD(d->character) = str_dup(CRYPT(arg, PASSWORD_SALT));
 			next_creation_step(d);
 			break;
 		}
@@ -2457,7 +2396,10 @@ void nanny(descriptor_data *d, char *arg) {
 			if (*arg) {
 				// store for later
 				arg[MAX_REFERRED_BY_LENGTH-1] = '\0';
-				strcpy(GET_REFERRED_BY(d->character), arg);
+				if (GET_REFERRED_BY(d->character)) {
+					free(GET_REFERRED_BY(d->character));
+				}
+				GET_REFERRED_BY(d->character) = str_dup(arg);
 			}
 			
 			next_creation_step(d);
@@ -2466,10 +2408,7 @@ void nanny(descriptor_data *d, char *arg) {
 
 		case CON_FINISH_CREATION: {
 			// some finalization
-
-			if (GET_PFILEPOS(d->character) < 0)
-				GET_PFILEPOS(d->character) = create_entry(GET_PC_NAME(d->character));
-			/* Now GET_NAME() will work properly. */
+			
 			if (GET_ACCESS_LEVEL(d->character) == 0) {
 				// set to base level now
 				GET_ACCESS_LEVEL(d->character) = 1;
@@ -2487,36 +2426,19 @@ void nanny(descriptor_data *d, char *arg) {
 		}
 
 		case CON_Q_ARCHETYPE: {
-			if (!*arg) {
-				// just re-show
-				prompt_creation(d);
-				return;
-			}
-			else if (!strn_cmp(arg, "help ", 5)) {
-				help = TRUE;
-				arg += 5;
-			}
-			else {
-				help = FALSE;
-			}
-			
-			i = atoi(arg);
-
-			/* Determine top choice # */
-			for (j = 1; str_cmp(archetype[j].name, "\n"); j++);
-
-			if (i < 1 || i >= j) {
-				SEND_TO_Q("\r\nInvalid choice.\r\n> ", d);
-				return;
-			}
-			
-			if (help) {
-				display_archetype_help(d, i);
-			}
-			else {
-				CREATION_ARCHETYPE(d->character) = i;
-				SET_BIT(PLR_FLAGS(d->character), PLR_NEEDS_NEWBIE_SETUP);
+			parse_archetype_menu(d, arg);
+			break;
+		}
+		
+		case CON_ARCHETYPE_CNFRM: {
+			if (is_abbrev(arg, "yes")) {
 				next_creation_step(d);
+			}
+			else if (is_abbrev(arg, "no")) {
+				set_creation_state(d, CON_Q_ARCHETYPE);
+			}
+			else {
+				msg_to_desc(d, "\r\nPlease type YES or NO: ");
 			}
 			break;
 		}
@@ -2598,7 +2520,7 @@ void nanny(descriptor_data *d, char *arg) {
 			// TODO most* of this block is repeated in do_alternate
 
 			// put them in-game
-			load_result = enter_player_game(d, TRUE, TRUE);
+			enter_player_game(d, TRUE, TRUE);
 			
 			msg_to_desc(d, "\r\n%s\r\n\r\n", config_get_string("welcome_message"));
 			act("$n has entered the game.", TRUE, d->character, 0, 0, TO_ROOM);
@@ -2626,7 +2548,7 @@ void nanny(descriptor_data *d, char *arg) {
 			
 			display_tip_to_char(d->character);
 			
-			if (has_mail(GET_IDNUM(d->character))) {
+			if (GET_MAIL_PENDING(d->character)) {
 				send_to_char("&rYou have mail waiting.&0\r\n", d->character);
 			}
 			

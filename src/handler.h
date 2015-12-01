@@ -162,8 +162,8 @@ extern bool run_interactions(char_data *ch, struct interaction_item *run_list, i
 extern bool run_room_interactions(char_data *ch, room_data *room, int type, INTERACTION_FUNC(*func));
 
 // lore handlers
-void add_lore(char_data *ch, int type, int value);
-void remove_lore(char_data *ch, int type, int value);
+void add_lore(char_data *ch, int type, const char *str, ...) __attribute__((format(printf, 3, 4)));
+void remove_lore(char_data *ch, int type);
 
 // mob tagging handlers
 extern bool find_id_in_tag_list(int id, struct mob_tag *list);
@@ -208,6 +208,7 @@ extern char *get_custom_message(obj_data *obj, int type);
 extern bool has_custom_message(obj_data *obj, int type);
 
 // object targeting handlers
+extern obj_data *get_obj_by_char_share(char_data *ch, char *arg);
 extern obj_data *get_obj_in_equip_vis(char_data *ch, char *arg, obj_data *equipment[]);
 extern obj_data *get_obj_in_list_num(int num, obj_data *list);
 extern obj_data *get_obj_in_list_vnum(obj_vnum vnum, obj_data *list);
@@ -317,3 +318,10 @@ extern int limit_crowd_control(char_data *victim, int atype);
 extern int get_morph_attack_type(char_data *ch);
 extern bool MORPH_FLAGGED(char_data *ch, bitvector_t flag);
 void perform_morph(char_data *ch, ubyte form);
+
+// objsave.c
+
+/**
+* This crash-saves all players in the game.
+*/
+void extract_all_items(char_data *ch);

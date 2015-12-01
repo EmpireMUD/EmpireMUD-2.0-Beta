@@ -5,7 +5,7 @@ A stone axe has been stuck in the ground.~
    The stone axe may look primitive, but it's great for chopping down trees,
 scraping logs, and general crafts.
 ~
-1 i an
+1 i an 1
 0 2 2
 1 0
 R
@@ -21,11 +21,9 @@ A woodsman's axe has been left here.~
 many times you can't see the original edge at all. But it's still good for
 chopping, scraping, and crafting.
 ~
-1 ilmo an
+1 ilmo an 1
 0 1 2
 13 0
-C
-0 0
 S
 #2102
 sword short~
@@ -33,11 +31,9 @@ a short sword~
 A short sword is staked into the ground.~
 This short sword is small and simple, but durable.
 ~
-1 hmo ano
+1 hmo ano 1
 0 1 1
 13 0
-C
-0 0
 S
 #2103
 shiv small~
@@ -46,11 +42,9 @@ A small shiv is lying on the ground.~
    This shiv is made from simple flint, but it's good when you need to hide a
 weapon.
 ~
-1 imo ano
+1 imo ano 1
 0 1 4
 1 0
-C
-0 0
 S
 #2104
 torch~
@@ -58,7 +52,7 @@ a torch~
 Someone has dropped their torch!~
 This long-lasting torch is one of the few things you packed for this journey.
 ~
-1 ch ano
+1 ch ano 1
 0 2 12
 0 48
 S
@@ -69,11 +63,9 @@ A blacksmith's hammer has been dropped here.~
    The hammer looks like it would be good for forging. Or, in a pinch, it would
 do in battle.
 ~
-1 hlmo ano
+1 hlmo ano 1
 0 1 6
 13 0
-C
-0 0
 S
 #2106
 hammer stone~
@@ -81,7 +73,7 @@ a stone hammer~
 A stone hammer is lying on the ground.~
 This hammer, though primitive, can function as both a weapon and a tool.
 ~
-1 ho ano
+1 ho ano 1
 0 3 6
 1 0
 S
@@ -92,15 +84,13 @@ A rawhide saddle is sitting on the ground.~
    The saddle is required in order to ride. Keep it in your inventory and it
 will equip itself.
 ~
-2 emo as
+2 emo as 1
 0 0 0
 7 0
 A
-11 1
+11 1 0
 A
-6 1
-C
-0 0
+6 1 0
 S
 #2108
 whip braided~
@@ -109,11 +99,9 @@ A braided whip is coiled on the ground.~
    This whip looks like it might have been made for an animal trainer, but it's
 strong enough to be used as a weapon.
 ~
-1 mo an
+1 mo an 1
 0 1 7
 7 0
-C
-0 0
 S
 #2109
 sword wooden~
@@ -121,10 +109,8 @@ a wooden sword~
 A wooden sword is stuck in the ground.~
 This sword doesn't look like it would do too much damage.
 ~
-1 eimo ano
+1 eimo ano 1
 0 1 1
-0 0
-C
 0 0
 S
 #2110
@@ -133,11 +119,9 @@ a pick~
 A simple pick is lying here.~
 The pick is small, but very useful in prying loose ore.
 ~
-1 hmo an
+1 hmo an 1
 0 1 8
 13 0
-C
-0 0
 S
 #2111
 robe simple brown mage~
@@ -145,15 +129,24 @@ a brown mage robe~
 A simple brown robe is lying here.~
 This robe is made for a mage, to be worn in lieu of armor.
 ~
-27 mo aq
+27 mo aq 1
 0 0 0
 7 0
 A
-16 3
+16 3 0
 A
-7 1
-C
-0 0
+7 1 0
+S
+#2112
+bottle clay~
+a clay bottle~
+A clay bottle rolls around on the ground.~
+   The bottle looks like it would be good for holding water. Type 'fill bottle'
+near the river or at an oasis to refill it.  
+~
+5 0 a 2
+12 12 0
+6 0
 S
 #2113
 saddle~
@@ -162,15 +155,13 @@ A saddle is lying on the ground.~
    The saddle is required in order to ride. Keep it in your inventory and it
 will equip itself.
 ~
-2 emo as
+2 emo as 1
 0 0 0
 7 0
 A
-11 5
+11 5 0
 A
-6 1
-C
-0 0
+6 1 0
 S
 #2114
 saddle fine leather~
@@ -179,15 +170,13 @@ A fine leather saddle is lying here.~
    The saddle is required in order to ride. Keep it in your inventory and it
 will equip itself.
 ~
-2 emo as
+2 emo as 1
 0 0 0
 7 0
 A
-11 5
+11 5 0
 A
-6 1
-C
-0 0
+6 1 0
 S
 #2115
 cask wooden~
@@ -195,7 +184,7 @@ a cask~
 A wooden cask is sitting here.~
 Casks are good for holding all kinds of liquids.
 ~
-5 e a
+5 e a 1
 168 168 3
 0 0
 S
@@ -206,15 +195,13 @@ A snakeskin saddle has been left behind.~
    The saddle is required in order to ride. Keep it in your inventory and it
 will equip itself.
 ~
-2 emo as
+2 emo as 1
 0 0 0
 7 0
 A
-11 3
+11 3 0
 A
-6 1
-C
-0 0
+6 1 0
 S
 #2117
 grave marker~
@@ -225,7 +212,7 @@ in order to have a nearby respawn point when you die. This grave marker can
 only be used once, so pick a good spot for it. You'll need the Monuments
 ability to build a proper tomb after that.
 ~
-3 g a
+3 g a 1
 0 0 0
 0 0
 S
@@ -235,7 +222,7 @@ a shovel~
 A shovel is stamped into the ground.~
 A shovel helps you dig or excavate faster.
 ~
-1 ehlu ano
+1 ehlu ano 1
 0 4 5
 13 0
 R
@@ -249,7 +236,7 @@ a metal pan~
 A pan has been left here.~
 You can pan at the edge of the river to look for gold.
 ~
-3 lt ao
+3 lt ao 1
 0 0 0
 13 0
 R
@@ -263,7 +250,7 @@ a small silver ring~
 A small, silver ring is lying on the ground.~
 It's a nice silver ring.
 ~
-2 0 ab
+2 0 ab 1
 0 0 0
 3 0
 R
@@ -275,7 +262,7 @@ a pair of silver earrings~
 A pair of earrings is lying on the ground.~
 They're a nice pair of earrings.
 ~
-2 0 am
+2 0 am 1
 0 0 0
 3 0
 R
@@ -287,11 +274,11 @@ a sparkling gold ring~
 A small ring is lying on the ground.~
 It's a sparkling gold ring.
 ~
-2 0 ab
+2 0 ab 1
 0 0 0
 4 0
 A
-4 1
+4 1 0
 R
 5617 0
 S
@@ -301,11 +288,11 @@ a pair of sparkling earrings~
 A pair of gold earrings is lying on the ground.~
 These are a nice pair of gold earrings.
 ~
-2 0 am
+2 0 am 1
 0 0 0
 4 0
 A
-4 1
+4 1 0
 R
 5617 0
 S
@@ -315,11 +302,11 @@ a golden engagement ring~
 A golden engagement ring is lying on the ground.~
 This is a brilliant golden engagement ring.
 ~
-2 o ab
+2 o ab 1
 0 0 0
 4 0
 A
-4 1
+4 1 0
 R
 5617 0
 S
@@ -329,11 +316,11 @@ a golden wedding band~
 A golden wedding band was dropped here!~
 This is a golden wedding band.
 ~
-2 o ab
+2 o ab 1
 0 0 0
 4 0
 A
-4 1
+4 1 0
 R
 5617 0
 S
@@ -343,7 +330,7 @@ silver bracelets~
 A pair of silver bracelets is lying here.~
 These fine silver bracelets accent any costume.
 ~
-2 0 aj
+2 0 aj 1
 -1 -1 -1
 3 0
 R
@@ -355,7 +342,7 @@ gold bracelets~
 A pair of gold bracelets is lying here.~
 These gold bracelets look amazing with your shoes.
 ~
-2 0 aj
+2 0 aj 1
 -1 -1 -1
 4 0
 R
@@ -367,11 +354,11 @@ a golden crown~
 A golden crown has fallen here.~
 The crown shines and sparkles.
 ~
-2 o ae
+2 o ae 1
 0 0 0
 4 0
 A
-5 1
+5 1 0
 R
 5617 0
 S
@@ -381,11 +368,11 @@ a spear~
 A long spear is protruding from the ground.~
 Spears can be used for fishing or fighting.
 ~
-1 ehl an
+1 ehl an 1
 0 2 3
 1 0
 A
-2 1
+2 1 0
 S
 #2130
 backpack leather~
@@ -393,11 +380,9 @@ a leather backpack~
 A leather backpack has fallen here.~
 Equip the backpack to increase your carrying capacity.
 ~
-24 mo ar
+24 mo ar 1
 1 0 0
 7 0
-C
-0 0
 S
 #2131
 satchel leather~
@@ -405,11 +390,9 @@ a leather satchel~
 A leather satchel has fallen here.~
 Equip the satchel to increase your carrying capacity.
 ~
-24 mo ar
+24 mo ar 1
 1 0 0
 7 0
-C
-0 0
 S
 #2132
 backpack large~
@@ -417,10 +400,8 @@ a large backpack~
 A large backpack has been left behind.~
 Equip the backpack to increase your carrying capacity.
 ~
-24 mo ar
+24 mo ar 1
 1 0 0
 7 0
-C
-0 0
 S
 $

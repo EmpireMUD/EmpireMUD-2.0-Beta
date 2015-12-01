@@ -10,6 +10,8 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 
+#include <math.h>
+
 #include "conf.h"
 #include "sysdep.h"
 
@@ -71,7 +73,8 @@ void check_attribute_gear(char_data *ch) {
 	extern const int apply_attribute[];
 	extern const int primary_attributes[];
 	
-	int iter, app, pos;
+	struct obj_apply *apply;
+	int iter, pos;
 	obj_data *obj;
 	bool found;
 	
@@ -105,14 +108,14 @@ void check_attribute_gear(char_data *ch) {
 		
 		// check all applies on item
 		found = FALSE;
-		for (app = 0; app < MAX_OBJ_AFFECT && !found; ++app) {
-			if (obj->affected[app].location == APPLY_NONE || obj->affected[app].modifier >= 0) {
+		for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
+			if (apply->modifier >= 0) {
 				continue;
 			}
 			
 			// check each primary attribute
 			for (iter = 0; primary_attributes[iter] != NOTHING && !found; ++iter) {
-				if (GET_ATT(ch, primary_attributes[iter]) < 1 && primary_attributes[iter] == apply_attribute[(int) obj->affected[app].location]) {
+				if (GET_ATT(ch, primary_attributes[iter]) < 1 && primary_attributes[iter] == apply_attribute[(int) apply->location]) {
 					act("You are too weak to keep using $p.", FALSE, ch, obj, NULL, TO_CHAR);
 					act("$n stops using $p.", TRUE, ch, obj, NULL, TO_ROOM);
 					// this may extract it
@@ -330,7 +333,7 @@ void point_update_char(char_data *ch) {
 	}
 	
 	// check spawned
-	if (REAL_NPC(ch) && !ch->desc && MOB_FLAGGED(ch, MOB_SPAWNED) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_STABLE) && MOB_SPAWN_TIME(ch) < (time(0) - config_get_int("mob_spawn_interval") * SECS_PER_REAL_MIN) && !GET_BOAT(IN_ROOM(ch))) {
+	if (REAL_NPC(ch) && !ch->desc && MOB_FLAGGED(ch, MOB_SPAWNED) && (!MOB_FLAGGED(ch, MOB_ANIMAL) || !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_STABLE)) && MOB_SPAWN_TIME(ch) < (time(0) - config_get_int("mob_spawn_interval") * SECS_PER_REAL_MIN) && !GET_BOAT(IN_ROOM(ch))) {
 		if (!GET_LED_BY(ch) && !GET_LEADING(ch) && !GET_PULLING(ch) && !MOB_FLAGGED(ch, MOB_TIED)) {
 			if (distance_to_nearest_player(IN_ROOM(ch)) > config_get_int("mob_despawn_radius")) {
 				despawn_mob(ch);
@@ -388,13 +391,17 @@ void point_update_char(char_data *ch) {
 		}
 	}
 
-	// check all cooldowns
-	for (cool = ch->cooldowns; cool; cool = next_cool) {
-		next_cool = cool->next;
+	// check all cooldowns -- ignore chars with descriptors, as they'll want
+	// the OTHER function to remove this (it sends messages; this one includes
+	// NPCs and doesn't)
+	if (!ch->desc) {
+		for (cool = ch->cooldowns; cool; cool = next_cool) {
+			next_cool = cool->next;
 		
-		// is expired?
-		if (time(0) >= cool->expire_time) {
-			remove_cooldown(ch, cool);
+			// is expired?
+			if (time(0) >= cool->expire_time) {
+				remove_cooldown(ch, cool);
+			}
 		}
 	}
 
@@ -414,6 +421,7 @@ void point_update_char(char_data *ch) {
 void real_update_char(char_data *ch) {
 	void adventure_unsummon(char_data *ch);
 	extern bool can_wear_item(char_data *ch, obj_data *item, bool send_messages);
+	void check_morph_ability(char_data *ch);
 	extern int compute_bonus_exp_per_day(char_data *ch);
 	extern int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname);	
 	void random_encounter(char_data *ch);
@@ -429,6 +437,18 @@ void real_update_char(char_data *ch) {
 	// first check location: this may move the player
 	if (!IS_NPC(ch) && PLR_FLAGGED(ch, PLR_ADVENTURE_SUMMONED) && !IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
 		adventure_unsummon(ch);
+	}
+	
+	if (!IS_NPC(ch) && GET_MORPH(ch) != MORPH_NONE) {
+		check_morph_ability(ch);
+	}
+	
+	// check master's solo role
+	if (IS_NPC(ch) && MOB_FLAGGED(ch, MOB_FAMILIAR) && ch->master && !check_solo_role(ch->master)) {
+		act("$N vanishes because you're in the solo role but not alone.", FALSE, ch->master, NULL, ch, TO_CHAR);
+		act("$N vanishes.", FALSE, ch->master, NULL, ch, TO_NOTVICT);
+		extract_char(ch);
+		return;
 	}
 	
 	// update affects (NPCs get this, too)
@@ -537,7 +557,7 @@ void real_update_char(char_data *ch) {
 	}
 
 	/* Update conditions */
-	if (IS_VAMPIRE(ch) && HAS_ABILITY(ch, ABIL_UNNATURAL_THIRST)) {			
+	if (IS_VAMPIRE(ch) && has_ability(ch, ABIL_UNNATURAL_THIRST)) {			
 		gain_condition(ch, FULL, -1);
 	}
 	else {
@@ -555,7 +575,7 @@ void real_update_char(char_data *ch) {
 	}
 	
 	// more thirsty?
-	if (HAS_ABILITY(ch, ABIL_SATED_THIRST) || (IS_VAMPIRE(ch) && HAS_ABILITY(ch, ABIL_UNNATURAL_THIRST))) {
+	if (has_ability(ch, ABIL_SATED_THIRST) || (IS_VAMPIRE(ch) && has_ability(ch, ABIL_UNNATURAL_THIRST))) {
 		gain_condition(ch, THIRST, -1);
 	}
 	else {
@@ -572,7 +592,7 @@ void real_update_char(char_data *ch) {
 	
 	// ensure character isn't using any gear they shouldn't be
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
-		if (GET_EQ(ch, iter) && !can_wear_item(ch, GET_EQ(ch, iter), TRUE)) {
+		if (wear_data[iter].count_stats && GET_EQ(ch, iter) && !can_wear_item(ch, GET_EQ(ch, iter), TRUE)) {
 			// can_wear_item sends own message to ch
 			act("$n stops using $p.", TRUE, ch, GET_EQ(ch, iter), NULL, TO_ROOM);
 			// this may extract it
@@ -588,7 +608,6 @@ void real_update_char(char_data *ch) {
 			msg_to_char(ch, "You die from your wounds!\r\n");
 			act("$n falls down, dead.", FALSE, ch, 0, 0, TO_ROOM);
 			death_log(ch, ch, TYPE_SUFFERING);
-			add_lore(ch, LORE_DEATH, 0);
 			die(ch, ch);
 			return;
 		}
@@ -872,7 +891,7 @@ static void reduce_outside_territory_one(empire_data *emp) {
 	far_dist = -1;	// always less
 	
 	// check the whole map to determine the farthest outside claim
-	HASH_ITER(world_hh, world_table, iter, next_iter) {
+	HASH_ITER(hh, world_table, iter, next_iter) {
 		// map only
 		if (GET_ROOM_VNUM(iter) >= MAP_SIZE) {
 			continue;
@@ -939,7 +958,9 @@ static void reduce_stale_empires_one(empire_data *emp) {
 	
 	// try interior first -- we'll take the first secondary room we find
 	if (!outside_only) {
-		HASH_ITER(interior_hh, interior_world_table, iter, next_iter) {
+		for (iter = interior_room_list; iter; iter = next_iter) {
+			next_iter = iter->next_interior;
+			
 			// only want rooms owned by this empire and only if they are their own home room (like a ship)
 			if (ROOM_OWNER(iter) != emp || HOME_ROOM(iter) != iter) {
 				continue;
@@ -957,7 +978,7 @@ static void reduce_stale_empires_one(empire_data *emp) {
 	
 	if (!found_room) {
 		// otherwise find a random room
-		HASH_ITER(world_hh, world_table, iter, next_iter) {
+		HASH_ITER(hh, world_table, iter, next_iter) {
 			// map only
 			if (GET_ROOM_VNUM(iter) >= MAP_SIZE) {
 				continue;
@@ -1142,8 +1163,15 @@ bool check_autostore(obj_data *obj, bool force) {
 */
 void point_update_obj(obj_data *obj) {
 	room_data *to_room, *obj_r;
+	obj_data *top;
 	char_data *c;
 	time_t timer;
+	
+	// ensure this obj is actually in-game
+	top = get_top_object(obj);
+	if ((top->carried_by && !IN_ROOM(top->carried_by)) || (top->worn_by && !IN_ROOM(top->worn_by))) {
+		return;
+	}
 	
 	// this is the firing cooldown on carts
 	if (GET_OBJ_TYPE(obj) == ITEM_CART && GET_OBJ_VAL(obj, VAL_CART_FIRING_DATA) > 1) {
@@ -1696,12 +1724,12 @@ void gain_condition(char_data *ch, int condition, int value) {
 	}
 	
 	// things that prevent thirst
-	if (value > 0 && condition == THIRST && (HAS_ABILITY(ch, ABIL_SATED_THIRST) || HAS_ABILITY(ch, ABIL_UNNATURAL_THIRST))) {
+	if (value > 0 && condition == THIRST && (has_ability(ch, ABIL_SATED_THIRST) || has_ability(ch, ABIL_UNNATURAL_THIRST))) {
 		return;
 	}
 	
 	// things that prevent hunger
-	if (value > 0 && condition == FULL && HAS_ABILITY(ch, ABIL_UNNATURAL_THIRST)) {
+	if (value > 0 && condition == FULL && has_ability(ch, ABIL_UNNATURAL_THIRST)) {
 		return;
 	}
 
@@ -1747,7 +1775,7 @@ void gain_condition(char_data *ch, int condition, int value) {
 * @return int How much health to gain per 5 seconds.
 */
 int health_gain(char_data *ch, bool info_only) {
-	double gain;
+	double gain, min;
 	
 	// no health gain in combat
 	if (GET_POS(ch) == POS_FIGHTING || FIGHTING(ch) || IS_INJURED(ch, INJ_STAKED | INJ_TIED)) {
@@ -1769,12 +1797,19 @@ int health_gain(char_data *ch, bool info_only) {
 		if (HAS_BONUS_TRAIT(ch, BONUS_HEALTH_REGEN)) {
 			gain += 1;
 		}
-
+		
+		if (GET_FEEDING_FROM(ch) && has_ability(ch, ABIL_SANGUINE_RESTORATION)) {
+			gain *= 4;
+		}
+		
+		if (GET_POS(ch) == POS_SLEEPING) {
+			min = round((double) GET_MAX_HEALTH(ch) / ((double) config_get_int("max_sleeping_regen_time") / (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
+			gain = MAX(gain, min);
+		}
+		
+		// put this last
 		if (IS_HUNGRY(ch) || IS_THIRSTY(ch) || IS_BLOOD_STARVED(ch)) {
 			gain /= 4;
-		}
-		if (GET_FEEDING_FROM(ch) && HAS_ABILITY(ch, ABIL_SANGUINE_RESTORATION)) {
-			gain *= 4;
 		}
 	}
 	
@@ -1790,7 +1825,7 @@ int health_gain(char_data *ch, bool info_only) {
 * @return int How much mana to gain per 5 seconds.
 */
 int mana_gain(char_data *ch, bool info_only) {
-	double gain;
+	double gain, min;
 	
 	double solar_power_levels[] = { 2, 2.5, 2.5 };
 	
@@ -1806,7 +1841,7 @@ int mana_gain(char_data *ch, bool info_only) {
 		gain = regen_by_pos[(int) GET_POS(ch)];
 		gain += GET_MANA_REGEN(ch);
 		
-		if (HAS_ABILITY(ch, ABIL_SOLAR_POWER)) {
+		if (has_ability(ch, ABIL_SOLAR_POWER)) {
 			if (IS_CLASS_ABILITY(ch, ABIL_SOLAR_POWER) || check_sunny(IN_ROOM(ch))) {
 				gain *= CHOOSE_BY_ABILITY_LEVEL(solar_power_levels, ch, ABIL_SOLAR_POWER);
 			
@@ -1822,12 +1857,18 @@ int mana_gain(char_data *ch, bool info_only) {
 		if (HAS_BONUS_TRAIT(ch, BONUS_MANA_REGEN)) {
 			gain += 1;
 		}
-
+		if (GET_FEEDING_FROM(ch) && has_ability(ch, ABIL_SANGUINE_RESTORATION)) {
+			gain *= 4;
+		}
+		
+		if (GET_POS(ch) == POS_SLEEPING) {
+			min = round((double) GET_MAX_MANA(ch) / ((double) config_get_int("max_sleeping_regen_time") / (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
+			gain = MAX(gain, min);
+		}
+		
+		// this goes last
 		if (IS_HUNGRY(ch) || IS_THIRSTY(ch) || IS_BLOOD_STARVED(ch)) {
 			gain /= 4;
-		}
-		if (GET_FEEDING_FROM(ch) && HAS_ABILITY(ch, ABIL_SANGUINE_RESTORATION)) {
-			gain *= 4;
 		}
 	}
 	
@@ -1843,7 +1884,7 @@ int mana_gain(char_data *ch, bool info_only) {
 * @return int How much move to gain per 5 seconds.
 */
 int move_gain(char_data *ch, bool info_only) {
-	double gain;
+	double gain, min;
 	
 	if (IS_INJURED(ch, INJ_STAKED | INJ_TIED)) {
 		return 0;
@@ -1857,7 +1898,7 @@ int move_gain(char_data *ch, bool info_only) {
 		gain = regen_by_pos[(int) GET_POS(ch)];
 		gain += GET_MOVE_REGEN(ch);
 		
-		if (HAS_ABILITY(ch, ABIL_STAMINA)) {
+		if (has_ability(ch, ABIL_STAMINA)) {
 			gain *= 2;
 			
 			if (GET_MOVE(ch) < GET_MAX_MOVE(ch) && !info_only) {
@@ -1871,12 +1912,17 @@ int move_gain(char_data *ch, bool info_only) {
 		if (HAS_BONUS_TRAIT(ch, BONUS_MOVE_REGEN)) {
 			gain += 1;
 		}
+		if (GET_FEEDING_FROM(ch) && has_ability(ch, ABIL_SANGUINE_RESTORATION)) {
+			gain *= 4;
+		}
+		
+		if (GET_POS(ch) == POS_SLEEPING) {
+			min = round((double) GET_MAX_MOVE(ch) / ((double) config_get_int("max_sleeping_regen_time") / (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
+			gain = MAX(gain, min);
+		}
 
 		if (IS_HUNGRY(ch) || IS_THIRSTY(ch) || IS_BLOOD_STARVED(ch)) {
 			gain /= 4;
-		}
-		if (GET_FEEDING_FROM(ch) && HAS_ABILITY(ch, ABIL_SANGUINE_RESTORATION)) {
-			gain *= 4;
 		}
 	}
 
@@ -1940,7 +1986,7 @@ void point_update(bool run_real) {
 	}
 	
 	// rooms
-	HASH_ITER(world_hh, world_table, room, next_room) {
+	HASH_ITER(hh, world_table, room, next_room) {
 		point_update_room(room);
 	}
 	

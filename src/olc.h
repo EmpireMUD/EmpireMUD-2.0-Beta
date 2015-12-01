@@ -39,7 +39,12 @@
 #define OLC_ROOM_TEMPLATE  BIT(9)
 #define OLC_GLOBAL  BIT(10)
 #define OLC_BOOK  BIT(11)
-#define NUM_OLC_TYPES  12
+#define OLC_AUGMENT  BIT(12)
+#define OLC_ARCHETYPE  BIT(13)
+#define OLC_ABILITY  BIT(14)
+#define OLC_CLASS  BIT(15)
+#define OLC_SKILL  BIT(16)
+#define NUM_OLC_TYPES  17
 
 
 // olc command flags
@@ -62,6 +67,11 @@
 #define OLC_FLAG_NO_ADVENTURE  BIT(10)	// cannot edit adventures
 #define OLC_FLAG_NO_ROOM_TEMPLATE  BIT(11)	// cannot edit room templates
 #define OLC_FLAG_NO_GLOBAL  BIT(12)	// cannot edit globals
+#define OLC_FLAG_NO_AUGMENT  BIT(13)	// cannot edit augs
+#define OLC_FLAG_NO_ARCHETYPE  BIT(14)	// cannot edit archetypes
+#define OLC_FLAG_ABILITIES  BIT(15)	// CAN edit abilities
+#define OLC_FLAG_CLASSES  BIT(16)	// CAN edit classes
+#define OLC_FLAG_SKILLS  BIT(17)	// CAN edit skills
 
 
 // for trigger editing
@@ -76,8 +86,8 @@
 struct olc_command_data {
 	char *command;
 	void (*func)(char_data *ch, int type, char *argument);
-	int valid_types;	// OLC_x type const
-	int flags;	// OLC_CF_x
+	int valid_types;	// OLC_ type const
+	int flags;	// OLC_CF_
 };
 
 
@@ -87,6 +97,7 @@ extern struct interaction_item *copy_interaction_list(struct interaction_item *i
 extern struct spawn_info *copy_spawn_list(struct spawn_info *input_list);
 extern int find_olc_type(char *name);
 extern bool player_can_olc_edit(char_data *ch, int type, any_vnum vnum);
+extern double olc_process_double(char_data *ch, char *argument, char *name, char *command, double min, double max, double old_value);
 extern bitvector_t olc_process_flag(char_data *ch, char *argument, char *name, char *command, const char **flag_names, bitvector_t existing_bits);
 extern int olc_process_number(char_data *ch, char *argument, char *name, char *command, int min, int max, int old_value);
 void olc_process_string(char_data *ch, char *argument, char *name, char **save_point);

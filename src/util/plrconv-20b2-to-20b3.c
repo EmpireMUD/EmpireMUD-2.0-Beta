@@ -579,8 +579,8 @@ void convert_char_file_u(struct b3_char_file_u *to, struct b2_char_file_u *from)
 	// player_special_data_saved
 	to->player_specials_saved.account_id = from->player_specials_saved.account_id;
 	PLRCONV_STRCPY(to->player_specials_saved.creation_host, from->player_specials_saved.creation_host, b3_MAX_HOST_LENGTH+1);
-	PLRCONV_STRCPY(to->player_specials_saved.referred_by, from->player_specials_saved.referred_by, MAX_REFERRED_BY_LENGTH);
-	PLRCONV_STRCPY(to->player_specials_saved.admin_notes, from->player_specials_saved.admin_notes, MAX_ADMIN_NOTES_LENGTH);
+	PLRCONV_STRCPY(to->player_specials_saved.referred_by, from->player_specials_saved.referred_by, b3_MAX_REFERRED_BY_LENGTH);
+	PLRCONV_STRCPY(to->player_specials_saved.admin_notes, from->player_specials_saved.admin_notes, b3_MAX_ADMIN_NOTES_LENGTH);
 	to->player_specials_saved.invis_level = from->player_specials_saved.invis_level;
 	to->player_specials_saved.immortal_level = from->player_specials_saved.immortal_level;
 	to->player_specials_saved.grants = from->player_specials_saved.grants;
@@ -674,7 +674,7 @@ void convert_char_file_u(struct b3_char_file_u *to, struct b2_char_file_u *from)
 	to->player_specials_saved.class_role = from->player_specials_saved.class_role;
 	to->player_specials_saved.character_class = from->player_specials_saved.character_class;
 	to->player_specials_saved.confused_dir = from->player_specials_saved.confused_dir;
-	PLRCONV_STRCPY(to->player_specials_saved.disguised_name, from->player_specials_saved.disguised_name, MAX_DISGUISED_NAME_LENGTH);
+	PLRCONV_STRCPY(to->player_specials_saved.disguised_name, from->player_specials_saved.disguised_name, b3_MAX_DISGUISED_NAME_LENGTH);
 	to->player_specials_saved.disguised_sex = from->player_specials_saved.disguised_sex;
 	to->player_specials_saved.morph = from->player_specials_saved.morph;
 	to->player_specials_saved.mount_flags = from->player_specials_saved.mount_flags;

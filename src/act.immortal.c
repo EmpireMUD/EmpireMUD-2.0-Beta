@@ -53,6 +53,7 @@ extern const char *grant_bits[];
 extern const char *island_bits[];
 extern const char *mapout_color_names[];
 extern const char *room_aff_bits[];
+extern const char *sector_flags[];
 extern const char *spawn_flags[];
 extern const char *spawn_flags_short[];
 extern const char *syslog_types[];
@@ -60,7 +61,7 @@ extern const char *syslog_types[];
 // external functions
 extern struct instance_data *build_instance_loc(adv_data *adv, struct adventure_link_rule *rule, room_data *loc, int dir);	// instance.c
 void check_autowiz(char_data *ch);
-void clear_char_abilities(char_data *ch, int skill);
+void clear_char_abilities(char_data *ch, any_vnum skill);
 void delete_instance(struct instance_data *inst);	// instance.c
 void get_icons_display(struct icon_data *list, char *save_buffer);
 void get_interaction_display(struct interaction_item *list, char *save_buffer);
@@ -300,6 +301,8 @@ ADMIN_UTIL(util_islandsize);
 ADMIN_UTIL(util_playerdump);
 ADMIN_UTIL(util_randtest);
 ADMIN_UTIL(util_redo_islands);
+ADMIN_UTIL(util_rescan);
+ADMIN_UTIL(util_strlen);
 ADMIN_UTIL(util_tool);
 
 
@@ -314,6 +317,8 @@ struct {
 	{ "playerdump", LVL_IMPL, util_playerdump },
 	{ "randtest", LVL_CIMPL, util_randtest },
 	{ "redoislands", LVL_CIMPL, util_redo_islands },
+	{ "rescan", LVL_START_IMM, util_rescan },
+	{ "strlen", LVL_START_IMM, util_strlen },
 	{ "tool", LVL_IMPL, util_tool },
 
 	// last
@@ -329,26 +334,17 @@ ADMIN_UTIL(util_tool) {
 
 // for util_clear_roles
 PLAYER_UPDATE_FUNC(update_clear_roles) {
-	void check_skill_sell(char_data *ch, int abil);
-	int iter;
+	void assign_class_abilities(char_data *ch, class_data *cls, int role);
 	
 	if (IS_IMMORTAL(ch)) {
 		return;
 	}
 	
 	GET_CLASS_ROLE(ch) = ROLE_NONE;
+	assign_class_abilities(ch, NULL, NOTHING);
 	
 	if (!is_file) {
 		msg_to_char(ch, "Your class role has been reset.\r\n");
-	}
-	
-	for (iter = 0; iter < NUM_ABILITIES; ++iter) {
-		if (ability_data[iter].parent_skill == NO_SKILL && HAS_ABILITY(ch, iter)) {
-			ch->player_specials->saved.abilities[iter].purchased = FALSE;
-			if (!is_file) {
-				check_skill_sell(ch, iter);
-			}
-		}
 	}
 }
 
@@ -402,7 +398,7 @@ ADMIN_UTIL(util_islandsize) {
 	size_t size;
 	int isle;
 	
-	HASH_ITER(world_hh, world_table, room, next_room) {
+	HASH_ITER(hh, world_table, room, next_room) {
 		if (GET_ROOM_VNUM(room) < MAP_SIZE) {
 			isle = GET_ISLAND_ID(room);
 			HASH_FIND_INT(list, &isle, isf);
@@ -437,9 +433,8 @@ ADMIN_UTIL(util_islandsize) {
 
 
 ADMIN_UTIL(util_playerdump) {
-	struct char_file_u chdata;
+	player_index_data *index, *next_index;
 	char_data *plr;
-	int pos;
 	bool is_file;
 	FILE *fl;
 	
@@ -449,17 +444,13 @@ ADMIN_UTIL(util_playerdump) {
 	}
 	
 	fprintf(fl, "name\taccount\thours\thost\n");
-
-	for (pos = 0; pos <= top_of_p_table; ++pos) {
-		if (load_char(player_table[pos].name, &chdata) <= NOBODY || IS_SET(chdata.char_specials_saved.act, PLR_DELETED)) {
+	
+	HASH_ITER(idnum_hh, player_table_by_idnum, index, next_index) {		
+		if (!(plr = find_or_load_player(index->name, &is_file))) {
 			continue;
 		}
 		
-		if (!(plr = find_or_load_player(player_table[pos].name, &is_file))) {
-			continue;
-		}
-		
-		fprintf(fl, "%s\t%d\t%d\t%s\n", GET_NAME(plr), GET_ACCOUNT_ID(plr), (chdata.played / SECS_PER_REAL_HOUR), chdata.host);
+		fprintf(fl, "%s\t%d\t%d\t%s\n", GET_NAME(plr), GET_ACCOUNT(plr)->id, (plr->player.time.played / SECS_PER_REAL_HOUR), plr->prev_host);
 		
 		// done
 		if (is_file && plr) {
@@ -557,6 +548,40 @@ ADMIN_UTIL(util_redo_islands) {
 		number_and_count_islands(TRUE);
 		msg_to_char(ch, "Islands renumbered. Caution: empire inventories may now be in the wrong place.\r\n");
 	}
+}
+
+
+ADMIN_UTIL(util_rescan) {
+	empire_data *emp;
+	
+	if (GET_ACCESS_LEVEL(ch) < LVL_CIMPL && !IS_GRANTED(ch, GRANT_EMPIRES)) {
+		msg_to_char(ch, "You don't have permission to rescan empires.\r\n");
+	}
+	else if (!*argument) {
+		msg_to_char(ch, "Usage: rescan <empire | all>\r\n");
+	}
+	else if (!str_cmp(argument, "all")) {
+		syslog(SYS_INFO, GET_INVIS_LEV(ch), TRUE, "Rescanning all empires");
+		reread_empire_tech(NULL);
+		send_config_msg(ch, "ok_string");
+	}
+	else if (!(emp = get_empire_by_name(argument))) {
+		msg_to_char(ch, "Unknown empire.\r\n");
+	}
+	else {
+		syslog(SYS_INFO, GET_INVIS_LEV(ch), TRUE, "Rescanning empire: %s", EMPIRE_NAME(emp));
+		reread_empire_tech(emp);
+		send_config_msg(ch, "ok_string");
+	}
+}
+
+
+ADMIN_UTIL(util_strlen) {
+	msg_to_char(ch, "String: %s\r\n", argument);
+	msg_to_char(ch, "Raw: %s\r\n", show_color_codes(argument));
+	msg_to_char(ch, "strlen: %d\r\n", (int)strlen(argument));
+	msg_to_char(ch, "color_strlen: %d\r\n", (int)color_strlen(argument));
+	msg_to_char(ch, "color_code_length: %d\r\n", color_code_length(argument));
 }
 
 
@@ -946,7 +971,6 @@ struct set_struct {
 		{ "thirst",		LVL_START_IMM, 	BOTH, 	MISC },
 		{ "level",		LVL_CIMPL, 	PC, 	NUMBER },
 		{ "siteok",		LVL_START_IMM, 	PC, 	BINARY },
-		{ "deleted", 	LVL_CIMPL, 	PC, 	BINARY },
 		{ "nowizlist", 	LVL_START_IMM, 	PC, 	BINARY },
 		{ "loadroom", 	LVL_START_IMM, 	PC, 	MISC },
 		{ "password",	LVL_CIMPL, 	PC, 	MISC },
@@ -959,7 +983,8 @@ struct set_struct {
 		{ "name",		LVL_CIMPL,	PC,		MISC },
 		{ "incognito",	LVL_START_IMM,	PC,		BINARY },
 		{ "ipmask",		LVL_START_IMM,	PC,		BINARY },
-		{ "multiok",	LVL_START_IMM,	PC,		BINARY },
+		{ "multi-ip",	LVL_START_IMM,	PC,		BINARY },
+		{ "multi-char",	LVL_START_IMM,	PC,		BINARY },	// deliberately after multi-ip, which is more common
 		{ "vampire",	LVL_START_IMM,	PC, 	BINARY },
 		{ "wizhide",	LVL_START_IMM,	PC,		BINARY },
 		{ "account",	LVL_START_IMM,	PC,		MISC },
@@ -986,9 +1011,9 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 	extern int _parse_name(char *arg, char *name);
 	extern int Valid_Name(char *newname);
 	void make_vampire(char_data *ch, bool lore);
-	int new_account_id();
 
-	int i, iter, nr, on = 0, off = 0, value = 0;
+	player_index_data *index, *next_index, *found_index;
+	int i, iter, on = 0, off = 0, value = 0;
 	empire_data *emp;
 	room_vnum rvnum;
 	char output[MAX_STRING_LENGTH], oldname[MAX_INPUT_LENGTH], newname[MAX_INPUT_LENGTH];
@@ -1044,7 +1069,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 	}
 	else if SET_CASE("title") {
 		set_title(vict, val_arg);
-		sprintf(output, "%s's title is now: %s", GET_NAME(vict), GET_TITLE(vict));
+		sprintf(output, "%s's title is now: %s", GET_NAME(vict), NULLSAFE(GET_TITLE(vict)));
 	}
 
 	else if SET_CASE("health") {
@@ -1110,13 +1135,16 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 			send_to_char("Better not -- could be a long winter!\r\n", ch);
 			return (0);
 		}
-		SET_OR_REMOVE(PLR_FLAGS(vict), PLR_FROZEN);
+		SET_OR_REMOVE(GET_ACCOUNT(vict)->flags, ACCT_FROZEN);
+		SAVE_ACCOUNT(GET_ACCOUNT(vict));
 	}
 	else if SET_CASE("muted") {
-		SET_OR_REMOVE(PLR_FLAGS(vict), PLR_MUTED);
+		SET_OR_REMOVE(GET_ACCOUNT(vict)->flags, ACCT_MUTED);
+		SAVE_ACCOUNT(GET_ACCOUNT(vict));
 	}
 	else if SET_CASE("notitle") {
-		SET_OR_REMOVE(PLR_FLAGS(vict), PLR_NOTITLE);
+		SET_OR_REMOVE(GET_ACCOUNT(vict)->flags, ACCT_NOTITLE);
+		SAVE_ACCOUNT(GET_ACCOUNT(vict));
 	}
 	else if SET_CASE("ipmask") {
 		SET_OR_REMOVE(PLR_FLAGS(vict), PLR_IPMASK);
@@ -1127,8 +1155,13 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 	else if SET_CASE("wizhide") {
 		SET_OR_REMOVE(PRF_FLAGS(vict), PRF_WIZHIDE);
 	}
-	else if SET_CASE("multiok") {
-		SET_OR_REMOVE(PLR_FLAGS(vict), PLR_MULTIOK);
+	else if SET_CASE("multi-ip") {
+		SET_OR_REMOVE(GET_ACCOUNT(vict)->flags, ACCT_MULTI_IP);
+		SAVE_ACCOUNT(GET_ACCOUNT(vict));
+	}
+	else if SET_CASE("multi-char") {
+		SET_OR_REMOVE(GET_ACCOUNT(vict)->flags, ACCT_MULTI_CHAR);
+		SAVE_ACCOUNT(GET_ACCOUNT(vict));
 	}
 	else if SET_CASE("vampire") {
 		if (IS_VAMPIRE(vict)) {
@@ -1210,24 +1243,8 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		check_autowiz(ch);
 	}
 	else if SET_CASE("siteok") {
-		SET_OR_REMOVE(PLR_FLAGS(vict), PLR_SITEOK);
-	}
-	else if SET_CASE("deleted") {
-		void delete_player_character(char_data *ch);
-		
-		if (on || !PLR_FLAGGED(vict, PLR_DELETED)) {
-			if (PLR_FLAGGED(vict, PLR_NODELETE)) {
-				msg_to_char(ch, "You can't set that on a no-delete player.\r\n");
-				return 0;
-			}
-			
-			// DELETE THEM!
-			SET_BIT(PLR_FLAGS(vict), PLR_DELETED);
-			delete_player_character(vict);
-		}
-		else {
-			REMOVE_BIT(PLR_FLAGS(vict), PLR_DELETED);
-		}
+		SET_OR_REMOVE(GET_ACCOUNT(vict)->flags, ACCT_SITEOK);
+		SAVE_ACCOUNT(GET_ACCOUNT(vict));
 	}
 	else if SET_CASE("nowizlist") {
 		SET_OR_REMOVE(PLR_FLAGS(vict), PLR_NOWIZLIST);
@@ -1259,8 +1276,10 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 			send_to_char("You cannot change that.\r\n", ch);
 			return (0);
 		}
-		strncpy(GET_PASSWD(vict), CRYPT(val_arg, PASSWORD_SALT), MAX_PWD_LENGTH);
-		*(GET_PASSWD(vict) + MAX_PWD_LENGTH) = '\0';
+		if (GET_PASSWD(vict)) {
+			free(GET_PASSWD(vict));
+		}
+		GET_PASSWD(vict) = str_dup(CRYPT(val_arg, PASSWORD_SALT));
 		sprintf(output, "Password for %s changed.", GET_NAME(vict));
 	}
 	else if SET_CASE("nodelete") {
@@ -1374,10 +1393,9 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		}
 	}
 	else if SET_CASE("skill") {
-		extern int find_skill_by_name(char *name);
-	
 		char skillname[MAX_INPUT_LENGTH], *skillval;
-		int level = -1, old_level, skill;
+		int level = -1, old_level;
+		skill_data *skill;
 		
 		// set <name> skill "<name>" <level>
 		skillval = any_one_word(val_arg, skillname);
@@ -1391,35 +1409,37 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 			msg_to_char(ch, "You must choose a level between 0 and %d.\r\n", CLASS_SKILL_CAP);
 			return 0;
 		}
-		else if ((skill = find_skill_by_name(skillname)) == NO_SKILL) {
+		else if (!(skill = find_skill(skillname))) {
 			msg_to_char(ch, "Unknown skill '%s'.\r\n", skillname);
 			return 0;
 		}
 
 		// victory
-		old_level = GET_SKILL(vict, skill);
-		set_skill(vict, skill, level);
+		old_level = get_skill_level(vict, SKILL_VNUM(skill));
+		set_skill(vict, SKILL_VNUM(skill), level);
 		if (old_level > level) {
-			clear_char_abilities(vict, skill);
+			clear_char_abilities(vict, SKILL_VNUM(skill));
 		}
 		update_class(vict);
-		sprintf(output, "%s's %s set to %d", GET_NAME(vict), skill_data[skill].name, level);
+		sprintf(output, "%s's %s set to %d", GET_NAME(vict), SKILL_NAME(skill), level);
 	}
 
 	else if SET_CASE("account") {		
-		if (!str_cmp(val_arg, "none")) {
-			sprintf(output, "%s is %s associated with an account", GET_NAME(vict), (GET_ACCOUNT_ID(vict) > 0) ? "no longer" : "not");
-			GET_ACCOUNT_ID(vict) = 0;
+		if (!str_cmp(val_arg, "new")) {
+			sprintf(output, "%s is now associated with a new account", GET_NAME(vict));
+			remove_player_from_account(vict);
+			create_account_for_player(vict);
 		}
 		else {
 			// load 2nd player
 			if ((alt = find_or_load_player(val_arg, &file))) {
 				sprintf(output, "%s is now associated with %s's account", GET_NAME(vict), GET_NAME(alt));
 				
+				remove_player_from_account(vict);
 				// does 2nd player have an account already? if not, make one
-				if (GET_ACCOUNT_ID(alt) == 0) {
-					GET_ACCOUNT_ID(alt) = new_account_id();
-					GET_ACCOUNT_ID(vict) = GET_ACCOUNT_ID(alt);
+				if (!GET_ACCOUNT(alt)) {
+					create_account_for_player(alt);
+					add_player_to_account(vict, GET_ACCOUNT(alt));
 
 					if (file) {
 						store_loaded_char(alt);
@@ -1432,7 +1452,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 				}
 				else {
 					// already has acct
-					GET_ACCOUNT_ID(vict) = GET_ACCOUNT_ID(alt);
+					add_player_to_account(vict, GET_ACCOUNT(alt));
 				}
 				
 				if (file && alt) {
@@ -1451,57 +1471,63 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 	}
 
 	else if SET_CASE("name") {
+		void add_player_to_table(player_index_data *plr);
+		void remove_player_from_table(player_index_data *plr);
+
 		SAVE_CHAR(vict);
 		one_argument(val_arg, buf);
 		if (_parse_name(buf, newname) || fill_word(newname) || strlen(newname) > MAX_NAME_LENGTH || strlen(newname) < 2 || !Valid_Name(newname)) {
 			msg_to_char(ch, "Invalid name.\r\n");
 			return 0;
 		}
-		nr = NOBODY;
-		for (i = 0; i <= top_of_p_table; i++) {
-			if (!str_cmp(player_table[i].name, newname)) {
+		found_index = NULL;
+		HASH_ITER(idnum_hh, player_table_by_idnum, index, next_index) {
+			if (!str_cmp(index->name, newname)) {
 				msg_to_char(ch, "That name is already taken.\r\n");
 				return 0;
 			}
-			if (!str_cmp(player_table[i].name, GET_NAME(vict))) {
-				if (nr >= 0) {
+			if (!str_cmp(index->name, GET_NAME(vict))) {
+				if (found_index) {
 					msg_to_char(ch, "WARNING: possible pfile corruption, more than one entry with that name.\r\n");
 				}
 				else {
-					nr = i;
+					found_index = index;
 				}
 			}
 		}
-		if (nr == NOBODY) {
+		if (!found_index) {
 			msg_to_char(ch, "WARNING: That character does not have a record in the pfile.\r\nName not changed.\r\n");
 			return 0;
 		}
-		strcpy(oldname, GET_NAME(vict));
-		if (player_table[nr].name)
-			free(player_table[nr].name);
-		CREATE(player_table[nr].name, char, strlen(newname) + 1);
-		for (i = 0; (*(player_table[nr].name + i) = *(newname + i)); i++);
-
-		if (GET_PC_NAME(vict))
+		strcpy(oldname, GET_PC_NAME(vict));
+		if (GET_PC_NAME(vict)) {
 			free(GET_PC_NAME(vict));
+		}
 		GET_PC_NAME(vict) = strdup(CAP(newname));
 		
-		// TODO file renames could be moved somewhere useful
-		// TODO also, this could be a lot cleaner and use remove() instead of system/rm
-		get_filename(oldname, buf1, CRASH_FILE);
-		get_filename(GET_NAME(vict), buf2, CRASH_FILE);
-		sprintf(buf, "rm -f %s", buf2);
-		system(buf);
+		// ensure we really have the right index
+		if ((found_index = find_player_index_by_idnum(GET_IDNUM(vict)))) {
+			remove_player_from_table(found_index);	// temporary remove
+			
+			if (found_index->name) {
+				free(found_index->name);
+			}
+			found_index->name = str_dup(GET_PC_NAME(vict));
+			strtolower(found_index->name);
+			
+			// now update the rest of the data
+			update_player_index(found_index, vict);
+			
+			// now re-add to index
+			add_player_to_table(found_index);
+		}
+		
+		// rename the save file
+		get_filename(oldname, buf1, PLR_FILE);
+		get_filename(GET_NAME(vict), buf2, PLR_FILE);
 		rename(buf1, buf2);
-		get_filename(oldname, buf1, ALIAS_FILE);
-		get_filename(GET_NAME(vict), buf2, ALIAS_FILE);
-		sprintf(buf, "rm -f %s", buf2);
-		system(buf);
-		rename(buf1, buf2);
-		get_filename(oldname, buf1, LORE_FILE);
-		get_filename(GET_NAME(vict), buf2, LORE_FILE);
-		sprintf(buf, "rm -f %s", buf2);
-		system(buf);
+		get_filename(oldname, buf1, DELAYED_FILE);
+		get_filename(GET_NAME(vict), buf2, DELAYED_FILE);
 		rename(buf1, buf2);
 		
 		SAVE_CHAR(vict);
@@ -1520,7 +1546,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		send_to_char("Can't set that!\r\n", ch);
 		return (0);
 	}
-
+	
 	if (*output) {
 		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s used set: %s", GET_REAL_NAME(ch), output);
 		strcat(output, "\r\n");
@@ -1633,35 +1659,40 @@ SHOW(show_islands) {
 
 
 SHOW(show_player) {
-	struct char_file_u vbuf;
 	char birth[80], lastlog[80];
 	double days_played, avg_min_per_day;
+	char_data *plr = NULL;
+	bool file = FALSE;
 	
 	if (!*argument) {
 		send_to_char("A name would help.\r\n", ch);
 		return;
 	}
-
-	if (load_char(argument, &vbuf) == NOTHING) {
+	
+	if (!(plr = find_or_load_player(argument, &file))) {
 		send_to_char("There is no such player.\r\n", ch);
 		return;
 	}
-	sprintf(buf, "Player: %-12s (%s) [%d]\r\n", vbuf.name, genders[(int) vbuf.sex], vbuf.access_level);
-	strcpy(birth, ctime(&vbuf.birth));
-	strcpy(lastlog, ctime(&vbuf.last_logon));
+	sprintf(buf, "Player: %-12s (%s) [%d]\r\n", GET_PC_NAME(plr), genders[(int) GET_REAL_SEX(plr)], GET_ACCESS_LEVEL(plr));
+	strcpy(birth, ctime(&plr->player.time.birth));
+	strcpy(lastlog, ctime(&plr->prev_logon));
 	// Www Mmm dd hh:mm:ss yyyy
 	sprintf(buf + strlen(buf), "Started: %-16.16s %4.4s   Last: %-16.16s %4.4s\r\n", birth, birth+20, lastlog, lastlog+20);
 	
-	if (vbuf.access_level <= GET_ACCESS_LEVEL(ch)) {
-		sprintf(buf + strlen(buf), "Creation host: %s\r\n", vbuf.player_specials_saved.creation_host);
+	if (GET_ACCESS_LEVEL(plr) <= GET_ACCESS_LEVEL(ch)) {
+		sprintf(buf + strlen(buf), "Creation host: %s\r\n", NULLSAFE(GET_CREATION_HOST(plr)));
 	}
 	
-	days_played = (double)(time(0) - vbuf.birth) / SECS_PER_REAL_DAY;
-	avg_min_per_day = (((double) vbuf.played / SECS_PER_REAL_HOUR) / days_played) * SECS_PER_REAL_MIN;
+	days_played = (double)(time(0) - plr->player.time.birth) / SECS_PER_REAL_DAY;
+	avg_min_per_day = (((double) plr->player.time.played / SECS_PER_REAL_HOUR) / days_played) * SECS_PER_REAL_MIN;
 	
-	sprintf(buf + strlen(buf), "Played: %3dh %2dm (%d minutes per day)\r\n", (int) (vbuf.played / SECS_PER_REAL_HOUR), (int) (vbuf.played % SECS_PER_REAL_HOUR) / SECS_PER_REAL_MIN, (int)avg_min_per_day);
+	sprintf(buf + strlen(buf), "Played: %3dh %2dm (%d minutes per day)\r\n", (int) (plr->player.time.played / SECS_PER_REAL_HOUR), (int) (plr->player.time.played % SECS_PER_REAL_HOUR) / SECS_PER_REAL_MIN, (int)avg_min_per_day);
 	
 	send_to_char(buf, ch);
+	
+	if (file) {
+		free_char(plr);
+	}
 }
 
 
@@ -1724,13 +1755,13 @@ SHOW(show_stats) {
 
 	msg_to_char(ch, "Current stats:\r\n");
 	msg_to_char(ch, "  %6d players in game  %6d connected\r\n", num_players, num_descs);
-	msg_to_char(ch, "  %6d registered       %6d at menus\r\n", top_of_p_table + 1, menu_count);
+	msg_to_char(ch, "  %6d registered       %6d at menus\r\n", HASH_CNT(idnum_hh, player_table_by_idnum), menu_count);
 	msg_to_char(ch, "  %6d player accounts  %6d active accounts\r\n", total_accounts, active_accounts);
 	msg_to_char(ch, "  %6d accounts logged in this week\r\n", active_accounts_week);
 	msg_to_char(ch, "  %6d empires          %6d active\r\n", HASH_COUNT(empire_table), num_active_empires);
 	msg_to_char(ch, "  %6d mobiles          %6d prototypes\r\n", num_mobs, HASH_COUNT(mobile_table));
 	msg_to_char(ch, "  %6d objects          %6d prototypes\r\n", num_objs, HASH_COUNT(object_table));
-	msg_to_char(ch, "  %6d adventures       %6d total rooms\r\n", HASH_COUNT(adventure_table), HASH_CNT(world_hh, world_table));
+	msg_to_char(ch, "  %6d adventures       %6d total rooms\r\n", HASH_COUNT(adventure_table), HASH_COUNT(world_table));
 	msg_to_char(ch, "  %6d buildings        %6d room templates\r\n", HASH_COUNT(building_table), HASH_COUNT(room_template_table));
 	msg_to_char(ch, "  %6d sectors          %6d crops\r\n", HASH_COUNT(sector_table), HASH_COUNT(crop_table));
 	msg_to_char(ch, "  %6d triggers         %6d craft recipes\r\n", HASH_COUNT(trigger_table), HASH_COUNT(craft_table));
@@ -1740,24 +1771,32 @@ SHOW(show_stats) {
 
 
 SHOW(show_site) {
-	struct char_file_u vbuf;
-	int j, k;
+	char buf[MAX_STRING_LENGTH], line[256];
+	player_index_data *index, *next_index;
+	size_t size;
+	int k;
 	
 	if (!*argument) {
 		msg_to_char(ch, "Locate players from what site?\r\n");
 		return;
 	}
+	
 	*buf = '\0';
+	size = 0;
 	k = 0;
-	for (j = 0; j <= top_of_p_table; j++) {
-		load_char((player_table + j)->name, &vbuf);
-		if (!IS_SET(vbuf.char_specials_saved.act, PLR_DELETED))
-			if (str_str(vbuf.host, argument))
-				sprintf(buf, "%s %-15.15s %s", buf, vbuf.name, ((++k % 3)) ? "|" : "\r\n");
+	HASH_ITER(idnum_hh, player_table_by_idnum, index, next_index) {
+		if (str_str(index->last_host, argument)) {
+			snprintf(line, sizeof(line), " %-15.15s %s", index->name, ((++k % 3)) ? "|" : "\r\n");
+			line[1] = UPPER(line[1]);	// cap name
+			
+			if (size + strlen(line) < sizeof(buf)) {
+				size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
+			}
+		}
 	}
 	msg_to_char(ch, "Players from site %s:\r\n", argument);
 	if (*buf) {
-		msg_to_char(ch, buf);
+		send_to_char(buf, ch);
 		
 		// trailing crlf
 		if (k % 3) {
@@ -1771,32 +1810,23 @@ SHOW(show_site) {
 
 
 SHOW(show_skills) {
-	extern char *ability_color(char_data *ch, int abil);
-	extern int get_ability_points_available_for_char(char_data *ch, int skill);
+	extern char *ability_color(char_data *ch, ability_data *abil);
+	extern int get_ability_points_available_for_char(char_data *ch, any_vnum skill);
 	
+	struct player_ability_data *plab, *next_plab;
+	struct player_skill_data *plsk, *next_plsk;
+	ability_data *abil;
+	skill_data *skill;
 	char_data *vict;
-	int sk_iter, ab_iter;
 	bool found, is_file = FALSE;
-	struct char_file_u tmp_store;
 	
 	argument = one_argument(argument, arg);
-	vict = get_player_vis(ch, arg, FIND_CHAR_WORLD);
 	
-	if (!vict) {
-		CREATE(vict, char_data, 1);
-		clear_char(vict);
-		if (load_char(arg, &tmp_store) > NOBODY) {
-			store_to_char(&tmp_store, vict);
-			SET_BIT(PLR_FLAGS(vict), PLR_KEEP_LAST_LOGIN_INFO);
-		}
-		else {
-			// still no
-			send_config_msg(ch, "no_person");
-			free(vict);
-			return;
-		}
+	if (!(vict = find_or_load_player(arg, &is_file))) {
+		send_config_msg(ch, "no_person");
+		return;
 	}
-	
+		
 	if (REAL_NPC(vict)) {
 		msg_to_char(ch, "You can't show skills on an NPC.\r\n");
 		if (is_file) {
@@ -1808,15 +1838,24 @@ SHOW(show_skills) {
 	
 	msg_to_char(ch, "Skills for %s:\r\n", PERS(vict, ch, TRUE));
 	
-	for (sk_iter = 0; sk_iter < NUM_SKILLS; ++sk_iter) {
-		msg_to_char(ch, "&y%s&0 [%d, %.1f%%, %d]: ", skill_data[sk_iter].name, GET_SKILL(vict, sk_iter), GET_SKILL_EXP(vict, sk_iter), get_ability_points_available_for_char(vict, sk_iter));
+	HASH_ITER(hh, GET_SKILL_HASH(vict), plsk, next_plsk) {
+		skill = plsk->ptr;
+		
+		msg_to_char(ch, "&y%s&0 [%d, %.1f%%, %d]: ", SKILL_NAME(skill), get_skill_level(vict, SKILL_VNUM(skill)), get_skill_exp(vict, SKILL_VNUM(skill)), get_ability_points_available_for_char(vict, SKILL_VNUM(skill)));
 		
 		found = FALSE;
-		for (ab_iter = 0; ab_iter < NUM_ABILITIES; ++ab_iter) {
-			if (ability_data[ab_iter].parent_skill == sk_iter && HAS_ABILITY(vict, ab_iter)) {
-				msg_to_char(ch, "%s%s%s&0", (found ? ", " : ""), ability_color(vict, ab_iter), ability_data[ab_iter].name);
-				found = TRUE;
+		HASH_ITER(hh, GET_ABILITY_HASH(vict), plab, next_plab) {
+			abil = plab->ptr;
+			
+			if (!plab->purchased) {
+				continue;
 			}
+			if (ABIL_ASSIGNED_SKILL(abil) != skill) {
+				continue;
+			}
+
+			msg_to_char(ch, "%s%s%s&0", (found ? ", " : ""), ability_color(vict, abil), ABIL_NAME(abil));
+			found = TRUE;
 		}
 		
 		msg_to_char(ch, "%s\r\n", (found ? "" : "none"));
@@ -1824,11 +1863,18 @@ SHOW(show_skills) {
 	
 	msg_to_char(ch, "&yClass&0: &g");
 	found = FALSE;
-	for (ab_iter = 0; ab_iter < NUM_ABILITIES; ++ab_iter) {
-		if (ability_data[ab_iter].parent_skill == NOTHING && HAS_ABILITY(vict, ab_iter)) {
-			msg_to_char(ch, "%s%s", (found ? ", " : ""), ability_data[ab_iter].name);
-			found = TRUE;
+	HASH_ITER(hh, GET_ABILITY_HASH(vict), plab, next_plab) {
+		abil = plab->ptr;
+		
+		if (!plab->purchased) {
+			continue;
 		}
+		if (ABIL_ASSIGNED_SKILL(abil) != NULL) {
+			continue;	// only looking for non-skill abilities
+		}
+
+		msg_to_char(ch, "%s%s", (found ? ", " : ""), ABIL_NAME(abil));
+		found = TRUE;
 	}
 	msg_to_char(ch, "&0%s\r\n", (found ? "" : "none"));
 	
@@ -1917,55 +1963,107 @@ SHOW(show_terrain) {
 
 
 SHOW(show_account) {
-	struct char_file_u cbuf, vbuf;
-	int iter;
+	player_index_data *plr_index, *index, *next_index;
+	bool file = FALSE, loaded_file = FALSE;
+	char_data *plr = NULL, *loaded;
 	
 	if (!*argument) {
 		msg_to_char(ch, "Usage: show account <player>\r\n");
 	}
-	else if (load_char(argument, &cbuf) == NOTHING) {
+	else if (!(plr = find_or_load_player(argument, &file))) {
 		send_to_char("There is no such player.\r\n", ch);
 	}
 	else {
 		msg_to_char(ch, "Account characters:\r\n");
 		
-		for (iter = 0; iter <= top_of_p_table; iter++) {
-			load_char(player_table[iter].name, &vbuf);
-			if (vbuf.char_specials_saved.idnum == cbuf.char_specials_saved.idnum || (vbuf.player_specials_saved.account_id != 0 && vbuf.player_specials_saved.account_id == cbuf.player_specials_saved.account_id)) {
-				// same account
-				if (is_playing(vbuf.char_specials_saved.idnum) || is_at_menu(vbuf.char_specials_saved.idnum)) {
-					msg_to_char(ch, " &c[%d %s] %s (online)&0%s\r\n", vbuf.player_specials_saved.last_known_level, class_data[vbuf.player_specials_saved.character_class].name, vbuf.name, IS_SET(vbuf.char_specials_saved.act, PLR_DELETED) ? " (deleted)" : "");
+		if (!(plr_index = find_player_index_by_idnum(GET_IDNUM(plr)))) {
+			msg_to_char(ch, "Unknown error: player not in index.\r\n");
+			if (file) {
+				free_char(plr);
+			}
+			return;
+		}
+		
+		HASH_ITER(name_hh, player_table_by_name, index, next_index) {
+			if (index->account_id != plr_index->account_id && strcmp(index->last_host, plr_index->last_host)) {
+				continue;
+			}
+			if (!(loaded = find_or_load_player(index->name, &loaded_file))) {
+				continue;
+			}
+			
+			if (GET_ACCOUNT(loaded) == GET_ACCOUNT(plr)) {
+				if (!loaded_file) {
+					msg_to_char(ch, " &c[%d %s] %s (online)&0\r\n", GET_COMPUTED_LEVEL(loaded), SHOW_CLASS_NAME(loaded), GET_PC_NAME(loaded));
 				}
 				else {
 					// not playing but same account
-					msg_to_char(ch, " [%d %s] %s%s\r\n", vbuf.player_specials_saved.last_known_level, class_data[vbuf.player_specials_saved.character_class].name, vbuf.name, IS_SET(vbuf.char_specials_saved.act, PLR_DELETED) ? " (deleted)" : "");
+					msg_to_char(ch, " [%d %s] %s\r\n", GET_LAST_KNOWN_LEVEL(loaded), SHOW_CLASS_NAME(loaded), GET_PC_NAME(loaded));
 				}
 			}
-			else if (!IS_SET(vbuf.char_specials_saved.act, PLR_DELETED) && !strcmp(vbuf.host, cbuf.host)) {
-				msg_to_char(ch, " &r[%d %s] %s (not on account)&0\r\n", vbuf.player_specials_saved.last_known_level, class_data[vbuf.player_specials_saved.character_class].name, vbuf.name);
+			else {
+				msg_to_char(ch, " &r[%d %s] %s (not on account)&0\r\n", loaded_file ? GET_LAST_KNOWN_LEVEL(loaded) : GET_COMPUTED_LEVEL(loaded), SHOW_CLASS_NAME(loaded), GET_PC_NAME(loaded));
+			}
+			
+			if (loaded_file) {
+				free_char(loaded);
 			}
 		}
+	}
+	
+	if (plr && file) {
+		free_char(plr);
 	}
 }
 
 
 SHOW(show_notes) {
-	struct char_file_u cbuf;
+	char buf[MAX_STRING_LENGTH];
+	player_index_data *index = NULL;
+	account_data *acct = NULL;
 	
 	if (!*argument) {
 		msg_to_char(ch, "Usage: show notes <player>\r\n");
+		return;
 	}
-	else if (load_char(argument, &cbuf) == NOTHING) {
-		msg_to_char(ch, "There is no such player.\r\n");
-	}
-	else if (cbuf.access_level >= GET_REAL_LEVEL(ch)) {
-		msg_to_char(ch, "You can't show notes for players of that level.\r\n");
-	}
-	else if (!*cbuf.player_specials_saved.admin_notes) {
-		msg_to_char(ch, "There are no notes for that player.\r\n");
+	
+	// argument parsing
+	if (isdigit(*argument)) {
+		if (!(acct = find_account(atoi(argument)))) {
+			msg_to_char(ch, "Unknown account '%s'.\r\n", argument);
+			return;
+		}
 	}
 	else {
-		msg_to_char(ch, "Admin notes for %s:\r\n%s", cbuf.name, cbuf.player_specials_saved.admin_notes);
+		if (!(index = find_player_index_by_name(argument))) {
+			msg_to_char(ch, "There is no such player.\r\n");
+			return;
+		}
+		if (index->access_level >= GET_ACCESS_LEVEL(ch)) {
+			msg_to_char(ch, "You can't show notes for players of that level.\r\n");
+			return;
+		}
+		if (!(acct = find_account(index->account_id))) {
+			msg_to_char(ch, "There are no notes for that player.\r\n");
+			return;
+		}
+	}
+	
+	// final checks
+	if (!acct) {	// in case somehow
+		msg_to_char(ch, "Unknown account.\r\n");
+	}
+	else if (!acct->notes || !*acct->notes) {
+		msg_to_char(ch, "There are no notes for that account.\r\n");
+	}
+	else {
+		if (index) {
+			strcpy(buf, index->fullname);
+		}
+		else {
+			sprintf(buf, "account %d", acct->id);
+		}
+		msg_to_char(ch, "Admin notes for %s:\r\n%s", buf, acct->notes);
 	}
 }
 
@@ -1998,6 +2096,7 @@ SHOW(show_arrowtypes) {
 
 SHOW(show_ignoring) {
 	char arg[MAX_INPUT_LENGTH];
+	player_index_data *index;
 	bool found, file = FALSE;
 	char_data *vict = NULL;
 	int iter;
@@ -2019,8 +2118,8 @@ SHOW(show_ignoring) {
 		
 		found = FALSE;
 		for (iter = 0; iter < MAX_IGNORES; ++iter) {
-			if (GET_IGNORE_LIST(vict, iter) != 0 && get_name_by_id(GET_IGNORE_LIST(vict, iter))) {
-				msg_to_char(ch, " %s\r\n", CAP(get_name_by_id(GET_IGNORE_LIST(vict, iter))));
+			if (GET_IGNORE_LIST(vict, iter) != 0 && (index = find_player_index_by_idnum(GET_IGNORE_LIST(vict, iter)))) {
+				msg_to_char(ch, " %s\r\n", index->fullname);
 				found = TRUE;
 			}
 		}
@@ -2107,7 +2206,7 @@ SHOW(show_startlocs) {
 	
 	strcpy(buf, "Starting locations:\r\n");
 	
-	HASH_ITER(world_hh, world_table, iter, next_iter) {
+	HASH_ITER(hh, world_table, iter, next_iter) {
 		if (ROOM_SECT_FLAGGED(iter, SECTF_START_LOCATION)) {
 			sprintf(buf + strlen(buf), "%s (%d, %d)&0\r\n", get_room_name(iter, TRUE), X_COORD(iter), Y_COORD(iter));
 		}
@@ -2288,11 +2387,12 @@ void do_stat_adventure(char_data *ch, adv_data *adv) {
 void do_stat_book(char_data *ch, book_data *book) {
 	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
 	struct paragraph_data *para;
+	player_index_data *index;
 	size_t size = 0;
 	int count, len, num;
 	char *ptr, *txt;
 	
-	size += snprintf(buf + size, sizeof(buf) - size, "Book VNum: [\tc%d\t0], Author: \ty%s\t0 (\tc%d\t0)\r\n", book->vnum, get_name_by_id(book->author) ? CAP(get_name_by_id(book->author)) : "nobody", book->author);
+	size += snprintf(buf + size, sizeof(buf) - size, "Book VNum: [\tc%d\t0], Author: \ty%s\t0 (\tc%d\t0)\r\n", book->vnum, (index = find_player_index_by_idnum(book->author)) ? index->fullname : "nobody", book->author);
 	size += snprintf(buf + size, sizeof(buf) - size, "Title: %s\r\n", book->title);
 	size += snprintf(buf + size, sizeof(buf) - size, "Byline: %s\r\n", book->byline);
 	size += snprintf(buf + size, sizeof(buf) - size, "Item: [%s]\r\n", book->item_name);
@@ -2424,6 +2524,7 @@ void do_stat_building(char_data *ch, bld_data *bdg) {
 
 /* Sends ch information on the character or animal k */
 void do_stat_character(char_data *ch, char_data *k) {
+	void check_delayed_load(char_data *ch);
 	void find_uid_name(char *uid, char *name);
 	extern double get_combat_speed(char_data *ch, int pos);
 	extern int get_block_rating(char_data *ch, bool can_gain_skill);
@@ -2433,7 +2534,8 @@ void do_stat_character(char_data *ch, char_data *k) {
 	extern int move_gain(char_data *ch);
 	void display_attributes(char_data *ch, char_data *to);
 
-	extern const char *class_role[NUM_ROLES];
+	extern const char *account_flags[];
+	extern const char *class_role[];
 	extern const char *cooldown_types[];
 	extern const char *damage_types[];
 	extern const double hit_per_dex;
@@ -2445,7 +2547,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 	extern const int base_hit_chance;
 	extern struct promo_code_list promo_codes[];
 
-	char lbuf[MAX_STRING_LENGTH], lbuf2[MAX_STRING_LENGTH], lbuf3[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH], lbuf2[MAX_STRING_LENGTH], lbuf3[MAX_STRING_LENGTH];
 	char uname[MAX_INPUT_LENGTH];
 	struct script_memory *mem;
 	struct trig_var_data *tv;
@@ -2457,12 +2559,20 @@ void do_stat_character(char_data *ch, char_data *k) {
 	struct affected_type *aff;
 	
 	bool is_proto = (IS_NPC(k) && k == mob_proto(GET_MOB_VNUM(k)));
+	
+	// ensure fully loaded
+	check_delayed_load(k);
 
 	sprinttype(GET_REAL_SEX(k), genders, buf);
 	CAP(buf);
 	sprintf(buf2, " %s '&y%s&0'  IDNum: [%5d], In room [%5d]\r\n", (!IS_NPC(k) ? "PC" : (!IS_MOB(k) ? "NPC" : "MOB")), GET_NAME(k), GET_IDNUM(k), IN_ROOM(k) ? GET_ROOM_VNUM(IN_ROOM(k)) : NOWHERE);
 	send_to_char(strcat(buf, buf2), ch);
-
+	
+	if (!IS_NPC(k) && GET_ACCOUNT(k)) {
+		sprintbit(GET_ACCOUNT(k)->flags, account_flags, buf, TRUE);
+		msg_to_char(ch, "Account: [%d], Flags: &g%s&0\r\n", GET_ACCOUNT(k)->id, buf);
+	}
+	
 	if (IS_MOB(k)) {
 		msg_to_char(ch, "Alias: &y%s&0, VNum: [&c%5d&0]\r\n", GET_PC_NAME(k), GET_MOB_VNUM(k));
 		msg_to_char(ch, "L-Des: &y%s&0", (GET_LONG_DESC(k) ? GET_LONG_DESC(k) : "<None>\r\n"));
@@ -2474,14 +2584,14 @@ void do_stat_character(char_data *ch, char_data *k) {
 	else {	// not NPC
 		msg_to_char(ch, "Title: %s&0\r\n", (GET_TITLE(k) ? GET_TITLE(k) : "<None>"));
 		
-		if (*GET_REFERRED_BY(k)) {
+		if (GET_REFERRED_BY(k) && *GET_REFERRED_BY(k)) {
 			msg_to_char(ch, "Referred by: %s\r\n", GET_REFERRED_BY(k));
 		}
 		if (GET_PROMO_ID(k) > 0) {
 			msg_to_char(ch, "Promo code: %s\r\n", promo_codes[GET_PROMO_ID(k)].code);
 		}
 
-		msg_to_char(ch, "Access Level: [&c%d&0], Class: [&c%s&0/&c%s&0], Skill Level: [&c%d&0], Gear Level: [&c%d&0], Total: [&c%d&0]\r\n", GET_ACCESS_LEVEL(k), class_data[GET_CLASS(k)].name, class_role[(int) GET_CLASS_ROLE(k)], GET_SKILL_LEVEL(k), GET_GEAR_LEVEL(k), IN_ROOM(k) ? GET_COMPUTED_LEVEL(k) : GET_LAST_KNOWN_LEVEL(k));
+		msg_to_char(ch, "Access Level: [&c%d&0], Class: [&c%s&0/&c%s&0], Skill Level: [&c%d&0], Gear Level: [&c%d&0], Total: [&c%d&0]\r\n", GET_ACCESS_LEVEL(k), SHOW_CLASS_NAME(k), class_role[(int) GET_CLASS_ROLE(k)], GET_SKILL_LEVEL(k), GET_GEAR_LEVEL(k), IN_ROOM(k) ? GET_COMPUTED_LEVEL(k) : GET_LAST_KNOWN_LEVEL(k));
 		
 		coin_string(GET_PLAYER_COINS(k), buf);
 		msg_to_char(ch, "Coins: %s\r\n", buf);
@@ -2493,7 +2603,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 
 		msg_to_char(ch, "Created: [%s, %s], Played [%dh %dm], Age [%d]\r\n", buf1, buf2, k->player.time.played / SECS_PER_REAL_HOUR, ((k->player.time.played % SECS_PER_REAL_HOUR) / SECS_PER_REAL_MIN), age(k)->year);
 		if (GET_ACCESS_LEVEL(k) <= GET_ACCESS_LEVEL(ch)) {
-			msg_to_char(ch, "Created from host: [%s]\r\n", GET_CREATION_HOST(k));
+			msg_to_char(ch, "Created from host: [%s]\r\n", NULLSAFE(GET_CREATION_HOST(k)));
 		}
 		
 		if (GET_ACCESS_LEVEL(k) >= LVL_BUILDER) {
@@ -2719,11 +2829,14 @@ void do_stat_character(char_data *ch, char_data *k) {
 
 
 void do_stat_craft(char_data *ch, craft_data *craft) {
+	void get_resource_display(struct resource_data *list, char *save_buffer);
+
 	extern const char *craft_flags[];
 	extern const char *craft_types[];
-
+	
+	ability_data *abil;
 	bld_data *bld;
-	int count, iter, seconds;
+	int seconds;
 	
 	msg_to_char(ch, "Name: '&y%s&0', Vnum: [&g%d&0], Type: &c%s&0\r\n", GET_CRAFT_NAME(craft), GET_CRAFT_VNUM(craft), craft_types[GET_CRAFT_TYPE(craft)]);
 	
@@ -2738,9 +2851,9 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 		msg_to_char(ch, "Creates Quantity: [&g%d&0], Item: [&c%d&0] %s\r\n", GET_CRAFT_QUANTITY(craft), GET_CRAFT_OBJECT(craft), get_obj_name_by_proto(GET_CRAFT_OBJECT(craft)));
 	}
 	
-	sprintf(buf, "%s", (GET_CRAFT_ABILITY(craft) == NO_ABIL ? "none" : ability_data[GET_CRAFT_ABILITY(craft)].name));
-	if (GET_CRAFT_ABILITY(craft) != NO_ABIL && ability_data[GET_CRAFT_ABILITY(craft)].parent_skill != NO_SKILL) {
-		sprintf(buf + strlen(buf), " (%s %d)", skill_data[ability_data[GET_CRAFT_ABILITY(craft)].parent_skill].name, ability_data[GET_CRAFT_ABILITY(craft)].parent_skill_required);
+	sprintf(buf, "%s", (GET_CRAFT_ABILITY(craft) == NO_ABIL ? "none" : get_ability_name_by_vnum(GET_CRAFT_ABILITY(craft))));
+	if ((abil = find_ability_by_vnum(GET_CRAFT_ABILITY(craft))) && ABIL_ASSIGNED_SKILL(abil) != NULL) {
+		sprintf(buf + strlen(buf), " (%s %d)", SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
 	}
 	seconds = GET_CRAFT_TIME(craft) * ACTION_CYCLE_TIME;
 	msg_to_char(ch, "Ability: &y%s&0, Level: &g%d&0, Time: [&g%d action tick%s&0 | &g%d:%02d&0]\r\n", buf, GET_CRAFT_MIN_LEVEL(craft), GET_CRAFT_TIME(craft), PLURAL(GET_CRAFT_TIME(craft)), seconds / SECS_PER_REAL_MIN, seconds % SECS_PER_REAL_MIN);
@@ -2760,18 +2873,9 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 	}
 
 	// resources
-	count = 0;
 	msg_to_char(ch, "Resources required: ");
-	for (iter = 0; iter < MAX_RESOURCES_REQUIRED && GET_CRAFT_RESOURCES(craft)[iter].vnum != NOTHING; ++iter) {
-		msg_to_char(ch, "%s&y[%d] %s (x%d)&0", (count > 0 ? ", ": ""), GET_CRAFT_RESOURCES(craft)[iter].vnum, skip_filler(get_obj_name_by_proto(GET_CRAFT_RESOURCES(craft)[iter].vnum)), GET_CRAFT_RESOURCES(craft)[iter].amount);
-		++count;
-	}
-	if (count == 0) {
-		msg_to_char(ch, "none\r\n");
-	}
-	else {
-		msg_to_char(ch, "\r\n");
-	}
+	get_resource_display(GET_CRAFT_RESOURCES(craft), buf);
+	send_to_char(buf, ch);
 }
 
 
@@ -2821,17 +2925,37 @@ void do_stat_global(char_data *ch, struct global_data *glb) {
 	extern const char *global_types[];
 	
 	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
+	ability_data *abil;
 	
 	msg_to_char(ch, "Global VNum: [&c%d&0], Type: [&c%s&0], Name: '&c%s&0'\r\n", GET_GLOBAL_VNUM(glb), global_types[GET_GLOBAL_TYPE(glb)], GET_GLOBAL_NAME(glb));
+
+	sprintf(buf, "%s", (GET_GLOBAL_ABILITY(glb) == NO_ABIL ? "none" : get_ability_name_by_vnum(GET_GLOBAL_ABILITY(glb))));
+	if ((abil = find_ability_by_vnum(GET_GLOBAL_ABILITY(glb))) && ABIL_ASSIGNED_SKILL(abil) != NULL) {
+		sprintf(buf + strlen(buf), " (%s %d)", SKILL_ABBREV(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
+	}
+	msg_to_char(ch, "Requires ability: [&y%s&0], Percent: [&g%.2f&0]\r\n", buf, GET_GLOBAL_PERCENT(glb));
 	
 	sprintbit(GET_GLOBAL_FLAGS(glb), global_flags, buf, TRUE);
 	msg_to_char(ch, "Flags: &g%s&0\r\n", buf);
 	
+	// GLOBAL_x
 	switch (GET_GLOBAL_TYPE(glb)) {
 		case GLOBAL_MOB_INTERACTIONS: {
 			sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), action_bits, buf, TRUE);
 			sprintbit(GET_GLOBAL_TYPE_EXCLUDE(glb), action_bits, buf2, TRUE);
 			msg_to_char(ch, "Levels: [&g%s&0], Mob Flags: &c%s&0, Exclude: &c%s&0\r\n", level_range_string(GET_GLOBAL_MIN_LEVEL(glb), GET_GLOBAL_MAX_LEVEL(glb), 0), buf, buf2);
+			break;
+		}
+		case GLOBAL_MINE_DATA: {
+			sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), sector_flags, buf, TRUE);
+			sprintbit(GET_GLOBAL_TYPE_EXCLUDE(glb), sector_flags, buf2, TRUE);
+			msg_to_char(ch, "Capacity: [&g%d-%d normal, %d-%d deep&0], Sector Flags: &c%s&0, Exclude: &c%s&0\r\n", GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE)/2, GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE), (int)(GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE) / 2.0 * 1.5), (int)(GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE) * 1.5), buf, buf2);
+			break;
+		}
+		case GLOBAL_NEWBIE_GEAR: {
+			void get_archetype_gear_display(struct archetype_gear *list, char *save_buffer);
+			get_archetype_gear_display(GET_GLOBAL_GEAR(glb), buf2);
+			msg_to_char(ch, "Gear:\r\n%s", buf2);
 			break;
 		}
 	}
@@ -2846,6 +2970,7 @@ void do_stat_global(char_data *ch, struct global_data *glb) {
 
 /* Gives detailed information on an object (j) to ch */
 void do_stat_object(char_data *ch, obj_data *j) {
+	extern const char *apply_type_names[];
 	extern const struct material_data materials[NUM_MATERIALS];
 	extern const char *wear_bits[];
 	extern const char *item_types[];
@@ -2857,13 +2982,16 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	extern struct ship_data_struct ship_data[];
 	extern const char *armor_types[NUM_ARMOR_TYPES+1];
 	extern const struct poison_data_type poison_data[];
-
-	int i, found;
+	
+	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
+	int found;
+	struct obj_apply *apply;
 	room_data *room;
 	obj_vnum vnum = GET_OBJ_VNUM(j);
 	obj_data *j2;
 	struct obj_storage_type *store;
 	struct obj_custom_message *ocm;
+	player_index_data *index;
 
 	msg_to_char(ch, "Name: '&y%s&0', Aliases: %s\r\n", GET_OBJ_DESC(j, ch, OBJ_DESC_SHORT), GET_OBJ_KEYWORDS(j));
 
@@ -2932,7 +3060,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 		
 		msg_to_char(ch, "Bound to:");
 		for (bind = OBJ_BOUND_TO(j); bind; bind = bind->next) {
-			msg_to_char(ch, " %s", get_name_by_id(bind->idnum) ? CAP(get_name_by_id(bind->idnum)) : "<unknown>");
+			msg_to_char(ch, " %s", (index = find_player_index_by_idnum(bind->idnum)) ? index->fullname : "<unknown>");
 		}
 		msg_to_char(ch, "\r\n");
 	}
@@ -2981,7 +3109,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 				msg_to_char(ch, "%s\r\n", get_mob_name_by_proto(GET_CORPSE_NPC_VNUM(j)));
 			}
 			else if (IS_PC_CORPSE(j)) {
-				msg_to_char(ch, "%s\r\n", get_name_by_id(GET_CORPSE_PC_ID(j)) ? CAP(get_name_by_id(GET_CORPSE_PC_ID(j))) : "a player");
+				msg_to_char(ch, "%s\r\n", (index = find_player_index_by_idnum(GET_CORPSE_PC_ID(j))) ? index->fullname : "a player");
 			}
 			else {
 				msg_to_char(ch, "unknown\r\n");
@@ -3077,9 +3205,15 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	}
 	found = 0;
 	send_to_char("Applies:", ch);
-	for (i = 0; i < MAX_OBJ_AFFECT; i++)
-		if (j->affected[i].modifier)
-			msg_to_char(ch, "%s %+d to %s", found++ ? "," : "", j->affected[i].modifier, apply_types[(int) j->affected[i].location]);
+	for (apply = GET_OBJ_APPLIES(j); apply; apply = apply->next) {
+		if (apply->apply_type != APPLY_TYPE_NATURAL) {
+			sprintf(part, " (%s)", apply_type_names[(int)apply->apply_type]);
+		}
+		else {
+			*part = '\0';
+		}
+		msg_to_char(ch, "%s %+d to %s%s", found++ ? "," : "", apply->modifier, apply_types[(int) apply->location], part);
+	}
 	if (!found)
 		send_to_char(" None", ch);
 
@@ -3122,7 +3256,6 @@ void do_stat_object(char_data *ch, obj_data *j) {
 
 /* Displays the vital statistics of IN_ROOM(ch) to ch */
 void do_stat_room(char_data *ch) {
-	extern char *get_mine_type_name(room_data *room);
 	extern const char *exit_bits[];
 	extern const char *depletion_type[NUM_DEPLETION_TYPES];
 	extern const char *room_extra_types[];
@@ -3136,18 +3269,20 @@ void do_stat_room(char_data *ch) {
 	crop_data *cp;
 	empire_data *emp;
 	struct affected_type *aff;
-	struct room_extra_data *red;
+	struct room_extra_data *red, *next_red;
+	player_index_data *index;
+	struct global_data *glb;
 	room_data *home = HOME_ROOM(IN_ROOM(ch));
 
 
-	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_HAS_CROP_DATA) && (cp = crop_proto(get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CROP_TYPE)))) {
+	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_HAS_CROP_DATA) && (cp = ROOM_CROP(IN_ROOM(ch)))) {
 		strcpy(buf2, GET_CROP_NAME(cp));
 		CAP(buf2);
 	}
 	else {
 		strcpy(buf2, GET_SECT_NAME(SECT(IN_ROOM(ch))));
 	}
-	msg_to_char(ch, "(%d, %d) %s (&c%s&0/&c%s&0)\r\n", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), get_room_name(IN_ROOM(ch), FALSE), buf2, GET_SECT_NAME(ROOM_ORIGINAL_SECT(IN_ROOM(ch))));
+	msg_to_char(ch, "(%d, %d) %s (&c%s&0/&c%s&0)\r\n", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), get_room_name(IN_ROOM(ch), FALSE), buf2, GET_SECT_NAME(BASE_SECT(IN_ROOM(ch))));
 	msg_to_char(ch, "VNum: [&g%d&0], Island: [%d] %s\r\n", GET_ROOM_VNUM(IN_ROOM(ch)), GET_ISLAND_ID(home), get_island(GET_ISLAND_ID(home), TRUE)->name);
 	
 	if (home != IN_ROOM(ch)) {
@@ -3165,7 +3300,7 @@ void do_stat_room(char_data *ch) {
 			msg_to_char(ch, ", City: %s", city->name);
 		}
 		if (ROOM_PRIVATE_OWNER(home) != NOBODY) {
-			msg_to_char(ch, ", Home: %s", get_name_by_id(ROOM_PRIVATE_OWNER(home)) ? CAP(get_name_by_id(ROOM_PRIVATE_OWNER(home))) : "someone");
+			msg_to_char(ch, ", Home: %s", (index = find_player_index_by_idnum(ROOM_PRIVATE_OWNER(home))) ? index->fullname : "someone");
 		}
 		
 		send_to_char("\r\n", ch);
@@ -3184,11 +3319,11 @@ void do_stat_room(char_data *ch) {
 	}
 
 	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_CAN_MINE) || ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_MINE)) {
-		if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_TYPE) == MINE_NOT_SET) {
+		if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_GLB_VNUM) <= 0 || !(glb = global_proto(get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_GLB_VNUM))) || GET_GLOBAL_TYPE(glb) != GLOBAL_MINE_DATA) {
 			msg_to_char(ch, "This area is unmined.\r\n");
 		}
 		else {
-			msg_to_char(ch, "Mineral: %s, Amount remaining: %d\r\n", get_mine_type_name(IN_ROOM(ch)), get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_AMOUNT));
+			msg_to_char(ch, "Mine type: %s, Amount remaining: %d\r\n", GET_GLOBAL_NAME(glb), get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_AMOUNT));
 		}
 	}
 
@@ -3283,7 +3418,7 @@ void do_stat_room(char_data *ch) {
 	if (IN_ROOM(ch)->extra_data) {
 		msg_to_char(ch, "Extra data:\r\n");
 		
-		for (red = IN_ROOM(ch)->extra_data; red; red = red->next) {
+		HASH_ITER(hh, IN_ROOM(ch)->extra_data, red, next_red) {
 			sprinttype(red->type, room_extra_types, buf);
 			msg_to_char(ch, " %s: %d\r\n", buf, red->value);
 		}
@@ -3358,8 +3493,6 @@ void do_stat_room_template(char_data *ch, room_template *rmt) {
 */
 void do_stat_sector(char_data *ch, sector_data *st) {
 	void get_evolution_display(struct evolution_data *list, char *save_buffer);
-
-	extern const char *sector_flags[];
 	
 	msg_to_char(ch, "Sector VNum: [&c%d&0], Name: '&c%s&0'\r\n", st->vnum, st->name);
 	msg_to_char(ch, "Room Title: %s\r\n", st->title);
@@ -3522,11 +3655,17 @@ int vnum_global(char *searchname, char_data *ch) {
 	int found = 0;
 	
 	HASH_ITER(hh, globals_table, iter, next_iter) {
-		if (multi_isname(searchname, GET_GLOBAL_NAME(iter))) {			
+		if (multi_isname(searchname, GET_GLOBAL_NAME(iter))) {
+			// GLOBAL_x
 			switch (GET_GLOBAL_TYPE(iter)) {
 				case GLOBAL_MOB_INTERACTIONS: {
 					sprintbit(GET_GLOBAL_TYPE_FLAGS(iter), action_bits, flags, TRUE);
 					msg_to_char(ch, "%3d. [%5d] %s (%s) %s\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), level_range_string(GET_GLOBAL_MIN_LEVEL(iter), GET_GLOBAL_MAX_LEVEL(iter), 0), flags);
+					break;
+				}
+				case GLOBAL_MINE_DATA: {
+					sprintbit(GET_GLOBAL_TYPE_FLAGS(iter), sector_flags, flags, TRUE);
+					msg_to_char(ch, "%3d. [%5d] %s - %s\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), flags);
 					break;
 				}
 				default: {
@@ -3635,44 +3774,62 @@ int vnum_trigger(char *searchname, char_data *ch) {
 //// COMMANDS ////////////////////////////////////////////////////////////////
 
 ACMD(do_addnotes) {
-	char notes[MAX_ADMIN_NOTES_LENGTH];
-	char_data *vict = NULL;
-	bool file = FALSE;
+	char notes[MAX_ADMIN_NOTES_LENGTH + 1], buf[MAX_STRING_LENGTH];
+	player_index_data *index = NULL;
+	account_data *acct = NULL;
 	
 	argument = one_argument(argument, arg);	// target
 	skip_spaces(&argument);	// text to add
 	
 	if (!*arg || !*argument) {
 		msg_to_char(ch, "Usage: addnotes <name> <text>\r\n");
+		return;
 	}
-	else if (!(vict = find_or_load_player(arg, &file))) {
-		send_to_char("There is no such player.\r\n", ch);
-	}
-	else if (GET_ACCESS_LEVEL(vict) >= GET_ACCESS_LEVEL(ch)) {
-		msg_to_char(ch, "You cannot add notes for players of that level.\r\n");
-	}
-	else if (strlen(GET_ADMIN_NOTES(vict)) + strlen(argument) + 2 > MAX_ADMIN_NOTES_LENGTH) {
-		msg_to_char(ch, "Notes too long, unable to add text. Use editnotes instead.\r\n");
+	
+	// argument processing
+	if (isdigit(*arg)) {
+		if (!(acct = find_account(atoi(arg)))) {
+			msg_to_char(ch, "Unknown account '%s'.\r\n", arg);
+			return;
+		}
 	}
 	else {
-		snprintf(notes, sizeof(notes), "%s%s\r\n", GET_ADMIN_NOTES(vict), argument);
-		strcpy(GET_ADMIN_NOTES(vict), notes);	// strcpy OK: same length
-		
-		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has added notes for %s", GET_NAME(ch), GET_NAME(vict));
-		msg_to_char(ch, "Notes added to %s.\r\n", GET_NAME(vict));
-		
-		if (file) {
-			store_loaded_char(vict);
-			file = FALSE;
+		if (!(index = find_player_index_by_name(arg))) {
+			send_to_char("There is no such player.\r\n", ch);
+			return;
 		}
-		else {
-			SAVE_CHAR(vict);
+		if (index->access_level >= GET_ACCESS_LEVEL(ch)) {
+			msg_to_char(ch, "You cannot add notes for players of that level.\r\n");
+			return;
+		}
+		if (!(acct = find_account(index->account_id))) {
+			msg_to_char(ch, "Unable to find the account for that player.\r\n");
+			return;
 		}
 	}
 	
-	// in case
-	if (vict && file) {
-		free_char(vict);
+	// final checks
+	if (!acct) {
+		msg_to_char(ch, "Unknown account.\r\n");
+	}
+	if (strlen(NULLSAFE(acct->notes)) + strlen(argument) + 2 > MAX_ADMIN_NOTES_LENGTH) {
+		msg_to_char(ch, "Notes too long, unable to add text. Use editnotes instead.\r\n");
+	}
+	else {
+		snprintf(notes, sizeof(notes), "%s%s\r\n", NULLSAFE(acct->notes), argument);
+		if (acct->notes) {
+			free(acct->notes);
+		}
+		acct->notes = str_dup(notes);
+		
+		if (index) {
+			strcpy(buf, index->fullname);
+		}
+		else {
+			sprintf(buf, "account %d", acct->id);
+		}
+		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has added notes for %s", GET_NAME(ch), buf);
+		msg_to_char(ch, "Notes added to %s.\r\n", buf);
 	}
 }
 
@@ -3799,46 +3956,37 @@ ACMD(do_at) {
 
 
 ACMD(do_authorize) {
-	void save_char_file_u(struct char_file_u *st);
-	struct char_file_u chdata;
-	char_data *vict;
-	int id;
+	char_data *vict = NULL;
+	bool file = FALSE;
 
 	one_argument(argument, arg);
 
 	if (!*arg)
 		msg_to_char(ch, "Usage: authorize <character>\r\n");
-	else if (!(id = get_id_by_name(arg)))
+	else if (!(vict = find_or_load_player(arg, &file))) {
 		msg_to_char(ch, "Unable to find character '%s'?\r\n", arg);
+	}
 	else {
-		if ((vict = is_playing(id))) {
-			if (GET_ACCESS_LEVEL(vict) < LVL_APPROVED) {
-				GET_ACCESS_LEVEL(vict) = LVL_APPROVED;
-			}
-			SAVE_CHAR(vict);
+		if (GET_ACCESS_LEVEL(vict) < LVL_APPROVED) {
+			GET_ACCESS_LEVEL(vict) = LVL_APPROVED;
+		}
+		if (!file) {
 			msg_to_char(vict, "Your character has been authorized.\r\n");
-			mortlog("%s has been authorized!", PERS(vict, vict, 1));
 		}
-		else {
-			if ((load_char(arg, &chdata)) > NOBODY) {
-				if (chdata.char_specials_saved.idnum > 0) {
-					if (chdata.access_level < LVL_APPROVED) {
-						chdata.access_level = LVL_APPROVED;
-					}
-					save_char_file_u(&chdata);
-				}
-				else {
-					msg_to_char(ch, "You can't authorize someone with idnum 0.\r\n");
-					return;
-				}
-			}
-			else {
-				msg_to_char(ch, "No player by that name.\r\n");
-				return;
-			}
+		mortlog("%s has been authorized!", PERS(vict, vict, TRUE));
+		syslog(SYS_VALID, GET_INVIS_LEV(ch), TRUE, "VALID: %s has been authorized by %s", GET_PC_NAME(vict), GET_NAME(ch));
+		msg_to_char(ch, "%s authorized.\r\n", GET_PC_NAME(vict));
+
+		if (file) {
+			store_loaded_char(vict);
+			vict = NULL;
+			file = FALSE;
 		}
-		syslog(SYS_VALID, GET_INVIS_LEV(ch), TRUE, "VALID: %s has been authorized by %s", CAP(arg), GET_NAME(ch));
-		msg_to_char(ch, "%s authorized.\r\n", CAP(arg));
+		
+	}
+	
+	if (vict && file) {
+		free_char(vict);
 	}
 }
 
@@ -3885,11 +4033,9 @@ ACMD(do_autowiz) {
 
 
 ACMD(do_clearabilities) {
-	extern int find_skill_by_name(char *name);
-	
 	char_data *vict;
 	char typestr[MAX_STRING_LENGTH];
-	int skill = NO_SKILL;
+	skill_data *skill = NULL;
 	bool all;
 
 	argument = one_argument(argument, arg);
@@ -3905,19 +4051,19 @@ ACMD(do_clearabilities) {
 	}
 	else {
 		all = FALSE;
-		if ((skill = find_skill_by_name(argument)) == NO_SKILL) {
+		if (!(skill = find_skill(argument))) {
 			msg_to_char(ch, "Invalid skill '%s'.\r\n", argument);
 			return;
 		}
 	}
 	
-	clear_char_abilities(vict, all ? NO_SKILL : skill);
+	clear_char_abilities(vict, all ? NO_SKILL : SKILL_VNUM(skill));
 	
 	if (all) {
 		*typestr = '\0';
 	}
 	else {
-		sprintf(typestr, "%s ", skill_data[skill].name);
+		sprintf(typestr, "%s ", SKILL_NAME(skill));
 	}
 	
 	syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has cleared %s's %sabilities", GET_REAL_NAME(ch), GET_REAL_NAME(vict), typestr);
@@ -4260,42 +4406,73 @@ ACMD(do_edelete) {
 
 
 ACMD(do_editnotes) {
-	char_data *vict = NULL;
-	bool file = FALSE;
-	char **write;
+	player_index_data *index = NULL;
+	char buf[MAX_STRING_LENGTH];
+	account_data *acct = NULL;
+	descriptor_data *desc;
 	
 	one_argument(argument, arg);
 	
+	// preliminaries
 	if (!ch->desc) {
 		msg_to_char(ch, "You can't do that.\r\n");
+		return;
 	}
-	else if (ch->desc->str) {
+	if (ch->desc->str) {
 		msg_to_char(ch, "You're already editing something else.\r\n");
+		return;
 	}
-	else if (!*arg) {
+	if (!*arg) {
 		msg_to_char(ch, "Edit notes for whom?\r\n");
+		return;
 	}
-	else if (!(vict = find_or_load_player(arg, &file))) {
-		send_to_char("There is no such player.\r\n", ch);
-	}
-	else if (GET_ACCESS_LEVEL(vict) >= GET_ACCESS_LEVEL(ch)) {
-		msg_to_char(ch, "You cannot edit notes for players of that level.\r\n");
+	
+	// argument processing
+	if (isdigit(*arg)) {
+		if (!(acct = find_account(atoi(arg)))) {
+			msg_to_char(ch, "Unknown account '%s'.\r\n", arg);
+			return;
+		}
 	}
 	else {
-		// duplicate the str -- the victim will be un-loaded, so we can't edit it directly
-		CREATE(write, char*, 1);
-		*write = str_dup(GET_ADMIN_NOTES(vict));
-		
-		sprintf(buf, "notes for %s", GET_NAME(vict));
-		start_string_editor(ch->desc, buf, write, MAX_ADMIN_NOTES_LENGTH-1);
-		ch->desc->notes_id = GET_IDNUM(vict);
-	
-		act("$n begins editing some notes.", TRUE, ch, 0, 0, TO_ROOM);
+		if (!(index = find_player_index_by_name(arg))) {
+			send_to_char("There is no such player.\r\n", ch);
+			return;
+		}
+		if (index->access_level >= GET_ACCESS_LEVEL(ch)) {
+			msg_to_char(ch, "You cannot edit notes for players of that level.\r\n");
+			return;
+		}
+		if (!(acct = find_account(index->account_id))) {
+			msg_to_char(ch, "Unable to find account for that player.\r\n");
+			return;
+		}
 	}
 	
-	if (vict && file) {
-		free_char(vict);
+	if (!acct) {
+		msg_to_char(ch, "Unable to find account.\r\n");
+		return;
 	}
+	
+	// ensure nobody else is writing notes for the same person
+	for (desc = descriptor_list; desc; desc = desc->next) {
+		if (desc != ch->desc && desc->str == &(acct->notes)) {
+			msg_to_char(ch, "Someone is already editing notes for that account.\r\n");
+			return;
+		}
+	}
+	
+	// good to go
+	if (index) {
+		sprintf(buf, "notes for %s", index->fullname);
+	}
+	else {
+		sprintf(buf, "notes for account %d", acct->id);
+	}
+	start_string_editor(ch->desc, buf, &(acct->notes), MAX_ADMIN_NOTES_LENGTH-1);
+	ch->desc->notes_id = acct->id;
+
+	act("$n begins editing some notes.", TRUE, ch, FALSE, FALSE, TO_ROOM);
 }
 
 
@@ -4510,7 +4687,7 @@ ACMD(do_gecho) {
 	skip_spaces(&argument);
 	delete_doubledollar(argument);
 
-	if (!IS_NPC(ch) && PLR_FLAGGED(ch, PLR_MUTED))
+	if (!IS_NPC(ch) && ACCOUNT_FLAGGED(ch, ACCT_MUTED))
 		msg_to_char(ch, "You can't use gecho while muted.\r\n");
 	else if (!*argument)
 		send_to_char("That must be a mistake...\r\n", ch);
@@ -4746,22 +4923,30 @@ ACMD(do_island) {
 
 ACMD(do_last) {
 	extern const char *level_names[][2];
-
-	struct char_file_u chdata;
+	
+	char_data *plr = NULL;
+	bool file = FALSE;
 	char status[10];
 
 	one_argument(argument, arg);
 
-	if (!*arg)
+	if (!*arg) {
 		send_to_char("For whom do you wish to search?\r\n", ch);
-	else if (load_char(arg, &chdata) == NOTHING)
+	}
+	else if (!(plr = find_or_load_player(arg, &file))) {
 		send_to_char("There is no such player.\r\n", ch);
-	else if ((chdata.access_level > GET_ACCESS_LEVEL(ch)) && (GET_ACCESS_LEVEL(ch) < LVL_IMPL))
+	}
+	else if ((GET_ACCESS_LEVEL(plr) > GET_ACCESS_LEVEL(ch)) && (GET_ACCESS_LEVEL(ch) < LVL_IMPL)) {
 		send_to_char("You are not sufficiently godly for that!\r\n", ch);
+	}
 	else {
-		strcpy(status, level_names[(int) chdata.access_level][0]);
+		strcpy(status, level_names[(int) GET_ACCESS_LEVEL(plr)][0]);
 		// crlf built into ctime
-		msg_to_char(ch, "[%5d] [%s] %-12s : %-18s : %-20s", chdata.char_specials_saved.idnum, status, chdata.name, chdata.host, ctime(&chdata.last_logon));
+		msg_to_char(ch, "[%5d] [%s] %-12s : %-18s : %-20s", GET_IDNUM(plr), status, GET_PC_NAME(plr), plr->desc ? plr->desc->host : plr->prev_host, file ? ctime(&plr->prev_logon) : ctime(&plr->player.time.logon));
+	}
+	
+	if (plr && file) {
+		free_char(plr);
 	}
 }
 
@@ -4976,6 +5161,80 @@ ACMD(do_oset) {
 }
 
 
+ACMD(do_playerdelete) {
+	void delete_player_character(char_data *ch);
+	
+	descriptor_data *desc, *next_desc;
+	char name[MAX_INPUT_LENGTH];
+	char_data *victim = NULL;
+	bool file = FALSE;
+	
+	argument = any_one_arg(argument, name);
+	skip_spaces(&argument);
+	
+	if (!*argument || !*name) {
+		msg_to_char(ch, "Usage: playerdelete <name> CONFIRM\r\n");
+	}
+	else if (!(victim = find_or_load_player(name, &file))) {
+		msg_to_char(ch, "Unknown player '%s'.\r\n", name);
+	}
+	else if (GET_ACCESS_LEVEL(victim) >= GET_ACCESS_LEVEL(ch)) {
+		msg_to_char(ch, "No, no, no, no, no, no, no.\r\n");
+	}
+	else if (PLR_FLAGGED(victim, PLR_NODELETE)) {
+		msg_to_char(ch, "You cannot delete that player because of a !DEL player flag.\r\n");
+	}
+	else if (strcmp(argument, "CONFIRM")) {
+		msg_to_char(ch, "You must type the word CONFIRM, in all caps, after the target name.\r\n");
+		msg_to_char(ch, "WARNING: This will permanently delete the character.\r\n");
+	}
+	else {
+		// logs and messaging
+		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has deleted player %s.", GET_NAME(ch), GET_NAME(victim));
+		if (!file) {
+			if (!GET_INVIS_LEV(victim)) {
+				act("$n has left the game.", TRUE, victim, FALSE, FALSE, TO_ROOM);
+			}
+			if (GET_INVIS_LEV(victim) == 0) {
+				if (config_get_bool("public_logins")) {
+					mortlog("%s has left the game", PERS(victim, victim, TRUE));
+				}
+				else if (GET_LOYALTY(victim)) {
+					log_to_empire(GET_LOYALTY(victim), ELOG_LOGINS, "%s has left the game", PERS(victim, victim, TRUE));
+				}
+			}
+			msg_to_char(victim, "Your character has been deleted. Goodbye...\r\n");
+		}
+		
+		// look for this character at a menu, in case
+		for (desc = descriptor_list; desc; desc = next_desc) {
+			next_desc = desc->next;
+			
+			if (desc->character && desc->character != victim && GET_IDNUM(desc->character) == GET_IDNUM(victim)) {
+				msg_to_desc(desc, "Your character has been deleted. Goodbye...\r\n");
+				if (STATE(desc) == CON_PLAYING) {
+					STATE(desc) = CON_DISCONNECT;
+				}
+				else {
+					STATE(desc) = CON_CLOSE;
+				}
+			}
+		}
+		
+		// actual delete (remove items first)
+		extract_all_items(victim);
+		delete_player_character(victim);
+		extract_char(victim);
+		victim = NULL;	// prevent cleanup
+	}
+	
+	// cleanup
+	if (victim && file) {
+		free_char(victim);
+	}
+}
+
+
 ACMD(do_poofset) {
 	char **msg;
 	
@@ -5000,8 +5259,7 @@ ACMD(do_poofset) {
 		}
 		return;
 	}
-
-	// char_file_u only holds MAX_POOFIN_LENGTH+1
+	
 	if (strlen(argument) > MAX_POOFIN_LENGTH) {
 		msg_to_char(ch, "You can't set that to anything longer than %d characters.\r\n", MAX_POOF_LENGTH);
 		return;
@@ -5309,6 +5567,8 @@ ACMD(do_rescale) {
 
 
 ACMD(do_restore) {
+	ability_data *abil, *next_abil;
+	skill_data *skill, *next_skill;
 	struct cooldown_data *cool;
 	empire_data *emp;
 	char_data *vict;
@@ -5348,8 +5608,8 @@ ACMD(do_restore) {
 				vict->real_attributes[iter] = att_max(vict);
 			}
 			
-			for (i = 0; i < NUM_SKILLS; ++i) {
-				set_skill(vict, i, 100);
+			HASH_ITER(hh, skill_table, skill, next_skill) {
+				set_skill(vict, SKILL_VNUM(skill), 100);
 			}
 			update_class(vict);
 			
@@ -5359,9 +5619,8 @@ ACMD(do_restore) {
 				adjust_abilities_to_empire(vict, emp, FALSE);
 			}
 			
-			for (i = 0; i < NUM_ABILITIES; ++i) {
-				vict->player_specials->saved.abilities[i].purchased = TRUE;
-				vict->player_specials->saved.abilities[i].levels_gained = 0;
+			HASH_ITER(hh, ability_table, abil, next_abil) {
+				add_ability(vict, abil, TRUE);
 			}
 
 			affect_total(vict);
@@ -5437,11 +5696,11 @@ ACMD(do_send) {
 
 
 ACMD(do_set) {
-	char_data *vict = NULL, *cbuf = NULL;
-	struct char_file_u tmp_store;
 	char field[MAX_INPUT_LENGTH], name[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
-	int mode, len, player_i = 0, retval;
-	char is_file = 0, is_player = 0;
+	bool is_file = FALSE, load_from_file = FALSE;
+	int mode, len, retval;
+	char_data *vict = NULL;
+	char is_player = 0;
 
 	half_chop(argument, name, buf);
 
@@ -5484,22 +5743,15 @@ ACMD(do_set) {
 		}
 	}
 	else if (is_file) {
-		/* try to load the player off disk */
-		CREATE(cbuf, char_data, 1);
-		clear_char(cbuf);
-		if ((player_i = load_char(name, &tmp_store)) > NOBODY) {
-			store_to_char(&tmp_store, cbuf);
-			if (GET_ACCESS_LEVEL(cbuf) >= GET_ACCESS_LEVEL(ch)) {
-				free_char(cbuf);
-				send_to_char("Sorry, you can't do that.\r\n", ch);
-				return;
-			}
-			vict = cbuf;
-			SET_BIT(PLR_FLAGS(vict), PLR_KEEP_LAST_LOGIN_INFO);
-		}
-		else {
-			free(cbuf);
+		if (!(vict = find_or_load_player(name, &load_from_file))) {
 			send_to_char("There is no such player.\r\n", ch);
+			return;
+		}
+		if (GET_ACCESS_LEVEL(vict) >= GET_ACCESS_LEVEL(ch)) {
+			send_to_char("Sorry, you can't do that.\r\n", ch);
+			if (load_from_file) {
+				free_char(vict);
+			}
 			return;
 		}
 	}
@@ -5515,16 +5767,16 @@ ACMD(do_set) {
 
 	/* save the character if a change was made */
 	if (retval) {
-		if (!is_file && !IS_NPC(vict))
-			SAVE_CHAR(vict);
-		if (is_file) {
+		if (load_from_file) {
 			store_loaded_char(vict);
 			send_to_char("Saved in file.\r\n", ch);
 		}
+		else if (!IS_NPC(vict)) {
+			SAVE_CHAR(vict);
+		}
 	}
-	else if (is_file) {
-		/* free the memory if we allocated it earlier */
-		free_char(cbuf);
+	else if (load_from_file) {
+		free_char(vict);
 	}
 }
 
@@ -5693,12 +5945,10 @@ ACMD(do_snoop) {
 
 
 ACMD(do_stat) {
-	void read_saved_vars(char_data *ch);
-	
-	char_data *victim;
+	char_data *victim = NULL;
 	crop_data *cp;
 	obj_data *obj;
-	struct char_file_u tmp_store;
+	bool file = FALSE;
 	int tmp;
 
 	half_chop(argument, buf1, buf2);
@@ -5735,7 +5985,7 @@ ACMD(do_stat) {
 		}
 	}
 	else if (!str_cmp(buf1, "crop")) {
-		if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_HAS_CROP_DATA) && (cp = crop_proto(ROOM_CROP_TYPE(IN_ROOM(ch))))) {
+		if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_HAS_CROP_DATA) && (cp = ROOM_CROP(IN_ROOM(ch)))) {
 			do_stat_crop(ch, cp);
 		}
 		else {
@@ -5770,27 +6020,18 @@ ACMD(do_stat) {
 		if (!*buf2) {
 			send_to_char("Stats on which player?\r\n", ch);
 		}
+		else if (!(victim = find_or_load_player(buf2, &file))) {
+			send_to_char("There is no such player.\r\n", ch);
+		}
+		else if (GET_ACCESS_LEVEL(victim) > GET_ACCESS_LEVEL(ch)) {
+			send_to_char("Sorry, you can't do that.\r\n", ch);
+		}
 		else {
-			CREATE(victim, char_data, 1);
-			clear_char(victim);
-			if (load_char(buf2, &tmp_store) > NOBODY) {
-				store_to_char(&tmp_store, victim);
-				SET_BIT(PLR_FLAGS(victim), PLR_KEEP_LAST_LOGIN_INFO);
-				// put somewhere extractable
-				char_to_room(victim, world_table);
-				if (GET_ACCESS_LEVEL(victim) > GET_ACCESS_LEVEL(ch)) {
-					send_to_char("Sorry, you can't do that.\r\n", ch);
-				}
-				else {
-					read_saved_vars(victim);
-					do_stat_character(ch, victim);
-				}
-				extract_char_final(victim);
-			}
-			else {
-				send_to_char("There is no such player.\r\n", ch);
-				free(victim);
-			}
+			do_stat_character(ch, victim);
+		}
+		
+		if (victim && file) {
+			free_char(victim);
 		}
 	}
 	else if (is_abbrev(buf1, "object")) {
@@ -6148,9 +6389,27 @@ ACMD(do_vnum) {
 			msg_to_char(ch, "No crafts by that name.\r\n");
 		}
 	}
-	else if (is_abbrev(buf, "adventure")) {
+	else if (is_abbrev(buf, "adventure")) {	// name precedence for "vnum a"
 		if (!vnum_adventure(buf2, ch)) {
 			msg_to_char(ch, "No adventures by that name.\r\n");
+		}
+	}
+	else if (is_abbrev(buf, "ability")) {
+		extern int vnum_ability(char *searchname, char_data *ch);
+		if (!vnum_ability(buf2, ch)) {
+			msg_to_char(ch, "No abilities by that name.\r\n");
+		}
+	}
+	else if (is_abbrev(buf, "archetype")) {
+		extern int vnum_archetype(char *searchname, char_data *ch);
+		if (!vnum_archetype(buf2, ch)) {
+			msg_to_char(ch, "No archetypes by that name.\r\n");
+		}
+	}
+	else if (is_abbrev(buf, "augment")) {
+		extern int vnum_augment(char *searchname, char_data *ch);
+		if (!vnum_augment(buf2, ch)) {
+			msg_to_char(ch, "No augments by that name.\r\n");
 		}
 	}
 	else if (is_abbrev(buf, "building")) {
@@ -6161,6 +6420,12 @@ ACMD(do_vnum) {
 	else if (is_abbrev(buf, "book")) {
 		if (!vnum_book(buf2, ch)) {
 			send_to_char("No books by that name.\r\n", ch);
+		}
+	}
+	else if (is_abbrev(buf, "class")) {
+		extern int vnum_class(char *searchname, char_data *ch);
+		if (!vnum_class(buf2, ch)) {
+			msg_to_char(ch, "No classes by that name.\r\n");
 		}
 	}
 	else if (is_abbrev(buf, "crop")) {
@@ -6181,6 +6446,12 @@ ACMD(do_vnum) {
 	else if (is_abbrev(buf, "sector")) {
 		if (!vnum_sector(buf2, ch)) {
 			msg_to_char(ch, "No sectors by that name.\r\n");
+		}
+	}
+	else if (is_abbrev(buf, "skill")) {
+		extern int vnum_skill(char *searchname, char_data *ch);
+		if (!vnum_skill(buf2, ch)) {
+			msg_to_char(ch, "No skills by that name.\r\n");
 		}
 	}
 	else if (is_abbrev(buf, "trigger")) {
@@ -6210,7 +6481,7 @@ ACMD(do_vstat) {
 		return;
 	}
 	
-	if (is_abbrev(buf, "adventure")) {
+	if (is_abbrev(buf, "adventure")) {	// alphabetic precedence for "vstat a"
 		adv_data *adv = adventure_proto(number);
 		if (!adv) {
 			msg_to_char(ch, "There is no adventure zone with that number.\r\n");
@@ -6218,7 +6489,34 @@ ACMD(do_vstat) {
 		}
 		do_stat_adventure(ch, adv);
 	}
-	else if (is_abbrev(buf, "building")) {
+	else if (is_abbrev(buf, "ability")) {
+		void do_stat_ability(char_data *ch, ability_data *abil);
+		ability_data *abil = find_ability_by_vnum(number);
+		if (!abil) {
+			msg_to_char(ch, "There is no ability with that number.\r\n");
+			return;
+		}
+		do_stat_ability(ch, abil);
+	}
+	else if (is_abbrev(buf, "archetype")) {
+		void do_stat_archetype(char_data *ch, archetype_data *arch);
+		archetype_data *arch = archetype_proto(number);
+		if (!arch) {
+			msg_to_char(ch, "There is no archetype with that number.\r\n");
+			return;
+		}
+		do_stat_archetype(ch, arch);
+	}
+	else if (is_abbrev(buf, "augment")) {
+		void do_stat_augment(char_data *ch, augment_data *aug);
+		augment_data *aug = augment_proto(number);
+		if (!aug) {
+			msg_to_char(ch, "There is no augment with that number.\r\n");
+			return;
+		}
+		do_stat_augment(ch, aug);
+	}
+	else if (is_abbrev(buf, "building")) {	// alphabetic precedence for "vstat b"
 		bld_data *bld = building_proto(number);
 		if (!bld) {
 			msg_to_char(ch, "There is no building with that number.\r\n");
@@ -6226,7 +6524,7 @@ ACMD(do_vstat) {
 		}
 		do_stat_building(ch, bld);
 	}
-	else if (is_abbrev(buf, "book")) {	// deliberately after 'building'
+	else if (is_abbrev(buf, "book")) {
 		book_data *book = book_proto(number);
 		if (!book) {
 			msg_to_char(ch, "There is no book with that number.\r\n");
@@ -6234,13 +6532,22 @@ ACMD(do_vstat) {
 		}
 		do_stat_book(ch, book);
 	}
-	else if (is_abbrev(buf, "craft")) {
+	else if (is_abbrev(buf, "craft")) {	// alphabetic precedence for "vstat c"
 		craft_data *craft = craft_proto(number);
 		if (!craft) {
 			msg_to_char(ch, "There is no craft with that number.\r\n");
 			return;
 		}
 		do_stat_craft(ch, craft);
+	}
+	else if (is_abbrev(buf, "class")) {
+		void do_stat_class(char_data *ch, class_data *cls);
+		class_data *cls = find_class_by_vnum(number);
+		if (!cls) {
+			msg_to_char(ch, "There is no class with that number.\r\n");
+			return;
+		}
+		do_stat_class(ch, cls);
 	}
 	else if (is_abbrev(buf, "crop")) {
 		crop_data *crop = crop_proto(number);
@@ -6293,6 +6600,15 @@ ACMD(do_vstat) {
 			return;
 		}
 		do_stat_sector(ch, sect);
+	}
+	else if (is_abbrev(buf, "skill")) {
+		void do_stat_skill(char_data *ch, skill_data *skill);
+		skill_data *skill = find_skill_by_vnum(number);
+		if (!skill) {
+			msg_to_char(ch, "There is no skill with that number.\r\n");
+			return;
+		}
+		do_stat_skill(ch, skill);
 	}
 	else if (is_abbrev(buf, "trigger")) {
 		trig_data *trig = real_trigger(number);
@@ -6378,12 +6694,12 @@ ACMD(do_wizutil) {
 	else {
 		switch (subcmd) {
 			case SCMD_NOTITLE:
-				result = PLR_TOG_CHK(vict, PLR_NOTITLE);
+				result = ((TOGGLE_BIT(GET_ACCOUNT(vict)->flags, ACCT_NOTITLE)) & ACCT_NOTITLE);
 				syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: Notitle %s for %s by %s.", ONOFF(result), GET_NAME(vict), GET_NAME(ch));
 				msg_to_char(ch, "Notitle %s for %s.\r\n", ONOFF(result), GET_NAME(vict));
 				break;
 			case SCMD_MUTE:
-				result = PLR_TOG_CHK(vict, PLR_MUTED);
+				result = ((TOGGLE_BIT(GET_ACCOUNT(vict)->flags, ACCT_MUTED)) & ACCT_MUTED);
 				syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: Mute %s for %s by %s.", ONOFF(result), GET_NAME(vict), GET_NAME(ch));
 				msg_to_char(ch, "Mute %s for %s.\r\n", ONOFF(result), GET_NAME(vict));
 				break;
@@ -6392,23 +6708,23 @@ ACMD(do_wizutil) {
 					send_to_char("Oh, yeah, THAT'S real smart...\r\n", ch);
 					return;
 				}
-				if (PLR_FLAGGED(vict, PLR_FROZEN)) {
+				if (ACCOUNT_FLAGGED(vict, ACCT_FROZEN)) {
 					send_to_char("Your victim is already pretty cold.\r\n", ch);
 					return;
 				}
-				SET_BIT(PLR_FLAGS(vict), PLR_FROZEN);
+				SET_BIT(GET_ACCOUNT(vict)->flags, ACCT_FROZEN);
 				send_to_char("A bitter wind suddenly rises and drains every erg of heat from your body!\r\nYou feel frozen!\r\n", vict);
 				send_to_char("Frozen.\r\n", ch);
 				act("A sudden cold wind conjured from nowhere freezes $n!", FALSE, vict, 0, 0, TO_ROOM);
 				syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s frozen by %s.", GET_NAME(vict), GET_NAME(ch));
 				break;
 			case SCMD_THAW:
-				if (!PLR_FLAGGED(vict, PLR_FROZEN)) {
+				if (!ACCOUNT_FLAGGED(vict, ACCT_FROZEN)) {
 					send_to_char("Sorry, your victim is not morbidly encased in ice at the moment.\r\n", ch);
 					return;
 				}
 				syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s un-frozen by %s.", GET_NAME(vict), GET_NAME(ch));
-				REMOVE_BIT(PLR_FLAGS(vict), PLR_FROZEN);
+				REMOVE_BIT(GET_ACCOUNT(vict)->flags, ACCT_FROZEN);
 				send_to_char("A fireball suddenly explodes in front of you, melting the ice!\r\nYou feel thawed.\r\n", vict);
 				send_to_char("Thawed.\r\n", ch);
 				act("A sudden fireball conjured from nowhere thaws $n!", FALSE, vict, 0, 0, TO_ROOM);
@@ -6417,6 +6733,7 @@ ACMD(do_wizutil) {
 				log("SYSERR: Unknown subcmd %d passed to do_wizutil (%s)", subcmd, __FILE__);
 				break;
 		}
+		SAVE_ACCOUNT(GET_ACCOUNT(vict));
 		SAVE_CHAR(vict);
 	}
 }
