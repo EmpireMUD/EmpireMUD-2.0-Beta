@@ -237,7 +237,7 @@ void check_morph_ability(char_data *ch) {
 	bool revert = FALSE;
 	
 	// nothing to check
-	if (!IS_NPC(ch) || GET_MORPH(ch) == MORPH_NONE) {
+	if (IS_NPC(ch) || GET_MORPH(ch) == MORPH_NONE) {
 		return;
 	}
 	
