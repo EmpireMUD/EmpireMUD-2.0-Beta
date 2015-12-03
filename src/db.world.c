@@ -1491,8 +1491,6 @@ void read_empire_territory(empire_data *emp) {
 void reread_empire_tech(empire_data *emp) {
 	void resort_empires();
 	
-	extern int top_island_num;
-	
 	struct empire_island *isle, *next_isle;
 	empire_data *iter, *next_iter;
 	int sub;
