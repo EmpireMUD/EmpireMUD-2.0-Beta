@@ -2192,6 +2192,7 @@ void update_empire_npc_data(void) {
 	struct empire_territory_data *ter, *next_ter;
 	struct empire_npc_data *npc;
 	empire_data *emp, *next_emp;
+	struct empire_island *isle;
 	int count, max, sex;
 	mob_vnum artisan;
 	bool found_artisan;
@@ -2244,6 +2245,9 @@ void update_empire_npc_data(void) {
 							proto = mob_proto(artisan);
 							npc = create_empire_npc(emp, artisan, sex, pick_generic_name(proto ? MOB_NAME_SET(proto) : 0, sex), ter);
 							EMPIRE_POPULATION(emp) += 1;
+							if ((isle = get_empire_island(emp, GET_ISLAND_ID(ter->room)))) {
+								isle->population += 1;
+							}
 					
 							// spawn it right away if anybody is in the room
 							if (ROOM_PEOPLE(ter->room)) {
@@ -2255,6 +2259,9 @@ void update_empire_npc_data(void) {
 							proto = mob_proto(sex == SEX_MALE ? CITIZEN_MALE : CITIZEN_FEMALE);
 							npc = create_empire_npc(emp, proto ? GET_MOB_VNUM(proto) : 0, sex, pick_generic_name(MOB_NAME_SET(proto), sex), ter);
 							EMPIRE_POPULATION(emp) += 1;
+							if ((isle = get_empire_island(emp, GET_ISLAND_ID(ter->room)))) {
+								isle->population += 1;
+							}
 					
 							// spawn it right away if anybody is in the room
 							if (ROOM_PEOPLE(ter->room)) {
