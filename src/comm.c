@@ -656,6 +656,10 @@ void perform_reboot(void) {
 		return;
 	}
 
+	// prepare for the end!
+	save_all_empires();
+	save_whole_world();
+
 	if (reboot_control.type == SCMD_REBOOT) {
 		sprintf(buf, "\r\n[0;0;31m *** Rebooting ***[0;0;37m\r\nPlease be patient, this will take a second.\r\n\r\n");
 	}
@@ -701,9 +705,6 @@ void perform_reboot(void) {
 		fprintf(fl, "$\n");
 		fclose(fl);
 	}
-
-	// prepare for the end!
-	save_whole_world();
 
 	// If this is a reboot, restart the mud!
 	if (reboot_control.type == SCMD_REBOOT) {
