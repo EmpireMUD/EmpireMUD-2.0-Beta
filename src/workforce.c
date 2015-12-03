@@ -794,9 +794,14 @@ CHORE_GEN_CRAFT_VALIDATOR(chore_weaving) {
 	if (GET_CRAFT_TYPE(craft) != CRAFT_TYPE_WEAVE) {
 		return FALSE;
 	}
-	// won't weave things higher level than BASIC_SKILL_CAP
-	if ((abil = find_ability_by_vnum(GET_CRAFT_ABILITY(craft))) && ABIL_SKILL_LEVEL(abil) > BASIC_SKILL_CAP) {
-		return FALSE;
+	// won't weave things that require skills
+	if ((abil = find_ability_by_vnum(GET_CRAFT_ABILITY(craft))) ) {
+		if (!ABIL_ASSIGNED_SKILL(abil)) {
+			return FALSE;	// class ability
+		}
+		else if (ABIL_SKILL_LEVEL(abil) > BASIC_SKILL_CAP) {
+			return FALSE;	// level too high
+		}
 	}
 	// success
 	return TRUE;
