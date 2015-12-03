@@ -2347,7 +2347,6 @@ void kill_empire_npc(char_data *ch) {
 		}
 	}
 	
-	GET_EMPIRE_NPC_DATA(ch)->mob = NULL;
 	GET_EMPIRE_NPC_DATA(ch) = NULL;
 }
 
