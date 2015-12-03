@@ -3109,6 +3109,16 @@ struct empire_city_data {
 };
 
 
+// per-island data for the empire
+struct empire_island {
+	int island;	// which island id
+	int tech[NUM_TECHS];	// TECH_ present on that island
+	int population;	// citizens
+	
+	UT_hash_handle hh;	// EMPIRE_ISLANDS(emp) hash handle
+};
+
+
 struct empire_log_data {
 	int type;	// ELOG_x
 	time_t timestamp;
@@ -3251,8 +3261,7 @@ struct empire_data {
 	int military;	// number of soldiers
 	int greatness;	// total greatness of members
 	int tech[NUM_TECHS];	// TECH_x, detected from buildings and abilities
-	int **island_tech;	// array of TECH_x by island
-	int size_island_tech;	// size of the island_tech array last time it was created
+	struct empire_island *islands;	// empire island data hash
 	int members;	// Number of members, calculated at boot time
 	int total_member_count;	// Total number of members including timeouts and dupes
 	int total_playtime;	// total playtime among all accounts, in hours

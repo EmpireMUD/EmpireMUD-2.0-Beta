@@ -3466,9 +3466,10 @@ room_data *find_home(char_data *ch) {
 }
 
 
-ACMD(do_home) {	
+ACMD(do_home) {
+	void delete_territory_npc(struct empire_territory_data *ter, struct empire_npc_data *npc);
+	
 	struct empire_territory_data *ter;
-	struct empire_npc_data *npc;
 	room_data *iter, *next_iter, *home = NULL, *real = HOME_ROOM(IN_ROOM(ch));
 	empire_data *emp = GET_LOYALTY(ch);
 	obj_data *obj;
@@ -3530,18 +3531,8 @@ ACMD(do_home) {
 			// clear out npcs
 			// TODO should this be done for interior rooms, too?
 			if ((ter = find_territory_entry(emp, real))) {
-				while ((npc = ter->npcs)) {
-					if (npc->mob) {
-						act("$n leaves.", TRUE, npc->mob, NULL, NULL, TO_ROOM);
-						GET_EMPIRE_NPC_DATA(npc->mob) = NULL;	// un-link this npc data from the mob, or extract will corrupt memory
-						extract_char(npc->mob);
-						npc->mob = NULL;
-					}
-					
-					EMPIRE_POPULATION(emp) -= 1;
-					
-					ter->npcs = npc->next;
-					free(npc);
+				while (ter->npcs) {
+					delete_territory_npc(ter, ter->npcs);
 				}
 			}
 			

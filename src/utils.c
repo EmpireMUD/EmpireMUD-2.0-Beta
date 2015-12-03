@@ -1164,7 +1164,7 @@ bool has_tech_available(char_data *ch, int tech) {
 * It takes the location into account, not just the tech flags.
 *
 * @param room_data *room The location to check.
-* @param int tech TECH_x id
+* @param int tech TECH_ id
 * @return TRUE if successful, FALSE if not (and sends its own error message to ch)
 */
 bool has_tech_available_room(room_data *room, int tech) {
@@ -1172,7 +1172,12 @@ bool has_tech_available_room(room_data *room, int tech) {
 	
 	empire_data *emp = ROOM_OWNER(room);
 	bool requires_island = FALSE;
-	int iter;
+	struct empire_island *isle;
+	int id, iter;
+	
+	if (!emp) {
+		return FALSE;
+	}
 	
 	// see if it requires island
 	for (iter = 0; techs_requiring_same_island[iter] != NOTHING; ++iter) {
@@ -1181,16 +1186,20 @@ bool has_tech_available_room(room_data *room, int tech) {
 			break;
 		}
 	}
-
-	if (!emp) {
-		return FALSE;
-	}
-	else if (!(requires_island ? EMPIRE_HAS_TECH_ON_ISLAND(emp, GET_ISLAND_ID(room), tech) : EMPIRE_HAS_TECH(emp, tech))) {
-		return FALSE;
-	}
-	else {
+	
+	// easy way out
+	if (!requires_island && EMPIRE_HAS_TECH(emp, tech)) {
 		return TRUE;
 	}
+	
+	// check the island
+	id = GET_ISLAND_ID(room);
+	if (id != NO_ISLAND && (isle = get_empire_island(emp, id))) {
+		return (isle->tech[tech] > 0);
+	}
+	
+	// nope
+	return FALSE;
 }
 
 

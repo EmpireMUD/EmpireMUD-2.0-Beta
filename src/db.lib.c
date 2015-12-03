@@ -1343,6 +1343,40 @@ void delete_empire(empire_data *emp) {
 
 
 /**
+* Removes a territory NPC entry, and removes the citizen if it's spawned. This
+* will free the "npc" argument after removing it from the territory npc list.
+*
+* @param struct empire_territory_data *ter The territory entry.
+* @param struct empire_npc_data *npc The npc data.
+*/
+void delete_territory_npc(struct empire_territory_data *ter, struct empire_npc_data *npc) {
+	struct empire_island *isle;
+	empire_data *emp;
+	
+	if (!ter || !npc || !(emp = ROOM_OWNER(HOME_ROOM(ter->room)))) {
+		return;
+	}
+	
+	// remove mob if any
+	if (npc->mob) {
+		act("$n leaves.", TRUE, npc->mob, NULL, NULL, TO_ROOM);
+		GET_EMPIRE_NPC_DATA(npc->mob) = NULL;	// un-link this npc data from the mob, or extract will corrupt memory
+		extract_char(npc->mob);
+		npc->mob = NULL;
+	}
+	
+	// reduce pop
+	EMPIRE_POPULATION(emp) -= 1;
+	if ((isle = get_empire_island(emp, GET_ISLAND_ID(ter->room)))) {
+		isle->population -= 1;
+	}
+	
+	LL_DELETE(ter->npcs, npc);
+	free(npc);
+}
+
+
+/**
 * Frees a set of workforce trackers.
 *
 * @param struct empire_workforce_tracker **tracker A pointer to the hash table of trackers.
@@ -1372,28 +1406,23 @@ void ewt_free_tracker(struct empire_workforce_tracker **tracker) {
 void free_empire(empire_data *emp) {
 	extern struct empire_territory_data *global_next_territory_entry;
 	
+	struct empire_island *isle, *next_isle;
 	struct empire_storage_data *store;
 	struct empire_unique_storage *eus;
 	struct empire_territory_data *ter;
-	struct empire_npc_data *npc;
 	struct empire_city_data *city;
 	struct empire_political_data *pol;
 	struct empire_trade_data *trade;
 	struct empire_log_data *elog;
 	struct shipping_data *shipd;
 	room_data *room;
-	int iter, pos;
+	int iter;
 	
 	// free island techs
-	if (emp->island_tech != NULL) {
-		for (pos = 0; pos < emp->size_island_tech; ++pos) {
-			if (emp->island_tech[pos]) {
-				free(emp->island_tech[pos]);
-			}
-		}
-		free(emp->island_tech);
-		emp->island_tech = NULL;
+	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
+		free(isle);
 	}
+	EMPIRE_ISLANDS(emp) = NULL;
 			
 	// free storage
 	while ((store = emp->store)) {
@@ -1455,18 +1484,8 @@ void free_empire(empire_data *emp) {
 		}
 		
 		// free npcs
-		while ((npc = ter->npcs)) {
-			if (npc->mob) {
-				// ensure these flags to force a despawn
-				SET_BIT(MOB_FLAGS(npc->mob), MOB_SPAWNED | MOB_EMPIRE);
-				
-				GET_EMPIRE_NPC_DATA(npc->mob) = NULL;
-				npc->mob = NULL;
-			}
-				
-			ter->npcs = npc->next;
-			npc->next = NULL;
-			free(npc);
+		while (ter->npcs) {
+			delete_territory_npc(ter, ter->npcs);
 		}
 		
 		emp->territory_list = ter->next;
@@ -2141,7 +2160,6 @@ struct empire_npc_data *create_empire_npc(empire_data *emp, mob_vnum mobv, int s
 */
 void delete_room_npcs(room_data *room, struct empire_territory_data *ter) {
 	struct empire_territory_data *tt = ter;
-	struct empire_npc_data *npc;
 	room_data *loc = (room ? room : ter->room);
 	empire_data *emp;
 
@@ -2157,19 +2175,9 @@ void delete_room_npcs(room_data *room, struct empire_territory_data *ter) {
 	}
 	
 	if (tt) {
-		while ((npc = tt->npcs)) {
-			if (npc->mob) {
-				// ensure these flags to force a despawn
-				SET_BIT(MOB_FLAGS(npc->mob), MOB_SPAWNED | MOB_EMPIRE);
-				
-				GET_EMPIRE_NPC_DATA(npc->mob) = NULL;
-				npc->mob = NULL;
-			}
-			EMPIRE_POPULATION(emp) = MAX(0, EMPIRE_POPULATION(emp) - 1);
-			tt->npcs = npc->next;
-			free(npc);
+		while (tt->npcs) {
+			delete_territory_npc(tt, tt->npcs);
 		}
-		tt->npcs = NULL;
 	}
 }
 
@@ -2310,7 +2318,7 @@ char_data *spawn_empire_npc_to_room(empire_data *emp, struct empire_npc_data *np
 */
 void kill_empire_npc(char_data *ch) {
 	struct empire_territory_data *ter, *ter_next;
-	struct empire_npc_data *npc, *npc_next, *temp;
+	struct empire_npc_data *npc, *npc_next;
 	empire_data *emp;
 	bool found = FALSE;
 	
@@ -2329,9 +2337,7 @@ void kill_empire_npc(char_data *ch) {
 			npc_next = npc->next;
 			
 			if (npc == GET_EMPIRE_NPC_DATA(ch)) {
-				// remove the npc data
-				REMOVE_FROM_LIST(npc, ter->npcs, next);
-				EMPIRE_POPULATION(emp) = MAX(0, EMPIRE_POPULATION(emp) - 1);
+				delete_territory_npc(ter, npc);
 				
 				// reset the population timer
 				ter->population_timer = building_population_timer;

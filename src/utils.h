@@ -459,7 +459,6 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define EMPIRE_MOTD(emp)  ((emp)->motd)
 #define EMPIRE_GREATNESS(emp)  ((emp)->greatness)
 #define EMPIRE_TECH(emp, num)  ((emp)->tech[(num)])
-#define EMPIRE_ISLAND_TECH(emp, isle, tech)  ((emp)->island_tech[isle][tech])
 #define EMPIRE_MEMBERS(emp)  ((emp)->members)
 #define EMPIRE_TOTAL_MEMBER_COUNT(emp)  ((emp)->total_member_count)
 #define EMPIRE_TOTAL_PLAYTIME(emp)  ((emp)->total_playtime)
@@ -472,10 +471,10 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define EMPIRE_SORT_VALUE(emp)  ((emp)->sort_value)
 #define EMPIRE_UNIQUE_STORAGE(emp)  ((emp)->unique_store)
 #define EMPIRE_WORKFORCE_TRACKER(emp)  ((emp)->ewt_tracker)
+#define EMPIRE_ISLANDS(emp)  ((emp)->islands)
 
 // helpers
 #define EMPIRE_HAS_TECH(emp, num)  (EMPIRE_TECH((emp), (num)) > 0)
-#define EMPIRE_HAS_TECH_ON_ISLAND(emp, ii, tt)  (((emp) && (ii) != NO_ISLAND) ? EMPIRE_ISLAND_TECH(emp, ii, tt) : FALSE)
 #define EMPIRE_IS_TIMED_OUT(emp)  (EMPIRE_LAST_LOGON(emp) + (config_get_int("whole_empire_timeout") * SECS_PER_REAL_DAY) < time(0))
 #define GET_TOTAL_WEALTH(emp)  (EMPIRE_WEALTH(emp) + (int)(EMPIRE_COINS(emp) * COIN_VALUE))
 

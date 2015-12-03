@@ -63,6 +63,7 @@ void grow_crop(room_data *room);
 void init_room(room_data *room, room_vnum vnum);
 void ruin_one_building(room_data *room);
 void save_world_map_to_file();
+extern int sort_empire_islands(struct empire_island *a, struct empire_island *b);
 void update_tavern(room_data *room);
 
 
@@ -1275,36 +1276,40 @@ void startup_room_reset(void) {
 * @param room_data *room the room to check
 */
 void check_building_tech(empire_data *emp, room_data *room) {
-	int island = GET_ISLAND_ID(room);
+	struct empire_island *isle = NULL;
+	int island;
 	
-	if (!IS_COMPLETE(room) || IS_DISMANTLING(room)) {
+	// only care about complete buildings
+	if (!emp || !GET_BUILDING(room) || !IS_COMPLETE(room) || IS_DISMANTLING(room)) {
+		return;
+	}
+	
+	// must be on an island
+	if ((island = GET_ISLAND_ID(room)) == NO_ISLAND) {
 		return;
 	}
 	
 	if (ROOM_BLD_FLAGGED(room, BLD_APIARY)) {
 		EMPIRE_TECH(emp, TECH_APIARIES) += 1;
-		if (island != NO_ISLAND) {
-			EMPIRE_ISLAND_TECH(emp, island, TECH_APIARIES) += 1;
+		if (isle || (isle = get_empire_island(emp, island))) {
+			isle->tech[TECH_APIARIES] += 1;
 		}
 	}
 	if (ROOM_BLD_FLAGGED(room, BLD_GLASSBLOWER)) {
 		EMPIRE_TECH(emp, TECH_GLASSBLOWING) += 1;
-		if (island != NO_ISLAND) {
-			EMPIRE_ISLAND_TECH(emp, island, TECH_GLASSBLOWING) += 1;
+		if (isle || (isle = get_empire_island(emp, island))) {
+			isle->tech[TECH_GLASSBLOWING] += 1;
 		}
 	}
 	if (ROOM_BLD_FLAGGED(room, BLD_DOCKS)) {
 		EMPIRE_TECH(emp, TECH_SEAPORT) += 1;
-		if (island != NO_ISLAND) {
-			EMPIRE_ISLAND_TECH(emp, island, TECH_SEAPORT) += 1;
+		if (isle || (isle = get_empire_island(emp, island))) {
+			isle->tech[TECH_SEAPORT] += 1;
 		}
 	}
 	
-	// buildings at all
-	if (GET_BUILDING(room)) {
-		// set up military right away
-		EMPIRE_MILITARY(emp) += GET_BLD_MILITARY(GET_BUILDING(room));
-	}
+	// set up military right away
+	EMPIRE_MILITARY(emp) += GET_BLD_MILITARY(GET_BUILDING(room));
 }
 
 
@@ -1382,6 +1387,7 @@ void read_empire_territory(empire_data *emp) {
 	void read_vault(empire_data *emp);
 	
 	struct empire_territory_data *ter, *next_ter;
+	struct empire_island *isle, *next_isle;
 	struct empire_npc_data *npc;
 	room_data *iter, *next_iter;
 	empire_data *e, *next_e;
@@ -1401,6 +1407,11 @@ void read_empire_territory(empire_data *emp) {
 			// reset marks to check for dead territory
 			for (ter = EMPIRE_TERRITORY_LIST(e); ter; ter = ter->next) {
 				ter->marked = FALSE;
+			}
+			
+			// reset population
+			HASH_ITER(hh, EMPIRE_ISLANDS(e), isle, next_isle) {
+				isle->population = 0;
 			}
 		}
 	}
@@ -1436,13 +1447,15 @@ void read_empire_territory(empire_data *emp) {
 						// or create
 						ter = create_territory_entry(e, iter);
 					}
-
+					
 					// mark it added/found
 					ter->marked = TRUE;
 					
 					if (IS_COMPLETE(iter)) {
+						isle = get_empire_island(e, GET_ISLAND_ID(iter));
 						for (npc = ter->npcs; npc; npc = npc->next) {
 							EMPIRE_POPULATION(e) += 1;
+							isle->population += 1;
 						}
 					}
 				}
@@ -1479,8 +1492,10 @@ void reread_empire_tech(empire_data *emp) {
 	void resort_empires();
 	
 	extern int top_island_num;
+	
+	struct empire_island *isle, *next_isle;
 	empire_data *iter, *next_iter;
-	int sub, pos;
+	int sub;
 	
 	// nowork
 	if (!empire_table) {
@@ -1488,31 +1503,20 @@ void reread_empire_tech(empire_data *emp) {
 	}
 	
 	HASH_ITER(hh, empire_table, iter, next_iter) {
-		if (emp == iter || !emp) {
-			// free old island tech
-			if (iter->island_tech != NULL) {
-				for (pos = 0; pos < iter->size_island_tech; ++pos) {
-					if (iter->island_tech[pos]) {
-						free(iter->island_tech[pos]);
-					}
-				}
-				free(iter->island_tech);
-			}
-			
-			// island techs
-			CREATE(iter->island_tech, int*, top_island_num+1);
-			iter->size_island_tech = top_island_num+1;
-			for (pos = 0; pos < iter->size_island_tech; ++pos) {
-				CREATE(iter->island_tech[pos], int, NUM_TECHS);
-				for (sub = 0; sub < NUM_TECHS; ++sub) {
-					EMPIRE_ISLAND_TECH(iter, pos, sub) = 0;
-				}
-			}
-			
-			// main techs
+		if (emp && iter != emp) {
+			continue;
+		}
+		
+		// zero out existing islands
+		HASH_ITER(hh, EMPIRE_ISLANDS(iter), isle, next_isle) {
 			for (sub = 0; sub < NUM_TECHS; ++sub) {
-				EMPIRE_TECH(iter, sub) = 0;
+				isle->population = 0;
+				isle->tech[sub] = 0;
 			}
+		}
+		// main techs
+		for (sub = 0; sub < NUM_TECHS; ++sub) {
+			EMPIRE_TECH(iter, sub) = 0;
 		}
 	}
 	
@@ -1521,16 +1525,19 @@ void reread_empire_tech(empire_data *emp) {
 	
 	// special-handling for imm-only empires: give them all techs
 	HASH_ITER(hh, empire_table, iter, next_iter) {
-		if (emp == iter || !emp) {
-			if (EMPIRE_IMM_ONLY(iter)) {
-				for (sub = 0; sub < NUM_TECHS; ++sub) {
-					EMPIRE_TECH(iter, sub) += 1;
-				}
-				for (pos = 0; pos < iter->size_island_tech; ++pos) {
-					for (sub = 0; sub < NUM_TECHS; ++sub) {
-						EMPIRE_ISLAND_TECH(iter, pos, sub) += 1;
-					}
-				}
+		if (emp && iter != emp) {
+			continue;
+		}
+		if (!EMPIRE_IMM_ONLY(iter)) {
+			continue;
+		}
+
+		for (sub = 0; sub < NUM_TECHS; ++sub) {
+			EMPIRE_TECH(iter, sub) += 1;
+		}
+		HASH_ITER(hh, EMPIRE_ISLANDS(iter), isle, next_isle) {
+			for (sub = 0; sub < NUM_TECHS; ++sub) {
+				isle->tech[sub] += 1;
 			}
 		}
 	}
@@ -1748,6 +1755,28 @@ static void evolve_one_map_tile(struct map_data *tile) {
 			}
 		}
 	}
+}
+
+
+/**
+* Fetches island data for the empire, and creates an entry if it doesn't exist.
+*
+* @param empire_data *emp Empire to get data for.
+* @param int island_id Which island.
+* @return struct empire_island* The data for that island.
+*/
+struct empire_island *get_empire_island(empire_data *emp, int island_id) {
+	struct empire_island *isle;
+	
+	HASH_FIND_INT(EMPIRE_ISLANDS(emp), &island_id, isle);
+	if (!isle) {
+		CREATE(isle, struct empire_island, 1);
+		isle->island = island_id;
+		HASH_ADD_INT(EMPIRE_ISLANDS(emp), island, isle);
+		HASH_SORT(EMPIRE_ISLANDS(emp), sort_empire_islands);
+	}
+	
+	return isle;
 }
 
 
@@ -1987,6 +2016,12 @@ void ruin_one_building(room_data *room) {
 	if (ROOM_PEOPLE(room)) {
 		act("The building around you crumbles to ruin!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
 	}
+}
+
+
+// Simple sorter for empire islands
+int sort_empire_islands(struct empire_island *a, struct empire_island *b) {
+	return a->island - b->island;
 }
 
 
