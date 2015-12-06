@@ -1660,6 +1660,7 @@ const char *versions_list[] = {
 	"b3.0",
 	"b3.1",
 	"b3.2",
+	"b3.6",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -1893,6 +1894,47 @@ void b3_2_map_and_gear(void) {
 }
 
 
+// fixes some guild-patterend cloth that was accidentally auto-weaved in a previous patch
+// NOTE: the cloth is not storable, so any empire with it in normal storage must have had the bug
+void b3_6_einv_fix(void) {
+	struct empire_storage_data *store, *next_store;
+	empire_data *emp, *next_emp;
+	obj_data *proto;
+	int total, amt;
+	
+	obj_vnum vnum = 2344;	// guild-patterned cloth
+	obj_vnum cloth = 1359;
+	obj_vnum silver = 161;
+	
+	proto = obj_proto(vnum);
+	if (!proto || proto->storage || !obj_proto(cloth) || !obj_proto(silver)) {
+		return;	// no work to do on this EmpireMUD
+	}
+	
+	log("Fixing incorrectly auto-weaved guild-patterned cloth (2344)");
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		total = 0;
+		LL_FOREACH_SAFE(EMPIRE_STORAGE(emp), store, next_store) {
+			if (store->vnum == vnum) {
+				amt = store->amount;
+				total += amt;
+				add_to_empire_storage(emp, store->island, cloth, 4 * amt);
+				add_to_empire_storage(emp, store->island, silver, 2 * amt);
+				LL_DELETE(EMPIRE_STORAGE(emp), store);
+				free(store);
+			}
+		}
+		
+		if (total > 0) {
+			log(" - [%d] %s: %d un-woven", EMPIRE_VNUM(emp), EMPIRE_NAME(emp), total);
+		}
+	}
+	
+	save_all_empires();
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -2036,6 +2078,9 @@ void check_version(void) {
 		}
 		if (MATCH_VERSION("b3.2")) {
 			b3_2_map_and_gear();
+		}
+		if (MATCH_VERSION("b3.6")) {
+			b3_6_einv_fix();
 		}
 	}
 	
