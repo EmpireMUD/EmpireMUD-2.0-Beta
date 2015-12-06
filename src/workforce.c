@@ -794,7 +794,7 @@ CHORE_GEN_CRAFT_VALIDATOR(chore_weaving) {
 	if (GET_CRAFT_TYPE(craft) != CRAFT_TYPE_WEAVE) {
 		return FALSE;
 	}
-	// won't weave things that require skills
+	// won't weave things that require classes or high skill
 	if ((abil = find_ability_by_vnum(GET_CRAFT_ABILITY(craft))) ) {
 		if (!ABIL_ASSIGNED_SKILL(abil)) {
 			return FALSE;	// class ability
