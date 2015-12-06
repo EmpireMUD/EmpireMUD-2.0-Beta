@@ -975,8 +975,10 @@ ACMD(do_changepass) {
 		msg_to_char(ch, "Unable to change password: new passwords do not match.\r\n");
 	}
 	else {
-		strncpy(GET_PASSWD(ch), CRYPT(new1, PASSWORD_SALT), MAX_PWD_LENGTH);
-		*(GET_PASSWD(ch) + MAX_PWD_LENGTH) = '\0';
+		if (GET_PASSWD(ch)) {
+			free(GET_PASSWD(ch));
+		}
+		GET_PASSWD(ch) = str_dup(CRYPT(new1, PASSWORD_SALT));
 		SAVE_CHAR(ch);
 		
 		syslog(SYS_INFO, GET_INVIS_LEV(ch), TRUE, "%s has changed %s password using changepass", GET_NAME(ch), HSHR(ch));
