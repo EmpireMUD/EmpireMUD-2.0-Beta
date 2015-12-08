@@ -465,7 +465,6 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define EMPIRE_IMM_ONLY(emp)  ((emp)->imm_only)
 #define EMPIRE_FAME(emp)  ((emp)->fame)
 #define EMPIRE_LAST_LOGON(emp)  ((emp)->last_logon)
-#define EMPIRE_CHORE(emp, num)  ((emp)->chore_active[(num)])
 #define EMPIRE_SCORE(emp, num)  ((emp)->scores[(num)])
 #define EMPIRE_SHIPPING_LIST(emp)  ((emp)->shipping_list)
 #define EMPIRE_SORT_VALUE(emp)  ((emp)->sort_value)

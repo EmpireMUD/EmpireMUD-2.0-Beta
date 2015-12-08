@@ -94,6 +94,56 @@ int get_war_cost(empire_data *emp, empire_data *victim) {
 
 
 /**
+* Sets the workforce limit on one island.
+* 0: Do not work
+* -1: Use natural limit
+* >0: How much to produce before stopping
+*
+* @param empire_data *emp The empire.
+* @param int island_id Which island we're on.
+* @param int chore Which CHORE_ type.
+* @param int limit The workforce limit to set.
+*/
+void set_workforce_limit(empire_data *emp, int island_id, int chore, int limit) {
+	struct empire_island *isle;
+	
+	// sanity
+	if (!emp || island_id == NO_ISLAND || chore < 0 || chore >= NUM_CHORES) {
+		return;
+	}
+	if (!(isle = get_empire_island(emp, island_id))) {
+		return;
+	}
+	
+	isle->workforce_limit[chore] = limit;
+}
+
+
+/**
+* Sets the workforce limit for all islands an empire controls.
+*
+* @param empire_data *emp The empire.
+* @param int chore Which CHORE_ type.
+* @param int limit The workforce limit to set.
+*/
+void set_workforce_limit_all(empire_data *emp, int chore, int limit) {
+	struct empire_island *isle, *next_isle;
+	
+	// sanity
+	if (!emp || chore < 0 || chore >= NUM_CHORES) {
+		return;
+	}
+	
+	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
+		// update it if it's populated OR it already has chore data
+		if (isle->population > 0 || isle->workforce_limit[chore]) {
+			isle->workforce_limit[chore] = limit;
+		}
+	}
+}
+
+
+/**
 * for do_empires
 *
 * @param char_data *ch who to send to
@@ -414,6 +464,61 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 
 
 /**
+* Shows current workforce settings for one chore, to a character.
+*
+* @param empire_data *emp The empire whose settings to show.
+* @param char_data *ch The person to show it to.
+* @param int chore Which CHORE_ to show.
+*/
+void show_detailed_workforce_setup_to_char(empire_data *emp, char_data *ch, int chore) {
+	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
+	struct empire_island *isle, *next_isle;
+	struct island_info *island;
+	size_t size;
+	bool found;
+	
+	if (!emp || chore < 0 || chore >= NUM_CHORES) {
+		msg_to_char(ch, "No workforce is set up.\r\n");
+	}
+	
+	size = snprintf(buf, sizeof(buf), "%s workforce setup for %s%s&0:\r\n", chore_data[chore].name, EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+	CAP(buf);
+	
+	found = FALSE;
+	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
+		// skip island if nothing to show
+		if (isle->population <= 0 && isle->workforce_limit[chore] == 0) {
+			continue;
+		}
+		
+		// look up island data (for name)
+		if (!(island = get_island(isle->island, TRUE))) {
+			continue;
+		}
+		
+		if (isle->workforce_limit[chore] == WORKFORCE_UNLIMITED) {
+			snprintf(part, sizeof(part), "%s: on%s", island->name, isle->population <= 0 ? " (no citizens)" : "");
+		}
+		else {
+			snprintf(part, sizeof(part), "%s: limit %d%s", island->name, isle->workforce_limit[chore], isle->population <= 0 ? " (no citizens)" : "");
+		}
+		
+		if (size + strlen(part) + 3 < sizeof(buf)) {
+			size += snprintf(buf + size, sizeof(buf) - size, " %s\r\n", part);
+		}
+		
+		found = TRUE;
+	}
+	
+	if (!found) {
+		size += snprintf(buf + size, sizeof(buf) - size, " no islands found\r\n");
+	}
+	
+	page_string(ch->desc, buf, TRUE);
+}
+
+
+/**
 * Finds workforce mobs belonging to an empire and reports on how many there
 * are.
 *
@@ -503,7 +608,9 @@ void show_workforce_where(empire_data *emp, char_data *to) {
 * @param char_data *ch The person to show it to.
 */
 void show_workforce_setup_to_char(empire_data *emp, char_data *ch) {
-	int iter;
+	struct empire_island *isle, *next_isle;
+	char part[MAX_STRING_LENGTH];
+	int iter, on, off, size;
 	
 	if (!emp) {
 		msg_to_char(ch, "No workforce is set up.\r\n");
@@ -512,7 +619,25 @@ void show_workforce_setup_to_char(empire_data *emp, char_data *ch) {
 	msg_to_char(ch, "Workforce setup for %s%s&0:\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 	
 	for (iter = 0; iter < NUM_CHORES; ++iter) {
-		msg_to_char(ch, " %s %-15.15s%s", EMPIRE_CHORE(emp, iter) ? " &con&0" : "&yoff&0", chore_data[iter].name, !((iter+1)%3) ? "\r\n" : " ");
+		// determine if any/all islands have it on
+		on = off = 0;
+		HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
+			// only count populated islands
+			if (isle->population == 0) {
+				continue;
+			}
+			
+			if (isle->workforce_limit[iter] == 0) {
+				++off;
+			}
+			else {
+				++on;
+			}
+		}
+		
+		snprintf(part, sizeof(part), "%s: %s", chore_data[iter].name, (on == 0) ? "&yoff&0" : ((off == 0) ? "&con&0" : "&bpart&0"));
+		size = 24 + color_code_length(part);
+		msg_to_char(ch, " %-*.*s%s", size, size, part, !((iter+1)%3) ? "\r\n" : " ");
 	}
 	if (iter % 3) {
 		msg_to_char(ch, "\r\n");
@@ -4489,24 +4614,34 @@ ACMD(do_unpublicize) {
 
 
 ACMD(do_workforce) {
-	void deactivate_workforce(empire_data *emp, int type);
+	void deactivate_workforce(empire_data *emp, int island_id, int type);
 	void deactivate_workforce_room(empire_data *emp, room_data *room);
 	
-	int iter, type;
+	char arg[MAX_INPUT_LENGTH], lim_arg[MAX_INPUT_LENGTH], name[MAX_STRING_LENGTH];
+	struct island_info *island = NULL;
+	bool all = FALSE, here = FALSE;
+	int iter, type, limit = 0;
 	empire_data *emp;
 	
-	one_argument(argument, arg);
+	argument = any_one_arg(argument, arg);
 
 	if (!(emp = GET_LOYALTY(ch))) {
 		msg_to_char(ch, "You must be in an empire to set up the workforce.\r\n");
+	}
+	else if (IS_NPC(ch) || !ch->desc) {
+		msg_to_char(ch, "You can't set up the workforce right now.\r\n");
 	}
 	else if (!EMPIRE_HAS_TECH(emp, TECH_WORKFORCE)) {
 		msg_to_char(ch, "Your empire has no workforce.\r\n");
 	}
 	else if (!*arg) {
-		show_workforce_setup_to_char(emp, ch);		
-		msg_to_char(ch, "Use 'workforce no-work' to toggle workforce for this room.\r\n");
+		msg_to_char(ch, "Usage: workforce [chore] [on | off | limit] [island name | all]\r\n");
+		show_workforce_setup_to_char(emp, ch);
 	}
+	else if (is_abbrev(arg, "where")) {
+		show_workforce_where(emp, ch);
+	}
+	// everything below requires privileges
 	else if (GET_RANK(ch) < EMPIRE_PRIV(emp, PRIV_WORKFORCE)) {
 		// this doesn't use has_permission because that would check if the current room is owned
 		msg_to_char(ch, "You don't have permission to set up the workforce.\r\n");
@@ -4528,27 +4663,88 @@ ACMD(do_workforce) {
 			deactivate_workforce_room(emp, IN_ROOM(ch));
 		}
 	}
-	else if (is_abbrev(arg, "where")) {
-		show_workforce_where(emp, ch);
-	}
-	else {
-		// find type to toggle
+	else {	// <chore>: show/change type
+		// find chore
 		for (iter = 0, type = NOTHING; iter < NUM_CHORES && type == NOTHING; ++iter) {
 			if (is_abbrev(arg, chore_data[iter].name)) {
 				type = iter;
 			}
 		}
-		
 		if (type == NOTHING) {
 			msg_to_char(ch, "Invalid workforce option.\r\n");
+			return;
+		}
+		
+		// process remaining args (island name may have quotes)
+		argument = any_one_arg(argument, lim_arg);
+		skip_spaces(&argument);
+		while (*argument == '"') {	// remove initial "
+			++argument;
+		}
+		if (*argument && argument[strlen(argument)-1] == '"') {	// remove trailing "
+			argument[strlen(argument)-1] = '\0';
+		}
+		
+		// limit arg
+		if (!*lim_arg) {
+			show_detailed_workforce_setup_to_char(emp, ch, type);
+			return;
+		}
+		else if (!str_cmp(lim_arg, "on")) {
+			limit = WORKFORCE_UNLIMITED;
+		}
+		else if (!str_cmp(lim_arg, "off")) {
+			limit = 0;
+		}
+		else if (isdigit(*lim_arg)) {
+			limit = atoi(lim_arg);
 		}
 		else {
-			EMPIRE_CHORE(emp, type) = !EMPIRE_CHORE(emp, type);
-			msg_to_char(ch, "You have %s the %s chore for your empire.\r\n", EMPIRE_CHORE(emp, type) ? "enabled" : "disabled", chore_data[type].name);
-			
-			if (!EMPIRE_CHORE(emp, type)) {
-				deactivate_workforce(emp, type);
+			msg_to_char(ch, "Invalid limit (must be on, off, or a number).\r\n");
+			return;
+		}
+		
+		// island arg
+		if (!*argument) {
+			if (GET_ISLAND_ID(IN_ROOM(ch)) == NO_ISLAND) {
+				msg_to_char(ch, "You can't set local workforce options when you're not on any island.\r\n");
+				return;
 			}
+			else {
+				here = TRUE;
+			}
+		}
+		else if (!str_cmp(argument, "all")) {
+			all = TRUE;
+		}
+		else if (!(island = get_island_by_name(argument)) && !(island = get_island_by_coords(argument))) {
+			msg_to_char(ch, "Unknown island \"%s\".\r\n", argument);
+			return;
+		}
+		
+		// ok, set workforce
+		*name = '\0';
+		if (all) {
+			set_workforce_limit_all(emp, type, limit);
+			strcpy(name, "all islands");
+		}
+		else if (here) {
+			set_workforce_limit(emp, GET_ISLAND_ID(IN_ROOM(ch)), type, limit);
+			strcpy(name, "this island");
+		}
+		else if (island) {
+			set_workforce_limit(emp, island->id, type, limit);
+			snprintf(name, sizeof(name), "%s", island->name);
+		}
+		else {
+			msg_to_char(ch, "No workforce to set for that.\r\n");
+			return;
+		}
+		
+		msg_to_char(ch, "You have %s the %s chore for %s.\r\n", (limit == 0) ? "disabled" : ((limit == WORKFORCE_UNLIMITED) ? "enabled" : "set the limit for"), chore_data[type].name, name);
+		
+		if (limit == 0) {
+			deactivate_workforce(emp, all ? NO_ISLAND : (here ? GET_ISLAND_ID(IN_ROOM(ch)) : island->id), type);
 		}
 	}
 }

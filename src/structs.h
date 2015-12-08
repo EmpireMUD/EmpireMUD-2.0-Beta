@@ -151,6 +151,7 @@
 #define OTHER_COIN  NOTHING	// use the NOTHING value to store the "other" coin type (which stores by empire id)
 #define REAL_OTHER_COIN  NULL	// for when other-coin type is an empire pointer
 #define UNLIMITED  -1	// unlimited duration/timer
+#define WORKFORCE_UNLIMITED  -1	// no resource limit on workforce
 
 
 // Various other special codes
@@ -3112,6 +3113,11 @@ struct empire_city_data {
 // per-island data for the empire
 struct empire_island {
 	int island;	// which island id
+	
+	// saved portion
+	int workforce_limit[NUM_CHORES];	// workforce settings
+	
+	// unsaved portion
 	int tech[NUM_TECHS];	// TECH_ present on that island
 	int population;	// citizens
 	
@@ -3268,7 +3274,6 @@ struct empire_data {
 	bool imm_only;	// Don't allow imms/morts to be together
 	int fame;	// Empire's fame rating
 	time_t last_logon;	// time of last member's last logon
-	bool chore_active[NUM_CHORES];	// which chores the empire should be doing
 	int scores[NUM_SCORES];	// empire score in each category
 	int sort_value;	// for score ties
 	bool storage_loaded;	// record whether or not storage has been loaded, to prevent saving over it

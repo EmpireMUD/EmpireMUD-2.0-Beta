@@ -1686,6 +1686,7 @@ void load_empire_storage(void) {
 * @param empire_vnum vnum The vnum to process.
 */
 void parse_empire(FILE *fl, empire_vnum vnum) {
+	void assign_old_workforce_chore(empire_data *emp, int chore);
 	extern struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_data *location, int type);
 	extern struct empire_npc_data *create_empire_npc(empire_data *emp, mob_vnum mob, int sex, int name, struct empire_territory_data *ter);
 	extern struct empire_territory_data *create_territory_entry(empire_data *emp, room_data *room);
@@ -1698,6 +1699,7 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 	struct empire_trade_data *trade, *last_trade = NULL;
 	struct empire_log_data *elog, *last_log = NULL;
 	struct empire_city_data *city;
+	struct empire_island *isle;
 	room_data *room;
 	long long_in;
 	
@@ -1765,9 +1767,18 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 				break;
 			}
 			case 'C': { // chore
-				j = atoi(line+1);
-				if (j < NUM_CHORES) {
-					EMPIRE_CHORE(emp, j) = TRUE;
+				if (sscanf(line, "C %d %d %d", &t[0], &t[1], &t[2]) == 3) {
+					if (t[1] > 0 && t[1] < NUM_CHORES && (isle = get_empire_island(emp, t[0]))) {
+						isle->workforce_limit[t[1]] = t[2];
+					}
+				}
+				else if (sscanf(line, "C%d", &t[0]) == 1) {
+					// old version
+					assign_old_workforce_chore(emp, t[0]);
+				}
+				else {
+					log("SYSERR: Bad chore data for empire %d", vnum);
+					exit(1);
 				}
 				break;
 			}
@@ -1930,6 +1941,7 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 * @param empire_data *emp The empire to save.
 */
 void write_empire_to_file(FILE *fl, empire_data *emp) {
+	struct empire_island *isle, *next_isle;
 	struct empire_political_data *emp_pol;
 	struct empire_territory_data *ter;
 	struct empire_trade_data *trade;
@@ -1958,12 +1970,14 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	}
 
 	// C: chores
-	for (iter = 0; iter < NUM_CHORES; ++iter) {
-		if (EMPIRE_CHORE(emp, iter)) {
-			fprintf(fl, "C%d\n", iter);
+	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
+		for (iter = 0; iter < NUM_CHORES; ++iter) {
+			if (isle->workforce_limit[iter] != 0) {
+				fprintf(fl, "C %d %d %d\n", isle->island, iter, isle->workforce_limit[iter]);
+			}
 		}
 	}
-
+	
 	// D: diplomacy
 	for (emp_pol = EMPIRE_DIPLOMACY(emp); emp_pol; emp_pol = emp_pol->next) {
 		fprintf(fl, "D\n%d %d %d %d\n", emp_pol->id, emp_pol->type, emp_pol->offer, (int) emp_pol->start_time);
