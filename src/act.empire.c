@@ -497,13 +497,13 @@ void show_detailed_workforce_setup_to_char(empire_data *emp, char_data *ch, int 
 		}
 		
 		if (isle->workforce_limit[chore] == WORKFORCE_UNLIMITED) {
-			snprintf(part, sizeof(part), "%s: on%s", island->name, isle->population <= 0 ? " (no citizens)" : "");
+			snprintf(part, sizeof(part), "%s: &con&0%s", island->name, isle->population <= 0 ? " (no citizens)" : "");
 		}
 		else if (isle->workforce_limit[chore] == 0) {
-			snprintf(part, sizeof(part), "%s: off%s", island->name, isle->population <= 0 ? " (no citizens)" : "");
+			snprintf(part, sizeof(part), "%s: &yoff&0%s", island->name, isle->population <= 0 ? " (no citizens)" : "");
 		}
 		else {
-			snprintf(part, sizeof(part), "%s: limit %d%s", island->name, isle->workforce_limit[chore], isle->population <= 0 ? " (no citizens)" : "");
+			snprintf(part, sizeof(part), "%s: &climit %d&0%s", island->name, isle->workforce_limit[chore], isle->population <= 0 ? " (no citizens)" : "");
 		}
 		
 		if (size + strlen(part) + 3 < sizeof(buf)) {
@@ -638,7 +638,7 @@ void show_workforce_setup_to_char(empire_data *emp, char_data *ch) {
 			}
 		}
 		
-		snprintf(part, sizeof(part), "%s: %s", chore_data[iter].name, (on == 0) ? "&yoff&0" : ((off == 0) ? "&con&0" : "&bpart&0"));
+		snprintf(part, sizeof(part), "%s: %s", chore_data[iter].name, (on == 0) ? "&yoff&0" : ((off == 0) ? "&con&0" : "&mpart&0"));
 		size = 24 + color_code_length(part);
 		msg_to_char(ch, " %-*.*s%s", size, size, part, !((iter+1)%3) ? "\r\n" : " ");
 	}
