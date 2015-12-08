@@ -1271,7 +1271,7 @@ WORKFORCE "SKILLED LABOR"
 
 Workforce, Skilled Labor (Empire abilities)
 
-Usage:  workforce [type]
+Usage:  workforce [chore] [on | off | <limit>] [island name | all]
         workforce no-work
         workforce where
 
@@ -1289,6 +1289,10 @@ The workforce is made up of the empire's citizens (NPCs). These citizens will
 only work within 20 map tiles of their own homes, and must be on the same 
 island. Citizens will only work on claimed land. Only one citizen will work
 a given location at a time.
+
+If you set your own limit on a chore, the empire won't produce more than that
+limit on each island. Not all chores use the numeric limit (for example, the
+abandon-* toggles don't use the limit).
 
 You can use the "workforce no-work" command to toggle whether or not your
 citizens will work the room you're currently standing in. The "workforce where"

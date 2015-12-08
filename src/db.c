@@ -1660,6 +1660,7 @@ const char *versions_list[] = {
 	"b3.0",
 	"b3.1",
 	"b3.2",
+	"b3.6",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -1893,6 +1894,47 @@ void b3_2_map_and_gear(void) {
 }
 
 
+// fixes some guild-patterend cloth that was accidentally auto-weaved in a previous patch
+// NOTE: the cloth is not storable, so any empire with it in normal storage must have had the bug
+void b3_6_einv_fix(void) {
+	struct empire_storage_data *store, *next_store;
+	empire_data *emp, *next_emp;
+	obj_data *proto;
+	int total, amt;
+	
+	obj_vnum vnum = 2344;	// guild-patterned cloth
+	obj_vnum cloth = 1359;
+	obj_vnum silver = 161;
+	
+	proto = obj_proto(vnum);
+	if (!proto || proto->storage || !obj_proto(cloth) || !obj_proto(silver)) {
+		return;	// no work to do on this EmpireMUD
+	}
+	
+	log("Fixing incorrectly auto-weaved guild-patterned cloth (2344)");
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		total = 0;
+		LL_FOREACH_SAFE(EMPIRE_STORAGE(emp), store, next_store) {
+			if (store->vnum == vnum) {
+				amt = store->amount;
+				total += amt;
+				add_to_empire_storage(emp, store->island, cloth, 4 * amt);
+				add_to_empire_storage(emp, store->island, silver, 2 * amt);
+				LL_DELETE(EMPIRE_STORAGE(emp), store);
+				free(store);
+			}
+		}
+		
+		if (total > 0) {
+			log(" - [%d] %s: %d un-woven", EMPIRE_VNUM(emp), EMPIRE_NAME(emp), total);
+		}
+	}
+	
+	save_all_empires();
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -1914,11 +1956,13 @@ void check_version(void) {
 		
 		// version-specific updates
 		if (MATCH_VERSION("b2.5")) {
+			void set_workforce_limit_all(empire_data *emp, int chore, int limit);
+			
 			log("Applying b2.5 update to empires...");
 			empire_data *emp, *next_emp;
 			HASH_ITER(hh, empire_table, emp, next_emp) {
 				// auto-balance was removed and the same id was used for dismantle-mines
-				EMPIRE_CHORE(emp, CHORE_DISMANTLE_MINES) = FALSE;
+				set_workforce_limit_all(emp, CHORE_DISMANTLE_MINES, 0);
 				save_empire(emp);
 			}
 		}
@@ -2037,6 +2081,9 @@ void check_version(void) {
 		if (MATCH_VERSION("b3.2")) {
 			b3_2_map_and_gear();
 		}
+		if (MATCH_VERSION("b3.6")) {
+			b3_6_einv_fix();
+		}
 	}
 	
 	write_last_boot_version(current);
@@ -2045,6 +2092,44 @@ void check_version(void) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// MISCELLANEOUS HELPERS ///////////////////////////////////////////////////
+
+/**
+* This adapts a saved empire's chore data from the pre-2.0b3.6 format, to the
+* newer version that is done per-island. It uses the temporary_room_data that
+* exists during startup to find a list of islands the empire controls. No other
+* ownership data is available during startup.
+* 
+* @param empire_data *emp The empire to add chore data for.
+* @param int chore Which CHORE_ to turn on.
+*/
+void assign_old_workforce_chore(empire_data *emp, int chore) {
+	void set_workforce_limit(empire_data *emp, int island_id, int chore, int limit);
+	
+	struct trd_type *trd, *next_trd;
+	struct map_data *map;
+	int last_isle = -1;
+	
+	if (chore < 0 || chore >= NUM_CHORES) {
+		return;
+	}
+	
+	HASH_ITER(hh, temporary_room_data, trd, next_trd) {
+		if (trd->owner != EMPIRE_VNUM(emp)) {	// ensure is this empire
+			continue;
+		}
+		if (trd->vnum >= MAP_SIZE) {	// ensure is on map
+			continue;
+		}
+		
+		// only bother if different from the last island found
+		map = &(world_map[MAP_X_COORD(trd->vnum)][MAP_Y_COORD(trd->vnum)]);
+		if (map->island != NO_ISLAND && last_isle != map->island) {
+			set_workforce_limit(emp, map->island, chore, WORKFORCE_UNLIMITED);
+			last_isle = map->island;
+		}
+	}
+}
+
 
 /* reset the time in the game from file */
 void reset_time(void) {

@@ -151,6 +151,7 @@
 #define OTHER_COIN  NOTHING	// use the NOTHING value to store the "other" coin type (which stores by empire id)
 #define REAL_OTHER_COIN  NULL	// for when other-coin type is an empire pointer
 #define UNLIMITED  -1	// unlimited duration/timer
+#define WORKFORCE_UNLIMITED  -1	// no resource limit on workforce
 
 
 // Various other special codes
@@ -3109,6 +3110,21 @@ struct empire_city_data {
 };
 
 
+// per-island data for the empire
+struct empire_island {
+	int island;	// which island id
+	
+	// saved portion
+	int workforce_limit[NUM_CHORES];	// workforce settings
+	
+	// unsaved portion
+	int tech[NUM_TECHS];	// TECH_ present on that island
+	int population;	// citizens
+	
+	UT_hash_handle hh;	// EMPIRE_ISLANDS(emp) hash handle
+};
+
+
 struct empire_log_data {
 	int type;	// ELOG_x
 	time_t timestamp;
@@ -3251,15 +3267,13 @@ struct empire_data {
 	int military;	// number of soldiers
 	int greatness;	// total greatness of members
 	int tech[NUM_TECHS];	// TECH_x, detected from buildings and abilities
-	int **island_tech;	// array of TECH_x by island
-	int size_island_tech;	// size of the island_tech array last time it was created
+	struct empire_island *islands;	// empire island data hash
 	int members;	// Number of members, calculated at boot time
 	int total_member_count;	// Total number of members including timeouts and dupes
 	int total_playtime;	// total playtime among all accounts, in hours
 	bool imm_only;	// Don't allow imms/morts to be together
 	int fame;	// Empire's fame rating
 	time_t last_logon;	// time of last member's last logon
-	bool chore_active[NUM_CHORES];	// which chores the empire should be doing
 	int scores[NUM_SCORES];	// empire score in each category
 	int sort_value;	// for score ties
 	bool storage_loaded;	// record whether or not storage has been loaded, to prevent saving over it

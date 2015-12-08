@@ -1343,6 +1343,43 @@ void delete_empire(empire_data *emp) {
 
 
 /**
+* Removes a territory NPC entry, and removes the citizen if it's spawned. This
+* will free the "npc" argument after removing it from the territory npc list.
+*
+* @param struct empire_territory_data *ter The territory entry.
+* @param struct empire_npc_data *npc The npc data.
+*/
+void delete_territory_npc(struct empire_territory_data *ter, struct empire_npc_data *npc) {
+	struct empire_island *isle;
+	empire_data *emp;
+	
+	if (!ter || !npc || !(emp = ROOM_OWNER(HOME_ROOM(ter->room)))) {
+		return;
+	}
+	
+	// remove mob if any
+	if (npc->mob) {
+		GET_EMPIRE_NPC_DATA(npc->mob) = NULL;	// un-link this npc data from the mob, or extract will corrupt memory
+		
+		if (!EXTRACTED(npc->mob) && !IS_DEAD(npc->mob)) {
+			act("$n leaves.", TRUE, npc->mob, NULL, NULL, TO_ROOM);
+			extract_char(npc->mob);
+		}
+		npc->mob = NULL;
+	}
+	
+	// reduce pop
+	EMPIRE_POPULATION(emp) -= 1;
+	if ((isle = get_empire_island(emp, GET_ISLAND_ID(ter->room)))) {
+		isle->population -= 1;
+	}
+	
+	LL_DELETE(ter->npcs, npc);
+	free(npc);
+}
+
+
+/**
 * Frees a set of workforce trackers.
 *
 * @param struct empire_workforce_tracker **tracker A pointer to the hash table of trackers.
@@ -1372,28 +1409,23 @@ void ewt_free_tracker(struct empire_workforce_tracker **tracker) {
 void free_empire(empire_data *emp) {
 	extern struct empire_territory_data *global_next_territory_entry;
 	
+	struct empire_island *isle, *next_isle;
 	struct empire_storage_data *store;
 	struct empire_unique_storage *eus;
 	struct empire_territory_data *ter;
-	struct empire_npc_data *npc;
 	struct empire_city_data *city;
 	struct empire_political_data *pol;
 	struct empire_trade_data *trade;
 	struct empire_log_data *elog;
 	struct shipping_data *shipd;
 	room_data *room;
-	int iter, pos;
+	int iter;
 	
 	// free island techs
-	if (emp->island_tech != NULL) {
-		for (pos = 0; pos < emp->size_island_tech; ++pos) {
-			if (emp->island_tech[pos]) {
-				free(emp->island_tech[pos]);
-			}
-		}
-		free(emp->island_tech);
-		emp->island_tech = NULL;
+	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
+		free(isle);
 	}
+	EMPIRE_ISLANDS(emp) = NULL;
 			
 	// free storage
 	while ((store = emp->store)) {
@@ -1455,18 +1487,8 @@ void free_empire(empire_data *emp) {
 		}
 		
 		// free npcs
-		while ((npc = ter->npcs)) {
-			if (npc->mob) {
-				// ensure these flags to force a despawn
-				SET_BIT(MOB_FLAGS(npc->mob), MOB_SPAWNED | MOB_EMPIRE);
-				
-				GET_EMPIRE_NPC_DATA(npc->mob) = NULL;
-				npc->mob = NULL;
-			}
-				
-			ter->npcs = npc->next;
-			npc->next = NULL;
-			free(npc);
+		while (ter->npcs) {
+			delete_territory_npc(ter, ter->npcs);
 		}
 		
 		emp->territory_list = ter->next;
@@ -1664,6 +1686,7 @@ void load_empire_storage(void) {
 * @param empire_vnum vnum The vnum to process.
 */
 void parse_empire(FILE *fl, empire_vnum vnum) {
+	void assign_old_workforce_chore(empire_data *emp, int chore);
 	extern struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_data *location, int type);
 	extern struct empire_npc_data *create_empire_npc(empire_data *emp, mob_vnum mob, int sex, int name, struct empire_territory_data *ter);
 	extern struct empire_territory_data *create_territory_entry(empire_data *emp, room_data *room);
@@ -1676,6 +1699,7 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 	struct empire_trade_data *trade, *last_trade = NULL;
 	struct empire_log_data *elog, *last_log = NULL;
 	struct empire_city_data *city;
+	struct empire_island *isle;
 	room_data *room;
 	long long_in;
 	
@@ -1743,9 +1767,18 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 				break;
 			}
 			case 'C': { // chore
-				j = atoi(line+1);
-				if (j < NUM_CHORES) {
-					EMPIRE_CHORE(emp, j) = TRUE;
+				if (sscanf(line, "C %d %d %d", &t[0], &t[1], &t[2]) == 3) {
+					if (t[1] > 0 && t[1] < NUM_CHORES && (isle = get_empire_island(emp, t[0]))) {
+						isle->workforce_limit[t[1]] = t[2];
+					}
+				}
+				else if (sscanf(line, "C%d", &t[0]) == 1) {
+					// old version
+					assign_old_workforce_chore(emp, t[0]);
+				}
+				else {
+					log("SYSERR: Bad chore data for empire %d", vnum);
+					exit(1);
 				}
 				break;
 			}
@@ -1908,6 +1941,7 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 * @param empire_data *emp The empire to save.
 */
 void write_empire_to_file(FILE *fl, empire_data *emp) {
+	struct empire_island *isle, *next_isle;
 	struct empire_political_data *emp_pol;
 	struct empire_territory_data *ter;
 	struct empire_trade_data *trade;
@@ -1936,12 +1970,14 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	}
 
 	// C: chores
-	for (iter = 0; iter < NUM_CHORES; ++iter) {
-		if (EMPIRE_CHORE(emp, iter)) {
-			fprintf(fl, "C%d\n", iter);
+	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
+		for (iter = 0; iter < NUM_CHORES; ++iter) {
+			if (isle->workforce_limit[iter] != 0) {
+				fprintf(fl, "C %d %d %d\n", isle->island, iter, isle->workforce_limit[iter]);
+			}
 		}
 	}
-
+	
 	// D: diplomacy
 	for (emp_pol = EMPIRE_DIPLOMACY(emp); emp_pol; emp_pol = emp_pol->next) {
 		fprintf(fl, "D\n%d %d %d %d\n", emp_pol->id, emp_pol->type, emp_pol->offer, (int) emp_pol->start_time);
@@ -2141,7 +2177,6 @@ struct empire_npc_data *create_empire_npc(empire_data *emp, mob_vnum mobv, int s
 */
 void delete_room_npcs(room_data *room, struct empire_territory_data *ter) {
 	struct empire_territory_data *tt = ter;
-	struct empire_npc_data *npc;
 	room_data *loc = (room ? room : ter->room);
 	empire_data *emp;
 
@@ -2157,19 +2192,9 @@ void delete_room_npcs(room_data *room, struct empire_territory_data *ter) {
 	}
 	
 	if (tt) {
-		while ((npc = tt->npcs)) {
-			if (npc->mob) {
-				// ensure these flags to force a despawn
-				SET_BIT(MOB_FLAGS(npc->mob), MOB_SPAWNED | MOB_EMPIRE);
-				
-				GET_EMPIRE_NPC_DATA(npc->mob) = NULL;
-				npc->mob = NULL;
-			}
-			EMPIRE_POPULATION(emp) = MAX(0, EMPIRE_POPULATION(emp) - 1);
-			tt->npcs = npc->next;
-			free(npc);
+		while (tt->npcs) {
+			delete_territory_npc(tt, tt->npcs);
 		}
-		tt->npcs = NULL;
 	}
 }
 
@@ -2184,6 +2209,7 @@ void update_empire_npc_data(void) {
 	struct empire_territory_data *ter, *next_ter;
 	struct empire_npc_data *npc;
 	empire_data *emp, *next_emp;
+	struct empire_island *isle;
 	int count, max, sex;
 	mob_vnum artisan;
 	bool found_artisan;
@@ -2236,6 +2262,9 @@ void update_empire_npc_data(void) {
 							proto = mob_proto(artisan);
 							npc = create_empire_npc(emp, artisan, sex, pick_generic_name(proto ? MOB_NAME_SET(proto) : 0, sex), ter);
 							EMPIRE_POPULATION(emp) += 1;
+							if ((isle = get_empire_island(emp, GET_ISLAND_ID(ter->room)))) {
+								isle->population += 1;
+							}
 					
 							// spawn it right away if anybody is in the room
 							if (ROOM_PEOPLE(ter->room)) {
@@ -2247,6 +2276,9 @@ void update_empire_npc_data(void) {
 							proto = mob_proto(sex == SEX_MALE ? CITIZEN_MALE : CITIZEN_FEMALE);
 							npc = create_empire_npc(emp, proto ? GET_MOB_VNUM(proto) : 0, sex, pick_generic_name(MOB_NAME_SET(proto), sex), ter);
 							EMPIRE_POPULATION(emp) += 1;
+							if ((isle = get_empire_island(emp, GET_ISLAND_ID(ter->room)))) {
+								isle->population += 1;
+							}
 					
 							// spawn it right away if anybody is in the room
 							if (ROOM_PEOPLE(ter->room)) {
@@ -2310,7 +2342,7 @@ char_data *spawn_empire_npc_to_room(empire_data *emp, struct empire_npc_data *np
 */
 void kill_empire_npc(char_data *ch) {
 	struct empire_territory_data *ter, *ter_next;
-	struct empire_npc_data *npc, *npc_next, *temp;
+	struct empire_npc_data *npc, *npc_next;
 	empire_data *emp;
 	bool found = FALSE;
 	
@@ -2329,9 +2361,7 @@ void kill_empire_npc(char_data *ch) {
 			npc_next = npc->next;
 			
 			if (npc == GET_EMPIRE_NPC_DATA(ch)) {
-				// remove the npc data
-				REMOVE_FROM_LIST(npc, ter->npcs, next);
-				EMPIRE_POPULATION(emp) = MAX(0, EMPIRE_POPULATION(emp) - 1);
+				delete_territory_npc(ter, npc);
 				
 				// reset the population timer
 				ter->population_timer = building_population_timer;
@@ -2341,7 +2371,6 @@ void kill_empire_npc(char_data *ch) {
 		}
 	}
 	
-	GET_EMPIRE_NPC_DATA(ch)->mob = NULL;
 	GET_EMPIRE_NPC_DATA(ch) = NULL;
 }
 

@@ -254,6 +254,7 @@ extern descriptor_data *descriptor_list;
 extern empire_data *empire_table;
 extern struct trading_post_data *trading_list;
 void delete_empire(empire_data *emp);
+extern struct empire_island *get_empire_island(empire_data *emp, int island_id);
 extern empire_data *get_or_create_empire(char_data *ch);
 void free_empire(empire_data *emp);
 void read_empire_members(empire_data *only_empire, bool read_techs);
