@@ -4703,7 +4703,7 @@ ACMD(do_workforce) {
 			limit = atoi(lim_arg);
 		}
 		else {
-			msg_to_char(ch, "Invalid limit (must be on, off, or a number).\r\n");
+			msg_to_char(ch, "Invalid setting (must be on, off, or a limit number).\r\n");
 			return;
 		}
 		
