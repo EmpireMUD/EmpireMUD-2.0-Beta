@@ -404,15 +404,15 @@ static bool can_gain_chore_resource(empire_data *emp, room_data *loc, int chore,
 		island_max = config_get_int("max_chore_resource");
 	}
 	
+	// total max is a factor of this
+	total_max = round(island_max * diminishing_returns(EMPIRE_MEMBERS(emp), 5));
+	
 	// check empire's own limit
 	if ((emp_isle = get_empire_island(emp, island_id))) {
 		if (emp_isle->workforce_limit[chore] > 0 && emp_isle->workforce_limit[chore] < island_max) {
 			island_max = emp_isle->workforce_limit[chore];
 		}
 	}
-	
-	// total max is a factor of this
-	total_max = round(island_max * diminishing_returns(EMPIRE_MEMBERS(emp), 5));
 
 	// do we have too much?
 	if (tt->total_amount + tt->total_workers >= total_max) {
