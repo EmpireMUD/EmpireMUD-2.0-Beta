@@ -499,6 +499,9 @@ void show_detailed_workforce_setup_to_char(empire_data *emp, char_data *ch, int 
 		if (isle->workforce_limit[chore] == WORKFORCE_UNLIMITED) {
 			snprintf(part, sizeof(part), "%s: on%s", island->name, isle->population <= 0 ? " (no citizens)" : "");
 		}
+		else if (isle->workforce_limit[chore] == 0) {
+			snprintf(part, sizeof(part), "%s: off%s", island->name, isle->population <= 0 ? " (no citizens)" : "");
+		}
 		else {
 			snprintf(part, sizeof(part), "%s: limit %d%s", island->name, isle->workforce_limit[chore], isle->population <= 0 ? " (no citizens)" : "");
 		}
@@ -4635,7 +4638,7 @@ ACMD(do_workforce) {
 		msg_to_char(ch, "Your empire has no workforce.\r\n");
 	}
 	else if (!*arg) {
-		msg_to_char(ch, "Usage: workforce [chore] [on | off | limit] [island name | all]\r\n");
+		msg_to_char(ch, "Usage: workforce [chore] [on | off | <limit>] [island name | all]\r\n");
 		show_workforce_setup_to_char(emp, ch);
 	}
 	else if (is_abbrev(arg, "where")) {

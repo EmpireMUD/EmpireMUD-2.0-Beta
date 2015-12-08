@@ -1271,7 +1271,7 @@ WORKFORCE "SKILLED LABOR"
 
 Workforce, Skilled Labor (Empire abilities)
 
-Usage:  workforce [chore] [on | off | limit] [island name | all]
+Usage:  workforce [chore] [on | off | <limit>] [island name | all]
         workforce no-work
         workforce where
 
