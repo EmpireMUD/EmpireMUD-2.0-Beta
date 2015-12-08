@@ -1353,9 +1353,12 @@ void delete_territory_npc(struct empire_territory_data *ter, struct empire_npc_d
 	struct empire_island *isle;
 	empire_data *emp;
 	
-	if (!ter || !npc || !(emp = ROOM_OWNER(HOME_ROOM(ter->room)))) {
+	if (!ter || !npc) {
 		return;
 	}
+	
+	// this MAY not exist anymore
+	emp = ROOM_OWNER(HOME_ROOM(ter->room));
 	
 	// remove mob if any
 	if (npc->mob) {
@@ -1369,9 +1372,11 @@ void delete_territory_npc(struct empire_territory_data *ter, struct empire_npc_d
 	}
 	
 	// reduce pop
-	EMPIRE_POPULATION(emp) -= 1;
-	if ((isle = get_empire_island(emp, GET_ISLAND_ID(ter->room)))) {
-		isle->population -= 1;
+	if (emp) {
+		EMPIRE_POPULATION(emp) -= 1;
+		if ((isle = get_empire_island(emp, GET_ISLAND_ID(ter->room)))) {
+			isle->population -= 1;
+		}
 	}
 	
 	LL_DELETE(ter->npcs, npc);
