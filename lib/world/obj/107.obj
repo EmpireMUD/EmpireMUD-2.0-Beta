@@ -3,7 +3,7 @@ portal north~
 the North Portal~
 The North Portal is blowing snow all over the place!~
    The portal howls with wind as snow blows through it. There's a blizzard on
-the other side, but through the noise you think you hear caroling.  
+the other side, but through the noise you think you hear caroling.
 ~
 8 0 0 2
 0 0 0
@@ -14,7 +14,7 @@ portal north~
 the North Portal~
 The North Portal leads back out of the winter wonderland.~
    The fierce wind blows snow out through the portal but the weather otherwise
-seems to be better on the other side.  
+seems to be better on the other side.
 ~
 8 0 0 3
 0 0 0
@@ -128,7 +128,7 @@ a snowglobe~
 A snowglobe is lying here.~
    The snowglobe has a tiny model of your house in here. You can 'use
 snowglobe' to teleport home, like a hestian trinket. Use the home command to
-set your home.  
+set your home.
 ~
 3 p a 4
 0 0 0
@@ -140,9 +140,9 @@ hat red christmas~
 a red Christmas hat~
 A red Christmas hat is lying on the ground.~
    The hat is red with white fur lining, with the scent of peppermint and a
-brisk winter breeze.  
+brisk winter breeze.
 ~
-2 0 ae 2
+2 p ae 3
 0 0 0
 11 0
 A
@@ -156,9 +156,11 @@ a bottomless gift sack~
 A bottomless sack is lying on the ground.~
 You really can't see the bottom!
 ~
-24 mp ar 1
-1 0 0
+24 mp ar 2
+3 0 0
 0 0
+A
+4 1 0
 C
 1 300
 S
@@ -176,9 +178,9 @@ S
 screwdriver elfish~
 an elfish screwdriver~
 An elfish screwdriver is lying on the floor.~
-   The elfish screwdriver also contains a hammer, a chisel, and a corkscrew. 
+   The elfish screwdriver also contains a hammer, a chisel, and a corkscrew.
 Flecks of brightly colored paint mar each part of the tool, no doubt the result
-of centuries of toymaking.  
+of centuries of toymaking.
 ~
 3 p ao 8
 0 0 0
@@ -193,7 +195,7 @@ sleigh red sleek~
 the sleigh~
 A sleek red sleigh is parked here.~
    The sleigh is small, but there's a curious red sack in the back that seems
-to hold a great deal.  
+to hold a great deal.
 ~
 16 0 0 2
 300 1 0
