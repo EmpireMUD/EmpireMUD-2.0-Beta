@@ -123,10 +123,13 @@ wait 4
   halt
 end
 wait 1 sec
-%echo% %self.name% begins speaking!
-wait 4 sec
+%echo% %self.name% stands up to greet you.
+wait 3 sec
+say Ho ho ho! Merry Christmas!
+wait 1 sec
 eval room %self.room%
 eval person %room.people%
+* Gifts for everyone!
 eval count 0
 while %person%
   if %person.is_pc%
