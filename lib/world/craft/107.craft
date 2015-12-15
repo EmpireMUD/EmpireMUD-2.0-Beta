@@ -1,0 +1,44 @@
+#10703
+honey-cured ham~
+10703 1  # 1x a honey-cured ham
+3 -1 bh 2 10704
+R
+3201 2  # 2x a slab of pork
+S
+#10705
+fruitcake~
+10705 1  # 1x a fruitcake
+3 -1 bh 2 10706
+R
+3312 2  # 2x a sack of flour
+R
+3002 1  # 1x a bunch of apples
+R
+3008 1  # 1x a bag of cherries
+S
+#10707
+roast goose~
+10707 1  # 1x roast goose
+3 -1 gh 6 10708
+R
+3200 2  # 2x a cut of poultry
+S
+#10715
+sleigh~
+10715 1  # 1x the sleigh
+2 59 eg 36 -1
+R
+125 24  # 24x a stack of lumber
+R
+1306 6  # 6x a pouch of nails
+R
+1359 4  # 4x a bolt of cloth
+S
+#10716
+Christmas cookies~
+10716 1  # 1x a plate of christmas cookies
+3 -1 bh 2 10717
+R
+3312 2  # 2x a sack of flour
+S
+$
