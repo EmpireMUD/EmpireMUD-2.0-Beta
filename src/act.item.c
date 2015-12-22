@@ -804,7 +804,9 @@ static bool perform_get_from_container(char_data *ch, obj_data *obj, obj_data *c
 	if (mode == FIND_OBJ_INV || can_take_obj(ch, obj)) {
 		if (get_otrigger(obj, ch)) {
 			// last-minute scaling: scale to its minimum (adventures will override this on their own)
-			scale_item_to_level(obj, GET_OBJ_MIN_SCALE_LEVEL(obj));
+			if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) < 1) {
+				scale_item_to_level(obj, GET_OBJ_MIN_SCALE_LEVEL(obj));
+			}
 			
 			obj_to_char(obj, ch);
 			act("You get $p from $P.", FALSE, ch, obj, cont, TO_CHAR);
@@ -926,7 +928,9 @@ static bool perform_get_from_room(char_data *ch, obj_data *obj) {
 	}
 	if (can_take_obj(ch, obj) && get_otrigger(obj, ch)) {
 		// last-minute scaling: scale to its minimum (adventures will override this on their own)
-		scale_item_to_level(obj, GET_OBJ_MIN_SCALE_LEVEL(obj));
+		if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) < 1) {
+			scale_item_to_level(obj, GET_OBJ_MIN_SCALE_LEVEL(obj));
+		}
 		
 		obj_to_char(obj, ch);
 		act("You get $p.", FALSE, ch, obj, 0, TO_CHAR);
