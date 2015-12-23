@@ -1049,7 +1049,7 @@ typedef struct trig_data trig_data;
 #define ITEM_WEAR_SADDLE  BIT(18)	// s. Saddle
 
 
-// Some different kind of liquids for use in values of drink containers
+// LIQ_x: Some different kind of liquids for use in values of drink containers
 #define LIQ_WATER  0
 #define LIQ_LAGER  1
 #define LIQ_WHEATBEER  2
@@ -1063,7 +1063,8 @@ typedef struct trig_data trig_data;
 #define LIQ_GREEN_TEA  10
 #define LIQ_RED_WINE  11
 #define LIQ_WHITE_WINE  12
-#define NUM_LIQUIDS  13	// total
+#define LIQ_GROG  13
+#define NUM_LIQUIDS  14	// total
 
 
 // Item materials

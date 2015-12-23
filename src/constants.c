@@ -1693,6 +1693,7 @@ const char *drinks[] = {
 	"green tea",
 	"red wine",
 	"white wine",
+	"grog",
 	"\n"
 };
 
@@ -1712,6 +1713,7 @@ const char *drinknames[] = {
 	"tea",
 	"wine",
 	"wine",
+	"grog",
 	"\n"
 };
 
@@ -1731,7 +1733,8 @@ int drink_aff[][3] = {
 	{ 0, 0, 1 },	// coffee
 	{ 0, 0, 1 },	// green tea
 	{ 4, 0, 1 },	// red wine
-	{ 3, 0, 1 }	// white wine
+	{ 3, 0, 1 },	// white wine
+	{ 2, 1, 1 },	// grog
 };
 
 
@@ -1750,6 +1753,7 @@ const char *color_liquid[] = {
 	"green",
 	"red",
 	"clear",
+	"amber",
 	"\n"
 };
 
