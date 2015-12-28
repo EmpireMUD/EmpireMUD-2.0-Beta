@@ -837,6 +837,27 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 
 
 /**
+* Shows one vehicle as in-the-room.
+*
+* @param vehicle_data *veh The vehicle to show.
+* @param char_data *ch The person to send the output to.
+*/
+void list_one_vehicle_to_char(vehicle_data *veh, char_data *ch) {
+	char buf[MAX_STRING_LENGTH];
+	size_t size = 0;
+	
+	if (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "[%d] %s", VEH_VNUM(veh), SCRIPT(veh) ? "[TRIG] " : "");
+	}
+	size += snprintf(buf + size, sizeof(buf) - size, "%s", VEH_LONG_DESC(veh));
+	
+	// additional descriptions like what's attached.
+	
+	msg_to_char(ch, "%s\r\n", buf);
+}
+
+
+/**
 * Shows a list of vehicles in the room.
 *
 * @param vehicle_data *list Pointer to the start of the list of vehicles.
@@ -856,9 +877,7 @@ void list_vehicles_to_char(vehicle_data *list, char_data *ch) {
 			continue;	// should we show a "something" ?
 		}
 		
-		msg_to_char(ch, "%s\r\n", VEH_LONG_DESC(veh));
-		
-		// additional descriptions like what's attached.
+		list_one_vehicle_to_char(veh, ch);
 	}
 }
 
