@@ -40,6 +40,7 @@
 *   Sector Utils
 *   Skill Utils
 *   String Utils
+*   Vehicle Utils
 *   Const Externs
 *   Util Function Protos
 *   Miscellaneous Utils
@@ -226,6 +227,13 @@
 #define CAN_SEE_OBJ_CARRIER(sub, obj)  ((!obj->carried_by || CAN_SEE(sub, obj->carried_by)) && (!obj->worn_by || CAN_SEE(sub, obj->worn_by)))
 #define MORT_CAN_SEE_OBJ(sub, obj)  ((LIGHT_OK(sub) || obj->worn_by == sub || obj->carried_by == sub) && CAN_SEE_OBJ_CARRIER(sub, obj))
 #define CAN_SEE_OBJ(sub, obj)  (MORT_CAN_SEE_OBJ(sub, obj) || (!IS_NPC(sub) && PRF_FLAGGED((sub), PRF_HOLYLIGHT)))
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// CAN SEE VEHICLE UTILS ///////////////////////////////////////////////////////
+
+#define MORT_CAN_SEE_VEHICLE(sub, veh)  (LIGHT_OK(sub))
+#define CAN_SEE_VEHICLE(sub, veh)  (MORT_CAN_SEE_VEHICLE(sub, veh) || (!IS_NPC(sub) && PRF_FLAGGED((sub), PRF_HOLYLIGHT)))
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -428,6 +436,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_OLC_SECTOR(desc)  ((desc)->olc_sector)
 #define GET_OLC_SKILL(desc)  ((desc)->olc_skill)
 #define GET_OLC_TRIGGER(desc)  ((desc)->olc_trigger)
+#define GET_OLC_VEHICLE(desc)  ((desc)->olc_vehicle)
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -934,6 +943,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define ROOM_OWNER(room)  ((room)->owner)
 #define ROOM_PEOPLE(room)  ((room)->people)
 #define ROOM_TRACKS(room)  ((room)->tracks)
+#define ROOM_VEHICLES(room)  ((room)->vehicles)
 #define SECT(room)  ((room)->sector_type)
 #define GET_EXITS_HERE(room)  ((room)->exits_here)
 
@@ -1097,6 +1107,38 @@ void SET_ISLAND_ID(room_data *room, int island);	// formerly a #define and a roo
 
 #define YESNO(a) ((a) ? "YES" : "NO")
 #define ONOFF(a) ((a) ? "ON" : "OFF")
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// VEHICLE UTILS ///////////////////////////////////////////////////////////
+
+// basic data
+#define VEH_ANIMALS(veh)  ((veh)->animals)
+#define VEH_CARRYING_N(veh)  ((veh)->carrying_n)
+#define VEH_CONTAINS(veh)  ((veh)->contains)
+#define VEH_FLAGS(veh)  ((veh)->flags)
+#define VEH_HEALTH(veh)  ((veh)->health)
+#define VEH_ICON(veh)  ((veh)->icon)
+#define VEH_KEYWORDS(veh)  ((veh)->keywords)
+#define VEH_LONG_DESC(veh)  ((veh)->long_desc)
+#define VEH_NAME(veh)  ((veh)->name)
+#define VEH_NEEDS_RESOURCES(veh)  ((veh)->needs_resources)
+#define VEH_OWNER(veh)  ((veh)->owner)
+#define VEH_SCALE_LEVEL(veh)  ((veh)->scale_level)
+#define VEH_VNUM(veh)  ((veh)->vnum)
+
+// attribute (non-instanced) data
+#define VEH_ANIMALS_REQUIRED(veh)  ((veh)->attributes->animals_required)
+#define VEH_CAPACITY(veh)  ((veh)->attributes->capacity)
+#define VEH_DESIGNATE_FLAGS(veh)  ((veh)->attributes->designate_flags)
+#define VEH_MAX_HEALTH(veh)  ((veh)->attributes->maxhealth)
+#define VEH_MAX_ROOMS(veh)  ((veh)->attributes->max_rooms)
+#define VEH_MOVE_TYPE(veh)  ((veh)->attributes->move_type)
+#define VEH_YEARLY_MAINTENANCE(veh)  ((veh)->attributes->yearly_maintenance)
+
+// helpers
+#define VEH_FLAGGED(veh, flag)  IS_SET(VEH_FLAGS(veh), (flag))
+#define VEH_IS_COMPLETE(veh)  (!VEH_NEEDS_RESOURCES(veh) || !VEH_FLAGGED(veh, VEH_INCOMPLETE))
 
 
  //////////////////////////////////////////////////////////////////////////////

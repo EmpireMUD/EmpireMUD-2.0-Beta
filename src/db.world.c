@@ -353,6 +353,7 @@ void delete_room(room_data *room, bool check_exits) {
 	struct empire_territory_data *ter, *next_ter;
 	struct empire_city_data *city, *next_city;
 	room_data *rm_iter, *next_rm, *home;
+	vehicle_data *veh, *next_veh;
 	struct instance_data *inst;
 	struct depletion_data *dep;
 	struct track_data *track;
@@ -398,6 +399,11 @@ void delete_room(room_data *room, bool check_exits) {
 	
 	// get rid of players
 	relocate_players(room, NULL);
+	
+	// get rid of vehicles
+	LL_FOREACH_SAFE2(ROOM_VEHICLES(room), veh, next_veh, next_in_room) {
+		extract_vehicle(veh);
+	}
 	
 	// Remove remaining chars
 	for (c = ROOM_PEOPLE(room); c; c = next_c) {

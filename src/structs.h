@@ -31,6 +31,8 @@
 *     Object Defines
 *     Player Defines
 *     Sector Defines
+*     Vehicle Defines
+*     Weather and Season Defines
 *     World Defines
 *     Maxima and Limits
 *   Structs Section
@@ -53,6 +55,7 @@
 *     Object Structs
 *     Sector Structs
 *     Trigger Structs
+*     Vehicle Structs
 *     Weather and Season Structs
 *     World Structs
 */
@@ -113,6 +116,7 @@
 	SECT(room) == world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)].sector_type && \
 	!ROOM_SECT_FLAGGED(room, TILE_KEEP_FLAGS) && \
 	!ROOM_OWNER(room) && !ROOM_CONTENTS(room) && !ROOM_PEOPLE(room) && \
+	!ROOM_VEHICLES(room) && \
 	!ROOM_DEPLETION(room) && !ROOM_CUSTOM_NAME(room) && \
 	!ROOM_CUSTOM_ICON(room) && !ROOM_CUSTOM_DESCRIPTION(room) && \
 	!ROOM_AFFECTS(room) && ROOM_BASE_FLAGS(room) == NOBITS && \
@@ -219,6 +223,7 @@ typedef struct room_template room_template;
 typedef struct sector_data sector_data;
 typedef struct skill_data skill_data;
 typedef struct trig_data trig_data;
+typedef struct vehicle_data vehicle_data;
 
 
   /////////////////////////////////////////////////////////////////////////////
@@ -946,7 +951,7 @@ typedef struct trig_data trig_data;
 #define MOB_NO_EXPERIENCE  BIT(31)	// F. players get no exp against this mob
 
 
-// mob movement types
+// MOB_MOVE_x: mob/vehicle movement types
 #define MOB_MOVE_WALK  0
 #define MOB_MOVE_CLIMB  1
 #define MOB_MOVE_FLY  2
@@ -966,6 +971,13 @@ typedef struct trig_data trig_data;
 #define MOB_MOVE_WADDLES  16
 #define MOB_MOVE_CRAWLS  17
 #define MOB_MOVE_FLUTTERS  18
+#define MOB_MOVE_DRIVES  19
+#define MOB_MOVE_SAILS  20
+#define MOB_MOVE_ROLLS  21
+#define MOB_MOVE_RATTLES  22
+#define MOB_MOVE_SKIS  23
+#define MOB_MOVE_SLIDES  24
+#define MOB_MOVE_SOARS  25
 
 
 // name sets: add matching files in lib/text/names/
@@ -1510,6 +1522,26 @@ typedef struct trig_data trig_data;
 	#define SECTF_UNUSED1  BIT(20)
 #define SECTF_ROUGH  BIT(21)	// hard terrain, requires ATR; other mountain-like properties
 #define SECTF_SHALLOW_WATER  BIT(22)	// can't earthmeld; other properties like swamp and oasis have
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// VEHICLE DEFINES //////////////////////////////////////////////////////////
+
+// VEH_x: vehicle flags
+#define VEH_INCOMPLETE  BIT(0)	// a. can't be used until finished
+#define VEH_DRIVING  BIT(1)	// b. can move on land
+#define VHC_SAILING  BIT(2)	// c. can move on water
+#define VEH_FLYING  BIT(3)	// d. no terrain restrictions
+#define VEH_ALLOW_ROUGH  BIT(4)	// e. can move on rough terrain
+#define VEH_SIT  BIT(5)	// f. can sit on
+#define VEH_IN  BIT(6)	// g. player sits IN rather than ON
+#define VEH_BURNABLE  BIT(7)	// h. can burn
+#define VEH_CONTAINER  BIT(8)	// i. can put items in
+#define VEH_SHIPPING  BIT(9)	// j. used for the shipping system
+#define VEH_NAMABLE  BIT(10)	// k. players can name it
+#define VEH_DRAGGABLE  BIT(11)	// l. player can drag it over land
+#define VEH_NO_BUILDING  BIT(12)	// m. won't fit into a building
+#define VEH_CAN_PORTAL  BIT(13)	// n. required for the vehicle to go through a portal
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2538,6 +2570,7 @@ struct descriptor_data {
 	struct sector_data *olc_sector;	// sector being edited
 	skill_data *olc_skill;	// skill being edited
 	struct trig_data *olc_trigger;	// trigger being edited
+	vehicle_data *olc_vehicle;	// vehicle being edited
 	
 	// linked list
 	descriptor_data *next;
@@ -3467,6 +3500,59 @@ struct trig_proto_list {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// VEHICLE STRUCTS /////////////////////////////////////////////////////////
+
+struct vehicle_data {
+	any_vnum vnum;
+	
+	char *keywords;	// targeting terms
+	char *name;	// display name ("canoe", "argosy")
+	char *icon;	// Optional: Shown on map if not null
+	char *long_desc;	// As described in the room
+	
+	struct vehicle_attribute_data *attributes;	// non-instanced data
+	bitvector_t flags;	// VEH_ flags
+	
+	// instance data
+	empire_data *owner;	// which empire owns it, if any
+	int scale_level;	// determines amount of damage, etc
+	int health;	// current health
+	obj_data *contains;	// contains objects
+	int carrying_n;	// size of contents
+	struct vehicle_attached_mob *animals;	// linked list of mobs attached
+	struct resource_data *needs_resources;	// resources until finished/maintained
+	room_data *in_room;	// where it is
+	
+	// lists
+	struct vehicle_data *next;	// vehicle_list (global) linked list
+	struct vehicle_data *next_in_room;	// ROOM_VEHICLES(room) linked list
+	UT_hash_handle hh;	// vehicle_table hash handle
+};
+
+
+// data that only prototypes need
+struct vehicle_attribute_data {
+	int maxhealth;	// total hitpoints
+	int capacity;	// holds X items
+	int animals_required;	// number of animals to move it
+	int move_type;	// MOB_MOVE_ type
+	int max_rooms;	// 1 = can enter; >1 allows designate
+	bitvector_t designate_flags;	// DES_ flags
+	struct resource_data *yearly_maintenance;
+};
+
+
+// data for a mob that's attached to the vehicle and extracted
+struct vehicle_attached_mob {
+	mob_vnum mob;	// which mob
+	int scale_level;	// what level it was
+	bitvector_t flags;	// mob flags
+	empire_vnum empire;	// empire that owned it
+	struct vehicle_attached_mob *next;	// linked list
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// WEATHER AND SEASON STRUCTS //////////////////////////////////////////////
 
 // TILESET_x, used in sector_data
@@ -3522,8 +3608,9 @@ struct room_data {
 	struct trig_proto_list *proto_script;	/* list of default triggers  */
 	struct script_data *script;	/* script info for the room           */
 
-	obj_data *contents;  // start of item list
-	char_data *people;  // start of people list
+	obj_data *contents;  // start of item list (obj->next_content)
+	char_data *people;  // start of people list (ch->next_in_room)
+	vehicle_data *vehicles;	// start of vehicle list (veh->next_in_room)
 	
 	struct reset_com *reset_commands;	// used only during startup
 	

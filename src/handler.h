@@ -274,6 +274,11 @@ extern struct empire_unique_storage *find_eus_entry(obj_data *obj, empire_data *
 void remove_eus_entry(struct empire_unique_storage *eus, empire_data *emp);
 void store_unique_item(char_data *ch, obj_data *obj, empire_data *emp, room_data *room, bool *full);
 
+// vehicle handlers
+void extract_vehicle(vehicle_data *veh);
+void vehicle_from_room(vehicle_data *veh);
+void vehicle_to_room(vehicle_data *veh, room_data *room);
+
 // world handlers
 extern struct room_direction_data *find_exit(room_data *room, int dir);
 extern int get_direction_for_char(char_data *ch, int dir);

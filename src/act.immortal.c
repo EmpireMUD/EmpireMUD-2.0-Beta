@@ -6459,6 +6459,12 @@ ACMD(do_vnum) {
 			msg_to_char(ch, "No triggers by that name.\r\n");
 		}
 	}
+	else if (is_abbrev(buf, "vehicle")) {
+		extern int vnum_vehicle(char *searchname, char_data *ch);
+		if (!vnum_vehicle(buf2, ch)) {
+			msg_to_char(ch, "No vehicles by that name.\r\n");
+		}
+	}
 	else {
 		send_to_char("Usage: vnum <type> <name>\r\n", ch);
 	}
@@ -6618,6 +6624,16 @@ ACMD(do_vstat) {
 		}
 
 		do_stat_trigger(ch, trig);
+	}
+	else if (is_abbrev(buf, "vehicle")) {
+		void do_stat_vehicle(char_data *ch, vehicle_data *veh);
+		vehicle_data *veh = vehicle_proto(number);
+		if (veh) {
+			do_stat_vehicle(ch, veh);
+		}
+		else {
+			msg_to_char(ch, "There is no vehicle with that vnum.\r\n");
+		}
 	}
 	else
 		send_to_char("Invalid type.\r\n", ch);

@@ -56,6 +56,7 @@
 *   Storage Handlers
 *   Targeting Handlers
 *   Unique Storage Handlers
+*   Vehicle Handlers
 *   World Handlers
 *   Miscellaneous Handlers
 */
@@ -4283,12 +4284,11 @@ void obj_to_obj(obj_data *obj, obj_data *obj_to) {
 * @param room_data *room Where to place it.
 */
 void obj_to_room(obj_data *object, room_data *room) {
-	check_obj_in_void(object);
-
 	if (!object || !room) {
 		log("SYSERR: Illegal value(s) passed to obj_to_room. (Room %p, obj %p)", room, object);
 	}
 	else {
+		check_obj_in_void(object);
 		object->next_content = ROOM_CONTENTS(room);
 		ROOM_CONTENTS(room) = object;
 		IN_ROOM(object) = room;
@@ -5972,6 +5972,69 @@ int get_number(char **name) {
 	
 	// default
 	return (1);
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// VEHICLE HANDLERS ////////////////////////////////////////////////////////
+
+/**
+* Extracts a vehicle from the game.
+*
+* @param vehicle_data *veh The vehicle to extract and free.
+*/
+void extract_vehicle(vehicle_data *veh) {
+	void empty_vehicle(vehicle_data *veh);
+	
+	// TODO release mobs
+	// TODO delete interior
+	
+	if (IN_ROOM(veh)) {
+		vehicle_from_room(veh);
+	}
+	
+	// dump contents (this will extract them since it's not in a room
+	empty_vehicle(veh);
+	
+	LL_DELETE(vehicle_list, veh);
+	free_vehicle(veh);
+}
+
+
+/**
+* Remove a vehicle from the room it is in.
+*
+* @param vehicle_data *veh The vehicle to remove from its room.
+*/
+void vehicle_from_room(vehicle_data *veh) {
+	if (!veh || !IN_ROOM(veh)) {
+		log("SYSERR: NULL vehicle (%p) or vehicle not in a room (%p) passed to vehicle_from_room", veh, IN_ROOM(veh));
+		return;
+	}
+	
+	LL_DELETE2(ROOM_VEHICLES(IN_ROOM(veh)), veh, next_in_room);
+	IN_ROOM(veh) = NULL;
+}
+
+
+/**
+* Put a vehicle in a room.
+*
+* @param vehicle_data *veh The vehicle.
+* @param room_data *room The room to put it in.
+*/
+void vehicle_to_room(vehicle_data *veh, room_data *room) {
+	if (!veh || !room) {
+		log("SYSERR: Illegal value(s) passed to vehicle_to_room. (Room %p, vehicle %p)", room, veh);
+		return;
+	}
+	
+	if (IN_ROOM(veh)) {
+		vehicle_from_room(veh);
+	}
+	
+	LL_PREPEND2(ROOM_VEHICLES(room), veh, next_in_room);
+	IN_ROOM(veh) = room;
 }
 
 

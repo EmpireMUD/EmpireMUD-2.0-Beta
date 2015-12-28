@@ -36,7 +36,7 @@ OBJFILES = abilities.o act.action.o act.battle.o act.comm.o act.empire.o \
 	morph.o objsave.o olc.adventure.o olc.building.o olc.o olc.craft.o \
 	olc.crop.o olc.global.o olc.map.o olc.mobile.o olc.object.o \
 	olc.roomtemplate.o olc.sector.o olc.trigger.o protocol.o random.o ships.o \
-	skills.o spells.o statistics.o utils.o weather.o workforce.o
+	skills.o spells.o statistics.o utils.o vehicles.o weather.o workforce.o
 
 CXREF_FILES = abilities.c act.action.c act.battle.c act.comm.c act.empire.c \
 	act.fight.c act.god.c act.highsorcery.c act.immortal.c act.informative.c \
@@ -50,7 +50,7 @@ CXREF_FILES = abilities.c act.action.c act.battle.c act.comm.c act.empire.c \
 	morph.c objsave.c olc.adventure.c olc.building.c olc.c olc.craft.c \
 	olc.crop.c olc.global.c olc.map.c olc.mobile.c olc.object.c \
 	olc.roomtemplate.c olc.sector.c olc.trigger.c protocol.c random.c ships.c \
-	skills.c spells.c statistics.c utils.c weather.c workforce.c
+	skills.c spells.c statistics.c utils.c vehicles.c weather.c workforce.c
 
 default: all
 
@@ -324,6 +324,9 @@ statistics.o: statistics.c conf.h sysdep.h structs.h uthash.h utils.h \
 utils.o: utils.c conf.h sysdep.h structs.h uthash.h utils.h db.h comm.h \
   handler.h interpreter.h skills.h vnums.h dg_scripts.h
 	$(CC) -c $(CFLAGS) utils.c
+vehicles.o: vehicles.c conf.h sysdep.h structs.h protocol.h uthash.h \
+  utils.h interpreter.h db.h comm.h olc.h skills.h handler.h dg_scripts.h
+	$(CC) -c $(CFLAGS) vehicles.c
 weather.o: weather.c conf.h sysdep.h structs.h uthash.h utils.h comm.h \
   handler.h interpreter.h db.h skills.h
 	$(CC) -c $(CFLAGS) weather.c

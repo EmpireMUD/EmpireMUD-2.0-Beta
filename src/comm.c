@@ -1244,6 +1244,11 @@ void perform_act(const char *orig, char_data *ch, obj_data *obj, const void *vic
 				case 'F':
 					CHECK_NULL(vict_obj, fname((const char *) vict_obj));
 					break;
+				case 'V': {	// $V: vehicle
+					extern char *get_vehicle_short_desc(vehicle_data *veh, char_data *to);
+					CHECK_NULL(vict_obj, get_vehicle_short_desc((vehicle_data*)vict_obj, (char_data*)to));
+					break;
+				}
 				case '$':
 					i = "$";
 					break;

@@ -31,7 +31,8 @@
 #define DB_BOOT_ABIL  17
 #define DB_BOOT_CLASS  18
 #define DB_BOOT_SKILL  19
-#define NUM_DB_BOOT_TYPES  20	// total
+#define DB_BOOT_VEH  20
+#define NUM_DB_BOOT_TYPES  21	// total
 
 
 // library sub-dirs
@@ -82,6 +83,7 @@
 #define SECTOR_PREFIX  LIB_WORLD"sect/"	// sect definitions
 #define SKILL_PREFIX  LIB_WORLD"skill/"	// player skills
 #define TRG_PREFIX  LIB_WORLD"trg/"	// trigger files
+#define VEH_PREFIX  LIB_WORLD"veh/"	// vehicle files
 #define HLP_PREFIX  LIB_TEXT"help/"	// for HELP <keyword>
 #define INTROS_PREFIX  LIB_TEXT"intros/"	// for intro screens
 #define BOOK_PREFIX  "books/"	// for books.c
@@ -106,6 +108,7 @@
 #define SECTOR_SUFFIX  ".sect"	// sector file suffix
 #define SKILL_SUFFIX  ".skill"	// player skills
 #define TRG_SUFFIX  ".trg"	// trigger file suffix
+#define VEH_SUFFIX  ".veh"	// vehicle file suffix
 #define WLD_SUFFIX  ".wld"	// suffix for rooms
 
 // various text files
@@ -341,6 +344,12 @@ extern char *get_skill_name_by_vnum(any_vnum vnum);
 // triggers
 extern trig_data *trigger_table;
 extern trig_data *trigger_list;
+
+// vehicles
+extern vehicle_data *vehicle_list;
+extern vehicle_data *vehicle_table;
+extern vehicle_data *vehicle_proto(any_vnum vnum);
+void free_vehicle(vehicle_data *veh);
 
 // world
 void check_all_exits();

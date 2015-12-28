@@ -181,6 +181,10 @@ int max_mob_id = MOB_ID_BASE;	// for unique mob id's
 int max_obj_id = OBJ_ID_BASE;	// for unique obj id's
 int dg_owner_purged;	// For control of scripts
 
+// vehicles
+vehicle_data *vehicle_table = NULL;	// master vehicle hash table
+vehicle_data *vehicle_list = NULL;	// global linked list of vehicles (veh->next)
+
 // world / rooms
 room_data *world_table = NULL;	// hash table of the whole world
 room_data *interior_room_list = NULL;	// linked list of interior rooms: room->next_interior
@@ -214,6 +218,7 @@ struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES] = {
 	{ ABIL_PREFIX, ABIL_SUFFIX },	// DB_BOOT_ABIL
 	{ CLASS_PREFIX, CLASS_SUFFIX },	// DB_BOOT_CLASS
 	{ SKILL_PREFIX, SKILL_SUFFIX },	// DB_BOOT_SKILL
+	{ VEH_PREFIX, VEH_SUFFIX },	// DB_BOOT_SKILL
 };
 
 
@@ -393,6 +398,9 @@ void boot_world(void) {
 	
 	log("Loading crops.");
 	index_boot(DB_BOOT_CROP);
+	
+	log("Loading vehicles.");
+	index_boot(DB_BOOT_VEH);
 	
 	// requires sectors, buildings, and room templates -- order matters here
 	log("Loading the world.");

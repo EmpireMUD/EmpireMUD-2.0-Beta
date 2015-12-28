@@ -295,6 +295,20 @@ OLC_MODULE(tedit_percent);
 OLC_MODULE(tedit_string);
 OLC_MODULE(tedit_types);
 
+// vehicle modules
+OLC_MODULE(vedit_animalsrequired);
+OLC_MODULE(vedit_capacity);
+OLC_MODULE(vedit_designate);
+OLC_MODULE(vedit_flags);
+OLC_MODULE(vedit_hitpoints);
+OLC_MODULE(vedit_icon);
+OLC_MODULE(vedit_keywords);
+OLC_MODULE(vedit_longdescription);
+OLC_MODULE(vedit_maxrooms);
+OLC_MODULE(vedit_movetype);
+OLC_MODULE(vedit_name);
+OLC_MODULE(vedit_resource);
+
 
 // externs
 extern const char *interact_types[];
@@ -327,6 +341,7 @@ void olc_show_room_template(char_data *ch);
 void olc_show_sector(char_data *ch);
 void olc_show_skill(char_data *ch);
 void olc_show_trigger(char_data *ch);
+void olc_show_vehicle(char_data *ch);
 extern ability_data *setup_olc_ability(ability_data *input);
 extern adv_data *setup_olc_adventure(adv_data *input);
 extern archetype_data *setup_olc_archetype(archetype_data *input);
@@ -343,22 +358,23 @@ extern room_template *setup_olc_room_template(room_template *input);
 extern sector_data *setup_olc_sector(sector_data *input);
 extern skill_data *setup_olc_skill(skill_data *input);
 extern struct trig_data *setup_olc_trigger(struct trig_data *input, char **cmdlist_storage);
+extern vehicle_data *setup_olc_vehicle(vehicle_data *input);
 extern bool validate_icon(char *icon);
 
 
 // master olc command structure
 const struct olc_command_data olc_data[] = {
 	// OLC_x: main commands
-	{ "abort", olc_abort, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
-	{ "audit", olc_audit, OLC_ABILITY | OLC_ADVENTURE | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_ROOM_TEMPLATE | OLC_SKILL, NOBITS },
-	{ "copy", olc_copy, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, NOBITS },
-	{ "delete", olc_delete, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, OLC_CF_NO_ABBREV },
+	{ "abort", olc_abort, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
+	{ "audit", olc_audit, OLC_ABILITY | OLC_ADVENTURE | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_ROOM_TEMPLATE | OLC_SKILL | OLC_VEHICLE, NOBITS },
+	{ "copy", olc_copy, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "delete", olc_delete, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_NO_ABBREV },
 	// "display" command uses the shortcut "." or "olc" with no args, and is in the do_olc function
-	{ "edit", olc_edit, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, NOBITS },
-	{ "free", olc_free, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, NOBITS },
-	{ "list", olc_list, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, NOBITS },
-	{ "save", olc_save, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
-	{ "search", olc_search, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ROOM_TEMPLATE, NOBITS },
+	{ "edit", olc_edit, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "free", olc_free, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "list", olc_list, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "save", olc_save, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
+	{ "search", olc_search, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
 	
 	// admin
 	{ "removeindev", olc_removeindev, NOBITS, NOBITS },
@@ -616,6 +632,20 @@ const struct olc_command_data olc_data[] = {
 	{ "percent", tedit_percent, OLC_TRIGGER, OLC_CF_EDITOR },
 	{ "string", tedit_string, OLC_TRIGGER, OLC_CF_EDITOR },
 	{ "types", tedit_types, OLC_TRIGGER, OLC_CF_EDITOR },
+	
+	// vehicle commands
+	{ "animalsrequired", vedit_animalsrequired, OLC_VEHICLE, OLC_CF_EDITOR },
+	{ "capacity", vedit_capacity, OLC_VEHICLE, OLC_CF_EDITOR },
+	{ "designate", vedit_designate, OLC_VEHICLE, OLC_CF_EDITOR },
+	{ "flags", vedit_flags, OLC_VEHICLE, OLC_CF_EDITOR },
+	{ "hitpoints", vedit_hitpoints, OLC_VEHICLE, OLC_CF_EDITOR },
+	{ "icon", vedit_icon, OLC_VEHICLE, OLC_CF_EDITOR },
+	{ "keywords", vedit_keywords, OLC_VEHICLE, OLC_CF_EDITOR },
+	{ "longdescription", vedit_longdescription, OLC_VEHICLE, OLC_CF_EDITOR },
+	{ "maxrooms", vedit_maxrooms, OLC_VEHICLE, OLC_CF_EDITOR },
+	{ "movetype", vedit_movetype, OLC_VEHICLE, OLC_CF_EDITOR },
+	{ "name", vedit_name, OLC_VEHICLE, OLC_CF_EDITOR },
+	{ "resource", vedit_resource, OLC_VEHICLE, OLC_CF_EDITOR },
 
 
 	// this goes last
@@ -810,6 +840,11 @@ OLC_MODULE(olc_abort) {
 					free(GET_OLC_STORAGE(ch->desc));
 					GET_OLC_STORAGE(ch->desc) = NULL;
 				}
+				break;
+			}
+			case OLC_VEHICLE: {
+				free_vehicle(GET_OLC_VEHICLE(ch->desc));
+				GET_OLC_VEHICLE(ch->desc) = NULL;
 				break;
 			}
 			default: {
@@ -1018,6 +1053,16 @@ OLC_MODULE(olc_audit) {
 				break;
 			}
 			*/
+			case OLC_VEHICLE: {
+				extern bool audit_vehicle(vehicle_data *veh, char_data *ch);
+				vehicle_data *veh, *next_veh;
+				HASH_ITER(hh, vehicle_table, veh, next_veh) {
+					if (VEH_VNUM(veh) >= from_vnum && VEH_VNUM(veh) <= to_vnum) {
+						found |= audit_vehicle(veh, ch);
+					}
+				}
+				break;
+			}
 			default: {
 				msg_to_char(ch, "OLC auditing isn't available for that type.\r\n");
 				return;
@@ -1143,6 +1188,11 @@ OLC_MODULE(olc_copy) {
 		case OLC_TRIGGER: {
 			found = (real_trigger(vnum) != NULL);
 			exists = (real_trigger(from_vnum) != NULL);
+			break;
+		}
+		case OLC_VEHICLE: {
+			found = (vehicle_proto(vnum) != NULL);
+			exists = (vehicle_proto(from_vnum) != NULL);
 			break;
 		}
 	}
@@ -1295,6 +1345,12 @@ OLC_MODULE(olc_copy) {
 			olc_show_trigger(ch);
 			break;
 		}
+		case OLC_VEHICLE: {
+			GET_OLC_VEHICLE(ch->desc) = setup_olc_vehicle(vehicle_proto(from_vnum));
+			GET_OLC_VEHICLE(ch->desc)->vnum = vnum;
+			olc_show_vehicle(ch);
+			break;
+		}
 		default: {
 			ok = FALSE;
 			break;
@@ -1326,6 +1382,7 @@ OLC_MODULE(olc_delete) {
 	void olc_delete_sector(char_data *ch, sector_vnum vnum);
 	void olc_delete_skill(char_data *ch, any_vnum vnum);
 	void olc_delete_trigger(char_data *ch, trig_vnum vnum);
+	void olc_delete_vehicle(char_data *ch, any_vnum vnum);
 	
 	descriptor_data *desc;
 	char typename[42];
@@ -1427,6 +1484,10 @@ OLC_MODULE(olc_delete) {
 			olc_delete_trigger(ch, vnum);
 			break;
 		}
+		case OLC_VEHICLE: {
+			olc_delete_vehicle(ch, vnum);
+			break;
+		}
 		default: {
 			msg_to_char(ch, "You can't delete that.\r\n");
 			break;
@@ -1500,6 +1561,10 @@ OLC_MODULE(olc_display) {
 		}
 		case OLC_TRIGGER: {
 			olc_show_trigger(ch);
+			break;
+		}
+		case OLC_VEHICLE: {
+			olc_show_vehicle(ch);
 			break;
 		}
 		default: {
@@ -1680,6 +1745,13 @@ OLC_MODULE(olc_edit) {
 			olc_show_trigger(ch);
 			break;
 		}
+		case OLC_VEHICLE: {
+			// this will set up from existing OR new automatically
+			GET_OLC_VEHICLE(ch->desc) = setup_olc_vehicle(vehicle_proto(vnum));
+			GET_OLC_VEHICLE(ch->desc)->vnum = vnum;			
+			olc_show_vehicle(ch);
+			break;
+		}
 		default: {
 			ok = FALSE;
 			break;
@@ -1786,6 +1858,10 @@ OLC_MODULE(olc_free) {
 				}
 				case OLC_TRIGGER: {
 					free = (real_trigger(iter) == NULL);
+					break;
+				}
+				case OLC_VEHICLE: {
+					free = (vehicle_proto(iter) == NULL);
 					break;
 				}
 				default: {
@@ -2098,6 +2174,20 @@ OLC_MODULE(olc_list) {
 					if (GET_TRIG_VNUM(trig) >= from_vnum && GET_TRIG_VNUM(trig) <= to_vnum) {
 						++count;
 						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_trigger(trig, show_details));
+					}
+				}
+				break;
+			}
+			case OLC_VEHICLE: {
+				extern char *list_one_vehicle(vehicle_data *veh, bool detail);
+				vehicle_data *veh, *next_veh;
+				HASH_ITER(hh, vehicle_table, veh, next_veh) {
+					if (len >= sizeof(buf)) {
+						break;
+					}
+					if (VEH_VNUM(veh) >= from_vnum && VEH_VNUM(veh) <= to_vnum) {
+						++count;
+						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_vehicle(veh, show_details));
 					}
 				}
 				break;
@@ -2426,6 +2516,13 @@ OLC_MODULE(olc_save) {
 				}
 				break;
 			}
+			case OLC_VEHICLE: {
+				void save_olc_vehicle(descriptor_data *desc);
+				save_olc_vehicle(ch->desc);
+				free_vehicle(GET_OLC_VEHICLE(ch->desc));
+				GET_OLC_VEHICLE(ch->desc) = NULL;
+				break;
+			}
 			default: {
 				msg_to_char(ch, "Error saving: unknown save type %s.\r\n", typename);
 				break;
@@ -2456,6 +2553,7 @@ OLC_MODULE(olc_search) {
 	void olc_search_sector(char_data *ch, sector_vnum vnum);
 	void olc_search_skill(char_data *ch, any_vnum vnum);
 	void olc_search_trigger(char_data *ch, trig_vnum vnum);
+	void olc_search_vehicle(char_data *ch, any_vnum vnum);
 
 	any_vnum vnum = NOTHING;
 	
@@ -2524,6 +2622,10 @@ OLC_MODULE(olc_search) {
 			}
 			case OLC_TRIGGER: {
 				olc_search_trigger(ch, vnum);
+				break;
+			}
+			case OLC_VEHICLE: {
+				olc_search_vehicle(ch, vnum);
 				break;
 			}
 			default: {
@@ -3198,6 +3300,9 @@ bool player_can_olc_edit(char_data *ch, int type, any_vnum vnum) {
 			return TRUE;
 		}
 		else if (IS_SET(type, OLC_TRIGGER) && !OLC_FLAGGED(ch, OLC_FLAG_NO_TRIGGER)) {
+			return TRUE;
+		}
+		else if (IS_SET(type, OLC_VEHICLE) && !OLC_FLAGGED(ch, OLC_FLAG_NO_VEHICLES)) {
 			return TRUE;
 		}
 		else if (IS_SET(type, OLC_SECTOR) && OLC_FLAGGED(ch, OLC_FLAG_SECTORS)) {

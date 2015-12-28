@@ -1334,7 +1334,7 @@ const char *action_bits[] = {
 };
 
 
-// MOB_MOVE_x
+// MOB_MOVE_x: mob/vehicle move types
 const char *mob_move_types[] = {
 	"walks",
 	"climbs",
@@ -1355,6 +1355,13 @@ const char *mob_move_types[] = {
 	"waddles",
 	"crawls",
 	"flutters",
+	"drives",
+	"sails",
+	"rolls",
+	"rattles",
+	"skis",
+	"slides",
+	"soars",
 	"\n"
 };
 
@@ -1856,6 +1863,7 @@ const char *olc_flag_bits[] = {
 	"ABILITIES",
 	"CLASSES",
 	"SKILLS",
+	"!VEHICLES",
 	"\n"
 };
 
@@ -1879,6 +1887,7 @@ const char *olc_type_bits[NUM_OLC_TYPES+1] = {
 	"ability",
 	"class",
 	"skill",
+	"vehicle",
 	"\n"
 };
 
@@ -2958,5 +2967,25 @@ const char *shutdown_types[] = {
 	"normal",
 	"pause",
 	"die",
+	"\n"
+};
+
+
+// VEH_x: Vehicle flags
+const char *vehicle_flags[] = {
+	"*INCOMPLETE",
+	"DRIVING",
+	"SAILING",
+	"FLYING",
+	"ALLOW-ROUGH",
+	"SIT",	// 5
+	"IN",
+	"BURNABLE",
+	"CONTAINER",
+	"SHIPPING",
+	"NAMABLE",	// 10
+	"DRAGGABLE",
+	"!BUILDING",
+	"CAN-PORTAL",
 	"\n"
 };
