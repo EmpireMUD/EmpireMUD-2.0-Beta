@@ -57,6 +57,7 @@
 *   Targeting Handlers
 *   Unique Storage Handlers
 *   Vehicle Handlers
+*   Vehicle Targeting Handlers
 *   World Handlers
 *   Miscellaneous Handlers
 */
@@ -5996,7 +5997,7 @@ void extract_vehicle(vehicle_data *veh) {
 	// dump contents (this will extract them since it's not in a room
 	empty_vehicle(veh);
 	
-	LL_DELETE(vehicle_list, veh);
+	LL_DELETE2(vehicle_list, veh, next);
 	free_vehicle(veh);
 }
 
@@ -6035,6 +6036,47 @@ void vehicle_to_room(vehicle_data *veh, room_data *room) {
 	
 	LL_PREPEND2(ROOM_VEHICLES(room), veh, next_in_room);
 	IN_ROOM(veh) = room;
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// VEHICLE TARGETING HANDLERS //////////////////////////////////////////////
+
+/**
+* Finds a vehicle the char can see in the room.
+*
+* @param char_data *ch The person who's looking.
+* @param char *name The target argument.
+* @return vehicle_data* The vehicle found, or NULL.
+*/
+vehicle_data *get_vehicle_in_room_vis(char_data *ch, char *name) {
+	int found = 0, number;
+	char tmpname[MAX_INPUT_LENGTH];
+	char *tmp = tmpname;
+	vehicle_data *iter;
+
+	strcpy(tmp, name);
+	
+	// 0.x does not target vehicles
+	if ((number = get_number(&tmp)) == 0) {
+		return (NULL);
+	}
+	
+	LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), iter, next_in_room) {
+		if (!isname(tmp, VEH_KEYWORDS(iter))) {
+			continue;
+		}
+		if (!CAN_SEE_VEHICLE(ch, iter)) {
+			continue;
+		}
+		
+		// found: check number
+		if (++found == number) {
+			return iter;
+		}
+	}
+
+	return NULL;
 }
 
 

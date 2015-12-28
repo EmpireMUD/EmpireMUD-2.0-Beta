@@ -350,6 +350,7 @@ extern vehicle_data *vehicle_list;
 extern vehicle_data *vehicle_table;
 extern vehicle_data *vehicle_proto(any_vnum vnum);
 void free_vehicle(vehicle_data *veh);
+extern vehicle_data *read_vehicle(any_vnum vnum, bool with_triggers);
 
 // world
 void check_all_exits();

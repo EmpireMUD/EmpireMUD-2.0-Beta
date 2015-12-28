@@ -4954,6 +4954,7 @@ ACMD(do_last) {
 ACMD(do_load) {
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	
+	vehicle_data *veh;
 	char_data *mob;
 	obj_data *obj;
 	any_vnum number;
@@ -4961,7 +4962,7 @@ ACMD(do_load) {
 	two_arguments(argument, buf, buf2);
 
 	if (!*buf || !*buf2 || !isdigit(*buf2)) {
-		send_to_char("Usage: load { obj | mob } <number>\r\n", ch);
+		send_to_char("Usage: load { obj | mob | vehicle } <number>\r\n", ch);
 		return;
 	}
 	if ((number = atoi(buf2)) < 0) {
@@ -4997,8 +4998,20 @@ ACMD(do_load) {
 		act("You create $p.", FALSE, ch, obj, 0, TO_CHAR);
 		load_otrigger(obj);
 	}
+	else if (is_abbrev(buf, "vehicle")) {
+		if (!vehicle_proto(number)) {
+			msg_to_char(ch, "There is no vehicle with that number.\r\n");
+			return;
+		}
+		veh = read_vehicle(number, TRUE);
+		vehicle_to_room(veh, IN_ROOM(ch));
+		act("$n makes an odd magical gesture.", TRUE, ch, NULL, NULL, TO_ROOM);
+		act("$n has created $V!", FALSE, ch, NULL, veh, TO_ROOM);
+		act("You create $V.", FALSE, ch, NULL, veh, TO_CHAR);
+		// load_vtrigger(veh);
+	}
 	else {
-		send_to_char("That'll have to be either 'obj' or 'mob'.\r\n", ch);
+		send_to_char("That'll have to be either 'obj', 'mob', or 'vehicle'.\r\n", ch);
 	}
 }
 
@@ -5282,6 +5295,7 @@ ACMD(do_poofset) {
 
 ACMD(do_purge) {
 	char_data *vict, *next_v;
+	vehicle_data *veh;
 	obj_data *obj;
 
 	one_argument(argument, buf);
@@ -5309,6 +5323,10 @@ ACMD(do_purge) {
 			act("$n destroys $p.", FALSE, ch, obj, 0, TO_ROOM);
 			extract_obj(obj);
 		}
+		else if ((veh = get_vehicle_in_room_vis(ch, buf))) {
+			act("$n destroys $V.", FALSE, ch, NULL, veh, TO_ROOM);
+			extract_vehicle(veh);
+		}
 		else {
 			send_to_char("Nothing here by that name.\r\n", ch);
 			return;
@@ -5327,8 +5345,9 @@ ACMD(do_purge) {
 				extract_char(vict);
 		}
 
-		while (ROOM_CONTENTS(IN_ROOM(ch)))
+		while (ROOM_CONTENTS(IN_ROOM(ch))) {
 			extract_obj(ROOM_CONTENTS(IN_ROOM(ch)));
+		}
 	}
 }
 

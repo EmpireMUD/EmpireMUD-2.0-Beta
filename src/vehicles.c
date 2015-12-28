@@ -38,6 +38,9 @@ const char *default_vehicle_keywords = "vehicle unnamed";
 const char *default_vehicle_name = "unnamed vehicle";
 const char *default_vehicle_long_desc = "An unnamed vehicle is parked here.";
 
+// local protos
+void clear_vehicle(vehicle_data *veh);
+
 // external consts
 extern const char *designate_flags[];
 extern const char *mob_move_types[];
@@ -201,6 +204,57 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 	}
 	
 	page_string(ch->desc, buf, TRUE);
+}
+
+
+/**
+* Create a new vehicle from a prototype. You should almost always call this
+* with with_triggers = TRUE.
+*
+* @param any_vnum vnum The vehicle vnum to load.
+* @param bool with_triggers If TRUE, attaches all triggers.
+* @return vehicle_data* The instantiated vehicle.
+*/
+vehicle_data *read_vehicle(any_vnum vnum, bool with_triggers) {
+	extern int max_vehicle_id;
+	
+	vehicle_data *veh, *proto;
+	
+	if (!(proto = vehicle_proto(vnum))) {
+		log("Vehicle vnum %d does not exist in database.", vnum);
+		// grab first one (bug)
+		proto = vehicle_table;
+	}
+
+	CREATE(veh, vehicle_data, 1);
+	clear_vehicle(veh);
+
+	*veh = *proto;
+	LL_PREPEND2(vehicle_list, veh, next);
+	
+	// new vehicle setup
+	VEH_OWNER(veh) = NULL;
+	VEH_SCALE_LEVEL(veh) = 0;	// unscaled
+	VEH_HEALTH(veh) = VEH_MAX_HEALTH(veh);
+	VEH_CONTAINS(veh) = NULL;
+	VEH_CARRYING_N(veh) = 0;
+	VEH_ANIMALS(veh) = NULL;
+	VEH_NEEDS_RESOURCES(veh) = NULL;
+	IN_ROOM(veh) = NULL;
+	REMOVE_BIT(VEH_FLAGS(veh), VEH_INCOMPLETE);	// ensure not marked incomplete
+	
+	// script id -- find_vehicle helper
+	GET_ID(veh) = max_vehicle_id++;
+	add_to_lookup_table(GET_ID(veh), (void *)veh);
+	
+	/*
+	if (with_triggers) {
+		copy_proto_script(proto, veh, VEH_TRIGGER);
+		assign_triggers(veh, VEH_TRIGGER);
+	}
+	*/
+
+	return veh;
 }
 
 
@@ -536,7 +590,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 		}
 		
 		if (ROOM_PEOPLE(IN_ROOM(iter))) {
-			act("$V vanishes.", FALSE, ROOM_PEOPLE(IN_ROOM(iter)), NULL, iter, TO_CHAR);
+			act("$V vanishes.", FALSE, ROOM_PEOPLE(IN_ROOM(iter)), NULL, iter, TO_CHAR | TO_ROOM);
 		}
 		extract_vehicle(iter);
 	}

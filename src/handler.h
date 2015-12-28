@@ -279,6 +279,9 @@ void extract_vehicle(vehicle_data *veh);
 void vehicle_from_room(vehicle_data *veh);
 void vehicle_to_room(vehicle_data *veh, room_data *room);
 
+// vehicle targeting handlers
+extern vehicle_data *get_vehicle_in_room_vis(char_data *ch, char *name);
+
 // world handlers
 extern struct room_direction_data *find_exit(room_data *room, int dir);
 extern int get_direction_for_char(char_data *ch, int dir);

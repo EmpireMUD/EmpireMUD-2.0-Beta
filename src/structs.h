@@ -3523,6 +3523,11 @@ struct vehicle_data {
 	struct resource_data *needs_resources;	// resources until finished/maintained
 	room_data *in_room;	// where it is
 	
+	// scripting
+	int id;	// used by DG triggers - unique id
+	struct trig_proto_list *proto_script;	// list of default triggers
+	struct script_data *script;	// script info for the object
+	
 	// lists
 	struct vehicle_data *next;	// vehicle_list (global) linked list
 	struct vehicle_data *next_in_room;	// ROOM_VEHICLES(room) linked list

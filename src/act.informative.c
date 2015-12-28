@@ -837,6 +837,33 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 
 
 /**
+* Shows a list of vehicles in the room.
+*
+* @param vehicle_data *list Pointer to the start of the list of vehicles.
+* @param vehicle_data *ch Person to send the output to.
+*/
+void list_vehicles_to_char(vehicle_data *list, char_data *ch) {
+	vehicle_data *veh;
+	
+	// no work
+	if (!list || !ch || !ch->desc) {
+		return;
+	}
+	
+	LL_FOREACH2(list, veh, next_in_room) {
+		// conditions to show
+		if (!CAN_SEE_VEHICLE(ch, veh)) {
+			continue;	// should we show a "something" ?
+		}
+		
+		msg_to_char(ch, "%s\r\n", VEH_LONG_DESC(veh));
+		
+		// additional descriptions like what's attached.
+	}
+}
+
+
+/**
 * Perform a look-at-person.
 *
 * @param char_data *i The person being looked at.

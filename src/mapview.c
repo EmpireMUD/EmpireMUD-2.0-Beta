@@ -473,6 +473,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options);
 	void list_obj_to_char(obj_data *list, char_data *ch, int mode, int show);
 	void list_char_to_char(char_data *list, char_data *ch);
+	void list_vehicles_to_char(vehicle_data *list, char_data *ch);
 	extern const struct tavern_data_type tavern_data[];
 	extern int how_to_show_map[NUM_SIMPLE_DIRS][2];
 	extern int show_map_y_first[NUM_SIMPLE_DIRS];
@@ -894,6 +895,8 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		/* now list characters & objects */
 		send_to_char("&g", ch);
 		list_obj_to_char(ROOM_CONTENTS(room), ch, OBJ_DESC_LONG, FALSE);
+		send_to_char("&w", ch);
+		list_vehicles_to_char(ROOM_VEHICLES(room), ch);
 		send_to_char("&y", ch);
 		list_char_to_char(ROOM_PEOPLE(room), ch);
 		send_to_char("&0", ch);
