@@ -377,7 +377,7 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 	
 	VEH_FLAGS(veh) = asciiflag_conv(str_in);
 	VEH_MOVE_TYPE(veh) = int_in[0];
-	VEH_MAX_HEALTH(veh) = int_in[1];
+	VEH_HEALTH(veh) = VEH_MAX_HEALTH(veh) = int_in[1];
 	VEH_CAPACITY(veh) = int_in[2];
 	VEH_ANIMALS_REQUIRED(veh) = int_in[3];
 	
@@ -593,6 +593,7 @@ void save_olc_vehicle(descriptor_data *desc) {
 		free(VEH_ICON(veh));
 		VEH_ICON(veh) = NULL;
 	}
+	VEH_HEALTH(veh) = VEH_MAX_HEALTH(veh);
 	
 	// update live vehicles
 	LL_FOREACH(vehicle_list, iter) {
@@ -723,9 +724,7 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 		size += snprintf(buf + size, sizeof(buf) - size, "Map Icon: %s %s\r\n", VEH_ICON(veh), show_color_codes(VEH_ICON(veh)));
 	}
 	
-	size += snprintf(buf + size, sizeof(buf) - size, "Move Type: [\ty%s\t0], \r\n", mob_move_types[VEH_MOVE_TYPE(veh)]);
-	
-	size += snprintf(buf + size, sizeof(buf) - size, "Health: [\tc%d\t0/\tc%d\t0], Capacity: [\tc%d\t0/\tc%d\t0], Animals Requires: [\tc%d\t0]\r\n", VEH_HEALTH(veh), VEH_MAX_HEALTH(veh), VEH_CARRYING_N(veh), VEH_CAPACITY(veh), VEH_ANIMALS_REQUIRED(veh));
+	size += snprintf(buf + size, sizeof(buf) - size, "Health: [\tc%d\t0/\tc%d\t0], Capacity: [\tc%d\t0/\tc%d\t0], Animals Req: [\tc%d\t0], Move Type: [\ty%s\t0]\r\n", VEH_HEALTH(veh), VEH_MAX_HEALTH(veh), VEH_CARRYING_N(veh), VEH_CAPACITY(veh), VEH_ANIMALS_REQUIRED(veh), mob_move_types[VEH_MOVE_TYPE(veh)]);
 	
 	if (VEH_MAX_ROOMS(veh) || VEH_DESIGNATE_FLAGS(veh)) {
 		sprintbit(VEH_DESIGNATE_FLAGS(veh), designate_flags, part, TRUE);
