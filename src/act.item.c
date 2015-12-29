@@ -1938,9 +1938,13 @@ void move_ship_to_destination(empire_data *emp, struct shipping_data *shipd, roo
 		return;
 	}
 	
-	act("$p sails away.", FALSE, NULL, boat, NULL, TO_ROOM);
+	if (ROOM_PEOPLE(IN_ROOM(boat))) {
+		act("$p sails away.", FALSE, ROOM_PEOPLE(IN_ROOM(boat)), boat, NULL, TO_CHAR | TO_ROOM);
+	}
 	obj_to_room(boat, to_room);
-	act("$p sails in.", FALSE, NULL, boat, NULL, TO_ROOM);
+	if (ROOM_PEOPLE(IN_ROOM(boat))) {
+		act("$p sails in.", FALSE, ROOM_PEOPLE(IN_ROOM(boat)), boat, NULL, TO_CHAR | TO_ROOM);
+	}
 	
 	// remove the ship homeroom from all shipments that were on this ship (including this one)
 	old = shipd->ship_homeroom;
@@ -2064,9 +2068,13 @@ void sail_shipment(empire_data *emp, obj_data *boat) {
 		}
 	}
 	
-	act("$p sails away.", FALSE, NULL, boat, NULL, TO_ROOM);
+	if (ROOM_PEOPLE(IN_ROOM(boat))) {
+		act("$p sails away.", FALSE, ROOM_PEOPLE(IN_ROOM(boat)), boat, NULL, TO_CHAR | TO_ROOM);
+	}
 	obj_to_room(boat, get_ship_pen());
-	act("$p sails in.", FALSE, NULL, boat, NULL, TO_ROOM);
+	if (ROOM_PEOPLE(IN_ROOM(boat))) {
+		act("$p sails in.", FALSE, ROOM_PEOPLE(IN_ROOM(boat)), boat, NULL, TO_CHAR | TO_ROOM);
+	}
 }
 
 

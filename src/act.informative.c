@@ -864,17 +864,23 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 * @param char_data *ch The person to send the output to.
 */
 void list_one_vehicle_to_char(vehicle_data *veh, char_data *ch) {
+	extern char *list_harnessed_mobs(vehicle_data *veh);
+	
 	char buf[MAX_STRING_LENGTH];
 	size_t size = 0;
 	
 	if (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "[%d] %s", VEH_VNUM(veh), SCRIPT(veh) ? "[TRIG] " : "");
 	}
-	size += snprintf(buf + size, sizeof(buf) - size, "%s", VEH_LONG_DESC(veh));
+	size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", VEH_LONG_DESC(veh));
 	
-	// additional descriptions like what's attached.
 	
-	msg_to_char(ch, "%s\r\n", buf);
+	// additional descriptions like what's attached:
+	if (VEH_ANIMALS(veh)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "...it is being pulled by %s.\r\n", list_harnessed_mobs(veh));
+	}
+
+	send_to_char(buf, ch);
 }
 
 

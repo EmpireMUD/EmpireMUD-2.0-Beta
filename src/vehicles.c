@@ -56,6 +56,18 @@ extern char *show_color_codes(char *string);
 //// HELPERS /////////////////////////////////////////////////////////////////
 
 /**
+* @param vehicle_data *veh Any vehicle instance.
+* @return int The number of animals harnessed to it.
+*/
+int count_harnessed_animals(vehicle_data *veh) {
+	struct vehicle_attached_mob *iter;
+	int count;
+	LL_COUNT(VEH_ANIMALS(veh), iter, count);
+	return count;
+}
+
+
+/**
 * Empties the contents of a vehicle into the room it's in (if any) or extracts
 * them.
 *
@@ -76,6 +88,72 @@ void empty_vehicle(vehicle_data *veh) {
 
 
 /**
+* Finds a mob (using multi-isname) attached to a vehicle, and returns the
+* vehicle_attached_mob entry for it.
+*
+* @param vehicle_data *veh The vehicle to check.
+* @param char *name The typed-in name (may contain "#.name" and/or multiple keywords).
+* @return struct vehicle_attached_mob* The found entry, or NULL.
+*/
+struct vehicle_attached_mob *find_harnessed_mob_by_name(vehicle_data *veh, char *name) {
+	struct vehicle_attached_mob *iter;
+	char tmpname[MAX_INPUT_LENGTH];
+	char *tmp = tmpname;
+	char_data *proto;
+	int number;
+	
+	// safety first
+	if (!veh || !*name) {
+		return NULL;
+	}
+	
+	strcpy(tmp, name);
+	number = get_number(&tmp);
+	
+	LL_FOREACH(VEH_ANIMALS(veh), iter) {
+		if (!(proto = mob_proto(iter->mob))) {
+			continue;
+		}
+		if (!multi_isname(tmp, GET_PC_NAME(proto))) {
+			continue;
+		}
+		
+		// found
+		if (--number == 0) {
+			return iter;
+		}
+	}
+	
+	return NULL;
+}
+
+
+/**
+* Attaches an animal to a vehicle, and extracts the animal.
+*
+* @param char_data *mob The mob to attach.
+* @param vehicle_data *veh The vehicle to attach it to.
+*/
+void harness_mob_to_vehicle(char_data *mob, vehicle_data *veh) {
+	struct vehicle_attached_mob *vam;
+	
+	// safety first
+	if (!mob || !IS_NPC(mob) || !veh) {
+		return;
+	}
+	
+	CREATE(vam, struct vehicle_attached_mob, 1);
+	vam->mob = GET_MOB_VNUM(mob);
+	vam->scale_level = GET_CURRENT_SCALE_LEVEL(mob);
+	vam->flags = MOB_FLAGS(mob);
+	vam->empire = GET_LOYALTY(mob) ? EMPIRE_VNUM(GET_LOYALTY(mob)) : NOTHING;
+	
+	LL_PREPEND(VEH_ANIMALS(veh), vam);
+	extract_char(mob);
+}
+
+
+/**
 * Gets the short description of a vehicle as seen by a particular person.
 *
 * @param vehicle_data *veh The vehicle to show.
@@ -92,6 +170,72 @@ char *get_vehicle_short_desc(vehicle_data *veh, char_data *to) {
 	}
 	
 	return VEH_SHORT_DESC(veh);
+}
+
+
+/**
+* Gets a nicely-formatted comma-separated list of all the animals leading
+* the vehicle.
+*
+* @param vehicle_data *veh The vehicle.
+* @return char* The list of animals pulling it.
+*/
+char *list_harnessed_mobs(vehicle_data *veh) {
+	static char output[MAX_STRING_LENGTH];
+	struct vehicle_attached_mob *iter, *next_iter;
+	size_t size = 0;
+	int num = 0;
+	
+	*output = '\0';
+	
+	LL_FOREACH_SAFE(VEH_ANIMALS(veh), iter, next_iter) {
+		size += snprintf(output+size, sizeof(output)-size, "%s%s", ((num == 0) ? "" : (next_iter ? ", " : (num > 1 ? ", and " : " and "))), get_mob_name_by_proto(iter->mob));
+		++num;
+	}
+	
+	return output;
+}
+
+
+/**
+* Unharnesses a mob and loads it back into the game. If it fails to load the
+* mob, it will still remove 'vam' from the animals list.
+*
+* @param struct vehicle_attached_mob *vam The attached-mob entry to unharness.
+* @param vehicle_data *veh The vehicle to remove it from.
+* @return char_data* A pointer to the mob if one was loaded, or NULL if not.
+*/
+char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh) {
+	void scale_mob_to_level(char_data *mob, int level);
+	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);	
+	
+	char_data *mob;
+	
+	// safety first
+	if (!vam || !veh) {
+		return NULL;
+	}
+	
+	// remove the vam entry now
+	LL_DELETE(VEH_ANIMALS(veh), vam);
+	
+	// things that keep us from spawning the mob
+	if (!IN_ROOM(veh) || !mob_proto(vam->mob)) {
+		free(vam);
+		return NULL;
+	}
+	
+	mob = read_mobile(vam->mob, TRUE);
+	MOB_FLAGS(mob) = vam->flags;
+	setup_generic_npc(mob, real_empire(vam->empire), NOTHING, NOTHING);
+	if (vam->scale_level > 0) {
+		scale_mob_to_level(mob, vam->scale_level);
+	}
+	char_to_room(mob, IN_ROOM(veh));
+	load_mtrigger(mob);
+	
+	free(vam);
+	return mob;
 }
 
 

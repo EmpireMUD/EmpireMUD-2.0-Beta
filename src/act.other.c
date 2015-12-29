@@ -1380,69 +1380,6 @@ ACMD(do_group) {
 }
 
 
-ACMD(do_harness) {
-	char_data *victim;
-	obj_data *rope = NULL, *cart = NULL;
-
-	/* subcmd 0 = harness, 1 = unharness */
-
-	two_arguments(argument, arg, buf);
-
-	if (!*arg || (!subcmd && !*buf)) {
-		if (subcmd)
-			msg_to_char(ch, "Remove whose harness?\r\n");
-		else
-			msg_to_char(ch, "Harness whom to what?\r\n");
-	}
-	else if (!(victim = get_char_vis(ch, arg, FIND_CHAR_ROOM)))
-		send_config_msg(ch, "no_person");
-	else if (subcmd && !GET_PULLING(victim))
-		act("$E isn't harnessed.", FALSE, ch, 0, victim, TO_CHAR);
-	else if (subcmd) {
-		obj_to_char((rope = read_object(o_ROPE, TRUE)), ch);
-		cart = GET_PULLING(victim);
-		if (GET_PULLED_BY(cart, 0) == victim) {
-			cart->pulled_by1 = NULL;
-		}
-		if (GET_PULLED_BY(cart, 1) == victim) {
-			cart->pulled_by2 = NULL;
-		}
-		GET_PULLING(victim) = NULL;
-		act("You unlatch $N from $p.", FALSE, ch, cart, victim, TO_CHAR);
-		act("$n unlatches you from $p.", FALSE, ch, cart, victim, TO_VICT);
-		act("$n unlatches $N from $p.", FALSE, ch, cart, victim, TO_NOTVICT);
-		load_otrigger(rope);
-	}
-	else if (GET_PULLING(victim))
-		act("$E is already harnessed!", FALSE, ch, 0, victim, TO_CHAR);
-	else if (!IS_NPC(victim))
-		msg_to_char(ch, "You can only harness animals.\r\n");
-	else if (!(cart = get_obj_in_list_vis(ch, buf, ROOM_CONTENTS(IN_ROOM(ch)))))
-		msg_to_char(ch, "You don't see a %s here.\r\n", buf);
-	else if (GET_OBJ_TYPE(cart) != ITEM_CART || GET_CART_ANIMALS_REQUIRED(cart) < 1)
-		msg_to_char(ch, "You can't harness anyone to that!\r\n");
-	else if (GET_PULLED_BY(cart, 0) && (GET_CART_ANIMALS_REQUIRED(cart) <= 1 || GET_PULLED_BY(cart, 1)))
-		msg_to_char(ch, "You can't harness any more animals to it.\r\n");
-	else if (!(rope = get_obj_in_list_num(o_ROPE, ch->carrying)))
-		msg_to_char(ch, "You need some rope to do that.\r\n");
-	else if (!MOB_FLAGGED(victim, MOB_MOUNTABLE))
-		act("You can't harness $N to that!", FALSE, ch, 0, victim, TO_CHAR);
-	else {
-		extract_obj(rope);
-		if (GET_PULLED_BY(cart, 0)) {
-			cart->pulled_by2 = victim;
-		}
-		else {
-			cart->pulled_by1 = victim;
-		}
-		GET_PULLING(victim) = cart;
-		act("You harness $N to $p.", FALSE, ch, cart, victim, TO_CHAR);
-		act("$n harnesses you to $p.", FALSE, ch, cart, victim, TO_VICT);
-		act("$n harnesses $N to $p.", FALSE, ch, cart, victim, TO_NOTVICT);
-	}
-}
-
-
 ACMD(do_herd) {
 	extern int perform_move(char_data *ch, int dir, int need_specials_check, byte mode);
 	extern const int rev_dir[];

@@ -400,6 +400,7 @@ ACMD(do_tunnel);
 
 ACMD(do_unban);
 ACMD(do_unbind);
+ACMD(do_unharness);
 ACMD(do_unload_boat);
 ACMD(do_unpublicize);
 ACMD(do_unshare);
@@ -691,7 +692,7 @@ cpp_extern const struct command_info cmd_info[] = {
 
 	SIMPLE_CMD( "help", POS_DEAD, do_help, NO_MIN, CTYPE_UTIL ),
 	SCMD_CMD( "handbook", POS_DEAD, do_gen_ps, LVL_START_IMM, CTYPE_IMMORTAL, SCMD_HANDBOOK ),
-	STANDARD_CMD( "harness", POS_STANDING, do_harness, NO_MIN, NO_GRANTS, FALSE, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
+	STANDARD_CMD( "harness", POS_STANDING, do_harness, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
 	STANDARD_CMD( "harvest", POS_STANDING, do_harvest, LVL_APPROVED, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	ABILITY_CMD( "hasten", POS_FIGHTING, do_hasten, NO_MIN, CTYPE_SKILL, ABIL_HASTEN ),
 	SIMPLE_CMD( "heal", POS_FIGHTING, do_heal, NO_MIN, CTYPE_SKILL ),
@@ -932,7 +933,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "typo", POS_DEAD, do_gen_write, NO_MIN, CTYPE_COMM, SCMD_TYPO ),
 
 	GRANT_CMD( "unbind", POS_SLEEPING, do_unbind, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_UNBIND ),
-	STANDARD_CMD( "unharness", POS_STANDING, do_harness, NO_MIN, NO_GRANTS, TRUE, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
+	STANDARD_CMD( "unharness", POS_STANDING, do_unharness, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
 	SCMD_CMD( "unkeep", POS_DEAD, do_keep, NO_MIN, CTYPE_UTIL, SCMD_UNKEEP ),
 	STANDARD_CMD( "unload", POS_STANDING, do_unload_boat, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
 	SCMD_CMD( "unstake", POS_STANDING, do_stake, NO_MIN, CTYPE_COMBAT, TRUE ),

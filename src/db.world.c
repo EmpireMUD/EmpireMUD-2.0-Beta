@@ -383,8 +383,8 @@ void delete_room(room_data *room, bool check_exits) {
 			next_o = o->next;
 		
 			if (IS_PORTAL(o) && GET_PORTAL_TARGET_VNUM(o) == GET_ROOM_VNUM(room)) {
-				if (IN_ROOM(o)) {
-					act("$p closes and vanishes!", FALSE, NULL, o, NULL, TO_ROOM);
+				if (IN_ROOM(o) && ROOM_PEOPLE(IN_ROOM(o))) {
+					act("$p closes and vanishes!", FALSE, ROOM_PEOPLE(IN_ROOM(o)), o, NULL, TO_CHAR | TO_ROOM);
 				}
 				extract_obj(o);
 			}
@@ -1567,8 +1567,8 @@ void check_all_exits(void) {
 		next_o = o->next;
 		
 		if (IS_PORTAL(o) && !real_real_room(GET_PORTAL_TARGET_VNUM(o))) {
-			if (IN_ROOM(o)) {
-				act("$p closes and vanishes!", FALSE, NULL, o, NULL, TO_ROOM);
+			if (IN_ROOM(o) && ROOM_PEOPLE(IN_ROOM(o))) {
+				act("$p closes and vanishes!", FALSE, ROOM_PEOPLE(IN_ROOM(o)), o, NULL, TO_CHAR | TO_ROOM);
 			}
 			extract_obj(o);
 		}

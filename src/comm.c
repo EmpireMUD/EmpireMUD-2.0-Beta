@@ -98,7 +98,7 @@ void heartbeat(int heart_pulse);
 void init_descriptor(descriptor_data *newd, int desc);
 void init_game(ush_int port);
 void nonblock(socket_t s);
-void perform_act(const char *orig, char_data *ch, obj_data *obj, const void *vict_obj, const char_data *to, bool ignore_bad_act_codes);
+void perform_act(const char *orig, char_data *ch, const void *obj, const void *vict_obj, const char_data *to, bool ignore_bad_act_codes, bool obj_is_vehicle);
 void reboot_recover(void);
 void setup_log(const char *filename, int fd);
 void signal_setup(void);
@@ -1018,7 +1018,7 @@ void heartbeat(int heart_pulse) {
  //////////////////////////////////////////////////////////////////////////////
 //// MESSAGING ///////////////////////////////////////////////////////////////
 
-void act(const char *str, int hide_invisible, char_data *ch, obj_data *obj, const void *vict_obj, int type) {
+void act(const char *str, int hide_invisible, char_data *ch, const void *obj, const void *vict_obj, int type) {
 	extern bool is_ignoring(char_data *ch, char_data *victim);
 
 	char_data *to = NULL;
@@ -1045,22 +1045,19 @@ void act(const char *str, int hide_invisible, char_data *ch, obj_data *obj, cons
 
 	/* To the character */
 	if (IS_SET(type, TO_CHAR) && ch && SENDOK(ch)) {
-		perform_act(str, ch, obj, vict_obj, ch, IS_SET(type, TO_IGNORE_BAD_CODE) != 0);
+		perform_act(str, ch, obj, vict_obj, ch, IS_SET(type, TO_IGNORE_BAD_CODE) != 0, IS_SET(type, ACT_VEHICLE_OBJ) != 0);
 	}
 
 	/* To the victim */
 	if (IS_SET(type, TO_VICT) && (to = (char_data*) vict_obj) != NULL && SENDOK(to) && (!IS_SET(type, TO_NOT_IGNORING) || !is_ignoring(to, ch))) {
-		perform_act(str, ch, obj, vict_obj, to, IS_SET(type, TO_IGNORE_BAD_CODE) != 0);
+		perform_act(str, ch, obj, vict_obj, to, IS_SET(type, TO_IGNORE_BAD_CODE) != 0, IS_SET(type, ACT_VEHICLE_OBJ) != 0);
 	}
 
 	if (IS_SET(type, TO_NOTVICT | TO_ROOM)) {
 		if (ch && IN_ROOM(ch)) {
 			to = ROOM_PEOPLE(IN_ROOM(ch));
 		}
-		else if (obj && IN_ROOM(obj)) {
-			to = ROOM_PEOPLE(IN_ROOM(obj));
-		}
-
+		
 		if (to) {
 			for (; to; to = to->next_in_room) {
 				if (!SENDOK(to) || (to == ch))
@@ -1075,7 +1072,7 @@ void act(const char *str, int hide_invisible, char_data *ch, obj_data *obj, cons
 				if (ch && !WIZHIDE_OK(to, ch)) {
 					continue;
 				}
-				perform_act(str, ch, obj, vict_obj, to, IS_SET(type, TO_IGNORE_BAD_CODE) != 0);
+				perform_act(str, ch, obj, vict_obj, to, IS_SET(type, TO_IGNORE_BAD_CODE) != 0, IS_SET(type, ACT_VEHICLE_OBJ) != 0);
 			}
 		}
 	}
@@ -1170,7 +1167,9 @@ void send_to_all(const char *messg, ...) {
 
 
 /* higher-level communication: the act() function */
-void perform_act(const char *orig, char_data *ch, obj_data *obj, const void *vict_obj, const char_data *to, bool ignore_bad_act_codes) {
+void perform_act(const char *orig, char_data *ch, const void *obj, const void *vict_obj, const char_data *to, bool ignore_bad_act_codes, bool obj_is_vehicle) {
+	extern char *get_vehicle_short_desc(vehicle_data *veh, char_data *to);
+	
 	const char *i = NULL;
 	char *buf, lbuf[MAX_STRING_LENGTH], *dg_arg = NULL;
 	char_data *dg_victim = NULL;
@@ -1221,14 +1220,14 @@ void perform_act(const char *orig, char_data *ch, obj_data *obj, const void *vic
 					dg_victim = (char_data*) vict_obj;
 					break;
 				case 'p':
-					CHECK_NULL(obj, OBJS(obj, (char_data*)to));
+					CHECK_NULL(obj, OBJS((obj_data*)obj, (char_data*)to));
 					break;
 				case 'P':
 					CHECK_NULL(vict_obj, OBJS((obj_data*) vict_obj, (char_data*)to));
 					dg_target = (obj_data*) vict_obj;
 					break;
 				case 'a':
-					CHECK_NULL(obj, SANA(obj));
+					CHECK_NULL(obj, SANA((obj_data*)obj));
 					break;
 				case 'A':
 					CHECK_NULL(vict_obj, SANA((const obj_data*) vict_obj));
@@ -1244,8 +1243,11 @@ void perform_act(const char *orig, char_data *ch, obj_data *obj, const void *vic
 				case 'F':
 					CHECK_NULL(vict_obj, fname((const char *) vict_obj));
 					break;
+				case 'v': {	// $v: vehicle
+					CHECK_NULL(obj, get_vehicle_short_desc((vehicle_data*)obj, (char_data*)to));
+					break;
+				}
 				case 'V': {	// $V: vehicle
-					extern char *get_vehicle_short_desc(vehicle_data *veh, char_data *to);
 					CHECK_NULL(vict_obj, get_vehicle_short_desc((vehicle_data*)vict_obj, (char_data*)to));
 					break;
 				}
@@ -1298,7 +1300,7 @@ void perform_act(const char *orig, char_data *ch, obj_data *obj, const void *vic
 	}
 
 	if ((IS_NPC(to) && dg_act_check) && (to != ch)) {
-		act_mtrigger(to, lbuf, ch, dg_victim, obj, dg_target, dg_arg);
+		act_mtrigger(to, lbuf, ch, dg_victim, obj_is_vehicle ? NULL : (obj_data*)obj, dg_target, dg_arg);
 	}
 }
 
