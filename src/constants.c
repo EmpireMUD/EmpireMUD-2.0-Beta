@@ -2015,6 +2015,7 @@ const char *designate_flags[] = {
 	"TOP-OF-TOWER",
 	"HOUSEHOLD",
 	"HAVEN",
+	"SHIP-ROOMS",
 	"\n"
 };
 

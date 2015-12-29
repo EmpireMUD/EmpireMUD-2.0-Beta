@@ -927,7 +927,7 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	}
 	
 	if (VEH_ICON(veh)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "Map Icon: %s %s\r\n", VEH_ICON(veh), show_color_codes(VEH_ICON(veh)));
+		size += snprintf(buf + size, sizeof(buf) - size, "Map Icon: %s\t0 %s\r\n", VEH_ICON(veh), show_color_codes(VEH_ICON(veh)));
 	}
 	
 	size += snprintf(buf + size, sizeof(buf) - size, "Health: [\tc%d\t0/\tc%d\t0], Capacity: [\tc%d\t0/\tc%d\t0], Animals Req: [\tc%d\t0], Move Type: [\ty%s\t0]\r\n", VEH_HEALTH(veh), VEH_MAX_HEALTH(veh), VEH_CARRYING_N(veh), VEH_CAPACITY(veh), VEH_ANIMALS_REQUIRED(veh), mob_move_types[VEH_MOVE_TYPE(veh)]);
@@ -1022,7 +1022,7 @@ void olc_show_vehicle(char_data *ch) {
 	sprintf(buf + strlen(buf), "<\tyshortdescription\t0> %s\r\n", NULLSAFE(VEH_SHORT_DESC(veh)));
 	sprintf(buf + strlen(buf), "<\tylongdescription\t0>\r\n%s\r\n", NULLSAFE(VEH_LONG_DESC(veh)));
 	sprintf(buf + strlen(buf), "<\tylookdescription\t0>\r\n%s", NULLSAFE(VEH_LOOK_DESC(veh)));
-	sprintf(buf + strlen(buf), "<\tyicon\t0> %s %s\r\n", VEH_ICON(veh) ? VEH_ICON(veh) : "none", VEH_ICON(veh) ? show_color_codes(VEH_ICON(veh)) : "");
+	sprintf(buf + strlen(buf), "<\tyicon\t0> %s\t0 %s\r\n", VEH_ICON(veh) ? VEH_ICON(veh) : "none", VEH_ICON(veh) ? show_color_codes(VEH_ICON(veh)) : "");
 	
 	sprintbit(VEH_FLAGS(veh), vehicle_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<\tyflags\t0> %s\r\n", lbuf);
@@ -1118,6 +1118,7 @@ OLC_MODULE(vedit_icon) {
 	}
 	else {
 		olc_process_string(ch, argument, "icon", &VEH_ICON(veh));
+		msg_to_char(ch, "\t0");	// in case color is unterminated
 	}
 }
 

@@ -528,6 +528,7 @@ typedef struct vehicle_data vehicle_data;
 #define DES_TOP_OF_TOWER	BIT(11)
 #define DES_HOUSEHOLD		BIT(12)
 #define DES_HAVEN			BIT(13)
+#define DES_SHIP_ROOMS		BIT(14)
 
 
  //////////////////////////////////////////////////////////////////////////////
