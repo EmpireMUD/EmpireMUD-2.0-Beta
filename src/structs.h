@@ -3506,9 +3506,10 @@ struct vehicle_data {
 	any_vnum vnum;
 	
 	char *keywords;	// targeting terms
-	char *name;	// display name ("canoe", "argosy")
+	char *short_desc;	// the sentence-building name ("a canoe")
+	char *long_desc;	// As described in the room.
+	char *look_desc;	// Description when looked at
 	char *icon;	// Optional: Shown on map if not null
-	char *long_desc;	// As described in the room
 	
 	struct vehicle_attribute_data *attributes;	// non-instanced data
 	bitvector_t flags;	// VEH_ flags

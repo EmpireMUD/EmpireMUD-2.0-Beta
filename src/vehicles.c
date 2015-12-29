@@ -35,7 +35,7 @@
 
 // local data
 const char *default_vehicle_keywords = "vehicle unnamed";
-const char *default_vehicle_name = "unnamed vehicle";
+const char *default_vehicle_short_desc = "an unnamed vehicle";
 const char *default_vehicle_long_desc = "An unnamed vehicle is parked here.";
 
 // local protos
@@ -83,9 +83,6 @@ void empty_vehicle(vehicle_data *veh) {
 * @return char* The short description of the vehicle for that person.
 */
 char *get_vehicle_short_desc(vehicle_data *veh, char_data *to) {
-	static char output[MAX_INPUT_LENGTH];
-	
-	*output = '\0';
 	if (!veh) {
 		return "<nothing>";
 	}
@@ -94,8 +91,7 @@ char *get_vehicle_short_desc(vehicle_data *veh, char_data *to) {
 		return "something";
 	}
 	
-	snprintf(output, sizeof(output), "the %s", VEH_NAME(veh));
-	return output;
+	return VEH_SHORT_DESC(veh);
 }
 
 
@@ -165,10 +161,10 @@ char *list_one_vehicle(vehicle_data *veh, bool detail) {
 	// char part[MAX_STRING_LENGTH], applies[MAX_STRING_LENGTH];
 	
 	if (detail) {
-		snprintf(output, sizeof(output), "[%5d] %s", VEH_VNUM(veh), VEH_NAME(veh));
+		snprintf(output, sizeof(output), "[%5d] %s", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
 	}
 	else {
-		snprintf(output, sizeof(output), "[%5d] %s", VEH_VNUM(veh), VEH_NAME(veh));
+		snprintf(output, sizeof(output), "[%5d] %s", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
 	}
 		
 	return output;
@@ -192,7 +188,7 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 	}
 	
 	found = 0;
-	size = snprintf(buf, sizeof(buf), "Occurrences of vehicle %d (%s):\r\n", vnum, VEH_NAME(veh));
+	size = snprintf(buf, sizeof(buf), "Occurrences of vehicle %d (%s):\r\n", vnum, VEH_SHORT_DESC(veh));
 	
 	// vehicles are not actually used anywhere else
 	
@@ -351,11 +347,14 @@ void free_vehicle(vehicle_data *veh) {
 	if (VEH_KEYWORDS(veh) && (!proto || VEH_KEYWORDS(veh) != VEH_KEYWORDS(proto))) {
 		free(VEH_KEYWORDS(veh));
 	}
-	if (VEH_NAME(veh) && (!proto || VEH_NAME(veh) != VEH_NAME(proto))) {
-		free(VEH_NAME(veh));
+	if (VEH_SHORT_DESC(veh) && (!proto || VEH_SHORT_DESC(veh) != VEH_SHORT_DESC(proto))) {
+		free(VEH_SHORT_DESC(veh));
 	}
 	if (VEH_LONG_DESC(veh) && (!proto || VEH_LONG_DESC(veh) != VEH_LONG_DESC(proto))) {
 		free(VEH_LONG_DESC(veh));
+	}
+	if (VEH_LOOK_DESC(veh) && (!proto || VEH_LOOK_DESC(veh) != VEH_LOOK_DESC(proto))) {
+		free(VEH_LOOK_DESC(veh));
 	}
 	if (VEH_ICON(veh) && (!proto || VEH_ICON(veh) != VEH_ICON(proto))) {
 		free(VEH_ICON(veh));
@@ -411,21 +410,16 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 	// for error messages
 	sprintf(error, "vehicle vnum %d", vnum);
 	
-	// lines 1-4: strings
+	// lines 1-5: strings
 	VEH_KEYWORDS(veh) = fread_string(fl, error);
-	VEH_NAME(veh) = fread_string(fl, error);
-	VEH_ICON(veh) = fread_string(fl, error);
+	VEH_SHORT_DESC(veh) = fread_string(fl, error);
 	VEH_LONG_DESC(veh) = fread_string(fl, error);
+	VEH_LOOK_DESC(veh) = fread_string(fl, error);
+	VEH_ICON(veh) = fread_string(fl, error);
 	
-	// ensure NULL if icon is missing
-	if (VEH_ICON(veh) && !*VEH_ICON(veh)) {
-		free(VEH_ICON(veh));
-		VEH_ICON(veh) = NULL;
-	}
-	
-	// line 5: flags move_type maxhealth capacity animals_required
+	// line 6: flags move_type maxhealth capacity animals_required
 	if (!get_line(fl, line) || sscanf(line, "%s %d %d %d %d", str_in, &int_in[0], &int_in[1], &int_in[2], &int_in[3]) != 5) {
-		log("SYSERR: Format error in line 5 of %s", error);
+		log("SYSERR: Format error in line 6 of %s", error);
 		exit(1);
 	}
 	
@@ -500,7 +494,7 @@ void write_vehicle_index(FILE *fl) {
 void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
 	void write_resources_to_file(FILE *fl, struct resource_data *list);
 	
-	char temp[256];
+	char temp[MAX_STRING_LENGTH];
 	
 	if (!fl || !veh) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: write_vehicle_to_file called without %s", !fl ? "file" : "vehicle");
@@ -509,13 +503,16 @@ void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
 	
 	fprintf(fl, "#%d\n", VEH_VNUM(veh));
 	
-	// 1-4. strings
+	// 1-5. strings
 	fprintf(fl, "%s~\n", NULLSAFE(VEH_KEYWORDS(veh)));
-	fprintf(fl, "%s~\n", NULLSAFE(VEH_NAME(veh)));
-	fprintf(fl, "%s~\n", NULLSAFE(VEH_ICON(veh)));
+	fprintf(fl, "%s~\n", NULLSAFE(VEH_SHORT_DESC(veh)));
 	fprintf(fl, "%s~\n", NULLSAFE(VEH_LONG_DESC(veh)));
+	strcpy(temp, NULLSAFE(VEH_LOOK_DESC(veh)));
+	strip_crlf(temp);
+	fprintf(fl, "%s~\n", temp);
+	fprintf(fl, "%s~\n", NULLSAFE(VEH_ICON(veh)));
 	
-	// 5. flags move_type maxhealth capacity animals_required
+	// 6. flags move_type maxhealth capacity animals_required
 	strcpy(temp, bitv_to_alpha(VEH_FLAGS(veh)));
 	fprintf(fl, "%s %d %d %d %d\n", temp, VEH_MOVE_TYPE(veh), VEH_MAX_HEALTH(veh), VEH_CAPACITY(veh), VEH_ANIMALS_REQUIRED(veh));
 	
@@ -557,7 +554,7 @@ vehicle_data *create_vehicle_table_entry(any_vnum vnum) {
 	VEH_VNUM(veh) = vnum;
 	
 	VEH_KEYWORDS(veh) = str_dup(default_vehicle_keywords);
-	VEH_NAME(veh) = str_dup(default_vehicle_name);
+	VEH_SHORT_DESC(veh) = str_dup(default_vehicle_short_desc);
 	VEH_LONG_DESC(veh) = str_dup(default_vehicle_long_desc);
 	add_vehicle_to_table(veh);
 
@@ -631,11 +628,11 @@ void save_olc_vehicle(descriptor_data *desc) {
 		}
 		VEH_KEYWORDS(veh) = str_dup(default_vehicle_keywords);
 	}
-	if (!VEH_NAME(veh) || !*VEH_NAME(veh)) {
-		if (VEH_NAME(veh)) {
-			free(VEH_NAME(veh));
+	if (!VEH_SHORT_DESC(veh) || !*VEH_SHORT_DESC(veh)) {
+		if (VEH_SHORT_DESC(veh)) {
+			free(VEH_SHORT_DESC(veh));
 		}
-		VEH_NAME(veh) = str_dup(default_vehicle_name);
+		VEH_SHORT_DESC(veh) = str_dup(default_vehicle_short_desc);
 	}
 	if (!VEH_LONG_DESC(veh) || !*VEH_LONG_DESC(veh)) {
 		if (VEH_LONG_DESC(veh)) {
@@ -659,14 +656,17 @@ void save_olc_vehicle(descriptor_data *desc) {
 		if (VEH_KEYWORDS(iter) == VEH_KEYWORDS(proto)) {
 			VEH_KEYWORDS(iter) = VEH_KEYWORDS(veh);
 		}
-		if (VEH_NAME(iter) == VEH_NAME(proto)) {
-			VEH_NAME(iter) = VEH_NAME(veh);
+		if (VEH_SHORT_DESC(iter) == VEH_SHORT_DESC(proto)) {
+			VEH_SHORT_DESC(iter) = VEH_SHORT_DESC(veh);
 		}
 		if (VEH_ICON(iter) == VEH_ICON(proto)) {
 			VEH_ICON(iter) = VEH_ICON(veh);
 		}
 		if (VEH_LONG_DESC(iter) == VEH_LONG_DESC(proto)) {
 			VEH_LONG_DESC(iter) = VEH_LONG_DESC(veh);
+		}
+		if (VEH_LOOK_DESC(iter) == VEH_LOOK_DESC(proto)) {
+			VEH_LOOK_DESC(iter) = VEH_LOOK_DESC(veh);
 		}
 		if (iter->attributes == proto->attributes) {
 			iter->attributes = veh->attributes;
@@ -682,14 +682,17 @@ void save_olc_vehicle(descriptor_data *desc) {
 	if (VEH_KEYWORDS(proto)) {
 		free(VEH_KEYWORDS(proto));
 	}
-	if (VEH_NAME(proto)) {
-		free(VEH_NAME(proto));
+	if (VEH_SHORT_DESC(proto)) {
+		free(VEH_SHORT_DESC(proto));
 	}
 	if (VEH_ICON(proto)) {
 		free(VEH_ICON(proto));
 	}
 	if (VEH_LONG_DESC(proto)) {
 		free(VEH_LONG_DESC(proto));
+	}
+	if (VEH_LOOK_DESC(proto)) {
+		free(VEH_LOOK_DESC(proto));
 	}
 	if (VEH_YEARLY_MAINTENANCE(proto)) {
 		free_resource_list(VEH_YEARLY_MAINTENANCE(proto));
@@ -729,9 +732,10 @@ vehicle_data *setup_olc_vehicle(vehicle_data *input) {
 
 		// copy things that are pointers
 		VEH_KEYWORDS(new) = VEH_KEYWORDS(input) ? str_dup(VEH_KEYWORDS(input)) : NULL;
-		VEH_NAME(new) = VEH_NAME(input) ? str_dup(VEH_NAME(input)) : NULL;
+		VEH_SHORT_DESC(new) = VEH_SHORT_DESC(input) ? str_dup(VEH_SHORT_DESC(input)) : NULL;
 		VEH_ICON(new) = VEH_ICON(input) ? str_dup(VEH_ICON(input)) : NULL;
 		VEH_LONG_DESC(new) = VEH_LONG_DESC(input) ? str_dup(VEH_LONG_DESC(input)) : NULL;
+		VEH_LOOK_DESC(new) = VEH_LOOK_DESC(input) ? str_dup(VEH_LOOK_DESC(input)) : NULL;
 		
 		// copy lists
 		VEH_YEARLY_MAINTENANCE(new) = copy_resource_list(VEH_YEARLY_MAINTENANCE(input));
@@ -739,7 +743,7 @@ vehicle_data *setup_olc_vehicle(vehicle_data *input) {
 	else {
 		// brand new: some defaults
 		VEH_KEYWORDS(new) = str_dup(default_vehicle_keywords);
-		VEH_NAME(new) = str_dup(default_vehicle_name);
+		VEH_SHORT_DESC(new) = str_dup(default_vehicle_short_desc);
 		VEH_LONG_DESC(new) = str_dup(default_vehicle_long_desc);
 		VEH_MAX_HEALTH(new) = 1;
 		VEH_MOVE_TYPE(new) = MOB_MOVE_DRIVES;
@@ -770,9 +774,13 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	}
 	
 	// first line
-	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Name: \tc%s\t0, Keywords: %s\r\n", VEH_VNUM(veh), VEH_NAME(veh), VEH_KEYWORDS(veh));
+	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], S-Des: \tc%s\t0, Keywords: %s\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh), VEH_KEYWORDS(veh));
 	
 	size += snprintf(buf + size, sizeof(buf) - size, "L-Des: %s\r\n", VEH_LONG_DESC(veh));
+	
+	if (VEH_LOOK_DESC(veh) && *VEH_LOOK_DESC(veh)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "%s", VEH_LOOK_DESC(veh));
+	}
 	
 	if (VEH_ICON(veh)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "Map Icon: %s %s\r\n", VEH_ICON(veh), show_color_codes(VEH_ICON(veh)));
@@ -844,12 +852,13 @@ void olc_show_vehicle(char_data *ch) {
 	
 	*buf = '\0';
 	
-	sprintf(buf + strlen(buf), "[\tc%d\t0] \tc%s\t0\r\n", GET_OLC_VNUM(ch->desc), !vehicle_proto(VEH_VNUM(veh)) ? "new vehicle" : VEH_NAME(vehicle_proto(VEH_VNUM(veh))));
+	sprintf(buf + strlen(buf), "[\tc%d\t0] \tc%s\t0\r\n", GET_OLC_VNUM(ch->desc), !vehicle_proto(VEH_VNUM(veh)) ? "new vehicle" : VEH_SHORT_DESC(vehicle_proto(VEH_VNUM(veh))));
 
 	sprintf(buf + strlen(buf), "<\tykeywords\t0> %s\r\n", NULLSAFE(VEH_KEYWORDS(veh)));
-	sprintf(buf + strlen(buf), "<\tyname\t0> %s\r\n", NULLSAFE(VEH_NAME(veh)));
-	sprintf(buf + strlen(buf), "<\tyicon\t0> %s %s\r\n", VEH_ICON(veh) ? VEH_ICON(veh) : "none", VEH_ICON(veh) ? show_color_codes(VEH_ICON(veh)) : "");
+	sprintf(buf + strlen(buf), "<\tyshortdescription\t0> %s\r\n", NULLSAFE(VEH_SHORT_DESC(veh)));
 	sprintf(buf + strlen(buf), "<\tylongdescription\t0>\r\n%s\r\n", NULLSAFE(VEH_LONG_DESC(veh)));
+	sprintf(buf + strlen(buf), "<\tylookdescription\t0>\r\n%s", NULLSAFE(VEH_LOOK_DESC(veh)));
+	sprintf(buf + strlen(buf), "<\tyicon\t0> %s %s\r\n", VEH_ICON(veh) ? VEH_ICON(veh) : "none", VEH_ICON(veh) ? show_color_codes(VEH_ICON(veh)) : "");
 	
 	sprintbit(VEH_FLAGS(veh), vehicle_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<\tyflags\t0> %s\r\n", lbuf);
@@ -885,7 +894,7 @@ int vnum_vehicle(char *searchname, char_data *ch) {
 	
 	HASH_ITER(hh, vehicle_table, iter, next_iter) {
 		if (multi_isname(searchname, VEH_KEYWORDS(iter))) {
-			msg_to_char(ch, "%3d. [%5d] %s\r\n", ++found, VEH_VNUM(iter), VEH_NAME(iter));
+			msg_to_char(ch, "%3d. [%5d] %s\r\n", ++found, VEH_VNUM(iter), VEH_SHORT_DESC(iter));
 		}
 	}
 	
@@ -961,6 +970,19 @@ OLC_MODULE(vedit_longdescription) {
 }
 
 
+OLC_MODULE(vedit_lookdescription) {
+	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
+	
+	if (ch->desc->str) {
+		msg_to_char(ch, "You are already editing a string.\r\n");
+	}
+	else {
+		sprintf(buf, "description for %s", VEH_SHORT_DESC(veh));
+		start_string_editor(ch->desc, buf, &VEH_LOOK_DESC(veh), MAX_ITEM_DESCRIPTION);
+	}
+}
+
+
 OLC_MODULE(vedit_maxrooms) {
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	VEH_MAX_ROOMS(veh) = olc_process_number(ch, argument, "max rooms", "maxrooms", 0, 1000, VEH_MAX_ROOMS(veh));
@@ -973,14 +995,14 @@ OLC_MODULE(vedit_movetype) {
 }
 
 
-OLC_MODULE(vedit_name) {
-	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
-	olc_process_string(ch, argument, "name", &VEH_NAME(veh));
-}
-
-
 OLC_MODULE(vedit_resource) {
 	void olc_process_resources(char_data *ch, char *argument, struct resource_data **list);
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	olc_process_resources(ch, argument, &VEH_YEARLY_MAINTENANCE(veh));
+}
+
+
+OLC_MODULE(vedit_shortdescription) {
+	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
+	olc_process_string(ch, argument, "short description", &VEH_SHORT_DESC(veh));
 }

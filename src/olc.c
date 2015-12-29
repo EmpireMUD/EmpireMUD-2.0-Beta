@@ -304,10 +304,11 @@ OLC_MODULE(vedit_hitpoints);
 OLC_MODULE(vedit_icon);
 OLC_MODULE(vedit_keywords);
 OLC_MODULE(vedit_longdescription);
+OLC_MODULE(vedit_lookdescription);
 OLC_MODULE(vedit_maxrooms);
 OLC_MODULE(vedit_movetype);
-OLC_MODULE(vedit_name);
 OLC_MODULE(vedit_resource);
+OLC_MODULE(vedit_shortdescription);
 
 
 // externs
@@ -642,10 +643,11 @@ const struct olc_command_data olc_data[] = {
 	{ "icon", vedit_icon, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "keywords", vedit_keywords, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "longdescription", vedit_longdescription, OLC_VEHICLE, OLC_CF_EDITOR },
+	{ "lookdescription", vedit_lookdescription, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "maxrooms", vedit_maxrooms, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "movetype", vedit_movetype, OLC_VEHICLE, OLC_CF_EDITOR },
-	{ "name", vedit_name, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "resource", vedit_resource, OLC_VEHICLE, OLC_CF_EDITOR },
+	{ "shortdescription", vedit_shortdescription, OLC_VEHICLE, OLC_CF_EDITOR },
 
 
 	// this goes last

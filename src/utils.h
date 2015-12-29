@@ -1121,10 +1121,11 @@ void SET_ISLAND_ID(room_data *room, int island);	// formerly a #define and a roo
 #define VEH_ICON(veh)  ((veh)->icon)
 #define VEH_KEYWORDS(veh)  ((veh)->keywords)
 #define VEH_LONG_DESC(veh)  ((veh)->long_desc)
-#define VEH_NAME(veh)  ((veh)->name)
+#define VEH_LOOK_DESC(veh)  ((veh)->look_desc)
 #define VEH_NEEDS_RESOURCES(veh)  ((veh)->needs_resources)
 #define VEH_OWNER(veh)  ((veh)->owner)
 #define VEH_SCALE_LEVEL(veh)  ((veh)->scale_level)
+#define VEH_SHORT_DESC(veh)  ((veh)->short_desc)
 #define VEH_VNUM(veh)  ((veh)->vnum)
 
 // attribute (non-instanced) data
