@@ -3084,6 +3084,8 @@ ACMD(do_enroll) {
 	struct empire_city_data *city, *next_city, *temp;
 	player_index_data *index, *next_index;
 	struct empire_unique_storage *eus;
+	struct vehicle_attached_mob *vam;
+	vehicle_data *veh, *next_veh;
 	struct shipping_data *shipd;
 	empire_data *e, *old;
 	room_data *room, *next_room;
@@ -3179,6 +3181,18 @@ ACMD(do_enroll) {
 			for (obj = object_list; obj; obj = obj->next) {
 				if (obj->last_empire_id == EMPIRE_VNUM(old)) {
 					obj->last_empire_id = EMPIRE_VNUM(e);
+				}
+			}
+			
+			// vehicles
+			LL_FOREACH_SAFE2(vehicle_list, veh, next_veh, next) {
+				if (VEH_OWNER(veh) == old) {
+					VEH_OWNER(veh) = e;
+				}
+				LL_FOREACH(VEH_ANIMALS(veh), vam) {
+					if (vam->empire == EMPIRE_VNUM(old)) {
+						vam->empire = EMPIRE_VNUM(e);
+					}
 				}
 			}
 

@@ -1233,7 +1233,9 @@ void delete_empire(empire_data *emp) {
 
 	struct empire_political_data *emp_pol, *next_pol, *temp;
 	player_index_data *index, *next_index;
+	struct vehicle_attached_mob *vam;
 	empire_data *emp_iter, *next_emp;
+	vehicle_data *veh, *next_veh;
 	room_data *room, *next_room;
 	char buf[MAX_STRING_LENGTH];
 	obj_data *obj, *next_obj;
@@ -1318,6 +1320,18 @@ void delete_empire(empire_data *emp) {
 		
 		if (obj->last_empire_id == vnum) {
 			obj->last_empire_id = NOTHING;
+		}
+	}
+	
+	// update all vehicles
+	LL_FOREACH_SAFE2(vehicle_list, veh, next_veh, next) {
+		if (VEH_OWNER(veh) == emp) {
+			VEH_OWNER(veh) = NULL;
+		}
+		LL_FOREACH(VEH_ANIMALS(veh), vam) {
+			if (vam->empire == vnum) {
+				vam->empire = NOTHING;
+			}
 		}
 	}
 	
