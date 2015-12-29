@@ -869,6 +869,9 @@ void list_one_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 	char buf[MAX_STRING_LENGTH];
 	size_t size = 0;
 	
+	if (VEH_OWNER(veh)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "<%s> ", EMPIRE_ADJECTIVE(VEH_OWNER(veh)));
+	}
 	if (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "[%d] %s", VEH_VNUM(veh), SCRIPT(veh) ? "[TRIG] " : "");
 	}
