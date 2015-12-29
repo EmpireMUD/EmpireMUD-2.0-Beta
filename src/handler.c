@@ -5881,12 +5881,13 @@ int find_all_dots(char *arg) {
  *  *ch      This is the person that is trying to "find"
  *  **tar_ch Will be NULL if no character was found, otherwise points
  * **tar_obj Will be NULL if no object was found, otherwise points
+ * **tar_veh Will be NULL if no vehicle was found, otherwise points
  *
  * The routine used to return a pointer to the next word in *arg (just
  * like the one_argument routine), but now it returns an integer that
  * describes what it filled in.
  */
-int generic_find(char *arg, bitvector_t bitvector, char_data *ch, char_data **tar_ch, obj_data **tar_obj) {
+int generic_find(char *arg, bitvector_t bitvector, char_data *ch, char_data **tar_ch, obj_data **tar_obj, vehicle_data **tar_veh) {
 	int i, found;
 	char name[256];
 
@@ -5923,6 +5924,11 @@ int generic_find(char *arg, bitvector_t bitvector, char_data *ch, char_data **ta
 	if (IS_SET(bitvector, FIND_OBJ_INV)) {
 		if ((*tar_obj = get_obj_in_list_vis(ch, name, ch->carrying)) != NULL) {
 			return (FIND_OBJ_INV);
+		}
+	}
+	if (IS_SET(bitvector, FIND_VEHICLE_ROOM)) {
+		if ((*tar_veh = get_vehicle_in_room_vis(ch, name)) != NULL) {
+			return (FIND_VEHICLE_ROOM);
 		}
 	}
 	if (IS_SET(bitvector, FIND_OBJ_ROOM)) {

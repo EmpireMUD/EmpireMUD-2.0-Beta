@@ -3658,6 +3658,7 @@ ACMD(do_exchange) {
 ACMD(do_get) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
 	int cont_dotmode, found = 0, mode;
+	vehicle_data *tmp_veh;
 	obj_data *cont;
 	char_data *tmp_char;
 
@@ -3682,7 +3683,7 @@ ACMD(do_get) {
 		}
 		cont_dotmode = find_all_dots(arg2);
 		if (cont_dotmode == FIND_INDIV) {
-			mode = generic_find(arg2, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP, ch, &tmp_char, &cont);
+			mode = generic_find(arg2, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP, ch, &tmp_char, &cont, &tmp_veh);
 			if (!cont) {
 				sprintf(buf, "You don't have %s %s.\r\n", AN(arg2), arg2);
 				send_to_char(buf, ch);
@@ -3870,6 +3871,7 @@ ACMD(do_grab) {
 
 
 ACMD(do_identify) {
+	vehicle_data *tmp_veh;
 	char_data *tmp_char;
 	obj_data *obj;
 	
@@ -3878,7 +3880,7 @@ ACMD(do_identify) {
 	if (!*arg) {
 		msg_to_char(ch, "Identify what object?\r\n");
 	}
-	else if (!generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP, ch, &tmp_char, &obj)) {
+	else if (!generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP, ch, &tmp_char, &obj, &tmp_veh)) {
 		msg_to_char(ch, "You see nothing like that here.\r\n");
 	}
 	else {
@@ -4195,6 +4197,7 @@ ACMD(do_pour) {
 ACMD(do_put) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
 	obj_data *obj, *next_obj, *cont;
+	vehicle_data *tmp_veh;
 	char_data *tmp_char;
 	int obj_dotmode, cont_dotmode, found = 0, howmany = 1;
 	char *theobj, *thecont;
@@ -4225,7 +4228,7 @@ ACMD(do_put) {
 		send_to_char(buf, ch);
 	}
 	else {
-		generic_find(thecont, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP, ch, &tmp_char, &cont);
+		generic_find(thecont, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP, ch, &tmp_char, &cont, &tmp_veh);
 		if (!cont) {
 			sprintf(buf, "You don't see %s %s here.\r\n", AN(thecont), thecont);
 			send_to_char(buf, ch);

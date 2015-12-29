@@ -1542,6 +1542,7 @@ typedef struct vehicle_data vehicle_data;
 #define VEH_DRAGGABLE  BIT(11)	// l. player can drag it over land
 #define VEH_NO_BUILDING  BIT(12)	// m. won't fit into a building
 #define VEH_CAN_PORTAL  BIT(13)	// n. required for the vehicle to go through a portal
+#define VEH_LEADABLE  BIT(14)	// o. can be lead around
 
 
  //////////////////////////////////////////////////////////////////////////////

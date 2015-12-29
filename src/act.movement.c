@@ -1219,6 +1219,7 @@ ACMD(do_circle) {
 ACMD(do_enter) {
 	extern bool can_infiltrate(char_data *ch, empire_data *emp);
 	
+	vehicle_data *tmp_veh = NULL;
 	char_data *tmp_char;
 	obj_data *portal;
 	room_data *room;
@@ -1241,7 +1242,7 @@ ACMD(do_enter) {
 		return;
 	}
 
-	generic_find(arg, FIND_OBJ_ROOM, ch, &tmp_char, &portal);
+	generic_find(arg, FIND_OBJ_ROOM, ch, &tmp_char, &portal, &tmp_veh);
 	
 	if (!portal) {
 		msg_to_char(ch, "You don't see %s %s here.\r\n", AN(arg), arg);
@@ -1335,6 +1336,7 @@ ACMD(do_follow) {
 ACMD(do_gen_door) {
 	int door = NO_DIR;
 	char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
+	vehicle_data *tmp_veh = NULL;
 	obj_data *obj = NULL;
 	char_data *victim = NULL;
 	struct room_direction_data *ex;
@@ -1356,7 +1358,7 @@ ACMD(do_gen_door) {
 		return;
 	}
 	two_arguments(argument, type, dir);
-	if (!generic_find(type, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, &victim, &obj))
+	if (!generic_find(type, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, &victim, &obj, &tmp_veh))
 		door = find_door(ch, type, dir, cmd_door[subcmd]);
 	
 	ex = find_exit(IN_ROOM(ch), door);

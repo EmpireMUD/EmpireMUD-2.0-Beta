@@ -2987,5 +2987,6 @@ const char *vehicle_flags[] = {
 	"DRAGGABLE",
 	"!BUILDING",
 	"CAN-PORTAL",
+	"LEADABLE",
 	"\n"
 };

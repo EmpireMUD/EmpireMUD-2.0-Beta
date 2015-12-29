@@ -46,6 +46,7 @@ extern const struct wear_data_type wear_data[NUM_WEARS];
 // external functions
 extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 extern char *get_room_name(room_data *room, bool color);
+void look_at_vehicle(vehicle_data *veh, char_data *ch);
 extern char *morph_string(char_data *ch, byte type);
 
 // local protos
@@ -164,6 +165,7 @@ void look_at_target(char_data *ch, char *arg) {
 	int bits, found = FALSE, j, fnum, i = 0;
 	char_data *found_char = NULL;
 	obj_data *obj, *found_obj = NULL;
+	vehicle_data *found_veh = NULL;
 	char *desc;
 
 	if (!ch->desc)
@@ -174,7 +176,7 @@ void look_at_target(char_data *ch, char *arg) {
 		return;
 		}
 
-	bits = generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_CHAR_ROOM, ch, &found_char, &found_obj);
+	bits = generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_CHAR_ROOM | FIND_VEHICLE_ROOM, ch, &found_char, &found_obj, &found_veh);
 
 	/* Is the target a character? */
 	if (found_char != NULL) {
@@ -186,6 +188,12 @@ void look_at_target(char_data *ch, char *arg) {
 			act("$n looks at $N.", TRUE, ch, 0, found_char, TO_NOTVICT);
 		}
 		return;
+	}
+	
+	// was the target a vehicle?
+	if (found_veh != NULL) {
+		look_at_vehicle(found_veh, ch);
+		act("$n looks at $V.", TRUE, ch, NULL, found_veh, TO_ROOM);
 	}
 
 	/* Strip off "number." from 2.foo and friends. */
@@ -260,16 +268,28 @@ void look_at_target(char_data *ch, char *arg) {
 void look_in_obj(char_data *ch, char *arg) {
 	extern const char *color_liquid[];
 	extern const char *fullness[];
+	vehicle_data *veh = NULL;
 	obj_data *obj = NULL;
 	char_data *dummy = NULL;
 	int amt, bits;
 
 	if (!*arg)
 		send_to_char("Look in what?\r\n", ch);
-	else if (!(bits = generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP, ch, &dummy, &obj))) {
+	else if (!(bits = generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM, ch, &dummy, &obj, &veh))) {
 		sprintf(buf, "There doesn't seem to be %s %s here.\r\n", AN(arg), arg);
 		send_to_char(buf, ch);
 	}
+	else if (veh) {
+		// vehicle section
+		if (!VEH_FLAGGED(veh, VEH_CONTAINER)) {
+			act("$V isn't a container.", FALSE, ch, NULL, veh, TO_CHAR);
+		}
+		else {
+			act("$V (here):", FALSE, ch, NULL, veh, TO_CHAR);
+			list_obj_to_char(VEH_CONTAINS(veh), ch, OBJ_DESC_CONTENTS, TRUE);
+		}
+	}
+	// the rest is objects:
 	else if ((GET_OBJ_TYPE(obj) != ITEM_DRINKCON) && (GET_OBJ_TYPE(obj) != ITEM_CORPSE) && (GET_OBJ_TYPE(obj) != ITEM_CONTAINER) && (GET_OBJ_TYPE(obj) != ITEM_CART))
 		send_to_char("There's nothing inside that!\r\n", ch);
 	else {
@@ -1854,6 +1874,7 @@ ACMD(do_equipment) {
 
 
 ACMD(do_examine) {
+	vehicle_data *tmp_veh = NULL;
 	char_data *tmp_char;
 	obj_data *tmp_object;
 
@@ -1865,13 +1886,17 @@ ACMD(do_examine) {
 	}
 	look_at_target(ch, arg);
 
-	generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_CHAR_ROOM | FIND_OBJ_EQUIP, ch, &tmp_char, &tmp_object);
+	generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_CHAR_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM, ch, &tmp_char, &tmp_object, &tmp_veh);
 
 	if (tmp_object) {
 		if ((GET_OBJ_TYPE(tmp_object) == ITEM_DRINKCON) || (GET_OBJ_TYPE(tmp_object) == ITEM_CONTAINER) || (GET_OBJ_TYPE(tmp_object) == ITEM_CORPSE) || (GET_OBJ_TYPE(tmp_object) == ITEM_CART)) {
 			send_to_char("When you look inside, you see:\r\n", ch);
 			look_in_obj(ch, arg);
 		}
+	}
+	if (tmp_veh && VEH_FLAGGED(tmp_veh, VEH_CONTAINER)) {
+		msg_to_char(ch, "When you look inside, you see:\r\n");
+		look_in_obj(ch, arg);
 	}
 }
 

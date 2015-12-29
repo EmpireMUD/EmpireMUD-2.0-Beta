@@ -4190,6 +4190,7 @@ ACMD(do_echo) {
 	char hbuf[MAX_INPUT_LENGTH];
 	char *ptr, *end;
 	char_data *vict = NULL, *tmp_char, *c;
+	vehicle_data *tmp_veh = NULL;
 	obj_data *obj = NULL;
 	int len;
 	bool needs_name = TRUE;
@@ -4231,7 +4232,7 @@ ACMD(do_echo) {
 			*end = '\0';
 		}
 		len = strlen(lbuf);
-		generic_find(lbuf, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP, ch, &tmp_char, &obj);
+		generic_find(lbuf, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP, ch, &tmp_char, &obj, &tmp_veh);
 		
 		if (obj) {
 			// replace with $p

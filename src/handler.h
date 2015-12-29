@@ -34,6 +34,7 @@
 #define FIND_OBJ_WORLD		BIT(4)
 #define FIND_OBJ_EQUIP		BIT(5)
 #define FIND_NO_DARK		BIT(6)
+#define FIND_VEHICLE_ROOM	BIT(7)
 
 
 // for the interaction handlers (returns TRUE if the character performs the interaction; FALSE if it aborts)
@@ -264,7 +265,7 @@ extern bool stored_item_requires_withdraw(obj_data *obj);
 
 // targeting handlers
 extern int find_all_dots(char *arg);
-extern int generic_find(char *arg, bitvector_t bitvector, char_data *ch, char_data **tar_ch, obj_data **tar_obj);
+extern int generic_find(char *arg, bitvector_t bitvector, char_data *ch, char_data **tar_ch, obj_data **tar_obj, vehicle_data **tar_veh);
 extern int get_number(char **name);
 
 // unique storage handlers

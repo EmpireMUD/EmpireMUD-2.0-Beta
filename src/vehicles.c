@@ -837,6 +837,26 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 
 
 /**
+* Perform a look-at-vehicle.
+*
+* @param vehicle_data *veh The vehicle to look at.
+* @param char_data *ch The person to show the output to.
+*/
+void look_at_vehicle(vehicle_data *veh, char_data *ch) {
+	if (!veh || !ch || !ch->desc) {
+		return;
+	}
+	
+	if (VEH_LOOK_DESC(veh) && *VEH_LOOK_DESC(veh)) {
+		msg_to_char(ch, "%s", VEH_LOOK_DESC(veh));
+	}
+	else {
+		act("You look at $V but see nothing special.", FALSE, ch, NULL, veh, TO_CHAR);
+	}
+}
+
+
+/**
 * This is the main recipe display for vehicle OLC. It displays the user's
 * currently-edited vehicle.
 *
