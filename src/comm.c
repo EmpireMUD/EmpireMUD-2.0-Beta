@@ -1057,6 +1057,12 @@ void act(const char *str, int hide_invisible, char_data *ch, const void *obj, co
 		if (ch && IN_ROOM(ch)) {
 			to = ROOM_PEOPLE(IN_ROOM(ch));
 		}
+		else if (!IS_SET(type, ACT_VEHICLE_OBJ) && obj && IN_ROOM((obj_data*)obj)) {
+			to = ROOM_PEOPLE(IN_ROOM((obj_data*)obj));
+		}
+		else if (IS_SET(type, ACT_VEHICLE_OBJ) && obj && IN_ROOM((vehicle_data*)obj)) {
+			to = ROOM_PEOPLE(IN_ROOM((vehicle_data*)obj));
+		}
 		
 		if (to) {
 			for (; to; to = to->next_in_room) {
@@ -1243,7 +1249,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 				case 'F':
 					CHECK_NULL(vict_obj, fname((const char *) vict_obj));
 					break;
-				case 'v': {	// $v: vehicle
+				case 'v': {	// $v: vehicle -- you need to pass ACT_VEHICLE_OBJ to use this
 					CHECK_NULL(obj, get_vehicle_short_desc((vehicle_data*)obj, (char_data*)to));
 					break;
 				}
