@@ -194,6 +194,7 @@ void look_at_target(char_data *ch, char *arg) {
 	if (found_veh != NULL) {
 		look_at_vehicle(found_veh, ch);
 		act("$n looks at $V.", TRUE, ch, NULL, found_veh, TO_ROOM);
+		return;
 	}
 
 	/* Strip off "number." from 2.foo and friends. */
