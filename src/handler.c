@@ -5099,6 +5099,7 @@ room_data *find_target_room(char_data *ch, char *rawroomstr) {
 	struct instance_data *inst;
 	room_vnum tmp;
 	room_data *location = NULL;
+	vehicle_data *target_veh;
 	char_data *target_mob;
 	obj_data *target_obj;
 	char roomstr[MAX_INPUT_LENGTH];
@@ -5147,6 +5148,17 @@ room_data *find_target_room(char_data *ch, char *rawroomstr) {
 		location = IN_ROOM(target_mob);
 	else if (!ch && (target_mob = get_char_world(roomstr)) != NULL) {
 		location = IN_ROOM(target_mob);
+	}
+	else if ((ch && (target_veh = get_vehicle_vis(ch, roomstr))) || (!ch && (target_veh = get_vehicle_world(roomstr)))) {
+		if (IN_ROOM(target_veh)) {
+			location = IN_ROOM(target_veh);
+		}
+		else {
+			if (ch) {
+				msg_to_char(ch, "That vehicle is not available.\r\n");
+			}
+			location = NULL;
+		}
 	}
 	else if ((ch && (target_obj = get_obj_vis(ch, roomstr)) != NULL) || (!ch && (target_obj = get_obj_world(roomstr)) != NULL)) {
 		if (IN_ROOM(target_obj))
@@ -6119,6 +6131,76 @@ vehicle_data *get_vehicle_in_room_vis(char_data *ch, char *name) {
 			continue;
 		}
 		if (!CAN_SEE_VEHICLE(ch, iter)) {
+			continue;
+		}
+		
+		// found: check number
+		if (++found == number) {
+			return iter;
+		}
+	}
+
+	return NULL;
+}
+
+
+/**
+* Find a vehicle in the world, visible to the character.
+*
+* @param char_data *ch The person looking.
+* @param char *name The string they typed.
+*/
+vehicle_data *get_vehicle_vis(char_data *ch, char *name) {
+	int found = 0, number;
+	char tmpname[MAX_INPUT_LENGTH];
+	char *tmp = tmpname;
+	vehicle_data *iter;
+
+	strcpy(tmp, name);
+	
+	// 0.x does not target vehicles
+	if ((number = get_number(&tmp)) == 0) {
+		return (NULL);
+	}
+	
+	LL_FOREACH2(vehicle_list, iter, next) {
+		if (!isname(tmp, VEH_KEYWORDS(iter))) {
+			continue;
+		}
+		if (!CAN_SEE_VEHICLE(ch, iter)) {
+			continue;
+		}
+		
+		// found: check number
+		if (++found == number) {
+			return iter;
+		}
+	}
+
+	return NULL;
+}
+
+
+/**
+* Find a vehicle in the world, without regard to visibility.
+*
+* @param char *name The string to search for.
+*/
+vehicle_data *get_vehicle_world(char *name) {
+	int found = 0, number;
+	char tmpname[MAX_INPUT_LENGTH];
+	char *tmp = tmpname;
+	vehicle_data *iter;
+
+	strcpy(tmp, name);
+	
+	// 0.x does not target vehicles
+	if ((number = get_number(&tmp)) == 0) {
+		return (NULL);
+	}
+	
+	LL_FOREACH2(vehicle_list, iter, next) {
+		if (!isname(tmp, VEH_KEYWORDS(iter))) {
 			continue;
 		}
 		

@@ -284,6 +284,8 @@ void vehicle_to_room(vehicle_data *veh, room_data *room);
 
 // vehicle targeting handlers
 extern vehicle_data *get_vehicle_in_room_vis(char_data *ch, char *name);
+extern vehicle_data *get_vehicle_vis(char_data *ch, char *name);
+extern vehicle_data *get_vehicle_world(char *name);
 
 // world handlers
 extern struct room_direction_data *find_exit(room_data *room, int dir);
