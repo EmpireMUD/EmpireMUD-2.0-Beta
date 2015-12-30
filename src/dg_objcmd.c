@@ -658,6 +658,7 @@ OCMD(do_dgoload) {
 	room_data *room;
 	char_data *mob, *tch;
 	obj_data *object, *cnt;
+	vehicle_data *veh;
 	char *target;
 	int pos;
 
@@ -678,11 +679,12 @@ OCMD(do_dgoload) {
 		inst = find_instance_by_room(obj_room(obj), FALSE);
 	}
 
-	if (is_abbrev(arg1, "mob")) {
-		if ((mob = read_mobile(number, TRUE)) == NULL) {
+	if (is_abbrev(arg1, "mobile")) {
+		if (!mob_proto(number)) {
 			obj_log(obj, "oload: bad mob vnum");
 			return;
 		}
+		mob = read_mobile(number, TRUE);
 		if (COMPLEX_DATA(room) && COMPLEX_DATA(room)->instance) {
 			MOB_INSTANCE_ID(mob) = COMPLEX_DATA(room)->instance->id;
 		}
@@ -696,11 +698,12 @@ OCMD(do_dgoload) {
 		
 		load_mtrigger(mob);
 	}
-	else if (is_abbrev(arg1, "obj")) {
-		if ((object = read_object(number, TRUE)) == NULL) {
+	else if (is_abbrev(arg1, "object")) {
+		if (!obj_proto(number)) {
 			obj_log(obj, "oload: bad object vnum");
 			return;
 		}
+		object = read_object(number, TRUE);
 		
 		if (inst) {
 			instance_obj_setup(inst, object);
@@ -750,6 +753,21 @@ OCMD(do_dgoload) {
 		obj_to_room(object, room); 
 		load_otrigger(object);
 		return;
+	}
+	else if (is_abbrev(arg1, "vehicle")) {
+		if (!vehicle_proto(number)) {
+			obj_log(obj, "oload: bad vehicle vnum");
+			return;
+		}
+		veh = read_vehicle(number, TRUE);
+		vehicle_to_room(veh, room);
+		
+		if (target && *target && isdigit(*target)) {
+			// target is scale level
+			// scale_vehicle_to_level(veh, atoi(target));
+		}
+		
+		//load_vtrigger(veh);
 	}
 	else {
 		obj_log(obj, "oload: bad type");
