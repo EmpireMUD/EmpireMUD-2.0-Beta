@@ -2078,7 +2078,7 @@ ACMD(do_barde) {
 	else if (!IS_NPC(mob)) {
 		act("You can't barde $N!", FALSE, ch, 0, mob, TO_CHAR);
 	}
-	else if (GET_PULLING(mob) || GET_LED_BY(mob)) {
+	else if (GET_LED_BY(mob)) {
 		act("You can't barde $M right now.", FALSE, ch, NULL, mob, TO_CHAR);
 	}
 	else if (ABILITY_TRIGGERS(ch, mob, NULL, ABIL_BARDE)) {

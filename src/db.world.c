@@ -1118,8 +1118,6 @@ void reset_one_room(room_data *room) {
 	struct reset_com *reset;
 	char_data *tmob = NULL; /* for trigger assignment */
 	char_data *mob = NULL;
-	obj_data *obj = NULL;
-	bool found;
 	
 	// shortcut
 	if (!room->reset_commands) {
@@ -1139,28 +1137,31 @@ void reset_one_room(room_data *room) {
 				REMOVE_BIT(MOB_FLAGS(mob), MOB_EXTRACTED);
 				
 				// pulling? attempt to re-attach
+				/*
 				if (obj_proto(reset->arg2)) {
-						found = FALSE;
-						for (obj = ROOM_CONTENTS(IN_ROOM(mob)); obj && !found; obj = obj->next_content) {
-							if (GET_OBJ_VNUM(obj) == reset->arg2) {
-								// find available pull slot
-								if (GET_PULLED_BY(obj, 0) && !GET_PULLED_BY(obj, 1) && GET_CART_ANIMALS_REQUIRED(obj) > 1) {
-									obj->pulled_by2 = mob;
-									GET_PULLING(mob) = obj;
-									found = TRUE;
-								}
-								else if (!GET_PULLED_BY(obj, 0)) {
-									obj->pulled_by1 = mob;
-									GET_PULLING(mob) = obj;
-									found = TRUE;
-								}
+					obj_data *obj = NULL;
+					bool found = FALSE;
+					for (obj = ROOM_CONTENTS(IN_ROOM(mob)); obj && !found; obj = obj->next_content) {
+						if (GET_OBJ_VNUM(obj) == reset->arg2) {
+							// find available pull slot
+							if (GET_PULLED_BY(obj, 0) && !GET_PULLED_BY(obj, 1) && GET_CART_ANIMALS_REQUIRED(obj) > 1) {
+								obj->pulled_by2 = mob;
+								GET_PULLING(mob) = obj;
+								found = TRUE;
+							}
+							else if (!GET_PULLED_BY(obj, 0)) {
+								obj->pulled_by1 = mob;
+								GET_PULLING(mob) = obj;
+								found = TRUE;
 							}
 						}
+					}
 					// couldn't find one -- just tie mob
 					if (!found) {
 						SET_BIT(MOB_FLAGS(mob), MOB_TIED);
 					}
 				}
+				*/
 
 				load_mtrigger(mob);
 				tmob = mob;

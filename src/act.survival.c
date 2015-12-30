@@ -342,9 +342,6 @@ ACMD(do_mount) {
 	else if (mob && GET_LED_BY(mob)) {
 		msg_to_char(ch, "You can't ride someone's who's being led around.\r\n");
 	}
-	else if (mob && GET_PULLING(mob)) {
-		msg_to_char(ch, "You can't ride a harnessed mob.\r\n");
-	}
 	else if (mob && GET_POS(mob) < POS_STANDING) {
 		act("You can't mount $N right now.", FALSE, ch, NULL, mob, TO_CHAR);
 	}

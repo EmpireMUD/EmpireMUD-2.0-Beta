@@ -385,8 +385,6 @@ OCMD(do_otransform) {
 		tmpobj.stolen_timer = obj->stolen_timer;
 		tmpobj.autostore_timer = obj->autostore_timer;
 		tmpobj.sitting = obj->sitting;
-		tmpobj.pulled_by1 = obj->pulled_by1;
-		tmpobj.pulled_by2 = obj->pulled_by2;
 		tmpobj.carried_by = obj->carried_by;
 		tmpobj.worn_by = obj->worn_by;
 		tmpobj.worn_on = obj->worn_on;

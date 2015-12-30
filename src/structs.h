@@ -1531,7 +1531,7 @@ typedef struct vehicle_data vehicle_data;
 // VEH_x: vehicle flags
 #define VEH_INCOMPLETE  BIT(0)	// a. can't be used until finished
 #define VEH_DRIVING  BIT(1)	// b. can move on land
-#define VHC_SAILING  BIT(2)	// c. can move on water
+#define VEH_SAILING  BIT(2)	// c. can move on water
 #define VEH_FLYING  BIT(3)	// d. no terrain restrictions
 #define VEH_ALLOW_ROUGH  BIT(4)	// e. can move on rough terrain
 #define VEH_SIT  BIT(5)	// f. can sit on
@@ -2815,9 +2815,8 @@ struct char_special_data {
 	char_data *fed_on_by;	// Who is biting person
 
 	char_data *led_by;	// A person may lead a mob
-	char_data *leading;	// A mob may lead a person
-
-	obj_data *pulling;	// The mob may be pulling something
+	char_data *leading_mob;	// A mob may lead a person
+	vehicle_data *leading_vehicle;	// A person may lead a vehicle
 	
 	struct empire_npc_data *empire_npc;	// if this is an empire spawn
 	
@@ -3416,8 +3415,6 @@ struct obj_data {
 	time_t autostore_timer;	// how long an object has been where it be
 
 	char_data *sitting;	// Person in the chair
-	char_data *pulled_by1;	// Animal pulling this obj
-	char_data *pulled_by2;	// Up to two animals may be needed
 	struct obj_binding *bound_to;	// LL of who it's bound to
 
 	obj_data *in_obj;	// In what object NULL when none
@@ -3525,6 +3522,7 @@ struct vehicle_data {
 	struct vehicle_attached_mob *animals;	// linked list of mobs attached
 	struct resource_data *needs_resources;	// resources until finished/maintained
 	room_data *in_room;	// where it is
+	char_data *led_by;	// person leading it
 	
 	// scripting
 	int id;	// used by DG triggers - unique id

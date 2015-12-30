@@ -585,7 +585,7 @@ void list_char_to_char(char_data *list, char_data *ch) {
 	int c = 1;
 	
 	bool use_mob_stacking = config_get_bool("use_mob_stacking");
-	#define MOB_CAN_STACK(ch)  (use_mob_stacking && !GET_LED_BY(ch) && !GET_PULLING(ch) && GET_POS(ch) != POS_FIGHTING && !MOB_FLAGGED((ch), MOB_EMPIRE | MOB_TIED | MOB_MOUNTABLE | MOB_FAMILIAR))
+	#define MOB_CAN_STACK(ch)  (use_mob_stacking && !GET_LED_BY(ch) && GET_POS(ch) != POS_FIGHTING && !MOB_FLAGGED((ch), MOB_EMPIRE | MOB_TIED | MOB_MOUNTABLE | MOB_FAMILIAR))
 	
 	// no work
 	if (!list || !ch || !ch->desc) {
@@ -807,9 +807,6 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 	if (GET_LED_BY(i)) {
 		sprintf(buf, "...%s is being led by %s.", HSSH(i), GET_LED_BY(i) == ch ? "you" : "$N");
 		act(buf, FALSE, ch, 0, GET_LED_BY(i), TO_CHAR);
-	}
-	if (GET_PULLING(i)) {
-		act("...$e is pulling $p.", FALSE, i, GET_PULLING(i), ch, TO_VICT);
 	}
 	if (MOB_FLAGGED(i, MOB_TIED))
 		act("...$e is tied up here.", FALSE, i, 0, ch, TO_VICT);

@@ -4256,8 +4256,8 @@ void write_room_to_file(FILE *fl, room_data *room) {
 		if (ROOM_PEOPLE(room)) {
 			for (mob = ROOM_PEOPLE(room); mob; mob = mob->next_in_room) {
 				if (mob && IS_NPC(mob) && !MOB_FLAGGED(mob, MOB_EMPIRE | MOB_FAMILIAR)) {
-					// C M vnum flags pulling
-					fprintf(fl, "C M %d %s %d\n", GET_MOB_VNUM(mob), bitv_to_alpha(MOB_FLAGS(mob)), (GET_PULLING(mob) ? GET_OBJ_VNUM(GET_PULLING(mob)) : NOTHING));
+					// C M vnum flags (pulling unused)
+					fprintf(fl, "C M %d %s %d\n", GET_MOB_VNUM(mob), bitv_to_alpha(MOB_FLAGS(mob)), NOTHING);
 					
 					// C I instance_id
 					if (MOB_INSTANCE_ID(mob) != NOTHING) {

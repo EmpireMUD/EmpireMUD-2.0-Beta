@@ -874,24 +874,19 @@ void extract_char_final(char_data *ch) {
 		GET_FED_ON_BY(GET_FEEDING_FROM(ch)) = NULL;
 		GET_FEEDING_FROM(ch) = NULL;
 	}
-	if (GET_LEADING(ch)) {
-		GET_LED_BY(GET_LEADING(ch)) = NULL;
-		GET_LEADING(ch) = NULL;
+	if (GET_LEADING_MOB(ch)) {
+		GET_LED_BY(GET_LEADING_MOB(ch)) = NULL;
+		GET_LEADING_MOB(ch) = NULL;
 	}
 	if (GET_LED_BY(ch)) {
-		GET_LEADING(GET_LED_BY(ch)) = NULL;
+		GET_LEADING_MOB(GET_LED_BY(ch)) = NULL;
 		GET_LED_BY(ch) = NULL;
 	}
-	if (GET_PULLING(ch)) {
-		if (GET_PULLED_BY(GET_PULLING(ch), 0) == ch) {
-			GET_PULLING(ch)->pulled_by1 = NULL;	// old macro here was causing "invalid lvalue assignment" error
-		}
-		if (GET_PULLED_BY(GET_PULLING(ch), 1) == ch) {
-			GET_PULLING(ch)->pulled_by2 = NULL;	// old macro here was causing "invalid lvalue assignment" error
-		}
-		GET_PULLING(ch) = NULL;
+	if (GET_LEADING_VEHICLE(ch)) {
+		VEH_LED_BY(GET_LEADING_VEHICLE(ch)) = NULL;
+		GET_LEADING_VEHICLE(ch) = NULL;
 	}
-
+	
 	// npc-only frees	
 	if (IS_NPC(ch)) {
 		// free up pursuit
@@ -3608,17 +3603,7 @@ void extract_obj(obj_data *obj) {
 	while (obj->contains) {
 		extract_obj(obj->contains);
 	}
-
-	// cancel anybody pulling the object
-	if (GET_PULLED_BY(obj, 0)) {
-		GET_PULLING(GET_PULLED_BY(obj, 0)) = NULL;
-		obj->pulled_by1 = NULL;
-	}
-	if (GET_PULLED_BY(obj, 1)) {
-		GET_PULLING(GET_PULLED_BY(obj, 1)) = NULL;
-		obj->pulled_by2 = NULL;
-	}
-
+	
 	remove_from_object_list(obj);
 
 	if (SCRIPT(obj)) {
@@ -5995,6 +5980,11 @@ void extract_vehicle(vehicle_data *veh) {
 	
 	// TODO release mobs
 	// TODO delete interior
+	
+	if (VEH_LED_BY(veh)) {
+		GET_LEADING_VEHICLE(VEH_LED_BY(veh)) = NULL;
+		VEH_LED_BY(veh) = NULL;
+	}
 	
 	if (IN_ROOM(veh)) {
 		vehicle_from_room(veh);

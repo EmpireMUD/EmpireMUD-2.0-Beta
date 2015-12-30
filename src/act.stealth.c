@@ -1587,11 +1587,7 @@ ACMD(do_sneak) {
 		msg_to_char(ch, "You are entangled and can't sneak.\r\n");
 		return;
 	}
-	if (GET_PULLING(ch)) {
-		msg_to_char(ch, "You can't sneak while pulling something.\r\n");
-		return;
-	}
-	if (GET_LEADING(ch)) {
+	if (GET_LEADING_MOB(ch) || GET_LEADING_VEHICLE(ch)) {
 		msg_to_char(ch, "You can't sneak while leading something.\r\n");
 		return;
 	}

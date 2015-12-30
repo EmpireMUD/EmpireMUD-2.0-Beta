@@ -66,6 +66,9 @@ ACMD(do_harness) {
 	else if (count_harnessed_animals(veh) >= VEH_ANIMALS_REQUIRED(veh)) {
 		msg_to_char(ch, "You can't harness %s animals to it.\r\n", count_harnessed_animals(veh) == 0 ? "any" : "any more");
 	}
+	else if (!VEH_IS_COMPLETE(veh)) {
+		act("You must finish constructing $V before you can harness anything to it.", FALSE, ch, NULL, veh, TO_CHAR);
+	}
 	else if (!IS_NPC(animal)) {
 		msg_to_char(ch, "You can only harness animals.\r\n");
 	}
@@ -80,6 +83,87 @@ ACMD(do_harness) {
 		act("$n harnesses you to $v.", FALSE, ch, veh, animal, TO_VICT | ACT_VEHICLE_OBJ);
 		act("$n harnesses $N to $v.", FALSE, ch, veh, animal, TO_NOTVICT | ACT_VEHICLE_OBJ);
 		harness_mob_to_vehicle(animal, veh);
+	}
+}
+
+
+ACMD(do_lead) {
+	vehicle_data *veh;
+	char_data *mob;
+	
+	one_argument(argument, arg);
+	
+	if (GET_LEADING_MOB(ch)) {
+		act("You stop leading $N.", FALSE, ch, NULL, GET_LEADING_MOB(ch), TO_CHAR);
+		act("$n stops leading $N.", FALSE, ch, NULL, GET_LEADING_MOB(ch), TO_ROOM);
+		GET_LED_BY(GET_LEADING_MOB(ch)) = NULL;
+		GET_LEADING_MOB(ch) = NULL;
+	}
+	else if (GET_LEADING_VEHICLE(ch)) {
+		act("You stop leading $V.", FALSE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_CHAR);
+		act("$n stops leading $V.", FALSE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_ROOM);
+		VEH_LED_BY(GET_LEADING_VEHICLE(ch)) = NULL;
+		GET_LEADING_VEHICLE(ch) = NULL;
+	}
+	else if (IS_NPC(ch)) {
+		msg_to_char(ch, "Npcs can't lead anything.\r\n");
+	}
+	else if (!*arg) {
+		msg_to_char(ch, "Lead whom (or what)?\r\n");
+	}
+	else if ((mob = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
+		// lead mob (we already made sure they aren't leading anything)
+		if (ch == mob) {
+			msg_to_char(ch, "You can't lead yourself.\r\n");
+		}
+		else if (!IS_NPC(mob)) {
+			msg_to_char(ch, "You can't lead other players around.\r\n");
+		}
+		else if (!MOB_FLAGGED(mob, MOB_MOUNTABLE)) {
+			act("You can't lead $N!", FALSE, ch, 0, mob, TO_CHAR);
+		}
+		else if (GET_LED_BY(mob)) {
+			act("Someone is already leading $M.", FALSE, ch, 0, mob, TO_CHAR);
+		}
+		else if (mob->desc) {
+			act("You can't lead $N!", FALSE, ch, 0, mob, TO_CHAR);
+		}
+		else if (GET_LOYALTY(mob) && GET_LOYALTY(mob) != GET_LOYALTY(ch)) {
+			msg_to_char(ch, "You can't lead animals owned by other empires.\r\n");
+		}
+		else {
+			act("You begin to lead $N.", FALSE, ch, NULL, mob, TO_CHAR);
+			act("$n begins to lead $N.", TRUE, ch, NULL, mob, TO_ROOM);
+			GET_LEADING_MOB(ch) = mob;
+			GET_LED_BY(mob) = ch;
+		}
+	}
+	else if ((veh = get_vehicle_in_room_vis(ch, arg))) {
+		// lead vehicle (we already made sure they aren't leading anything)
+		if (!VEH_FLAGGED(veh, VEH_LEADABLE)) {
+			act("You can't lead $V!", FALSE, ch, NULL, veh, TO_CHAR);
+		}
+		else if (!VEH_IS_COMPLETE(veh)) {
+			act("You must finish constructing $V before you can lead it.", FALSE, ch, NULL, veh, TO_CHAR);
+		}
+		else if (VEH_LED_BY(veh)) {
+			act("$N is already leading it.", FALSE, ch, NULL, VEH_LED_BY(veh), TO_CHAR);
+		}
+		else if (count_harnessed_animals(veh) < VEH_ANIMALS_REQUIRED(veh)) {
+			msg_to_char(ch, "You need to harness %d animal%s to it before you can lead it.\r\n", VEH_ANIMALS_REQUIRED(veh), PLURAL(VEH_ANIMALS_REQUIRED(veh)));
+		}
+		else if (VEH_OWNER(veh) && VEH_OWNER(veh) != GET_LOYALTY(ch)) {
+			msg_to_char(ch, "You can't lead something owned by another empire.\r\n");
+		}
+		else {
+			act("You begin to lead $V.", FALSE, ch, NULL, veh, TO_CHAR);
+			act("$n begins to lead $V.", TRUE, ch, NULL, veh, TO_ROOM);
+			GET_LEADING_VEHICLE(ch) = veh;
+			VEH_LED_BY(veh) = ch;
+		}
+	}
+	else {
+		msg_to_char(ch, "You don't see any %s to lead here.\r\n", arg);
 	}
 }
 

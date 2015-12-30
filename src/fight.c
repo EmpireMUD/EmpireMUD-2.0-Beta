@@ -1108,8 +1108,8 @@ obj_data *make_corpse(char_data *ch) {
 			}
 		}
 		
-		// rope if it was pulling or tied
-		if (GET_PULLING(ch) || MOB_FLAGGED(ch, MOB_TIED)) {
+		// rope if it was tied
+		if (MOB_FLAGGED(ch, MOB_TIED)) {
 			obj_to_obj(read_object(o_ROPE, TRUE), corpse);
 		}
 
@@ -1310,10 +1310,6 @@ static void shoot_at_char(room_data *from_room, char_data *ch) {
 	else {
 		dam = 0;
 	}
-
-	if (GET_PULLING(ch) && CART_CAN_FIRE(GET_PULLING(ch))) {
-		log_to_empire(emp, ELOG_HOSTILITY, "A catapult has been spotted at (%d, %d)!", X_COORD(to_room), Y_COORD(to_room));
-	}
 	
 	if (damage(ch, ch, dam, type, DAM_PHYSICAL) != 0) {
 		log_to_empire(emp, ELOG_HOSTILITY, "Guard tower at (%d, %d) is shooting at an infiltrator at (%d, %d)", X_COORD(from_room), Y_COORD(from_room), X_COORD(to_room), Y_COORD(to_room));
@@ -1338,7 +1334,6 @@ static bool tower_would_shoot(room_data *from_room, char_data *vict) {
 	empire_data *m_empire;
 	room_data *shift_room, *to_room = IN_ROOM(vict);
 	char_data *m;
-	obj_data *pulling = GET_PULLING(vict);
 	int iter, distance;
 	bool hostile = IS_HOSTILE(vict);
 	
@@ -1369,7 +1364,7 @@ static bool tower_would_shoot(room_data *from_room, char_data *vict) {
 	}
 	
 	// visibility
-	if ((AFF_FLAGGED(vict, AFF_INVISIBLE) || AFF_FLAGGED(vict, AFF_HIDE)) && !GET_LEADING(vict)) {
+	if ((AFF_FLAGGED(vict, AFF_INVISIBLE) || AFF_FLAGGED(vict, AFF_HIDE))) {
 		return FALSE;
 	}
 
@@ -1390,26 +1385,11 @@ static bool tower_would_shoot(room_data *from_room, char_data *vict) {
 		return FALSE;
 	}
 	
-	// Special handling for mobs -- skip any mob not pulling a catapult
-	if (IS_NPC(vict)) {
-		if (!pulling || !CART_CAN_FIRE(pulling)) {
-			return FALSE;
-		}
-	}
-
 	// check character OR their leader for permission to use the guard tower room -- that saves them
 	if (!((m = vict->master) && in_same_group(vict, m))) {
 		m = vict;
 	}
-	// try for master of other-pulling
-	if (m == vict && pulling && GET_PULLED_BY(pulling, 0) && (GET_PULLED_BY(pulling, 0) != vict)) {
-		m = GET_PULLED_BY(pulling, 0)->master ? GET_PULLED_BY(pulling, 0)->master : vict;
-	}
-	// try for master of other-other-pulling
-	if (m == vict && pulling && GET_PULLED_BY(pulling, 1) && (GET_PULLED_BY(pulling, 1) != vict)) {
-		m = GET_PULLED_BY(pulling, 1)->master ? GET_PULLED_BY(pulling, 1)->master : vict;
-	}
-
+	
 	if ((!IS_NPC(vict) && can_use_room(vict, from_room, GUESTS_ALLOWED)) || (!IS_NPC(m) && can_use_room(m, from_room, GUESTS_ALLOWED))) {
 		return FALSE;
 	}
