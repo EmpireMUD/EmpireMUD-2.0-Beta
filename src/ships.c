@@ -286,7 +286,7 @@ int load_all_objs_to_boat(char_data *ch, room_data *from, room_data *to, obj_dat
 bool move_ship(char_data *ch, obj_data *ship, int dir) {
 	extern const char *from_dir[];
 	
-	room_data *deck, *to_room = NULL, *was_in, *room, *next_room;
+	room_data *deck, *to_room = NULL, *room, *next_room;
 	struct room_direction_data *ex;
 	char_data *ch_iter;
 	
@@ -340,8 +340,7 @@ bool move_ship(char_data *ch, obj_data *ship, int dir) {
 		return FALSE;
 	}
 	
-	// let's do this
-	was_in = IN_ROOM(ship);
+	// let's do this:
 	
 	// notify leaving
 	for (ch_iter = ROOM_PEOPLE(IN_ROOM(ship)); ch_iter; ch_iter = ch_iter->next_in_room) {
