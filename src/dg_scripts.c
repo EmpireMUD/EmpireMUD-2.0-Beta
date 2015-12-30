@@ -3765,6 +3765,9 @@ void process_detach(void *go, struct script_data *sc, trig_data *trig, int type,
 room_data *dg_room_of_obj(obj_data *obj) {
 	if (IN_ROOM(obj))
 		return IN_ROOM(obj);
+	if (obj->in_vehicle) {
+		return IN_ROOM(obj->in_vehicle);
+	}
 	if (obj->carried_by)
 		return IN_ROOM(obj->carried_by);
 	if (obj->worn_by)

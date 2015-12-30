@@ -727,9 +727,7 @@ void delete_orphaned_rooms(void) {
 *
 * This is meant to be called at startup.
 */
-void update_ships(void) {
-	void check_for_ships_present(room_data *room);
-	
+void update_ships(void) {	
 	obj_data *o, *next_o;
 	room_data *rl, *room, *next_room;
 	bool found = FALSE;
@@ -751,10 +749,6 @@ void update_ships(void) {
 		if (BUILDING_VNUM(room) == RTYPE_B_ONDECK && HOME_ROOM(room) == room && !GET_BOAT(room)) {
 			delete_room(room, FALSE);	// must check_all_exits
 			found = TRUE;
-		}
-		else if (GET_ROOM_VNUM(room) < MAP_SIZE) {
-			// regular map room? check for ships present
-			check_for_ships_present(room);
 		}
 	}
 	

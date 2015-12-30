@@ -36,6 +36,7 @@
 */
 
 // external functions
+extern char *get_vehicle_short_desc(vehicle_data *veh, char_data *to);
 extern vehicle_data *find_vehicle_to_show(char_data *ch, room_data *room);
 
 
@@ -1534,7 +1535,6 @@ char *get_screenreader_room_name(room_data *from_room, room_data *to_room) {
 void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 	extern byte distance_can_see(char_data *ch);
 	extern bool can_see_player_in_other_room(char_data *ch, char_data *vict);
-	extern char *get_vehicle_short_desc(vehicle_data *veh, char_data *to);
 	
 	char buf[MAX_STRING_LENGTH], roombuf[MAX_INPUT_LENGTH], lastroom[MAX_INPUT_LENGTH], dirbuf[MAX_STRING_LENGTH], plrbuf[MAX_INPUT_LENGTH], infobuf[MAX_INPUT_LENGTH];
 	char_data *vict;
@@ -1870,6 +1870,10 @@ void print_object_location(int num, obj_data *obj, char_data *ch, int recur) {
 	}
 	else if (obj->carried_by) {
 		sprintf(buf + strlen(buf), "carried by %s\r\n", PERS(obj->carried_by, ch, 1));
+		send_to_char(buf, ch);
+	}
+	else if (obj->in_vehicle) {
+		sprintf(buf + strlen(buf), "inside %s\r\n", get_vehicle_short_desc(obj->in_vehicle, ch));
 		send_to_char(buf, ch);
 	}
 	else if (obj->worn_by) {

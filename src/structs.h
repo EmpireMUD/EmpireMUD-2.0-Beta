@@ -3402,6 +3402,7 @@ struct obj_data {
 	char *action_description;	// What to write when looked at
 	struct extra_descr_data *ex_description;	// extra descriptions
 	struct obj_custom_message *custom_msgs;	// any custom messages
+	vehicle_data *in_vehicle;	// in vehicle or NULL
 	char_data *carried_by;	// Carried by NULL in room/container
 	char_data *worn_by;	// Worn by?
 	sh_int worn_on;	// Worn where?

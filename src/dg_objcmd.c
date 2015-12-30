@@ -118,6 +118,9 @@ void obj_log(obj_data *obj, const char *format, ...) {
 room_data *obj_room(obj_data *obj) {
 	if (IN_ROOM(obj))
 		return IN_ROOM(obj);
+	else if (obj->in_vehicle) {
+		return IN_ROOM(obj->in_vehicle);
+	}
 	else if (obj->carried_by)
 		return IN_ROOM(obj->carried_by);
 	else if (obj->worn_by)
@@ -386,6 +389,7 @@ OCMD(do_otransform) {
 		tmpobj.autostore_timer = obj->autostore_timer;
 		tmpobj.sitting = obj->sitting;
 		tmpobj.carried_by = obj->carried_by;
+		tmpobj.in_vehicle = obj->in_vehicle;
 		tmpobj.worn_by = obj->worn_by;
 		tmpobj.worn_on = obj->worn_on;
 		tmpobj.in_obj = obj->in_obj;

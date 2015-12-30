@@ -191,6 +191,7 @@ int get_wear_by_item_wear(bitvector_t item_wear) {
 */
 void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	extern double get_base_dps(obj_data *weapon);
+	extern char *get_vehicle_short_desc(vehicle_data *veh, char_data *to);
 	extern double get_weapon_speed(obj_data *weapon);
 	extern const char *apply_type_names[];
 	extern const char *extra_bits[];
@@ -222,6 +223,9 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	}
 	else if (obj->carried_by) {
 		snprintf(location, sizeof(location), " (carried by %s)", PERS(obj->carried_by, obj->carried_by, FALSE));
+	}
+	else if (obj->in_vehicle) {
+		snprintf(location, sizeof(location), " (in %s)", get_vehicle_short_desc(obj->in_vehicle, ch));
 	}
 	else if (obj->in_obj) {
 		snprintf(location, sizeof(location), " (in %s)", GET_OBJ_DESC(obj->in_obj, ch, OBJ_DESC_SHORT));
@@ -1288,6 +1292,9 @@ void scale_item_to_level(obj_data *obj, int level) {
 	}
 	else if (top_obj->carried_by) {
 		room = IN_ROOM(top_obj->carried_by);
+	}
+	else if (top_obj->in_vehicle) {
+		room = IN_ROOM(top_obj->in_vehicle);
 	}
 	else if (top_obj->worn_by) {
 		room = IN_ROOM(top_obj->worn_by);

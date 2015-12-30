@@ -3578,6 +3578,9 @@ void empty_obj_before_extract(obj_data *obj) {
 			obj_to_char(jj, obj->worn_by);
 			get_check_money(obj->worn_by, jj);
 		}
+		else if (obj->in_vehicle) {
+			obj_to_vehicle(jj, obj->in_vehicle);
+		}
 		else if (IN_ROOM(obj)) {
 			obj_to_room(jj, IN_ROOM(obj));
 		}
@@ -3994,6 +3997,9 @@ void check_obj_in_void(obj_data *obj) {
 		if (obj->carried_by) {
 			obj_from_char(obj);
 		}
+		if (obj->in_vehicle) {
+			obj_from_vehicle(obj);
+		}
 		if (obj->worn_by) {
 			if (unequip_char(obj->worn_by, obj->worn_on) != obj) {
 				log("SYSERR: Inconsistent worn_by and worn_on pointers!!");
@@ -4126,6 +4132,22 @@ void obj_from_room(obj_data *object) {
 
 		REMOVE_FROM_LIST(object, ROOM_CONTENTS(IN_ROOM(object)), next_content);
 		IN_ROOM(object) = NULL;
+		object->next_content = NULL;
+	}
+}
+
+
+/**
+* @param obj_data *object The item to remove from whatever vehicle it's in.
+*/
+void obj_from_vehicle(obj_data *object) {
+	if (!object || !object->in_vehicle) {
+		log("SYSERR: NULL object (%p) or obj not in a vehicle (%p) passed to obj_from_vehicle", object, object->in_vehicle);
+	}
+	else {
+		VEH_CARRYING_N(object->in_vehicle) -= obj_carry_size(object);
+		LL_DELETE2(VEH_CONTAINS(object->in_vehicle), object, next_content);
+		object->in_vehicle = NULL;
 		object->next_content = NULL;
 	}
 }
@@ -4295,6 +4317,32 @@ void obj_to_room(obj_data *object, room_data *room) {
 
 
 /**
+* Put an object into a vehicle.
+*
+* @param obj_data *object The object.
+* @param vehicle_data *veh The vehicle to put it in.
+*/
+void obj_to_vehicle(obj_data *object, vehicle_data *veh) {
+	if (!object || !veh) {
+		log("SYSERR: Illegal value(s) passed to obj_to_vehicle. (Vehicle %p, obj %p)", veh, object);
+	}
+	else {
+		check_obj_in_void(object);
+		
+		LL_PREPEND2(VEH_CONTAINS(veh), object, next_content);
+		object->in_vehicle = veh;
+		VEH_CARRYING_N(veh) += obj_carry_size(object);
+		
+		// clear keep now
+		REMOVE_BIT(GET_OBJ_EXTRA(object), OBJ_KEEP);
+		
+		// set the timer here; actual rules for it are in limits.c
+		GET_AUTOSTORE_TIMER(object) = time(0);
+	}
+}
+
+
+/**
 * This will put a new object wherever an old object was (in obj, in room, etc)
 * and will leave the old object nowhere. This is called e.g. to replace an
 * item with a fresh copy of that item.
@@ -4311,6 +4359,9 @@ void swap_obj_for_obj(obj_data *old, obj_data *new) {
 	
 	if (old->carried_by) {
 		obj_to_char(new, old->carried_by);
+	}
+	else if (old->in_vehicle) {
+		obj_to_vehicle(new, old->in_vehicle);
 	}
 	else if (IN_ROOM(old)) {
 		obj_to_room(new, IN_ROOM(old));

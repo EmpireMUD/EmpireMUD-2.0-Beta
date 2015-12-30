@@ -3047,6 +3047,8 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	 */
 	strcat(buf, ", In object: ");
 	strcat(buf, j->in_obj ? GET_OBJ_DESC(j->in_obj, ch, OBJ_DESC_SHORT) : "None");
+	strcat(buf, ", In vehicle: ");
+	strcat(buf, j->in_vehicle ? VEH_SHORT_DESC(j->in_vehicle) : "None");
 	strcat(buf, ", Carried by: ");
 	strcat(buf, j->carried_by ? GET_NAME(j->carried_by) : "Nobody");
 	strcat(buf, ", Worn by: ");

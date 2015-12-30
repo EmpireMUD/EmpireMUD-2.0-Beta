@@ -330,6 +330,23 @@ bool audit_vehicle(vehicle_data *veh, char_data *ch) {
 
 
 /**
+* Saves the vehicles list for a room to the room file.
+*
+* @param vehicle_data *room_list The list of vehicles in the room.
+* @param FILE *fl The file open for writing.
+*/
+void Crash_save_vehicles(vehicle_data *room_list, FILE *fl) {
+	void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl);
+	
+	vehicle_data *iter;
+	
+	LL_FOREACH2(room_list, iter, next_in_room) {
+		store_one_vehicle_to_file(iter, fl);
+	}
+}
+
+
+/**
 * For the .list command.
 *
 * @param vehicle_data *veh The thing to list.
@@ -437,6 +454,359 @@ vehicle_data *read_vehicle(any_vnum vnum, bool with_triggers) {
 // Simple vnum sorter for the vehicle hash
 int sort_vehicles(vehicle_data *a, vehicle_data *b) {
 	return VEH_VNUM(a) - VEH_VNUM(b);
+}
+
+
+/**
+* write_one_vehicle_to_file: Write a vehicle to a tagged save file. Vehicle
+* tags start with %VNUM instead of #VNUM because they may co-exist with items
+* in the file.
+*
+* @param vehicle_data *veh The vehicle to save.
+* @param FILE *fl The file to save to (open for writing).
+*/
+void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
+	void Crash_save(obj_data *obj, FILE *fp, int location);
+	
+	struct vehicle_attached_mob *vam;
+	char temp[MAX_STRING_LENGTH];
+	struct resource_data *res;
+	vehicle_data *proto;
+	
+	if (!fl || !veh) {
+		log("SYSERR: write_one_vehicle_to_file called without %s", fl ? "vehicle" : "file");
+		return;
+	}
+	
+	proto = vehicle_proto(VEH_VNUM(veh));
+	
+	fprintf(fl, "%%%d\n", VEH_VNUM(veh));
+	fprintf(fl, "Flags: %s\n", bitv_to_alpha(VEH_FLAGS(veh)));
+
+	if (!proto || VEH_KEYWORDS(veh) != VEH_KEYWORDS(proto)) {
+		fprintf(fl, "Keywords:\n%s~\n", NULLSAFE(VEH_KEYWORDS(veh)));
+	}
+	if (!proto || VEH_SHORT_DESC(veh) != VEH_SHORT_DESC(proto)) {
+		fprintf(fl, "Short-desc:\n%s~\n", NULLSAFE(VEH_SHORT_DESC(veh)));
+	}
+	if (!proto || VEH_LONG_DESC(veh) != VEH_LONG_DESC(proto)) {
+		fprintf(fl, "Long-desc:\n%s~\n", NULLSAFE(VEH_LONG_DESC(veh)));
+	}
+	if (!proto || VEH_LOOK_DESC(veh) != VEH_LOOK_DESC(proto)) {
+		strcpy(temp, NULLSAFE(VEH_LOOK_DESC(veh)));
+		strip_crlf(temp);
+		fprintf(fl, "Look-desc:\n%s~\n", temp);
+	}
+	if (!proto || VEH_ICON(veh) != VEH_ICON(proto)) {
+		fprintf(fl, "Icon:\n%s~\n", NULLSAFE(VEH_ICON(veh)));
+	}
+
+	if (VEH_OWNER(veh)) {
+		fprintf(fl, "Owner: %d\n", EMPIRE_VNUM(VEH_OWNER(veh)));
+	}
+	if (VEH_SCALE_LEVEL(veh)) {
+		fprintf(fl, "Scale: %d\n", VEH_SCALE_LEVEL(veh));
+	}
+	if (VEH_HEALTH(veh) != VEH_MAX_HEALTH(veh)) {
+		fprintf(fl, "Health: %d\n", VEH_HEALTH(veh));
+	}
+	if (VEH_CONTAINS(veh)) {
+		fprintf(fl, "Contents:\n");
+		Crash_save(VEH_CONTAINS(veh), fl, LOC_INVENTORY);
+		fprintf(fl, "Contents-end\n");
+	}
+	LL_FOREACH(VEH_ANIMALS(veh), vam) {
+		fprintf(fl, "Animal: %d %d %s %d\n", vam->mob, vam->scale_level, bitv_to_alpha(vam->flags), vam->empire);
+	}
+	LL_FOREACH(VEH_NEEDS_RESOURCES(veh), res) {
+		fprintf(fl, "Needs-res: %d %d\n", res->vnum, res->amount);
+	}
+	
+	// scripts
+	if (SCRIPT(veh)) {
+		trig_data *trig;
+		
+		for (trig = TRIGGERS(SCRIPT(veh)); trig; trig = trig->next) {
+			fprintf(fl, "Trigger: %d\n", GET_TRIG_VNUM(trig));
+		}
+		
+		// TODO could save SCRIPT(obj)->global_vars here too
+	}
+	
+	fprintf(fl, "Vehicle-end\n");
+}
+
+
+/**
+* Reads a vehicle from a tagged data file.
+*
+* @param FILE *fl The file open for reading, just after the %VNUM line.
+* @param any_vnum vnum The vnum already read from the file.
+* @return vehicle_data* The loaded vehicle, if possible.
+*/
+vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
+	extern obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify);
+
+	char line[MAX_INPUT_LENGTH], error[MAX_STRING_LENGTH], s_in[MAX_INPUT_LENGTH];
+	obj_data *load_obj, *obj2, *cont_row[MAX_BAG_ROWS];
+	struct vehicle_attached_mob *vam, *last_vam = NULL;
+	int length, iter, i_in[3], location = 0, timer;
+	struct resource_data *res, *last_res = NULL;
+	vehicle_data *proto = vehicle_proto(vnum);
+	bool end = FALSE, seek_end = FALSE;
+	any_vnum load_vnum;
+	vehicle_data *veh;
+	
+	// load based on vnum or, if NOTHING, create anonymous object
+	if (proto) {
+		veh = read_vehicle(vnum, FALSE);
+	}
+	else {
+		veh = NULL;
+		seek_end = TRUE;	// signal it to skip the whole vehicle
+	}
+		
+	// for fread_string
+	sprintf(error, "unstore_vehicle_from_file %d", vnum);
+	
+	// for more readable if/else chain	
+	#define OBJ_FILE_TAG(src, tag, len)  (!strn_cmp((src), (tag), ((len) = strlen(tag))))
+
+	while (!end) {
+		if (!get_line(fl, line)) {
+			log("SYSERR: Unexpected end of pack file in unstore_vehicle_from_file");
+			exit(1);
+		}
+		
+		if (OBJ_FILE_TAG(line, "Vehicle-end", length)) {
+			end = TRUE;
+			continue;
+		}
+		else if (seek_end) {
+			// are we looking for the end of the vehicle? ignore this line
+			// WARNING: don't put any ifs that require "veh" above seek_end; obj is not guaranteed
+			continue;
+		}
+		
+		// normal tags by letter
+		switch (UPPER(*line)) {
+			case 'A': {
+				if (OBJ_FILE_TAG(line, "Animal:", length)) {
+					if (sscanf(line + length + 1, "%d %d %s %d", &i_in[0], &i_in[1], s_in, &i_in[2]) == 4) {
+						CREATE(vam, struct vehicle_attached_mob, 1);
+						vam->mob = i_in[0];
+						vam->scale_level = i_in[1];
+						vam->flags = asciiflag_conv(s_in);
+						vam->empire = i_in[2];
+						
+						// append
+						if (last_vam) {
+							last_vam->next = vam;
+						}
+						else {
+							VEH_ANIMALS(veh) = vam;
+						}
+						last_vam = vam;
+					}
+				}
+				break;
+			}
+			case 'C': {
+				if (OBJ_FILE_TAG(line, "Contents:", length)) {
+					// empty container lists
+					for (iter = 0; iter < MAX_BAG_ROWS; iter++) {
+						cont_row[iter] = NULL;
+					}
+
+					// load contents until we find an end
+					for (;;) {
+						if (!get_line(fl, line)) {
+							log("SYSERR: Format error in pack file with vehicle %d", vnum);
+							return NULL;
+						}
+						
+						if (*line == '#') {
+							if (sscanf(line, "#%d", &load_vnum) < 1) {
+								log("SYSERR: Format error in vnum line of pack file with vehicle %d", vnum);
+								return NULL;
+							}
+							if ((load_obj = Obj_load_from_file(fl, load_vnum, &location, NULL))) {
+								// Obj_load_from_file may return a NULL for deleted objs
+				
+								// Not really an inventory, but same idea.
+								if (location > 0) {
+									location = LOC_INVENTORY;
+								}
+
+								// store autostore timer through obj_to_room
+								timer = GET_AUTOSTORE_TIMER(load_obj);
+								obj_to_vehicle(load_obj, veh);
+								GET_AUTOSTORE_TIMER(load_obj) = timer;
+				
+								for (iter = MAX_BAG_ROWS - 1; iter > -location; --iter) {
+									if (cont_row[iter]) {		/* No container, back to vehicle. */
+										for (; cont_row[iter]; cont_row[iter] = obj2) {
+											obj2 = cont_row[iter]->next_content;
+											timer = GET_AUTOSTORE_TIMER(cont_row[iter]);
+											obj_to_vehicle(cont_row[iter], veh);
+											GET_AUTOSTORE_TIMER(cont_row[iter]) = timer;
+										}
+										cont_row[iter] = NULL;
+									}
+								}
+								if (iter == -location && cont_row[iter]) {			/* Content list exists. */
+									if (GET_OBJ_TYPE(load_obj) == ITEM_CONTAINER || GET_OBJ_TYPE(load_obj) == ITEM_CART || IS_CORPSE(load_obj)) {
+										/* Take the item, fill it, and give it back. */
+										obj_from_room(load_obj);
+										load_obj->contains = NULL;
+										for (; cont_row[iter]; cont_row[iter] = obj2) {
+											obj2 = cont_row[iter]->next_content;
+											obj_to_obj(cont_row[iter], load_obj);
+										}
+										timer = GET_AUTOSTORE_TIMER(load_obj);
+										obj_to_vehicle(load_obj, veh);			/* Add to vehicle first. */
+										GET_AUTOSTORE_TIMER(load_obj) = timer;
+									}
+									else {				/* Object isn't container, empty content list. */
+										for (; cont_row[iter]; cont_row[iter] = obj2) {
+											obj2 = cont_row[iter]->next_content;
+											timer = GET_AUTOSTORE_TIMER(cont_row[iter]);
+											obj_to_vehicle(cont_row[iter], veh);
+											GET_AUTOSTORE_TIMER(cont_row[iter]) = timer;
+										}
+										cont_row[iter] = NULL;
+									}
+								}
+								if (location < 0 && location >= -MAX_BAG_ROWS) {
+									obj_from_room(load_obj);
+									if ((obj2 = cont_row[-location - 1]) != NULL) {
+										while (obj2->next_content) {
+											obj2 = obj2->next_content;
+										}
+										obj2->next_content = load_obj;
+									}
+									else {
+										cont_row[-location - 1] = load_obj;
+									}
+								}
+							}
+						}
+						else if (!strn_cmp(line, "Contents-end", 12)) {
+							// done
+						}
+						else {
+							log("SYSERR: Format error in pack file for vehicle %d: %s", vnum, line);
+							return NULL;
+						}
+					}
+				}
+				break;
+			}
+			case 'F': {
+				if (OBJ_FILE_TAG(line, "Flags:", length)) {
+					if (sscanf(line + length + 1, "%s", s_in)) {
+						VEH_FLAGS(veh) = asciiflag_conv(s_in);
+					}
+				}
+				break;
+			}
+			case 'H': {
+				if (OBJ_FILE_TAG(line, "Health:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+						VEH_HEALTH(veh) = MIN(i_in[0], VEH_MAX_HEALTH(veh));
+					}
+				}
+				break;
+			}
+			case 'I': {
+				if (OBJ_FILE_TAG(line, "Icon:", length)) {
+					if (VEH_ICON(veh) && (!proto || VEH_ICON(veh) != VEH_ICON(proto))) {
+						free(VEH_ICON(veh));
+					}
+					VEH_ICON(veh) = fread_string(fl, error);
+				}
+				break;
+			}
+			case 'K': {
+				if (OBJ_FILE_TAG(line, "Keywords:", length)) {
+					if (VEH_KEYWORDS(veh) && (!proto || VEH_KEYWORDS(veh) != VEH_KEYWORDS(proto))) {
+						free(VEH_KEYWORDS(veh));
+					}
+					VEH_KEYWORDS(veh) = fread_string(fl, error);
+				}
+				break;
+			}
+			case 'L': {
+				if (OBJ_FILE_TAG(line, "Long-desc:", length)) {
+					if (VEH_LONG_DESC(veh) && (!proto || VEH_LONG_DESC(veh) != VEH_LONG_DESC(proto))) {
+						free(VEH_LONG_DESC(veh));
+					}
+					VEH_LONG_DESC(veh) = fread_string(fl, error);
+				}
+				else if (OBJ_FILE_TAG(line, "Look-desc:", length)) {
+					if (VEH_LOOK_DESC(veh) && (!proto || VEH_LOOK_DESC(veh) != VEH_LOOK_DESC(proto))) {
+						free(VEH_LOOK_DESC(veh));
+					}
+					VEH_LOOK_DESC(veh) = fread_string(fl, error);
+				}
+				break;
+			}
+			case 'N': {
+				if (OBJ_FILE_TAG(line, "Needs-res:", length)) {
+					if (sscanf(line + length + 1, "%d %d", &i_in[0], &i_in[1]) == 2) {
+						CREATE(res, struct resource_data, 1);
+						res->vnum = i_in[0];
+						res->amount = i_in[1];
+						
+						// append
+						if (last_res) {
+							last_res->next = res;
+						}
+						else {
+							VEH_NEEDS_RESOURCES(veh) = res;
+						}
+						last_res = res;
+					}
+				}
+				break;
+			}
+			case 'O': {
+				if (OBJ_FILE_TAG(line, "Owner:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+						VEH_OWNER(veh) = real_empire(i_in[0]);
+					}
+				}
+				break;
+			}
+			case 'S': {
+				if (OBJ_FILE_TAG(line, "Scale:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+						// TODO scale it
+					}
+				}
+				else if (OBJ_FILE_TAG(line, "Short-desc:", length)) {
+					if (VEH_SHORT_DESC(veh) && (!proto || VEH_SHORT_DESC(veh) != VEH_SHORT_DESC(proto))) {
+						free(VEH_SHORT_DESC(veh));
+					}
+					VEH_SHORT_DESC(veh) = fread_string(fl, error);
+				}
+				break;
+			}
+			case 'T': {
+				if (OBJ_FILE_TAG(line, "Trigger:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0]) && real_trigger(i_in[0])) {
+						if (!SCRIPT(veh)) {
+							CREATE(SCRIPT(veh), struct script_data, 1);
+						}
+						add_trigger(SCRIPT(veh), read_trigger(i_in[0]), -1);
+					}
+				}
+				break;
+			}
+		}
+	}
+	
+	return veh;	// if any
 }
 
 
