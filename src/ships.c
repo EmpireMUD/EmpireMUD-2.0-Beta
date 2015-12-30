@@ -66,33 +66,6 @@ struct ship_data_struct ship_data[] = {
  //////////////////////////////////////////////////////////////////////////////
 //// SHIP FUNCTIONS //////////////////////////////////////////////////////////
 
-/**
-* This function looks for any ships in the room, then sets or un-sets the
-* appropriate room flags.
-*
-* @param room_data *room Where to check
-*/
-void check_for_ships_present(room_data *room) {
-	obj_data *obj;
-	bool found = FALSE;
-	
-	for (obj = ROOM_CONTENTS(room); obj && !found; obj = obj->next_content) {
-		if (IS_SHIP(obj)) {
-			found = TRUE;
-		}
-	}
-	
-	if (found) {
-		SET_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_SHIP_PRESENT);
-		SET_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_SHIP_PRESENT);
-	}
-	else {
-		REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_SHIP_PRESENT);
-		REMOVE_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_SHIP_PRESENT);
-	}
-}
-
-
 static obj_data *create_ship(obj_vnum vnum, empire_data *owner, room_data *to_room) {
 	extern room_data *create_room();
 	extern room_vnum find_free_vnum(void);
@@ -379,8 +352,6 @@ bool move_ship(char_data *ch, obj_data *ship, int dir) {
 	}
 			
 	obj_to_room(ship, to_room);
-	check_for_ships_present(was_in);	// update old room
-	check_for_ships_present(to_room);	// update new room
 	
 	for (ch_iter = ROOM_PEOPLE(IN_ROOM(ship)); ch_iter; ch_iter = ch_iter->next_in_room) {
 		if (ch_iter->desc) {

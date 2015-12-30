@@ -1664,8 +1664,8 @@ typedef struct vehicle_data vehicle_data;
 #define ROOM_AFF_PUBLIC  BIT(7)	// h. Empire allows public use
 #define ROOM_AFF_DISMANTLING  BIT(8)	// i. Being dismantled
 #define ROOM_AFF_NO_FLY  BIT(9)	// j. Can't fly there
-#define ROOM_AFF_SHIP_PRESENT  BIT(10)	// k. A ship is present
-	#define ROOM_AFF_UNUSED  BIT(11)
+	#define ROOM_AFF_UNUSED1  BIT(10)
+	#define ROOM_AFF_UNUSED2  BIT(11)
 #define ROOM_AFF_NO_WORK  BIT(12)	// m. workforce ignores this room
 #define ROOM_AFF_NO_DISREPAIR  BIT(13)	// n. will not fall into disrepair
 #define ROOM_AFF_NO_DISMANTLE  BIT(14)
