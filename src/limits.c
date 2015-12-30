@@ -443,6 +443,17 @@ void real_update_char(char_data *ch) {
 		check_morph_ability(ch);
 	}
 	
+	if (GET_LEADING_VEHICLE(ch) && IN_ROOM(ch) != IN_ROOM(GET_LEADING_VEHICLE(ch))) {
+		act("You have lost $V and stop leading it.", FALSE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_CHAR);
+		VEH_LED_BY(GET_LEADING_VEHICLE(ch)) = NULL;
+		GET_LEADING_VEHICLE(ch) = NULL;
+	}
+	if (GET_LEADING_MOB(ch) && IN_ROOM(ch) != IN_ROOM(GET_LEADING_MOB(ch))) {
+		act("You have lost $N and stop leading $M.", FALSE, ch, NULL, GET_LEADING_MOB(ch), TO_CHAR);
+		GET_LED_BY(GET_LEADING_MOB(ch)) = NULL;
+		GET_LEADING_MOB(ch) = NULL;
+	}
+	
 	// check master's solo role
 	if (IS_NPC(ch) && MOB_FLAGGED(ch, MOB_FAMILIAR) && ch->master && !check_solo_role(ch->master)) {
 		act("$N vanishes because you're in the solo role but not alone.", FALSE, ch->master, NULL, ch, TO_CHAR);
