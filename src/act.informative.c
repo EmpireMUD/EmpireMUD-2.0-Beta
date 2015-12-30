@@ -875,7 +875,10 @@ void list_one_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 	size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", VEH_LONG_DESC(veh));
 	
 	// additional descriptions like what's attached:
-	if (VEH_LED_BY(veh)) {
+	if (VEH_LED_BY(veh) == ch) {
+		size += snprintf(buf + size, sizeof(buf) - size, "...you are leading it.\r\n");
+	}
+	else if (VEH_LED_BY(veh)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "...it is being led by %s.\r\n", PERS(VEH_LED_BY(veh), ch, FALSE));
 	}
 	if (VEH_ANIMALS(veh)) {
