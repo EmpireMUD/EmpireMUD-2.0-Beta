@@ -129,6 +129,42 @@ struct vehicle_attached_mob *find_harnessed_mob_by_name(vehicle_data *veh, char 
 
 
 /**
+* Finds a vehicle that will be shown in the room. The vehicle must have an icon
+* to qualify for this, and must also be complete. Vehicles in buildings are
+* never shown. Only the first valid vehicle is returned.
+*
+* @param char_data *ch The player looking.
+* @param room_data *room The room to check.
+* @return vehicle_data* A vehicle to show, if any (NULL if not).
+*/
+vehicle_data *find_vehicle_to_show(char_data *ch, room_data *room) {
+	vehicle_data *iter;
+	obj_data *on_ship;
+	bool is_on_vehicle = ((on_ship = GET_BOAT(HOME_ROOM(IN_ROOM(ch)))) && room == IN_ROOM(on_ship));
+	
+	// we don't show vehicles in buildings or closed tiles (unless the player is on a vehicle in that room, in which case we override)
+	if (!is_on_vehicle && (IS_ANY_BUILDING(room) || ROOM_IS_CLOSED(room))) {
+		return NULL;
+	}
+	
+	LL_FOREACH2(ROOM_VEHICLES(room), iter, next_in_room) {
+		if (!VEH_ICON(iter) || !*VEH_ICON(iter)) {
+			continue;	// no icon
+		}
+		if (!VEH_IS_COMPLETE(iter)) {
+			continue;	// skip incomplete
+		}
+		
+		// we'll show the first match
+		return iter;
+	}
+	
+	// nothing found
+	return NULL;
+}
+
+
+/**
 * Attaches an animal to a vehicle, and extracts the animal.
 *
 * @param char_data *mob The mob to attach.

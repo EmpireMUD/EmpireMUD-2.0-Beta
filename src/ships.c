@@ -57,10 +57,6 @@ struct ship_data_struct ship_data[] = {
 	{ "\n", NOTHING, 0, NO_ABIL, 0, 0, 0 }
 };
 
-// how ships appear in the room
-const char *boat_icon_ocean = "&0<&u44&0>";	// "&b~&0&u44&0&b~&0";
-const char *boat_icon_river = "&0<&u44&0>";	// "&c~&0&u44&0&c~&0";
-
 // currently only galleon can hold items that are !take
 #define SHIP_CAN_HOLD_OBJ(ship, obj)  (IS_SHIP(ship) && (CAN_WEAR(obj, ITEM_WEAR_TAKE) || GET_SHIP_TYPE(ship) == SHIP_GALLEON))
 

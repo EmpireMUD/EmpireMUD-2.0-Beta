@@ -35,6 +35,9 @@
 *   Commands
 */
 
+// external functions
+extern vehicle_data *find_vehicle_to_show(char_data *ch, room_data *room);
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// DATA ////////////////////////////////////////////////////////////////////
@@ -1103,9 +1106,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	extern int get_north_for_char(char_data *ch);
 	extern int get_direction_for_char(char_data *ch, int dir);
 	extern struct city_metadata_type city_type[];
-	extern const char *boat_icon_ocean;
-	extern const char *boat_icon_river;
-
+	
 	bool need_color_terminator = FALSE;
 	char buf[30], buf1[30], lbuf[MAX_STRING_LENGTH];
 	struct empire_city_data *city;
@@ -1118,7 +1119,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	sector_data *st, *base_sect = BASE_SECT(to_room);
 	char *base_color, *str;
 	room_data *map_loc = get_map_location_for(IN_ROOM(ch)), *map_to_room = get_map_location_for(to_room);
-	obj_data *on_ship;
+	vehicle_data *show_veh;
 	
 	// options
 	bool show_dark = IS_SET(options, LRR_SHOW_DARK) ? TRUE : FALSE;
@@ -1155,15 +1156,9 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 		return;
 	}
 	
-	// ship present -- in specific cases where it overrides the normal icon
-	else if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_SHIP_PRESENT) && (ROOM_SECT_FLAGGED(to_room, SECTF_FRESH_WATER | SECTF_OCEAN) || ((on_ship = GET_BOAT(HOME_ROOM(IN_ROOM(ch)))) && to_room == IN_ROOM(on_ship)))) {
-		// show boats in room
-		if (ROOM_SECT_FLAGGED(to_room, SECTF_OCEAN)) {
-			strcat(buf, boat_icon_ocean);
-		}
-		else {	// general else ... could be: if (ROOM_SECT_FLAGGED(to_room, SECTF_FRESH_WATER))
-			strcat(buf, boat_icon_river);
-		}
+	// check for a vehicle with an icon
+	else if ((show_veh = find_vehicle_to_show(ch, to_room))) {
+		strcat(buf, NULLSAFE(VEH_ICON(show_veh)));
 	}
 
 	/* Hidden buildings */
@@ -1539,10 +1534,12 @@ char *get_screenreader_room_name(room_data *from_room, room_data *to_room) {
 void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 	extern byte distance_can_see(char_data *ch);
 	extern bool can_see_player_in_other_room(char_data *ch, char_data *vict);
+	extern char *get_vehicle_short_desc(vehicle_data *veh, char_data *to);
 	
 	char buf[MAX_STRING_LENGTH], roombuf[MAX_INPUT_LENGTH], lastroom[MAX_INPUT_LENGTH], dirbuf[MAX_STRING_LENGTH], plrbuf[MAX_INPUT_LENGTH], infobuf[MAX_INPUT_LENGTH];
 	char_data *vict;
 	int mapsize, dist_iter;
+	vehicle_data *show_veh;
 	empire_data *emp;
 	room_data *to_room;
 	int repeats;
@@ -1598,10 +1595,10 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 			}
 			
 			// show ships
-			if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_SHIP_PRESENT) && ROOM_SECT_FLAGGED(to_room, SECTF_FRESH_WATER | SECTF_OCEAN)) {
-				sprintf(roombuf + strlen(roombuf), " <ship>");
+			if ((show_veh = find_vehicle_to_show(ch, to_room))) {
+				sprintf(roombuf + strlen(roombuf), " <%s>", skip_filler(get_vehicle_short_desc(show_veh, ch)));
 			}
-
+			
 			// show ownership (political)
 			if (PRF_FLAGGED(ch, PRF_POLITICAL)) {
 				emp = ROOM_OWNER(to_room);
