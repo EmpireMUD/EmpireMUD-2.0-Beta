@@ -466,7 +466,7 @@ bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room)
 	
 	// required number of mounts
 	if (count_harnessed_animals(veh) < VEH_ANIMALS_REQUIRED(veh)) {
-		snprintf(buf, sizeof(buf), "You need to harness %d animal%s to $v before it can move.", VEH_ANIMALS_REQUIRED(veh), PLURAL(VEH_ANIMALS_REQUIRED(veh)));
+		snprintf(buf, sizeof(buf), "You need to harness %d animal%s to $V before it can move.", VEH_ANIMALS_REQUIRED(veh), PLURAL(VEH_ANIMALS_REQUIRED(veh)));
 		act(buf, FALSE, ch, NULL, veh, TO_CHAR);
 		return FALSE;
 	}

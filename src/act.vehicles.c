@@ -75,10 +75,17 @@ ACMD(do_harness) {
 	else if (!MOB_FLAGGED(animal, MOB_MOUNTABLE)) {
 		act("You can't harness $N to anything!", FALSE, ch, NULL, animal, TO_CHAR);
 	}
+	else if (GET_LED_BY(animal) && GET_LED_BY(animal) != ch) {
+		act("$N is being led by someone else.", FALSE, ch, NULL, animal, TO_CHAR);
+	}
 	else if (GET_LOYALTY(animal) && GET_LOYALTY(animal) != GET_LOYALTY(ch)) {
 		msg_to_char(ch, "You can't harness animals that belong to other empires.\r\n");
 	}
 	else {
+		if (GET_LED_BY(animal)) {
+			act("You stop leading $N.", FALSE, GET_LED_BY(animal), NULL, animal, TO_CHAR);
+		}
+		
 		act("You harness $N to $v.", FALSE, ch, veh, animal, TO_CHAR | ACT_VEHICLE_OBJ);
 		act("$n harnesses you to $v.", FALSE, ch, veh, animal, TO_VICT | ACT_VEHICLE_OBJ);
 		act("$n harnesses $N to $v.", FALSE, ch, veh, animal, TO_NOTVICT | ACT_VEHICLE_OBJ);
