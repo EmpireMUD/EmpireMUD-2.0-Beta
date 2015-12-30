@@ -976,7 +976,7 @@ int perform_move(char_data *ch, int dir, int need_specials_check, byte mode) {
 		}
 		vehicle_to_room(GET_LEADING_VEHICLE(ch), IN_ROOM(ch));
 		snprintf(buf, sizeof(buf), "$V %s in behind you.", mob_move_types[VEH_MOVE_TYPE(GET_LEADING_VEHICLE(ch))]);
-		act(buf, FALSE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_ROOM);
+		act(buf, FALSE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_CHAR);
 		snprintf(buf, sizeof(buf), "$V %s in behind $n.", mob_move_types[VEH_MOVE_TYPE(GET_LEADING_VEHICLE(ch))]);
 		act(buf, FALSE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_ROOM);
 	}
