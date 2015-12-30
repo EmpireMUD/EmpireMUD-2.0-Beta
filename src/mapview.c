@@ -1895,10 +1895,11 @@ void print_object_location(int num, obj_data *obj, char_data *ch, int recur) {
 
 
 void perform_immort_where(char_data *ch, char *arg) {
-	register char_data *i;
-	register obj_data *k;
-	descriptor_data *d;
 	int check_x, check_y, num = 0, found = 0;
+	descriptor_data *d;
+	vehicle_data *veh;
+	char_data *i;
+	obj_data *k;
 
 	if (!*arg) {
 		send_to_char("Players\r\n-------\r\n", ch);
@@ -1941,6 +1942,20 @@ void perform_immort_where(char_data *ch, char *arg) {
 				}
 				else {
 					msg_to_char(ch, "M%3d. %-25s - %s(unknown) %s\r\n", ++num, GET_NAME(i), (IS_NPC(i) && i->proto_script) ? "[TRIG] " : "", get_room_name(IN_ROOM(i), FALSE));
+				}
+			}
+		}
+		num = 0;
+		LL_FOREACH2(vehicle_list, veh, next) {
+			if (CAN_SEE_VEHICLE(ch, veh) && multi_isname(arg, VEH_KEYWORDS(veh))) {
+				found = 1;
+				check_x = X_COORD(IN_ROOM(veh));	// not all locations are on the map
+				check_y = Y_COORD(IN_ROOM(veh));
+				if (CHECK_MAP_BOUNDS(check_x, check_y)) {
+					msg_to_char(ch, "V%3d. %-25s - %s(%*d, %*d) %s\r\n", ++num, VEH_SHORT_DESC(veh), (veh->proto_script ? "[TRIG] " : ""), X_PRECISION, check_x, Y_PRECISION, check_y, get_room_name(IN_ROOM(veh), FALSE));
+				}
+				else {
+					msg_to_char(ch, "V%3d. %-25s - %s(unknown) %s\r\n", ++num, VEH_SHORT_DESC(veh), (veh->proto_script ? "[TRIG] " : ""), get_room_name(IN_ROOM(veh), FALSE));
 				}
 			}
 		}
