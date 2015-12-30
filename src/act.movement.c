@@ -472,7 +472,7 @@ bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room)
 	}
 	
 	// closed building?
-	if (VEH_FLAGGED(veh, VEH_NO_BUILDING) && !IS_INSIDE(IN_ROOM(ch)) && !ROOM_IS_CLOSED(IN_ROOM(ch)) && !IS_ADVENTURE_ROOM(IN_ROOM(ch)) && IS_ANY_BUILDING(to_room) && ROOM_IS_CLOSED(to_room)) {
+	if ((VEH_FLAGGED(veh, VEH_NO_BUILDING) || !BLD_ALLOWS_MOUNTS(to_room)) && !IS_INSIDE(IN_ROOM(ch)) && !ROOM_IS_CLOSED(IN_ROOM(ch)) && !IS_ADVENTURE_ROOM(IN_ROOM(ch)) && IS_ANY_BUILDING(to_room) && ROOM_IS_CLOSED(to_room)) {
 		act("$V can't go in there.", FALSE, ch, NULL, veh, TO_CHAR);
 		return FALSE;
 	}
