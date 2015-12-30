@@ -4241,11 +4241,9 @@ void write_room_to_file(FILE *fl, room_data *room) {
 	// C: load commands
 	{
 		// must save obj pack instruction BEFORE mob instruction
-		if (ROOM_CONTENTS(room)) {
-			if (objpack_save_room(room)) {
-				// C O
-				fprintf(fl, "C O\n");
-			}
+		if (objpack_save_room(room)) {
+			// C O
+			fprintf(fl, "C O\n");
 		}
 		// triggers: C T type vnum
 		if (SCRIPT(room)) {

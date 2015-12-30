@@ -748,7 +748,7 @@ bool objpack_save_room(room_data *room) {
 	char filename[MAX_INPUT_LENGTH], tempname[MAX_INPUT_LENGTH];
 	FILE *fp;
 
-	if (!ROOM_CONTENTS(room)) {
+	if (!ROOM_CONTENTS(room) && !ROOM_VEHICLES(room)) {
 		return FALSE;
 	}
 
