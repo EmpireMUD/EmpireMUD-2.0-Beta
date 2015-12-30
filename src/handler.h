@@ -78,8 +78,6 @@ extern bool room_affected_by_spell(room_data *room, int type);
 #define create_mod_aff(type, duration, loc, mod, cast_by)  create_aff((type), (duration), (loc), (mod), 0, (cast_by))
 
 // character handlers
-extern bool char_from_chair(char_data *ch);
-extern bool char_to_chair(char_data *ch, obj_data *chair);
 void extract_char(char_data *ch);
 void extract_char_final(char_data *ch);
 void perform_dismount(char_data *ch);
@@ -279,6 +277,8 @@ void store_unique_item(char_data *ch, obj_data *obj, empire_data *emp, room_data
 
 // vehicle handlers
 void extract_vehicle(vehicle_data *veh);
+void sit_on_vehicle(char_data *ch, vehicle_data *veh);
+void unseat_char_from_vehicle(char_data *ch);
 void vehicle_from_room(vehicle_data *veh);
 void vehicle_to_room(vehicle_data *veh, room_data *room);
 

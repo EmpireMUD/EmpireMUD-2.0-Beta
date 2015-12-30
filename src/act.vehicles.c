@@ -42,6 +42,78 @@ extern char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, v
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
 
+/**
+* Command processing for a character who is trying to sit in/on a vehicle.
+*
+* @param char_data *ch The person trying to sit.
+* @param char *argument The targeting arg.
+*/
+void do_sit_on_vehicle(char_data *ch, char *argument) {
+	vehicle_data *veh;
+	
+	skip_spaces(&argument);	// usually done ahead of time, but in case
+	
+	if (GET_POS(ch) == POS_FIGHTING) {
+		msg_to_char(ch, "You can't really do that right now!\r\n");
+	}
+	else if (GET_POS(ch) < POS_STANDING || GET_SITTING_ON(ch)) {
+		msg_to_char(ch, "You need to stand up before you can do that.\r\n");
+	}
+	else if (IS_RIDING(ch)) {
+		msg_to_char(ch, "You can't do that while mounted.\r\n");
+	}
+	else if (!(veh = get_vehicle_in_room_vis(ch, argument))) {
+		msg_to_char(ch, "You don't see anything like that here.\r\n");
+	}
+	else if (!VEH_FLAGGED(veh, VEH_SIT)) {
+		msg_to_char(ch, "You can't sit on that!\r\n");
+	}
+	else if (!VEH_IS_COMPLETE(veh)) {
+		msg_to_char(ch, "You can't sit %s it until it's finished.\r\n", VEH_FLAGGED(veh, VEH_IN) ? "in" : "on");
+	}
+	else if (VEH_SITTING_ON(veh) != ch) {
+		msg_to_char(ch, "Someone else is already sitting %s it.\r\n", VEH_FLAGGED(veh, VEH_IN) ? "in" : "on");
+	}
+	else if (VEH_LED_BY(veh)) {
+		msg_to_char(ch, "You can't sit %s it while %s leading it around.\r\n", VEH_FLAGGED(veh, VEH_IN) ? "in" : "on", (VEH_LED_BY(veh) == ch) ? "you are" : "someone else is");
+	}
+	else if (GET_LEADING_VEHICLE(ch) || GET_LEADING_MOB(ch)) {
+		msg_to_char(ch, "You can't sit %s it while you're leading something.\r\n", VEH_FLAGGED(veh, VEH_IN) ? "in" : "on");
+	}
+	else {
+		act("You sit on $V.", FALSE, ch, NULL, veh, TO_CHAR);
+		act("$n sits on $V.", FALSE, ch, NULL, veh, TO_ROOM);
+		sit_on_vehicle(ch, veh);
+		GET_POS(ch) = POS_SITTING;
+	}
+}
+
+
+/**
+* Processes a request to remove a character from a chair/vehicle and sends
+* a message. Exits early if the character is not actually in/on a vehicle.
+*
+* @param char_data *ch The person getting up.
+*/
+void do_unseat_from_vehicle(char_data *ch) {
+	char buf[MAX_STRING_LENGTH];
+	
+	if (!GET_SITTING_ON(ch)) {
+		return;
+	}
+	
+	snprintf(buf, sizeof(buf), "You get up %s of $V.", VEH_FLAGGED(GET_SITTING_ON(ch), VEH_IN) ? "out" : "off");
+	act(buf, FALSE, ch, NULL, GET_SITTING_ON(ch), TO_CHAR);
+
+	snprintf(buf, sizeof(buf), "$n gets up %s of $V.", VEH_FLAGGED(GET_SITTING_ON(ch), VEH_IN) ? "out" : "off");
+	act(buf, TRUE, ch, NULL, GET_SITTING_ON(ch), TO_ROOM);
+
+	unseat_char_from_vehicle(ch);
+	if (GET_POS(ch) == POS_SITTING) {
+		GET_POS(ch) = FIGHTING(ch) ? POS_FIGHTING : POS_STANDING;
+	}
+}
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// COMMANDS ////////////////////////////////////////////////////////////////
@@ -115,6 +187,9 @@ ACMD(do_lead) {
 	else if (IS_NPC(ch)) {
 		msg_to_char(ch, "Npcs can't lead anything.\r\n");
 	}
+	else if (GET_SITTING_ON(ch)) {
+		msg_to_char(ch, "You can't lead anything while you're sitting %s something.\r\n", VEH_FLAGGED(GET_SITTING_ON(ch), VEH_IN) ? "in" : "on");
+	}
 	else if (!*arg) {
 		msg_to_char(ch, "Lead whom (or what)?\r\n");
 	}
@@ -161,6 +236,9 @@ ACMD(do_lead) {
 		}
 		else if (VEH_OWNER(veh) && VEH_OWNER(veh) != GET_LOYALTY(ch)) {
 			msg_to_char(ch, "You can't lead something owned by another empire.\r\n");
+		}
+		else if (VEH_SITTING_ON(veh)) {
+			msg_to_char(ch, "You can't lead it while %s sitting on it.\r\n", (VEH_SITTING_ON(veh) == ch) ? "you are" : "someone else is");
 		}
 		else {
 			act("You begin to lead $V.", FALSE, ch, NULL, veh, TO_CHAR);

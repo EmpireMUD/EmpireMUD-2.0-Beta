@@ -2155,6 +2155,7 @@ int get_attribute_by_name(char *name) {
 * @return bool TRUE if the character ended up standing (>= fighting), FALSE if not.
 */
 bool wake_and_stand(char_data *ch) {
+	void do_unseat_from_vehicle(char_data *ch);
 	char buf[MAX_STRING_LENGTH];
 	bool was_sleeping = FALSE;
 	
@@ -2165,6 +2166,7 @@ bool wake_and_stand(char_data *ch) {
 		}
 		case POS_RESTING:
 		case POS_SITTING: {
+			do_unseat_from_vehicle(ch);
 			GET_POS(ch) = POS_STANDING;
 			msg_to_char(ch, "You %sget up.\r\n", (was_sleeping ? "awaken and " : ""));
 			snprintf(buf, sizeof(buf), "$n %sgets up.", (was_sleeping ? "awakens and " : ""));

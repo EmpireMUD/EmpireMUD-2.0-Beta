@@ -313,11 +313,21 @@ ACMD(do_mount) {
 		msg_to_char(ch, "What did you want to mount?\r\n");
 	}
 	else if (*arg && !(mob = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
-		send_config_msg(ch, "no_person");
+		// special case: mount/ride a vehicle
+		if (get_vehicle_in_room_vis(ch, arg)) {
+			void do_sit_on_vehicle(char_data *ch, char *argument);
+			do_sit_on_vehicle(ch, arg);
+		}
+		else {
+			send_config_msg(ch, "no_person");
+		}
 	}
 	else if (!mob && IS_COMPLETE(IN_ROOM(ch)) && !BLD_ALLOWS_MOUNTS(IN_ROOM(ch))) {
 		// only check this if they didn't target a mob -- still need to be able to pick up new mounts indoors
 		msg_to_char(ch, "You can't mount here.\r\n");
+	}
+	else if (GET_SITTING_ON(ch)) {
+		msg_to_char(ch, "You're already sitting %s something.\r\n", VEH_FLAGGED(GET_SITTING_ON(ch), VEH_IN) ? "in" : "on");
 	}
 	else if (mob && ch == mob) {
 		msg_to_char(ch, "You can't mount yourself.\r\n");

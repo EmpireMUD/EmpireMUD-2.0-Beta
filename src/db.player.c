@@ -3155,7 +3155,6 @@ void reset_char(char_data *ch) {
 	ch->next = NULL;
 	ch->next_fighting = NULL;
 	ch->next_in_room = NULL;
-	ON_CHAIR(ch) = NULL;
 	FIGHTING(ch) = NULL;
 	ch->char_specials.position = POS_STANDING;
 	

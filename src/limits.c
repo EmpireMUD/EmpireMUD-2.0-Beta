@@ -423,6 +423,7 @@ void real_update_char(char_data *ch) {
 	extern bool can_wear_item(char_data *ch, obj_data *item, bool send_messages);
 	void check_morph_ability(char_data *ch);
 	extern int compute_bonus_exp_per_day(char_data *ch);
+	void do_unseat_from_vehicle(char_data *ch);
 	extern int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname);	
 	void random_encounter(char_data *ch);
 	void update_biting_char(char_data *ch);
@@ -452,6 +453,12 @@ void real_update_char(char_data *ch) {
 		act("You have lost $N and stop leading $M.", FALSE, ch, NULL, GET_LEADING_MOB(ch), TO_CHAR);
 		GET_LED_BY(GET_LEADING_MOB(ch)) = NULL;
 		GET_LEADING_MOB(ch) = NULL;
+	}
+	if (GET_SITTING_ON(ch)) {
+		// things that cancel sitting-on:
+		if (IN_ROOM(ch) != IN_ROOM(GET_SITTING_ON(ch)) || GET_POS(ch) != POS_SITTING || IS_RIDING(ch) || GET_LEADING_MOB(ch) || GET_LEADING_VEHICLE(ch)) {
+			do_unseat_from_vehicle(ch);
+		}
 	}
 	
 	// check master's solo role

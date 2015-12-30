@@ -784,47 +784,6 @@ bool room_affected_by_spell(room_data *room, int type) {
 //////////////////////////////////////////////////////////////////////////////
 //// CHARACTER HANDLERS /////////////////////////////////////////////////////
 
-
-/**
-* Removes a person from the chair he was sitting in.
-*
-* @param char_data *ch The character to remove from a chair.
-* @return bool TRUE if a character was removed from a chair, FALSE if not
-*/
-bool char_from_chair(char_data *ch) {
-	obj_data *chair;
-	bool result = FALSE;
-
-	if ((chair = ON_CHAIR(ch))) {
-		ON_CHAIR(ch) = NULL;
-		IN_CHAIR(chair) = NULL;
-		result = TRUE;
-	}
-	
-	return result;
-}
-
-
-/**
-* Puts a character in a chair, if possible.
-*
-* @param char_data *ch The sitter.
-* @param obj_data *chair The sittee.
-* @return bool TRUE if successful, otherwise FALSE
-*/
-bool char_to_chair(char_data *ch, obj_data *chair) {
-	bool result = FALSE;
-	
-	if (ch && chair && !IN_CHAIR(chair) && !ON_CHAIR(ch)) {
-		IN_CHAIR(chair) = ch;
-		ON_CHAIR(ch) = chair;
-		result = TRUE;
-	}
-
-	return result;
-}
-
-
 /* Extract a ch completely from the world, and leave his stuff behind */
 void extract_char_final(char_data *ch) {
 	void die_follower(char_data *ch);
@@ -1183,11 +1142,7 @@ void char_from_room(char_data *ch) {
 		log("SYSERR: NULL character or no location in %s, char_from_room", __FILE__);
 		exit(1);
 	}
-
-	if (ON_CHAIR(ch)) {
-		char_from_chair(ch);
-	}
-
+	
 	if (FIGHTING(ch) != NULL) {
 		stop_fighting(ch);
 	}
@@ -4121,10 +4076,6 @@ void obj_from_room(obj_data *object) {
 		log("SYSERR: NULL object (%p) or obj not in a room (%p) passed to obj_from_room", object, IN_ROOM(object));
 	}
 	else {
-		if (IN_CHAIR(object)) {
-			char_from_chair(IN_CHAIR(object));
-		}
-
 		// update lights
 		if (OBJ_FLAGGED(object, OBJ_LIGHT)) {
 			ROOM_LIGHTS(IN_ROOM(object))--;
@@ -6063,6 +6014,35 @@ void extract_vehicle(vehicle_data *veh) {
 	
 	LL_DELETE2(vehicle_list, veh, next);
 	free_vehicle(veh);
+}
+
+
+/**
+* @param char_data *ch Someone trying to sit.
+* @param vehicle_data *veh The vehicle to seat them on.
+*/
+void sit_on_vehicle(char_data *ch, vehicle_data *veh) {
+	// safety first
+	if (GET_SITTING_ON(ch)) {
+		unseat_char_from_vehicle(ch);
+	}
+	if (VEH_SITTING_ON(veh)) {
+		unseat_char_from_vehicle(VEH_SITTING_ON(veh));
+	}
+	
+	GET_SITTING_ON(ch) = veh;
+	VEH_SITTING_ON(veh) = ch;
+}
+
+
+/**
+* @param char_data *ch A player to remove from the seat he is in/on.
+*/
+void unseat_char_from_vehicle(char_data *ch) {
+	if (GET_SITTING_ON(ch)) {
+		VEH_SITTING_ON(GET_SITTING_ON(ch)) = NULL;
+	}
+	GET_SITTING_ON(ch) = NULL;
 }
 
 

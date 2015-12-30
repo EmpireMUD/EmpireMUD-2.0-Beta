@@ -46,6 +46,7 @@ extern const struct wear_data_type wear_data[NUM_WEARS];
 // external functions
 extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 extern char *get_room_name(room_data *room, bool color);
+extern char *list_harnessed_mobs(vehicle_data *veh);
 void look_at_vehicle(vehicle_data *veh, char_data *ch);
 extern char *morph_string(char_data *ch, byte type);
 
@@ -665,6 +666,7 @@ void list_lore_to_char(char_data *ch, char_data *to) {
 * @param int num If mob-stacking is on, number of copies of this i to show.
 */
 void list_one_char(char_data *i, char_data *ch, int num) {
+	extern char *get_vehicle_short_desc(vehicle_data *veh, char_data *to);
 	extern struct action_data_struct action_data[];
 	
 	// POS_x
@@ -761,8 +763,8 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 			strcat(buf, " (writing)");
 
 		if (GET_POS(i) != POS_FIGHTING) {
-			if (ON_CHAIR(i) && !IS_DEAD(i)) {
-				sprintf(buf + strlen(buf), " is sitting on %s.", CAN_SEE_OBJ(ch, ON_CHAIR(i)) ? GET_OBJ_DESC(ON_CHAIR(i), ch, OBJ_DESC_SHORT) : "something");			
+			if (GET_SITTING_ON(i)) {
+				sprintf(buf + strlen(buf), " is sitting %s %s%s%s.", VEH_FLAGGED(GET_SITTING_ON(i), VEH_IN) ? "in" : "on", get_vehicle_short_desc(GET_SITTING_ON(i), ch), (VEH_ANIMALS(GET_SITTING_ON(i)) ? ", being pulled by " : ""), (VEH_ANIMALS(GET_SITTING_ON(i)) ? list_harnessed_mobs(GET_SITTING_ON(i)) : ""));
 			}
 			else if (!IS_NPC(i) && GET_ACTION(i) != ACT_NONE) {
 				sprintf(buf + strlen(buf), " %s", action_data[GET_ACTION(i)].long_desc);
@@ -861,8 +863,6 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 * @param char_data *ch The person to send the output to.
 */
 void list_one_vehicle_to_char(vehicle_data *veh, char_data *ch) {
-	extern char *list_harnessed_mobs(vehicle_data *veh);
-	
 	char buf[MAX_STRING_LENGTH];
 	size_t size = 0;
 	
@@ -875,12 +875,21 @@ void list_one_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 	size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", VEH_LONG_DESC(veh));
 	
 	// additional descriptions like what's attached:
+	if (VEH_SITTING_ON(veh) == ch) {
+		size += snprintf(buf + size, sizeof(buf) - size, "...you are sitting %s it.\r\n", VEH_FLAGGED(veh, VEH_IN) ? "in" : "on");
+	}
+	else if (VEH_SITTING_ON(veh)) {
+		// this is PROBABLY not shown to players
+		size += snprintf(buf + size, sizeof(buf) - size, "...%s is sitting %s it.\r\n", PERS(VEH_SITTING_ON(veh), ch, FALSE), VEH_FLAGGED(veh, VEH_IN) ? "in" : "on");
+	}
+	
 	if (VEH_LED_BY(veh) == ch) {
 		size += snprintf(buf + size, sizeof(buf) - size, "...you are leading it.\r\n");
 	}
 	else if (VEH_LED_BY(veh)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "...it is being led by %s.\r\n", PERS(VEH_LED_BY(veh), ch, FALSE));
 	}
+	
 	if (VEH_ANIMALS(veh)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "...it is being pulled by %s.\r\n", list_harnessed_mobs(veh));
 	}
@@ -907,6 +916,9 @@ void list_vehicles_to_char(vehicle_data *list, char_data *ch) {
 		// conditions to show
 		if (!CAN_SEE_VEHICLE(ch, veh)) {
 			continue;	// should we show a "something" ?
+		}
+		if (VEH_SITTING_ON(veh) && VEH_SITTING_ON(veh) != ch) {
+			continue;	// don't show vehicles someone else is sitting on
 		}
 		
 		list_one_vehicle_to_char(veh, ch);
@@ -1235,7 +1247,7 @@ void list_obj_to_char(obj_data *list, char_data *ch, int mode, int show) {
 			}
 		}
 
-		if (CAN_SEE_OBJ(ch, i) && (!IN_CHAIR(i) || ch == IN_CHAIR(i))) {
+		if (CAN_SEE_OBJ(ch, i)) {
 			if (mode == OBJ_DESC_LONG) {
 				send_to_char("&g", ch);
 			}
@@ -1272,10 +1284,6 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 	}
 	else {
 		strcpy(buf, GET_OBJ_DESC(obj, ch, mode));
-	}
-	
-	if (mode == OBJ_DESC_LONG && IN_CHAIR(obj) == ch) {
-		strcat(buf, "...you are sitting on it.");
 	}
 
 	if (mode == OBJ_DESC_EQUIPMENT) {

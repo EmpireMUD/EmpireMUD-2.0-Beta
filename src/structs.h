@@ -2806,8 +2806,6 @@ struct char_special_data {
 
 	// UNSAVED SECTION //
 	
-	obj_data *chair;	// Object that this char's sitting in
-
 	struct fight_data fighting;	// Opponent
 	char_data *hunting;	// Char hunted by this char
 
@@ -2817,6 +2815,7 @@ struct char_special_data {
 	char_data *led_by;	// A person may lead a mob
 	char_data *leading_mob;	// A mob may lead a person
 	vehicle_data *leading_vehicle;	// A person may lead a vehicle
+	vehicle_data *sitting_on;	// Vehicle the person is on
 	
 	struct empire_npc_data *empire_npc;	// if this is an empire spawn
 	
@@ -3414,8 +3413,7 @@ struct obj_data {
 	struct interaction_item *interactions;	// interaction items
 	struct obj_storage_type *storage;	// linked list of where an obj can be stored
 	time_t autostore_timer;	// how long an object has been where it be
-
-	char_data *sitting;	// Person in the chair
+	
 	struct obj_binding *bound_to;	// LL of who it's bound to
 
 	obj_data *in_obj;	// In what object NULL when none
@@ -3524,6 +3522,7 @@ struct vehicle_data {
 	struct resource_data *needs_resources;	// resources until finished/maintained
 	room_data *in_room;	// where it is
 	char_data *led_by;	// person leading it
+	char_data *sitting_on;	// person sitting on it
 	
 	// scripting
 	int id;	// used by DG triggers - unique id

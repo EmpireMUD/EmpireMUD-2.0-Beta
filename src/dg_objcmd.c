@@ -387,7 +387,6 @@ OCMD(do_otransform) {
 		tmpobj.last_owner_id = obj->last_owner_id;
 		tmpobj.stolen_timer = obj->stolen_timer;
 		tmpobj.autostore_timer = obj->autostore_timer;
-		tmpobj.sitting = obj->sitting;
 		tmpobj.carried_by = obj->carried_by;
 		tmpobj.in_vehicle = obj->in_vehicle;
 		tmpobj.worn_by = obj->worn_by;

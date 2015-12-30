@@ -312,10 +312,10 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_LED_BY(ch)  ((ch)->char_specials.led_by)
 #define GET_MANA_REGEN(ch)  ((ch)->char_specials.mana_regen)
 #define GET_MOVE_REGEN(ch)  ((ch)->char_specials.move_regen)
+#define GET_SITTING_ON(ch)  ((ch)->char_specials.sitting_on)
 #define GET_POS(ch)  ((ch)->char_specials.position)
 #define HUNTING(ch)  ((ch)->char_specials.hunting)
 #define IS_CARRYING_N(ch)  ((ch)->char_specials.carry_items)
-#define ON_CHAIR(ch)  ((ch)->char_specials.chair)
 
 
 // definitions
@@ -628,7 +628,6 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_OBJ_VAL(obj, val)  ((obj)->obj_flags.value[(val)])
 #define GET_OBJ_WEAR(obj)  ((obj)->obj_flags.wear_flags)
 #define GET_STOLEN_TIMER(obj)  ((obj)->stolen_timer)
-#define IN_CHAIR(obj)  ((obj)->sitting)
 #define LAST_OWNER_ID(obj)  ((obj)->last_owner_id)
 #define OBJ_BOUND_TO(obj)  ((obj)->bound_to)
 #define OBJ_VERSION(obj)  ((obj)->version)
@@ -647,7 +646,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define CAN_WEAR(obj, part)  (IS_SET(GET_OBJ_WEAR(obj), (part)))
 
 // for stacking, sotring, etc
-#define OBJ_CAN_STACK(obj)  (GET_OBJ_TYPE(obj) != ITEM_CONTAINER && !OBJ_FLAGGED((obj), OBJ_ENCHANTED) && !IN_CHAIR(obj) && !IS_ARROW(obj))
+#define OBJ_CAN_STACK(obj)  (GET_OBJ_TYPE(obj) != ITEM_CONTAINER && !OBJ_FLAGGED((obj), OBJ_ENCHANTED) && !IS_ARROW(obj))
 #define OBJ_CAN_STORE(obj)  ((obj)->storage && !OBJ_BOUND_TO(obj) && !OBJ_FLAGGED((obj), OBJ_SUPERIOR | OBJ_ENCHANTED))
 #define UNIQUE_OBJ_CAN_STORE(obj)  (!OBJ_BOUND_TO(obj) && !OBJ_CAN_STORE(obj) && !OBJ_FLAGGED((obj), OBJ_JUNK) && (!OBJ_FLAGGED((obj), OBJ_LIGHT) || GET_OBJ_TIMER(obj) == UNLIMITED) && !IS_STOLEN(obj))
 #define OBJ_STACK_FLAGS  (OBJ_SUPERIOR | OBJ_KEEP)
@@ -1126,6 +1125,7 @@ void SET_ISLAND_ID(room_data *room, int island);	// formerly a #define and a roo
 #define VEH_OWNER(veh)  ((veh)->owner)
 #define VEH_SCALE_LEVEL(veh)  ((veh)->scale_level)
 #define VEH_SHORT_DESC(veh)  ((veh)->short_desc)
+#define VEH_SITTING_ON(veh)  ((veh)->sitting_on)
 #define VEH_VNUM(veh)  ((veh)->vnum)
 
 // attribute (non-instanced) data
