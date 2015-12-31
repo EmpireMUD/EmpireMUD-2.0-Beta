@@ -3700,7 +3700,7 @@ ACMD(do_get) {
 		}
 		cont_dotmode = find_all_dots(arg2);
 		if (cont_dotmode == FIND_INDIV) {
-			mode = generic_find(arg2, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP, ch, &tmp_char, &cont, &find_vehicle);
+			mode = generic_find(arg2, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM, ch, &tmp_char, &cont, &find_vehicle);
 			
 			// pass off to vehicle handler
 			if (find_vehicle) {
@@ -4259,7 +4259,7 @@ ACMD(do_put) {
 		send_to_char(buf, ch);
 	}
 	else {
-		generic_find(thecont, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP, ch, &tmp_char, &cont, &find_vehicle);
+		generic_find(thecont, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM, ch, &tmp_char, &cont, &find_vehicle);
 		
 		// override for put obj in vehicle
 		if (find_vehicle) {
