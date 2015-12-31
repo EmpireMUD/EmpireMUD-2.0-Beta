@@ -4210,9 +4210,11 @@ ACMD(do_pour) {
 *  all objects to be put into container must be in inventory.
 */
 ACMD(do_put) {
+	void do_put_obj_in_vehicle(char_data *ch, vehicle_data *veh, int dotmode, char *arg, int howmany);
+	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
 	obj_data *obj, *next_obj, *cont;
-	vehicle_data *tmp_veh;
+	vehicle_data *find_vehicle;
 	char_data *tmp_char;
 	int obj_dotmode, cont_dotmode, found = 0, howmany = 1;
 	char *theobj, *thecont;
@@ -4243,7 +4245,14 @@ ACMD(do_put) {
 		send_to_char(buf, ch);
 	}
 	else {
-		generic_find(thecont, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP, ch, &tmp_char, &cont, &tmp_veh);
+		generic_find(thecont, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP, ch, &tmp_char, &cont, &find_vehicle);
+		
+		// override for put obj in vehicle
+		if (find_vehicle) {
+			do_put_obj_in_vehicle(ch, find_vehicle, obj_dotmode, theobj, howmany);
+			return;
+		}
+		
 		if (!cont) {
 			sprintf(buf, "You don't see %s %s here.\r\n", AN(thecont), thecont);
 			send_to_char(buf, ch);

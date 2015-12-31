@@ -25,6 +25,7 @@
 /**
 * Contents:
 *   Helpers
+*   Sub-Commands
 *   Commands
 */
 
@@ -41,6 +42,34 @@ extern char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, v
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
+
+/**
+* Processes putting a single item into a vehicle.
+*
+* @param char_data *ch The player acting.
+* @param obj_data *obj The item being put.
+* @param vehicle_data *veh The vehicle to put it in.
+* @return bool TRUE if successful, FALSE if not.
+*/
+bool perform_put_obj_in_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh) {
+	if (!drop_otrigger(obj, ch)) {	// also takes care of obj purging self
+		return FALSE;
+	}
+	
+	if (VEH_CARRYING_N(veh) + obj_carry_size(obj) > VEH_CAPACITY(veh)) {
+		act("$p won't fit in $V.", FALSE, ch, obj, veh, TO_CHAR);
+		return FALSE;
+	}
+	
+	obj_to_vehicle(obj, veh);
+	act("$n puts $p in $V.", TRUE, ch, obj, veh, TO_ROOM);
+	act("You put $p in $V.", FALSE, ch, obj, veh, TO_CHAR);
+	return TRUE;
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// SUB-COMMANDS ////////////////////////////////////////////////////////////
 
 /**
 * Command processing for a character who is trying to sit in/on a vehicle.
@@ -85,6 +114,80 @@ void do_sit_on_vehicle(char_data *ch, char *argument) {
 		act("$n sits on $V.", FALSE, ch, NULL, veh, TO_ROOM);
 		sit_on_vehicle(ch, veh);
 		GET_POS(ch) = POS_SITTING;
+	}
+}
+
+
+/**
+* Processor for "put [number] <obj(s)> <vehicle>"
+*
+* @param char_data *ch The player.
+* @param vehicle_data *veh Which vehicle.
+* @param int dotmode Detected FIND_ dotmode ("all.obj").
+* @param char *arg The object name typed by the player.
+* @param int howmany Number to put (1+).
+*/
+void do_put_obj_in_vehicle(char_data *ch, vehicle_data *veh, int dotmode, char *arg, int howmany) {
+	obj_data *obj, *next_obj;
+	bool multi = (howmany > 1);
+	bool found = FALSE;
+	
+	if (!VEH_FLAGGED(veh, VEH_CONTAINER)) {
+		act("$V is not a container.", FALSE, ch, NULL, veh, TO_CHAR);
+		return;
+	}
+	if (VEH_OWNER(veh) && VEH_OWNER(veh) != GET_LOYALTY(ch)) {
+		msg_to_char(ch, "You can't put items into vehicles owned by other empires.\r\n");
+		return;
+	}
+	
+	if (dotmode == FIND_INDIV) {	// put <obj> <vehicle>
+		if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+			msg_to_char(ch, "You aren't carrying %s %s.\r\n", AN(arg), arg);
+		}
+		else if (multi && OBJ_FLAGGED(obj, OBJ_KEEP)) {
+			msg_to_char(ch, "You marked that 'keep' and can't put it in anything unless you unkeep it.\r\n");
+		}
+		else {
+			while (obj && howmany--) {
+				next_obj = obj->next_content;
+				
+				if (multi && OBJ_FLAGGED(obj, OBJ_KEEP)) {
+					continue;
+				}
+				
+				if (!perform_put_obj_in_vehicle(ch, obj, veh)) {
+					break;
+				}
+				
+				obj = get_obj_in_list_vis(ch, arg, next_obj);
+				found = TRUE;
+			}
+			
+			if (!found) {
+				msg_to_char(ch, "You didn't seem to have any that aren't marked 'keep'.\r\n");
+			}
+		}
+	}
+	else {
+		LL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
+			if (CAN_SEE_OBJ(ch, obj) && (dotmode == FIND_ALL || isname(arg, GET_OBJ_KEYWORDS(obj)))) {
+				if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
+					continue;
+				}
+				found = TRUE;
+				if (!perform_put_obj_in_vehicle(ch, obj, veh)) {
+					break;
+				}
+			}
+		}
+		if (!found) {
+			if (dotmode == FIND_ALL)
+				msg_to_char(ch, "You don't seem to have any non-keep items to put in it.\r\n");
+			else {
+				msg_to_char(ch, "You don't seem to have any %ss that aren't marked 'keep'.\r\n", arg);
+			}
+		}
 	}
 }
 
