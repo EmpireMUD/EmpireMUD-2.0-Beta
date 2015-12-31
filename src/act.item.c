@@ -77,7 +77,7 @@ static void wear_message(char_data *ch, obj_data *obj, int where);
 * @param obj_data *obj The item he's trying to take.
 * @return bool TRUE if ch can take obj.
 */
-static bool can_take_obj(char_data *ch, obj_data *obj) {
+bool can_take_obj(char_data *ch, obj_data *obj) {
 	if (!IS_NPC(ch) && !CAN_CARRY_OBJ(ch, obj)) {
 		act("$p: you can't carry that many items.", FALSE, ch, obj, 0, TO_CHAR);
 		return FALSE;
@@ -3671,9 +3671,11 @@ ACMD(do_exchange) {
 
 
 ACMD(do_get) {
+	void do_get_from_vehicle(char_data *ch, vehicle_data *veh, char *arg, int mode, int howmany);
+
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
 	int cont_dotmode, found = 0, mode;
-	vehicle_data *tmp_veh;
+	vehicle_data *find_vehicle, *veh;
 	obj_data *cont;
 	char_data *tmp_char;
 
@@ -3698,7 +3700,14 @@ ACMD(do_get) {
 		}
 		cont_dotmode = find_all_dots(arg2);
 		if (cont_dotmode == FIND_INDIV) {
-			mode = generic_find(arg2, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP, ch, &tmp_char, &cont, &tmp_veh);
+			mode = generic_find(arg2, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP, ch, &tmp_char, &cont, &find_vehicle);
+			
+			// pass off to vehicle handler
+			if (find_vehicle) {
+				do_get_from_vehicle(ch, find_vehicle, arg1, mode, amount);
+				return;
+			}
+			
 			if (!cont) {
 				sprintf(buf, "You don't have %s %s.\r\n", AN(arg2), arg2);
 				send_to_char(buf, ch);
@@ -3712,6 +3721,11 @@ ACMD(do_get) {
 			if (cont_dotmode == FIND_ALLDOT && !*arg2) {
 				send_to_char("Get from all of what?\r\n", ch);
 				return;
+			}
+			LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+				if (CAN_SEE_VEHICLE(ch, veh) && (cont_dotmode == FIND_ALL || isname(arg2, VEH_KEYWORDS(veh)))) {
+					do_get_from_vehicle(ch, veh, arg1, FIND_OBJ_ROOM, amount);
+				}
 			}
 			for (cont = ch->carrying; cont; cont = cont->next_content) {
 				if (CAN_SEE_OBJ(ch, cont) && (cont_dotmode == FIND_ALL || isname(arg2, GET_OBJ_KEYWORDS(cont)))) {

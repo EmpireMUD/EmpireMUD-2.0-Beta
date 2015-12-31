@@ -37,11 +37,52 @@
 extern int count_harnessed_animals(vehicle_data *veh);
 extern struct vehicle_attached_mob *find_harnessed_mob_by_name(vehicle_data *veh, char *name);
 void harness_mob_to_vehicle(char_data *mob, vehicle_data *veh);
+void scale_item_to_level(obj_data *obj, int level);
 extern char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh);
 
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
+
+/**
+* Processes a get-item-from-vehicle.
+*
+* @param char_data *ch The person trying to get.
+* @param obj_data *obj The item to get.
+* @Param vehicle_data *veh The vehicle the item is in.
+* @param int mode A find-obj mode like FIND_OBJ_INV.
+* @return bool TRUE if successful, FALSE on fail.
+*/
+bool perform_get_from_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh, int mode) {
+	extern bool can_take_obj(char_data *ch, obj_data *obj);
+	void get_check_money(char_data *ch, obj_data *obj);
+
+	if (!bind_ok(obj, ch)) {
+		act("$p: item is bound to someone else.", FALSE, ch, obj, NULL, TO_CHAR);
+		return TRUE;	// don't break loop
+	}
+	if (!IS_NPC(ch) && !CAN_CARRY_OBJ(ch, obj)) {
+		act("$p: you can't hold any more items.", FALSE, ch, obj, NULL, TO_CHAR);
+		return FALSE;
+	}
+	
+	if (mode == FIND_OBJ_INV || can_take_obj(ch, obj)) {
+		if (get_otrigger(obj, ch)) {
+			// last-minute scaling: scale to its minimum (adventures will override this on their own)
+			if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) < 1) {
+				scale_item_to_level(obj, GET_OBJ_MIN_SCALE_LEVEL(obj));
+			}
+			
+			obj_to_char(obj, ch);
+			act("You get $p from $V.", FALSE, ch, obj, veh, TO_CHAR);
+			act("$n gets $p from $V.", TRUE, ch, obj, veh, TO_ROOM);
+			get_check_money(ch, obj);
+			return TRUE;
+		}
+	}
+	return TRUE;	// return TRUE even though it failed -- don't break "get all" loops
+}
+
 
 /**
 * Processes putting a single item into a vehicle.
@@ -70,6 +111,73 @@ bool perform_put_obj_in_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh)
 
  //////////////////////////////////////////////////////////////////////////////
 //// SUB-COMMANDS ////////////////////////////////////////////////////////////
+
+/**
+* Get helper for getting from a vehicle.
+*
+* @param char_data *ch Person trying to get from the container.
+* @param vehicle_data *veh The vehicle to get from.
+* @param char *arg The typed argument.
+* @param int mode Passed through to perform_get_from_vehicle.
+* @param int howmany Number to get.
+*/
+void do_get_from_vehicle(char_data *ch, vehicle_data *veh, char *arg, int mode, int howmany) {
+	obj_data *obj, *next_obj;
+	bool found = FALSE;
+	int obj_dotmode;
+	
+	// basic checks
+	if (!VEH_FLAGGED(veh, VEH_CONTAINER)) {
+		act("$V is not a container.", FALSE, ch, NULL, veh, TO_CHAR);
+		return;
+	}
+	if (VEH_OWNER(veh) && VEH_OWNER(veh) != GET_LOYALTY(ch)) {
+		msg_to_char(ch, "You can't get items from vehicles owned by other empires.\r\n");
+		return;
+	}
+
+	obj_dotmode = find_all_dots(arg);
+	
+	if (obj_dotmode == FIND_INDIV) {
+		if (!(obj = get_obj_in_list_vis(ch, arg, VEH_CONTAINS(veh)))) {
+			sprintf(buf, "There doesn't seem to be %s %s in $V.", AN(arg), arg);
+			act(buf, FALSE, ch, NULL, veh, TO_CHAR);
+		}
+		else {
+			while(obj && howmany--) {
+				next_obj = obj->next_content;
+				if (!perform_get_from_vehicle(ch, obj, veh, mode)) {
+					break;
+				}
+				obj = get_obj_in_list_vis(ch, arg, next_obj);
+			}
+		}
+	}
+	else {
+		if (obj_dotmode == FIND_ALLDOT && !*arg) {
+			msg_to_char(ch, "Get all of what?\r\n");
+			return;
+		}
+		LL_FOREACH_SAFE2(VEH_CONTAINS(veh), obj, next_obj, next_content) {
+			if (CAN_SEE_OBJ(ch, obj) && (obj_dotmode == FIND_ALL || isname(arg, GET_OBJ_KEYWORDS(obj)))) {
+				found = TRUE;
+				if (!perform_get_from_vehicle(ch, obj, veh, mode)) {
+					break;
+				}
+			}
+		}
+		if (!found) {
+			if (obj_dotmode == FIND_ALL) {
+				act("$V seems to be empty.", FALSE, ch, NULL, veh, TO_CHAR);
+			}
+			else {
+				sprintf(buf, "You can't seem to find any %ss in $V.", arg);
+				act(buf, FALSE, ch, NULL, veh, TO_CHAR);
+			}
+		}
+	}
+}
+
 
 /**
 * Command processing for a character who is trying to sit in/on a vehicle.
