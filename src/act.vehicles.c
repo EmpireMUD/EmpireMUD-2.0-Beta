@@ -208,8 +208,8 @@ void do_sit_on_vehicle(char_data *ch, char *argument) {
 	else if (!VEH_IS_COMPLETE(veh)) {
 		msg_to_char(ch, "You can't sit %s it until it's finished.\r\n", VEH_FLAGGED(veh, VEH_IN) ? "in" : "on");
 	}
-	else if (VEH_SITTING_ON(veh) != ch) {
-		msg_to_char(ch, "Someone else is already sitting %s it.\r\n", VEH_FLAGGED(veh, VEH_IN) ? "in" : "on");
+	else if (VEH_SITTING_ON(veh)) {
+		msg_to_char(ch, "%s already sitting %s it.\r\n", (VEH_SITTING_ON(veh) != ch ? "Someone else is" : "You are"), VEH_FLAGGED(veh, VEH_IN) ? "in" : "on");
 	}
 	else if (VEH_LED_BY(veh)) {
 		msg_to_char(ch, "You can't sit %s it while %s leading it around.\r\n", VEH_FLAGGED(veh, VEH_IN) ? "in" : "on", (VEH_LED_BY(veh) == ch) ? "you are" : "someone else is");
