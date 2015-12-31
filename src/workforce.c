@@ -786,9 +786,6 @@ void run_chore_tracker_updates(void) {
 * @return bool TRUE if this workforce chore can work this craft, FALSE if not
 */
 CHORE_GEN_CRAFT_VALIDATOR(chore_nexus_crystals) {
-	if (GET_CRAFT_TYPE(craft) == CRAFT_BUILD || CRAFT_FLAGGED(craft, CRAFT_SOUP | CRAFT_VEHICLE)) {
-		return FALSE;
-	}
 	if (GET_CRAFT_OBJECT(craft) != o_NEXUS_CRYSTAL) {
 		return FALSE;
 	}
@@ -891,7 +888,7 @@ void do_chore_gen_craft(empire_data *emp, room_data *room, int chore, CHORE_GEN_
 	crafts_found = 0;
 	HASH_ITER(hh, craft_table, craft, next_craft) {
 		// must be a live recipe; must make an item
-		if (CRAFT_FLAGGED(craft, CRAFT_IN_DEVELOPMENT | CRAFT_SOUP | CRAFT_VEHICLE) || GET_CRAFT_TYPE(craft) == CRAFT_BUILD) {
+		if (CRAFT_FLAGGED(craft, CRAFT_IN_DEVELOPMENT | CRAFT_SOUP | CRAFT_VEHICLE) || GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD) {
 			continue;
 		}
 		// pass through validator function

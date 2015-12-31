@@ -88,7 +88,7 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 		}
 	}
 	else if (CRAFT_FLAGGED(craft, CRAFT_VEHICLE)) {	// vehicles only
-		if (GET_CRAFT_OBJECT(craft) == NOTHING || !vehicle_proto(GET_CRAFT_OBJECT(craft)) {
+		if (GET_CRAFT_OBJECT(craft) == NOTHING || !vehicle_proto(GET_CRAFT_OBJECT(craft))) {
 			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft makes nothing");
 			problem = TRUE;
 		}

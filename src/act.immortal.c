@@ -3613,7 +3613,6 @@ int vnum_building(char *searchname, char_data *ch) {
 */
 int vnum_craft(char *searchname, char_data *ch) {
 	craft_data *iter, *next_iter;
-	obj_data *or;
 	int found = 0;
 	
 	HASH_ITER(hh, craft_table, iter, next_iter) {
