@@ -1132,6 +1132,7 @@ const char *craft_flags[] = {
 	"UPGRADE",
 	"DISMANTLE-ONLY",
 	"IN-CITY-ONLY",
+	"VEHICLE",
 	"\n"
 };
 

@@ -843,7 +843,7 @@ void write_craft_to_file(FILE *fl, craft_data *craft) {
 	fprintf(fl, "#%d\n", GET_CRAFT_VNUM(craft));
 	fprintf(fl, "%s~\n", NULLSAFE(GET_CRAFT_NAME(craft)));
 	
-	fprintf(fl, "%d %d  # %dx %s\n", GET_CRAFT_OBJECT(craft), GET_CRAFT_QUANTITY(craft), GET_CRAFT_QUANTITY(craft), IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_SOUP) ? drinks[GET_CRAFT_OBJECT(craft)] : get_obj_name_by_proto(GET_CRAFT_OBJECT(craft)));
+	fprintf(fl, "%d %d\n", GET_CRAFT_OBJECT(craft), GET_CRAFT_QUANTITY(craft));
 	fprintf(fl, "%d %d %s %d %d\n", GET_CRAFT_TYPE(craft), GET_CRAFT_ABILITY(craft), bitv_to_alpha(GET_CRAFT_FLAGS(craft)), GET_CRAFT_TIME(craft), GET_CRAFT_REQUIRES_OBJ(craft));
 	
 	if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD) {

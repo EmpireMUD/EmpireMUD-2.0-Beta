@@ -677,6 +677,7 @@ typedef struct vehicle_data vehicle_data;
 #define CRAFT_UPGRADE  BIT(10)	// build: is an upgrade, not a new building
 #define CRAFT_DISMANTLE_ONLY  BIT(11)	// build: building can be dismantled but not built
 #define CRAFT_IN_CITY_ONLY  BIT(12)	// craft/building must be inside a city
+#define CRAFT_VEHICLE  BIT(13)	// creates a vehicle instead of an object
 
 
 // For find_building_list_entry
@@ -2925,11 +2926,11 @@ struct craft_data {
 	any_vnum ability;	// NO_ABIL for none, otherwise ABIL_ type
 	
 	char *name;
-	obj_vnum object;	// vnum of the object it makes, or liquid id if CRAFT_SOUP
+	any_vnum object;	// vnum of the object it makes, or liquid id if CRAFT_SOUP, or vehicle if CRAFT_VEHICLE
 	int quantity;	// makes X
 	
 	int min_level;	// required level to craft it using get_crafting_level()
-	bitvector_t flags;	// CRAFT_x
+	bitvector_t flags;	// CRAFT_
 	int time;	// how many action ticks it takes
 	
 	// for buildings:

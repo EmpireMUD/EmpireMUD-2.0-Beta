@@ -347,6 +347,18 @@ void Crash_save_vehicles(vehicle_data *room_list, FILE *fl) {
 
 
 /**
+* Quick way to turn a vnum into a name, safely.
+*
+* @param any_vnum vnum The vehicle vnum to look up.
+* @return char* A name for the vnum, or "UNKNOWN".
+*/
+char *get_vehicle_name_by_proto(obj_vnum vnum) {
+	vehicle_data *proto = vehicle_proto(vnum);
+	return proto ? VEH_SHORT_DESC(proto) : "UNKNOWN";
+}
+
+
+/**
 * For the .list command.
 *
 * @param vehicle_data *veh The thing to list.

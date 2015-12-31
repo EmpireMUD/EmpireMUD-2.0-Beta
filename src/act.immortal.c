@@ -2844,6 +2844,9 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 		bld = building_proto(GET_CRAFT_BUILD_TYPE(craft));
 		msg_to_char(ch, "Builds: [&c%d&0] %s\r\n", GET_CRAFT_BUILD_TYPE(craft), bld ? GET_BLD_NAME(bld) : "UNKNOWN");
 	}
+	else if (CRAFT_FLAGGED(craft, CRAFT_VEHICLE)) {
+		msg_to_char(ch, "Creates Vehicle: [&c%d&0] %s\r\n", GET_CRAFT_OBJECT(craft), (GET_CRAFT_OBJECT(craft) == NOTHING ? "NOTHING" : get_vehicle_name_by_proto(GET_CRAFT_OBJECT(craft))));
+	}
 	else if (CRAFT_FLAGGED(craft, CRAFT_SOUP)) {
 		msg_to_char(ch, "Creates Volume: [&g%d drink%s&0], Liquid: [&g%d&0] %s\r\n", GET_CRAFT_QUANTITY(craft), PLURAL(GET_CRAFT_QUANTITY(craft)), GET_CRAFT_OBJECT(craft), (GET_CRAFT_OBJECT(craft) == NOTHING ? "NOTHING" : drinks[GET_CRAFT_OBJECT(craft)]));
 	}
@@ -3614,7 +3617,7 @@ int vnum_craft(char *searchname, char_data *ch) {
 	int found = 0;
 	
 	HASH_ITER(hh, craft_table, iter, next_iter) {
-		if (multi_isname(searchname, GET_CRAFT_NAME(iter)) || ((or = obj_proto(GET_CRAFT_OBJECT(iter))) && multi_isname(searchname, GET_OBJ_KEYWORDS(or)))) {
+		if (multi_isname(searchname, GET_CRAFT_NAME(iter))) {
 			msg_to_char(ch, "%3d. [%5d] %s\r\n", ++found, GET_CRAFT_VNUM(iter), GET_CRAFT_NAME(iter));
 		}
 	}

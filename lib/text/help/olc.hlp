@@ -1428,6 +1428,7 @@ Available flags:
  DISMANTLE-ONLY - for building recipes only, this recipe allows the building
     to be dismantled, but not built; it won't show up in the build list
  IN-CITY-ONLY - a craft or building can only be made in a city radius
+ VEHICLE - creates a vehicle instead of an item
 
 See also: CEDIT TYPE, OLC CRAFTS, OLC REMOVEINDEV
 #d

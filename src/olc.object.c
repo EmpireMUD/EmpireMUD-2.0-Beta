@@ -517,7 +517,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	// update crafts
 	HASH_ITER(hh, craft_table, craft, next_craft) {
 		found = FALSE;
-		if (GET_CRAFT_TYPE(craft) != CRAFT_TYPE_BUILD && !IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_SOUP) && GET_CRAFT_OBJECT(craft) == vnum) {
+		if (GET_CRAFT_TYPE(craft) != CRAFT_TYPE_BUILD && !IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_SOUP | CRAFT_VEHICLE) && GET_CRAFT_OBJECT(craft) == vnum) {
 			GET_CRAFT_OBJECT(craft) = NOTHING;
 			found = TRUE;
 		}
@@ -625,7 +625,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		}
 		if (GET_OLC_CRAFT(desc)) {
 			found = FALSE;
-			if (GET_OLC_CRAFT(desc)->type != CRAFT_TYPE_BUILD && !IS_SET(GET_OLC_CRAFT(desc)->flags, CRAFT_SOUP) && GET_OLC_CRAFT(desc)->object == vnum) {
+			if (GET_OLC_CRAFT(desc)->type != CRAFT_TYPE_BUILD && !IS_SET(GET_OLC_CRAFT(desc)->flags, CRAFT_SOUP | CRAFT_VEHICLE) && GET_OLC_CRAFT(desc)->object == vnum) {
 				GET_OLC_CRAFT(desc)->object = NOTHING;
 				found = TRUE;
 			}
@@ -772,7 +772,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	// crafts
 	HASH_ITER(hh, craft_table, craft, next_craft) {
 		any = FALSE;
-		if (GET_CRAFT_TYPE(craft) != CRAFT_TYPE_BUILD && !IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_SOUP) && GET_CRAFT_OBJECT(craft) == vnum) {
+		if (GET_CRAFT_TYPE(craft) != CRAFT_TYPE_BUILD && !IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_SOUP | CRAFT_VEHICLE) && GET_CRAFT_OBJECT(craft) == vnum) {
 			any = TRUE;
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));

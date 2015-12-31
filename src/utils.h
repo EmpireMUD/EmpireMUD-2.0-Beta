@@ -1308,6 +1308,9 @@ extern bool adjacent_room_is_light(room_data *room);
 void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options);
 #define look_at_room(ch)  look_at_room_by_loc((ch), IN_ROOM(ch), NOBITS)
 
+// utils from vehicles.c
+extern char *get_vehicle_name_by_proto(obj_vnum vnum);
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// MISCELLANEOUS UTILS /////////////////////////////////////////////////////

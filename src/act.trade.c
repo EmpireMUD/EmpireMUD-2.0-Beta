@@ -275,7 +275,7 @@ craft_data *find_craft_for_obj_vnum(obj_vnum vnum) {
 	craft_data *iter, *next_iter;
 	
 	HASH_ITER(hh, craft_table, iter, next_iter) {
-		if (!IS_SET(GET_CRAFT_FLAGS(iter), CRAFT_SOUP) && GET_CRAFT_OBJECT(iter) == vnum) {
+		if (!IS_SET(GET_CRAFT_FLAGS(iter), CRAFT_SOUP | CRAFT_VEHICLE) && GET_CRAFT_TYPE(iter) != CRAFT_BUILD && GET_CRAFT_OBJECT(iter) == vnum) {
 			return iter;
 		}
 	}
