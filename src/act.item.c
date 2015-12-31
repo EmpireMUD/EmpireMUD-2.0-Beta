@@ -3723,7 +3723,8 @@ ACMD(do_get) {
 				return;
 			}
 			LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
-				if (CAN_SEE_VEHICLE(ch, veh) && (cont_dotmode == FIND_ALL || isname(arg2, VEH_KEYWORDS(veh)))) {
+				if (CAN_SEE_VEHICLE(ch, veh) && VEH_FLAGGED(veh, VEH_CONTAINER) && (cont_dotmode == FIND_ALL || isname(arg2, VEH_KEYWORDS(veh)))) {
+					found = 1;
 					do_get_from_vehicle(ch, veh, arg1, FIND_OBJ_ROOM, amount);
 				}
 			}
