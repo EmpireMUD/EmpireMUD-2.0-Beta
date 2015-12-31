@@ -831,8 +831,6 @@ void parse_craft(FILE *fl, craft_vnum vnum) {
 * @param craft_data *craft The thing to save.
 */
 void write_craft_to_file(FILE *fl, craft_data *craft) {
-	extern const char *drinks[];
-
 	char temp1[256], temp2[256];
 	
 	if (!fl || !craft) {
