@@ -693,6 +693,7 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 						}
 						else if (!strn_cmp(line, "Contents-end", 12)) {
 							// done
+							break;
 						}
 						else {
 							log("SYSERR: Format error in pack file for vehicle %d: %s", vnum, line);
