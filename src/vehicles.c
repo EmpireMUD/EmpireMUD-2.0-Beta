@@ -1608,9 +1608,9 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	
 	size += snprintf(buf + size, sizeof(buf) - size, "Health: [\tc%d\t0/\tc%d\t0], Capacity: [\tc%d\t0/\tc%d\t0], Animals Req: [\tc%d\t0], Move Type: [\ty%s\t0]\r\n", VEH_HEALTH(veh), VEH_MAX_HEALTH(veh), VEH_CARRYING_N(veh), VEH_CAPACITY(veh), VEH_ANIMALS_REQUIRED(veh), mob_move_types[VEH_MOVE_TYPE(veh)]);
 	
-	if (VEH_MAX_ROOMS(veh) || VEH_DESIGNATE_FLAGS(veh)) {
+	if (VEH_INTERIOR_ROOM_VNUM(veh) != NOTHING || VEH_MAX_ROOMS(veh) || VEH_DESIGNATE_FLAGS(veh)) {
 		sprintbit(VEH_DESIGNATE_FLAGS(veh), designate_flags, part, TRUE);
-		size += snprintf(buf + size, sizeof(buf) - size, "Max Rooms: [\tc%d\t0], Designate: \ty%s\t0\r\n", VEH_MAX_ROOMS(veh), part);
+		size += snprintf(buf + size, sizeof(buf) - size, "Interior: [\tc%d\t0 - \ty%s\t0], Rooms: [\tc%d\t0], Designate: \ty%s\t0\r\n", VEH_INTERIOR_ROOM_VNUM(veh), building_proto(VEH_INTERIOR_ROOM_VNUM(veh)) ? GET_BLD_NAME(building_proto(VEH_INTERIOR_ROOM_VNUM(veh))) : "none", VEH_MAX_ROOMS(veh), part);
 	}
 	
 	sprintbit(VEH_FLAGS(veh), vehicle_flags, part, TRUE);
