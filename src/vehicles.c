@@ -1864,7 +1864,7 @@ OLC_MODULE(vedit_interiorroom) {
 		msg_to_char(ch, "You can only set it to a building template with the ROOM flag. Old value restored.\r\n");
 	}	
 	else {
-		msg_to_char(ch, "It now has interior room [%d] %s.\r\n", VEH_INTERIOR_ROOM_VNUM(veh), GET_BLD_NAME(bld));
+		msg_to_char(ch, "It now has interior room '%s'.\r\n", GET_BLD_NAME(bld));
 	}
 }
 
