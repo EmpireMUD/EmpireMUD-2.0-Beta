@@ -254,14 +254,47 @@ char *get_vehicle_short_desc(vehicle_data *veh, char_data *to) {
 */
 char *list_harnessed_mobs(vehicle_data *veh) {
 	static char output[MAX_STRING_LENGTH];
-	struct vehicle_attached_mob *iter, *next_iter;
+	struct vehicle_attached_mob *iter, *next_iter, *tmp;
+	int count, num = 0;
 	size_t size = 0;
-	int num = 0;
+	char mult[256];
+	bool skip;
 	
 	*output = '\0';
 	
 	LL_FOREACH_SAFE(VEH_ANIMALS(veh), iter, next_iter) {
-		size += snprintf(output+size, sizeof(output)-size, "%s%s", ((num == 0) ? "" : (next_iter ? ", " : (num > 1 ? ", and " : " and "))), get_mob_name_by_proto(iter->mob));
+		// stacking: determine if already listed
+		skip = FALSE;
+		count = 1;
+		LL_FOREACH(VEH_ANIMALS(veh), tmp) {
+			if (tmp == iter) {
+				break;	// stop when we find this one
+			}
+			if (tmp->mob == iter->mob) {
+				skip = TRUE;
+				break;
+			}
+		}
+		if (skip) {
+			continue;	// already showed this one
+		}
+		
+		// count how many to show
+		count = 1;	// this one
+		LL_FOREACH(iter->next, tmp) {
+			if (tmp->mob == iter->mob) {
+				++count;
+			}
+		}
+		
+		if (count > 1) {
+			snprintf(mult, sizeof(mult), " (x%d)", count);
+		}
+		else {
+			*mult = '\0';
+		}
+	
+		size += snprintf(output+size, sizeof(output)-size, "%s%s%s", ((num == 0) ? "" : (next_iter ? ", " : (num > 1 ? ", and " : " and "))), get_mob_name_by_proto(iter->mob), mult);
 		++num;
 	}
 	
