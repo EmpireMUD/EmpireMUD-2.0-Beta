@@ -401,6 +401,9 @@ void delete_room(room_data *room, bool check_exits) {
 	if (home != room && GET_INSIDE_ROOMS(home) > 0) {
 		COMPLEX_DATA(home)->inside_rooms -= 1;
 	}
+	if (home != room && GET_ROOM_VEHICLE(home)) {
+		--VEH_INSIDE_ROOMS(GET_ROOM_VEHICLE(home));
+	}
 	
 	// get rid of players
 	relocate_players(room, NULL);

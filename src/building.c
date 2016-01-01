@@ -1622,6 +1622,9 @@ ACMD(do_designate) {
 			create_exit(IN_ROOM(ch), new, dir, TRUE);
 
 			COMPLEX_DATA(home)->inside_rooms++;
+			if (GET_ROOM_VEHICLE(home)) {
+				++VEH_INSIDE_ROOMS(GET_ROOM_VEHICLE(home));
+			}
 		}
 
 		// remove old objects

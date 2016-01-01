@@ -842,6 +842,9 @@ void renum_world(void) {
 				if (COMPLEX_DATA(home)) {
 					COMPLEX_DATA(home)->inside_rooms++;
 				}
+				if (GET_ROOM_VEHICLE(home)) {
+					++VEH_INSIDE_ROOMS(GET_ROOM_VEHICLE(home));
+				}
 			}
 		}
 	}
