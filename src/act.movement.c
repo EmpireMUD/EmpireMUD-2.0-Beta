@@ -43,6 +43,7 @@ extern const char *mob_move_types[];
 void do_unseat_from_vehicle(char_data *ch);
 
 // local protos
+bool can_enter_room(char_data *ch, room_data *room);
 bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room);
 
 // move vars
@@ -109,6 +110,81 @@ void add_tracks(char_data *ch, room_data *room, byte dir) {
 			ROOM_TRACKS(room) = track;
 		}
 	}
+}
+
+
+/**
+* Determines if a character should be able to enter a portal. This will send
+* its own error message.
+*
+* @param char_data *ch The character trying to enter a portal.
+* @param obj_data *portal The portal.
+* @param bool allow_infiltrate Whether or not to allow stealth entry.
+* @param bool skip_permissions If TRUE (like when following), ignores permissions.
+* @return bool TRUE if the character can enter the portal.
+*/
+bool can_enter_portal(char_data *ch, obj_data *portal, bool allow_infiltrate, bool skip_permissions) {
+	extern bool can_infiltrate(char_data *ch, empire_data *emp);
+	
+	room_data *to_room;
+	bool ok = FALSE;
+	
+	// easy checks
+	if (AFF_FLAGGED(ch, AFF_ENTANGLED)) {
+		msg_to_char(ch, "You are entangled and can't enter anything.\r\n");
+	}
+	else if (AFF_FLAGGED(ch, AFF_CHARM) && ch->master && IN_ROOM(ch) == IN_ROOM(ch->master)) {
+		msg_to_char(ch, "The thought of leaving your master makes you weep.\r\n");
+		act("$n bursts into tears.", FALSE, ch, NULL, NULL, TO_ROOM);
+	}
+	else if (!IS_PORTAL(portal) || !(to_room = real_room(GET_PORTAL_TARGET_VNUM(portal)))) {
+		msg_to_char(ch, "You can't enter that!\r\n");
+	}
+	else if (!IS_IMMORTAL(ch) && !IS_NPC(ch) && IS_CARRYING_N(ch) > CAN_CARRY_N(ch)) {
+		msg_to_char(ch, "You are overburdened and cannot move.\r\n");
+	}
+	else if (!can_enter_room(ch, to_room)) {
+		msg_to_char(ch, "You can't seem to go there. Perhaps it's full.\r\n");
+	}
+	else if (!IS_IMMORTAL(ch) && GET_OBJ_VNUM(portal) == o_PORTAL && get_cooldown_time(ch, COOLDOWN_PORTAL_SICKNESS) > SECS_PER_REAL_MIN) {
+		msg_to_char(ch, "You can't enter a portal until your portal sickness cooldown is under one minute.\r\n");
+	}
+	else {
+		ok = TRUE;
+	}
+	
+	if (!ok) {
+		return FALSE;
+	}
+	
+	// complex checks:
+	
+	// vehicles
+	if (GET_LEADING_VEHICLE(ch)) {
+		if (!VEH_FLAGGED(GET_LEADING_VEHICLE(ch), VEH_CAN_PORTAL)) {
+			act("$V can't be led through a portal.", FALSE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_CHAR);
+			return FALSE;
+		}
+		if (!validate_vehicle_move(ch, GET_LEADING_VEHICLE(ch), to_room)) {
+			// sends own message
+			return FALSE;
+		}
+	}
+	
+	// permissions
+	if (!skip_permissions && ROOM_OWNER(IN_ROOM(ch)) && !IS_IMMORTAL(ch) && !IS_NPC(ch) && (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) || !can_use_room(ch, to_room, GUESTS_ALLOWED))) {
+		if (!allow_infiltrate || !has_ability(ch, ABIL_INFILTRATE)) {
+			msg_to_char(ch, "You don't have permission to enter that.\r\n");
+			return FALSE;
+		}
+		if (!can_infiltrate(ch, ROOM_OWNER(IN_ROOM(ch)))) {
+			// sends own message
+			return FALSE;
+		}
+	}
+	
+	// SUCCESS
+	return TRUE;
 }
 
 
@@ -599,14 +675,9 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 	for (fol = ch->followers; fol; fol = next_fol) {
 		next_fol = fol->next;
 		if ((IN_ROOM(fol->follower) == was_in) && (GET_POS(fol->follower) >= POS_STANDING) && can_enter_room(fol->follower, to_room)) {
-			if (!IS_IMMORTAL(fol->follower) && GET_OBJ_VNUM(portal) == o_PORTAL && get_cooldown_time(fol->follower, COOLDOWN_PORTAL_SICKNESS) > SECS_PER_REAL_MIN) {
-				msg_to_char(ch, "You can't enter a portal until your portal sickness cooldown is under one minute.\r\n");
-			}
-			else if (GET_LEADING_VEHICLE(fol->follower) && IN_ROOM(GET_LEADING_VEHICLE(fol->follower)) == IN_ROOM(GET_LEADING_VEHICLE(fol->follower)) && !VEH_FLAGGED(GET_LEADING_VEHICLE(fol->follower), VEH_CAN_PORTAL)) {
-				act("You can't follow because $V can't be led through a portal.", FALSE, fol->follower, NULL, GET_LEADING_VEHICLE(fol->follower), TO_CHAR);
-			}
-			else if (GET_LEADING_VEHICLE(fol->follower) && IN_ROOM(GET_LEADING_VEHICLE(fol->follower)) == IN_ROOM(GET_LEADING_VEHICLE(fol->follower)) && !validate_vehicle_move(fol->follower, GET_LEADING_VEHICLE(fol->follower), IN_ROOM(ch))) {
-				// sends own message
+			if (!can_enter_portal(fol->follower, portal, TRUE, TRUE)) {
+				// sent its own message
+				msg_to_char(ch, "You are unable to follow.\r\n");
 			}
 			else {
 				act("You follow $N.\r\n", FALSE, fol->follower, 0, ch, TO_CHAR);
@@ -1263,17 +1334,6 @@ ACMD(do_enter) {
 	obj_data *portal;
 	room_data *room;
 	
-	if (AFF_FLAGGED(ch, AFF_ENTANGLED)) {
-		msg_to_char(ch, "You are entangled and can't enter anything.\r\n");
-		return;
-	}
-	
-	if (AFF_FLAGGED(ch, AFF_CHARM) && ch->master && IN_ROOM(ch) == IN_ROOM(ch->master)) {
-		msg_to_char(ch, "The thought of leaving your master makes you weep.\r\n");
-		act("$n bursts into tears.", FALSE, ch, NULL, NULL, TO_ROOM);
-		return;
-	}
-	
 	one_argument(argument, arg);
 	
 	if (!*arg) {
@@ -1294,44 +1354,9 @@ ACMD(do_enter) {
 		return;
 	}
 	
-	if (!IS_IMMORTAL(ch) && !IS_NPC(ch) && IS_CARRYING_N(ch) > CAN_CARRY_N(ch)) {
-		msg_to_char(ch, "You are overburdened and cannot move.\r\n");
+	if (!can_enter_portal(ch, portal, TRUE, FALSE)) {
+		// sends own message
 		return;
-	}
-	
-	if (!can_enter_room(ch, room)) {
-		msg_to_char(ch, "You can't seem to go there. Perhaps it's full.\r\n");
-		return;
-	}
-	
-	// portal sickness
-	if (!IS_IMMORTAL(ch) && GET_OBJ_VNUM(portal) == o_PORTAL && get_cooldown_time(ch, COOLDOWN_PORTAL_SICKNESS) > SECS_PER_REAL_MIN) {
-		msg_to_char(ch, "You can't enter a portal until your portal sickness cooldown is under one minute.\r\n");
-		return;
-	}
-	
-	// vehicles
-	if (GET_LEADING_VEHICLE(ch)) {
-		if (!VEH_FLAGGED(GET_LEADING_VEHICLE(ch), VEH_CAN_PORTAL)) {
-			act("$V can't be led through a portal.", FALSE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_CHAR);
-			return;
-		}
-		if (!validate_vehicle_move(ch, GET_LEADING_VEHICLE(ch), room)) {
-			// sends own message
-			return;
-		}
-	}
-	
-	// permissions
-	if (ROOM_OWNER(IN_ROOM(ch)) && !IS_IMMORTAL(ch) && !IS_NPC(ch) && (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) || !can_use_room(ch, room, GUESTS_ALLOWED))) {
-		if (!has_ability(ch, ABIL_INFILTRATE)) {
-			msg_to_char(ch, "You don't have permission to enter that.\r\n");
-			return;
-		}
-		if (!can_infiltrate(ch, ROOM_OWNER(IN_ROOM(ch)))) {
-			// sends own message
-			return;
-		}
 	}
 	
 	char_through_portal(ch, portal, FALSE);

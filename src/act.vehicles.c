@@ -116,6 +116,53 @@ bool perform_put_obj_in_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh)
 //// SUB-COMMANDS ////////////////////////////////////////////////////////////
 
 /**
+* Attempts to drag an object through a portal. This is a sub-function of
+* do_drag. It is called when no direction matched the drag command.
+*
+* @param char_data *ch The player.
+* @param vehicle_data *veh The vehicle being dragged.
+* @param char *arg The typed-in arg.
+*/
+void do_drag_portal(char_data *ch, vehicle_data *veh, char *arg) {
+	extern bool can_enter_portal(char_data *ch, obj_data *portal, bool allow_infiltrate, bool skip_permissions);
+	void char_through_portal(char_data *ch, obj_data *portal, bool following);
+
+	room_data *was_in;
+	obj_data *portal;
+	
+	if (!*arg || !(portal = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
+		msg_to_char(ch, "Which direction is that?\r\n");
+	}
+	else if (!IS_PORTAL(portal)) {
+		msg_to_char(ch, "You can't drag it into that!\r\n");
+	}
+	else if (!can_enter_portal(ch, portal, FALSE, FALSE)) {
+		// sends own message
+	}
+	else if (!VEH_FLAGGED(veh, VEH_CAN_PORTAL)) {
+		act("$V can't be dragged through portals.", FALSE, ch, NULL, veh, TO_CHAR);
+	}
+	else {
+		was_in = IN_ROOM(ch);
+		char_through_portal(ch, portal, FALSE);
+		
+		if (IN_ROOM(ch) == was_in) {
+			// failure here would have sent its own message
+			return;
+		}
+		
+		if (ROOM_PEOPLE(IN_ROOM(veh))) {
+			act("$V is dragged into $p.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), portal, veh, TO_CHAR | TO_ROOM);
+		}
+		
+		vehicle_to_room(veh, IN_ROOM(ch));
+		act("$V is dragged in with you.", FALSE, ch, NULL, veh, TO_CHAR);
+		act("$V is dragged in with $M.", FALSE, ch, NULL, veh, TO_ROOM);
+	}
+}
+
+
+/**
 * Get helper for getting from a vehicle.
 *
 * @param char_data *ch Person trying to get from the container.
@@ -573,6 +620,10 @@ ACMD(do_drag) {
 	else if (IS_WATER_SECT(SECT(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You can't drag anything in the water.\r\n");
 	}
+	else if (AFF_FLAGGED(ch, AFF_CHARM) && ch->master && IN_ROOM(ch) == IN_ROOM(ch->master)) {
+		msg_to_char(ch, "The thought of leaving your master makes you weep.\r\n");
+		act("$n bursts into tears.", FALSE, ch, NULL, NULL, TO_ROOM);
+	}
 	else if (!*what || !*where) {
 		msg_to_char(ch, "Drag what, in which direction?\r\n");
 	}
@@ -600,8 +651,7 @@ ACMD(do_drag) {
 	}
 	// direction validation
 	else if ((dir = parse_direction(ch, where)) == NO_DIR) {
-		// TODO portal?
-		msg_to_char(ch, "Which direction is that?\r\n");
+		do_drag_portal(ch, veh, where);
 	}
 	else if (!(to_room = dir_to_room(IN_ROOM(ch), dir))) {
 		msg_to_char(ch, "You can't drag anything in that direction.\r\n");
