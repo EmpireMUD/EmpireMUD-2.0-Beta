@@ -2991,5 +2991,7 @@ const char *vehicle_flags[] = {
 	"!BUILDING",
 	"CAN-PORTAL",
 	"LEADABLE",
+	"CARRY-VEHICLES",	// 15
+	"CARRY-MOBS",
 	"\n"
 };

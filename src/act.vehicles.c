@@ -36,6 +36,7 @@
 // external funcs
 extern int count_harnessed_animals(vehicle_data *veh);
 extern struct vehicle_attached_mob *find_harnessed_mob_by_name(vehicle_data *veh, char *name);
+extern room_data *get_vehicle_interior(vehicle_data *veh);
 void harness_mob_to_vehicle(char_data *mob, vehicle_data *veh);
 void scale_item_to_level(obj_data *obj, int level);
 extern char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh);
@@ -328,6 +329,230 @@ void do_unseat_from_vehicle(char_data *ch) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// COMMANDS ////////////////////////////////////////////////////////////////
+
+ACMD(do_board) {
+	char *command = (subcmd == SCMD_ENTER ? "enter" : "board");
+	room_data *was_in = IN_ROOM(ch), *to_room;
+	char buf[MAX_STRING_LENGTH];
+	struct vehicle_data *veh;
+	struct follow_type *k;
+
+	one_argument(argument, arg);
+
+	if (IS_NPC(ch) && AFF_FLAGGED(ch, AFF_ORDERED)) {
+		return;
+	}
+	else if (!IS_IMMORTAL(ch) && !IS_NPC(ch) && IS_CARRYING_N(ch) > CAN_CARRY_N(ch)) {
+		msg_to_char(ch, "You are overburdened and cannot move.\r\n");
+	}
+	else if (!*arg) {
+		snprintf(buf, sizeof(buf), "%s what?\r\n", command);
+		send_to_char(CAP(buf), ch);
+	}
+	else if (!(veh = get_vehicle_in_room_vis(ch, arg))) {
+		msg_to_char(ch, "You don't see %s %s here.\r\n", AN(arg), arg);
+	}
+	else if (!VEH_INTERIOR_HOME_ROOM(veh) && VEH_INTERIOR_ROOM_VNUM(veh) == NOTHING) {
+		// this is a pre-check
+		msg_to_char(ch, "You can't %s that!\r\n", command);
+	}
+	else if (!VEH_IS_COMPLETE(veh)) {
+		msg_to_char(ch, "You can't %s it until it's finished.\r\n", command);
+	}
+	else if (!(to_room = get_vehicle_interior(veh))) {
+		msg_to_char(ch, "You can't seem to %s it.\r\n", command);
+	}
+	else if (VEH_OWNER(veh) && GET_LOYALTY(ch) != VEH_OWNER(veh)) {
+		msg_to_char(ch, "You don't have permission to %s it.\r\n", command);
+	}
+	else if (IS_RIDING(ch) && !ROOM_BLD_FLAGGED(to_room, BLD_ALLOW_MOUNTS)) {
+		msg_to_char(ch, "You can't %s that while riding.\r\n", command);
+	}
+	else if (GET_LEADING_MOB(ch) && IN_ROOM(GET_LEADING_MOB(ch)) == IN_ROOM(ch) && !VEH_FLAGGED(veh, VEH_CARRY_MOBS)) {
+		msg_to_char(ch, "You can't %s it while leading an animal.\r\n", command);
+	}
+	else if (GET_LEADING_VEHICLE(ch) && IN_ROOM(GET_LEADING_VEHICLE(ch)) == IN_ROOM(ch) && !VEH_FLAGGED(veh, VEH_CARRY_VEHICLES)) {
+		msg_to_char(ch, "You can't %s it while leading another vehicle.\r\n", command);
+	}
+	else if (GET_LEADING_VEHICLE(ch) && VEH_FLAGGED(GET_LEADING_VEHICLE(ch), VEH_NO_BUILDING)) {
+		act("You can't lead $V in there.", FALSE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_CHAR);
+	}
+	else {
+		// move ch: out-message
+		snprintf(buf, sizeof(buf), "You %s $V.", command);
+		act(buf, FALSE, ch, NULL, veh, TO_CHAR);
+		snprintf(buf, sizeof(buf), "$n %ss $V.", command);
+		act(buf, TRUE, ch, NULL, veh, TO_ROOM);
+		
+		// move ch
+		char_to_room(ch, to_room);
+		if (!IS_NPC(ch)) {
+			GET_LAST_DIR(ch) = NO_DIR;
+		}
+		look_at_room(ch);
+		
+		// move ch: in-message
+		snprintf(buf, sizeof(buf), "$n %ss.", command);
+		act(buf, TRUE, ch, NULL, NULL, TO_ROOM);
+		
+		// move ch: triggers
+		enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
+		entry_memory_mtrigger(ch);
+		greet_mtrigger(ch, NO_DIR);
+		greet_memory_mtrigger(ch);
+		
+		// leading-mob
+		if (GET_LEADING_MOB(ch) && IN_ROOM(GET_LEADING_MOB(ch)) == was_in) {
+			act("$n follows $M.", TRUE, GET_LEADING_MOB(ch), NULL, ch, TO_NOTVICT);
+			
+			char_to_room(GET_LEADING_MOB(ch), to_room);
+			if (!IS_NPC(GET_LEADING_MOB(ch))) {
+				GET_LAST_DIR(GET_LEADING_MOB(ch)) = NO_DIR;
+			}
+			look_at_room(GET_LEADING_MOB(ch));
+			
+			snprintf(buf, sizeof(buf), "$n %ss.", command);
+			act(buf, TRUE, GET_LEADING_MOB(ch), NULL, NULL, TO_ROOM);
+			
+			enter_wtrigger(IN_ROOM(GET_LEADING_MOB(ch)), GET_LEADING_MOB(ch), NO_DIR);
+			entry_memory_mtrigger(GET_LEADING_MOB(ch));
+			greet_mtrigger(GET_LEADING_MOB(ch), NO_DIR);
+			greet_memory_mtrigger(GET_LEADING_MOB(ch));
+		}
+		
+		// leading-vehicle
+		if (GET_LEADING_VEHICLE(ch) && IN_ROOM(GET_LEADING_VEHICLE(ch)) == was_in) {
+			if (ROOM_PEOPLE(was_in)) {
+				act("$v is led behind $M.", TRUE, ROOM_PEOPLE(was_in), GET_LEADING_MOB(ch), ch, TO_CHAR | TO_NOTVICT | ACT_VEHICLE_OBJ);
+			}
+			
+			vehicle_to_room(GET_LEADING_VEHICLE(ch), to_room);
+			act("$v is led.", TRUE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_CHAR | TO_ROOM | ACT_VEHICLE_OBJ);
+		}
+		
+		// followers?
+		for (k = ch->followers; k; k = k->next) {
+			if (IN_ROOM(k->follower) != was_in) {
+				continue;
+			}
+			if (GET_POS(k->follower) < POS_STANDING) {
+				continue;
+			}
+			if (!IS_IMMORTAL(k->follower) && !IS_NPC(k->follower) && IS_CARRYING_N(k->follower) > CAN_CARRY_N(k->follower)) {
+				continue;
+			}
+		
+			act("You follow $N.\r\n", FALSE, k->follower, NULL, ch, TO_CHAR);
+			snprintf(buf, sizeof(buf), "$n %ss $V.", command);
+			act(buf, TRUE, k->follower, NULL, veh, TO_ROOM);
+
+			char_to_room(k->follower, to_room);
+			if (!IS_NPC(k->follower)) {
+				GET_LAST_DIR(k->follower) = NO_DIR;
+			}
+			look_at_room(k->follower);
+			
+			snprintf(buf, sizeof(buf), "$n %ss.", command);
+			act(buf, TRUE, k->follower, NULL, NULL, TO_ROOM);
+			
+			enter_wtrigger(IN_ROOM(k->follower), k->follower, NO_DIR);
+			entry_memory_mtrigger(k->follower);
+			greet_mtrigger(k->follower, NO_DIR);
+			greet_memory_mtrigger(k->follower);
+		}
+		
+		command_lag(ch, WAIT_OTHER);
+	}
+}
+
+
+ACMD(do_disembark) {
+	vehicle_data *veh = GET_ROOM_VEHICLE(IN_ROOM(ch));
+	room_data *was_in = IN_ROOM(ch), *to_room;
+	struct follow_type *k;
+
+	if (!veh || !(to_room = IN_ROOM(veh))) {
+		msg_to_char(ch, "You can't disembark from here!\r\n");
+	}
+	else if (!IS_IMMORTAL(ch) && !IS_NPC(ch) && IS_CARRYING_N(ch) > CAN_CARRY_N(ch)) {
+		msg_to_char(ch, "You are overburdened and cannot move.\r\n");
+	}
+	else if (IS_RIDING(ch) && !ROOM_BLD_FLAGGED(to_room, BLD_ALLOW_MOUNTS)) {
+		msg_to_char(ch, "You can't disembark here while riding.\r\n");
+	}
+	else {
+		act("$n disembarks from $V.", TRUE, ch, NULL, veh, TO_ROOM);
+		msg_to_char(ch, "You disembark.\r\n");
+		
+		char_to_room(ch, to_room);
+		if (!IS_NPC(ch)) {
+			GET_LAST_DIR(ch) = NO_DIR;
+		}
+		look_at_room(ch);
+		
+		act("$n disembarks from $V.", TRUE, ch, NULL, veh, TO_ROOM);
+		
+		enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
+		entry_memory_mtrigger(ch);
+		greet_mtrigger(ch, NO_DIR);
+		greet_memory_mtrigger(ch);
+		
+		if (GET_LEADING_MOB(ch) && IN_ROOM(GET_LEADING_MOB(ch)) == was_in) {
+			act("$n is led off.", TRUE, GET_LEADING_MOB(ch), NULL, NULL, TO_ROOM);
+			
+			char_to_room(GET_LEADING_MOB(ch), to_room);
+			if (!IS_NPC(GET_LEADING_MOB(ch))) {
+				GET_LAST_DIR(GET_LEADING_MOB(ch)) = NO_DIR;
+			}
+			look_at_room(GET_LEADING_MOB(ch));
+			
+			act("$n disembarks from $V.", TRUE, GET_LEADING_MOB(ch), NULL, veh, TO_ROOM);
+			
+			enter_wtrigger(IN_ROOM(GET_LEADING_MOB(ch)), GET_LEADING_MOB(ch), NO_DIR);
+			entry_memory_mtrigger(GET_LEADING_MOB(ch));
+			greet_mtrigger(GET_LEADING_MOB(ch), NO_DIR);
+			greet_memory_mtrigger(GET_LEADING_MOB(ch));
+		}
+		if (GET_LEADING_VEHICLE(ch) && IN_ROOM(GET_LEADING_VEHICLE(ch)) == was_in) {
+			if (ROOM_PEOPLE(was_in)) {
+				act("$v is led behind $M.", TRUE, ROOM_PEOPLE(was_in), GET_LEADING_MOB(ch), ch, TO_CHAR | TO_NOTVICT | ACT_VEHICLE_OBJ);
+			}
+			vehicle_to_room(GET_LEADING_VEHICLE(ch), to_room);
+			act("$v is led off.", TRUE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_CHAR | TO_ROOM | ACT_VEHICLE_OBJ);
+		}
+
+		for (k = ch->followers; k; k = k->next) {
+			if (IN_ROOM(k->follower) != was_in) {
+				continue;
+			}
+			if (GET_POS(k->follower) < POS_STANDING) {
+				continue;
+			}
+			if (!IS_IMMORTAL(k->follower) && !IS_NPC(k->follower) && IS_CARRYING_N(k->follower) > CAN_CARRY_N(k->follower)) {
+				continue;
+			}
+		
+			act("You follow $N.\r\n", FALSE, k->follower, NULL, ch, TO_CHAR);
+			act("$n disembarks from $V.", TRUE, k->follower, NULL, veh, TO_ROOM);
+
+			char_to_room(k->follower, to_room);
+			if (!IS_NPC(k->follower)) {
+				GET_LAST_DIR(k->follower) = NO_DIR;
+			}
+			look_at_room(k->follower);
+			
+			act("$n disembarks from $p.", TRUE, k->follower, NULL, veh, TO_ROOM);
+			
+			enter_wtrigger(IN_ROOM(k->follower), k->follower, NO_DIR);
+			entry_memory_mtrigger(k->follower);
+			greet_mtrigger(k->follower, NO_DIR);
+			greet_memory_mtrigger(k->follower);
+		}
+		
+		command_lag(ch, WAIT_OTHER);
+	}
+}
+
 
 ACMD(do_harness) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];

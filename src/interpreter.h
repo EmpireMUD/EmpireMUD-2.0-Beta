@@ -89,6 +89,10 @@ struct alias_data {
 #define SCMD_ACCEPT  0
 #define SCMD_REJECT  1
 
+// do_board
+#define SCMD_BOARD  0
+#define SCMD_ENTER  1
+
 /* do_gen_ps */
 #define SCMD_INFO		0
 #define SCMD_HANDBOOK	1 
