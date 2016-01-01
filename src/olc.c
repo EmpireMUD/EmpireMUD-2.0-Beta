@@ -302,6 +302,7 @@ OLC_MODULE(vedit_designate);
 OLC_MODULE(vedit_flags);
 OLC_MODULE(vedit_hitpoints);
 OLC_MODULE(vedit_icon);
+OLC_MODULE(vedit_interiorroom);
 OLC_MODULE(vedit_keywords);
 OLC_MODULE(vedit_longdescription);
 OLC_MODULE(vedit_lookdescription);
@@ -641,6 +642,7 @@ const struct olc_command_data olc_data[] = {
 	{ "flags", vedit_flags, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "hitpoints", vedit_hitpoints, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "icon", vedit_icon, OLC_VEHICLE, OLC_CF_EDITOR },
+	{ "interiorroom", vedit_interiorroom, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "keywords", vedit_keywords, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "longdescription", vedit_longdescription, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "lookdescription", vedit_lookdescription, OLC_VEHICLE, OLC_CF_EDITOR },

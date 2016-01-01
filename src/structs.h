@@ -3544,6 +3544,7 @@ struct vehicle_attribute_data {
 	int capacity;	// holds X items
 	int animals_required;	// number of animals to move it
 	int move_type;	// MOB_MOVE_ type
+	bld_vnum interior_room_vnum;	// Any ROOM-flagged bld to use as an interior
 	int max_rooms;	// 1 = can enter; >1 allows designate
 	bitvector_t designate_flags;	// DES_ flags
 	struct resource_data *yearly_maintenance;

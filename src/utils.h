@@ -1133,6 +1133,7 @@ void SET_ISLAND_ID(room_data *room, int island);	// formerly a #define and a roo
 #define VEH_ANIMALS_REQUIRED(veh)  ((veh)->attributes->animals_required)
 #define VEH_CAPACITY(veh)  ((veh)->attributes->capacity)
 #define VEH_DESIGNATE_FLAGS(veh)  ((veh)->attributes->designate_flags)
+#define VEH_INTERIOR_ROOM_VNUM(veh)  ((veh)->attributes->interior_room_vnum)
 #define VEH_MAX_HEALTH(veh)  ((veh)->attributes->maxhealth)
 #define VEH_MAX_ROOMS(veh)  ((veh)->attributes->max_rooms)
 #define VEH_MOVE_TYPE(veh)  ((veh)->attributes->move_type)

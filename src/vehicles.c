@@ -931,6 +931,9 @@ void clear_vehicle(vehicle_data *veh) {
 	else {
 		CREATE(veh->attributes, struct vehicle_attribute_data, 1);
 	}
+	
+	// attributes init
+	VEH_INTERIOR_ROOM_VNUM(veh) = NOTHING;
 }
 
 
@@ -1039,12 +1042,13 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 		}
 		switch (*line) {
 			case 'D': {	// designate/rooms
-				if (!get_line(fl, line) || sscanf(line, "%d %s", &int_in[0], str_in) != 2) {
+				if (!get_line(fl, line) || sscanf(line, "%d %d %s", &int_in[0], &int_in[1], str_in) != 3) {
 					log("SYSERR: Format error in D line of %s", error);
 					exit(1);
 				}
 				
-				VEH_MAX_ROOMS(veh) = int_in[0];
+				VEH_INTERIOR_ROOM_VNUM(veh) = int_in[0];
+				VEH_MAX_ROOMS(veh) = int_in[1];
 				VEH_DESIGNATE_FLAGS(veh) = asciiflag_conv(str_in);
 				break;
 			}
@@ -1119,9 +1123,9 @@ void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
 	fprintf(fl, "%s %d %d %d %d\n", temp, VEH_MOVE_TYPE(veh), VEH_MAX_HEALTH(veh), VEH_CAPACITY(veh), VEH_ANIMALS_REQUIRED(veh));
 	
 	// 'D': designate/rooms
-	if (VEH_MAX_ROOMS(veh) || VEH_DESIGNATE_FLAGS(veh)) {
+	if (VEH_INTERIOR_ROOM_VNUM(veh) != NOTHING || VEH_MAX_ROOMS(veh) || VEH_DESIGNATE_FLAGS(veh)) {
 		strcpy(temp, bitv_to_alpha(VEH_DESIGNATE_FLAGS(veh)));
-		fprintf(fl, "D\n%d %s\n", VEH_MAX_ROOMS(veh), temp);
+		fprintf(fl, "D\n%d %d %s\n", VEH_INTERIOR_ROOM_VNUM(veh), VEH_MAX_ROOMS(veh), temp);
 	}
 	
 	// 'R': resources
@@ -1704,6 +1708,7 @@ void olc_show_vehicle(char_data *ch) {
 	sprintf(buf + strlen(buf), "<\tycapacity\t0> %d item%s\r\n", VEH_CAPACITY(veh), PLURAL(VEH_CAPACITY(veh)));
 	sprintf(buf + strlen(buf), "<\tyanimalsrequired\t0> %d\r\n", VEH_ANIMALS_REQUIRED(veh));
 
+	sprintf(buf + strlen(buf), "<\tyinteriorroom\t0> %d - %s\r\n", VEH_INTERIOR_ROOM_VNUM(veh), building_proto(VEH_INTERIOR_ROOM_VNUM(veh)) ? GET_BLD_NAME(building_proto(VEH_INTERIOR_ROOM_VNUM(veh))) : "none");
 	sprintf(buf + strlen(buf), "<\tymaxrooms\t0> %d\r\n", VEH_MAX_ROOMS(veh));
 	sprintbit(VEH_DESIGNATE_FLAGS(veh), designate_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<\tydesignate\t0> %s\r\n", lbuf);
@@ -1791,6 +1796,34 @@ OLC_MODULE(vedit_icon) {
 	else {
 		olc_process_string(ch, argument, "icon", &VEH_ICON(veh));
 		msg_to_char(ch, "\t0");	// in case color is unterminated
+	}
+}
+
+
+OLC_MODULE(vedit_interiorroom) {
+	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
+	any_vnum old_b;
+	bld_data *bld;
+	
+	if (!str_cmp(argument, "none")) {
+		VEH_INTERIOR_ROOM_VNUM(veh) = NOTHING;
+		msg_to_char(ch, "It now has no interior room.\r\n");
+		return;
+	}
+	
+	old_b = VEH_INTERIOR_ROOM_VNUM(veh);
+	VEH_INTERIOR_ROOM_VNUM(veh) = olc_process_number(ch, argument, "interior room vnum", "interiorroom", 0, MAX_VNUM, VEH_INTERIOR_ROOM_VNUM(veh));
+	
+	if (!(bld = building_proto(VEH_INTERIOR_ROOM_VNUM(veh)))) {
+		VEH_INTERIOR_ROOM_VNUM(veh) = old_b;
+		msg_to_char(ch, "Invalid room building vnum. Old value restored.\r\n");
+	}
+	else if (!IS_SET(GET_BLD_FLAGS(bld), BLD_ROOM)) {
+		VEH_INTERIOR_ROOM_VNUM(veh) = old_b;
+		msg_to_char(ch, "You can only set it to a building template with the ROOM flag. Old value restored.\r\n");
+	}	
+	else {
+		msg_to_char(ch, "It now has interior room [%d] %s.\r\n", VEH_INTERIOR_ROOM_VNUM(veh), GET_BLD_NAME(bld));
 	}
 }
 

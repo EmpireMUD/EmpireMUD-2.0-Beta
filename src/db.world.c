@@ -391,6 +391,11 @@ void delete_room(room_data *room, bool check_exits) {
 		}
 	}
 	
+	// check if it was part of the interior of a vehicle
+	if (GET_ROOM_VEHICLE(room) && VEH_INTERIOR_HOME_ROOM(GET_ROOM_VEHICLE(room)) == room) {
+		VEH_INTERIOR_HOME_ROOM(GET_ROOM_VEHICLE(room)) = NULL;
+	}
+	
 	// shrink home
 	home = HOME_ROOM(room);
 	if (home != room && GET_INSIDE_ROOMS(home) > 0) {
