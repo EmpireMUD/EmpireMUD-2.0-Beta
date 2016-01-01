@@ -240,6 +240,7 @@ void boot_db(void) {
 	void delete_old_players();
 	void delete_orphaned_rooms();
 	void init_config_system();
+	void link_and_check_vehicles();
 	void load_banned();
 	void load_daily_cycle();
 	void load_intro_screens();
@@ -247,9 +248,9 @@ void boot_db(void) {
 	void load_tips_of_the_day();
 	void load_trading_post();
 	void reset_time();
+	int run_convert_vehicle_list();
 	void sort_commands();
 	void startup_room_reset();
-	void update_ships();
 	void verify_sectors();
 
 	log("Boot db -- BEGIN.");
@@ -318,24 +319,33 @@ void boot_db(void) {
 	log("Resetting all rooms.");
 	startup_room_reset();
 
-	log("Updating all ships.");
-	update_ships();
+	load_daily_cycle();
+	log("Beginning skill reset cycle at %d.", daily_cycle);
+	
+	// NOTE: check_version() updates many things that change from version to
+	// version. See the function itself for a list of one-time updates it runs
+	// on the game. This should run as late in boot_db() as possible.
+	log("Checking game version...");
+	check_version();
+	
+	// Some things runs AFTER check_version() because they rely on all version
+	// updates having been run on this EmpireMUD:
+	
+	log("Verifying world sectors.");
+	verify_sectors();
+	
+	// convert vehicles -- this normally does nothing, but it may free a temporary list
+	run_convert_vehicle_list();
 	
 	log("Checking for orphaned rooms...");
 	delete_orphaned_rooms();
-
-	load_daily_cycle();
-	log("Beginning skill reset cycle at %d.", daily_cycle);
-
-	boot_time = time(0);
 	
-	log("Checking game version...");
-	check_version();
-		
-	log("Verifying world sectors.");
-	verify_sectors();
-
+	log("Linking and checking vehicles.");
+	link_and_check_vehicles();
+	
+	// END
 	log("Boot db -- DONE.");
+	boot_time = time(0);
 }
 
 
@@ -697,8 +707,8 @@ void delete_orphaned_rooms(void) {
 	for (room = interior_room_list; room; room = next_room) {
 		next_room = room->next_interior;
 		
-		// boats are checked separately
-		if (BUILDING_VNUM(room) == RTYPE_B_ONDECK && HOME_ROOM(room) == room) {
+		// vehicles are checked separately
+		if (ROOM_AFF_FLAGGED(room, ROOM_AFF_IN_VEHICLE) && HOME_ROOM(room) == room) {
 			continue;
 		}
 		
@@ -718,44 +728,6 @@ void delete_orphaned_rooms(void) {
 	
 	if (deleted) {
 		check_all_exits();
-	}
-}
-
-/**
-* Sets the boat pointers on all rooms associated with ships, sets the ship-
-* present flag on map rooms, and deletes boat interiors that have no exterior.
-*
-* This is meant to be called at startup.
-*/
-void update_ships(void) {	
-	obj_data *o, *next_o;
-	room_data *rl, *room, *next_room;
-	bool found = FALSE;
-
-	for (o = object_list; o; o = next_o) {
-		next_o = o->next;
-
-		if (GET_OBJ_TYPE(o) == ITEM_SHIP) {
-			if ((rl = real_room(GET_SHIP_MAIN_ROOM(o)))) {
-				COMPLEX_DATA(rl)->boat = o;
-			}
-			else {
-				extract_obj(o);
-			}
-		}
-	}
-
-	HASH_ITER(hh, world_table, room, next_room) {
-		if (BUILDING_VNUM(room) == RTYPE_B_ONDECK && HOME_ROOM(room) == room && !GET_BOAT(room)) {
-			delete_room(room, FALSE);	// must check_all_exits
-			found = TRUE;
-		}
-	}
-	
-	// only bother this if we deleted anything
-	if (found) {
-		check_all_exits();
-		read_empire_territory(NULL);
 	}
 }
 

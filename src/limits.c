@@ -333,7 +333,7 @@ void point_update_char(char_data *ch) {
 	}
 	
 	// check spawned
-	if (REAL_NPC(ch) && !ch->desc && MOB_FLAGGED(ch, MOB_SPAWNED) && (!MOB_FLAGGED(ch, MOB_ANIMAL) || !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_STABLE)) && MOB_SPAWN_TIME(ch) < (time(0) - config_get_int("mob_spawn_interval") * SECS_PER_REAL_MIN) && !GET_BOAT(IN_ROOM(ch))) {
+	if (REAL_NPC(ch) && !ch->desc && MOB_FLAGGED(ch, MOB_SPAWNED) && (!MOB_FLAGGED(ch, MOB_ANIMAL) || !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_STABLE)) && MOB_SPAWN_TIME(ch) < (time(0) - config_get_int("mob_spawn_interval") * SECS_PER_REAL_MIN) && !GET_ROOM_VEHICLE(IN_ROOM(ch))) {
 		if (!GET_LED_BY(ch) && !GET_LEADING_MOB(ch) && !GET_LEADING_VEHICLE(ch) && !MOB_FLAGGED(ch, MOB_TIED)) {
 			if (distance_to_nearest_player(IN_ROOM(ch)) > config_get_int("mob_despawn_radius")) {
 				despawn_mob(ch);
@@ -1098,8 +1098,9 @@ bool check_autostore(obj_data *obj, bool force) {
 		return TRUE;
 	}
 	
-	// check boat room: items on ships in the Ship Holding Pen do not autostore
-	real_loc = BOAT_ROOM(real_loc);
+	// check vehicle room: items on ships in the Ship Holding Pen do not autostore
+	// TODO this can go
+	real_loc = IN_VEHICLE_IN_ROOM(real_loc);
 	if (!real_loc || BUILDING_VNUM(real_loc) == RTYPE_SHIP_HOLDING_PEN) {
 		return TRUE;
 	}

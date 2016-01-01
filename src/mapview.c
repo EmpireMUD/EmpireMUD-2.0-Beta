@@ -508,7 +508,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	// options
 	bool ship_partial = IS_SET(options, LRR_SHIP_PARTIAL) ? TRUE : FALSE;
 	bool look_out = IS_SET(options, LRR_LOOK_OUT) ? TRUE : FALSE;
-	bool has_ship = GET_BOAT(IN_ROOM(ch)) ? TRUE : FALSE;
+	bool has_ship = GET_ROOM_VEHICLE(IN_ROOM(ch)) ? TRUE : FALSE;
 	bool show_title = !has_ship || ship_partial || look_out;
 
 	// begin with the sanity check
@@ -528,16 +528,16 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	}
 
 	// check for ship
-	if (!look_out && !ship_partial && GET_BOAT(IN_ROOM(ch))) {
-		look_at_room_by_loc(ch, IN_ROOM(GET_BOAT(IN_ROOM(ch))), LRR_SHIP_PARTIAL);
+	if (!look_out && !ship_partial && has_ship) {
+		look_at_room_by_loc(ch, IN_ROOM(GET_ROOM_VEHICLE(IN_ROOM(ch))), LRR_SHIP_PARTIAL);
 	}
 
 	// mappc setup
 	CREATE(mappc, struct mappc_data_container, 1);
 	
 	// put ship in name
-	if (ship_partial && GET_BOAT(IN_ROOM(ch))) {
-		snprintf(shipbuf, sizeof(shipbuf), ", Aboard %s", get_obj_desc(GET_BOAT(IN_ROOM(ch)), ch, OBJ_DESC_SHORT));
+	if (ship_partial && GET_ROOM_VEHICLE(IN_ROOM(ch))) {
+		snprintf(shipbuf, sizeof(shipbuf), ", Aboard %s", get_vehicle_short_desc(GET_ROOM_VEHICLE(IN_ROOM(ch)), ch));
 	}
 	else {
 		*shipbuf = '\0';
@@ -2049,7 +2049,7 @@ ACMD(do_scan) {
 	else if (!use_room || IS_ADVENTURE_ROOM(use_room) || ROOM_IS_CLOSED(use_room)) {	// check map room
 		msg_to_char(ch, "You can only use scan out on the map.\r\n");
 	}
-	else if (!GET_BOAT(IN_ROOM(ch)) && (IS_ADVENTURE_ROOM(IN_ROOM(ch)) || ROOM_IS_CLOSED(IN_ROOM(ch)))) {
+	else if (!GET_ROOM_VEHICLE(IN_ROOM(ch)) && (IS_ADVENTURE_ROOM(IN_ROOM(ch)) || ROOM_IS_CLOSED(IN_ROOM(ch)))) {
 		// if not on a boat, can't see out from here
 		msg_to_char(ch, "Scan only works out on the map.\r\n");
 	}

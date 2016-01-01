@@ -1666,7 +1666,7 @@ typedef struct vehicle_data vehicle_data;
 #define ROOM_AFF_DISMANTLING  BIT(8)	// i. Being dismantled
 #define ROOM_AFF_NO_FLY  BIT(9)	// j. Can't fly there
 	#define ROOM_AFF_UNUSED1  BIT(10)
-	#define ROOM_AFF_UNUSED2  BIT(11)
+#define ROOM_AFF_IN_VEHICLE  BIT(11)	// l. Part of a vehicle
 #define ROOM_AFF_NO_WORK  BIT(12)	// m. workforce ignores this room
 #define ROOM_AFF_NO_DISREPAIR  BIT(13)	// n. will not fall into disrepair
 #define ROOM_AFF_NO_DISMANTLE  BIT(14)
@@ -3653,7 +3653,7 @@ struct complex_room_data {
 	
 	int disrepair;	// decay over time
 	
-	obj_data *boat;  // if in a boat, this is the boat obj
+	vehicle_data *vehicle;  // the associated vehicle (usually only on the home room)
 	struct instance_data *instance;	// if part of an instantiated adventure
 	
 	int private_owner;	// for privately-owned houses

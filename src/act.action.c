@@ -343,6 +343,7 @@ void cancel_minting(char_data *ch) {
 * @param char_data *ch The sailer.
 */
 void cancel_sailing(char_data *ch) {
+	/*
 	room_data *room;
 	obj_data *ship;
 	
@@ -356,6 +357,7 @@ void cancel_sailing(char_data *ch) {
 			act("The ship stops moving.", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
 		}
 	}
+	*/
 }
 
 
@@ -1810,6 +1812,7 @@ void process_quarrying(char_data *ch) {
 * @param char_data *ch The character doing the sailing.
 */
 void process_sailing(char_data *ch) {
+	/*
 	extern bool move_ship(char_data *ch, obj_data *ship, int dir);
 	extern bool only_one_sailing(char_data *ch, obj_data *ship);
 
@@ -1848,6 +1851,7 @@ void process_sailing(char_data *ch) {
 			return;
 		}
 	}
+	*/
 }
 
 

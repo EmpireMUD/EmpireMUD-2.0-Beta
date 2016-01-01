@@ -139,9 +139,8 @@ struct vehicle_attached_mob *find_harnessed_mob_by_name(vehicle_data *veh, char 
 * @return vehicle_data* A vehicle to show, if any (NULL if not).
 */
 vehicle_data *find_vehicle_to_show(char_data *ch, room_data *room) {
-	vehicle_data *iter;
-	obj_data *on_ship;
-	bool is_on_vehicle = ((on_ship = GET_BOAT(HOME_ROOM(IN_ROOM(ch)))) && room == IN_ROOM(on_ship));
+	vehicle_data *iter, *in_veh;
+	bool is_on_vehicle = ((in_veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) && room == IN_ROOM(in_veh));
 	
 	// we don't show vehicles in buildings or closed tiles (unless the player is on a vehicle in that room, in which case we override)
 	if (!is_on_vehicle && (IS_ANY_BUILDING(room) || ROOM_IS_CLOSED(room))) {
@@ -356,6 +355,37 @@ void Crash_save_vehicles(vehicle_data *room_list, FILE *fl) {
 char *get_vehicle_name_by_proto(obj_vnum vnum) {
 	vehicle_data *proto = vehicle_proto(vnum);
 	return proto ? VEH_SHORT_DESC(proto) : "UNKNOWN";
+}
+
+
+/**
+* Looks for dead vehicle interiors at startup, and deletes them.
+*/
+void link_and_check_vehicles(void) {
+	vehicle_data *veh, *next_veh;
+	room_data *room, *next_room;
+	bool found = FALSE;
+	
+	// reverse-link the home-room of vehicles to this one
+	LL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
+		if (VEH_INTERIOR_HOME_ROOM(veh)) {
+			COMPLEX_DATA(VEH_INTERIOR_HOME_ROOM(veh))->vehicle = veh;
+		}
+	}
+	
+	// check for orphaned ship rooms
+	LL_FOREACH_SAFE2(interior_room_list, room, next_room, next_interior) {
+		if (ROOM_AFF_FLAGGED(room, ROOM_AFF_IN_VEHICLE) && HOME_ROOM(room) == room && !GET_ROOM_VEHICLE(room)) {
+			delete_room(room, FALSE);	// must check_all_exits later
+			found = TRUE;
+		}
+	}
+	
+	// only bother this if we deleted anything
+	if (found) {
+		check_all_exits();
+		read_empire_territory(NULL);
+	}
 }
 
 
@@ -1193,7 +1223,7 @@ void convert_one_obj_to_vehicle(obj_data *obj) {
 	extern room_data *obj_room(obj_data *obj);
 	
 	obj_data *obj_iter, *next_obj;
-	room_data *room, *main;
+	room_data *room, *room_iter, *main;
 	vehicle_data *veh;
 	
 	// if there isn't a room or vehicle involved, just remove the object
@@ -1220,8 +1250,18 @@ void convert_one_obj_to_vehicle(obj_data *obj) {
 		case ITEM_SHIP: {
 			if ((main = real_room(GET_SHIP_MAIN_ROOM(obj)))) {
 				VEH_INTERIOR_HOME_ROOM(veh) = main;
-				if (ROOM_OWNER(main)) {	// detect owner from room
+				
+				// detect owner from room
+				if (ROOM_OWNER(main)) {
 					VEH_OWNER(veh) = ROOM_OWNER(main);
+				}
+				
+				// apply vehicle aff
+				LL_FOREACH2(interior_room_list, room_iter, next_interior) {
+					if (room_iter == main || HOME_ROOM(room_iter) == main) {
+						SET_BIT(ROOM_AFF_FLAGS(room_iter), ROOM_AFF_IN_VEHICLE);
+						SET_BIT(ROOM_BASE_FLAGS(room_iter), ROOM_AFF_IN_VEHICLE);
+					}
 				}
 			}
 			break;

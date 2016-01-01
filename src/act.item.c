@@ -1923,9 +1923,10 @@ void load_shipment(struct empire_data *emp, struct shipping_data *shipd, obj_dat
 * @param room_data *to_room Which room to send it to.
 */
 void move_ship_to_destination(empire_data *emp, struct shipping_data *shipd, room_data *to_room) {
+	/*
 	struct shipping_data *iter;
 	room_data *ship_room;
-	obj_data *boat;
+	vehicle_data *boat;
 	room_vnum old;
 
 	// sanity
@@ -1940,7 +1941,7 @@ void move_ship_to_destination(empire_data *emp, struct shipping_data *shipd, roo
 	}
 	
 	// find the ship itself
-	if (!(boat = GET_BOAT(ship_room))) {
+	if (!(boat = GET_ROOM_VEHICLE(ship_room))) {
 		shipd->ship_homeroom = NOWHERE;
 		return;
 	}
@@ -1960,6 +1961,7 @@ void move_ship_to_destination(empire_data *emp, struct shipping_data *shipd, roo
 			iter->ship_homeroom = NOWHERE;
 		}
 	}
+	*/
 }
 
 
@@ -1970,6 +1972,7 @@ void move_ship_to_destination(empire_data *emp, struct shipping_data *shipd, roo
 * @param empire_data *emp The empire to run.
 */
 void process_shipping_one(empire_data *emp) {
+	/*
 	struct shipping_data *shipd, *next_shipd;
 	obj_data *last_ship = NULL;
 	bool full, changed = FALSE;
@@ -2033,6 +2036,7 @@ void process_shipping_one(empire_data *emp) {
 	if (changed) {
 		save_empire(emp);
 	}
+*/
 }
 
 

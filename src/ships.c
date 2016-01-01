@@ -67,6 +67,8 @@ struct ship_data_struct ship_data[] = {
 //// SHIP FUNCTIONS //////////////////////////////////////////////////////////
 
 static obj_data *create_ship(obj_vnum vnum, empire_data *owner, room_data *to_room) {
+	return NULL;
+/*
 	extern room_data *create_room();
 	extern room_vnum find_free_vnum(void);
 
@@ -81,7 +83,7 @@ static obj_data *create_ship(obj_vnum vnum, empire_data *owner, room_data *to_ro
 	ship = read_object(vnum, TRUE);
 	type = GET_SHIP_TYPE(ship);
 
-	/* The main room */
+	// The main room
 	main_room = create_room();
 	attach_building_to_room(building_proto(RTYPE_B_ONDECK), main_room);
 	GET_OBJ_VAL(ship, VAL_SHIP_MAIN_ROOM) = GET_ROOM_VNUM(main_room);
@@ -91,7 +93,7 @@ static obj_data *create_ship(obj_vnum vnum, empire_data *owner, room_data *to_ro
 
 	switch (type) {
 		case SHIP_PINNACE:
-			/* Helm - 0 */
+			// Helm - 0
 			spare[0] = create_room();
 			attach_building_to_room(building_proto(RTYPE_B_HELM), spare[0]);
 			ROOM_OWNER(spare[0]) = owner;
@@ -100,13 +102,13 @@ static obj_data *create_ship(obj_vnum vnum, empire_data *owner, room_data *to_ro
 			create_exit(main_room, spare[0], AFT, TRUE);
 			break;
 		case SHIP_GALLEY:
-			/* Helm - 0 */
+			// Helm - 0
 			spare[0] = create_room();
 			attach_building_to_room(building_proto(RTYPE_B_HELM), spare[0]);
 			ROOM_OWNER(spare[0]) = owner;
 			COMPLEX_DATA(spare[0])->home_room = main_room;
 
-			/* On Deck - 1 */
+			// On Deck - 1
 			spare[1] = create_room();
 			attach_building_to_room(building_proto(RTYPE_B_ONDECK), spare[1]);
 			ROOM_OWNER(spare[1]) = owner;
@@ -116,13 +118,13 @@ static obj_data *create_ship(obj_vnum vnum, empire_data *owner, room_data *to_ro
 			create_exit(main_room, spare[1], FORE, TRUE);
 			break;
 		case SHIP_BRIGANTINE:
-			/* Helm - 0 */
+			// Helm - 0
 			spare[0] = create_room();
 			attach_building_to_room(building_proto(RTYPE_B_HELM), spare[0]);
 			ROOM_OWNER(spare[0]) = owner;
 			COMPLEX_DATA(spare[0])->home_room = main_room;
 
-			/* Storage - 1 */
+			// Storage - 1
 			spare[1] = create_room();
 			attach_building_to_room(building_proto(RTYPE_B_STORAGE), spare[1]);
 			ROOM_OWNER(spare[1]) = owner;
@@ -132,19 +134,19 @@ static obj_data *create_ship(obj_vnum vnum, empire_data *owner, room_data *to_ro
 			create_exit(main_room, spare[1], DOWN, TRUE);
 			break;
 		case SHIP_ARGOSY:
-			/* Helm - 0 */
+			// Helm - 0
 			spare[0] = create_room();
 			attach_building_to_room(building_proto(RTYPE_B_HELM), spare[0]);
 			ROOM_OWNER(spare[0]) = owner;
 			COMPLEX_DATA(spare[0])->home_room = main_room;
 
-			/* On Deck - 1 */
+			// On Deck - 1
 			spare[1] = create_room();
 			attach_building_to_room(building_proto(RTYPE_B_ONDECK), spare[1]);
 			ROOM_OWNER(spare[1]) = owner;
 			COMPLEX_DATA(spare[1])->home_room = main_room;
 
-			/* Storage - 2-3 */
+			// Storage - 2-3
 			for (i = 2; i <= 3; i++) {
 				spare[i] = create_room();
 				attach_building_to_room(building_proto(RTYPE_B_STORAGE), spare[i]);
@@ -158,19 +160,19 @@ static obj_data *create_ship(obj_vnum vnum, empire_data *owner, room_data *to_ro
 			create_exit(main_room, spare[3], DOWN, TRUE);
 			break;
 		case SHIP_GALLEON:
-			/* Helm - 0 */
+			// Helm - 0
 			spare[0] = create_room();
 			attach_building_to_room(building_proto(RTYPE_B_HELM), spare[0]);
 			ROOM_OWNER(spare[0]) = owner;
 			COMPLEX_DATA(spare[0])->home_room = main_room;
 
-			/* On Deck - 1 */
+			// On Deck - 1
 			spare[1] = create_room();
 			attach_building_to_room(building_proto(RTYPE_B_ONDECK), spare[1]);
 			ROOM_OWNER(spare[1]) = owner;
 			COMPLEX_DATA(spare[1])->home_room = main_room;
 
-			/* Below Deck - 2-3 */
+			// Below Deck - 2-3
 			for (i = 2; i <= 3; i++) {
 				spare[i] = create_room();
 				attach_building_to_room(building_proto(RTYPE_B_BELOWDECK), spare[i]);
@@ -178,7 +180,7 @@ static obj_data *create_ship(obj_vnum vnum, empire_data *owner, room_data *to_ro
 				COMPLEX_DATA(spare[i])->home_room = main_room;
 			}
 
-			/* Storage - 4-7 */
+			// Storage - 4-7
 			for (i = 4; i < 8; i++) {
 				spare[i] = create_room();
 				attach_building_to_room(building_proto(RTYPE_B_STORAGE), spare[i]);
@@ -203,6 +205,7 @@ static obj_data *create_ship(obj_vnum vnum, empire_data *owner, room_data *to_ro
 	obj_to_room(ship, to_room);
 	load_otrigger(ship);
 	return (ship);
+	*/
 }
 
 
@@ -529,6 +532,7 @@ void process_manufacturing(char_data *ch) {
 
 
 ACMD(do_board) {
+	/*
 	struct follow_type *k;
 	obj_data *ship;
 	char_data *leading = NULL;
@@ -610,10 +614,12 @@ ACMD(do_board) {
 			command_lag(ch, WAIT_OTHER);
 		}
 	}
+	*/
 }
 
 
 ACMD(do_disembark) {
+	/*
 	obj_data *ship = GET_BOAT(IN_ROOM(ch));
 	char_data *leading = NULL;
 	room_data *was_in = IN_ROOM(ch);
@@ -680,6 +686,7 @@ ACMD(do_disembark) {
 			command_lag(ch, WAIT_OTHER);
 		}
 	}
+	*/
 }
 
 
@@ -804,6 +811,7 @@ ACMD(do_manufacture) {
 
 
 ACMD(do_sail) {
+	/*
 	char dir_arg[MAX_INPUT_LENGTH], dist_arg[MAX_INPUT_LENGTH];
 	room_data *room, *next_room;
 	bool was_sailing, same_dir;
@@ -878,6 +886,7 @@ ACMD(do_sail) {
 			}
 		}
 	}
+	*/
 }
 
 

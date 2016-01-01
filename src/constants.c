@@ -2226,6 +2226,7 @@ const char *room_aff_bits[] = {
 	"*!WORK",
 	"!DISREPAIR",
 	"*!DISMANTLE",
+	"*IN-VEHICLE",
 	"\n"
 };
 

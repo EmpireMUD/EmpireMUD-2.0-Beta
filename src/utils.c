@@ -3399,8 +3399,8 @@ int distance_to_nearest_player(room_data *room) {
 * @return room_data* A location on the map, or NULL if there is no map location.
 */
 room_data *get_map_location_for(room_data *room) {
-	room_data *working = room, *last;
-	obj_data *boat;
+	room_data *working, *last;
+	vehicle_data *veh;
 	
 	if (!room) {
 		return NULL;
@@ -3409,15 +3409,12 @@ room_data *get_map_location_for(room_data *room) {
 		// shortcut
 		return room;
 	}
-	else if (GET_ROOM_VNUM(HOME_ROOM(room)) >= MAP_SIZE && BOAT_ROOM(room) == room && !IS_ADVENTURE_ROOM(HOME_ROOM(room))) {
-		// no home room on the map and not in a boat?
-		return NULL;
-	}
-	else if (GET_BOAT(room) && GET_ROOM_VNUM(BOAT_ROOM(room)) >= MAP_SIZE) {
-		// in a boat but it's not on the map?
+	else if (GET_ROOM_VNUM(HOME_ROOM(room)) >= MAP_SIZE && IN_VEHICLE_IN_ROOM(room) == room && !IS_ADVENTURE_ROOM(HOME_ROOM(room))) {
+		// no home room on the map and not in a vehicle?
 		return NULL;
 	}
 	
+	working = room;
 	do {
 		last = working;
 		
@@ -3429,13 +3426,13 @@ room_data *get_map_location_for(room_data *room) {
 			}
 		} while (last != working);
 		
-		// boat resolution: find top boat->in_room: this is similar to GET_BOAT()/BOAT_ROOM()
+		// vehicle resolution: find top vehicle->in_room: this is similar to GET_ROOM_VEHICLE()/IN_VEHICLE_IN_ROOM()
 		do {
 			last = working;
-			boat = (COMPLEX_DATA(working) ? COMPLEX_DATA(working)->boat : NULL);
+			veh = (COMPLEX_DATA(working) ? COMPLEX_DATA(working)->vehicle : NULL);
 		
-			if (boat && IN_ROOM(boat)) {
-				working = IN_ROOM(boat);
+			if (veh && IN_ROOM(veh)) {
+				working = IN_ROOM(veh);
 			}
 		} while (last != working);
 		
@@ -3445,7 +3442,12 @@ room_data *get_map_location_for(room_data *room) {
 		}
 	} while (COMPLEX_DATA(working) && GET_ROOM_VNUM(working) >= MAP_SIZE && last != working);
 	
-	return working;
+	if (GET_ROOM_VNUM(working) < MAP_SIZE) {
+		return working;
+	}
+	else {
+		return NULL;	// found a location not on the map
+	}
 }
 
 

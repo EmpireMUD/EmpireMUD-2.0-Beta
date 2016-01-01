@@ -6918,8 +6918,6 @@ struct complex_room_data *init_complex_data() {
 	data->home_room = NULL;
 	data->private_owner = NOBODY;
 	
-	data->boat = NULL;
-	
 	data->burning = 0;	// not-burning
 	data->damage = 0;	// no damage
 	

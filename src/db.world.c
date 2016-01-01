@@ -1112,6 +1112,7 @@ struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_da
 * @param room_data *room The room to reset.
 */
 void reset_one_room(room_data *room) {
+	void add_convert_vehicle_data(char_data *mob, any_vnum vnum);
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	void objpack_load_room(room_data *room);
 	
@@ -1136,33 +1137,11 @@ void reset_one_room(room_data *room) {
 				SET_BIT(MOB_FLAGS(mob), MOB_ISNPC);
 				REMOVE_BIT(MOB_FLAGS(mob), MOB_EXTRACTED);
 				
-				// pulling? attempt to re-attach
-				/*
-				if (obj_proto(reset->arg2)) {
-					obj_data *obj = NULL;
-					bool found = FALSE;
-					for (obj = ROOM_CONTENTS(IN_ROOM(mob)); obj && !found; obj = obj->next_content) {
-						if (GET_OBJ_VNUM(obj) == reset->arg2) {
-							// find available pull slot
-							if (GET_PULLED_BY(obj, 0) && !GET_PULLED_BY(obj, 1) && GET_CART_ANIMALS_REQUIRED(obj) > 1) {
-								obj->pulled_by2 = mob;
-								GET_PULLING(mob) = obj;
-								found = TRUE;
-							}
-							else if (!GET_PULLED_BY(obj, 0)) {
-								obj->pulled_by1 = mob;
-								GET_PULLING(mob) = obj;
-								found = TRUE;
-							}
-						}
-					}
-					// couldn't find one -- just tie mob
-					if (!found) {
-						SET_BIT(MOB_FLAGS(mob), MOB_TIED);
-					}
+				// has old pulling data? attempt to convert
+				if (reset->arg2 > 0) {
+					add_convert_vehicle_data(mob, reset->arg2);
 				}
-				*/
-
+				
 				load_mtrigger(mob);
 				tmob = mob;
 				break;
