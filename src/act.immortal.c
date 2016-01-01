@@ -1714,9 +1714,10 @@ SHOW(show_stats) {
 	extern int buf_switches, buf_largecount, buf_overflows;
 	extern int total_accounts, active_accounts, active_accounts_week;
 	
-	int num_active_empires = 0, num_objs = 0, num_mobs = 0, num_players = 0, num_descs = 0, menu_count = 0;
+	int num_active_empires = 0, num_objs = 0, num_mobs = 0, num_vehs = 0, num_players = 0, num_descs = 0, menu_count = 0;
 	empire_data *emp, *next_emp;
 	descriptor_data *desc;
+	vehicle_data *veh;
 	char_data *vict;
 	obj_data *obj;
 	
@@ -1740,10 +1741,9 @@ SHOW(show_stats) {
 		}
 	}
 	
-	// count objs in world
-	for (obj = object_list; obj; obj = obj->next) {
-		++num_objs;
-	}
+	// other counts
+	LL_COUNT(object_list, obj, num_objs);
+	LL_COUNT(vehicle_list, veh, num_vehs);
 
 	// count active empires
 	HASH_ITER(hh, empire_table, emp, next_emp) {
@@ -1762,6 +1762,7 @@ SHOW(show_stats) {
 	msg_to_char(ch, "  %6d empires          %6d active\r\n", HASH_COUNT(empire_table), num_active_empires);
 	msg_to_char(ch, "  %6d mobiles          %6d prototypes\r\n", num_mobs, HASH_COUNT(mobile_table));
 	msg_to_char(ch, "  %6d objects          %6d prototypes\r\n", num_objs, HASH_COUNT(object_table));
+	msg_to_char(ch, "  %6d vehicles         %6d prototypes\r\n", num_vehs, HASH_COUNT(vehicle_table));
 	msg_to_char(ch, "  %6d adventures       %6d total rooms\r\n", HASH_COUNT(adventure_table), HASH_COUNT(world_table));
 	msg_to_char(ch, "  %6d buildings        %6d room templates\r\n", HASH_COUNT(building_table), HASH_COUNT(room_template_table));
 	msg_to_char(ch, "  %6d sectors          %6d crops\r\n", HASH_COUNT(sector_table), HASH_COUNT(crop_table));

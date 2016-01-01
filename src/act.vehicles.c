@@ -35,9 +35,11 @@
 
 // external funcs
 extern int count_harnessed_animals(vehicle_data *veh);
+extern room_data *dir_to_room(room_data *room, int dir);
 extern struct vehicle_attached_mob *find_harnessed_mob_by_name(vehicle_data *veh, char *name);
 extern room_data *get_vehicle_interior(vehicle_data *veh);
 void harness_mob_to_vehicle(char_data *mob, vehicle_data *veh);
+extern int perform_move(char_data *ch, int dir, int need_specials_check, byte mode);
 void scale_item_to_level(obj_data *obj, int level);
 extern char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh);
 
@@ -132,8 +134,8 @@ void do_get_from_vehicle(char_data *ch, vehicle_data *veh, char *arg, int mode, 
 		act("$V is not a container.", FALSE, ch, NULL, veh, TO_CHAR);
 		return;
 	}
-	if (VEH_OWNER(veh) && VEH_OWNER(veh) != GET_LOYALTY(ch)) {
-		msg_to_char(ch, "You can't get items from vehicles owned by other empires.\r\n");
+	if (!can_use_vehicle(ch, veh, MEMBERS_ONLY)) {
+		msg_to_char(ch, "You don't have permission to get anything from that.\r\n");
 		return;
 	}
 
@@ -245,8 +247,8 @@ void do_put_obj_in_vehicle(char_data *ch, vehicle_data *veh, int dotmode, char *
 		act("$V is not a container.", FALSE, ch, NULL, veh, TO_CHAR);
 		return;
 	}
-	if (VEH_OWNER(veh) && VEH_OWNER(veh) != GET_LOYALTY(ch)) {
-		msg_to_char(ch, "You can't put items into vehicles owned by other empires.\r\n");
+	if (!can_use_vehicle(ch, veh, MEMBERS_ONLY)) {
+		msg_to_char(ch, "You don't have permission to put anything in there, and you wouldn't be able to get it out again.\r\n");
 		return;
 	}
 	
@@ -362,7 +364,7 @@ ACMD(do_board) {
 	else if (!(to_room = get_vehicle_interior(veh))) {
 		msg_to_char(ch, "You can't seem to %s it.\r\n", command);
 	}
-	else if (VEH_OWNER(veh) && GET_LOYALTY(ch) != VEH_OWNER(veh)) {
+	else if (!can_use_vehicle(ch, veh, MEMBERS_AND_ALLIES)) {
 		msg_to_char(ch, "You don't have permission to %s it.\r\n", command);
 	}
 	else if (IS_RIDING(ch) && !ROOM_BLD_FLAGGED(to_room, BLD_ALLOW_MOUNTS)) {
@@ -554,6 +556,84 @@ ACMD(do_disembark) {
 }
 
 
+ACMD(do_drag) {
+	char what[MAX_INPUT_LENGTH], where[MAX_INPUT_LENGTH];
+	room_data *to_room, *was_in;
+	vehicle_data *veh;
+	int dir;
+	
+	two_arguments(argument, what, where);
+	
+	if (GET_LEADING_MOB(ch) || GET_LEADING_VEHICLE(ch)) {
+		msg_to_char(ch, "You can't drag anything while you're leading something.\r\n");
+	}
+	else if (GET_SITTING_ON(ch)) {
+		msg_to_char(ch, "You can't drag anything while you're sitting on something.\r\n");
+	}
+	else if (IS_WATER_SECT(SECT(IN_ROOM(ch)))) {
+		msg_to_char(ch, "You can't drag anything in the water.\r\n");
+	}
+	else if (!*what || !*where) {
+		msg_to_char(ch, "Drag what, in which direction?\r\n");
+	}
+	// vehicle validation
+	else if (!(veh = get_vehicle_in_room_vis(ch, what))) {
+		msg_to_char(ch, "You don't see %s %s here.\r\n", AN(what), what);
+	}
+	else if (!VEH_FLAGGED(veh, VEH_DRAGGABLE)) {
+		msg_to_char(ch, "You can't drag that!\r\n");
+	}
+	else if (!can_use_vehicle(ch, veh, MEMBERS_ONLY)) {
+		msg_to_char(ch, "You don't have permission to drag that.\r\n");
+	}
+	else if (!VEH_IS_COMPLETE(veh)) {
+		msg_to_char(ch, "You can't drag that around until it's finished.\r\n");
+	}
+	else if (count_harnessed_animals(veh) > 0) {
+		msg_to_char(ch, "You can't drag that while animals are harnessed to it.\r\n");
+	}
+	else if (VEH_SITTING_ON(veh)) {
+		msg_to_char(ch, "You can't drag it while someone is sitting on it.\r\n");
+	}
+	else if (VEH_LED_BY(veh)) {
+		msg_to_char(ch, "You can't drag it while someone is leading it.\r\n");
+	}
+	// direction validation
+	else if ((dir = parse_direction(ch, where)) == NO_DIR) {
+		// TODO portal?
+		msg_to_char(ch, "Which direction is that?\r\n");
+	}
+	else if (!(to_room = dir_to_room(IN_ROOM(ch), dir))) {
+		msg_to_char(ch, "You can't drag anything in that direction.\r\n");
+	}
+	else if (IS_WATER_SECT(SECT(to_room))) {
+		msg_to_char(ch, "You can't drag anything into the water.\r\n");
+	}
+	else if (ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && !VEH_FLAGGED(veh, VEH_ALLOW_ROUGH)) {
+		msg_to_char(ch, "You can't drag it on such rough terrain.\r\n");
+	}
+	else if (ROOM_IS_CLOSED(to_room) && VEH_FLAGGED(veh, VEH_NO_BUILDING)) {
+		msg_to_char(ch, "You can't drag it in there.\r\n");
+	}
+	else {
+		// seems okay enough -- try movement
+		was_in = IN_ROOM(ch);
+		if (!perform_move(ch, dir, FALSE, 0) || IN_ROOM(ch) == was_in) {
+			// failure here would have sent its own message
+			return;
+		}
+		
+		if (ROOM_PEOPLE(IN_ROOM(veh))) {
+			act("$V is dragged along.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+		}
+		
+		vehicle_to_room(veh, IN_ROOM(ch));
+		act("$V is dragged along with you.", FALSE, ch, NULL, veh, TO_CHAR);
+		act("$V is dragged along with $M.", FALSE, ch, NULL, veh, TO_ROOM);
+	}
+}
+
+
 ACMD(do_harness) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	char_data *animal;
@@ -670,8 +750,8 @@ ACMD(do_lead) {
 		else if (count_harnessed_animals(veh) < VEH_ANIMALS_REQUIRED(veh)) {
 			msg_to_char(ch, "You need to harness %d animal%s to it before you can lead it.\r\n", VEH_ANIMALS_REQUIRED(veh), PLURAL(VEH_ANIMALS_REQUIRED(veh)));
 		}
-		else if (VEH_OWNER(veh) && VEH_OWNER(veh) != GET_LOYALTY(ch)) {
-			msg_to_char(ch, "You can't lead something owned by another empire.\r\n");
+		else if (!can_use_vehicle(ch, veh, MEMBERS_ONLY)) {
+			msg_to_char(ch, "You don't have permission to lead that.\r\n");
 		}
 		else if (VEH_SITTING_ON(veh)) {
 			msg_to_char(ch, "You can't lead it while %s sitting on it.\r\n", (VEH_SITTING_ON(veh) == ch) ? "you are" : "someone else is");

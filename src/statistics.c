@@ -80,6 +80,7 @@ void display_statistics_to_char(char_data *ch) {
 
 	char populous_str[MAX_STRING_LENGTH], wealthiest_str[MAX_STRING_LENGTH], famous_str[MAX_STRING_LENGTH], greatest_str[MAX_STRING_LENGTH];
 	int populous_empire = NOTHING, wealthiest_empire = NOTHING, famous_empire = NOTHING, greatest_empire = NOTHING;
+	vehicle_data *veh;
 	char_data *vict;
 	obj_data *obj;
 	empire_data *emp, *next_emp;
@@ -188,11 +189,12 @@ void display_statistics_to_char(char_data *ch) {
 	msg_to_char(ch, "Unique Creatures:   %3d     Total Mobs:         %d\r\n", HASH_COUNT(mobile_table), count);
 
 	// objs
-	count = 0;
-	for (obj = object_list; obj; obj = obj->next) {
-		++count;
-	}
+	LL_COUNT(object_list, obj, count);
 	msg_to_char(ch, "Unique Objects:     %3d     Total Objects:      %d\r\n", HASH_COUNT(object_table), count);
+	
+	// vehicles
+	LL_COUNT(vehicle_list, veh, count);
+	msg_to_char(ch, "Unique Vehicles:    %3d     Total Vehicles:     %d\r\n", HASH_COUNT(vehicle_table), count);
 }
 
 

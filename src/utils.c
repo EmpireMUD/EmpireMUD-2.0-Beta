@@ -1109,6 +1109,39 @@ bool emp_can_use_room(empire_data *emp, room_data *room, int mode) {
 
 
 /**
+* Determines if an empire can use a vehicle.
+*
+* @param empire_data *emp The empire trying to use it -- MAY be null.
+* @param vehicle_data *veh The vehicle it's trying to use.
+* @param int mode -- GUESTS_ALLOWED, MEMBERS_AND_ALLIES, MEMBERS_ONLY
+* @return bool TRUE if emp can use veh, FALSE otherwise
+*/
+bool emp_can_use_vehicle(empire_data *emp, vehicle_data *veh, int mode) {
+	room_data *interior = VEH_INTERIOR_HOME_ROOM(veh);	// if any
+	
+	// no owner?
+	if (!VEH_OWNER(veh)) {
+		return TRUE;
+	}
+	// empire ownership
+	if (VEH_OWNER(veh) == emp) {
+		return TRUE;
+	}
+	// public + guests
+	if (interior && ROOM_AFF_FLAGGED(interior, ROOM_AFF_PUBLIC) && mode == GUESTS_ALLOWED) {
+		return TRUE;
+	}
+	// check allies
+	if (mode != MEMBERS_ONLY && emp && has_relationship(VEH_OWNER(veh), emp, DIPL_ALLIED)) {
+		return TRUE;
+	}
+	
+	// newp
+	return FALSE;
+}
+
+
+/**
 * Checks the room to see if ch has permission.
 *
 * @param char_data *ch

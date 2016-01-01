@@ -1607,6 +1607,42 @@ void clear_private_owner(int id) {
 
 
 /**
+* Gets a simple movable room based on valid exits. This does not take a player
+* into account, only that a room exists that way and it's possible to move to
+* it.
+*/
+room_data *dir_to_room(room_data *room, int dir) {
+	struct room_direction_data *ex;
+	room_data *to_room = NULL;
+	
+	// on the map
+	if (!ROOM_IS_CLOSED(room) && GET_ROOM_VNUM(room) < MAP_SIZE) {
+		if (dir >= NUM_2D_DIRS || dir < 0) {
+			return NULL;
+		}
+		// may produce a NULL
+		to_room = real_shift(room, shift_dir[dir][0], shift_dir[dir][1]);
+		
+		// check building entrance
+		if (to_room && IS_MAP_BUILDING(to_room) && !IS_INSIDE(room) && !IS_ADVENTURE_ROOM(room) && BUILDING_ENTRANCE(to_room) != dir && ROOM_IS_CLOSED(to_room) && (!ROOM_BLD_FLAGGED(to_room, BLD_TWO_ENTRANCES) || BUILDING_ENTRANCE(to_room) != rev_dir[dir])) {
+			to_room = NULL;	// can't enter this way
+		}
+	}
+	else {	// not on the map
+		if (!(ex = find_exit(room, dir)) || !ex->room_ptr) {
+			return NULL;
+		}
+		if (EXIT_FLAGGED(ex, EX_CLOSED) && ex->keyword) {
+			return NULL;
+		}
+		to_room = ex->room_ptr;
+	}
+	
+	return to_room;
+}
+
+
+/**
 * Creates a blank map room from the world_map data. This allows parts of the
 * map to be unloaded using CAN_UNLOAD_MAP_ROOM(); this function builds new
 * rooms as-needed.
