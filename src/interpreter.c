@@ -609,7 +609,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	ABILITY_CMD( "disarm", POS_FIGHTING, do_disarm, NO_MIN, CTYPE_COMBAT, ABIL_DISARM ),
 	ABILITY_CMD( "disenchant", POS_STANDING, do_disenchant, NO_MIN, CTYPE_SKILL, ABIL_DISENCHANT ),
 	ABILITY_CMD( "disguise", POS_STANDING, do_disguise, NO_MIN, CTYPE_SKILL, ABIL_DISGUISE ),
-	ABILITY_CMD( "dismount", POS_FIGHTING, do_dismount, NO_MIN, CTYPE_MOVE, ABIL_RIDE ),
+	ABILITY_CMD( "dismount", POS_SITTING, do_dismount, NO_MIN, CTYPE_MOVE, ABIL_RIDE ),
 	STANDARD_CMD( "dismantle", POS_STANDING, do_dismantle, LVL_APPROVED, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "dismiss", POS_STANDING, do_dismiss, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "disembark", POS_STANDING, do_disembark, NO_MIN, CTYPE_MOVE ),
