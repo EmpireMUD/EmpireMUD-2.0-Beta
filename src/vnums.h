@@ -67,10 +67,6 @@
 
 
 // Room building vnums
-#define RTYPE_B_HELM  5500	// boat
-#define RTYPE_B_ONDECK  5501	// boat
-#define RTYPE_B_STORAGE  5502	// boat
-#define RTYPE_B_BELOWDECK  5503	// boat
 #define RTYPE_SHIP_HOLDING_PEN  5509	// for the shipping system's storage room
 #define RTYPE_STEALTH_HIDEOUT  5510
 #define RTYPE_SORCERER_TOWER  5511
@@ -138,18 +134,10 @@
 
 // Sewn items
 #define o_ROPE  2035
-#define o_TENT  2036
 
 // Wood crafts
 #define o_STAKE  915	// could be a flag
 #define o_BLANK_SIGN  918
-
-// Ships
-#define os_PINNACE  952
-#define os_BRIGANTINE  953
-#define os_GALLEY  954
-#define os_ARGOSY  955
-#define os_GALLEON  956
 
 // core objects
 #define o_CORPSE  1000

@@ -2940,7 +2940,7 @@ struct craft_data {
 	bitvector_t build_on;	// BLD_ON_x flags for the tile it's built upon
 	bitvector_t build_facing;	// BLD_ON_x flags for the tile it's facing
 	
-	obj_vnum requires_obj;	// only shows up if you have the item, e.g. o_TENT
+	obj_vnum requires_obj;	// only shows up if you have the item
 	struct resource_data *resources;	// linked list
 	
 	UT_hash_handle hh;	// craft_table hash

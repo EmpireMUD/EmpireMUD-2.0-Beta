@@ -46,6 +46,14 @@ extern int count_objs_in_room(room_data *room);
 #define SHIP_GALLEON		4
 
 
+// Ships
+#define os_PINNACE  952
+#define os_BRIGANTINE  953
+#define os_GALLEY  954
+#define os_ARGOSY  955
+#define os_GALLEON  956
+
+
 struct ship_data_struct ship_data[] = {
 	// name, vnum, type, ability, resources (number), is-advanced, cargo-size
 	{ "pinnace", os_PINNACE, 0, ABIL_SHIPBUILDING, 60, 0, 150 },
@@ -531,6 +539,7 @@ void process_manufacturing(char_data *ch) {
 //// SHIP COMMANDS ///////////////////////////////////////////////////////////
 
 ACMD(do_load_boat) {
+	/*
 	obj_data *ship, *to_load = NULL;
 	room_data *room, *next_room, *ship_room;
 	int val = -1;
@@ -581,7 +590,7 @@ ACMD(do_load_boat) {
 					act("You load some cargo into $p.", FALSE, ch, ship, 0, TO_CHAR);
 					act("$n loads some cargo into $p.", FALSE, ch, ship, 0, TO_ROOM);
 				}
-				/* else nothing was loaded at all to this room */
+				// else nothing was loaded at all to this room
 			}
 		}
 		if (val == -1 && !done) {
@@ -591,6 +600,7 @@ ACMD(do_load_boat) {
 			act("$p is full.", FALSE, ch, ship, 0, TO_CHAR);
 		}
 	}
+	*/
 }
 
 
@@ -731,6 +741,7 @@ ACMD(do_sail) {
 
 
 ACMD(do_unload_boat) {
+	/*
 	obj_data *ship;
 	room_data *room, *next_room, *ship_room;
 	int val = 0;
@@ -774,4 +785,5 @@ ACMD(do_unload_boat) {
 			msg_to_char(ch, "There was nothing to unload from that ship.\r\n");
 		}
 	}
+	*/
 }
