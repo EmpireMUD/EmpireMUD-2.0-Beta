@@ -41,6 +41,7 @@ const char *default_vehicle_long_desc = "An unnamed vehicle is parked here.";
 
 // local protos
 void clear_vehicle(vehicle_data *veh);
+extern room_data *create_room();
 
 // external consts
 extern const char *designate_flags[];
@@ -85,6 +86,41 @@ void empty_vehicle(vehicle_data *veh) {
 			extract_obj(obj);
 		}
 	}
+}
+
+/**
+* This returns (or creates, if necessary) the start of the interior of the
+* vehicle. Some vehicles don't have this feature.
+*
+* @param vehicle_data *veh The vehicle to get the interior for.
+* @return room_data* The interior home room, if it exists (may be NULL).
+*/
+room_data *get_vehicle_interior(vehicle_data *veh) {
+	room_data *room;
+	bld_data *bld;
+	
+	// already have one?
+	if (VEH_INTERIOR_HOME_ROOM(veh)) {
+		return VEH_INTERIOR_HOME_ROOM(veh);
+	}
+	// this vehicle has no interior available
+	if (!VEH_IS_COMPLETE(veh) || !(bld = building_proto(VEH_INTERIOR_ROOM_VNUM(veh)))) {
+		return NULL;
+	}
+	
+	// otherwise, create the interior
+	room = create_room();
+	attach_building_to_room(bld, room);
+	ROOM_OWNER(room) = VEH_OWNER(veh);
+	COMPLEX_DATA(room)->home_room = NULL;
+	SET_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_IN_VEHICLE);
+	SET_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_IN_VEHICLE);
+	
+	// attach
+	COMPLEX_DATA(room)->vehicle = veh;
+	VEH_INTERIOR_HOME_ROOM(veh) = room;
+		
+	return room;
 }
 
 
@@ -1623,6 +1659,11 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	
 	if (VEH_OWNER(veh) || VEH_SCALE_LEVEL(veh)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "Scaled to level: [\tc%d\t0], Owner: [%s%s\t0]\r\n", VEH_SCALE_LEVEL(veh), EMPIRE_BANNER(VEH_OWNER(veh)), EMPIRE_NAME(VEH_OWNER(veh)));
+	}
+	
+	if (VEH_INTERIOR_HOME_ROOM(veh) || VEH_INSIDE_ROOMS(veh) > 0) {
+		// this adds 1 room for the home room, which isn't counted
+		size += snprintf(buf + size, sizeof(buf) - size, "Interior location: [\ty%d\t0], Rooms inside: [\tg%d\t0]\r\n", VEH_INTERIOR_HOME_ROOM(veh) ? GET_ROOM_VNUM(VEH_INTERIOR_HOME_ROOM(veh)) : NOTHING, VEH_INSIDE_ROOMS(veh) + 1);
 	}
 	
 	if (VEH_CONTAINS(veh)) {

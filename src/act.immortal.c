@@ -63,6 +63,7 @@ extern struct instance_data *build_instance_loc(adv_data *adv, struct adventure_
 void check_autowiz(char_data *ch);
 void clear_char_abilities(char_data *ch, any_vnum skill);
 void delete_instance(struct instance_data *inst);	// instance.c
+void do_stat_vehicle(char_data *ch, vehicle_data *veh);
 void get_icons_display(struct icon_data *list, char *save_buffer);
 void get_interaction_display(struct interaction_item *list, char *save_buffer);
 void get_script_display(struct trig_proto_list *list, char *save_buffer);
@@ -5970,6 +5971,7 @@ ACMD(do_snoop) {
 
 ACMD(do_stat) {
 	char_data *victim = NULL;
+	vehicle_data *veh;
 	crop_data *cp;
 	obj_data *obj;
 	bool file = FALSE;
@@ -6029,6 +6031,18 @@ ACMD(do_stat) {
 				send_to_char("No such mobile around.\r\n", ch);
 		}
 	}
+	else if (is_abbrev(buf1, "vehicle")) {
+		if (!*buf2)
+			send_to_char("Stats on which vehicle?\r\n", ch);
+		else {
+			if ((veh = get_vehicle_vis(ch, buf2)) != NULL) {
+				do_stat_vehicle(ch, veh);
+			}
+			else {
+				send_to_char("No such vehicle around.\r\n", ch);
+			}
+		}
+	}
 	else if (is_abbrev(buf1, "player")) {
 		if (!*buf2) {
 			send_to_char("Stats on which player?\r\n", ch);
@@ -6079,6 +6093,9 @@ ACMD(do_stat) {
 			do_stat_object(ch, obj);
 		else if ((victim = get_char_vis(ch, buf1, FIND_CHAR_WORLD)) != NULL)
 			do_stat_character(ch, victim);
+		else if ((veh = get_vehicle_vis(ch, buf1)) != NULL) {
+			do_stat_vehicle(ch, veh);
+		}
 		else if ((obj = get_obj_vis(ch, buf1)) != NULL)
 			do_stat_object(ch, obj);
 		else
@@ -6650,7 +6667,6 @@ ACMD(do_vstat) {
 		do_stat_trigger(ch, trig);
 	}
 	else if (is_abbrev(buf, "vehicle")) {
-		void do_stat_vehicle(char_data *ch, vehicle_data *veh);
 		vehicle_data *veh = vehicle_proto(number);
 		if (veh) {
 			do_stat_vehicle(ch, veh);
