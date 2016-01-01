@@ -5994,9 +5994,27 @@ int get_number(char **name) {
 */
 void extract_vehicle(vehicle_data *veh) {
 	void empty_vehicle(vehicle_data *veh);
+	void relocate_players(room_data *room, room_data *to_room);
 	extern char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh);
 	
-	// TODO delete interior
+	room_data *main_room, *room, *next_room;
+	
+	// delete interior
+	if ((main_room = VEH_INTERIOR_HOME_ROOM(veh))) {
+		LL_FOREACH_SAFE2(interior_room_list, room, next_room, next_interior) {
+			if (HOME_ROOM(room) == main_room && room != main_room) {
+				if (IN_ROOM(veh)) {
+					relocate_players(room, IN_ROOM(veh));
+				}
+				delete_room(room, FALSE);	// MUST check_all_exits later
+			}
+		}
+		if (IN_ROOM(veh)) {
+			relocate_players(main_room, IN_ROOM(veh));
+		}
+		delete_room(main_room, FALSE);
+		check_all_exits();
+	}
 	
 	if (VEH_LED_BY(veh)) {
 		GET_LEADING_VEHICLE(VEH_LED_BY(veh)) = NULL;
