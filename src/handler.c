@@ -845,6 +845,9 @@ void extract_char_final(char_data *ch) {
 		VEH_LED_BY(GET_LEADING_VEHICLE(ch)) = NULL;
 		GET_LEADING_VEHICLE(ch) = NULL;
 	}
+	if (GET_SITTING_ON(ch)) {
+		unseat_char_from_vehicle(ch);
+	}
 	
 	// npc-only frees	
 	if (IS_NPC(ch)) {
@@ -5998,6 +6001,9 @@ void extract_vehicle(vehicle_data *veh) {
 	if (VEH_LED_BY(veh)) {
 		GET_LEADING_VEHICLE(VEH_LED_BY(veh)) = NULL;
 		VEH_LED_BY(veh) = NULL;
+	}
+	if (VEH_SITTING_ON(veh)) {
+		unseat_char_from_vehicle(VEH_SITTING_ON(veh));
 	}
 	
 	if (IN_ROOM(veh)) {

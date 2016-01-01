@@ -1263,7 +1263,7 @@ void convert_one_obj_to_vehicle(obj_data *obj) {
 	extern room_data *obj_room(obj_data *obj);
 	
 	obj_data *obj_iter, *next_obj;
-	room_data *room, *room_iter, *main;
+	room_data *room, *room_iter, *main_room;
 	vehicle_data *veh;
 	
 	// if there isn't a room or vehicle involved, just remove the object
@@ -1288,17 +1288,17 @@ void convert_one_obj_to_vehicle(obj_data *obj) {
 	// type-based traits
 	switch (GET_OBJ_TYPE(obj)) {
 		case ITEM_SHIP: {
-			if ((main = real_room(GET_SHIP_MAIN_ROOM(obj)))) {
-				VEH_INTERIOR_HOME_ROOM(veh) = main;
+			if ((main_room = real_room(GET_SHIP_MAIN_ROOM(obj)))) {
+				VEH_INTERIOR_HOME_ROOM(veh) = main_room;
 				
 				// detect owner from room
-				if (ROOM_OWNER(main)) {
-					VEH_OWNER(veh) = ROOM_OWNER(main);
+				if (ROOM_OWNER(main_room)) {
+					VEH_OWNER(veh) = ROOM_OWNER(main_room);
 				}
 				
 				// apply vehicle aff
 				LL_FOREACH2(interior_room_list, room_iter, next_interior) {
-					if (room_iter == main || HOME_ROOM(room_iter) == main) {
+					if (room_iter == main_room || HOME_ROOM(room_iter) == main_room) {
 						SET_BIT(ROOM_AFF_FLAGS(room_iter), ROOM_AFF_IN_VEHICLE);
 						SET_BIT(ROOM_BASE_FLAGS(room_iter), ROOM_AFF_IN_VEHICLE);
 					}
