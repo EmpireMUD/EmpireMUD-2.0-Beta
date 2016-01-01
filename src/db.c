@@ -1664,6 +1664,7 @@ const char *versions_list[] = {
 	"b3.1",
 	"b3.2",
 	"b3.6",
+	"b3.8",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -2087,6 +2088,11 @@ void check_version(void) {
 		if (MATCH_VERSION("b3.6")) {
 			b3_6_einv_fix();
 		}
+		if (MATCH_VERSION("b3.8")) {
+			void b3_8_ship_update(void);	// vehicles.c
+			log("Applying b3.8 update to vehicles...");
+			b3_8_ship_update();
+}
 	}
 	
 	write_last_boot_version(current);

@@ -28,6 +28,7 @@
 *   Helpers
 *   Utilities
 *   Database
+*   2.0b3.8 Converter
 *   OLC Handlers
 *   Displays
 *   Edit Modules
@@ -522,6 +523,9 @@ void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
 	if (VEH_HEALTH(veh) != VEH_MAX_HEALTH(veh)) {
 		fprintf(fl, "Health: %d\n", VEH_HEALTH(veh));
 	}
+	if (VEH_INTERIOR_HOME_ROOM(veh)) {
+		fprintf(fl, "Interior-home: %d\n", GET_ROOM_VNUM(VEH_INTERIOR_HOME_ROOM(veh)));
+	}
 	if (VEH_CONTAINS(veh)) {
 		fprintf(fl, "Contents:\n");
 		Crash_save(VEH_CONTAINS(veh), fl, LOC_INVENTORY);
@@ -737,6 +741,11 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 						free(VEH_ICON(veh));
 					}
 					VEH_ICON(veh) = fread_string(fl, error);
+				}
+				else if (OBJ_FILE_TAG(line, "Interior-home:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+						VEH_INTERIOR_HOME_ROOM(veh) = real_room(i_in[0]);
+					}
 				}
 				break;
 			}
@@ -1094,8 +1103,212 @@ void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
 
 
  //////////////////////////////////////////////////////////////////////////////
-//// OLC HANDLERS ////////////////////////////////////////////////////////////
+//// 2.0b3.8 CONVERTER ///////////////////////////////////////////////////////
 
+// this system converts a set of objects to vehicles, including all the boats,
+// catapults, carts, and ships.
+	
+// list of vnums to convert directly from obj to vehicle
+any_vnum convert_list[] = {
+	900,	// a rickety cart
+	901,	// a carriage
+	902,	// a covered wagon
+	903,	// the catapult
+	904,	// a chair
+	905,	// a wooden bench
+	906,	// a long table
+	907,	// a stool
+	917,	// the throne
+	920,	// a wooden canoe
+	952,	// the pinnace
+	953,	// the brigantine
+	954,	// the galley
+	955,	// the argosy
+	956,	// the galleon
+	10715,	// the sleigh
+	NOTHING	// end list
+};
+
+struct convert_vehicle_data {
+	char_data *mob;	// mob to attach
+	any_vnum vnum;	// vehicle vnum
+	struct convert_vehicle_data *next;
+};
+
+struct convert_vehicle_data *convert_vehicle_list = NULL;
+
+/**
+* Stores data for a mob that was supposed to be attached to a vehicle.
+*/
+void add_convert_vehicle_data(char_data *mob, any_vnum vnum) {
+	struct convert_vehicle_data *cvd;
+	
+	CREATE(cvd, struct convert_vehicle_data, 1);
+	cvd->mob = mob;
+	cvd->vnum = vnum;
+	LL_PREPEND(convert_vehicle_list, cvd);
+}
+
+
+/**
+* Processes any temporary data for mobs that should be attached to a vehicle.
+* This basically assumes you're in the middle of upgrading to 2.0 b3.8 and
+* works on any data it found. Mobs are only removed if they become attached
+* to a vehicle.
+*
+* @return int the number converted
+*/
+int run_convert_vehicle_list(void) {
+	struct convert_vehicle_data *cvd;
+	vehicle_data *veh;
+	int changed = 0;
+	
+	while ((cvd = convert_vehicle_list)) {
+		convert_vehicle_list = cvd->next;
+		
+		if (cvd->mob && IN_ROOM(cvd->mob)) {
+			LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(cvd->mob)), veh, next_in_room) {
+				if (VEH_VNUM(veh) == cvd->vnum && count_harnessed_animals(veh) < VEH_ANIMALS_REQUIRED(veh)) {
+					harness_mob_to_vehicle(cvd->mob, veh);
+					++changed;
+					break;
+				}
+			}
+		}
+		
+		free(cvd);
+	}
+	
+	return changed;
+}
+
+/**
+* Replaces an object with a vehicle of the same VNUM, and converts the traits
+* that it can. This will result in partially-completed ships becoming fully-
+* completed.
+* 
+* @param obj_data *obj The object to convert (will be extracted).
+*/
+void convert_one_obj_to_vehicle(obj_data *obj) {
+	extern room_data *obj_room(obj_data *obj);
+	
+	obj_data *obj_iter, *next_obj;
+	room_data *room, *main;
+	vehicle_data *veh;
+	
+	// if there isn't a room or vehicle involved, just remove the object
+	if (!(room = obj_room(obj)) || !vehicle_proto(GET_OBJ_VNUM(obj))) {
+		extract_obj(obj);
+		return;
+	}
+	
+	// create the vehicle
+	veh = read_vehicle(GET_OBJ_VNUM(obj), TRUE);
+	vehicle_to_room(veh, room);
+	
+	// move inventory
+	LL_FOREACH_SAFE2(obj->contains, obj_iter, next_obj, next_content) {
+		obj_to_vehicle(obj_iter, veh);
+	}
+	
+	// convert traits
+	VEH_OWNER(veh) = real_empire(obj->last_empire_id);
+	VEH_SCALE_LEVEL(veh) = GET_OBJ_CURRENT_SCALE_LEVEL(obj);
+	
+	// type-based traits
+	switch (GET_OBJ_TYPE(obj)) {
+		case ITEM_SHIP: {
+			if ((main = real_room(GET_SHIP_MAIN_ROOM(obj)))) {
+				VEH_INTERIOR_HOME_ROOM(veh) = main;
+				if (ROOM_OWNER(main)) {	// detect owner from room
+					VEH_OWNER(veh) = ROOM_OWNER(main);
+				}
+			}
+			break;
+		}
+		case ITEM_BOAT: {
+			// nothing to convert?
+			break;
+		}
+		case ITEM_CART: {
+			// nothing to convert?
+			break;
+		}
+	}
+	
+	// did we successfully get an owner? try the room it's in
+	if (!VEH_OWNER(veh)) {
+		VEH_OWNER(veh) = ROOM_OWNER(room);
+	}
+	
+	// remove the object
+	extract_obj(obj);
+}
+
+
+/**
+* Converts a list of objects into vehicles with the same vnum. This converter
+* was used during the initial implementation of vehicles in 2.0 b3.8.
+*
+* @return int the number converted
+*/
+int convert_to_vehicles(void) {
+	obj_data *obj, *next_obj;
+	int iter, changed = 0;
+	bool found;
+	
+	LL_FOREACH_SAFE(object_list, obj, next_obj) {
+		// determine if it's in the list to replace
+		found = FALSE;
+		for (iter = 0; convert_list[iter] != NOTHING && !found; ++iter) {
+			if (convert_list[iter] == GET_OBJ_VNUM(obj)) {
+				found = TRUE;
+			}
+		}
+		if (!found) {
+			continue;
+		}
+		
+		// success
+		convert_one_obj_to_vehicle(obj);
+		++changed;
+	}
+	
+	return changed;
+}
+
+
+/**
+* Removes the old room affect flag that hinted when to show a ship in pre-
+* b3.8.
+*/
+void b3_8_ship_update(void) {
+	void save_whole_world();
+	
+	room_data *room, *next_room;
+	int changed = 0;
+	
+	bitvector_t ROOM_AFF_SHIP_PRESENT = BIT(10);	// old bit to remove
+	
+	HASH_ITER(hh, world_table, room, next_room) {
+		if (IS_SET(ROOM_AFF_FLAGS(room) | ROOM_BASE_FLAGS(room), ROOM_AFF_SHIP_PRESENT)) {
+			REMOVE_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_SHIP_PRESENT);
+			REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_SHIP_PRESENT);
+			++changed;
+		}
+	}
+	
+	changed += convert_to_vehicles();
+	changed += run_convert_vehicle_list();
+	
+	if (changed > 0) {
+		save_whole_world();
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// OLC HANDLERS ////////////////////////////////////////////////////////////
 
 /**
 * Creates a new vehicle entry.

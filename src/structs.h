@@ -3521,6 +3521,7 @@ struct vehicle_data {
 	int carrying_n;	// size of contents
 	struct vehicle_attached_mob *animals;	// linked list of mobs attached
 	struct resource_data *needs_resources;	// resources until finished/maintained
+	room_data *interior_home_room;	// the vehicle's main room
 	room_data *in_room;	// where it is
 	char_data *led_by;	// person leading it
 	char_data *sitting_on;	// person sitting on it
