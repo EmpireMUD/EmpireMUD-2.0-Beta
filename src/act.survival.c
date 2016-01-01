@@ -198,11 +198,11 @@ ACMD(do_butcher) {
 
 
 ACMD(do_dismount) {
+	void do_unseat_from_vehicle(char_data *ch);
+	
 	char_data *mount;
 	
-	if (!IS_RIDING(ch))
-		msg_to_char(ch, "You're not riding anything right now.\r\n");
-	else {
+	if (IS_RIDING(ch)) {
 		mount = mob_proto(GET_MOUNT_VNUM(ch));
 		
 		msg_to_char(ch, "You jump down off of %s.\r\n", mount ? GET_SHORT_DESC(mount) : "your mount");
@@ -211,6 +211,12 @@ ACMD(do_dismount) {
 		act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
 		
 		perform_dismount(ch);
+	}
+	else if (GET_SITTING_ON(ch)) {
+		do_unseat_from_vehicle(ch);
+	}
+	else {
+		msg_to_char(ch, "You're not riding anything right now.\r\n");
 	}
 }
 
