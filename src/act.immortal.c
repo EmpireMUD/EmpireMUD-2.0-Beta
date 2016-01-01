@@ -6093,7 +6093,7 @@ ACMD(do_stat) {
 			do_stat_object(ch, obj);
 		else if ((victim = get_char_vis(ch, buf1, FIND_CHAR_WORLD)) != NULL)
 			do_stat_character(ch, victim);
-		else if ((veh = get_vehicle_vis(ch, buf1)) != NULL) {
+		else if ((veh = get_vehicle_in_room_vis(ch, buf1)) || (veh = get_vehicle_vis(ch, buf1))) {
 			do_stat_vehicle(ch, veh);
 		}
 		else if ((obj = get_obj_vis(ch, buf1)) != NULL)
