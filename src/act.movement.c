@@ -1327,9 +1327,10 @@ ACMD(do_circle) {
 
 // enters a portal
 ACMD(do_enter) {
+	ACMD(do_board);
 	extern bool can_infiltrate(char_data *ch, empire_data *emp);
 	
-	vehicle_data *tmp_veh = NULL;
+	vehicle_data *find_veh;
 	char_data *tmp_char;
 	obj_data *portal;
 	room_data *room;
@@ -1341,7 +1342,13 @@ ACMD(do_enter) {
 		return;
 	}
 
-	generic_find(arg, FIND_OBJ_ROOM, ch, &tmp_char, &portal, &tmp_veh);
+	generic_find(arg, FIND_OBJ_ROOM | FIND_VEHICLE_ROOM, ch, &tmp_char, &portal, &find_veh);
+	
+	if (find_veh) {
+		// overload by passing to board
+		do_board(ch, argument, 0, SCMD_ENTER);
+		return;
+	}
 	
 	if (!portal) {
 		msg_to_char(ch, "You don't see %s %s here.\r\n", AN(arg), arg);
