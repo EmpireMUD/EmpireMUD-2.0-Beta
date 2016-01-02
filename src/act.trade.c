@@ -1015,6 +1015,7 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type) {
 	// additional setup
 	SET_BIT(VEH_FLAGS(veh), VEH_INCOMPLETE);
 	VEH_NEEDS_RESOURCES(veh) = copy_resource_list(GET_CRAFT_RESOURCES(type));
+	VEH_OWNER(veh) = GET_LOYALTY(ch);
 	
 	start_action(ch, ACT_GEN_CRAFT, -1);
 	GET_ACTION_VNUM(ch, 0) = GET_CRAFT_VNUM(type);
