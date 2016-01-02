@@ -605,6 +605,7 @@ ACMD(do_load_boat) {
 
 
 ACMD(do_manufacture) {
+	/*
 	obj_data *ship;
 	int i = 0;
 	bool comma = FALSE;
@@ -657,6 +658,7 @@ ACMD(do_manufacture) {
 		start_action(ch, ACT_MANUFACTURING, 1);
 		GET_OBJ_VAL(ship, VAL_SHIP_RESOURCES_REMAINING) = ship_data[i].resources;
 	}
+	*/
 }
 
 
