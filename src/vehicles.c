@@ -520,6 +520,7 @@ char *list_one_vehicle(vehicle_data *veh, bool detail) {
 void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 	char buf[MAX_STRING_LENGTH];
 	vehicle_data *veh = vehicle_proto(vnum);
+	craft_data *craft, *next_craft;
 	int size, found;
 	
 	if (!veh) {
@@ -530,7 +531,13 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 	found = 0;
 	size = snprintf(buf, sizeof(buf), "Occurrences of vehicle %d (%s):\r\n", vnum, VEH_SHORT_DESC(veh));
 	
-	// vehicles are not actually used anywhere else
+	// crafts
+	HASH_ITER(hh, craft_table, craft, next_craft) {
+		if (CRAFT_FLAGGED(craft, CRAFT_VEHICLE) && GET_CRAFT_OBJECT(craft) == vnum) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
+		}
+	}
 	
 	if (found > 0) {
 		size += snprintf(buf + size, sizeof(buf) - size, "%d location%s shown\r\n", found, PLURAL(found));
@@ -1494,6 +1501,9 @@ vehicle_data *create_vehicle_table_entry(any_vnum vnum) {
 */
 void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 	vehicle_data *veh, *iter, *next_iter;
+	craft_data *craft, *next_craft;
+	descriptor_data *desc;
+	bool found;
 	
 	if (!(veh = vehicle_proto(vnum))) {
 		msg_to_char(ch, "There is no such vehicle %d.\r\n", vnum);
@@ -1518,6 +1528,36 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 	// save index and vehicle file now
 	save_index(DB_BOOT_VEH);
 	save_library_file_for_vnum(DB_BOOT_VEH, vnum);
+	
+	// update crafts
+	HASH_ITER(hh, craft_table, craft, next_craft) {
+		found = FALSE;
+		if (CRAFT_FLAGGED(craft, CRAFT_VEHICLE) && GET_CRAFT_OBJECT(craft) == vnum) {
+			GET_CRAFT_OBJECT(craft) = NOTHING;
+			found = TRUE;
+		}
+		
+		if (found) {
+			SET_BIT(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_CRAFT, GET_CRAFT_VNUM(craft));
+		}
+	}
+	
+	// olc editor updates
+	LL_FOREACH(descriptor_list, desc) {
+		if (GET_OLC_CRAFT(desc)) {
+			found = FALSE;
+			if (CRAFT_FLAGGED(GET_OLC_CRAFT(desc), CRAFT_VEHICLE) && GET_OLC_CRAFT(desc)->object == vnum) {
+				GET_OLC_CRAFT(desc)->object = NOTHING;
+				found = TRUE;
+			}
+		
+			if (found) {
+				SET_BIT(GET_OLC_CRAFT(desc)->flags, CRAFT_IN_DEVELOPMENT);
+				msg_to_char(desc->character, "The vehicle made by the craft you're editing was deleted.\r\n");
+			}
+		}
+	}
 	
 	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted vehicle %d", GET_NAME(ch), vnum);
 	msg_to_char(ch, "Vehicle %d deleted.\r\n", vnum);

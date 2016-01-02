@@ -577,7 +577,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	}
 	
 	// olc editor updates
-	for (desc = descriptor_list; desc; desc = desc->next) {		
+	for (desc = descriptor_list; desc; desc = desc->next) {
 		if (GET_OLC_ADVENTURE(desc)) {
 			found = FALSE;
 			found |= delete_link_rule_by_portal(&(GET_OLC_ADVENTURE(desc)->linking), vnum);
