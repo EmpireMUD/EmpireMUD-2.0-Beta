@@ -1747,6 +1747,34 @@ void look_at_vehicle(vehicle_data *veh, char_data *ch) {
 	else {
 		act("You look at $V but see nothing special.", FALSE, ch, NULL, veh, TO_CHAR);
 	}
+	
+	if (VEH_OWNER(veh)) {
+		msg_to_char(ch, "It is owned by %s%s\t0.\r\n", EMPIRE_BANNER(VEH_OWNER(veh)), EMPIRE_NAME(VEH_OWNER(veh)));
+	}
+	
+	if (VEH_NEEDS_RESOURCES(veh)) {
+		struct resource_data *res;
+		bool found = FALSE;
+		
+		if (VEH_IS_COMPLETE(veh)) {
+			msg_to_char(ch, "Mainteance needed: ");
+		}
+		else {
+			msg_to_char(ch, "Resources to completion: ");
+		}
+		
+		LL_FOREACH(VEH_NEEDS_RESOURCES(veh), res) {
+			msg_to_char(ch, "%s%s (x%d)", (found ? ", " : ""), skip_filler(get_obj_name_by_proto(res->vnum)), res->amount);
+			found = TRUE;
+		}
+		
+		if (found) {
+			msg_to_char(ch, "\r\n");
+		}
+		else {
+			msg_to_char(ch, "none\r\n");	// can we even get here?
+		}
+	}
 }
 
 

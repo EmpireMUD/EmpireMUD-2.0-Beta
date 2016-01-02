@@ -74,9 +74,8 @@ struct ship_data_struct ship_data[] = {
  //////////////////////////////////////////////////////////////////////////////
 //// SHIP FUNCTIONS //////////////////////////////////////////////////////////
 
-static obj_data *create_ship(obj_vnum vnum, empire_data *owner, room_data *to_room) {
-	return NULL;
 /*
+static obj_data *create_ship(obj_vnum vnum, empire_data *owner, room_data *to_room) {
 	extern room_data *create_room();
 	extern room_vnum find_free_vnum(void);
 
@@ -213,8 +212,8 @@ static obj_data *create_ship(obj_vnum vnum, empire_data *owner, room_data *to_ro
 	obj_to_room(ship, to_room);
 	load_otrigger(ship);
 	return (ship);
-	*/
 }
+*/
 
 
 /* Returns TRUE if it loads the object */

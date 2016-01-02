@@ -875,6 +875,13 @@ void list_one_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 	size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", VEH_LONG_DESC(veh));
 	
 	// additional descriptions like what's attached:
+	if (!VEH_IS_COMPLETE(veh)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "...it is unfinished.\r\n");
+	}
+	else if (VEH_NEEDS_RESOURCES(veh) || VEH_HEALTH(veh) < VEH_MAX_HEALTH(veh)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "...it is in need of repair.\r\n");
+	}
+	
 	if (VEH_SITTING_ON(veh) == ch) {
 		size += snprintf(buf + size, sizeof(buf) - size, "...you are sitting %s it.\r\n", VEH_FLAGGED(veh, VEH_IN) ? "in" : "on");
 	}
