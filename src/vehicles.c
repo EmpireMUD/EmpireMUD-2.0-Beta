@@ -303,6 +303,37 @@ char *list_harnessed_mobs(vehicle_data *veh) {
 
 
 /**
+* @param vehicle_data *veh The vehicle to scale.
+* @param int level What level to scale it to (passing 0 will trigger auto-detection).
+*/
+void scale_vehicle_to_level(vehicle_data *veh, int level) {
+	struct instance_data *inst = NULL;
+	
+	// detect level if we weren't given a strong level
+	if (!level) {
+		if (IN_ROOM(veh) && (inst = ROOM_INSTANCE(IN_ROOM(veh)))) {
+			if (inst->level > 0) {
+				level = inst->level;
+			}
+		}
+	}
+	
+	// constraints
+	if (inst || (IN_ROOM(veh) && (inst = ROOM_INSTANCE(IN_ROOM(veh))))) {
+		if (GET_ADV_MIN_LEVEL(inst->adventure) > 0) {
+			level = MAX(level, GET_ADV_MIN_LEVEL(inst->adventure));
+		}
+		if (GET_ADV_MAX_LEVEL(inst->adventure) > 0) {
+			level = MIN(level, GET_ADV_MAX_LEVEL(inst->adventure));
+		}
+	}
+	
+	// set the level
+	VEH_SCALE_LEVEL(veh) = level;
+}
+
+
+/**
 * Unharnesses a mob and loads it back into the game. If it fails to load the
 * mob, it will still remove 'vam' from the animals list.
 *

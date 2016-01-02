@@ -529,6 +529,7 @@ ACMD(do_mregionecho) {
 ACMD(do_mload) {
 	void scale_item_to_level(obj_data *obj, int level);
 	void scale_mob_to_level(char_data *mob, int level);
+	void scale_vehicle_to_level(vehicle_data *veh, int level);
 	
 	struct instance_data *inst = get_instance_by_mob(ch);
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
@@ -652,7 +653,7 @@ ACMD(do_mload) {
 		load_otrigger(object);
 		return;
 	}
-	else if (is_abbrev(arg1, "mobile")) {
+	else if (is_abbrev(arg1, "vehicle")) {
 		if (!vehicle_proto(number)) {
 			mob_log(ch, "mload: bad vehicle vnum");
 			return;
@@ -662,11 +663,15 @@ ACMD(do_mload) {
 		
 		if (*target && isdigit(*target)) {
 			// scale to requested level
-			// scale_vehicle_to_level(veh, atoi(target));
+			scale_vehicle_to_level(veh, atoi(target));
 		}
 		else if (GET_CURRENT_SCALE_LEVEL(ch) > 0) {
 			// only scale vehicle if self is scaled
-			// scale_vehicle_to_level(veh, GET_CURRENT_SCALE_LEVEL(ch));
+			scale_vehicle_to_level(veh, GET_CURRENT_SCALE_LEVEL(ch));
+		}
+		else {
+			// hope to inherit
+			scale_vehicle_to_level(veh, 0);
 		}
 		
 		// load_vtrigger(veh);

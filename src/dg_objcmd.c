@@ -650,6 +650,7 @@ OCMD(do_oterraform) {
 
 OCMD(do_dgoload) {
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
+	void scale_vehicle_to_level(vehicle_data *veh, int level);
 	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	struct instance_data *inst = NULL;
@@ -763,7 +764,14 @@ OCMD(do_dgoload) {
 		
 		if (target && *target && isdigit(*target)) {
 			// target is scale level
-			// scale_vehicle_to_level(veh, atoi(target));
+			scale_vehicle_to_level(veh, atoi(target));
+		}
+		else if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) > 0) {
+			scale_vehicle_to_level(veh, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+		}
+		else {
+			// hope to inherit
+			scale_vehicle_to_level(veh, 0);
 		}
 		
 		//load_vtrigger(veh);

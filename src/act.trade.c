@@ -52,7 +52,6 @@ ACMD(do_gen_craft);
 craft_data *find_craft_for_obj_vnum(obj_vnum vnum);
 obj_data *find_water_container(char_data *ch, obj_data *list);
 obj_data *has_hammer(char_data *ch);
-void scale_craftable(obj_data *obj, char_data *ch, craft_data *craft);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -212,6 +211,73 @@ int get_crafting_level(char_data *ch) {
 	else {
 		return GET_SKILL_LEVEL(ch) + GET_CRAFTING_BONUS(ch);
 	}
+}
+
+
+/**
+* Determines what level to scale something to, based on who crafted it and what
+* craft recipe they used.
+*
+* @param char_data *ch The crafter.
+* @param craft_data *craft The recipe.
+* @return int The best scale level.
+*/
+int get_craft_scale_level(char_data *ch, craft_data *craft) {
+	int level = 1, psr;
+	ability_data *abil;
+	obj_data *req;
+	
+	if (IS_NPC(ch)) {
+		return 0;
+	}
+	
+	// determine ideal scale level
+	if (craft) {
+		if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING && (req = obj_proto(GET_CRAFT_REQUIRES_OBJ(craft)))) {
+			level = get_crafting_level(ch);
+			
+			// check bounds on the required object
+			if (GET_OBJ_MAX_SCALE_LEVEL(req) > 0) {
+				level = MIN(level, GET_OBJ_MAX_SCALE_LEVEL(req));
+			}
+			if (GET_OBJ_MIN_SCALE_LEVEL(req) > 0) {
+				level = MAX(level, GET_OBJ_MIN_SCALE_LEVEL(req));
+			}
+		}
+		else {
+			if (!(abil = find_ability_by_vnum(GET_CRAFT_ABILITY(craft)))) {
+				level = EMPIRE_CHORE_SKILL_CAP;	// considered the "default" level for unskilled things
+			}
+			else if (!ABIL_ASSIGNED_SKILL(abil)) {
+				// probably a class skill
+				level = get_crafting_level(ch);
+			}
+			else if ((psr = ABIL_SKILL_LEVEL(abil)) != NOTHING) {
+				if (psr < BASIC_SKILL_CAP) {
+					level = MIN(BASIC_SKILL_CAP, get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))));
+				}
+				else if (psr < SPECIALTY_SKILL_CAP) {
+					level = MIN(SPECIALTY_SKILL_CAP, get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))));
+				}
+				else {
+					level = MIN(CLASS_SKILL_CAP, get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))));
+				}
+			}
+			else {
+				// this is probably unreachable
+				level = get_crafting_level(ch);
+			}
+			
+			// always bound by the crafting level
+			level = MIN(level, get_crafting_level(ch));
+		}
+	}
+	else {
+		// no craft given
+		level = get_crafting_level(ch);
+	}
+	
+	return level;
 }
 
 
@@ -422,7 +488,7 @@ void finish_gen_craft(char_data *ch) {
 		else {
 			obj_to_room(obj, IN_ROOM(ch));
 		}
-		scale_craftable(obj, ch, type);
+		scale_item_to_level(obj, get_craft_scale_level(ch, type));
 		
 		load_otrigger(obj);
 	}
@@ -444,7 +510,7 @@ void finish_gen_craft(char_data *ch) {
 					applied_master = TRUE;
 					SET_BIT(GET_OBJ_EXTRA(obj), OBJ_SUPERIOR);
 				}
-				scale_craftable(obj, ch, type);
+				scale_item_to_level(obj, get_craft_scale_level(ch, type));
 	
 				// where to put it
 				if (CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
@@ -662,74 +728,6 @@ void process_gen_craft(char_data *ch) {
 			}
 		}
 	}
-}
-
-
-/**
-* This function attempts to scale a crafted item. It will ignore non-scalables,
-* so any crafted item can be passed through this.
-*
-* @param obj_data *obj The item to scale.
-* @param char_data *ch The person who crafted it (for skill levels).
-* @param craft_data *craft The craft recipe (used to get requires-object info).
-*/
-void scale_craftable(obj_data *obj, char_data *ch, craft_data *craft) {
-	int level = 1, psr;
-	ability_data *abil;
-	obj_data *req;
-	
-	if (IS_NPC(ch)) {
-		return;
-	}
-	
-	// determine ideal scale level
-	if (craft) {
-		if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING && (req = obj_proto(GET_CRAFT_REQUIRES_OBJ(craft)))) {
-			level = get_crafting_level(ch);
-			
-			// check bounds on the required object
-			if (GET_OBJ_MAX_SCALE_LEVEL(req) > 0) {
-				level = MIN(level, GET_OBJ_MAX_SCALE_LEVEL(req));
-			}
-			if (GET_OBJ_MIN_SCALE_LEVEL(req) > 0) {
-				level = MAX(level, GET_OBJ_MIN_SCALE_LEVEL(req));
-			}
-		}
-		else {
-			if (!(abil = find_ability_by_vnum(GET_CRAFT_ABILITY(craft)))) {
-				level = EMPIRE_CHORE_SKILL_CAP;	// considered the "default" level for unskilled things
-			}
-			else if (!ABIL_ASSIGNED_SKILL(abil)) {
-				// probably a class skill
-				level = get_crafting_level(ch);
-			}
-			else if ((psr = ABIL_SKILL_LEVEL(abil)) != NOTHING) {
-				if (psr < BASIC_SKILL_CAP) {
-					level = MIN(BASIC_SKILL_CAP, get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))));
-				}
-				else if (psr < SPECIALTY_SKILL_CAP) {
-					level = MIN(SPECIALTY_SKILL_CAP, get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))));
-				}
-				else {
-					level = MIN(CLASS_SKILL_CAP, get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))));
-				}
-			}
-			else {
-				// this is probably unreachable
-				level = get_crafting_level(ch);
-			}
-			
-			// always bound by the crafting level
-			level = MIN(level, get_crafting_level(ch));
-		}
-	}
-	else {
-		// no craft given
-		level = get_crafting_level(ch);
-	}
-	
-	// do it
-	scale_item_to_level(obj, level);	
 }
 
 
@@ -981,6 +979,8 @@ ACMD(do_gen_augment) {
 * @param craft_data *type Pre-selected vehicle craft.
 */
 void do_gen_craft_vehicle(char_data *ch, craft_data *type) {
+	void scale_vehicle_to_level(vehicle_data *veh, int level);
+	
 	vehicle_data *veh;
 	char buf[MAX_STRING_LENGTH];
 	bool any = FALSE;
@@ -1017,6 +1017,7 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type) {
 	VEH_NEEDS_RESOURCES(veh) = copy_resource_list(GET_CRAFT_RESOURCES(type));
 	VEH_OWNER(veh) = GET_LOYALTY(ch);
 	VEH_HEALTH(veh) = MAX(1, VEH_MAX_HEALTH(veh) * 0.2);	// start at 20% health, will heal on completion
+	scale_vehicle_to_level(veh, get_craft_scale_level(ch, type));
 	
 	start_action(ch, ACT_GEN_CRAFT, -1);
 	GET_ACTION_VNUM(ch, 0) = GET_CRAFT_VNUM(type);

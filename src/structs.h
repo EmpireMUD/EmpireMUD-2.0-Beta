@@ -1204,7 +1204,7 @@ typedef struct vehicle_data vehicle_data;
 #define ACT_MINTING			9
 #define ACT_FISHING			10
 #define ACT_MELTING			11
-#define ACT_MANUFACTURING	12
+	#define ACT_UNUSED			12	// formerly manufacturing
 #define ACT_CHIPPING		13
 #define ACT_PANNING			14
 #define ACT_MUSIC			15

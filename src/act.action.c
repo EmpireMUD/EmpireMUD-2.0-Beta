@@ -78,7 +78,6 @@ void process_fishing(char_data *ch);
 void process_gathering(char_data *ch);
 void process_gen_craft(char_data *ch);
 void process_harvesting(char_data *ch);
-void process_manufacturing(char_data *ch);
 void process_mining(char_data *ch);
 void process_minting(char_data *ch);
 void process_morphing(char_data *ch);
@@ -114,7 +113,7 @@ const struct action_data_struct action_data[] = {
 	{ "minting", "is minting coins.", ACTF_FAST_CHORES, process_minting, cancel_minting },	// ACT_MINTING
 	{ "fishing", "is fishing.", NOBITS, process_fishing, NULL },	// ACT_FISHING
 	{ "smelting", "is melting down ore.", ACTF_FAST_CHORES, process_smelting, cancel_smelting },	// ACT_MELTING
-	{ "manufacturing", "is working on the ship.", ACTF_HASTE | ACTF_FAST_CHORES, process_manufacturing, NULL },	// ACT_MANUFACTURING
+		{ "unknown", "is doing something.", NOBITS, NULL, NULL },
 	{ "chipping", "is chipping rocks.", ACTF_FAST_CHORES, process_chipping, cancel_chipping },	// ACT_CHIPPING
 	{ "panning", "is panning for gold.", ACTF_FINDER, process_panning, NULL },	// ACT_PANNING
 	{ "music", "is playing soothing music.", ACTF_ANYWHERE | ACTF_HASTE, process_music, NULL },	// ACT_MUSIC

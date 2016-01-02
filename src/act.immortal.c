@@ -70,6 +70,7 @@ void get_script_display(struct trig_proto_list *list, char *save_buffer);
 extern char *get_room_name(room_data *room, bool color);
 void save_whole_world();
 void scale_mob_to_level(char_data *mob, int level);
+void scale_vehicle_to_level(vehicle_data *veh, int level);
 extern char *show_color_codes(char *string);
 void update_class(char_data *ch);
 
@@ -5012,6 +5013,7 @@ ACMD(do_load) {
 		}
 		veh = read_vehicle(number, TRUE);
 		vehicle_to_room(veh, IN_ROOM(ch));
+		scale_vehicle_to_level(veh, 0);	// attempt auto-detect of level
 		act("$n makes an odd magical gesture.", TRUE, ch, NULL, NULL, TO_ROOM);
 		act("$n has created $V!", FALSE, ch, NULL, veh, TO_ROOM);
 		act("You create $V.", FALSE, ch, NULL, veh, TO_CHAR);
