@@ -1416,7 +1416,7 @@ void read_empire_territory(empire_data *emp) {
 		if (ROOM_OWNER(iter) && (!emp || ROOM_OWNER(iter) == emp) && (HOME_ROOM(iter) == iter || IS_INSIDE(iter))) {
 			if ((e = ROOM_OWNER(iter))) {
 				// only count each building as 1
-				if (HOME_ROOM(iter) == iter) {
+				if (HOME_ROOM(iter) == iter && !GET_ROOM_VEHICLE(iter)) {
 					if (is_in_city_for_empire(iter, e, FALSE, &junk)) {
 						EMPIRE_CITY_TERRITORY(e) += 1;
 					}

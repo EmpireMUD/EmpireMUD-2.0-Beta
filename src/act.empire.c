@@ -2025,24 +2025,83 @@ void sort_territory_node_list_by_distance(room_data *from, struct find_territory
  //////////////////////////////////////////////////////////////////////////////
 //// EMPIRE COMMANDS /////////////////////////////////////////////////////////
 
-ACMD(do_abandon) {
-	empire_data *e;
-
-	if ((e = ROOM_OWNER(IN_ROOM(ch))) != GET_LOYALTY(ch))
-		msg_to_char(ch, "You don't own this acre.\r\n");
-	else if (IS_CITY_CENTER(IN_ROOM(ch))) {
+/**
+* Command sub-processor for abandoning a room.
+*
+* @param char_data *ch The player trying to abandon.
+* @param room_data *room The room to abandon.
+*/
+void do_abandon_room(char_data *ch, room_data *room) {
+	if (!ROOM_OWNER(room) || ROOM_OWNER(room) != GET_LOYALTY(ch)) {
+		msg_to_char(ch, "You don't even own the area.\r\n");
+	}
+	else if (IS_CITY_CENTER(room)) {
 		msg_to_char(ch, "You can't abandon a city center that way -- use \"city abandon\".\r\n");
 	}
-	else if (!has_permission(ch, PRIV_CEDE)) {
-		msg_to_char(ch, "You don't have permission to abandon land.\r\n");
-	}
-	else if (HOME_ROOM(IN_ROOM(ch)) != IN_ROOM(ch)) {
-		msg_to_char(ch, "Just abandon the main room for the building.\r\n");
+	else if (HOME_ROOM(room) != room) {
+		msg_to_char(ch, "Just abandon the main room.\r\n");
 	}
 	else {
-		msg_to_char(ch, "Territory abandoned.\r\n");
-		abandon_room(IN_ROOM(ch));
-		read_empire_territory(e);
+		if (room != IN_ROOM(ch) && has_ability(ch, ABIL_NAVIGATION)) {
+			msg_to_char(ch, "(%d, %d) abandoned.\r\n", X_COORD(room), Y_COORD(room));
+		}
+		else {
+			msg_to_char(ch, "Territory abandoned.\r\n");
+		}
+		abandon_room(room);
+		read_empire_territory(GET_LOYALTY(ch));
+	}
+}
+
+
+/**
+* Command sub-processor for abandoning a vehicle.
+*
+* @param char_data *ch The player trying to abandon.
+* @param vehicle_data *veh The vehicle to abandon.
+*/
+void do_abandon_vehicle(char_data *ch, vehicle_data *veh) {
+	if (!VEH_OWNER(veh) || VEH_OWNER(veh) != GET_LOYALTY(ch)) {
+		msg_to_char(ch, "You don't even own that.\r\n");
+	}
+	else {
+		act("You abandon $V.", FALSE, ch, NULL, veh, TO_CHAR);
+		VEH_OWNER(veh) = NULL;
+		
+		if (VEH_INTERIOR_HOME_ROOM(veh)) {
+			abandon_room(VEH_INTERIOR_HOME_ROOM(veh));
+		}
+	}
+}
+
+
+ACMD(do_abandon) {
+	char arg[MAX_INPUT_LENGTH];
+	vehicle_data *veh;
+
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	one_argument(argument, arg);
+	
+	if (!GET_LOYALTY(ch)) {
+		msg_to_char(ch, "You're not part of an empire.\r\n");
+	}
+	else if (!has_permission(ch, PRIV_CEDE)) {
+		msg_to_char(ch, "You don't have permission to abandon.\r\n");
+	}
+	else if (*arg && (veh = get_vehicle_in_room_vis(ch, arg))) {
+		do_abandon_vehicle(ch, veh);
+	}
+	else if (*arg) {
+		msg_to_char(ch, "You don't see that to abandon.\r\n");
+	}
+	else if (GET_ROOM_VEHICLE(IN_ROOM(ch))) {
+		do_abandon_vehicle(ch, GET_ROOM_VEHICLE(IN_ROOM(ch)));
+	}
+	else {
+		do_abandon_room(ch, IN_ROOM(ch));
 	}
 }
 
@@ -2259,46 +2318,112 @@ ACMD(do_city) {
 }
 
 
-ACMD(do_claim) {
-	empire_data *e;
+/**
+* Processes a "claim" targeting a room.
+*
+* @param char_data *ch The player trying to claim.
+* @param room_data *room The room he's trying to claim.
+*/
+void do_claim_room(char_data *ch, room_data *room) {
+	empire_data *emp = get_or_create_empire(ch);
 	bool junk;
-
-	if (IS_NPC(ch))
-		return;
-
-	// this will found an empire if the character has none
-	e = get_or_create_empire(ch);
-
-	if (!e)
-		msg_to_char(ch, "You don't belong to any empire.\r\n");
-	else if (ROOM_OWNER(IN_ROOM(ch)) == e)
-		msg_to_char(ch, "Your empire already owns this acre.\r\n");
-	else if (GET_RANK(ch) < EMPIRE_PRIV(e, PRIV_CLAIM)) {
-		// this doesn't use has_permission because that would check if the land is owned already
-		msg_to_char(ch, "You don't have permission to claim land for the empire.\r\n");
+	
+	if (!emp) {
+		msg_to_char(ch, "You don't belong to any empre.\r\n");
 	}
-	else if (IS_CITY_CENTER(IN_ROOM(ch))) {
+	else if (ROOM_OWNER(room) == emp) {
+		msg_to_char(ch, "Your empire already owns this area.\r\n");
+	}
+	else if (IS_CITY_CENTER(room)) {
 		msg_to_char(ch, "You can't claim a city center.\r\n");
 	}
-	else if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_NO_CLAIM) || ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE | ROOM_AFF_HAS_INSTANCE))
-		msg_to_char(ch, "This tile can't be claimed.\r\n");
-	else if (ROOM_OWNER(IN_ROOM(ch)) != NULL)
-		msg_to_char(ch, "This acre is already claimed.\r\n");
-	else if (HOME_ROOM(IN_ROOM(ch)) != IN_ROOM(ch))
-		msg_to_char(ch, "Just claim the main room for the building.\r\n");
-	else if (!can_claim(ch))
-		msg_to_char(ch, "You can't claim any more land.\r\n");
-	else if (!can_build_or_claim_at_war(ch, IN_ROOM(ch))) {
-		msg_to_char(ch, "You can't claim here while at war with the empire that controls this area.\r\n");
+	else if (ROOM_SECT_FLAGGED(room, SECTF_NO_CLAIM) || ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE | ROOM_AFF_HAS_INSTANCE)) {
+		msg_to_char(ch, "The tile can't be claimed.\r\n");
 	}
-	else if (!is_in_city_for_empire(IN_ROOM(ch), e, FALSE, &junk) && EMPIRE_OUTSIDE_TERRITORY(e) >= land_can_claim(e, TRUE)) {
-		msg_to_char(ch, "You can't claim this land because you're over the 20%% of your territory that can be outside of cities.\r\n");
+	else if (ROOM_OWNER(room) != NULL) {
+		msg_to_char(ch, "The area is already claimed.\r\n");
+	}
+	else if (HOME_ROOM(room) != room) {
+		msg_to_char(ch, "Just claim the entrance room.\r\n");
+	}
+	else if (!can_claim(ch)) {
+		msg_to_char(ch, "You can't claim any more land.\r\n");
+	}
+	else if (!can_build_or_claim_at_war(ch, room)) {
+		msg_to_char(ch, "You can't claim while at war with the empire that controls this area.\r\n");
+	}
+	else if (!is_in_city_for_empire(room, emp, FALSE, &junk) && EMPIRE_OUTSIDE_TERRITORY(emp) >= land_can_claim(emp, TRUE)) {
+		msg_to_char(ch, "You can't claim the area because you're over the 20%% of your territory that can be outside of cities.\r\n");
 	}
 	else {
 		send_config_msg(ch, "ok_string");
-		claim_room(IN_ROOM(ch), e);
-		read_empire_territory(e);
-		save_empire(e);
+		claim_room(room, emp);
+		read_empire_territory(emp);
+		save_empire(emp);
+	}
+}
+
+
+/**
+* Processes a "claim" targeting a vehicle.
+*
+* @param char_data *ch The player trying to claim.
+* @param vehicle_data *veh The vehicle he's trying to claim.
+*/
+void do_claim_vehicle(char_data *ch, vehicle_data *veh) {
+	empire_data *emp = get_or_create_empire(ch);
+	
+	if (!emp) {
+		msg_to_char(ch, "You don't belong to any empre.\r\n");
+	}
+	else if (VEH_OWNER(veh) == emp) {
+		msg_to_char(ch, "Your empire already owns that.\r\n");
+	}
+	else if (VEH_OWNER(veh)) {
+		msg_to_char(ch, "Someone else already owns that.\r\n");
+	}
+	else {
+		send_config_msg(ch, "ok_string");
+		VEH_OWNER(veh) = emp;
+		
+		if (VEH_INTERIOR_HOME_ROOM(veh)) {
+			if (ROOM_OWNER(VEH_INTERIOR_HOME_ROOM(veh))) {
+				abandon_room(VEH_INTERIOR_HOME_ROOM(veh));
+			}
+			claim_room(VEH_INTERIOR_HOME_ROOM(veh), emp);
+		}
+	}
+}
+
+
+ACMD(do_claim) {
+	char arg[MAX_INPUT_LENGTH];
+	vehicle_data *veh;
+
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	one_argument(argument, arg);
+
+	if (!get_or_create_empire(ch)) {
+		msg_to_char(ch, "You don't belong to any empire.\r\n");
+	}
+	else if (GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_CLAIM)) {
+		// this doesn't use has_permission because that would check if the land is owned already
+		msg_to_char(ch, "You don't have permission to claim for the empire.\r\n");
+	}
+	else if (*arg && (veh = get_vehicle_in_room_vis(ch, arg))) {
+		do_claim_vehicle(ch, veh);
+	}
+	else if (*arg) {
+		msg_to_char(ch, "You don't see that to claim.\r\n");
+	}
+	else if (GET_ROOM_VEHICLE(IN_ROOM(ch))) {
+		do_claim_vehicle(ch, GET_ROOM_VEHICLE(IN_ROOM(ch)));
+	}
+	else {
+		do_claim_room(ch, IN_ROOM(ch));
 	}
 }
 
