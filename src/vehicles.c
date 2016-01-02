@@ -393,6 +393,20 @@ void scale_vehicle_to_level(vehicle_data *veh, int level) {
 
 
 /**
+* Sets a vehicle ablaze!
+*
+* @param vehicle_data *veh The vehicle to ignite.
+*/
+void start_vehicle_burning(vehicle_data *veh) {
+	msg_to_vehicle(veh, TRUE, "It seems %s has caught fire!\r\n", VEH_SHORT_DESC(veh));
+	SET_BIT(VEH_FLAGS(veh), VEH_ON_FIRE);
+	if (VEH_OWNER(veh)) {
+		log_to_empire(VEH_OWNER(veh), ELOG_HOSTILITY, "Your %s has caught on fire at (%d, %d)", skip_filler(VEH_SHORT_DESC(veh)), X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh)));
+	}
+}
+
+
+/**
 * Unharnesses a mob and loads it back into the game. If it fails to load the
 * mob, it will still remove 'vam' from the animals list.
 *

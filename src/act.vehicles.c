@@ -237,6 +237,8 @@ void do_get_from_vehicle(char_data *ch, vehicle_data *veh, char *arg, int mode, 
 * @param obj_data *flint The flint.
 */
 void do_light_vehicle(char_data *ch, vehicle_data *veh, obj_data *flint) {
+	void start_vehicle_burning(vehicle_data *veh);
+	
 	char buf[MAX_STRING_LENGTH];
 	
 	if (IS_NPC(ch)) {
@@ -256,13 +258,7 @@ void do_light_vehicle(char_data *ch, vehicle_data *veh, obj_data *flint) {
 		act(buf, FALSE, ch, flint, veh, TO_CHAR);
 		snprintf(buf, sizeof(buf), "$n %s $V on fire!", (flint ? "strikes $p and lights" : "lights"));
 		act(buf, FALSE, ch, flint, veh, TO_ROOM);
-		
-		msg_to_vehicle(veh, TRUE, "It seems %s has caught fire!\r\n", VEH_SHORT_DESC(veh));
-		
-		SET_BIT(VEH_FLAGS(veh), VEH_ON_FIRE);
-		if (VEH_OWNER(veh) && VEH_OWNER(veh) != GET_LOYALTY(ch)) {
-			log_to_empire(VEH_OWNER(veh), ELOG_HOSTILITY, "Someone has set %s on fire at (%d, %d)", VEH_SHORT_DESC(veh), X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh)));
-		}
+		start_vehicle_burning(veh);
 	}
 }
 
@@ -295,6 +291,9 @@ void do_sit_on_vehicle(char_data *ch, char *argument) {
 	}
 	else if (!VEH_IS_COMPLETE(veh)) {
 		msg_to_char(ch, "You can't sit %s it until it's finished.\r\n", VEH_FLAGGED(veh, VEH_IN) ? "in" : "on");
+	}
+	else if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
+		msg_to_char(ch, "You can't sit on it while it's on fire!\r\n");
 	}
 	else if (VEH_SITTING_ON(veh)) {
 		msg_to_char(ch, "%s already sitting %s it.\r\n", (VEH_SITTING_ON(veh) != ch ? "Someone else is" : "You are"), VEH_FLAGGED(veh, VEH_IN) ? "in" : "on");
@@ -840,6 +839,9 @@ ACMD(do_lead) {
 		}
 		else if (!can_use_vehicle(ch, veh, MEMBERS_ONLY)) {
 			msg_to_char(ch, "You don't have permission to lead that.\r\n");
+		}
+		else if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
+			msg_to_char(ch, "You can't lead it while it's on fire!\r\n");
 		}
 		else if (VEH_SITTING_ON(veh)) {
 			msg_to_char(ch, "You can't lead it while %s sitting on it.\r\n", (VEH_SITTING_ON(veh) == ch) ? "you are" : "someone else is");
