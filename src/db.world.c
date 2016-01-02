@@ -958,9 +958,42 @@ static void annual_update_room(room_data *room) {
 
 
 /**
+* Runs an annual update (mainly, maintenance) on the vehicle.
+*/
+void annual_update_vehicle(vehicle_data *veh) {
+	extern struct resource_data *combine_resources(struct resource_data *combine_a, struct resource_data *combine_b);
+	void fully_empty_vehicle(vehicle_data *veh);
+	
+	struct resource_data *old_list;
+	
+	// does not take annual damage
+	if (!VEH_YEARLY_MAINTENANCE(veh)) {
+		return;
+	}
+	
+	VEH_HEALTH(veh) -= MAX(1, (VEH_MAX_HEALTH(veh) / 10));
+	
+	if (VEH_HEALTH(veh) > 0) {
+		// add maintenance
+		old_list = VEH_NEEDS_RESOURCES(veh);
+		VEH_NEEDS_RESOURCES(veh) = combine_resources(old_list, VEH_YEARLY_MAINTENANCE(veh));
+		free_resource_list(old_list);
+	}
+	else {	// destroyed
+		if (ROOM_PEOPLE(IN_ROOM(veh))) {
+			act("$V crumbles from disrepair!", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+		}
+		fully_empty_vehicle(veh);
+		extract_vehicle(veh);
+	}
+}
+
+
+/**
 * This runs once a mud year to update the world.
 */
 void annual_world_update(void) {
+	vehicle_data *veh, *next_veh;
 	descriptor_data *d;
 	room_data *room, *next_room;
 	
@@ -984,6 +1017,10 @@ void annual_world_update(void) {
 			annual_update_map_tile(room);
 		}
 		annual_update_room(room);
+	}
+	
+	LL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
+		annual_update_vehicle(veh);
 	}
 	
 	// lastly

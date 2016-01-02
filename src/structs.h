@@ -1553,6 +1553,7 @@ typedef struct vehicle_data vehicle_data;
 #define VEH_CARRY_VEHICLES  BIT(15)	// p. can put vehicles on board
 #define VEH_CARRY_MOBS  BIT(16)	// q. can put mobs on board
 #define VEH_SIEGE_WEAPONS  BIT(17)	// r. can be used to besiege
+#define VEH_BURNING  BIT(18)	// s. currently on fire
 
 
  //////////////////////////////////////////////////////////////////////////////

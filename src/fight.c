@@ -2050,6 +2050,98 @@ void besiege_room(room_data *to_room, int damage) {
 
 
 /**
+* Does siege damage, which may destroy the vehicle.
+*
+* @param vehicle_data *veh The vehicle to damage.
+* @param int damage How much siege damage to deal.
+* @param int siege_type What SIEGE_ damage type.
+*/
+void besiege_vehicle(vehicle_data *veh, int damage, int siege_type) {
+	extern struct resource_data *combine_resources(struct resource_data *combine_a, struct resource_data *combine_b);
+	void fully_empty_vehicle(vehicle_data *veh);
+
+	static struct resource_data *default_res = NULL;
+	struct resource_data *old_list;
+	char_data *ch, *next_ch;
+	room_data *room;
+	
+	// resources if it doesn't have its own
+	if (!default_res) {
+		default_res = create_resource_list(o_NAILS, 1, NOTHING);
+	}
+	
+	// no effect
+	if (damage <= 0) {
+		return;
+	}
+	
+	// deal damage
+	VEH_HEALTH(veh) -= damage;
+	
+	// not dead yet
+	if (VEH_HEALTH(veh) > 0) {
+		// apply needed maintenance if we did more than 10% damage
+		if (damage >= (VEH_MAX_HEALTH(veh) / 10)) {
+			old_list = VEH_NEEDS_RESOURCES(veh);
+			VEH_NEEDS_RESOURCES(veh) = combine_resources(old_list, VEH_YEARLY_MAINTENANCE(veh) ? VEH_YEARLY_MAINTENANCE(veh) : default_res);
+			free_resource_list(old_list);
+		}
+		
+		// warn the room
+		if (VEH_INTERIOR_HOME_ROOM(veh)) {
+			LL_FOREACH2(interior_room_list, room, next_interior) {
+				if (HOME_ROOM(room) != VEH_INTERIOR_HOME_ROOM(veh)) {
+					continue;
+				}
+				
+				LL_FOREACH_SAFE2(ROOM_PEOPLE(room), ch, next_ch, next_in_room) {
+					// SIEGE_x
+					switch (siege_type) {
+						case SIEGE_BURNING: {
+							act("$V crackles and burns!", FALSE, ch, NULL, veh, TO_CHAR);
+							break;
+						}
+						case SIEGE_PHYSICAL:
+						case SIEGE_MAGICAL:
+						default: {
+							act("$V shakes as it is damaged!", FALSE, ch, NULL, veh, TO_CHAR);
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
+	else {
+		if (ROOM_PEOPLE(IN_ROOM(veh))) {
+			act("$V is destroyed!", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+		}
+		
+		if (VEH_INTERIOR_HOME_ROOM(veh)) {
+			LL_FOREACH2(interior_room_list, room, next_interior) {
+				if (HOME_ROOM(room) != VEH_INTERIOR_HOME_ROOM(veh)) {
+					continue;
+				}
+				
+				LL_FOREACH_SAFE2(ROOM_PEOPLE(room), ch, next_ch, next_in_room) {
+					act("You are killed as $V is destroyed!", FALSE, ch, NULL, veh, TO_CHAR);
+					if (!IS_NPC(ch)) {
+						mortlog("%s has been killed by siege damage at (%d, %d)!", PERS(ch, ch, TRUE), X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
+						syslog(SYS_DEATH, 0, TRUE, "DEATH: %s has been killed by siege damage at %s", GET_NAME(ch), room_log_identifier(IN_ROOM(ch)));
+					}
+					die(ch, ch);
+				}
+			}
+		}
+		
+		vehicle_from_room(veh);	// remove from room first to destroy anything inside
+		fully_empty_vehicle(veh);
+		extract_vehicle(veh);
+	}
+}
+
+
+/**
 * Checks for helpers in the room to start combat too.
 *
 * @param char_data *ch The person who needs help!

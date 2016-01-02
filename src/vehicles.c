@@ -70,8 +70,8 @@ int count_harnessed_animals(vehicle_data *veh) {
 
 
 /**
-* Empties the contents of a vehicle into the room it's in (if any) or extracts
-* them.
+* Empties the contents (items) of a vehicle into the room it's in (if any) or
+* extracts them.
 *
 * @param vehicle_data *veh The vehicle to empty.
 */
@@ -87,6 +87,65 @@ void empty_vehicle(vehicle_data *veh) {
 		}
 	}
 }
+
+
+/**
+* Removes everyone/everything from inside a vehicle, and puts it on the outside
+* if possible.
+*
+* @param vehicle_data *veh The vehicle to empty.
+*/
+void fully_empty_vehicle(vehicle_data *veh) {
+	vehicle_data *iter, *next_iter;
+	obj_data *obj, *next_obj;
+	char_data *ch, *next_ch;
+	room_data *room;
+	
+	if (VEH_INTERIOR_HOME_ROOM(veh)) {
+		LL_FOREACH2(interior_room_list, room, next_interior) {
+			if (HOME_ROOM(room) != VEH_INTERIOR_HOME_ROOM(veh)) {
+				continue;
+			}
+			
+			// remove people
+			LL_FOREACH_SAFE2(ROOM_PEOPLE(room), ch, next_ch, next_in_room) {
+				act("You are ejected from $V!", FALSE, ch, NULL, veh, TO_CHAR);
+				if (IN_ROOM(veh)) {
+					char_to_room(ch, IN_ROOM(veh));
+					look_at_room(ch);
+					act("$n is ejected from $V!", TRUE, ch, NULL, veh, TO_ROOM);
+				}
+				else {
+					extract_char(ch);
+				}
+			}
+			
+			// remove items
+			LL_FOREACH_SAFE2(ROOM_CONTENTS(room), obj, next_obj, next_content) {
+				if (IN_ROOM(veh)) {
+					obj_to_room(obj, IN_ROOM(veh));
+				}
+				else {
+					extract_obj(obj);
+				}
+			}
+			
+			// remove other vehicles
+			LL_FOREACH_SAFE2(ROOM_VEHICLES(room), iter, next_iter, next_in_room) {
+				if (IN_ROOM(veh)) {
+					vehicle_to_room(iter, IN_ROOM(veh));
+				}
+				else {
+					extract_vehicle(iter);
+				}
+			}
+		}
+	}
+	
+	// dump contents
+	empty_vehicle(veh);
+}
+
 
 /**
 * This returns (or creates, if necessary) the start of the interior of the

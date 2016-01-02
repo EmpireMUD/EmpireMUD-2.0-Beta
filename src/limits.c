@@ -31,6 +31,7 @@
 *   Empire Limits
 *   Object Limits
 *   Room Limits
+*   Vehicle Limits
 *   Miscellaneous Limits
 *   Periodic Gainers
 *   Core Periodicals
@@ -1592,6 +1593,25 @@ void point_update_room(room_data *room) {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// VEHICLE LIMITS //////////////////////////////////////////////////////////
+
+/**
+* This runs an hourly "point update" on a vehicle.
+*
+* @param vehicle_data *veh The vehicle to update.
+*/
+void point_update_vehicle(vehicle_data *veh) {
+	void besiege_vehicle(vehicle_data *veh, int damage, int siege_type);
+
+	// burny burny burny! (do this last)
+	if (VEH_FLAGGED(veh, VEH_BURNING)) {
+		besiege_vehicle(veh, MAX(1, (VEH_MAX_HEALTH(veh) / 12)), SIEGE_BURNING);
+		// WARNING: this may have extracted it
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// MISCELLANEOUS LIMITS ////////////////////////////////////////////////////
 
 /**
@@ -1961,6 +1981,7 @@ void point_update(bool run_real) {
 	void update_players_online_stats();
 	extern int max_players_today;
 	
+	vehicle_data *veh, *next_veh;
 	room_data *room, *next_room;
 	obj_data *obj, *next_obj;
 	char_data *ch, *next_ch;
@@ -1984,6 +2005,7 @@ void point_update(bool run_real) {
 		next_ch = ch->next;
 		
 		// remove stale offers -- this needs to happen even if dead (resurrect)
+		// TODO shouldn't this logic be inside the point_update_char function?
 		if (!IS_NPC(ch)) {
 			clean_offers(ch);
 		}
@@ -1994,6 +2016,11 @@ void point_update(bool run_real) {
 		
 		real_update_char(ch);
 		point_update_char(ch);
+	}
+	
+	// vehicles
+	LL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
+		point_update_vehicle(veh);
 	}
 	
 	// objs

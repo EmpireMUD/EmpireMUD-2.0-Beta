@@ -511,6 +511,12 @@ extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 #define TOTAL_ATTACK_TYPES		(TYPE_SUFFERING + 17)
 
 
+// SIEGE_x types for besiege
+#define SIEGE_PHYSICAL  0
+#define SIEGE_MAGICAL  1
+#define SIEGE_BURNING  2
+
+
 /* Affect types */
 #define ATYPE_RESERVED  0
 #define ATYPE_FLY  1
