@@ -187,13 +187,17 @@ void perform_escape(char_data *ch) {
 	room_data *home, *to_room = NULL;
 	
 	// on a boat?
-	/*
-	if ((to_room = IN_VEHICLE_IN_ROOM(IN_ROOM(ch))) != IN_ROOM(ch)) {
-		msg_to_char(ch, "You dive over the side of the ship!\r\n");
-		act("$n dives over the side of the ship!", TRUE, ch, NULL, NULL, TO_ROOM);
+	if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && (to_room = IN_VEHICLE_IN_ROOM(IN_ROOM(ch))) != IN_ROOM(ch)) {
+		if (VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_IN)) {
+			act("You dive out of $V!", FALSE, ch, NULL, GET_ROOM_VEHICLE(IN_ROOM(ch)), TO_CHAR);
+			act("$n dives out of $V!", TRUE, ch, NULL, GET_ROOM_VEHICLE(IN_ROOM(ch)), TO_ROOM);
+		}
+		else {	// not an IN vehicle
+			msg_to_char(ch, "You dive off the side!\r\n");
+			act("$n dives off the side!", TRUE, ch, NULL, NULL, TO_ROOM);
+		}
 	}
 	else {
-	*/
 		msg_to_char(ch, "You dive out the window!\r\n");
 		act("$n dives out the window!", TRUE, ch, NULL, NULL, TO_ROOM);
 		
@@ -201,7 +205,7 @@ void perform_escape(char_data *ch) {
 		if (BUILDING_ENTRANCE(home) != NO_DIR) {
 			to_room = real_shift(home, shift_dir[rev_dir[BUILDING_ENTRANCE(home)]][0], shift_dir[rev_dir[BUILDING_ENTRANCE(home)]][1]);
 		}
-	//}
+	}
 
 	if (!to_room) {
 		msg_to_char(ch, "But you can't seem to escape from here...\r\n");
@@ -881,16 +885,14 @@ ACMD(do_escape) {
 		msg_to_char(ch, "You don't need to escape from here.\r\n");
 	}
 	else {
-		/*
-		if (BOAT_ROOM(IN_ROOM(ch)) != IN_ROOM(ch)) {
-			msg_to_char(ch, "You run for the edge of the deck to escape!\r\n");
-			act("$n runs toward the edge of the deck!", TRUE, ch, NULL, NULL, TO_ROOM);
+		if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && IN_VEHICLE_IN_ROOM(IN_ROOM(ch)) != IN_ROOM(ch) && !VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_IN)) {
+			msg_to_char(ch, "You run for the edge to escape!\r\n");
+			act("$n runs toward the edge to escape!", TRUE, ch, NULL, NULL, TO_ROOM);
 		}
-		else {
-		*/
+		else {	// this handles buildings and IN-vehicles
 			msg_to_char(ch, "You run for the window to escape!\r\n");
 			act("$n runs toward the window!", TRUE, ch, NULL, NULL, TO_ROOM);
-		//}
+		}
 		
 		charge_ability_cost(ch, MOVE, cost, NOTHING, 0, WAIT_ABILITY);
 		start_action(ch, ACT_ESCAPING, 1);
