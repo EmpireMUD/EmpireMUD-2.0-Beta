@@ -1078,33 +1078,54 @@ ACMD(do_dismiss) {
 }
 
 
-ACMD(do_douse) {	
-	obj_data *obj;
-	byte amount;
+ACMD(do_douse) {
+	void do_douse_vehicle(char_data *ch, vehicle_data *veh, obj_data *cont);
+	
 	room_data *room = HOME_ROOM(IN_ROOM(ch));
+	char arg[MAX_INPUT_LENGTH];
+	obj_data *obj, *iter;
+	vehicle_data *veh;
+	byte amount;
 	
 	int fire_extinguish_value = config_get_int("fire_extinguish_value");
 
-	// this loop finds a drink container and sets obj
-	for (obj = ch->carrying; obj && !(GET_DRINK_CONTAINER_CONTENTS(obj) > 0); obj = obj->next_content);
-
+	// this loop finds a water container and sets obj
+	LL_FOREACH2(ch->carrying, iter, next_content) {
+		if (GET_DRINK_CONTAINER_TYPE(iter) == LIQ_WATER && GET_DRINK_CONTAINER_CONTENTS(iter) > 0) {
+			obj = iter;
+			break;
+		}
+	}
+	
+	one_argument(argument, arg);
+	
 	if (!IN_ROOM(ch))
 		msg_to_char(ch, "Unexpected error in douse.\r\n");
-	else if (!IS_ANY_BUILDING(IN_ROOM(ch)))
-		msg_to_char(ch, "You can't really douse a fire here.\r\n");
-	else if (!BUILDING_BURNING(room))
-		msg_to_char(ch, "There's no fire here!\r\n");
 	else if (!obj)
-		msg_to_char(ch, "What do you plan to douse the fire with?\r\n");
-	else if (GET_DRINK_CONTAINER_TYPE(obj) != LIQ_WATER)
-		msg_to_char(ch, "Only water will douse a fire!\r\n");
+		msg_to_char(ch, "You have nothing to douse the fire with!\r\n");
+	else if (*arg) {
+		if ((veh = get_vehicle_in_room_vis(ch, arg))) {
+			do_douse_vehicle(ch, veh, obj);
+		}
+		else if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && isname(arg, VEH_KEYWORDS(GET_ROOM_VEHICLE(IN_ROOM(ch))))) {
+			do_douse_vehicle(ch, GET_ROOM_VEHICLE(IN_ROOM(ch)), obj);
+		}
+		else {
+			msg_to_char(ch, "You don't see %s %s to douse!\r\n", AN(arg), arg);
+		}
+	}
+	else if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_ON_FIRE)) {
+		do_douse_vehicle(ch, GET_ROOM_VEHICLE(IN_ROOM(ch)), obj);
+	}
+	else if (!IS_ANY_BUILDING(IN_ROOM(ch)) || !BUILDING_BURNING(room))
+		msg_to_char(ch, "There's no fire here!\r\n");
 	else {
 		amount = GET_DRINK_CONTAINER_CONTENTS(obj);
 		GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) = 0;
 
 		COMPLEX_DATA(room)->burning = MIN(fire_extinguish_value, BUILDING_BURNING(room) + amount);
 		act("You throw some water from $p onto the flames!", FALSE, ch, obj, 0, TO_CHAR);
-		act("$n throws some water from $p onto the flames!", FALSE, ch, obj, 0, TO_CHAR);
+		act("$n throws some water from $p onto the flames!", FALSE, ch, obj, 0, TO_ROOM);
 
 		if (BUILDING_BURNING(room) >= fire_extinguish_value) {
 			act("The flames have been extinguished!", FALSE, ch, 0, 0, TO_CHAR | TO_ROOM);

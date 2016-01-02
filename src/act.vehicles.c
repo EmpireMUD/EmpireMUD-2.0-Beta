@@ -116,6 +116,28 @@ bool perform_put_obj_in_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh)
 //// SUB-COMMANDS ////////////////////////////////////////////////////////////
 
 /**
+* Performs a douse on a vehicle.
+*
+* @param char_data *ch The douser.
+* @param vehicle_data *veh The burning vehicle.
+* @param obj_data *cont The liquid container full of water.
+*/
+void do_douse_vehicle(char_data *ch, vehicle_data *veh, obj_data *cont) {
+	if (!VEH_FLAGGED(veh, VEH_ON_FIRE)) {
+		msg_to_char(ch, "It's not even on fire!\r\n");
+	}
+	else {
+		GET_OBJ_VAL(cont, VAL_DRINK_CONTAINER_CONTENTS) = 0;
+		REMOVE_BIT(VEH_FLAGS(veh), VEH_ON_FIRE);
+		
+		act("You put out the fire on $V with $p!", FALSE, ch, cont, veh, TO_CHAR);
+		act("$n puts out the fire on $V with $p!", FALSE, ch, cont, veh, TO_ROOM);
+		msg_to_vehicle(veh, FALSE, "The flames have been extinguished!\r\n");
+	}
+}
+
+
+/**
 * Attempts to drag an object through a portal. This is a sub-function of
 * do_drag. It is called when no direction matched the drag command.
 *
