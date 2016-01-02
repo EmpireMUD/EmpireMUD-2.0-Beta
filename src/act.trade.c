@@ -98,6 +98,12 @@ bool check_can_craft(char_data *ch, craft_data *type) {
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_CARPENTER) && (BUILDING_VNUM(IN_ROOM(ch)) != BUILDING_CARPENTER || !IS_COMPLETE(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You need to %s that at the carpenter!\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
 	}
+	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_SHIPYARD) && (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_SHIPYARD) || !IS_COMPLETE(IN_ROOM(ch)))) {
+		msg_to_char(ch, "You need to %s that at the shipyard!\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
+	}
+	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_BLD_UPGRADED) && (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_UPGRADED) || !IS_COMPLETE(IN_ROOM(ch)))) {
+		msg_to_char(ch, "The building needs to be upgraded to %s that!\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
+	}
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_GLASSBLOWER) && (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_GLASSBLOWER) || !IS_COMPLETE(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You need to %s that at the glassblower!\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
 	}

@@ -438,7 +438,7 @@ typedef struct vehicle_data vehicle_data;
  //////////////////////////////////////////////////////////////////////////////
 //// BUILDING DEFINES ////////////////////////////////////////////////////////
 
-// building data flags
+// BLD_x: building data flags
 #define BLD_ROOM  BIT(0)	// a designatable interior room instead of a whole building
 #define BLD_ALLOW_MOUNTS  BIT(1)	// can ride/mount in
 #define BLD_TWO_ENTRANCES  BIT(2)	// has a rear door
@@ -484,6 +484,8 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_NEED_BOAT  BIT(42)	// requires a boat to enter
 #define BLD_LOOK_OUT  BIT(43)	// can see the map using "look out"
 #define BLD_SECONDARY_TERRITORY  BIT(44)	// similar to a ship -- counts as territory off the map
+#define BLD_SHIPYARD  BIT(45)	// for building ships
+#define BLD_UPGRADED  BIT(46)	// combines with SHIPYARD, etc. to create upgraded versions of buildings
 
 
 // Terrain flags for do_build -- these match up with build_on flags for building crafts
@@ -664,7 +666,7 @@ typedef struct vehicle_data vehicle_data;
 #define CRAFT_TYPE_MANUFACTURE  11
 
 
-// Craft Flags for do_gen_craft
+// CRAFT_x: Craft Flags for do_gen_craft
 #define CRAFT_POTTERY  BIT(0)  // bonus at pottery; requires fire
 #define CRAFT_APIARIES  BIT(1)  // requires apiary tech
 #define CRAFT_GLASS  BIT(2)  // requires glassblowing tech
@@ -679,6 +681,8 @@ typedef struct vehicle_data vehicle_data;
 #define CRAFT_DISMANTLE_ONLY  BIT(11)	// build: building can be dismantled but not built
 #define CRAFT_IN_CITY_ONLY  BIT(12)	// craft/building must be inside a city
 #define CRAFT_VEHICLE  BIT(13)	// creates a vehicle instead of an object
+#define CRAFT_SHIPYARD  BIT(14)	// requires a shipyard
+#define CRAFT_BLD_UPGRADED  BIT(15)	// requires a building with the upgraded flag
 
 
 // For find_building_list_entry
@@ -1548,6 +1552,7 @@ typedef struct vehicle_data vehicle_data;
 #define VEH_LEADABLE  BIT(14)	// o. can be lead around
 #define VEH_CARRY_VEHICLES  BIT(15)	// p. can put vehicles on board
 #define VEH_CARRY_MOBS  BIT(16)	// q. can put mobs on board
+#define VEH_SIEGE_WEAPONS  BIT(17)	// r. can be used to besiege
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2311,7 +2316,7 @@ struct bld_data {
 	
 	int max_damage;
 	int fame;	// how much is added to empire fame
-	bitvector_t flags;	// BLD_x
+	bitvector_t flags;	// BLD_
 	bld_vnum upgrades_to;	// the vnum of any building
 	
 	int extra_rooms;	// how many rooms it can have

@@ -1133,6 +1133,8 @@ const char *craft_flags[] = {
 	"DISMANTLE-ONLY",
 	"IN-CITY-ONLY",
 	"VEHICLE",
+	"SHIPYARD",
+	"BLD-UPGRADED",
 	"\n"
 };
 
@@ -1965,6 +1967,8 @@ const char *bld_flags[] = {
 	"NEED-BOAT",
 	"LOOK-OUT",
 	"2ND-TERRITORY",
+	"SHIPYARD",
+	"UPGRADED",
 	"\n"
 };
 
@@ -2994,5 +2998,6 @@ const char *vehicle_flags[] = {
 	"LEADABLE",
 	"CARRY-VEHICLES",	// 15
 	"CARRY-MOBS",
+	"SIEGE-WEAPONS",
 	"\n"
 };

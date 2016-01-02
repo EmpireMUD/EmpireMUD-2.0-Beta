@@ -1158,7 +1158,9 @@ Available flags:
  SUMMON-PLAYER - allows the summon player command
  NEED-BOAT - requires a boat, flying, or swimming to enter
  LOOK-OUT - can see the map using "look out"
- 2ND-TERRITORY - like a ship, counts as territory off the map
+ 2ND-TERRITORY - counts as territory off the map (e.g. in a ship)
+ SHIPYARD - used to build ships
+ UPGRADED - modifies other building types like SHIPYARD
 
 * Note: If you change the LARGE-CITY-RADIUS flag on existing buildings,
         territory counts will not update right away. Any empire can force a
@@ -1429,6 +1431,8 @@ Available flags:
     to be dismantled, but not built; it won't show up in the build list
  IN-CITY-ONLY - a craft or building can only be made in a city radius
  VEHICLE - creates a vehicle instead of an item
+ SHIPYARD - requires being at a shipyard
+ BLD-UPGRADED - requires being at a building with the UPGRADED flag
 
 See also: CEDIT TYPE, OLC CRAFTS, OLC REMOVEINDEV
 #d
