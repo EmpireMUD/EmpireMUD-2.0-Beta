@@ -894,6 +894,9 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	if (BUILDING_BURNING(room)) {
 		msg_to_char(ch, "%sThe building is on fire!&0\r\n", BACKGROUND_RED);
 	}
+	if (GET_ROOM_VEHICLE(room) && VEH_FLAGGED(GET_ROOM_VEHICLE(room), VEH_ON_FIRE)) {
+		msg_to_char(ch, "%sThe %s has caught on fire!\t0\r\n", BACKGROUND_RED, skip_filler(VEH_SHORT_DESC(GET_ROOM_VEHICLE(room))));
+	}
 
 	if (!AFF_FLAGGED(ch, AFF_EARTHMELD)) {
 		/* now list characters & objects */

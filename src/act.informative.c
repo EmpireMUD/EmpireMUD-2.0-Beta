@@ -875,6 +875,9 @@ void list_one_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 	size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", VEH_LONG_DESC(veh));
 	
 	// additional descriptions like what's attached:
+	if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "...it is ON FIRE!\r\n");
+	}
 	if (!VEH_IS_COMPLETE(veh)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "...it is unfinished.\r\n");
 	}
