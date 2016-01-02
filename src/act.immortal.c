@@ -5537,7 +5537,8 @@ ACMD(do_reload) {
 
 ACMD(do_rescale) {
 	void scale_item_to_level(obj_data *obj, int level);
-
+	
+	vehicle_data *veh;
 	obj_data *obj, *new;
 	char_data *vict;
 	int level;
@@ -5570,6 +5571,13 @@ ACMD(do_rescale) {
 				act(buf, FALSE, ch, NULL, vict, TO_VICT);
 			}
 		}
+	}
+	else if ((veh = get_vehicle_in_room_vis(ch, arg))) {
+		scale_vehicle_to_level(veh, level);
+		syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s has rescaled vehicle %s to level %d at %s", GET_NAME(ch), VEH_SHORT_DESC(veh), VEH_SCALE_LEVEL(veh), room_log_identifier(IN_ROOM(ch)));
+		sprintf(buf, "You rescale $V to level %d.", VEH_SCALE_LEVEL(veh));
+		act(buf, FALSE, ch, NULL, veh, TO_CHAR);
+		act("$n rescales $V.", FALSE, ch, NULL, veh, TO_ROOM);
 	}
 	else if ((obj = get_obj_in_list_vis(ch, arg, ch->carrying)) || (obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
 		// item mode
