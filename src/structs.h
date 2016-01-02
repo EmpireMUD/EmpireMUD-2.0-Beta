@@ -649,7 +649,7 @@ typedef struct vehicle_data vehicle_data;
  //////////////////////////////////////////////////////////////////////////////
 //// CRAFT DEFINES ///////////////////////////////////////////////////////////
 
-// do_gen_craft (trade.c)
+// CRAFT_TYPE_x: do_gen_craft (trade.c)
 #define CRAFT_TYPE_ERROR  0
 #define CRAFT_TYPE_FORGE  1
 #define CRAFT_TYPE_CRAFT  2
@@ -661,6 +661,7 @@ typedef struct vehicle_data vehicle_data;
 #define CRAFT_TYPE_BUILD  8
 #define CRAFT_TYPE_WEAVE  9
 #define CRAFT_TYPE_WORKFORCE  10
+#define CRAFT_TYPE_MANUFACTURE  11
 
 
 // Craft Flags for do_gen_craft
@@ -2924,7 +2925,7 @@ struct lore_data {
 struct craft_data {
 	craft_vnum vnum;	// vnum of this recipe
 	
-	int type;	// CRAFT_TYPE_x
+	int type;	// CRAFT_TYPE_
 	any_vnum ability;	// NO_ABIL for none, otherwise ABIL_ type
 	
 	char *name;

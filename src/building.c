@@ -720,6 +720,7 @@ void process_build(char_data *ch, room_data *room) {
 		if (res->amount <= 0) {
 			// remove the resource entry entirely
 			REMOVE_FROM_LIST(res, GET_BUILDING_RESOURCES(room), next);
+			free(res);
 		}
 	}
 

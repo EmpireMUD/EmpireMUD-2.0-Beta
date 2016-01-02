@@ -1150,6 +1150,7 @@ const char *craft_types[] = {
 	"BUILD",
 	"WEAVE",
 	"WORKFORCE",
+	"MANUFACTURE",
 	"\n"
 };
 
