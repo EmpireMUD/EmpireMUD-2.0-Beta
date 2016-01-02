@@ -1082,8 +1082,8 @@ ACMD(do_douse) {
 	void do_douse_vehicle(char_data *ch, vehicle_data *veh, obj_data *cont);
 	
 	room_data *room = HOME_ROOM(IN_ROOM(ch));
+	obj_data *obj = NULL, *iter;
 	char arg[MAX_INPUT_LENGTH];
-	obj_data *obj, *iter;
 	vehicle_data *veh;
 	byte amount;
 	

@@ -2778,7 +2778,7 @@ Object flags allow additional properties to be set on objects, with various
 effects. Never set a flag marked with an * (asterisk).
 
 Available flags:
- CHAIR - can be sat upon using the 'sit' command
+ * - do not set
  PLANTABLE - can be planted as a crop (see OEDIT PLANTS)
  LIGHT - lights up the room at night
  SUPERIOR - crafted by a master craftsman, adds the (superior) tag

@@ -1551,7 +1551,7 @@ int item_wear_to_wear[] = {
 
 // OBJ_x (extra bits), part 1
 const char *extra_bits[] = {
-	"CHAIR",
+	"*",
 	"PLANTABLE",
 	"LIGHT",
 	"SUPERIOR",

@@ -398,6 +398,8 @@ void scale_vehicle_to_level(vehicle_data *veh, int level) {
 * @param vehicle_data *veh The vehicle to ignite.
 */
 void start_vehicle_burning(vehicle_data *veh) {
+	void do_unseat_from_vehicle(char_data *ch);
+	
 	if (VEH_OWNER(veh)) {
 		log_to_empire(VEH_OWNER(veh), ELOG_HOSTILITY, "Your %s has caught on fire at (%d, %d)", skip_filler(VEH_SHORT_DESC(veh)), X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh)));
 	}
