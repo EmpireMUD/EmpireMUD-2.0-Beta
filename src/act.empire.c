@@ -2088,7 +2088,8 @@ ACMD(do_abandon) {
 	if (!GET_LOYALTY(ch)) {
 		msg_to_char(ch, "You're not part of an empire.\r\n");
 	}
-	else if (!has_permission(ch, PRIV_CEDE)) {
+	else if (GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_CEDE)) {
+		// this doesn't use has_permission because that would check if the land is owned already
 		msg_to_char(ch, "You don't have permission to abandon.\r\n");
 	}
 	else if (*arg && (veh = get_vehicle_in_room_vis(ch, arg))) {
