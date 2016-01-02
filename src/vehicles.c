@@ -933,7 +933,7 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 			case 'S': {
 				if (OBJ_FILE_TAG(line, "Scale:", length)) {
 					if (sscanf(line + length + 1, "%d", &i_in[0])) {
-						// TODO scale it
+						VEH_SCALE_LEVEL(veh) = i_in[0];
 					}
 				}
 				else if (OBJ_FILE_TAG(line, "Short-desc:", length)) {
