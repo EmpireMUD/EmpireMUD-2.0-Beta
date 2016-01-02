@@ -439,7 +439,7 @@ void olc_show_craft(char_data *ch) {
 	
 	sprintf(buf + strlen(buf), "<&ylevelrequired&0> %d\r\n", GET_CRAFT_MIN_LEVEL(craft));
 
-	if (GET_CRAFT_TYPE(craft) != CRAFT_TYPE_BUILD) {
+	if (GET_CRAFT_TYPE(craft) != CRAFT_TYPE_BUILD && !CRAFT_FLAGGED(craft, CRAFT_VEHICLE)) {
 		seconds = (GET_CRAFT_TIME(craft) * ACTION_CYCLE_TIME);
 		sprintf(buf + strlen(buf), "<&ytime&0> %d action tick%s (%d:%02d)\r\n", GET_CRAFT_TIME(craft), (GET_CRAFT_TIME(craft) != 1 ? "s" : ""), seconds / 60, seconds % 60);
 	}
@@ -688,6 +688,9 @@ OLC_MODULE(cedit_time) {
 	
 	if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD) {
 		msg_to_char(ch, "You can't set that property on a building.\r\n");
+	}
+	else if (CRAFT_FLAGGED(craft, CRAFT_VEHICLE)) {
+		msg_to_char(ch, "You can't set that property on a vehicle craft.\r\n");
 	}
 	else {
 		GET_CRAFT_TIME(craft) = olc_process_number(ch, argument, "time", "time", 1, MAX_INT, GET_CRAFT_TIME(craft));
