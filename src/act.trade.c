@@ -1016,6 +1016,7 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type) {
 	SET_BIT(VEH_FLAGS(veh), VEH_INCOMPLETE);
 	VEH_NEEDS_RESOURCES(veh) = copy_resource_list(GET_CRAFT_RESOURCES(type));
 	VEH_OWNER(veh) = GET_LOYALTY(ch);
+	VEH_HEALTH(veh) = MAX(1, VEH_MAX_HEALTH(veh) * 0.2);	// start at 20% health, will heal on completion
 	
 	start_action(ch, ACT_GEN_CRAFT, -1);
 	GET_ACTION_VNUM(ch, 0) = GET_CRAFT_VNUM(type);
