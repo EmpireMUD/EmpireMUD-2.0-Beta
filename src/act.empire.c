@@ -2044,9 +2044,13 @@ void do_abandon_room(char_data *ch, room_data *room) {
 	else {
 		if (room != IN_ROOM(ch) && has_ability(ch, ABIL_NAVIGATION)) {
 			msg_to_char(ch, "(%d, %d) abandoned.\r\n", X_COORD(room), Y_COORD(room));
+			if (ROOM_PEOPLE(room)) {
+				act("$N abandons $S claim to this area.", FALSE, ROOM_PEOPLE(room), NULL, ch, TO_CHAR | TO_ROOM);
+			}
 		}
 		else {
 			msg_to_char(ch, "Territory abandoned.\r\n");
+			act("$n abandons $s claim to this area.", FALSE, ch, NULL, NULL, TO_ROOM);
 		}
 		abandon_room(room);
 		read_empire_territory(GET_LOYALTY(ch));
@@ -2066,6 +2070,7 @@ void do_abandon_vehicle(char_data *ch, vehicle_data *veh) {
 	}
 	else {
 		act("You abandon $V.", FALSE, ch, NULL, veh, TO_CHAR);
+		act("$n abandons $V.", FALSE, ch, NULL, veh, TO_ROOM);
 		VEH_OWNER(veh) = NULL;
 		
 		if (VEH_INTERIOR_HOME_ROOM(veh)) {
@@ -2358,6 +2363,12 @@ void do_claim_room(char_data *ch, room_data *room) {
 	}
 	else {
 		send_config_msg(ch, "ok_string");
+		if (room == IN_ROOM(ch)) {
+			act("$n stakes a claim to this area.", FALSE, ch, NULL, NULL, TO_ROOM);
+		}
+		else if (ROOM_PEOPLE(room)) {
+			act("$N stakes a claim to this area.", FALSE, ROOM_PEOPLE(room), NULL, ch, TO_CHAR | TO_ROOM);
+		}
 		claim_room(room, emp);
 		read_empire_territory(emp);
 		save_empire(emp);
@@ -2385,6 +2396,7 @@ void do_claim_vehicle(char_data *ch, vehicle_data *veh) {
 	}
 	else {
 		send_config_msg(ch, "ok_string");
+		act("$n claims $V.", FALSE, ch, NULL, veh, TO_ROOM);
 		VEH_OWNER(veh) = emp;
 		
 		if (VEH_INTERIOR_HOME_ROOM(veh)) {
