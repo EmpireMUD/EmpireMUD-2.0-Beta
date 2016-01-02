@@ -819,6 +819,51 @@ ACMD(do_lead) {
 }
 
 
+ACMD(do_scrap) {
+	char arg[MAX_INPUT_LENGTH];
+	vehicle_data *veh;
+	craft_data *craft;
+	char_data *iter;
+	
+	one_argument(argument, arg);
+	
+	if (!*arg) {
+		msg_to_char(ch, "Scrap what?\r\n");
+	}
+	else if (!(veh = get_vehicle_in_room_vis(ch, arg))) {
+		msg_to_char(ch, "You don't see anything like that here.\r\n");
+	}
+	else if (!can_use_vehicle(ch, veh, MEMBERS_ONLY)) {
+		msg_to_char(ch, "You can't scrap that! It's not even yours.\r\n");
+	}
+	else if (VEH_IS_COMPLETE(veh)) {
+		msg_to_char(ch, "You can only scrap incomplete vehicles.\r\n");
+	}
+	else {
+		// seems good... but make sure nobody is working on it
+		LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_in_room) {
+			if (IS_NPC(iter) || GET_ACTION(iter) != ACT_GEN_CRAFT) {
+				continue;
+			}
+			if (!(craft = craft_proto(GET_ACTION_VNUM(iter, 0)))) {
+				continue;
+			}
+			if (!CRAFT_FLAGGED(craft, CRAFT_VEHICLE) || GET_CRAFT_OBJECT(craft) != VEH_VNUM(veh)) {
+				continue;
+			}
+			
+			// someone is working on the vehicle
+			msg_to_char(ch, "You can't scrap it while %s working on it.\r\n", (ch == iter ? "you're" : "someone is"));
+			return;
+		}
+		
+		act("You scrap $V.", FALSE, ch, NULL, veh, TO_CHAR);
+		act("$n scraps $V.", FALSE, ch, NULL, veh, TO_ROOM);
+		extract_vehicle(veh);
+	}
+}
+
+
 ACMD(do_unharness) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	struct vehicle_attached_mob *animal = NULL, *iter, *next_iter;
