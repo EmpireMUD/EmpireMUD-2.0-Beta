@@ -2999,6 +2999,6 @@ const char *vehicle_flags[] = {
 	"CARRY-VEHICLES",	// 15
 	"CARRY-MOBS",
 	"SIEGE-WEAPONS",
-	"BURNING",
+	"ON-FIRE",
 	"\n"
 };

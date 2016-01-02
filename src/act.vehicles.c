@@ -230,6 +230,44 @@ void do_get_from_vehicle(char_data *ch, vehicle_data *veh, char *arg, int mode, 
 
 
 /**
+* command sub-processor for burning a vehicle
+*
+* @param char_data *ch The person trying to burn a vehicle.
+* @param vehicle_data *veh The vehicle to burn.
+* @param obj_data *flint The flint.
+*/
+void do_light_vehicle(char_data *ch, vehicle_data *veh, obj_data *flint) {
+	char buf[MAX_STRING_LENGTH];
+	
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "Mobs can't light vehicles on fire.\r\n");
+	}
+	else if (!VEH_FLAGGED(veh, VEH_BURNABLE)) {
+		msg_to_char(ch, "You can't seem to get it to burn.\r\n");
+	}
+	else if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
+		msg_to_char(ch, "It is already on fire!\r\n");
+	}
+	else if (VEH_OWNER(veh) && GET_LOYALTY(ch) != VEH_OWNER(veh) && !has_relationship(GET_LOYALTY(ch), VEH_OWNER(veh), DIPL_WAR)) {
+		msg_to_char(ch, "You can't burn %s vehicles unless you're at war.\r\n", EMPIRE_ADJECTIVE(VEH_OWNER(veh)));
+	}
+	else {
+		snprintf(buf, sizeof(buf), "You %s $V on fire!", (flint ? "strike $p and light" : "light"));
+		act(buf, FALSE, ch, flint, veh, TO_CHAR);
+		snprintf(buf, sizeof(buf), "$n %s $V on fire!", (flint ? "strikes $p and lights" : "lights"));
+		act(buf, FALSE, ch, flint, veh, TO_ROOM);
+		
+		msg_to_vehicle(veh, TRUE, "It seems %s has caught fire!\r\n", VEH_SHORT_DESC(veh));
+		
+		SET_BIT(VEH_FLAGS(veh), VEH_ON_FIRE);
+		if (VEH_OWNER(veh) && VEH_OWNER(veh) != GET_LOYALTY(ch)) {
+			log_to_empire(VEH_OWNER(veh), ELOG_HOSTILITY, "Someone has set %s on fire at (%d, %d)", VEH_SHORT_DESC(veh), X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh)));
+		}
+	}
+}
+
+
+/**
 * Command processing for a character who is trying to sit in/on a vehicle.
 *
 * @param char_data *ch The person trying to sit.

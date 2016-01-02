@@ -1604,7 +1604,7 @@ void point_update_vehicle(vehicle_data *veh) {
 	void besiege_vehicle(vehicle_data *veh, int damage, int siege_type);
 
 	// burny burny burny! (do this last)
-	if (VEH_FLAGGED(veh, VEH_BURNING)) {
+	if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
 		besiege_vehicle(veh, MAX(1, (VEH_MAX_HEALTH(veh) / 12)), SIEGE_BURNING);
 		// WARNING: this may have extracted it
 	}

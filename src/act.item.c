@@ -4014,8 +4014,11 @@ ACMD(do_keep) {
 
 
 ACMD(do_light) {
+	void do_light_vehicle(char_data *ch, vehicle_data *veh, obj_data *flint);
+	
 	obj_data *obj, *flint = NULL;
 	bool magic = !IS_NPC(ch) && has_ability(ch, ABIL_TOUCH_OF_FLAME);
+	vehicle_data *veh;
 
 	one_argument(argument, arg);
 
@@ -4027,8 +4030,15 @@ ACMD(do_light) {
 		msg_to_char(ch, "Light what?\r\n");
 	else if (!IS_NPC(ch) && !magic && !flint)
 		msg_to_char(ch, "You don't have a flint set to light that with.\r\n");
-	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying)) && !(obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)))))
-		msg_to_char(ch, "You don't have a %s.\r\n", arg);
+	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying)) && !(obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
+		// try burning a vehicle
+		if ((veh = get_vehicle_in_room_vis(ch, arg))) {
+			do_light_vehicle(ch, veh, flint);
+		}
+		else {
+			msg_to_char(ch, "You don't have a %s.\r\n", arg);
+		}
+	}
 	else if (!has_interaction(obj->interactions, INTERACT_LIGHT)) {
 		msg_to_char(ch, "You can't light that!\r\n");
 	}

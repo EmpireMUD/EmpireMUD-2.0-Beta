@@ -1133,6 +1133,45 @@ void msg_to_char(char_data *ch, const char *messg, ...) {
 
 
 /**
+* Sends a message to everyone in/on the vehicle.
+*
+* @param vehicle_data *veh The vehicle to send to.
+* @param bool awake_only If TRUE, only sends to people who aren't sleeping.
+* @param const char *messg... va_arg format.
+*/
+void msg_to_vehicle(vehicle_data *veh, bool awake_only, const char *messg, ...) {
+	char output[MAX_STRING_LENGTH];
+	descriptor_data *desc;
+	va_list tArgList;
+	char_data *ch;
+	
+	if (!messg || !veh) {
+		return;
+	}
+	
+	va_start(tArgList, messg);
+	vsprintf(output, messg, tArgList);
+	
+	LL_FOREACH(descriptor_list, desc) {
+		if (STATE(desc) != CON_PLAYING || !(ch = desc->character)) {
+			continue;
+		}
+		if (VEH_SITTING_ON(veh) != ch && GET_ROOM_VEHICLE(IN_ROOM(ch)) != veh) {
+			continue;
+		}
+		if (awake_only && GET_POS(ch) <= POS_SLEEPING && GET_POS(ch) != POS_DEAD) {
+			continue;
+		}
+		
+		// looks valid
+		SEND_TO_Q(output, desc);
+	}
+	
+	va_end(tArgList);
+}
+
+
+/**
 * Sends olc audit info to the player.
 *
 * @param char_data *ch The player.
