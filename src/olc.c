@@ -299,6 +299,7 @@ OLC_MODULE(tedit_types);
 OLC_MODULE(vedit_animalsrequired);
 OLC_MODULE(vedit_capacity);
 OLC_MODULE(vedit_designate);
+OLC_MODULE(vedit_extrarooms);
 OLC_MODULE(vedit_flags);
 OLC_MODULE(vedit_hitpoints);
 OLC_MODULE(vedit_icon);
@@ -306,7 +307,6 @@ OLC_MODULE(vedit_interiorroom);
 OLC_MODULE(vedit_keywords);
 OLC_MODULE(vedit_longdescription);
 OLC_MODULE(vedit_lookdescription);
-OLC_MODULE(vedit_maxrooms);
 OLC_MODULE(vedit_movetype);
 OLC_MODULE(vedit_resource);
 OLC_MODULE(vedit_shortdescription);
@@ -639,6 +639,7 @@ const struct olc_command_data olc_data[] = {
 	{ "animalsrequired", vedit_animalsrequired, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "capacity", vedit_capacity, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "designate", vedit_designate, OLC_VEHICLE, OLC_CF_EDITOR },
+	{ "extrarooms", vedit_extrarooms, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "flags", vedit_flags, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "hitpoints", vedit_hitpoints, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "icon", vedit_icon, OLC_VEHICLE, OLC_CF_EDITOR },
@@ -646,7 +647,6 @@ const struct olc_command_data olc_data[] = {
 	{ "keywords", vedit_keywords, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "longdescription", vedit_longdescription, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "lookdescription", vedit_lookdescription, OLC_VEHICLE, OLC_CF_EDITOR },
-	{ "maxrooms", vedit_maxrooms, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "movetype", vedit_movetype, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "resource", vedit_resource, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "shortdescription", vedit_shortdescription, OLC_VEHICLE, OLC_CF_EDITOR },

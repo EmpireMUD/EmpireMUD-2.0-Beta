@@ -1966,7 +1966,7 @@ void olc_show_vehicle(char_data *ch) {
 	sprintf(buf + strlen(buf), "<\tyanimalsrequired\t0> %d\r\n", VEH_ANIMALS_REQUIRED(veh));
 
 	sprintf(buf + strlen(buf), "<\tyinteriorroom\t0> %d - %s\r\n", VEH_INTERIOR_ROOM_VNUM(veh), building_proto(VEH_INTERIOR_ROOM_VNUM(veh)) ? GET_BLD_NAME(building_proto(VEH_INTERIOR_ROOM_VNUM(veh))) : "none");
-	sprintf(buf + strlen(buf), "<\tymaxrooms\t0> %d\r\n", VEH_MAX_ROOMS(veh));
+	sprintf(buf + strlen(buf), "<\tyextrarooms\t0> %d\r\n", VEH_MAX_ROOMS(veh));
 	sprintbit(VEH_DESIGNATE_FLAGS(veh), designate_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<\tydesignate\t0> %s\r\n", lbuf);
 	
@@ -2018,6 +2018,12 @@ OLC_MODULE(vedit_capacity) {
 OLC_MODULE(vedit_designate) {
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	VEH_DESIGNATE_FLAGS(veh) = olc_process_flag(ch, argument, "designate", "designate", designate_flags, VEH_DESIGNATE_FLAGS(veh));
+}
+
+
+OLC_MODULE(vedit_extrarooms) {
+	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
+	VEH_MAX_ROOMS(veh) = olc_process_number(ch, argument, "max rooms", "maxrooms", 0, 1000, VEH_MAX_ROOMS(veh));
 }
 
 
@@ -2107,12 +2113,6 @@ OLC_MODULE(vedit_lookdescription) {
 		sprintf(buf, "description for %s", VEH_SHORT_DESC(veh));
 		start_string_editor(ch->desc, buf, &VEH_LOOK_DESC(veh), MAX_ITEM_DESCRIPTION);
 	}
-}
-
-
-OLC_MODULE(vedit_maxrooms) {
-	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
-	VEH_MAX_ROOMS(veh) = olc_process_number(ch, argument, "max rooms", "maxrooms", 0, 1000, VEH_MAX_ROOMS(veh));
 }
 
 
