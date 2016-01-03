@@ -909,6 +909,9 @@ ACMD(do_repair) {
 	else if (!VEH_NEEDS_RESOURCES(veh) && VEH_HEALTH(veh) >= VEH_MAX_HEALTH(veh)) {
 		msg_to_char(ch, "It doesn't need repair.\r\n");
 	}
+	else if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
+		msg_to_char(ch, "You can't repair it while it's on fire!\r\n");
+	}
 	else {
 		start_action(ch, ACT_REPAIRING, -1);
 		GET_ACTION_VNUM(ch, 0) = GET_ID(veh);
