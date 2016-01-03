@@ -1336,6 +1336,7 @@ Workforce types:
   &cnexus-crystal (skilled):&0 Will make nexus crystals at the sorcery tower;
      requires both Exarch Crafts and Skilled Labor.
   &ymilling:&0 Will mill grains into flour.
+  &yrepair-vehicles&0: Will keep vehicles maintained.
   
 Items marked (skilled) require the Skilled Labor ability.
 

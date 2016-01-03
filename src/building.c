@@ -173,10 +173,20 @@ void check_lay_territory(char_data *ch, room_data *room) {
 * @return struct resource_data* The copied/merged list.
 */
 struct resource_data *combine_resources(struct resource_data *combine_a, struct resource_data *combine_b) {
-	struct resource_data *list, *two, *end;
+	struct resource_data *list, *two, *end, *iter, *next_iter, *el;
 	
 	list = copy_resource_list(combine_a);
 	two = copy_resource_list(combine_b);
+	
+	// attempt clean combine
+	LL_FOREACH_SAFE(two, iter, next_iter) {
+		LL_SEARCH_SCALAR(list, el, vnum, iter->vnum);
+		if (el) {
+			el->amount += iter->amount;
+			LL_DELETE(two, iter);
+			free(iter);
+		}
+	}
 	
 	if ((end = list)) {
 		while (end->next) {

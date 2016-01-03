@@ -1888,8 +1888,8 @@ void vehicle_chore_fire_brigade(empire_data *emp, vehicle_data *veh) {
 void vehicle_chore_repair(empire_data *emp, vehicle_data *veh) {
 	char_data *worker = find_chore_worker_in_room(IN_ROOM(veh), chore_data[CHORE_REPAIR_VEHICLES].mob);
 	struct empire_storage_data *store = NULL;
-	bool can_do = FALSE, found = FALSE;
 	struct resource_data *res;
+	bool can_do = FALSE;
 	
 	if ((res = VEH_NEEDS_RESOURCES(veh))) {
 		if ((store = find_stored_resource(emp, GET_ISLAND_ID(IN_ROOM(veh)), res->vnum)) && store->amount > 0) {
@@ -1899,7 +1899,6 @@ void vehicle_chore_repair(empire_data *emp, vehicle_data *veh) {
 	
 	if (worker && can_do) {
 		if (store && res) {
-			found = TRUE;
 			empire_skillup(emp, ABIL_WORKFORCE, config_get_double("exp_from_workforce"));
 		
 			charge_stored_resource(emp, GET_ISLAND_ID(IN_ROOM(veh)), res->vnum, 1);
