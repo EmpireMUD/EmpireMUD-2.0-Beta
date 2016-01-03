@@ -2723,8 +2723,8 @@ Message types:
  instrument-to-room - Shown every few seconds to the room when someone is playing an instrument.
  eat-to-char - Shown to the person when they eat the item.
  eat-to-room - Shown to the room when a person eats an item.
- craft-to-char - Shown to the actor when building a vehicle.
- craft-to-room - Shown to the room when building a vehicle.
+ craft-to-char - Shown to the actor when building a vehicle ($V for vehicle).
+ craft-to-room - Shown to the room when building a vehicle ($V for vehicle).
 
 See also: OLC OBJECTS
 #d
