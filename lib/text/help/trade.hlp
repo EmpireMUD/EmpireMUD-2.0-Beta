@@ -14,6 +14,37 @@ the person who crafts them. HELP SCALABLE CRAFTS has a full explanation.
 See also: CRAFT, IDENTIFY, FORGE, SEWING, POTTERY, WOODWORKING, SHIPBUILDING,
   REFORGE
 #
+"ADVANCED SHIPS" "ADVANCED SHIPYARDS" "UPGRADED SHIPYARD" "ADVANCED SHIP LIST"
+
+Advanced Ships (Trade ability)
+
+Building:  &b~&0[]&b~&0  Upgraded Shipyard (Seafaring ability)
+Resource:  30 blocks, 20 iron ingots
+Built on:  upgrade Shipyard
+Command:  manufacture <ship>
+Fame:  4
+
+The upgraded shipyard allows you to manufacture bigger, more powerful ships.
+
+With Advanced Ships you can manufacture:
+  Carrack
+    Type: Exploration ship (shipping)
+    Cost: 50x lumber, 100x nails, 4x log, 12x sail, 24x rope, 2x anchor
+    Capacity: 400
+    Health: 96
+  Brigantine
+    Type: Warship (siege weapons)
+    Cost: 60x lumber, 120x nails, 3x log, 10x sail, 20x rope, 2x anchor,
+          10x cannon    
+    Health: 128
+  Hulk
+    Type: Cargo ship (shipping)
+    Cost: 50x lumber, 100x nails, 3x log, 6x sail, 12x rope, 1x anchor
+    Capacity: 1000
+    Health: 64
+
+See also: SHIPBUILDING, BOARD, DISEMBARK, SAIL, SHIPPING, SHIPS, UPGRADE
+#
 "ALCHEMIST CRAFTS"
 
 Alchemist Crafts
@@ -625,32 +656,35 @@ command.
 
 See also: BOARD, DISEMBARK, SAIL, SHIPBUILDING, SHIPPING
 #
-SHIPBUILDING "SHIP BUILDING" MANUFACTURE SHIPYARDS "ADVANCED SHIPYARDS" "UPGRADED SHIPYARD" "ADVANCED SHIPS" "SHIP LIST"
+SHIPBUILDING "SHIP BUILDING" MANUFACTURE SHIPYARDS "SHIP LIST"
 
 Shipbuilding (Trade ability)
-Advanced Ships (Trade ability)
 
-Buildings:  &b~&0()&b~&0  Shipyard (Seafaring ability)
-            &b~&0[]&b~&0  Upgraded Shipyard (Seafaring ability)
-Resources:  60 lumber, 24 nails (shipyard)
-            30 blocks, 20 iron ingots  (upgraded)
+Building:  &b~&0()&b~&0  Shipyard (Seafaring ability)
+Resource:  60 lumber, 24 nails
 Built on:  plains or desert, next to water
 Command:  manufacture <ship>
-Fame:  4 (upgraded shipyard)
 
 Great ships can be created via the manufacture skill. This can only be done in
 a shipyard, and the vessel can be sailed to a dock when finished.
 
 With basic Shipbuilding you can manufacture:
-  pinnace  30 lumber, 60 nails  (shipping capacity: 150)
-  galley  45 lumber, 90 nails  (shipping capacity: 300)
-  brigantine  60 lumber, 120 nails  (shipping capacity: 450)
+  Caravel
+    Type: Exploration ship (shipping)
+    Cost: 35x lumber, 70x nails, 2x log, 6x sail, 12x rope, 1x anchor
+    Capacity: 150
+    Health: 32
+  Longship
+    Type: Warship (siege weapons)
+    Cost: 40x lumber, 80x nails, 1x log, 4x sail, 8x rope, 1x anchor, 2x cannon    
+    Health: 64
+  Cog
+    Type: Cargo ship (shipping)
+    Cost: 30x lumber, 60x nails, 1x log, 2x sail, 4x rope, 1x anchor
+    Capacity: 450
+    Health: 32
 
-With Advanced Ships you can manufacture:
-  argosy  120 lumber, 240 nails  (shipping capacity: 600)
-  galleon  240 lumber, 480 nails  (shipping capacity: 750)
-
-See also: BOARD, DISEMBARK, SAIL, SHIPPING, SHIPS, UPGRADE
+See also: ADVANCED SHIPS, BOARD, DISEMBARK, SAIL, SHIPPING, SHIPS, UPGRADE
 #
 SIEGEWORKS "SIEGE WORKS"
 
