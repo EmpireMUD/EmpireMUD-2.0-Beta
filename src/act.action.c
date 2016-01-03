@@ -193,7 +193,7 @@ void start_action(char_data *ch, int type, int timer) {
 *
 * @param room_data *room Where.
 * @param int action ACTION_x or NOTHING to not stop actions.
-* @param int chore CHORE_x or NOTHING to not stop workforce.
+* @param int chore CHORE_ or NOTHING to not stop workforce.
 */
 void stop_room_action(room_data *room, int action, int chore) {
 	extern struct empire_chore_type chore_data[NUM_CHORES];

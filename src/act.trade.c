@@ -1028,7 +1028,7 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type) {
 	start_action(ch, ACT_GEN_CRAFT, -1);
 	GET_ACTION_VNUM(ch, 0) = GET_CRAFT_VNUM(type);
 	
-	snprintf(buf, sizeof(buf), "You lay the framework and begins %s $V.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
+	snprintf(buf, sizeof(buf), "You lay the framework and begin %s $V.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 	act(buf, FALSE, ch, NULL, veh, TO_CHAR);
 	snprintf(buf, sizeof(buf), "$n lays the framework and begins %s $V.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 	act(buf, FALSE, ch, NULL, veh, TO_ROOM);

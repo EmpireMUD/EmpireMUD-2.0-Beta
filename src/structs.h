@@ -709,7 +709,7 @@ typedef struct vehicle_data vehicle_data;
 #define ETRAIT_DISTRUSTFUL  BIT(0)	// hostile behavior
 
 
-// workforce types
+// CHORE_x: workforce types
 #define CHORE_BUILDING  0
 #define CHORE_FARMING  1
 #define CHORE_REPLANTING  2
@@ -736,7 +736,8 @@ typedef struct vehicle_data vehicle_data;
 #define CHORE_ABANDON_FARMED  23
 #define CHORE_NEXUS_CRYSTALS  24
 #define CHORE_MILLING  25
-#define NUM_CHORES  26		// total
+#define CHORE_REPAIR_VEHICLES  26
+#define NUM_CHORES  27		// total
 
 
 /* Diplomacy types */
@@ -3022,7 +3023,7 @@ struct city_metadata_type {
 };
 
 
-// chore type data -- CHORE_x
+// chore type data -- CHORE_
 struct empire_chore_type {
 	char *name;
 	mob_vnum mob;

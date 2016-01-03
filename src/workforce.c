@@ -31,6 +31,7 @@
 *   Helpers
 *   Generic Craft Workforce
 *   Chore Functions
+*   Vehicle Chore Functions
 */
 
 // for territory iteration
@@ -56,6 +57,9 @@ void do_chore_shearing(empire_data *emp, room_data *room);
 void do_chore_smelting(empire_data *emp, room_data *room);
 void do_chore_trapping(empire_data *emp, room_data *room);
 void do_chore_tanning(empire_data *emp, room_data *room);
+
+void vehicle_chore_fire_brigade(empire_data *emp, vehicle_data *veh);
+void vehicle_chore_repair(empire_data *emp, vehicle_data *veh);
 
 // other locals
 int empire_chore_limit(empire_data *emp, int island_id, int chore);
@@ -108,6 +112,7 @@ struct empire_chore_type chore_data[NUM_CHORES] = {
 	{ "abandon-farmed", FARMER },	// mob is strictly a safe placeholder here
 	{ "nexus crystals", APPRENTICE_EXARCH },
 	{ "milling", MILL_WORKER },
+	{ "repair-vehicles", VEHICLE_REPAIRMAN },
 };
 
 
@@ -240,6 +245,43 @@ void process_one_chore(empire_data *emp, room_data *room) {
 		if (BUILDING_VNUM(room) == RTYPE_SORCERER_TOWER && CHORE_ACTIVE(CHORE_NEXUS_CRYSTALS) && EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR) && EMPIRE_HAS_TECH(emp, TECH_EXARCH_CRAFTS)) {
 			do_chore_gen_craft(emp, room, CHORE_NEXUS_CRYSTALS, chore_nexus_crystals);
 		}
+	}
+}
+
+
+/**
+* Runs a single vehicle-related chore
+*/
+void process_one_vehicle_chore(empire_data *emp, vehicle_data *veh) {
+	int island;
+	
+	// basic safety and sanitation
+	if (!emp || !veh || !IN_ROOM(veh)) {
+		return;
+	}
+	if (IS_WATER_SECT(SECT(IN_ROOM(veh))) || (island = GET_ISLAND_ID(IN_ROOM(veh))) == NO_ISLAND) {
+		return;
+	}
+	if (ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_NO_WORK)) {
+		return;
+	}
+	if (VEH_INTERIOR_HOME_ROOM(veh) && ROOM_AFF_FLAGGED(VEH_INTERIOR_HOME_ROOM(veh), ROOM_AFF_NO_WORK)) {
+		return;
+	}
+	if (ROOM_OWNER(IN_ROOM(veh)) && ROOM_OWNER(IN_ROOM(veh)) != emp && !has_relationship(emp, ROOM_OWNER(IN_ROOM(veh)), DIPL_ALLIED)) {
+		return;
+	}
+	
+	if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
+		if (empire_chore_limit(emp, island, CHORE_FIRE_BRIGADE)) {
+			vehicle_chore_fire_brigade(emp, veh);
+		}
+		else {
+			// prevent other chores from firing while burning
+		}
+	}
+	else if (VEH_IS_COMPLETE(veh) && VEH_NEEDS_RESOURCES(veh) && empire_chore_limit(emp, island, CHORE_REPAIR_VEHICLES)) {
+		vehicle_chore_repair(emp, veh);
 	}
 }
 
@@ -502,6 +544,7 @@ void chore_update(void) {
 	void run_chore_tracker_updates();
 	
 	struct empire_territory_data *ter;
+	vehicle_data *veh, *next_veh;
 	empire_data *emp, *next_emp;
 	
 	int time_to_empire_emptiness = config_get_int("time_to_empire_emptiness") * SECS_PER_REAL_WEEK;
@@ -517,6 +560,12 @@ void chore_update(void) {
 			for (ter = EMPIRE_TERRITORY_LIST(emp); ter; ter = global_next_territory_entry) {
 				global_next_territory_entry = ter->next;
 				process_one_chore(emp, ter->room);
+			}
+			
+			LL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
+				if (VEH_OWNER(veh) == emp) {
+					process_one_vehicle_chore(emp, veh);
+				}
 			}
 			
 			save_empire(emp);
@@ -667,7 +716,7 @@ char_data *find_chore_worker_in_room(room_data *room, mob_vnum vnum) {
 * npc who already has a loaded mob. If so, it's ok to repurpose this npc.
 *
 * @param room_data *loc The location of the chore
-* @param int chore Which CHORE_x
+* @param int chore Which CHORE_
 * @return struct empire_npc_data* The npc who will help, or NULL
 */
 struct empire_npc_data *find_free_npc_for_chore(room_data *loc, int chore) {	
@@ -724,7 +773,7 @@ struct empire_npc_data *find_free_npc_for_chore(room_data *loc, int chore) {
 
 /**
 * @param empire_data *emp Empire the worker belongs to
-* @param int chore Which CHORE_x
+* @param int chore Which CHORE_
 * @param room_data *room Where to look
 * @return char_data *the mob, or NULL if none to spawn
 */
@@ -781,7 +830,7 @@ void run_chore_tracker_updates(void) {
 *
 * @param empire_data *emp The empire doing the chore.
 * @param room_data *room The room the chore is in.
-* @param int chore CHORE_x const for this chore.
+* @param int chore CHORE_ const for this chore.
 * @param craft_data *craft The craft to validate.
 * @return bool TRUE if this workforce chore can work this craft, FALSE if not
 */
@@ -799,7 +848,7 @@ CHORE_GEN_CRAFT_VALIDATOR(chore_nexus_crystals) {
 *
 * @param empire_data *emp The empire doing the chore.
 * @param room_data *room The room the chore is in.
-* @param int chore CHORE_x const for this chore.
+* @param int chore CHORE_ const for this chore.
 * @param craft_data *craft The craft to validate.
 * @return bool TRUE if this workforce chore can work this craft, FALSE if not
 */
@@ -820,7 +869,7 @@ CHORE_GEN_CRAFT_VALIDATOR(chore_milling) {
 *
 * @param empire_data *emp The empire doing the chore.
 * @param room_data *room The room the chore is in.
-* @param int chore CHORE_x const for this chore.
+* @param int chore CHORE_ const for this chore.
 * @param craft_data *craft The craft to validate.
 * @return bool TRUE if this workforce chore can work this craft, FALSE if not
 */
@@ -841,7 +890,7 @@ CHORE_GEN_CRAFT_VALIDATOR(chore_sawing) {
 *
 * @param empire_data *emp The empire doing the chore.
 * @param room_data *room The room the chore is in.
-* @param int chore CHORE_x const for this chore.
+* @param int chore CHORE_ const for this chore.
 * @param craft_data *craft The craft to validate.
 * @return bool TRUE if this workforce chore can work this craft, FALSE if not
 */
@@ -870,7 +919,7 @@ CHORE_GEN_CRAFT_VALIDATOR(chore_weaving) {
 *
 * @param empire_data *emp The empire doing the chore.
 * @param room_data *room The room the chore is in.
-* @param int chore CHORE_x const for this chore.
+* @param int chore CHORE_ const for this chore.
 * @param CHORE_GEN_CRAFT_VALIDATOR *validator A function that validates a craft.
 */
 void do_chore_gen_craft(empire_data *emp, room_data *room, int chore, CHORE_GEN_CRAFT_VALIDATOR(*validator)) {
@@ -1812,5 +1861,65 @@ void do_chore_tanning(empire_data *emp, room_data *room) {
 	}
 	else if (worker) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
+	}
+}
+
+
+ /////////////////////////////////////////////////////////////////////////////
+//// VEHICLE CHORE FUNCTIONS ////////////////////////////////////////////////
+
+void vehicle_chore_fire_brigade(empire_data *emp, vehicle_data *veh) {
+	char_data *worker = find_chore_worker_in_room(IN_ROOM(veh), chore_data[CHORE_FIRE_BRIGADE].mob);
+	
+	if (worker && VEH_FLAGGED(veh, VEH_ON_FIRE)) {
+		REMOVE_BIT(VEH_FLAGS(veh), VEH_ON_FIRE);
+		
+		act("$n throws a bucket of water to douse the flames!", FALSE, worker, NULL, NULL, TO_ROOM);
+		msg_to_vehicle(veh, FALSE, "The flames have been extinguished!\r\n");
+		empire_skillup(emp, ABIL_WORKFORCE, 10);	// special case: does not use exp_from_workforce
+	}
+	else if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
+		worker = place_chore_worker(emp, CHORE_FIRE_BRIGADE, IN_ROOM(veh));
+		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);	// vehicle chore workers should always be marked SPAWNED right away
+	}
+}
+
+
+void vehicle_chore_repair(empire_data *emp, vehicle_data *veh) {
+	char_data *worker = find_chore_worker_in_room(IN_ROOM(veh), chore_data[CHORE_REPAIR_VEHICLES].mob);
+	struct empire_storage_data *store = NULL;
+	bool can_do = FALSE, found = FALSE;
+	struct resource_data *res;
+	
+	if ((res = VEH_NEEDS_RESOURCES(veh))) {
+		if ((store = find_stored_resource(emp, GET_ISLAND_ID(IN_ROOM(veh)), res->vnum)) && store->amount > 0) {
+			can_do = TRUE;
+		}
+	}
+	
+	if (worker && can_do) {
+		if (store && res) {
+			found = TRUE;
+			empire_skillup(emp, ABIL_WORKFORCE, config_get_double("exp_from_workforce"));
+		
+			charge_stored_resource(emp, GET_ISLAND_ID(IN_ROOM(veh)), res->vnum, 1);
+			res->amount -= 1;
+			// remove res?
+			if (res->amount <= 0) {
+				LL_DELETE(VEH_NEEDS_RESOURCES(veh), res);
+				free(res);
+			}
+		}
+		
+		// check for completion
+		if (!VEH_NEEDS_RESOURCES(veh)) {
+			act("$n finishes repairing $V.", FALSE, worker, NULL, veh, TO_ROOM);
+			REMOVE_BIT(VEH_FLAGS(veh), VEH_INCOMPLETE);
+			VEH_HEALTH(veh) = VEH_MAX_HEALTH(veh);
+		}
+	}
+	else if (can_do) {
+		worker = place_chore_worker(emp, CHORE_BUILDING, IN_ROOM(veh));
+		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);	// vehicle chore workers should always be marked SPAWNED right away
 	}
 }
