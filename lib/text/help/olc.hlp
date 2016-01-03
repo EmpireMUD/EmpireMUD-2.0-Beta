@@ -1084,6 +1084,9 @@ Available designate flags:
  TOP-OF-TOWER - may designate the top-of-the-tower room (for the sorcery tower)
  HOUSEHOLD - may designate bedroom, study, sitting room, closet, storage, etc
  HAVEN - vampire havens
+ SHIP-MAIN - core ship rooms
+ SHIP-LARGE - rooms for larger ships
+ SHIP-EXTRA - bonus rooms for huge ships
 
 See also: OLC BUILDINGS
 #d

@@ -89,6 +89,7 @@ void process_prospecting(char_data *ch);
 void process_quarrying(char_data *ch);
 void process_reading(char_data *ch);
 void process_reclaim(char_data *ch);
+void process_repairing(char_data *ch);
 void process_sailing(char_data *ch);
 void process_scraping(char_data *ch);
 void process_siring(char_data *ch);
@@ -113,7 +114,7 @@ const struct action_data_struct action_data[] = {
 	{ "minting", "is minting coins.", ACTF_FAST_CHORES, process_minting, cancel_minting },	// ACT_MINTING
 	{ "fishing", "is fishing.", NOBITS, process_fishing, NULL },	// ACT_FISHING
 	{ "smelting", "is melting down ore.", ACTF_FAST_CHORES, process_smelting, cancel_smelting },	// ACT_MELTING
-		{ "unknown", "is doing something.", NOBITS, NULL, NULL },
+	{ "repairing", "is doing some repairs.", ACTF_FAST_CHORES | ACTF_HASTE, process_repairing, NULL },	// ACT_REPAIRING
 	{ "chipping", "is chipping rocks.", ACTF_FAST_CHORES, process_chipping, cancel_chipping },	// ACT_CHIPPING
 	{ "panning", "is panning for gold.", ACTF_FINDER, process_panning, NULL },	// ACT_PANNING
 	{ "music", "is playing soothing music.", ACTF_ANYWHERE | ACTF_HASTE, process_music, NULL },	// ACT_MUSIC
@@ -168,7 +169,7 @@ void cancel_action(char_data *ch) {
 * Begins an action.
 *
 * @param char_data *ch The actor
-* @param int type ACT_x const
+* @param int type ACT_ const
 * @param int timer Countdown in action ticks
 */
 void start_action(char_data *ch, int type, int timer) {
@@ -213,7 +214,7 @@ void stop_room_action(room_data *room, int action, int chore) {
 
 
 /**
-* This is the main processor for periodic actions (ACT_x), once per second.
+* This is the main processor for periodic actions (ACT_), once per second.
 */
 void update_actions(void) {
 	descriptor_data *desc;
@@ -1801,6 +1802,90 @@ void process_quarrying(char_data *ch) {
 		if (in_room == IN_ROOM(ch)) {
 			start_quarrying(ch);
 		}
+	}
+}
+
+
+/**
+* Tick update for repairing action.
+*
+* @param char_data *ch The character doing the repairing.
+*/
+void process_repairing(char_data *ch) {
+	extern vehicle_data *find_vehicle(int n);
+
+	struct resource_data *res, *found_res = NULL;
+	obj_data *obj, *found_obj = NULL;
+	vehicle_data *veh;
+	
+	// first attempt to re-find the vehicle
+	if (!(veh = find_vehicle(GET_ACTION_VNUM(ch, 0))) || IN_ROOM(veh) != IN_ROOM(ch) || !VEH_IS_COMPLETE(veh)) {
+		cancel_action(ch);
+		return;
+	}
+	if (!VEH_NEEDS_RESOURCES(veh) && VEH_HEALTH(veh) >= VEH_MAX_HEALTH(veh)) {
+		cancel_action(ch);
+		return;
+	}
+	
+	// good to repair:
+	
+	// find a resource to process
+	LL_FOREACH(VEH_NEEDS_RESOURCES(veh), res) {
+		// check inventory
+		LL_FOREACH2(ch->carrying, obj, next_content) {
+			if (GET_OBJ_VNUM(obj) == res->vnum) {
+				found_res = res;
+				found_obj = obj;
+				break;
+			}
+		}
+
+		// check room
+		if (!found_obj && can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
+			LL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_content) {
+				if (GET_OBJ_VNUM(obj) == res->vnum) {
+					found_res = res;
+					found_obj = obj;
+					break;
+				}
+			}
+		}
+		
+		if (found_obj && found_res) {
+			break;
+		}
+	}
+	
+	// found an item to add?
+	if (found_obj && found_res) {
+		found_res->amount -= 1;
+		
+		// check zero-res whether or not we found anything
+		if (found_res->amount <= 0) {
+			LL_DELETE(VEH_NEEDS_RESOURCES(veh), found_res);
+			free(found_res);
+		}
+		
+		// messaging
+		act("You use $p to repair $V.", FALSE, ch, found_obj, veh, TO_CHAR | TO_SPAMMY);
+		act("$n uses $p to repair $V.", FALSE, ch, found_obj, veh, TO_ROOM | TO_SPAMMY);
+		
+		// remove the resource
+		extract_obj(found_obj);
+	}
+	
+	// done?
+	if (!VEH_NEEDS_RESOURCES(veh)) {
+		GET_ACTION(ch) = ACT_NONE;
+		REMOVE_BIT(VEH_FLAGS(veh), VEH_INCOMPLETE);
+		VEH_HEALTH(veh) = VEH_MAX_HEALTH(veh);
+		act("$V is fully repaired!", FALSE, ch, NULL, veh, TO_CHAR | TO_ROOM);
+	}
+	else if (!found_obj) {
+		GET_ACTION(ch) = ACT_NONE;
+		msg_to_char(ch, "You run out of resources and stop repairing.\r\n");
+		act("$n runs out of resources and stops.", FALSE, ch, NULL, NULL, TO_ROOM);
 	}
 }
 

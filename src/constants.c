@@ -2021,7 +2021,9 @@ const char *designate_flags[] = {
 	"TOP-OF-TOWER",
 	"HOUSEHOLD",
 	"HAVEN",
-	"SHIP-ROOMS",
+	"SHIP-MAIN",
+	"SHIP-LARGE",
+	"SHIP-EXTRA",
 	"\n"
 };
 

@@ -339,6 +339,7 @@ int can_wear_on_pos(obj_data *obj, int pos);
 void init_lookup_table(void);
 char_data *find_char_by_uid_in_lookup_table(int uid);
 obj_data *find_obj_by_uid_in_lookup_table(int uid);
+vehicle_data *find_vehicle_by_uid_in_lookup_table(int uid);
 void add_to_lookup_table(int uid, void *c);
 void remove_from_lookup_table(int uid);
 

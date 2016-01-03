@@ -3679,7 +3679,7 @@ ACMD(do_get) {
 
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
 	int cont_dotmode, found = 0, mode;
-	vehicle_data *find_vehicle, *veh;
+	vehicle_data *find_veh, *veh;
 	obj_data *cont;
 	char_data *tmp_char;
 
@@ -3704,11 +3704,11 @@ ACMD(do_get) {
 		}
 		cont_dotmode = find_all_dots(arg2);
 		if (cont_dotmode == FIND_INDIV) {
-			mode = generic_find(arg2, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM, ch, &tmp_char, &cont, &find_vehicle);
+			mode = generic_find(arg2, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM, ch, &tmp_char, &cont, &find_veh);
 			
 			// pass off to vehicle handler
-			if (find_vehicle) {
-				do_get_from_vehicle(ch, find_vehicle, arg1, mode, amount);
+			if (find_veh) {
+				do_get_from_vehicle(ch, find_veh, arg1, mode, amount);
 				return;
 			}
 			
@@ -4243,7 +4243,7 @@ ACMD(do_put) {
 	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
 	obj_data *obj, *next_obj, *cont;
-	vehicle_data *find_vehicle;
+	vehicle_data *find_veh;
 	char_data *tmp_char;
 	int obj_dotmode, cont_dotmode, found = 0, howmany = 1;
 	char *theobj, *thecont;
@@ -4274,11 +4274,11 @@ ACMD(do_put) {
 		send_to_char(buf, ch);
 	}
 	else {
-		generic_find(thecont, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM, ch, &tmp_char, &cont, &find_vehicle);
+		generic_find(thecont, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM, ch, &tmp_char, &cont, &find_veh);
 		
 		// override for put obj in vehicle
-		if (find_vehicle) {
-			do_put_obj_in_vehicle(ch, find_vehicle, obj_dotmode, theobj, howmany);
+		if (find_veh) {
+			do_put_obj_in_vehicle(ch, find_veh, obj_dotmode, theobj, howmany);
 			return;
 		}
 		

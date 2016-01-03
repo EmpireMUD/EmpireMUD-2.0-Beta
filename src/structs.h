@@ -530,7 +530,9 @@ typedef struct vehicle_data vehicle_data;
 #define DES_TOP_OF_TOWER	BIT(11)
 #define DES_HOUSEHOLD		BIT(12)
 #define DES_HAVEN			BIT(13)
-#define DES_SHIP_ROOMS		BIT(14)
+#define DES_SHIP_MAIN		BIT(14)
+#define DES_SHIP_LARGE		BIT(15)
+#define DES_SHIP_EXTRA		BIT(16)
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1195,7 +1197,7 @@ typedef struct vehicle_data vehicle_data;
 #define ACCT_MULTI_CHAR  BIT(5)	// f. can log in more than one character on this account
 
 
-// Periodic actions -- WARNING: changing the order of these will have tragic consequences with saved players
+// ACT_x: Periodic actions -- WARNING: changing the order of these will have tragic consequences with saved players
 #define ACT_NONE			0
 #define ACT_DIGGING			1
 #define ACT_GATHERING		2
@@ -1208,7 +1210,7 @@ typedef struct vehicle_data vehicle_data;
 #define ACT_MINTING			9
 #define ACT_FISHING			10
 #define ACT_MELTING			11
-	#define ACT_UNUSED			12	// formerly manufacturing
+#define ACT_REPAIRING		12
 #define ACT_CHIPPING		13
 #define ACT_PANNING			14
 #define ACT_MUSIC			15
