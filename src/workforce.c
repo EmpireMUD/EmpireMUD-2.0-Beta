@@ -1918,7 +1918,7 @@ void vehicle_chore_repair(empire_data *emp, vehicle_data *veh) {
 		}
 	}
 	else if (can_do) {
-		worker = place_chore_worker(emp, CHORE_BUILDING, IN_ROOM(veh));
+		worker = place_chore_worker(emp, CHORE_REPAIR_VEHICLES, IN_ROOM(veh));
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);	// vehicle chore workers should always be marked SPAWNED right away
 	}
 }
