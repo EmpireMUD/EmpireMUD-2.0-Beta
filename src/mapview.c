@@ -491,7 +491,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	struct mappc_data *pc, *next_pc;
 	struct building_resource_type *res;
 	struct empire_city_data *city;
-	char output[MAX_STRING_LENGTH], shipbuf[256], flagbuf[MAX_STRING_LENGTH], locbuf[128], partialbuf[MAX_STRING_LENGTH];
+	char output[MAX_STRING_LENGTH], veh_buf[256], flagbuf[MAX_STRING_LENGTH], locbuf[128], partialbuf[MAX_STRING_LENGTH], tmpbuf[MAX_STRING_LENGTH];
 	int s, t, mapsize, iter, check_x, check_y;
 	int first_iter, second_iter, xx, yy, magnitude, north;
 	int first_start, first_end, second_start, second_end, temp;
@@ -509,7 +509,8 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	bool ship_partial = IS_SET(options, LRR_SHIP_PARTIAL) ? TRUE : FALSE;
 	bool look_out = IS_SET(options, LRR_LOOK_OUT) ? TRUE : FALSE;
 	bool has_ship = GET_ROOM_VEHICLE(IN_ROOM(ch)) ? TRUE : FALSE;
-	bool show_title = !has_ship || ship_partial || look_out;
+	bool show_on_ship = has_ship && ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_LOOK_OUT);
+	bool show_title = !show_on_ship || ship_partial || look_out;
 
 	// begin with the sanity check
 	if (!ch || !ch->desc)
@@ -528,7 +529,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	}
 
 	// check for ship
-	if (!look_out && !ship_partial && has_ship) {
+	if (!look_out && !ship_partial && show_on_ship) {
 		look_at_room_by_loc(ch, IN_ROOM(GET_ROOM_VEHICLE(IN_ROOM(ch))), LRR_SHIP_PARTIAL);
 	}
 
@@ -537,10 +538,11 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	
 	// put ship in name
 	if (ship_partial && GET_ROOM_VEHICLE(IN_ROOM(ch))) {
-		snprintf(shipbuf, sizeof(shipbuf), ", Aboard %s", get_vehicle_short_desc(GET_ROOM_VEHICLE(IN_ROOM(ch)), ch));
+		strcpy(tmpbuf, skip_filler(VEH_SHORT_DESC(GET_ROOM_VEHICLE(IN_ROOM(ch)))));
+		snprintf(veh_buf, sizeof(veh_buf), ", %s %s", VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_IN) ? "Inside" : "Aboard", CAP(tmpbuf));
 	}
 	else {
-		*shipbuf = '\0';
+		*veh_buf = '\0';
 	}
 	
 	// set up location: may not actually have a map location
@@ -564,14 +566,14 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 			snprintf(flagbuf + strlen(flagbuf), sizeof(flagbuf) - strlen(flagbuf), "| %s", partialbuf);
 		}
 		
-		sprintf(output, "[%d] %s%s %s&0 %s[ %s]\r\n", GET_ROOM_VNUM(room), get_room_name(room, TRUE), shipbuf, locbuf, (SCRIPT(room) ? "[TRIG] " : ""), flagbuf);
+		sprintf(output, "[%d] %s%s %s&0 %s[ %s]\r\n", GET_ROOM_VNUM(room), get_room_name(room, TRUE), veh_buf, locbuf, (SCRIPT(room) ? "[TRIG] " : ""), flagbuf);
 	}
 	else if (has_ability(ch, ABIL_NAVIGATION) && !RMT_FLAGGED(IN_ROOM(ch), RMT_NO_LOCATION)) {
 		// need navigation to see coords
-		sprintf(output, "%s%s %s&0\r\n", get_room_name(room, TRUE), shipbuf, locbuf);
+		sprintf(output, "%s%s %s&0\r\n", get_room_name(room, TRUE), veh_buf, locbuf);
 	}
 	else {
-		sprintf(output, "%s%s&0\r\n", get_room_name(room, TRUE), shipbuf);
+		sprintf(output, "%s%s&0\r\n", get_room_name(room, TRUE), veh_buf);
 	}
 
 	// show the room
