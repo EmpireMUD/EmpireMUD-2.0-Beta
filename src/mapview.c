@@ -539,7 +539,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	// put ship in name
 	if (ship_partial && GET_ROOM_VEHICLE(IN_ROOM(ch))) {
 		strcpy(tmpbuf, skip_filler(VEH_SHORT_DESC(GET_ROOM_VEHICLE(IN_ROOM(ch)))));
-		snprintf(veh_buf, sizeof(veh_buf), ", %s %s", VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_IN) ? "Inside" : "Aboard", CAP(tmpbuf));
+		snprintf(veh_buf, sizeof(veh_buf), ", %s the %s", VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_IN) ? "Inside" : "Aboard", CAP(tmpbuf));
 	}
 	else {
 		*veh_buf = '\0';
