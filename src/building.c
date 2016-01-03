@@ -49,6 +49,7 @@ void stop_room_action(room_data *room, int action, int chore);
 // external vars
 extern const char *bld_on_flags[];
 extern const bool can_designate_dir[NUM_OF_DIRS];
+extern const bool can_designate_dir_vehicle[NUM_OF_DIRS];
 extern const char *dirs[];
 extern int rev_dir[];
 
@@ -1559,6 +1560,10 @@ ACMD(do_designate) {
 	bld_data *type;
 	obj_data *obj;
 	bool found;
+	
+	vehicle_data *veh = NULL;	// if this is set, we're doing a vehicle designate instead of building
+	bitvector_t valid_des_flags = NOBITS;
+	int maxrooms = 0, hasrooms = 0;
 
 	/*
 	 * arg = direction (designate only)
@@ -1570,11 +1575,17 @@ ACMD(do_designate) {
 	}
 
 	skip_spaces(&argument);
+	
+	// detect based on vehicle or building
+	veh = GET_ROOM_VEHICLE(home);
+	maxrooms = veh ? VEH_MAX_ROOMS(veh) : BLD_MAX_ROOMS(home);
+	valid_des_flags = veh ? VEH_DESIGNATE_FLAGS(veh) : (GET_BUILDING(home) ? GET_BLD_DESIGNATE_FLAGS(GET_BUILDING(home)) : NOBITS);
+	hasrooms = veh ? VEH_INSIDE_ROOMS(veh) : GET_INSIDE_ROOMS(home);
 
 	if (!*argument || !(type = get_building_by_name(argument, TRUE))) {
 		msg_to_char(ch, "Usage: %s <room>\r\n", (subcmd == SCMD_REDESIGNATE) ? "redesignate" : "designate <direction>");
 
-		if (!ROOM_IS_CLOSED(IN_ROOM(ch)) && (subcmd == SCMD_DESIGNATE) && GET_INSIDE_ROOMS(home) >= BLD_MAX_ROOMS(IN_ROOM(ch))) {
+		if (!ROOM_IS_CLOSED(IN_ROOM(ch)) && (subcmd == SCMD_DESIGNATE) && GET_INSIDE_ROOMS(home) >= maxrooms) {
 			msg_to_char(ch, "You can't designate any new rooms here.\r\n");
 		}
 		else {
@@ -1583,7 +1594,7 @@ ACMD(do_designate) {
 			found = FALSE;
 			HASH_ITER(hh, building_table, bld, next_bld) {
 				if (IS_SET(GET_BLD_FLAGS(bld), BLD_ROOM) && GET_BLD_DESIGNATE_FLAGS(bld) != NOBITS) {
-					if (!ROOM_IS_CLOSED(IN_ROOM(ch)) || BLD_DESIGNATE_FLAGGED(home, GET_BLD_DESIGNATE_FLAGS(bld))) {
+					if (!ROOM_IS_CLOSED(IN_ROOM(ch)) || IS_SET(valid_des_flags, GET_BLD_DESIGNATE_FLAGS(bld))) {
 						msg_to_char(ch, "%s%s", (found ? ", " : ""), GET_BLD_NAME(bld));
 						found = TRUE;
 					}
@@ -1593,35 +1604,47 @@ ACMD(do_designate) {
 			msg_to_char(ch, "\r\n");
 		}
 	}
-	else if (!ROOM_IS_CLOSED(IN_ROOM(ch)))
+	else if (!ROOM_IS_CLOSED(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't designate rooms here!\r\n");
-	else if (subcmd == SCMD_DESIGNATE && ((dir = parse_direction(ch, arg)) == NO_DIR || !can_designate_dir[dir])) {
+	}
+	else if (subcmd == SCMD_DESIGNATE && ((dir = parse_direction(ch, arg)) == NO_DIR || !(veh ? can_designate_dir_vehicle[dir] : can_designate_dir[dir]))) {
 		msg_to_char(ch, "Invalid direction.\r\n");
 		msg_to_char(ch, "Usage: %s <room>\r\n", subcmd == SCMD_REDESIGNATE ? "redesignate" : "designate <direction>");
 	}
 	else if (!has_permission(ch, PRIV_BUILD) || !can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
 		msg_to_char(ch, "You don't have permission to designate rooms here.\r\n");
 	}
-	else if (subcmd == SCMD_DESIGNATE && IS_MAP_BUILDING(IN_ROOM(ch)) && dir != BUILDING_ENTRANCE(IN_ROOM(ch)))
+	else if (subcmd == SCMD_DESIGNATE && IS_MAP_BUILDING(IN_ROOM(ch)) && dir != BUILDING_ENTRANCE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You may only designate %s from here.\r\n", dirs[get_direction_for_char(ch, BUILDING_ENTRANCE(IN_ROOM(ch)))]);
+	}
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You need to finish the building before you can designate rooms.\r\n");
 	}
-	else if (!IS_INSIDE(IN_ROOM(ch)) && subcmd == SCMD_REDESIGNATE)
+	else if (!IS_INSIDE(IN_ROOM(ch)) && subcmd == SCMD_REDESIGNATE) {
 		msg_to_char(ch, "You can't redesignate here.\r\n");
-	else if (subcmd == SCMD_REDESIGNATE && get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_REDESIGNATE_TIME) + (config_get_int("redesignate_time") * SECS_PER_REAL_MIN) > time(0)) {
-		msg_to_char(ch, "You can't redesignate this room so soon.\r\n");
 	}
-	else if (BLD_MAX_ROOMS(IN_ROOM(ch)) <= 0)
+	else if (subcmd == SCMD_REDESIGNATE && !IS_SET(valid_des_flags, GET_BLD_DESIGNATE_FLAGS(GET_BUILDING(IN_ROOM(ch))))) {
+		// room the character is in does not match the valid flags for the building/vehicle
+		msg_to_char(ch, "You can't redesignate this %s.\r\n", veh ? "part" : "room");
+	}
+	else if (subcmd == SCMD_REDESIGNATE && get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_REDESIGNATE_TIME) + (config_get_int("redesignate_time") * SECS_PER_REAL_MIN) > time(0)) {
+		msg_to_char(ch, "You can't redesignate this %s so soon.\r\n", veh ? "part" : "room");
+	}
+	else if (maxrooms <= 0) {
 		msg_to_char(ch, "You can't designate here.\r\n");
-	else if (subcmd == SCMD_DESIGNATE && (ex = find_exit(IN_ROOM(ch), dir)) && ex->room_ptr)
+	}
+	else if (subcmd == SCMD_DESIGNATE && (ex = find_exit(IN_ROOM(ch), dir)) && ex->room_ptr) {
 		msg_to_char(ch, "There is already a room that direction.\r\n");
-	else if (subcmd == SCMD_DESIGNATE && GET_INSIDE_ROOMS(home) >= BLD_MAX_ROOMS(IN_ROOM(ch)))
+	}
+	else if (subcmd == SCMD_DESIGNATE && hasrooms >= maxrooms) {
 		msg_to_char(ch, "There's no more free space.\r\n");
-	else if (GET_BLD_DESIGNATE_FLAGS(type) == NOBITS)
+	}
+	else if (GET_BLD_DESIGNATE_FLAGS(type) == NOBITS) {
 		msg_to_char(ch, "You can't designate that type of room!\r\n");
-	else if (!BLD_DESIGNATE_FLAGGED(home, GET_BLD_DESIGNATE_FLAGS(type)))
+	}
+	else if (!IS_SET(valid_des_flags, GET_BLD_DESIGNATE_FLAGS(type))) {
 		msg_to_char(ch, "You can't designate that here!\r\n");
+	}
 	else {
 		if (subcmd == SCMD_REDESIGNATE) {
 			// redesignate this room
@@ -1633,8 +1656,8 @@ ACMD(do_designate) {
 			create_exit(IN_ROOM(ch), new, dir, TRUE);
 
 			COMPLEX_DATA(home)->inside_rooms++;
-			if (GET_ROOM_VEHICLE(home)) {
-				++VEH_INSIDE_ROOMS(GET_ROOM_VEHICLE(home));
+			if (veh) {
+				++VEH_INSIDE_ROOMS(veh);
 			}
 		}
 
@@ -1662,6 +1685,7 @@ ACMD(do_designate) {
 
 		/* set applicable values */
 		COMPLEX_DATA(new)->home_room = home;
+		COMPLEX_DATA(new)->vehicle = veh;	// if any
 		ROOM_OWNER(new) = ROOM_OWNER(home);
 		
 		set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_REDESIGNATE_TIME, time(0));
@@ -1673,11 +1697,11 @@ ACMD(do_designate) {
 			act(buf, FALSE, ch, 0, 0, TO_ROOM);
 		}
 		else {
-			msg_to_char(ch, "You designate the room %s as %s %s.\r\n", dirs[get_direction_for_char(ch, dir)], AN(GET_BLD_NAME(type)), GET_BLD_NAME(type));
+			msg_to_char(ch, "You designate the %s %s as %s %s.\r\n", veh ? "area" : "room", dirs[get_direction_for_char(ch, dir)], AN(GET_BLD_NAME(type)), GET_BLD_NAME(type));
 			
 			for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict; vict = vict->next_in_room) {
 				if (vict != ch && vict->desc) {
-					sprintf(buf, "$n designates the room %s as %s %s.", dirs[get_direction_for_char(vict, dir)], AN(GET_BLD_NAME(type)), GET_BLD_NAME(type));
+					sprintf(buf, "$n designates the %s %s as %s %s.", veh ? "area" : "room", dirs[get_direction_for_char(vict, dir)], AN(GET_BLD_NAME(type)), GET_BLD_NAME(type));
 					act(buf, FALSE, ch, 0, vict, TO_VICT);
 				}
 			}

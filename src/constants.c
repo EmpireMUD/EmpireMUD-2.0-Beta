@@ -639,7 +639,7 @@ const int shift_dir[][2] = {
 };
 
 
-// whether or not a direction can be used by designate
+// whether or not a direction can be used by designate, building version
 const bool can_designate_dir[NUM_OF_DIRS] = {
 	TRUE,	// n
 	TRUE,
@@ -655,6 +655,26 @@ const bool can_designate_dir[NUM_OF_DIRS] = {
 	FALSE,
 	FALSE,
 	FALSE,
+	FALSE	// random
+};
+
+
+// whether or not a direction can be used by designate, vehicle version
+const bool can_designate_dir_vehicle[NUM_OF_DIRS] = {
+	FALSE,	// n
+	FALSE,
+	FALSE,
+	FALSE,
+	FALSE,	// nw
+	FALSE,
+	FALSE,
+	FALSE,
+	TRUE,	// up
+	TRUE,	// down
+	TRUE,	// fore
+	TRUE,
+	TRUE,
+	TRUE,
 	FALSE	// random
 };
 
