@@ -3706,20 +3706,23 @@ ACMD(do_get) {
 		if (cont_dotmode == FIND_INDIV) {
 			mode = generic_find(arg2, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM, ch, &tmp_char, &cont, &find_veh);
 			
-			// pass off to vehicle handler
 			if (find_veh) {
+				// pass off to vehicle handler
 				do_get_from_vehicle(ch, find_veh, arg1, mode, amount);
-				return;
 			}
-			
-			if (!cont) {
+			else if (!cont && GET_ROOM_VEHICLE(IN_ROOM(ch)) && isname(arg2, VEH_KEYWORDS(GET_ROOM_VEHICLE(IN_ROOM(ch))))) {
+				// vehicle they are in
+				do_get_from_vehicle(ch, GET_ROOM_VEHICLE(IN_ROOM(ch)), arg1, mode, amount);
+			}
+			else if (!cont) {
 				sprintf(buf, "You don't have %s %s.\r\n", AN(arg2), arg2);
 				send_to_char(buf, ch);
 			}
 			else if (GET_OBJ_TYPE(cont) != ITEM_CONTAINER && GET_OBJ_TYPE(cont) != ITEM_CART && !IS_CORPSE(cont))
 				act("$p is not a container.", FALSE, ch, cont, 0, TO_CHAR);
-			else
+			else {
 				get_from_container(ch, cont, arg1, mode, amount);
+			}
 		}
 		else {
 			if (cont_dotmode == FIND_ALLDOT && !*arg2) {
@@ -4276,13 +4279,15 @@ ACMD(do_put) {
 	else {
 		generic_find(thecont, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM, ch, &tmp_char, &cont, &find_veh);
 		
-		// override for put obj in vehicle
 		if (find_veh) {
+			// override for put obj in vehicle
 			do_put_obj_in_vehicle(ch, find_veh, obj_dotmode, theobj, howmany);
-			return;
 		}
-		
-		if (!cont) {
+		else if (!cont && GET_ROOM_VEHICLE(IN_ROOM(ch)) && isname(thecont, VEH_KEYWORDS(GET_ROOM_VEHICLE(IN_ROOM(ch))))) {
+			// the vehicle they are in
+			do_put_obj_in_vehicle(ch, GET_ROOM_VEHICLE(IN_ROOM(ch)), obj_dotmode, theobj, howmany);
+		}
+		else if (!cont) {
 			sprintf(buf, "You don't see %s %s here.\r\n", AN(thecont), thecont);
 			send_to_char(buf, ch);
 		}

@@ -247,7 +247,13 @@ void look_at_target(char_data *ch, char *arg) {
 			found = TRUE;
 		}
 	}
-
+	
+	// look at vehicle they're in
+	if (!found && GET_ROOM_VEHICLE(IN_ROOM(ch)) && isname(arg, VEH_KEYWORDS(GET_ROOM_VEHICLE(IN_ROOM(ch))))) {
+		look_at_vehicle(GET_ROOM_VEHICLE(IN_ROOM(ch)), ch);
+		found = TRUE;
+	}
+	
 	/* If an object was found back in generic_find */
 	if (bits) {
 		if (!found) {
