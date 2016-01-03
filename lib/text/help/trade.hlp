@@ -170,6 +170,9 @@ Deadly Weapons:
   kris  6 iron ingots, 5 imperium ingots
   maul  6 iron ingots, 5 imperium ingots, 1 handle
 
+Ship Weapons:
+  cannon  14 iron ignot, 1 imperium ingot
+
 Weaponcrafting -> Iron Blades -> Deadly Weapons
 
 See also: FORGE, WEAPONCRAFTING, IRON BLADES
@@ -216,6 +219,7 @@ With the basic Forge skill, you can create:
   pan  2 copper ingots -- pan for gold
   mirror  1 iron ingot
   coin mill  24 iron ingots, 2 imperium ingots
+  anchor  10 iron ingot -- used on ships
 
 See also: CRAFTING LEVEL, SMELT, WEAPONCRAFTING, ARMORSMITHING, JEWELRY,
   MASTER BLACKSMITH, IRON BLADES, STURDY ARMORS, DEADLY WEAPONS,
@@ -596,6 +600,7 @@ With basic Sewing, you can make:
   canteen (2 small leather) -- holds drinks
   satchel (2 large leather) -- increases carrying capacity
   tent (8 large leather) -- a portable shelter
+  sail (8 bolts of cloth) -- for shipbuilding
 
 Additional sewing items are available from other abilities in the Trade skill,
 as well as patterns and crafts hidden around the world.
@@ -655,7 +660,7 @@ Building:  (CC) carpenter  4 lumber, 2 nails, 12 bricks
 Command:  craft [number] <item>
 
 With Siegeworks you can craft:
-  catapult*  48 lumber, 12 nails
+  catapult*  48 lumber, 12 nails, 4 rope
 
 * Crafts marked with an asterisk require the Carpenter building.
 
@@ -784,7 +789,7 @@ Command:  craft [number] <item>
 With Woodworking you can craft:
   flute  1 lumber               shortbow  1 lumber, small leather
   lyre  1 lumber                longbow*  1 lumber, small leather
-  stake  1 stick                cart*  16 lumber, 4 nails
+  stake  1 stick                cart*  16 lumber, 4 nails, 1 rope
   walking stick  1 stick        lantern*  1 iron ingot, candle, (glassblowing)
   wooden sword  1 lumber        blank sign*  1 lumber, 1 nails
   stool*  2 lumber, nails
@@ -795,8 +800,8 @@ With Woodworking you can craft:
 
 With Advanced Woodworking you can craft:
   beehive*  8 lumber, 2 nails
-  carriage*  24 lumber, 6 nails
-  wagon*  32 lumber, 8 nails, 12 cloth
+  carriage*  24 lumber, 6 nails, 2 ropes
+  wagon*  32 lumber, 8 nails, 12 cloth, 2 ropes
 
 * Crafts marked with an asterisk require the Carpenter building.
 #

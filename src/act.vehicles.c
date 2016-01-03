@@ -179,7 +179,7 @@ void do_drag_portal(char_data *ch, vehicle_data *veh, char *arg) {
 		
 		vehicle_to_room(veh, IN_ROOM(ch));
 		act("$V is dragged in with you.", FALSE, ch, NULL, veh, TO_CHAR);
-		act("$V is dragged in with $M.", FALSE, ch, NULL, veh, TO_ROOM);
+		act("$V is dragged in with $m.", FALSE, ch, NULL, veh, TO_ROOM);
 	}
 }
 
@@ -531,11 +531,11 @@ ACMD(do_board) {
 		// leading-vehicle
 		if (GET_LEADING_VEHICLE(ch) && IN_ROOM(GET_LEADING_VEHICLE(ch)) == was_in) {
 			if (ROOM_PEOPLE(was_in)) {
-				act("$v is led behind $M.", TRUE, ROOM_PEOPLE(was_in), GET_LEADING_MOB(ch), ch, TO_CHAR | TO_NOTVICT | ACT_VEHICLE_OBJ);
+				act("$v is led behind $M.", TRUE, ROOM_PEOPLE(was_in), GET_LEADING_VEHICLE(ch), ch, TO_CHAR | TO_NOTVICT | ACT_VEHICLE_OBJ);
 			}
 			
 			vehicle_to_room(GET_LEADING_VEHICLE(ch), to_room);
-			act("$v is led.", TRUE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_CHAR | TO_ROOM | ACT_VEHICLE_OBJ);
+			act("$V is led in.", TRUE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_CHAR | TO_ROOM | ACT_VEHICLE_OBJ);
 		}
 		
 		// followers?
@@ -623,10 +623,10 @@ ACMD(do_disembark) {
 		}
 		if (GET_LEADING_VEHICLE(ch) && IN_ROOM(GET_LEADING_VEHICLE(ch)) == was_in) {
 			if (ROOM_PEOPLE(was_in)) {
-				act("$v is led behind $M.", TRUE, ROOM_PEOPLE(was_in), GET_LEADING_MOB(ch), ch, TO_CHAR | TO_NOTVICT | ACT_VEHICLE_OBJ);
+				act("$v is led behind $M.", TRUE, ROOM_PEOPLE(was_in), GET_LEADING_VEHICLE(ch), ch, TO_CHAR | TO_NOTVICT | ACT_VEHICLE_OBJ);
 			}
 			vehicle_to_room(GET_LEADING_VEHICLE(ch), to_room);
-			act("$v is led off.", TRUE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_CHAR | TO_ROOM | ACT_VEHICLE_OBJ);
+			act("$V is led off.", TRUE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_CHAR | TO_ROOM | ACT_VEHICLE_OBJ);
 		}
 
 		for (k = ch->followers; k; k = k->next) {
