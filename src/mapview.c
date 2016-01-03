@@ -781,8 +781,14 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	else if (GET_SECT_COMMANDS(SECT(room)) && *GET_SECT_COMMANDS(SECT(room))) {
 		msg_to_char(ch, "Commands: &c%s&0\r\n", GET_SECT_COMMANDS(SECT(room)));
 	}
-
-	if ((emp = ROOM_OWNER(HOME_ROOM(room)))) {
+	
+	// used from here on
+	emp = ROOM_OWNER(HOME_ROOM(room));
+	
+	if (GET_ROOM_VEHICLE(room) && VEH_OWNER(GET_ROOM_VEHICLE(room))) {
+		msg_to_char(ch, "The %s is owned by %s%s\t0%s.\r\n", skip_filler(VEH_SHORT_DESC(GET_ROOM_VEHICLE(room))), EMPIRE_BANNER(VEH_OWNER(GET_ROOM_VEHICLE(room))), EMPIRE_NAME(VEH_OWNER(GET_ROOM_VEHICLE(room))), ROOM_AFF_FLAGGED(HOME_ROOM(room), ROOM_AFF_PUBLIC) ? " (public)" : "");
+	}
+	else if (emp) {
 		if ((city = find_city(emp, room))) {
 			msg_to_char(ch, "This is the %s%s&0 %s of %s.", EMPIRE_BANNER(emp), EMPIRE_ADJECTIVE(emp), city_type[city->type].name, city->name);
 		}	
