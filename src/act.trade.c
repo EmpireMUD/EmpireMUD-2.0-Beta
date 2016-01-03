@@ -624,10 +624,21 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 		}
 		
 		// messaging
-		snprintf(buf, sizeof(buf), "You %s $V with $p.", gen_craft_data[GET_CRAFT_TYPE(type)].command);
-		act(buf, FALSE, ch, found_obj, veh, TO_CHAR | TO_SPAMMY);
-		snprintf(buf, sizeof(buf), "$n %ss $V with $p.", gen_craft_data[GET_CRAFT_TYPE(type)].command);
-		act(buf, FALSE, ch, found_obj, veh, TO_ROOM | TO_SPAMMY);
+		if (has_custom_message(found_obj, OBJ_CUSTOM_CRAFT_TO_CHAR)) {
+			act(get_custom_message(found_obj, OBJ_CUSTOM_CRAFT_TO_CHAR), FALSE, ch, found_obj, veh, TO_CHAR | TO_SPAMMY);
+		}
+		else {
+			snprintf(buf, sizeof(buf), "You %s $V with $p.", gen_craft_data[GET_CRAFT_TYPE(type)].command);
+			act(buf, FALSE, ch, found_obj, veh, TO_CHAR | TO_SPAMMY);
+		}
+		
+		if (has_custom_message(found_obj, OBJ_CUSTOM_CRAFT_TO_ROOM)) {
+			act(get_custom_message(found_obj, OBJ_CUSTOM_CRAFT_TO_ROOM), FALSE, ch, found_obj, veh, TO_ROOM | TO_SPAMMY);
+		}
+		else {
+			snprintf(buf, sizeof(buf), "$n %ss $V with $p.", gen_craft_data[GET_CRAFT_TYPE(type)].command);
+			act(buf, FALSE, ch, found_obj, veh, TO_ROOM | TO_SPAMMY);
+		}
 		
 		// remove the resource
 		extract_obj(found_obj);

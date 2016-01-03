@@ -1139,13 +1139,15 @@ typedef struct vehicle_data vehicle_data;
 #define OBJ_BIND_FLAGS  (OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP)	// all bind-on flags
 
 
-// custom message types
+// OBJ_CUSTOM_x: custom message types
 #define OBJ_CUSTOM_BUILD_TO_CHAR  0
 #define OBJ_CUSTOM_BUILD_TO_ROOM  1
 #define OBJ_CUSTOM_INSTRUMENT_TO_CHAR  2
 #define OBJ_CUSTOM_INSTRUMENT_TO_ROOM  3
 #define OBJ_CUSTOM_EAT_TO_CHAR  4
 #define OBJ_CUSTOM_EAT_TO_ROOM  5
+#define OBJ_CUSTOM_CRAFT_TO_CHAR  6
+#define OBJ_CUSTOM_CRAFT_TO_ROOM  7
 
 
 // storage flags (for obj storage locations)
