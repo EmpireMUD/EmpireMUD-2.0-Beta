@@ -153,7 +153,6 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 	// move sitter
 	if (VEH_SITTING_ON(veh)) {
 		char_to_room(VEH_SITTING_ON(veh), to_room);
-		look_at_room(VEH_SITTING_ON(veh));
 		if (!IS_NPC(VEH_SITTING_ON(veh))) {
 			GET_LAST_DIR(VEH_SITTING_ON(veh)) = dir;
 		}
