@@ -310,6 +310,27 @@ Triggers and Scripts (TRIGEDIT):
   room template. It only works for room templates in the same adventure zone.
 - If a script loads an object or mob, and it's not in a level-locked adventure
   zone, the script may also need to scale the obj's/mob's level itself.
+
+Vehicles (VEDIT):
+- Only set an icon on a vehicle if it should be visible on the map; in most
+  cases you should leave this blank.
+- Vehicles only have an interior (are boardable) if the "interior room"
+  property is set.
+- The IN flag will modify the SIT flag, and will also change how the vehicle
+  appears when you're inside it.
+- The movement flags (DRIVING, SAILING, FLYING) only matter when combined with
+  LEADABLE or an interior room. Otherwise there is no way to move the vehicle.
+- The DRAGABLE flag always allows a vehicle to be dragged on land, never any
+  other terrain.
+- A vehicle is effectively a chair if it has SIT but no movement flags.
+- Vehicles take 10% health damage each year ONLY if they require yearly
+  maintenance (or are incomplete). A vehicle with only 1 hitpoint won't last
+  long.
+- When a vehicle takes at least 10% of its max hitpoints in damage, it will
+  also add 1 year's maintenance to its repair needs. If it has no yearly
+  maintenance set, it will add a "pouch of nails" instead.
+- If a vehicle takes damage that's less than 10% of its hitpoints, it still
+  needs repair but doesn't require any additional resources.
 #d
 "OLC LEVELS" "OLC SCALING" "OLC SCALE"
 
@@ -1021,7 +1042,7 @@ in bedrooms.
 NOTE: Any building that allows at least 1 citizen may also be set as a player's
 private home.
 
-See also: BEDIT EXTRA ROOMS, HOME, OLC BUILDINGS, WORKFORCE
+See also: BEDIT ROOMS, HOME, OLC BUILDINGS, WORKFORCE
 #d
 "BEDIT COMMANDS"
 
@@ -1232,7 +1253,7 @@ room title is "A Foul-Smelling Outhouse", the name should be "Outhouse".
 
 See also: BEDIT TITLE, OLC BUILDINGS, TERRITORY, VNUM
 #d
-"BEDIT ROOMS" "BEDIT ROOMS"
+"BEDIT ROOMS" "BEDIT ROOMS" "BEDIT EXTRA ROOMS"
 
 Usage:  .rooms <number>
 
@@ -2425,6 +2446,8 @@ Usage:  .keywords <keywords>
 This command updates the keywords on a mob. The keywords are a list of single
 words that can be used to target the mob. It should include any words from the
 mob's short or long description that identify the mob.
+
+Usually the most significant keyword should be first.
 
 Example:
  name: a fiery dragon
@@ -3644,6 +3667,30 @@ For notes on the mud's building rules, see HELP BUILDING GUIDE.
 See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
 See also: TRIGEDIT-TYPES
 #d
+"OLC VEHICLES"
+
+Usage:  .v <command>
+        .<command>
+
+The .olc vehicle editor gives you the freedom to create a wide range of
+vehicles. It provides an in-game menu for controlling every detail of the
+vehicle (except how to make one; that's the craft editor).
+
+All of the .olc commands are highlighted in yellow and placed inside <angle
+braces>. You can get help on any of these by typing &yHELP VEDIT <COMMAND>&0.
+
+You can close an open editor with .abort or .save.
+
+For notes on the mud's building rules, see HELP BUILDING GUIDE.
+
+Example vehicle settings:
+ cart: DRIVING SIT CONTAINER LEADABLE, capacity: 200, animals required: 1
+ ship: SAILING SHIPPING, interior room: set
+ chair: SIT IN DRAGGABLE CAN-PORTAL
+ catapult: LEADABLE SIEGE-WEAPONS, animals required: 2
+
+See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
 "REDIT DESCRIPTION"
 
 Usage:  .description
@@ -4411,6 +4458,253 @@ currently an option.
 
 The UNDEFINED item type should not be used for live items. If you need a
 generic item, use type OTHER.
+#d
+"VEDIT ANIMALSREQUIRED" "VEDIT ANIMALS REQUIRED"
+
+Usage:  .animalsrequired <number>
+
+This is the number of animals that can be harnessed to the vehicle. Players
+cannot drag, lead, or drive a vehicle that doesn't have enough animals attached
+to it.
+
+See also: HARNESS, OLC VEHICLES
+#d
+"VEDIT CAPACITY"
+
+Usage:  .capacity <number>
+
+Vehicle capacity is used for both container storage, and for the amount moved
+by the shipping system -- depending on which flags are set on the vehicle. It
+has no purpose if you don't set either CONTAINER or SHIPPING. If the vehicle
+has both flags, the shipping system will be limited by how many items are
+stored in the vehicle as a container.
+
+The capacity is measured in item size -- most items count as 1, except LARGE
+items which count as 2. Items with other items inside of them count as the
+total of all items inside.
+
+See also: VEDIT FLAGS, OLC VEHICLES
+#d
+"VEDIT DESIGNATE" "DESIGNATE FLAGS"
+
+Usage:  .designate [add | remove] <flags>
+
+Designate flags control what types of rooms may be added to a vehicle. This
+only matters if the "extra rooms" property is set greater than 0 AND the
+"interior room" property is set.
+
+Rooms can be designated in vehicles that have a matching designate flag with
+the room. If a room without a matching designate flag is somehow added to the
+vehicle (for example, as the "interior room" or via a trigger), players will
+not be able to change that room with redesignate.
+
+See HELP DESIGNATE FLAGS for a list of valid flags.
+
+See also: VEDIT EXTRA ROOMS, VEDIT INTERIOR ROOM, OLC VEHICLES
+#d
+"VEDIT EXTRAROOMS" "VEDIT EXTRA ROOMS"
+
+Usage:  .extrarooms <number>
+
+If this number is greater than 0, players may use the 'designate' command to
+add additional rooms to the inside of the vehicle, with options based on what
+you set with the '.designate' olc option.
+
+Players will only be able to add these rooms if they can get inside the
+vehicle, which means you MUST also set the '.interiorroom' property.
+
+See also: VEDIT DESIGNATE, VEDIT INTERIOR ROOM, OLC VEHICLES
+#d
+"VEDIT FLAGS"
+
+Usage:  .flags [add | remove] <flags>
+
+Flags let you specify certain properties about the vehicle. Many different
+types of vehicles can be constructed this way.
+
+Available flags:
+ *INCOMPLETE - vehicle is not fully constructed (triggered by crafting)
+ DRIVING - vehicle moves on land**
+ SAILING - vehicle moves on water**
+ FLYING - vehicle moves through the air**
+ ALLOW-ROUGH - drag/drive work on rough terrain (e.g. mountains)
+ SIT - player can sit on the vehicle
+ IN - changes text from "on" to "in", and "aboard" to "inside"
+ BURNABLE - can be burnt using the "light" command
+ CONTAINER - items can be placed inside
+ SHIPPING - can be used by the shipping system
+ NAMABLE - allows customize
+ DRAGGABLE - players can move it on land with "drag"
+ !BUILDING - cannot be dragged/driven into a building (e.g. too large)
+ CAN-PORTAL - can be dragged/driven/led through portals
+ LEADABLE - can be pulled around with the "lead" command
+ CARRY-VEHICLES - vehicles can be put inside (usually via drag/lead)
+ CARRY-MOBS - mobs can be put inside (usually via lead)
+ SIEGE-WEAPONS - can fire on buildings and vehicles
+ ON-FIRE - currently burning (via the "light" command)
+
+** The DRIVING/SAILING/FLYING flags each enable specific commands for moving
+the vehicle. If it has more than one of these, each command will work. Usually
+each of these flags enables a certain set of terrain, but vehicles with more
+than one of these flags can be moved on any valid terrain with any of those
+commands.
+
+See also: OLC VEHICLES
+#d
+"VEDIT HITPOINTS"
+
+Usage:  .hitpoints <value>
+
+This number is how much damage a vehicle can take from a catapult or other
+sources, before it is destroyed.
+
+Catapults deal 8 damage per shot. Siege rituals deal Intelligence + 1 damage.
+
+Any damage over 10% of a vehicle's health will also add "1 year" of required
+maintenance to the vehicle (or nails, if the vehicle requires no yearly work).
+The repair command can be used to restore hitpoints.
+
+See also: VEDIT YEARLY MAINTENANCE, CATAPULT, OLC VEHICLES, REPAIR,
+          SIEGE RITUAL
+#d
+"VEDIT ICON"
+
+Usage:  .icon <icon | none>
+
+Vehicles usually don't appear on the world map, but they can be set to do so by
+giving them an icon. In general, vehicle icons can lead to map clutter and
+should be avoided. However, they can help players find ships or other large
+vehicles on the map. Users in screen-reader mode will see the vehicle's name
+next to the tile name, instead of its icon.
+
+If more than one vehicle is in the same room, only the first vehicle in the
+list is shown on the map (this is generally the last vehicle that entered the
+room).
+
+You should almost always start the icon with &&0 to clear the tile's base
+color. There is no need to put a &&0 at the end of the icon.
+
+Examples:
+ > .icon &&0<&&u44&&0>
+
+See also: COLOR, OLC VEHICLES
+#d
+"VEDIT INTERIORROOM" "VEDIT INTERIOR ROOM"
+
+Usage:  .interiorroom <vnum | none>
+
+This sets the room (actually, building) vnum that is used for the interior of
+the vehicle. It must be a "building" (.b editor) with the ROOM flag, and cannot
+be an adventure's room template.
+
+If the interior room has the LOOK-OUT flag, players will see the world map
+above the room description, and the room title will appear as the exterior room
+rather than the one the player is standing in. In this case, the description
+of the interior room should be short.
+
+This property must be set for a player to be able to board/enter the vehicle.
+
+See also: OLC BUILDINGS, OLC VEHICLES
+#d
+"VEDIT KEYWORDS"
+
+Usage:  .keywords <keywords>
+
+This command updates the keywords on a vehicle. The keywords are a list of
+single words that can be used to target it. It should include any words from
+the short or long description that identify the vehicle.
+
+Usually the most significant keyword should be first.
+
+Example:
+ name: a cart
+ long description: A rickety cart is parked here
+ keywords: cart rickety
+
+See also: VEDIT SHORTDESCRIPTION, VEDIT LONGDESCRIPTION, OLC VEHICLES
+#d
+"VEDIT LONGDESCRIPTION" "VEDIT LONG DESCRIPTION"
+
+Usage:  .longdescription <string>
+
+The long description is the text you see when the vehicle is in the room. Its
+name should appear somewhere near the beginning, and the rest should be a
+complete sentence indicating that it is present.
+
+Examples:
+A cart is parked here.
+A ship is floating in the water.
+
+See also: VEDIT KEYWORDS, OLC VEHICLES
+#d
+"VEDIT LOOKDESCRIPTION" "VEDIT LOOK DESCRIPTION"
+
+Usage:  .lookdescription
+
+The look description is shown when a player looks at or examines the vehicle.
+This can be any length, but "newbie" vehicles should include information on how
+to use them.
+
+The look description is set in the string editor. If it is less than 80
+characters long, it will fit on one line and should not be indented. If it
+goes any longer than that, you should use /fi to format it with indent inside
+the string editor.
+
+See also: OLC VEHICLES, STRING EDITOR
+#d
+"VEDIT MOVETYPE" "VEDIT MOVE TYPE"
+
+Usage:  .movetype <type>
+
+The move type determines what message is sent when the vehicle moves. The same
+message is sent regardless of which movement command (drive, sail, pilot) is
+used.
+
+The same list of move types is used for mobs, so some types may not be
+appropriate for vehicles.
+
+See also: OLC VEHICLES
+#d
+"VEDIT RESOURCES" "VEDIT YEARLY MAINTENANCE"
+
+Usage:  .resource add <amount> <vnum>
+        .resource change <number> <quantity | vnum> <value>
+        .resource remove <number | all>
+        .resource move <number> <up | down>
+
+This command adds materials to the vehicle's "yearly maintenance" list. These
+are resources needed to maintain the vehicle each year. If you don't set any,
+then the vehicle does not require maintenance.
+
+This uses the ".resource" command to be consistent with other editors, but
+these are not the resources needed to build the vehicle in the first place --
+only to repair it.
+
+If a vehicle takes damage from any source, and that damage is more than 10% of
+its hitpoints, it will also add the yearly-maintenance resources to the repair
+cost.
+
+Vehicles with only 1 hitpoint will never get their yearly maintenance cost, as
+even 1 year of decay will destroy them.
+
+See also: VEDIT HITPOINTS, OLC VEHICLES, REPAIR
+#d
+"VEDIT SHORTDESCRIPTION" "VEDIT SHORT DESCRIPTION"
+
+Usage:  .shortdescription <string>
+
+The 'short description' is the trait that's shown in lists, in action messages,
+and almost everywhere else except when a player types 'look' in the room (where
+the long description is shown instead). This should be short, should generally
+begin with a/an/the unless it's a proper noun, and should not be capitalized
+(again unless it's a proper noun).
+
+Examples:
+ the cart
+ a carriage
+ the Enterprise
+
+See also: VEDIT KEYWORDS, VEDIT LONG DESCRIPTION, OLC VEHICLES
 #d
 "WEALTH ITEM" "WEALTH OBJECT"
 
