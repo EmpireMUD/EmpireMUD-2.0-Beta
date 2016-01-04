@@ -133,13 +133,13 @@ const struct action_data_struct action_data[] = {
 	{ "ritual", "is performing an arcane ritual.", NOBITS, perform_ritual, NULL },	// ACT_RITUAL
 	{ "sawing", "is sawing lumber.", ACTF_HASTE | ACTF_FAST_CHORES, perform_saw, cancel_sawing },	// ACT_SAWING
 	{ "quarrying", "is quarrying stone.", ACTF_HASTE | ACTF_FAST_CHORES, process_quarrying, NULL },	// ACT_QUARRYING
-	{ "driving", "is driving.", ACTF_ALWAYS_FAST, process_driving, cancel_driving },	// ACT_DRIVING
+	{ "driving", "is driving.", ACTF_ALWAYS_FAST | ACTF_SITTING, process_driving, cancel_driving },	// ACT_DRIVING
 	{ "tanning", "is tanning leather.", ACTF_FAST_CHORES, process_tanning, cancel_tanning },	// ACT_TANNING
 	{ "reading", "is reading a book.", NOBITS, process_reading, NULL },	// ACT_READING
 	{ "copying", "is writing out a copy of a book.", NOBITS, process_copying_book, NULL },	// ACT_COPYING_BOOK
 	{ "crafting", "is working on something.", NOBITS, process_gen_craft, cancel_gen_craft },	// ACT_GEN_CRAFT
-	{ "sailing", "is sailing the ship.", ACTF_ALWAYS_FAST, process_driving, cancel_driving },	// ACT_SAILING
-	{ "piloting", "is piloting the vessel.", ACTF_ALWAYS_FAST, process_driving, cancel_driving },	// ACT_PILOTING
+	{ "sailing", "is sailing the ship.", ACTF_ALWAYS_FAST | ACTF_SITTING, process_driving, cancel_driving },	// ACT_SAILING
+	{ "piloting", "is piloting the vessel.", ACTF_ALWAYS_FAST | ACTF_SITTING, process_driving, cancel_driving },	// ACT_PILOTING
 
 	{ "\n", "\n", NOBITS, NULL, NULL }
 };
@@ -236,7 +236,11 @@ void update_actions(void) {
 			cancel_action(ch);
 			continue;
 		}
-		if (FIGHTING(ch) || GET_POS(ch) < POS_STANDING || IS_WRITING(ch)) {
+		if (FIGHTING(ch) || IS_WRITING(ch)) {
+			cancel_action(ch);
+			continue;
+		}
+		if (GET_POS(ch) < POS_SITTING || GET_POS(ch) == POS_FIGHTING || (!IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_SITTING) && GET_POS(ch) < POS_STANDING)) {
 			cancel_action(ch);
 			continue;
 		}

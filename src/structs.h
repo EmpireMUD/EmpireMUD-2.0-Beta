@@ -1247,6 +1247,7 @@ typedef struct vehicle_data vehicle_data;
 #define ACTF_SHOVEL  BIT(3)	// shovel increases speed
 #define ACTF_FINDER  BIT(4)	// finder increases speed
 #define ACTF_ALWAYS_FAST  BIT(5)	// this action is always faster
+#define ACTF_SITTING  BIT(6)	// can be sitting
 
 
 // bonus traits
@@ -3005,7 +3006,7 @@ struct crop_data {
 struct action_data_struct {
 	char *name;	// shown e.g. in sentences or prompt ("digging")
 	char *long_desc;	// shown in room (action description)
-	bitvector_t flags;	// ACTF_x flags
+	bitvector_t flags;	// ACTF_ flags
 	void (*process_function)(char_data *ch);	// called on ticks (may be NULL)
 	void (*cancel_function)(char_data *ch);	// called when the action is cancelled early (may be NULL)
 };
