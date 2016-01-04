@@ -339,6 +339,28 @@ int find_door(char_data *ch, const char *type, char *dir, const char *cmdname) {
 }
 
 
+/**
+* Finds a return portal to use for messaging.
+*
+* @param room_data *in_room What room to look for the portal in.
+* @param room_data *from_room Find a portal leading where?
+* @param obj_data *fallback Portal to use if none is found.
+* @return obj_data* The portal to send the message from.
+*/
+obj_data *find_back_portal(room_data *in_room, room_data *from_room, obj_data *fallback) {
+	obj_data *objiter;
+	
+	LL_FOREACH2(ROOM_CONTENTS(in_room), objiter, next_content) {
+		if (GET_PORTAL_TARGET_VNUM(objiter) == GET_ROOM_VNUM(from_room)) {
+			return objiter;
+		}
+	}
+	
+	// otherwise just use the original one
+	return fallback;
+}
+
+
 // processes the character's north
 int get_north_for_char(char_data *ch) {
 	if (IS_NPC(ch) || (has_ability(ch, ABIL_NAVIGATION) && GET_COND(ch, DRUNK) < 250)) {
@@ -346,6 +368,38 @@ int get_north_for_char(char_data *ch) {
 	}
 	else {
 		return (int)GET_CONFUSED_DIR(ch);
+	}
+}
+
+
+/**
+* Gives a player the appropriate amount of portal sickness.
+*
+* @param char_data *ch The player.
+* @param obj_data *portal The portal they went through.
+* @param room_data *from Origination room.
+* @param room_data *to Destination room.
+*/
+void give_portal_sickness(char_data *ch, obj_data *portal, room_data *from, room_data *to) {
+	bool junk;
+	
+	if (IS_NPC(ch) || IS_IMMORTAL(ch) || GET_OBJ_VNUM(portal) != o_PORTAL) {
+		return;
+	}
+
+	if (get_cooldown_time(ch, COOLDOWN_PORTAL_SICKNESS) > 0) {
+		if (is_in_city_for_empire(from, ROOM_OWNER(from), TRUE, &junk) && is_in_city_for_empire(to, ROOM_OWNER(to), TRUE, &junk)) {
+			add_cooldown(ch, COOLDOWN_PORTAL_SICKNESS, 2 * SECS_PER_REAL_MIN);
+		}
+		else if (has_ability(ch, ABIL_PORTAL_MAGIC)) {
+			add_cooldown(ch, COOLDOWN_PORTAL_SICKNESS, 4 * SECS_PER_REAL_MIN);
+		}
+		else {
+			add_cooldown(ch, COOLDOWN_PORTAL_SICKNESS, 5 * SECS_PER_REAL_MIN);
+		}
+	}
+	else {
+		add_cooldown(ch, COOLDOWN_PORTAL_SICKNESS, SECS_PER_REAL_MIN);
 	}
 }
 
@@ -597,11 +651,10 @@ bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room)
 void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 	void trigger_distrust_from_stealth(char_data *ch, empire_data *emp);
 	
-	obj_data *objiter, *use_portal;
+	obj_data *use_portal;
 	struct follow_type *fol, *next_fol;
 	room_data *to_room = real_room(GET_PORTAL_TARGET_VNUM(portal));
 	room_data *was_in = IN_ROOM(ch);
-	bool found, junk;
 	
 	// safety
 	if (!to_room) {
@@ -619,41 +672,12 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 	}
 	
 	// see if there's a different portal on the other end
-	found = FALSE;
-	for (objiter = ROOM_CONTENTS(to_room); objiter; objiter = objiter->next_content) {
-		if (GET_PORTAL_TARGET_VNUM(objiter) == GET_ROOM_VNUM(was_in)) {
-			found = TRUE;
-			use_portal = objiter;
-			break;
-		}
-	}
-	
-	// otherwise just use the original one
-	if (!found) {
-		use_portal = portal;
-	}
+	use_portal = find_back_portal(to_room, was_in, portal);
 
 	act("$n appears from $p!", TRUE, ch, use_portal, 0, TO_ROOM);
 	look_at_room(ch);
 	command_lag(ch, WAIT_MOVEMENT);
-	
-	// portal sickness
-	if (!IS_NPC(ch) && !IS_IMMORTAL(ch) && GET_OBJ_VNUM(portal) == o_PORTAL) {
-		if (get_cooldown_time(ch, COOLDOWN_PORTAL_SICKNESS) > 0) {
-			if (is_in_city_for_empire(was_in, ROOM_OWNER(was_in), TRUE, &junk) && is_in_city_for_empire(to_room, ROOM_OWNER(to_room), TRUE, &junk)) {
-				add_cooldown(ch, COOLDOWN_PORTAL_SICKNESS, 2 * SECS_PER_REAL_MIN);
-			}
-			else if (has_ability(ch, ABIL_PORTAL_MAGIC)) {
-				add_cooldown(ch, COOLDOWN_PORTAL_SICKNESS, 4 * SECS_PER_REAL_MIN);
-			}
-			else {
-				add_cooldown(ch, COOLDOWN_PORTAL_SICKNESS, 5 * SECS_PER_REAL_MIN);
-			}
-		}
-		else {
-			add_cooldown(ch, COOLDOWN_PORTAL_SICKNESS, SECS_PER_REAL_MIN);
-		}
-	}
+	give_portal_sickness(ch, portal, was_in, to_room);
 	
 	// leading vehicle (movement validated by can_move in do_simple_move)
 	if (GET_LEADING_VEHICLE(ch) && IN_ROOM(GET_LEADING_VEHICLE(ch)) == was_in) {

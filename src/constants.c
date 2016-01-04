@@ -699,6 +699,26 @@ const bool can_flee_dir[NUM_OF_DIRS] = {
 };
 
 
+// whether or not a direction is "flat" (2D)
+const bool is_flat_dir[NUM_OF_DIRS] = {
+	TRUE,	// n
+	TRUE,
+	TRUE,
+	TRUE,
+	TRUE,	// nw
+	TRUE,
+	TRUE,
+	TRUE,
+	FALSE,	// up
+	FALSE,	// down
+	TRUE,	// fore
+	TRUE,
+	TRUE,
+	TRUE,
+	FALSE	// random
+};
+
+
 /* EX_x */
 const char *exit_bits[] = {
 	"DOOR",

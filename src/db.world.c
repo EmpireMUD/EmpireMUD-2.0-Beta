@@ -1670,6 +1670,9 @@ room_data *dir_to_room(room_data *room, int dir) {
 		if (to_room && IS_MAP_BUILDING(to_room) && !IS_INSIDE(room) && !IS_ADVENTURE_ROOM(room) && BUILDING_ENTRANCE(to_room) != dir && ROOM_IS_CLOSED(to_room) && (!ROOM_BLD_FLAGGED(to_room, BLD_TWO_ENTRANCES) || BUILDING_ENTRANCE(to_room) != rev_dir[dir])) {
 			to_room = NULL;	// can't enter this way
 		}
+		else if (to_room == room) {
+			to_room = NULL;	// don't return a shifted exit back to the room we're already in
+		}
 	}
 	else {	// not on the map
 		if (!(ex = find_exit(room, dir)) || !ex->room_ptr) {

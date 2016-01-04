@@ -2985,7 +2985,6 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	extern const char *storage_bits[];
 	extern double get_base_dps(obj_data *weapon);
 	extern double get_weapon_speed(obj_data *weapon);
-	extern struct ship_data_struct ship_data[];
 	extern const char *armor_types[NUM_ARMOR_TYPES+1];
 	extern const struct poison_data_type poison_data[];
 	
@@ -3133,12 +3132,6 @@ void do_stat_object(char_data *ch, obj_data *j) {
 			if (CART_CAN_FIRE(j)) {
 				msg_to_char(ch, "Capable of firing.\r\n");
 			}
-			break;
-		case ITEM_SHIP:
-			msg_to_char(ch, "Ship type: %s\r\n", ship_data[GET_SHIP_TYPE(j)].name);
-			if (GET_SHIP_RESOURCES_REMAINING(j) > 0)
-				msg_to_char(ch, "Resources required to finish: %d\r\n", GET_SHIP_RESOURCES_REMAINING(j));
-			msg_to_char(ch, "On deck: %d\r\n", GET_SHIP_MAIN_ROOM(j));
 			break;
 		case ITEM_MISSILE_WEAPON:
 			msg_to_char(ch, "Speed: %.2f\r\n", missile_weapon_speed[GET_MISSILE_WEAPON_SPEED(j)]);

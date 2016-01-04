@@ -132,6 +132,7 @@ ACMD(do_distance);
 ACMD(do_diversion);
 ACMD(do_douse);
 ACMD(do_drag);
+ACMD(do_drive);
 ACMD(do_draw);
 ACMD(do_drink);
 ACMD(do_drop);
@@ -325,7 +326,6 @@ ACMD(do_roll);
 ACMD(do_roster);
 
 ACMD(do_sacrifice);
-ACMD(do_sail);
 ACMD(do_sap);
 ACMD(do_save);
 ACMD(do_saw);
@@ -623,6 +623,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "drop", POS_RESTING, do_drop, NO_MIN, CTYPE_MOVE, SCMD_DROP ),
 	STANDARD_CMD( "drag", POS_STANDING, do_drag, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "draw", POS_RESTING, do_draw, NO_MIN, CTYPE_COMBAT ),
+	STANDARD_CMD( "drive", POS_STANDING, do_drive, NO_MIN, NO_GRANTS, SCMD_DRIVE, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
 
 	SCMD_CMD( "eat", POS_RESTING, do_eat, NO_MIN, CTYPE_UTIL, SCMD_EAT ),
 	ABILITY_CMD( "eartharmor", POS_FIGHTING, do_eartharmor, NO_MIN, CTYPE_SKILL, ABIL_EARTHARMOR ),
@@ -792,6 +793,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "party", POS_DEAD, do_group, NO_MIN, CTYPE_UTIL ),
 	STANDARD_CMD( "pick", POS_STANDING, do_pick, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	STANDARD_CMD( "pickpocket", POS_STANDING, do_pickpocket, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_COMBAT, CMD_STAY_HIDDEN, ABIL_PICKPOCKET ),
+	STANDARD_CMD( "pilot", POS_STANDING, do_drive, NO_MIN, NO_GRANTS, SCMD_PILOT, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
 	STANDARD_CMD( "play", POS_STANDING, do_play, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
 	STANDARD_CMD( "playerdelete", POS_SLEEPING, do_playerdelete, LVL_CIMPL, GRANT_PLAYERDELETE, NO_SCMD, CTYPE_IMMORTAL, CMD_NO_ABBREV, NO_ABIL ),
 	STANDARD_CMD( "plant", POS_STANDING, do_plant, LVL_APPROVED, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
@@ -854,7 +856,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "say", POS_RESTING, do_say, NO_MIN, CTYPE_COMM, SCMD_SAY ),
 	SCMD_CMD( "'", POS_RESTING, do_say, NO_MIN, CTYPE_COMM, SCMD_SAY ),
 	SIMPLE_CMD( "sacrifice", POS_STANDING, do_sacrifice, NO_MIN, CTYPE_MOVE ),
-	SIMPLE_CMD( "sail", POS_STANDING, do_sail, NO_MIN, CTYPE_MOVE ),
+	STANDARD_CMD( "sail", POS_STANDING, do_drive, NO_MIN, NO_GRANTS, SCMD_SAIL, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
 	ABILITY_CMD( "sap", POS_STANDING, do_sap, NO_MIN, CTYPE_COMBAT, ABIL_SAP ),
 	SIMPLE_CMD( "save", POS_STUNNED, do_save, NO_MIN, CTYPE_UTIL ),
 	STANDARD_CMD( "saw", POS_STANDING, do_saw, LVL_APPROVED, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),

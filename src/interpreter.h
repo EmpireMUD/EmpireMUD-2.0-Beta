@@ -93,6 +93,11 @@ struct alias_data {
 #define SCMD_BOARD  0
 #define SCMD_ENTER  1
 
+// do_drive
+#define SCMD_DRIVE  0
+#define SCMD_SAIL  1
+#define SCMD_PILOT  2
+
 /* do_gen_ps */
 #define SCMD_INFO		0
 #define SCMD_HANDBOOK	1 

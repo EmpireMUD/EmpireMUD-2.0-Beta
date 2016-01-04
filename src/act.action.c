@@ -50,9 +50,9 @@ obj_data *has_shovel(char_data *ch);
 
 // cancel protos
 void cancel_chipping(char_data *ch);
+void cancel_driving(char_data *ch);
 void cancel_gen_craft(char_data *ch);
 void cancel_minting(char_data *ch);
-void cancel_sailing(char_data *ch);
 void cancel_sawing(char_data *ch);
 void cancel_scraping(char_data *ch);
 void cancel_siring(char_data *ch);
@@ -62,6 +62,7 @@ void cancel_tanning(char_data *ch);
 // process protos
 void perform_chant(char_data *ch);
 void process_chipping(char_data *ch);
+void process_driving(char_data *ch);
 void perform_ritual(char_data *ch);
 void perform_saw(char_data *ch);
 void perform_study(char_data *ch);
@@ -90,7 +91,6 @@ void process_quarrying(char_data *ch);
 void process_reading(char_data *ch);
 void process_reclaim(char_data *ch);
 void process_repairing(char_data *ch);
-void process_sailing(char_data *ch);
 void process_scraping(char_data *ch);
 void process_siring(char_data *ch);
 void process_smelting(char_data *ch);
@@ -133,12 +133,13 @@ const struct action_data_struct action_data[] = {
 	{ "ritual", "is performing an arcane ritual.", NOBITS, perform_ritual, NULL },	// ACT_RITUAL
 	{ "sawing", "is sawing lumber.", ACTF_HASTE | ACTF_FAST_CHORES, perform_saw, cancel_sawing },	// ACT_SAWING
 	{ "quarrying", "is quarrying stone.", ACTF_HASTE | ACTF_FAST_CHORES, process_quarrying, NULL },	// ACT_QUARRYING
-		{ "unknown", "is doing something.", NOBITS, NULL, NULL },	// ACT_UNUSED1
+	{ "driving", "is driving.", ACTF_ALWAYS_FAST, process_driving, cancel_driving },	// ACT_DRIVING
 	{ "tanning", "is tanning leather.", ACTF_FAST_CHORES, process_tanning, cancel_tanning },	// ACT_TANNING
 	{ "reading", "is reading a book.", NOBITS, process_reading, NULL },	// ACT_READING
 	{ "copying", "is writing out a copy of a book.", NOBITS, process_copying_book, NULL },	// ACT_COPYING_BOOK
 	{ "crafting", "is working on something.", NOBITS, process_gen_craft, cancel_gen_craft },	// ACT_GEN_CRAFT
-	{ "sailing", "is sailing the ship.", ACTF_ALWAYS_FAST, process_sailing, cancel_sailing },	// ACT_SAILING
+	{ "sailing", "is sailing the ship.", ACTF_ALWAYS_FAST, process_driving, cancel_driving },	// ACT_SAILING
+	{ "piloting", "is piloting the vessel.", ACTF_ALWAYS_FAST, process_driving, cancel_driving },	// ACT_PILOTING
 
 	{ "\n", "\n", NOBITS, NULL, NULL }
 };
@@ -334,30 +335,6 @@ void cancel_minting(char_data *ch) {
 	obj_data *obj = read_object(GET_ACTION_VNUM(ch, 0), TRUE);
 	obj_to_char_or_room(obj, ch);
 	load_otrigger(obj);
-}
-
-
-/**
-* Alerts people that the ship stops moving.
-*
-* @param char_data *ch The sailer.
-*/
-void cancel_sailing(char_data *ch) {
-	/*
-	room_data *room;
-	obj_data *ship;
-	
-	// no ship? no work
-	if (!(ship = GET_BOAT(HOME_ROOM(IN_ROOM(ch))))) {
-		return;
-	}
-	
-	for (room = interior_room_list; room; room = room->next_interior) {
-		if (HOME_ROOM(room) == HOME_ROOM(IN_ROOM(ch)) && ROOM_PEOPLE(room)) {
-			act("The ship stops moving.", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
-		}
-	}
-	*/
 }
 
 
@@ -1887,55 +1864,6 @@ void process_repairing(char_data *ch) {
 		msg_to_char(ch, "You run out of resources and stop repairing.\r\n");
 		act("$n runs out of resources and stops.", FALSE, ch, NULL, NULL, TO_ROOM);
 	}
-}
-
-
-/**
-* Tick update for sailing action.
-*
-* @param char_data *ch The character doing the sailing.
-*/
-void process_sailing(char_data *ch) {
-	/*
-	extern bool move_ship(char_data *ch, obj_data *ship, int dir);
-	extern bool only_one_sailing(char_data *ch, obj_data *ship);
-
-	int dir = GET_ACTION_VNUM(ch, 0);
-	obj_data *ship;
-	
-	// not on a ship?
-	if (!(ship = GET_BOAT(HOME_ROOM(IN_ROOM(ch))))) {
-		cancel_action(ch);
-		return;
-	}
-	
-	if (!only_one_sailing(ch, ship)) {
-		msg_to_char(ch, "Someone else is sailing the ship right now.\r\n");
-		GET_ACTION(ch) = ACT_NONE;	// silent stop -- no message to the whole ship
-		return;
-	}
-	
-	// attempt to move the ship
-	if (!move_ship(ch, ship, dir)) {
-		look_at_room(ch);	// show them where they stopped
-		msg_to_char(ch, "\r\n");	// extra linebreak between look and "ship stops"
-		cancel_action(ch);
-		return;
-	}
-	
-	// limited distance?
-	if (GET_ACTION_VNUM(ch, 1) > 0) {
-		GET_ACTION_VNUM(ch, 1) -= 1;
-		
-		// arrived!
-		if (GET_ACTION_VNUM(ch, 1) <= 0) {
-			look_at_room(ch);	// show them where they stopped
-			msg_to_char(ch, "\r\n");	// extra linebreak between look and "ship stops"
-			cancel_action(ch);
-			return;
-		}
-	}
-	*/
 }
 
 

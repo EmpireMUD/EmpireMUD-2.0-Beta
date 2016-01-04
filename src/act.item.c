@@ -42,7 +42,6 @@
 // extern variables
 extern const char *drinks[];
 extern int drink_aff[][3];
-extern struct ship_data_struct ship_data[];
 extern const struct wear_data_type wear_data[NUM_WEARS];
 
 // extern functions
@@ -1808,7 +1807,7 @@ obj_data *find_free_ship(empire_data *emp, struct shipping_data *shipd) {
 					}
 				}
 			}
-			if (already_used || capacity >= ship_data[GET_SHIP_TYPE(obj)].cargo_size) {
+			if (already_used) { // || capacity >= ship_data[GET_SHIP_TYPE(obj)].cargo_size) {
 				// ship full or in use
 				continue;
 			}
@@ -1879,16 +1878,16 @@ void load_shipment(struct empire_data *emp, struct shipping_data *shipd, obj_dat
 	}
 	
 	// this shouldn't be possible... but just in case
-	if (capacity >= ship_data[GET_SHIP_TYPE(boat)].cargo_size) {
+	if (capacity >= 0) {	//ship_data[GET_SHIP_TYPE(boat)].cargo_size) {
 		*full = TRUE;
 		return;
 	}
 	
 	// ship full? need to split
-	if (capacity + shipd->amount > ship_data[GET_SHIP_TYPE(boat)].cargo_size) {
+	if (capacity + shipd->amount > 0) { //ship_data[GET_SHIP_TYPE(boat)].cargo_size) {
 		CREATE(newd, struct shipping_data, 1);
 		newd->vnum = shipd->vnum;
-		newd->amount = shipd->amount - (ship_data[GET_SHIP_TYPE(boat)].cargo_size - capacity);	// only what's left
+		newd->amount = shipd->amount - 0;	//(ship_data[GET_SHIP_TYPE(boat)].cargo_size - capacity);	// only what's left
 		newd->from_island = shipd->from_island;
 		newd->to_island = shipd->to_island;
 		newd->status = SHIPPING_QUEUED;
@@ -1901,11 +1900,11 @@ void load_shipment(struct empire_data *emp, struct shipping_data *shipd, obj_dat
 		shipd->next = newd;
 		
 		// remove overage
-		shipd->amount = ship_data[GET_SHIP_TYPE(boat)].cargo_size - capacity;
+		shipd->amount = 0;	//ship_data[GET_SHIP_TYPE(boat)].cargo_size - capacity;
 		*full = TRUE;
 	}
 	else {
-		*full = ((shipd->amount + capacity) >= ship_data[GET_SHIP_TYPE(boat)].cargo_size);
+		*full = ((shipd->amount + capacity) >= 0);//ship_data[GET_SHIP_TYPE(boat)].cargo_size);
 	}
 	
 	// mark it as attached to this boat

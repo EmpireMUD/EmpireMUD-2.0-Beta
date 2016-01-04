@@ -1232,12 +1232,13 @@ typedef struct vehicle_data vehicle_data;
 #define ACT_RITUAL			28
 #define ACT_SAWING			29
 #define ACT_QUARRYING		30
-	#define ACT_UNUSED1			31	// formerly weaving
+#define ACT_DRIVING			31
 #define ACT_TANNING			32
 #define ACT_READING			33
 #define ACT_COPYING_BOOK	34
 #define ACT_GEN_CRAFT		35
 #define ACT_SAILING			36
+#define ACT_PILOTING		37
 
 // act flags
 #define ACTF_ANYWHERE  BIT(0)	// movement won't break it
@@ -1934,9 +1935,9 @@ struct interact_exclusion_data {
 };
 
 
-// for the "interactions" system (like butcher, dig, etc) -- INTERACT_x
+// for the "interactions" system (like butcher, dig, etc)
 struct interaction_item {
-	int type;	// INTERACT_x
+	int type;	// INTERACT_
 	obj_vnum vnum;	// the skin object
 	double percent;	// how often to do it 0.01 - 100.00
 	int quantity;	// how many to give
@@ -2704,7 +2705,7 @@ struct player_special_data {
 	int rewarded_today[MAX_REWARDS_PER_DAY];	// idnums, for ABIL_REWARD
 
 	// action info
-	int action;	// ACT_x
+	int action;	// ACT_
 	int action_cycle;	// time left before an action tick
 	int action_timer;	// ticks to completion (use varies)
 	room_vnum action_room;	// player location
@@ -2831,6 +2832,7 @@ struct char_special_data {
 	char_data *leading_mob;	// A mob may lead a person
 	vehicle_data *leading_vehicle;	// A person may lead a vehicle
 	vehicle_data *sitting_on;	// Vehicle the person is on
+	vehicle_data *driving;	// Vehicle the person is driving
 	
 	struct empire_npc_data *empire_npc;	// if this is an empire spawn
 	
@@ -3075,18 +3077,6 @@ struct potion_data_type {
 	int apply;	// APPLY_x
 	bitvector_t aff;
 	int spec;	// POTION_SPEC_x
-};
-
-
-// ships.c ship_data[]
-struct ship_data_struct {
-	char *name;
-	int vnum;
-	int type;
-	any_vnum ability;	// NO_ABIL or ABIL_x
-	int resources;
-	int advanced;
-	int cargo_size;
 };
 
 
@@ -3540,6 +3530,7 @@ struct vehicle_data {
 	room_data *in_room;	// where it is
 	char_data *led_by;	// person leading it
 	char_data *sitting_on;	// person sitting on it
+	char_data *driver;	// person driving it
 	
 	// scripting
 	int id;	// used by DG triggers - unique id

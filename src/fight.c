@@ -2133,14 +2133,14 @@ void besiege_vehicle(vehicle_data *veh, int damage, int siege_type) {
 					die(ch, ch);
 				}
 			}
-			if (VEH_SITTING_ON(veh)) {
-				act("You are killed as $V is destroyed!", FALSE, VEH_SITTING_ON(veh), NULL, veh, TO_CHAR);
-				if (!IS_NPC(VEH_SITTING_ON(veh))) {
-					mortlog("%s has been killed by siege damage at (%d, %d)!", PERS(VEH_SITTING_ON(veh), VEH_SITTING_ON(veh), TRUE), X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh)));
-					syslog(SYS_DEATH, 0, TRUE, "DEATH: %s has been killed by siege damage at %s", GET_NAME(VEH_SITTING_ON(veh)), room_log_identifier(IN_ROOM(veh)));
-				}
-				die(ch, ch);
+		}
+		if (VEH_SITTING_ON(veh)) {
+			act("You are killed as $V is destroyed!", FALSE, VEH_SITTING_ON(veh), NULL, veh, TO_CHAR);
+			if (!IS_NPC(VEH_SITTING_ON(veh))) {
+				mortlog("%s has been killed by siege damage at (%d, %d)!", PERS(VEH_SITTING_ON(veh), VEH_SITTING_ON(veh), TRUE), X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh)));
+				syslog(SYS_DEATH, 0, TRUE, "DEATH: %s has been killed by siege damage at %s", GET_NAME(VEH_SITTING_ON(veh)), room_log_identifier(IN_ROOM(veh)));
 			}
+			die(ch, ch);
 		}
 		
 		vehicle_from_room(veh);	// remove from room first to destroy anything inside
