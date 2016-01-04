@@ -4744,7 +4744,7 @@ If you are going to use the worn-as-armor wear location, or are planning to
 give the item good stats, you should usually be using the ARMOR item type
 instead.
 #d
-"DOLLAR SIGN CODES" "DOLLARSIGN CODES" $ $n $e $v $m $p $o $p $v
+"DOLLAR SIGN CODES" "DOLLARSIGN CODES" $$ $$n $$e $$v $$m $$p $$o $$p $$v
 
 EmpireMUD uses the so-called dollar sign codes in a function called act(),
 which is used to send action text to people in the game. Usually this only
