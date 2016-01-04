@@ -884,6 +884,18 @@ lead them, but can store far more than you can carry alone.
 
 See also: WOODWORKING, RIDE, HARNESS, PUT, GET
 #
+VEHICLE VEH
+
+A vehicle (sometimes abbreviated "veh", especially in the code) is a type of
+"thing" that includes canoes, carts, ships, and even furniture. Vehicles can
+have many different properties -- some can be lead, dragged, boarded, or burnt.
+
+Vehicles appear in the room when you look, colored &wgray&0, between objects and
+people.
+
+See also: BOARD, CUSTOMIZE, DESIGNATE, DISEMBARK, DRAG, DRIVE, HARNESS, LEAD,
+LIGHT, REPAIR, SCRAP, SIT
+#
 WHEREAMI "WHERE AM I"
 
 Usage:  whereami

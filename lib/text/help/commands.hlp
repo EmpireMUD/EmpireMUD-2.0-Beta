@@ -222,9 +222,10 @@ See also: FOLLOW
 #
 BOARD
 
-Usage:  board <ship>
+Usage:  board <vehicle>
 
-This command is used to board a ship in the same room.
+This command is used to board a ship or other vehicle in the same room. Not
+all vehicles can be boarded.
 
 See also: DISEMBARK, SAIL, MANUFACTURE, LOAD, SHIPS
 #
@@ -383,9 +384,8 @@ DISEMBARK
 
 Usage:  disembark
 
-From the entry room of a ship (the room you're placed in when you board it),
-you may disembark. This can be done even in the ocean, though you may need a
-smaller vessel unless you disembark very close to the shore.
+You can get out of vehicles (such as ships) with the disembark command. In some
+cases, you must do this from the same part of the vehicle where you entered.
 
 See also: BOARD, SAIL, UNLOAD, SHIPS
 #
@@ -399,7 +399,7 @@ dismiss it anywhere in the world.
 #
 DOUSE BURNING "PUT OUT FIRE" "FIRE BRIGADE"
 
-Usage:  douse
+Usage:  douse [vehicle]
 
 In the event of a fire, you may douse it with water from any portable source. 
 It may take a lot of water to douse the fire, and you may have to leave and 
@@ -411,6 +411,16 @@ you. They will always succeed if left alone. However, they do so very slowly
 and are easy targets for enemy players at war.
 
 See also: WORKFORCE
+#
+DRAG
+
+Usage:  drag <vehicle> <direction | portal>
+
+You can drag some vehicles, such as canoes, from room to room. Unlike "lead",
+you must use the drag command for each movement. You can only drag vehicles on
+land, never into the water.
+
+See also: BOARD, LEAD
 #
 DRAW
 
@@ -554,11 +564,13 @@ GET TAKE
 
 Usage:  get <object>
         take all [object]
-        take all all.<object>
-        get all.<object> all.<object>
+        take all all.<container>
+        get all.<object> all.<container>
 
 If you find something interesting on the ground, you may use 'get' to pick
-it up. 'get' can also be used to extract items from containers.
+it up. 'get' can also be used to extract items from containers. Some vehicles
+also act as containers, such as carts and ships. You can get items from a
+ship's cargo hold while inside the ship.
 
 Examples:
 
@@ -566,6 +578,7 @@ Examples:
   > get all corpse
   > get all all.bag
   > get all.bread all.bag
+  > get all caravel
 
 See also: DROP, KEEP, PUT
 #
@@ -1076,7 +1089,10 @@ Usage:  put <item> [in] <container>
         put all.<item> [in] <container>
         put all <container>
 
-For putting items into containers.
+For putting items into containers. This also works on some vehicles, like
+carts. Certain vehicles (like ships) also allow you to put items into them
+while inside the vehicle yourself -- like a container you can access from any
+room.
 
 Examples:
 
@@ -1631,6 +1647,9 @@ For changing your position. If you feel weary, it's probably a good idea to
 sit and rest for a while, or maybe even take a nap.
 
 Wake can also be used to wake up other players.
+
+Sit can also target certain vehicles and furniture, allowing you to sit on
+them.
 
 See also: SLEEP
 #

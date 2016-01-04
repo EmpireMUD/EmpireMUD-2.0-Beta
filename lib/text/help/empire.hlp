@@ -27,10 +27,12 @@ See also: CLAIM, PLEDGE, ENROLL, PROMOTE, TERRITORY, CITIES, ROSTER, ESCORE,
 #
 ABANDON
 
-Usage:  abandon
+Usage:  abandon [target]
 
 This command allows you to abandon a building or acre of land which your 
 empire no longer wants. This falls under the cede privilege.
+
+It can also be used to abandon vehicles.
 
 See also: CEDE, CLAIM, PRIVILEGE, PUBLICIZE
 #
@@ -222,9 +224,10 @@ ability.
 #
 CLAIM
 
-Usage:  claim
+Usage:  claim [target]
 
-Claims the acre you're currently on for your empire.
+Claims the acre you're currently on for your empire. This can also be used
+to claim vehicles.
 
 You can't claim land that's inside another empire's city radius while at war
 with that empire.
