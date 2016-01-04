@@ -54,6 +54,7 @@ void init_craft(craft_data *craft);
 */
 bool audit_craft(craft_data *craft, char_data *ch) {
 	bool problem = FALSE;
+	int count;
 
 	if (GET_CRAFT_REQUIRES_OBJ(craft) == NOTHING && GET_CRAFT_ABILITY(craft) == NO_ABIL) {
 		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft requires no object or ability");
@@ -112,6 +113,12 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft creates item with different vnum");
 			problem = TRUE;
 		}
+	}
+	
+	count = (CRAFT_FLAGGED(craft, CRAFT_SOUP) ? 1 : 0) + (CRAFT_FLAGGED(craft, CRAFT_VEHICLE) ? 1 : 0) + ((GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD) ? 1 : 0);
+	if (count > 1) {
+		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Unusual combination of SOUP, VEHICLE, BUILD");
+		problem = TRUE;
 	}
 	
 	// anything not a building

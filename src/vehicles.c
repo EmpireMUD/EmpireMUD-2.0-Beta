@@ -52,6 +52,7 @@ extern const char *vehicle_flags[];
 extern struct resource_data *copy_resource_list(struct resource_data *input);
 void get_resource_display(struct resource_data *list, char *save_buffer);
 extern char *show_color_codes(char *string);
+extern bool validate_icon(char *icon);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -470,44 +471,128 @@ char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_
 * @return bool TRUE if any problems were reported; FALSE if all good.
 */
 bool audit_vehicle(vehicle_data *veh, char_data *ch) {
-	// char temp[MAX_STRING_LENGTH];
+	char temp[MAX_STRING_LENGTH], *ptr;
+	bld_data *interior = building_proto(VEH_INTERIOR_ROOM_VNUM(veh));
 	bool problem = FALSE;
 	
-	/*
-	strcpy(temp, GET_AUG_NAME(aug));
-	strtolower(temp);
-	if (strcmp(GET_AUG_NAME(aug), temp)) {
-		olc_audit_msg(ch, GET_AUG_VNUM(aug), "Non-lowercase name");
+	if (!str_cmp(VEH_KEYWORDS(veh), default_vehicle_keywords)) {
+		olc_audit_msg(ch, VEH_VNUM(veh), "Keywords not set");
 		problem = TRUE;
 	}
 	
-	for (app = GET_AUG_APPLIES(aug); app; app = app->next) {
-		if (app->location == APPLY_NONE || app->weight == 0) {
-			olc_audit_msg(ch, GET_AUG_VNUM(aug), "Invalid apply: %d to %s", app->weight, apply_types[app->location]);
+	ptr = VEH_KEYWORDS(veh);
+	do {
+		ptr = any_one_arg(ptr, temp);
+		if (*temp && !str_str(VEH_SHORT_DESC(veh), temp) && !str_str(VEH_LONG_DESC(veh), temp)) {
+			olc_audit_msg(ch, VEH_VNUM(veh), "Keyword '%s' not found in strings", temp);
 			problem = TRUE;
 		}
+	} while (*ptr);
+	
+	if (!str_cmp(VEH_LONG_DESC(veh), default_vehicle_long_desc)) {
+		olc_audit_msg(ch, VEH_VNUM(veh), "Long desc not set");
+		problem = TRUE;
+	}
+	if (!ispunct(VEH_LONG_DESC(veh)[strlen(VEH_LONG_DESC(veh)) - 1])) {
+		olc_audit_msg(ch, VEH_VNUM(veh), "Long desc missing punctuation");
+		problem = TRUE;
+	}
+	if (islower(*VEH_LONG_DESC(veh))) {
+		olc_audit_msg(ch, VEH_VNUM(veh), "Long desc not capitalized");
+		problem = TRUE;
+	}
+	if (!str_cmp(VEH_SHORT_DESC(veh), default_vehicle_short_desc)) {
+		olc_audit_msg(ch, VEH_VNUM(veh), "Short desc not set");
+		problem = TRUE;
+	}
+	any_one_arg(VEH_SHORT_DESC(veh), temp);
+	if ((fill_word(temp) || reserved_word(temp)) && isupper(*temp)) {
+		olc_audit_msg(ch, VEH_VNUM(veh), "Short desc capitalized");
+		problem = TRUE;
+	}
+	if (ispunct(VEH_SHORT_DESC(veh)[strlen(VEH_SHORT_DESC(veh)) - 1])) {
+		olc_audit_msg(ch, VEH_VNUM(veh), "Short desc has punctuation");
+		problem = TRUE;
 	}
 	
-	if (GET_AUG_ABILITY(aug) == NO_ABIL && GET_AUG_REQUIRES_OBJ(aug) == NOTHING) {
-		olc_audit_msg(ch, GET_AUG_VNUM(aug), "Requires no ability or object");
+	ptr = VEH_SHORT_DESC(veh);
+	do {
+		ptr = any_one_arg(ptr, temp);
+		// remove trailing punctuation
+		while (*temp && ispunct(temp[strlen(temp)-1])) {
+			temp[strlen(temp)-1] = '\0';
+		}
+		if (*temp && !fill_word(temp) && !reserved_word(temp) && !isname(temp, VEH_KEYWORDS(veh))) {
+			olc_audit_msg(ch, VEH_VNUM(veh), "Suggested missing keyword '%s'", temp);
+			problem = TRUE;
+		}
+	} while (*ptr);
+	
+	if (!VEH_LOOK_DESC(veh) || !*VEH_LOOK_DESC(veh) || !str_cmp(VEH_LOOK_DESC(veh), "Nothing.\r\n")) {
+		olc_audit_msg(ch, VEH_VNUM(veh), "Look desc not set");
 		problem = TRUE;
 	}
-	if (GET_AUG_REQUIRES_OBJ(aug) != NOTHING && !obj_proto(GET_AUG_REQUIRES_OBJ(aug))) {
-		olc_audit_msg(ch, GET_AUG_VNUM(aug), "Requires-object does not exist");
+	else if (!strn_cmp(VEH_LOOK_DESC(veh), "Nothing.", 8)) {
+		olc_audit_msg(ch, VEH_VNUM(veh), "Look desc starting with 'Nothing.'");
 		problem = TRUE;
 	}
 	
-	if (!GET_AUG_RESOURCES(aug)) {
-		olc_audit_msg(ch, GET_AUG_VNUM(aug), "No resources required");
+	if (VEH_ICON(veh) && !validate_icon(VEH_ICON(veh))) {
+		olc_audit_msg(ch, VEH_VNUM(veh), "Bad icon set");
 		problem = TRUE;
 	}
 	
-	// AUG_x: any new targeting flags must be added here
-	if (GET_AUG_WEAR_FLAGS(aug) == NOBITS && !AUGMENT_FLAGGED(aug, AUG_ARMOR | AUG_SHIELD)) {
-		olc_audit_msg(ch, GET_AUG_VNUM(aug), "No targeting flags");
+	if (VEH_MAX_HEALTH(veh) < 1) {
+		olc_audit_msg(ch, VEH_VNUM(veh), "Hitpoints set lower than 1");
 		problem = TRUE;
 	}
-	*/
+	
+	if (VEH_INTERIOR_ROOM_VNUM(veh) != NOTHING && (!interior || !IS_SET(GET_BLD_FLAGS(interior), BLD_ROOM))) {
+		olc_audit_msg(ch, VEH_VNUM(veh), "Interior room set to invalid building vnum");
+		problem = TRUE;
+	}
+	if (VEH_MAX_ROOMS(veh) > 0 && !interior) {
+		olc_audit_msg(ch, VEH_VNUM(veh), "Extra rooms set but vehicle has no interior");
+		problem = TRUE;
+	}
+	if (VEH_DESIGNATE_FLAGS(veh) && !interior) {
+		olc_audit_msg(ch, VEH_VNUM(veh), "Designate flags set but vehicle has no interior");
+		problem = TRUE;
+	}
+	if (!VEH_YEARLY_MAINTENANCE(veh)) {
+		olc_audit_msg(ch, VEH_VNUM(veh), "Requires no maintenance");
+		problem = TRUE;
+	}
+	
+	// flags
+	if (VEH_FLAGGED(veh, VEH_INCOMPLETE)) {
+		olc_audit_msg(ch, VEH_VNUM(veh), "INCOMPLETE flag");
+		problem = TRUE;
+	}
+	if (VEH_FLAGGED(veh, VEH_CONTAINER | VEH_SHIPPING) && VEH_CAPACITY(veh) < 1) {
+		olc_audit_msg(ch, VEH_VNUM(veh), "No capacity set when container or shipping flag present");
+		problem = TRUE;
+	}
+	if (!VEH_FLAGGED(veh, VEH_CONTAINER | VEH_SHIPPING) && VEH_CAPACITY(veh) > 0) {
+		olc_audit_msg(ch, VEH_VNUM(veh), "Capacity set without container or shipping flag");
+		problem = TRUE;
+	}
+	if (VEH_FLAGGED(veh, VEH_ALLOW_ROUGH) && !VEH_FLAGGED(veh, VEH_DRIVING | VEH_DRAGGABLE)) {
+		olc_audit_msg(ch, VEH_VNUM(veh), "ALLOW-ROUGH set without driving/draggable");
+		problem = TRUE;
+	}
+	if (VEH_FLAGGED(veh, VEH_IN) && !VEH_FLAGGED(veh, VEH_SIT) && VEH_INTERIOR_ROOM_VNUM(veh) == NOTHING) {
+		olc_audit_msg(ch, VEH_VNUM(veh), "IN flag set without SIT or interior room");
+		problem = TRUE;
+	}
+	if (VEH_FLAGGED(veh, VEH_CARRY_VEHICLES | VEH_CARRY_MOBS) && VEH_INTERIOR_ROOM_VNUM(veh) == NOTHING) {
+		olc_audit_msg(ch, VEH_VNUM(veh), "CARRY-* flag present without interior room");
+		problem = TRUE;
+	}
+	if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
+		olc_audit_msg(ch, VEH_VNUM(veh), "ON-FIRE flag");
+		problem = TRUE;
+	}
 	
 	return problem;
 }
@@ -2043,8 +2128,6 @@ OLC_MODULE(vedit_hitpoints) {
 
 
 OLC_MODULE(vedit_icon) {
-	extern bool validate_icon(char *icon);
-
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	
 	delete_doubledollar(argument);
