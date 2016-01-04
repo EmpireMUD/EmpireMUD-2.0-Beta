@@ -134,7 +134,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 	
 	// notify leaving
 	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(veh)), ch_iter, next_in_room) {
-		if (ch_iter->desc) {
+		if (ch_iter != VEH_SITTING_ON(veh) && ch_iter->desc) {
 			sprintf(buf, "$V %s %s.", mob_move_types[VEH_MOVE_TYPE(veh)], dirs[get_direction_for_char(ch_iter, dir)]);
 			act(buf, TRUE, ch_iter, NULL, veh, TO_CHAR);
 		}
@@ -144,7 +144,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 	
 	// notify arrival
 	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(veh)), ch_iter, next_in_room) {
-		if (ch_iter->desc) {
+		if (ch_iter != VEH_SITTING_ON(veh) && ch_iter->desc) {
 			sprintf(buf, "$p %s in from %s.", mob_move_types[VEH_MOVE_TYPE(veh)], from_dir[get_direction_for_char(ch_iter, dir)]);
 			act(buf, TRUE, ch_iter, NULL, veh, TO_CHAR);
 		}
