@@ -3035,7 +3035,7 @@ const char *vehicle_flags[] = {
 	"BURNABLE",
 	"CONTAINER",
 	"SHIPPING",
-	"NAMABLE",	// 10
+	"CUSTOMIZABLE",	// 10
 	"DRAGGABLE",
 	"!BUILDING",
 	"CAN-PORTAL",

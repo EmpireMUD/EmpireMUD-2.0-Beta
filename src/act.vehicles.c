@@ -332,7 +332,7 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 	else if (!(veh = get_vehicle_in_room_vis(ch, tar_arg)) && (!(veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) || !isname(tar_arg, VEH_KEYWORDS(veh)))) {
 		msg_to_char(ch, "You don't see that vehicle here.\r\n");
 	}
-	else if (!VEH_FLAGGED(veh, VEH_NAMABLE)) {
+	else if (!VEH_FLAGGED(veh, VEH_CUSTOMIZABLE)) {
 		msg_to_char(ch, "You can't customize that!\r\n");
 	}
 	else if (!can_use_vehicle(ch, veh, MEMBERS_ONLY) || !has_permission(ch, PRIV_CUSTOMIZE)) {

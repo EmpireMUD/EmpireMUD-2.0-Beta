@@ -4533,7 +4533,7 @@ Available flags:
  BURNABLE - can be burnt using the "light" command
  CONTAINER - items can be placed inside
  SHIPPING - can be used by the shipping system
- NAMABLE - allows customize
+ CUSTOMIZABLE - allows "customize vehicle"
  DRAGGABLE - players can move it on land with "drag"
  !BUILDING - cannot be dragged/driven into a building (e.g. too large)
  CAN-PORTAL - can be dragged/driven/led through portals

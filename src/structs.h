@@ -1552,7 +1552,7 @@ typedef struct vehicle_data vehicle_data;
 #define VEH_BURNABLE  BIT(7)	// h. can burn
 #define VEH_CONTAINER  BIT(8)	// i. can put items in
 #define VEH_SHIPPING  BIT(9)	// j. used for the shipping system
-#define VEH_NAMABLE  BIT(10)	// k. players can name it
+#define VEH_CUSTOMIZABLE  BIT(10)	// k. players can name it
 #define VEH_DRAGGABLE  BIT(11)	// l. player can drag it over land
 #define VEH_NO_BUILDING  BIT(12)	// m. won't fit into a building
 #define VEH_CAN_PORTAL  BIT(13)	// n. required for the vehicle to go through a portal
