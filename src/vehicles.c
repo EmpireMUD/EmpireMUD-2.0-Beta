@@ -1461,10 +1461,6 @@ void convert_one_obj_to_vehicle(obj_data *obj) {
 			}
 			break;
 		}
-		case ITEM_BOAT: {
-			// nothing to convert?
-			break;
-		}
 		case ITEM_CART: {
 			// nothing to convert?
 			break;

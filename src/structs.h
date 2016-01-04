@@ -1024,7 +1024,7 @@ typedef struct vehicle_data vehicle_data;
 #define ITEM_CONTAINER  4	// item is a container
 #define ITEM_DRINKCON  5	// item is a drink container
 #define ITEM_FOOD  6	// item is food
-#define ITEM_BOAT  7	// a boat
+	#define ITEM_UNUSED1  7
 #define ITEM_PORTAL  8  // a portal
 #define ITEM_BOARD  9	// message board
 #define ITEM_CORPSE  10	// a corpse, pc or npc

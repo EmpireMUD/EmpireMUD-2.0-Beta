@@ -3096,7 +3096,7 @@ Available types:
  CONTAINER - a chest, holds items on the ground (never set wear TAKE)
  DRINKCON - a drink container, like a flask
  FOOD - edible
- BOAT - lets you move on river/ocean, like a canoe
+ * - unused
  PORTAL - transports a player to another place (never set .wear TAKE)
  *BOARD - a message board
  *CORPSE - a corpse
@@ -4232,16 +4232,6 @@ inventory.
 
 The BOARD item type is used only for in-game boards and cannot be set in OLC
 because boards require code support as well.
-#d
-"BOAT ITEM" "BOAT OBJECT"
-
-The BOAT item represents a canoe or raft, something reasonably small that the
-player can take with them (although you should set the LARGE flag). A player
-who has a boat will be able to cross water tiles and will be immune to water-
-based random encounters, such as sharks.
-
-This is not the type of item that players can go inside and explore; for that
-you want a ship.
 #d
 "BOOK ITEM" "BOOK OBJECT"
 

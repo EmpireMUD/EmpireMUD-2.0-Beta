@@ -714,7 +714,6 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define IS_PLANTABLE_FOOD(obj)  (IS_FOOD(obj) && OBJ_FLAGGED((obj), OBJ_PLANTABLE))
 #define GET_FOOD_CROP_TYPE(obj)  (IS_PLANTABLE_FOOD(obj) ? GET_OBJ_VAL((obj), VAL_FOOD_CROP_TYPE) : NOTHING)
 
-// ITEM_BOAT
 // ITEM_BOARD
 // ITEM_CORPSE
 #define IS_CORPSE(obj)  (GET_OBJ_TYPE(obj) == ITEM_CORPSE)

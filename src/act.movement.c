@@ -518,15 +518,10 @@ int can_move(char_data *ch, int dir, room_data *to_room, int need_specials_check
 
 /* simple function to determine if char can walk on water */
 bool has_boat(char_data *ch) {
-	obj_data *obj;
-
 	if (EFFECTIVELY_FLYING(ch)) {
 		return TRUE;
 	}
 	
-	for (obj = ch->carrying; obj; obj = obj->next_content)
-		if (GET_OBJ_TYPE(obj) == ITEM_BOAT)
-			return TRUE;
 	return FALSE;
 }
 

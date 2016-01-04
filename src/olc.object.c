@@ -1258,7 +1258,6 @@ void olc_get_values_display(char_data *ch, char *storage) {
 		}
 		
 		// types with no vals
-		case ITEM_BOAT:
 		case ITEM_BOARD:
 		case ITEM_MAIL:
 		case ITEM_SHIELD:
