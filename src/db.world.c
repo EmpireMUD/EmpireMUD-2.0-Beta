@@ -964,10 +964,16 @@ void annual_update_vehicle(vehicle_data *veh) {
 	extern struct resource_data *combine_resources(struct resource_data *combine_a, struct resource_data *combine_b);
 	void fully_empty_vehicle(vehicle_data *veh);
 	
+	static struct resource_data *default_res = NULL;
 	struct resource_data *old_list;
 	
-	// does not take annual damage
-	if (!VEH_YEARLY_MAINTENANCE(veh)) {
+	// resources if it doesn't have its own
+	if (!default_res) {
+		default_res = create_resource_list(o_NAILS, 1, NOTHING);
+	}
+	
+	// does not take annual damage (unless incomplete)
+	if (!VEH_YEARLY_MAINTENANCE(veh) && VEH_IS_COMPLETE(veh)) {
 		return;
 	}
 	
@@ -976,7 +982,7 @@ void annual_update_vehicle(vehicle_data *veh) {
 	if (VEH_HEALTH(veh) > 0) {
 		// add maintenance
 		old_list = VEH_NEEDS_RESOURCES(veh);
-		VEH_NEEDS_RESOURCES(veh) = combine_resources(old_list, VEH_YEARLY_MAINTENANCE(veh));
+		VEH_NEEDS_RESOURCES(veh) = combine_resources(old_list, VEH_YEARLY_MAINTENANCE(veh) ? VEH_YEARLY_MAINTENANCE(veh) : default_res);
 		free_resource_list(old_list);
 	}
 	else {	// destroyed

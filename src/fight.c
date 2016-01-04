@@ -2103,7 +2103,19 @@ void besiege_vehicle(vehicle_data *veh, int damage, int siege_type) {
 	}
 	else {
 		if (ROOM_PEOPLE(IN_ROOM(veh))) {
-			act("$V is destroyed!", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+			// SIEGE_x: warn the occupants
+			switch (siege_type) {
+				case SIEGE_BURNING: {
+					act("$V burns down!", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+					break;
+				}
+				case SIEGE_PHYSICAL:
+				case SIEGE_MAGICAL:
+				default: {
+					act("$V is destroyed!", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+					break;
+				}
+			}
 		}
 		
 		if (VEH_INTERIOR_HOME_ROOM(veh)) {
