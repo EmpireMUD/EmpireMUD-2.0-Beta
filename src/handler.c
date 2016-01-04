@@ -3596,6 +3596,7 @@ void extract_obj(obj_data *obj) {
 obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 	struct obj_binding *bind;
 	obj_data *proto, *new;
+	int iter;
 	
 	if (!obj || !(proto = obj_proto(GET_OBJ_VNUM(obj)))) {
 		// get a normal 'bug' object
@@ -3659,8 +3660,10 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 			break;
 		}
 		case ITEM_SHIP: {
-			GET_OBJ_VAL(new, VAL_SHIP_RESOURCES_REMAINING) = GET_OBJ_VAL(obj, VAL_SHIP_RESOURCES_REMAINING);
-			GET_OBJ_VAL(new, VAL_SHIP_MAIN_ROOM) = GET_OBJ_VAL(obj, VAL_SHIP_MAIN_ROOM);
+			// copy these blind
+			for (iter = 0; iter < NUM_OBJ_VAL_POSITIONS; ++iter) {
+				GET_OBJ_VAL(new, iter) = GET_OBJ_VAL(obj, iter);
+			}
 			break;
 		}
 	}

@@ -3104,7 +3104,7 @@ Available types:
  *MAIL - a letter
  WEALTH - adds to empire wealth when stored
  *CART - use vehicles instead
- *SHIP - a sailing ship
+ *SHIP - use vehicles instead
  * - unused
  * - unused
  MISSILE_WEAPON - a bow, or similar (requires .wear RANGED)

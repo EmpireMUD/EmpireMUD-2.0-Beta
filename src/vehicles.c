@@ -1443,7 +1443,7 @@ void convert_one_obj_to_vehicle(obj_data *obj) {
 	// type-based traits
 	switch (GET_OBJ_TYPE(obj)) {
 		case ITEM_SHIP: {
-			if ((main_room = real_room(GET_SHIP_MAIN_ROOM(obj)))) {
+			if ((main_room = real_room(GET_OBJ_VAL(obj, 2)))) {	// obj val 2: was ship's main-room-vnum
 				VEH_INTERIOR_HOME_ROOM(veh) = main_room;
 				
 				// detect owner from room

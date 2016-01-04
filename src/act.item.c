@@ -1751,6 +1751,8 @@ room_data *find_docks(empire_data *emp, int island_id) {
 * @return obj_data* A ship, or NULL if none.
 */
 obj_data *find_free_ship(empire_data *emp, struct shipping_data *shipd) {
+	return NULL;
+/*
 	struct empire_territory_data *ter;
 	struct shipping_data *iter;
 	bool already_used;
@@ -1818,6 +1820,7 @@ obj_data *find_free_ship(empire_data *emp, struct shipping_data *shipd) {
 	}
 	
 	return NULL;
+	*/
 }
 
 
@@ -1855,6 +1858,7 @@ room_data *get_ship_pen(void) {
 * @param struct shipping_data *shipd The 
 */
 void load_shipment(struct empire_data *emp, struct shipping_data *shipd, obj_data *boat, bool *full) {
+	/*
 	struct shipping_data *iter, *newd;
 	int capacity;
 
@@ -1904,6 +1908,7 @@ void load_shipment(struct empire_data *emp, struct shipping_data *shipd, obj_dat
 	
 	// mark it as attached to this boat
 	shipd->ship_homeroom = GET_SHIP_MAIN_ROOM(boat);
+	*/
 }
 
 
@@ -2057,6 +2062,7 @@ void process_shipping(void) {
 * @param obj_data *boat The ship object.
 */
 void sail_shipment(empire_data *emp, obj_data *boat) {
+	/*
 	struct shipping_data *iter;
 
 	// sanity
@@ -2080,6 +2086,7 @@ void sail_shipment(empire_data *emp, obj_data *boat) {
 	if (ROOM_PEOPLE(IN_ROOM(boat))) {
 		act("$p sails in.", FALSE, ROOM_PEOPLE(IN_ROOM(boat)), boat, NULL, TO_CHAR | TO_ROOM);
 	}
+	*/
 }
 
 
@@ -2090,6 +2097,7 @@ void sail_shipment(empire_data *emp, obj_data *boat) {
 * @return bool TRUE if the ship is empty, FALSE if it has players inside.
 */
 bool ship_is_empty(obj_data *ship) {
+	/*
 	room_data *ship_room, *iter;
 	char_data *ch;
 	
@@ -2113,6 +2121,8 @@ bool ship_is_empty(obj_data *ship) {
 	
 	// didn't find anybody
 	return TRUE;
+	*/
+	return FALSE;
 }
 
 

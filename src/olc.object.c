@@ -1263,6 +1263,7 @@ void olc_get_values_display(char_data *ch, char *storage) {
 		case ITEM_MAIL:
 		case ITEM_SHIELD:
 		case ITEM_SHIP:
+		case ITEM_CART:
 		case ITEM_WORN: {
 			break;
 		}

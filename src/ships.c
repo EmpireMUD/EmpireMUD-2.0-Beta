@@ -38,7 +38,7 @@ extern int count_objs_in_room(room_data *room);
 
 
 // currently only galleon can hold items that are !take
-#define SHIP_CAN_HOLD_OBJ(ship, obj)  (IS_SHIP(ship) && (CAN_WEAR(obj, ITEM_WEAR_TAKE)))	// || GET_SHIP_TYPE(ship) == SHIP_GALLEON))
+#define SHIP_CAN_HOLD_OBJ(ship, obj)  (FALSE && (CAN_WEAR(obj, ITEM_WEAR_TAKE)))	// || GET_SHIP_TYPE(ship) == SHIP_GALLEON))
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -70,10 +70,6 @@ int load_all_objs_to_boat(char_data *ch, room_data *from, room_data *to, obj_dat
 
 	for (o = ROOM_CONTENTS(from); o; o = next_o) {
 		next_o = o->next_content;
-
-		/* We can never load a ship */
-		if (GET_OBJ_TYPE(o) == ITEM_SHIP)
-			continue;
 
 		/* We can only load a !take item onto a Galleon (catapult, etc) */
 		if (!SHIP_CAN_HOLD_OBJ(ship, o)) {
@@ -126,10 +122,6 @@ int perform_unload_boat(char_data *ch, room_data *from, room_data *to, obj_data 
 
 	for (o = ROOM_CONTENTS(from); o; o = next_o) {
 		next_o = o->next_content;
-
-		/* We can never load a ship */
-		if (GET_OBJ_TYPE(o) == ITEM_SHIP)
-			continue;
 
 		/* It's not necessary to check for ITEM_WEAR_TAKE.. if it got here we'll take it out */
 
