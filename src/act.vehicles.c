@@ -116,6 +116,151 @@ bool perform_put_obj_in_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh)
 //// SUB-COMMANDS ////////////////////////////////////////////////////////////
 
 /**
+* Sub-processor for do_customize: customize vehicle <target> <name | description> <value>
+*
+* @param char_data *ch The person trying to customize the vehicle.
+* @param char *argument The argument.
+*/
+void do_customize_vehicle(char_data *ch, char *argument) {
+	char tar_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH];
+	vehicle_data *veh, *proto;
+	
+	argument = two_arguments(argument, tar_arg, type_arg);
+	skip_spaces(&argument);
+	
+	if (!ch->desc) {
+		msg_to_char(ch, "You can't do that.\r\n");
+	}
+	else if (!*tar_arg || !*type_arg || !*argument) {
+		msg_to_char(ch, "Usage: customize vehicle <target> <name | longdesc | description> <value>\r\n");
+	}
+	// vehicle validation
+	else if (!(veh = get_vehicle_in_room_vis(ch, tar_arg)) && (!(veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) || !isname(tar_arg, VEH_KEYWORDS(veh)))) {
+		msg_to_char(ch, "You don't see that vehicle here.\r\n");
+	}
+	else if (!VEH_FLAGGED(veh, VEH_NAMABLE)) {
+		msg_to_char(ch, "You can't customize that!\r\n");
+	}
+	else if (!can_use_vehicle(ch, veh, MEMBERS_ONLY) || !has_permission(ch, PRIV_CUSTOMIZE)) {
+		msg_to_char(ch, "You don't have permission to customize that.\r\n");
+	}
+	
+	// types:
+	else if (is_abbrev(type_arg, "name")) {
+		if (!*argument) {
+			msg_to_char(ch, "What would you like to name this vehicle (or \"none\")?\r\n");
+		}
+		else if (!str_cmp(argument, "none")) {
+			proto = vehicle_proto(VEH_VNUM(veh));
+			
+			if (!proto || VEH_SHORT_DESC(veh) != VEH_SHORT_DESC(proto)) {
+				free(VEH_SHORT_DESC(veh));
+				VEH_SHORT_DESC(veh) = VEH_SHORT_DESC(proto);
+			}
+			if (!proto || VEH_KEYWORDS(veh) != VEH_KEYWORDS(proto)) {
+				free(VEH_KEYWORDS(veh));
+				VEH_KEYWORDS(veh) = VEH_KEYWORDS(proto);
+			}
+			
+			msg_to_char(ch, "The vehicle no longer has a custom name.\r\n");
+		}
+		else if (color_code_length(argument) > 0) {
+			msg_to_char(ch, "You cannot use color codes in custom names.\r\n");
+		}
+		else if (strlen(argument) > 24) {
+			msg_to_char(ch, "That name is too long. Vehicle names may not be over 24 characters.\r\n");
+		}
+		else {
+			proto = vehicle_proto(VEH_VNUM(veh));
+			
+			if (!proto || VEH_SHORT_DESC(veh) != VEH_SHORT_DESC(proto)) {
+				free(VEH_SHORT_DESC(veh));
+			}
+			if (!proto || VEH_KEYWORDS(veh) != VEH_KEYWORDS(proto)) {
+				free(VEH_KEYWORDS(veh));
+			}
+			
+			VEH_SHORT_DESC(veh) = str_dup(argument);
+			VEH_KEYWORDS(veh) = str_dup(skip_filler(argument));
+			
+			msg_to_char(ch, "It is now called \"%s\".\r\n", argument);
+		}
+	}
+	else if (is_abbrev(type_arg, "longdesc")) {
+		if (!*argument) {
+			msg_to_char(ch, "What would you like to make the long description of this vehicle (or \"none\")?\r\n");
+		}
+		else if (!str_cmp(argument, "none")) {
+			proto = vehicle_proto(VEH_VNUM(veh));
+			
+			if (!proto || VEH_LONG_DESC(veh) != VEH_LONG_DESC(proto)) {
+				free(VEH_LONG_DESC(veh));
+				VEH_LONG_DESC(veh) = VEH_LONG_DESC(proto);
+			}
+			
+			msg_to_char(ch, "It no longer has a custom long description.\r\n");
+		}
+		else if (color_code_length(argument) > 0) {
+			msg_to_char(ch, "You cannot use color codes in custom long descriptions.\r\n");
+		}
+		else if (strlen(argument) > 72) {
+			msg_to_char(ch, "That description is too long. Long descriptions may not be over 72 characters.\r\n");
+		}
+		else {
+			proto = vehicle_proto(VEH_VNUM(veh));
+			
+			if (!proto || VEH_LONG_DESC(veh) != VEH_LONG_DESC(proto)) {
+				free(VEH_LONG_DESC(veh));
+			}
+			
+			VEH_LONG_DESC(veh) = str_dup(argument);
+			
+			msg_to_char(ch, "It now has the long description:\r\n%s\r\n", argument);
+		}
+	}
+	else if (is_abbrev(type_arg, "description")) {
+		if (!*argument) {
+			msg_to_char(ch, "To set a description, use \"description set\".\r\n");
+			msg_to_char(ch, "To remove a description, use \"description none\".\r\n");
+		}
+		else if (ch->desc->str) {
+			msg_to_char(ch, "You are already editing something else.\r\n");
+		}
+		else if (is_abbrev(argument, "none")) {
+			proto = vehicle_proto(VEH_VNUM(veh));
+			
+			if (!proto || VEH_LOOK_DESC(veh) != VEH_LOOK_DESC(proto)) {
+				free(VEH_LOOK_DESC(veh));
+				VEH_LOOK_DESC(veh) = VEH_LOOK_DESC(proto);
+			}
+			msg_to_char(ch, "It no longer has a custom description.\r\n");
+		}
+		else if (is_abbrev(argument, "set")) {
+			proto = vehicle_proto(VEH_VNUM(veh));
+			
+			if (!proto || VEH_LOOK_DESC(veh) != VEH_LOOK_DESC(proto)) {
+				// differs from proto
+				start_string_editor(ch->desc, "vehicle description", &VEH_LOOK_DESC(veh), MAX_ITEM_DESCRIPTION);
+			}
+			else {
+				// has proto's desc
+				VEH_LOOK_DESC(veh) = str_dup(VEH_LOOK_DESC(proto));
+				start_string_editor(ch->desc, "vehicle description", &VEH_LOOK_DESC(veh), MAX_ITEM_DESCRIPTION);
+			}
+			
+			act("$n begins editing a vehicle description.", TRUE, ch, 0, 0, TO_ROOM);
+		}
+		else {
+			msg_to_char(ch, "You must specify whether you want to set or remove the description.\r\n");
+		}
+	}
+	else {
+		msg_to_char(ch, "You can customize name, longdesc, or description.\r\n");
+	}
+
+}
+
+/**
 * Performs a douse on a vehicle.
 *
 * @param char_data *ch The douser.

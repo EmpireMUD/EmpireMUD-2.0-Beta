@@ -1026,6 +1026,7 @@ ACMD(do_confirm) {
 
 ACMD(do_customize) {
 	void do_customize_room(char_data *ch, char *argument);
+	void do_customize_vehicle(char_data *ch, char *argument);
 
 	char arg2[MAX_INPUT_LENGTH];
 	
@@ -1036,6 +1037,9 @@ ACMD(do_customize) {
 	}
 	else if (is_abbrev(arg, "building") || is_abbrev(arg, "room")) {
 		do_customize_room(ch, arg2);
+	}
+	else if (is_abbrev(arg, "vehicle") || is_abbrev(arg, "ship")) {
+		do_customize_vehicle(ch, arg2);
 	}
 	else {
 		msg_to_char(ch, "What do you want to customize? (See HELP CUSTOMIZE)\r\n");

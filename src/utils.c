@@ -2982,6 +2982,22 @@ char *str_dup(const char *source) {
 
 
 /**
+* Capitalizes the first letter of each word.
+*
+* @param char *string The string to ucwords on.
+*/
+void ucwords(char *string) {
+	int iter, len = strlen(string);
+	
+	for (iter = 0; iter < len; ++iter) {
+		if (iter == 0 || string[iter-1] == ' ') {
+			string[iter] = UPPER(string[iter]);
+		}
+	}
+}
+
+
+/**
 * Generic string replacement function: returns a memory-allocated char* with
 * the resulting string.
 *

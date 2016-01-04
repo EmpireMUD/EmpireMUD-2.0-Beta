@@ -1197,6 +1197,7 @@ extern int reserved_word(char *argument);
 extern int search_block(char *arg, const char **list, int exact);
 void skip_spaces(char **string);
 extern char *two_arguments(char *argument, char *first_arg, char *second_arg);
+void ucwords(char *string);
 
 // permission utils from utils.c
 extern bool can_build_or_claim_at_war(char_data *ch, room_data *loc);

@@ -1891,9 +1891,13 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 * @param char_data *ch The person to show the output to.
 */
 void look_at_vehicle(vehicle_data *veh, char_data *ch) {
+	vehicle_data *proto;
+	
 	if (!veh || !ch || !ch->desc) {
 		return;
 	}
+	
+	proto = vehicle_proto(VEH_VNUM(veh));
 	
 	if (VEH_LOOK_DESC(veh) && *VEH_LOOK_DESC(veh)) {
 		msg_to_char(ch, "%s", VEH_LOOK_DESC(veh));
@@ -1902,8 +1906,12 @@ void look_at_vehicle(vehicle_data *veh, char_data *ch) {
 		act("You look at $V but see nothing special.", FALSE, ch, NULL, veh, TO_CHAR);
 	}
 	
+	if (VEH_SHORT_DESC(veh) != VEH_SHORT_DESC(proto)) {
+		msg_to_char(ch, "Type: %s\r\n", skip_filler(VEH_SHORT_DESC(proto)));
+	}
+	
 	if (VEH_OWNER(veh)) {
-		msg_to_char(ch, "It is owned by %s%s\t0.\r\n", EMPIRE_BANNER(VEH_OWNER(veh)), EMPIRE_NAME(VEH_OWNER(veh)));
+		msg_to_char(ch, "Owner: %s%s\t0\r\n", EMPIRE_BANNER(VEH_OWNER(veh)), EMPIRE_NAME(VEH_OWNER(veh)));
 	}
 	
 	if (VEH_NEEDS_RESOURCES(veh)) {
