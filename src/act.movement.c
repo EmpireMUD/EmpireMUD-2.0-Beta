@@ -516,16 +516,6 @@ int can_move(char_data *ch, int dir, room_data *to_room, int need_specials_check
 }
 
 
-/* simple function to determine if char can walk on water */
-bool has_boat(char_data *ch) {
-	if (EFFECTIVELY_FLYING(ch)) {
-		return TRUE;
-	}
-	
-	return FALSE;
-}
-
-
 /**
 * @param char_data *ch
 * @param room_data *from Origin room
@@ -767,9 +757,9 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 		return FALSE;
 	}
 
-	/* if the room we're going to needs a boat, check for one.  You can wade if you're already in one */
+	// if the room we're going to is water, check for ability to move
 	if (WATER_SECT(to_room)) {
-		if (!has_boat(ch) && !IS_RIDING(ch)) {
+		if (!EFFECTIVELY_FLYING(ch) && !IS_RIDING(ch)) {
 			if (has_ability(ch, ABIL_SWIMMING) && (mode == MOVE_NORMAL || mode == MOVE_FOLLOW)) {
 				mode = MOVE_SWIM;
 			}
@@ -861,10 +851,6 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 	}
 	else if (move_type == MOB_MOVE_WALK && ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH) && move_type != MOB_MOVE_FLY) {
 		move_type = MOB_MOVE_CLIMB;
-	}
-	// tweak for people in boats
-	if (!IS_NPC(ch) && has_boat(ch) && move_type == MOB_MOVE_SWIM) {
-		move_type = MOB_MOVE_PADDLE;
 	}
 
 	// leaving message
