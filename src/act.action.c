@@ -250,24 +250,30 @@ void update_actions(void) {
 		}
 		
 		// action-cycle is time remaining -- compute how fast we go through it
-		speed = 1;	// default is 1 second per second
+		speed = 2;	// default is 2 per second (allowing it to be slowed)
 		
 		// things that modify speed...
 		if (IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_ALWAYS_FAST)) {
-			speed += 1;
+			speed += 2;
 		}
 		if (IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_HASTE) && AFF_FLAGGED(ch, AFF_HASTE)) {
-			speed += 1;
+			speed += 2;
 		}
 		if (IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_FAST_CHORES) && HAS_BONUS_TRAIT(ch, BONUS_FAST_CHORES)) {
-			speed += 1;
+			speed += 2;
 		}
 		if (IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_FINDER) && has_ability(ch, ABIL_FINDER)) {
-			speed += 1;
+			speed += 2;
 			gain_ability_exp(ch, ABIL_FINDER, 0.1);
 		}
 		if (IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_SHOVEL) && has_shovel(ch)) {
-			speed += 1;
+			speed += 2;
+		}
+		
+		// things that slow you down
+		if (AFF_FLAGGED(ch, AFF_SLOW) || IS_HUNGRY(ch) || IS_THIRSTY(ch) || IS_BLOOD_STARVED(ch)) {
+			speed /= 2;
+			speed = MAX(1, speed);	// don't stall them completely
 		}
 		
 		GET_ACTION_CYCLE(ch) -= speed;
