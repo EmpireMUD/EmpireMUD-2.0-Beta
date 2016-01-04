@@ -984,8 +984,14 @@ void do_drag_portal(char_data *ch, vehicle_data *veh, char *arg) {
 	else if (!VEH_FLAGGED(veh, VEH_CAN_PORTAL)) {
 		act("$V can't be dragged through portals.", FALSE, ch, NULL, veh, TO_CHAR);
 	}
-	else if (!validate_vehicle_move(ch, veh, to_room)) {
-		// sends own message
+	else if (IS_WATER_SECT(SECT(to_room))) {
+		msg_to_char(ch, "You can't drag it through there because it can't be dragged into water.\r\n");
+	}
+	else if (ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && !VEH_FLAGGED(veh, VEH_ALLOW_ROUGH)) {
+		msg_to_char(ch, "You can't drag it through there because of rough terrain on the other side.\r\n");
+	}
+	else if (ROOM_IS_CLOSED(to_room) && VEH_FLAGGED(veh, VEH_NO_BUILDING)) {
+		msg_to_char(ch, "You can't drag it in there.\r\n");
 	}
 	else {
 		was_in = IN_ROOM(ch);
