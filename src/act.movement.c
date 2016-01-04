@@ -595,9 +595,8 @@ bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room)
 
 	char buf[MAX_STRING_LENGTH];
 	
-	// things that are (theoretically) already pre-validated
-	if (!VEH_FLAGGED(veh, VEH_LEADABLE) || !VEH_IS_COMPLETE(veh)) {
-		act("You can't lead $V anywhere!", FALSE, ch, NULL, veh, TO_CHAR);
+	if (!VEH_IS_COMPLETE(veh)) {
+		act("$V can't move anywhere until it's complete!", FALSE, ch, NULL, veh, TO_CHAR);
 		return FALSE;
 	}
 	
@@ -616,7 +615,7 @@ bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room)
 	
 	// barrier?
 	if (ROOM_BLD_FLAGGED(to_room, BLD_BARRIER)) {
-		act("You can't lead $V up to the barrier.", FALSE, ch, NULL, veh, TO_CHAR);
+		act("$V can't move that close to the barrier.", FALSE, ch, NULL, veh, TO_CHAR);
 		return FALSE;
 	}
 	

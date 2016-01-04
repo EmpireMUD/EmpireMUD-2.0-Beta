@@ -608,6 +608,9 @@ void do_sit_on_vehicle(char_data *ch, char *argument) {
 	else if (VEH_LED_BY(veh)) {
 		msg_to_char(ch, "You can't sit %s it while %s leading it around.\r\n", VEH_FLAGGED(veh, VEH_IN) ? "in" : "on", (VEH_LED_BY(veh) == ch) ? "you are" : "someone else is");
 	}
+	else if (VEH_DRIVER(veh)) {
+		msg_to_char(ch, "You can't lead it while someone else is controlling it.\r\n");
+	}
 	else if (GET_LEADING_VEHICLE(ch) || GET_LEADING_MOB(ch)) {
 		msg_to_char(ch, "You can't sit %s it while you're leading something.\r\n", VEH_FLAGGED(veh, VEH_IN) ? "in" : "on");
 	}
@@ -1181,6 +1184,9 @@ ACMD(do_drive) {
 		snprintf(buf, sizeof(buf), "You can't %s $V!", drive_data[subcmd].command);
 		act(buf, FALSE, ch, NULL, veh, TO_CHAR);
 	}
+	else if (!VEH_IS_COMPLETE(veh)) {
+		act("$V isn't going anywhere until it's finished.", FALSE, ch, NULL, veh, TO_CHAR);
+	}
 	else if (veh == GET_ROOM_VEHICLE(IN_ROOM(ch)) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_LOOK_OUT)) {
 		msg_to_char(ch, "You can't %s here because you can't see outside.\r\n", drive_data[subcmd].command);
 	}
@@ -1388,6 +1394,9 @@ ACMD(do_lead) {
 		}
 		else if (VEH_SITTING_ON(veh)) {
 			msg_to_char(ch, "You can't lead it while %s sitting on it.\r\n", (VEH_SITTING_ON(veh) == ch) ? "you are" : "someone else is");
+		}
+		else if (VEH_DRIVER(veh)) {
+			msg_to_char(ch, "You can't lead it while someone else is controlling it.\r\n");
 		}
 		else {
 			act("You begin to lead $V.", FALSE, ch, NULL, veh, TO_CHAR);
