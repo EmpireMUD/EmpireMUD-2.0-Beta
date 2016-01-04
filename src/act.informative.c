@@ -287,7 +287,7 @@ void look_in_obj(char_data *ch, char *arg) {
 		sprintf(buf, "There doesn't seem to be %s %s here.\r\n", AN(arg), arg);
 		send_to_char(buf, ch);
 	}
-	else if (veh) {
+	else if (veh || (!obj && (veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) && isname(arg, VEH_KEYWORDS(veh)))) {
 		// vehicle section
 		if (!VEH_FLAGGED(veh, VEH_CONTAINER)) {
 			act("$V isn't a container.", FALSE, ch, NULL, veh, TO_CHAR);
