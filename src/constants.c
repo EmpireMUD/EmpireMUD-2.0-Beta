@@ -1499,7 +1499,7 @@ const char *item_types[] = {
 	"*",
 	"*MAIL",
 	"WEALTH",
-	"CART",
+	"*CART",
 	"*SHIP",
 	"*HELM",
 	"*WINDOW",

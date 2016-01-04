@@ -2,6 +2,9 @@
 *   File: objsave.c                                       EmpireMUD 2.0b3 *
 *  Usage: loading/saving player objects for rent and crash-save           *
 *                                                                         *
+*  Note: ITEM_CART is deprecated but this will still put items inside of  *
+*  one so that the 2.0 b3.8 auto-converter will move them to vehicles.    *
+*                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *

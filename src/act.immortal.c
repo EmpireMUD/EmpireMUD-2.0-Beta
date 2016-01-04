@@ -3126,13 +3126,6 @@ void do_stat_object(char_data *ch, obj_data *j) {
 			msg_to_char(ch, "Amount: %s\r\n", money_amount(real_empire(GET_COINS_EMPIRE_ID(j)), GET_COINS_AMOUNT(j)));
 			break;
 		}
-		case ITEM_CART:
-			msg_to_char(ch, "Holds: %d items\r\n", GET_MAX_CART_CONTENTS(j));
-			msg_to_char(ch, "Animals required: %d\r\n", GET_CART_ANIMALS_REQUIRED(j));
-			if (CART_CAN_FIRE(j)) {
-				msg_to_char(ch, "Capable of firing.\r\n");
-			}
-			break;
 		case ITEM_MISSILE_WEAPON:
 			msg_to_char(ch, "Speed: %.2f\r\n", missile_weapon_speed[GET_MISSILE_WEAPON_SPEED(j)]);
 			msg_to_char(ch, "Damage: %d\r\n", GET_MISSILE_WEAPON_DAMAGE(j));

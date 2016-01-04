@@ -201,17 +201,6 @@ bool audit_object(obj_data *obj, char_data *ch) {
 			}
 			break;
 		}
-		case ITEM_CART: {
-			if (GET_MAX_CART_CONTENTS(obj) == 0) {
-				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Cart capacity not set");
-				problem = TRUE;
-			}
-			if (GET_CART_ANIMALS_REQUIRED(obj) == 0) {
-				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Cart animals not set");
-				problem = TRUE;
-			}
-			break;
-		}
 		case ITEM_MISSILE_WEAPON: {
 			if (GET_MISSILE_WEAPON_DAMAGE(obj) == 0) {
 				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Damage amount not set");
@@ -1227,12 +1216,6 @@ void olc_get_values_display(char_data *ch, char *storage) {
 			sprintf(storage + strlen(storage), "<&yroomvnum&0> %d\r\n", GET_PORTAL_TARGET_VNUM(obj));
 			break;
 		}
-		case ITEM_CART: {
-			sprintf(storage + strlen(storage), "<&ycapacity&0> %d object%s\r\n", GET_MAX_CART_CONTENTS(obj), PLURAL(GET_MAX_CART_CONTENTS(obj)));
-			sprintf(storage + strlen(storage), "<&yanimalsrequired&0> %d\r\n", GET_CART_ANIMALS_REQUIRED(obj));
-			sprintf(storage + strlen(storage), "<&ycatapult&0> %s\r\n", CART_CAN_FIRE(obj) ? "yes" : "no");
-			break;
-		}
 		case ITEM_MISSILE_WEAPON: {
 			sprintf(storage + strlen(storage), "<&ymissilespeed&0> %.2f\r\n", missile_weapon_speed[GET_MISSILE_WEAPON_SPEED(obj)]);
 			sprintf(storage + strlen(storage), "<&ydamage&0> %d (speed %.2f, %.2f base dps)\r\n", GET_MISSILE_WEAPON_DAMAGE(obj), get_weapon_speed(obj), get_base_dps(obj));
@@ -1435,18 +1418,6 @@ OLC_MODULE(oedit_action_desc) {
 OLC_MODULE(oedit_affects) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	GET_OBJ_AFF_FLAGS(obj) = olc_process_flag(ch, argument, "affects", "affects", affected_bits, GET_OBJ_AFF_FLAGS(obj));
-}
-
-
-OLC_MODULE(oedit_animalsrequired) {
-	obj_data *obj = GET_OLC_OBJECT(ch->desc);
-	
-	if (!IS_CART(obj)) {
-		msg_to_char(ch, "You can only set animalsrequired on a cart.\r\n");
-	}
-	else {
-		GET_OBJ_VAL(obj, VAL_CART_ANIMALS_REQUIRED) = olc_process_number(ch, argument, "animals required", "animalsrequired", 0, 2, GET_OBJ_VAL(obj, VAL_CART_ANIMALS_REQUIRED));
-	}
 }
 
 
@@ -1695,10 +1666,6 @@ OLC_MODULE(oedit_capacity) {
 			slot = VAL_DRINK_CONTAINER_CAPACITY;
 			break;
 		}
-		case ITEM_CART: {
-			slot = VAL_CART_MAX_CONTENTS;
-			break;
-		}
 		case ITEM_PACK: {
 			slot = VAL_PACK_CAPACITY;
 			break;
@@ -1710,25 +1677,6 @@ OLC_MODULE(oedit_capacity) {
 	}
 	else {
 		GET_OBJ_VAL(obj, slot) = olc_process_number(ch, argument, "capacity", "capacity", 0, MAX_INT, GET_OBJ_VAL(obj, slot));
-	}
-}
-
-
-OLC_MODULE(oedit_catapult) {
-	obj_data *obj = GET_OLC_OBJECT(ch->desc);
-	
-	if (!IS_CART(obj)) {
-		msg_to_char(ch, "You can only toggle 'catapult' on a cart.\r\n");
-	}
-	else {
-		if (GET_OBJ_VAL(obj, VAL_CART_FIRING_DATA) > 0) {
-			GET_OBJ_VAL(obj, VAL_CART_FIRING_DATA) = 0;
-			msg_to_char(ch, "You toggle 'catapult' off.\r\n");
-		}
-		else {
-			GET_OBJ_VAL(obj, VAL_CART_FIRING_DATA) = 1;
-			msg_to_char(ch, "You toggle 'catapult' on.\r\n");
-		}
 	}
 }
 

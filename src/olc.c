@@ -207,14 +207,12 @@ OLC_MODULE(mapedit_unclaimable);
 // object modules
 OLC_MODULE(oedit_action_desc);
 OLC_MODULE(oedit_affects);
-OLC_MODULE(oedit_animalsrequired);
 OLC_MODULE(oedit_apply);
 OLC_MODULE(oedit_armortype);
 OLC_MODULE(oedit_arrowtype);
 OLC_MODULE(oedit_automint);
 OLC_MODULE(oedit_book);
 OLC_MODULE(oedit_capacity);
-OLC_MODULE(oedit_catapult);
 OLC_MODULE(oedit_charges);
 OLC_MODULE(oedit_coinamount);
 OLC_MODULE(oedit_containerflags);
@@ -545,14 +543,12 @@ const struct olc_command_data olc_data[] = {
 	
 	// object commands
 	{ "affects", oedit_affects, OLC_OBJECT, OLC_CF_EDITOR },
-	{ "animalsrequired", oedit_animalsrequired, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "apply", oedit_apply, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "armortype", oedit_armortype, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "arrowtype", oedit_arrowtype, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "automint", oedit_automint, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "book", oedit_book, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "capacity", oedit_capacity, OLC_OBJECT, OLC_CF_EDITOR },
-	{ "catapult", oedit_catapult, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "charges", oedit_charges, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "coinamount", oedit_coinamount, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "containerflags", oedit_containerflags, OLC_OBJECT, OLC_CF_EDITOR },

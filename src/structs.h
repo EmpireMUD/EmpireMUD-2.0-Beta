@@ -1033,7 +1033,7 @@ typedef struct vehicle_data vehicle_data;
 	#define ITEM_UNUSED3  13
 #define ITEM_MAIL  14	// mail
 #define ITEM_WEALTH  15	// item provides wealth
-#define ITEM_CART  16	// item is a cart/wagon
+#define ITEM_CART  16	// This type is mostly DEPRECATED; use vehicles instead
 #define ITEM_SHIP  17	// large ship
 	#define ITEM_UNUSED4  18
 	#define ITEM_UNUSED5  19

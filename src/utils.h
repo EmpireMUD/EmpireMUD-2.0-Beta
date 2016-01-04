@@ -694,7 +694,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define IS_CONTAINER(obj)  (GET_OBJ_TYPE(obj) == ITEM_CONTAINER)
 #define VAL_CONTAINER_MAX_CONTENTS  0
 #define VAL_CONTAINER_FLAGS  1
-#define GET_MAX_CONTAINER_CONTENTS(obj)  (IS_CONTAINER(obj) ? GET_OBJ_VAL((obj), VAL_CONTAINER_MAX_CONTENTS) : (IS_CART(obj) ? GET_OBJ_VAL((obj), VAL_CART_MAX_CONTENTS) : 0))
+#define GET_MAX_CONTAINER_CONTENTS(obj)  (IS_CONTAINER(obj) ? GET_OBJ_VAL((obj), VAL_CONTAINER_MAX_CONTENTS) : 0)
 #define GET_CONTAINER_FLAGS(obj)  (IS_CONTAINER(obj) ? GET_OBJ_VAL((obj), VAL_CONTAINER_FLAGS) : 0)
 
 // ITEM_DRINKCON
@@ -742,15 +742,6 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define VAL_WEALTH_AUTOMINT  1
 #define GET_WEALTH_VALUE(obj)  (IS_WEALTH_ITEM(obj) ? GET_OBJ_VAL((obj), VAL_WEALTH_VALUE) : 0)
 #define GET_WEALTH_AUTOMINT(obj)  (IS_WEALTH_ITEM(obj) ? GET_OBJ_VAL((obj), VAL_WEALTH_AUTOMINT) : 0)
-
-// ITEM_CART
-#define IS_CART(obj)  (GET_OBJ_TYPE(obj) == ITEM_CART)
-#define VAL_CART_MAX_CONTENTS  0
-#define VAL_CART_ANIMALS_REQUIRED  1
-#define VAL_CART_FIRING_DATA  2	// this val is 1 for can-fire, >1 for cooling down to fire
-#define GET_MAX_CART_CONTENTS(obj)  (IS_CART(obj) ? GET_OBJ_VAL((obj), VAL_CART_MAX_CONTENTS) : (IS_CONTAINER(obj) ? GET_OBJ_VAL((obj), VAL_CONTAINER_MAX_CONTENTS) : 0))
-#define GET_CART_ANIMALS_REQUIRED(obj)  (IS_CART(obj) ? GET_OBJ_VAL((obj), VAL_CART_ANIMALS_REQUIRED) : 0)
-#define CART_CAN_FIRE(obj)  (IS_CART(obj) ? (GET_OBJ_VAL((obj), VAL_CART_FIRING_DATA) > 0) : FALSE)
 
 // ITEM_SHIP
 #define IS_SHIP(obj)  (GET_OBJ_TYPE(obj) == ITEM_SHIP)

@@ -892,7 +892,7 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 									}
 								}
 								if (iter == -location && cont_row[iter]) {			/* Content list exists. */
-									if (GET_OBJ_TYPE(load_obj) == ITEM_CONTAINER || GET_OBJ_TYPE(load_obj) == ITEM_CART || IS_CORPSE(load_obj)) {
+									if (GET_OBJ_TYPE(load_obj) == ITEM_CONTAINER || IS_CORPSE(load_obj)) {
 										/* Take the item, fill it, and give it back. */
 										obj_from_room(load_obj);
 										load_obj->contains = NULL;

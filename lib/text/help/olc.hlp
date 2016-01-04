@@ -2534,15 +2534,6 @@ on them.
 
 See also: AFFECT FLAGS, OLC OBJECTS
 #d
-"OEDIT ANIMALSREQUIRED" "OEDIT ANIMALS REQUIRED"
-
-Usage:  .animalsrequired <number>
-
-You can specify whether the cart needs 0, 1, or 2 animals to pull it. However,
-with 0 animals, it can never be pulled.
-
-See also: HARNESS, OLC OBJECTS
-#d
 "OEDIT APPLY" "OEDIT APPLIES" APPLIES
 
 Usage:  .apply add <value> <apply> [type]
@@ -2649,15 +2640,6 @@ For SCALABLE objects, thus number is a scalable value if it is set to a number
 other than 0.
 
 See also: ITEM SCALING, OEDIT CONTENTS, OLC OBJECTS
-#d
-"OEDIT CATAPULT"
-
-Usage:  .catapult
-
-This trait, set on cart objects, turns the cart into a catapult and allows it
-to be used with the catapult command. Using .catapult again will toggle it off.
-
-See also: CATAPULT
 #d
 "OEDIT CHARGES"
 
@@ -3121,7 +3103,7 @@ Available types:
  COINS - a pile of coins
  *MAIL - a letter
  WEALTH - adds to empire wealth when stored
- CART - a cart or wagon
+ *CART - use vehicles instead
  *SHIP - a sailing ship
  * - unused
  * - unused
@@ -4269,17 +4251,6 @@ then assigning their book ID to a book object in your adventure zone. The
 data from the book editor will override your short description, long desc-
 ription, and look description.
 #d
-"CART ITEM" "CART OBJECT"
-
-The CART item type represents a large item that can be moved by harnessing
-animals to it. This includes carts, but also catapults.
-
-To make a cart-type item, set the number of animals needed to pull it (1 or 2),
-and set its capacity.
-
-To make a catapult-type item, set the capacity to zero (it doesn't need to
-move anything) and the number of animals required, plus the catapult property.
-#d
 "COINS ITEM" "COINS OBJECT"
 
 The COINS type represents a pile of coins and will be converted from an object
@@ -4298,8 +4269,7 @@ EmpireMUD does not use containers with the TAKE flag. These items should only
 be used on the ground. If you want to raise inventory capacity, use the PACK
 item type instead.
 
-If you want to make a cart (or other movable container), use the CART type
-instead.
+If you want to make a cart (or other movable container), use a vehicle instead.
 #d
 "CORPSE ITEM" "CORPSE OBJECT"
 

@@ -88,6 +88,7 @@ ACMD(do_assist) {
 
 
 ACMD(do_catapult) {
+/*
 	static struct resource_data *rocks = NULL;
 	struct empire_political_data *emp_pol = NULL;
 	obj_data *catapult;
@@ -100,7 +101,7 @@ ACMD(do_catapult) {
 		rocks = create_resource_list(o_ROCK, 12, NOTHING);
 	}
 
-	/* Find a 'pult */
+	// Find a 'pult
 	for (catapult = ROOM_CONTENTS(IN_ROOM(ch)); catapult; catapult = catapult->next_content)
 		if (GET_OBJ_TYPE(catapult) == ITEM_CART && CART_CAN_FIRE(catapult))
 			break;
@@ -111,8 +112,9 @@ ACMD(do_catapult) {
 		msg_to_char(ch, "You don't even have a catapult.\r\n");
 	else if (!*argument)
 		msg_to_char(ch, "Which direction would you like to shoot?\r\n");
-	else if (!has_resources(ch, rocks, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), TRUE))
-		{ /* This line intentionally left blank */ }
+	else if (!has_resources(ch, rocks, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), TRUE)) {
+		// This line intentionally left blank
+	}
 	else if ((dir = parse_direction(ch, argument)) == NO_DIR)
 		msg_to_char(ch, "Which direction is that?\r\n");
 	else if (dir >= NUM_2D_DIRS || !(to_room = real_shift(IN_ROOM(ch), shift_dir[dir][0], shift_dir[dir][1])) || to_room == IN_ROOM(ch))
@@ -149,7 +151,7 @@ ACMD(do_catapult) {
 			}
 		}
 		
-		GET_OBJ_VAL(catapult, VAL_CART_FIRING_DATA) = 2;	/* shot timer, 1 = ready to shoot */
+		GET_OBJ_VAL(catapult, VAL_CART_FIRING_DATA) = 2;	// shot timer, 1 = ready to shoot
 		
 		if (SHOULD_APPEAR(ch)) {
 			appear(ch);
@@ -163,6 +165,7 @@ ACMD(do_catapult) {
 		besiege_room(to_room, 8);
 		GET_WAIT_STATE(ch) = 5 RL_SEC;
 	}
+*/
 }
 
 

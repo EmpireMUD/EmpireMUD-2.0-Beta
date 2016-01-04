@@ -340,11 +340,6 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 			msg_to_char(ch, "Contains %s\r\n", money_amount(real_empire(GET_COINS_EMPIRE_ID(obj)), GET_COINS_AMOUNT(obj)));
 			break;
 		}
-		case ITEM_CART:
-			msg_to_char(ch, "Holds %d items.\r\n", GET_MAX_CART_CONTENTS(obj));
-			if (CART_CAN_FIRE(obj))
-				msg_to_char(ch, "Capable of firing shots.\r\n");
-			break;
 		case ITEM_MISSILE_WEAPON:
 			msg_to_char(ch, "Fires at a speed of %.2f for %d damage.\r\n", missile_weapon_speed[GET_MISSILE_WEAPON_SPEED(obj)], GET_MISSILE_WEAPON_DAMAGE(obj));
 			break;
@@ -3717,7 +3712,7 @@ ACMD(do_get) {
 				sprintf(buf, "You don't have %s %s.\r\n", AN(arg2), arg2);
 				send_to_char(buf, ch);
 			}
-			else if (GET_OBJ_TYPE(cont) != ITEM_CONTAINER && GET_OBJ_TYPE(cont) != ITEM_CART && !IS_CORPSE(cont))
+			else if (GET_OBJ_TYPE(cont) != ITEM_CONTAINER && !IS_CORPSE(cont))
 				act("$p is not a container.", FALSE, ch, cont, 0, TO_CHAR);
 			else {
 				get_from_container(ch, cont, arg1, mode, amount);
@@ -3736,7 +3731,7 @@ ACMD(do_get) {
 			}
 			for (cont = ch->carrying; cont; cont = cont->next_content) {
 				if (CAN_SEE_OBJ(ch, cont) && (cont_dotmode == FIND_ALL || isname(arg2, GET_OBJ_KEYWORDS(cont)))) {
-					if (GET_OBJ_TYPE(cont) == ITEM_CONTAINER || GET_OBJ_TYPE(cont) == ITEM_CART || IS_CORPSE(cont)) {
+					if (GET_OBJ_TYPE(cont) == ITEM_CONTAINER || IS_CORPSE(cont)) {
 						found = 1;
 						get_from_container(ch, cont, arg1, FIND_OBJ_INV, amount);
 					}
@@ -3748,7 +3743,7 @@ ACMD(do_get) {
 			}
 			for (cont = ROOM_CONTENTS(IN_ROOM(ch)); cont; cont = cont->next_content) {
 				if (CAN_SEE_OBJ(ch, cont) && (cont_dotmode == FIND_ALL || isname(arg2, GET_OBJ_KEYWORDS(cont)))) {
-					if (GET_OBJ_TYPE(cont) == ITEM_CONTAINER || GET_OBJ_TYPE(cont) == ITEM_CART || IS_CORPSE(cont)) {
+					if (GET_OBJ_TYPE(cont) == ITEM_CONTAINER || IS_CORPSE(cont)) {
 						get_from_container(ch, cont, arg1, FIND_OBJ_ROOM, amount);
 						found = 1;
 					}
@@ -4290,7 +4285,7 @@ ACMD(do_put) {
 			sprintf(buf, "You don't see %s %s here.\r\n", AN(thecont), thecont);
 			send_to_char(buf, ch);
 		}
-		else if (GET_OBJ_TYPE(cont) != ITEM_CONTAINER && GET_OBJ_TYPE(cont) != ITEM_CART)
+		else if (GET_OBJ_TYPE(cont) != ITEM_CONTAINER)
 			act("$p is not a container.", FALSE, ch, cont, 0, TO_CHAR);
 		else if (OBJVAL_FLAGGED(cont, CONT_CLOSED) && GET_OBJ_TYPE(cont) == ITEM_CONTAINER)
 			send_to_char("You'd better open it first!\r\n", ch);

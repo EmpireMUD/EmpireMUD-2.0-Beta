@@ -1192,11 +1192,6 @@ void point_update_obj(obj_data *obj) {
 	if ((top->carried_by && !IN_ROOM(top->carried_by)) || (top->worn_by && !IN_ROOM(top->worn_by))) {
 		return;
 	}
-	
-	// this is the firing cooldown on carts
-	if (GET_OBJ_TYPE(obj) == ITEM_CART && GET_OBJ_VAL(obj, VAL_CART_FIRING_DATA) > 1) {
-		GET_OBJ_VAL(obj, VAL_CART_FIRING_DATA) -= 1;
-	}
 
 	if (OBJ_FLAGGED(obj, OBJ_LIGHT)) {
 		if (GET_OBJ_TIMER(obj) == 2) {
