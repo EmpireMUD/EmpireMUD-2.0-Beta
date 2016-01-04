@@ -1058,7 +1058,7 @@ shown if the building is flagged CLOSED).
 
 See also: BEDIT FLAGS, OLC BUILDINGS, STRING EDITOR
 #d
-"BEDIT DESIGNATE"
+"BEDIT DESIGNATE" "DESIGNATE FLAGS"
 
 Usage:  .designate [add | remove] <flags>
 
@@ -1433,7 +1433,7 @@ Available flags:
  DISMANTLE-ONLY - for building recipes only, this recipe allows the building
     to be dismantled, but not built; it won't show up in the build list
  IN-CITY-ONLY - a craft or building can only be made in a city radius
- VEHICLE - creates a vehicle instead of an item
+ VEHICLE - creates a vehicle instead of an item, see CRAFT VEHICLES
  SHIPYARD - requires being at a shipyard
  BLD-UPGRADED - requires being at a building with the UPGRADED flag
 
@@ -1561,8 +1561,14 @@ Available types are:
  MILL - requires mill building, quantity doubled by Master Farmer ability
  BREW - potions
  MIX - poisons
+ BUILD - used with the build command
+ WEAVE
+ WORKFORCE - has specific code interactions, but no player command
+ MANUFACTURE - for shipbuilding
 
-See also: CEDIT REQUIRESABILITY, OLC CRAFTS
+Note: The SOUP and VEHICLE craft flags both also modify the recipe.
+
+See also: CEDIT FLAGS, CEDIT REQUIRESABILITY, OLC CRAFTS
 #d
 "CEDIT VOLUME"
 
@@ -1698,6 +1704,15 @@ player who has the ability from his/her class will also count as having spent
 an abilitiy point in the skill tree.
 
 See also: OLC CLASSES, VNUM
+#d
+"CRAFT VEHICLES" "VEHICLE CRAFTS"
+
+Crafts with the VEHICLE flag will create a vehicle instead of an item. Vehicles
+are constructed over time like buildings, and will appear unfinished in the
+room until they are completed.
+
+Vehicle crafts don't use the "quantity" or "time" fields. Otherwise, they
+behave like regular crafts.
 #d
 "CROPEDIT CLIMATE" "SECTEDIT CLIMATE"
 

@@ -100,6 +100,8 @@ Room types:
  vault - Holds gold and silver, and sets your wealth (castle)
  crypt - Can be set as a tomb (castle)
 
+For more, see SHIP ROOMS.
+
 See also: BUILD, STORAGE
 #
 DIG
@@ -195,12 +197,14 @@ See also: BOARD, DRAG, HARNESS
 #
 LIGHT TORCH
 
-Usage:  light <item>
+Usage:  light <item | vehicle>
 
 To light something, you must have a flint set. You may light sticks to create
 torches. You can also light trees or logs to make camp fires.
 
-See also: COOKING FIRE
+You can also burn down some vehicles with this command.
+
+See also: COOKING FIRE, DOUSE
 #
 MILK
 

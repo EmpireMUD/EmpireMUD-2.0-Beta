@@ -355,6 +355,25 @@ tailor.
 
 See also: TAILOR, WEAVE
 #
+CUSTOMIZE "CUSTOMIZE VEHICLE"
+
+Usage:  customize <type> [target] <field> <value | none>
+
+This command allows you to customize the names (and other text) of your 
+buildings and vehicles. You must have the correct privilege in your empire to
+customize its things.
+
+Valid types:
+- building (requires the Customize Building ability)
+- vehicle
+
+Valid fields:
+- name
+- longdesc: the text shown in the room (doesn't work on buildings)
+- description: will open a text editor
+
+See also: CUSTOMIZE BUILDING, TEXT EDITOR
+#
 DIAGNOSE
 
 Usage:  diagnose [character]
@@ -1148,6 +1167,18 @@ Examples:
 
 See also: GRAB, HOLD, WEAR, WIELD, SHEATH, DRAW, SWAP
 #
+REPAIR
+
+Usage:  repair <vehicle>
+
+This command allows you to repair vehicles that have decayed or been damaged.
+Like building, repair happens one item at a time using materials in your
+inventory or in the room with you.
+
+Fully repairing a vehicle will restore it to full health.
+
+See also: STOP, WORKFORCE
+#
 REPLY
 
 Usage:  reply <message>
@@ -1210,23 +1241,24 @@ tag next to your name on the "who" list.
 
 See also: TOGGLE
 #
-SAIL
+SAIL DRIVE PILOT
 
-Usage:  sail <direction> [distance]
+Usage:  sail <direction | portal> [distance]
+        drive <direction | portal> [distance]
+        pilot <direction | portal> [distance]
 
-You can sail the ship from any location inside, for your convenience. Ships
-can travel on oceans and rivers, through river gates, and under bridges. 
-Though this is fairly slow, it is one of the most efficient means of 
-transoceanic travel.
+These three commands are used to control ships, carriages, and other vehicles.
+Which command you use depends upon the type of vehicle. Travel in this manner
+is usually slow, but does not require movement points. You need to either be
+sitting on the vehicle, or inside of it, to do this.
 
-If you specify a distance, you will only sail that many tiles.
+If you specify a distance, you will only travel that many tiles. If not, you
+will continue to move until you hit an obstacle.
 
-Once you've started sailing, the ship will move every few seconds in that
-direction, for as long as you're sailing it. You can type 'sail' again to
-stop, or to change directions. If you don't like seeing the messages each time
-the ship moves, you can 'toggle action-spam'.
+You can use 'stop' to cancel travel at any time. If you don't like seeing the
+messages each time the ship moves, you can 'toggle action-spam'.
 
-See also: BOARD, DISEMBARK, SHIPBUILDING, SHIPS, STOP, TOGGLE
+See also: BOARD, DISEMBARK, DRAG, LEAD, SHIPBUILDING, SHIPS, STOP, TOGGLE
 #
 SAVE
 
@@ -1299,6 +1331,15 @@ and (1) represents the number of ability points you have to spend.
 Score also shows things which are affecting you.
 
 See also: SHIELD BLOCK, AFFECTS, SKILL LEVEL, CLASS, GEAR LEVEL
+#
+SCRAP
+
+Usage:  scrap <vehicle>
+
+This command is used to cancel a partially-built vehicle. No materials will be
+refunded.
+
+See also: MANUFACTURE
 #
 "SCREEN READERS" SCREENREADERS SCREEN-READERS
 

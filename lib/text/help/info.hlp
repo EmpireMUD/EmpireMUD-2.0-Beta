@@ -783,6 +783,37 @@ Example:
 
 See also: MAPSIZE, SCREEN-READERS
 #
+"SHIP ROOMS" "SHIP DESIGNATE" "DESIGNATE ON SHIPS"
+
+Usage:  designate <direction> <room>
+        redesignate <room>
+
+You can designate rooms on some ships. These have their own list of available
+rooms and can only be designated in shipboard directions (fore, aft, starboard,
+port, up, and down). Some ships come with pre-designated rooms, and you can't
+always redesignate those.
+
+Some ship rooms are above-deck and show you the map above their description;
+others are indoors and don't show this.
+
+Ship designate types:
+ Aftercastle
+ Below Deck
+ Bilge
+ Bow (outdoors)
+ Bunk Room - bedroom
+ Captain's Cabin - bedroom
+ Cargo Hold (outdoors)
+ Crow's Nest (outdoors)
+ Forecastle (outdoors)
+ Helm (outdoors)
+ On Deck (outdoors)
+ Quarterdeck (outdoors)
+ Stern (outdoors)
+ The Galley - cooking fire
+
+See also: DESIGNATE
+#
 SHOVEL
 
 A shovel can help you dig or excavate much faster. It can be made by any

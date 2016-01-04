@@ -28,20 +28,23 @@ The upgraded shipyard allows you to manufacture bigger, more powerful ships.
 
 With Advanced Ships you can manufacture:
   Carrack
-    Type: Exploration ship (shipping)
+    Type: Exploration ship (house boat, shipping)
     Cost: 50x lumber, 100x nails, 4x log, 12x sail, 24x rope, 2x anchor
     Capacity: 400
     Health: 96
+    Extra rooms: 8
   Brigantine
     Type: Warship (siege weapons)
     Cost: 60x lumber, 120x nails, 3x log, 10x sail, 20x rope, 2x anchor,
           10x cannon    
     Health: 128
+    Extra rooms: 4
   Hulk
     Type: Cargo ship (shipping)
     Cost: 50x lumber, 100x nails, 3x log, 6x sail, 12x rope, 1x anchor
     Capacity: 1000
     Health: 64
+    Extra rooms: 4
 
 See also: SHIPBUILDING, BOARD, DISEMBARK, SAIL, SHIPPING, SHIPS, UPGRADE
 #
@@ -674,15 +677,18 @@ With basic Shipbuilding you can manufacture:
     Cost: 35x lumber, 70x nails, 2x log, 6x sail, 12x rope, 1x anchor
     Capacity: 150
     Health: 32
+    Extra rooms: 2
   Longship
     Type: Warship (siege weapons)
     Cost: 40x lumber, 80x nails, 1x log, 4x sail, 8x rope, 1x anchor, 2x cannon    
     Health: 64
+    Extra rooms: 2
   Cog
     Type: Cargo ship (shipping)
     Cost: 30x lumber, 60x nails, 1x log, 2x sail, 4x rope, 1x anchor
     Capacity: 450
     Health: 32
+    Extra rooms: 1
 
 See also: ADVANCED SHIPS, BOARD, DISEMBARK, SAIL, SHIPPING, SHIPS, UPGRADE
 #

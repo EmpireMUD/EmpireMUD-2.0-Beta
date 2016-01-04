@@ -237,10 +237,10 @@ DOCK DOCKS
 Resources:  20 lumber, 8 nails
 Built on:  plains or desert, next to water
 
-The docks allow you a safe place to moor your ships. You can also load and
-unload boats at the docks.
+The docks allow you a safe place to moor your ships, and are required for the
+shipping system.
 
-See also:  BOARD, LOAD, UNLOAD
+See also:  BOARD, LOAD, SHIPPING, UNLOAD
 #
 ESTUARYGARDEN "ESTUARY GARDEN"
 
