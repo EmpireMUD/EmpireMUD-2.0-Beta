@@ -1605,6 +1605,9 @@ void point_update_vehicle(vehicle_data *veh) {
 
 	// burny burny burny! (do this last)
 	if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
+		if (ROOM_PEOPLE(IN_ROOM(veh))) {
+			act("The flames roar as they envelop $V!", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+		}
 		besiege_vehicle(veh, MAX(1, (VEH_MAX_HEALTH(veh) / 12)), SIEGE_BURNING);
 		// WARNING: this may have extracted it
 	}
