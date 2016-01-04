@@ -157,6 +157,14 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 			GET_LAST_DIR(VEH_SITTING_ON(veh)) = dir;
 		}
 		
+		if (has_ability(VEH_SITTING_ON(veh), ABIL_NAVIGATION)) {
+			snprintf(buf, sizeof(buf), "$V %s %s (%d, %d).", mob_move_types[VEH_MOVE_TYPE(veh)], dirs[get_direction_for_char(VEH_SITTING_ON(veh), dir)], X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh)));
+		}
+		else {
+			snprintf(buf, sizeof(buf), "$V %s %s.", mob_move_types[VEH_MOVE_TYPE(veh)], dirs[get_direction_for_char(VEH_SITTING_ON(veh), dir)]);
+		}
+		act(buf, FALSE, VEH_SITTING_ON(veh), NULL, veh, TO_CHAR);
+		
 		entry_memory_mtrigger(VEH_SITTING_ON(veh));
 		greet_mtrigger(VEH_SITTING_ON(veh), dir);
 		greet_memory_mtrigger(VEH_SITTING_ON(veh));
