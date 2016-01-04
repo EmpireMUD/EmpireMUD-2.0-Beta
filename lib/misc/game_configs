@@ -92,7 +92,7 @@ auto_update_items 1
 autostore_time 180
 bound_item_junk_time 10080
 long_autostore_time 720
-room_item_limit 404
+room_item_limit 5
 scale_coin_amount 10.000000
 scale_drink_capacity 9.800000
 scale_food_fullness 6.000000
