@@ -4744,4 +4744,31 @@ If you are going to use the worn-as-armor wear location, or are planning to
 give the item good stats, you should usually be using the ARMOR item type
 instead.
 #d
+"DOLLAR SIGN CODES" "DOLLARSIGN CODES" $ $n $e $v $m $p $o $p $v
+
+EmpireMUD uses the so-called dollar sign codes in a function called act(),
+which is used to send action text to people in the game. Usually this only
+appears in the code itself, but there are a few places where players encounter
+it -- such as emotes and custom object messages.
+
+Player variables:
+ $n - actor's name                      $N - 2nd person's name
+ $o - actor's real name                 $O - 2nd person's real name
+ $e - he/she/it for the actor           $E - he/she/it for 2nd person
+ $m - him/her/it for the actor          $M - him/her/it for 2nd person
+ $s - his/her/its for the actor         $S - his/her/its for 2nd person
+
+Item variables:
+ $p - short desc for the 1st item       $P - short desc for the 2nd item
+ $a - a/an for the 1st item             $A - a/an for the 2nd item
+
+Vehicle variables:
+ $v - short desc for the 1st vehicle (in the code, requires ACT_VEHICLE_OBJ)
+ $V - short desc for the 2nd vehicle
+
+Misc variables (code only):
+ $t - The obj parameter as a string
+ $T - The vict_obj parameter as a string
+ $F - The first word of a string passed to the vict_obj parameter
+#d
 $~
