@@ -837,6 +837,9 @@ void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
 		Crash_save(VEH_CONTAINS(veh), fl, LOC_INVENTORY);
 		fprintf(fl, "Contents-end\n");
 	}
+	if (VEH_LAST_FIRE_TIME(veh)) {
+		fprintf(fl, "Last-fired: %ld\n", VEH_LAST_FIRE_TIME(veh));
+	}
 	LL_FOREACH(VEH_ANIMALS(veh), vam) {
 		fprintf(fl, "Animal: %d %d %s %d\n", vam->mob, vam->scale_level, bitv_to_alpha(vam->flags), vam->empire);
 	}
@@ -878,6 +881,7 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 	bool end = FALSE, seek_end = FALSE;
 	any_vnum load_vnum;
 	vehicle_data *veh;
+	long long_in[2];
 	
 	// load based on vnum or, if NOTHING, create anonymous object
 	if (proto) {
@@ -1065,7 +1069,12 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 				break;
 			}
 			case 'L': {
-				if (OBJ_FILE_TAG(line, "Long-desc:", length)) {
+				if (OBJ_FILE_TAG(line, "Last-fired:", length)) {
+					if (sscanf(line + length + 1, "%ld", &long_in[0])) {
+						VEH_LAST_FIRE_TIME(veh) = long_in[0];
+					}
+				}
+				else if (OBJ_FILE_TAG(line, "Long-desc:", length)) {
 					if (VEH_LONG_DESC(veh) && (!proto || VEH_LONG_DESC(veh) != VEH_LONG_DESC(proto))) {
 						free(VEH_LONG_DESC(veh));
 					}

@@ -21,6 +21,7 @@
 #include "db.h"
 #include "skills.h"
 #include "dg_scripts.h"
+#include "vnums.h"
 
 /**
 * Contents:
@@ -46,6 +47,7 @@ extern room_data *get_vehicle_interior(vehicle_data *veh);
 void harness_mob_to_vehicle(char_data *mob, vehicle_data *veh);
 extern int perform_move(char_data *ch, int dir, int need_specials_check, byte mode);
 void scale_item_to_level(obj_data *obj, int level);
+void trigger_distrust_from_hostile(char_data *ch, empire_data *emp);	// fight.c
 extern char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh);
 extern bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room);
 
@@ -82,6 +84,66 @@ void cancel_driving(char_data *ch) {
 	CAP(buf);
 	msg_to_vehicle(veh, FALSE, buf);
 }
+
+
+/**
+* Finds a valid target for a siege. This doesn't validate the target, just
+* determines what the player is aiming at. This sends its own error messages.
+*
+* @param char_data *ch The person trying to lay siege.
+* @param vehicle_data *veh The vehicle they're firing with.
+* @param char *arg The typed-in target arg.
+* @param room_data **room_targ A variable to bind the result to, if a room target.
+* @param int *dir A variable to bind the direction to, for a room target.
+* @param vehicle_data **veh_targ A variable to bind the result to, for a vehicle.
+* @return bool TRUE if any target was found, FALSE if not.
+*/
+bool find_siege_target_for_vehicle(char_data *ch, vehicle_data *veh, char *arg, room_data **room_targ, int *dir, vehicle_data **veh_targ) {
+	bool validate_siege_target_room(char_data *ch, vehicle_data *veh, room_data *to_room);
+	bool validate_siege_target_vehicle(char_data *ch, vehicle_data *veh, vehicle_data *target);
+	
+	vehicle_data *tar;
+	room_data *room;
+	int find_dir;
+	
+	// init
+	*room_targ = NULL;
+	*dir = NO_DIR;
+	*veh_targ = NULL;
+	
+	// direction targeting
+	if ((find_dir = parse_direction(ch, arg)) != NO_DIR) {
+		if (!is_flat_dir[find_dir] || !(room = dir_to_room(IN_ROOM(veh), find_dir)) || room == IN_ROOM(veh)) {
+			msg_to_char(ch, "You can't shoot that direction.\r\n");
+		}
+		else if (!validate_siege_target_room(ch, veh, room)) {
+			// sends own message
+		}
+		else {
+			// found!
+			*dir = find_dir;
+			*room_targ = room;
+		}
+	}
+
+	// vehicle targeting
+	else if ((tar = get_vehicle_in_target_room_vis(ch, IN_ROOM(veh), arg))) {
+		// validation
+		if (!validate_siege_target_vehicle(ch, veh, tar)) {
+			// sends own message
+		}
+		else {
+			// found!
+			*veh_targ = tar;
+		}
+	}
+	else {
+		msg_to_char(ch, "There's no %s to shoot at.\r\n", arg);
+	}
+	
+	return (room_targ || veh_targ);
+}
+
 
 /**
 * Attempt to move a vehicle. This may send an error message if it fails.
@@ -1279,6 +1341,117 @@ ACMD(do_drive) {
 				}
 			}
 		}
+	}
+}
+
+
+ACMD(do_fire) {
+	void besiege_room(room_data *to_room, int damage);
+	void besiege_vehicle(vehicle_data *veh, int damage, int siege_type);
+	
+	char veh_arg[MAX_INPUT_LENGTH], tar_arg[MAX_INPUT_LENGTH];
+	vehicle_data *veh, *veh_targ;
+	room_data *room_targ;
+	int dam, diff, dir;
+	char_data *vict;
+	
+	static struct resource_data *ammo = NULL;
+	
+	if (!ammo) {
+		ammo = create_resource_list(o_HEAVY_SHOT, 1, NOTHING);
+	}
+	
+	two_arguments(argument, veh_arg, tar_arg);
+	
+	// basic checks
+	if (GET_POS(ch) == POS_FIGHTING) {
+		// only POS_SITTING is required so people can fire while sitting on a vehicle
+		msg_to_char(ch, "You're too busy fighting!\r\n");
+	}
+	else if (!*veh_arg || !*tar_arg) {
+		msg_to_char(ch, "Usage: fire <vehicle> <direction | target vehicle>\r\n");
+	}
+	else if (!has_resources(ch, ammo, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), TRUE)) {
+		// sends own error message
+	}
+	
+	// find what to fire with
+	else if (!(veh = get_vehicle_in_room_vis(ch, veh_arg)) && (!(veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) || !isname(veh_arg, VEH_KEYWORDS(veh)))) {
+		msg_to_char(ch, "You don't see %s %s here to fire.\r\n", AN(arg), arg);
+	}
+	else if (!VEH_FLAGGED(veh, VEH_SIEGE_WEAPONS)) {
+		act("$V has no siege weapons.", FALSE, ch, NULL, veh, TO_CHAR);
+	}
+	else if (!can_use_vehicle(ch, veh, MEMBERS_AND_ALLIES)) {
+		msg_to_char(ch, "You don't have permission to fire that.\r\n");
+	}
+	else if (time(0) - VEH_LAST_FIRE_TIME(veh) < config_get_int("vehicle_siege_time")) {
+		diff = config_get_int("vehicle_siege_time") - (time(0) - VEH_LAST_FIRE_TIME(veh));
+		msg_to_char(ch, "You must wait another %d second%s to fire it.\r\n", diff, PLURAL(diff));
+	}
+	
+	// find a target
+	else if (!find_siege_target_for_vehicle(ch, veh, arg, &room_targ, &dir, &veh_targ)) {
+		msg_to_char(ch, "That isn't a valid target to fire at.\r\n");
+	}
+	
+	// seems ok
+	else {
+		if (SHOULD_APPEAR(ch)) {
+			appear(ch);
+		}
+		
+		extract_resources(ch, ammo, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED));
+		dam = VEH_SCALE_LEVEL(veh) * 8 / 100;	// 8 damage per 100 levels
+		dam = MAX(1, dam);	// minimum 1
+		
+		if (room_targ) {
+			sprintf(buf, "You fire $V %s!", dirs[get_direction_for_char(ch, dir)]);
+			act(buf, FALSE, ch, NULL, veh, TO_CHAR);
+			
+			// message to ch's room
+			LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
+				if (vict != ch && vict->desc) {
+					sprintf(buf, "$V fires %s!", dirs[get_direction_for_char(vict, dir)]);
+					act(buf, FALSE, vict, NULL, veh, TO_CHAR);
+				}
+			}
+			
+			// message to veh's room
+			if (IN_ROOM(veh) != IN_ROOM(ch)) {
+				LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(veh)), vict, next_in_room) {
+					if (vict != ch && vict->desc) {
+						sprintf(buf, "$V fires %s!", dirs[get_direction_for_char(vict, dir)]);
+						act(buf, FALSE, vict, NULL, veh, TO_CHAR);
+					}
+				}
+			}
+			
+			if (ROOM_OWNER(room_targ) && GET_LOYALTY(ch) != ROOM_OWNER(room_targ)) {
+				trigger_distrust_from_hostile(ch, ROOM_OWNER(room_targ));
+			}
+			
+			besiege_room(room_targ, dam);
+		}
+		else if (veh_targ) {
+			act("You fire $v at $V!", FALSE, ch, veh, veh_targ, TO_CHAR | ACT_VEHICLE_OBJ);
+			act("$n fires $v at $V!", FALSE, ch, veh, veh_targ, TO_ROOM | ACT_VEHICLE_OBJ);
+			
+			// message to veh's room
+			if (IN_ROOM(veh) != IN_ROOM(ch) && ROOM_PEOPLE(IN_ROOM(veh))) {
+				act("$v fires at $V!", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), veh, veh_targ, TO_CHAR | TO_ROOM | ACT_VEHICLE_OBJ);
+			}
+			
+			if (VEH_OWNER(veh_targ) && GET_LOYALTY(ch) != VEH_OWNER(veh_targ)) {
+				trigger_distrust_from_hostile(ch, VEH_OWNER(veh_targ));
+			}
+			
+			besiege_vehicle(veh_targ, dam, SIEGE_PHYSICAL);
+		}
+		
+		// delays
+		VEH_LAST_FIRE_TIME(veh) = time(0);
+		GET_WAIT_STATE(ch) = 5 RL_SEC;
 	}
 }
 

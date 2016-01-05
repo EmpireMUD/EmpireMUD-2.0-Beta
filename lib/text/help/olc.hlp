@@ -1199,9 +1199,10 @@ Usage:  .hitpoints <value>
 This number is how much damage a building can take from a catapult or siege
 ritual before it is destroyed.
 
-Catapults deal 8 damage per shot. Siege rituals deal Intelligence + 1 damage.
+Catapults deal 8 damage per 100 levels, per shot. Siege rituals deal
+Intelligence + 1 damage.
 
-See also: CATAPULT, OLC BUILDINGS, SIEGE RITUAL
+See also: FIRE, OLC BUILDINGS, SIEGE RITUAL
 #d
 "BEDIT ICON"
 
@@ -3909,7 +3910,7 @@ Available sector flags:
  MAP-BUILDING - This sector represents a building on the map; shown using building data
  INSIDE-ROOM - This sector represents an interior (designated) ROOM building
  LARGE-CITY-RADIUS - This tile counts as in-city much further away than normal
- OBSCURE-VISION - Players can't be seen here; also blocks catapults and towers
+ OBSCURE-VISION - Players can't be seen here; also blocks guard towers
  IS-TRENCH - Sector counts as a trench and fills with water
  * - unused
  ROUGH - This is rough, raised terrain, like a mountain
@@ -4558,14 +4559,14 @@ Usage:  .hitpoints <value>
 This number is how much damage a vehicle can take from a catapult or other
 sources, before it is destroyed.
 
-Catapults deal 8 damage per shot. Siege rituals deal Intelligence + 1 damage.
+Vehicles like catapults deal 8 damage per 100 levels, per shot. Siege rituals
+deal Intelligence + 1 damage.
 
 Any damage over 10% of a vehicle's health will also add "1 year" of required
 maintenance to the vehicle (or nails, if the vehicle requires no yearly work).
 The repair command can be used to restore hitpoints.
 
-See also: VEDIT YEARLY MAINTENANCE, CATAPULT, OLC VEHICLES, REPAIR,
-          SIEGE RITUAL
+See also: VEDIT YEARLY MAINTENANCE, FIRE, OLC VEHICLES, REPAIR, SIEGE RITUAL
 #d
 "VEDIT ICON"
 

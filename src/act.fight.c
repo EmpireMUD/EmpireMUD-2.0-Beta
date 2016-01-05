@@ -32,7 +32,6 @@
 extern const char *dirs[];
 
 // external functions
-void besiege_room(room_data *to_room, int damage);
 void death_log(char_data *ch, char_data *killer, int type);
 extern obj_data *die(char_data *ch, char_data *killer);
 extern int determine_best_scale_level(char_data *ch, bool check_group);	// mobact.c
@@ -84,88 +83,6 @@ ACMD(do_assist) {
 			act("You can't attack $N!", FALSE, ch, 0, opponent, TO_CHAR);
 		}
 	}
-}
-
-
-ACMD(do_catapult) {
-/*
-	static struct resource_data *rocks = NULL;
-	struct empire_political_data *emp_pol = NULL;
-	obj_data *catapult;
-	char_data *vict;
-	int dir;
-	empire_data *e;
-	room_data *to_room;
-	
-	if (!rocks) {
-		rocks = create_resource_list(o_ROCK, 12, NOTHING);
-	}
-
-	// Find a 'pult
-	for (catapult = ROOM_CONTENTS(IN_ROOM(ch)); catapult; catapult = catapult->next_content)
-		if (GET_OBJ_TYPE(catapult) == ITEM_CART && CART_CAN_FIRE(catapult))
-			break;
-
-	skip_spaces(&argument);
-
-	if (!catapult)
-		msg_to_char(ch, "You don't even have a catapult.\r\n");
-	else if (!*argument)
-		msg_to_char(ch, "Which direction would you like to shoot?\r\n");
-	else if (!has_resources(ch, rocks, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), TRUE)) {
-		// This line intentionally left blank
-	}
-	else if ((dir = parse_direction(ch, argument)) == NO_DIR)
-		msg_to_char(ch, "Which direction is that?\r\n");
-	else if (dir >= NUM_2D_DIRS || !(to_room = real_shift(IN_ROOM(ch), shift_dir[dir][0], shift_dir[dir][1])) || to_room == IN_ROOM(ch))
-		msg_to_char(ch, "You can't shoot that way.\r\n");
-	else if (GET_OBJ_VAL(catapult, VAL_CART_FIRING_DATA) > 1)
-		msg_to_char(ch, "You must wait before shooting the catapult again.\r\n");
-	else if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH))
-		msg_to_char(ch, "You can't shoot from here!\r\n");
-	else if (ROOM_IS_CLOSED(IN_ROOM(ch)))
-		msg_to_char(ch, "You can't shoot from indoors.\r\n");
-	else if (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_BARRIER))
-		msg_to_char(ch, "You can't shoot from this close to the barrier.\r\n");
-	else if (IS_CITY_CENTER(to_room)) {
-		msg_to_char(ch, "You can't shoot at a city center.\r\n");
-	}
-	else if (ROOM_SECT_FLAGGED(to_room, SECTF_START_LOCATION)) {
-		msg_to_char(ch, "You can't besiege a starting location.\r\n");
-	}
-	else {
-		if ((e = ROOM_OWNER(to_room)))
-			emp_pol = find_relation(GET_LOYALTY(ch), e);
-		if (e && (!emp_pol || !IS_SET(emp_pol->type, DIPL_WAR))) {
-			msg_to_char(ch, "You can't attack that acre!\r\n");
-			return;
-		}
-		extract_resources(ch, rocks, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED));
-		sprintf(buf, "You shoot $p %s!", dirs[get_direction_for_char(ch, dir)]);
-		act(buf, FALSE, ch, catapult, 0, TO_CHAR);
-		
-		for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict; vict = vict->next_in_room) {
-			if (vict != ch && vict->desc) {
-				sprintf(buf, "$n shoots $p %s!", dirs[get_direction_for_char(vict, dir)]);
-				act(buf, FALSE, ch, catapult, vict, TO_VICT);
-			}
-		}
-		
-		GET_OBJ_VAL(catapult, VAL_CART_FIRING_DATA) = 2;	// shot timer, 1 = ready to shoot
-		
-		if (SHOULD_APPEAR(ch)) {
-			appear(ch);
-		}
-
-		if (e && GET_LOYALTY(ch) != e) {
-			trigger_distrust_from_hostile(ch, e);
-		}
-		
-		// fire!
-		besiege_room(to_room, 8);
-		GET_WAIT_STATE(ch) = 5 RL_SEC;
-	}
-*/
 }
 
 

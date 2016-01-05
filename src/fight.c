@@ -1926,6 +1926,63 @@ bool can_fight(char_data *ch, char_data *victim) {
 }
 
 
+/**
+* Validate a room target for a siege command.
+*
+* @param char_data *ch The person firing (will receive errors).
+* @param vehicle_data *veh The vehicle firing.
+* @param room_data *to_room The target room.
+* @return bool TRUE if okay, FALSE if not.
+*/
+bool validate_siege_target_room(char_data *ch, vehicle_data *veh, room_data *to_room) {
+	if (ROOM_SECT_FLAGGED(IN_ROOM(veh), SECTF_ROUGH)) {
+		msg_to_char(ch, "You can't lay siege from rough terrain!\r\n");
+	}
+	else if (ROOM_IS_CLOSED(IN_ROOM(veh))) {
+		msg_to_char(ch, "You can't lay siege from indoors.\r\n");
+	}
+	else if (ROOM_BLD_FLAGGED(IN_ROOM(veh), BLD_BARRIER)) {
+		msg_to_char(ch, "You can't lay siege from so close to a barrier.\r\n");
+	}
+	else if (IS_CITY_CENTER(to_room)) {
+		msg_to_char(ch, "You can't besiege a city center.\r\n");
+	}
+	else if (ROOM_SECT_FLAGGED(to_room, SECTF_START_LOCATION)) {
+		msg_to_char(ch, "You can't besiege a starting location.\r\n");
+	}
+	else if (ROOM_OWNER(to_room) && !has_relationship(GET_LOYALTY(ch), ROOM_OWNER(to_room), DIPL_WAR)) {
+		msg_to_char(ch, "You can't besiege that direction because you're not at war with %s.\r\n", EMPIRE_NAME(ROOM_OWNER(to_room)));
+	}
+	else {
+		// looks ok!
+		return TRUE;
+	}
+	
+	return FALSE;
+}
+
+
+/**
+* Validate a vehicle target for a siege command.
+*
+* @param char_data *ch The person firing (will receive errors).
+* @param vehicle_data *veh The vehicle firing.
+* @param vehicle_data *target The target vehicle.
+* @return bool TRUE if okay, FALSE if not.
+*/
+bool validate_siege_target_vehicle(char_data *ch, vehicle_data *veh, vehicle_data *target) {
+	if (VEH_OWNER(target) && !has_relationship(GET_LOYALTY(ch), VEH_OWNER(target), DIPL_WAR)) {
+		msg_to_char(ch, "You can't besiege that because you're not at war with %s.\r\n", EMPIRE_NAME(VEH_OWNER(target)));
+	}
+	else {
+		// looks ok!
+		return TRUE;
+	}
+	
+	return FALSE;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// SETTERS / DOERS /////////////////////////////////////////////////////////
 

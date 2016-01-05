@@ -78,7 +78,6 @@ ACMD(do_boost);
 ACMD(do_build);
 ACMD(do_butcher);
 
-ACMD(do_catapult);
 ACMD(do_cede);
 ACMD(do_changepass);
 ACMD(do_chant);
@@ -169,6 +168,7 @@ ACMD(do_feed);
 ACMD(do_file);
 ACMD(do_fillin);
 ACMD(do_findmaintenance);
+ACMD(do_fire);
 ACMD(do_firstaid);
 ACMD(do_fish);
 ACMD(do_flee);
@@ -561,7 +561,6 @@ cpp_extern const struct command_info cmd_info[] = {
 	ABILITY_CMD( "butcher", POS_STANDING, do_butcher, NO_MIN, CTYPE_SKILL, ABIL_BUTCHER ),
 
 	STANDARD_CMD( "chop", POS_STANDING, do_chop, LVL_APPROVED, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
-	STANDARD_CMD( "catapult", POS_STANDING, do_catapult, LVL_APPROVED, NO_GRANTS, NO_SCMD, CTYPE_COMBAT, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "cd", POS_DEAD, do_cooldowns, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "cede", POS_DEAD, do_cede, LVL_APPROVED, CTYPE_EMPIRE ),
 	STANDARD_CMD( "chant", POS_STANDING, do_chant, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_SKILL, CMD_NO_ANIMALS, NO_ABIL ),
@@ -665,6 +664,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "file", POS_DEAD, do_file, LVL_START_IMM, CTYPE_IMMORTAL ),
 	STANDARD_CMD( "fillin", POS_STANDING, do_fillin, LVL_APPROVED, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "findmaintenance", POS_DEAD, do_findmaintenance, LVL_APPROVED, CTYPE_EMPIRE ),
+	STANDARD_CMD( "fire", POS_SITTING, do_fire, LVL_APPROVED, NO_GRANTS, NO_SCMD, CTYPE_COMBAT, CMD_NO_ANIMALS, NO_ABIL ),
 	ABILITY_CMD( "firstaid", POS_STANDING, do_firstaid, NO_MIN, CTYPE_SKILL, ABIL_FIRSTAID ),
 	STANDARD_CMD( "fish", POS_STANDING, do_fish, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_SKILL, CMD_NO_ANIMALS, ABIL_FISH ),
 	STANDARD_CMD( "flee", POS_FIGHTING, do_flee, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_COMBAT, CMD_NO_ABBREV, NO_ABIL ),

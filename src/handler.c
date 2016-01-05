@@ -6126,9 +6126,10 @@ void vehicle_to_room(vehicle_data *veh, room_data *room) {
 *
 * @param char_data *ch The person who's looking.
 * @param char *name The target argument.
+* @parma room_data *room Which room to look for a vehicle in.
 * @return vehicle_data* The vehicle found, or NULL.
 */
-vehicle_data *get_vehicle_in_room_vis(char_data *ch, char *name) {
+vehicle_data *get_vehicle_in_target_room_vis(char_data *ch, room_data *room, char *name) {
 	int found = 0, number;
 	char tmpname[MAX_INPUT_LENGTH];
 	char *tmp = tmpname;
@@ -6141,7 +6142,7 @@ vehicle_data *get_vehicle_in_room_vis(char_data *ch, char *name) {
 		return (NULL);
 	}
 	
-	LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), iter, next_in_room) {
+	LL_FOREACH2(ROOM_VEHICLES(room), iter, next_in_room) {
 		if (!isname(tmp, VEH_KEYWORDS(iter))) {
 			continue;
 		}

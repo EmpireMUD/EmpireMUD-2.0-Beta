@@ -432,9 +432,9 @@ If your empire's disposition is set to "Friendly", towers will only shoot at
 people you distrust or are at war with. If your disposition is "Distrustful",
 they will shoot at anyone you're not at peace (or better) with.
 
-Guard towers periodically shoot at any hostile player, as well as any animal
-that is leading a catapult. Advanced and Superior towers do increasingly larger
-amounts of damage.
+Guard towers periodically shoot at any hostile player, as well as hostile
+vehicles. Advanced and Superior towers do increasingly larger amounts of
+damage.
 
 Regular guard towers have a range of 2 tiles. All other guard towers have a
 range of 3 tiles. Towers can fire over walls and buildings, but won't fire

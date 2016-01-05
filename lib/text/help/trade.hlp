@@ -696,15 +696,13 @@ SIEGEWORKS "SIEGE WORKS"
 
 Siegeworks (Trade ability)
 
-Building:  (CC) carpenter  4 lumber, 2 nails, 12 bricks
-Command:  craft [number] <item>
+Craft:
+  catapult  48 lumber, 12 nails, 4 rope  (requires Carpenter building)
 
-With Siegeworks you can craft:
-  catapult*  48 lumber, 12 nails, 4 rope
+Forge:
+  heavy shot  12 iron ingots
 
-* Crafts marked with an asterisk require the Carpenter building.
-
-See also: WOODWORKING
+See also: CRAFT, FORGE
 #
 SKIN SKINS
 

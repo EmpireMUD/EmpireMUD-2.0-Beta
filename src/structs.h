@@ -1531,7 +1531,7 @@ typedef struct vehicle_data vehicle_data;
 #define SECTF_MAP_BUILDING  BIT(15)	// shows a building instead of sect tile
 #define SECTF_INSIDE  BIT(16)	// shows a room instead of sect tile; is interior of a building (off-map)
 #define SECTF_LARGE_CITY_RADIUS  BIT(17)	// counts as in-city much further than normal
-#define SECTF_OBSCURE_VISION  BIT(18)	// blocks catapult, mappc
+#define SECTF_OBSCURE_VISION  BIT(18)	// blocks mappc
 #define SECTF_IS_TRENCH  BIT(19)	// excavate-related
 	#define SECTF_UNUSED1  BIT(20)
 #define SECTF_ROUGH  BIT(21)	// hard terrain, requires ATR; other mountain-like properties
@@ -3528,6 +3528,7 @@ struct vehicle_data {
 	struct resource_data *needs_resources;	// resources until finished/maintained
 	room_data *interior_home_room;	// the vehicle's main room
 	int inside_rooms;	// how many rooms are inside
+	time_t last_fire_time;	// for vehicles with siege weapons
 	room_data *in_room;	// where it is
 	char_data *led_by;	// person leading it
 	char_data *sitting_on;	// person sitting on it

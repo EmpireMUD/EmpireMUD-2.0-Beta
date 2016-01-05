@@ -817,9 +817,8 @@ Usage:  load <ship> <item>
 This command allows you to load items onto a ship. You can only do this at the
 docks.
 
-You can load items from your inventory or from the room. Only the Galleon can
-hold items like carts and catapults (or any item that won't fit in your
-inventory).
+You can load items from your inventory or from the room. Only larger ships can
+hold animals or small vehicles.
 
 See also: UNLOAD, BOARD, SAIL, SHIPS
 #

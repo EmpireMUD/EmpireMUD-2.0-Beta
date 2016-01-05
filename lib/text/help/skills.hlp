@@ -22,18 +22,6 @@ Bathe is used to begin cleaning yourself in either a bath house or a river.
 You must bathe regularly to keep clean. If you bathe in a bath house you will
 get cleaner faster than if you were to bathe in a river.
 #
-CATAPULT 
-
-Usage:  catapult <direction> 
-
-Catapult is used to launch your catapult in the direction that you want. You
-must have 12 rocks and a catapult to use this. It can only shoot at an
-adjacent room.
-
-Example:  
-
-  > catapult north 
-#
 CHIP
 
 Usage:  chip <item>
