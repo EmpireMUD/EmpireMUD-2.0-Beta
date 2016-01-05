@@ -142,7 +142,7 @@ bool find_siege_target_for_vehicle(char_data *ch, vehicle_data *veh, char *arg, 
 		msg_to_char(ch, "There's no %s to shoot at.\r\n", arg);
 	}
 	
-	return (room_targ || veh_targ);
+	return (*room_targ || *veh_targ);
 }
 
 

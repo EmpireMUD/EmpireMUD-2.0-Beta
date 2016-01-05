@@ -1607,7 +1607,7 @@ RITUAL_SETUP_FUNC(start_siege_ritual) {
 	if (!*argument) {
 		msg_to_char(ch, "Besiege which direction or vehicle?\r\n");
 	}
-	else if (!find_siege_target_for_vehicle(ch, NULL, arg, &room_targ, &dir, &veh_targ)) {
+	else if (!find_siege_target_for_vehicle(ch, NULL, argument, &room_targ, &dir, &veh_targ)) {
 		// sends own messages
 	}
 	else {
