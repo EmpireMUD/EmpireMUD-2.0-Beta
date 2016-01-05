@@ -195,13 +195,13 @@ struct ritual_data_type {
 	{ "siege", 30, ABIL_SIEGE_RITUAL, 0,
 		start_siege_ritual,
 		perform_siege_ritual,
-		{{ "You summon the full force of your magic...", "$n begins drawing mana to $mself..." },
+		{{ "You draw mana to yourself...", "$n begins drawing mana to $mself..." },
 		NO_MESSAGE,
-		{ "You shoot a fireball at the building...", "$n shoots a fireball at the building..." },
+		{ "You concentrate your power into a ball of fire...", "$n concentrates $s power into a fireball..." },
 		NO_MESSAGE,
-		{ "You draw more mana...", "$n draws more mana..." },
+		{ "You  summon the full force of your magic...", "$n draws more mana..." },
 		NO_MESSAGE,
-		{ "You shoot a fireball at the building...", "$n shoots a fireball at the building..." },
+		{ "You twist and grow the ball of fire in your hands...", "$n twists and grows the ball of fire in $s hands..." },
 		NO_MESSAGE,
 		MESSAGE_END
 	}},
@@ -1672,8 +1672,8 @@ RITUAL_FINISH_FUNC(perform_siege_ritual) {
 		
 		dam = 1 + GET_INTELLIGENCE(ch);
 		
-		msg_to_char(ch, "You fire one last powerful fireball...\r\n");
-		act("$n fires one last powerful fireball...", FALSE, ch, NULL, NULL, TO_ROOM);
+		msg_to_char(ch, "You shoot one powerful fireball...\r\n");
+		act("$n shoots one powerful fireball...", FALSE, ch, NULL, NULL, TO_ROOM);
 		
 		if (room_targ) {
 			secttype = SECT(room_targ);

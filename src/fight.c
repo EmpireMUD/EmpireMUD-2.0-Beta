@@ -1952,6 +1952,9 @@ bool validate_siege_target_room(char_data *ch, vehicle_data *veh, room_data *to_
 	else if (ROOM_SECT_FLAGGED(to_room, SECTF_START_LOCATION)) {
 		msg_to_char(ch, "You can't besiege a starting location.\r\n");
 	}
+	else if (ROOM_OWNER(to_room) && ROOM_OWNER(to_room) == GET_LOYALTY(ch)) {
+		msg_to_char(ch, "You can't besiege your own property. Abandon it first.\r\n");
+	}
 	else if (ROOM_OWNER(to_room) && !has_relationship(GET_LOYALTY(ch), ROOM_OWNER(to_room), DIPL_WAR)) {
 		msg_to_char(ch, "You can't besiege that direction because you're not at war with %s.\r\n", EMPIRE_NAME(ROOM_OWNER(to_room)));
 	}
@@ -1973,7 +1976,10 @@ bool validate_siege_target_room(char_data *ch, vehicle_data *veh, room_data *to_
 * @return bool TRUE if okay, FALSE if not.
 */
 bool validate_siege_target_vehicle(char_data *ch, vehicle_data *veh, vehicle_data *target) {
-	if (VEH_OWNER(target) && !has_relationship(GET_LOYALTY(ch), VEH_OWNER(target), DIPL_WAR)) {
+	if (VEH_OWNER(target) && VEH_OWNER(target) == GET_LOYALTY(ch)) {
+		msg_to_char(ch, "You can't besiege your own property. Abandon it first.\r\n");
+	}
+	else if (VEH_OWNER(target) && !has_relationship(GET_LOYALTY(ch), VEH_OWNER(target), DIPL_WAR)) {
 		msg_to_char(ch, "You can't besiege that because you're not at war with %s.\r\n", EMPIRE_NAME(VEH_OWNER(target)));
 	}
 	else {
