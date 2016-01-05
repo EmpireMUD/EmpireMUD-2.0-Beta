@@ -1392,7 +1392,7 @@ ACMD(do_fire) {
 	}
 	
 	// find a target
-	else if (!find_siege_target_for_vehicle(ch, veh, arg, &room_targ, &dir, &veh_targ)) {
+	else if (!find_siege_target_for_vehicle(ch, veh, tar_arg, &room_targ, &dir, &veh_targ)) {
 		// sends own messages
 	}
 	
