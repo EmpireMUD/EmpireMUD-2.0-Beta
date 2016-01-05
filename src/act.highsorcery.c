@@ -199,7 +199,7 @@ struct ritual_data_type {
 		NO_MESSAGE,
 		{ "You concentrate your power into a ball of fire...", "$n concentrates $s power into a fireball..." },
 		NO_MESSAGE,
-		{ "You  summon the full force of your magic...", "$n draws more mana..." },
+		{ "You summon the full force of your magic...", "$n draws more mana..." },
 		NO_MESSAGE,
 		{ "You twist and grow the ball of fire in your hands...", "$n twists and grows the ball of fire in $s hands..." },
 		NO_MESSAGE,
