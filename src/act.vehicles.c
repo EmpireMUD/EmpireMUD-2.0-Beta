@@ -91,7 +91,7 @@ void cancel_driving(char_data *ch) {
 * determines what the player is aiming at. This sends its own error messages.
 *
 * @param char_data *ch The person trying to lay siege.
-* @param vehicle_data *veh The vehicle they're firing with.
+* @param vehicle_data *veh The vehicle they're firing with. (Optional, it could actually be ch.)
 * @param char *arg The typed-in target arg.
 * @param room_data **room_targ A variable to bind the result to, if a room target.
 * @param int *dir A variable to bind the direction to, for a room target.
@@ -103,6 +103,7 @@ bool find_siege_target_for_vehicle(char_data *ch, vehicle_data *veh, char *arg, 
 	bool validate_siege_target_vehicle(char_data *ch, vehicle_data *veh, vehicle_data *target);
 	
 	vehicle_data *tar;
+	room_data *from_room = veh ? IN_ROOM(veh) : IN_ROOM(ch);
 	room_data *room;
 	int find_dir;
 	
@@ -113,7 +114,7 @@ bool find_siege_target_for_vehicle(char_data *ch, vehicle_data *veh, char *arg, 
 	
 	// direction targeting
 	if ((find_dir = parse_direction(ch, arg)) != NO_DIR) {
-		if (!is_flat_dir[find_dir] || !(room = dir_to_room(IN_ROOM(veh), find_dir)) || room == IN_ROOM(veh)) {
+		if (!is_flat_dir[find_dir] || !(room = dir_to_room(from_room, find_dir)) || room == from_room) {
 			msg_to_char(ch, "You can't shoot that direction.\r\n");
 		}
 		else if (!validate_siege_target_room(ch, veh, room)) {
@@ -127,7 +128,7 @@ bool find_siege_target_for_vehicle(char_data *ch, vehicle_data *veh, char *arg, 
 	}
 
 	// vehicle targeting
-	else if ((tar = get_vehicle_in_target_room_vis(ch, IN_ROOM(veh), arg))) {
+	else if ((tar = get_vehicle_in_target_room_vis(ch, from_room, arg))) {
 		// validation
 		if (!validate_siege_target_vehicle(ch, veh, tar)) {
 			// sends own message
@@ -1392,7 +1393,7 @@ ACMD(do_fire) {
 	
 	// find a target
 	else if (!find_siege_target_for_vehicle(ch, veh, arg, &room_targ, &dir, &veh_targ)) {
-		msg_to_char(ch, "That isn't a valid target to fire at.\r\n");
+		// sends own messages
 	}
 	
 	// seems ok

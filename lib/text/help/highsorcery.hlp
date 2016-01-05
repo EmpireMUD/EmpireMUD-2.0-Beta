@@ -347,10 +347,9 @@ Usage:  ritual siege <direction>
 Cost:  30 mana
 
 This powerful ability is rivaled only by the catapult in its ability to take
-down buildings. Use it to destroy your enemies!
+down buildings and vehicles. Use it to destroy your enemies!
 
-Like the catapult, you must be adjacent to your target and it targets only
-buildings.
+You can only fire at adjacent buildings, or at vehicles in the room with you.
 
 See also: RITUAL
 #

@@ -1598,95 +1598,105 @@ RITUAL_FINISH_FUNC(perform_ritual_of_detection) {
 
 
 RITUAL_SETUP_FUNC(start_siege_ritual) {
-	struct empire_political_data *emp_pol = NULL;
-	room_data *to_room;
-	empire_data *enemy;
+	extern bool find_siege_target_for_vehicle(char_data *ch, vehicle_data *veh, char *arg, room_data **room_targ, int *dir, vehicle_data **veh_targ);
+	
+	vehicle_data *veh_targ;
+	room_data *room_targ;
 	int dir;
 	
 	if (!*argument) {
-		msg_to_char(ch, "Besiege which direction?\r\n");
-		return FALSE;
+		msg_to_char(ch, "Besiege which direction or vehicle?\r\n");
 	}
-	if ((dir = parse_direction(ch, argument)) == NO_DIR) {
-		msg_to_char(ch, "Which direction is that?\r\n");
-		return FALSE;
+	else if (!find_siege_target_for_vehicle(ch, NULL, arg, &room_targ, &dir, &veh_targ)) {
+		// sends own messages
 	}
-	if (ROOM_IS_CLOSED(IN_ROOM(ch))) {
-		msg_to_char(ch, "You must be outdoors to do this.\r\n");
-		return FALSE;
-	}
-	
-	to_room = real_shift(IN_ROOM(ch), shift_dir[dir][0], shift_dir[dir][1]);
-	if (dir >= NUM_2D_DIRS || !to_room || to_room == IN_ROOM(ch)) {
-		msg_to_char(ch, "You can't besiege that direction.\r\n");
-		return FALSE;
-	}
-	if (!ROOM_IS_CLOSED(to_room) && !IS_MAP_BUILDING(to_room)) {
-		msg_to_char(ch, "The Siege Ritual can only be used to destroy completed buildings.\r\n");
-		return FALSE;
-	}
-	if (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_BARRIER)) {
-		msg_to_char(ch, "You can't perform the ritual this close to the barrier.\r\n");
-		return FALSE;
-	}
-	if (IS_CITY_CENTER(to_room)) {
-		msg_to_char(ch, "You can't besiege at a city center.\r\n");
-		return FALSE;
-	}
-	if (ROOM_SECT_FLAGGED(to_room, SECTF_START_LOCATION)) {
-		msg_to_char(ch, "You can't besiege a starting location.\r\n");
-		return FALSE;
-	}
-	
-	if ((enemy = ROOM_OWNER(to_room))) {
-		emp_pol = find_relation(GET_LOYALTY(ch), enemy);
-	}
-	if (enemy && (!emp_pol || !IS_SET(emp_pol->type, DIPL_WAR))) {
-		msg_to_char(ch, "You can't besiege that tile!\r\n");
-		return FALSE;
-	}
+	else {
+		// ready:
 
-	// ready:
-
-	// trigger hostile immediately so they are attackable
-	if (enemy && GET_LOYALTY(ch) != enemy) {
-		trigger_distrust_from_hostile(ch, enemy);
+		// trigger hostile immediately so they are attackable
+		if (room_targ && ROOM_OWNER(room_targ) && ROOM_OWNER(room_targ) != GET_LOYALTY(ch)) {
+			trigger_distrust_from_hostile(ch, ROOM_OWNER(room_targ));
+		}
+		if (veh_targ && VEH_OWNER(veh_targ) && VEH_OWNER(veh_targ) != GET_LOYALTY(ch)) {
+			trigger_distrust_from_hostile(ch, VEH_OWNER(veh_targ));
+		}
+	
+		start_ritual(ch, ritual);
+		// action 0 is ritual #
+		GET_ACTION_VNUM(ch, 1) = room_targ ? GET_ROOM_VNUM(room_targ) : NOTHING;
+		GET_ACTION_VNUM(ch, 2) = veh_targ ? GET_ID(veh_targ) : NOTHING;
+		return TRUE;
 	}
 	
-	start_ritual(ch, ritual);
-	GET_ACTION_VNUM(ch, 1) = GET_ROOM_VNUM(to_room);	// action 0 is ritual #
-	return TRUE;
+	return FALSE;
 }
 
 
 RITUAL_FINISH_FUNC(perform_siege_ritual) {
 	void besiege_room(room_data *to_room, int damage);
+	void besiege_vehicle(vehicle_data *veh, int damage, int siege_type);
+	extern vehicle_data *find_vehicle(int n);
+	extern bool validate_siege_target_room(char_data *ch, vehicle_data *veh, room_data *to_room);
+	extern bool validate_siege_target_vehicle(char_data *ch, vehicle_data *veh, vehicle_data *target);
 	
+	vehicle_data *veh_targ = NULL;
+	room_data *room_targ = NULL;
 	sector_data *secttype;
-	room_data *to_room = real_room(GET_ACTION_VNUM(ch, 1));
+	int dam;
 	
-	if (!to_room) {
+	// get the target back
+	if (GET_ACTION_VNUM(ch, 1) != NOTHING) {
+		room_targ = real_room(GET_ACTION_VNUM(ch, 1));
+	}
+	else if (GET_ACTION_VNUM(ch, 2) != NOTHING) {
+		veh_targ = find_vehicle(GET_ACTION_VNUM(ch, 2));
+		if (veh_targ && IN_ROOM(veh_targ) != IN_ROOM(ch)) {
+			// must not really be valid
+			veh_targ = NULL;
+		}
+	}
+	
+	if (!room_targ && !veh_targ) {
 		msg_to_char(ch, "You don't seem to have a valid target, and the ritual fails.\r\n");
+	}
+	else if (room_targ && !validate_siege_target_room(ch, NULL, room_targ)) {
+		// sends own message
+	}
+	else if (veh_targ && !validate_siege_target_vehicle(ch, NULL, veh_targ)) {
+		// sends own message
 	}
 	else {
 		if (SHOULD_APPEAR(ch)) {
 			appear(ch);
 		}
 		
-		secttype = SECT(to_room);
+		dam = 1 + GET_INTELLIGENCE(ch);
+		
 		msg_to_char(ch, "You fire one last powerful fireball...\r\n");
 		act("$n fires one last powerful fireball...", FALSE, ch, NULL, NULL, TO_ROOM);
-
-		if (ROOM_OWNER(to_room) && GET_LOYALTY(ch) != ROOM_OWNER(to_room)) {
-			trigger_distrust_from_hostile(ch, ROOM_OWNER(to_room));
+		
+		if (room_targ) {
+			secttype = SECT(room_targ);
+			
+			if (ROOM_OWNER(room_targ) && GET_LOYALTY(ch) != ROOM_OWNER(room_targ)) {
+				trigger_distrust_from_hostile(ch, ROOM_OWNER(room_targ));
+			}
+			
+			besiege_room(room_targ, dam);
+			
+			if (SECT(room_targ) != secttype) {
+				msg_to_char(ch, "It is destroyed!\r\n");
+				act("$n's target is destroyed!", FALSE, ch, NULL, NULL, TO_ROOM);
+			}
 		}
-		besiege_room(to_room, 1 + GET_INTELLIGENCE(ch));
-
-		if (SECT(to_room) != secttype) {
-			msg_to_char(ch, "It is destroyed!\r\n");
-			act("$n's target is destroyed!", FALSE, ch, NULL, NULL, TO_ROOM);
+		else if (veh_targ) {
+			if (VEH_OWNER(veh_targ) && GET_LOYALTY(ch) != VEH_OWNER(veh_targ)) {
+				trigger_distrust_from_hostile(ch, VEH_OWNER(veh_targ));
+			}
+			
+			besiege_vehicle(veh_targ, dam, SIEGE_MAGICAL);
 		}
-
+		
 		gain_ability_exp(ch, ABIL_SIEGE_RITUAL, 33.4);
 	}
 }

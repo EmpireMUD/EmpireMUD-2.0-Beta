@@ -1930,18 +1930,20 @@ bool can_fight(char_data *ch, char_data *victim) {
 * Validate a room target for a siege command.
 *
 * @param char_data *ch The person firing (will receive errors).
-* @param vehicle_data *veh The vehicle firing.
+* @param vehicle_data *veh The vehicle firing. (OPTIONAL: Could just be ch firing.)
 * @param room_data *to_room The target room.
 * @return bool TRUE if okay, FALSE if not.
 */
 bool validate_siege_target_room(char_data *ch, vehicle_data *veh, room_data *to_room) {
-	if (ROOM_SECT_FLAGGED(IN_ROOM(veh), SECTF_ROUGH)) {
+	room_data *from_room = veh ? IN_ROOM(veh) : IN_ROOM(ch);
+	
+	if (ROOM_SECT_FLAGGED(from_room, SECTF_ROUGH)) {
 		msg_to_char(ch, "You can't lay siege from rough terrain!\r\n");
 	}
-	else if (ROOM_IS_CLOSED(IN_ROOM(veh))) {
+	else if (ROOM_IS_CLOSED(from_room)) {
 		msg_to_char(ch, "You can't lay siege from indoors.\r\n");
 	}
-	else if (ROOM_BLD_FLAGGED(IN_ROOM(veh), BLD_BARRIER)) {
+	else if (ROOM_BLD_FLAGGED(from_room, BLD_BARRIER)) {
 		msg_to_char(ch, "You can't lay siege from so close to a barrier.\r\n");
 	}
 	else if (IS_CITY_CENTER(to_room)) {
@@ -1966,7 +1968,7 @@ bool validate_siege_target_room(char_data *ch, vehicle_data *veh, room_data *to_
 * Validate a vehicle target for a siege command.
 *
 * @param char_data *ch The person firing (will receive errors).
-* @param vehicle_data *veh The vehicle firing.
+* @param vehicle_data *veh The vehicle firing. (OPTIONAL: could just be ch firing.)
 * @param vehicle_data *target The target vehicle.
 * @return bool TRUE if okay, FALSE if not.
 */
