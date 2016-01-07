@@ -3317,6 +3317,7 @@ struct empire_data {
 	int scores[NUM_SCORES];	// empire score in each category
 	int sort_value;	// for score ties
 	bool storage_loaded;	// record whether or not storage has been loaded, to prevent saving over it
+	int top_shipping_id;	// shipping system quick id for the empire
 	
 	UT_hash_handle hh;	// empire_table hash handle
 };
@@ -3529,6 +3530,7 @@ struct vehicle_data {
 	room_data *interior_home_room;	// the vehicle's main room
 	int inside_rooms;	// how many rooms are inside
 	time_t last_fire_time;	// for vehicles with siege weapons
+	int shipping_id;	// id for the shipping system for the owner
 	room_data *in_room;	// where it is
 	char_data *led_by;	// person leading it
 	char_data *sitting_on;	// person sitting on it

@@ -481,6 +481,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define EMPIRE_UNIQUE_STORAGE(emp)  ((emp)->unique_store)
 #define EMPIRE_WORKFORCE_TRACKER(emp)  ((emp)->ewt_tracker)
 #define EMPIRE_ISLANDS(emp)  ((emp)->islands)
+#define EMPIRE_TOP_SHIPPING_ID(emp)  ((emp)->top_shipping_id)
 
 // helpers
 #define EMPIRE_HAS_TECH(emp, num)  (EMPIRE_TECH((emp), (num)) > 0)
@@ -1110,6 +1111,7 @@ void SET_ISLAND_ID(room_data *room, int island);	// formerly a #define and a roo
 #define VEH_NEEDS_RESOURCES(veh)  ((veh)->needs_resources)
 #define VEH_OWNER(veh)  ((veh)->owner)
 #define VEH_SCALE_LEVEL(veh)  ((veh)->scale_level)
+#define VEH_SHIPPING_ID(veh)  ((veh)->shipping_id)
 #define VEH_SHORT_DESC(veh)  ((veh)->short_desc)
 #define VEH_SITTING_ON(veh)  ((veh)->sitting_on)
 #define VEH_VNUM(veh)  ((veh)->vnum)

@@ -840,6 +840,9 @@ void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
 	if (VEH_LAST_FIRE_TIME(veh)) {
 		fprintf(fl, "Last-fired: %ld\n", VEH_LAST_FIRE_TIME(veh));
 	}
+	if (VEH_SHIPPING_ID(veh) >= 0) {
+		fprintf(fl, "Shipping-id: %d\n", VEH_SHIPPING_ID(veh));
+	}
 	LL_FOREACH(VEH_ANIMALS(veh), vam) {
 		fprintf(fl, "Animal: %d %d %s %d\n", vam->mob, vam->scale_level, bitv_to_alpha(vam->flags), vam->empire);
 	}
@@ -1121,6 +1124,11 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 						VEH_SCALE_LEVEL(veh) = i_in[0];
 					}
 				}
+				else if (OBJ_FILE_TAG(line, "Shipping-id:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+						VEH_SHIPPING_ID(veh) = i_in[0];
+					}
+				}
 				else if (OBJ_FILE_TAG(line, "Short-desc:", length)) {
 					if (VEH_SHORT_DESC(veh) && (!proto || VEH_SHORT_DESC(veh) != VEH_SHORT_DESC(proto))) {
 						free(VEH_SHORT_DESC(veh));
@@ -1208,6 +1216,7 @@ void clear_vehicle(vehicle_data *veh) {
 	memset((char *) veh, 0, sizeof(vehicle_data));
 	
 	VEH_VNUM(veh) = NOTHING;
+	VEH_SHIPPING_ID(veh) = -1;
 	
 	veh->attributes = attr;	// stored from earlier
 	if (veh->attributes) {

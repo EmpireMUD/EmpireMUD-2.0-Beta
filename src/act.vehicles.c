@@ -1352,6 +1352,7 @@ ACMD(do_fire) {
 	
 	char veh_arg[MAX_INPUT_LENGTH], tar_arg[MAX_INPUT_LENGTH];
 	vehicle_data *veh, *veh_targ;
+	sector_data *secttype;
 	room_data *room_targ;
 	int dam, diff, dir;
 	char_data *vict;
@@ -1432,7 +1433,12 @@ ACMD(do_fire) {
 				trigger_distrust_from_hostile(ch, ROOM_OWNER(room_targ));
 			}
 			
+			secttype = SECT(room_targ);
 			besiege_room(room_targ, dam);
+			
+			if (SECT(room_targ) != secttype) {
+				msg_to_char(ch, "It is destroyed!\r\n");
+			}
 		}
 		else if (veh_targ) {
 			act("You fire $v at $V!", FALSE, ch, veh, veh_targ, TO_CHAR | ACT_VEHICLE_OBJ);

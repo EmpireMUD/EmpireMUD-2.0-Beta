@@ -5902,6 +5902,7 @@ int generic_find(char *arg, bitvector_t bitvector, char_data *ch, char_data **ta
 
 	*tar_ch = NULL;
 	*tar_obj = NULL;
+	*tar_veh = NULL;
 
 	one_argument(arg, name);
 

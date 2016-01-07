@@ -2398,6 +2398,7 @@ void do_claim_vehicle(char_data *ch, vehicle_data *veh) {
 		send_config_msg(ch, "ok_string");
 		act("$n claims $V.", FALSE, ch, NULL, veh, TO_ROOM);
 		VEH_OWNER(veh) = emp;
+		VEH_SHIPPING_ID(veh) = -1;
 		
 		if (VEH_INTERIOR_HOME_ROOM(veh)) {
 			if (ROOM_OWNER(VEH_INTERIOR_HOME_ROOM(veh))) {
