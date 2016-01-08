@@ -625,7 +625,9 @@ void save_olc_mobile(descriptor_data *desc) {
 			if (SCRIPT(mob_iter)) {
 				extract_script(mob_iter, MOB_TRIGGER);
 			}
-			free_proto_script(mob_iter, MOB_TRIGGER);
+			if (mob_iter->proto_script && mob_iter->proto_script != proto->proto_script) {
+				free_proto_script(mob_iter, MOB_TRIGGER);
+			}
 			
 			// attach new scripts
 			copy_proto_script(mob, mob_iter, MOB_TRIGGER);

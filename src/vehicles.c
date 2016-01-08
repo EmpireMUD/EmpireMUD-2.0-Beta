@@ -764,6 +764,9 @@ vehicle_data *read_vehicle(any_vnum vnum, bool with_triggers) {
 		copy_proto_script(proto, veh, VEH_TRIGGER);
 		assign_triggers(veh, VEH_TRIGGER);
 	}
+	else {
+		veh->proto_script = NULL;
+	}
 	*/
 
 	return veh;

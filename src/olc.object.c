@@ -911,7 +911,9 @@ void update_live_obj_from_olc(obj_data *to_update, obj_data *old_proto, obj_data
 	if (SCRIPT(to_update)) {
 		extract_script(to_update, OBJ_TRIGGER);
 	}
-	free_proto_script(to_update, OBJ_TRIGGER);
+	if (to_update->proto_script && to_update->proto_script != old_proto->proto_script) {
+		free_proto_script(to_update, OBJ_TRIGGER);
+	}
 	
 	// re-attach scripts
 	copy_proto_script(new_proto, to_update, OBJ_TRIGGER);

@@ -1622,6 +1622,9 @@ obj_data *read_object(obj_vnum nr, bool with_triggers) {
 		copy_proto_script(proto, obj, OBJ_TRIGGER);
 		assign_triggers(obj, OBJ_TRIGGER);
 	}
+	else {
+		obj->proto_script = NULL;
+	}
 
 	return (obj);
 }
