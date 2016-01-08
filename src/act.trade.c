@@ -861,6 +861,7 @@ ACMD(do_gen_augment) {
 	obj_data *obj;
 	
 	augment_arg = one_argument(argument, target_arg);
+	skip_spaces(&augment_arg);
 	
 	if (IS_NPC(ch)) {
 		// TODO should we allow this for scripting?
