@@ -1537,6 +1537,9 @@ char_data *read_mobile(mob_vnum nr, bool with_triggers) {
 		copy_proto_script(proto, mob, MOB_TRIGGER);
 		assign_triggers(mob, MOB_TRIGGER);
 	}
+	else {
+		mob->proto_script = NULL;
+	}
 
 	return (mob);
 }
