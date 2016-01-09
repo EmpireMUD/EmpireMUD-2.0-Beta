@@ -1915,10 +1915,8 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 		fprintf(fl, "Empire: %d\n", EMPIRE_VNUM(GET_LOYALTY(ch)));
 		fprintf(fl, "Rank: %d\n", GET_RANK(ch));
 	}
-	else {
-		if (GET_PLEDGE(ch) != NOTHING) {
-			fprintf(fl, "Pledge Empire: %d\n", GET_PLEDGE(ch));
-		}
+	if (GET_PLEDGE(ch) != NOTHING) {
+		fprintf(fl, "Pledge Empire: %d\n", GET_PLEDGE(ch));
 	}
 	
 	// Last login info
