@@ -1219,6 +1219,7 @@ void upgrade_city(char_data *ch, char *argument) {
 struct efind_group {
 	room_data *location;	// where
 	obj_data *obj;	// 1st object for this set (used for names, etc)
+	vehicle_data *veh;	// 1st vehicle for this set
 	int count;	// how many found
 	bool stackable;	// whether or not this can stack
 	
@@ -1226,16 +1227,39 @@ struct efind_group {
 };
 
 
-// simple increment/add function for managing efind groups
-void add_obj_to_efind(struct efind_group **list, obj_data *obj, room_data *location) {
+/**
+* simple increment/add function for managing efind groups -- supports obj or
+* vehicle (not both in 1 call).
+*
+* @param struct efind_group **list The list to add to/update.
+* @param obj_data *obj The object to add (optional; use NULL if none).
+* @param vehicle_data *veh The vehicle to add (optional; use NULL if none).
+* @param room_data *location Where it is.
+*/
+void add_obj_to_efind(struct efind_group **list, obj_data *obj, vehicle_data *veh, room_data *location) {
 	struct efind_group *eg, *temp;
 	bool found = FALSE;
 	
-	if (OBJ_CAN_STACK(obj)) {
-		for (eg = *list; !found && eg; eg = eg->next) {
+	// need 1 or the other
+	if (!obj && !veh) {
+		return;
+	}
+	
+	if (obj && OBJ_CAN_STACK(obj)) {
+		LL_FOREACH(*list, eg) {
 			if (eg->location == location && eg->stackable && GET_OBJ_VNUM(eg->obj) == GET_OBJ_VNUM(obj)) {
 				eg->count += 1;
 				found = TRUE;
+				break;
+			}
+		}
+	}
+	if (veh) {
+		LL_FOREACH(*list, eg) {
+			if (eg->veh && VEH_VNUM(eg->veh) == VEH_VNUM(veh) && VEH_SHORT_DESC(eg->veh) == VEH_SHORT_DESC(veh)) {
+				eg->count += 1;
+				found = TRUE;
+				break;
 			}
 		}
 	}
@@ -1245,8 +1269,9 @@ void add_obj_to_efind(struct efind_group **list, obj_data *obj, room_data *locat
 		
 		eg->location = location;
 		eg->obj = obj;
+		eg->veh = veh;
 		eg->count = 1;
-		eg->stackable = OBJ_CAN_STACK(obj);
+		eg->stackable = obj ? OBJ_CAN_STACK(obj) : FALSE;	// not used for vehicle
 		eg->next = NULL;
 		
 		if (*list) {
@@ -2836,6 +2861,8 @@ ACMD(do_diplomacy) {
 
 
 ACMD(do_efind) {
+	extern char *get_vehicle_short_desc(vehicle_data *veh, char_data *to);
+	
 	char buf[MAX_STRING_LENGTH*2];
 	obj_data *obj;
 	empire_data *emp;
@@ -2843,6 +2870,7 @@ ACMD(do_efind) {
 	bool all = FALSE;
 	room_data *last_rm, *iter, *next_iter;
 	struct efind_group *eg, *next_eg, *list = NULL;
+	vehicle_data *veh;
 	size_t size;
 	
 	one_argument(argument, arg);
@@ -2868,11 +2896,24 @@ ACMD(do_efind) {
 			if (ROOM_OWNER(iter) == emp) {			
 				for (obj = ROOM_CONTENTS(iter); obj; obj = obj->next_content) {
 					if ((all && CAN_WEAR(obj, ITEM_WEAR_TAKE)) || (!all && isname(arg, obj->name))) {
-						add_obj_to_efind(&list, obj, iter);
+						add_obj_to_efind(&list, obj, NULL, iter);
 						++total;
 					}
 				}
 			}
+		}
+		
+		// next, vehicles
+		LL_FOREACH(vehicle_list, veh) {
+			if (VEH_OWNER(veh) != emp || !IN_ROOM(veh)) {
+				continue;
+			}
+			if (!all && !isname(arg, VEH_KEYWORDS(veh))) {
+				continue;
+			}
+			
+			add_obj_to_efind(&list, NULL, veh, IN_ROOM(veh));
+			++total;
 		}
 
 		if (total > 0) {
@@ -2917,7 +2958,12 @@ ACMD(do_efind) {
 					size += snprintf(buf + size, sizeof(buf) - size, "%dx ", eg->count);
 				}
 				
-				size += snprintf(buf + size, sizeof(buf) - size, "%s", get_obj_desc(eg->obj, ch, OBJ_DESC_SHORT));
+				if (eg->obj) {
+					size += snprintf(buf + size, sizeof(buf) - size, "%s", get_obj_desc(eg->obj, ch, OBJ_DESC_SHORT));
+				}
+				else if (eg->veh) {
+					size += snprintf(buf + size, sizeof(buf) - size, "%s", get_vehicle_short_desc(eg->veh, ch));
+				}
 				free(eg);
 			}
 			// all free! free!

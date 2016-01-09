@@ -407,6 +407,9 @@ The efind command allows you to find items that have been left around your
 empire. Efind shows you the coordinates and the name of the room, but you may
 not find it very useful without the Navigation ability.
 
+Efind will also find vehicles belonging to your empire, even if they aren't
+in your own territory.
+
 You can use "efind all" to find all items on the ground in your empire. The
 "all" option will skip items that you can't pick up (boards, carts).
 
