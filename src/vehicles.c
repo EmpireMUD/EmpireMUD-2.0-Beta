@@ -1910,6 +1910,8 @@ vehicle_data *setup_olc_vehicle(vehicle_data *input) {
 * @param vehicle_data *veh The vehicle to display.
 */
 void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
+	extern char *get_room_name(room_data *room, bool color);
+	
 	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
 	obj_data *obj;
 	size_t size;
@@ -1953,6 +1955,12 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	
 	if (VEH_INTERIOR_HOME_ROOM(veh) || VEH_INSIDE_ROOMS(veh) > 0) {
 		size += snprintf(buf + size, sizeof(buf) - size, "Interior location: [\ty%d\t0], Added rooms: [\tg%d\t0/\tg%d\t0]\r\n", VEH_INTERIOR_HOME_ROOM(veh) ? GET_ROOM_VNUM(VEH_INTERIOR_HOME_ROOM(veh)) : NOTHING, VEH_INSIDE_ROOMS(veh), VEH_MAX_ROOMS(veh));
+	}
+	
+	if (IN_ROOM(veh)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "In room: %s, Led by: %s, ", get_room_name(IN_ROOM(veh), FALSE), VEH_LED_BY(veh) ? PERS(VEH_LED_BY(veh), ch, TRUE) : "nobody");
+		size += snprintf(buf + size, sizeof(buf) - size, "Sitting on: %s, ", VEH_SITTING_ON(veh) ? PERS(VEH_SITTING_ON(veh), ch, TRUE) : "nobody");
+		size += snprintf(buf + size, sizeof(buf) - size, "Driven by: %s\r\n", VEH_DRIVER(veh) ? PERS(VEH_DRIVER(veh), ch, TRUE) : "nobody");
 	}
 	
 	if (VEH_CONTAINS(veh)) {
