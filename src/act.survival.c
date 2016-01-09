@@ -333,7 +333,7 @@ ACMD(do_mount) {
 		msg_to_char(ch, "You can't mount here.\r\n");
 	}
 	else if (GET_SITTING_ON(ch)) {
-		msg_to_char(ch, "You're already sitting %s something.\r\n", VEH_FLAGGED(GET_SITTING_ON(ch), VEH_IN) ? "in" : "on");
+		msg_to_char(ch, "You're already sitting %s something.\r\n", IN_OR_ON(GET_SITTING_ON(ch)));
 	}
 	else if (mob && ch == mob) {
 		msg_to_char(ch, "You can't mount yourself.\r\n");

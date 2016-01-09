@@ -770,7 +770,7 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 
 		if (GET_POS(i) != POS_FIGHTING) {
 			if (GET_SITTING_ON(i)) {
-				sprintf(buf + strlen(buf), " is sitting %s %s%s%s.", VEH_FLAGGED(GET_SITTING_ON(i), VEH_IN) ? "in" : "on", get_vehicle_short_desc(GET_SITTING_ON(i), ch), (VEH_ANIMALS(GET_SITTING_ON(i)) ? ", being pulled by " : ""), (VEH_ANIMALS(GET_SITTING_ON(i)) ? list_harnessed_mobs(GET_SITTING_ON(i)) : ""));
+				sprintf(buf + strlen(buf), " is sitting %s %s%s%s.", IN_OR_ON(GET_SITTING_ON(i)), get_vehicle_short_desc(GET_SITTING_ON(i), ch), (VEH_ANIMALS(GET_SITTING_ON(i)) ? ", being pulled by " : ""), (VEH_ANIMALS(GET_SITTING_ON(i)) ? list_harnessed_mobs(GET_SITTING_ON(i)) : ""));
 			}
 			else if (!IS_NPC(i) && GET_ACTION(i) != ACT_NONE) {
 				sprintf(buf + strlen(buf), " %s", action_data[GET_ACTION(i)].long_desc);
@@ -892,11 +892,11 @@ void list_one_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 	}
 	
 	if (VEH_SITTING_ON(veh) == ch) {
-		size += snprintf(buf + size, sizeof(buf) - size, "...you are sitting %s it.\r\n", VEH_FLAGGED(veh, VEH_IN) ? "in" : "on");
+		size += snprintf(buf + size, sizeof(buf) - size, "...you are sitting %s it.\r\n", IN_OR_ON(veh));
 	}
 	else if (VEH_SITTING_ON(veh)) {
 		// this is PROBABLY not shown to players
-		size += snprintf(buf + size, sizeof(buf) - size, "...%s is sitting %s it.\r\n", PERS(VEH_SITTING_ON(veh), ch, FALSE), VEH_FLAGGED(veh, VEH_IN) ? "in" : "on");
+		size += snprintf(buf + size, sizeof(buf) - size, "...%s is sitting %s it.\r\n", PERS(VEH_SITTING_ON(veh), ch, FALSE), IN_OR_ON(veh));
 	}
 	
 	if (VEH_LED_BY(veh) == ch) {

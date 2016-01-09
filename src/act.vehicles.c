@@ -667,22 +667,22 @@ void do_sit_on_vehicle(char_data *ch, char *argument) {
 		msg_to_char(ch, "You can't sit on that!\r\n");
 	}
 	else if (!VEH_IS_COMPLETE(veh)) {
-		msg_to_char(ch, "You can't sit %s it until it's finished.\r\n", VEH_FLAGGED(veh, VEH_IN) ? "in" : "on");
+		msg_to_char(ch, "You can't sit %s it until it's finished.\r\n", IN_OR_ON(veh));
 	}
 	else if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
 		msg_to_char(ch, "You can't sit on it while it's on fire!\r\n");
 	}
 	else if (VEH_SITTING_ON(veh)) {
-		msg_to_char(ch, "%s already sitting %s it.\r\n", (VEH_SITTING_ON(veh) != ch ? "Someone else is" : "You are"), VEH_FLAGGED(veh, VEH_IN) ? "in" : "on");
+		msg_to_char(ch, "%s already sitting %s it.\r\n", (VEH_SITTING_ON(veh) != ch ? "Someone else is" : "You are"), IN_OR_ON(veh));
 	}
 	else if (VEH_LED_BY(veh)) {
-		msg_to_char(ch, "You can't sit %s it while %s leading it around.\r\n", VEH_FLAGGED(veh, VEH_IN) ? "in" : "on", (VEH_LED_BY(veh) == ch) ? "you are" : "someone else is");
+		msg_to_char(ch, "You can't sit %s it while %s leading it around.\r\n", IN_OR_ON(veh), (VEH_LED_BY(veh) == ch) ? "you are" : "someone else is");
 	}
 	else if (VEH_DRIVER(veh)) {
 		msg_to_char(ch, "You can't lead it while someone else is controlling it.\r\n");
 	}
 	else if (GET_LEADING_VEHICLE(ch) || GET_LEADING_MOB(ch)) {
-		msg_to_char(ch, "You can't sit %s it while you're leading something.\r\n", VEH_FLAGGED(veh, VEH_IN) ? "in" : "on");
+		msg_to_char(ch, "You can't sit %s it while you're leading something.\r\n", IN_OR_ON(veh));
 	}
 	else {
 		act("You sit on $V.", FALSE, ch, NULL, veh, TO_CHAR);
@@ -1273,7 +1273,7 @@ ACMD(do_drive) {
 		msg_to_char(ch, "Someone else is %s it right now.\r\n", drive_data[subcmd].verb);
 	}
 	else if (VEH_SITTING_ON(veh) && VEH_SITTING_ON(veh) != ch) {
-		msg_to_char(ch, "You can't %s it while someone else is sitting %s it.\r\n", drive_data[subcmd].command, VEH_FLAGGED(veh, VEH_IN) ? "in" : "on");
+		msg_to_char(ch, "You can't %s it while someone else is sitting %s it.\r\n", drive_data[subcmd].command, IN_OR_ON(veh));
 	}
 	else if (VEH_LED_BY(veh) && VEH_LED_BY(veh) != ch) {
 		msg_to_char(ch, "You can't %s it while someone else is leading it.\r\n", drive_data[subcmd].command);
@@ -1533,7 +1533,7 @@ ACMD(do_lead) {
 		msg_to_char(ch, "Npcs can't lead anything.\r\n");
 	}
 	else if (GET_SITTING_ON(ch)) {
-		msg_to_char(ch, "You can't lead anything while you're sitting %s something.\r\n", VEH_FLAGGED(GET_SITTING_ON(ch), VEH_IN) ? "in" : "on");
+		msg_to_char(ch, "You can't lead anything while you're sitting %s something.\r\n", IN_OR_ON(GET_SITTING_ON(ch)));
 	}
 	else if (!*arg) {
 		msg_to_char(ch, "Lead whom (or what)?\r\n");
