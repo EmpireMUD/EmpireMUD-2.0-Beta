@@ -2905,7 +2905,10 @@ ACMD(do_efind) {
 		
 		// next, vehicles
 		LL_FOREACH(vehicle_list, veh) {
-			if (VEH_OWNER(veh) != emp || !IN_ROOM(veh)) {
+			if (!IN_ROOM(veh)) {
+				continue;
+			}
+			if (VEH_OWNER(veh) != emp && (VEH_OWNER(veh) != NULL ||ROOM_OWNER(IN_ROOM(veh)) != emp)) {
 				continue;
 			}
 			if (!all && !isname(arg, VEH_KEYWORDS(veh))) {
