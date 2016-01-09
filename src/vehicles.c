@@ -954,12 +954,14 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 					for (;;) {
 						if (!get_line(fl, line)) {
 							log("SYSERR: Format error in pack file with vehicle %d", vnum);
+							extract_vehicle(veh);
 							return NULL;
 						}
 						
 						if (*line == '#') {
 							if (sscanf(line, "#%d", &load_vnum) < 1) {
 								log("SYSERR: Format error in vnum line of pack file with vehicle %d", vnum);
+								extract_vehicle(veh);
 								return NULL;
 							}
 							if ((load_obj = Obj_load_from_file(fl, load_vnum, &location, NULL))) {
@@ -1029,6 +1031,7 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 						}
 						else {
 							log("SYSERR: Format error in pack file for vehicle %d: %s", vnum, line);
+							extract_vehicle(veh);
 							return NULL;
 						}
 					}
