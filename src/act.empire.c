@@ -1889,6 +1889,7 @@ void scan_for_tile(char_data *ch, char *argument) {
 	char output[MAX_STRING_LENGTH], line[128];
 	room_data *map, *room;
 	size_t size, lsize;
+	vehicle_data *veh;
 	crop_data *crop;
 	bool ok;
 	
@@ -1939,7 +1940,22 @@ void scan_for_tile(char_data *ch, char *argument) {
 				ok = TRUE;
 			}
 			else {
-				continue;
+				// try finding a matching vehicle visible in the tile
+				LL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+					if (!VEH_ICON(veh) || !VEH_IS_COMPLETE(veh)) {
+						continue;
+					}
+					if (!CAN_SEE_VEHICLE(ch, veh)) {
+						continue;
+					}
+					if (!multi_isname(argument, VEH_KEYWORDS(veh))) {
+						continue;
+					}
+					
+					// found a vehicle match (only need 1)
+					ok = TRUE;
+					break;
+				}
 			}
 			
 			if (ok) {
