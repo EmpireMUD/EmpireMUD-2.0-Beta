@@ -692,9 +692,12 @@ See also: HELP
 #
 IDENTIFY
 
-Usage:  identify <item>
+Usage:  identify <item | vehicle>
 
-This command provides detailed information about an item.
+This command provides detailed information about an item or vehicle.
+
+Tip: When trying to identify an item in your inventory that has the same name
+as something you are wearing, try using "1.name".
 #
 INFORMATIVE "TOGGLE INFORMATIVE"
 

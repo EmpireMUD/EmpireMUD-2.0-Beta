@@ -383,6 +383,27 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 }
 
 
+/**
+* Shows an "identify" of the vehicle.
+*
+* @param vehicle_data *veh The vehicle to id.
+* @param char_data *ch The person to show the data to.
+*/
+void identify_vehicle_to_char(vehicle_data *veh, char_data *ch) {
+	vehicle_data *proto = vehicle_proto(VEH_VNUM(veh));
+	
+	// basic info
+	act("Your analysis of $V reveals:", FALSE, ch, NULL, veh, TO_CHAR);
+	
+	if (VEH_OWNER(veh)) {
+		msg_to_char(ch, "Owner: %s%s\t0\r\n", EMPIRE_BANNER(VEH_OWNER(veh)), EMPIRE_NAME(VEH_OWNER(veh)));
+	}
+	
+	msg_to_char(ch, "Type: %s\r\n", skip_filler(proto ? VEH_SHORT_DESC(proto) : VEH_SHORT_DESC(veh)));
+	msg_to_char(ch, "Level: %d\r\n", VEH_SCALE_LEVEL(veh));
+}
+
+
 INTERACTION_FUNC(light_obj_interact) {	
 	obj_vnum vnum = interaction->vnum;
 	obj_data *new = NULL;
@@ -3912,8 +3933,8 @@ ACMD(do_grab) {
 
 
 ACMD(do_identify) {
-	vehicle_data *tmp_veh;
 	char_data *tmp_char;
+	vehicle_data *veh;
 	obj_data *obj;
 	
 	one_argument(argument, arg);
@@ -3921,12 +3942,16 @@ ACMD(do_identify) {
 	if (!*arg) {
 		msg_to_char(ch, "Identify what object?\r\n");
 	}
-	else if (!generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP, ch, &tmp_char, &obj, &tmp_veh)) {
+	else if (!generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM, ch, &tmp_char, &obj, &veh)) {
 		msg_to_char(ch, "You see nothing like that here.\r\n");
 	}
-	else {
+	else if (obj) {
 		charge_ability_cost(ch, NOTHING, 0, NOTHING, 0, WAIT_OTHER);
 		identify_obj_to_char(obj, ch);
+	}
+	else if (veh) {
+		charge_ability_cost(ch, NOTHING, 0, NOTHING, 0, WAIT_OTHER);
+		identify_vehicle_to_char(veh, ch);
 	}
 }
 
