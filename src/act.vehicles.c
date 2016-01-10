@@ -198,8 +198,14 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 	// notify leaving
 	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(veh)), ch_iter, next_in_room) {
 		if (ch_iter != VEH_SITTING_ON(veh) && ch_iter->desc) {
-			sprintf(buf, "$V %s %s.", mob_move_types[VEH_MOVE_TYPE(veh)], dirs[get_direction_for_char(ch_iter, dir)]);
-			act(buf, TRUE, ch_iter, NULL, veh, TO_CHAR);
+			if (VEH_SITTING_ON(veh)) {
+				sprintf(buf, "$v %s %s with $N %s it.", mob_move_types[VEH_MOVE_TYPE(veh)], dirs[get_direction_for_char(ch_iter, dir)], IN_OR_ON(veh));
+				act(buf, TRUE, ch_iter, veh, VEH_SITTING_ON(veh), TO_CHAR | ACT_VEHICLE_OBJ);
+			}
+			else {
+				sprintf(buf, "$V %s %s.", mob_move_types[VEH_MOVE_TYPE(veh)], dirs[get_direction_for_char(ch_iter, dir)]);
+				act(buf, TRUE, ch_iter, NULL, veh, TO_CHAR);
+			}
 		}
 	}
 	
@@ -208,9 +214,26 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 	// notify arrival
 	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(veh)), ch_iter, next_in_room) {
 		if (ch_iter != VEH_SITTING_ON(veh) && ch_iter->desc) {
-			sprintf(buf, "$p %s in from %s.", mob_move_types[VEH_MOVE_TYPE(veh)], from_dir[get_direction_for_char(ch_iter, dir)]);
-			act(buf, TRUE, ch_iter, NULL, veh, TO_CHAR);
+			if (VEH_SITTING_ON(veh)) {
+				sprintf(buf, "$v %s in from %s with $N %s it.", mob_move_types[VEH_MOVE_TYPE(veh)], from_dir[get_direction_for_char(ch_iter, dir)], IN_OR_ON(veh));
+				act(buf, TRUE, ch_iter, veh, VEH_SITTING_ON(veh), TO_CHAR | ACT_VEHICLE_OBJ);
+			}
+			else {
+				sprintf(buf, "$V %s in from %s.", mob_move_types[VEH_MOVE_TYPE(veh)], from_dir[get_direction_for_char(ch_iter, dir)]);
+				act(buf, TRUE, ch_iter, NULL, veh, TO_CHAR);
+			}
 		}
+	}
+	
+	// message driver
+	if (VEH_DRIVER(veh)) {
+		if (has_ability(VEH_SITTING_ON(veh), ABIL_NAVIGATION)) {
+			snprintf(buf, sizeof(buf), "You %s $V %s (%d, %d).", drive_data[subcmd].command, dirs[get_direction_for_char(VEH_DRIVER(veh), dir)], X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh)));
+		}
+		else {
+			snprintf(buf, sizeof(buf), "You %s $V %s.", drive_data[subcmd].command, dirs[get_direction_for_char(VEH_DRIVER(veh), dir)]);
+		}
+		act(buf, FALSE, VEH_DRIVER(veh), NULL, veh, TO_CHAR);
 	}
 	
 	// move sitter
@@ -220,13 +243,15 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 			GET_LAST_DIR(VEH_SITTING_ON(veh)) = dir;
 		}
 		
-		if (has_ability(VEH_SITTING_ON(veh), ABIL_NAVIGATION)) {
-			snprintf(buf, sizeof(buf), "$V %s %s (%d, %d).", mob_move_types[VEH_MOVE_TYPE(veh)], dirs[get_direction_for_char(VEH_SITTING_ON(veh), dir)], X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh)));
+		if (VEH_SITTING_ON(veh) != VEH_DRIVER(veh)) {
+			if (has_ability(VEH_SITTING_ON(veh), ABIL_NAVIGATION)) {
+				snprintf(buf, sizeof(buf), "$V %s %s (%d, %d).", mob_move_types[VEH_MOVE_TYPE(veh)], dirs[get_direction_for_char(ch_iter, dir)], X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh)));
+			}
+			else {
+				snprintf(buf, sizeof(buf), "$V %s %s.", mob_move_types[VEH_MOVE_TYPE(veh)], dirs[get_direction_for_char(ch_iter, dir)]);
+			}
+			act(buf, FALSE, VEH_SITTING_ON(veh), NULL, veh, TO_CHAR);
 		}
-		else {
-			snprintf(buf, sizeof(buf), "$V %s %s.", mob_move_types[VEH_MOVE_TYPE(veh)], dirs[get_direction_for_char(VEH_SITTING_ON(veh), dir)]);
-		}
-		act(buf, FALSE, VEH_SITTING_ON(veh), NULL, veh, TO_CHAR);
 		
 		entry_memory_mtrigger(VEH_SITTING_ON(veh));
 		greet_mtrigger(VEH_SITTING_ON(veh), dir);
@@ -241,7 +266,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 			}
 			
 			LL_FOREACH2(ROOM_PEOPLE(room), ch_iter, next_in_room) {
-				if (ch_iter->desc) {
+				if (ch_iter->desc && ch_iter != VEH_DRIVER(veh)) {
 					if (has_ability(ch_iter, ABIL_NAVIGATION)) {
 						snprintf(buf, sizeof(buf), "$V %s %s (%d, %d).", mob_move_types[VEH_MOVE_TYPE(veh)], dirs[get_direction_for_char(ch_iter, dir)], X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh)));
 					}
