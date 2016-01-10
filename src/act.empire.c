@@ -1256,11 +1256,19 @@ void add_obj_to_efind(struct efind_group **list, obj_data *obj, vehicle_data *ve
 	}
 	if (veh) {
 		LL_FOREACH(*list, eg) {
-			if (eg->veh && VEH_VNUM(eg->veh) == VEH_VNUM(veh) && VEH_SHORT_DESC(eg->veh) == VEH_SHORT_DESC(veh)) {
-				eg->count += 1;
-				found = TRUE;
-				break;
+			if (eg->location != location) {
+				continue;
 			}
+			if (!eg->veh || VEH_VNUM(eg->veh) != VEH_VNUM(veh)) {
+				continue;
+			}
+			if (VEH_SHORT_DESC(eg->veh) != VEH_SHORT_DESC(veh)) {
+				continue;
+			}
+			
+			eg->count += 1;
+			found = TRUE;
+			break;
 		}
 	}
 	
@@ -2908,7 +2916,7 @@ ACMD(do_efind) {
 			if (!IN_ROOM(veh)) {
 				continue;
 			}
-			if (VEH_OWNER(veh) != emp && (VEH_OWNER(veh) != NULL ||ROOM_OWNER(IN_ROOM(veh)) != emp)) {
+			if (VEH_OWNER(veh) != emp && (VEH_OWNER(veh) != NULL || ROOM_OWNER(IN_ROOM(veh)) != emp)) {
 				continue;
 			}
 			if (!all && !isname(arg, VEH_KEYWORDS(veh))) {
