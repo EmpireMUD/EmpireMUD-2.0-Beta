@@ -931,6 +931,7 @@ void look_in_direction(char_data *ch, int dir) {
 	extern const int rev_dir[];
 	
 	char buf[MAX_STRING_LENGTH - 9], buf2[MAX_STRING_LENGTH - 9];	// save room for the "You see "
+	vehicle_data *veh;
 	char_data *c;
 	room_data *to_room;
 	struct room_direction_data *ex;
@@ -962,6 +963,17 @@ void look_in_direction(char_data *ch, int dir) {
 					for (c = ROOM_PEOPLE(to_room); c; c = c->next_in_room) {
 						if (CAN_SEE(ch, c)) {
 							bufsize += snprintf(buf + bufsize, sizeof(buf) - bufsize, "%s, ", PERS(c, ch, FALSE));
+							if (last_comma_pos != -1) {
+								prev_comma_pos = last_comma_pos;
+							}
+							last_comma_pos = bufsize - 2;
+							++num_commas;
+						}
+					}
+					
+					LL_FOREACH2(ROOM_VEHICLES(to_room), veh, next_in_room) {
+						if (CAN_SEE_VEHICLE(ch, veh)) {
+							bufsize += snprintf(buf + bufsize, sizeof(buf) - bufsize, "%s, ", get_vehicle_short_desc(veh, ch));
 							if (last_comma_pos != -1) {
 								prev_comma_pos = last_comma_pos;
 							}
