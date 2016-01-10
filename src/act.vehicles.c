@@ -1651,6 +1651,12 @@ ACMD(do_load_vehicle) {
 	else if (!(cont = get_vehicle_in_room_vis(ch, arg2))) {
 		msg_to_char(ch, "You don't see %s %s here.\r\n", arg2, AN(arg2));
 	}
+	else if (!VEH_IS_COMPLETE(cont)) {
+		msg_to_char(ch, "You must finish constructing it before anything can be loaded %sto it.\r\n", IN_OR_ON(cont));
+	}
+	else if (VEH_FLAGGED(cont, VEH_ON_FIRE)) {
+		msg_to_char(ch, "You can't load anything %sto it while it's on fire!\r\n", IN_OR_ON(cont));
+	}
 	else if (!(to_room = get_vehicle_interior(cont))) {
 		msg_to_char(ch, "You can't load anything %sto that!\r\n", IN_OR_ON(cont));
 	}
@@ -1670,6 +1676,9 @@ ACMD(do_load_vehicle) {
 		}
 		else if (!VEH_FLAGGED(cont, VEH_CARRY_MOBS)) {
 			act("$v won't carry animals.", FALSE, ch, cont, NULL, TO_CHAR | ACT_VEHICLE_OBJ);
+		}
+		else if (GET_POS(mob) < POS_STANDING || FIGHTING(mob) || AFF_FLAGGED(mob, AFF_ENTANGLED) || GET_FED_ON_BY(mob)) {
+			act("You can't load $M right now.", FALSE, ch, NULL, mob, TO_CHAR);
 		}
 		else if (GET_LED_BY(mob)) {
 			snprintf(buf, sizeof(buf), "You can't load $N while %s leading $M.", GET_LED_BY(mob) == ch ? "you're" : "someone else is");
@@ -1708,6 +1717,12 @@ ACMD(do_load_vehicle) {
 		else if (VEH_FLAGGED(veh, VEH_NO_BUILDING)) {
 			snprintf(buf, sizeof(buf), "You can't load $v %sto anything.", IN_OR_ON(cont));
 			act(buf, FALSE, ch, cont, NULL, TO_CHAR | ACT_VEHICLE_OBJ);
+		}
+		else if (!VEH_IS_COMPLETE(veh)) {
+			msg_to_char(ch, "You must finish constructing it before it can be loaded %sto anything.", IN_OR_ON(cont));
+		}
+		else if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
+			msg_to_char(ch, "You can't load that -- it's on fire!\r\n");
 		}
 		else if (!can_use_vehicle(ch, veh, MEMBERS_ONLY)) {
 			act("You don't have permission to load $V.", FALSE, ch, NULL, veh, TO_CHAR);
