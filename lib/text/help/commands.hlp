@@ -1660,11 +1660,15 @@ Immortal toggles:
   incognito - if on, the immortal does not appear on 'who' to mortals
   wizhide - if on, the immortal can't be seen in rooms but is not invisible
 #
-UNLOAD BOATUNLOAD
+UNLOAD UNLOADVEHICLE BOATUNLOAD
 
-Usage:  unload <ship>
+Usage:  unload <mob | vehicle | all>
 
-This command allows you to unload cargo from a ship at the docks.
+This command unloads a mob or vehicle from the vehicle you are in. You must
+be inside a vehicle, and targeting a mob or vehicle (or "all") in the room
+with you.
+
+This command was previously also called boatunload.
 
 See also: LOAD, BOARD, SAIL, SHIPS
 #

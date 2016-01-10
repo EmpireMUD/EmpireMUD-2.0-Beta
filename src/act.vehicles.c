@@ -349,6 +349,51 @@ bool perform_put_obj_in_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh)
 
 
 /**
+* Performs 1 unload of a mob from a vehicle.
+*
+* @param char_data *ch The person doing the unloading.
+* @param char_data *mob The person to unload.
+* @param vehicle_data *cont The containing vehicle.
+*/
+void perform_unload_mob(char_data *ch, char_data *mob, vehicle_data *cont) {
+	act("You unload $N from $v.", FALSE, ch, cont, mob, TO_CHAR | ACT_VEHICLE_OBJ);
+	act("$n unloads you from $v.", FALSE, ch, cont, mob, TO_VICT | ACT_VEHICLE_OBJ);
+	act("$n unloads $N from $v.", FALSE, ch, cont, mob, TO_NOTVICT | ACT_VEHICLE_OBJ);
+	
+	char_to_room(mob, IN_ROOM(cont));
+	if (mob->desc) {
+		look_at_room(mob);
+	}
+	
+	act("$n is unloaded from $V.", FALSE, mob, NULL, cont, TO_ROOM);
+	
+	enter_wtrigger(IN_ROOM(mob), mob, NO_DIR);
+	entry_memory_mtrigger(mob);
+	greet_mtrigger(mob, NO_DIR);
+	greet_memory_mtrigger(mob);
+}
+
+
+/**
+* Performs 1 unload of a vehicle from another vehicle.
+*
+* @param char_data *ch The person doing the unloading.
+* @param vehicle_data *veh The vehicle to unload.
+* @param vehicle_data *cont The containing vehicle.
+*/
+void perform_unload_vehicle(char_data *ch, vehicle_data *veh, vehicle_data *cont) {
+	act("You unload $V from $v.", FALSE, ch, cont, veh, TO_CHAR | ACT_VEHICLE_OBJ);
+	act("$n unloads $V from $v.", FALSE, ch, cont, veh, TO_ROOM | ACT_VEHICLE_OBJ);
+	
+	vehicle_to_room(veh, IN_ROOM(cont));
+	
+	if (ROOM_PEOPLE(IN_ROOM(cont))) {
+		act("$V is unloaded from $v.", FALSE, ROOM_PEOPLE(IN_ROOM(cont)), cont, veh, TO_CHAR | TO_ROOM | ACT_VEHICLE_OBJ);
+	}
+}
+
+
+/**
 * Tick update for driving action.
 *
 * @param char_data *ch The character doing the driving.
@@ -1660,7 +1705,7 @@ ACMD(do_load_vehicle) {
 	else if (!(to_room = get_vehicle_interior(cont))) {
 		msg_to_char(ch, "You can't load anything %sto that!\r\n", IN_OR_ON(cont));
 	}
-	else if (!can_use_vehicle(ch, cont, MEMBERS_ONLY)) {
+	else if (!can_use_vehicle(ch, cont, MEMBERS_AND_ALLIES)) {
 		act("You don't have permission to use $V.", FALSE, ch, NULL, cont, TO_CHAR);
 	}
 	else if ((mob = get_char_room_vis(ch, arg1))) {
@@ -1671,11 +1716,11 @@ ACMD(do_load_vehicle) {
 		else if (!IS_NPC(mob) || mob->master) {
 			act("You can't load $N.", FALSE, ch, NULL, mob, TO_CHAR);
 		}
-		else if (!MOB_FLAGGED(mob, MOB_ANIMAL)) {
-			msg_to_char(ch, "You can only load animals.\r\n");
+		else if (!MOB_FLAGGED(mob, MOB_ANIMAL | MOB_MOUNTABLE)) {
+			msg_to_char(ch, "You can only load animals and mounts.\r\n");
 		}
 		else if (!VEH_FLAGGED(cont, VEH_CARRY_MOBS)) {
-			act("$v won't carry animals.", FALSE, ch, cont, NULL, TO_CHAR | ACT_VEHICLE_OBJ);
+			act("$v won't carry mobs.", FALSE, ch, cont, NULL, TO_CHAR | ACT_VEHICLE_OBJ);
 		}
 		else if (GET_POS(mob) < POS_STANDING || FIGHTING(mob) || AFF_FLAGGED(mob, AFF_ENTANGLED) || GET_FED_ON_BY(mob)) {
 			act("You can't load $M right now.", FALSE, ch, NULL, mob, TO_CHAR);
@@ -1888,5 +1933,131 @@ ACMD(do_unharness) {
 		if (!any) {
 			send_config_msg(ch, "ok_string");
 		}
+	}
+}
+
+
+ACMD(do_unload_vehicle) {
+	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	vehicle_data *cont, *veh, *next_veh;
+	char_data *mob, *next_mob;
+	bool found;
+	
+	one_argument(argument, arg);
+	
+	if (!(cont = GET_ROOM_VEHICLE(IN_ROOM(ch)))) {
+		msg_to_char(ch, "You must be inside a vehicle to unload anything.\r\n");
+	}
+	else if (!can_use_vehicle(ch, cont, MEMBERS_AND_ALLIES)) {
+		act("You don't have permission to unload $V.", FALSE, ch, NULL, cont, TO_CHAR);
+	}
+	else if (!VEH_IS_COMPLETE(cont)) {
+		act("You must finish constructing $V before anything can be unloaded.", FALSE, ch, NULL, cont, TO_CHAR);
+	}
+	else if (VEH_FLAGGED(cont, VEH_ON_FIRE)) {
+		msg_to_char(ch, "You can't load anything while there's a fire!\r\n");
+	}
+	else if (!*arg) {
+		msg_to_char(ch, "Unload what?\r\n");
+	}
+	else if (!str_cmp(arg, "all")) {
+		// UNLOAD ALL
+		found = FALSE;
+		
+		if (!GET_ROOM_VEHICLE(IN_ROOM(cont)) || VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(cont)), VEH_CARRY_MOBS)) {
+			LL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), mob, next_mob, next_in_room) {
+				if (mob == ch || !IS_NPC(mob)) {
+					continue;
+				}
+				if (!MOB_FLAGGED(mob, MOB_ANIMAL | MOB_MOUNTABLE) || GET_LED_BY(mob)) {
+					continue;
+				}
+				if (GET_POS(mob) < POS_STANDING || FIGHTING(mob) || AFF_FLAGGED(mob, AFF_ENTANGLED) || GET_FED_ON_BY(mob)) {
+					continue;
+				}
+			
+				perform_unload_mob(ch, mob, cont);
+				found = TRUE;
+			}
+		}
+		
+		if (!GET_ROOM_VEHICLE(IN_ROOM(cont)) || VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(cont)), VEH_CARRY_VEHICLES)) {
+			LL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_veh, next_in_room) {
+				if (veh == cont || !VEH_IS_COMPLETE(veh) || VEH_FLAGGED(veh, VEH_ON_FIRE)) {
+					continue;
+				}
+				if (!can_use_vehicle(ch, veh, MEMBERS_ONLY)) {
+					continue;
+				}
+				if (VEH_SITTING_ON(veh) || VEH_LED_BY(veh) || VEH_DRIVER(veh)) {
+					continue;
+				}
+			
+				perform_unload_vehicle(ch, veh, cont);
+				found = TRUE;
+			}
+		}
+		
+		if (!found) {
+			msg_to_char(ch, "There was nothing you could unload here.\r\n");
+		}
+	}
+	else if ((mob = get_char_room_vis(ch, arg))) {
+		// UNLOAD MOB
+		if (ch == mob) {
+			msg_to_char(ch, "You can't unload yourself.\r\n");
+		}
+		else if (!IS_NPC(mob) || mob->master) {
+			act("You can't unload $N.", FALSE, ch, NULL, mob, TO_CHAR);
+		}
+		else if (!MOB_FLAGGED(mob, MOB_ANIMAL | MOB_MOUNTABLE)) {
+			msg_to_char(ch, "You can only unload animals and mounts.\r\n");
+		}
+		else if (GET_ROOM_VEHICLE(IN_ROOM(cont)) && !VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(cont)), VEH_CARRY_MOBS)) {
+			msg_to_char(ch, "You can't unload mobs here.\r\n");
+		}
+		else if (GET_POS(mob) < POS_STANDING || FIGHTING(mob) || AFF_FLAGGED(mob, AFF_ENTANGLED) || GET_FED_ON_BY(mob)) {
+			act("You can't unload $M right now.", FALSE, ch, NULL, mob, TO_CHAR);
+		}
+		else if (GET_LED_BY(mob)) {
+			snprintf(buf, sizeof(buf), "You can't unload $N while %s leading $M.", GET_LED_BY(mob) == ch ? "you're" : "someone else is");
+			act(buf, FALSE, ch, NULL, mob, TO_CHAR);
+		}
+		else {
+			perform_unload_mob(ch, mob, cont);
+		}
+	}
+	else if ((veh = get_vehicle_in_room_vis(ch, arg))) {
+		// UNLOAD VEHICLE
+		if (veh == cont) {
+			msg_to_char(ch, "You can't unload it from itself.\r\n");
+		}
+		else if (GET_ROOM_VEHICLE(IN_ROOM(cont)) && !VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(cont)), VEH_CARRY_VEHICLES)) {
+			msg_to_char(ch, "You can't unload vehicles here.\r\n");
+		}
+		else if (!VEH_IS_COMPLETE(veh)) {
+			msg_to_char(ch, "You must finish constructing it before it can be unloaded from anything.");
+		}
+		else if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
+			msg_to_char(ch, "You can't unload that -- it's on fire!\r\n");
+		}
+		else if (!can_use_vehicle(ch, veh, MEMBERS_ONLY)) {
+			act("You don't have permission to unload $V.", FALSE, ch, NULL, veh, TO_CHAR);
+		}
+		else if (VEH_DRIVER(veh)) {
+			msg_to_char(ch, "You can't unload %s while %s driving it.\r\n", VEH_SHORT_DESC(veh), VEH_DRIVER(veh) == ch ? "you're" : "someone else is");
+		}
+		else if (VEH_LED_BY(veh)) {
+			msg_to_char(ch, "You can't unload %s while %s leading it.\r\n", VEH_SHORT_DESC(veh), VEH_LED_BY(veh) == ch ? "you're" : "someone else is");
+		}
+		else if (VEH_SITTING_ON(veh)) {
+			msg_to_char(ch, "You can't unload %s while %s sitting %s it.\r\n", VEH_SHORT_DESC(veh), VEH_SITTING_ON(veh) == ch ? "you're" : "someone else is", IN_OR_ON(veh));
+		}
+		else {
+			perform_unload_vehicle(ch, veh, cont);
+		}
+	}
+	else {
+		msg_to_char(ch, "You don't see %s %s here.\r\n", arg, AN(arg));
 	}
 }
