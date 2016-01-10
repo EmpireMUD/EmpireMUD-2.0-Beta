@@ -815,7 +815,7 @@ See also: EMPIRE, ROADSIGN
 #
 LOAD LOADVEHICLE "LOAD VEHICLE" BOATLOAD "BOAT LOAD"
 
-Usage:  load <mob | vehicle> <onto vehicle>
+Usage:  load <mob | vehicle | all> <onto vehicle>
 
 This command allows you to load animals and vehicles onto other vehicles, such
 as ships. To store items in vehicles, use "put <item> <vehicle>" instead.

@@ -349,6 +349,60 @@ bool perform_put_obj_in_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh)
 
 
 /**
+* Performs loading of a mob to a vehicle.
+*
+* @param char_data *ch The person doing the loading.
+* @param char_data *mob The person to load.
+* @param vehicle_data *cont The vehicle to load onto.
+* @param room_data *to_room Where to put the item in cont.
+*/
+void perform_load_mob(char_data *ch, char_data *mob, vehicle_data *cont, room_data *to_room) {
+	snprintf(buf, sizeof(buf), "You load $N %sto $v.", IN_OR_ON(cont));
+	act(buf, FALSE, ch, cont, mob, TO_CHAR | ACT_VEHICLE_OBJ);
+	snprintf(buf, sizeof(buf), "$n loads you %sto $v.", IN_OR_ON(cont));
+	act(buf, FALSE, ch, cont, mob, TO_VICT | ACT_VEHICLE_OBJ);
+	snprintf(buf, sizeof(buf), "$n loads $N %sto $v.", IN_OR_ON(cont));
+	act(buf, FALSE, ch, cont, mob, TO_NOTVICT | ACT_VEHICLE_OBJ);
+	
+	char_to_room(mob, to_room);
+	if (mob->desc) {
+		look_at_room(mob);
+	}
+	
+	snprintf(buf, sizeof(buf), "$n is loaded %sto $V.", IN_OR_ON(cont));
+	act(buf, FALSE, mob, NULL, cont, TO_ROOM);
+	
+	enter_wtrigger(IN_ROOM(mob), mob, NO_DIR);
+	entry_memory_mtrigger(mob);
+	greet_mtrigger(mob, NO_DIR);
+	greet_memory_mtrigger(mob);
+}
+
+
+/**
+* Performs loading of a vehicle into another vehicle.
+*
+* @param char_data *ch The person doing the loading.
+* @param vehicle_data *veh The vehicle to load.
+* @param vehicle_data *cont The vehicle to load into.
+* @param room_data *to_room Where to put the item in cont.
+*/
+void perform_load_vehicle(char_data *ch, vehicle_data *veh, vehicle_data *cont, room_data *to_room) {
+	snprintf(buf, sizeof(buf), "You load $V %sto $v.", IN_OR_ON(cont));
+	act(buf, FALSE, ch, cont, veh, TO_CHAR | ACT_VEHICLE_OBJ);
+	snprintf(buf, sizeof(buf), "$n loads $V %sto $v.", IN_OR_ON(cont));
+	act(buf, FALSE, ch, cont, veh, TO_ROOM | ACT_VEHICLE_OBJ);
+	
+	vehicle_to_room(veh, to_room);
+	
+	snprintf(buf, sizeof(buf), "$V is loaded %sto $v.", IN_OR_ON(cont));
+	if (ROOM_PEOPLE(to_room)) {
+		act(buf, FALSE, ROOM_PEOPLE(to_room), cont, veh, TO_CHAR | TO_ROOM | ACT_VEHICLE_OBJ);
+	}
+}
+
+
+/**
 * Performs 1 unload of a mob from a vehicle.
 *
 * @param char_data *ch The person doing the unloading.
@@ -915,7 +969,7 @@ ACMD(do_board) {
 	else if (GET_LEADING_VEHICLE(ch) && IN_ROOM(GET_LEADING_VEHICLE(ch)) == IN_ROOM(ch) && !VEH_FLAGGED(veh, VEH_CARRY_VEHICLES)) {
 		msg_to_char(ch, "You can't %s it while leading another vehicle.\r\n", command);
 	}
-	else if (GET_LEADING_VEHICLE(ch) && VEH_FLAGGED(GET_LEADING_VEHICLE(ch), VEH_NO_BUILDING)) {
+	else if (GET_LEADING_VEHICLE(ch) && (VEH_FLAGGED(GET_LEADING_VEHICLE(ch), VEH_NO_LOAD_ONTO_VEHICLE) || !VEH_FLAGGED(veh, VEH_CARRY_VEHICLES))) {
 		act("You can't lead $V in there.", FALSE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_CHAR);
 	}
 	else {
@@ -1129,6 +1183,9 @@ void do_drag_portal(char_data *ch, vehicle_data *veh, char *arg) {
 		msg_to_char(ch, "You can't drag it through there because of rough terrain on the other side.\r\n");
 	}
 	else if (ROOM_IS_CLOSED(to_room) && VEH_FLAGGED(veh, VEH_NO_BUILDING)) {
+		msg_to_char(ch, "You can't drag it in there.\r\n");
+	}
+	else if (GET_ROOM_VEHICLE(to_room) && (VEH_FLAGGED(veh, VEH_NO_LOAD_ONTO_VEHICLE) || !VEH_FLAGGED(GET_ROOM_VEHICLE(to_room), VEH_CARRY_VEHICLES))) {
 		msg_to_char(ch, "You can't drag it in there.\r\n");
 	}
 	else {
@@ -1684,14 +1741,15 @@ ACMD(do_lead) {
 
 ACMD(do_load_vehicle) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
-	vehicle_data *cont, *veh;
+	vehicle_data *cont, *veh, *next_veh;
+	char_data *mob, *next_mob;
 	room_data *to_room;
-	char_data *mob;
+	bool found;
 	
 	two_arguments(argument, arg1, arg2);
 	
 	if (!*arg1 || !*arg2) {
-		msg_to_char(ch, "Usage: load <mob | vehicle> <onto vehicle>\r\n");
+		msg_to_char(ch, "Usage: load <mob | vehicle | all> <onto vehicle>\r\n");
 	}
 	else if (!(cont = get_vehicle_in_room_vis(ch, arg2))) {
 		msg_to_char(ch, "You don't see %s %s here.\r\n", arg2, AN(arg2));
@@ -1707,6 +1765,48 @@ ACMD(do_load_vehicle) {
 	}
 	else if (!can_use_vehicle(ch, cont, MEMBERS_AND_ALLIES)) {
 		act("You don't have permission to use $V.", FALSE, ch, NULL, cont, TO_CHAR);
+	}
+	else if (!str_cmp(arg1, "all")) {
+		// LOAD ALL
+		found = FALSE;
+		
+		if (VEH_FLAGGED(cont, VEH_CARRY_MOBS)) {
+			LL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), mob, next_mob, next_in_room) {
+				if (mob == ch || !IS_NPC(mob)) {
+					continue;
+				}
+				if (!MOB_FLAGGED(mob, MOB_ANIMAL | MOB_MOUNTABLE) || GET_LED_BY(mob)) {
+					continue;
+				}
+				if (GET_POS(mob) < POS_STANDING || FIGHTING(mob) || AFF_FLAGGED(mob, AFF_ENTANGLED) || GET_FED_ON_BY(mob)) {
+					continue;
+				}
+			
+				perform_load_mob(ch, mob, cont, to_room);
+				found = TRUE;
+			}
+		}
+		
+		if (VEH_FLAGGED(cont, VEH_CARRY_VEHICLES)) {
+			LL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_veh, next_in_room) {
+				if (veh == cont || !VEH_IS_COMPLETE(veh) || VEH_FLAGGED(veh, VEH_ON_FIRE)) {
+					continue;
+				}
+				if (!can_use_vehicle(ch, veh, MEMBERS_ONLY)) {
+					continue;
+				}
+				if (VEH_SITTING_ON(veh) || VEH_LED_BY(veh) || VEH_DRIVER(veh)) {
+					continue;
+				}
+			
+				perform_load_vehicle(ch, veh, cont, to_room);
+				found = TRUE;
+			}
+		}
+		
+		if (!found) {
+			msg_to_char(ch, "There was nothing you could load here.\r\n");
+		}
 	}
 	else if ((mob = get_char_room_vis(ch, arg1))) {
 		// LOAD MOB
@@ -1730,25 +1830,7 @@ ACMD(do_load_vehicle) {
 			act(buf, FALSE, ch, NULL, mob, TO_CHAR);
 		}
 		else {
-			snprintf(buf, sizeof(buf), "You load $N %sto $v.", IN_OR_ON(cont));
-			act(buf, FALSE, ch, cont, mob, TO_CHAR | ACT_VEHICLE_OBJ);
-			snprintf(buf, sizeof(buf), "$n loads you %sto $v.", IN_OR_ON(cont));
-			act(buf, FALSE, ch, cont, mob, TO_VICT | ACT_VEHICLE_OBJ);
-			snprintf(buf, sizeof(buf), "$n loads $N %sto $v.", IN_OR_ON(cont));
-			act(buf, FALSE, ch, cont, mob, TO_NOTVICT | ACT_VEHICLE_OBJ);
-			
-			char_to_room(mob, to_room);
-			if (mob->desc) {
-				look_at_room(mob);
-			}
-			
-			snprintf(buf, sizeof(buf), "$n is loaded %sto $V.", IN_OR_ON(cont));
-			act(buf, FALSE, mob, NULL, cont, TO_ROOM);
-			
-			enter_wtrigger(IN_ROOM(mob), mob, NO_DIR);
-			entry_memory_mtrigger(mob);
-			greet_mtrigger(mob, NO_DIR);
-			greet_memory_mtrigger(mob);
+			perform_load_mob(ch, mob, cont, to_room);
 		}
 	}
 	else if ((veh = get_vehicle_in_room_vis(ch, arg1))) {
@@ -1759,7 +1841,7 @@ ACMD(do_load_vehicle) {
 		else if (!VEH_FLAGGED(cont, VEH_CARRY_VEHICLES)) {
 			act("$v won't carry vehicles.", FALSE, ch, cont, NULL, TO_CHAR | ACT_VEHICLE_OBJ);
 		}
-		else if (VEH_FLAGGED(veh, VEH_NO_BUILDING)) {
+		else if (VEH_FLAGGED(veh, VEH_NO_LOAD_ONTO_VEHICLE)) {
 			snprintf(buf, sizeof(buf), "You can't load $v %sto anything.", IN_OR_ON(cont));
 			act(buf, FALSE, ch, cont, NULL, TO_CHAR | ACT_VEHICLE_OBJ);
 		}
@@ -1782,17 +1864,7 @@ ACMD(do_load_vehicle) {
 			msg_to_char(ch, "You can't load %s while %s sitting %s it.\r\n", VEH_SHORT_DESC(veh), VEH_SITTING_ON(veh) == ch ? "you're" : "someone else is", IN_OR_ON(veh));
 		}
 		else {
-			snprintf(buf, sizeof(buf), "You load $V %sto $v.", IN_OR_ON(cont));
-			act(buf, FALSE, ch, cont, veh, TO_CHAR | ACT_VEHICLE_OBJ);
-			snprintf(buf, sizeof(buf), "$n loads $V %sto $v.", IN_OR_ON(cont));
-			act(buf, FALSE, ch, cont, veh, TO_ROOM | ACT_VEHICLE_OBJ);
-			
-			vehicle_to_room(veh, to_room);
-			
-			snprintf(buf, sizeof(buf), "$V is loaded %sto $v.", IN_OR_ON(cont));
-			if (ROOM_PEOPLE(to_room)) {
-				act(buf, FALSE, ROOM_PEOPLE(to_room), cont, veh, TO_CHAR | TO_ROOM | ACT_VEHICLE_OBJ);
-			}
+			perform_load_vehicle(ch, veh, cont, to_room);
 		}
 	}
 	else {

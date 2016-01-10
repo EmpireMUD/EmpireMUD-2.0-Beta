@@ -165,6 +165,10 @@ bool can_enter_portal(char_data *ch, obj_data *portal, bool allow_infiltrate, bo
 			act("$V can't be led through a portal.", FALSE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_CHAR);
 			return FALSE;
 		}
+		if (GET_ROOM_VEHICLE(to_room) && (VEH_FLAGGED(GET_LEADING_VEHICLE(ch), VEH_NO_LOAD_ONTO_VEHICLE) || !VEH_FLAGGED(GET_ROOM_VEHICLE(to_room), VEH_CARRY_VEHICLES))) {
+			act("$V can't be led into $v.", FALSE, ch, GET_ROOM_VEHICLE(to_room), GET_LEADING_VEHICLE(ch), TO_CHAR | ACT_VEHICLE_OBJ);
+			return FALSE;
+		}
 		if (!validate_vehicle_move(ch, GET_LEADING_VEHICLE(ch), to_room)) {
 			// sends own message
 			return FALSE;

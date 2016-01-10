@@ -4543,6 +4543,7 @@ Available flags:
  CARRY-MOBS - mobs can be put inside (usually via lead)
  SIEGE-WEAPONS - can fire on buildings and vehicles
  ON-FIRE - currently burning (via the "light" command)
+ !LOAD-ONTO-VEHICLE - cannot be loaded onto another vehicle
 
 ** The DRIVING/SAILING/FLYING flags each enable specific commands for moving
 the vehicle. If it has more than one of these, each command will work. Usually
