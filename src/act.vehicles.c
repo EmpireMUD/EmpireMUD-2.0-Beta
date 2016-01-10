@@ -363,6 +363,11 @@ void process_driving(char_data *ch) {
 		return;
 	}
 	
+	if (count_harnessed_animals(veh) < VEH_ANIMALS_REQUIRED(veh)) {
+		cancel_action(ch);
+		return;
+	}
+	
 	if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
 		cancel_action(ch);
 		return;
@@ -1287,6 +1292,9 @@ ACMD(do_drive) {
 	}
 	else if (!VEH_IS_COMPLETE(veh)) {
 		act("$V isn't going anywhere until it's finished.", FALSE, ch, NULL, veh, TO_CHAR);
+	}
+	else if (count_harnessed_animals(veh) < VEH_ANIMALS_REQUIRED(veh)) {
+		msg_to_char(ch, "You must harness %d more animal%s to it first.\r\n", (VEH_ANIMALS_REQUIRED(veh) - count_harnessed_animals(veh)), PLURAL(VEH_ANIMALS_REQUIRED(veh) - count_harnessed_animals(veh)));
 	}
 	else if (veh == GET_ROOM_VEHICLE(IN_ROOM(ch)) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_LOOK_OUT)) {
 		msg_to_char(ch, "You can't %s here because you can't see outside.\r\n", drive_data[subcmd].command);
