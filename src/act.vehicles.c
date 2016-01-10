@@ -1637,6 +1637,108 @@ ACMD(do_lead) {
 }
 
 
+ACMD(do_load_vehicle) {
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	vehicle_data *cont, *veh;
+	room_data *to_room;
+	char_data *mob;
+	
+	two_arguments(argument, arg1, arg2);
+	
+	if (!*arg1 || !*arg2) {
+		msg_to_char(ch, "Usage: load <mob | vehicle> <onto vehicle>\r\n");
+	}
+	else if (!(cont = get_vehicle_in_room_vis(ch, arg2))) {
+		msg_to_char(ch, "You don't see %s %s here.\r\n", arg2, AN(arg2));
+	}
+	else if (!(to_room = get_vehicle_interior(cont))) {
+		msg_to_char(ch, "You can't load anything %sto that!\r\n", IN_OR_ON(cont));
+	}
+	else if (!can_use_vehicle(ch, cont, MEMBERS_ONLY)) {
+		act("You don't have permission to use $V.", FALSE, ch, NULL, cont, TO_CHAR);
+	}
+	else if ((mob = get_char_room_vis(ch, arg1))) {
+		// LOAD MOB
+		if (ch == mob) {
+			msg_to_char(ch, "Just board it.\r\n");
+		}
+		else if (!IS_NPC(mob) || mob->master) {
+			act("You can't load $N.", FALSE, ch, NULL, mob, TO_CHAR);
+		}
+		else if (!MOB_FLAGGED(mob, MOB_ANIMAL)) {
+			msg_to_char(ch, "You can only load animals.\r\n");
+		}
+		else if (!VEH_FLAGGED(cont, VEH_CARRY_MOBS)) {
+			act("$v won't carry animals.", FALSE, ch, cont, NULL, TO_CHAR | ACT_VEHICLE_OBJ);
+		}
+		else if (GET_LED_BY(mob)) {
+			snprintf(buf, sizeof(buf), "You can't load $N while %s leading $M.", GET_LED_BY(mob) == ch ? "you're" : "someone else is");
+			act(buf, FALSE, ch, NULL, mob, TO_CHAR);
+		}
+		else {
+			snprintf(buf, sizeof(buf), "You load $N %sto $v.", IN_OR_ON(cont));
+			act(buf, FALSE, ch, cont, mob, TO_CHAR | ACT_VEHICLE_OBJ);
+			snprintf(buf, sizeof(buf), "$n loads you %sto $v.", IN_OR_ON(cont));
+			act(buf, FALSE, ch, cont, mob, TO_VICT | ACT_VEHICLE_OBJ);
+			snprintf(buf, sizeof(buf), "$n loads $N %sto $v.", IN_OR_ON(cont));
+			act(buf, FALSE, ch, cont, mob, TO_NOTVICT | ACT_VEHICLE_OBJ);
+			
+			char_to_room(mob, to_room);
+			if (mob->desc) {
+				look_at_room(mob);
+			}
+			
+			snprintf(buf, sizeof(buf), "$n is loaded %sto $V.", IN_OR_ON(cont));
+			act(buf, FALSE, mob, NULL, cont, TO_ROOM);
+			
+			enter_wtrigger(IN_ROOM(mob), mob, NO_DIR);
+			entry_memory_mtrigger(mob);
+			greet_mtrigger(mob, NO_DIR);
+			greet_memory_mtrigger(mob);
+		}
+	}
+	else if ((veh = get_vehicle_in_room_vis(ch, arg1))) {
+		// LOAD VEHICLE
+		if (veh == cont) {
+			msg_to_char(ch, "You can't load it into itself.\r\n");
+		}
+		else if (!VEH_FLAGGED(cont, VEH_CARRY_VEHICLES)) {
+			act("$v won't carry vehicles.", FALSE, ch, cont, NULL, TO_CHAR | ACT_VEHICLE_OBJ);
+		}
+		else if (VEH_FLAGGED(veh, VEH_NO_BUILDING)) {
+			snprintf(buf, sizeof(buf), "You can't load $v %sto anything.", IN_OR_ON(cont));
+			act(buf, FALSE, ch, cont, NULL, TO_CHAR | ACT_VEHICLE_OBJ);
+		}
+		else if (!can_use_vehicle(ch, veh, MEMBERS_ONLY)) {
+			act("You don't have permission to load $V.", FALSE, ch, NULL, veh, TO_CHAR);
+		}
+		else if (VEH_DRIVER(veh)) {
+			msg_to_char(ch, "You can't load %s while %s driving it.\r\n", VEH_SHORT_DESC(veh), VEH_DRIVER(veh) == ch ? "you're" : "someone else is");
+		}
+		else if (VEH_LED_BY(veh)) {
+			msg_to_char(ch, "You can't load %s while %s leading it.\r\n", VEH_SHORT_DESC(veh), VEH_LED_BY(veh) == ch ? "you're" : "someone else is");
+		}
+		else if (VEH_SITTING_ON(veh)) {
+			msg_to_char(ch, "You can't load %s while %s sitting %s it.\r\n", VEH_SHORT_DESC(veh), VEH_SITTING_ON(veh) == ch ? "you're" : "someone else is", IN_OR_ON(veh));
+		}
+		else {
+			snprintf(buf, sizeof(buf), "You load $V %sto $v.", IN_OR_ON(cont));
+			act(buf, FALSE, ch, cont, veh, TO_CHAR | ACT_VEHICLE_OBJ);
+			snprintf(buf, sizeof(buf), "$n loads $V %sto $v.", IN_OR_ON(cont));
+			act(buf, FALSE, ch, cont, veh, TO_ROOM | ACT_VEHICLE_OBJ);
+			
+			vehicle_to_room(veh, to_room);
+			
+			snprintf(buf, sizeof(buf), "$V is loaded %sto $v.", IN_OR_ON(cont));
+			act(buf, FALSE, mob, cont, veh, TO_ROOM | ACT_VEHICLE_OBJ);
+		}
+	}
+	else {
+		msg_to_char(ch, "You don't see %s %s here.\r\n", arg1, AN(arg1));
+	}
+}
+
+
 ACMD(do_repair) {
 	char arg[MAX_INPUT_LENGTH];
 	vehicle_data *veh;

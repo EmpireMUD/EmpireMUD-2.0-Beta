@@ -813,17 +813,16 @@ road underneath will be lost. Roads count as in-city territory as far away as
 
 See also: EMPIRE, ROADSIGN
 #
-LOAD BOATLOAD "BOAT LOAD"
+LOAD LOADVEHICLE "LOAD VEHICLE" BOATLOAD "BOAT LOAD"
 
-Usage:  load <ship> <item>
+Usage:  load <mob | vehicle> <onto vehicle>
 
-This command allows you to load items onto a ship. You can only do this at the
-docks.
+This command allows you to load animals and vehicles onto other vehicles, such
+as ships. To store items in vehicles, use "put <item> <vehicle>" instead.
 
-You can load items from your inventory or from the room. Only larger ships can
-hold animals or small vehicles.
+This command was formerly called "boatload".
 
-See also: UNLOAD, BOARD, SAIL, SHIPS
+See also: UNLOAD, BOARD, PUT, SAIL, SHIPS
 #
 LOOK EXAMINE
 
