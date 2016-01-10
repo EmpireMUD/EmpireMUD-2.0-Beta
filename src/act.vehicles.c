@@ -1789,7 +1789,7 @@ ACMD(do_load_vehicle) {
 		
 		if (VEH_FLAGGED(cont, VEH_CARRY_VEHICLES)) {
 			LL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_veh, next_in_room) {
-				if (veh == cont || !VEH_IS_COMPLETE(veh) || VEH_FLAGGED(veh, VEH_ON_FIRE)) {
+				if (veh == cont || !VEH_IS_COMPLETE(veh) || VEH_FLAGGED(veh, VEH_ON_FIRE | VEH_NO_LOAD_ONTO_VEHICLE)) {
 					continue;
 				}
 				if (!can_use_vehicle(ch, veh, MEMBERS_ONLY)) {
@@ -1844,6 +1844,9 @@ ACMD(do_load_vehicle) {
 		else if (VEH_FLAGGED(veh, VEH_NO_LOAD_ONTO_VEHICLE)) {
 			snprintf(buf, sizeof(buf), "You can't load $v %sto anything.", IN_OR_ON(cont));
 			act(buf, FALSE, ch, cont, NULL, TO_CHAR | ACT_VEHICLE_OBJ);
+		}
+		else if (VEH_FLAGGED(veh, VEH_NO_LOAD_ONTO_VEHICLE)) {
+			msg_to_char(ch, "You can't load that %sto vehicles.\r\n", IN_OR_ON(cont));
 		}
 		else if (!VEH_IS_COMPLETE(veh)) {
 			msg_to_char(ch, "You must finish constructing it before it can be loaded %sto anything.\r\n", IN_OR_ON(cont));
@@ -2055,7 +2058,7 @@ ACMD(do_unload_vehicle) {
 		
 		if (!GET_ROOM_VEHICLE(IN_ROOM(cont)) || VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(cont)), VEH_CARRY_VEHICLES)) {
 			LL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_veh, next_in_room) {
-				if (veh == cont || !VEH_IS_COMPLETE(veh) || VEH_FLAGGED(veh, VEH_ON_FIRE)) {
+				if (veh == cont || !VEH_IS_COMPLETE(veh) || VEH_FLAGGED(veh, VEH_ON_FIRE | VEH_NO_LOAD_ONTO_VEHICLE)) {
 					continue;
 				}
 				if (!can_use_vehicle(ch, veh, MEMBERS_ONLY)) {
@@ -2106,6 +2109,9 @@ ACMD(do_unload_vehicle) {
 		}
 		else if (GET_ROOM_VEHICLE(IN_ROOM(cont)) && !VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(cont)), VEH_CARRY_VEHICLES)) {
 			msg_to_char(ch, "You can't unload vehicles here.\r\n");
+		}
+		else if (VEH_FLAGGED(veh, VEH_NO_LOAD_ONTO_VEHICLE)) {
+			msg_to_char(ch, "That cannot be unloaded from vehicles.\r\n");
 		}
 		else if (!VEH_IS_COMPLETE(veh)) {
 			msg_to_char(ch, "You must finish constructing it before it can be unloaded from anything.\r\n");
