@@ -1730,7 +1730,9 @@ ACMD(do_load_vehicle) {
 			vehicle_to_room(veh, to_room);
 			
 			snprintf(buf, sizeof(buf), "$V is loaded %sto $v.", IN_OR_ON(cont));
-			act(buf, FALSE, mob, cont, veh, TO_ROOM | ACT_VEHICLE_OBJ);
+			if (ROOM_PEOPLE(to_room)) {
+				act(buf, FALSE, ROOM_PEOPLE(to_room), cont, veh, TO_CHAR | TO_ROOM | ACT_VEHICLE_OBJ);
+			}
 		}
 	}
 	else {
