@@ -1764,7 +1764,7 @@ ACMD(do_load_vehicle) {
 			act(buf, FALSE, ch, cont, NULL, TO_CHAR | ACT_VEHICLE_OBJ);
 		}
 		else if (!VEH_IS_COMPLETE(veh)) {
-			msg_to_char(ch, "You must finish constructing it before it can be loaded %sto anything.", IN_OR_ON(cont));
+			msg_to_char(ch, "You must finish constructing it before it can be loaded %sto anything.\r\n", IN_OR_ON(cont));
 		}
 		else if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
 			msg_to_char(ch, "You can't load that -- it's on fire!\r\n");
@@ -2036,7 +2036,7 @@ ACMD(do_unload_vehicle) {
 			msg_to_char(ch, "You can't unload vehicles here.\r\n");
 		}
 		else if (!VEH_IS_COMPLETE(veh)) {
-			msg_to_char(ch, "You must finish constructing it before it can be unloaded from anything.");
+			msg_to_char(ch, "You must finish constructing it before it can be unloaded from anything.\r\n");
 		}
 		else if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
 			msg_to_char(ch, "You can't unload that -- it's on fire!\r\n");
