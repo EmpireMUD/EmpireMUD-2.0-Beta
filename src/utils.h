@@ -332,6 +332,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define CAN_SPEND_BLOOD(ch)  (!AFF_FLAGGED(ch, AFF_CANT_SPEND_BLOOD))
 #define CAST_BY_ID(ch)  (IS_NPC(ch) ? (-1 * GET_MOB_VNUM(ch)) : GET_IDNUM(ch))
 #define EFFECTIVELY_FLYING(ch)  (IS_RIDING(ch) ? MOUNT_FLAGGED(ch, MOUNT_FLYING) : AFF_FLAGGED(ch, AFF_FLY))
+#define EFFECTIVELY_SWIMMING(ch)  (EFFECTIVELY_FLYING(ch) || (IS_RIDING(ch) && MOUNT_FLAGGED((ch), MOUNT_AQUATIC)) || (IS_NPC(ch) ? MOB_FLAGGED((ch), MOB_AQUATIC) : has_ability((ch), ABIL_SWIMMING)))
 #define HAS_INFRA(ch)  AFF_FLAGGED(ch, AFF_INFRAVISION)
 #define IS_HUMAN(ch)  (!IS_VAMPIRE(ch))
 #define IS_MAGE(ch)  (IS_NPC(ch) ? GET_MAX_MANA(ch) > 0 : (get_skill_level((ch), SKILL_NATURAL_MAGIC) > 0 || get_skill_level((ch), SKILL_HIGH_SORCERY) > 0))

@@ -444,6 +444,10 @@ void perform_transport(char_data *ch, room_data *to_room) {
 
 // dir here is a real dir, not a confused dir
 int can_move(char_data *ch, int dir, room_data *to_room, int need_specials_check) {
+	if (WATER_SECT(to_room) && !EFFECTIVELY_SWIMMING(ch)) {
+		send_to_char("You don't know how to swim.\r\n", ch);
+		return 0;
+	}
 	// water->mountain
 	if (!PLR_FLAGGED(ch, PLR_UNRESTRICT) && WATER_SECT(IN_ROOM(ch))) {
 		if (ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && !EFFECTIVELY_FLYING(ch)) {
@@ -507,7 +511,7 @@ int can_move(char_data *ch, int dir, room_data *to_room, int need_specials_check
 		// sends own messages
 		return 0;
 	}
-	if (GET_LEADING_MOB(ch) && !GET_LEADING_MOB(ch)->desc && IN_ROOM(GET_LEADING_MOB(ch)) == IN_ROOM(ch) && !can_move(GET_LEADING_MOB(ch), dir, to_room, TRUE)) {
+	if (GET_LEADING_MOB(ch) && !GET_LEADING_MOB(ch)->desc && IN_ROOM(GET_LEADING_MOB(ch)) == IN_ROOM(ch) && !can_move(GET_LEADING_MOB(ch), dir, to_room, FALSE)) {
 		act("You can't go there while leading $N.", FALSE, ch, NULL, GET_LEADING_MOB(ch), TO_CHAR);
 		return 0;
 	}
@@ -765,10 +769,6 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 			}
 			else if (IS_NPC(ch) && MOB_FLAGGED(ch, MOB_AQUATIC)) {
 				mode = MOVE_SWIM;
-			}
-			else {
-				send_to_char("You don't know how to swim.\r\n", ch);
-				return FALSE;
 			}
 		}
 	}
