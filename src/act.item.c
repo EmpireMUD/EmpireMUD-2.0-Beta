@@ -1963,6 +1963,7 @@ void load_shipment(struct empire_data *emp, struct shipping_data *shipd, vehicle
 		newd->status = SHIPPING_QUEUED;
 		newd->status_time = shipd->status_time;
 		newd->ship_origin = NOWHERE;
+		newd->shipping_id = -1;
 		
 		// put right after shipd in the list
 		newd->next = shipd->next;
