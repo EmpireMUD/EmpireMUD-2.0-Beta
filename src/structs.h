@@ -1994,8 +1994,8 @@ struct shipping_data {
 	int to_island;
 	int status;	// SHIPPING_x
 	long status_time;	// when it gained that status
-	room_vnum ship_homeroom;	// if a ship is assigned, which one
 	room_vnum ship_origin;	// where the ship is coming from (in case we have to send it back)
+	int shipping_id;	// VEH_SHIPPING_ID() of ship
 	
 	struct shipping_data *next;
 };

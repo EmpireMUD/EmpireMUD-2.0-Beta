@@ -64,6 +64,53 @@ void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool 
 //// HELPERS /////////////////////////////////////////////////////////////////
 
 /**
+* Updates all shipping ids (run before converting vehicle ownership) and moves
+* shipping data to the new empire. Call this during an empire merge.
+*
+* @param empire_data *old_emp
+* @param empire_data *new_emp
+*/
+void convert_empire_shipping(empire_data *old_emp, empire_data *new_emp) {
+	extern int find_free_shipping_id(empire_data *emp);
+	
+	struct shipping_data *sd, *next_sd;
+	vehicle_data *veh;
+	int old_id, new_id;
+	
+	LL_FOREACH(vehicle_list, veh) {
+		if (VEH_OWNER(veh) != old_emp || VEH_SHIPPING_ID(veh) == -1) {
+			continue;
+		}
+		
+		old_id = VEH_SHIPPING_ID(veh);
+		new_id = find_free_shipping_id(new_emp);
+		
+		LL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(old_emp), sd, next_sd) {
+			if (sd->shipping_id == old_id) {
+				sd->shipping_id = new_id;
+			}
+		}
+		
+		VEH_SHIPPING_ID(veh) = new_id;
+	}
+	
+	// move all shipping entries over
+	if ((sd = EMPIRE_SHIPPING_LIST(new_emp))) {
+		// append to end
+		while (sd->next) {
+			sd = sd->next;
+		}
+		sd->next = EMPIRE_SHIPPING_LIST(old_emp);
+	}
+	else {
+		EMPIRE_SHIPPING_LIST(new_emp) = EMPIRE_SHIPPING_LIST(old_emp);
+	}
+	
+	EMPIRE_SHIPPING_LIST(old_emp) = NULL;
+}
+
+
+/**
 * Determines how much an empire must spend to start a war with another empire,
 * based on the configs "war_cost_max" and "war_cost_min". This is calculated
 * by the difference in score between the two empires with the maximum value at
@@ -3298,7 +3345,6 @@ ACMD(do_enroll) {
 	struct empire_unique_storage *eus;
 	struct vehicle_attached_mob *vam;
 	vehicle_data *veh, *next_veh;
-	struct shipping_data *shipd;
 	empire_data *e, *old;
 	room_data *room, *next_room;
 	int old_store;
@@ -3396,6 +3442,9 @@ ACMD(do_enroll) {
 				}
 			}
 			
+			// convert shipping (before doing vehicles)
+			convert_empire_shipping(old, e);
+			
 			// vehicles
 			LL_FOREACH_SAFE2(vehicle_list, veh, next_veh, next) {
 				if (VEH_OWNER(veh) == old) {
@@ -3424,21 +3473,6 @@ ACMD(do_enroll) {
 				if (store2->amount < old_store || store2->amount > MAX_STORAGE) {
 					store2->amount = MAX_STORAGE;
 				}
-			}
-			
-			// shipping: append to end of current empire's list
-			if (EMPIRE_SHIPPING_LIST(old)) {
-				// find end
-				if ((shipd = EMPIRE_SHIPPING_LIST(e))) {
-					while (shipd->next) {
-						shipd = shipd->next;
-					}
-					shipd->next = EMPIRE_SHIPPING_LIST(old);
-				}
-				else {
-					EMPIRE_SHIPPING_LIST(e) = EMPIRE_SHIPPING_LIST(old);
-				}
-				EMPIRE_SHIPPING_LIST(old) = NULL;
 			}
 			
 			// unique storage: append to end of current empire's list

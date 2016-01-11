@@ -1644,7 +1644,7 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 				shipd->to_island = t[3];
 				shipd->status = t[4];
 				shipd->status_time = l_in;
-				shipd->ship_homeroom = t[5];
+				shipd->shipping_id = t[5];
 				shipd->ship_origin = t[6];
 				shipd->next = NULL;
 
@@ -2090,7 +2090,7 @@ void write_empire_storage_to_file(FILE *fl, empire_data *emp) {
 	
 	// V: shipments
 	for (shipd = EMPIRE_SHIPPING_LIST(emp); shipd; shipd = shipd->next) {
-		fprintf(fl, "V %d %d %d %d %d %ld %d %d\n", shipd->vnum, shipd->amount, shipd->from_island, shipd->to_island, shipd->status, shipd->status_time, shipd->ship_homeroom, shipd->ship_origin);
+		fprintf(fl, "V %d %d %d %d %d %ld %d %d\n", shipd->vnum, shipd->amount, shipd->from_island, shipd->to_island, shipd->status, shipd->status_time, shipd->shipping_id, shipd->ship_origin);
 	}
 
 	fprintf(fl, "S\n");
