@@ -376,7 +376,7 @@ void scale_vehicle_to_level(vehicle_data *veh, int level) {
 		}
 	}
 	
-	// constraints
+	// outside constraints
 	if (inst || (IN_ROOM(veh) && (inst = ROOM_INSTANCE(IN_ROOM(veh))))) {
 		if (GET_ADV_MIN_LEVEL(inst->adventure) > 0) {
 			level = MAX(level, GET_ADV_MIN_LEVEL(inst->adventure));
@@ -384,6 +384,14 @@ void scale_vehicle_to_level(vehicle_data *veh, int level) {
 		if (GET_ADV_MAX_LEVEL(inst->adventure) > 0) {
 			level = MIN(level, GET_ADV_MAX_LEVEL(inst->adventure));
 		}
+	}
+	
+	// vehicle constraints
+	if (VEH_MIN_SCALE_LEVEL(veh) > 0) {
+		level = MAX(level, VEH_MIN_SCALE_LEVEL(veh));
+	}
+	if (VEH_MAX_SCALE_LEVEL(veh) > 0) {
+		level = MIN(level, VEH_MAX_SCALE_LEVEL(veh));
 	}
 	
 	// set the level
@@ -1383,6 +1391,16 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 			exit(1);
 		}
 		switch (*line) {
+			case 'C': {	// scalable
+				if (!get_line(fl, line) || sscanf(line, "%d %d", &int_in[0], &int_in[1]) != 2) {
+					log("SYSERR: Format error in C line of %s", error);
+					exit(1);
+				}
+				
+				VEH_MIN_SCALE_LEVEL(veh) = int_in[0];
+				VEH_MAX_SCALE_LEVEL(veh) = int_in[1];
+				break;
+			}
 			case 'D': {	// designate/rooms
 				if (!get_line(fl, line) || sscanf(line, "%d %d %s", &int_in[0], &int_in[1], str_in) != 3) {
 					log("SYSERR: Format error in D line of %s", error);
@@ -1463,6 +1481,12 @@ void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
 	// 6. flags move_type maxhealth capacity animals_required
 	strcpy(temp, bitv_to_alpha(VEH_FLAGS(veh)));
 	fprintf(fl, "%s %d %d %d %d\n", temp, VEH_MOVE_TYPE(veh), VEH_MAX_HEALTH(veh), VEH_CAPACITY(veh), VEH_ANIMALS_REQUIRED(veh));
+	
+	// C: scaling
+	if (VEH_MIN_SCALE_LEVEL(veh) > 0 || VEH_MAX_SCALE_LEVEL(veh) > 0) {
+		fprintf(fl, "C\n");
+		fprintf(fl, "%d %d\n", VEH_MIN_SCALE_LEVEL(veh), VEH_MAX_SCALE_LEVEL(veh));
+	}
 	
 	// 'D': designate/rooms
 	if (VEH_INTERIOR_ROOM_VNUM(veh) != NOTHING || VEH_MAX_ROOMS(veh) || VEH_DESIGNATE_FLAGS(veh)) {
@@ -1994,9 +2018,7 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 		size += snprintf(buf + size, sizeof(buf) - size, "Yearly maintenance:\r\n%s", part);
 	}
 	
-	if (VEH_OWNER(veh) || VEH_SCALE_LEVEL(veh)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "Scaled to level: [\tc%d\t0], Owner: [%s%s\t0]\r\n", VEH_SCALE_LEVEL(veh), EMPIRE_BANNER(VEH_OWNER(veh)), EMPIRE_NAME(VEH_OWNER(veh)));
-	}
+	size += snprintf(buf + size, sizeof(buf) - size, "Scaled to level: [\tc%d (%d-%d)\t0], Owner: [%s%s\t0]\r\n", VEH_SCALE_LEVEL(veh), VEH_MIN_SCALE_LEVEL(veh), VEH_MAX_SCALE_LEVEL(veh), VEH_OWNER(veh) ? EMPIRE_BANNER(VEH_OWNER(veh)) : "", VEH_OWNER(veh) ? EMPIRE_NAME(VEH_OWNER(veh)) : "nobody");
 	
 	if (VEH_INTERIOR_HOME_ROOM(veh) || VEH_INSIDE_ROOMS(veh) > 0) {
 		size += snprintf(buf + size, sizeof(buf) - size, "Interior location: [\ty%d\t0], Added rooms: [\tg%d\t0/\tg%d\t0]\r\n", VEH_INTERIOR_HOME_ROOM(veh) ? GET_ROOM_VNUM(VEH_INTERIOR_HOME_ROOM(veh)) : NOTHING, VEH_INSIDE_ROOMS(veh), VEH_MAX_ROOMS(veh));
@@ -2126,6 +2148,19 @@ void olc_show_vehicle(char_data *ch) {
 	sprintf(buf + strlen(buf), "<\tymovetype\t0> %s\r\n", mob_move_types[VEH_MOVE_TYPE(veh)]);
 	sprintf(buf + strlen(buf), "<\tycapacity\t0> %d item%s\r\n", VEH_CAPACITY(veh), PLURAL(VEH_CAPACITY(veh)));
 	sprintf(buf + strlen(buf), "<\tyanimalsrequired\t0> %d\r\n", VEH_ANIMALS_REQUIRED(veh));
+	
+	if (VEH_MIN_SCALE_LEVEL(veh) > 0) {
+		sprintf(buf + strlen(buf), "<&yminlevel&0> %d\r\n", VEH_MIN_SCALE_LEVEL(veh));
+	}
+	else {
+		sprintf(buf + strlen(buf), "<&yminlevel&0> none\r\n");
+	}
+	if (VEH_MAX_SCALE_LEVEL(veh) > 0) {
+		sprintf(buf + strlen(buf), "<&ymaxlevel&0> %d\r\n", VEH_MAX_SCALE_LEVEL(veh));
+	}
+	else {
+		sprintf(buf + strlen(buf), "<&ymaxlevel&0> none\r\n");
+	}
 
 	sprintf(buf + strlen(buf), "<\tyinteriorroom\t0> %d - %s\r\n", VEH_INTERIOR_ROOM_VNUM(veh), building_proto(VEH_INTERIOR_ROOM_VNUM(veh)) ? GET_BLD_NAME(building_proto(VEH_INTERIOR_ROOM_VNUM(veh))) : "none");
 	sprintf(buf + strlen(buf), "<\tyextrarooms\t0> %d\r\n", VEH_MAX_ROOMS(veh));
@@ -2273,6 +2308,18 @@ OLC_MODULE(vedit_lookdescription) {
 		sprintf(buf, "description for %s", VEH_SHORT_DESC(veh));
 		start_string_editor(ch->desc, buf, &VEH_LOOK_DESC(veh), MAX_ITEM_DESCRIPTION);
 	}
+}
+
+
+OLC_MODULE(vedit_maxlevel) {
+	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
+	VEH_MAX_SCALE_LEVEL(veh) = olc_process_number(ch, argument, "maximum level", "maxlevel", 0, MAX_INT, VEH_MAX_SCALE_LEVEL(veh));
+}
+
+
+OLC_MODULE(vedit_minlevel) {
+	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
+	VEH_MIN_SCALE_LEVEL(veh) = olc_process_number(ch, argument, "minimum level", "minlevel", 0, MAX_INT, VEH_MIN_SCALE_LEVEL(veh));
 }
 
 

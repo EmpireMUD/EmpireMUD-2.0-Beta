@@ -3555,6 +3555,8 @@ struct vehicle_data {
 // data that only prototypes need
 struct vehicle_attribute_data {
 	int maxhealth;	// total hitpoints
+	int min_scale_level;	// minimum level
+	int max_scale_level;	// maximum level
 	int capacity;	// holds X items
 	int animals_required;	// number of animals to move it
 	int move_type;	// MOB_MOVE_ type

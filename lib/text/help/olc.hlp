@@ -2941,7 +2941,7 @@ See also: OLC OBJECTS
 
 Usage:  .maxlevel <level>
 
-This command determines the maximum level a objecdt will scale to. Players are
+This command determines the maximum level a object will scale to. Players are
 rated from level 1 to 100 based on their skills, plus a number based on their
 gear. There is a full guide to item scaling at HELP ITEM SCALING.
 
@@ -4654,6 +4654,32 @@ goes any longer than that, you should use /fi to format it with indent inside
 the string editor.
 
 See also: OLC VEHICLES, STRING EDITOR
+#d
+"VEDIT MAXLEVEL" "VEDIT MAX LEVEL"
+
+Usage:  .maxlevel <level>
+
+This command determines the maximum level a vehicle will scale to. Players are
+rated from level 1 to 100 based on their skills, plus a number based on their
+gear.
+
+If you set the maxlevel to 0, there will be no maximum and the vehicle can
+scale to any level over the minimum.
+
+See also: VEDIT MINLEVEL, OLC VEHICLES
+#d
+"VEDIT MINLEVEL" "VEDIT MIN LEVEL"
+
+Usage:  .minlevel <level>
+
+This command determines the minimum level a object will scale to. Players are
+rated from level 1 to 100 based on their skills, plus a number based on their
+gear.
+
+If you set the minlevel to 0, there will be no lower limit and the vehicle can
+scale to any level under the maximum.
+
+See also: VEDIT MAXLEVEL, OLC VEHICLES
 #d
 "VEDIT MOVETYPE" "VEDIT MOVE TYPE"
 
