@@ -5794,6 +5794,8 @@ void remove_eus_entry(struct empire_unique_storage *eus, empire_data *emp) {
 * @param bool *full A variable to set TRUE if the storage is full and the item can't be stored.
 */
 void store_unique_item(char_data *ch, obj_data *obj, empire_data *emp, room_data *room, bool *full) {
+	extern int get_main_island(empire_data *emp);
+	
 	struct empire_unique_storage *eus;
 	bool extract = FALSE;
 	
@@ -5832,7 +5834,10 @@ void store_unique_item(char_data *ch, obj_data *obj, empire_data *emp, room_data
 		eus->obj = obj;
 		eus->amount = 1;
 		eus->island = room ? GET_ISLAND_ID(room) : NO_ISLAND;
-		if (ROOM_BLD_FLAGGED(room, BLD_VAULT)) {
+		if (eus->island == NO_ISLAND) {
+			eus->island = get_main_island(emp);
+		}
+		if (room && ROOM_BLD_FLAGGED(room, BLD_VAULT)) {
 			eus->flags = EUS_VAULT;
 		}
 			
@@ -6122,6 +6127,7 @@ void vehicle_to_room(vehicle_data *veh, room_data *room) {
 	
 	LL_PREPEND2(ROOM_VEHICLES(room), veh, next_in_room);
 	IN_ROOM(veh) = room;
+	VEH_LAST_MOVE_TIME(veh) = time(0);
 }
 
 

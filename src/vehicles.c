@@ -877,6 +877,9 @@ void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
 	if (VEH_LAST_FIRE_TIME(veh)) {
 		fprintf(fl, "Last-fired: %ld\n", VEH_LAST_FIRE_TIME(veh));
 	}
+	if (VEH_LAST_MOVE_TIME(veh)) {
+		fprintf(fl, "Last-moved: %ld\n", VEH_LAST_MOVE_TIME(veh));
+	}
 	if (VEH_SHIPPING_ID(veh) >= 0) {
 		fprintf(fl, "Shipping-id: %d\n", VEH_SHIPPING_ID(veh));
 	}
@@ -1115,6 +1118,11 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 				if (OBJ_FILE_TAG(line, "Last-fired:", length)) {
 					if (sscanf(line + length + 1, "%ld", &long_in[0])) {
 						VEH_LAST_FIRE_TIME(veh) = long_in[0];
+					}
+				}
+				else if (OBJ_FILE_TAG(line, "Last-moved:", length)) {
+					if (sscanf(line + length + 1, "%ld", &long_in[0])) {
+						VEH_LAST_MOVE_TIME(veh) = long_in[0];
 					}
 				}
 				else if (OBJ_FILE_TAG(line, "Long-desc:", length)) {

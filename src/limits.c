@@ -1077,10 +1077,14 @@ bool should_delete_empire(empire_data *emp) {
 * @return bool TRUE if the item is still in the world, FALSE if it was extracted
 */
 bool check_autostore(obj_data *obj, bool force) {
+	extern int get_main_island(empire_data *emp);
+	
+	empire_data *emp = NULL;
+	vehicle_data *in_veh;
 	room_data *real_loc;
 	obj_data *top_obj;
-	empire_data *emp;
 	bool store, unique, full;
+	int islid;
 	
 	// easy exclusions
 	if (obj->carried_by || obj->worn_by || !CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
@@ -1095,23 +1099,28 @@ bool check_autostore(obj_data *obj, bool force) {
 	// ensure object is in a room, or in an object in a room
 	top_obj = get_top_object(obj);
 	real_loc = IN_ROOM(top_obj);
-	if (!real_loc || IS_ADVENTURE_ROOM(real_loc)) {
-		return TRUE;
+	in_veh = top_obj->in_vehicle;
+	
+	// detect owner here
+	if (!emp && in_veh) {
+		emp = VEH_OWNER(in_veh);
+	}
+	if (!emp && real_loc) {
+		emp = ROOM_OWNER(real_loc);
 	}
 	
-	// check vehicle room: items on ships in the Ship Holding Pen do not autostore
-	// TODO this can go
-	real_loc = IN_VEHICLE_IN_ROOM(real_loc);
-	if (!real_loc || BUILDING_VNUM(real_loc) == RTYPE_SHIP_HOLDING_PEN) {
+	// validate location
+	if (in_veh && !force) {
+		return TRUE;	// vehicles do their own checking and call this with force
+	}
+	if (!in_veh && (!real_loc || IS_ADVENTURE_ROOM(real_loc))) {
 		return TRUE;
 	}
-	
+		
 	// never do it in front of players
-	if (!force && any_players_in_room(IN_ROOM(top_obj))) {
+	if (!force && real_loc && any_players_in_room(real_loc)) {
 		return TRUE;
 	}
-	
-	emp = ROOM_OWNER(IN_ROOM(top_obj));
 	
 	// reasons something is storable (timer was already checked)
 	store = unique = FALSE;
@@ -1132,12 +1141,12 @@ bool check_autostore(obj_data *obj, bool force) {
 		// but this otherwise blocks the item from storing
 		store = FALSE;
 	}
-	else if (UNIQUE_OBJ_CAN_STORE(obj) && ROOM_PRIVATE_OWNER(HOME_ROOM(IN_ROOM(top_obj))) == NOBODY) {
+	else if (UNIQUE_OBJ_CAN_STORE(obj) && real_loc && ROOM_PRIVATE_OWNER(HOME_ROOM(real_loc)) == NOBODY) {
 		// store unique items but not in private homes
 		store = TRUE;
 		unique = TRUE;
 	}
-	else if (OBJ_BOUND_TO(obj) && ROOM_PRIVATE_OWNER(HOME_ROOM(IN_ROOM(top_obj))) == NOBODY && (GET_AUTOSTORE_TIMER(obj) + config_get_int("bound_item_junk_time") * SECS_PER_REAL_MIN) < time(0)) {
+	else if (OBJ_BOUND_TO(obj) && real_loc && ROOM_PRIVATE_OWNER(HOME_ROOM(real_loc)) == NOBODY && (GET_AUTOSTORE_TIMER(obj) + config_get_int("bound_item_junk_time") * SECS_PER_REAL_MIN) < time(0)) {
 		// room owned, item is bound, not a private home, but not storable? junk it
 		store = TRUE;
 		// DON'T mark unique -- we are just junking it
@@ -1149,7 +1158,7 @@ bool check_autostore(obj_data *obj, bool force) {
 	}
 
 	// final timer check (long-autostore)
-	if (!force && ROOM_BLD_FLAGGED(IN_ROOM(top_obj), BLD_LONG_AUTOSTORE) && (GET_AUTOSTORE_TIMER(obj) + config_get_int("long_autostore_time") * SECS_PER_REAL_MIN) > time(0)) {
+	if (!force && real_loc && ROOM_BLD_FLAGGED(real_loc, BLD_LONG_AUTOSTORE) && (GET_AUTOSTORE_TIMER(obj) + config_get_int("long_autostore_time") * SECS_PER_REAL_MIN) > time(0)) {
 		return TRUE;
 	}
 	
@@ -1162,14 +1171,20 @@ bool check_autostore(obj_data *obj, bool force) {
 		}
 		else if (unique) {
 			// this extracts it itself
-			store_unique_item(NULL, obj, emp, IN_ROOM(top_obj), &full);
+			store_unique_item(NULL, obj, emp, real_loc, &full);
 			return FALSE;
 		}
 		else if (OBJ_CAN_STORE(obj)) {
-			add_to_empire_storage(emp, GET_ISLAND_ID(IN_ROOM(top_obj)), GET_OBJ_VNUM(obj), 1);
+			// find where to store it, especially if we got this far with emp but no real_loc
+			islid = real_loc ? GET_ISLAND_ID(real_loc) : NO_ISLAND;
+			if (islid == NO_ISLAND) {
+				islid = get_main_island(emp);
+			}
+			
+			add_to_empire_storage(emp, islid, GET_OBJ_VNUM(obj), 1);
 		}
 	}
-
+	
 	// get rid of it either way
 	extract_obj(obj);
 	return FALSE;

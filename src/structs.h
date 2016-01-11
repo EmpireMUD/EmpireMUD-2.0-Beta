@@ -3532,6 +3532,7 @@ struct vehicle_data {
 	struct vehicle_room_list *room_list;	// all interior rooms
 	int inside_rooms;	// how many rooms are inside
 	time_t last_fire_time;	// for vehicles with siege weapons
+	time_t last_move_time;	// for autostore
 	int shipping_id;	// id for the shipping system for the owner
 	room_data *in_room;	// where it is
 	char_data *led_by;	// person leading it
