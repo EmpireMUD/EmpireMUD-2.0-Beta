@@ -1106,7 +1106,7 @@ bool check_autostore(obj_data *obj, bool force) {
 		emp = VEH_OWNER(in_veh);
 	}
 	if (!emp && real_loc) {
-		emp = ROOM_OWNER(real_loc);
+		emp = ROOM_OWNER(HOME_ROOM(real_loc));
 	}
 	
 	// validate location

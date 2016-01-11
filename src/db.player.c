@@ -2883,8 +2883,13 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	if (IS_VAMPIRE(ch) && GET_APPARENT_AGE(ch) <= 0)
 		GET_APPARENT_AGE(ch) = 25;
 
+	// add to lists
 	ch->next = character_list;
 	character_list = ch;
+	GET_ID(ch) = GET_IDNUM(ch);
+	add_to_lookup_table(GET_ID(ch), (void *)ch);
+	
+	// place character
 	char_to_room(ch, load_room);
 	ch->prev_logon = ch->player.time.logon;	// and update prev_logon now
 	if (dolog) {
@@ -2985,10 +2990,8 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	}
 
 	// script/trigger stuff
-	GET_ID(ch) = GET_IDNUM(ch);
 	greet_mtrigger(ch, NO_DIR);
 	greet_memory_mtrigger(ch);
-	add_to_lookup_table(GET_ID(ch), (void *)ch);
 	
 	// update the index in case any of this changed
 	index = find_player_index_by_idnum(GET_IDNUM(ch));
