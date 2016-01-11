@@ -40,6 +40,7 @@ const char *default_vehicle_short_desc = "an unnamed vehicle";
 const char *default_vehicle_long_desc = "An unnamed vehicle is parked here.";
 
 // local protos
+void add_room_to_vehicle(room_data *room, vehicle_data *veh);
 void clear_vehicle(vehicle_data *veh);
 extern room_data *create_room();
 
@@ -98,18 +99,14 @@ void empty_vehicle(vehicle_data *veh) {
 */
 void fully_empty_vehicle(vehicle_data *veh) {
 	vehicle_data *iter, *next_iter;
+	struct vehicle_room_list *vrl;
 	obj_data *obj, *next_obj;
 	char_data *ch, *next_ch;
-	room_data *room;
 	
-	if (VEH_INTERIOR_HOME_ROOM(veh)) {
-		LL_FOREACH2(interior_room_list, room, next_interior) {
-			if (HOME_ROOM(room) != VEH_INTERIOR_HOME_ROOM(veh)) {
-				continue;
-			}
-			
+	if (VEH_ROOM_LIST(veh)) {
+		LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
 			// remove people
-			LL_FOREACH_SAFE2(ROOM_PEOPLE(room), ch, next_ch, next_in_room) {
+			LL_FOREACH_SAFE2(ROOM_PEOPLE(vrl->room), ch, next_ch, next_in_room) {
 				act("You are ejected from $V!", FALSE, ch, NULL, veh, TO_CHAR);
 				if (IN_ROOM(veh)) {
 					char_to_room(ch, IN_ROOM(veh));
@@ -122,7 +119,7 @@ void fully_empty_vehicle(vehicle_data *veh) {
 			}
 			
 			// remove items
-			LL_FOREACH_SAFE2(ROOM_CONTENTS(room), obj, next_obj, next_content) {
+			LL_FOREACH_SAFE2(ROOM_CONTENTS(vrl->room), obj, next_obj, next_content) {
 				if (IN_ROOM(veh)) {
 					obj_to_room(obj, IN_ROOM(veh));
 				}
@@ -132,7 +129,7 @@ void fully_empty_vehicle(vehicle_data *veh) {
 			}
 			
 			// remove other vehicles
-			LL_FOREACH_SAFE2(ROOM_VEHICLES(room), iter, next_iter, next_in_room) {
+			LL_FOREACH_SAFE2(ROOM_VEHICLES(vrl->room), iter, next_iter, next_in_room) {
 				if (IN_ROOM(veh)) {
 					vehicle_to_room(iter, IN_ROOM(veh));
 				}
@@ -179,6 +176,7 @@ room_data *get_vehicle_interior(vehicle_data *veh) {
 	// attach
 	COMPLEX_DATA(room)->vehicle = veh;
 	VEH_INTERIOR_HOME_ROOM(veh) = room;
+	add_room_to_vehicle(room, veh);
 		
 	return room;
 }
@@ -464,6 +462,20 @@ char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_
 //// UTILITIES ///////////////////////////////////////////////////////////////
 
 /**
+* Adds a room to a vehicle's tracking list.
+*
+* @param room_data *room The room.
+* @param vehicle_data *veh The vehicle to add it to.
+*/
+void add_room_to_vehicle(room_data *room, vehicle_data *veh) {
+	struct vehicle_room_list *vrl;
+	CREATE(vrl, struct vehicle_room_list, 1);
+	vrl->room = room;
+	LL_APPEND(VEH_ROOM_LIST(veh), vrl);
+}
+
+
+/**
 * Checks for common vehicle problems and reports them to ch.
 *
 * @param vehicle_data *veh The item to audit.
@@ -642,11 +654,15 @@ void link_and_check_vehicles(void) {
 		}
 	}
 	
-	// check for orphaned ship rooms
 	LL_FOREACH_SAFE2(interior_room_list, room, next_room, next_interior) {
+		// check for orphaned ship rooms
 		if (ROOM_AFF_FLAGGED(room, ROOM_AFF_IN_VEHICLE) && HOME_ROOM(room) == room && !GET_ROOM_VEHICLE(room)) {
 			delete_room(room, FALSE);	// must check_all_exits later
 			found = TRUE;
+		}
+		// otherwise add the room to the vehicle's interior list
+		else if (GET_ROOM_VEHICLE(room)) {
+			add_room_to_vehicle(room, GET_ROOM_VEHICLE(room));
 		}
 	}
 	
@@ -770,6 +786,24 @@ vehicle_data *read_vehicle(any_vnum vnum, bool with_triggers) {
 	*/
 
 	return veh;
+}
+
+
+/**
+* Removes a room from a vehicle's tracking list, if it's present.
+*
+* @param room_data *room The room.
+* @param vehicle_data *veh The vehicle to remove it from.
+*/
+void remove_room_from_vehicle(room_data *room, vehicle_data *veh) {
+	struct vehicle_room_list *vrl, *next_vrl;
+	
+	LL_FOREACH_SAFE(VEH_ROOM_LIST(veh), vrl, next_vrl) {
+		if (vrl->room == room) {
+			LL_DELETE(VEH_ROOM_LIST(veh), vrl);
+			free(vrl);
+		}
+	}
 }
 
 

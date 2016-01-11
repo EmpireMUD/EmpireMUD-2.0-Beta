@@ -1548,6 +1548,7 @@ ACMD(do_dedicate) {
 
 // Takes subcmd SCMD_DESIGNATE, SCMD_REDESIGNATE
 ACMD(do_designate) {
+	void add_room_to_vehicle(room_data *room, vehicle_data *veh);
 	extern struct empire_territory_data *create_territory_entry(empire_data *emp, room_data *room);
 	extern bld_data *get_building_by_name(char *name, bool room_only);
 	void sort_world_table();
@@ -1649,24 +1650,27 @@ ACMD(do_designate) {
 		if (subcmd == SCMD_REDESIGNATE) {
 			// redesignate this room
 			new = IN_ROOM(ch);
+			
+			remove_designate_objects(new);
+			attach_building_to_room(type, new);
 		}
 		else {
 			// create the new room
 			new = create_room();
 			create_exit(IN_ROOM(ch), new, dir, TRUE);
+			attach_building_to_room(type, new);
 
+			COMPLEX_DATA(new)->home_room = home;
 			COMPLEX_DATA(home)->inside_rooms++;
+			ROOM_OWNER(new) = ROOM_OWNER(home);
+			
 			if (veh) {
 				++VEH_INSIDE_ROOMS(veh);
+				COMPLEX_DATA(new)->vehicle = veh;
+				add_room_to_vehicle(new, veh);
 			}
 		}
-
-		// remove old objects
-		remove_designate_objects(new);
 		
-		// attach new type
-		attach_building_to_room(type, new);
-
 		// add new objects
 		switch (GET_BLD_VNUM(type)) {
 			case RTYPE_STUDY: {
@@ -1682,13 +1686,8 @@ ACMD(do_designate) {
 				break;
 			}
 		}
-
-		/* set applicable values */
-		COMPLEX_DATA(new)->home_room = home;
-		COMPLEX_DATA(new)->vehicle = veh;	// if any
-		ROOM_OWNER(new) = ROOM_OWNER(home);
 		
-		set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_REDESIGNATE_TIME, time(0));
+		set_room_extra_data(new, ROOM_EXTRA_REDESIGNATE_TIME, time(0));
 
 		/* send messages */
 		if (subcmd == SCMD_REDESIGNATE) {

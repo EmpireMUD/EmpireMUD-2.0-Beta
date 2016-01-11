@@ -156,8 +156,9 @@ bool find_siege_target_for_vehicle(char_data *ch, vehicle_data *veh, char *arg, 
 * @return bool TRUE if it moved, FALSE if it was blocked.
 */
 bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
-	room_data *to_room = NULL, *room;
+	struct vehicle_room_list *vrl;
 	char buf[MAX_STRING_LENGTH];
+	room_data *to_room = NULL;
 	char_data *ch_iter;
 	
 	// sanity
@@ -259,13 +260,9 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 	}
 	
 	// alert whole vessel
-	if (VEH_INTERIOR_HOME_ROOM(veh)) {
-		LL_FOREACH2(interior_room_list, room, next_interior) {
-			if (HOME_ROOM(room) != VEH_INTERIOR_HOME_ROOM(veh)) {
-				continue;
-			}
-			
-			LL_FOREACH2(ROOM_PEOPLE(room), ch_iter, next_in_room) {
+	if (VEH_ROOM_LIST(veh)) {
+		LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
+			LL_FOREACH2(ROOM_PEOPLE(vrl->room), ch_iter, next_in_room) {
 				if (ch_iter->desc && ch_iter != VEH_DRIVER(veh)) {
 					if (has_ability(ch_iter, ABIL_NAVIGATION)) {
 						snprintf(buf, sizeof(buf), "$V %s %s (%d, %d).", mob_move_types[VEH_MOVE_TYPE(veh)], dirs[get_direction_for_char(ch_iter, dir)], X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh)));
@@ -1302,7 +1299,8 @@ void do_drive_through_portal(char_data *ch, vehicle_data *veh, obj_data *portal,
 	extern obj_data *find_back_portal(room_data *in_room, room_data *from_room, obj_data *fallback);
 	void give_portal_sickness(char_data *ch, obj_data *portal, room_data *from, room_data *to);
 	
-	room_data *to_room, *was_in = IN_ROOM(veh), *room;
+	room_data *to_room, *was_in = IN_ROOM(veh);
+	struct vehicle_room_list *vrl;
 	char_data *ch_iter, *next_ch;
 	char buf[MAX_STRING_LENGTH];
 	
@@ -1344,14 +1342,10 @@ void do_drive_through_portal(char_data *ch, vehicle_data *veh, obj_data *portal,
 		if (VEH_SITTING_ON(veh)) {
 			give_portal_sickness(VEH_SITTING_ON(veh), portal, was_in, to_room);
 		}
-		if (VEH_INTERIOR_HOME_ROOM(veh)) {
+		if (VEH_ROOM_LIST(veh)) {
 			snprintf(buf, sizeof(buf), "$V %s through $p.", mob_move_types[VEH_MOVE_TYPE(veh)]);
-			LL_FOREACH2(interior_room_list, room, next_interior) {
-				if (HOME_ROOM(room) != VEH_INTERIOR_HOME_ROOM(veh)) {
-					continue;
-				}
-				
-				LL_FOREACH_SAFE2(ROOM_PEOPLE(room), ch_iter, next_ch, next_in_room) {
+			LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
+				LL_FOREACH_SAFE2(ROOM_PEOPLE(vrl->room), ch_iter, next_ch, next_in_room) {
 					give_portal_sickness(ch_iter, portal, was_in, to_room);
 					act(buf, FALSE, ch_iter, portal, veh, TO_CHAR | TO_SPAMMY);
 				}
@@ -1363,7 +1357,7 @@ void do_drive_through_portal(char_data *ch, vehicle_data *veh, obj_data *portal,
 
 ACMD(do_drive) {
 	char dir_arg[MAX_INPUT_LENGTH], dist_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
-	room_data *room, *next_room;
+	struct vehicle_room_list *vrl;
 	bool was_driving, same_dir;
 	char_data *ch_iter;
 	vehicle_data *veh;
@@ -1463,13 +1457,9 @@ ACMD(do_drive) {
 		}
 		
 		// alert whole vehicle
-		if (!same_dir && VEH_INTERIOR_HOME_ROOM(veh)) {
-			LL_FOREACH_SAFE2(interior_room_list, room, next_room, next_interior) {
-				if (HOME_ROOM(room) != VEH_INTERIOR_HOME_ROOM(veh)) {
-					continue;
-				}
-				
-				LL_FOREACH2(ROOM_PEOPLE(room), ch_iter, next_in_room) {
+		if (!same_dir && VEH_ROOM_LIST(veh)) {
+			LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
+				LL_FOREACH2(ROOM_PEOPLE(vrl->room), ch_iter, next_in_room) {
 					if (ch_iter != ch && ch_iter->desc) {
 						snprintf(buf, sizeof(buf), "$V %s %s.", (was_driving ? "turns to the" : "begins to move"), dirs[get_direction_for_char(ch_iter, dir)]);
 						act(buf, FALSE, ch_iter, NULL, veh, TO_CHAR);

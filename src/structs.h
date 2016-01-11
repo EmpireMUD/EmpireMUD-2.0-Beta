@@ -3529,6 +3529,7 @@ struct vehicle_data {
 	struct vehicle_attached_mob *animals;	// linked list of mobs attached
 	struct resource_data *needs_resources;	// resources until finished/maintained
 	room_data *interior_home_room;	// the vehicle's main room
+	struct vehicle_room_list *room_list;	// all interior rooms
 	int inside_rooms;	// how many rooms are inside
 	time_t last_fire_time;	// for vehicles with siege weapons
 	int shipping_id;	// id for the shipping system for the owner
@@ -3569,6 +3570,13 @@ struct vehicle_attached_mob {
 	bitvector_t flags;	// mob flags
 	empire_vnum empire;	// empire that owned it
 	struct vehicle_attached_mob *next;	// linked list
+};
+
+
+// list of rooms inside a vehicle
+struct vehicle_room_list {
+	room_data *room;
+	struct vehicle_room_list *next;
 };
 
 

@@ -1111,6 +1111,7 @@ void SET_ISLAND_ID(room_data *room, int island);	// formerly a #define and a roo
 #define VEH_LOOK_DESC(veh)  ((veh)->look_desc)
 #define VEH_NEEDS_RESOURCES(veh)  ((veh)->needs_resources)
 #define VEH_OWNER(veh)  ((veh)->owner)
+#define VEH_ROOM_LIST(veh)  ((veh)->room_list)
 #define VEH_SCALE_LEVEL(veh)  ((veh)->scale_level)
 #define VEH_SHIPPING_ID(veh)  ((veh)->shipping_id)
 #define VEH_SHORT_DESC(veh)  ((veh)->short_desc)

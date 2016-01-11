@@ -2127,8 +2127,8 @@ void besiege_vehicle(vehicle_data *veh, int damage, int siege_type) {
 
 	static struct resource_data *default_res = NULL;
 	struct resource_data *old_list;
+	struct vehicle_room_list *vrl;
 	char_data *ch, *next_ch;
-	room_data *room;
 	
 	// resources if it doesn't have its own
 	if (!default_res) {
@@ -2183,13 +2183,9 @@ void besiege_vehicle(vehicle_data *veh, int damage, int siege_type) {
 			}
 		}
 		
-		if (VEH_INTERIOR_HOME_ROOM(veh)) {
-			LL_FOREACH2(interior_room_list, room, next_interior) {
-				if (HOME_ROOM(room) != VEH_INTERIOR_HOME_ROOM(veh)) {
-					continue;
-				}
-				
-				LL_FOREACH_SAFE2(ROOM_PEOPLE(room), ch, next_ch, next_in_room) {
+		if (VEH_ROOM_LIST(veh)) {
+			LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
+				LL_FOREACH_SAFE2(ROOM_PEOPLE(vrl->room), ch, next_ch, next_in_room) {
 					act("You are killed as $V is destroyed!", FALSE, ch, NULL, veh, TO_CHAR);
 					if (!IS_NPC(ch)) {
 						mortlog("%s has been killed by siege damage at (%d, %d)!", PERS(ch, ch, TRUE), X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));

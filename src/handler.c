@@ -6005,22 +6005,28 @@ void extract_vehicle(vehicle_data *veh) {
 	void relocate_players(room_data *room, room_data *to_room);
 	extern char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh);
 	
-	room_data *main_room, *room, *next_room;
+	struct vehicle_room_list *vrl, *next_vrl;
+	room_data *main_room;
 	
 	// delete interior
-	if ((main_room = VEH_INTERIOR_HOME_ROOM(veh))) {
-		LL_FOREACH_SAFE2(interior_room_list, room, next_room, next_interior) {
-			if (HOME_ROOM(room) == main_room && room != main_room) {
-				if (IN_ROOM(veh)) {
-					relocate_players(room, IN_ROOM(veh));
-				}
-				delete_room(room, FALSE);	// MUST check_all_exits later
+	if ((main_room = VEH_INTERIOR_HOME_ROOM(veh)) || VEH_ROOM_LIST(veh)) {
+		LL_FOREACH_SAFE(VEH_ROOM_LIST(veh), vrl, next_vrl) {
+			if (vrl->room == main_room) {
+				continue;	// do this one last
 			}
+			
+			if (IN_ROOM(veh)) {
+				relocate_players(vrl->room, IN_ROOM(veh));
+			}
+			delete_room(vrl->room, FALSE);	// MUST check_all_exits later
 		}
-		if (IN_ROOM(veh)) {
-			relocate_players(main_room, IN_ROOM(veh));
+		
+		if (main_room) {
+			if (IN_ROOM(veh)) {
+				relocate_players(main_room, IN_ROOM(veh));
+			}
+			delete_room(main_room, FALSE);
 		}
-		delete_room(main_room, FALSE);
 		check_all_exits();
 	}
 	

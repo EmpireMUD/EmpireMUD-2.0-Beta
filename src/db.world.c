@@ -348,6 +348,7 @@ void delete_room(room_data *room, bool check_exits) {
 	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 	void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool full_abandon);
 	void relocate_players(room_data *room, room_data *to_room);
+	void remove_room_from_vehicle(room_data *room, vehicle_data *veh);
 
 	struct room_direction_data *ex, *next_ex, *temp;
 	struct empire_territory_data *ter, *next_ter;
@@ -376,6 +377,9 @@ void delete_room(room_data *room, bool check_exits) {
 	
 	// remove it now
 	remove_room_from_world_tables(room);
+	if (GET_ROOM_VEHICLE(room)) {
+		remove_room_from_vehicle(room, GET_ROOM_VEHICLE(room));
+	}
 	
 	if (check_exits) {
 		// search world for portals that link here
