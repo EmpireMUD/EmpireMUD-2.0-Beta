@@ -1065,6 +1065,17 @@ void look_in_direction(char_data *ch, int dir) {
 					++num_commas;
 				}
 			}
+			
+			LL_FOREACH2(ROOM_VEHICLES(to_room), veh, next_in_room) {
+				if (CAN_SEE_VEHICLE(ch, veh)) {
+					bufsize += snprintf(buf + bufsize, sizeof(buf) - bufsize, "%s, ", get_vehicle_short_desc(veh, ch));
+					if (last_comma_pos != -1) {
+						prev_comma_pos = last_comma_pos;
+					}
+					last_comma_pos = bufsize - 2;
+					++num_commas;
+				}
+			}
 		}
 		
 		/* Shift, rinse, repeat */
