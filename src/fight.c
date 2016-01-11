@@ -2120,8 +2120,9 @@ void besiege_room(room_data *to_room, int damage) {
 * @param vehicle_data *veh The vehicle to damage.
 * @param int damage How much siege damage to deal.
 * @param int siege_type What SIEGE_ damage type.
+* @return bool TRUE if the target survives, FALSE if it's extracted
 */
-void besiege_vehicle(vehicle_data *veh, int damage, int siege_type) {
+bool besiege_vehicle(vehicle_data *veh, int damage, int siege_type) {
 	extern struct resource_data *combine_resources(struct resource_data *combine_a, struct resource_data *combine_b);
 	void fully_empty_vehicle(vehicle_data *veh);
 
@@ -2137,7 +2138,7 @@ void besiege_vehicle(vehicle_data *veh, int damage, int siege_type) {
 	
 	// no effect
 	if (damage <= 0) {
-		return;
+		return TRUE;
 	}
 	
 	// deal damage
@@ -2207,7 +2208,10 @@ void besiege_vehicle(vehicle_data *veh, int damage, int siege_type) {
 		vehicle_from_room(veh);	// remove from room first to destroy anything inside
 		fully_empty_vehicle(veh);
 		extract_vehicle(veh);
+		return FALSE;
 	}
+	
+	return TRUE;
 }
 
 

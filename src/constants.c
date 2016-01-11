@@ -2066,6 +2066,7 @@ const char *designate_flags[] = {
 	"SHIP-MAIN",
 	"SHIP-LARGE",
 	"SHIP-EXTRA",
+	"LAND-VEHICLE",
 	"\n"
 };
 

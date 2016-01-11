@@ -1473,7 +1473,7 @@ ACMD(do_drive) {
 
 ACMD(do_fire) {
 	void besiege_room(room_data *to_room, int damage);
-	void besiege_vehicle(vehicle_data *veh, int damage, int siege_type);
+	bool besiege_vehicle(vehicle_data *veh, int damage, int siege_type);
 	
 	char veh_arg[MAX_INPUT_LENGTH], tar_arg[MAX_INPUT_LENGTH];
 	vehicle_data *veh, *veh_targ;

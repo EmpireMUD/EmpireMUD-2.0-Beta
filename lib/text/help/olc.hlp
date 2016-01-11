@@ -1108,6 +1108,7 @@ Available designate flags:
  SHIP-MAIN - core ship rooms
  SHIP-LARGE - rooms for larger ships
  SHIP-EXTRA - bonus rooms for huge ships
+ LAND-VEHICLE - rooms for land vehicles like wagons
 
 See also: OLC BUILDINGS
 #d

@@ -1606,20 +1606,63 @@ void point_update_room(room_data *room) {
 //// VEHICLE LIMITS //////////////////////////////////////////////////////////
 
 /**
+* Attempts to autostore the contents of the vehicle. This will check for
+* players present first.
+*
+* @param vehicle_data *veh The vehicle to autostore.
+*/
+void autostore_vehicle_contents(vehicle_data *veh) {
+	struct vehicle_room_list *vrl;
+	obj_data *obj, *next_obj;
+	
+	// things that block autostore
+	if (IN_ROOM(veh) && any_players_in_room(IN_ROOM(veh))) {
+		return;
+	}
+	if (VEH_SITTING_ON(veh) && !IS_NPC(VEH_SITTING_ON(veh))) {
+		return;
+	}
+	if (VEH_DRIVER(veh) && !IS_NPC(VEH_DRIVER(veh))) {
+		return;
+	}
+	if (VEH_LED_BY(veh) && !IS_NPC(VEH_LED_BY(veh))) {
+		return;
+	}
+	LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
+		if (any_players_in_room(vrl->room)) {
+			return;
+		}
+	}
+	
+	// ok we are good to autostore
+	LL_FOREACH_SAFE2(VEH_CONTAINS(veh), obj, next_obj, next_content) {
+		check_autostore(obj, TRUE);
+	}
+}
+
+
+/**
 * This runs an hourly "point update" on a vehicle.
 *
 * @param vehicle_data *veh The vehicle to update.
 */
 void point_update_vehicle(vehicle_data *veh) {
-	void besiege_vehicle(vehicle_data *veh, int damage, int siege_type);
+	bool besiege_vehicle(vehicle_data *veh, int damage, int siege_type);
+	
+	// autostore
+	if ((time(0) - VEH_LAST_MOVE_TIME(veh)) > (config_get_int("autostore_time") * SECS_PER_REAL_MIN)) {
+		autostore_vehicle_contents(veh);
+	}
 
 	// burny burny burny! (do this last)
 	if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
 		if (ROOM_PEOPLE(IN_ROOM(veh))) {
 			act("The flames roar as they envelop $V!", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
 		}
-		besiege_vehicle(veh, MAX(1, (VEH_MAX_HEALTH(veh) / 12)), SIEGE_BURNING);
-		// WARNING: this may have extracted it
+		if (!besiege_vehicle(veh, MAX(1, (VEH_MAX_HEALTH(veh) / 12)), SIEGE_BURNING)) {
+			// extracted
+			return;
+		}
 	}
 }
 

@@ -533,6 +533,7 @@ typedef struct vehicle_data vehicle_data;
 #define DES_SHIP_MAIN		BIT(14)
 #define DES_SHIP_LARGE		BIT(15)
 #define DES_SHIP_EXTRA		BIT(16)
+#define DES_LAND_VEHICLE	BIT(17)
 
 
  //////////////////////////////////////////////////////////////////////////////
