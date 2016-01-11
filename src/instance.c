@@ -1790,7 +1790,10 @@ void save_instances(void) {
 * @param int level A pre-validated level.
 */
 static void scale_instance_to_level(struct instance_data *inst, int level) {	
+	void scale_vehicle_to_level(vehicle_data *veh, int level);
+	
 	int iter;
+	vehicle_data *veh;
 	char_data *ch;
 	obj_data *obj;
 	
@@ -1799,12 +1802,19 @@ static void scale_instance_to_level(struct instance_data *inst, int level) {
 	for (iter = 0; iter < inst->size; ++iter) {
 		if (inst->room[iter]) {
 			for (ch = ROOM_PEOPLE(inst->room[iter]); ch; ch = ch->next_in_room) {
-				if (IS_NPC(ch)) {
+				if (IS_NPC(ch) && GET_CURRENT_SCALE_LEVEL(ch) == 0) {
 					scale_mob_to_level(ch, level);
 				}
 			}
 			for (obj = ROOM_CONTENTS(inst->room[iter]); obj; obj = obj->next_content) {
-				scale_item_to_level(obj, level);
+				if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) == 0) {
+					scale_item_to_level(obj, level);
+				}
+			}
+			LL_FOREACH2(ROOM_VEHICLES(inst->room[iter]), veh, next_in_room) {
+				if (VEH_SCALE_LEVEL(veh) == 0) {
+					scale_vehicle_to_level(veh, level);
+				}
 			}
 		}
 	}
