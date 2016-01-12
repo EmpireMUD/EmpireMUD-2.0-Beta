@@ -2,11 +2,11 @@
 rock~
 a rock~
 A rock is lying on the ground.~
-   Rocks can be used as a primite weapon, used to chip other rocks, used as a
+   Rocks can be used as a primitive weapon, used to chip other rocks, used as a
 crafting component, or as catapult shot. They are also used to lay roads and
-build some buildings.  
+build some buildings.
 ~
-1 il ano
+1 il ano 2
 0 2 5
 1 0
 R
@@ -18,7 +18,7 @@ a pile of clay~
 Some clay is lumped here.~
 You can mold clay into pottery.
 ~
-3 l a
+3 l a 1
 0 0 0
 6 0
 R
@@ -30,7 +30,7 @@ a flint stone~
 A piece of flint is lying on the ground.~
 You can craft a flint set and use that to light torches.
 ~
-1 il ano
+1 il ano 1
 0 1 5
 5 0
 R
@@ -42,7 +42,7 @@ a yellow lightning stone~
 A translucent yellow lightning stone is lying here.~
 The lightning stone can be used for certain crafts and enchantments.
 ~
-3 l a
+3 l a 1
 0 0 0
 1 0
 R
@@ -56,7 +56,7 @@ a red bloodstone~
 A red bloodstone is sitting on the ground.~
 The bloodstone can be used for certain crafts and enchantments.
 ~
-3 l a
+3 l a 1
 0 0 0
 1 0
 R
@@ -70,7 +70,7 @@ a huge stone block~
 A huge stone block is sitting here.~
 The stone block is used in monumental architecture.
 ~
-3 el a
+3 el a 1
 0 0 0
 1 0
 M
@@ -89,7 +89,7 @@ A large tree has fallen here.~
    You can use a sharp tool to scrape a tree until it's a log, or craft it
 into a canoe.
 ~
-3 el a
+3 el a 1
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: a roaring fire
@@ -102,7 +102,7 @@ a stick~
 A stick has fallen on the ground.~
 You can craft a handle from a stick, or use it for building.
 ~
-1 l ano
+1 l ano 1
 0 2 5
 0 0
 I 11 184 100.00 1  # LIGHT: a torch
@@ -115,7 +115,7 @@ a small flower~
 A small flower has been dropped here.~
 It's a very pretty flower.
 ~
-3 kl a
+3 kl a 1
 0 0 0
 7 64
 S
@@ -125,10 +125,16 @@ a heavy log~
 A heavy log has been left here.~
 Logs are used in construction.
 ~
-3 el a
+3 el a 2
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: a roaring fire
+M
+7
+$n hoists a log onto $V.~
+M
+6
+You hoist a log onto $V.~
 R
 5118 0
 S
@@ -138,7 +144,7 @@ a stack of lumber~
 Some lumber is stacked on the ground.~
 Lumber is used in building construction.
 ~
-3 el a
+3 el a 2
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: a roaring fire
@@ -148,6 +154,12 @@ You position some lumber and tie it in place.~
 M
 1
 $n positions some lumber and ties it in place.~
+M
+6
+You position some lumber on the frame of $V.~
+M
+7
+$n positions some lumber on the frame of $V.~
 R
 5118 0
 R
@@ -159,7 +171,7 @@ a bundle of wheat~
 A bundle of wheat has been left on the ground.~
 Wheat can be milled into flour, or planted.
 ~
-3 bl a
+3 bl a 1
 0 1 0
 7 168
 R
@@ -171,7 +183,7 @@ a bushel of hops~
 A bushel of hops is sitting on the ground.~
 Hops can be made into ale at the tavern.
 ~
-3 bl a
+3 bl a 1
 0 3 0
 7 168
 M
@@ -189,7 +201,7 @@ a basket of cotton~
 A basket of cotton has been left here.~
 Weave cotton into cloth.
 ~
-3 bl a
+3 bl a 1
 0 4 0
 7 0
 R
@@ -201,7 +213,7 @@ a sack of barley~
 A sack of barley is sitting here.~
 Barley can be made into ale at the tavern.
 ~
-3 bl a
+3 bl a 1
 0 5 0
 7 168
 M
@@ -219,7 +231,7 @@ some iron ore~
 A piece of iron ore has fallen to the ground.~
 Iron is used for forging and building.
 ~
-3 l a
+3 l a 1
 0 0 0
 2 0
 R
@@ -231,7 +243,7 @@ a silver nugget~
 A silver nugget has fallen to the ground.~
 Silver can be melted down for money.
 ~
-15 l a
+15 l a 1
 2 0 0
 3 0
 R
@@ -245,7 +257,7 @@ a pile of gold dust~
 Some sparkling gold dust is scattered across the ground.~
 Gold can be melted down for money.
 ~
-15 l a
+15 l a 1
 3 0 0
 4 0
 R
@@ -259,7 +271,7 @@ some nocturnium ore~
 A chunk of nocturnium ore has fallen to the ground.~
 Nocturnium ore is used in forging high-quality armor and weapons.
 ~
-3 l a
+3 l a 1
 0 0 0
 2 0
 R
@@ -271,7 +283,7 @@ some imperium ore~
 A glistening hunk of imperium ore is sitting here.~
 Imperium ore is used in forging high-quality armor and weapons.
 ~
-3 l a
+3 l a 1
 0 0 0
 2 0
 R
@@ -283,7 +295,7 @@ some copper ore~
 Some copper ore is piled on the ground.~
 Copper ore can be minted into coins.
 ~
-3 l a
+3 l a 1
 0 0 0
 13 0
 R
@@ -295,7 +307,7 @@ a silver disc~
 A silver disc has been left on the ground.~
 Store the silver disc in your vault to gain wealth, or melt it again.
 ~
-15 l a
+15 l a 1
 5 0 0
 3 0
 R
@@ -309,7 +321,7 @@ a gold disc~
 A gold disc is lying on the ground.~
 Store the gold disc in your vault to gain wealth, or melt it again.
 ~
-15 l a
+15 l a 1
 8 0 0
 4 0
 R
@@ -323,7 +335,7 @@ a silver bar~
 A bar of silver has been left on the ground.~
 Store the silver bar in your vault to gain wealth.
 ~
-15 l a
+15 l a 1
 10 1 0
 3 0
 R
@@ -337,7 +349,7 @@ a gold bar~
 A bar of gold is lying on the ground.~
 Store the gold bar in your vault to gain wealth.
 ~
-15 l a
+15 l a 1
 16 1 0
 4 0
 R
@@ -351,7 +363,7 @@ a small flake of gold~
 A small golden flake is lying here.~
 You can melt down gold flakes to make discs.
 ~
-15 l a
+15 l a 1
 0 0 0
 4 0
 R
@@ -365,7 +377,7 @@ an iron ingot~
 An iron ingot is sitting on the ground.~
 Iron is used for forging and building.
 ~
-3 l a
+3 l a 1
 0 0 0
 2 0
 R
@@ -377,7 +389,7 @@ an ingot of nocturnium~
 A nocturnium ingot is sitting on the ground.~
 Nocturnium ore is used in forging high-quality armor and weapons.
 ~
-3 l a
+3 l a 1
 0 0 0
 2 0
 M
@@ -395,7 +407,7 @@ an imperium ingot~
 An imperium ingot is sitting on the ground.~
 Imperium ore is used in forging high-quality armor and weapons.
 ~
-3 l a
+3 l a 1
 0 0 0
 2 0
 M
@@ -413,7 +425,7 @@ a copper ingot~
 A copper ingot is sitting here.~
 Copper ingots can be forged into useful things.
 ~
-3 l a
+3 l a 1
 0 0 0
 13 0
 R
@@ -425,7 +437,7 @@ a copper bar~
 A bar of copper has been left here.~
 Store the copper bar in your vault to gain wealth.
 ~
-15 l a
+15 l a 1
 1 1 0
 13 0
 R
@@ -441,7 +453,7 @@ a chipped rock~
 A chipped rock is lying on the ground.~
 Keep chipping the rock.
 ~
-1 ikl ano
+1 ikl ano 1
 0 2 5
 1 0
 S
@@ -451,7 +463,7 @@ a handaxe~
 A handaxe has been left here.~
 A handaxe is a great multi-purpose tool, but you can also chip it down further.
 ~
-1 hl ano
+1 hl ano 1
 0 2 1
 1 0
 R
@@ -465,7 +477,7 @@ a flint set~
 A flint set is lying here.~
 You can use the flint set to light sticks and make torches.
 ~
-3 0 a
+3 0 a 1
 0 0 0
 5 0
 R
@@ -479,7 +491,7 @@ a torch~
 A torch has been dropped here.~
 A torch is important when you're out at night.
 ~
-1 chl ao
+1 chl ao 1
 0 2 12
 0 8
 S
@@ -489,7 +501,7 @@ a stone spear head~
 A spear head is jabbed into the ground.~
 You can attach this spear head to a handle.
 ~
-1 il ano
+1 il ano 1
 0 1 4
 1 0
 R

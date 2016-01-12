@@ -17,7 +17,7 @@ through another entrance to the north, while the sound of water is heard louder
 from the southeast. It is obvious the area has been frequently used for
 shelter.
 ~
-d 0
+0 0
 D6
 ~
 0 11100
@@ -27,8 +27,8 @@ D0
 D7
 ~
 0 11103
-M 0 11102 80.00 30
-M 0 11100 50.00 30
+M 0 11102 80.00 10
+M 0 11100 50.00 10
 S
 #11102
 A Winding Tunnel~
@@ -44,8 +44,8 @@ D2
 D1
 ~
 0 11104
-M 0 11100 50.00 30
-M 0 11102 80.00 30
+M 0 11100 50.00 10
+M 0 11102 80.00 10
 S
 #11103
 A Downward Passage~
@@ -61,8 +61,8 @@ D4
 D9
 ~
 0 11105
-M 0 11100 50.00 30
-M 0 11102 80.00 30
+M 0 11100 50.00 10
+M 0 11102 80.00 10
 S
 #11104
 A Dried-up Canyon~
@@ -81,16 +81,17 @@ D7
 D8
 ~
 0 11106
-M 0 9126 100.00 2
-M 0 11100 50.00 30
-M 0 11102 80.00 30
+M 0 11108 100.00 2
+M 0 11100 50.00 10
+M 0 11102 80.00 10
 S
 #11105
 An Underground Lakeshore~
    A cavernous space opens up before you, the roof disappearing into darkness
 above a basin-shaped floor. The thunderous rumble of a waterfall can be heard
 to the east, on the farthest side of an underground lake. The water is brisk
-and deep, rimmed with detritus common to fluctuating shorelines.
+and deep, rimmed with detritus common to fluctuating shorelines. A few old
+boats lie among the debris.  
 ~
 b 0
 D8
@@ -100,7 +101,7 @@ D1
 ~
 0 11109
 M 0 11101 50.00 1
-M 0 11102 80.00 30
+M 0 11102 80.00 10
 S
 #11106
 A Narrow Opening~
@@ -120,15 +121,16 @@ D9
 D5
 ~
 0 11119
-M 0 9126 100.00 2
-M 0 11100 50.00 30
+M 0 11108 100.00 2
+M 0 11100 50.00 10
 S
 #11107
 A Downward Slide~
    The rock underfoot is slick and stained black. Bands of brown, green, grey
 and ochre along the walls show that this was once an underground stream, long
 dry from lack of replenishment. Now all that remains is a seeping trickle
-meandering its way toward a more distinct sound of falling water.
+meandering its way toward a more distinct sound of falling water. You could
+slide down to the lakeshore below, but climbing back up looks impossible.  
 ~
 b 0
 D4
@@ -137,8 +139,8 @@ D4
 D9
 ~
 0 11105
-M 0 9126 100.00 1
-M 0 11102 80.00 30
+M 0 11108 100.00 2
+M 0 11102 80.00 10
 S
 #11108
 An Impassable Landslide~
@@ -150,26 +152,23 @@ a 0
 D3
 ~
 0 11106
-D4
-rubble~
-ab 11119
-M 0 9126 100.00 2
-M 0 11100 50.00 30
+M 0 11108 100.00 2
+M 0 11100 50.00 10
 S
 #11109
 An Underground Lake~
-   The water is so deep, it appears impervious to light. A slight current
-ripples from the east, the result of tons of water cascading from somewhere in
-the darkness above.
+   You paddle out onto the water in your boat, found among the wrecks on the
+lakeshore. The water is so deep, it appears impervious to light. A slight
+current ripples from the east, the result of tons of water cascading from
+somewhere in the darkness above.  
 ~
-bf 0
+b 0
 D3
 ~
 0 11105
 D1
 ~
 0 11110
-M 0 11103 50.00 1
 S
 #11110
 A Thunderous Waterfall~
@@ -180,7 +179,7 @@ a ledge juts out from the wall at mooring level, secured with a post indicating
 this is its intended purpose. There is a hollow rushing sound from deep behind
 the waterfall.
 ~
-bf 0
+b 0
 D3
 ~
 0 11109
@@ -190,7 +189,11 @@ D8
 D5
 waterfall~
 ab 11112
-M 0 11103 50.00 1
+E
+waterfall~
+It looks like you could push through it (with 'open waterfall').
+~
+M 0 11103 100.00 1
 S
 #11111
 A Narrow Walkway~
@@ -198,7 +201,8 @@ A Narrow Walkway~
 half-moon just wide enough at the base for one occupant, and tall enough to
 brush the shoulder of an average height. Given the open space on the other
 side, it's likely the groove was created from backs pressed against it for
-balance.
+balance. A few old boats are lying on the path ahead, probably used to cross
+the lake below.  
 ~
 0 0
 D9
@@ -207,8 +211,8 @@ D9
 D8
 ~
 0 11115
-M 0 9126 100.00 4
-M 0 11102 80.00 30
+M 0 11108 100.00 2
+M 0 11102 80.00 10
 S
 #11112
 An Underground Rapids~
@@ -240,15 +244,16 @@ I 6 11107 100.00 1 X  # FORAGE: a juicy pear
 I 8 11102 33.33 1 X  # HARVEST: a bunch of carrots
 I 8 11104 33.33 1 X  # HARVEST: a bunch of blackberries
 I 8 11106 100.00 1 X  # HARVEST: some juicy pears
-M 0 9023 100.00 10
-M 0 9005 100.00 3
-M 0 9150 100.00 4
+M 0 11109 100.00 5
+M 0 11110 100.00 3
+M 0 11111 100.00 2
 M 0 11106 2.00 1
 S
 #11114
 An Inclining Seam~
    The split rises gradually, and narrows only slightly, but the grass quickly
-gives way to scrub and then stone as the slope steepens.
+gives way to scrub and then stone as the slope steepens dramatically. If you
+continue on, you will not be able to return the same way.  
 ~
 0 0
 D9
@@ -257,20 +262,19 @@ D9
 D2
 ~
 0 11108
-M 0 11105 50.00 1
-M 0 9150 50.00 2
-M 0 9005 100.00 3
-M 0 9117 100.00 2
-M 0 9055 20.00 1
+M 0 11111 50.00 2
+M 0 11110 100.00 3
+M 0 11112 100.00 2
 S
 #11115
 An Overlook Waterfall~
-   The view from the mouth of the falls is magnificent the lake below shrouded
-in a churning mist that rolls out with the current, ships of fog cast toward
-the darkness between the falls and the distant shore. Yet the sheer amount of
-water that rushes recklessly toward its breakover is equally impressive. The
-primary origin appears to be through a wide opening to the north, but it is
-greatly reinforced by several jets erupting from fissures in the walls.
+   The view from the mouth of the falls is magnificent. The lake below is
+shrouded in a churning mist that rolls out with the current, casting ships of
+fog into the darkness between the falls and the distant shore. Yet the sheer
+amount of water that rushes recklessly toward its breakover is equally
+impressive. The primary origin appears to be through a wide opening to the
+north, but it is greatly reinforced by several jets erupting from fissures in
+the walls.  
 ~
 b 0
 D9
@@ -279,8 +283,8 @@ D9
 D0
 ~
 0 11116
-M 0 9126 100.00 4
-M 0 11102 80.00 30
+M 0 11108 100.00 1
+M 0 11102 80.00 1
 S
 #11116
 A Swampy Canyon~
@@ -296,10 +300,10 @@ D2
 D8
 ~
 0 11117
-M 0 11105 50.00 1
-M 0 9150 50.00 2
-M 0 9126 100.00 4
-M 0 11102 80.00 30
+M 0 11105 33.33 1
+M 0 11111 50.00 2
+M 0 11108 100.00 2
+M 0 11102 80.00 10
 S
 #11117
 A Sloping Gully~
@@ -315,11 +319,11 @@ D9
 D3
 ~
 0 11118
-M 0 9117 100.00 2
-M 0 9005 100.00 3
-M 0 9150 50.00 2
+M 0 11112 100.00 2
+M 0 11110 100.00 3
+M 0 11111 50.00 2
 M 0 11105 50.00 1
-M 0 9023 100.00 5
+M 0 11109 100.00 5
 S
 #11118
 A Bottleneck Canyon~
@@ -335,10 +339,10 @@ D1
 D9
 ~
 0 11119
-M 0 9023 100.00 10
-M 0 9005 100.00 3
-M 0 9150 50.00 2
-M 0 11105 50.00 1
+M 0 11109 100.00 5
+M 0 11110 100.00 3
+M 0 11111 50.00 2
+M 0 11105 100.00 1
 S
 #11119
 A Hazardous Cut~
@@ -354,8 +358,8 @@ D6
 D8
 ~
 0 11118
-M 0 11102 80.00 30
-M 0 11100 50.00 30
+M 0 11102 80.00 10
+M 0 11100 50.00 10
 S
 #11120
 A Large Rock~
@@ -604,7 +608,7 @@ S
 Inside the Gate House~
    The ground is a patchwork of ivy and roots, weaving over the fallen roof
 debris to form a layer of varying greens with speckles of red berries.
-Songbirds dart through the branches, their plumage flashing irridescent shades
+Songbirds dart through the branches, their plumage flashing iridescent shades
 of blue and violet over mottled grey, their chirps and trills contained by the
 room's leafy insulation.
 ~

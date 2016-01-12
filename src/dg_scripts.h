@@ -210,9 +210,9 @@ void reset_wtrigger(room_data *ch);
 void load_mtrigger(char_data *ch);
 void load_otrigger(obj_data *obj);
 
-int ability_mtrigger(char_data *actor, char_data *ch, int abil);
-int ability_otrigger(char_data *actor, obj_data *obj, int abil);
-int ability_wtrigger(char_data *actor, char_data *vict, obj_data *obj, int abil);
+int ability_mtrigger(char_data *actor, char_data *ch, any_vnum abil);
+int ability_otrigger(char_data *actor, obj_data *obj, any_vnum abil);
+int ability_wtrigger(char_data *actor, char_data *vict, obj_data *obj, any_vnum abil);
 
 int leave_mtrigger(char_data *actor, int dir);
 int leave_wtrigger(room_data *room, char_data *actor, int dir);
@@ -253,7 +253,6 @@ void free_trigger(trig_data *trig);
 void copy_proto_script(void *source, void *dest, int type);
 void copy_script(void *source, void *dest, int type);
 void trig_data_copy(trig_data *this_data, const trig_data *trg);
-void delete_variables(const char *charname);
 
 trig_data *read_trigger(int nr);
 void add_var(struct trig_var_data **var_list, char *name, char *value, int id);
@@ -307,7 +306,8 @@ int valid_dg_target(char_data *ch, int bitvector);
 /* object id's: OBJ_ID_BASE and higher           */
 #define MOB_ID_BASE	  10000000  /* 10000000 player IDNUMS should suffice */
 #define ROOM_ID_BASE    (10000000 + MOB_ID_BASE) /* 10000000 Mobs */
-#define OBJ_ID_BASE     ((MAP_SIZE * 5) + ROOM_ID_BASE) /* Lots o' Rooms */
+#define VEHICLE_ID_BASE  ((MAP_SIZE * 5) + ROOM_ID_BASE)	// Lots o' Rooms
+#define OBJ_ID_BASE  (1000000 + VEHICLE_ID_BASE)	// Plenty o' Vehicles
 
 #define SCRIPT(o)		  ((o)->script)
 #define SCRIPT_MEM(c)             ((c)->memory)
@@ -339,6 +339,7 @@ int can_wear_on_pos(obj_data *obj, int pos);
 void init_lookup_table(void);
 char_data *find_char_by_uid_in_lookup_table(int uid);
 obj_data *find_obj_by_uid_in_lookup_table(int uid);
+vehicle_data *find_vehicle_by_uid_in_lookup_table(int uid);
 void add_to_lookup_table(int uid, void *c);
 void remove_from_lookup_table(int uid);
 

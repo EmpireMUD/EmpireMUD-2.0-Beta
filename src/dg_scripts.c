@@ -51,8 +51,6 @@ extern const char *wtrig_types[];
 extern const struct wear_data_type wear_data[NUM_WEARS];
 
 /* external functions */
-extern int find_ability_by_name(char *name, bool allow_abbrev);
-extern int find_skill_by_name(char *name);
 void free_varlist(struct trig_var_data *vd);
 extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
 extern bool is_fight_enemy(char_data *ch, char_data *frenemy);	// fight.c
@@ -163,6 +161,7 @@ int find_eq_pos_script(char *arg) {
 		const char *pos;
 		int where;
 	} eq_pos[] = {
+		// WEAR_x:
 		{ "head", WEAR_HEAD },
 		{ "ears", WEAR_EARS },
 		{ "neck1", WEAR_NECK_1 },
@@ -186,6 +185,7 @@ int find_eq_pos_script(char *arg) {
 		{ "ranged", WEAR_RANGED },
 		{ "hold", WEAR_HOLD },
 		{ "held", WEAR_HOLD },
+		{ "shared", WEAR_SHARE },
 		{ "none", NO_WEAR }
 	};
 
@@ -236,6 +236,20 @@ room_data *find_room(int n) {
 	room = real_room((room_vnum)n); 
 
 	return room;
+}
+
+
+/**
+* Find a vehicle in the lookup table by id.
+*
+* @param int n The scripting id.
+* @return vehicle_data* The vehicle, if any.
+*/
+vehicle_data *find_vehicle(int n) {
+	if (n < VEHICLE_ID_BASE) {
+		return NULL;
+	}
+	return find_vehicle_by_uid_in_lookup_table(n);
 }
 
 
@@ -629,15 +643,16 @@ void script_trigger_check(void) {
 	// Except every 5th cycle, this only does "interior" rooms -- to prevent over-frequent map iteration
 	if (++my_cycle >= 5) {
 		my_cycle = 0;
-		HASH_ITER(world_hh, world_table, room, next_room) {
+		HASH_ITER(hh, world_table, room, next_room) {
 			if ((sc = SCRIPT(room)) && IS_SET(SCRIPT_TYPES(sc), WTRIG_RANDOM) && (players_nearby_script(room) || IS_SET(SCRIPT_TYPES(sc), WTRIG_GLOBAL))) {
 				random_wtrigger(room);
 			}
 		}
 	}
 	else {
-		// partial		
-		HASH_ITER(interior_hh, interior_world_table, room, next_room) {
+		// partial
+		for (room = interior_room_list; room; room = next_room) {
+			next_room = room->next_interior;
 			if ((sc = SCRIPT(room)) && IS_SET(SCRIPT_TYPES(sc), WTRIG_RANDOM) && (players_nearby_script(room) || IS_SET(SCRIPT_TYPES(sc), WTRIG_GLOBAL))) {
 				random_wtrigger(room);
 			}
@@ -678,7 +693,7 @@ EVENTFUNC(trig_wait_event) {
 		}
 		else {
 			room_data *i, *next_i;
-			HASH_ITER(world_hh, world_table, i, next_i) {
+			HASH_ITER(hh, world_table, i, next_i) {
 				if (i == (room_data*)go) {
 					found = TRUE;
 					break;
@@ -1863,8 +1878,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 			else if (!str_cmp(var, "skill")) {
 				if (!str_cmp(field, "name")) {
 					if (subfield && *subfield) {
-						int sk = find_skill_by_name(subfield);
-						snprintf(str, slen, "%s", sk != NO_SKILL ? skill_data[sk].name : "");
+						skill_data *sk = find_skill(subfield);
+						snprintf(str, slen, "%s", sk ? SKILL_NAME(sk) : "");
 					}
 					else {
 						*str = '\0';
@@ -1872,8 +1887,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				else if (!str_cmp(field, "validate")) {
 					if (subfield && *subfield) {
-						int sk = find_skill_by_name(subfield);
-						snprintf(str, slen, "%d", sk != NO_SKILL ? 1 : 0);
+						skill_data *sk = find_skill(subfield);
+						snprintf(str, slen, "%d", sk ? 1 : 0);
 					}
 					else {
 						snprintf(str, slen, "0");
@@ -1898,9 +1913,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				case 'a': {	// char.a*
 					if (!str_cmp(field, "ability")) {
 						if (subfield && *subfield) {
-							int ab = find_ability_by_name(subfield, TRUE);
-							if (ab != NO_ABIL) {
-								snprintf(str, slen, (IS_NPC(c) || HAS_ABILITY(c, ab)) ? "1" : "0");
+							ability_data *ab = find_ability(subfield);
+							if (ab) {
+								snprintf(str, slen, (IS_NPC(c) || has_ability(c, ABIL_VNUM(ab))) ? "1" : "0");
 							}
 							else {
 								snprintf(str, slen, "0");
@@ -1928,14 +1943,13 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (subfield && *subfield && !IS_NPC(c)) {
 							// nop %actor.add_resources(vnum, number)%
 							char arg1[256], arg2[256];
-							Resource res[2] = { END_RESOURCE_LIST, END_RESOURCE_LIST };
+							struct resource_data *res = NULL;
 							obj_vnum vnum;
 							int amt;
 						
 							comma_args(subfield, arg1, arg2);
 							if (*arg1 && *arg2 && (vnum = atoi(arg1)) > 0 && (amt = atoi(arg2)) != 0 && obj_proto(vnum)) {
-								res[0].vnum = vnum;
-								res[0].amount = ABSOLUTE(amt);
+								res = create_resource_list(vnum, ABSOLUTE(amt), NOTHING);
 								
 								// this sends an error message to c on failure
 								if (amt > 0) {
@@ -1944,6 +1958,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 								else {
 									extract_resources(c, res, can_use_room(c, IN_ROOM(c), GUESTS_ALLOWED));
 								}
+								
+								free_resource_list(res);
 							}
 							*str = '\0';
 						}
@@ -2086,11 +2102,11 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%d", (troom && can_teleport_to(c, troom, TRUE)) ? 1 : 0);
 					}
 					else if (!str_cmp(field, "class")) {
-						if (IS_NPC(c) || GET_CLASS(c) == CLASS_NONE) {
+						if (IS_NPC(c) || !GET_CLASS(c)) {
 							*str = '\0';
 						}
 						else {
-							snprintf(str, slen, "%s", class_data[GET_CLASS(c)].name);
+							snprintf(str, slen, "%s", SHOW_CLASS_NAME(ch));
 						}
 					}
 					else if (!str_cmp(field, "cha") || !str_cmp(field, "charisma")) {
@@ -2177,12 +2193,13 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "gain_skill")) {
 						if (subfield && *subfield && !IS_NPC(c)) {
 							// %actor.gain_skill(skill, amount)%
-							void set_skill(char_data *ch, int skill, int level);
+							void set_skill(char_data *ch, any_vnum skill, int level);
 							char arg1[256], arg2[256];
-							int sk = NO_SKILL, amount = 0;
+							skill_data *sk;
+							int amount = 0;
 							
 							comma_args(subfield, arg1, arg2);
-							if (*arg1 && *arg2 && (sk = find_skill_by_name(arg1)) != NO_SKILL && (amount = atoi(arg2)) != 0 && !NOSKILL_BLOCKED(c, sk)) {
+							if (*arg1 && *arg2 && (sk = find_skill(arg1)) && (amount = atoi(arg2)) != 0 && noskill_ok(c, SKILL_VNUM(sk))) {
 								gain_skill(c, sk, amount);
 								snprintf(str, slen, "1");
 							}
@@ -2199,9 +2216,11 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "give_skill_reset")) {
-						int sk = find_skill_by_name(subfield);
-						if (sk != NO_SKILL && !IS_NPC(c)) {
-							GET_FREE_SKILL_RESETS(c, sk) = MIN(GET_FREE_SKILL_RESETS(c, sk) + 1, MAX_SKILL_RESETS);
+						skill_data *sk = find_skill(subfield);
+						struct player_skill_data *skdata;
+						
+						if (sk && (skdata = get_skill_data(c, SKILL_VNUM(sk), TRUE))) {
+							skdata->resets = MIN(skdata->resets + 1, MAX_SKILL_RESETS);
 						}
 						*str = '\0';
 					}
@@ -2219,18 +2238,19 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (subfield && *subfield && !IS_NPC(c)) {
 							// %actor.has_resources(vnum, number)%
 							char arg1[256], arg2[256];
-							Resource res[2] = { END_RESOURCE_LIST, END_RESOURCE_LIST };
+							struct resource_data *res;
 							obj_vnum vnum;
 							int amt;
 						
 							comma_args(subfield, arg1, arg2);
 							if (*arg1 && *arg2 && (vnum = atoi(arg1)) > 0 && (amt = atoi(arg2)) > 0) {
-								res[0].vnum = vnum;
-								res[0].amount = amt;
+								res = create_resource_list(vnum, amt, NOTHING);
 								
 								if (has_resources(c, res, can_use_room(c, IN_ROOM(c), GUESTS_ALLOWED), FALSE)) {
 									snprintf(str, slen, "1");
 								}
+								
+								free_resource_list(res);
 							}
 						}
 						// all other cases...
@@ -2457,7 +2477,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "poison_immunity")) {
-						if (HAS_ABILITY(c, ABIL_POISON_IMMUNITY)) {
+						if (has_ability(c, ABIL_POISON_IMMUNITY)) {
 							snprintf(str, slen, "1");
 						}
 						else {
@@ -2491,7 +2511,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%d", GET_RESIST_PHYSICAL(c));
 					}
 					else if (!str_cmp(field, "resist_poison")) {
-						if (HAS_ABILITY(c, ABIL_RESIST_POISON)) {
+						if (has_ability(c, ABIL_RESIST_POISON)) {
 							snprintf(str, slen, "1");
 						}
 						else {
@@ -2518,9 +2538,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%d", GET_STRENGTH(c));
 
 					else if (!str_cmp(field, "skill")) {
-						int sk = find_skill_by_name(subfield);
-						if (sk != NO_SKILL && !IS_NPC(c)) {
-							snprintf(str, slen, "%d", GET_SKILL(c, sk));
+						skill_data *sk = find_skill(subfield);
+						if (sk && !IS_NPC(c)) {
+							snprintf(str, slen, "%d", get_skill_level(c, SKILL_VNUM(sk)));
 						}
 						else {
 							snprintf(str, slen, "0");
@@ -2530,14 +2550,15 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "set_skill")) {
 						if (subfield && *subfield && !IS_NPC(c)) {
 							// %actor.set_skill(skill, number)%
-							void set_skill(char_data *ch, int skill, int level);
+							void set_skill(char_data *ch, any_vnum skill, int level);
 							char arg1[256], arg2[256];
-							int sk = NO_SKILL, sk_lev = 0;
+							skill_data *sk;
+							int sk_lev = 0;
 							
 							comma_args(subfield, arg1, arg2);
-							if (*arg1 && *arg2 && (sk = find_skill_by_name(arg1)) != NO_SKILL && (sk_lev = atoi(arg2)) >= 0 && sk_lev <= CLASS_SKILL_CAP && (sk_lev < GET_SKILL(c, sk) || !NOSKILL_BLOCKED(c, sk))) {
+							if (*arg1 && *arg2 && (sk = find_skill(arg1)) && (sk_lev = atoi(arg2)) >= 0 && sk_lev <= CLASS_SKILL_CAP && (sk_lev < get_skill_level(c, SKILL_VNUM(sk)) || noskill_ok(c, SKILL_VNUM(sk)))) {
 								// TODO skill cap checking! need a f() like can_set_skill_to(ch, sk, lev)
-								set_skill(c, sk, sk_lev);
+								set_skill(c, SKILL_VNUM(sk), sk_lev);
 								snprintf(str, slen, "1");
 							}
 						}
@@ -2876,7 +2897,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "crop")) {
 						crop_data *cp;
-						if ((cp = crop_proto(ROOM_CROP_TYPE(r)))) {
+						if ((cp = ROOM_CROP(r))) {
 							snprintf(str, slen, "%s", GET_CROP_NAME(cp));
 						}
 						else {
@@ -3758,6 +3779,9 @@ void process_detach(void *go, struct script_data *sc, trig_data *trig, int type,
 room_data *dg_room_of_obj(obj_data *obj) {
 	if (IN_ROOM(obj))
 		return IN_ROOM(obj);
+	if (obj->in_vehicle) {
+		return IN_ROOM(obj->in_vehicle);
+	}
 	if (obj->carried_by)
 		return IN_ROOM(obj->carried_by);
 	if (obj->worn_by)
@@ -4551,85 +4575,6 @@ int fgetline(FILE *file, char *p) {
 }
 
 
-/* load in a character's saved variables */
-void read_saved_vars(char_data *ch) {
-	FILE *file;
-	long context;
-	char fn[127];
-	char input_line[1024], *temp, *p;
-	char varname[32];
-	char context_str[16];
-
-	/* create the space for the script structure which holds the vars */
-	/* We need to do this first, because later calls to 'remote' will need */
-	/* a script already assigned. */
-	CREATE(SCRIPT(ch), struct script_data, 1);
-
-	/* find the file that holds the saved variables and open it*/
-	get_filename(GET_NAME(ch), fn, SCRIPT_VARS_FILE);
-	file = fopen(fn,"r");
-
-	/* if we failed to open the file, return */
-	if( !file ) {
-		log("%s had no variable file", GET_NAME(ch)); 
-		return;
-	}
-	/* walk through each line in the file parsing variables */
-	do {
-		if (get_line(file, input_line)>0) {
-			p = temp = strdup(input_line);
-			temp = any_one_arg(temp, varname);
-			temp = any_one_arg(temp, context_str);
-			skip_spaces(&temp); /* temp now points to the rest of the line */
-
-			context = atol(context_str);
-			add_var(&(SCRIPT(ch)->global_vars), varname, temp, context);
-			free(p); /* plug memory hole */
-		}
-	} while( !feof(file) );
-
-	/* close the file and return */
-	fclose(file);
-}
-
-/* save a characters variables out to disk */
-void save_char_vars(char_data *ch) {
-	FILE *file;
-	char fn[127];
-	struct trig_var_data *vars;
-
-	/* immediate return if no script (and therefore no variables) structure */
-	/* has been created. this will happen when the player is logging in */
-	if (SCRIPT(ch) == NULL)
-		return;
-
-	/* we should never be called for an NPC, but just in case... */
-	if (IS_NPC(ch)) return;
-
-	get_filename(GET_NAME(ch), fn, SCRIPT_VARS_FILE);
-	unlink(fn);
-
-	/* make sure this char has global variables to save */
-	if (ch->script->global_vars == NULL)
-		return;
-	vars = ch->script->global_vars;
-
-	file = fopen(fn,"wt");
-	if (!file) {
-		syslog(SYS_ERROR, LVL_CIMPL, TRUE, "SYSERR: Could not open player variable file %s for writing.:%s", fn, strerror(errno));
-		return;
-	}
-	/* note that currently, context will always be zero. this may change */
-	/* in the future */
-	while (vars) {
-		if (*vars->name != '-') /* don't save if it begins with - */
-			fprintf(file, "%s %ld %s\n", vars->name, vars->context, vars->value);
-		vars = vars->next;
-	}
-
-	fclose(file);
-}
-
 /* find_char() helpers */
 
 // Must be power of 2
@@ -4676,6 +4621,19 @@ obj_data *find_obj_by_uid_in_lookup_table(int uid) {
 		return (obj_data*)(lt->c);
 
 	log("find_obj_by_uid_in_lookup_table : No entity with number %d in lookup table", uid);
+	return NULL;
+}
+
+vehicle_data *find_vehicle_by_uid_in_lookup_table(int uid) {
+	int bucket = (int) (uid & (BUCKET_COUNT - 1));
+	struct lookup_table_t *lt = &lookup_table[bucket];
+
+	for (;lt && lt->uid != uid ; lt = lt->next) ;
+
+	if (lt)
+		return (vehicle_data*)(lt->c);
+
+	log("find_vehicle_by_uid_in_lookup_table : No entity with number %d in lookup table", uid);
 	return NULL;
 }
 

@@ -1,92 +1,82 @@
 #900
-cart wooden rickety~
-a rickety cart~
-A wooden cart is parked here.~
-Carts hold items. You can harness a horse to the cart and lead the horse.
+cart broken~
+a broken cart~
+A broken cart is parked here.~
+This item is deprecated.
 ~
-16 e 0
+16 e 0 3
 200 1 0
-0 0
+0 1
 S
 #901
-carriage wooden~
-a carriage~
-A wooden carriage has stopped here.~
-Carriages hold items. You can harness two horses to it and lead one.
+carriage broken~
+a broken carriage~
+A broken carriage is parked here.~
+This item is deprecated.
 ~
-16 e 0
+16 e 0 3
 300 2 0
-0 0
+0 1
 S
 #902
-wagon covered~
-a covered wagon~
-A covered wagon has been parked here.~
-Wagons hold items. You can harness two horses to it and lead one.
+wagon broken~
+a broken wagon~
+A broken wagon is parked here.~
+This item is deprecated.
 ~
-16 e 0
+16 e 0 2
 400 2 0
-0 0
+0 1
 S
 #903
-catapult~
-a catapult~
-A catapult is poised to strike!~
-   You can fire the catapult to do siege damage to buildings. You will need
-two horses or other beasts of burden to pull the catapult. Harness the horses
-to the catapult and then lead one of them.
+catapult broken~
+a broken catapult~
+A broken catapult is parked here.~
+This item is deprecated.
 ~
-16 e 0
+16 e 0 2
 0 2 1
-0 0
+0 1
 S
 #904
-chair wooden~
-a chair~
-There is a wooden chair here.~
-You can sit on the chair.
+chair broken~
+a broken chair~
+A broken chair is sitting here.~
+This item is deprecated.
 ~
-3 aelv a
+3 e 0 3
 0 0 0
-0 0
-R
-5610 0
+0 1
 S
 #905
-bench wooden~
-a wooden bench~
-There is a wooden bench here.~
-You can sit on the bench.
+bench broken~
+a broken bench~
+A broken bench is sitting here.~
+This item is deprecated.
 ~
-3 aelv a
+3 e 0 3
 0 0 0
-0 0
-R
-5610 0
+0 1
 S
 #906
-table long~
-a long table~
-There is a long table here.~
-Tables are merely for decoration.
+table broken~
+a broken table~
+A broken table is sitting here.~
+This item is deprecated.
 ~
-3 elv a
+3 e 0 2
 0 0 0
 0 0
-R
-5610 0
 S
 #907
-stool wooden~
-a stool~
-There is a wooden stool here.~
-You can sit on the stool.
+stool broken~
+a broken stool~
+A broken stool is sitting here.~
+This item is deprecated.
 ~
-3 aelv a
+3 e 0 3
 0 0 0
-0 0
-R
-5610 0
+0 1
 S
 #908
 arrows quiver~
@@ -94,7 +84,7 @@ a quiver of arrows~
 A quiver of arrows is lying here.~
 You can use arrows from your inventory, if you have a bow equipped.
 ~
-21 l a
+21 l a 1
 10 0 0
 0 0
 I 11 911 10.00 1  # LIGHT: a quiver of flaming arrows
@@ -105,11 +95,11 @@ a short bow~
 A short bow has been left here.~
 Equip a quiver of arrows and then use "shoot" to start ranged combat.
 ~
-20 emo ap
+20 emo ap 1
 2 2 0
 0 0
 A
-17 1
+17 1 0
 C
 0 50
 S
@@ -119,13 +109,11 @@ a long bow~
 A long bow has been dropped here.~
 Equip a quiver of arrows and then use "shoot" to start ranged combat.
 ~
-20 emo ap
+20 emo ap 1
 1 3 0
 0 0
 A
-17 1
-C
-0 0
+17 1 0
 S
 #911
 arrows quiver flaming~
@@ -133,7 +121,7 @@ a quiver of flaming arrows~
 A quiver of flaming arrows is burning here.~
 Keep this in your inventory while shooting your bow.
 ~
-21 c a
+21 c a 1
 10 1 0
 0 4
 S
@@ -143,7 +131,7 @@ a lyre~
 Someone has left her lyre here.~
 You can play the lyre to make soothing music.
 ~
-22 0 ao
+22 0 ao 1
 0 0 0
 0 0
 M
@@ -167,7 +155,7 @@ a wooden flute~
 A wooden flute has been tossed here.~
 You can play the flute to entertain your friends.
 ~
-22 0 ao
+22 0 ao 1
 1 0 0
 0 0
 M
@@ -189,13 +177,11 @@ a walking stick~
 A long, wooden walking stick has been dropped here!~
 The walking stick helps you walk easier.
 ~
-1 ehmo ao
+1 ehmo ao 1
 0 1 5
 0 0
 A
-11 5
-C
-0 0
+11 5 0
 S
 #915
 stake wooden sleek~
@@ -203,7 +189,7 @@ a wooden stake~
 A sleek wooden stake has been jabbed into the ground!~
 This isn't a tent stake. It's a vampire stake!
 ~
-3 l ao
+3 l ao 1
 0 0 0
 0 0
 R
@@ -215,7 +201,7 @@ a large beehive~
 A large beehive has been left here~
 You can sap honey or extract wax from the beehive.
 ~
-3 e a
+3 e a 1
 0 0 0
 0 0
 M
@@ -226,16 +212,14 @@ M
 $n sets up $p.~
 S
 #917
-throne~
-the throne~
-There is a throne at the head of the room.~
-You can sit on the throne.
+throne broken~
+a broken throne~
+A broken throne is lying here.~
+This item is deprecated.
 ~
-3 aelv a
+3 e 0 5
 0 0 0
-0 0
-R
-5610 0
+0 1
 S
 #918
 sign blank~
@@ -244,7 +228,7 @@ A blank sign is lying on the ground.~
    If you have the right ability, you can use this sign to mark a road with the
 roadsign command (see HELP ROADSIGN).
 ~
-3 e a
+3 e a 1
 0 0 0
 0 0
 R
@@ -256,7 +240,7 @@ a wooden handle~
 A wooden handle has been dropped on the ground.~
 The handle can be attached to many things to build tools and weapons.
 ~
-1 l ano
+1 l ano 1
 0 3 5
 0 0
 I 11 184 100.00 1  # LIGHT: a torch
@@ -264,18 +248,14 @@ R
 5121 0
 S
 #920
-canoe wooden large~
-a wooden canoe~
-A large wooden canoe is lying on its side.~
-A canoe is a convenient way to cross rivers.
+canoe broken~
+a broken canoe~
+A broken canoe is lying on its side.~
+This item is deprecated.
 ~
-7 el a
+3 e 0 5
 0 0 0
-0 0
-R
-5152 0
-R
-5610 0
+0 1
 S
 #952
 pinnace ship small~
@@ -283,9 +263,9 @@ the Pinnace~
 A small pinnace is floating here.~
 Type "board" to get onto the ship.
 ~
-17 0 0
+17 0 0 2
 0 0 0
-0 0
+0 1
 S
 #953
 brigantine ship small~
@@ -293,9 +273,9 @@ the Brigantine~
 A small brigantine is floating here.~
 Type "board" to get onto the ship.
 ~
-17 0 0
+17 0 0 2
 1 0 0
-0 0
+0 1
 S
 #954
 galley ship large~
@@ -303,9 +283,9 @@ the Galley~
 A large galley is floating here.~
 Type "board" to get onto the ship.
 ~
-17 0 0
+17 0 0 2
 2 0 0
-0 0
+0 1
 S
 #955
 argosy ship large~
@@ -313,18 +293,18 @@ the Argosy~
 A large argosy is floating here.~
 Type "board" to get onto the ship.
 ~
-17 0 0
+17 0 0 2
 3 0 0
-0 0
+0 1
 S
 #956
-galleon titanic large~
+galleon ship titanic large~
 the Galleon~
 A titanic galleon is floating here.~
 Type "board" to get onto the ship.
 ~
-17 0 0
+17 0 0 3
 4 0 0
-0 0
+0 1
 S
 $

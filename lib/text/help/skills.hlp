@@ -22,18 +22,6 @@ Bathe is used to begin cleaning yourself in either a bath house or a river.
 You must bathe regularly to keep clean. If you bathe in a bath house you will
 get cleaner faster than if you were to bathe in a river.
 #
-CATAPULT 
-
-Usage:  catapult <direction> 
-
-Catapult is used to launch your catapult in the direction that you want. You
-must have 12 rocks and a catapult to use this. It can only shoot at an
-adjacent room.
-
-Example:  
-
-  > catapult north 
-#
 CHIP
 
 Usage:  chip <item>
@@ -100,6 +88,8 @@ Room types:
  vault - Holds gold and silver, and sets your wealth (castle)
  crypt - Can be set as a tomb (castle)
 
+For more, see SHIP ROOMS.
+
 See also: BUILD, STORAGE
 #
 DIG
@@ -146,17 +136,22 @@ See also: DEPLETION, STICKS, APPLES, ORCHARD, FOREST
 #
 HARNESS UNHARNESS
 
-Usage:  harness <animal> <object to harness them to> 
-        unharness <animal>
+Usage:  harness <animal> <vehicle> 
+        unharness [animal] <vehicle>
 
 Harness is used to tie one or more beasts of burden to some type of wagon in
-order to pull it. You must have the animals and the wagon in the same room,
-and have some rope in your inventory. After you have harnessed enough animals
-to the wagon you will be able to lead the animals and the wagon will follow. 
+order to pull it. You must have the animals and the wagon in the same room.
+After you have harnessed enough animals to the vehicle, you will be able to
+lead that vehicle around.
+
+Harnessed animals can no longer be targeted by most commands, similar to a
+mount.
 
 Example:  
+  > harness horse wagon
+  > unharness wagon
 
-  > harness horse wagon 
+See also: DRAG, LEAD
 #
 HARVEST HARVESTING
 
@@ -175,25 +170,29 @@ This command is useful in herding animals into stables and fenced-in areas.
 #
 LEAD 
 
-Usage:  lead <animal> 
+Usage:  lead [vehicle]
 
-Lead is used to lead animals. Once you begin leading an animal it will follow
-you where you walk. This can be used to pull carts and wagons. You usually
-can't lead animals indoors.
+The lead command is used to move vehicles around. Once you are leading a
+vehicle, it will move with you until type "lead" again to stop. Some vehicles
+need you to harness animals to them before they can move.
+
+Some vehicles can't be led.
 
 Example:  
   > lead horse 
 
-See also: TIE, HARNESS
+See also: BOARD, DRAG, HARNESS
 #
 LIGHT TORCH
 
-Usage:  light <item>
+Usage:  light <item | vehicle>
 
 To light something, you must have a flint set. You may light sticks to create
 torches. You can also light trees or logs to make camp fires.
 
-See also: COOKING FIRE
+You can also burn down some vehicles with this command.
+
+See also: COOKING FIRE, DOUSE
 #
 MILK
 
@@ -440,7 +439,8 @@ chance is checked any time you use an ability. You don't need to get the
 experience all the way to 100%.
 
 When your skills hit level 50 or 75, you will not be able to gain additional
-levels in the skill unless you specialize into it.
+levels in the skill unless you specialize into it. You won't gain skill from
+using abilities on mobs and players who are more than 50 levels below you.
 
 See also: SKILL CAPS, SPECIALIZE, SKILLS
 #

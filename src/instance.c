@@ -160,14 +160,18 @@ static void build_instance_entrance(struct instance_data *inst, struct adventure
 				portal = read_object(rule->portal_in, TRUE);
 				GET_OBJ_VAL(portal, VAL_PORTAL_TARGET_VNUM) = GET_ROOM_VNUM(inst->start);
 				obj_to_room(portal, loc);
-				act("$p spins open!", FALSE, NULL, portal, NULL, TO_ROOM);
+				if (ROOM_PEOPLE(IN_ROOM(portal))) {
+					act("$p spins open!", FALSE, ROOM_PEOPLE(IN_ROOM(portal)), portal, NULL, TO_CHAR | TO_ROOM);
+				}
 				load_otrigger(portal);
 			}
 			if (obj_proto(rule->portal_out)) {
 				portal = read_object(rule->portal_out, TRUE);
 				GET_OBJ_VAL(portal, VAL_PORTAL_TARGET_VNUM) = GET_ROOM_VNUM(loc);
 				obj_to_room(portal, inst->start);
-				act("$p spins open!", FALSE, NULL, portal, NULL, TO_ROOM);
+				if (ROOM_PEOPLE(IN_ROOM(portal))) {
+					act("$p spins open!", FALSE, ROOM_PEOPLE(IN_ROOM(portal)), portal, NULL, TO_CHAR | TO_ROOM);
+				}
 				load_otrigger(portal);
 			}
 			break;
@@ -376,6 +380,7 @@ static void instantiate_one_exit(struct instance_data *inst, room_data *room, st
 	new->dir = dir;
 	new->to_room = GET_ROOM_VNUM(to_room);
 	new->room_ptr = to_room;
+	++GET_EXITS_HERE(to_room);
 	new->exit_info = exit->exit_info;
 	if (new->keyword) {
 		free(new->keyword);
@@ -405,7 +410,7 @@ static room_data *instantiate_one_room(struct instance_data *inst, room_template
 	
 	room = create_room();
 	attach_template_to_room(rmt, room);
-	ROOM_ORIGINAL_SECT(room) = SECT(room) = sector_proto(config_get_int("default_adventure_sect"));
+	BASE_SECT(room) = SECT(room) = sector_proto(config_get_int("default_adventure_sect"));
 	SET_BIT(ROOM_BASE_FLAGS(room), GET_RMT_BASE_AFFECTS(rmt) | default_affs);
 	SET_BIT(ROOM_AFF_FLAGS(room), GET_RMT_BASE_AFFECTS(rmt) | default_affs);
 	
@@ -524,13 +529,19 @@ static void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct 
 * Checks secondary link limiters like ADV_LINK_NOT_NEAR_SELF.
 *
 * @param adv_data *adv The adventure we are trying to link.
-* @param room_data *loc The chosen location.
+* @param room_data *loc The chosen room -- OPTIONAL (pass loc OR map).
+* @param struct map_data *map The chosen map tile -- OPTIONAL (pass loc OR map).
 * @return bool TRUE if the location is ok, FALSE if not.
 */
-bool validate_linking_limits(adv_data *adv, room_data *loc) {
+bool validate_linking_limits(adv_data *adv, room_data *loc, struct map_data *map) {
 	struct adventure_link_rule *rule;
 	struct instance_data *inst;
 	
+	if (!loc && !map) {
+		return FALSE;
+	}
+	
+	// Warning: these must all account for having loc OR map
 	for (rule = GET_ADV_LINKING(adv); rule; rule = rule->next) {
 		// ADV_LINK_x: but only some rules matter here (secondary limiters)
 		switch (rule->type) {
@@ -546,7 +557,7 @@ bool validate_linking_limits(adv_data *adv, room_data *loc) {
 					}
 					
 					// check distance
-					if (inst->location && compute_distance(inst->location, loc) <= rule->value) {
+					if (inst->location && compute_map_distance(X_COORD(inst->location), Y_COORD(inst->location), (loc ? X_COORD(loc) : MAP_X_COORD(map->vnum)), (loc ? Y_COORD(loc) : MAP_Y_COORD(map->vnum))) <= rule->value) {
 						// NO! Too close.
 						return FALSE;
 					}
@@ -566,17 +577,19 @@ bool validate_linking_limits(adv_data *adv, room_data *loc) {
 /**
 * This function checks basic room properties too see if the location is allowed
 * at all. It does NOT check the sector/building/bld_on rules -- that is done
-* in find_location_for_rule, which calls this.
+* in find_location_for_rule, which calls this. You must pass one of 'loc' or
+* 'map' (if you pass both, they must refer to the same location).
 *
 * @param adv_data *adv The adventure we are linking.
 * @param struct adventure_link_rule *rule The linking rule we're trying.
-* @param room_data *loc A location to test.
+* @param room_data *loc A location to test -- OPTIONAL (pass this or map).
+* @param struct map_data *map A location to test -- OPTIONAL (pass this or loc).
 * @return bool TRUE if the location seems ok.
 */
-bool validate_one_loc(adv_data *adv, struct adventure_link_rule *rule, room_data *loc) {
+bool validate_one_loc(adv_data *adv, struct adventure_link_rule *rule, room_data *loc, struct map_data *map) {
 	extern bool is_entrance(room_data *room);
 	
-	room_data *home = HOME_ROOM(loc);
+	room_data *home;
 	struct island_info *isle;
 	empire_data *emp;
 	char_data *ch;
@@ -585,25 +598,63 @@ bool validate_one_loc(adv_data *adv, struct adventure_link_rule *rule, room_data
 	
 	const bitvector_t no_no_flags = ROOM_AFF_DISMANTLING | ROOM_AFF_HAS_INSTANCE;
 	
-	// ownership check
-	if (ROOM_OWNER(home) && !LINK_FLAGGED(rule, ADV_LINKF_CLAIMED_OK | ADV_LINKF_CITY_ONLY)) {
+	// need one of these
+	if (!loc && !map) {
 		return FALSE;
 	}
 	
-	// certain room flags are always no-gos
-	if (ROOM_AFF_FLAGGED(loc, no_no_flags) || ROOM_AFF_FLAGGED(home, no_no_flags)) {
+	// detect map
+	if (!map && GET_ROOM_VNUM(loc) < MAP_SIZE) {
+		map = &(world_map[FLAT_X_COORD(loc)][FLAT_Y_COORD(loc)]);
+	}
+	
+	// detect loc (still OPTIONAL at this stage)
+	if (!loc) {
+		loc = real_real_room(map->vnum);
+	}
+	
+	// detect home room if applicable
+	home = loc ? HOME_ROOM(loc) : NULL;
+	
+	// short-cut for city-only: no owner = definitely no city
+	if (LINK_FLAGGED(rule, ADV_LINKF_CITY_ONLY) && (!home || !ROOM_OWNER(home))) {
 		return FALSE;
 	}
 	
-	// do not generate instances in front of players
-	for (ch = ROOM_PEOPLE(loc); ch; ch = ch->next_in_room) {
-		if (!IS_NPC(ch)) {
+	// things that only matter if we received/found loc
+	if (loc) {
+		// ownership check
+		if (ROOM_OWNER(home) && !LINK_FLAGGED(rule, ADV_LINKF_CLAIMED_OK | ADV_LINKF_CITY_ONLY)) {
 			return FALSE;
+		}
+	
+		// certain room flags are always no-gos
+		if ((ROOM_AFF_FLAGGED(loc, no_no_flags) || ROOM_AFF_FLAGGED(home, no_no_flags))) {
+			return FALSE;
+		}
+	
+		// do not generate instances in front of players
+		for (ch = ROOM_PEOPLE(loc); ch; ch = ch->next_in_room) {
+			if (!IS_NPC(ch)) {
+				return FALSE;
+			}
+		}
+	
+		// rules based on specific ownership (only really checkable if we have a location)
+		if (LINK_FLAGGED(rule, ADV_LINKF_CITY_ONLY | ADV_LINKF_NO_CITY)) {
+			emp = ROOM_OWNER(home);
+			if (LINK_FLAGGED(rule, ADV_LINKF_CITY_ONLY) && (!emp || !is_in_city_for_empire(loc, emp, FALSE, &junk))) {
+				return FALSE;
+			}
+			if (LINK_FLAGGED(rule, ADV_LINKF_NO_CITY) && emp && is_in_city_for_empire(loc, emp, FALSE, &junk)) {
+				return FALSE;
+			}
 		}
 	}
 	
 	// newbie island checks
-	if ((island_id = GET_ISLAND_ID(loc)) != NO_ISLAND) {
+	island_id = map ? map->island : GET_ISLAND_ID(loc);
+	if (island_id != NO_ISLAND) {
 		isle = get_island(island_id, TRUE);
 		if (IS_SET(isle->flags, ISLE_NEWBIE)) {	// is newbie island
 			if (GET_ADV_MIN_LEVEL(adv) > config_get_int("newbie_adventure_cap") && !ADVENTURE_FLAGGED(adv, ADV_NEWBIE_ONLY)) {
@@ -620,23 +671,18 @@ bool validate_one_loc(adv_data *adv, struct adventure_link_rule *rule, room_data
 		}
 	}
 	
-	// rules based on specific ownership
-	if (LINK_FLAGGED(rule, ADV_LINKF_CITY_ONLY | ADV_LINKF_NO_CITY)) {
-		emp = ROOM_OWNER(home);
-		if (LINK_FLAGGED(rule, ADV_LINKF_CITY_ONLY) && (!emp || !is_in_city_for_empire(loc, emp, FALSE, &junk))) {
-			return FALSE;
-		}
-		if (LINK_FLAGGED(rule, ADV_LINKF_NO_CITY) && emp && is_in_city_for_empire(loc, emp, FALSE, &junk)) {
-			return FALSE;
-		}
-	}
-	
 	// room is an entrance for something?
 	if (rule->type == ADV_LINK_BUILDING_NEW || rule->type == ADV_LINK_PORTAL_BUILDING_NEW) {
 		bld_data *bdg = building_proto(rule->value);
 		
-		if (!IS_SET(GET_BLD_FLAGS(bdg), BLD_OPEN) && is_entrance(loc)) {
-			return FALSE;
+		if (!IS_SET(GET_BLD_FLAGS(bdg), BLD_OPEN)) {
+			// now we need loc
+			if (!loc) {
+				loc = real_room(map->vnum);
+			}
+			if (is_entrance(loc)) {
+				return FALSE;
+			}
 		}
 	}
 	
@@ -656,12 +702,13 @@ bool validate_one_loc(adv_data *adv, struct adventure_link_rule *rule, room_data
 room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rule, int *which_dir) {
 	extern bool can_build_on(room_data *room, bitvector_t flags);
 	
-	room_data *room, *next_room, *loc, *shift, *found = NULL;
-	bld_data *findbdg = NULL;
-	sector_data *findsect = NULL;
 	room_template *start_room = room_template_proto(GET_ADV_START_VNUM(adv));
+	room_data *room, *next_room, *loc, *shift, *found = NULL;
+	int dir, iter, sub, num_found, pos;
+	sector_data *findsect = NULL;
 	bool match_buildon = FALSE;
-	int dir, iter, sub, num_found;
+	bld_data *findbdg = NULL;
+	struct map_data *map;
 	
 	const int max_tries = 500, max_dir_tries = 10;	// for random checks
 	
@@ -701,72 +748,97 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 	}
 	
 	// two ways of doing this:
-	if (!match_buildon) {
-		// scan the whole world world
-		if (findsect || findbdg) {
-			num_found = 0;
-			HASH_ITER(world_hh, world_table, room, next_room) {
-				if (!validate_one_loc(adv, rule, room)) {
-					continue;
-				}
+	if (findsect) {	// scan the whole map
+		num_found = 0;
+		for (map = land_map; map; map = map->next) {
+			// looking for sect: fail
+			if (findsect && map->sector_type != findsect) {
+				continue;
+			}
 			
-				// check secondary limits
-				if (!validate_linking_limits(adv, room)) {
-					continue;
-				}
+			// attributes/limits checks
+			if (!validate_one_loc(adv, rule, NULL, map) || !validate_linking_limits(adv, NULL, map)) {
+				continue;
+			}
 			
-				// TODO this specifically does not work on ocean without the whole map loaded
-				if ((findsect && SECT(room) == findsect) || (findbdg && BUILDING_VNUM(room) == GET_BLD_VNUM(findbdg) && IS_COMPLETE(room))) {
-					if (!number(0, num_found++) || !found) {
-						found = room;
-					}
-				}
+			// SUCCESS: mark it ok
+			if (!number(0, num_found++) || !found) {
+				// may already have looked up room
+				found = real_room(map->vnum);
 			}
 		}
 	}
-	else {
-		// try to match a build rule
-		
-		for (iter = 0; iter < max_tries && !found; ++iter) {
-			// random map spot: this will ignore BASIC_OCEAN rooms using real_real_room
-			if (!(loc = real_real_room(number(0, MAP_SIZE-1)))) {
+	else if (findbdg) {	// check live rooms for matching building
+		num_found = 0;
+		HASH_ITER(hh, world_table, room, next_room) {
+			if (BUILDING_VNUM(room) != GET_BLD_VNUM(findbdg) || !IS_COMPLETE(room)) {
 				continue;
 			}
-
-			if (!validate_one_loc(adv, rule, loc)) {
+			
+			// attributes/limits checks
+			if (!validate_one_loc(adv, rule, room, NULL) || !validate_linking_limits(adv, room, NULL)) {
+				continue;
+			}
+			
+			// SUCCESS: mark it ok
+			if (!number(0, num_found++) || !found) {
+				found = room;
+			}
+		}
+	}
+	else if (match_buildon) {
+		// try to match a build rule
+		for (iter = 0; iter < max_tries && !found; ++iter) {
+			// random location:
+			pos = number(0, MAP_SIZE-1);
+			map = &(world_map[MAP_X_COORD(pos)][MAP_Y_COORD(pos)]);
+			
+			// shortcut: skip BASIC_OCEAN
+			if (GET_SECT_VNUM(map->sector_type) == BASIC_OCEAN) {
+				continue;
+			}
+			
+			// basic validation
+			if (!validate_one_loc(adv, rule, NULL, map)) {
 				continue;
 			}
 			
 			// check secondary limits
-			if (!validate_linking_limits(adv, loc)) {
+			if (!validate_linking_limits(adv, NULL, map)) {
 				continue;
 			}
 			
-			// never build on a closed location
-			if (!ROOM_IS_CLOSED(loc) && can_build_on(loc, rule->bld_on)) {
-				if (rule->bld_facing == NOBITS) {
-					found = loc;
-					break;
-				}
-				else {
-					for (sub = 0; sub < max_dir_tries && !found; ++sub) {
-						dir = number(0, NUM_2D_DIRS-1);
-						
-						// matches the dir we need inside?
-						if (dir == rule->dir) {
-							continue;
-						}
-						// need a valid map tile to face
-						if (!(shift = real_shift(loc, shift_dir[dir][0], shift_dir[dir][1]))) {
-							continue;
-						}
-						
-						// ok go
-						if (can_build_on(shift, rule->bld_facing)) {
-							*which_dir = dir;
-							found = loc;
-							break;
-						}
+			// this spot SEEMS ok... now we need the actual spot:
+			loc = real_room(pos);
+			
+			// can we build here? (never build on a closed location)
+			if (ROOM_IS_CLOSED(loc) || !can_build_on(loc, rule->bld_on)) {
+				continue;
+			}
+			
+			if (rule->bld_facing == NOBITS) {
+				// success!
+				found = loc;
+				break;
+			}
+			else {
+				for (sub = 0; sub < max_dir_tries && !found; ++sub) {
+					dir = number(0, NUM_2D_DIRS-1);
+					
+					// matches the dir we need inside?
+					if (dir == rule->dir) {
+						continue;
+					}
+					// need a valid map tile to face
+					if (!(shift = real_shift(loc, shift_dir[dir][0], shift_dir[dir][1]))) {
+						continue;
+					}
+					
+					// ok go
+					if (can_build_on(shift, rule->bld_facing)) {
+						*which_dir = dir;
+						found = loc;
+						break;
 					}
 				}
 			}
@@ -999,7 +1071,9 @@ static void reset_instance_room(struct instance_data *inst, room_data *room) {
 						if (inst->level > 0) {
 							scale_item_to_level(obj, inst->level);
 						}
-						act("$p appears.", FALSE, NULL, obj, NULL, TO_ROOM);
+						if (ROOM_PEOPLE(IN_ROOM(obj))) {
+							act("$p appears.", FALSE, ROOM_PEOPLE(IN_ROOM(obj)), obj, NULL, TO_CHAR | TO_ROOM);
+						}
 						load_otrigger(obj);
 					}
 					break;
@@ -1077,7 +1151,9 @@ void prune_instances(void) {
 	// shut off saves briefly
 	instance_save_wait = TRUE;
 	
-	HASH_ITER(interior_hh, interior_world_table, room, next_room) {
+	for (room = interior_room_list; room; room = next_room) {
+		next_room = room->next_interior;
+		
 		// scan only non-map rooms for orphaned instance rooms
 		if (IS_ADVENTURE_ROOM(room) && (!COMPLEX_DATA(room) || !COMPLEX_DATA(room)->instance)) {
 			log("Deleting room %d due to missing instance.", GET_ROOM_VNUM(room));
@@ -1714,7 +1790,10 @@ void save_instances(void) {
 * @param int level A pre-validated level.
 */
 static void scale_instance_to_level(struct instance_data *inst, int level) {	
+	void scale_vehicle_to_level(vehicle_data *veh, int level);
+	
 	int iter;
+	vehicle_data *veh;
 	char_data *ch;
 	obj_data *obj;
 	
@@ -1723,12 +1802,19 @@ static void scale_instance_to_level(struct instance_data *inst, int level) {
 	for (iter = 0; iter < inst->size; ++iter) {
 		if (inst->room[iter]) {
 			for (ch = ROOM_PEOPLE(inst->room[iter]); ch; ch = ch->next_in_room) {
-				if (IS_NPC(ch)) {
+				if (IS_NPC(ch) && GET_CURRENT_SCALE_LEVEL(ch) == 0) {
 					scale_mob_to_level(ch, level);
 				}
 			}
 			for (obj = ROOM_CONTENTS(inst->room[iter]); obj; obj = obj->next_content) {
-				scale_item_to_level(obj, level);
+				if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) == 0) {
+					scale_item_to_level(obj, level);
+				}
+			}
+			LL_FOREACH2(ROOM_VEHICLES(inst->room[iter]), veh, next_in_room) {
+				if (VEH_SCALE_LEVEL(veh) == 0) {
+					scale_vehicle_to_level(veh, level);
+				}
 			}
 		}
 	}

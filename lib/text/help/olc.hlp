@@ -50,15 +50,19 @@ See also: OLC ABORT, OLC AUDIT, OLC COPY, OLC DELETE, OLC EDIT, OLC FREE,
 Sometimes abbreviations are used for core "thing" types, like mobs. Here are
 some common ones:
 
+abl - ability
 adv - adventure
 bld (or bdg) - building (these include designated rooms)
 cft - craft
+cls - class
 crp - crop
+glb - global
 mob - mobile/npc
 npc - non-player character (mob)
 obj - object
 rmt - room template
 sct - sector/terrain
+skl - skill
 trg - trigger
 #d
 "OLC LICENSE" "OLC RIGHTS"
@@ -86,6 +90,10 @@ on the editors instead, see HELP OLC.
 
 ** Editor Notes **
 
+Abilities (ABILEDIT):
+- The mastery ability is mainly used to determine when a craft should be marked
+  (superior). Do not apply mastery abilities to abilities that don't need this.
+
 Adventures (ADVEDIT):
 - When you set a min/max level for the adventure, mobs and items that don't
   have their own level limits will inherit the limits from the adventure.
@@ -96,9 +104,38 @@ Adventures (ADVEDIT):
   evidence of them nearby, like a thieves' den.
 - Adventure scripts will ONLY run if they are 'Adventure Cleanup' scripts.
 
+Archetypes (ARCHEDIT):
+- Archetypes should have a total of 11 attribute points (3 2 2 2 1 1).
+- Archetypes should have a total of 30 skill points.
+- Archetypes should provide gear for: head, clothes, legs, feet, wield, hold.
+- The hold slot is always a long-lasting light, like the newbie torch (2104).
+- You should only set the BASIC flag on very simple archetypes. Most archetypes
+  should only appear in the extended list.
+- Lore is optional. If you have it, make sure it ends with no punctuation.
+
+Augments (AUGEDIT):
+- Augment names should be all lowercase.
+- You should always require either an ability, or a certain object (or both) on
+  each augment. No augments should be available without at least one of those.
+- If you use the "requiresobject" option, that object will only be consumed on
+  use if it is also in the resource list. Otherwise, having the object means
+  a re-usable augment.
+- Unlike crafts, it is safe to use SCALABLE items as resources and requires-
+  objects, because augments are instant and non-refundable.
+
 Buildings (BEDIT):
 - Designated rooms are also built in the building editor, using the ROOM flag.
 - If a building has at least 1 Citizen, players can also set it as their home.
+
+Classes (CLASSEDIT):
+- By convention, stock EmpireMUD has one class for every pair of level 100
+  skills. This leaves no room for adding more classes unless you are re-
+  designing that entire notion.
+- A player will get assigned the class with the most matching skills, so adding
+  a 100/100/75 class would give them a more specific version of the 100/100.
+- Abilities can be on more than one class and more than one role within a class
+  but you CANNOT assign an ability to both a class and a skill -- it would
+  count toward purchased abilities in that skill tree.
 
 Crafts (CEDIT):
 - Soups are made using the COOK type and the SOUP flag. Instead of choosing an
@@ -134,7 +171,21 @@ Crops (CROPEDIT):
 Globals (GEDIT):
 - All global tables must be approved by the head builder, because they apply
   to the entire game rather than just one adventure.
-- Only SHEAR, LOOT, and PICKPOCKET mob interactions are supported.
+- If a global is set ADVENTURE-ONLY, it will only apply to mobs (etc.) in the
+  adventure which its vnum falls into.
+- In most cases (but not Mine Data), more than one global can trigger at the
+  same time. This means two global loot tables might apply to one mob kill.
+  You can lower the chance of an entire global set being checked by setting the
+  percent on the global itself. If its percent fails, the interactions won't
+  even be checked.
+- If you use the CUMULATIVE-PRC flag, the game rolls a 0.01 - 100% chance once,
+  and tracks the total percentages of each matching global until the first one
+  that passes. No additional cumulative globals will pass at all, but globals
+  that are not cumulative may still also trigger.
+- The cumulative percent is always checked in ascending order of vnum. We
+  acknowledge that this is not necessarily the best approach, and are open to
+  suggestions on how to improve it.
+- See also: MINE DATA GLOBAL, MOB INTERACTIONS GLOBAL
 
 Map (MAPEDIT):
 - Immortals are not generally permitted to make edits to the map. However,
@@ -224,6 +275,23 @@ Sectors (SECTEDIT):
 - Please provide a useful list of commands for any new sector. For example, if
   you add any DIG interaction, put "dig" on the commands list.
 
+Skills (SKILLEDIT):
+- See HELP ABILITY POINTS for a breakdown of how many points a player gets in
+  each skill tree. Use this to "gate" abilities and prevent players from having
+  too many powerful abilities at once.
+- Remember that players can only level up an ability from the level you assign
+  it to, to the cap for that level range (50, 75, 100). You need to provide
+  several abilities at the 50 and 75 marks so that players can level past these
+  points.
+- An ability assigned at level 50 can be purchased by someone who does not
+  specialize past 50. If they choose to specialize, that ability can be used to
+  level the skill from there.
+- The skill description should be short (40-50 characters), written like a
+  sentence, and with no punctuation. It is displayed on the "skills" command.
+- Abilities can be on more than one class and more than one role within a class
+  but you CANNOT assign an ability to both a class and a skill -- it would
+  count toward purchased abilities in that skill tree.
+
 Triggers and Scripts (TRIGEDIT):
 - Scripts must be formatted with /f -- this will also ensure your if/end and
   while/done tags all match.
@@ -242,6 +310,27 @@ Triggers and Scripts (TRIGEDIT):
   room template. It only works for room templates in the same adventure zone.
 - If a script loads an object or mob, and it's not in a level-locked adventure
   zone, the script may also need to scale the obj's/mob's level itself.
+
+Vehicles (VEDIT):
+- Only set an icon on a vehicle if it should be visible on the map; in most
+  cases you should leave this blank.
+- Vehicles only have an interior (are boardable) if the "interior room"
+  property is set.
+- The IN flag will modify the SIT flag, and will also change how the vehicle
+  appears when you're inside it.
+- The movement flags (DRIVING, SAILING, FLYING) only matter when combined with
+  LEADABLE or an interior room. Otherwise there is no way to move the vehicle.
+- The DRAGABLE flag always allows a vehicle to be dragged on land, never any
+  other terrain.
+- A vehicle is effectively a chair if it has SIT but no movement flags.
+- Vehicles take 10% health damage each year ONLY if they require yearly
+  maintenance (or are incomplete). A vehicle with only 1 hitpoint won't last
+  long.
+- When a vehicle takes at least 10% of its max hitpoints in damage, it will
+  also add 1 year's maintenance to its repair needs. If it has no yearly
+  maintenance set, it will add a "pouch of nails" instead.
+- If a vehicle takes damage that's less than 10% of its hitpoints, it still
+  needs repair but doesn't require any additional resources.
 #d
 "OLC LEVELS" "OLC SCALING" "OLC SCALE"
 
@@ -264,6 +353,64 @@ it doesn't have its own min or max, it will inherit one from the adventure it
 is in.
 
 See also: BUILDING GUIDE
+#d
+ABILEDIT "OLC ABILITIES" "OLC ABILITY" "ABILITY EDITOR"
+
+Usage:  .abil <command>
+        .command
+
+The .olc ability editor allows you to configure the data for various abilities.
+The main properties set up here are names and mastery abilities.
+
+All commands in the editor arg highlighted in yellow and placed inside <angle
+braces>. You can get help on these commands by typing &yHELP ABILEDIT <COMMAND>&0.
+
+You can close an open editor with .abort or .save.
+
+Example:
+> .abil edit 123
+> .name Test Ability
+> .save
+
+For notes on the mud's building rules, see HELP BUILDING GUIDE.
+
+See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
+"ABILEDIT FLAGS" "ABILITY FLAGS"
+
+Usage:  .flags [add | remove] <flags>
+
+The following adventure flags are available:
+ * - There are noflags for abilities yet
+#d
+"ABILEDIT MASTERYABILITY" "ABILEDIT MASTERY ABILITY"
+
+Usage:  .masterability <ability>
+
+The mastery ability is a separate ability which boosts the performance of this
+ability if a player has both. For example, many crafting abilities have linked
+mastery abilities that result in the (superior) flag on crafts.
+
+Most abilities have no mastery ability.
+
+See also: OLC ABILITIES
+#d
+"ABILEDIT NAME"
+
+Usage:  .name <name>
+
+This lets you set an ability's name. Names should have each word capitalized
+and should be relatively short.
+
+By convention, active abilities (ones with their own commands) almost always
+have the same name one-word name as the command they will use.
+
+When a player types an ability name (e.g. to buy the ability), the game looks
+for exact matches first and then tries a multi-abbreviation approach, where
+each word typed by the user is matched sequentially. For example, "hor fo"
+matches "Horrid Form".
+
+See also: OLC ABILITIES
 #d
 "ADVEDIT AUTHOR"
 
@@ -445,6 +592,10 @@ See also: ADVEDIT LINKING, %ADVENTURECOMPLETE%
 #d
 "ADVEDIT LINKING" "ADVEDIT LINK RULE" "LINKING RULES" "LINK RULES"
 
+Usage: linking add <type> <data> [flags]
+       linking change <number> <field> <value>
+       linking remove <number | all>
+
 Linking rules help the game engine determine where to link instances of an
 adventure. You can add as many linking rules as you like; it will spawn
 instances in any place that matches any rule.
@@ -562,6 +713,282 @@ The following affect flags are available:
  !VAMPIRE - Immune to Vampire debuffs.
  !STUN - Immune to stun effects.
 #d
+ARCHEDIT "OLC ARCHETYPES" "ARCHETYPE OLC" "ARCHETYPE EDITOR"
+
+Usage:  .arch <command>
+        .<command>
+
+The .olc archetype editor is a powerful tool for creating and editing player
+archetypes (character creation options). It provides a simple in-game menu with
+contextual choices to design any archetype.
+
+All commands in the editor are highlighted in yellow and placed inside <angle
+braces>. You can get help on these by typing &yHELP ARCHEDIT <COMMMAND>&0.
+
+You can close an open editor with .abort or .save.
+
+Example:
+ > .arch edit 99
+ > .name Silent Assassin
+ > .skill add Stealth 30
+ > .save
+
+For notes on the mud's building rules, see HELP BUILDING GUIDE.
+
+See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
+"ARCHEDIT ATTRIBUTES"
+
+Usage:  .attribute <type> <number>
+        .attribute <copy> <archetype vnum>
+
+This allows you to set the starting level of each attribute. By design, the
+starting attributes should be low. Players will earn higher attributes using
+gear and abilities.
+
+All of the stock archetypes have starting attributes totalling 11 (one at 3,
+two at 1, and the rest at 2).
+
+See also: OLC ARCHETYPES
+#d
+"ARCHEDIT DESCRIPTION"
+
+Usage:  .description <text>
+
+The archetype description should be a short phrase that indicates what type
+of character it is meant for. Descriptions should not be longer than about
+half a line of text.
+
+See also: OLC ARCHETYPES
+#d
+"ARCHEDIT FEMALERANK" "ARCHEDIT FEMALE RANK" "ARCHEDIT MALERANK" "ARCHEDIT MALE RANK"
+
+Usage:  .femalerank <name>
+        .malerank <name>
+
+These set the default rank when a player of this archetype founds an empire.
+Two rank names are available in case the name is gender-specific (Lord, Lady).
+However, it's also ok to set the same name for both.
+
+See also: OLC ARCHETYPES
+#d
+"ARCHEDIT FLAGS"
+
+Usage:  .flags [add | remove] <flags>
+
+Archetype flags are properties that affect how the archetype behaves.
+
+Available flags:
+ IN-DEV - Cannot be chosen or displayed.
+ BASIC - Shows up in the basic set of archetypes (others must be searched).
+
+See also: OLC ARCHETYPES
+#d
+"ARCHEDIT GEAR" "GEDIT GEAR"
+
+Usage:  .gear add <slot | inventory> <vnum>
+        .gear copy <from type> <from vnum>
+        .gear change <number> <slot | vnum> <new value>
+        .gear remove <number>
+
+Archetypes: Sets the starting gear for players who choose this archetype. You
+should provide some low-level gear (it will be scaled to level 1, or to the
+item's minimum scale level).
+
+Global Newbie Gear: Gear given to all new players, if their archetype didn't
+fill the slot.
+
+Usually, the following slots have newbie gear: head, clothes, legs, feet,
+wield, hold.
+
+The hold slot is generally a light, e.g. the newbie torch (2104).
+
+See also: OLC ARCHETYPES, OLC GLOBALS, GEDIT TYPE
+#d
+"ARCHEDIT LORE"
+
+Usage:  .lore <text | none>
+
+Archetype lore is the lore given to a player who starts the game with this
+archetype. It's optional -- if it's set to none, the player will get no lore
+at all from it.
+
+Lore is always the first part of a sentence that will end with "on Month Day,
+Year." It should end with no punctuation.
+
+You can use the following tokens in lore:
+ $e - he/she
+ $s - his/her
+ $m - him/her
+
+See also: OLC ARCHETYPES
+#d
+"ARCHEDIT NAME"
+
+Usage:  .name <name>
+
+The archetype name is the text displayed to the player, and used to choose an
+archetype. The name should be reasonably short, and title-cased (Each Word
+Capitalized).
+
+See also: OLC ARCHETYPES
+#d
+"ARCHEDIT STARTINGSKILLS" "ARCHEDIT STARTING SKILLS"
+
+Usage:  .startingskill <add | change> <name> <level>
+        .startingskill remove <name>
+
+Archetypes determine a player's starting skill levels. Players should begin
+the game with a small number of skill points split between one or two skills.
+However, the system is flexible and you may choose to give a small number of
+points to all skills.
+
+All of the stock archetypes have a total of 30 skill points, usually split
+between two skills as 20/10.
+
+See also: OLC ARCHETYPES
+#d
+AUGEDIT "OLC AUGMENTS" "AUGMENT OLC" "AUGMENT EDITOR"
+
+Usage:  .aug <command>
+        .<command>
+
+The .olc augment editor is a powerful tool for creating and editing augments
+(which are like item enchantments). It provides a simple in-game menu with
+contextual choices to design multiple types of augments.
+
+All commands in the editor are highlighted in yellow and placed inside <angle
+braces>. You can get help on these by typing &yHELP AUGEDIT <COMMMAND>&0.
+
+You can close an open editor with .abort or .save.
+
+Example:
+ > .aug edit 11000
+ > .name moar power
+ > .type enchantment
+ > .save
+
+For notes on the mud's building rules, see HELP BUILDING GUIDE.
+
+See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
+"AUGEDIT APPLY" "AUGEDIT APPLIES"
+
+Usage:  .apply add <value> <apply>
+        .apply change <number> <value | apply> <new value>
+        .apply remove <number | all>
+
+Applies are the specific bonuses that will be added to an item when it is
+enhanced with this augment. The values you provide for the applies are actually
+"weights", as the final value is determined by the level of the augmented item
+and the level of the person who augmented it.
+
+If you set applies like "2 to STRENGTH, 1 to DEXTERITY", it means 2/3 of the
+points go to the STRENGTH apply and 1/3 to the DEXTERITY apply. If this is used
+on an item that receives 6 points from the augment, the final values would come
+out to +4 Strength and +2 Dexterity.
+
+You can see a list of applies on HELP APPLIES.
+
+See also: APPLIES, OLC AUGMENTS
+#d
+"AUGEDIT FLAGS"
+
+Usage:  .flags [add | remove] <flags>
+
+Augment flags are properties that affect how the augment behaves.
+
+Available flags:
+ IN-DEV - Cannot be used by mortals.
+ SELF-ONLY - Can only be used on own items; will bind items to self.
+ ARMOR - Works on any ARMOR-type item only.
+ SHIELD - Works on any SHIELD-type item only.
+
+See also: OLC AUGMENTS
+#d
+"AUGEDIT NAME"
+
+Usage:  .name <name>
+
+The augment name is the text used by the player when enchanting (or otherwise
+modifying) an item. The name should be all lowercase, and should be fairly
+simple.
+
+For example, if an enchantment augment is named "striking", the player will
+use it by typing "enchant sword striking".
+
+See also: OLC AUGMENTS
+#d
+"AUGEDIT REQUIRESABILITY" "AUGEDIT REQUIRES ABILITY"
+
+Usage:  .requiresability <name | none>
+
+This allows you to require the player to have a certain ability in order to
+apply this augment. Setting it to 'none' removes this requirement.
+
+See also: OLC AUGMENTS
+#d
+"AUGEDIT REQUIRESOBJECT" "AUGEDIT REQUIRES OBJECT"
+
+Usage:  .requiresobject <vnum>
+
+Instead of (or in addition to) requiring an ability to use an augment, you
+can make it dependent upon having a certain item in the player's inventory.
+The player will not see the augment in his list (for example, when he types
+enchant) if he doesn't have the item.
+
+The required object will not be consumed unless it is also in the resource
+list. An example non-consumable augment might require a spellbook object, so
+the effect is that having the spellbook allows the player to enchant weapons
+with extra mana.  An example consumable augment might be a grindstone that
+lets a player "hone" a sword with additional to-hit.
+
+See also: OLC AUGMENTS, VNUM
+#d
+"AUGEDIT RESOURCES"
+
+Usage:  .resource add <amount> <vnum>
+        .resource change <number> <quantity | vnum> <value>
+        .resource remove <number | all>
+        .resource move <number> <up | down>
+
+This command sets the resources required to apply the augment to an item.
+
+Don't use SCALABLE items as a resource, because it won't be scaled back to
+the same level if it's refunded.
+
+See also: OLC AUGMENTS, VNUM
+#d
+"AUGEDIT TYPE" "AUGMENT TYPES"
+
+Usage:  .type <type>
+
+The augment type determines which command is used to apply the augment to an
+item. It also determines what type of "apply" is added to the item, and what
+rules those applies will follow. For example, "enchantment" applies can be
+removed with the Disenchant ability, but "hone" applies cannot.
+
+Type notes:
+ Enchantment - Also sets the ENCHANTED bit on items.
+ Hone - Always acts as if it has the SELF-ONLY flag.
+
+See also: OLC AUGMENTS
+#d
+"AUGEDIT WEAR" "AUGMENT WEAR FLAGS"
+
+Usage:  .wear [add | remove] <wear flags>
+
+The "wear" flags on an augment help determine what kind of item can be a valid
+target for the augment. For example, an augment with the WIELD setting can only
+be used on items that can be wielded (i.e. weapons).
+
+An augment with no "wear" setting can generally not be used. An augment with
+the TAKE wear flag could be used on virtually any item.
+
+Usually an augment should be locked down to just one wear flag.
+
+See also: OEDIT WEAR, OLC AUGMENTS
+#d
 "BEDIT AFFECTS" "REDIT AFFECTS"
 
 Usage:  .affects [add | remove] <flags>
@@ -615,7 +1042,7 @@ in bedrooms.
 NOTE: Any building that allows at least 1 citizen may also be set as a player's
 private home.
 
-See also: BEDIT EXTRA ROOMS, HOME, OLC BUILDINGS, WORKFORCE
+See also: BEDIT ROOMS, HOME, OLC BUILDINGS, WORKFORCE
 #d
 "BEDIT COMMANDS"
 
@@ -652,7 +1079,7 @@ shown if the building is flagged CLOSED).
 
 See also: BEDIT FLAGS, OLC BUILDINGS, STRING EDITOR
 #d
-"BEDIT DESIGNATE"
+"BEDIT DESIGNATE" "DESIGNATE FLAGS"
 
 Usage:  .designate [add | remove] <flags>
 
@@ -678,6 +1105,10 @@ Available designate flags:
  TOP-OF-TOWER - may designate the top-of-the-tower room (for the sorcery tower)
  HOUSEHOLD - may designate bedroom, study, sitting room, closet, storage, etc
  HAVEN - vampire havens
+ SHIP-MAIN - core ship rooms
+ SHIP-LARGE - rooms for larger ships
+ SHIP-EXTRA - bonus rooms for huge ships
+ LAND-VEHICLE - rooms for land vehicles like wagons
 
 See also: OLC BUILDINGS
 #d
@@ -752,7 +1183,9 @@ Available flags:
  SUMMON-PLAYER - allows the summon player command
  NEED-BOAT - requires a boat, flying, or swimming to enter
  LOOK-OUT - can see the map using "look out"
- 2ND-TERRITORY - like a ship, counts as territory off the map
+ 2ND-TERRITORY - counts as territory off the map (e.g. in a ship)
+ SHIPYARD - used to build ships
+ UPGRADED - modifies other building types like SHIPYARD
 
 * Note: If you change the LARGE-CITY-RADIUS flag on existing buildings,
         territory counts will not update right away. Any empire can force a
@@ -767,9 +1200,10 @@ Usage:  .hitpoints <value>
 This number is how much damage a building can take from a catapult or siege
 ritual before it is destroyed.
 
-Catapults deal 8 damage per shot. Siege rituals deal Intelligence + 1 damage.
+Catapults deal 8 damage per 100 levels, per shot. Siege rituals deal
+Intelligence + 1 damage.
 
-See also: CATAPULT, OLC BUILDINGS, SIEGE RITUAL
+See also: FIRE, OLC BUILDINGS, SIEGE RITUAL
 #d
 "BEDIT ICON"
 
@@ -821,7 +1255,7 @@ room title is "A Foul-Smelling Outhouse", the name should be "Outhouse".
 
 See also: BEDIT TITLE, OLC BUILDINGS, TERRITORY, VNUM
 #d
-"BEDIT ROOMS" "BEDIT ROOMS"
+"BEDIT ROOMS" "BEDIT ROOMS" "BEDIT EXTRA ROOMS"
 
 Usage:  .rooms <number>
 
@@ -904,15 +1338,6 @@ and mark it as UPGRADE. This building will only need a regular craft recipe,
 and only if it's buildable.
 
 See also: OLC BUILDINGS, UPGRADE, VNUM
-#d
-"CEDIT ABILITY"
-
-Usage:  .ability <ability name | none>
-
-You can use this command to set which ability is required to use a particular
-craft recipe. If you don't want it to require an ability any more, use 'none'.
-
-See also: OLC CRAFTS
 #d
 "CEDIT BUILDFACING" "CEDIT BUILD FACING"
 
@@ -1031,6 +1456,9 @@ Available flags:
  DISMANTLE-ONLY - for building recipes only, this recipe allows the building
     to be dismantled, but not built; it won't show up in the build list
  IN-CITY-ONLY - a craft or building can only be made in a city radius
+ VEHICLE - creates a vehicle instead of an item, see CRAFT VEHICLES
+ SHIPYARD - requires being at a shipyard
+ BLD-UPGRADED - requires being at a building with the UPGRADED flag
 
 See also: CEDIT TYPE, OLC CRAFTS, OLC REMOVEINDEV
 #d
@@ -1075,6 +1503,15 @@ Craft recipes can be set to create more than one of an item by raising the
 quantity.
 
 See also: CEDIT CREATES, OLC CRAFTS
+#d
+"CEDIT REQUIRESABILITY" "CEDIT REQUIRES ABILITY"
+
+Usage:  .requiresability <ability name | none>
+
+You can use this command to set which ability is required to use a particular
+craft recipe. If you don't want it to require an ability any more, use 'none'.
+
+See also: OLC CRAFTS
 #d
 "CEDIT REQUIRESOBJECT" "CEDIT REQUIRES OBJECT"
 
@@ -1147,8 +1584,14 @@ Available types are:
  MILL - requires mill building, quantity doubled by Master Farmer ability
  BREW - potions
  MIX - poisons
+ BUILD - used with the build command
+ WEAVE
+ WORKFORCE - has specific code interactions, but no player command
+ MANUFACTURE - for shipbuilding
 
-See also: CEDIT ABILITY, OLC CRAFTS
+Note: The SOUP and VEHICLE craft flags both also modify the recipe.
+
+See also: CEDIT FLAGS, CEDIT REQUIRESABILITY, OLC CRAFTS
 #d
 "CEDIT VOLUME"
 
@@ -1159,6 +1602,140 @@ It will always be limited by the size of the drink container the player uses
 to cook the soup in.
 
 See also: CEDIT FLAGS, OLC CRAFTS
+#d
+CLASSEDIT "OLC CLASSES" "OLC CLASS"
+
+Usage:  .class <command>
+        .command
+
+The .olc class editor allows you to set up player classes. On EmpireMUD, the
+players don't begin with classes -- they unlock them by leveling up certain
+skills. Classes can have broadly overlapping requirements (but can't be
+identical to each other), allowing players with similar sets of skills to end
+up in different classes.
+
+All commands in the editor arg highlighted in yellow and placed inside <angle
+braces>. You can get help on these commands by typing &yHELP CLASSEDIT <COMMAND>&0.
+
+You can close an open editor with .abort or .save.
+
+Example:
+> .class edit 123
+> .abbrev Test
+> .save
+
+For notes on the mud's building rules, see HELP BUILDING GUIDE.
+
+See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
+"CLASSEDIT ABBREVIATION"
+
+Usage:  .abbrev <string>
+
+The class abbreviation is shown on the who list and in other places where a
+short name is desired. It must be exactly 4 characters and contain no color
+codes.
+
+See also: OLC CLASSES
+#d
+"CLASSEDIT FLAGS" "CLASS FLAGS"
+
+Usage:  .flags [add | remove] <flags>
+
+Class flags set various properties on classes.
+
+Available flags:
+ IN-DEVELOPMENT - Will not be assigned to players.
+
+See also: OLC CLASSES, OLC REMOVEINDEV
+#d
+"CLASSEDIT MAXHEALTH" "CLASSEDIT MAX HEALTH"
+
+Usage:  .maxhealth <amount>
+
+This determines the amount of health a player gets at skill level 100. Remember
+that certain abilities will raise this amount, and gear will also add to it.
+
+See also: OLC CLASSES
+#d
+"CLASSEDIT MAXMANA" "CLASSEDIT MAX MANA"
+
+Usage:  .maxmana <amount>
+
+This determines the amount of mana a player gets at skill level 100. Remember
+that certain abilities will raise this amount, and gear will also add to it.
+
+See also: OLC CLASSES
+#d
+"CLASSEDIT MAXMOVES" "CLASSEDIT MAX MOVES"
+
+Usage:  .maxmoves <amount>
+
+This determines the number of movement points a player gets at skill level 100.
+Remember that certain abilities will raise this amount, and gear will also add
+to it.
+
+See also: OLC CLASSES
+#d
+"CLASSEDIT NAME"
+
+Usage:  .name <name>
+
+This sets the name of the class. Names should have their first letters
+capitalized and should be reasonably short and concise. You should avoid names
+that conflict with other classes.
+
+See also: OLC CLASSES
+#d
+"CLASSEDIT REQUIRES"
+
+Usage:  .requires <skill> <level>
+        .requires remove <skill>
+
+This allows you to set the skill requirements for a class. Players are auto-
+matically assigned a class when their skills enter a certain range. You can
+set as few or as many skill requirements on a class as you like; the player
+will be matched to the class that has the best fit.
+
+You can specify the skill by vnum or name (use "quotation marks" for multi-word
+names).
+
+The actual requirement is 24 levels below the value you set -- if you set a
+skill requirement to 100, a player will qualify when it hits 76.
+
+All stock EmpireMUD classes specify two skills at level 100, but you have more
+flexibility if you want to do something different. For example, you could do
+more specialized classes that require two skills at 100 and a third at 75.
+If you intend to change the number of skills that a player can raise to 50/75/
+100, though, you should consult a programmer.
+
+See also: OLC CLASSES, VNUM
+#d
+"CLASSEDIT ROLE"
+
+Usage:  .role <role> add <ability>
+        .role <role> remove <ability | all>
+
+This command assigns abilities to the class, under each role. If more than one
+role will have an ability, you must assign it to each of them. There is no
+limit on the number of abilities that can be assigned to each role.
+
+Abilities can be specified by name or vnum.
+
+You should not assign an ability that is also assigned to a skill, because a
+player who has the ability from his/her class will also count as having spent
+an abilitiy point in the skill tree.
+
+See also: OLC CLASSES, VNUM
+#d
+"CRAFT VEHICLES" "VEHICLE CRAFTS"
+
+Crafts with the VEHICLE flag will create a vehicle instead of an item. Vehicles
+are constructed over time like buildings, and will appear unfinished in the
+room until they are completed.
+
+Vehicle crafts don't use the "quantity" or "time" fields. Otherwise, they
+behave like regular crafts.
 #d
 "CROPEDIT CLIMATE" "SECTEDIT CLIMATE"
 
@@ -1257,8 +1834,9 @@ This set of flags applies to the global table itself.
 Available flags:
  IN-DEVELOPMENT - Will not be used live.
  ADVENTURE-ONLY - This global table will only apply to the adventure it's in.
+ CUMULATIVE-PRC - Percent check will be cumulative.
 
-See also: OLC GLOBALS
+See also: GEDIT PERCENT, OLC GLOBALS
 #d
 "GEDIT MAXLEVEL"
 
@@ -1320,6 +1898,55 @@ table is for.
 
 See also: OLC GLOBALS
 #d
+"GEDIT PERCENT" CUMULATIVE-PRC
+
+Usage:  .percent <amount>
+
+This allows you to add a chance of choosing this global, between 0.01 and
+100 (default is 100). When a global would be selected, its percent is checked.
+
+You can make the percent check cumulative, in order to link several different
+globals together. If multiple globals have the CUMULATIVE-PRC flag, only one
+of them will be chosen (if any), based on a cumulative percentage.
+
+More than one global may be selected if the CUMULATIVE-PRC flag is not set.
+
+See also: OLC GLOBALS
+#d
+"GEDIT REQUIRESABILITY" "GEDIT REQUIRES ABILITY"
+
+Usage:  .requiresability <name | none>
+
+This allows you to require the player to have a certain ability in order to
+trigger this global (of any type). Setting it to 'none' removes this
+requirement.
+
+See also: OLC GLOBALS
+#d
+"GEDIT SECTOREXCLUDE"
+
+Usage:  .sectorexclude [add | remove] <flags>
+
+A 'Mine Data' global table may have sector flags set to exclude. If so, the
+global table is only used if a tile DOES NOT have all the flags in this set.
+For example, you can use it to create a set that does not apply to ROUGH sects.
+
+These are the same set of flags from HELP SECTEDIT FLAGS.
+
+See also: OLC GLOBALS
+#d
+"GEDIT SECTORFLAGS"
+
+Usage:  .sectorflags [add | remove] <flags>
+
+A 'Mine Data' global table may have sector flags set. If so, the global table
+is only used if a tile has ALL of the flags set here. For example, you might
+set a global table to only apply to ROUGH sectors.
+
+These are the same set of flags from HELP SECTEDIT FLAGS.
+
+See also: OLC GLOBALS
+#d
 "GEDIT TYPE"
 
 Usage:  .type <type>
@@ -1331,6 +1958,84 @@ Types:
  Mob Interactions - Used for global SHEAR, LOOT, and PICKPOCKET tables.
 
 See also: OLC GLOBALS
+#d
+"GLOBAL MINE DATA" "MINE DATA GLOBAL"
+
+The 'Mine Data' global type is used for determining what type of mine a given
+mountain (or any sector) tile will have. The basic elements required are:
+
+1. A sector with the CAN-MINE flag (e.g. #8 Mountain).
+2. A building with the MINE flag which can be built upon that sector (like 
+   #5107 Mine).
+3. At least one global with the 'Mine Data' type, with matching sector flags
+   for your sector (e.g. #199).
+
+If there is more than one matching Mine Data global, the percentages on those
+globals will be used. Only the first match will be selected, as each map tile
+can only have 1 global vnum. Once the tile has been prospected or a mine has
+been built upon it, "stat room" will show "mine global vnum:" under extra data,
+indicating which global was chosen.
+
+When a player or Workforce NPC mines on that tile, it will run the interactions
+ONLY from that one chosen Mine Data global, not from other matching globals.
+This means that once a mine is established, it stays the same type of mine.
+However, if the interaction list in that global has more than one possible
+result, any of those results might appear from any successful swing of the
+pick.
+
+Notes on Mine Data globals:
+- You should name the global something like "iron mine", as it is used to build
+  certain strings, such as "This appears to be an iron mine."
+- The sector flags and excludes match the base map terrain the mine was built
+  upon, not the Building sector type of the mine itself. Setting ROUGH on the
+  global's sector flags will match the ROUGH mountain.
+- The capacity is a maximum. Mines normally have between 50% and 100% of this
+  maximum, at random. Deep mines have 75% to 150% of this range.
+- The level requirements, if you set any, will apply to the total level of the
+  player who is prospecting or who builds the mine.
+
+See also: BUILDING GUIDE, OLC GLOBALS
+#d
+"GLOBAL NEWBIE GEAR" "NEWBIE GEAR GLOBAL"
+
+The 'Newbie Gear' Global allows the same gear list options as Archetypes,
+but this is given to all newbie characters.
+
+Notes on Newbie Gear globals:
+- Only the percent field (and cumulative flag) really affect this type of
+  global. The other usual global controls like exclude flags and level
+  restrictions don't apply.
+- Gear from archetypes is given first, so players only receive gear from
+  globals in equipment slots not already filled. (This doesn't apply to
+  inventory.)
+
+See also: GEDIT GEAR
+#d
+"GLOBAL MOB INTERACTIONS" "MOB INTERACTIONS GLOBAL" "MOB INTERACTION GLOBAL"
+
+The 'Mob Interactions' Global allows SHEAR, LOOT, and PICKPOCKET globals to
+be applied to all mobs in a matching range. This can be used for loot tables
+that are adventure-wide, or truly global.
+
+Notes on Mob Interactions globals:
+- Only SHEAR, LOOT, and PICKPOCKET mob interactions are supported.
+- The min/max levels, if any, apply to the mobs (not the player attacking the
+  mob). If the mob normally has a range of 150-250, and is scaled to 175, it
+  will not trigger a global loot interaction that requires 200-250. But the
+  same mob scaled to 225 would.
+
+See also: BUILDING GUIDE, OLC GLOBALS
+#d
+IN-DEVELOPMENT "IN DEVELOPMENT" IN-DEV
+
+The IN-DEVELOPMENT flag prevents an augment, craft, or global from being
+available to players. Generally immortals can still use them (although they
+won't appear in craft lists).
+
+You can quickly remove the IN-DEV flag using the .removeindev command. The OLC
+auditors will warn about items that still have IN-DEV flags.
+
+See also: OLC AUDIT, REMOVEINDEV
 #d
 "ITEM SCALING" "OBJ SCALING" "OBJECT SCALING" SCALABLE "SCALABLE FLAG" "SCALING ITEM"
 
@@ -1674,6 +2379,7 @@ Available mob flags:
  *EXTRACTED - Do not set.
  !LOOT - Will not drop any loot.
  !TELEPORT - Cannot teleport to this mob.
+ !EXP - Players get no experience from using abilities against this mob.
 
 See also: OLC MOBILES
 #d
@@ -1742,6 +2448,8 @@ Usage:  .keywords <keywords>
 This command updates the keywords on a mob. The keywords are a list of single
 words that can be used to target the mob. It should include any words from the
 mob's short or long description that identify the mob.
+
+Usually the most significant keyword should be first.
 
 Example:
  name: a fiery dragon
@@ -1866,23 +2574,19 @@ on them.
 
 See also: AFFECT FLAGS, OLC OBJECTS
 #d
-"OEDIT ANIMALSREQUIRED" "OEDIT ANIMALS REQUIRED"
+"OEDIT APPLY" "OEDIT APPLIES" APPLIES
 
-Usage:  .animalsrequired <number>
-
-You can specify whether the cart needs 0, 1, or 2 animals to pull it. However,
-with 0 animals, it can never be pulled.
-
-See also: HARNESS, OLC OBJECTS
-#d
-"OEDIT APPLY" APPLIES
-
-Usage:  .apply add <value> <type>
-        .apply change <number> <value | type> <new value>
+Usage:  .apply add <value> <apply> [type]
+        .apply change <number> <value | apply | type> <new value>
         .apply remove <number | all>
 
 Applies are bonuses (or penalties) that an item gives to the player who is
-using it. The following applies are available. Most are self-explanatory:
+using it. The following applies are available.
+
+Apply types (optional) let you specify which applies come from enchantments or
+other sources (the default is "natural").
+
+Most applies are self-explanatory:
  STRENGTH - characters can't use an item that would reduce them below 1 strength
  DEXTERITY - chance to hit/dodge
  HEALTH-REGEN - rate of health regen (per 5 second tick)
@@ -1977,15 +2681,6 @@ other than 0.
 
 See also: ITEM SCALING, OEDIT CONTENTS, OLC OBJECTS
 #d
-"OEDIT CATAPULT"
-
-Usage:  .catapult
-
-This trait, set on cart objects, turns the cart into a catapult and allows it
-to be used with the catapult command. Using .catapult again will toggle it off.
-
-See also: CATAPULT
-#d
 "OEDIT CHARGES"
 
 Usage:  .charges <number>
@@ -2050,6 +2745,8 @@ Message types:
  instrument-to-room - Shown every few seconds to the room when someone is playing an instrument.
  eat-to-char - Shown to the person when they eat the item.
  eat-to-room - Shown to the room when a person eats an item.
+ craft-to-char - Shown to the actor when building a vehicle ($V for vehicle).
+ craft-to-room - Shown to the room when building a vehicle ($V for vehicle).
 
 See also: OLC OBJECTS
 #d
@@ -2108,7 +2805,7 @@ Object flags allow additional properties to be set on objects, with various
 effects. Never set a flag marked with an * (asterisk).
 
 Available flags:
- CHAIR - can be sat upon using the 'sit' command
+ * - do not set
  PLANTABLE - can be planted as a crop (see OEDIT PLANTS)
  LIGHT - lights up the room at night
  SUPERIOR - crafted by a master craftsman, adds the (superior) tag
@@ -2244,7 +2941,7 @@ See also: OLC OBJECTS
 
 Usage:  .maxlevel <level>
 
-This command determines the maximum level a objecdt will scale to. Players are
+This command determines the maximum level a object will scale to. Players are
 rated from level 1 to 100 based on their skills, plus a number based on their
 gear. There is a full guide to item scaling at HELP ITEM SCALING.
 
@@ -2439,15 +3136,15 @@ Available types:
  CONTAINER - a chest, holds items on the ground (never set wear TAKE)
  DRINKCON - a drink container, like a flask
  FOOD - edible
- BOAT - lets you move on river/ocean, like a canoe
+ * - unused
  PORTAL - transports a player to another place (never set .wear TAKE)
  *BOARD - a message board
  *CORPSE - a corpse
  COINS - a pile of coins
  *MAIL - a letter
  WEALTH - adds to empire wealth when stored
- CART - a cart or wagon
- *SHIP - a sailing ship
+ *CART - use vehicles instead
+ *SHIP - use vehicles instead
  * - unused
  * - unused
  MISSILE_WEAPON - a bow, or similar (requires .wear RANGED)
@@ -2652,11 +3349,17 @@ Available flags:
  - !MOBILE -- Cannot edit mobiles
  - !OBJECT -- Cannot edit objects
  - !BUILDING -- Cannot edit buildings
- - SECTORS -- Can edit map sectors
+ - SECTORS -- CAN edit map sectors
  - !CROP -- Cannot edit crops
  - !TRIGGER -- Cannot edit triggers
  - !ADVENTURE -- Cannot edit adventures
  - !ROOMTEMPLATE -- Cannot edit room templates
+ - !GLOBAL -- Cannot edit globals
+ - !AUGMENT -- Cannot edit augments
+ - !ARCHETYPE -- Cannot edit archetypes
+ - ABILITIES -- CAN edit abilities
+ - CLASSES -- CAN edit classes
+ -- SKILLS -- CAN edit skills
 
 For notes on the mud's building rules, see HELP BUILDING GUIDE.
 #d
@@ -2726,6 +3429,9 @@ live game system.
 All commands in the editor are highlighted in yellow and placed inside <angle
 braces>. You can get help on any of these commands by typing &yHELP GEDIT
 <COMMAND>&0.
+
+Each type of global provides a different function, and has its own help file.
+See: GLOBAL MINE DATA, GLOBAL MOB INTERACTIONS
 
 You can close an open editor with .abort or .save.
 
@@ -2852,7 +3558,14 @@ This command removes the IN-DEVELOPMENT flag from an adventure and any craft
 recipes in it, or from craft recipes over a given vnum range. It can be used
 to quickly activate a zone.
 
-This also applies to global tables in the range.
+The following types will have IN-DEVELOPMENT flags removed in the vnum range:
+- the adventure (when targeting an adventure vnum)
+- archetypes
+- augments
+- classes
+- crafts
+- globals
+- skills
 
 See also: OLC CONTROLS, OLC ADVENTURES, ADVEDIT FLAGS, CEDIT FLAGS
 #d
@@ -2955,6 +3668,30 @@ For notes on the mud's building rules, see HELP BUILDING GUIDE.
 
 See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
 See also: TRIGEDIT-TYPES
+#d
+"OLC VEHICLES"
+
+Usage:  .v <command>
+        .<command>
+
+The .olc vehicle editor gives you the freedom to create a wide range of
+vehicles. It provides an in-game menu for controlling every detail of the
+vehicle (except how to make one; that's the craft editor).
+
+All of the .olc commands are highlighted in yellow and placed inside <angle
+braces>. You can get help on any of these by typing &yHELP VEDIT <COMMAND>&0.
+
+You can close an open editor with .abort or .save.
+
+For notes on the mud's building rules, see HELP BUILDING GUIDE.
+
+Example vehicle settings:
+ cart: DRIVING SIT CONTAINER LEADABLE, capacity: 200, animals required: 1
+ ship: SAILING SHIPPING, interior room: set
+ chair: SIT IN DRAGGABLE CAN-PORTAL
+ catapult: LEADABLE SIEGE-WEAPONS, animals required: 2
+
+See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
 #d
 "REDIT DESCRIPTION"
 
@@ -3157,7 +3894,8 @@ Usage:  .flags [add | remove] <flags>
 Available sector flags:
  LOCK-ICON - a random icon is chosen when the terrain changes to this, and kept
  IS-ADVENTURE - used only for adventure rooms
- NON-ISLAND - won't be detected as part of an island by the island detection system
+ NON-ISLAND - won't be detected as part of an island by the island detection
+    system.
  CHORE - This sector may have a chore (required, or the chore will never trigger)
  !CLAIM - Cannot be claimed.
  START-LOCATION - A starting location for players; prevents combat here
@@ -3173,7 +3911,7 @@ Available sector flags:
  MAP-BUILDING - This sector represents a building on the map; shown using building data
  INSIDE-ROOM - This sector represents an interior (designated) ROOM building
  LARGE-CITY-RADIUS - This tile counts as in-city much further away than normal
- OBSCURE-VISION - Players can't be seen here; also blocks catapults and towers
+ OBSCURE-VISION - Players can't be seen here; also blocks guard towers
  IS-TRENCH - Sector counts as a trench and fills with water
  * - unused
  ROUGH - This is rough, raised terrain, like a mountain
@@ -3263,6 +4001,91 @@ punctuation at the end, and should be a reasonably short description of the
 sector.
 
 See also: OLC SECTORS
+#d
+SKILLEDIT "OLC SKILLS" "SKILL OLC"
+
+Usage:  .skill <command>
+        .command
+
+The .olc skill editor allows you to set up player skills. The main purpose of
+this is to choose which abilities that skill unlocks, and at what level. This
+does not control what class a player becomes (see HELP CLASSEDIT), only which
+powers they have access to and in which order.
+
+All commands in the editor arg highlighted in yellow and placed inside <angle
+braces>. You can get help on these commands by typing &yHELP SKILLEDIT <COMMAND>&0.
+
+You can close an open editor with .abort or .save.
+
+Example:
+> .skill edit 123
+> .name Test Skill
+> .save
+
+For notes on the mud's building rules, see HELP BUILDING GUIDE.
+
+See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
+"SKILLEDIT ABBREVIATION"
+
+Usage:  .abbrev <string>
+
+The skill abbreviation is a short name used for some strings where there isn't
+enough space for the full name. It must always be 3 letters and contain no
+color codes.
+
+See also: OLC SKILLS
+#d
+"SKILLEDIT DESCRIPTION"
+
+Usage:  .description <text>
+
+Skill descriptions are short phrases that appear when a player types "skills",
+or when they get more info on a skill during character creation. These should
+always be short -- 40 characters or so. Generally they are written as whole
+sentences, but with no punctuation.
+
+See also: OLC SKILLS
+#d
+"SKILLEDIT FLAGS" "SKILL FLAGS"
+
+Usage:  .flags [add | remove] <flags>
+
+Skill flags set various properties on skills.
+
+Available flags:
+ IN-DEVELOPMENT - Players can't see or gain the skill.
+
+See also: OLC SKILLS, OLC REMOVEINDEV
+#d
+"SKILLEDIT NAME"
+
+Usage:  .name <name>
+
+A skill's name is what players see on their skill list, and what is shown in
+many messages related to the skill. Skill names should be reasonably short and
+very unique. Players will want to abbreviate them easily.
+
+See also: OLC SKILLS
+#d
+"SKILLEDIT TREE"
+
+Usage:  .tree add <ability> <level> [requires ability]
+        .tree remove <ability | all>
+        .tree change <ability> <level | requires> <new value>
+
+This command allows you to set up the skill tree -- the abilities players can
+purchase. Each ability requires a level. You can also set a requirement that
+they buy another ability first -- that's what makes it a tree.
+
+Each ability may only be assigned to only one skill, and cannot be assigned to
+both a skill and a class.
+
+Players always get a fixed number of ability points in a skill, and you can
+use the level and prerequisite abilities to help control how many of the
+abilities a player can access.
+
+See also: ABILITY POINTS, OLC SKILLS, VNUM
 #d
 "SPECIAL ICONS" "ICON CODES"
 
@@ -3474,16 +4297,6 @@ inventory.
 The BOARD item type is used only for in-game boards and cannot be set in OLC
 because boards require code support as well.
 #d
-"BOAT ITEM" "BOAT OBJECT"
-
-The BOAT item represents a canoe or raft, something reasonably small that the
-player can take with them (although you should set the LARGE flag). A player
-who has a boat will be able to cross water tiles and will be immune to water-
-based random encounters, such as sharks.
-
-This is not the type of item that players can go inside and explore; for that
-you want a ship.
-#d
 "BOOK ITEM" "BOOK OBJECT"
 
 The BOOK type is used along with the bookedit interface and EmpireMUD's library
@@ -3491,17 +4304,6 @@ system. You can spawn books in adventures by writing them in the book editor,
 then assigning their book ID to a book object in your adventure zone. The
 data from the book editor will override your short description, long desc-
 ription, and look description.
-#d
-"CART ITEM" "CART OBJECT"
-
-The CART item type represents a large item that can be moved by harnessing
-animals to it. This includes carts, but also catapults.
-
-To make a cart-type item, set the number of animals needed to pull it (1 or 2),
-and set its capacity.
-
-To make a catapult-type item, set the capacity to zero (it doesn't need to
-move anything) and the number of animals required, plus the catapult property.
 #d
 "COINS ITEM" "COINS OBJECT"
 
@@ -3521,8 +4323,7 @@ EmpireMUD does not use containers with the TAKE flag. These items should only
 be used on the ground. If you want to raise inventory capacity, use the PACK
 item type instead.
 
-If you want to make a cart (or other movable container), use the CART type
-instead.
+If you want to make a cart (or other movable container), use a vehicle instead.
 #d
 "CORPSE ITEM" "CORPSE OBJECT"
 
@@ -3660,6 +4461,280 @@ currently an option.
 The UNDEFINED item type should not be used for live items. If you need a
 generic item, use type OTHER.
 #d
+"VEDIT ANIMALSREQUIRED" "VEDIT ANIMALS REQUIRED"
+
+Usage:  .animalsrequired <number>
+
+This is the number of animals that can be harnessed to the vehicle. Players
+cannot drag, lead, or drive a vehicle that doesn't have enough animals attached
+to it.
+
+See also: HARNESS, OLC VEHICLES
+#d
+"VEDIT CAPACITY"
+
+Usage:  .capacity <number>
+
+Vehicle capacity is used for both container storage, and for the amount moved
+by the shipping system -- depending on which flags are set on the vehicle. It
+has no purpose if you don't set either CONTAINER or SHIPPING. If the vehicle
+has both flags, the shipping system will be limited by how many items are
+stored in the vehicle as a container.
+
+The capacity is measured in item size -- most items count as 1, except LARGE
+items which count as 2. Items with other items inside of them count as the
+total of all items inside.
+
+See also: VEDIT FLAGS, OLC VEHICLES
+#d
+"VEDIT DESIGNATE" "DESIGNATE FLAGS"
+
+Usage:  .designate [add | remove] <flags>
+
+Designate flags control what types of rooms may be added to a vehicle. This
+only matters if the "extra rooms" property is set greater than 0 AND the
+"interior room" property is set.
+
+Rooms can be designated in vehicles that have a matching designate flag with
+the room. If a room without a matching designate flag is somehow added to the
+vehicle (for example, as the "interior room" or via a trigger), players will
+not be able to change that room with redesignate.
+
+See HELP DESIGNATE FLAGS for a list of valid flags.
+
+See also: VEDIT EXTRA ROOMS, VEDIT INTERIOR ROOM, OLC VEHICLES
+#d
+"VEDIT EXTRAROOMS" "VEDIT EXTRA ROOMS"
+
+Usage:  .extrarooms <number>
+
+If this number is greater than 0, players may use the 'designate' command to
+add additional rooms to the inside of the vehicle, with options based on what
+you set with the '.designate' olc option.
+
+Players will only be able to add these rooms if they can get inside the
+vehicle, which means you MUST also set the '.interiorroom' property.
+
+See also: VEDIT DESIGNATE, VEDIT INTERIOR ROOM, OLC VEHICLES
+#d
+"VEDIT FLAGS"
+
+Usage:  .flags [add | remove] <flags>
+
+Flags let you specify certain properties about the vehicle. Many different
+types of vehicles can be constructed this way.
+
+Available flags:
+ *INCOMPLETE - vehicle is not fully constructed (triggered by crafting)
+ DRIVING - vehicle moves on land**
+ SAILING - vehicle moves on water**
+ FLYING - vehicle moves through the air**
+ ALLOW-ROUGH - drag/drive work on rough terrain (e.g. mountains)
+ SIT - player can sit on the vehicle
+ IN - changes text from "on" to "in", and "aboard" to "inside"
+ BURNABLE - can be burnt using the "light" command
+ CONTAINER - items can be placed inside
+ SHIPPING - can be used by the shipping system
+ CUSTOMIZABLE - allows "customize vehicle"
+ DRAGGABLE - players can move it on land with "drag"
+ !BUILDING - cannot be dragged/driven into a building (e.g. too large)
+ CAN-PORTAL - can be dragged/driven/led through portals
+ LEADABLE - can be pulled around with the "lead" command
+ CARRY-VEHICLES - vehicles can be put inside (usually via drag/lead)
+ CARRY-MOBS - mobs can be put inside (usually via lead)
+ SIEGE-WEAPONS - can fire on buildings and vehicles
+ ON-FIRE - currently burning (via the "light" command)
+ !LOAD-ONTO-VEHICLE - cannot be loaded onto another vehicle
+
+** The DRIVING/SAILING/FLYING flags each enable specific commands for moving
+the vehicle. If it has more than one of these, each command will work. Usually
+each of these flags enables a certain set of terrain, but vehicles with more
+than one of these flags can be moved on any valid terrain with any of those
+commands.
+
+See also: OLC VEHICLES
+#d
+"VEDIT HITPOINTS"
+
+Usage:  .hitpoints <value>
+
+This number is how much damage a vehicle can take from a catapult or other
+sources, before it is destroyed.
+
+Vehicles like catapults deal 8 damage per 100 levels, per shot. Siege rituals
+deal Intelligence + 1 damage.
+
+Any damage over 10% of a vehicle's health will also add "1 year" of required
+maintenance to the vehicle (or nails, if the vehicle requires no yearly work).
+The repair command can be used to restore hitpoints.
+
+See also: VEDIT YEARLY MAINTENANCE, FIRE, OLC VEHICLES, REPAIR, SIEGE RITUAL
+#d
+"VEDIT ICON"
+
+Usage:  .icon <icon | none>
+
+Vehicles usually don't appear on the world map, but they can be set to do so by
+giving them an icon. In general, vehicle icons can lead to map clutter and
+should be avoided. However, they can help players find ships or other large
+vehicles on the map. Users in screen-reader mode will see the vehicle's name
+next to the tile name, instead of its icon.
+
+If more than one vehicle is in the same room, only the first vehicle in the
+list is shown on the map (this is generally the last vehicle that entered the
+room).
+
+You should almost always start the icon with &&0 to clear the tile's base
+color. There is no need to put a &&0 at the end of the icon.
+
+Examples:
+ > .icon &&0<&&u44&&0>
+
+See also: COLOR, OLC VEHICLES
+#d
+"VEDIT INTERIORROOM" "VEDIT INTERIOR ROOM"
+
+Usage:  .interiorroom <vnum | none>
+
+This sets the room (actually, building) vnum that is used for the interior of
+the vehicle. It must be a "building" (.b editor) with the ROOM flag, and cannot
+be an adventure's room template.
+
+If the interior room has the LOOK-OUT flag, players will see the world map
+above the room description, and the room title will appear as the exterior room
+rather than the one the player is standing in. In this case, the description
+of the interior room should be short.
+
+This property must be set for a player to be able to board/enter the vehicle.
+
+See also: OLC BUILDINGS, OLC VEHICLES
+#d
+"VEDIT KEYWORDS"
+
+Usage:  .keywords <keywords>
+
+This command updates the keywords on a vehicle. The keywords are a list of
+single words that can be used to target it. It should include any words from
+the short or long description that identify the vehicle.
+
+Usually the most significant keyword should be first.
+
+Example:
+ name: a cart
+ long description: A rickety cart is parked here
+ keywords: cart rickety
+
+See also: VEDIT SHORTDESCRIPTION, VEDIT LONGDESCRIPTION, OLC VEHICLES
+#d
+"VEDIT LONGDESCRIPTION" "VEDIT LONG DESCRIPTION"
+
+Usage:  .longdescription <string>
+
+The long description is the text you see when the vehicle is in the room. Its
+name should appear somewhere near the beginning, and the rest should be a
+complete sentence indicating that it is present.
+
+Examples:
+A cart is parked here.
+A ship is floating in the water.
+
+See also: VEDIT KEYWORDS, OLC VEHICLES
+#d
+"VEDIT LOOKDESCRIPTION" "VEDIT LOOK DESCRIPTION"
+
+Usage:  .lookdescription
+
+The look description is shown when a player looks at or examines the vehicle.
+This can be any length, but "newbie" vehicles should include information on how
+to use them.
+
+The look description is set in the string editor. If it is less than 80
+characters long, it will fit on one line and should not be indented. If it
+goes any longer than that, you should use /fi to format it with indent inside
+the string editor.
+
+See also: OLC VEHICLES, STRING EDITOR
+#d
+"VEDIT MAXLEVEL" "VEDIT MAX LEVEL"
+
+Usage:  .maxlevel <level>
+
+This command determines the maximum level a vehicle will scale to. Players are
+rated from level 1 to 100 based on their skills, plus a number based on their
+gear.
+
+If you set the maxlevel to 0, there will be no maximum and the vehicle can
+scale to any level over the minimum.
+
+See also: VEDIT MINLEVEL, OLC VEHICLES
+#d
+"VEDIT MINLEVEL" "VEDIT MIN LEVEL"
+
+Usage:  .minlevel <level>
+
+This command determines the minimum level a object will scale to. Players are
+rated from level 1 to 100 based on their skills, plus a number based on their
+gear.
+
+If you set the minlevel to 0, there will be no lower limit and the vehicle can
+scale to any level under the maximum.
+
+See also: VEDIT MAXLEVEL, OLC VEHICLES
+#d
+"VEDIT MOVETYPE" "VEDIT MOVE TYPE"
+
+Usage:  .movetype <type>
+
+The move type determines what message is sent when the vehicle moves. The same
+message is sent regardless of which movement command (drive, sail, pilot) is
+used.
+
+The same list of move types is used for mobs, so some types may not be
+appropriate for vehicles.
+
+See also: OLC VEHICLES
+#d
+"VEDIT RESOURCES" "VEDIT YEARLY MAINTENANCE"
+
+Usage:  .resource add <amount> <vnum>
+        .resource change <number> <quantity | vnum> <value>
+        .resource remove <number | all>
+        .resource move <number> <up | down>
+
+This command adds materials to the vehicle's "yearly maintenance" list. These
+are resources needed to maintain the vehicle each year. If you don't set any,
+then the vehicle does not require maintenance.
+
+This uses the ".resource" command to be consistent with other editors, but
+these are not the resources needed to build the vehicle in the first place --
+only to repair it.
+
+If a vehicle takes damage from any source, and that damage is more than 10% of
+its hitpoints, it will also add the yearly-maintenance resources to the repair
+cost.
+
+Vehicles with only 1 hitpoint will never get their yearly maintenance cost, as
+even 1 year of decay will destroy them.
+
+See also: VEDIT HITPOINTS, OLC VEHICLES, REPAIR
+#d
+"VEDIT SHORTDESCRIPTION" "VEDIT SHORT DESCRIPTION"
+
+Usage:  .shortdescription <string>
+
+The 'short description' is the trait that's shown in lists, in action messages,
+and almost everywhere else except when a player types 'look' in the room (where
+the long description is shown instead). This should be short, should generally
+begin with a/an/the unless it's a proper noun, and should not be capitalized
+(again unless it's a proper noun).
+
+Examples:
+ the cart
+ a carriage
+ the Enterprise
+
+See also: VEDIT KEYWORDS, VEDIT LONG DESCRIPTION, OLC VEHICLES
+#d
 "WEALTH ITEM" "WEALTH OBJECT"
 
 The WEALTH type represents an object of value. These are not converted to money
@@ -3697,5 +4772,32 @@ and some other worn items are an exception to this.
 If you are going to use the worn-as-armor wear location, or are planning to
 give the item good stats, you should usually be using the ARMOR item type
 instead.
+#d
+"DOLLAR SIGN CODES" "DOLLARSIGN CODES" $$ $$n $$e $$v $$m $$p $$o $$p $$v
+
+EmpireMUD uses the so-called dollar sign codes in a function called act(),
+which is used to send action text to people in the game. Usually this only
+appears in the code itself, but there are a few places where players encounter
+it -- such as emotes and custom object messages.
+
+Player variables:
+ $n - actor's name                      $N - 2nd person's name
+ $o - actor's real name                 $O - 2nd person's real name
+ $e - he/she/it for the actor           $E - he/she/it for 2nd person
+ $m - him/her/it for the actor          $M - him/her/it for 2nd person
+ $s - his/her/its for the actor         $S - his/her/its for 2nd person
+
+Item variables:
+ $p - short desc for the 1st item       $P - short desc for the 2nd item
+ $a - a/an for the 1st item             $A - a/an for the 2nd item
+
+Vehicle variables:
+ $v - short desc for the 1st vehicle (in the code, requires ACT_VEHICLE_OBJ)
+ $V - short desc for the 2nd vehicle
+
+Misc variables (code only):
+ $t - The obj parameter as a string
+ $T - The vict_obj parameter as a string
+ $F - The first word of a string passed to the vict_obj parameter
 #d
 $~

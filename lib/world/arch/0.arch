@@ -1,0 +1,505 @@
+#0
+Adventurer~
+Ready to take on the world~
+Left home in search of adventure~
+Adventurer~
+Adventurer~
+0
+A
+0 2
+A
+1 2
+A
+2 2
+A
+4 2
+A
+5 2
+G
+0 2004
+G
+4 2009
+G
+13 2027
+G
+14 2032
+G
+19 2102
+G
+21 2104
+K
+0 10
+K
+5 10
+K
+6 10
+S
+#1
+Noble Birth~
+Raised to rule (Empire, Battle)~
+Left the manor in search of greatness~
+Lord~
+Lady~
+b
+A
+0 2
+A
+2 2
+A
+3 3
+A
+5 2
+G
+0 2004
+G
+4 2014
+G
+13 2028
+G
+14 2032
+G
+19 2102
+G
+21 2104
+K
+1 20
+K
+0 10
+S
+#2
+Skilled Apprentice~
+Trained by a master artisan (Trade)~
+Graduated from an apprenticeship~
+Tradesman~
+Tradesman~
+b
+A
+0 2
+A
+1 3
+A
+2 2
+A
+4 2
+G
+0 2006
+G
+4 2009
+G
+13 2028
+G
+14 2032
+G
+19 2102
+G
+21 2104
+K
+6 30
+S
+#3
+Promising Squire~
+Built for battle (Battle, Survival)~
+Left to seek $s own fame~
+Sir~
+Lady~
+b
+A
+0 2
+A
+1 3
+A
+3 2
+A
+5 2
+G
+0 2006
+G
+4 2009
+G
+13 2028
+G
+14 2032
+G
+19 2102
+G
+21 2104
+K
+0 20
+K
+5 10
+S
+#4
+Rugged Woodsman~
+Cleaved from stone (Survival, Trade)~
+Left the logging camp to seek fortune~
+Adventurer~
+Adventurer~
+b
+A
+0 2
+A
+1 3
+A
+4 2
+A
+5 2
+G
+0 2001
+G
+4 2016
+G
+13 2027
+G
+14 2031
+G
+19 2101
+G
+21 2104
+K
+5 20
+K
+6 10
+S
+#5
+Tribal Leader~
+Rise from nothing (Empire, Survival)~
+Left the tribe to seek greatness~
+Elder~
+Elder~
+b
+A
+1 2
+A
+3 2
+A
+4 2
+A
+5 3
+G
+0 2001
+G
+4 2017
+G
+13 2027
+G
+14 2031
+G
+19 2100
+G
+21 2104
+K
+1 15
+K
+5 15
+S
+#6
+Street Urchin~
+The shadows of society (Stealth, Battle)~
+Stepped out of the shadows~
+Adventurer~
+Adventurer~
+b
+A
+0 2
+A
+1 2
+A
+2 3
+A
+5 2
+G
+0 2002
+G
+4 2009
+G
+13 2028
+G
+14 2032
+G
+19 2103
+G
+21 2104
+K
+4 20
+K
+0 10
+S
+#7
+Druidic Commune~
+Wield ancient magic (Natural Magic, Survival)~
+Left the commune~
+Elder~
+Elder~
+b
+A
+1 2
+A
+2 2
+A
+4 3
+A
+5 2
+G
+0 2001
+G
+4 2012
+G
+14 2032
+G
+19 2100
+G
+21 2104
+K
+3 20
+K
+5 10
+S
+#8
+Novice Sorcerer~
+Master the rituals (High Sorcery, Battle)~
+Graduated from the Academy~
+Master~
+Mistress~
+b
+A
+1 2
+A
+3 2
+A
+4 3
+A
+5 2
+G
+0 2002
+G
+4 2012
+G
+14 2032
+G
+19 1107
+G
+21 2104
+K
+2 20
+K
+0 10
+S
+#9
+Lone Vampire~
+Empowered by blood (Vampire, Battle)~
+~
+Hunter~
+Hunter~
+b
+A
+0 2
+A
+2 2
+A
+4 2
+A
+5 3
+G
+4 2009
+G
+13 2028
+G
+14 2032
+G
+19 2102
+G
+21 2104
+K
+7 20
+K
+0 10
+S
+#10
+Heretic~
+Practice both magics (High Sorcery, Natural Magic, Intelligence)~
+Branded a heretic~
+Heretic~
+Heretic~
+0
+A
+1 2
+A
+2 2
+A
+4 3
+A
+5 2
+G
+0 2001
+G
+4 2012
+G
+14 2032
+G
+19 1107
+G
+21 2104
+K
+2 15
+K
+3 15
+S
+#11
+Reclusive Baron~
+A vampire noble from an old family (Vampire, Empire)~
+Became a recluse~
+Baron~
+Baroness~
+0
+A
+0 2
+A
+3 2
+A
+4 2
+A
+5 3
+G
+0 2004
+G
+4 2014
+G
+13 2028
+G
+14 2032
+G
+19 2102
+G
+21 2104
+K
+7 15
+K
+1 15
+S
+#12
+Herbalist~
+An apprentice alchemist (Natural Magic, Trade, Intelligence)~
+Finished an herbalist apprenticeship~
+Herbalist~
+Herbalist~
+0
+A
+1 2
+A
+3 2
+A
+4 3
+A
+5 2
+G
+0 2001
+G
+4 2012
+G
+14 2032
+G
+19 2100
+G
+21 2104
+K
+3 20
+K
+6 10
+S
+#13
+Petty Thug~
+A streetwise bruiser up to no good (Battle, Stealth)~
+Moved on to bigger and better things~
+Hood~
+Hood~
+0
+A
+0 3
+A
+1 2
+A
+2 2
+A
+5 2
+G
+0 2002
+G
+4 2009
+G
+13 2028
+G
+14 2032
+G
+19 2103
+G
+21 2104
+K
+0 20
+K
+4 10
+S
+#14
+Boorish Warrior~
+A skilled fighter looking to move up (Battle)~
+Left prizefighting for greater fame~
+Warlord~
+Warlord~
+0
+A
+0 3
+A
+1 2
+A
+3 2
+A
+5 2
+G
+0 2006
+G
+4 2009
+G
+13 2028
+G
+14 2032
+G
+19 2102
+G
+21 2104
+K
+0 30
+S
+#15
+Alley Predator~
+Lurking in the shadows of society (Vampire, Stealth, Battle)~
+Moved into the shadows~
+Hunter~
+Hunter~
+0
+A
+0 2
+A
+1 2
+A
+2 2
+A
+5 3
+G
+0 2002
+G
+4 2009
+G
+13 2028
+G
+14 2032
+G
+19 2103
+G
+21 2104
+K
+7 10
+K
+4 10
+K
+0 10
+S
+$

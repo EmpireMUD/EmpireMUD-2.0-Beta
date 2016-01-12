@@ -131,7 +131,7 @@ OLC_MODULE(mapedit_terrain) {
 		msg_to_char(ch, "That sector requires extra data and can't be set this way.\r\n");
 	}
 	else {
-		old_sect = ROOM_ORIGINAL_SECT(IN_ROOM(ch));
+		old_sect = BASE_SECT(IN_ROOM(ch));
 		emp = ROOM_OWNER(IN_ROOM(ch));
 
 		// delete city center?
@@ -155,18 +155,14 @@ OLC_MODULE(mapedit_terrain) {
 			}
 			else {
 				change_terrain(IN_ROOM(ch), GET_SECT_VNUM(sect));
-				set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CROP_TYPE, GET_CROP_VNUM(cp));
+				set_crop_type(IN_ROOM(ch), cp);
 				msg_to_char(ch, "This room is now %s.\r\n", GET_CROP_NAME(cp));
 			}
 		}
-
-		// clear these
-		REMOVE_BIT(ROOM_AFF_FLAGS(IN_ROOM(ch)), ROOM_AFF_PLAYER_MADE);
-		REMOVE_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_PLAYER_MADE);
 				
 		// preserve old original sect for roads -- TODO this is a special-case
 		if (IS_ROAD(IN_ROOM(ch))) {
-			ROOM_ORIGINAL_SECT(IN_ROOM(ch)) = old_sect;
+			change_base_sector(IN_ROOM(ch), old_sect);
 		}
 
 		if (emp) {
@@ -372,6 +368,7 @@ OLC_MODULE(mapedit_ruin) {
 
 
 OLC_MODULE(mapedit_exits) {
+	void add_room_to_vehicle(room_data *room, vehicle_data *veh);
 	extern room_data *create_room();
 	extern const char *dirs[];
 	extern room_vnum find_free_vnum();
@@ -406,7 +403,14 @@ OLC_MODULE(mapedit_exits) {
 		if (new) {
 			to_room = create_room();
 			attach_building_to_room(building_proto(config_get_int("default_interior")), to_room);
+			
+			if (GET_ROOM_VEHICLE(IN_ROOM(ch))) {
+				++VEH_INSIDE_ROOMS(GET_ROOM_VEHICLE(IN_ROOM(ch)));
+				COMPLEX_DATA(to_room)->vehicle = GET_ROOM_VEHICLE(IN_ROOM(ch));
+				add_room_to_vehicle(to_room, GET_ROOM_VEHICLE(IN_ROOM(ch)));
+			}
 			COMPLEX_DATA(HOME_ROOM(IN_ROOM(ch)))->inside_rooms++;
+			
 			COMPLEX_DATA(to_room)->home_room = HOME_ROOM(IN_ROOM(ch));
 			ROOM_OWNER(to_room) = ROOM_OWNER(HOME_ROOM(IN_ROOM(ch)));
 		}
@@ -432,6 +436,9 @@ OLC_MODULE(mapedit_delete_exit) {
 	}
 	else {
 		if ((ex = find_exit(IN_ROOM(ch), dir))) {
+			if (ex->room_ptr) {
+				--GET_EXITS_HERE(ex->room_ptr);
+			}
 			if (ex->keyword)
 				free(ex->keyword);
 			REMOVE_FROM_LIST(ex, COMPLEX_DATA(IN_ROOM(ch))->exits, next);

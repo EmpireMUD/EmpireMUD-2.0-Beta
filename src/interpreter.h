@@ -31,7 +31,7 @@ struct command_info {
 	int	subcmd;
 	byte ctype;
 	sh_int flags;
-	sh_int ability;
+	any_vnum ability;
 };
 
 
@@ -88,6 +88,15 @@ struct alias_data {
 // for do_accept
 #define SCMD_ACCEPT  0
 #define SCMD_REJECT  1
+
+// do_board
+#define SCMD_BOARD  0
+#define SCMD_ENTER  1
+
+// do_drive
+#define SCMD_DRIVE  0
+#define SCMD_SAIL  1
+#define SCMD_PILOT  2
 
 /* do_gen_ps */
 #define SCMD_INFO		0
@@ -206,6 +215,15 @@ struct alias_data {
 #define TOG_ONOFF  0
 #define TOG_OFFON  1
 #define NUM_TOG_TYPES  2
+
+
+// movement types
+#define MOVE_NORMAL  0	// Normal move message
+#define MOVE_LEAD  1	// Leading message
+#define MOVE_FOLLOW  2	// Follower message
+	#define MOVE_UNUSED  3
+#define MOVE_EARTHMELD  4
+#define MOVE_SWIM  5	// swim skill
 
 
 // obj desc flags

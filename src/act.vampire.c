@@ -133,9 +133,11 @@ void cancel_siring(char_data *ch) {
 
 
 // checks for Blood Fortitude and does skill gain
-bool check_blood_fortitude(char_data *ch) {
-	if (!IS_NPC(ch) && IS_VAMPIRE(ch) && check_vampire_sun(ch, FALSE) && HAS_ABILITY(ch, ABIL_BLOOD_FORTITUDE)) {
-		gain_ability_exp(ch, ABIL_BLOOD_FORTITUDE, 1);
+bool check_blood_fortitude(char_data *ch, bool can_gain_skill) {
+	if (!IS_NPC(ch) && IS_VAMPIRE(ch) && check_vampire_sun(ch, FALSE) && has_ability(ch, ABIL_BLOOD_FORTITUDE) && check_solo_role(ch)) {
+		if (can_gain_skill) {
+			gain_ability_exp(ch, ABIL_BLOOD_FORTITUDE, 1);
+		}
 		return TRUE;
 	}
 	return FALSE;
@@ -143,7 +145,7 @@ bool check_blood_fortitude(char_data *ch) {
 
 
 // returns TRUE if the character is a vampire and has the ability; sends its own error
-bool check_vampire_ability(char_data *ch, int ability, int cost_pool, int cost_amount, int cooldown_type) {
+bool check_vampire_ability(char_data *ch, any_vnum ability, int cost_pool, int cost_amount, int cooldown_type) {
 	if (!IS_VAMPIRE(ch)) {
 		send_config_msg(ch, "must_be_vampire");
 		return FALSE;
@@ -162,7 +164,7 @@ bool check_vampire_ability(char_data *ch, int ability, int cost_pool, int cost_a
 * @return bool TRUE if the ability can proceed, FALSE if sunny
 */
 bool check_vampire_sun(char_data *ch, bool message) {
-	if (IS_NPC(ch) || HAS_ABILITY(ch, ABIL_DAYWALKING) || IS_GOD(ch) || IS_IMMORTAL(ch) || AFF_FLAGGED(ch, AFF_EARTHMELD) || !check_sunny(IN_ROOM(ch))) {
+	if (IS_NPC(ch) || has_ability(ch, ABIL_DAYWALKING) || IS_GOD(ch) || IS_IMMORTAL(ch) || AFF_FLAGGED(ch, AFF_EARTHMELD) || !check_sunny(IN_ROOM(ch))) {
 		// ok -- not sunny
 		return TRUE;
 	}
@@ -227,7 +229,7 @@ int get_blood_upkeep_cost(char_data *ch) {
 	
 	if (!IS_NPC(ch) && IS_VAMPIRE(ch) && !IS_IMMORTAL(ch)) {
 		// low skill vamp upkeep
-		if (GET_SKILL(ch, SKILL_VAMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
+		if (get_skill_level(ch, SKILL_VAMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
 			cost += 1;
 		}
 	
@@ -276,7 +278,7 @@ int GET_MAX_BLOOD(char_data *ch) {
 				base += 50;
 			}
 
-			if (HAS_ABILITY(ch, ABIL_ANCIENT_BLOOD)) {
+			if (has_ability(ch, ABIL_ANCIENT_BLOOD)) {
 				base *= 2;
 			}
 		}
@@ -291,7 +293,7 @@ int GET_MAX_BLOOD(char_data *ch) {
 * bool lore if TRUE, also adds lore
 */
 void make_vampire(char_data *ch, bool lore) {
-	void set_skill(char_data *ch, int skill, int level);
+	void set_skill(char_data *ch, any_vnum skill, int level);
 	
 	if (!IS_NPC(ch)) {	
 		/* set BEFORE set as a vampire! */
@@ -299,14 +301,14 @@ void make_vampire(char_data *ch, bool lore) {
 
 		SET_BIT(PLR_FLAGS(ch), PLR_VAMPIRE);
 	
-		if (GET_SKILL(ch, SKILL_VAMPIRE) < 1) {
+		if (get_skill_level(ch, SKILL_VAMPIRE) < 1) {
 			set_skill(ch, SKILL_VAMPIRE, 1);
 		}
 
 		GET_BLOOD(ch) = 30;
 	
 		if (lore) {
-			add_lore(ch, LORE_START_VAMPIRE, -1);
+			add_lore(ch, LORE_START_VAMPIRE, "Sired");
 		}
 	
 		SAVE_CHAR(ch);
@@ -347,8 +349,8 @@ void sire_char(char_data *ch, char_data *victim) {
 		msg_to_char(victim, "You sit up quickly, nearly knocking over your sire!\r\n");
 		act("$n sits up quickly!", FALSE, victim, 0, 0, TO_ROOM);
 
-		add_lore(victim, LORE_SIRE_VAMPIRE, GET_IDNUM(ch));
-		add_lore(ch, LORE_MAKE_VAMPIRE, GET_IDNUM(victim));
+		add_lore(victim, LORE_SIRE_VAMPIRE, "Sired by %s", PERS(ch, ch, TRUE));
+		add_lore(ch, LORE_MAKE_VAMPIRE, "Sired %s", PERS(victim, victim, TRUE));
 
 		/* Turn off that SIRING action */
 		GET_ACTION(ch) = ACT_NONE;
@@ -410,7 +412,9 @@ void taste_blood(char_data *ch, char_data *vict) {
 		act(buf, FALSE, ch, 0, vict, TO_CHAR);
 		
 		command_lag(ch, WAIT_ABILITY);
-		gain_ability_exp(ch, ABIL_TASTE_BLOOD, 20);
+		if (can_gain_exp_from(ch, vict)) {
+			gain_ability_exp(ch, ABIL_TASTE_BLOOD, 20);
+		}
 	}
 }
 
@@ -451,10 +455,10 @@ void un_deathshroud(char_data *ch) {
 
 // undo vampirism
 void un_vampire(char_data *ch) {
-	void clear_char_abilities(char_data *ch, int skill);
+	void clear_char_abilities(char_data *ch, any_vnum skill);
 
 	if (!IS_NPC(ch)) {
-		add_lore(ch, LORE_PURIFY, -1);
+		add_lore(ch, LORE_PURIFY, "Purified");
 		REMOVE_BIT(PLR_FLAGS(ch), PLR_VAMPIRE);
 		GET_BLOOD(ch) = GET_MAX_BLOOD(ch);
 		clear_char_abilities(ch, SKILL_VAMPIRE);
@@ -492,7 +496,7 @@ void update_biting_char(char_data *ch) {
 	GET_BLOOD(victim) -= amount;
 	
 	// can gain more
-	if (HAS_ABILITY(ch, ABIL_ANCIENT_BLOOD)) {
+	if (has_ability(ch, ABIL_ANCIENT_BLOOD)) {
 		amount *= 2;
 	}
 	GET_BLOOD(ch) = MIN(GET_MAX_BLOOD(ch), GET_BLOOD(ch) + amount);
@@ -509,14 +513,16 @@ void update_biting_char(char_data *ch) {
 		act("$N falls limply from $n's arms!", FALSE, ch, 0, victim, TO_NOTVICT);
 		act("You feel faint as the last of your blood is pulled from your body!", FALSE, ch, 0, victim, TO_VICT);
 		
-		gain_ability_exp(ch, ABIL_ANCIENT_BLOOD, 15);
+		if (can_gain_exp_from(ch, victim)) {
+			gain_ability_exp(ch, ABIL_ANCIENT_BLOOD, 15);
+		}
 
 		act("$n is dead! R.I.P.", FALSE, victim, 0, 0, TO_ROOM);
 		msg_to_char(victim, "You are dead! Sorry...\r\n");
 		if (!IS_NPC(victim)) {
 			death_log(victim, ch, ATTACK_EXECUTE);
-			add_lore(ch, LORE_PLAYER_KILL, GET_IDNUM(victim));
-			add_lore(victim, LORE_PLAYER_DEATH, GET_IDNUM(ch));
+			add_lore(ch, LORE_PLAYER_KILL, "Killed %s", PERS(victim, victim, TRUE));
+			add_lore(victim, LORE_PLAYER_DEATH, "Slain by %s", PERS(ch, ch, TRUE));
 		}
 
 		GET_FED_ON_BY(victim) = NULL;
@@ -539,14 +545,14 @@ void update_biting_char(char_data *ch) {
 			act("...$e sways from lack of blood.", FALSE, victim, NULL, NULL, TO_ROOM);
 		}
 		
-		if (HAS_ABILITY(ch, ABIL_ANCIENT_BLOOD)) {
+		if (has_ability(ch, ABIL_ANCIENT_BLOOD) && can_gain_exp_from(ch, victim)) {
 			gain_ability_exp(ch, ABIL_ANCIENT_BLOOD, 1);
 		}
 	}
 	
 	gain_ability_exp(ch, ABIL_SANGUINE_RESTORATION, 2);
 	gain_ability_exp(ch, ABIL_UNNATURAL_THIRST, 2);
-	if (GET_SKILL(ch, SKILL_VAMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
+	if (get_skill_level(ch, SKILL_VAMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
 		gain_skill_exp(ch, SKILL_VAMPIRE, 5);
 	}
 }
@@ -758,6 +764,9 @@ ACMD(do_bloodsweat) {
 	if (!can_use_ability(ch, ABIL_BLOODSWEAT, BLOOD, cost, COOLDOWN_BLOODSWEAT)) {
 		return;
 	}
+	else if (!check_solo_role(ch)) {
+		msg_to_char(ch, "You must be alone to use that ability in the solo role.\r\n");
+	}
 	else {
 		// remove first (to ensure there are some
 		for (dot = ch->over_time_effects; dot; dot = next_dot) {
@@ -826,7 +835,7 @@ ACMD(do_bloodsword) {
 		scale_level = get_approximate_level(ch);
 	}
 	else {
-		scale_level = MIN(get_approximate_level(ch), GET_SKILL(ch, SKILL_VAMPIRE));
+		scale_level = MIN(get_approximate_level(ch), get_skill_level(ch, SKILL_VAMPIRE));
 	}
 	
 	scale_item_to_level(obj, scale_level);
@@ -994,7 +1003,7 @@ ACMD(do_command) {
 	else if (MOB_FLAGGED(victim, MOB_HARD | MOB_GROUP)) {
 		act("You can't command $N.", FALSE, ch, NULL, victim, TO_CHAR);
 	}
-	else if (IS_VAMPIRE(victim) && (IS_NPC(victim) || GET_SKILL(victim, SKILL_VAMPIRE) > GET_SKILL(ch, SKILL_VAMPIRE)))
+	else if (IS_VAMPIRE(victim) && (IS_NPC(victim) || get_skill_level(victim, SKILL_VAMPIRE) > get_skill_level(ch, SKILL_VAMPIRE)))
 		msg_to_char(ch, "You cannot force your will upon those of more powerful blood.\r\n");
 	else if (get_approximate_level(ch) - get_approximate_level(victim) < level_threshold) {
 		msg_to_char(ch, "Your victim is too powerful.\r\n");
@@ -1017,7 +1026,9 @@ ACMD(do_command) {
 			strcpy(argument, buf);
 		do_say(ch, argument, 0, 0);
 		
-		gain_ability_exp(ch, ABIL_COMMAND, 33.4);
+		if (can_gain_exp_from(ch, victim)) {
+			gain_ability_exp(ch, ABIL_COMMAND, 33.4);
+		}
 
 		if (skill_check(ch, ABIL_COMMAND, DIFF_MEDIUM) && !AFF_FLAGGED(victim, AFF_IMMUNE_VAMPIRE)) {
 			un_charm = AFF_FLAGGED(victim, AFF_CHARM) ? FALSE : TRUE;
@@ -1498,7 +1509,9 @@ ACMD(do_weaken) {
 		}
 		
 		engage_combat(ch, victim, TRUE);
-
-		gain_ability_exp(ch, ABIL_WEAKEN, 15);
+		
+		if (can_gain_exp_from(ch, victim)) {
+			gain_ability_exp(ch, ABIL_WEAKEN, 15);
+		}
 	}
 }

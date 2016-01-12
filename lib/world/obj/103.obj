@@ -19,10 +19,10 @@ A dragon egg is sitting here.~
 This dragon egg looks ready to hatch and summon you a noncombat pet!
 Type 'use egg' to summon it.
 ~
-3 p a 2
+3 p a 3
 10301 0 0
 14 0
-T 10301
+T 9900
 S
 #10302
 seeds firefruit fruit~
@@ -64,9 +64,9 @@ It's suspended from a gold necklace, and is much heavier than it looks.
 0 0 0
 4 0
 A
-9 1
+9 1 0
 A
-22 2
+22 2 0
 S
 #10305
 charm dragons dragon's ferocity~
@@ -79,9 +79,9 @@ with all the ferocity a dragon can muster. As a result, it's quite heavy.
 0 0 0
 4 0
 A
-9 1
+9 1 0
 A
-21 2
+21 2 0
 S
 #10306
 charm courage dragons dragon's~
@@ -94,11 +94,11 @@ the courage of a dragon. It's much heavier than it looks.
 0 0 0
 4 0
 A
-18 2
+18 2 0
 A
-24 1
+24 1 0
 A
-12 1
+12 1 0
 S
 #10307
 charm wind dragons dragon's~
@@ -112,9 +112,9 @@ much lighter than it looks.
 0 0 0
 0 0
 A
-7 1
+7 1 0
 A
-23 2
+23 2 0
 S
 #10308
 leggings dragonscale~
@@ -127,11 +127,11 @@ stitched chips of dragonscale.
 0 0 0
 14 0
 A
-8 1
+8 1 0
 A
-2 1
+2 1 0
 A
-17 1
+17 1 0
 C
 0 175
 S
@@ -145,11 +145,11 @@ These leggings are stitched from the sinews of dragonscale.
 0 0 0
 14 0
 A
-8 1
+8 1 0
 A
-7 1
+7 1 0
 A
-23 1
+23 1 0
 C
 0 175
 S
@@ -163,13 +163,13 @@ These short pants are made from hardened dragonscales, and fastened by imperium.
 3 0 0
 14 0
 A
-2 1
+2 1 0
 A
-24 1
+24 1 0
 A
-13 2
+13 2 0
 A
-12 1
+12 1 0
 C
 0 175
 S
@@ -183,11 +183,11 @@ These leggings are made from tiny ringlets of dragonscale.
 1 0 0
 14 0
 A
-2 1
+2 1 0
 A
-1 1
+1 1 0
 A
-17 2
+17 2 0
 C
 0 175
 S
@@ -276,10 +276,10 @@ A wyvern whistle is lying here.~
 The wyvern whistle can be used to summon a noncombat pet!
 Type 'use whistle' to summon it.
 ~
-3 p a 3
+3 p a 4
 10334 0 0
 14 0
-T 10301
+T 9900
 S
 #10335
 whistle emerald~
@@ -370,11 +370,11 @@ It's made from actual dragon scales.
 3 0 0
 14 0
 A
-13 1
+13 1 0
 A
-24 2
+24 2 0
 A
-12 2
+12 2 0
 C
 125 200
 S
@@ -403,11 +403,11 @@ material. What's more, there's a nocturnium mesh woven around them.
 0 0 0
 14 0
 A
-8 1
+8 1 0
 A
-9 1
+9 1 0
 A
-22 2
+22 2 0
 C
 125 200
 S
@@ -435,11 +435,11 @@ edges with sharpened imperium.
 1 0 0
 14 0
 A
-1 1
+1 1 0
 A
-9 1
+9 1 0
 A
-21 2
+21 2 0
 C
 125 200
 S
@@ -467,9 +467,9 @@ This saddle is made from molded dragon scales!
 0 0 0
 14 0
 A
-7 3
+7 3 0
 A
-6 1
+6 1 0
 C
 125 200
 S
@@ -496,11 +496,11 @@ The gloves still have bits of the charred flesh of the previous occupant.
 3 0 0
 2 0
 A
-2 1
+2 1 0
 A
-18 2
+18 2 0
 A
-13 2
+13 2 0
 S
 #10350
 earrings unlucky adventurer's adventurers~
@@ -512,11 +512,11 @@ These earrings still smell of burnt flesh. They're otherwise quite handsome.
 0 0 0
 4 0
 A
-2 1
+2 1 0
 A
-9 1
+9 1 0
 A
-17 2
+17 2 0
 S
 #10351
 cloak unlucky adventurer's adventurers~
@@ -528,13 +528,13 @@ This cloak is singed around the edges, and smells faintly of burnt hair.
 0 0 0
 7 0
 A
-8 1
+8 1 0
 A
-9 1
+9 1 0
 A
-7 1
+7 1 0
 A
-23 2
+23 2 0
 S
 #10352
 spellbook book adventurer's adventurers unlucky~
@@ -546,11 +546,11 @@ The book looks slightly singed, and there's more dried blood than just the ink.
 0 0 0
 7 0
 A
-23 3
+23 3 0
 A
-7 1
+7 1 0
 A
-9 1
+9 1 0
 S
 #10353
 dagger unlucky adventurer's adventurers~
@@ -562,9 +562,9 @@ This dagger has plenty of dried blood, but only on the handle.
 0 3 4
 2 0
 A
-4 1
+4 1 0
 A
-17 1
+17 1 0
 S
 #10354
 shield unlucky adventurer's adventurers~
@@ -576,13 +576,13 @@ This shield looks like it once bore a crest, long scorched off.
 0 0 0
 13 0
 A
-18 1
+18 1 0
 A
-13 2
+13 2 0
 A
-24 1
+24 1 0
 A
-12 1
+12 1 0
 S
 #10355
 effigy unlucky adventurer~
@@ -594,12 +594,12 @@ This clay effigy looks like it spent too long in the kiln.
 0 0 0
 6 0
 A
-22 2
+22 2 0
 A
-9 1
+9 1 0
 A
-17 1
+17 1 0
 A
-2 1
+2 1 0
 S
 $
