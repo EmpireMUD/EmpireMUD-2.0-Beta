@@ -264,45 +264,65 @@ M
 255 20.00 c
 S
 #5518
-Caravan Inside~
-Inside the Caravan~
+Inside Wagon~
+Inside the Wagon~
 &0[  ]~
 1 0 a r
 0 0 0 -1
 C
-disembark, redesignate~
+disembark~
 D
-   The inside of this wooden caravan is bare now, but with a bit of work, you
-could furnish it to do any number of useful things while on the road.  
+   The base of the wagon is made of sturdy wood, though it rumbles as it rolls
+along the prairie. The cloth covering is supported by tall wooden arches,
+giving you enough room to stand comfortably and move about the vehicle.  
 ~
 S
 #5519
-Caravan Bedroom~
-A Caravan Bedroom~
+Wagon Sleeping Area~
+Inside the Wagon~
 &0[  ]~
 1 0 aN r
 0 0 0 -1
 C
 disembark, sleep~
 D
-   This small but cozy room is packed with wooden furniture, painted and
-upholstered in bright, riotous colors. A small bed in one corner indicates its
-main use, but dozens of small cupboards and drawers line the walls, providing
-plenty of storage space.  
+   This part of the wagon is cozy, almost cramped, due to the upholstered
+furniture and plush bed. Everything is firmly attached to the wooden base of
+the wagon so that it doesn't shift in transit, but you can't imagine trying to
+sleep while it's rattling over the open plains.  
 ~
 S
 #5520
-Caravan Kitchen~
-A Caravan Kitchen~
+Wagon Cooking Area~
+In the Wagon~
 &0[  ]~
 1 0 ar r
 0 0 0 -1
 C
+cook, disembark~
+D
+   This tiny corner of the wagon has been fashioned into something of a
+kitchen, with a little iron stove that vents out the back. The cloth canopy
+above the stove is a little scorched. A table has been bolted to the floor, but
+it has only pillows for chairs.  
+~
+S
+#5521
+Carriage~
+In the Carriage~
+&0[  ]~
+1 0 a 0
+0 0 0 -1
+C
 disembark~
 D
-   This cozy wooden room is set aside as a kitchen. A considerable space is
-left open around the cooking fire's metal housing, and a small chimney
-protruding from the cloth roof allows smoke from the fire to escape.  
+   The inside of the carriage is a little cramped, but the upholstered seats
+are made to sit four. The windows are covered in dark curtains to grant you a
+little privacy while the driver steers from a seat on the outside.  
+~
+E
+windows out~
+The windows are too dirty to see much.
 ~
 S
 $
