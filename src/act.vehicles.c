@@ -76,13 +76,16 @@ void cancel_driving(char_data *ch) {
 	char buf[MAX_STRING_LENGTH];
 	vehicle_data *veh;
 	
-	if (!(veh = GET_SITTING_ON(ch)) && !(veh = GET_ROOM_VEHICLE(IN_ROOM(ch)))) {
+	if (!(veh = GET_DRIVING(ch))) {
 		return;
 	}
 	
 	snprintf(buf, sizeof(buf), "%s stops %s.\r\n", VEH_SHORT_DESC(veh), drive_data[GET_ACTION_VNUM(ch, 2)].verb);
 	CAP(buf);
 	msg_to_vehicle(veh, FALSE, buf);
+	
+	GET_DRIVING(ch) = NULL;
+	VEH_DRIVER(veh) = NULL;
 }
 
 
@@ -455,6 +458,11 @@ void process_driving(char_data *ch) {
 	
 	// not got a vehicle?
 	if ((!(veh = GET_SITTING_ON(ch)) && !(veh = GET_ROOM_VEHICLE(IN_ROOM(ch)))) || !VEH_FLAGGED(veh, drive_data[subcmd].flag)) {
+		cancel_action(ch);
+		return;
+	}
+	// on wrong vehicle?
+	if (veh != GET_DRIVING(ch)) {
 		cancel_action(ch);
 		return;
 	}
