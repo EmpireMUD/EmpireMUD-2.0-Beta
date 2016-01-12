@@ -1100,6 +1100,9 @@ bool check_autostore(obj_data *obj, bool force) {
 	top_obj = get_top_object(obj);
 	real_loc = IN_ROOM(top_obj);
 	in_veh = top_obj->in_vehicle;
+	if (in_veh && !real_loc) {
+		real_loc = IN_ROOM(in_veh);
+	}
 	
 	// detect owner here
 	if (!emp && in_veh) {
