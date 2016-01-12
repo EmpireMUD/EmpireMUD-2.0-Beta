@@ -42,7 +42,7 @@
 // extern variables
 extern const char *drinks[];
 extern int drink_aff[][3];
-extern struct ship_data_struct ship_data[];
+extern const char *mob_move_types[];
 extern const struct wear_data_type wear_data[NUM_WEARS];
 
 // extern functions
@@ -59,9 +59,9 @@ ACMD(do_unshare);
 room_data *find_docks(empire_data *emp, int island_id);
 int get_wear_by_item_wear(bitvector_t item_wear);
 void move_ship_to_destination(empire_data *emp, struct shipping_data *shipd, room_data *to_room);
-void sail_shipment(empire_data *emp, obj_data *boat);
+void sail_shipment(empire_data *emp, vehicle_data *boat);
 void scale_item_to_level(obj_data *obj, int level);
-bool ship_is_empty(obj_data *ship);
+bool ship_is_empty(vehicle_data *ship);
 static void wear_message(char_data *ch, obj_data *obj, int where);
 
 // local stuff
@@ -77,7 +77,7 @@ static void wear_message(char_data *ch, obj_data *obj, int where);
 * @param obj_data *obj The item he's trying to take.
 * @return bool TRUE if ch can take obj.
 */
-static bool can_take_obj(char_data *ch, obj_data *obj) {
+bool can_take_obj(char_data *ch, obj_data *obj) {
 	if (!IS_NPC(ch) && !CAN_CARRY_OBJ(ch, obj)) {
 		act("$p: you can't carry that many items.", FALSE, ch, obj, 0, TO_CHAR);
 		return FALSE;
@@ -191,6 +191,7 @@ int get_wear_by_item_wear(bitvector_t item_wear) {
 */
 void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	extern double get_base_dps(obj_data *weapon);
+	extern char *get_vehicle_short_desc(vehicle_data *veh, char_data *to);
 	extern double get_weapon_speed(obj_data *weapon);
 	extern const char *apply_type_names[];
 	extern const char *extra_bits[];
@@ -222,6 +223,9 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	}
 	else if (obj->carried_by) {
 		snprintf(location, sizeof(location), " (carried by %s)", PERS(obj->carried_by, obj->carried_by, FALSE));
+	}
+	else if (obj->in_vehicle) {
+		snprintf(location, sizeof(location), " (in %s)", get_vehicle_short_desc(obj->in_vehicle, ch));
 	}
 	else if (obj->in_obj) {
 		snprintf(location, sizeof(location), " (in %s)", GET_OBJ_DESC(obj->in_obj, ch, OBJ_DESC_SHORT));
@@ -337,11 +341,6 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 			msg_to_char(ch, "Contains %s\r\n", money_amount(real_empire(GET_COINS_EMPIRE_ID(obj)), GET_COINS_AMOUNT(obj)));
 			break;
 		}
-		case ITEM_CART:
-			msg_to_char(ch, "Holds %d items.\r\n", GET_MAX_CART_CONTENTS(obj));
-			if (CART_CAN_FIRE(obj))
-				msg_to_char(ch, "Capable of firing shots.\r\n");
-			break;
 		case ITEM_MISSILE_WEAPON:
 			msg_to_char(ch, "Fires at a speed of %.2f for %d damage.\r\n", missile_weapon_speed[GET_MISSILE_WEAPON_SPEED(obj)], GET_MISSILE_WEAPON_DAMAGE(obj));
 			break;
@@ -382,6 +381,27 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	if (*lbuf) {
 		msg_to_char(ch, "Modifiers: %s\r\n", lbuf);
 	}
+}
+
+
+/**
+* Shows an "identify" of the vehicle.
+*
+* @param vehicle_data *veh The vehicle to id.
+* @param char_data *ch The person to show the data to.
+*/
+void identify_vehicle_to_char(vehicle_data *veh, char_data *ch) {
+	vehicle_data *proto = vehicle_proto(VEH_VNUM(veh));
+	
+	// basic info
+	act("Your analysis of $V reveals:", FALSE, ch, NULL, veh, TO_CHAR);
+	
+	if (VEH_OWNER(veh)) {
+		msg_to_char(ch, "Owner: %s%s\t0\r\n", EMPIRE_BANNER(VEH_OWNER(veh)), EMPIRE_NAME(VEH_OWNER(veh)));
+	}
+	
+	msg_to_char(ch, "Type: %s\r\n", skip_filler(proto ? VEH_SHORT_DESC(proto) : VEH_SHORT_DESC(veh)));
+	msg_to_char(ch, "Level: %d\r\n", VEH_SCALE_LEVEL(veh));
 }
 
 
@@ -1289,6 +1309,9 @@ void scale_item_to_level(obj_data *obj, int level) {
 	else if (top_obj->carried_by) {
 		room = IN_ROOM(top_obj->carried_by);
 	}
+	else if (top_obj->in_vehicle) {
+		room = IN_ROOM(top_obj->in_vehicle);
+	}
 	else if (top_obj->worn_by) {
 		room = IN_ROOM(top_obj->worn_by);
 	}
@@ -1552,7 +1575,6 @@ void scale_item_to_level(obj_data *obj, int level) {
  //////////////////////////////////////////////////////////////////////////////
 //// SHIPPING SYSTEM /////////////////////////////////////////////////////////
 
-
 /**
 * Queues up a shipping order and messages the character.
 *
@@ -1601,8 +1623,8 @@ void add_shipping_queue(char_data *ch, empire_data *emp, int from_island, int to
 		sd->to_island = to_island;
 		sd->status = SHIPPING_QUEUED;
 		sd->status_time = time(0);
-		sd->ship_homeroom = NOWHERE;
 		sd->ship_origin = NOWHERE;
+		sd->shipping_id = -1;
 		sd->next = NULL;
 		
 		// add to end
@@ -1673,14 +1695,14 @@ int calculate_shipping_time(struct shipping_data *shipd) {
 * @param struct shipping_data *shipd Which shipment to deliver.
 */
 void deliver_shipment(empire_data *emp, struct shipping_data *shipd) {
-	bool have_ship = (shipd->ship_homeroom != NOWHERE);
+	bool have_ship = (shipd->shipping_id != -1);
 	struct shipping_data *iter, *temp;
 	room_data *dock;
 	
 	// mark all shipments on this ship "delivered" (if we still have a ship)
 	if (have_ship) {
 		for (iter = shipd; iter; iter = iter->next) {
-			if (iter->ship_homeroom == shipd->ship_homeroom) {
+			if (iter->shipping_id == shipd->shipping_id) {
 				iter->status = SHIPPING_DELIVERED;
 			}
 		}
@@ -1747,14 +1769,13 @@ room_data *find_docks(empire_data *emp, int island_id) {
 *
 * @param empire_data *emp The empire that is shipping.
 * @param struct shipping_data *shipd The shipment.
-* @return obj_data* A ship, or NULL if none.
+* @return vehicle_data* A ship, or NULL if none.
 */
-obj_data *find_free_ship(empire_data *emp, struct shipping_data *shipd) {
+vehicle_data *find_free_ship(empire_data *emp, struct shipping_data *shipd) {
 	struct empire_territory_data *ter;
 	struct shipping_data *iter;
 	bool already_used;
-	obj_data *obj;
-	room_data *in_ship;
+	vehicle_data *veh;
 	int capacity;
 	
 	if (!emp || shipd->from_island == NO_ISLAND) {
@@ -1773,46 +1794,97 @@ obj_data *find_free_ship(empire_data *emp, struct shipping_data *shipd) {
 		}
 		
 		// found docks...
-		for (obj = ROOM_CONTENTS(ter->room); obj; obj = obj->next_content) {
-			if (!IS_SHIP(obj))  {
+		LL_FOREACH2(ROOM_VEHICLES(ter->room), veh, next_in_room) {
+			if (VEH_OWNER(veh) != emp) {
 				continue;
 			}
-			if (GET_SHIP_RESOURCES_REMAINING(obj) > 0) {
+			if (!VEH_IS_COMPLETE(veh) || VEH_FLAGGED(veh, VEH_ON_FIRE)) {
 				continue;
 			}
-			if (!(in_ship = real_room(GET_SHIP_MAIN_ROOM(obj)))) {
+			if (!VEH_FLAGGED(veh, VEH_SHIPPING) || VEH_CARRYING_N(veh) >= VEH_CAPACITY(veh)) {
 				continue;
 			}
-			if (ROOM_OWNER(in_ship) != NULL && ROOM_OWNER(in_ship) != emp) {
-				continue;
-			}
-			if (ROOM_AFF_FLAGGED(in_ship, ROOM_AFF_NO_WORK)) {
+			if (VEH_INTERIOR_HOME_ROOM(veh) && ROOM_AFF_FLAGGED(VEH_INTERIOR_HOME_ROOM(veh), ROOM_AFF_NO_WORK)) {
 				continue;
 			}
 			
 			// calculate capacity to see if it's full, and check if it's already used for a different island
-			capacity = 0;
-			already_used = FALSE;
-			for (iter = EMPIRE_SHIPPING_LIST(emp); iter && !already_used; iter = iter->next) {
-				if (iter->ship_homeroom == GET_SHIP_MAIN_ROOM(obj)) {
-					capacity += iter->amount;
-					if (iter->from_island != shipd->from_island || iter->to_island != shipd->to_island) {
-						already_used = TRUE;
+			if (VEH_SHIPPING_ID(veh) != -1) {
+				capacity = VEH_CARRYING_N(veh);
+				already_used = FALSE;
+				for (iter = EMPIRE_SHIPPING_LIST(emp); iter && !already_used; iter = iter->next) {
+					if (iter->shipping_id == VEH_SHIPPING_ID(veh)) {
+						capacity += iter->amount;
+						if (iter->from_island != shipd->from_island || iter->to_island != shipd->to_island) {
+							already_used = TRUE;
+						}
 					}
 				}
-			}
-			if (already_used || capacity >= ship_data[GET_SHIP_TYPE(obj)].cargo_size) {
-				// ship full or in use
-				continue;
+				if (already_used || capacity >= VEH_CAPACITY(veh)) {
+					// ship full or in use
+					continue;
+				}
 			}
 			
 			// ensure no players on board
-			if (!ship_is_empty(obj)) {
+			if (!ship_is_empty(veh)) {
 				continue;
 			}
 			
 			// looks like we actually found one!
-			return obj;
+			return veh;
+		}
+	}
+	
+	return NULL;
+}
+
+
+/**
+* @param empire_data *emp The empire that needs a new shipping id.
+* @return int The first free shipping id.
+*/
+int find_free_shipping_id(empire_data *emp) {
+	struct shipping_data *find;
+	int id;
+	
+	// shortcut
+	if (EMPIRE_TOP_SHIPPING_ID(emp) < INT_MAX) {
+		return ++EMPIRE_TOP_SHIPPING_ID(emp);
+	}
+	
+	// better look it up
+	for (id = 0; id < INT_MAX; ++id) {
+		LL_SEARCH_SCALAR(EMPIRE_SHIPPING_LIST(emp), find, shipping_id, id);
+		if (!find) {
+			return id;
+		}
+	}
+	
+	// this really shouldn't even be possible
+	syslog(SYS_ERROR, 0, TRUE, "SYSERR: find_free_shipping_id found no free id for empire [%d] %s", EMPIRE_VNUM(emp), EMPIRE_NAME(emp));
+	return -1;
+}
+
+
+/**
+* Finds a ship using its shipping id.
+*
+* @param empire_data *emp The purported owner of the ship.
+* @param int shipping_id The shipping id to find.
+* @return vehicle_data* The found ship, or NULL.
+*/
+vehicle_data *find_ship_by_shipping_id(empire_data *emp, int shipping_id) {
+	vehicle_data *veh;
+	
+	// shortcut
+	if (!emp || shipping_id == -1) {
+		return NULL;
+	}
+	
+	LL_FOREACH(vehicle_list, veh) {
+		if (VEH_OWNER(veh) == emp && VEH_SHIPPING_ID(veh) == shipping_id) {
+			return veh;
 		}
 	}
 	
@@ -1851,58 +1923,67 @@ room_data *get_ship_pen(void) {
 * will be added immediately after.
 *
 * @param empire_data *emp The empire who is shipping.
-* @param struct shipping_data *shipd The 
+* @param struct shipping_data *shipd The shipment
+* @param vehicle_data *boat The ship.
+* @param bool *full A variable to bind to if the ship filles up
 */
-void load_shipment(struct empire_data *emp, struct shipping_data *shipd, obj_data *boat, bool *full) {
+void load_shipment(struct empire_data *emp, struct shipping_data *shipd, vehicle_data *boat, bool *full) {
 	struct shipping_data *iter, *newd;
-	int capacity;
+	int capacity, size_avail;
 
 	// on bad input, just tell them it was full and hope for better results next time
-	if (!emp || !shipd || !boat || GET_SHIP_TYPE(boat) == NOTHING || GET_SHIP_MAIN_ROOM(boat) == NOWHERE) {
+	if (!emp || !shipd || !boat) {
 		*full = TRUE;
 		return;
 	}
 	
+	size_avail = VEH_CAPACITY(boat) - VEH_CARRYING_N(boat);
+	
 	// calculate capacity
 	capacity = 0;
 	for (iter = EMPIRE_SHIPPING_LIST(emp); iter; iter = iter->next) {
-		if (iter->ship_homeroom == GET_SHIP_MAIN_ROOM(boat)) {
+		if (iter->shipping_id == VEH_SHIPPING_ID(boat)) {
 			capacity += iter->amount;
 		}
 	}
 	
 	// this shouldn't be possible... but just in case
-	if (capacity >= ship_data[GET_SHIP_TYPE(boat)].cargo_size) {
+	if (capacity >= size_avail) {
 		*full = TRUE;
 		return;
 	}
 	
 	// ship full? need to split
-	if (capacity + shipd->amount > ship_data[GET_SHIP_TYPE(boat)].cargo_size) {
+	if (capacity + shipd->amount > size_avail) {
 		CREATE(newd, struct shipping_data, 1);
 		newd->vnum = shipd->vnum;
-		newd->amount = shipd->amount - (ship_data[GET_SHIP_TYPE(boat)].cargo_size - capacity);	// only what's left
+		newd->amount = shipd->amount - (size_avail - capacity);	// only what's left
 		newd->from_island = shipd->from_island;
 		newd->to_island = shipd->to_island;
 		newd->status = SHIPPING_QUEUED;
 		newd->status_time = shipd->status_time;
-		newd->ship_homeroom = NOWHERE;
 		newd->ship_origin = NOWHERE;
+		newd->shipping_id = -1;
 		
 		// put right after shipd in the list
 		newd->next = shipd->next;
 		shipd->next = newd;
 		
 		// remove overage
-		shipd->amount = ship_data[GET_SHIP_TYPE(boat)].cargo_size - capacity;
+		shipd->amount = size_avail - capacity;
 		*full = TRUE;
 	}
 	else {
-		*full = ((shipd->amount + capacity) >= ship_data[GET_SHIP_TYPE(boat)].cargo_size);
+		*full = ((shipd->amount + capacity) >= size_avail);
 	}
 	
 	// mark it as attached to this boat
-	shipd->ship_homeroom = GET_SHIP_MAIN_ROOM(boat);
+	if (VEH_SHIPPING_ID(boat) != -1) {
+		shipd->shipping_id = VEH_SHIPPING_ID(boat);
+	}
+	else {
+		shipd->shipping_id = VEH_SHIPPING_ID(boat) = find_free_shipping_id(emp);
+	}
 }
 
 
@@ -1916,37 +1997,37 @@ void load_shipment(struct empire_data *emp, struct shipping_data *shipd, obj_dat
 * @param room_data *to_room Which room to send it to.
 */
 void move_ship_to_destination(empire_data *emp, struct shipping_data *shipd, room_data *to_room) {
+	char buf[MAX_STRING_LENGTH];
 	struct shipping_data *iter;
-	room_data *ship_room;
-	obj_data *boat;
-	room_vnum old;
+	vehicle_data *boat;
+	int old;
 
 	// sanity
-	if (!emp || !shipd || !to_room || shipd->ship_homeroom == NOWHERE) {
+	if (!emp || !shipd || !to_room || shipd->shipping_id == -1) {
 		return;
 	}
 	
-	// find ship's home room
-	if (!(ship_room = real_real_room(shipd->ship_homeroom))) {
-		shipd->ship_homeroom = NOWHERE;
+	// find the boat
+	if (!(boat = find_ship_by_shipping_id(emp, shipd->shipping_id))) {
+		shipd->shipping_id = -1;	// whoops? it doesn't exist
 		return;
 	}
 	
-	// find the ship itself
-	if (!(boat = GET_BOAT(ship_room))) {
-		shipd->ship_homeroom = NOWHERE;
-		return;
+	if (ROOM_PEOPLE(IN_ROOM(boat))) {
+		snprintf(buf, sizeof(buf), "$V %s away.", mob_move_types[VEH_MOVE_TYPE(boat)]);
+		act(buf, FALSE, ROOM_PEOPLE(IN_ROOM(boat)), NULL, boat, TO_CHAR | TO_ROOM);
 	}
-	
-	act("$p sails away.", FALSE, NULL, boat, NULL, TO_ROOM);
-	obj_to_room(boat, to_room);
-	act("$p sails in.", FALSE, NULL, boat, NULL, TO_ROOM);
+	vehicle_to_room(boat, to_room);
+	if (ROOM_PEOPLE(IN_ROOM(boat))) {
+		snprintf(buf, sizeof(buf), "$V %s in.", mob_move_types[VEH_MOVE_TYPE(boat)]);
+		act(buf, FALSE, ROOM_PEOPLE(IN_ROOM(boat)), NULL, boat, TO_CHAR | TO_ROOM);
+	}
 	
 	// remove the ship homeroom from all shipments that were on this ship (including this one)
-	old = shipd->ship_homeroom;
+	old = shipd->shipping_id;
 	for (iter = EMPIRE_SHIPPING_LIST(emp); iter; iter = iter->next) {
-		if (iter->ship_homeroom == old) {
-			iter->ship_homeroom = NOWHERE;
+		if (iter->shipping_id == old) {
+			iter->shipping_id = -1;
 		}
 	}
 }
@@ -1960,7 +2041,7 @@ void move_ship_to_destination(empire_data *emp, struct shipping_data *shipd, roo
 */
 void process_shipping_one(empire_data *emp) {
 	struct shipping_data *shipd, *next_shipd;
-	obj_data *last_ship = NULL;
+	vehicle_data *last_ship = NULL;
 	bool full, changed = FALSE;
 	int last_from = NO_ISLAND, last_to = NO_ISLAND;
 	
@@ -2010,9 +2091,8 @@ void process_shipping_one(empire_data *emp) {
 	for (shipd = EMPIRE_SHIPPING_LIST(emp); shipd; shipd = next_shipd) {
 		next_shipd = shipd->next;
 		
-		if (shipd->status == SHIPPING_QUEUED && shipd->ship_homeroom != NOWHERE) {
-			room_data *deck = real_room(shipd->ship_homeroom);
-			obj_data *boat = deck ? GET_BOAT(deck) : NULL;
+		if (shipd->status == SHIPPING_QUEUED && shipd->shipping_id != -1) {
+			vehicle_data *boat = find_ship_by_shipping_id(emp, shipd->shipping_id);
 			if (boat) {
 				sail_shipment(emp, boat);
 			}
@@ -2045,52 +2125,66 @@ void process_shipping(void) {
 * are marked en-route.
 *
 * @param empire_data *emp The empire sending the shipment.
-* @param obj_data *boat The ship object.
+* @param vehicle_data *boat The ship object.
 */
-void sail_shipment(empire_data *emp, obj_data *boat) {
+void sail_shipment(empire_data *emp, vehicle_data *boat) {
+	char buf[MAX_STRING_LENGTH];
 	struct shipping_data *iter;
 
 	// sanity
-	if (!emp|| !boat || GET_SHIP_MAIN_ROOM(boat) == NOWHERE) {
+	if (!emp|| !boat) {
 		return;
 	}
 	
 	// verify contents
 	for (iter = EMPIRE_SHIPPING_LIST(emp); iter; iter = iter->next) {
-		if (iter->ship_homeroom == GET_SHIP_MAIN_ROOM(boat)) {
+		if (iter->shipping_id == VEH_SHIPPING_ID(boat)) {
 			iter->status = SHIPPING_EN_ROUTE;
 			iter->status_time = time(0);
 			iter->ship_origin = GET_ROOM_VNUM(IN_ROOM(boat));
 		}
 	}
 	
-	act("$p sails away.", FALSE, NULL, boat, NULL, TO_ROOM);
-	obj_to_room(boat, get_ship_pen());
-	act("$p sails in.", FALSE, NULL, boat, NULL, TO_ROOM);
+	if (ROOM_PEOPLE(IN_ROOM(boat))) {
+		snprintf(buf, sizeof(buf), "$V %s away.", mob_move_types[VEH_MOVE_TYPE(boat)]);
+		act(buf, FALSE, ROOM_PEOPLE(IN_ROOM(boat)), NULL, boat, TO_CHAR | TO_ROOM);
+	}
+	vehicle_to_room(boat, get_ship_pen());
+	if (ROOM_PEOPLE(IN_ROOM(boat))) {
+		snprintf(buf, sizeof(buf), "$V %s in.", mob_move_types[VEH_MOVE_TYPE(boat)]);
+		act(buf, FALSE, ROOM_PEOPLE(IN_ROOM(boat)), boat, NULL, TO_CHAR | TO_ROOM);
+	}
 }
 
 
 /**
 * Determines if a ship has any players in it.
 *
-* @param obj_data *ship The ship to check.
+* @param vehicle_data *ship The ship to check.
 * @return bool TRUE if the ship is empty, FALSE if it has players inside.
 */
-bool ship_is_empty(obj_data *ship) {
-	room_data *ship_room, *iter;
+bool ship_is_empty(vehicle_data *ship) {
+	struct vehicle_room_list *vrl;
 	char_data *ch;
 	
-	if (!ship || !IS_SHIP(ship) || !(ship_room = real_room(GET_SHIP_MAIN_ROOM(ship)))) {
+	if (!ship) {
+		return FALSE;
+	}
+	
+	// simple occupants
+	if (VEH_SITTING_ON(ship) && !IS_NPC(VEH_SITTING_ON(ship))) {
+		return FALSE;
+	}
+	if (VEH_LED_BY(ship) && !IS_NPC(VEH_LED_BY(ship))) {
+		return FALSE;
+	}
+	if (VEH_DRIVER(ship) && !IS_NPC(VEH_DRIVER(ship))) {
 		return FALSE;
 	}
 	
 	// check all interior rooms
-	for (iter = interior_room_list; iter; iter = iter->next_interior) {
-		if (HOME_ROOM(iter) != ship_room) {
-			continue;
-		}
-		
-		for (ch = ROOM_PEOPLE(iter); ch; ch = ch->next_in_room) {
+	LL_FOREACH(VEH_ROOM_LIST(ship), vrl) {
+		LL_FOREACH2(ROOM_PEOPLE(vrl->room), ch, next_in_room) {
 			if (!IS_NPC(ch)) {
 				// not empty!
 				return FALSE;
@@ -3656,8 +3750,11 @@ ACMD(do_exchange) {
 
 
 ACMD(do_get) {
+	void do_get_from_vehicle(char_data *ch, vehicle_data *veh, char *arg, int mode, int howmany);
+
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
 	int cont_dotmode, found = 0, mode;
+	vehicle_data *find_veh, *veh;
 	obj_data *cont;
 	char_data *tmp_char;
 
@@ -3682,24 +3779,40 @@ ACMD(do_get) {
 		}
 		cont_dotmode = find_all_dots(arg2);
 		if (cont_dotmode == FIND_INDIV) {
-			mode = generic_find(arg2, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP, ch, &tmp_char, &cont);
-			if (!cont) {
+			mode = generic_find(arg2, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM, ch, &tmp_char, &cont, &find_veh);
+			
+			if (find_veh) {
+				// pass off to vehicle handler
+				do_get_from_vehicle(ch, find_veh, arg1, mode, amount);
+			}
+			else if (!cont && GET_ROOM_VEHICLE(IN_ROOM(ch)) && isname(arg2, VEH_KEYWORDS(GET_ROOM_VEHICLE(IN_ROOM(ch))))) {
+				// vehicle they are in
+				do_get_from_vehicle(ch, GET_ROOM_VEHICLE(IN_ROOM(ch)), arg1, mode, amount);
+			}
+			else if (!cont) {
 				sprintf(buf, "You don't have %s %s.\r\n", AN(arg2), arg2);
 				send_to_char(buf, ch);
 			}
-			else if (GET_OBJ_TYPE(cont) != ITEM_CONTAINER && GET_OBJ_TYPE(cont) != ITEM_CART && !IS_CORPSE(cont))
+			else if (GET_OBJ_TYPE(cont) != ITEM_CONTAINER && !IS_CORPSE(cont))
 				act("$p is not a container.", FALSE, ch, cont, 0, TO_CHAR);
-			else
+			else {
 				get_from_container(ch, cont, arg1, mode, amount);
+			}
 		}
 		else {
 			if (cont_dotmode == FIND_ALLDOT && !*arg2) {
 				send_to_char("Get from all of what?\r\n", ch);
 				return;
 			}
+			LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+				if (CAN_SEE_VEHICLE(ch, veh) && VEH_FLAGGED(veh, VEH_CONTAINER) && (cont_dotmode == FIND_ALL || isname(arg2, VEH_KEYWORDS(veh)))) {
+					found = 1;
+					do_get_from_vehicle(ch, veh, arg1, FIND_OBJ_ROOM, amount);
+				}
+			}
 			for (cont = ch->carrying; cont; cont = cont->next_content) {
 				if (CAN_SEE_OBJ(ch, cont) && (cont_dotmode == FIND_ALL || isname(arg2, GET_OBJ_KEYWORDS(cont)))) {
-					if (GET_OBJ_TYPE(cont) == ITEM_CONTAINER || GET_OBJ_TYPE(cont) == ITEM_CART || IS_CORPSE(cont)) {
+					if (GET_OBJ_TYPE(cont) == ITEM_CONTAINER || IS_CORPSE(cont)) {
 						found = 1;
 						get_from_container(ch, cont, arg1, FIND_OBJ_INV, amount);
 					}
@@ -3711,7 +3824,7 @@ ACMD(do_get) {
 			}
 			for (cont = ROOM_CONTENTS(IN_ROOM(ch)); cont; cont = cont->next_content) {
 				if (CAN_SEE_OBJ(ch, cont) && (cont_dotmode == FIND_ALL || isname(arg2, GET_OBJ_KEYWORDS(cont)))) {
-					if (GET_OBJ_TYPE(cont) == ITEM_CONTAINER || GET_OBJ_TYPE(cont) == ITEM_CART || IS_CORPSE(cont)) {
+					if (GET_OBJ_TYPE(cont) == ITEM_CONTAINER || IS_CORPSE(cont)) {
 						get_from_container(ch, cont, arg1, FIND_OBJ_ROOM, amount);
 						found = 1;
 					}
@@ -3871,6 +3984,7 @@ ACMD(do_grab) {
 
 ACMD(do_identify) {
 	char_data *tmp_char;
+	vehicle_data *veh;
 	obj_data *obj;
 	
 	one_argument(argument, arg);
@@ -3878,12 +3992,16 @@ ACMD(do_identify) {
 	if (!*arg) {
 		msg_to_char(ch, "Identify what object?\r\n");
 	}
-	else if (!generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP, ch, &tmp_char, &obj)) {
+	else if (!generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM, ch, &tmp_char, &obj, &veh)) {
 		msg_to_char(ch, "You see nothing like that here.\r\n");
 	}
-	else {
+	else if (obj) {
 		charge_ability_cost(ch, NOTHING, 0, NOTHING, 0, WAIT_OTHER);
 		identify_obj_to_char(obj, ch);
+	}
+	else if (veh) {
+		charge_ability_cost(ch, NOTHING, 0, NOTHING, 0, WAIT_OTHER);
+		identify_vehicle_to_char(veh, ch);
 	}
 }
 
@@ -3978,8 +4096,11 @@ ACMD(do_keep) {
 
 
 ACMD(do_light) {
+	void do_light_vehicle(char_data *ch, vehicle_data *veh, obj_data *flint);
+	
 	obj_data *obj, *flint = NULL;
 	bool magic = !IS_NPC(ch) && has_ability(ch, ABIL_TOUCH_OF_FLAME);
+	vehicle_data *veh;
 
 	one_argument(argument, arg);
 
@@ -3991,8 +4112,15 @@ ACMD(do_light) {
 		msg_to_char(ch, "Light what?\r\n");
 	else if (!IS_NPC(ch) && !magic && !flint)
 		msg_to_char(ch, "You don't have a flint set to light that with.\r\n");
-	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying)) && !(obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)))))
-		msg_to_char(ch, "You don't have a %s.\r\n", arg);
+	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying)) && !(obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
+		// try burning a vehicle
+		if ((veh = get_vehicle_in_room_vis(ch, arg))) {
+			do_light_vehicle(ch, veh, flint);
+		}
+		else {
+			msg_to_char(ch, "You don't have a %s.\r\n", arg);
+		}
+	}
 	else if (!has_interaction(obj->interactions, INTERACT_LIGHT)) {
 		msg_to_char(ch, "You can't light that!\r\n");
 	}
@@ -4193,8 +4321,11 @@ ACMD(do_pour) {
 *  all objects to be put into container must be in inventory.
 */
 ACMD(do_put) {
+	void do_put_obj_in_vehicle(char_data *ch, vehicle_data *veh, int dotmode, char *arg, int howmany);
+	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
 	obj_data *obj, *next_obj, *cont;
+	vehicle_data *find_veh;
 	char_data *tmp_char;
 	int obj_dotmode, cont_dotmode, found = 0, howmany = 1;
 	char *theobj, *thecont;
@@ -4225,12 +4356,21 @@ ACMD(do_put) {
 		send_to_char(buf, ch);
 	}
 	else {
-		generic_find(thecont, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP, ch, &tmp_char, &cont);
-		if (!cont) {
+		generic_find(thecont, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM, ch, &tmp_char, &cont, &find_veh);
+		
+		if (find_veh) {
+			// override for put obj in vehicle
+			do_put_obj_in_vehicle(ch, find_veh, obj_dotmode, theobj, howmany);
+		}
+		else if (!cont && GET_ROOM_VEHICLE(IN_ROOM(ch)) && isname(thecont, VEH_KEYWORDS(GET_ROOM_VEHICLE(IN_ROOM(ch))))) {
+			// the vehicle they are in
+			do_put_obj_in_vehicle(ch, GET_ROOM_VEHICLE(IN_ROOM(ch)), obj_dotmode, theobj, howmany);
+		}
+		else if (!cont) {
 			sprintf(buf, "You don't see %s %s here.\r\n", AN(thecont), thecont);
 			send_to_char(buf, ch);
 		}
-		else if (GET_OBJ_TYPE(cont) != ITEM_CONTAINER && GET_OBJ_TYPE(cont) != ITEM_CART)
+		else if (GET_OBJ_TYPE(cont) != ITEM_CONTAINER)
 			act("$p is not a container.", FALSE, ch, cont, 0, TO_CHAR);
 		else if (OBJVAL_FLAGGED(cont, CONT_CLOSED) && GET_OBJ_TYPE(cont) == ITEM_CONTAINER)
 			send_to_char("You'd better open it first!\r\n", ch);
@@ -4695,7 +4835,7 @@ ACMD(do_ship) {
 		// find a matching entry
 		done = FALSE;
 		for (sd = EMPIRE_SHIPPING_LIST(GET_LOYALTY(ch)); sd; sd = sd->next) {
-			if (sd->status != SHIPPING_QUEUED || sd->ship_homeroom != NOWHERE) {
+			if (sd->status != SHIPPING_QUEUED || sd->shipping_id != -1) {
 				continue;	// never cancel one in progress
 			}
 			if (sd->from_island != GET_ISLAND_ID(IN_ROOM(ch))) {

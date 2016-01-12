@@ -239,6 +239,20 @@ room_data *find_room(int n) {
 }
 
 
+/**
+* Find a vehicle in the lookup table by id.
+*
+* @param int n The scripting id.
+* @return vehicle_data* The vehicle, if any.
+*/
+vehicle_data *find_vehicle(int n) {
+	if (n < VEHICLE_ID_BASE) {
+		return NULL;
+	}
+	return find_vehicle_by_uid_in_lookup_table(n);
+}
+
+
 /************************************************************
 * generic searches based only on name
 ************************************************************/
@@ -3765,6 +3779,9 @@ void process_detach(void *go, struct script_data *sc, trig_data *trig, int type,
 room_data *dg_room_of_obj(obj_data *obj) {
 	if (IN_ROOM(obj))
 		return IN_ROOM(obj);
+	if (obj->in_vehicle) {
+		return IN_ROOM(obj->in_vehicle);
+	}
 	if (obj->carried_by)
 		return IN_ROOM(obj->carried_by);
 	if (obj->worn_by)
@@ -4604,6 +4621,19 @@ obj_data *find_obj_by_uid_in_lookup_table(int uid) {
 		return (obj_data*)(lt->c);
 
 	log("find_obj_by_uid_in_lookup_table : No entity with number %d in lookup table", uid);
+	return NULL;
+}
+
+vehicle_data *find_vehicle_by_uid_in_lookup_table(int uid) {
+	int bucket = (int) (uid & (BUCKET_COUNT - 1));
+	struct lookup_table_t *lt = &lookup_table[bucket];
+
+	for (;lt && lt->uid != uid ; lt = lt->next) ;
+
+	if (lt)
+		return (vehicle_data*)(lt->c);
+
+	log("find_vehicle_by_uid_in_lookup_table : No entity with number %d in lookup table", uid);
 	return NULL;
 }
 

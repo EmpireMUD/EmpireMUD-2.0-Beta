@@ -1108,8 +1108,8 @@ obj_data *make_corpse(char_data *ch) {
 			}
 		}
 		
-		// rope if it was pulling or tied
-		if (GET_PULLING(ch) || MOB_FLAGGED(ch, MOB_TIED)) {
+		// rope if it was tied
+		if (MOB_FLAGGED(ch, MOB_TIED)) {
 			obj_to_obj(read_object(o_ROPE, TRUE), corpse);
 		}
 
@@ -1310,10 +1310,6 @@ static void shoot_at_char(room_data *from_room, char_data *ch) {
 	else {
 		dam = 0;
 	}
-
-	if (GET_PULLING(ch) && CART_CAN_FIRE(GET_PULLING(ch))) {
-		log_to_empire(emp, ELOG_HOSTILITY, "A catapult has been spotted at (%d, %d)!", X_COORD(to_room), Y_COORD(to_room));
-	}
 	
 	if (damage(ch, ch, dam, type, DAM_PHYSICAL) != 0) {
 		log_to_empire(emp, ELOG_HOSTILITY, "Guard tower at (%d, %d) is shooting at an infiltrator at (%d, %d)", X_COORD(from_room), Y_COORD(from_room), X_COORD(to_room), Y_COORD(to_room));
@@ -1338,7 +1334,6 @@ static bool tower_would_shoot(room_data *from_room, char_data *vict) {
 	empire_data *m_empire;
 	room_data *shift_room, *to_room = IN_ROOM(vict);
 	char_data *m;
-	obj_data *pulling = GET_PULLING(vict);
 	int iter, distance;
 	bool hostile = IS_HOSTILE(vict);
 	
@@ -1369,7 +1364,7 @@ static bool tower_would_shoot(room_data *from_room, char_data *vict) {
 	}
 	
 	// visibility
-	if ((AFF_FLAGGED(vict, AFF_INVISIBLE) || AFF_FLAGGED(vict, AFF_HIDE)) && !GET_LEADING(vict)) {
+	if ((AFF_FLAGGED(vict, AFF_INVISIBLE) || AFF_FLAGGED(vict, AFF_HIDE))) {
 		return FALSE;
 	}
 
@@ -1390,26 +1385,11 @@ static bool tower_would_shoot(room_data *from_room, char_data *vict) {
 		return FALSE;
 	}
 	
-	// Special handling for mobs -- skip any mob not pulling a catapult
-	if (IS_NPC(vict)) {
-		if (!pulling || !CART_CAN_FIRE(pulling)) {
-			return FALSE;
-		}
-	}
-
 	// check character OR their leader for permission to use the guard tower room -- that saves them
 	if (!((m = vict->master) && in_same_group(vict, m))) {
 		m = vict;
 	}
-	// try for master of other-pulling
-	if (m == vict && pulling && GET_PULLED_BY(pulling, 0) && (GET_PULLED_BY(pulling, 0) != vict)) {
-		m = GET_PULLED_BY(pulling, 0)->master ? GET_PULLED_BY(pulling, 0)->master : vict;
-	}
-	// try for master of other-other-pulling
-	if (m == vict && pulling && GET_PULLED_BY(pulling, 1) && (GET_PULLED_BY(pulling, 1) != vict)) {
-		m = GET_PULLED_BY(pulling, 1)->master ? GET_PULLED_BY(pulling, 1)->master : vict;
-	}
-
+	
 	if ((!IS_NPC(vict) && can_use_room(vict, from_room, GUESTS_ALLOWED)) || (!IS_NPC(m) && can_use_room(m, from_room, GUESTS_ALLOWED))) {
 		return FALSE;
 	}
@@ -1946,6 +1926,71 @@ bool can_fight(char_data *ch, char_data *victim) {
 }
 
 
+/**
+* Validate a room target for a siege command.
+*
+* @param char_data *ch The person firing (will receive errors).
+* @param vehicle_data *veh The vehicle firing. (OPTIONAL: Could just be ch firing.)
+* @param room_data *to_room The target room.
+* @return bool TRUE if okay, FALSE if not.
+*/
+bool validate_siege_target_room(char_data *ch, vehicle_data *veh, room_data *to_room) {
+	room_data *from_room = veh ? IN_ROOM(veh) : IN_ROOM(ch);
+	
+	if (ROOM_SECT_FLAGGED(from_room, SECTF_ROUGH)) {
+		msg_to_char(ch, "You can't lay siege from rough terrain!\r\n");
+	}
+	else if (ROOM_IS_CLOSED(from_room)) {
+		msg_to_char(ch, "You can't lay siege from indoors.\r\n");
+	}
+	else if (ROOM_BLD_FLAGGED(from_room, BLD_BARRIER)) {
+		msg_to_char(ch, "You can't lay siege from so close to a barrier.\r\n");
+	}
+	else if (IS_CITY_CENTER(to_room)) {
+		msg_to_char(ch, "You can't besiege a city center.\r\n");
+	}
+	else if (ROOM_SECT_FLAGGED(to_room, SECTF_START_LOCATION)) {
+		msg_to_char(ch, "You can't besiege a starting location.\r\n");
+	}
+	else if (ROOM_OWNER(to_room) && ROOM_OWNER(to_room) == GET_LOYALTY(ch)) {
+		msg_to_char(ch, "You can't besiege your own property. Abandon it first.\r\n");
+	}
+	else if (ROOM_OWNER(to_room) && !has_relationship(GET_LOYALTY(ch), ROOM_OWNER(to_room), DIPL_WAR)) {
+		msg_to_char(ch, "You can't besiege that direction because you're not at war with %s.\r\n", EMPIRE_NAME(ROOM_OWNER(to_room)));
+	}
+	else {
+		// looks ok!
+		return TRUE;
+	}
+	
+	return FALSE;
+}
+
+
+/**
+* Validate a vehicle target for a siege command.
+*
+* @param char_data *ch The person firing (will receive errors).
+* @param vehicle_data *veh The vehicle firing. (OPTIONAL: could just be ch firing.)
+* @param vehicle_data *target The target vehicle.
+* @return bool TRUE if okay, FALSE if not.
+*/
+bool validate_siege_target_vehicle(char_data *ch, vehicle_data *veh, vehicle_data *target) {
+	if (VEH_OWNER(target) && VEH_OWNER(target) == GET_LOYALTY(ch)) {
+		msg_to_char(ch, "You can't besiege your own property. Abandon it first.\r\n");
+	}
+	else if (VEH_OWNER(target) && !has_relationship(GET_LOYALTY(ch), VEH_OWNER(target), DIPL_WAR)) {
+		msg_to_char(ch, "You can't besiege that because you're not at war with %s.\r\n", EMPIRE_NAME(VEH_OWNER(target)));
+	}
+	else {
+		// looks ok!
+		return TRUE;
+	}
+	
+	return FALSE;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// SETTERS / DOERS /////////////////////////////////////////////////////////
 
@@ -2066,6 +2111,107 @@ void besiege_room(room_data *to_room, int damage) {
 			extract_obj(o);
 		}
 	}
+}
+
+
+/**
+* Does siege damage, which may destroy the vehicle.
+*
+* @param vehicle_data *veh The vehicle to damage.
+* @param int damage How much siege damage to deal.
+* @param int siege_type What SIEGE_ damage type.
+* @return bool TRUE if the target survives, FALSE if it's extracted
+*/
+bool besiege_vehicle(vehicle_data *veh, int damage, int siege_type) {
+	extern struct resource_data *combine_resources(struct resource_data *combine_a, struct resource_data *combine_b);
+	void fully_empty_vehicle(vehicle_data *veh);
+
+	static struct resource_data *default_res = NULL;
+	struct resource_data *old_list;
+	struct vehicle_room_list *vrl;
+	char_data *ch, *next_ch;
+	
+	// resources if it doesn't have its own
+	if (!default_res) {
+		default_res = create_resource_list(o_NAILS, 1, NOTHING);
+	}
+	
+	// no effect
+	if (damage <= 0) {
+		return TRUE;
+	}
+	
+	// deal damage
+	VEH_HEALTH(veh) -= damage;
+	
+	// not dead yet
+	if (VEH_HEALTH(veh) > 0) {
+		// apply needed maintenance if we did more than 10% damage
+		if (damage >= (VEH_MAX_HEALTH(veh) / 10)) {
+			old_list = VEH_NEEDS_RESOURCES(veh);
+			VEH_NEEDS_RESOURCES(veh) = combine_resources(old_list, VEH_YEARLY_MAINTENANCE(veh) ? VEH_YEARLY_MAINTENANCE(veh) : default_res);
+			free_resource_list(old_list);
+		}
+		
+		// SIEGE_x: warn the occupants
+		switch (siege_type) {
+			case SIEGE_BURNING: {
+				msg_to_vehicle(veh, FALSE, "Your skin blisters as %s burns around you!", VEH_SHORT_DESC(veh));
+				break;
+			}
+			case SIEGE_PHYSICAL:
+			case SIEGE_MAGICAL:
+			default: {
+				msg_to_vehicle(veh, FALSE, "You shake with %s as it is besieged!", VEH_SHORT_DESC(veh));
+				break;
+			}
+		}
+	}
+	else {
+		if (ROOM_PEOPLE(IN_ROOM(veh))) {
+			// SIEGE_x: warn the occupants
+			switch (siege_type) {
+				case SIEGE_BURNING: {
+					act("$V burns down!", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+					break;
+				}
+				case SIEGE_PHYSICAL:
+				case SIEGE_MAGICAL:
+				default: {
+					act("$V is destroyed!", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+					break;
+				}
+			}
+		}
+		
+		if (VEH_ROOM_LIST(veh)) {
+			LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
+				LL_FOREACH_SAFE2(ROOM_PEOPLE(vrl->room), ch, next_ch, next_in_room) {
+					act("You are killed as $V is destroyed!", FALSE, ch, NULL, veh, TO_CHAR);
+					if (!IS_NPC(ch)) {
+						mortlog("%s has been killed by siege damage at (%d, %d)!", PERS(ch, ch, TRUE), X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
+						syslog(SYS_DEATH, 0, TRUE, "DEATH: %s has been killed by siege damage at %s", GET_NAME(ch), room_log_identifier(IN_ROOM(ch)));
+					}
+					die(ch, ch);
+				}
+			}
+		}
+		if (VEH_SITTING_ON(veh)) {
+			act("You are killed as $V is destroyed!", FALSE, VEH_SITTING_ON(veh), NULL, veh, TO_CHAR);
+			if (!IS_NPC(VEH_SITTING_ON(veh))) {
+				mortlog("%s has been killed by siege damage at (%d, %d)!", PERS(VEH_SITTING_ON(veh), VEH_SITTING_ON(veh), TRUE), X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh)));
+				syslog(SYS_DEATH, 0, TRUE, "DEATH: %s has been killed by siege damage at %s", GET_NAME(VEH_SITTING_ON(veh)), room_log_identifier(IN_ROOM(veh)));
+			}
+			die(ch, ch);
+		}
+		
+		vehicle_from_room(veh);	// remove from room first to destroy anything inside
+		fully_empty_vehicle(veh);
+		extract_vehicle(veh);
+		return FALSE;
+	}
+	
+	return TRUE;
 }
 
 

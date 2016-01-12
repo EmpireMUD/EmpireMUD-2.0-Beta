@@ -46,6 +46,8 @@ extern const struct wear_data_type wear_data[NUM_WEARS];
 // external functions
 extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 extern char *get_room_name(room_data *room, bool color);
+extern char *list_harnessed_mobs(vehicle_data *veh);
+void look_at_vehicle(vehicle_data *veh, char_data *ch);
 extern char *morph_string(char_data *ch, byte type);
 
 // local protos
@@ -164,6 +166,7 @@ void look_at_target(char_data *ch, char *arg) {
 	int bits, found = FALSE, j, fnum, i = 0;
 	char_data *found_char = NULL;
 	obj_data *obj, *found_obj = NULL;
+	vehicle_data *found_veh = NULL;
 	char *desc;
 
 	if (!ch->desc)
@@ -174,7 +177,7 @@ void look_at_target(char_data *ch, char *arg) {
 		return;
 		}
 
-	bits = generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_CHAR_ROOM, ch, &found_char, &found_obj);
+	bits = generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_CHAR_ROOM | FIND_VEHICLE_ROOM, ch, &found_char, &found_obj, &found_veh);
 
 	/* Is the target a character? */
 	if (found_char != NULL) {
@@ -185,6 +188,13 @@ void look_at_target(char_data *ch, char *arg) {
 			}
 			act("$n looks at $N.", TRUE, ch, 0, found_char, TO_NOTVICT);
 		}
+		return;
+	}
+	
+	// was the target a vehicle?
+	if (found_veh != NULL) {
+		look_at_vehicle(found_veh, ch);
+		act("$n looks at $V.", TRUE, ch, NULL, found_veh, TO_ROOM);
 		return;
 	}
 
@@ -237,7 +247,13 @@ void look_at_target(char_data *ch, char *arg) {
 			found = TRUE;
 		}
 	}
-
+	
+	// look at vehicle they're in
+	if (!found && GET_ROOM_VEHICLE(IN_ROOM(ch)) && isname(arg, VEH_KEYWORDS(GET_ROOM_VEHICLE(IN_ROOM(ch))))) {
+		look_at_vehicle(GET_ROOM_VEHICLE(IN_ROOM(ch)), ch);
+		found = TRUE;
+	}
+	
 	/* If an object was found back in generic_find */
 	if (bits) {
 		if (!found) {
@@ -260,21 +276,33 @@ void look_at_target(char_data *ch, char *arg) {
 void look_in_obj(char_data *ch, char *arg) {
 	extern const char *color_liquid[];
 	extern const char *fullness[];
+	vehicle_data *veh = NULL;
 	obj_data *obj = NULL;
 	char_data *dummy = NULL;
 	int amt, bits;
 
 	if (!*arg)
 		send_to_char("Look in what?\r\n", ch);
-	else if (!(bits = generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP, ch, &dummy, &obj))) {
+	else if (!(bits = generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM, ch, &dummy, &obj, &veh))) {
 		sprintf(buf, "There doesn't seem to be %s %s here.\r\n", AN(arg), arg);
 		send_to_char(buf, ch);
 	}
-	else if ((GET_OBJ_TYPE(obj) != ITEM_DRINKCON) && (GET_OBJ_TYPE(obj) != ITEM_CORPSE) && (GET_OBJ_TYPE(obj) != ITEM_CONTAINER) && (GET_OBJ_TYPE(obj) != ITEM_CART))
+	else if (veh || (!obj && (veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) && isname(arg, VEH_KEYWORDS(veh)))) {
+		// vehicle section
+		if (!VEH_FLAGGED(veh, VEH_CONTAINER)) {
+			act("$V isn't a container.", FALSE, ch, NULL, veh, TO_CHAR);
+		}
+		else {
+			act("$V (here):", FALSE, ch, NULL, veh, TO_CHAR);
+			list_obj_to_char(VEH_CONTAINS(veh), ch, OBJ_DESC_CONTENTS, TRUE);
+		}
+	}
+	// the rest is objects:
+	else if ((GET_OBJ_TYPE(obj) != ITEM_DRINKCON) && (GET_OBJ_TYPE(obj) != ITEM_CORPSE) && (GET_OBJ_TYPE(obj) != ITEM_CONTAINER))
 		send_to_char("There's nothing inside that!\r\n", ch);
 	else {
-		if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER || GET_OBJ_TYPE(obj) == ITEM_CORPSE || GET_OBJ_TYPE(obj) == ITEM_CART) {
-			if (OBJVAL_FLAGGED(obj, CONT_CLOSED) && GET_OBJ_TYPE(obj) != ITEM_CORPSE && GET_OBJ_TYPE(obj) != ITEM_CART)
+		if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER || GET_OBJ_TYPE(obj) == ITEM_CORPSE) {
+			if (OBJVAL_FLAGGED(obj, CONT_CLOSED) && GET_OBJ_TYPE(obj) != ITEM_CORPSE)
 				send_to_char("It is closed.\r\n", ch);
 			else {
 				send_to_char(fname(GET_OBJ_KEYWORDS(obj)), ch);
@@ -564,7 +592,7 @@ void list_char_to_char(char_data *list, char_data *ch) {
 	int c = 1;
 	
 	bool use_mob_stacking = config_get_bool("use_mob_stacking");
-	#define MOB_CAN_STACK(ch)  (use_mob_stacking && !GET_LED_BY(ch) && !GET_PULLING(ch) && GET_POS(ch) != POS_FIGHTING && !MOB_FLAGGED((ch), MOB_EMPIRE | MOB_TIED | MOB_MOUNTABLE | MOB_FAMILIAR))
+	#define MOB_CAN_STACK(ch)  (use_mob_stacking && !GET_LED_BY(ch) && GET_POS(ch) != POS_FIGHTING && !MOB_FLAGGED((ch), MOB_EMPIRE | MOB_TIED | MOB_MOUNTABLE | MOB_FAMILIAR))
 	
 	// no work
 	if (!list || !ch || !ch->desc) {
@@ -644,6 +672,7 @@ void list_lore_to_char(char_data *ch, char_data *to) {
 * @param int num If mob-stacking is on, number of copies of this i to show.
 */
 void list_one_char(char_data *i, char_data *ch, int num) {
+	extern char *get_vehicle_short_desc(vehicle_data *veh, char_data *to);
 	extern struct action_data_struct action_data[];
 	
 	// POS_x
@@ -740,8 +769,8 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 			strcat(buf, " (writing)");
 
 		if (GET_POS(i) != POS_FIGHTING) {
-			if (ON_CHAIR(i) && !IS_DEAD(i)) {
-				sprintf(buf + strlen(buf), " is sitting on %s.", CAN_SEE_OBJ(ch, ON_CHAIR(i)) ? GET_OBJ_DESC(ON_CHAIR(i), ch, OBJ_DESC_SHORT) : "something");			
+			if (GET_SITTING_ON(i)) {
+				sprintf(buf + strlen(buf), " is sitting %s %s%s%s.", IN_OR_ON(GET_SITTING_ON(i)), get_vehicle_short_desc(GET_SITTING_ON(i), ch), (VEH_ANIMALS(GET_SITTING_ON(i)) ? ", being pulled by " : ""), (VEH_ANIMALS(GET_SITTING_ON(i)) ? list_harnessed_mobs(GET_SITTING_ON(i)) : ""));
 			}
 			else if (!IS_NPC(i) && GET_ACTION(i) != ACT_NONE) {
 				sprintf(buf + strlen(buf), " %s", action_data[GET_ACTION(i)].long_desc);
@@ -787,9 +816,6 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 		sprintf(buf, "...%s is being led by %s.", HSSH(i), GET_LED_BY(i) == ch ? "you" : "$N");
 		act(buf, FALSE, ch, 0, GET_LED_BY(i), TO_CHAR);
 	}
-	if (GET_PULLING(i)) {
-		act("...$e is pulling $p.", FALSE, i, GET_PULLING(i), ch, TO_VICT);
-	}
 	if (MOB_FLAGGED(i, MOB_TIED))
 		act("...$e is tied up here.", FALSE, i, 0, ch, TO_VICT);
 	if (AFF_FLAGGED(i, AFF_STUNNED)) {
@@ -832,6 +858,86 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 		else {
 			act("...$e is unable to be seen by players.", FALSE, i, 0, ch, TO_VICT);
 		}
+	}
+}
+
+
+/**
+* Shows one vehicle as in-the-room.
+*
+* @param vehicle_data *veh The vehicle to show.
+* @param char_data *ch The person to send the output to.
+*/
+void list_one_vehicle_to_char(vehicle_data *veh, char_data *ch) {
+	char buf[MAX_STRING_LENGTH];
+	size_t size = 0;
+	
+	if (VEH_OWNER(veh)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "<%s> ", EMPIRE_ADJECTIVE(VEH_OWNER(veh)));
+	}
+	if (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "[%d] %s", VEH_VNUM(veh), SCRIPT(veh) ? "[TRIG] " : "");
+	}
+	size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", VEH_LONG_DESC(veh));
+	
+	// additional descriptions like what's attached:
+	if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "...it is ON FIRE!\r\n");
+	}
+	if (!VEH_IS_COMPLETE(veh)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "...it is unfinished.\r\n");
+	}
+	else if (VEH_NEEDS_RESOURCES(veh) || VEH_HEALTH(veh) < VEH_MAX_HEALTH(veh)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "...it is in need of repair.\r\n");
+	}
+	
+	if (VEH_SITTING_ON(veh) == ch) {
+		size += snprintf(buf + size, sizeof(buf) - size, "...you are sitting %s it.\r\n", IN_OR_ON(veh));
+	}
+	else if (VEH_SITTING_ON(veh)) {
+		// this is PROBABLY not shown to players
+		size += snprintf(buf + size, sizeof(buf) - size, "...%s is sitting %s it.\r\n", PERS(VEH_SITTING_ON(veh), ch, FALSE), IN_OR_ON(veh));
+	}
+	
+	if (VEH_LED_BY(veh) == ch) {
+		size += snprintf(buf + size, sizeof(buf) - size, "...you are leading it.\r\n");
+	}
+	else if (VEH_LED_BY(veh)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "...it is being led by %s.\r\n", PERS(VEH_LED_BY(veh), ch, FALSE));
+	}
+	
+	if (VEH_ANIMALS(veh)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "...it is being pulled by %s.\r\n", list_harnessed_mobs(veh));
+	}
+
+	send_to_char(buf, ch);
+}
+
+
+/**
+* Shows a list of vehicles in the room.
+*
+* @param vehicle_data *list Pointer to the start of the list of vehicles.
+* @param vehicle_data *ch Person to send the output to.
+*/
+void list_vehicles_to_char(vehicle_data *list, char_data *ch) {
+	vehicle_data *veh;
+	
+	// no work
+	if (!list || !ch || !ch->desc) {
+		return;
+	}
+	
+	LL_FOREACH2(list, veh, next_in_room) {
+		// conditions to show
+		if (!CAN_SEE_VEHICLE(ch, veh)) {
+			continue;	// should we show a "something" ?
+		}
+		if (VEH_SITTING_ON(veh) && VEH_SITTING_ON(veh) != ch) {
+			continue;	// don't show vehicles someone else is sitting on
+		}
+		
+		list_one_vehicle_to_char(veh, ch);
 	}
 }
 
@@ -1157,7 +1263,7 @@ void list_obj_to_char(obj_data *list, char_data *ch, int mode, int show) {
 			}
 		}
 
-		if (CAN_SEE_OBJ(ch, i) && (!IN_CHAIR(i) || ch == IN_CHAIR(i))) {
+		if (CAN_SEE_OBJ(ch, i)) {
 			if (mode == OBJ_DESC_LONG) {
 				send_to_char("&g", ch);
 			}
@@ -1194,10 +1300,6 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 	}
 	else {
 		strcpy(buf, GET_OBJ_DESC(obj, ch, mode));
-	}
-	
-	if (mode == OBJ_DESC_LONG && IN_CHAIR(obj) == ch) {
-		strcat(buf, "...you are sitting on it.");
 	}
 
 	if (mode == OBJ_DESC_EQUIPMENT) {
@@ -1808,6 +1910,7 @@ ACMD(do_equipment) {
 
 
 ACMD(do_examine) {
+	vehicle_data *tmp_veh = NULL;
 	char_data *tmp_char;
 	obj_data *tmp_object;
 
@@ -1819,13 +1922,17 @@ ACMD(do_examine) {
 	}
 	look_at_target(ch, arg);
 
-	generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_CHAR_ROOM | FIND_OBJ_EQUIP, ch, &tmp_char, &tmp_object);
+	generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_CHAR_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM, ch, &tmp_char, &tmp_object, &tmp_veh);
 
 	if (tmp_object) {
-		if ((GET_OBJ_TYPE(tmp_object) == ITEM_DRINKCON) || (GET_OBJ_TYPE(tmp_object) == ITEM_CONTAINER) || (GET_OBJ_TYPE(tmp_object) == ITEM_CORPSE) || (GET_OBJ_TYPE(tmp_object) == ITEM_CART)) {
+		if ((GET_OBJ_TYPE(tmp_object) == ITEM_DRINKCON) || (GET_OBJ_TYPE(tmp_object) == ITEM_CONTAINER) || (GET_OBJ_TYPE(tmp_object) == ITEM_CORPSE)) {
 			send_to_char("When you look inside, you see:\r\n", ch);
 			look_in_obj(ch, arg);
 		}
+	}
+	if (tmp_veh && VEH_FLAGGED(tmp_veh, VEH_CONTAINER)) {
+		msg_to_char(ch, "When you look inside, you see:\r\n");
+		look_in_obj(ch, arg);
 	}
 }
 

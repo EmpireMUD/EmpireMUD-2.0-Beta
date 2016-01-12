@@ -2,6 +2,9 @@
 *   File: objsave.c                                       EmpireMUD 2.0b3 *
 *  Usage: loading/saving player objects for rent and crash-save           *
 *                                                                         *
+*  Note: ITEM_CART is deprecated but this will still put items inside of  *
+*  one so that the 2.0 b3.8 auto-converter will move them to vehicles.    *
+*                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
@@ -743,10 +746,12 @@ void loaded_obj_to_char(obj_data *obj, char_data *ch, int location) {
 * @param room_data *room The world location whose objects we are saving.
 */
 bool objpack_save_room(room_data *room) {
+	void Crash_save_vehicles(vehicle_data *room_list, FILE *fl);
+	
 	char filename[MAX_INPUT_LENGTH], tempname[MAX_INPUT_LENGTH];
 	FILE *fp;
 
-	if (!ROOM_CONTENTS(room)) {
+	if (!ROOM_CONTENTS(room) && !ROOM_VEHICLES(room)) {
 		return FALSE;
 	}
 
@@ -760,6 +765,7 @@ bool objpack_save_room(room_data *room) {
 	}
 	
 	Crash_save(ROOM_CONTENTS(room), fp, LOC_INVENTORY);
+	Crash_save_vehicles(ROOM_VEHICLES(room), fp);
 
 	fprintf(fp, "$\n");
 
@@ -776,9 +782,12 @@ bool objpack_save_room(room_data *room) {
 * @param room_data *room The room.
 */
 void objpack_load_room(room_data *room) {
+	extern vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum);
+
 	obj_data *obj, *obj2, *cont_row[MAX_BAG_ROWS];
 	char fname[MAX_STRING_LENGTH], line[MAX_INPUT_LENGTH];
 	int iter, location;
+	vehicle_data *veh;
 	obj_vnum vnum;
 	time_t timer;
 	FILE *fl;
@@ -883,6 +892,17 @@ void objpack_load_room(room_data *room) {
 				fclose(fl);
 				return;
 				*/
+			}
+		}
+		else if (*line == '%') {	// vehicle entry
+			if (sscanf(line, "%%%d", &vnum) < 1) {
+				log("SYSERR: Format error in vehicle vnum line of pack file %s", fname);
+				fclose(fl);
+				return;
+			}
+			
+			if ((veh = unstore_vehicle_from_file(fl, vnum))) {
+				vehicle_to_room(veh, room);
 			}
 		}
 		else if (!strn_cmp(line, "Rent-time:", 10)) {

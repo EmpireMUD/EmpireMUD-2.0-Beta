@@ -824,7 +824,7 @@ S
 Shipyard~
 The Shipyard~
 @w&0()@e~
-40 0 bdp 0
+40 0 bdpT 0
 0 0 0 216
 C
 board, manufacture, upgrade~
@@ -841,7 +841,7 @@ S
 Great Shipyard~
 A Great Shipyard~
 @w&0[]@e~
-40 4 bd 0
+40 4 bdTU 0
 0 0 0 216
 C
 board, manufacture~

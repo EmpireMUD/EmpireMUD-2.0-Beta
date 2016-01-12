@@ -689,6 +689,7 @@ WCMD(do_wpurge) {
 /* loads a mobile or object into the room */
 WCMD(do_wload) {
 	void scale_mob_to_level(char_data *mob, int level);
+	void scale_vehicle_to_level(vehicle_data *veh, int level);
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
@@ -696,6 +697,7 @@ WCMD(do_wload) {
 	int number = 0;
 	char_data *mob, *tch;
 	obj_data *object, *cnt;
+	vehicle_data *veh;
 	char *target;
 	int pos;
 
@@ -707,11 +709,12 @@ WCMD(do_wload) {
 		return;
 	}
 
-	if (is_abbrev(arg1, "mob")) {
-		if ((mob = read_mobile(number, TRUE)) == NULL) {
+	if (is_abbrev(arg1, "mobile")) {
+		if (!mob_proto(number)) {
 			wld_log(room, "wload: bad mob vnum");
 			return;
 		}
+		mob = read_mobile(number, TRUE);
 		
 		// store instance id
 		if (COMPLEX_DATA(room) && COMPLEX_DATA(room)->instance) {
@@ -730,12 +733,12 @@ WCMD(do_wload) {
 		setup_generic_npc(mob, NULL, NOTHING, NOTHING);
 		load_mtrigger(mob);
 	}
-
-	else if (is_abbrev(arg1, "obj")) {
-		if ((object = read_object(number, TRUE)) == NULL) {
+	else if (is_abbrev(arg1, "object")) {
+		if (!obj_proto(number)) {
 			wld_log(room, "wload: bad object vnum");
 			return;
 		}
+		object = read_object(number, TRUE);
 		
 		if (inst) {
 			instance_obj_setup(inst, object);
@@ -789,7 +792,24 @@ WCMD(do_wload) {
 		load_otrigger(object);
 		return;
 	}
-
+	else if (is_abbrev(arg1, "vehicle")) {
+		if (!vehicle_proto(number)) {
+			wld_log(room, "wload: bad vehicle vnum");
+			return;
+		}
+		veh = read_vehicle(number, TRUE);
+		
+		if (*target && isdigit(*target)) {
+			scale_vehicle_to_level(veh, atoi(target));
+		}
+		else {
+			// hope to inherit
+			scale_vehicle_to_level(veh, 0);
+		}
+		
+		vehicle_to_room(veh, room);
+		// load_vtrigger(veh);
+	}
 	else
 		wld_log(room, "wload: bad type");
 }

@@ -1915,10 +1915,8 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 		fprintf(fl, "Empire: %d\n", EMPIRE_VNUM(GET_LOYALTY(ch)));
 		fprintf(fl, "Rank: %d\n", GET_RANK(ch));
 	}
-	else {
-		if (GET_PLEDGE(ch) != NOTHING) {
-			fprintf(fl, "Pledge Empire: %d\n", GET_PLEDGE(ch));
-		}
+	if (GET_PLEDGE(ch) != NOTHING) {
+		fprintf(fl, "Pledge Empire: %d\n", GET_PLEDGE(ch));
 	}
 	
 	// Last login info
@@ -2885,8 +2883,13 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	if (IS_VAMPIRE(ch) && GET_APPARENT_AGE(ch) <= 0)
 		GET_APPARENT_AGE(ch) = 25;
 
+	// add to lists
 	ch->next = character_list;
 	character_list = ch;
+	GET_ID(ch) = GET_IDNUM(ch);
+	add_to_lookup_table(GET_ID(ch), (void *)ch);
+	
+	// place character
 	char_to_room(ch, load_room);
 	ch->prev_logon = ch->player.time.logon;	// and update prev_logon now
 	if (dolog) {
@@ -2987,10 +2990,8 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	}
 
 	// script/trigger stuff
-	GET_ID(ch) = GET_IDNUM(ch);
 	greet_mtrigger(ch, NO_DIR);
 	greet_memory_mtrigger(ch);
-	add_to_lookup_table(GET_ID(ch), (void *)ch);
 	
 	// update the index in case any of this changed
 	index = find_player_index_by_idnum(GET_IDNUM(ch));
@@ -3155,7 +3156,6 @@ void reset_char(char_data *ch) {
 	ch->next = NULL;
 	ch->next_fighting = NULL;
 	ch->next_in_room = NULL;
-	ON_CHAIR(ch) = NULL;
 	FIGHTING(ch) = NULL;
 	ch->char_specials.position = POS_STANDING;
 	

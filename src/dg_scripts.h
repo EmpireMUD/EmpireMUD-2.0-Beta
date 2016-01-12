@@ -306,7 +306,8 @@ int valid_dg_target(char_data *ch, int bitvector);
 /* object id's: OBJ_ID_BASE and higher           */
 #define MOB_ID_BASE	  10000000  /* 10000000 player IDNUMS should suffice */
 #define ROOM_ID_BASE    (10000000 + MOB_ID_BASE) /* 10000000 Mobs */
-#define OBJ_ID_BASE     ((MAP_SIZE * 5) + ROOM_ID_BASE) /* Lots o' Rooms */
+#define VEHICLE_ID_BASE  ((MAP_SIZE * 5) + ROOM_ID_BASE)	// Lots o' Rooms
+#define OBJ_ID_BASE  (1000000 + VEHICLE_ID_BASE)	// Plenty o' Vehicles
 
 #define SCRIPT(o)		  ((o)->script)
 #define SCRIPT_MEM(c)             ((c)->memory)
@@ -338,6 +339,7 @@ int can_wear_on_pos(obj_data *obj, int pos);
 void init_lookup_table(void);
 char_data *find_char_by_uid_in_lookup_table(int uid);
 obj_data *find_obj_by_uid_in_lookup_table(int uid);
+vehicle_data *find_vehicle_by_uid_in_lookup_table(int uid);
 void add_to_lookup_table(int uid, void *c);
 void remove_from_lookup_table(int uid);
 

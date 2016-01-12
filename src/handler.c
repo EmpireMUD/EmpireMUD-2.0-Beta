@@ -56,6 +56,8 @@
 *   Storage Handlers
 *   Targeting Handlers
 *   Unique Storage Handlers
+*   Vehicle Handlers
+*   Vehicle Targeting Handlers
 *   World Handlers
 *   Miscellaneous Handlers
 */
@@ -782,47 +784,6 @@ bool room_affected_by_spell(room_data *room, int type) {
 //////////////////////////////////////////////////////////////////////////////
 //// CHARACTER HANDLERS /////////////////////////////////////////////////////
 
-
-/**
-* Removes a person from the chair he was sitting in.
-*
-* @param char_data *ch The character to remove from a chair.
-* @return bool TRUE if a character was removed from a chair, FALSE if not
-*/
-bool char_from_chair(char_data *ch) {
-	obj_data *chair;
-	bool result = FALSE;
-
-	if ((chair = ON_CHAIR(ch))) {
-		ON_CHAIR(ch) = NULL;
-		IN_CHAIR(chair) = NULL;
-		result = TRUE;
-	}
-	
-	return result;
-}
-
-
-/**
-* Puts a character in a chair, if possible.
-*
-* @param char_data *ch The sitter.
-* @param obj_data *chair The sittee.
-* @return bool TRUE if successful, otherwise FALSE
-*/
-bool char_to_chair(char_data *ch, obj_data *chair) {
-	bool result = FALSE;
-	
-	if (ch && chair && !IN_CHAIR(chair) && !ON_CHAIR(ch)) {
-		IN_CHAIR(chair) = ch;
-		ON_CHAIR(ch) = chair;
-		result = TRUE;
-	}
-
-	return result;
-}
-
-
 /* Extract a ch completely from the world, and leave his stuff behind */
 void extract_char_final(char_data *ch) {
 	void die_follower(char_data *ch);
@@ -872,24 +833,26 @@ void extract_char_final(char_data *ch) {
 		GET_FED_ON_BY(GET_FEEDING_FROM(ch)) = NULL;
 		GET_FEEDING_FROM(ch) = NULL;
 	}
-	if (GET_LEADING(ch)) {
-		GET_LED_BY(GET_LEADING(ch)) = NULL;
-		GET_LEADING(ch) = NULL;
+	if (GET_LEADING_MOB(ch)) {
+		GET_LED_BY(GET_LEADING_MOB(ch)) = NULL;
+		GET_LEADING_MOB(ch) = NULL;
 	}
 	if (GET_LED_BY(ch)) {
-		GET_LEADING(GET_LED_BY(ch)) = NULL;
+		GET_LEADING_MOB(GET_LED_BY(ch)) = NULL;
 		GET_LED_BY(ch) = NULL;
 	}
-	if (GET_PULLING(ch)) {
-		if (GET_PULLED_BY(GET_PULLING(ch), 0) == ch) {
-			GET_PULLING(ch)->pulled_by1 = NULL;	// old macro here was causing "invalid lvalue assignment" error
-		}
-		if (GET_PULLED_BY(GET_PULLING(ch), 1) == ch) {
-			GET_PULLING(ch)->pulled_by2 = NULL;	// old macro here was causing "invalid lvalue assignment" error
-		}
-		GET_PULLING(ch) = NULL;
+	if (GET_LEADING_VEHICLE(ch)) {
+		VEH_LED_BY(GET_LEADING_VEHICLE(ch)) = NULL;
+		GET_LEADING_VEHICLE(ch) = NULL;
 	}
-
+	if (GET_SITTING_ON(ch)) {
+		unseat_char_from_vehicle(ch);
+	}
+	if (GET_DRIVING(ch)) {
+		VEH_DRIVER(GET_DRIVING(ch)) = NULL;
+		GET_DRIVING(ch) = NULL;
+	}
+	
 	// npc-only frees	
 	if (IS_NPC(ch)) {
 		// free up pursuit
@@ -1186,11 +1149,7 @@ void char_from_room(char_data *ch) {
 		log("SYSERR: NULL character or no location in %s, char_from_room", __FILE__);
 		exit(1);
 	}
-
-	if (ON_CHAIR(ch)) {
-		char_from_chair(ch);
-	}
-
+	
 	if (FIGHTING(ch) != NULL) {
 		stop_fighting(ch);
 	}
@@ -3581,6 +3540,9 @@ void empty_obj_before_extract(obj_data *obj) {
 			obj_to_char(jj, obj->worn_by);
 			get_check_money(obj->worn_by, jj);
 		}
+		else if (obj->in_vehicle) {
+			obj_to_vehicle(jj, obj->in_vehicle);
+		}
 		else if (IN_ROOM(obj)) {
 			obj_to_room(jj, IN_ROOM(obj));
 		}
@@ -3606,17 +3568,7 @@ void extract_obj(obj_data *obj) {
 	while (obj->contains) {
 		extract_obj(obj->contains);
 	}
-
-	// cancel anybody pulling the object
-	if (GET_PULLED_BY(obj, 0)) {
-		GET_PULLING(GET_PULLED_BY(obj, 0)) = NULL;
-		obj->pulled_by1 = NULL;
-	}
-	if (GET_PULLED_BY(obj, 1)) {
-		GET_PULLING(GET_PULLED_BY(obj, 1)) = NULL;
-		obj->pulled_by2 = NULL;
-	}
-
+	
 	remove_from_object_list(obj);
 
 	if (SCRIPT(obj)) {
@@ -3644,6 +3596,7 @@ void extract_obj(obj_data *obj) {
 obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 	struct obj_binding *bind;
 	obj_data *proto, *new;
+	int iter;
 	
 	if (!obj || !(proto = obj_proto(GET_OBJ_VNUM(obj)))) {
 		// get a normal 'bug' object
@@ -3707,8 +3660,10 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 			break;
 		}
 		case ITEM_SHIP: {
-			GET_OBJ_VAL(new, VAL_SHIP_RESOURCES_REMAINING) = GET_OBJ_VAL(obj, VAL_SHIP_RESOURCES_REMAINING);
-			GET_OBJ_VAL(new, VAL_SHIP_MAIN_ROOM) = GET_OBJ_VAL(obj, VAL_SHIP_MAIN_ROOM);
+			// copy these blind
+			for (iter = 0; iter < NUM_OBJ_VAL_POSITIONS; ++iter) {
+				GET_OBJ_VAL(new, iter) = GET_OBJ_VAL(obj, iter);
+			}
 			break;
 		}
 	}
@@ -4007,6 +3962,9 @@ void check_obj_in_void(obj_data *obj) {
 		if (obj->carried_by) {
 			obj_from_char(obj);
 		}
+		if (obj->in_vehicle) {
+			obj_from_vehicle(obj);
+		}
 		if (obj->worn_by) {
 			if (unequip_char(obj->worn_by, obj->worn_on) != obj) {
 				log("SYSERR: Inconsistent worn_by and worn_on pointers!!");
@@ -4128,10 +4086,6 @@ void obj_from_room(obj_data *object) {
 		log("SYSERR: NULL object (%p) or obj not in a room (%p) passed to obj_from_room", object, IN_ROOM(object));
 	}
 	else {
-		if (IN_CHAIR(object)) {
-			char_from_chair(IN_CHAIR(object));
-		}
-
 		// update lights
 		if (OBJ_FLAGGED(object, OBJ_LIGHT)) {
 			ROOM_LIGHTS(IN_ROOM(object))--;
@@ -4139,6 +4093,22 @@ void obj_from_room(obj_data *object) {
 
 		REMOVE_FROM_LIST(object, ROOM_CONTENTS(IN_ROOM(object)), next_content);
 		IN_ROOM(object) = NULL;
+		object->next_content = NULL;
+	}
+}
+
+
+/**
+* @param obj_data *object The item to remove from whatever vehicle it's in.
+*/
+void obj_from_vehicle(obj_data *object) {
+	if (!object || !object->in_vehicle) {
+		log("SYSERR: NULL object (%p) or obj not in a vehicle (%p) passed to obj_from_vehicle", object, object->in_vehicle);
+	}
+	else {
+		VEH_CARRYING_N(object->in_vehicle) -= obj_carry_size(object);
+		LL_DELETE2(VEH_CONTAINS(object->in_vehicle), object, next_content);
+		object->in_vehicle = NULL;
 		object->next_content = NULL;
 	}
 }
@@ -4283,12 +4253,11 @@ void obj_to_obj(obj_data *obj, obj_data *obj_to) {
 * @param room_data *room Where to place it.
 */
 void obj_to_room(obj_data *object, room_data *room) {
-	check_obj_in_void(object);
-
 	if (!object || !room) {
 		log("SYSERR: Illegal value(s) passed to obj_to_room. (Room %p, obj %p)", room, object);
 	}
 	else {
+		check_obj_in_void(object);
 		object->next_content = ROOM_CONTENTS(room);
 		ROOM_CONTENTS(room) = object;
 		IN_ROOM(object) = room;
@@ -4302,6 +4271,32 @@ void obj_to_room(obj_data *object, room_data *room) {
 		// clear keep now
 		REMOVE_BIT(GET_OBJ_EXTRA(object), OBJ_KEEP);
 
+		// set the timer here; actual rules for it are in limits.c
+		GET_AUTOSTORE_TIMER(object) = time(0);
+	}
+}
+
+
+/**
+* Put an object into a vehicle.
+*
+* @param obj_data *object The object.
+* @param vehicle_data *veh The vehicle to put it in.
+*/
+void obj_to_vehicle(obj_data *object, vehicle_data *veh) {
+	if (!object || !veh) {
+		log("SYSERR: Illegal value(s) passed to obj_to_vehicle. (Vehicle %p, obj %p)", veh, object);
+	}
+	else {
+		check_obj_in_void(object);
+		
+		LL_PREPEND2(VEH_CONTAINS(veh), object, next_content);
+		object->in_vehicle = veh;
+		VEH_CARRYING_N(veh) += obj_carry_size(object);
+		
+		// clear keep now
+		REMOVE_BIT(GET_OBJ_EXTRA(object), OBJ_KEEP);
+		
 		// set the timer here; actual rules for it are in limits.c
 		GET_AUTOSTORE_TIMER(object) = time(0);
 	}
@@ -4325,6 +4320,9 @@ void swap_obj_for_obj(obj_data *old, obj_data *new) {
 	
 	if (old->carried_by) {
 		obj_to_char(new, old->carried_by);
+	}
+	else if (old->in_vehicle) {
+		obj_to_vehicle(new, old->in_vehicle);
 	}
 	else if (IN_ROOM(old)) {
 		obj_to_room(new, IN_ROOM(old));
@@ -5062,6 +5060,7 @@ room_data *find_target_room(char_data *ch, char *rawroomstr) {
 	struct instance_data *inst;
 	room_vnum tmp;
 	room_data *location = NULL;
+	vehicle_data *target_veh;
 	char_data *target_mob;
 	obj_data *target_obj;
 	char roomstr[MAX_INPUT_LENGTH];
@@ -5110,6 +5109,17 @@ room_data *find_target_room(char_data *ch, char *rawroomstr) {
 		location = IN_ROOM(target_mob);
 	else if (!ch && (target_mob = get_char_world(roomstr)) != NULL) {
 		location = IN_ROOM(target_mob);
+	}
+	else if ((ch && (target_veh = get_vehicle_vis(ch, roomstr))) || (!ch && (target_veh = get_vehicle_world(roomstr)))) {
+		if (IN_ROOM(target_veh)) {
+			location = IN_ROOM(target_veh);
+		}
+		else {
+			if (ch) {
+				msg_to_char(ch, "That vehicle is not available.\r\n");
+			}
+			location = NULL;
+		}
 	}
 	else if ((ch && (target_obj = get_obj_vis(ch, roomstr)) != NULL) || (!ch && (target_obj = get_obj_world(roomstr)) != NULL)) {
 		if (IN_ROOM(target_obj))
@@ -5784,6 +5794,8 @@ void remove_eus_entry(struct empire_unique_storage *eus, empire_data *emp) {
 * @param bool *full A variable to set TRUE if the storage is full and the item can't be stored.
 */
 void store_unique_item(char_data *ch, obj_data *obj, empire_data *emp, room_data *room, bool *full) {
+	extern int get_main_island(empire_data *emp);
+	
 	struct empire_unique_storage *eus;
 	bool extract = FALSE;
 	
@@ -5822,7 +5834,10 @@ void store_unique_item(char_data *ch, obj_data *obj, empire_data *emp, room_data
 		eus->obj = obj;
 		eus->amount = 1;
 		eus->island = room ? GET_ISLAND_ID(room) : NO_ISLAND;
-		if (ROOM_BLD_FLAGGED(room, BLD_VAULT)) {
+		if (eus->island == NO_ISLAND) {
+			eus->island = get_main_island(emp);
+		}
+		if (room && ROOM_BLD_FLAGGED(room, BLD_VAULT)) {
 			eus->flags = EUS_VAULT;
 		}
 			
@@ -5880,17 +5895,19 @@ int find_all_dots(char *arg) {
  *  *ch      This is the person that is trying to "find"
  *  **tar_ch Will be NULL if no character was found, otherwise points
  * **tar_obj Will be NULL if no object was found, otherwise points
+ * **tar_veh Will be NULL if no vehicle was found, otherwise points
  *
  * The routine used to return a pointer to the next word in *arg (just
  * like the one_argument routine), but now it returns an integer that
  * describes what it filled in.
  */
-int generic_find(char *arg, bitvector_t bitvector, char_data *ch, char_data **tar_ch, obj_data **tar_obj) {
+int generic_find(char *arg, bitvector_t bitvector, char_data *ch, char_data **tar_ch, obj_data **tar_obj, vehicle_data **tar_veh) {
 	int i, found;
 	char name[256];
 
 	*tar_ch = NULL;
 	*tar_obj = NULL;
+	*tar_veh = NULL;
 
 	one_argument(arg, name);
 
@@ -5922,6 +5939,11 @@ int generic_find(char *arg, bitvector_t bitvector, char_data *ch, char_data **ta
 	if (IS_SET(bitvector, FIND_OBJ_INV)) {
 		if ((*tar_obj = get_obj_in_list_vis(ch, name, ch->carrying)) != NULL) {
 			return (FIND_OBJ_INV);
+		}
+	}
+	if (IS_SET(bitvector, FIND_VEHICLE_ROOM)) {
+		if ((*tar_veh = get_vehicle_in_room_vis(ch, name)) != NULL) {
+			return (FIND_VEHICLE_ROOM);
 		}
 	}
 	if (IS_SET(bitvector, FIND_OBJ_ROOM)) {
@@ -5972,6 +5994,252 @@ int get_number(char **name) {
 	
 	// default
 	return (1);
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// VEHICLE HANDLERS ////////////////////////////////////////////////////////
+
+/**
+* Extracts a vehicle from the game.
+*
+* @param vehicle_data *veh The vehicle to extract and free.
+*/
+void extract_vehicle(vehicle_data *veh) {
+	void empty_vehicle(vehicle_data *veh);
+	void relocate_players(room_data *room, room_data *to_room);
+	extern char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh);
+	
+	struct vehicle_room_list *vrl, *next_vrl;
+	room_data *main_room;
+	
+	// delete interior
+	if ((main_room = VEH_INTERIOR_HOME_ROOM(veh)) || VEH_ROOM_LIST(veh)) {
+		LL_FOREACH_SAFE(VEH_ROOM_LIST(veh), vrl, next_vrl) {
+			if (vrl->room == main_room) {
+				continue;	// do this one last
+			}
+			
+			if (IN_ROOM(veh)) {
+				relocate_players(vrl->room, IN_ROOM(veh));
+			}
+			delete_room(vrl->room, FALSE);	// MUST check_all_exits later
+		}
+		
+		if (main_room) {
+			if (IN_ROOM(veh)) {
+				relocate_players(main_room, IN_ROOM(veh));
+			}
+			delete_room(main_room, FALSE);
+		}
+		check_all_exits();
+	}
+	
+	if (VEH_LED_BY(veh)) {
+		GET_LEADING_VEHICLE(VEH_LED_BY(veh)) = NULL;
+		VEH_LED_BY(veh) = NULL;
+	}
+	if (VEH_SITTING_ON(veh)) {
+		unseat_char_from_vehicle(VEH_SITTING_ON(veh));
+	}
+	if (VEH_DRIVER(veh)) {
+		GET_DRIVING(VEH_DRIVER(veh)) = NULL;
+		VEH_DRIVER(veh) = NULL;
+	}
+	
+	if (IN_ROOM(veh)) {
+		vehicle_from_room(veh);
+	}
+	
+	// dump contents (this will extract them since it's not in a room)
+	empty_vehicle(veh);
+	
+	// remove animals: doing this without the vehicle in a room will not spawn the mobs
+	while (VEH_ANIMALS(veh)) {
+		unharness_mob_from_vehicle(VEH_ANIMALS(veh), veh);
+	}
+	
+	LL_DELETE2(vehicle_list, veh, next);
+	free_vehicle(veh);
+}
+
+
+/**
+* @param char_data *ch Someone trying to sit.
+* @param vehicle_data *veh The vehicle to seat them on.
+*/
+void sit_on_vehicle(char_data *ch, vehicle_data *veh) {
+	// safety first
+	if (GET_SITTING_ON(ch)) {
+		unseat_char_from_vehicle(ch);
+	}
+	if (VEH_SITTING_ON(veh)) {
+		unseat_char_from_vehicle(VEH_SITTING_ON(veh));
+	}
+	
+	GET_SITTING_ON(ch) = veh;
+	VEH_SITTING_ON(veh) = ch;
+}
+
+
+/**
+* @param char_data *ch A player to remove from the seat he is in/on.
+*/
+void unseat_char_from_vehicle(char_data *ch) {
+	if (GET_SITTING_ON(ch)) {
+		VEH_SITTING_ON(GET_SITTING_ON(ch)) = NULL;
+	}
+	GET_SITTING_ON(ch) = NULL;
+}
+
+
+/**
+* Remove a vehicle from the room it is in.
+*
+* @param vehicle_data *veh The vehicle to remove from its room.
+*/
+void vehicle_from_room(vehicle_data *veh) {
+	if (!veh || !IN_ROOM(veh)) {
+		log("SYSERR: NULL vehicle (%p) or vehicle not in a room (%p) passed to vehicle_from_room", veh, IN_ROOM(veh));
+		return;
+	}
+	
+	LL_DELETE2(ROOM_VEHICLES(IN_ROOM(veh)), veh, next_in_room);
+	IN_ROOM(veh) = NULL;
+}
+
+
+/**
+* Put a vehicle in a room.
+*
+* @param vehicle_data *veh The vehicle.
+* @param room_data *room The room to put it in.
+*/
+void vehicle_to_room(vehicle_data *veh, room_data *room) {
+	if (!veh || !room) {
+		log("SYSERR: Illegal value(s) passed to vehicle_to_room. (Room %p, vehicle %p)", room, veh);
+		return;
+	}
+	
+	if (IN_ROOM(veh)) {
+		vehicle_from_room(veh);
+	}
+	
+	LL_PREPEND2(ROOM_VEHICLES(room), veh, next_in_room);
+	IN_ROOM(veh) = room;
+	VEH_LAST_MOVE_TIME(veh) = time(0);
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// VEHICLE TARGETING HANDLERS //////////////////////////////////////////////
+
+/**
+* Finds a vehicle the char can see in the room.
+*
+* @param char_data *ch The person who's looking.
+* @param char *name The target argument.
+* @parma room_data *room Which room to look for a vehicle in.
+* @return vehicle_data* The vehicle found, or NULL.
+*/
+vehicle_data *get_vehicle_in_target_room_vis(char_data *ch, room_data *room, char *name) {
+	int found = 0, number;
+	char tmpname[MAX_INPUT_LENGTH];
+	char *tmp = tmpname;
+	vehicle_data *iter;
+
+	strcpy(tmp, name);
+	
+	// 0.x does not target vehicles
+	if ((number = get_number(&tmp)) == 0) {
+		return (NULL);
+	}
+	
+	LL_FOREACH2(ROOM_VEHICLES(room), iter, next_in_room) {
+		if (!isname(tmp, VEH_KEYWORDS(iter))) {
+			continue;
+		}
+		if (!CAN_SEE_VEHICLE(ch, iter)) {
+			continue;
+		}
+		
+		// found: check number
+		if (++found == number) {
+			return iter;
+		}
+	}
+
+	return NULL;
+}
+
+
+/**
+* Find a vehicle in the world, visible to the character.
+*
+* @param char_data *ch The person looking.
+* @param char *name The string they typed.
+*/
+vehicle_data *get_vehicle_vis(char_data *ch, char *name) {
+	int found = 0, number;
+	char tmpname[MAX_INPUT_LENGTH];
+	char *tmp = tmpname;
+	vehicle_data *iter;
+
+	strcpy(tmp, name);
+	
+	// 0.x does not target vehicles
+	if ((number = get_number(&tmp)) == 0) {
+		return (NULL);
+	}
+	
+	LL_FOREACH2(vehicle_list, iter, next) {
+		if (!isname(tmp, VEH_KEYWORDS(iter))) {
+			continue;
+		}
+		if (!CAN_SEE_VEHICLE(ch, iter)) {
+			continue;
+		}
+		
+		// found: check number
+		if (++found == number) {
+			return iter;
+		}
+	}
+
+	return NULL;
+}
+
+
+/**
+* Find a vehicle in the world, without regard to visibility.
+*
+* @param char *name The string to search for.
+*/
+vehicle_data *get_vehicle_world(char *name) {
+	int found = 0, number;
+	char tmpname[MAX_INPUT_LENGTH];
+	char *tmp = tmpname;
+	vehicle_data *iter;
+
+	strcpy(tmp, name);
+	
+	// 0.x does not target vehicles
+	if ((number = get_number(&tmp)) == 0) {
+		return (NULL);
+	}
+	
+	LL_FOREACH2(vehicle_list, iter, next) {
+		if (!isname(tmp, VEH_KEYWORDS(iter))) {
+			continue;
+		}
+		
+		// found: check number
+		if (++found == number) {
+			return iter;
+		}
+	}
+
+	return NULL;
 }
 
 

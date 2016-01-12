@@ -77,7 +77,7 @@ augment_data *find_augment_by_name(char_data *ch, char *name, int type) {
 			// perfect match
 			return aug;
 		}
-		if (is_multiword_abbrev(name, GET_AUG_NAME(aug))) {
+		if (!partial && is_multiword_abbrev(name, GET_AUG_NAME(aug))) {
 			// probable match
 			partial = aug;
 		}

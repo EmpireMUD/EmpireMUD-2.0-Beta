@@ -274,7 +274,7 @@ they are to the room you're in, or another location. The transfer command is
 grantable.
 
 For both GOTO and TRANS, the location specifier can be either a virtual room
-number, or the name of a character or object.
+number, coordinates, or the name of a character, object, or vehicle.
 
 Examples:
 
@@ -453,11 +453,13 @@ See also: STAT
 #d
 LOAD
 
-Usage:  load <mob | obj> <virtual number>
+Usage:  load <type> <virtual number>
 
-LOAD is used to create mobiles and objects. The first argument specifies if
-you are trying to load a mobile or an object; the second is the virtual
+LOAD is used to create instances of mobs, objects, and vehicles. The first
+argument specifies what type you are trying to load; the second is the virtual
 number. This command is grantable.
+
+You can load: mob, obj, vehicle
 
 Example:
 
@@ -588,14 +590,17 @@ PURGE
 Usage:  purge [name]
 
 Purge destroys things. If used with no arguments, it will clear a room of all
-mobiles and objects, but will not harm players. If the argument is an object,
-that object (and all of its contents, if any) will be destroyed. If the
-argument is a mobile, the mobile will be destroyed, leaving its inventory and
-equipment lying on the ground. This command is grantable.
+mobiles and objects, but will not harm players or vehicles. If the argument is
+an object, that object (and all of its contents, if any) will be destroyed. If
+the argument is a mobile, the mobile will be destroyed, leaving its inventory
+and equipment lying on the ground. This command is grantable.
 
 If the argument is the name of a player, the player's inventory and equipment
 will drop on the ground and the player will lose his/her connection. For this
 reason, PURGE should only be used on players in disciplinary situations.
+
+You can also purge vehicles this way, but the no-argument room purge will
+ignore them. Anything inside a purged vehicle will be lost.
 
 Examples:
 
@@ -653,11 +658,11 @@ See also: GRANT
 #d
 RESCALE
 
-Usage:  rescale <mob/item> <level>
+Usage:  rescale <thing> <level>
 
-This command allows you to rescale a mob or item. It checks for a matching mob
-in the room first, then an item in your inventory, then an item on the ground.
-This command is grantable.
+This command allows you to rescale a mob, item, or vehicle. It checks for a
+matching mob in the room first, then a vehicle, then an item in your inventory,
+then an item on the ground. This command is grantable.
 
 The level you choose will still be constrained by the mob/item's minimum and
 maximum scale value.
@@ -841,7 +846,7 @@ See also: GRANT
 #d
 STAT
 
-Usage:  stat [adventure | building | player | object | mobile | room | template | file] [name]
+Usage:  stat [type] [name]
 
 Gives information about players, animals, and objects in the game. The type
 argument is optional.
@@ -973,7 +978,8 @@ specified name. If you specify more than one keyword, it will find things
 that match ALL of those keywords.
 
 Valid types are: adventure, ability, archetype, augment, book, building, craft,
-                 class, crop, global, obj, mob, roomtemplate, sector, skill
+                 class, crop, global, obj, mob, roomtemplate, sector, skill,
+                 vehicle
 
 Examples:
 
@@ -994,7 +1000,8 @@ Usage:  vstat <type> <vnum>
 Used to stat a prototypical object by virtual number.
 
 Valid types are: adventure, ability, archetype, augment, building, book, craft,
-                 class, crop, global, obj, mob, roomtemplate, sector, skill
+                 class, crop, global, obj, mob, roomtemplate, sector, skill,
+                 vehicle
 
 Examples:
 

@@ -92,7 +92,7 @@ auto_update_items 1
 autostore_time 180
 bound_item_junk_time 10080
 long_autostore_time 720
-room_item_limit 404
+room_item_limit 5
 scale_coin_amount 10.000000
 scale_drink_capacity 9.800000
 scale_food_fullness 6.000000
@@ -171,6 +171,7 @@ pvp_timer 5
 seconds_per_death 30
 stolen_object_timer 30
 stun_immunity_time 5
+vehicle_siege_time 30
 war_cost_max 50000
 war_cost_min 5000
 war_login_delay 30

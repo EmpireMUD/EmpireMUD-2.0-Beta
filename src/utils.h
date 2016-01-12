@@ -40,6 +40,7 @@
 *   Sector Utils
 *   Skill Utils
 *   String Utils
+*   Vehicle Utils
 *   Const Externs
 *   Util Function Protos
 *   Miscellaneous Utils
@@ -229,6 +230,13 @@
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// CAN SEE VEHICLE UTILS ///////////////////////////////////////////////////////
+
+#define MORT_CAN_SEE_VEHICLE(sub, veh)  (LIGHT_OK(sub))
+#define CAN_SEE_VEHICLE(sub, veh)  (MORT_CAN_SEE_VEHICLE(sub, veh) || (!IS_NPC(sub) && PRF_FLAGGED((sub), PRF_HOLYLIGHT)))
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// CHARACTER UTILS /////////////////////////////////////////////////////////
 
 // ch: char_data
@@ -293,21 +301,22 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define FIGHTING(ch)  ((ch)->char_specials.fighting.victim)
 #define FIGHT_MODE(ch)  ((ch)->char_specials.fighting.mode)
 #define FIGHT_WAIT(ch)  ((ch)->char_specials.fighting.wait)
+#define GET_DRIVING(ch)  ((ch)->char_specials.driving)
 #define GET_EMPIRE_NPC_DATA(ch)  ((ch)->char_specials.empire_npc)
 #define GET_FED_ON_BY(ch)  ((ch)->char_specials.fed_on_by)
 #define GET_FEEDING_FROM(ch)  ((ch)->char_specials.feeding_from)
 #define GET_HEALTH_REGEN(ch)  ((ch)->char_specials.health_regen)
 #define GET_ID(x)  ((x)->id)
 #define GET_IDNUM(ch)  (REAL_CHAR(ch)->char_specials.idnum)
-#define GET_LEADING(ch)  ((ch)->char_specials.leading)
+#define GET_LEADING_MOB(ch)  ((ch)->char_specials.leading_mob)
+#define GET_LEADING_VEHICLE(ch)  ((ch)->char_specials.leading_vehicle)
 #define GET_LED_BY(ch)  ((ch)->char_specials.led_by)
 #define GET_MANA_REGEN(ch)  ((ch)->char_specials.mana_regen)
 #define GET_MOVE_REGEN(ch)  ((ch)->char_specials.move_regen)
+#define GET_SITTING_ON(ch)  ((ch)->char_specials.sitting_on)
 #define GET_POS(ch)  ((ch)->char_specials.position)
-#define GET_PULLING(ch)  ((ch)->char_specials.pulling)
 #define HUNTING(ch)  ((ch)->char_specials.hunting)
 #define IS_CARRYING_N(ch)  ((ch)->char_specials.carry_items)
-#define ON_CHAIR(ch)  ((ch)->char_specials.chair)
 
 
 // definitions
@@ -323,6 +332,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define CAN_SPEND_BLOOD(ch)  (!AFF_FLAGGED(ch, AFF_CANT_SPEND_BLOOD))
 #define CAST_BY_ID(ch)  (IS_NPC(ch) ? (-1 * GET_MOB_VNUM(ch)) : GET_IDNUM(ch))
 #define EFFECTIVELY_FLYING(ch)  (IS_RIDING(ch) ? MOUNT_FLAGGED(ch, MOUNT_FLYING) : AFF_FLAGGED(ch, AFF_FLY))
+#define EFFECTIVELY_SWIMMING(ch)  (EFFECTIVELY_FLYING(ch) || (IS_RIDING(ch) && MOUNT_FLAGGED((ch), MOUNT_AQUATIC)) || (IS_NPC(ch) ? MOB_FLAGGED((ch), MOB_AQUATIC) : has_ability((ch), ABIL_SWIMMING)))
 #define HAS_INFRA(ch)  AFF_FLAGGED(ch, AFF_INFRAVISION)
 #define IS_HUMAN(ch)  (!IS_VAMPIRE(ch))
 #define IS_MAGE(ch)  (IS_NPC(ch) ? GET_MAX_MANA(ch) > 0 : (get_skill_level((ch), SKILL_NATURAL_MAGIC) > 0 || get_skill_level((ch), SKILL_HIGH_SORCERY) > 0))
@@ -428,6 +438,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_OLC_SECTOR(desc)  ((desc)->olc_sector)
 #define GET_OLC_SKILL(desc)  ((desc)->olc_skill)
 #define GET_OLC_TRIGGER(desc)  ((desc)->olc_trigger)
+#define GET_OLC_VEHICLE(desc)  ((desc)->olc_vehicle)
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -471,6 +482,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define EMPIRE_UNIQUE_STORAGE(emp)  ((emp)->unique_store)
 #define EMPIRE_WORKFORCE_TRACKER(emp)  ((emp)->ewt_tracker)
 #define EMPIRE_ISLANDS(emp)  ((emp)->islands)
+#define EMPIRE_TOP_SHIPPING_ID(emp)  ((emp)->top_shipping_id)
 
 // helpers
 #define EMPIRE_HAS_TECH(emp, num)  (EMPIRE_TECH((emp), (num)) > 0)
@@ -618,9 +630,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_OBJ_TYPE(obj)  ((obj)->obj_flags.type_flag)
 #define GET_OBJ_VAL(obj, val)  ((obj)->obj_flags.value[(val)])
 #define GET_OBJ_WEAR(obj)  ((obj)->obj_flags.wear_flags)
-#define GET_PULLED_BY(obj, i)  (i == 0 ? (obj)->pulled_by1 : (obj)->pulled_by2)
 #define GET_STOLEN_TIMER(obj)  ((obj)->stolen_timer)
-#define IN_CHAIR(obj)  ((obj)->sitting)
 #define LAST_OWNER_ID(obj)  ((obj)->last_owner_id)
 #define OBJ_BOUND_TO(obj)  ((obj)->bound_to)
 #define OBJ_VERSION(obj)  ((obj)->version)
@@ -639,7 +649,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define CAN_WEAR(obj, part)  (IS_SET(GET_OBJ_WEAR(obj), (part)))
 
 // for stacking, sotring, etc
-#define OBJ_CAN_STACK(obj)  (GET_OBJ_TYPE(obj) != ITEM_CONTAINER && !OBJ_FLAGGED((obj), OBJ_ENCHANTED) && !IN_CHAIR(obj) && !IS_ARROW(obj))
+#define OBJ_CAN_STACK(obj)  (GET_OBJ_TYPE(obj) != ITEM_CONTAINER && !OBJ_FLAGGED((obj), OBJ_ENCHANTED) && !IS_ARROW(obj))
 #define OBJ_CAN_STORE(obj)  ((obj)->storage && !OBJ_BOUND_TO(obj) && !OBJ_FLAGGED((obj), OBJ_SUPERIOR | OBJ_ENCHANTED))
 #define UNIQUE_OBJ_CAN_STORE(obj)  (!OBJ_BOUND_TO(obj) && !OBJ_CAN_STORE(obj) && !OBJ_FLAGGED((obj), OBJ_JUNK) && (!OBJ_FLAGGED((obj), OBJ_LIGHT) || GET_OBJ_TIMER(obj) == UNLIMITED) && !IS_STOLEN(obj))
 #define OBJ_STACK_FLAGS  (OBJ_SUPERIOR | OBJ_KEEP)
@@ -686,7 +696,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define IS_CONTAINER(obj)  (GET_OBJ_TYPE(obj) == ITEM_CONTAINER)
 #define VAL_CONTAINER_MAX_CONTENTS  0
 #define VAL_CONTAINER_FLAGS  1
-#define GET_MAX_CONTAINER_CONTENTS(obj)  (IS_CONTAINER(obj) ? GET_OBJ_VAL((obj), VAL_CONTAINER_MAX_CONTENTS) : (IS_CART(obj) ? GET_OBJ_VAL((obj), VAL_CART_MAX_CONTENTS) : 0))
+#define GET_MAX_CONTAINER_CONTENTS(obj)  (IS_CONTAINER(obj) ? GET_OBJ_VAL((obj), VAL_CONTAINER_MAX_CONTENTS) : 0)
 #define GET_CONTAINER_FLAGS(obj)  (IS_CONTAINER(obj) ? GET_OBJ_VAL((obj), VAL_CONTAINER_FLAGS) : 0)
 
 // ITEM_DRINKCON
@@ -706,7 +716,6 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define IS_PLANTABLE_FOOD(obj)  (IS_FOOD(obj) && OBJ_FLAGGED((obj), OBJ_PLANTABLE))
 #define GET_FOOD_CROP_TYPE(obj)  (IS_PLANTABLE_FOOD(obj) ? GET_OBJ_VAL((obj), VAL_FOOD_CROP_TYPE) : NOTHING)
 
-// ITEM_BOAT
 // ITEM_BOARD
 // ITEM_CORPSE
 #define IS_CORPSE(obj)  (GET_OBJ_TYPE(obj) == ITEM_CORPSE)
@@ -734,24 +743,6 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define VAL_WEALTH_AUTOMINT  1
 #define GET_WEALTH_VALUE(obj)  (IS_WEALTH_ITEM(obj) ? GET_OBJ_VAL((obj), VAL_WEALTH_VALUE) : 0)
 #define GET_WEALTH_AUTOMINT(obj)  (IS_WEALTH_ITEM(obj) ? GET_OBJ_VAL((obj), VAL_WEALTH_AUTOMINT) : 0)
-
-// ITEM_CART
-#define IS_CART(obj)  (GET_OBJ_TYPE(obj) == ITEM_CART)
-#define VAL_CART_MAX_CONTENTS  0
-#define VAL_CART_ANIMALS_REQUIRED  1
-#define VAL_CART_FIRING_DATA  2	// this val is 1 for can-fire, >1 for cooling down to fire
-#define GET_MAX_CART_CONTENTS(obj)  (IS_CART(obj) ? GET_OBJ_VAL((obj), VAL_CART_MAX_CONTENTS) : (IS_CONTAINER(obj) ? GET_OBJ_VAL((obj), VAL_CONTAINER_MAX_CONTENTS) : 0))
-#define GET_CART_ANIMALS_REQUIRED(obj)  (IS_CART(obj) ? GET_OBJ_VAL((obj), VAL_CART_ANIMALS_REQUIRED) : 0)
-#define CART_CAN_FIRE(obj)  (IS_CART(obj) ? (GET_OBJ_VAL((obj), VAL_CART_FIRING_DATA) > 0) : FALSE)
-
-// ITEM_SHIP
-#define IS_SHIP(obj)  (GET_OBJ_TYPE(obj) == ITEM_SHIP)
-#define VAL_SHIP_TYPE  0
-#define VAL_SHIP_RESOURCES_REMAINING  1
-#define VAL_SHIP_MAIN_ROOM  2
-#define GET_SHIP_TYPE(obj)  (IS_SHIP(obj) ? GET_OBJ_VAL((obj), VAL_SHIP_TYPE) : NOTHING)
-#define GET_SHIP_RESOURCES_REMAINING(obj)  (IS_SHIP(obj) ? GET_OBJ_VAL((obj), VAL_SHIP_RESOURCES_REMAINING) : 0)
-#define GET_SHIP_MAIN_ROOM(obj)  (IS_SHIP(obj) ? GET_OBJ_VAL((obj), VAL_SHIP_MAIN_ROOM) : NOWHERE)
 
 // ITEM_MISSILE_WEAPON
 #define IS_MISSILE_WEAPON(obj)  (GET_OBJ_TYPE(obj) == ITEM_MISSILE_WEAPON)
@@ -934,6 +925,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define ROOM_OWNER(room)  ((room)->owner)
 #define ROOM_PEOPLE(room)  ((room)->people)
 #define ROOM_TRACKS(room)  ((room)->tracks)
+#define ROOM_VEHICLES(room)  ((room)->vehicles)
 #define SECT(room)  ((room)->sector_type)
 #define GET_EXITS_HERE(room)  ((room)->exits_here)
 
@@ -942,13 +934,13 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define COMPLEX_DATA(room)  ((room)->complex)
 #define GET_BUILDING(room)  (COMPLEX_DATA(room) ? COMPLEX_DATA(room)->bld_ptr : NULL)
 #define GET_ROOM_TEMPLATE(room)  (COMPLEX_DATA(room) ? COMPLEX_DATA(room)->rmt_ptr : NULL)
-#define BOAT_ROOM(room)  (GET_BOAT(room) ? IN_ROOM(GET_BOAT(room)) : room)
+#define IN_VEHICLE_IN_ROOM(room)  (GET_ROOM_VEHICLE(room) ? IN_ROOM(GET_ROOM_VEHICLE(room)) : room)
 #define BUILDING_BURNING(room)  (COMPLEX_DATA(HOME_ROOM(room)) ? COMPLEX_DATA(HOME_ROOM(room))->burning : 0)
 #define BUILDING_DAMAGE(room)  (COMPLEX_DATA(HOME_ROOM(room)) ? COMPLEX_DATA(HOME_ROOM(room))->damage : 0)
 #define BUILDING_DISREPAIR(room)  (COMPLEX_DATA(room) ? COMPLEX_DATA(room)->disrepair : 0)
 #define BUILDING_ENTRANCE(room)  (COMPLEX_DATA(room) ? COMPLEX_DATA(room)->entrance : NO_DIR)
 #define BUILDING_RESOURCES(room)  (COMPLEX_DATA(room) ? GET_BUILDING_RESOURCES(room) : NULL)
-#define GET_BOAT(room)  (COMPLEX_DATA(HOME_ROOM(room)) ? COMPLEX_DATA(HOME_ROOM(room))->boat : NULL)
+#define GET_ROOM_VEHICLE(room)  (COMPLEX_DATA(HOME_ROOM(room)) ? COMPLEX_DATA(HOME_ROOM(room))->vehicle : NULL)
 #define GET_BUILDING_RESOURCES(room)  (COMPLEX_DATA(room)->to_build)
 #define GET_INSIDE_ROOMS(room)  (COMPLEX_DATA(room) ? COMPLEX_DATA(room)->inside_rooms : 0)
 #define HOME_ROOM(room)  ((COMPLEX_DATA(room) && COMPLEX_DATA(room)->home_room) ? COMPLEX_DATA(room)->home_room : (room))
@@ -1100,6 +1092,52 @@ void SET_ISLAND_ID(room_data *room, int island);	// formerly a #define and a roo
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// VEHICLE UTILS ///////////////////////////////////////////////////////////
+
+// basic data
+#define VEH_ANIMALS(veh)  ((veh)->animals)
+#define VEH_CARRYING_N(veh)  ((veh)->carrying_n)
+#define VEH_CONTAINS(veh)  ((veh)->contains)
+#define VEH_DRIVER(veh)  ((veh)->driver)
+#define VEH_FLAGS(veh)  ((veh)->flags)
+#define VEH_HEALTH(veh)  ((veh)->health)
+#define VEH_ICON(veh)  ((veh)->icon)
+#define VEH_INSIDE_ROOMS(veh)  ((veh)->inside_rooms)
+#define VEH_INTERIOR_HOME_ROOM(veh)  ((veh)->interior_home_room)
+#define VEH_KEYWORDS(veh)  ((veh)->keywords)
+#define VEH_LAST_FIRE_TIME(veh)  ((veh)->last_fire_time)
+#define VEH_LAST_MOVE_TIME(veh)  ((veh)->last_move_time)
+#define VEH_LED_BY(veh)  ((veh)->led_by)
+#define VEH_LONG_DESC(veh)  ((veh)->long_desc)
+#define VEH_LOOK_DESC(veh)  ((veh)->look_desc)
+#define VEH_NEEDS_RESOURCES(veh)  ((veh)->needs_resources)
+#define VEH_OWNER(veh)  ((veh)->owner)
+#define VEH_ROOM_LIST(veh)  ((veh)->room_list)
+#define VEH_SCALE_LEVEL(veh)  ((veh)->scale_level)
+#define VEH_SHIPPING_ID(veh)  ((veh)->shipping_id)
+#define VEH_SHORT_DESC(veh)  ((veh)->short_desc)
+#define VEH_SITTING_ON(veh)  ((veh)->sitting_on)
+#define VEH_VNUM(veh)  ((veh)->vnum)
+
+// attribute (non-instanced) data
+#define VEH_ANIMALS_REQUIRED(veh)  ((veh)->attributes->animals_required)
+#define VEH_CAPACITY(veh)  ((veh)->attributes->capacity)
+#define VEH_DESIGNATE_FLAGS(veh)  ((veh)->attributes->designate_flags)
+#define VEH_INTERIOR_ROOM_VNUM(veh)  ((veh)->attributes->interior_room_vnum)
+#define VEH_MAX_HEALTH(veh)  ((veh)->attributes->maxhealth)
+#define VEH_MAX_ROOMS(veh)  ((veh)->attributes->max_rooms)
+#define VEH_MAX_SCALE_LEVEL(veh)  ((veh)->attributes->max_scale_level)
+#define VEH_MIN_SCALE_LEVEL(veh)  ((veh)->attributes->min_scale_level)
+#define VEH_MOVE_TYPE(veh)  ((veh)->attributes->move_type)
+#define VEH_YEARLY_MAINTENANCE(veh)  ((veh)->attributes->yearly_maintenance)
+
+// helpers
+#define IN_OR_ON(veh)		(VEH_FLAGGED((veh), VEH_IN) ? "in" : "on")
+#define VEH_FLAGGED(veh, flag)  IS_SET(VEH_FLAGS(veh), (flag))
+#define VEH_IS_COMPLETE(veh)  (!VEH_NEEDS_RESOURCES(veh) || !VEH_FLAGGED(veh, VEH_INCOMPLETE))
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// CONST EXTERNS ///////////////////////////////////////////////////////////
 
 extern FILE *logfile;	// comm.c
@@ -1151,11 +1189,14 @@ extern int reserved_word(char *argument);
 extern int search_block(char *arg, const char **list, int exact);
 void skip_spaces(char **string);
 extern char *two_arguments(char *argument, char *first_arg, char *second_arg);
+void ucwords(char *string);
 
 // permission utils from utils.c
 extern bool can_build_or_claim_at_war(char_data *ch, room_data *loc);
 extern bool can_use_room(char_data *ch, room_data *room, int mode);
 extern bool emp_can_use_room(empire_data *emp, room_data *room, int mode);
+extern bool emp_can_use_vehicle(empire_data *emp, vehicle_data *veh, int mode);
+#define can_use_vehicle(ch, veh, mode)  (IS_IMMORTAL(ch) || emp_can_use_vehicle(GET_LOYALTY(ch), (veh), (mode)))
 extern bool has_permission(char_data *ch, int type);
 extern bool has_tech_available(char_data *ch, int tech);
 extern bool has_tech_available_room(room_data *room, int tech);
@@ -1264,6 +1305,9 @@ void gain_condition(char_data *ch, int condition, int value);
 extern bool adjacent_room_is_light(room_data *room);
 void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options);
 #define look_at_room(ch)  look_at_room_by_loc((ch), IN_ROOM(ch), NOBITS)
+
+// utils from vehicles.c
+extern char *get_vehicle_name_by_proto(obj_vnum vnum);
 
 
  //////////////////////////////////////////////////////////////////////////////

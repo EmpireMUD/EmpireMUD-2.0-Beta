@@ -1109,6 +1109,39 @@ bool emp_can_use_room(empire_data *emp, room_data *room, int mode) {
 
 
 /**
+* Determines if an empire can use a vehicle.
+*
+* @param empire_data *emp The empire trying to use it -- MAY be null.
+* @param vehicle_data *veh The vehicle it's trying to use.
+* @param int mode -- GUESTS_ALLOWED, MEMBERS_AND_ALLIES, MEMBERS_ONLY
+* @return bool TRUE if emp can use veh, FALSE otherwise
+*/
+bool emp_can_use_vehicle(empire_data *emp, vehicle_data *veh, int mode) {
+	room_data *interior = VEH_INTERIOR_HOME_ROOM(veh);	// if any
+	
+	// no owner?
+	if (!VEH_OWNER(veh)) {
+		return TRUE;
+	}
+	// empire ownership
+	if (VEH_OWNER(veh) == emp) {
+		return TRUE;
+	}
+	// public + guests
+	if (interior && ROOM_AFF_FLAGGED(interior, ROOM_AFF_PUBLIC) && mode == GUESTS_ALLOWED) {
+		return TRUE;
+	}
+	// check allies
+	if (mode != MEMBERS_ONLY && emp && has_relationship(VEH_OWNER(veh), emp, DIPL_ALLIED)) {
+		return TRUE;
+	}
+	
+	// newp
+	return FALSE;
+}
+
+
+/**
 * Checks the room to see if ch has permission.
 *
 * @param char_data *ch
@@ -2155,6 +2188,7 @@ int get_attribute_by_name(char *name) {
 * @return bool TRUE if the character ended up standing (>= fighting), FALSE if not.
 */
 bool wake_and_stand(char_data *ch) {
+	void do_unseat_from_vehicle(char_data *ch);
 	char buf[MAX_STRING_LENGTH];
 	bool was_sleeping = FALSE;
 	
@@ -2165,6 +2199,7 @@ bool wake_and_stand(char_data *ch) {
 		}
 		case POS_RESTING:
 		case POS_SITTING: {
+			do_unseat_from_vehicle(ch);
 			GET_POS(ch) = POS_STANDING;
 			msg_to_char(ch, "You %sget up.\r\n", (was_sleeping ? "awaken and " : ""));
 			snprintf(buf, sizeof(buf), "$n %sgets up.", (was_sleeping ? "awakens and " : ""));
@@ -2947,6 +2982,22 @@ char *str_dup(const char *source) {
 
 
 /**
+* Capitalizes the first letter of each word.
+*
+* @param char *string The string to ucwords on.
+*/
+void ucwords(char *string) {
+	int iter, len = strlen(string);
+	
+	for (iter = 0; iter < len; ++iter) {
+		if (iter == 0 || string[iter-1] == ' ') {
+			string[iter] = UPPER(string[iter]);
+		}
+	}
+}
+
+
+/**
 * Generic string replacement function: returns a memory-allocated char* with
 * the resulting string.
 *
@@ -3397,8 +3448,8 @@ int distance_to_nearest_player(room_data *room) {
 * @return room_data* A location on the map, or NULL if there is no map location.
 */
 room_data *get_map_location_for(room_data *room) {
-	room_data *working = room, *last;
-	obj_data *boat;
+	room_data *working, *last;
+	vehicle_data *veh;
 	
 	if (!room) {
 		return NULL;
@@ -3407,15 +3458,12 @@ room_data *get_map_location_for(room_data *room) {
 		// shortcut
 		return room;
 	}
-	else if (GET_ROOM_VNUM(HOME_ROOM(room)) >= MAP_SIZE && BOAT_ROOM(room) == room && !IS_ADVENTURE_ROOM(HOME_ROOM(room))) {
-		// no home room on the map and not in a boat?
-		return NULL;
-	}
-	else if (GET_BOAT(room) && GET_ROOM_VNUM(BOAT_ROOM(room)) >= MAP_SIZE) {
-		// in a boat but it's not on the map?
+	else if (GET_ROOM_VNUM(HOME_ROOM(room)) >= MAP_SIZE && IN_VEHICLE_IN_ROOM(room) == room && !IS_ADVENTURE_ROOM(HOME_ROOM(room))) {
+		// no home room on the map and not in a vehicle?
 		return NULL;
 	}
 	
+	working = room;
 	do {
 		last = working;
 		
@@ -3427,13 +3475,13 @@ room_data *get_map_location_for(room_data *room) {
 			}
 		} while (last != working);
 		
-		// boat resolution: find top boat->in_room: this is similar to GET_BOAT()/BOAT_ROOM()
+		// vehicle resolution: find top vehicle->in_room: this is similar to GET_ROOM_VEHICLE()/IN_VEHICLE_IN_ROOM()
 		do {
 			last = working;
-			boat = (COMPLEX_DATA(working) ? COMPLEX_DATA(working)->boat : NULL);
+			veh = (COMPLEX_DATA(working) ? COMPLEX_DATA(working)->vehicle : NULL);
 		
-			if (boat && IN_ROOM(boat)) {
-				working = IN_ROOM(boat);
+			if (veh && IN_ROOM(veh)) {
+				working = IN_ROOM(veh);
 			}
 		} while (last != working);
 		
@@ -3443,7 +3491,12 @@ room_data *get_map_location_for(room_data *room) {
 		}
 	} while (COMPLEX_DATA(working) && GET_ROOM_VNUM(working) >= MAP_SIZE && last != working);
 	
-	return working;
+	if (GET_ROOM_VNUM(working) < MAP_SIZE) {
+		return working;
+	}
+	else {
+		return NULL;	// found a location not on the map
+	}
 }
 
 

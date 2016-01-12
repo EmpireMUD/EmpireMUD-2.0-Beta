@@ -348,11 +348,13 @@ void delete_room(room_data *room, bool check_exits) {
 	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 	void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool full_abandon);
 	void relocate_players(room_data *room, room_data *to_room);
+	void remove_room_from_vehicle(room_data *room, vehicle_data *veh);
 
 	struct room_direction_data *ex, *next_ex, *temp;
 	struct empire_territory_data *ter, *next_ter;
 	struct empire_city_data *city, *next_city;
 	room_data *rm_iter, *next_rm, *home;
+	vehicle_data *veh, *next_veh;
 	struct instance_data *inst;
 	struct depletion_data *dep;
 	struct track_data *track;
@@ -375,6 +377,9 @@ void delete_room(room_data *room, bool check_exits) {
 	
 	// remove it now
 	remove_room_from_world_tables(room);
+	if (GET_ROOM_VEHICLE(room)) {
+		remove_room_from_vehicle(room, GET_ROOM_VEHICLE(room));
+	}
 	
 	if (check_exits) {
 		// search world for portals that link here
@@ -382,12 +387,17 @@ void delete_room(room_data *room, bool check_exits) {
 			next_o = o->next;
 		
 			if (IS_PORTAL(o) && GET_PORTAL_TARGET_VNUM(o) == GET_ROOM_VNUM(room)) {
-				if (IN_ROOM(o)) {
-					act("$p closes and vanishes!", FALSE, NULL, o, NULL, TO_ROOM);
+				if (IN_ROOM(o) && ROOM_PEOPLE(IN_ROOM(o))) {
+					act("$p closes and vanishes!", FALSE, ROOM_PEOPLE(IN_ROOM(o)), o, NULL, TO_CHAR | TO_ROOM);
 				}
 				extract_obj(o);
 			}
 		}
+	}
+	
+	// check if it was part of the interior of a vehicle
+	if (GET_ROOM_VEHICLE(room) && VEH_INTERIOR_HOME_ROOM(GET_ROOM_VEHICLE(room)) == room) {
+		VEH_INTERIOR_HOME_ROOM(GET_ROOM_VEHICLE(room)) = NULL;
 	}
 	
 	// shrink home
@@ -395,9 +405,17 @@ void delete_room(room_data *room, bool check_exits) {
 	if (home != room && GET_INSIDE_ROOMS(home) > 0) {
 		COMPLEX_DATA(home)->inside_rooms -= 1;
 	}
+	if (home != room && GET_ROOM_VEHICLE(home)) {
+		--VEH_INSIDE_ROOMS(GET_ROOM_VEHICLE(home));
+	}
 	
 	// get rid of players
 	relocate_players(room, NULL);
+	
+	// get rid of vehicles
+	LL_FOREACH_SAFE2(ROOM_VEHICLES(room), veh, next_veh, next_in_room) {
+		extract_vehicle(veh);
+	}
 	
 	// Remove remaining chars
 	for (c = ROOM_PEOPLE(room); c; c = next_c) {
@@ -944,9 +962,48 @@ static void annual_update_room(room_data *room) {
 
 
 /**
+* Runs an annual update (mainly, maintenance) on the vehicle.
+*/
+void annual_update_vehicle(vehicle_data *veh) {
+	extern struct resource_data *combine_resources(struct resource_data *combine_a, struct resource_data *combine_b);
+	void fully_empty_vehicle(vehicle_data *veh);
+	
+	static struct resource_data *default_res = NULL;
+	struct resource_data *old_list;
+	
+	// resources if it doesn't have its own
+	if (!default_res) {
+		default_res = create_resource_list(o_NAILS, 1, NOTHING);
+	}
+	
+	// does not take annual damage (unless incomplete)
+	if (!VEH_YEARLY_MAINTENANCE(veh) && VEH_IS_COMPLETE(veh)) {
+		return;
+	}
+	
+	VEH_HEALTH(veh) -= MAX(1, (VEH_MAX_HEALTH(veh) / 10));
+	
+	if (VEH_HEALTH(veh) > 0) {
+		// add maintenance
+		old_list = VEH_NEEDS_RESOURCES(veh);
+		VEH_NEEDS_RESOURCES(veh) = combine_resources(old_list, VEH_YEARLY_MAINTENANCE(veh) ? VEH_YEARLY_MAINTENANCE(veh) : default_res);
+		free_resource_list(old_list);
+	}
+	else {	// destroyed
+		if (ROOM_PEOPLE(IN_ROOM(veh))) {
+			act("$V crumbles from disrepair!", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+		}
+		fully_empty_vehicle(veh);
+		extract_vehicle(veh);
+	}
+}
+
+
+/**
 * This runs once a mud year to update the world.
 */
 void annual_world_update(void) {
+	vehicle_data *veh, *next_veh;
 	descriptor_data *d;
 	room_data *room, *next_room;
 	
@@ -970,6 +1027,10 @@ void annual_world_update(void) {
 			annual_update_map_tile(room);
 		}
 		annual_update_room(room);
+	}
+	
+	LL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
+		annual_update_vehicle(veh);
 	}
 	
 	// lastly
@@ -1106,14 +1167,13 @@ struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_da
 * @param room_data *room The room to reset.
 */
 void reset_one_room(room_data *room) {
+	void add_convert_vehicle_data(char_data *mob, any_vnum vnum);
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	void objpack_load_room(room_data *room);
 	
 	struct reset_com *reset;
 	char_data *tmob = NULL; /* for trigger assignment */
 	char_data *mob = NULL;
-	obj_data *obj = NULL;
-	bool found;
 	
 	// shortcut
 	if (!room->reset_commands) {
@@ -1132,30 +1192,11 @@ void reset_one_room(room_data *room) {
 				SET_BIT(MOB_FLAGS(mob), MOB_ISNPC);
 				REMOVE_BIT(MOB_FLAGS(mob), MOB_EXTRACTED);
 				
-				// pulling? attempt to re-attach
-				if (obj_proto(reset->arg2)) {
-						found = FALSE;
-						for (obj = ROOM_CONTENTS(IN_ROOM(mob)); obj && !found; obj = obj->next_content) {
-							if (GET_OBJ_VNUM(obj) == reset->arg2) {
-								// find available pull slot
-								if (GET_PULLED_BY(obj, 0) && !GET_PULLED_BY(obj, 1) && GET_CART_ANIMALS_REQUIRED(obj) > 1) {
-									obj->pulled_by2 = mob;
-									GET_PULLING(mob) = obj;
-									found = TRUE;
-								}
-								else if (!GET_PULLED_BY(obj, 0)) {
-									obj->pulled_by1 = mob;
-									GET_PULLING(mob) = obj;
-									found = TRUE;
-								}
-							}
-						}
-					// couldn't find one -- just tie mob
-					if (!found) {
-						SET_BIT(MOB_FLAGS(mob), MOB_TIED);
-					}
+				// has old pulling data? attempt to convert
+				if (reset->arg2 > 0) {
+					add_convert_vehicle_data(mob, reset->arg2);
 				}
-
+				
 				load_mtrigger(mob);
 				tmob = mob;
 				break;
@@ -1422,7 +1463,7 @@ void read_empire_territory(empire_data *emp) {
 		if (ROOM_OWNER(iter) && (!emp || ROOM_OWNER(iter) == emp) && (HOME_ROOM(iter) == iter || IS_INSIDE(iter))) {
 			if ((e = ROOM_OWNER(iter))) {
 				// only count each building as 1
-				if (HOME_ROOM(iter) == iter) {
+				if (HOME_ROOM(iter) == iter && !GET_ROOM_VEHICLE(iter)) {
 					if (is_in_city_for_empire(iter, e, FALSE, &junk)) {
 						EMPIRE_CITY_TERRITORY(e) += 1;
 					}
@@ -1561,8 +1602,8 @@ void check_all_exits(void) {
 		next_o = o->next;
 		
 		if (IS_PORTAL(o) && !real_real_room(GET_PORTAL_TARGET_VNUM(o))) {
-			if (IN_ROOM(o)) {
-				act("$p closes and vanishes!", FALSE, NULL, o, NULL, TO_ROOM);
+			if (IN_ROOM(o) && ROOM_PEOPLE(IN_ROOM(o))) {
+				act("$p closes and vanishes!", FALSE, ROOM_PEOPLE(IN_ROOM(o)), o, NULL, TO_CHAR | TO_ROOM);
 			}
 			extract_obj(o);
 		}
@@ -1609,6 +1650,45 @@ void clear_private_owner(int id) {
 			remove_designate_objects(iter);
 		}
 	}
+}
+
+
+/**
+* Gets a simple movable room based on valid exits. This does not take a player
+* into account, only that a room exists that way and it's possible to move to
+* it.
+*/
+room_data *dir_to_room(room_data *room, int dir) {
+	struct room_direction_data *ex;
+	room_data *to_room = NULL;
+	
+	// on the map
+	if (!ROOM_IS_CLOSED(room) && GET_ROOM_VNUM(room) < MAP_SIZE) {
+		if (dir >= NUM_2D_DIRS || dir < 0) {
+			return NULL;
+		}
+		// may produce a NULL
+		to_room = real_shift(room, shift_dir[dir][0], shift_dir[dir][1]);
+		
+		// check building entrance
+		if (to_room && IS_MAP_BUILDING(to_room) && !IS_INSIDE(room) && !IS_ADVENTURE_ROOM(room) && BUILDING_ENTRANCE(to_room) != dir && ROOM_IS_CLOSED(to_room) && (!ROOM_BLD_FLAGGED(to_room, BLD_TWO_ENTRANCES) || BUILDING_ENTRANCE(to_room) != rev_dir[dir])) {
+			to_room = NULL;	// can't enter this way
+		}
+		else if (to_room == room) {
+			to_room = NULL;	// don't return a shifted exit back to the room we're already in
+		}
+	}
+	else {	// not on the map
+		if (!(ex = find_exit(room, dir)) || !ex->room_ptr) {
+			return NULL;
+		}
+		if (EXIT_FLAGGED(ex, EX_CLOSED) && ex->keyword) {
+			return NULL;
+		}
+		to_room = ex->room_ptr;
+	}
+	
+	return to_room;
 }
 
 

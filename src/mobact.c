@@ -195,8 +195,6 @@ INTERACTION_FUNC(run_one_encounter) {
 * @param char_data *ch The unsuspecting fool.
 */
 void random_encounter(char_data *ch) {
-	extern bool has_boat(char_data *ch);
-
 	if (!ch->desc || IS_NPC(ch) || !IN_ROOM(ch) || FIGHTING(ch) || IS_GOD(ch) || NOHASSLE(ch) || ISLAND_FLAGGED(IN_ROOM(ch), ISLE_NO_AGGRO)) {
 		return;
 	}
@@ -205,8 +203,8 @@ void random_encounter(char_data *ch) {
 		return;
 	}
 	
-	// water encounters don't trigger if the player has a boat
-	if ((IS_WATER_SECT(SECT(IN_ROOM(ch))) || ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_NEED_BOAT) || RMT_FLAGGED(IN_ROOM(ch), RMT_NEED_BOAT)) && has_boat(ch)) {
+	// water encounters don't trigger if the player is on a vehicle
+	if ((IS_WATER_SECT(SECT(IN_ROOM(ch))) || ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_NEED_BOAT) || RMT_FLAGGED(IN_ROOM(ch), RMT_NEED_BOAT)) && GET_SITTING_ON(ch)) {
 		return;
 	}
 
@@ -554,7 +552,7 @@ void mobile_activity(void) {
 
 		if (!IS_MOB(ch) || GET_FED_ON_BY(ch) || EXTRACTED(ch) || IS_DEAD(ch) || AFF_FLAGGED(ch, AFF_STUNNED))
 			continue;
-		if (FIGHTING(ch) || !AWAKE(ch) || AFF_FLAGGED(ch, AFF_CHARM) || MOB_FLAGGED(ch, MOB_TIED) || GET_PULLING(ch) || GET_LED_BY(ch))
+		if (FIGHTING(ch) || !AWAKE(ch) || AFF_FLAGGED(ch, AFF_CHARM) || MOB_FLAGGED(ch, MOB_TIED)  || GET_LED_BY(ch))
 			continue;
 		
 		// found stops further execution

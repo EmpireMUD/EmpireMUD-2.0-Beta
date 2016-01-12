@@ -35,6 +35,10 @@
 *   Commands
 */
 
+// external functions
+extern char *get_vehicle_short_desc(vehicle_data *veh, char_data *to);
+extern vehicle_data *find_vehicle_to_show(char_data *ch, room_data *room);
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// DATA ////////////////////////////////////////////////////////////////////
@@ -473,6 +477,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options);
 	void list_obj_to_char(obj_data *list, char_data *ch, int mode, int show);
 	void list_char_to_char(char_data *list, char_data *ch);
+	void list_vehicles_to_char(vehicle_data *list, char_data *ch);
 	extern const struct tavern_data_type tavern_data[];
 	extern int how_to_show_map[NUM_SIMPLE_DIRS][2];
 	extern int show_map_y_first[NUM_SIMPLE_DIRS];
@@ -486,7 +491,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	struct mappc_data *pc, *next_pc;
 	struct building_resource_type *res;
 	struct empire_city_data *city;
-	char output[MAX_STRING_LENGTH], shipbuf[256], flagbuf[MAX_STRING_LENGTH], locbuf[128], partialbuf[MAX_STRING_LENGTH];
+	char output[MAX_STRING_LENGTH], veh_buf[256], flagbuf[MAX_STRING_LENGTH], locbuf[128], partialbuf[MAX_STRING_LENGTH], tmpbuf[MAX_STRING_LENGTH];
 	int s, t, mapsize, iter, check_x, check_y;
 	int first_iter, second_iter, xx, yy, magnitude, north;
 	int first_start, first_end, second_start, second_end, temp;
@@ -503,8 +508,9 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	// options
 	bool ship_partial = IS_SET(options, LRR_SHIP_PARTIAL) ? TRUE : FALSE;
 	bool look_out = IS_SET(options, LRR_LOOK_OUT) ? TRUE : FALSE;
-	bool has_ship = GET_BOAT(IN_ROOM(ch)) ? TRUE : FALSE;
-	bool show_title = !has_ship || ship_partial || look_out;
+	bool has_ship = GET_ROOM_VEHICLE(IN_ROOM(ch)) ? TRUE : FALSE;
+	bool show_on_ship = has_ship && ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_LOOK_OUT);
+	bool show_title = !show_on_ship || ship_partial || look_out;
 
 	// begin with the sanity check
 	if (!ch || !ch->desc)
@@ -523,19 +529,21 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	}
 
 	// check for ship
-	if (!look_out && !ship_partial && GET_BOAT(IN_ROOM(ch))) {
-		look_at_room_by_loc(ch, IN_ROOM(GET_BOAT(IN_ROOM(ch))), LRR_SHIP_PARTIAL);
+	if (!look_out && !ship_partial && show_on_ship) {
+		look_at_room_by_loc(ch, IN_ROOM(GET_ROOM_VEHICLE(IN_ROOM(ch))), LRR_SHIP_PARTIAL);
 	}
 
 	// mappc setup
 	CREATE(mappc, struct mappc_data_container, 1);
 	
 	// put ship in name
-	if (ship_partial && GET_BOAT(IN_ROOM(ch))) {
-		snprintf(shipbuf, sizeof(shipbuf), ", Aboard %s", get_obj_desc(GET_BOAT(IN_ROOM(ch)), ch, OBJ_DESC_SHORT));
+	if (ship_partial && GET_ROOM_VEHICLE(IN_ROOM(ch))) {
+		strcpy(tmpbuf, skip_filler(VEH_SHORT_DESC(GET_ROOM_VEHICLE(IN_ROOM(ch)))));
+		ucwords(tmpbuf);
+		snprintf(veh_buf, sizeof(veh_buf), ", %s the %s", VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_IN) ? "Inside" : "Aboard", tmpbuf);
 	}
 	else {
-		*shipbuf = '\0';
+		*veh_buf = '\0';
 	}
 	
 	// set up location: may not actually have a map location
@@ -559,14 +567,14 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 			snprintf(flagbuf + strlen(flagbuf), sizeof(flagbuf) - strlen(flagbuf), "| %s", partialbuf);
 		}
 		
-		sprintf(output, "[%d] %s%s %s&0 %s[ %s]\r\n", GET_ROOM_VNUM(room), get_room_name(room, TRUE), shipbuf, locbuf, (SCRIPT(room) ? "[TRIG] " : ""), flagbuf);
+		sprintf(output, "[%d] %s%s %s&0 %s[ %s]\r\n", GET_ROOM_VNUM(room), get_room_name(room, TRUE), veh_buf, locbuf, (SCRIPT(room) ? "[TRIG] " : ""), flagbuf);
 	}
 	else if (has_ability(ch, ABIL_NAVIGATION) && !RMT_FLAGGED(IN_ROOM(ch), RMT_NO_LOCATION)) {
 		// need navigation to see coords
-		sprintf(output, "%s%s %s&0\r\n", get_room_name(room, TRUE), shipbuf, locbuf);
+		sprintf(output, "%s%s %s&0\r\n", get_room_name(room, TRUE), veh_buf, locbuf);
 	}
 	else {
-		sprintf(output, "%s%s&0\r\n", get_room_name(room, TRUE), shipbuf);
+		sprintf(output, "%s%s&0\r\n", get_room_name(room, TRUE), veh_buf);
 	}
 
 	// show the room
@@ -774,8 +782,14 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	else if (GET_SECT_COMMANDS(SECT(room)) && *GET_SECT_COMMANDS(SECT(room))) {
 		msg_to_char(ch, "Commands: &c%s&0\r\n", GET_SECT_COMMANDS(SECT(room)));
 	}
-
-	if ((emp = ROOM_OWNER(HOME_ROOM(room)))) {
+	
+	// used from here on
+	emp = ROOM_OWNER(HOME_ROOM(room));
+	
+	if (GET_ROOM_VEHICLE(room) && VEH_OWNER(GET_ROOM_VEHICLE(room))) {
+		msg_to_char(ch, "The %s is owned by %s%s\t0%s.\r\n", skip_filler(VEH_SHORT_DESC(GET_ROOM_VEHICLE(room))), EMPIRE_BANNER(VEH_OWNER(GET_ROOM_VEHICLE(room))), EMPIRE_NAME(VEH_OWNER(GET_ROOM_VEHICLE(room))), ROOM_AFF_FLAGGED(HOME_ROOM(room), ROOM_AFF_PUBLIC) ? " (public)" : "");
+	}
+	else if (emp) {
 		if ((city = find_city(emp, room))) {
 			msg_to_char(ch, "This is the %s%s&0 %s of %s.", EMPIRE_BANNER(emp), EMPIRE_ADJECTIVE(emp), city_type[city->type].name, city->name);
 		}	
@@ -889,11 +903,16 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	if (BUILDING_BURNING(room)) {
 		msg_to_char(ch, "%sThe building is on fire!&0\r\n", BACKGROUND_RED);
 	}
+	if (GET_ROOM_VEHICLE(room) && VEH_FLAGGED(GET_ROOM_VEHICLE(room), VEH_ON_FIRE)) {
+		msg_to_char(ch, "%sThe %s has caught on fire!\t0\r\n", BACKGROUND_RED, skip_filler(VEH_SHORT_DESC(GET_ROOM_VEHICLE(room))));
+	}
 
 	if (!AFF_FLAGGED(ch, AFF_EARTHMELD)) {
 		/* now list characters & objects */
 		send_to_char("&g", ch);
 		list_obj_to_char(ROOM_CONTENTS(room), ch, OBJ_DESC_LONG, FALSE);
+		send_to_char("&w", ch);
+		list_vehicles_to_char(ROOM_VEHICLES(room), ch);
 		send_to_char("&y", ch);
 		list_char_to_char(ROOM_PEOPLE(room), ch);
 		send_to_char("&0", ch);
@@ -912,6 +931,7 @@ void look_in_direction(char_data *ch, int dir) {
 	extern const int rev_dir[];
 	
 	char buf[MAX_STRING_LENGTH - 9], buf2[MAX_STRING_LENGTH - 9];	// save room for the "You see "
+	vehicle_data *veh;
 	char_data *c;
 	room_data *to_room;
 	struct room_direction_data *ex;
@@ -943,6 +963,17 @@ void look_in_direction(char_data *ch, int dir) {
 					for (c = ROOM_PEOPLE(to_room); c; c = c->next_in_room) {
 						if (CAN_SEE(ch, c)) {
 							bufsize += snprintf(buf + bufsize, sizeof(buf) - bufsize, "%s, ", PERS(c, ch, FALSE));
+							if (last_comma_pos != -1) {
+								prev_comma_pos = last_comma_pos;
+							}
+							last_comma_pos = bufsize - 2;
+							++num_commas;
+						}
+					}
+					
+					LL_FOREACH2(ROOM_VEHICLES(to_room), veh, next_in_room) {
+						if (CAN_SEE_VEHICLE(ch, veh)) {
+							bufsize += snprintf(buf + bufsize, sizeof(buf) - bufsize, "%s, ", get_vehicle_short_desc(veh, ch));
 							if (last_comma_pos != -1) {
 								prev_comma_pos = last_comma_pos;
 							}
@@ -1034,6 +1065,17 @@ void look_in_direction(char_data *ch, int dir) {
 					++num_commas;
 				}
 			}
+			
+			LL_FOREACH2(ROOM_VEHICLES(to_room), veh, next_in_room) {
+				if (CAN_SEE_VEHICLE(ch, veh)) {
+					bufsize += snprintf(buf + bufsize, sizeof(buf) - bufsize, "%s, ", get_vehicle_short_desc(veh, ch));
+					if (last_comma_pos != -1) {
+						prev_comma_pos = last_comma_pos;
+					}
+					last_comma_pos = bufsize - 2;
+					++num_commas;
+				}
+			}
 		}
 		
 		/* Shift, rinse, repeat */
@@ -1100,9 +1142,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	extern int get_north_for_char(char_data *ch);
 	extern int get_direction_for_char(char_data *ch, int dir);
 	extern struct city_metadata_type city_type[];
-	extern const char *boat_icon_ocean;
-	extern const char *boat_icon_river;
-
+	
 	bool need_color_terminator = FALSE;
 	char buf[30], buf1[30], lbuf[MAX_STRING_LENGTH];
 	struct empire_city_data *city;
@@ -1115,7 +1155,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	sector_data *st, *base_sect = BASE_SECT(to_room);
 	char *base_color, *str;
 	room_data *map_loc = get_map_location_for(IN_ROOM(ch)), *map_to_room = get_map_location_for(to_room);
-	obj_data *on_ship;
+	vehicle_data *show_veh;
 	
 	// options
 	bool show_dark = IS_SET(options, LRR_SHOW_DARK) ? TRUE : FALSE;
@@ -1152,15 +1192,9 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 		return;
 	}
 	
-	// ship present -- in specific cases where it overrides the normal icon
-	else if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_SHIP_PRESENT) && (ROOM_SECT_FLAGGED(to_room, SECTF_FRESH_WATER | SECTF_OCEAN) || ((on_ship = GET_BOAT(HOME_ROOM(IN_ROOM(ch)))) && to_room == IN_ROOM(on_ship)))) {
-		// show boats in room
-		if (ROOM_SECT_FLAGGED(to_room, SECTF_OCEAN)) {
-			strcat(buf, boat_icon_ocean);
-		}
-		else {	// general else ... could be: if (ROOM_SECT_FLAGGED(to_room, SECTF_FRESH_WATER))
-			strcat(buf, boat_icon_river);
-		}
+	// check for a vehicle with an icon
+	else if ((show_veh = find_vehicle_to_show(ch, to_room))) {
+		strcat(buf, NULLSAFE(VEH_ICON(show_veh)));
 	}
 
 	/* Hidden buildings */
@@ -1540,6 +1574,7 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 	char buf[MAX_STRING_LENGTH], roombuf[MAX_INPUT_LENGTH], lastroom[MAX_INPUT_LENGTH], dirbuf[MAX_STRING_LENGTH], plrbuf[MAX_INPUT_LENGTH], infobuf[MAX_INPUT_LENGTH];
 	char_data *vict;
 	int mapsize, dist_iter;
+	vehicle_data *show_veh;
 	empire_data *emp;
 	room_data *to_room;
 	int repeats;
@@ -1595,10 +1630,10 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 			}
 			
 			// show ships
-			if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_SHIP_PRESENT) && ROOM_SECT_FLAGGED(to_room, SECTF_FRESH_WATER | SECTF_OCEAN)) {
-				sprintf(roombuf + strlen(roombuf), " <ship>");
+			if ((show_veh = find_vehicle_to_show(ch, to_room))) {
+				sprintf(roombuf + strlen(roombuf), " <%s>", skip_filler(get_vehicle_short_desc(show_veh, ch)));
 			}
-
+			
 			// show ownership (political)
 			if (PRF_FLAGGED(ch, PRF_POLITICAL)) {
 				emp = ROOM_OWNER(to_room);
@@ -1872,6 +1907,10 @@ void print_object_location(int num, obj_data *obj, char_data *ch, int recur) {
 		sprintf(buf + strlen(buf), "carried by %s\r\n", PERS(obj->carried_by, ch, 1));
 		send_to_char(buf, ch);
 	}
+	else if (obj->in_vehicle) {
+		sprintf(buf + strlen(buf), "inside %s\r\n", get_vehicle_short_desc(obj->in_vehicle, ch));
+		send_to_char(buf, ch);
+	}
 	else if (obj->worn_by) {
 		sprintf(buf + strlen(buf), "worn by %s\r\n", PERS(obj->worn_by, ch, 1));
 		send_to_char(buf, ch);
@@ -1891,10 +1930,11 @@ void print_object_location(int num, obj_data *obj, char_data *ch, int recur) {
 
 
 void perform_immort_where(char_data *ch, char *arg) {
-	register char_data *i;
-	register obj_data *k;
-	descriptor_data *d;
 	int check_x, check_y, num = 0, found = 0;
+	descriptor_data *d;
+	vehicle_data *veh;
+	char_data *i;
+	obj_data *k;
 
 	if (!*arg) {
 		send_to_char("Players\r\n-------\r\n", ch);
@@ -1937,6 +1977,20 @@ void perform_immort_where(char_data *ch, char *arg) {
 				}
 				else {
 					msg_to_char(ch, "M%3d. %-25s - %s(unknown) %s\r\n", ++num, GET_NAME(i), (IS_NPC(i) && i->proto_script) ? "[TRIG] " : "", get_room_name(IN_ROOM(i), FALSE));
+				}
+			}
+		}
+		num = 0;
+		LL_FOREACH2(vehicle_list, veh, next) {
+			if (CAN_SEE_VEHICLE(ch, veh) && multi_isname(arg, VEH_KEYWORDS(veh))) {
+				found = 1;
+				check_x = X_COORD(IN_ROOM(veh));	// not all locations are on the map
+				check_y = Y_COORD(IN_ROOM(veh));
+				if (CHECK_MAP_BOUNDS(check_x, check_y)) {
+					msg_to_char(ch, "V%3d. %-25s - %s(%*d, %*d) %s\r\n", ++num, VEH_SHORT_DESC(veh), (veh->proto_script ? "[TRIG] " : ""), X_PRECISION, check_x, Y_PRECISION, check_y, get_room_name(IN_ROOM(veh), FALSE));
+				}
+				else {
+					msg_to_char(ch, "V%3d. %-25s - %s(unknown) %s\r\n", ++num, VEH_SHORT_DESC(veh), (veh->proto_script ? "[TRIG] " : ""), get_room_name(IN_ROOM(veh), FALSE));
 				}
 			}
 		}
@@ -2030,8 +2084,7 @@ ACMD(do_scan) {
 	else if (!use_room || IS_ADVENTURE_ROOM(use_room) || ROOM_IS_CLOSED(use_room)) {	// check map room
 		msg_to_char(ch, "You can only use scan out on the map.\r\n");
 	}
-	else if (!GET_BOAT(IN_ROOM(ch)) && (IS_ADVENTURE_ROOM(IN_ROOM(ch)) || ROOM_IS_CLOSED(IN_ROOM(ch)))) {
-		// if not on a boat, can't see out from here
+	else if ((!GET_ROOM_VEHICLE(IN_ROOM(ch)) || !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_LOOK_OUT)) && (IS_ADVENTURE_ROOM(IN_ROOM(ch)) || ROOM_IS_CLOSED(IN_ROOM(ch)))) {
 		msg_to_char(ch, "Scan only works out on the map.\r\n");
 	}
 	else if ((dir = parse_direction(ch, argument)) == NO_DIR) {

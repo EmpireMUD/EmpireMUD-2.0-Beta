@@ -306,6 +306,90 @@ else
   done
 end
 ~
+#11113
+Raptor greet/aggro~
+0 g 100
+~
+if (%self.fighting% || %self.disabled% || %actor.nohassle% || !(%actor.room%==%self.room%) || !%actor.is_pc%)
+  halt
+end
+wait 5
+%echo% A raspy screech echoes through the caves and canyons!
+wait 3 sec
+if (%self.fighting% || %self.disabled% || %actor.nohassle% || !(%actor.room%==%self.room%))
+  halt
+end
+%echo% An ominous shadow passes overhead!
+wait 3 sec
+if (%self.fighting% || %self.disabled% || %actor.nohassle% || !(%actor.room%==%self.room%))
+  halt
+end
+%echo% You spot %self.name% in the air above!
+wait 3 sec
+if (%self.fighting% || %self.disabled% || %actor.nohassle% || !(%actor.room%==%self.room%))
+  halt
+end
+%echo% %self.name% goes into a dive, heading straight for you!
+wait 3 sec
+if (%self.fighting% || %self.disabled% || %actor.nohassle% || !(%actor.room%==%self.room%))
+  halt
+end
+mkill %actor%
+~
+#11114
+Loch colossus greet/aggro~
+0 g 100
+~
+if (%self.fighting% || %self.disabled% || %actor.nohassle% || !(%actor.room%==%self.room%) || !%actor.is_pc%)
+  halt
+end
+wait 5
+%echo% Ripples spread slowly across the surface of the loch...
+wait 3 sec
+if (%self.fighting% || %self.disabled% || %actor.nohassle% || !(%actor.room%==%self.room%))
+  halt
+end
+%echo% An ominous shadow circles below the water...
+wait 3 sec
+if (%self.fighting% || %self.disabled% || %actor.nohassle% || !(%actor.room%==%self.room%))
+  halt
+end
+%echo% %self.name% emerges from the water!
+wait 3 sec
+if (%self.fighting% || %self.disabled% || %actor.nohassle% || !(%actor.room%==%self.room%))
+  halt
+end
+%echoaround% %actor% %self.name% charges toward %actor.name%!
+%send% %actor% %self.name% charges toward you!
+wait 3 sec
+if (%self.fighting% || %self.disabled% || %actor.nohassle% || !(%actor.room%==%self.room%))
+  halt
+end
+mkill %actor%
+~
+#11115
+Vehicle Coupon Summon~
+1 c 2
+use~
+eval test %%self.is_name(%arg%)%%
+if !%test%
+  return 0
+  halt
+end
+if (%actor.position% != Standing)
+  %send% %actor% You can't do that right now.
+  halt
+end
+eval target %self.val0%
+%load% v %target%
+* Todo: eval vehicle %room_var.first_vehicle_in_room% / etc
+* and use %vehicle.name% instead of "a rib-bone boat"
+* (see mini-pet use for an example)
+eval room_var %self.room%
+%send% %actor% You use %self.shortdesc% and a rib-bone boat appears!
+%echoaround% %actor% %actor.name% uses %self.shortdesc% and a rib-bone boat appears!
+%purge% %self%
+~
 #11130
 Caretaker Replacement~
 2 q 100

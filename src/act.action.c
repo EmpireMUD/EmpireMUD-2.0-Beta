@@ -50,9 +50,9 @@ obj_data *has_shovel(char_data *ch);
 
 // cancel protos
 void cancel_chipping(char_data *ch);
+void cancel_driving(char_data *ch);
 void cancel_gen_craft(char_data *ch);
 void cancel_minting(char_data *ch);
-void cancel_sailing(char_data *ch);
 void cancel_sawing(char_data *ch);
 void cancel_scraping(char_data *ch);
 void cancel_siring(char_data *ch);
@@ -62,6 +62,7 @@ void cancel_tanning(char_data *ch);
 // process protos
 void perform_chant(char_data *ch);
 void process_chipping(char_data *ch);
+void process_driving(char_data *ch);
 void perform_ritual(char_data *ch);
 void perform_saw(char_data *ch);
 void perform_study(char_data *ch);
@@ -78,7 +79,6 @@ void process_fishing(char_data *ch);
 void process_gathering(char_data *ch);
 void process_gen_craft(char_data *ch);
 void process_harvesting(char_data *ch);
-void process_manufacturing(char_data *ch);
 void process_mining(char_data *ch);
 void process_minting(char_data *ch);
 void process_morphing(char_data *ch);
@@ -90,7 +90,7 @@ void process_prospecting(char_data *ch);
 void process_quarrying(char_data *ch);
 void process_reading(char_data *ch);
 void process_reclaim(char_data *ch);
-void process_sailing(char_data *ch);
+void process_repairing(char_data *ch);
 void process_scraping(char_data *ch);
 void process_siring(char_data *ch);
 void process_smelting(char_data *ch);
@@ -114,7 +114,7 @@ const struct action_data_struct action_data[] = {
 	{ "minting", "is minting coins.", ACTF_FAST_CHORES, process_minting, cancel_minting },	// ACT_MINTING
 	{ "fishing", "is fishing.", NOBITS, process_fishing, NULL },	// ACT_FISHING
 	{ "smelting", "is melting down ore.", ACTF_FAST_CHORES, process_smelting, cancel_smelting },	// ACT_MELTING
-	{ "manufacturing", "is working on the ship.", ACTF_HASTE | ACTF_FAST_CHORES, process_manufacturing, NULL },	// ACT_MANUFACTURING
+	{ "repairing", "is doing some repairs.", ACTF_FAST_CHORES | ACTF_HASTE, process_repairing, NULL },	// ACT_REPAIRING
 	{ "chipping", "is chipping rocks.", ACTF_FAST_CHORES, process_chipping, cancel_chipping },	// ACT_CHIPPING
 	{ "panning", "is panning for gold.", ACTF_FINDER, process_panning, NULL },	// ACT_PANNING
 	{ "music", "is playing soothing music.", ACTF_ANYWHERE | ACTF_HASTE, process_music, NULL },	// ACT_MUSIC
@@ -133,12 +133,13 @@ const struct action_data_struct action_data[] = {
 	{ "ritual", "is performing an arcane ritual.", NOBITS, perform_ritual, NULL },	// ACT_RITUAL
 	{ "sawing", "is sawing lumber.", ACTF_HASTE | ACTF_FAST_CHORES, perform_saw, cancel_sawing },	// ACT_SAWING
 	{ "quarrying", "is quarrying stone.", ACTF_HASTE | ACTF_FAST_CHORES, process_quarrying, NULL },	// ACT_QUARRYING
-		{ "unknown", "is doing something.", NOBITS, NULL, NULL },	// ACT_UNUSED1
+	{ "driving", "is driving.", ACTF_ALWAYS_FAST | ACTF_SITTING, process_driving, cancel_driving },	// ACT_DRIVING
 	{ "tanning", "is tanning leather.", ACTF_FAST_CHORES, process_tanning, cancel_tanning },	// ACT_TANNING
 	{ "reading", "is reading a book.", NOBITS, process_reading, NULL },	// ACT_READING
 	{ "copying", "is writing out a copy of a book.", NOBITS, process_copying_book, NULL },	// ACT_COPYING_BOOK
 	{ "crafting", "is working on something.", NOBITS, process_gen_craft, cancel_gen_craft },	// ACT_GEN_CRAFT
-	{ "sailing", "is sailing the ship.", ACTF_ALWAYS_FAST, process_sailing, cancel_sailing },	// ACT_SAILING
+	{ "sailing", "is sailing the ship.", ACTF_ALWAYS_FAST | ACTF_SITTING, process_driving, cancel_driving },	// ACT_SAILING
+	{ "piloting", "is piloting the vessel.", ACTF_ALWAYS_FAST | ACTF_SITTING, process_driving, cancel_driving },	// ACT_PILOTING
 
 	{ "\n", "\n", NOBITS, NULL, NULL }
 };
@@ -169,7 +170,7 @@ void cancel_action(char_data *ch) {
 * Begins an action.
 *
 * @param char_data *ch The actor
-* @param int type ACT_x const
+* @param int type ACT_ const
 * @param int timer Countdown in action ticks
 */
 void start_action(char_data *ch, int type, int timer) {
@@ -193,7 +194,7 @@ void start_action(char_data *ch, int type, int timer) {
 *
 * @param room_data *room Where.
 * @param int action ACTION_x or NOTHING to not stop actions.
-* @param int chore CHORE_x or NOTHING to not stop workforce.
+* @param int chore CHORE_ or NOTHING to not stop workforce.
 */
 void stop_room_action(room_data *room, int action, int chore) {
 	extern struct empire_chore_type chore_data[NUM_CHORES];
@@ -214,7 +215,7 @@ void stop_room_action(room_data *room, int action, int chore) {
 
 
 /**
-* This is the main processor for periodic actions (ACT_x), once per second.
+* This is the main processor for periodic actions (ACT_), once per second.
 */
 void update_actions(void) {
 	descriptor_data *desc;
@@ -235,7 +236,11 @@ void update_actions(void) {
 			cancel_action(ch);
 			continue;
 		}
-		if (FIGHTING(ch) || GET_POS(ch) < POS_STANDING || IS_WRITING(ch)) {
+		if (FIGHTING(ch) || IS_WRITING(ch)) {
+			cancel_action(ch);
+			continue;
+		}
+		if (GET_POS(ch) < POS_SITTING || GET_POS(ch) == POS_FIGHTING || (!IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_SITTING) && GET_POS(ch) < POS_STANDING)) {
 			cancel_action(ch);
 			continue;
 		}
@@ -245,24 +250,30 @@ void update_actions(void) {
 		}
 		
 		// action-cycle is time remaining -- compute how fast we go through it
-		speed = 1;	// default is 1 second per second
+		speed = 2;	// default is 2 per second (allowing it to be slowed)
 		
 		// things that modify speed...
 		if (IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_ALWAYS_FAST)) {
-			speed += 1;
+			speed += 2;
 		}
 		if (IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_HASTE) && AFF_FLAGGED(ch, AFF_HASTE)) {
-			speed += 1;
+			speed += 2;
 		}
 		if (IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_FAST_CHORES) && HAS_BONUS_TRAIT(ch, BONUS_FAST_CHORES)) {
-			speed += 1;
+			speed += 2;
 		}
 		if (IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_FINDER) && has_ability(ch, ABIL_FINDER)) {
-			speed += 1;
+			speed += 2;
 			gain_ability_exp(ch, ABIL_FINDER, 0.1);
 		}
 		if (IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_SHOVEL) && has_shovel(ch)) {
-			speed += 1;
+			speed += 2;
+		}
+		
+		// things that slow you down
+		if (AFF_FLAGGED(ch, AFF_SLOW) || IS_HUNGRY(ch) || IS_THIRSTY(ch) || IS_BLOOD_STARVED(ch)) {
+			speed /= 2;
+			speed = MAX(1, speed);	// don't stall them completely
 		}
 		
 		GET_ACTION_CYCLE(ch) -= speed;
@@ -334,28 +345,6 @@ void cancel_minting(char_data *ch) {
 	obj_data *obj = read_object(GET_ACTION_VNUM(ch, 0), TRUE);
 	obj_to_char_or_room(obj, ch);
 	load_otrigger(obj);
-}
-
-
-/**
-* Alerts people that the ship stops moving.
-*
-* @param char_data *ch The sailer.
-*/
-void cancel_sailing(char_data *ch) {
-	room_data *room;
-	obj_data *ship;
-	
-	// no ship? no work
-	if (!(ship = GET_BOAT(HOME_ROOM(IN_ROOM(ch))))) {
-		return;
-	}
-	
-	for (room = interior_room_list; room; room = room->next_interior) {
-		if (HOME_ROOM(room) == HOME_ROOM(IN_ROOM(ch)) && ROOM_PEOPLE(room)) {
-			act("The ship stops moving.", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
-		}
-	}
 }
 
 
@@ -1805,48 +1794,85 @@ void process_quarrying(char_data *ch) {
 
 
 /**
-* Tick update for sailing action.
+* Tick update for repairing action.
 *
-* @param char_data *ch The character doing the sailing.
+* @param char_data *ch The character doing the repairing.
 */
-void process_sailing(char_data *ch) {
-	extern bool move_ship(char_data *ch, obj_data *ship, int dir);
-	extern bool only_one_sailing(char_data *ch, obj_data *ship);
+void process_repairing(char_data *ch) {
+	extern vehicle_data *find_vehicle(int n);
 
-	int dir = GET_ACTION_VNUM(ch, 0);
-	obj_data *ship;
+	struct resource_data *res, *found_res = NULL;
+	obj_data *obj, *found_obj = NULL;
+	vehicle_data *veh;
 	
-	// not on a ship?
-	if (!(ship = GET_BOAT(HOME_ROOM(IN_ROOM(ch))))) {
+	// first attempt to re-find the vehicle
+	if (!(veh = find_vehicle(GET_ACTION_VNUM(ch, 0))) || IN_ROOM(veh) != IN_ROOM(ch) || !VEH_IS_COMPLETE(veh)) {
+		cancel_action(ch);
+		return;
+	}
+	if (!VEH_NEEDS_RESOURCES(veh) && VEH_HEALTH(veh) >= VEH_MAX_HEALTH(veh)) {
 		cancel_action(ch);
 		return;
 	}
 	
-	if (!only_one_sailing(ch, ship)) {
-		msg_to_char(ch, "Someone else is sailing the ship right now.\r\n");
-		GET_ACTION(ch) = ACT_NONE;	// silent stop -- no message to the whole ship
-		return;
-	}
+	// good to repair:
 	
-	// attempt to move the ship
-	if (!move_ship(ch, ship, dir)) {
-		look_at_room(ch);	// show them where they stopped
-		msg_to_char(ch, "\r\n");	// extra linebreak between look and "ship stops"
-		cancel_action(ch);
-		return;
-	}
-	
-	// limited distance?
-	if (GET_ACTION_VNUM(ch, 1) > 0) {
-		GET_ACTION_VNUM(ch, 1) -= 1;
-		
-		// arrived!
-		if (GET_ACTION_VNUM(ch, 1) <= 0) {
-			look_at_room(ch);	// show them where they stopped
-			msg_to_char(ch, "\r\n");	// extra linebreak between look and "ship stops"
-			cancel_action(ch);
-			return;
+	// find a resource to process
+	LL_FOREACH(VEH_NEEDS_RESOURCES(veh), res) {
+		// check inventory
+		LL_FOREACH2(ch->carrying, obj, next_content) {
+			if (GET_OBJ_VNUM(obj) == res->vnum) {
+				found_res = res;
+				found_obj = obj;
+				break;
+			}
 		}
+
+		// check room
+		if (!found_obj && can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
+			LL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_content) {
+				if (GET_OBJ_VNUM(obj) == res->vnum) {
+					found_res = res;
+					found_obj = obj;
+					break;
+				}
+			}
+		}
+		
+		if (found_obj && found_res) {
+			break;
+		}
+	}
+	
+	// found an item to add?
+	if (found_obj && found_res) {
+		found_res->amount -= 1;
+		
+		// check zero-res whether or not we found anything
+		if (found_res->amount <= 0) {
+			LL_DELETE(VEH_NEEDS_RESOURCES(veh), found_res);
+			free(found_res);
+		}
+		
+		// messaging
+		act("You use $p to repair $V.", FALSE, ch, found_obj, veh, TO_CHAR | TO_SPAMMY);
+		act("$n uses $p to repair $V.", FALSE, ch, found_obj, veh, TO_ROOM | TO_SPAMMY);
+		
+		// remove the resource
+		extract_obj(found_obj);
+	}
+	
+	// done?
+	if (!VEH_NEEDS_RESOURCES(veh)) {
+		GET_ACTION(ch) = ACT_NONE;
+		REMOVE_BIT(VEH_FLAGS(veh), VEH_INCOMPLETE);
+		VEH_HEALTH(veh) = VEH_MAX_HEALTH(veh);
+		act("$V is fully repaired!", FALSE, ch, NULL, veh, TO_CHAR | TO_ROOM);
+	}
+	else if (!found_obj) {
+		GET_ACTION(ch) = ACT_NONE;
+		msg_to_char(ch, "You run out of resources and stop repairing.\r\n");
+		act("$n runs out of resources and stops.", FALSE, ch, NULL, NULL, TO_ROOM);
 	}
 }
 

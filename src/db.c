@@ -177,9 +177,14 @@ int tips_of_the_day_size = 0;	// size of tip array
 // triggers
 trig_data *trigger_table = NULL;	// trigger prototype hash
 trig_data *trigger_list = NULL;	// LL of all attached triggers
-int max_mob_id = MOB_ID_BASE;	// for unique mob id's
-int max_obj_id = OBJ_ID_BASE;	// for unique obj id's
+int max_mob_id = MOB_ID_BASE;	// for unique mob ids
+int max_obj_id = OBJ_ID_BASE;	// for unique obj ids
+int max_vehicle_id = VEHICLE_ID_BASE;	// for unique vehicle ids
 int dg_owner_purged;	// For control of scripts
+
+// vehicles
+vehicle_data *vehicle_table = NULL;	// master vehicle hash table
+vehicle_data *vehicle_list = NULL;	// global linked list of vehicles (veh->next)
 
 // world / rooms
 room_data *world_table = NULL;	// hash table of the whole world
@@ -214,6 +219,7 @@ struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES] = {
 	{ ABIL_PREFIX, ABIL_SUFFIX },	// DB_BOOT_ABIL
 	{ CLASS_PREFIX, CLASS_SUFFIX },	// DB_BOOT_CLASS
 	{ SKILL_PREFIX, SKILL_SUFFIX },	// DB_BOOT_SKILL
+	{ VEH_PREFIX, VEH_SUFFIX },	// DB_BOOT_SKILL
 };
 
 
@@ -234,6 +240,7 @@ void boot_db(void) {
 	void delete_old_players();
 	void delete_orphaned_rooms();
 	void init_config_system();
+	void link_and_check_vehicles();
 	void load_banned();
 	void load_daily_cycle();
 	void load_intro_screens();
@@ -241,9 +248,9 @@ void boot_db(void) {
 	void load_tips_of_the_day();
 	void load_trading_post();
 	void reset_time();
+	int run_convert_vehicle_list();
 	void sort_commands();
 	void startup_room_reset();
-	void update_ships();
 	void verify_sectors();
 
 	log("Boot db -- BEGIN.");
@@ -312,24 +319,33 @@ void boot_db(void) {
 	log("Resetting all rooms.");
 	startup_room_reset();
 
-	log("Updating all ships.");
-	update_ships();
+	load_daily_cycle();
+	log("Beginning skill reset cycle at %d.", daily_cycle);
+	
+	// NOTE: check_version() updates many things that change from version to
+	// version. See the function itself for a list of one-time updates it runs
+	// on the game. This should run as late in boot_db() as possible.
+	log("Checking game version...");
+	check_version();
+	
+	// Some things runs AFTER check_version() because they rely on all version
+	// updates having been run on this EmpireMUD:
+	
+	log("Verifying world sectors.");
+	verify_sectors();
+	
+	// convert vehicles -- this normally does nothing, but it may free a temporary list
+	run_convert_vehicle_list();
 	
 	log("Checking for orphaned rooms...");
 	delete_orphaned_rooms();
-
-	load_daily_cycle();
-	log("Beginning skill reset cycle at %d.", daily_cycle);
-
-	boot_time = time(0);
 	
-	log("Checking game version...");
-	check_version();
-		
-	log("Verifying world sectors.");
-	verify_sectors();
-
+	log("Linking and checking vehicles.");
+	link_and_check_vehicles();
+	
+	// END
 	log("Boot db -- DONE.");
+	boot_time = time(0);
 }
 
 
@@ -393,6 +409,9 @@ void boot_world(void) {
 	
 	log("Loading crops.");
 	index_boot(DB_BOOT_CROP);
+	
+	log("Loading vehicles.");
+	index_boot(DB_BOOT_VEH);
 	
 	// requires sectors, buildings, and room templates -- order matters here
 	log("Loading the world.");
@@ -688,8 +707,8 @@ void delete_orphaned_rooms(void) {
 	for (room = interior_room_list; room; room = next_room) {
 		next_room = room->next_interior;
 		
-		// boats are checked separately
-		if (BUILDING_VNUM(room) == RTYPE_B_ONDECK && HOME_ROOM(room) == room) {
+		// vehicles are checked separately
+		if (ROOM_AFF_FLAGGED(room, ROOM_AFF_IN_VEHICLE) && HOME_ROOM(room) == room) {
 			continue;
 		}
 		
@@ -709,50 +728,6 @@ void delete_orphaned_rooms(void) {
 	
 	if (deleted) {
 		check_all_exits();
-	}
-}
-
-/**
-* Sets the boat pointers on all rooms associated with ships, sets the ship-
-* present flag on map rooms, and deletes boat interiors that have no exterior.
-*
-* This is meant to be called at startup.
-*/
-void update_ships(void) {
-	void check_for_ships_present(room_data *room);
-	
-	obj_data *o, *next_o;
-	room_data *rl, *room, *next_room;
-	bool found = FALSE;
-
-	for (o = object_list; o; o = next_o) {
-		next_o = o->next;
-
-		if (GET_OBJ_TYPE(o) == ITEM_SHIP) {
-			if ((rl = real_room(GET_SHIP_MAIN_ROOM(o)))) {
-				COMPLEX_DATA(rl)->boat = o;
-			}
-			else {
-				extract_obj(o);
-			}
-		}
-	}
-
-	HASH_ITER(hh, world_table, room, next_room) {
-		if (BUILDING_VNUM(room) == RTYPE_B_ONDECK && HOME_ROOM(room) == room && !GET_BOAT(room)) {
-			delete_room(room, FALSE);	// must check_all_exits
-			found = TRUE;
-		}
-		else if (GET_ROOM_VNUM(room) < MAP_SIZE) {
-			// regular map room? check for ships present
-			check_for_ships_present(room);
-		}
-	}
-	
-	// only bother this if we deleted anything
-	if (found) {
-		check_all_exits();
-		read_empire_territory(NULL);
 	}
 }
 
@@ -866,6 +841,9 @@ void renum_world(void) {
 			if (GET_ROOM_VNUM(room) > MAP_SIZE && (home = HOME_ROOM(room)) != room) {
 				if (COMPLEX_DATA(home)) {
 					COMPLEX_DATA(home)->inside_rooms++;
+				}
+				if (GET_ROOM_VEHICLE(home)) {
+					++VEH_INSIDE_ROOMS(GET_ROOM_VEHICLE(home));
 				}
 			}
 		}
@@ -1559,6 +1537,9 @@ char_data *read_mobile(mob_vnum nr, bool with_triggers) {
 		copy_proto_script(proto, mob, MOB_TRIGGER);
 		assign_triggers(mob, MOB_TRIGGER);
 	}
+	else {
+		mob->proto_script = NULL;
+	}
 
 	return (mob);
 }
@@ -1641,6 +1622,9 @@ obj_data *read_object(obj_vnum nr, bool with_triggers) {
 		copy_proto_script(proto, obj, OBJ_TRIGGER);
 		assign_triggers(obj, OBJ_TRIGGER);
 	}
+	else {
+		obj->proto_script = NULL;
+	}
 
 	return (obj);
 }
@@ -1661,6 +1645,7 @@ const char *versions_list[] = {
 	"b3.1",
 	"b3.2",
 	"b3.6",
+	"b3.8",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -2084,6 +2069,11 @@ void check_version(void) {
 		if (MATCH_VERSION("b3.6")) {
 			b3_6_einv_fix();
 		}
+		if (MATCH_VERSION("b3.8")) {
+			void b3_8_ship_update(void);	// vehicles.c
+			log("Applying b3.8 update to vehicles...");
+			b3_8_ship_update();
+}
 	}
 	
 	write_last_boot_version(current);

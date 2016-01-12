@@ -222,9 +222,10 @@ See also: FOLLOW
 #
 BOARD
 
-Usage:  board <ship>
+Usage:  board <vehicle>
 
-This command is used to board a ship in the same room.
+This command is used to board a ship or other vehicle in the same room. Not
+all vehicles can be boarded.
 
 See also: DISEMBARK, SAIL, MANUFACTURE, LOAD, SHIPS
 #
@@ -354,6 +355,25 @@ tailor.
 
 See also: TAILOR, WEAVE
 #
+CUSTOMIZE "CUSTOMIZE VEHICLE"
+
+Usage:  customize <type> [target] <field> <value | none>
+
+This command allows you to customize the names (and other text) of your 
+buildings and vehicles. You must have the correct privilege in your empire to
+customize its things.
+
+Valid types:
+- building (requires the Customize Building ability)
+- vehicle
+
+Valid fields:
+- name
+- longdesc: the text shown in the room (doesn't work on buildings)
+- description: will open a text editor
+
+See also: CUSTOMIZE BUILDING, TEXT EDITOR
+#
 DIAGNOSE
 
 Usage:  diagnose [character]
@@ -383,9 +403,8 @@ DISEMBARK
 
 Usage:  disembark
 
-From the entry room of a ship (the room you're placed in when you board it),
-you may disembark. This can be done even in the ocean, though you may need a
-smaller vessel unless you disembark very close to the shore.
+You can get out of vehicles (such as ships) with the disembark command. In some
+cases, you must do this from the same part of the vehicle where you entered.
 
 See also: BOARD, SAIL, UNLOAD, SHIPS
 #
@@ -399,7 +418,7 @@ dismiss it anywhere in the world.
 #
 DOUSE BURNING "PUT OUT FIRE" "FIRE BRIGADE"
 
-Usage:  douse
+Usage:  douse [vehicle]
 
 In the event of a fire, you may douse it with water from any portable source. 
 It may take a lot of water to douse the fire, and you may have to leave and 
@@ -411,6 +430,16 @@ you. They will always succeed if left alone. However, they do so very slowly
 and are easy targets for enemy players at war.
 
 See also: WORKFORCE
+#
+DRAG
+
+Usage:  drag <vehicle> <direction | portal>
+
+You can drag some vehicles, such as canoes, from room to room. Unlike "lead",
+you must use the drag command for each movement. You can only drag vehicles on
+land, never into the water.
+
+See also: BOARD, LEAD
 #
 DRAW
 
@@ -554,11 +583,13 @@ GET TAKE
 
 Usage:  get <object>
         take all [object]
-        take all all.<object>
-        get all.<object> all.<object>
+        take all all.<container>
+        get all.<object> all.<container>
 
 If you find something interesting on the ground, you may use 'get' to pick
-it up. 'get' can also be used to extract items from containers.
+it up. 'get' can also be used to extract items from containers. Some vehicles
+also act as containers, such as carts and ships. You can get items from a
+ship's cargo hold while inside the ship.
 
 Examples:
 
@@ -566,6 +597,7 @@ Examples:
   > get all corpse
   > get all all.bag
   > get all.bread all.bag
+  > get all caravel
 
 See also: DROP, KEEP, PUT
 #
@@ -660,9 +692,12 @@ See also: HELP
 #
 IDENTIFY
 
-Usage:  identify <item>
+Usage:  identify <item | vehicle>
 
-This command provides detailed information about an item.
+This command provides detailed information about an item or vehicle.
+
+Tip: When trying to identify an item in your inventory that has the same name
+as something you are wearing, try using "1.name".
 #
 INFORMATIVE "TOGGLE INFORMATIVE"
 
@@ -778,18 +813,16 @@ road underneath will be lost. Roads count as in-city territory as far away as
 
 See also: EMPIRE, ROADSIGN
 #
-LOAD BOATLOAD "BOAT LOAD"
+LOAD LOADVEHICLE "LOAD VEHICLE" BOATLOAD "BOAT LOAD"
 
-Usage:  load <ship> <item>
+Usage:  load <mob | vehicle | all> <onto vehicle>
 
-This command allows you to load items onto a ship. You can only do this at the
-docks.
+This command allows you to load animals and vehicles onto other vehicles, such
+as ships. To store items in vehicles, use "put <item> <vehicle>" instead.
 
-You can load items from your inventory or from the room. Only the Galleon can
-hold items like carts and catapults (or any item that won't fit in your
-inventory).
+This command was formerly called "boatload".
 
-See also: UNLOAD, BOARD, SAIL, SHIPS
+See also: UNLOAD, BOARD, PUT, SAIL, SHIPS
 #
 LOOK EXAMINE
 
@@ -1076,7 +1109,10 @@ Usage:  put <item> [in] <container>
         put all.<item> [in] <container>
         put all <container>
 
-For putting items into containers.
+For putting items into containers. This also works on some vehicles, like
+carts. Certain vehicles (like ships) also allow you to put items into them
+while inside the vehicle yourself -- like a container you can access from any
+room.
 
 Examples:
 
@@ -1131,6 +1167,18 @@ Examples:
   > remove all.bronze
 
 See also: GRAB, HOLD, WEAR, WIELD, SHEATH, DRAW, SWAP
+#
+REPAIR
+
+Usage:  repair <vehicle>
+
+This command allows you to repair vehicles that have decayed or been damaged.
+Like building, repair happens one item at a time using materials in your
+inventory or in the room with you.
+
+Fully repairing a vehicle will restore it to full health.
+
+See also: STOP, WORKFORCE
 #
 REPLY
 
@@ -1194,23 +1242,24 @@ tag next to your name on the "who" list.
 
 See also: TOGGLE
 #
-SAIL
+SAIL DRIVE PILOT
 
-Usage:  sail <direction> [distance]
+Usage:  sail <direction | portal> [distance]
+        drive <direction | portal> [distance]
+        pilot <direction | portal> [distance]
 
-You can sail the ship from any location inside, for your convenience. Ships
-can travel on oceans and rivers, through river gates, and under bridges. 
-Though this is fairly slow, it is one of the most efficient means of 
-transoceanic travel.
+These three commands are used to control ships, carriages, and other vehicles.
+Which command you use depends upon the type of vehicle. Travel in this manner
+is usually slow, but does not require movement points. You need to either be
+sitting on the vehicle, or inside of it, to do this.
 
-If you specify a distance, you will only sail that many tiles.
+If you specify a distance, you will only travel that many tiles. If not, you
+will continue to move until you hit an obstacle.
 
-Once you've started sailing, the ship will move every few seconds in that
-direction, for as long as you're sailing it. You can type 'sail' again to
-stop, or to change directions. If you don't like seeing the messages each time
-the ship moves, you can 'toggle action-spam'.
+You can use 'stop' to cancel travel at any time. If you don't like seeing the
+messages each time the ship moves, you can 'toggle action-spam'.
 
-See also: BOARD, DISEMBARK, SHIPBUILDING, SHIPS, STOP, TOGGLE
+See also: BOARD, DISEMBARK, DRAG, LEAD, SHIPBUILDING, SHIPS, STOP, TOGGLE
 #
 SAVE
 
@@ -1283,6 +1332,15 @@ and (1) represents the number of ability points you have to spend.
 Score also shows things which are affecting you.
 
 See also: SHIELD BLOCK, AFFECTS, SKILL LEVEL, CLASS, GEAR LEVEL
+#
+SCRAP
+
+Usage:  scrap <vehicle>
+
+This command is used to cancel a partially-built vehicle. No materials will be
+refunded.
+
+See also: MANUFACTURE
 #
 "SCREEN READERS" SCREENREADERS SCREEN-READERS
 
@@ -1602,11 +1660,15 @@ Immortal toggles:
   incognito - if on, the immortal does not appear on 'who' to mortals
   wizhide - if on, the immortal can't be seen in rooms but is not invisible
 #
-UNLOAD BOATUNLOAD
+UNLOAD UNLOADVEHICLE BOATUNLOAD
 
-Usage:  unload <ship>
+Usage:  unload <mob | vehicle | all>
 
-This command allows you to unload cargo from a ship at the docks.
+This command unloads a mob or vehicle from the vehicle you are in. You must
+be inside a vehicle, and targeting a mob or vehicle (or "all") in the room
+with you.
+
+This command was previously also called boatunload.
 
 See also: LOAD, BOARD, SAIL, SHIPS
 #
@@ -1631,6 +1693,9 @@ For changing your position. If you feel weary, it's probably a good idea to
 sit and rest for a while, or maybe even take a nap.
 
 Wake can also be used to wake up other players.
+
+Sit can also target certain vehicles and furniture, allowing you to sit on
+them.
 
 See also: SLEEP
 #

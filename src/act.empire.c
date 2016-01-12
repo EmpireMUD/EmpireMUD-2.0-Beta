@@ -64,6 +64,53 @@ void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool 
 //// HELPERS /////////////////////////////////////////////////////////////////
 
 /**
+* Updates all shipping ids (run before converting vehicle ownership) and moves
+* shipping data to the new empire. Call this during an empire merge.
+*
+* @param empire_data *old_emp
+* @param empire_data *new_emp
+*/
+void convert_empire_shipping(empire_data *old_emp, empire_data *new_emp) {
+	extern int find_free_shipping_id(empire_data *emp);
+	
+	struct shipping_data *sd, *next_sd;
+	vehicle_data *veh;
+	int old_id, new_id;
+	
+	LL_FOREACH(vehicle_list, veh) {
+		if (VEH_OWNER(veh) != old_emp || VEH_SHIPPING_ID(veh) == -1) {
+			continue;
+		}
+		
+		old_id = VEH_SHIPPING_ID(veh);
+		new_id = find_free_shipping_id(new_emp);
+		
+		LL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(old_emp), sd, next_sd) {
+			if (sd->shipping_id == old_id) {
+				sd->shipping_id = new_id;
+			}
+		}
+		
+		VEH_SHIPPING_ID(veh) = new_id;
+	}
+	
+	// move all shipping entries over
+	if ((sd = EMPIRE_SHIPPING_LIST(new_emp))) {
+		// append to end
+		while (sd->next) {
+			sd = sd->next;
+		}
+		sd->next = EMPIRE_SHIPPING_LIST(old_emp);
+	}
+	else {
+		EMPIRE_SHIPPING_LIST(new_emp) = EMPIRE_SHIPPING_LIST(old_emp);
+	}
+	
+	EMPIRE_SHIPPING_LIST(old_emp) = NULL;
+}
+
+
+/**
 * Determines how much an empire must spend to start a war with another empire,
 * based on the configs "war_cost_max" and "war_cost_min". This is calculated
 * by the difference in score between the two empires with the maximum value at
@@ -1219,6 +1266,7 @@ void upgrade_city(char_data *ch, char *argument) {
 struct efind_group {
 	room_data *location;	// where
 	obj_data *obj;	// 1st object for this set (used for names, etc)
+	vehicle_data *veh;	// 1st vehicle for this set
 	int count;	// how many found
 	bool stackable;	// whether or not this can stack
 	
@@ -1226,17 +1274,48 @@ struct efind_group {
 };
 
 
-// simple increment/add function for managing efind groups
-void add_obj_to_efind(struct efind_group **list, obj_data *obj, room_data *location) {
+/**
+* simple increment/add function for managing efind groups -- supports obj or
+* vehicle (not both in 1 call).
+*
+* @param struct efind_group **list The list to add to/update.
+* @param obj_data *obj The object to add (optional; use NULL if none).
+* @param vehicle_data *veh The vehicle to add (optional; use NULL if none).
+* @param room_data *location Where it is.
+*/
+void add_obj_to_efind(struct efind_group **list, obj_data *obj, vehicle_data *veh, room_data *location) {
 	struct efind_group *eg, *temp;
 	bool found = FALSE;
 	
-	if (OBJ_CAN_STACK(obj)) {
-		for (eg = *list; !found && eg; eg = eg->next) {
+	// need 1 or the other
+	if (!obj && !veh) {
+		return;
+	}
+	
+	if (obj && OBJ_CAN_STACK(obj)) {
+		LL_FOREACH(*list, eg) {
 			if (eg->location == location && eg->stackable && GET_OBJ_VNUM(eg->obj) == GET_OBJ_VNUM(obj)) {
 				eg->count += 1;
 				found = TRUE;
+				break;
 			}
+		}
+	}
+	if (veh) {
+		LL_FOREACH(*list, eg) {
+			if (eg->location != location) {
+				continue;
+			}
+			if (!eg->veh || VEH_VNUM(eg->veh) != VEH_VNUM(veh)) {
+				continue;
+			}
+			if (VEH_SHORT_DESC(eg->veh) != VEH_SHORT_DESC(veh)) {
+				continue;
+			}
+			
+			eg->count += 1;
+			found = TRUE;
+			break;
 		}
 	}
 	
@@ -1245,8 +1324,9 @@ void add_obj_to_efind(struct efind_group **list, obj_data *obj, room_data *locat
 		
 		eg->location = location;
 		eg->obj = obj;
+		eg->veh = veh;
 		eg->count = 1;
-		eg->stackable = OBJ_CAN_STACK(obj);
+		eg->stackable = obj ? OBJ_CAN_STACK(obj) : FALSE;	// not used for vehicle
 		eg->next = NULL;
 		
 		if (*list) {
@@ -1856,6 +1936,7 @@ void scan_for_tile(char_data *ch, char *argument) {
 	char output[MAX_STRING_LENGTH], line[128];
 	room_data *map, *room;
 	size_t size, lsize;
+	vehicle_data *veh;
 	crop_data *crop;
 	bool ok;
 	
@@ -1906,7 +1987,22 @@ void scan_for_tile(char_data *ch, char *argument) {
 				ok = TRUE;
 			}
 			else {
-				continue;
+				// try finding a matching vehicle visible in the tile
+				LL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+					if (!VEH_ICON(veh) || !VEH_IS_COMPLETE(veh)) {
+						continue;
+					}
+					if (!CAN_SEE_VEHICLE(ch, veh)) {
+						continue;
+					}
+					if (!multi_isname(argument, VEH_KEYWORDS(veh))) {
+						continue;
+					}
+					
+					// found a vehicle match (only need 1)
+					ok = TRUE;
+					break;
+				}
 			}
 			
 			if (ok) {
@@ -2025,24 +2121,89 @@ void sort_territory_node_list_by_distance(room_data *from, struct find_territory
  //////////////////////////////////////////////////////////////////////////////
 //// EMPIRE COMMANDS /////////////////////////////////////////////////////////
 
-ACMD(do_abandon) {
-	empire_data *e;
-
-	if ((e = ROOM_OWNER(IN_ROOM(ch))) != GET_LOYALTY(ch))
-		msg_to_char(ch, "You don't own this acre.\r\n");
-	else if (IS_CITY_CENTER(IN_ROOM(ch))) {
+/**
+* Command sub-processor for abandoning a room.
+*
+* @param char_data *ch The player trying to abandon.
+* @param room_data *room The room to abandon.
+*/
+void do_abandon_room(char_data *ch, room_data *room) {
+	if (!ROOM_OWNER(room) || ROOM_OWNER(room) != GET_LOYALTY(ch)) {
+		msg_to_char(ch, "You don't even own the area.\r\n");
+	}
+	else if (IS_CITY_CENTER(room)) {
 		msg_to_char(ch, "You can't abandon a city center that way -- use \"city abandon\".\r\n");
 	}
-	else if (!has_permission(ch, PRIV_CEDE)) {
-		msg_to_char(ch, "You don't have permission to abandon land.\r\n");
-	}
-	else if (HOME_ROOM(IN_ROOM(ch)) != IN_ROOM(ch)) {
-		msg_to_char(ch, "Just abandon the main room for the building.\r\n");
+	else if (HOME_ROOM(room) != room) {
+		msg_to_char(ch, "Just abandon the main room.\r\n");
 	}
 	else {
-		msg_to_char(ch, "Territory abandoned.\r\n");
-		abandon_room(IN_ROOM(ch));
-		read_empire_territory(e);
+		if (room != IN_ROOM(ch) && has_ability(ch, ABIL_NAVIGATION)) {
+			msg_to_char(ch, "(%d, %d) abandoned.\r\n", X_COORD(room), Y_COORD(room));
+			if (ROOM_PEOPLE(room)) {
+				act("$N abandons $S claim to this area.", FALSE, ROOM_PEOPLE(room), NULL, ch, TO_CHAR | TO_ROOM);
+			}
+		}
+		else {
+			msg_to_char(ch, "Territory abandoned.\r\n");
+			act("$n abandons $s claim to this area.", FALSE, ch, NULL, NULL, TO_ROOM);
+		}
+		abandon_room(room);
+		read_empire_territory(GET_LOYALTY(ch));
+	}
+}
+
+
+/**
+* Command sub-processor for abandoning a vehicle.
+*
+* @param char_data *ch The player trying to abandon.
+* @param vehicle_data *veh The vehicle to abandon.
+*/
+void do_abandon_vehicle(char_data *ch, vehicle_data *veh) {
+	if (!VEH_OWNER(veh) || VEH_OWNER(veh) != GET_LOYALTY(ch)) {
+		msg_to_char(ch, "You don't even own that.\r\n");
+	}
+	else {
+		act("You abandon $V.", FALSE, ch, NULL, veh, TO_CHAR);
+		act("$n abandons $V.", FALSE, ch, NULL, veh, TO_ROOM);
+		VEH_OWNER(veh) = NULL;
+		
+		if (VEH_INTERIOR_HOME_ROOM(veh)) {
+			abandon_room(VEH_INTERIOR_HOME_ROOM(veh));
+		}
+	}
+}
+
+
+ACMD(do_abandon) {
+	char arg[MAX_INPUT_LENGTH];
+	vehicle_data *veh;
+
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	one_argument(argument, arg);
+	
+	if (!GET_LOYALTY(ch)) {
+		msg_to_char(ch, "You're not part of an empire.\r\n");
+	}
+	else if (GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_CEDE)) {
+		// this doesn't use has_permission because that would check if the land is owned already
+		msg_to_char(ch, "You don't have permission to abandon.\r\n");
+	}
+	else if (*arg && (veh = get_vehicle_in_room_vis(ch, arg))) {
+		do_abandon_vehicle(ch, veh);
+	}
+	else if (*arg) {
+		msg_to_char(ch, "You don't see that to abandon.\r\n");
+	}
+	else if (GET_ROOM_VEHICLE(IN_ROOM(ch))) {
+		do_abandon_vehicle(ch, GET_ROOM_VEHICLE(IN_ROOM(ch)));
+	}
+	else {
+		do_abandon_room(ch, IN_ROOM(ch));
 	}
 }
 
@@ -2078,7 +2239,7 @@ ACMD(do_barde) {
 	else if (!IS_NPC(mob)) {
 		act("You can't barde $N!", FALSE, ch, 0, mob, TO_CHAR);
 	}
-	else if (GET_PULLING(mob) || GET_LED_BY(mob)) {
+	else if (GET_LED_BY(mob)) {
 		act("You can't barde $M right now.", FALSE, ch, NULL, mob, TO_CHAR);
 	}
 	else if (ABILITY_TRIGGERS(ch, mob, NULL, ABIL_BARDE)) {
@@ -2259,46 +2420,120 @@ ACMD(do_city) {
 }
 
 
-ACMD(do_claim) {
-	empire_data *e;
+/**
+* Processes a "claim" targeting a room.
+*
+* @param char_data *ch The player trying to claim.
+* @param room_data *room The room he's trying to claim.
+*/
+void do_claim_room(char_data *ch, room_data *room) {
+	empire_data *emp = get_or_create_empire(ch);
 	bool junk;
-
-	if (IS_NPC(ch))
-		return;
-
-	// this will found an empire if the character has none
-	e = get_or_create_empire(ch);
-
-	if (!e)
-		msg_to_char(ch, "You don't belong to any empire.\r\n");
-	else if (ROOM_OWNER(IN_ROOM(ch)) == e)
-		msg_to_char(ch, "Your empire already owns this acre.\r\n");
-	else if (GET_RANK(ch) < EMPIRE_PRIV(e, PRIV_CLAIM)) {
-		// this doesn't use has_permission because that would check if the land is owned already
-		msg_to_char(ch, "You don't have permission to claim land for the empire.\r\n");
+	
+	if (!emp) {
+		msg_to_char(ch, "You don't belong to any empre.\r\n");
 	}
-	else if (IS_CITY_CENTER(IN_ROOM(ch))) {
+	else if (ROOM_OWNER(room) == emp) {
+		msg_to_char(ch, "Your empire already owns this area.\r\n");
+	}
+	else if (IS_CITY_CENTER(room)) {
 		msg_to_char(ch, "You can't claim a city center.\r\n");
 	}
-	else if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_NO_CLAIM) || ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE | ROOM_AFF_HAS_INSTANCE))
-		msg_to_char(ch, "This tile can't be claimed.\r\n");
-	else if (ROOM_OWNER(IN_ROOM(ch)) != NULL)
-		msg_to_char(ch, "This acre is already claimed.\r\n");
-	else if (HOME_ROOM(IN_ROOM(ch)) != IN_ROOM(ch))
-		msg_to_char(ch, "Just claim the main room for the building.\r\n");
-	else if (!can_claim(ch))
-		msg_to_char(ch, "You can't claim any more land.\r\n");
-	else if (!can_build_or_claim_at_war(ch, IN_ROOM(ch))) {
-		msg_to_char(ch, "You can't claim here while at war with the empire that controls this area.\r\n");
+	else if (ROOM_SECT_FLAGGED(room, SECTF_NO_CLAIM) || ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE | ROOM_AFF_HAS_INSTANCE)) {
+		msg_to_char(ch, "The tile can't be claimed.\r\n");
 	}
-	else if (!is_in_city_for_empire(IN_ROOM(ch), e, FALSE, &junk) && EMPIRE_OUTSIDE_TERRITORY(e) >= land_can_claim(e, TRUE)) {
-		msg_to_char(ch, "You can't claim this land because you're over the 20%% of your territory that can be outside of cities.\r\n");
+	else if (ROOM_OWNER(room) != NULL) {
+		msg_to_char(ch, "The area is already claimed.\r\n");
+	}
+	else if (HOME_ROOM(room) != room) {
+		msg_to_char(ch, "Just claim the entrance room.\r\n");
+	}
+	else if (!can_claim(ch)) {
+		msg_to_char(ch, "You can't claim any more land.\r\n");
+	}
+	else if (!can_build_or_claim_at_war(ch, room)) {
+		msg_to_char(ch, "You can't claim while at war with the empire that controls this area.\r\n");
+	}
+	else if (!is_in_city_for_empire(room, emp, FALSE, &junk) && EMPIRE_OUTSIDE_TERRITORY(emp) >= land_can_claim(emp, TRUE)) {
+		msg_to_char(ch, "You can't claim the area because you're over the 20%% of your territory that can be outside of cities.\r\n");
 	}
 	else {
 		send_config_msg(ch, "ok_string");
-		claim_room(IN_ROOM(ch), e);
-		read_empire_territory(e);
-		save_empire(e);
+		if (room == IN_ROOM(ch)) {
+			act("$n stakes a claim to this area.", FALSE, ch, NULL, NULL, TO_ROOM);
+		}
+		else if (ROOM_PEOPLE(room)) {
+			act("$N stakes a claim to this area.", FALSE, ROOM_PEOPLE(room), NULL, ch, TO_CHAR | TO_ROOM);
+		}
+		claim_room(room, emp);
+		read_empire_territory(emp);
+		save_empire(emp);
+	}
+}
+
+
+/**
+* Processes a "claim" targeting a vehicle.
+*
+* @param char_data *ch The player trying to claim.
+* @param vehicle_data *veh The vehicle he's trying to claim.
+*/
+void do_claim_vehicle(char_data *ch, vehicle_data *veh) {
+	empire_data *emp = get_or_create_empire(ch);
+	
+	if (!emp) {
+		msg_to_char(ch, "You don't belong to any empre.\r\n");
+	}
+	else if (VEH_OWNER(veh) == emp) {
+		msg_to_char(ch, "Your empire already owns that.\r\n");
+	}
+	else if (VEH_OWNER(veh)) {
+		msg_to_char(ch, "Someone else already owns that.\r\n");
+	}
+	else {
+		send_config_msg(ch, "ok_string");
+		act("$n claims $V.", FALSE, ch, NULL, veh, TO_ROOM);
+		VEH_OWNER(veh) = emp;
+		VEH_SHIPPING_ID(veh) = -1;
+		
+		if (VEH_INTERIOR_HOME_ROOM(veh)) {
+			if (ROOM_OWNER(VEH_INTERIOR_HOME_ROOM(veh))) {
+				abandon_room(VEH_INTERIOR_HOME_ROOM(veh));
+			}
+			claim_room(VEH_INTERIOR_HOME_ROOM(veh), emp);
+		}
+	}
+}
+
+
+ACMD(do_claim) {
+	char arg[MAX_INPUT_LENGTH];
+	vehicle_data *veh;
+
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	one_argument(argument, arg);
+
+	if (!get_or_create_empire(ch)) {
+		msg_to_char(ch, "You don't belong to any empire.\r\n");
+	}
+	else if (GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_CLAIM)) {
+		// this doesn't use has_permission because that would check if the land is owned already
+		msg_to_char(ch, "You don't have permission to claim for the empire.\r\n");
+	}
+	else if (*arg && (veh = get_vehicle_in_room_vis(ch, arg))) {
+		do_claim_vehicle(ch, veh);
+	}
+	else if (*arg) {
+		msg_to_char(ch, "You don't see that to claim.\r\n");
+	}
+	else if (GET_ROOM_VEHICLE(IN_ROOM(ch))) {
+		do_claim_vehicle(ch, GET_ROOM_VEHICLE(IN_ROOM(ch)));
+	}
+	else {
+		do_claim_room(ch, IN_ROOM(ch));
 	}
 }
 
@@ -2697,6 +2932,8 @@ ACMD(do_diplomacy) {
 
 
 ACMD(do_efind) {
+	extern char *get_vehicle_short_desc(vehicle_data *veh, char_data *to);
+	
 	char buf[MAX_STRING_LENGTH*2];
 	obj_data *obj;
 	empire_data *emp;
@@ -2704,6 +2941,7 @@ ACMD(do_efind) {
 	bool all = FALSE;
 	room_data *last_rm, *iter, *next_iter;
 	struct efind_group *eg, *next_eg, *list = NULL;
+	vehicle_data *veh;
 	size_t size;
 	
 	one_argument(argument, arg);
@@ -2729,11 +2967,27 @@ ACMD(do_efind) {
 			if (ROOM_OWNER(iter) == emp) {			
 				for (obj = ROOM_CONTENTS(iter); obj; obj = obj->next_content) {
 					if ((all && CAN_WEAR(obj, ITEM_WEAR_TAKE)) || (!all && isname(arg, obj->name))) {
-						add_obj_to_efind(&list, obj, iter);
+						add_obj_to_efind(&list, obj, NULL, iter);
 						++total;
 					}
 				}
 			}
+		}
+		
+		// next, vehicles
+		LL_FOREACH(vehicle_list, veh) {
+			if (!IN_ROOM(veh)) {
+				continue;
+			}
+			if (VEH_OWNER(veh) != emp && (VEH_OWNER(veh) != NULL || ROOM_OWNER(IN_ROOM(veh)) != emp)) {
+				continue;
+			}
+			if (!all && !isname(arg, VEH_KEYWORDS(veh))) {
+				continue;
+			}
+			
+			add_obj_to_efind(&list, NULL, veh, IN_ROOM(veh));
+			++total;
 		}
 
 		if (total > 0) {
@@ -2778,7 +3032,12 @@ ACMD(do_efind) {
 					size += snprintf(buf + size, sizeof(buf) - size, "%dx ", eg->count);
 				}
 				
-				size += snprintf(buf + size, sizeof(buf) - size, "%s", get_obj_desc(eg->obj, ch, OBJ_DESC_SHORT));
+				if (eg->obj) {
+					size += snprintf(buf + size, sizeof(buf) - size, "%s", get_obj_desc(eg->obj, ch, OBJ_DESC_SHORT));
+				}
+				else if (eg->veh) {
+					size += snprintf(buf + size, sizeof(buf) - size, "%s", get_vehicle_short_desc(eg->veh, ch));
+				}
 				free(eg);
 			}
 			// all free! free!
@@ -3084,7 +3343,8 @@ ACMD(do_enroll) {
 	struct empire_city_data *city, *next_city, *temp;
 	player_index_data *index, *next_index;
 	struct empire_unique_storage *eus;
-	struct shipping_data *shipd;
+	struct vehicle_attached_mob *vam;
+	vehicle_data *veh, *next_veh;
 	empire_data *e, *old;
 	room_data *room, *next_room;
 	int old_store;
@@ -3181,6 +3441,21 @@ ACMD(do_enroll) {
 					obj->last_empire_id = EMPIRE_VNUM(e);
 				}
 			}
+			
+			// convert shipping (before doing vehicles)
+			convert_empire_shipping(old, e);
+			
+			// vehicles
+			LL_FOREACH_SAFE2(vehicle_list, veh, next_veh, next) {
+				if (VEH_OWNER(veh) == old) {
+					VEH_OWNER(veh) = e;
+				}
+				LL_FOREACH(VEH_ANIMALS(veh), vam) {
+					if (vam->empire == EMPIRE_VNUM(old)) {
+						vam->empire = EMPIRE_VNUM(e);
+					}
+				}
+			}
 
 			// storage
 			for (store = EMPIRE_STORAGE(old); store; store = store->next) {
@@ -3198,21 +3473,6 @@ ACMD(do_enroll) {
 				if (store2->amount < old_store || store2->amount > MAX_STORAGE) {
 					store2->amount = MAX_STORAGE;
 				}
-			}
-			
-			// shipping: append to end of current empire's list
-			if (EMPIRE_SHIPPING_LIST(old)) {
-				// find end
-				if ((shipd = EMPIRE_SHIPPING_LIST(e))) {
-					while (shipd->next) {
-						shipd = shipd->next;
-					}
-					shipd->next = EMPIRE_SHIPPING_LIST(old);
-				}
-				else {
-					EMPIRE_SHIPPING_LIST(e) = EMPIRE_SHIPPING_LIST(old);
-				}
-				EMPIRE_SHIPPING_LIST(old) = NULL;
 			}
 			
 			// unique storage: append to end of current empire's list
@@ -3629,6 +3889,9 @@ ACMD(do_home) {
 		else if (GET_POS(ch) < POS_STANDING) {
 			msg_to_char(ch, "You can't do that right now. You need to be standing.\r\n");
 		}
+		else if (GET_ROOM_VEHICLE(IN_ROOM(ch))) {
+			msg_to_char(ch, "You can't set your home in a vehicle.\r\n");
+		}
 		else if (!GET_LOYALTY(ch) || ROOM_OWNER(real) != GET_LOYALTY(ch)) {
 			msg_to_char(ch, "You need to own a building to make it your home.\r\n");
 		}
@@ -3900,6 +4163,9 @@ ACMD(do_tomb) {
 		}
 		else if (GET_POS(ch) < POS_STANDING) {
 			msg_to_char(ch, "You can't do that right now. You need to be standing.\r\n");
+		}
+		else if (GET_ROOM_VEHICLE(IN_ROOM(ch))) {
+			msg_to_char(ch, "You can't set your tomb in a vehicle.\r\n");
 		}
 		else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 			msg_to_char(ch, "You need to own a building to make it your tomb.\r\n");

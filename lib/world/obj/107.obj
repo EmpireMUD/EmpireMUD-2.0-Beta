@@ -5,7 +5,7 @@ The North Portal is blowing snow all over the place!~
    The portal howls with wind as snow blows through it. There's a blizzard on
 the other side, but through the noise you think you hear caroling.
 ~
-8 0 0 2
+8 0 0 3
 0 0 0
 10 0
 S
@@ -191,15 +191,14 @@ C
 100 100
 S
 #10715
-sleigh red sleek~
-the sleigh~
-A sleek red sleigh is parked here.~
-   The sleigh is small, but there's a curious red sack in the back that seems
-to hold a great deal.
+sleigh broken~
+a broken sleigh~
+A broken sleigh is parked here.~
+This item is deprecated.
 ~
-16 0 0 2
+16 0 0 3
 300 1 0
-0 0
+0 1
 S
 #10716
 cookies plate christmas~

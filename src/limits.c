@@ -31,6 +31,7 @@
 *   Empire Limits
 *   Object Limits
 *   Room Limits
+*   Vehicle Limits
 *   Miscellaneous Limits
 *   Periodic Gainers
 *   Core Periodicals
@@ -333,8 +334,8 @@ void point_update_char(char_data *ch) {
 	}
 	
 	// check spawned
-	if (REAL_NPC(ch) && !ch->desc && MOB_FLAGGED(ch, MOB_SPAWNED) && (!MOB_FLAGGED(ch, MOB_ANIMAL) || !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_STABLE)) && MOB_SPAWN_TIME(ch) < (time(0) - config_get_int("mob_spawn_interval") * SECS_PER_REAL_MIN) && !GET_BOAT(IN_ROOM(ch))) {
-		if (!GET_LED_BY(ch) && !GET_LEADING(ch) && !GET_PULLING(ch) && !MOB_FLAGGED(ch, MOB_TIED)) {
+	if (REAL_NPC(ch) && !ch->desc && MOB_FLAGGED(ch, MOB_SPAWNED) && (!MOB_FLAGGED(ch, MOB_ANIMAL) || !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_STABLE)) && MOB_SPAWN_TIME(ch) < (time(0) - config_get_int("mob_spawn_interval") * SECS_PER_REAL_MIN)) {
+		if (!GET_LED_BY(ch) && !GET_LEADING_MOB(ch) && !GET_LEADING_VEHICLE(ch) && !MOB_FLAGGED(ch, MOB_TIED)) {
 			if (distance_to_nearest_player(IN_ROOM(ch)) > config_get_int("mob_despawn_radius")) {
 				despawn_mob(ch);
 				return;
@@ -423,6 +424,7 @@ void real_update_char(char_data *ch) {
 	extern bool can_wear_item(char_data *ch, obj_data *item, bool send_messages);
 	void check_morph_ability(char_data *ch);
 	extern int compute_bonus_exp_per_day(char_data *ch);
+	void do_unseat_from_vehicle(char_data *ch);
 	extern int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname);	
 	void random_encounter(char_data *ch);
 	void update_biting_char(char_data *ch);
@@ -441,6 +443,23 @@ void real_update_char(char_data *ch) {
 	
 	if (!IS_NPC(ch) && GET_MORPH(ch) != MORPH_NONE) {
 		check_morph_ability(ch);
+	}
+	
+	if (GET_LEADING_VEHICLE(ch) && IN_ROOM(ch) != IN_ROOM(GET_LEADING_VEHICLE(ch))) {
+		act("You have lost $V and stop leading it.", FALSE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_CHAR);
+		VEH_LED_BY(GET_LEADING_VEHICLE(ch)) = NULL;
+		GET_LEADING_VEHICLE(ch) = NULL;
+	}
+	if (GET_LEADING_MOB(ch) && IN_ROOM(ch) != IN_ROOM(GET_LEADING_MOB(ch))) {
+		act("You have lost $N and stop leading $M.", FALSE, ch, NULL, GET_LEADING_MOB(ch), TO_CHAR);
+		GET_LED_BY(GET_LEADING_MOB(ch)) = NULL;
+		GET_LEADING_MOB(ch) = NULL;
+	}
+	if (GET_SITTING_ON(ch)) {
+		// things that cancel sitting-on:
+		if (IN_ROOM(ch) != IN_ROOM(GET_SITTING_ON(ch)) || GET_POS(ch) != POS_SITTING || IS_RIDING(ch) || GET_LEADING_MOB(ch) || GET_LEADING_VEHICLE(ch)) {
+			do_unseat_from_vehicle(ch);
+		}
 	}
 	
 	// check master's solo role
@@ -1058,10 +1077,14 @@ bool should_delete_empire(empire_data *emp) {
 * @return bool TRUE if the item is still in the world, FALSE if it was extracted
 */
 bool check_autostore(obj_data *obj, bool force) {
+	extern int get_main_island(empire_data *emp);
+	
+	empire_data *emp = NULL;
+	vehicle_data *in_veh;
 	room_data *real_loc;
 	obj_data *top_obj;
-	empire_data *emp;
 	bool store, unique, full;
+	int islid;
 	
 	// easy exclusions
 	if (obj->carried_by || obj->worn_by || !CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
@@ -1076,22 +1099,31 @@ bool check_autostore(obj_data *obj, bool force) {
 	// ensure object is in a room, or in an object in a room
 	top_obj = get_top_object(obj);
 	real_loc = IN_ROOM(top_obj);
-	if (!real_loc || IS_ADVENTURE_ROOM(real_loc)) {
-		return TRUE;
+	in_veh = top_obj->in_vehicle;
+	if (in_veh && !real_loc) {
+		real_loc = IN_ROOM(in_veh);
 	}
 	
-	// check boat room: items on ships in the Ship Holding Pen do not autostore
-	real_loc = BOAT_ROOM(real_loc);
-	if (!real_loc || BUILDING_VNUM(real_loc) == RTYPE_SHIP_HOLDING_PEN) {
-		return TRUE;
+	// detect owner here
+	if (!emp && in_veh) {
+		emp = VEH_OWNER(in_veh);
+	}
+	if (!emp && real_loc) {
+		emp = ROOM_OWNER(HOME_ROOM(real_loc));
 	}
 	
+	// validate location
+	if (in_veh && !force) {
+		return TRUE;	// vehicles do their own checking and call this with force
+	}
+	if (!in_veh && (!real_loc || IS_ADVENTURE_ROOM(real_loc))) {
+		return TRUE;
+	}
+		
 	// never do it in front of players
-	if (!force && any_players_in_room(IN_ROOM(top_obj))) {
+	if (!force && real_loc && any_players_in_room(real_loc)) {
 		return TRUE;
 	}
-	
-	emp = ROOM_OWNER(IN_ROOM(top_obj));
 	
 	// reasons something is storable (timer was already checked)
 	store = unique = FALSE;
@@ -1112,12 +1144,12 @@ bool check_autostore(obj_data *obj, bool force) {
 		// but this otherwise blocks the item from storing
 		store = FALSE;
 	}
-	else if (UNIQUE_OBJ_CAN_STORE(obj) && ROOM_PRIVATE_OWNER(HOME_ROOM(IN_ROOM(top_obj))) == NOBODY) {
+	else if (UNIQUE_OBJ_CAN_STORE(obj) && real_loc && ROOM_PRIVATE_OWNER(HOME_ROOM(real_loc)) == NOBODY) {
 		// store unique items but not in private homes
 		store = TRUE;
 		unique = TRUE;
 	}
-	else if (OBJ_BOUND_TO(obj) && ROOM_PRIVATE_OWNER(HOME_ROOM(IN_ROOM(top_obj))) == NOBODY && (GET_AUTOSTORE_TIMER(obj) + config_get_int("bound_item_junk_time") * SECS_PER_REAL_MIN) < time(0)) {
+	else if (OBJ_BOUND_TO(obj) && real_loc && ROOM_PRIVATE_OWNER(HOME_ROOM(real_loc)) == NOBODY && (GET_AUTOSTORE_TIMER(obj) + config_get_int("bound_item_junk_time") * SECS_PER_REAL_MIN) < time(0)) {
 		// room owned, item is bound, not a private home, but not storable? junk it
 		store = TRUE;
 		// DON'T mark unique -- we are just junking it
@@ -1129,7 +1161,7 @@ bool check_autostore(obj_data *obj, bool force) {
 	}
 
 	// final timer check (long-autostore)
-	if (!force && ROOM_BLD_FLAGGED(IN_ROOM(top_obj), BLD_LONG_AUTOSTORE) && (GET_AUTOSTORE_TIMER(obj) + config_get_int("long_autostore_time") * SECS_PER_REAL_MIN) > time(0)) {
+	if (!force && real_loc && ROOM_BLD_FLAGGED(real_loc, BLD_LONG_AUTOSTORE) && (GET_AUTOSTORE_TIMER(obj) + config_get_int("long_autostore_time") * SECS_PER_REAL_MIN) > time(0)) {
 		return TRUE;
 	}
 	
@@ -1142,14 +1174,20 @@ bool check_autostore(obj_data *obj, bool force) {
 		}
 		else if (unique) {
 			// this extracts it itself
-			store_unique_item(NULL, obj, emp, IN_ROOM(top_obj), &full);
+			store_unique_item(NULL, obj, emp, real_loc, &full);
 			return FALSE;
 		}
 		else if (OBJ_CAN_STORE(obj)) {
-			add_to_empire_storage(emp, GET_ISLAND_ID(IN_ROOM(top_obj)), GET_OBJ_VNUM(obj), 1);
+			// find where to store it, especially if we got this far with emp but no real_loc
+			islid = real_loc ? GET_ISLAND_ID(real_loc) : NO_ISLAND;
+			if (islid == NO_ISLAND) {
+				islid = get_main_island(emp);
+			}
+			
+			add_to_empire_storage(emp, islid, GET_OBJ_VNUM(obj), 1);
 		}
 	}
-
+	
 	// get rid of it either way
 	extract_obj(obj);
 	return FALSE;
@@ -1171,11 +1209,6 @@ void point_update_obj(obj_data *obj) {
 	top = get_top_object(obj);
 	if ((top->carried_by && !IN_ROOM(top->carried_by)) || (top->worn_by && !IN_ROOM(top->worn_by))) {
 		return;
-	}
-	
-	// this is the firing cooldown on carts
-	if (GET_OBJ_TYPE(obj) == ITEM_CART && GET_OBJ_VAL(obj, VAL_CART_FIRING_DATA) > 1) {
-		GET_OBJ_VAL(obj, VAL_CART_FIRING_DATA) -= 1;
 	}
 
 	if (OBJ_FLAGGED(obj, OBJ_LIGHT)) {
@@ -1206,7 +1239,7 @@ void point_update_obj(obj_data *obj) {
 	}
 
 	// float or sink
-	if (IN_ROOM(obj) && ROOM_SECT_FLAGGED(IN_ROOM(obj), SECTF_FRESH_WATER | SECTF_OCEAN) && GET_OBJ_TYPE(obj) != ITEM_SHIP) {
+	if (IN_ROOM(obj) && ROOM_SECT_FLAGGED(IN_ROOM(obj), SECTF_FRESH_WATER | SECTF_OCEAN)) {
 		if (materials[GET_OBJ_MATERIAL(obj)].floats && (to_room = real_shift(IN_ROOM(obj), shift_dir[WEST][0], shift_dir[WEST][1]))) {
 			if (!number(0, 2) && !ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && !ROOM_IS_CLOSED(to_room)) {
 				// float-west message
@@ -1569,6 +1602,71 @@ void point_update_room(room_data *room) {
 	
 	// ensure these are up to date
 	SET_BIT(ROOM_AFF_FLAGS(room), ROOM_BASE_FLAGS(room));
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// VEHICLE LIMITS //////////////////////////////////////////////////////////
+
+/**
+* Attempts to autostore the contents of the vehicle. This will check for
+* players present first.
+*
+* @param vehicle_data *veh The vehicle to autostore.
+*/
+void autostore_vehicle_contents(vehicle_data *veh) {
+	struct vehicle_room_list *vrl;
+	obj_data *obj, *next_obj;
+	
+	// things that block autostore
+	if (IN_ROOM(veh) && any_players_in_room(IN_ROOM(veh))) {
+		return;
+	}
+	if (VEH_SITTING_ON(veh) && !IS_NPC(VEH_SITTING_ON(veh))) {
+		return;
+	}
+	if (VEH_DRIVER(veh) && !IS_NPC(VEH_DRIVER(veh))) {
+		return;
+	}
+	if (VEH_LED_BY(veh) && !IS_NPC(VEH_LED_BY(veh))) {
+		return;
+	}
+	LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
+		if (any_players_in_room(vrl->room)) {
+			return;
+		}
+	}
+	
+	// ok we are good to autostore
+	LL_FOREACH_SAFE2(VEH_CONTAINS(veh), obj, next_obj, next_content) {
+		check_autostore(obj, TRUE);
+	}
+}
+
+
+/**
+* This runs an hourly "point update" on a vehicle.
+*
+* @param vehicle_data *veh The vehicle to update.
+*/
+void point_update_vehicle(vehicle_data *veh) {
+	bool besiege_vehicle(vehicle_data *veh, int damage, int siege_type);
+	
+	// autostore
+	if ((time(0) - VEH_LAST_MOVE_TIME(veh)) > (config_get_int("autostore_time") * SECS_PER_REAL_MIN)) {
+		autostore_vehicle_contents(veh);
+	}
+
+	// burny burny burny! (do this last)
+	if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
+		if (ROOM_PEOPLE(IN_ROOM(veh))) {
+			act("The flames roar as they envelop $V!", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+		}
+		if (!besiege_vehicle(veh, MAX(1, (VEH_MAX_HEALTH(veh) / 12)), SIEGE_BURNING)) {
+			// extracted
+			return;
+		}
+	}
 }
 
 
@@ -1942,6 +2040,7 @@ void point_update(bool run_real) {
 	void update_players_online_stats();
 	extern int max_players_today;
 	
+	vehicle_data *veh, *next_veh;
 	room_data *room, *next_room;
 	obj_data *obj, *next_obj;
 	char_data *ch, *next_ch;
@@ -1965,6 +2064,7 @@ void point_update(bool run_real) {
 		next_ch = ch->next;
 		
 		// remove stale offers -- this needs to happen even if dead (resurrect)
+		// TODO shouldn't this logic be inside the point_update_char function?
 		if (!IS_NPC(ch)) {
 			clean_offers(ch);
 		}
@@ -1975,6 +2075,11 @@ void point_update(bool run_real) {
 		
 		real_update_char(ch);
 		point_update_char(ch);
+	}
+	
+	// vehicles
+	LL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
+		point_update_vehicle(veh);
 	}
 	
 	// objs

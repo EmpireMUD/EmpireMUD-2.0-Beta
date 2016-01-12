@@ -63,12 +63,14 @@ extern struct instance_data *build_instance_loc(adv_data *adv, struct adventure_
 void check_autowiz(char_data *ch);
 void clear_char_abilities(char_data *ch, any_vnum skill);
 void delete_instance(struct instance_data *inst);	// instance.c
+void do_stat_vehicle(char_data *ch, vehicle_data *veh);
 void get_icons_display(struct icon_data *list, char *save_buffer);
 void get_interaction_display(struct interaction_item *list, char *save_buffer);
 void get_script_display(struct trig_proto_list *list, char *save_buffer);
 extern char *get_room_name(room_data *room, bool color);
 void save_whole_world();
 void scale_mob_to_level(char_data *mob, int level);
+void scale_vehicle_to_level(vehicle_data *veh, int level);
 extern char *show_color_codes(char *string);
 void update_class(char_data *ch);
 
@@ -1713,9 +1715,10 @@ SHOW(show_stats) {
 	extern int buf_switches, buf_largecount, buf_overflows;
 	extern int total_accounts, active_accounts, active_accounts_week;
 	
-	int num_active_empires = 0, num_objs = 0, num_mobs = 0, num_players = 0, num_descs = 0, menu_count = 0;
+	int num_active_empires = 0, num_objs = 0, num_mobs = 0, num_vehs = 0, num_players = 0, num_descs = 0, menu_count = 0;
 	empire_data *emp, *next_emp;
 	descriptor_data *desc;
+	vehicle_data *veh;
 	char_data *vict;
 	obj_data *obj;
 	
@@ -1739,10 +1742,9 @@ SHOW(show_stats) {
 		}
 	}
 	
-	// count objs in world
-	for (obj = object_list; obj; obj = obj->next) {
-		++num_objs;
-	}
+	// other counts
+	LL_COUNT(object_list, obj, num_objs);
+	LL_COUNT(vehicle_list, veh, num_vehs);
 
 	// count active empires
 	HASH_ITER(hh, empire_table, emp, next_emp) {
@@ -1761,6 +1763,7 @@ SHOW(show_stats) {
 	msg_to_char(ch, "  %6d empires          %6d active\r\n", HASH_COUNT(empire_table), num_active_empires);
 	msg_to_char(ch, "  %6d mobiles          %6d prototypes\r\n", num_mobs, HASH_COUNT(mobile_table));
 	msg_to_char(ch, "  %6d objects          %6d prototypes\r\n", num_objs, HASH_COUNT(object_table));
+	msg_to_char(ch, "  %6d vehicles         %6d prototypes\r\n", num_vehs, HASH_COUNT(vehicle_table));
 	msg_to_char(ch, "  %6d adventures       %6d total rooms\r\n", HASH_COUNT(adventure_table), HASH_COUNT(world_table));
 	msg_to_char(ch, "  %6d buildings        %6d room templates\r\n", HASH_COUNT(building_table), HASH_COUNT(room_template_table));
 	msg_to_char(ch, "  %6d sectors          %6d crops\r\n", HASH_COUNT(sector_table), HASH_COUNT(crop_table));
@@ -2844,6 +2847,9 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 		bld = building_proto(GET_CRAFT_BUILD_TYPE(craft));
 		msg_to_char(ch, "Builds: [&c%d&0] %s\r\n", GET_CRAFT_BUILD_TYPE(craft), bld ? GET_BLD_NAME(bld) : "UNKNOWN");
 	}
+	else if (CRAFT_FLAGGED(craft, CRAFT_VEHICLE)) {
+		msg_to_char(ch, "Creates Vehicle: [&c%d&0] %s\r\n", GET_CRAFT_OBJECT(craft), (GET_CRAFT_OBJECT(craft) == NOTHING ? "NOTHING" : get_vehicle_name_by_proto(GET_CRAFT_OBJECT(craft))));
+	}
 	else if (CRAFT_FLAGGED(craft, CRAFT_SOUP)) {
 		msg_to_char(ch, "Creates Volume: [&g%d drink%s&0], Liquid: [&g%d&0] %s\r\n", GET_CRAFT_QUANTITY(craft), PLURAL(GET_CRAFT_QUANTITY(craft)), GET_CRAFT_OBJECT(craft), (GET_CRAFT_OBJECT(craft) == NOTHING ? "NOTHING" : drinks[GET_CRAFT_OBJECT(craft)]));
 	}
@@ -2979,7 +2985,6 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	extern const char *storage_bits[];
 	extern double get_base_dps(obj_data *weapon);
 	extern double get_weapon_speed(obj_data *weapon);
-	extern struct ship_data_struct ship_data[];
 	extern const char *armor_types[NUM_ARMOR_TYPES+1];
 	extern const struct poison_data_type poison_data[];
 	
@@ -3047,6 +3052,8 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	 */
 	strcat(buf, ", In object: ");
 	strcat(buf, j->in_obj ? GET_OBJ_DESC(j->in_obj, ch, OBJ_DESC_SHORT) : "None");
+	strcat(buf, ", In vehicle: ");
+	strcat(buf, j->in_vehicle ? VEH_SHORT_DESC(j->in_vehicle) : "None");
 	strcat(buf, ", Carried by: ");
 	strcat(buf, j->carried_by ? GET_NAME(j->carried_by) : "Nobody");
 	strcat(buf, ", Worn by: ");
@@ -3119,19 +3126,6 @@ void do_stat_object(char_data *ch, obj_data *j) {
 			msg_to_char(ch, "Amount: %s\r\n", money_amount(real_empire(GET_COINS_EMPIRE_ID(j)), GET_COINS_AMOUNT(j)));
 			break;
 		}
-		case ITEM_CART:
-			msg_to_char(ch, "Holds: %d items\r\n", GET_MAX_CART_CONTENTS(j));
-			msg_to_char(ch, "Animals required: %d\r\n", GET_CART_ANIMALS_REQUIRED(j));
-			if (CART_CAN_FIRE(j)) {
-				msg_to_char(ch, "Capable of firing.\r\n");
-			}
-			break;
-		case ITEM_SHIP:
-			msg_to_char(ch, "Ship type: %s\r\n", ship_data[GET_SHIP_TYPE(j)].name);
-			if (GET_SHIP_RESOURCES_REMAINING(j) > 0)
-				msg_to_char(ch, "Resources required to finish: %d\r\n", GET_SHIP_RESOURCES_REMAINING(j));
-			msg_to_char(ch, "On deck: %d\r\n", GET_SHIP_MAIN_ROOM(j));
-			break;
 		case ITEM_MISSILE_WEAPON:
 			msg_to_char(ch, "Speed: %.2f\r\n", missile_weapon_speed[GET_MISSILE_WEAPON_SPEED(j)]);
 			msg_to_char(ch, "Damage: %d\r\n", GET_MISSILE_WEAPON_DAMAGE(j));
@@ -3608,11 +3602,10 @@ int vnum_building(char *searchname, char_data *ch) {
 */
 int vnum_craft(char *searchname, char_data *ch) {
 	craft_data *iter, *next_iter;
-	obj_data *or;
 	int found = 0;
 	
 	HASH_ITER(hh, craft_table, iter, next_iter) {
-		if (multi_isname(searchname, GET_CRAFT_NAME(iter)) || ((or = obj_proto(GET_CRAFT_OBJECT(iter))) && multi_isname(searchname, GET_OBJ_KEYWORDS(or)))) {
+		if (multi_isname(searchname, GET_CRAFT_NAME(iter))) {
 			msg_to_char(ch, "%3d. [%5d] %s\r\n", ++found, GET_CRAFT_VNUM(iter), GET_CRAFT_NAME(iter));
 		}
 	}
@@ -4190,6 +4183,7 @@ ACMD(do_echo) {
 	char hbuf[MAX_INPUT_LENGTH];
 	char *ptr, *end;
 	char_data *vict = NULL, *tmp_char, *c;
+	vehicle_data *tmp_veh = NULL;
 	obj_data *obj = NULL;
 	int len;
 	bool needs_name = TRUE;
@@ -4231,7 +4225,7 @@ ACMD(do_echo) {
 			*end = '\0';
 		}
 		len = strlen(lbuf);
-		generic_find(lbuf, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP, ch, &tmp_char, &obj);
+		generic_find(lbuf, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP, ch, &tmp_char, &obj, &tmp_veh);
 		
 		if (obj) {
 			// replace with $p
@@ -4954,6 +4948,7 @@ ACMD(do_last) {
 ACMD(do_load) {
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	
+	vehicle_data *veh;
 	char_data *mob;
 	obj_data *obj;
 	any_vnum number;
@@ -4961,7 +4956,7 @@ ACMD(do_load) {
 	two_arguments(argument, buf, buf2);
 
 	if (!*buf || !*buf2 || !isdigit(*buf2)) {
-		send_to_char("Usage: load { obj | mob } <number>\r\n", ch);
+		send_to_char("Usage: load { obj | mob | vehicle } <number>\r\n", ch);
 		return;
 	}
 	if ((number = atoi(buf2)) < 0) {
@@ -4997,8 +4992,21 @@ ACMD(do_load) {
 		act("You create $p.", FALSE, ch, obj, 0, TO_CHAR);
 		load_otrigger(obj);
 	}
+	else if (is_abbrev(buf, "vehicle")) {
+		if (!vehicle_proto(number)) {
+			msg_to_char(ch, "There is no vehicle with that number.\r\n");
+			return;
+		}
+		veh = read_vehicle(number, TRUE);
+		vehicle_to_room(veh, IN_ROOM(ch));
+		scale_vehicle_to_level(veh, 0);	// attempt auto-detect of level
+		act("$n makes an odd magical gesture.", TRUE, ch, NULL, NULL, TO_ROOM);
+		act("$n has created $V!", FALSE, ch, NULL, veh, TO_ROOM);
+		act("You create $V.", FALSE, ch, NULL, veh, TO_CHAR);
+		// load_vtrigger(veh);
+	}
 	else {
-		send_to_char("That'll have to be either 'obj' or 'mob'.\r\n", ch);
+		send_to_char("That'll have to be either 'obj', 'mob', or 'vehicle'.\r\n", ch);
 	}
 }
 
@@ -5282,6 +5290,7 @@ ACMD(do_poofset) {
 
 ACMD(do_purge) {
 	char_data *vict, *next_v;
+	vehicle_data *veh;
 	obj_data *obj;
 
 	one_argument(argument, buf);
@@ -5309,6 +5318,10 @@ ACMD(do_purge) {
 			act("$n destroys $p.", FALSE, ch, obj, 0, TO_ROOM);
 			extract_obj(obj);
 		}
+		else if ((veh = get_vehicle_in_room_vis(ch, buf))) {
+			act("$n destroys $V.", FALSE, ch, NULL, veh, TO_ROOM);
+			extract_vehicle(veh);
+		}
 		else {
 			send_to_char("Nothing here by that name.\r\n", ch);
 			return;
@@ -5327,8 +5340,9 @@ ACMD(do_purge) {
 				extract_char(vict);
 		}
 
-		while (ROOM_CONTENTS(IN_ROOM(ch)))
+		while (ROOM_CONTENTS(IN_ROOM(ch))) {
 			extract_obj(ROOM_CONTENTS(IN_ROOM(ch)));
+		}
 	}
 }
 
@@ -5509,7 +5523,8 @@ ACMD(do_reload) {
 
 ACMD(do_rescale) {
 	void scale_item_to_level(obj_data *obj, int level);
-
+	
+	vehicle_data *veh;
 	obj_data *obj, *new;
 	char_data *vict;
 	int level;
@@ -5542,6 +5557,13 @@ ACMD(do_rescale) {
 				act(buf, FALSE, ch, NULL, vict, TO_VICT);
 			}
 		}
+	}
+	else if ((veh = get_vehicle_in_room_vis(ch, arg))) {
+		scale_vehicle_to_level(veh, level);
+		syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s has rescaled vehicle %s to level %d at %s", GET_NAME(ch), VEH_SHORT_DESC(veh), VEH_SCALE_LEVEL(veh), room_log_identifier(IN_ROOM(ch)));
+		sprintf(buf, "You rescale $V to level %d.", VEH_SCALE_LEVEL(veh));
+		act(buf, FALSE, ch, NULL, veh, TO_CHAR);
+		act("$n rescales $V.", FALSE, ch, NULL, veh, TO_ROOM);
 	}
 	else if ((obj = get_obj_in_list_vis(ch, arg, ch->carrying)) || (obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
 		// item mode
@@ -5946,6 +5968,7 @@ ACMD(do_snoop) {
 
 ACMD(do_stat) {
 	char_data *victim = NULL;
+	vehicle_data *veh;
 	crop_data *cp;
 	obj_data *obj;
 	bool file = FALSE;
@@ -6005,6 +6028,18 @@ ACMD(do_stat) {
 				send_to_char("No such mobile around.\r\n", ch);
 		}
 	}
+	else if (is_abbrev(buf1, "vehicle")) {
+		if (!*buf2)
+			send_to_char("Stats on which vehicle?\r\n", ch);
+		else {
+			if ((veh = get_vehicle_vis(ch, buf2)) != NULL) {
+				do_stat_vehicle(ch, veh);
+			}
+			else {
+				send_to_char("No such vehicle around.\r\n", ch);
+			}
+		}
+	}
 	else if (is_abbrev(buf1, "player")) {
 		if (!*buf2) {
 			send_to_char("Stats on which player?\r\n", ch);
@@ -6055,6 +6090,9 @@ ACMD(do_stat) {
 			do_stat_object(ch, obj);
 		else if ((victim = get_char_vis(ch, buf1, FIND_CHAR_WORLD)) != NULL)
 			do_stat_character(ch, victim);
+		else if ((veh = get_vehicle_in_room_vis(ch, buf1)) || (veh = get_vehicle_vis(ch, buf1))) {
+			do_stat_vehicle(ch, veh);
+		}
 		else if ((obj = get_obj_vis(ch, buf1)) != NULL)
 			do_stat_object(ch, obj);
 		else
@@ -6459,6 +6497,12 @@ ACMD(do_vnum) {
 			msg_to_char(ch, "No triggers by that name.\r\n");
 		}
 	}
+	else if (is_abbrev(buf, "vehicle")) {
+		extern int vnum_vehicle(char *searchname, char_data *ch);
+		if (!vnum_vehicle(buf2, ch)) {
+			msg_to_char(ch, "No vehicles by that name.\r\n");
+		}
+	}
 	else {
 		send_to_char("Usage: vnum <type> <name>\r\n", ch);
 	}
@@ -6618,6 +6662,15 @@ ACMD(do_vstat) {
 		}
 
 		do_stat_trigger(ch, trig);
+	}
+	else if (is_abbrev(buf, "vehicle")) {
+		vehicle_data *veh = vehicle_proto(number);
+		if (veh) {
+			do_stat_vehicle(ch, veh);
+		}
+		else {
+			msg_to_char(ch, "There is no vehicle with that vnum.\r\n");
+		}
 	}
 	else
 		send_to_char("Invalid type.\r\n", ch);

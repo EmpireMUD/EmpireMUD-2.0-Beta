@@ -44,7 +44,8 @@
 #define OLC_ABILITY  BIT(14)
 #define OLC_CLASS  BIT(15)
 #define OLC_SKILL  BIT(16)
-#define NUM_OLC_TYPES  17
+#define OLC_VEHICLE  BIT(17)
+#define NUM_OLC_TYPES  18
 
 
 // olc command flags
@@ -72,6 +73,7 @@
 #define OLC_FLAG_ABILITIES  BIT(15)	// CAN edit abilities
 #define OLC_FLAG_CLASSES  BIT(16)	// CAN edit classes
 #define OLC_FLAG_SKILLS  BIT(17)	// CAN edit skills
+#define OLC_FLAG_NO_VEHICLES  BIT(18)	// cannot edit vehicles
 
 
 // for trigger editing

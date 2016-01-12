@@ -27,10 +27,12 @@ See also: CLAIM, PLEDGE, ENROLL, PROMOTE, TERRITORY, CITIES, ROSTER, ESCORE,
 #
 ABANDON
 
-Usage:  abandon
+Usage:  abandon [target]
 
 This command allows you to abandon a building or acre of land which your 
 empire no longer wants. This falls under the cede privilege.
+
+It can also be used to abandon vehicles.
 
 See also: CEDE, CLAIM, PRIVILEGE, PUBLICIZE
 #
@@ -222,9 +224,10 @@ ability.
 #
 CLAIM
 
-Usage:  claim
+Usage:  claim [target]
 
-Claims the acre you're currently on for your empire.
+Claims the acre you're currently on for your empire. This can also be used
+to claim vehicles.
 
 You can't claim land that's inside another empire's city radius while at war
 with that empire.
@@ -246,7 +249,7 @@ Commerce also allows you to build the mint building, and mint your own coins:
 
 See also: BUILD, MINT, TERRITORY, WEALTH
 #
-CUSTOMIZE "CUSTOMIZE BUILDING"
+"CUSTOMIZE BUILDING"
 
 Customize Building (Empire ability)
 
@@ -403,6 +406,9 @@ Usage:  efind <name>
 The efind command allows you to find items that have been left around your
 empire. Efind shows you the coordinates and the name of the room, but you may
 not find it very useful without the Navigation ability.
+
+Efind will also find vehicles belonging to your empire, even if they aren't
+in your own territory.
 
 You can use "efind all" to find all items on the ground in your empire. The
 "all" option will skip items that you can't pick up (boards, carts).
@@ -1336,6 +1342,7 @@ Workforce types:
   &cnexus-crystal (skilled):&0 Will make nexus crystals at the sorcery tower;
      requires both Exarch Crafts and Skilled Labor.
   &ymilling:&0 Will mill grains into flour.
+  &yrepair-vehicles&0: Will keep vehicles maintained.
   
 Items marked (skilled) require the Skilled Labor ability.
 

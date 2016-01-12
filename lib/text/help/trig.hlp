@@ -203,14 +203,15 @@ wait 1 s
 
 %load% obj <vnum> [name <position>] [scale level]
 %load% mob <vnum> [ally] [scale level]
+%load% veh <vnum> [scale level]
 
-   This command loads a mob or object into the game. No-take objects loaded to
-a mob will load to the room. Mobs loading other mobs may specify "ally" to
-set the loaded mob as a follower, which assists combat scripts in determining
-whose side they are on.
+   This command loads a mob, object, or vehicle into the game. No-take objects
+loaded to a mob will load to the room. Mobs loading other mobs may specify
+"ally" to set the loaded mob as a follower, which assists combat scripts in
+determining whose side they are on.
 
-The %load% command will automatically scale items and mobs to the same level
-as the thing that does the loading (when it can). However, you can specify a
+The %load% command will automatically scale things to the same level as the
+thing that does the loading (when it can). However, you can specify a
 different scale level if you like. For object loading, you MUST also include
 the target to load to AND the load position before the scale level.
 

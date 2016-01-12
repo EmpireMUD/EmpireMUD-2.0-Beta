@@ -639,7 +639,7 @@ const int shift_dir[][2] = {
 };
 
 
-// whether or not a direction can be used by designate
+// whether or not a direction can be used by designate, building version
 const bool can_designate_dir[NUM_OF_DIRS] = {
 	TRUE,	// n
 	TRUE,
@@ -659,8 +659,48 @@ const bool can_designate_dir[NUM_OF_DIRS] = {
 };
 
 
+// whether or not a direction can be used by designate, vehicle version
+const bool can_designate_dir_vehicle[NUM_OF_DIRS] = {
+	FALSE,	// n
+	FALSE,
+	FALSE,
+	FALSE,
+	FALSE,	// nw
+	FALSE,
+	FALSE,
+	FALSE,
+	TRUE,	// up
+	TRUE,	// down
+	TRUE,	// fore
+	TRUE,
+	TRUE,
+	TRUE,
+	FALSE	// random
+};
+
+
 // whether or not you can flee in a given direction
 const bool can_flee_dir[NUM_OF_DIRS] = {
+	TRUE,	// n
+	TRUE,
+	TRUE,
+	TRUE,
+	TRUE,	// nw
+	TRUE,
+	TRUE,
+	TRUE,
+	FALSE,	// up
+	FALSE,	// down
+	TRUE,	// fore
+	TRUE,
+	TRUE,
+	TRUE,
+	FALSE	// random
+};
+
+
+// whether or not a direction is "flat" (2D)
+const bool is_flat_dir[NUM_OF_DIRS] = {
 	TRUE,	// n
 	TRUE,
 	TRUE,
@@ -1132,6 +1172,9 @@ const char *craft_flags[] = {
 	"UPGRADE",
 	"DISMANTLE-ONLY",
 	"IN-CITY-ONLY",
+	"VEHICLE",
+	"SHIPYARD",
+	"BLD-UPGRADED",
 	"\n"
 };
 
@@ -1149,6 +1192,7 @@ const char *craft_types[] = {
 	"BUILD",
 	"WEAVE",
 	"WORKFORCE",
+	"MANUFACTURE",
 	"\n"
 };
 
@@ -1334,7 +1378,7 @@ const char *action_bits[] = {
 };
 
 
-// MOB_MOVE_x
+// MOB_MOVE_x: mob/vehicle move types
 const char *mob_move_types[] = {
 	"walks",
 	"climbs",
@@ -1355,6 +1399,13 @@ const char *mob_move_types[] = {
 	"waddles",
 	"crawls",
 	"flutters",
+	"drives",
+	"sails",
+	"rolls",
+	"rattles",
+	"skis",
+	"slides",
+	"soars",
 	"\n"
 };
 
@@ -1439,7 +1490,7 @@ const char *item_types[] = {
 	"CONTAINER",
 	"DRINKCON",
 	"FOOD",
-	"BOAT",
+	"*",
 	"PORTAL",
 	"*BOARD",
 	"*CORPSE",
@@ -1448,7 +1499,7 @@ const char *item_types[] = {
 	"*",
 	"*MAIL",
 	"WEALTH",
-	"CART",
+	"*CART",
 	"*SHIP",
 	"*HELM",
 	"*WINDOW",
@@ -1540,7 +1591,7 @@ int item_wear_to_wear[] = {
 
 // OBJ_x (extra bits), part 1
 const char *extra_bits[] = {
-	"CHAIR",
+	"*",
 	"PLANTABLE",
 	"LIGHT",
 	"SUPERIOR",
@@ -1693,6 +1744,7 @@ const char *drinks[] = {
 	"green tea",
 	"red wine",
 	"white wine",
+	"grog",
 	"\n"
 };
 
@@ -1712,6 +1764,7 @@ const char *drinknames[] = {
 	"tea",
 	"wine",
 	"wine",
+	"grog",
 	"\n"
 };
 
@@ -1731,7 +1784,8 @@ int drink_aff[][3] = {
 	{ 0, 0, 1 },	// coffee
 	{ 0, 0, 1 },	// green tea
 	{ 4, 0, 1 },	// red wine
-	{ 3, 0, 1 }	// white wine
+	{ 3, 0, 1 },	// white wine
+	{ 2, 1, 1 },	// grog
 };
 
 
@@ -1750,6 +1804,7 @@ const char *color_liquid[] = {
 	"green",
 	"red",
 	"clear",
+	"amber",
 	"\n"
 };
 
@@ -1778,6 +1833,8 @@ const char *obj_custom_types[] = {
 	"instrument-to-room",
 	"eat-to-char",
 	"eat-to-room",
+	"craft-to-char",
+	"craft-to-room",
 	"\n"
 };
 
@@ -1852,6 +1909,7 @@ const char *olc_flag_bits[] = {
 	"ABILITIES",
 	"CLASSES",
 	"SKILLS",
+	"!VEHICLES",
 	"\n"
 };
 
@@ -1875,6 +1933,7 @@ const char *olc_type_bits[NUM_OLC_TYPES+1] = {
 	"ability",
 	"class",
 	"skill",
+	"vehicle",
 	"\n"
 };
 
@@ -1950,6 +2009,8 @@ const char *bld_flags[] = {
 	"NEED-BOAT",
 	"LOOK-OUT",
 	"2ND-TERRITORY",
+	"SHIPYARD",
+	"UPGRADED",
 	"\n"
 };
 
@@ -2002,6 +2063,10 @@ const char *designate_flags[] = {
 	"TOP-OF-TOWER",
 	"HOUSEHOLD",
 	"HAVEN",
+	"SHIP-MAIN",
+	"SHIP-LARGE",
+	"SHIP-EXTRA",
+	"LAND-VEHICLE",
 	"\n"
 };
 
@@ -2206,11 +2271,12 @@ const char *room_aff_bits[] = {
 	"*PUBLIC",
 	"*DISMANTLING",
 	"!FLY",
-	"*SHIP-PRESENT",
+	"*",
 	"*",
 	"*!WORK",
 	"!DISREPAIR",
 	"*!DISMANTLE",
+	"*IN-VEHICLE",
 	"\n"
 };
 
@@ -2954,5 +3020,31 @@ const char *shutdown_types[] = {
 	"normal",
 	"pause",
 	"die",
+	"\n"
+};
+
+
+// VEH_x: Vehicle flags
+const char *vehicle_flags[] = {
+	"*INCOMPLETE",
+	"DRIVING",
+	"SAILING",
+	"FLYING",
+	"ALLOW-ROUGH",
+	"SIT",	// 5
+	"IN",
+	"BURNABLE",
+	"CONTAINER",
+	"SHIPPING",
+	"CUSTOMIZABLE",	// 10
+	"DRAGGABLE",
+	"!BUILDING",
+	"CAN-PORTAL",
+	"LEADABLE",
+	"CARRY-VEHICLES",	// 15
+	"CARRY-MOBS",
+	"SIEGE-WEAPONS",
+	"ON-FIRE",
+	"!LOAD-ONTO-VEHICLE",
 	"\n"
 };

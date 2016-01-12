@@ -529,12 +529,14 @@ ACMD(do_mregionecho) {
 ACMD(do_mload) {
 	void scale_item_to_level(obj_data *obj, int level);
 	void scale_mob_to_level(char_data *mob, int level);
+	void scale_vehicle_to_level(vehicle_data *veh, int level);
 	
 	struct instance_data *inst = get_instance_by_mob(ch);
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	int number = 0;
 	char_data *mob, *tch;
 	obj_data *object, *cnt;
+	vehicle_data *veh;
 	char *target;
 	int pos;
 	bool ally = FALSE;
@@ -559,11 +561,12 @@ ACMD(do_mload) {
 		return;
 	}
 
-	if (is_abbrev(arg1, "mob")) {
-		if ((mob = read_mobile(number, TRUE)) == NULL) {
+	if (is_abbrev(arg1, "mobile")) {
+		if (!mob_proto(number)) {
 			mob_log(ch, "mload: bad mob vnum");
 			return;
 		}
+		mob = read_mobile(number, TRUE);
 		MOB_INSTANCE_ID(mob) = MOB_INSTANCE_ID(ch);
 		char_to_room(mob, IN_ROOM(ch));
 		setup_generic_npc(mob, GET_LOYALTY(ch), NOTHING, NOTHING);
@@ -590,11 +593,12 @@ ACMD(do_mload) {
 			add_follower(mob, ch, FALSE);
 		}
 	}
-	else if (is_abbrev(arg1, "obj")) {
-		if ((object = read_object(number, TRUE)) == NULL) {
+	else if (is_abbrev(arg1, "object")) {
+		if (!obj_proto(number)) {
 			mob_log(ch, "mload: bad object vnum");
 			return;
 		}
+		object = read_object(number, TRUE);
 		
 		if (inst) {
 			instance_obj_setup(inst, object);
@@ -648,6 +652,29 @@ ACMD(do_mload) {
 		obj_to_room(object, IN_ROOM(ch)); 
 		load_otrigger(object);
 		return;
+	}
+	else if (is_abbrev(arg1, "vehicle")) {
+		if (!vehicle_proto(number)) {
+			mob_log(ch, "mload: bad vehicle vnum");
+			return;
+		}
+		veh = read_vehicle(number, TRUE);
+		vehicle_to_room(veh, IN_ROOM(ch));
+		
+		if (*target && isdigit(*target)) {
+			// scale to requested level
+			scale_vehicle_to_level(veh, atoi(target));
+		}
+		else if (GET_CURRENT_SCALE_LEVEL(ch) > 0) {
+			// only scale vehicle if self is scaled
+			scale_vehicle_to_level(veh, GET_CURRENT_SCALE_LEVEL(ch));
+		}
+		else {
+			// hope to inherit
+			scale_vehicle_to_level(veh, 0);
+		}
+		
+		// load_vtrigger(veh);
 	}
 	else
 		mob_log(ch, "mload: bad type");

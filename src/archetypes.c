@@ -140,7 +140,7 @@ archetype_data *find_archetype_by_name(char *name) {
 			// perfect match
 			return arch;
 		}
-		if (is_multiword_abbrev(name, GET_ARCH_NAME(arch))) {
+		if (!partial && is_multiword_abbrev(name, GET_ARCH_NAME(arch))) {
 			// probable match
 			partial = arch;
 		}

@@ -368,6 +368,7 @@ OLC_MODULE(mapedit_ruin) {
 
 
 OLC_MODULE(mapedit_exits) {
+	void add_room_to_vehicle(room_data *room, vehicle_data *veh);
 	extern room_data *create_room();
 	extern const char *dirs[];
 	extern room_vnum find_free_vnum();
@@ -402,7 +403,14 @@ OLC_MODULE(mapedit_exits) {
 		if (new) {
 			to_room = create_room();
 			attach_building_to_room(building_proto(config_get_int("default_interior")), to_room);
+			
+			if (GET_ROOM_VEHICLE(IN_ROOM(ch))) {
+				++VEH_INSIDE_ROOMS(GET_ROOM_VEHICLE(IN_ROOM(ch)));
+				COMPLEX_DATA(to_room)->vehicle = GET_ROOM_VEHICLE(IN_ROOM(ch));
+				add_room_to_vehicle(to_room, GET_ROOM_VEHICLE(IN_ROOM(ch)));
+			}
 			COMPLEX_DATA(HOME_ROOM(IN_ROOM(ch)))->inside_rooms++;
+			
 			COMPLEX_DATA(to_room)->home_room = HOME_ROOM(IN_ROOM(ch));
 			ROOM_OWNER(to_room) = ROOM_OWNER(HOME_ROOM(IN_ROOM(ch)));
 		}

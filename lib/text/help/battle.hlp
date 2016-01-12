@@ -151,6 +151,22 @@ As a basic ability, attacks are 10% faster. As a specialty ability, they are
 
 See also: SPEED
 #
+FIRE CATAPULT CANNONS
+
+Usage:  fire <vehicle> <direction | target vehicle> 
+
+Certain vehicles are siege weapons and can fire at buildings or at other
+vehicles. You need heavy shot for this. You can shoot at buildings in adjacent
+rooms, or at vehicles in the same room.
+
+If you're aboard a ship with cannons, you can fire from onboard the ship, but
+it still fires only at vehicles in the room the ship is in, or at adjacent
+rooms from there.
+
+Example:  
+  > fire catapult north
+  > fire brigantine 2.brigantine
+#
 FIRSTAID "FIRST AID"
 
 Firstaid (Battle ability)

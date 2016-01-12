@@ -78,7 +78,6 @@ ACMD(do_boost);
 ACMD(do_build);
 ACMD(do_butcher);
 
-ACMD(do_catapult);
 ACMD(do_cede);
 ACMD(do_changepass);
 ACMD(do_chant);
@@ -131,6 +130,8 @@ ACMD(do_display);
 ACMD(do_distance);
 ACMD(do_diversion);
 ACMD(do_douse);
+ACMD(do_drag);
+ACMD(do_drive);
 ACMD(do_draw);
 ACMD(do_drink);
 ACMD(do_drop);
@@ -167,6 +168,7 @@ ACMD(do_feed);
 ACMD(do_file);
 ACMD(do_fillin);
 ACMD(do_findmaintenance);
+ACMD(do_fire);
 ACMD(do_firstaid);
 ACMD(do_fish);
 ACMD(do_flee);
@@ -233,14 +235,13 @@ ACMD(do_lead);
 ACMD(do_library);
 ACMD(do_light);
 ACMD(do_load);
-ACMD(do_load_boat);
+ACMD(do_load_vehicle);
 ACMD(do_look);
 
 ACMD(do_mail);
 ACMD(do_maintain);
 ACMD(do_majesty);
 ACMD(do_manashield);
-ACMD(do_manufacture);
 ACMD(do_mapout);
 ACMD(do_mapsize);
 ACMD(do_mark);
@@ -307,6 +308,7 @@ ACMD(do_regenerate);
 ACMD(do_rejuvenate);
 ACMD(do_reload);
 ACMD(do_remove);
+ACMD(do_repair);
 ACMD(do_reply);
 ACMD(do_rescale);
 ACMD(do_rescue);
@@ -324,13 +326,13 @@ ACMD(do_roll);
 ACMD(do_roster);
 
 ACMD(do_sacrifice);
-ACMD(do_sail);
 ACMD(do_sap);
 ACMD(do_save);
 ACMD(do_saw);
 ACMD(do_say);
 ACMD(do_scan);
 ACMD(do_score);
+ACMD(do_scrap);
 ACMD(do_scrape);
 ACMD(do_search);
 ACMD(do_send);
@@ -400,7 +402,8 @@ ACMD(do_tunnel);
 
 ACMD(do_unban);
 ACMD(do_unbind);
-ACMD(do_unload_boat);
+ACMD(do_unharness);
+ACMD(do_unload_vehicle);
 ACMD(do_unpublicize);
 ACMD(do_unshare);
 ACMD(do_upgrade);
@@ -548,17 +551,14 @@ cpp_extern const struct command_info cmd_info[] = {
 	ABILITY_CMD( "blind", POS_FIGHTING, do_blind, NO_MIN, CTYPE_COMBAT, ABIL_BLIND ),
 	ABILITY_CMD( "bloodsweat", POS_SLEEPING, do_bloodsweat, NO_MIN, CTYPE_SKILL, ABIL_BLOODSWEAT ),
 	ABILITY_CMD( "bloodsword", POS_RESTING, do_bloodsword, NO_MIN, CTYPE_SKILL, ABIL_BLOODSWORD ),
-	SIMPLE_CMD( "board", POS_STANDING, do_board, NO_MIN, CTYPE_MOVE ),
-	STANDARD_CMD( "boatload", POS_STANDING, do_load_boat, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
+	SCMD_CMD( "board", POS_STANDING, do_board, NO_MIN, CTYPE_MOVE, SCMD_BOARD ),
 	ABILITY_CMD( "boost", POS_RESTING, do_boost, NO_MIN, CTYPE_UTIL, ABIL_BOOST ),
 	SCMD_CMD( "bookedit", POS_STANDING, do_library, LVL_APPROVED, CTYPE_UTIL, SCMD_BOOKEDIT ),
-	STANDARD_CMD( "boatunload", POS_STANDING, do_unload_boat, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_SKILL, CMD_NO_ANIMALS, NO_ABIL ),
 	STANDARD_CMD( "brew", POS_STANDING, do_gen_craft, LVL_APPROVED, NO_GRANTS, CRAFT_TYPE_BREW, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SCMD_CMD( "bug", POS_DEAD, do_gen_write, NO_MIN, CTYPE_COMM, SCMD_BUG ),
 	ABILITY_CMD( "butcher", POS_STANDING, do_butcher, NO_MIN, CTYPE_SKILL, ABIL_BUTCHER ),
 
 	STANDARD_CMD( "chop", POS_STANDING, do_chop, LVL_APPROVED, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
-	STANDARD_CMD( "catapult", POS_STANDING, do_catapult, LVL_APPROVED, NO_GRANTS, NO_SCMD, CTYPE_COMBAT, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "cd", POS_DEAD, do_cooldowns, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "cede", POS_DEAD, do_cede, LVL_APPROVED, CTYPE_EMPIRE ),
 	STANDARD_CMD( "chant", POS_STANDING, do_chant, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_SKILL, CMD_NO_ANIMALS, NO_ABIL ),
@@ -607,7 +607,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	ABILITY_CMD( "disarm", POS_FIGHTING, do_disarm, NO_MIN, CTYPE_COMBAT, ABIL_DISARM ),
 	ABILITY_CMD( "disenchant", POS_STANDING, do_disenchant, NO_MIN, CTYPE_SKILL, ABIL_DISENCHANT ),
 	ABILITY_CMD( "disguise", POS_STANDING, do_disguise, NO_MIN, CTYPE_SKILL, ABIL_DISGUISE ),
-	ABILITY_CMD( "dismount", POS_FIGHTING, do_dismount, NO_MIN, CTYPE_MOVE, ABIL_RIDE ),
+	ABILITY_CMD( "dismount", POS_SITTING, do_dismount, NO_MIN, CTYPE_MOVE, ABIL_RIDE ),
 	STANDARD_CMD( "dismantle", POS_STANDING, do_dismantle, LVL_APPROVED, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "dismiss", POS_STANDING, do_dismiss, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "disembark", POS_STANDING, do_disembark, NO_MIN, CTYPE_MOVE ),
@@ -618,7 +618,9 @@ cpp_extern const struct command_info cmd_info[] = {
 	ABILITY_CMD( "diversion", POS_FIGHTING, do_diversion, NO_MIN, CTYPE_SKILL, ABIL_DIVERSION ),
 	SIMPLE_CMD( "douse", POS_STANDING, do_douse, NO_MIN, CTYPE_BUILD ),
 	SCMD_CMD( "drop", POS_RESTING, do_drop, NO_MIN, CTYPE_MOVE, SCMD_DROP ),
+	STANDARD_CMD( "drag", POS_STANDING, do_drag, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "draw", POS_RESTING, do_draw, NO_MIN, CTYPE_COMBAT ),
+	STANDARD_CMD( "drive", POS_SITTING, do_drive, NO_MIN, NO_GRANTS, SCMD_DRIVE, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
 
 	SCMD_CMD( "eat", POS_RESTING, do_eat, NO_MIN, CTYPE_UTIL, SCMD_EAT ),
 	ABILITY_CMD( "eartharmor", POS_FIGHTING, do_eartharmor, NO_MIN, CTYPE_SKILL, ABIL_EARTHARMOR ),
@@ -660,6 +662,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "file", POS_DEAD, do_file, LVL_START_IMM, CTYPE_IMMORTAL ),
 	STANDARD_CMD( "fillin", POS_STANDING, do_fillin, LVL_APPROVED, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "findmaintenance", POS_DEAD, do_findmaintenance, LVL_APPROVED, CTYPE_EMPIRE ),
+	STANDARD_CMD( "fire", POS_SITTING, do_fire, LVL_APPROVED, NO_GRANTS, NO_SCMD, CTYPE_COMBAT, CMD_NO_ANIMALS, NO_ABIL ),
 	ABILITY_CMD( "firstaid", POS_STANDING, do_firstaid, NO_MIN, CTYPE_SKILL, ABIL_FIRSTAID ),
 	STANDARD_CMD( "fish", POS_STANDING, do_fish, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_SKILL, CMD_NO_ANIMALS, ABIL_FISH ),
 	STANDARD_CMD( "flee", POS_FIGHTING, do_flee, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_COMBAT, CMD_NO_ABBREV, NO_ABIL ),
@@ -691,7 +694,7 @@ cpp_extern const struct command_info cmd_info[] = {
 
 	SIMPLE_CMD( "help", POS_DEAD, do_help, NO_MIN, CTYPE_UTIL ),
 	SCMD_CMD( "handbook", POS_DEAD, do_gen_ps, LVL_START_IMM, CTYPE_IMMORTAL, SCMD_HANDBOOK ),
-	STANDARD_CMD( "harness", POS_STANDING, do_harness, NO_MIN, NO_GRANTS, FALSE, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
+	STANDARD_CMD( "harness", POS_STANDING, do_harness, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
 	STANDARD_CMD( "harvest", POS_STANDING, do_harvest, LVL_APPROVED, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	ABILITY_CMD( "hasten", POS_FIGHTING, do_hasten, NO_MIN, CTYPE_SKILL, ABIL_HASTEN ),
 	SIMPLE_CMD( "heal", POS_FIGHTING, do_heal, NO_MIN, CTYPE_SKILL ),
@@ -739,13 +742,14 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "lightningbolt", POS_FIGHTING, do_damage_spell, NO_MIN, NO_GRANTS, ABIL_LIGHTNINGBOLT, CTYPE_COMBAT, NOBITS, ABIL_LIGHTNINGBOLT ),
 	SCMD_CMD( "library", POS_STANDING, do_library, NO_MIN, CTYPE_UTIL, SCMD_LIBRARY ),
 	GRANT_CMD( "load", POS_DEAD, do_load, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_LOAD ),
-	STANDARD_CMD( "load", POS_STANDING, do_load_boat, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
+	STANDARD_CMD( "load", POS_STANDING, do_load_vehicle, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
+	STANDARD_CMD( "loadvehicle", POS_STANDING, do_load_vehicle, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
 
 	ABILITY_CMD( "mount", POS_STANDING, do_mount, NO_MIN, CTYPE_MOVE, ABIL_RIDE ),
 	STANDARD_CMD( "maintain", POS_STANDING, do_maintain, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	ABILITY_CMD( "majesty", POS_RESTING, do_majesty, NO_MIN, CTYPE_SKILL, ABIL_MAJESTY ),
 	ABILITY_CMD( "manashield", POS_RESTING, do_manashield, NO_MIN, CTYPE_COMBAT, ABIL_MANASHIELD ),
-	STANDARD_CMD( "manufacture", POS_STANDING, do_manufacture, LVL_APPROVED, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
+	STANDARD_CMD( "manufacture", POS_STANDING, do_gen_craft, LVL_APPROVED, NO_GRANTS, CRAFT_TYPE_MANUFACTURE, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "mapsize", POS_DEAD, do_mapsize, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "mapout", POS_DEAD, do_mapout, LVL_CIMPL, CTYPE_IMMORTAL ),
 	SIMPLE_CMD( "mark", POS_RESTING, do_mark, NO_MIN, CTYPE_UTIL ),
@@ -788,6 +792,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "party", POS_DEAD, do_group, NO_MIN, CTYPE_UTIL ),
 	STANDARD_CMD( "pick", POS_STANDING, do_pick, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	STANDARD_CMD( "pickpocket", POS_STANDING, do_pickpocket, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_COMBAT, CMD_STAY_HIDDEN, ABIL_PICKPOCKET ),
+	STANDARD_CMD( "pilot", POS_SITTING, do_drive, NO_MIN, NO_GRANTS, SCMD_PILOT, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
 	STANDARD_CMD( "play", POS_STANDING, do_play, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
 	STANDARD_CMD( "playerdelete", POS_SLEEPING, do_playerdelete, LVL_CIMPL, GRANT_PLAYERDELETE, NO_SCMD, CTYPE_IMMORTAL, CMD_NO_ABBREV, NO_ABIL ),
 	STANDARD_CMD( "plant", POS_STANDING, do_plant, LVL_APPROVED, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
@@ -829,6 +834,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "reject", POS_DEAD, do_accept, NO_MIN, CTYPE_UTIL, SCMD_REJECT ),
 	GRANT_CMD( "reload", POS_DEAD, do_reload, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_RELOAD ),
 	SIMPLE_CMD( "remove", POS_RESTING, do_remove, NO_MIN, CTYPE_COMM ),
+	STANDARD_CMD( "repair", POS_STANDING, do_repair, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	GRANT_CMD( "rescale", POS_RESTING, do_rescale, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_RESCALE ),
 	ABILITY_CMD( "rescue", POS_FIGHTING, do_rescue, NO_MIN, CTYPE_COMBAT, ABIL_RESCUE ),
 	SIMPLE_CMD( "respawn", POS_DEAD, do_respawn, NO_MIN, CTYPE_UTIL ),
@@ -849,13 +855,14 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "say", POS_RESTING, do_say, NO_MIN, CTYPE_COMM, SCMD_SAY ),
 	SCMD_CMD( "'", POS_RESTING, do_say, NO_MIN, CTYPE_COMM, SCMD_SAY ),
 	SIMPLE_CMD( "sacrifice", POS_STANDING, do_sacrifice, NO_MIN, CTYPE_MOVE ),
-	SIMPLE_CMD( "sail", POS_STANDING, do_sail, NO_MIN, CTYPE_MOVE ),
+	STANDARD_CMD( "sail", POS_SITTING, do_drive, NO_MIN, NO_GRANTS, SCMD_SAIL, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
 	ABILITY_CMD( "sap", POS_STANDING, do_sap, NO_MIN, CTYPE_COMBAT, ABIL_SAP ),
 	SIMPLE_CMD( "save", POS_STUNNED, do_save, NO_MIN, CTYPE_UTIL ),
 	STANDARD_CMD( "saw", POS_STANDING, do_saw, LVL_APPROVED, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SCMD_CMD( "sayhistory", POS_DEAD, do_history, NO_MIN, CTYPE_COMM, CHANNEL_HISTORY_SAY ),
 	SIMPLE_CMD( "score", POS_DEAD, do_score, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "scan", POS_RESTING, do_scan, NO_MIN, CTYPE_UTIL ),
+	SIMPLE_CMD( "scrap", POS_STANDING, do_scrap, NO_MIN, CTYPE_BUILD ),
 	STANDARD_CMD( "scrape", POS_STANDING, do_scrape, LVL_APPROVED, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	ABILITY_CMD( "search", POS_STANDING, do_search, NO_MIN, CTYPE_COMBAT, ABIL_SEARCH ),
 	STANDARD_CMD( "selfdelete", POS_SLEEPING, do_selfdelete, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_UTIL, CMD_NO_ABBREV, NO_ABIL ),
@@ -932,9 +939,10 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "typo", POS_DEAD, do_gen_write, NO_MIN, CTYPE_COMM, SCMD_TYPO ),
 
 	GRANT_CMD( "unbind", POS_SLEEPING, do_unbind, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_UNBIND ),
-	STANDARD_CMD( "unharness", POS_STANDING, do_harness, NO_MIN, NO_GRANTS, TRUE, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
+	STANDARD_CMD( "unharness", POS_STANDING, do_unharness, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
 	SCMD_CMD( "unkeep", POS_DEAD, do_keep, NO_MIN, CTYPE_UTIL, SCMD_UNKEEP ),
-	STANDARD_CMD( "unload", POS_STANDING, do_unload_boat, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
+	STANDARD_CMD( "unload", POS_STANDING, do_unload_vehicle, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
+	STANDARD_CMD( "unloadvehicle", POS_STANDING, do_unload_vehicle, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
 	SCMD_CMD( "unstake", POS_STANDING, do_stake, NO_MIN, CTYPE_COMBAT, TRUE ),
 	STANDARD_CMD( "untie", POS_STANDING, do_tie, NO_MIN, NO_GRANTS, TRUE, CTYPE_COMBAT, CMD_NO_ANIMALS, NO_ABIL ),
 	GRANT_CMD( "unban", POS_DEAD, do_unban, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_BAN ),

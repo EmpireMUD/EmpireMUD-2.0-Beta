@@ -11,12 +11,15 @@ A
 17 1 0
 S
 #11101
-boat rowboat small~
-a rib-bone boat~
-A rib-bone boat floats nearby.~
-The ribs of this colossus sure are buoyant.
+ribcage colossal~
+a colossal ribcage~
+A colossal ribcage is lying here.~
+   This could be made into a handy boat, but you'll have trouble picking it up
+again afterwards.
+Craft (no skill): rib-bone boat
+  1x colossal ribcage
 ~
-7 ep a 1
+3 e a 5
 0 0 0
 14 0
 S
@@ -129,24 +132,194 @@ A
 13 1 0
 S
 #11111
-small pouch venom viper~
+pouch venom viper~
 a pouch of viper venom~
 A pouch of viper venom rests nearby.~
 This small pouch of viper venom could come in handy.
 ~
-26 0 a 1
+26 0 a 2
 11 30 0
 7 0
 S
 #11112
-pouch skink saliva small~
+pouch skink saliva~
 a pouch of skink saliva~
 A pouch of skink saliva rests nearby.~
 This small pouch of skink saliva could come in handy.
 ~
-26 0 a 1
+26 0 a 2
 1 30 0
 7 0
+S
+#11113
+stone glowing green serpent~
+a serpent stone~
+A faintly glowing green stone is sitting here.~
+You could make this into a beautiful necklace... But in what shape?
+
+Forge (Jewelry): cave viper sigil (mage neck)
+ 1x serpent stone
+ 2x silver dust
+Forge (Jewelry): serpent pendant (melee neck)
+ 1x serpent stone
+ 2x silver dust
+Forge (Jewelry): skink amulet (tank neck)
+ 1x serpent stone
+ 2x silver dust
+~
+3 0 a 2
+0 0 0
+12 0
+S
+#11114
+cape scarlet-feathered feathered~
+a scarlet-feathered cape~
+A scarlet-feathered cape is lying here.~
+This cape is made from the bright red plumage of a scarlet-feathered raptor.
+~
+27 mp ak 2
+2 0 0
+7 0
+A
+2 1 0
+A
+18 1 0
+S
+#11115
+bracer skinkskin colorful~
+a skinkskin bracer~
+A colorful skinkskin bracer is lying here.~
+This colorful scaly bracelet is made from the skin of a cave skink.
+~
+27 mo aj 2
+1 0 0
+7 0
+A
+17 1 0
+A
+2 1 0
+S
+#11116
+skullcap bone colossal~
+a colossal skullcap~
+A colossal bone skullcap is lying here.~
+   This massive skullcap is made from an actual colossus skull! It's
+surprisingly comfortable.
+~
+27 mp ae 1
+3 0 0
+14 0
+A
+1 2 0
+A
+17 1 0
+S
+#11117
+leggings adventurer's adventurers torn~
+torn adventurer's leggings~
+An adventurer's leggings are lying here, ripped and torn.~
+   Something unfortunate clearly happened to the owner of these leggings, but
+their many, many pockets are still intact. Waste not, want not?
+~
+2 mo af 1
+0 0 0
+7 0
+A
+19 1 0
+A
+9 2 0
+S
+#11118
+whistle skink colorful~
+a skink whistle~
+A colorful skink whistle is lying here.~
+This whistle can summon a noncombat pet!
+Type 'use whistle' to summon it.
+~
+3 p a 1
+11113 0 0
+7 0
+T 9900
+S
+#11119
+sigil viper cave~
+a cave viper sigil~
+A cave viper sigil is lying here.~
+   This magical silver necklace is shaped like a cave viper. Its emerald eyes
+almost seems to follow you around the room...
+~
+2 mo ac 5
+0 0 0
+3 0
+A
+8 1 0
+A
+7 1 0
+C
+75 125
+S
+#11120
+pendant serpent~
+a serpent pendant~
+A serpent pendant is lying here.~
+   This silver pendant is shaped like a cave viper, with strange emerald eyes.
+It almost seems to move when you're not watching.
+~
+2 mo ac 6
+0 0 0
+3 0
+A
+6 1 0
+A
+4 1 0
+C
+75 125
+S
+#11121
+amulet skink~
+a skink amulet~
+A skink amulet is lying here.~
+   The emerald eyes of this silver amulet gaze balefully at you. It almost
+seems to move when you're not watching.
+~
+2 mo ac 4
+0 0 0
+3 0
+A
+2 1 0
+A
+15 1 0
+C
+75 125
+S
+#11122
+staff bone colossal~
+a colossal bone staff~
+A colossal bone staff is lying here.~
+   This massive staff is made from one of the smaller bones of a loch colossus.
+It's still REALLY big.
+~
+1 ehmp an 2
+0 3 20
+14 0
+A
+17 1 0
+S
+#11123
+earrings scarlet feather~
+scarlet feather earrings~
+A pair of scarlet feathered earrings is lying here.~
+   These wooden earrings with scarlet feathers attached are perfect for
+displaying your victory over a scarlet-feathered raptor without wearing its
+entire scalp on your head.
+~
+2 mp am 2
+0 0 0
+7 0
+A
+4 2 0
+A
+9 1 0
 S
 #11130
 leather leatherbound book journal~
@@ -209,11 +382,11 @@ an opal carapace~
 A shard of opal carapace shines nearby.~
    The carapace -- tough as plate mail -- swirls in blends of gold, green, and
 blue against a midnight backdrop.
-Forge (Imperial Armors): carapace buckler
+Forge (Imperial Armors): opal carapace buckler
  18x opal carapace
  2x imperium ingot
 ~
-3 0 a 1
+3 0 a 2
 0 0 0
 14 0
 R
@@ -430,7 +603,7 @@ A pair of titanaconda scale trousers hang nearby.~
    The trousers, sewn from the scales of a titanaconda, are strong but
 flexible, and their hues of deep green reflect wetly in the light.
 ~
-27 m af 1
+27 mo af 2
 2 0 0
 7 0
 A

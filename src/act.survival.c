@@ -198,11 +198,11 @@ ACMD(do_butcher) {
 
 
 ACMD(do_dismount) {
+	void do_unseat_from_vehicle(char_data *ch);
+	
 	char_data *mount;
 	
-	if (!IS_RIDING(ch))
-		msg_to_char(ch, "You're not riding anything right now.\r\n");
-	else {
+	if (IS_RIDING(ch)) {
 		mount = mob_proto(GET_MOUNT_VNUM(ch));
 		
 		msg_to_char(ch, "You jump down off of %s.\r\n", mount ? GET_SHORT_DESC(mount) : "your mount");
@@ -211,6 +211,12 @@ ACMD(do_dismount) {
 		act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
 		
 		perform_dismount(ch);
+	}
+	else if (GET_SITTING_ON(ch)) {
+		do_unseat_from_vehicle(ch);
+	}
+	else {
+		msg_to_char(ch, "You're not riding anything right now.\r\n");
 	}
 }
 
@@ -313,11 +319,21 @@ ACMD(do_mount) {
 		msg_to_char(ch, "What did you want to mount?\r\n");
 	}
 	else if (*arg && !(mob = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
-		send_config_msg(ch, "no_person");
+		// special case: mount/ride a vehicle
+		if (get_vehicle_in_room_vis(ch, arg)) {
+			void do_sit_on_vehicle(char_data *ch, char *argument);
+			do_sit_on_vehicle(ch, arg);
+		}
+		else {
+			send_config_msg(ch, "no_person");
+		}
 	}
 	else if (!mob && IS_COMPLETE(IN_ROOM(ch)) && !BLD_ALLOWS_MOUNTS(IN_ROOM(ch))) {
 		// only check this if they didn't target a mob -- still need to be able to pick up new mounts indoors
 		msg_to_char(ch, "You can't mount here.\r\n");
+	}
+	else if (GET_SITTING_ON(ch)) {
+		msg_to_char(ch, "You're already sitting %s something.\r\n", IN_OR_ON(GET_SITTING_ON(ch)));
 	}
 	else if (mob && ch == mob) {
 		msg_to_char(ch, "You can't mount yourself.\r\n");
@@ -341,9 +357,6 @@ ACMD(do_mount) {
 	}
 	else if (mob && GET_LED_BY(mob)) {
 		msg_to_char(ch, "You can't ride someone's who's being led around.\r\n");
-	}
-	else if (mob && GET_PULLING(mob)) {
-		msg_to_char(ch, "You can't ride a harnessed mob.\r\n");
 	}
 	else if (mob && GET_POS(mob) < POS_STANDING) {
 		act("You can't mount $N right now.", FALSE, ch, NULL, mob, TO_CHAR);

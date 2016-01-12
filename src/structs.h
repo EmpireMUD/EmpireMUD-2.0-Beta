@@ -31,6 +31,8 @@
 *     Object Defines
 *     Player Defines
 *     Sector Defines
+*     Vehicle Defines
+*     Weather and Season Defines
 *     World Defines
 *     Maxima and Limits
 *   Structs Section
@@ -53,6 +55,7 @@
 *     Object Structs
 *     Sector Structs
 *     Trigger Structs
+*     Vehicle Structs
 *     Weather and Season Structs
 *     World Structs
 */
@@ -113,6 +116,7 @@
 	SECT(room) == world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)].sector_type && \
 	!ROOM_SECT_FLAGGED(room, TILE_KEEP_FLAGS) && \
 	!ROOM_OWNER(room) && !ROOM_CONTENTS(room) && !ROOM_PEOPLE(room) && \
+	!ROOM_VEHICLES(room) && \
 	!ROOM_DEPLETION(room) && !ROOM_CUSTOM_NAME(room) && \
 	!ROOM_CUSTOM_ICON(room) && !ROOM_CUSTOM_DESCRIPTION(room) && \
 	!ROOM_AFFECTS(room) && ROOM_BASE_FLAGS(room) == NOBITS && \
@@ -219,6 +223,7 @@ typedef struct room_template room_template;
 typedef struct sector_data sector_data;
 typedef struct skill_data skill_data;
 typedef struct trig_data trig_data;
+typedef struct vehicle_data vehicle_data;
 
 
   /////////////////////////////////////////////////////////////////////////////
@@ -433,7 +438,7 @@ typedef struct trig_data trig_data;
  //////////////////////////////////////////////////////////////////////////////
 //// BUILDING DEFINES ////////////////////////////////////////////////////////
 
-// building data flags
+// BLD_x: building data flags
 #define BLD_ROOM  BIT(0)	// a designatable interior room instead of a whole building
 #define BLD_ALLOW_MOUNTS  BIT(1)	// can ride/mount in
 #define BLD_TWO_ENTRANCES  BIT(2)	// has a rear door
@@ -479,6 +484,8 @@ typedef struct trig_data trig_data;
 #define BLD_NEED_BOAT  BIT(42)	// requires a boat to enter
 #define BLD_LOOK_OUT  BIT(43)	// can see the map using "look out"
 #define BLD_SECONDARY_TERRITORY  BIT(44)	// similar to a ship -- counts as territory off the map
+#define BLD_SHIPYARD  BIT(45)	// for building ships
+#define BLD_UPGRADED  BIT(46)	// combines with SHIPYARD, etc. to create upgraded versions of buildings
 
 
 // Terrain flags for do_build -- these match up with build_on flags for building crafts
@@ -523,6 +530,10 @@ typedef struct trig_data trig_data;
 #define DES_TOP_OF_TOWER	BIT(11)
 #define DES_HOUSEHOLD		BIT(12)
 #define DES_HAVEN			BIT(13)
+#define DES_SHIP_MAIN		BIT(14)
+#define DES_SHIP_LARGE		BIT(15)
+#define DES_SHIP_EXTRA		BIT(16)
+#define DES_LAND_VEHICLE	BIT(17)
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -643,7 +654,7 @@ typedef struct trig_data trig_data;
  //////////////////////////////////////////////////////////////////////////////
 //// CRAFT DEFINES ///////////////////////////////////////////////////////////
 
-// do_gen_craft (trade.c)
+// CRAFT_TYPE_x: do_gen_craft (trade.c)
 #define CRAFT_TYPE_ERROR  0
 #define CRAFT_TYPE_FORGE  1
 #define CRAFT_TYPE_CRAFT  2
@@ -655,9 +666,10 @@ typedef struct trig_data trig_data;
 #define CRAFT_TYPE_BUILD  8
 #define CRAFT_TYPE_WEAVE  9
 #define CRAFT_TYPE_WORKFORCE  10
+#define CRAFT_TYPE_MANUFACTURE  11
 
 
-// Craft Flags for do_gen_craft
+// CRAFT_x: Craft Flags for do_gen_craft
 #define CRAFT_POTTERY  BIT(0)  // bonus at pottery; requires fire
 #define CRAFT_APIARIES  BIT(1)  // requires apiary tech
 #define CRAFT_GLASS  BIT(2)  // requires glassblowing tech
@@ -671,6 +683,9 @@ typedef struct trig_data trig_data;
 #define CRAFT_UPGRADE  BIT(10)	// build: is an upgrade, not a new building
 #define CRAFT_DISMANTLE_ONLY  BIT(11)	// build: building can be dismantled but not built
 #define CRAFT_IN_CITY_ONLY  BIT(12)	// craft/building must be inside a city
+#define CRAFT_VEHICLE  BIT(13)	// creates a vehicle instead of an object
+#define CRAFT_SHIPYARD  BIT(14)	// requires a shipyard
+#define CRAFT_BLD_UPGRADED  BIT(15)	// requires a building with the upgraded flag
 
 
 // For find_building_list_entry
@@ -695,7 +710,7 @@ typedef struct trig_data trig_data;
 #define ETRAIT_DISTRUSTFUL  BIT(0)	// hostile behavior
 
 
-// workforce types
+// CHORE_x: workforce types
 #define CHORE_BUILDING  0
 #define CHORE_FARMING  1
 #define CHORE_REPLANTING  2
@@ -722,7 +737,8 @@ typedef struct trig_data trig_data;
 #define CHORE_ABANDON_FARMED  23
 #define CHORE_NEXUS_CRYSTALS  24
 #define CHORE_MILLING  25
-#define NUM_CHORES  26		// total
+#define CHORE_REPAIR_VEHICLES  26
+#define NUM_CHORES  27		// total
 
 
 /* Diplomacy types */
@@ -883,7 +899,7 @@ typedef struct trig_data trig_data;
 
 
 // misc game configs
-#define ACTION_CYCLE_TIME  5	// seconds per action tick (before haste) -- TODO should this be a config?
+#define ACTION_CYCLE_TIME  10	// seconds per action tick (before haste) -- TODO should this be a config?
 #define HISTORY_SIZE  5	// Keep last 5 commands.
 
 
@@ -946,7 +962,7 @@ typedef struct trig_data trig_data;
 #define MOB_NO_EXPERIENCE  BIT(31)	// F. players get no exp against this mob
 
 
-// mob movement types
+// MOB_MOVE_x: mob/vehicle movement types
 #define MOB_MOVE_WALK  0
 #define MOB_MOVE_CLIMB  1
 #define MOB_MOVE_FLY  2
@@ -966,6 +982,13 @@ typedef struct trig_data trig_data;
 #define MOB_MOVE_WADDLES  16
 #define MOB_MOVE_CRAWLS  17
 #define MOB_MOVE_FLUTTERS  18
+#define MOB_MOVE_DRIVES  19
+#define MOB_MOVE_SAILS  20
+#define MOB_MOVE_ROLLS  21
+#define MOB_MOVE_RATTLES  22
+#define MOB_MOVE_SKIS  23
+#define MOB_MOVE_SLIDES  24
+#define MOB_MOVE_SOARS  25
 
 
 // name sets: add matching files in lib/text/names/
@@ -1002,7 +1025,7 @@ typedef struct trig_data trig_data;
 #define ITEM_CONTAINER  4	// item is a container
 #define ITEM_DRINKCON  5	// item is a drink container
 #define ITEM_FOOD  6	// item is food
-#define ITEM_BOAT  7	// a boat
+	#define ITEM_UNUSED1  7
 #define ITEM_PORTAL  8  // a portal
 #define ITEM_BOARD  9	// message board
 #define ITEM_CORPSE  10	// a corpse, pc or npc
@@ -1011,8 +1034,8 @@ typedef struct trig_data trig_data;
 	#define ITEM_UNUSED3  13
 #define ITEM_MAIL  14	// mail
 #define ITEM_WEALTH  15	// item provides wealth
-#define ITEM_CART  16	// item is a cart/wagon
-#define ITEM_SHIP  17	// large ship
+#define ITEM_CART  16	// This type is mostly DEPRECATED; use vehicles instead
+#define ITEM_SHIP  17	// This type is mostly DEPRECATED; use vehicles instead
 	#define ITEM_UNUSED4  18
 	#define ITEM_UNUSED5  19
 #define ITEM_MISSILE_WEAPON  20	// bow/crossbow/etc
@@ -1049,7 +1072,7 @@ typedef struct trig_data trig_data;
 #define ITEM_WEAR_SADDLE  BIT(18)	// s. Saddle
 
 
-// Some different kind of liquids for use in values of drink containers
+// LIQ_x: Some different kind of liquids for use in values of drink containers
 #define LIQ_WATER  0
 #define LIQ_LAGER  1
 #define LIQ_WHEATBEER  2
@@ -1063,7 +1086,8 @@ typedef struct trig_data trig_data;
 #define LIQ_GREEN_TEA  10
 #define LIQ_RED_WINE  11
 #define LIQ_WHITE_WINE  12
-#define NUM_LIQUIDS  13	// total
+#define LIQ_GROG  13
+#define NUM_LIQUIDS  14	// total
 
 
 // Item materials
@@ -1087,7 +1111,7 @@ typedef struct trig_data trig_data;
 
 
 // Extra object flags -- OBJ_FLAGGED(obj, f)
-#define OBJ_CHAIR  BIT(0)	// a. Item can be sat upon
+	#define OBJ_UNUSED  BIT(0)	// formerly "chair"
 #define OBJ_PLANTABLE  BIT(1)	// b. Uses val 2 to set a crop type
 #define OBJ_LIGHT  BIT(2)	// c. Lights until timer pops
 #define OBJ_SUPERIOR  BIT(3)	// d. Item is of superior quality
@@ -1116,13 +1140,15 @@ typedef struct trig_data trig_data;
 #define OBJ_BIND_FLAGS  (OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP)	// all bind-on flags
 
 
-// custom message types
+// OBJ_CUSTOM_x: custom message types
 #define OBJ_CUSTOM_BUILD_TO_CHAR  0
 #define OBJ_CUSTOM_BUILD_TO_ROOM  1
 #define OBJ_CUSTOM_INSTRUMENT_TO_CHAR  2
 #define OBJ_CUSTOM_INSTRUMENT_TO_ROOM  3
 #define OBJ_CUSTOM_EAT_TO_CHAR  4
 #define OBJ_CUSTOM_EAT_TO_ROOM  5
+#define OBJ_CUSTOM_CRAFT_TO_CHAR  6
+#define OBJ_CUSTOM_CRAFT_TO_ROOM  7
 
 
 // storage flags (for obj storage locations)
@@ -1175,7 +1201,7 @@ typedef struct trig_data trig_data;
 #define ACCT_MULTI_CHAR  BIT(5)	// f. can log in more than one character on this account
 
 
-// Periodic actions -- WARNING: changing the order of these will have tragic consequences with saved players
+// ACT_x: Periodic actions -- WARNING: changing the order of these will have tragic consequences with saved players
 #define ACT_NONE			0
 #define ACT_DIGGING			1
 #define ACT_GATHERING		2
@@ -1188,7 +1214,7 @@ typedef struct trig_data trig_data;
 #define ACT_MINTING			9
 #define ACT_FISHING			10
 #define ACT_MELTING			11
-#define ACT_MANUFACTURING	12
+#define ACT_REPAIRING		12
 #define ACT_CHIPPING		13
 #define ACT_PANNING			14
 #define ACT_MUSIC			15
@@ -1207,12 +1233,13 @@ typedef struct trig_data trig_data;
 #define ACT_RITUAL			28
 #define ACT_SAWING			29
 #define ACT_QUARRYING		30
-	#define ACT_UNUSED1			31	// formerly weaving
+#define ACT_DRIVING			31
 #define ACT_TANNING			32
 #define ACT_READING			33
 #define ACT_COPYING_BOOK	34
 #define ACT_GEN_CRAFT		35
 #define ACT_SAILING			36
+#define ACT_PILOTING		37
 
 // act flags
 #define ACTF_ANYWHERE  BIT(0)	// movement won't break it
@@ -1221,6 +1248,7 @@ typedef struct trig_data trig_data;
 #define ACTF_SHOVEL  BIT(3)	// shovel increases speed
 #define ACTF_FINDER  BIT(4)	// finder increases speed
 #define ACTF_ALWAYS_FAST  BIT(5)	// this action is always faster
+#define ACTF_SITTING  BIT(6)	// can be sitting
 
 
 // bonus traits
@@ -1504,11 +1532,37 @@ typedef struct trig_data trig_data;
 #define SECTF_MAP_BUILDING  BIT(15)	// shows a building instead of sect tile
 #define SECTF_INSIDE  BIT(16)	// shows a room instead of sect tile; is interior of a building (off-map)
 #define SECTF_LARGE_CITY_RADIUS  BIT(17)	// counts as in-city much further than normal
-#define SECTF_OBSCURE_VISION  BIT(18)	// blocks catapult, mappc
+#define SECTF_OBSCURE_VISION  BIT(18)	// blocks mappc
 #define SECTF_IS_TRENCH  BIT(19)	// excavate-related
 	#define SECTF_UNUSED1  BIT(20)
 #define SECTF_ROUGH  BIT(21)	// hard terrain, requires ATR; other mountain-like properties
 #define SECTF_SHALLOW_WATER  BIT(22)	// can't earthmeld; other properties like swamp and oasis have
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// VEHICLE DEFINES //////////////////////////////////////////////////////////
+
+// VEH_x: vehicle flags
+#define VEH_INCOMPLETE  BIT(0)	// a. can't be used until finished
+#define VEH_DRIVING  BIT(1)	// b. can move on land
+#define VEH_SAILING  BIT(2)	// c. can move on water
+#define VEH_FLYING  BIT(3)	// d. no terrain restrictions
+#define VEH_ALLOW_ROUGH  BIT(4)	// e. can move on rough terrain
+#define VEH_SIT  BIT(5)	// f. can sit on
+#define VEH_IN  BIT(6)	// g. player sits IN rather than ON
+#define VEH_BURNABLE  BIT(7)	// h. can burn
+#define VEH_CONTAINER  BIT(8)	// i. can put items in
+#define VEH_SHIPPING  BIT(9)	// j. used for the shipping system
+#define VEH_CUSTOMIZABLE  BIT(10)	// k. players can name it
+#define VEH_DRAGGABLE  BIT(11)	// l. player can drag it over land
+#define VEH_NO_BUILDING  BIT(12)	// m. won't fit into a building
+#define VEH_CAN_PORTAL  BIT(13)	// n. required for the vehicle to go through a portal
+#define VEH_LEADABLE  BIT(14)	// o. can be lead around
+#define VEH_CARRY_VEHICLES  BIT(15)	// p. can put vehicles on board
+#define VEH_CARRY_MOBS  BIT(16)	// q. can put mobs on board
+#define VEH_SIEGE_WEAPONS  BIT(17)	// r. can be used to besiege
+#define VEH_ON_FIRE  BIT(18)	// s. currently on fire
+#define VEH_NO_LOAD_ONTO_VEHICLE  BIT(19)	// t. cannot be loaded onto a vehicle
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1629,8 +1683,8 @@ typedef struct trig_data trig_data;
 #define ROOM_AFF_PUBLIC  BIT(7)	// h. Empire allows public use
 #define ROOM_AFF_DISMANTLING  BIT(8)	// i. Being dismantled
 #define ROOM_AFF_NO_FLY  BIT(9)	// j. Can't fly there
-#define ROOM_AFF_SHIP_PRESENT  BIT(10)	// k. A ship is present
-	#define ROOM_AFF_UNUSED  BIT(11)
+	#define ROOM_AFF_UNUSED1  BIT(10)
+#define ROOM_AFF_IN_VEHICLE  BIT(11)	// l. Part of a vehicle
 #define ROOM_AFF_NO_WORK  BIT(12)	// m. workforce ignores this room
 #define ROOM_AFF_NO_DISREPAIR  BIT(13)	// n. will not fall into disrepair
 #define ROOM_AFF_NO_DISMANTLE  BIT(14)
@@ -1884,9 +1938,9 @@ struct interact_exclusion_data {
 };
 
 
-// for the "interactions" system (like butcher, dig, etc) -- INTERACT_x
+// for the "interactions" system (like butcher, dig, etc)
 struct interaction_item {
-	int type;	// INTERACT_x
+	int type;	// INTERACT_
 	obj_vnum vnum;	// the skin object
 	double percent;	// how often to do it 0.01 - 100.00
 	int quantity;	// how many to give
@@ -1940,8 +1994,8 @@ struct shipping_data {
 	int to_island;
 	int status;	// SHIPPING_x
 	long status_time;	// when it gained that status
-	room_vnum ship_homeroom;	// if a ship is assigned, which one
 	room_vnum ship_origin;	// where the ship is coming from (in case we have to send it back)
+	int shipping_id;	// VEH_SHIPPING_ID() of ship
 	
 	struct shipping_data *next;
 };
@@ -2272,7 +2326,7 @@ struct bld_data {
 	
 	int max_damage;
 	int fame;	// how much is added to empire fame
-	bitvector_t flags;	// BLD_x
+	bitvector_t flags;	// BLD_
 	bld_vnum upgrades_to;	// the vnum of any building
 	
 	int extra_rooms;	// how many rooms it can have
@@ -2537,6 +2591,7 @@ struct descriptor_data {
 	struct sector_data *olc_sector;	// sector being edited
 	skill_data *olc_skill;	// skill being edited
 	struct trig_data *olc_trigger;	// trigger being edited
+	vehicle_data *olc_vehicle;	// vehicle being edited
 	
 	// linked list
 	descriptor_data *next;
@@ -2653,7 +2708,7 @@ struct player_special_data {
 	int rewarded_today[MAX_REWARDS_PER_DAY];	// idnums, for ABIL_REWARD
 
 	// action info
-	int action;	// ACT_x
+	int action;	// ACT_
 	int action_cycle;	// time left before an action tick
 	int action_timer;	// ticks to completion (use varies)
 	room_vnum action_room;	// player location
@@ -2770,8 +2825,6 @@ struct char_special_data {
 
 	// UNSAVED SECTION //
 	
-	obj_data *chair;	// Object that this char's sitting in
-
 	struct fight_data fighting;	// Opponent
 	char_data *hunting;	// Char hunted by this char
 
@@ -2779,9 +2832,10 @@ struct char_special_data {
 	char_data *fed_on_by;	// Who is biting person
 
 	char_data *led_by;	// A person may lead a mob
-	char_data *leading;	// A mob may lead a person
-
-	obj_data *pulling;	// The mob may be pulling something
+	char_data *leading_mob;	// A mob may lead a person
+	vehicle_data *leading_vehicle;	// A person may lead a vehicle
+	vehicle_data *sitting_on;	// Vehicle the person is on
+	vehicle_data *driving;	// Vehicle the person is driving
 	
 	struct empire_npc_data *empire_npc;	// if this is an empire spawn
 	
@@ -2887,15 +2941,15 @@ struct lore_data {
 struct craft_data {
 	craft_vnum vnum;	// vnum of this recipe
 	
-	int type;	// CRAFT_TYPE_x
+	int type;	// CRAFT_TYPE_
 	any_vnum ability;	// NO_ABIL for none, otherwise ABIL_ type
 	
 	char *name;
-	obj_vnum object;	// vnum of the object it makes, or liquid id if CRAFT_SOUP
+	any_vnum object;	// vnum of the object it makes, or liquid id if CRAFT_SOUP, or vehicle if CRAFT_VEHICLE
 	int quantity;	// makes X
 	
 	int min_level;	// required level to craft it using get_crafting_level()
-	bitvector_t flags;	// CRAFT_x
+	bitvector_t flags;	// CRAFT_
 	int time;	// how many action ticks it takes
 	
 	// for buildings:
@@ -2903,7 +2957,7 @@ struct craft_data {
 	bitvector_t build_on;	// BLD_ON_x flags for the tile it's built upon
 	bitvector_t build_facing;	// BLD_ON_x flags for the tile it's facing
 	
-	obj_vnum requires_obj;	// only shows up if you have the item, e.g. o_TENT
+	obj_vnum requires_obj;	// only shows up if you have the item
 	struct resource_data *resources;	// linked list
 	
 	UT_hash_handle hh;	// craft_table hash
@@ -2954,7 +3008,7 @@ struct crop_data {
 struct action_data_struct {
 	char *name;	// shown e.g. in sentences or prompt ("digging")
 	char *long_desc;	// shown in room (action description)
-	bitvector_t flags;	// ACTF_x flags
+	bitvector_t flags;	// ACTF_ flags
 	void (*process_function)(char_data *ch);	// called on ticks (may be NULL)
 	void (*cancel_function)(char_data *ch);	// called when the action is cancelled early (may be NULL)
 };
@@ -2976,7 +3030,7 @@ struct city_metadata_type {
 };
 
 
-// chore type data -- CHORE_x
+// chore type data -- CHORE_
 struct empire_chore_type {
 	char *name;
 	mob_vnum mob;
@@ -3026,18 +3080,6 @@ struct potion_data_type {
 	int apply;	// APPLY_x
 	bitvector_t aff;
 	int spec;	// POTION_SPEC_x
-};
-
-
-// ships.c ship_data[]
-struct ship_data_struct {
-	char *name;
-	int vnum;
-	int type;
-	any_vnum ability;	// NO_ABIL or ABIL_x
-	int resources;
-	int advanced;
-	int cargo_size;
 };
 
 
@@ -3277,6 +3319,7 @@ struct empire_data {
 	int scores[NUM_SCORES];	// empire score in each category
 	int sort_value;	// for score ties
 	bool storage_loaded;	// record whether or not storage has been loaded, to prevent saving over it
+	int top_shipping_id;	// shipping system quick id for the empire
 	
 	UT_hash_handle hh;	// empire_table hash handle
 };
@@ -3367,6 +3410,7 @@ struct obj_data {
 	char *action_description;	// What to write when looked at
 	struct extra_descr_data *ex_description;	// extra descriptions
 	struct obj_custom_message *custom_msgs;	// any custom messages
+	vehicle_data *in_vehicle;	// in vehicle or NULL
 	char_data *carried_by;	// Carried by NULL in room/container
 	char_data *worn_by;	// Worn by?
 	sh_int worn_on;	// Worn where?
@@ -3378,10 +3422,7 @@ struct obj_data {
 	struct interaction_item *interactions;	// interaction items
 	struct obj_storage_type *storage;	// linked list of where an obj can be stored
 	time_t autostore_timer;	// how long an object has been where it be
-
-	char_data *sitting;	// Person in the chair
-	char_data *pulled_by1;	// Animal pulling this obj
-	char_data *pulled_by2;	// Up to two animals may be needed
+	
 	struct obj_binding *bound_to;	// LL of who it's bound to
 
 	obj_data *in_obj;	// In what object NULL when none
@@ -3466,6 +3507,84 @@ struct trig_proto_list {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// VEHICLE STRUCTS /////////////////////////////////////////////////////////
+
+struct vehicle_data {
+	any_vnum vnum;
+	
+	char *keywords;	// targeting terms
+	char *short_desc;	// the sentence-building name ("a canoe")
+	char *long_desc;	// As described in the room.
+	char *look_desc;	// Description when looked at
+	char *icon;	// Optional: Shown on map if not null
+	
+	struct vehicle_attribute_data *attributes;	// non-instanced data
+	bitvector_t flags;	// VEH_ flags
+	
+	// instance data
+	empire_data *owner;	// which empire owns it, if any
+	int scale_level;	// determines amount of damage, etc
+	int health;	// current health
+	obj_data *contains;	// contains objects
+	int carrying_n;	// size of contents
+	struct vehicle_attached_mob *animals;	// linked list of mobs attached
+	struct resource_data *needs_resources;	// resources until finished/maintained
+	room_data *interior_home_room;	// the vehicle's main room
+	struct vehicle_room_list *room_list;	// all interior rooms
+	int inside_rooms;	// how many rooms are inside
+	time_t last_fire_time;	// for vehicles with siege weapons
+	time_t last_move_time;	// for autostore
+	int shipping_id;	// id for the shipping system for the owner
+	room_data *in_room;	// where it is
+	char_data *led_by;	// person leading it
+	char_data *sitting_on;	// person sitting on it
+	char_data *driver;	// person driving it
+	
+	// scripting
+	int id;	// used by DG triggers - unique id
+	struct trig_proto_list *proto_script;	// list of default triggers
+	struct script_data *script;	// script info for the object
+	
+	// lists
+	struct vehicle_data *next;	// vehicle_list (global) linked list
+	struct vehicle_data *next_in_room;	// ROOM_VEHICLES(room) linked list
+	UT_hash_handle hh;	// vehicle_table hash handle
+};
+
+
+// data that only prototypes need
+struct vehicle_attribute_data {
+	int maxhealth;	// total hitpoints
+	int min_scale_level;	// minimum level
+	int max_scale_level;	// maximum level
+	int capacity;	// holds X items
+	int animals_required;	// number of animals to move it
+	int move_type;	// MOB_MOVE_ type
+	bld_vnum interior_room_vnum;	// Any ROOM-flagged bld to use as an interior
+	int max_rooms;	// 1 = can enter; >1 allows designate
+	bitvector_t designate_flags;	// DES_ flags
+	struct resource_data *yearly_maintenance;
+};
+
+
+// data for a mob that's attached to the vehicle and extracted
+struct vehicle_attached_mob {
+	mob_vnum mob;	// which mob
+	int scale_level;	// what level it was
+	bitvector_t flags;	// mob flags
+	empire_vnum empire;	// empire that owned it
+	struct vehicle_attached_mob *next;	// linked list
+};
+
+
+// list of rooms inside a vehicle
+struct vehicle_room_list {
+	room_data *room;
+	struct vehicle_room_list *next;
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// WEATHER AND SEASON STRUCTS //////////////////////////////////////////////
 
 // TILESET_x, used in sector_data
@@ -3521,8 +3640,9 @@ struct room_data {
 	struct trig_proto_list *proto_script;	/* list of default triggers  */
 	struct script_data *script;	/* script info for the room           */
 
-	obj_data *contents;  // start of item list
-	char_data *people;  // start of people list
+	obj_data *contents;  // start of item list (obj->next_content)
+	char_data *people;  // start of people list (ch->next_in_room)
+	vehicle_data *vehicles;	// start of vehicle list (veh->next_in_room)
 	
 	struct reset_com *reset_commands;	// used only during startup
 	
@@ -3557,7 +3677,7 @@ struct complex_room_data {
 	
 	int disrepair;	// decay over time
 	
-	obj_data *boat;  // if in a boat, this is the boat obj
+	vehicle_data *vehicle;  // the associated vehicle (usually only on the home room)
 	struct instance_data *instance;	// if part of an instantiated adventure
 	
 	int private_owner;	// for privately-owned houses

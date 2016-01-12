@@ -160,14 +160,18 @@ static void build_instance_entrance(struct instance_data *inst, struct adventure
 				portal = read_object(rule->portal_in, TRUE);
 				GET_OBJ_VAL(portal, VAL_PORTAL_TARGET_VNUM) = GET_ROOM_VNUM(inst->start);
 				obj_to_room(portal, loc);
-				act("$p spins open!", FALSE, NULL, portal, NULL, TO_ROOM);
+				if (ROOM_PEOPLE(IN_ROOM(portal))) {
+					act("$p spins open!", FALSE, ROOM_PEOPLE(IN_ROOM(portal)), portal, NULL, TO_CHAR | TO_ROOM);
+				}
 				load_otrigger(portal);
 			}
 			if (obj_proto(rule->portal_out)) {
 				portal = read_object(rule->portal_out, TRUE);
 				GET_OBJ_VAL(portal, VAL_PORTAL_TARGET_VNUM) = GET_ROOM_VNUM(loc);
 				obj_to_room(portal, inst->start);
-				act("$p spins open!", FALSE, NULL, portal, NULL, TO_ROOM);
+				if (ROOM_PEOPLE(IN_ROOM(portal))) {
+					act("$p spins open!", FALSE, ROOM_PEOPLE(IN_ROOM(portal)), portal, NULL, TO_CHAR | TO_ROOM);
+				}
 				load_otrigger(portal);
 			}
 			break;
@@ -1067,7 +1071,9 @@ static void reset_instance_room(struct instance_data *inst, room_data *room) {
 						if (inst->level > 0) {
 							scale_item_to_level(obj, inst->level);
 						}
-						act("$p appears.", FALSE, NULL, obj, NULL, TO_ROOM);
+						if (ROOM_PEOPLE(IN_ROOM(obj))) {
+							act("$p appears.", FALSE, ROOM_PEOPLE(IN_ROOM(obj)), obj, NULL, TO_CHAR | TO_ROOM);
+						}
 						load_otrigger(obj);
 					}
 					break;
@@ -1784,7 +1790,10 @@ void save_instances(void) {
 * @param int level A pre-validated level.
 */
 static void scale_instance_to_level(struct instance_data *inst, int level) {	
+	void scale_vehicle_to_level(vehicle_data *veh, int level);
+	
 	int iter;
+	vehicle_data *veh;
 	char_data *ch;
 	obj_data *obj;
 	
@@ -1793,12 +1802,19 @@ static void scale_instance_to_level(struct instance_data *inst, int level) {
 	for (iter = 0; iter < inst->size; ++iter) {
 		if (inst->room[iter]) {
 			for (ch = ROOM_PEOPLE(inst->room[iter]); ch; ch = ch->next_in_room) {
-				if (IS_NPC(ch)) {
+				if (IS_NPC(ch) && GET_CURRENT_SCALE_LEVEL(ch) == 0) {
 					scale_mob_to_level(ch, level);
 				}
 			}
 			for (obj = ROOM_CONTENTS(inst->room[iter]); obj; obj = obj->next_content) {
-				scale_item_to_level(obj, level);
+				if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) == 0) {
+					scale_item_to_level(obj, level);
+				}
+			}
+			LL_FOREACH2(ROOM_VEHICLES(inst->room[iter]), veh, next_in_room) {
+				if (VEH_SCALE_LEVEL(veh) == 0) {
+					scale_vehicle_to_level(veh, level);
+				}
 			}
 		}
 	}

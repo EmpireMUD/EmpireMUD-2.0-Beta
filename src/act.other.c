@@ -1026,6 +1026,7 @@ ACMD(do_confirm) {
 
 ACMD(do_customize) {
 	void do_customize_room(char_data *ch, char *argument);
+	void do_customize_vehicle(char_data *ch, char *argument);
 
 	char arg2[MAX_INPUT_LENGTH];
 	
@@ -1036,6 +1037,9 @@ ACMD(do_customize) {
 	}
 	else if (is_abbrev(arg, "building") || is_abbrev(arg, "room")) {
 		do_customize_room(ch, arg2);
+	}
+	else if (is_abbrev(arg, "vehicle") || is_abbrev(arg, "ship")) {
+		do_customize_vehicle(ch, arg2);
 	}
 	else {
 		msg_to_char(ch, "What do you want to customize? (See HELP CUSTOMIZE)\r\n");
@@ -1078,33 +1082,54 @@ ACMD(do_dismiss) {
 }
 
 
-ACMD(do_douse) {	
-	obj_data *obj;
-	byte amount;
+ACMD(do_douse) {
+	void do_douse_vehicle(char_data *ch, vehicle_data *veh, obj_data *cont);
+	
 	room_data *room = HOME_ROOM(IN_ROOM(ch));
+	obj_data *obj = NULL, *iter;
+	char arg[MAX_INPUT_LENGTH];
+	vehicle_data *veh;
+	byte amount;
 	
 	int fire_extinguish_value = config_get_int("fire_extinguish_value");
 
-	// this loop finds a drink container and sets obj
-	for (obj = ch->carrying; obj && !(GET_DRINK_CONTAINER_CONTENTS(obj) > 0); obj = obj->next_content);
-
+	// this loop finds a water container and sets obj
+	LL_FOREACH2(ch->carrying, iter, next_content) {
+		if (GET_DRINK_CONTAINER_TYPE(iter) == LIQ_WATER && GET_DRINK_CONTAINER_CONTENTS(iter) > 0) {
+			obj = iter;
+			break;
+		}
+	}
+	
+	one_argument(argument, arg);
+	
 	if (!IN_ROOM(ch))
 		msg_to_char(ch, "Unexpected error in douse.\r\n");
-	else if (!IS_ANY_BUILDING(IN_ROOM(ch)))
-		msg_to_char(ch, "You can't really douse a fire here.\r\n");
-	else if (!BUILDING_BURNING(room))
-		msg_to_char(ch, "There's no fire here!\r\n");
 	else if (!obj)
-		msg_to_char(ch, "What do you plan to douse the fire with?\r\n");
-	else if (GET_DRINK_CONTAINER_TYPE(obj) != LIQ_WATER)
-		msg_to_char(ch, "Only water will douse a fire!\r\n");
+		msg_to_char(ch, "You have nothing to douse the fire with!\r\n");
+	else if (*arg) {
+		if ((veh = get_vehicle_in_room_vis(ch, arg))) {
+			do_douse_vehicle(ch, veh, obj);
+		}
+		else if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && isname(arg, VEH_KEYWORDS(GET_ROOM_VEHICLE(IN_ROOM(ch))))) {
+			do_douse_vehicle(ch, GET_ROOM_VEHICLE(IN_ROOM(ch)), obj);
+		}
+		else {
+			msg_to_char(ch, "You don't see %s %s to douse!\r\n", AN(arg), arg);
+		}
+	}
+	else if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_ON_FIRE)) {
+		do_douse_vehicle(ch, GET_ROOM_VEHICLE(IN_ROOM(ch)), obj);
+	}
+	else if (!IS_ANY_BUILDING(IN_ROOM(ch)) || !BUILDING_BURNING(room))
+		msg_to_char(ch, "There's no fire here!\r\n");
 	else {
 		amount = GET_DRINK_CONTAINER_CONTENTS(obj);
 		GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) = 0;
 
 		COMPLEX_DATA(room)->burning = MIN(fire_extinguish_value, BUILDING_BURNING(room) + amount);
 		act("You throw some water from $p onto the flames!", FALSE, ch, obj, 0, TO_CHAR);
-		act("$n throws some water from $p onto the flames!", FALSE, ch, obj, 0, TO_CHAR);
+		act("$n throws some water from $p onto the flames!", FALSE, ch, obj, 0, TO_ROOM);
 
 		if (BUILDING_BURNING(room) >= fire_extinguish_value) {
 			act("The flames have been extinguished!", FALSE, ch, 0, 0, TO_CHAR | TO_ROOM);
@@ -1376,69 +1401,6 @@ ACMD(do_group) {
 	}
 	else {
 		msg_to_char(ch, "You must specify a group option, or type HELP GROUP for more info.\r\n");		
-	}
-}
-
-
-ACMD(do_harness) {
-	char_data *victim;
-	obj_data *rope = NULL, *cart = NULL;
-
-	/* subcmd 0 = harness, 1 = unharness */
-
-	two_arguments(argument, arg, buf);
-
-	if (!*arg || (!subcmd && !*buf)) {
-		if (subcmd)
-			msg_to_char(ch, "Remove whose harness?\r\n");
-		else
-			msg_to_char(ch, "Harness whom to what?\r\n");
-	}
-	else if (!(victim = get_char_vis(ch, arg, FIND_CHAR_ROOM)))
-		send_config_msg(ch, "no_person");
-	else if (subcmd && !GET_PULLING(victim))
-		act("$E isn't harnessed.", FALSE, ch, 0, victim, TO_CHAR);
-	else if (subcmd) {
-		obj_to_char((rope = read_object(o_ROPE, TRUE)), ch);
-		cart = GET_PULLING(victim);
-		if (GET_PULLED_BY(cart, 0) == victim) {
-			cart->pulled_by1 = NULL;
-		}
-		if (GET_PULLED_BY(cart, 1) == victim) {
-			cart->pulled_by2 = NULL;
-		}
-		GET_PULLING(victim) = NULL;
-		act("You unlatch $N from $p.", FALSE, ch, cart, victim, TO_CHAR);
-		act("$n unlatches you from $p.", FALSE, ch, cart, victim, TO_VICT);
-		act("$n unlatches $N from $p.", FALSE, ch, cart, victim, TO_NOTVICT);
-		load_otrigger(rope);
-	}
-	else if (GET_PULLING(victim))
-		act("$E is already harnessed!", FALSE, ch, 0, victim, TO_CHAR);
-	else if (!IS_NPC(victim))
-		msg_to_char(ch, "You can only harness animals.\r\n");
-	else if (!(cart = get_obj_in_list_vis(ch, buf, ROOM_CONTENTS(IN_ROOM(ch)))))
-		msg_to_char(ch, "You don't see a %s here.\r\n", buf);
-	else if (GET_OBJ_TYPE(cart) != ITEM_CART || GET_CART_ANIMALS_REQUIRED(cart) < 1)
-		msg_to_char(ch, "You can't harness anyone to that!\r\n");
-	else if (GET_PULLED_BY(cart, 0) && (GET_CART_ANIMALS_REQUIRED(cart) <= 1 || GET_PULLED_BY(cart, 1)))
-		msg_to_char(ch, "You can't harness any more animals to it.\r\n");
-	else if (!(rope = get_obj_in_list_num(o_ROPE, ch->carrying)))
-		msg_to_char(ch, "You need some rope to do that.\r\n");
-	else if (!MOB_FLAGGED(victim, MOB_MOUNTABLE))
-		act("You can't harness $N to that!", FALSE, ch, 0, victim, TO_CHAR);
-	else {
-		extract_obj(rope);
-		if (GET_PULLED_BY(cart, 0)) {
-			cart->pulled_by2 = victim;
-		}
-		else {
-			cart->pulled_by1 = victim;
-		}
-		GET_PULLING(victim) = cart;
-		act("You harness $N to $p.", FALSE, ch, cart, victim, TO_CHAR);
-		act("$n harnesses you to $p.", FALSE, ch, cart, victim, TO_VICT);
-		act("$n harnesses $N to $p.", FALSE, ch, cart, victim, TO_NOTVICT);
 	}
 }
 

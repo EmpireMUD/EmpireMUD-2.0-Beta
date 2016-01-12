@@ -831,8 +831,6 @@ void parse_craft(FILE *fl, craft_vnum vnum) {
 * @param craft_data *craft The thing to save.
 */
 void write_craft_to_file(FILE *fl, craft_data *craft) {
-	extern const char *drinks[];
-
 	char temp1[256], temp2[256];
 	
 	if (!fl || !craft) {
@@ -843,7 +841,7 @@ void write_craft_to_file(FILE *fl, craft_data *craft) {
 	fprintf(fl, "#%d\n", GET_CRAFT_VNUM(craft));
 	fprintf(fl, "%s~\n", NULLSAFE(GET_CRAFT_NAME(craft)));
 	
-	fprintf(fl, "%d %d  # %dx %s\n", GET_CRAFT_OBJECT(craft), GET_CRAFT_QUANTITY(craft), GET_CRAFT_QUANTITY(craft), IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_SOUP) ? drinks[GET_CRAFT_OBJECT(craft)] : get_obj_name_by_proto(GET_CRAFT_OBJECT(craft)));
+	fprintf(fl, "%d %d\n", GET_CRAFT_OBJECT(craft), GET_CRAFT_QUANTITY(craft));
 	fprintf(fl, "%d %d %s %d %d\n", GET_CRAFT_TYPE(craft), GET_CRAFT_ABILITY(craft), bitv_to_alpha(GET_CRAFT_FLAGS(craft)), GET_CRAFT_TIME(craft), GET_CRAFT_REQUIRES_OBJ(craft));
 	
 	if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD) {
@@ -1233,7 +1231,9 @@ void delete_empire(empire_data *emp) {
 
 	struct empire_political_data *emp_pol, *next_pol, *temp;
 	player_index_data *index, *next_index;
+	struct vehicle_attached_mob *vam;
 	empire_data *emp_iter, *next_emp;
+	vehicle_data *veh, *next_veh;
 	room_data *room, *next_room;
 	char buf[MAX_STRING_LENGTH];
 	obj_data *obj, *next_obj;
@@ -1318,6 +1318,19 @@ void delete_empire(empire_data *emp) {
 		
 		if (obj->last_empire_id == vnum) {
 			obj->last_empire_id = NOTHING;
+		}
+	}
+	
+	// update all vehicles
+	LL_FOREACH_SAFE2(vehicle_list, veh, next_veh, next) {
+		if (VEH_OWNER(veh) == emp) {
+			VEH_OWNER(veh) = NULL;
+			VEH_SHIPPING_ID(veh) = -1;
+		}
+		LL_FOREACH(VEH_ANIMALS(veh), vam) {
+			if (vam->empire == vnum) {
+				vam->empire = NOTHING;
+			}
 		}
 	}
 	
@@ -1631,7 +1644,7 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 				shipd->to_island = t[3];
 				shipd->status = t[4];
 				shipd->status_time = l_in;
-				shipd->ship_homeroom = t[5];
+				shipd->shipping_id = t[5];
 				shipd->ship_origin = t[6];
 				shipd->next = NULL;
 
@@ -2077,7 +2090,7 @@ void write_empire_storage_to_file(FILE *fl, empire_data *emp) {
 	
 	// V: shipments
 	for (shipd = EMPIRE_SHIPPING_LIST(emp); shipd; shipd = shipd->next) {
-		fprintf(fl, "V %d %d %d %d %d %ld %d %d\n", shipd->vnum, shipd->amount, shipd->from_island, shipd->to_island, shipd->status, shipd->status_time, shipd->ship_homeroom, shipd->ship_origin);
+		fprintf(fl, "V %d %d %d %d %d %ld %d %d\n", shipd->vnum, shipd->amount, shipd->from_island, shipd->to_island, shipd->status, shipd->status_time, shipd->shipping_id, shipd->ship_origin);
 	}
 
 	fprintf(fl, "S\n");
@@ -4227,11 +4240,9 @@ void write_room_to_file(FILE *fl, room_data *room) {
 	// C: load commands
 	{
 		// must save obj pack instruction BEFORE mob instruction
-		if (ROOM_CONTENTS(room)) {
-			if (objpack_save_room(room)) {
-				// C O
-				fprintf(fl, "C O\n");
-			}
+		if (objpack_save_room(room)) {
+			// C O
+			fprintf(fl, "C O\n");
 		}
 		// triggers: C T type vnum
 		if (SCRIPT(room)) {
@@ -4242,8 +4253,8 @@ void write_room_to_file(FILE *fl, room_data *room) {
 		if (ROOM_PEOPLE(room)) {
 			for (mob = ROOM_PEOPLE(room); mob; mob = mob->next_in_room) {
 				if (mob && IS_NPC(mob) && !MOB_FLAGGED(mob, MOB_EMPIRE | MOB_FAMILIAR)) {
-					// C M vnum flags pulling
-					fprintf(fl, "C M %d %s %d\n", GET_MOB_VNUM(mob), bitv_to_alpha(MOB_FLAGS(mob)), (GET_PULLING(mob) ? GET_OBJ_VNUM(GET_PULLING(mob)) : NOTHING));
+					// C M vnum flags (pulling unused)
+					fprintf(fl, "C M %d %s %d\n", GET_MOB_VNUM(mob), bitv_to_alpha(MOB_FLAGS(mob)), NOTHING);
 					
 					// C I instance_id
 					if (MOB_INSTANCE_ID(mob) != NOTHING) {
@@ -5080,12 +5091,13 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 	void parse_book(FILE *fl, int book_id);
 	void parse_class(FILE *fl, any_vnum vnum);
 	void parse_skill(FILE *fl, any_vnum vnum);
+	void parse_vehicle(FILE *fl, any_vnum vnum);
 	
 	any_vnum nr = -1, last;
 	char line[256];
 
 	/* modes positions correspond to DB_BOOT_x in db.h */
-	const char *modes[] = {"world", "mob", "obj", "zone", "empire", "book", "craft", "trg", "crop", "sector", "adventure", "room template", "global", "account", "augment", "archetype", "ability", "class", "skill" };
+	const char *modes[] = {"world", "mob", "obj", "zone", "empire", "book", "craft", "trg", "crop", "sector", "adventure", "room template", "global", "account", "augment", "archetype", "ability", "class", "skill", "vehicle" };
 
 	for (;;) {
 		if (!get_line(fl, line)) {
@@ -5180,6 +5192,10 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 					parse_trigger(fl, nr);
 					break;
 				}
+				case DB_BOOT_VEH: {
+					parse_vehicle(fl, nr);
+					break;
+				}
 				default: {
 					log("SYSERR: discrete_load not implemented for mode %d", mode);
 					exit(1);
@@ -5243,7 +5259,7 @@ void index_boot(int mode) {
 
 	if (!rec_count) {
 		// DB_BOOT_x: some types don't matter TODO could move this into a config
-		if (mode == DB_BOOT_EMP || mode == DB_BOOT_BOOKS || mode == DB_BOOT_CRAFT || mode == DB_BOOT_BLD || mode == DB_BOOT_ADV || mode == DB_BOOT_RMT || mode == DB_BOOT_WLD || mode == DB_BOOT_GLB || mode == DB_BOOT_ACCT || mode == DB_BOOT_AUG || mode == DB_BOOT_ARCH || mode == DB_BOOT_ABIL || mode == DB_BOOT_CLASS || mode == DB_BOOT_SKILL) {
+		if (mode == DB_BOOT_EMP || mode == DB_BOOT_BOOKS || mode == DB_BOOT_CRAFT || mode == DB_BOOT_BLD || mode == DB_BOOT_ADV || mode == DB_BOOT_RMT || mode == DB_BOOT_WLD || mode == DB_BOOT_GLB || mode == DB_BOOT_ACCT || mode == DB_BOOT_AUG || mode == DB_BOOT_ARCH || mode == DB_BOOT_ABIL || mode == DB_BOOT_CLASS || mode == DB_BOOT_SKILL || mode == DB_BOOT_VEH) {
 			// types that don't require any entries and exit early if none
 			return;
 		}
@@ -5356,6 +5372,11 @@ void index_boot(int mode) {
 			log("   %d triggers, %d bytes in triggers.", rec_count, size[0]);
 			break;
 		}
+		case DB_BOOT_VEH: {
+			size[0] = sizeof(vehicle_data) * rec_count;
+			log("   %d vehicles, %d bytes in db.", rec_count, size[0]);
+			break;
+		}
 	}
 	rewind(index);
 	fscanf(index, "%s\n", buf1);
@@ -5385,6 +5406,7 @@ void index_boot(int mode) {
 			case DB_BOOT_SECTOR:
 			case DB_BOOT_SKILL:
 			case DB_BOOT_TRG:
+			case DB_BOOT_VEH:
 			case DB_BOOT_WLD: {
 				discrete_load(db_file, mode, buf2);
 				break;
@@ -5585,6 +5607,16 @@ void save_library_file_for_vnum(int type, any_vnum vnum) {
 			HASH_ITER(hh, trigger_table, trig, next_trig) {
 				if (GET_TRIG_VNUM(trig) >= (zone * 100) && GET_TRIG_VNUM(trig) <= (zone * 100 + 99)) {
 					write_trigger_to_file(fl, trig);
+				}
+			}
+			break;
+		}
+		case DB_BOOT_VEH: {
+			void write_vehicle_to_file(FILE *fl, vehicle_data *veh);
+			vehicle_data *veh, *next_veh;
+			HASH_ITER(hh, vehicle_table, veh, next_veh) {
+				if (VEH_VNUM(veh) >= (zone * 100) && VEH_VNUM(veh) <= (zone * 100 + 99)) {
+					write_vehicle_to_file(fl, veh);
 				}
 			}
 			break;
@@ -5887,6 +5919,11 @@ void save_index(int type) {
 		}
 		case DB_BOOT_TRG: {
 			write_trigger_index(fl);
+			break;
+		}
+		case DB_BOOT_VEH: {
+			void write_vehicle_index(FILE *fl);
+			write_vehicle_index(fl);
 			break;
 		}
 		case DB_BOOT_EMP: {
@@ -6881,8 +6918,6 @@ struct complex_room_data *init_complex_data() {
 	data->inside_rooms = 0;
 	data->home_room = NULL;
 	data->private_owner = NOBODY;
-	
-	data->boat = NULL;
 	
 	data->burning = 0;	// not-burning
 	data->damage = 0;	// no damage
