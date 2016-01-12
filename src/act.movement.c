@@ -46,14 +46,7 @@ void do_unseat_from_vehicle(char_data *ch);
 bool can_enter_room(char_data *ch, room_data *room);
 bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room);
 
-// move vars
-#define MOVE_NORMAL		0		/* Normal move message		*/
-#define MOVE_LEAD		1		/* Leading message			*/
-#define MOVE_FOLLOW		2		/* Follower message			*/
-	#define MOVE_UNUSED		3
-#define MOVE_EARTHMELD	4
-#define MOVE_SWIM		5	// swim skill
-
+// move helpers
 #define WATER_SECT(room)		(ROOM_SECT_FLAGGED((room), SECTF_FRESH_WATER | SECTF_OCEAN) || ROOM_BLD_FLAGGED((room), BLD_NEED_BOAT) || RMT_FLAGGED((room), RMT_NEED_BOAT) || (IS_WATER_BUILDING(room) && !IS_COMPLETE(room) && SECT_FLAGGED(BASE_SECT(room), SECTF_FRESH_WATER | SECTF_OCEAN)))
 #define DEEP_WATER_SECT(room)	(ROOM_SECT_FLAGGED((room), SECTF_OCEAN))
 

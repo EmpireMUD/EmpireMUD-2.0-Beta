@@ -217,6 +217,15 @@ struct alias_data {
 #define NUM_TOG_TYPES  2
 
 
+// movement types
+#define MOVE_NORMAL  0	// Normal move message
+#define MOVE_LEAD  1	// Leading message
+#define MOVE_FOLLOW  2	// Follower message
+	#define MOVE_UNUSED  3
+#define MOVE_EARTHMELD  4
+#define MOVE_SWIM  5	// swim skill
+
+
 // obj desc flags
 #define OBJ_DESC_LONG  0	// long desc: in room
 #define OBJ_DESC_SHORT  1	// short desc: inventory, misc

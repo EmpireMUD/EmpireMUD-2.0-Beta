@@ -159,9 +159,10 @@ bool find_siege_target_for_vehicle(char_data *ch, vehicle_data *veh, char *arg, 
 * @return bool TRUE if it moved, FALSE if it was blocked.
 */
 bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
+	room_data *to_room = NULL, *was_in;
+	struct follow_type *fol, *next_fol;
 	struct vehicle_room_list *vrl;
 	char buf[MAX_STRING_LENGTH];
-	room_data *to_room = NULL;
 	char_data *ch_iter;
 	
 	// sanity
@@ -213,6 +214,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 		}
 	}
 	
+	was_in = IN_ROOM(veh);
 	vehicle_to_room(veh, to_room);
 	
 	// notify arrival
@@ -260,6 +262,13 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 		entry_memory_mtrigger(VEH_SITTING_ON(veh));
 		greet_mtrigger(VEH_SITTING_ON(veh), dir);
 		greet_memory_mtrigger(VEH_SITTING_ON(veh));
+		
+		LL_FOREACH_SAFE(VEH_SITTING_ON(veh)->followers, fol, next_fol) {
+			if ((IN_ROOM(fol->follower) == was_in) && (GET_POS(fol->follower) >= POS_STANDING)) {
+				act("You follow $N.\r\n", FALSE, fol->follower, NULL, VEH_SITTING_ON(veh), TO_CHAR);
+				perform_move(fol->follower, dir, TRUE, MOVE_FOLLOW);
+			}
+		}
 	}
 	
 	// alert whole vessel
