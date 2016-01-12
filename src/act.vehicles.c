@@ -1628,6 +1628,9 @@ ACMD(do_harness) {
 	else if (!VEH_IS_COMPLETE(veh)) {
 		act("You must finish constructing $V before you can harness anything to it.", FALSE, ch, NULL, veh, TO_CHAR);
 	}
+	else if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
+		msg_to_char(ch, "You can't harness anything to it while it's on fire.\r\n");
+	}
 	else if (!IS_NPC(animal)) {
 		msg_to_char(ch, "You can only harness animals.\r\n");
 	}
