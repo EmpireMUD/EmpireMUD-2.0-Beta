@@ -40,7 +40,7 @@ A Rock Shelter~
 A
 d
 C
-abandon, dismantle~
+abandon, dismantle, sleep~
 D
    This is a small shelter made from a rock outcropping on the hillside and
 protected from the wind by a mat of debris. It's small and it's not very com-
@@ -56,7 +56,7 @@ A Tree Shelter~
 A
 d
 C
-abandon, dismantle~
+abandon, dismantle, sleep~
 D
    You've found shelter high in the branches of a tree, protected from the wind
 and weather by thick branches. It's not a large shelter and it isn't very com-
@@ -72,7 +72,7 @@ A Cave Shelter~
 A
 d
 C
-abandon, dismantle~
+abandon, dismantle, sleep~
 D
    This small cave looks like it was originally hollowed out by an animal, but
 it's large enough for you to stand. A fallen rock covers most of the entrance
@@ -89,7 +89,7 @@ A Shelter in the Jungle~
 A
 d
 C
-abandon, dismantle~
+abandon, dismantle, sleep~
 D
    This tiny shelter has been scraped together from vines and leaves to provide
 some protection from the hungry animals of the jungle. The trees also give

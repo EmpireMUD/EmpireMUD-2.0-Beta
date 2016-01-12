@@ -10,7 +10,7 @@ D0
 0 10701
 E
 steps ice stairs~
-Stairs have been cut from the ice to make it easier to climb the mountain.  
+Stairs have been cut from the ice to make it easier to climb the mountain.
 ~
 M 0 10704 50.00 3
 S
@@ -18,7 +18,7 @@ S
 A Winter Wonderland~
    The icy staircase spirals around the mountain. Now that you're above the
 blizard, the beauty of the snow-covered peak is striking. Evergreen trees
-frosted in glittering snow give you the warm feeling of home.  
+frosted in glittering snow give you the warm feeling of home.
 ~
 ai 0
 D2
@@ -30,7 +30,7 @@ D1
 E
 trees evergreen~
    The fragrant evergreens are covered in a coat of fine white snow, which
-twinkles as it catches the light.  
+twinkles as it catches the light.
 ~
 E
 staircase stairs icy~
@@ -42,7 +42,7 @@ S
 A Winter Wonderland~
    The snowy mountain peak rises above the winter blizzard below, and tracks in
 the snow tell you that you're not the only one here. You can hear carolers
-singing in the distance, and the smell of cookies fills the air with warmth. 
+singing in the distance, and the smell of cookies fills the air with warmth.
 ~
 ai 0
 D3
@@ -59,7 +59,7 @@ A Winter Wonderland~
    The side of the mountain is covered in picturesque snow, all fresh and
 fluffy as though it just fell. Below, you can see the top of a harsh winter
 blizzard. But though it is cold up here, you're warmed by visions of sugarplums
-dancing in your head.  
+dancing in your head.
 ~
 ai 0
 D0
@@ -79,7 +79,7 @@ A Winter Wonderland~
    The icy stairs which wind up the whole of the mountain are finally near the
 peak, and you have found the source of the lovely music that fills the cold
 mountain air. You're above even the evergreen trees here, surrounded by nothing
-but the untouched beauty of the snow.  
+but the untouched beauty of the snow.
 ~
 ai 0
 D1
@@ -98,7 +98,7 @@ S
 The Snowy Peak~
    You have reached the top of the long, ice-hewn staircase. Here, atop the
 world, surrounded by the joy of carolers below, you cannot help but be caught
-up in the spirit of the holiday.  
+up in the spirit of the holiday.
 ~
 aci 0
 D2
@@ -107,12 +107,12 @@ D2
 E
 down world below~
    You can't see past the blizzard. Only this one mountain peak rises above a
-sea of clouds that stretches from horizon to horizon.  
+sea of clouds that stretches from horizon to horizon.
 ~
 E
 throne~
    The great throne is candy-striped and, upon closer inspection, might
-actually be made from candy canes.  
+actually be made from candy canes.
 ~
 M 0 10703 100.00 1
 S

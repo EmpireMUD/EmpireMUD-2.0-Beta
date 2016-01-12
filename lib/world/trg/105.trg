@@ -129,6 +129,11 @@ end
 Dragontooth Sceptre Summon~
 1 c 1
 use~
+eval test %%self.is_name(%arg%)%%
+if !%test%
+  return 0
+  halt
+end
 eval varname summon%target%
 eval test %%actor.varexists(%varname%)%%
 * Change this if trigger vnum != mob vnum
@@ -140,11 +145,6 @@ if %test%
     %send% %actor% You have used %self.shortdesc% too recently.
     halt
   end
-end
-eval test %%self.is_name(%arg%)%%
-if !%test%
-  return 0
-  halt
 end
 if (%actor.position% != Standing)
   %send% %actor% You can't do that right now.

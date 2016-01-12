@@ -142,7 +142,7 @@ bottle clay~
 a clay bottle~
 A clay bottle rolls around on the ground.~
    The bottle looks like it would be good for holding water. Type 'fill bottle'
-near the river or at an oasis to refill it.  
+near the river or at an oasis to refill it.
 ~
 5 0 a 2
 12 12 0
@@ -403,5 +403,63 @@ Equip the backpack to increase your carrying capacity.
 24 mo ar 1
 1 0 0
 7 0
+S
+#2133
+anchor heavy~
+an anchor~
+A heavy anchor is lying here.~
+Anchors are used in shipbuilding.
+~
+3 el a 2
+0 0 0
+2 0
+C
+1 1
+M
+6
+You attach an anchor to $V.~
+M
+7
+$n attaches an anchor to $V.~
+R
+5153 0
+R
+5154 0
+S
+#2134
+cannon ship's~
+a cannon~
+A ship's cannon is resting on the ground.~
+This cannon is used to build some ships.
+~
+3 el a 2
+0 0 0
+2 0
+C
+1 1
+M
+6
+You hoist a cannon onto $V!~
+M
+7
+$n hoists a cannon onto $V!~
+R
+5153 0
+R
+5154 0
+S
+#2135
+shot heavy ball~
+heavy shot~
+A heavy shot ball is lying on the ground.~
+Heavy shot is used by catapults and cannons.
+~
+3 e a 2
+0 0 0
+2 0
+C
+1 1
+R
+5121 0
 S
 $
