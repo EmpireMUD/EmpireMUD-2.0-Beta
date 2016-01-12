@@ -2096,7 +2096,7 @@ void look_at_vehicle(vehicle_data *veh, char_data *ch) {
 		bool found = FALSE;
 		
 		if (VEH_IS_COMPLETE(veh)) {
-			msg_to_char(ch, "Mainteance needed: ");
+			msg_to_char(ch, "Maintenance needed: ");
 		}
 		else {
 			msg_to_char(ch, "Resources to completion: ");

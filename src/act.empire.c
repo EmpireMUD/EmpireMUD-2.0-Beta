@@ -2186,7 +2186,10 @@ ACMD(do_abandon) {
 	
 	one_argument(argument, arg);
 	
-	if (!GET_LOYALTY(ch)) {
+	if (FIGHTING(ch)) {
+		msg_to_char(ch, "You're too busy fighting!\r\n");
+	}
+	else if (!GET_LOYALTY(ch)) {
 		msg_to_char(ch, "You're not part of an empire.\r\n");
 	}
 	else if (GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_CEDE)) {
@@ -2515,8 +2518,11 @@ ACMD(do_claim) {
 	}
 	
 	one_argument(argument, arg);
-
-	if (!get_or_create_empire(ch)) {
+	
+	if (FIGHTING(ch)) {
+		msg_to_char(ch, "You're too busy fighting!\r\n");
+	}
+	else if (!get_or_create_empire(ch)) {
 		msg_to_char(ch, "You don't belong to any empire.\r\n");
 	}
 	else if (GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_CLAIM)) {

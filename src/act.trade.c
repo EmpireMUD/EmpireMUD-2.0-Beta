@@ -662,7 +662,7 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 		
 		// stop all actors on this type
 		LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
-			if (GET_ACTION(vict) == ACT_GEN_CRAFT && GET_ACTION_VNUM(vict, 0) == GET_CRAFT_VNUM(type)) {
+			if (!IS_NPC(vict) && GET_ACTION(vict) == ACT_GEN_CRAFT && GET_ACTION_VNUM(vict, 0) == GET_CRAFT_VNUM(type)) {
 				GET_ACTION(vict) = ACT_NONE;
 			}
 		}
