@@ -233,7 +233,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 	
 	// message driver
 	if (VEH_DRIVER(veh)) {
-		if (has_ability(VEH_SITTING_ON(veh), ABIL_NAVIGATION)) {
+		if (has_ability(VEH_DRIVER(veh), ABIL_NAVIGATION)) {
 			snprintf(buf, sizeof(buf), "You %s $V %s (%d, %d).", drive_data[subcmd].command, dirs[get_direction_for_char(VEH_DRIVER(veh), dir)], X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh)));
 		}
 		else {
