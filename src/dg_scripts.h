@@ -21,6 +21,7 @@
 #define WLD_TRIGGER  2
 #define RMT_TRIGGER  3
 #define ADV_TRIGGER  4
+#define VEH_TRIGGER  5
 
 /* unless you change this, Puff casts all your dg spells */
 #define DG_CASTER_PROXY 1
@@ -55,6 +56,7 @@
 #define MTRIG_LEAVE_ALL        BIT(18)	// leave even if they can't see
 #define MTRIG_FIGHT_CHARMED    BIT(19)	// fight trigger that fires even while charmed
 
+
 /* obj trigger types */
 #define OTRIG_GLOBAL           BIT(0)	     /* unused                     */
 #define OTRIG_RANDOM           BIT(1)	     /* checked randomly           */
@@ -74,6 +76,23 @@
 
 #define OTRIG_CONSUME          BIT(18)    /* char tries to eat/drink obj */
 
+
+// VTRIG_x: vehicle trigger types
+#define VTRIG_GLOBAL  BIT(0)	// checked even if zone empty
+#define VTRIG_RANDOM  BIT(1)	// checked randomly when people nearby
+#define VTRIG_COMMAND  BIT(2)	// character types a command
+#define VTRIG_SPEECH  BIT(3)	// character speaks a word or phrase
+// unused BIT(4), BIT(5)
+#define VTRIG_GREET  BIT(6)	// character enters the room
+// unused BIT(7)
+#define VTRIG_ENTRY  BIT(8)	// vehicle enters a room
+#define VTRIG_RECEIVE  BIT(9)	// item put in vehicle
+// unused BIT(10), BIT(11), BIT(12)
+#define VTRIG_LOAD  BIT(13)	// vehicle is loaded
+// unused BIT(14), BIT(15)
+#define VTRIG_LEAVE  BIT(16)	// someone leaves the room
+
+
 /* wld trigger types */
 #define WTRIG_GLOBAL           BIT(0)      /* check even if zone empty   */
 #define WTRIG_RANDOM           BIT(1)	     /* checked randomly           */
@@ -87,6 +106,7 @@
 #define WTRIG_ABILITY          BIT(15)     /* ability used in room */
 #define WTRIG_LEAVE            BIT(16)     /* character leaves the room */
 #define WTRIG_DOOR             BIT(17)     /* door manipulated in room  */
+
 
 /* obj command trigger types */
 #define OCMD_EQUIP             BIT(0)	     /* obj must be in char's equip */
@@ -279,6 +299,8 @@ struct cmdlist_element * find_case(trig_data *trig, struct cmdlist_element *cl, 
 int find_eq_pos_script(char *arg);
 char_data *get_char_near_obj(obj_data *obj, char *name);
 obj_data *get_obj_near_obj(obj_data *obj, char *name);
+char_data *get_char_near_vehicle(vehicle_data *veh, char *name);
+obj_data *get_obj_near_vehicle(vehicle_data *veh, char *name);
 
 
 /* defines for valid_dg_target */

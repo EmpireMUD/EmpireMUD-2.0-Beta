@@ -2797,6 +2797,51 @@ const bitvector_t otrig_argument_types[] = {
 };
 
 
+// VTRIG_x: vehicle trigger types
+const char *vtrig_types[] = {
+	"Global",
+	"Random",
+	"Command",
+	"Speech",
+	"*",	// 4
+	"*",	// 5
+	"Greet",
+	"*",	// 7
+	"Entry",
+	"Receive",
+	"*",	// 10
+	"*",	// 11
+	"*",	// 12
+	"Load",
+	"*",	// 14
+	"*",	// 15
+	"Leave",
+	"\n"
+};
+
+
+// VTRIG_x: argument types for vehicle triggers
+const bitvector_t vtrig_argument_types[] = {
+	NOBITS,	// global
+	TRIG_ARG_PERCENT,	// random
+	TRIG_ARG_COMMAND,	// command
+	TRIG_ARG_PHRASE_OR_WORDLIST,	// speech
+	NOBITS,	// 4
+	NOBITS,	// 5
+	TRIG_ARG_PERCENT,	// greet
+	NOBITS,	// 7
+	TRIG_ARG_PERCENT,	// entry
+	TRIG_ARG_PERCENT,	// receive
+	NOBITS,	// 10
+	NOBITS,	// 11
+	NOBITS,	// 12
+	TRIG_ARG_PERCENT,	// load
+	NOBITS,	// 14
+	NOBITS,	// 15
+	TRIG_ARG_PERCENT,	// leave
+};
+
+
 /* wld trigger types */
 const char *wtrig_types[] = {
 	"Global",
@@ -2852,6 +2897,7 @@ const char *trig_attach_types[] = {
 	"Room",
 	"*",	// rmt_trigger -- never set on an actual trigger
 	"*",	// adv_trigger -- never set on an actual trigger
+	"Vehicle",
 	"\n"
 };
 
@@ -2862,7 +2908,8 @@ const char **trig_attach_type_list[] = {
 	otrig_types,
 	wtrig_types,
 	wtrig_types,	// RMT_TRIGGER (not really used)
-	wtrig_types	// ADV_TRIGGER (not really used)
+	wtrig_types,	// ADV_TRIGGER (not really used)
+	vtrig_types
 };
 
 
@@ -2872,7 +2919,8 @@ const bitvector_t *trig_argument_type_list[] = {
 	otrig_argument_types,	// OBJ_TRIGGER
 	wtrig_argument_types,	// WLD_TRIGGER
 	wtrig_argument_types,	// RMT_TRIGGER (not really used)
-	wtrig_argument_types	// ADV_TRIGGER (not really used)
+	wtrig_argument_types,	// ADV_TRIGGER (not really used)
+	vtrig_argument_types,	// VEH_TRIGGER
 };
 
 

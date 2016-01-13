@@ -246,7 +246,7 @@ room_data *find_room(int n) {
 * @return vehicle_data* The vehicle, if any.
 */
 vehicle_data *find_vehicle(int n) {
-	if (n < VEHICLE_ID_BASE) {
+	if (n < VEHICLE_ID_BASE || n >= OBJ_ID_BASE) {
 		return NULL;
 	}
 	return find_vehicle_by_uid_in_lookup_table(n);
@@ -294,6 +294,48 @@ char_data *get_char_near_obj(obj_data *obj, char *name) {
 			for (ch = ROOM_PEOPLE(num); ch; ch = ch->next_in_room) 
 				if (isname(name, ch->player.name) && valid_dg_target(ch, DG_ALLOW_GODS))
 					return ch;
+	}
+
+	return NULL;
+}
+
+
+/**
+* Finds a char present with a vehicle.
+*
+* @param vehicle_data *veh The vehicle to search near.
+* @param char *name The name to search for.
+* @return char_data* The found character, or NULL.
+*/
+char_data *get_char_near_vehicle(vehicle_data *veh, char *name) {
+	char_data *ch;
+
+	if (*name == UID_CHAR) {
+		ch = find_char(atoi(name + 1));
+
+		if (ch && valid_dg_target(ch, DG_ALLOW_GODS)) {
+			return ch;
+		}
+	}
+	else {
+		// prefer people attached to the vehicle
+		if (VEH_DRIVER(veh) && isname(name, GET_PC_NAME(VEH_DRIVER(veh))) && valid_dg_target(VEH_DRIVER(veh), DG_ALLOW_GODS)) {
+			return VEH_DRIVER(veh);
+		}
+		if (VEH_SITTING_ON(veh) && isname(name, GET_PC_NAME(VEH_SITTING_ON(veh))) && valid_dg_target(VEH_SITTING_ON(veh), DG_ALLOW_GODS)) {
+			return VEH_SITTING_ON(veh);
+		}
+		if (VEH_LED_BY(veh) && isname(name, GET_PC_NAME(VEH_LED_BY(veh))) && valid_dg_target(VEH_LED_BY(veh), DG_ALLOW_GODS)) {
+			return VEH_LED_BY(veh);
+		}
+		
+		if (IN_ROOM(veh)) {
+			for (ch = ROOM_PEOPLE(IN_ROOM(veh)); ch; ch = ch->next_in_room) {
+				if (isname(name, GET_PC_NAME(ch)) && valid_dg_target(ch, DG_ALLOW_GODS)) {
+					return ch;
+				}
+			}
+		}
 	}
 
 	return NULL;
@@ -365,7 +407,42 @@ obj_data *get_obj_near_obj(obj_data *obj, char *name) {
 				return i;
 	}
 	return NULL;
-}   
+}
+
+
+/**
+* Finds a matching object near the vehicle.
+*
+* @param vehicle_data *veh The vehicle that's looking for an object.
+* @param char *name The name to look for.
+* @return obj_data* The object found, or NULL if none.
+*/
+obj_data *get_obj_near_vehicle(vehicle_data *veh, char *name) {
+	obj_data *i = NULL;
+	char_data *ch;
+
+	if (*name == UID_CHAR) {
+		return find_obj(atoi(name + 1));
+	}
+	if (VEH_CONTAINS(veh) && (i = get_obj_in_list(name, VEH_CONTAINS(veh)))) {
+		return i;
+	}
+	if (IN_ROOM(veh)) {
+		if ((i = get_obj_in_list(name, ROOM_CONTENTS(IN_ROOM(veh))))) {
+			return i;
+		}
+		
+		// check inventories (because get_obj_near_obj does)
+		LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(veh)), ch, next_in_room) {
+			if ((i = get_object_in_equip(ch, name))) {
+				return i;
+			}
+		}
+	}
+	
+	return NULL;
+}
+
 
 /* returns the object in the world with name name, or NULL if not found */
 obj_data *get_obj(char *name)  {
@@ -414,6 +491,30 @@ room_data *get_room(room_data *ref, char *name) {
 }
 
 
+/**
+* Find a vehicle in the world by name/uid.
+*
+* @param char *name The name to look up.
+* @return vehicle_data* The found vehicle, or NULL if none.
+*/
+vehicle_data *get_vehicle(char *name) {
+	vehicle_data *veh;
+	
+	if (*name == UID_CHAR) {
+		return find_vehicle(atoi(name + 1));
+	}
+	else {
+		LL_FOREACH(vehicle_list, veh) {
+			if (isname(name, VEH_KEYWORDS(veh))) {
+				return veh;
+			}
+		}
+	}
+	
+	return NULL;
+}
+
+
 /*
 * returns a pointer to the first character in world by name name,
 * or NULL if none found.  Starts searching with the person owing the object
@@ -437,6 +538,54 @@ char_data *get_char_by_obj(obj_data *obj, char *name) {
 		for (ch = character_list; ch; ch = ch->next)
 			if (isname(name, ch->player.name) && valid_dg_target(ch, DG_ALLOW_GODS))
 				return ch;
+	}
+
+	return NULL;
+}
+
+
+/**
+* Looks up a character using a vehicle as a reference.
+*
+* @param vehicle_data *veh The vehicle that's looking for a character.
+* @param char *name The argument.
+* @return char_data* The found character, or NULL.
+*/
+char_data *get_char_by_vehicle(vehicle_data *veh, char *name) {
+	char_data *ch;
+
+	if (*name == UID_CHAR) {
+		ch = find_char(atoi(name + 1));
+
+		if (ch && valid_dg_target(ch, DG_ALLOW_GODS)) {
+			return ch;
+		}
+	}
+	else {
+		// prefer people attached to the vehicle
+		if (VEH_DRIVER(veh) && isname(name, GET_PC_NAME(VEH_DRIVER(veh))) && valid_dg_target(VEH_DRIVER(veh), DG_ALLOW_GODS)) {
+			return VEH_DRIVER(veh);
+		}
+		if (VEH_SITTING_ON(veh) && isname(name, GET_PC_NAME(VEH_SITTING_ON(veh))) && valid_dg_target(VEH_SITTING_ON(veh), DG_ALLOW_GODS)) {
+			return VEH_SITTING_ON(veh);
+		}
+		if (VEH_LED_BY(veh) && isname(name, GET_PC_NAME(VEH_LED_BY(veh))) && valid_dg_target(VEH_LED_BY(veh), DG_ALLOW_GODS)) {
+			return VEH_LED_BY(veh);
+		}
+		
+		// try people in the room with the vehicle
+		LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(veh)), ch, next_in_room) {
+			if (isname(name, GET_PC_NAME(ch)) && valid_dg_target(ch, DG_ALLOW_GODS)) {
+				return ch;
+			}
+		}
+		
+		// try whole world
+		LL_FOREACH(character_list, ch) {
+			if (isname(name, GET_PC_NAME(ch)) && valid_dg_target(ch, DG_ALLOW_GODS)) {
+				return ch;
+			}
+		}
 	}
 
 	return NULL;
@@ -500,7 +649,32 @@ obj_data *get_obj_by_obj(obj_data *obj, char *name) {
 		return i;
 
 	return get_obj(name);
-}   
+}
+
+
+/**
+* Finds a matching object in relation to the vehicle.
+*
+* @param vehicle_data *veh The vehicle that's looking for an object.
+* @param char *name The name to look for.
+* @return obj_data* The object found, or NULL if none.
+*/
+obj_data *get_obj_by_vehicle(vehicle_data *veh, char *name) {
+	obj_data *i = NULL;
+
+	if (*name == UID_CHAR) {
+		return find_obj(atoi(name + 1));
+	}
+	if (VEH_CONTAINS(veh) && (i = get_obj_in_list(name, VEH_CONTAINS(veh)))) {
+		return i;
+	}
+	if (IN_ROOM(veh) && (i = get_obj_in_list(name, ROOM_CONTENTS(IN_ROOM(veh))))) {
+		return i;
+	}
+	
+	return get_obj(name);
+}
+
 
 /* only searches the room */
 obj_data *get_obj_in_room(room_data *room, char *name) {
@@ -539,6 +713,35 @@ obj_data *get_obj_by_room(room_data *room, char *name) {
 
 	return NULL;
 }
+
+
+/**
+* Finds a matching vehicle in relation to another vehicle.
+*
+* @param vehicle_data *veh The vehicle that's looking for an object.
+* @param char *name The name to look for.
+* @return obj_data* The object found, or NULL if none.
+*/
+vehicle_data *get_vehicle_by_vehicle(vehicle_data *veh, char *name) {
+	vehicle_data *iter;
+	
+	if (*name == UID_CHAR) {
+		return find_vehicle(atoi(name + 1));
+	}
+	if (!str_cmp(name, "self") || !str_cmp(name, "me")) {
+		return veh;
+	}
+	if (IN_ROOM(veh)) {
+		LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(veh)), iter, next_in_room) {
+			if (isname(name, VEH_KEYWORDS(iter))) {
+				return iter;
+			}
+		}
+	}
+	
+	return get_vehicle(name);
+}
+
 
 /* search through all the persons items, including containers
 and 0 if it doesnt exist, and greater then 0 if it does!
@@ -1513,29 +1716,30 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 	char *name;
 	int num, count;
 
-	char *send_cmd[] = {"msend ", "osend ", "wsend " };
-	char *echo_cmd[] = {"mecho ", "oecho ", "wecho " };
-	char *echoaround_cmd[] = {"mechoaround ", "oechoaround ", "wechoaround " };
-	char *echoneither_cmd[] = {"mechoneither ", "oechoneither ", "wechoneither " };
-	char *door[] = {"mdoor ", "odoor ", "wdoor " };
-	char *force[] = {"mforce ", "oforce ", "wforce " };
-	char *load[] = {"mload ", "oload ", "wload " };
-	char *purge[] = {"mpurge ", "opurge ", "wpurge " };
-	char *scale[] = {"mscale ", "oscale ", "wscale " };
-	char *teleport[] = {"mteleport ", "oteleport ", "wteleport " };
-	char *terracrop[] = {"mterracrop ", "oterracrop ", "wterracrop " };
-	char *terraform[] = {"mterraform ", "oterraform ", "wterraform " };
+	// x_TRIGGER: mob, obj, world, rmt, adv, vehicle
+	char *send_cmd[] = {"msend ", "osend ", "wsend ", "wsend ", "wsend ", "vsend " };
+	char *echo_cmd[] = {"mecho ", "oecho ", "wecho ", "wecho ", "wecho ", "vecho " };
+	char *echoaround_cmd[] = {"mechoaround ", "oechoaround ", "wechoaround ", "wechoaround ", "wechoaround ", "vechoaround " };
+	char *echoneither_cmd[] = {"mechoneither ", "oechoneither ", "wechoneither ", "wechoneither ", "wechoneither ", "vechoneither " };
+	char *door[] = {"mdoor ", "odoor ", "wdoor ", "wdoor ", "wdoor ", "vdoor " };
+	char *force[] = {"mforce ", "oforce ", "wforce ", "wforce ", "wforce ", "vforce " };
+	char *load[] = {"mload ", "oload ", "wload ", "wload ", "wload ", "vload " };
+	char *purge[] = {"mpurge ", "opurge ", "wpurge ", "wpurge ", "wpurge ", "vpurge " };
+	char *scale[] = {"mscale ", "oscale ", "wscale ", "wscale ", "wscale ", "vscale " };
+	char *teleport[] = {"mteleport ", "oteleport ", "wteleport ", "wteleport ", "wteleport ", "vteleport " };
+	char *terracrop[] = {"mterracrop ", "oterracrop ", "wterracrop ", "wterracrop ", "wterracrop ", "vterracrop " };
+	char *terraform[] = {"mterraform ", "oterraform ", "wterraform ", "wterraform ", "wterraform ", "vterraform " };
 	/* the x kills a 'shadow' warning in gcc. */
-	char *xdamage[] = {"mdamage ", "odamage ", "wdamage " };
-	char *xaoe[] = {"maoe ", "oaoe ", "waoe " };
-	char *xdot[] = {"mdot ", "odot ", "wdot " };
-	char *buildingecho[] = {"mbuildingecho ", "obuildingecho ", "wbuildingecho " };
-	char *regionecho[] = {"mregionecho ", "oregionecho ", "wregionecho " };
-	char *asound[] = {"masound ", "oasound ", "wasound " };
-	char *at[] = {"mat ", "oat ", "wat " };
-	char *adventurecomplete[] = {"madventurecomplete", "oadventurecomplete", "wadventurecomplete" };
+	char *xdamage[] = {"mdamage ", "odamage ", "wdamage ", "wdamage ", "wdamage ", "vdamage " };
+	char *xaoe[] = {"maoe ", "oaoe ", "waoe ", "waoe ", "waoe ", "vaoe " };
+	char *xdot[] = {"mdot ", "odot ", "wdot ", "wdot ", "wdot ", "vdot " };
+	char *buildingecho[] = {"mbuildingecho ", "obuildingecho ", "wbuildingecho ", "wbuildingecho ", "wbuildingecho ", "vbuildingecho " };
+	char *regionecho[] = {"mregionecho ", "oregionecho ", "wregionecho ", "wregionecho ", "wregionecho ", "vregionecho " };
+	char *asound[] = {"masound ", "oasound ", "wasound ", "wasound ", "wasound ", "vasound " };
+	char *at[] = {"mat ", "oat ", "wat ", "wat ", "wat ", "vat " };
+	char *adventurecomplete[] = {"madventurecomplete", "oadventurecomplete", "wadventurecomplete", "wadventurecomplete", "wadventurecomplete", "vadventurecomplete" };
 	/* there is no such thing as wtransform, thus the wecho below  */
-	char *transform[] = {"mtransform ", "otransform ", "wecho" };
+	char *transform[] = {"mtransform ", "otransform ", "wecho ", "wecho ", "wecho ", "vecho " };
 	/* X.global() will have a NULL trig */
 	if (trig) {
 		for (vd = GET_TRIG_VARS(trig); vd; vd = vd->next)
