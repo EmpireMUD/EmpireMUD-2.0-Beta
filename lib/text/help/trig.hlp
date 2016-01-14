@@ -1063,6 +1063,7 @@ When using field  - The variable returns:
 &cmaxrooms&0 - Maximum added rooms (not counting the base interior room).
 &cmovetype&0 - The verb for the vehicle's movement (like "sails").
 &cneedsrepair&0 - The vehicle needs yearly maintenance or took damage.
+&croom&0 - The room the vehicle is in.
 &crooms&0 - The number of added rooms (not counting the base interior room).
 &cshortdesc&0 - The vehicle's short description (the name the players see).
 &csitting_in&0 - The person who's sitting in/on the vehicle, if any.

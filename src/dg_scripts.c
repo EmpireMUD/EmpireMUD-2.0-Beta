@@ -3527,7 +3527,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 'd': {	// veh.d*
 					if (!str_cmp(field, "driver")) {
-						if (VEH_DRIVER(veh)) {
+						if (VEH_DRIVER(v)) {
 							snprintf(str, slen, "%c%d", UID_CHAR, GET_ID(VEH_DRIVER(v)));
 						}
 						else {
@@ -3657,7 +3657,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 'l': {	// veh.l*
 					if (!str_cmp(field, "led_by")) {
-						if (VEH_LED_BY(veh)) {
+						if (VEH_LED_BY(v)) {
 							snprintf(str, slen, "%c%d", UID_CHAR, GET_ID(VEH_LED_BY(v)));
 						}
 						else {
@@ -3693,7 +3693,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'r': {	// veh.r*
-					if (!str_cmp(field, "rooms")) {
+					if (!str_cmp(field, "room")) {
+						snprintf(str, slen, "%c%d",UID_CHAR, GET_ROOM_VNUM(IN_ROOM(v)) + ROOM_ID_BASE); 
+					}
+					else if (!str_cmp(field, "rooms")) {
 						snprintf(str, slen, "%d", VEH_INSIDE_ROOMS(v));
 					}
 					break;
@@ -3703,7 +3706,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%s", VEH_SHORT_DESC(v));
 					}
 					else if (!str_cmp(field, "sitting_on") || !str_cmp(field, "sitting_in")) {
-						if (VEH_SITTING_ON(veh)) {
+						if (VEH_SITTING_ON(v)) {
 							snprintf(str, slen, "%c%d", UID_CHAR, GET_ID(VEH_SITTING_ON(v)));
 						}
 						else {
