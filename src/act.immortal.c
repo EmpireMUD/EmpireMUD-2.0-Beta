@@ -2861,8 +2861,15 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 	if ((abil = find_ability_by_vnum(GET_CRAFT_ABILITY(craft))) && ABIL_ASSIGNED_SKILL(abil) != NULL) {
 		sprintf(buf + strlen(buf), " (%s %d)", SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
 	}
-	seconds = GET_CRAFT_TIME(craft) * ACTION_CYCLE_TIME;
-	msg_to_char(ch, "Ability: &y%s&0, Level: &g%d&0, Time: [&g%d action tick%s&0 | &g%d:%02d&0]\r\n", buf, GET_CRAFT_MIN_LEVEL(craft), GET_CRAFT_TIME(craft), PLURAL(GET_CRAFT_TIME(craft)), seconds / SECS_PER_REAL_MIN, seconds % SECS_PER_REAL_MIN);
+	msg_to_char(ch, "Ability: &y%s&0, Level: &g%d&0", buf, GET_CRAFT_MIN_LEVEL(craft));
+	
+	if (GET_CRAFT_TYPE(craft) != CRAFT_TYPE_BUILD && !CRAFT_FLAGGED(craft, CRAFT_VEHICLE)) {
+		seconds = GET_CRAFT_TIME(craft) * ACTION_CYCLE_TIME;
+		msg_to_char(ch, ", Time: [&g%d action tick%s&0 | &g%d:%02d&0]\r\n", GET_CRAFT_TIME(craft), PLURAL(GET_CRAFT_TIME(craft)), seconds / SECS_PER_REAL_MIN, seconds % SECS_PER_REAL_MIN);
+	}
+	else {
+		msg_to_char(ch, "\r\n");
+	}
 
 	sprintbit(GET_CRAFT_FLAGS(craft), craft_flags, buf, TRUE);
 	msg_to_char(ch, "Flags: &c%s&0\r\n", buf);
