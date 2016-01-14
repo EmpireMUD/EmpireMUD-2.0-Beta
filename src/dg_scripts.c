@@ -926,26 +926,37 @@ int char_has_item(char *item, char_data *ch) {
 void script_trigger_check(void) {
 	static int my_cycle = 0;
 	
-	char_data *ch;
-	obj_data *obj;
+	vehicle_data *veh, *next_veh;
+	char_data *ch, *next_ch;
+	obj_data *obj, *next_obj;
 	room_data *room, *next_room;
 	struct script_data *sc;
-
-	for (ch = character_list; ch; ch = ch->next) {
+	
+	LL_FOREACH_SAFE(character_list, ch, next_ch) {
 		if (SCRIPT(ch)) {
 			sc = SCRIPT(ch);
 
-		if (IS_SET(SCRIPT_TYPES(sc), WTRIG_RANDOM) && (players_nearby_script(IN_ROOM(ch)) || IS_SET(SCRIPT_TYPES(sc), WTRIG_GLOBAL)))
+		if (IS_SET(SCRIPT_TYPES(sc), MTRIG_RANDOM) && (IS_SET(SCRIPT_TYPES(sc), MTRIG_GLOBAL) || players_nearby_script(IN_ROOM(ch))))
 			random_mtrigger(ch);
 		}
 	}
-
-	for (obj = object_list; obj; obj = obj->next) {
+	
+	LL_FOREACH_SAFE(object_list, obj, next_obj) {
 		if (SCRIPT(obj)) {
 			sc = SCRIPT(obj);
 
 			if (IS_SET(SCRIPT_TYPES(sc), OTRIG_RANDOM))
 				random_otrigger(obj);
+		}
+	}
+	
+	LL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
+		if (IN_ROOM(veh) && SCRIPT(veh)) {
+			sc = SCRIPT(veh);
+
+			if (IS_SET(SCRIPT_TYPES(sc), VTRIG_RANDOM) && (IS_SET(SCRIPT_TYPES(sc), VTRIG_GLOBAL) || players_nearby_script(IN_ROOM(veh)))) {
+				random_vtrigger(veh);
+			}
 		}
 	}
 
@@ -960,9 +971,8 @@ void script_trigger_check(void) {
 	}
 	else {
 		// partial
-		for (room = interior_room_list; room; room = next_room) {
-			next_room = room->next_interior;
-			if ((sc = SCRIPT(room)) && IS_SET(SCRIPT_TYPES(sc), WTRIG_RANDOM) && (players_nearby_script(room) || IS_SET(SCRIPT_TYPES(sc), WTRIG_GLOBAL))) {
+		LL_FOREACH_SAFE2(interior_room_list, room, next_room, next_interior) {
+			if ((sc = SCRIPT(room)) && IS_SET(SCRIPT_TYPES(sc), WTRIG_RANDOM) && (IS_SET(SCRIPT_TYPES(sc), WTRIG_GLOBAL) || players_nearby_script(room))) {
 				random_wtrigger(room);
 			}
 		}
@@ -5125,9 +5135,6 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 
 			else if (!strn_cmp(cmd, "halt", 4))
 				break;
-
-			else if (!strn_cmp(cmd, "dg_cast ", 8))
-				do_dg_cast(go, sc, trig, type, cmd);
 
 			else if (!strn_cmp(cmd, "dg_affect ", 10))
 				do_dg_affect(go, sc, trig, type, cmd);

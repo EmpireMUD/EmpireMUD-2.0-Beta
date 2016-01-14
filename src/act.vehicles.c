@@ -217,6 +217,11 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 	was_in = IN_ROOM(veh);
 	vehicle_to_room(veh, to_room);
 	
+	if (!entry_vtrigger(veh)) {
+		vehicle_to_room(veh, was_in);
+		return FALSE;
+	}
+	
 	// notify arrival
 	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(veh)), ch_iter, next_in_room) {
 		if (ch_iter != VEH_SITTING_ON(veh) && ch_iter->desc) {

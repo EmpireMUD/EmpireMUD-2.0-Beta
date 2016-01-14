@@ -168,6 +168,8 @@ void dg_read_trigger(char *line, void *proto, int type) {
 	char_data *mob;
 	room_data *room;
 	room_template *rmt;
+	vehicle_data *veh;
+	obj_data *obj;
 	adv_data *adv;
 	trig_data *trproto;
 	struct trig_proto_list *trg_proto, *new_trg;
@@ -241,6 +243,23 @@ void dg_read_trigger(char *line, void *proto, int type) {
 				trg_proto->next = new_trg;
 			}
 			break;
+		case OBJ_TRIGGER: {
+			CREATE(new_trg, struct trig_proto_list, 1);
+			new_trg->vnum = vnum;
+			new_trg->next = NULL;
+
+			obj = (obj_data*)proto;
+			trg_proto = obj->proto_script;
+			if (!trg_proto) {
+				obj->proto_script = trg_proto = new_trg;
+			}
+			else {
+				while (trg_proto->next) 
+					trg_proto = trg_proto->next;
+				trg_proto->next = new_trg;
+			}
+			break;
+		}
 		case RMT_TRIGGER: {
 			CREATE(new_trg, struct trig_proto_list, 1);
 			new_trg->vnum = vnum;
@@ -282,6 +301,23 @@ void dg_read_trigger(char *line, void *proto, int type) {
 				syslog(SYS_ERROR, LVL_BUILDER, TRUE, "SYSERR: non-existant trigger #%d assigned to room #%d", vnum, GET_ROOM_VNUM(room));
 			}
 			break;
+		case VEH_TRIGGER: {
+			CREATE(new_trg, struct trig_proto_list, 1);
+			new_trg->vnum = vnum;
+			new_trg->next = NULL;
+
+			veh = (vehicle_data*)proto;
+			trg_proto = veh->proto_script;
+			if (!trg_proto) {
+				veh->proto_script = trg_proto = new_trg;
+			}
+			else {
+				while (trg_proto->next) 
+					trg_proto = trg_proto->next;
+				trg_proto->next = new_trg;
+			}
+			break;
+		}
 		default:
 			syslog(SYS_ERROR, LVL_BUILDER, TRUE, "SYSERR: Trigger vnum #%d assigned to non-mob/obj/room", vnum);
 	}
@@ -322,6 +358,7 @@ void dg_obj_trigger(char *line, obj_data *obj) {
 }
 
 void assign_triggers(void *i, int type) {
+	vehicle_data *veh = NULL;
 	char_data *mob = NULL;
 	obj_data *obj = NULL;
 	room_data *room = NULL;
@@ -362,6 +399,8 @@ void assign_triggers(void *i, int type) {
 			}
 			break;
 		case WLD_TRIGGER:
+		case ADV_TRIGGER:
+		case RMT_TRIGGER:
 			room = (room_data*)i;
 			trg_proto = room->proto_script;
 			while (trg_proto) {
@@ -378,6 +417,23 @@ void assign_triggers(void *i, int type) {
 				trg_proto = trg_proto->next;
 			}
 			break;
+		case VEH_TRIGGER: {
+			veh = (vehicle_data*)i;
+			trg_proto = veh->proto_script;
+			while (trg_proto) {
+				trproto = real_trigger(trg_proto->vnum);
+				if (!trproto) {
+					syslog(SYS_ERROR, LVL_BUILDER, TRUE, "SYSERR: trigger #%d non-existant, for vehicle #%d", trg_proto->vnum, VEH_VNUM(veh));
+				}
+				else {
+					if (!SCRIPT(veh))
+						CREATE(SCRIPT(veh), struct script_data, 1);
+					add_trigger(SCRIPT(veh), read_trigger(trg_proto->vnum), -1);
+				}
+				trg_proto = trg_proto->next;
+			}
+			break;
+		}
 		default:
 			syslog(SYS_ERROR, LVL_BUILDER, TRUE, "SYSERR: unknown type for assign_triggers()");
 			break;

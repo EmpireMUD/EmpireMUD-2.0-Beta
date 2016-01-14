@@ -309,6 +309,7 @@ OLC_MODULE(vedit_maxlevel);
 OLC_MODULE(vedit_minlevel);
 OLC_MODULE(vedit_movetype);
 OLC_MODULE(vedit_resource);
+OLC_MODULE(vedit_script);
 OLC_MODULE(vedit_shortdescription);
 
 
@@ -649,6 +650,7 @@ const struct olc_command_data olc_data[] = {
 	{ "minlevel", vedit_minlevel, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "movetype", vedit_movetype, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "resource", vedit_resource, OLC_VEHICLE, OLC_CF_EDITOR },
+	{ "script", vedit_script, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "shortdescription", vedit_shortdescription, OLC_VEHICLE, OLC_CF_EDITOR },
 
 
@@ -4864,6 +4866,13 @@ void olc_process_script(char_data *ch, char *argument, struct trig_proto_list **
 					room_template *rmt = room_template_proto(vnum);
 					if (rmt && trigger_attach == WLD_TRIGGER) {
 						copyfrom = GET_RMT_SCRIPTS(rmt);
+					}
+					break;
+				}
+				case OLC_VEHICLE: {
+					vehicle_data *veh = vehicle_proto(vnum);
+					if (veh && trigger_attach == VEH_TRIGGER) {
+						copyfrom = veh->proto_script;
 					}
 					break;
 				}

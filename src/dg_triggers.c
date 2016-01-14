@@ -276,6 +276,7 @@ void entry_memory_mtrigger(char_data *ch) {
 	}
 }
 
+
 int entry_mtrigger(char_data *ch) {
 	trig_data *t;
 
@@ -539,6 +540,7 @@ void bribe_mtrigger(char_data *ch, char_data *actor, int amount) {
 	}
 }
 
+
 void load_mtrigger(char_data *ch) {
 	trig_data *t;
 
@@ -554,6 +556,7 @@ void load_mtrigger(char_data *ch) {
 		}
 	}
 }
+
 
 int ability_mtrigger(char_data *actor, char_data *ch, any_vnum abil) {
 	trig_data *t;
@@ -583,6 +586,7 @@ int ability_mtrigger(char_data *actor, char_data *ch, any_vnum abil) {
 	return 1;
 }
 
+
 int leave_mtrigger(char_data *actor, int dir) {
 	trig_data *t;
 	char_data *ch;
@@ -611,6 +615,7 @@ int leave_mtrigger(char_data *actor, int dir) {
 	}
 	return 1;
 }
+
 
 int door_mtrigger(char_data *actor, int subcmd, int dir) {
 	trig_data *t;
@@ -1331,5 +1336,225 @@ bool check_command_trigger(char_data *actor, char *cmd, char *argument, int mode
 	if (!cont) {
 		cont = command_otrigger(actor, cmd, argument, mode);	// obj trigs
 	}
+	if (!cont) {
+		cont = command_vtrigger(actor, cmd, argument, mode);	// vehicles
+	}
 	return cont;
 }
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// VEHICLE TRIGGERS ////////////////////////////////////////////////////////
+
+
+/**
+* Command trigger (vehicle).
+*
+* @param char_data *actor The person typing a command.
+* @param char *cmd The command as-typed (first word).
+* @param char *argument Any arguments (remaining text).
+* @param int mode CMDTRG_EXACT or CMDTRG_ABBREV.
+* @return int 1 if a trigger ran (stop); 0 if not (ok to continue).
+*/
+int command_vtrigger(char_data *actor, char *cmd, char *argument, int mode) {
+	vehicle_data *veh, *next_veh;
+	char buf[MAX_INPUT_LENGTH];
+	trig_data *t;
+
+	/* prevent people we like from becoming trapped :P */
+	if (!valid_dg_target(actor, 0)) {
+		return 0;
+	}
+	
+	LL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(actor)), veh, next_veh, next_in_room) {
+		if (SCRIPT_CHECK(veh, VTRIG_COMMAND)) {
+			for (t = TRIGGERS(SCRIPT(veh)); t; t = t->next) {
+				if (!TRIGGER_CHECK(t, VTRIG_COMMAND)) {
+					continue;
+				}
+
+				if (!GET_TRIG_ARG(t) || !*GET_TRIG_ARG(t)) {
+					syslog(SYS_ERROR, LVL_BUILDER, TRUE, "SYSERR: Command Trigger #%d has no text argument!", GET_TRIG_VNUM(t));
+					continue;
+				}
+
+				if (*GET_TRIG_ARG(t) == '*' || (mode == CMDTRG_EXACT && !str_cmp(cmd, GET_TRIG_ARG(t))) || (mode == CMDTRG_ABBREV && is_abbrev(cmd, GET_TRIG_ARG(t)))) {
+					union script_driver_data_u sdd;
+					ADD_UID_VAR(buf, t, actor, "actor", 0);
+					skip_spaces(&argument);
+					add_var(&GET_TRIG_VARS(t), "arg", argument, 0);
+					skip_spaces(&cmd);
+					add_var(&GET_TRIG_VARS(t), "cmd", cmd, 0);
+					sdd.v = veh;
+
+					if (script_driver(&sdd, t, VEH_TRIGGER, TRIG_NEW)) {
+						return 1;
+					}
+				}
+			}
+		}
+	}
+
+	return 0;
+}
+
+
+int entry_vtrigger(vehicle_data *veh) {
+	trig_data *t;
+
+	if (!SCRIPT_CHECK(veh, VTRIG_ENTRY)) {
+		return 1;
+	}
+
+	for (t = TRIGGERS(SCRIPT(veh)); t; t = t->next) {
+		if (TRIGGER_CHECK(t, VTRIG_ENTRY) && (number(1, 100) <= GET_TRIG_NARG(t))){
+			union script_driver_data_u sdd;
+			sdd.v = veh;
+			return script_driver(&sdd, t, VEH_TRIGGER, TRIG_NEW);
+			break;
+		}
+	}
+
+	return 1;
+}
+
+
+int greet_vtrigger(char_data *actor, int dir) {
+	int intermediate, final = TRUE;
+	vehicle_data *veh, *next_veh;
+	char buf[MAX_INPUT_LENGTH];
+	trig_data *t;
+
+	if (!valid_dg_target(actor, DG_ALLOW_GODS)) {
+		return TRUE;
+	}
+	
+	LL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(actor)), veh, next_veh, next_in_room) {
+		if (!SCRIPT_CHECK(veh, VTRIG_GREET)) {
+			continue;
+		}
+
+		for (t = TRIGGERS(SCRIPT(veh)); t; t = t->next) {
+			if (IS_SET(GET_TRIG_TYPE(t), VTRIG_GREET) && !GET_TRIG_DEPTH(t) && (number(1, 100) <= GET_TRIG_NARG(t))) {
+				union script_driver_data_u sdd;
+				if (dir >= 0 && dir < NUM_OF_DIRS) {
+					add_var(&GET_TRIG_VARS(t), "direction", (char *)dirs[rev_dir[dir]], 0);
+				}
+				else {
+					add_var(&GET_TRIG_VARS(t), "direction", "none", 0);
+				}
+				ADD_UID_VAR(buf, t, actor, "actor", 0);
+				sdd.v = veh;
+				intermediate = script_driver(&sdd, t, VEH_TRIGGER, TRIG_NEW);
+				if (!intermediate) {
+					final = FALSE;
+				}
+				continue;
+			}
+		}
+	}
+	return final;
+}
+
+
+int leave_vtrigger(char_data *actor, int dir) {
+	vehicle_data *veh, *next_veh;
+	char buf[MAX_INPUT_LENGTH];
+	trig_data *t;
+
+	LL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(actor)), veh, next_veh, next_in_room) {
+		if (!SCRIPT_CHECK(veh, VTRIG_LEAVE)) {
+			continue;
+		}
+
+		for (t = TRIGGERS(SCRIPT(veh)); t; t = t->next) {
+			if (IS_SET(GET_TRIG_TYPE(t), VTRIG_LEAVE) && !GET_TRIG_DEPTH(t) && (number(1, 100) <= GET_TRIG_NARG(t))) {
+				union script_driver_data_u sdd;
+				if ( dir >= 0 && dir < NUM_OF_DIRS) {
+					add_var(&GET_TRIG_VARS(t), "direction", (char *)dirs[dir], 0);
+				}
+				else {
+					add_var(&GET_TRIG_VARS(t), "direction", "none", 0);
+				}
+				ADD_UID_VAR(buf, t, actor, "actor", 0);
+				sdd.v = veh;
+				return script_driver(&sdd, t, VEH_TRIGGER, TRIG_NEW);
+			}
+		}
+	}
+	return 1;
+}
+
+
+void load_vtrigger(vehicle_data *veh) {
+	trig_data *t;
+
+	if (!SCRIPT_CHECK(veh, VTRIG_LOAD)) {
+		return;
+	}
+
+	for (t = TRIGGERS(SCRIPT(veh)); t; t = t->next) {
+		if (TRIGGER_CHECK(t, VTRIG_LOAD) &&  (number(1, 100) <= GET_TRIG_NARG(t))) {
+			union script_driver_data_u sdd;
+			sdd.v = veh;
+			script_driver(&sdd, t, VEH_TRIGGER, TRIG_NEW);
+			break;
+		}
+	}
+}
+
+
+/**
+* This trigger is only called if a char is in the area without nohassle.
+*
+* @param vehicle_data *veh The vehicle triggering.
+*/
+void random_vtrigger(vehicle_data *veh) {
+	trig_data *t;
+
+	if (!SCRIPT_CHECK(veh, VTRIG_RANDOM)) {
+		return;
+	}
+
+	for (t = TRIGGERS(SCRIPT(veh)); t; t = t->next) {
+		if (TRIGGER_CHECK(t, VTRIG_RANDOM) && (number(1, 100) <= GET_TRIG_NARG(t))) {
+			union script_driver_data_u sdd;
+			sdd.v = veh;
+			if (script_driver(&sdd, t, VEH_TRIGGER, TRIG_NEW)) {
+				break;
+			}
+		}
+	}
+}
+
+
+void speech_vtrigger(char_data *actor, char *str) {
+	vehicle_data *veh, *next_veh;
+	char buf[MAX_INPUT_LENGTH];
+	trig_data *t;
+	
+	LL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(actor)), veh, next_veh, next_in_room) {
+		if (SCRIPT_CHECK(veh, VTRIG_SPEECH)) {
+			for (t = TRIGGERS(SCRIPT(veh)); t; t = t->next) {
+				if (!TRIGGER_CHECK(t, VTRIG_SPEECH)) {
+					continue;
+				}
+
+				if (!GET_TRIG_ARG(t) || !*GET_TRIG_ARG(t)) {
+					syslog(SYS_ERROR, LVL_BUILDER, TRUE, "SYSERR: Speech Trigger #%d has no text argument!", GET_TRIG_VNUM(t));
+					continue;
+				}
+
+				if (*GET_TRIG_ARG(t) == '*' || ((GET_TRIG_NARG(t) && word_check(str, GET_TRIG_ARG(t))) || (!GET_TRIG_NARG(t) && is_substring(GET_TRIG_ARG(t), str)))) {
+					union script_driver_data_u sdd;
+					ADD_UID_VAR(buf, t, actor, "actor", 0);
+					add_var(&GET_TRIG_VARS(t), "speech", str, 0);
+					sdd.v = veh;
+					script_driver(&sdd, t, VEH_TRIGGER, TRIG_NEW);
+					break;
+				}
+			}
+		}
+	}
+}
+

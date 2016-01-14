@@ -1323,6 +1323,14 @@ void free_vehicle(vehicle_data *veh) {
 	}
 	empty_vehicle(veh);
 	
+	// free any assigned scripts and vars
+	if (SCRIPT(veh)) {
+		extract_script(veh, VEH_TRIGGER);
+	}
+	if (veh->proto_script && (!proto || veh->proto_script != proto->proto_script)) {
+		free_proto_script(veh, VEH_TRIGGER);
+	}
+	
 	// attributes
 	if (veh->attributes && (!proto || veh->attributes != proto->attributes)) {
 		if (VEH_YEARLY_MAINTENANCE(veh)) {
@@ -1894,6 +1902,18 @@ void save_olc_vehicle(descriptor_data *desc) {
 			iter->attributes = veh->attributes;
 		}
 		
+		// remove old scripts
+		if (SCRIPT(iter)) {
+			extract_script(iter, VEH_TRIGGER);
+		}
+		if (iter->proto_script && iter->proto_script != proto->proto_script) {
+			free_proto_script(iter, VEH_TRIGGER);
+		}
+		
+		// re-attach scripts
+		copy_proto_script(veh, iter, VEH_TRIGGER);
+		assign_triggers(iter, VEH_TRIGGER);
+		
 		// sanity checks
 		if (VEH_HEALTH(iter) > VEH_MAX_HEALTH(iter)) {
 			VEH_HEALTH(iter) = VEH_MAX_HEALTH(iter);
@@ -1920,7 +1940,12 @@ void save_olc_vehicle(descriptor_data *desc) {
 		free_resource_list(VEH_YEARLY_MAINTENANCE(proto));
 	}
 	free(proto->attributes);
-
+	
+	// free old script?
+	if (proto->proto_script) {
+		free_proto_script(proto, VEH_TRIGGER);
+	}
+	
 	// save data back over the proto-type
 	hh = proto->hh;	// save old hash handle
 	*proto = *veh;	// copy over all data
@@ -1961,6 +1986,11 @@ vehicle_data *setup_olc_vehicle(vehicle_data *input) {
 		
 		// copy lists
 		VEH_YEARLY_MAINTENANCE(new) = copy_resource_list(VEH_YEARLY_MAINTENANCE(input));
+		
+		// copy scripts
+		SCRIPT(new) = NULL;
+		new->proto_script = NULL;
+		copy_proto_script(input, new, VEH_TRIGGER);
 	}
 	else {
 		// brand new: some defaults
@@ -1969,6 +1999,8 @@ vehicle_data *setup_olc_vehicle(vehicle_data *input) {
 		VEH_LONG_DESC(new) = str_dup(default_vehicle_long_desc);
 		VEH_MAX_HEALTH(new) = 1;
 		VEH_MOVE_TYPE(new) = MOB_MOVE_DRIVES;
+		SCRIPT(new) = NULL;
+		new->proto_script = NULL;
 	}
 	
 	// done
@@ -1987,6 +2019,7 @@ vehicle_data *setup_olc_vehicle(vehicle_data *input) {
 */
 void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	extern char *get_room_name(room_data *room, bool color);
+	void script_stat (char_data *ch, struct script_data *sc);
 	
 	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
 	obj_data *obj;
@@ -2063,8 +2096,17 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 		get_resource_display(VEH_NEEDS_RESOURCES(veh), part);
 		size += snprintf(buf + size, sizeof(buf) - size, "Needs resources:\r\n%s", part);
 	}
-		
-	page_string(ch->desc, buf, TRUE);
+	
+	send_to_char(buf, ch);
+	
+	// script info
+	msg_to_char(ch, "Script information:\r\n");
+	if (SCRIPT(veh)) {
+		script_stat(ch, SCRIPT(veh));
+	}
+	else {
+		msg_to_char(ch, "  None.\r\n");
+	}
 }
 
 
@@ -2131,6 +2173,8 @@ void look_at_vehicle(vehicle_data *veh, char_data *ch) {
 * @param char_data *ch The person who is editing a vehicle and will see its display.
 */
 void olc_show_vehicle(char_data *ch) {
+	void get_script_display(struct trig_proto_list *list, char *save_buffer);
+	
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
 	
@@ -2177,6 +2221,11 @@ void olc_show_vehicle(char_data *ch) {
 	// maintenance resources
 	sprintf(buf + strlen(buf), "Yearly maintenance resources required: <\tyresource\t0>\r\n");
 	get_resource_display(VEH_YEARLY_MAINTENANCE(veh), lbuf);
+	strcat(buf, lbuf);
+	
+	// scripts
+	sprintf(buf + strlen(buf), "Scripts: <&yscript&0>\r\n");
+	get_script_display(veh->proto_script, lbuf);
 	strcat(buf, lbuf);
 	
 	page_string(ch->desc, buf, TRUE);
@@ -2340,6 +2389,12 @@ OLC_MODULE(vedit_resource) {
 	void olc_process_resources(char_data *ch, char *argument, struct resource_data **list);
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	olc_process_resources(ch, argument, &VEH_YEARLY_MAINTENANCE(veh));
+}
+
+
+OLC_MODULE(vedit_script) {
+	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
+	olc_process_script(ch, argument, &(veh->proto_script), VEH_TRIGGER);
 }
 
 

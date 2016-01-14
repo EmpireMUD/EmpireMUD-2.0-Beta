@@ -741,6 +741,10 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 		/* prevent teleport crashes */
 		return FALSE;
 	}
+	if (!leave_vtrigger(ch, dir) || IN_ROOM(ch) != was_in) {
+		/* prevent teleport crashes */
+		return FALSE;
+	}
 	if (!leave_otrigger(IN_ROOM(ch), ch, dir) || IN_ROOM(ch) != was_in) {
 		/* prevent teleport crashes */
 		return FALSE;

@@ -674,7 +674,7 @@ ACMD(do_mload) {
 			scale_vehicle_to_level(veh, 0);
 		}
 		
-		// load_vtrigger(veh);
+		load_vtrigger(veh);
 	}
 	else
 		mob_log(ch, "mload: bad type");

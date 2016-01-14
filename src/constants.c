@@ -2808,7 +2808,7 @@ const char *vtrig_types[] = {
 	"Greet",
 	"*",	// 7
 	"Entry",
-	"Receive",
+	"*",	// 9
 	"*",	// 10
 	"*",	// 11
 	"*",	// 12
@@ -2831,7 +2831,7 @@ const bitvector_t vtrig_argument_types[] = {
 	TRIG_ARG_PERCENT,	// greet
 	NOBITS,	// 7
 	TRIG_ARG_PERCENT,	// entry
-	TRIG_ARG_PERCENT,	// receive
+	NOBITS,	// 9
 	NOBITS,	// 10
 	NOBITS,	// 11
 	NOBITS,	// 12

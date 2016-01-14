@@ -695,7 +695,7 @@ VCMD(do_dgvload) {
 			scale_vehicle_to_level(veh, 0);
 		}
 		
-		//load_vtrigger(veh);
+		load_vtrigger(veh);
 	}
 	else {
 		veh_log(veh, "vload: bad type");

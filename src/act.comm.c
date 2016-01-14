@@ -1243,6 +1243,7 @@ ACMD(do_say) {
 		if (subcmd != SCMD_OOCSAY) {
 			speech_mtrigger(ch, argument);
 			speech_wtrigger(ch, argument);
+			speech_vtrigger(ch, argument);
 		}
 	}
 }

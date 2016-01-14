@@ -86,8 +86,7 @@
 #define VTRIG_GREET  BIT(6)	// character enters the room
 // unused BIT(7)
 #define VTRIG_ENTRY  BIT(8)	// vehicle enters a room
-#define VTRIG_RECEIVE  BIT(9)	// item put in vehicle
-// unused BIT(10), BIT(11), BIT(12)
+// unused BIT(9), BIT(10), BIT(11), BIT(12)
 #define VTRIG_LOAD  BIT(13)	// vehicle is loaded
 // unused BIT(14), BIT(15)
 #define VTRIG_LEAVE  BIT(16)	// someone leaves the room
@@ -243,6 +242,14 @@ int door_wtrigger(char_data *actor, int subcmd, int dir);
 
 int consume_otrigger(obj_data *obj, char_data *actor, int cmd);
 
+int command_vtrigger(char_data *actor, char *cmd, char *argument, int mode);
+int entry_vtrigger(vehicle_data *veh);
+int leave_vtrigger(char_data *actor, int dir);
+void load_vtrigger(vehicle_data *veh);
+int greet_vtrigger(char_data *actor, int dir);
+void random_vtrigger(vehicle_data *veh);
+void speech_vtrigger(char_data *actor, char *str);
+
 /* function prototypes from scripts.c */
 void script_trigger_check(void);
 void add_trigger(struct script_data *sc, trig_data *t, int loc);
@@ -277,7 +284,6 @@ void trig_data_copy(trig_data *this_data, const trig_data *trg);
 trig_data *read_trigger(int nr);
 void add_var(struct trig_var_data **var_list, char *name, char *value, int id);
 room_data *dg_room_of_obj(obj_data *obj);
-void do_dg_cast(void *go, struct script_data *sc, trig_data *trig, int type, char *cmd);
 void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int type, char *cmd);
 void script_damage(char_data *vict, char_data *killer, int level, int dam_type, double modifier);
 void script_damage_over_time(char_data *vict, int level, int dam_type, double modifier, int dur_seconds, int max_stacks, char_data *cast_by);

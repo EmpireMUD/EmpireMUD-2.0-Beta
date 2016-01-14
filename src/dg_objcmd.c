@@ -774,7 +774,7 @@ OCMD(do_dgoload) {
 			scale_vehicle_to_level(veh, 0);
 		}
 		
-		//load_vtrigger(veh);
+		load_vtrigger(veh);
 	}
 	else {
 		obj_log(obj, "oload: bad type");

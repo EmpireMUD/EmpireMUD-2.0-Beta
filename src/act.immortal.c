@@ -5003,7 +5003,7 @@ ACMD(do_load) {
 		act("$n makes an odd magical gesture.", TRUE, ch, NULL, NULL, TO_ROOM);
 		act("$n has created $V!", FALSE, ch, NULL, veh, TO_ROOM);
 		act("You create $V.", FALSE, ch, NULL, veh, TO_CHAR);
-		// load_vtrigger(veh);
+		load_vtrigger(veh);
 	}
 	else {
 		send_to_char("That'll have to be either 'obj', 'mob', or 'vehicle'.\r\n", ch);

@@ -808,7 +808,7 @@ WCMD(do_wload) {
 		}
 		
 		vehicle_to_room(veh, room);
-		// load_vtrigger(veh);
+		load_vtrigger(veh);
 	}
 	else
 		wld_log(room, "wload: bad type");

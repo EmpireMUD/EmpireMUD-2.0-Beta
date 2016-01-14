@@ -666,6 +666,8 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 				GET_ACTION(vict) = ACT_NONE;
 			}
 		}
+		
+		load_vtrigger(veh);
 	}
 	else if (!found_obj) {
 		msg_to_char(ch, "You run out of resources and stop %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
