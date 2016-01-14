@@ -783,7 +783,6 @@ vehicle_data *read_vehicle(any_vnum vnum, bool with_triggers) {
 	GET_ID(veh) = max_vehicle_id++;
 	add_to_lookup_table(GET_ID(veh), (void *)veh);
 	
-	/*
 	if (with_triggers) {
 		copy_proto_script(proto, veh, VEH_TRIGGER);
 		assign_triggers(veh, VEH_TRIGGER);
@@ -791,8 +790,7 @@ vehicle_data *read_vehicle(any_vnum vnum, bool with_triggers) {
 	else {
 		veh->proto_script = NULL;
 	}
-	*/
-
+	
 	return veh;
 }
 
@@ -1418,6 +1416,11 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 				break;
 			}
 			
+			case 'T': {	// trigger
+				dg_read_trigger(line, veh, VEH_TRIGGER);
+				break;
+			}
+			
 			// end
 			case 'S': {
 				return;
@@ -1458,6 +1461,7 @@ void write_vehicle_index(FILE *fl) {
 * @param vehicle_data *veh The thing to save.
 */
 void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
+	void script_save_to_disk(FILE *fp, void *item, int type);
 	void write_resources_to_file(FILE *fl, struct resource_data *list);
 	
 	char temp[MAX_STRING_LENGTH];
@@ -1496,6 +1500,9 @@ void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
 	
 	// 'R': resources
 	write_resources_to_file(fl, VEH_YEARLY_MAINTENANCE(veh));
+	
+	// T, V: triggers
+	script_save_to_disk(fl, veh, VEH_TRIGGER);
 	
 	// end
 	fprintf(fl, "S\n");

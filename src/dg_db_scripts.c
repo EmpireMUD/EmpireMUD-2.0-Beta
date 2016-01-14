@@ -194,6 +194,12 @@ void dg_read_trigger(char *line, void *proto, int type) {
 			case ADV_TRIGGER:
 				syslog(SYS_ERROR, LVL_BUILDER, TRUE,  "SYSERR: dg_read_trigger: Trigger vnum #%d asked for but non-existant! (room:%d)", vnum, ((adv_data*)proto)->vnum);
 				break;
+			case VEH_TRIGGER:
+				syslog(SYS_ERROR, LVL_BUILDER, TRUE,  "SYSERR: dg_read_trigger: Trigger vnum #%d asked for but non-existant! (veh:%d)", vnum, ((vehicle_data*)proto)->vnum);
+				break;
+			case OBJ_TRIGGER:
+				syslog(SYS_ERROR, LVL_BUILDER, TRUE,  "SYSERR: dg_read_trigger: Trigger vnum #%d asked for but non-existant! (obj:%d)", vnum, ((obj_data*)proto)->vnum);
+				break;
 			default:
 				syslog(SYS_ERROR, LVL_BUILDER, TRUE, "SYSERR: dg_read_trigger: Trigger vnum #%d asked for but non-existant! (?)", vnum);
 				break;
