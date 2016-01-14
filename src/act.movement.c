@@ -573,7 +573,7 @@ int move_cost(char_data *ch, room_data *from, room_data *to, int dir, int mode) 
 * Checks if 'ch' can move 'veh' from the room they are in, to 'to_room'. This
 * sends its own error message.
 * 
-* @param char_data *ch The player trying to move.
+* @param char_data *ch The player trying to move. (OPTIONAL)
 * @param vehicle_data *veh The vehicle trying to move, too.
 * @return bool TRUE if the player's vehicle can move there, FALSE if not.
 */
@@ -583,40 +583,54 @@ bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room)
 	char buf[MAX_STRING_LENGTH];
 	
 	if (!VEH_IS_COMPLETE(veh)) {
-		act("$V can't move anywhere until it's complete!", FALSE, ch, NULL, veh, TO_CHAR);
+		if (ch) {
+			act("$V can't move anywhere until it's complete!", FALSE, ch, NULL, veh, TO_CHAR);
+		}
 		return FALSE;
 	}
 	
 	// required number of mounts
 	if (count_harnessed_animals(veh) < VEH_ANIMALS_REQUIRED(veh)) {
-		snprintf(buf, sizeof(buf), "You need to harness %d animal%s to $V before it can move.", VEH_ANIMALS_REQUIRED(veh), PLURAL(VEH_ANIMALS_REQUIRED(veh)));
-		act(buf, FALSE, ch, NULL, veh, TO_CHAR);
+		if (ch) {
+			snprintf(buf, sizeof(buf), "You need to harness %d animal%s to $V before it can move.", VEH_ANIMALS_REQUIRED(veh), PLURAL(VEH_ANIMALS_REQUIRED(veh)));
+			act(buf, FALSE, ch, NULL, veh, TO_CHAR);
+		}
 		return FALSE;
 	}
 	
 	// closed building?
-	if ((VEH_FLAGGED(veh, VEH_NO_BUILDING) || !BLD_ALLOWS_MOUNTS(to_room)) && !IS_INSIDE(IN_ROOM(ch)) && !ROOM_IS_CLOSED(IN_ROOM(ch)) && !IS_ADVENTURE_ROOM(IN_ROOM(ch)) && IS_ANY_BUILDING(to_room) && ROOM_IS_CLOSED(to_room)) {
-		act("$V can't go in there.", FALSE, ch, NULL, veh, TO_CHAR);
+	if ((VEH_FLAGGED(veh, VEH_NO_BUILDING) || !BLD_ALLOWS_MOUNTS(to_room)) && !IS_INSIDE(IN_ROOM(veh)) && !ROOM_IS_CLOSED(IN_ROOM(veh)) && !IS_ADVENTURE_ROOM(IN_ROOM(veh)) && IS_ANY_BUILDING(to_room) && ROOM_IS_CLOSED(to_room)) {
+		if (ch) {
+			act("$V can't go in there.", FALSE, ch, NULL, veh, TO_CHAR);
+		}
 		return FALSE;
 	}
 	
 	// barrier?
 	if (ROOM_BLD_FLAGGED(to_room, BLD_BARRIER)) {
-		act("$V can't move that close to the barrier.", FALSE, ch, NULL, veh, TO_CHAR);
+		if (ch) {
+			act("$V can't move that close to the barrier.", FALSE, ch, NULL, veh, TO_CHAR);
+		}
 		return FALSE;
 	}
 	
 	// terrain-based checks
 	if (WATER_SECT(to_room) && !VEH_FLAGGED(veh, VEH_SAILING | VEH_FLYING)) {
-		act("$V can't go onto the water.", FALSE, ch, NULL, veh, TO_CHAR);
+		if (ch) {
+			act("$V can't go onto the water.", FALSE, ch, NULL, veh, TO_CHAR);
+		}
 		return FALSE;
 	}
 	if (!WATER_SECT(to_room) && !IS_WATER_BUILDING(to_room) && !WATER_SECT(IN_ROOM(veh)) && !VEH_FLAGGED(veh, VEH_DRIVING | VEH_FLYING)) {
-		act("$V can't go onto land.", FALSE, ch, NULL, veh, TO_CHAR);
+		if (ch) {
+			act("$V can't go onto land.", FALSE, ch, NULL, veh, TO_CHAR);
+		}
 		return FALSE;
 	}
 	if (ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && !VEH_FLAGGED(veh, VEH_ALLOW_ROUGH | VEH_FLYING)) {
-		act("$V can't go into rough terrain.", FALSE, ch, NULL, veh, TO_CHAR);
+		if (ch) {
+			act("$V can't go into rough terrain.", FALSE, ch, NULL, veh, TO_CHAR);
+		}
 		return FALSE;
 	}
 	

@@ -330,6 +330,13 @@ VCMD(do_vsend) {
 }
 
 
+// incoming subcmd is direction
+VCMD(do_vmove) {
+	extern bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd);
+	move_vehicle(NULL, veh, subcmd, 0);
+}
+
+
 // purge all objects and npcs in room, or specified object/mob/vehicle
 VCMD(do_vpurge) {
 	char arg[MAX_INPUT_LENGTH];
@@ -1034,6 +1041,25 @@ VCMD(do_vscale) {
 
 const struct vehicle_command_info veh_cmd_info[] = {
 	{ "RESERVED", 0, 0 },/* this must be first -- for specprocs */
+	
+	// dirs
+	{ "north", do_vmove, NORTH },
+	{ "east", do_vmove, EAST },
+	{ "south", do_vmove, SOUTH },
+	{ "northwest", do_vmove, NORTHWEST },
+	{ "northeast", do_vmove, NORTHEAST },
+	{ "southwest", do_vmove, SOUTHWEST },
+	{ "southeast", do_vmove, SOUTHEAST },
+	{ "nw", do_vmove, NORTHWEST },
+	{ "ne", do_vmove, NORTHEAST },
+	{ "sw", do_vmove, SOUTHWEST },
+	{ "se", do_vmove, SOUTHEAST },
+	{ "up", do_vmove, UP },
+	{ "down", do_vmove, DOWN },
+	{ "fore", do_vmove, FORE },
+	{ "starboard", do_vmove, STARBOARD },
+	{ "port", do_vmove, PORT },
+	{ "aft", do_vmove, AFT },
 
 	{ "vadventurecomplete", do_vadventurecomplete, NO_SCMD },
 	{ "vat", do_vat, NO_SCMD },
