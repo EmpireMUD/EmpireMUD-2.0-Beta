@@ -6664,12 +6664,14 @@ ACMD(do_vstat) {
 		do_stat_trigger(ch, trig);
 	}
 	else if (is_abbrev(buf, "vehicle")) {
-		vehicle_data *veh = vehicle_proto(number);
-		if (veh) {
-			do_stat_vehicle(ch, veh);
+		vehicle_data *veh;
+		if (!vehicle_proto(number)) {
+			msg_to_char(ch, "There is no vehicle with that vnum.\r\n");
 		}
 		else {
-			msg_to_char(ch, "There is no vehicle with that vnum.\r\n");
+			veh = read_vehicle(number, TRUE);
+			do_stat_vehicle(ch, veh);
+			extract_vehicle(veh);
 		}
 	}
 	else
