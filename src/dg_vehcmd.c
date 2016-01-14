@@ -1046,6 +1046,7 @@ const struct vehicle_command_info veh_cmd_info[] = {
 	{ "north", do_vmove, NORTH },
 	{ "east", do_vmove, EAST },
 	{ "south", do_vmove, SOUTH },
+	{ "west", do_vmove, WEST },
 	{ "northwest", do_vmove, NORTHWEST },
 	{ "northeast", do_vmove, NORTHEAST },
 	{ "southwest", do_vmove, SOUTHWEST },
