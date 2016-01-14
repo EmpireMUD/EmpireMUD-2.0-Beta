@@ -89,10 +89,16 @@ A large tree has fallen here.~
    You can use a sharp tool to scrape a tree until it's a log, or craft it
 into a canoe.
 ~
-3 el a 1
+3 el a 2
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: a roaring fire
+M
+7
+$n carves out a tree for $V.~
+M
+6
+You carve out a tree for $V.~
 R
 5118 0
 S
