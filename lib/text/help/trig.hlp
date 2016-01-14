@@ -620,6 +620,9 @@ MAKEUID VAREXISTS %VAREXISTS% %EXISTS% EXISTS
 
 Usage:  makeuid <variable> <id>
         makeuid <variable> room [room location]
+        makeuid <variable> mob <target>
+        makeuid <variable> obj <target>
+        makeuid <variable> vehicle <target>
 
 * We have one mob giving a quest. This mob sets the targets id as a global on 
 * the player via the 'remote' command, like this:
@@ -793,6 +796,7 @@ files below.
 CHAR-VAR - Variables for characters.
 OBJ-VAR  - Variables for objects.
 ROOM-VAR - Variables for rooms.
+VEH-VAR  - Variables for vehicles.
 TEXT-VAR - Variables for text.
 SPEC-VAR - Variables for special stuff.
 
@@ -900,6 +904,8 @@ carried_by   - The id of the character carrying the object, or an empty return.
 contents     - Gives the first object in a container.
 cost         - The cost (not rent cost) of the object.
 cost_per_day - The rent cost of the object
+count(str)   - Number of matching items (name/vnum) inside it.
+has_in(str)  - Has an object (name/vnum) inside it.
 id           - The unique id of the object.
 is_inroom    - Returns true if object is in room.
 is_name(str) - Returns true if str contains names for the object.
@@ -1026,6 +1032,44 @@ wits              - The actor's Wits.
                     end
                     * and then later in the script write it back:
                     remote testvar %actor.id%
+#d
+TRIGEDIT-VARIABLES-VEHICLES VEH-VAR VEHICLE-VARS TRIGEDIT-VEH-VAR TRIGEDIT-VEHICLE-VAR
+
+When using field  - The variable returns:
+&canimals_harnessed&0 - Number of animals harnessed to the vehicle.
+&canimals_required&0 - Number of animals needed for the vehicle to move.
+&cburn&0 - Ignites the vehicle, if possible.
+&ccan_fire&0 - Currently capable of using siege weapons.
+&ccomplete&0 - True if the vehicle is complete.
+&ccontents&0 - The first item inside the vehicle (if a container).
+&ccount(str)&0 - Number of matching items inside (name/vnum).
+&cdriver&0 - The person driving/sailing the vehicle, if any.
+&cdump&0 - Empties everything out of the vehicle, including people.
+&cdump_objects&0 - Empties just the contents, if the vehicle is a container.
+&cempire_id&0 - ID of the empire that owns the vehicle, if any.
+&cempire_name&0 - The name of the empire that owns the vehicle, if any.
+&cextinguish&0 - If the vehicle is on fire, puts it out.
+&charness(mob)&0 - Harnesses a mob to the vehicle (or loads and harnesses one if
+   you give a vnum instead of a mob).
+&chas_in(str)&0 - True if an object with a given name/vnum is inside.
+&chealth&0 - Current health of the vehicle.
+&cin_on&0 - "in" or "on" depending on how characters sit in/on the vehicle.
+&cinterior&0 - The base inside room (where you'd board to, if it has one).
+&cis_flagged(FLAG)&0 - True if the vehicle has the flag.
+&ckeywords&0 - The vehicle's keyword list.
+&cled_by&0 - The person leading the vehicle, if any.
+&clevel&0 - What level the vehicle is scaled to.
+&cmaxhealth&0 - Maximum health of the vehicle.
+&cmaxrooms&0 - Maximum added rooms (not counting the base interior room).
+&cmovetype&0 - The verb for the vehicle's movement (like "sails").
+&cneedsrepair&0 - The vehicle needs yearly maintenance or took damage.
+&crooms&0 - The number of added rooms (not counting the base interior room).
+&cshortdesc&0 - The vehicle's short description (the name the players see).
+&csitting_in&0 - The person who's sitting in/on the vehicle, if any.
+&cunharness&0 - Detatches all mobs that were harnessed to it.
+&cvnum&0 - The vehicle's vnum.
+
+See also: VEDIT FLAGS
 #d
 EXPRESSIONS TRIGEDIT-EXPRESSIONS INCREMENTS MATHEMATICAL /= || \
 

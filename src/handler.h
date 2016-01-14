@@ -286,6 +286,7 @@ void vehicle_to_room(vehicle_data *veh, room_data *room);
 vehicle_data *get_vehicle_in_target_room_vis(char_data *ch, room_data *room, char *name);
 #define get_vehicle_in_room_vis(ch, name)  get_vehicle_in_target_room_vis((ch), IN_ROOM(ch), (name))
 extern vehicle_data *get_vehicle_vis(char_data *ch, char *name);
+extern vehicle_data *get_vehicle_room(room_data *room, char *name);
 extern vehicle_data *get_vehicle_world(char *name);
 
 // world handlers

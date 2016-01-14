@@ -289,6 +289,7 @@ union script_driver_data_u {
 	char_data *c;
 	room_data *r;
 	obj_data *o;
+	vehicle_data *v;
 };
 int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, int mode);
 //int script_driver(void *go, trig_data *trig, int type, int mode);

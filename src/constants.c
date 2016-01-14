@@ -2895,8 +2895,8 @@ const char *trig_attach_types[] = {
 	"Mobile",
 	"Object",
 	"Room",
-	"*",	// rmt_trigger -- never set on an actual trigger
-	"*",	// adv_trigger -- never set on an actual trigger
+	"*RMT",	// rmt_trigger -- never set on an actual trigger
+	"*ADV",	// adv_trigger -- never set on an actual trigger
 	"Vehicle",
 	"\n"
 };

@@ -6178,6 +6178,7 @@ vehicle_data *get_vehicle_in_target_room_vis(char_data *ch, room_data *room, cha
 *
 * @param char_data *ch The person looking.
 * @param char *name The string they typed.
+* @return vehicle_data* The vehicle found, or NULL.
 */
 vehicle_data *get_vehicle_vis(char_data *ch, char *name) {
 	int found = 0, number;
@@ -6211,9 +6212,45 @@ vehicle_data *get_vehicle_vis(char_data *ch, char *name) {
 
 
 /**
+* Find a vehicle in the room, without regard to visibility.
+*
+* @param room_data *room The room to look in.
+* @param char *name The string to search for.
+* @return vehicle_data* The found vehicle, or NULL.
+*/
+vehicle_data *get_vehicle_room(room_data *room, char *name) {
+	int found = 0, number;
+	char tmpname[MAX_INPUT_LENGTH];
+	char *tmp = tmpname;
+	vehicle_data *iter;
+
+	strcpy(tmp, name);
+	
+	// 0.x does not target vehicles
+	if ((number = get_number(&tmp)) == 0) {
+		return (NULL);
+	}
+	
+	LL_FOREACH2(ROOM_VEHICLES(room), iter, next_in_room) {
+		if (!isname(tmp, VEH_KEYWORDS(iter))) {
+			continue;
+		}
+		
+		// found: check number
+		if (++found == number) {
+			return iter;
+		}
+	}
+	
+	return NULL;
+}
+
+
+/**
 * Find a vehicle in the world, without regard to visibility.
 *
 * @param char *name The string to search for.
+* @return vehicle_data* The vehicle found, or NULL.
 */
 vehicle_data *get_vehicle_world(char *name) {
 	int found = 0, number;
