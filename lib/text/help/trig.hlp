@@ -887,6 +887,9 @@ empire_name - The owner empire's name, if any.
            subfield, "key"   - vnum of key to use
            subfield, "bits"  - CLOSED LOCKED, etc.
            subfield, "room"  - room variable for room in direction
+           subfield, "create,VNUM" - Adds a new room in that direction, using
+              building VNUM (which must be a ROOM-flagged building). This only
+              works in building/vehicle interiors that aren't adventures.
            no subfield: same as 'bits'. %self.north(key)%
 id       - The unique id of the room.
 name     - The name of the room.
