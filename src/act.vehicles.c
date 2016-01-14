@@ -798,6 +798,7 @@ void do_light_vehicle(char_data *ch, vehicle_data *veh, obj_data *flint) {
 * @param char *argument The targeting arg.
 */
 void do_sit_on_vehicle(char_data *ch, char *argument) {
+	char buf[MAX_STRING_LENGTH];
 	vehicle_data *veh;
 	
 	skip_spaces(&argument);	// usually done ahead of time, but in case
@@ -836,8 +837,12 @@ void do_sit_on_vehicle(char_data *ch, char *argument) {
 		msg_to_char(ch, "You can't sit %s it while you're leading something.\r\n", IN_OR_ON(veh));
 	}
 	else {
-		act("You sit on $V.", FALSE, ch, NULL, veh, TO_CHAR);
-		act("$n sits on $V.", FALSE, ch, NULL, veh, TO_ROOM);
+		snprintf(buf, sizeof(buf), "You sit %s $V.", IN_OR_ON(veh));
+		act(buf, FALSE, ch, NULL, veh, TO_CHAR);
+		
+		snprintf(buf, sizeof(buf), "$n sits %s $V.", IN_OR_ON(veh));
+		act(buf, FALSE, ch, NULL, veh, TO_ROOM);
+		
 		sit_on_vehicle(ch, veh);
 		GET_POS(ch) = POS_SITTING;
 	}
