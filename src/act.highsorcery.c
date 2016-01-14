@@ -1436,6 +1436,7 @@ RITUAL_FINISH_FUNC(perform_ritual_of_teleportation) {
 		entry_memory_mtrigger(ch);
 		greet_mtrigger(ch, NO_DIR);
 		greet_memory_mtrigger(ch);
+		greet_vtrigger(ch, NO_DIR);
 	
 		gain_ability_exp(ch, ABIL_RITUAL_OF_TELEPORTATION, 50);
 	

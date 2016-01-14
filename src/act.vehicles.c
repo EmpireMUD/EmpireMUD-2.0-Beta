@@ -267,6 +267,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 		entry_memory_mtrigger(VEH_SITTING_ON(veh));
 		greet_mtrigger(VEH_SITTING_ON(veh), dir);
 		greet_memory_mtrigger(VEH_SITTING_ON(veh));
+		greet_vtrigger(VEH_SITTING_ON(veh), NO_DIR);
 		
 		LL_FOREACH_SAFE(VEH_SITTING_ON(veh)->followers, fol, next_fol) {
 			if ((IN_ROOM(fol->follower) == was_in) && (GET_POS(fol->follower) >= POS_STANDING)) {
@@ -390,6 +391,7 @@ void perform_load_mob(char_data *ch, char_data *mob, vehicle_data *cont, room_da
 	entry_memory_mtrigger(mob);
 	greet_mtrigger(mob, NO_DIR);
 	greet_memory_mtrigger(mob);
+	greet_vtrigger(mob, NO_DIR);
 }
 
 
@@ -439,6 +441,7 @@ void perform_unload_mob(char_data *ch, char_data *mob, vehicle_data *cont) {
 	entry_memory_mtrigger(mob);
 	greet_mtrigger(mob, NO_DIR);
 	greet_memory_mtrigger(mob);
+	greet_vtrigger(mob, NO_DIR);
 }
 
 
@@ -1014,6 +1017,7 @@ ACMD(do_board) {
 		entry_memory_mtrigger(ch);
 		greet_mtrigger(ch, NO_DIR);
 		greet_memory_mtrigger(ch);
+		greet_vtrigger(ch, NO_DIR);
 		
 		// leading-mob
 		if (GET_LEADING_MOB(ch) && IN_ROOM(GET_LEADING_MOB(ch)) == was_in) {
@@ -1032,6 +1036,7 @@ ACMD(do_board) {
 			entry_memory_mtrigger(GET_LEADING_MOB(ch));
 			greet_mtrigger(GET_LEADING_MOB(ch), NO_DIR);
 			greet_memory_mtrigger(GET_LEADING_MOB(ch));
+			greet_vtrigger(GET_LEADING_MOB(ch), NO_DIR);
 		}
 		
 		// leading-vehicle
@@ -1073,6 +1078,7 @@ ACMD(do_board) {
 			entry_memory_mtrigger(k->follower);
 			greet_mtrigger(k->follower, NO_DIR);
 			greet_memory_mtrigger(k->follower);
+			greet_vtrigger(k->follower, NO_DIR);
 		}
 		
 		command_lag(ch, WAIT_OTHER);
@@ -1110,6 +1116,7 @@ ACMD(do_disembark) {
 		entry_memory_mtrigger(ch);
 		greet_mtrigger(ch, NO_DIR);
 		greet_memory_mtrigger(ch);
+		greet_vtrigger(ch, NO_DIR);
 		
 		if (GET_LEADING_MOB(ch) && IN_ROOM(GET_LEADING_MOB(ch)) == was_in) {
 			act("$n is led off.", TRUE, GET_LEADING_MOB(ch), NULL, NULL, TO_ROOM);
@@ -1126,6 +1133,7 @@ ACMD(do_disembark) {
 			entry_memory_mtrigger(GET_LEADING_MOB(ch));
 			greet_mtrigger(GET_LEADING_MOB(ch), NO_DIR);
 			greet_memory_mtrigger(GET_LEADING_MOB(ch));
+			greet_vtrigger(GET_LEADING_MOB(ch), NO_DIR);
 		}
 		if (GET_LEADING_VEHICLE(ch) && IN_ROOM(GET_LEADING_VEHICLE(ch)) == was_in) {
 			if (ROOM_PEOPLE(was_in)) {
@@ -1161,6 +1169,7 @@ ACMD(do_disembark) {
 			entry_memory_mtrigger(k->follower);
 			greet_mtrigger(k->follower, NO_DIR);
 			greet_memory_mtrigger(k->follower);
+			greet_vtrigger(k->follower, NO_DIR);
 		}
 		
 		command_lag(ch, WAIT_OTHER);

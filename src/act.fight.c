@@ -332,6 +332,7 @@ ACMD(do_respawn) {
 		SAVE_CHAR(ch);
 		greet_mtrigger(ch, NO_DIR);
 		greet_memory_mtrigger(ch);
+		greet_vtrigger(ch, NO_DIR);
 	}
 }
 

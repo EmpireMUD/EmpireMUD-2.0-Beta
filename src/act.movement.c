@@ -426,6 +426,7 @@ void perform_transport(char_data *ch, room_data *to_room) {
 	entry_memory_mtrigger(ch);
 	greet_mtrigger(ch, NO_DIR);
 	greet_memory_mtrigger(ch);
+	greet_vtrigger(ch, NO_DIR);
 
 	for (k = ch->followers; k; k = k->next) {
 		if ((IN_ROOM(k->follower) == was_in) && (GET_POS(k->follower) >= POS_STANDING)) {
@@ -679,6 +680,7 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 	entry_memory_mtrigger(ch);
 	greet_mtrigger(ch, NO_DIR);
 	greet_memory_mtrigger(ch);
+	greet_vtrigger(ch, NO_DIR);
 	
 	// now followers
 	for (fol = ch->followers; fol; fol = next_fol) {
@@ -997,7 +999,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 
 	// trigger section
 	entry_memory_mtrigger(ch);
-	if (!greet_mtrigger(ch, dir)) {
+	if (!greet_mtrigger(ch, dir) || !greet_vtrigger(ch, dir)) {
 		char_from_room(ch);
 		char_to_room(ch, was_in);
 		look_at_room(ch);
@@ -1298,7 +1300,7 @@ ACMD(do_circle) {
 	command_lag(ch, WAIT_MOVEMENT);
 	
 	// triggers?
-	if (!enter_wtrigger(IN_ROOM(ch), ch, dir) || !greet_mtrigger(ch, dir)) {
+	if (!enter_wtrigger(IN_ROOM(ch), ch, dir) || !greet_mtrigger(ch, dir) || !greet_vtrigger(ch, dir)) {
 		char_from_room(ch);
 		char_to_room(ch, was_in);
 		if (ch->desc) {

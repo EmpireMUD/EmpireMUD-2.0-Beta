@@ -2992,6 +2992,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	// script/trigger stuff
 	greet_mtrigger(ch, NO_DIR);
 	greet_memory_mtrigger(ch);
+	greet_vtrigger(ch, NO_DIR);
 	
 	// update the index in case any of this changed
 	index = find_player_index_by_idnum(GET_IDNUM(ch));
