@@ -43,6 +43,7 @@ extern char_data *get_char_by_vehicle(vehicle_data *veh, char *name);
 extern obj_data *get_obj_by_vehicle(vehicle_data *veh, char *name);
 extern room_data *get_room(room_data *ref, char *name);
 extern vehicle_data *get_vehicle_by_vehicle(vehicle_data *veh, char *name);
+extern vehicle_data *get_vehicle_near_vehicle(vehicle_data *veh, char *name);
 void instance_obj_setup(struct instance_data *inst, obj_data *obj);
 void scale_item_to_level(obj_data *obj, int level);
 void scale_mob_to_level(char_data *mob, int level);
@@ -394,6 +395,7 @@ VCMD(do_vteleport) {
 	room_data *target, *orm = IN_ROOM(veh);
 	struct instance_data *inst;
 	char_data *ch, *next_ch;
+	vehicle_data *v;
 	int iter;
 
 	two_arguments(argument, arg1, arg2);
@@ -468,6 +470,11 @@ VCMD(do_vteleport) {
 				}
 				enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
 			}
+		}
+		else if ((v = get_vehicle_near_vehicle(veh, arg1))) {
+			vehicle_from_room(v);
+			vehicle_to_room(v, target);
+			entry_vtrigger(v);
 		}
 		else {
 			veh_log(veh, "vteleport: no target found");

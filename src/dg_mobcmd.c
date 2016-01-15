@@ -847,9 +847,9 @@ ACMD(do_mteleport) {
 	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	room_data *target;
-	char_data *vict = NULL, *next_ch;
+	char_data *vict, *next_ch;
 	struct instance_data *inst;
-	vehicle_data *veh = NULL;
+	vehicle_data *veh;
 	int iter;
 
 	if (!MOB_OR_IMPL(ch)) {
@@ -925,19 +925,7 @@ ACMD(do_mteleport) {
 		}
 	}
 	else {
-		// attempt to find targets
-		if (*arg1 == UID_CHAR) {
-			// prefer char
-			if (!(vict = get_char(arg1))) {
-				// try vehicle as backup
-				veh = get_vehicle(arg1);
-			}
-		}
-		else {
-			vict = get_char_vis(ch, arg1, FIND_CHAR_WORLD);
-		}
-		
-		if (vict) {
+		if ((*arg1 == UID_CHAR && (vict = get_char(arg1))) || (vict = get_char_vis(ch, arg1, FIND_CHAR_WORLD))) {
 			if (valid_dg_target(vict, DG_ALLOW_GODS)) {
 				if (!IS_NPC(vict)) {
 					GET_LAST_DIR(vict) = NO_DIR;
@@ -947,7 +935,7 @@ ACMD(do_mteleport) {
 				enter_wtrigger(IN_ROOM(vict), vict, NO_DIR);
 			}
 		}
-		else if (veh) {
+		else if ((*arg1 == UID_CHAR && (veh = get_vehicle(arg1))) || (veh = get_vehicle_in_room_vis(ch, arg1))) {
 			vehicle_from_room(veh);
 			vehicle_to_room(veh, target);
 			entry_vtrigger(veh);

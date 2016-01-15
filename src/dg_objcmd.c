@@ -37,6 +37,8 @@ extern struct instance_data *find_instance_by_room(room_data *room, bool check_h
 char_data *get_char_by_obj(obj_data *obj, char *name);
 obj_data *get_obj_by_obj(obj_data *obj, char *name);
 room_data *get_room(room_data *ref, char *name);
+vehicle_data *get_vehicle_by_obj(obj_data *obj, char *name);
+vehicle_data *get_vehicle_near_obj(obj_data *obj, char *name);
 void instance_obj_setup(struct instance_data *inst, obj_data *obj);
 void sub_write(char *arg, char_data *ch, byte find_invis, int targets);
 void die(char_data *ch, char_data *killer);
@@ -469,6 +471,7 @@ OCMD(do_oteleport) {
 	room_data *target, *orm = obj_room(obj);
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	struct instance_data *inst;
+	vehicle_data *veh;
 	int iter;
 
 	two_arguments(argument, arg1, arg2);
@@ -541,6 +544,11 @@ OCMD(do_oteleport) {
 				}
 				enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
 			}
+		}
+		else if ((veh = get_vehicle_near_obj(obj, arg1))) {
+			vehicle_from_room(veh);
+			vehicle_to_room(veh, target);
+			entry_vtrigger(veh);
 		}
 		else {
 			obj_log(obj, "oteleport: no target found");
