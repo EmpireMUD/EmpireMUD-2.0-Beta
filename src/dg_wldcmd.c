@@ -236,6 +236,7 @@ WCMD(do_wsend) {
 		wld_log(room, "no target found for wsend");
 }
 
+
 WCMD(do_wbuildingecho) {
 	room_data *froom, *iter, *home;
 	char room_num[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH], *msg;
@@ -305,6 +306,24 @@ WCMD(do_wregionecho) {
 				}
 			}
 		}
+	}
+}
+
+
+WCMD(do_wvehicleecho) {
+	char targ[MAX_INPUT_LENGTH], *msg;
+	vehicle_data *veh;
+
+	msg = any_one_word(argument, targ);
+	skip_spaces(&msg);
+
+	if (!*targ || !*msg)
+		wld_log(room, "wvehicleecho called with too few args");
+	else if (!(*targ == UID_CHAR && (veh = get_vehicle(targ))) && !(veh = get_vehicle_room(room, targ))) {
+		wld_log(room, "wvehicleecho called with bad target");
+	}
+	else {
+		msg_to_vehicle(veh, FALSE, "%s\r\n", msg);
 	}
 }
 
@@ -1050,6 +1069,7 @@ const struct wld_command_info wld_cmd_info[] = {
 	{ "wterraform", do_wterraform, NO_SCMD },
 	{ "wbuildingecho", do_wbuildingecho, NO_SCMD },
 	{ "wregionecho", do_wregionecho, NO_SCMD },
+	{ "wvehicleecho", do_wvehicleecho, NO_SCMD },
 	{ "wdamage", do_wdamage, NO_SCMD },
 	{ "waoe", do_waoe, NO_SCMD },
 	{ "wdot", do_wdot, NO_SCMD },

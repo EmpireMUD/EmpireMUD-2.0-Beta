@@ -275,6 +275,25 @@ OCMD(do_oregionecho) {
 }
 
 
+OCMD(do_ovehicleecho) {
+	char targ[MAX_INPUT_LENGTH], *msg;
+	vehicle_data *veh;
+
+	msg = any_one_word(argument, targ);
+	skip_spaces(&msg);
+
+	if (!*targ || !*msg) {
+		obj_log(obj, "ovehicleecho called with too few args");
+	}
+	else if (!(veh = get_vehicle_near_obj(obj, targ))) {
+		obj_log(obj, "ovehicleecho called with invalid target");
+	}
+	else {
+		msg_to_vehicle(veh, FALSE, "%s\r\n", msg);
+	}
+}
+
+
 // prints the message to everyone except two targets
 OCMD(do_oechoneither) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
@@ -1168,6 +1187,7 @@ const struct obj_command_info obj_cmd_info[] = {
 	{ "otransform", do_otransform, NO_SCMD },
 	{ "obuildingecho", do_obuildingecho, NO_SCMD }, /* fix by Rumble */
 	{ "oregionecho", do_oregionecho, NO_SCMD },
+	{ "ovehicleecho", do_ovehicleecho, NO_SCMD },
 
 	{ "\n", 0, 0 }        /* this must be last */
 };

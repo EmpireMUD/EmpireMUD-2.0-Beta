@@ -270,6 +270,25 @@ VCMD(do_vregionecho) {
 }
 
 
+VCMD(do_vvehicleecho) {
+	char targ[MAX_INPUT_LENGTH], *msg;
+	vehicle_data *v;
+
+	msg = any_one_word(argument, targ);
+	skip_spaces(&msg);
+
+	if (!*targ || !*msg) {
+		veh_log(veh, "vvehicleecho called with too few args");
+	}
+	else if (!(v = get_vehicle_near_vehicle(veh, targ))) {
+		veh_log(veh, "vvehicleecho called with invalid target");
+	}
+	else {
+		msg_to_vehicle(v, FALSE, "%s\r\n", msg);
+	}
+}
+
+
 // prints the message to everyone except two targets
 VCMD(do_vechoneither) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
@@ -1088,6 +1107,7 @@ const struct vehicle_command_info veh_cmd_info[] = {
 	{ "vterraform", do_vterraform, NO_SCMD },
 	{ "vbuildingecho", do_vbuildingecho, NO_SCMD },
 	{ "vregionecho", do_vregionecho, NO_SCMD },
+	{ "vvehicleecho", do_vvehicleecho, NO_SCMD },
 
 	{ "\n", 0, 0 }        /* this must be last */
 };

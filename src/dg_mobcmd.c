@@ -523,6 +523,30 @@ ACMD(do_mregionecho) {
 }
 
 
+ACMD(do_mvehicleecho) {
+	char targ[MAX_INPUT_LENGTH], *msg;
+	vehicle_data *veh;
+
+	if (!MOB_OR_IMPL(ch) || AFF_FLAGGED(ch, AFF_ORDERED)) {
+		send_config_msg(ch, "huh_string");
+		return;
+	}
+
+	msg = any_one_word(argument, targ);
+	skip_spaces(&msg);
+	
+	if (!*targ || !*msg) {
+		mob_log(ch, "mvehicleecho called with too few args");
+	}
+	else if ((*targ == UID_CHAR && (veh = get_vehicle(targ))) || (veh = get_vehicle_in_room_vis(ch, targ))) {
+		mob_log(ch, "mvehicleecho called with invalid target");
+	}
+	else {
+		msg_to_vehicle(veh, FALSE, "%s\r\n", msg);
+	}
+}
+
+
 /*
 * lets the mobile load an item or mobile.  All items
 * are loaded into inventory, unless it is NO-TAKE. 

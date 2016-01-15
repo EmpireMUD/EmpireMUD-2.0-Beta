@@ -1911,6 +1911,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 	char *xdot[] = {"mdot ", "odot ", "wdot ", "wdot ", "wdot ", "vdot " };
 	char *buildingecho[] = {"mbuildingecho ", "obuildingecho ", "wbuildingecho ", "wbuildingecho ", "wbuildingecho ", "vbuildingecho " };
 	char *regionecho[] = {"mregionecho ", "oregionecho ", "wregionecho ", "wregionecho ", "wregionecho ", "vregionecho " };
+	char *vehicleecho[] = {"mvehicleecho ", "ovehicleecho ", "wvehicleecho ", "wvehicleecho ", "wvehicleecho ", "vvehicleecho " };
 	char *asound[] = {"masound ", "oasound ", "wasound ", "wasound ", "wasound ", "vasound " };
 	char *at[] = {"mat ", "oat ", "wat ", "wat ", "wat ", "vat " };
 	char *adventurecomplete[] = {"madventurecomplete", "oadventurecomplete", "wadventurecomplete", "wadventurecomplete", "wadventurecomplete", "vadventurecomplete" };
@@ -1993,6 +1994,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				snprintf(str, slen, "%s", buildingecho[type]);
 			else if (!str_cmp(var, "regionecho"))
 				snprintf(str, slen, "%s", regionecho[type]);
+			else if (!str_cmp(var, "vehicleecho"))
+				snprintf(str, slen, "%s", vehicleecho[type]);
 			else if (!str_cmp(var, "asound"))
 				snprintf(str, slen, "%s", asound[type]);
 			else if (!str_cmp(var, "at"))
