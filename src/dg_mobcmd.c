@@ -1513,8 +1513,10 @@ ACMD(do_msiege) {
 	dam = scale * 8 / 100;	// 8 damage per 100 levels
 	dam = MAX(1, dam);	// minimum 1
 	
-	if (room_targ && validate_siege_target_room(ch, NULL, room_targ)) {
-		besiege_room(room_targ, dam);
+	if (room_targ) {
+		if (validate_siege_target_room(ch, NULL, room_targ)) {
+			besiege_room(room_targ, dam);
+		}
 	}
 	else if (veh_targ) {
 		besiege_vehicle(veh_targ, dam, SIEGE_PHYSICAL);
