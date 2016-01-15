@@ -40,6 +40,7 @@ TRIGEDIT-COMMANDS TRIG-COMMANDS TRIGGER-COMMANDS TRIGEDIT-COMMANDLISTS
 |      set        |     %purge%         |     %purge%      |     %purge%      |
 |     unset       |    %teleport%       |    %teleport%    |    %teleport%    |
 |    detach       |     %damage%        |     %damage%     |     %damage%     |
+|                 |      %siege%        |     %siege%      |     %siege%      |
 |    extract      |   %buildingecho%    |  %buildingecho%  |  %buildingecho%  |
 |                 |    %regionecho%     |   %regionecho%   |   %regionecho%   |
 |                 |    %vehicleecho%    |  %vehicleecho%   |  %vehicleecho%   |
@@ -71,7 +72,7 @@ Usage:  %adventurecomplete%
 This script command triggers completion on the adventure instance, which will
 clean it up (delete the instance) next time it's empty.
 #d
-%DAMAGE% ODAMAGE MDAMAGE WDAMAGE
+%DAMAGE% ODAMAGE MDAMAGE WDAMAGE VDAMAGE
 
 %damage% %victim% [modifier] [damage type]
 
@@ -87,7 +88,23 @@ direct).
 %damage% %actor% 20           - cause 20% scaled damage
 %damage% %actor% %random.100%  - cause 1-100% scaled damage randomly
 
-See Also: DEATH, %AOE%, %DOT%
+See Also: DEATH, %AOE%, %DOT%, %SIEGE%
+#d
+%SIEGE% MSIEGE OSIEGE VSIEGE WSIEGE
+
+Usage:  %siege% <target> [scale level]
+
+This deals siege damage to a vehicle or room. Either can be targeted using
+%vars%; vehicles can also be targeted by name while rooms can be targeted by
+direction. Note that this will fail on certain rooms, such as starting
+locations.
+
+You can specify a scale level, or inherit it from the user.
+
+The siege damage is done silently.
+
+%siege% %veh%
+%siege% north 100
 #d
 %AOE% OAOE MAOE WAOE
 

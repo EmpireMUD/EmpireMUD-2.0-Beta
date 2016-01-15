@@ -1465,6 +1465,68 @@ ACMD(do_mforget) {
 }
 
 
+ACMD(do_msiege) {
+	void besiege_room(room_data *to_room, int damage);
+	extern bool besiege_vehicle(vehicle_data *veh, int damage, int siege_type);
+	extern bool find_siege_target_for_vehicle(char_data *ch, vehicle_data *veh, char *arg, room_data **room_targ, int *dir, vehicle_data **veh_targ);
+	extern bool validate_siege_target_room(char_data *ch, vehicle_data *veh, room_data *to_room);
+	
+	char scale_arg[MAX_INPUT_LENGTH], tar_arg[MAX_INPUT_LENGTH];
+	vehicle_data *veh_targ = NULL;
+	room_data *room_targ = NULL;
+	int dam, dir, scale = -1;
+
+	if (!MOB_OR_IMPL(ch) || AFF_FLAGGED(ch, AFF_ORDERED)) {
+		send_config_msg(ch, "huh_string");
+		return;
+	}
+	
+	two_arguments(argument, tar_arg, scale_arg);
+	
+	if (!*tar_arg) {
+		mob_log(ch, "msiege called with no args");
+		return;
+	}
+	// determine scale level if provided
+	if (*scale_arg && (!isdigit(*scale_arg) || (scale = atoi(scale_arg)) < 0)) {
+		mob_log(ch, "msiege called with invalid scale level '%s'", scale_arg);
+		return;
+	}
+	
+	// find a target
+	if (!veh_targ && !room_targ && *tar_arg == UID_CHAR) {
+		room_targ = find_room(atoi(tar_arg+1));
+	}
+	if (!veh_targ && !room_targ && *tar_arg == UID_CHAR) {
+		veh_targ = get_vehicle(tar_arg);
+	}
+	if (!veh_targ && !room_targ && !find_siege_target_for_vehicle(ch, NULL, tar_arg, &room_targ, &dir, &veh_targ)) {
+		// sends own messages -- last try here
+		return;
+	}
+	
+	// seems ok
+	else {
+		if (scale == -1) {
+			scale = get_approximate_level(ch);
+		}
+		
+		dam = scale * 8 / 100;	// 8 damage per 100 levels
+		dam = MAX(1, dam);	// minimum 1
+		
+		if (room_targ && validate_siege_target_room(ch, NULL, room_targ)) {
+			besiege_room(room_targ, dam);
+		}
+		else if (veh_targ) {
+			besiege_vehicle(veh_targ, dam, SIEGE_PHYSICAL);
+		}
+		else {
+			mob_log(ch, "osiege: invalid target");
+		}
+	}
+}
+
+
 /* transform into a different mobile */
 ACMD(do_mtransform) {
 	char arg[MAX_INPUT_LENGTH];

@@ -129,7 +129,7 @@ bool audit_room_template(room_template *rmt, char_data *ch) {
 				break;
 			}
 			case ADV_SPAWN_VEH: {
-				char_data *veh = vehicle_proto(spawn->vnum);
+				vehicle_data *veh = vehicle_proto(spawn->vnum);
 				if (!veh) {
 					olc_audit_msg(ch, GET_RMT_VNUM(rmt), "Spawn veh %d: No such vehicle", spawn->vnum);
 					problem = TRUE;

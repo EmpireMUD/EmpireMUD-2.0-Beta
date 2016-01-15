@@ -27,6 +27,7 @@
 
 // external vars
 extern const char *damage_types[];
+extern const char *alt_dirs[];
 extern const char *dirs[];
 
 // external functions
@@ -425,6 +426,68 @@ WCMD(do_wdoor) {
 				else
 					wld_log(room, "wdoor: invalid door target");
 				break;
+		}
+	}
+}
+
+
+WCMD(do_wsiege) {
+	void besiege_room(room_data *to_room, int damage);
+	extern bool besiege_vehicle(vehicle_data *veh, int damage, int siege_type);
+	extern room_data *dir_to_room(room_data *room, int dir);
+	extern bool find_siege_target_for_vehicle(char_data *ch, vehicle_data *veh, char *arg, room_data **room_targ, int *dir, vehicle_data **veh_targ);
+	extern bool validate_siege_target_room(char_data *ch, vehicle_data *veh, room_data *to_room);
+	
+	char scale_arg[MAX_INPUT_LENGTH], tar_arg[MAX_INPUT_LENGTH];
+	vehicle_data *veh_targ = NULL;
+	room_data *room_targ = NULL;
+	int dam, dir, scale = -1;
+	
+	two_arguments(argument, tar_arg, scale_arg);
+	
+	if (!*tar_arg) {
+		wld_log(room, "wsiege called with no args");
+		return;
+	}
+	// determine scale level if provided
+	if (*scale_arg && (!isdigit(*scale_arg) || (scale = atoi(scale_arg)) < 0)) {
+		wld_log(room, "wsiege called with invalid scale level '%s'", scale_arg);
+		return;
+	}
+	
+	// find a target
+	if (!veh_targ && !room_targ && *tar_arg == UID_CHAR) {
+		room_targ = find_room(atoi(tar_arg+1));
+	}
+	if (!veh_targ && !room_targ && *tar_arg == UID_CHAR) {
+		veh_targ = get_vehicle(tar_arg);
+	}
+	if (!veh_targ && !room_targ) {
+		if ((dir = search_block(tar_arg, dirs, FALSE)) != NOTHING || (dir = search_block(tar_arg, alt_dirs, FALSE)) != NOTHING) {
+			room_targ = dir_to_room(room, dir);
+		}
+	}
+	if (!veh_targ && !room_targ) {
+		veh_targ = get_vehicle_room(room, tar_arg);
+	}
+	
+	// seems ok
+	else {
+		if (scale == -1) {
+			scale = get_room_scale_level(room, NULL);
+		}
+		
+		dam = scale * 8 / 100;	// 8 damage per 100 levels
+		dam = MAX(1, dam);	// minimum 1
+		
+		if (room_targ && validate_siege_target_room(NULL, NULL, room_targ)) {
+			besiege_room(room_targ, dam);
+		}
+		else if (veh_targ) {
+			besiege_vehicle(veh_targ, dam, SIEGE_PHYSICAL);
+		}
+		else {
+			wld_log(room, "wsiege: invalid target");
 		}
 	}
 }
@@ -1064,6 +1127,7 @@ const struct wld_command_info wld_cmd_info[] = {
 	{ "wpurge", do_wpurge, NO_SCMD },
 	{ "wscale", do_wscale, NO_SCMD },
 	{ "wsend", do_wsend, SCMD_WSEND },
+	{ "wsiege", do_wsiege, NO_SCMD },
 	{ "wteleport", do_wteleport, NO_SCMD },
 	{ "wterracrop", do_wterracrop, NO_SCMD },
 	{ "wterraform", do_wterraform, NO_SCMD },
