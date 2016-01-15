@@ -1506,23 +1506,21 @@ ACMD(do_msiege) {
 	}
 	
 	// seems ok
+	if (scale == -1) {
+		scale = get_approximate_level(ch);
+	}
+	
+	dam = scale * 8 / 100;	// 8 damage per 100 levels
+	dam = MAX(1, dam);	// minimum 1
+	
+	if (room_targ && validate_siege_target_room(ch, NULL, room_targ)) {
+		besiege_room(room_targ, dam);
+	}
+	else if (veh_targ) {
+		besiege_vehicle(veh_targ, dam, SIEGE_PHYSICAL);
+	}
 	else {
-		if (scale == -1) {
-			scale = get_approximate_level(ch);
-		}
-		
-		dam = scale * 8 / 100;	// 8 damage per 100 levels
-		dam = MAX(1, dam);	// minimum 1
-		
-		if (room_targ && validate_siege_target_room(ch, NULL, room_targ)) {
-			besiege_room(room_targ, dam);
-		}
-		else if (veh_targ) {
-			besiege_vehicle(veh_targ, dam, SIEGE_PHYSICAL);
-		}
-		else {
-			mob_log(ch, "osiege: invalid target");
-		}
+		mob_log(ch, "osiege: invalid target");
 	}
 }
 

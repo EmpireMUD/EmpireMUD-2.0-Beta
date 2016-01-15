@@ -453,27 +453,25 @@ VCMD(do_vsiege) {
 	}
 	
 	// seems ok
+	if (scale == -1) {
+		scale = get_vehicle_scale_level(veh, NULL);
+	}
+	
+	dam = scale * 8 / 100;	// 8 damage per 100 levels
+	dam = MAX(1, dam);	// minimum 1
+	
+	if (room_targ && validate_siege_target_room(NULL, NULL, room_targ)) {
+		besiege_room(room_targ, dam);
+	}
+	else if (veh_targ) {
+		self = (veh_targ == veh);
+		res = besiege_vehicle(veh_targ, dam, SIEGE_PHYSICAL);
+		if (self && !res) {
+			dg_owner_purged = TRUE;
+		}
+	}
 	else {
-		if (scale == -1) {
-			scale = get_vehicle_scale_level(veh, NULL);
-		}
-		
-		dam = scale * 8 / 100;	// 8 damage per 100 levels
-		dam = MAX(1, dam);	// minimum 1
-		
-		if (room_targ && validate_siege_target_room(NULL, NULL, room_targ)) {
-			besiege_room(room_targ, dam);
-		}
-		else if (veh_targ) {
-			self = (veh_targ == veh);
-			res = besiege_vehicle(veh_targ, dam, SIEGE_PHYSICAL);
-			if (self && !res) {
-				dg_owner_purged = TRUE;
-			}
-		}
-		else {
-			veh_log(veh, "vsiege: invalid target");
-		}
+		veh_log(veh, "vsiege: invalid target");
 	}
 }
 

@@ -472,23 +472,21 @@ WCMD(do_wsiege) {
 	}
 	
 	// seems ok
+	if (scale == -1) {
+		scale = get_room_scale_level(room, NULL);
+	}
+	
+	dam = scale * 8 / 100;	// 8 damage per 100 levels
+	dam = MAX(1, dam);	// minimum 1
+	
+	if (room_targ && validate_siege_target_room(NULL, NULL, room_targ)) {
+		besiege_room(room_targ, dam);
+	}
+	else if (veh_targ) {
+		besiege_vehicle(veh_targ, dam, SIEGE_PHYSICAL);
+	}
 	else {
-		if (scale == -1) {
-			scale = get_room_scale_level(room, NULL);
-		}
-		
-		dam = scale * 8 / 100;	// 8 damage per 100 levels
-		dam = MAX(1, dam);	// minimum 1
-		
-		if (room_targ && validate_siege_target_room(NULL, NULL, room_targ)) {
-			besiege_room(room_targ, dam);
-		}
-		else if (veh_targ) {
-			besiege_vehicle(veh_targ, dam, SIEGE_PHYSICAL);
-		}
-		else {
-			wld_log(room, "wsiege: invalid target");
-		}
+		wld_log(room, "wsiege: invalid target");
 	}
 }
 
