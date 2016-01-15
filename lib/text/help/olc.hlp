@@ -2519,7 +2519,7 @@ You're standing at the foot of a huge giant!
 
 See also: OLC MOBILES
 #d
-"ADVEDIT SCRIPTS" "MEDIT SCRIPTS" "OEDIT SCRIPTS" "REDIT SCRIPTS"
+"ADVEDIT SCRIPTS" "MEDIT SCRIPTS" "OEDIT SCRIPTS" "REDIT SCRIPTS" "VEDIT SCRIPTS"
 
 Usage:  .script add [position] <trigger vnum>
         .script copy <from type> <from vnum>
