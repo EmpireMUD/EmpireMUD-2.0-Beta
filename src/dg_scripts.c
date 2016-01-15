@@ -38,6 +38,8 @@ extern int dg_owner_purged;
 extern const char *action_bits[];
 extern const char *affected_bits[];
 extern const char *affect_types[];
+extern const char *alt_dirs[];
+extern const char *dirs[];
 extern const char *drinks[];
 extern const char *extra_bits[];
 extern const char *item_types[];
@@ -2565,6 +2567,26 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				case 'd': {	// char.d*
 					if (!str_cmp(field, "dex") || !str_cmp(field, "dexterity")) {
 						snprintf(str, slen, "%d", GET_DEXTERITY(c));
+					}
+					else if (!str_cmp(field, "dir")) {
+						if (subfield && *subfield) {
+							int dir;
+							if ((dir = search_block(subfield, dirs, FALSE)) != NOTHING || (dir = search_block(subfield, alt_dirs, FALSE)) != NOTHING) {
+								if (IS_NPC(c) || has_ability(c, ABIL_NAVIGATION)) {
+									snprintf(str, slen, "%s", dirs[dir]);	// real dir
+								}
+								else {
+									snprintf(str, slen, "%s", dirs[get_direction_for_char(c, dir)]);	// fake dir
+								}
+							}
+							else {
+								// bad direction -- just give them their arg back
+								snprintf(str, slen, "%s", subfield);
+							}
+						}
+						else {	// missing arg
+							*str = '\0';
+						}
 					}
 					else if (!str_cmp(field, "disabled")) {
 						// things which would keep a character from acting

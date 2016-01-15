@@ -983,6 +983,9 @@ cha               - The actor's Charisma.
 class             - The actor's class, as a string.
 crafting_level    - The actor's crafting level.
 dex               - The actor's Dexterity.
+dir(name)         - Gives the name of the character's perceived direction
+                    ('name' is the real direction), which is useful for people
+                    without navigation.
 disabled          - Returns TRUE if the actor is stunned or otherwise disabled.
 eq()              - This will return the identifier (id) for the object 
                     equipped in position, if any. The specified position may be 
