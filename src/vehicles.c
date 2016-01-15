@@ -714,6 +714,8 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 	char buf[MAX_STRING_LENGTH];
 	vehicle_data *veh = vehicle_proto(vnum);
 	craft_data *craft, *next_craft;
+	room_template *rmt, *next_rmt;
+	struct adventure_spawn *asp;
 	int size, found;
 	
 	if (!veh) {
@@ -729,6 +731,17 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 		if (CRAFT_FLAGGED(craft, CRAFT_VEHICLE) && GET_CRAFT_OBJECT(craft) == vnum) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
+		}
+	}
+	
+	// room templates
+	HASH_ITER(hh, room_template_table, rmt, next_rmt) {
+		LL_FOREACH(GET_RMT_SPAWNS(rmt), asp) {
+			if (asp->type == ADV_SPAWN_VEH && asp->vnum == vnum) {
+				++found;
+				size += snprintf(buf + size, sizeof(buf) - size, "RMT [%5d] %s\r\n", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
+				break;	// only need 1
+			}
 		}
 	}
 	
@@ -1770,8 +1783,11 @@ vehicle_data *create_vehicle_table_entry(any_vnum vnum) {
 * @param any_vnum vnum The vnum to delete.
 */
 void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
+	extern bool delete_from_spawn_template_list(struct adventure_spawn **list, int spawn_type, mob_vnum vnum);
+	
 	vehicle_data *veh, *iter, *next_iter;
 	craft_data *craft, *next_craft;
+	room_template *rmt, *next_rmt;
 	descriptor_data *desc;
 	bool found;
 	
@@ -1813,6 +1829,14 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
+	// update room templates
+	HASH_ITER(hh, room_template_table, rmt, next_rmt) {
+		found = delete_from_spawn_template_list(&GET_RMT_SPAWNS(rmt), ADV_SPAWN_VEH, vnum);
+		if (found) {
+			save_library_file_for_vnum(DB_BOOT_RMT, GET_RMT_VNUM(rmt));
+		}
+	}
+	
 	// olc editor updates
 	LL_FOREACH(descriptor_list, desc) {
 		if (GET_OLC_CRAFT(desc)) {
@@ -1825,6 +1849,11 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 			if (found) {
 				SET_BIT(GET_OLC_CRAFT(desc)->flags, CRAFT_IN_DEVELOPMENT);
 				msg_to_char(desc->character, "The vehicle made by the craft you're editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_ROOM_TEMPLATE(desc)) {
+			if (delete_from_spawn_template_list(&GET_OLC_ROOM_TEMPLATE(desc)->spawns, ADV_SPAWN_VEH, vnum)) {
+				msg_to_char(desc->character, "One of the vehicles that spawns in the room template you're editing was deleted.\r\n");
 			}
 		}
 	}

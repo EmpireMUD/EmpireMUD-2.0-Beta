@@ -373,9 +373,10 @@ typedef struct vehicle_data vehicle_data;
 #define ADV_LINKF_NO_CITY  BIT(2)	// won't spawn on claimed land in cities
 
 
-// adventure spawn types
+// ADV_SPAWN_x: adventure spawn types
 #define ADV_SPAWN_MOB  0
 #define ADV_SPAWN_OBJ  1
+#define ADV_SPAWN_VEH  2
 
 
 // instance flags

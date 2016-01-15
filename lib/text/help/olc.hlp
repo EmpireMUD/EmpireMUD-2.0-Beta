@@ -3786,12 +3786,12 @@ Usage:  .spawn add <type> <vnum> <percent> <limit>
         .spawn copy <from type> <from vnum>
         .spawn remove <number | all>
 
-Spawn commands cause any OBJ or MOB to load in the room whenever the adventure
-zone is reset (if their percent check passes, and there aren't more than the
-limit).
+Spawn commands cause any OBJ, MOB, or VEH to load in the room whenever the
+adventure zone is reset (if their percent check passes, and there aren't more
+than the limit).
 
 The limit is only for the current instance, so setting a limit of 3 means that
-each copy of this adventure zone can have 3 of the object or mob at a time.
+each copy of this adventure zone can have 3 of the thing at a time.
 
 This is different from the spawn data set on crops, sectors, and buildings.
 

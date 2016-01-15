@@ -221,7 +221,7 @@ bool delete_mob_from_spawn_list(struct spawn_info **list, mob_vnum vnum) {
 * confused with live spawn lists (building, sector, etc).
 * 
 * @param struct adventure_spawn **list A pointer to the start of a spawn_info list.
-* @param int spawn_type Any ADV_SPAWN_x.
+* @param int spawn_type Any ADV_SPAWN_.
 * @param mob_vnum vnum The mob to remove.
 * @return bool TRUE if any spawn entries were deleted; FALSE otherwise.
 */

@@ -143,6 +143,7 @@ const char *adventure_link_types[] = {
 const char *adventure_spawn_types[] = {
 	"MOB",
 	"OBJ",
+	"VEH",
 	"\n"
 };
 
