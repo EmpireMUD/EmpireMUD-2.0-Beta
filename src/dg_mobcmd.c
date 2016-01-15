@@ -65,6 +65,9 @@ extern room_data *get_room(room_data *ref, char *name);
 extern vehicle_data *get_vehicle(char *name);
 void instance_obj_setup(struct instance_data *inst, obj_data *obj);
 extern struct instance_data *real_instance(any_vnum instance_id);
+void scale_item_to_level(obj_data *obj, int level);
+void scale_mob_to_level(char_data *mob, int level);
+void scale_vehicle_to_level(vehicle_data *veh, int level);
 void send_char_pos(char_data *ch, int dam);
 void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 void sub_write(char *arg, char_data *ch, byte find_invis, int targets);
@@ -551,11 +554,7 @@ ACMD(do_mvehicleecho) {
 * lets the mobile load an item or mobile.  All items
 * are loaded into inventory, unless it is NO-TAKE. 
 */
-ACMD(do_mload) {
-	void scale_item_to_level(obj_data *obj, int level);
-	void scale_mob_to_level(char_data *mob, int level);
-	void scale_vehicle_to_level(vehicle_data *veh, int level);
-	
+ACMD(do_mload) {	
 	struct instance_data *inst = get_instance_by_mob(ch);
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	int number = 0;
@@ -1807,12 +1806,10 @@ ACMD(do_mfollow) {
 
 
 ACMD(do_mscale) {
-	void scale_item_to_level(obj_data *obj, int level);
-	void scale_mob_to_level(char_data *mob, int level);
-
 	char arg[MAX_INPUT_LENGTH], lvl_arg[MAX_INPUT_LENGTH];
 	char_data *victim;
 	obj_data *obj, *fresh, *proto;
+	vehicle_data *veh;
 	int level;
 
 	if (!MOB_OR_IMPL(ch)) {
@@ -1848,48 +1845,37 @@ ACMD(do_mscale) {
 		mob_log(ch, "mscale: no valid level to scale to");
 		return;
 	}
+	
+	// scale char
+	if ((*arg == UID_CHAR && (victim = get_char(arg))) || (victim = get_char_room_vis(ch, arg))) {
+		if (!IS_NPC(victim)) {
+			mob_log(ch, "mscale: unable to scale a PC");
+			return;
+		}
 
-	if (*arg == UID_CHAR) {
-		victim = get_char(arg);
+		scale_mob_to_level(victim, level);
+	}
+	// scale evhicle
+	else if ((*arg == UID_CHAR && (veh = get_vehicle(arg))) || (veh = get_vehicle_in_room_vis(ch, arg))) {
+		scale_vehicle_to_level(veh, level);
+	}
+	// scale obj
+	else if ((*arg == UID_CHAR && (obj = get_obj(arg))) || (obj = get_obj_vis(ch, arg))) {
+		if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
+			scale_item_to_level(obj, level);
+		}
+		else if ((proto = obj_proto(GET_OBJ_VNUM(obj))) && OBJ_FLAGGED(proto, OBJ_SCALABLE)) {
+			fresh = read_object(GET_OBJ_VNUM(obj), TRUE);
+			scale_item_to_level(fresh, level);
+			swap_obj_for_obj(obj, fresh);
+			extract_obj(obj);
+		}
+		else {
+			// attempt to scale anyway
+			scale_item_to_level(obj, level);
+		}
 	}
 	else {
-		victim = get_char_room_vis(ch, arg);
+		mob_log(ch, "mscale: bad argument");
 	}
-
-	if (victim == NULL) {
-		if (*arg == UID_CHAR) {
-			obj = get_obj(arg);
-		}
-		else {
-			obj = get_obj_vis(ch, arg);
-		}
-
-		if (obj) {
-			if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-				scale_item_to_level(obj, level);
-			}
-			else if ((proto = obj_proto(GET_OBJ_VNUM(obj))) && OBJ_FLAGGED(proto, OBJ_SCALABLE)) {
-				fresh = read_object(GET_OBJ_VNUM(obj), TRUE);
-				scale_item_to_level(fresh, level);
-				swap_obj_for_obj(obj, fresh);
-				extract_obj(obj);
-			}
-			else {
-				// attempt to scale anyway
-				scale_item_to_level(obj, level);
-			}
-		}
-		else {
-			mob_log(ch, "mscale: bad argument");
-		}
-
-		return;
-	}
-
-	if (!IS_NPC(victim)) {
-		mob_log(ch, "mscale: unable to scale a PC");
-		return;
-	}
-
-	scale_mob_to_level(victim, level);
 }

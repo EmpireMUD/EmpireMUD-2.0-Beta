@@ -261,14 +261,14 @@ Examples:
  
 See Also: POSITIONS
 #d
-%SCALE% OSCALE MSCALE WSCALE
+%SCALE% OSCALE MSCALE VSCALE WSCALE
 
-%scale% <victim/object> [level]
+%scale% <victim/object/vehicle> [level]
 
-This scales (or re-scales) a target NPC or object to a given level. If no level
-is provided, the script will attempt to use the scale of the character, object,
-or instance that called the scale command. If no valid level is detected, it
-will send an error.
+This scales (or re-scales) a target NPC, object, or vehicle to a given level.
+If no level is provided, the script will attempt to use the scale of the
+character, object, or instance that called the scale command. If no valid level
+is detected, it will send an error.
 
 If you scale an item that is already scaled, a fresh copy will be loaded and
 scaled. This would result in the original item being purged.

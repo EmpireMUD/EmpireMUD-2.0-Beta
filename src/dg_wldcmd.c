@@ -44,6 +44,7 @@ extern vehicle_data *get_vehicle(char *name);
 void instance_obj_setup(struct instance_data *inst, obj_data *obj);
 void scale_item_to_level(obj_data *obj, int level);
 void scale_mob_to_level(char_data *mob, int level);
+void scale_vehicle_to_level(vehicle_data *veh, int level);
 void wld_command_interpreter(room_data *room, char *argument);
 
 // locals
@@ -772,8 +773,6 @@ WCMD(do_wpurge) {
 
 /* loads a mobile or object into the room */
 WCMD(do_wload) {
-	void scale_mob_to_level(char_data *mob, int level);
-	void scale_vehicle_to_level(vehicle_data *veh, int level);
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
@@ -1042,6 +1041,7 @@ WCMD(do_wscale) {
 	struct instance_data *inst;
 	char_data *victim;
 	obj_data *obj, *fresh, *proto;
+	vehicle_data *veh;
 	int level;
 
 	two_arguments(argument, arg, lvl_arg);
@@ -1069,47 +1069,39 @@ WCMD(do_wscale) {
 		wld_log(room, "wscale: no valid level to scale to");
 		return;
 	}
+	
+	// scale char
+	if ((*arg == UID_CHAR && (victim = get_char(arg))) || (victim = get_char_in_room(room, arg))) {
+		if (!IS_NPC(victim)) {
+			wld_log(room, "wscale: unable to scale a PC");
+			return;
+		}
 
-	if (*arg == UID_CHAR) {
-		victim = get_char(arg);
+		scale_mob_to_level(victim, level);
+	}
+	// scale vehicle
+	else if ((*arg == UID_CHAR && (veh = get_vehicle(arg))) || (veh = get_vehicle_room(room, arg))) {
+		scale_vehicle_to_level(veh, level);
+	}
+	// scale obj
+	else if ((*arg == UID_CHAR && (obj = get_obj(arg))) || (obj = get_obj_in_room(room, arg))) {
+		if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
+			scale_item_to_level(obj, level);
+		}
+		else if ((proto = obj_proto(GET_OBJ_VNUM(obj))) && OBJ_FLAGGED(proto, OBJ_SCALABLE)) {
+			fresh = read_object(GET_OBJ_VNUM(obj), TRUE);
+			scale_item_to_level(fresh, level);
+			swap_obj_for_obj(obj, fresh);
+			extract_obj(obj);
+		}
+		else {
+			// attempt to scale anyway
+			scale_item_to_level(obj, level);
+		}
 	}
 	else {
-		victim = get_char_in_room(room, arg);
+		wld_log(room, "wscale: bad argument");
 	}
-
-	if (!victim) {
-		if (*arg == UID_CHAR)
-			obj = get_obj(arg);
-		else 
-			obj = get_obj_in_room(room, arg);
-
-		if (obj) {
-			if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-				scale_item_to_level(obj, level);
-			}
-			else if ((proto = obj_proto(GET_OBJ_VNUM(obj))) && OBJ_FLAGGED(proto, OBJ_SCALABLE)) {
-				fresh = read_object(GET_OBJ_VNUM(obj), TRUE);
-				scale_item_to_level(fresh, level);
-				swap_obj_for_obj(obj, fresh);
-				extract_obj(obj);
-			}
-			else {
-				// attempt to scale anyway
-				scale_item_to_level(obj, level);
-			}
-		}
-		else 
-			wld_log(room, "wscale: bad argument");
-
-		return;
-	}
-
-	if (!IS_NPC(victim)) {
-		wld_log(room, "wscale: unable to scale a PC");
-		return;
-	}
-
-	scale_mob_to_level(victim, level);
 }
 
 

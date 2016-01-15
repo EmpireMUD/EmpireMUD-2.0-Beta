@@ -46,6 +46,7 @@ void sub_write(char *arg, char_data *ch, byte find_invis, int targets);
 void die(char_data *ch, char_data *killer);
 void scale_item_to_level(obj_data *obj, int level);
 void scale_mob_to_level(char_data *mob, int level);
+void scale_vehicle_to_level(vehicle_data *veh, int level);
 
 // locals
 room_data *obj_room(obj_data *obj);
@@ -745,7 +746,6 @@ OCMD(do_oterraform) {
 
 OCMD(do_dgoload) {
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
-	void scale_vehicle_to_level(vehicle_data *veh, int level);
 	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	struct instance_data *inst = NULL;
@@ -1164,6 +1164,7 @@ OCMD(do_oscale) {
 	char arg[MAX_INPUT_LENGTH], lvl_arg[MAX_INPUT_LENGTH];
 	char_data *victim;
 	obj_data *otarg, *fresh, *proto;
+	vehicle_data *veh;
 	int level;
 
 	two_arguments(argument, arg, lvl_arg);
@@ -1189,40 +1190,41 @@ OCMD(do_oscale) {
 		return;
 	}
 
-	victim = get_char_by_obj(obj, arg);
-	if (!victim) {
-		otarg = get_obj_by_obj(obj, arg);
-		if (otarg) {
-			if (OBJ_FLAGGED(otarg, OBJ_SCALABLE)) {
-				scale_item_to_level(otarg, level);
+	// scale char
+	if ((victim = get_char_by_obj(obj, arg))) {
+		if (!IS_NPC(victim)) {
+			obj_log(obj, "oscale: unable to scale a PC");
+			return;
+		}
+
+		scale_mob_to_level(victim, level);
+	}
+	// scale vehicle
+	else if ((veh = get_vehicle_by_obj(obj, arg))) {
+		scale_vehicle_to_level(veh, level);
+	}
+	// scale obj
+	else if ((otarg = get_obj_by_obj(obj, arg))) {
+		if (OBJ_FLAGGED(otarg, OBJ_SCALABLE)) {
+			scale_item_to_level(otarg, level);
+		}
+		else if ((proto = obj_proto(GET_OBJ_VNUM(otarg))) && OBJ_FLAGGED(proto, OBJ_SCALABLE)) {
+			fresh = read_object(GET_OBJ_VNUM(otarg), TRUE);
+			scale_item_to_level(fresh, level);
+			swap_obj_for_obj(otarg, fresh);
+			if (otarg == obj) {
+				dg_owner_purged = 1;
 			}
-			else if ((proto = obj_proto(GET_OBJ_VNUM(otarg))) && OBJ_FLAGGED(proto, OBJ_SCALABLE)) {
-				fresh = read_object(GET_OBJ_VNUM(otarg), TRUE);
-				scale_item_to_level(fresh, level);
-				swap_obj_for_obj(otarg, fresh);
-				if (otarg == obj) {
-					dg_owner_purged = 1;
-				}
-				extract_obj(otarg);
-			}
-			else {
-				// attempt to scale anyway
-				scale_item_to_level(otarg, level);
-			}
+			extract_obj(otarg);
 		}
 		else {
-			obj_log(obj, "oscale: bad argument");
+			// attempt to scale anyway
+			scale_item_to_level(otarg, level);
 		}
-
-		return;
 	}
-
-	if (!IS_NPC(victim)) {
-		obj_log(obj, "oscale: unable to scale a PC");
-		return;
+	else {
+		obj_log(obj, "oscale: bad argument");
 	}
-
-	scale_mob_to_level(victim, level);
 }
 
 
