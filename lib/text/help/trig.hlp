@@ -1081,6 +1081,7 @@ When using field  - The variable returns:
    you give a vnum instead of a mob).
 &chas_in(str)&0 - True if an object with a given name/vnum is inside.
 &chealth&0 - Current health of the vehicle.
+&cid&0 - The id number of the vehicle.
 &cin_on&0 - "in" or "on" depending on how characters sit in/on the vehicle.
 &cinterior&0 - The base inside room (where you'd board to, if it has one).
 &cis_flagged(FLAG)&0 - True if the vehicle has the flag.

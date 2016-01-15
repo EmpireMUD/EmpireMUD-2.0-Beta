@@ -1902,6 +1902,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 	char *load[] = {"mload ", "oload ", "wload ", "wload ", "wload ", "vload " };
 	char *purge[] = {"mpurge ", "opurge ", "wpurge ", "wpurge ", "wpurge ", "vpurge " };
 	char *scale[] = {"mscale ", "oscale ", "wscale ", "wscale ", "wscale ", "vscale " };
+	char *siege[] = {"msiege ", "osiege ", "wsiege ", "wsiege ", "wsiege ", "vsiege " };
 	char *teleport[] = {"mteleport ", "oteleport ", "wteleport ", "wteleport ", "wteleport ", "vteleport " };
 	char *terracrop[] = {"mterracrop ", "oterracrop ", "wterracrop ", "wterracrop ", "wterracrop ", "vterracrop " };
 	char *terraform[] = {"mterraform ", "oterraform ", "wterraform ", "wterraform ", "wterraform ", "vterraform " };
@@ -1970,6 +1971,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				snprintf(str, slen, "%s", purge[type]);
 			else if (!str_cmp(var, "scale"))
 				snprintf(str, slen, "%s", scale[type]);
+			else if (!str_cmp(var, "siege"))
+				snprintf(str, slen, "%s", siege[type]);
 			else if (!str_cmp(var, "teleport"))
 				snprintf(str, slen, "%s", teleport[type]);
 			else if (!str_cmp(var, "terracrop"))
@@ -3700,7 +3703,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'i': {	// veh.i*
-					if (!str_cmp(field, "in_on")) {
+					if (!str_cmp(field, "id")) {
+						snprintf(str, slen, "%d", GET_ID(v));
+					}
+					else if (!str_cmp(field, "in_on")) {
 						snprintf(str, slen, "%s", IN_OR_ON(v));
 					}
 					else if (!str_cmp(field, "interior")) {
