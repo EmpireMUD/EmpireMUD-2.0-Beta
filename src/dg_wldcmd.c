@@ -39,6 +39,7 @@ room_data *get_room(room_data *ref, char *name);
 obj_data *get_obj_by_room(room_data *room, char *name);
 char_data *get_char_in_room(room_data *room, char *name);
 obj_data *get_obj_in_room(room_data *room, char *name);
+extern vehicle_data *get_vehicle(char *name);
 void instance_obj_setup(struct instance_data *inst, obj_data *obj);
 void scale_item_to_level(obj_data *obj, int level);
 void scale_mob_to_level(char_data *mob, int level);
@@ -638,6 +639,7 @@ WCMD(do_wpurge) {
 	char arg[MAX_INPUT_LENGTH];
 	char_data *ch, *next_ch;
 	obj_data *obj, *next_obj;
+	vehicle_data *veh;
 
 	one_argument(argument, arg);
 
@@ -656,33 +658,27 @@ WCMD(do_wpurge) {
 
 		return;
 	}
-
-	if (*arg == UID_CHAR)
-		ch = get_char(arg);
-	else 
-		ch = get_char_in_room(room, arg);
-
-	if (!ch) {
-		if (*arg == UID_CHAR)
-			obj = get_obj(arg);
-		else 
-			obj = get_obj_in_room(room, arg);
-
-		if (obj) {
-			extract_obj(obj);
+	
+	// purge char
+	if ((*arg == UID_CHAR && (ch = get_char(arg))) || (ch = get_char_in_room(room, arg))) {
+		if (!IS_NPC(ch)) {
+			wld_log(room, "wpurge: purging a PC");
+			return;
 		}
-		else 
-			wld_log(room, "wpurge: bad argument");
 
-		return;
+		extract_char(ch);
 	}
-
-	if (!IS_NPC(ch)) {
-		wld_log(room, "wpurge: purging a PC");
-		return;
+	// purge vehicle
+	else if ((*arg == UID_CHAR && (veh = get_vehicle(arg))) || (veh = get_vehicle_room(room, arg))) {
+		extract_vehicle(veh);
 	}
-
-	extract_char(ch);
+	// purge obj
+	else if ((*arg == UID_CHAR && (obj = get_obj(arg))) || (obj = get_obj_in_room(room, arg))) {
+		extract_obj(obj);
+	}
+	else {
+		wld_log(room, "wpurge: bad argument");
+	}
 }
 
 

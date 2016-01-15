@@ -5054,6 +5054,8 @@ void set_room_extra_data(room_data *room, int type, int value) {
 * @return room_data* The matching room, or NULL if none.
 */
 room_data *find_target_room(char_data *ch, char *rawroomstr) {
+	extern vehicle_data *get_vehicle(char *name);
+	extern room_data *obj_room(obj_data *obj);
 	extern struct instance_data *real_instance(any_vnum instance_id);
 	extern room_data *find_room_template_in_instance(struct instance_data *inst, rmt_vnum vnum);
 	
@@ -5079,6 +5081,16 @@ room_data *find_target_room(char_data *ch, char *rawroomstr) {
 	else if (*roomstr == UID_CHAR) {
 		// maybe
 		location = find_room(atoi(roomstr + 1));
+		
+		if (!location && (target_mob = get_char(roomstr))) {
+			location = IN_ROOM(target_mob);
+		}
+		if (!location && (target_veh = get_vehicle(roomstr))) {
+			location = IN_ROOM(target_veh);
+		}
+		if (!location && (target_obj = get_obj(roomstr))) {
+			location = obj_room(target_obj);
+		}
 	}
 	else if (*roomstr == 'i' && isdigit(*(roomstr+1)) && ch && IS_NPC(ch) && (inst = real_instance(MOB_INSTANCE_ID(ch))) != NULL) {
 		// find room in instance by template vnum

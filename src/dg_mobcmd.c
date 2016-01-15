@@ -62,6 +62,7 @@ extern const char *dirs[];
 void die(char_data *ch, char_data *killer);
 extern struct instance_data *get_instance_by_mob(char_data *mob);
 extern room_data *get_room(room_data *ref, char *name);
+extern vehicle_data *get_vehicle(char *name);
 void instance_obj_setup(struct instance_data *inst, obj_data *obj);
 extern struct instance_data *real_instance(any_vnum instance_id);
 void send_char_pos(char_data *ch, int dam);
@@ -688,6 +689,7 @@ ACMD(do_mload) {
 */
 ACMD(do_mpurge) {
 	char arg[MAX_INPUT_LENGTH];
+	vehicle_data *veh;
 	char_data *victim;
 	obj_data *obj;
 
@@ -722,37 +724,32 @@ ACMD(do_mpurge) {
 
 		return;
 	}
-
-	if (*arg == UID_CHAR)
-		victim = get_char(arg);
-	else
-		victim = get_char_room_vis(ch, arg);
-
-	if (victim == NULL) {
-		if (*arg == UID_CHAR)
-			obj = get_obj(arg);
-		else 
-			obj = get_obj_vis(ch, arg);
-
-		if (obj) {
-			extract_obj(obj);
-			obj = NULL;
+	
+	// purge mob
+	if ((*arg == UID_CHAR && (victim = get_char(arg))) || (victim = get_char_room_vis(ch, arg))) {
+		if (!IS_NPC(victim)) {
+			mob_log(ch, "mpurge: purging a PC");
+			return;
 		}
-		else 
-			mob_log(ch, "mpurge: bad argument");
 
-		return;
+		if (victim == ch) {
+			dg_owner_purged = 1;
+		}
+
+		extract_char(victim);
 	}
-
-	if (!IS_NPC(victim)) {
-		mob_log(ch, "mpurge: purging a PC");
-		return;
+	// purge vehicle
+	else if ((*arg == UID_CHAR && (veh = get_vehicle(arg))) || (veh = get_vehicle_in_room_vis(ch, arg))) {
+		extract_vehicle(veh);
 	}
-
-	if (victim == ch)
-		dg_owner_purged = 1;
-
-	extract_char(victim);
+	// purge obj
+	else if ((*arg == UID_CHAR && (obj = get_obj(arg))) || (obj = get_obj_vis(ch, arg))) {
+		extract_obj(obj);
+	}
+	// bad arg
+	else {
+		mob_log(ch, "mpurge: bad argument");
+	}
 }
 
 

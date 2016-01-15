@@ -414,6 +414,7 @@ OCMD(do_opurge) {
 	char arg[MAX_INPUT_LENGTH];
 	char_data *ch, *next_ch;
 	obj_data *o, *next_obj;
+	vehicle_data *veh;
 	room_data *rm;
 
 	one_argument(argument, arg);
@@ -436,27 +437,30 @@ OCMD(do_opurge) {
 
 		return;
 	} /* no arg */
-
-	ch = get_char_by_obj(obj, arg);
-	if (!ch) {
-		o = get_obj_by_obj(obj, arg);
-		if (o) {
-			if (o == obj) 
-				dg_owner_purged = 1;
-			extract_obj(o);
+	
+	// purge char
+	if ((ch = get_char_by_obj(obj, arg))) {
+		if (!IS_NPC(ch)) {
+			obj_log(obj, "opurge: purging a PC");
+			return;
 		}
-		else 
-			obj_log(obj, "opurge: bad argument");
 
-		return;
+		extract_char(ch);
 	}
-
-	if (!IS_NPC(ch)) {
-		obj_log(obj, "opurge: purging a PC");
-		return;
+	// purge vehicle
+	else if ((veh = get_vehicle_by_obj(obj, arg))) {
+		extract_vehicle(veh);
 	}
-
-	extract_char(ch);
+	// purge obj
+	else if ((o = get_obj_by_obj(obj, arg))) {
+		if (o == obj) {
+			dg_owner_purged = 1;
+		}
+		extract_obj(o);
+	}
+	else {
+		obj_log(obj, "opurge: bad argument");
+	}
 }
 
 
