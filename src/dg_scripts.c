@@ -3501,7 +3501,15 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'v': {	// room.v*
-					if (!str_cmp(field, "vnum")) {
+					if (!str_cmp(field, "vehicles")) {
+						if (ROOM_VEHICLES(r)) {
+							snprintf(str, slen, "%c%d", UID_CHAR, GET_ID(ROOM_VEHICLES(r)));
+						}
+						else {
+							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "vnum")) {
 						snprintf(str, slen, "%d", GET_ROOM_VNUM(r)); 
 					}
 					break;
@@ -3775,6 +3783,14 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 						else {
 							snprintf(str, slen, "0");
+						}
+					}
+					else if (!str_cmp(field, "next_in_room")) {
+						if (v->next_in_room) {
+							snprintf(str, slen, "%c%d", UID_CHAR, GET_ID(v->next_in_room));
+						}
+						else {
+							strcpy(str, "");
 						}
 					}
 					break;

@@ -921,6 +921,8 @@ name     - The name of the room.
 people   - The id of the first character in the room, or an empty return.
 sector   - The sector type of the room.
 template - The room template vnum, if any.
+vehicles - The id of the first vehicle in the room, if any
+           (then %veh.next_in_room%).
 vnum     - The room's vnum.
 weather  - current weather: sunny, cloudy, rainy, or lightning
 #d
@@ -1092,6 +1094,7 @@ When using field  - The variable returns:
 &cmaxrooms&0 - Maximum added rooms (not counting the base interior room).
 &cmovetype&0 - The verb for the vehicle's movement (like "sails").
 &cneedsrepair&0 - The vehicle needs yearly maintenance or took damage.
+&cnext_in_room&0 - The next vehicle in the room (list of %room.vehicles%).
 &croom&0 - The room the vehicle is in.
 &crooms&0 - The number of added rooms (not counting the base interior room).
 &cshortdesc&0 - The vehicle's short description (the name the players see).

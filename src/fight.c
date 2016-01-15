@@ -1940,7 +1940,7 @@ bool can_fight(char_data *ch, char_data *victim) {
 * @return bool TRUE if okay, FALSE if not.
 */
 bool validate_siege_target_room(char_data *ch, vehicle_data *veh, room_data *to_room) {
-	room_data *from_room = veh ? IN_ROOM(veh) : IN_ROOM(ch);
+	room_data *from_room = veh ? IN_ROOM(veh) : (ch ? IN_ROOM(ch) : NULL);
 	
 	if (ch && ROOM_SECT_FLAGGED(from_room, SECTF_ROUGH)) {
 		msg_to_char(ch, "You can't lay siege from rough terrain!\r\n");
