@@ -990,6 +990,12 @@ void annual_update_vehicle(vehicle_data *veh) {
 		free_resource_list(old_list);
 	}
 	else {	// destroyed
+		// return of 0 prevents the decay
+		if (!destroy_vtrigger(veh)) {
+			VEH_HEALTH(veh) = MAX(1, VEH_HEALTH(veh));	// ensure health
+			return;
+		}
+		
 		if (ROOM_PEOPLE(IN_ROOM(veh))) {
 			act("$V crumbles from disrepair!", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
 		}

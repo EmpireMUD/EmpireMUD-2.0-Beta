@@ -82,7 +82,8 @@
 #define VTRIG_RANDOM  BIT(1)	// checked randomly when people nearby
 #define VTRIG_COMMAND  BIT(2)	// character types a command
 #define VTRIG_SPEECH  BIT(3)	// character speaks a word or phrase
-// unused BIT(4), BIT(5)
+// unused BIT(4)
+#define VTRIG_DESTROY  BIT(5)	// called before destruction
 #define VTRIG_GREET  BIT(6)	// character enters the room
 // unused BIT(7)
 #define VTRIG_ENTRY  BIT(8)	// vehicle enters a room
@@ -243,6 +244,7 @@ int door_wtrigger(char_data *actor, int subcmd, int dir);
 int consume_otrigger(obj_data *obj, char_data *actor, int cmd);
 
 int command_vtrigger(char_data *actor, char *cmd, char *argument, int mode);
+int destroy_vtrigger(vehicle_data *veh);
 int entry_vtrigger(vehicle_data *veh);
 int leave_vtrigger(char_data *actor, int dir);
 void load_vtrigger(vehicle_data *veh);

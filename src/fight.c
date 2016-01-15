@@ -2182,6 +2182,13 @@ bool besiege_vehicle(vehicle_data *veh, int damage, int siege_type) {
 		}
 	}
 	else {
+		// return 0 prevents the destruction
+		if (!destroy_vtrigger(veh)) {
+			VEH_HEALTH(veh) = MAX(1, VEH_HEALTH(veh));	// ensure health
+			REMOVE_BIT(VEH_FLAGS(veh), VEH_ON_FIRE);	// cancel fire
+			return TRUE;
+		}
+
 		if (ROOM_PEOPLE(IN_ROOM(veh))) {
 			// SIEGE_x: warn the occupants
 			switch (siege_type) {

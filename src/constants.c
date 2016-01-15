@@ -2805,7 +2805,7 @@ const char *vtrig_types[] = {
 	"Command",
 	"Speech",
 	"*",	// 4
-	"*",	// 5
+	"Destroy",
 	"Greet",
 	"*",	// 7
 	"Entry",
@@ -2828,7 +2828,7 @@ const bitvector_t vtrig_argument_types[] = {
 	TRIG_ARG_COMMAND,	// command
 	TRIG_ARG_PHRASE_OR_WORDLIST,	// speech
 	NOBITS,	// 4
-	NOBITS,	// 5
+	TRIG_ARG_PERCENT,	// destroy
 	TRIG_ARG_PERCENT,	// greet
 	NOBITS,	// 7
 	TRIG_ARG_PERCENT,	// entry

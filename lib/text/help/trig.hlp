@@ -2206,4 +2206,12 @@ male PC 'Test'  IDNum: [ 3531], In room [    0]
 
 See Also: REMOTE, RDELETE
 #d
+TRIGEDIT-VEH-DESTROY
+
+Activated when a vehicle is destroyed from siege damage or decay.
+ 
+Numeric Arg : percent chance this trigger will be activated upon destruction.
+
+If used with a return 0, the vehicle destruction is prevented.
+#d
 $~

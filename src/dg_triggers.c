@@ -1399,6 +1399,25 @@ int command_vtrigger(char_data *actor, char *cmd, char *argument, int mode) {
 }
 
 
+int destroy_vtrigger(vehicle_data *veh) {
+	trig_data *t;
+
+	if (!SCRIPT_CHECK(veh, VTRIG_DESTROY)) {
+		return 1;
+	}
+
+	for (t = TRIGGERS(SCRIPT(veh)); t; t = t->next) {
+		if (TRIGGER_CHECK(t, VTRIG_DESTROY) && (number(1, 100) <= GET_TRIG_NARG(t))) {
+			union script_driver_data_u sdd;
+			sdd.v = veh;
+			return script_driver(&sdd, t, VEH_TRIGGER, TRIG_NEW);
+		}
+	}
+
+	return 1;
+}
+
+
 int entry_vtrigger(vehicle_data *veh) {
 	trig_data *t;
 
@@ -1407,7 +1426,7 @@ int entry_vtrigger(vehicle_data *veh) {
 	}
 
 	for (t = TRIGGERS(SCRIPT(veh)); t; t = t->next) {
-		if (TRIGGER_CHECK(t, VTRIG_ENTRY) && (number(1, 100) <= GET_TRIG_NARG(t))){
+		if (TRIGGER_CHECK(t, VTRIG_ENTRY) && (number(1, 100) <= GET_TRIG_NARG(t))) {
 			union script_driver_data_u sdd;
 			sdd.v = veh;
 			return script_driver(&sdd, t, VEH_TRIGGER, TRIG_NEW);
