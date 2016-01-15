@@ -847,8 +847,9 @@ ACMD(do_mteleport) {
 	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	room_data *target;
-	char_data *vict, *next_ch;
+	char_data *vict = NULL, *next_ch;
 	struct instance_data *inst;
+	vehicle_data *veh = NULL;
 	int iter;
 
 	if (!MOB_OR_IMPL(ch)) {
@@ -924,24 +925,35 @@ ACMD(do_mteleport) {
 		}
 	}
 	else {
+		// attempt to find targets
 		if (*arg1 == UID_CHAR) {
+			// prefer char
 			if (!(vict = get_char(arg1))) {
-				mob_log(ch, "mteleport: victim (%s) does not exist",arg1);
-				return;
+				// try vehicle as backup
+				veh = get_vehicle(arg1);
 			}
 		}
-		else if (!(vict = get_char_vis(ch, arg1, FIND_CHAR_WORLD))) {
-			mob_log(ch, "mteleport: victim (%s) does not exist",arg1);
-			return;
+		else {
+			vict = get_char_vis(ch, arg1, FIND_CHAR_WORLD);
 		}
-
-		if (valid_dg_target(vict, DG_ALLOW_GODS)) {
-			if (!IS_NPC(vict)) {
-				GET_LAST_DIR(vict) = NO_DIR;
+		
+		if (vict) {
+			if (valid_dg_target(vict, DG_ALLOW_GODS)) {
+				if (!IS_NPC(vict)) {
+					GET_LAST_DIR(vict) = NO_DIR;
+				}
+				char_from_room(vict);
+				char_to_room(vict, target);
+				enter_wtrigger(IN_ROOM(vict), vict, NO_DIR);
 			}
-			char_from_room(vict);
-			char_to_room(vict, target);
-			enter_wtrigger(IN_ROOM(vict), vict, NO_DIR);
+		}
+		else if (veh) {
+			vehicle_from_room(veh);
+			vehicle_to_room(veh, target);
+			entry_vtrigger(veh);
+		}
+		else {
+			mob_log(ch, "mteleport: victim (%s) does not exist", arg1);
 		}
 	}
 }
