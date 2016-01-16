@@ -1,0 +1,88 @@
+RTRIG "ROOM TRIGGERS" "WORLD TRIGGERS" "TRIGEDIT ROOMS" ROOM-TRIGGERS TRIGEDIT-ROOMS
+
+Rooms and room templates are fully scriptable in EmpireMUD, and are able to
+fire triggers, can execute commands, and can be stored as variables.
+
+See also:
+- List of variables: &yRTRIG VARS&0
+- List of triggers: &yRTRIG TYPES&0
+- List of commands: &yRTRIG COMMANDS&0
+#d
+"RTRIG COMMANDS" "ROOM COMMANDS" TRIGEDIT-ROOM-COMMANDS
+
+The following commands are available in room triggers (see their individual
+help files for more info):
+
+&c%adventurecomplete%&0 - Triggers completion of the adventure it's in.
+&c%aoe%&0 - Deals scaled damage to all people in the room.
+&c%asound%&0 - Sends a message to surrounding rooms.
+&c%at%&0 - Performs a command as if it's at that location.
+&c%buildingecho%&0 - Sends a message to everyone at a certain map location.
+&c%damage%&0 - Deals scaled damage to a person.
+&c%door%&0 - Various functions for changing doors and exits.
+&c%dot%&0 - Adds a damage-over-time effect to a person.
+&c%echo%&0 - Sends a message to the whole room.
+&c%echoaround%&0 - Sends a message to all but one target.
+&c%echoneither%&0 - Sends a message to all but two people.
+&c%force%&0 - Forces a person to execute a command.
+&c%load%&0 - Loads a mob, object, etc.
+&c%purge%&0 - Purges a mob, object, etc.
+&c%regionecho%&0 - Sends a message to everyone in a given map radius.
+&c%scale%&0 - Changes the scale level of a target.
+&c%send%&0 - Send a message to one person.
+&c%siege%&0 - Deals siege damage to a vehicle or room.
+&c%teleport%&0 - Moves people to another location.
+&c%terracrop%&0 - Changes the terrain to a certain crop type.
+&c%terraform%&0 - Changes the terrain to a certain sector type.
+&c%vehicleecho%&0 - Sends a message to everyone in/on a vehicle.
+#d
+"RTRIG TYPES" TRIGEDIT-ROOM-TYPES "ROOM TRIGGER TYPES" "WORLD TRIGGER TYPES"
+
+Rooms can trigger on the following events:
+
+&cGlobal&0 - Can happen even without players present (combine with Random).
+&cRandom&0 - Triggers randomly when players are around.
+&cCommand&0 - Responds to a player command.
+&cSpeech&0 - Responds to player speech.
+&cAdventure Cleanup&0 - Special; see RTRIG ADVENTURE COMPLETE.
+&cZone Reset&0 - Triggers when the adventure zone resets.
+&cEnter&0 - Triggers when a person enters the room.
+&cDrop&0 - Triggers when a player drops an item in the room.
+&cAbility&0 - Triggers when an ability is used in the room.
+&cLeave&0 - Triggers when a person tries to leave.
+&cDoor&0 - Triggers when a player interacts with a door.
+
+For each type, there is a help file named &yRTRIG <type>&0.
+#d
+"RTRIG VARS" "RTRIG VARIABLES" ROOM-VARS TRIGEDIT-ROOM-VAR TRIGEDIT-VARIABLES-ROOMS
+
+When using field  - The variable returns:
+&cbuilding&0 - The name of the building on the room, if any.
+&ccontents&0 - The id of the first obj in the room.
+&ccoords&0 - The (x, y) location of the room on the map.
+&ccrop&0 - The name of the crop on the map room, if any.
+&cdirection(target)&0 - The approximate direction to the target.
+&cdistance(target)&0 - The distance between this room and the target.
+&cempire_adjective&0 - The owner empire's adjective form, if any.
+&cempire_id&0 - The owner empire's id number, if any.
+&cempire_name&0 - The owner empire's name, if any.
+&c<dir>&0 - The list of flags affecting the exit in the specified direction: 
+      north, south, up, down, fore, aft (etc). The result is either:
+      %room.north(vnum)% - vnum of room in direction
+      %room.north(FLG)% - CLOSED LOCKED, etc.
+      %room.north(room)% - room variable for room in direction
+      %room.north(create,VNUM)% - Adds a new room in that direction, using
+         building VNUM (which must be a ROOM-flagged building). This only
+         works in building/vehicle interiors that aren't adventures. This
+         returns the variable for the new room if it succeeds.
+&cid&0 - The unique id of the room.
+&cname&0 - The name of the room.
+&cpeople&0 - The id of the first character in the room, or an empty return.
+&csector&0 - The sector type of the room.
+&ctemplate&0 - The room template vnum, if any.
+&cvehicles&0 - The id of the first vehicle in the room, if any
+   (then %veh.next_in_room%).
+&cvnum&0 - The room's vnum.
+&cweather&0 - current weather: sunny, cloudy, rainy, or lightning
+#d
+$~

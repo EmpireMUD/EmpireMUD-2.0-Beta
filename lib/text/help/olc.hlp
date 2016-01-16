@@ -4142,7 +4142,7 @@ The attach type also determines which event types you can choose.
 
 See also: OLC TRIGGERS, TRIGEDIT TYPES
 #d
-"TRIGEDIT COMMANDS"
+"TRIGEDIT COMMANDS" TRIGEDIT-COMMANDS TRIG-COMMANDS TRIGGER-COMMANDS TRIGEDIT-COMMANDLISTS
 
 Usage:  .commands
 
@@ -4154,7 +4154,8 @@ The commands are edited in the text editor. When you're done editing the
 commands, you should format them with /f -- this will clean up the code, as
 well as check it to help make sure it will run safely.
 
-See also: OLC TRIGGERS, TEXT EDITOR
+See also: MTRIG COMMANDS, OTRIG COMMANDS, RTRIG COMMANDS, VTRIG COMMANDS
+See also: SCRIPT COMMANDS, OLC TRIGGERS, TEXT EDITOR
 #d
 "TRIGEDIT NAME"
 
@@ -4179,75 +4180,15 @@ it runs.
 
 See also: OLC TRIGGERS
 #d
-"TRIGEDIT TYPES"
+"TRIGEDIT TYPES" TRIGEDIT-TYPES TRIGGER-LIST TRIGGER-TYPES TRIG-TYPES
 
 Usage:  .types [add | remove] <flags>
 
 You can set trigger types this way. These determine which events will set off
 the script. The available types are determined by what the trigger attaches to.
 
-See also: MOB TRIGGER TYPES, OBJ TRIGGER TYPES, ROOM TRIGGER TYPES
+See also: MTRIG TYPES, OTRIG TYPES, RTRIG TYPES, VTRIG TYPES
 See also: OLC TRIGGERS, TRIGEDIT ATTACHES
-#d
-"MOB TRIGGER TYPES" "MOBILE TRIGGER TYPES"
-
-The following triggers are available for mobs:
- Global
- Random
- Command
- Speech
- Act
- Death
- Greet
- Greet-All
- Entry
- Receive
- Fight
- HitPrcnt
- Bribe
- Load
- Memory
- Ability
- Leave
- Leave-All
- Door
-
-See also: OLC TRIGGERS, TRIGEDIT ARGUMENTS, TRIGEDIT NUMARG, TRIGEDIT TYPES
-#d
-"OBJ TRIGGER TYPES" "OBJECT TRIGGER TYPES"
-
-The following triggers are available for objects:
- Global
- Random
- Command
- Timer
- Get
- Drop
- Give
- Wear
- Remove
- Load
- Ability
- Leave
- Consume
-
-See also: OLC TRIGGERS, TRIGEDIT ARGUMENTS, TRIGEDIT NUMARG, TRIGEDIT TYPES
-#d
-"ROOM TRIGGER TYPES" "WORLD TRIGGER TYPES"
-
-The following triggers are available for rooms:
- Global
- Random
- Command
- Speech
- Zone Reset
- Enter
- Drop
- Ability
- Leave
- Door
-
-See also: OLC TRIGGERS, TRIGEDIT ARGUMENTS, TRIGEDIT NUMARG, TRIGEDIT TYPES
 #d
 "#n" "#e" "#a"
 

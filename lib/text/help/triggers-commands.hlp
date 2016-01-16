@@ -1,0 +1,383 @@
+%ADVENTURECOMPLETE% ADVENTURECOMPLETE MADVENTURECOMPLETE OADVENTURECOMPLETE VADVENTURECOMPLETE WADVENTURECOMPLETE
+
+Usage:  %adventurecomplete%
+
+This script command triggers completion on the adventure instance, which will
+clean it up (delete the instance) next time it's empty. Only mobs can use this
+when physically outside the instance. The other types will only work if still
+inside.
+#d
+%AOE% OAOE MAOE VAOE WAOE
+
+%aoe% [modifier] [damage type]
+
+This does AoE -- Area-of-Effect -- damage to every enemy in the room. The mob
+version only counts combat enemies. The other versions call any player (as well
+as their followers) an enemy. Like %damage%, the damage is scaled, and a
+negative modifier causes healing instead.
+
+You can optionally specify a damage type (physical, magical, fire, poison,
+direct).
+
+Examples:
+  %aoe% 100  - group damage
+  %aoe% -20    - group healing
+
+See also: DEATH, %DAMAGE%, %DOT%
+#d
+%ASOUND% ASOUND OASOUND MASOUND VASOUND WASOUND
+
+%asound% <message>
+   
+The message is sent to all surrounding rooms.
+
+Example:
+  %asound% You hear a blood chilling howl from nearby.
+
+See also: %ECHO%, %REGIONECHO%
+#d
+%AT% MAT OAT VAT WAT
+
+%at% <target> <command>
+
+Using %at% will perform the command in the room where target is found, as if
+the script were firing there. Note that in some cases, such as objects, it
+actually loads a duplicate there temporarily, rather than moving the original
+object.
+#d
+ATTACH "ATTACH COMMAND" TRIG-ATTACH
+
+Usage:  attach <vnum> <id>
+
+* This small trigger will attach a trigger to the carrier (this can, for
+* instance, be used if you want the mob to change attitude by adding another
+* trigger, i.e. mob was mad - mob got apple - mob gets a 'nicer' trigger
+* attached).
+attach 3001 %self.id%
+
+This command allows a script to attach a trigger (referenced by vnum) to
+anything capable of receiving triggers, by id number. (%self.id%, %object.id%,
+and %actor.id% are examples of id numbers, for use with this command.)
+
+See also: DETACH, TATTACH, TDETATCH
+#d
+%BUILDINGECHO% %ECHO% %ECHOAROUND% %ECHONEITHER% %VEHICLEECHO% %SEND% BUILDINGECHO VEHICLEECHO %ZECHOAROUND% ECHOAROUND TRIG-SEND
+
+&c%echo% <message>&0
+   Message is sent to all non-sleeping characters in the same room that this 
+   script is executing in.
+
+&c%echoaround% <victim> <message>&0
+   Message will be sent to all characters in the room with victim, except for 
+   the victim.
+
+&c%echoneither% <person> <person> <message>&0
+   Message will be sent to all characters in the room EXCEPT the two people.
+
+&c%send% <victim> <message>&0
+   Message will be sent to the victim only.
+  
+&c%buildingecho% <room vnum> <message>&0
+   Buildingecho echoes message to the entire building. room vnum should be any
+   vnum in the building you wish to echo around.
+
+&c%vehicleecho% <vehicle> <message>&0
+   Sends a message to everyone on/in the target vehicle.
+
+NOTE: When used with mobs make sure the mobs can see the players and vehicles,
+i.e not blind, set INFRA.
+
+See also: %ASOUND%, %REGIONECHO%
+#d
+COMMENT * "TRIGEDIT COMMENT"
+
+* This is an example of a comment in a script. Because of the *s, the lines 
+* are not parsed, so the script still works even if it has a lot of 
+* explanations built in. All triggers should be have enough comments to help
+* future developers know what's going on.
+
+* The below line sends the text 'Trigger firing' to the room.
+%echo% Trigger firing.
+
+NOTE: Some flags are named * or start with a *; these are flags that cannot be
+set by builders. They are used for internal functions only, or not used at all.
+#d
+%DAMAGE% ODAMAGE MDAMAGE WDAMAGE VDAMAGE
+
+%damage% <victim> [modifier] [damage type]
+
+Cause amount points of damage to victim. Damage is automatically scaled based
+on the mob or adventure level. Modifier is a percent of the scaled damage,
+where 100 is the normal level. If modifier is negative, the player will be
+healed.
+
+You can optionally specify a damage type (physical, magical, fire, poison,
+direct).
+
+Examples:
+  %damage% %actor% -100  - cause scaled healing
+  %damage% %actor% 20  - cause 20% scaled damage
+  %damage% %actor% %random.100%  - cause 1-100% scaled damage randomly
+
+See also: DEATH, %AOE%, %DOT%, %SIEGE%
+#d
+%DOOR% MDOOR ODOOR VDOOR WDOOR TRIGEDIT-EXIT TRIG-EXIT 
+
+%door% <vnum> <direction> <field> [value]
+
+Used for adding, deleting, and modifying doors in room #vnum. Direction 
+determines which door is being changed, and can be any full direction name.
+If the door does not exist first, a new door will be created. Field is what
+property of the door is being changed. Valid fields are:
+
+&cpurge&0 - Remove the exit in the direction specified - no value needed.
+&cflags&0 - value will be the new door flags bitvector as defined here:
+   a - Exit is a door that can be opened and closed. Default is open.
+   b - The door is closed.
+&cname&0- Value is the name of the door in the specified direction.
+&croom&0- Value is the vnum of the room this direction leads to.
+#d
+%DOT% MDOT ODOT VDOT WDOT
+
+%dot% <victim> <modifier> <duration> [damage type] [max stacks]
+
+Adds a scaled DoT -- Damage-Over-Time -- effect to the target.
+
+You can optionally specify a damage type (physical, magical, fire, poison,
+direct).
+
+You can also optionally specify a maximum number of stacks. If a %dot% hits
+again while the victim already has that dot, it will add its damage and stack,
+resetting the duration on the existing effect. If it has hit its maximum, it
+will only refresh the time on the whole stack. If you don't specify, it will
+not stack (max 1).
+
+NOTE: If you want to use max stacks, you must also provide the damage type.
+
+See also: %DAMAGE%, %AOE%, %SIEGE%
+#d
+%FORCE% MFORCE OFORCE VFORCE WFORCE TRIGEDIT-FORCE TRIG-FORCE
+
+%force% <victim> <command>
+
+Force the victim to perform a particular command. Cannot be made to force 
+immortals.
+
+This little script teleports the actor to another place when he enters the
+room, then makes him look to see the description:
+  wait 1 s
+  %echo% A powerful force drags you down.
+  %teleport% %actor% 3001
+  %force% %actor% look
+#d
+%LOAD% MLOAD OLOAD VLOAD WLOAD
+
+%load% obj <vnum> [name <position>] [scale level]
+%load% mob <vnum> [ally] [scale level]
+%load% veh <vnum> [scale level]
+
+This command loads a mob, object, or vehicle into the game. No-take objects
+loaded to a mob will load to the room. Mobs loading other mobs may specify
+"ally" to set the loaded mob as a follower, which assists combat scripts in
+determining whose side they are on.
+
+The %load% command will automatically scale things to the same level as the
+thing that does the loading (when it can). However, you can specify a
+different scale level if you like. For object loading, you MUST also include
+the target to load to AND the load position before the scale level.
+
+Load an object the room:  %load% obj 1300
+Load a scaled mob to room:  %load% mob 1300 %actor.level%
+Load obj to player inv:  %load% obj 1300 %actor% inv
+Equip obj to player:  %load% obj 1300 %actor% waist
+
+Valid wear positions are: head, ears, neck1, neck2, clothes, armor, about,
+arms, wrists, hands, rfinger, lfinger, waist, legs, feet, pack, saddle,
+sheath1, sheath2, wield, ranged, hold, shared
+#d
+%PURGE% MPURGE OPURGE VPURGE WPURGE
+
+%purge% <victim | obj | vehicle>
+
+Purge removes objects, mobs, or vehicles from the game. If no argument is
+given, then all objects and mobs (but not vehicles) in the room will be
+removed. If there is an argument, only that thing will be  purged. Players
+cannot be purged.
+
+Examples: 
+  %purge% %self%
+  %purge% %actor.inventory(1300)%   
+  %purge% %actor.eq(hold)%
+
+See also: POSITIONS
+#d
+%REGIONECHO% MREGIONECHO OREGIONECHO WREGIONECHO
+
+%regionecho% <location> <radius> <message>
+
+Sends a message to the entire map region around a location, up to a distance
+given by the radius. You can specify a real map location, a building, or an
+adventure zone and it will find the map location associated with it.
+
+If you use a negative radius, it will only echo to people outdoors. Otherwise,
+all players in range will see the echo.
+
+Examples:
+  %regionecho% %self.room% 100 The fair has come to town!
+  %regionecho% %self.room% -50 A pegasus flies overhead.
+
+See also: %ECHO%
+#d
+%SCALE% MSCALE OSCALE VSCALE WSCALE
+
+%scale% <victim/object/vehicle> [level]
+
+This scales (or re-scales) a target NPC, object, or vehicle to a given level.
+If no level is provided, the script will attempt to use the scale of the
+character, object, or instance that called the scale command. If no valid level
+is detected, it will send an error.
+
+Normal scaling limits apply, including limits set on objects, mobs, or
+adventures.
+
+If you scale an item that is already scaled, a fresh copy will be loaded and
+scaled. This would result in the original item being purged.
+
+Examples: 
+  %scale% bag 100
+  %scale% sword %actor.level%
+#d
+%SIEGE% MSIEGE OSIEGE VSIEGE WSIEGE
+
+Usage:  %siege% <target> [scale level]
+
+This deals siege damage to a vehicle or room. Either can be targeted using
+%vars%; vehicles can also be targeted by name while rooms can be targeted by
+direction. Note that this will fail on certain rooms, such as starting
+locations.
+
+You can specify a scale level, or inherit it from the user.
+
+The siege damage is done silently, but there may be a message if the target
+is destroyed.
+
+Examples:
+  %siege% %veh%
+  %siege% north 100
+#d
+"SWITCH STATEMENT" "CASE STATEMENT" "BREAK STATEMENT" "DEFAULT STATEMENT" CASE DEFAULT BREAK TRIG-SWITCH TRIGEDIT-SWITCH
+
+Switch statements let you compare once variable to several outcomes. A switch
+always ends with a break statement. Inside, it contains pairs of case/break
+section, and may have a default/break section.
+
+Example:
+  switch %random.4%
+    case 1
+      emote sings a merry song about someone named Fulbert and Beatrice.
+    break
+    case 2
+      emote booms out loudly, 'Heigh Ho! Heigh Ho! It's home from work we go!'
+    break
+    case 3
+      emote tries to sing falsetto, but his voice doesn't agree.
+    break
+    default
+      sing
+    break
+  done
+
+Switch evaluates an expression and looks for a match amongst the case
+statements that follow. If none of the following case statements are a match,
+and a default statement exists, the default statement is considered a match.
+If a match is found, the commands that follow it, up until a break or done
+command, are executed. 
+
+&cbreak&0 - Used to terminate cases in a switch.
+&ccase&0 - Used to begin a new conditional group in a switch block.
+&cdefault&0 - Similar to case but matches any condition not met.
+&cdone&0 - Used to terminate a switch (or while) block.
+#d
+%TELEPORT% MTELEPORT OTELEPORT VTELEPORT WTELEPORT
+
+%teleport% <victim | vehicle> <location>
+%teleport% all <location>
+%teleport% adventure <location>
+
+Teleport moves the victim to the target. The victim does not need to be in 
+the same room as the user. If the victim is 'all', all the characters in the 
+room will be teleported to the target room. No messages are generated by this 
+command. Teleport can also move vehicles.
+
+If you target 'adventure', all players in the entire adventure zone instance,
+plus their NPC followers, will be teleported to the target.
+
+You can use i### to target a room in the current adventure instance by its
+room template vnum instead of live room number (if used in an instanced zone).
+
+Examples:
+  %teleport% all i17401
+  %teleport% %actor% %actor.home%
+#d
+%TERRACROP% MTERRACROP OTERRACROP VTERRACROP WTERRACROP
+
+%terracrop% [location] <crop vnum>
+
+This command allows you to make changes to the map, one tile at a time. It is
+usually a bad idea to terracrop tiles by coordinates. It's almost always
+safest to do this on the map tile the script is running in.
+
+Some sectors cannot be terracropped.
+
+Example:
+  if (%room.sector% ~= Forest)
+    %terracrop% %room% 4900
+  end
+
+See also: %TERRAFORM%
+#d
+%TERRAFORM% MTERRAFORM OTERRAFORM VTERRAFORM WTERRAFORM
+
+%terraform% [location] <sector vnum>
+
+This command allows you to make changes to the map, one tile at a time. It is
+usually a bad idea to terraform tiles by coordinates. It's almost always
+safest to do this on the map tile the script is running in.
+
+Some sectors cannot be terraformed.
+
+Example:
+  if (%room.sector% ~= Forest)
+    %terraform% %room% 4412
+  end
+
+See also: %TERRACROP%
+#d
+%TRANSFORM% TRANSFORM MTRANSFORM OTRANSFORM
+
+&rNOTE: This functionality is disabled and not currently supported by EmpireMUD.
+If you have a use for it, send a request for it to be implemented.&0
+
+%transform% <vnum|-vnum>
+
+This command causes the executing mob or object to transform into another 
+mob or object, based on the vnum argument supplied. The transformation is 
+permanent, though additional transformations may be performed. No message 
+regarding the transformation is sent to the room. The new mob or object will 
+have the same script as the original, rather than any script normally assigned 
+to the new, and no load trigger will be executed.
+
+Mobs - The hit points, max hit points, and position will remain those of the
+original mob but all other statistics and descriptions will be those of the new
+mob. (The new mob can be made to have all of its normal statistics by using a
+negative vnum.) Only mobiles may use this command (naturally).
+
+Objects - Based on the vnum argument supplied. The three basic values will 
+remain those of the original obj but all other statistics and descriptions will 
+be those of the new object. The transformation is permanent, additional 
+transformations may be performed. No message regarding the transformation is 
+sent to the room. The new object will have the same script as the originating 
+object, rather than any script normally assigned to the new object, and no 
+load trigger will be executed.
+#d
+$~

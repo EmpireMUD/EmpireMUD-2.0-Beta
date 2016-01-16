@@ -1918,8 +1918,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 	char *asound[] = {"masound ", "oasound ", "wasound ", "wasound ", "wasound ", "vasound " };
 	char *at[] = {"mat ", "oat ", "wat ", "wat ", "wat ", "vat " };
 	char *adventurecomplete[] = {"madventurecomplete", "oadventurecomplete", "wadventurecomplete", "wadventurecomplete", "wadventurecomplete", "vadventurecomplete" };
-	/* there is no such thing as wtransform, thus the wecho below  */
-	char *transform[] = {"mtransform ", "otransform ", "wecho ", "wecho ", "wecho ", "vecho " };
+	char *transform[] = {"mtransform ", "otransform ", "wtransform ", "wtransform ", "wtransform ", "vtransform " };
 	
 	/* X.global() will have a NULL trig */
 	if (trig) {
@@ -2450,8 +2449,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'b': {	// char.b*
-					if (!str_cmp(field, "block"))
-						snprintf(str, slen, "%d", GET_BLOCK(c));
+					if (!str_cmp(field, "block")) {
+						extern int get_block_rating(char_data *ch, bool can_gain_skill);
+						snprintf(str, slen, "%d", get_block_rating(c, FALSE));
+					}
 					else if (!str_cmp(field, "blood")) {
 						if (subfield && *subfield) {
 							int amt = atoi(subfield);
@@ -2479,6 +2480,16 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							// current blood
 							snprintf(str, slen, "%d", GET_BLOOD(c));
 						}
+					}
+					else if (!str_cmp(field, "bonus_healing")) {
+						extern int total_bonus_healing(char_data *ch);
+						snprintf(str, slen, "%d", total_bonus_healing(c));
+					}
+					else if (!str_cmp(field, "bonus_magical")) {
+						snprintf(str, slen, "%d", GET_BONUS_MAGICAL(c));
+					}
+					else if (!str_cmp(field, "bonus_physical")) {
+						snprintf(str, slen, "%d", GET_BONUS_PHYSICAL(c));
 					}
 					break;
 				}
@@ -2597,8 +2608,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							snprintf(str, slen, "0");
 						}
 					}
-					else if (!str_cmp(field, "dodge"))
-						snprintf(str, slen, "%d", GET_DODGE(c));
+					else if (!str_cmp(field, "dodge")) {
+						extern int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
+						snprintf(str, slen, "%d", get_dodge_modifier(ch, NULL, FALSE));
+					}
 					break;
 				}
 				case 'e': {	// char.e*
@@ -3037,7 +3050,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 't': {	// char.t*
 					if (!str_cmp(field, "tohit")) {
-						snprintf(str, slen, "%d", GET_TO_HIT(c));
+						extern int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill);
+						snprintf(str, slen, "%d", get_to_hit(c, NULL, FALSE, FALSE));
 					}
 					else if (!str_cmp(field, "trigger_counterspell")) {
 						extern bool trigger_counterspell(char_data *ch);	// spells.c
@@ -3255,8 +3269,13 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 's': {	// obj.s*
-					if (!str_cmp(field, "shortdesc"))
+					if (!str_cmp(field, "shortdesc")) {
 						snprintf(str, slen, "%s",  GET_OBJ_SHORT_DESC(o));
+					}
+					else if (!str_cmp(field, "size")) {
+						extern int obj_carry_size(obj_data *obj);
+						snprintf(str, slen, "%d", obj_carry_size(o));
+					}
 					break;
 				}
 				case 't': {	// obj.t*
