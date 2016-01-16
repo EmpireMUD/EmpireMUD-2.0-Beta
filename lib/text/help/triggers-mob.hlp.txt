@@ -10,6 +10,8 @@ See also:
 #d
 "ACT TRIGGER" "MTRIG ACT" TRIGEDIT-MOB-ACT TRIGEDIT-MOB-ACTION
 
+Act (mob trigger)
+
 Argument type:  the phrase (whole string) or word list to match
 
 The Act trigger occurs when someone performs a matching action in the same room
@@ -28,7 +30,23 @@ Variables:
   &c%target%&0 - The target object of the action, if any.
   &c%arg%&0 - The entire action phrase that was seen.
 #d
+"BRIBE TRIGGER" "MTRIG BRIBE" TRIGEDIT-MOB-BRIBE
+
+Bribe (mob trigger)
+
+Argument type:  minimum number of misc coins given to the mobile
+
+Bribe is triggered when a person gives coins to the mob. The type of coin is
+not considered, because all coinage is made by players and has different
+values. Only the number of coins matters.
+
+Variables:
+  &c%actor%&0 - The character providing coins to the mobile.
+  &c%amount%&0 - Number of coins given.
+#d
 "DEATH TRIGGER" "MTRIG DEATH" TRIGEDIT-MOB-DEATH
+
+Death (mob trigger)
 
 Argument type:  percent chance to execute
 Return value:  return 0 to prevent the mob's death cry
@@ -37,6 +55,47 @@ This type of trigger fires when the mob dies (but not when if it is purged).
 
 Variables:
   &c%actor%&0 - The character killing this mob, if any.
+#d
+"FIGHT TRIGGER" "FIGHT-CHARMED TRIGGER" "MTRIG FIGHT" "MTRIG FIGHT-CHARMED" TRIGEDIT-MOB-FIGHT TRIGEDIT-MOB-FIGHT-CHARMED
+
+Fight (mob trigger)
+
+Argument type:  percent chance to execute
+
+Activated each round of fighting, after the mobile has had all of its attacks.
+
+Charmed mobs will not activate normal Fight triggers, but you can use the
+Fight-Charmed trigger instead. This is useful for mobs that are designed as
+companions or familiars. Most adventure mobs shouldn't use triggers while
+charmed, though, because players may find a way to abuse tehm.
+
+Variables:
+  &c%actor%&0 - The character this mobile is fighting.
+#d
+"HITPRCNT TRIGGER" "HITPERCENT TRIGGER" "MTRIG HITPRCNT" "MTRIG HITPERCENT" TRIGEDIT-MOB-HITPERCENT TRIGEDIT-MOB-HITPRCNT 
+
+HitPrcnt (mob trigger)
+
+Argument type:  percentage of health points remaining
+
+Activated during combat when the mobile's hit point percentage drops below a 
+specified percentage.
+
+Variables:
+  &c%actor%&0 - The character this mobile is fighting.
+#d
+"MEMORY TRIGGER" "MTRIG MEMORY" TRIGEDIT-MOB-MEMORY
+
+Memory (mob trigger)
+
+Argument type:  percent chance to execute
+
+Activated when the mobile encounters a character in its memory (&yMREMEMBER&0) 
+list, and there is no over-riding command. Any mobile making use of mremember 
+MUST have a memory script, even if it will never be called.
+
+Variables:
+  &c%actor%&0 - The character being remembered.
 #d
 "MTRIG COMMANDS" "MOB COMMANDS" TRIGEDIT-MOB-COMMANDS
 
@@ -99,10 +158,13 @@ Mobs can trigger on the following events:
 &cLeave&0 - Triggers when a visible person tries to leave.
 &cLeave-All&0 - Triggers when ANY person tries to leave.
 &cDoor&0 - Triggers when a player interacts with a door in the room.
+&cFight-Charmed&0 - Triggers during combat rounds even when charmed.
 
 For each type, there is a help file named &yMTRIG <type>&0.
 #d
 "MTRIG VARS" "MTRIG VARIABLES" CHAR-VARS MOB-VAR TRIGEDIT-CHAR-VAR TRIGEDIT-VARIABLES-CHARACTERS MOBVARS MOB-VARS 
+
+All mob scripts provide the &c%self%&0 variable.
 
 When using field  - The variable returns:
 &cability(name)&0 - Returns whether or not the player knows the ability.
@@ -225,5 +287,18 @@ When using field  - The variable returns:
       remote testvar %actor.id%
 
 See also: AFFECT FLAGS, MEDIT FLAGS
+#d
+"RECEIVE TRIGGER" "MTRIG RECEIVE" TRIGEDIT-MOB-RECEIVE TRIG-MOB-RECEIVE
+
+Receive (mob trigger)
+
+Argument type:  percent chance to execute
+Return value:  return 0 to prevent transferring the object to the mob
+
+Receive triggers fire whenever a mob receives an item from someone.
+
+Variables:
+  &c%actor%&0 - The character handing the object to the mob.
+  &c%object%&0 - The object being handed over.
 #d
 $~

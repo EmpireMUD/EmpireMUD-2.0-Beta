@@ -1,4 +1,30 @@
+"ABILITY TRIGGER" "MTRIG ABILITY" "OTRIG ABILITY" "RTRIG ABILITY" TRIGEDIT-MOB-ABILITY TRIGEDIT-OBJ-ABILITY TRIGEDIT-ROOM-ABILITY
+
+Ability (trigger type)
+
+Argument type:  percent chance to execute
+Return value:  return 0 to prevent the ability
+
+Ability triggers are used by mobs, objects, and rooms to detect, alter,
+replace, or prevent player abilities. Rooms will trigger on any ability
+performed in them, but mobs and objects only execute Ability triggers if they
+are the target of the ability.
+
+Variables: 
+  &c%actor% - The user of the ability.
+  &c%ability%&0 - The vnum of the ability.
+  &c%abilityname%&0 - The name of the ability.
+
+Room triggers also provide:
+  &c%vict%&0 - The target (mob/player) of the ability, if any.
+  &c%obj%&0 - The target (object) of the ability, if any.
+
+Mob and object triggers also provide:
+  &c%self%&0 - Ability triggers only execute when the target is self.
+#d
 "COMMAND TRIGGER" "MTRIG COMMAND" "OTRIG COMMAND" "RTRIG COMMAND" "VTRIG COMMAND" TRIGEDIT-MOB-COMMAND TRIGEDIT-OBJ-COMMAND TRIGEDIT-ROOM-COMMAND TRIGEDIT-VEH-COMMAND
+
+Command (trigger type)
 
 Argument type:  name of the command (string)
 Return value:  return 0 to proceed with normal command execution
@@ -26,12 +52,106 @@ Variables:
 
 See also: TOGGLE
 #d
+CONTEXT
+
+Usage:  context <number>
+
+Changes the "context" of a script to this value. When first run, a script's 
+context is 0. When a variable is made global, it is given the current context. 
+When a variable is accessed, if it must be searched for globally, a "found" 
+variable must either have context 0 or the current context. The net result of 
+this is you may have many global variables in a single script, with the same 
+name, differing only by context. Players may have variables; this mostly 
+removes the need for variable context.
+
+Example:
+* This little script will make sure one %has_said_hello% exist for each player.
+context %actor.id%
+set has_said_hello 1
+global has_said_hello
+* now only scripts running with context = %actor.id% can access this particular 
+* variable. however - it's a better idea to use vars set on players: help remote.
+
+See also: REMOTE
+#d
+DG_AFFECT DG_AFFECTS
+
+Usage:  dg_affect <target> <property> <value> <duration>
+
+Puts an affection or apply on the target. Durations must be non-zero. You can
+use -1 for infinite duration ONLY if the target is an NPC.
+
+Examples:
+  dg_affect %actor% HASTE on 20  -- Sets haste on actor for 20 seconds.
+  dg_affect %actor% DODGE 100 20  -- Sets dodge on actor +100 for 20 seconds.
+
+See also: APPLIES, AFFECTS
+#d
+"DOOR TRIGGER" "MTRIG DOOR" "RTRIG DOOR" TRIGEDIT-MOB-DOOR TRIGEDIT-ROOM-DOOR TRIGEDIT-DOOR
+
+Door (trigger type)
+
+Argument type:  percent chance to execute
+Return value:  return 0 to prevent the door command
+
+Activated when a player uses the door-specific commands: 'close, open' on a
+door (not on objects). This can be used to require keys or other restrictions.
+
+Variables:
+  &c%actor%&0 - The character using the command.
+  &c%direction%&0 - The direction the command is used on.
+  &c%cmd%&0 - The specific command activating the trigger.
+#d
+TRIGEDIT-MOB-DOOR 
+ 
+Activated when the mobile is in the same room as someone using the door
+specific commands 'close, open, pick, lock, unlock' on a door. 
+
+Used with return 0 will prevent the command from executing.
+
+Numeric Arg : percent chance this trigger will be activated. 
+Argument    : not used.
+
+Variables:
+%actor%     - the character using the command. 
+%direction% - the direction the command is used on. 
+%cmd%       - the specific command activating the trigger  
+#d
+"DROP TRIGGER" "OTRIG DROP" "RTRIG DROP" TRIGEDIT-OBJ-DROP TRIGEDIT-ROOM-DROP DROP-TRIGGER TRIG-OBJ-DROP TRIG-ROOM-DROP
+
+Drop (trigger)
+
+Argument type:  percent chance to trigger
+Return value:  return 0 to prevent the drop
+
+As an object trigger, this is activated any time a character attempts to drop
+the object. As a room trigger, it happens when an objectd is dropped in the
+room.
+
+The object trigger includes putting the object into a container or vehicle.
+
+Variables:
+  &c%actor%&0 - The character attempting to drop the object.
+  &c%object%&0 - The object the character is attempting to drop (room trigger).
+  &c%self%&0 - The item being dropped (object trigger).
+#d
+"ENTER TRIGGER" "ENTRY TRIGGER"
+
+Disambiguation: Different scriptable things have different uses for enter/entry
+triggers. See also:
+
+Mob Entry trigger: &yMTRIG ENTRY&0
+Room Enter trigger: &yRTRIG ENTER&0
+Vehicle Entry trigger: &yVTRIG ENTRY&0
+#d
 DG_CAST
 
 EmpireMUD does not use the "dg_cast" command because it doesn't have CircleMUD-
 style spells. Instead, mobs can use most player abilities directly at no cost.
 #d
 "GLOBAL TRIGGER" "GLOBAL RANDOM TRIGGER" "MTRIG GLOBAL" "OTRIG GLOBAL" "RTRIG GLOBAL" "VTRIG GLOBAL" TRIGEDIT-MOB-GLOBAL TRIGEDIT-OBJ-GLOBAL TRIGEDIT-ROOM-GLOBAL TRIGEDIT-VEH-GLOBAL
+
+Global (trigger)
 
 The Global trigger type is not an event itself, but is instead combined with
 the Random trigger event. This allows the Random trigger to fire even if there
@@ -44,6 +164,8 @@ detach any random trigger that's no longer needed.
 See also: DETACH, RANDOM TRIGGER
 #d
 "GREET TRIGGER" "MTRIG GREET" "VTRIG GREET" TRIGEDIT-MOB-GREET TRIGEDIT-VEH-GREET GREET "GREET ALL TRIGGER" "MTRIG GREET ALL" TRIGEDIT-MOB-GREET-ALL GREET-ALL TRIGEDIT-MOB-GREETALL
+
+Greet (trigger)
 
 Argument type:  percent chance to execute
 Return value:  return 0 to attempt to block entry and send the actor back
@@ -62,7 +184,53 @@ Variables:
   &c%actor%&0 - The character entering the room.
   &c%direction%&0 - The direction the character came from, if any.
 #d
+"LEAVE TRIGGER" "LEAVE-ALL TRIGGER" "MTRIG LEAVE" "OTRIG LEAVE" "RTRIG LEAVE" "VTRIG LEAVE" "MTRIG LEAVE ALL" TRIGEDIT-MOB-LEAVE TRIGEDIT-OBJ-LEAVE TRIGEDIT-ROOM-LEAVE TRIGEDIT-VEH-LEAVE TRIGEDIT-MOB-LEAVE-ALL
+
+Leave (trigger)
+
+Argument type:  percent chance to execute
+Return value:  return 0 to prevent leaving
+
+Leave triggers occur when a character attempts to leave a room. For mobs,
+objects, and vehicles, it is the room they are currently in.
+
+Mobs can only execute Leave triggers on people they can see. You can use the
+Leave-All version to also stop sneaky or invisible people.
+
+Variables: 
+  &c%actor%&0 - The character trying to leave the room.
+  &c%direction%&0 - The direction the character is leaving to.
+#d
+"LOAD TRIGGER" "MTRIG LOAD" "OTRIG LOAD" "VTRIG LOAD" TRIGEDIT-MOB-LOAD TRIGEDIT-OBJ-LOAD TRIGEDIT-VEH-LOAD TRIGEDIT-LOAD TRIG-LOAD
+
+Load (trigger type)
+
+Argument type:  percent chance to execute
+
+The Load trigger happens when something is first loaded into the game (but not
+on reboot or re-login). For crafted vehicles, the Load trigger doesn't happen
+until construction is complete.
+
+Certain actions like unharnessing a mob from a vehicle will load a new copy of
+the mob and set off its load triggers.
+#d
+"MTRIG ENTRY" "VTRIG ENTRY" "MTRIG ENTER" "VTRIG ENTER" TRIGEDIT-MOB-ENTRY TRIGEDIT-VEH-ENTRY TRIGEDIT-ENTRY TRIGGER-ENTRY 
+
+Entry (trigger)
+
+Argument type:  percent chance to execute
+Return value:  return 0 to cancel the movement and put the mob back
+
+The Entry trigger happens whenever its mob (or vehicle) enters a new room.
+You can return 0 if it shouldn't have gone there and should go back. If you
+want the mob to do something on arrival, you should consider using a short
+wait.
+
+See also: WAIT
+#d
 "RANDOM TRIGGER" "MTRIG RANDOM" "OTRIG RANDOM" "RTRIG RANDOM" "VTRIG RANDOM" TRIGEDIT-MOB-RANDOM TRIGEDIT-OBJ-RANDOM TRIGEDIT-ROOM-RANDOM TRIGEDIT-VEH-RANDOM RANDOM-TIMING TIMING
+
+Random (trigger type)
 
 Argument type:  percent chance to execute
 
@@ -117,6 +285,8 @@ See the specific help files for those commands for more information.
 See also: MTRIG COMMANDS, OTRIG COMMANDS, RTRIG COMMANDS, VTRIG COMMANDS
 #d
 "SPEECH TRIGGER" "MTRIG SPEECH" "RTRIG SPEECH" "VTRIG SPEECH" TRIGEDIT-MOB-SPEECH TRIGEDIT-ROOM-SPEECH TRIGEDIT-VEH-SPEECH
+
+Speech (trigger type)
 
 Argument type:  the phrase (whole string) or word list to match
 
@@ -247,28 +417,6 @@ global has_bribed_guard
 modified, this command must be used to update the global contents as well.
 
 See also: VARIABLES, CONTEXT
-#d
-CONTEXT
-
-Usage:  context number
-
-* This little script will make sure one %has_said_hello% exist for each player.
-context %actor.id%
-set has_said_hello 1
-global has_said_hello
-* now only scripts running with context = %actor.id% can access this particular 
-* variable. however - it's a better idea to use vars set on players: help remote.
-
-   Changes the "context" of a script to this value. When first run, a script's 
-context is 0. When a variable is made global, it is given the current context. 
-When a variable is accessed, if it must be searched for globally, a "found" 
-variable must either have context 0 or the current context. The net result of 
-this is you may have many global variables in a single script, with the same 
-name, differing only by context. Players may have variables; this mostly 
-removes the need for variable context. Previously, a player's ID could be used 
-as variable context to allow a script to service multiple players at once.
-
-See also: REMOTE
 #d
 EVAL
 
@@ -645,329 +793,6 @@ evaluated from left to right. Parenthesis can be used to group.
 |   //   | remainder             | 5 // 4 = 1                |
 |   !    | negation              | !() = 1; !0 = 1; !dog = 0;| 
 --------------------------------------------------------------
-#d
-TRIGEDIT-OBJ-GET
-
-Activated any time a character attempts to pick up this object.
- 
-Numeric Arg : percentage chance this trigger will activate.
-Argument    : not used.
-
-If used with a return 0 the character will fail to pick the object up.
-
-Variables:
-%actor% - the character trying to get the object
-#d
-TRIGEDIT-OBJ-DROP DROP-TRIGGER TRIG-OBJ-DROP
-
-Activated any time a character attempts to drop this object. This includes
-putting the object into a container.
-
-If used with a return 0 the character will fail to drop the object.
- 
-Numeric Arg : percent chance this trigger will be activated.
-Argument    : not used.
-
-Variables:
-%actor% - the character attempting to drop the object
-%self% - the item being dropped. 
-#d
-TRIGEDIT-OBJ-GIVE
- 
-Activated when a player attempts to give this object to another character.
- 
-If used with a return 0 the character will fail to give the object.
-
-Numeric Arg : percent chance this trigger will be activated.
-Argument    : not used.
-
-Variables:
-%actor% - the character giving away the object
-%victim - the potential recipient of the object
-#d
-TRIGEDIT-OBJ-WEAR
-
-Activated each time a character attempts to wear the
-object.
- 
-Numeric Arg : not used.
-Argument    : not used.
-
-Variables:
-%actor% - the character attempting to wear the object.
-#d
-TRIGEDIT-OBJ-REMOVE
-
-Activated each time a character tries to remove the object.
-
-Numeric Arg : not used.
-Argument    : not used.
-
-With a return 0 the object is not removed.
-
-Variables:
-%actor%  - the character attempting to remove the object
-#d
-TRIGEDIT-OBJ-LOAD 
- 
-Activated when the object is created. Can be used with the global trigger.
- 
-Numeric Arg : percent chance this trigger will be activated.
-Argument    : not used.
-#d
-TRIGEDIT-OBJ-ABILITY
-
-Activated when the obj is targetted by an ability.
- 
-Numeric Arg : percent chance this trigger will be activated. 
-Argument    : not used.
-
-Used with return 0 will cause the ability to fail.
-
-Variables: 
-%actor%       - the user of the ability
-%ability%     - the number of the ability
-%abilityname% - the name of the ability
-#d
-TRIGEDIT-OBJ-LEAVE 
- 
-Activated when someone leaves the room the obj is in.
-
-Numeric Arg : percent chance this trigger will be activated. 
-Argument    : not used.
-
-Used with return 0 will prevent the player from leaving the room.
-
-Variables: 
-%actor%     - the character leaving the room. 
-%direction% - the direction the character is leaving to.
-#d
-TRIGEDIT-OBJ-CONSUME
-
-Activated any time a character attempts to consume (eat, drink, or quaff) this 
-object. If used with a return 0 the character will fail to consume the object.
-
-Numeric Arg : percent chance this trigger will be activated.
-Argument    : not used.
-
-Variables:
-%actor% - the character attempting to consume the object.
-%self% - the object being consumed.
-%command% - either eat, drink, or consume.
-#d
-TRIGEDIT-ROOM-ADVCLN TRIGEDIT-ROOM-ADVENTURE-CLEANUP "ADVENTURE CLEANUP"
-
-Activated when an adventure is removed from the world, on the room that the
-adventure was linked to (usually on the map or in a building).
-
-Used with return 0 will prevent further triggers (for example, if you terraform
-the room).
-
-Note: This trigger ONLY works when attached to an adventure directly.
-
-Note: You won't have access to %instance% variable information anymore.
-
-Numeric Arg : percent chance this trigger will be activated. 
-
-Variables:
-%room%     - the room it was activated on.
-#d
-TRIGEDIT-ROOM-ZONE-RESET TRIGEDIT-ROOM-ZRESET TRIGEDIT-ROOM-LOAD
- 
-Activated when the zone this room belongs to is reset.
- 
-Numeric Arg : percentage chance this trigger will activate.
-Argument    : not used.
-#d
-TRIGEDIT-ROOM-ENTER TRIGEDIT-ROOM-ENTRY TRIGEDIT-ENTRY TRIG-ROOM-ENTRY
-
-   This trigger is checked whenever someone enters the room. This trigger is
-checked just before the character enters the room, so if you want the action
-to occur in the room the character is entering, you must use a wait.
- 
-Numeric Arg : percentage chance this trigger will activate.
-Argument    : not used.
-
-If used with a return 0 the character will fail to enter the room.
-
-Variables:
-%actor%     - the character trying to get the object
-%direction% - the direction the character came from
-#d
-TRIGEDIT-ROOM-DROP
-
-Activated any time a character attempts to drop an item in this room.
-
-If used with a return 0 the character will fail to drop anything.
- 
-Numeric Arg : percent chance this trigger will be activated.
-Argument    : not used.
-
-Variables:
-%actor%  - the character attempting to drop the object
-%object% - the object the character is attempting to drop
-#d
-TRIGEDIT-ROOM-ABILITY
-
-Activated if an ability is used in the room.
-
-Numeric Arg : percent chance this trigger will be activated. 
-Argument    : not used.
-
-Used with return 0 will cause the ability to fail.
-
-Variables: 
-%actor%       - the user of the ability
-%ability%     - the number of the ability
-%abilityname% - the name of the ability
-%vict%        - the target (mob/player) of the ability, if any.
-%obj%         - the target (object) of the ability, if any.
-#d
-TRIGEDIT-ROOM-LEAVE 
-
-Activated when someone leaves the room.
-
-Numeric Arg : percent chance this trigger will be activated. 
-Argument    : not used.
-
-Used with return 0 will prevent the player from leaving the room.
-
-Variables: 
-%actor%     - the character leaving the room. 
-%direction% - the direction the character is leaving to.
-#d
-TRIGEDIT-ROOM-DOOR TRIGEDIT-DOOR
- 
-Activated when a player uses the door specific commands: 
-'close, open, pick, lock, unlock' on a door. 
-
-Used with return 0 will prevent the command from executing.
-
-Numeric Arg : percent chance this trigger will be activated. 
-Argument    : not used.
-
-Variables:
-%actor%     - the character using the command. 
-%direction% - the direction the command is used on. 
-%cmd%       - the specific command activating the trigger  
-#d
-TRIGEDIT-MOB-ENTRY ENTRY TRIGEDIT-ENTRY TRIGGER-ENTRY 
-
-Activated each time the mobile it is attached to enters a room.
- 
-Numeric Arg : percent chance this trigger will be activated.
-Argument    : not used.
-#d
-TRIGEDIT-MOB-RECEIVE TRIG-MOB-RECEIVE
-
-Activated any time an object is given to the mobile.
-
-Numeric Arg : percent chance this trigger will be activated.
-Argument    : not used.
-
-With a return 0 the object is not transferred to the mobile.
-
-Variables:
-%actor%  - the character handing the object to the mobile
-%object% - the object being handed over           
-#d
-TRIGEDIT-MOB-FIGHT TRIGEDIT-MOB-FIGHT-CHARMED
- 
-Activated each round of fighting, after the mobile has had all of its attacks.
-
-Numeric Arg : percent chance this trigger will be activated.
-Argument    : not used.
-
-Variables:
-%actor% - the character this mobile is fighting
-
-Using the Fight-Charmed type will work even on charmed creatures, like
-familiars.
-#d
-TRIGEDIT-MOB-HITPERCENT TRIGEDIT-MOB-HITPRCNT 
- 
-Activated during combat when the mobiles hit point percentage drops below a 
-specified percentage.
- 
-Numeric Arg : percentage of hitpoints at the threshold of allowing this trigger to
-              activate.
-Argument    : not used.
-
-Variables:
-%actor% - the character this mobile is fighting
-#d
-TRIGEDIT-MOB-BRIBE
-
-Activated when a character gives a specified amount of coins to the mobile.
- 
-Numeric Arg : minimum number of misc coins required to activate this trigger.
-Argument    : not used.
-
-Variables:
-%actor% - the character providing coins to the mobile
-%amount% - number of coins given
-#d
-TRIGEDIT-MOB-LOAD TRIGEDIT-LOAD TRIG-LOAD 
- 
-Activated when this mobile is created.
- 
-Numeric Arg : percent chance this trigger will be activated.
-Argument    : not used.
-#d
-TRIGEDIT-MOB-MEMORY
- 
-Activated when the mobile encounters a character in its memory (mremember) 
-list and there is no over-riding command. Any mobile making use of mremember 
-MUST have a memory script, even if it will never be called.
- 
-Numeric Arg : percent chance this trigger will be activated.
-Argument    : not used.
-
-Variables:
-%actor% - the character being remembered
-#d
-TRIGEDIT-MOB-ABILITY
-
-Activated when the mob is targetted by an ability.
- 
-Numeric Arg : percent chance this trigger will be activated. 
-Argument    : not used.
-
-Used with return 0 will cause the ability to fail.
-
-Variables: 
-%actor%       - the user of the ability
-%ability%     - the number of the ability
-%abilityname% - the name of the ability
-#d
-TRIGEDIT-MOB-LEAVE TRIGEDIT-MOB-LEAVE-ALL
-
-Activated when someone leaves the room the mob is in. The difference between
-'Leave' and 'Leave-All' is that Leave only works if the mob can see the person.
-
-Numeric Arg : percent chance this trigger will be activated. 
-Argument    : not used.
-
-Used with return 0 will prevent the player from leaving the room.
-
-Variables: 
-%actor%     - the character leaving the room. 
-%direction% - the direction the character is leaving to.
-#d
-TRIGEDIT-MOB-DOOR 
- 
-Activated when the mobile is in the same room as someone using the door
-specific commands 'close, open, pick, lock, unlock' on a door. 
-
-Used with return 0 will prevent the command from executing.
-
-Numeric Arg : percent chance this trigger will be activated. 
-Argument    : not used.
-
-Variables:
-%actor%     - the character using the command. 
-%direction% - the direction the command is used on. 
-%cmd%       - the specific command activating the trigger  
 #d
 TRIGEDIT-ADVANCED
 
@@ -1361,16 +1186,6 @@ detach all %self.id%
    The opposite of attach, this removes triggers from the specified target.
 
 See also: ATTACH, DETACH, TRIG-ATTACH
-#d
-DG_AFFECTS
-
-Usage:  dg_affect <target> <property> <value> <duration>
-
-Modifies an affection or apply on the target. Durations must be non-zero.
-dg_affect %actor% HASTE on 20    -- Sets haste on actor for 20 seconds.
-dg_affect %actor% DODGE 100 20  -- Sets dodge on actor +100 for 20 seconds.
-
-See also: APPLIES, AFFECTS
 #d
 VDELETE
 

@@ -63,7 +63,7 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 
 	value = atoi(value_p);
 	duration = atoi(duration_p);
-	if (duration <= 0) {
+	if (duration == 0 || duration < -1 || (duration == -1 && !IS_NPC(ch))) {
 		script_log("Trigger: %s, VNum %d. dg_affect: need positive duration!", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
 		script_log("Line was: dg_affect %s %s %s %s (%d)", charname, property, value_p, duration_p, duration);
 		return;
@@ -104,8 +104,8 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 
 	/* add the affect */
 	af.type = ATYPE_DG_AFFECT;
-	af.cast_by = 0;	// TODO implement this
-	af.duration = ceil((double)duration / SECS_PER_REAL_UPDATE);
+	af.cast_by = (script_type == MOB_TRIGGER ? CAST_BY_ID((char_data*)go) : 0);
+	af.duration = (duration == -1 ? UNLIMITED : ceil((double)duration / SECS_PER_REAL_UPDATE));
 	af.modifier = value;
 
 	if (type == APPLY_TYPE) {

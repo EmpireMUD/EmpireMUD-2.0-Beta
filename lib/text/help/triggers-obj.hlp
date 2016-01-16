@@ -8,6 +8,46 @@ See also:
 - List of triggers: &yOTRIG TYPES&0
 - List of commands: &yOTRIG COMMANDS&0
 #d
+"CONSUME TRIGGER" "OTRIG CONSUME" TRIGEDIT-OBJ-CONSUME
+
+Consume (object trigger)
+
+Argument type:  percent chance to execute
+Return value:  return 0 to prevent the consumption
+
+Activated any time a character attempts to consume (eat, drink, or quaff) the
+object.
+
+Variables:
+  &c%actor%&0 - The character attempting to consume the object.
+  &c%self%&0 - The object being consumed.
+  &c%command%&0 - Either eat, drink, or quaff.
+#d
+"GET TRIGGER" "OTRIG GET" TRIGEDIT-OBJ-GET
+
+Get (object trigger)
+
+Argument type:  percent chance to execute
+Return value:  return 0 to cancel getting the object
+
+Activated any time a character attempts to pick up the object.
+
+Variables:
+  &c%actor%&0 - The character trying to get the object.
+#d
+"GIVE TRIGGER" "OTRIG GIVE" TRIGEDIT-OBJ-GIVE
+
+Give (object trigger)
+
+Argument type:  percent chance to execute
+Return value:  return 0 to prevent giving the item
+
+Activated when a player attempts to give this object to another character.
+
+Variables:
+  &c%actor%&0 - The character giving away the object.
+  &c%victim%&0 - The potential recipient of the object.
+#d
 "OTRIG COMMANDS" "OBJECT COMMANDS" TRIGEDIT-OBJ-COMMANDS
 
 The following commands are available in object triggers (see their individual
@@ -59,6 +99,8 @@ For each type, there is a help file named &yOTRIG <type>&0.
 #d
 "OTRIG VARS" "OTRIG VARIABLES" OBJ-VARS TRIGEDIT-OBJ-VAR TRIGEDIT-VARIABLES-OBJECTS
 
+All object scripts provide the &c%self%&0 variable.
+
 When using field  - The variable returns:
 &ccarried_by&0 - The id of the character carrying the object, or an empty return.
 &ccontents&0 - Gives the first object in a container.
@@ -86,7 +128,22 @@ When using field  - The variable returns:
 
 See also: OEDIT FLAGS
 #d
+"REMOVE TRIGGER" "OTRIG REMOVE" TRIGEDIT-OBJ-REMOVE
+
+Disambiguation: See &yDETACH&0 and &yTDETACH&0 for removing triggers.
+
+Remove (object trigger)
+
+Return value:  return 0 to prevent removing the item
+
+Activated each time a character is wearing this object and tries to remove it.
+
+Variables:
+  &c%actor%&0 - The character attempting to remove the object.
+#d
 "TIMER TRIGGER" "OTRIG TIMER" TRIGEDIT-OBJ-TIMER
+
+Timer (object trigger)
 
 Return value:  return 0 to prevent the object from decaying normally
 
@@ -96,5 +153,16 @@ use the "otimer" command to change its timer to -1 (infinite) or to a new
 positive value, then return 0 from the script.
 
 See also: OTIMER
+#d
+"WEAR TRIGGER" "OTRIG WEAR" TRIGEDIT-OBJ-WEAR
+
+Wear (object trigger)
+
+Return value:  return 0 to prevent wearing the item
+
+Activated each time a character attempts to wear the object.
+
+Variables:
+  &c%actor%&0 - The character attempting to wear the object.
 #d
 $~
