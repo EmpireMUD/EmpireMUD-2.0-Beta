@@ -1,3 +1,31 @@
+"COMMAND TRIGGER" "MTRIG COMMAND" "OTRIG COMMAND" "RTRIG COMMAND" "VTRIG COMMAND" TRIGEDIT-MOB-COMMAND TRIGEDIT-OBJ-COMMAND TRIGEDIT-ROOM-COMMAND TRIGEDIT-VEH-COMMAND
+
+Argument type:  name of the command (string)
+Return value:  return 0 to proceed with normal command execution
+               return 1 (default) if the trigger processed the command
+
+Command triggers let you create player commands, or modify the result of normal
+input. Common functions of command triggers include making something happen
+when you "use" an object, preventing a player from using "flee", or building
+puzzle games. If your script determines that it shouldn't actually process the
+command that triggered it, return 0 and the player will see the normal result
+of their command.
+
+Note: Immortals can only use command triggers when the "hassle" toggle is on.
+Note: If you trigger on a real game command, you should use the entire word
+   (not an abbreviation); the trigger will also match abbreviations. If you are
+   instead adding a new command, it will only work if the player types an exact
+   match OR the player abbreviates your command with something that isn't an
+   abbreviation for a real command ("c" always abbreviates the real command 
+   "chop", not a script command like "canoodle").
+
+Variables:
+  &c%actor%&0 - The person who issued the command.
+  &c%cmd&0 - The command (without arguments) as typed.
+  &c%arg%&0 - The arguments typed with the command (if any).
+
+See also: TOGGLE
+#d
 DG_CAST
 
 EmpireMUD does not use the "dg_cast" command because it doesn't have CircleMUD-
@@ -13,7 +41,26 @@ Because EmpireMUD's world is so large, you should use Global triggers sparingly
 and not on things that spawn on the map. Also consider having the script
 detach any random trigger that's no longer needed.
 
-See also: DETATCH, RANDOM TRIGGER
+See also: DETACH, RANDOM TRIGGER
+#d
+"GREET TRIGGER" "MTRIG GREET" "VTRIG GREET" TRIGEDIT-MOB-GREET TRIGEDIT-VEH-GREET GREET "GREET ALL TRIGGER" "MTRIG GREET ALL" TRIGEDIT-MOB-GREET-ALL GREET-ALL TRIGEDIT-MOB-GREETALL
+
+Argument type:  percent chance to execute
+Return value:  return 0 to attempt to block entry and send the actor back
+
+When a character attempts to enter a room, it executes all the Greet triggers
+in that room. Some types of entry, like normal movement, can be prevented by
+returning 0 from the script.
+
+Note: Mobs can only Greet people they can see; use Greet All to also trigger on
+   people the mob can't see. Vehicle triggers do not make this distinction.
+Note: Players entering magically (or via something other than a normal room
+   exit) may not be prevented from entering. You can usually check this by
+   seeing if the %direction% variable is empty.
+
+Variables:
+  &c%actor%&0 - The character entering the room.
+  &c%direction%&0 - The direction the character came from, if any.
 #d
 "RANDOM TRIGGER" "MTRIG RANDOM" "OTRIG RANDOM" "RTRIG RANDOM" "VTRIG RANDOM" TRIGEDIT-MOB-RANDOM TRIGEDIT-OBJ-RANDOM TRIGEDIT-ROOM-RANDOM TRIGEDIT-VEH-RANDOM RANDOM-TIMING TIMING
 
@@ -68,6 +115,21 @@ The following is a list of special commands that can be used in triggers:
 See the specific help files for those commands for more information.
 
 See also: MTRIG COMMANDS, OTRIG COMMANDS, RTRIG COMMANDS, VTRIG COMMANDS
+#d
+"SPEECH TRIGGER" "MTRIG SPEECH" "RTRIG SPEECH" "VTRIG SPEECH" TRIGEDIT-MOB-SPEECH TRIGEDIT-ROOM-SPEECH TRIGEDIT-VEH-SPEECH
+
+Argument type:  the phrase (whole string) or word list to match
+
+Speech triggers occur when someone in the room says the phrase (or one of the
+words in a word list) using the normal "say" command. This is can be used to
+add riddle quests, to make doors activate on command ("open sesame"), or to
+add other types of interactions to the game.
+
+Note: Objects cannot have speech triggers, but mobs, rooms, and vehicles can.
+
+Variables:
+  &c%actor%&0 - The character whose speech activated the trigger.
+  &c%speech%&0 - The entire phrase spoken.
 #d
 TODO
 
@@ -710,40 +772,6 @@ Numeric Arg : percent chance this trigger will be activated.
 Variables:
 %room%     - the room it was activated on.
 #d
-TRIGEDIT-ROOM-COMMAND
-
-Activates when commands are performed in the room.
-Does not work for immortals with !hassle.
-
-String: The command to catch. If you are using a real game command, put the
-   entire word in here; the trigger will also match abbreviations. If you are
-   instead adding a new command, it will only work if the player types an exact
-   match OR the player abbreviates your command with something that isn't an
-   abbreviation for a real command ("c" abbreviates the real command "chop", 
-   not a script command like "canoodle").
-
-If 0 is returned by the trigger, character will receive the same message as 
-if the trigger did not exist, and any other command triggers will be checked.
-
-Variables:
-%actor% - the character issuing the command
-%cmd%   - the exact command (without arguments) issued
-%arg%   - the arguments, if any, following the command
-#d
-TRIGEDIT-ROOM-SPEECH
-
-Activates when matching text is spoken by a character in the room
- 
-Numeric Arg : 0: argument is a substring that must be found in the speech to cause a
-                 match. 
-              1: argument is a list of words, any of which found in the speech will
-                 activate the trigger.
-Argument    : a phrase or wordlist to be matched.
-
-Variables:
-%actor%  - the character whose speech activated the trigger
-%speech% - the entire phrase spoken
-#d
 TRIGEDIT-ROOM-ZONE-RESET TRIGEDIT-ROOM-ZRESET TRIGEDIT-ROOM-LOAD
  
 Activated when the zone this room belongs to is reset.
@@ -822,97 +850,6 @@ Variables:
 %actor%     - the character using the command. 
 %direction% - the direction the command is used on. 
 %cmd%       - the specific command activating the trigger  
-#d
-TRIGEDIT-MOB-COMMAND
-
-Activates when commands are performed in the same room as the mobile.
-Does not work for immortals with !hassle.
-
-String: The command to catch. If you are using a real game command, put the
-   entire word in here; the trigger will also match abbreviations. If you are
-   instead adding a new command, it will only work if the player types an exact
-   match OR the player abbreviates your command with something that isn't an
-   abbreviation for a real command ("c" abbreviates the real command "chop", 
-   not a script command like "canoodle").
-
-If 0 is returned by the trigger, character will receive the same message as 
-if the trigger did not exist, and any other command triggers will be checked.
-
-Variables:
-%actor% - the character issuing the command
-%cmd%   - the exact command (without arguments) issued
-%arg%   - the arguments, if any, following the command
-#d
-TRIGEDIT-MOB-SPEECH
-
-Activates when matching text is spoken by a character in the same room as the 
-mobile.
- 
-Numeric Arg : 0: argument is a substring that must be found in the speech to cause a
-                 match. 
-              1: argument is a list of words, any of which found in the speech will
-                 activate the trigger.
-Argument    : a phrase or wordlist to be matched. Use * to make it match any
-              speech.
-
-Variables:
-%actor%  - the character whose speech activated the trigger
-%speech% - the entire phrase spoken
-#d
-TRIGEDIT-MOB-ACTION ACTIONS
-
-Activated when a matching action is performed by a character in the room. 
-Actions are any text output via the act() function, and include most output 
-from the mud. (Notable exclusions are character say's, and immortal echo's.) 
- 
-Numeric Arg : 0: argument is a substring that must be found in the text to cause a
-                 match. 
-              1: argument is a list of words, any of which found in the text will
-                 activate the trigger.
-Argument    : a phrase or wordlist to be matched.
-
-Variables:
-%actor%  - the character causing the trigger to activate
-%victim% - the character, if any, on the receiving end of the action 
-%object% - the object, if any, used in the action
-%target% - the target of the action, if any
-%arg%    - the entire phrase
-#d
-TRIGEDIT-MOB-DEATH
-
-Activated when this mobile dies.
- 
-Numeric Arg : percent chance this trigger will be activated upon the mobile's death.
-Argument    : not used.
-
-If used with a return 0 no death cry will be heard from the mobile.
-
-Variables:
-%actor% - the character killing this mob, if any
-#d
-TRIGEDIT-MOB-GREET GREET
-
-Activated when a player attempts to enter the room and the character is visible 
-to the mobile with this trigger. Does not work for poofins.
- 
-Numeric Arg : percent chance this trigger will be activated.
-Argument    : not used.
-
-Variables:
-%actor%     - the character entering the room
-%direction% - the direction the character came from
-#d
-TRIGEDIT-MOB-GREET-ALL GREET-ALL TRIGEDIT-MOB-GREETALL 
- 
-Identical to greet except the mobile does not have to see the entering character 
-for this trigger to activate. Does not work for poofins.
- 
-Numeric Arg : percent chance this trigger will be activated.
-Argument    : not used.
-
-Variables:
-%actor%     - the character entering the room
-%direction% - the direction the character came from
 #d
 TRIGEDIT-MOB-ENTRY ENTRY TRIGEDIT-ENTRY TRIGGER-ENTRY 
 
@@ -1031,41 +968,6 @@ Variables:
 %actor%     - the character using the command. 
 %direction% - the direction the command is used on. 
 %cmd%       - the specific command activating the trigger  
-#d
-TRIGEDIT-OBJ-COMMAND TRIGEDIT-OBJECT-COMMAND TRIG-OBJ-COMMAND
-
-Activates when commands are performed in the same room as the object.
-Does not work for immortals with !hassle.
-
-Location: Where the item must be in order to trigger (inventory, worn, room).
-String: The command to catch. If you are using a real game command, put the
-   entire word in here; the trigger will also match abbreviations. If you are
-   instead adding a new command, it will only work if the player types an exact
-   match OR the player abbreviates your command with something that isn't an
-   abbreviation for a real command ("c" abbreviates the real command "chop", 
-   not a script command like "canoodle").
-
-If 0 is returned by the trigger, character will receive the same message as 
-if the trigger did not exist, and any other command triggers will be checked.
-
-Variables:
-%actor% - the character issuing the command
-%cmd%   - the exact command (without arguments) issued
-%arg%   - the arguments, if any, following the command
-#d
-TRIGEDIT-OBJ-TIMER
- 
-Activated when the timer for this object has expired. The otimer command may 
-be used in a script to set the object's timer. Timer value of 1 equals about
-1 minute. 
- 
-Numeric Arg : not used.
-Argument    : not used.
-
-If 0 is returned by the trigger, or the object is purged, it will block further
-execution and the normal object decay extraction. If you intend for the object
-to become permanent after the timer expires, you should change its timer to -1
-and return 0 from this trigger.
 #d
 TRIGEDIT-ADVANCED
 

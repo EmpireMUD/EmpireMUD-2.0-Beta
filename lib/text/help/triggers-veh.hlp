@@ -8,6 +8,19 @@ See also:
 - List of triggers: &yVTRIG TYPES&0
 - List of commands: &yVTRIG COMMANDS&0
 #d
+"DESTROY TRIGGER" "VTRIG DESTROY" TRIGEDIT-VEH-DESTROY
+
+Argument type:  percent chance to execute
+Return value:  return 0 to prevent the vehicle's destruction
+
+The Destroy trigger is called when a vehicle would be destroyed by siege
+damage, burning, or lack of maintenance. You can prevent this destruction by
+returning 0 from the script (which will restore 1 health point and put out any
+fire).
+
+Use the "return 0" option cautiously, as this may make the vehicle
+indestructible.
+#d
 "VTRIG COMMANDS" "VEHICLE COMMANDS" TRIGEDIT-VEH-COMMANDS
 
 The following commands are available in vehicle triggers (see their individual
@@ -88,7 +101,7 @@ When using field  - The variable returns:
 &crooms&0 - The number of added rooms (not counting the base interior room).
 &cshortdesc&0 - The vehicle's short description (the name the players see).
 &csitting_in&0 - The person who's sitting in/on the vehicle, if any.
-&cunharness&0 - Detatches all mobs that were harnessed to it.
+&cunharness&0 - Detaches all mobs that were harnessed to it.
 &cvnum&0 - The vehicle's vnum.
 
 See also: VEDIT FLAGS

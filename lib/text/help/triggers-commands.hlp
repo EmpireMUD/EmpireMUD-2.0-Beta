@@ -59,7 +59,7 @@ This command allows a script to attach a trigger (referenced by vnum) to
 anything capable of receiving triggers, by id number. (%self.id%, %object.id%,
 and %actor.id% are examples of id numbers, for use with this command.)
 
-See also: DETACH, TATTACH, TDETATCH
+See also: DETACH, TATTACH, TDETACH
 #d
 %BUILDINGECHO% %ECHO% %ECHOAROUND% %ECHONEITHER% %VEHICLEECHO% %SEND% BUILDINGECHO VEHICLEECHO %ZECHOAROUND% ECHOAROUND TRIG-SEND
 

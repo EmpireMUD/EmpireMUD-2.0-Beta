@@ -8,6 +8,36 @@ See also:
 - List of triggers: &yMTRIG TYPES&0
 - List of commands: &yMTRIG COMMANDS&0
 #d
+"ACT TRIGGER" "MTRIG ACT" TRIGEDIT-MOB-ACT TRIGEDIT-MOB-ACTION
+
+Argument type:  the phrase (whole string) or word list to match
+
+The Act trigger occurs when someone performs a matching action in the same room
+as the mob who has the trigger. It can match either a phrase (which must be
+contained in the action text), or match any word from a word list.
+
+Note: Act triggers can only match things passed through the code's act()
+   function, which includes MOST game text that gets sent to the room. If you
+   find that you can't get a trigger to respond to action text, consult a
+   programmer about looking into how that text is being sent.
+ 
+Variables:
+  &c%actor%&0 - The character causing the trigger to activate.
+  &c%victim%&0 - The character, if any, on the receiving end of the action.
+  &c%object%&0 - The object, if any, used in the action.
+  &c%target%&0 - The target object of the action, if any.
+  &c%arg%&0 - The entire action phrase that was seen.
+#d
+"DEATH TRIGGER" "MTRIG DEATH" TRIGEDIT-MOB-DEATH
+
+Argument type:  percent chance to execute
+Return value:  return 0 to prevent the mob's death cry
+
+This type of trigger fires when the mob dies (but not when if it is purged).
+
+Variables:
+  &c%actor%&0 - The character killing this mob, if any.
+#d
 "MTRIG COMMANDS" "MOB COMMANDS" TRIGEDIT-MOB-COMMANDS
 
 Mobs can use any normal player commands in their triggers (except a few which

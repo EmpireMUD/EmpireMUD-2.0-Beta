@@ -86,4 +86,15 @@ When using field  - The variable returns:
 
 See also: OEDIT FLAGS
 #d
+"TIMER TRIGGER" "OTRIG TIMER" TRIGEDIT-OBJ-TIMER
+
+Return value:  return 0 to prevent the object from decaying normally
+
+Timer triggers occur when an object's timer expires, right before the object
+would be extracted. If you want to prevent the object's extraction, you should
+use the "otimer" command to change its timer to -1 (infinite) or to a new
+positive value, then return 0 from the script.
+
+See also: OTIMER
+#d
 $~
