@@ -102,21 +102,6 @@ Variables:
   &c%direction%&0 - The direction the command is used on.
   &c%cmd%&0 - The specific command activating the trigger.
 #d
-TRIGEDIT-MOB-DOOR 
- 
-Activated when the mobile is in the same room as someone using the door
-specific commands 'close, open, pick, lock, unlock' on a door. 
-
-Used with return 0 will prevent the command from executing.
-
-Numeric Arg : percent chance this trigger will be activated. 
-Argument    : not used.
-
-Variables:
-%actor%     - the character using the command. 
-%direction% - the direction the command is used on. 
-%cmd%       - the specific command activating the trigger  
-#d
 "DROP TRIGGER" "OTRIG DROP" "RTRIG DROP" TRIGEDIT-OBJ-DROP TRIGEDIT-ROOM-DROP DROP-TRIGGER TRIG-OBJ-DROP TRIG-ROOM-DROP
 
 Drop (trigger)
@@ -183,6 +168,38 @@ Note: Players entering magically (or via something other than a normal room
 Variables:
   &c%actor%&0 - The character entering the room.
   &c%direction%&0 - The direction the character came from, if any.
+#d
+IF ELSEIF END "ELSE IF" ELSIF
+
+if (expression)
+  ...
+elseif (expression)
+  ...
+else
+  ...
+end
+
+An 'if' must occur before any elseif or else. If expression evaluates to true 
+(&yHELP EXPRESSIONS&0), the statements between the if statement and the next 
+elseif, else, or end are executed. If it stopped at an elseif or else, it scans 
+for the next end, and continues execution at that point. If the expression 
+evaluated to false, it searches for the next elseif, else, or end. If it finds 
+an elseif, it checks that expression. If it is true, it executes the statements 
+between the elseif and the next elseif, else, or end, and then finds the end of
+the block. If it is false, it continues searching in the same pattern, until a 
+true elseif is found, an else is found, or an end is found. There may be at
+most 1 else statement but as many elseif statements as you like in the block.
+
+*** EVERY IF NEEDS AN END; 2 IFs NEED 2 ENDs ***
+
+Example:
+if (%actor.is_pc%) 
+  %echo% You are a player
+else 
+  %echo% You are a mob.
+end
+
+See also: EXPRESSIONS, NESTED
 #d
 "LEAVE TRIGGER" "LEAVE-ALL TRIGGER" "MTRIG LEAVE" "OTRIG LEAVE" "RTRIG LEAVE" "VTRIG LEAVE" "MTRIG LEAVE ALL" TRIGEDIT-MOB-LEAVE TRIGEDIT-OBJ-LEAVE TRIGEDIT-ROOM-LEAVE TRIGEDIT-VEH-LEAVE TRIGEDIT-MOB-LEAVE-ALL
 
@@ -300,6 +317,23 @@ Note: Objects cannot have speech triggers, but mobs, rooms, and vehicles can.
 Variables:
   &c%actor%&0 - The character whose speech activated the trigger.
   &c%speech%&0 - The entire phrase spoken.
+#d
+WHILE DONE
+
+Usage:  while <expression>
+        done
+
+The "while" command starts a loop, running until the expression becomes zero 
+or negative. This can make infinite loops - be careful. There is a limit on
+how many times a loop can execute in one trigger, to prevent that.
+
+The "done" command is used to terminate a switch or while.
+
+while %something%
+  ...
+done
+
+See also: SWITCH
 #d
 TODO
 
@@ -486,37 +520,6 @@ say do you mean %testvar4% %testvar3% %testvar2% %testvar1% ?
    Place a specific word from the 'from-text' into a new or existing variable 
 'to-variable'. Do not enclose the name of the to-variable in %'s.
 #d
-IF ELSEIF END "ELSE IF" ELSIF
-
-if (expression)
-  ...
-elseif (expression)
-  ...
-else
-  ...
-end
-
-if (%actor.is_pc%) 
-  %echo% You are a player
-else 
-  %echo% You are a mob.
-end
-
-   An 'if' must occur before the other three. If expression evaluates to true 
-(HELP EXPRESSIONS), the statements between the if statement and the next 
-elseif, else, or end are executed. If it stopped at an elseif or else, it scans 
-for the next end, and continues execution at that point. If the expression 
-evaluated to false, it searches for the next elseif, else, or end. If it finds 
-an elseif, it checks that expression. If it is true, it executes the statements 
-between the elseif and the next elseif, else, or end, and then finds the end of
-the block. If it is false, it continues searching in the same pattern, until a 
-true elseif is found, an else is found, or an end is found. There may be 0 or 
-1 else statements and 0 or many elseif statements in the block.
-
-***EVERY IF NEEDS AN END: 2 IFs NEED 2 ENDS....***
-
-See also: EXPRESSIONS, NESTED
-#d
 NESTED-IFS
 
    A nested if is an if statement contained within another if or if...else 
@@ -611,18 +614,6 @@ command does not end the trigger's execution. The value is returned after all
 the commands have been executed, or a wait or halt command is called.
 
 See also: HALT, WAIT
-#d
-WHILE DONE
-
-Usage:  while expression
-
-   The while command starts a loop, running until the expression becomes zero 
-or negative. This can make permanent loops - be careful. The switch block must 
-be terminated by a done. While loops are disabled after looping 100 times.
-
-while %something%
-  ...
-done
 #d
 WAIT WAITUNTIL WAIT-UNTIL PAUSE TRIGEDIT-TIMING TIMING
 
