@@ -102,6 +102,28 @@ COMMENT * "TRIGEDIT COMMENT"
 NOTE: Some flags are named * or start with a *; these are flags that cannot be
 set by builders. They are used for internal functions only, or not used at all.
 #d
+CONTEXT
+
+Usage:  context <number>
+
+Changes the "context" of a script to this value. When first run, a script's 
+context is 0. When a variable is made global, it is given the current context. 
+When a variable is accessed, if it must be searched for globally, a "found" 
+variable must either have context 0 or the current context. The net result of 
+this is you may have many global variables in a single script, with the same 
+name, differing only by context. Players may have variables; this mostly 
+removes the need for variable context.
+
+Example:
+* This little script will make sure one %has_said_hello% exist for each player.
+context %actor.id%
+set has_said_hello 1
+global has_said_hello
+* now only scripts running with context = %actor.id% can access this particular 
+* variable. however - it's a better idea to use vars set on players: help remote.
+
+See also: REMOTE
+#d
 %DAMAGE% ODAMAGE MDAMAGE WDAMAGE VDAMAGE
 
 %damage% <victim> [modifier] [damage type]
@@ -120,6 +142,24 @@ Examples:
   %damage% %actor% %random.100%  - cause 1-100% scaled damage randomly
 
 See also: DEATH, %AOE%, %DOT%, %SIEGE%
+#d
+DG_AFFECT DG_AFFECTS
+
+Usage:  dg_affect <target> <property> <value> <duration>
+
+Puts an affection or apply on the target. Durations must be non-zero. You can
+use -1 for infinite duration ONLY if the target is an NPC.
+
+Examples:
+  dg_affect %actor% HASTE on 20  -- Sets haste on actor for 20 seconds.
+  dg_affect %actor% DODGE 100 20  -- Sets dodge on actor +100 for 20 seconds.
+
+See also: APPLIES, AFFECTS
+#d
+DG_CAST
+
+EmpireMUD does not use the "dg_cast" command because it doesn't have CircleMUD-
+style spells. Instead, mobs can use most player abilities directly at no cost.
 #d
 %DOOR% MDOOR ODOOR VDOOR WDOOR TRIGEDIT-EXIT TRIG-EXIT 
 
@@ -156,6 +196,39 @@ NOTE: If you want to use max stacks, you must also provide the damage type.
 
 See also: %DAMAGE%, %AOE%, %SIEGE%
 #d
+EVAL
+
+Usage:  eval <variable> <expression>
+
+The eval command is used to set (or create) the specified variable equal to 
+the result of the immediate evaluation of the provided expression. There also 
+exists a "set" command, with the same syntax. Set differs in that the expression
+is not evaluated until each time the variable is accessed.
+
+Example:
+* this example immediately evaluates the expression below and stores the result
+* in %result%:
+eval result %self.health% * 100 / %self.maxhealth% 
+say My hitpoint percentage is %result%.
+* this result will not change after the evaluation even if %self.health% changes.
+
+See also: TRIG-SET
+#d
+EXTRACT
+
+Usage:  extract <to variable> <word number> <from text>
+
+Place a specific word from the 'from-text' into a new or existing variable. Do
+not enclose the name of the to-variable in %'s.
+
+Example:
+* could be used to do strange things to what people say:
+extract testvar1 1 %speech%
+extract testvar2 2 %speech%
+extract testvar3 3 %speech%
+extract testvar4 4 %speech%
+say do you mean %testvar4% %testvar3% %testvar2% %testvar1% ?
+#d
 %FORCE% MFORCE OFORCE VFORCE WFORCE TRIGEDIT-FORCE TRIG-FORCE
 
 %force% <victim> <command>
@@ -169,6 +242,72 @@ room, then makes him look to see the description:
   %echo% A powerful force drags you down.
   %teleport% %actor% 3001
   %force% %actor% look
+#d
+"GLOBAL VARIABLES" GLOBALS GLOBAL-VARIABLES GLOBAL-VARS GVARS
+
+Usage:  global <variablename>
+
+Used to change a variable from local to global. If a global variable is 
+modified, this command must be used to update the global contents as well.
+Global variables aren't quite as global as they sound; they are stored to the
+room in which the script is executing, where they are available to other
+scripts running in the same room.
+
+Example:
+* To make a variable 'reachable' from other scripts it has to be made 'global'. 
+* In this case I make a local known var %has_bribed_guard% and make it global. 
+* It's a good idea to use this in conjunction with context.
+global has_bribed_guard
+
+See also: VARIABLES, CONTEXT
+#d
+HALT
+
+Usage:  halt
+
+Halt terminates the trigger execution. early.
+
+Example:
+* This script attacks players of level 20 and above. The reason for the use of 
+* halt and return 0 is to make sure other scripts are checked too.
+if %actor.level% < 20
+  return 0
+  halt
+end
+%echo% %self.name% yells a Battlecry and throws himself at you.
+mkill %actor%
+#d
+IF ELSEIF END "ELSE IF" ELSIF
+
+if (expression)
+  ...
+elseif (expression)
+  ...
+else
+  ...
+end
+
+An 'if' must occur before any elseif or else. If expression evaluates to true 
+(&yHELP EXPRESSIONS&0), the statements between the if statement and the next 
+elseif, else, or end are executed. If it stopped at an elseif or else, it scans 
+for the next end, and continues execution at that point. If the expression 
+evaluated to false, it searches for the next elseif, else, or end. If it finds 
+an elseif, it checks that expression. If it is true, it executes the statements 
+between the elseif and the next elseif, else, or end, and then finds the end of
+the block. If it is false, it continues searching in the same pattern, until a 
+true elseif is found, an else is found, or an end is found. There may be at
+most 1 else statement but as many elseif statements as you like in the block.
+
+*** EVERY IF NEEDS AN END; 2 IFs NEED 2 ENDs ***
+
+Example:
+if (%actor.is_pc%) 
+  %echo% You are a player
+else 
+  %echo% You are a mob.
+end
+
+See also: EXPRESSIONS, NESTED-IFS
 #d
 %LOAD% MLOAD OLOAD VLOAD WLOAD
 
@@ -195,6 +334,60 @@ Valid wear positions are: head, ears, neck1, neck2, clothes, armor, about,
 arms, wrists, hands, rfinger, lfinger, waist, legs, feet, pack, saddle,
 sheath1, sheath2, wield, ranged, hold, shared
 #d
+MAKEUID
+
+Usage:  makeuid <variable> <id>
+        makeuid <variable> room [room location]
+        makeuid <variable> mob <target>
+        makeuid <variable> obj <target>
+        makeuid <variable> vehicle <target>
+
+Creates a new variable with the name given, whose contents shall be suitable 
+for referring to a character, object, or room whose id is provided.
+
+Example:
+  * We have one mob giving a quest. This mob sets the targets id as a global on 
+  * the player via the 'remote' command, like this:
+  eval quest_object %obj.id%
+  remote quest_object %actor.id%
+  * We then have another mob receiving the quest object, with the following script.
+  if !(%actor.varexists(quest_object)%)
+    return 0
+    halt
+  end
+  * now we know the player has a quest_object variable
+  makeuid obj %actor.quest_object%
+  say Have you brought me %obj.shortdesc%, %actor.name% ?
+  say You must bring it to me to complete your quest, you know.
+#d
+NESTED-IFS NESTING
+
+A "nested if" is an if statement contained within another if or if/else 
+statement. Nested if's allow the creation of a decision tree or flow chart
+of events with multiple conclusions. 
+
+Always use /f to format and indent your trigger. This will warn you if you do
+not have the correct number of ifs to ends. WARNING: Running scripts with
+multiple unmatched if/ends could cause serious side effects. Make sure
+everything lines up with /f before you test.
+#d
+NOP
+
+Usage:  nop <anything>
+
+Almost a no-operation. Certain variable/subfield combinations for characters 
+change some attribute about the character. Nop allows those changes to be used 
+legally on lines that do not need to process the result.
+
+Examples:
+  * this will award the actor with 10 coins
+  nop %actor.give_coins(10)%
+
+Here is a workaround to use a variable:
+  *nop workaround
+  eval making %%self.give_coins(%coins%)%%
+  nop %making%
+#d
 %PURGE% MPURGE OPURGE VPURGE WPURGE
 
 %purge% <victim | obj | vehicle>
@@ -210,6 +403,19 @@ Examples:
   %purge% %actor.eq(hold)%
 
 See also: POSITIONS
+#d
+RDELETE
+
+Usage:  rdelete <variable> <id>
+
+Delete a remote variable from the script referred to by the id of its owner.
+
+Example:
+  * This is used to remove a variable
+  say Thank you, %actor.name% - your quest is completed.
+  rdelete quest_object %actor.id%
+
+See also: VDELETE, REMOTE
 #d
 %REGIONECHO% MREGIONECHO OREGIONECHO WREGIONECHO
 
@@ -227,6 +433,39 @@ Examples:
   %regionecho% %self.room% -50 A pegasus flies overhead.
 
 See also: %ECHO%
+#d
+REMOTE
+
+Usage:  remote <variable> <id>
+
+Remoting a variable saves that variable to the player file for future access.
+The variable must first exist in the script (but don't put % signs around its
+name in this command). This is used heavily for quests to limit a player to
+only performing it once.
+
+You can see if a person has a remote variable using %actor.varexists(varname)%
+and access it using %actor.varname%.
+
+Example:
+  * setting the variable to 1 means completed.
+  set solved_example_quest_zone_14 1
+  remote solved_example_quest_zone_14 %actor.id%
+
+See also: CONTEXT, MTRIG VARS, RDELETE, VDELETE, TRIG-SET
+#d
+"RETURN STATEMENT" TRIG-RETURN
+ 
+Usage:  return 0
+ 
+Return sets the return value of the trigger. Normally, a script will return
+1, unless return 0 is specified. Unlike most computer languages, the return
+command does NOT end the trigger's execution. The value is returned after all
+the commands have been executed, or a wait or halt command is called.
+
+The help files for individual trigger types will explain what happens when the
+script returns 0, if anything.
+
+See also: HALT, WAIT
 #d
 %SCALE% MSCALE OSCALE VSCALE WSCALE
 
@@ -246,6 +485,25 @@ scaled. This would result in the original item being purged.
 Examples: 
   %scale% bag 100
   %scale% sword %actor.level%
+#d
+"SET VARIABLE" TRIG-SET "TRIGGER SET" "SCRIPT SET"
+
+Usage:  set <variable> <value>
+
+The set command is used to set (or create) the specified variable equal to 
+the provided expression, which will be evaluated when the variable is accessed. 
+There also exists an "eval" command, with the same syntax. Eval differs in that 
+the expression is evaluated immediately.
+
+Example:
+* this example sets the value of result to '%self.health% * 100 / %self.maxhealth%'
+set result %self.health% * 100 / %self.maxhealth% 
+* The %result% var now works as a 'function' every time it's accessed.
+say My hitpoint percentage is %result%.
+%damage% %self% 30
+say My hitpoint percentage is %result%.
+
+See also: EVAL
 #d
 %SIEGE% MSIEGE OSIEGE VSIEGE WSIEGE
 
@@ -379,5 +637,89 @@ transformations may be performed. No message regarding the transformation is
 sent to the room. The new object will have the same script as the originating 
 object, rather than any script normally assigned to the new object, and no 
 load trigger will be executed.
+#d
+UNSET
+
+Usage:  unset <variable>
+
+Remove the variable from the global variables of this script, or if not 
+found there, from the script.
+Example:
+* in this example we have a var %testvar% we no longer need:
+set testvar hops happily along
+%echo% %self.name% %testvar%
+unset testvar
+* please note - if we had made the var global, that would be gone instead.
+
+See also: TRIG-SET, EVAL
+#d
+VDELETE
+
+Usage:  vdelete <variablename> <id>
+
+Use this to remove a variable from either mob, room, obj, or player.
+
+Examples:
+  vdelete has_solved_quest 5351
+
+To determine the player ID, stat player:
+  > stat file test
+  male PC 'Test'  IDNum: [ 3531], In room [    0]
+
+See also: REMOTE, RDELETE
+#d
+WAIT WAITUNTIL WAIT-UNTIL PAUSE TRIGEDIT-TIMING TIMING
+
+Usage:  wait <time> [s]
+        wait until <mudtime>
+
+The wait statement is used to 'pause' the script execution for a period of 
+time. When a script is being executed it will attempt to execute all commands 
+right away. To get small breaks in, and perhaps give the players time to adjust, 
+use the wait command.
+
+Note: A trigger won't fire again while it's still in a 'wait', so be careful
+using this on Greet triggers.
+
+Examples:
+  say GET OUT! NOW!
+  wait 10 s
+  mkill %actor%
+
+  * If you want to synchronise your script, you can use the 'wait until'
+  * feature. This script wakes the mob at dawn, and puts him to sleep at night.
+  wait until 8:00
+  wake
+  * wait # without seconds following it will wait 10 ticks, which is very quick
+  wait 10 
+  yawn
+  wait 10
+  stand
+  * This one uses wait 10 seconds. Recommend you always use seconds
+  wait 10 sec
+  emote looks sleepy.
+  wait until 21:00
+  yawn
+  wait 10 s
+  rest
+  wait 10 s
+  sleep
+#d
+WHILE DONE
+
+Usage:  while <expression>
+        done
+
+The "while" command starts a loop, running until the expression becomes zero 
+or negative. This can make infinite loops - be careful. There is a limit on
+how many times a loop can execute in one trigger, to prevent that.
+
+The "done" command is used to terminate a switch or while.
+
+while %something%
+  ...
+done
+
+See also: SWITCH
 #d
 $~

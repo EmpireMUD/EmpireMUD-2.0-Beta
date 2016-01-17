@@ -97,6 +97,86 @@ MUST have a memory script, even if it will never be called.
 Variables:
   &c%actor%&0 - The character being remembered.
 #d
+MFOLLOW %FOLLOW% TRIG-FOLLOW
+
+Usage:  mfollow <victim>
+
+The mobile will begin following the victim without the revealing "starts
+following you" message. A silent follow.
+
+Note: You must use "mfollow" (not "%follow%") for this.
+#d
+MFORGET MREMEMBER %FORGET% %REMEMBER%
+
+Usage:  mremember <victim> [command]
+        mforget <victim>
+
+Mremember places the victim into the mob's memory list, and will run Memory
+triggers each time the mob meets the victim. You can also provide a command
+which will be run next time the mob sees the player.
+
+Mforget removes a character from the memory list, which also happens
+automatically after a Memory trigger or mremember'd command occurs.
+
+Note: Any mob using the mremeber command MUST have a Memory trigger attached. 
+   It doesn't matter if the Memory trigger is never called (0% chance).
+Note: You must use "mremember" and "mforget" (not like "%remember%") for this.
+
+See also: MTRIG MEMORY
+#d
+MGOTO %GOTO%
+
+Usage:  mgoto <target>
+
+This command moves the mob to the given target. The target may be an object,
+room, vehicle, or character. No message is given on either end.
+
+You can use i### to target a room in the mob's current adventure instance by
+its room template vnum instead of live room number (if used in an instanced
+zone).
+
+Note: You must use "mgoto" (not "%goto%") for this.
+
+Examples:
+  mgoto 1233
+  mgoto Rumble
+  mgoto fountain
+#d
+MHUNT %HUNT% HUNT 
+
+Usage:  mhunt <victim>
+
+The mobile will begin to hunt for victim, and engage in combat upon finding 
+them. Only Mobiles may use this command. Hunting mobs will walk through !MOB
+rooms.
+
+Note: You must use "mhunt" (not "%hunt%") for this.
+#d
+MJUNK %JUNK%
+
+Usage:  mjunk <object | all>
+   
+The object in the mob's inventory specified is removed from the game. 
+'Mjunk all' removes all of the objects in the mob's inventory. No message 
+is sent by this command.
+
+Note: You must use "mjunk" (not "%junk%") for this.
+
+See also: %PURGE%
+#d
+MKILL %KILL%
+
+Usage:  mkill <victim>
+
+Mkill causes the mob to hit the victim. It is the same as kill, except mkill 
+works in cases where kill might not. It can also be used to change targets in
+a group fight.
+
+Note: You must use "mkill" (not "%kill%") for this.
+
+Example:
+  mkill %actor%
+#d
 "MTRIG COMMANDS" "MOB COMMANDS" TRIGEDIT-MOB-COMMANDS
 
 Mobs can use any normal player commands in their triggers (except a few which

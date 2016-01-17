@@ -48,6 +48,28 @@ Variables:
   &c%actor%&0 - The character giving away the object.
   &c%victim%&0 - The potential recipient of the object.
 #d
+OSETVAL %SETVAL%
+
+Usage:  osetval <position> <value>
+
+Osetval lets you alter the three numeric object values (of the object running
+the script). The meaning of the values depends on the object type.
+
+Value position numbers are: 0, 1, 2
+
+Note: You must use "osetval" (not "%setval%") for this.
+
+See also: OBJECT VALUES
+#d
+OTIMER %TIMER% 
+
+Usage:  otimer <value>
+
+Set the decay timer of this object to value. Useful for objects with timer
+triggers. Setting the timer to -1 makes it never decay.
+
+Note: You must use "otimer" (not "%timer%") for this.
+#d
 "OTRIG COMMANDS" "OBJECT COMMANDS" TRIGEDIT-OBJ-COMMANDS
 
 The following commands are available in object triggers (see their individual
