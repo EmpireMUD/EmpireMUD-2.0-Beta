@@ -509,7 +509,7 @@ char compute_slash_channel_color(char *name) {
 		sum += (int)(*ptr);
 	}
 	
-	// just basically pick a number between 1 and 6 (for color codes) based on the sum
+	// choose a position in the color code list based on the sum
 	return colors[sum % strlen(colors)];
 }
 
