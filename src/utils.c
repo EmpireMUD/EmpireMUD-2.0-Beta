@@ -2825,7 +2825,7 @@ char *show_color_codes(char *string) {
 	static char value[MAX_STRING_LENGTH];
 	char *ptr;
 	
-	ptr = str_replace("&", "&&", string);
+	ptr = str_replace("&", "\t&", string);
 	strncpy(value, ptr, MAX_STRING_LENGTH);
 	value[MAX_STRING_LENGTH-1] = '\0';	// safety
 	free(ptr);
