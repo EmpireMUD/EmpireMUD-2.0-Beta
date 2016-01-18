@@ -840,14 +840,19 @@ Using the Sew ability:
 
 See also: SHEAR
 #
-WOODWORKING "WOOD WORKING" "ADVANCED WOODWORKING"
+WOODWORKING "WOOD WORKING"
 
 Woodworking (Trade ability)
 
-With Advanced Woodworking you can craft:
-  beehive*  8 lumber, 2 nails
-  carriage*  24 lumber, 6 nails, 2 ropes
-  wagon*  32 lumber, 8 nails, 12 cloth, 2 ropes
+With Woodworking you can craft:
+  flute  1 lumber               shortbow  1 lumber, small leather
+  lyre  1 lumber                longbow*  1 lumber, small leather
+  stake  1 stick                cart*  16 lumber, 4 nails, 1 rope
+  walking stick  1 stick        lantern*  1 iron ingot, candle, (glassblowing)
+  wooden sword  1 lumber        blank sign*  1 lumber, 1 nails
+  stool*  2 lumber, nails       bench*  4 lumber, nails
+  chair*  2 lumber, nails       table*  4 lumber, nails
+  throne* 8 lumber, 2 nails, 2 cloth
 
 * Crafts marked with an asterisk require the Carpenter building.
 
