@@ -68,6 +68,8 @@ room_data *do_dg_add_room_dir(room_data *from, int dir, bld_data *bld) {
 		++VEH_INSIDE_ROOMS(GET_ROOM_VEHICLE(from));
 		COMPLEX_DATA(new)->vehicle = GET_ROOM_VEHICLE(from);
 		add_room_to_vehicle(new, GET_ROOM_VEHICLE(from));
+		SET_BIT(ROOM_AFF_FLAGS(new), ROOM_AFF_IN_VEHICLE);
+		SET_BIT(ROOM_BASE_FLAGS(new), ROOM_AFF_IN_VEHICLE);
 	}
 	
 	if (ROOM_OWNER(new)) {
