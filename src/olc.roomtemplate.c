@@ -128,6 +128,14 @@ bool audit_room_template(room_template *rmt, char_data *ch) {
 				}
 				break;
 			}
+			case ADV_SPAWN_VEH: {
+				vehicle_data *veh = vehicle_proto(spawn->vnum);
+				if (!veh) {
+					olc_audit_msg(ch, GET_RMT_VNUM(rmt), "Spawn veh %d: No such vehicle", spawn->vnum);
+					problem = TRUE;
+				}
+				break;
+			}
 		}
 	}
 
@@ -617,6 +625,10 @@ void get_spawn_template_name(struct adventure_spawn *spawn, char *save_buffer) {
 			strcpy(save_buffer, skip_filler(get_obj_name_by_proto(spawn->vnum)));
 			break;
 		}
+		case ADV_SPAWN_VEH: {
+			strcpy(save_buffer, skip_filler(get_vehicle_name_by_proto(spawn->vnum)));
+			break;
+		}
 		default: {
 			log("SYSERR: Unknown spawn type %d in get_spawn_template_name", spawn->type);
 			strcpy(save_buffer, "???");
@@ -965,7 +977,9 @@ OLC_MODULE(rmedit_spawns) {
 	extern const char *olc_type_bits[NUM_OLC_TYPES+1];
 
 	room_template *rmt = GET_OLC_ROOM_TEMPLATE(ch->desc);
-	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], num_arg[MAX_INPUT_LENGTH], prc_arg[MAX_INPUT_LENGTH];
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
+	char type_arg[MAX_INPUT_LENGTH], num_arg[MAX_INPUT_LENGTH], prc_arg[MAX_INPUT_LENGTH];
+	char lbuf[MAX_STRING_LENGTH];
 	int num, stype, limit, findtype;
 	struct adventure_spawn *spawn, *temp, *change, *copyfrom = NULL;
 	double prc;
@@ -1039,7 +1053,8 @@ OLC_MODULE(rmedit_spawns) {
 				if (--num == 0) {
 					found = TRUE;
 					
-					msg_to_char(ch, "You remove the spawn info for %s.\r\n", (spawn->type == ADV_SPAWN_MOB ? get_mob_name_by_proto(spawn->vnum) : get_obj_name_by_proto(spawn->vnum)));
+					get_spawn_template_name(spawn, lbuf);
+					msg_to_char(ch, "You remove the spawn info for %s.\r\n", lbuf);
 					REMOVE_FROM_LIST(spawn, GET_RMT_SPAWNS(rmt), next);
 					free(spawn);
 				}
@@ -1071,6 +1086,9 @@ OLC_MODULE(rmedit_spawns) {
 		else if (stype == ADV_SPAWN_OBJ && !obj_proto(vnum)) {
 			msg_to_char(ch, "Invalid object vnum '%s'.\r\n", num_arg);
 		}
+		else if (stype == ADV_SPAWN_VEH && !vehicle_proto(vnum)) {
+			msg_to_char(ch, "Invalid vehicle vnum '%s'.\r\n", num_arg);
+		}
 		else if ((prc = atof(prc_arg)) < .01 || prc > 100.00) {
 			msg_to_char(ch, "Percentage must be between .01 and 100; '%s' given.\r\n", prc_arg);
 		}
@@ -1097,7 +1115,8 @@ OLC_MODULE(rmedit_spawns) {
 				GET_RMT_SPAWNS(rmt) = spawn;
 			}
 			
-			msg_to_char(ch, "You add spawn for %s %s (%d) at %.2f%%, limit %d.\r\n", adventure_spawn_types[stype], stype == ADV_SPAWN_MOB ? get_mob_name_by_proto(vnum) : get_obj_name_by_proto(vnum), vnum, prc, limit);
+			get_spawn_template_name(spawn, lbuf);
+			msg_to_char(ch, "You add spawn for %s %s (%d) at %.2f%%, limit %d.\r\n", adventure_spawn_types[stype], lbuf, vnum, prc, limit);
 		}
 	}
 	else if (is_abbrev(arg1, "change")) {
@@ -1133,9 +1152,13 @@ OLC_MODULE(rmedit_spawns) {
 			else if (change->type == ADV_SPAWN_OBJ && !obj_proto(vnum)) {
 				msg_to_char(ch, "Invalid object vnum '%s'.\r\n", argument);
 			}
+			else if (change->type == ADV_SPAWN_VEH && !vehicle_proto(vnum)) {
+				msg_to_char(ch, "Invalid vehicle vnum '%s'.\r\n", argument);
+			}
 			else {
 				change->vnum = vnum;
-				msg_to_char(ch, "Spawn %d changed to vnum %d (%s).\r\n", atoi(num_arg), vnum, change->type == ADV_SPAWN_MOB ? get_mob_name_by_proto(vnum) : get_obj_name_by_proto(vnum));
+				get_spawn_template_name(change, lbuf);
+				msg_to_char(ch, "Spawn %d changed to vnum %d (%s).\r\n", atoi(num_arg), vnum, lbuf);
 			}
 		}
 		else if (is_abbrev(type_arg, "percent")) {

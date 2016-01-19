@@ -88,6 +88,7 @@ void extract_trigger(trig_data *trig) {
 void extract_script(void *thing, int type) {
 	struct script_data *sc = NULL;
 	trig_data *trig, *next_trig;
+	vehicle_data *veh;
 	char_data *mob;
 	obj_data *obj;
 	room_data *room;
@@ -108,6 +109,12 @@ void extract_script(void *thing, int type) {
 			sc = SCRIPT(room);
 			SCRIPT(room) = NULL;
 			break;
+		case VEH_TRIGGER: {
+			veh = (vehicle_data*)thing;
+			sc = SCRIPT(veh);
+			SCRIPT(veh) = NULL;
+			break;
+		}
 		default: {
 			log("SYSERR: Invalid type called for extract_script()");
 			return;
@@ -119,6 +126,7 @@ void extract_script(void *thing, int type) {
 		char_data *i = character_list;
 		obj_data *j = object_list;
 		room_data *k, *next_k;
+		vehicle_data *v;
 		
 		if (sc) {
 			for ( ; i ; i = i->next)
@@ -126,6 +134,10 @@ void extract_script(void *thing, int type) {
 
 			for ( ; j ; j = j->next)
 				assert(sc != SCRIPT(j));
+			
+			LL_FOREACH(vehicle_list, v) {
+				assert(sc != SCRIPT(v));
+			}
 			
 			HASH_ITER(hh, world_table, k, next_k) {
 				assert(sc != SCRIPT(k));
@@ -161,6 +173,7 @@ void extract_script_mem(struct script_memory *sc) {
 
 void free_proto_script(void *thing, int type) {
 	struct trig_proto_list *proto = NULL, *fproto;
+	vehicle_data *veh;
 	char_data *mob;
 	obj_data *obj;
 	room_data *room;
@@ -195,12 +208,19 @@ void free_proto_script(void *thing, int type) {
 			GET_ADV_SCRIPTS(adv) = NULL;
 			break;
 		}
+		case VEH_TRIGGER: {
+			veh = (vehicle_data*)thing;
+			proto = veh->proto_script;
+			veh->proto_script = NULL;
+			break;
+		}
 	}
 	#if 0 /* debugging */
 	{
 		char_data *i = character_list;
 		obj_data *j = object_list;
 		room_data *k, *next_k;
+		vehicle_data *v;
 		
 		if (proto) {
 			for ( ; i ; i = i->next)
@@ -208,6 +228,10 @@ void free_proto_script(void *thing, int type) {
 
 			for ( ; j ; j = j->next)
 				assert(proto != j->proto_script);
+			
+			LL_FOREACH(vehicle_list, v) {
+				assert(proto != v->proto_script);
+			}
 
 			HASH_ITER(hh, world_table, k, next_k) {
 				assert(proto != k->proto_script);
@@ -244,6 +268,10 @@ void copy_proto_script(void *source, void *dest, int type) {
 			tp_src = ((adv_data*)source)->proto_script;
 			break;
 		}
+		case VEH_TRIGGER: {
+			tp_src = ((vehicle_data*)source)->proto_script;
+			break;
+		}
 	}
 
 	if (tp_src) {
@@ -264,6 +292,10 @@ void copy_proto_script(void *source, void *dest, int type) {
 			}
 			case ADV_TRIGGER: {
 				((adv_data*)dest)->proto_script = tp_dst;
+				break;
+			}
+			case VEH_TRIGGER: {
+				((vehicle_data*)dest)->proto_script = tp_dst;
 				break;
 			}
 		}

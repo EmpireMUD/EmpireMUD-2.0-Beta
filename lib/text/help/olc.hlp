@@ -2519,7 +2519,7 @@ You're standing at the foot of a huge giant!
 
 See also: OLC MOBILES
 #d
-"ADVEDIT SCRIPTS" "MEDIT SCRIPTS" "OEDIT SCRIPTS" "REDIT SCRIPTS"
+"ADVEDIT SCRIPTS" "MEDIT SCRIPTS" "OEDIT SCRIPTS" "REDIT SCRIPTS" "VEDIT SCRIPTS"
 
 Usage:  .script add [position] <trigger vnum>
         .script copy <from type> <from vnum>
@@ -2739,14 +2739,16 @@ If you set more than one message of the same type, one will be chosen at
 random each time.
 
 Message types:
- build-to-char - Shown to the character when the item is built into a building.
- build-to-room - Shown to the room when the item is built into a building.
- instrument-to-char - Shown every few seconds to the person playing the instrument.
- instrument-to-room - Shown every few seconds to the room when someone is playing an instrument.
- eat-to-char - Shown to the person when they eat the item.
- eat-to-room - Shown to the room when a person eats an item.
- craft-to-char - Shown to the actor when building a vehicle ($V for vehicle).
- craft-to-room - Shown to the room when building a vehicle ($V for vehicle).
+ &cbuild-to-char&0 - Shown to the character when the item is built into a building.
+ &cbuild-to-room&0 - Shown to the room when the item is built into a building.
+ &cinstrument-to-char&0 - Shown every few seconds to the person playing the instrument.
+ &cinstrument-to-room&0 - Shown every few seconds to the room when someone is playing an instrument.
+ &ceat-to-char&0 - Shown to the person when they eat the item.
+ &ceat-to-room&0 - Shown to the room when a person eats an item.
+ &ccraft-to-char&0 - Shown to the actor when building a vehicle ($V for vehicle).
+ &ccraft-to-room&0 - Shown to the room when building a vehicle ($V for vehicle).
+ &cwear-to-char&0 - Shown to the person when they wear an item ($p for item).
+ &cwear-to-room&0 - Shown to the room when the person wears an item ($p for item).
 
 See also: OLC OBJECTS
 #d
@@ -3786,12 +3788,12 @@ Usage:  .spawn add <type> <vnum> <percent> <limit>
         .spawn copy <from type> <from vnum>
         .spawn remove <number | all>
 
-Spawn commands cause any OBJ or MOB to load in the room whenever the adventure
-zone is reset (if their percent check passes, and there aren't more than the
-limit).
+Spawn commands cause any OBJ, MOB, or VEH to load in the room whenever the
+adventure zone is reset (if their percent check passes, and there aren't more
+than the limit).
 
 The limit is only for the current instance, so setting a limit of 3 means that
-each copy of this adventure zone can have 3 of the object or mob at a time.
+each copy of this adventure zone can have 3 of the thing at a time.
 
 This is different from the spawn data set on crops, sectors, and buildings.
 
@@ -4140,9 +4142,11 @@ object.
 
 The attach type also determines which event types you can choose.
 
+You can find help files for different triggers at: &yMTRIG&0, &yOTRIG&0, &yRTRIG&0, &yVTRIG&0
+
 See also: OLC TRIGGERS, TRIGEDIT TYPES
 #d
-"TRIGEDIT COMMANDS"
+"TRIGEDIT COMMANDS" TRIGEDIT-COMMANDS TRIG-COMMANDS TRIGGER-COMMANDS TRIGEDIT-COMMANDLISTS
 
 Usage:  .commands
 
@@ -4154,7 +4158,8 @@ The commands are edited in the text editor. When you're done editing the
 commands, you should format them with /f -- this will clean up the code, as
 well as check it to help make sure it will run safely.
 
-See also: OLC TRIGGERS, TEXT EDITOR
+See also: MTRIG COMMANDS, OTRIG COMMANDS, RTRIG COMMANDS, VTRIG COMMANDS
+See also: SCRIPT COMMANDS, OLC TRIGGERS, TEXT EDITOR
 #d
 "TRIGEDIT NAME"
 
@@ -4179,75 +4184,15 @@ it runs.
 
 See also: OLC TRIGGERS
 #d
-"TRIGEDIT TYPES"
+"TRIGEDIT TYPES" TRIGEDIT-TYPES TRIGGER-LIST TRIGGER-TYPES TRIG-TYPES
 
 Usage:  .types [add | remove] <flags>
 
 You can set trigger types this way. These determine which events will set off
 the script. The available types are determined by what the trigger attaches to.
 
-See also: MOB TRIGGER TYPES, OBJ TRIGGER TYPES, ROOM TRIGGER TYPES
+See also: MTRIG TYPES, OTRIG TYPES, RTRIG TYPES, VTRIG TYPES
 See also: OLC TRIGGERS, TRIGEDIT ATTACHES
-#d
-"MOB TRIGGER TYPES" "MOBILE TRIGGER TYPES"
-
-The following triggers are available for mobs:
- Global
- Random
- Command
- Speech
- Act
- Death
- Greet
- Greet-All
- Entry
- Receive
- Fight
- HitPrcnt
- Bribe
- Load
- Memory
- Ability
- Leave
- Leave-All
- Door
-
-See also: OLC TRIGGERS, TRIGEDIT ARGUMENTS, TRIGEDIT NUMARG, TRIGEDIT TYPES
-#d
-"OBJ TRIGGER TYPES" "OBJECT TRIGGER TYPES"
-
-The following triggers are available for objects:
- Global
- Random
- Command
- Timer
- Get
- Drop
- Give
- Wear
- Remove
- Load
- Ability
- Leave
- Consume
-
-See also: OLC TRIGGERS, TRIGEDIT ARGUMENTS, TRIGEDIT NUMARG, TRIGEDIT TYPES
-#d
-"ROOM TRIGGER TYPES" "WORLD TRIGGER TYPES"
-
-The following triggers are available for rooms:
- Global
- Random
- Command
- Speech
- Zone Reset
- Enter
- Drop
- Ability
- Leave
- Door
-
-See also: OLC TRIGGERS, TRIGEDIT ARGUMENTS, TRIGEDIT NUMARG, TRIGEDIT TYPES
 #d
 "#n" "#e" "#a"
 

@@ -656,8 +656,21 @@ void remove_armor_by_type(char_data *ch, int armor_type) {
 * @param int where Any WEAR_x position.
 */
 static void wear_message(char_data *ch, obj_data *obj, int where) {
-	act(wear_data[where].wear_msg_to_room, TRUE, ch, obj, NULL, TO_ROOM);
-	act(wear_data[where].wear_msg_to_char, FALSE, ch, obj, NULL, TO_CHAR);
+	// char message
+	if (has_custom_message(obj, OBJ_CUSTOM_WEAR_TO_CHAR)) {
+		act(get_custom_message(obj, OBJ_CUSTOM_WEAR_TO_CHAR), FALSE, ch, obj, NULL, TO_CHAR);
+	}
+	else {
+		act(wear_data[where].wear_msg_to_char, FALSE, ch, obj, NULL, TO_CHAR);
+	}
+	
+	// room message
+	if (has_custom_message(obj, OBJ_CUSTOM_WEAR_TO_ROOM)) {
+		act(get_custom_message(obj, OBJ_CUSTOM_WEAR_TO_ROOM), TRUE, ch, obj, NULL, TO_ROOM);
+	}
+	else {
+		act(wear_data[where].wear_msg_to_room, TRUE, ch, obj, NULL, TO_ROOM);
+	}
 }
 
 

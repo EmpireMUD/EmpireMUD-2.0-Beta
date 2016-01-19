@@ -13,7 +13,7 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 
-#define DG_SCRIPT_VERSION "DG Scripts 1.0.12 e1"
+#define DG_SCRIPT_VERSION "DG Scripts 1.0.12 e2"
 
 // look for 'x_TRIGGER' for things related to this (I know that's backwards)
 #define MOB_TRIGGER  0
@@ -21,6 +21,7 @@
 #define WLD_TRIGGER  2
 #define RMT_TRIGGER  3
 #define ADV_TRIGGER  4
+#define VEH_TRIGGER  5
 
 /* unless you change this, Puff casts all your dg spells */
 #define DG_CASTER_PROXY 1
@@ -55,6 +56,7 @@
 #define MTRIG_LEAVE_ALL        BIT(18)	// leave even if they can't see
 #define MTRIG_FIGHT_CHARMED    BIT(19)	// fight trigger that fires even while charmed
 
+
 /* obj trigger types */
 #define OTRIG_GLOBAL           BIT(0)	     /* unused                     */
 #define OTRIG_RANDOM           BIT(1)	     /* checked randomly           */
@@ -74,6 +76,23 @@
 
 #define OTRIG_CONSUME          BIT(18)    /* char tries to eat/drink obj */
 
+
+// VTRIG_x: vehicle trigger types
+#define VTRIG_GLOBAL  BIT(0)	// checked even if zone empty
+#define VTRIG_RANDOM  BIT(1)	// checked randomly when people nearby
+#define VTRIG_COMMAND  BIT(2)	// character types a command
+#define VTRIG_SPEECH  BIT(3)	// character speaks a word or phrase
+// unused BIT(4)
+#define VTRIG_DESTROY  BIT(5)	// called before destruction
+#define VTRIG_GREET  BIT(6)	// character enters the room
+// unused BIT(7)
+#define VTRIG_ENTRY  BIT(8)	// vehicle enters a room
+// unused BIT(9), BIT(10), BIT(11), BIT(12)
+#define VTRIG_LOAD  BIT(13)	// vehicle is loaded
+// unused BIT(14), BIT(15)
+#define VTRIG_LEAVE  BIT(16)	// someone leaves the room
+
+
 /* wld trigger types */
 #define WTRIG_GLOBAL           BIT(0)      /* check even if zone empty   */
 #define WTRIG_RANDOM           BIT(1)	     /* checked randomly           */
@@ -87,6 +106,7 @@
 #define WTRIG_ABILITY          BIT(15)     /* ability used in room */
 #define WTRIG_LEAVE            BIT(16)     /* character leaves the room */
 #define WTRIG_DOOR             BIT(17)     /* door manipulated in room  */
+
 
 /* obj command trigger types */
 #define OCMD_EQUIP             BIT(0)	     /* obj must be in char's equip */
@@ -223,6 +243,15 @@ int door_wtrigger(char_data *actor, int subcmd, int dir);
 
 int consume_otrigger(obj_data *obj, char_data *actor, int cmd);
 
+int command_vtrigger(char_data *actor, char *cmd, char *argument, int mode);
+int destroy_vtrigger(vehicle_data *veh);
+int entry_vtrigger(vehicle_data *veh);
+int leave_vtrigger(char_data *actor, int dir);
+void load_vtrigger(vehicle_data *veh);
+int greet_vtrigger(char_data *actor, int dir);
+void random_vtrigger(vehicle_data *veh);
+void speech_vtrigger(char_data *actor, char *str);
+
 /* function prototypes from scripts.c */
 void script_trigger_check(void);
 void add_trigger(struct script_data *sc, trig_data *t, int loc);
@@ -257,7 +286,7 @@ void trig_data_copy(trig_data *this_data, const trig_data *trg);
 trig_data *read_trigger(int nr);
 void add_var(struct trig_var_data **var_list, char *name, char *value, int id);
 room_data *dg_room_of_obj(obj_data *obj);
-void do_dg_cast(void *go, struct script_data *sc, trig_data *trig, int type, char *cmd);
+room_data *do_dg_add_room_dir(room_data *from, int dir, bld_data *bld);
 void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int type, char *cmd);
 void script_damage(char_data *vict, char_data *killer, int level, int dam_type, double modifier);
 void script_damage_over_time(char_data *vict, int level, int dam_type, double modifier, int dur_seconds, int max_stacks, char_data *cast_by);
@@ -269,6 +298,7 @@ union script_driver_data_u {
 	char_data *c;
 	room_data *r;
 	obj_data *o;
+	vehicle_data *v;
 };
 int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, int mode);
 //int script_driver(void *go, trig_data *trig, int type, int mode);
@@ -279,6 +309,8 @@ struct cmdlist_element * find_case(trig_data *trig, struct cmdlist_element *cl, 
 int find_eq_pos_script(char *arg);
 char_data *get_char_near_obj(obj_data *obj, char *name);
 obj_data *get_obj_near_obj(obj_data *obj, char *name);
+char_data *get_char_near_vehicle(vehicle_data *veh, char *name);
+obj_data *get_obj_near_vehicle(vehicle_data *veh, char *name);
 
 
 /* defines for valid_dg_target */

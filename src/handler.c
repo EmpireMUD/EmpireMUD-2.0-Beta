@@ -5054,6 +5054,8 @@ void set_room_extra_data(room_data *room, int type, int value) {
 * @return room_data* The matching room, or NULL if none.
 */
 room_data *find_target_room(char_data *ch, char *rawroomstr) {
+	extern vehicle_data *get_vehicle(char *name);
+	extern room_data *obj_room(obj_data *obj);
 	extern struct instance_data *real_instance(any_vnum instance_id);
 	extern room_data *find_room_template_in_instance(struct instance_data *inst, rmt_vnum vnum);
 	
@@ -5079,6 +5081,16 @@ room_data *find_target_room(char_data *ch, char *rawroomstr) {
 	else if (*roomstr == UID_CHAR) {
 		// maybe
 		location = find_room(atoi(roomstr + 1));
+		
+		if (!location && (target_mob = get_char(roomstr))) {
+			location = IN_ROOM(target_mob);
+		}
+		if (!location && (target_veh = get_vehicle(roomstr))) {
+			location = IN_ROOM(target_veh);
+		}
+		if (!location && (target_obj = get_obj(roomstr))) {
+			location = obj_room(target_obj);
+		}
 	}
 	else if (*roomstr == 'i' && isdigit(*(roomstr+1)) && ch && IS_NPC(ch) && (inst = real_instance(MOB_INSTANCE_ID(ch))) != NULL) {
 		// find room in instance by template vnum
@@ -6178,6 +6190,7 @@ vehicle_data *get_vehicle_in_target_room_vis(char_data *ch, room_data *room, cha
 *
 * @param char_data *ch The person looking.
 * @param char *name The string they typed.
+* @return vehicle_data* The vehicle found, or NULL.
 */
 vehicle_data *get_vehicle_vis(char_data *ch, char *name) {
 	int found = 0, number;
@@ -6211,9 +6224,45 @@ vehicle_data *get_vehicle_vis(char_data *ch, char *name) {
 
 
 /**
+* Find a vehicle in the room, without regard to visibility.
+*
+* @param room_data *room The room to look in.
+* @param char *name The string to search for.
+* @return vehicle_data* The found vehicle, or NULL.
+*/
+vehicle_data *get_vehicle_room(room_data *room, char *name) {
+	int found = 0, number;
+	char tmpname[MAX_INPUT_LENGTH];
+	char *tmp = tmpname;
+	vehicle_data *iter;
+
+	strcpy(tmp, name);
+	
+	// 0.x does not target vehicles
+	if ((number = get_number(&tmp)) == 0) {
+		return (NULL);
+	}
+	
+	LL_FOREACH2(ROOM_VEHICLES(room), iter, next_in_room) {
+		if (!isname(tmp, VEH_KEYWORDS(iter))) {
+			continue;
+		}
+		
+		// found: check number
+		if (++found == number) {
+			return iter;
+		}
+	}
+	
+	return NULL;
+}
+
+
+/**
 * Find a vehicle in the world, without regard to visibility.
 *
 * @param char *name The string to search for.
+* @return vehicle_data* The vehicle found, or NULL.
 */
 vehicle_data *get_vehicle_world(char *name) {
 	int found = 0, number;

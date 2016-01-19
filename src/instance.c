@@ -35,6 +35,7 @@ extern const int rev_dir[];
 // external funcs
 void scale_item_to_level(obj_data *obj, int level);
 void scale_mob_to_level(char_data *mob, int level);
+void scale_vehicle_to_level(vehicle_data *veh, int level);
 extern int stats_get_building_count(bld_data *bdg);
 extern int stats_get_sector_count(sector_data *sect);
 
@@ -44,6 +45,7 @@ int count_instances(adv_data *adv);
 int count_mobs_in_instance(struct instance_data *inst, mob_vnum vnum);
 int count_objs_in_instance(struct instance_data *inst, obj_vnum vnum);
 int count_players_in_instance(struct instance_data *inst, bool include_imms);
+int count_vehicles_in_instance(struct instance_data *inst, any_vnum vnum);
 static int determine_random_exit(adv_data *adv, room_data *from, room_data *to);
 room_data *find_room_template_in_instance(struct instance_data *inst, rmt_vnum vnum);
 static struct adventure_link_rule *get_link_rule_by_type(adv_data *adv, int type);
@@ -1037,6 +1039,7 @@ static void reset_instance_room(struct instance_data *inst, room_data *room) {
 	
 	room_template *rmt = GET_ROOM_TEMPLATE(room);
 	struct adventure_spawn *spawn;
+	vehicle_data *veh;
 	char_data *mob;
 	obj_data *obj;
 	
@@ -1075,6 +1078,20 @@ static void reset_instance_room(struct instance_data *inst, room_data *room) {
 							act("$p appears.", FALSE, ROOM_PEOPLE(IN_ROOM(obj)), obj, NULL, TO_CHAR | TO_ROOM);
 						}
 						load_otrigger(obj);
+					}
+					break;
+				}
+				case ADV_SPAWN_VEH: {
+					if (vehicle_proto(spawn->vnum) && count_vehicles_in_instance(inst, spawn->vnum) < spawn->limit) {
+						veh = read_vehicle(spawn->vnum, TRUE);
+						vehicle_to_room(veh, room);
+						if (inst->level > 0) {
+							scale_vehicle_to_level(veh, inst->level);
+						}
+						if (ROOM_PEOPLE(IN_ROOM(veh))) {
+							act("$V appears.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+						}
+						load_vtrigger(veh);
 					}
 					break;
 				}
@@ -1346,6 +1363,29 @@ int count_players_in_instance(struct instance_data *inst, bool count_imms) {
 		if (inst->room[iter]) {
 			for (ch = ROOM_PEOPLE(inst->room[iter]); ch; ch = ch->next_in_room) {
 				if (!IS_NPC(ch) && (count_imms || !IS_IMMORTAL(ch))) {
+					++count;
+				}
+			}
+		}
+	}
+	
+	return count;
+}
+
+
+/**
+* @param struct instance_data *inst The instance to check.
+* @param any_vnum vnum Vehicle vnum to look for.
+* @return int Total number of that vehicle in the instance.
+*/
+int count_vehicles_in_instance(struct instance_data *inst, any_vnum vnum) {
+	int iter, count = 0;
+	vehicle_data *veh;
+	
+	for (iter = 0; iter < inst->size; ++iter) {
+		if (inst->room[iter]) {
+			LL_FOREACH2(ROOM_VEHICLES(inst->room[iter]), veh, next_in_room) {
+				if (VEH_VNUM(veh) == vnum) {
 					++count;
 				}
 			}

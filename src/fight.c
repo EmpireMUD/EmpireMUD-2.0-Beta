@@ -1354,6 +1354,11 @@ static bool tower_would_shoot(room_data *from_room, char_data *vict) {
 		return FALSE;
 	}
 	
+	// don't shoot npcs
+	if (IS_NPC(vict)) {
+		return FALSE;
+	}
+	
 	// can't see into buildings/mountains
 	if (ROOM_IS_CLOSED(to_room) || ROOM_SECT_FLAGGED(to_room, SECTF_OBSCURE_VISION) || SECT_FLAGGED(BASE_SECT(to_room), SECTF_OBSCURE_VISION)) {
 		return FALSE;
@@ -1929,33 +1934,42 @@ bool can_fight(char_data *ch, char_data *victim) {
 /**
 * Validate a room target for a siege command.
 *
-* @param char_data *ch The person firing (will receive errors).
+* @param char_data *ch The person firing (Optional; will receive errors and trigger certain checks).
 * @param vehicle_data *veh The vehicle firing. (OPTIONAL: Could just be ch firing.)
 * @param room_data *to_room The target room.
 * @return bool TRUE if okay, FALSE if not.
 */
 bool validate_siege_target_room(char_data *ch, vehicle_data *veh, room_data *to_room) {
-	room_data *from_room = veh ? IN_ROOM(veh) : IN_ROOM(ch);
+	room_data *from_room = veh ? IN_ROOM(veh) : (ch ? IN_ROOM(ch) : NULL);
 	
-	if (ROOM_SECT_FLAGGED(from_room, SECTF_ROUGH)) {
+	if (ch && ROOM_SECT_FLAGGED(from_room, SECTF_ROUGH)) {
 		msg_to_char(ch, "You can't lay siege from rough terrain!\r\n");
 	}
-	else if (ROOM_IS_CLOSED(from_room)) {
+	else if (ch && ROOM_IS_CLOSED(from_room)) {
 		msg_to_char(ch, "You can't lay siege from indoors.\r\n");
 	}
-	else if (ROOM_BLD_FLAGGED(from_room, BLD_BARRIER)) {
+	else if (ch && ROOM_BLD_FLAGGED(from_room, BLD_BARRIER)) {
 		msg_to_char(ch, "You can't lay siege from so close to a barrier.\r\n");
 	}
+	else if (!IS_MAP_BUILDING(to_room)) {
+		if (ch) {
+			msg_to_char(ch, "That isn't a building.\r\n");
+		}
+	}
 	else if (IS_CITY_CENTER(to_room)) {
-		msg_to_char(ch, "You can't besiege a city center.\r\n");
+		if (ch) {
+			msg_to_char(ch, "You can't besiege a city center.\r\n");
+		}
 	}
 	else if (ROOM_SECT_FLAGGED(to_room, SECTF_START_LOCATION)) {
-		msg_to_char(ch, "You can't besiege a starting location.\r\n");
+		if (ch) {
+			msg_to_char(ch, "You can't besiege a starting location.\r\n");
+		}
 	}
-	else if (ROOM_OWNER(to_room) && ROOM_OWNER(to_room) == GET_LOYALTY(ch)) {
+	else if (ch && ROOM_OWNER(to_room) && ROOM_OWNER(to_room) == GET_LOYALTY(ch)) {
 		msg_to_char(ch, "You can't besiege your own property. Abandon it first.\r\n");
 	}
-	else if (ROOM_OWNER(to_room) && !has_relationship(GET_LOYALTY(ch), ROOM_OWNER(to_room), DIPL_WAR)) {
+	else if (ch && ROOM_OWNER(to_room) && !has_relationship(GET_LOYALTY(ch), ROOM_OWNER(to_room), DIPL_WAR)) {
 		msg_to_char(ch, "You can't besiege that direction because you're not at war with %s.\r\n", EMPIRE_NAME(ROOM_OWNER(to_room)));
 	}
 	else {
@@ -2168,6 +2182,13 @@ bool besiege_vehicle(vehicle_data *veh, int damage, int siege_type) {
 		}
 	}
 	else {
+		// return 0 prevents the destruction
+		if (!destroy_vtrigger(veh)) {
+			VEH_HEALTH(veh) = MAX(1, VEH_HEALTH(veh));	// ensure health
+			REMOVE_BIT(VEH_FLAGS(veh), VEH_ON_FIRE);	// cancel fire
+			return TRUE;
+		}
+
 		if (ROOM_PEOPLE(IN_ROOM(veh))) {
 			// SIEGE_x: warn the occupants
 			switch (siege_type) {

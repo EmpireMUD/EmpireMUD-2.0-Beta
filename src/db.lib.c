@@ -5021,6 +5021,9 @@ void script_save_to_disk(FILE *fp, void *item, int type) {
 	else if (type == ADV_TRIGGER) {
 		t = ((adv_data*)item)->proto_script;
 	}
+	else if (type == VEH_TRIGGER) {
+		t = ((vehicle_data*)item)->proto_script;
+	}
 	else {
 		log("SYSERR: Invalid type passed to script_save_to_disk()");
 		return;

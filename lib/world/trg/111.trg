@@ -17,6 +17,8 @@ if %object.type% == FOOD
   %echo% %self.name% gleefully eats %object.shortdesc%!
   mjunk %object.name%
   tdetach mob %self% all
+else
+  drop %object.name%
 end
 ~
 #11102
@@ -329,7 +331,8 @@ wait 3 sec
 if (%self.fighting% || %self.disabled% || %actor.nohassle% || !(%actor.room%==%self.room%))
   halt
 end
-%echo% %self.name% goes into a dive, heading straight for you!
+%send% %actor% %self.name% goes into a dive, heading straight for you!
+%echoaround% %actor% %self.name% goes into a dive, heading straight for %actor.name%!
 wait 3 sec
 if (%self.fighting% || %self.disabled% || %actor.nohassle% || !(%actor.room%==%self.room%))
   halt
@@ -389,6 +392,13 @@ eval room_var %self.room%
 %send% %actor% You use %self.shortdesc% and a rib-bone boat appears!
 %echoaround% %actor% %actor.name% uses %self.shortdesc% and a rib-bone boat appears!
 %purge% %self%
+~
+#11116
+Loch Colossus block door~
+0 r 100
+~
+%send% %actor% You cannot reach that while %self.name% is in the way.
+return 0
 ~
 #11130
 Caretaker Replacement~

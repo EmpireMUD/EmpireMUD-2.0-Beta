@@ -426,6 +426,7 @@ void perform_transport(char_data *ch, room_data *to_room) {
 	entry_memory_mtrigger(ch);
 	greet_mtrigger(ch, NO_DIR);
 	greet_memory_mtrigger(ch);
+	greet_vtrigger(ch, NO_DIR);
 
 	for (k = ch->followers; k; k = k->next) {
 		if ((IN_ROOM(k->follower) == was_in) && (GET_POS(k->follower) >= POS_STANDING)) {
@@ -494,7 +495,7 @@ int can_move(char_data *ch, int dir, room_data *to_room, int need_specials_check
 		return 0;
 	}
 	
-	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH) && ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && (!IS_NPC(ch) || !MOB_FLAGGED(ch, MOB_MOUNTAINWALK)) && !has_ability(ch, ABIL_MOUNTAIN_CLIMBING) && !EFFECTIVELY_FLYING(ch)) {
+	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH) && ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && (!IS_NPC(ch) || !MOB_FLAGGED(ch, MOB_MOUNTAINWALK)) && (IS_NPC(ch) || !IS_RIDING(ch) || !has_ability(ch, ABIL_ALL_TERRAIN_RIDING)) && !has_ability(ch, ABIL_MOUNTAIN_CLIMBING) && !EFFECTIVELY_FLYING(ch)) {
 		msg_to_char(ch, "You must buy the Mountain Climbing ability to cross such rough terrain.\r\n");
 		return 0;
 	}
@@ -572,7 +573,7 @@ int move_cost(char_data *ch, room_data *from, room_data *to, int dir, int mode) 
 * Checks if 'ch' can move 'veh' from the room they are in, to 'to_room'. This
 * sends its own error message.
 * 
-* @param char_data *ch The player trying to move.
+* @param char_data *ch The player trying to move. (OPTIONAL)
 * @param vehicle_data *veh The vehicle trying to move, too.
 * @return bool TRUE if the player's vehicle can move there, FALSE if not.
 */
@@ -582,40 +583,54 @@ bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room)
 	char buf[MAX_STRING_LENGTH];
 	
 	if (!VEH_IS_COMPLETE(veh)) {
-		act("$V can't move anywhere until it's complete!", FALSE, ch, NULL, veh, TO_CHAR);
+		if (ch) {
+			act("$V can't move anywhere until it's complete!", FALSE, ch, NULL, veh, TO_CHAR);
+		}
 		return FALSE;
 	}
 	
 	// required number of mounts
 	if (count_harnessed_animals(veh) < VEH_ANIMALS_REQUIRED(veh)) {
-		snprintf(buf, sizeof(buf), "You need to harness %d animal%s to $V before it can move.", VEH_ANIMALS_REQUIRED(veh), PLURAL(VEH_ANIMALS_REQUIRED(veh)));
-		act(buf, FALSE, ch, NULL, veh, TO_CHAR);
+		if (ch) {
+			snprintf(buf, sizeof(buf), "You need to harness %d animal%s to $V before it can move.", VEH_ANIMALS_REQUIRED(veh), PLURAL(VEH_ANIMALS_REQUIRED(veh)));
+			act(buf, FALSE, ch, NULL, veh, TO_CHAR);
+		}
 		return FALSE;
 	}
 	
 	// closed building?
-	if ((VEH_FLAGGED(veh, VEH_NO_BUILDING) || !BLD_ALLOWS_MOUNTS(to_room)) && !IS_INSIDE(IN_ROOM(ch)) && !ROOM_IS_CLOSED(IN_ROOM(ch)) && !IS_ADVENTURE_ROOM(IN_ROOM(ch)) && IS_ANY_BUILDING(to_room) && ROOM_IS_CLOSED(to_room)) {
-		act("$V can't go in there.", FALSE, ch, NULL, veh, TO_CHAR);
+	if ((VEH_FLAGGED(veh, VEH_NO_BUILDING) || !BLD_ALLOWS_MOUNTS(to_room)) && !IS_INSIDE(IN_ROOM(veh)) && !ROOM_IS_CLOSED(IN_ROOM(veh)) && !IS_ADVENTURE_ROOM(IN_ROOM(veh)) && IS_ANY_BUILDING(to_room) && ROOM_IS_CLOSED(to_room)) {
+		if (ch) {
+			act("$V can't go in there.", FALSE, ch, NULL, veh, TO_CHAR);
+		}
 		return FALSE;
 	}
 	
 	// barrier?
 	if (ROOM_BLD_FLAGGED(to_room, BLD_BARRIER)) {
-		act("$V can't move that close to the barrier.", FALSE, ch, NULL, veh, TO_CHAR);
+		if (ch) {
+			act("$V can't move that close to the barrier.", FALSE, ch, NULL, veh, TO_CHAR);
+		}
 		return FALSE;
 	}
 	
 	// terrain-based checks
 	if (WATER_SECT(to_room) && !VEH_FLAGGED(veh, VEH_SAILING | VEH_FLYING)) {
-		act("$V can't go onto the water.", FALSE, ch, NULL, veh, TO_CHAR);
+		if (ch) {
+			act("$V can't go onto the water.", FALSE, ch, NULL, veh, TO_CHAR);
+		}
 		return FALSE;
 	}
 	if (!WATER_SECT(to_room) && !IS_WATER_BUILDING(to_room) && !WATER_SECT(IN_ROOM(veh)) && !VEH_FLAGGED(veh, VEH_DRIVING | VEH_FLYING)) {
-		act("$V can't go onto land.", FALSE, ch, NULL, veh, TO_CHAR);
+		if (ch) {
+			act("$V can't go onto land.", FALSE, ch, NULL, veh, TO_CHAR);
+		}
 		return FALSE;
 	}
 	if (ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && !VEH_FLAGGED(veh, VEH_ALLOW_ROUGH | VEH_FLYING)) {
-		act("$V can't go into rough terrain.", FALSE, ch, NULL, veh, TO_CHAR);
+		if (ch) {
+			act("$V can't go into rough terrain.", FALSE, ch, NULL, veh, TO_CHAR);
+		}
 		return FALSE;
 	}
 	
@@ -679,6 +694,7 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 	entry_memory_mtrigger(ch);
 	greet_mtrigger(ch, NO_DIR);
 	greet_memory_mtrigger(ch);
+	greet_vtrigger(ch, NO_DIR);
 	
 	// now followers
 	for (fol = ch->followers; fol; fol = next_fol) {
@@ -738,6 +754,10 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 		return FALSE;
 	}
 	if (!leave_wtrigger(IN_ROOM(ch), ch, dir) || IN_ROOM(ch) != was_in) {
+		/* prevent teleport crashes */
+		return FALSE;
+	}
+	if (!leave_vtrigger(ch, dir) || IN_ROOM(ch) != was_in) {
 		/* prevent teleport crashes */
 		return FALSE;
 	}
@@ -993,7 +1013,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 
 	// trigger section
 	entry_memory_mtrigger(ch);
-	if (!greet_mtrigger(ch, dir)) {
+	if (!greet_mtrigger(ch, dir) || !greet_vtrigger(ch, dir)) {
 		char_from_room(ch);
 		char_to_room(ch, was_in);
 		look_at_room(ch);
@@ -1294,7 +1314,7 @@ ACMD(do_circle) {
 	command_lag(ch, WAIT_MOVEMENT);
 	
 	// triggers?
-	if (!enter_wtrigger(IN_ROOM(ch), ch, dir) || !greet_mtrigger(ch, dir)) {
+	if (!enter_wtrigger(IN_ROOM(ch), ch, dir) || !greet_mtrigger(ch, dir) || !greet_vtrigger(ch, dir)) {
 		char_from_room(ch);
 		char_to_room(ch, was_in);
 		if (ch->desc) {

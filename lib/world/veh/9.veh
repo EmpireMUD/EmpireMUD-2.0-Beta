@@ -48,7 +48,7 @@ A catapult is poised to strike!~
 will need two horses to pull the catapult.
 ~
 &0o==o~
-or 19 20 0 2
+bor 19 20 0 2
 C
 0 100
 R
@@ -129,6 +129,7 @@ R
 1306 1  # 1x a pouch of nails
 R
 1359 1  # 1x a bolt of cloth
+T 921
 S
 #952
 caravel lanteen-rigged~
@@ -147,6 +148,7 @@ R
 1306 1  # 1x a pouch of nails
 R
 1359 1  # 1x a bolt of cloth
+T 952
 S
 #953
 cog~
@@ -166,6 +168,7 @@ R
 1306 1  # 1x a pouch of nails
 R
 1359 1  # 1x a bolt of cloth
+T 953
 S
 #954
 longship fearsome~
@@ -187,6 +190,7 @@ R
 1306 1  # 1x a pouch of nails
 R
 1359 1  # 1x a bolt of cloth
+T 954
 S
 #955
 brigantine massive~
@@ -208,6 +212,7 @@ R
 1306 2  # 2x a pouch of nails
 R
 1359 2  # 2x a bolt of cloth
+T 955
 S
 #956
 carrack four-masted~
@@ -226,6 +231,7 @@ R
 1306 2  # 2x a pouch of nails
 R
 1359 2  # 2x a bolt of cloth
+T 956
 S
 #957
 hulk cargo huge~
@@ -244,5 +250,6 @@ R
 1306 1  # 1x a pouch of nails
 R
 1359 1  # 1x a bolt of cloth
+T 957
 S
 $

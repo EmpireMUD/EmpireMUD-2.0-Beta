@@ -2861,8 +2861,15 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 	if ((abil = find_ability_by_vnum(GET_CRAFT_ABILITY(craft))) && ABIL_ASSIGNED_SKILL(abil) != NULL) {
 		sprintf(buf + strlen(buf), " (%s %d)", SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
 	}
-	seconds = GET_CRAFT_TIME(craft) * ACTION_CYCLE_TIME;
-	msg_to_char(ch, "Ability: &y%s&0, Level: &g%d&0, Time: [&g%d action tick%s&0 | &g%d:%02d&0]\r\n", buf, GET_CRAFT_MIN_LEVEL(craft), GET_CRAFT_TIME(craft), PLURAL(GET_CRAFT_TIME(craft)), seconds / SECS_PER_REAL_MIN, seconds % SECS_PER_REAL_MIN);
+	msg_to_char(ch, "Ability: &y%s&0, Level: &g%d&0", buf, GET_CRAFT_MIN_LEVEL(craft));
+	
+	if (GET_CRAFT_TYPE(craft) != CRAFT_TYPE_BUILD && !CRAFT_FLAGGED(craft, CRAFT_VEHICLE)) {
+		seconds = GET_CRAFT_TIME(craft) * ACTION_CYCLE_TIME;
+		msg_to_char(ch, ", Time: [&g%d action tick%s&0 | &g%d:%02d&0]\r\n", GET_CRAFT_TIME(craft), PLURAL(GET_CRAFT_TIME(craft)), seconds / SECS_PER_REAL_MIN, seconds % SECS_PER_REAL_MIN);
+	}
+	else {
+		msg_to_char(ch, "\r\n");
+	}
 
 	sprintbit(GET_CRAFT_FLAGS(craft), craft_flags, buf, TRUE);
 	msg_to_char(ch, "Flags: &c%s&0\r\n", buf);
@@ -5003,7 +5010,7 @@ ACMD(do_load) {
 		act("$n makes an odd magical gesture.", TRUE, ch, NULL, NULL, TO_ROOM);
 		act("$n has created $V!", FALSE, ch, NULL, veh, TO_ROOM);
 		act("You create $V.", FALSE, ch, NULL, veh, TO_CHAR);
-		// load_vtrigger(veh);
+		load_vtrigger(veh);
 	}
 	else {
 		send_to_char("That'll have to be either 'obj', 'mob', or 'vehicle'.\r\n", ch);
@@ -6664,12 +6671,14 @@ ACMD(do_vstat) {
 		do_stat_trigger(ch, trig);
 	}
 	else if (is_abbrev(buf, "vehicle")) {
-		vehicle_data *veh = vehicle_proto(number);
-		if (veh) {
-			do_stat_vehicle(ch, veh);
+		vehicle_data *veh;
+		if (!vehicle_proto(number)) {
+			msg_to_char(ch, "There is no vehicle with that vnum.\r\n");
 		}
 		else {
-			msg_to_char(ch, "There is no vehicle with that vnum.\r\n");
+			veh = read_vehicle(number, TRUE);
+			do_stat_vehicle(ch, veh);
+			extract_vehicle(veh);
 		}
 	}
 	else

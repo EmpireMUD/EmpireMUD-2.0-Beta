@@ -662,10 +662,12 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 		
 		// stop all actors on this type
 		LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
-			if (GET_ACTION(vict) == ACT_GEN_CRAFT && GET_ACTION_VNUM(vict, 0) == GET_CRAFT_VNUM(type)) {
+			if (!IS_NPC(vict) && GET_ACTION(vict) == ACT_GEN_CRAFT && GET_ACTION_VNUM(vict, 0) == GET_CRAFT_VNUM(type)) {
 				GET_ACTION(vict) = ACT_NONE;
 			}
 		}
+		
+		load_vtrigger(veh);
 	}
 	else if (!found_obj) {
 		msg_to_char(ch, "You run out of resources and stop %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
@@ -826,7 +828,7 @@ bool validate_item_rename(char_data *ch, obj_data *obj, char *name) {
 		act("You can't rename $p.", FALSE, ch, obj, NULL, TO_CHAR);
 	}
 	else if (strchr(name, '&') || strchr(name, '%')) {
-		msg_to_char(ch, "Item names cannot contain the && or %% symbols.\r\n");
+		msg_to_char(ch, "Item names cannot contain the \t& or %% symbols.\r\n");
 	}
 	else if (!str_str(name, (char*)skip_filler(GET_OBJ_SHORT_DESC(obj)))) {
 		msg_to_char(ch, "The new name must contain '%s'.\r\n", skip_filler(GET_OBJ_SHORT_DESC(obj)));

@@ -714,6 +714,8 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 	char buf[MAX_STRING_LENGTH];
 	vehicle_data *veh = vehicle_proto(vnum);
 	craft_data *craft, *next_craft;
+	room_template *rmt, *next_rmt;
+	struct adventure_spawn *asp;
 	int size, found;
 	
 	if (!veh) {
@@ -729,6 +731,17 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 		if (CRAFT_FLAGGED(craft, CRAFT_VEHICLE) && GET_CRAFT_OBJECT(craft) == vnum) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
+		}
+	}
+	
+	// room templates
+	HASH_ITER(hh, room_template_table, rmt, next_rmt) {
+		LL_FOREACH(GET_RMT_SPAWNS(rmt), asp) {
+			if (asp->type == ADV_SPAWN_VEH && asp->vnum == vnum) {
+				++found;
+				size += snprintf(buf + size, sizeof(buf) - size, "RMT [%5d] %s\r\n", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
+				break;	// only need 1
+			}
 		}
 	}
 	
@@ -783,7 +796,6 @@ vehicle_data *read_vehicle(any_vnum vnum, bool with_triggers) {
 	GET_ID(veh) = max_vehicle_id++;
 	add_to_lookup_table(GET_ID(veh), (void *)veh);
 	
-	/*
 	if (with_triggers) {
 		copy_proto_script(proto, veh, VEH_TRIGGER);
 		assign_triggers(veh, VEH_TRIGGER);
@@ -791,8 +803,7 @@ vehicle_data *read_vehicle(any_vnum vnum, bool with_triggers) {
 	else {
 		veh->proto_script = NULL;
 	}
-	*/
-
+	
 	return veh;
 }
 
@@ -1325,6 +1336,14 @@ void free_vehicle(vehicle_data *veh) {
 	}
 	empty_vehicle(veh);
 	
+	// free any assigned scripts and vars
+	if (SCRIPT(veh)) {
+		extract_script(veh, VEH_TRIGGER);
+	}
+	if (veh->proto_script && (!proto || veh->proto_script != proto->proto_script)) {
+		free_proto_script(veh, VEH_TRIGGER);
+	}
+	
 	// attributes
 	if (veh->attributes && (!proto || veh->attributes != proto->attributes)) {
 		if (VEH_YEARLY_MAINTENANCE(veh)) {
@@ -1418,6 +1437,11 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 				break;
 			}
 			
+			case 'T': {	// trigger
+				dg_read_trigger(line, veh, VEH_TRIGGER);
+				break;
+			}
+			
 			// end
 			case 'S': {
 				return;
@@ -1458,6 +1482,7 @@ void write_vehicle_index(FILE *fl) {
 * @param vehicle_data *veh The thing to save.
 */
 void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
+	void script_save_to_disk(FILE *fp, void *item, int type);
 	void write_resources_to_file(FILE *fl, struct resource_data *list);
 	
 	char temp[MAX_STRING_LENGTH];
@@ -1496,6 +1521,9 @@ void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
 	
 	// 'R': resources
 	write_resources_to_file(fl, VEH_YEARLY_MAINTENANCE(veh));
+	
+	// T, V: triggers
+	script_save_to_disk(fl, veh, VEH_TRIGGER);
 	
 	// end
 	fprintf(fl, "S\n");
@@ -1755,8 +1783,11 @@ vehicle_data *create_vehicle_table_entry(any_vnum vnum) {
 * @param any_vnum vnum The vnum to delete.
 */
 void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
+	extern bool delete_from_spawn_template_list(struct adventure_spawn **list, int spawn_type, mob_vnum vnum);
+	
 	vehicle_data *veh, *iter, *next_iter;
 	craft_data *craft, *next_craft;
+	room_template *rmt, *next_rmt;
 	descriptor_data *desc;
 	bool found;
 	
@@ -1798,6 +1829,14 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
+	// update room templates
+	HASH_ITER(hh, room_template_table, rmt, next_rmt) {
+		found = delete_from_spawn_template_list(&GET_RMT_SPAWNS(rmt), ADV_SPAWN_VEH, vnum);
+		if (found) {
+			save_library_file_for_vnum(DB_BOOT_RMT, GET_RMT_VNUM(rmt));
+		}
+	}
+	
 	// olc editor updates
 	LL_FOREACH(descriptor_list, desc) {
 		if (GET_OLC_CRAFT(desc)) {
@@ -1810,6 +1849,11 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 			if (found) {
 				SET_BIT(GET_OLC_CRAFT(desc)->flags, CRAFT_IN_DEVELOPMENT);
 				msg_to_char(desc->character, "The vehicle made by the craft you're editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_ROOM_TEMPLATE(desc)) {
+			if (delete_from_spawn_template_list(&GET_OLC_ROOM_TEMPLATE(desc)->spawns, ADV_SPAWN_VEH, vnum)) {
+				msg_to_char(desc->character, "One of the vehicles that spawns in the room template you're editing was deleted.\r\n");
 			}
 		}
 	}
@@ -1887,6 +1931,18 @@ void save_olc_vehicle(descriptor_data *desc) {
 			iter->attributes = veh->attributes;
 		}
 		
+		// remove old scripts
+		if (SCRIPT(iter)) {
+			extract_script(iter, VEH_TRIGGER);
+		}
+		if (iter->proto_script && iter->proto_script != proto->proto_script) {
+			free_proto_script(iter, VEH_TRIGGER);
+		}
+		
+		// re-attach scripts
+		copy_proto_script(veh, iter, VEH_TRIGGER);
+		assign_triggers(iter, VEH_TRIGGER);
+		
 		// sanity checks
 		if (VEH_HEALTH(iter) > VEH_MAX_HEALTH(iter)) {
 			VEH_HEALTH(iter) = VEH_MAX_HEALTH(iter);
@@ -1913,7 +1969,12 @@ void save_olc_vehicle(descriptor_data *desc) {
 		free_resource_list(VEH_YEARLY_MAINTENANCE(proto));
 	}
 	free(proto->attributes);
-
+	
+	// free old script?
+	if (proto->proto_script) {
+		free_proto_script(proto, VEH_TRIGGER);
+	}
+	
 	// save data back over the proto-type
 	hh = proto->hh;	// save old hash handle
 	*proto = *veh;	// copy over all data
@@ -1954,6 +2015,11 @@ vehicle_data *setup_olc_vehicle(vehicle_data *input) {
 		
 		// copy lists
 		VEH_YEARLY_MAINTENANCE(new) = copy_resource_list(VEH_YEARLY_MAINTENANCE(input));
+		
+		// copy scripts
+		SCRIPT(new) = NULL;
+		new->proto_script = NULL;
+		copy_proto_script(input, new, VEH_TRIGGER);
 	}
 	else {
 		// brand new: some defaults
@@ -1962,6 +2028,8 @@ vehicle_data *setup_olc_vehicle(vehicle_data *input) {
 		VEH_LONG_DESC(new) = str_dup(default_vehicle_long_desc);
 		VEH_MAX_HEALTH(new) = 1;
 		VEH_MOVE_TYPE(new) = MOB_MOVE_DRIVES;
+		SCRIPT(new) = NULL;
+		new->proto_script = NULL;
 	}
 	
 	// done
@@ -1980,6 +2048,7 @@ vehicle_data *setup_olc_vehicle(vehicle_data *input) {
 */
 void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	extern char *get_room_name(room_data *room, bool color);
+	void script_stat (char_data *ch, struct script_data *sc);
 	
 	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
 	obj_data *obj;
@@ -2056,8 +2125,17 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 		get_resource_display(VEH_NEEDS_RESOURCES(veh), part);
 		size += snprintf(buf + size, sizeof(buf) - size, "Needs resources:\r\n%s", part);
 	}
-		
-	page_string(ch->desc, buf, TRUE);
+	
+	send_to_char(buf, ch);
+	
+	// script info
+	msg_to_char(ch, "Script information:\r\n");
+	if (SCRIPT(veh)) {
+		script_stat(ch, SCRIPT(veh));
+	}
+	else {
+		msg_to_char(ch, "  None.\r\n");
+	}
 }
 
 
@@ -2096,7 +2174,7 @@ void look_at_vehicle(vehicle_data *veh, char_data *ch) {
 		bool found = FALSE;
 		
 		if (VEH_IS_COMPLETE(veh)) {
-			msg_to_char(ch, "Mainteance needed: ");
+			msg_to_char(ch, "Maintenance needed: ");
 		}
 		else {
 			msg_to_char(ch, "Resources to completion: ");
@@ -2124,6 +2202,8 @@ void look_at_vehicle(vehicle_data *veh, char_data *ch) {
 * @param char_data *ch The person who is editing a vehicle and will see its display.
 */
 void olc_show_vehicle(char_data *ch) {
+	void get_script_display(struct trig_proto_list *list, char *save_buffer);
+	
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
 	
@@ -2170,6 +2250,11 @@ void olc_show_vehicle(char_data *ch) {
 	// maintenance resources
 	sprintf(buf + strlen(buf), "Yearly maintenance resources required: <\tyresource\t0>\r\n");
 	get_resource_display(VEH_YEARLY_MAINTENANCE(veh), lbuf);
+	strcat(buf, lbuf);
+	
+	// scripts
+	sprintf(buf + strlen(buf), "Scripts: <&yscript&0>\r\n");
+	get_script_display(veh->proto_script, lbuf);
 	strcat(buf, lbuf);
 	
 	page_string(ch->desc, buf, TRUE);
@@ -2333,6 +2418,12 @@ OLC_MODULE(vedit_resource) {
 	void olc_process_resources(char_data *ch, char *argument, struct resource_data **list);
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	olc_process_resources(ch, argument, &VEH_YEARLY_MAINTENANCE(veh));
+}
+
+
+OLC_MODULE(vedit_script) {
+	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
+	olc_process_script(ch, argument, &(veh->proto_script), VEH_TRIGGER);
 }
 
 

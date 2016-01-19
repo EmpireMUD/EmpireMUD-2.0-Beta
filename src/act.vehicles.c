@@ -217,6 +217,11 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 	was_in = IN_ROOM(veh);
 	vehicle_to_room(veh, to_room);
 	
+	if (!entry_vtrigger(veh)) {
+		vehicle_to_room(veh, was_in);
+		return FALSE;
+	}
+	
 	// notify arrival
 	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(veh)), ch_iter, next_in_room) {
 		if (ch_iter != VEH_SITTING_ON(veh) && ch_iter->desc) {
@@ -233,7 +238,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 	
 	// message driver
 	if (VEH_DRIVER(veh)) {
-		if (has_ability(VEH_SITTING_ON(veh), ABIL_NAVIGATION)) {
+		if (has_ability(VEH_DRIVER(veh), ABIL_NAVIGATION)) {
 			snprintf(buf, sizeof(buf), "You %s $V %s (%d, %d).", drive_data[subcmd].command, dirs[get_direction_for_char(VEH_DRIVER(veh), dir)], X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh)));
 		}
 		else {
@@ -262,6 +267,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 		entry_memory_mtrigger(VEH_SITTING_ON(veh));
 		greet_mtrigger(VEH_SITTING_ON(veh), dir);
 		greet_memory_mtrigger(VEH_SITTING_ON(veh));
+		greet_vtrigger(VEH_SITTING_ON(veh), NO_DIR);
 		
 		LL_FOREACH_SAFE(VEH_SITTING_ON(veh)->followers, fol, next_fol) {
 			if ((IN_ROOM(fol->follower) == was_in) && (GET_POS(fol->follower) >= POS_STANDING)) {
@@ -385,6 +391,7 @@ void perform_load_mob(char_data *ch, char_data *mob, vehicle_data *cont, room_da
 	entry_memory_mtrigger(mob);
 	greet_mtrigger(mob, NO_DIR);
 	greet_memory_mtrigger(mob);
+	greet_vtrigger(mob, NO_DIR);
 }
 
 
@@ -434,6 +441,7 @@ void perform_unload_mob(char_data *ch, char_data *mob, vehicle_data *cont) {
 	entry_memory_mtrigger(mob);
 	greet_mtrigger(mob, NO_DIR);
 	greet_memory_mtrigger(mob);
+	greet_vtrigger(mob, NO_DIR);
 }
 
 
@@ -790,6 +798,7 @@ void do_light_vehicle(char_data *ch, vehicle_data *veh, obj_data *flint) {
 * @param char *argument The targeting arg.
 */
 void do_sit_on_vehicle(char_data *ch, char *argument) {
+	char buf[MAX_STRING_LENGTH];
 	vehicle_data *veh;
 	
 	skip_spaces(&argument);	// usually done ahead of time, but in case
@@ -828,8 +837,12 @@ void do_sit_on_vehicle(char_data *ch, char *argument) {
 		msg_to_char(ch, "You can't sit %s it while you're leading something.\r\n", IN_OR_ON(veh));
 	}
 	else {
-		act("You sit on $V.", FALSE, ch, NULL, veh, TO_CHAR);
-		act("$n sits on $V.", FALSE, ch, NULL, veh, TO_ROOM);
+		snprintf(buf, sizeof(buf), "You sit %s $V.", IN_OR_ON(veh));
+		act(buf, FALSE, ch, NULL, veh, TO_CHAR);
+		
+		snprintf(buf, sizeof(buf), "$n sits %s $V.", IN_OR_ON(veh));
+		act(buf, FALSE, ch, NULL, veh, TO_ROOM);
+		
 		sit_on_vehicle(ch, veh);
 		GET_POS(ch) = POS_SITTING;
 	}
@@ -1009,6 +1022,7 @@ ACMD(do_board) {
 		entry_memory_mtrigger(ch);
 		greet_mtrigger(ch, NO_DIR);
 		greet_memory_mtrigger(ch);
+		greet_vtrigger(ch, NO_DIR);
 		
 		// leading-mob
 		if (GET_LEADING_MOB(ch) && IN_ROOM(GET_LEADING_MOB(ch)) == was_in) {
@@ -1027,6 +1041,7 @@ ACMD(do_board) {
 			entry_memory_mtrigger(GET_LEADING_MOB(ch));
 			greet_mtrigger(GET_LEADING_MOB(ch), NO_DIR);
 			greet_memory_mtrigger(GET_LEADING_MOB(ch));
+			greet_vtrigger(GET_LEADING_MOB(ch), NO_DIR);
 		}
 		
 		// leading-vehicle
@@ -1068,6 +1083,7 @@ ACMD(do_board) {
 			entry_memory_mtrigger(k->follower);
 			greet_mtrigger(k->follower, NO_DIR);
 			greet_memory_mtrigger(k->follower);
+			greet_vtrigger(k->follower, NO_DIR);
 		}
 		
 		command_lag(ch, WAIT_OTHER);
@@ -1105,6 +1121,7 @@ ACMD(do_disembark) {
 		entry_memory_mtrigger(ch);
 		greet_mtrigger(ch, NO_DIR);
 		greet_memory_mtrigger(ch);
+		greet_vtrigger(ch, NO_DIR);
 		
 		if (GET_LEADING_MOB(ch) && IN_ROOM(GET_LEADING_MOB(ch)) == was_in) {
 			act("$n is led off.", TRUE, GET_LEADING_MOB(ch), NULL, NULL, TO_ROOM);
@@ -1121,6 +1138,7 @@ ACMD(do_disembark) {
 			entry_memory_mtrigger(GET_LEADING_MOB(ch));
 			greet_mtrigger(GET_LEADING_MOB(ch), NO_DIR);
 			greet_memory_mtrigger(GET_LEADING_MOB(ch));
+			greet_vtrigger(GET_LEADING_MOB(ch), NO_DIR);
 		}
 		if (GET_LEADING_VEHICLE(ch) && IN_ROOM(GET_LEADING_VEHICLE(ch)) == was_in) {
 			if (ROOM_PEOPLE(was_in)) {
@@ -1156,6 +1174,7 @@ ACMD(do_disembark) {
 			entry_memory_mtrigger(k->follower);
 			greet_mtrigger(k->follower, NO_DIR);
 			greet_memory_mtrigger(k->follower);
+			greet_vtrigger(k->follower, NO_DIR);
 		}
 		
 		command_lag(ch, WAIT_OTHER);
@@ -1627,6 +1646,9 @@ ACMD(do_harness) {
 	}
 	else if (!VEH_IS_COMPLETE(veh)) {
 		act("You must finish constructing $V before you can harness anything to it.", FALSE, ch, NULL, veh, TO_CHAR);
+	}
+	else if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
+		msg_to_char(ch, "You can't harness anything to it while it's on fire.\r\n");
 	}
 	else if (!IS_NPC(animal)) {
 		msg_to_char(ch, "You can only harness animals.\r\n");

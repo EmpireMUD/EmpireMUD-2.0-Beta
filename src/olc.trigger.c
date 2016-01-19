@@ -198,6 +198,7 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 	
 	trig_data *trig;
 	room_template *rmt, *next_rmt;
+	vehicle_data *veh, *next_veh;
 	room_data *room, *next_room;
 	char_data *mob, *next_mob;
 	descriptor_data *dsc;
@@ -230,6 +231,13 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 		}
 	}
 	
+	// live vehicles -> remove
+	LL_FOREACH(vehicle_list, veh) {
+		if (SCRIPT(veh)) {
+			remove_live_script_by_vnum(SCRIPT(veh), vnum);
+		}
+	}
+	
 	// look for live rooms with this trigger
 	HASH_ITER(hh, world_table, room, next_room) {
 		if (SCRIPT(room)) {
@@ -259,6 +267,13 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 		}
 	}
 	
+	// update vehicle protos
+	HASH_ITER(hh, vehicle_table, veh, next_veh) {
+		if (delete_from_proto_list_by_vnum(&veh->proto_script, vnum)) {
+			save_library_file_for_vnum(DB_BOOT_VEH, VEH_VNUM(veh));
+		}
+	}
+	
 	// update olc editors
 	for (dsc = descriptor_list; dsc; dsc = dsc->next) {
 		if (GET_OLC_OBJECT(dsc) && delete_from_proto_list_by_vnum(&GET_OLC_OBJECT(dsc)->proto_script, vnum)) {
@@ -269,6 +284,9 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 		}
 		if (GET_OLC_ROOM_TEMPLATE(dsc) && delete_from_proto_list_by_vnum(&GET_OLC_ROOM_TEMPLATE(dsc)->proto_script, vnum)) {
 			msg_to_char(dsc->character, "A trigger attached to the room template you're editing was deleted.\r\n");
+		}
+		if (GET_OLC_VEHICLE(dsc) && delete_from_proto_list_by_vnum(&GET_OLC_VEHICLE(dsc)->proto_script, vnum)) {
+			msg_to_char(dsc->character, "A trigger attached to the vehicle you're editing was deleted.\r\n");
 		}
 	}
 	
@@ -294,6 +312,7 @@ void olc_search_trigger(char_data *ch, trig_vnum vnum) {
 	trig_data *proto = real_trigger(vnum);
 	struct trig_proto_list *trig;
 	room_template *rmt, *next_rmt;
+	vehicle_data *veh, *next_veh;
 	char_data *mob, *next_mob;
 	obj_data *obj, *next_obj;
 	int size, found;
@@ -339,6 +358,18 @@ void olc_search_trigger(char_data *ch, trig_vnum vnum) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "RMT [%5d] %s\r\n", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
+			}
+		}
+	}
+	
+	// vehicles
+	HASH_ITER(hh, vehicle_table, veh, next_veh) {
+		any = FALSE;
+		for (trig = veh->proto_script; trig && !any; trig = trig->next) {
+			if (trig->vnum == vnum) {
+				any = TRUE;
+				++found;
+				size += snprintf(buf + size, sizeof(buf) - size, "VEH [%5d] %s\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
 			}
 		}
 	}
