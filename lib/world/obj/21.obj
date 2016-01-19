@@ -5,9 +5,11 @@ A stone axe has been stuck in the ground.~
    The stone axe may look primitive, but it's great for chopping down trees,
 scraping logs, and general crafts.
 ~
-1 i an 1
+1 i an 2
 0 2 2
 1 0
+C
+1 1
 R
 5121 0
 R
@@ -73,9 +75,11 @@ a stone hammer~
 A stone hammer is lying on the ground.~
 This hammer, though primitive, can function as both a weapon and a tool.
 ~
-1 ho ano 1
+1 ho ano 2
 0 3 6
 1 0
+C
+1 1
 S
 #2107
 saddle rawhide~

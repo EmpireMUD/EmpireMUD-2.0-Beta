@@ -13,6 +13,7 @@ I 4 11115 10.00 1 x  # LOOT: a skinkskin bracer
 I 4 11117 15.00 1 x  # LOOT: torn adventurer's leggings
 I 4 11118 1.00 1 x  # LOOT: a skink whistle
 T 11104
+T 10405
 S
 #11101
 hermit~
@@ -39,6 +40,7 @@ I 4 11115 20.00 1 x  # LOOT: a skinkskin bracer
 I 4 11117 20.00 1 x  # LOOT: torn adventurer's leggings
 I 4 11118 1.00 1 x  # LOOT: a skink whistle
 T 11105
+T 10405
 S
 #11103
 colossus collossus loch shadow massive~
@@ -55,6 +57,7 @@ I 4 11116 25.00 1 x  # LOOT: a colossal skullcap
 I 4 11122 25.00 1 x  # LOOT: a colossal bone staff
 T 11114
 T 10405
+T 11116
 S
 #11104
 pegasus majestic white pristine~

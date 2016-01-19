@@ -7,7 +7,7 @@ if (!%inter%)
   halt
 end
 if (!%inter.aft%)
-  nop %inter.aft(create,5518)%
+  %door% %inter% aft add 5518
 end
 ~
 #952
@@ -18,7 +18,7 @@ eval inter %self.interior%
 if (!%inter% || %inter.aft%)
   halt
 end
-nop %inter.aft(create,5500)%
+%door% %inter% aft add 5500
 ~
 #953
 Cog setup~
@@ -28,7 +28,7 @@ eval inter %self.interior%
 if (!%inter% || %inter.down%)
   halt
 end
-nop %inter.down(create,5502)%
+%door% %inter% down add 5502
 ~
 #954
 Longship setup~
@@ -38,7 +38,7 @@ eval inter %self.interior%
 if (!%inter% || %inter.aft%)
   halt
 end
-nop %inter.aft(create,5500)%
+%door% %inter% aft add 5500
 ~
 #955
 Brigantine setup~
@@ -49,10 +49,10 @@ if (!%inter%)
   halt
 end
 if (!%inter.aft%)
-  nop %inter.aft(create,5512)%
+  %door% %inter% aft add 5512
 end
 if (!%inter.fore%)
-  nop %inter.fore(create,5506)%
+  %door% %inter% fore add 5506
 end
 ~
 #956
@@ -64,10 +64,10 @@ if (!%inter%)
   halt
 end
 if (!%inter.aft%)
-  nop %inter.aft(create,5513)%
+  %door% %inter% aft add 5513
 end
 if (!%inter.fore%)
-  nop %inter.fore(create,5506)%
+  %door% %inter% fore add 5506
 end
 ~
 #957
@@ -79,10 +79,10 @@ if (!%inter%)
   halt
 end
 if (!%inter.aft%)
-  nop %inter.aft(create,5500)%
+  %door% %inter% aft add 5500
 end
 if (!%inter.down%)
-  nop %inter.down(create,5502)%
+  %door% %inter% down add 5502
 end
 ~
 $
