@@ -1809,9 +1809,6 @@ void direction_vars(room_data *room, int dir, char *subfield, char *str, size_t 
 					*str = '\0';
 				}
 			}
-			else if (!strn_cmp(subfield, "create,", 7)) {
-				log("SYSERR: Script attempting to create an exit where one already exists in room %d", GET_ROOM_VNUM(room));
-			}
 		}
 		else { /* no subfield - default to bits */
 			sprintbit(ex->exit_info ,exit_bits, str, TRUE);
@@ -1826,56 +1823,9 @@ void direction_vars(room_data *room, int dir, char *subfield, char *str, size_t 
 			else if (!str_cmp(subfield, "room")) {
 				snprintf(str, slen, "%c%d", UID_CHAR, GET_ROOM_VNUM(to_room) + ROOM_ID_BASE);
 			}
-			else if (!strn_cmp(subfield, "create,", 7)) {
-				log("SYSERR: Script attempting to create an exit from map room %d", GET_ROOM_VNUM(room));
-			}
 		}
 		else {	// default to empty
 			*str = '\0';
-		}
-	}
-	else if (subfield && !strn_cmp(subfield, "create,", 7)) {	// for adding an exit
-		void add_room_to_vehicle(room_data *room, vehicle_data *veh);
-		extern room_data *create_room();
-		extern struct empire_territory_data *create_territory_entry(empire_data *emp, room_data *room);
-		void sort_world_table();
-	
-		char arg1[256], arg2[256];
-		room_data *new;
-		bld_data *bld;
-		
-		comma_args(subfield, arg1, arg2);
-		*str = '\0';	// in case
-		
-		if (!ROOM_IS_CLOSED(room) || IS_ADVENTURE_ROOM(room)) {
-			log("SYSERR: Script attempting to create an exit from invalid room %d", GET_ROOM_VNUM(room));
-		}
-		else if (!*arg2 || !isdigit(*arg2) || !(bld = building_proto(atoi(arg2))) || !IS_SET(GET_BLD_FLAGS(bld), BLD_ROOM)) {
-			log("SYSERR: Script attempting to add invalid building vnum '%s' at room %d", arg2, GET_ROOM_VNUM(room));
-		}
-		else {
-			// create the new room
-			new = create_room();
-			create_exit(room, new, dir, TRUE);
-			attach_building_to_room(bld, new);
-
-			COMPLEX_DATA(new)->home_room = HOME_ROOM(room);
-			COMPLEX_DATA(HOME_ROOM(room))->inside_rooms++;
-			ROOM_OWNER(new) = ROOM_OWNER(HOME_ROOM(room));
-			
-			if (GET_ROOM_VEHICLE(room)) {
-				++VEH_INSIDE_ROOMS(GET_ROOM_VEHICLE(room));
-				COMPLEX_DATA(new)->vehicle = GET_ROOM_VEHICLE(room);
-				add_room_to_vehicle(new, GET_ROOM_VEHICLE(room));
-			}
-			
-			if (ROOM_OWNER(new)) {
-				create_territory_entry(ROOM_OWNER(new), new);
-			}
-			// sort now just in case
-			sort_world_table();
-			
-			snprintf(str, slen, "%c%d", UID_CHAR, GET_ROOM_VNUM(new) + ROOM_ID_BASE);
 		}
 	}
 	else {

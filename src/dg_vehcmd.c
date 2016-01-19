@@ -943,6 +943,7 @@ VCMD(do_vdoor) {
 		"flags",	// 1
 		"name",	// 2
 		"room",	// 3
+		"add",	// 4
 		"\n"
 	};
 
@@ -1028,6 +1029,20 @@ VCMD(do_vdoor) {
 			else
 				veh_log(veh, "vdoor: invalid door target");
 			break;
+		case 4: {	// create room
+			bld_data *bld;
+			
+			if (IS_ADVENTURE_ROOM(rm) || !ROOM_IS_CLOSED(rm) || !COMPLEX_DATA(rm)) {
+				veh_log(veh, "vdoor: attempting to add a room in invalid location %d", GET_ROOM_VNUM(rm));
+			}
+			else if (!*value || !isdigit(*value) || !(bld = building_proto(atoi(value))) || !IS_SET(GET_BLD_FLAGS(bld), BLD_ROOM)) {
+				veh_log(veh, "vdoor: attempting to add invalid room '%s'", value);
+			}
+			else {
+				do_dg_add_room_dir(rm, dir, bld);
+			}
+			break;
+		}
 	}
 }
 

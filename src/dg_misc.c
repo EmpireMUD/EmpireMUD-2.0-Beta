@@ -34,6 +34,53 @@ extern const char *apply_types[];
 extern const char *affected_bits[];
 
 
+/**
+* Creates a room and adds it to the current ship/building.
+*
+* WARNING: This cannot currently be used for adventure rooms. That would take
+* an upgrade.
+*
+* @param room_data *from The room we're attaching a new one to.
+* @param int dir Which direction to add it.
+* @param bld_data *bld A building prototype to attach, if desired (technically optional here but you do need to attach one at some point).
+* @return room_data* The created room.
+*/
+room_data *do_dg_add_room_dir(room_data *from, int dir, bld_data *bld) {
+	void add_room_to_vehicle(room_data *room, vehicle_data *veh);
+	extern struct empire_territory_data *create_territory_entry(empire_data *emp, room_data *room);
+	extern room_data *create_room();
+	void sort_world_table();
+	
+	room_data *home = HOME_ROOM(from), *new;
+	
+	// create the new room
+	new = create_room();
+	create_exit(from, new, dir, TRUE);
+	if (bld) {
+		attach_building_to_room(bld, new);
+	}
+
+	COMPLEX_DATA(new)->home_room = home;
+	COMPLEX_DATA(home)->inside_rooms++;
+	ROOM_OWNER(new) = ROOM_OWNER(home);
+	
+	if (GET_ROOM_VEHICLE(from)) {
+		++VEH_INSIDE_ROOMS(GET_ROOM_VEHICLE(from));
+		COMPLEX_DATA(new)->vehicle = GET_ROOM_VEHICLE(from);
+		add_room_to_vehicle(new, GET_ROOM_VEHICLE(from));
+	}
+	
+	if (ROOM_OWNER(new)) {
+		create_territory_entry(ROOM_OWNER(new), new);
+	}
+	
+	// sort now just in case
+	sort_world_table();
+	
+	return new;
+}
+
+
 /* modify an affection on the target. affections can be of the AFF_x  */
 /* variety or APPLY_x type. APPLY_x's have an integer value for them  */
 /* while AFF_x's have boolean values. In any case, the duration MUST  */

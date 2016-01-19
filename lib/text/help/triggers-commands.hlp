@@ -176,6 +176,10 @@ property of the door is being changed. Valid fields are:
    b - The door is closed.
 &cname&0- Value is the name of the door in the specified direction.
 &croom&0- Value is the vnum of the room this direction leads to.
+&cadd <room building vnum>&0 - Add an exit (two-way) to a new room in this
+   direction, using the building vnum provided (must be flagged ROOM). This
+   only works in map buildings and vehicles, never in adventure zones or on
+   the map itself.
 #d
 %DOT% MDOT ODOT VDOT WDOT
 

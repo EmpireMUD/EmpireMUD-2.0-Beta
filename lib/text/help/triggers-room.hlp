@@ -108,10 +108,6 @@ When using field - The variable returns:
       %room.north(vnum)% - vnum of room in direction
       %room.north(FLG)% - CLOSED LOCKED, etc.
       %room.north(room)% - room variable for room in direction
-      %room.north(create,VNUM)% - Adds a new room in that direction, using
-         building VNUM (which must be a ROOM-flagged building). This only
-         works in building/vehicle interiors that aren't adventures. This
-         returns the variable for the new room if it succeeds.
 &cid&0 - The unique id of the room.
 &cname&0 - The name of the room.
 &cpeople&0 - The id of the first character in the room, or an empty return.
