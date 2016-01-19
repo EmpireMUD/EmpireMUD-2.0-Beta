@@ -38,21 +38,24 @@ extern int dg_owner_purged;
 extern const char *action_bits[];
 extern const char *affected_bits[];
 extern const char *affect_types[];
+extern const char *alt_dirs[];
+extern const char *dirs[];
 extern const char *drinks[];
 extern const char *extra_bits[];
 extern const char *item_types[];
 extern const char *genders[];
 extern const char *player_bits[];
 extern const char *exit_bits[];
+extern const char *mob_move_types[];
 extern struct time_info_data time_info;
 extern const char *otrig_types[];
+extern const char *trig_attach_types[];
 extern const char *trig_types[];
 extern const char *wtrig_types[];
 extern const struct wear_data_type wear_data[NUM_WEARS];
 
 /* external functions */
-extern int find_ability_by_name(char *name, bool allow_abbrev);
-extern int find_skill_by_name(char *name);
+extern int count_harnessed_animals(vehicle_data *veh);
 void free_varlist(struct trig_var_data *vd);
 extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
 extern bool is_fight_enemy(char_data *ch, char_data *frenemy);	// fight.c
@@ -163,6 +166,7 @@ int find_eq_pos_script(char *arg) {
 		const char *pos;
 		int where;
 	} eq_pos[] = {
+		// WEAR_x:
 		{ "head", WEAR_HEAD },
 		{ "ears", WEAR_EARS },
 		{ "neck1", WEAR_NECK_1 },
@@ -186,6 +190,7 @@ int find_eq_pos_script(char *arg) {
 		{ "ranged", WEAR_RANGED },
 		{ "hold", WEAR_HOLD },
 		{ "held", WEAR_HOLD },
+		{ "shared", WEAR_SHARE },
 		{ "none", NO_WEAR }
 	};
 
@@ -239,6 +244,20 @@ room_data *find_room(int n) {
 }
 
 
+/**
+* Find a vehicle in the lookup table by id.
+*
+* @param int n The scripting id.
+* @return vehicle_data* The vehicle, if any.
+*/
+vehicle_data *find_vehicle(int n) {
+	if (n < VEHICLE_ID_BASE || n >= OBJ_ID_BASE) {
+		return NULL;
+	}
+	return find_vehicle_by_uid_in_lookup_table(n);
+}
+
+
 /************************************************************
 * generic searches based only on name
 ************************************************************/
@@ -280,6 +299,48 @@ char_data *get_char_near_obj(obj_data *obj, char *name) {
 			for (ch = ROOM_PEOPLE(num); ch; ch = ch->next_in_room) 
 				if (isname(name, ch->player.name) && valid_dg_target(ch, DG_ALLOW_GODS))
 					return ch;
+	}
+
+	return NULL;
+}
+
+
+/**
+* Finds a char present with a vehicle.
+*
+* @param vehicle_data *veh The vehicle to search near.
+* @param char *name The name to search for.
+* @return char_data* The found character, or NULL.
+*/
+char_data *get_char_near_vehicle(vehicle_data *veh, char *name) {
+	char_data *ch;
+
+	if (*name == UID_CHAR) {
+		ch = find_char(atoi(name + 1));
+
+		if (ch && valid_dg_target(ch, DG_ALLOW_GODS)) {
+			return ch;
+		}
+	}
+	else {
+		// prefer people attached to the vehicle
+		if (VEH_DRIVER(veh) && isname(name, GET_PC_NAME(VEH_DRIVER(veh))) && valid_dg_target(VEH_DRIVER(veh), DG_ALLOW_GODS)) {
+			return VEH_DRIVER(veh);
+		}
+		if (VEH_SITTING_ON(veh) && isname(name, GET_PC_NAME(VEH_SITTING_ON(veh))) && valid_dg_target(VEH_SITTING_ON(veh), DG_ALLOW_GODS)) {
+			return VEH_SITTING_ON(veh);
+		}
+		if (VEH_LED_BY(veh) && isname(name, GET_PC_NAME(VEH_LED_BY(veh))) && valid_dg_target(VEH_LED_BY(veh), DG_ALLOW_GODS)) {
+			return VEH_LED_BY(veh);
+		}
+		
+		if (IN_ROOM(veh)) {
+			for (ch = ROOM_PEOPLE(IN_ROOM(veh)); ch; ch = ch->next_in_room) {
+				if (isname(name, GET_PC_NAME(ch)) && valid_dg_target(ch, DG_ALLOW_GODS)) {
+					return ch;
+				}
+			}
+		}
 	}
 
 	return NULL;
@@ -351,7 +412,42 @@ obj_data *get_obj_near_obj(obj_data *obj, char *name) {
 				return i;
 	}
 	return NULL;
-}   
+}
+
+
+/**
+* Finds a matching object near the vehicle.
+*
+* @param vehicle_data *veh The vehicle that's looking for an object.
+* @param char *name The name to look for.
+* @return obj_data* The object found, or NULL if none.
+*/
+obj_data *get_obj_near_vehicle(vehicle_data *veh, char *name) {
+	obj_data *i = NULL;
+	char_data *ch;
+
+	if (*name == UID_CHAR) {
+		return find_obj(atoi(name + 1));
+	}
+	if (VEH_CONTAINS(veh) && (i = get_obj_in_list(name, VEH_CONTAINS(veh)))) {
+		return i;
+	}
+	if (IN_ROOM(veh)) {
+		if ((i = get_obj_in_list(name, ROOM_CONTENTS(IN_ROOM(veh))))) {
+			return i;
+		}
+		
+		// check inventories (because get_obj_near_obj does)
+		LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(veh)), ch, next_in_room) {
+			if ((i = get_object_in_equip(ch, name))) {
+				return i;
+			}
+		}
+	}
+	
+	return NULL;
+}
+
 
 /* returns the object in the world with name name, or NULL if not found */
 obj_data *get_obj(char *name)  {
@@ -400,6 +496,30 @@ room_data *get_room(room_data *ref, char *name) {
 }
 
 
+/**
+* Find a vehicle in the world by name/uid.
+*
+* @param char *name The name to look up.
+* @return vehicle_data* The found vehicle, or NULL if none.
+*/
+vehicle_data *get_vehicle(char *name) {
+	vehicle_data *veh;
+	
+	if (*name == UID_CHAR) {
+		return find_vehicle(atoi(name + 1));
+	}
+	else {
+		LL_FOREACH(vehicle_list, veh) {
+			if (isname(name, VEH_KEYWORDS(veh))) {
+				return veh;
+			}
+		}
+	}
+	
+	return NULL;
+}
+
+
 /*
 * returns a pointer to the first character in world by name name,
 * or NULL if none found.  Starts searching with the person owing the object
@@ -423,6 +543,54 @@ char_data *get_char_by_obj(obj_data *obj, char *name) {
 		for (ch = character_list; ch; ch = ch->next)
 			if (isname(name, ch->player.name) && valid_dg_target(ch, DG_ALLOW_GODS))
 				return ch;
+	}
+
+	return NULL;
+}
+
+
+/**
+* Looks up a character using a vehicle as a reference.
+*
+* @param vehicle_data *veh The vehicle that's looking for a character.
+* @param char *name The argument.
+* @return char_data* The found character, or NULL.
+*/
+char_data *get_char_by_vehicle(vehicle_data *veh, char *name) {
+	char_data *ch;
+
+	if (*name == UID_CHAR) {
+		ch = find_char(atoi(name + 1));
+
+		if (ch && valid_dg_target(ch, DG_ALLOW_GODS)) {
+			return ch;
+		}
+	}
+	else {
+		// prefer people attached to the vehicle
+		if (VEH_DRIVER(veh) && isname(name, GET_PC_NAME(VEH_DRIVER(veh))) && valid_dg_target(VEH_DRIVER(veh), DG_ALLOW_GODS)) {
+			return VEH_DRIVER(veh);
+		}
+		if (VEH_SITTING_ON(veh) && isname(name, GET_PC_NAME(VEH_SITTING_ON(veh))) && valid_dg_target(VEH_SITTING_ON(veh), DG_ALLOW_GODS)) {
+			return VEH_SITTING_ON(veh);
+		}
+		if (VEH_LED_BY(veh) && isname(name, GET_PC_NAME(VEH_LED_BY(veh))) && valid_dg_target(VEH_LED_BY(veh), DG_ALLOW_GODS)) {
+			return VEH_LED_BY(veh);
+		}
+		
+		// try people in the room with the vehicle
+		LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(veh)), ch, next_in_room) {
+			if (isname(name, GET_PC_NAME(ch)) && valid_dg_target(ch, DG_ALLOW_GODS)) {
+				return ch;
+			}
+		}
+		
+		// try whole world
+		LL_FOREACH(character_list, ch) {
+			if (isname(name, GET_PC_NAME(ch)) && valid_dg_target(ch, DG_ALLOW_GODS)) {
+				return ch;
+			}
+		}
 	}
 
 	return NULL;
@@ -486,7 +654,32 @@ obj_data *get_obj_by_obj(obj_data *obj, char *name) {
 		return i;
 
 	return get_obj(name);
-}   
+}
+
+
+/**
+* Finds a matching object in relation to the vehicle.
+*
+* @param vehicle_data *veh The vehicle that's looking for an object.
+* @param char *name The name to look for.
+* @return obj_data* The object found, or NULL if none.
+*/
+obj_data *get_obj_by_vehicle(vehicle_data *veh, char *name) {
+	obj_data *i = NULL;
+
+	if (*name == UID_CHAR) {
+		return find_obj(atoi(name + 1));
+	}
+	if (VEH_CONTAINS(veh) && (i = get_obj_in_list(name, VEH_CONTAINS(veh)))) {
+		return i;
+	}
+	if (IN_ROOM(veh) && (i = get_obj_in_list(name, ROOM_CONTENTS(IN_ROOM(veh))))) {
+		return i;
+	}
+	
+	return get_obj(name);
+}
+
 
 /* only searches the room */
 obj_data *get_obj_in_room(room_data *room, char *name) {
@@ -525,6 +718,138 @@ obj_data *get_obj_by_room(room_data *room, char *name) {
 
 	return NULL;
 }
+
+
+/**
+* Finds a matching vehicle in relation to an object.
+*
+* @param obj_data *obj The object that's looking for a vehicle.
+* @param char *name The name to look for.
+* @return vehicle_data* The found vehicle, or NULL.
+*/
+vehicle_data *get_vehicle_by_obj(obj_data *obj, char *name) {
+	vehicle_data *iter;
+	room_data *room;
+	
+	if (*name == UID_CHAR) {
+		return find_vehicle(atoi(name + 1));
+	}
+	
+	if ((room = obj_room(obj))) {
+		LL_FOREACH2(ROOM_VEHICLES(room), iter, next_in_room) {
+			if (isname(name, VEH_KEYWORDS(iter))) {
+				return iter;
+			}
+		}
+	}
+	
+	return get_vehicle(name);
+}
+
+
+
+/**
+* Finds a matching vehicle in relation to a room.
+*
+* @param room_data *room The room that's looking for a vehicle.
+* @param char *name The name to look for.
+* @return vehicle_data* The found vehicle or NULL.
+*/
+vehicle_data *get_vehicle_by_room(room_data *room, char *name) {
+	vehicle_data *iter;
+	
+	if (*name == UID_CHAR) {
+		return find_vehicle(atoi(name + 1));
+	}
+
+	LL_FOREACH2(ROOM_VEHICLES(room), iter, next_in_room) {
+		if (isname(name, VEH_KEYWORDS(iter))) {
+			return iter;
+		}
+	}
+	
+	return get_vehicle(name);
+}
+
+
+/**
+* Finds a matching vehicle in relation to another vehicle.
+*
+* @param vehicle_data *veh The vehicle that's looking for an object.
+* @param char *name The name to look for.
+* @return vehicle_data* The found vehicle or NULL.
+*/
+vehicle_data *get_vehicle_by_vehicle(vehicle_data *veh, char *name) {
+	vehicle_data *iter;
+	
+	if (*name == UID_CHAR) {
+		return find_vehicle(atoi(name + 1));
+	}
+	if (!str_cmp(name, "self") || !str_cmp(name, "me")) {
+		return veh;
+	}
+	if (IN_ROOM(veh)) {
+		LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(veh)), iter, next_in_room) {
+			if (isname(name, VEH_KEYWORDS(iter))) {
+				return iter;
+			}
+		}
+	}
+	
+	return get_vehicle(name);
+}
+
+
+/**
+* Finds a vehicle in the same room as the object.
+*
+* @param obj_data *obj The object to search near.
+* @param char *name The name argument.
+*/
+vehicle_data *get_vehicle_near_obj(obj_data *obj, char *name) {
+	room_data *orm;
+
+	if (*name == UID_CHAR) {
+		return find_vehicle(atoi(name + 1));
+	}
+	else if (obj->in_vehicle && isname(name, VEH_KEYWORDS(obj->in_vehicle))) {
+		return obj->in_vehicle;
+	}
+	else if ((orm = obj_room(obj))) {
+		if (GET_ROOM_VEHICLE(orm) && isname(name, VEH_KEYWORDS(GET_ROOM_VEHICLE(orm)))) {
+			return GET_ROOM_VEHICLE(orm);
+		}
+		return get_vehicle_room(orm, name);
+	}
+	else {
+		return NULL;
+	}
+}
+
+
+/**
+* Finds a matching vehicle near the vehicle.
+*
+* @param vehicle_data *veh The vehicle that's looking for another.
+* @param char *name The name to look for.
+* @return vehicle_data* The vehicle found, or NULL if none.
+*/
+vehicle_data *get_vehicle_near_vehicle(vehicle_data *veh, char *name) {
+	vehicle_data *find;
+	
+	if (*name == UID_CHAR) {
+		return find_vehicle(atoi(name + 1));
+	}
+	if ((find = get_vehicle_room(IN_ROOM(veh), name))) {
+		return find;
+	}
+	if (GET_ROOM_VEHICLE(IN_ROOM(veh)) && isname(name, VEH_KEYWORDS(GET_ROOM_VEHICLE(IN_ROOM(veh))))) {
+		return GET_ROOM_VEHICLE(IN_ROOM(veh));
+	}
+	
+	return NULL;
+}
+
 
 /* search through all the persons items, including containers
 and 0 if it doesnt exist, and greater then 0 if it does!
@@ -603,21 +928,22 @@ int char_has_item(char *item, char_data *ch) {
 void script_trigger_check(void) {
 	static int my_cycle = 0;
 	
-	char_data *ch;
-	obj_data *obj;
+	vehicle_data *veh, *next_veh;
+	char_data *ch, *next_ch;
+	obj_data *obj, *next_obj;
 	room_data *room, *next_room;
 	struct script_data *sc;
-
-	for (ch = character_list; ch; ch = ch->next) {
+	
+	LL_FOREACH_SAFE(character_list, ch, next_ch) {
 		if (SCRIPT(ch)) {
 			sc = SCRIPT(ch);
 
-		if (IS_SET(SCRIPT_TYPES(sc), WTRIG_RANDOM) && (players_nearby_script(IN_ROOM(ch)) || IS_SET(SCRIPT_TYPES(sc), WTRIG_GLOBAL)))
+		if (IS_SET(SCRIPT_TYPES(sc), MTRIG_RANDOM) && (IS_SET(SCRIPT_TYPES(sc), MTRIG_GLOBAL) || players_nearby_script(IN_ROOM(ch))))
 			random_mtrigger(ch);
 		}
 	}
-
-	for (obj = object_list; obj; obj = obj->next) {
+	
+	LL_FOREACH_SAFE(object_list, obj, next_obj) {
 		if (SCRIPT(obj)) {
 			sc = SCRIPT(obj);
 
@@ -625,20 +951,30 @@ void script_trigger_check(void) {
 				random_otrigger(obj);
 		}
 	}
+	
+	LL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
+		if (IN_ROOM(veh) && SCRIPT(veh)) {
+			sc = SCRIPT(veh);
+
+			if (IS_SET(SCRIPT_TYPES(sc), VTRIG_RANDOM) && (IS_SET(SCRIPT_TYPES(sc), VTRIG_GLOBAL) || players_nearby_script(IN_ROOM(veh)))) {
+				random_vtrigger(veh);
+			}
+		}
+	}
 
 	// Except every 5th cycle, this only does "interior" rooms -- to prevent over-frequent map iteration
 	if (++my_cycle >= 5) {
 		my_cycle = 0;
-		HASH_ITER(world_hh, world_table, room, next_room) {
+		HASH_ITER(hh, world_table, room, next_room) {
 			if ((sc = SCRIPT(room)) && IS_SET(SCRIPT_TYPES(sc), WTRIG_RANDOM) && (players_nearby_script(room) || IS_SET(SCRIPT_TYPES(sc), WTRIG_GLOBAL))) {
 				random_wtrigger(room);
 			}
 		}
 	}
 	else {
-		// partial		
-		HASH_ITER(interior_hh, interior_world_table, room, next_room) {
-			if ((sc = SCRIPT(room)) && IS_SET(SCRIPT_TYPES(sc), WTRIG_RANDOM) && (players_nearby_script(room) || IS_SET(SCRIPT_TYPES(sc), WTRIG_GLOBAL))) {
+		// partial
+		LL_FOREACH_SAFE2(interior_room_list, room, next_room, next_interior) {
+			if ((sc = SCRIPT(room)) && IS_SET(SCRIPT_TYPES(sc), WTRIG_RANDOM) && (IS_SET(SCRIPT_TYPES(sc), WTRIG_GLOBAL) || players_nearby_script(room))) {
 				random_wtrigger(room);
 			}
 		}
@@ -676,9 +1012,18 @@ EVENTFUNC(trig_wait_event) {
 				if (obj == (obj_data*)go)
 					found = TRUE;
 		}
-		else {
+		else if (type == VEH_TRIGGER) {
+			vehicle_data *veh;
+			LL_FOREACH(vehicle_list, veh) {
+				if (veh == (vehicle_data*)go) {
+					found = TRUE;
+					break;
+				}
+			}
+		}
+		else {	// WLD_TRIGGER, RMT_TRIGGER, ADV_TRIGGER
 			room_data *i, *next_i;
-			HASH_ITER(world_hh, world_table, i, next_i) {
+			HASH_ITER(hh, world_table, i, next_i) {
 				if (i == (room_data*)go) {
 					found = TRUE;
 					break;
@@ -687,7 +1032,7 @@ EVENTFUNC(trig_wait_event) {
 		}
 		if (!found) {
 			log("Trigger restarted on unknown entity. Vnum: %d", GET_TRIG_VNUM(trig));
-			log("Type: %s trigger", type==MOB_TRIGGER ? "Mob" : type == OBJ_TRIGGER ? "Obj" : "Room");
+			log("Type: %s trigger", trig_attach_types[type]);
 			script_log("Trigger restart attempt on unknown entity.");
 			return 0;
 		}
@@ -883,6 +1228,7 @@ void add_trigger(struct script_data *sc, trig_data *t, int loc) {
 
 
 ACMD(do_tattach) {
+	vehicle_data *veh;
 	char_data *victim;
 	obj_data *object;
 	room_data *room;
@@ -896,7 +1242,7 @@ ACMD(do_tattach) {
 	two_arguments(argument, targ_name, loc_name);
 
 	if (!*arg || !*targ_name || !*trig_name) {
-		msg_to_char(ch, "Usage: tattach { mob | obj | room } { trigger } { name } [ location ]\r\n");
+		msg_to_char(ch, "Usage: tattach <type> <trigger> <attach to target> [location]\r\n");
 		return;
 	}
 
@@ -976,6 +1322,43 @@ ACMD(do_tattach) {
 
 		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d (%s) attached to %s [%d] by %s.", tn, GET_TRIG_NAME(trig), (GET_OBJ_SHORT_DESC(object) ? GET_OBJ_SHORT_DESC(object) : object->name), GET_OBJ_VNUM(object), GET_NAME(ch));
 		msg_to_char(ch, "Trigger %d (%s) attached to %s [%d].\r\n", tn, GET_TRIG_NAME(trig), (GET_OBJ_SHORT_DESC(object) ? GET_OBJ_SHORT_DESC(object) : object->name), GET_OBJ_VNUM(object));
+	}
+	else if (is_abbrev(arg, "vehicle") || is_abbrev(arg, "vtr")) {
+		veh = (*targ_name == UID_CHAR) ? get_vehicle(targ_name) : get_vehicle_vis(ch, targ_name);
+		if (!veh) {
+			// search room for vehicle with matching vnum
+			LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+				if (VEH_VNUM(veh) == num_arg) {
+					break;
+				}
+			}
+			
+			// no?
+			if (!veh) {
+				msg_to_char(ch, "That vehicle does not exist.\r\n");
+				return;
+			}
+		}
+		
+		if (!player_can_olc_edit(ch, OLC_VEHICLE, VEH_VNUM(veh))) {
+			msg_to_char(ch, "You can't edit that vnum.\r\n");
+			return;
+		}
+
+		/* have a valid obj, now get trigger */
+		proto = real_trigger(tn);
+		if (!proto || !(trig = read_trigger(tn))) {
+			msg_to_char(ch, "That trigger does not exist.\r\n");
+			return;
+		}
+
+		if (!SCRIPT(veh)) {
+			CREATE(SCRIPT(veh), struct script_data, 1);
+		}
+		add_trigger(SCRIPT(veh), trig, loc);
+
+		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d (%s) attached to %s [%d] by %s.", tn, GET_TRIG_NAME(trig), VEH_SHORT_DESC(veh), VEH_VNUM(veh), GET_NAME(ch));
+		msg_to_char(ch, "Trigger %d (%s) attached to %s [%d].\r\n", tn, GET_TRIG_NAME(trig), VEH_SHORT_DESC(veh), VEH_VNUM(veh));
 	}
 	else if (is_abbrev(arg, "room") || is_abbrev(arg, "wtr")) {
 		if (strchr(targ_name, '.'))
@@ -1117,6 +1500,7 @@ int remove_trigger(struct script_data *sc, char *name) {
 }
 
 ACMD(do_tdetach) {
+	vehicle_data *veh = NULL;
 	char_data *victim = NULL;
 	obj_data *object = NULL;
 	room_data *room;
@@ -1128,13 +1512,13 @@ ACMD(do_tdetach) {
 	one_argument(argument, arg3);
 
 	if (!*arg1 || !*arg2) {
-		msg_to_char(ch, "Usage: detach [ mob | object | room ] { target } { trigger | 'all' }\r\n");
+		msg_to_char(ch, "Usage: tdetach <type> <target> <trigger | 'all'>\r\n");
 		return;
 	}
 
 	/* vnum of mob/obj, if given */
 	num_arg = atoi(arg2);
-
+	
 	if (!str_cmp(arg1, "room") || !str_cmp(arg1, "wtr")) {
 		room = IN_ROOM(ch);
 		if (!SCRIPT(room))
@@ -1158,138 +1542,198 @@ ACMD(do_tdetach) {
 				extract_script(room, WLD_TRIGGER);
 			}
 		}
-		else
+		else {
 			msg_to_char(ch, "That trigger was not found.\r\n");
+		}
+		
+		// room always done now
+		return;
 	}
-	else {
-		if (is_abbrev(arg1, "mobile") || !str_cmp(arg1, "mtr")) {
-			victim = (*arg2 == UID_CHAR) ? get_char(arg2) : get_char_vis(ch, arg2, FIND_CHAR_WORLD);
-			if (!victim) { /* search room for one with this vnum */
-				for (victim = ROOM_PEOPLE(IN_ROOM(ch)); victim;victim=victim->next_in_room) 
-					if (GET_MOB_VNUM(victim) == num_arg)
-						break;
+	else if (is_abbrev(arg1, "mobile") || !str_cmp(arg1, "mtr")) {
+		victim = (*arg2 == UID_CHAR) ? get_char(arg2) : get_char_vis(ch, arg2, FIND_CHAR_WORLD);
+		if (!victim) { /* search room for one with this vnum */
+			for (victim = ROOM_PEOPLE(IN_ROOM(ch)); victim;victim=victim->next_in_room) 
+				if (GET_MOB_VNUM(victim) == num_arg)
+					break;
 
-				if (!victim) {
-					msg_to_char(ch, "No such mobile around.\r\n");
-					return;
-				}
-			}
-
-			if (!player_can_olc_edit(ch, OLC_MOBILE, GET_MOB_VNUM(victim))) {
-				msg_to_char(ch, "You can't edit that vnum.\r\n");
+			if (!victim) {
+				msg_to_char(ch, "No such mobile around.\r\n");
 				return;
 			}
-
-			if (!*arg3)
-				msg_to_char(ch, "You must specify a trigger to remove.\r\n");
-			else
-				trigger = arg3;
 		}
-		else if (is_abbrev(arg1, "object") || !str_cmp(arg1, "otr")) {
-			object = (*arg2 == UID_CHAR) ? get_obj(arg2) : get_obj_vis(ch, arg2);
-			if (!object) { /* search room for one with this vnum */
-				for (object = ROOM_CONTENTS(IN_ROOM(ch)); object;object=object->next_content) 
+
+		if (!player_can_olc_edit(ch, OLC_MOBILE, GET_MOB_VNUM(victim))) {
+			msg_to_char(ch, "You can't edit that vnum.\r\n");
+			return;
+		}
+
+		if (!*arg3)
+			msg_to_char(ch, "You must specify a trigger to remove.\r\n");
+		else
+			trigger = arg3;
+	}
+	else if (is_abbrev(arg1, "object") || !str_cmp(arg1, "otr")) {
+		object = (*arg2 == UID_CHAR) ? get_obj(arg2) : get_obj_vis(ch, arg2);
+		if (!object) { /* search room for one with this vnum */
+			for (object = ROOM_CONTENTS(IN_ROOM(ch)); object;object=object->next_content) 
+				if (GET_OBJ_VNUM(object) == num_arg)
+					break;
+
+			if (!object) { /* search inventory for one with this vnum */
+				for (object = ch->carrying;object;object=object->next_content) 
 					if (GET_OBJ_VNUM(object) == num_arg)
 						break;
 
-				if (!object) { /* search inventory for one with this vnum */
-					for (object = ch->carrying;object;object=object->next_content) 
-						if (GET_OBJ_VNUM(object) == num_arg)
-							break;
-
-					if (!object) { /* give up */
-						msg_to_char(ch, "No such object around.\r\n");
-						return;
-					}
+				if (!object) { /* give up */
+					msg_to_char(ch, "No such object around.\r\n");
+					return;
 				}
 			}
+		}
 
-			if (!player_can_olc_edit(ch, OLC_OBJECT, GET_OBJ_VNUM(object))) {
-				msg_to_char(ch, "You can't edit that vnum.\r\n");
+		if (!player_can_olc_edit(ch, OLC_OBJECT, GET_OBJ_VNUM(object))) {
+			msg_to_char(ch, "You can't edit that vnum.\r\n");
+			return;
+		}
+
+		if (!*arg3)
+			msg_to_char(ch, "You must specify a trigger to remove.\r\n");
+		else
+			trigger = arg3;
+	}
+	else if (is_abbrev(arg1, "vehicle") || !str_cmp(arg1, "vtr")) {
+		veh = (*arg2 == UID_CHAR) ? get_vehicle(arg2) : get_vehicle_vis(ch, arg2);
+		if (!veh) {
+			// search room for vehicle with matching vnum
+			LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+				if (VEH_VNUM(veh) == num_arg) {
+					break;
+				}
+			}
+			
+			// no?
+			if (!veh) {
+				msg_to_char(ch, "That vehicle does not exist.\r\n");
 				return;
 			}
+		}
+		
+		if (!player_can_olc_edit(ch, OLC_VEHICLE, VEH_VNUM(veh))) {
+			msg_to_char(ch, "You can't edit that vnum.\r\n");
+			return;
+		}
 
-			if (!*arg3)
-				msg_to_char(ch, "You must specify a trigger to remove.\r\n");
-			else
-				trigger = arg3;
+		if (!*arg3) {
+			msg_to_char(ch, "You must specify a trigger to remove.\r\n");
 		}
 		else {
-			if (*arg1 == UID_CHAR && ((victim = get_char(arg1)) || (object = get_obj(arg1)))) {
-			}
-			else if ((object = get_obj_in_equip_vis(ch, arg1, ch->equipment))) {
-				/* Thanks to Carlos Myers for fixing the line above */
-			}
-			else if ((object = get_obj_in_list_vis(ch, arg1, ch->carrying))) {
-			}
-			else if ((victim = get_char_room_vis(ch, arg1))) {
-			}
-			else if ((object = get_obj_in_list_vis(ch, arg1, ROOM_CONTENTS(IN_ROOM(ch))))) {
-			}
-			else if ((victim = get_char_vis(ch, arg1, FIND_CHAR_WORLD))) {
-			}
-			else if ((object = get_obj_vis(ch, arg1))) {
-			}
-			else {
-				msg_to_char(ch, "Nothing around by that name.\r\n");
-			}
-
-			if ((victim && !player_can_olc_edit(ch, OLC_MOBILE, GET_MOB_VNUM(victim))) || (object && !player_can_olc_edit(ch, OLC_OBJECT, GET_OBJ_VNUM(object)))) {
-				msg_to_char(ch, "You can't edit that vnum.\r\n");
-				return;
-			}
-
-			trigger = arg2;
+			trigger = arg3;
+		}
+	}
+	else {
+		if (*arg1 == UID_CHAR && ((victim = get_char(arg1)) || (object = get_obj(arg1)))) {
+		}
+		else if ((veh = get_vehicle_in_room_vis(ch, arg1))) {
+		}
+		else if ((object = get_obj_in_equip_vis(ch, arg1, ch->equipment))) {
+			/* Thanks to Carlos Myers for fixing the line above */
+		}
+		else if ((object = get_obj_in_list_vis(ch, arg1, ch->carrying))) {
+		}
+		else if ((victim = get_char_room_vis(ch, arg1))) {
+		}
+		else if ((object = get_obj_in_list_vis(ch, arg1, ROOM_CONTENTS(IN_ROOM(ch))))) {
+		}
+		else if ((victim = get_char_vis(ch, arg1, FIND_CHAR_WORLD))) {
+		}
+		else if ((veh = get_vehicle_vis(ch, arg1))) {
+		}
+		else if ((object = get_obj_vis(ch, arg1))) {
+		}
+		else {
+			msg_to_char(ch, "Nothing around by that name.\r\n");
 		}
 
-		if (victim) {
-			if (!IS_NPC(victim))
-				msg_to_char(ch, "Players don't have triggers.\r\n");
-			else if (!SCRIPT(victim))
-				msg_to_char(ch, "That mob doesn't have any triggers.\r\n");
-			else if (trigger && !str_cmp(trigger, "all")) {
+		if ((victim && !player_can_olc_edit(ch, OLC_MOBILE, GET_MOB_VNUM(victim))) || (object && !player_can_olc_edit(ch, OLC_OBJECT, GET_OBJ_VNUM(object))) || (veh && !player_can_olc_edit(ch, OLC_VEHICLE, VEH_VNUM(veh)))) {
+			msg_to_char(ch, "You can't edit that vnum.\r\n");
+			return;
+		}
+
+		trigger = arg2;
+	}
+	
+	// do the actual detaching
+	if (victim) {
+		if (!IS_NPC(victim))
+			msg_to_char(ch, "Players don't have triggers.\r\n");
+		else if (!SCRIPT(victim))
+			msg_to_char(ch, "That mob doesn't have any triggers.\r\n");
+		else if (trigger && !str_cmp(trigger, "all")) {
+			extract_script(victim, MOB_TRIGGER);
+			if (!IS_NPC(ch)) {
+				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "All triggers removed from mob %s by %s.", GET_SHORT(victim), GET_NAME(ch));
+			}
+			msg_to_char(ch, "All triggers removed from %s.\r\n", GET_SHORT(victim));
+		}
+		else if (trigger && remove_trigger(SCRIPT(victim), trigger)) {
+			if (!IS_NPC(ch)) {
+				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "Trigger %s removed from mob %s by %s.", trigger, GET_SHORT(victim), GET_NAME(ch));
+			}
+			msg_to_char(ch, "Trigger removed.\r\n");
+			if (!TRIGGERS(SCRIPT(victim))) {
 				extract_script(victim, MOB_TRIGGER);
-				if (!IS_NPC(ch)) {
-					syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "All triggers removed from mob %s by %s.", GET_SHORT(victim), GET_NAME(ch));
-				}
-				msg_to_char(ch, "All triggers removed from %s.\r\n", GET_SHORT(victim));
 			}
-			else if (trigger && remove_trigger(SCRIPT(victim), trigger)) {
-				if (!IS_NPC(ch)) {
-					syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "Trigger %s removed from mob %s by %s.", trigger, GET_SHORT(victim), GET_NAME(ch));
-				}
-				msg_to_char(ch, "Trigger removed.\r\n");
-				if (!TRIGGERS(SCRIPT(victim))) {
-					extract_script(victim, MOB_TRIGGER);
-				}
-			}
-			else
-				msg_to_char(ch, "That trigger was not found.\r\n");
 		}
-		else if (object) {
-			if (!SCRIPT(object))
-				msg_to_char(ch, "That object doesn't have any triggers.\r\n");
-			else if (trigger && !str_cmp(trigger, "all")) {
+		else
+			msg_to_char(ch, "That trigger was not found.\r\n");
+	}
+	else if (object) {
+		if (!SCRIPT(object))
+			msg_to_char(ch, "That object doesn't have any triggers.\r\n");
+		else if (trigger && !str_cmp(trigger, "all")) {
+			extract_script(object, OBJ_TRIGGER);
+			if (!IS_NPC(ch)) {
+				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "All triggers removed from obj %s by %s.", GET_OBJ_SHORT_DESC(object), GET_NAME(ch));
+			}
+			msg_to_char(ch, "All triggers removed from %s.\r\n", GET_OBJ_SHORT_DESC(object) ? GET_OBJ_SHORT_DESC(object) : object->name);
+		}
+		else if (remove_trigger(SCRIPT(object), trigger)) {
+			if (!IS_NPC(ch)) {
+				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "Trigger %s removed from obj %s by %s.", trigger, GET_OBJ_SHORT_DESC(object), GET_NAME(ch));
+			}
+			msg_to_char(ch, "Trigger removed.\r\n");
+			if (!TRIGGERS(SCRIPT(object))) {
 				extract_script(object, OBJ_TRIGGER);
-				if (!IS_NPC(ch)) {
-					syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "All triggers removed from obj %s by %s.", GET_OBJ_SHORT_DESC(object), GET_NAME(ch));
-				}
-				msg_to_char(ch, "All triggers removed from %s.\r\n", GET_OBJ_SHORT_DESC(object) ? GET_OBJ_SHORT_DESC(object) : object->name);
 			}
-			else if (remove_trigger(SCRIPT(object), trigger)) {
-				if (!IS_NPC(ch)) {
-					syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "Trigger %s removed from obj %s by %s.", trigger, GET_OBJ_SHORT_DESC(object), GET_NAME(ch));
-				}
-				msg_to_char(ch, "Trigger removed.\r\n");
-				if (!TRIGGERS(SCRIPT(object))) {
-					extract_script(object, OBJ_TRIGGER);
-				}
-			}
-			else
-				msg_to_char(ch, "That trigger was not found.\r\n");
 		}
-	}  
-}    
+		else
+			msg_to_char(ch, "That trigger was not found.\r\n");
+	}
+	else if (veh) {
+		if (!SCRIPT(veh)) {
+			msg_to_char(ch, "That vehicle has no triggers.\r\n");
+		}
+		else if (trigger && !str_cmp(trigger, "all")) {
+			extract_script(veh, VEH_TRIGGER);
+			if (!IS_NPC(ch)) {
+				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "All triggers removed from vehicle %s by %s.", VEH_SHORT_DESC(veh), GET_NAME(ch));
+			}
+			msg_to_char(ch, "All triggers removed from %s.\r\n", VEH_SHORT_DESC(veh));
+		}
+		else if (remove_trigger(SCRIPT(veh), trigger)) {
+			if (!IS_NPC(ch)) {
+				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "Trigger %s removed from vehicle %s by %s.", trigger, VEH_SHORT_DESC(veh), GET_NAME(ch));
+			}
+			msg_to_char(ch, "Trigger removed.\r\n");
+			if (!TRIGGERS(SCRIPT(veh))) {
+				extract_script(veh, VEH_TRIGGER);
+			}
+		}
+		else {
+			msg_to_char(ch, "That trigger was not found.\r\n");
+		}
+	}
+}
 
 
 /* frees memory associated with var */
@@ -1476,7 +1920,7 @@ void direction_vars(room_data *room, int dir, char *subfield, char *str, size_t 
 				snprintf(str, slen, "%d", GET_ROOM_VNUM(to_room));
 			}
 			else if (!str_cmp(subfield, "room")) {
-				snprintf(str, slen, "%c%d", UID_CHAR, GET_ROOM_VNUM(to_room) + ROOM_ID_BASE); 
+				snprintf(str, slen, "%c%d", UID_CHAR, GET_ROOM_VNUM(to_room) + ROOM_ID_BASE);
 			}
 		}
 		else {	// default to empty
@@ -1493,50 +1937,60 @@ void direction_vars(room_data *room, int dir, char *subfield, char *str, size_t 
 void find_replacement(void *go, struct script_data *sc, trig_data *trig, int type, char *var, char *field, char *subfield, char *str, size_t slen) {
 	struct trig_var_data *vd=NULL;
 	char_data *ch = NULL, *c = NULL, *rndm;
+	vehicle_data *veh = NULL, *v = NULL;
 	obj_data *obj = NULL, *o = NULL;
 	room_data *room, *r = NULL;
 	char *name;
 	int num, count;
 
-	char *send_cmd[] = {"msend ", "osend ", "wsend " };
-	char *echo_cmd[] = {"mecho ", "oecho ", "wecho " };
-	char *echoaround_cmd[] = {"mechoaround ", "oechoaround ", "wechoaround " };
-	char *echoneither_cmd[] = {"mechoneither ", "oechoneither ", "wechoneither " };
-	char *door[] = {"mdoor ", "odoor ", "wdoor " };
-	char *force[] = {"mforce ", "oforce ", "wforce " };
-	char *load[] = {"mload ", "oload ", "wload " };
-	char *purge[] = {"mpurge ", "opurge ", "wpurge " };
-	char *scale[] = {"mscale ", "oscale ", "wscale " };
-	char *teleport[] = {"mteleport ", "oteleport ", "wteleport " };
-	char *terracrop[] = {"mterracrop ", "oterracrop ", "wterracrop " };
-	char *terraform[] = {"mterraform ", "oterraform ", "wterraform " };
+	// x_TRIGGER: mob, obj, world, rmt, adv, vehicle
+	char *send_cmd[] = {"msend ", "osend ", "wsend ", "wsend ", "wsend ", "vsend " };
+	char *echo_cmd[] = {"mecho ", "oecho ", "wecho ", "wecho ", "wecho ", "vecho " };
+	char *echoaround_cmd[] = {"mechoaround ", "oechoaround ", "wechoaround ", "wechoaround ", "wechoaround ", "vechoaround " };
+	char *echoneither_cmd[] = {"mechoneither ", "oechoneither ", "wechoneither ", "wechoneither ", "wechoneither ", "vechoneither " };
+	char *door[] = {"mdoor ", "odoor ", "wdoor ", "wdoor ", "wdoor ", "vdoor " };
+	char *force[] = {"mforce ", "oforce ", "wforce ", "wforce ", "wforce ", "vforce " };
+	char *load[] = {"mload ", "oload ", "wload ", "wload ", "wload ", "vload " };
+	char *purge[] = {"mpurge ", "opurge ", "wpurge ", "wpurge ", "wpurge ", "vpurge " };
+	char *scale[] = {"mscale ", "oscale ", "wscale ", "wscale ", "wscale ", "vscale " };
+	char *siege[] = {"msiege ", "osiege ", "wsiege ", "wsiege ", "wsiege ", "vsiege " };
+	char *teleport[] = {"mteleport ", "oteleport ", "wteleport ", "wteleport ", "wteleport ", "vteleport " };
+	char *terracrop[] = {"mterracrop ", "oterracrop ", "wterracrop ", "wterracrop ", "wterracrop ", "vterracrop " };
+	char *terraform[] = {"mterraform ", "oterraform ", "wterraform ", "wterraform ", "wterraform ", "vterraform " };
 	/* the x kills a 'shadow' warning in gcc. */
-	char *xdamage[] = {"mdamage ", "odamage ", "wdamage " };
-	char *xaoe[] = {"maoe ", "oaoe ", "waoe " };
-	char *xdot[] = {"mdot ", "odot ", "wdot " };
-	char *buildingecho[] = {"mbuildingecho ", "obuildingecho ", "wbuildingecho " };
-	char *regionecho[] = {"mregionecho ", "oregionecho ", "wregionecho " };
-	char *asound[] = {"masound ", "oasound ", "wasound " };
-	char *at[] = {"mat ", "oat ", "wat " };
-	char *adventurecomplete[] = {"madventurecomplete", "oadventurecomplete", "wadventurecomplete" };
-	/* there is no such thing as wtransform, thus the wecho below  */
-	char *transform[] = {"mtransform ", "otransform ", "wecho" };
+	char *xdamage[] = {"mdamage ", "odamage ", "wdamage ", "wdamage ", "wdamage ", "vdamage " };
+	char *xaoe[] = {"maoe ", "oaoe ", "waoe ", "waoe ", "waoe ", "vaoe " };
+	char *xdot[] = {"mdot ", "odot ", "wdot ", "wdot ", "wdot ", "vdot " };
+	char *buildingecho[] = {"mbuildingecho ", "obuildingecho ", "wbuildingecho ", "wbuildingecho ", "wbuildingecho ", "vbuildingecho " };
+	char *regionecho[] = {"mregionecho ", "oregionecho ", "wregionecho ", "wregionecho ", "wregionecho ", "vregionecho " };
+	char *vehicleecho[] = {"mvehicleecho ", "ovehicleecho ", "wvehicleecho ", "wvehicleecho ", "wvehicleecho ", "vvehicleecho " };
+	char *asound[] = {"masound ", "oasound ", "wasound ", "wasound ", "wasound ", "vasound " };
+	char *at[] = {"mat ", "oat ", "wat ", "wat ", "wat ", "vat " };
+	char *adventurecomplete[] = {"madventurecomplete", "oadventurecomplete", "wadventurecomplete", "wadventurecomplete", "wadventurecomplete", "vadventurecomplete" };
+	char *transform[] = {"mtransform ", "otransform ", "wtransform ", "wtransform ", "wtransform ", "vtransform " };
+	
 	/* X.global() will have a NULL trig */
 	if (trig) {
-		for (vd = GET_TRIG_VARS(trig); vd; vd = vd->next)
-			if (!str_cmp(vd->name, var))
+		for (vd = GET_TRIG_VARS(trig); vd; vd = vd->next) {
+			if (!str_cmp(vd->name, var)) {
 				break;
+			}
+		}
 	}
 
 	/* some evil waitstates could crash the mud if sent here with sc==NULL*/
-	if (!vd && sc) 
-		for (vd = sc->global_vars; vd; vd = vd->next)
-			if (!str_cmp(vd->name, var) && (vd->context==0 || vd->context==sc->context))
+	if (!vd && sc) {
+		for (vd = sc->global_vars; vd; vd = vd->next) {
+			if (!str_cmp(vd->name, var) && (vd->context==0 || vd->context==sc->context)) {
 				break;
+			}
+		}
+	}
 
 	if (!*field) {
-		if (vd)
+		if (vd) {
 			snprintf(str, slen, "%s", vd->value);
+		}
 		else {
 			if (!str_cmp(var, "self"))
 				switch (type) {
@@ -1551,6 +2005,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					case ADV_TRIGGER:
 						snprintf(str, slen, "%c%d", UID_CHAR, GET_ROOM_VNUM((room_data*)go) + ROOM_ID_BASE);
 						break;
+					case VEH_TRIGGER: {
+						snprintf(str, slen, "%c%d", UID_CHAR, GET_ID((vehicle_data*) go));
+						break;
+					}
 				}
 			//        snprintf(str, slen, "self");
 			else if (!str_cmp(var, "door"))
@@ -1563,6 +2021,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				snprintf(str, slen, "%s", purge[type]);
 			else if (!str_cmp(var, "scale"))
 				snprintf(str, slen, "%s", scale[type]);
+			else if (!str_cmp(var, "siege"))
+				snprintf(str, slen, "%s", siege[type]);
 			else if (!str_cmp(var, "teleport"))
 				snprintf(str, slen, "%s", teleport[type]);
 			else if (!str_cmp(var, "terracrop"))
@@ -1587,6 +2047,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				snprintf(str, slen, "%s", buildingecho[type]);
 			else if (!str_cmp(var, "regionecho"))
 				snprintf(str, slen, "%s", regionecho[type]);
+			else if (!str_cmp(var, "vehicleecho"))
+				snprintf(str, slen, "%s", vehicleecho[type]);
 			else if (!str_cmp(var, "asound"))
 				snprintf(str, slen, "%s", asound[type]);
 			else if (!str_cmp(var, "at"))
@@ -1634,10 +2096,19 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if ((c = get_char_room(name, IN_ROOM(ch)))) {
 						// just setting
 					}
+					else if ((v = get_vehicle_room(IN_ROOM(ch), name))) {
+						// just setting
+					}
+					else if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && isname(name, VEH_KEYWORDS(GET_ROOM_VEHICLE(IN_ROOM(ch))))) {
+						v = GET_ROOM_VEHICLE(IN_ROOM(ch));
+					}
 					else if ((o = get_obj_in_list(name, ROOM_CONTENTS(IN_ROOM(ch))))) {
 						// just setting
 					}
 					else if ((c = get_char(name))) {
+						// just setting
+					}
+					else if ((v = get_vehicle(name))) {
 						// just setting
 					}
 					else if ((o = get_obj(name))) {
@@ -1652,6 +2123,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					obj = (obj_data*) go;
 
 					if ((c = get_char_by_obj(obj, name))) {
+						// just setting
+					}
+					else if ((v = get_vehicle_by_obj(obj, name))) {
 						// just setting
 					}
 					else if ((o = get_obj_by_obj(obj, name))) {
@@ -1673,6 +2147,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					if ((c = get_char_by_room(room, name))) {
 						// just setting
 					}
+					else if ((v = get_vehicle_by_room(room, name))) {
+						// just setting
+					}
 					else if ((o = get_obj_by_room(room, name))) {
 						// just setting
 					}
@@ -1681,6 +2158,14 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 
 					break;
+				case VEH_TRIGGER: {
+					veh = (vehicle_data*)go;
+					
+					if ((c = get_char_by_vehicle(veh, name)) || (v = get_vehicle_by_vehicle(veh, name)) || (o = get_obj_by_vehicle(veh, name)) || (r = get_room(IN_ROOM(veh), name))) {
+						// just setting vars
+					}
+					break;
+				}
 			}
 		}
 		else {
@@ -1689,12 +2174,14 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					case MOB_TRIGGER:
 						c = (char_data*) go;
 						r = NULL;
+						v = NULL;
 						o = NULL;  /* NULL assignments added to avoid self to always be    */ 
 						break;     /* the room.  - Welcor        */
 					case OBJ_TRIGGER:
 						o = (obj_data*) go;
 						c = NULL;
 						r = NULL;
+						v = NULL;
 						break;
 					case WLD_TRIGGER:
 					case RMT_TRIGGER:
@@ -1702,7 +2189,15 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						r = (room_data*) go;
 						c = NULL;
 						o = NULL;
+						v = NULL;
 						break;
+					case VEH_TRIGGER: {
+						v = (vehicle_data*)go;
+						c = NULL;
+						o = NULL;
+						r = NULL;
+						break;
+					}
 				}
 			}
 			else if (!str_cmp(var, "people")) {
@@ -1748,6 +2243,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					case ADV_TRIGGER:
 						inst = find_instance_by_room((room_data*)go, FALSE);
 						break;
+					case VEH_TRIGGER: {
+						inst = find_instance_by_room(IN_ROOM((vehicle_data*)go), FALSE);
+						break;
+					}
 				}
 				
 				if (!inst) {
@@ -1849,6 +2348,15 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 								count++;
 							}
 					}
+					else if (type == VEH_TRIGGER) {
+						LL_FOREACH2(ROOM_PEOPLE(IN_ROOM((vehicle_data*)go)), c, next_in_room) {
+							if (valid_dg_target(c, DG_ALLOW_GODS)) {
+								if (!number(0, count++)) {
+									rndm = c;
+								}
+							}
+						}
+					}
 
 					if (rndm)
 						snprintf(str, slen, "%c%d", UID_CHAR, GET_ID(rndm));
@@ -1863,8 +2371,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 			else if (!str_cmp(var, "skill")) {
 				if (!str_cmp(field, "name")) {
 					if (subfield && *subfield) {
-						int sk = find_skill_by_name(subfield);
-						snprintf(str, slen, "%s", sk != NO_SKILL ? skill_data[sk].name : "");
+						skill_data *sk = find_skill(subfield);
+						snprintf(str, slen, "%s", sk ? SKILL_NAME(sk) : "");
 					}
 					else {
 						*str = '\0';
@@ -1872,8 +2380,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				else if (!str_cmp(field, "validate")) {
 					if (subfield && *subfield) {
-						int sk = find_skill_by_name(subfield);
-						snprintf(str, slen, "%d", sk != NO_SKILL ? 1 : 0);
+						skill_data *sk = find_skill(subfield);
+						snprintf(str, slen, "%d", sk ? 1 : 0);
 					}
 					else {
 						snprintf(str, slen, "0");
@@ -1898,9 +2406,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				case 'a': {	// char.a*
 					if (!str_cmp(field, "ability")) {
 						if (subfield && *subfield) {
-							int ab = find_ability_by_name(subfield, TRUE);
-							if (ab != NO_ABIL) {
-								snprintf(str, slen, (IS_NPC(c) || HAS_ABILITY(c, ab)) ? "1" : "0");
+							ability_data *ab = find_ability(subfield);
+							if (ab) {
+								snprintf(str, slen, (IS_NPC(c) || has_ability(c, ABIL_VNUM(ab))) ? "1" : "0");
 							}
 							else {
 								snprintf(str, slen, "0");
@@ -1928,14 +2436,13 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (subfield && *subfield && !IS_NPC(c)) {
 							// nop %actor.add_resources(vnum, number)%
 							char arg1[256], arg2[256];
-							Resource res[2] = { END_RESOURCE_LIST, END_RESOURCE_LIST };
+							struct resource_data *res = NULL;
 							obj_vnum vnum;
 							int amt;
 						
 							comma_args(subfield, arg1, arg2);
 							if (*arg1 && *arg2 && (vnum = atoi(arg1)) > 0 && (amt = atoi(arg2)) != 0 && obj_proto(vnum)) {
-								res[0].vnum = vnum;
-								res[0].amount = ABSOLUTE(amt);
+								res = create_resource_list(vnum, ABSOLUTE(amt), NOTHING);
 								
 								// this sends an error message to c on failure
 								if (amt > 0) {
@@ -1944,6 +2451,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 								else {
 									extract_resources(c, res, can_use_room(c, IN_ROOM(c), GUESTS_ALLOWED));
 								}
+								
+								free_resource_list(res);
 							}
 							*str = '\0';
 						}
@@ -1989,8 +2498,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'b': {	// char.b*
-					if (!str_cmp(field, "block"))
-						snprintf(str, slen, "%d", GET_BLOCK(c));
+					if (!str_cmp(field, "block")) {
+						extern int get_block_rating(char_data *ch, bool can_gain_skill);
+						snprintf(str, slen, "%d", get_block_rating(c, FALSE));
+					}
 					else if (!str_cmp(field, "blood")) {
 						if (subfield && *subfield) {
 							int amt = atoi(subfield);
@@ -2018,6 +2529,16 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							// current blood
 							snprintf(str, slen, "%d", GET_BLOOD(c));
 						}
+					}
+					else if (!str_cmp(field, "bonus_healing")) {
+						extern int total_bonus_healing(char_data *ch);
+						snprintf(str, slen, "%d", total_bonus_healing(c));
+					}
+					else if (!str_cmp(field, "bonus_magical")) {
+						snprintf(str, slen, "%d", GET_BONUS_MAGICAL(c));
+					}
+					else if (!str_cmp(field, "bonus_physical")) {
+						snprintf(str, slen, "%d", GET_BONUS_PHYSICAL(c));
 					}
 					break;
 				}
@@ -2086,11 +2607,11 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%d", (troom && can_teleport_to(c, troom, TRUE)) ? 1 : 0);
 					}
 					else if (!str_cmp(field, "class")) {
-						if (IS_NPC(c) || GET_CLASS(c) == CLASS_NONE) {
+						if (IS_NPC(c) || !GET_CLASS(c)) {
 							*str = '\0';
 						}
 						else {
-							snprintf(str, slen, "%s", class_data[GET_CLASS(c)].name);
+							snprintf(str, slen, "%s", SHOW_CLASS_NAME(ch));
 						}
 					}
 					else if (!str_cmp(field, "cha") || !str_cmp(field, "charisma")) {
@@ -2107,6 +2628,26 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					if (!str_cmp(field, "dex") || !str_cmp(field, "dexterity")) {
 						snprintf(str, slen, "%d", GET_DEXTERITY(c));
 					}
+					else if (!str_cmp(field, "dir")) {
+						if (subfield && *subfield) {
+							int dir;
+							if ((dir = search_block(subfield, dirs, FALSE)) != NOTHING || (dir = search_block(subfield, alt_dirs, FALSE)) != NOTHING) {
+								if (IS_NPC(c) || has_ability(c, ABIL_NAVIGATION)) {
+									snprintf(str, slen, "%s", dirs[dir]);	// real dir
+								}
+								else {
+									snprintf(str, slen, "%s", dirs[get_direction_for_char(c, dir)]);	// fake dir
+								}
+							}
+							else {
+								// bad direction -- just give them their arg back
+								snprintf(str, slen, "%s", subfield);
+							}
+						}
+						else {	// missing arg
+							*str = '\0';
+						}
+					}
 					else if (!str_cmp(field, "disabled")) {
 						// things which would keep a character from acting
 						if (GET_FEEDING_FROM(c) || GET_FED_ON_BY(c) || IS_DEAD(c) || GET_POS(c) < POS_SLEEPING || AFF_FLAGGED(c, AFF_STUNNED)) {
@@ -2116,8 +2657,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							snprintf(str, slen, "0");
 						}
 					}
-					else if (!str_cmp(field, "dodge"))
-						snprintf(str, slen, "%d", GET_DODGE(c));
+					else if (!str_cmp(field, "dodge")) {
+						extern int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
+						snprintf(str, slen, "%d", get_dodge_modifier(ch, NULL, FALSE));
+					}
 					break;
 				}
 				case 'e': {	// char.e*
@@ -2177,12 +2720,13 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "gain_skill")) {
 						if (subfield && *subfield && !IS_NPC(c)) {
 							// %actor.gain_skill(skill, amount)%
-							void set_skill(char_data *ch, int skill, int level);
+							void set_skill(char_data *ch, any_vnum skill, int level);
 							char arg1[256], arg2[256];
-							int sk = NO_SKILL, amount = 0;
+							skill_data *sk;
+							int amount = 0;
 							
 							comma_args(subfield, arg1, arg2);
-							if (*arg1 && *arg2 && (sk = find_skill_by_name(arg1)) != NO_SKILL && (amount = atoi(arg2)) != 0 && !NOSKILL_BLOCKED(c, sk)) {
+							if (*arg1 && *arg2 && (sk = find_skill(arg1)) && (amount = atoi(arg2)) != 0 && noskill_ok(c, SKILL_VNUM(sk))) {
 								gain_skill(c, sk, amount);
 								snprintf(str, slen, "1");
 							}
@@ -2199,9 +2743,11 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "give_skill_reset")) {
-						int sk = find_skill_by_name(subfield);
-						if (sk != NO_SKILL && !IS_NPC(c)) {
-							GET_FREE_SKILL_RESETS(c, sk) = MIN(GET_FREE_SKILL_RESETS(c, sk) + 1, MAX_SKILL_RESETS);
+						skill_data *sk = find_skill(subfield);
+						struct player_skill_data *skdata;
+						
+						if (sk && (skdata = get_skill_data(c, SKILL_VNUM(sk), TRUE))) {
+							skdata->resets = MIN(skdata->resets + 1, MAX_SKILL_RESETS);
 						}
 						*str = '\0';
 					}
@@ -2219,18 +2765,19 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (subfield && *subfield && !IS_NPC(c)) {
 							// %actor.has_resources(vnum, number)%
 							char arg1[256], arg2[256];
-							Resource res[2] = { END_RESOURCE_LIST, END_RESOURCE_LIST };
+							struct resource_data *res;
 							obj_vnum vnum;
 							int amt;
 						
 							comma_args(subfield, arg1, arg2);
 							if (*arg1 && *arg2 && (vnum = atoi(arg1)) > 0 && (amt = atoi(arg2)) > 0) {
-								res[0].vnum = vnum;
-								res[0].amount = amt;
+								res = create_resource_list(vnum, amt, NOTHING);
 								
 								if (has_resources(c, res, can_use_room(c, IN_ROOM(c), GUESTS_ALLOWED), FALSE)) {
 									snprintf(str, slen, "1");
 								}
+								
+								free_resource_list(res);
 							}
 						}
 						// all other cases...
@@ -2457,7 +3004,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "poison_immunity")) {
-						if (HAS_ABILITY(c, ABIL_POISON_IMMUNITY)) {
+						if (has_ability(c, ABIL_POISON_IMMUNITY)) {
 							snprintf(str, slen, "1");
 						}
 						else {
@@ -2491,7 +3038,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%d", GET_RESIST_PHYSICAL(c));
 					}
 					else if (!str_cmp(field, "resist_poison")) {
-						if (HAS_ABILITY(c, ABIL_RESIST_POISON)) {
+						if (has_ability(c, ABIL_RESIST_POISON)) {
 							snprintf(str, slen, "1");
 						}
 						else {
@@ -2518,9 +3065,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%d", GET_STRENGTH(c));
 
 					else if (!str_cmp(field, "skill")) {
-						int sk = find_skill_by_name(subfield);
-						if (sk != NO_SKILL && !IS_NPC(c)) {
-							snprintf(str, slen, "%d", GET_SKILL(c, sk));
+						skill_data *sk = find_skill(subfield);
+						if (sk && !IS_NPC(c)) {
+							snprintf(str, slen, "%d", get_skill_level(c, SKILL_VNUM(sk)));
 						}
 						else {
 							snprintf(str, slen, "0");
@@ -2530,14 +3077,15 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "set_skill")) {
 						if (subfield && *subfield && !IS_NPC(c)) {
 							// %actor.set_skill(skill, number)%
-							void set_skill(char_data *ch, int skill, int level);
+							void set_skill(char_data *ch, any_vnum skill, int level);
 							char arg1[256], arg2[256];
-							int sk = NO_SKILL, sk_lev = 0;
+							skill_data *sk;
+							int sk_lev = 0;
 							
 							comma_args(subfield, arg1, arg2);
-							if (*arg1 && *arg2 && (sk = find_skill_by_name(arg1)) != NO_SKILL && (sk_lev = atoi(arg2)) >= 0 && sk_lev <= CLASS_SKILL_CAP && (sk_lev < GET_SKILL(c, sk) || !NOSKILL_BLOCKED(c, sk))) {
+							if (*arg1 && *arg2 && (sk = find_skill(arg1)) && (sk_lev = atoi(arg2)) >= 0 && sk_lev <= CLASS_SKILL_CAP && (sk_lev < get_skill_level(c, SKILL_VNUM(sk)) || noskill_ok(c, SKILL_VNUM(sk)))) {
 								// TODO skill cap checking! need a f() like can_set_skill_to(ch, sk, lev)
-								set_skill(c, sk, sk_lev);
+								set_skill(c, SKILL_VNUM(sk), sk_lev);
 								snprintf(str, slen, "1");
 							}
 						}
@@ -2551,7 +3099,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 't': {	// char.t*
 					if (!str_cmp(field, "tohit")) {
-						snprintf(str, slen, "%d", GET_TO_HIT(c));
+						extern int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill);
+						snprintf(str, slen, "%d", get_to_hit(c, NULL, FALSE, FALSE));
 					}
 					else if (!str_cmp(field, "trigger_counterspell")) {
 						extern bool trigger_counterspell(char_data *ch);	// spells.c
@@ -2769,8 +3318,13 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 's': {	// obj.s*
-					if (!str_cmp(field, "shortdesc"))
+					if (!str_cmp(field, "shortdesc")) {
 						snprintf(str, slen, "%s",  GET_OBJ_SHORT_DESC(o));
+					}
+					else if (!str_cmp(field, "size")) {
+						extern int obj_carry_size(obj_data *obj);
+						snprintf(str, slen, "%d", obj_carry_size(o));
+					}
 					break;
 				}
 				case 't': {	// obj.t*
@@ -2832,6 +3386,12 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				
 			*str = '\x1';
 			switch (LOWER(*field)) {
+				case 'a': {	// room.a*
+					if (!str_cmp(field, "aft")) {
+						direction_vars(r, AFT, subfield, str, slen);
+					}
+					break;
+				}
 				case 'b': {	// room.b*
 					if (!str_cmp(field, "building")) {
 						if (GET_BUILDING(r)) {
@@ -2876,7 +3436,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "crop")) {
 						crop_data *cp;
-						if ((cp = crop_proto(ROOM_CROP_TYPE(r)))) {
+						if ((cp = ROOM_CROP(r))) {
 							snprintf(str, slen, "%s", GET_CROP_NAME(cp));
 						}
 						else {
@@ -2942,10 +3502,16 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					break;
 				}
+				case 'f': {	// room.f*
+					if (!str_cmp(field, "fore")) {
+						direction_vars(r, FORE, subfield, str, slen);
+					}
+					break;
+				}
 				case 'i': {	// room.i*
 					if (!str_cmp(field, "id")) {
 						if (r)
-							snprintf(str, slen, "%d", GET_ROOM_VNUM(r) + ROOM_ID_BASE); 
+							snprintf(str, slen, "%d", GET_ROOM_VNUM(r) + ROOM_ID_BASE);
 						else
 							*str = '\0';
 					}
@@ -2984,6 +3550,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							*str = '\0';
 						}
 					}
+					else if (!str_cmp(field, "port")) {
+						direction_vars(r, PORT, subfield, str, slen);
+					}
 					break;
 				}
 				case 's': {	// room.s*
@@ -2998,6 +3567,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "southwest")) {
 						direction_vars(r, SOUTHWEST, subfield, str, slen);
+					}
+					else if (!str_cmp(field, "starboard")) {
+						direction_vars(r, STARBOARD, subfield, str, slen);
 					}
 					break;
 				}
@@ -3019,7 +3591,15 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'v': {	// room.v*
-					if (!str_cmp(field, "vnum")) {
+					if (!str_cmp(field, "vehicles")) {
+						if (ROOM_VEHICLES(r)) {
+							snprintf(str, slen, "%c%d", UID_CHAR, GET_ID(ROOM_VEHICLES(r)));
+						}
+						else {
+							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "vnum")) {
 						snprintf(str, slen, "%d", GET_ROOM_VNUM(r)); 
 					}
 					break;
@@ -3058,6 +3638,316 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 			}
 		}	// if (r) ...
+		
+
+		else if (v) {	// vehicle variable
+			if (text_processed(field, subfield, vd, str, slen))
+				return;
+				
+			*str = '\x1';
+			switch (LOWER(*field)) {
+				case 'a': {	// veh.a*
+					if (!str_cmp(field, "animals_harnessed")) {
+						snprintf(str, slen, "%d", count_harnessed_animals(v));
+					}
+					else if (!str_cmp(field, "animals_required")) {
+						snprintf(str, slen, "%d", VEH_ANIMALS_REQUIRED(v));
+					}
+					break;
+				}
+				case 'b': {	// veh.b*
+					if (!str_cmp(field, "burn")) {
+						if (VEH_FLAGGED(v, VEH_BURNABLE) && !VEH_FLAGGED(v, VEH_ON_FIRE)) {
+							void start_vehicle_burning(vehicle_data *veh);
+							start_vehicle_burning(v);
+						}
+						*str = '\0';
+					}
+					break;
+				}
+				case 'c': {	// veh.c*
+					if (!str_cmp(field, "can_fire")) {
+						if (VEH_FLAGGED(v, VEH_SIEGE_WEAPONS) && (time(0) - VEH_LAST_FIRE_TIME(v)) >= config_get_int("vehicle_siege_time")) {
+							snprintf(str, slen, "1");
+						}
+						else {
+							snprintf(str, slen, "0");
+						}
+					}
+					else if (!str_cmp(field, "complete")) {
+						snprintf(str, slen, "%d", VEH_IS_COMPLETE(v) ? 1 : 0);
+					}
+					else if (!str_cmp(field, "contents")) {
+						if (VEH_FLAGGED(v, VEH_CONTAINER) && VEH_CONTAINS(v)) {
+							snprintf(str, slen, "%c%d", UID_CHAR, GET_ID(VEH_CONTAINS(v)));
+						}
+						else {
+							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "count")) {
+						int count = 0; 
+						if (VEH_FLAGGED(v, VEH_CONTAINER)) {
+							obj_vnum snum = (subfield && is_number(subfield)) ? atoi(subfield) : NOTHING;
+							obj_data *item;
+							for (item = VEH_CONTAINS(v); item; item = item->next_content) {
+								if (snum != NOTHING) {
+									if (snum == GET_OBJ_VNUM(item)) {
+										++count;
+									}
+								}
+								else {
+									if (isname(subfield, item->name)) {
+										++count;
+									}
+								}
+							}
+						}
+						snprintf(str, slen, "%d", count);
+					}
+					break;
+				}
+				case 'd': {	// veh.d*
+					if (!str_cmp(field, "driver")) {
+						if (VEH_DRIVER(v)) {
+							snprintf(str, slen, "%c%d", UID_CHAR, GET_ID(VEH_DRIVER(v)));
+						}
+						else {
+							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "dump")) {
+						void fully_empty_vehicle(vehicle_data *veh);
+						fully_empty_vehicle(v);
+						*str = '\0';
+					}
+					else if (!str_cmp(field, "dump_objects")) {
+						void empty_vehicle(vehicle_data *veh);
+						empty_vehicle(v);
+						*str = '\0';
+					}
+					break;
+				}
+				case 'e': {	// veh.e*
+					if (!str_cmp(field, "empire_id")) {
+						if (VEH_OWNER(v)) {
+							snprintf(str, slen, "%d", EMPIRE_VNUM(VEH_OWNER(v)));
+						}
+						else {
+							snprintf(str, slen, "0");
+						}
+					}
+					else if (!str_cmp(field, "empire_name")) {
+						if (VEH_OWNER(v)) {
+							snprintf(str, slen, "%s", EMPIRE_NAME(VEH_OWNER(v)));
+						}
+						else {
+							strcpy(str, "");
+						}
+					}
+					else if (!str_cmp(field, "extinguish")) {
+						if (VEH_FLAGGED(v, VEH_ON_FIRE)) {
+							REMOVE_BIT(VEH_FLAGS(v), VEH_ON_FIRE);
+						}
+						*str = '\0';
+					}
+					break;
+				}
+				case 'h': {	// veh.h*
+					if (!str_cmp(field, "harness")) {
+						if (subfield && *subfield && VEH_ANIMALS_REQUIRED(v) < count_harnessed_animals(v)) {
+							void harness_mob_to_vehicle(char_data *mob, vehicle_data *veh);
+							char_data *mob = NULL;
+							
+							// find or load mob
+							if (*subfield == UID_CHAR) {
+								mob = get_char(subfield);
+							}
+							else if (is_number(subfield)) {
+								mob = read_mobile(atoi(subfield), FALSE);	// don't bother attaching triggers
+							}
+							
+							if (mob && IS_NPC(mob)) {
+								harness_mob_to_vehicle(mob, v);
+							}
+						}
+						*str = '\0';
+					}
+					else if (!str_cmp(field, "has_in")) {
+						bool found = FALSE;
+						if (VEH_FLAGGED(v, VEH_CONTAINER)) {
+							obj_data *item;
+							obj_vnum snum = (subfield && is_number(subfield)) ? atoi(subfield) : NOTHING;
+
+							for (item = VEH_CONTAINS(v); item && !found; item = item->next_content) {
+								if (snum != NOTHING) {
+									if (snum == GET_OBJ_VNUM(item)) {
+										found = TRUE;
+									}
+								}
+								else {
+									if (isname(subfield, item->name)) {
+										found = TRUE;
+									}
+								}
+							}
+						}
+						
+						snprintf(str, slen, "%d", found ? 1 : 0);
+					}
+					else if (!str_cmp(field, "health") || !str_cmp(field, "hitp")) {
+						snprintf(str, slen, "%d", VEH_HEALTH(v));
+					}
+					break;
+				}
+				case 'i': {	// veh.i*
+					if (!str_cmp(field, "id")) {
+						snprintf(str, slen, "%d", GET_ID(v));
+					}
+					else if (!str_cmp(field, "in_on")) {
+						snprintf(str, slen, "%s", IN_OR_ON(v));
+					}
+					else if (!str_cmp(field, "interior")) {
+						extern room_data *get_vehicle_interior(vehicle_data *veh);
+						room_data *interior = get_vehicle_interior(v);
+						if (interior) {
+							snprintf(str, slen, "%c%d", UID_CHAR, GET_ROOM_VNUM(interior) + ROOM_ID_BASE);
+						}
+						else {
+							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "is_flagged")) {
+						if (subfield && *subfield) {
+							extern const char *vehicle_flags[];
+							int fl = search_block(subfield, vehicle_flags, FALSE);
+							if (fl != NOTHING) {
+								snprintf(str, slen, (VEH_FLAGGED(v, BIT(fl)) ? "1" : "0"));
+							}
+							else {
+								snprintf(str, slen, "0");
+							}
+						}
+						else {
+							snprintf(str, slen, "0");
+						}
+					}
+					break;
+				}
+				case 'k': {	// veh.k*
+					if (!str_cmp(field, "keywords")) {
+						snprintf(str, slen, "%s", VEH_KEYWORDS(v));
+					}
+					break;
+				}
+				case 'l': {	// veh.l*
+					if (!str_cmp(field, "led_by")) {
+						if (VEH_LED_BY(v)) {
+							snprintf(str, slen, "%c%d", UID_CHAR, GET_ID(VEH_LED_BY(v)));
+						}
+						else {
+							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "level")) {
+						snprintf(str, slen, "%d", VEH_SCALE_LEVEL(v));
+					}
+					break;
+				}
+				case 'm': {	// veh.m*
+					if (!str_cmp(field, "maxhealth") || !str_cmp(field, "maxhitp")) {
+						snprintf(str, slen, "%d", VEH_MAX_HEALTH(v));
+					}
+					else if (!str_cmp(field, "maxrooms")) {
+						snprintf(str, slen, "%d", VEH_MAX_ROOMS(v));
+					}
+					else if (!str_cmp(field, "movetype")) {
+						snprintf(str, slen, "%s", mob_move_types[VEH_MOVE_TYPE(v)]);
+					}
+					break;
+				}
+				case 'n': {	// veh.n*
+					if (!str_cmp(field, "needsrepair")) {
+						if (VEH_IS_COMPLETE(v) && (VEH_NEEDS_RESOURCES(v) || VEH_HEALTH(v) < VEH_MAX_HEALTH(v))) {
+							snprintf(str, slen, "1");
+						}
+						else {
+							snprintf(str, slen, "0");
+						}
+					}
+					else if (!str_cmp(field, "next_in_room")) {
+						if (v->next_in_room) {
+							snprintf(str, slen, "%c%d", UID_CHAR, GET_ID(v->next_in_room));
+						}
+						else {
+							strcpy(str, "");
+						}
+					}
+					break;
+				}
+				case 'r': {	// veh.r*
+					if (!str_cmp(field, "room")) {
+						snprintf(str, slen, "%c%d",UID_CHAR, GET_ROOM_VNUM(IN_ROOM(v)) + ROOM_ID_BASE); 
+					}
+					else if (!str_cmp(field, "rooms")) {
+						snprintf(str, slen, "%d", VEH_INSIDE_ROOMS(v));
+					}
+					break;
+				}
+				case 's': {	// veh.s*
+					if (!str_cmp(field, "shortdesc")) {
+						snprintf(str, slen, "%s", VEH_SHORT_DESC(v));
+					}
+					else if (!str_cmp(field, "sitting_on") || !str_cmp(field, "sitting_in")) {
+						if (VEH_SITTING_ON(v)) {
+							snprintf(str, slen, "%c%d", UID_CHAR, GET_ID(VEH_SITTING_ON(v)));
+						}
+						else {
+							*str = '\0';
+						}
+					}
+					break;
+				}
+				case 'u': {	// veh.u*
+					if (!str_cmp(field, "unharness")) {
+						extern char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh);
+						while (VEH_ANIMALS(v)) {
+							unharness_mob_from_vehicle(VEH_ANIMALS(v), v);
+						}
+						*str = '\0';
+					}
+					break;
+				}
+				case 'v': {	// veh.v*
+					if (!str_cmp(field, "vnum")) {
+						snprintf(str, slen, "%d", VEH_VNUM(v));
+					}
+					break;
+				}
+			}	// end switch
+			
+			if (*str == '\x1') { /* no match in switch */
+				if (SCRIPT(v)) { /* check for global var */
+					for (vd = (SCRIPT(v))->global_vars; vd; vd = vd->next) {
+						if (!str_cmp(vd->name, field)) {
+							break;
+						}
+					}
+					if (vd) {
+						snprintf(str, slen, "%s", vd->value);
+					}
+					else {
+						*str = '\0';
+						script_log("Trigger: %s, VNum %d, type: %d. unknown room field: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), type, field);
+					}
+				}
+				else {
+					*str = '\0';
+					script_log("Trigger: %s, VNum %d, type: %d. unknown room field: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), type, field);
+				}
+			}
+		}	// if (v) ...
+		
 		else {
 			if (vd && text_processed(field, subfield, vd, str, slen))
 				return;
@@ -3604,6 +4494,7 @@ void process_attach(void *go, struct script_data *sc, trig_data *trig, int type,
 	char arg[MAX_INPUT_LENGTH], trignum_s[MAX_INPUT_LENGTH];
 	char result[MAX_INPUT_LENGTH], *id_p;
 	trig_data *newtrig, *proto;
+	vehicle_data *v = NULL;
 	char_data *c=NULL;
 	obj_data *o=NULL;
 	room_data *r=NULL;
@@ -3628,16 +4519,10 @@ void process_attach(void *go, struct script_data *sc, trig_data *trig, int type,
 		script_log("Trigger: %s, VNum %d. attach invalid id arg: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), cmd);
 		return;
 	}
-	c = find_char(id);
-	if (!c) {
-		o = find_obj(id);
-		if (!o) {
-			r = find_room(id);
-			if (!r) {
-				script_log("Trigger: %s, VNum %d. attach invalid id arg: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), cmd);
-				return;
-			}
-		}
+	
+	if (!(c = find_char(id)) && !(v = find_vehicle(id)) && !(o = find_obj(id)) && !(r = find_room(id))) {
+		script_log("Trigger: %s, VNum %d. attach invalid id arg: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), cmd);
+		return;
 	}
 
 	/* locate and load the trigger specified */
@@ -3655,6 +4540,14 @@ void process_attach(void *go, struct script_data *sc, trig_data *trig, int type,
 		if (!SCRIPT(c))
 			CREATE(SCRIPT(c), struct script_data, 1);
 		add_trigger(SCRIPT(c), newtrig, -1);
+		return;
+	}
+
+	if (v) {
+		if (!SCRIPT(v)) {
+			CREATE(SCRIPT(v), struct script_data, 1);
+		}
+		add_trigger(SCRIPT(v), newtrig, -1);
 		return;
 	}
 
@@ -3678,6 +4571,7 @@ void process_attach(void *go, struct script_data *sc, trig_data *trig, int type,
 void process_detach(void *go, struct script_data *sc, trig_data *trig, int type, char *cmd) {
 	char arg[MAX_INPUT_LENGTH], trignum_s[MAX_INPUT_LENGTH];
 	char result[MAX_INPUT_LENGTH], *id_p;
+	vehicle_data *v = NULL;
 	char_data *c=NULL;
 	obj_data *o=NULL;
 	room_data *r=NULL;
@@ -3702,16 +4596,11 @@ void process_detach(void *go, struct script_data *sc, trig_data *trig, int type,
 		script_log("Trigger: %s, VNum %d. detach invalid id arg: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), cmd);
 		return;
 	}
-	c = find_char(id);
-	if (!c) {
-		o = find_obj(id);
-		if (!o) {
-			r = find_room(id);
-			if (!r) {
-				script_log("Trigger: %s, VNum %d. detach invalid id arg: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), cmd);
-				return;
-			}
-		}
+	
+	// find first good match
+	if (!(c = find_char(id)) && !(v = find_vehicle(id)) && !(o = find_obj(id)) && !(r = find_room(id))) {
+		script_log("Trigger: %s, VNum %d. detach invalid id arg: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), cmd);
+		return;
 	}
 
 	if (c && SCRIPT(c)) {
@@ -3722,6 +4611,19 @@ void process_detach(void *go, struct script_data *sc, trig_data *trig, int type,
 		if (remove_trigger(SCRIPT(c), trignum_s)) {
 			if (!TRIGGERS(SCRIPT(c))) {
 				extract_script(c, MOB_TRIGGER);
+			}
+		}
+		return;
+	}
+
+	if (v && SCRIPT(v)) {
+		if (!str_cmp(trignum_s, "all")) {
+			extract_script(v, VEH_TRIGGER);
+			return;
+		}
+		if (remove_trigger(SCRIPT(v), trignum_s)) {
+			if (!TRIGGERS(SCRIPT(v))) {
+				extract_script(v, VEH_TRIGGER);
 			}
 		}
 		return;
@@ -3758,6 +4660,9 @@ void process_detach(void *go, struct script_data *sc, trig_data *trig, int type,
 room_data *dg_room_of_obj(obj_data *obj) {
 	if (IN_ROOM(obj))
 		return IN_ROOM(obj);
+	if (obj->in_vehicle) {
+		return IN_ROOM(obj->in_vehicle);
+	}
 	if (obj->carried_by)
 		return IN_ROOM(obj->carried_by);
 	if (obj->worn_by)
@@ -3806,6 +4711,8 @@ void makeuid_var(void *go, struct script_data *sc, trig_data *trig, int type, ch
 			char_data *c = NULL;
 			switch (type) {
 				case WLD_TRIGGER:
+				case RMT_TRIGGER:
+				case ADV_TRIGGER:
 					c = get_char_in_room((room_data*)go, name);
 					break;
 				case OBJ_TRIGGER:
@@ -3814,6 +4721,10 @@ void makeuid_var(void *go, struct script_data *sc, trig_data *trig, int type, ch
 				case MOB_TRIGGER:
 					c = get_char_room_vis((char_data*)go, name);
 					break;
+				case VEH_TRIGGER: {
+					c = get_char_near_vehicle((vehicle_data*)go, name);
+					break;
+				}
 			}
 			if (c) 
 				snprintf(uid, sizeof(uid), "%c%d", UID_CHAR, GET_ID(c));
@@ -3822,6 +4733,8 @@ void makeuid_var(void *go, struct script_data *sc, trig_data *trig, int type, ch
 			obj_data *o = NULL;
 			switch (type) {
 				case WLD_TRIGGER:
+				case RMT_TRIGGER:
+				case ADV_TRIGGER:
 					o = get_obj_in_room((room_data*)go, name);
 					break;
 				case OBJ_TRIGGER:
@@ -3831,6 +4744,10 @@ void makeuid_var(void *go, struct script_data *sc, trig_data *trig, int type, ch
 					if ((o = get_obj_in_list_vis((char_data*)go, name, ((char_data*)go)->carrying)) == NULL)
 						o = get_obj_in_list_vis((char_data*)go, name, ROOM_CONTENTS(IN_ROOM((char_data*)go)));
 					break;
+				case VEH_TRIGGER: {
+					o = get_obj_near_vehicle((vehicle_data*)go, name);
+					break;
+				}
 			}
 			if (o)
 				snprintf(uid, sizeof(uid), "%c%d", UID_CHAR, GET_ID(o));
@@ -3839,6 +4756,8 @@ void makeuid_var(void *go, struct script_data *sc, trig_data *trig, int type, ch
 			room_data *r = NULL;
 			switch (type) {
 				case WLD_TRIGGER:
+				case RMT_TRIGGER:
+				case ADV_TRIGGER:
 					r = (room_data*)go;
 					if (*name) {
 						r = get_room(r, name);
@@ -3856,9 +4775,42 @@ void makeuid_var(void *go, struct script_data *sc, trig_data *trig, int type, ch
 						r = get_room(r, name);
 					}
 					break;
+				case VEH_TRIGGER: {
+					r = IN_ROOM((vehicle_data*)go);
+					if (*name) {
+						r = get_room(r, name);
+					}
+					break;
+				}
 			}
 			if (r) {
 				snprintf(uid, sizeof(uid), "%c%d", UID_CHAR, GET_ROOM_VNUM(r) + ROOM_ID_BASE);
+			}
+		}
+		else if (is_abbrev(arg, "vehicle")) {
+			vehicle_data *v = NULL;
+			switch (type) {
+				case WLD_TRIGGER:
+				case RMT_TRIGGER:
+				case ADV_TRIGGER: {
+					v = get_vehicle_room((room_data*)go, name);
+					break;
+				}
+				case OBJ_TRIGGER: {
+					v = get_vehicle_near_obj((obj_data*)go, name);
+					break;
+				}
+				case MOB_TRIGGER: {
+					v = get_vehicle_in_room_vis((char_data*)go, name);
+					break;
+				}
+				case VEH_TRIGGER: {
+					v = get_vehicle_near_vehicle((vehicle_data*)go, name);
+					break;
+				}
+			}
+			if (v) {
+				snprintf(uid, sizeof(uid), "%c%d", UID_CHAR, GET_ID(v));
 			}
 		}
 		else {
@@ -4237,6 +5189,7 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 	void *go = NULL;
 
 	void obj_command_interpreter(obj_data *obj, char *argument);
+	void vehicle_command_interpreter(vehicle_data *veh, char *argument);
 	void wld_command_interpreter(room_data *room, char *argument);
 
 	if (depth > MAX_SCRIPT_DEPTH) {
@@ -4256,9 +5209,16 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 			sc = SCRIPT((obj_data*) go);
 			break;
 		case WLD_TRIGGER:
+		case RMT_TRIGGER:
+		case ADV_TRIGGER:
 			go = sdd->r;
 			sc = SCRIPT((room_data*) go);
 			break;
+		case VEH_TRIGGER: {
+			go = sdd->v;
+			sc = SCRIPT((vehicle_data*) go);
+			break;
+		}
 	}
 
 	if (mode == TRIG_NEW) {
@@ -4371,9 +5331,6 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 			else if (!strn_cmp(cmd, "halt", 4))
 				break;
 
-			else if (!strn_cmp(cmd, "dg_cast ", 8))
-				do_dg_cast(go, sc, trig, type, cmd);
-
 			else if (!strn_cmp(cmd, "dg_affect ", 10))
 				do_dg_affect(go, sc, trig, type, cmd);
 
@@ -4422,8 +5379,14 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 						obj_command_interpreter((obj_data*) go, cmd);
 						break;
 					case WLD_TRIGGER:
+					case RMT_TRIGGER:
+					case ADV_TRIGGER:
 						wld_command_interpreter((room_data*) go, cmd);
 						break;
+					case VEH_TRIGGER: {
+						vehicle_command_interpreter((vehicle_data*) go, cmd);
+						break;
+					}
 				}
 				if (dg_owner_purged) {
 						depth--;
@@ -4444,8 +5407,14 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 			sc = SCRIPT((obj_data*) go);
 			break;
 		case WLD_TRIGGER:
+		case RMT_TRIGGER:
+		case ADV_TRIGGER:
 			sc = SCRIPT((room_data*) go);
 			break;
+		case VEH_TRIGGER: {
+			sc = SCRIPT((vehicle_data*) go);
+			break;
+		}
 	}
 	if (sc)
 		free_varlist(GET_TRIG_VARS(trig));
@@ -4551,85 +5520,6 @@ int fgetline(FILE *file, char *p) {
 }
 
 
-/* load in a character's saved variables */
-void read_saved_vars(char_data *ch) {
-	FILE *file;
-	long context;
-	char fn[127];
-	char input_line[1024], *temp, *p;
-	char varname[32];
-	char context_str[16];
-
-	/* create the space for the script structure which holds the vars */
-	/* We need to do this first, because later calls to 'remote' will need */
-	/* a script already assigned. */
-	CREATE(SCRIPT(ch), struct script_data, 1);
-
-	/* find the file that holds the saved variables and open it*/
-	get_filename(GET_NAME(ch), fn, SCRIPT_VARS_FILE);
-	file = fopen(fn,"r");
-
-	/* if we failed to open the file, return */
-	if( !file ) {
-		log("%s had no variable file", GET_NAME(ch)); 
-		return;
-	}
-	/* walk through each line in the file parsing variables */
-	do {
-		if (get_line(file, input_line)>0) {
-			p = temp = strdup(input_line);
-			temp = any_one_arg(temp, varname);
-			temp = any_one_arg(temp, context_str);
-			skip_spaces(&temp); /* temp now points to the rest of the line */
-
-			context = atol(context_str);
-			add_var(&(SCRIPT(ch)->global_vars), varname, temp, context);
-			free(p); /* plug memory hole */
-		}
-	} while( !feof(file) );
-
-	/* close the file and return */
-	fclose(file);
-}
-
-/* save a characters variables out to disk */
-void save_char_vars(char_data *ch) {
-	FILE *file;
-	char fn[127];
-	struct trig_var_data *vars;
-
-	/* immediate return if no script (and therefore no variables) structure */
-	/* has been created. this will happen when the player is logging in */
-	if (SCRIPT(ch) == NULL)
-		return;
-
-	/* we should never be called for an NPC, but just in case... */
-	if (IS_NPC(ch)) return;
-
-	get_filename(GET_NAME(ch), fn, SCRIPT_VARS_FILE);
-	unlink(fn);
-
-	/* make sure this char has global variables to save */
-	if (ch->script->global_vars == NULL)
-		return;
-	vars = ch->script->global_vars;
-
-	file = fopen(fn,"wt");
-	if (!file) {
-		syslog(SYS_ERROR, LVL_CIMPL, TRUE, "SYSERR: Could not open player variable file %s for writing.:%s", fn, strerror(errno));
-		return;
-	}
-	/* note that currently, context will always be zero. this may change */
-	/* in the future */
-	while (vars) {
-		if (*vars->name != '-') /* don't save if it begins with - */
-			fprintf(file, "%s %ld %s\n", vars->name, vars->context, vars->value);
-		vars = vars->next;
-	}
-
-	fclose(file);
-}
-
 /* find_char() helpers */
 
 // Must be power of 2
@@ -4676,6 +5566,19 @@ obj_data *find_obj_by_uid_in_lookup_table(int uid) {
 		return (obj_data*)(lt->c);
 
 	log("find_obj_by_uid_in_lookup_table : No entity with number %d in lookup table", uid);
+	return NULL;
+}
+
+vehicle_data *find_vehicle_by_uid_in_lookup_table(int uid) {
+	int bucket = (int) (uid & (BUCKET_COUNT - 1));
+	struct lookup_table_t *lt = &lookup_table[bucket];
+
+	for (;lt && lt->uid != uid ; lt = lt->next) ;
+
+	if (lt)
+		return (vehicle_data*)(lt->c);
+
+	log("find_vehicle_by_uid_in_lookup_table : No entity with number %d in lookup table", uid);
 	return NULL;
 }
 

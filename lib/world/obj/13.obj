@@ -64,11 +64,11 @@ a worn old statuette~
 A worn old statuette is lying in the dust.~
 You're not sure what it is, but it looks like you could hold it.
 ~
-3 jl ao 1
+3 jl ao 2
 0 0 0
 1 0
 A
-17 10
+17 10 1
 S
 #1306
 nails pouch~
@@ -76,7 +76,7 @@ a pouch of nails~
 A pouch of nails is sitting here.~
 Nails are used for building.
 ~
-3 l a 1
+3 l a 2
 0 0 0
 2 0
 M
@@ -85,6 +85,12 @@ You hammer nails into the wood joints.~
 M
 1
 $n hammers nails into the wood joints.~
+M
+6
+You hammer nails into $V.~
+M
+7
+$n hammers nails into $V.~
 R
 5134 0
 R
@@ -115,9 +121,15 @@ A vial of deep orange dye is sitting here.~
 pigment of a magenta arrowfish. It has an unusual glow in dim light, like it
 catches and amplifies every ray of light that hits it.
 ~
-3 l a 1
+3 l a 2
 0 0 0
 8 0
+M
+6
+You paint $V orange.~
+M
+7
+$n paints $V orange.~
 R
 5137 0
 S
@@ -253,9 +265,15 @@ a bolt of cloth~
 A bolt of cloth is lying on the ground.~
 This simple cloth is used to sew clothing.
 ~
-3 l a 1
+3 l a 2
 0 0 0
 7 0
+M
+6
+You hang some cloth on $V.~
+M
+7
+$n hangs some cloth on $V.~
 R
 5137 0
 R

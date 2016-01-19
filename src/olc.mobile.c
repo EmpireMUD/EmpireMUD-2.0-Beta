@@ -221,7 +221,7 @@ bool delete_mob_from_spawn_list(struct spawn_info **list, mob_vnum vnum) {
 * confused with live spawn lists (building, sector, etc).
 * 
 * @param struct adventure_spawn **list A pointer to the start of a spawn_info list.
-* @param int spawn_type Any ADV_SPAWN_x.
+* @param int spawn_type Any ADV_SPAWN_.
 * @param mob_vnum vnum The mob to remove.
 * @return bool TRUE if any spawn entries were deleted; FALSE otherwise.
 */
@@ -625,7 +625,9 @@ void save_olc_mobile(descriptor_data *desc) {
 			if (SCRIPT(mob_iter)) {
 				extract_script(mob_iter, MOB_TRIGGER);
 			}
-			free_proto_script(mob_iter, MOB_TRIGGER);
+			if (mob_iter->proto_script && mob_iter->proto_script != proto->proto_script) {
+				free_proto_script(mob_iter, MOB_TRIGGER);
+			}
 			
 			// attach new scripts
 			copy_proto_script(mob, mob_iter, MOB_TRIGGER);

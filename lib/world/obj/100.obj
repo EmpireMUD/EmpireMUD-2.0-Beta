@@ -21,9 +21,9 @@ Wild fire is bright, but quite harmless.
 0 0 0
 10 168
 A
-7 2
+7 2 0
 A
-8 1
+8 1 0
 C
 0 75
 S
@@ -39,9 +39,9 @@ head, but you can't imagine it causes anything but a sore neck.
 -1 -1 -1
 7 0
 A
-3 1
+3 1 0
 A
-9 1
+9 1 0
 C
 0 75
 S
@@ -55,9 +55,9 @@ The ring is covered in coarse fur.
 -1 -1 -1
 7 0
 A
-17 1
+17 1 0
 A
-9 1
+9 1 0
 C
 0 75
 S
@@ -71,7 +71,7 @@ This gnarled staff surely came from the Magiterranean!
 0 1 18
 0 0
 A
-7 3
+7 3 0
 C
 0 75
 S
@@ -85,9 +85,9 @@ This fur-lined belt is marked with the sigil of the Grove of the Magiterranean!
 -1 -1 -1
 7 0
 A
-2 2
+2 2 0
 A
-3 1
+3 1 0
 C
 0 75
 S
@@ -115,9 +115,9 @@ The shield looks like it can really take a beating.
 0 0 0
 7 0
 A
-13 2
+13 2 0
 A
-12 1
+12 1 0
 S
 #10008
 longsword sword red-hot firebrand~
@@ -129,9 +129,9 @@ The sword looks like it would burn the wielder!
 0 3 1
 2 0
 A
-1 1
+1 1 0
 A
-17 1
+17 1 0
 C
 0 120
 S
@@ -145,9 +145,9 @@ The red dragon charm pulses with fiery energy.
 -1 -1 -1
 4 0
 A
-16 3
+16 3 0
 A
-8 1
+8 1 0
 C
 0 120
 S
@@ -161,9 +161,9 @@ The talisman makes you feel more powerful just by holding it.
 -1 -1 -1
 4 0
 A
-17 2
+17 2 0
 A
-2 1
+2 1 0
 S
 #10011
 grate sewer~
@@ -207,9 +207,9 @@ It's made from many tiny teeth.
 -1 -1 -1
 14 0
 A
-2 1
+2 1 0
 A
-9 1
+9 1 0
 S
 #10015
 totem ratskin furry~
@@ -221,9 +221,9 @@ This totem is carefully crafted from the skins of rats and bits of wire.
 0 0 0
 7 0
 A
-2 1
+2 1 0
 A
-9 1
+9 1 0
 S
 #10016
 meat hunk rat spoiled~
@@ -255,7 +255,7 @@ It doesn't look like this would do much damage.
 0 1 4
 13 0
 A
-2 3
+2 3 0
 S
 #10019
 cloak hooded~
@@ -263,13 +263,13 @@ a hooded cloak~
 A hooded cloak is crumpled on the floor.~
 It seems like a good cloak if you're interested in dark alleys.
 ~
-0 mo ak 1
+2 mo ak 2
 0 0 0
 11 0
 A
-4 2
+4 2 0
 A
-6 1
+6 1 0
 S
 #10020
 cheese bits~
@@ -292,9 +292,9 @@ It looks like someone pried the fang out of a very large spider.
 0 3 4
 7 0
 A
-1 1
+1 1 0
 A
-17 1
+17 1 0
 S
 #10022
 ring spider-hair hair creepy~
@@ -306,9 +306,9 @@ Someone with a lot of free time has braided giant spider hairs into a ring.
 -1 -1 -1
 15 0
 A
-12 1
+12 1 0
 A
-17 1
+17 1 0
 S
 #10023
 ring lucky shiny~
@@ -320,9 +320,9 @@ Lucky for you, someone has lost their ring.
 -1 -1 -1
 13 0
 A
-8 1
+8 1 0
 A
-9 1
+9 1 0
 S
 #10024
 vial sewage grimy~
@@ -344,7 +344,7 @@ It looks like someone turned a rat's nest into a hat, and you don't know why.
 -1 -1 -1
 0 0
 A
-9 1
+9 1 0
 S
 #10026
 corpse bloated~
@@ -365,11 +365,11 @@ A piece of armor made from dragon's wings is folded on the ground.~
 2 0 0
 7 0
 A
-17 1
+17 1 0
 A
-18 1
+18 1 0
 A
-15 1
+15 1 0
 S
 #10030
 buffet bufet~
@@ -477,11 +477,11 @@ a skycleaver belt~
 A skycleaver belt is lying in the dust.~
 This belt is sewn from fine silk.
 ~
-2 jmo al 1
+2 mo al 4
 -1 -1 -1
 11 0
 A
-16 1
+16 1 1
 C
 30 50
 S
@@ -491,11 +491,11 @@ skycleaver gloves~
 A pair of skycleaver gloves is lying here.~
 The gloves are sewn from fine silk, and are as blue as the sky.
 ~
-2 jmo ah 1
+2 jmo ah 2
 -1 -1 -1
 11 0
 A
-11 1
+11 1 1
 C
 30 50
 S
@@ -505,13 +505,13 @@ skycleaver armor~
 A set of skycleaver armor has been left here.~
 The armor appears to have been woven from silk, but offers surprising protection.
 ~
-27 jmo aq 1
+27 jmo aq 2
 2 0 0
 11 0
 A
-17 1
+17 1 1
 A
-15 1
+15 1 1
 C
 30 50
 S
@@ -521,11 +521,11 @@ a skycleaver rucksack~
 Someone has left their skycleaver rucksack here.~
 This bag looks like it could hold a lot.
 ~
-24 jmo ar 1
+24 mo ar 2
 1 0 0
 11 0
 A
-8 1
+8 1 0
 C
 30 50
 S
@@ -539,9 +539,9 @@ These shoes were made for walking.
 -1 -1 -1
 11 0
 A
-6 2
+6 2 0
 A
-11 1
+11 1 0
 S
 #10043
 robes set page~
@@ -553,9 +553,9 @@ These are the robes worn by Skycleave pages.
 0 0 0
 11 0
 A
-11 1
+11 1 0
 A
-6 1
+6 1 0
 S
 #10044
 book skycleaver spellbook~
@@ -567,9 +567,9 @@ You can't really read the spellbook, but it seems to give you power.
 0 0 0
 0 0
 A
-17 2
+17 2 0
 A
-16 1
+16 1 0
 S
 #10045
 robes set apprentice~
@@ -581,9 +581,9 @@ These are the robes worn by Skycleave apprentices.
 0 0 0
 11 0
 A
-8 1
+8 1 0
 A
-9 1
+9 1 0
 S
 #10046
 whip goblin wrangler green~
@@ -595,7 +595,7 @@ This whip is good for just one thing: goblin wrangling.
 0 2 7
 7 0
 A
-17 1
+17 1 0
 S
 #10047
 pants pair wrangler goblin~
@@ -607,9 +607,9 @@ These sort of wrangler pants are worn by people who deal with a lot of goblins.
 2 0 0
 11 0
 A
-18 1
+18 1 0
 A
-2 2
+2 2 0
 S
 #10048
 sword shortsword goblin~
@@ -621,7 +621,7 @@ This shortsword was certainly crafted by goblins.
 0 1 1
 2 0
 A
-5 -1
+5 -1 0
 S
 #10049
 vest goblin's goblins~
@@ -633,9 +633,9 @@ This vest is small, and slightly too snug.
 -1 -1 -1
 11 0
 A
-9 1
+9 1 0
 A
-5 -1
+5 -1 0
 S
 #10050
 skull goblin~
@@ -647,9 +647,9 @@ This appears to be the skull of a goblin.
 0 0 0
 0 0
 A
-17 1
+17 1 0
 A
-5 -1
+5 -1 0
 S
 #10051
 armor goblin pleated set~
@@ -661,11 +661,11 @@ Say what you want about goblins, their armorcrafting is renowned.
 2 0 0
 0 0
 A
-5 -1
+5 -1 0
 A
-17 1
+17 1 0
 A
-18 1
+18 1 0
 S
 #10052
 vial pixy pixie dust~
@@ -687,7 +687,7 @@ You can see straight through it!
 0 2 1
 8 0
 A
-2 1
+2 1 0
 S
 #10054
 shield glass~
@@ -699,9 +699,9 @@ You can see straight through it!
 0 0 0
 8 0
 A
-13 1
+13 1 0
 A
-7 4
+7 4 0
 S
 #10055
 earcuff pointed cuff~
@@ -713,7 +713,7 @@ It's made of copper and gives your ears the impression of having points.
 -1 -1 -1
 13 0
 A
-8 1
+8 1 0
 S
 #10056
 doublet glimmering~
@@ -725,7 +725,7 @@ It shines in every color, all at once.
 -1 -1 -1
 10 0
 A
-5 1
+5 1 0
 S
 #10057
 wand bone long thin~
@@ -737,7 +737,7 @@ This appears to be made from a baculum.
 0 4 16
 14 0
 A
-9 1
+9 1 0
 S
 #10058
 pocket double-pocket~
@@ -749,7 +749,7 @@ This appears to be two pockets, occupying the same space.
 3 0 0
 11 0
 A
-18 1
+18 1 0
 S
 #10059
 gauntlet single otherworlder's~
@@ -771,9 +771,9 @@ These wristband seem to pulse with an otherworldly power.
 -1 -1 -1
 2 0
 A
-1 1
+1 1 0
 A
-13 1
+13 1 0
 S
 #10061
 bindings lich~
@@ -785,11 +785,11 @@ These bindings once held a lich together.
 0 0 0
 11 0
 A
-8 1
+8 1 0
 A
-9 1
+9 1 0
 A
-17 1
+17 1 0
 S
 #10062
 cloak tattered lich~
@@ -801,11 +801,11 @@ This cloak might have been nice once.
 -1 -1 -1
 11 0
 A
-8 1
+8 1 0
 A
-16 1
+16 1 0
 A
-7 1
+7 1 0
 S
 #10063
 club bone large~
@@ -817,11 +817,11 @@ This might have been a femur.
 0 1 5
 14 0
 A
-17 1
+17 1 0
 A
-4 -1
+4 -1 0
 A
-15 1
+15 1 0
 S
 #10064
 chains ghastly piled~
@@ -833,7 +833,7 @@ These chains are cold to the touch.
 -1 -1 -1
 2 0
 A
-18 1
+18 1 0
 S
 #10065
 backpack armored~
@@ -845,7 +845,7 @@ Someone has plated a backpack in iron.
 2 0 0
 2 0
 A
-12 1
+12 1 0
 C
 30 100
 S
@@ -859,7 +859,7 @@ This backpack looks like it moves with the wearer's body.
 2 0 0
 11 0
 A
-17 1
+17 1 0
 C
 30 100
 S
@@ -873,7 +873,7 @@ It just looks like a hole. Not really a hole in anything. Just a hole.
 2 0 0
 10 0
 A
-7 1
+7 1 0
 C
 30 100
 S
@@ -887,11 +887,11 @@ The shield is warm to the touch and pulses with pure mana.
 0 0 0
 10 0
 A
-24 1
+24 1 0
 A
-16 2
+16 2 0
 A
-7 1
+7 1 0
 S
 #10069
 belt silk majestic~
@@ -903,11 +903,11 @@ This belt is made of fine silk and seems to glow.
 -1 -1 -1
 11 0
 A
-5 1
+5 1 0
 A
-11 3
+11 3 0
 A
-6 1
+6 1 0
 S
 #10070
 ring impact reverse sparkling~
@@ -919,9 +919,9 @@ This ring sparkles in the light.
 -1 -1 -1
 4 0
 A
-12 4
+12 4 0
 A
-1 1
+1 1 0
 S
 #10071
 grimoire arcane barrosh's~
@@ -933,11 +933,11 @@ The first page has, in large writing, the words "This Book Belongs To: Barrosh".
 0 0 0
 0 0
 A
-5 1
+5 1 0
 A
-7 3
+7 3 0
 A
-8 1
+8 1 0
 S
 #10072
 staff apollus appollus~
@@ -949,9 +949,9 @@ This is the staff of Apollus, patron of healers.
 0 1 19
 0 0
 A
-8 3
+8 3 0
 A
-7 3
+7 3 0
 S
 #10073
 goggles crystal-clear clear pair~
@@ -975,13 +975,13 @@ These robes once belonged to a Grand High Sorcerer.
 0 0 0
 10 0
 A
-5 1
+5 1 0
 A
-8 2
+8 2 0
 A
-16 1
+16 1 0
 A
-7 1
+7 1 0
 S
 #10075
 dagger arcane black~
@@ -993,9 +993,9 @@ The dagger is inky-dark, surely forged from nocturnium.
 0 1 4
 2 0
 A
-7 3
+7 3 0
 A
-16 2
+16 2 0
 S
 #10076
 earrings bone phoenix pair~
@@ -1007,7 +1007,7 @@ These earrings are made from the bones of an actual phoenix!
 0 0 0
 14 0
 A
-9 1
+9 1 0
 S
 #10077
 handwraps wraps experimental~
@@ -1015,11 +1015,11 @@ experimental handwraps~
 Some handwraps are lying on the ground.~
 You're not really sure what these are, but you found them on somebody's hands.
 ~
-2 jmo ah 1
+2 jmo ah 2
 -1 -1 -1
 10 0
 A
-3 1
+3 1 1
 S
 #10078
 aura experimental~
@@ -1027,12 +1027,12 @@ an experimental aura~
 There's... sort of an aura hovering here.~
 It glows with... something.
 ~
-2 ejmo ak 1
+2 ejmo ak 2
 -1 -1 -1
 10 0
 A
-12 1
+12 1 1
 A
-1 -3
+1 -3 0
 S
 $

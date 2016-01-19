@@ -256,7 +256,7 @@ It is added to damage in the same way as Strength.
 
 See also: SCORE
 #
-FIRE "CAMPING FIRE" "COOKING FIRE" "CAMP FIRE"
+"CAMPING FIRE" "COOKING FIRE" "CAMP FIRE"
 
 You can create a cooking fire by lighting a tree or log, using a flint set.
 This will let you cook food, brew potions, or craft pottery.
@@ -768,20 +768,51 @@ See also: CONSIDER, LEVELS, SCALABLE CRAFTS
 SCAN
 
 Usage:  scan <direction>
-        scan <tile name>
+        scan <tile/vehicle name>
 
 This command shows you the same information as the screen-reader map display,
 but in only one direction. The distance you see on a scan is based on your
 mapsize.
 
-You can also scan for nearby tiles matching a given keyword, such as a building
-or crop name. It will scan a distance up to your mapsize.
+You can also scan for nearby tiles matching a given keyword, such as a crop,
+building, or vehicle name. It will scan a distance up to your mapsize.
 
 Example:
  > scan southwest
  southwest: River, River, River, Swamp, Overgrown Forest, Road, Overgrown Forest, Jungle, Jungle
 
 See also: MAPSIZE, SCREEN-READERS
+#
+"SHIP ROOMS" "SHIP DESIGNATE" "DESIGNATE ON SHIPS"
+
+Usage:  designate <direction> <room>
+        redesignate <room>
+
+You can designate rooms on some ships. These have their own list of available
+rooms and can only be designated in shipboard directions (fore, aft, starboard,
+port, up, and down). Some ships come with pre-designated rooms, and you can't
+always redesignate those.
+
+Some ship rooms are above-deck and show you the map above their description;
+others are indoors and don't show this.
+
+Ship designate types:
+ Aftercastle
+ Below Deck
+ Bilge
+ Bow (outdoors)
+ Bunk Room - bedroom
+ Captain's Cabin - bedroom
+ Cargo Hold (outdoors)
+ Crow's Nest (outdoors)
+ Forecastle (outdoors)
+ Helm (outdoors)
+ On Deck (outdoors)
+ Quarterdeck (outdoors)
+ Stern (outdoors)
+ The Galley - cooking fire
+
+See also: DESIGNATE
 #
 SHOVEL
 
@@ -883,6 +914,18 @@ around the world. These types of transportation require harnessed animals to
 lead them, but can store far more than you can carry alone.
 
 See also: WOODWORKING, RIDE, HARNESS, PUT, GET
+#
+VEHICLE VEH
+
+A vehicle (sometimes abbreviated "veh", especially in the code) is a type of
+"thing" that includes canoes, carts, ships, and even furniture. Vehicles can
+have many different properties -- some can be lead, dragged, boarded, or burnt.
+
+Vehicles appear in the room when you look, colored &wgray&0, between objects and
+people.
+
+See also: BOARD, CUSTOMIZE, DESIGNATE, DISEMBARK, DRAG, DRIVE, HARNESS, LEAD,
+LIGHT, REPAIR, SCRAP, SIT
 #
 WHEREAMI "WHERE AM I"
 

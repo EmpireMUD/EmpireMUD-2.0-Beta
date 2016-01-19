@@ -1,0 +1,255 @@
+#900
+cart rickety wooden~
+a rickety cart~
+A wooden cart is parked here.~
+   Carts hold items. You can harness a horse to the cart and lead it around, or
+ride on the cart and drive it around.
+~
+~
+bfhio 22 10 200 1
+R
+1306 1  # 1x a pouch of nails
+S
+#901
+carriage wooden~
+a carriage~
+A wooden carriage has stopped here.~
+   The carriage can be used to travel around, or to carry items around. It's
+not much bigger than a cart, but it does have an enclosed cabin that allows
+several people to ride around in style. You must harness an animal to the cart
+and then sit on it to drive it, or board it to get inside.
+~
+~
+bfhio 19 14 200 1
+D
+5521 0 0
+R
+1306 1  # 1x a pouch of nails
+S
+#902
+wagon covered~
+a covered wagon~
+A covered wagon has been parked here.~
+   The wagon can be used to travel around, or to carry items around. You can
+harness two horses to the wagon and then lead it, or ride in it and drive it.
+~
+~
+bfhio 19 20 400 2
+R
+1306 1  # 1x a pouch of nails
+R
+1359 1  # 1x a bolt of cloth
+S
+#903
+catapult~
+the catapult~
+A catapult is poised to strike!~
+   You can fire the catapult to do siege damage to buildings and vehicles. You
+will need two horses to pull the catapult.
+~
+&0o==o~
+bor 19 20 0 2
+C
+0 100
+R
+1306 1  # 1x a pouch of nails
+R
+125 1  # 1x a stack of lumber
+S
+#904
+chair wooden~
+a chair~
+There is a wooden chair here.~
+You can sit on the chair.
+~
+~
+fghln 19 1 0 0
+S
+#905
+bench wooden~
+a wooden bench~
+There is a wooden bench here.~
+You can sit on the bench.
+~
+~
+fhln 19 1 0 0
+S
+#906
+table long~
+a long table~
+There is a long table here.~
+Tables are merely for decoration.
+~
+~
+hln 19 1 0 0
+S
+#907
+stool wooden~
+a stool~
+There is a wooden stool here.~
+You can sit on the stool.
+~
+~
+fhln 19 1 0 0
+S
+#917
+throne~
+the throne~
+There is a throne at the head of the room.~
+You can sit on the throne.
+~
+~
+fhln 19 1 0 0
+S
+#920
+canoe wooden~
+a wooden canoe~
+A wooden canoe is lying on its side.~
+   You can ride in a canoe and sail it across the water, or you can drag it on
+land.
+~
+~
+cfghln 3 10 0 0
+R
+1356 1  # 1x a small piece of leather
+S
+#921
+caravan brightly-painted painted wooden~
+the caravan~
+A brightly-painted wooden caravan is parked here.~
+   This cloth-covered wooden caravan could be set up to provide some of the
+features of a house on the move, but it's not big enough to be a proper home
+for someone as important as you.
+~
+~
+bfhio 19 25 100 4
+D
+5518 1 r
+R
+1306 1  # 1x a pouch of nails
+R
+1359 1  # 1x a bolt of cloth
+T 921
+S
+#952
+caravel lanteen-rigged~
+the caravel~
+A lanteen-rigged caravel is floating here.~
+   A caravel is a small, fast ship and the preferred vehicle for explorers
+everywhere. You can "board" the ship from here.
+~
+&0<&u44&0>~
+chijkt 20 32 150 0
+D
+5501 2 o
+R
+125 1  # 1x a stack of lumber
+R
+1306 1  # 1x a pouch of nails
+R
+1359 1  # 1x a bolt of cloth
+T 952
+S
+#953
+cog~
+a cog~
+A cog is floating here, loaded to the top with cargo.~
+   The cog is a small cargo ship, used virtually everywhere to move goods. It
+can be used for shipping, or to move items manually between islands. You can
+"board" it from here.
+~
+&0<&u44&0>~
+cijt 20 32 450 0
+D
+5501 1 0
+R
+125 1  # 1x a stack of lumber
+R
+1306 1  # 1x a pouch of nails
+R
+1359 1  # 1x a bolt of cloth
+T 953
+S
+#954
+longship fearsome~
+the longship~
+A fearsome longship floats ominiously on the water.~
+   The longship has a single tall mast, its single sail embroidered with the
+fierce emblem of its master. This longship is armed with cannon, and used to
+raid up and down the coast. You can "board" it from here.
+~
+&0<&u44&0>~
+ckrt 20 64 0 0
+C
+0 100
+D
+5501 2 o
+R
+125 1  # 1x a stack of lumber
+R
+1306 1  # 1x a pouch of nails
+R
+1359 1  # 1x a bolt of cloth
+T 954
+S
+#955
+brigantine massive~
+the brigantine~
+A massive brigantine floats along the water.~
+   The brigantine is a massive ship of war, decked out with guns on both sides.
+It has at least ten sails, granting it great speed and control on the high seas
+as it lets the great seafaring empire move weapons over incredible distances.
+~
+&0<&u44&0>~
+ckpqrt 20 128 0 0
+C
+0 100
+D
+5501 4 op
+R
+125 2  # 2x a stack of lumber
+R
+1306 2  # 2x a pouch of nails
+R
+1359 2  # 2x a bolt of cloth
+T 955
+S
+#956
+carrack four-masted~
+the carrack~
+A four-masted carrack looms large on the water.~
+   The carrack is a huge ship, used for global exploration. It's large enough
+to carry the entire expedition, and fast enough to move between continents.
+~
+&0<&u44&0>~
+cijkt 20 96 400 0
+D
+5501 8 opq
+R
+125 2  # 2x a stack of lumber
+R
+1306 2  # 2x a pouch of nails
+R
+1359 2  # 2x a bolt of cloth
+T 956
+S
+#957
+hulk cargo huge~
+a hulk~
+A huge cargo hulk is floating here.~
+   The hulk is a massive cargo ship, the gold standard for shipping on these
+seas. You can keep items in it, or using it to move goods from dock to dock.
+~
+&0<&u44&0>~
+cijkpqt 20 64 1000 0
+D
+5501 4 op
+R
+125 1  # 1x a stack of lumber
+R
+1306 1  # 1x a pouch of nails
+R
+1359 1  # 1x a bolt of cloth
+T 957
+S
+$

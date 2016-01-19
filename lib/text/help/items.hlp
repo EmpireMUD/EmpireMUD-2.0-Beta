@@ -22,16 +22,15 @@ See also: CLAY, CRAFT, POTTER
 #
 CANOE
 
-Canoe (item)
+Canoe (vehicle)
 
 Required ability:  Basic Crafts
 
 A good canoe will allow you to cross rivers as well as oceans. And unlike
-swimming, you won't be bothered by sharks.
+swimming, you won't be bothered by sharks. To use a canoe, drag it to the shore
+and then sit in it. After that, use "sail" to move it.
 
-You only need to have the canoe in your inventory for it to work.
-
-See also: SWIMMING, SHIPBUILDING
+See also: SAIL, SWIMMING, SHIPBUILDING
 #
 CLOTH "COTTON CLOTH"
 

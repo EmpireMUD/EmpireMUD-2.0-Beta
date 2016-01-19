@@ -337,4 +337,28 @@ L
 10400 -1 -1
 0 de de
 S
+#190
+Winter Wonderland~
+Paul Clarke and Owen Morris~
+Venture to the top of a snowy mountain in search of holiday gifts.
+
+EmpireMUD Administrators: You should remove the IN-DEV flag
+from this adventure during the Christmas season, and re-add
+the flag when you're ready to shut the adventure off again.
+~
+10700 10729 0-300
+3 0 ace 0
+L
+5 0
+60 -1 -1
+-1 0 0
+L
+4 0
+10700 10700 10701
+-1 n 0
+L
+4 0
+10701 10700 10701
+-1 el 0
+S
 $

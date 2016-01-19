@@ -197,11 +197,14 @@ const int base_player_pools[NUM_POOLS] = { 50, 100, 50, 100 };
 // attributes that can't go below 1 (terminate list with NOTHING)
 const int primary_attributes[] = { STRENGTH, CHARISMA, INTELLIGENCE, NOTHING };
 
+// skill levels at which you gain an ability
+int master_ability_levels[] = { 1, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 75, 80, 90, 100, -1 };
+
 // universal wait (command lag) after abilities with cooldowns
 const int universal_wait = 1.25 RL_SEC;
 
 // lore cleanup -- terminate the list with a -1
-const int remove_lore_types[] = { LORE_PLAYER_KILL, LORE_PLAYER_DEATH, LORE_TOWER_DEATH, LORE_DEATH, -1 };
+const int remove_lore_types[] = { LORE_PLAYER_KILL, LORE_PLAYER_DEATH, LORE_TOWER_DEATH, -1 };
 
 // used in several places to represent the lowest to-hit a player could have
 const int base_hit_chance = 50;
@@ -1542,7 +1545,7 @@ void init_config_system(void) {
 	// first set up all the config types
 
 	// game configs
-	init_config(CONFIG_GAME, "allow_extended_color_codes", CONFTYPE_BOOL, "if on, players can use &&[F000] and &&[B000]");
+	init_config(CONFIG_GAME, "allow_extended_color_codes", CONFTYPE_BOOL, "if on, players can use \t&[F000] and \t&[B000]");
 	init_config(CONFIG_GAME, "hiring_builders", CONFTYPE_BOOL, "whether the mud is hiring builders");
 	init_config(CONFIG_GAME, "hiring_coders", CONFTYPE_BOOL, "whether the mud is hiring coders");
 	init_config(CONFIG_GAME, "mud_contact", CONFTYPE_SHORT_STRING, "email address of an admin");
@@ -1660,6 +1663,11 @@ void init_config_system(void) {
 	init_config(CONFIG_OTHER, "test_config", CONFTYPE_INT, "this is a test config");
 	
 	// players
+	init_config(CONFIG_PLAYERS, "default_class_abbrev", CONFTYPE_SHORT_STRING, "abbreviation to show for unclassed players");
+	init_config(CONFIG_PLAYERS, "default_class_name", CONFTYPE_SHORT_STRING, "name to show for unclassed players");
+	init_config(CONFIG_PLAYERS, "delete_inactive_players_after", CONFTYPE_INT, "days to a player can be inactive before auto-delete (0 = never)");
+	init_config(CONFIG_PLAYERS, "delete_invalid_players_after", CONFTYPE_INT, "days to wait before deleting players with bad level data (0 = never)");
+	init_config(CONFIG_PLAYERS, "exp_level_difference", CONFTYPE_INT, "levels a player can have above a mob and still gain exp from it");
 	init_config(CONFIG_PLAYERS, "pool_bonus_amount", CONFTYPE_INT, "bonus trait amount for health/move/mana");
 	init_config(CONFIG_PLAYERS, "num_daily_skill_points", CONFTYPE_INT, "easy skillups per day");
 	init_config(CONFIG_PLAYERS, "num_bonus_trait_daily_skills", CONFTYPE_INT, "bonus trait for skillups");
@@ -1667,7 +1675,7 @@ void init_config_system(void) {
 	init_config(CONFIG_PLAYERS, "idle_linkdead_rent_time", CONFTYPE_INT, "how many ticks before a linkdead player is idle-rented");
 	init_config(CONFIG_PLAYERS, "max_capitals_in_name", CONFTYPE_INT, "how many uppercase letters can be in a player name (0 for unlimited)");
 	init_config(CONFIG_PLAYERS, "max_player_attribute", CONFTYPE_INT, "how high primary player attributes go");
-	init_config(CONFIG_PLAYERS, "obj_file_timeout", CONFTYPE_INT, "lifetime of normal player inventory files, in days");
+	init_config(CONFIG_PLAYERS, "max_sleeping_regen_time", CONFTYPE_INT, "maximum seconds to regen to full when sleeping (min interval is 5)");
 	init_config(CONFIG_PLAYERS, "remove_lore_after_years", CONFTYPE_INT, "game years to clean some lore types");
 	init_config(CONFIG_PLAYERS, "default_map_size", CONFTYPE_INT, "distance from the player that can be seen");
 	init_config(CONFIG_PLAYERS, "max_map_size", CONFTYPE_INT, "highest view radius a player may set");
@@ -1690,7 +1698,7 @@ void init_config_system(void) {
 	init_config(CONFIG_SYSTEM, "nameserver_is_slow", CONFTYPE_BOOL, "if enabled, system will not resolve numeric IPs");
 	init_config(CONFIG_SYSTEM, "max_filesize", CONFTYPE_INT, "maximum size of bug, typo and idea files in bytes (to prevent bombing)");
 	init_config(CONFIG_SYSTEM, "max_bad_pws", CONFTYPE_INT, "maximum number of password attempts before disconnection");
-	init_config(CONFIG_SYSTEM, "use_autowiz", CONFTYPE_BOOL, "if on, automatically generates the wizlist (unix only)");
+	init_config(CONFIG_SYSTEM, "use_autowiz", CONFTYPE_BOOL, "if on, automatically generates the wizlist");
 	init_config(CONFIG_SYSTEM, "siteok_everyone", CONFTYPE_BOOL, "flags players siteok on creation, essentially inverting ban logic");
 	init_config(CONFIG_SYSTEM, "log_losing_descriptor_without_char", CONFTYPE_BOOL, "somewhat spammy disconnect logs");
 
@@ -1711,6 +1719,7 @@ void init_config_system(void) {
 	init_config(CONFIG_WAR, "rogue_flag_time", CONFTYPE_INT, "in minutes, acts like hostile flag but for non-empire players");
 	init_config(CONFIG_WAR, "seconds_per_death", CONFTYPE_INT, "how long the penalty lasts per death over the limit");
 	init_config(CONFIG_WAR, "stun_immunity_time", CONFTYPE_INT, "seconds a person is immune to stuns after a stun wears off");
+	init_config(CONFIG_WAR, "vehicle_siege_time", CONFTYPE_INT, "seconds between catapult/vehicle firing");
 	init_config(CONFIG_WAR, "war_cost_max", CONFTYPE_INT, "empire coins to start a war at maximum level difference");
 	init_config(CONFIG_WAR, "war_cost_min", CONFTYPE_INT, "empire coins to start a war at minimum level difference");
 	init_config(CONFIG_WAR, "war_login_delay", CONFTYPE_INT, "seconds a person is stunned if they log in while at war");

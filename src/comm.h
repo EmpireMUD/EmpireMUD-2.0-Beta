@@ -19,13 +19,14 @@ void send_to_all(const char *messg, ...) __attribute__((format(printf, 1, 2)));
 void send_to_char(const char *messg, char_data *ch);
 void msg_to_char(char_data *ch, const char *messg, ...) __attribute__((format(printf, 2, 3)));
 void msg_to_desc(descriptor_data *d, const char *messg, ...) __attribute__((format(printf, 2, 3)));
+void msg_to_vehicle(vehicle_data *veh, bool awake_only, const char *messg, ...) __attribute__((format(printf, 3, 4)));
 void olc_audit_msg(char_data *ch, any_vnum vnum, const char *messg, ...);
 void send_to_group(char_data *ch, struct group_data *group, const char * msg, ...) __attribute__ ((format (printf, 3, 4)));
 void send_to_room(const char *messg, room_data *room);
 void send_to_outdoor(const char *messg, ...) __attribute__((format(printf, 1, 2)));
 void perform_to_all(const char *messg, char_data *ch);
 void close_socket(descriptor_data *d);
-void act(const char *str, int hide_invisible, char_data *ch, obj_data *obj, const void *vict_obj, int type);
+void act(const char *str, int hide_invisible, char_data *ch, const void *obj, const void *vict_obj, int type);
 
 
 // background color codes - not available to players so you have to sprintf/strcpy them in
@@ -49,6 +50,7 @@ void act(const char *str, int hide_invisible, char_data *ch, obj_data *obj, cons
 #define TO_NOT_IGNORING  BIT(11)	// doesn't send to people who are ignoring the main actor
 #define TO_IGNORE_BAD_CODE  BIT(12)	// ignores bad $ codes
 #define DG_NO_TRIG  BIT(13)	// don't check act trigger
+#define ACT_VEHICLE_OBJ  BIT(14)  // the middle/obj param is a vehicle
 
 /* I/O functions */
 int write_to_descriptor(socket_t desc, const char *txt);

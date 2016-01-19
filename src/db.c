@@ -20,7 +20,6 @@
 #include "db.h"
 #include "comm.h"
 #include "handler.h"
-#include "mail.h"
 #include "interpreter.h"
 #include "skills.h"
 #include "olc.h"
@@ -52,8 +51,11 @@ extern const sector_vnum climate_default_sector[NUM_CLIMATES];
 void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location);
 void discrete_load(FILE *fl, int mode, char *filename);
 void free_complex_data(struct complex_room_data *data);
+extern crop_data *get_potential_crop_for_location(room_data *location);
 void index_boot(int mode);
 extern obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify);
+void save_whole_world();
+void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func));
 
 // local functions
 int file_to_string_alloc(const char *name, char **buf);
@@ -65,11 +67,27 @@ void save_daily_cycle();
  //////////////////////////////////////////////////////////////////////////////
 //// GLOBAL DATA /////////////////////////////////////////////////////////////
 
+// abilities
+ability_data *ability_table = NULL;	// main hash (hh)
+ability_data *sorted_abilities = NULL;	// alpha hash (sorted_hh)
+
 // adventures
 adv_data *adventure_table = NULL;	// adventure hash table
 
+// archetype
+archetype_data *archetype_table = NULL;	// master hash (hh)
+archetype_data *sorted_archetypes = NULL;	// sorted hash (sorted_hh)
+
+// augments
+augment_data *augment_table = NULL;	// master augment hash table
+augment_data *sorted_augments = NULL;	// alphabetic version // sorted_hh
+
 // buildings
 bld_data *building_table = NULL;	// building hash table
+
+// classes
+class_data *class_table = NULL;	// main hash (hh)
+class_data *sorted_classes = NULL;	// alpha hash (sorted_hh)
 
 // crafts
 craft_data *craft_table = NULL;	// master crafting table
@@ -90,8 +108,7 @@ struct message_list fight_messages[MAX_MESSAGES];	// fighting messages
 time_t boot_time = 0;	// time of mud boot
 int daily_cycle = 0;	// this is a timestamp for the last time skills/exp reset
 int Global_ignore_dark = 0;	// For use in public channels
-int no_mail = 0;	// mail disabled?
-int no_rent_check = 0;	// skip rent check on boot?
+int no_auto_deletes = 0;	// skip player deletes on boot?
 struct time_info_data time_info;	// the infomation about the time
 struct weather_data weather_info;	// the infomation about the weather
 int wizlock_level = 0;	// level of game restriction
@@ -122,10 +139,9 @@ obj_data *object_list = NULL;	// global linked list of objs
 obj_data *object_table = NULL;	// hash table of objs
 
 // players
-struct player_index_element *player_table = NULL;	// index to plr file
-FILE *player_fl = NULL;	// file desc of player file
-int top_of_p_table = 0;	// ref to top of table
-int top_of_p_file = 0;	// ref of size of p file
+account_data *account_table = NULL;	// hash table of accounts
+player_index_data *player_table_by_idnum = NULL;	// hash table by idnum
+player_index_data *player_table_by_name = NULL;	// hash table by name
 int top_idnum = 0;	// highest idnum in use
 int top_account_id = 0;  // highest account number in use, determined during startup
 struct group_data *group_list = NULL;	// global LL of groups
@@ -135,6 +151,10 @@ room_template *room_template_table = NULL;	// hash table of room templates
 
 // sectors
 sector_data *sector_table = NULL;	// sector hash table
+
+// skills
+skill_data *skill_table = NULL;	// main skills hash (hh)
+skill_data *sorted_skills = NULL;	// alpha hash (sorted_hh)
 
 // strings
 char *credits = NULL;	// game credits
@@ -157,16 +177,24 @@ int tips_of_the_day_size = 0;	// size of tip array
 // triggers
 trig_data *trigger_table = NULL;	// trigger prototype hash
 trig_data *trigger_list = NULL;	// LL of all attached triggers
-int max_mob_id = MOB_ID_BASE;	// for unique mob id's
-int max_obj_id = OBJ_ID_BASE;	// for unique obj id's
+int max_mob_id = MOB_ID_BASE;	// for unique mob ids
+int max_obj_id = OBJ_ID_BASE;	// for unique obj ids
+int max_vehicle_id = VEHICLE_ID_BASE;	// for unique vehicle ids
 int dg_owner_purged;	// For control of scripts
+
+// vehicles
+vehicle_data *vehicle_table = NULL;	// master vehicle hash table
+vehicle_data *vehicle_list = NULL;	// global linked list of vehicles (veh->next)
 
 // world / rooms
 room_data *world_table = NULL;	// hash table of the whole world
-room_data *interior_world_table = NULL;	// hash table of the interior world
+room_data *interior_room_list = NULL;	// linked list of interior rooms: room->next_interior
 bool world_is_sorted = FALSE;	// to prevent unnecessary re-sorts
 bool need_world_index = TRUE;	// used to trigger world index saving (always save at least once)
 struct island_info *island_table = NULL; // hash table for all the islands
+struct map_data world_map[MAP_WIDTH][MAP_HEIGHT];	// master world map
+struct map_data *land_map = NULL;	// linked list of non-ocean
+bool world_map_needs_save = TRUE;	// always do at least 1 save
 
 
 // DB_BOOT_x
@@ -185,6 +213,13 @@ struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES] = {
 	{ ADV_PREFIX, ADV_SUFFIX },	// DB_BOOT_ADV
 	{ RMT_PREFIX, RMT_SUFFIX },	// DB_BOOT_RMT
 	{ GLB_PREFIX, GLB_SUFFIX },	// DB_BOOT_GLB
+	{ ACCT_PREFIX, ACCT_SUFFIX },	// DB_BOOT_ACCT
+	{ AUG_PREFIX, AUG_SUFFIX },	// DB_BOOT_AUG
+	{ ARCH_PREFIX, ARCH_SUFFIX },	// DB_BOOT_ARCH
+	{ ABIL_PREFIX, ABIL_SUFFIX },	// DB_BOOT_ABIL
+	{ CLASS_PREFIX, CLASS_SUFFIX },	// DB_BOOT_CLASS
+	{ SKILL_PREFIX, SKILL_SUFFIX },	// DB_BOOT_SKILL
+	{ VEH_PREFIX, VEH_SUFFIX },	// DB_BOOT_SKILL
 };
 
 
@@ -202,21 +237,21 @@ void boot_db(void) {
 	void build_player_index();
 	void check_ruined_cities();
 	void check_version();
+	void delete_old_players();
 	void delete_orphaned_rooms();
 	void init_config_system();
-	void init_skills();
+	void link_and_check_vehicles();
 	void load_banned();
 	void load_daily_cycle();
 	void load_intro_screens();
 	void load_fight_messages();
-	void load_player_data_at_startup();
 	void load_tips_of_the_day();
 	void load_trading_post();
 	void reset_time();
+	int run_convert_vehicle_list();
 	void sort_commands();
 	void startup_room_reset();
-	void update_obj_file();
-	void update_ships();
+	void verify_sectors();
 
 	log("Boot db -- BEGIN.");
 	
@@ -238,16 +273,15 @@ void boot_db(void) {
 	file_to_string_alloc(HANDBOOK_FILE, &handbook);
 	file_to_string_alloc(SCREDITS_FILE, &CREDIT_MESSG);
 	load_intro_screens();
-	
-	// skills are needed for some world files (crafts?)
-	log("Initializing skills.");
-	init_skills();
 
 	// Load the world!
 	boot_world();
 
 	log("Loading help entries.");
 	index_boot_help();
+	
+	log("Loading player accounts.");
+	index_boot(DB_BOOT_ACCT);
 
 	log("Generating player index.");
 	build_player_index();
@@ -269,12 +303,6 @@ void boot_db(void) {
 
 	log("Sorting command list.");
 	sort_commands();
-
-	log("Booting mail system.");
-	if (!scan_file()) {
-		log("    Mail boot failed -- Mail system disabled");
-		no_mail = 1;
-	}
 	
 	// sends own log
 	load_tips_of_the_day();
@@ -283,34 +311,41 @@ void boot_db(void) {
 	load_banned();
 	Read_Invalid_List();
 
-	if (!no_rent_check) {
-		log("Deleting timed-out crash and rent files:");
-		update_obj_file();
-		log("   Done.");
+	if (!no_auto_deletes) {
+		delete_old_players();
 	}
 	
 	// this loads objs and mobs back into the world
 	log("Resetting all rooms.");
 	startup_room_reset();
 
-	log("Updating all ships.");
-	update_ships();
+	load_daily_cycle();
+	log("Beginning skill reset cycle at %d.", daily_cycle);
+	
+	// NOTE: check_version() updates many things that change from version to
+	// version. See the function itself for a list of one-time updates it runs
+	// on the game. This should run as late in boot_db() as possible.
+	log("Checking game version...");
+	check_version();
+	
+	// Some things runs AFTER check_version() because they rely on all version
+	// updates having been run on this EmpireMUD:
+	
+	log("Verifying world sectors.");
+	verify_sectors();
+	
+	// convert vehicles -- this normally does nothing, but it may free a temporary list
+	run_convert_vehicle_list();
 	
 	log("Checking for orphaned rooms...");
 	delete_orphaned_rooms();
-
-	load_daily_cycle();
-	log("Beginning skill reset cycle at %d.", daily_cycle);
-
-	log("Loading player data...");
-	load_player_data_at_startup();
-
-	boot_time = time(0);
 	
-	log("Checking game version...");
-	check_version();
-
+	log("Linking and checking vehicles.");
+	link_and_check_vehicles();
+	
+	// END
 	log("Boot db -- DONE.");
+	boot_time = time(0);
 }
 
 
@@ -320,6 +355,12 @@ void boot_db(void) {
 * rooms (because rooms have sectors).
 */
 void boot_world(void) {
+	void build_land_map();
+	void build_world_map();
+	void check_abilities();
+	void check_archetypes();
+	void check_classes();
+	void check_skills();
 	void check_for_bad_buildings();
 	void check_for_bad_sectors();
 	void check_newbie_islands();
@@ -328,11 +369,29 @@ void boot_world(void) {
 	void load_empire_storage();
 	void load_instances();
 	void load_islands();
+	void load_world_map_from_file();
 	void number_and_count_islands(bool reset);
+	void read_ability_requirements();
 	void renum_world();
 	void setup_start_locations();
-	void verify_sectors();
+	extern int sort_abilities_by_data(ability_data *a, ability_data *b);
+	extern int sort_archetypes_by_data(archetype_data *a, archetype_data *b);
+	extern int sort_augments_by_data(augment_data *a, augment_data *b);
+	extern int sort_classes_by_data(class_data *a, class_data *b);
+	extern int sort_crafts_by_data(craft_data *a, craft_data *b);
+	extern int sort_skills_by_data(skill_data *a, skill_data *b);
 
+	// DB_BOOT_x search: boot new types in this function
+	
+	log("Loading abilities.");
+	index_boot(DB_BOOT_ABIL);
+	
+	log("Loading classes.");
+	index_boot(DB_BOOT_CLASS);
+	
+	log("Loading skills.");
+	index_boot(DB_BOOT_SKILL);
+	
 	log("Loading name lists.");
 	index_boot(DB_BOOT_NAMES);
 
@@ -351,17 +410,20 @@ void boot_world(void) {
 	log("Loading crops.");
 	index_boot(DB_BOOT_CROP);
 	
-	// requires sectors, buildings, and room templates
-	log("Loading rooms.");
-	index_boot(DB_BOOT_WLD);
+	log("Loading vehicles.");
+	index_boot(DB_BOOT_VEH);
+	
+	// requires sectors, buildings, and room templates -- order matters here
+	log("Loading the world.");
+	load_world_map_from_file();	// get base data
+	index_boot(DB_BOOT_WLD);	// override with live rooms
+	build_world_map();	// ensure full world map
+	build_land_map();	// determine which parts are land
 	
 	// requires rooms
 	log("Loading empires.");
 	index_boot(DB_BOOT_EMP);
 	clean_empire_logs();
-		
-	log("  Verifying world sectors.");
-	verify_sectors();
 	
 	// requires empires
 	log("  Renumbering rooms.");
@@ -392,6 +454,12 @@ void boot_world(void) {
 	log("Loading adventures.");
 	index_boot(DB_BOOT_ADV);
 	
+	log("Loading archetypes.");
+	index_boot(DB_BOOT_ARCH);
+	
+	log("Loading augments.");
+	index_boot(DB_BOOT_AUG);
+	
 	log("Loading instances.");
 	load_instances();
 	
@@ -400,8 +468,21 @@ void boot_world(void) {
 	
 	// check for bad data
 	log("Verifying data.");
+	check_abilities();
+	check_archetypes();
+	check_classes();
+	check_skills();
 	check_for_bad_buildings();
 	check_for_bad_sectors();
+	read_ability_requirements();
+	
+	log("Sorting data.");
+	HASH_SRT(sorted_hh, sorted_abilities, sort_abilities_by_data);
+	HASH_SRT(sorted_hh, sorted_archetypes, sort_archetypes_by_data);
+	HASH_SRT(sorted_hh, sorted_augments, sort_augments_by_data);
+	HASH_SRT(sorted_hh, sorted_classes, sort_classes_by_data);
+	HASH_SRT(sorted_hh, sorted_crafts, sort_crafts_by_data);
+	HASH_SRT(sorted_hh, sorted_skills, sort_skills_by_data);
 	
 	log("Checking newbie islands.");
 	check_newbie_islands();
@@ -491,7 +572,7 @@ void check_for_bad_buildings(void) {
 	bool deleted = FALSE;
 	
 	// check buildings and adventures
-	HASH_ITER(world_hh, world_table, room, next_room) {
+	HASH_ITER(hh, world_table, room, next_room) {
 		if (ROOM_SECT_FLAGGED(room, SECTF_MAP_BUILDING) && !GET_BUILDING(room)) {
 			// map building
 			log(" removing building at %d for bad building type", GET_ROOM_VNUM(room));
@@ -623,9 +704,11 @@ void delete_orphaned_rooms(void) {
 	bool deleted = FALSE;
 	
 	// start at the end of the map!
-	HASH_ITER(interior_hh, interior_world_table, room, next_room) {
-		// boats are checked separately
-		if (BUILDING_VNUM(room) == RTYPE_B_ONDECK && HOME_ROOM(room) == room) {
+	for (room = interior_room_list; room; room = next_room) {
+		next_room = room->next_interior;
+		
+		// vehicles are checked separately
+		if (ROOM_AFF_FLAGGED(room, ROOM_AFF_IN_VEHICLE) && HOME_ROOM(room) == room) {
 			continue;
 		}
 		
@@ -648,57 +731,11 @@ void delete_orphaned_rooms(void) {
 	}
 }
 
-/**
-* Sets the boat pointers on all rooms associated with ships, sets the ship-
-* present flag on map rooms, and deletes boat interiors that have no exterior.
-*
-* This is meant to be called at startup.
-*/
-void update_ships(void) {
-	void check_for_ships_present(room_data *room);
-	
-	obj_data *o, *next_o;
-	room_data *rl, *room, *next_room;
-	bool found = FALSE;
-
-	for (o = object_list; o; o = next_o) {
-		next_o = o->next;
-
-		if (GET_OBJ_TYPE(o) == ITEM_SHIP) {
-			if ((rl = real_room(GET_SHIP_MAIN_ROOM(o)))) {
-				COMPLEX_DATA(rl)->boat = o;
-			}
-			else {
-				extract_obj(o);
-			}
-		}
-	}
-
-	HASH_ITER(world_hh, world_table, room, next_room) {
-		if (BUILDING_VNUM(room) == RTYPE_B_ONDECK && HOME_ROOM(room) == room && !GET_BOAT(room)) {
-			delete_room(room, FALSE);	// must check_all_exits
-			found = TRUE;
-		}
-		else if (GET_ROOM_VNUM(room) < MAP_SIZE) {
-			// regular map room? check for ships present
-			check_for_ships_present(room);
-		}
-	}
-	
-	// only bother this if we deleted anything
-	if (found) {
-		check_all_exits();
-		read_empire_territory(NULL);
-	}
-}
-
 
 /**
 * This ensures that every room has a valid sector.
 */
-void verify_sectors(void) {
-	extern crop_data *get_potential_crop_for_location(room_data *location);
-	
+void verify_sectors(void) {	
 	sector_data *use_sect, *sect, *next_sect;
 	room_data *room, *next_room;
 	
@@ -719,19 +756,24 @@ void verify_sectors(void) {
 	}
 	
 	// check whole world
-	HASH_ITER(world_hh, world_table, room, next_room) {
+	HASH_ITER(hh, world_table, room, next_room) {
 		if (!SECT(room)) {
+			// can't use change_terrain() here
 			SECT(room) = use_sect;
+			if (GET_ROOM_VNUM(room) < MAP_SIZE) {
+				world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)].sector_type = use_sect;
+				world_map_needs_save = TRUE;
+			}
 		}
-		if (!ROOM_ORIGINAL_SECT(room)) {
-			ROOM_ORIGINAL_SECT(room) = use_sect;
+		if (!BASE_SECT(room)) {
+			change_base_sector(room, use_sect);
 		}
 		
 		// also check for missing crop data
-		if (SECT_FLAGGED(SECT(room), SECTF_HAS_CROP_DATA | SECTF_CROP) && !find_room_extra_data(room, ROOM_EXTRA_CROP_TYPE)) {
+		if (SECT_FLAGGED(SECT(room), SECTF_HAS_CROP_DATA | SECTF_CROP) && !ROOM_CROP(room)) {
 			crop_data *new_crop = get_potential_crop_for_location(room);
 			if (new_crop) {
-				set_room_extra_data(room, ROOM_EXTRA_CROP_TYPE, GET_CROP_VNUM(new_crop));
+				set_crop_type(room, new_crop);
 			}
 		}
 	}
@@ -774,7 +816,7 @@ void renum_world(void) {
 	process_temporary_room_data();
 
 	// exits
-	HASH_ITER(world_hh, world_table, room, next_room) {
+	HASH_ITER(hh, world_table, room, next_room) {
 		// exits
 		if (COMPLEX_DATA(room)) {
 			// exit targets
@@ -783,7 +825,10 @@ void renum_world(void) {
 				
 				// validify exit
 				ex->room_ptr = real_room(ex->to_room);
-				if (!ex->room_ptr) {
+				if (ex->room_ptr) {
+					++GET_EXITS_HERE(ex->room_ptr);
+				}
+				else {
 					if (ex->keyword) {
 						free(ex->keyword);
 					}
@@ -796,6 +841,9 @@ void renum_world(void) {
 			if (GET_ROOM_VNUM(room) > MAP_SIZE && (home = HOME_ROOM(room)) != room) {
 				if (COMPLEX_DATA(home)) {
 					COMPLEX_DATA(home)->inside_rooms++;
+				}
+				if (GET_ROOM_VEHICLE(home)) {
+					++VEH_INSIDE_ROOMS(GET_ROOM_VEHICLE(home));
 				}
 			}
 		}
@@ -1144,6 +1192,38 @@ void index_boot_help(void) {
  //////////////////////////////////////////////////////////////////////////////
 //// ISLAND SETUP ////////////////////////////////////////////////////////////
 
+// this helps find places to number
+struct island_num_data_t {
+	struct map_data *loc;
+	struct island_num_data_t *next;	// LL
+};
+
+struct island_num_data_t *island_stack = NULL;	// global stack
+
+
+// pops an item from the stack and returns it, or NULL if empty
+struct island_num_data_t *pop_island(void) {
+	struct island_num_data_t *temp = NULL;
+	
+	if (island_stack) {
+		temp = island_stack;
+		island_stack = temp->next;
+	}
+	
+	return temp;
+}
+
+
+// push a location onto the stack
+void push_island(struct map_data *loc) {
+	struct island_num_data_t *island;
+	CREATE(island, struct island_num_data_t, 1);
+	island->loc = loc;
+	island->next = island_stack;
+	island_stack = island;
+}
+
+
 /**
 * Checks the newbie islands and applies their rules (abandons land).
 */
@@ -1170,7 +1250,7 @@ void check_newbie_islands(void) {
 		}
 	}
 	
-	HASH_ITER(world_hh, world_table, room, next_room) {
+	HASH_ITER(hh, world_table, room, next_room) {
 		if (GET_ROOM_VNUM(room) >= MAP_SIZE || GET_ISLAND_ID(room) == NO_ISLAND) {
 			continue;
 		}
@@ -1214,20 +1294,41 @@ void check_newbie_islands(void) {
 }
 
 
-// adds a room to an island, then scans all adjacent rooms
-static void recursive_island_scan(room_data *room, int island) {
-	int dir;
-	room_data *to_room;
+/**
+* Numbers an island and pushes its neighbors onto the stack if they need island
+* ids.
+*
+* @param struct map_data *map A map location.
+* @param int island The island id.
+*/
+void number_island(struct map_data *map, int island) {
+	int x, y, new_x, new_y;
+	struct map_data *tile;
+	room_data *room;
 	
-	SET_ISLAND_ID(room, MAX(0, island));	// ensure it's never < 0, as that would go poorly
+	map->island = island;
 	
-	for (dir = 0; dir < NUM_2D_DIRS; ++dir) {
-		// TODO disabling ocean lookups on this real_shift would save RAM at startup
-		to_room = real_shift(room, shift_dir[dir][0], shift_dir[dir][1]);
-		
-		// TODO <= 0 here -- isn't 0 a valid island num?
-		if (to_room && !ROOM_SECT_FLAGGED(to_room, SECTF_NON_ISLAND) && GET_ISLAND_ID(to_room) <= 0) {
-			recursive_island_scan(to_room, island);
+	// if there's a real room
+	if ((room = real_real_room(map->vnum))) {
+		SET_ISLAND_ID(room, island);
+	}
+	
+	// check neighboring tiles
+	for (x = -1; x <= 1; ++x) {
+		for (y = -1; y <= 1; ++y) {
+			// same tile
+			if (x == 0 && y == 0) {
+				continue;
+			}
+			
+			if (get_coord_shift(MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum), x, y, &new_x, &new_y)) {
+				tile = &(world_map[new_x][new_y]);
+				
+				if (!SECT_FLAGGED(tile->sector_type, SECTF_NON_ISLAND) && tile->island <= 0) {
+					// add to stack
+					push_island(tile);
+				}
+			}
 		}
 	}
 }
@@ -1245,7 +1346,7 @@ void number_and_count_islands(bool reset) {
 	// helper type
 	struct island_read_data {
 		int id;
-			int size;
+		int size;
 		int sum_x, sum_y;	// for averaging center
 		room_vnum edge[NUM_SIMPLE_DIRS];	// detected edges
 		int edge_val[NUM_SIMPLE_DIRS];	// for detecting edges
@@ -1254,23 +1355,20 @@ void number_and_count_islands(bool reset) {
 	
 	struct island_read_data *data, *next_data, *list = NULL;
 	bool re_empire = (top_island_num != -1);
-	room_data *room, *next_room;
+	struct island_num_data_t *item;
 	struct island_info *isle;
-	int id, iter;
+	struct map_data *map;
+	room_data *room;
+	int iter, use_id;
 	
 	// find top island id (and reset if requested)
 	top_island_num = -1;
-	HASH_ITER(world_hh, world_table, room, next_room) {
-		// map only
-		if (GET_ROOM_VNUM(room) >= MAP_SIZE) {
-			continue;
-		}
-		
-		if (reset || ROOM_SECT_FLAGGED(room, SECTF_NON_ISLAND)) {
-			SET_ISLAND_ID(room, NO_ISLAND);
+	for (map = land_map; map; map = map->next) {
+		if (reset || SECT_FLAGGED(map->sector_type, SECTF_NON_ISLAND)) {
+			map->island = NO_ISLAND;
 		}
 		else {
-			top_island_num = MAX(top_island_num, GET_ISLAND_ID(room));
+			top_island_num = MAX(top_island_num, map->island);
 		}
 	}
 	
@@ -1278,40 +1376,40 @@ void number_and_count_islands(bool reset) {
 	
 	// 1. expand EXISTING islands
 	if (!reset) {
-		HASH_ITER(world_hh, world_table, room, next_room) {
-			// map only
-			if (GET_ROOM_VNUM(room) >= MAP_SIZE) {
+		for (map = land_map; map; map = map->next) {
+			if (map->island == NO_ISLAND) {
 				continue;
 			}
 			
-			if (GET_ISLAND_ID(room) != NO_ISLAND) {
-				recursive_island_scan(room, GET_ISLAND_ID(room));
+			use_id = map->island;
+			push_island(map);
+			
+			while ((item = pop_island())) {
+				number_island(item->loc, use_id);
+				free(item);
 			}
 		}
 	}
 	
 	// 2. look for places that have no island id but need one -- and also measure islands while we're here
-	HASH_ITER(world_hh, world_table, room, next_room) {
-		// map only!
-		if (GET_ROOM_VNUM(room) >= MAP_SIZE) {
-			continue;
+	for (map = land_map; map; map = map->next) {
+		if (map->island == NO_ISLAND && !SECT_FLAGGED(map->sector_type, SECTF_NON_ISLAND)) {
+			use_id = ++top_island_num;
+			push_island(map);
+			
+			while ((item = pop_island())) {
+				number_island(item->loc, use_id);
+				free(item);
+			}
+		}
+		else {
+			use_id = map->island;
 		}
 		
-		if (GET_ISLAND_ID(room) == NO_ISLAND && !ROOM_SECT_FLAGGED(room, SECTF_NON_ISLAND)) {
-			recursive_island_scan(room, ++top_island_num);
-		}
-		
-		// find helper entry
-		id = GET_ISLAND_ID(room);
-		if (id == NO_ISLAND) {
-			// just an ocean
-			continue;
-		}
-		
-		HASH_FIND_INT(list, &id, data);
+		HASH_FIND_INT(list, &use_id, data);
 		if (!data) {	// or create one
 			CREATE(data, struct island_read_data, 1);
-			data->id = id;
+			data->id = use_id;
 			for (iter = 0; iter < NUM_SIMPLE_DIRS; ++iter) {
 				data->edge[iter] = NOWHERE;
 				data->edge_val[iter] = NOWHERE;
@@ -1321,25 +1419,25 @@ void number_and_count_islands(bool reset) {
 
 		// update helper data
 		data->size += 1;
-		data->sum_x += FLAT_X_COORD(room);
-		data->sum_y += FLAT_Y_COORD(room);
+		data->sum_x += MAP_X_COORD(map->vnum);
+		data->sum_y += MAP_Y_COORD(map->vnum);
 	
 		// detect edges
-		if (data->edge[NORTH] == NOWHERE || FLAT_Y_COORD(room) > data->edge_val[NORTH]) {
-			data->edge[NORTH] = GET_ROOM_VNUM(room);
-			data->edge_val[NORTH] = FLAT_Y_COORD(room);
+		if (data->edge[NORTH] == NOWHERE || MAP_Y_COORD(map->vnum) > data->edge_val[NORTH]) {
+			data->edge[NORTH] = map->vnum;
+			data->edge_val[NORTH] = MAP_Y_COORD(map->vnum);
 		}
-		if (data->edge[SOUTH] == NOWHERE || FLAT_Y_COORD(room) < data->edge_val[SOUTH]) {
-			data->edge[SOUTH] = GET_ROOM_VNUM(room);
-			data->edge_val[SOUTH] = FLAT_Y_COORD(room);
+		if (data->edge[SOUTH] == NOWHERE || MAP_Y_COORD(map->vnum) < data->edge_val[SOUTH]) {
+			data->edge[SOUTH] = map->vnum;
+			data->edge_val[SOUTH] = MAP_Y_COORD(map->vnum);
 		}
-		if (data->edge[EAST] == NOWHERE || FLAT_X_COORD(room) > data->edge_val[EAST]) {
-			data->edge[EAST] = GET_ROOM_VNUM(room);
-			data->edge_val[EAST] = FLAT_X_COORD(room);
+		if (data->edge[EAST] == NOWHERE || MAP_X_COORD(map->vnum) > data->edge_val[EAST]) {
+			data->edge[EAST] = map->vnum;
+			data->edge_val[EAST] = MAP_X_COORD(map->vnum);
 		}
-		if (data->edge[WEST] == NOWHERE || FLAT_X_COORD(room) < data->edge_val[WEST]) {
-			data->edge[WEST] = GET_ROOM_VNUM(room);
-			data->edge_val[WEST] = FLAT_X_COORD(room);
+		if (data->edge[WEST] == NOWHERE || MAP_X_COORD(map->vnum) < data->edge_val[WEST]) {
+			data->edge[WEST] = map->vnum;
+			data->edge_val[WEST] = MAP_X_COORD(map->vnum);
 		}
 	}
 	
@@ -1377,7 +1475,6 @@ void number_and_count_islands(bool reset) {
 void clear_char(char_data *ch) {
 	memset((char *) ch, 0, sizeof(char_data));
 
-	GET_PFILEPOS(ch) = NOTHING;
 	ch->vnum = NOBODY;
 	GET_POS(ch) = POS_STANDING;
 	MOB_INSTANCE_ID(ch) = NOTHING;
@@ -1439,6 +1536,9 @@ char_data *read_mobile(mob_vnum nr, bool with_triggers) {
 	if (with_triggers) {
 		copy_proto_script(proto, mob, MOB_TRIGGER);
 		assign_triggers(mob, MOB_TRIGGER);
+	}
+	else {
+		mob->proto_script = NULL;
 	}
 
 	return (mob);
@@ -1507,7 +1607,10 @@ obj_data *read_object(obj_vnum nr, bool with_triggers) {
 
 	*obj = *proto;
 	add_to_object_list(obj);
-
+	
+	// applies are ALWAYS a copy
+	GET_OBJ_APPLIES(obj) = copy_apply_list(GET_OBJ_APPLIES(proto));
+	
 	if (obj->obj_flags.timer == 0)
 		obj->obj_flags.timer = UNLIMITED;
 	
@@ -1518,6 +1621,9 @@ obj_data *read_object(obj_vnum nr, bool with_triggers) {
 	if (with_triggers) {
 		copy_proto_script(proto, obj, OBJ_TRIGGER);
 		assign_triggers(obj, OBJ_TRIGGER);
+	}
+	else {
+		obj->proto_script = NULL;
 	}
 
 	return (obj);
@@ -1536,6 +1642,10 @@ const char *versions_list[] = {
 	"b2.9",
 	"b2.11",
 	"b3.0",
+	"b3.1",
+	"b3.2",
+	"b3.6",
+	"b3.8",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -1591,9 +1701,8 @@ PLAYER_UPDATE_FUNC(b2_8_update_players) {
 
 // 2.11 loads inventories and attaches triggers
 PLAYER_UPDATE_FUNC(b2_11_update_players) {
-	extern int Objload_char(char_data *ch, int dolog);
-	void Objsave_char(char_data *ch, int rent_code);
-	
+	void check_delayed_load(char_data *ch);
+
 	obj_data *obj, *proto;
 	int iter;
 	
@@ -1602,7 +1711,7 @@ PLAYER_UPDATE_FUNC(b2_11_update_players) {
 		return;
 	}
 	
-	Objload_char(ch, FALSE);
+	check_delayed_load(ch);
 	
 	// inventory
 	for (obj = ch->carrying; obj; obj = obj->next_content) {
@@ -1619,18 +1728,202 @@ PLAYER_UPDATE_FUNC(b2_11_update_players) {
 			assign_triggers(GET_EQ(ch, iter), OBJ_TRIGGER);
 		}
 	}
+}
+
+
+// updater for existing mines
+void b3_1_mine_update(void) {
+	room_data *room, *next_room;
+	int type;
 	
-	// save gear
-	Objsave_char(ch, RENT_RENTED);
+	HASH_ITER(hh, world_table, room, next_room) {
+		if ((type = get_room_extra_data(room, 0)) <= 0) {	// 0 was ROOM_EXTRA_MINE_TYPE
+			continue;
+		}
+
+		switch (type) {
+			case 10: {	// iron
+				set_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM, 199);
+				break;
+			}
+			case 11: {	// silver
+				set_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM, 161);
+				break;
+			}
+			case 12: {	// gold
+				set_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM, 162);
+				break;
+			}
+			case 13: {	// nocturnium
+				set_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM, 163);
+				break;
+			}
+			case 14: {	// imperium
+				set_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM, 164);
+				break;
+			}
+			case 15: {	// copper
+				set_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM, 160);
+				break;
+			}
+		}
+
+		remove_room_extra_data(room, 0);	// ROOM_EXTRA_MINE_TYPE prior to b3.1
+	}
+}
+
+
+PLAYER_UPDATE_FUNC(b3_2_player_gear_disenchant) {
+	void check_delayed_load(char_data *ch);
+	obj_data *obj, *next_obj, *new;
+	int iter;
+	
+	check_delayed_load(ch);
+	
+	for (iter = 0; iter < NUM_WEARS; ++iter) {
+		if ((obj = GET_EQ(ch, iter)) && OBJ_FLAGGED(obj, OBJ_ENCHANTED) && obj_proto(GET_OBJ_VNUM(obj))) {
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			swap_obj_for_obj(obj, new);
+			extract_obj(obj);
+		}
+	}
+	for (obj = ch->carrying; obj; obj = next_obj) {
+		next_obj = obj->next_content;
+		if (OBJ_FLAGGED(obj, OBJ_ENCHANTED) && obj_proto(GET_OBJ_VNUM(obj))) {
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			swap_obj_for_obj(obj, new);
+			extract_obj(obj);
+		}
+	}
+}
+
+
+// removes the PLAYER-MADE flag from rooms and sets their "natural sect" instead
+void b3_2_map_and_gear(void) {
+	extern const sector_vnum climate_default_sector[NUM_CLIMATES];
+	void save_trading_post();
+
+	obj_data *obj, *next_obj, *new, *proto;
+	struct empire_unique_storage *eus;
+	struct trading_post_data *tpd;
+	room_data *room, *next_room;
+	empire_data *emp, *next_emp;
+	crop_vnum type;
+	
+	int ROOM_EXTRA_CROP_TYPE = 2;	// removed extra type
+	bitvector_t ROOM_AFF_PLAYER_MADE = BIT(11);	// removed flag
+	sector_vnum OASIS = 21, SANDY_TRENCH = 22;
+	
+	log("Applying b3.2 update...");
+	
+	log(" - updating the map...");
+	HASH_ITER(hh, world_table, room, next_room) {
+		// player-made
+		if (IS_SET(ROOM_AFF_FLAGS(room) | ROOM_BASE_FLAGS(room), ROOM_AFF_PLAYER_MADE)) {
+			// remove the bits
+			REMOVE_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_PLAYER_MADE);
+			REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_PLAYER_MADE);
+		
+			// update the natural sector
+			if (GET_ROOM_VNUM(room) < MAP_SIZE) {
+				world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)].natural_sector = sector_proto((GET_SECT_VNUM(SECT(room)) == OASIS || GET_SECT_VNUM(SECT(room)) == SANDY_TRENCH) ? climate_default_sector[CLIMATE_ARID] : climate_default_sector[CLIMATE_TEMPERATE]);
+				world_map_needs_save = TRUE;
+			}
+		}
+		
+		// crops
+		if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && !ROOM_CROP(room)) {
+			type = get_room_extra_data(room, ROOM_EXTRA_CROP_TYPE);
+			set_crop_type(room, type > 0 ? crop_proto(type) : get_potential_crop_for_location(room));
+			remove_room_extra_data(room, ROOM_EXTRA_CROP_TYPE);
+		}
+	}
+	
+	log(" - disenchanting the object list...");
+	for (obj = object_list; obj; obj = next_obj) {
+		next_obj = obj->next;
+		if (OBJ_FLAGGED(obj, OBJ_ENCHANTED) && (proto = obj_proto(GET_OBJ_VNUM(obj))) && !OBJ_FLAGGED(proto, OBJ_ENCHANTED)) {
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			swap_obj_for_obj(obj, new);
+			extract_obj(obj);
+		}
+	}
+	
+	log(" - disenchanting warehouse objects...");
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		for (eus = EMPIRE_UNIQUE_STORAGE(emp); eus; eus = eus->next) {
+			if ((obj = eus->obj) && OBJ_FLAGGED(obj, OBJ_ENCHANTED) && (proto = obj_proto(GET_OBJ_VNUM(obj))) && !OBJ_FLAGGED(proto, OBJ_ENCHANTED)) {
+				new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+				eus->obj = new;
+				extract_obj(obj);
+			}
+		}
+	}
+	
+	log(" - disenchanting trading post objects...");
+	for (tpd = trading_list; tpd; tpd = tpd->next) {
+		if ((obj = tpd->obj) && OBJ_FLAGGED(obj, OBJ_ENCHANTED) && (proto = obj_proto(GET_OBJ_VNUM(obj))) && !OBJ_FLAGGED(proto, OBJ_ENCHANTED)) {
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			tpd->obj = new;
+			extract_obj(obj);
+		}
+	}
+	
+	log(" - disenchanting player inventories...");
+	update_all_players(NULL, b3_2_player_gear_disenchant);
+	
+	// ensure everything gets saved this way since we won't do this again
+	save_all_empires();
+	save_trading_post();
+	save_whole_world();
+}
+
+
+// fixes some guild-patterend cloth that was accidentally auto-weaved in a previous patch
+// NOTE: the cloth is not storable, so any empire with it in normal storage must have had the bug
+void b3_6_einv_fix(void) {
+	struct empire_storage_data *store, *next_store;
+	empire_data *emp, *next_emp;
+	obj_data *proto;
+	int total, amt;
+	
+	obj_vnum vnum = 2344;	// guild-patterned cloth
+	obj_vnum cloth = 1359;
+	obj_vnum silver = 161;
+	
+	proto = obj_proto(vnum);
+	if (!proto || proto->storage || !obj_proto(cloth) || !obj_proto(silver)) {
+		return;	// no work to do on this EmpireMUD
+	}
+	
+	log("Fixing incorrectly auto-weaved guild-patterned cloth (2344)");
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		total = 0;
+		LL_FOREACH_SAFE(EMPIRE_STORAGE(emp), store, next_store) {
+			if (store->vnum == vnum) {
+				amt = store->amount;
+				total += amt;
+				add_to_empire_storage(emp, store->island, cloth, 4 * amt);
+				add_to_empire_storage(emp, store->island, silver, 2 * amt);
+				LL_DELETE(EMPIRE_STORAGE(emp), store);
+				free(store);
+			}
+		}
+		
+		if (total > 0) {
+			log(" - [%d] %s: %d un-woven", EMPIRE_VNUM(emp), EMPIRE_NAME(emp), total);
+		}
+	}
+	
+	save_all_empires();
 }
 
 
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
-void check_version(void) {
-	void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func));
-	
+void check_version(void) {	
 	int last, iter, current = NOTHING;
 	
 	#define MATCH_VERSION(name)  (!str_cmp(versions_list[iter], name))
@@ -1648,11 +1941,13 @@ void check_version(void) {
 		
 		// version-specific updates
 		if (MATCH_VERSION("b2.5")) {
+			void set_workforce_limit_all(empire_data *emp, int chore, int limit);
+			
 			log("Applying b2.5 update to empires...");
 			empire_data *emp, *next_emp;
 			HASH_ITER(hh, empire_table, emp, next_emp) {
 				// auto-balance was removed and the same id was used for dismantle-mines
-				EMPIRE_CHORE(emp, CHORE_DISMANTLE_MINES) = FALSE;
+				set_workforce_limit_all(emp, CHORE_DISMANTLE_MINES, 0);
 				save_empire(emp);
 			}
 		}
@@ -1667,29 +1962,28 @@ void check_version(void) {
 			// error state -- crops that were in the 'seeded' state during the
 			// b2.8 reboot would have gotten bad original-sect data
 			room_data *room, *next_room;
-			HASH_ITER(world_hh, world_table, room, next_room) {
-				if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && SECT_FLAGGED(ROOM_ORIGINAL_SECT(room), SECTF_HAS_CROP_DATA) && !SECT_FLAGGED(ROOM_ORIGINAL_SECT(room), SECTF_CROP)) {
+			HASH_ITER(hh, world_table, room, next_room) {
+				if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && SECT_FLAGGED(BASE_SECT(room), SECTF_HAS_CROP_DATA) && !SECT_FLAGGED(BASE_SECT(room), SECTF_CROP)) {
 					// normal case: crop with a 'Seeded' original sect
 					// the fix is just to set the original sect to the current
 					// sect so it will detect a new sect on-harvest instead of
 					// setting it back to seeded
-					ROOM_ORIGINAL_SECT(room) = SECT(room);
+					change_base_sector(room, SECT(room));
 				}
-				else if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && !ROOM_SECT_FLAGGED(room, SECTF_CROP) && SECT(room) == ROOM_ORIGINAL_SECT(room)) {
+				else if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && !ROOM_SECT_FLAGGED(room, SECTF_CROP) && SECT(room) == BASE_SECT(room)) {
 					// second error case: a Seeded crop with itself as its
 					// original sect: detect a new original sect
 					extern const sector_vnum climate_default_sector[NUM_CLIMATES];
 					sector_data *sect;
 					crop_data *cp;
-					if ((cp = crop_proto(ROOM_CROP_TYPE(room))) && (sect = sector_proto(climate_default_sector[GET_CROP_CLIMATE(cp)]))) {
-						ROOM_ORIGINAL_SECT(room) = sect;
+					if ((cp = ROOM_CROP(room)) && (sect = sector_proto(climate_default_sector[GET_CROP_CLIMATE(cp)]))) {
+						change_base_sector(room, sect);
 					}
 				}
 			}
 		}
 		if (MATCH_VERSION("b2.11")) {
 			void save_trading_post();
-			void save_whole_world();
 			
 			struct empire_unique_storage *eus;
 			struct trading_post_data *tpd;
@@ -1745,26 +2039,41 @@ void check_version(void) {
 			// this is a repeat of the b2.9 update, but should fix additional
 			// rooms
 			room_data *room, *next_room;
-			HASH_ITER(world_hh, world_table, room, next_room) {
-				if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && SECT_FLAGGED(ROOM_ORIGINAL_SECT(room), SECTF_HAS_CROP_DATA) && !SECT_FLAGGED(ROOM_ORIGINAL_SECT(room), SECTF_CROP)) {
+			HASH_ITER(hh, world_table, room, next_room) {
+				if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && SECT_FLAGGED(BASE_SECT(room), SECTF_HAS_CROP_DATA) && !SECT_FLAGGED(BASE_SECT(room), SECTF_CROP)) {
 					// normal case: crop with a 'Seeded' original sect
 					// the fix is just to set the original sect to the current
 					// sect so it will detect a new sect on-harvest instead of
 					// setting it back to seeded
-					ROOM_ORIGINAL_SECT(room) = SECT(room);
+					change_base_sector(room, SECT(room));
 				}
-				else if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && !ROOM_SECT_FLAGGED(room, SECTF_CROP) && SECT_FLAGGED(ROOM_ORIGINAL_SECT(room), SECTF_HAS_CROP_DATA) && !SECT_FLAGGED(ROOM_ORIGINAL_SECT(room), SECTF_CROP)) {
+				else if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && !ROOM_SECT_FLAGGED(room, SECTF_CROP) && SECT_FLAGGED(BASE_SECT(room), SECTF_HAS_CROP_DATA) && !SECT_FLAGGED(BASE_SECT(room), SECTF_CROP)) {
 					// second error case: a Seeded crop with a Seeded crop as
 					// its original sect: detect a new original sect
 					extern const sector_vnum climate_default_sector[NUM_CLIMATES];
 					sector_data *sect;
 					crop_data *cp;
-					if ((cp = crop_proto(ROOM_CROP_TYPE(room))) && (sect = sector_proto(climate_default_sector[GET_CROP_CLIMATE(cp)]))) {
-						ROOM_ORIGINAL_SECT(room) = sect;
+					if ((cp = ROOM_CROP(room)) && (sect = sector_proto(climate_default_sector[GET_CROP_CLIMATE(cp)]))) {
+						change_base_sector(room, sect);
 					}
 				}
 			}
 		}
+		if (MATCH_VERSION("b3.1")) {
+			log("Applying b3.1 update to mines...");
+			b3_1_mine_update();
+		}
+		if (MATCH_VERSION("b3.2")) {
+			b3_2_map_and_gear();
+		}
+		if (MATCH_VERSION("b3.6")) {
+			b3_6_einv_fix();
+		}
+		if (MATCH_VERSION("b3.8")) {
+			void b3_8_ship_update(void);	// vehicles.c
+			log("Applying b3.8 update to vehicles...");
+			b3_8_ship_update();
+}
 	}
 	
 	write_last_boot_version(current);
@@ -1774,10 +2083,41 @@ void check_version(void) {
  //////////////////////////////////////////////////////////////////////////////
 //// MISCELLANEOUS HELPERS ///////////////////////////////////////////////////
 
-/* this is necessary for the autowiz system */
-void reload_wizlists(void) {
-	file_to_string_alloc(WIZLIST_FILE, &wizlist);
-	file_to_string_alloc(GODLIST_FILE, &godlist);
+/**
+* This adapts a saved empire's chore data from the pre-2.0b3.6 format, to the
+* newer version that is done per-island. It uses the temporary_room_data that
+* exists during startup to find a list of islands the empire controls. No other
+* ownership data is available during startup.
+* 
+* @param empire_data *emp The empire to add chore data for.
+* @param int chore Which CHORE_ to turn on.
+*/
+void assign_old_workforce_chore(empire_data *emp, int chore) {
+	void set_workforce_limit(empire_data *emp, int island_id, int chore, int limit);
+	
+	struct trd_type *trd, *next_trd;
+	struct map_data *map;
+	int last_isle = -1;
+	
+	if (chore < 0 || chore >= NUM_CHORES) {
+		return;
+	}
+	
+	HASH_ITER(hh, temporary_room_data, trd, next_trd) {
+		if (trd->owner != EMPIRE_VNUM(emp)) {	// ensure is this empire
+			continue;
+		}
+		if (trd->vnum >= MAP_SIZE) {	// ensure is on map
+			continue;
+		}
+		
+		// only bother if different from the last island found
+		map = &(world_map[MAP_X_COORD(trd->vnum)][MAP_Y_COORD(trd->vnum)]);
+		if (map->island != NO_ISLAND && last_isle != map->island) {
+			set_workforce_limit(emp, map->island, chore, WORKFORCE_UNLIMITED);
+			last_isle = map->island;
+		}
+	}
 }
 
 
@@ -1830,7 +2170,7 @@ void setup_start_locations(void) {
 	room_vnum *new_start_locs = NULL;
 	int count = -1;
 
-	HASH_ITER(world_hh, world_table, room, next_room) {
+	HASH_ITER(hh, world_table, room, next_room) {
 		if (ROOM_SECT_FLAGGED(room, SECTF_START_LOCATION)) {
 			++count;
 			

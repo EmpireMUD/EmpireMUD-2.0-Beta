@@ -24,6 +24,9 @@
 * Contents:
 *   EmpireMUD Constants
 *   Adventure Constants
+*   Archetype Constants
+*   Augment Constants
+*   Class Constants
 *   Player Constants
 *   Direction And Room Constants
 *   Character Constants
@@ -140,6 +143,7 @@ const char *adventure_link_types[] = {
 const char *adventure_spawn_types[] = {
 	"MOB",
 	"OBJ",
+	"VEH",
 	"\n"
 };
 
@@ -169,78 +173,71 @@ const char *room_template_flags[] = {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// ARCHETYPE CONSTANTS /////////////////////////////////////////////////////
+
+// ARCH_x: archetype flags
+const char *archetype_flags[] = {
+	"IN-DEVELOPMENT",
+	"BASIC",
+	"\n"
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// AUGMENT CONSTANTS ///////////////////////////////////////////////////////
+
+// AUGMENT_x (1/2): augment types
+const char *augment_types[] = {
+	"None",
+	"Enchantment",
+	"Hone",
+	"\n"
+};
+
+
+// AUGMENT_x (1/2): augment type data
+const struct augment_type_data augment_info[] = {
+	// noun, verb, apply-type, default-flags, greater-ability, use-obj-flag
+	{ "augment", "augment", APPLY_TYPE_NATURAL, NOBITS, NO_ABIL, NOBITS },
+	{ "enchantment", "enchant", APPLY_TYPE_ENCHANTMENT, NOBITS, ABIL_GREATER_ENCHANTMENTS, OBJ_ENCHANTED },
+	{ "hone", "hone", APPLY_TYPE_HONED, AUG_SELF_ONLY, NO_ABIL, NOBITS },
+	
+	{ "\n", "\n", 0, 0, 0 }	// last
+};
+
+
+// AUG_x: augment flags
+const char *augment_flags[] = {
+	"IN-DEV",
+	"SELF-ONLY",
+	"ARMOR",
+	"SHIELD",
+	"\n"
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// CLASS CONSTANTS /////////////////////////////////////////////////////////
+
+// CLASSF_x: class flags
+const char *class_flags[] = {
+	"IN-DEVELOPMENT",
+	"\n"
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// PLAYER CONSTANTS ////////////////////////////////////////////////////////
 
-// gear lists MUST be terminated with this
-#define GEAR_END  { NOWHERE, NOTHING }
-
-// starting player equipment and skills -- just don't change the order or insert new ones anywhere but the end (these are stored in the playerfile)
-const struct archetype_type archetype[] = {
-	// dummy row so options numbered 1+ match up
-	{ "\r", "\r", { "Adventurer", "Adventurer", "Adventurer" }, 0, 0, 0, 0, { 0, 0, 0, 0, 0, 0 }, { GEAR_END } },
-	
-	/*
-	* name, description, { Neuter rank, Male rank, Female rank },
-	* skill, level,  skill (or NO_SKILL), level
-	* strength, dexterity,  charisma, greatness,  intelligence, wits
-	*/
-
-	{ "Noble Birth", "raised to rule (Empire, Battle, Greatness)", { "Lord", "Lord", "Lady" },
-		SKILL_EMPIRE, 20,  SKILL_BATTLE, 10,
-		{ 2, 1,  2, 3,  1, 2 },
-		{ { WEAR_HEAD, o_BRIMMED_CAP }, { WEAR_CLOTHES, o_WAISTCOAT }, { WEAR_LEGS, o_BREECHES }, { WEAR_FEET, o_SANDALS }, { WEAR_WIELD, o_SHORT_SWORD }, { WEAR_HOLD, o_NEWBIE_TORCH }, GEAR_END }
-	},
-	
-	{ "Skilled Apprentice", "trained by a master artisan (Trade, Dexterity)", { "Tradesman", "Tradesman", "Tradesman" },
-		SKILL_TRADE, 30,  NO_SKILL, 0,
-		{ 2, 3,  2, 1,  2, 1 },
-		{ { WEAR_HEAD, o_COIF }, { WEAR_CLOTHES, o_SHIRT }, { WEAR_LEGS, o_BREECHES }, { WEAR_FEET, o_SANDALS }, { WEAR_WIELD, o_SHORT_SWORD }, { WEAR_HOLD, o_NEWBIE_TORCH }, GEAR_END }
-	},
-	
-	{ "Promising Squire", "built for battle (Battle, Survival, Strength)", { "Sir", "Sir", "Lady" },
-		SKILL_BATTLE, 20,  SKILL_SURVIVAL, 10,
-		{ 3, 2,  1, 2,  1, 2 },
-		{ { WEAR_HEAD, o_COIF }, { WEAR_CLOTHES, o_SHIRT }, { WEAR_LEGS, o_BREECHES }, { WEAR_FEET, o_SANDALS }, { WEAR_WIELD, o_SHORT_SWORD }, { WEAR_HOLD, o_NEWBIE_TORCH }, GEAR_END }
-	},
-	
-	{ "Rugged Woodsman", "cleaved from stone (Survival, Trade, Dexterity)", { "Adventurer", "Adventurer", "Adventurer" },
-		SKILL_SURVIVAL, 20,  SKILL_TRADE, 10,
-		{ 2, 3,  1, 1,  2, 2 },
-		{ { WEAR_HEAD, o_LEATHER_HOOD }, { WEAR_CLOTHES, o_LEATHER_JACKET }, { WEAR_LEGS, o_PANTS }, { WEAR_FEET, o_MOCCASINS }, { WEAR_WIELD, o_WOODSMANS_AXE }, { WEAR_HOLD, o_NEWBIE_TORCH }, GEAR_END }
-	},
-	
-	{ "Tribal Leader", "rise from nothing (Empire, Survival, Wits)", { "Elder", "Elder", "Elder" },
-		SKILL_EMPIRE, 15, SKILL_SURVIVAL, 15,
-		{ 2, 1,  1, 2,  2, 3 },
-		{ { WEAR_HEAD, o_LEATHER_HOOD }, { WEAR_CLOTHES, o_SPOTTED_ROBE }, { WEAR_LEGS, o_PANTS }, { WEAR_FEET, o_MOCCASINS }, { WEAR_WIELD, o_STONE_AXE }, { WEAR_HOLD, o_NEWBIE_TORCH }, GEAR_END }
-	},
-	
-	{ "Street Urchin", "the shadows of society (Stealth, Battle, Charisma)", { "Adventurer", "Adventurer", "Adventurer" },
-		SKILL_STEALTH, 20,  SKILL_BATTLE, 10,
-		{ 2, 2,  3, 1,  1, 2 },
-		{ { WEAR_HEAD, o_CLOTH_HOOD }, { WEAR_CLOTHES, o_SHIRT }, { WEAR_LEGS, o_BREECHES }, { WEAR_FEET, o_SANDALS }, { WEAR_WIELD, o_SHIV }, { WEAR_HOLD, o_NEWBIE_TORCH }, GEAR_END }
-	},
-		
-	{ "Druidic Commune", "wield ancient magic (Natural Magic, Survival, Intelligence)", { "Elder", "Elder", "Elder" },
-		SKILL_NATURAL_MAGIC, 20, SKILL_SURVIVAL, 10,
-		{ 1, 2,  2, 1,  3, 2 },
-		{ { WEAR_HEAD, o_LEATHER_HOOD }, { WEAR_CLOTHES, o_ROBE }, { WEAR_FEET, o_SANDALS }, { WEAR_WIELD, o_STONE_AXE }, { WEAR_HOLD, o_NEWBIE_TORCH }, GEAR_END }
-	},
-		
-	{ "Novice Sorcerer", "master the rituals (High Sorcery, Battle, Intelligence)", { "Master", "Master", "Mistress" },
-		SKILL_HIGH_SORCERY, 20, SKILL_BATTLE, 10,
-		{ 1, 2,  1, 2,  3, 2 },
-		{ { WEAR_HEAD, o_CLOTH_HOOD }, { WEAR_CLOTHES, o_ROBE }, { WEAR_FEET, o_SANDALS }, { WEAR_WIELD, o_STAFF }, { WEAR_HOLD, o_NEWBIE_TORCH }, GEAR_END }
-	},
-
-	{ "Lone Vampire", "empowered by blood (Vampire, Battle, Wits)", { "Hunter", "Hunter", "Hunter" },
-		SKILL_VAMPIRE, 20,  SKILL_BATTLE, 10,
-		{ 2, 1,  2, 1,  2, 3 },
-		{ { WEAR_CLOTHES, o_SHIRT }, { WEAR_LEGS, o_BREECHES }, { WEAR_FEET, o_SANDALS }, { WEAR_WIELD, o_SHORT_SWORD }, { WEAR_HOLD, o_NEWBIE_TORCH }, GEAR_END }
-	},
-
-	// end
-	{ "\n", "\n", { "\n", "\n", "\n" }, 0, 0, 0, 0, { 0, 0, 0, 0, 0, 0 }, { GEAR_END } }
+// ACCT_x: Account flags
+const char *account_flags[] = {
+	"FROZEN",
+	"MUTED",
+	"SITEOK",
+	"!TITLE",
+	"MULTI-IP",
+	"MULTI-CHAR",
+	"\n"
 };
 
 
@@ -288,6 +285,15 @@ const char *bonus_bit_descriptions[] = {
 };
 
 
+// COND_x: player conditions
+const char *condition_types[] = {
+	"Drunk",
+	"Full",
+	"Thirst",
+	"\n"
+};
+
+
 // CUSTOM_COLOR_x
 const char *custom_color_types[] = {
 	"emote",
@@ -298,6 +304,24 @@ const char *custom_color_types[] = {
 	"slash-channels",
 	"tell",
 	"status",
+	"\n"
+};
+
+
+// ATT_x: extra attributes
+const char *extra_attribute_types[] = {
+	"Bonus-Inventory",
+	"Resist-Physical",
+	"Block",
+	"To-Hit",
+	"Dodge",
+	"Extra-Blood",	// 5
+	"Bonus-Physical",
+	"Bonus-Magical",
+	"Bonus-Healing",
+	"Heal-Over-Time",
+	"Resist-Magical",	// 10
+	"Crafting-Bonus",
 	"\n"
 };
 
@@ -341,20 +365,21 @@ const char *grant_bits[] = {
 	"slay",
 	"island",	// 35
 	"oset",
+	"playerdelete",
 	"\n"
 };
 
 
 /* PLR_x */
 const char *player_bits[] = {
-	"FROZEN",
+		"UNUSED",
 	"WRITING",
 	"MAILING",
 	"DONTSET",
-	"SITEOK",
-	"MUTED",
-	"NOTITLE",
-	"DELETED",
+		"UNUSED",
+		"UNUSED",
+		"UNUSED",
+		"UNUSED",
 	"LOADRM",
 	"!WIZL",
 	"!DEL",
@@ -362,7 +387,7 @@ const char *player_bits[] = {
 	"IPMASK",
 	"DISGUISED",
 	"VAMPIRE",
-	"MULTI",
+		"UNUSED",
 	"NEEDS-NEWBIE-SETUP",
 	"!RESTICT",
 	"KEEP-LOGIN",
@@ -402,6 +427,32 @@ const char *preference_bits[] = {
 	"SCREENREADER",
 	"STEALTHABLE",
 	"WIZHIDE",
+	"\n"
+};
+
+
+// ROLE_x (1/2): role names
+const char *class_role[] = {
+	"none",
+	"Tank",
+	"Melee",
+	"Caster",
+	"Healer",
+	"Utility",
+	"Solo",
+	"\n"
+};
+
+
+// ROLE_x (2/2): role colors for who list
+const char *class_role_color[] = {
+	"\t0",
+	"\ty",	// tank
+	"\tr",	// melee
+	"\ta",	// caster
+	"\tj",	// healer
+	"\tm",	// utility
+	"\tw",	// solo
 	"\n"
 };
 
@@ -471,7 +522,7 @@ const char *connected_types[] = {
 	"Last name?",
 	"Get last name",
 	"Cnf last name",	// 15
-		"UNUSED 2",
+	"Cnf archetype",
 	"Have alt?",
 	"Alt name",
 	"Alt password",
@@ -589,7 +640,7 @@ const int shift_dir[][2] = {
 };
 
 
-// whether or not a direction can be used by designate
+// whether or not a direction can be used by designate, building version
 const bool can_designate_dir[NUM_OF_DIRS] = {
 	TRUE,	// n
 	TRUE,
@@ -609,8 +660,48 @@ const bool can_designate_dir[NUM_OF_DIRS] = {
 };
 
 
+// whether or not a direction can be used by designate, vehicle version
+const bool can_designate_dir_vehicle[NUM_OF_DIRS] = {
+	FALSE,	// n
+	FALSE,
+	FALSE,
+	FALSE,
+	FALSE,	// nw
+	FALSE,
+	FALSE,
+	FALSE,
+	TRUE,	// up
+	TRUE,	// down
+	TRUE,	// fore
+	TRUE,
+	TRUE,
+	TRUE,
+	FALSE	// random
+};
+
+
 // whether or not you can flee in a given direction
 const bool can_flee_dir[NUM_OF_DIRS] = {
+	TRUE,	// n
+	TRUE,
+	TRUE,
+	TRUE,
+	TRUE,	// nw
+	TRUE,
+	TRUE,
+	TRUE,
+	FALSE,	// up
+	FALSE,	// down
+	TRUE,	// fore
+	TRUE,
+	TRUE,
+	TRUE,
+	FALSE	// random
+};
+
+
+// whether or not a direction is "flat" (2D)
+const bool is_flat_dir[NUM_OF_DIRS] = {
 	TRUE,	// n
 	TRUE,
 	TRUE,
@@ -924,6 +1015,15 @@ const char *injury_bits[] = {
 };
 
 
+// APPLY_TYPE_x: source of obj apply
+const char *apply_type_names[] = {
+	"natural",
+	"enchantment",
+	"honed",
+	"\n"
+};
+
+
 /* APPLY_x (1/3) */
 const char *apply_types[] = {
 	"NONE",
@@ -1018,7 +1118,7 @@ const int apply_attribute[] = {
 };
 
 
-// STRENGTH, etc
+// STRENGTH, etc (part 1)
 struct attribute_data_type attributes[NUM_ATTRIBUTES] = {
 	{ "Strength", "Strength improves your melee damage and lets you chop trees faster" },
 	{ "Dexterity", "Dexterity helps you hit opponents and dodge hits" },
@@ -1026,6 +1126,12 @@ struct attribute_data_type attributes[NUM_ATTRIBUTES] = {
 	{ "Greatness", "Greatness determines how much territory your empire can claim" },
 	{ "Intelligence", "Intelligence improves your magical damage and healing" },
 	{ "Wits", "Wits improves your speed and effectiveness in combat" }
+};
+
+// STRENGTH, etc (part 2)
+int attribute_display_order[NUM_ATTRIBUTES] = {
+	STRENGTH, CHARISMA, INTELLIGENCE,
+	DEXTERITY, GREATNESS, WITS
 };
 
 
@@ -1067,6 +1173,9 @@ const char *craft_flags[] = {
 	"UPGRADE",
 	"DISMANTLE-ONLY",
 	"IN-CITY-ONLY",
+	"VEHICLE",
+	"SHIPYARD",
+	"BLD-UPGRADED",
 	"\n"
 };
 
@@ -1084,6 +1193,7 @@ const char *craft_types[] = {
 	"BUILD",
 	"WEAVE",
 	"WORKFORCE",
+	"MANUFACTURE",
 	"\n"
 };
 
@@ -1264,11 +1374,12 @@ const char *action_bits[] = {
 	"*EXTRACTED",
 	"!LOOT",
 	"!TELEPORT",
+	"!EXP",
 	"\n"
 };
 
 
-// MOB_MOVE_x
+// MOB_MOVE_x: mob/vehicle move types
 const char *mob_move_types[] = {
 	"walks",
 	"climbs",
@@ -1289,6 +1400,13 @@ const char *mob_move_types[] = {
 	"waddles",
 	"crawls",
 	"flutters",
+	"drives",
+	"sails",
+	"rolls",
+	"rattles",
+	"skis",
+	"slides",
+	"soars",
 	"\n"
 };
 
@@ -1330,35 +1448,37 @@ const char *wear_keywords[] = {
 	"\r!",	// wield
 	"\r!",	// ranged
 	"\r!",	// hold
+	"\r!",	// share
 	"\n"
 };
 
 
 // WEAR_x -- data for each wear slot
 const struct wear_data_type wear_data[NUM_WEARS] = {
-	// eq tag,				 wear bit,		count-stats, gear-level-mod, cascade-pos, already-wearing, wear-message-to-room, wear-message-to-char
-	{ "    <worn on head> ", ITEM_WEAR_HEAD, TRUE, 1.0, NO_WEAR, "You're already wearing $p on your head.", "$n wears $p on $s head.", "You wear $p on your head." },
-	{ "    <worn on ears> ", ITEM_WEAR_EARS, TRUE, 1.0, NO_WEAR, "You're already wearing $p on your ears.", "$n pins $p onto $s ears.", "You pin $p onto your ears." },
-	{ "<worn around neck> ", ITEM_WEAR_NECK, TRUE, 1.0, WEAR_NECK_2, "YOU SHOULD NEVER SEE THIS MESSAGE. PLEASE REPORT.", "$n wears $p around $s neck.", "You wear $p around your neck." },
-	{ "<worn around neck> ", ITEM_WEAR_NECK, TRUE, 1.0, NO_WEAR, "You're already wearing enough around your neck.", "$n wears $p around $s neck.", "You wear $p around your neck." },
-	{ " <worn as clothes> ", ITEM_WEAR_CLOTHES, TRUE, 0, NO_WEAR, "You're already wearing $p as clothes.", "$n wears $p as clothing.", "You wear $p as clothing." },
-	{ "   <worn as armor> ", ITEM_WEAR_ARMOR, TRUE, 2.0, NO_WEAR, "You're already wearing $p as armor.", "$n wears $p as armor.", "You wear $p as armor." },
-	{ " <worn about body> ", ITEM_WEAR_ABOUT, TRUE, 1.0, NO_WEAR, "You're already wearing $p about your body.", "$n wears $p about $s body.", "You wear $p around your body." },
-	{ "    <worn on arms> ", ITEM_WEAR_ARMS, TRUE, 1.0, NO_WEAR, "You're already wearing $p on your arms.", "$n wears $p on $s arms.", "You wear $p on your arms." },
-	{ "  <worn on wrists> ", ITEM_WEAR_WRISTS, TRUE, 1.0, NO_WEAR, "You're already wearing $p on your wrists.", "$n wears $p on $s wrists.", "You wear $p on your wrists." },
-	{ "   <worn on hands> ", ITEM_WEAR_HANDS, TRUE, 1.0, NO_WEAR, "You're already wearing $p on your hands.", "$n puts $p on $s hands.", "You put $p on your hands." },
-	{ "  <worn on finger> ", ITEM_WEAR_FINGER, TRUE, 1.0, WEAR_FINGER_L, "YOU SHOULD NEVER SEE THIS MESSAGE. PLEASE REPORT.", "$n slides $p on to $s right ring finger.", "You slide $p on to your right ring finger." },
-	{ "  <worn on finger> ", ITEM_WEAR_FINGER, TRUE, 1.0, NO_WEAR, "You're already wearing something on both of your ring fingers.", "$n slides $p on to $s left ring finger.", "You slide $p on to your left ring finger." },
-	{ "<worn about waist> ", ITEM_WEAR_WAIST, TRUE, 1.0, NO_WEAR, "You already have $p around your waist.", "$n wears $p around $s waist.", "You wear $p around your waist." },
-	{ "    <worn on legs> ", ITEM_WEAR_LEGS, TRUE, 1.0, NO_WEAR, "You're already wearing $p on your legs.", "$n puts $p on $s legs.", "You put $p on your legs." },
-	{ "    <worn on feet> ", ITEM_WEAR_FEET, TRUE, 1.0, NO_WEAR, "You're already wearing $p on your feet.", "$n wears $p on $s feet.", "You wear $p on your feet." },
-	{ " <carried as pack> ", ITEM_WEAR_PACK, TRUE, 0.5, NO_WEAR, "You're already using $p.", "$n starts using $p.", "You start using $p." },
-	{ "  <used as saddle> ", ITEM_WEAR_SADDLE, TRUE, 0, NO_WEAR, "You're already using $p.", "$n start using $p.", "You start using $p." },
-	{ "          (sheath) ", ITEM_WEAR_WIELD, FALSE, 0, WEAR_SHEATH_2, "You've already got something sheathed.", "$n sheathes $p.", "You sheathe $p." },
-	{ "          (sheath) ", ITEM_WEAR_WIELD, FALSE, 0, NO_WEAR, "You've already got something sheathed.", "$n sheathes $p.", "You sheathe $p." },
-	{ "         <wielded> ", ITEM_WEAR_WIELD, 	TRUE, 2.0, NO_WEAR, "You're already wielding $p.", "$n wields $p.", "You wield $p." },
-	{ "          <ranged> ", ITEM_WEAR_RANGED, TRUE, 0, NO_WEAR, "You're already using $p.", "$n uses $p.", "You use $p." },
-	{ "            <held> ", ITEM_WEAR_HOLD, TRUE, 1.0, NO_WEAR, "You're already holding $p.", "$n grabs $p.", "You grab $p." }
+	// eq tag,				 name, wear bit,       count-stats, gear-level-mod, cascade-pos, already-wearing, wear-message-to-room, wear-message-to-char
+	{ "    <worn on head> ", "head", ITEM_WEAR_HEAD, TRUE, 1.0, NO_WEAR, "You're already wearing $p on your head.", "$n wears $p on $s head.", "You wear $p on your head." },
+	{ "    <worn on ears> ", "ears", ITEM_WEAR_EARS, TRUE, 1.0, NO_WEAR, "You're already wearing $p on your ears.", "$n pins $p onto $s ears.", "You pin $p onto your ears." },
+	{ "<worn around neck> ", "neck", ITEM_WEAR_NECK, TRUE, 1.0, WEAR_NECK_2, "YOU SHOULD NEVER SEE THIS MESSAGE. PLEASE REPORT.", "$n wears $p around $s neck.", "You wear $p around your neck." },
+	{ "<worn around neck> ", "neck", ITEM_WEAR_NECK, TRUE, 1.0, NO_WEAR, "You're already wearing enough around your neck.", "$n wears $p around $s neck.", "You wear $p around your neck." },
+	{ " <worn as clothes> ", "clothes", ITEM_WEAR_CLOTHES, TRUE, 0, NO_WEAR, "You're already wearing $p as clothes.", "$n wears $p as clothing.", "You wear $p as clothing." },
+	{ "   <worn as armor> ", "armor", ITEM_WEAR_ARMOR, TRUE, 2.0, NO_WEAR, "You're already wearing $p as armor.", "$n wears $p as armor.", "You wear $p as armor." },
+	{ " <worn about body> ", "body", ITEM_WEAR_ABOUT, TRUE, 1.0, NO_WEAR, "You're already wearing $p about your body.", "$n wears $p about $s body.", "You wear $p around your body." },
+	{ "    <worn on arms> ", "arms", ITEM_WEAR_ARMS, TRUE, 1.0, NO_WEAR, "You're already wearing $p on your arms.", "$n wears $p on $s arms.", "You wear $p on your arms." },
+	{ "  <worn on wrists> ", "wrists", ITEM_WEAR_WRISTS, TRUE, 1.0, NO_WEAR, "You're already wearing $p on your wrists.", "$n wears $p on $s wrists.", "You wear $p on your wrists." },
+	{ "   <worn on hands> ", "hands", ITEM_WEAR_HANDS, TRUE, 1.0, NO_WEAR, "You're already wearing $p on your hands.", "$n puts $p on $s hands.", "You put $p on your hands." },
+	{ "  <worn on finger> ", "finger", ITEM_WEAR_FINGER, TRUE, 1.0, WEAR_FINGER_L, "YOU SHOULD NEVER SEE THIS MESSAGE. PLEASE REPORT.", "$n slides $p on to $s right ring finger.", "You slide $p on to your right ring finger." },
+	{ "  <worn on finger> ", "finger", ITEM_WEAR_FINGER, TRUE, 1.0, NO_WEAR, "You're already wearing something on both of your ring fingers.", "$n slides $p on to $s left ring finger.", "You slide $p on to your left ring finger." },
+	{ "<worn about waist> ", "waist", ITEM_WEAR_WAIST, TRUE, 1.0, NO_WEAR, "You already have $p around your waist.", "$n wears $p around $s waist.", "You wear $p around your waist." },
+	{ "    <worn on legs> ", "legs", ITEM_WEAR_LEGS, TRUE, 1.0, NO_WEAR, "You're already wearing $p on your legs.", "$n puts $p on $s legs.", "You put $p on your legs." },
+	{ "    <worn on feet> ", "feet", ITEM_WEAR_FEET, TRUE, 1.0, NO_WEAR, "You're already wearing $p on your feet.", "$n wears $p on $s feet.", "You wear $p on your feet." },
+	{ " <carried as pack> ", "pack", ITEM_WEAR_PACK, TRUE, 0.5, NO_WEAR, "You're already using $p.", "$n starts using $p.", "You start using $p." },
+	{ "  <used as saddle> ", "saddle", ITEM_WEAR_SADDLE, TRUE, 0, NO_WEAR, "You're already using $p.", "$n start using $p.", "You start using $p." },
+	{ "          (sheath) ", "sheath", ITEM_WEAR_WIELD, FALSE, 0, WEAR_SHEATH_2, "You've already got something sheathed.", "$n sheathes $p.", "You sheathe $p." },
+	{ "          (sheath) ", "sheath", ITEM_WEAR_WIELD, FALSE, 0, NO_WEAR, "You've already got something sheathed.", "$n sheathes $p.", "You sheathe $p." },
+	{ "         <wielded> ", "wield", ITEM_WEAR_WIELD, 	TRUE, 2.0, NO_WEAR, "You're already wielding $p.", "$n wields $p.", "You wield $p." },
+	{ "          <ranged> ", "ranged", ITEM_WEAR_RANGED, TRUE, 0, NO_WEAR, "You're already using $p.", "$n uses $p.", "You use $p." },
+	{ "            <held> ", "hold", ITEM_WEAR_HOLD, TRUE, 1.0, NO_WEAR, "You're already holding $p.", "$n grabs $p.", "You grab $p." },
+	{ "          (shared) ", "shared", ITEM_WEAR_TAKE, FALSE, 0, NO_WEAR, "You're already sharing $p.", "$n shares $p.", "You share $p." }
 };
 
 
@@ -1371,7 +1491,7 @@ const char *item_types[] = {
 	"CONTAINER",
 	"DRINKCON",
 	"FOOD",
-	"BOAT",
+	"*",
 	"PORTAL",
 	"*BOARD",
 	"*CORPSE",
@@ -1380,7 +1500,7 @@ const char *item_types[] = {
 	"*",
 	"*MAIL",
 	"WEALTH",
-	"CART",
+	"*CART",
 	"*SHIP",
 	"*HELM",
 	"*WINDOW",
@@ -1472,7 +1592,7 @@ int item_wear_to_wear[] = {
 
 // OBJ_x (extra bits), part 1
 const char *extra_bits[] = {
-	"CHAIR",
+	"*",
 	"PLANTABLE",
 	"LIGHT",
 	"SUPERIOR",
@@ -1625,6 +1745,7 @@ const char *drinks[] = {
 	"green tea",
 	"red wine",
 	"white wine",
+	"grog",
 	"\n"
 };
 
@@ -1644,6 +1765,7 @@ const char *drinknames[] = {
 	"tea",
 	"wine",
 	"wine",
+	"grog",
 	"\n"
 };
 
@@ -1663,7 +1785,8 @@ int drink_aff[][3] = {
 	{ 0, 0, 1 },	// coffee
 	{ 0, 0, 1 },	// green tea
 	{ 4, 0, 1 },	// red wine
-	{ 3, 0, 1 }	// white wine
+	{ 3, 0, 1 },	// white wine
+	{ 2, 1, 1 },	// grog
 };
 
 
@@ -1682,6 +1805,7 @@ const char *color_liquid[] = {
 	"green",
 	"red",
 	"clear",
+	"amber",
 	"\n"
 };
 
@@ -1710,6 +1834,10 @@ const char *obj_custom_types[] = {
 	"instrument-to-room",
 	"eat-to-char",
 	"eat-to-room",
+	"craft-to-char",
+	"craft-to-room",
+	"wear-to-char",
+	"wear-to-room",
 	"\n"
 };
 
@@ -1779,6 +1907,12 @@ const char *olc_flag_bits[] = {
 	"!ADVENTURE",
 	"!ROOMTEMPLATE",
 	"!GLOBAL",
+	"!AUGMENT",
+	"!ARCHETYPE",
+	"ABILITIES",
+	"CLASSES",
+	"SKILLS",
+	"!VEHICLES",
 	"\n"
 };
 
@@ -1797,6 +1931,12 @@ const char *olc_type_bits[NUM_OLC_TYPES+1] = {
 	"roomtemplate",
 	"global",
 	"book",
+	"augment",
+	"archetype",
+	"ability",
+	"class",
+	"skill",
+	"vehicle",
 	"\n"
 };
 
@@ -1872,6 +2012,8 @@ const char *bld_flags[] = {
 	"NEED-BOAT",
 	"LOOK-OUT",
 	"2ND-TERRITORY",
+	"SHIPYARD",
+	"UPGRADED",
 	"\n"
 };
 
@@ -1924,6 +2066,10 @@ const char *designate_flags[] = {
 	"TOP-OF-TOWER",
 	"HOUSEHOLD",
 	"HAVEN",
+	"SHIP-MAIN",
+	"SHIP-LARGE",
+	"SHIP-EXTRA",
+	"LAND-VEHICLE",
 	"\n"
 };
 
@@ -2128,20 +2274,21 @@ const char *room_aff_bits[] = {
 	"*PUBLIC",
 	"*DISMANTLING",
 	"!FLY",
-	"*SHIP-PRESENT",
-	"*PLAYER-MADE",
+	"*",
+	"*",
 	"*!WORK",
 	"!DISREPAIR",
 	"*!DISMANTLE",
+	"*IN-VEHICLE",
 	"\n"
 };
 
 
 // ROOM_EXTRA_x
 const char *room_extra_types[] = {
-	"mine type",
+		"unused",
 	"mine amount",
-	"crop type",
+		"unused",
 	"seed time",
 	"tavern type",
 	"tavern brewing time",
@@ -2156,6 +2303,7 @@ const char *room_extra_types[] = {
 	"found time",
 	"redesignate time",
 	"ceded",
+	"mine global vnum",
 	"\n"
 };
 
@@ -2267,6 +2415,13 @@ const char *weather_types[] = {
 
  //////////////////////////////////////////////////////////////////////////////
 //// SKILL CONSTANTS /////////////////////////////////////////////////////////
+
+// ABILF_x: ability flags
+const char *ability_flags[] = {
+	"*",
+	"\n"
+};
+
 
 /* ATYPE_x */
 const char *affect_types[] = {
@@ -2475,6 +2630,22 @@ const char *damage_types[] = {
 };
 
 
+// DIFF_x: modifiers to your skill level before a skill check
+double skill_check_difficulty_modifier[NUM_DIFF_TYPES] = {
+	1.5,  // easy
+	1,  // medium
+	0.66,  // hard
+	0.1  // rarely
+};
+
+
+// SKILLF_x: skill flags
+const char *skill_flags[] = {
+	"IN-DEVELOPMENT",
+	"\n"
+};
+
+
 // for do_fish
 const struct fishing_data_type fishing_data[] = {
 	{ o_GLOWING_SEASHELL, 20 },	// formerly 12	// formerly 8.5
@@ -2487,22 +2658,6 @@ const struct fishing_data_type fishing_data[] = {
 
 	// must come last -- any catch-all with 100% to grab the overflow
 	{ o_BARBFISH, 100 }
-};
-
-
-// master mines data
-const struct mine_data_type mine_data[] = {
-	// type, name, vnum, min amt, max amt, chance, ability
-	{ MINE_COPPER, "copper", o_COPPER, 20, 40, 20.0, NO_ABIL },
-	{ MINE_SILVER, "silver", o_SILVER, 15, 25, 3.5, NO_ABIL },
-	{ MINE_GOLD, "gold", o_GOLD, 10, 20, 0.5, ABIL_RARE_METALS },
-	{ MINE_NOCTURNIUM, "nocturnium", o_NOCTURNIUM_ORE, 10, 20, 1.5, ABIL_RARE_METALS },
-	{ MINE_IMPERIUM, "imperium", o_IMPERIUM_ORE, 10, 20, 1.5, ABIL_RARE_METALS },
-	
-	// put this as last real entry, since it's "default" if the others miss (-1 chance means "always")
-	{ MINE_IRON, "iron", o_IRON_ORE, 30, 50, -1, NO_ABIL },
-	
-	{ NOTHING, "\n", NOTHING, 0, 0, 0, NO_ABIL }
 };
 
 
@@ -2645,6 +2800,51 @@ const bitvector_t otrig_argument_types[] = {
 };
 
 
+// VTRIG_x: vehicle trigger types
+const char *vtrig_types[] = {
+	"Global",
+	"Random",
+	"Command",
+	"Speech",
+	"*",	// 4
+	"Destroy",
+	"Greet",
+	"*",	// 7
+	"Entry",
+	"*",	// 9
+	"*",	// 10
+	"*",	// 11
+	"*",	// 12
+	"Load",
+	"*",	// 14
+	"*",	// 15
+	"Leave",
+	"\n"
+};
+
+
+// VTRIG_x: argument types for vehicle triggers
+const bitvector_t vtrig_argument_types[] = {
+	NOBITS,	// global
+	TRIG_ARG_PERCENT,	// random
+	TRIG_ARG_COMMAND,	// command
+	TRIG_ARG_PHRASE_OR_WORDLIST,	// speech
+	NOBITS,	// 4
+	TRIG_ARG_PERCENT,	// destroy
+	TRIG_ARG_PERCENT,	// greet
+	NOBITS,	// 7
+	TRIG_ARG_PERCENT,	// entry
+	NOBITS,	// 9
+	NOBITS,	// 10
+	NOBITS,	// 11
+	NOBITS,	// 12
+	TRIG_ARG_PERCENT,	// load
+	NOBITS,	// 14
+	NOBITS,	// 15
+	TRIG_ARG_PERCENT,	// leave
+};
+
+
 /* wld trigger types */
 const char *wtrig_types[] = {
 	"Global",
@@ -2698,8 +2898,9 @@ const char *trig_attach_types[] = {
 	"Mobile",
 	"Object",
 	"Room",
-	"*",	// rmt_trigger -- never set on an actual trigger
-	"*",	// adv_trigger -- never set on an actual trigger
+	"*RMT",	// rmt_trigger -- never set on an actual trigger
+	"*ADV",	// adv_trigger -- never set on an actual trigger
+	"Vehicle",
 	"\n"
 };
 
@@ -2710,7 +2911,8 @@ const char **trig_attach_type_list[] = {
 	otrig_types,
 	wtrig_types,
 	wtrig_types,	// RMT_TRIGGER (not really used)
-	wtrig_types	// ADV_TRIGGER (not really used)
+	wtrig_types,	// ADV_TRIGGER (not really used)
+	vtrig_types
 };
 
 
@@ -2720,7 +2922,8 @@ const bitvector_t *trig_argument_type_list[] = {
 	otrig_argument_types,	// OBJ_TRIGGER
 	wtrig_argument_types,	// WLD_TRIGGER
 	wtrig_argument_types,	// RMT_TRIGGER (not really used)
-	wtrig_argument_types	// ADV_TRIGGER (not really used)
+	wtrig_argument_types,	// ADV_TRIGGER (not really used)
+	vtrig_argument_types,	// VEH_TRIGGER
 };
 
 
@@ -2743,6 +2946,8 @@ const char *fill_words[] = {
 // GLOBAL_x types
 const char *global_types[] = {
 	"Mob Interactions",
+	"Mine Data",
+	"Newbie Gear",
 	"\n"
 };
 
@@ -2751,6 +2956,7 @@ const char *global_types[] = {
 const char *global_flags[] = {
 	"IN-DEVELOPMENT",
 	"ADVENTURE-ONLY",
+	"CUMULATIVE-PRC",
 	"\n"
 };
 
@@ -2770,6 +2976,7 @@ const char *interact_types[] = {
 	"ENCOUNTER",
 	"LIGHT",
 	"PICKPOCKET",
+	"MINE",
 	"\n"
 };
 
@@ -2788,7 +2995,8 @@ const int interact_attach_types[NUM_INTERACTS] = {
 	TYPE_ROOM,
 	TYPE_ROOM,
 	TYPE_OBJ,	// light
-	TYPE_MOB	// pickpocket
+	TYPE_MOB,	// pickpocket
+	TYPE_MINE_DATA	// mine
 };
 
 
@@ -2806,7 +3014,8 @@ const byte interact_vnum_types[NUM_INTERACTS] = {
 	TYPE_OBJ,
 	TYPE_MOB,	// encounter
 	TYPE_OBJ,
-	TYPE_OBJ	// pickpocket
+	TYPE_OBJ,
+	TYPE_OBJ	// mine
 };
 
 
@@ -2862,5 +3071,31 @@ const char *shutdown_types[] = {
 	"normal",
 	"pause",
 	"die",
+	"\n"
+};
+
+
+// VEH_x: Vehicle flags
+const char *vehicle_flags[] = {
+	"*INCOMPLETE",
+	"DRIVING",
+	"SAILING",
+	"FLYING",
+	"ALLOW-ROUGH",
+	"SIT",	// 5
+	"IN",
+	"BURNABLE",
+	"CONTAINER",
+	"SHIPPING",
+	"CUSTOMIZABLE",	// 10
+	"DRAGGABLE",
+	"!BUILDING",
+	"CAN-PORTAL",
+	"LEADABLE",
+	"CARRY-VEHICLES",	// 15
+	"CARRY-MOBS",
+	"SIEGE-WEAPONS",
+	"ON-FIRE",
+	"!LOAD-ONTO-VEHICLE",
 	"\n"
 };

@@ -1,763 +1,373 @@
-TRIGEDIT-TYPES TRIGGER-LIST TRIGGER-TYPES TRIG-TYPES
- 
-Triggers are broken up into three types by what they are attached to:
- 
-|         ROOMS          |         OBJECTS         |            MOBS         |
-=============================================================================
-|  TRIGEDIT-ROOM-GLOBAL  |   TRIGEDIT-OBJ-GLOBAL   |  TRIGEDIT-MOB-GLOBAL    |
-|  TRIGEDIT-ROOM-RANDOM  |   TRIGEDIT-OBJ-RANDOM   |  TRIGEDIT-MOB-RANDOM    |
-|  TRIGEDIT-ROOM-COMMAND |   TRIGEDIT-OBJ-COMMAND  |  TRIGEDIT-MOB-COMMAND   |
-|  TRIGEDIT-ROOM-SPEECH  |   TRIGEDIT-OBJ-TIMER    |  TRIGEDIT-MOB-SPEECH    |
-|  TRIGEDIT-ROOM-ZONE    |   TRIGEDIT-OBJ-GET      |  TRIGEDIT-MOB-ACT       |
-|  TRIGEDIT-ROOM-ENTER   |   TRIGEDIT-OBJ-DROP     |  TRIGEDIT-MOB-DEATH     |
-|  TRIGEDIT-ROOM-DROP    |   TRIGEDIT-OBJ-GIVE     |  TRIGEDIT-MOB-GREET     |
-|  TRIGEDIT-ROOM-ABILITY |   TRIGEDIT-OBJ-WEAR     |  TRIGEDIT-MOB-GREET-ALL |
-|  TRIGEDIT-ROOM-LEAVE   |   TRIGEDIT-OBJ-REMOVE   |  TRIGEDIT-MOB-ENTRY     |
-|  TRIGEDIT-ROOM-DOOR    |   TRIGEDIT-OBJ-LOAD     |  TRIGEDIT-MOB-RECEIVE   |
-|  TRIGEDIT-ROOM-ADVCLN  |   TRIGEDIT-OBJ-ABILITY  |  TRIGEDIT-MOB-FIGHT     |
- ========================|   TRIGEDIT-OBJ-LEAVE    |  TRIGEDIT-MOB-HITPRCNT  |
-                         |   TRIGEDIT-OBJ-CONSUME  |  TRIGEDIT-MOB-BRIBE     |
-Further help can be       =========================|  TRIGEDIT-MOB-LOAD      |
-accessed by typing:                             |     TRIGEDIT-MOB-MEMORY    |
-HELP <TYPE>.                                    |     TRIGEDIT-MOB-ABILITY   |
-i.e. HELP TRIGEDIT-MOB-ACT                      |     TRIGEDIT-MOB-LEAVE     |
-                                                |     TRIGEDIT-MOB-LEAVE-ALL |
-                                                |     TRIGEDIT-MOB-DOOR      |
-                                                | TRIGEDIT-MOB-FIGHT-CHARMED |
-See also: TRIG-COMMANDS, VARIABLES, EXPRESSIONS  ============================
+DG-SCRIPTS DG_SCRIPTS DGSCRIPTS TRIGGERS
+
+DG Scripts 1.0.12 e2
+
+Stands for Death Gate scripts and are named after the original MUD they came
+from. DG Scripts is a popular CircleMUD snippet and is also included with
+TBAMUD, the successor to the CIrcleMUD project.
+
+EmpireMUD uses a ported version of DG Scripts that has additional variables
+and functionality unique to the EmpireMUD code base, such as support for
+scripting vehicles. It is also missing some of the functions that no longer
+exist in its CircleMUD base code. For the most part, EmpireMUD's version of
+DG Scripts attempts to preserve the variables and syntax of classic DG Scripts
+in order to make the system easy to learn for people already familiar with the
+scripting system, and to make it easier to use online DG Scripts tutorials.
+
+See: TRIGEDIT
 #d
-TRIGEDIT-COMMANDS TRIG-COMMANDS TRIGGER-COMMANDS TRIGEDIT-COMMANDLISTS
- 
-| Script Commands |  Mobile Commands    |  Object Commands |   Room Commands  |
- ==============================================================================
-|  * (comment)    |      %send%         |      %send%      |      %send%      |
-|      nop        |      %echo%         |      %echo%      |      %echo%      |
-|    attach       |    %echoaround%     |   %echoaround%   |   %echoaround%   |
-|                 |    %echoneither%    |   %echoneither%  |   %echoneither%  |
-|    global       |      %door%         |      %door%      |      %door%      |
-|    context      |     %force%         |     %force%      |     %force%      |
-|     eval        |      %load%         |      %load%      |      %load%      |
-|      set        |     %purge%         |     %purge%      |     %purge%      |
-|     unset       |    %teleport%       |    %teleport%    |    %teleport%    |
-|    detach       |     %damage%        |     %damage%     |     %damage%     |
-|    extract      |  %buildingecho%     |  %buildingecho%  |  %buildingecho%  |
-|                 |   %regionecho%      |   %regionecho%   |   %regionecho%   |
-|      if         |     %asound%        |     %asound%     |     %asound%     |
-|     halt        |     dg_affect       |     dg_affect    |     dg_affect    |
-|     wait        |      dg_cast        |      dg_cast     |      dg_cast     |
-|    makeuid      |       %at%          |       %at%       |       %at%       |
-|    rdelete      |    %transform%      |    %transform%   |      %scale%     |
-|     remote      |       mhunt         |      otimer      |%adventurecomplete%
-|     return      |     mremember       |     osetval      |    %terraform%   |
-|     switch      |      mforget        |     %scale%      |    %terracrop%   |
-|      case       |       mgoto         | %adventurecomplete% |===============|
-|     break       |       mkill         |    %terraform%      |
-|     done        |       %junk%        |    %terracrop%      |
-|     while       |      %follow%       |=====================|
-|                 |       %aoe%         |
-|                 |       %dot%         | Further help can be accessed by
-|                 |      %scale%        | typing: HELP <COMMAND>.
-|                 | %adventurecomplete% |
-|                 |     %terraform%     |
-|                 |     %terracrop%     |
-========================================|
-See also: TRIG-TYPES, VARIABLES, EXPRESSIONS
+"ABILITY TRIGGER" "MTRIG ABILITY" "OTRIG ABILITY" "RTRIG ABILITY" TRIGEDIT-MOB-ABILITY TRIGEDIT-OBJ-ABILITY TRIGEDIT-ROOM-ABILITY
+
+Ability (trigger type)
+
+Argument type:  percent chance to execute
+Return value:  return 0 to prevent the ability
+
+Ability triggers are used by mobs, objects, and rooms to detect, alter,
+replace, or prevent player abilities. Rooms will trigger on any ability
+performed in them, but mobs and objects only execute Ability triggers if they
+are the target of the ability.
+
+Variables: 
+  &c%actor%&0 - The user of the ability.
+  &c%ability%&0 - The vnum of the ability.
+  &c%abilityname%&0 - The name of the ability.
+
+Room triggers also provide:
+  &c%vict%&0 - The target (mob/player) of the ability, if any.
+  &c%obj%&0 - The target (object) of the ability, if any.
+
+Mob and object triggers also provide:
+  &c%self%&0 - Ability triggers only execute when the target is self.
 #d
-%ADVENTURECOMPLETE% MADVENTURECOMPLETE OADVENTURECOMPLETE WADVENTURECOMPLETE
+"COMMAND TRIGGER" "MTRIG COMMAND" "OTRIG COMMAND" "RTRIG COMMAND" "VTRIG COMMAND" TRIGEDIT-MOB-COMMAND TRIGEDIT-OBJ-COMMAND TRIGEDIT-ROOM-COMMAND TRIGEDIT-VEH-COMMAND
 
-Usage:  %adventurecomplete%
+Command (trigger type)
 
-This script command triggers completion on the adventure instance, which will
-clean it up (delete the instance) next time it's empty.
+Argument type:  name of the command (string)
+Return value:  return 0 to proceed with normal command execution
+               return 1 (default) if the trigger processed the command
+
+Command triggers let you create player commands, or modify the result of normal
+input. Common functions of command triggers include making something happen
+when you "use" an object, preventing a player from using "flee", or building
+puzzle games. If your script determines that it shouldn't actually process the
+command that triggered it, return 0 and the player will see the normal result
+of their command.
+
+Note: Immortals can only use command triggers when the "hassle" toggle is on.
+Note: If you trigger on a real game command, you should use the entire word
+   (not an abbreviation); the trigger will also match abbreviations. If you are
+   instead adding a new command, it will only work if the player types an exact
+   match OR the player abbreviates your command with something that isn't an
+   abbreviation for a real command ("c" always abbreviates the real command 
+   "chop", not a script command like "canoodle").
+
+Variables:
+  &c%actor%&0 - The person who issued the command.
+  &c%cmd%&0 - The command (without arguments) as typed.
+  &c%arg%&0 - The arguments typed with the command (if any).
+
+See also: TOGGLE
 #d
-%DAMAGE% ODAMAGE MDAMAGE WDAMAGE
+"DOOR TRIGGER" "MTRIG DOOR" "RTRIG DOOR" TRIGEDIT-MOB-DOOR TRIGEDIT-ROOM-DOOR TRIGEDIT-DOOR
 
-%damage% %victim% [modifier] [damage type]
+Door (trigger type)
 
-   Cause amount points of damage to victim. Damage is automatically scaled
-based on the mob or adventure level. Modifier is a percent of the scaled
-damage, where 100 is the normal level. If modifier is negative, the player
-will be healed.
+Argument type:  percent chance to execute
+Return value:  return 0 to prevent the door command
 
-You can optionally specify a damage type (physical, magical, fire, poison,
-direct).
+Activated when a player uses the door-specific commands: 'close, open' on a
+door (not on objects). This can be used to require keys or other restrictions.
 
-%damage% %actor% -100          - cause scaled healing
-%damage% %actor% 20           - cause 20% scaled damage
-%damage% %actor% %random.100%  - cause 1-100% scaled damage randomly
-
-See Also: DEATH, %AOE%, %DOT%
+Variables:
+  &c%actor%&0 - The character using the command.
+  &c%direction%&0 - The direction the command is used on.
+  &c%cmd%&0 - The specific command activating the trigger.
 #d
-%AOE% OAOE MAOE WAOE
+"DROP TRIGGER" "OTRIG DROP" "RTRIG DROP" TRIGEDIT-OBJ-DROP TRIGEDIT-ROOM-DROP DROP-TRIGGER TRIG-OBJ-DROP TRIG-ROOM-DROP
 
-%aoe% [modifier] [damage type]
+Drop (trigger)
 
-This does AoE -- Area-of-Effect -- damage to every enemy in the room. The obj/
-room versions call any player (as well as their followers) an enemy. The mob
-version only counts combat enemies. Like %damage%, the damage is scaled, and
-a negative modifier causes healing instead.
+Argument type:  percent chance to trigger
+Return value:  return 0 to prevent the drop
 
-You can optionally specify a damage type (physical, magical, fire, poison,
-direct).
+As an object trigger, this is activated any time a character attempts to drop
+the object. As a room trigger, it happens when an objectd is dropped in the
+room.
 
-%aoe% 100    - group damage
-%aoe% -20    - group healing
+The object trigger includes putting the object into a container or vehicle.
 
-See Also: DEATH, %DAMAGE%, %DOT%
+Variables:
+  &c%actor%&0 - The character attempting to drop the object.
+  &c%object%&0 - The object the character is attempting to drop (room trigger).
+  &c%self%&0 - The item being dropped (object trigger).
 #d
-%DOT% ODOT MDOT WDOT
+"ENTER TRIGGER" "ENTRY TRIGGER"
 
-%dot% <victim> <modifier> <duration> [damage type] [max stacks]
+Disambiguation: Different scriptable things have different uses for enter/entry
+triggers. See also:
 
-Adds a scaled DoT -- Damage-Over-Time -- effect to the target.
-
-You can optionally specify a damage type (physical, magical, fire, poison,
-direct).
-
-You can also optionally specify a maximum number of stacks. If a %dot% hits
-again while the victim already has that dot, it will add its damage and stack,
-resetting the duration on the existing effect. If it has hit its maximum, it
-will only refresh the time on the whole stack. If you don't specify, it will
-not stack (max 1).
-
-NOTE: If you want to use max stacks, you must also provide the damage type.
-
-See Also: %DAMAGE%, %AOE%
+Mob Entry trigger: &yMTRIG ENTRY&0
+Room Enter trigger: &yRTRIG ENTER&0
+Vehicle Entry trigger: &yVTRIG ENTRY&0
 #d
-%DOOR% WDOOR ODOOR MDOOR TRIGEDIT-EXIT TRIG-EXIT 
+EXPRESSIONS TRIGEDIT-EXPRESSIONS INCREMENTS MATHEMATICAL /= || \
 
-%door% <vnum> <direction> <field> [value] 
+A FALSE expression is any expression that evaluates to 0, or an empty string.
+A TRUE expression is any expression that evaluates to anything other than a
+false expression. The following list are the recognized operators. The higher
+the operator is on the list, the higher the precedence. The expression is
+evaluated from left to right. Parenthesis can be used to group. 
 
-  Used for adding, deleting, and modifying doors in room #vnum. Direction 
-determines which door is being changed, and can be north, south, east, west, 
-up, or down. If the door does not exist first, a new door will be created. 
-Field is what property of the door is being changed. Valid fields are:
-
-purge       - remove the exit in the direction specified - no value needed
-flags       -  value will be the new door flags bitvector as defined here:
-        a - Exit is a door that can be opened and closed. Default is open
-        b - The door is closed
-name        - value is the name of the door in the specified direction.
-room        - value is the vnum of the room this direction leads to
+|Operator|         Name          | Examples  0=False 1=True  |
+--------------------------------------------------------------
+|   ||   | logical or            | 0 || ( ) = 0; 5 || 0 = 1  |
+|   &&&&   | logical and           | 1 &&&& 0 = 0; 5 &&&& 3 = 1    |
+|   ==   | equivalence           | 5 == 3 = 0; dog == DoG = 1| 
+|   !=   | inequality            | 0 != Z = 0; dog != d = 1  | 
+|   <    | less than             | 4 < 3 = 0; 4 < 5 = 1      |
+|   >    | greater than          | 4 > 3 = 1; 4 > 4 = 0      |
+|   <=   | less than or equal    | 4 <= 3 = 0; 4 <= 5 = 1    |
+|   >=   | greater than or equal | 4 >= 3 = 1; 4 >= 4 = 1    |
+|   /=   | abbrev                | "concatenate" /= "con"    |
+|   ~=   | substring             | "Dark Forest" ~= "Forest" |
+|   -    | subtraction           | 15 - 10 = 5               |
+|   +    | addition              | 10 + 15 = 25              |
+|   *    | multiplication        | 10 * 20 = 400             |
+|   /    | division              | 100 / 20 = 5              |
+|   //   | remainder             | 5 // 4 = 1                |
+|   !    | negation              | !() = 1; !0 = 1; !dog = 0;| 
+--------------------------------------------------------------
 #d
-%ECHO% %ECHOAROUND% %ECHONEITHER% %SEND% TRIG-SEND %BUILDINGECHO% BUILDINGECHO ZECHOAROUND ECHOAROUND OECHO WECHO MECHO OECHOAROUND WECHOAROUND MECHOAROUND OSEND WSEND MSEND MBUILDINGECHO MECHONEITHER OECHONEITHER WECHONEITHER
+"GLOBAL TRIGGER" "GLOBAL RANDOM TRIGGER" "MTRIG GLOBAL" "OTRIG GLOBAL" "RTRIG GLOBAL" "VTRIG GLOBAL" TRIGEDIT-MOB-GLOBAL TRIGEDIT-OBJ-GLOBAL TRIGEDIT-ROOM-GLOBAL TRIGEDIT-VEH-GLOBAL
 
-%echo% <message>
-   Message is sent to all non-sleeping characters in the same room that this 
-script is executing in.
+Global (trigger)
 
-%echoaround% <victim> <message>
-   Message will be sent to all characters in the room with victim, except for 
-the victim.
+The Global trigger type is not an event itself, but is instead combined with
+the Random trigger event. This allows the Random trigger to fire even if there
+are no players present.
 
-%echoneither% <person> <person> <message>
-   Message will be sent to all characters in the room EXCEPT the two people.
+Because EmpireMUD's world is so large, you should use Global triggers sparingly
+and not on things that spawn on the map. Also consider having the script
+detach any random trigger that's no longer needed.
 
-%send% <victim> <message>
-   Message will be sent to the victim only.
-  
-%buildingecho% <room vnum> <message>
-   Buildingecho echoes message to the entire building. room vnum should be any
-   vnum in the building you wish to echo around.
-
-NOTE: When used with mobs make sure the mobs can see the players. i.e not blind, set INFRA.
-
-See Also: %ASOUND%, %REGIONECHO%
+See also: DETACH, RANDOM TRIGGER
 #d
-%REGIONECHO% MREGIONECHO OREGIONECHO WREGIONECHO
+"GREET TRIGGER" "MTRIG GREET" "VTRIG GREET" TRIGEDIT-MOB-GREET TRIGEDIT-VEH-GREET GREET "GREET ALL TRIGGER" "MTRIG GREET ALL" TRIGEDIT-MOB-GREET-ALL GREET-ALL TRIGEDIT-MOB-GREETALL
 
-%regionecho% %location% %radius% %message%
+Greet (trigger)
 
-Sends a message to the entire map region around a location, up to a distance
-given by the radius. You can specify a real map location, a building, or an
-adventure zone and it will find the map location associated with it.
+Argument type:  percent chance to execute
+Return value:  return 0 to attempt to block entry and send the actor back
 
-If you use a negative radius, it will only echo to people outdoors. Otherwise,
-all players in range will see the echo.
+When a character attempts to enter a room, it executes all the Greet triggers
+in that room. Some types of entry, like normal movement, can be prevented by
+returning 0 from the script.
 
-Examples:
- > %regionecho% %self.room% 100 The fair has come to town!
- > %regionecho% %self.room% -50 A pegasus flies overhead.
+Note: Mobs can only Greet people they can see; use Greet All to also trigger on
+   people the mob can't see. Vehicle triggers do not make this distinction.
+Note: Players entering magically (or via something other than a normal room
+   exit) may not be prevented from entering. You can usually check this by
+   seeing if the %direction% variable is empty.
 
-See Also: %echo%
+Variables:
+  &c%actor%&0 - The character entering the room.
+  &c%direction%&0 - The direction the character came from, if any.
 #d
-%FORCE% OFORCE WFORCE MFORCE TRIGEDIT-FORCE TRIG-FORCE
+"LEAVE TRIGGER" "LEAVE-ALL TRIGGER" "MTRIG LEAVE" "OTRIG LEAVE" "RTRIG LEAVE" "VTRIG LEAVE" "MTRIG LEAVE ALL" TRIGEDIT-MOB-LEAVE TRIGEDIT-OBJ-LEAVE TRIGEDIT-ROOM-LEAVE TRIGEDIT-VEH-LEAVE TRIGEDIT-MOB-LEAVE-ALL
 
-%force% <victim> <command>
+Leave (trigger)
 
-   Force the victim to perform a particular command. Cannot be made to force 
-immortals.
+Argument type:  percent chance to execute
+Return value:  return 0 to prevent leaving
 
-   This little script teleports the actor to another place when he enters the
-room. It then makes him look to see the description.
+Leave triggers occur when a character attempts to leave a room. For mobs,
+objects, and vehicles, it is the room they are currently in.
 
-Trigger Intended Assignment: Rooms
-Trigger Type: Enter , Numeric Arg: 100, Arg list: None
-Commands:
-wait 1 s
-%echo% A powerful force drags you down.
-%teleport% %actor% 3001
-%force% %actor% look
+Mobs can only execute Leave triggers on people they can see. You can use the
+Leave-All version to also stop sneaky or invisible people.
+
+Variables: 
+  &c%actor%&0 - The character trying to leave the room.
+  &c%direction%&0 - The direction the character is leaving to.
 #d
-%LOAD% OLOAD MLOAD WLOAD
+"LOAD TRIGGER" "MTRIG LOAD" "OTRIG LOAD" "VTRIG LOAD" TRIGEDIT-MOB-LOAD TRIGEDIT-OBJ-LOAD TRIGEDIT-VEH-LOAD TRIGEDIT-LOAD TRIG-LOAD
 
-%load% obj <vnum> [name <position>] [scale level]
-%load% mob <vnum> [ally] [scale level]
+Load (trigger type)
 
-   This command loads a mob or object into the game. No-take objects loaded to
-a mob will load to the room. Mobs loading other mobs may specify "ally" to
-set the loaded mob as a follower, which assists combat scripts in determining
-whose side they are on.
+Argument type:  percent chance to execute
 
-The %load% command will automatically scale items and mobs to the same level
-as the thing that does the loading (when it can). However, you can specify a
-different scale level if you like. For object loading, you MUST also include
-the target to load to AND the load position before the scale level.
+The Load trigger happens when something is first loaded into the game (but not
+on reboot or re-login). For crafted vehicles, the Load trigger doesn't happen
+until construction is complete.
 
-load an object to room: %load% obj 1300
-load a mob to room    : %load% mob 1300 %actor.level%
-load obj to player inv: %load% obj 1300 %actor% inv %actor.level%
-equip obj to player   : %load% obj 1300 %actor% waist
-
-See Also: POSITIONS, CHAR-VAR
+Certain actions like unharnessing a mob from a vehicle will load a new copy of
+the mob and set off its load triggers.
 #d
-%PURGE% OPURGE MPURGE WPURGE
+"MTRIG ENTRY" "VTRIG ENTRY" "MTRIG ENTER" "VTRIG ENTER" TRIGEDIT-MOB-ENTRY TRIGEDIT-VEH-ENTRY TRIGEDIT-ENTRY TRIGGER-ENTRY 
 
-%purge% <victim>
+Entry (trigger)
 
-   Purge removes objects or mobs from the game. If no argument is given, then
-all objects and mobs in the room will be removed. If there is an argument,
-only that mob or object will be  purged. Players can not be purged.
+Argument type:  percent chance to execute
+Return value:  return 0 to cancel the movement and put the mob back
 
-Examples: 
-   %purge% %self%
-   %purge% %actor.inventory(1300)%   
-   %purge% %actor.eq(hold)%
- 
-See Also: POSITIONS
+The Entry trigger happens whenever its mob (or vehicle) enters a new room.
+You can return 0 if it shouldn't have gone there and should go back. If you
+want the mob to do something on arrival, you should consider using a short
+wait.
+
+See also: WAIT
 #d
-%SCALE% OSCALE MSCALE WSCALE
+MUDCOMMAND CMD.MUDCOMMAND %CMD.MUDCOMMAND% %MUDCOMMAND%
 
-%scale% <victim/object> [level]
+Used to match text to existing commands in the MUD. This will also match
+any abbreviations.
 
-This scales (or re-scales) a target NPC or object to a given level. If no level
-is provided, the script will attempt to use the scale of the character, object,
-or instance that called the scale command. If no valid level is detected, it
-will send an error.
-
-If you scale an item that is already scaled, a fresh copy will be loaded and
-scaled. This would result in the original item being purged.
-
-Examples: 
-   %scale% bag 100
-   %scale% sword %actor.level%
-#d
-%TELEPORT% WTELEPORT OTELEPORT MTELEPORT
-
-%teleport% <victim> <location>
-%teleport% all <location>
-%teleport% adventure <location>
-
-   Teleport moves the victim to the target. The victim does not need to be in 
-the same room as the mob. If the victim is 'all', all the characters in the 
-room will be teleported to the target room. No messages are generated by this 
-command.
-
-If you target 'adventure', all players in the entire adventure zone instance,
-plus their NPC followers, will be teleported to the target.
-
-You can use i### to target a room in the current adventure instance by its
-room template vnum instead of live room number (if used in an instanced zone).
-
-%teleport% all 17401
-%teleport% %actor% 1300
-#d
-%TERRACROP% WTERRACROP OTERRACROP MTERRACROP
-
-%terracrop% [location] <crop vnum>
-
-This command allows you to make changes to the map, one tile at a time. It is
-usually a bad idea to terracrop tiles by coordinates. It's almost always
-safest to do this on the map tile the script is running in.
-
-Some sectors cannot be terracropped.
+Note that in Command triggers, you only have to specify the whole word you
+want to match, and the mud will handle abbreviations for you. This means you
+almost never have to check %cmd.mudcommand%.
 
 Example:
-  if (%room.sector% ~= Forest)
-    %terracrop% %room% 4900
-  end
+  * check for command sit with arg chair. Also matching any abbreviations. 
+  if %cmd.mudcommand% == sit &&&& chair /= %arg% &&&& %arg%
 
-See also: %TERRAFORM%
+See also: COMMAND TRIGGER
 #d
-%TERRAFORM% WTERRAFORM OTERRAFORM MTERRAFORM
+"RANDOM TRIGGER" "MTRIG RANDOM" "OTRIG RANDOM" "RTRIG RANDOM" "VTRIG RANDOM" TRIGEDIT-MOB-RANDOM TRIGEDIT-OBJ-RANDOM TRIGEDIT-ROOM-RANDOM TRIGEDIT-VEH-RANDOM RANDOM-TIMING TIMING
 
-%terraform% [location] <sector vnum>
+Random (trigger type)
 
-This command allows you to make changes to the map, one tile at a time. It is
-usually a bad idea to terraform tiles by coordinates. It's almost always
-safest to do this on the map tile the script is running in.
+Argument type:  percent chance to execute
 
-Some sectors cannot be terraformed.
+Random triggers fire every 13 seconds -- but only if a player is nearby.
+You can set how often the trigger fires by setting the percent to:
 
-Example:
-  if (%room.sector% ~= Forest)
-    %terraform% %room% 4412
-  end
+1% = every 22 minutes
+2% = 11 minutes
+5% = 4 minutes
+10% = 2 minutes
+20% = 1 minute
+50% = 26 seconds
+100% = 13 seconds
 
-See also: %TERRACROP%
+(all times are approximate, except 100%)
 #d
-%ASOUND% OASOUND MASOUND WASOUND ASOUND
+"SCRIPT COMMANDS" "TRIGEDIT SCRIPT COMMANDS"
 
-%asound% <message>
-   
-   The message is sent to all surrounding rooms.
+The following is a list of special commands that can be used in triggers:
 
-Trigger Intended Assignment: Rooms
-Trigger Type: Random , Numeric Arg: 10, Arg list: None
-Commands:
-   %asound% You hear a blood chilling howl from nearby.
+&c*&0 - A comment (the rest line is ignored).
+&cattach&0 - Attaches a trigger to something.
+&cbreak&0 - Ends a case or while.
+&ccase&0 - Part of a switch statement.
+&ccontext&0 - Sets the variable context, to prevent variable name collisions.
+&cdefault&0 - Part of a switch statement.
+&cdetach&0 - Removes a trigger from something.
+&cdg_affect&0 - Adds a spell effect to a person.
+&cdone&0 - Ends a switch or while statement.
+&celse&0 - Part of an if/elseif/else/end series of conditions.
+&celseif&0 - Part of an if/elseif/else/end series of conditions.
+&cend&0 - The end of an if, elseif, or else series of conditions.
+&ceval&0 - Evaluates an expression and assigns the result to a variable.
+&cextract&0 - Gets a single word from a text string.
+&cglobal&0 - Stores a variable to the room, reachable by other scripts.
+&chalt&0 - Ends execution of a script early.
+&cif&0 - Begins a conditional series.
+&cmakeuid&0 - Stores a mob, obj, etc as a variable.
+&cnop&0 - Executes the rest of the line but doesn't run the result as a command.
+&crdelete&0 - Removes a variable that's stored to a character.
+&cremote&0 - Store a variable to a character.
+&creturn&0 - Sets the return value of the script (but doesn't halt).
+&cset&0 - Sets some script to a variable, to be executed when called.
+&cswitch&0 - Beginning of a switch/case/break/done statement.
+&cunset&0 - Get rid of a global or local variable.
+&cversion&0 - Causes a syslog of the DG Scripts version.
+&cwait&0 - Delay script execution for a certain amount of time.
+&cwhile&0 - Beginning of a while/done loop.
+
+See the specific help files for those commands for more information.
+
+See also: MTRIG COMMANDS, OTRIG COMMANDS, RTRIG COMMANDS, VTRIG COMMANDS
 #d
-%AT% WAT MAT OAT
+"SPECIAL VARS" "SPEC VAR" "SPECIAL VARIABLES" TRIGEDIT-VARIABLES-SPECIALS SPEC-VAR %SELF% RANDOM %RANDOM% %TIME% %PEOPLE% TRIGEDIT-SPEC-VAR %RANDOM.CHAR% %SPEECH% 
 
-%at% <target> <command>
-
-   Using %at% will perform the command in the room where target is found.
-#d
-MFORGET MREMEMBER %FORGET% %REMEMBER%
-
-mremember <victim> [command]
-
-   The victim is placed into this mobile's memory list. The next time the 
-victim is seen by the mobile, the mobile will perform command if set, or 
-execute the memory trigger if no command was provided. When the command is 
-carried out or the script executed, the victim is forgotten.
-
-NOTE: Any mob using the mremeber command MUST have a MEMORY trigger attached. 
-It doesn't matter if the Memory trigger is never called (Narg 0).
-Only Mobs may use mremember.
-
-mforget <victim>
-   Remove victim from this mobile's memory list. 
-#d
-MGOTO %GOTO%
-
-mgoto <target>
-   This command moves the mob to the given target. The target may be an object,
-room, or  character, as long as it is not in a private room occupied with two 
-or more characters, or god  room. No message is given. 
-
-You can use i### to target a room in the mob's current adventure instance by
-its room template vnum instead of live room number (if used in an instanced
-zone).
-
-mgoto 1233
-mgoto Rumble
-mgoto fountain
-#d
-MJUNK %JUNK%
-
-mjunk <object | all>
-   
-   The object in the mob's inventory specified is removed from the game. 
-'Mjunk all' removes all of the objects in the mob's inventory. No message 
-is sent by this command. Only mobs may use this command.
-#d
-%FOLLOW% TRIG-FOLLOW MFOLLOW
-
-mfollow <victim>
-   The mobile will begin following the victim without the revealing "starts
-following you" message. A silent follow.
-#d
-MHUNT %HUNT% HUNT 
-
-mhunt <victim>
-   The mobile will begin to hunt for victim, and engage in combat upon finding 
-them. Only Mobiles may use this command. Hunting mobs will walk through NOMOB
-rooms.
-
-*mobs do not currently engage upon finding, it is bugged.
-#d
-MKILL
-
-mkill <victim>
-mkill %actor%
-
-   mkill causes the mob to hit the victim. It is the same as kill, except mkill 
-works for low level mobs attacking PCs, where kill might not.
-#d
-%TRANSFORM% MTRANSFORM OTRANSFORM TRANSFORM
-
-%transform% <vnum|-vnum>
-
-   This command causes the executing mob or object to transform into another 
-mob or object, based on the vnum argument supplied. The transformation is 
-permanent, though additional transformations may be performed. No message 
-regarding the transformation is sent to the room. The new mob or object will 
-have the same script as the original, rather than any script normally assigned 
-to the new, and no load trigger will be executed.
-
-   Mobs - The hit points, max hit points, position, gold, and experience value 
-will remain those of the original mob but all other statistics and descriptions 
-will be those of the new mob. (The new mob can be made to have all of its normal 
-statistics by using a negative vnum.) Only mobiles may use this command (naturally).
-
-   Objects - Based on the vnum argument supplied. The four basic values will 
-remain those of the original mob but all other statistics and descriptions will 
-be those of the new object. The transformation is permanent, additional 
-transformations may be performed. No message regarding the transformation is 
-sent to the room. The new object will have the same script as the originating 
-object, rather than any script normally assigned to the new object, and no 
-load trigger will be executed.
-#d
-OTIMER %TIMER% 
-
-otimer <value>
-
-   Set the countdown timer of this object to value. Useful for objects with 
-timer triggers.
-#d
-OSETVAL %SETVAL%
-
-osetval <position> <value>
-
-   Osetval lets you alter the object values of an object. The meaning of the 
-values depends on the object type (HELP OEDIT-VALUES).
-#d
-COMMENT * 
-
-* This is an example of a comment in trigedit. Because of the *'s the lines 
-* are not parsed, so the script still works even if it has a lot of 
-* explanations built in. All triggers should be heavily commented.
-
-* The below line sends the text 'Trigger firing' to the room.
-%echo% Trigger firing
-
-   Comments are useful in scripts to document what is happening, for future 
-reference, and for others to see what the script does.
-
-See also: REDIT-ROOM-FLAGS
-#d
-NOP
-
-   Almost a no-operation. Certain variable/subfield combinations for characters 
-change some attribute about the character. nop allows those changes to be used 
-legally on lines that do not need to process the result.
-
-* this will award the actor with 10 coins
-nop %actor.give_coins(10)%
-* this awards 10 experience
-nop %actor.exp(10)%
-
-Here is a workaround to use a variable:
-  *nop workaround
-  eval making %%self.give_coins(%coins%)%%
-  nop %making%
-
-#d
-GLOBALS GLOBAL-VARIABLES GLOBAL-VARS GVARS
-
-Usage:  global variablename
-
-* To make a variable 'reachable' from other scripts it has to be made 'global'. 
-* In this case I make a local known var %has_bribed_guard% and make it global. 
-* It's a good idea to use this in conjunction with context.
-global has_bribed_guard
-
-   Used to change a variable from local to global. If a global variable is 
-modified, this command must be used to update the global contents as well.
-
-See Also: VARIABLES, CONTEXT
-#d
-CONTEXT
-
-Usage:  context number
-
-* This little script will make sure one %has_said_hello% exist for each player.
-context %actor.id%
-set has_said_hello 1
-global has_said_hello
-* now only scripts running with context = %actor.id% can access this particular 
-* variable. however - it's a better idea to use vars set on players: help remote.
-
-   Changes the "context" of a script to this value. When first run, a script's 
-context is 0. When a variable is made global, it is given the current context. 
-When a variable is accessed, if it must be searched for globally, a "found" 
-variable must either have context 0 or the current context. The net result of 
-this is you may have many global variables in a single script, with the same 
-name, differing only by context. Players may have variables; this mostly 
-removes the need for variable context. Previously, a player's ID could be used 
-as variable context to allow a script to service multiple players at once.
-
-See Also: REMOTE
-#d
-EVAL
-
-Usage:  eval <variable> <expression>
-
-* this example immediately evaluates the expression below and stores the result
-* in %result%:
-eval result %self.health% * 100 / %self.maxhealth% 
-say My hitpoint percentage is %result%
-* this result will not change after the evaluation even if %self.health% changes.
-
-   The eval command is used to set (or create) the specified variable equal to 
-the result of the immediate evaluation of the provided expression. There also 
-exists a "set" command, with the same syntax. Set differs in that the expression
-is not evaluated until the variable is accessed.
-
-See Also: TRIG-SET
-#d
-TRIG-SET
-
-Usage:  set <variable> <value>
-
-Set sets variable to value, without evaluating it. 
- Example: set foobar 15 - 5
- sets the variable foobar to the string "15 - 5"
-
-* this example sets the value of result to '%self.health% * 100 / %self.maxhealth%'
-set result %self.health% * 100 / %self.maxhealth% 
-* The %result% var now works as a 'function' every time it's accessed.
-say My hitpoint percentage is %result%
-%damage% %self% 30
-say My hitpoint percentage is %result%
-
-   The set command is used to set (or create) the specified variable equal to 
-the provided expression, which will be evaluated when the variable is accessed. 
-There also exists an "eval" command, with the same syntax. Eval differs in that 
-the expression is evaluated immediately.
-
-See Also: EVAL
-#d
-UNSET
-
-Usage:  unset variable
-
-* in this example we have a var %testvar% we no longer need:
-set testvar hops happily along
-%echo% %self.name% %testvar%
-unset testvar
-* please note - if we had made the var global, it'd be gone instead.
-
-   Remove the variable from the global variables of this script, or if not 
-found there, from the script.
-
-See Also: SET, EVAL
-#d
-EXTRACT
-
-Usage:  extract to-variable word-number from-text
-
-* could be used to do strange things to what people say:
-extract testvar1 1 %speech%
-extract testvar2 2 %speech%
-extract testvar3 3 %speech%
-extract testvar4 4 %speech%
-say do you mean %testvar4% %testvar3% %testvar2% %testvar1% ?
-
-   Place a specific word from the 'from-text' into a new or existing variable 
-'to-variable'. Do not enclose the name of the to-variable in %'s.
-#d
-IF ELSEIF END "ELSE IF" ELSIF
-
-if (expression)
-  ...
-elseif (expression)
-  ...
-else
-  ...
-end
-
-if (%actor.is_pc%) 
-  %echo% You are a player
-else 
-  %echo% You are a mob.
-end
-
-   An 'if' must occur before the other three. If expression evaluates to true 
-(HELP EXPRESSIONS), the statements between the if statement and the next 
-elseif, else, or end are executed. If it stopped at an elseif or else, it scans 
-for the next end, and continues execution at that point. If the expression 
-evaluated to false, it searches for the next elseif, else, or end. If it finds 
-an elseif, it checks that expression. If it is true, it executes the statements 
-between the elseif and the next elseif, else, or end, and then finds the end of
-the block. If it is false, it continues searching in the same pattern, until a 
-true elseif is found, an else is found, or an end is found. There may be 0 or 
-1 else statements and 0 or many elseif statements in the block.
-
-***EVERY IF NEEDS AN END: 2 IFs NEED 2 ENDS....***
-
-See Also: EXPRESSIONS, NESTED
-#d
-NESTED-IFS
-
-   A nested if is an if statement contained within another if or if...else 
-statement. Nested if's allow the creation of a decision tree or flow chart
-of events with multiple conclusions. 
-   Always use /f to format and indent your trigger. This will warn you if you
-do not have the correct number of ifs to ends. WARNING: multiple unmatched
-if/ends will crash us. Make sure everything lines up with /f before you test.
-#d
-HALT
-
-Usage:  halt
-
-   Halt terminates the trigger execution.    
-
-* This script attacks players of level 20 and above. The reason for the use of 
-* halt and return 0 is to make sure other scripts are checked too.
-if %actor.level% < 20
-  return 0
-  halt
-end
-%echo% %self.name% yells a Battlecry and throws himself at you.
-mkill %actor%
-
-   Terminates the trigger execution.
-#d
-MAKEUID VAREXISTS %VAREXISTS% %EXISTS% EXISTS
-
-Usage:  makeuid <variable> <id>
-        makeuid <variable> room [room location]
-
-* We have one mob giving a quest. This mob sets the targets id as a global on 
-* the player via the 'remote' command, like this:
-eval quest_object %obj.id%
-remote quest_object %actor.id%
-* We then have another mob receiving the quest object, with the following script.
-if !(%actor.varexists(quest_object)%)
-  return 0
-  halt
-end
-* now we know the player has a quest_object variable
-makeuid obj %actor.quest_object%
-say Have you brought me %obj.shortdesc%, %actor.name% ?
-say You must bring it to me to complete your quest, you know.
-
-   Creates a new variable with the name given, whose contents shall be suitable 
-for referring to a character, object, or room whose id is provided.
-#d
-RDELETE
-
-Usage:  rdelete variable id
-
-* This is used to remove a variable
-say Thank you, %actor.name% - your quest is completed.
-rdelete quest_object %actor.id%
-
-   Delete a remote variable from the script referred to by the id of its owner.
-
-See Also: VDELETE, REMOTE
-#d
-REMOTE
-
-Usage:  remote <variable> <id>
-
-Remoting a variable saves that variable to the player file for future access. 
-This is used heavily for quests to limit a player to only performing it once.
-Here is a quick example from zone 14. The variable must first be set and then
-saved to the players file via remote, like:
-  * setting the variable to 1 means completed.
-  set solved_example_quest_zone_14 1
-  remote solved_example_quest_zone_14 %actor.id%
-Then in future triggers it is checked if that variable already exists in the
-player file. In this example, if it does the player is not allowed to continue.
-<variable> should always be a unique name. I suggest always including zone #.
-<id> can be any value or text you wish to use later.
-
-   Create a global variable belonging to a character or player whose id is 
-specified. The variable must first exist in the script that is running.
-
-See Also: RDELETE, VDELETE, TRIG-SET, CONTEXT
-#d
-TRIG-RETURN
+Special Variables When using field - The variable returns:
  
-Usage:  return 0
- 
-   Return sets the return value of the trigger. Normally, a script will return
-1, unless return 0 is specified. Unlike most computer languages, the return  
-command does not end the trigger's execution. The value is returned after all 
-the commands have been executed, or a wait or halt command is called.
-
-See Also: HALT, WAIT
+&cself&0 - The mob, item, or room running the script. Normal fields may be 
+                used with this.
+&cinstance.id&0 - Unique id of the adventure instance, if any.
+&cinstance.location&0 - The map/linked location of the instance, if any.
+&cinstance.mob(vnum)&0 - Finds a copy of a mob belonging to the instance.
+&cinstance.name&0 - Name of the adventure instance, if any.
+&cinstance.start&0 - The entry room of the instance, if any.
+&cpeople.<vnum>&0 - This variable returns the number of people in the room 
+   specified via vnum.
+&crandom.<#>&0 - This returns a number between 1 and the field value. 
+   %random.10% would return a number between 1 and 10.
+&crandom.char&0 - This returns a random character in the room.
+&crandom.ally&0 - Returns a random ally (only if fighting).
+&crandom.enemy&0 - Returns a random enemy (only if fighting).
+&cskill.name(sk)&0 - The full name of a skill abbreviated by sk.
+&cskill.validate(sk)&0 - Returns true if sk is a valid skill.
+&cspeech&0 - This variable is set to the complete phrase spoken by an actor 
+   that triggers a speech trigger.
+&cstartloc&0 - A random starting location.
+&ctime.<field>&0 - Field may be hour, day, month, or year. The returned value will 
+   be the current hour in the mud (0-23), day of the month (1-35), month
+   (1-16), or year respectively.
+&ctimestamp&0 - Current unix timestamp.
+&cweather&0 - One of: sunny, cloudy, raining, lightning
+&c|%var%&0 - name's, someone's, your
+&c&&%var%&0 - it, you, he/she -- DOES NOT WORK
+&c*%var%&0 - it, you, him/her
+* object only
+&c'%obj%&0 - something, name
 #d
-TRIG-SWITCH TRIGEDIT-SWITCH CASE DEFAULT BREAK
+"SPEECH TRIGGER" "MTRIG SPEECH" "RTRIG SPEECH" "VTRIG SPEECH" TRIGEDIT-MOB-SPEECH TRIGEDIT-ROOM-SPEECH TRIGEDIT-VEH-SPEECH
 
-Usage:  switch expression
+Speech (trigger type)
 
-switch %random.4%
-  case 1
-    emote sings a merry song about someone named Fulbert and Beatrice.
-  break
-  case 2
-    emote booms out loudly, 'Heigh Ho! Heigh Ho! It's home from work we go!'
-  break
-  case 3
-    emote tries to sing falsetto, but his voice doesn't agree.
-  break
-  default
-    sing
-  break
-done
+Argument type:  the phrase (whole string) or word list to match
 
-   Switch evaluates an expression and looks for a match amongst the case 
-statements that follow. If none of the following case statements are a match, 
-and a default statement exists, the default statement is considered a match. 
-If a match is found, the commands that follow it, up until a break or done 
-command, are executed. 
-Break is used to terminate commands in a switch. 
-Case is used to begin a new conditional group in a switch block.
-Default is similar to case but matches any condition not met. 
-Done is used to terminate a while or switch block.
+Speech triggers occur when someone in the room says the phrase (or one of the
+words in a word list) using the normal "say" command. This is can be used to
+add riddle quests, to make doors activate on command ("open sesame"), or to
+add other types of interactions to the game.
+
+Note: Objects cannot have speech triggers, but mobs, rooms, and vehicles can.
+
+Variables:
+  &c%actor%&0 - The character whose speech activated the trigger.
+  &c%speech%&0 - The entire phrase spoken.
 #d
-WHILE DONE
+"TEXT VARIABLES" "TEXT VARS" TRIGEDIT-VARIABLES-TEXTS TEXT-VAR TRIGEDIT-TEXT-VAR
 
-Usage:  while expression
+Text Variable Fields 
 
-   The while command starts a loop, running until the expression becomes zero 
-or negative. This can make permanent loops - be careful. The switch block must 
-be terminated by a done. While loops are disabled after looping 100 times.
+These fields pertain to any variable that contains a string of text. These 
+are often the variables, such as %speech%, which are provided to a script, but 
+can also be variables that have been created by the script, such as 
+  %room.north% 
 
-while %something%
-  ...
-done
+When using field - The variable returns
+&cstrlen&0 - Returns the number of characters in the string.
+&ctrim&0 - Returns the string without any leading or trailing whitespace. 
+   This is used to trim extra spaces from the beginning or end of a string.
+&ccar&0 - Returns the first word of the string. For %text%="this is the string";
+   %text.car% will yield "this".
+&ccdr&0 - Returns all but the first word of the string, trimmed. For %text%=
+   "this is the string"; %text.cdr% will yield "is the string". 
+&ccontains()&0 - Subfield used for comparison.
+&cmudcommand&0 - Returns the mud command the string is shorthand for. Used to make 
+   sure the command you react to is the one you want: For %text%="o"
+   %text.mudcommand% will yield "open".
+   
+See also: MUDCOMMAND
 #d
-WAIT WAITUNTIL WAIT-UNTIL PAUSE TRIGEDIT-TIMING TIMING
+"TRIGGER VARIABLES" "SCRIPT VARIABLES" "TRIGGER VARS" "SCRIPT VARS" "TRIG VARS" TRIGEDIT-VARIABLES VARIABLES TRIG-VARS TRIG-VARIABLES VARS
 
-Usage:  wait <time> [s]
-       wait until <mudtime>
-* This script gives the actor 10 seconds to get out.
-say GET OUT! NOW!
-wait 10 s
-mkill %actor%
-
-   The wait statement is used to 'pause' the script execution for a period of 
-time. When a script is being executed it will attempt to execute all commands 
-right away. To get small breaks in, and perhaps give the players time to adjust, 
-use the wait command.
-
-* If you want to synchronise your script, you can use the 'wait until' feature.
-* This script wakes the mob at dawn, and puts him to sleep at night.
-wait until 8:00
-wake
-* wait # without seconds following it will wait 10 ticks, which is very quick.
-wait 10 
-yawn
-wait 10
-stand
-* This one uses wait 10 seconds. Recommend you always use seconds
-wait 10 sec
-emote looks sleepy.
-wait until 21:00
-yawn
-wait 10 s
-rest
-wait 10 s
-sleep
-#d
-TRIGEDIT-VARIABLES VARIABLES TRIG-VARS TRIG-VARIABLES VARS 
-
-Variables appear as a name surrounded by '%'s, such as %actor% 
+Variables appear as a name surrounded by '%'s, such as %actor%
 
 Before a command is processed, the line is scanned and any variables are
 replaced. First the list of local variables are checked to see if the variable
@@ -789,1347 +399,32 @@ A field of a variable can also retrieved, based on their type. To get a field,
 a notation of %variable.field% is used. The valid fields are listed in the help
 files below. 
 
-CHAR-VAR - Variables for characters.
-OBJ-VAR  - Variables for objects.
-ROOM-VAR - Variables for rooms.
-TEXT-VAR - Variables for text.
-SPEC-VAR - Variables for special stuff.
+Variables for characters: &yMTRIG VARS&0
+Variables for objects: &yOTRIG VARS&0
+Variables for rooms: &yRTRIG VARS&0
+Variables for vehicles: &yVTRIG VARS&0
+Variables for text: &yTEXT VARS&0
+Variables for special stuff: &ySPEC VARS&0
 
-See Also: GLOBAL
+See also: GLOBAL
 #d
-MUDCOMMAND CMD.MUDCOMMAND %CMD.MUDCOMMAND% %MUDCOMMAND%
+VAREXISTS %VAREXISTS% %EXISTS% EXISTS
 
-   Used to match text to existing commands in the MUD. This will also match
-any abbreviations.
- 
-* check for command sit with arg chair. Also matching any abbreviations. 
-if %cmd.mudcommand% == sit &&&& chair /= %arg% &&&& %arg%
-#d
-TRIGEDIT-VARIABLES-TEXTS TEXT-VAR %ARG% .CDR .CAR ARG.CDR CMD.CDR ARG.CAR CMD.CAR %TEXT% PUSH CMD %CMD% %CDR% %CAR% %TRIM% TRIGEDIT-TEXT-VAR %STRLEN%
+Usage:  %actor.varexists(varname)%
 
-Text Variable Fields 
+This lets you determine if a person has a variable that was given to them
+using the "remote" command.
 
-   These fields pertain to any variable that contains a string of text. These 
-are often the variables, such as %speech%, which are provided to a script, but 
-can also be variables that have been created by the script, such as 
-%room.north% 
-
-When using field - The variable returns
- 
-strlen     - Returns the number of characters in the string.
-trim       - Returns the string without any leading or trailing whitespace. 
-             This is used to trim extra spaces from the beginning or end of a 
-             string.
-car        - Returns the first word of the string. For %text%="this is the 
-             string"; %text.car% will yield "this".
-cdr        - Returns all but the first word of the string, trimmed. For %text%=
-             "this is the string"; %text.cdr% will yield "is the string". 
-contains() - Subfield used for comparison.
-mudcommand - Returns the mud command the string is shorthand for. Used to make 
-             sure the command you react to is the one you want: For %text%="o"
-             %text.mudcommand% will yield "open". HELP MUDCOMMAND
-#d
-TRIGEDIT-VARIABLES-SPECIALS SPEC-VAR %SELF% RANDOM %RANDOM% %TIME% %PEOPLE% TRIGEDIT-SPEC-VAR %RANDOM.CHAR% %SPEECH% 
-
-Special Variables When using field - The variable returns:
- 
-self          - The mob, item, or room running the script. Normal fields may be 
-                used with this.
-instance.id   - Unique id of the adventure instance, if any.
-instance.location - The map/linked location of the instance, if any.
-instance.mob(vnum) - Finds a copy of a mob belonging to the instance.
-instance.name - Name of the adventure instance, if any.
-instance.start - The entry room of the instance, if any.
-people.<vnum> - This variable returns the number of people in the room 
-                specified via vnum.
-random.<#>    - This returns a number between 1 and the field value. 
-                %random.10% would return a number between 1 and 10.
-random.char   - This returns a random character in the room.
-random.ally   - Returns a random ally (only if fighting).
-random.enemy  - Returns a random enemy (only if fighting).
-skill.name(sk) - The full name of a skill abbreviated by sk.
-skill.validate(sk) - Returns true if sk is a valid skill.
-speech        - This variable is set to the complete phrase spoken by an actor 
-                that triggers a speech trigger.
-startloc      - A random starting location.
-time.<field>  - Field may be hour, day, month, or year. The returned value will 
-                be the current hour in the mud (0-23), day of the month (1-35),
-                month (1-16), or year respectively.
-timestamp     - Current unix timestamp.
-weather       - One of: sunny, cloudy, raining, lightning
-|%var%        - name's, someone's, your
-&&%var%        - it, you, he/she -- DOES NOT WORK
-*%var%        - it, you, him/her
-* object only
-'%obj%        - something, name
-#d
-TRIGEDIT-VARIABLES-ROOMS ROOM-VARIABLES %WEATHER% %ID% %NAME% %DIRECTION% TRIGEDIT-ROOM-VAR %VNUM% CONTENTS %CONTENTS% %ROOMS% ROOM-VARS 
-
-Rooms When using field - The variable returns:
- 
-building - The name of the building on the room, if any.
-contents - The id of the first obj in the room.
-coords   - The (x, y) location of the room on the map.
-crop     - The name of the crop on the map room, if any.
-distance(target) - The distance between this room and the target.
-direction(target) - The approximate direction to the target.
-empire_adjective - The owner empire's adjective form, if any.
-empire_id - The owner empire's id number, if any.
-empire_name - The owner empire's name, if any.
-(dir)    - The list of flags affecting the exit in the specified direction: 
-           north, south, east, west, up or down. The result is either:
-           subfield, "vnum"  - vnum of room in direction
-           subfield, "key"   - vnum of key to use
-           subfield, "bits"  - CLOSED LOCKED, etc.
-           subfield, "room"  - room variable for room in direction
-           no subfield: same as 'bits'. %self.north(key)%
-id       - The unique id of the room.
-name     - The name of the room.
-people   - The id of the first character in the room, or an empty return.
-sector   - The sector type of the room.
-template - The room template vnum, if any.
-vnum     - The room's vnum.
-weather  - current weather: sunny, cloudy, rainy, or lightning
-#d
-TRIGEDIT-VARIABLES-OBJECTS OBJ-VAR %SHORTDESC% TRIGEDIT-OBJ-VAR VAL0 VAL1 VAL2 VAL3 %OBJECT% OBJVARS OBJ-VARS
-
-Objects When using field - The variable returns:
- 
-carried_by   - The id of the character carrying the object, or an empty return.
-contents     - Gives the first object in a container.
-cost         - The cost (not rent cost) of the object.
-cost_per_day - The rent cost of the object
-id           - The unique id of the object.
-is_inroom    - Returns true if object is in room.
-is_name(str) - Returns true if str contains names for the object.
-material     - Name of what the object is made out of, e.g. GOLD.
-name         - The list of key words of the object.
-next_in_list - The id of the next object in the characters inventory, or an
-               empty return
-room         - Returns the room id the object is in.
-shortdesc    - The name of the object that players see.
-timer        - The timer of the object.
-type         - The type of object, such as WAND, ARMOR, or KEY.
-val0         - Returns the current value 0 of the object, defined here.
-val1         - Returns the current value 1 of the object, defined here.
-val2         - Returns the current value 2 of the object, defined here.
-vnum         - The virtual number of the object. 
-weight       - The weight of the object.     
-worn_by      - The id of the character wearing the object, or an empty return
-#d
-TRIGEDIT-VARIABLES-CHARACTERS HAS_ITEM CHAR-VAR TRIGEDIT-CHAR-VAR ACTOR.INV %ACTOR.INV% %ACTOR.ALIGN% %ACTOR.EQ% %ACTOR.ID% ACTOR.ID ACTOR.VNUM %ACTOR.VNUM% %ACTOR.NAME% IS_PC %IS_PC% %ACTOR% MASTER %VICTIM% SELF %SELF% MOBVARS MOB-VARS 
-
-When using field  - The variable returns:
- 
-add_mob_flag(flg) - Adds a mob flag to the mob. Also, remove_mob_flag().
-alias             - The list of aliases of the mob or the player name. 
-aff_flagged(flg)  - Checks if the actor has an AFF flag (e.g. ENTANGLED).
-affect()          - Checks the actor for the affect in the subfield 
-blood(amt)        - Returns current blood, or adds/removes blood if amt is set.
-can_afford(amt)   - Checks if the actor has enough coins of any converted type.
-can_gain_new_skills - Checks if the character can gain a new skill from 0.
-cancel_adventure_summon - Call this if a script teleports a player around, to
-                    prevent them from being teleported again if they were
-                    adventure-summoned.
-charge_coins(amt) - Charges the actor a number of coins.
-canbeseen         - True if the actor can be seen by the mob (always true 
-                    for non-mob triggers).
-canuseroom_ally(room) - Character can use the room as a member or ally (with
-                    no arg, defaults to current room).
-canuseroom_guest(room) - Character can use the room as a guest (with no arg,
-                    defaults to current room).
-canuseroom_member(room) - Character can use the room as a member (with no arg,
-                    defaults to current room).
-can_teleport_room(room) - Character can legally teleport in/out of the room
-                    (defaults to current room).
-cha               - The actor's Charisma.
-class             - The actor's class, as a string.
-crafting_level    - The actor's crafting level.
-dex               - The actor's Dexterity.
-disabled          - Returns TRUE if the actor is stunned or otherwise disabled.
-eq()              - This will return the identifier (id) for the object 
-                    equipped in position, if any. The specified position may be 
-                    either a position number (0-18) or the name of the location
-                    * checks all positions. HELP POSITIONS
-fighting          - The unique id of the mob fighting the actor.
-follower(name)    - The follower of the actor (as an id) with name supplied.
-gain_skill(sk, amt) - Gives the player points in a skill, or takes them.
-give_coins(amt)   - Gives the actor a number of coins.
-give_skill_reset(sk) - Grants the player a free skill reset in that skill.
-grt               - The actor's Greatness.
-has_item()        - Checks if the actor has a object (inventory, equipped and
-                    in containers) by subfield name/var/vnum.
-heshe             - Returns the correct pronoun (he/she/it).
-himher            - Returns the correct pronoun (him/her/it).
-hisher            - Returns the correct pronoun (his/her/its).
-health            - The current hit points of the actor.      
-home              - Room id of the player's home, if any.
-id                - The unique id of the actor.
-int               - The actor's intelligence.
-inventory()       - Returns the id of the first item in the actors inventory or 
-                    the id of the first object with vnum in the subfield. If
-                    the character doesn't have the item, an empty string is
-                    returned. %actor.inventory(1300)%. * checks for any inv. 
-is_ally(char)     - Returns true if the other character is a combat ally. Run
-                    this in two steps:
-                    eval test %%actor.is_ally(%char%)%%
-                    if %test% ...
-is_enemy(char)    - Returns true if the other character is a combat enemy.
-is_god            - Returns true if the actor is a God-level player.
-is_hostile(on/off)- If the ()'s are omitted, return value is whether or not the 
-                    actor is marked as a Hostile player.
-is_immortal       - Returns true if the actor is an immortal (admin).
-is_name(str)      - Returns true if str is a valid name for the actor.
-is_pc             - Checks if the actor is a player. Useful when you want a 
-                    trigger to fire on players and not mobs.
-level             - The actor's computed level (or scaled level, for mobs).
-mana              - The current mana points of the actor.
-mana(amount)      - Add/subtract mana on the actor.
-master            - The master of the actor (as an id), or an empty return.
-maxblood          - The maximum blood points of the actor.
-maxhealth         - The maximum hit points of the actor.
-maxmana           - The maximum mana points of the actor.
-maxmove           - The maximum movement points of the actor.
-mob_flagged(flag) - Returns TRUE if the NPC has the given flag, e.g. VAMPIRE.
-move              - The movement points of the actor.
-move(amount)      - Add/subtract movement points on the actor.
-name              - The actor's name (the short description for mobs).
-next_in_room      - The next actor in the room as a variable (id) nice to 
-                    use for loops, or an empty return.
-nohassle          - If TRUE, the player is an immortal with !HASSLE on.
-pc_name           - Player's name or mob's keyword list, rather than short desc
-plr_flagged(flag) - Returns TRUE if the player has the given flag (VAMPIRE).
-poison_immunity   - Returns TRUE if the player has Poison Immunity.
-position          - Returns Standing, Sitting, Fighting, etc.
-remove_mob_flag(flg) - Removes a mob flag from the mob. Also, add_mob_flag().
-resist_magical    - Returns the amount of magic resistance the player has.
-resist_physical   - Returns the amount of physical resistance the player has.
-resist_poison     - Returns TRUE if the player has Resist Poison.
-room              - The room the actor is in as a room variable. 
-sex               - The actor's sex, as a string: MALE, FEMALE, or NEUTRAL.
-skill()           - The percentage of learnedness in the skill subfield.
-str               - The actor's Strength.
-title()           - The actor's title. Subfield sets. Not used for mobs.
-trigger_counterspell - Fires the character's counterspell and returns 1 if
-                    so, or returns 0 if there was no counterspell.
-varexists()       - Returns 1 if global variable in subfield exists, 0 if not.
-                    Useful when dealing with remote vars on players.
-vnum              - The actor's virtual number.  
-wits              - The actor's Wits.
-<global>          - If the specified field is not a recognized one, the 
-                    actor's script global list is searched for a matching 
-                    global name. If found, its value will be returned. This 
-                    can is also used to get values of vars set on players;
-                    if %actor.varexists(testvar)%
-                      set testvar %actor.testvar%
-                    end
-                    * and then later in the script write it back:
-                    remote testvar %actor.id%
-#d
-EXPRESSIONS TRIGEDIT-EXPRESSIONS INCREMENTS MATHEMATICAL /= || \
-
-A false expression is any expression that evaluates to 0, or an empty string.
-A true expression is any expression that evaluates to anything other than a
-false expression. The following list are the recognized operators. The higher
-the operator is on the list, the higher the precedence. The expression is
-evaluated from left to right. Parenthesis can be used to group. 
-
-|Operator|         Name          | Examples  0=False 1=True  |
---------------------------------------------------------------
-|   ||   | logical or            | 0 || ( ) = 0; 5 || 0 = 1  |
-|   &&&&   | logical and           | 1 &&&& 0 = 0; 5 &&&& 3 = 1    |
-|   ==   | equivalence           | 5 == 3 = 0; dog == DoG = 1| 
-|   !=   | inequality            | 0 != Z = 0; dog != d = 1  | 
-|   <    | less than             | 4 < 3 = 0; 4 < 5 = 1      |
-|   >    | greater than          | 4 > 3 = 1; 4 > 4 = 0      |
-|   <=   | less than or equal    | 4 <= 3 = 0; 4 <= 5 = 1    |
-|   >=   | greater than or equal | 4 >= 3 = 1; 4 >= 4 = 1    |
-|   /=   | abbrev                | "concatenate" /= "con"    |
-|   ~=   | substring             | "Dark Forest" ~= "Forest" |
-|   -    | subtraction           | 15 - 10 = 5               |
-|   +    | addition              | 10 + 15 = 25              |
-|   *    | multiplication        | 10 * 20 = 400             |
-|   /    | division              | 100 / 20 = 5              |
-|   //   | remainder             | 5 // 4 = 1                |
-|   !    | negation              | !() = 1; !0 = 1; !dog = 0;| 
---------------------------------------------------------------
-#d
-ROOM-TRIGGERS TRIGEDIT-ROOM-TYPES
- 
- 1) Global       HELP TRIGEDIT-ROOM-GLOBAL
- 2) Random       HELP TRIGEDIT-ROOM-RANDOM
- 3) Command      HELP TRIGEDIT-ROOM-COMMAND
- 4) Speech       HELP TRIGEDIT-ROOM-SPEECH
- 5) Adventure Cleanup  HELP TRIGEDIT-ROOM-ADVCLN
- 6) Zone Reset   HELP TRIGEDIT-ROOM-ZONE       
- 7) Enter        HELP TRIGEDIT-ROOM-ENTER        
- 8) Drop         HELP TRIGEDIT-ROOM-DROP
-16) Ability      HELP TRIGEDIT-ROOM-ABILITY
-17) Leave        HELP TRIGEDIT-ROOM-LEAVE       
-18) Door         HELP TRIGEDIT-ROOM-DOOR       
-#d
-OBJ-TRIGGERS OBJECT-TRIGGERS TRIGEDIT-OBJ-TYPES
-
- 1) Global    HELP TRIGEDIT-OBJ-GLOBAL
- 2) Random    HELP TRIGEDIT-OBJ-RANDOM            
- 3) Command   HELP TRIGEDIT-OBJ-COMMAND             
- 6) Timer     HELP TRIGEDIT-OBJ-TIMER              
- 7) Get       HELP TRIGEDIT-OBJ-GET              
- 8) Drop      HELP TRIGEDIT-OBJ-DROP            
- 9) Give      HELP TRIGEDIT-OBJ-GIVE              
-10) Wear      HELP TRIGEDIT-OBJ-WEAR              
-12) Remove    HELP TRIGEDIT-OBJ-REMOVE              
-14) Load      HELP TRIGEDIT-OBJ-LOAD              
-17) Leave     HELP TRIGEDIT-OBJ-LEAVE              
-#d
-MOB-TRIGGERS MOBILE-TRIGGERS TRIGEDIT-MOB-TYPES
-
- 1) Global      HELP TRIGEDIT-MOB-GLOBAL              
- 2) Random      HELP TRIGEDIT-MOB-RANDOM          
- 3) Command     HELP TRIGEDIT-MOB-COMMAND           
- 4) Speech      HELP TRIGEDIT-MOB-SPEECH          
- 5) Act         HELP TRIGEDIT-MOB-ACT           
- 6) Death       HELP TRIGEDIT-MOB-DEATH          
- 7) Greet       HELP TRIGEDIT-MOB-GREET           
- 8) Greet-All   HELP TRIGEDIT-MOB-GREET-ALL          
- 9) Entry       HELP TRIGEDIT-MOB-ENTRY          
-10) Receive     HELP TRIGEDIT-MOB-RECEIVE          
-11) Fight       HELP TRIGEDIT-MOB-FIGHT          
-12) HitPrcnt    HELP TRIGEDIT-MOB-HITPRCNT          
-13) Bribe       HELP TRIGEDIT-MOB-BRIBE          
-14) Load        HELP TRIGEDIT-MOB-LOAD          
-15) Memory      HELP TRIGEDIT-MOB-MEMORY          
-16) Ability     HELP TRIGEDIT-MOB-ABILITY          
-17) Leave       HELP TRIGEDIT-MOB-LEAVE          
-18) Door        HELP TRIGEDIT-MOB-DOOR                    
-17) Leave-All   HELP TRIGEDIT-MOB-LEAVE-ALL
-18) Fight-Charmed  HELP TRIGEDIT-MOB-FIGHT-CHARMED
-#d
-TRIGEDIT-OBJ-GET
-
-Activated any time a character attempts to pick up this object.
- 
-Numeric Arg : percentage chance this trigger will activate.
-Argument    : not used.
-
-If used with a return 0 the character will fail to pick the object up.
-
-Variables:
-%actor% - the character trying to get the object
-#d
-TRIGEDIT-OBJ-DROP DROP-TRIGGER TRIG-OBJ-DROP
-
-Activated any time a character attempts to drop this object. This includes
-putting the object into a container.
-
-If used with a return 0 the character will fail to drop the object.
- 
-Numeric Arg : percent chance this trigger will be activated.
-Argument    : not used.
-
-Variables:
-%actor% - the character attempting to drop the object
-%self% - the item being dropped. 
-#d
-TRIGEDIT-OBJ-GIVE
- 
-Activated when a player attempts to give this object to another character.
- 
-If used with a return 0 the character will fail to give the object.
-
-Numeric Arg : percent chance this trigger will be activated.
-Argument    : not used.
-
-Variables:
-%actor% - the character giving away the object
-%victim - the potential recipient of the object
-#d
-TRIGEDIT-OBJ-WEAR
-
-Activated each time a character attempts to wear the
-object.
- 
-Numeric Arg : not used.
-Argument    : not used.
-
-Variables:
-%actor% - the character attempting to wear the object.
-#d
-TRIGEDIT-OBJ-REMOVE
-
-Activated each time a character tries to remove the object.
-
-Numeric Arg : not used.
-Argument    : not used.
-
-With a return 0 the object is not removed.
-
-Variables:
-%actor%  - the character attempting to remove the object
-#d
-TRIGEDIT-OBJ-LOAD 
- 
-Activated when the object is created. Can be used with the global trigger.
- 
-Numeric Arg : percent chance this trigger will be activated.
-Argument    : not used.
-#d
-TRIGEDIT-OBJ-ABILITY
-
-Activated when the obj is targetted by an ability.
- 
-Numeric Arg : percent chance this trigger will be activated. 
-Argument    : not used.
-
-Used with return 0 will cause the ability to fail.
-
-Variables: 
-%actor%       - the user of the ability
-%ability%     - the number of the ability
-%abilityname% - the name of the ability
-#d
-TRIGEDIT-OBJ-LEAVE 
- 
-Activated when someone leaves the room the obj is in.
-
-Numeric Arg : percent chance this trigger will be activated. 
-Argument    : not used.
-
-Used with return 0 will prevent the player from leaving the room.
-
-Variables: 
-%actor%     - the character leaving the room. 
-%direction% - the direction the character is leaving to.
-#d
-TRIGEDIT-OBJ-CONSUME
-
-Activated any time a character attempts to consume (eat, drink, or quaff) this 
-object. If used with a return 0 the character will fail to consume the object.
-
-Numeric Arg : percent chance this trigger will be activated.
-Argument    : not used.
-
-Variables:
-%actor% - the character attempting to consume the object.
-%self% - the object being consumed.
-%command% - either eat, drink, or consume.
-#d
-TRIGEDIT-ROOM-GLOBAL
-
-Not a trigger type by itself; used in conjunction with Random HELP 
-TRIGEDIT-ROOM-RANDOM. While Random triggers only trigger if players 
-are in the same room, Global Random triggers will trigger regardless. 
- 
-Numeric Arg : not used.
-Argument    : not used.
-#d
-TRIGEDIT-ROOM-RANDOM
- 
-No specific event needs to occur for this trigger to be activated. Every 13 
-seconds this trigger has a chance to run.
- 
-Numeric Arg : 0-100: percentage chance this trigger will run when its time 
-              comes due.
-Argument    : not used.
-
-See Also: RANDOM-TIMING
-#d
-RANDOM-TIMING TIMING
-
-Since random triggers fire every 13 seconds you can set how often the trigger
-fires by modifying numeric arg to the following values:
-
-1%   = 22 minutes
-2%   = 11 minutes
-5%   =  4 minutes
-10%  =  2 minutes
-20%  =  1 minute
-50%  = 26 seconds
-100% = 13 seconds
-
-See Also: TRIGEDIT-OBJ-RANDOM, TRIGEDIT-MOB-RANDOM, TRIGEDIT-ROOM-RANDOM
-#d
-TRIGEDIT-ROOM-ADVCLN TRIGEDIT-ROOM-ADVENTURE-CLEANUP "ADVENTURE CLEANUP"
-
-Activated when an adventure is removed from the world, on the room that the
-adventure was linked to (usually on the map or in a building).
-
-Used with return 0 will prevent further triggers (for example, if you terraform
-the room).
-
-Note: This trigger ONLY works when attached to an adventure directly.
-
-Note: You won't have access to %instance% variable information anymore.
-
-Numeric Arg : percent chance this trigger will be activated. 
-
-Variables:
-%room%     - the room it was activated on.
-#d
-TRIGEDIT-ROOM-COMMAND
-
-Activates when commands are performed in the room.
-Does not work for immortals with !hassle.
-
-String: The command to catch. If you are using a real game command, put the
-   entire word in here; the trigger will also match abbreviations. If you are
-   instead adding a new command, it will only work if the player types an exact
-   match OR the player abbreviates your command with something that isn't an
-   abbreviation for a real command ("c" abbreviates the real command "chop", 
-   not a script command like "canoodle").
-
-If 0 is returned by the trigger, character will receive the same message as 
-if the trigger did not exist, and any other command triggers will be checked.
-
-Variables:
-%actor% - the character issuing the command
-%cmd%   - the exact command (without arguments) issued
-%arg%   - the arguments, if any, following the command
-#d
-TRIGEDIT-ROOM-SPEECH
-
-Activates when matching text is spoken by a character in the room
- 
-Numeric Arg : 0: argument is a substring that must be found in the speech to cause a
-                 match. 
-              1: argument is a list of words, any of which found in the speech will
-                 activate the trigger.
-Argument    : a phrase or wordlist to be matched.
-
-Variables:
-%actor%  - the character whose speech activated the trigger
-%speech% - the entire phrase spoken
-#d
-TRIGEDIT-ROOM-ZONE-RESET TRIGEDIT-ROOM-ZRESET TRIGEDIT-ROOM-LOAD
- 
-Activated when the zone this room belongs to is reset.
- 
-Numeric Arg : percentage chance this trigger will activate.
-Argument    : not used.
-#d
-TRIGEDIT-ROOM-ENTER TRIGEDIT-ROOM-ENTRY TRIGEDIT-ENTRY TRIG-ROOM-ENTRY
-
-   This trigger is checked whenever someone enters the room. This trigger is
-checked just before the character enters the room, so if you want the action
-to occur in the room the character is entering, you must use a wait.
- 
-Numeric Arg : percentage chance this trigger will activate.
-Argument    : not used.
-
-If used with a return 0 the character will fail to enter the room.
-
-Variables:
-%actor%     - the character trying to get the object
-%direction% - the direction the character came from
-#d
-TRIGEDIT-ROOM-DROP
-
-Activated any time a character attempts to drop an item in this room.
-
-If used with a return 0 the character will fail to drop anything.
- 
-Numeric Arg : percent chance this trigger will be activated.
-Argument    : not used.
-
-Variables:
-%actor%  - the character attempting to drop the object
-%object% - the object the character is attempting to drop
-#d
-TRIGEDIT-ROOM-ABILITY
-
-Activated if an ability is used in the room.
-
-Numeric Arg : percent chance this trigger will be activated. 
-Argument    : not used.
-
-Used with return 0 will cause the ability to fail.
-
-Variables: 
-%actor%       - the user of the ability
-%ability%     - the number of the ability
-%abilityname% - the name of the ability
-%vict%        - the target (mob/player) of the ability, if any.
-%obj%         - the target (object) of the ability, if any.
-#d
-TRIGEDIT-ROOM-LEAVE 
-
-Activated when someone leaves the room.
-
-Numeric Arg : percent chance this trigger will be activated. 
-Argument    : not used.
-
-Used with return 0 will prevent the player from leaving the room.
-
-Variables: 
-%actor%     - the character leaving the room. 
-%direction% - the direction the character is leaving to.
-#d
-TRIGEDIT-ROOM-DOOR TRIGEDIT-DOOR
- 
-Activated when a player uses the door specific commands: 
-'close, open, pick, lock, unlock' on a door. 
-
-Used with return 0 will prevent the command from executing.
-
-Numeric Arg : percent chance this trigger will be activated. 
-Argument    : not used.
-
-Variables:
-%actor%     - the character using the command. 
-%direction% - the direction the command is used on. 
-%cmd%       - the specific command activating the trigger  
-#d
-TRIGEDIT-MOB-RANDOM TRIGEDIT-RANDOM TRIG-MOB-RANDOM TRIG-RANDOM
- 
-No specific event needs to occur for this trigger to be activated. Every 13 
-seconds this trigger has a chance to run.
- 
-Numeric Arg : 0-100: percentage chance this trigger will run when its time 
-              comes due.
-Argument    : not used.
-
-See Also: RANDOM-TIMING
-#d
-TRIGEDIT-MOB-COMMAND
-
-Activates when commands are performed in the same room as the mobile.
-Does not work for immortals with !hassle.
-
-String: The command to catch. If you are using a real game command, put the
-   entire word in here; the trigger will also match abbreviations. If you are
-   instead adding a new command, it will only work if the player types an exact
-   match OR the player abbreviates your command with something that isn't an
-   abbreviation for a real command ("c" abbreviates the real command "chop", 
-   not a script command like "canoodle").
-
-If 0 is returned by the trigger, character will receive the same message as 
-if the trigger did not exist, and any other command triggers will be checked.
-
-Variables:
-%actor% - the character issuing the command
-%cmd%   - the exact command (without arguments) issued
-%arg%   - the arguments, if any, following the command
-#d
-TRIGEDIT-MOB-SPEECH
-
-Activates when matching text is spoken by a character in the same room as the 
-mobile.
- 
-Numeric Arg : 0: argument is a substring that must be found in the speech to cause a
-                 match. 
-              1: argument is a list of words, any of which found in the speech will
-                 activate the trigger.
-Argument    : a phrase or wordlist to be matched. Use * to make it match any
-              speech.
-
-Variables:
-%actor%  - the character whose speech activated the trigger
-%speech% - the entire phrase spoken
-#d
-TRIGEDIT-MOB-ACTION ACTIONS
-
-Activated when a matching action is performed by a character in the room. 
-Actions are any text output via the act() function, and include most output 
-from the mud. (Notable exclusions are character say's, and immortal echo's.) 
- 
-Numeric Arg : 0: argument is a substring that must be found in the text to cause a
-                 match. 
-              1: argument is a list of words, any of which found in the text will
-                 activate the trigger.
-Argument    : a phrase or wordlist to be matched.
-
-Variables:
-%actor%  - the character causing the trigger to activate
-%victim% - the character, if any, on the receiving end of the action 
-%object% - the object, if any, used in the action
-%target% - the target of the action, if any
-%arg%    - the entire phrase
-#d
-TRIGEDIT-MOB-DEATH
-
-Activated when this mobile dies.
- 
-Numeric Arg : percent chance this trigger will be activated upon the mobile's death.
-Argument    : not used.
-
-If used with a return 0 no death cry will be heard from the mobile.
-
-Variables:
-%actor% - the character killing this mob, if any
-#d
-TRIGEDIT-MOB-GREET GREET
-
-Activated when a player attempts to enter the room and the character is visible 
-to the mobile with this trigger. Does not work for poofins.
- 
-Numeric Arg : percent chance this trigger will be activated.
-Argument    : not used.
-
-Variables:
-%actor%     - the character entering the room
-%direction% - the direction the character came from
-#d
-TRIGEDIT-MOB-GREET-ALL GREET-ALL TRIGEDIT-MOB-GREETALL 
- 
-Identical to greet except the mobile does not have to see the entering character 
-for this trigger to activate. Does not work for poofins.
- 
-Numeric Arg : percent chance this trigger will be activated.
-Argument    : not used.
-
-Variables:
-%actor%     - the character entering the room
-%direction% - the direction the character came from
-#d
-TRIGEDIT-MOB-ENTRY ENTRY TRIGEDIT-ENTRY TRIGGER-ENTRY 
-
-Activated each time the mobile it is attached to enters a room.
- 
-Numeric Arg : percent chance this trigger will be activated.
-Argument    : not used.
-#d
-TRIGEDIT-MOB-RECEIVE TRIG-MOB-RECEIVE
-
-Activated any time an object is given to the mobile.
-
-Numeric Arg : percent chance this trigger will be activated.
-Argument    : not used.
-
-With a return 0 the object is not transferred to the mobile.
-
-Variables:
-%actor%  - the character handing the object to the mobile
-%object% - the object being handed over           
-#d
-TRIGEDIT-MOB-FIGHT TRIGEDIT-MOB-FIGHT-CHARMED
- 
-Activated each round of fighting, after the mobile has had all of its attacks.
-
-Numeric Arg : percent chance this trigger will be activated.
-Argument    : not used.
-
-Variables:
-%actor% - the character this mobile is fighting
-
-Using the Fight-Charmed type will work even on charmed creatures, like
-familiars.
-#d
-TRIGEDIT-MOB-HITPERCENT TRIGEDIT-MOB-HITPRCNT 
- 
-Activated during combat when the mobiles hit point percentage drops below a 
-specified percentage.
- 
-Numeric Arg : percentage of hitpoints at the threshold of allowing this trigger to
-              activate.
-Argument    : not used.
-
-Variables:
-%actor% - the character this mobile is fighting
-#d
-TRIGEDIT-MOB-BRIBE
-
-Activated when a character gives a specified amount of coins to the mobile.
- 
-Numeric Arg : minimum number of misc coins required to activate this trigger.
-Argument    : not used.
-
-Variables:
-%actor% - the character providing coins to the mobile
-%amount% - number of coins given
-#d
-TRIGEDIT-MOB-LOAD TRIGEDIT-LOAD TRIG-LOAD 
- 
-Activated when this mobile is created.
- 
-Numeric Arg : percent chance this trigger will be activated.
-Argument    : not used.
-#d
-TRIGEDIT-MOB-MEMORY
- 
-Activated when the mobile encounters a character in its memory (mremember) 
-list and there is no over-riding command. Any mobile making use of mremember 
-MUST have a memory script, even if it will never be called.
- 
-Numeric Arg : percent chance this trigger will be activated.
-Argument    : not used.
-
-Variables:
-%actor% - the character being remembered
-#d
-TRIGEDIT-MOB-ABILITY
-
-Activated when the mob is targetted by an ability.
- 
-Numeric Arg : percent chance this trigger will be activated. 
-Argument    : not used.
-
-Used with return 0 will cause the ability to fail.
-
-Variables: 
-%actor%       - the user of the ability
-%ability%     - the number of the ability
-%abilityname% - the name of the ability
-#d
-TRIGEDIT-MOB-LEAVE TRIGEDIT-MOB-LEAVE-ALL
-
-Activated when someone leaves the room the mob is in. The difference between
-'Leave' and 'Leave-All' is that Leave only works if the mob can see the person.
-
-Numeric Arg : percent chance this trigger will be activated. 
-Argument    : not used.
-
-Used with return 0 will prevent the player from leaving the room.
-
-Variables: 
-%actor%     - the character leaving the room. 
-%direction% - the direction the character is leaving to.
-#d
-TRIGEDIT-MOB-DOOR 
- 
-Activated when the mobile is in the same room as someone using the door
-specific commands 'close, open, pick, lock, unlock' on a door. 
-
-Used with return 0 will prevent the command from executing.
-
-Numeric Arg : percent chance this trigger will be activated. 
-Argument    : not used.
-
-Variables:
-%actor%     - the character using the command. 
-%direction% - the direction the command is used on. 
-%cmd%       - the specific command activating the trigger  
-#d
-TRIGEDIT-OBJ-GLOBAL
-
-Not a trigger type by itself; used in conjunction with Random HELP 
-TRIGEDIT-OBJ-RANDOM. While Random triggers only trigger if players 
-are in the same room, Global Random triggers will trigger regardless. 
- 
-Numeric Arg : not used.
-Argument    : not used.
-#d
-TRIGEDIT-OBJ-RANDOM
- 
-No specific event needs to occur for this trigger to be activated. Every 13 
-seconds this trigger has a chance to run.
- 
-Numeric Arg : 0-100: percentage chance this trigger will run when its time 
-              comes due.
-Argument    : not used.
-
-See Also: RANDOM-TIMING
-#d
-TRIGEDIT-OBJ-COMMAND TRIGEDIT-OBJECT-COMMAND TRIG-OBJ-COMMAND
-
-Activates when commands are performed in the same room as the object.
-Does not work for immortals with !hassle.
-
-Location: Where the item must be in order to trigger (inventory, worn, room).
-String: The command to catch. If you are using a real game command, put the
-   entire word in here; the trigger will also match abbreviations. If you are
-   instead adding a new command, it will only work if the player types an exact
-   match OR the player abbreviates your command with something that isn't an
-   abbreviation for a real command ("c" abbreviates the real command "chop", 
-   not a script command like "canoodle").
-
-If 0 is returned by the trigger, character will receive the same message as 
-if the trigger did not exist, and any other command triggers will be checked.
-
-Variables:
-%actor% - the character issuing the command
-%cmd%   - the exact command (without arguments) issued
-%arg%   - the arguments, if any, following the command
-#d
-TRIGEDIT-OBJ-TIMER
- 
-Activated when the timer for this object has expired. The otimer command may 
-be used in a script to set the object's timer. Timer value of 1 equals about
-1 minute. 
- 
-Numeric Arg : not used.
-Argument    : not used.
-
-If 0 is returned by the trigger, or the object is purged, it will block further
-execution and the normal object decay extraction. If you intend for the object
-to become permanent after the timer expires, you should change its timer to -1
-and return 0 from this trigger.
-#d
-TRIGEDIT-ADVANCED
-
-WARNING: long and verbose (wordy)
-
-To add life to the worlds circlemud uses something called scripts (or triggers). 
-There are three major types of game objects which can use scripts. These are 
-mobiles (mobs), objects, and rooms (world objects). Examples of scripts in the 
-game are: 
-
-Cityguards screaming 'PROTECT THE INNOCENT! BANZAI! CHARGE!', (a mob script).
-A portal that teleports players when they enter it (an object script).
-A room that creates a new exit when a player pulls a lever (a room script).
-
-Each game item (room, mobile, or object) can have a script. A script is composed
-of one or more triggers, which work in collaboration to define complex actions 
-of the game object. A trigger is a definition of an event that the script watches 
-for, and list of commands to execute when that event occurs. 
-
-There are several different types of triggers. Each trigger type determines
-when the trigger will be checked. For example, a mob speech trigger is checked
-every time a character who is in the same room as the mob with the trigger uses
-the 'say' command. A room enter trigger is checked every time a character
-enters the room. There are two parts of the trigger used to determine if the
-trigger's commands are executed when it is checked, the argument and numerical
-argument (NArg). Some triggers use both; some may use only one of the two; and
-some may use neither. The interpretation of these two fields is dependant on
-the type, and is described in more detail on the webpage and in the help files.
-
-When an event in the game occurs, each script in the room where the event 
-occurred is checked to see if there are any triggers which are supposed to
-react to that event. A trigger currently running (such as from a 'wait'
-command) is skipped. Only one trigger of each script will be run by a single
-event. For example, if there are two triggers on a script, and both are the
-same type with the same arguments, the second trigger will only be run if the
-first one is already running. 
-
-Triggers can be of more than one type. For example, to simulate a cursed item,
-a trigger on the object could be of types drop, give, and remove. A more common
-combined trigger would have both random and global types, so the random trigger
-would be checked even when the zone was empty. Combined triggers must have the
-same argument and numerical argument. 
-
-The other component of a trigger is the command list. This is a series of
-commands that are executed when the trigger is run. Commands are chosen from
-two groups of commands, script specific commands and game commands. Script
-specific commands are those commands that only the script interpreter can
-recognize. These include flow control commands (such as if, elseif, else, end,
-halt, wait, and return), and commands to manipulate variables (such as set,
-eval, unset, and global). Game commands are those commands that a player could
-issue from their command line as well as special commands added for mobiles,
-objects, and rooms.
-#d
-TRIGEDIT-ADVANCED-TUTORIAL
-
-This section is a step by step tutorial to explain the writing of scripts 
-(triggers). It goes through the script creation process developing a practical
-script. 
-
-Decide what you want the script to do. 
-   Consider how your mob, item, or room should behave. Doing this before
-worrying what can be done prevents you from limiting yourself to what you have
-seen other scripts do, and allows you to produce a more interesting script. 
-  
-For example, I want to create a gate guard for a small walled town. The ruler
-of the town has decided that each group of people will be charged ten coins to
-enter his domain. The gate guard must notify travelers of the cost to enter,
-collect the money, allow people who have payed to enter the city, and close the
-gate after them. This will be a mob script. 
-  
-Decide what trigger types you need.
-   Look through the section on triggers to see the currently available trigger
-types. New trigger types can be added by one of the implementors if needed. All
-types are listed in the help files HELP TRIGEDIT-TYPE.
-  
-Our gate guard needs to react to five different events: 
-
-1. A character entering the room from the south, the road leading away from the
-   town, needs to be informed of the price for entrance. This will be a greet
-   trigger. 
-2. When the guard is given ten or more coins, the guard must open the gate. This
-   is done by a bribe trigger. 
-3. If the guard is given less than ten coins, the guard needs to inform the
-   character that it is insufficient. This is also a bribe trigger. 
-4. When someone passes through the gate into the city, the guard must close the
-   gate behind them. This is done with an act trigger. 
-5. When the gate is opened from the other side, the guard must eventually close
-   it. This will be another act trigger. 
-
-Determine the argument and the numerical argument of the triggers. Read the 
-specifications on trigger types, and decide what the values for argument and 
-Numeric Arg must be for the trigger to react appropriately to the events.
-  
-HELP TRIGEDIT-MOB-GREET
-Argument    : not used 
-Numeric Arg : the percent chance that the trigger is run when checked. Since I 
-              want it run every time someone enters the room, it should be 100. 
-
-HELP TRIGEDIT-MOB-BRIBE
-Argument    : not used
-Numeric Arg . minimum number of misc coins required to activate this trigger.
-              The guard should only open the gate when given 10 coins, so it
-              should be 10. 
-
-For the second bribe trigger, the guard must respond whenever someone gives 
-him 1 or more coins, so Numeric Arg should be 1. 
-
-HELP TRIGEDIT-MOB-ACT
-Argument    : the text the mob should react to. Since I want the guard to 
-              react to a character going north, argument should be "leaves 
-              north." 
-Numeric Arg : Since argument is a phrase, NArg should be 0. 
-
-The second act trigger should trigger on text "The gate is opened from the other
-side", so it is triggered whenever someone opens the gate from inside the town.
-Again, Numeric Arg should be 0 for a phrase. 
-  
-Write the list of commands for the trigger.
-This is the most complex and time consuming part of a trigger to write. The
-valid commands are explained in the help files and on the webpage. Variables 
-and expressions are also used in the commands list.
-
-For the greet trigger, I want the guard to inform anyone entering from the
-south how to get into the city. First, I must check if the character is
-entering from the south. If they are entering from that direction, the guard
-should tell the character the cost of entry. The command list for this trigger
-will be as follows: 
-  
-if (%direction% == south) 
- wait 1 sec
- emote snaps to attention as you approach. 
- wait 1 sec
- say Admittance to the city is 10 coins. 
-end 
- 
-Checking the specifications of the greet trigger, we see that the variable
-"direction" is set to the direction that the character entered. The percent
-sign surrounding direction means it is a variable. The two equal signs together
-compare the value of the variable to the word "south". If these are equal, the
-statements between this line and the line "end" will be executed. The "wait 1 sec"
-pauses briefly while the character finishes his move. (The greet trigger is
-actually checked before the character enters the room, so if we did not have
-this line, he or she would never see the guard snap to attention.) After
-another brief pause, the guard announces the cost to enter the town. The
-indentations are not needed, but make it easier to read. 
-
-The guard must open the gate if ten or more coins were given to him. The
-command list looks like this: 
-  
-wait 1 sec
-unlock gate 
-open gate 
-wait 10 sec 
-close gate 
-lock gate 
-  
-After a brief wait (so everything doesn't happen at once), the guard unlocks
-the gate and opens it. The guard will close the gate after 10 seconds, even if
-no one passes through it. 
-
-The guard must inform the character that his payment was not enough, and
-return the money. The commands list will be: 
-  
-wait 1 sec
-say This is not enough! 
-give %amount% coins %actor.name% 
-  
-For the line "give %amount% coins %actor.name%", the variables amount and actor,
-both set when the bribe trigger is called, are substituted into the line before
-the guard performs the command. The gate guard returns the number of coins he
-was given. 
-
-For the first act trigger, I want the guard to close and lock the gate after
-someone passes through the gate. The guard should wait briefly so he isn't
-shutting the gate on the character's back, and close and lock the gate. The
-command list will be: 
-
-wait 1 sec
-close gate 
-lock gate 
-  
-For the last act trigger we want the guard to close and lock the gate when it 
-is opened from the other side. The commands will look like: 
-  
-wait 5 sec 
-close gate 
-lock gate 
-  
-The "wait 5 sec" gives time for someone on the other side to get through the gate. 
-Decide the order of the triggers. The triggers are checked from first to last.
-If there are two triggers of the same type, the first one run will be the only
-one run. 
-
-There are two sets of triggers which are the same type, the bribe triggers and
-the act triggers. If the bribe trigger with the Numeric Arg of 1 is first, the 
-other trigger would never be run, since ten or more coins is still one or more. 
-In order for my triggers to work right, the trigger with Numeric Arg of 10 must 
-be before the trigger with the NArg of 1 in the list. The other possible 
-conflict is with the act triggers. Since both have arguments that will not 
-occur together, the order does not matter. 
-
-Create the trigger file.
-Simply use trigedit to create your triggers and they will be saved for you
-when you exit the editor. 
-
-Put the triggers into the game.
-In the OasisOLC medit / redit / oedit menus, use menu option S to enter the
-script editor. Then select the triggers that will be part of your script. Note,
-that order is important! If there are two possible triggers that could both be
-executed at the same time, only the first one found in the list will be
-activated. In this example, it means place the bribe trigger for 10 or more
-coins BEFORE the bribe trigger for 1 coin. 
-
-Test the script.
-You should see how the script actually works in the game, and watch other
-people interact with it. Often you will see ways you can improve it. 
-
-GOTO 1310 and work your way north to test these out. Triggers 4-8.
-#d
-TRIGEDIT-MOB-GLOBAL
-
-Not a trigger type by itself; used in conjunction with Random HELP 
-TRIGEDIT-MOB-RANDOM. While Random triggers only trigger if players 
-are in the same room, Global Random triggers will trigger regardless. 
- 
-Numeric Arg : not used.
-Argument    : not used.
-#d
-DG-SCRIPTS DG_SCRIPTS DGSCRIPTS 
-
-Stands for Death Gate scripts and are named after the original MUD they came from.
-See: TRIGEDIT
-#d
-TRIGEDIT-MOB-TUTORIAL TRIGEDIT-TUTORIAL
-
-Mob trigger tutorial
-This mini-quest is setup in TBA as an example. GOTO 1310 and work your way north
-with nohassle off.
- 
-The following 7 steps should give you a general idea about what to do, and how to go 
-about making small quests in the dg scripting language. This example is concentrated 
-on quests involving mobs. 
-
-The process can be broken down to the following:  
-   1. Decide what you want the script to do.
-   2. Make corresponding objects and mobs.
-   3. Split up the quest.
-   4. Find corresponding trigger types.
-   5. write the scripts for the triggers.
-   6. Attach the scripts - permanently
-   7. Done ? 
-   
-1. Decide what you want the script to do.  
-   In this example, we want to make a small mini quest in an area. The quest 
-will work like this: When you enter the room, where the first mob is, it will 
-start to tell a tale. In this tale, you are instructed to perform a task, in 
-this case, kill an evil ogre, that lives in a nearby forest. As proof of the 
-kill, you must bring back the ogre's apprehension to the questgiving mob. 
-
-2. Make corresponding objects and mobs.  
-   Ingredients for this quest:
-      1 Questgiver mob - I've chosen 'the questmaster' - vnum 1310
-      1 Target mob - In this case 'an apprehensive Ogre' - vnum 1311
-      1 Quest object - 'some apprehension' - trash object, vnum 1300 
-
-3. Split up the quest.  
-   Next thing to do is look at the different steps involved with the quest. In 
-this example, we have three steps: 
-   Player entering room -> tell story 
-   Player finds ogre -> load object (Do not just want the mob to carry it) 
-   Player gives questmaster apprehension -> reward player 
-
-4. Find corresponding trigger types.  
-   Having split the quest up also means we reasonably easy can decide what 
-kinds of triggers we need - in this case: 
-   mob GREET trigger (attached to questmaster) 
-   mob DEATH trigger (attached to ogre) 
-   mob RECEIVE trigger (attached to questmaster) 
- 
-5. write the scripts for the triggers.  
-    Up to this point, neither trigedit or the script editors have been used. 
-All the info needed is in the help files and on the webpages. Notice most of
-the work required is PLANNING! You must know exactly what you want to do before
-you do it. Now is the time to fire up trigedit and start editing the triggers. 
-Let's give the first one vnum 0, and edit it to look like the script below: 
-
-* we don't want him to tell this to mobs. vnum -1 is reserved for players.
-if %actor.vnum% == -1
-  * only greet players coming from the south.
-  if %direction% == south
-    *wait 1 second, always give the player time before you start sending text.
-    wait 1 sec
-    say Can you help me, %actor.name%?
-    wait 1 sec
-    say An apprehensive ogre has something of mine.
-    wait 1 sec
-    say If you slay him I'll give you all the coins I can spare.
-    wait 1 sec
-    say Please, bring me the apprehension he has stolen.
+Example:
+  if %actor.varexists(quest_progress)%
+    eval progress %actor.quest_progress%
+  else
+    eval progress 0
   end
-end
+  ...
+  eval quest_progress %progress% + 1
+  remote quest_progress %actor.id%
 
-The script above will be executed every time anyone enters the room. If the 
-person entering is a mobile, the if check at the beginning will stop the 
-execution. Note, that I've named the trigger as I did above. ALWAYS include
-the VNUM of where you plan on attaching the trigger. Also, give it a name so 
-it is easy to see what part of the quest this trigger handles. The second 
-script is very simple.
-
-say you got the best of me %actor.name%.
-* load some apprehension
-%load% obj 1300
-* reload the mob for the next questor
-%load% mob 1311
-
-The above script will be executed when the mob is killed - just before the 
-death cry. The last script just needs to check if the object handed over is 
-the correct one. Let's see it, here with vnum 2: 
-
-* check if this was indeed the right object
-if %object.vnum% == 1300
-  wait 1 sec
-  say Thank you, %actor.name%
-  %send% %actor% %self.name% gives you a gold piece.
-  %echoaround% %actor% %actor.name% is rewarded for his valor.
-  nop %actor.give_coins(1)%
-  wait 5 sec
-  %purge% obj 1300
-else
-  * this wasn't the right object - don't accept it
-  say I don't want that - bring me back my apprehension.
-  return 0
-end
-
-The script above is pretty self explanatory, but to clarify a bit: First check 
-if the object is the correct vnum, then give the reward, and send messages to 
-the player and others in the room. If it wasn't the object, reject it, and use 
-the return value of the script to prevent the object being passed over. Lastly, 
-and very importantly, 'end' ends the if. 
-
-6. Attach the scripts - permanently  
-   Proceed and add the scripts to the two mobiles. And add the trigger vnum
-   3 to the ogre in a similar manner. 
-
-7. Done ?  
-   The scripts are now attached to the correct mobs, and the players of your 
-mud can now take the quest whenever they wish. This is a great time for 
-considering improvements to the little quest: 
-
-Balance issues: 
-   Should players get a smaller reward if they perform the quest many times ? 
-   Should it be limited to 1 quest per player or 1 per reboot ? 
-Gameplay issues: 
-   Perhaps other mobs in town should tell the player to go see the old man ? 
-   Should the ogre always load the object, or only when people know he has it ? 
-   Are there other mobs who would like to pay for that object ? 
-
-The above list is just a few examples. All of them could be implemented, but 
-it is beyond the scope of this tutorial. 
-
-
-12DEC01 - mob tutorial by Welcor
-04OCT02 - updated/modified by Rumble
-#d
-ATTACH
-
-Builder's working on their trial vnum do not need to learn this command, yet.
-
-Usage:  attach mob {trigger vnum/name} {mob name} [location]
-        attach obj {trigger vnum/name} {obj name} [location]
-        attach room {trigger vnum/name} {room vnum} [location]
-
-   Attach lets you attach a script to one instance of a mob/obj/room, for
-testing or other purposes. The command only attaches the script once,
-and will not last over a reboot (or crash).
-
-The 'location' is what number in the triggerlist the trigger will assume.
-It is important to first attach a trigger to test before you manually add it
-through oedit/medit/redit. 
-
-Examples:
-attach room 14500 14520 - Attaches room trigger 14500 to room 14520.
-attach mob 1332 santa   - Attaches mob trigger 1332 to mob 1308 (santa).
-attach obj 1480 sword   - Attaches obj trigger 1480 to a sword. 
-
-See also: DETACH, TRIG-ATTACH, TRIG-DETACH, OLC, TRIGEDIT, STAT, ROOMFLAGS
-#d
-DETACH
-
-Usage:  detach [mob | obj] {target name} {trigger name/vnum | 'all'}
-        detach room {target vnum | '.'} {trigger name/vnum | 'all'}
-
-   Detach removes a script to one instance of a mob/obj/room, for testing or 
-other purposes. The command only removes the trigger temporarily, until the
-room/obj/mob is reloaded via reboot, zreset, load.
-
-Use the optional arguments 'mob' and 'obj' to differentiate if more entities
-with the same alias are in the room.
-
-Examples:
-detach room 14500 14520 - remove trigger 14500 from room 14520.
-detach room all         - removes all triggers from a room.
-detach santa 1332       - detach trigger 1332 from mob 1308 (santa).
-detach mob santa all    - detach all triggers from Santa.
-detach santa all        - Same as above.
-detach sword 1300       - detach trigger 1300 from sword.
-detach obj sword 1300   - You guessed it - same as above.
-detach sword all        - detach all triggers from the sword.
-
-See also: ATTACH, TRIG-DETACH, TRIG-ATTACH, OLC, TRIGEDIT, STAT, ROOMFLAGS
-#d
-TRIG-ATTACH TATTACH
-
-Usage:  attach vnum id
-
-* This small trigger will attach a trigger to the carrier this can for instance 
-* be used if you want the mob to change attitude by adding another trigger 
-* (ie - mob was mad - mob got apple - mob gets a 'nicer' trigger attached
-attach 3001 %self.id% 
-
-   This command allows a script to attach a trigger (referenced by vnum) to 
-anything capable of receiving triggers, by id number. (%self.id%, %object.id%, 
-and %actor.id% are examples of id numbers, for use with this command.)
-
-See Also: ATTACH, DETACH, TRIG-DETACH
-#d
-TRIG-DETACH TDETACH
-
-Usage:  detach <vnum | all> id
-
-* if we - as described in the attach example, want our mob/obj/room to behave
-* differently, it's not always enough to just add another trigger with attach.
-* it might be necessary to remove some old ones :
-detach 3000 %self.id%
-or
-detach all %self.id%
-
-   The opposite of attach, this removes triggers from the specified target.
-
-See Also: ATTACH, DETACH, TRIG-ATTACH
-#d
-TLIST TRIGLIST TRIG-LIST TRIGEDIT-LIST 
-
-Usage:  tlist <range of vnums or zone number>
-
-Tlist gives you a list of the triggers numbered within the parameters.
-Be warned that all the triggers on TBA may not work since anyone could
-have made them. Ask around for the best examples. Zone 13, 40, 41 is a 
-good start.
-
-   tlist 13          - lists all triggers defined in zone 13
-   tlist 4000 4099   - lists all existing triggers from vnum 4000 to 4099
-   
-See also: TRIGEDIT, OLC
-#d
-DG_AFFECTS
-
-Usage:  dg_affect <target> <property> <value> <duration>
-
-Modifies an affection or apply on the target. Durations must be non-zero.
-dg_affect %actor% HASTE on 20    -- Sets haste on actor for 20 seconds.
-dg_affect %actor% DODGE 100 20  -- Sets dodge on actor +100 for 20 seconds.
-
-See also: APPLIES, AFFECTS
-#d
-VDELETE
-
-Usage:  vdelete <variablename> <id>
-
-Use this to remove a Variable from either mob, room, obj, or player.
-
-Examples: vdelete has_solved_quest 5351
-
-To determine the player ID stat player
-> stat file test
-male PC 'Test'  IDNum: [ 3531], In room [    0]
-
-See Also: REMOTE, RDELETE
+See also:  EVAL, REMOTE
 #d
 $~

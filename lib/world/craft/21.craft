@@ -1,6 +1,6 @@
 #2100
 stone axe~
-2100 1  # 1x a stone axe
+2100 1
 2 -1 0 4 181
 R
 181 1  # 1x a handaxe
@@ -9,7 +9,7 @@ R
 S
 #2101
 woodsman axe~
-2101 1  # 1x a woodsman's axe
+2101 1
 1 51 0 8 -1
 R
 178 1  # 1x a copper ingot
@@ -18,7 +18,7 @@ R
 S
 #2102
 short sword~
-2102 1  # 1x a short sword
+2102 1
 1 51 0 8 -1
 R
 178 2  # 2x a copper ingot
@@ -27,7 +27,7 @@ R
 S
 #2103
 shiv~
-2103 1  # 1x a shiv
+2103 1
 2 198 0 8 -1
 R
 102 1  # 1x a flint stone
@@ -36,7 +36,7 @@ R
 S
 #2105
 hammer~
-2105 1  # 1x a hammer
+2105 1
 1 51 0 8 -1
 R
 178 1  # 1x a copper ingot
@@ -45,7 +45,7 @@ R
 S
 #2106
 stone hammer~
-2106 1  # 1x a stone hammer
+2106 1
 2 -1 0 4 100
 R
 919 1  # 1x a wooden handle
@@ -54,7 +54,7 @@ R
 S
 #2107
 rawhide saddle~
-2107 1  # 1x a rawhide saddle
+2107 1
 4 223 g 10 -1
 R
 1359 2  # 2x a bolt of cloth
@@ -63,21 +63,21 @@ R
 S
 #2108
 whip~
-2108 1  # 1x a braided whip
+2108 1
 4 55 g 16 -1
 R
 1357 2  # 2x a large piece of leather
 S
 #2109
 wooden sword~
-2109 1  # 1x a wooden sword
+2109 1
 2 58 g 6 -1
 R
 125 1  # 1x a stack of lumber
 S
 #2110
 pick~
-2110 1  # 1x a pick
+2110 1
 1 51 0 8 -1
 R
 178 2  # 2x a copper ingot
@@ -86,7 +86,7 @@ R
 S
 #2111
 mage robe~
-2111 1  # 1x a brown mage robe
+2111 1
 4 224 g 16 -1
 R
 1359 10  # 10x a bolt of cloth
@@ -97,7 +97,7 @@ R
 S
 #2113
 saddle~
-2113 1  # 1x a saddle
+2113 1
 2 198 g 10 -1
 R
 1356 1  # 1x a small piece of leather
@@ -106,7 +106,7 @@ R
 S
 #2114
 fine saddle~
-2114 1  # 1x a fine leather saddle
+2114 1
 4 56 g 10 -1
 R
 1359 2  # 2x a bolt of cloth
@@ -115,7 +115,7 @@ R
 S
 #2116
 snakeskin saddle~
-2116 1  # 1x a snakeskin saddle
+2116 1
 4 182 g 10 -1
 R
 1359 2  # 2x a bolt of cloth
@@ -126,7 +126,7 @@ R
 S
 #2118
 shovel~
-2118 1  # 1x a shovel
+2118 1
 1 51 0 8 -1
 R
 178 2  # 2x a copper ingot
@@ -135,77 +135,77 @@ R
 S
 #2119
 pan~
-2119 1  # 1x a metal pan
+2119 1
 1 51 0 4 -1
 R
 178 2  # 2x a copper ingot
 S
 #2120
 silver ring~
-2120 1  # 1x a small silver ring
+2120 1
 1 54 0 8 -1
 R
 161 1  # 1x a silver nugget
 S
 #2121
 silver earrings~
-2121 1  # 1x a pair of silver earrings
+2121 1
 1 54 0 8 -1
 R
 161 2  # 2x a silver nugget
 S
 #2122
 gold ring~
-2122 1  # 1x a sparkling gold ring
+2122 1
 1 54 0 8 -1
 R
 162 1  # 1x a pile of gold dust
 S
 #2123
 gold earrings~
-2123 1  # 1x a pair of sparkling earrings
+2123 1
 1 54 0 8 -1
 R
 162 2  # 2x a pile of gold dust
 S
 #2124
 engagement ring~
-2124 1  # 1x a golden engagement ring
+2124 1
 1 54 0 8 -1
 R
 162 1  # 1x a pile of gold dust
 S
 #2125
 wedding band~
-2125 1  # 1x a golden wedding band
+2125 1
 1 54 0 8 -1
 R
 162 1  # 1x a pile of gold dust
 S
 #2126
 silver bracelets~
-2126 1  # 1x silver bracelets
+2126 1
 1 54 0 8 -1
 R
 161 2  # 2x a silver nugget
 S
 #2127
 gold bracelets~
-2127 1  # 1x gold bracelets
+2127 1
 1 54 0 8 -1
 R
 162 2  # 2x a pile of gold dust
 S
 #2128
 crown~
-2128 1  # 1x a golden crown
+2128 1
 1 54 0 8 -1
 R
 162 4  # 4x a pile of gold dust
 S
 #2129
 spear~
-2129 1  # 1x a spear
+2129 1
 2 -1 0 4 186
 R
 186 1  # 1x a stone spear head
@@ -214,21 +214,21 @@ R
 S
 #2130
 leather backpack~
-2130 1  # 1x a leather backpack
+2130 1
 4 56 g 8 -1
 R
 1357 4  # 4x a large piece of leather
 S
 #2131
 satchel~
-2131 1  # 1x a leather satchel
+2131 1
 4 55 g 8 -1
 R
 1357 2  # 2x a large piece of leather
 S
 #2132
 large backpack~
-2132 1  # 1x a large backpack
+2132 1
 4 182 g 10 -1
 R
 1353 2  # 2x a big cat pelt
@@ -236,5 +236,28 @@ R
 1357 10  # 10x a large piece of leather
 R
 1355 8  # 8x some snakeskin
+S
+#2133
+anchor~
+2133 1
+1 51 0 6 -1
+R
+175 10  # 10x an iron ingot
+S
+#2134
+cannon~
+2134 1
+1 196 0 12 -1
+R
+175 14  # 14x an iron ingot
+R
+177 1  # 1x an imperium ingot
+S
+#2135
+heavy shot~
+2135 1
+1 60 0 6 -1
+R
+175 12  # 12x an iron ingot
 S
 $

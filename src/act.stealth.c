@@ -119,7 +119,7 @@ bool can_steal(char_data *ch, empire_data *emp) {
 		return TRUE;
 	}
 	
-	if (!HAS_ABILITY(ch, ABIL_STEAL)) {
+	if (!has_ability(ch, ABIL_STEAL)) {
 		msg_to_char(ch, "You don't have the Steal ability.\r\n");
 		return FALSE;
 	}
@@ -187,9 +187,15 @@ void perform_escape(char_data *ch) {
 	room_data *home, *to_room = NULL;
 	
 	// on a boat?
-	if ((to_room = BOAT_ROOM(IN_ROOM(ch))) != IN_ROOM(ch)) {
-		msg_to_char(ch, "You dive over the side of the ship!\r\n");
-		act("$n dives over the side of the ship!", TRUE, ch, NULL, NULL, TO_ROOM);
+	if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && (to_room = IN_VEHICLE_IN_ROOM(IN_ROOM(ch))) != IN_ROOM(ch)) {
+		if (VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_IN)) {
+			act("You dive out of $V!", FALSE, ch, NULL, GET_ROOM_VEHICLE(IN_ROOM(ch)), TO_CHAR);
+			act("$n dives out of $V!", TRUE, ch, NULL, GET_ROOM_VEHICLE(IN_ROOM(ch)), TO_ROOM);
+		}
+		else {	// not an IN vehicle
+			msg_to_char(ch, "You dive off the side!\r\n");
+			act("$n dives off the side!", TRUE, ch, NULL, NULL, TO_ROOM);
+		}
 	}
 	else {
 		msg_to_char(ch, "You dive out the window!\r\n");
@@ -214,6 +220,7 @@ void perform_escape(char_data *ch) {
 		entry_memory_mtrigger(ch);
 		greet_mtrigger(ch, NO_DIR);
 		greet_memory_mtrigger(ch);
+		greet_vtrigger(ch, NO_DIR);
 		
 		act("$n dives out a window and lands before you!", TRUE, ch, NULL, NULL, TO_ROOM);
 	}
@@ -445,7 +452,7 @@ int apply_poison(char_data *ch, char_data *vict, int type) {
 	}
 	
 	// ability check
-	if (poison_data[type].ability != NO_ABIL && !HAS_ABILITY(ch, poison_data[type].ability)) {
+	if (poison_data[type].ability != NO_ABIL && !has_ability(ch, poison_data[type].ability)) {
 		return 0;
 	}
 
@@ -463,8 +470,10 @@ int apply_poison(char_data *ch, char_data *vict, int type) {
 	}
 	
 	// GAIN SKILL NOW -- it at least attempts an application
-	gain_ability_exp(ch, ABIL_POISONS, 2);
-	gain_ability_exp(ch, ABIL_DEADLY_POISONS, 2);
+	if (can_gain_exp_from(ch, vict)) {
+		gain_ability_exp(ch, ABIL_POISONS, 2);
+		gain_ability_exp(ch, ABIL_DEADLY_POISONS, 2);
+	}
 	
 	// skill check!
 	if (!skill_check(ch, ABIL_POISONS, DIFF_HARD)) {
@@ -479,12 +488,16 @@ int apply_poison(char_data *ch, char_data *vict, int type) {
 	}
 	
 	// attempt immunity/resist
-	if (HAS_ABILITY(vict, ABIL_POISON_IMMUNITY)) {
-		gain_ability_exp(vict, ABIL_POISON_IMMUNITY, 10);
+	if (has_ability(vict, ABIL_POISON_IMMUNITY)) {
+		if (can_gain_exp_from(vict, ch)) {
+			gain_ability_exp(vict, ABIL_POISON_IMMUNITY, 10);
+		}
 		return 0;
 	}
-	if (HAS_ABILITY(vict, ABIL_RESIST_POISON)) {
-		gain_ability_exp(vict, ABIL_RESIST_POISON, 10);
+	if (has_ability(vict, ABIL_RESIST_POISON)) {
+		if (can_gain_exp_from(vict, ch)) {
+			gain_ability_exp(vict, ABIL_RESIST_POISON, 10);
+		}
 		if (!number(0, 2)) {
 			return 0;
 		}
@@ -493,7 +506,7 @@ int apply_poison(char_data *ch, char_data *vict, int type) {
 	// atype
 	if (poison_data[type].atype > 0) {
 		
-		af = create_aff(poison_data[type].atype, 2 MUD_HOURS, poison_data[type].apply, poison_data[type].mod * (HAS_ABILITY(ch, ABIL_DEADLY_POISONS) ? 2 : 1), poison_data[type].aff, ch);
+		af = create_aff(poison_data[type].atype, 2 MUD_HOURS, poison_data[type].apply, poison_data[type].mod * (has_ability(ch, ABIL_DEADLY_POISONS) ? 2 : 1), poison_data[type].aff, ch);
 		affect_join(vict, af, poison_data[type].allow_stack ? (AVG_DURATION|ADD_MODIFIER) : 0);
 		
 		if (!messaged) {
@@ -507,7 +520,7 @@ int apply_poison(char_data *ch, char_data *vict, int type) {
 	
 	// dot
 	if (poison_data[type].dot_type > 0) {
-		apply_dot_effect(vict, poison_data[type].dot_type, poison_data[type].dot_duration, poison_data[type].dot_damage_type, poison_data[type].dot_damage * (HAS_ABILITY(ch, ABIL_DEADLY_POISONS) ? 2 : 1), poison_data[type].dot_max_stacks, ch);
+		apply_dot_effect(vict, poison_data[type].dot_type, poison_data[type].dot_duration, poison_data[type].dot_damage_type, poison_data[type].dot_damage * (has_ability(ch, ABIL_DEADLY_POISONS) ? 2 : 1), poison_data[type].dot_max_stacks, ch);
 		
 		if (!messaged) {
 			act("You feel ill as you are poisoned!", FALSE, vict, NULL, NULL, TO_CHAR);
@@ -521,7 +534,7 @@ int apply_poison(char_data *ch, char_data *vict, int type) {
 	// special cases
 	switch (poison_data[type].special) {
 		case SPEC_SEARING: {
-			result = damage(ch, vict, 5 * (HAS_ABILITY(ch, ABIL_DEADLY_POISONS) ? 2 : 1), ATTACK_POISON, DAM_POISON);
+			result = damage(ch, vict, 5 * (has_ability(ch, ABIL_DEADLY_POISONS) ? 2 : 1), ATTACK_POISON, DAM_POISON);
 			break;
 		}
 	}
@@ -549,7 +562,7 @@ void use_poison(char_data *ch, obj_data *obj) {
 		return;
 	}
 	
-	if (poison_data[type].ability != NO_ABIL && !HAS_ABILITY(ch, poison_data[type].ability)) {
+	if (poison_data[type].ability != NO_ABIL && !has_ability(ch, poison_data[type].ability)) {
 		msg_to_char(ch, "You don't have the correct ability to use that poison.\r\n");
 		return;
 	}
@@ -625,15 +638,17 @@ ACMD(do_backstab) {
 			}
 
 			if (damage(ch, vict, dam, ATTACK_BACKSTAB, DAM_PHYSICAL) > 0) {
-				if (HAS_ABILITY(ch, ABIL_POISONS)) {
+				if (has_ability(ch, ABIL_POISONS)) {
 					if (!number(0, 1) && apply_poison(ch, vict, USING_POISON(ch)) < 0) {
 						// dedz
 					}
 				}
 			}		
 		}
-
-		gain_ability_exp(ch, ABIL_BACKSTAB, 15);
+		
+		if (can_gain_exp_from(ch, vict)) {
+			gain_ability_exp(ch, ABIL_BACKSTAB, 15);
+		}
 	}
 }
 
@@ -684,7 +699,9 @@ ACMD(do_blind) {
 			engage_combat(ch, vict, TRUE);
 		}
 		
-		gain_ability_exp(ch, ABIL_BLIND, 15);
+		if (can_gain_exp_from(ch, vict)) {
+			gain_ability_exp(ch, ABIL_BLIND, 15);
+		}
 	}
 }
 
@@ -758,10 +775,6 @@ ACMD(do_disguise) {
 	else if (!MOB_FLAGGED(vict, MOB_HUMAN)) {
 		act("You can't disguise yourself as $N!", FALSE, ch, NULL, vict, TO_CHAR);
 	}
-	else if (strlen(PERS(vict, vict, FALSE)) >= MAX_DISGUISED_NAME_LENGTH) {
-		// this check is to make sure we can store the whole name
-		act("You can't disguise yourself as $N!", FALSE, ch, NULL, vict, TO_CHAR);
-	}
 	else if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_DISGUISE)) {
 		return;
 	}
@@ -779,9 +792,10 @@ ACMD(do_disguise) {
 		SET_BIT(PLR_FLAGS(ch), PLR_DISGUISED);
 		
 		// copy name and check limit
-		strcpy(buf, PERS(vict, vict, FALSE));
-		buf[MAX_DISGUISED_NAME_LENGTH-1] = '\0';
-		strcpy(GET_DISGUISED_NAME(ch), buf);
+		if (GET_DISGUISED_NAME(ch)) {
+			free(GET_DISGUISED_NAME(ch));
+		}
+		GET_DISGUISED_NAME(ch) = str_dup(PERS(vict, vict, FALSE));
 
 		// copy the sex
 		GET_DISGUISED_SEX(ch) = GET_SEX(vict);
@@ -800,6 +814,9 @@ ACMD(do_diversion) {
 	
 	if (!can_use_ability(ch, ABIL_DIVERSION, MOVE, cost, COOLDOWN_DIVERSION)) {
 		return;
+	}
+	else if (!check_solo_role(ch)) {
+		msg_to_char(ch, "You must be alone to use that ability in the solo role.\r\n");
 	}
 	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_DIVERSION)) {
 		return;
@@ -869,11 +886,11 @@ ACMD(do_escape) {
 		msg_to_char(ch, "You don't need to escape from here.\r\n");
 	}
 	else {
-		if (BOAT_ROOM(IN_ROOM(ch)) != IN_ROOM(ch)) {
-			msg_to_char(ch, "You run for the edge of the deck to escape!\r\n");
-			act("$n runs toward the edge of the deck!", TRUE, ch, NULL, NULL, TO_ROOM);
+		if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && IN_VEHICLE_IN_ROOM(IN_ROOM(ch)) != IN_ROOM(ch) && !VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_IN)) {
+			msg_to_char(ch, "You run for the edge to escape!\r\n");
+			act("$n runs toward the edge to escape!", TRUE, ch, NULL, NULL, TO_ROOM);
 		}
-		else {
+		else {	// this handles buildings and IN-vehicles
 			msg_to_char(ch, "You run for the window to escape!\r\n");
 			act("$n runs toward the window!", TRUE, ch, NULL, NULL, TO_ROOM);
 		}
@@ -924,7 +941,7 @@ ACMD(do_hide) {
 	gain_ability_exp(ch, ABIL_HIDE, 33.4);
 	gain_ability_exp(ch, ABIL_CLING_TO_SHADOW, 10);
 
-	if (HAS_ABILITY(ch, ABIL_CLING_TO_SHADOW) || skill_check(ch, ABIL_HIDE, DIFF_MEDIUM)) {
+	if (has_ability(ch, ABIL_CLING_TO_SHADOW) || skill_check(ch, ABIL_HIDE, DIFF_MEDIUM)) {
 		SET_BIT(AFF_FLAGS(ch), AFF_HIDE);
 	}
 }
@@ -938,6 +955,9 @@ ACMD(do_howl) {
 	
 	if (!can_use_ability(ch, ABIL_HOWL, MOVE, cost, COOLDOWN_HOWL)) {
 		return;
+	}
+	else if (!check_solo_role(ch)) {
+		msg_to_char(ch, "You must be alone to use that ability in the solo role.\r\n");
 	}
 	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_HOWL)) {
 		return;
@@ -975,7 +995,7 @@ ACMD(do_howl) {
 
 
 ACMD(do_infiltrate) {
-	void empire_skillup(empire_data *emp, int ability, double amount);
+	void empire_skillup(empire_data *emp, any_vnum ability, double amount);
 
 	room_data *to_room;
 	int dir;
@@ -1018,7 +1038,7 @@ ACMD(do_infiltrate) {
 		gain_ability_exp(ch, ABIL_INFILTRATE, 50);
 		gain_ability_exp(ch, ABIL_IMPROVED_INFILTRATE, 50);
 		
-		if (!HAS_ABILITY(ch, ABIL_IMPROVED_INFILTRATE) && !skill_check(ch, ABIL_INFILTRATE, (emp && EMPIRE_HAS_TECH(emp, TECH_LOCKS)) ? DIFF_RARELY : DIFF_HARD)) {
+		if (!has_ability(ch, ABIL_IMPROVED_INFILTRATE) && !skill_check(ch, ABIL_INFILTRATE, (emp && EMPIRE_HAS_TECH(emp, TECH_LOCKS)) ? DIFF_RARELY : DIFF_HARD)) {
 			if (emp && EMPIRE_HAS_TECH(emp, TECH_LOCKS)) {
 				empire_skillup(emp, ABIL_LOCKS, 10);
 			}
@@ -1036,11 +1056,12 @@ ACMD(do_infiltrate) {
 			entry_memory_mtrigger(ch);
 			greet_mtrigger(ch, NO_DIR);
 			greet_memory_mtrigger(ch);
+			greet_vtrigger(ch, NO_DIR);
 		}
 
 		// chance to log
 		if (emp && !skill_check(ch, ABIL_IMPROVED_INFILTRATE, DIFF_HARD)) {
-			if (HAS_ABILITY(ch, ABIL_IMPROVED_INFILTRATE)) {
+			if (has_ability(ch, ABIL_IMPROVED_INFILTRATE)) {
 				log_to_empire(emp, ELOG_HOSTILITY, "An infiltrator has been spotted at (%d, %d)!", X_COORD(to_room), Y_COORD(to_room));
 			}
 			else {
@@ -1102,28 +1123,30 @@ ACMD(do_jab) {
 		if (hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FALSE) > 0) {
 			apply_dot_effect(vict, ATYPE_JABBED, 3, DAM_PHYSICAL, get_ability_level(ch, ABIL_JAB) / 24, 2, ch);
 			
-			if (!HAS_ABILITY(ch, ABIL_STAGGER_JAB) && !AFF_FLAGGED(vict, AFF_IMMUNE_STEALTH)) {
+			if (has_ability(ch, ABIL_STAGGER_JAB) && !AFF_FLAGGED(vict, AFF_IMMUNE_STEALTH) && check_solo_role(ch)) {
 				struct affected_type *af;
 				int value = ceil(GET_CHARISMA(ch) / 5);
 				af = create_mod_aff(ATYPE_STAGGER_JAB, 3, APPLY_TO_HIT, -value, ch);
 				affect_join(vict, af, ADD_MODIFIER);
 			}
 			
-			if (HAS_ABILITY(ch, ABIL_CRUCIAL_JAB) && !AFF_FLAGGED(vict, AFF_IMMUNE_STEALTH)) {
+			if (has_ability(ch, ABIL_CRUCIAL_JAB) && !AFF_FLAGGED(vict, AFF_IMMUNE_STEALTH) && check_solo_role(ch)) {
 				struct affected_type *af;
 				int value = round(GET_COMPUTED_LEVEL(ch) / 80);
 				af = create_mod_aff(ATYPE_CRUCIAL_JAB, 2, APPLY_DEXTERITY, -value, ch);
 				affect_join(vict, af, NOBITS);
 			}
 			
-			if (HAS_ABILITY(ch, ABIL_SHADOW_JAB) && !AFF_FLAGGED(vict, AFF_IMMUNE_STEALTH)) {
+			if (has_ability(ch, ABIL_SHADOW_JAB) && !AFF_FLAGGED(vict, AFF_IMMUNE_STEALTH) && check_solo_role(ch)) {
 				struct affected_type *af;
 				int value = ceil(GET_CHARISMA(ch) / 5);
 				af = create_mod_aff(ATYPE_SHADOW_JAB, 3, APPLY_DEXTERITY, -value, ch);
 				affect_join(vict, af, ADD_MODIFIER);
 			}
 		}
-		gain_ability_exp(ch, ABIL_JAB, 15);
+		if (can_gain_exp_from(ch, vict)) {
+			gain_ability_exp(ch, ABIL_JAB, 15);
+		}
 	}
 }
 
@@ -1222,7 +1245,9 @@ ACMD(do_pickpocket) {
 		}
 		
 		// gain either way
-		gain_ability_exp(ch, ABIL_PICKPOCKET, 25);
+		if (can_gain_exp_from(ch, vict)) {
+			gain_ability_exp(ch, ABIL_PICKPOCKET, 25);
+		}
 		command_lag(ch, WAIT_ABILITY);
 	}
 }
@@ -1282,8 +1307,10 @@ ACMD(do_prick) {
 		if (!EXTRACTED(vict) && !IS_DEAD(vict) && CAN_SEE(vict, ch)) {
 			engage_combat(ch, vict, TRUE);
 		}
-
-		gain_ability_exp(ch, ABIL_PRICK, 15);
+		
+		if (can_gain_exp_from(ch, vict)) {
+			gain_ability_exp(ch, ABIL_PRICK, 15);
+		}
 	}
 }
 
@@ -1342,8 +1369,10 @@ ACMD(do_sap) {
 		else {
 			engage_combat(ch, vict, TRUE);
 		}
-
-		gain_ability_exp(ch, ABIL_SAP, 20);
+		
+		if (can_gain_exp_from(ch, vict)) {
+			gain_ability_exp(ch, ABIL_SAP, 20);
+		}
 		
 		// release other saps here
 		limit_crowd_control(vict, ATYPE_SAP);
@@ -1378,7 +1407,7 @@ ACMD(do_search) {
 
 			SET_BIT(AFF_FLAGS(ch), AFF_SENSE_HIDE);
 			
-			if (HAS_ABILITY(targ, ABIL_CLING_TO_SHADOW)) {
+			if (has_ability(targ, ABIL_CLING_TO_SHADOW)) {
 				gain_ability_exp(targ, ABIL_CLING_TO_SHADOW, 20);
 				continue;
 			}
@@ -1410,6 +1439,9 @@ ACMD(do_shadowcage) {
 	
 	if (!can_use_ability(ch, ABIL_SHADOWCAGE, MOVE, cost, COOLDOWN_SHADOWCAGE)) {
 		return;
+	}
+	else if (!check_solo_role(ch)) {
+		msg_to_char(ch, "You must be alone to use that ability in the solo role.\r\n");
 	}
 	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_SHADOWCAGE)) {
 		return;
@@ -1507,7 +1539,7 @@ ACMD(do_shadowstep) {
 		charge_ability_cost(ch, MOVE, cost, COOLDOWN_SHADOWSTEP, SECS_PER_REAL_MIN, WAIT_ABILITY);
 		gain_ability_exp(ch, ABIL_SHADOWSTEP, 20);
 		
-		if (infil && !HAS_ABILITY(ch, ABIL_IMPROVED_INFILTRATE) && !skill_check(ch, ABIL_INFILTRATE, DIFF_HARD)) {
+		if (infil && !has_ability(ch, ABIL_IMPROVED_INFILTRATE) && !skill_check(ch, ABIL_INFILTRATE, DIFF_HARD)) {
 			msg_to_char(ch, "You fail to shadowstep to that location.\r\n");
 		}
 		else {
@@ -1523,11 +1555,12 @@ ACMD(do_shadowstep) {
 			entry_memory_mtrigger(ch);
 			greet_mtrigger(ch, NO_DIR);
 			greet_memory_mtrigger(ch);
+			greet_vtrigger(ch, NO_DIR);
 		}
 
 		// chance to log
 		if (infil && emp && !skill_check(ch, ABIL_IMPROVED_INFILTRATE, DIFF_HARD)) {
-			if (HAS_ABILITY(ch, ABIL_IMPROVED_INFILTRATE)) {
+			if (has_ability(ch, ABIL_IMPROVED_INFILTRATE)) {
 				log_to_empire(emp, ELOG_HOSTILITY, "An infiltrator has been spotted shadowstepping into (%d, %d)!", X_COORD(IN_ROOM(vict)), Y_COORD(IN_ROOM(vict)));
 			}
 			else {
@@ -1563,11 +1596,7 @@ ACMD(do_sneak) {
 		msg_to_char(ch, "You are entangled and can't sneak.\r\n");
 		return;
 	}
-	if (GET_PULLING(ch)) {
-		msg_to_char(ch, "You can't sneak while pulling something.\r\n");
-		return;
-	}
-	if (GET_LEADING(ch)) {
+	if (GET_LEADING_MOB(ch) || GET_LEADING_VEHICLE(ch)) {
 		msg_to_char(ch, "You can't sneak while leading something.\r\n");
 		return;
 	}
@@ -1657,7 +1686,7 @@ ACMD(do_steal) {
 			if (proto && obj_can_be_stored(proto, IN_ROOM(ch)) && isname(arg, GET_OBJ_KEYWORDS(proto))) {
 				found = TRUE;
 				
-				if (stored_item_requires_withdraw(proto) && !HAS_ABILITY(ch, ABIL_VAULTCRACKING)) {
+				if (stored_item_requires_withdraw(proto) && !has_ability(ch, ABIL_VAULTCRACKING)) {
 					msg_to_char(ch, "You can't steal that without Vaultcracking!\r\n");
 					return;
 				}
@@ -1745,6 +1774,8 @@ ACMD(do_terrify) {
 		}
 		
 		engage_combat(victim, ch, TRUE);
-		gain_ability_exp(ch, ABIL_TERRIFY, 15);
+		if (can_gain_exp_from(ch, victim)) {
+			gain_ability_exp(ch, ABIL_TERRIFY, 15);
+		}
 	}
 }
