@@ -1228,6 +1228,7 @@ void add_trigger(struct script_data *sc, trig_data *t, int loc) {
 
 
 ACMD(do_tattach) {
+	vehicle_data *veh;
 	char_data *victim;
 	obj_data *object;
 	room_data *room;
@@ -1241,7 +1242,7 @@ ACMD(do_tattach) {
 	two_arguments(argument, targ_name, loc_name);
 
 	if (!*arg || !*targ_name || !*trig_name) {
-		msg_to_char(ch, "Usage: tattach { mob | obj | room } { trigger } { name } [ location ]\r\n");
+		msg_to_char(ch, "Usage: tattach <type> <trigger> <attach to target> [location]\r\n");
 		return;
 	}
 
@@ -1321,6 +1322,43 @@ ACMD(do_tattach) {
 
 		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d (%s) attached to %s [%d] by %s.", tn, GET_TRIG_NAME(trig), (GET_OBJ_SHORT_DESC(object) ? GET_OBJ_SHORT_DESC(object) : object->name), GET_OBJ_VNUM(object), GET_NAME(ch));
 		msg_to_char(ch, "Trigger %d (%s) attached to %s [%d].\r\n", tn, GET_TRIG_NAME(trig), (GET_OBJ_SHORT_DESC(object) ? GET_OBJ_SHORT_DESC(object) : object->name), GET_OBJ_VNUM(object));
+	}
+	else if (is_abbrev(arg, "vehicle") || is_abbrev(arg, "vtr")) {
+		veh = (*targ_name == UID_CHAR) ? get_vehicle(targ_name) : get_vehicle_vis(ch, targ_name);
+		if (!veh) {
+			// search room for vehicle with matching vnum
+			LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+				if (VEH_VNUM(veh) == num_arg) {
+					break;
+				}
+			}
+			
+			// no?
+			if (!veh) {
+				msg_to_char(ch, "That vehicle does not exist.\r\n");
+				return;
+			}
+		}
+		
+		if (!player_can_olc_edit(ch, OLC_VEHICLE, VEH_VNUM(veh))) {
+			msg_to_char(ch, "You can't edit that vnum.\r\n");
+			return;
+		}
+
+		/* have a valid obj, now get trigger */
+		proto = real_trigger(tn);
+		if (!proto || !(trig = read_trigger(tn))) {
+			msg_to_char(ch, "That trigger does not exist.\r\n");
+			return;
+		}
+
+		if (!SCRIPT(veh)) {
+			CREATE(SCRIPT(veh), struct script_data, 1);
+		}
+		add_trigger(SCRIPT(veh), trig, loc);
+
+		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d (%s) attached to %s [%d] by %s.", tn, GET_TRIG_NAME(trig), VEH_SHORT_DESC(veh), VEH_VNUM(veh), GET_NAME(ch));
+		msg_to_char(ch, "Trigger %d (%s) attached to %s [%d].\r\n", tn, GET_TRIG_NAME(trig), VEH_SHORT_DESC(veh), VEH_VNUM(veh));
 	}
 	else if (is_abbrev(arg, "room") || is_abbrev(arg, "wtr")) {
 		if (strchr(targ_name, '.'))

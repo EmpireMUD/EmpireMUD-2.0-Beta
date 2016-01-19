@@ -560,6 +560,33 @@ command, are executed.
 &cdefault&0 - Similar to case but matches any condition not met.
 &cdone&0 - Used to terminate a switch (or while) block.
 #d
+TATTACH
+
+Usage:  attach mob <trigger vnum> <mob name> [location]
+        attach obj <trigger vnum> <obj name> [location]
+        attach room <trigger vnum> <room vnum> [location]
+        attach vehicle <trigger vnum> <vehicle name> [location]
+
+The tattach command allows you to attach a trigger to a single live copy of
+a mob (or object, etc) -- rather than attach it to the prototype. This is good
+for testing, as well as for creating single-use content. These triggers will
+almost always save through a reboot or logoff (rare exceptions include things
+like harnessing or mounting a mob, which will later load a fresh copy).
+
+It's a good idea to attach a trigger manually to test it before adding it to
+the prototype in OLC. You require OLC edit permissions to attach triggers to
+things.
+
+The 'location' is what number in the triggerlist the trigger will assume.
+
+Examples:
+  tattach room 14500 14520 - Attaches room trigger 14500 to room 14520.
+  tattach mob 1332 santa   - Attaches mob trigger 1332 to mob 1308 (santa).
+  tattach obj 1480 sword   - Attaches obj trigger 1480 to a sword. 
+  tattach veh 952 %boat%   - Attach trigger 952 to the %boat% vehicle.
+
+See also: TDETACH, TRIG-ATTACH, TRIG-DETACH, OLC, TRIGEDIT, STAT
+#d
 %TELEPORT% MTELEPORT OTELEPORT VTELEPORT WTELEPORT
 
 %teleport% <victim | vehicle> <location>
