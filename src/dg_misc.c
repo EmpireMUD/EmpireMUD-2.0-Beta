@@ -112,7 +112,7 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 
 	value = atoi(value_p);
 	duration = atoi(duration_p);
-	if (duration == 0 || duration < -1 || (duration == -1 && !IS_NPC(ch))) {
+	if (duration == 0 || duration < -1) {
 		script_log("Trigger: %s, VNum %d. dg_affect: need positive duration!", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
 		script_log("Line was: dg_affect %s %s %s %s (%d)", charname, property, value_p, duration_p, duration);
 		return;
@@ -138,6 +138,11 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 	ch = get_char(charname);
 	if (!ch) {
 		script_log("Trigger: %s, VNum %d. dg_affect: cannot locate target!", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
+		return;
+	}
+	
+	if (duration == -1 && !IS_NPC(ch)) {
+		script_log("Trigger: %s, VNum %d. dg_affect: cannot use infinite duration on player target", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
 		return;
 	}
 
