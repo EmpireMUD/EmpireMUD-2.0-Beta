@@ -290,6 +290,40 @@ See the specific help files for those commands for more information.
 
 See also: MTRIG COMMANDS, OTRIG COMMANDS, RTRIG COMMANDS, VTRIG COMMANDS
 #d
+"SPECIAL VARS" "SPEC VAR" "SPECIAL VARIABLES" TRIGEDIT-VARIABLES-SPECIALS SPEC-VAR %SELF% RANDOM %RANDOM% %TIME% %PEOPLE% TRIGEDIT-SPEC-VAR %RANDOM.CHAR% %SPEECH% 
+
+Special Variables When using field - The variable returns:
+ 
+&cself&0 - The mob, item, or room running the script. Normal fields may be 
+                used with this.
+&cinstance.id&0 - Unique id of the adventure instance, if any.
+&cinstance.location&0 - The map/linked location of the instance, if any.
+&cinstance.mob(vnum)&0 - Finds a copy of a mob belonging to the instance.
+&cinstance.name&0 - Name of the adventure instance, if any.
+&cinstance.start&0 - The entry room of the instance, if any.
+&cpeople.<vnum>&0 - This variable returns the number of people in the room 
+   specified via vnum.
+&crandom.<#>&0 - This returns a number between 1 and the field value. 
+   %random.10% would return a number between 1 and 10.
+&crandom.char&0 - This returns a random character in the room.
+&crandom.ally&0 - Returns a random ally (only if fighting).
+&crandom.enemy&0 - Returns a random enemy (only if fighting).
+&cskill.name(sk)&0 - The full name of a skill abbreviated by sk.
+&cskill.validate(sk)&0 - Returns true if sk is a valid skill.
+&cspeech&0 - This variable is set to the complete phrase spoken by an actor 
+   that triggers a speech trigger.
+&cstartloc&0 - A random starting location.
+&ctime.<field>&0 - Field may be hour, day, month, or year. The returned value will 
+   be the current hour in the mud (0-23), day of the month (1-35), month
+   (1-16), or year respectively.
+&ctimestamp&0 - Current unix timestamp.
+&cweather&0 - One of: sunny, cloudy, raining, lightning
+&c|%var%&0 - name's, someone's, your
+&c&&%var%&0 - it, you, he/she -- DOES NOT WORK
+&c*%var%&0 - it, you, him/her
+* object only
+&c'%obj%&0 - something, name
+#d
 "SPEECH TRIGGER" "MTRIG SPEECH" "RTRIG SPEECH" "VTRIG SPEECH" TRIGEDIT-MOB-SPEECH TRIGEDIT-ROOM-SPEECH TRIGEDIT-VEH-SPEECH
 
 Speech (trigger type)
@@ -331,38 +365,9 @@ When using field - The variable returns
    
 See also: MUDCOMMAND
 #d
-VAREXISTS %VAREXISTS% %EXISTS% EXISTS
+"TRIGGER VARIABLES" "SCRIPT VARIABLES" "TRIGGER VARS" "SCRIPT VARS" "TRIG VARS" TRIGEDIT-VARIABLES VARIABLES TRIG-VARS TRIG-VARIABLES VARS
 
-Usage:  %actor.varexists(varname)%
-
-This lets you determine if a person has a variable that was given to them
-using the "remote" command.
-
-Example:
-  if %actor.varexists(quest_progress)%
-    eval progress %actor.quest_progress%
-  else
-    eval progress 0
-  end
-  ...
-  eval quest_progress %progress% + 1
-  remote quest_progress %actor.id%
-
-See also:  EVAL, REMOTE
-#d
-TODO
-
-This is a placeholder for where I'm working on triggers
-
-
-
-
-
-
-#d
-TRIGEDIT-VARIABLES VARIABLES TRIG-VARS TRIG-VARIABLES VARS 
-
-Variables appear as a name surrounded by '%'s, such as %actor% 
+Variables appear as a name surrounded by '%'s, such as %actor%
 
 Before a command is processed, the line is scanned and any variables are
 replaced. First the list of local variables are checked to see if the variable
@@ -394,88 +399,32 @@ A field of a variable can also retrieved, based on their type. To get a field,
 a notation of %variable.field% is used. The valid fields are listed in the help
 files below. 
 
-CHAR-VAR - Variables for characters.
-OBJ-VAR  - Variables for objects.
-ROOM-VAR - Variables for rooms.
-VEH-VAR  - Variables for vehicles.
-TEXT-VAR - Variables for text.
-SPEC-VAR - Variables for special stuff.
+Variables for characters: &yMTRIG VARS&0
+Variables for objects: &yOTRIG VARS&0
+Variables for rooms: &yRTRIG VARS&0
+Variables for vehicles: &yVTRIG VARS&0
+Variables for text: &yTEXT VARS&0
+Variables for special stuff: &ySPEC VARS&0
 
 See also: GLOBAL
 #d
-TRIGEDIT-VARIABLES-SPECIALS SPEC-VAR %SELF% RANDOM %RANDOM% %TIME% %PEOPLE% TRIGEDIT-SPEC-VAR %RANDOM.CHAR% %SPEECH% 
+VAREXISTS %VAREXISTS% %EXISTS% EXISTS
 
-Special Variables When using field - The variable returns:
- 
-self          - The mob, item, or room running the script. Normal fields may be 
-                used with this.
-instance.id   - Unique id of the adventure instance, if any.
-instance.location - The map/linked location of the instance, if any.
-instance.mob(vnum) - Finds a copy of a mob belonging to the instance.
-instance.name - Name of the adventure instance, if any.
-instance.start - The entry room of the instance, if any.
-people.<vnum> - This variable returns the number of people in the room 
-                specified via vnum.
-random.<#>    - This returns a number between 1 and the field value. 
-                %random.10% would return a number between 1 and 10.
-random.char   - This returns a random character in the room.
-random.ally   - Returns a random ally (only if fighting).
-random.enemy  - Returns a random enemy (only if fighting).
-skill.name(sk) - The full name of a skill abbreviated by sk.
-skill.validate(sk) - Returns true if sk is a valid skill.
-speech        - This variable is set to the complete phrase spoken by an actor 
-                that triggers a speech trigger.
-startloc      - A random starting location.
-time.<field>  - Field may be hour, day, month, or year. The returned value will 
-                be the current hour in the mud (0-23), day of the month (1-35),
-                month (1-16), or year respectively.
-timestamp     - Current unix timestamp.
-weather       - One of: sunny, cloudy, raining, lightning
-|%var%        - name's, someone's, your
-&&%var%        - it, you, he/she -- DOES NOT WORK
-*%var%        - it, you, him/her
-* object only
-'%obj%        - something, name
-#d
-DETACH
+Usage:  %actor.varexists(varname)%
 
-Usage:  detach [mob|obj] <target name> <trigger name/vnum | all>
-        detach room <target vnum | .> <trigger name/vnum | all>
-
-Detach removes a script to one instance of a mob/obj/room, for testing or 
-other purposes. This removal doesn't affect the prototype, so new copies of the
-thing will still have their scripts. However, in most cases the script will
-remain detached from the thing even through a reboot.
-
-Use the optional arguments 'mob' and 'obj' to differentiate if more entities
-with the same alias are in the room.
-
-Examples:
-  detach room 14500 14520 - remove trigger 14500 from room 14520.
-  detach room all         - removes all triggers from a room.
-  detach santa 1332       - detach trigger 1332 from mob 1308 (santa).
-  detach mob santa all    - detach all triggers from Santa.
-  detach santa all        - Same as above.
-  detach sword 1300       - detach trigger 1300 from sword.
-  detach obj sword 1300   - You guessed it - same as above.
-  detach sword all        - detach all triggers from the sword.
-
-See also: ATTACH, TRIG-DETACH, TRIG-ATTACH, OLC, TRIGEDIT, STAT, REDIT FLAGS
-#d
-TRIG-DETACH TDETACH
-
-Usage:  detach <vnum | all> id
-
-The opposite of attach, this removes triggers from the specified target.
+This lets you determine if a person has a variable that was given to them
+using the "remote" command.
 
 Example:
-  * if we - as described in the attach example, want our mob/obj/room to behave
-  * differently, it's not always enough to just add another trigger with attach.
-  * it might be necessary to remove some old ones :
-  detach 3000 %self.id%
-  * or
-  detach all %self.id%
+  if %actor.varexists(quest_progress)%
+    eval progress %actor.quest_progress%
+  else
+    eval progress 0
+  end
+  ...
+  eval quest_progress %progress% + 1
+  remote quest_progress %actor.id%
 
-See also: ATTACH, DETACH, TRIG-ATTACH
+See also:  EVAL, REMOTE
 #d
 $~

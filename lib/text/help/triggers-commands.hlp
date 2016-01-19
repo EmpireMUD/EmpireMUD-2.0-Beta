@@ -47,17 +47,21 @@ object.
 #d
 ATTACH "ATTACH COMMAND" TRIG-ATTACH
 
-Usage:  attach <vnum> <id>
+Disambiguation: This is the scripting command 'attach'. The immortal version
+of this command is &yTATTACH&0.
 
-* This small trigger will attach a trigger to the carrier (this can, for
-* instance, be used if you want the mob to change attitude by adding another
-* trigger, i.e. mob was mad - mob got apple - mob gets a 'nicer' trigger
-* attached).
-attach 3001 %self.id%
+Usage:  attach <vnum> <id>
 
 This command allows a script to attach a trigger (referenced by vnum) to
 anything capable of receiving triggers, by id number. (%self.id%, %object.id%,
 and %actor.id% are examples of id numbers, for use with this command.)
+
+Example:
+  * This small trigger will attach a trigger to the carrier (this can, for
+  * instance, be used if you want the mob to change attitude by adding another
+  * trigger, i.e. mob was mad - mob got apple - mob gets a 'nicer' trigger
+  * attached).
+  attach 3001 %self.id%
 
 See also: DETACH, TATTACH, TDETACH
 #d
@@ -142,6 +146,25 @@ Examples:
   %damage% %actor% %random.100%  - cause 1-100% scaled damage randomly
 
 See also: DEATH, %AOE%, %DOT%, %SIEGE%
+#d
+DETACH "DETACH COMMAND" TRIG-DETACH
+
+Disambiguation: This is the scripting command 'detach'. The immortal version
+of this command is &yTDETACH&0.
+
+Usage:  detach <vnum | all> id
+
+The opposite of attach, this removes triggers from the specified target.
+
+Example:
+  * if we - as described in the attach example, want our mob/obj/room to behave
+  * differently, it's not always enough to just add another trigger with attach.
+  * it might be necessary to remove some old ones :
+  detach 3000 %self.id%
+  * or
+  detach all %self.id%
+
+See also: TATTACH, TDETACH, TRIG-ATTACH
 #d
 DG_AFFECT DG_AFFECTS
 
@@ -586,6 +609,31 @@ Examples:
   tattach veh 952 %boat%   - Attach trigger 952 to the %boat% vehicle.
 
 See also: TDETACH, TRIG-ATTACH, TRIG-DETACH, OLC, TRIGEDIT, STAT
+#d
+TDETACH
+
+Usage:  tdetach [mob|obj|vehicle] <target name> <trigger name/vnum | all>
+        tdetach room <target vnum | .> <trigger name/vnum | all>
+
+Detach removes a script to one instance of a mob (or obj, etc), for testing or 
+other purposes. This removal doesn't affect the prototype, so new copies of the
+thing will still have their scripts. However, in most cases the script will
+remain detached from the thing even through a reboot.
+
+Use the optional argument mob/obj/vehicle to differentiate if more entities
+with the same alias are in the room.
+
+Examples:
+  tdetach room 14500 14520 - remove trigger 14500 from room 14520.
+  tdetach room all         - removes all triggers from a room.
+  tdetach santa 1332       - detach trigger 1332 from mob 1308 (santa).
+  tdetach mob santa all    - detach all triggers from Santa.
+  tdetach santa all        - Same as above.
+  tdetach sword 1300       - detach trigger 1300 from sword.
+  tdetach obj sword 1300   - You guessed it - same as above.
+  tdetach sword all        - detach all triggers from the sword.
+
+See also: TATTACH, TRIG-DETACH, TRIG-ATTACH, OLC, TRIGEDIT, STAT
 #d
 %TELEPORT% MTELEPORT OTELEPORT VTELEPORT WTELEPORT
 

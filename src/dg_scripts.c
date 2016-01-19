@@ -1500,6 +1500,7 @@ int remove_trigger(struct script_data *sc, char *name) {
 }
 
 ACMD(do_tdetach) {
+	vehicle_data *veh = NULL;
 	char_data *victim = NULL;
 	obj_data *object = NULL;
 	room_data *room;
@@ -1511,13 +1512,13 @@ ACMD(do_tdetach) {
 	one_argument(argument, arg3);
 
 	if (!*arg1 || !*arg2) {
-		msg_to_char(ch, "Usage: detach [ mob | object | room ] { target } { trigger | 'all' }\r\n");
+		msg_to_char(ch, "Usage: tdetach <type> <target> <trigger | 'all'>\r\n");
 		return;
 	}
 
 	/* vnum of mob/obj, if given */
 	num_arg = atoi(arg2);
-
+	
 	if (!str_cmp(arg1, "room") || !str_cmp(arg1, "wtr")) {
 		room = IN_ROOM(ch);
 		if (!SCRIPT(room))
@@ -1541,138 +1542,198 @@ ACMD(do_tdetach) {
 				extract_script(room, WLD_TRIGGER);
 			}
 		}
-		else
+		else {
 			msg_to_char(ch, "That trigger was not found.\r\n");
+		}
+		
+		// room always done now
+		return;
 	}
-	else {
-		if (is_abbrev(arg1, "mobile") || !str_cmp(arg1, "mtr")) {
-			victim = (*arg2 == UID_CHAR) ? get_char(arg2) : get_char_vis(ch, arg2, FIND_CHAR_WORLD);
-			if (!victim) { /* search room for one with this vnum */
-				for (victim = ROOM_PEOPLE(IN_ROOM(ch)); victim;victim=victim->next_in_room) 
-					if (GET_MOB_VNUM(victim) == num_arg)
-						break;
+	else if (is_abbrev(arg1, "mobile") || !str_cmp(arg1, "mtr")) {
+		victim = (*arg2 == UID_CHAR) ? get_char(arg2) : get_char_vis(ch, arg2, FIND_CHAR_WORLD);
+		if (!victim) { /* search room for one with this vnum */
+			for (victim = ROOM_PEOPLE(IN_ROOM(ch)); victim;victim=victim->next_in_room) 
+				if (GET_MOB_VNUM(victim) == num_arg)
+					break;
 
-				if (!victim) {
-					msg_to_char(ch, "No such mobile around.\r\n");
-					return;
-				}
-			}
-
-			if (!player_can_olc_edit(ch, OLC_MOBILE, GET_MOB_VNUM(victim))) {
-				msg_to_char(ch, "You can't edit that vnum.\r\n");
+			if (!victim) {
+				msg_to_char(ch, "No such mobile around.\r\n");
 				return;
 			}
-
-			if (!*arg3)
-				msg_to_char(ch, "You must specify a trigger to remove.\r\n");
-			else
-				trigger = arg3;
 		}
-		else if (is_abbrev(arg1, "object") || !str_cmp(arg1, "otr")) {
-			object = (*arg2 == UID_CHAR) ? get_obj(arg2) : get_obj_vis(ch, arg2);
-			if (!object) { /* search room for one with this vnum */
-				for (object = ROOM_CONTENTS(IN_ROOM(ch)); object;object=object->next_content) 
+
+		if (!player_can_olc_edit(ch, OLC_MOBILE, GET_MOB_VNUM(victim))) {
+			msg_to_char(ch, "You can't edit that vnum.\r\n");
+			return;
+		}
+
+		if (!*arg3)
+			msg_to_char(ch, "You must specify a trigger to remove.\r\n");
+		else
+			trigger = arg3;
+	}
+	else if (is_abbrev(arg1, "object") || !str_cmp(arg1, "otr")) {
+		object = (*arg2 == UID_CHAR) ? get_obj(arg2) : get_obj_vis(ch, arg2);
+		if (!object) { /* search room for one with this vnum */
+			for (object = ROOM_CONTENTS(IN_ROOM(ch)); object;object=object->next_content) 
+				if (GET_OBJ_VNUM(object) == num_arg)
+					break;
+
+			if (!object) { /* search inventory for one with this vnum */
+				for (object = ch->carrying;object;object=object->next_content) 
 					if (GET_OBJ_VNUM(object) == num_arg)
 						break;
 
-				if (!object) { /* search inventory for one with this vnum */
-					for (object = ch->carrying;object;object=object->next_content) 
-						if (GET_OBJ_VNUM(object) == num_arg)
-							break;
-
-					if (!object) { /* give up */
-						msg_to_char(ch, "No such object around.\r\n");
-						return;
-					}
+				if (!object) { /* give up */
+					msg_to_char(ch, "No such object around.\r\n");
+					return;
 				}
 			}
+		}
 
-			if (!player_can_olc_edit(ch, OLC_OBJECT, GET_OBJ_VNUM(object))) {
-				msg_to_char(ch, "You can't edit that vnum.\r\n");
+		if (!player_can_olc_edit(ch, OLC_OBJECT, GET_OBJ_VNUM(object))) {
+			msg_to_char(ch, "You can't edit that vnum.\r\n");
+			return;
+		}
+
+		if (!*arg3)
+			msg_to_char(ch, "You must specify a trigger to remove.\r\n");
+		else
+			trigger = arg3;
+	}
+	else if (is_abbrev(arg1, "vehicle") || !str_cmp(arg1, "vtr")) {
+		veh = (*arg2 == UID_CHAR) ? get_vehicle(arg2) : get_vehicle_vis(ch, arg2);
+		if (!veh) {
+			// search room for vehicle with matching vnum
+			LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+				if (VEH_VNUM(veh) == num_arg) {
+					break;
+				}
+			}
+			
+			// no?
+			if (!veh) {
+				msg_to_char(ch, "That vehicle does not exist.\r\n");
 				return;
 			}
+		}
+		
+		if (!player_can_olc_edit(ch, OLC_VEHICLE, VEH_VNUM(veh))) {
+			msg_to_char(ch, "You can't edit that vnum.\r\n");
+			return;
+		}
 
-			if (!*arg3)
-				msg_to_char(ch, "You must specify a trigger to remove.\r\n");
-			else
-				trigger = arg3;
+		if (!*arg3) {
+			msg_to_char(ch, "You must specify a trigger to remove.\r\n");
 		}
 		else {
-			if (*arg1 == UID_CHAR && ((victim = get_char(arg1)) || (object = get_obj(arg1)))) {
-			}
-			else if ((object = get_obj_in_equip_vis(ch, arg1, ch->equipment))) {
-				/* Thanks to Carlos Myers for fixing the line above */
-			}
-			else if ((object = get_obj_in_list_vis(ch, arg1, ch->carrying))) {
-			}
-			else if ((victim = get_char_room_vis(ch, arg1))) {
-			}
-			else if ((object = get_obj_in_list_vis(ch, arg1, ROOM_CONTENTS(IN_ROOM(ch))))) {
-			}
-			else if ((victim = get_char_vis(ch, arg1, FIND_CHAR_WORLD))) {
-			}
-			else if ((object = get_obj_vis(ch, arg1))) {
-			}
-			else {
-				msg_to_char(ch, "Nothing around by that name.\r\n");
-			}
-
-			if ((victim && !player_can_olc_edit(ch, OLC_MOBILE, GET_MOB_VNUM(victim))) || (object && !player_can_olc_edit(ch, OLC_OBJECT, GET_OBJ_VNUM(object)))) {
-				msg_to_char(ch, "You can't edit that vnum.\r\n");
-				return;
-			}
-
-			trigger = arg2;
+			trigger = arg3;
+		}
+	}
+	else {
+		if (*arg1 == UID_CHAR && ((victim = get_char(arg1)) || (object = get_obj(arg1)))) {
+		}
+		else if ((veh = get_vehicle_in_room_vis(ch, arg1))) {
+		}
+		else if ((object = get_obj_in_equip_vis(ch, arg1, ch->equipment))) {
+			/* Thanks to Carlos Myers for fixing the line above */
+		}
+		else if ((object = get_obj_in_list_vis(ch, arg1, ch->carrying))) {
+		}
+		else if ((victim = get_char_room_vis(ch, arg1))) {
+		}
+		else if ((object = get_obj_in_list_vis(ch, arg1, ROOM_CONTENTS(IN_ROOM(ch))))) {
+		}
+		else if ((victim = get_char_vis(ch, arg1, FIND_CHAR_WORLD))) {
+		}
+		else if ((veh = get_vehicle_vis(ch, arg1))) {
+		}
+		else if ((object = get_obj_vis(ch, arg1))) {
+		}
+		else {
+			msg_to_char(ch, "Nothing around by that name.\r\n");
 		}
 
-		if (victim) {
-			if (!IS_NPC(victim))
-				msg_to_char(ch, "Players don't have triggers.\r\n");
-			else if (!SCRIPT(victim))
-				msg_to_char(ch, "That mob doesn't have any triggers.\r\n");
-			else if (trigger && !str_cmp(trigger, "all")) {
+		if ((victim && !player_can_olc_edit(ch, OLC_MOBILE, GET_MOB_VNUM(victim))) || (object && !player_can_olc_edit(ch, OLC_OBJECT, GET_OBJ_VNUM(object))) || (veh && !player_can_olc_edit(ch, OLC_VEHICLE, VEH_VNUM(veh)))) {
+			msg_to_char(ch, "You can't edit that vnum.\r\n");
+			return;
+		}
+
+		trigger = arg2;
+	}
+	
+	// do the actual detaching
+	if (victim) {
+		if (!IS_NPC(victim))
+			msg_to_char(ch, "Players don't have triggers.\r\n");
+		else if (!SCRIPT(victim))
+			msg_to_char(ch, "That mob doesn't have any triggers.\r\n");
+		else if (trigger && !str_cmp(trigger, "all")) {
+			extract_script(victim, MOB_TRIGGER);
+			if (!IS_NPC(ch)) {
+				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "All triggers removed from mob %s by %s.", GET_SHORT(victim), GET_NAME(ch));
+			}
+			msg_to_char(ch, "All triggers removed from %s.\r\n", GET_SHORT(victim));
+		}
+		else if (trigger && remove_trigger(SCRIPT(victim), trigger)) {
+			if (!IS_NPC(ch)) {
+				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "Trigger %s removed from mob %s by %s.", trigger, GET_SHORT(victim), GET_NAME(ch));
+			}
+			msg_to_char(ch, "Trigger removed.\r\n");
+			if (!TRIGGERS(SCRIPT(victim))) {
 				extract_script(victim, MOB_TRIGGER);
-				if (!IS_NPC(ch)) {
-					syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "All triggers removed from mob %s by %s.", GET_SHORT(victim), GET_NAME(ch));
-				}
-				msg_to_char(ch, "All triggers removed from %s.\r\n", GET_SHORT(victim));
 			}
-			else if (trigger && remove_trigger(SCRIPT(victim), trigger)) {
-				if (!IS_NPC(ch)) {
-					syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "Trigger %s removed from mob %s by %s.", trigger, GET_SHORT(victim), GET_NAME(ch));
-				}
-				msg_to_char(ch, "Trigger removed.\r\n");
-				if (!TRIGGERS(SCRIPT(victim))) {
-					extract_script(victim, MOB_TRIGGER);
-				}
-			}
-			else
-				msg_to_char(ch, "That trigger was not found.\r\n");
 		}
-		else if (object) {
-			if (!SCRIPT(object))
-				msg_to_char(ch, "That object doesn't have any triggers.\r\n");
-			else if (trigger && !str_cmp(trigger, "all")) {
+		else
+			msg_to_char(ch, "That trigger was not found.\r\n");
+	}
+	else if (object) {
+		if (!SCRIPT(object))
+			msg_to_char(ch, "That object doesn't have any triggers.\r\n");
+		else if (trigger && !str_cmp(trigger, "all")) {
+			extract_script(object, OBJ_TRIGGER);
+			if (!IS_NPC(ch)) {
+				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "All triggers removed from obj %s by %s.", GET_OBJ_SHORT_DESC(object), GET_NAME(ch));
+			}
+			msg_to_char(ch, "All triggers removed from %s.\r\n", GET_OBJ_SHORT_DESC(object) ? GET_OBJ_SHORT_DESC(object) : object->name);
+		}
+		else if (remove_trigger(SCRIPT(object), trigger)) {
+			if (!IS_NPC(ch)) {
+				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "Trigger %s removed from obj %s by %s.", trigger, GET_OBJ_SHORT_DESC(object), GET_NAME(ch));
+			}
+			msg_to_char(ch, "Trigger removed.\r\n");
+			if (!TRIGGERS(SCRIPT(object))) {
 				extract_script(object, OBJ_TRIGGER);
-				if (!IS_NPC(ch)) {
-					syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "All triggers removed from obj %s by %s.", GET_OBJ_SHORT_DESC(object), GET_NAME(ch));
-				}
-				msg_to_char(ch, "All triggers removed from %s.\r\n", GET_OBJ_SHORT_DESC(object) ? GET_OBJ_SHORT_DESC(object) : object->name);
 			}
-			else if (remove_trigger(SCRIPT(object), trigger)) {
-				if (!IS_NPC(ch)) {
-					syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "Trigger %s removed from obj %s by %s.", trigger, GET_OBJ_SHORT_DESC(object), GET_NAME(ch));
-				}
-				msg_to_char(ch, "Trigger removed.\r\n");
-				if (!TRIGGERS(SCRIPT(object))) {
-					extract_script(object, OBJ_TRIGGER);
-				}
-			}
-			else
-				msg_to_char(ch, "That trigger was not found.\r\n");
 		}
-	}  
-}    
+		else
+			msg_to_char(ch, "That trigger was not found.\r\n");
+	}
+	else if (veh) {
+		if (!SCRIPT(veh)) {
+			msg_to_char(ch, "That vehicle has no triggers.\r\n");
+		}
+		else if (trigger && !str_cmp(trigger, "all")) {
+			extract_script(veh, VEH_TRIGGER);
+			if (!IS_NPC(ch)) {
+				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "All triggers removed from vehicle %s by %s.", VEH_SHORT_DESC(veh), GET_NAME(ch));
+			}
+			msg_to_char(ch, "All triggers removed from %s.\r\n", VEH_SHORT_DESC(veh));
+		}
+		else if (remove_trigger(SCRIPT(veh), trigger)) {
+			if (!IS_NPC(ch)) {
+				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "Trigger %s removed from vehicle %s by %s.", trigger, VEH_SHORT_DESC(veh), GET_NAME(ch));
+			}
+			msg_to_char(ch, "Trigger removed.\r\n");
+			if (!TRIGGERS(SCRIPT(veh))) {
+				extract_script(veh, VEH_TRIGGER);
+			}
+		}
+		else {
+			msg_to_char(ch, "That trigger was not found.\r\n");
+		}
+	}
+}
 
 
 /* frees memory associated with var */
@@ -4433,6 +4494,7 @@ void process_attach(void *go, struct script_data *sc, trig_data *trig, int type,
 	char arg[MAX_INPUT_LENGTH], trignum_s[MAX_INPUT_LENGTH];
 	char result[MAX_INPUT_LENGTH], *id_p;
 	trig_data *newtrig, *proto;
+	vehicle_data *v = NULL;
 	char_data *c=NULL;
 	obj_data *o=NULL;
 	room_data *r=NULL;
@@ -4457,16 +4519,10 @@ void process_attach(void *go, struct script_data *sc, trig_data *trig, int type,
 		script_log("Trigger: %s, VNum %d. attach invalid id arg: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), cmd);
 		return;
 	}
-	c = find_char(id);
-	if (!c) {
-		o = find_obj(id);
-		if (!o) {
-			r = find_room(id);
-			if (!r) {
-				script_log("Trigger: %s, VNum %d. attach invalid id arg: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), cmd);
-				return;
-			}
-		}
+	
+	if (!(c = find_char(id)) && !(v = find_vehicle(id)) && !(o = find_obj(id)) && !(r = find_room(id))) {
+		script_log("Trigger: %s, VNum %d. attach invalid id arg: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), cmd);
+		return;
 	}
 
 	/* locate and load the trigger specified */
@@ -4484,6 +4540,14 @@ void process_attach(void *go, struct script_data *sc, trig_data *trig, int type,
 		if (!SCRIPT(c))
 			CREATE(SCRIPT(c), struct script_data, 1);
 		add_trigger(SCRIPT(c), newtrig, -1);
+		return;
+	}
+
+	if (v) {
+		if (!SCRIPT(v)) {
+			CREATE(SCRIPT(v), struct script_data, 1);
+		}
+		add_trigger(SCRIPT(v), newtrig, -1);
 		return;
 	}
 
@@ -4507,6 +4571,7 @@ void process_attach(void *go, struct script_data *sc, trig_data *trig, int type,
 void process_detach(void *go, struct script_data *sc, trig_data *trig, int type, char *cmd) {
 	char arg[MAX_INPUT_LENGTH], trignum_s[MAX_INPUT_LENGTH];
 	char result[MAX_INPUT_LENGTH], *id_p;
+	vehicle_data *v = NULL;
 	char_data *c=NULL;
 	obj_data *o=NULL;
 	room_data *r=NULL;
@@ -4531,16 +4596,11 @@ void process_detach(void *go, struct script_data *sc, trig_data *trig, int type,
 		script_log("Trigger: %s, VNum %d. detach invalid id arg: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), cmd);
 		return;
 	}
-	c = find_char(id);
-	if (!c) {
-		o = find_obj(id);
-		if (!o) {
-			r = find_room(id);
-			if (!r) {
-				script_log("Trigger: %s, VNum %d. detach invalid id arg: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), cmd);
-				return;
-			}
-		}
+	
+	// find first good match
+	if (!(c = find_char(id)) && !(v = find_vehicle(id)) && !(o = find_obj(id)) && !(r = find_room(id))) {
+		script_log("Trigger: %s, VNum %d. detach invalid id arg: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), cmd);
+		return;
 	}
 
 	if (c && SCRIPT(c)) {
@@ -4551,6 +4611,19 @@ void process_detach(void *go, struct script_data *sc, trig_data *trig, int type,
 		if (remove_trigger(SCRIPT(c), trignum_s)) {
 			if (!TRIGGERS(SCRIPT(c))) {
 				extract_script(c, MOB_TRIGGER);
+			}
+		}
+		return;
+	}
+
+	if (v && SCRIPT(v)) {
+		if (!str_cmp(trignum_s, "all")) {
+			extract_script(v, VEH_TRIGGER);
+			return;
+		}
+		if (remove_trigger(SCRIPT(v), trignum_s)) {
+			if (!TRIGGERS(SCRIPT(v))) {
+				extract_script(v, VEH_TRIGGER);
 			}
 		}
 		return;

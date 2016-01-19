@@ -4140,6 +4140,8 @@ object.
 
 The attach type also determines which event types you can choose.
 
+You can find help files for different triggers at: &yMTRIG&0, &yOTRIG&0, &yRTRIG&0, &yVTRIG&0
+
 See also: OLC TRIGGERS, TRIGEDIT TYPES
 #d
 "TRIGEDIT COMMANDS" TRIGEDIT-COMMANDS TRIG-COMMANDS TRIGGER-COMMANDS TRIGEDIT-COMMANDLISTS
