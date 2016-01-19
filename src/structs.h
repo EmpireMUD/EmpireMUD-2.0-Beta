@@ -1150,6 +1150,8 @@ typedef struct vehicle_data vehicle_data;
 #define OBJ_CUSTOM_EAT_TO_ROOM  5
 #define OBJ_CUSTOM_CRAFT_TO_CHAR  6
 #define OBJ_CUSTOM_CRAFT_TO_ROOM  7
+#define OBJ_CUSTOM_WEAR_TO_CHAR  8
+#define OBJ_CUSTOM_WEAR_TO_ROOM  9
 
 
 // storage flags (for obj storage locations)

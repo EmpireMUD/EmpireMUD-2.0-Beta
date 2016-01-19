@@ -1836,6 +1836,8 @@ const char *obj_custom_types[] = {
 	"eat-to-room",
 	"craft-to-char",
 	"craft-to-room",
+	"wear-to-char",
+	"wear-to-room",
 	"\n"
 };
 
