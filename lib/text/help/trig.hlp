@@ -29,7 +29,7 @@ performed in them, but mobs and objects only execute Ability triggers if they
 are the target of the ability.
 
 Variables: 
-  &c%actor% - The user of the ability.
+  &c%actor%&0 - The user of the ability.
   &c%ability%&0 - The vnum of the ability.
   &c%abilityname%&0 - The name of the ability.
 
