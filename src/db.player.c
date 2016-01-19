@@ -3200,7 +3200,7 @@ void set_title(char_data *ch, char *title) {
 	if (GET_TITLE(ch) != NULL)
 		free(GET_TITLE(ch));
 
-	if (*title != ':' && *title != ',' && *title != '-' && *title != ';' && *title != '~')
+	if (*title && *title != ':' && *title != ',' && *title != '-' && *title != ';' && *title != '~')
 		sprintf(buf, " %s", title);
 	else
 		strcpy(buf, title);
