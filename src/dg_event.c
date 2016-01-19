@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: dg_event.c                                      EmpireMUD 2.0b2 *
+*   File: dg_event.c                                      EmpireMUD 2.0b3 *
 *  Usage: Simplified event system to allow DG Scripts triggers to "wait"  *
 *         As of DG Scripts pl 8, this includes queue.c priority queues    *
 *                                                                         *

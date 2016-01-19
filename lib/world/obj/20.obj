@@ -5,7 +5,7 @@ Someone has dropped a traveling hat.~
    This soft leather hat protects the head from the sun while traveling across
 the countryside. It looks like it was made by a skilled tailor.
 ~
-2 0 ae
+2 0 ae 1
 0 0 0
 7 0
 R
@@ -18,7 +18,7 @@ A dirty leather hood is sitting on the ground.~
    The hood has been stitched together from soft, expertly-worked leather. It
 covers the head and shoulders, and does a fair job of obscuring the face.
 ~
-2 0 ae
+2 0 ae 1
 0 0 0
 7 0
 R
@@ -30,7 +30,7 @@ a red hood~
 A red hood is lying here.~
 This hood is made of fine red cloth and stitched by an expert tailor.
 ~
-2 0 ae
+2 0 ae 1
 0 0 0
 7 0
 R
@@ -43,7 +43,7 @@ A barbette is lying on the ground.~
    This barbette is a small ladies' hat that is tied around the chin, with a
 beautiful piece of cloth to cover the hair.
 ~
-2 0 ae
+2 0 ae 1
 0 0 0
 7 0
 R
@@ -55,7 +55,7 @@ a brimmed cap~
 A brimmed cap is lying on the ground.~
 The cap is made of fine cloth. Its upturned brim is the height of fashion.
 ~
-2 0 ae
+2 0 ae 1
 0 0 0
 7 0
 R
@@ -67,7 +67,7 @@ a bonnet~
 There is a bonnet on the ground.~
 The bonnet is made of folds of fine cloth and would look good on your head.
 ~
-2 0 ae
+2 0 ae 1
 0 0 0
 7 0
 R
@@ -79,7 +79,7 @@ a coif~
 A simple coif is sitting on the ground.~
 The coif is among the most popular hats of the day.
 ~
-2 0 ae
+2 0 ae 1
 0 0 0
 7 0
 R
@@ -91,7 +91,7 @@ a blouse~
 A ruffled blouse is draped across the ground.~
 The blouse is made of fine, expertly tailored cloth.
 ~
-2 0 ad
+2 0 ad 1
 0 0 0
 11 0
 R
@@ -104,7 +104,7 @@ A pleated dress has been left here.~
    The dress is made of several layers of fine cloth and is masterfully pleated
 to create a flowing effect as you walk.
 ~
-2 0 ad
+2 0 ad 1
 0 0 0
 11 0
 R
@@ -116,7 +116,7 @@ a shirt~
 A fine tailored shirt has been left here.~
 This shirt, though simple, is the height of men's fashion in the city.
 ~
-2 0 ad
+2 0 ad 1
 0 0 0
 11 0
 R
@@ -128,7 +128,7 @@ a fur hat~
 A fur hat is sitting on the ground.~
 This reddish hat looks like it might be made from fox.
 ~
-2 0 ae
+2 0 ae 1
 0 0 0
 7 0
 R
@@ -141,7 +141,7 @@ A flowing toga is draped all along the ground.~
    The toga, made from one very long piece of cloth, was once the height of
 city fashion. Now, it reminds people of an earlier time.
 ~
-2 0 ad
+2 0 ad 1
 0 0 0
 11 0
 R
@@ -154,7 +154,7 @@ A plain brown robe has been discarded here.~
    The robe is made from simple cloth, dyed brown to prevent staining. This
 type of robe is worn by everyone from humble druids to elderly statesmen.
 ~
-2 0 ad
+2 0 ad 1
 0 0 0
 11 0
 R
@@ -168,7 +168,7 @@ A fine doublet was left here.~
 king's court from sea to sea. It is made from quilted layers of fine cloth, and
 comes down to the hip.
 ~
-2 0 ad
+2 0 ad 1
 0 0 0
 11 0
 R
@@ -180,7 +180,7 @@ a shirt and waistcoat~
 A shirt and waistcoat are folded up on the ground.~
 A well-pressed shirt and waistcoat are the mark of a gentleman.
 ~
-2 0 ad
+2 0 ad 1
 0 0 0
 11 0
 R
@@ -192,7 +192,7 @@ a tunic~
 A plain tunic is lying on the ground.~
 Tunics have been standard clothing since the dawn of civilization.
 ~
-2 0 ad
+2 0 ad 1
 0 0 0
 11 0
 R
@@ -204,7 +204,7 @@ a leather jacket~
 A leather jacket has fallen to the ground.~
 This leather jacket has been made to withstand the rugged environment.
 ~
-2 0 ad
+2 0 ad 1
 0 0 0
 7 0
 R
@@ -218,7 +218,7 @@ A spotted robe is lying on the ground.~
 warrior. It is made from the spotted pelt of a ferocious jungle cat, and it
 retains every ounce of that animal's majesty.
 ~
-2 0 ad
+2 0 ad 1
 0 0 0
 7 0
 R
@@ -231,7 +231,7 @@ A cape is draped out on the ground.~
    This short cape adds a little rain protection and a little class to any
 citizen's traveling ensemble.
 ~
-2 0 ak
+2 0 ak 1
 0 0 0
 7 0
 R
@@ -243,7 +243,7 @@ a dark cloak~
 A dark cloak has been dropped here.~
 This sheepskin cloak is perfect for hiding in the shadows.
 ~
-2 0 ak
+2 0 ak 1
 0 0 0
 7 0
 R
@@ -255,7 +255,7 @@ a fur shawl~
 A fur shawl is lying here.~
 The fur shawl is warm and comfortable.
 ~
-2 0 ak
+2 0 ak 1
 0 0 0
 7 0
 R
@@ -267,7 +267,7 @@ a cloth mantle~
 A cloth mantle is lying on the ground.~
 The mantle provides light protection for your other clothing.
 ~
-2 0 ak
+2 0 ak 1
 0 0 0
 7 0
 R
@@ -279,7 +279,7 @@ a wimple~
 A wimple is lying here.~
 The wimple is common headwear for pious women.
 ~
-2 0 ae
+2 0 ae 1
 0 0 0
 7 0
 R
@@ -291,7 +291,7 @@ fine cloth gloves~
 A pair of gloves is lying here.~
 The gloves are made of fine cloth, by a master tailor.
 ~
-2 0 ah
+2 0 ah 1
 0 0 0
 7 0
 R
@@ -303,7 +303,7 @@ a pair of leather gloves~
 A pair of leather gloves is lying here.~
 These gloves are made from finely crafted leather.
 ~
-2 0 ah
+2 0 ah 1
 0 0 0
 7 0
 R
@@ -315,7 +315,7 @@ a leather belt~
 A leather belt has fallen on the ground.~
 The leather belt is perfect for attaching your sheath.
 ~
-2 0 al
+2 0 al 1
 0 0 0
 7 0
 R
@@ -327,7 +327,7 @@ a cloth girdle~
 Someone has lost her girdle on the ground.~
 The girdle resembles a loose cloth belt.
 ~
-2 0 al
+2 0 al 1
 0 0 0
 7 0
 R
@@ -339,7 +339,7 @@ leather pants~
 A pair of leather pants is lying here.~
 These sturdy pants are good for a life in the wilderness.
 ~
-2 0 af
+2 0 af 1
 0 0 0
 7 0
 R
@@ -352,7 +352,7 @@ A pair of breeches is lying here.~
    Breeches are popular tailored pants that cover from the waist down to just
 below the knee.
 ~
-2 0 af
+2 0 af 1
 0 0 0
 7 0
 R
@@ -364,7 +364,7 @@ a pair of stockings~
 A pair of stockings is lying here.~
 These fine stockings are made from cotton cloth.
 ~
-2 0 af
+2 0 af 1
 0 0 0
 7 0
 R
@@ -376,7 +376,7 @@ a pair of hose~
 A pair of hose is lying here.~
 Hose are common men's fashion in the city.
 ~
-2 0 af
+2 0 af 1
 0 0 0
 7 0
 R
@@ -388,7 +388,7 @@ a pair of moccasins~
 A pair of moccasins is lying here.~
 These soft leather shoes protect your feet from the ground.
 ~
-2 0 ag
+2 0 ag 1
 0 0 0
 7 0
 R
@@ -400,7 +400,7 @@ a pair of sandals~
 A pair of sandals are sitting on the ground.~
 These simple shoes are comfortable around the city.
 ~
-2 0 ag
+2 0 ag 1
 0 0 0
 7 0
 R
@@ -412,7 +412,7 @@ a canteen~
 A canteen has been left here.~
 Canteens are good for holding water.
 ~
-5 0 a
+5 0 a 1
 32 0 0
 7 0
 R
@@ -426,7 +426,7 @@ a wineskin~
 A wineskin has mistakenly been dropped here.~
 Wineskins are good for holding all kinds of liquids.
 ~
-5 0 a
+5 0 a 1
 56 0 0
 7 0
 R
@@ -440,21 +440,53 @@ a length of rope~
 A rope is coiled on the ground.~
 Rope can be used to lead, tie, or harness an animal.
 ~
-3 l a
+3 l a 3
 0 0 0
 7 0
+M
+6
+You attach a rope to $V.~
+M
+7
+$n attaches a rope to $V.~
 R
 5121 0
 R
 5610 0
+R
+5153 0
+R
+5154 0
 S
 #2036
 tent collapsed folded~
 a collapsed tent~
 A folded up tent has been left on the ground.~
 ~
-3 0 a
+3 0 a 1
 0 0 0
 7 0
+S
+#2037
+sail folded~
+a folded sail~
+A sail is folded neatly on the ground.~
+Sails are used in shipbuilding.
+~
+3 el a 2
+0 0 0
+11 0
+C
+1 1
+M
+6
+You run a sail up the mast of $V.~
+M
+7
+$n runs a sail up the mast of $V.~
+R
+5153 0
+R
+5154 0
 S
 $

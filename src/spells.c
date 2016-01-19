@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: spells.c                                        EmpireMUD 2.0b2 *
+*   File: spells.c                                        EmpireMUD 2.0b3 *
 *  Usage: implementation for spells                                       *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -62,7 +62,7 @@ bool trigger_counterspell(char_data *ch) {
 //// DAMAGE SPELLS ///////////////////////////////////////////////////////////
 
 struct damage_spell_type {
-	int ability;	// ABIL_x
+	any_vnum ability;	// ABIL_ type
 	int cost;	// mana
 	int attack_type;	// ATTACK_x
 	double damage_mod;	// 1.0 = normal damage, balance based on affects
@@ -196,7 +196,9 @@ ACMD(do_damage_spell) {
 		damage(ch, vict, 0, damage_spell[type].attack_type, DAM_MAGICAL);
 	}
 	
-	gain_ability_exp(ch, subcmd, 15);
+	if (can_gain_exp_from(ch, vict)) {
+		gain_ability_exp(ch, subcmd, 15);
+	}
 }
 
 
@@ -209,7 +211,7 @@ ACMD(do_damage_spell) {
 
 struct chant_data_type {
 	char *name;
-	int ability;
+	any_vnum ability;
 	bitvector_t flags;
 } chant_data[] = {
 	{ "druids", NO_ABIL, CHANT_HENGE },	// 0
@@ -222,7 +224,7 @@ struct chant_data_type {
 bool can_use_chant(char_data *ch, int chant) {
 	bool ok = TRUE;
 	
-	if (chant_data[chant].ability != NO_ABIL && !HAS_ABILITY(ch, chant_data[chant].ability)) {
+	if (chant_data[chant].ability != NO_ABIL && !has_ability(ch, chant_data[chant].ability)) {
 		ok = FALSE;
 	}
 	
@@ -235,12 +237,11 @@ bool can_use_chant(char_data *ch, int chant) {
 
 
 void perform_chant(char_data *ch) {
-	void set_skill(char_data *ch, int skill, int level);
+	void set_skill(char_data *ch, any_vnum skill, int level);
 	char lbuf[MAX_STRING_LENGTH];
 	struct evolution_data *evo;
 	int chant = GET_ACTION_VNUM(ch, 0);
 	sector_data *new_sect, *preserve;
-	crop_vnum cropv;
 	
 	// some chants could be timed...
 	if (GET_ACTION_TIMER(ch) > 0) {
@@ -282,7 +283,7 @@ void perform_chant(char_data *ch) {
 	// effects?
 	switch (chant) {
 		case 0: {	// druids
-			if (CAN_GAIN_NEW_SKILLS(ch) && GET_SKILL(ch, SKILL_NATURAL_MAGIC) == 0 && number(0, 99) == 0 && !NOSKILL_BLOCKED(ch, SKILL_NATURAL_MAGIC)) {
+			if (CAN_GAIN_NEW_SKILLS(ch) && get_skill_level(ch, SKILL_NATURAL_MAGIC) == 0 && number(0, 99) == 0 && noskill_ok(ch, SKILL_NATURAL_MAGIC)) {
 				msg_to_char(ch, "&gAs you chant, you begin to see the weave of mana through nature...&0\r\n");
 				set_skill(ch, SKILL_NATURAL_MAGIC, 1);
 				SAVE_CHAR(ch);
@@ -293,8 +294,7 @@ void perform_chant(char_data *ch) {
 			// percentage is checked in the evolution data
 			if ((evo = get_evolution_by_type(SECT(IN_ROOM(ch)), EVO_MAGIC_GROWTH))) {
 				new_sect = sector_proto(evo->becomes);
-				cropv = ROOM_CROP_TYPE(IN_ROOM(ch));
-				preserve = (ROOM_ORIGINAL_SECT(IN_ROOM(ch)) != SECT(IN_ROOM(ch))) ? ROOM_ORIGINAL_SECT(IN_ROOM(ch)) : NULL;
+				preserve = (BASE_SECT(IN_ROOM(ch)) != SECT(IN_ROOM(ch))) ? BASE_SECT(IN_ROOM(ch)) : NULL;
 				
 				// messaging based on whether or not it's choppable
 				if (new_sect && has_evolution_type(new_sect, EVO_CHOPPED_DOWN)) {
@@ -307,12 +307,12 @@ void perform_chant(char_data *ch) {
 				}
 				
 				change_terrain(IN_ROOM(ch), evo->becomes);
-				if (cropv != NOTHING) {
-					set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CROP_TYPE, cropv);
-				}
 				if (preserve) {
-					ROOM_ORIGINAL_SECT(IN_ROOM(ch)) = preserve;
+					change_base_sector(IN_ROOM(ch), preserve);
 				}
+				
+				remove_depletion(IN_ROOM(ch), DPLTN_PICK);
+				remove_depletion(IN_ROOM(ch), DPLTN_FORAGE);
 				
 				gain_ability_exp(ch, ABIL_CHANT_OF_NATURE, 20);
 			}
@@ -417,7 +417,7 @@ ACMD(do_chant) {
 struct ready_magic_weapon_type {
 	char *name;
 	int mana;
-	int ability;
+	any_vnum ability;
 	obj_vnum vnum;
 	double min_dps;	// the lowest the DPS should ever go (or close to it)
 	double target_dps;	// DPS at level 100 -- will get as close to this as possible without going over
@@ -445,7 +445,7 @@ ACMD(do_ready) {
 		
 		found = FALSE;
 		for (iter = 0; *ready_magic_weapon[iter].name != '\n'; ++iter) {
-			if (ready_magic_weapon[iter].ability == NO_ABIL || HAS_ABILITY(ch, ready_magic_weapon[iter].ability)) {
+			if (ready_magic_weapon[iter].ability == NO_ABIL || has_ability(ch, ready_magic_weapon[iter].ability)) {
 				msg_to_char(ch, "%s%s", (found ? ", " : ""), ready_magic_weapon[iter].name);
 				found = TRUE;
 			}
@@ -457,7 +457,7 @@ ACMD(do_ready) {
 
 	found = FALSE;
 	for (iter = 0; *ready_magic_weapon[iter].name != '\n' && !found; ++iter) {
-		if (is_abbrev(arg, ready_magic_weapon[iter].name) && (ready_magic_weapon[iter].ability == NO_ABIL || HAS_ABILITY(ch, ready_magic_weapon[iter].ability))) {
+		if (is_abbrev(arg, ready_magic_weapon[iter].name) && (ready_magic_weapon[iter].ability == NO_ABIL || has_ability(ch, ready_magic_weapon[iter].ability))) {
 			type = iter;
 			found = TRUE;
 		}

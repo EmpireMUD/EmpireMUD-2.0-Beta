@@ -1,0 +1,118 @@
+=====================================================================
+Updating EmpireMUD from 2.0b3 binary playerfiles to ascii playerfiles
+=====================================================================
+
+Upgrade Intro, or, What are ASCII playerfiles?
+
+  Older versions of EmpireMID (like its CircleMUD and DikuMUD ancestors) used
+  a binary playerfile that contained all the players as fixed-length data. This
+  meant that adding new features to the playerfile required writing and running
+  a converter program on it. Additionally, players had extra files to store
+  variable-length data like aliases, equipment, inventory, lore, mail, and
+  script variables.
+  
+  ASCII (or "tagged") playerfiles instead use a human-readable text file for
+  each player. This file stores all of the information for the character, and
+  is parsed as text when EmpireMUD loads the player. Changes to the player
+  data structs in the game will not corrupt this type of playerfile. If you
+  wish to add new data, you can add a place where it's written to the player-
+  file, and a place where it's read in if available. Existing playerfiles just
+  don't have the data yet, and won't cause any problems -- those players will
+  just get default or empty data for those fields, until they're saved again.
+  
+  Why didn't older MUDs do this? It's largely a time consideration. Most MUD
+  source code comes from an older, less civilized era, when processing time
+  was at a premium, and file loading was slow. These just aren't big enough
+  concerns anymore. Patch 2.0b3.1, which introduced ascii playerfiles, was a
+  massive update with thousands of lines of new and changed code, but it opens
+  up new flexibility in player data and will effectively mean this is the last
+  time you will have to run a player converter.
+
+WARNINGS:
+- You will need to convert your playerfile for this upgrade.
+- If you used any of the "spare" variables in player_special_data_saved, or if
+you added any variables to the player_special_data, char_special_data, or
+char_special_data_saved, you need to update the playerfile converter to
+preserve your spares.
+- If you made any changes to those things, you will also need to update the
+write_player_to_file() and read_player_primary_data() functions in db.player.c.
+- If you haven't made any code changes, you can use the converter as-is.
+
+Step by step instructions:
+
+1. Shut down your EmpireMUD using "shutdown die".
+
+2. Create a backup of your MUD.
+
+3. Update your code to 2.0b3.1 using git, or by creating a patch on the GitHub
+site. (Usually you should "git stash", "git pull", then "git stash pop").
+
+4. If any of your own changes conflict, you must resolve conflicts in those
+files. Conflict sections look like this:
+
+  <<<<<<< Updated upstream
+    ...
+  =======
+    ...
+  >>>>>>> Stashed changes
+
+Your original code is between the === and >>> lines (the bottom part). The top
+portion is the change from the repository. You'll have to reconcile the two
+sections and remove the <<<, ===, and >>> lines.
+
+5. If you haven't changed your Makefiles or conf.h, you can run the 'configure'
+script again to get new Makefiles. Otherwise, you will need to manually add the
+following to src/utils/Makefile:
+
+  5a. In the "all:" block, add:
+
+    $(BINDIR)/plrconv-20b3-to-ascii
+
+  5b. After the "plrconv-20b2-to-20b3:" line, add a new section:
+
+    plrconv-20b3-to-ascii: $(BINDIR)/plrconv-20b3-to-ascii
+
+  5c. At the end, add this block:
+
+    $(BINDIR)/plrconv-20b3-to-ascii: plrconv-20b3-to-ascii.c $(INCDIR)/conf.h \
+       $(INCDIR)/sysdep.h $(INCDIR)/structs.h $(INCDIR)/utils.h
+       $(CC) $(CFLAGS) -o $(BINDIR)/plrconv-20b3-to-ascii plrconv-20b3-to-ascii.c
+  
+  5d: Remove all references to the following utilities, which were removed:
+
+    autowiz
+    mudpasswd
+    plrconv (the base plrconv, not the version-specific ones)
+    purgeplay
+    showplay
+
+6. If you didn't run 'configure' again, you'll also need to update your main
+Makefile (src/Makefile): Remove all references to alias.c, which was removed.
+
+7. Compile your MUD using "make all". This will also compile the playerfile
+converter.
+
+8. Use the playerfile converter to update your playerfile:
+
+  8a. Change directory into the mud's base directory, for example:
+
+    cd empiremud
+
+  8b. Run the converter from here:
+
+    ./bin/plrconv-20b3-to-ascii
+
+  8c. After the converter finishes, you can delete the following files and
+  directories:
+
+    rm lib/etc/players lib/etc/plrmail
+    rm -rf lib/plralias/ lib/plrlore/ lib/plrobjs/ lib/plrvars/
+
+9. Start up your MUD like normal.
+
+    ./autorun &
+
+10. For help with this update, contact us:
+
+  Email: paul@empiremud.net
+  Forums: http://empiremud.net/forums/

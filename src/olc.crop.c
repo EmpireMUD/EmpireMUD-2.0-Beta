@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: olc.crop.c                                      EmpireMUD 2.0b2 *
+*   File: olc.crop.c                                      EmpireMUD 2.0b3 *
 *  Usage: OLC for crop prototypes                                         *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -75,6 +75,27 @@ crop_data* create_crop_table_entry(crop_vnum vnum) {
 
 
 /**
+* For the .list command.
+*
+* @param crop_data *crop The thing to list.
+* @param bool detail If TRUE, provide additional details
+* @return char* The line to show (without a CRLF).
+*/
+char *list_one_crop(crop_data *crop, bool detail) {
+	static char output[MAX_STRING_LENGTH];
+	
+	if (detail) {
+		snprintf(output, sizeof(output), "[%5d] %s", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
+	}
+	else {
+		snprintf(output, sizeof(output), "[%5d] %s", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
+	}
+	
+	return output;
+}
+
+
+/**
 * WARNING: This function actually deletes a crop.
 *
 * @param char_data *ch The person doing the deleting.
@@ -113,8 +134,9 @@ void olc_delete_crop(char_data *ch, crop_vnum vnum) {
 	
 	// update world
 	count = 0;
-	HASH_ITER(world_hh, world_table, room, next_room) {
-		if (get_room_extra_data(room, ROOM_EXTRA_CROP_TYPE) == vnum) {
+	HASH_ITER(hh, world_table, room, next_room) {
+		if (ROOM_CROP(room) == crop) {
+			set_crop_type(room, NULL);	// remove it explicitly
 			change_terrain(room, GET_SECT_VNUM(base));
 			++count;
 		}

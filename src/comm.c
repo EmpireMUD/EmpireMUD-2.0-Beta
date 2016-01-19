@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: comm.c                                          EmpireMUD 2.0b2 *
+*   File: comm.c                                          EmpireMUD 2.0b3 *
 *  Usage: Communication, socket handling, main(), central game loop       *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -54,8 +54,7 @@ extern char **intros;
 extern int num_intros;
 extern const char *version;
 extern int wizlock_level;
-extern int no_rent_check;
-extern FILE *player_fl;
+extern int no_auto_deletes;
 extern ush_int DFLT_PORT;
 extern const char *DFLT_DIR;
 extern char *LOGNAME;
@@ -63,7 +62,7 @@ extern int max_playing;
 extern char *help;
 
 // external functions
-void Crash_save_all();
+void save_all_players();
 extern char *flush_reduced_color_codes(descriptor_data *desc);
 void mobile_activity(void);
 void show_string(descriptor_data *d, char *input);
@@ -74,7 +73,6 @@ void save_whole_world();
 RETSIGTYPE checkpointing(int sig);
 RETSIGTYPE hupsig(int sig);
 RETSIGTYPE reap(int sig);
-RETSIGTYPE reread_wizlists(int sig);
 RETSIGTYPE unrestrict_game(int sig);
 char *make_prompt(descriptor_data *point);
 char *prompt_str(char_data *ch);
@@ -100,7 +98,7 @@ void heartbeat(int heart_pulse);
 void init_descriptor(descriptor_data *newd, int desc);
 void init_game(ush_int port);
 void nonblock(socket_t s);
-void perform_act(const char *orig, char_data *ch, obj_data *obj, const void *vict_obj, const char_data *to, bool ignore_bad_act_codes);
+void perform_act(const char *orig, char_data *ch, const void *obj, const void *vict_obj, const char_data *to, bool ignore_bad_act_codes, bool obj_is_vehicle);
 void reboot_recover(void);
 void setup_log(const char *filename, int fd);
 void signal_setup(void);
@@ -204,7 +202,7 @@ inline void empire_sleep(struct timeval *timeout) {
 * @param char_data *ch The player to update (no effect if no descriptor).
 */
 void msdp_update_room(char_data *ch) {
-	extern struct instance_data *find_instance_by_room(room_data *room);
+	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 	extern char *get_room_name(room_data *room, bool color);
 	extern const char *alt_dirs[];
 	
@@ -221,7 +219,7 @@ void msdp_update_room(char_data *ch) {
 	}
 
 	// determine area name: we'll use it twice
-	if ((inst = find_instance_by_room(IN_ROOM(ch)))) {
+	if ((inst = find_instance_by_room(IN_ROOM(ch), FALSE))) {
 		snprintf(area_name, sizeof(area_name), "%s", GET_ADV_NAME(inst->adventure));
 	}
 	else if ((city = find_city(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch)))) {
@@ -241,7 +239,7 @@ void msdp_update_room(char_data *ch) {
 	buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cAREA%c%s", (char)MSDP_VAR, (char)MSDP_VAL, area_name);
 	
 	buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cCOORDS%c%c", (char)MSDP_VAR, (char)MSDP_VAL, (char)MSDP_TABLE_OPEN);
-	if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
+	if (has_ability(ch, ABIL_NAVIGATION)) {
 		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cX%c%d", (char)MSDP_VAR, (char)MSDP_VAL, X_COORD(IN_ROOM(ch)));
 		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cY%c%d", (char)MSDP_VAR, (char)MSDP_VAL, Y_COORD(IN_ROOM(ch)));
 	}
@@ -295,13 +293,14 @@ static void msdp_update(void) {
 	extern const double hit_per_dex;
 	extern const char *seasons[];
 	
+	struct player_skill_data *skill, *next_skill;
 	struct over_time_effect_type *dot;
 	char buf[MAX_STRING_LENGTH];
 	struct cooldown_data *cool;
 	char_data *ch, *pOpponent;
 	struct affected_type *aff;
 	descriptor_data *d;
-	int hit_points, iter, PlayerCount = 0;
+	int hit_points, PlayerCount = 0;
 	size_t buf_size;
 
 	for (d = descriptor_list; d; d = d->next) {
@@ -367,24 +366,22 @@ static void msdp_update(void) {
 			MSDPSetNumber(d, eMSDP_GEAR_LEVEL, IS_NPC(ch) ? 0 : GET_GEAR_LEVEL(ch));
 			MSDPSetNumber(d, eMSDP_CRAFTING_LEVEL, get_crafting_level(ch));
 
-			snprintf(buf, sizeof(buf), "%s", IS_IMMORTAL(ch) ? "Immortal" : class_data[GET_CLASS(ch)].name);
+			snprintf(buf, sizeof(buf), "%s", SHOW_CLASS_NAME(ch));
 			MSDPSetString(d, eMSDP_CLASS, buf);
 			
 			// skills
 			*buf = '\0';
 			buf_size = 0;
-			for (iter = 0; iter < NUM_SKILLS; ++iter) {
-				if (GET_SKILL(ch, iter) > 0) {
-					buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%c", (char)MSDP_VAR, skill_data[iter].name, (char)MSDP_VAL, (char)MSDP_TABLE_OPEN);
-					
-					buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cLEVEL%c%d", (char)MSDP_VAR, (char)MSDP_VAL, GET_SKILL(ch, iter));
-					buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cEXP%c%.2f", (char)MSDP_VAR, (char)MSDP_VAL, GET_SKILL_EXP(ch, iter));
-					buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cRESETS%c%d", (char)MSDP_VAR, (char)MSDP_VAL, GET_FREE_SKILL_RESETS(ch, iter));
-					buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cNOSKILL%c%d", (char)MSDP_VAR, (char)MSDP_VAL, NOSKILL_BLOCKED(ch, iter));
-					
-					// end table
-					buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c", (char)MSDP_TABLE_CLOSE);
-				}
+			HASH_ITER(hh, GET_SKILL_HASH(ch), skill, next_skill) {
+				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%c", (char)MSDP_VAR, SKILL_NAME(skill->ptr), (char)MSDP_VAL, (char)MSDP_TABLE_OPEN);
+				
+				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cLEVEL%c%d", (char)MSDP_VAR, (char)MSDP_VAL, skill->level);
+				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cEXP%c%.2f", (char)MSDP_VAR, (char)MSDP_VAL, skill->exp);
+				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cRESETS%c%d", (char)MSDP_VAR, (char)MSDP_VAL, skill->resets);
+				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cNOSKILL%c%d", (char)MSDP_VAR, (char)MSDP_VAL, skill->noskill ? 1 : 0);
+				
+				// end table
+				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c", (char)MSDP_TABLE_CLOSE);
 			}
 			MSDPSetTable(d, eMSDP_SKILLS, buf);
 
@@ -643,7 +640,6 @@ bool check_reboot_confirms(void) {
 * Perform a reboot/shutdown.
 */
 void perform_reboot(void) {
-	void Objsave_char(char_data *ch, int rent_code);
 	extern const char *reboot_strings[];
 	extern int num_of_reboot_strings;
 	
@@ -659,6 +655,10 @@ void perform_reboot(void) {
 		reboot_control.time = -1;
 		return;
 	}
+
+	// prepare for the end!
+	save_all_empires();
+	save_whole_world();
 
 	if (reboot_control.type == SCMD_REBOOT) {
 		sprintf(buf, "\r\n[0;0;31m *** Rebooting ***[0;0;37m\r\nPlease be patient, this will take a second.\r\n\r\n");
@@ -691,9 +691,9 @@ void perform_reboot(void) {
 		if (reboot_control.type == SCMD_REBOOT) {
 			write_to_descriptor(desc->descriptor, reboot_strings[number(0, num_of_reboot_strings - 1)]);
 		}
-
-		Objsave_char(och, RENT_RENTED);
+		
 		SAVE_CHAR(och);
+		extract_all_items(och);
 		
 		// extract is not actually necessary since we're rebooting, right?
 		// extract_char(och);
@@ -705,10 +705,6 @@ void perform_reboot(void) {
 		fprintf(fl, "$\n");
 		fclose(fl);
 	}
-
-	// prepare for the end!
-	fclose(player_fl);
-	save_whole_world();
 
 	// If this is a reboot, restart the mud!
 	if (reboot_control.type == SCMD_REBOOT) {
@@ -738,7 +734,7 @@ void perform_reboot(void) {
 		sprintf(buf2, "-C%d", mother_desc);
 		
 		// TODO: should support more of the extra options we might have started up with
-		if (no_rent_check) {
+		if (no_auto_deletes) {
 			execl("bin/empire", "empire", buf2, "-q", buf, (char *) NULL);
 		}
 		else {
@@ -836,6 +832,7 @@ void heartbeat(int heart_pulse) {
 	void reduce_outside_territory();
 	void reduce_stale_empires();
 	void reset_instances();
+	void run_map_evolutions();
 	void sanity_check();
 	void update_actions();
 	void update_empire_npc_data();
@@ -921,15 +918,13 @@ void heartbeat(int heart_pulse) {
 	if (HEARTBEAT(SECS_PER_MUD_HOUR)) {
 		weather_and_time(1);
 		if (debug_log && HEARTBEAT(15)) { log("debug 14a:\t%lld", microtime()); }
-		fflush(player_fl);
-		if (debug_log && HEARTBEAT(15)) { log("debug 14b:\t%lld", microtime()); }
 		chore_update();
-		if (debug_log && HEARTBEAT(15)) { log("debug 14c:\t%lld", microtime()); }
+		if (debug_log && HEARTBEAT(15)) { log("debug 14b:\t%lld", microtime()); }
 		
 		// save the world at dawn
 		if (time_info.hours == 7) {
 			save_whole_world();
-			if (debug_log && HEARTBEAT(15)) { log("debug 14d:\t%lld", microtime()); }
+			if (debug_log && HEARTBEAT(15)) { log("debug 14c:\t%lld", microtime()); }
 		}
 	}
 	
@@ -955,7 +950,7 @@ void heartbeat(int heart_pulse) {
 		update_reboot();
 		if (++mins_since_crashsave >= 5) {
 			mins_since_crashsave = 0;
-			Crash_save_all();
+			save_all_players();
 			if (debug_log && HEARTBEAT(15)) { log("debug 19:\t%lld", microtime()); }
 		}
 	}
@@ -996,6 +991,12 @@ void heartbeat(int heart_pulse) {
 		}
 	}
 	
+	// just over 7.5 minutes -- to avoid putting it right on the same cycle as hours
+	if (HEARTBEAT(455)) {
+		run_map_evolutions();
+		if (debug_log && HEARTBEAT(15)) { log("debug 26:\t%lld", microtime()); }
+	}
+	
 	// this goes roughly last -- update MSDP users
 	if (HEARTBEAT(1)) {
 		msdp_update();
@@ -1017,7 +1018,7 @@ void heartbeat(int heart_pulse) {
  //////////////////////////////////////////////////////////////////////////////
 //// MESSAGING ///////////////////////////////////////////////////////////////
 
-void act(const char *str, int hide_invisible, char_data *ch, obj_data *obj, const void *vict_obj, int type) {
+void act(const char *str, int hide_invisible, char_data *ch, const void *obj, const void *vict_obj, int type) {
 	extern bool is_ignoring(char_data *ch, char_data *victim);
 
 	char_data *to = NULL;
@@ -1044,22 +1045,25 @@ void act(const char *str, int hide_invisible, char_data *ch, obj_data *obj, cons
 
 	/* To the character */
 	if (IS_SET(type, TO_CHAR) && ch && SENDOK(ch)) {
-		perform_act(str, ch, obj, vict_obj, ch, IS_SET(type, TO_IGNORE_BAD_CODE) != 0);
+		perform_act(str, ch, obj, vict_obj, ch, IS_SET(type, TO_IGNORE_BAD_CODE) != 0, IS_SET(type, ACT_VEHICLE_OBJ) != 0);
 	}
 
 	/* To the victim */
 	if (IS_SET(type, TO_VICT) && (to = (char_data*) vict_obj) != NULL && SENDOK(to) && (!IS_SET(type, TO_NOT_IGNORING) || !is_ignoring(to, ch))) {
-		perform_act(str, ch, obj, vict_obj, to, IS_SET(type, TO_IGNORE_BAD_CODE) != 0);
+		perform_act(str, ch, obj, vict_obj, to, IS_SET(type, TO_IGNORE_BAD_CODE) != 0, IS_SET(type, ACT_VEHICLE_OBJ) != 0);
 	}
 
 	if (IS_SET(type, TO_NOTVICT | TO_ROOM)) {
 		if (ch && IN_ROOM(ch)) {
 			to = ROOM_PEOPLE(IN_ROOM(ch));
 		}
-		else if (obj && IN_ROOM(obj)) {
-			to = ROOM_PEOPLE(IN_ROOM(obj));
+		else if (!IS_SET(type, ACT_VEHICLE_OBJ) && obj && IN_ROOM((obj_data*)obj)) {
+			to = ROOM_PEOPLE(IN_ROOM((obj_data*)obj));
 		}
-
+		else if (IS_SET(type, ACT_VEHICLE_OBJ) && obj && IN_ROOM((vehicle_data*)obj)) {
+			to = ROOM_PEOPLE(IN_ROOM((vehicle_data*)obj));
+		}
+		
 		if (to) {
 			for (; to; to = to->next_in_room) {
 				if (!SENDOK(to) || (to == ch))
@@ -1074,7 +1078,7 @@ void act(const char *str, int hide_invisible, char_data *ch, obj_data *obj, cons
 				if (ch && !WIZHIDE_OK(to, ch)) {
 					continue;
 				}
-				perform_act(str, ch, obj, vict_obj, to, IS_SET(type, TO_IGNORE_BAD_CODE) != 0);
+				perform_act(str, ch, obj, vict_obj, to, IS_SET(type, TO_IGNORE_BAD_CODE) != 0, IS_SET(type, ACT_VEHICLE_OBJ) != 0);
 			}
 		}
 	}
@@ -1129,6 +1133,45 @@ void msg_to_char(char_data *ch, const char *messg, ...) {
 
 
 /**
+* Sends a message to everyone in/on the vehicle.
+*
+* @param vehicle_data *veh The vehicle to send to.
+* @param bool awake_only If TRUE, only sends to people who aren't sleeping.
+* @param const char *messg... va_arg format.
+*/
+void msg_to_vehicle(vehicle_data *veh, bool awake_only, const char *messg, ...) {
+	char output[MAX_STRING_LENGTH];
+	descriptor_data *desc;
+	va_list tArgList;
+	char_data *ch;
+	
+	if (!messg || !veh) {
+		return;
+	}
+	
+	va_start(tArgList, messg);
+	vsprintf(output, messg, tArgList);
+	
+	LL_FOREACH(descriptor_list, desc) {
+		if (STATE(desc) != CON_PLAYING || !(ch = desc->character)) {
+			continue;
+		}
+		if (VEH_SITTING_ON(veh) != ch && GET_ROOM_VEHICLE(IN_ROOM(ch)) != veh) {
+			continue;
+		}
+		if (awake_only && GET_POS(ch) <= POS_SLEEPING && GET_POS(ch) != POS_DEAD) {
+			continue;
+		}
+		
+		// looks valid
+		SEND_TO_Q(output, desc);
+	}
+	
+	va_end(tArgList);
+}
+
+
+/**
 * Sends olc audit info to the player.
 *
 * @param char_data *ch The player.
@@ -1169,7 +1212,9 @@ void send_to_all(const char *messg, ...) {
 
 
 /* higher-level communication: the act() function */
-void perform_act(const char *orig, char_data *ch, obj_data *obj, const void *vict_obj, const char_data *to, bool ignore_bad_act_codes) {
+void perform_act(const char *orig, char_data *ch, const void *obj, const void *vict_obj, const char_data *to, bool ignore_bad_act_codes, bool obj_is_vehicle) {
+	extern char *get_vehicle_short_desc(vehicle_data *veh, char_data *to);
+	
 	const char *i = NULL;
 	char *buf, lbuf[MAX_STRING_LENGTH], *dg_arg = NULL;
 	char_data *dg_victim = NULL;
@@ -1220,14 +1265,14 @@ void perform_act(const char *orig, char_data *ch, obj_data *obj, const void *vic
 					dg_victim = (char_data*) vict_obj;
 					break;
 				case 'p':
-					CHECK_NULL(obj, OBJS(obj, (char_data*)to));
+					CHECK_NULL(obj, OBJS((obj_data*)obj, (char_data*)to));
 					break;
 				case 'P':
 					CHECK_NULL(vict_obj, OBJS((obj_data*) vict_obj, (char_data*)to));
 					dg_target = (obj_data*) vict_obj;
 					break;
 				case 'a':
-					CHECK_NULL(obj, SANA(obj));
+					CHECK_NULL(obj, SANA((obj_data*)obj));
 					break;
 				case 'A':
 					CHECK_NULL(vict_obj, SANA((const obj_data*) vict_obj));
@@ -1243,6 +1288,14 @@ void perform_act(const char *orig, char_data *ch, obj_data *obj, const void *vic
 				case 'F':
 					CHECK_NULL(vict_obj, fname((const char *) vict_obj));
 					break;
+				case 'v': {	// $v: vehicle -- you need to pass ACT_VEHICLE_OBJ to use this
+					CHECK_NULL(obj, get_vehicle_short_desc((vehicle_data*)obj, (char_data*)to));
+					break;
+				}
+				case 'V': {	// $V: vehicle
+					CHECK_NULL(vict_obj, get_vehicle_short_desc((vehicle_data*)vict_obj, (char_data*)to));
+					break;
+				}
 				case '$':
 					i = "$";
 					break;
@@ -1292,7 +1345,7 @@ void perform_act(const char *orig, char_data *ch, obj_data *obj, const void *vic
 	}
 
 	if ((IS_NPC(to) && dg_act_check) && (to != ch)) {
-		act_mtrigger(to, lbuf, ch, dg_victim, obj, dg_target, dg_arg);
+		act_mtrigger(to, lbuf, ch, dg_victim, obj_is_vehicle ? NULL : (obj_data*)obj, dg_target, dg_arg);
 	}
 }
 
@@ -1378,7 +1431,9 @@ void send_to_room(const char *messg, room_data *room) {
 
 
 void close_socket(descriptor_data *d) {
+	struct channel_history_data *hist;
 	descriptor_data *temp;
+	int iter;
 
 	REMOVE_FROM_LIST(d, descriptor_list, next);
 	CLOSE_SOCKET(d->descriptor);
@@ -1398,15 +1453,16 @@ void close_socket(descriptor_data *d) {
 		 * Plug memory leak, from Eric Green.
 		 * Note: only free if it's a type that isn't editing a live string -pc
 		 */
-		if (!IS_NPC(d->character) && (PLR_FLAGGED(d->character, PLR_MAILING) || d->notes_id > 0) && d->str) {
-			if (*(d->str))
+		if (!IS_NPC(d->character) && PLR_FLAGGED(d->character, PLR_MAILING) && d->str) {
+			if (*(d->str)) {
 				free(*(d->str));
+			}
 			free(d->str);
 			d->str = NULL;
 		}
 		if (STATE(d) == CON_PLAYING || STATE(d) == CON_DISCONNECT) {
 			act("$n has lost $s link.", TRUE, d->character, 0, 0, TO_ROOM);
-			if (!IS_NPC(d->character)) {			
+			if (!IS_NPC(d->character)) {
 				SAVE_CHAR(d->character);
 				syslog(SYS_LOGIN, GET_INVIS_LEV(d->character), TRUE, "Closing link to: %s.", GET_NAME(d->character));
 			}
@@ -1444,14 +1500,45 @@ void close_socket(descriptor_data *d) {
 		free(d->backstr);
 	}
 	
+	// other strings
+	if (d->host) {
+		free(d->host);
+	}
+	if (d->last_act_message) {
+		free(d->last_act_message);
+	}
+	if (d->file_storage) {
+		free(d->file_storage);
+	}
+	
+	// free channel histories
+	for (iter = 0; iter < NUM_CHANNEL_HISTORY_TYPES; ++iter) {
+		while ((hist = d->channel_history[iter])) {
+			d->channel_history[iter] = hist->next;
+			if (hist->message) {
+				free(hist->message);
+			}
+			free(hist);
+		}
+	}
+	
 	ProtocolDestroy(d->pProtocol);
 
 	// olc data
 	if (d->olc_storage) {
 		free(d->olc_storage);
 	}
+	if (d->olc_ability) {
+		free_ability(d->olc_ability);
+	}
 	if (d->olc_adventure) {
 		free_adventure(d->olc_adventure);
+	}
+	if (d->olc_archetype) {
+		free_archetype(d->olc_archetype);
+	}
+	if (d->olc_augment) {
+		free_augment(d->olc_augment);
 	}
 	if (d->olc_book) {
 		free_book(d->olc_book);
@@ -1643,8 +1730,6 @@ void init_descriptor(descriptor_data *newd, int desc) {
 	
 	newd->olc_type = 0;
 	newd->olc_vnum = NOTHING;
-	newd->olc_object = NULL;
-	newd->olc_mobile = NULL;
 	
 	// ensure clean data
 	*newd->color.last_fg = '\0';
@@ -1881,12 +1966,10 @@ int new_descriptor(int s) {
 		}
 
 		/* find the numeric site address */
-		strncpy(newd->host, (char *)inet_ntoa(peer.sin_addr), MAX_HOST_LENGTH);
-		*(newd->host + MAX_HOST_LENGTH) = '\0';
+		newd->host = str_dup((char *)inet_ntoa(peer.sin_addr));
 	}
 	else {
-		strncpy(newd->host, from->h_name, MAX_HOST_LENGTH);
-		*(newd->host + MAX_HOST_LENGTH) = '\0';
+		newd->host = str_dup(from->h_name);
 	}
 
 	/* determine if the site is banned */
@@ -2918,8 +3001,8 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 						else if (GET_BUILDING(IN_ROOM(ch))) {
 							sprintf(i, "b%d", GET_BLD_VNUM(GET_BUILDING(IN_ROOM(ch))));
 						}
-						else if (crop_proto(ROOM_CROP_TYPE(IN_ROOM(ch)))) {
-							sprintf(i, "c%d/s%d", GET_CROP_VNUM(crop_proto(ROOM_CROP_TYPE(IN_ROOM(ch)))), GET_SECT_VNUM(SECT(IN_ROOM(ch))));
+						else if (ROOM_CROP(IN_ROOM(ch))) {
+							sprintf(i, "c%d/s%d", GET_CROP_VNUM(ROOM_CROP(IN_ROOM(ch))), GET_SECT_VNUM(SECT(IN_ROOM(ch))));
 						}
 						else {
 							sprintf(i, "s%d", GET_SECT_VNUM(SECT(IN_ROOM(ch))));
@@ -2966,14 +3049,6 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// SIGNAL PROCESSING ///////////////////////////////////////////////////////
-
-
-RETSIGTYPE reread_wizlists(int sig) {
-	void reload_wizlists(void);
-	syslog(SYS_INFO, 0, TRUE, "Signal received - rereading wizlists.");
-	reload_wizlists();
-}
-
 
 RETSIGTYPE unrestrict_game(int sig) {
 	syslog(SYS_INFO, 0, TRUE, "Received SIGUSR2 - completely unrestricting game (emergent)");
@@ -3044,9 +3119,6 @@ sigfunc *my_signal(int signo, sigfunc * func) {
 void signal_setup(void) {
 	struct itimerval itime;
 	struct timeval interval;
-
-	/* user signal 1: reread wizlists.  Used by autowiz system. */
-	my_signal(SIGUSR1, reread_wizlists);
 
 	/*
 	 * user signal 2: unrestrict game.  Used for emergencies if you lock
@@ -3350,14 +3422,13 @@ void init_game(ush_int port) {
 	log("Entering game loop.");
 	game_loop(mother_desc);
 
-	Crash_save_all();
+	save_all_players();
 
 	log("Closing all sockets.");
 	while (descriptor_list)
 		close_socket(descriptor_list);
 
 	CLOSE_SOCKET(mother_desc);
-	fclose(player_fl);
 
 	log("Normal termination of game.");
 }
@@ -3409,8 +3480,8 @@ int main(int argc, char **argv) {
 				puts("Syntax check mode enabled.");
 				break;
 			case 'q':
-				no_rent_check = 1;
-				puts("Quick boot mode -- rent check suppressed.");
+				no_auto_deletes = 1;
+				puts("Quick boot mode -- auto-deletes suppressed.");
 				break;
 			case 'r':
 				wizlock_level = 1;
@@ -3427,7 +3498,7 @@ int main(int argc, char **argv) {
 					   "  -d <directory> Specify library directory (defaults to 'lib').\n"
 					   "  -h             Print this command line argument help.\n"
 					   "  -o <file>      Write log to <file> instead of stderr.\n"
-					   "  -q             Quick boot (doesn't scan rent for object limits)\n"
+					   "  -q             Quick boot (doesn't auto-delete players)\n"
 					   "  -r             Restrict MUD -- no new players allowed.\n",
 					argv[0]);
 				exit(0);
@@ -3540,15 +3611,14 @@ void setup_log(const char *filename, int fd) {
 
 
 void reboot_recover(void) {
-	extern int enter_player_game(descriptor_data *d, int dolog, bool fresh);
+	extern void enter_player_game(descriptor_data *d, int dolog, bool fresh);
 	extern bool global_mute_slash_channel_joins;
 
 	descriptor_data *d;
 	char_data *plr, *ldr;
 	FILE *fp;
 	char host[1024], protocol_info[1024], line[256];
-	struct char_file_u tmp_store;
-	int desc, player_i, plid, leid;
+	int desc, plid, leid;
 	bool fOld;
 	char name[MAX_INPUT_LENGTH];
 
@@ -3585,26 +3655,16 @@ void reboot_recover(void) {
 		memset((char *) d, 0, sizeof (descriptor_data));
 		init_descriptor(d, desc);
 
-		strcpy(d->host, host);
+		d->host = str_dup(host);
 		d->next = descriptor_list;
 		descriptor_list = d;
 
 		d->connected = CON_CLOSE;
-
-		CREATE(d->character, char_data, 1);
-		clear_char(d->character);
-		CREATE(d->character->player_specials, struct player_special_data, 1);
-		d->character->desc = d;
-
-		if ((player_i = load_char(name, &tmp_store)) >= 0) {
-			store_to_char(&tmp_store, d->character);
-			GET_PFILEPOS(d->character) = player_i;
-			if (!PLR_FLAGGED(d->character, PLR_DELETED)) {
-				REMOVE_BIT(PLR_FLAGS(d->character), PLR_WRITING | PLR_MAILING);
-			}
-			else {
-				fOld = FALSE;
-			}
+				
+		d->character = load_player(name, TRUE);
+		if (d->character) {
+			REMOVE_BIT(PLR_FLAGS(d->character), PLR_WRITING | PLR_MAILING);
+			d->character->desc = d;
 		}
 		else {
 			fOld = FALSE;

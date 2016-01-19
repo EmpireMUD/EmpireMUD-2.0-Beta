@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: weather.c                                       EmpireMUD 2.0b2 *
+*   File: weather.c                                       EmpireMUD 2.0b3 *
 *  Usage: functions handling time and the weather                         *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -308,7 +308,7 @@ byte distance_can_see(char_data *ch) {
 	p = a + b;
 	p = MIN(5, p);
 
-	if (HAS_ABILITY(ch, ABIL_BY_MOONLIGHT)) {
+	if (has_ability(ch, ABIL_BY_MOONLIGHT)) {
 		p += 2;
 	}
 

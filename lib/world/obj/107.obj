@@ -1,0 +1,246 @@
+#10700
+portal north~
+the North Portal~
+The North Portal is blowing snow all over the place!~
+   The portal howls with wind as snow blows through it. There's a blizzard on
+the other side, but through the noise you think you hear caroling.
+~
+8 0 0 3
+0 0 0
+10 0
+S
+#10701
+portal north~
+the North Portal~
+The North Portal leads back out of the winter wonderland.~
+   The fierce wind blows snow out through the portal but the weather otherwise
+seems to be better on the other side.
+~
+8 0 0 3
+0 0 0
+10 0
+S
+#10702
+gift carefully-wrapped wrapped~
+a carefully-wrapped gift~
+A wrapped gift is sitting on the ground.~
+It looks like you could 'open gift'.
+~
+3 p a 4
+0 0 0
+0 0
+T 10702
+S
+#10703
+ham honey-cured cured large~
+a honey-cured ham~
+A large ham is lying in the dirt.~
+The ham is mouth-watering.
+~
+6 0 a 2
+72 0 0
+7 336
+R
+5619 0
+S
+#10704
+recipe ham honey-cured cured~
+the honey-cured ham recipe~
+The honey-cured ham recipe is lying here.~
+You can cook: honey-cured ham
+  2x slab of pork
+  apiaries
+  fire
+~
+3 p a 2
+0 0 0
+0 0
+S
+#10705
+fruitcake cake~
+a fruitcake~
+A fruitcake is lying on the ground.~
+This fruitcake looks like it might have been re-gifted.
+~
+6 0 a 4
+72 0 0
+7 336
+M
+4
+As you eat the fruitcake, you feel warm deep down inside.~
+R
+5619 0
+S
+#10706
+recipe cake fruitcake~
+the fruitcake recipe~
+The fruitcake recipe is lying on the ground.~
+You can cook: fruitcake
+  2x sack of flour
+  1x bunch of apples
+  1x bag of cherries
+  apiaries
+  fire
+~
+3 p a 3
+0 0 0
+0 0
+S
+#10707
+goose roast~
+roast goose~
+A roast goose is lying here.~
+This plump roast goose is perfect for Christmas dinner.
+~
+6 0 a 3
+72 0 0
+7 336
+R
+5619 0
+S
+#10708
+recipe roast goose~
+the roast goose recipe~
+The roast goose recipe is lying here.~
+You can cook: roast goose
+  2x cut of poultry
+  fire
+~
+3 p a 3
+0 0 0
+0 0
+S
+#10709
+bell holiday~
+a holiday bell~
+A holiday bell is lying here.~
+This bell can summon a cheerful elf (a noncombat pet)!
+Type 'use bell' to summon him.
+~
+3 p a 4
+10709 0 0
+2 0
+T 9900
+S
+#10710
+snowglobe globe~
+a snowglobe~
+A snowglobe is lying here.~
+   The snowglobe has a tiny model of your house in here. You can 'use
+snowglobe' to teleport home, like a hestian trinket. Use the home command to
+set your home.
+~
+3 p a 4
+0 0 0
+8 0
+T 10710
+S
+#10711
+hat red christmas~
+a red Christmas hat~
+A red Christmas hat is lying on the ground.~
+   The hat is red with white fur lining, with the scent of peppermint and a
+brisk winter breeze.
+~
+2 p ae 3
+0 0 0
+11 0
+A
+5 2 0
+C
+1 300
+S
+#10712
+sack bottomless gift~
+a bottomless gift sack~
+A bottomless sack is lying on the ground.~
+You really can't see the bottom!
+~
+24 mp ar 2
+3 0 0
+0 0
+A
+4 1 0
+C
+1 300
+S
+#10713
+spawner reindeer~
+the reindeer spawner~
+The reindeer spawner is here.~
+~
+3 0 0 2
+0 0 0
+0 0
+T 10713
+S
+#10714
+screwdriver elfish~
+an elfish screwdriver~
+An elfish screwdriver is lying on the floor.~
+   The elfish screwdriver also contains a hammer, a chisel, and a corkscrew.
+Flecks of brightly colored paint mar each part of the tool, no doubt the result
+of centuries of toymaking.
+~
+3 p ao 8
+0 0 0
+2 0
+A
+25 25 0
+C
+100 100
+S
+#10715
+sleigh broken~
+a broken sleigh~
+A broken sleigh is parked here.~
+This item is deprecated.
+~
+16 0 0 3
+300 1 0
+0 1
+S
+#10716
+cookies plate christmas~
+a plate of christmas cookies~
+A plate of cookies is lying here.~
+A variety of delicious cookies are spread across the plate.
+~
+6 0 a 5
+72 0 0
+7 336
+M
+4
+You're filled with holiday cheer!~
+R
+5606 0
+S
+#10717
+recipe cookie christmas~
+the Christmas cookie recipe~
+The Christmas cookie recipe is lying here.~
+You can cook: Christmas cookies
+  2x sack of flour
+  apiaries
+  fire
+~
+3 p a 3
+0 0 0
+0 0
+S
+#10718
+schematic sleigh~
+the sleigh schematic~
+The sleigh schematic is lying on the ground.~
+You can craft (Advanced Woodworking): sleigh
+  24x stack of lumber
+  6x pouch of nails
+  4x bolt of cloth
+  sharp tool
+  carpenter
+~
+3 p a 1
+0 0 0
+0 0
+S
+$

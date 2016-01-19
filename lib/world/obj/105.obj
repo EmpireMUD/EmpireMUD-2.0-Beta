@@ -4,7 +4,7 @@ a glowkra pod~
 Someone has dropped a glowing vegetable.~
    It has a faint sky-blue glow, although not enough to light the way. This
 appears to be a magi-netically modified crop from the deranged druids of the
-Magiterranean.  
+Magiterranean.
 ~
 6 0 a 5
 6 0 0
@@ -20,10 +20,10 @@ S
 pods handful glowkra~
 a handful of glowkra pods~
 A handful of glowkra pods are scattered on the ground.~
-   The glowkra are a bright sky-blue fruit that seems to have a faint glow. 
+   The glowkra are a bright sky-blue fruit that seems to have a faint glow.
 You've heard they glow brighter when pickled. You also have a good recipe for
-seafood glowkra gumbo that just needs some magenta arrowfish and some rice. 
-This strange crop is surely the work of the mad druids of the Magiterranean. 
+seafood glowkra gumbo that just needs some magenta arrowfish and some rice.
+This strange crop is surely the work of the mad druids of the Magiterranean.
 ~
 6 b a 5
 24 10500 0
@@ -77,11 +77,11 @@ A dragon's tooth is lying here.~
    You can plant these magi-netically engineered dragons' teeth in a field to
 grow more, or use several of them to summon a skeletal guard for your empire.
 
-Craft (Jewelry): dragontooth sceptre
+Craft (Jewelry): dragonstooth sceptre
  10x dragon's tooth
-  2x gold dust
+  4x gold dust
 ~
-3 b a 6
+3 b a 7
 0 10502 0
 14 0
 R
@@ -97,11 +97,13 @@ A dragonstooth sceptre is lying here.~
 with 'use sceptre' when wielded to summon skeleton minions to guard your
 empire!
 ~
-1 ho an 3
+1 ho an 4
 0 2 5
 14 0
 A
-5 1
+5 1 0
+C
+0 150
 T 10505
 S
 #10506
@@ -109,7 +111,7 @@ seeds spadebrush handful~
 a handful of spadebrush seeds~
 A handful of spadebrush seeds is scattered here.~
    These magi-netically modified seeds can be used to plant spadebrush, or as a
-light snack.  
+light snack.
 ~
 6 b a 2
 3 10501 0
@@ -366,7 +368,7 @@ beans magic handful~
 a handful of magic beans~
 A handful of magic beans is scattered here.~
    These beans look strangely ordinary... You can't believe anyone would sell a
-whole cow just for these.  
+whole cow just for these.
 ~
 6 bk a 4
 6 10507 0
@@ -389,12 +391,12 @@ an axeroot~
 An axeroot is lying here, uprooted.~
    The magi-netically engineered axeroot grows in a distinctive blade shape,
 and need only be sharpened to make a suitable chopper. You can also plant it to
-start a new crop.  
- 
+start a new crop.
+
 Craft (Basic Crafts): axeroot chopper
  1x axeroot
  1x wooden handle
- 
+
 Craft (Master Craftsman, level 150): spade-axe
  1x axeroot
  3x bundle of spadebrush
@@ -520,9 +522,11 @@ A thorn pick is stuck into the ground.~
 modified from a woody desert plant into a temperate tool. What will those
 Magiterranean druids come up with next?
 ~
-1 0 an 3
+1 0 an 4
 0 3 8
 2 0
+C
+50 50
 R
 5121 0
 R

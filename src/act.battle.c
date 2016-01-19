@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.battle.c                                    EmpireMUD 2.0b2 *
+*   File: act.battle.c                                    EmpireMUD 2.0b3 *
 *  Usage: commands and functions related to the Battle skill              *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -145,8 +145,10 @@ ACMD(do_bash) {
 			}			
 		}		
 	}
-
-	gain_ability_exp(ch, ABIL_BASH, 15);
+	
+	if (can_gain_exp_from(ch, vict)) {
+		gain_ability_exp(ch, ABIL_BASH, 15);
+	}
 }
 
 
@@ -203,7 +205,9 @@ ACMD(do_disarm) {
 		}
 		
 		engage_combat(ch, victim, TRUE);
-		gain_ability_exp(ch, ABIL_DISARM, 15);
+		if (can_gain_exp_from(ch, victim)) {
+			gain_ability_exp(ch, ABIL_DISARM, 15);
+		}
 	}
 }
 
@@ -212,6 +216,7 @@ ACMD(do_firstaid) {
 	extern int total_bonus_healing(char_data *ch);
 
 	struct over_time_effect_type *dot, *next_dot;
+	bool has_dot = FALSE;
 	char_data *vict;
 	int cost = 20;
 	int levels[] = { 10, 20, 50 };
@@ -238,8 +243,18 @@ ACMD(do_firstaid) {
 		msg_to_char(ch, "You can't use firstaid on someone in combat.\r\n");
 		return;
 	}
+	
+	// check for DoTs
+	for (dot = vict->over_time_effects; dot; dot = next_dot) {
+		next_dot = dot->next;
 
-	if (GET_HEALTH(vict) >= GET_MAX_HEALTH(vict)) {
+		if (dot->damage_type == DAM_PHYSICAL || dot->damage_type == DAM_POISON || dot->damage_type == DAM_FIRE) {
+			has_dot = TRUE;
+			break;
+		}
+	}
+
+	if (GET_HEALTH(vict) >= GET_MAX_HEALTH(vict) && !has_dot) {
 		msg_to_char(ch, "You can't apply first aid to someone who isn't injured.\r\n");
 		return;
 	}
@@ -270,7 +285,9 @@ ACMD(do_firstaid) {
 	}
 	
 	heal(ch, vict, CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_FIRSTAID) + total_bonus_healing(ch));
-	gain_ability_exp(ch, ABIL_FIRSTAID, 15);
+	if (can_gain_exp_from(ch, vict)) {
+		gain_ability_exp(ch, ABIL_FIRSTAID, 15);
+	}
 	GET_WAIT_STATE(ch) += 2 RL_SEC;	// plus normal command_lag
 }
 
@@ -318,7 +335,9 @@ ACMD(do_heartstop) {
 			return;
 		}
 		
-		gain_ability_exp(ch, ABIL_HEARTSTOP, 15);
+		if (can_gain_exp_from(ch, victim)) {
+			gain_ability_exp(ch, ABIL_HEARTSTOP, 15);
+		}
 
 		af = create_flag_aff(ATYPE_HEARTSTOP, 4, AFF_CANT_SPEND_BLOOD, ch);
 		affect_join(victim, af, ADD_DURATION);
@@ -373,7 +392,7 @@ ACMD(do_kick) {
 	success = IS_SPECIALTY_ABILITY(ch, ABIL_KICK) || check_hit_vs_dodge(ch, vict, FALSE);
 
 	if (success) {
-		if (HAS_ABILITY(ch, ABIL_SHADOW_KICK) && !AFF_FLAGGED(vict, AFF_IMMUNE_BATTLE)) {
+		if (has_ability(ch, ABIL_SHADOW_KICK) && check_solo_role(ch) && !AFF_FLAGGED(vict, AFF_IMMUNE_BATTLE)) {
 			struct affected_type *af;
 			int value = round(GET_COMPUTED_LEVEL(ch) / 50);
 			af = create_mod_aff(ATYPE_SHADOW_KICK, 2, APPLY_BONUS_PHYSICAL, -value, ch);
@@ -389,8 +408,10 @@ ACMD(do_kick) {
 	else {
 		damage(ch, vict, 0, ATTACK_KICK, DAM_PHYSICAL);
 	}
-
-	gain_ability_exp(ch, ABIL_KICK, 15);
+	
+	if (can_gain_exp_from(ch, vict)) {
+		gain_ability_exp(ch, ABIL_KICK, 15);
+	}
 }
 
 
@@ -425,12 +446,14 @@ ACMD(do_outrage) {
 				}
 				
 				hit(ch, victim, GET_EQ(ch, WEAR_WIELD), FALSE);
-				found = TRUE;
+				found |= can_gain_exp_from(ch, victim);
 				
 				// rescue check
-				if (HAS_ABILITY(ch, ABIL_RESCUE) && FIGHTING(victim) && !IS_NPC(FIGHTING(victim)) && FIGHTING(victim) != ch && skill_check(ch, ABIL_RESCUE, DIFF_MEDIUM)) {
+				if (has_ability(ch, ABIL_RESCUE) && FIGHTING(victim) && !IS_NPC(FIGHTING(victim)) && FIGHTING(victim) != ch && skill_check(ch, ABIL_RESCUE, DIFF_MEDIUM)) {
 					perform_rescue(ch, FIGHTING(victim), victim);
-					gain_ability_exp(ch, ABIL_RESCUE, 15);
+					if (can_gain_exp_from(ch, victim)) {
+						gain_ability_exp(ch, ABIL_RESCUE, 15);
+					}
 				}
 			}
 		}
@@ -472,7 +495,9 @@ ACMD(do_rescue) {
 
 			charge_ability_cost(ch, MOVE, cost, COOLDOWN_RESCUE, 6, WAIT_COMBAT_ABILITY);
 			perform_rescue(ch, FIGHTING(vict), vict);
-			gain_ability_exp(ch, ABIL_RESCUE, 15);
+			if (can_gain_exp_from(ch, vict)) {
+				gain_ability_exp(ch, ABIL_RESCUE, 15);
+			}
 			break;
 		}
 		
@@ -522,5 +547,7 @@ ACMD(do_rescue) {
 
 	charge_ability_cost(ch, MOVE, cost, COOLDOWN_RESCUE, 6, WAIT_COMBAT_ABILITY);
 	perform_rescue(ch, vict, tmp_ch);
-	gain_ability_exp(ch, ABIL_RESCUE, 15);
+	if (can_gain_exp_from(ch, tmp_ch)) {
+		gain_ability_exp(ch, ABIL_RESCUE, 15);
+	}
 }

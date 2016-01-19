@@ -1,2 +1,4 @@
-This directory contains player lore.
-
+This directory formerly contained player lore. EmpireMUD now stores lore
+directly in the player file. It retains these directories because running
+copies may still have old lore until they run the playerfile converter. After
+that, you can safely delete your plrlore directory.

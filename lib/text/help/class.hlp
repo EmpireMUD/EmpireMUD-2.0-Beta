@@ -23,6 +23,7 @@ command.
 &aCaster&0: Does magical damage.
 &jHealer&0: Keeps the group alive.
 &mUtility&0: Doesn't fight; builds or crafts instead.
+&wSolo&0: For playing alone; some abilities won't work in groups.
 
 The colors shown above are used to display class roles on "who" and "roster".
 
@@ -82,8 +83,8 @@ The available archetypes are:
 Alchemist
 Natural Magic + Trade
 
-Healer: Alchemist Crafts, Fastcasting, Resurrect, Salamander (familiar)
-Utility: Alchemist Crafts, Resurrect, Salamander (familiar)
+All: Alchemist Crafts, Resurrect, Salamander (familiar)
+Healer: Fastcasting, Healing Boost
 
 Note: Class abilities are unfinished.
 
@@ -94,8 +95,7 @@ See also: CLASS, HEALER, UTILITY
 Ancient
 Vampire + Empire
 
-Melee: Dragonriding
-Utility: Dragonriding
+All: Dragonriding
 
 Note: Class abilities are unfinished.
 
@@ -106,8 +106,7 @@ See also: CLASS, MELEE, UTILITY
 Antiquarian
 Trade + Vampire
 
-Melee: Antiquarian Crafts
-Utility: Antiquarian Crafts
+All: Antiquarian Crafts
 
 Note: Class abilities are unfinished.
 
@@ -118,8 +117,8 @@ See also: CLASS, MELEE, UTILITY
 Archmage
 High Sorcery + Natural Magic
 
-Caster: Resurrect
-Healer: Fastcasting, Phoenix (familiar), Resurrect
+All: Phoenix (familiar), Resurrect
+Healer: Fastcasting, Healing Boost
 
 Note: Class abilities are unfinished.
 
@@ -130,8 +129,7 @@ See also: CLASS, CASTER, HEALER
 Artificer
 High Sorcery + Trade
 
-Caster: Artificer Crafts
-Utility: Artificer Crafts
+All: Artificer Crafts
 
 Note: Class abilities are unfinished.
 
@@ -234,9 +232,9 @@ See also: BUFF, CLASS FAMILIARS
 Duke
 Battle + Empire
 
-Tank: Dragonriding, Noble Bearing
-Melee: Dragonriding, Two-Handed Weapons
-Utility: Dragonriding
+All: Dragonriding
+Tank: Noble Bearing
+Melee: Two-Handed Weapons
 
 Note: Class abilities are unfinished.
 
@@ -247,8 +245,7 @@ See also: CLASS, TANK, MELEE, UTILITY
 Elder
 Empire + Survival
 
-Melee: Dragonriding
-Utility: Dragonriding
+All: Dragonriding
 
 Note: Class abilities are unfinished.
 
@@ -259,8 +256,7 @@ See also: CLASS, MELEE, UTILITY
 Exarch
 Empire + High Sorcery
 
-Caster: Dragonriding, Exarch Crafts
-Utility: Dragonriding, Exarch Crafts
+All: Dragonriding, Exarch Crafts
 
 Note: Class abilities are unfinished.
 
@@ -271,8 +267,9 @@ See also: CLASS, CASTER, UTILITY
 Feral
 Natural Magic + Survival
 
-Tank: Basilisk (familiar), Resurrect, Towering Werewolf Form
-Healer: Basilisk (familiar), Fastcasting, Resurrect, Sage Werewolf Form
+All: Basilisk (familiar), Resurrect
+Tank: Towering Werewolf Form
+Healer: Fastcasting, Healing Boost, Sage Werewolf Form
 
 Note: Class abilities are unfinished.
 
@@ -283,7 +280,7 @@ See also: CLASS, TANK, HEALER
 Guildsman
 Empire + Trade
 
-Utility: Dragonriding, Guildsman Crafts
+All: Dragonriding, Guildsman Crafts
 
 Note: Class abilities are unfinished.
 
@@ -331,10 +328,8 @@ See also: CLASS, CASTER
 Luminary
 Empire + Natural Magic
 
-Caster: Dragonriding, Griffin (familiar), Manticore (familiar), Resurrect
-Healer: Ancestral Healing, Dragonriding, Fastcasting, Manticore (familiar),
-        Griffin (familiar), Resurrect
-Utility: Dragonriding, Griffin (familiar), Manticore (familiar), Resurrect
+All: Dragonriding, Griffin (familiar), Manticore (familiar), Resurrect
+Healer: Ancestral Healing, Fastcasting, Healing Boost
 
 Luminary Healers gain additional healing power from Greatness and should build
 their Greatness in addition to the 4 healer traits.
@@ -372,8 +367,9 @@ See also: CASTER, HEALER, HIT CAP, TANK
 Necromancer
 Natural Magic + Vampire
 
-Caster: Dread Blood Form, Resurrect, Skeletal Hulk (familiar)
-Healer: Banshee (familiar), Fastcasting, Resurrect
+All: Resurrect
+Caster: Dread Blood Form, Skeletal Hulk (familiar)
+Healer: Banshee (familiar), Fastcasting, Healing Boost
 
 Note: Class abilities are unfinished.
 
@@ -395,7 +391,8 @@ See also: CLASS, MELEE
 Powerbroker
 Empire + Stealth
 
-Melee: Dragonriding, Stagger Jab
+All: Dragonriding
+Melee: Stagger Jab
 
 Note: Class abilities are unfinished.
 
@@ -429,8 +426,9 @@ See also: CLASS, MELEE
 Shadow Wolf
 Natural Magic + Stealth
 
-Melee: Howl, Moonrise, Savage Werewolf Form, Scorpion Shadow (familiar)
-Healer: Fastcasting, Moonrise, Owl Shadow (familiar), Sage Werewolf Form
+All: Moonrise
+Melee: Howl, Savage Werewolf Form, Scorpion Shadow (familiar)
+Healer: Fastcasting, Healing Boost, Owl Shadow (familiar), Sage Werewolf Form
 
 Note: Class abilities are unfinished.
 
@@ -441,20 +439,29 @@ See also: CLASS, MELEE, HEALER
 Smuggler
 Stealth + Trade
 
-Melee: Diversion, Dual-Wield, Smuggler Crafts
-Utility: Smuggler Crafts
+All: Smuggler Crafts
+Melee: Diversion, Dual-Wield
 
 Note: Class abilities are unfinished.
 
 See also: CLASS, MELEE, UTILITY
+#
+SOLO SOLOIST "SOLO ROLE" "SOLO CLASS ROLE"
+
+The "solo" class role is for people who are going it alone and need every ounce
+of strength their class can muster. This gives them access to a broader range
+of class abilities, but those abilities will only work if the player is
+actually solo.
+
+If another player is present, solo role abilities will not work.
 #
 "STEELSMITH CLASS" "STEEL SMITH CLASS" SMTH
 
 Steelsmith
 Battle + Trade
 
-Melee: Steelsmith Crafts, Two-Handed Weapons
-Utility: Steelsmith Crafts
+All: Steelsmith Crafts
+Melee: Two-Handed Weapons
 
 Note: Class abilities are unfinished.
 
@@ -503,8 +510,7 @@ See also: CLASS, UTILITY
 Tinker
 Survival + Trade
 
-Melee: Tinker Crafts
-Utility: Tinker Crafts
+All: Tinker Crafts
 
 Note: Class abilities are unfinished.
 
@@ -526,9 +532,11 @@ See also: CASTER, HEALER, MELEE, TANK
 Werewolf
 Battle + Natural Magic
 
-Tank: Resurrect, Spirit Wolf (familiar), Towering Werewolf Form
-Melee: Dire Wolf (familiar), Resurrect, Savage Werewolf Form
-Healer: Confer, Fastcasting, Moon Rabbit (familiar), Resurrect, Sage Werewolf Form
+All: Resurrect
+Tank: Spirit Wolf (familiar), Towering Werewolf Form
+Melee: Dire Wolf (familiar), Savage Werewolf Form
+Healer: Confer, Fastcasting, Healing Boost, Moon Rabbit (familiar), Sage
+        Werewolf Form
 
 Healer Werewolves can convert Strength into buffs for themselves and their
 allies, and should build their Strength in addition to the 4 healer traits.

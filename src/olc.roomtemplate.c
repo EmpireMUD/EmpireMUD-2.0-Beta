@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: olc.roomtemplate.c                              EmpireMUD 2.0b2 *
+*   File: olc.roomtemplate.c                              EmpireMUD 2.0b3 *
 *  Usage: OLC for room templates                                          *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -48,6 +48,116 @@ void sort_interactions(struct interaction_item **list);
 //// HELPERS /////////////////////////////////////////////////////////////////
 
 /**
+* Checks for common room template problems and reports them to ch.
+*
+* @param room_template *rmt The thing to audit.
+* @param char_data *ch The person to report to.
+* @return bool TRUE if any problems were reported; FALSE if all good.
+*/
+bool audit_room_template(room_template *rmt, char_data *ch) {
+	extern bool audit_extra_descs(any_vnum vnum, struct extra_descr_data *list, char_data *ch);
+	extern bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach_type, char_data *ch);
+	
+	adv_data *my_adv = get_adventure_for_vnum(GET_RMT_VNUM(rmt));
+	struct adventure_spawn *spawn;
+	struct trig_proto_list *tpl;
+	struct exit_template *ex;
+	room_template *other;
+	bool problem = FALSE;
+	trig_data *trig;
+	
+	if (!my_adv) {
+		olc_audit_msg(ch, GET_RMT_VNUM(rmt), "Not part of any adventure");
+		problem = TRUE;
+	}
+	if (!strcmp(GET_RMT_TITLE(rmt), "An Unnamed Room")) {
+		olc_audit_msg(ch, GET_RMT_VNUM(rmt), "Title not set");
+		problem = TRUE;
+	}
+	if (!isupper(*GET_RMT_TITLE(rmt))) {
+		olc_audit_msg(ch, GET_RMT_VNUM(rmt), "Title not capitalized");
+		problem = TRUE;
+	}
+	if (ispunct(GET_RMT_TITLE(rmt)[strlen(GET_RMT_TITLE(rmt)) - 1])) {
+		olc_audit_msg(ch, GET_RMT_VNUM(rmt), "Title is punctuated");
+		problem = TRUE;
+	}
+	if (!GET_RMT_DESC(rmt) || !*GET_RMT_DESC(rmt) || !str_cmp(GET_RMT_DESC(rmt), "Nothing.\r\n")) {
+		olc_audit_msg(ch, GET_RMT_VNUM(rmt), "Desc not set");
+		problem = TRUE;
+	}
+	else if (!strn_cmp(GET_RMT_DESC(rmt), "Nothing.", 8)) {
+		olc_audit_msg(ch, GET_RMT_VNUM(rmt), "Desc starts with 'Nothing.'");
+		problem = TRUE;
+	}
+	
+	if (IS_SET(GET_RMT_FLAGS(rmt), RMT_DARK) && IS_SET(GET_RMT_FLAGS(rmt), RMT_LIGHT)) {
+		olc_audit_msg(ch, GET_RMT_VNUM(rmt), "Both DARK and LIGHT");
+		problem = TRUE;
+	}
+	
+	// check exits
+	for (ex = GET_RMT_EXITS(rmt); ex; ex = ex->next) {
+		other = room_template_proto(ex->target_room);
+		if (!other) {
+			olc_audit_msg(ch, GET_RMT_VNUM(rmt), "Exit %s: invalid target room %d", dirs[ex->dir], ex->target_room);
+			problem = TRUE;
+		}
+		else if (get_adventure_for_vnum(ex->target_room) != my_adv) {
+			olc_audit_msg(ch, GET_RMT_VNUM(rmt), "Exit %s: links outside the adventure", dirs[ex->dir]);
+			problem = TRUE;
+		}
+	}
+	
+	// check spawns
+	for (spawn = GET_RMT_SPAWNS(rmt); spawn; spawn = spawn->next) {
+		switch (spawn->type) {
+			case ADV_SPAWN_MOB: {
+				char_data *mob = mob_proto(spawn->vnum);
+				if (!mob) {
+					olc_audit_msg(ch, GET_RMT_VNUM(rmt), "Spawn mob %d: No such mob", spawn->vnum);
+					problem = TRUE;
+				}
+				break;
+			}
+			case ADV_SPAWN_OBJ: {
+				obj_data *obj = obj_proto(spawn->vnum);
+				if (!obj) {
+					olc_audit_msg(ch, GET_RMT_VNUM(rmt), "Spawn obj %d: No such obj", spawn->vnum);
+					problem = TRUE;
+				}
+				break;
+			}
+			case ADV_SPAWN_VEH: {
+				vehicle_data *veh = vehicle_proto(spawn->vnum);
+				if (!veh) {
+					olc_audit_msg(ch, GET_RMT_VNUM(rmt), "Spawn veh %d: No such vehicle", spawn->vnum);
+					problem = TRUE;
+				}
+				break;
+			}
+		}
+	}
+
+	// check scripts
+	for (tpl = GET_RMT_SCRIPTS(rmt); tpl; tpl = tpl->next) {
+		if (!(trig = real_trigger(tpl->vnum))) {
+			continue;
+		}
+		if (trig->attach_type != WLD_TRIGGER) {
+			olc_audit_msg(ch, GET_RMT_VNUM(rmt), "Incorrect trigger type (trg %d)", tpl->vnum);
+			problem = TRUE;
+		}
+	}
+
+	problem |= audit_extra_descs(GET_RMT_VNUM(rmt), GET_RMT_EX_DESCS(rmt), ch);
+	problem |= audit_interactions(GET_RMT_VNUM(rmt), GET_RMT_INTERACTIONS(rmt), TYPE_ROOM, ch);
+	
+	return problem;
+}
+
+
+/**
 * Creates a new room template entry.
 * 
 * @param rmt_vnum vnum The number to create.
@@ -74,6 +184,38 @@ room_template *create_room_template_table_entry(rmt_vnum vnum) {
 	save_library_file_for_vnum(DB_BOOT_RMT, vnum);
 	
 	return rmt;
+}
+
+
+/**
+* For the .list command.
+*
+* @param room_template *rmt The thing to list.
+* @param bool detail If TRUE, provide additional details
+* @return char* The line to show (without a CRLF).
+*/
+char *list_one_room_template(room_template *rmt, bool detail) {
+	static char output[MAX_STRING_LENGTH];
+	char flags[MAX_STRING_LENGTH];
+	
+	bitvector_t show_flags = RMT_OUTDOOR | RMT_DARK | RMT_LIGHT | RMT_NO_MOB | RMT_NO_TELEPORT | RMT_LOOK_OUT | RMT_NO_LOCATION;
+	
+	if (detail) {
+		if (IS_SET(GET_RMT_FLAGS(rmt), show_flags)) {
+			strcpy(flags, " - ");
+			sprintbit(GET_RMT_FLAGS(rmt) & show_flags, room_template_flags, flags + 3, TRUE);
+		}
+		else {
+			*flags = '\0';
+		}
+		
+		snprintf(output, sizeof(output), "[%5d] %s%s", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt), flags);
+	}
+	else {
+		snprintf(output, sizeof(output), "[%5d] %s", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
+	}
+	
+	return output;
 }
 
 
@@ -173,7 +315,9 @@ void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
 	
 	// update world
 	count = 0;
-	HASH_ITER(interior_hh, interior_world_table, room, next_room) {
+	for (room = interior_room_list; room; room = next_room) {
+		next_room = room->next_interior;
+		
 		if (ROOM_TEMPLATE_VNUM(room) == vnum) {
 			delete_room(room, FALSE);	// must call check_all_exits
 			++count;
@@ -479,6 +623,10 @@ void get_spawn_template_name(struct adventure_spawn *spawn, char *save_buffer) {
 		}
 		case ADV_SPAWN_OBJ: {
 			strcpy(save_buffer, skip_filler(get_obj_name_by_proto(spawn->vnum)));
+			break;
+		}
+		case ADV_SPAWN_VEH: {
+			strcpy(save_buffer, skip_filler(get_vehicle_name_by_proto(spawn->vnum)));
 			break;
 		}
 		default: {
@@ -829,7 +977,9 @@ OLC_MODULE(rmedit_spawns) {
 	extern const char *olc_type_bits[NUM_OLC_TYPES+1];
 
 	room_template *rmt = GET_OLC_ROOM_TEMPLATE(ch->desc);
-	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], num_arg[MAX_INPUT_LENGTH], prc_arg[MAX_INPUT_LENGTH];
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
+	char type_arg[MAX_INPUT_LENGTH], num_arg[MAX_INPUT_LENGTH], prc_arg[MAX_INPUT_LENGTH];
+	char lbuf[MAX_STRING_LENGTH];
 	int num, stype, limit, findtype;
 	struct adventure_spawn *spawn, *temp, *change, *copyfrom = NULL;
 	double prc;
@@ -903,7 +1053,8 @@ OLC_MODULE(rmedit_spawns) {
 				if (--num == 0) {
 					found = TRUE;
 					
-					msg_to_char(ch, "You remove the spawn info for %s.\r\n", (spawn->type == ADV_SPAWN_MOB ? get_mob_name_by_proto(spawn->vnum) : get_obj_name_by_proto(spawn->vnum)));
+					get_spawn_template_name(spawn, lbuf);
+					msg_to_char(ch, "You remove the spawn info for %s.\r\n", lbuf);
 					REMOVE_FROM_LIST(spawn, GET_RMT_SPAWNS(rmt), next);
 					free(spawn);
 				}
@@ -935,6 +1086,9 @@ OLC_MODULE(rmedit_spawns) {
 		else if (stype == ADV_SPAWN_OBJ && !obj_proto(vnum)) {
 			msg_to_char(ch, "Invalid object vnum '%s'.\r\n", num_arg);
 		}
+		else if (stype == ADV_SPAWN_VEH && !vehicle_proto(vnum)) {
+			msg_to_char(ch, "Invalid vehicle vnum '%s'.\r\n", num_arg);
+		}
 		else if ((prc = atof(prc_arg)) < .01 || prc > 100.00) {
 			msg_to_char(ch, "Percentage must be between .01 and 100; '%s' given.\r\n", prc_arg);
 		}
@@ -961,7 +1115,8 @@ OLC_MODULE(rmedit_spawns) {
 				GET_RMT_SPAWNS(rmt) = spawn;
 			}
 			
-			msg_to_char(ch, "You add spawn for %s %s (%d) at %.2f%%, limit %d.\r\n", adventure_spawn_types[stype], stype == ADV_SPAWN_MOB ? get_mob_name_by_proto(vnum) : get_obj_name_by_proto(vnum), vnum, prc, limit);
+			get_spawn_template_name(spawn, lbuf);
+			msg_to_char(ch, "You add spawn for %s %s (%d) at %.2f%%, limit %d.\r\n", adventure_spawn_types[stype], lbuf, vnum, prc, limit);
 		}
 	}
 	else if (is_abbrev(arg1, "change")) {
@@ -997,9 +1152,13 @@ OLC_MODULE(rmedit_spawns) {
 			else if (change->type == ADV_SPAWN_OBJ && !obj_proto(vnum)) {
 				msg_to_char(ch, "Invalid object vnum '%s'.\r\n", argument);
 			}
+			else if (change->type == ADV_SPAWN_VEH && !vehicle_proto(vnum)) {
+				msg_to_char(ch, "Invalid vehicle vnum '%s'.\r\n", argument);
+			}
 			else {
 				change->vnum = vnum;
-				msg_to_char(ch, "Spawn %d changed to vnum %d (%s).\r\n", atoi(num_arg), vnum, change->type == ADV_SPAWN_MOB ? get_mob_name_by_proto(vnum) : get_obj_name_by_proto(vnum));
+				get_spawn_template_name(change, lbuf);
+				msg_to_char(ch, "Spawn %d changed to vnum %d (%s).\r\n", atoi(num_arg), vnum, lbuf);
 			}
 		}
 		else if (is_abbrev(type_arg, "percent")) {

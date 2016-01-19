@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: olc.sector.c                                    EmpireMUD 2.0b2 *
+*   File: olc.sector.c                                    EmpireMUD 2.0b3 *
 *  Usage: OLC for sector prototypes                                       *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -105,6 +105,27 @@ bool delete_sector_from_evolutions(sector_vnum vnum, struct evolution_data **lis
 
 
 /**
+* For the .list command.
+*
+* @param sector_data *sect The thing to list.
+* @param bool detail If TRUE, provide additional details
+* @return char* The line to show (without a CRLF).
+*/
+char *list_one_sector(sector_data *sect, bool detail) {
+	static char output[MAX_STRING_LENGTH];
+	
+	if (detail) {
+		snprintf(output, sizeof(output), "[%5d] %s", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
+	}
+	else {
+		snprintf(output, sizeof(output), "[%5d] %s", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
+	}
+	
+	return output;
+}
+
+
+/**
 * WARNING: This function actually deletes a sector.
 *
 * @param char_data *ch The person doing the deleting.
@@ -114,6 +135,7 @@ void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 	extern bool delete_link_rule_by_type_value(struct adventure_link_rule **list, int type, any_vnum value);
 	void remove_sector_from_table(sector_data *sect);
 	extern const sector_vnum climate_default_sector[NUM_CLIMATES];
+	extern bool world_map_needs_save;
 	
 	sector_data *sect, *sect_iter, *next_sect, *replace_sect;
 	room_data *room, *next_room;
@@ -151,13 +173,19 @@ void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 	
 	// update world
 	count = 0;
-	HASH_ITER(world_hh, world_table, room, next_room) {
+	HASH_ITER(hh, world_table, room, next_room) {
 		if (SECT(room) == sect) {
+			// can't use change_terrain() here
 			SECT(room) = replace_sect;
 			++count;
+			
+			if (GET_ROOM_VNUM(room) < MAP_SIZE) {
+				world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)].sector_type = replace_sect;
+				world_map_needs_save = TRUE;
+			}
 		}
-		if (ROOM_ORIGINAL_SECT(room) == sect) {
-			ROOM_ORIGINAL_SECT(room) = replace_sect;
+		if (BASE_SECT(room) == sect) {
+			change_base_sector(room, replace_sect);
 		}
 	}
 	

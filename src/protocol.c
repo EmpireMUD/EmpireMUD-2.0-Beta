@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: protocol.c                                      EmpireMUD 2.0b2 *
+*   File: protocol.c                                      EmpireMUD 2.0b3 *
 *  Usage: KaVir's protocol snippet                                        *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -2567,12 +2567,12 @@ static const char *GetMSSP_DB_Size() {
 	int size = 0;
 
 	// we're not 100% sure what counts toward DB Size, but here is a rough guess
-	size += top_of_p_table + 1;
+	size += HASH_CNT(idnum_hh, player_table_by_idnum);
 	size += HASH_COUNT(empire_table);
 	size += HASH_COUNT(mobile_table);
 	size += HASH_COUNT(object_table);
 	size += HASH_COUNT(adventure_table);
-	size += HASH_CNT(world_hh, world_table);
+	size += HASH_COUNT(world_table);
 	size += HASH_COUNT(building_table);
 	size += HASH_COUNT(room_template_table);
 	size += HASH_COUNT(sector_table);
@@ -2701,14 +2701,15 @@ static const char *GetMSSP_Port() {
 
 static const char *GetMSSP_Rooms() {
 	static char buf[256];
-	snprintf(buf, sizeof(buf), "%d", HASH_CNT(world_hh, world_table));
+	snprintf(buf, sizeof(buf), "%d", HASH_COUNT(world_table));
 	return buf;
 }
 
 static const char *GetMSSP_Skills() {
 	static char buf[256];
+	
 	// we think this refers more to our concept of "abilities" than "skills"
-	snprintf(buf, sizeof(buf), "%d", NUM_ABILITIES);
+	snprintf(buf, sizeof(buf), "%d", HASH_COUNT(ability_table));
 	return buf;
 }
 

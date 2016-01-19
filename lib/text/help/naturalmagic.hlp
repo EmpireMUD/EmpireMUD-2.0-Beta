@@ -367,12 +367,26 @@ entire party at once.
 If you cast this spell with no target, it will heal yourself. Self-heals cost
 25% less. Healing the whole party costs 50% more.
 
-The size of your heals, and their cost, rises with your level, with your
-Natural Magic level, and with your Intelligence. The Bonus-Healing trait,
-shown as "Healing [+X]" on your score, adds directly to the amount healed, but
-does not increase the cost.
+The size of your heals, and their cost, with your Natural Magic level and with
+your Intelligence. The Bonus-Healing trait, shown as "Healing [+X]" on your
+score, adds directly to the amount healed, but does not increase the cost. The
+Healer class role allows your character's total level to increase the amount
+healed, and it also lowers the mana cost per point healed.
 
 If your target is in combat, you will join the combat upon using this ability.
+
+See also: HEALER
+#
+"HEALING BOOST"
+
+Healing Boost
+Class ability: various
+
+This ability increases the amount healed by abilities such as Heal and
+Rejuvenate, making the user more effective at healing. This ability is auto-
+matic.
+
+See also: HEAL, HEALER, REJUVENATE
 #
 "HEALING POTIONS" "HEALING ELIXIRS"
 
@@ -547,17 +561,23 @@ Rejuvenate (Natural Magic ability)
 
 Usage:  rejuvenate [target]
 Cooldown:  15 seconds
-Cost:  25 mana
+Cost:  25+ mana (based on amount healed)
 
 By blessing a person with rejuvenation, a nature mage can cause that person's
 wounds to heal themselves over time. This spell heals the target every 5
-seconds until it expires. The amount rejuvenated depends on your total level,
-your Natural Magic level, and your Intelligence. The cost depends upon the
-amount healed.
+seconds until it expires. The amount rejuvenated depends on your your Natural
+Magic level and your Intelligence. The cost depends upon the amount healed.
+The Bonus-Healing attribute will also add to the amount healed, but won't
+raise the cost.
+
+The Healer class role allows your character's total level to increase the
+amount healed, and it also lowers the mana cost per point healed.
 
 If you cast this spell without a target, it will target yourself.
 
 If your target is in combat, you will join the combat upon using this ability.
+
+See also: HEALER
 #
 RESURRECT RESURRECTION
 

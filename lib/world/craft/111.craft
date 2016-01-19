@@ -1,6 +1,40 @@
+#11101
+rib-bone boat~
+11101 1
+2 -1 n 1 11101
+R
+11101 1  # 1x a colossal ribcage
+S
+#11119
+cave viper sigil~
+11119 1
+1 54 0 8 11113
+R
+11113 1  # 1x a serpent stone
+R
+161 2  # 2x a silver nugget
+S
+#11120
+serpent pendant~
+11120 1
+1 54 0 8 11113
+R
+11113 1  # 1x a serpent stone
+R
+161 2  # 2x a silver nugget
+S
+#11121
+skink amulet~
+11121 1
+1 54 0 8 11113
+R
+11113 1  # 1x a serpent stone
+R
+161 2  # 2x a silver nugget
+S
 #11146
 titanaconda scale coat~
-11146 1  # 1x a titanaconda scale coat
+11146 1
 4 197 g 16 11145
 R
 11145 2  # 2x the titanaconda's scales
@@ -11,7 +45,7 @@ R
 S
 #11147
 titanaconda scale trousers~
-11147 1  # 1x titanaconda scale trousers
+11147 1
 4 197 g 16 11145
 R
 11145 2  # 2x the titanaconda's scales
@@ -22,7 +56,7 @@ R
 S
 #11148
 opal carapace buckler~
-11148 1  # 1x an opal carapace buckler
+11148 1
 1 197 0 16 11133
 R
 11133 18  # 18x an opal carapace
@@ -31,11 +65,11 @@ R
 S
 #11149
 dorsal spine mace~
-11149 1  # 1x dorsal spine mace
+11149 1
 2 196 0 16 11136
 R
 11136 2  # 2x a catfish dorsal spine
 R
-919 1  # 1x UNKNOWN
+919 1  # 1x a wooden handle
 S
 $

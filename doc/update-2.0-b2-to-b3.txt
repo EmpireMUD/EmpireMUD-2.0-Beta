@@ -1,0 +1,74 @@
+=======================================
+Updating EmpireMUD from 2.0b2 to 2.0b3:
+=======================================
+
+WARNING: You will need to convert your playerfile for this upgrade. If you used
+any of the "spare" variables in player_special_data_saved, you need to update
+the playerfile converter to preserve your spares. If you haven't made any code
+changes, that step isn't necessary.
+
+Step by step instructions:
+
+1. Shut down your EmpireMUD using "shutdown die".
+
+2. Create a backup of your MUD.
+
+3. Update your code to 2.0b3 using git, or by creating a patch on the GitHub
+site. (Usually you should "git stash", "git pull", then "git stash pop").
+
+4. If any of your own changes conflict, you must resolve conflicts in those
+files. Conflict sections look like this:
+
+  <<<<<<< Updated upstream
+    ...
+  =======
+    ...
+  >>>>>>> Stashed changes
+
+Your original code is between the === and >>> lines (the bottom part). The top
+portion is the change from the repository. You'll have to reconcile the two
+sections and remove the <<<, ===, and >>> lines.
+
+5. You will need to manually add the following to src/utils/Makefile (this file
+was generated when you configured your EmpireMUD and isn't updated by the
+patch):
+
+  5a. In the "all:" block, add:
+
+    $(BINDIR)/plrconv-20b2-to-20b3
+
+  5b. After the "plrconv-20b1-to-20b2:" line, add a new section:
+
+    plrconv-20b2-to-20b3: $(BINDIR)/plrconv-20b2-to-20b3
+
+  5c. At the end, add this block:
+
+    $(BINDIR)/plrconv-20b2-to-20b3: plrconv-20b2-to-20b3.c $(INCDIR)/conf.h \
+       $(INCDIR)/sysdep.h $(INCDIR)/structs.h $(INCDIR)/utils.h
+       $(CC) $(CFLAGS) -o $(BINDIR)/plrconv-20b2-to-20b3 plrconv-20b2-to-20b3.c
+
+6. Compile your MUD using "make all". This will also compile the playerfile
+converter.
+
+7. Use the playerfile converter to update your playerfile:
+
+  7a. Change directory into lib/etc:
+
+    cd lib/etc
+
+  7b. Rename your existing playerfile:
+
+    mv players player.old
+
+  7c. Convert your playerfile:
+
+    ./../../bin/plrconv-20b2-to-20b3 players.old players
+
+8. Start up your MUD. Warning: If your playerfile wasn't correctly converted
+and was corrupted, the player with ID #1 may still be able to log in, but all
+other players will fail. You should verify that your game is running correctly.
+
+9. For help with this update, contact us:
+
+  Email: paul@empiremud.net
+  Forums: http://empiremud.net/forums/

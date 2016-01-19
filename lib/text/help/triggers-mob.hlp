@@ -1,0 +1,384 @@
+MTRIG MOBTRIGS "MOBILE TRIGGERS" "MOB TRIGGERS" "TRIGEDIT MOBILES" MOBILE-TRIGGERS TRIGEDIT-MOBILES MOB-TRIGGERS
+
+Mobs are fully scriptable in EmpireMUD. See the following help files for more
+information:
+
+See also:
+- List of variables: &yMTRIG VARS&0
+- List of triggers: &yMTRIG TYPES&0
+- List of commands: &yMTRIG COMMANDS&0
+#d
+"ACT TRIGGER" "MTRIG ACT" TRIGEDIT-MOB-ACT TRIGEDIT-MOB-ACTION
+
+Act (mob trigger)
+
+Argument type:  the phrase (whole string) or word list to match
+
+The Act trigger occurs when someone performs a matching action in the same room
+as the mob who has the trigger. It can match either a phrase (which must be
+contained in the action text), or match any word from a word list.
+
+Note: Act triggers can only match things passed through the code's act()
+   function, which includes MOST game text that gets sent to the room. If you
+   find that you can't get a trigger to respond to action text, consult a
+   programmer about looking into how that text is being sent.
+ 
+Variables:
+  &c%actor%&0 - The character causing the trigger to activate.
+  &c%victim%&0 - The character, if any, on the receiving end of the action.
+  &c%object%&0 - The object, if any, used in the action.
+  &c%target%&0 - The target object of the action, if any.
+  &c%arg%&0 - The entire action phrase that was seen.
+#d
+"BRIBE TRIGGER" "MTRIG BRIBE" TRIGEDIT-MOB-BRIBE
+
+Bribe (mob trigger)
+
+Argument type:  minimum number of misc coins given to the mobile
+
+Bribe is triggered when a person gives coins to the mob. The type of coin is
+not considered, because all coinage is made by players and has different
+values. Only the number of coins matters.
+
+Variables:
+  &c%actor%&0 - The character providing coins to the mobile.
+  &c%amount%&0 - Number of coins given.
+#d
+"DEATH TRIGGER" "MTRIG DEATH" TRIGEDIT-MOB-DEATH
+
+Death (mob trigger)
+
+Argument type:  percent chance to execute
+Return value:  return 0 to prevent the mob's death cry
+
+This type of trigger fires when the mob dies (but not when if it is purged).
+
+Variables:
+  &c%actor%&0 - The character killing this mob, if any.
+#d
+"FIGHT TRIGGER" "FIGHT-CHARMED TRIGGER" "MTRIG FIGHT" "MTRIG FIGHT-CHARMED" TRIGEDIT-MOB-FIGHT TRIGEDIT-MOB-FIGHT-CHARMED
+
+Fight (mob trigger)
+
+Argument type:  percent chance to execute
+
+Activated each round of fighting, after the mobile has had all of its attacks.
+
+Charmed mobs will not activate normal Fight triggers, but you can use the
+Fight-Charmed trigger instead. This is useful for mobs that are designed as
+companions or familiars. Most adventure mobs shouldn't use triggers while
+charmed, though, because players may find a way to abuse tehm.
+
+Variables:
+  &c%actor%&0 - The character this mobile is fighting.
+#d
+"HITPRCNT TRIGGER" "HITPERCENT TRIGGER" "MTRIG HITPRCNT" "MTRIG HITPERCENT" TRIGEDIT-MOB-HITPERCENT TRIGEDIT-MOB-HITPRCNT 
+
+HitPrcnt (mob trigger)
+
+Argument type:  percentage of health points remaining
+
+Activated during combat when the mobile's hit point percentage drops below a 
+specified percentage.
+
+Variables:
+  &c%actor%&0 - The character this mobile is fighting.
+#d
+"MEMORY TRIGGER" "MTRIG MEMORY" TRIGEDIT-MOB-MEMORY
+
+Memory (mob trigger)
+
+Argument type:  percent chance to execute
+
+Activated when the mobile encounters a character in its memory (&yMREMEMBER&0) 
+list, and there is no over-riding command. Any mobile making use of mremember 
+MUST have a memory script, even if it will never be called.
+
+Variables:
+  &c%actor%&0 - The character being remembered.
+#d
+MFOLLOW %FOLLOW% TRIG-FOLLOW
+
+Usage:  mfollow <victim>
+
+The mobile will begin following the victim without the revealing "starts
+following you" message. A silent follow.
+
+Note: You must use "mfollow" (not "%follow%") for this.
+#d
+MFORGET MREMEMBER %FORGET% %REMEMBER%
+
+Usage:  mremember <victim> [command]
+        mforget <victim>
+
+Mremember places the victim into the mob's memory list, and will run Memory
+triggers each time the mob meets the victim. You can also provide a command
+which will be run next time the mob sees the player.
+
+Mforget removes a character from the memory list, which also happens
+automatically after a Memory trigger or mremember'd command occurs.
+
+Note: Any mob using the mremeber command MUST have a Memory trigger attached. 
+   It doesn't matter if the Memory trigger is never called (0% chance).
+Note: You must use "mremember" and "mforget" (not like "%remember%") for this.
+
+See also: MTRIG MEMORY
+#d
+MGOTO %GOTO%
+
+Usage:  mgoto <target>
+
+This command moves the mob to the given target. The target may be an object,
+room, vehicle, or character. No message is given on either end.
+
+You can use i### to target a room in the mob's current adventure instance by
+its room template vnum instead of live room number (if used in an instanced
+zone).
+
+Note: You must use "mgoto" (not "%goto%") for this.
+
+Examples:
+  mgoto 1233
+  mgoto Rumble
+  mgoto fountain
+#d
+MHUNT %HUNT% HUNT 
+
+Usage:  mhunt <victim>
+
+The mobile will begin to hunt for victim, and engage in combat upon finding 
+them. Only Mobiles may use this command. Hunting mobs will walk through !MOB
+rooms.
+
+Note: You must use "mhunt" (not "%hunt%") for this.
+#d
+MJUNK %JUNK%
+
+Usage:  mjunk <object | all>
+   
+The object in the mob's inventory specified is removed from the game. 
+'Mjunk all' removes all of the objects in the mob's inventory. No message 
+is sent by this command.
+
+Note: You must use "mjunk" (not "%junk%") for this.
+
+See also: %PURGE%
+#d
+MKILL %KILL%
+
+Usage:  mkill <victim>
+
+Mkill causes the mob to hit the victim. It is the same as kill, except mkill 
+works in cases where kill might not. It can also be used to change targets in
+a group fight.
+
+Note: You must use "mkill" (not "%kill%") for this.
+
+Example:
+  mkill %actor%
+#d
+"MTRIG COMMANDS" "MOB COMMANDS" TRIGEDIT-MOB-COMMANDS
+
+Mobs can use any normal player commands in their triggers (except a few which
+are player-only), in addition to some special commands:
+
+&c%adventurecomplete%&0 - Triggers completion of the mob's adventure.
+&c%aoe%&0 - Deals scaled damage to all people in the room.
+&c%asound%&0 - Echoes to rooms around the mob (but not its own).
+&c%at%&0 - Performs an action in another room, without moving the mob.
+&c%buildingecho%&0 - Sends a message to everyone in a building.
+&c%damage%&0 - Deals scaled damage to a person.
+&c%door%&0 - Various functions for changing doors and exits.
+&c%dot%&0 - Adds a damage-over-time effect to a person.
+&c%echo%&0 - Sends a message to the whole room.
+&c%echoaround%&0 - Sends a message to all but one target.
+&c%echoneither%&0 - Sends a message to all but two targets.
+&c%force%&0 - Forces a person to perform a command.
+&c%load%&0 - Loads a mob, object, etc.
+&c%purge%&0 - Purges a mob, object, etc.
+&c%regionecho%&0 - Sends a message to a whole map region.
+&c%scale%&0 - Re-scales the target to a different level.
+&c%send%&0 - Sends a message to one person.
+&c%siege%&0 - Deals siege damage to a vehicle or building.
+&c%teleport%&0 - Moves players to a target room.
+&c%terracrop%&0 - Changes the terrain to a certain crop type.
+&c%terraform%&0 - Changes the terrain to a certain sector type.
+&c%transform%&0 - NOT CURRENTLY IMPLEMENTED.
+&c%vehicleecho%&0 - Sends a message to everyone in/on a vehicle.
+&cmfollow&0 - Causes the mob to start following someone.
+&cmforget&0 - Removes a target from the mob's memory.
+&cmgoto&0 - Moves the mob to another room.
+&cmhunt&0 - Starts tracking a target.
+&cmjunk&0 - Destroys an item in inventory.
+&cmkill&0 - Starts combat against the target (or switches targets).
+&cmremember&0 - Adds a target to the mob's memory.
+
+See the help files on those commands for more info.
+#d
+"MTRIG TYPES" TRIGEDIT-MOB-TYPES "MOB TRIGGER TYPES" "MOBILE TRIGGER TYPES"
+
+Mobs can trigger on the following events:
+
+&cGlobal&0 - Can happen even without players present (combine with Random).
+&cRandom&0 - Triggers randomly when players are around.
+&cCommand&0 - Responds to a player command.
+&cSpeech&0 - Responds to player speech.
+&cAct&0 - Matches text in action messages.
+&cDeath&0 - Triggers when the mob dies.
+&cGreet&0 - Triggers when a visible person enters the room.
+&cGreet-All&0 - Triggers ANY person enters the room.
+&cEntry&0 - Triggers when the mob moves into a new room.
+&cReceive&0 - Triggers when the mob receives an item.
+&cFight&0 - Triggers during combat rounds.
+&cHitPrcnt&0 - Triggers during combat rounds when below a certain health level.
+&cBribe&0 - Triggers when someone gives coins to the mob.
+&cLoad&0 - Triggers when the mobile first loads.
+&cMemory&0 - Triggers when the mob meets a player it remembers.
+&cAbility&0 - Triggered when a certain ability targets the mob.
+&cLeave&0 - Triggers when a visible person tries to leave.
+&cLeave-All&0 - Triggers when ANY person tries to leave.
+&cDoor&0 - Triggers when a player interacts with a door in the room.
+&cFight-Charmed&0 - Triggers during combat rounds even when charmed.
+
+For each type, there is a help file named &yMTRIG <type>&0.
+#d
+"MTRIG VARS" "MTRIG VARIABLES" CHAR-VARS MOB-VAR TRIGEDIT-CHAR-VAR TRIGEDIT-VARIABLES-CHARACTERS MOBVARS MOB-VARS 
+
+All mob scripts provide the &c%self%&0 variable.
+
+When using field  - The variable returns:
+&cability(name)&0 - Returns whether or not the player knows the ability.
+&cadd_mob_flag(FLG)&0 - Adds a mob flag to the mob. Also, remove_mob_flag().
+&cadd_resources(vnum,amt)&0 - Gives a person <amt> of object <vnum>.
+&caff_flagged(FLG)&0 - Checks if the actor has an AFF flag (e.g. ENTANGLED).
+&calias&0 - The list of aliases (keywords) of the mob or the player name.
+&caffect(name)&0 - Checks the actor for the affect (by name) in the subfield.
+   This is the name that shows on your affects/score command when using active.
+&cblock&0 - Player's block rating.
+&cblood(amt)&0 - Returns current blood, or adds/removes blood if amt is set.
+&cbonus_healing&0 - Character's Bonus-Healing trait.
+&cbonus_magical&0 - Character's Bonus-Magical damage trait.
+&cbonus_physical&0 - Character's Bonus-Physical damage trait.
+&ccan_afford(amt)&0 - Checks if the actor has enough coins of any converted type.
+&ccan_gain_new_skills&0 - Checks if the character can gain a new skill from 0.
+&ccancel_adventure_summon&0 - Call this if a script teleports a player around, to
+   prevent them from being teleported again if they were adventure-summoned.
+&ccharge_coins(amt)&0 - Charges the actor a number of coins.
+&ccanbeseen&0 - True if the actor can be seen by the mob (always true 
+   for non-mob triggers).
+&ccanuseroom_ally(room)&0 - Character can use the room as a member or ally (with
+   no arg, defaults to current room).
+&ccanuseroom_guest(room)&0 - Character can use the room as a guest (with no arg,
+   defaults to current room).
+&ccanuseroom_member(room)&0 - Character can use the room as a member (with no arg,
+   defaults to current room).
+&ccan_teleport_room(room)&0 - Character can legally teleport in/out of the room
+   (defaults to current room).
+&ccha&0 - The actor's Charisma.
+&cclass&0 - The actor's class, as a string.
+&ccrafting_level&0 - The actor's crafting level.
+&cdex&0 - The actor's Dexterity.
+&cdir(name)&0 - Gives the name of the character's perceived direction
+   ('name' is the real direction), which is useful for people without
+   navigation.
+&cdisabled&0 - Returns TRUE if the actor is stunned or otherwise disabled.
+&cdodge&0 - The character's dodge rating.
+&ceq()&0 - This will return the identifier (id) for the object equipped in
+   position, if any. The specified position may be either a position number
+   (0-18) or the name of the location * checks all positions. &yHELP POSITIONS&0
+&cfighting&0 - The unique id of the mob fighting the actor.
+&cfollower(name)&0 - The follower of the actor (as an id) with name supplied.
+&cgain_skill(sk,amt)&0 - Gives the player points in a skill, or takes them.
+&cgive_coins(amt)&0 - Gives the actor a number of coins.
+&cgive_skill_reset(sk)&0 - Grants the player a free skill reset in that skill.
+&cgrt&0 - The actor's Greatness.
+&chas_item()&0 - Checks if the actor has a object (inventory, equipped and
+   in containers) by subfield name/var/vnum.
+&chas_resources(vnum,amt)&0 - Whether or not the player has <amt> of object <vnum>
+   available in the inventory/room.
+&cheshe&0 - Returns the correct pronoun (he/she/it).
+&chimher&0 - Returns the correct pronoun (him/her/it).
+&chisher&0 - Returns the correct pronoun (his/her/its).
+&chealth&0 - The current hit points of the actor.      
+&chome&0 - Room id of the player's home, if any.
+&cid&0 - The unique id of the actor.
+&cint&0 - The actor's intelligence.
+&cinventory()&0 - Returns the id of the first item in the actors inventory or 
+   the id of the first object with vnum in the subfield. If the character
+   doesn't have the item, an empty string is returned. * checks for any inv. 
+&cis_ally(char)&0 - Returns true if the other character is a combat ally. Run
+   this in two steps:
+      eval test %%actor.is_ally(%char%)%%
+      if %test% ...
+&cis_enemy(char)&0 - Returns true if the other character is a combat enemy.
+&cis_god&0 - Returns true if the actor is a God-level player.
+&cis_hostile(on/off)&0 - If the ()'s are omitted, return value is whether or
+   not the actor is marked as a Hostile player.
+&cis_immortal&0 - Returns true if the actor is an immortal (admin).
+&cis_name(str)&0 - Returns true if str is a valid name for the actor.
+&cis_npc&0 - True if the actor is NOT a player.
+&cis_pc&0 - Checks if the actor is a player. Useful when you want a trigger
+   to fire on players and not mobs.
+&clevel&0 - The actor's computed level (or scaled level, for mobs).
+&cmana&0 - The current mana points of the actor.
+&cmana(amount)&0 - Add/subtract mana on the actor.
+&cmaster&0 - The master of the actor (as an id), or an empty return.
+&cmaxblood&0 - The maximum blood points of the actor.
+&cmaxhealth&0 - The maximum hit points of the actor.
+&cmaxmana&0 - The maximum mana points of the actor.
+&cmaxmove&0 - The maximum movement points of the actor.
+&cmob_flagged(FLAG)&0 - Returns TRUE if the NPC has the given flag, e.g. VAMPIRE.
+&cmove&0 - The movement points of the actor.
+&cmove(amount)&0 - Add/subtract movement points on the actor.
+&cname&0 - The actor's name (the short description for mobs).
+&cnext_in_room&0 - The next actor in the room as a variable (id) nice to use
+   for loops, or an empty return.
+&cnohassle&0 - If TRUE, the player is an immortal with !HASSLE on.
+&cpc_name&0 - Player's name or mob's keyword list, rather than short desc
+&cplr_flagged(FLAG)&0 - Returns TRUE if the player has the given flag (VAMPIRE).
+&cpoison_immunity&0 - Returns TRUE if the player has Poison Immunity.
+&cposition&0 - Returns Standing, Sitting, Fighting, etc.
+&cremove_mob_flag(FLG)&0 - Removes a mob flag from the mob. Also, add_mob_flag().
+&cresist_magical&0 - Returns the amount of magic resistance the player has.
+&cresist_physical&0 - Returns the amount of physical resistance the player has.
+&cresist_poison&0 - Returns TRUE if the player has Resist Poison.
+&criding&0 - TRUE if the character is currently mounted.
+&croom&0 - The room the actor is in as a room variable. 
+&csex&0 - The actor's sex, as a string: MALE, FEMALE, or NEUTRAL.
+&cset_skill(name,level)&0 - Change a player's skill level, also gain_skill()
+&cskill(name)&0 - The player's level in the given skill.
+&cstr&0 - The actor's Strength.
+&ctitle()&0 - The actor's title. Subfield sets. Not used for mobs.
+&ctohit&0 - The player's to-hit rating.
+&ctrigger_counterspell&0 - Fires the character's counterspell and returns 1 if
+   so, or returns 0 if there was no counterspell.
+&cvarexists()&0 - Returns 1 if global variable in subfield exists, 0 if not.
+   Useful when dealing with remote vars on players.
+&cvnum&0 - The actor's virtual number.  
+&cwits&0 - The actor's Wits.
+&c<global>&0 - If the specified field is not a recognized one, the 
+   actor's script global list is searched for a matching global name. If found,
+   its value will be returned. This can is also used to get values of vars set
+   on players:
+      if %actor.varexists(testvar)%
+         set testvar %actor.testvar%
+      end
+      * and then later in the script write it back:
+      remote testvar %actor.id%
+
+See also: AFFECT FLAGS, MEDIT FLAGS
+#d
+"RECEIVE TRIGGER" "MTRIG RECEIVE" TRIGEDIT-MOB-RECEIVE TRIG-MOB-RECEIVE
+
+Receive (mob trigger)
+
+Argument type:  percent chance to execute
+Return value:  return 0 to prevent transferring the object to the mob
+
+Receive triggers fire whenever a mob receives an item from someone.
+
+Variables:
+  &c%actor%&0 - The character handing the object to the mob.
+  &c%object%&0 - The object being handed over.
+#d
+$~

@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: vnums.h                                         EmpireMUD 2.0b2 *
+*   File: vnums.h                                         EmpireMUD 2.0b3 *
 *  Usage: stores commonly-used virtual numbers                            *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -67,10 +67,6 @@
 
 
 // Room building vnums
-#define RTYPE_B_HELM  5500	// boat
-#define RTYPE_B_ONDECK  5501	// boat
-#define RTYPE_B_STORAGE  5502	// boat
-#define RTYPE_B_BELOWDECK  5503	// boat
 #define RTYPE_SHIP_HOLDING_PEN  5509	// for the shipping system's storage room
 #define RTYPE_STEALTH_HIDEOUT  5510
 #define RTYPE_SORCERER_TOWER  5511
@@ -138,18 +134,10 @@
 
 // Sewn items
 #define o_ROPE  2035
-#define o_TENT  2036
 
 // Wood crafts
 #define o_STAKE  915	// could be a flag
 #define o_BLANK_SIGN  918
-
-// Ships
-#define os_PINNACE  952
-#define os_BRIGANTINE  953
-#define os_GALLEY  954
-#define os_ARGOSY  955
-#define os_GALLEON  956
 
 // core objects
 #define o_CORPSE  1000
@@ -186,28 +174,8 @@
 #define o_SMALL_LEATHER  1356
 #define o_LARGE_LEATHER  1357
 
-// newbie gear
-#define o_STAFF  1107
-#define o_LEATHER_HOOD  2001
-#define o_CLOTH_HOOD  2002
-#define o_BRIMMED_CAP  2004
-#define o_COIF  2006
-#define o_SHIRT  2009
-#define o_ROBE  2012
-#define o_WAISTCOAT  2014
-#define o_LEATHER_JACKET  2016
-#define o_SPOTTED_ROBE  2017
-#define o_PANTS  2027
-#define o_BREECHES  2028
-#define o_MOCCASINS  2031
-#define o_SANDALS  2032
-#define o_STONE_AXE  2100
-#define o_WOODSMANS_AXE  2101
-#define o_SHORT_SWORD  2102
-#define o_SHIV  2103
-#define o_NEWBIE_TORCH  2104
-#define o_GRAVE_MARKER  2117
-#define o_BREAD  3313
+// for catapults/ships
+#define o_HEAVY_SHOT  2135
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -281,3 +249,4 @@
 #define DOCKWORKER  270
 #define APPRENTICE_EXARCH  271
 #define MILL_WORKER  272
+#define VEHICLE_REPAIRMAN  273

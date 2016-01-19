@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: morph.c                                         EmpireMUD 2.0b2 *
+*   File: morph.c                                         EmpireMUD 2.0b3 *
 *  Usage: morph-related code                                              *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -29,13 +29,16 @@
 *   Commands
 */
 
+// local protos
+void finish_morphing(char_data *ch, int morph_to);
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// DATA ////////////////////////////////////////////////////////////////////
 
 // validates morphs
 #define MORPH_OK(ch, morph)  ( \
-	(morph_data[(morph)].ability == NO_ABIL || HAS_ABILITY((ch), morph_data[(morph)].ability)) && \
+	(morph_data[(morph)].ability == NO_ABIL || has_ability((ch), morph_data[(morph)].ability)) && \
 	(!IS_SET(morph_data[(morph)].morph_flags, MORPH_FLAG_VAMPIRE_ONLY) || IS_VAMPIRE(ch)) \
 )
 
@@ -43,7 +46,7 @@
 /* The main data structure */
 struct morph_data_structure {
 	char *name;	// for "morph <form>" -- "\n" to not be able to manually morph to this form
-	int ability;	// required ability, or NO_ABIL for none
+	any_vnum ability;	// required ability, or NO_ABIL for none
 	int normal_cost[NUM_POOLS];	// cost when out of combat (slow morph)
 	int combat_cost[NUM_POOLS];	// cost when in combat
 	
@@ -107,7 +110,7 @@ const struct morph_data_structure morph_data[] = {
 		{ 2, 0, 0, 0, 0, 0 },
 		{ 150, 150, 25, 100 },
 		TYPE_CLAW, 0,
-		MORPH_FLAG_VAMPIRE_ONLY,
+		MORPH_FLAG_VAMPIRE_ONLY | MORPH_FLAG_CHECK_SOLO,
 		"a horrid monstrosity",
 		"   The horrid monstrosity is huge! At well over eight feet tall, with greenish-\r\ngray flesh, it's like nothing you've ever seen! Its arms are long, thin, and\r\nedged black nails. Its face is something out of a nightmare. A row of spines\r\nrun down its back, and bony plates protect its skin!"
 	},
@@ -119,7 +122,7 @@ const struct morph_data_structure morph_data[] = {
 		{ 0, 0, 0, 0, 2, 0 },
 		{ 50, 100, 150, 100 },
 		TYPE_HIT, 0,
-		MORPH_FLAG_VAMPIRE_ONLY,
+		MORPH_FLAG_VAMPIRE_ONLY | MORPH_FLAG_CHECK_SOLO,
 		"the dread blood",
 		"   What stands before you is a twisting, swirling, oozing mass of red blood.\r\nIts shape resembles a man, but its fanged, gaping maw is too large. Its limbs\r\nare too long. And when you look upon it, you're barely certain what's real and\r\nwhat exists only in your mind."
 	},
@@ -143,7 +146,7 @@ const struct morph_data_structure morph_data[] = {
 		{ 2, 0, 0, 0, 0, 0 },
 		{ 100, 200, 25, 100 },
 		TYPE_CLAW, 0,
-		0,
+		MORPH_FLAG_CHECK_SOLO,
 		"a savage werewolf",
 		"   The werewolf stands over you, snarling, baring every one of its long\r\ncanine teeth. It stands on two legs, more like a man than a wolf, and yet\r\nthere is something disturbingly bestial about it. You can't bring yourself\r\nto stop looking at it, for fear that turning away would spell your doom."
 	},
@@ -155,7 +158,7 @@ const struct morph_data_structure morph_data[] = {
 		{ 1, 3, 0, 0, 0, -1 },
 		{ 200, 125, 20, 100 },
 		TYPE_CLAW, 0,
-		0,
+		MORPH_FLAG_CHECK_SOLO,
 		"a towering werewolf",
 		"   You can scarcely avoid the shadow of this massive wolf-man, which towers\r\nover you and everything else. Its massive, powerful muscles are etched with\r\nthe scars of dozens of battles -- or hundreds -- and you wonder how many\r\nchildren this creature has orphaned on its quest for blood."
 	},
@@ -167,7 +170,7 @@ const struct morph_data_structure morph_data[] = {
 		{ 1, 0, 0, 0, 2, 0 },
 		{ 50, 100, 150, 100 },
 		TYPE_CLAW, 0,
-		0,
+		MORPH_FLAG_CHECK_SOLO,
 		"a sage werewolf",
 		"   Though you have seen other werewolves, this one looks somehow smaller and\r\ngentler. It isn't the size of an ox cart, and its arms are not muscled to the\r\npoint of straining its armor. Instead, it has a serene look about it, as if it\r\nis in tune with the nature around it."
 	},
@@ -226,6 +229,32 @@ const struct morph_data_structure morph_data[] = {
 //// HELPERS /////////////////////////////////////////////////////////////////
 
 /**
+* Ensures that a player can still be in their morph. This may un-morph them.
+*
+* @param char_data *ch The character to check.
+*/
+void check_morph_ability(char_data *ch) {
+	bool revert = FALSE;
+	
+	// nothing to check
+	if (IS_NPC(ch) || GET_MORPH(ch) == MORPH_NONE) {
+		return;
+	}
+	
+	if (!revert && morph_data[GET_MORPH(ch)].ability != NO_ABIL && !has_ability(ch, morph_data[GET_MORPH(ch)].ability)) {
+		revert = TRUE;
+	}
+	if (!revert && IS_SET(morph_data[GET_MORPH(ch)].morph_flags, MORPH_FLAG_CHECK_SOLO) && !check_solo_role(ch)) {
+		revert = TRUE;
+	}
+	
+	if (revert) {
+		finish_morphing(ch, MORPH_NONE);
+	}
+}
+
+
+/**
 *
 * @param room_data *location Where the morph affinity is happening.
 * @param int morph Which MORPH_x the person is trying to morph into.
@@ -236,7 +265,7 @@ bool morph_affinity_ok(room_data *location, int morph) {
 	crop_data *cp;
 	bool ok = TRUE;
 	
-	if (ROOM_SECT_FLAGGED(location, SECTF_HAS_CROP_DATA) && (cp = crop_proto(ROOM_CROP_TYPE(location)))) {
+	if (ROOM_SECT_FLAGGED(location, SECTF_HAS_CROP_DATA) && (cp = ROOM_CROP(location))) {
 		climate = GET_CROP_CLIMATE(cp);
 	}
 	else {

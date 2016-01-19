@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: fight.c                                         EmpireMUD 2.0b2 *
+*   File: fight.c                                         EmpireMUD 2.0b3 *
 *  Usage: Combat system                                                   *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -85,11 +85,11 @@ bool check_block(char_data *ch, char_data *attacker, bool can_gain_skill) {
 	int max_block = 50;	// never pass this value
 	
 	// must have a shield and Shield Block
-	if (!shield || !IS_SHIELD(shield) || (!IS_NPC(ch) && !HAS_ABILITY(ch, ABIL_SHIELD_BLOCK))) {
+	if (!shield || !IS_SHIELD(shield) || (!IS_NPC(ch) && !has_ability(ch, ABIL_SHIELD_BLOCK))) {
 		return FALSE;
 	}
 	
-	rating = get_block_rating(ch, can_gain_skill);
+	rating = get_block_rating(ch, can_gain_skill && can_gain_exp_from(ch, attacker));
 	
 	// penalty for blind/dark
 	if (attacker && !CAN_SEE(ch, attacker)) {
@@ -272,7 +272,7 @@ int get_block_rating(char_data *ch, bool can_gain_skill) {
 	rating = GET_BLOCK(ch);
 	
 	// quick block procs to add 10%
-	if (HAS_ABILITY(ch, ABIL_QUICK_BLOCK)) {
+	if (has_ability(ch, ABIL_QUICK_BLOCK)) {
 		if (IS_CLASS_ABILITY(ch, ABIL_QUICK_BLOCK)) {
 			rating += MAX(quick_block_base, get_approximate_level(ch) * quick_block_scale);
 		}
@@ -282,8 +282,8 @@ int get_block_rating(char_data *ch, bool can_gain_skill) {
 	}
 	
 	if (can_gain_skill) {
-		gain_ability_exp(ch, ABIL_SHIELD_BLOCK, 1);
-		gain_ability_exp(ch, ABIL_QUICK_BLOCK, 1);
+		gain_ability_exp(ch, ABIL_SHIELD_BLOCK, 2);
+		gain_ability_exp(ch, ABIL_QUICK_BLOCK, 2);
 	}
 		
 	return rating;
@@ -321,10 +321,10 @@ double get_combat_speed(char_data *ch, int pos) {
 
 	// ability mods: player only
 	if (!IS_NPC(ch) && weapon) {
-		if (HAS_ABILITY(ch, ABIL_FINESSE) && !IS_MISSILE_WEAPON(weapon)) {
+		if (has_ability(ch, ABIL_FINESSE) && !IS_MISSILE_WEAPON(weapon)) {
 			base *= CHOOSE_BY_ABILITY_LEVEL(finesse, ch, ABIL_FINESSE);
 		}
-		if (HAS_ABILITY(ch, ABIL_QUICK_DRAW) && IS_MISSILE_WEAPON(weapon)) {
+		if (has_ability(ch, ABIL_QUICK_DRAW) && IS_MISSILE_WEAPON(weapon)) {
 			base *= CHOOSE_BY_ABILITY_LEVEL(quick_draw, ch, ABIL_QUICK_DRAW);
 		}
 	}
@@ -338,7 +338,7 @@ double get_combat_speed(char_data *ch, int pos) {
 	}
 	
 	// wits: it gets .1 second faster for every 4 wits
-	if (!HAS_ABILITY(ch, ABIL_FASTCASTING)) {
+	if (!has_ability(ch, ABIL_FASTCASTING)) {
 		base *= (1.0 - (0.025 * GET_WITS(ch)));
 	}
 	
@@ -370,7 +370,7 @@ int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill) 
 	base += GET_DEXTERITY(ch) * hit_per_dex;
 	
 	// skills
-	if (HAS_ABILITY(ch, ABIL_REFLEXES)) {
+	if (has_ability(ch, ABIL_REFLEXES)) {
 		if (IS_CLASS_ABILITY(ch, ABIL_REFLEXES)) {
 			refl = MAX(10.0, GET_COMPUTED_LEVEL(ch) * 0.1);
 		}
@@ -383,8 +383,8 @@ int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill) 
 		
 		base += refl;
 		
-		if (can_gain_skill) {
-			gain_ability_exp(ch, ABIL_REFLEXES, 1);
+		if (can_gain_skill && can_gain_exp_from(ch, attacker)) {
+			gain_ability_exp(ch, ABIL_REFLEXES, 2);
 		}
 	}
 	
@@ -424,7 +424,7 @@ int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_sk
 	base_chance += GET_DEXTERITY(ch) * hit_per_dex;
 	
 	// skills: sparring
-	if (HAS_ABILITY(ch, ABIL_SPARRING)) {
+	if (has_ability(ch, ABIL_SPARRING)) {
 		if (IS_CLASS_ABILITY(ch, ABIL_SPARRING)) {
 			spar = MAX(10.0, GET_COMPUTED_LEVEL(ch) * 0.1);
 		}
@@ -437,8 +437,8 @@ int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_sk
 		
 		base_chance += spar;
 		
-		if (can_gain_skill) {
-			gain_ability_exp(ch, ABIL_SPARRING, 1);
+		if (can_gain_skill && can_gain_exp_from(ch, victim)) {
+			gain_ability_exp(ch, ABIL_SPARRING, 2);
 		}
 	}
 	
@@ -648,14 +648,14 @@ static void recursive_loot_set(obj_data *obj, int idnum, empire_data *emp) {
 * @param int damtype The DAM_x type of damage.
 */
 int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, int damtype) {
-	extern bool check_blood_fortitude(char_data *ch);
+	extern bool check_blood_fortitude(char_data *ch, bool can_gain_skill);
 	
 	bool self = (!attacker || attacker == victim);
 	int max_resist, use_resist;
 	double resist_prc;
 	
 	if (!self) {
-		if (HAS_ABILITY(victim, ABIL_NOBLE_BEARING)) {
+		if (has_ability(victim, ABIL_NOBLE_BEARING) && check_solo_role(victim)) {
 			dam -= GET_GREATNESS(victim);
 		}
 		
@@ -664,7 +664,7 @@ int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, i
 			max_resist = get_approximate_level(attacker) / 2;
 			use_resist = 0;
 			
-			if (damtype == DAM_PHYSICAL || damtype == DAM_FIRE || (damtype == DAM_POISON && HAS_ABILITY(victim, ABIL_RESIST_POISON))) {
+			if (damtype == DAM_PHYSICAL || damtype == DAM_FIRE || (damtype == DAM_POISON && has_ability(victim, ABIL_RESIST_POISON))) {
 				use_resist = GET_RESIST_PHYSICAL(victim);
 			}
 			else if (damtype == DAM_MAGICAL) {
@@ -679,28 +679,32 @@ int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, i
 			}
 		}
 	
-		if (check_blood_fortitude(victim)) {
+		if (check_blood_fortitude(victim, can_gain_exp_from(victim, attacker))) {
 			dam = (int) round(0.9 * dam);
 		}
 	
 		// redirect some damage to mana: player only
-		if (damtype == DAM_MAGICAL && !IS_NPC(victim) && HAS_ABILITY(victim, ABIL_NULL_MANA) && GET_MANA(victim) > 0) {
+		if (damtype == DAM_MAGICAL && !IS_NPC(victim) && has_ability(victim, ABIL_NULL_MANA) && GET_MANA(victim) > 0) {
 			int absorb = MIN(dam / 2, GET_MANA(victim));
 		
 			if (absorb > 0) {
 				dam -= absorb;
 				GET_MANA(victim) -= absorb;
-				gain_ability_exp(victim, ABIL_NULL_MANA, 5);
+				if (can_gain_exp_from(victim, attacker)) {
+					gain_ability_exp(victim, ABIL_NULL_MANA, 5);
+				}
 			}
 		}
 	}
 	
 	if (damtype == DAM_POISON) {
-		if (HAS_ABILITY(victim, ABIL_POISON_IMMUNITY)) {
+		if (has_ability(victim, ABIL_POISON_IMMUNITY)) {
 			dam = 0;
 		}
-		gain_ability_exp(victim, ABIL_POISON_IMMUNITY, 2);
-		gain_ability_exp(victim, ABIL_RESIST_POISON, 5);
+		if (can_gain_exp_from(victim, attacker)) {
+			gain_ability_exp(victim, ABIL_POISON_IMMUNITY, 2);
+			gain_ability_exp(victim, ABIL_RESIST_POISON, 5);
+		}
 	}
 	
 	return dam;
@@ -845,7 +849,6 @@ obj_data *die(char_data *ch, char_data *killer) {
 	void cancel_blood_upkeeps(char_data *ch);
 	void despawn_charmies(char_data *ch);
 	void kill_empire_npc(char_data *ch);
-	void Objsave_char(char_data *ch, int rent_code);
 	
 	char_data *ch_iter;
 	obj_data *corpse = NULL;
@@ -1105,8 +1108,8 @@ obj_data *make_corpse(char_data *ch) {
 			}
 		}
 		
-		// rope if it was pulling or tied
-		if (GET_PULLING(ch) || MOB_FLAGGED(ch, MOB_TIED)) {
+		// rope if it was tied
+		if (MOB_FLAGGED(ch, MOB_TIED)) {
 			obj_to_obj(read_object(o_ROPE, TRUE), corpse);
 		}
 
@@ -1141,9 +1144,9 @@ obj_data *make_corpse(char_data *ch) {
 * @param char_data *ch The player resurrecting.
 * @param char_data *rez_by Optional (or NULL): The player who resurrected them.
 * @param room_data *loc The location to resurrect to.
-* @param int ability Optional (or NO_ABIL): The ability to skillup for rez_by.
+* @param any_vnum ability Optional (or NO_ABIL): The ability to skillup for rez_by.
 */
-void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, int ability) {
+void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, any_vnum ability) {
 	extern obj_data *find_obj(int n);
 
 	obj_data *corpse;
@@ -1307,10 +1310,6 @@ static void shoot_at_char(room_data *from_room, char_data *ch) {
 	else {
 		dam = 0;
 	}
-
-	if (GET_PULLING(ch) && CART_CAN_FIRE(GET_PULLING(ch))) {
-		log_to_empire(emp, ELOG_HOSTILITY, "A catapult has been spotted at (%d, %d)!", X_COORD(to_room), Y_COORD(to_room));
-	}
 	
 	if (damage(ch, ch, dam, type, DAM_PHYSICAL) != 0) {
 		log_to_empire(emp, ELOG_HOSTILITY, "Guard tower at (%d, %d) is shooting at an infiltrator at (%d, %d)", X_COORD(from_room), Y_COORD(from_room), X_COORD(to_room), Y_COORD(to_room));
@@ -1335,7 +1334,6 @@ static bool tower_would_shoot(room_data *from_room, char_data *vict) {
 	empire_data *m_empire;
 	room_data *shift_room, *to_room = IN_ROOM(vict);
 	char_data *m;
-	obj_data *pulling = GET_PULLING(vict);
 	int iter, distance;
 	bool hostile = IS_HOSTILE(vict);
 	
@@ -1356,8 +1354,13 @@ static bool tower_would_shoot(room_data *from_room, char_data *vict) {
 		return FALSE;
 	}
 	
+	// don't shoot npcs
+	if (IS_NPC(vict)) {
+		return FALSE;
+	}
+	
 	// can't see into buildings/mountains
-	if (ROOM_IS_CLOSED(to_room) || ROOM_SECT_FLAGGED(to_room, SECTF_OBSCURE_VISION) || SECT_FLAGGED(ROOM_ORIGINAL_SECT(to_room), SECTF_OBSCURE_VISION)) {
+	if (ROOM_IS_CLOSED(to_room) || ROOM_SECT_FLAGGED(to_room, SECTF_OBSCURE_VISION) || SECT_FLAGGED(BASE_SECT(to_room), SECTF_OBSCURE_VISION)) {
 		return FALSE;
 	}
 
@@ -1366,7 +1369,7 @@ static bool tower_would_shoot(room_data *from_room, char_data *vict) {
 	}
 	
 	// visibility
-	if ((AFF_FLAGGED(vict, AFF_INVISIBLE) || AFF_FLAGGED(vict, AFF_HIDE)) && !GET_LEADING(vict)) {
+	if ((AFF_FLAGGED(vict, AFF_INVISIBLE) || AFF_FLAGGED(vict, AFF_HIDE))) {
 		return FALSE;
 	}
 
@@ -1387,26 +1390,11 @@ static bool tower_would_shoot(room_data *from_room, char_data *vict) {
 		return FALSE;
 	}
 	
-	// Special handling for mobs -- skip any mob not pulling a catapult
-	if (IS_NPC(vict)) {
-		if (!pulling || !CART_CAN_FIRE(pulling)) {
-			return FALSE;
-		}
-	}
-
 	// check character OR their leader for permission to use the guard tower room -- that saves them
 	if (!((m = vict->master) && in_same_group(vict, m))) {
 		m = vict;
 	}
-	// try for master of other-pulling
-	if (m == vict && pulling && GET_PULLED_BY(pulling, 0) && (GET_PULLED_BY(pulling, 0) != vict)) {
-		m = GET_PULLED_BY(pulling, 0)->master ? GET_PULLED_BY(pulling, 0)->master : vict;
-	}
-	// try for master of other-other-pulling
-	if (m == vict && pulling && GET_PULLED_BY(pulling, 1) && (GET_PULLED_BY(pulling, 1) != vict)) {
-		m = GET_PULLED_BY(pulling, 1)->master ? GET_PULLED_BY(pulling, 1)->master : vict;
-	}
-
+	
 	if ((!IS_NPC(vict) && can_use_room(vict, from_room, GUESTS_ALLOWED)) || (!IS_NPC(m) && can_use_room(m, from_room, GUESTS_ALLOWED))) {
 		return FALSE;
 	}
@@ -1450,7 +1438,7 @@ static bool tower_would_shoot(room_data *from_room, char_data *vict) {
 	}
 	
 	// cloak of darkness
-	if (!IS_NPC(vict) && HAS_ABILITY(vict, ABIL_CLOAK_OF_DARKNESS)) {
+	if (!IS_NPC(vict) && has_ability(vict, ABIL_CLOAK_OF_DARKNESS)) {
 		gain_ability_exp(vict, ABIL_CLOAK_OF_DARKNESS, 15);
 		if (!number(0, 1) && skill_check(vict, ABIL_CLOAK_OF_DARKNESS, DIFF_HARD)) {
 			return FALSE;
@@ -1852,7 +1840,9 @@ bool can_fight(char_data *ch, char_data *victim) {
 		return FALSE;
 
 	// try to hit people through majesty?
-	gain_ability_exp(victim, ABIL_MAJESTY, 33.4);
+	if (can_gain_exp_from(victim, ch)) {
+		gain_ability_exp(victim, ABIL_MAJESTY, 33.4);
+	}
 	if (CHECK_MAJESTY(victim) && !AFF_FLAGGED(ch, AFF_IMMUNE_VAMPIRE)) {
 		return FALSE;
 	}
@@ -1941,6 +1931,80 @@ bool can_fight(char_data *ch, char_data *victim) {
 }
 
 
+/**
+* Validate a room target for a siege command.
+*
+* @param char_data *ch The person firing (Optional; will receive errors and trigger certain checks).
+* @param vehicle_data *veh The vehicle firing. (OPTIONAL: Could just be ch firing.)
+* @param room_data *to_room The target room.
+* @return bool TRUE if okay, FALSE if not.
+*/
+bool validate_siege_target_room(char_data *ch, vehicle_data *veh, room_data *to_room) {
+	room_data *from_room = veh ? IN_ROOM(veh) : (ch ? IN_ROOM(ch) : NULL);
+	
+	if (ch && ROOM_SECT_FLAGGED(from_room, SECTF_ROUGH)) {
+		msg_to_char(ch, "You can't lay siege from rough terrain!\r\n");
+	}
+	else if (ch && ROOM_IS_CLOSED(from_room)) {
+		msg_to_char(ch, "You can't lay siege from indoors.\r\n");
+	}
+	else if (ch && ROOM_BLD_FLAGGED(from_room, BLD_BARRIER)) {
+		msg_to_char(ch, "You can't lay siege from so close to a barrier.\r\n");
+	}
+	else if (!IS_MAP_BUILDING(to_room)) {
+		if (ch) {
+			msg_to_char(ch, "That isn't a building.\r\n");
+		}
+	}
+	else if (IS_CITY_CENTER(to_room)) {
+		if (ch) {
+			msg_to_char(ch, "You can't besiege a city center.\r\n");
+		}
+	}
+	else if (ROOM_SECT_FLAGGED(to_room, SECTF_START_LOCATION)) {
+		if (ch) {
+			msg_to_char(ch, "You can't besiege a starting location.\r\n");
+		}
+	}
+	else if (ch && ROOM_OWNER(to_room) && ROOM_OWNER(to_room) == GET_LOYALTY(ch)) {
+		msg_to_char(ch, "You can't besiege your own property. Abandon it first.\r\n");
+	}
+	else if (ch && ROOM_OWNER(to_room) && !has_relationship(GET_LOYALTY(ch), ROOM_OWNER(to_room), DIPL_WAR)) {
+		msg_to_char(ch, "You can't besiege that direction because you're not at war with %s.\r\n", EMPIRE_NAME(ROOM_OWNER(to_room)));
+	}
+	else {
+		// looks ok!
+		return TRUE;
+	}
+	
+	return FALSE;
+}
+
+
+/**
+* Validate a vehicle target for a siege command.
+*
+* @param char_data *ch The person firing (will receive errors).
+* @param vehicle_data *veh The vehicle firing. (OPTIONAL: could just be ch firing.)
+* @param vehicle_data *target The target vehicle.
+* @return bool TRUE if okay, FALSE if not.
+*/
+bool validate_siege_target_vehicle(char_data *ch, vehicle_data *veh, vehicle_data *target) {
+	if (VEH_OWNER(target) && VEH_OWNER(target) == GET_LOYALTY(ch)) {
+		msg_to_char(ch, "You can't besiege your own property. Abandon it first.\r\n");
+	}
+	else if (VEH_OWNER(target) && !has_relationship(GET_LOYALTY(ch), VEH_OWNER(target), DIPL_WAR)) {
+		msg_to_char(ch, "You can't besiege that because you're not at war with %s.\r\n", EMPIRE_NAME(VEH_OWNER(target)));
+	}
+	else {
+		// looks ok!
+		return TRUE;
+	}
+	
+	return FALSE;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// SETTERS / DOERS /////////////////////////////////////////////////////////
 
@@ -1951,6 +2015,7 @@ bool can_fight(char_data *ch, char_data *victim) {
 * @param char_data *ch The person who will appear.
 */
 void appear(char_data *ch) {
+	affects_from_char_by_aff_flag(ch, AFF_HIDE | AFF_INVISIBLE);
 	REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDE | AFF_INVISIBLE);
 
 	if (GET_ACCESS_LEVEL(ch) < LVL_GOD) {
@@ -1976,7 +2041,7 @@ void besiege_room(room_data *to_room, int damage) {
 	empire_data *emp = ROOM_OWNER(to_room);
 	int max_dam;
 	bool junk;
-	room_data *rm, *next_rm;
+	room_data *rm;
 	
 	// make sure we only hit the home-room
 	to_room = HOME_ROOM(to_room);
@@ -2022,7 +2087,7 @@ void besiege_room(room_data *to_room, int damage) {
 			if (ROOM_PEOPLE(to_room)) {
 				act("The building is hit by something and shakes violently!", FALSE, ROOM_PEOPLE(to_room), 0, 0, TO_CHAR | TO_ROOM);
 			}
-			HASH_ITER(interior_hh, interior_world_table, rm, next_rm) {
+			for (rm = interior_room_list; rm; rm = rm->next_interior) {
 				if (HOME_ROOM(rm) == to_room && ROOM_PEOPLE(rm)) {
 					act("The building is hit by something and shakes violently!", FALSE, ROOM_PEOPLE(rm), 0, 0, TO_CHAR | TO_ROOM);
 				}
@@ -2064,6 +2129,114 @@ void besiege_room(room_data *to_room, int damage) {
 
 
 /**
+* Does siege damage, which may destroy the vehicle.
+*
+* @param vehicle_data *veh The vehicle to damage.
+* @param int damage How much siege damage to deal.
+* @param int siege_type What SIEGE_ damage type.
+* @return bool TRUE if the target survives, FALSE if it's extracted
+*/
+bool besiege_vehicle(vehicle_data *veh, int damage, int siege_type) {
+	extern struct resource_data *combine_resources(struct resource_data *combine_a, struct resource_data *combine_b);
+	void fully_empty_vehicle(vehicle_data *veh);
+
+	static struct resource_data *default_res = NULL;
+	struct resource_data *old_list;
+	struct vehicle_room_list *vrl;
+	char_data *ch, *next_ch;
+	
+	// resources if it doesn't have its own
+	if (!default_res) {
+		default_res = create_resource_list(o_NAILS, 1, NOTHING);
+	}
+	
+	// no effect
+	if (damage <= 0) {
+		return TRUE;
+	}
+	
+	// deal damage
+	VEH_HEALTH(veh) -= damage;
+	
+	// not dead yet
+	if (VEH_HEALTH(veh) > 0) {
+		// apply needed maintenance if we did more than 10% damage
+		if (damage >= (VEH_MAX_HEALTH(veh) / 10)) {
+			old_list = VEH_NEEDS_RESOURCES(veh);
+			VEH_NEEDS_RESOURCES(veh) = combine_resources(old_list, VEH_YEARLY_MAINTENANCE(veh) ? VEH_YEARLY_MAINTENANCE(veh) : default_res);
+			free_resource_list(old_list);
+		}
+		
+		// SIEGE_x: warn the occupants
+		switch (siege_type) {
+			case SIEGE_BURNING: {
+				msg_to_vehicle(veh, FALSE, "Your skin blisters as %s burns around you!", VEH_SHORT_DESC(veh));
+				break;
+			}
+			case SIEGE_PHYSICAL:
+			case SIEGE_MAGICAL:
+			default: {
+				msg_to_vehicle(veh, FALSE, "You shake with %s as it is besieged!", VEH_SHORT_DESC(veh));
+				break;
+			}
+		}
+	}
+	else {
+		// return 0 prevents the destruction
+		if (!destroy_vtrigger(veh)) {
+			VEH_HEALTH(veh) = MAX(1, VEH_HEALTH(veh));	// ensure health
+			REMOVE_BIT(VEH_FLAGS(veh), VEH_ON_FIRE);	// cancel fire
+			return TRUE;
+		}
+
+		if (ROOM_PEOPLE(IN_ROOM(veh))) {
+			// SIEGE_x: warn the occupants
+			switch (siege_type) {
+				case SIEGE_BURNING: {
+					act("$V burns down!", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+					break;
+				}
+				case SIEGE_PHYSICAL:
+				case SIEGE_MAGICAL:
+				default: {
+					act("$V is destroyed!", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+					break;
+				}
+			}
+		}
+		
+		if (VEH_ROOM_LIST(veh)) {
+			LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
+				LL_FOREACH_SAFE2(ROOM_PEOPLE(vrl->room), ch, next_ch, next_in_room) {
+					act("You are killed as $V is destroyed!", FALSE, ch, NULL, veh, TO_CHAR);
+					if (!IS_NPC(ch)) {
+						mortlog("%s has been killed by siege damage at (%d, %d)!", PERS(ch, ch, TRUE), X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
+						syslog(SYS_DEATH, 0, TRUE, "DEATH: %s has been killed by siege damage at %s", GET_NAME(ch), room_log_identifier(IN_ROOM(ch)));
+					}
+					die(ch, ch);
+				}
+			}
+		}
+		if (VEH_SITTING_ON(veh)) {
+			act("You are killed as $V is destroyed!", FALSE, VEH_SITTING_ON(veh), NULL, veh, TO_CHAR);
+			if (!IS_NPC(VEH_SITTING_ON(veh))) {
+				mortlog("%s has been killed by siege damage at (%d, %d)!", PERS(VEH_SITTING_ON(veh), VEH_SITTING_ON(veh), TRUE), X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh)));
+				syslog(SYS_DEATH, 0, TRUE, "DEATH: %s has been killed by siege damage at %s", GET_NAME(VEH_SITTING_ON(veh)), room_log_identifier(IN_ROOM(veh)));
+			}
+			die(ch, ch);
+		}
+		
+		vehicle_from_room(veh);	// remove from room first to destroy anything inside
+		fully_empty_vehicle(veh);
+		extract_vehicle(veh);
+		return FALSE;
+	}
+	
+	return TRUE;
+}
+
+
+/**
 * Checks for helpers in the room to start combat too.
 *
 * @param char_data *ch The person who needs help!
@@ -2090,7 +2263,7 @@ void check_auto_assist(char_data *ch) {
 		}
 		
 		// already busy
-		if (ch == ch_iter || FIGHTING(ch) == ch_iter || GET_POS(ch_iter) < POS_STANDING || FIGHTING(ch_iter) || AFF_FLAGGED(ch_iter, AFF_STUNNED) || IS_INJURED(ch_iter, INJ_TIED | INJ_STAKED) || !CAN_SEE(ch_iter, FIGHTING(ch))) {
+		if (ch == ch_iter || FIGHTING(ch) == ch_iter || GET_POS(ch_iter) < POS_STANDING || FIGHTING(ch_iter) || AFF_FLAGGED(ch_iter, AFF_STUNNED | AFF_NO_ATTACK) || IS_INJURED(ch_iter, INJ_TIED | INJ_STAKED) || !CAN_SEE(ch_iter, FIGHTING(ch)) || GET_FEEDING_FROM(ch_iter) || GET_FED_ON_BY(ch_iter) || MOB_FLAGGED(ch_iter, MOB_NO_ATTACK)) {
 			continue;
 		}
 		
@@ -2176,6 +2349,8 @@ bool check_combat_position(char_data *ch, double speed) {
  *	> 0	How much damage done.
  */
 int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damtype) {
+	extern const struct wear_data_type wear_data[NUM_WEARS];
+	
 	struct instance_data *inst;
 	int iter;
 	bool full_miss = (dam <= 0);
@@ -2232,7 +2407,7 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 	dam = reduce_damage_from_skills(dam, victim, ch, damtype);
 	
 	// lethal damage?? check Master Survivalist
-	if ((ch != victim) && dam >= GET_HEALTH(victim) && !IS_NPC(victim) && AWAKE(victim) && HAS_ABILITY(victim, ABIL_MASTER_SURVIVALIST)) {
+	if ((ch != victim) && dam >= GET_HEALTH(victim) && !IS_NPC(victim) && AWAKE(victim) && has_ability(victim, ABIL_MASTER_SURVIVALIST)) {
 		if (!number(0, 2)) {
 			msg_to_char(victim, "You dive out of the way at the last second!\r\n");
 			act("$n dives out of the way at the last second!", FALSE, victim, NULL, NULL, TO_ROOM);
@@ -2309,34 +2484,36 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 	// skill gains when you take damage
 	if (!full_miss && !IS_NPC(victim) && ch != victim && !EXTRACTED(victim)) {
 		// endurance (extra HP)
-		gain_ability_exp(victim, ABIL_ENDURANCE, 1);
+		if (can_gain_exp_from(victim, ch)) {
+			gain_ability_exp(victim, ABIL_ENDURANCE, 2);
+		}
 
 		// armor skills
 		for (iter = 0; iter < NUM_WEARS; ++iter) {
-			if (GET_EQ(victim, iter) && GET_ARMOR_TYPE(GET_EQ(victim, iter)) != NOTHING) {
+			if (wear_data[iter].count_stats && GET_EQ(victim, iter) && GET_ARMOR_TYPE(GET_EQ(victim, iter)) != NOTHING && can_gain_exp_from(victim, ch)) {
 				switch (GET_ARMOR_TYPE(GET_EQ(victim, iter))) {
 					case ARMOR_MAGE: {
-						gain_ability_exp(victim, ABIL_MAGE_ARMOR, 1);
+						gain_ability_exp(victim, ABIL_MAGE_ARMOR, 2);
 						break;
 					}
 					case ARMOR_LIGHT: {
-						gain_ability_exp(victim, ABIL_LIGHT_ARMOR, 1);
+						gain_ability_exp(victim, ABIL_LIGHT_ARMOR, 2);
 						break;
 					}
 					case ARMOR_MEDIUM: {
-						gain_ability_exp(victim, ABIL_MEDIUM_ARMOR, 1);
+						gain_ability_exp(victim, ABIL_MEDIUM_ARMOR, 2);
 						break;
 					}
 					case ARMOR_HEAVY: {
-						gain_ability_exp(victim, ABIL_HEAVY_ARMOR, 1);
+						gain_ability_exp(victim, ABIL_HEAVY_ARMOR, 2);
 						break;
 					}
 				}
 			}
 		}
 	
-		if (affected_by_spell(victim, ATYPE_MANASHIELD)) {
-			gain_ability_exp(victim, ABIL_MANASHIELD, 1);
+		if (affected_by_spell(victim, ATYPE_MANASHIELD) && can_gain_exp_from(victim, ch)) {
+			gain_ability_exp(victim, ABIL_MANASHIELD, 2);
 		}
 	}
 	
@@ -2581,7 +2758,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		if (attack_hit_info[w_type].damage_type == DAM_PHYSICAL) {
 			block = check_block(victim, ch, TRUE);
 		}
-		else if (HAS_ABILITY(victim, ABIL_WARD_AGAINST_MAGIC) && attack_hit_info[w_type].damage_type == DAM_MAGICAL) {
+		else if (has_ability(victim, ABIL_WARD_AGAINST_MAGIC) && check_solo_role(victim) && attack_hit_info[w_type].damage_type == DAM_MAGICAL) {
 			// half-chance
 			block = check_block(victim, ch, TRUE) && !number(0, 1);
 		}
@@ -2631,21 +2808,27 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 				
 		// All these abilities add damage: no skill gain on an already-beated foe
 		if (can_gain_skill) {
-			if (!IS_NPC(ch) && HAS_ABILITY(ch, ABIL_DAGGER_MASTERY) && weapon && GET_WEAPON_TYPE(weapon) == TYPE_STAB) {
+			if (!IS_NPC(ch) && has_ability(ch, ABIL_DAGGER_MASTERY) && weapon && GET_WEAPON_TYPE(weapon) == TYPE_STAB) {
 				dam *= 1.5;
-				gain_ability_exp(ch, ABIL_DAGGER_MASTERY, 1);
+				if (can_gain_exp_from(ch, victim)) {
+					gain_ability_exp(ch, ABIL_DAGGER_MASTERY, 2);
+				}
 			}
-			if (!IS_NPC(ch) && HAS_ABILITY(ch, ABIL_STAFF_MASTERY) && weapon && IS_STAFF(weapon)) {
+			if (!IS_NPC(ch) && has_ability(ch, ABIL_STAFF_MASTERY) && weapon && IS_STAFF(weapon)) {
 				dam *= 1.5;
-				gain_ability_exp(ch, ABIL_STAFF_MASTERY, 1);
+				if (can_gain_exp_from(ch, victim)) {
+					gain_ability_exp(ch, ABIL_STAFF_MASTERY, 2);
+				}
 			}	
-			if (!IS_NPC(ch) && HAS_ABILITY(ch, ABIL_CLAWS) && w_type == TYPE_VAMPIRE_CLAWS) {
-				gain_ability_exp(ch, ABIL_CLAWS, 1);
+			if (!IS_NPC(ch) && has_ability(ch, ABIL_CLAWS) && w_type == TYPE_VAMPIRE_CLAWS && can_gain_exp_from(ch, victim)) {
+				gain_ability_exp(ch, ABIL_CLAWS, 2);
 			}
 
 			// raw damage modified by hunt
-			if (IS_NPC(victim) && MOB_FLAGGED(victim, MOB_ANIMAL) && HAS_ABILITY(ch, ABIL_HUNT)) {
-				gain_ability_exp(ch, ABIL_HUNT, 1);
+			if (IS_NPC(victim) && MOB_FLAGGED(victim, MOB_ANIMAL) && has_ability(ch, ABIL_HUNT)) {
+				if (can_gain_exp_from(ch, victim)) {
+					gain_ability_exp(ch, ABIL_HUNT, 2);
+				}
 			
 				if (skill_check(ch, ABIL_HUNT, DIFF_EASY)) {
 					dam *= 2;
@@ -2653,9 +2836,11 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 			}
 		
 			// raw damage modified by big game hunter
-			if (!IS_NPC(ch) && HAS_ABILITY(ch, ABIL_BIG_GAME_HUNTER) && (IS_VAMPIRE(victim) || IS_MAGE(victim))) {
-				gain_ability_exp(ch, ABIL_BIG_GAME_HUNTER, 1);
-			
+			if (!IS_NPC(ch) && has_ability(ch, ABIL_BIG_GAME_HUNTER) && (IS_VAMPIRE(victim) || IS_MAGE(victim))) {
+				if (can_gain_exp_from(ch, victim)) {
+					gain_ability_exp(ch, ABIL_BIG_GAME_HUNTER, 1);
+				}
+		
 				if (skill_check(ch, ABIL_BIG_GAME_HUNTER, DIFF_MEDIUM)) {
 					dam = (int) (CHOOSE_BY_ABILITY_LEVEL(big_game_hunter, ch, ABIL_BIG_GAME_HUNTER) * dam);
 				}
@@ -2667,24 +2852,25 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		// anything after this must NOT rely on victim being alive
 		result = damage(ch, victim, dam, w_type, attack_hit_info[w_type].damage_type);
 		
-		if (combat_round && can_gain_skill) {
+		// exp gain
+		if (combat_round && can_gain_skill && can_gain_exp_from(ch, victim)) {
 			if (!IS_NPC(ch)) {
-				gain_ability_exp(ch, ABIL_FINESSE, 1);
-				if (GET_SKILL(ch, SKILL_BATTLE) < EMPIRE_CHORE_SKILL_CAP) {
-					gain_skill_exp(ch, SKILL_BATTLE, 2);
+				gain_ability_exp(ch, ABIL_FINESSE, 2);
+				if (get_skill_level(ch, SKILL_BATTLE) < EMPIRE_CHORE_SKILL_CAP) {
+					gain_skill_exp(ch, SKILL_BATTLE, 4);
 				}
 				if (affected_by_spell(ch, ATYPE_ALACRITY)) {
-					gain_ability_exp(ch, ABIL_ALACRITY, 1);
+					gain_ability_exp(ch, ABIL_ALACRITY, 2);
 				}
 			
 				// fireball skill gain
 				if (GET_EQ(ch, WEAR_WIELD) && GET_OBJ_VNUM(GET_EQ(ch, WEAR_WIELD)) == o_FIREBALL) {
-					gain_ability_exp(ch, ABIL_READY_FIREBALL, 1);
+					gain_ability_exp(ch, ABIL_READY_FIREBALL, 2);
 				}
 			}
 			if (!IS_NPC(victim) && result >= 0) {
 				if (affected_by_spell(victim, ATYPE_FORESIGHT)) {
-					gain_ability_exp(victim, ABIL_FORESIGHT, 1);
+					gain_ability_exp(victim, ABIL_FORESIGHT, 2);
 				}
 			}
 		}
@@ -2704,7 +2890,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 				act("$n's last attack cuts deep -- you are bleeding!", FALSE, ch, NULL, victim, TO_VICT);
 				act("$n's last attack cuts deep -- $N is bleeding!", FALSE, ch, NULL, victim, TO_NOTVICT);
 
-				if (can_gain_skill) {
+				if (can_gain_skill && can_gain_exp_from(ch, victim)) {
 					gain_ability_exp(ch, ABIL_CUT_DEEP, 10);
 				}
 			}
@@ -2718,13 +2904,13 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 				act("$n's last blow hit you hard! You're knocked to the floor, stunned.", FALSE, ch, NULL, victim, TO_VICT);
 				act("$n's last blow seems to stun $N!", FALSE, ch, NULL, victim, TO_NOTVICT);
 
-				if (can_gain_skill) {
+				if (can_gain_skill && can_gain_exp_from(ch, victim)) {
 					gain_ability_exp(ch, ABIL_STUNNING_BLOW, 10);
 				}
 			}
 			
 			// poison could kill too
-			if (!IS_NPC(ch) && HAS_ABILITY(ch, ABIL_POISONS) && weapon && attack_hit_info[w_type].weapon_type == WEAPON_SHARP) {
+			if (!IS_NPC(ch) && has_ability(ch, ABIL_POISONS) && weapon && attack_hit_info[w_type].weapon_type == WEAPON_SHARP) {
 				if (!number(0, 1) && apply_poison(ch, victim, USING_POISON(ch)) < 0) {
 					// dedz
 					result = -1;
@@ -2749,7 +2935,6 @@ void out_of_blood(char_data *ch) {
 	msg_to_char(ch, "You die from lack of blood!\r\n");
 	act("$n falls down, dead.", FALSE, ch, 0, 0, TO_ROOM);
 	death_log(ch, ch, TYPE_SUFFERING);
-	add_lore(ch, LORE_DEATH, 0);
 	die(ch, ch);
 }
 
@@ -2864,14 +3049,18 @@ void perform_execute(char_data *ch, char_data *victim, int attacktype, int damty
 	msg_to_char(victim, "You are dead! Sorry...\r\n");
 	if (!IS_NPC(victim) && !IS_NPC(ch)) {
 		if (ch == victim) {
-			if (attacktype == ATTACK_GUARD_TOWER)
-				add_lore(ch, LORE_TOWER_DEATH, 0);
-			else
-				add_lore(ch, LORE_DEATH, 0);
+			if (attacktype == ATTACK_GUARD_TOWER) {
+				if (IN_ROOM(ch) && ROOM_OWNER(IN_ROOM(ch))) {
+					add_lore(ch, LORE_TOWER_DEATH, "Killed by a guard tower on %s%s&0 land", EMPIRE_BANNER(ROOM_OWNER(IN_ROOM(ch))), EMPIRE_ADJECTIVE(ROOM_OWNER(IN_ROOM(ch))));
+				}
+				else {
+					add_lore(ch, LORE_TOWER_DEATH, "Killed by a guard tower");
+				}
+			}
 		}
 		else {
-			add_lore(ch, LORE_PLAYER_KILL, GET_IDNUM(victim));
-			add_lore(victim, LORE_PLAYER_DEATH, GET_IDNUM(ch));
+			add_lore(ch, LORE_PLAYER_KILL, "Killed %s in battle", PERS(victim, victim, TRUE));
+			add_lore(victim, LORE_PLAYER_DEATH, "Slain by %s in battle", PERS(ch, ch, TRUE));
 		}
 	}
 	
@@ -3006,6 +3195,11 @@ void perform_violence_melee(char_data *ch, obj_data *weapon) {
 		weapon = NULL;
 	}
 	
+	if (weapon && OBJ_FLAGGED(weapon, OBJ_TWO_HANDED) && (!has_ability(ch, ABIL_TWO_HANDED_WEAPONS) || !check_solo_role(ch))) {
+		msg_to_char(ch, "You must be alone to use two-handed weapons in the solo role.\r\n");
+		return;
+	}
+	
 	if (hit(ch, FIGHTING(ch), weapon, TRUE) < 0) {
 		return;
 	}
@@ -3066,9 +3260,11 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 	// compute
 	success = check_hit_vs_dodge(ch, FIGHTING(ch), FALSE);
 	
-	if (success && AWAKE(FIGHTING(ch)) && HAS_ABILITY(FIGHTING(ch), ABIL_BLOCK_ARROWS)) {
+	if (success && AWAKE(FIGHTING(ch)) && has_ability(FIGHTING(ch), ABIL_BLOCK_ARROWS)) {
 		block = check_block(FIGHTING(ch), ch, TRUE);
-		gain_ability_exp(FIGHTING(ch), ABIL_BLOCK_ARROWS, 2);
+		if (can_gain_exp_from(FIGHTING(ch), ch)) {
+			gain_ability_exp(FIGHTING(ch), ABIL_BLOCK_ARROWS, 2);
+		}
 	}
 	
 	if (block) {
@@ -3085,10 +3281,12 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 		damage(ch, FIGHTING(ch), dam, ATTACK_ARROW, DAM_PHYSICAL);
 		
 		// McSkillups
-		gain_ability_exp(ch, ABIL_ARCHERY, 1);
-		gain_ability_exp(ch, ABIL_QUICK_DRAW, 1);
-		if (affected_by_spell(ch, ATYPE_ALACRITY)) {
-			gain_ability_exp(ch, ABIL_ALACRITY, 1);
+		if (can_gain_exp_from(ch, FIGHTING(ch))) {
+			gain_ability_exp(ch, ABIL_ARCHERY, 2);
+			gain_ability_exp(ch, ABIL_QUICK_DRAW, 2);
+			if (affected_by_spell(ch, ATYPE_ALACRITY)) {
+				gain_ability_exp(ch, ABIL_ALACRITY, 2);
+			}
 		}
 	}
 	
@@ -3271,7 +3469,7 @@ void frequent_combat(int pulse) {
 				}
 				
 				// still fighting and can dual-wield?
-				if (!IS_NPC(ch) && FIGHTING(ch) && !IS_DEAD(ch) && !EXTRACTED(ch) && !EXTRACTED(FIGHTING(ch)) && HAS_ABILITY(ch, ABIL_DUAL_WIELD) && GET_EQ(ch, WEAR_HOLD) && IS_WEAPON(GET_EQ(ch, WEAR_HOLD))) {
+				if (!IS_NPC(ch) && FIGHTING(ch) && !IS_DEAD(ch) && !EXTRACTED(ch) && !EXTRACTED(FIGHTING(ch)) && has_ability(ch, ABIL_DUAL_WIELD) && check_solo_role(ch) && GET_EQ(ch, WEAR_HOLD) && IS_WEAPON(GET_EQ(ch, WEAR_HOLD))) {
 					speed = get_combat_speed(ch, WEAR_HOLD);
 					if ((pulse % ((int)(speed RL_SEC))) == 0) {
 						one_combat_round(ch, speed, GET_EQ(ch, WEAR_HOLD));

@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: books.c                                         EmpireMUD 2.0b2 *
+*   File: books.c                                         EmpireMUD 2.0b3 *
 *  Usage: data and functions for libraries and books                      *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -639,8 +639,8 @@ struct {
 } library_command[] = {
 	{ SCMD_LIBRARY, "browse", 0, LIBR_REQ_LIBRARY, library_browse },
 	{ SCMD_LIBRARY, "checkout", 0, LIBR_REQ_LIBRARY, library_checkout },
-	{ SCMD_LIBRARY, "shelve", LIBR_REQ_LIBRARY, LVL_APPROVED, library_shelve },
-	{ SCMD_LIBRARY, "burn", LIBR_REQ_LIBRARY, LVL_APPROVED, library_burn },
+	{ SCMD_LIBRARY, "shelve", LVL_APPROVED, LIBR_REQ_LIBRARY, library_shelve },
+	{ SCMD_LIBRARY, "burn", LVL_APPROVED, LIBR_REQ_LIBRARY, library_burn },
 	
 	{ SCMD_BOOKEDIT, "list", LVL_APPROVED, LIBR_REQ_LIBRARY, bookedit_list },
 	{ SCMD_BOOKEDIT, "copy", LVL_APPROVED, LIBR_REQ_LIBRARY, bookedit_copy },

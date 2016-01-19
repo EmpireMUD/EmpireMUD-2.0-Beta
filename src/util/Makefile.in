@@ -24,63 +24,44 @@ INCDIR = ..
 
 CFLAGS = @CFLAGS@ $(MYFLAGS) $(PROFILE) -I$(INCDIR)
 
-LIBS = -lm
+LIBS = @CRYPTLIB@ -lm
 
 default: all
 
-all: $(BINDIR)/autowiz $(BINDIR)/delobjs \
-	$(WLDDIR)/map $(BINDIR)/mudpasswd $(BINDIR)/purgeplay \
-	$(BINDIR)/showplay $(BINDIR)/sign $(BINDIR)/plrconv \
-	$(BINDIR)/plrconv-20b1-to-20b2
+all: $(BINDIR)/cryptpasswd $(WLDDIR)/map $(BINDIR)/sign \
+	$(BINDIR)/plrconv-20b1-to-20b2 $(BINDIR)/plrconv-20b2-to-20b3 \
+	$(BINDIR)/plrconv-20b3-to-ascii
 
-autowiz: $(BINDIR)/autowiz
-
-delobjs: $(BINDIR)/delobjs
-
-mudpasswd: $(BINDIR)/mudpasswd
+cryptpasswd: $(BINDIR)/cryptpasswd
 
 map: $(WLDDIR)/map
 
-plrconv: $(BINDIR)/plrconv
-
 plrconv-20b1-to-20b2: $(BINDIR)/plrconv-20b1-to-20b2
 
-purgeplay: $(BINDIR)/purgeplay
+plrconv-20b2-to-20b3: $(BINDIR)/plrconv-20b2-to-20b3
 
-showplay: $(BINDIR)/showplay
+plrconv-20b3-to-ascii: $(BINDIR)/plrconv-20b3-to-ascii
 
 sign: $(BINDIR)/sign
 
-$(BINDIR)/autowiz: autowiz.c $(INCDIR)/conf.h $(INCDIR)/sysdep.h \
-	$(INCDIR)/structs.h $(INCDIR)/utils.h $(INCDIR)/db.h
-	$(CC) $(CFLAGS) -o $(BINDIR)/autowiz autowiz.c $(LIBS)
-
-$(BINDIR)/delobjs: delobjs.c $(INCDIR)/conf.h $(INCDIR)/sysdep.h \
+$(BINDIR)/cryptpasswd: cryptpasswd.c $(INCDIR)/conf.h $(INCDIR)/sysdep.h \
 	$(INCDIR)/structs.h $(INCDIR)/utils.h
-	$(CC) $(CFLAGS) -o $(BINDIR)/delobjs delobjs.c $(LIBS)
+	$(CC) $(CFLAGS) -o $(BINDIR)/cryptpasswd cryptpasswd.c $(LIBS)
 
 $(WLDDIR)/map: map.c $(INCDIR)/conf.h $(INCDIR)/sysdep.h $(INCDIR)/structs.h
 	$(CC) $(CFLAGS) -o $(WLDDIR)/map map.c $(LIBS)
-
-$(BINDIR)/mudpasswd: mudpasswd.c $(INCDIR)/conf.h $(INCDIR)/sysdep.h \
-	$(INCDIR)/structs.h $(INCDIR)/utils.h
-	$(CC) $(CFLAGS) -o $(BINDIR)/mudpasswd mudpasswd.c -lcrypt $(LIBS)
-
-$(BINDIR)/plrconv: plrconv.c $(INCDIR)/conf.h $(INCDIR)/sysdep.h \
-	$(INCDIR)/structs.h $(INCDIR)/utils.h
-	$(CC) $(CFLAGS) -o $(BINDIR)/plrconv plrconv.c $(LIBS)
 
 $(BINDIR)/plrconv-20b1-to-20b2: plrconv-20b1-to-20b2.c $(INCDIR)/conf.h \
 	$(INCDIR)/sysdep.h $(INCDIR)/structs.h $(INCDIR)/utils.h
 	$(CC) $(CFLAGS) -o $(BINDIR)/plrconv-20b1-to-20b2 plrconv-20b1-to-20b2.c $(LIBS)
 
-$(BINDIR)/purgeplay: purgeplay.c $(INCDIR)/conf.h $(INCDIR)/sysdep.h \
-	$(INCDIR)/structs.h $(INCDIR)/utils.h
-	$(CC) $(CFLAGS) -o $(BINDIR)/purgeplay purgeplay.c $(LIBS)
+$(BINDIR)/plrconv-20b2-to-20b3: plrconv-20b2-to-20b3.c $(INCDIR)/conf.h \
+	$(INCDIR)/sysdep.h $(INCDIR)/structs.h $(INCDIR)/utils.h
+	$(CC) $(CFLAGS) -o $(BINDIR)/plrconv-20b2-to-20b3 plrconv-20b2-to-20b3.c $(LIBS)
 
-$(BINDIR)/showplay: showplay.c $(INCDIR)/conf.h $(INCDIR)/sysdep.h \
-	$(INCDIR)/structs.h
-	$(CC) $(CFLAGS) -o $(BINDIR)/showplay showplay.c $(LIBS)
+$(BINDIR)/plrconv-20b3-to-ascii: plrconv-20b3-to-ascii.c $(INCDIR)/conf.h \
+	$(INCDIR)/sysdep.h $(INCDIR)/structs.h $(INCDIR)/utils.h
+	$(CC) $(CFLAGS) -o $(BINDIR)/plrconv-20b3-to-ascii plrconv-20b3-to-ascii.c $(LIBS)
 
 $(BINDIR)/sign: sign.c $(INCDIR)/conf.h $(INCDIR)/sysdep.h
 	$(CC) $(CFLAGS) -o $(BINDIR)/sign sign.c $(LIBS)

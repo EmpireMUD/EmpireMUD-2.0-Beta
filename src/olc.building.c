@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: olc.building.c                                  EmpireMUD 2.0b2 *
+*   File: olc.building.c                                  EmpireMUD 2.0b3 *
 *  Usage: OLC for building prototypes                                     *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -71,7 +71,11 @@ bool audit_building(bld_data *bld, char_data *ch) {
 		problem = TRUE;
 	}
 	if (!IS_SET(GET_BLD_FLAGS(bld), BLD_OPEN) && (!GET_BLD_DESC(bld) || !*GET_BLD_DESC(bld) || !str_cmp(GET_BLD_DESC(bld), "Nothing.\r\n"))) {
-		olc_audit_msg(ch, GET_BLD_VNUM(bld), "Description");
+		olc_audit_msg(ch, GET_BLD_VNUM(bld), "Description not set");
+		problem = TRUE;
+	}
+	else if (!IS_SET(GET_BLD_FLAGS(bld), BLD_OPEN) && !strn_cmp(GET_BLD_DESC(bld), "Nothing.", 8)) {
+		olc_audit_msg(ch, GET_BLD_VNUM(bld), "Description starting with 'Nothing.'");
 		problem = TRUE;
 	}
 	if (GET_BLD_EXTRA_ROOMS(bld) > 0 && IS_SET(GET_BLD_FLAGS(bld), BLD_ROOM)) {
@@ -130,6 +134,27 @@ bld_data *create_building_table_entry(bld_vnum vnum) {
 
 
 /**
+* For the .list command.
+*
+* @param bld_data *bld The thing to list.
+* @param bool detail If TRUE, provide additional details
+* @return char* The line to show (without a CRLF).
+*/
+char *list_one_building(bld_data *bld, bool detail) {
+	static char output[MAX_STRING_LENGTH];
+	
+	if (detail) {
+		snprintf(output, sizeof(output), "[%5d] %s", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
+	}
+	else {
+		snprintf(output, sizeof(output), "[%5d] %s", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
+	}
+	
+	return output;
+}
+
+
+/**
 * WARNING: This function actually deletes a building.
 *
 * @param char_data *ch The person doing the deleting.
@@ -167,7 +192,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 	
 	// update world
 	count = 0;
-	HASH_ITER(world_hh, world_table, room, next_room) {
+	HASH_ITER(hh, world_table, room, next_room) {
 		if (IS_ANY_BUILDING(room) && BUILDING_VNUM(room) == vnum) {
 			if (GET_ROOM_VNUM(room) >= MAP_SIZE) {
 				delete_room(room, FALSE);	// must call check_all_exits

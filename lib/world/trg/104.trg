@@ -352,19 +352,13 @@ end
 Sewer Ladder: Exit~
 1 c 4
 exit~
-%echoaround% %actor% %actor.name% climbs up out of the sewer.
-%teleport% %actor% %instance.location%
-%echoaround% %actor% %actor.name% climbs up out of the sewer.
-%force% %actor% look
+%force% %actor% enter exit
 ~
 #10451
 Sewer Ladder: Climb~
 1 c 4
 climb~
-%echoaround% %actor% %actor.name% climbs up out of the sewer.
-%teleport% %actor% %instance.location%
-%echoaround% %actor% %actor.name% climbs up out of the sewer.
-%force% %actor% look
+%force% %actor% enter exit
 ~
 #10452
 Sewer Environment~
@@ -395,7 +389,7 @@ switch %random.2%
   break
   case 2
     jab
-  break  
+  break
 done
 ~
 #10456

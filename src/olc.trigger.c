@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: olc.trigger.c                                   EmpireMUD 2.0b2 *
+*   File: olc.trigger.c                                   EmpireMUD 2.0b3 *
 *  Usage: OLC for triggers                                                *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -112,6 +112,27 @@ trig_data *create_trigger_table_entry(trig_vnum vnum) {
 
 
 /**
+* For the .list command.
+*
+* @param trig_data *trig The thing to list.
+* @param bool detail If TRUE, provide additional details
+* @return char* The line to show (without a CRLF).
+*/
+char *list_one_trigger(trig_data *trig, bool detail) {
+	static char output[MAX_STRING_LENGTH];
+	
+	if (detail) {
+		snprintf(output, sizeof(output), "[%5d] %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig));
+	}
+	else {
+		snprintf(output, sizeof(output), "[%5d] %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig));
+	}
+	
+	return output;
+}
+
+
+/**
 * Removes triggers from a live set of scripts, by vnum.
 *
 * @param struct script_data *script The script to remove triggers from.
@@ -177,6 +198,7 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 	
 	trig_data *trig;
 	room_template *rmt, *next_rmt;
+	vehicle_data *veh, *next_veh;
 	room_data *room, *next_room;
 	char_data *mob, *next_mob;
 	descriptor_data *dsc;
@@ -209,8 +231,15 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 		}
 	}
 	
+	// live vehicles -> remove
+	LL_FOREACH(vehicle_list, veh) {
+		if (SCRIPT(veh)) {
+			remove_live_script_by_vnum(SCRIPT(veh), vnum);
+		}
+	}
+	
 	// look for live rooms with this trigger
-	HASH_ITER(world_hh, world_table, room, next_room) {
+	HASH_ITER(hh, world_table, room, next_room) {
 		if (SCRIPT(room)) {
 			remove_live_script_by_vnum(SCRIPT(room), vnum);
 		}
@@ -238,6 +267,13 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 		}
 	}
 	
+	// update vehicle protos
+	HASH_ITER(hh, vehicle_table, veh, next_veh) {
+		if (delete_from_proto_list_by_vnum(&veh->proto_script, vnum)) {
+			save_library_file_for_vnum(DB_BOOT_VEH, VEH_VNUM(veh));
+		}
+	}
+	
 	// update olc editors
 	for (dsc = descriptor_list; dsc; dsc = dsc->next) {
 		if (GET_OLC_OBJECT(dsc) && delete_from_proto_list_by_vnum(&GET_OLC_OBJECT(dsc)->proto_script, vnum)) {
@@ -248,6 +284,9 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 		}
 		if (GET_OLC_ROOM_TEMPLATE(dsc) && delete_from_proto_list_by_vnum(&GET_OLC_ROOM_TEMPLATE(dsc)->proto_script, vnum)) {
 			msg_to_char(dsc->character, "A trigger attached to the room template you're editing was deleted.\r\n");
+		}
+		if (GET_OLC_VEHICLE(dsc) && delete_from_proto_list_by_vnum(&GET_OLC_VEHICLE(dsc)->proto_script, vnum)) {
+			msg_to_char(dsc->character, "A trigger attached to the vehicle you're editing was deleted.\r\n");
 		}
 	}
 	
@@ -273,6 +312,7 @@ void olc_search_trigger(char_data *ch, trig_vnum vnum) {
 	trig_data *proto = real_trigger(vnum);
 	struct trig_proto_list *trig;
 	room_template *rmt, *next_rmt;
+	vehicle_data *veh, *next_veh;
 	char_data *mob, *next_mob;
 	obj_data *obj, *next_obj;
 	int size, found;
@@ -318,6 +358,18 @@ void olc_search_trigger(char_data *ch, trig_vnum vnum) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "RMT [%5d] %s\r\n", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
+			}
+		}
+	}
+	
+	// vehicles
+	HASH_ITER(hh, vehicle_table, veh, next_veh) {
+		any = FALSE;
+		for (trig = veh->proto_script; trig && !any; trig = trig->next) {
+			if (trig->vnum == vnum) {
+				any = TRUE;
+				++found;
+				size += snprintf(buf + size, sizeof(buf) - size, "VEH [%5d] %s\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
 			}
 		}
 	}

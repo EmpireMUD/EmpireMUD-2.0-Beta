@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.action.c                                    EmpireMUD 2.0b2 *
+*   File: act.action.c                                    EmpireMUD 2.0b3 *
 *  Usage: commands and processors related to the action system            *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -50,9 +50,9 @@ obj_data *has_shovel(char_data *ch);
 
 // cancel protos
 void cancel_chipping(char_data *ch);
+void cancel_driving(char_data *ch);
 void cancel_gen_craft(char_data *ch);
 void cancel_minting(char_data *ch);
-void cancel_sailing(char_data *ch);
 void cancel_sawing(char_data *ch);
 void cancel_scraping(char_data *ch);
 void cancel_siring(char_data *ch);
@@ -62,6 +62,7 @@ void cancel_tanning(char_data *ch);
 // process protos
 void perform_chant(char_data *ch);
 void process_chipping(char_data *ch);
+void process_driving(char_data *ch);
 void perform_ritual(char_data *ch);
 void perform_saw(char_data *ch);
 void perform_study(char_data *ch);
@@ -78,7 +79,6 @@ void process_fishing(char_data *ch);
 void process_gathering(char_data *ch);
 void process_gen_craft(char_data *ch);
 void process_harvesting(char_data *ch);
-void process_manufacturing(char_data *ch);
 void process_mining(char_data *ch);
 void process_minting(char_data *ch);
 void process_morphing(char_data *ch);
@@ -90,7 +90,7 @@ void process_prospecting(char_data *ch);
 void process_quarrying(char_data *ch);
 void process_reading(char_data *ch);
 void process_reclaim(char_data *ch);
-void process_sailing(char_data *ch);
+void process_repairing(char_data *ch);
 void process_scraping(char_data *ch);
 void process_siring(char_data *ch);
 void process_smelting(char_data *ch);
@@ -114,7 +114,7 @@ const struct action_data_struct action_data[] = {
 	{ "minting", "is minting coins.", ACTF_FAST_CHORES, process_minting, cancel_minting },	// ACT_MINTING
 	{ "fishing", "is fishing.", NOBITS, process_fishing, NULL },	// ACT_FISHING
 	{ "smelting", "is melting down ore.", ACTF_FAST_CHORES, process_smelting, cancel_smelting },	// ACT_MELTING
-	{ "manufacturing", "is working on the ship.", ACTF_HASTE | ACTF_FAST_CHORES, process_manufacturing, NULL },	// ACT_MANUFACTURING
+	{ "repairing", "is doing some repairs.", ACTF_FAST_CHORES | ACTF_HASTE, process_repairing, NULL },	// ACT_REPAIRING
 	{ "chipping", "is chipping rocks.", ACTF_FAST_CHORES, process_chipping, cancel_chipping },	// ACT_CHIPPING
 	{ "panning", "is panning for gold.", ACTF_FINDER, process_panning, NULL },	// ACT_PANNING
 	{ "music", "is playing soothing music.", ACTF_ANYWHERE | ACTF_HASTE, process_music, NULL },	// ACT_MUSIC
@@ -133,12 +133,13 @@ const struct action_data_struct action_data[] = {
 	{ "ritual", "is performing an arcane ritual.", NOBITS, perform_ritual, NULL },	// ACT_RITUAL
 	{ "sawing", "is sawing lumber.", ACTF_HASTE | ACTF_FAST_CHORES, perform_saw, cancel_sawing },	// ACT_SAWING
 	{ "quarrying", "is quarrying stone.", ACTF_HASTE | ACTF_FAST_CHORES, process_quarrying, NULL },	// ACT_QUARRYING
-		{ "unknown", "is doing something.", NOBITS, NULL, NULL },	// ACT_UNUSED1
+	{ "driving", "is driving.", ACTF_ALWAYS_FAST | ACTF_SITTING, process_driving, cancel_driving },	// ACT_DRIVING
 	{ "tanning", "is tanning leather.", ACTF_FAST_CHORES, process_tanning, cancel_tanning },	// ACT_TANNING
 	{ "reading", "is reading a book.", NOBITS, process_reading, NULL },	// ACT_READING
 	{ "copying", "is writing out a copy of a book.", NOBITS, process_copying_book, NULL },	// ACT_COPYING_BOOK
 	{ "crafting", "is working on something.", NOBITS, process_gen_craft, cancel_gen_craft },	// ACT_GEN_CRAFT
-	{ "sailing", "is sailing the ship.", ACTF_ALWAYS_FAST, process_sailing, cancel_sailing },	// ACT_SAILING
+	{ "sailing", "is sailing the ship.", ACTF_ALWAYS_FAST | ACTF_SITTING, process_driving, cancel_driving },	// ACT_SAILING
+	{ "piloting", "is piloting the vessel.", ACTF_ALWAYS_FAST | ACTF_SITTING, process_driving, cancel_driving },	// ACT_PILOTING
 
 	{ "\n", "\n", NOBITS, NULL, NULL }
 };
@@ -169,7 +170,7 @@ void cancel_action(char_data *ch) {
 * Begins an action.
 *
 * @param char_data *ch The actor
-* @param int type ACT_x const
+* @param int type ACT_ const
 * @param int timer Countdown in action ticks
 */
 void start_action(char_data *ch, int type, int timer) {
@@ -193,7 +194,7 @@ void start_action(char_data *ch, int type, int timer) {
 *
 * @param room_data *room Where.
 * @param int action ACTION_x or NOTHING to not stop actions.
-* @param int chore CHORE_x or NOTHING to not stop workforce.
+* @param int chore CHORE_ or NOTHING to not stop workforce.
 */
 void stop_room_action(room_data *room, int action, int chore) {
 	extern struct empire_chore_type chore_data[NUM_CHORES];
@@ -214,7 +215,7 @@ void stop_room_action(room_data *room, int action, int chore) {
 
 
 /**
-* This is the main processor for periodic actions (ACT_x), once per second.
+* This is the main processor for periodic actions (ACT_), once per second.
 */
 void update_actions(void) {
 	descriptor_data *desc;
@@ -235,7 +236,11 @@ void update_actions(void) {
 			cancel_action(ch);
 			continue;
 		}
-		if (FIGHTING(ch) || GET_POS(ch) < POS_STANDING || IS_WRITING(ch)) {
+		if (FIGHTING(ch) || IS_WRITING(ch)) {
+			cancel_action(ch);
+			continue;
+		}
+		if (GET_POS(ch) < POS_SITTING || GET_POS(ch) == POS_FIGHTING || (!IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_SITTING) && GET_POS(ch) < POS_STANDING)) {
 			cancel_action(ch);
 			continue;
 		}
@@ -245,24 +250,30 @@ void update_actions(void) {
 		}
 		
 		// action-cycle is time remaining -- compute how fast we go through it
-		speed = 1;	// default is 1 second per second
+		speed = 2;	// default is 2 per second (allowing it to be slowed)
 		
 		// things that modify speed...
 		if (IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_ALWAYS_FAST)) {
-			speed += 1;
+			speed += 2;
 		}
 		if (IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_HASTE) && AFF_FLAGGED(ch, AFF_HASTE)) {
-			speed += 1;
+			speed += 2;
 		}
 		if (IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_FAST_CHORES) && HAS_BONUS_TRAIT(ch, BONUS_FAST_CHORES)) {
-			speed += 1;
+			speed += 2;
 		}
-		if (IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_FINDER) && HAS_ABILITY(ch, ABIL_FINDER)) {
-			speed += 1;
+		if (IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_FINDER) && has_ability(ch, ABIL_FINDER)) {
+			speed += 2;
 			gain_ability_exp(ch, ABIL_FINDER, 0.1);
 		}
 		if (IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_SHOVEL) && has_shovel(ch)) {
-			speed += 1;
+			speed += 2;
+		}
+		
+		// things that slow you down
+		if (AFF_FLAGGED(ch, AFF_SLOW) || IS_HUNGRY(ch) || IS_THIRSTY(ch) || IS_BLOOD_STARVED(ch)) {
+			speed /= 2;
+			speed = MAX(1, speed);	// don't stall them completely
 		}
 		
 		GET_ACTION_CYCLE(ch) -= speed;
@@ -334,28 +345,6 @@ void cancel_minting(char_data *ch) {
 	obj_data *obj = read_object(GET_ACTION_VNUM(ch, 0), TRUE);
 	obj_to_char_or_room(obj, ch);
 	load_otrigger(obj);
-}
-
-
-/**
-* Alerts people that the ship stops moving.
-*
-* @param char_data *ch The sailer.
-*/
-void cancel_sailing(char_data *ch) {
-	room_data *room, *next_room;
-	obj_data *ship;
-	
-	// no ship? no work
-	if (!(ship = GET_BOAT(HOME_ROOM(IN_ROOM(ch))))) {
-		return;
-	}
-	
-	HASH_ITER(interior_hh, interior_world_table, room, next_room) {
-		if (HOME_ROOM(room) == HOME_ROOM(IN_ROOM(ch)) && ROOM_PEOPLE(room)) {
-			act("The ship stops moving.", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
-		}
-	}
 }
 
 
@@ -613,7 +602,7 @@ INTERACTION_FUNC(finish_gathering) {
 		act(buf, FALSE, ch, obj, 0, TO_CHAR);
 		act("$n finds $p!", TRUE, ch, obj, 0, TO_ROOM);
 		
-		if (GET_SKILL(ch, SKILL_SURVIVAL) < EMPIRE_CHORE_SKILL_CAP) {
+		if (get_skill_level(ch, SKILL_SURVIVAL) < EMPIRE_CHORE_SKILL_CAP) {
 			gain_skill_exp(ch, SKILL_SURVIVAL, 10);
 		}
 		// action does not end normally
@@ -633,13 +622,13 @@ INTERACTION_FUNC(finish_harvesting) {
 	int count, num;
 	obj_data *obj = NULL;
 		
-	if ((cp = crop_proto(ROOM_CROP_TYPE(inter_room))) && (sect = sector_proto(climate_default_sector[GET_CROP_CLIMATE(cp)]))) {
+	if ((cp = ROOM_CROP(inter_room)) && (sect = sector_proto(climate_default_sector[GET_CROP_CLIMATE(cp)]))) {
 		// victory
 		act("You finish harvesting the crop!", FALSE, ch, 0, 0, TO_CHAR);
 		act("$n finished harvesting the crop!", FALSE, ch, 0, 0, TO_ROOM);
 
 		// how many to get
-		num = number(2, 6) + (HAS_ABILITY(ch, ABIL_MASTER_FARMER) ? number(2, 6) : 0);
+		num = number(2, 6) + (has_ability(ch, ABIL_MASTER_FARMER) ? number(2, 6) : 0);
 		num *= interaction->quantity;
 	
 		// give them over
@@ -663,9 +652,9 @@ INTERACTION_FUNC(finish_harvesting) {
 	}
 
 	// finally, change the terrain
-	if (ROOM_ORIGINAL_SECT(inter_room) != SECT(inter_room)) {
+	if (BASE_SECT(inter_room) != SECT(inter_room)) {
 		// use original terrain (appears to have been stored)
-		change_terrain(inter_room, GET_SECT_VNUM(ROOM_ORIGINAL_SECT(inter_room)));
+		change_terrain(inter_room, GET_SECT_VNUM(BASE_SECT(inter_room)));
 	}
 	else if (sect) {
 		// use fallback sect
@@ -675,13 +664,34 @@ INTERACTION_FUNC(finish_harvesting) {
 }
 
 
+INTERACTION_FUNC(finish_mining) {
+	bool any = FALSE;
+	obj_data *obj;
+	int iter;
+	
+	for (iter = 0; iter < interaction->quantity; ++iter) {
+		obj = read_object(interaction->vnum, TRUE);
+		obj_to_char_or_room(obj, ch);
+
+		act("With that last stroke, $p falls from the wall!", FALSE, ch, obj, 0, TO_CHAR);
+		act("With $s last stroke, $p falls from the wall where $n was picking!", FALSE, ch, obj, 0, TO_ROOM);
+
+		GET_ACTION(ch) = ACT_NONE;
+		load_otrigger(obj);
+		any = TRUE;
+	}
+	
+	return any;
+}
+
+
 INTERACTION_FUNC(finish_picking_herb) {
 	obj_data *obj = NULL;
 	room_data *in_room = IN_ROOM(ch);
 	obj_vnum vnum = interaction->vnum;
 	int iter, num = interaction->quantity;
 	
-	if (HAS_ABILITY(ch, ABIL_FIND_HERBS)) {
+	if (has_ability(ch, ABIL_FIND_HERBS)) {
 		gain_ability_exp(ch, ABIL_FIND_HERBS, 10);
 	
 		if (!number(0, 11)) {
@@ -807,7 +817,7 @@ void perform_saw(char_data *ch) {
 		act("You finish sawing $p (x2).", FALSE, ch, obj, NULL, TO_CHAR);
 		act("$n finishes sawing $p.", TRUE, ch, obj, 0, TO_ROOM);
 		
-		if (GET_SKILL(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
+		if (get_skill_level(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
 			gain_skill_exp(ch, SKILL_EMPIRE, 10);
 		}
 		if ((proto = obj_proto(GET_ACTION_VNUM(ch, 0)))) {
@@ -906,7 +916,7 @@ void process_chipping(char_data *ch) {
 					obj = read_object(o_CHIPPED, TRUE);
 					obj_to_char_or_room(obj, ch);
 					msg_to_char(ch, "It splits open!\r\n");
-					if (GET_SKILL(ch, SKILL_TRADE) < EMPIRE_CHORE_SKILL_CAP) {
+					if (get_skill_level(ch, SKILL_TRADE) < EMPIRE_CHORE_SKILL_CAP) {
 						gain_skill_exp(ch, SKILL_TRADE, 25);
 					}
 					load_otrigger(obj);
@@ -916,7 +926,7 @@ void process_chipping(char_data *ch) {
 					obj = read_object(o_HANDAXE, TRUE);
 					obj_to_char_or_room(obj, ch);
 					act("You have crafted $p!", FALSE, ch, obj, 0, TO_CHAR);
-					if (GET_SKILL(ch, SKILL_TRADE) < EMPIRE_CHORE_SKILL_CAP) {
+					if (get_skill_level(ch, SKILL_TRADE) < EMPIRE_CHORE_SKILL_CAP) {
 						gain_skill_exp(ch, SKILL_TRADE, 25);
 					}
 					load_otrigger(obj);
@@ -926,7 +936,7 @@ void process_chipping(char_data *ch) {
 					obj = read_object(o_SPEARHEAD, TRUE);
 					obj_to_char_or_room(obj, ch);
 					act("You have crafted $p!", FALSE, ch, obj, 0, TO_CHAR);
-					if (GET_SKILL(ch, SKILL_TRADE) < EMPIRE_CHORE_SKILL_CAP) {
+					if (get_skill_level(ch, SKILL_TRADE) < EMPIRE_CHORE_SKILL_CAP) {
 						gain_skill_exp(ch, SKILL_TRADE, 25);
 					}
 					load_otrigger(obj);
@@ -983,7 +993,7 @@ void process_chop(char_data *ch) {
 				load_otrigger(obj);
 			}
 		
-			if (GET_SKILL(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
+			if (get_skill_level(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
 				gain_skill_exp(ch, SKILL_EMPIRE, 15);
 			}
 			
@@ -1022,7 +1032,7 @@ void process_digging(char_data *ch) {
 		
 		if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_DIG, finish_digging)) {
 			// success
-			if (GET_SKILL(ch, SKILL_SURVIVAL) < EMPIRE_CHORE_SKILL_CAP) {
+			if (get_skill_level(ch, SKILL_SURVIVAL) < EMPIRE_CHORE_SKILL_CAP) {
 				gain_skill_exp(ch, SKILL_SURVIVAL, 10);
 			}
 		
@@ -1313,17 +1323,17 @@ void process_harvesting(char_data *ch) {
 	switch (number(0, 2)) {
 		case 0: {
 			if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
-				msg_to_char(ch, "You walk through the field, harvesting the %s.\r\n", GET_CROP_NAME(crop_proto(ROOM_CROP_TYPE(IN_ROOM(ch)))));
+				msg_to_char(ch, "You walk through the field, harvesting the %s.\r\n", GET_CROP_NAME(ROOM_CROP(IN_ROOM(ch))));
 			}
-			sprintf(buf, "$n walks through the field, harvesting the %s.", GET_CROP_NAME(crop_proto(ROOM_CROP_TYPE(IN_ROOM(ch)))));
+			sprintf(buf, "$n walks through the field, harvesting the %s.", GET_CROP_NAME(ROOM_CROP(IN_ROOM(ch))));
 			act(buf, FALSE, ch, 0, 0, TO_ROOM | TO_SPAMMY);
 			break;
 		}
 		case 1: {
 			if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
-				msg_to_char(ch, "You carefully harvest the %s.\r\n", GET_CROP_NAME(crop_proto(ROOM_CROP_TYPE(IN_ROOM(ch)))));
+				msg_to_char(ch, "You carefully harvest the %s.\r\n", GET_CROP_NAME(ROOM_CROP(IN_ROOM(ch))));
 			}
-			sprintf(buf, "$n carefully harvests the %s.", GET_CROP_NAME(crop_proto(ROOM_CROP_TYPE(IN_ROOM(ch)))));
+			sprintf(buf, "$n carefully harvests the %s.", GET_CROP_NAME(ROOM_CROP(IN_ROOM(ch))));
 			act(buf, FALSE, ch, 0, 0, TO_ROOM | TO_SPAMMY);
 			break;
 		}
@@ -1341,7 +1351,7 @@ void process_harvesting(char_data *ch) {
 		
 		if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_HARVEST, finish_harvesting)) {
 			// skillups
-			if (GET_SKILL(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
+			if (get_skill_level(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
 				gain_skill_exp(ch, SKILL_EMPIRE, 30);
 			}
 			gain_ability_exp(ch, ABIL_MASTER_FARMER, 5);
@@ -1358,13 +1368,11 @@ void process_harvesting(char_data *ch) {
 *
 * @param char_data *ch The miner.
 */
-void process_mining(char_data *ch) {
-	extern obj_vnum find_mine_vnum_by_type(int type);
-	
-	obj_data *obj;
+void process_mining(char_data *ch) {	
+	struct global_data *glb;
 	int count, total;
 	room_data *in_room;
-	obj_vnum vnum;
+	bool success;
 
 	total = 1;	// pick swings at once (add things that speed up mining)
 	for (count = 0; count < total && GET_ACTION(ch) == ACT_MINING; ++count) {
@@ -1390,29 +1398,30 @@ void process_mining(char_data *ch) {
 			
 			// amount of ore remaining
 			add_to_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_AMOUNT, -1);
-
-
-			vnum = find_mine_vnum_by_type(get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_TYPE));
-			// random gold instead of iron
-			if (vnum == o_IRON_ORE && !number(0, 100)) {
-				vnum = o_GOLD;
+			
+			glb = global_proto(get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_GLB_VNUM));
+			if (!glb || GET_GLOBAL_TYPE(glb) != GLOBAL_MINE_DATA) {
+				msg_to_char(ch, "You can't seem to mine here.\r\n");
+				cancel_action(ch);
+				break;
 			}
-
-			obj = read_object(vnum, TRUE);
-			obj_to_char_or_room(obj, ch);
-	
-			act("With that last stroke, $p falls from the wall!", FALSE, ch, obj, 0, TO_CHAR);
-			act("With $s last stroke, $p falls from the wall where $n was picking!", FALSE, ch, obj, 0, TO_ROOM);
-
-			GET_ACTION(ch) = ACT_NONE;
-			if (GET_SKILL(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
-				gain_skill_exp(ch, SKILL_EMPIRE, 10);
-			}
-			load_otrigger(obj);
-	
-			// go again! (if ch is still there)
-			if (in_room == IN_ROOM(ch)) {
-				start_mining(ch);
+			
+			// attempt to mine it
+			success = run_interactions(ch, GET_GLOBAL_INTERACTIONS(glb), INTERACT_MINE, IN_ROOM(ch), NULL, NULL, finish_mining);
+			
+			if (success && in_room == IN_ROOM(ch)) {
+				// skillups
+				if (GET_GLOBAL_ABILITY(glb) != NO_ABIL) {
+					gain_ability_exp(ch, GET_GLOBAL_ABILITY(glb), 5);
+				}
+				else if (get_skill_level(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
+					gain_skill_exp(ch, SKILL_EMPIRE, 10);
+				}
+				
+				// go again! (if ch is still there)
+				if (in_room == IN_ROOM(ch)) {
+					start_mining(ch);
+				}
 			}
 		}
 	}
@@ -1453,7 +1462,7 @@ void process_minting(char_data *ch) {
 		increase_coins(ch, emp, num);
 		
 		GET_ACTION(ch) = ACT_NONE;
-		if (GET_SKILL(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
+		if (get_skill_level(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
 			gain_skill_exp(ch, SKILL_EMPIRE, 10);
 		}
 		
@@ -1590,7 +1599,7 @@ void process_picking(char_data *ch) {
 		}
 		else {
 			if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_FIND_HERB, finish_picking_herb)) {
-				if (GET_SKILL(ch, SKILL_SURVIVAL) < EMPIRE_CHORE_SKILL_CAP) {
+				if (get_skill_level(ch, SKILL_SURVIVAL) < EMPIRE_CHORE_SKILL_CAP) {
 					gain_skill_exp(ch, SKILL_SURVIVAL, 10);
 				}
 				found = TRUE;
@@ -1598,7 +1607,7 @@ void process_picking(char_data *ch) {
 			else if (CAN_INTERACT_ROOM(IN_ROOM(ch), INTERACT_HARVEST) && (IS_ADVENTURE_ROOM(IN_ROOM(ch)) || ROOM_CROP_FLAGGED(IN_ROOM(ch), CROPF_IS_ORCHARD))) {
 				// only orchards allow pick -- and only run this if we hit no herbs at all
 				if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_HARVEST, finish_picking_crop)) {
-					if (GET_SKILL(ch, SKILL_SURVIVAL) < EMPIRE_CHORE_SKILL_CAP) {
+					if (get_skill_level(ch, SKILL_SURVIVAL) < EMPIRE_CHORE_SKILL_CAP) {
 						gain_skill_exp(ch, SKILL_SURVIVAL, 10);
 					}
 					found = TRUE;
@@ -1654,7 +1663,7 @@ void process_planting(char_data *ch) {
 		msg_to_char(ch, "You have finished planting!\r\n");
 		act("$n finishes planting!", FALSE, ch, 0, 0, TO_ROOM);
 		
-		if (GET_SKILL(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
+		if (get_skill_level(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
 			gain_skill_exp(ch, SKILL_EMPIRE, 30);
 		}
 		GET_ACTION(ch) = ACT_NONE;
@@ -1668,13 +1677,10 @@ void process_planting(char_data *ch) {
 * @param char_data *ch The prospector.
 */
 void process_prospecting(char_data *ch) {
-	extern int find_mine_type(int type);
 	extern char *get_mine_type_name(room_data *room);
 	extern bool is_deep_mine(room_data *room);
 	void init_mine(room_data *room, char_data *ch);
-	
-	int type;
-	
+		
 	// simple decrement
 	GET_ACTION_TIMER(ch) -= 1;
 	
@@ -1700,13 +1706,12 @@ void process_prospecting(char_data *ch) {
 		case 0: {
 			GET_ACTION(ch) = ACT_NONE;
 			init_mine(IN_ROOM(ch), ch);
-			type = find_mine_type(get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_TYPE));
 			
-			if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_AMOUNT) <= 0 || type == NOTHING) {
+			if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_AMOUNT) <= 0 || !global_proto(get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_GLB_VNUM))) {
 				msg_to_char(ch, "This area has already been mined for all it's worth.\r\n");
 			}
 			else {
-				msg_to_char(ch, "You discover that this area %s %s.\r\n", (is_deep_mine(IN_ROOM(ch)) ? "has a deep vein of" : "is rich in"), get_mine_type_name(IN_ROOM(ch)));
+				msg_to_char(ch, "You discover that this area %s %s.\r\n", (is_deep_mine(IN_ROOM(ch)) ? "is a deep" : "is a"), get_mine_type_name(IN_ROOM(ch)));
 				act("$n finishes prospecting.", TRUE, ch, NULL, NULL, TO_ROOM);
 			}
 			
@@ -1775,7 +1780,7 @@ void process_quarrying(char_data *ch) {
 		act("You give the plug drill one final swing and pry loose $p!", FALSE, ch, obj, 0, TO_CHAR);
 		act("$n hits the plug drill hard with a hammer and pries loose $p!", FALSE, ch, obj, 0, TO_ROOM);
 	
-		if (GET_SKILL(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
+		if (get_skill_level(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
 			gain_skill_exp(ch, SKILL_EMPIRE, 25);
 		}
 		load_otrigger(obj);
@@ -1789,48 +1794,85 @@ void process_quarrying(char_data *ch) {
 
 
 /**
-* Tick update for sailing action.
+* Tick update for repairing action.
 *
-* @param char_data *ch The character doing the sailing.
+* @param char_data *ch The character doing the repairing.
 */
-void process_sailing(char_data *ch) {
-	extern bool move_ship(char_data *ch, obj_data *ship, int dir);
-	extern bool only_one_sailing(char_data *ch, obj_data *ship);
+void process_repairing(char_data *ch) {
+	extern vehicle_data *find_vehicle(int n);
 
-	int dir = GET_ACTION_VNUM(ch, 0);
-	obj_data *ship;
+	struct resource_data *res, *found_res = NULL;
+	obj_data *obj, *found_obj = NULL;
+	vehicle_data *veh;
 	
-	// not on a ship?
-	if (!(ship = GET_BOAT(HOME_ROOM(IN_ROOM(ch))))) {
+	// first attempt to re-find the vehicle
+	if (!(veh = find_vehicle(GET_ACTION_VNUM(ch, 0))) || IN_ROOM(veh) != IN_ROOM(ch) || !VEH_IS_COMPLETE(veh)) {
+		cancel_action(ch);
+		return;
+	}
+	if (!VEH_NEEDS_RESOURCES(veh) && VEH_HEALTH(veh) >= VEH_MAX_HEALTH(veh)) {
 		cancel_action(ch);
 		return;
 	}
 	
-	if (!only_one_sailing(ch, ship)) {
-		msg_to_char(ch, "Someone else is sailing the ship right now.\r\n");
-		GET_ACTION(ch) = ACT_NONE;	// silent stop -- no message to the whole ship
-		return;
-	}
+	// good to repair:
 	
-	// attempt to move the ship
-	if (!move_ship(ch, ship, dir)) {
-		look_at_room(ch);	// show them where they stopped
-		msg_to_char(ch, "\r\n");	// extra linebreak between look and "ship stops"
-		cancel_action(ch);
-		return;
-	}
-	
-	// limited distance?
-	if (GET_ACTION_VNUM(ch, 1) > 0) {
-		GET_ACTION_VNUM(ch, 1) -= 1;
-		
-		// arrived!
-		if (GET_ACTION_VNUM(ch, 1) <= 0) {
-			look_at_room(ch);	// show them where they stopped
-			msg_to_char(ch, "\r\n");	// extra linebreak between look and "ship stops"
-			cancel_action(ch);
-			return;
+	// find a resource to process
+	LL_FOREACH(VEH_NEEDS_RESOURCES(veh), res) {
+		// check inventory
+		LL_FOREACH2(ch->carrying, obj, next_content) {
+			if (GET_OBJ_VNUM(obj) == res->vnum) {
+				found_res = res;
+				found_obj = obj;
+				break;
+			}
 		}
+
+		// check room
+		if (!found_obj && can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
+			LL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_content) {
+				if (GET_OBJ_VNUM(obj) == res->vnum) {
+					found_res = res;
+					found_obj = obj;
+					break;
+				}
+			}
+		}
+		
+		if (found_obj && found_res) {
+			break;
+		}
+	}
+	
+	// found an item to add?
+	if (found_obj && found_res) {
+		found_res->amount -= 1;
+		
+		// check zero-res whether or not we found anything
+		if (found_res->amount <= 0) {
+			LL_DELETE(VEH_NEEDS_RESOURCES(veh), found_res);
+			free(found_res);
+		}
+		
+		// messaging
+		act("You use $p to repair $V.", FALSE, ch, found_obj, veh, TO_CHAR | TO_SPAMMY);
+		act("$n uses $p to repair $V.", FALSE, ch, found_obj, veh, TO_ROOM | TO_SPAMMY);
+		
+		// remove the resource
+		extract_obj(found_obj);
+	}
+	
+	// done?
+	if (!VEH_NEEDS_RESOURCES(veh)) {
+		GET_ACTION(ch) = ACT_NONE;
+		REMOVE_BIT(VEH_FLAGS(veh), VEH_INCOMPLETE);
+		VEH_HEALTH(veh) = VEH_MAX_HEALTH(veh);
+		act("$V is fully repaired!", FALSE, ch, NULL, veh, TO_CHAR | TO_ROOM);
+	}
+	else if (!found_obj) {
+		GET_ACTION(ch) = ACT_NONE;
+		msg_to_char(ch, "You run out of resources and stop repairing.\r\n");
+		act("$n runs out of resources and stops.", FALSE, ch, NULL, NULL, TO_ROOM);
 	}
 }
 
@@ -1877,7 +1919,7 @@ void process_scraping(char_data *ch) {
 			act(buf, FALSE, ch, obj, stick, TO_CHAR);
 			act("$n finishes scraping off $p!", TRUE, ch, obj, 0, TO_ROOM);
 	
-			if (GET_SKILL(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
+			if (get_skill_level(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
 				gain_skill_exp(ch, SKILL_EMPIRE, 10);
 			}
 			load_otrigger(obj);
@@ -1998,7 +2040,7 @@ void process_tanning(char_data *ch) {
 
 		GET_ACTION(ch) = ACT_NONE;
 	
-		if (GET_SKILL(ch, SKILL_TRADE) < EMPIRE_CHORE_SKILL_CAP) {
+		if (get_skill_level(ch, SKILL_TRADE) < EMPIRE_CHORE_SKILL_CAP) {
 			gain_skill_exp(ch, SKILL_TRADE, 20);
 		}
 		load_otrigger(obj);
@@ -2211,8 +2253,6 @@ ACMD(do_excavate) {
 		// Set up the trench
 		change_terrain(IN_ROOM(ch), evo->becomes);
 		set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_PROGRESS, config_get_int("trench_initial_value"));
-		SET_BIT(ROOM_AFF_FLAGS(IN_ROOM(ch)), ROOM_AFF_PLAYER_MADE);
-		SET_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_PLAYER_MADE);
 	}
 }
 
@@ -2248,11 +2288,11 @@ ACMD(do_fillin) {
 			set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_PROGRESS, -1);
 		}
 	}
-	else if (!(old_sect = reverse_lookup_evolution_for_sector(SECT(IN_ROOM(ch)), EVO_TRENCH_FULL))) {
+	else if (GET_ROOM_VNUM(IN_ROOM(ch)) >= MAP_SIZE || !(old_sect = reverse_lookup_evolution_for_sector(SECT(IN_ROOM(ch)), EVO_TRENCH_FULL))) {
 		// anything to reverse it to?
 		msg_to_char(ch, "You can't fill anything in here.\r\n");
 	}
-	else if (!ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_PLAYER_MADE)) {
+	else if (SECT(IN_ROOM(ch)) == world_map[FLAT_X_COORD(IN_ROOM(ch))][FLAT_Y_COORD(IN_ROOM(ch))].natural_sector) {
 		msg_to_char(ch, "You can only fill in a tile that was made by excavation, not a natural one.\r\n");
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
@@ -2302,7 +2342,7 @@ ACMD(do_harvest) {
 		msg_to_char(ch, "You can't do that.\r\n");
 	}
 	else if (GET_ACTION(ch) == ACT_HARVESTING) {
-		msg_to_char(ch, "You stop harvesting the %s.\r\n", GET_CROP_NAME(crop_proto(ROOM_CROP_TYPE(IN_ROOM(ch)))));
+		msg_to_char(ch, "You stop harvesting the %s.\r\n", GET_CROP_NAME(ROOM_CROP(IN_ROOM(ch))));
 		act("$n stops harvesting.\r\n", FALSE, ch, 0, 0, TO_ROOM);
 		cancel_action(ch);
 	}
@@ -2335,7 +2375,7 @@ ACMD(do_harvest) {
 			set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_HARVEST_PROGRESS, harvest_timer);
 		}
 		
-		msg_to_char(ch, "You begin harvesting the %s.\r\n", GET_CROP_NAME(crop_proto(ROOM_CROP_TYPE(IN_ROOM(ch)))));
+		msg_to_char(ch, "You begin harvesting the %s.\r\n", GET_CROP_NAME(ROOM_CROP(IN_ROOM(ch))));
 		act("$n begins to harvest the crop.", FALSE, ch, 0, 0, TO_ROOM);
 	}
 }
@@ -2530,10 +2570,10 @@ ACMD(do_plant) {
 	else {
 		original = SECT(IN_ROOM(ch));
 		change_terrain(IN_ROOM(ch), evo->becomes);
-		ROOM_ORIGINAL_SECT(IN_ROOM(ch)) = original;
+		change_base_sector(IN_ROOM(ch), original);
 		
 		// don't use GET_FOOD_CROP_TYPE because not all plantables are food
-		set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CROP_TYPE, GET_OBJ_VAL(obj, VAL_FOOD_CROP_TYPE));
+		set_crop_type(IN_ROOM(ch), cp);
 		set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_SEED_TIME, planting_base_timer);
 		
 		extract_obj(obj);
@@ -2579,7 +2619,7 @@ ACMD(do_prospect) {
 		act("$n stops prospecting.", FALSE, ch, 0, 0, TO_ROOM);
 		cancel_action(ch);
 	}
-	else if (IS_NPC(ch) || !HAS_ABILITY(ch, ABIL_PROSPECT)) {
+	else if (IS_NPC(ch) || !has_ability(ch, ABIL_PROSPECT)) {
 		msg_to_char(ch, "You need to buy the Prospect ability before you can use it.\r\n");
 	}
 	else if (GET_ACTION(ch) != ACT_NONE) {

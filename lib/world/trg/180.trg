@@ -137,6 +137,10 @@ if %phase%==3
     break
     case 2
       eval target %random.enemy%
+      * Unable to find a target = return self
+      if %target% == %self%
+        halt
+      end
       %send% %target% %self.name% makes a heretical gesture at you!
       %echoaround% %target% %self.name% makes a heretical gesture at %target.name%!
       wait 5 sec
