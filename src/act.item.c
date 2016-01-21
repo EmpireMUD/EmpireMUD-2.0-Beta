@@ -1954,9 +1954,11 @@ void load_shipment(struct empire_data *emp, struct shipping_data *shipd, vehicle
 	
 	// calculate capacity
 	capacity = 0;
-	for (iter = EMPIRE_SHIPPING_LIST(emp); iter; iter = iter->next) {
-		if (iter->shipping_id == VEH_SHIPPING_ID(boat)) {
-			capacity += iter->amount;
+	if (VEH_SHIPPING_ID(boat) != -1) {
+		for (iter = EMPIRE_SHIPPING_LIST(emp); iter; iter = iter->next) {
+			if (iter->shipping_id == VEH_SHIPPING_ID(boat)) {
+				capacity += iter->amount;
+			}
 		}
 	}
 	
@@ -1991,12 +1993,10 @@ void load_shipment(struct empire_data *emp, struct shipping_data *shipd, vehicle
 	}
 	
 	// mark it as attached to this boat
-	if (VEH_SHIPPING_ID(boat) != -1) {
-		shipd->shipping_id = VEH_SHIPPING_ID(boat);
+	if (VEH_SHIPPING_ID(boat) == -1) {
+		VEH_SHIPPING_ID(boat) = find_free_shipping_id(emp);
 	}
-	else {
-		shipd->shipping_id = VEH_SHIPPING_ID(boat) = find_free_shipping_id(emp);
-	}
+	shipd->shipping_id = VEH_SHIPPING_ID(boat);
 }
 
 
@@ -2165,7 +2165,7 @@ void sail_shipment(empire_data *emp, vehicle_data *boat) {
 	vehicle_to_room(boat, get_ship_pen());
 	if (ROOM_PEOPLE(IN_ROOM(boat))) {
 		snprintf(buf, sizeof(buf), "$V %s in.", mob_move_types[VEH_MOVE_TYPE(boat)]);
-		act(buf, FALSE, ROOM_PEOPLE(IN_ROOM(boat)), boat, NULL, TO_CHAR | TO_ROOM);
+		act(buf, FALSE, ROOM_PEOPLE(IN_ROOM(boat)), NULL, boat, TO_CHAR | TO_ROOM);
 	}
 }
 
