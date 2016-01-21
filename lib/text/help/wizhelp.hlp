@@ -266,12 +266,12 @@ See also: GHISTORY
 GOTO TRANSFER
 
 Usage:  goto <location>
-        trans <victim> [location]
+        transfer <victim|vehicle> [location]
 
 These commands are used to transports yourself and others to different rooms.
-GOTO allows you to go to other rooms; TRANS transports a person from wherever
-they are to the room you're in, or another location. The transfer command is
-grantable.
+GOTO allows you to go to other rooms; TRANS transports a person (or vehicle)
+from wherever they are to the room you're in, or another location. The transfer
+command is grantable.
 
 For both GOTO and TRANS, the location specifier can be either a virtual room
 number, coordinates, or the name of a character, object, or vehicle.
