@@ -6197,6 +6197,11 @@ vehicle_data *get_vehicle_vis(char_data *ch, char *name) {
 	char tmpname[MAX_INPUT_LENGTH];
 	char *tmp = tmpname;
 	vehicle_data *iter;
+	
+	// prefer match in same room
+	if ((iter = get_vehicle_in_room_vis(ch, name))) {
+		return iter;
+	}
 
 	strcpy(tmp, name);
 	
