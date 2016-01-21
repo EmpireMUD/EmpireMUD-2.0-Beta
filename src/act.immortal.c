@@ -6224,6 +6224,7 @@ ACMD(do_trans) {
 	descriptor_data *i;
 	char_data *victim;
 	room_data *to_room = IN_ROOM(ch);
+	vehicle_data *veh;
 
 	argument = one_argument(argument, buf);
 	one_word(argument, arg);
@@ -6238,35 +6239,7 @@ ACMD(do_trans) {
 	if (!*buf) {
 		send_to_char("Whom do you wish to transfer (and where)?\r\n", ch);
 	}
-	else if (str_cmp("all", buf) != 0) {
-		if (!(victim = get_char_vis(ch, buf, FIND_CHAR_WORLD)))
-			send_config_msg(ch, "no_person");
-		else if (victim == ch)
-			send_to_char("That doesn't make much sense, does it?\r\n", ch);
-		else {
-			if ((GET_REAL_LEVEL(ch) < GET_REAL_LEVEL(victim)) && !REAL_NPC(victim)) {
-				send_to_char("Go transfer someone your own size.\r\n", ch);
-				return;
-			}
-			
-			if (!IS_NPC(victim)) {
-				syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has transferred %s to %s", GET_REAL_NAME(ch), GET_REAL_NAME(victim), room_log_identifier(to_room));
-			}
-
-			act("$n disappears in a mushroom cloud.", FALSE, victim, 0, 0, TO_ROOM);
-			char_from_room(victim);
-			char_to_room(victim, to_room);
-			if (!IS_NPC(victim)) {
-				GET_LAST_DIR(victim) = NO_DIR;
-			}
-			act("$n arrives from a puff of smoke.", FALSE, victim, 0, 0, TO_ROOM);
-			act("$n has transferred you!", FALSE, ch, 0, victim, TO_VICT);
-			look_at_room(victim);
-			enter_wtrigger(IN_ROOM(victim), victim, NO_DIR);
-			send_config_msg(ch, "ok_string");
-		}
-	}
-	else {			/* Trans All */
+	else if (!str_cmp(buf, "all")) {			/* Trans All */
 		if (GET_ACCESS_LEVEL(ch) < LVL_IMPL) {
 			send_to_char("I think not.\r\n", ch);
 			return;
@@ -6293,6 +6266,48 @@ ACMD(do_trans) {
 		}
 		
 		send_config_msg(ch, "ok_string");
+	}
+	else if ((victim = get_char_vis(ch, buf, FIND_CHAR_WORLD))) {
+		if (victim == ch)
+			send_to_char("That doesn't make much sense, does it?\r\n", ch);
+		else {
+			if ((GET_REAL_LEVEL(ch) < GET_REAL_LEVEL(victim)) && !REAL_NPC(victim)) {
+				send_to_char("Go transfer someone your own size.\r\n", ch);
+				return;
+			}
+			
+			if (!IS_NPC(victim)) {
+				syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has transferred %s to %s", GET_REAL_NAME(ch), GET_REAL_NAME(victim), room_log_identifier(to_room));
+			}
+
+			act("$n disappears in a mushroom cloud.", FALSE, victim, 0, 0, TO_ROOM);
+			char_from_room(victim);
+			char_to_room(victim, to_room);
+			if (!IS_NPC(victim)) {
+				GET_LAST_DIR(victim) = NO_DIR;
+			}
+			act("$n arrives from a puff of smoke.", FALSE, victim, 0, 0, TO_ROOM);
+			act("$n has transferred you!", FALSE, ch, 0, victim, TO_VICT);
+			look_at_room(victim);
+			enter_wtrigger(IN_ROOM(victim), victim, NO_DIR);
+			send_config_msg(ch, "ok_string");
+		}
+	}
+	else if ((veh = get_vehicle_vis(ch, buf))) {
+		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has transferred %s to %s", GET_REAL_NAME(ch), VEH_SHORT_DESC(veh), room_log_identifier(to_room));
+		
+		if (ROOM_PEOPLE(IN_ROOM(veh))) {
+			act("$V disappears in a mushroom cloud.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+		}
+		vehicle_from_room(veh);
+		vehicle_to_room(veh, to_room);
+		if (ROOM_PEOPLE(IN_ROOM(veh))) {
+			act("$V arrives from a puff of smoke.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+		}
+		send_config_msg(ch, "ok_string");
+	}
+	else {
+		send_config_msg(ch, "no_person");
 	}
 }
 
