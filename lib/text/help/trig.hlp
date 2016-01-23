@@ -103,6 +103,32 @@ Variables:
   &c%object%&0 - The object the character is attempting to drop (room trigger).
   &c%self%&0 - The item being dropped (object trigger).
 #d
+"EMPIRE VARS" "EMPIRE VARIABLES" EMP-VARS EMPIRE-VARS TRIGEDIT-EMP-VAR TRIGEDIT-VARIABLES-EMPIRES
+
+Empire variables are accessed via %char.empire% (or obj, room, vehicle). If
+the thing belongs to no empire, this will be empty.
+
+When using field - The variable returns:
+adj - Adjective form of the empire's name.
+banner - Empire's banner (as a color code).
+coins - How many coins the empire has in its vaults.
+description - The empire's full description.
+fame - The empire's total fame value.
+greatness - The empire's total greatness value.
+has_tech(name) - True if the empire has that technology (globally).
+   This will not work for island-based techs.
+leader_id - The player id of the empire's leader.
+members - Number of players in the empire.
+military - Total military value of the empire.
+name - Empire's full name.
+population - Total NPC population.
+priv(name)
+rank(num)
+ranks
+territory
+vnum
+wealth
+#d
 "ENTER TRIGGER" "ENTRY TRIGGER"
 
 Disambiguation: Different scriptable things have different uses for enter/entry

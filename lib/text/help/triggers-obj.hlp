@@ -127,6 +127,7 @@ When using field  - The variable returns:
 &ccarried_by&0 - The id of the character carrying the object, or an empty return.
 &ccontents&0 - Gives the first object in a container.
 &ccount(str)&0 - Number of matching items (name/vnum) inside it.
+&cempire&0 - The last empire that controlled the object, if any.
 &cflag(FLAG)&0 - Togglesthe flag then returns whether or not the flag is on.
 &chas_in(str)&0 - Has an object (name/vnum) inside it.
 &cid&0 - The unique id of the object.
@@ -148,7 +149,7 @@ When using field  - The variable returns:
 &cvnum&0 - The virtual number of the object.
 &cworn_by&0 - The id of the character wearing the object, or an empty return.
 
-See also: OEDIT FLAGS
+See also: EMPIRE VARS, OEDIT FLAGS
 #d
 "REMOVE TRIGGER" "OTRIG REMOVE" TRIGEDIT-OBJ-REMOVE
 

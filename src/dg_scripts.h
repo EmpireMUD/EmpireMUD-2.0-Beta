@@ -257,6 +257,7 @@ void script_trigger_check(void);
 void add_trigger(struct script_data *sc, trig_data *t, int loc);
 char_data *get_char(char *name);
 char_data *get_char_by_obj(obj_data *obj, char *name);
+empire_data *get_empire(char *name);
 obj_data *get_obj(char *name);
 
 void do_stat_trigger(char_data *ch, trig_data *trig);
@@ -333,11 +334,13 @@ int valid_dg_target(char_data *ch, int bitvector);
 #define GET_TRIG_LOOPS(t)         ((t)->loops)
 
 /* player id's: 0 to MOB_ID_BASE - 1            */
-/* mob id's: MOB_ID_BASE to ROOM_ID_BASE - 1      */
+/* mob id's: MOB_ID_BASE to EMPIRE_ID_BASE - 1      */
+// empire ids: EMPIRE_ID_BASE to ROOM_ID_BASE - 1
 /* room id's: ROOM_ID_BASE to OBJ_ID_BASE - 1    */
 /* object id's: OBJ_ID_BASE and higher           */
 #define MOB_ID_BASE	  10000000  /* 10000000 player IDNUMS should suffice */
-#define ROOM_ID_BASE    (10000000 + MOB_ID_BASE) /* 10000000 Mobs */
+#define EMPIRE_ID_BASE  (10000000 + MOB_ID_BASE) /* 10000000 Mobs */
+#define ROOM_ID_BASE    (10000000 + EMPIRE_ID_BASE)	// 10000000 empire id limit?
 #define VEHICLE_ID_BASE  ((MAP_SIZE * 5) + ROOM_ID_BASE)	// Lots o' Rooms
 #define OBJ_ID_BASE  (1000000 + VEHICLE_ID_BASE)	// Plenty o' Vehicles
 
@@ -377,4 +380,5 @@ void remove_from_lookup_table(int uid);
 
 // find helpers
 extern char_data *find_char(int n);
+extern empire_data *find_empire_by_uid(int n);
 extern room_data *find_room(int n);
