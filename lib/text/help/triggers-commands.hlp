@@ -415,7 +415,7 @@ Here is a workaround to use a variable:
   eval making %%self.give_coins(%coins%)%%
   nop %making%
 #d
-%OWN% MOWN OOOWN VOWN WOWN
+%OWN% MOWN OOWN VOWN WOWN
 
 Usage:  %own% [type] <target> <empire>
 

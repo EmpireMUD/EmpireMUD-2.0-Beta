@@ -1822,6 +1822,7 @@ ACMD(do_mfollow) {
 
 ACMD(do_mown) {
 	void kill_empire_npc(char_data *ch);
+	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	
 	char type_arg[MAX_INPUT_LENGTH], targ_arg[MAX_INPUT_LENGTH], emp_arg[MAX_INPUT_LENGTH];
 	vehicle_data *veh = NULL;
@@ -1965,6 +1966,7 @@ ACMD(do_mown) {
 			kill_empire_npc(vict);
 		}
 		GET_LOYALTY(vict) = emp;
+		setup_generic_npc(vict, emp, MOB_DYNAMIC_NAME(vict), MOB_DYNAMIC_SEX(vict));
 	}
 	if (obj) {
 		obj->last_empire_id = emp ? EMPIRE_VNUM(emp) : NOTHING;
