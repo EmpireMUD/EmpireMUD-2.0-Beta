@@ -359,6 +359,150 @@ VCMD(do_vmove) {
 }
 
 
+VCMD(do_vown) {
+	void do_dg_own(empire_data *emp, char_data *vict, obj_data *obj, room_data *room, vehicle_data *veh);
+	
+	char type_arg[MAX_INPUT_LENGTH], targ_arg[MAX_INPUT_LENGTH], emp_arg[MAX_INPUT_LENGTH];
+	room_data *orm = IN_ROOM(veh);
+	vehicle_data *vtarg = NULL;
+	empire_data *emp = NULL;
+	char_data *vict = NULL;
+	room_data *rtarg = NULL;
+	obj_data *otarg = NULL;
+	
+	*emp_arg = '\0';	// just in case
+	
+	if (!orm) {
+		veh_log(veh, "vown: Vehicle nowhere when trying to vown");
+		return;
+	}
+	
+	// first arg -- possibly a type
+	argument = one_argument(argument, type_arg);
+	if (is_abbrev(type_arg, "room")) {
+		argument = one_argument(argument, targ_arg);
+		skip_spaces(&argument);
+		
+		if (!*targ_arg) {
+			veh_log(veh, "vown: Too few arguments (vown room)");
+			return;
+		}
+		else if (!*argument) {
+			// this was the last arg
+			strcpy(emp_arg, targ_arg);
+		}
+		else if (!(rtarg = get_room(orm, targ_arg))) {
+			veh_log(veh, "vown: Invalid room target");
+			return;
+		}
+		else {
+			// room is set; remaining arg is owner
+			strcpy(emp_arg, argument);
+		}
+	}
+	else if (is_abbrev(type_arg, "mobile")) {
+		argument = one_argument(argument, targ_arg);
+		skip_spaces(&argument);
+		strcpy(emp_arg, argument);	// always
+		
+		if (!*targ_arg || !*emp_arg) {
+			veh_log(veh, "vown: Too few arguments (vown mob)");
+			return;
+		}
+		else if (!(vict = ((*targ_arg == UID_CHAR) ? get_char(targ_arg) : get_char_near_vehicle(veh, targ_arg)))) {
+			veh_log(veh, "vown: Invalid mob target");
+			return;
+		}
+	}
+	else if (is_abbrev(type_arg, "vehicle")) {
+		argument = one_argument(argument, targ_arg);
+		skip_spaces(&argument);
+		strcpy(emp_arg, argument);	// always
+		
+		if (!*targ_arg || !*emp_arg) {
+			veh_log(veh, "vown: Too few arguments (vown vehicle)");
+			return;
+		}
+		else if (!(vtarg = ((*targ_arg == UID_CHAR) ? get_vehicle(targ_arg) : get_vehicle_near_vehicle(veh, targ_arg)))) {
+			veh_log(veh, "vown: Invalid vehicle target");
+			return;
+		}
+	}
+	else if (is_abbrev(type_arg, "object")) {
+		argument = one_argument(argument, targ_arg);
+		skip_spaces(&argument);
+		strcpy(emp_arg, argument);	// always
+		
+		if (!*targ_arg || !*emp_arg) {
+			veh_log(veh, "vown: Too few arguments (vown obj)");
+			return;
+		}
+		else if (!(otarg = ((*targ_arg == UID_CHAR) ? get_obj(targ_arg) : get_obj_near_vehicle(veh, targ_arg)))) {
+			veh_log(veh, "vown: Invalid obj target");
+			return;
+		}
+	}
+	else {	// attempt to find a target
+		strcpy(targ_arg, type_arg);	// there was no type
+		
+		if (!*targ_arg) {
+			veh_log(veh, "vown: Too few arguments");
+			return;
+		}
+		else if (*targ_arg == UID_CHAR && !(vict = get_char(targ_arg)) && !(vtarg = get_vehicle(targ_arg)) && !(otarg = get_obj(targ_arg)) && !(rtarg = get_room(orm, targ_arg))) {
+			veh_log(veh, "vown: Unable to find target %s", targ_arg);
+			return;
+		}
+		else if ((vict = get_char_near_vehicle(veh, targ_arg)) || (vtarg = get_vehicle_near_vehicle(veh, targ_arg)) || (otarg = get_obj_near_vehicle(veh, targ_arg))) {
+			// must have been found
+			skip_spaces(&argument);
+			strcpy(emp_arg, argument);
+		}
+		else {
+			veh_log(veh, "vown: Invalid target");
+			return;
+		}
+	}
+	
+	// only change owner on the home room
+	if (rtarg) {
+		rtarg = HOME_ROOM(rtarg);
+	}
+	
+	// check that we got a target
+	if (!vict && !vtarg && !rtarg && !otarg) {
+		veh_log(veh, "vown: Unable to find a target");
+		return;
+	}
+	
+	// process the empire
+	if (!*emp_arg) {
+		veh_log(veh, "vown: No empire argument given");
+		return;
+	}
+	else if (!str_cmp(emp_arg, "none")) {
+		emp = NULL;	// set owner to none
+	}
+	else if (!(emp = get_empire(emp_arg))) {
+		veh_log(veh, "vown: Invalid empire");
+		return;
+	}
+	
+	// final target checks
+	if (vict && !IS_NPC(vict)) {
+		veh_log(veh, "vown: Attempting to change the empire of a player");
+		return;
+	}
+	if (rtarg && IS_ADVENTURE_ROOM(rtarg)) {
+		veh_log(veh, "vown: Attempting to change ownership of an adventure room");
+		return;
+	}
+	
+	// do the ownership change
+	do_dg_own(emp, vict, otarg, rtarg, vtarg);
+}
+
+
 // purge all objects and npcs in room, or specified object/mob/vehicle
 VCMD(do_vpurge) {
 	char arg[MAX_INPUT_LENGTH];

@@ -438,10 +438,10 @@ OCMD(do_oown) {
 	
 	char type_arg[MAX_INPUT_LENGTH], targ_arg[MAX_INPUT_LENGTH], emp_arg[MAX_INPUT_LENGTH];
 	room_data *orm = obj_room(obj);
-	vehicle_data *veh = NULL;
+	vehicle_data *vtarg = NULL;
 	empire_data *emp = NULL;
 	char_data *vict = NULL;
-	room_data *room = NULL;
+	room_data *rtarg = NULL;
 	obj_data *otarg = NULL;
 	
 	*emp_arg = '\0';	// just in case
@@ -465,7 +465,7 @@ OCMD(do_oown) {
 			// this was the last arg
 			strcpy(emp_arg, targ_arg);
 		}
-		else if (!(room = get_room(orm, targ_arg))) {
+		else if (!(rtarg = get_room(orm, targ_arg))) {
 			obj_log(obj, "oown: Invalid room target");
 			return;
 		}
@@ -497,7 +497,7 @@ OCMD(do_oown) {
 			obj_log(obj, "oown: Too few arguments (oown vehicle)");
 			return;
 		}
-		else if (!(veh = ((*targ_arg == UID_CHAR) ? get_vehicle(targ_arg) : get_vehicle_near_obj(obj, targ_arg)))) {
+		else if (!(vtarg = ((*targ_arg == UID_CHAR) ? get_vehicle(targ_arg) : get_vehicle_near_obj(obj, targ_arg)))) {
 			obj_log(obj, "oown: Invalid vehicle target");
 			return;
 		}
@@ -523,11 +523,11 @@ OCMD(do_oown) {
 			obj_log(obj, "oown: Too few arguments");
 			return;
 		}
-		else if (*targ_arg == UID_CHAR && !(vict = get_char(targ_arg)) && !(veh = get_vehicle(targ_arg)) && !(otarg = get_obj(targ_arg)) && !(room = get_room(orm, targ_arg))) {
+		else if (*targ_arg == UID_CHAR && !(vict = get_char(targ_arg)) && !(vtarg = get_vehicle(targ_arg)) && !(otarg = get_obj(targ_arg)) && !(rtarg = get_room(orm, targ_arg))) {
 			obj_log(obj, "oown: Unable to find target %s", targ_arg);
 			return;
 		}
-		else if ((vict = get_char_near_obj(obj, targ_arg)) || (veh = get_vehicle_near_obj(obj, targ_arg)) || (otarg = get_obj_near_obj(obj, targ_arg))) {
+		else if ((vict = get_char_near_obj(obj, targ_arg)) || (vtarg = get_vehicle_near_obj(obj, targ_arg)) || (otarg = get_obj_near_obj(obj, targ_arg))) {
 			// must have been found
 			skip_spaces(&argument);
 			strcpy(emp_arg, argument);
@@ -539,12 +539,12 @@ OCMD(do_oown) {
 	}
 	
 	// only change owner on the home room
-	if (room) {
-		room = HOME_ROOM(room);
+	if (rtarg) {
+		rtarg = HOME_ROOM(rtarg);
 	}
 	
 	// check that we got a target
-	if (!vict && !veh && !room && !otarg) {
+	if (!vict && !vtarg && !rtarg && !otarg) {
 		obj_log(obj, "oown: Unable to find a target");
 		return;
 	}
@@ -567,13 +567,13 @@ OCMD(do_oown) {
 		obj_log(obj, "oown: Attempting to change the empire of a player");
 		return;
 	}
-	if (room && IS_ADVENTURE_ROOM(room)) {
+	if (rtarg && IS_ADVENTURE_ROOM(rtarg)) {
 		obj_log(obj, "oown: Attempting to change ownership of an adventure room");
 		return;
 	}
 	
 	// do the ownership change
-	do_dg_own(emp, vict, otarg, room, veh);
+	do_dg_own(emp, vict, otarg, rtarg, vtarg);
 }
 
 

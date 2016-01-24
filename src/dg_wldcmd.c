@@ -738,6 +738,144 @@ WCMD(do_wforce) {
 }
 
 
+WCMD(do_wown) {
+	void do_dg_own(empire_data *emp, char_data *vict, obj_data *obj, room_data *room, vehicle_data *veh);
+	
+	char type_arg[MAX_INPUT_LENGTH], targ_arg[MAX_INPUT_LENGTH], emp_arg[MAX_INPUT_LENGTH];
+	vehicle_data *vtarg = NULL;
+	empire_data *emp = NULL;
+	char_data *vict = NULL;
+	room_data *rtarg = NULL;
+	obj_data *otarg = NULL;
+	
+	*emp_arg = '\0';	// just in case
+		
+	// first arg -- possibly a type
+	argument = one_argument(argument, type_arg);
+	if (is_abbrev(type_arg, "room")) {
+		argument = one_argument(argument, targ_arg);
+		skip_spaces(&argument);
+		
+		if (!*targ_arg) {
+			wld_log(room, "wown: Too few arguments (wown room)");
+			return;
+		}
+		else if (!*argument) {
+			// this was the last arg
+			strcpy(emp_arg, targ_arg);
+		}
+		else if (!(rtarg = get_room(room, targ_arg))) {
+			wld_log(room, "wown: Invalid room target");
+			return;
+		}
+		else {
+			// room is set; remaining arg is owner
+			strcpy(emp_arg, argument);
+		}
+	}
+	else if (is_abbrev(type_arg, "mobile")) {
+		argument = one_argument(argument, targ_arg);
+		skip_spaces(&argument);
+		strcpy(emp_arg, argument);	// always
+		
+		if (!*targ_arg || !*emp_arg) {
+			wld_log(room, "wown: Too few arguments (wown mob)");
+			return;
+		}
+		else if (!(vict = ((*targ_arg == UID_CHAR) ? get_char(targ_arg) : get_char_by_room(room, targ_arg)))) {
+			wld_log(room, "wown: Invalid mob target");
+			return;
+		}
+	}
+	else if (is_abbrev(type_arg, "vehicle")) {
+		argument = one_argument(argument, targ_arg);
+		skip_spaces(&argument);
+		strcpy(emp_arg, argument);	// always
+		
+		if (!*targ_arg || !*emp_arg) {
+			wld_log(room, "wown: Too few arguments (wown vehicle)");
+			return;
+		}
+		else if (!(vtarg = ((*targ_arg == UID_CHAR) ? get_vehicle(targ_arg) : get_vehicle_room(room, targ_arg)))) {
+			wld_log(room, "wown: Invalid vehicle target");
+			return;
+		}
+	}
+	else if (is_abbrev(type_arg, "object")) {
+		argument = one_argument(argument, targ_arg);
+		skip_spaces(&argument);
+		strcpy(emp_arg, argument);	// always
+		
+		if (!*targ_arg || !*emp_arg) {
+			wld_log(room, "wown: Too few arguments (wown obj)");
+			return;
+		}
+		else if (!(otarg = ((*targ_arg == UID_CHAR) ? get_obj(targ_arg) : get_obj_by_room(room, targ_arg)))) {
+			wld_log(room, "wown: Invalid obj target");
+			return;
+		}
+	}
+	else {	// attempt to find a target
+		strcpy(targ_arg, type_arg);	// there was no type
+		
+		if (!*targ_arg) {
+			wld_log(room, "wown: Too few arguments");
+			return;
+		}
+		else if (*targ_arg == UID_CHAR && !(vict = get_char(targ_arg)) && !(vtarg = get_vehicle(targ_arg)) && !(otarg = get_obj(targ_arg)) && !(rtarg = get_room(room, targ_arg))) {
+			wld_log(room, "wown: Unable to find target %s", targ_arg);
+			return;
+		}
+		else if ((vict = get_char_by_room(room, targ_arg)) || (vtarg = get_vehicle_room(room, targ_arg)) || (otarg = get_obj_by_room(room, targ_arg))) {
+			// must have been found
+			skip_spaces(&argument);
+			strcpy(emp_arg, argument);
+		}
+		else {
+			wld_log(room, "wown: Invalid target");
+			return;
+		}
+	}
+	
+	// only change owner on the home room
+	if (rtarg) {
+		rtarg = HOME_ROOM(rtarg);
+	}
+	
+	// check that we got a target
+	if (!vict && !vtarg && !rtarg && !otarg) {
+		wld_log(room, "wown: Unable to find a target");
+		return;
+	}
+	
+	// process the empire
+	if (!*emp_arg) {
+		wld_log(room, "wown: No empire argument given");
+		return;
+	}
+	else if (!str_cmp(emp_arg, "none")) {
+		emp = NULL;	// set owner to none
+	}
+	else if (!(emp = get_empire(emp_arg))) {
+		wld_log(room, "wown: Invalid empire");
+		return;
+	}
+	
+	// final target checks
+	if (vict && !IS_NPC(vict)) {
+		wld_log(room, "wown: Attempting to change the empire of a player");
+		return;
+	}
+	if (rtarg && IS_ADVENTURE_ROOM(rtarg)) {
+		wld_log(room, "wown: Attempting to change ownership of an adventure room");
+		return;
+	}
+	
+	// do the ownership change
+	do_dg_own(emp, vict, otarg, rtarg, vtarg);
+}
+
+
 /* purge all objects an npcs in room, or specified object or mob */
 WCMD(do_wpurge) {
 	char arg[MAX_INPUT_LENGTH];

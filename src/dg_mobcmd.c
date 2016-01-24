@@ -1824,11 +1824,11 @@ ACMD(do_mown) {
 	void do_dg_own(empire_data *emp, char_data *vict, obj_data *obj, room_data *room, vehicle_data *veh);
 	
 	char type_arg[MAX_INPUT_LENGTH], targ_arg[MAX_INPUT_LENGTH], emp_arg[MAX_INPUT_LENGTH];
-	vehicle_data *veh = NULL;
+	vehicle_data *vtarg = NULL;
 	empire_data *emp = NULL;
 	char_data *vict = NULL;
-	room_data *room = NULL;
-	obj_data *obj = NULL;
+	room_data *rtarg = NULL;
+	obj_data *otarg = NULL;
 	
 	*emp_arg = '\0';	// just in case
 
@@ -1851,7 +1851,7 @@ ACMD(do_mown) {
 			// this was the last arg
 			strcpy(emp_arg, targ_arg);
 		}
-		else if (!(room = find_target_room(ch, targ_arg))) {
+		else if (!(rtarg = find_target_room(ch, targ_arg))) {
 			mob_log(ch, "mown: Invalid room target");
 			return;
 		}
@@ -1883,7 +1883,7 @@ ACMD(do_mown) {
 			mob_log(ch, "mown: Too few arguments (mown vehicle)");
 			return;
 		}
-		else if (!(veh = ((*targ_arg == UID_CHAR) ? get_vehicle(targ_arg) : get_vehicle_in_room_vis(ch, targ_arg)))) {
+		else if (!(vtarg = ((*targ_arg == UID_CHAR) ? get_vehicle(targ_arg) : get_vehicle_in_room_vis(ch, targ_arg)))) {
 			mob_log(ch, "mown: Invalid vehicle target");
 			return;
 		}
@@ -1897,7 +1897,7 @@ ACMD(do_mown) {
 			mob_log(ch, "mown: Too few arguments (mown obj)");
 			return;
 		}
-		else if (!(obj = ((*targ_arg == UID_CHAR) ? get_obj(targ_arg) : get_obj_vis(ch, targ_arg)))) {
+		else if (!(otarg = ((*targ_arg == UID_CHAR) ? get_obj(targ_arg) : get_obj_vis(ch, targ_arg)))) {
 			mob_log(ch, "mown: Invalid obj target");
 			return;
 		}
@@ -1909,11 +1909,11 @@ ACMD(do_mown) {
 			mob_log(ch, "mown: Too few arguments");
 			return;
 		}
-		else if (*targ_arg == UID_CHAR && !(vict = get_char(targ_arg)) && !(veh = get_vehicle(targ_arg)) && !(obj = get_obj(targ_arg)) && !(room = get_room(IN_ROOM(ch), targ_arg))) {
+		else if (*targ_arg == UID_CHAR && !(vict = get_char(targ_arg)) && !(vtarg = get_vehicle(targ_arg)) && !(otarg = get_obj(targ_arg)) && !(rtarg = get_room(IN_ROOM(ch), targ_arg))) {
 			mob_log(ch, "mown: Unable to find target %s", targ_arg);
 			return;
 		}
-		else if ((vict = get_char_room_vis(ch, targ_arg)) || (veh = get_vehicle_in_room_vis(ch, targ_arg)) || (obj = get_obj_in_list_vis(ch, targ_arg, ch->carrying)) || (obj = get_obj_in_list_vis(ch, targ_arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
+		else if ((vict = get_char_room_vis(ch, targ_arg)) || (vtarg = get_vehicle_in_room_vis(ch, targ_arg)) || (otarg = get_obj_in_list_vis(ch, targ_arg, ch->carrying)) || (otarg = get_obj_in_list_vis(ch, targ_arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
 			// must have been found
 			skip_spaces(&argument);
 			strcpy(emp_arg, argument);
@@ -1925,12 +1925,12 @@ ACMD(do_mown) {
 	}
 	
 	// only change owner on the home room
-	if (room) {
-		room = HOME_ROOM(room);
+	if (rtarg) {
+		rtarg = HOME_ROOM(rtarg);
 	}
 	
 	// check that we got a target
-	if (!vict && !veh && !room && !obj) {
+	if (!vict && !vtarg && !rtarg && !otarg) {
 		mob_log(ch, "mown: Unable to find a target");
 		return;
 	}
@@ -1953,13 +1953,13 @@ ACMD(do_mown) {
 		mob_log(ch, "mown: Attempting to change the empire of a player");
 		return;
 	}
-	if (room && IS_ADVENTURE_ROOM(room)) {
+	if (rtarg && IS_ADVENTURE_ROOM(rtarg)) {
 		mob_log(ch, "mown: Attempting to change ownership of an adventure room");
 		return;
 	}
 	
 	// do the ownership change
-	do_dg_own(emp, vict, obj, room, veh);
+	do_dg_own(emp, vict, otarg, rtarg, vtarg);
 }
 
 
