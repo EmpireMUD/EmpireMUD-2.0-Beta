@@ -4946,8 +4946,14 @@ void makeuid_var(void *go, struct script_data *sc, trig_data *trig, int type, ch
 			script_log("Trigger: %s, VNum %d. makeuid needs name: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), cmd);
 			return;
 		}
-
-		if (is_abbrev(arg, "mob")) {
+		
+		if (is_abbrev(arg, "empire")) {
+			empire_data *emp = get_empire_by_name(name);
+			if (emp) {
+				snprintf(uid, sizeof(uid), "%c%d", UID_CHAR, EMPIRE_VNUM(emp) + EMPIRE_ID_BASE);
+			}
+		}
+		else if (is_abbrev(arg, "mob")) {
 			char_data *c = NULL;
 			switch (type) {
 				case WLD_TRIGGER:
