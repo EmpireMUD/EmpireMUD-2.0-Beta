@@ -1845,6 +1845,7 @@ ACMD(do_mown) {
 		
 		if (!*targ_arg) {
 			mob_log(ch, "mown: Too few arguments (mown room)");
+			return;
 		}
 		else if (!*argument) {
 			// this was the last arg
@@ -1866,6 +1867,7 @@ ACMD(do_mown) {
 		
 		if (!*targ_arg || !*emp_arg) {
 			mob_log(ch, "mown: Too few arguments (mown mob)");
+			return;
 		}
 		else if (!(vict = ((*targ_arg == UID_CHAR) ? get_char(targ_arg) : get_char_room_vis(ch, targ_arg)))) {
 			mob_log(ch, "mown: Invalid mob target");
@@ -1879,6 +1881,7 @@ ACMD(do_mown) {
 		
 		if (!*targ_arg || !*emp_arg) {
 			mob_log(ch, "mown: Too few arguments (mown vehicle)");
+			return;
 		}
 		else if (!(veh = ((*targ_arg == UID_CHAR) ? get_vehicle(targ_arg) : get_vehicle_in_room_vis(ch, targ_arg)))) {
 			mob_log(ch, "mown: Invalid vehicle target");
@@ -1892,6 +1895,7 @@ ACMD(do_mown) {
 		
 		if (!*targ_arg || !*emp_arg) {
 			mob_log(ch, "mown: Too few arguments (mown obj)");
+			return;
 		}
 		else if (!(obj = ((*targ_arg == UID_CHAR) ? get_obj(targ_arg) : get_obj_vis(ch, targ_arg)))) {
 			mob_log(ch, "mown: Invalid obj target");
