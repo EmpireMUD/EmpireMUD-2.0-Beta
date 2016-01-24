@@ -2004,6 +2004,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 	char *at[] = {"mat ", "oat ", "wat ", "wat ", "wat ", "vat " };
 	char *adventurecomplete[] = {"madventurecomplete", "oadventurecomplete", "wadventurecomplete", "wadventurecomplete", "wadventurecomplete", "vadventurecomplete" };
 	char *transform[] = {"mtransform ", "otransform ", "wtransform ", "wtransform ", "wtransform ", "vtransform " };
+	char *own[] = {"mown ", "oown ", "wown ", "wown ", "wown ", "vown " };
 	
 	/* X.global() will have a NULL trig */
 	if (trig) {
@@ -2053,6 +2054,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				snprintf(str, slen, "%s", force[type]);
 			else if (!str_cmp(var, "load"))
 				snprintf(str, slen, "%s", load[type]);
+			else if (!str_cmp(var, "own"))
+				snprintf(str, slen, "%s", own[type]);
 			else if (!str_cmp(var, "purge"))
 				snprintf(str, slen, "%s", purge[type]);
 			else if (!str_cmp(var, "scale"))
