@@ -1280,6 +1280,9 @@ ACMD(do_dispatch) {
 	if (IS_NPC(ch) || !GET_LOYALTY(ch)) {
 		msg_to_char(ch, "You can't dispatch any ships.\r\n");
 	}
+	else if (GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_SHIPPING)) {
+		msg_to_char(ch, "You don't have permission to dispatch ships.\r\n");
+	}
 	else if (!*targ || !*argument) {
 		msg_to_char(ch, "Dispatch which ship to which island?\r\n");
 	}

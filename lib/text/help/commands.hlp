@@ -416,6 +416,20 @@ This command causes your familiar to leave. You can target the familiar by
 name if it's in the room with you, or else can type 'dismiss familiar' to
 dismiss it anywhere in the world.
 #
+DISPATCH
+
+Usage:  dispatch <ship> <island>
+
+You can use the shipping system to move empty ships between islands. This
+requires the same permissions as the "ship" command, and it requires an
+available worker (citizen) at the location you want to dispatch the ship from.
+
+You can dispatch ships from your current location, or from any docks on the
+same island. (This command always prefers ships in your current room.) The
+destination island must have docks to receive the ship.
+
+See also: SHIPPING
+#
 DOUSE BURNING "PUT OUT FIRE" "FIRE BRIGADE"
 
 Usage:  douse [vehicle]
@@ -1442,7 +1456,7 @@ shipping system. You can also set this option on individual ships. (Workforce
 is not required to use the shipping system, but 'workforce no-work' is still
 used to prevent shipping.)
 
-See also: DOCKS, EINVENTORY, SHIPBUILDING, SHIPS, WORKFORCE
+See also: DISPATCH, DOCKS, EINVENTORY, SHIPBUILDING, SHIPS, WORKFORCE
 #
 SLEEP
 
