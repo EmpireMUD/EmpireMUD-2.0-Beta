@@ -1723,16 +1723,20 @@ void deliver_shipment(empire_data *emp, struct shipping_data *shipd) {
 	
 	if ((dock = find_docks(emp, shipd->to_island))) {
 		// unload the shipment at the destination
-		log_to_empire(emp, ELOG_SHIPPING, "%dx %s: shipped to %s", shipd->amount, get_obj_name_by_proto(shipd->vnum), get_island(shipd->to_island, TRUE)->name);
-		add_to_empire_storage(emp, shipd->to_island, shipd->vnum, shipd->amount);
+		if (shipd->vnum != NOTHING && shipd->amount > 0) {
+			log_to_empire(emp, ELOG_SHIPPING, "%dx %s: shipped to %s", shipd->amount, get_obj_name_by_proto(shipd->vnum), get_island(shipd->to_island, TRUE)->name);
+			add_to_empire_storage(emp, shipd->to_island, shipd->vnum, shipd->amount);
+		}
 		if (have_ship) {
 			move_ship_to_destination(emp, shipd, dock);
 		}
 	}
 	else {
 		// no docks -- unload the shipment at home
-		log_to_empire(emp, ELOG_SHIPPING, "%dx %s: returned to %s", shipd->amount, get_obj_name_by_proto(shipd->vnum), get_island(shipd->from_island, TRUE)->name);
-		add_to_empire_storage(emp, shipd->from_island, shipd->vnum, shipd->amount);
+		if (shipd->vnum != NOTHING && shipd->amount > 0) {
+			log_to_empire(emp, ELOG_SHIPPING, "%dx %s: returned to %s", shipd->amount, get_obj_name_by_proto(shipd->vnum), get_island(shipd->from_island, TRUE)->name);
+			add_to_empire_storage(emp, shipd->from_island, shipd->vnum, shipd->amount);
+		}
 		if (have_ship) {
 			move_ship_to_destination(emp, shipd, real_room(shipd->ship_origin));
 		}
@@ -4770,6 +4774,7 @@ ACMD(do_ship) {
 	struct empire_storage_data *store;
 	struct shipping_data *sd, *temp;
 	bool done, gave_number = FALSE;
+	vehicle_data *veh;
 	obj_data *proto;
 	int number = 1;
 	size_t size;
@@ -4807,19 +4812,35 @@ ACMD(do_ship) {
 		
 		done = FALSE;
 		for (sd = EMPIRE_SHIPPING_LIST(GET_LOYALTY(ch)); sd; sd = sd->next) {
-			if (!(proto = obj_proto(sd->vnum))) {
-				continue;
+			if (sd->vnum == NOTHING) {
+				// just a ship, not a shipment
+				if (sd->shipping_id == -1 || !(veh = find_ship_by_shipping_id(GET_LOYALTY(ch), sd->shipping_id))) {
+					continue;
+				}
+				if (*keywords && !multi_isname(keywords, VEH_KEYWORDS(veh))) {
+					continue;
+				}
+				
+				from_isle = get_island(sd->from_island, TRUE);
+				to_isle = get_island(sd->to_island, TRUE);
+				snprintf(line, sizeof(line), " * %s (%s to %s, %s)\r\n", skip_filler(VEH_SHORT_DESC(veh)), from_isle ? from_isle->name : "unknown", to_isle ? to_isle->name : "unknown", status_type[sd->status]);
 			}
-			if (*keywords && !multi_isname(keywords, GET_OBJ_KEYWORDS(proto))) {
-				// skip non-matching keywords, if-requested
-				continue;
+			else {
+				// normal object shipment
+				if (!(proto = obj_proto(sd->vnum))) {
+					continue;
+				}
+				if (*keywords && !multi_isname(keywords, GET_OBJ_KEYWORDS(proto))) {
+					// skip non-matching keywords, if-requested
+					continue;
+				}
+				
+				from_isle = get_island(sd->from_island, TRUE);
+				to_isle = get_island(sd->to_island, TRUE);
+				snprintf(line, sizeof(line), " %dx %s (%s to %s, %s)\r\n", sd->amount, skip_filler(GET_OBJ_SHORT_DESC(proto)), from_isle ? from_isle->name : "unknown", to_isle ? to_isle->name : "unknown", status_type[sd->status]);
 			}
 			
-			from_isle = get_island(sd->from_island, TRUE);
-			to_isle = get_island(sd->to_island, TRUE);
-			snprintf(line, sizeof(line), " %dx %s (%s to %s, %s)\r\n", sd->amount, skip_filler(GET_OBJ_SHORT_DESC(proto)), from_isle ? from_isle->name : "unknown", to_isle ? to_isle->name : "unknown", status_type[sd->status]);
 			done = TRUE;
-			
 			if (size + strlen(line) >= sizeof(buf)) {
 				// too long
 				size += snprintf(buf + size, sizeof(buf) - size, " ...\r\n");
