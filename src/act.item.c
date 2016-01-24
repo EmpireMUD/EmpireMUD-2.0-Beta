@@ -4823,7 +4823,7 @@ ACMD(do_ship) {
 				
 				from_isle = get_island(sd->from_island, TRUE);
 				to_isle = get_island(sd->to_island, TRUE);
-				snprintf(line, sizeof(line), " * %s (%s to %s, %s)\r\n", skip_filler(VEH_SHORT_DESC(veh)), from_isle ? from_isle->name : "unknown", to_isle ? to_isle->name : "unknown", status_type[sd->status]);
+				snprintf(line, sizeof(line), "    %s (%s to %s, %s)\r\n", skip_filler(VEH_SHORT_DESC(veh)), from_isle ? from_isle->name : "unknown", to_isle ? to_isle->name : "unknown", status_type[sd->status]);
 			}
 			else {
 				// normal object shipment

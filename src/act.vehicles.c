@@ -1356,7 +1356,7 @@ ACMD(do_dispatch) {
 		VEH_SHIPPING_ID(veh) = find_free_shipping_id(GET_LOYALTY(ch));
 		shipd->shipping_id = VEH_SHIPPING_ID(veh);
 		
-		LL_PREPEND(EMPIRE_SHIPPING_LIST(GET_LOYALTY(ch)), shipd);
+		LL_APPEND(EMPIRE_SHIPPING_LIST(GET_LOYALTY(ch)), shipd);
 		sail_shipment(GET_LOYALTY(ch), veh);
 		send_config_msg(ch, "ok_string");
 	}
