@@ -4091,6 +4091,13 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					break;
 				}
+				case 'i': {	// emp.i*
+					if (!str_cmp(field, "id")) {
+						// this is scripting id
+						snprintf(str, slen, "%d", EMPIRE_VNUM(emp) + EMPIRE_ID_BASE);
+					}
+					break;
+				}
 				case 'l': {	// emp.l*
 					if (!str_cmp(field, "leader_id")) {
 						snprintf(str, slen, "%d", EMPIRE_LEADER(emp));
@@ -4098,7 +4105,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'm': {	// emp.m*
-					if (!str_cmp(field, "members")) {
+					if (!str_cmp(field, "max_territory")) {
+						snprintf(str, slen, "%d", land_can_claim(emp, FALSE));
+					}
+					else if (!str_cmp(field, "members")) {
 						snprintf(str, slen, "%d", EMPIRE_MEMBERS(emp));
 					}
 					else if (!str_cmp(field, "military")) {
@@ -4116,13 +4126,62 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					if (!str_cmp(field, "population")) {
 						snprintf(str, slen, "%d", EMPIRE_POPULATION(emp));
 					}
+					else if (!str_cmp(field, "priv")) {
+						if (subfield && *subfield) {
+							extern const char *priv[];
+							int pos = search_block(subfield, priv, FALSE);
+							
+							if (pos != NOTHING) {
+								snprintf(str, slen, "%d", EMPIRE_PRIV(emp, pos));
+							}
+							// let any other result error out.
+						}
+					}
+					break;
+				}
+				case 'r': {	// emp.r*
+					if (!str_cmp(field, "rank")) {
+						if (subfield && *subfield) {
+							int num = atoi(subfield);
+							if (num > 0 && num <= EMPIRE_NUM_RANKS(emp)) {
+								snprintf(str, slen, "%s", EMPIRE_RANK(emp, num-1));
+							}
+							else {
+								*str = '\0';
+							}
+						}
+						else {
+							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "ranks")) {
+						snprintf(str, slen, "%d", EMPIRE_NUM_RANKS(emp));
+					}
+					break;
+				}
+				case 't': {	// emp.t*
+					if (!str_cmp(field, "territory")) {
+						snprintf(str, slen, "%d", EMPIRE_CITY_TERRITORY(emp) + EMPIRE_OUTSIDE_TERRITORY(emp));
+					}
+					break;
+				}
+				case 'v': {	// emp.v*
+					if (!str_cmp(field, "vnum")) {
+						snprintf(str, slen, "%d", EMPIRE_VNUM(emp));
+					}
+					break;
+				}
+				case 'w': {	// emp.w*
+					if (!str_cmp(field, "wealth")) {
+						snprintf(str, slen, "%d", GET_TOTAL_WEALTH(emp));
+					}
 					break;
 				}
 			}	// end switch
 			
 			if (*str == '\x1') { /* no match in switch */
 				*str = '\0';
-				script_log("Trigger: %s, VNum %d, type: %d. unknown empire field: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), type, field);
+				script_log("Trigger: %s, VNum %d, type: %d. unknown empire field: '%s%s%s%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), type, field, (subfield && *subfield) ? "(" : "", NULLSAFE(subfield), (subfield && *subfield) ? ")" : "");
 			}
 		}	// if (emp) ...
 		
