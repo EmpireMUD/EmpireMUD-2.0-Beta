@@ -415,6 +415,21 @@ Here is a workaround to use a variable:
   eval making %%self.give_coins(%coins%)%%
   nop %making%
 #d
+%OWN% MOWN OOOWN VOWN WOWN
+
+Usage:  %own% [type] <target> <empire>
+
+This command changes empire ownership of a thing (mob, obj, vehicle, or room).
+Be very careful using this command in scripts, as it wields a great deal of
+power.
+
+Examples:
+  %own% room %actor.empire%
+  %own% %self% %empire%
+  %own% veh cart %empire%
+
+See also: EMPIRE VARS
+#d
 %PURGE% MPURGE OPURGE VPURGE WPURGE
 
 %purge% <victim | obj | vehicle>
