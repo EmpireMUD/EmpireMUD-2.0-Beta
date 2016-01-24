@@ -1820,6 +1820,177 @@ ACMD(do_mfollow) {
 }
 
 
+ACMD(do_mown) {
+	void kill_empire_npc(char_data *ch);
+	
+	char type_arg[MAX_INPUT_LENGTH], targ_arg[MAX_INPUT_LENGTH], emp_arg[MAX_INPUT_LENGTH];
+	vehicle_data *veh = NULL;
+	empire_data *emp = NULL;
+	char_data *vict = NULL;
+	room_data *room = NULL;
+	obj_data *obj = NULL;
+	
+	*emp_arg = '\0';	// just in case
+
+	if (!MOB_OR_IMPL(ch) || AFF_FLAGGED(ch, AFF_ORDERED)) {
+		send_config_msg(ch, "huh_string");
+		return;
+	}
+	
+	// first arg -- possibly a type
+	argument = one_argument(argument, type_arg);
+	if (is_abbrev(type_arg, "room")) {
+		argument = one_argument(argument, targ_arg);
+		skip_spaces(&argument);
+		
+		if (!*targ_arg) {
+			mob_log(ch, "mown: Too few arguments (mown room)");
+		}
+		else if (!*argument) {
+			// this was the last arg
+			strcpy(emp_arg, targ_arg);
+		}
+		else if (!(room = find_target_room(ch, targ_arg))) {
+			mob_log(ch, "mown: Invalid room target");
+			return;
+		}
+		else {
+			// room is set; remaining arg is owner
+			strcpy(emp_arg, argument);
+		}
+	}
+	else if (is_abbrev(type_arg, "mobile")) {
+		argument = one_argument(argument, targ_arg);
+		skip_spaces(&argument);
+		strcpy(emp_arg, argument);	// always
+		
+		if (!*targ_arg || !*emp_arg) {
+			mob_log(ch, "mown: Too few arguments (mown mob)");
+		}
+		else if (!(vict = ((*targ_arg == UID_CHAR) ? get_char(targ_arg) : get_char_room_vis(ch, targ_arg)))) {
+			mob_log(ch, "mown: Invalid mob target");
+			return;
+		}
+	}
+	else if (is_abbrev(type_arg, "vehicle")) {
+		argument = one_argument(argument, targ_arg);
+		skip_spaces(&argument);
+		strcpy(emp_arg, argument);	// always
+		
+		if (!*targ_arg || !*emp_arg) {
+			mob_log(ch, "mown: Too few arguments (mown vehicle)");
+		}
+		else if (!(veh = ((*targ_arg == UID_CHAR) ? get_vehicle(targ_arg) : get_vehicle_in_room_vis(ch, targ_arg)))) {
+			mob_log(ch, "mown: Invalid vehicle target");
+			return;
+		}
+	}
+	else if (is_abbrev(type_arg, "object")) {
+		argument = one_argument(argument, targ_arg);
+		skip_spaces(&argument);
+		strcpy(emp_arg, argument);	// always
+		
+		if (!*targ_arg || !*emp_arg) {
+			mob_log(ch, "mown: Too few arguments (mown obj)");
+		}
+		else if (!(obj = ((*targ_arg == UID_CHAR) ? get_obj(targ_arg) : get_obj_vis(ch, targ_arg)))) {
+			mob_log(ch, "mown: Invalid obj target");
+			return;
+		}
+	}
+	else {	// attempt to find a target
+		strcpy(targ_arg, type_arg);	// there was no type
+		
+		if (!*targ_arg) {
+			mob_log(ch, "mown: Too few arguments");
+			return;
+		}
+		else if (*targ_arg == UID_CHAR && !(vict = get_char(targ_arg)) && !(veh = get_vehicle(targ_arg)) && !(obj = get_obj(targ_arg)) && !(room = get_room(IN_ROOM(ch), targ_arg))) {
+			mob_log(ch, "mown: Unable to find target %s", targ_arg);
+			return;
+		}
+		else if ((vict = get_char_room_vis(ch, targ_arg)) || (veh = get_vehicle_in_room_vis(ch, targ_arg)) || (obj = get_obj_in_list_vis(ch, targ_arg, ch->carrying)) || (obj = get_obj_in_list_vis(ch, targ_arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
+			// must have been found
+			skip_spaces(&argument);
+			strcpy(emp_arg, argument);
+		}
+		else {
+			mob_log(ch, "mown: Invalid target");
+			return;
+		}
+	}
+	
+	// only change owner on the home room
+	if (room) {
+		room = HOME_ROOM(room);
+	}
+	
+	// check that we got a target
+	if (!vict && !veh && !room && !obj) {
+		mob_log(ch, "mown: Unable to find a target");
+		return;
+	}
+	
+	// process the empire
+	if (!*emp_arg) {
+		mob_log(ch, "mown: No empire argument given");
+		return;
+	}
+	else if (!str_cmp(emp_arg, "none")) {
+		emp = NULL;	// set owner to none
+	}
+	else if (!(emp = get_empire(emp_arg))) {
+		mob_log(ch, "mown: Invalid empire");
+		return;
+	}
+	
+	// final target checks
+	if (vict && !IS_NPC(vict)) {
+		mob_log(ch, "mown: Attempting to change the empire of a player");
+		return;
+	}
+	if (room && IS_ADVENTURE_ROOM(room)) {
+		mob_log(ch, "mown: Attempting to change ownership of an adventure room");
+		return;
+	}
+	
+	// do the ownership change
+	if (vict) {
+		if (GET_LOYALTY(vict) && emp != GET_LOYALTY(vict) && GET_EMPIRE_NPC_DATA(vict)) {
+			// resets the population timer on their house
+			kill_empire_npc(vict);
+		}
+		GET_LOYALTY(vict) = emp;
+	}
+	if (obj) {
+		obj->last_empire_id = emp ? EMPIRE_VNUM(emp) : NOTHING;
+	}
+	if (veh) {
+		if (VEH_OWNER(veh) && emp != VEH_OWNER(veh) ) {
+			VEH_SHIPPING_ID(veh) = -1;
+			if (VEH_INTERIOR_HOME_ROOM(veh)) {
+				abandon_room(VEH_INTERIOR_HOME_ROOM(veh));
+			}
+		}
+		VEH_OWNER(veh) = emp;
+		if (emp && VEH_INTERIOR_HOME_ROOM(veh)) {
+			claim_room(VEH_INTERIOR_HOME_ROOM(veh), emp);
+		}
+	}
+	if (room) {
+		if (ROOM_OWNER(room) && emp != ROOM_OWNER(room)) {
+			abandon_room(room);
+		}
+		if (emp) {
+			claim_room(room, emp);
+		}
+		if (GET_ROOM_VEHICLE(room)) {
+			VEH_OWNER(GET_ROOM_VEHICLE(room)) = emp;
+		}
+	}
+}
+
+
 ACMD(do_mscale) {
 	char arg[MAX_INPUT_LENGTH], lvl_arg[MAX_INPUT_LENGTH];
 	char_data *victim;

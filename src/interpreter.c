@@ -463,6 +463,7 @@ ACMD(do_mforget);
 ACMD(do_mscale);
 ACMD(do_mtransform);
 ACMD(do_mbuildingecho);
+ACMD(do_mown);
 ACMD(do_mregionecho);
 ACMD(do_mvehicleecho);
 ACMD(do_vdelete);
@@ -1007,6 +1008,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "mpurge", POS_DEAD, do_mpurge, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
 	STANDARD_CMD( "mgoto", POS_DEAD, do_mgoto, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
 	STANDARD_CMD( "mat", POS_DEAD, do_mat, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
+	STANDARD_CMD( "mown", POS_DEAD, do_mown, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
 	STANDARD_CMD( "mscale", POS_DEAD, do_mscale, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
 	STANDARD_CMD( "msiege", POS_DEAD, do_msiege, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
 	STANDARD_CMD( "mteleport", POS_DEAD, do_mteleport, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
