@@ -1821,8 +1821,7 @@ ACMD(do_mfollow) {
 
 
 ACMD(do_mown) {
-	void kill_empire_npc(char_data *ch);
-	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
+	void do_dg_own(empire_data *emp, char_data *vict, obj_data *obj, room_data *room, vehicle_data *veh);
 	
 	char type_arg[MAX_INPUT_LENGTH], targ_arg[MAX_INPUT_LENGTH], emp_arg[MAX_INPUT_LENGTH];
 	vehicle_data *veh = NULL;
@@ -1960,40 +1959,7 @@ ACMD(do_mown) {
 	}
 	
 	// do the ownership change
-	if (vict) {
-		if (GET_LOYALTY(vict) && emp != GET_LOYALTY(vict) && GET_EMPIRE_NPC_DATA(vict)) {
-			// resets the population timer on their house
-			kill_empire_npc(vict);
-		}
-		GET_LOYALTY(vict) = emp;
-		setup_generic_npc(vict, emp, MOB_DYNAMIC_NAME(vict), MOB_DYNAMIC_SEX(vict));
-	}
-	if (obj) {
-		obj->last_empire_id = emp ? EMPIRE_VNUM(emp) : NOTHING;
-	}
-	if (veh) {
-		if (VEH_OWNER(veh) && emp != VEH_OWNER(veh) ) {
-			VEH_SHIPPING_ID(veh) = -1;
-			if (VEH_INTERIOR_HOME_ROOM(veh)) {
-				abandon_room(VEH_INTERIOR_HOME_ROOM(veh));
-			}
-		}
-		VEH_OWNER(veh) = emp;
-		if (emp && VEH_INTERIOR_HOME_ROOM(veh)) {
-			claim_room(VEH_INTERIOR_HOME_ROOM(veh), emp);
-		}
-	}
-	if (room) {
-		if (ROOM_OWNER(room) && emp != ROOM_OWNER(room)) {
-			abandon_room(room);
-		}
-		if (emp) {
-			claim_room(room, emp);
-		}
-		if (GET_ROOM_VEHICLE(room)) {
-			VEH_OWNER(GET_ROOM_VEHICLE(room)) = emp;
-		}
-	}
+	do_dg_own(emp, vict, obj, room, veh);
 }
 
 

@@ -433,6 +433,150 @@ OCMD(do_otransform) {
 }
 
 
+OCMD(do_oown) {
+	void do_dg_own(empire_data *emp, char_data *vict, obj_data *obj, room_data *room, vehicle_data *veh);
+	
+	char type_arg[MAX_INPUT_LENGTH], targ_arg[MAX_INPUT_LENGTH], emp_arg[MAX_INPUT_LENGTH];
+	room_data *orm = obj_room(obj);
+	vehicle_data *veh = NULL;
+	empire_data *emp = NULL;
+	char_data *vict = NULL;
+	room_data *room = NULL;
+	obj_data *otarg = NULL;
+	
+	*emp_arg = '\0';	// just in case
+	
+	if (!orm) {
+		obj_log(obj, "oown: Object nowhere when trying to oown");
+		return;
+	}
+	
+	// first arg -- possibly a type
+	argument = one_argument(argument, type_arg);
+	if (is_abbrev(type_arg, "room")) {
+		argument = one_argument(argument, targ_arg);
+		skip_spaces(&argument);
+		
+		if (!*targ_arg) {
+			obj_log(obj, "oown: Too few arguments (oown room)");
+			return;
+		}
+		else if (!*argument) {
+			// this was the last arg
+			strcpy(emp_arg, targ_arg);
+		}
+		else if (!(room = get_room(orm, targ_arg))) {
+			obj_log(obj, "oown: Invalid room target");
+			return;
+		}
+		else {
+			// room is set; remaining arg is owner
+			strcpy(emp_arg, argument);
+		}
+	}
+	else if (is_abbrev(type_arg, "mobile")) {
+		argument = one_argument(argument, targ_arg);
+		skip_spaces(&argument);
+		strcpy(emp_arg, argument);	// always
+		
+		if (!*targ_arg || !*emp_arg) {
+			obj_log(obj, "oown: Too few arguments (oown mob)");
+			return;
+		}
+		else if (!(vict = ((*targ_arg == UID_CHAR) ? get_char(targ_arg) : get_char_near_obj(obj, targ_arg)))) {
+			obj_log(obj, "oown: Invalid mob target");
+			return;
+		}
+	}
+	else if (is_abbrev(type_arg, "vehicle")) {
+		argument = one_argument(argument, targ_arg);
+		skip_spaces(&argument);
+		strcpy(emp_arg, argument);	// always
+		
+		if (!*targ_arg || !*emp_arg) {
+			obj_log(obj, "oown: Too few arguments (oown vehicle)");
+			return;
+		}
+		else if (!(veh = ((*targ_arg == UID_CHAR) ? get_vehicle(targ_arg) : get_vehicle_near_obj(obj, targ_arg)))) {
+			obj_log(obj, "oown: Invalid vehicle target");
+			return;
+		}
+	}
+	else if (is_abbrev(type_arg, "object")) {
+		argument = one_argument(argument, targ_arg);
+		skip_spaces(&argument);
+		strcpy(emp_arg, argument);	// always
+		
+		if (!*targ_arg || !*emp_arg) {
+			obj_log(obj, "oown: Too few arguments (oown obj)");
+			return;
+		}
+		else if (!(otarg = ((*targ_arg == UID_CHAR) ? get_obj(targ_arg) : get_obj_near_obj(obj, targ_arg)))) {
+			obj_log(obj, "oown: Invalid obj target");
+			return;
+		}
+	}
+	else {	// attempt to find a target
+		strcpy(targ_arg, type_arg);	// there was no type
+		
+		if (!*targ_arg) {
+			obj_log(obj, "oown: Too few arguments");
+			return;
+		}
+		else if (*targ_arg == UID_CHAR && !(vict = get_char(targ_arg)) && !(veh = get_vehicle(targ_arg)) && !(otarg = get_obj(targ_arg)) && !(room = get_room(orm, targ_arg))) {
+			obj_log(obj, "oown: Unable to find target %s", targ_arg);
+			return;
+		}
+		else if ((vict = get_char_near_obj(obj, targ_arg)) || (veh = get_vehicle_near_obj(obj, targ_arg)) || (otarg = get_obj_near_obj(obj, targ_arg))) {
+			// must have been found
+			skip_spaces(&argument);
+			strcpy(emp_arg, argument);
+		}
+		else {
+			obj_log(obj, "oown: Invalid target");
+			return;
+		}
+	}
+	
+	// only change owner on the home room
+	if (room) {
+		room = HOME_ROOM(room);
+	}
+	
+	// check that we got a target
+	if (!vict && !veh && !room && !otarg) {
+		obj_log(obj, "oown: Unable to find a target");
+		return;
+	}
+	
+	// process the empire
+	if (!*emp_arg) {
+		obj_log(obj, "oown: No empire argument given");
+		return;
+	}
+	else if (!str_cmp(emp_arg, "none")) {
+		emp = NULL;	// set owner to none
+	}
+	else if (!(emp = get_empire(emp_arg))) {
+		obj_log(obj, "oown: Invalid empire");
+		return;
+	}
+	
+	// final target checks
+	if (vict && !IS_NPC(vict)) {
+		obj_log(obj, "oown: Attempting to change the empire of a player");
+		return;
+	}
+	if (room && IS_ADVENTURE_ROOM(room)) {
+		obj_log(obj, "oown: Attempting to change ownership of an adventure room");
+		return;
+	}
+	
+	// do the ownership change
+	do_dg_own(emp, vict, otarg, room, veh);
+}
+
+
 /* purge all objects an npcs in room, or specified object or mob */
 OCMD(do_opurge) {
 	char arg[MAX_INPUT_LENGTH];
@@ -1257,6 +1401,7 @@ const struct obj_command_info obj_cmd_info[] = {
 	{ "oechoneither", do_oechoneither, NO_SCMD },
 	{ "oforce", do_oforce, NO_SCMD },
 	{ "oload", do_dgoload, NO_SCMD },
+	{ "oown", do_oown, NO_SCMD },
 	{ "opurge", do_opurge, NO_SCMD },
 	{ "oscale", do_oscale, NO_SCMD },
 	{ "osend", do_osend, SCMD_OSEND },
