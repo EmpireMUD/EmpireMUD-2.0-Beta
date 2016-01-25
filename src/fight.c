@@ -2263,7 +2263,18 @@ void check_auto_assist(char_data *ch) {
 		}
 		
 		// already busy
-		if (ch == ch_iter || FIGHTING(ch) == ch_iter || GET_POS(ch_iter) < POS_STANDING || FIGHTING(ch_iter) || AFF_FLAGGED(ch_iter, AFF_STUNNED | AFF_NO_ATTACK) || IS_INJURED(ch_iter, INJ_TIED | INJ_STAKED) || !CAN_SEE(ch_iter, FIGHTING(ch)) || GET_FEEDING_FROM(ch_iter) || GET_FED_ON_BY(ch_iter) || MOB_FLAGGED(ch_iter, MOB_NO_ATTACK)) {
+		if (ch == ch_iter || FIGHTING(ch) == ch_iter || GET_POS(ch_iter) < POS_STANDING || FIGHTING(ch_iter) || AFF_FLAGGED(ch_iter, AFF_STUNNED | AFF_NO_ATTACK) || IS_INJURED(ch_iter, INJ_TIED | INJ_STAKED) || !CAN_SEE(ch_iter, FIGHTING(ch)) || GET_FEEDING_FROM(ch_iter) || GET_FED_ON_BY(ch_iter)) {
+			continue;
+		}
+		
+		// champion
+		if (iter_master == ch && FIGHTING(ch) && FIGHTING(FIGHTING(ch)) == ch && IS_NPC(ch_iter) && MOB_FLAGGED(ch_iter, MOB_CHAMPION) && FIGHT_MODE(FIGHTING(ch)) == FMODE_MELEE) {
+			perform_rescue(ch_iter, ch, FIGHTING(ch));
+			continue;
+		}
+		
+		// things which stop normal auto-assist but not champion
+		if (MOB_FLAGGED(ch_iter, MOB_NO_ATTACK)) {
 			continue;
 		}
 		
@@ -2278,12 +2289,6 @@ void check_auto_assist(char_data *ch) {
 		else if (iter_master == ch && AFF_FLAGGED(ch_iter, AFF_CHARM)) {
 			// charm
 			assist = TRUE;
-		}
-		
-		// champion
-		if (iter_master == ch && FIGHTING(ch) && FIGHTING(FIGHTING(ch)) == ch && IS_NPC(ch_iter) && MOB_FLAGGED(ch_iter, MOB_CHAMPION) && FIGHT_MODE(FIGHTING(ch)) == FMODE_MELEE) {
-			perform_rescue(ch_iter, ch, FIGHTING(ch));
-			continue;
 		}
 		
 		// if we got this far and hit an assist condition
