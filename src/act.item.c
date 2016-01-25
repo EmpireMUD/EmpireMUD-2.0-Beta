@@ -2040,6 +2040,8 @@ void move_ship_to_destination(empire_data *emp, struct shipping_data *shipd, roo
 		act(buf, FALSE, ROOM_PEOPLE(IN_ROOM(boat)), NULL, boat, TO_CHAR | TO_ROOM);
 	}
 	
+	VEH_SHIPPING_ID(boat) = -1;
+	
 	// remove the ship homeroom from all shipments that were on this ship (including this one)
 	old = shipd->shipping_id;
 	for (iter = EMPIRE_SHIPPING_LIST(emp); iter; iter = iter->next) {
