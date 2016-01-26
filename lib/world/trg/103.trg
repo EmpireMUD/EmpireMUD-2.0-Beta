@@ -253,4 +253,27 @@ switch %random.5%
   break
 done
 ~
+#10339
+Empire Non-Mount Summon~
+1 c 2
+use~
+eval test %%self.is_name(%arg%)%%
+if !%test%
+  return 0
+  halt
+end
+if (%actor.position% != Standing)
+  %send% %actor% You can't do that right now.
+  halt
+end
+%load% m %self.val0%
+eval room_var %self.room%
+eval mob %room_var.people%
+if (%mob% && %mob.vnum% == %self.val0%)
+%own% %mob% %actor.empire%
+  %send% %actor% You use %self.shortdesc% and %mob.name% appears!
+  %echoaround% %actor% %actor.name% uses %self.shortdesc% and %mob.name% appears!
+end
+%purge% %self%
+~
 $

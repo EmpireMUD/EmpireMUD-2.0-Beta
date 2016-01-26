@@ -154,6 +154,7 @@ end
 eval room_var %self.room%
 eval mob %room_var.people%
 if (%mob% && %mob.vnum% == %target%)
+  %own% %mob% %actor.empire%
   %send% %actor% You use %self.shortdesc% and %mob.name% appears!
   %echoaround% %actor% %actor.name% uses %self.shortdesc% and %mob.name% appears!
   eval %varname% %timestamp%
