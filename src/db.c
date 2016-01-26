@@ -1646,6 +1646,7 @@ const char *versions_list[] = {
 	"b3.2",
 	"b3.6",
 	"b3.8",
+	"b3.11",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -1920,6 +1921,18 @@ void b3_6_einv_fix(void) {
 }
 
 
+// removes shipping ids that got stuck and are not in the holding pen
+void b3_11_ship_fix(void) {
+	vehicle_data *veh;
+	
+	LL_FOREACH(vehicle_list, veh) {
+		if (IN_ROOM(veh) && VEH_SHIPPING_ID(veh) != -1 && (!GET_BUILDING(IN_ROOM(veh)) || GET_BLD_VNUM(GET_BUILDING(IN_ROOM(veh))) != RTYPE_SHIP_HOLDING_PEN)) {
+			VEH_SHIPPING_ID(veh) = -1;
+		}
+	}
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -2073,7 +2086,11 @@ void check_version(void) {
 			void b3_8_ship_update(void);	// vehicles.c
 			log("Applying b3.8 update to vehicles...");
 			b3_8_ship_update();
-}
+		}
+		if (MATCH_VERSION("b3.11")) {
+			log("Applying b3.11 fix to ships...");
+			b3_11_ship_fix();
+		}
 	}
 	
 	write_last_boot_version(current);

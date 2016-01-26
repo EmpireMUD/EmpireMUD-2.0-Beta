@@ -283,6 +283,7 @@ When using field  - The variable returns:
    navigation.
 &cdisabled&0 - Returns TRUE if the actor is stunned or otherwise disabled.
 &cdodge&0 - The character's dodge rating.
+&cempire&0 - The character's empire, if any.
 &ceq()&0 - This will return the identifier (id) for the object equipped in
    position, if any. The specified position may be either a position number
    (0-18) or the name of the location * checks all positions. &yHELP POSITIONS&0
@@ -366,7 +367,7 @@ When using field  - The variable returns:
       * and then later in the script write it back:
       remote testvar %actor.id%
 
-See also: AFFECT FLAGS, MEDIT FLAGS
+See also: AFFECT FLAGS, EMPIRE VARS, MEDIT FLAGS
 #d
 "RECEIVE TRIGGER" "MTRIG RECEIVE" TRIGEDIT-MOB-RECEIVE TRIG-MOB-RECEIVE
 

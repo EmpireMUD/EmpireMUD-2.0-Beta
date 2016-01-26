@@ -100,6 +100,7 @@ When using field - The variable returns:
 &ccrop&0 - The name of the crop on the map room, if any.
 &cdirection(target)&0 - The approximate direction to the target.
 &cdistance(target)&0 - The distance between this room and the target.
+&cempire&0 - The empire that owns the room, if any.
 &cempire_adjective&0 - The owner empire's adjective form, if any.
 &cempire_id&0 - The owner empire's id number, if any.
 &cempire_name&0 - The owner empire's name, if any.
@@ -117,6 +118,8 @@ When using field - The variable returns:
    (then %veh.next_in_room%).
 &cvnum&0 - The room's vnum.
 &cweather&0 - current weather: sunny, cloudy, rainy, or lightning
+
+See also: EMPIRE VARS
 #d
 "ZONE RESET TRIGGER" "RTRIG ZONE RESET" TRIGEDIT-ROOM-ZONE-RESET TRIGEDIT-ROOM-ZRESET TRIGEDIT-ROOM-LOAD
 

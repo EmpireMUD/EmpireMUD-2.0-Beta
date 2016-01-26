@@ -2498,9 +2498,9 @@ int write_to_descriptor(socket_t desc, const char *txt) {
 
 /* Add a new string to a player's output queue */
 void write_to_output(const char *txt, descriptor_data *t) {
+	const char *overflow_txt = "**OVERFLOW**\r\n";
 	int size, wantsize;
 	char protocol_txt[MAX_STRING_LENGTH];
-	//char *overflow_txt = "**OVERFLOW**\r\n";
 
 	/* if we're in the overflow state already, ignore this new output */
 	if (t->bufspace == 0)
@@ -2512,6 +2512,12 @@ void write_to_output(const char *txt, descriptor_data *t) {
 	size = wantsize;
 	if (t->pProtocol->WriteOOB > 0) {
 		--t->pProtocol->WriteOOB;
+	}
+
+	/* If exceeding the size of the buffer, truncate it for the overflow message */
+	if (size < 0 || wantsize >= sizeof(protocol_txt)) {
+		size = sizeof(protocol_txt) - 1;
+		strcpy(protocol_txt + size - strlen(overflow_txt), overflow_txt);	/* strcpy: OK */
 	}
 	
 	// check that text size is going to fit into a large bufffer

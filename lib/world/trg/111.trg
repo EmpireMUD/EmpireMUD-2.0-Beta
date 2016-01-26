@@ -9,6 +9,12 @@ say Are you going to eat that?
 Hermit Food Exchange~
 0 j 100
 ~
+eval test %%self.varexists(gave%actor.name%)%%
+if %object.type% != FOOD || %test%
+  %send% %actor% %self.name% doesn't want %object.shortdesc%!
+  return 0
+  halt
+end
 wait 1 sec
 if %object.type% == FOOD
   say My thanks to you, %actor.name%!
@@ -16,9 +22,8 @@ if %object.type% == FOOD
   give bag %actor.name%
   %echo% %self.name% gleefully eats %object.shortdesc%!
   mjunk %object.name%
-  tdetach mob %self% all
-else
-  drop %object.name%
+  eval gave%actor.name% 1
+  remote gave%actor.name% %self.id%
 end
 ~
 #11102

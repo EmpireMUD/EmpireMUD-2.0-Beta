@@ -715,14 +715,13 @@ char_data *find_chore_worker_in_room(room_data *room, mob_vnum vnum) {
 * This finds an NPC citizen who can do work in the area. It may return an
 * npc who already has a loaded mob. If so, it's ok to repurpose this npc.
 *
-* @param room_data *loc The location of the chore
-* @param int chore Which CHORE_
-* @return struct empire_npc_data* The npc who will help, or NULL
+* @param empire_data *emp The empire looking for a worker.
+* @param room_data *loc The location of the chore.
+* @return struct empire_npc_data* The npc who will help, or NULL.
 */
-struct empire_npc_data *find_free_npc_for_chore(room_data *loc, int chore) {	
+struct empire_npc_data *find_free_npc_for_chore(empire_data *emp, room_data *loc) {
 	struct empire_territory_data *ter_iter;
 	struct empire_npc_data *found = NULL, *backup = NULL, *npc_iter;
-	empire_data *emp = ROOM_OWNER(loc);
 	room_data *rm;
 
 	int chore_distance = config_get_int("chore_distance");
@@ -783,7 +782,7 @@ char_data *place_chore_worker(empire_data *emp, int chore, room_data *room) {
 	struct empire_npc_data *npc;
 	char_data *mob = NULL;
 	
-	if ((npc = find_free_npc_for_chore(room, chore))) {
+	if ((npc = find_free_npc_for_chore(emp, room))) {
 		mob = spawn_empire_npc_to_room(emp, npc, room, chore_data[chore].mob);
 		
 		// shut off SPAWNED flag so chore mobs don't despawn

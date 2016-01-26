@@ -90,6 +90,82 @@ void cancel_driving(char_data *ch) {
 
 
 /**
+* Finds a ship in ch's room or docked on ch's current island, which could be
+* dispatched. Ships in the same room are preferred even if they aren't owned
+* by ch; ships in other rooms are partially-validated for ownership and flags.
+*
+* @param char_data *ch The person looking to dispatch a ship.
+* @param char *arg The typed-in arg for ship name.
+* @return vehicle_data *veh The found ship, if any.
+*/
+vehicle_data *find_ship_to_dispatch(char_data *ch, char *arg) {
+	char tmpname[MAX_INPUT_LENGTH], *tmp = tmpname;
+	int island, found = 0, number = 1;
+	vehicle_data *veh;
+	
+	// prefer ones here
+	if ((veh = get_vehicle_in_room_vis(ch, arg))) {
+		return veh;
+	}
+	
+	// can't really find an island match if the character is not in an empire
+	if (!GET_LOYALTY(ch)) {
+		return NULL;
+	}
+	
+	// can't find ships if character isn't on an island
+	if ((island = GET_ISLAND_ID(IN_ROOM(ch))) == NO_ISLAND) {
+		return NULL;
+	}
+	
+	// 0.x does not target vehicles
+	strcpy(tmp, arg);
+	if ((number = get_number(&tmp)) == 0) {
+		return NULL;
+	}
+	
+	// otherwise look for ones that match
+	LL_FOREACH(vehicle_list, veh) {
+		if (VEH_OWNER(veh) != GET_LOYALTY(ch)) {
+			continue;
+		}
+		if (!VEH_IS_COMPLETE(veh) || !VEH_FLAGGED(veh, VEH_SHIPPING)) {
+			continue;
+		}
+		if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
+			continue;
+		}
+		if (VEH_INTERIOR_HOME_ROOM(veh) && ROOM_AFF_FLAGGED(VEH_INTERIOR_HOME_ROOM(veh), ROOM_AFF_NO_WORK)) {
+			continue;
+		}
+		if (VEH_SHIPPING_ID(veh) != -1) {
+			continue;
+		}
+		
+		// ensure in docks if we're finding it remotely
+		if (!IN_ROOM(veh) || !ROOM_BLD_FLAGGED(IN_ROOM(veh), BLD_DOCKS) || !IS_COMPLETE(IN_ROOM(veh))) {
+			continue;
+		}
+		if (GET_ISLAND_ID(IN_ROOM(veh)) != island) {
+			continue;
+		}
+		
+		// check name match
+		if (!isname(tmp, VEH_KEYWORDS(veh))) {
+			continue;
+		}
+		
+		// found: check number
+		if (++found == number) {
+			return veh;
+		}
+	}
+	
+	return NULL;
+}
+
+
+/**
 * Finds a valid target for a siege. This doesn't validate the target, just
 * determines what the player is aiming at. This sends its own error messages.
 *
@@ -1178,6 +1254,111 @@ ACMD(do_disembark) {
 		}
 		
 		command_lag(ch, WAIT_OTHER);
+	}
+}
+
+
+ACMD(do_dispatch) {
+	extern char_data *find_chore_worker_in_room(room_data *room, mob_vnum vnum);
+	extern room_data *find_docks(empire_data *emp, int island_id);
+	extern struct empire_npc_data *find_free_npc_for_chore(empire_data *emp, room_data *loc);
+	extern int find_free_shipping_id(empire_data *emp);
+	void sail_shipment(empire_data *emp, vehicle_data *boat);
+	extern bool ship_is_empty(vehicle_data *ship);
+	extern char_data *spawn_empire_npc_to_room(empire_data *emp, struct empire_npc_data *npc, room_data *room, mob_vnum override_mob);
+
+	struct island_info *to_isle;
+	char targ[MAX_INPUT_LENGTH];
+	struct empire_npc_data *npc;
+	struct shipping_data *shipd;
+	char_data *worker;
+	vehicle_data *veh;
+	
+	argument = one_argument(argument, targ);
+	skip_spaces(&argument);
+	
+	if (IS_NPC(ch) || !GET_LOYALTY(ch)) {
+		msg_to_char(ch, "You can't dispatch any ships.\r\n");
+	}
+	else if (GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_SHIPPING)) {
+		msg_to_char(ch, "You don't have permission to dispatch ships.\r\n");
+	}
+	else if (!*targ || !*argument) {
+		msg_to_char(ch, "Dispatch which ship to which island?\r\n");
+	}
+	
+	// vehicle validation
+	else if (!(veh = find_ship_to_dispatch(ch, targ))) {
+		msg_to_char(ch, "You can't find any ship like that to dispatch on this island.\r\n");
+	}
+	else if (!can_use_vehicle(ch, veh, MEMBERS_ONLY)) {
+		msg_to_char(ch, "You don't have permission to dispatch that.\r\n");
+	}
+	else if (!VEH_FLAGGED(veh, VEH_SHIPPING)) {
+		msg_to_char(ch, "You can only dispatch shipping vessels.\r\n");
+	}
+	else if (!VEH_IS_COMPLETE(veh)) {
+		msg_to_char(ch, "It isn't even built yet.\r\n");
+	}
+	else if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
+		msg_to_char(ch, "You can't dispatch it while it's on fire!\r\n");
+	}
+	else if (VEH_SHIPPING_ID(veh) != -1) {
+		msg_to_char(ch, "It's already being used for shipping.\r\n");
+	}
+	else if (!ship_is_empty(veh)) {
+		msg_to_char(ch, "You can't dispatch a ship that has people inside it.\r\n");
+	}
+	else if (!WATER_SECT(IN_ROOM(veh)) && !IS_WATER_BUILDING(IN_ROOM(veh))) {
+		msg_to_char(ch, "You can only dispatch ships that are on the water or in docks.\r\n");
+	}
+	
+	// destination validation
+	else if (GET_ISLAND_ID(IN_ROOM(veh)) == NO_ISLAND) {
+		msg_to_char(ch, "You can't automatically dispatch ships that are out at sea.\r\n");
+	}
+	else if (!(to_isle = get_island_by_name(argument)) && !(to_isle = get_island_by_coords(argument))) {
+		msg_to_char(ch, "Unknown target island \"%s\".\r\n", argument);
+	}
+	else if (to_isle->id == GET_ISLAND_ID(IN_ROOM(veh)) && ROOM_BLD_FLAGGED(IN_ROOM(veh), BLD_DOCKS)) {
+		msg_to_char(ch, "It is already docked on that island.\r\n");
+	}
+	else if (!find_docks(GET_LOYALTY(ch), to_isle->id)) {
+		msg_to_char(ch, "%s has no docks (docks must not be set no-work).\r\n", to_isle->name);
+	}
+	
+	// ready ready go
+	else {
+		if (!(worker = find_chore_worker_in_room(IN_ROOM(veh), OVERSEER))) {
+			if ((npc = find_free_npc_for_chore(GET_LOYALTY(ch), IN_ROOM(veh)))) {
+				worker = spawn_empire_npc_to_room(GET_LOYALTY(ch), npc, IN_ROOM(veh), OVERSEER);
+			}
+		}
+		
+		// still no worker?
+		if (!worker) {
+			msg_to_char(ch, "There are no free workers to oversee the dispatch.\r\n");
+			return;
+		}
+		
+		// ensure a despawn
+		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
+		
+		// create shipment
+		CREATE(shipd, struct shipping_data, 1);
+		shipd->vnum = NOTHING;
+		shipd->from_island = GET_ISLAND_ID(IN_ROOM(veh));
+		shipd->to_island = to_isle->id;
+		shipd->status = SHIPPING_QUEUED;
+		shipd->status_time = time(0);
+		shipd->ship_origin = GET_ROOM_VNUM(IN_ROOM(veh));
+		
+		VEH_SHIPPING_ID(veh) = find_free_shipping_id(GET_LOYALTY(ch));
+		shipd->shipping_id = VEH_SHIPPING_ID(veh);
+		
+		LL_APPEND(EMPIRE_SHIPPING_LIST(GET_LOYALTY(ch)), shipd);
+		sail_shipment(GET_LOYALTY(ch), veh);
+		send_config_msg(ch, "ok_string");
 	}
 }
 
