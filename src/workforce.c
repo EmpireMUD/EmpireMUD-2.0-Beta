@@ -100,7 +100,7 @@ struct empire_chore_type chore_data[NUM_CHORES] = {
 	{ "quarrying", STONECUTTER },
 	{ "nailmaking", NAILMAKER },
 	{ "brickmaking", BRICKMAKER },
-	{ "abandon-dismantled", BUILDER },	// builder is strictly a safe placeholder here
+	{ "abandon-dismantled", NOTHING },
 	{ "herb gardening", GARDENER },
 	{ "fire brigade", FIRE_BRIGADE },
 	{ "trapping", TRAPPER },
@@ -108,8 +108,8 @@ struct empire_chore_type chore_data[NUM_CHORES] = {
 	{ "shearing", SHEARER },
 	{ "minting", COIN_MAKER },
 	{ "dismantle-mines", BUILDER },
-	{ "abandon-chopped", FELLER },	// mob is strictly a safe placeholder here
-	{ "abandon-farmed", FARMER },	// mob is strictly a safe placeholder here
+	{ "abandon-chopped", NOTHING },
+	{ "abandon-farmed", NOTHING },
 	{ "nexus crystals", APPRENTICE_EXARCH },
 	{ "milling", MILL_WORKER },
 	{ "repair-vehicles", VEHICLE_REPAIRMAN },
@@ -590,26 +590,28 @@ void chore_update(void) {
 void deactivate_workforce(empire_data *emp, int island_id, int type) {
 	char_data *mob, *next_mob;
 	
-	for (mob = character_list; mob; mob = next_mob) {
-		next_mob = mob->next;
+	if (chore_data[type].mob != NOTHING) {
+		for (mob = character_list; mob; mob = next_mob) {
+			next_mob = mob->next;
 		
-		if (!IS_NPC(mob) || GET_LOYALTY(mob) != emp) {
-			continue;
-		}
-		if (GET_MOB_VNUM(mob) != chore_data[type].mob) {
-			continue;
-		}
-		if (island_id != NO_ISLAND && GET_ISLAND_ID(IN_ROOM(mob)) != island_id) {
-			continue;
-		}
+			if (!IS_NPC(mob) || GET_LOYALTY(mob) != emp) {
+				continue;
+			}
+			if (GET_MOB_VNUM(mob) != chore_data[type].mob) {
+				continue;
+			}
+			if (island_id != NO_ISLAND && GET_ISLAND_ID(IN_ROOM(mob)) != island_id) {
+				continue;
+			}
 		
-		// mark in case we can't remove
-		SET_BIT(MOB_FLAGS(mob), MOB_SPAWNED);
+			// mark in case we can't remove
+			SET_BIT(MOB_FLAGS(mob), MOB_SPAWNED);
 		
-		// attempt to despawn
-		if (!FIGHTING(mob)) {
-			act("$n leaves to do other work.", TRUE, mob, NULL, NULL, TO_ROOM);
-			extract_char(mob);
+			// attempt to despawn
+			if (!FIGHTING(mob)) {
+				act("$n leaves to do other work.", TRUE, mob, NULL, NULL, TO_ROOM);
+				extract_char(mob);
+			}
 		}
 	}
 }
@@ -629,11 +631,11 @@ void deactivate_workforce_room(empire_data *emp, room_data *room) {
 	for (mob = ROOM_PEOPLE(room); mob; mob = next_mob) {
 		next_mob = mob->next_in_room;
 		
-		if (IS_NPC(mob)) {
+		if (IS_NPC(mob) && GET_MOB_VNUM(mob) != NOTHING) {
 			// check it's a workforce mob
 			match = FALSE;
 			for (iter = 0; iter < NUM_CHORES && !match; ++iter) {
-				if (GET_MOB_VNUM(mob) ==  chore_data[iter].mob) {
+				if (GET_MOB_VNUM(mob) == chore_data[iter].mob) {
 					match = TRUE;
 				}
 			}
@@ -691,6 +693,11 @@ int empire_chore_limit(empire_data *emp, int island_id, int chore) {
 */
 char_data *find_chore_worker_in_room(room_data *room, mob_vnum vnum) {
 	char_data *mob;
+	
+	// does not work if no vnum provided
+	if (vnum == NOTHING) {
+		return NULL;
+	}
 	
 	for (mob = ROOM_PEOPLE(room); mob; mob = mob->next_in_room) {
 		// not our mob
@@ -781,6 +788,11 @@ char_data *place_chore_worker(empire_data *emp, int chore, room_data *room) {
 	
 	struct empire_npc_data *npc;
 	char_data *mob = NULL;
+	
+	// nobody to spawn
+	if (chore_data[chore].mob == NOTHING) {
+		return NULL;
+	}
 	
 	if ((npc = find_free_npc_for_chore(emp, room))) {
 		mob = spawn_empire_npc_to_room(emp, npc, room, chore_data[chore].mob);
