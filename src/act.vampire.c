@@ -1005,7 +1005,7 @@ ACMD(do_command) {
 	}
 	else if (IS_VAMPIRE(victim) && (IS_NPC(victim) || get_skill_level(victim, SKILL_VAMPIRE) > get_skill_level(ch, SKILL_VAMPIRE)))
 		msg_to_char(ch, "You cannot force your will upon those of more powerful blood.\r\n");
-	else if (get_approximate_level(ch) - get_approximate_level(victim) < level_threshold) {
+	else if (MAX(get_skill_level(ch, SKILL_VAMPIRE), get_approximate_level(ch)) - get_approximate_level(victim) < level_threshold) {
 		msg_to_char(ch, "Your victim is too powerful.\r\n");
 	}
 	else if (!AWAKE(victim))
