@@ -1404,13 +1404,13 @@ ACMD(do_search) {
 				continue;
 			if (!AFF_FLAGGED(targ, AFF_HIDE) || CAN_SEE(ch, targ))
 				continue;
-
-			SET_BIT(AFF_FLAGS(ch), AFF_SENSE_HIDE);
 			
 			if (has_ability(targ, ABIL_CLING_TO_SHADOW)) {
 				gain_ability_exp(targ, ABIL_CLING_TO_SHADOW, 20);
 				continue;
 			}
+
+			SET_BIT(AFF_FLAGS(ch), AFF_SENSE_HIDE);
 
 			if (skill_check(ch, ABIL_SEARCH, DIFF_HARD) && CAN_SEE(ch, targ)) {
 				act("You find $N!", FALSE, ch, 0, targ, TO_CHAR);
