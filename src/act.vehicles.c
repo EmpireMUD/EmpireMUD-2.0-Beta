@@ -1498,7 +1498,7 @@ ACMD(do_drag) {
 		
 		vehicle_to_room(veh, IN_ROOM(ch));
 		act("$V is dragged along with you.", FALSE, ch, NULL, veh, TO_CHAR);
-		act("$V is dragged along with $M.", FALSE, ch, NULL, veh, TO_ROOM);
+		act("$V is dragged along with $m.", FALSE, ch, NULL, veh, TO_ROOM);
 	}
 }
 
