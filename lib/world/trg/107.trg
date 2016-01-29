@@ -268,7 +268,7 @@ switch %random.3%
 done
 ~
 #10733
-Jack/Jill/Pail~
+Jack/Pail~
 0 j 100
 ~
 if %object.vnum% != 10732
@@ -452,6 +452,21 @@ end
 %purge% %object%
 return 0
 ~
+#10745
+Jill/Pail~
+0 j 100
+~
+if %object.vnum% != 10732
+  %send% %actor% %self.name% does not want that.
+  return 0
+  halt
+end
+%load% obj 10745 %actor% inv 25
+%send% %actor% %self.name% gives you a fetching skirt in exchange for the pail!
+%echoaround% %actor% %self.name% gives %actor.name% a fetching skirt in exchange for a pail!
+%purge% %object%
+return 0
+~
 #10746
 Old Woman who lived in a shoe~
 0 b 10
@@ -503,7 +518,7 @@ if (%self.vnum% != 10746)
   mmove
   mmove
   mmove
-  moove
+  mmove
 end
 ~
 $

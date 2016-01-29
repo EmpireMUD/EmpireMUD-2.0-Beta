@@ -349,6 +349,7 @@ Notes for implementors:
 - This adventure uses fixed-location instances.
 - Create an instance of the Shoe on each of your newbie islands:
   .map build 10730
+  .map unclaimable
 - Edit this adventure and set its limit to the number of shoes
   you added. Remove the IN-DEV flag and delete these lines from
   the notes.

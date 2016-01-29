@@ -273,7 +273,7 @@ a starry cloak~
 A starry cloak is draped on the ground.~
    This starry cloak has the shape of a cow jumping over the moon stitched on
 its inside. The outside of the cloak is dark blue, with glittering stars all
-over it.  
+over it.
 ~
 2 mp ak 1
 0 0 0
@@ -298,10 +298,10 @@ S
 trousers fetching pair~
 fetching trousers~
 A pair of fetching trousers are lying on the ground.~
-   This fetching pair of trousers would look good on you, although is seems to
-have gotten wet somehow.  
+   This fetching pair of trousers would look good on you, although it seems to
+have gotten wet somehow.
 ~
-2 mp af 1
+2 mp af 2
 0 0 0
 11 0
 A
@@ -339,7 +339,7 @@ shoes burnt pair~
 burnt shoes~
 A pair of burnt shoes are simmering here.~
    These shoes are a little burnt, as if their former owner missed a jump over
-a candlestick.  
+a candlestick.
 ~
 2 mp ag 2
 0 0 0
@@ -372,7 +372,7 @@ belt lean~
 a lean belt~
 A lean belt is lying here.~
    This belt makes your waistline look good. It must have been made for someone
-who eats no fat.  
+who eats no fat.
 ~
 2 mp al 4
 0 0 0
@@ -417,9 +417,9 @@ gloves plum-stained stained~
 plum-stained gloves~
 A pair of plum-stained gloves are lying on the ground.~
    These gloves are actually white, but are stained a deep plum color on the
-fingers, perhaps from being worn while eaten.  
+fingers, perhaps from being worn while eating.
 ~
-2 mp ah 2
+2 mp ah 3
 0 0 0
 11 0
 A
@@ -451,7 +451,7 @@ S
 spider dangling~
 a dangling spider~
 A spider is dangling nearby.~
-This adorable little spider looks like it would look good on your ear.  
+This adorable little spider looks like it would look good on your ear.
 ~
 2 mp am 3
 0 0 0
@@ -466,13 +466,15 @@ fleece warm~
 warm fleece~
 Some warm fleece is lying here.~
    This warm fleece is white as snow. It looks like it would protect you, a
-little bit.  
+little bit.
 ~
-2 mp ad 4
+2 mp ad 6
 0 0 0
 11 0
 A
 15 1 0
+A
+12 2 0
 C
 25 25
 S
@@ -488,6 +490,21 @@ lamb by typing 'use bell'.
 10744 0 0
 2 0
 T 9900
+S
+#10745
+skirt fetching~
+a fetching skirt~
+A fetching skirt is lying here.~
+   This fetching skirt would look good on you, although it looks like it took a
+tumble.  
+~
+2 mp af 2
+0 0 0
+11 0
+A
+11 1 0
+C
+25 25
 S
 #10746
 broth bowl leathery~
@@ -511,7 +528,7 @@ shoestring string spare~
 a spare shoestring~
 A spare shoestring is coiled up on the ground.~
    This shoestring is quite large, but you could easily loop it around your
-wrist.  
+wrist.
 ~
 2 mp aj 5
 0 0 0
