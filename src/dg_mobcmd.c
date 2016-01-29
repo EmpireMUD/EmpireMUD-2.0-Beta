@@ -705,6 +705,23 @@ ACMD(do_mload) {
 }
 
 
+ACMD(do_mmove) {
+	extern bool try_mobile_movement(char_data *ch);
+
+	if (!MOB_OR_IMPL(ch)) {
+		send_config_msg(ch, "huh_string");
+		return;
+	}
+	
+	// things that block moves
+	if (MOB_FLAGGED(ch, MOB_SENTINEL | MOB_TIED) || AFF_FLAGGED(ch, AFF_CHARM | AFF_ENTANGLED) || GET_POS(ch) != POS_STANDING || (ch->master && IN_ROOM(ch) == IN_ROOM(ch->master))) {
+		return;
+	}
+	
+	try_mobile_movement(ch);
+}
+
+
 /*
 * lets the mobile purge all objects and other npcs in the room,
 * or purge a specified object or mob in the room.  It can purge
