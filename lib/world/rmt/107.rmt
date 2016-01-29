@@ -116,4 +116,19 @@ actually be made from candy canes.
 ~
 M 0 10703 100.00 1
 S
+#10730
+Misplaced Mother Goose Spawning Chamber~
+   This room is used to spawn the Misplaced Mother Goose adventure. You
+shouldn't be in here.  
+~
+ghi 0
+M 0 10730 100.00 1
+M 0 10732 100.00 1
+M 0 10734 100.00 1
+M 0 10737 100.00 1
+M 0 10739 100.00 1
+M 0 10741 100.00 1
+M 0 10743 100.00 1
+M 0 10746 100.00 1
+S
 $

@@ -243,4 +243,282 @@ You can craft (Advanced Woodworking): sleigh
 0 0 0
 0 0
 S
+#10730
+fiddle~
+a fiddle~
+A fiddle is lying here.~
+   This fiddle, though a fine musical instrument, belongs to someone else. If
+you can find the cat who has lost the fiddle, surely he will reward you. You
+can also play it as an instrument.
+~
+22 p ao 3
+0 0 0
+0 0
+M
+2
+You play a fine melody on $p.~
+M
+3
+$n plays a fine melody on $p.~
+M
+2
+You fill the air with fine music from $p.~
+M
+3
+You dance as $n plays fine music with $p.~
+S
+#10731
+cloak starry~
+a starry cloak~
+A starry cloak is draped on the ground.~
+   This starry cloak has the shape of a cow jumping over the moon stitched on
+its inside. The outside of the cloak is dark blue, with glittering stars all
+over it.  
+~
+2 mp ak 1
+0 0 0
+11 0
+A
+18 1 0
+C
+25 25
+S
+#10732
+pail~
+a pail~
+A pail is lying on the ground.~
+   This pail is inscribed with the names 'Jack' and 'Jill', and surely they
+would reward you if you gave it back to them.
+~
+5 p a 1
+32 32 0
+0 0
+S
+#10733
+trousers fetching pair~
+fetching trousers~
+A pair of fetching trousers are lying on the ground.~
+   This fetching pair of trousers would look good on you, although is seems to
+have gotten wet somehow.  
+~
+2 mp af 1
+0 0 0
+11 0
+A
+11 1 0
+C
+25 25
+S
+#10734
+candlestick~
+a candlestick~
+A candlestick is lying here, unlit.~
+   This candlestick is made from fine copper, and is surely someone's family
+heirloom. Indeed, the base is etched with the name 'Nimble'. Perhaps if you
+could find its owner, he'd reward you.
+~
+3 p ao 2
+0 0 0
+13 0
+I 11 10735 100.00 1  # LIGHT: a lit candlestick
+S
+#10735
+candlestick lit~
+a lit candlestick~
+A lit candlestick is sitting on the ground.~
+   This candlestick is made from fine copper, and is surely someone's family
+heirloom. Indeed, the base is etched with the name 'Nimble'. Perhaps if you
+could find its owner, he'd reward you.
+~
+3 cp ao 3
+0 0 0
+13 168
+S
+#10736
+shoes burnt pair~
+burnt shoes~
+A pair of burnt shoes are simmering here.~
+   These shoes are a little burnt, as if their former owner missed a jump over
+a candlestick.  
+~
+2 mp ag 2
+0 0 0
+11 0
+A
+11 1 0
+C
+25 25
+S
+#10737
+ham fatty~
+a fatty ham~
+A large ham is lying in the dirt.~
+   The ham is mouth-watering. Nevertheless, the plate indicates it belongs to
+Jack Sprat and he must be going hungry without it. Perhaps he would reward you
+if you returned it.
+~
+6 p a 4
+72 0 0
+7 336
+M
+4
+You eat the ham, carefully making sure you eat no fat.~
+M
+4
+You eat the ham, carefully making sure you eat no lean.~
+S
+#10738
+belt lean~
+a lean belt~
+A lean belt is lying here.~
+   This belt makes your waistline look good. It must have been made for someone
+who eats no fat.  
+~
+2 mp al 4
+0 0 0
+11 0
+A
+19 1 0
+C
+25 25
+S
+#10739
+pie christmas~
+a Christmas pie~
+A Christmas pie is sitting on the ground.~
+   This is a Christmas pie, although they're good all year long. From the
+markings on the pie plate, this seems to belong to Jack Horner. Perhaps he
+would reward you if you returned it to him.
+~
+6 p a 5
+72 0 0
+7 336
+M
+4
+You eat the Christmas pie.~
+M
+4
+You eat the Christmas pie.~
+M
+4
+You stick your thumb into the Christmas pie, and pull out a plum!~
+M
+5
+$n eats a Christmas pie.~
+M
+5
+$n eats a Christmas pie.~
+M
+5
+$n sticks $s thumb into a Christmas pie, and pulls out a plum!~
+S
+#10740
+gloves plum-stained stained~
+plum-stained gloves~
+A pair of plum-stained gloves are lying on the ground.~
+   These gloves are actually white, but are stained a deep plum color on the
+fingers, perhaps from being worn while eaten.  
+~
+2 mp ah 2
+0 0 0
+11 0
+A
+17 1 0
+C
+25 25
+S
+#10741
+curds whey dish~
+curds and whey~
+Someone has left a dish of curds and whey on the ground.~
+   These curds and whey could only belong to little Miss Muffet. If you could
+find her, she might reward you for their safe return.
+~
+6 p a 5
+72 0 0
+7 336
+M
+4
+You enjoy the curds and whey.~
+M
+4
+You enjoy the curds and whey, all the while looking out for spiders.~
+M
+5
+$n enjoys some curds and whey.~
+S
+#10742
+spider dangling~
+a dangling spider~
+A spider is dangling nearby.~
+This adorable little spider looks like it would look good on your ear.  
+~
+2 mp am 3
+0 0 0
+11 0
+A
+16 1 0
+C
+25 25
+S
+#10743
+fleece warm~
+warm fleece~
+Some warm fleece is lying here.~
+   This warm fleece is white as snow. It looks like it would protect you, a
+little bit.  
+~
+2 mp ad 4
+0 0 0
+11 0
+A
+15 1 0
+C
+25 25
+S
+#10744
+bell ribbon blue~
+a bell on a blue ribbon~
+A bell on a blue ribbon is lying here.~
+   This little bell on a blue ribbon belongs to Mary's lost lamb. Surely she
+would reward you if you gave the bell back to her. You can also summon a little
+lamb by typing 'use bell'.
+~
+3 p a 6
+10744 0 0
+2 0
+T 9900
+S
+#10746
+broth bowl leathery~
+a leathery broth~
+A bowl of leathery broth is sitting here.~
+   This broth is hearty enough to chew! Surely it belongs to the woman who
+lives in the shoe. If you returned it, she might reward you.
+~
+6 p a 6
+72 0 0
+7 336
+M
+4
+You chew the leathery broth for a bit, but it doesn't taste too bad.~
+M
+5
+$n chews on a leathery broth.~
+S
+#10747
+shoestring string spare~
+a spare shoestring~
+A spare shoestring is coiled up on the ground.~
+   This shoestring is quite large, but you could easily loop it around your
+wrist.  
+~
+2 mp aj 5
+0 0 0
+11 0
+A
+2 1 0
+C
+25 25
+S
 $

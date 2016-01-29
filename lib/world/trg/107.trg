@@ -220,4 +220,290 @@ else
 end
 %purge% %self%
 ~
+#10730
+Hey Diddle Diddle~
+0 b 10
+~
+switch %random.3%
+  case 1
+    say Hey diddle diddle...
+  break
+  case 2
+    %echo% A cow jumps over the moon. Oh, that was just a reflection.
+  break
+  case 3
+    say Have you seen my fiddle?
+  break
+done
+~
+#10731
+Cat/Fiddle~
+0 j 100
+~
+if %object.vnum% != 10730
+  %send% %actor% %self.name% does not want that.
+  return 0
+  halt
+end
+%load% obj 10731 %actor% inv 25
+%send% %actor% %self.name% gives you a starry cloak in exchange for the fiddle!
+%echoaround% %actor% %self.name% gives %actor.name% a starry cloak in exchange for a fiddle!
+%purge% %object%
+return 0
+~
+#10732
+Jack~
+0 b 10
+~
+switch %random.3%
+  case 1
+    say I'm supposed to fetch some water but I've lost my pail.
+  break
+  case 2
+    say I don't like hills.
+  break
+  case 3
+    %echo% %self.name% wears some sticks like a crown.
+  break
+done
+~
+#10733
+Jack/Jill/Pail~
+0 j 100
+~
+if %object.vnum% != 10732
+  %send% %actor% %self.name% does not want that.
+  return 0
+  halt
+end
+%load% obj 10733 %actor% inv 25
+%send% %actor% %self.name% gives you a pair of fetching trousers in exchange for the pail!
+%echoaround% %actor% %self.name% gives %actor.name% a pair of fetching trousers in exchange for a pail!
+%purge% %object%
+return 0
+~
+#10734
+Jack Be Nimble~
+0 b 10
+~
+switch %random.3%
+  case 1
+    say Wanna see me jump something?
+  break
+  case 2
+    say Me mum says jumping is evel.
+  break
+  case 3
+    %echo% plants a regular stick in the ground and jumps over it, but it's just not the same.
+  break
+done
+~
+#10735
+Jack/Candlestick~
+0 j 100
+~
+if (%object.vnum% != 10734 && %object.vnum% != 10735)
+  %send% %actor% %self.name% does not want that.
+  return 0
+  halt
+end
+%load% obj 10736 %actor% inv 25
+%send% %actor% %self.name% gives you a pair of burnt shoes in exchange for the candlestick!
+%echoaround% %actor% %self.name% gives %actor.name% a pair of burnt shoes in exchange for a candlestick!
+%purge% %object%
+return 0
+~
+#10736
+Jill~
+0 b 10
+~
+switch %random.3%
+  case 1
+    say I'm supposed to fetch some water but I've lost my pail.
+  break
+  case 2
+    say Jack, that hill doesn't look safe.
+  break
+  case 3
+    %echo% %self.name% tumbles around on the ground.
+  break
+done
+~
+#10737
+Jack Sprat~
+0 b 10
+~
+switch %random.3%
+  case 1
+    say The wife says we should feed the pigs more.
+  break
+  case 2
+    say I think we overfeed the pigs.
+  break
+  case 3
+    %echo% %self.name% could eat no fat. His wife could eat no lean.
+  break
+~
+#10738
+Jack/Ham~
+0 j 100
+~
+if %object.vnum% != 10737
+  %send% %actor% %self.name% does not want that.
+  return 0
+  halt
+end
+%load% obj 10738 %actor% inv 25
+%send% %actor% %self.name% gives you a lean belt in exchange for the fatty ham!
+%echoaround% %actor% %self.name% gives %actor.name% a lean belt in exchange for a fatty ham!
+%purge% %object%
+return 0
+~
+#10739
+Jack Horner~
+0 b 10
+~
+switch %random.3%
+  case 1
+    say Mum said I have to sit in this corner.
+  break
+  case 2
+    say I can't believe we're out of pie.
+  break
+  case 3
+    %echo% %self.name% licks his lips and looks around for his pie.
+  break
+done
+~
+#10740
+Jack/Pie~
+0 j 100
+~
+if %object.vnum% != 10739
+  %send% %actor% %self.name% does not want that.
+  return 0
+  halt
+end
+%load% obj 10740 %actor% inv 25
+%send% %actor% %self.name% gives you a pair of plum-stained gloves in exchange for the Christmas pie!
+%echoaround% %actor% %self.name% gives %actor.name% a pair of plum-stained gloves in exchange for a Christmas pie!
+%purge% %object%
+return 0
+~
+#10741
+Miss Muffet~
+0 b 10
+~
+switch %random.3%
+  case 1
+    say Eek! A spider!
+  break
+  case 2
+    say Has anyone seen my curds and whey?
+  break
+  case 3
+    %echo% %self.name% dusts off her tuffet.
+  break
+done
+~
+#10742
+Muffet/Curds~
+0 j 100
+~
+if %object.vnum% != 10741
+  %send% %actor% %self.name% does not want that.
+  return 0
+  halt
+end
+%load% obj 10742 %actor% inv 25
+%send% %actor% %self.name% gives you a spider in exchange for the curds and whey!
+%echoaround% %actor% %self.name% gives %actor.name% a spider in exchange for some curds and whey!
+%purge% %object%
+return 0
+~
+#10743
+Mary~
+0 b 10
+~
+switch %random.3%
+  case 1
+    say I had a little lamb, somewhere...
+  break
+  case 2
+    say Oh where, oh where has my little lamb gone?
+  break
+  case 3
+    %echo% %self.name% seems to have lost her bell.
+  break
+done
+~
+#10744
+Mary/Lamb~
+0 j 100
+~
+if %object.vnum% != 10744
+  %send% %actor% %self.name% does not want that.
+  return 0
+  halt
+end
+%load% obj 10743 %actor% inv 25
+%send% %actor% %self.name% gives you some warm fleece in exchange for the bell!
+%echoaround% %actor% %self.name% gives %actor.name% some warm fleece in exchange for a bell and ribbon!
+%purge% %object%
+return 0
+~
+#10746
+Old Woman who lived in a shoe~
+0 b 10
+~
+switch %random.3%
+  case 1
+    say I'll whip those children if they don't behave.
+  break
+  case 2
+    say I have so many children, I don't know what to do.
+  break
+  case 3
+    %echo% %self.name% seems to have lost her broth.
+  break
+done
+~
+#10747
+Woman/Broth~
+0 j 100
+~
+if %object.vnum% != 10746
+  %send% %actor% %self.name% does not want that.
+  return 0
+  halt
+end
+%load% obj 10747 %actor% inv 25
+%send% %actor% %self.name% gives you a spare shoestring in exchange for the broth!
+%echoaround% %actor% %self.name% gives %actor.name% a spare shoestring in exchange for a leathery broth!
+%purge% %object%
+return 0
+~
+#10748
+Mother Goose spawn~
+0 n 100
+~
+eval room %self.room%
+if (!%instance.location% || %room.template% != 10730)
+  halt
+end
+%echo% %self.name% vanishes!
+mgoto %instance.location%
+%echo% %self.name% exits from the giant shoe.
+if (%self.vnum% == 10732)
+  * Jack: load Jill
+  %load% mob 10733 ally
+end
+if (%self.vnum% != 10746)
+  * If not Old Woman, move about a bit
+  mmove
+  mmove
+  mmove
+  moove
+end
+~
 $

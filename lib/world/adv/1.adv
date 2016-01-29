@@ -337,6 +337,33 @@ L
 10400 -1 -1
 0 de de
 S
+#180
+Misplaced Mother Goose~
+Paul Clarke~
+   Mother Goose has been busily writing down her nursery rhymes, but some of
+the items have gone missing. If you find what the characters are looking for,
+surely they'll be grateful. Nursery rhyme items can be found on low-level mobs
+all over the world.
+
+Notes for implementors:
+- This adventure uses fixed-location instances.
+- Create an instance of the Shoe on each of your newbie islands:
+  .map build 10730
+- Edit this adventure and set its limit to the number of shoes
+  you added. Remove the IN-DEV flag and delete these lines from
+  the notes.
+~
+10730 10749 0-25
+1 0 a 0
+L
+5 0
+10080 -1 -1
+-1 0 0
+L
+0 0
+10730 -1 -1
+14 0 0
+S
 #190
 Winter Wonderland~
 Paul Clarke and Owen Morris~
