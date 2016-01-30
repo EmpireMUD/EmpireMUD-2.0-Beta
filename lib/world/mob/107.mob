@@ -182,4 +182,102 @@ T 10748
 T 10747
 T 10746
 S
+#10750
+spider hairy giant~
+a hairy giant spider~
+A giant, hairy spider stares at you from the mine wall.
+~
+0 25 bcdgj c
+0 0 8 9
+I 0 10751 100.00 1  # BUTCHER: spider meat
+I 4 10750 90.00 1  # LOOT: spider parts
+I 4 10753 8.33 1 a  # LOOT: a spider egg
+I 4 10755 8.33 1 a  # LOOT: crusty goblin bread
+I 4 10756 8.33 1 a  # LOOT: a rusty goblin ring
+I 4 10757 8.33 1 a  # LOOT: a rusty goblin idol
+I 4 10758 8.33 1 a  # LOOT: a rusty goblin helmet
+I 4 10759 8.33 1 a  # LOOT: a rusty flask
+S
+#10751
+spider hunter~
+a hunter spider~
+A hunter spider stalks you on long legs.
+~
+0 25 bcdgj c
+0 0 8 9
+I 0 10751 100.00 1  # BUTCHER: spider meat
+I 4 10750 90.00 1  # LOOT: spider parts
+I 4 10753 8.33 1 a  # LOOT: a spider egg
+I 4 10755 8.33 1 a  # LOOT: crusty goblin bread
+I 4 10756 8.33 1 a  # LOOT: a rusty goblin ring
+I 4 10757 8.33 1 a  # LOOT: a rusty goblin idol
+I 4 10758 8.33 1 a  # LOOT: a rusty goblin helmet
+I 4 10759 8.33 1 a  # LOOT: a rusty flask
+S
+#10752
+spider widow massive~
+a massive widow spider~
+A massive widow spider eyes you from her nest.
+~
+0 25 bcdgjA ce
+2 0 8 9
+I 0 10751 100.00 1  # BUTCHER: spider meat
+I 4 10750 90.00 1  # LOOT: spider parts
+I 4 10767 100.00 1  # LOOT: some goblin coins
+I 4 10753 12.50 1 a  # LOOT: a spider egg
+I 4 10760 12.50 1 a  # LOOT: a spidersilk gown
+I 4 10761 12.50 1 a  # LOOT: a spidersilk pouch
+I 4 10762 12.50 1 a  # LOOT: a spidersilk whip
+I 4 10763 12.50 1 a  # LOOT: a spidersilk lantern
+I 4 10764 12.50 1 a  # LOOT: a lit spidersilk lantern
+I 4 10765 12.50 1 a  # LOOT: spidersilk slippers
+I 4 10766 12.50 1 a  # LOOT: a spidersilk mask
+T 10757
+S
+#10753
+spiderling~
+a spiderling~
+A spiderling crawls over its master.
+~
+1 1 bdoD n
+0 0 8 9
+T 9901
+T 9902
+S
+#10754
+nynar goblin miner~
+Miner Nynar~
+Nynar the goblin stands here, looking into his boot ('buy potion').
+~
+25 25 d cn
+1 0 0 15
+T 10756
+T 10753
+T 10754
+S
+#10755
+meena miner goblin~
+Miner Meena~
+Meena the goblin is sitting here, filing her pick ('buy pick').
+~
+25 25 d cn
+2 0 0 15
+T 10756
+T 10752
+T 10755
+S
+#10756
+goblin webbed goblin-shaped coccoon~
+the webbed goblin~
+A goblin-shaped coccoon dangles from the ceiling.
+~
+0 1 bdn 0
+0 0 0 15
+I 4 10767 4.17 1 a  # LOOT: some goblin coins
+I 4 10755 4.17 1 a  # LOOT: crusty goblin bread
+I 4 10756 4.17 1 a  # LOOT: a rusty goblin ring
+I 4 10757 4.17 1 a  # LOOT: a rusty goblin idol
+I 4 10758 4.17 1 a  # LOOT: a rusty goblin helmet
+I 4 10759 4.17 1 a  # LOOT: a rusty flask
+S
 $

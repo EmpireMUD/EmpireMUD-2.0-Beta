@@ -496,7 +496,7 @@ skirt fetching~
 a fetching skirt~
 A fetching skirt is lying here.~
    This fetching skirt would look good on you, although it looks like it took a
-tumble.  
+tumble.
 ~
 2 mp af 2
 0 0 0
@@ -537,5 +537,219 @@ A
 2 1 0
 C
 25 25
+S
+#10750
+parts spider pile~
+spider parts~
+A pile of spider parts is lying on the ground.~
+   These bits of spider are gross and gooey, and have a foul smell. But you've
+heard goblins sometimes use them to brew potions, so you might be able to sell
+them if you can find the right buyer.
+(Type 'sell parts' when you find Miner Nynar.)
+~
+3 k a 3
+0 0 0
+7 0
+T 10750
+S
+#10751
+meat spider~
+spider meat~
+Some spider meat is globbed on the ground.~
+   This meat looks -- and smells -- awful. It might improve if you cooked it,
+or you could probably just sell it to the goblins.  
+(Type 'sell meat' when you find Miner Meena.)
+~
+6 0 a 3
+4 0 0
+7 24
+T 10751
+S
+#10752
+meat spider cooked~
+cooked spider meat~
+Some spider meat is lying on the ground.~
+   Spider meat actually improves significantly after you cook it. Now it just
+tastes like rancid chicken.  
+~
+6 0 a 3
+12 0 0
+7 24
+T 10751
+S
+#10753
+egg spider~
+a spider egg~
+A spider egg is lying here.~
+This egg will summon a spiderling minipet if you use it.
+~
+3 p a 5
+10753 0 0
+7 0
+T 9900
+S
+#10754
+potion bug~
+a bug potion~
+A bug potion is sitting here.~
+This potion smells foul, but it will help you in combat.
+~
+25 0 a 2
+8 25 0
+8 0
+S
+#10755
+bread goblin crusty~
+crusty goblin bread~
+Some crusty goblin bread is lying on the ground.~
+This bread is a bit tough to eat, but it doesn't taste too bad.
+~
+6 0 a 2
+24 0 0
+7 336
+S
+#10756
+ring rusty goblin~
+a rusty goblin ring~
+A rusty goblin ring is lying on the ground.~
+This iron ring pokes at your finger, and leaves your skin stained.  
+~
+2 mp ab 1
+0 0 0
+2 0
+A
+17 1 0
+S
+#10757
+idol goblin rusty~
+a rusty goblin idol~
+A rusty goblin idol is planted in the ground.~
+   This old idol looks like it was once shaped like an animal, but you can't
+tell whether it was a warg or a cow.  
+~
+2 mp ao 2
+0 0 0
+2 0
+A
+8 1 0
+S
+#10758
+helmet goblin rusty~
+a rusty goblin helmet~
+A rusty goblin helmet is lying in the dust.~
+This old helmet probably helped a goblin out in battle once or twice.
+~
+2 mp ae 3
+0 0 0
+2 0
+A
+1 1 0
+S
+#10759
+flask rusty~
+a rusty flask~
+A rusty flask is lying here.~
+This old flask certainly doesn't taste as good as it looks.
+~
+5 0 a 1
+24 24 4
+2 0
+S
+#10760
+gown silk spidersilk~
+a spidersilk gown~
+A silk gown is draped on the ground.~
+This fine gown looks like it was actually woven by a spider.
+~
+2 o ad 1
+0 0 0
+11 0
+S
+#10761
+pouch silk spidersilk~
+a spidersilk pouch~
+A silk pouch is lying here.~
+This pouch is actually just a hatched coccoon!
+~
+24 mp ar 1
+1 0 0
+11 0
+S
+#10762
+whip silk spidersilk~
+a spidersilk whip~
+A silk whip is coiled here.~
+This whip is actually just a thick strand of spiderweb.
+~
+1 hmp an 1
+0 1 7
+11 0
+S
+#10763
+lantern silk spidersilk~
+a spidersilk lantern~
+A spidersilk lantern was left here.~
+You wonder if you could light it without burning yourself.
+~
+3 0 ao 2
+0 0 0
+11 0
+I 11 10764 100.00 1  # LIGHT: a lit spidersilk lantern
+S
+#10764
+lantern lit spidersilk silk~
+a lit spidersilk lantern~
+A lit spidersilk lantern is lying on the ground.~
+The spidersilk burns nicely.
+~
+3 c ao 2
+0 0 0
+11 168
+S
+#10765
+slippers silk pair spidersilk~
+spidersilk slippers~
+A pair of silk slippers sits here.~
+These slippers are comfortable, but sort of stick when you walk.
+~
+2 mp ag 6
+0 0 0
+11 0
+A
+6 1 0
+S
+#10766
+mask silk spidersilk~
+a spidersilk mask~
+A silk mask has fallen here.~
+This mask makes you look like some kind of superhero.
+~
+2 mp ae 5
+0 0 0
+11 0
+A
+4 1 0
+S
+#10767
+coins goblin pile~
+some goblin coins~
+A pile of goblin coins are lying here.~
+The coins appear to be made of rusted iron.
+~
+11 mp a 6
+1 -1 0
+2 0
+S
+#10768
+pick goblin~
+a goblin pick~
+A goblin pick is stabbed into the ground.~
+It's a fine pick, if somewhat small.
+~
+1 mp ano 2
+0 1 8
+2 0
+C
+0 25
 S
 $

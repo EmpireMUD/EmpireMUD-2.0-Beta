@@ -521,4 +521,186 @@ if (%self.vnum% != 10746)
   mmove
 end
 ~
+#10750
+Sell spider parts to Miner Nynar~
+1 c 2
+sell~
+eval test %%self.is_name(%arg%)%%
+* Test keywords
+if !%test%
+  return 0
+  halt
+end
+* find Miner Nynar
+eval room %actor.room%
+eval iter %room.people%
+eval found 0
+while %iter% && !%found%
+  if %iter.vnum% == 10754
+    eval found 1
+  end
+  eval iter %iter.next_in_room%
+done
+if !%found%
+  return 0
+  halt
+end
+%send% %actor% You sell %self.shortdesc% to Miner Nynar for 5 goblin coins.
+%echoaround% %actor% %actor.name% sells %self.shortdesc% to Miner Nynar.
+nop %actor.give_coins(5)%
+%purge% %self%
+~
+#10751
+Sell spider meat to Miner Meena~
+1 c 2
+sell~
+eval test %%self.is_name(%arg%)%%
+* Test keywords
+if !%test%
+  return 0
+  halt
+end
+* find Miner Nynar
+eval room %actor.room%
+eval iter %room.people%
+eval found 0
+while %iter% && !%found%
+  if %iter.vnum% == 10755
+    eval found 1
+  end
+  eval iter %iter.next_in_room%
+done
+if !%found%
+  return 0
+  halt
+end
+%send% %actor% You sell %self.shortdesc% to Miner Meena for 5 goblin coins.
+%echoaround% %actor% %actor.name% sells %self.shortdesc% to Miner Meena.
+nop %actor.give_coins(5)%
+%purge% %self%
+~
+#10752
+Buy Pick/Meena~
+0 c 0
+buy~
+eval vnum -1
+set named a thing
+if (!%arg%)
+  %send% %actor% %self.name% tells you, 'Meena only sell pick.'
+  %send% %actor% (Type 'buy pick' to spend 50 coins and buy a goblin pick.)
+  halt
+elseif pick ~= %arg%
+  eval vnum 10768
+  set named a goblin pick
+else
+  %send% %actor% %self.name% tells you, 'Meena don't sell %arg%.'
+  halt
+end
+if !%actor.can_afford(50)%
+  %send% %actor% %self.name% tells you, 'Big human needs 50 coin to buy that.'
+  halt
+end
+nop %actor.charge_coins(50)%
+%load% obj %vnum% %actor% inv 25
+%send% %actor% You buy %named% for 50 coins.
+%echoaround% %actor% %actor.name% buys %named%.
+~
+#10753
+Buy Potion/Nynar~
+0 c 0
+buy~
+eval vnum -1
+set named a thing
+if (!%arg%)
+  %send% %actor% %self.name% tells you, 'Nynar only sell bug potion.'
+  %send% %actor% (Type 'buy potion' to spend 30 coins and buy a bug potion.)
+  halt
+elseif bug potion ~= %arg%
+  eval vnum 10754
+  set named a bug potion
+else
+  %send% %actor% %self.name% tells you, 'Nynar don't sell %arg%.'
+  halt
+end
+if !%actor.can_afford(30)%
+  %send% %actor% %self.name% tells you, 'Big human needs 30 coin to buy that.'
+  halt
+end
+nop %actor.charge_coins(30)%
+%load% obj %vnum% %actor% inv 25
+%send% %actor% You buy %named% for 30 coins.
+%echoaround% %actor% %actor.name% buys %named%.
+~
+#10754
+Nynar env~
+0 b 10
+~
+switch %random.4%
+  case 1
+    say So much webs... So much webs...
+    %echo% %self.name% shivers uncomfortably.
+  break
+  case 2
+    say Nynar sell bug potion for 30 coin!
+    %echo% (Type 'buy potion' to buy one.)
+  break
+  case 3
+    %echo% %self.name% scratches %self.himher%self all over.
+  break
+  case 4
+    say Never going back there.
+  break
+done
+~
+#10755
+Meena env~
+0 b 10
+~
+switch %random.4%
+  case 1
+    say All of the screaming!
+    %echo% %self.name% shivers uncomfortably.
+  break
+  case 2
+    say Meena sell goblin pick for 50 coin!
+    %echo% (Type 'buy pick' to buy one.)
+  break
+  case 3
+    %echo% %self.name% leaps up suddenly, as if something crawled up her leg.
+  break
+  case 4
+    say Meena should have been a major.
+  break
+done
+~
+#10756
+Goblin Miner Spawn~
+0 n 100
+~
+eval room %self.room%
+if (!%instance.location% || %room.template% != 10750)
+  halt
+end
+%echo% %self.name% flees the mine!
+mgoto %instance.location%
+%echo% %self.name% comes screaming out of the mine!
+mmove
+mmove
+mmove
+mmove
+mmove
+mmove
+mmove
+mmove
+mmove
+mmove
+~
+#10757
+Widow Spider Complete~
+0 f 100
+~
+%buildingecho% %self.room% You hear the terrifying skree of the widow spider dying!
+%adventurecomplete%
+return 0
+~
 $
