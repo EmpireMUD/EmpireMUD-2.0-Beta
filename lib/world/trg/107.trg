@@ -700,7 +700,13 @@ Widow Spider Complete~
 0 f 100
 ~
 %buildingecho% %self.room% You hear the terrifying skree of the widow spider dying!
-%adventurecomplete%
+%load% obj 10769
 return 0
+~
+#10769
+Delayed Completer~
+1 f 0
+~
+%adventurecomplete%
 ~
 $
