@@ -656,7 +656,7 @@ void mobile_activity(void) {
 		found = FALSE;
 
 		/* Aggressive Mobs */
-		if (!found && MOB_FLAGGED(ch, MOB_AGGRESSIVE) && !ISLAND_FLAGGED(IN_ROOM(ch), ISLE_NO_AGGRO)) {
+		if (!found && MOB_FLAGGED(ch, MOB_AGGRESSIVE) && (IS_ADVENTURE_ROOM(IN_ROOM(ch)) || !ISLAND_FLAGGED(IN_ROOM(ch), ISLE_NO_AGGRO))) {
 			for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict && !found; vict = vict->next_in_room) {
 				if (vict == ch) {
 					continue;
