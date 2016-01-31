@@ -147,7 +147,7 @@ bool check_can_still_fight(char_data *ch, char_data *victim) {
 * @return bool TRUE if the attack hits, or FALSE if not.
 */
 bool check_hit_vs_dodge(char_data *attacker, char_data *victim, bool off_hand) {
-	int chance;
+	double tohit, max, min, chance;
 	
 	int level_tolerance = 50;	// must be within X levels to get minimum hit chance
 	int min_npc_to_hit = 25;	// min chance an NPC will hit the target
@@ -159,19 +159,21 @@ bool check_hit_vs_dodge(char_data *attacker, char_data *victim, bool off_hand) {
 	}
 	
 	if (AWAKE(victim)) {
-		chance = get_to_hit(attacker, victim, off_hand, TRUE) - get_dodge_modifier(victim, attacker, TRUE);
+		// basic numbers
+		max = get_dodge_modifier(victim, attacker, TRUE) + 100;	// hit must be higher than dodge by this much for a perfect score
+		tohit = get_to_hit(attacker, victim, off_hand, TRUE);
 		
 		// limits IF the character is at least close in level
 		if (get_approximate_level(attacker) >= (get_approximate_level(victim) - level_tolerance)) {
-			if (IS_NPC(attacker)) {
-				chance = MAX(chance, min_npc_to_hit);
-			}
-			else {
-				chance = MAX(chance, min_pc_to_hit);
-			}
+			min = IS_NPC(attacker) ? min_npc_to_hit : min_pc_to_hit;
+		}
+		else {
+			min = 0;
 		}
 		
-		return (chance >= number(1, 100));
+		// real chance to hit is what % chance is of max
+		chance = tohit * 100 / max;
+		return (chance >= (number(1, 100) - min));
 	}
 	else {
 		// not awake: always hit
