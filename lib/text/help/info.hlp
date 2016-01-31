@@ -884,10 +884,10 @@ a base to-hit of 50 with no gear, representing a 50% chance to hit a level 1
 mob.
 
 Players always have a minimum of 5% final chance to hit (mobs have 25%), so
-long as they're within 50 levels of the target. Your opponent's Dodge rating
-is subtracted from your to-hit to determine your final chance to-hit. You can
-compute the "hit cap" -- the point at which you'll hit 100% of the time --
-based on the level of the mob you're fighting.
+long as they're within 50 levels of the target. Your actual chance to hit is
+based on your opponent's Dodge rating. You can compute the "hit cap" -- the
+point at which you'll hit 100% of the time -- based on the level of the mob
+you're fighting.
 
 Hit cap:
 - Start with the mob's level, minus 50 (not less than 0)
