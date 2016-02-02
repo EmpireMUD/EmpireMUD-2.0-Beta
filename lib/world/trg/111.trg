@@ -663,7 +663,7 @@ if %instance.id%
   * swap in i11150 for the old stone marker
   %door% i11130 east room i11150
   %echo% You find yourself back at the stone marker, where the adventure began!
-  %echo% %self.name% has vanished.
+  %echo% %self.shortdesc% has vanished.
   %teleport% adventure i11150
   return 0
   %purge% %self%
