@@ -158,11 +158,30 @@ bool check_hit_vs_dodge(char_data *attacker, char_data *victim, bool off_hand) {
 		return FALSE;
 	}
 	
-	if (AWAKE(victim)) {
-		// basic numbers
+	if (!AWAKE(victim)) {
+		// not awake: always hit
+		return TRUE;
+	}
+	
+	if (IS_NPC(attacker)) {
+		// mob/player dodging a mob
+		// NOTE: this currently uses two different formulae in order to provide a real dodge cap for tanks vs mobs
+		chance = get_to_hit(attacker, victim, off_hand, TRUE) - get_dodge_modifier(victim, attacker, TRUE);
+		
+		// limits IF the character is at least close in level
+		if (get_approximate_level(attacker) >= (get_approximate_level(victim) - level_tolerance)) {
+			min = IS_NPC(attacker) ? min_npc_to_hit : min_pc_to_hit;
+			chance = MAX(chance, min);
+		}
+		
+		return (chance >= number(1, 100));
+	}
+	else {
+		// mob/player dodging a player
+		// NOTE: this version is mainly to make it easier for players to hit things
 		max = get_dodge_modifier(victim, attacker, TRUE) + 100;	// hit must be higher than dodge by this much for a perfect score
 		tohit = get_to_hit(attacker, victim, off_hand, TRUE);
-		
+	
 		// limits IF the character is at least close in level
 		if (get_approximate_level(attacker) >= (get_approximate_level(victim) - level_tolerance)) {
 			min = IS_NPC(attacker) ? min_npc_to_hit : min_pc_to_hit;
@@ -170,14 +189,10 @@ bool check_hit_vs_dodge(char_data *attacker, char_data *victim, bool off_hand) {
 		else {
 			min = 0;
 		}
-		
+	
 		// real chance to hit is what % chance is of max
 		chance = tohit * 100 / max;
 		return (chance >= (number(1, 100) - min));
-	}
-	else {
-		// not awake: always hit
-		return TRUE;
 	}
 }
 
