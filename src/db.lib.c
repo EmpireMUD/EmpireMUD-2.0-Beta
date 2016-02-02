@@ -1647,6 +1647,8 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 				shipd->shipping_id = t[5];
 				shipd->ship_origin = t[6];
 				shipd->next = NULL;
+				
+				EMPIRE_TOP_SHIPPING_ID(emp) = MAX(shipd->shipping_id, EMPIRE_TOP_SHIPPING_ID(emp));
 
 				// append to end
 				if (last_shipd) {
