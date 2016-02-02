@@ -177,6 +177,19 @@ Note: You must use "mkill" (not "%kill%") for this.
 Example:
   mkill %actor%
 #d
+MMOVE %MOVE%
+
+Usage:  mmove
+
+This causes the mob to attempt a normal random movement, like it does
+periodically anyway. This won't work on SENTINEL mobs, or ones who are
+entangled or following someone.
+
+Note: You must use "mmove" (not "%move%") for this.
+
+Example:
+  mmove
+#d
 "MTRIG COMMANDS" "MOB COMMANDS" TRIGEDIT-MOB-COMMANDS
 
 Mobs can use any normal player commands in their triggers (except a few which

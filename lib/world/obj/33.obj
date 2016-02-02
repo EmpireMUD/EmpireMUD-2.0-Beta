@@ -489,4 +489,17 @@ $n slices off a piece of catfish and pops it into $s mouth, followed quickly by 
 R
 5619 0
 S
+#3329
+meat fillet roast~
+a fillet of roast meat~
+A fillet of roast meat is sitting on the ground here.~
+   You're not sure what this is from, but it probably tastes fine. Or at least
+better than it would have raw.  
+~
+6 0 a 2
+18 0 0
+7 96
+R
+5619 0
+S
 $
