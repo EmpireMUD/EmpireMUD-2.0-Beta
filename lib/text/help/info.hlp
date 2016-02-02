@@ -370,8 +370,9 @@ banks will eventually run out. For most resources, you will receive a message
 telling you the area is depleted. For example, digging might tell you the
 ground is too hard and there are no good rocks left.
 
-Most depletions recover over time, at the rate of 1/2 per game year. However,
-mines will never replenish unless you dismantle them completely.
+Most depleted resources recover over time. In each tile, half of the depleted
+resources (not the total resources) will return. However, mines will never
+replenish unless you dismantle them completely.
 
 Forests will spread at their edges over time, creating more trees to chop.
 Desert Groves re-grow on their own, at random.
