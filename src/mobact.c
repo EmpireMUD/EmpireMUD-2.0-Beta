@@ -336,10 +336,15 @@ char *replace_npc_names(const char *str, const char *name, const char *empire_na
 * @param int sex Which sex it should be -- NOTHING for auto-pick
 */
 void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex) {
+	char *free_name = NULL, *free_short = NULL, *free_long = NULL;
 	struct generic_name_data *name_set;
+	char_data *proto;
+	
+	// will work with the proto to make them re-stringable
+	proto = mob_proto(GET_MOB_VNUM(mob));
 	
 	// short-circuit
-	if (!strchr(GET_PC_NAME(mob), '#') && !strchr(GET_SHORT_DESC(mob), '#') && !strchr(GET_LONG_DESC(mob), '#')) {
+	if (!strchr(GET_PC_NAME(proto ? proto : mob), '#') && !strchr(GET_SHORT_DESC(proto ? proto : mob), '#') && !strchr(GET_LONG_DESC(proto ? proto : mob), '#')) {
 		// no # codes: no work to do
 		return;
 	}
@@ -374,11 +379,32 @@ void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex) {
 	MOB_DYNAMIC_SEX(mob) = sex;
 	MOB_DYNAMIC_NAME(mob) = name;
 	
+	// mark strings for freeing later (this patches a small memory leak on mobs whose strings weren't prototypical)
+	if (GET_PC_NAME(mob) && (!proto || GET_PC_NAME(mob) != GET_PC_NAME(proto))) {
+		free_name = GET_PC_NAME(mob);
+	}
+	if (GET_SHORT_DESC(mob) && (!proto || GET_SHORT_DESC(mob) != GET_SHORT_DESC(proto))) {
+		free_short = GET_SHORT_DESC(mob);
+	}
+	if (GET_LONG_DESC(mob) && (!proto || GET_LONG_DESC(mob) != GET_LONG_DESC(proto))) {
+		free_long = GET_LONG_DESC(mob);
+	}
+	
 	// restrings: uses "afar"/"lost" if there is no empire
-	// TODO slight memory leak here if strings != proto
-	GET_PC_NAME(mob) = str_dup(replace_npc_names(GET_PC_NAME(mob), name_set->names[name], !emp ? "afar" : EMPIRE_NAME(emp), !emp ? "lost" : EMPIRE_ADJECTIVE(emp)));
-	GET_SHORT_DESC(mob) = str_dup(replace_npc_names(GET_SHORT_DESC(mob), name_set->names[name], !emp ? "afar" : EMPIRE_NAME(emp), !emp ? "lost" : EMPIRE_ADJECTIVE(emp)));
-	GET_LONG_DESC(mob) = str_dup(replace_npc_names(GET_LONG_DESC(mob), name_set->names[name], !emp ? "afar" : EMPIRE_NAME(emp), !emp ? "lost" : EMPIRE_ADJECTIVE(emp)));
+	GET_PC_NAME(mob) = str_dup(replace_npc_names(GET_PC_NAME(proto ? proto : mob), name_set->names[name], !emp ? "afar" : EMPIRE_NAME(emp), !emp ? "lost" : EMPIRE_ADJECTIVE(emp)));
+	GET_SHORT_DESC(mob) = str_dup(replace_npc_names(GET_SHORT_DESC(proto ? proto : mob), name_set->names[name], !emp ? "afar" : EMPIRE_NAME(emp), !emp ? "lost" : EMPIRE_ADJECTIVE(emp)));
+	GET_LONG_DESC(mob) = str_dup(replace_npc_names(GET_LONG_DESC(proto ? proto : mob), name_set->names[name], !emp ? "afar" : EMPIRE_NAME(emp), !emp ? "lost" : EMPIRE_ADJECTIVE(emp)));
+	
+	// and free that memory if necessary
+	if (free_name) {
+		free(free_name);
+	}
+	if (free_short) {
+		free(free_short);
+	}
+	if (free_long) {
+		free(free_long);
+	}
 }
 
 
@@ -630,7 +656,7 @@ void mobile_activity(void) {
 		found = FALSE;
 
 		/* Aggressive Mobs */
-		if (!found && MOB_FLAGGED(ch, MOB_AGGRESSIVE) && !ISLAND_FLAGGED(IN_ROOM(ch), ISLE_NO_AGGRO)) {
+		if (!found && MOB_FLAGGED(ch, MOB_AGGRESSIVE) && (IS_ADVENTURE_ROOM(IN_ROOM(ch)) || !ISLAND_FLAGGED(IN_ROOM(ch), ISLE_NO_AGGRO))) {
 			for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict && !found; vict = vict->next_in_room) {
 				if (vict == ch) {
 					continue;

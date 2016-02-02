@@ -337,6 +337,62 @@ L
 10400 -1 -1
 0 de de
 S
+#180
+Misplaced Mother Goose~
+Paul Clarke~
+   Mother Goose has been busily writing down her nursery rhymes, but some of
+the items have gone missing. If you find what the characters are looking for,
+surely they'll be grateful. Nursery rhyme items can be found on low-level mobs
+all over the world.
+
+Notes for implementors:
+- This adventure uses fixed-location instances.
+- Create an instance of the Shoe on each of your newbie islands:
+  .map build 10730
+  .map unclaimable
+- Edit this adventure and set its limit to the number of shoes
+  you added. Remove the IN-DEV flag and delete these lines from
+  the notes.
+~
+10730 10749 0-25
+1 0 a 0
+L
+5 0
+10080 -1 -1
+-1 0 0
+L
+0 0
+10730 -1 -1
+14 0 0
+S
+#181
+Goblin Mines~
+Paul Clarke~
+   The goblins have fled the mines and something tells you it's not good. 
+Venture into the goblin mines and see what sends even goblins running for their
+lives! And maybe if you can find those goblins, they'll be willing to reward
+you for clearing out the mine.  
+
+Directions for implementors:
+- Increase the instance limit to the number of newbie islands in your game.
+- If you aren't using newbie islands, you should remove NEWBIE-ONLY.
+- Make sure your newbie islands have mountains.
+~
+10750 10774 0-25
+1 0 eh 0
+L
+5 0
+10080 -1 -1
+-1 0 0
+L
+1 0
+10750 -1 -1
+9 c bdeln
+L
+6 0
+80 -1 -1
+-1 0 0
+S
 #190
 Winter Wonderland~
 Paul Clarke and Owen Morris~

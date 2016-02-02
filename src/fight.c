@@ -147,7 +147,7 @@ bool check_can_still_fight(char_data *ch, char_data *victim) {
 * @return bool TRUE if the attack hits, or FALSE if not.
 */
 bool check_hit_vs_dodge(char_data *attacker, char_data *victim, bool off_hand) {
-	int chance;
+	double tohit, max, min, chance;
 	
 	int level_tolerance = 50;	// must be within X levels to get minimum hit chance
 	int min_npc_to_hit = 25;	// min chance an NPC will hit the target
@@ -158,24 +158,41 @@ bool check_hit_vs_dodge(char_data *attacker, char_data *victim, bool off_hand) {
 		return FALSE;
 	}
 	
-	if (AWAKE(victim)) {
+	if (!AWAKE(victim)) {
+		// not awake: always hit
+		return TRUE;
+	}
+	
+	if (IS_NPC(attacker)) {
+		// mob/player dodging a mob
+		// NOTE: this currently uses two different formulae in order to provide a real dodge cap for tanks vs mobs
 		chance = get_to_hit(attacker, victim, off_hand, TRUE) - get_dodge_modifier(victim, attacker, TRUE);
 		
 		// limits IF the character is at least close in level
 		if (get_approximate_level(attacker) >= (get_approximate_level(victim) - level_tolerance)) {
-			if (IS_NPC(attacker)) {
-				chance = MAX(chance, min_npc_to_hit);
-			}
-			else {
-				chance = MAX(chance, min_pc_to_hit);
-			}
+			min = IS_NPC(attacker) ? min_npc_to_hit : min_pc_to_hit;
+			chance = MAX(chance, min);
 		}
 		
 		return (chance >= number(1, 100));
 	}
 	else {
-		// not awake: always hit
-		return TRUE;
+		// mob/player dodging a player
+		// NOTE: this version is mainly to make it easier for players to hit things
+		max = get_dodge_modifier(victim, attacker, TRUE) + 100;	// hit must be higher than dodge by this much for a perfect score
+		tohit = get_to_hit(attacker, victim, off_hand, TRUE);
+	
+		// limits IF the character is at least close in level
+		if (get_approximate_level(attacker) >= (get_approximate_level(victim) - level_tolerance)) {
+			min = IS_NPC(attacker) ? min_npc_to_hit : min_pc_to_hit;
+		}
+		else {
+			min = 0;
+		}
+	
+		// real chance to hit is what % chance is of max
+		chance = tohit * 100 / max;
+		return (chance >= (number(1, 100) - min));
 	}
 }
 
@@ -2263,7 +2280,18 @@ void check_auto_assist(char_data *ch) {
 		}
 		
 		// already busy
-		if (ch == ch_iter || FIGHTING(ch) == ch_iter || GET_POS(ch_iter) < POS_STANDING || FIGHTING(ch_iter) || AFF_FLAGGED(ch_iter, AFF_STUNNED | AFF_NO_ATTACK) || IS_INJURED(ch_iter, INJ_TIED | INJ_STAKED) || !CAN_SEE(ch_iter, FIGHTING(ch)) || GET_FEEDING_FROM(ch_iter) || GET_FED_ON_BY(ch_iter) || MOB_FLAGGED(ch_iter, MOB_NO_ATTACK)) {
+		if (ch == ch_iter || FIGHTING(ch) == ch_iter || GET_POS(ch_iter) < POS_STANDING || FIGHTING(ch_iter) || AFF_FLAGGED(ch_iter, AFF_STUNNED | AFF_NO_ATTACK) || IS_INJURED(ch_iter, INJ_TIED | INJ_STAKED) || !CAN_SEE(ch_iter, FIGHTING(ch)) || GET_FEEDING_FROM(ch_iter) || GET_FED_ON_BY(ch_iter)) {
+			continue;
+		}
+		
+		// champion
+		if (iter_master == ch && FIGHTING(ch) && FIGHTING(FIGHTING(ch)) == ch && IS_NPC(ch_iter) && MOB_FLAGGED(ch_iter, MOB_CHAMPION) && FIGHT_MODE(FIGHTING(ch)) == FMODE_MELEE) {
+			perform_rescue(ch_iter, ch, FIGHTING(ch));
+			continue;
+		}
+		
+		// things which stop normal auto-assist but not champion
+		if (MOB_FLAGGED(ch_iter, MOB_NO_ATTACK)) {
 			continue;
 		}
 		
@@ -2278,12 +2306,6 @@ void check_auto_assist(char_data *ch) {
 		else if (iter_master == ch && AFF_FLAGGED(ch_iter, AFF_CHARM)) {
 			// charm
 			assist = TRUE;
-		}
-		
-		// champion
-		if (iter_master == ch && FIGHTING(ch) && FIGHTING(FIGHTING(ch)) == ch && IS_NPC(ch_iter) && MOB_FLAGGED(ch_iter, MOB_CHAMPION) && FIGHT_MODE(FIGHTING(ch)) == FMODE_MELEE) {
-			perform_rescue(ch_iter, ch, FIGHTING(ch));
-			continue;
 		}
 		
 		// if we got this far and hit an assist condition

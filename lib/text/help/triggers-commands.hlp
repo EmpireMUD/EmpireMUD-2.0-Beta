@@ -368,6 +368,7 @@ Usage:  makeuid <variable> <id>
         makeuid <variable> mob <target>
         makeuid <variable> obj <target>
         makeuid <variable> vehicle <target>
+        makeuid <variable> empire <name>
 
 Creates a new variable with the name given, whose contents shall be suitable 
 for referring to a character, object, or room whose id is provided.
@@ -414,6 +415,21 @@ Here is a workaround to use a variable:
   *nop workaround
   eval making %%self.give_coins(%coins%)%%
   nop %making%
+#d
+%OWN% MOWN OOWN VOWN WOWN
+
+Usage:  %own% [type] <target> <empire>
+
+This command changes empire ownership of a thing (mob, obj, vehicle, or room).
+Be very careful using this command in scripts, as it wields a great deal of
+power.
+
+Examples:
+  %own% room %actor.empire%
+  %own% %self% %empire%
+  %own% veh cart %empire%
+
+See also: EMPIRE VARS
 #d
 %PURGE% MPURGE OPURGE VPURGE WPURGE
 

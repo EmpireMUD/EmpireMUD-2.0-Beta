@@ -150,13 +150,19 @@ say I could use some more rat skins, if you have any.
 Ratskins's reward~
 0 c 100
 trade~
+eval test %%self.varexists(gave%actor.name%)%%
+if %test%
+  %send% %actor% You have already completed this quest in this adventure.
+  halt
+end
 if (%actor.has_resources(10013,15)%)
   nop %actor.add_resources(10013,-15)%
   say Excellent, %actor.name%, this is exactly what I was looking for!
   %load% o 10015 %actor% inv
   %send% %actor% %self.name% gives you the ratskin totem.
   %echoaround% %actor% %self.name% gives %actor.name% the ratskin totem.
-  detach all %self.id%
+  eval gave%actor.name% 1
+  remote gave%actor.name% %self.id%
 else
   say What I'm looking for is 15 rat skins.
 end

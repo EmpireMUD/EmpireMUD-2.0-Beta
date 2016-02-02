@@ -705,6 +705,23 @@ ACMD(do_mload) {
 }
 
 
+ACMD(do_mmove) {
+	extern bool try_mobile_movement(char_data *ch);
+
+	if (!MOB_OR_IMPL(ch)) {
+		send_config_msg(ch, "huh_string");
+		return;
+	}
+	
+	// things that block moves
+	if (MOB_FLAGGED(ch, MOB_SENTINEL | MOB_TIED) || AFF_FLAGGED(ch, AFF_CHARM | AFF_ENTANGLED) || GET_POS(ch) != POS_STANDING || (ch->master && IN_ROOM(ch) == IN_ROOM(ch->master))) {
+		return;
+	}
+	
+	try_mobile_movement(ch);
+}
+
+
 /*
 * lets the mobile purge all objects and other npcs in the room,
 * or purge a specified object or mob in the room.  It can purge
@@ -1817,6 +1834,149 @@ ACMD(do_mfollow) {
 	k->follower = ch;
 	k->next = leader->followers;
 	leader->followers = k;
+}
+
+
+ACMD(do_mown) {
+	void do_dg_own(empire_data *emp, char_data *vict, obj_data *obj, room_data *room, vehicle_data *veh);
+	
+	char type_arg[MAX_INPUT_LENGTH], targ_arg[MAX_INPUT_LENGTH], emp_arg[MAX_INPUT_LENGTH];
+	vehicle_data *vtarg = NULL;
+	empire_data *emp = NULL;
+	char_data *vict = NULL;
+	room_data *rtarg = NULL;
+	obj_data *otarg = NULL;
+	
+	*emp_arg = '\0';	// just in case
+
+	if (!MOB_OR_IMPL(ch) || AFF_FLAGGED(ch, AFF_ORDERED)) {
+		send_config_msg(ch, "huh_string");
+		return;
+	}
+	
+	// first arg -- possibly a type
+	argument = one_argument(argument, type_arg);
+	if (is_abbrev(type_arg, "room")) {
+		argument = one_argument(argument, targ_arg);
+		skip_spaces(&argument);
+		
+		if (!*targ_arg) {
+			mob_log(ch, "mown: Too few arguments (mown room)");
+			return;
+		}
+		else if (!*argument) {
+			// this was the last arg
+			strcpy(emp_arg, targ_arg);
+		}
+		else if (!(rtarg = find_target_room(ch, targ_arg))) {
+			mob_log(ch, "mown: Invalid room target");
+			return;
+		}
+		else {
+			// room is set; remaining arg is owner
+			strcpy(emp_arg, argument);
+		}
+	}
+	else if (is_abbrev(type_arg, "mobile")) {
+		argument = one_argument(argument, targ_arg);
+		skip_spaces(&argument);
+		strcpy(emp_arg, argument);	// always
+		
+		if (!*targ_arg || !*emp_arg) {
+			mob_log(ch, "mown: Too few arguments (mown mob)");
+			return;
+		}
+		else if (!(vict = ((*targ_arg == UID_CHAR) ? get_char(targ_arg) : get_char_room_vis(ch, targ_arg)))) {
+			mob_log(ch, "mown: Invalid mob target");
+			return;
+		}
+	}
+	else if (is_abbrev(type_arg, "vehicle")) {
+		argument = one_argument(argument, targ_arg);
+		skip_spaces(&argument);
+		strcpy(emp_arg, argument);	// always
+		
+		if (!*targ_arg || !*emp_arg) {
+			mob_log(ch, "mown: Too few arguments (mown vehicle)");
+			return;
+		}
+		else if (!(vtarg = ((*targ_arg == UID_CHAR) ? get_vehicle(targ_arg) : get_vehicle_in_room_vis(ch, targ_arg)))) {
+			mob_log(ch, "mown: Invalid vehicle target");
+			return;
+		}
+	}
+	else if (is_abbrev(type_arg, "object")) {
+		argument = one_argument(argument, targ_arg);
+		skip_spaces(&argument);
+		strcpy(emp_arg, argument);	// always
+		
+		if (!*targ_arg || !*emp_arg) {
+			mob_log(ch, "mown: Too few arguments (mown obj)");
+			return;
+		}
+		else if (!(otarg = ((*targ_arg == UID_CHAR) ? get_obj(targ_arg) : get_obj_vis(ch, targ_arg)))) {
+			mob_log(ch, "mown: Invalid obj target");
+			return;
+		}
+	}
+	else {	// attempt to find a target
+		strcpy(targ_arg, type_arg);	// there was no type
+		
+		if (!*targ_arg) {
+			mob_log(ch, "mown: Too few arguments");
+			return;
+		}
+		else if (*targ_arg == UID_CHAR && !(vict = get_char(targ_arg)) && !(vtarg = get_vehicle(targ_arg)) && !(otarg = get_obj(targ_arg)) && !(rtarg = get_room(IN_ROOM(ch), targ_arg))) {
+			mob_log(ch, "mown: Unable to find target %s", targ_arg);
+			return;
+		}
+		else if ((vict = get_char_room_vis(ch, targ_arg)) || (vtarg = get_vehicle_in_room_vis(ch, targ_arg)) || (otarg = get_obj_in_list_vis(ch, targ_arg, ch->carrying)) || (otarg = get_obj_in_list_vis(ch, targ_arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
+			// must have been found
+			skip_spaces(&argument);
+			strcpy(emp_arg, argument);
+		}
+		else {
+			mob_log(ch, "mown: Invalid target");
+			return;
+		}
+	}
+	
+	// only change owner on the home room
+	if (rtarg) {
+		rtarg = HOME_ROOM(rtarg);
+	}
+	
+	// check that we got a target
+	if (!vict && !vtarg && !rtarg && !otarg) {
+		mob_log(ch, "mown: Unable to find a target");
+		return;
+	}
+	
+	// process the empire
+	if (!*emp_arg) {
+		mob_log(ch, "mown: No empire argument given");
+		return;
+	}
+	else if (!str_cmp(emp_arg, "none")) {
+		emp = NULL;	// set owner to none
+	}
+	else if (!(emp = get_empire(emp_arg))) {
+		mob_log(ch, "mown: Invalid empire");
+		return;
+	}
+	
+	// final target checks
+	if (vict && !IS_NPC(vict)) {
+		mob_log(ch, "mown: Attempting to change the empire of a player");
+		return;
+	}
+	if (rtarg && IS_ADVENTURE_ROOM(rtarg)) {
+		mob_log(ch, "mown: Attempting to change ownership of an adventure room");
+		return;
+	}
+	
+	// do the ownership change
+	do_dg_own(emp, vict, otarg, rtarg, vtarg);
 }
 
 

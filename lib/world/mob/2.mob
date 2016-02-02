@@ -3,7 +3,7 @@ child boy little~
 a boy~
 A little boy is playing here.
 ~
-1 10 dqv 0
+5 10 dqv 0
 1 0 0 15
 S
 #201
@@ -11,7 +11,7 @@ child girl little~
 a girl~
 A little girl is playing here.
 ~
-1 10 dqv 0
+5 10 dqv 0
 2 0 0 15
 S
 #202
@@ -19,7 +19,7 @@ S
 #n~
 #n, citizen of #e, is standing here.
 ~
-40 60 dqv 0
+20 50 dqv 0
 1 0 0 15
 S
 #203
@@ -27,7 +27,7 @@ S
 #n~
 #n, citizen of #e, is standing here.
 ~
-40 60 dqv 0
+20 50 dqv 0
 2 0 0 15
 S
 #204
@@ -51,7 +51,7 @@ S
 farmer #n~
 Farmer #n is working the fields.
 ~
-40 60 bdqv 0
+20 50 bdqv 0
 1 0 0 1
 S
 #207
@@ -59,7 +59,7 @@ S
 feller #n~
 Feller #n is chopping trees.
 ~
-40 60 bdqv 0
+20 50 bdqv 0
 1 0 0 2
 S
 #208
@@ -67,7 +67,7 @@ S
 miner #n~
 Miner #n is looking for ore.
 ~
-40 60 bdqv 0
+20 50 bdqv 0
 1 0 0 3
 S
 #209
@@ -75,7 +75,7 @@ S
 builder #n~
 Builder #n is hard at work.
 ~
-40 60 bdqv 0
+20 50 bdqv 0
 1 0 0 6
 S
 #210
@@ -83,7 +83,7 @@ S
 #n Miller~
 #n Miller is pouring some flour into a sack.
 ~
-40 60 bdqv 0
+20 50 bdqv 0
 1 0 0 15
 S
 #211
@@ -91,7 +91,7 @@ S
 #n Potter~
 #n Potter is cleaning up the shop.
 ~
-40 60 bdqv 0
+20 50 bdqv 0
 1 0 0 15
 S
 #212
@@ -99,7 +99,7 @@ S
 #n Smith~
 #n Smith is sharpening a sword.
 ~
-40 60 bdqv 0
+20 50 bdqv 0
 1 0 0 15
 I 4 2105 100.00 1  # LOOT: a hammer
 S
@@ -108,7 +108,7 @@ S
 Stablemaster #n~
 Stablemaster #n is tending the animals.
 ~
-40 60 bdqv 0
+20 50 bdqv 0
 1 0 0 7
 S
 #214
@@ -116,7 +116,7 @@ S
 #n the baker~
 #n the baker is mixing dough.
 ~
-40 60 bdqv 0
+20 50 bdqv 0
 1 0 0 15
 I 4 3313 100.00 2  # LOOT: a loaf of bread
 S
@@ -125,7 +125,7 @@ S
 #n the glassblower~
 #n the glassblower is tending the oven.
 ~
-40 60 bdqv 0
+20 50 bdqv 0
 1 0 0 15
 S
 #216
@@ -133,7 +133,7 @@ S
 Imperial Engineer #n~
 Imperial Engineer #n is standing here.
 ~
-40 60 bdqv 0
+20 50 bdqv 0
 1 0 0 15
 S
 #217
@@ -141,7 +141,7 @@ S
 #n Wright~
 #n Wright is sweeping up sawdust.
 ~
-40 60 bdqv 0
+20 50 bdqv 0
 1 0 0 6
 S
 #218
@@ -149,7 +149,7 @@ S
 #n the Beekeeper~
 #n the Beekeeper is standing here.
 ~
-40 60 bdqv 0
+20 50 bdqv 0
 1 0 0 15
 S
 #219
@@ -157,7 +157,7 @@ S
 #n Taylor~
 #n Taylor is mending a gown.
 ~
-40 60 bdqv 0
+20 50 bdqv 0
 1 0 0 15
 S
 #220
@@ -165,7 +165,7 @@ S
 Old #n~
 Old #n the #a barkeep is standing here.
 ~
-40 60 bdqv 0
+20 50 bdqv 0
 1 0 0 15
 S
 #221
@@ -173,7 +173,7 @@ S
 #n, Master of Shadow~
 Master #n is sitting here, watching you.
 ~
-100 150 bdqvA 0
+100 125 bdqvA 0
 1 0 0 4
 T 221
 T 222
@@ -183,7 +183,7 @@ dog grayhound greyhound hound~
 a greyhound~
 A greyhound is running around.
 ~
-20 40 djoq c
+5 15 djoq c
 0 0 14 9
 T 9012
 S
@@ -192,7 +192,7 @@ dog terrier small~
 a terrier~
 A small terrier is sitting here.
 ~
-10 30 djoq c
+5 15 djoq c
 0 0 14 9
 T 9012
 S
@@ -201,7 +201,7 @@ S
 #n~
 #n is busy digging.
 ~
-40 60 bdqv 0
+20 50 bdqv 0
 1 0 0 6
 S
 #225
@@ -209,7 +209,7 @@ S
 #n~
 #n is gathering sticks.
 ~
-40 60 bdqv 0
+20 50 bdqv 0
 1 0 0 6
 S
 #226
@@ -217,7 +217,7 @@ mobile new~
 a new mobile~
 A new mobile is standing here.
 ~
-40 60 d 0
+20 50 d 0
 0 0 0 15
 S
 #227
@@ -225,7 +225,7 @@ S
 #n~
 #n is scraping off trees.
 ~
-40 60 bdqv 0
+20 50 bdqv 0
 1 0 0 6
 S
 #228
@@ -246,7 +246,7 @@ S
 #n the repairman~
 #n, the repairman, is hard at work.
 ~
-40 60 bdqv 0
+20 50 bdqv 0
 1 0 0 6
 S
 #230
@@ -262,7 +262,7 @@ S
 #n the Alchemist~
 #n the Alchemist is standing at the counter.
 ~
-40 60 bdqv 0
+20 50 bdqv 0
 1 0 0 15
 S
 #232
@@ -270,7 +270,7 @@ foreman mine~
 the mine foreman~
 The mine foreman is standing here.
 ~
-40 60 bdqv 0
+20 50 bdqv 0
 1 0 0 15
 S
 #233
@@ -278,7 +278,7 @@ stablehand hand~
 a stablehand~
 A stablehand is standing here.
 ~
-40 60 bdqv 0
+20 50 bdqv 0
 1 0 0 15
 S
 #234
@@ -286,7 +286,7 @@ daughter miller's millers girl~
 the miller's daughter~
 The miller's daughter is standing here.
 ~
-10 30 bdqv 0
+10 15 bdqv 0
 2 0 0 15
 S
 #235
@@ -294,7 +294,7 @@ butler unusual~
 an unusual butler~
 An unusual butler is standing here.
 ~
-40 60 dqv 0
+20 50 dqv 0
 1 0 0 15
 S
 #236
@@ -302,7 +302,7 @@ bather bathing citizen~
 a bathing citizen~
 A bathing citizen is lounging here.
 ~
-40 60 bdqv 0
+20 50 bdqv 0
 1 0 0 15
 S
 #237
@@ -310,7 +310,7 @@ sorcerer city~
 a city sorcerer~
 A city sorcerer is standing here.
 ~
-75 100 dquvx 0
+50 75 dquvx 0
 1 0 0 16
 I 4 1107 10.00 1  # LOOT: a wooden staff
 I 4 1206 10.00 1 X  # LOOT: an iridescent blue iris
@@ -323,7 +323,7 @@ diplomat foreign~
 a foreign diplomat~
 A foreign diplomat is standing here.
 ~
-40 60 dqv 0
+20 50 dqv 0
 2 0 0 15
 S
 #239
@@ -331,7 +331,7 @@ dignitary visiting~
 a visiting dignitary~
 A visiting dignitary is standing here.
 ~
-40 60 dqv 0
+20 50 dqv 0
 1 0 0 15
 S
 #240
@@ -339,7 +339,7 @@ trader wandering~
 a wandering trader~
 A wandering trader is standing here.
 ~
-40 60 dqv 0
+20 50 dqv 0
 1 0 0 15
 S
 #241
@@ -347,7 +347,7 @@ apprentice young~
 a young apprentice~
 A young apprentice is standing here.
 ~
-20 40 bdqv 0
+10 15 bdqv 0
 1 0 0 15
 S
 #242
@@ -355,7 +355,7 @@ patron drunk~
 a drunk patron~
 A drunk patron is standing here.
 ~
-20 40 bdqv 0
+20 50 bdqv 0
 1 0 0 15
 S
 #243
@@ -363,7 +363,7 @@ druid~
 a druid~
 A druid is chanting here.
 ~
-40 60 dqvx c
+20 50 dqvx c
 1 0 0 16
 I 4 1107 10.00 1  # LOOT: a wooden staff
 S
@@ -372,7 +372,7 @@ priest~
 the priest~
 The priest is standing here.
 ~
-40 60 bdqv 0
+20 50 bdqv 0
 1 0 0 15
 I 4 1107 10.00 1  # LOOT: a wooden staff
 S
@@ -381,7 +381,7 @@ knight court~
 a court knight~
 A court knight is standing here.
 ~
-75 100 dquvz 0
+50 75 dquvz 0
 1 0 0 1
 I 4 2202 10.00 1  # LOOT: an arming sword
 I 4 2210 10.00 1  # LOOT: a mace
@@ -408,7 +408,7 @@ boy lost~
 a lost boy~
 A lost boy is hiding here.
 ~
-1 10 dqv 0
+5 10 dqv 0
 1 0 0 15
 S
 #248
@@ -416,7 +416,7 @@ knight traveling travelling~
 a traveling knight~
 A traveling knight is standing here.
 ~
-75 95 dquvz c
+20 50 dquvz c
 2 0 0 1
 I 4 2310 10.00 1  # LOOT: splint vambraces
 I 4 2315 10.00 1  # LOOT: a kite shield
@@ -429,7 +429,7 @@ sailor lost~
 a lost sailor~
 A lost sailor is lurking in the shadows.
 ~
-30 50 dlqv c
+20 50 dlqv c
 1 0 3 4
 S
 #250
@@ -450,7 +450,7 @@ guard cityguard~
 a city guard~
 A city guard is standing here.
 ~
-100 125 dqtuv c
+75 100 dqtuvA c
 1 0 0 1
 I 4 2202 10.00 1  # LOOT: an arming sword
 I 4 2210 10.00 1  # LOOT: a mace
@@ -474,7 +474,7 @@ scout #a~
 a #a scout~
 A #a scout is standing here.
 ~
-60 80 dqtv c
+50 75 dqtv c
 1 0 0 1
 I 4 2202 10.00 1  # LOOT: an arming sword
 I 4 2210 10.00 1  # LOOT: a mace
@@ -486,7 +486,7 @@ imperial guard~
 an imperial guard~
 An imperial guard is standing here.
 ~
-100 140 bdpqtuvy 0
+75 100 bdpqtuvyB 0
 1 0 0 1
 I 4 2202 10.00 1  # LOOT: an arming sword
 I 4 2210 10.00 1  # LOOT: a mace
@@ -498,7 +498,7 @@ sailor~
 a sailor~
 A sailor is standing here.
 ~
-40 60 dqv 0
+20 50 dqv 0
 1 0 0 15
 S
 #256
@@ -506,7 +506,7 @@ S
 #n~
 #n is sawing trees into lumber.
 ~
-40 60 bdqv 0
+20 50 bdqv 0
 1 0 0 6
 S
 #257
@@ -514,7 +514,7 @@ S
 #n~
 #n is smelting ore into ingots.
 ~
-40 60 bdqv 0
+20 50 bdqv 0
 1 0 0 6
 S
 #258
@@ -522,7 +522,7 @@ S
 #n~
 #n is weaving cloth.
 ~
-40 60 bdqv 0
+20 50 bdqv 0
 1 0 0 6
 S
 #259
@@ -530,7 +530,7 @@ S
 #n~
 #n is cutting stone from the quarry.
 ~
-40 60 bdqv 0
+20 50 bdqv 0
 1 0 0 6
 S
 #260
@@ -538,7 +538,7 @@ S
 #n~
 #n is forging nails for building.
 ~
-40 60 bdqv 0
+20 50 bdqv 0
 1 0 0 6
 S
 #261
@@ -546,7 +546,7 @@ S
 #n~
 #n is making bricks from clay.
 ~
-40 60 bdqv 0
+20 50 bdqv 0
 1 0 0 6
 S
 #262
@@ -554,7 +554,7 @@ S
 gardener #n~
 Gardener #n is tending the herbs.
 ~
-40 60 bdqv 0
+20 50 bdqv 0
 1 0 0 1
 S
 #263
@@ -562,7 +562,7 @@ S
 Postmaster #n~
 Postmaster #n is tending the cages.
 ~
-40 60 bdqv 0
+20 50 bdqv 0
 1 0 0 15
 S
 #264
@@ -570,7 +570,7 @@ bootlegger~
 a bootlegger~
 A bootlegger is standing here.
 ~
-40 60 dqv c
+20 50 dqv c
 1 0 0 15
 I 4 2115 50.00 1  # LOOT: a cask
 S
@@ -579,7 +579,7 @@ S
 #n~
 #n is here with a bucket trying to put out the fire!
 ~
-40 60 bdqv 0
+20 50 bdqv 0
 1 0 0 1
 S
 #266
@@ -587,7 +587,7 @@ S
 trapper #n~
 #n is tending the skins.
 ~
-40 60 bdqv 0
+20 50 bdqv 0
 1 0 0 1
 S
 #267
@@ -595,7 +595,7 @@ S
 tanner #n~
 #n is tanning leather.
 ~
-40 60 bdqv 0
+20 50 bdqv 0
 1 0 0 1
 S
 #268
@@ -603,7 +603,7 @@ S
 stablehand #n~
 #n is sharpening some shears.
 ~
-40 60 bdqv 0
+20 50 bdqv 0
 1 0 0 1
 S
 #269
@@ -611,7 +611,7 @@ maker coinmaker #n~
 #n the coin maker~
 #n is working the coin mill.
 ~
-40 60 bdqv 0
+20 50 bdqv 0
 1 0 0 1
 S
 #270
@@ -619,7 +619,7 @@ dockworker worker #n~
 dockworker #n~
 #n is moving crates around the docks.
 ~
-40 60 bdqv 0
+20 50 bdqv 0
 1 0 0 1
 S
 #271
@@ -627,7 +627,7 @@ S
 apprentice exarch #n~
 Apprentice Exarch #n is working on a nexus crystal.
 ~
-40 60 bdqv 0
+20 50 bdqv 0
 1 0 0 16
 S
 #272
@@ -635,7 +635,7 @@ S
 #n~
 #n is working as the miller's apprentice.
 ~
-40 60 bdqv 0
+20 50 bdqv 0
 1 0 0 6
 S
 #273
@@ -643,7 +643,15 @@ S
 #n the repairman~
 #n, the repairman, is hard at work.
 ~
-40 60 bdqv 0
+20 50 bdqv 0
 1 0 0 6
+S
+#274
+overseer #n~
+Overseer #n~
+Overseer #n is standing here.
+~
+20 50 bdqv 0
+1 0 0 1
 S
 $

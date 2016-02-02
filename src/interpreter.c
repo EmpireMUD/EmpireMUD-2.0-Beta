@@ -125,6 +125,7 @@ ACMD(do_disguise);
 ACMD(do_dismantle);
 ACMD(do_dismiss);
 ACMD(do_dismount);
+ACMD(do_dispatch);
 ACMD(do_dispel);
 ACMD(do_display);
 ACMD(do_distance);
@@ -446,6 +447,7 @@ ACMD(do_mechoneither);
 ACMD(do_msend);
 ACMD(do_mecho);
 ACMD(do_mload);
+ACMD(do_mmove);
 ACMD(do_mpurge);
 ACMD(do_mgoto);
 ACMD(do_maoe);
@@ -463,6 +465,7 @@ ACMD(do_mforget);
 ACMD(do_mscale);
 ACMD(do_mtransform);
 ACMD(do_mbuildingecho);
+ACMD(do_mown);
 ACMD(do_mregionecho);
 ACMD(do_mvehicleecho);
 ACMD(do_vdelete);
@@ -616,6 +619,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "distance", POS_DEAD, do_distance, LVL_START_IMM, CTYPE_IMMORTAL ),
 	STANDARD_CMD( "dig", POS_STANDING, do_dig, LVL_APPROVED, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "display", POS_DEAD, do_display, NO_MIN, CTYPE_UTIL ),
+	SIMPLE_CMD( "dispatch", POS_RESTING, do_dispatch, NO_MIN, CTYPE_UTIL ),
 	ABILITY_CMD( "dispel", POS_FIGHTING, do_dispel, NO_MIN, CTYPE_SKILL, ABIL_DISPEL ),
 	ABILITY_CMD( "diversion", POS_FIGHTING, do_diversion, NO_MIN, CTYPE_SKILL, ABIL_DIVERSION ),
 	SIMPLE_CMD( "douse", POS_STANDING, do_douse, NO_MIN, CTYPE_BUILD ),
@@ -1004,9 +1008,11 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "mechoneither", POS_DEAD, do_mechoneither, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
 	STANDARD_CMD( "msend", POS_DEAD, do_msend, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
 	STANDARD_CMD( "mload", POS_DEAD, do_mload, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
+	STANDARD_CMD( "mmove", POS_STANDING, do_mmove, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
 	STANDARD_CMD( "mpurge", POS_DEAD, do_mpurge, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
 	STANDARD_CMD( "mgoto", POS_DEAD, do_mgoto, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
 	STANDARD_CMD( "mat", POS_DEAD, do_mat, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
+	STANDARD_CMD( "mown", POS_DEAD, do_mown, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
 	STANDARD_CMD( "mscale", POS_DEAD, do_mscale, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
 	STANDARD_CMD( "msiege", POS_DEAD, do_msiege, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
 	STANDARD_CMD( "mteleport", POS_DEAD, do_mteleport, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),

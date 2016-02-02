@@ -176,6 +176,56 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 
 
 /**
+* Performs a script-caused ownership change on one (or more) things.
+*
+* @param empire_data *emp The empire to change ownership to (may be NULL for none).
+* @param char_data *vict Optional: A mob whose ownership to change.
+* @param obj_data *obj Optional: An object whose ownership to change.
+* @param room_data *room Optional: A room whose ownership to change.
+* @param vehicle_data *veh Optional: A vehicle whose ownership to change.
+*/
+void do_dg_own(empire_data *emp, char_data *vict, obj_data *obj, room_data *room, vehicle_data *veh) {
+	void kill_empire_npc(char_data *ch);
+	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
+	
+	if (vict && IS_NPC(vict)) {
+		if (GET_LOYALTY(vict) && emp != GET_LOYALTY(vict) && GET_EMPIRE_NPC_DATA(vict)) {
+			// resets the population timer on their house
+			kill_empire_npc(vict);
+		}
+		GET_LOYALTY(vict) = emp;
+		setup_generic_npc(vict, emp, MOB_DYNAMIC_NAME(vict), MOB_DYNAMIC_SEX(vict));
+	}
+	if (obj) {
+		obj->last_empire_id = emp ? EMPIRE_VNUM(emp) : NOTHING;
+	}
+	if (veh) {
+		if (VEH_OWNER(veh) && emp != VEH_OWNER(veh) ) {
+			VEH_SHIPPING_ID(veh) = -1;
+			if (VEH_INTERIOR_HOME_ROOM(veh)) {
+				abandon_room(VEH_INTERIOR_HOME_ROOM(veh));
+			}
+		}
+		VEH_OWNER(veh) = emp;
+		if (emp && VEH_INTERIOR_HOME_ROOM(veh)) {
+			claim_room(VEH_INTERIOR_HOME_ROOM(veh), emp);
+		}
+	}
+	if (room) {
+		if (ROOM_OWNER(room) && emp != ROOM_OWNER(room)) {
+			abandon_room(room);
+		}
+		if (emp) {
+			claim_room(room, emp);
+		}
+		if (GET_ROOM_VEHICLE(room)) {
+			VEH_OWNER(GET_ROOM_VEHICLE(room)) = emp;
+		}
+	}
+}
+
+
+/**
 * Do the actual work for the %terracrop% commands, once everything has been
 * validated.
 *

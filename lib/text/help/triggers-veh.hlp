@@ -80,6 +80,7 @@ When using field  - The variable returns:
 &cdriver&0 - The person driving/sailing the vehicle, if any.
 &cdump&0 - Empties everything out of the vehicle, including people.
 &cdump_objects&0 - Empties just the contents, if the vehicle is a container.
+&cempire&0 - The empire that owns the vehicle, if any.
 &cempire_id&0 - ID of the empire that owns the vehicle, if any.
 &cempire_name&0 - The name of the empire that owns the vehicle, if any.
 &cextinguish&0 - If the vehicle is on fire, puts it out.
@@ -106,6 +107,6 @@ When using field  - The variable returns:
 &cunharness&0 - Detaches all mobs that were harnessed to it.
 &cvnum&0 - The vehicle's vnum.
 
-See also: VEDIT FLAGS
+See also: EMPIRE VARS, VEDIT FLAGS
 #d
 $~

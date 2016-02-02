@@ -1014,6 +1014,8 @@ void SET_ISLAND_ID(room_data *room, int island);	// formerly a #define and a roo
 #define IS_ROAD(room)  ROOM_SECT_FLAGGED((room), SECTF_IS_ROAD)
 #define IS_UNCLAIMABLE(room)  (ROOM_AFF_FLAGGED((room), ROOM_AFF_UNCLAIMABLE))
 #define IS_WATER_BUILDING(room)  (ROOM_BLD_FLAGGED((room), BLD_SAIL))
+#define WATER_SECT(room)		(ROOM_SECT_FLAGGED((room), SECTF_FRESH_WATER | SECTF_OCEAN) || ROOM_BLD_FLAGGED((room), BLD_NEED_BOAT) || RMT_FLAGGED((room), RMT_NEED_BOAT) || (IS_WATER_BUILDING(room) && !IS_COMPLETE(room) && SECT_FLAGGED(BASE_SECT(room), SECTF_FRESH_WATER | SECTF_OCEAN)))
+#define DEEP_WATER_SECT(room)	(ROOM_SECT_FLAGGED((room), SECTF_OCEAN))
 
 
  //////////////////////////////////////////////////////////////////////////////

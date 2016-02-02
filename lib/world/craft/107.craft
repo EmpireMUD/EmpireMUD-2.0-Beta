@@ -41,4 +41,11 @@ Christmas cookies~
 R
 3312 2  # 2x a sack of flour
 S
+#10752
+spider meat~
+10752 1
+3 -1 h 2 10751
+R
+10751 1  # 1x spider meat
+S
 $

@@ -116,4 +116,107 @@ actually be made from candy canes.
 ~
 M 0 10703 100.00 1
 S
+#10730
+Misplaced Mother Goose Spawning Chamber~
+   This room is used to spawn the Misplaced Mother Goose adventure. You
+shouldn't be in here.
+~
+ghi 0
+M 0 10730 100.00 1
+M 0 10732 100.00 1
+M 0 10734 100.00 1
+M 0 10737 100.00 1
+M 0 10739 100.00 1
+M 0 10741 100.00 1
+M 0 10743 100.00 1
+M 0 10746 100.00 1
+S
+#10750
+A Mine Shaft~
+   At the bottom of the ladder, and just beyond the reach of the outside light,
+you find the entrance to the mine shaft. The walls appears to have been scraped
+clear by picks -- and possibly claws. Little ore remains.  
+~
+bd 0
+D5
+~
+0 10751
+M 0 10754 100.00 1
+M 0 10755 100.00 1
+S
+#10751
+A Mine Shaft~
+   The mine shaft twists around on itself, slowly sloping downward. A
+chittering sound comes from lower in the mine, and you can't help but notice
+that the walls here have a lot of spiderwebs on them.  
+~
+bd 0
+D6
+~
+0 10750
+D9
+~
+0 10752
+M 0 10751 75.00 2
+S
+#10752
+An Old Mining Tunnel~
+   The floor clings to your feet as you step, and you realize that every inch
+of the tunnel is covered in spiderwebs. You think you can see eyes reflecting
+your light, but maybe if you are very lucky, those will turn out to be precious
+gems instead.  
+~
+bd 0
+D8
+~
+0 10751
+D7
+~
+0 10753
+M 0 10750 75.00 2
+S
+#10753
+An Old Mining Tunnel~
+   The spiderwebs are thicker here, and you notice more than one spot where it
+looks like something was cocooned into the walls. It makes you wonder how many
+goblins were working this old mine.  
+~
+bd 0
+D4
+~
+0 10752
+D9
+~
+0 10754
+M 0 10751 75.00 2
+S
+#10754
+A Web-Covered Cavern~
+   The tunnel in the goblin mine breaks through into a natural cavern here. 
+There's no evidence of mining, so perhaps the goblins broke through only to
+find themselves in a spider's nest.  
+~
+bd 0
+D8
+~
+0 10753
+D6
+~
+0 10755
+M 0 10750 75.00 2
+S
+#10755
+A Web-Covered Cavern~
+   You have reached the end of the spiderweb-filled cavern, and this is clearly
+the nest of a very large spider. Empty egg sacs dangle from every stalactite.
+Trails of rust run from old cocoons. And there is a distinct chittering noise
+that tells you trouble is not far.  
+~
+bd 0
+D5
+~
+0 10754
+M 0 10752 100.00 1
+M 0 10756 100.00 1
+S
 $
