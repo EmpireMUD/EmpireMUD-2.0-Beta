@@ -61,6 +61,7 @@ BARRACKS FORT
 Resources:  40 lumber, 10 nails, 20 bricks
 Built on:  plains, desert
 Extra rooms:  10, interlink
+Military:  20
 
 The barracks are one of the main parts of forts and outposts. It provides
 military to the city, and can be interlinked with other buildings.
@@ -1097,6 +1098,7 @@ See also: TRADE ROUTES, TRADE COMMAND
 Resources:  40 lumber, 10 nails, 20 bricks
 Built on:  plains, desert
 Extra rooms:  10, interlink
+Military:  20
 
 The training yard serves as an entrance to various fort facilities and as such,
 you can designate extra rooms and interlink with other buildings.
