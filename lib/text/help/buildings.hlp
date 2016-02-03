@@ -842,7 +842,9 @@ Built on:  plains, desert
 Stables are a safe place to keep your animals. You can also use them as a place
 to milk cows or shear sheep. This is also where you can barde horses.
 
-Most animals will not de-spawn if left in a stable.
+Most animals will not despawn if left in a stable, but there is a limit on the
+number of duplicate animals in each stable, after which any extras will despawn
+normally. (By default, this limit is 2.)
 
 See also: BARDE, MILK, SHEAR
 #
