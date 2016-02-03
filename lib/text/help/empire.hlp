@@ -436,6 +436,7 @@ Log types are:
  Members - Logs related to promotions, defections, and other member changes.
  Territory - Logs such as cede, and city commands.
  Trade - Logs related to empire trades.
+ Shipping - Logs related to shipping.
  
 See also: PRIVILEGE
 #
