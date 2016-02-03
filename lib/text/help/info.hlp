@@ -426,11 +426,12 @@ come from spells, abilities, scripts, and other sources. They deal damage every
 five seconds until they expire.
 
 Some DoT effects can stack multiple times. The damage shown on your score or
-affects command is the total damage per 5 seconds (base x stacks), and the number at the end
-like (1/5) is the number and maximum number of stacks.
+affects command is the total damage per 5 seconds (base multiplied by stacks),
+and the number at the end (example: 1/5) is the current and maximum number of
+stacks.
 
-Physical DoTs can be removed by firstaid. Magical and poison DoTs can be
-removed by cleanse.
+Physical and poison DoTs can be removed by firstaid and cleanse. Magical and
+fire DoTs can be removed by dispel.
 
 See also: AFFECTS, CLEANSE, DISPEL, FIRSTAID, SCORE
 #
