@@ -70,6 +70,9 @@ Cloak of Darkness (Stealth ability)
 
 This passive ability keeps you from being spotted at range on the map, and
 reduces the chance of guard towers seeing you.
+
+This ability gains skill points when you would be spotted on the map, or a
+tower would try to shoot you.
 #
 CONCEALMENT
 
@@ -461,6 +464,9 @@ Unseen Passing (Stealth ability)
 
 When in a city or indoors, Unseen Passing makes you immune to the "where" and
 "track" commands. It doesn't work in the wilderness.
+
+This ability gains skill points whenever it prevents you from being found with
+"where", and whenever it prevents you from leaving tracks.
 
 See also: NO TRACE, WHERE, TRACK
 #
