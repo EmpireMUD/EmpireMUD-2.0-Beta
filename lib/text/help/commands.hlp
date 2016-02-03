@@ -813,7 +813,7 @@ Usage:  lay
 You may use this ability to lay 20 rocks into the ground to form a cobblestone 
 road. Roads eliminate the small movement lag that you normally get while
 walking. They can aid in tree and crop control -- nothing will grow over the
-roads.
+roads, but they will eventually decay if left unclaimed.
 
 The lay command is also used to pull up a road and retrieve half its rocks.
 
