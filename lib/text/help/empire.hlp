@@ -239,9 +239,10 @@ COMMERCE
 Commerce (Empire ability)
 
 The Commerce ability allows your empire to trade globally, increasing its
-influence. The empire can now gain additional territory from its Wealth. Only
-one member of the empire must have this ability to gain the benefit. There is
-no additional benefit to more members having it.
+influence. The empire can now gain additional territory from its Wealth, up to
+3x its normal limit (for a total of 4x). Only one member of the empire must have
+this ability to gain the benefit. There is no additional benefit to more members
+having it.
 
 Commerce also allows you to build the mint building, and mint your own coins:
 
@@ -1107,7 +1108,8 @@ territory is:
 
 * Greatness: This is the total Greatness of all members.
 * Wealth: Only empires with the Commerce tech can gain territory from Wealth.
-      You can gain wealth by storing precious metals in your vault.
+      You can gain wealth by storing precious metals in your vault. Max
+	  territory from commerce is equal to 3x normal territory.
 * Technologies: Each technology you unlock (e.g. City Lights) gives 15. These
       only count once per empire, so two members with City Lights will not
       result in +30 territory.
