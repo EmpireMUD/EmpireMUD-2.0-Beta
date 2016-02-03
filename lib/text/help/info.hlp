@@ -563,10 +563,10 @@ Do not try to get out of a fight by breaking link. You will likely still die.
 MANA "MANA POINTS" "MANA POOL" "MAGIC POINTS"
 
 The mana pool is the amount of magical energy you can channel before you must
-stop to recover some. All players begin with 50 mana points and start to rise
-around level 80. Your base mana at level 100 is based on your class.
+stop to recover some. All players begin with 50 mana points and start to gain
+more around level 75. Your base mana at level 100 is based on your class.
 
-See also: CLASS, GIFT OF NATURE
+See also: ARCANE POWER, CLASS, GIFT OF NATURE, SOLAR POWER
 #
 MOVE MOVES "MOVE POINTS" "MOVEMENT POINTS"
 
