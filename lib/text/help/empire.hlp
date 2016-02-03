@@ -1113,9 +1113,9 @@ territory is:
       result in +30 territory.
 
 80% of an empire's maximum must be within the borders of its cities. Only 20%
-of your total territory can be outside of cities. However, some buildings, such
-as Mines, do not count as outside territory no matter where you build them.
-Roads also do not count as outside.
+of your total territory can be outside of cities. Roads and some buildings, such
+as Mines, count as in-city territory up to 3x as far out as the edge of the city
+radius.
 
 When an empire's members start to time out from lack of gameplay, the empire
 may start losing territory.
