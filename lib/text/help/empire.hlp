@@ -434,9 +434,9 @@ Log types are:
  Diplomacy - Logs related to diplomacy.
  Hostility - Logs related to war and stealth.
  Members - Logs related to promotions, defections, and other member changes.
+ Shipping - Logs related to shipping.
  Territory - Logs such as cede, and city commands.
  Trade - Logs related to empire trades.
- Shipping - Logs related to shipping.
  
 See also: PRIVILEGE
 #
