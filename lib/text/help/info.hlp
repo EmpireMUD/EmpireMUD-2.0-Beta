@@ -543,9 +543,11 @@ Composite level: This is the sum of your skill and gear levels. It is the
    number used for scaling mobs to fight you. This is the level shown on your
    "score".
 
-Note: You can't use gear that's more than 25 levels above you (50 for BoP
-   items). Your highest recent level is used, so you should still be able to
-   remove all your gear and re-equip it.
+Note: Until level 100, you must be in the same level range as an item
+   (1-50, 50-75, 75-100, or 101+) or higher to equip it. After level 100, you
+   can't use gear that's more than 25 levels above you (50 for BoP items). Your
+   highest recent level is used, so you should still be able to remove all your
+   gear and re-equip it.
 
 See also: CLASS, SCALING
 #
