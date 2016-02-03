@@ -579,7 +579,7 @@ Usage:  recipes <item>
 
 This command allows you to see which recipes (forge, craft, cook, etc) you
 know that require a given item. It also shows which augments (enchant, hone)
-you know that us the item.
+you know that require the item.
 #
 REFORGE REFASHION
 
