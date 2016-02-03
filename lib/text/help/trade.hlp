@@ -110,6 +110,7 @@ Command:  craft [number] <item>
 Unskilled crafts:
   handle  1 stick               stone axe  1 handaxe, 1 handle
   flint set  1 flint, 1 rock    stone hammer  1 rock, 1 handle
+  spear  1 spear head, 1 handle
 
 With Archery, you can craft:
   arrows  1 lumber
