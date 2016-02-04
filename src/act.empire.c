@@ -1383,11 +1383,11 @@ void do_import_add(char_data *ch, empire_data *emp, char *argument, int subcmd) 
 		// max coin is a safe limit here
 		msg_to_char(ch, "That limit is out of bounds.\r\n");
 	}
-	else if (((obj = get_obj_in_list_vis(ch, argument, ch->carrying)) || (obj = get_obj_in_list_vis(ch, argument, ROOM_CONTENTS(IN_ROOM(ch))))) && (vnum = GET_OBJ_VNUM(obj)) == NOTHING) {
+	else if (((obj = get_obj_in_list_vis(ch, argument, ch->carrying)) || (obj = get_obj_in_list_vis(ch, argument, ROOM_CONTENTS(IN_ROOM(ch))))) && ((vnum = GET_OBJ_VNUM(obj)) == NOTHING || !obj->storage)) {
 		// targeting an item in room/inventory
 		act("$p can't be traded.", FALSE, ch, obj, NULL, TO_CHAR);
 	}
-	else if (vnum == NOTHING && (vnum = get_obj_vnum_by_name(argument)) == NOTHING) {
+	else if (vnum == NOTHING && (vnum = get_obj_vnum_by_name(argument, TRUE)) == NOTHING) {
 		msg_to_char(ch, "Unknown item '%s'.\r\n", argument);
 	}
 	else {
@@ -1427,7 +1427,7 @@ void do_import_remove(char_data *ch, empire_data *emp, char *argument, int subcm
 		// targeting an item in room/inventory
 		act("$p can't be traded.", FALSE, ch, obj, NULL, TO_CHAR);
 	}
-	else if (vnum == NOTHING && (vnum = get_obj_vnum_by_name(argument)) == NOTHING) {
+	else if (vnum == NOTHING && (vnum = get_obj_vnum_by_name(argument, TRUE)) == NOTHING) {
 		msg_to_char(ch, "Unknown item '%s'.\r\n", argument);
 	}
 	else if (!(trade = find_trade_entry(emp, subcmd, vnum))) {
@@ -1547,11 +1547,11 @@ void do_import_analysis(char_data *ch, empire_data *emp, char *argument, int sub
 	if (!*argument) {
 		msg_to_char(ch, "Usage: %s analyze <item name>\r\n", trade_type[subcmd]);
 	}
-	else if (((obj = get_obj_in_list_vis(ch, argument, ch->carrying)) || (obj = get_obj_in_list_vis(ch, argument, ROOM_CONTENTS(IN_ROOM(ch))))) && (vnum = GET_OBJ_VNUM(obj)) == NOTHING) {
+	else if (((obj = get_obj_in_list_vis(ch, argument, ch->carrying)) || (obj = get_obj_in_list_vis(ch, argument, ROOM_CONTENTS(IN_ROOM(ch))))) && ((vnum = GET_OBJ_VNUM(obj)) == NOTHING || !obj->storage)) {
 		// targeting an item in room/inventory
 		act("$p can't be traded.", FALSE, ch, obj, NULL, TO_CHAR);
 	}
-	else if (vnum == NOTHING && (vnum = get_obj_vnum_by_name(argument)) == NOTHING) {
+	else if (vnum == NOTHING && (vnum = get_obj_vnum_by_name(argument, TRUE)) == NOTHING) {
 		msg_to_char(ch, "Unknown item '%s'.\r\n", argument);
 	}
 	else {
