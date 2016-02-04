@@ -1723,11 +1723,11 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options) {
 	extern int get_north_for_char(char_data *ch);
 	
-	int each_dir;
+	int each_dir, north = get_north_for_char(ch);
 		
 	// each_dir: iterate over directions and show them in order
 	for (each_dir = 0; each_dir < NUM_2D_DIRS; ++each_dir) {
-		screenread_one_dir(ch, room, confused_dirs[get_north_for_char(ch)][0][each_dir]);
+		screenread_one_dir(ch, room, confused_dirs[north][0][each_dir]);
 	}
 	
 	if (!IS_SET(options, LRR_SHIP_PARTIAL)) {
