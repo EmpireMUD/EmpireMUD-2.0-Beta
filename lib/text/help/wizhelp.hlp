@@ -503,6 +503,9 @@ Prevent players from being able to set their own titles; i.e., if the player
 consistently has an offensive title. The definition of offensive is left as
 an exercise for the reader.
 
+Notitle also prevents the player from changing their empire name, empire
+adjective, and the names of empire ranks.
+
 See also: TITLE
 #d
 NOWIZNET "NO WIZNET"

@@ -256,7 +256,10 @@ ACMD(do_eedit) {
 //// EDITOR COMMANDS /////////////////////////////////////////////////////////
 
 EEDIT(eedit_adjective) {
-	if (!*argument) {
+	if (ACCOUNT_FLAGGED(ch, ACCT_NOTITLE)) {
+		msg_to_char(ch, "You are not allowed to change the empire's adjective.\r\n");
+	}
+	else if (!*argument) {
 		msg_to_char(ch, "Set the empire's adjective form to what?\r\n");
 	}
 	else if (color_code_length(argument) > 0 || strchr(argument, '&') != NULL) {
@@ -422,7 +425,10 @@ EEDIT(eedit_name) {
 	bool file = FALSE;
 	char_data *mem;
 	
-	if (!*argument) {
+	if (ACCOUNT_FLAGGED(ch, ACCT_NOTITLE)) {
+		msg_to_char(ch, "You are not allowed to change the empire's name.\r\n");
+	}
+	else if (!*argument) {
 		msg_to_char(ch, "Set the empire name to what?\r\n");
 	}
 	else if (color_code_length(argument) > 0 || strchr(argument, '&') != NULL) {
@@ -509,7 +515,10 @@ EEDIT(eedit_rank) {
 	argument = any_one_word(argument, arg);
 	skip_spaces(&argument);
 	
-	if (!*argument || !*arg) {
+	if (ACCOUNT_FLAGGED(ch, ACCT_NOTITLE)) {
+		msg_to_char(ch, "You are not allowed to change the empire's rank names.\r\n");
+	}
+	else if (!*argument || !*arg) {
 		msg_to_char(ch, "Usage: eedit rank <rank> <new name>\r\n");
 		msg_to_char(ch, "Current ranks:\r\n");
 		for (iter = 0; iter < EMPIRE_NUM_RANKS(emp); ++iter) {
