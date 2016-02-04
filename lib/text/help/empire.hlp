@@ -1109,7 +1109,7 @@ territory is:
 * Greatness: This is the total Greatness of all members.
 * Wealth: Only empires with the Commerce tech can gain territory from Wealth.
       You can gain wealth by storing precious metals in your vault. Max
-	  territory from commerce is equal to 3x normal territory.
+      territory from commerce is equal to 3x normal territory.
 * Technologies: Each technology you unlock (e.g. City Lights) gives 15. These
       only count once per empire, so two members with City Lights will not
       result in +30 territory.
