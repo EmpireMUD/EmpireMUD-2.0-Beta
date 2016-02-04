@@ -291,7 +291,7 @@ ACMD(do_hit) {
 		else {
 			hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FALSE);
 			// ensure hitting
-			if (vict && !EXTRACTED(vict) && !IS_DEAD(vict) && FIGHTING(ch) && FIGHTING(ch) != vict) {
+			if (vict && !EXTRACTED(vict) && !IS_DEAD(vict) && FIGHTING(ch) && FIGHTING(ch) != vict && (GET_HEALTH(vict) > 0 || WOULD_EXECUTE(ch, vict))) {
 				FIGHTING(ch) = vict;
 			}
 			command_lag(ch, WAIT_OTHER);
