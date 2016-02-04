@@ -106,10 +106,10 @@ Usage:  bloodsword
 Cost:  40 blood
 
 A vampire with this ability can create a sword from its own blood. The blood-
-red sword is only as powerful as the vampire who created it, and it only lasts
-a short time.
+red sword is only as powerful as the vampire who created it.
 
-When you activate this power, you will automatically wield the sword.
+When you activate this power, you will automatically wield the sword, and it
+will disappear when unequipped.
 #
 BOOST
 
@@ -246,7 +246,7 @@ Cost:  20 blood
 Upkeep:  1 blood/hr
 
 With this ability, a vampire can mummify itself in a hard casing, protecting
-it from all physical harm.
+it from all physical harm. You cannot, however, move while mummified.
 #
 "PREDATOR VISION"
 

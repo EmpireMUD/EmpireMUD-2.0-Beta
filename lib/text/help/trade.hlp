@@ -6,7 +6,8 @@ The Trade skill contains abilities for collecting, crafting, and trading goods
 of all kinds.
 
 You can get started in Trade by chipping rocks together to make handaxes,
-tanning leather, crafting certain items, or weaving cloth.
+tanning leather, or crafting certain items (from the unskilled crafts section 
+of HELP CRAFT).
 
 Many craftable items are scalable, meaning their stats depend on the level of
 the person who crafts them. HELP SCALABLE CRAFTS has a full explanation.
@@ -110,6 +111,7 @@ Command:  craft [number] <item>
 Unskilled crafts:
   handle  1 stick               stone axe  1 handaxe, 1 handle
   flint set  1 flint, 1 rock    stone hammer  1 rock, 1 handle
+  spear  1 spear head, 1 handle
 
 With Archery, you can craft:
   arrows  1 lumber
@@ -218,7 +220,7 @@ Deadly Weapons:
   maul  6 iron ingots, 5 imperium ingots, 1 handle
 
 Ship Weapons:
-  cannon  14 iron ignot, 1 imperium ingot
+  cannon  14 iron ingots, 1 imperium ingot
 
 Weaponcrafting -> Iron Blades -> Deadly Weapons
 
@@ -288,10 +290,10 @@ See also: CRAFTING LEVEL, SMELT, WEAPONCRAFTING, ARMORSMITHING, JEWELRY,
 Guildsman Crafts
 Class ability: Guildsman
 
-Sew items:
+Weave items:
   guild patterned cloth  4 cloth, 2 silver nuggets  (crafter item)
 
-See also: SEW
+See also: WEAVE
 #
 HANDLE
 
@@ -579,7 +581,7 @@ Usage:  recipes <item>
 
 This command allows you to see which recipes (forge, craft, cook, etc) you
 know that require a given item. It also shows which augments (enchant, hone)
-you know that us the item.
+you know that require the item.
 #
 REFORGE REFASHION
 

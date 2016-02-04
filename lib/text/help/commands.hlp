@@ -501,7 +501,7 @@ wells, fountains, and the edge of nearby rivers, too.
   
 Some vampires can also taste the blood of others.
 
-See also: FILL, POUR, TASTE BLOOD
+See also: FILL, HUNGER, POUR, TASTE BLOOD
 #
 EMOTE :
 
@@ -813,7 +813,7 @@ Usage:  lay
 You may use this ability to lay 20 rocks into the ground to form a cobblestone 
 road. Roads eliminate the small movement lag that you normally get while
 walking. They can aid in tree and crop control -- nothing will grow over the
-roads.
+roads, but they will eventually decay if left unclaimed.
 
 The lay command is also used to pull up a road and retrieve half its rocks.
 
@@ -898,7 +898,7 @@ Examples:
   > mail receive 1
   > mail receive
 
-See also: PIGEON POST
+See also: PIGEON POST, TEXT EDITOR
 #
 MARK
 
@@ -1326,14 +1326,14 @@ Your class is determined by your top two skills, and you first receive a class
 when both of these skills are past 75. The level shown on score is your total
 level, with your skill level shown in parentheses.
 
-Conditions are displayed as:  Health: &g50&0/&g100&0+&g15&0/hr
-The first number (50) is your current health, the 100 is your maximum health,
-and the final number (15/hr) is your rate of regeneration. One hour in the MUD
-is 75 seconds. Your actual regeneration happens every 5 seconds.
+Conditions are displayed as:  Health: &g50&0/&g100&0+&g15&0/5s
+The first number (50) is your current health, the second (100) is your maximum
+health, and the final number (15/5s) is your rate of regeneration. Your
+regeneration happens every 5 seconds.
 
-Attributes are rated from 0 to 10. They are shown in green if you have a spell
-or piece of gear enhancing the attribute, or red if there is one subtracting
-from it.
+Attributes are rated from 0 to 15. They are shown in green if your current
+rating is higher than your base (starting) rating, or red if they are reduced
+below your base (by spells or pieces of gear).
 
 You can get more information on most of the traits on the score from their own
 help files (e.g. HELP DODGE). The 'Resist' trait is split into two parts: the

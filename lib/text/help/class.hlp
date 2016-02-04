@@ -64,19 +64,8 @@ See also: CLASS
 ARCHETYPES "STARTING ARCHETYPES" "STARTING CLASS"
 
 All player characters start with some gear, low attributes, and 30 skill
-points. One attribute will be 3, two will be 1, and the rest all 2s. Starting
-archetype does not limit your skills or class choices in any way.
-
-The available archetypes are:
- Noble Birth - raised to rule (Empire, Battle, Greatness)
- Skilled Apprentice - trained by a master artisan (Trade, Dexterity)
- Promising Squire - built for battle (Battle, Survival, Strength)
- Rugged Woodsman - cleaved from stone (Survival, Trade, Dexterity)
- Tribal Leader - rise from nothing (Empire, Survival, Wits)
- Street Urchin - the shadows of society (Stealth, Battle, Charisma)
- Druidic Commune - wield ancient magic (Natural Magic, Survival, Intelligence)
- Novice Sorcerer - master the rituals (High Sorcery, Battle, Intelligence)
- Lone Vampire - empowered by blood (Vampire, Battle, Wits)
+points. Generally, one attribute will be 3, two will be 1, and the rest all 2s.
+Starting archetype does not limit your skills or class choices in any way.
 #
 "ALCHEMIST CLASS" ALCH
 

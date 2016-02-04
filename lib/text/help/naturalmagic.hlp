@@ -282,8 +282,8 @@ Magic.
 
 Available familiars:
   cat - A low-level familiar for novice mages.
-  saber-toothed cat - A larger cat with a bigger bite. (requires 50)
-  sphinx - A familiar that will tank for you in combat. (requires 75)
+  saber-toothed cat - A larger cat with a bigger bite. (requires 51)
+  sphinx - A familiar that will tank for you in combat. (requires 76)
   giant tortoise - A stronger tank who deals no damage, but protects better.
     (requires 100)
 
@@ -383,8 +383,8 @@ Healing Boost
 Class ability: various
 
 This ability increases the amount healed by abilities such as Heal and
-Rejuvenate, making the user more effective at healing. This ability is auto-
-matic.
+Rejuvenate, making the user more effective at healing. This ability is
+automatic.
 
 See also: HEAL, HEALER, REJUVENATE
 #

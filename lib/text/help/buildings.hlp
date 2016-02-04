@@ -61,6 +61,7 @@ BARRACKS FORT
 Resources:  40 lumber, 10 nails, 20 bricks
 Built on:  plains, desert
 Extra rooms:  10, interlink
+Military:  20
 
 The barracks are one of the main parts of forts and outposts. It provides
 military to the city, and can be interlinked with other buildings.
@@ -101,7 +102,7 @@ BURROWHAVEN "BURROW HAVEN" "STRANGE BURROW"
 Resources:  12 lumber, 3 nails, 4 blocks
 Built on:  forest
 Extra rooms:  6
-Special rooms:  tunnel, no hallway
+Special rooms:  crypt, tunnel, no hallway
 Citizens:  1
 Chameleon:  &g^^^^&0
 
@@ -153,7 +154,7 @@ CAVEHAVEN "CAVE HAVEN" "OBSCURE CAVE"
 Resources:  30 lumber, 10 nails, 2 blocks
 Built on:  mountain
 Extra rooms:  6
-Special rooms:  tunnel, no hallway
+Special rooms:  crypt, tunnel, no hallway
 Citizens:  1
 Chameleon:  &y/\/\&0
 
@@ -198,7 +199,7 @@ Built on: plains or desert, facing water
 Clay pits are reinforced areas where fresh clay can be dug deeper, safer than
 digging on unprepared ground. You can dig more clay from them before depletion.
 
-Clay pits Mines count as in-city territory as far away as 3x a city's normal
+Clay pits count as in-city territory as far away as 3x a city's normal
 radius.
 
 See also: DIG
@@ -497,6 +498,7 @@ HOUSEHAVEN "HOUSE HAVEN" "RICKETY OLD HOUSE"
 Resources:  8 lumber, 2 nails, 12 bricks
 Built on:  plains
 Extra rooms:  6
+Special rooms:  crypt
 Citizens:  1
 
 Havens are houses specifically for vampires. They provide increased protection
@@ -710,6 +712,7 @@ PUEBLOHAVEN "PUEBLO HAVEN" "OLD PUEBLO"
 Resources:  4 lumber, 1 nails, 20 bricks
 Built on:  desert
 Extra rooms:  6
+Special rooms:  crypt
 Citizens:  1
 
 Havens are houses specifically for vampires. They provide increased protection
@@ -839,7 +842,9 @@ Built on:  plains, desert
 Stables are a safe place to keep your animals. You can also use them as a place
 to milk cows or shear sheep. This is also where you can barde horses.
 
-Most animals will not de-spawn if left in a stable.
+Most animals will not despawn if left in a stable, but there is a limit on the
+number of duplicate animals in each stable, after which any extras will despawn
+normally. (By default, this limit is 2.)
 
 See also: BARDE, MILK, SHEAR
 #
@@ -1095,6 +1100,7 @@ See also: TRADE ROUTES, TRADE COMMAND
 Resources:  40 lumber, 10 nails, 20 bricks
 Built on:  plains, desert
 Extra rooms:  10, interlink
+Military:  20
 
 The training yard serves as an entrance to various fort facilities and as such,
 you can designate extra rooms and interlink with other buildings.

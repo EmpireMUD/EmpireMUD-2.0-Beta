@@ -44,7 +44,8 @@ Find Herbs (Survival ability)
 
 Usage:  pick
 
-With the ability to find herbs, your "pick" command will find new things.
+With the ability to find herbs, your "pick" command will find new things instead
+of flowers.
 
 Herbs you can find:
  whitegrass - near oceans

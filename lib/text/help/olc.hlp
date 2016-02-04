@@ -686,7 +686,7 @@ The following affect flags are available:
  INFRA - Can see in the dark (glowing red eyes).
  SNEAK - Cannot be seen while moving.
  HIDE - Cannot be seen in room (without search).
- CHARM - NPC will take orders from its master -- do not use this on items.
+ *CHARM - NPC will take orders from its master -- do not use this on items.
  INVIS - Can't be seen, except by magic.
  !BATTLE - Immune to the Battle debuffs.
  SENSE-HIDE - Can see hidden people.
