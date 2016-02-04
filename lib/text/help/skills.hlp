@@ -159,7 +159,8 @@ HARVEST HARVESTING
 Usage:  harvest
 
 Allows you to harvest a crop. Be careful that you also replant some,
-otherwise you'll run out of that crop quickly.
+otherwise you'll run out of that crop quickly. You must be wielding a slashing
+or slicing weapon (sword or axe) to harvest crops.
 
 See also: PLANT
 #
