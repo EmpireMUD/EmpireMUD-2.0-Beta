@@ -1727,7 +1727,7 @@ void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options)
 		
 	// each_dir: iterate over directions and show them in order
 	for (each_dir = 0; each_dir < NUM_2D_DIRS; ++each_dir) {
-		screenread_one_dir(ch, room, confused_dirs[get_north_for_char(ch)][1][each_dir]);
+		screenread_one_dir(ch, room, confused_dirs[get_north_for_char(ch)][0][each_dir]);
 	}
 	
 	if (!IS_SET(options, LRR_SHIP_PARTIAL)) {
