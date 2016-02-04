@@ -303,6 +303,14 @@ time. If you immediately stop planting, your character just scatters the seeds
 and the crop will grow eventually. If you take care to plant neat rows, and
 water them (let the planting action finish), the crop will grow very quickly.
 
+Crops must be planted on the following tiles:
+Temperate: plains
+Arid: desert
+Jungle: light jungle
+
+Light jungle is jungle which has been partially chopped, but not reduced to
+plains.
+
 See also: HARVEST, WHEAT, CORN, APPLES
 #
 SACRIFICE 
