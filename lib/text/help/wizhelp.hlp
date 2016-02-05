@@ -725,7 +725,8 @@ Field          Who     Value Type   Description
 ----------------------------------------------------------------
 account        PC      NAME         Sets account to match another character
 age            BOTH    NUMBER       Player age
-bonus          PC      MISC         Set bonus traits for player
+bonustrait     PC      MISC         Set bonus traits for player
+bonusexp       PC      NUMBER       Set daily bonus exp for the player
 coins          PC      MISC         Sets coins on-hand for player
 grants         PC      MISC         Set grants for player
 invstart       PC      BINARY       Invisible @ Start
