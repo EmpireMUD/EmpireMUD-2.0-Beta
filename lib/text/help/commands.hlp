@@ -845,7 +845,8 @@ Usage:  look
         look <direction>
         look out
 
-For studying your surroundings. Examine and look do the same thing.
+For studying your surroundings. Examine will look at an object and, if it's a
+container, also show you its contents.
 
 Examples:
 
@@ -857,7 +858,7 @@ Examples:
 Note that if you LOOK AT CORPSE you will not see its inventory.
 To see what's inside a container (i.e. a corpse) use LOOK IN <object>.
 
-See also: EXAMINE, GET, READ, TAKE
+See also: GET, READ, TAKE
 #
 MAPSIZE "MAP SIZE"
 
