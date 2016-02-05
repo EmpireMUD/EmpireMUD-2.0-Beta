@@ -837,7 +837,7 @@ ACMD(do_slash_channel) {
 		if (!*arg2) {
 			msg_to_char(ch, "Usage: /who <channel>\r\n");
 		}
-		else if (!(chan = find_slash_channel_for_char(ch, arg2))) {
+		else if (!(chan = find_slash_channel_for_char(ch, arg2)) && (!IS_IMMORTAL(ch) || !(chan = find_slash_channel_by_name(arg2, TRUE)))) {
 			msg_to_char(ch, "You're not even on that channel.\r\n");
 		}
 		else {
