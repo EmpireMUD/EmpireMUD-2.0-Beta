@@ -4234,6 +4234,9 @@ ACMD(do_import) {
 	else if (!EMPIRE_HAS_TECH(emp, TECH_TRADE_ROUTES)) {
 		msg_to_char(ch, "The empire needs the Trade Routes technology for you to do that.\r\n");
 	}
+	else if (is_abbrev(arg, "analyze") || is_abbrev(arg, "analysis")) {
+		do_import_analysis(ch, emp, argument, subcmd);
+	}
 	else if (!imm_access && GET_RANK(ch) < EMPIRE_PRIV(emp, PRIV_TRADE)) {
 		msg_to_char(ch, "You don't have permission to set trade rules.\r\n");
 	}
@@ -4242,9 +4245,6 @@ ACMD(do_import) {
 	}
 	else if (is_abbrev(arg, "remove")) {
 		do_import_remove(ch, emp, argument, subcmd);
-	}
-	else if (is_abbrev(arg, "analyze") || is_abbrev(arg, "analysis")) {
-		do_import_analysis(ch, emp, argument, subcmd);
 	}
 	else {
 		msg_to_char(ch, "Usage: %s <add | remove | list | analyze>\r\n", trade_type[subcmd]);
