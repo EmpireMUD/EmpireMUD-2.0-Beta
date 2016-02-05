@@ -2354,13 +2354,18 @@ ACMD(do_nearby) {
 		found = TRUE;
 		dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), inst->location));
 		if (has_ability(ch, ABIL_NAVIGATION)) {
-			snprintf(line, sizeof(line), " %d tile%s %s: %s (%d, %d) / %s\r\n", dist, PLURAL(dist), (dir == NO_DIR ? "away" : dirs[dir]), GET_ADV_NAME(inst->adventure), X_COORD(loc), Y_COORD(loc), instance_level_string(inst));
+			snprintf(line, sizeof(line), " %d tile%s %s: %s (%d, %d) / %s", dist, PLURAL(dist), (dir == NO_DIR ? "away" : dirs[dir]), GET_ADV_NAME(inst->adventure), X_COORD(loc), Y_COORD(loc), instance_level_string(inst));
 		}
 		else {
-			snprintf(line, sizeof(line), " %d tile%s %s: %s / %s\r\n", dist, PLURAL(dist), (dir == NO_DIR ? "away" : dirs[dir]), GET_ADV_NAME(inst->adventure), instance_level_string(inst));
+			snprintf(line, sizeof(line), " %d tile%s %s: %s / %s", dist, PLURAL(dist), (dir == NO_DIR ? "away" : dirs[dir]), GET_ADV_NAME(inst->adventure), instance_level_string(inst));
 		}
 		
-		size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
+		if (ROOM_OWNER(loc)) {
+			size += snprintf(buf + size, sizeof(buf) - size, "%s / %s%s&0\r\n", line,  EMPIRE_BANNER(ROOM_OWNER(loc)), EMPIRE_NAME(ROOM_OWNER(loc)));
+		}
+		else {
+			size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", line);
+		}
 	}
 	
 	if (!found) {
