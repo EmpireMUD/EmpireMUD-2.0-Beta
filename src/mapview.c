@@ -1459,6 +1459,9 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 					strcpy(buf2, "&r");
 				}
 			}
+			else if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_WORK)) {
+				strcpy(buf2, "&B");
+			}
 			else {
 				strcpy(buf2, "&0");
 			}
