@@ -1274,7 +1274,8 @@ will continue to move until you hit an obstacle.
 You can use 'stop' to cancel travel at any time. If you don't like seeing the
 messages each time the ship moves, you can 'toggle action-spam'.
 
-See also: BOARD, DISEMBARK, DRAG, LEAD, SHIPBUILDING, SHIPS, STOP, TOGGLE
+See also: BOARD, DISEMBARK, DRAG, LAND VEHICLES, LEAD, SHIPBUILDING, SHIPS,
+STOP, TOGGLE
 #
 SAVE
 

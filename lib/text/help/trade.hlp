@@ -60,7 +60,7 @@ With Advanced Woodworking you can craft:
 
 * Crafts marked with an asterisk require the Carpenter building.
 
-See also: CRAFT
+See also: CRAFT, LAND VEHICLES
 #
 "ALCHEMIST CRAFTS"
 
@@ -127,6 +127,24 @@ Basic Crafts:
   orange dye  2 oranges, 1 magenta arrowfish, (glassblowing)
 
 See also: CRAFTING LEVEL, WOODWORKING
+#
+CARTS WAGONS CARRIAGES CARAVANS "LAND VEHICLES"
+
+Carts and their more advanced counsins, carriages, caravans and wagons, are
+essentially large chests on wheels, allowing you to carry large piles of
+resources quickly from one place to another. They can also be ridden on and
+driven to move around without spending moves.
+
+You can enter caravans and carriages, and drive them fron inside. Caravans can
+even have a few different rooms redesignated inside.
+
+Storage capacities (large items count twice):
+Cart: 200 items
+Carriage: 200 items, 1 room inside
+Wagon: 400 items
+Caravan: 100 items: 2 rooms inside
+
+See also: DRIVE, ENTER, GET, HARNESS, LEAD, MOUNT, PUT, VEHICLE
 #
 CLOTHING CLOTHES
 
@@ -235,7 +253,7 @@ With Exquisite Woodworking you can craft:
 
 * Crafts marked with an asterisk require the Carpenter building.
 
-See also: CRAFT
+See also: CRAFT, LAND VEHICLES
 #
 "FINE POTTERY"
 
@@ -858,6 +876,6 @@ With Woodworking you can craft:
 
 * Crafts marked with an asterisk require the Carpenter building.
 
-See also: CRAFT
+See also: CRAFT, LAND VEHICLES
 #
 $
