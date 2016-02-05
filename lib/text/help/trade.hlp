@@ -442,7 +442,7 @@ Rawhide Stitching -> Leatherworking -> Dangerous Leathers
 See also: SEWING, DANGEROUS LEATHERS, MASTER TAILOR, RAWHIDE STITCHING, SKIN,
   TAN
 #
-"MAGIC ATTIRE" "MAGICAL ATTIRE"
+"MAGIC ATTIRE" "MAGICAL ATTIRE" "MAGE ATTIRE"
 
 Magic Attire (Trade ability)
 Command:  sew [number] <item>
@@ -807,7 +807,7 @@ Forge items:
 
 See also: FORGE
 #
-WEAPONCRAFTING
+WEAPONCRAFTING WEAPONSMITHING
 
 Weaponcrafting (Trade ability)
 Building:  forge

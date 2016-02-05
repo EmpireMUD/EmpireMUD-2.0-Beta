@@ -417,7 +417,7 @@ You can use "efind all" to find all items on the ground in your empire. The
 Example:
  > efind cart
 
-See also: NAVIGATION
+See also: EINVENTORY, NAVIGATION
 #
 ELOG ELOGS "EMPIRE LOGS"
 
@@ -469,7 +469,7 @@ You can use "warehouse inventory" to see items in warehouse (unique) storage.
 their own empire. If the empire name has more than one word, you can use
 quotation marks.
 
-See also: SHIPPING, WORKFORCE
+See also: EFIND, SHIPPING, WORKFORCE
 #
 "EMPIRE SCORE" ESCORE
 
@@ -718,6 +718,8 @@ This command lists the islands your empire has territory or einventory on
 coordinates for each island are the approximate center of the island.
 
 Note: Immortals with the 'empires' grant can list the islands of any empire.
+
+See also: SURVEY
 #
 LOCKSMITHING
 

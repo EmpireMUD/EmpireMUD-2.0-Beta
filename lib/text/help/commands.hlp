@@ -858,7 +858,7 @@ Examples:
 Note that if you LOOK AT CORPSE you will not see its inventory.
 To see what's inside a container (i.e. a corpse) use LOOK IN <object>.
 
-See also: GET, READ, TAKE
+See also: GET, READ, TAKE, SURVEY
 #
 MAPSIZE "MAP SIZE"
 
@@ -1457,7 +1457,7 @@ shipping system. You can also set this option on individual ships. (Workforce
 is not required to use the shipping system, but 'workforce no-work' is still
 used to prevent shipping.)
 
-See also: DISPATCH, DOCKS, EINVENTORY, SHIPBUILDING, SHIPS, WORKFORCE
+See also: DISPATCH, DOCKS, EINVENTORY, ISLANDS, SHIPBUILDING, SHIPS, WORKFORCE
 #
 SLEEP
 
