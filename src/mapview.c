@@ -1670,6 +1670,9 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 						sprintf(infobuf + strlen(infobuf), "%sdepleted", *infobuf ? ", " :"");
 					}
 				}
+				if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_WORK)) {
+					sprintf(infobuf + strlen(infobuf), "%sno-work", *infobuf ? ", " :"");
+				}
 			
 				if (*infobuf) {
 					sprintf(roombuf + strlen(roombuf), " [%s]", infobuf);
