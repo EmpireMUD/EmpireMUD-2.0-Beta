@@ -149,6 +149,52 @@ bool can_forge(char_data *ch) {
 
 
 /**
+* Looks for a bound version of the item in ch's inventory, and binds one if
+* it only finds an unbound version. This is used for BoE recipes, for example.
+* 
+* @param char_data *ch The player to bind to.
+* @param obj_vnum vnum The vnum item to look for in ch's inventory.
+* @return bool TRUE if one was found and/or bound.
+*/
+bool find_and_bind(char_data *ch, obj_vnum vnum) {
+	obj_data *iter, *unbound = NULL;
+	struct obj_binding *bind;
+	
+	if (IS_NPC(ch) || vnum == NOTHING) {
+		return TRUE;	// don't bother
+	}
+	
+	LL_FOREACH2(ch->carrying, iter, next_content) {
+		if (GET_OBJ_VNUM(iter) != vnum) {
+			continue;	// wrong obj
+		}
+		if (!OBJ_FLAGGED(iter, OBJ_BIND_FLAGS)) {
+			return TRUE;	// we found the object but it doesn't require binding
+		}
+		
+		// ok we have the item, see if it's bound to ch
+		LL_FOREACH(OBJ_BOUND_TO(iter), bind) {
+			if (bind->idnum == GET_IDNUM(ch)) {
+				reduce_obj_binding(iter, ch);
+				return TRUE;	// already bound to ch
+			}
+		}
+		
+		// if we got this far, it's not bound
+		unbound = iter;
+	}
+	
+	if (unbound) {
+		bind_obj_to_player(unbound, ch);
+		return TRUE;
+	}
+	else {
+		return FALSE;	// found no matching item
+	}
+}
+
+
+/**
 * Finds an unfinished vehicle in the room that the character can finish.
 *
 * @param char_data *ch The person trying to craft a vehicle.
@@ -1046,6 +1092,10 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type) {
 	act(buf, FALSE, ch, NULL, veh, TO_CHAR);
 	snprintf(buf, sizeof(buf), "$n lays the framework and begins %s $V.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 	act(buf, FALSE, ch, NULL, veh, TO_ROOM);
+	
+	if (GET_CRAFT_REQUIRES_OBJ(type) != NOTHING) {
+		find_and_bind(ch, GET_CRAFT_REQUIRES_OBJ(type));
+	}
 }
 
 
@@ -1167,7 +1217,7 @@ ACMD(do_gen_craft) {
 		
 		// base timer
 		timer = GET_CRAFT_TIME(type);
-
+		
 		// potter building bonus	
 		if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_POTTERY) && ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_POTTER) && IS_COMPLETE(IN_ROOM(ch))) {
 			timer /= 4;
@@ -1188,6 +1238,11 @@ ACMD(do_gen_craft) {
 		
 		// how many
 		GET_ACTION_VNUM(ch, 2) = num;
+		
+		// do this BEFORE extract, as it may be extracted
+		if (GET_CRAFT_REQUIRES_OBJ(type) != NOTHING) {
+			find_and_bind(ch, GET_CRAFT_REQUIRES_OBJ(type));
+		}
 		
 		extract_resources(ch, GET_CRAFT_RESOURCES(type), can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED));
 		
