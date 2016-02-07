@@ -111,6 +111,20 @@ if any, happens at random as you chant.
 
 See also: help for individual chants, like HELP CHANT OF NATURE
 #
+"CHANT OF ILLUSIONS"
+
+Chant of Illusions
+
+Usage:  chant illusions
+Class ability:  Luminary
+Cost:  1 nocturnium spike and 1 iridescent iris per road
+
+This chant allows you to hide a road tile behind an illusion, making it more
+difficult to see from a distance. You will not get your resources back if you
+cancel the chant; they are spent immediately.
+
+See also: CHANT, FORGE, LAY
+#
 "CHANT OF NATURE"
 
 Chant of Nature (Natural Magic)

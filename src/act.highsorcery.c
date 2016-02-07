@@ -120,8 +120,10 @@ RITUAL_SETUP_FUNC(start_simple_ritual);
 
 // chant prototypes
 RITUAL_FINISH_FUNC(perform_chant_of_druids);
+RITUAL_FINISH_FUNC(perform_chant_of_illusions);
 RITUAL_FINISH_FUNC(perform_chant_of_nature);
 RITUAL_SETUP_FUNC(start_chant_of_druids);
+RITUAL_SETUP_FUNC(start_chant_of_illusions);
 
 
 // SCMD_RITUAL, SCMD_CHANT
@@ -247,6 +249,15 @@ struct ritual_data_type {
 		MESSAGE_END
 	}},
 	
+	// 10: chant of illusions
+	{ "illusions", 0, ABIL_CHANT_OF_ILLUSIONS, 0, SCMD_CHANT,
+		start_chant_of_illusions,
+		perform_chant_of_illusions,
+		{{ "You start the chant of illusions...", "$n starts the chant of illusions..." },
+		{ "You perform the chant of illusions...", "$n performs the chant of illusions..." },
+		MESSAGE_END
+	}},
+	
 	{ "\n", 0, NO_ABIL, 0, 0, NULL, NULL, { MESSAGE_END } },
 };
 
@@ -265,11 +276,7 @@ bool can_use_ritual(char_data *ch, int ritual) {
 	if (ritual_data[ritual].ability != NO_ABIL && !has_ability(ch, ritual_data[ritual].ability)) {
 		return FALSE;
 	}
-	
-//	if (IS_SET(ritual_data[ritual].flags, RIT_HENGE) && (!IS_COMPLETE(IN_ROOM(ch)) || BUILDING_VNUM(IN_ROOM(ch)) != BUILDING_HENGE)) {
-//		return FALSE;
-//	}
-	
+		
 	return TRUE;
 }
 
@@ -1352,7 +1359,7 @@ RITUAL_SETUP_FUNC(start_chant_of_druids) {
 }
 
 RITUAL_FINISH_FUNC(perform_chant_of_druids) {
-	if (CAN_GAIN_NEW_SKILLS(ch) && get_skill_level(ch, SKILL_NATURAL_MAGIC) == 0 && noskill_ok(ch, SKILL_NATURAL_MAGIC)) {
+	if (CAN_GAIN_NEW_SKILLS(ch) && get_skill_level(ch, SKILL_NATURAL_MAGIC) == 0 && noskill_ok(ch, SKILL_NATURAL_MAGIC) && BUILDING_VNUM(IN_ROOM(ch)) == BUILDING_HENGE && IS_COMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "&gAs you finish the chant, you begin to see the weave of mana through nature...&0\r\n");
 		set_skill(ch, SKILL_NATURAL_MAGIC, 1);
 		SAVE_CHAR(ch);
@@ -1360,6 +1367,47 @@ RITUAL_FINISH_FUNC(perform_chant_of_druids) {
 	else {
 		msg_to_char(ch, "You have finished the chant.\r\n");
 	}
+}
+
+
+RITUAL_SETUP_FUNC(start_chant_of_illusions) {
+	static struct resource_data *illusion_res = NULL;
+	if (!illusion_res) {
+		illusion_res = create_resource_list(o_NOCTURNIUM_SPIKE, 1, o_IRIDESCENT_IRIS, 1, NOTHING);
+	}
+	
+	if (!IS_ROAD(IN_ROOM(ch)) || !IS_COMPLETE(IN_ROOM(ch))) {
+		msg_to_char(ch, "You can't perform the chant of illusions here.\r\n");
+		return FALSE;
+	}
+	if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_AND_ALLIES)) {
+		msg_to_char(ch, "You don't have permission to perform that chant here.\r\n");
+		return FALSE;
+	}
+	if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_CHAMELEON)) {
+		msg_to_char(ch, "This road is already cloaked in illusion.\r\n");
+		return FALSE;
+	}
+	if (!has_resources(ch, illusion_res, TRUE, TRUE)) {
+		// message sent by has_resources
+		return FALSE;
+	}
+	
+	// OK
+	extract_resources(ch, illusion_res, TRUE);
+	start_ritual(ch, ritual);
+	return TRUE;
+}
+
+RITUAL_FINISH_FUNC(perform_chant_of_illusions) {
+	if (!IS_ROAD(IN_ROOM(ch)) || !IS_COMPLETE(IN_ROOM(ch)) || !can_use_room(ch, IN_ROOM(ch), MEMBERS_AND_ALLIES)) {
+		msg_to_char(ch, "You finish the chant, but it has no effect.\r\n");
+		return;
+	}
+	
+	SET_BIT(ROOM_AFF_FLAGS(IN_ROOM(ch)), ROOM_AFF_CHAMELEON);
+	SET_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_CHAMELEON);
+	msg_to_char(ch, "As you finish the chant, the road is cloaked in illusion!\r\n");
 }
 
 
