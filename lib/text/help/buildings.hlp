@@ -243,6 +243,15 @@ shipping system.
 
 See also:  BOARD, LOAD, SHIPPING, UNLOAD
 #
+DRAINAGE "OASIS DRAINAGE" "DRAINED OASIS" "DRAIN OASIS" "DRAINING OASIS"
+
+&y.&c__&y.&0  Draining Oasis  (Elder Crafts ability)
+
+Resources:  12 lumber, 4 nails, 40 sticks
+Built on: oasis
+
+By building drainage for an oasis, it can be converted into a normal desert.
+#
 ESTUARYGARDEN "ESTUARY GARDEN"
 
 &b~&0##&b~&0  Estuary Garden  (Herb Gardens ability)
@@ -257,6 +266,16 @@ to grow rare whitegrass in greater abundance.
 You can pick more herbs than normal before the tile is depleted.
 
 See also: PICK
+#
+"ELDER CRAFTS"
+
+Elder Crafts
+Class ability:  Elder
+
+This ability allows you to build the following buildings:
+  &y.&c__&y.&0 drainage  12 lumber, 4 nails, 40 sticks (built on oasis)
+
+See also: BUILD, ELDER CLASS
 #
 "EXARCH CRAFTS"
 

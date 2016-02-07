@@ -65,6 +65,8 @@
 
 #define BUILDING_RIVER_GATE  5176  // custom icons, rituals
 
+#define BUILDING_OASIS_DRAINAGE  5191	// custom completion
+
 
 // Room building vnums
 #define RTYPE_SHIP_HOLDING_PEN  5509	// for the shipping system's storage room
