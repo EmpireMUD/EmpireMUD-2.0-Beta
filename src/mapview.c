@@ -1542,8 +1542,11 @@ char *get_screenreader_room_name(room_data *from_room, room_data *to_room) {
 	crop_data *cp;
 	
 	strcpy(lbuf, "*");
-
-	if (ROOM_CUSTOM_NAME(to_room)) {
+	
+	if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_CHAMELEON) && compute_distance(from_room, to_room) > 2) {
+		strcpy(lbuf, GET_SECT_NAME(BASE_SECT(to_room)));
+	}
+	else if (ROOM_CUSTOM_NAME(to_room)) {
 		strcpy(lbuf, ROOM_CUSTOM_NAME(to_room));
 	}
 	else if (GET_BUILDING(to_room) && ROOM_BLD_FLAGGED(to_room, BLD_BARRIER) && ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_FLY)) {
