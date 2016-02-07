@@ -87,6 +87,8 @@ A forgemaster with the Armorsmithing specialization can create many armors:
   copper mask (head)  4 copper ingot, 1 cloth
   copper vambraces (arms)  8 copper ingot, 2 small leather
   copper buckler (shield)  6 copper ingot, 1 small leather, 1 lumber
+  
+These armor pieces are all classified as Medium Armor.
 
 Armorsmithing -> Sturdy Armors -> Imperial Armors
 
@@ -800,6 +802,8 @@ Sturdy Armors:
   mail coif (head)  4 iron ingots, 1 small leather, 1 cloth
   splint vambraces (arms)  8 iron ingots, 2 large leather
   kite shield  6 iron ingots, 2 small leather
+  
+These armor pieces are all classified as Medium Armor.
 
 Armorsmithing -> Sturdy Armors -> Imperial Armors
 
