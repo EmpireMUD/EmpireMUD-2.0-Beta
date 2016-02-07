@@ -1543,7 +1543,7 @@ char *get_screenreader_room_name(room_data *from_room, room_data *to_room) {
 	
 	strcpy(lbuf, "*");
 	
-	if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_CHAMELEON) && compute_distance(from_room, to_room) > 2) {
+	if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_CHAMELEON) && compute_distance(from_room, to_room) >= 2) {
 		strcpy(lbuf, GET_SECT_NAME(BASE_SECT(to_room)));
 	}
 	else if (ROOM_CUSTOM_NAME(to_room)) {
@@ -1675,6 +1675,9 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 				}
 				if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_WORK)) {
 					sprintf(infobuf + strlen(infobuf), "%sno-work", *infobuf ? ", " :"");
+				}
+				if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_CHAMELEON) && IS_IMMORTAL(ch)) {
+					sprintf(infobuf + strlen(infobuf), "%schameleon", *infobuf ? ", " :"");
 				}
 			
 				if (*infobuf) {
