@@ -653,7 +653,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "etalk", POS_DEAD, do_esay, LVL_APPROVED, CTYPE_EMPIRE ),
 	ABILITY_CMD( "escape", POS_STANDING, do_escape, NO_MIN, CTYPE_MOVE, ABIL_ESCAPE ),
 	SIMPLE_CMD( "examine", POS_SITTING, do_examine, NO_MIN, CTYPE_UTIL ),
-	SIMPLE_CMD( "excavate", POS_STANDING, do_excavate, LVL_APPROVED, CTYPE_BUILD ),
+	STANDARD_CMD( "excavate", POS_STANDING, do_excavate, LVL_APPROVED, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "exchange", POS_STANDING, do_exchange, NO_MIN, CTYPE_BUILD ),
 	SIMPLE_CMD( "execute", POS_STANDING, do_execute, NO_MIN, CTYPE_COMBAT ),
 	SCMD_CMD( "exits", POS_RESTING, do_exits, NO_MIN, CTYPE_UTIL, -1 ),
