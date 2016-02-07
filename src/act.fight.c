@@ -406,7 +406,7 @@ ACMD(do_stake) {
 		if (GET_HEALTH(victim) > 0)
 			GET_POS(victim) = POS_RESTING;
 		REMOVE_BIT(INJURY_FLAGS(victim), INJ_STAKED);
-		obj_to_char_or_room((stake = read_object(o_STAKE, TRUE)), ch);
+		obj_to_char((stake = read_object(o_STAKE, TRUE)), ch);
 		scale_item_to_level(stake, 1);	// min scale
 		load_otrigger(stake);
 	}

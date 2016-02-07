@@ -110,6 +110,10 @@ static void special_building_completion(room_data *room) {
 			change_terrain(room, climate_default_sector[CLIMATE_TEMPERATE]);
 			break;
 		}
+		case BUILDING_OASIS_DRAINAGE: {
+			change_terrain(room, climate_default_sector[CLIMATE_ARID]);
+			break;
+		}
 	}
 }
 
