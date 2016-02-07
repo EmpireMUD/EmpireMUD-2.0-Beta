@@ -207,6 +207,10 @@ struct alias_data {
 #define SCMD_REFORGE  0
 #define SCMD_REFASHION  1
 
+// do_ritual
+#define SCMD_RITUAL  0
+#define SCMD_CHANT  1
+
 // do_library
 #define SCMD_LIBRARY  0
 #define SCMD_BOOKEDIT  1
