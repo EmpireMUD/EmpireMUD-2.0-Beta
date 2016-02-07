@@ -1092,8 +1092,9 @@ void scale_mob_as_familiar(char_data *mob, char_data *master) {
 	int scale_level;
 	
 	scale_level = get_approximate_level(master);
-	if (scale_level > CLASS_SKILL_CAP + 25) {
-		scale_level -= 25;
+	if (scale_level > CLASS_SKILL_CAP) {
+		// 25 levels lower if over 100
+		scale_level = MAX(CLASS_SKILL_CAP, scale_level - 25);
 	}
 	scale_mob_to_level(mob, scale_level);
 }

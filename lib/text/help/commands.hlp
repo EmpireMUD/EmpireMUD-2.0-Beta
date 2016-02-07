@@ -726,8 +726,9 @@ Informative map mode shows you details about your buildings.
   &g/[]\&0  mine with ore
   &r/[]\&0  depleted mine
   &y^()^&0  chameleon building (immortal only)
+  &B^^^^&0  no-work
 
-See also: TOGGLES, MAINTAIN
+See also: TOGGLES, MAINTAIN, WORKFORCE
 #
 IGNORE IGNORING
 

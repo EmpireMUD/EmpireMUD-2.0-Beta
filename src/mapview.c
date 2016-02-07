@@ -1459,6 +1459,9 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 					strcpy(buf2, "&r");
 				}
 			}
+			else if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_WORK)) {
+				strcpy(buf2, "&B");
+			}
 			else {
 				strcpy(buf2, "&0");
 			}
@@ -1667,6 +1670,9 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 						sprintf(infobuf + strlen(infobuf), "%sdepleted", *infobuf ? ", " :"");
 					}
 				}
+				if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_WORK)) {
+					sprintf(infobuf + strlen(infobuf), "%sno-work", *infobuf ? ", " :"");
+				}
 			
 				if (*infobuf) {
 					sprintf(roombuf + strlen(roombuf), " [%s]", infobuf);
@@ -1721,11 +1727,13 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 * @param bitvector_t options Any LLR_x flags that get passed along.
 */
 void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options) {
-	int each_dir;
+	extern int get_north_for_char(char_data *ch);
+	
+	int each_dir, north = get_north_for_char(ch);
 		
 	// each_dir: iterate over directions and show them in order
 	for (each_dir = 0; each_dir < NUM_2D_DIRS; ++each_dir) {
-		screenread_one_dir(ch, room, each_dir);
+		screenread_one_dir(ch, room, confused_dirs[north][0][each_dir]);
 	}
 	
 	if (!IS_SET(options, LRR_SHIP_PARTIAL)) {

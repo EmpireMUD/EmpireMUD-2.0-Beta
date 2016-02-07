@@ -60,7 +60,6 @@ void cancel_smelting(char_data *ch);
 void cancel_tanning(char_data *ch);
 
 // process protos
-void perform_chant(char_data *ch);
 void process_chipping(char_data *ch);
 void process_driving(char_data *ch);
 void perform_ritual(char_data *ch);
@@ -124,7 +123,7 @@ const struct action_data_struct action_data[] = {
 	{ "morphing", "is morphing and changing shape!", ACTF_ANYWHERE, process_morphing, NULL },	// ACT_MORPHING
 	{ "scraping", "is scraping at a tree.", ACTF_HASTE | ACTF_FAST_CHORES, process_scraping, cancel_scraping },	// ACT_SCRAPING
 	{ "bathing", "is bathing in the water.", NOBITS, process_bathing, NULL },	// ACT_BATHING
-	{ "chanting", "is chanting a strange song.", NOBITS, perform_chant, NULL },	// ACT_CHANTING
+	{ "chanting", "is chanting a strange song.", NOBITS, perform_ritual, NULL },	// ACT_CHANTING
 	{ "prospecting", "is prospecting.", NOBITS, process_prospecting, NULL },	// ACT_PROSPECTING
 	{ "filling", "is filling in the trench.", ACTF_HASTE | ACTF_FAST_CHORES, process_fillin, NULL },	// ACT_FILLING_IN
 	{ "reclaiming", "is reclaiming this acre!", NOBITS, process_reclaim, NULL },	// ACT_RECLAIMING

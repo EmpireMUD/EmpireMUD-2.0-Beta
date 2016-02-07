@@ -2159,6 +2159,7 @@ void output_map_to_file(void) {
 	room_data *room;
 	empire_data *emp, *next_emp;
 	sector_data *ocean = sector_proto(BASIC_OCEAN);
+	sector_data *sect;
 	
 	// basic ocean sector is required
 	if (!ocean) {
@@ -2185,16 +2186,23 @@ void output_map_to_file(void) {
 	
 	for (y = 0; y < MAP_HEIGHT; ++y) {
 		for (x = 0; x < MAP_WIDTH; ++x) {
+			// load room only if in memory
+			room = real_real_room(world_map[x][y].vnum);
+			sect = world_map[x][y].sector_type;
+			if (room && ROOM_AFF_FLAGGED(room, ROOM_AFF_CHAMELEON) && IS_COMPLETE(room)) {
+				sect = world_map[x][y].base_sector;
+			}
+			
 			// normal map output
 			if (world_map[x][y].crop_type) {
 				fprintf(out, "%c", mapout_color_tokens[GET_CROP_MAPOUT(world_map[x][y].crop_type)]);
 			}
 			else {
-				fprintf(out, "%c", mapout_color_tokens[GET_SECT_MAPOUT(world_map[x][y].sector_type)]);
+				fprintf(out, "%c", mapout_color_tokens[GET_SECT_MAPOUT(sect)]);
 			}
 		
 			// political output
-			if ((room = real_real_room(world_map[x][y].vnum)) && (emp = ROOM_OWNER(room))) {
+			if (room && (emp = ROOM_OWNER(room)) && (!ROOM_AFF_FLAGGED(room, ROOM_AFF_CHAMELEON) || !IS_COMPLETE(room))) {
 				// find the first color in banner_to_mapout_token that is in the banner
 				color = -1;
 				for (num = 0; banner_to_mapout_token[0][0] != '\n'; ++num) {
@@ -2208,8 +2216,8 @@ void output_map_to_file(void) {
 			}
 			else {
 				// no owner -- only some sects get printed
-				if (SECT_FLAGGED(world_map[x][y].sector_type, SECTF_SHOW_ON_POLITICAL_MAPOUT)) {
-					fprintf(pol, "%c", mapout_color_tokens[GET_SECT_MAPOUT(world_map[x][y].sector_type)]);
+				if (SECT_FLAGGED(sect, SECTF_SHOW_ON_POLITICAL_MAPOUT)) {
+					fprintf(pol, "%c", mapout_color_tokens[GET_SECT_MAPOUT(sect)]);
 				}
 				else {
 					fprintf(pol, "?");

@@ -1383,11 +1383,11 @@ void do_import_add(char_data *ch, empire_data *emp, char *argument, int subcmd) 
 		// max coin is a safe limit here
 		msg_to_char(ch, "That limit is out of bounds.\r\n");
 	}
-	else if (((obj = get_obj_in_list_vis(ch, argument, ch->carrying)) || (obj = get_obj_in_list_vis(ch, argument, ROOM_CONTENTS(IN_ROOM(ch))))) && (vnum = GET_OBJ_VNUM(obj)) == NOTHING) {
+	else if (((obj = get_obj_in_list_vis(ch, argument, ch->carrying)) || (obj = get_obj_in_list_vis(ch, argument, ROOM_CONTENTS(IN_ROOM(ch))))) && ((vnum = GET_OBJ_VNUM(obj)) == NOTHING || !obj->storage)) {
 		// targeting an item in room/inventory
 		act("$p can't be traded.", FALSE, ch, obj, NULL, TO_CHAR);
 	}
-	else if (vnum == NOTHING && (vnum = get_obj_vnum_by_name(argument)) == NOTHING) {
+	else if (vnum == NOTHING && (vnum = get_obj_vnum_by_name(argument, TRUE)) == NOTHING) {
 		msg_to_char(ch, "Unknown item '%s'.\r\n", argument);
 	}
 	else {
@@ -1427,7 +1427,7 @@ void do_import_remove(char_data *ch, empire_data *emp, char *argument, int subcm
 		// targeting an item in room/inventory
 		act("$p can't be traded.", FALSE, ch, obj, NULL, TO_CHAR);
 	}
-	else if (vnum == NOTHING && (vnum = get_obj_vnum_by_name(argument)) == NOTHING) {
+	else if (vnum == NOTHING && (vnum = get_obj_vnum_by_name(argument, TRUE)) == NOTHING) {
 		msg_to_char(ch, "Unknown item '%s'.\r\n", argument);
 	}
 	else if (!(trade = find_trade_entry(emp, subcmd, vnum))) {
@@ -1547,11 +1547,11 @@ void do_import_analysis(char_data *ch, empire_data *emp, char *argument, int sub
 	if (!*argument) {
 		msg_to_char(ch, "Usage: %s analyze <item name>\r\n", trade_type[subcmd]);
 	}
-	else if (((obj = get_obj_in_list_vis(ch, argument, ch->carrying)) || (obj = get_obj_in_list_vis(ch, argument, ROOM_CONTENTS(IN_ROOM(ch))))) && (vnum = GET_OBJ_VNUM(obj)) == NOTHING) {
+	else if (((obj = get_obj_in_list_vis(ch, argument, ch->carrying)) || (obj = get_obj_in_list_vis(ch, argument, ROOM_CONTENTS(IN_ROOM(ch))))) && ((vnum = GET_OBJ_VNUM(obj)) == NOTHING || !obj->storage)) {
 		// targeting an item in room/inventory
 		act("$p can't be traded.", FALSE, ch, obj, NULL, TO_CHAR);
 	}
-	else if (vnum == NOTHING && (vnum = get_obj_vnum_by_name(argument)) == NOTHING) {
+	else if (vnum == NOTHING && (vnum = get_obj_vnum_by_name(argument, TRUE)) == NOTHING) {
 		msg_to_char(ch, "Unknown item '%s'.\r\n", argument);
 	}
 	else {
@@ -4234,6 +4234,9 @@ ACMD(do_import) {
 	else if (!EMPIRE_HAS_TECH(emp, TECH_TRADE_ROUTES)) {
 		msg_to_char(ch, "The empire needs the Trade Routes technology for you to do that.\r\n");
 	}
+	else if (is_abbrev(arg, "analyze") || is_abbrev(arg, "analysis")) {
+		do_import_analysis(ch, emp, argument, subcmd);
+	}
 	else if (!imm_access && GET_RANK(ch) < EMPIRE_PRIV(emp, PRIV_TRADE)) {
 		msg_to_char(ch, "You don't have permission to set trade rules.\r\n");
 	}
@@ -4242,9 +4245,6 @@ ACMD(do_import) {
 	}
 	else if (is_abbrev(arg, "remove")) {
 		do_import_remove(ch, emp, argument, subcmd);
-	}
-	else if (is_abbrev(arg, "analyze") || is_abbrev(arg, "analysis")) {
-		do_import_analysis(ch, emp, argument, subcmd);
 	}
 	else {
 		msg_to_char(ch, "Usage: %s <add | remove | list | analyze>\r\n", trade_type[subcmd]);

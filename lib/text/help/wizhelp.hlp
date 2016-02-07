@@ -503,6 +503,9 @@ Prevent players from being able to set their own titles; i.e., if the player
 consistently has an offensive title. The definition of offensive is left as
 an exercise for the reader.
 
+Notitle also prevents the player from changing their empire name, empire
+adjective, and the names of empire ranks.
+
 See also: TITLE
 #d
 NOWIZNET "NO WIZNET"
@@ -722,7 +725,8 @@ Field          Who     Value Type   Description
 ----------------------------------------------------------------
 account        PC      NAME         Sets account to match another character
 age            BOTH    NUMBER       Player age
-bonus          PC      MISC         Set bonus traits for player
+bonustrait     PC      MISC         Set bonus traits for player
+bonusexp       PC      NUMBER       Set daily bonus exp for the player
 coins          PC      MISC         Sets coins on-hand for player
 grants         PC      MISC         Set grants for player
 invstart       PC      BINARY       Invisible @ Start

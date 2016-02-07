@@ -747,6 +747,12 @@ void read_book(char_data *ch, obj_data *obj) {
 		
 		msg_to_char(ch, "You start to read '%s', by %s.\r\n", book->title, book->byline);
 		act("$n begins to read $p.", TRUE, ch, obj, NULL, TO_ROOM);
+		
+		// ensure binding
+		if (!IS_NPC(ch) && OBJ_FLAGGED(obj, OBJ_BIND_FLAGS)) {
+			bind_obj_to_player(obj, ch);
+			reduce_obj_binding(obj, ch);
+		}
 	}
 }
 

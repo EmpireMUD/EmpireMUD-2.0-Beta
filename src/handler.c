@@ -4618,15 +4618,22 @@ int get_obj_pos_in_equip_vis(char_data *ch, char *arg, obj_data *equipment[]) {
 * Uses multi_isname to match any number of name args.
 *
 * @param char *name The search name.
+* @param bool storable_only If TRUE, only storable items will be found.
 * @return obj_vnum A matching object, or NOTHING.
 */
-obj_vnum get_obj_vnum_by_name(char *name) {
+obj_vnum get_obj_vnum_by_name(char *name, bool storable_only) {
 	obj_data *obj, *next_obj;
 	
 	HASH_ITER(hh, object_table, obj, next_obj) {
-		if (multi_isname(name, GET_OBJ_KEYWORDS(obj))) {
-			return GET_OBJ_VNUM(obj);
+		if (storable_only && !obj->storage) {
+			continue;
 		}
+		if (!multi_isname(name, GET_OBJ_KEYWORDS(obj))) {
+			continue;
+		}
+		
+		// found!
+		return GET_OBJ_VNUM(obj);
 	}
 	
 	return NOTHING;

@@ -149,6 +149,9 @@ in territory claimed by other empires. Bound items will disappear from the
 ground if left on unclaimed land, like normal. They are safe to leave longer on
 claimed land (although not forever) or in your private chest (no time limit).
 
+Bind-on-equip items bind when equipped (gear), consumed (drink containers),
+or used (books, patterns, and recipes).
+
 You cannot unbind items.
 
 See also: TAGS, HOME
