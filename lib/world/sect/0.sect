@@ -156,7 +156,7 @@ S
 #1
 Light Forest~
 A Light Forest~
-'.' 14 1 2 d n
+'.' 14 1 2 dl n
 C
 chop, dig, gather, pick~
 D1
@@ -296,7 +296,7 @@ S
 #2
 Forest~
 A Forest~
-'^' 14 1 3 d n
+'^' 14 1 3 dl n
 C
 chop, dig, gather, pick~
 D1
@@ -408,7 +408,7 @@ S
 #3
 Shady Forest~
 A Shady Forest~
-'^' 14 1 4 d n
+'^' 14 1 4 dl n
 C
 chop, dig, gather, pick~
 D1
@@ -508,7 +508,7 @@ S
 #4
 Overgrown Forest~
 An Overgrown Forest~
-'^' 14 1 6 d dn
+'^' 14 1 6 dl dn
 C
 chop, dig, gather, pick~
 D1
@@ -1700,7 +1700,7 @@ S
 #26
 Grove~
 A Shady Desert Grove~
-'^' 10 2 6 ad l
+'^' 10 2 6 adl l
 C
 chop, dig, gather, pick~
 D0
@@ -2249,7 +2249,7 @@ S
 #71
 Irrigated Forest~
 A Marshy Forest~
-'^' 14 1 3 d n
+'^' 14 1 3 dl n
 C
 chop, dig, gather, pick~
 D1
