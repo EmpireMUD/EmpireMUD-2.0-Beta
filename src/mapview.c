@@ -353,7 +353,7 @@ int pick_season(room_data *room) {
 bool can_see_player_in_other_room(char_data *ch, char_data *vict) {
 	int distance_can_see_players = 7;
 	
-	if (!IS_NPC(vict) && CAN_SEE(ch, vict) && CAN_RECOGNIZE(ch, vict)) {
+	if (!IS_NPC(vict) && CAN_SEE(ch, vict) && WIZHIDE_OK(ch, vict) && CAN_RECOGNIZE(ch, vict)) {
 		if (compute_distance(IN_ROOM(ch), IN_ROOM(vict)) <= distance_can_see_players) {
 			if (has_ability(vict, ABIL_CLOAK_OF_DARKNESS)) {
 				gain_ability_exp(vict, ABIL_CLOAK_OF_DARKNESS, 10);
@@ -961,7 +961,7 @@ void look_in_direction(char_data *ch, int dir) {
 				to_room = ex->room_ptr;
 				if (CAN_SEE_IN_DARK_ROOM(ch, to_room)) {
 					for (c = ROOM_PEOPLE(to_room); c; c = c->next_in_room) {
-						if (CAN_SEE(ch, c)) {
+						if (CAN_SEE(ch, c) && WIZHIDE_OK(ch, c)) {
 							bufsize += snprintf(buf + bufsize, sizeof(buf) - bufsize, "%s, ", PERS(c, ch, FALSE));
 							if (last_comma_pos != -1) {
 								prev_comma_pos = last_comma_pos;
@@ -1056,7 +1056,7 @@ void look_in_direction(char_data *ch, int dir) {
 
 		if (CAN_SEE_IN_DARK_ROOM(ch, to_room)) {
 			for (c = ROOM_PEOPLE(to_room); c; c = c->next_in_room) {
-				if (CAN_SEE(ch, c)) {
+				if (CAN_SEE(ch, c) && WIZHIDE_OK(ch, c)) {
 					bufsize += snprintf(buf + bufsize, sizeof(buf) - bufsize, "%s, ", PERS(c, ch, FALSE));
 					if (last_comma_pos != -1) {
 						prev_comma_pos = last_comma_pos;
@@ -1083,7 +1083,7 @@ void look_in_direction(char_data *ch, int dir) {
 		if (to_room && !ROOM_SECT_FLAGGED(to_room, SECTF_OBSCURE_VISION) && !ROOM_IS_CLOSED(to_room)) {
 			if (CAN_SEE_IN_DARK_ROOM(ch, to_room)) {
 				for (c = ROOM_PEOPLE(to_room); c; c = c->next_in_room) {
-					if (CAN_SEE(ch, c)) {
+					if (CAN_SEE(ch, c) && WIZHIDE_OK(ch, c)) {
 						bufsize += snprintf(buf + bufsize, sizeof(buf) - bufsize, "%s, ", PERS(c, ch, FALSE));
 						if (last_comma_pos != -1) {
 							prev_comma_pos = last_comma_pos;
@@ -1098,7 +1098,7 @@ void look_in_direction(char_data *ch, int dir) {
 			if (to_room && !ROOM_SECT_FLAGGED(to_room, SECTF_OBSCURE_VISION) && !ROOM_IS_CLOSED(to_room)) {
 				if (CAN_SEE_IN_DARK_ROOM(ch, to_room)) {
 					for (c = ROOM_PEOPLE(to_room); c; c = c->next_in_room) {
-						if (CAN_SEE(ch, c)) {
+						if (CAN_SEE(ch, c) && WIZHIDE_OK(ch, c)) {
 							bufsize += snprintf(buf + bufsize, sizeof(buf) - bufsize, "%s, ", PERS(c, ch, FALSE));
 							if (last_comma_pos != -1) {
 								prev_comma_pos = last_comma_pos;

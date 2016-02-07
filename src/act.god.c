@@ -150,7 +150,7 @@ ACMD(do_create) {
 				obj_to_room(obj, IN_ROOM(ch));
 			}
 			else {
-				obj_to_char_or_room(obj, ch);
+				obj_to_char(obj, ch);
 			}
 			
 			scale_item_to_level(obj, 1);	// minimum level

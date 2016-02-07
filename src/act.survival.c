@@ -48,7 +48,7 @@ INTERACTION_FUNC(butcher_interact) {
 	for (num = 0; num < interaction->quantity; ++num) {
 		fillet = read_object(interaction->vnum, TRUE);
 		scale_item_to_level(fillet, 1);	// minimum level
-		obj_to_char_or_room(fillet, ch);
+		obj_to_char(fillet, ch);
 		load_otrigger(fillet);
 	}
 	

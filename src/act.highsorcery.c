@@ -699,7 +699,7 @@ ACMD(do_disenchant) {
 		
 			if (vnum != NOTHING) {
 				reward = read_object(vnum, TRUE);
-				obj_to_char_or_room(reward, ch);
+				obj_to_char(reward, ch);
 				act("You manage to weave the freed mana into $p!", FALSE, ch, reward, NULL, TO_CHAR);
 				act("$n weaves the freed mana into $p!", TRUE, ch, reward, NULL, TO_ROOM);
 				load_otrigger(reward);
