@@ -2189,7 +2189,7 @@ void output_map_to_file(void) {
 			// load room only if in memory
 			room = real_real_room(world_map[x][y].vnum);
 			sect = world_map[x][y].sector_type;
-			if (room && ROOM_AFF_FLAGGED(room, ROOM_AFF_CHAMELEON)) {
+			if (room && ROOM_AFF_FLAGGED(room, ROOM_AFF_CHAMELEON) && IS_COMPLETE(room)) {
 				sect = world_map[x][y].base_sector;
 			}
 			
@@ -2202,7 +2202,7 @@ void output_map_to_file(void) {
 			}
 		
 			// political output
-			if (room && (emp = ROOM_OWNER(room)) && !ROOM_AFF_FLAGGED(room, ROOM_AFF_CHAMELEON)) {
+			if (room && (emp = ROOM_OWNER(room)) && (!ROOM_AFF_FLAGGED(room, ROOM_AFF_CHAMELEON) || !IS_COMPLETE(room))) {
 				// find the first color in banner_to_mapout_token that is in the banner
 				color = -1;
 				for (num = 0; banner_to_mapout_token[0][0] != '\n'; ++num) {
