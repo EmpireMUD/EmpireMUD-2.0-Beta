@@ -1649,7 +1649,7 @@ Toggles:
   tell - the tell channel
   shout - the local shout channel
   political - shows empire colors instead of terrain colors
-  mortlog - see logs when people log in, log out, and die
+  mortlog - see logs when people create characters and die
   scrolling - scroll long text instead of paginating
   brief - see smaller maps and no room descriptions
   compact - no extra newlines
