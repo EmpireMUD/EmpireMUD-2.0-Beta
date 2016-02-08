@@ -233,7 +233,8 @@ Usage:  morph mist
 Cost: 20 blood (40 in combat)
 Upkeep:  1 blood/hr
 
-The vampire dissolves into mist, unable to be harmed.
+The vampire dissolves into mist, unable to be harmed. Many spells and abilities
+cannot be used while in this state, but you can use it in combat.
 
 See also: MORPH
 #
@@ -246,7 +247,8 @@ Cost:  20 blood
 Upkeep:  1 blood/hr
 
 With this ability, a vampire can mummify itself in a hard casing, protecting
-it from all physical harm. You cannot, however, move while mummified.
+it from all physical harm. You cannot, however, move while mummified, and you
+can't activate this ability in combat.
 #
 "PREDATOR VISION"
 
