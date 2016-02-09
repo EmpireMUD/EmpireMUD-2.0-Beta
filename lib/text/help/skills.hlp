@@ -527,8 +527,9 @@ Commands: sew tent
 Requires 8 large leather to sew.
 
 Once you have sewn a tent, you can carry it with you in your inventory and set
-it up or take it down using build and dismantle. The tent requires no add-
-itional resources each time you set it up.
+it up or take it down using build and dismantle. The basic tent requires no
+additional resources each time you set it up. The interior provides the same
+increased regeneration rate while resting as a bedroom.
 
 Building the tent will claim the land, just like any building command. When
 you dismantle it later, be sure to abandon the claim.
