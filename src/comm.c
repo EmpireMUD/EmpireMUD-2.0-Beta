@@ -2745,7 +2745,7 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					if (IS_HUNGRY(ch)) {
 						strcat(i, "\t0H");
 					}
-					if (!IS_NPC(ch) && GET_MORPH(ch) != MORPH_NONE) {
+					if (IS_MORPHED(ch)) {
 						strcat(i, "\t0M");
 					}
 					if (IS_PVP_FLAGGED(ch)) {
@@ -2794,7 +2794,7 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					if (IS_HUNGRY(ch)) {
 						sprintf(i + strlen(i), "%shungry", (*i ? " " : ""));
 					}
-					if (!IS_NPC(ch) && GET_MORPH(ch) != MORPH_NONE) {
+					if (IS_MORPHED(ch)) {
 						sprintf(i + strlen(i), "%smorphed", (*i ? " " : ""));
 					}
 					if (IS_PVP_FLAGGED(ch)) {

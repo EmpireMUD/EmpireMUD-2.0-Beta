@@ -84,7 +84,7 @@ void check_attribute_gear(char_data *ch) {
 	}
 	
 	// don't bother if morphed -- let them keep using gear, but not equip any more
-	if (GET_MORPH(ch) != MORPH_NONE) {
+	if (IS_MORPHED(ch)) {
 		return;
 	}
 	
@@ -442,7 +442,7 @@ void real_update_char(char_data *ch) {
 		adventure_unsummon(ch);
 	}
 	
-	if (!IS_NPC(ch) && GET_MORPH(ch) != MORPH_NONE) {
+	if (!IS_NPC(ch) && IS_MORPHED(ch)) {
 		check_morph_ability(ch);
 	}
 	
@@ -659,10 +659,10 @@ void real_update_char(char_data *ch) {
 		update_vampire_sun(ch);
 	}
 
-	if (!AWAKE(ch) && GET_MORPH(ch) == MORPH_MIST) {
+	if (!AWAKE(ch) && IS_MORPHED(ch) && MORPH_VNUM(GET_MORPH(ch)) == MORPH_MIST) {
 		sprintf(buf, "%s has become $n!", PERS(ch, ch, 0));
 
-		perform_morph(ch, MORPH_NONE);
+		perform_morph(ch, NULL);
 
 		act(buf, TRUE, ch, 0, 0, TO_ROOM);
 		msg_to_char(ch, "You revert to normal!\r\n");

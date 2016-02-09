@@ -79,16 +79,15 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 	
 	// empire_data *emp = GET_LOYALTY(ch);
 	
+	// un-morph
+	if (IS_MORPHED(ch) && MORPH_ABILITY(GET_MORPH(ch)) == ABIL_VNUM(abil)) {
+		perform_morph(ch, NULL);
+	}
+	
 	switch (ABIL_VNUM(abil)) {
 		case ABIL_ALACRITY: {
 			void end_alacrity(char_data *ch);
 			end_alacrity(ch);
-			break;
-		}
-		case ABIL_ANIMAL_FORMS: {
-			if (GET_MORPH(ch) == MORPH_DEER || GET_MORPH(ch) == MORPH_OSTRICH || GET_MORPH(ch) == MORPH_TAPIR) {
-				perform_morph(ch, MORPH_NONE);
-			}
 			break;
 		}
 		case ABIL_BANSHEE: {
@@ -97,12 +96,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 		}
 		case ABIL_BASILISK: {
 			despawn_familiar(ch, FAMILIAR_BASILISK);
-			break;
-		}
-		case ABIL_BAT_FORM: {
-			if (GET_MORPH(ch) == MORPH_BAT) {
-				perform_morph(ch, MORPH_NONE);
-			}
 			break;
 		}
 		case ABIL_BLOODSWORD: {
@@ -159,12 +152,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			}
 			break;
 		}
-		case ABIL_DREAD_BLOOD_FORM: {
-			if (GET_MORPH(ch) == MORPH_DREAD_BLOOD) {
-				perform_morph(ch, MORPH_NONE);
-			}
-			break;
-		}
 		case ABIL_EARTHMELD: {
 			if (affected_by_spell(ch, ATYPE_EARTHMELD)) {
 				void un_earthmeld(char_data *ch);
@@ -201,12 +188,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			remove_armor_by_type(ch, ARMOR_HEAVY);
 			break;
 		}
-		case ABIL_HORRID_FORM: {
-			if (GET_MORPH(ch) == MORPH_HORRID_FORM) {
-				perform_morph(ch, MORPH_NONE);
-			}
-			break;
-		}
 		case ABIL_LIGHT_ARMOR: {
 			remove_armor_by_type(ch, ARMOR_LIGHT);
 			break;
@@ -229,12 +210,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 		}
 		case ABIL_MIRRORIMAGE: {
 			despawn_familiar(ch, MIRROR_IMAGE_MOB);
-			break;
-		}
-		case ABIL_MIST_FORM: {
-			if (GET_MORPH(ch) == MORPH_MIST) {
-				perform_morph(ch, MORPH_NONE);
-			}
 			break;
 		}
 		case ABIL_MOON_RABBIT: {
@@ -307,18 +282,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			despawn_familiar(ch, FAMILIAR_SCORPION_SHADOW);
 			break;
 		}
-		case ABIL_SAGE_WEREWOLF_FORM: {
-			if (GET_MORPH(ch) == MORPH_SAGE_WEREWOLF) {
-				perform_morph(ch, MORPH_NONE);
-			}
-			break;
-		}
-		case ABIL_SAVAGE_WEREWOLF_FORM: {
-			if (GET_MORPH(ch) == MORPH_SAVAGE_WEREWOLF) {
-				perform_morph(ch, MORPH_NONE);
-			}
-			break;
-		}
 		case ABIL_SHIELD_BLOCK: {
 			if ((obj = GET_EQ(ch, WEAR_HOLD)) && IS_SHIELD(obj)) {
 				act("You stop using $p.", FALSE, ch, GET_EQ(ch, WEAR_HOLD), NULL, TO_CHAR);
@@ -340,18 +303,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 		}
 		case ABIL_SOULMASK: {
 			affect_from_char(ch, ATYPE_SOULMASK);
-			break;
-		}
-		case ABIL_TOWERING_WEREWOLF_FORM: {
-			if (GET_MORPH(ch) == MORPH_TOWERING_WEREWOLF) {
-				perform_morph(ch, MORPH_NONE);
-			}
-			break;
-		}
-		case ABIL_WOLF_FORM: {
-			if (GET_MORPH(ch) == MORPH_WOLF) {
-				perform_morph(ch, MORPH_NONE);
-			}
 			break;
 		}
 		default: {

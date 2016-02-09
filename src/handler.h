@@ -331,7 +331,6 @@ extern int limit_crowd_control(char_data *victim, int atype);
 
 // morph.c
 extern int get_morph_attack_type(char_data *ch);
-extern bool MORPH_FLAGGED(char_data *ch, bitvector_t flag);
 void perform_morph(char_data *ch, ubyte form);
 
 // objsave.c

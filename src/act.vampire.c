@@ -106,7 +106,7 @@ void cancel_blood_upkeeps(char_data *ch) {
 					break;
 				}
 				case VUP_MORPH: {
-					active = (GET_MORPH(ch) == vampire_upkeep[iter].value);
+					active = (IS_MORPHED(ch) && MORPH_VNUM(GET_MORPH(ch)) == vampire_upkeep[iter].value);
 					break;
 				}
 			}
@@ -245,7 +245,7 @@ int get_blood_upkeep_cost(char_data *ch) {
 					break;
 				}
 				case VUP_MORPH: {
-					if (GET_MORPH(ch) == vampire_upkeep[iter].value) {
+					if (IS_MORPHED(ch) && MORPH_VNUM(GET_MORPH(ch)) == vampire_upkeep[iter].value) {
 						cost += vampire_upkeep[iter].blood;
 					}
 					break;
@@ -591,7 +591,7 @@ void update_vampire_sun(char_data *ch) {
 	}
 	
 	// revert vampire morphs
-	if (GET_MORPH(ch) != MORPH_NONE && MORPH_FLAGGED(ch, MORPHF_VAMPIRE_ONLY)) {
+	if (IS_MORPHED(ch) && CHAR_MORPH_FLAGGED(ch, MORPHF_VAMPIRE_ONLY)) {
 		if (!found) {
 			sun_message(ch);
 		}
@@ -599,7 +599,7 @@ void update_vampire_sun(char_data *ch) {
 		// store morph name
 		sprintf(buf, "%s lurches and reverts into $n!", PERS(ch, ch, 0));
 
-		perform_morph(ch, MORPH_NONE);
+		perform_morph(ch, NULL);
 
 		act(buf, TRUE, ch, 0, 0, TO_ROOM);
 		msg_to_char(ch, "You revert to your natural form!\r\n");
@@ -939,7 +939,7 @@ ACMD(do_claws) {
 	if (!check_vampire_sun(ch, TRUE)) {
 		return;
 	}
-	if (MORPH_FLAGGED(ch, MORPHF_NO_CLAWS)) {
+	if (CHAR_MORPH_FLAGGED(ch, MORPHF_NO_CLAWS)) {
 		msg_to_char(ch, "You can't grow claws in this form!\r\n");
 		return;
 	}

@@ -1302,9 +1302,6 @@ void convert_char(struct b3_char_file_u *cfu) {
 	if (cfu->player_specials_saved.mapsize) {
 		fprintf(fl, "Mapsize: %d\n", cfu->player_specials_saved.mapsize);
 	}
-	if (cfu->player_specials_saved.morph != MORPH_NONE) {
-		fprintf(fl, "Morph: %d\n", cfu->player_specials_saved.morph);
-	}
 	if (cfu->player_specials_saved.mount_flags) {
 		fprintf(fl, "Mount Flags: %s\n", bitv_to_alpha(cfu->player_specials_saved.mount_flags));
 	}

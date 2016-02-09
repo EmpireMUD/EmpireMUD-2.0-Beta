@@ -710,7 +710,7 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 	}
 	
 	// empire prefixing
-	if (!MORPH_FLAGGED(i, MORPHF_ANIMAL)) {
+	if (!CHAR_MORPH_FLAGGED(i, MORPHF_ANIMAL)) {
 		if (IS_DISGUISED(i)) {
 			if (ROOM_OWNER(IN_ROOM(i))) {
 				// disguised player shows loyalty of the area you're in -- players can't tell you're not an npc
@@ -843,10 +843,7 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 		}
 	if (!IS_NPC(i) && GET_ACTION(i) == ACT_MORPHING)
 		act("...$e is undergoing a hideous transformation!", FALSE, i, 0, ch, TO_VICT);
-	if (IS_IMMORTAL(ch) && !IS_NPC(i) && GET_MORPH(i) != MORPH_NONE)
-		act("...this appears to be $o.", FALSE, i, 0, ch, TO_VICT);
-	
-	if (IS_IMMORTAL(ch) && !IS_NPC(i) && IS_DISGUISED(i)) {
+	if (IS_IMMORTAL(ch) && (IS_MORPHED(i) || IS_DISGUISED(i))) {
 		act("...this appears to be $o.", FALSE, i, 0, ch, TO_VICT);
 	}
 	
@@ -966,21 +963,21 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 	}
 
 	// For morphs, we show a description
-	if (!IS_NPC(i) && GET_MORPH(i) != MORPH_NONE) {
+	if (IS_MORPHED(i)) {
 		act(morph_string(i, MORPH_STRING_DESC), FALSE, ch, 0, i, TO_CHAR);
 	}
 	
 	// only show this block if the person is not morphed, or the morph is not an npc disguise
-	if (IS_NPC(i) || IS_IMMORTAL(ch) || GET_MORPH(i) == MORPH_NONE || !MORPH_FLAGGED(i, MORPHF_ANIMAL)) {
+	if (IS_NPC(i) || IS_IMMORTAL(ch) || !IS_MORPHED(i) || !CHAR_MORPH_FLAGGED(i, MORPHF_ANIMAL)) {
 		
-		if (GET_LOYALTY(i) && !IS_DISGUISED(i) && !MORPH_FLAGGED(i, MORPHF_ANIMAL)) {
+		if (GET_LOYALTY(i) && !IS_DISGUISED(i) && !CHAR_MORPH_FLAGGED(i, MORPHF_ANIMAL)) {
 			sprintf(buf, "   $E is a member of %s.", EMPIRE_NAME(GET_LOYALTY(i)));
 			act(buf, FALSE, ch, NULL, i, TO_CHAR);
 		}
 		
 		if (!IS_NPC(i) && !IS_DISGUISED(i)) {
 			// basic description -- don't show if morphed
-			if (GET_LONG_DESC(i) && (IS_NPC(i) || GET_MORPH(i) == MORPH_NONE)) {
+			if (GET_LONG_DESC(i) && !IS_MORPHED(i)) {
 				msg_to_char(ch, "%s&0", GET_LONG_DESC(i));
 			}
 
@@ -1029,7 +1026,7 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 		return;
 	}
 
-	if (ch != i && (IS_IMMORTAL(ch) || IS_NPC(i) || GET_MORPH(i) == MORPH_NONE || !MORPH_FLAGGED(i, MORPHF_ANIMAL)) && has_ability(ch, ABIL_APPRAISAL)) {
+	if (ch != i && (IS_IMMORTAL(ch) || !IS_MORPHED(i) || !CHAR_MORPH_FLAGGED(i, MORPHF_ANIMAL)) && has_ability(ch, ABIL_APPRAISAL)) {
 		act("\r\nYou appraise $s inventory:", FALSE, i, 0, ch, TO_VICT);
 		list_obj_to_char(i->carrying, ch, OBJ_DESC_INVENTORY, TRUE);
 
@@ -1786,7 +1783,7 @@ ACMD(do_affects) {
 	}
 
 	/* Morph */
-	if (GET_MORPH(ch) != MORPH_NONE) {
+	if (IS_MORPHED(ch)) {
 		msg_to_char(ch, "   You are in the form of %s!\r\n", morph_string(ch, MORPH_STRING_NAME));
 	}
 	else if (IS_DISGUISED(ch)) {

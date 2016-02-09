@@ -338,7 +338,7 @@ char *PERS(char_data *ch, char_data *vict, bool real) {
 		return "someone";
 	}
 
-	if (!IS_NPC(ch) && GET_MORPH(ch) && !real) {
+	if (IS_MORPHED(ch) && !real) {
 		return morph_string(ch, MORPH_STRING_NAME);
 	}
 	

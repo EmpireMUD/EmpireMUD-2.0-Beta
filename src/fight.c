@@ -224,7 +224,7 @@ int get_attack_type(char_data *ch, obj_data *weapon) {
 				w_type = TYPE_HIT;
 			}
 		}
-		else if (!IS_NPC(ch) && GET_MORPH(ch) != MORPH_NONE) {
+		else if (IS_MORPHED(ch)) {
 			w_type = get_morph_attack_type(ch);
 		}
 		else if (AFF_FLAGGED(ch, AFF_DISARM) && weapon && IS_WEAPON(weapon) && attack_hit_info[GET_WEAPON_TYPE(weapon)].damage_type == DAM_MAGICAL) {
@@ -896,7 +896,7 @@ obj_data *die(char_data *ch, char_data *killer) {
 	}
 	
 	// disable things
-	perform_morph(ch, MORPH_NONE);
+	perform_morph(ch, NULL);
 	cancel_blood_upkeeps(ch);
 	perform_dismount(ch);
 	
@@ -1386,7 +1386,7 @@ static bool tower_would_shoot(room_data *from_room, char_data *vict) {
 		return FALSE;
 	}
 
-	if (CHECK_MAJESTY(vict) || MORPH_FLAGGED(vict, MORPHF_ANIMAL)) {
+	if (CHECK_MAJESTY(vict) || CHAR_MORPH_FLAGGED(vict, MORPHF_ANIMAL)) {
 		return FALSE;
 	}
 	
@@ -3028,10 +3028,10 @@ void perform_execute(char_data *ch, char_data *victim, int attacktype, int damty
 		}
 	}
 
-	if (revert && !IS_NPC(victim) && GET_MORPH(victim) != MORPH_NONE) {
+	if (revert && IS_MORPHED(ch)) {
 		sprintf(buf, "%s reverts into $n!", PERS(victim, victim, FALSE));
 
-		perform_morph(victim, MORPH_NONE);
+		perform_morph(victim, NULL);
 		act(buf, TRUE, victim, 0, 0, TO_ROOM);
 	}
 	

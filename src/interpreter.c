@@ -1121,7 +1121,7 @@ void command_interpreter(char_data *ch, char *argument) {
 	else if (IS_SET(cmd_info[cmd].flags, CMD_NOT_RP) && !IS_NPC(ch) && !IS_GOD(ch) && !IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_RP)) {
 		msg_to_char(ch, "You can't do that while role-playing!\r\n");
 	}
-	else if (IS_SET(cmd_info[cmd].flags, CMD_NO_ANIMALS) && MORPH_FLAGGED(ch, MORPHF_ANIMAL)) {
+	else if (IS_SET(cmd_info[cmd].flags, CMD_NO_ANIMALS) && CHAR_MORPH_FLAGGED(ch, MORPHF_ANIMAL)) {
 		msg_to_char(ch, "You can't do that in this form!\r\n");
 	}
 	else if (IS_INJURED(ch, INJ_STAKED) && cmd_info[cmd].minimum_position >= POS_SLEEPING && !IS_IMMORTAL(ch))
