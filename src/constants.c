@@ -2489,6 +2489,7 @@ const char *affect_types[] = {
 	"shadow jab",
 	"confer",	// 60
 	"conferred",
+	"morph",
 	"\n"
 	};
 
@@ -2557,6 +2558,7 @@ const char *affect_wear_off_msgs[] = {
 	"You are no longer weakened by the shadow jab.",
 	"The power you were conferred has faded.",	// 60
 	"Your conferred strength returns.",
+	"",	// morph stats -- no wear-off message
 	"\n"
 };
 

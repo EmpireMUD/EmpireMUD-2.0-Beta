@@ -1479,12 +1479,12 @@ void process_minting(char_data *ch) {
 * @param char_data *ch The morpher.
 */
 void process_morphing(char_data *ch) {
-	void finish_morphing(char_data *ch, int morph_to);
+	void finish_morphing(char_data *ch, morph_data *morph);
 
 	GET_ACTION_TIMER(ch) -= 1;
 
 	if (GET_ACTION_TIMER(ch) <= 0) {
-		finish_morphing(ch, GET_ACTION_VNUM(ch, 0));
+		finish_morphing(ch, morph_proto(GET_ACTION_VNUM(ch, 0)));
 		GET_ACTION(ch) = ACT_NONE;
 	}
 	else {

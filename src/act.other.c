@@ -1515,6 +1515,11 @@ ACMD(do_milk) {
 }
 
 
+ACMD(do_morph) {
+	msg_to_char(ch, "Morphs temporarily disabled.\r\n");
+}
+
+
 ACMD(do_mydescription) {
 	skip_spaces(&argument);
 	

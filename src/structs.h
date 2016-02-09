@@ -2915,7 +2915,7 @@ struct cooldown_data {
 
 // for damage-over-time (DoTs)
 struct over_time_effect_type {
-	sh_int type;	// ATYPE_x
+	sh_int type;	// ATYPE_
 	int cast_by;	// player ID (positive) or mob vnum (negative)
 	sh_int duration;	// time in 5-second real-updates
 	sh_int damage_type;	// DAM_x type
@@ -3066,15 +3066,15 @@ struct poison_data_type {
 	char *name;
 	any_vnum ability;
 	
-	int atype;	// ATYPE_x
-	int apply;	// APPLY_x
+	int atype;	// ATYPE_
+	int apply;	// APPLY_
 	int mod;	// +/- value
 	bitvector_t aff;
 	
 	// dot affect
-	int dot_type;	// ATYPE_x, -1 for none
+	int dot_type;	// ATYPE_, -1 for none
 	int dot_duration;	// time for the dot
-	int dot_damage_type;	// DAM_x for the dot
+	int dot_damage_type;	// DAM_ for the dot
 	int dot_damage;	// damage for the dot
 	int dot_max_stacks;	// how high the dot can stack
 	
@@ -3086,10 +3086,10 @@ struct poison_data_type {
 // see act.naturalmagic.c
 struct potion_data_type {
 	char *name;	// name for olc, etc
-	int atype;	// ATYPE_x
-	int apply;	// APPLY_x
+	int atype;	// ATYPE_
+	int apply;	// APPLY_
 	bitvector_t aff;
-	int spec;	// POTION_SPEC_x
+	int spec;	// POTION_SPEC_
 };
 
 

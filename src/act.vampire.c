@@ -52,7 +52,7 @@ void un_mummify(char_data *ch);
 //// CONSTS //////////////////////////////////////////////////////////////////
 
 // flags for vampire_upkeep[] -- if you add a new one, modify get_blood_upkeep_cost() and cancel_blood_upkeeps()
-#define VUP_AFFECT  1	// represents an active affect ATYPE_x
+#define VUP_AFFECT  1	// represents an active affect ATYPE_
 #define VUP_MORPH  2	// represents a MORPH_x state
 
 
@@ -69,7 +69,7 @@ const struct vampire_upkeep_type vampire_upkeep[] = {
 	{ VUP_MORPH, MORPH_BAT, 1, end_morph },
 	{ VUP_MORPH, MORPH_MIST, 1, end_morph },
 	
-	// affects are charged per instance of the ATYPE_x flag, so boost may charge twice
+	// affects are charged per instance of the ATYPE_ flag, so boost may charge twice
 	{ VUP_AFFECT, ATYPE_ALACRITY, 3, end_alacrity },
 	{ VUP_AFFECT, ATYPE_BOOST, 1, end_boost },
 	{ VUP_AFFECT, ATYPE_CLAWS, 2, retract_claws },

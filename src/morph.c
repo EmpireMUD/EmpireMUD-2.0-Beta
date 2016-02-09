@@ -49,11 +49,67 @@ extern struct resource_data *copy_resource_list(struct resource_data *input);
 void get_resource_display(struct resource_data *list, char *save_buffer);
 
 // local protos
-void finish_morphing(char_data *ch, int morph_to);
+void finish_morphing(char_data *ch, morph_data *morph);
 
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
+
+/**
+* Scales morph applies and adds them to the character.
+*
+* @param char_data *ch The character to add morph affects to.
+*/
+void add_morph_affects(char_data *ch) {
+	morph_data *morph = GET_MORPH(ch);
+	
+	// no work
+	if (!morph) {
+		return;
+	}
+	
+	// TODO
+}
+
+
+/**
+* Ensures that a player can still be in their morph. This may un-morph them.
+*
+* @param char_data *ch The character to check.
+*/
+void check_morph_ability(char_data *ch) {
+	bool revert = FALSE;
+	
+	// nothing to check
+	if (!IS_MORPHED(ch)) {
+		return;
+	}
+	
+	if (!revert && MORPH_ABILITY(GET_MORPH(ch)) != NO_ABIL && !has_ability(ch, MORPH_ABILITY(GET_MORPH(ch)))) {
+		revert = TRUE;
+	}
+	if (!revert && CHAR_MORPH_FLAGGED(ch, MORPHF_CHECK_SOLO) && !check_solo_role(ch)) {
+		revert = TRUE;
+	}
+	
+	if (revert) {
+		finish_morphing(ch, NULL);
+	}
+}
+
+
+/**
+* Morphs a player back to normal. This function takes just 1 arg so it can
+* be passed e.g. as a function pointer in vampire blood upkeep.
+*
+* @param char_data *ch The morph-ed one.
+*/
+void end_morph(char_data *ch) {
+	if (IS_MORPHED(ch)) {
+		perform_morph(ch, NULL);
+	}
+}
+
 
 /**
 * Used for choosing a morph that's valid for the player.
@@ -89,6 +145,77 @@ morph_data *find_morph_by_name(char_data *ch, char *name) {
 	
 	// no exact match...
 	return partial;
+}
+
+
+/**
+* This is called by the morphing action, as well as the instamorph in do_morph.
+* It sends messages and finishes the morph.
+*
+* @param char_data *ch The person for whom it's morphin' time.
+* @param morph_data *morph Which form to change into (NULL for none).
+*/
+void finish_morphing(char_data *ch, morph_data *morph) {
+	void undisguise(char_data *ch);
+
+	char lbuf[MAX_STRING_LENGTH];
+	
+	// can't be disguised while morphed
+	if (IS_DISGUISED(ch) && morph != NULL) {
+		undisguise(ch);
+	}
+	
+	sprintf(lbuf, "%s has become $n!", PERS(ch, ch, FALSE));
+
+	perform_morph(ch, morph);
+
+	act(lbuf, TRUE, ch, 0, 0, TO_ROOM);
+	act("You have become $n!", FALSE, ch, 0, 0, TO_CHAR);
+	
+	if (morph && MORPH_ABILITY(morph) != NO_ABIL) {
+		gain_ability_exp(ch, MORPH_ABILITY(morph), 33.4);
+	}
+}
+
+
+/**
+* Puts a character into a morph form (or back) with no message.
+*
+* @param char_data *ch The person to morph.
+* @param morph_data *morph Which morph (NULL to revert to normal).
+*/
+void perform_morph(char_data *ch, morph_data *morph) {
+	ACMD(do_dismount);
+	double move_mod, health_mod, mana_mod;
+	
+	// read current pools
+	health_mod = (double) GET_HEALTH(ch) / GET_MAX_HEALTH(ch);
+	move_mod = (double) GET_MOVE(ch) / GET_MAX_MOVE(ch);
+	mana_mod = (double) GET_MANA(ch) / GET_MAX_MANA(ch);
+	
+	// remove all existing morph effects
+	affect_from_char(ch, ATYPE_MORPH);
+
+	if (IS_RIDING(ch) && morph != NULL) {
+		do_dismount(ch, "", 0, 0);
+	}
+
+	// Set the new form
+	GET_MORPH(ch) = morph;
+	add_morph_affects(ch);
+	
+	// this fixes all the things
+	affect_total(ch);
+
+	// set new pools
+	GET_HEALTH(ch) = (sh_int) (GET_MAX_HEALTH(ch) * health_mod);
+	GET_MOVE(ch) = (sh_int) (GET_MAX_MOVE(ch) * move_mod);
+	GET_MANA(ch) = (sh_int) (GET_MAX_MANA(ch) * mana_mod);
+	
+	// flag-specific changes
+	if (CHAR_MORPH_FLAGGED(ch, MORPHF_NO_CLAWS) && AFF_FLAGGED(ch, AFF_CLAWS)) {
+		affects_from_char_by_aff_flag(ch, AFF_CLAWS);
+	}
 }
 
 
@@ -338,6 +465,7 @@ void clear_morph(morph_data *morph) {
 	MORPH_VNUM(morph) = NOTHING;
 	MORPH_ABILITY(morph) = NO_ABIL;
 	MORPH_REQUIRES_OBJ(morph) = NOTHING;
+	MORPH_ATTACK_TYPE(morph) = TYPE_HIT;
 }
 
 
@@ -700,7 +828,7 @@ void do_stat_morph(char_data *ch, morph_data *morph) {
 	if ((abil = find_ability_by_vnum(MORPH_ABILITY(morph))) && ABIL_ASSIGNED_SKILL(abil) != NULL) {
 		snprintf(part + strlen(part), sizeof(part) - strlen(part), " (%s %d)", SKILL_ABBREV(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
 	}
-	size += snprintf(buf + size, sizeof(buf) - size, "Cost: [\ty%d %s\t0], Requires Ability: [\ty%s\t0]\r\n", MORPH_COST(morph), MORPH_COST(morph) > 0 ? pool_types[MORPH_COST_TYPE(morph)] : "/ none", part);
+	size += snprintf(buf + size, sizeof(buf) - size, "Cost: [\ty%d %s\t0], Max Level: [\ty%d%s\t0], Requires Ability: [\ty%s\t0]\r\n", MORPH_COST(morph), MORPH_COST(morph) > 0 ? pool_types[MORPH_COST_TYPE(morph)] : "/ none", MORPH_MAX_SCALE(morph), (MORPH_MAX_SCALE(morph) == 0 ? " none" : ""), part);
 	
 	if (MORPH_REQUIRES_OBJ(morph) != NOTHING) {
 		size += snprintf(buf + size, sizeof(buf) - size, "Requires item: [%d] \tg%s\t0\r\n", MORPH_REQUIRES_OBJ(morph), skip_filler(get_obj_name_by_proto(MORPH_REQUIRES_OBJ(morph))));
@@ -708,7 +836,9 @@ void do_stat_morph(char_data *ch, morph_data *morph) {
 	
 	sprintbit(MORPH_FLAGS(morph), morph_flags, part, TRUE);
 	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
-		
+	
+	size += snprintf(buf + size, sizeof(buf) - size, "Attack type: %s", attack_hit_info[MORPH_ATTACK_TYPE(morph)].name);
+	
 	// applies
 	size += snprintf(buf + size, sizeof(buf) - size, "Applies: ");
 	for (app = MORPH_APPLIES(morph), num = 0; app; app = app->next, ++num) {

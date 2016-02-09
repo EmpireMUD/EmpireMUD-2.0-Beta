@@ -87,7 +87,7 @@ static int extractions_pending = 0;
 * Call affect_remove with every af of "type"
 *
 * @param char_data *ch The person to remove affects from.
-* @param int type Any ATYPE_x const
+* @param int type Any ATYPE_ const
 */
 void affect_from_char(char_data *ch, int type) {
 	struct over_time_effect_type *dot, *next_dot;
@@ -114,8 +114,8 @@ void affect_from_char(char_data *ch, int type) {
 * Calls affect_remove on every affect of type "type" with location "apply".
 *
 * @param char_data *ch The person to remove affects from.
-* @param int type Any ATYPE_x const to match.
-* @param int apply Any APPLY_x const to match.
+* @param int type Any ATYPE_ const to match.
+* @param int apply Any APPLY_ const to match.
 */
 void affect_from_char_by_apply(char_data *ch, int type, int apply) {
 	struct affected_type *aff, *next_aff;
@@ -133,8 +133,8 @@ void affect_from_char_by_apply(char_data *ch, int type, int apply) {
 * Calls affect_remove on every affect of type "type" that sets AFF flag "bits".
 *
 * @param char_data *ch The person to remove affects from.
-* @param int type Any ATYPE_x const to match.
-* @param bitvector_t bits Any AFF_x bit(s) to match.
+* @param int type Any ATYPE_ const to match.
+* @param bitvector_t bits Any AFF_ bit(s) to match.
 */
 void affect_from_char_by_bitvector(char_data *ch, int type, bitvector_t bits) {
 	struct affected_type *aff, *next_aff;
@@ -173,7 +173,7 @@ void affects_from_char_by_aff_flag(char_data *ch, bitvector_t aff_flag) {
 * Call affect_remove_room to remove all effects of "type"
 *
 * @param room_data *room The location to remove affects from.
-* @param int type Any ATYPE_X const
+* @param int type Any ATYPE_ const
 */
 void affect_from_room(room_data *room, int type) {
 	struct affected_type *hjp, *next;
@@ -518,7 +518,6 @@ void affect_to_room(room_data *room, struct affected_type *af) {
 */
 void affect_total(char_data *ch) {
 	extern const int base_player_pools[NUM_POOLS];
-	void update_morph_stats(char_data *ch, bool add);
 
 	struct affected_type *af;
 	int i, iter;
@@ -545,8 +544,6 @@ void affect_total(char_data *ch) {
 			}
 		}
 	}
-
-	update_morph_stats(ch, FALSE);
 	
 	// abilities
 	if (!IS_NPC(ch)) {
@@ -581,8 +578,6 @@ void affect_total(char_data *ch) {
 			}
 		}
 	}
-
-	update_morph_stats(ch, TRUE);
 
 	for (af = ch->affected; af; af = af->next) {
 		affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
@@ -633,7 +628,7 @@ void affect_total(char_data *ch) {
 
 /**
 * @param char_data *ch The person to check
-* @param int type Any ATYPE_x const
+* @param int type Any ATYPE_ const
 * @return bool TRUE if ch is affected by anything with matching type
 */
 bool affected_by_spell(char_data *ch, int type) {
@@ -659,11 +654,11 @@ bool affected_by_spell(char_data *ch, int type) {
 
 
 /**
-* Matches both an ATYPE_x and an APPLY_x on an effect.
+* Matches both an ATYPE_ and an APPLY_ on an effect.
 *
 * @param char_data *ch The character to check
-* @param int type the ATYPE_x flag
-* @param int apply the APPLY_x flag
+* @param int type the ATYPE_ flag
+* @param int apply the APPLY_ flag
 * @return bool TRUE if an effect matches both conditions
 */
 bool affected_by_spell_and_apply(char_data *ch, int type, int apply) {
@@ -683,11 +678,11 @@ bool affected_by_spell_and_apply(char_data *ch, int type, int apply) {
 /**
 * Create an affect that modifies a trait.
 *
-* @param int type ATYPE_x
+* @param int type ATYPE_
 * @param int duration in 5-second ticks
-* @param int location APPLY_x
+* @param int location APPLY_
 * @param int modifier +/- amount
-* @param bitvector_t bitvector AFF_x
+* @param bitvector_t bitvector AFF_
 * @param char_data *cast_by The caster who made the effect (may be NULL; use the person themselves for penalty effects as those won't cleanse).
 * @return struct affected_type* The created af
 */
@@ -708,9 +703,9 @@ struct affected_type *create_aff(int type, int duration, int location, int modif
 
 /**
 * @param char_data *ch Person receiving the DoT.
-* @param sh_int type ATYPE_x spell that caused it.
+* @param sh_int type ATYPE_ spell that caused it.
 * @param sh_int duration Affect time, in 5-second intervals.
-* @param sh_int damage_type DAM_x type.
+* @param sh_int damage_type DAM_ type.
 * @param sh_int damage How much damage to do per 5-seconds.
 * @param sh_int max_stack Number of times this can stack when re-applied before it expires.
 * @param sh_int char_data *cast_by The caster.
@@ -764,7 +759,7 @@ void dot_remove(char_data *ch, struct over_time_effect_type *dot) {
 
 /**
 * @param room_data *room The room to check
-* @param int type Any ATYPE_x const
+* @param int type Any ATYPE_ const
 * @return bool TRUE if the room is affected by the spell
 */
 bool room_affected_by_spell(room_data *room, int type) {

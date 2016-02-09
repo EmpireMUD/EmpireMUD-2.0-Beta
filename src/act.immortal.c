@@ -6502,6 +6502,12 @@ ACMD(do_vnum) {
 			msg_to_char(ch, "No globals by that name.\r\n");
 		}
 	}
+	else if (is_abbrev(buf, "morph")) {
+		extern int vnum_morph(char *searchname, char_data *ch);
+		if (!vnum_morph(buf2, ch)) {
+			msg_to_char(ch, "No morphs by that name.\r\n");
+		}
+	}
 	else if (is_abbrev(buf, "roomtemplate")) {
 		if (!vnum_room_template(buf2, ch)) {
 			msg_to_char(ch, "No room templates by that name.\r\n");
@@ -6645,6 +6651,15 @@ ACMD(do_vstat) {
 		char_to_room(mob, world_table);
 		do_stat_character(ch, mob);
 		extract_char(mob);
+	}
+	else if (is_abbrev(buf, "morph")) {
+		void do_stat_morph(char_data *ch, morph_data *morph);
+		morph_data *morph = morph_proto(number);
+		if (!morph) {
+			msg_to_char(ch, "There is no morph with that number.\r\n");
+			return;
+		}
+		do_stat_morph(ch, morph);
 	}
 	else if (is_abbrev(buf, "object")) {
 		if (!obj_proto(number)) {

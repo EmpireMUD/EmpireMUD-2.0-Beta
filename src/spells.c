@@ -69,14 +69,14 @@ struct damage_spell_type {
 	bitvector_t aff_immunity;	// AFF_x flag making person immune
 	
 	// affect group: all this only matters if aff_type != -1
-	int aff_type;	// ATYPE_x, -1 for none
+	int aff_type;	// ATYPE_, -1 for none
 	int duration;	// time for the affect
 	int apply;	// APPLY_x, 0 for none
 	int modifier;	// +/- value, if apply != 0
 	bitvector_t aff_flag;	// AFF_x, 0 for none
 	
 	// dot affect
-	int dot_type;	// ATYPE_x, -1 for none
+	int dot_type;	// ATYPE_, -1 for none
 	int dot_duration;	// time for the dot
 	int dot_damage_type;	// DAM_x for the dot
 	int dot_damage;	// damage for the dot

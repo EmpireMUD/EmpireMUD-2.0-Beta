@@ -244,9 +244,9 @@ struct b1_char_point_data {
 };
 
 struct b1_over_time_effect_type {
-	sh_int type;	// ATYPE_x
+	sh_int type;	// ATYPE_
 	sh_int duration;	// time in 5-second real-updates
-	sh_int damage_type;	// DAM_x type
+	sh_int damage_type;	// DAM_ type
 	sh_int damage;	// amount
 	sh_int stack;	// damage is multiplied by this
 	sh_int max_stack;	// how high it's allowed to stack
@@ -488,10 +488,10 @@ struct b2_char_point_data {
 };
 
 struct b2_over_time_effect_type {
-	sh_int type;	// ATYPE_x
+	sh_int type;	// ATYPE_
 	int cast_by;	// player ID (positive) or mob vnum (negative)
 	sh_int duration;	// time in 5-second real-updates
-	sh_int damage_type;	// DAM_x type
+	sh_int damage_type;	// DAM_ type
 	sh_int damage;	// amount
 	sh_int stack;	// damage is multiplied by this
 	sh_int max_stack;	// how high it's allowed to stack

@@ -253,7 +253,7 @@ void eliminate_linkdead_players(void) {
 * All other chars in the room that have the same affect will be freed from it.
 *
 * @param char_data *victim The person that was just crowd-controlled.
-* @param int atype The ATYPE_x spell type to limit.
+* @param int atype The ATYPE_ spell type to limit.
 * @return int The number of people freed by this function.
 */
 int limit_crowd_control(char_data *victim, int atype) {
