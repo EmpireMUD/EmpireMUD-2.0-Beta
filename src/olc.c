@@ -207,10 +207,12 @@ OLC_MODULE(mapedit_unclaimable);
 // morph modules
 OLC_MODULE(morphedit_ability);
 OLC_MODULE(morphedit_apply);
+OLC_MODULE(morphedit_attack);
 OLC_MODULE(morphedit_cost);
 OLC_MODULE(morphedit_costtype);
 OLC_MODULE(morphedit_flags);
 OLC_MODULE(morphedit_longdesc);
+OLC_MODULE(morphedit_maxlevel);
 OLC_MODULE(morphedit_name);
 OLC_MODULE(morphedit_requiresobject);
 OLC_MODULE(morphedit_shortdesc);
@@ -350,6 +352,7 @@ void olc_show_craft(char_data *ch);
 void olc_show_crop(char_data *ch);
 void olc_show_global(char_data *ch);
 void olc_show_mobile(char_data *ch);
+void olc_show_morph(char_data *ch);
 void olc_show_object(char_data *ch);
 void olc_show_room_template(char_data *ch);
 void olc_show_sector(char_data *ch);
@@ -367,6 +370,7 @@ extern craft_data *setup_olc_craft(craft_data *input);
 extern crop_data *setup_olc_crop(crop_data *input);
 extern struct global_data *setup_olc_global(struct global_data *input);
 extern char_data *setup_olc_mobile(char_data *input);
+extern morph_data *setup_olc_morph(morph_data *input);
 extern obj_data *setup_olc_object(obj_data *input);
 extern room_template *setup_olc_room_template(room_template *input);
 extern sector_data *setup_olc_sector(sector_data *input);
@@ -557,10 +561,12 @@ const struct olc_command_data olc_data[] = {
 	
 	// morph commands
 	{ "apply", morphedit_apply, OLC_MORPH, OLC_CF_EDITOR },
+	{ "attack", morphedit_attack, OLC_MORPH, OLC_CF_EDITOR },
 	{ "cost", morphedit_cost, OLC_MORPH, OLC_CF_EDITOR },
 	{ "costtype", morphedit_costtype, OLC_MORPH, OLC_CF_EDITOR },
 	{ "flags", morphedit_flags, OLC_MORPH, OLC_CF_EDITOR },
 	{ "longdescription", morphedit_longdesc, OLC_MORPH, OLC_CF_EDITOR },
+	{ "maxlevel", morphedit_maxlevel, OLC_MORPH, OLC_CF_EDITOR },
 	{ "name", morphedit_name, OLC_MORPH, OLC_CF_EDITOR },
 	{ "requiresability", morphedit_ability, OLC_MORPH, OLC_CF_EDITOR },
 	{ "requiresobject", morphedit_requiresobject, OLC_MORPH, OLC_CF_EDITOR },
@@ -2301,7 +2307,7 @@ OLC_MODULE(olc_removeindev) {
 	bool use_adv = FALSE, any = FALSE;
 	struct global_data *glb, *next_glb;
 	archetype_data *arch, *next_arch;
-	morph_adta *morph, *next_morph;
+	morph_data *morph, *next_morph;
 	craft_data *craft, *next_craft;
 	skill_data *skill, *next_skill;
 	augment_data *aug, *next_aug;
@@ -3809,6 +3815,8 @@ int olc_process_type(char_data *ch, char *argument, char *name, char *command, c
 
 
 void olc_process_applies(char_data *ch, char *argument, struct apply_data **list) {
+	extern const char *apply_types[];
+	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
 	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
 	struct apply_data *apply, *next_apply, *change, *temp;

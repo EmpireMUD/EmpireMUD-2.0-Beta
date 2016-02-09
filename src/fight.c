@@ -225,7 +225,7 @@ int get_attack_type(char_data *ch, obj_data *weapon) {
 			}
 		}
 		else if (IS_MORPHED(ch)) {
-			w_type = get_morph_attack_type(ch);
+			w_type = MORPH_ATTACK_TYPE(GET_MORPH(ch));
 		}
 		else if (AFF_FLAGGED(ch, AFF_DISARM) && weapon && IS_WEAPON(weapon) && attack_hit_info[GET_WEAPON_TYPE(weapon)].damage_type == DAM_MAGICAL) {
 			w_type = TYPE_MANA_BLAST;

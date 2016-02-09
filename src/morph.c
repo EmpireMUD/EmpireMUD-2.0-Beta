@@ -41,6 +41,7 @@ const char *default_morph_long_desc = "A shapeless morph is standing here.";
 
 // external consts
 extern const char *apply_types[];
+extern const char *morph_flags[];
 extern const char *pool_types[];
 
 // external funcs
@@ -401,13 +402,22 @@ void parse_morph(FILE *fl, any_vnum vnum) {
 	MORPH_SHORT_DESC(morph) = fread_string(fl, error);
 	MORPH_LONG_DESC(morph) = fread_string(fl, error);
 	
-	// 4. flags cost-type cost-amount ability requires-obj
-	if (!get_line(fl, line) || sscanf(line, "%s %d %d %d %d", str_in, &int_in[0], &int_in[1], &int_in[2], &int_in[3]) != 5) {
-		log("SYSERR: Format error in line 2 of %s", error);
+	// 4. flags attack-type max-level
+	if (!get_line(fl, line) || sscanf(line, "%s %d %d", str_in, &int_in[0], &int_in[1]) != 3) {
+		log("SYSERR: Format error in line 4 of %s", error);
 		exit(1);
 	}
 	
 	MORPH_FLAGS(morph) = asciiflag_conv(str_in);
+	MORPH_ATTACK_TYPE(morph) = int_in[0];
+	MORPH_MAX_SCALE(morph) = int_in[1];
+	
+	// 5. cost-type cost-amount ability requires-obj
+	if (!get_line(fl, line) || sscanf(line, "%d %d %d %d", &int_in[0], &int_in[1], &int_in[2], &int_in[3]) != 4) {
+		log("SYSERR: Format error in line 5 of %s", error);
+		exit(1);
+	}
+	
 	MORPH_COST_TYPE(morph) = int_in[0];
 	MORPH_COST(morph) = int_in[1];
 	MORPH_ABILITY(morph) = int_in[2];
@@ -468,8 +478,7 @@ void write_morph_to_file(FILE *fl, morph_data *morph) {
 	void write_applies_to_file(FILE *fl, struct apply_data *list);
 	void write_resources_to_file(FILE *fl, struct resource_data *list);
 	
-	char temp[256], temp2[256];
-	struct apply_data *app;
+	char temp[256];
 	
 	if (!fl || !morph) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: write_morph_to_file called without %s", !fl ? "file" : "morph");
@@ -483,9 +492,12 @@ void write_morph_to_file(FILE *fl, morph_data *morph) {
 	fprintf(fl, "%s~\n", NULLSAFE(MORPH_SHORT_DESC(morph)));
 	fprintf(fl, "%s~\n", NULLSAFE(MORPH_LONG_DESC(morph)));
 	
-	// 4. flags cost-type cost-amount ability requires-obj
+	// 4. flags attack-type max-level
 	strcpy(temp, bitv_to_alpha(MORPH_FLAGS(morph)));
-	fprintf(fl, "%s %d %d %d %d\n", temp, MORPH_COST_TYPE(morph), MORPH_COST(morph), MORPH_ABILITY(morph), MORPH_REQUIRES_OBJ(morph));
+	fprintf(fl, "%s %d %d\n", temp, MORPH_ATTACK_TYPE(morph), MORPH_MAX_SCALE(morph));
+	
+	// 5. cost-type cost-amount ability requires-obj
+	fprintf(fl, "%d %d %d %d\n", MORPH_COST_TYPE(morph), MORPH_COST(morph), MORPH_ABILITY(morph), MORPH_REQUIRES_OBJ(morph));
 	
 	// 'A': applies
 	write_applies_to_file(fl, MORPH_APPLIES(morph));
@@ -738,6 +750,15 @@ void olc_show_morph(char_data *ch) {
 	sprintbit(MORPH_FLAGS(morph), morph_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<\tyflags\t0> %s\r\n", lbuf);
 	
+	sprintf(buf + strlen(buf), "<&yattack&0> %s\r\n", attack_hit_info[MORPH_ATTACK_TYPE(morph)].name);
+	
+	if (MORPH_MAX_SCALE(morph) > 0) {
+		sprintf(buf + strlen(buf), "<&ymaxlevel&0> %d\r\n", MORPH_MAX_SCALE(morph));
+	}
+	else {
+		sprintf(buf + strlen(buf), "<&ymaxlevel&0> none\r\n");
+	}
+	
 	sprintf(buf + strlen(buf), "<\tycosttype\t0> %s\r\n", pool_types[MORPH_COST_TYPE(morph)]);
 	sprintf(buf + strlen(buf), "<\tycost\t0> %d %s\r\n", MORPH_COST(morph), pool_types[MORPH_COST_TYPE(morph)]);
 	
@@ -832,6 +853,13 @@ OLC_MODULE(morphedit_apply) {
 }
 
 
+OLC_MODULE(morphedit_attack) {
+	extern char **get_weapon_types_string();
+	morph_data *morph = GET_OLC_MORPH(ch->desc);
+	MORPH_ATTACK_TYPE(morph) = olc_process_type(ch, argument, "attack type", "attack", (const char**)get_weapon_types_string(), MORPH_ATTACK_TYPE(morph));
+}
+
+
 OLC_MODULE(morphedit_cost) {
 	morph_data *morph = GET_OLC_MORPH(ch->desc);
 	MORPH_COST(morph) = olc_process_number(ch, argument, "cost", "cost", 0, INT_MAX, MORPH_COST(morph));
@@ -861,6 +889,12 @@ OLC_MODULE(morphedit_flags) {
 OLC_MODULE(morphedit_longdesc) {
 	morph_data *morph = GET_OLC_MORPH(ch->desc);
 	olc_process_string(ch, argument, "long description", &MORPH_LONG_DESC(morph));
+}
+
+
+OLC_MODULE(morphedit_maxlevel) {
+	morph_data *morph = GET_OLC_MORPH(ch->desc);
+	MORPH_MAX_SCALE(morph) = olc_process_number(ch, argument, "maximum level", "maxlevel", 0, MAX_INT, MORPH_MAX_SCALE(morph));
 }
 
 

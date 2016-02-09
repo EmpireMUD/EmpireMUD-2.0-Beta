@@ -1524,7 +1524,7 @@ void close_socket(descriptor_data *d) {
 	
 	ProtocolDestroy(d->pProtocol);
 
-	// olc data
+	// OLC_x: olc data
 	if (d->olc_storage) {
 		free(d->olc_storage);
 	}
@@ -1551,6 +1551,9 @@ void close_socket(descriptor_data *d) {
 	}
 	if (d->olc_mobile) {
 		free_char(d->olc_mobile);
+	}
+	if (d->olc_morph) {
+		free_morph(d->olc_morph);
 	}
 	if (d->olc_building) {
 		free_building(d->olc_building);

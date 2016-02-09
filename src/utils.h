@@ -420,7 +420,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define STATE(d)  ((d)->connected)
 
 
-// olc
+// OLC_x: olc getters
 #define GET_OLC_TYPE(desc)  ((desc)->olc_type)
 #define GET_OLC_VNUM(desc)  ((desc)->olc_vnum)
 #define GET_OLC_STORAGE(desc)  ((desc)->olc_storage)
@@ -435,6 +435,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_OLC_CROP(desc)  ((desc)->olc_crop)
 #define GET_OLC_GLOBAL(desc)  ((desc)->olc_global)
 #define GET_OLC_MOBILE(desc)  ((desc)->olc_mobile)
+#define GET_OLC_MORPH(desc)  ((desc)->olc_morph)
 #define GET_OLC_OBJECT(desc)  ((desc)->olc_object)
 #define GET_OLC_ROOM_TEMPLATE(desc)  ((desc)->olc_room_template)
 #define GET_OLC_SECTOR(desc)  ((desc)->olc_sector)
@@ -616,10 +617,12 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 
 #define MORPH_ABILITY(mph)  ((mph)->ability)
 #define MORPH_APPLIES(mph)  ((mph)->applies)
+#define MORPH_ATTACK_TYPE(mph)  ((mph)->attack_type)
 #define MORPH_COST(mph)  ((mph)->cost)
 #define MORPH_COST_TYPE(mph)  ((mph)->cost_type)
 #define MORPH_FLAGS(mph)  ((mph)->flags)
 #define MORPH_LONG_DESC(mph)  ((mph)->long_desc)
+#define MORPH_MAX_SCALE(mph)  ((mph)->max_scale)
 #define MORPH_NAME(mph)  ((mph)->name)
 #define MORPH_REQUIRES_OBJ(mph)  ((mph)->requires_obj)
 #define MORPH_SHORT_DESC(mph)  ((mph)->short_desc)

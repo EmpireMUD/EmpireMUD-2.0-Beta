@@ -1951,13 +1951,15 @@ struct morph_data {
 	char *short_desc;	// short description (a bat)
 	char *long_desc;	// long description (seen in room)
 	
-	bitvector_t flags;	// MORPHF_x flags
+	bitvector_t flags;	// MORPHF_ flags
+	int attack_type;	// TYPE_ flags
 	struct apply_data *applies;	// how it modifies players
 	
 	int cost_type;	// any pool (NUM_POOLS)
 	int cost;	// amount it costs in that pool
 	any_vnum ability;	// required ability or NO_ABIL
 	obj_vnum requires_obj;	// required item or NOTHING
+	int max_scale;	// highest possible level
 	
 	UT_hash_handle hh;	// morph_table hash
 	UT_hash_handle sorted_hh;	// sorted_morphs hash
@@ -2581,6 +2583,7 @@ struct descriptor_data {
 	char *olc_storage;	// a character buffer created and used by some olc modes
 	any_vnum olc_vnum;	// vnum being edited
 	
+	// OLC_x: olc types
 	ability_data *olc_ability;	// abil being edited
 	adv_data *olc_adventure;	// adv being edited
 	archetype_data *olc_archetype;	// arch being edited
@@ -2589,6 +2592,7 @@ struct descriptor_data {
 	class_data *olc_class;	// class being edited
 	obj_data *olc_object;	// item being edited
 	char_data *olc_mobile;	// mobile being edited
+	morph_data *olc_morph;	// morph being edited
 	craft_data *olc_craft;	// craft recipe being edited
 	bld_data *olc_building;	// building being edited
 	crop_data *olc_crop;	// crop being edited

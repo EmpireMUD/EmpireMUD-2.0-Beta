@@ -5095,6 +5095,7 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 	void parse_augment(FILE *fl, any_vnum vnum);
 	void parse_book(FILE *fl, int book_id);
 	void parse_class(FILE *fl, any_vnum vnum);
+	void parse_morph(FILE *fl, any_vnum vnum);
 	void parse_skill(FILE *fl, any_vnum vnum);
 	void parse_vehicle(FILE *fl, any_vnum vnum);
 	
@@ -5585,7 +5586,7 @@ void save_library_file_for_vnum(int type, any_vnum vnum) {
 			morph_data *morph, *next_morph;
 			HASH_ITER(hh, morph_table, morph, next_morph) {
 				if (MORPH_VNUM(morph) >= (zone * 100) && MORPH_VNUM(morph) <= (zone * 100 + 99)) {
-					write_morph_to_file(fl, aug);
+					write_morph_to_file(fl, morph);
 				}
 			}
 			break;

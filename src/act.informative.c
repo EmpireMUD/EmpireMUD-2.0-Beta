@@ -48,7 +48,6 @@ extern struct instance_data *find_instance_by_room(room_data *room, bool check_h
 extern char *get_room_name(room_data *room, bool color);
 extern char *list_harnessed_mobs(vehicle_data *veh);
 void look_at_vehicle(vehicle_data *veh, char_data *ch);
-extern char *morph_string(char_data *ch, byte type);
 
 // local protos
 ACMD(do_affects);
@@ -964,7 +963,7 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 
 	// For morphs, we show a description
 	if (IS_MORPHED(i)) {
-		act(morph_string(i, MORPH_STRING_DESC), FALSE, ch, 0, i, TO_CHAR);
+		act(MORPH_LONG_DESC(GET_MORPH(i)), FALSE, ch, 0, i, TO_CHAR);
 	}
 	
 	// only show this block if the person is not morphed, or the morph is not an npc disguise
@@ -1784,7 +1783,7 @@ ACMD(do_affects) {
 
 	/* Morph */
 	if (IS_MORPHED(ch)) {
-		msg_to_char(ch, "   You are in the form of %s!\r\n", morph_string(ch, MORPH_STRING_NAME));
+		msg_to_char(ch, "   You are in the form of %s!\r\n", MORPH_SHORT_DESC(GET_MORPH(ch)));
 	}
 	else if (IS_DISGUISED(ch)) {
 		msg_to_char(ch, "   You are disguised as %s!\r\n", PERS(ch, ch, 0));
