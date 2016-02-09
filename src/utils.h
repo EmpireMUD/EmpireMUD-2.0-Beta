@@ -616,6 +616,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 //// MORPH UTILS /////////////////////////////////////////////////////////////
 
 #define MORPH_ABILITY(mph)  ((mph)->ability)
+#define MORPH_AFFECTS(mph)  ((mph)->affects)
 #define MORPH_APPLIES(mph)  ((mph)->applies)
 #define MORPH_ATTACK_TYPE(mph)  ((mph)->attack_type)
 #define MORPH_COST(mph)  ((mph)->cost)

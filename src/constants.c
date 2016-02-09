@@ -3033,7 +3033,8 @@ const char *morph_flags[] = {
 	"ARID-AFFINITY",	// 5
 	"TROPICAL-AFFINITY",
 	"CHECK-SOLO",
-	"NO-SLEEP",
+	"!SLEEP",
+	"SCRIPT-ONLY",
 	"\n"
 };
 

@@ -206,6 +206,7 @@ OLC_MODULE(mapedit_unclaimable);
 
 // morph modules
 OLC_MODULE(morphedit_ability);
+OLC_MODULE(morphedit_affects);
 OLC_MODULE(morphedit_apply);
 OLC_MODULE(morphedit_attack);
 OLC_MODULE(morphedit_cost);
@@ -561,6 +562,7 @@ const struct olc_command_data olc_data[] = {
 	
 	// morph commands
 	{ "apply", morphedit_apply, OLC_MORPH, OLC_CF_EDITOR },
+	{ "affects", morphedit_affects, OLC_MORPH, OLC_CF_EDITOR },
 	{ "attack", morphedit_attack, OLC_MORPH, OLC_CF_EDITOR },
 	{ "cost", morphedit_cost, OLC_MORPH, OLC_CF_EDITOR },
 	{ "costtype", morphedit_costtype, OLC_MORPH, OLC_CF_EDITOR },
